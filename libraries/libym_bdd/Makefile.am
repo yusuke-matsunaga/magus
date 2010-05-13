@@ -1,0 +1,32 @@
+## Process this file with automake to produce Makefile.in
+
+## $Id: Makefile.am 33 2006-07-16 14:58:17Z matsunaga $
+
+SUBDIRS = \
+	ym_bdd \
+	base \
+	bmc \
+	bmm \
+	dec \
+	. \
+	tests
+
+INCLUDES = \
+	-I$(top_srcdir)/include
+
+MAINTAINERCLEANFILES = Makefile.in
+
+lib_LTLIBRARIES = libym_bdd.la
+
+libym_bdd_la_LIBADD = \
+	base/libym_bdd_base.la \
+	bmc/libym_bdd_bmc.la \
+	bmm/libym_bdd_bmm.la \
+	dec/libym_bdd_dec.la \
+	$(top_builddir)/libym_lexp/libym_lexp.la \
+	$(top_builddir)/libym_utils/libym_utils.la
+
+libym_bdd_la_LDFLAGS =
+
+libym_bdd_la_SOURCES =
+

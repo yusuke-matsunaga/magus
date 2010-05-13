@@ -1,0 +1,27 @@
+## Process this file with automake to produce Makefile.in
+
+## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+SUBDIRS = \
+	ym_bdn \
+	. \
+	tests
+
+INCLUDES = \
+	-I$(top_srcdir)/include
+
+MAINTAINERCLEANFILES = Makefile.in
+
+lib_LTLIBRARIES = libym_bdn.la
+
+libym_bdn_la_LIBADD = \
+	$(top_builddir)/libym_blif/libym_blif.la \
+	$(top_builddir)/libym_utils/libym_utils.la
+
+libym_bdn_la_LDFLAGS = 
+
+libym_bdn_la_SOURCES = \
+	BdNetwork.cc \
+	BdnBlifWriter.cc \
+	BlifBdnConv.cc
+

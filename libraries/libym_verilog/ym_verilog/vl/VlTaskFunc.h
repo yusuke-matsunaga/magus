@@ -1,0 +1,143 @@
+#ifndef YM_VERILOG_VL_VLTASKFUNC_H
+#define YM_VERILOG_VL_VLTASKFUNC_H
+
+/// @file ym_verilog/vl/VlTaskFunc.h
+/// @brief VlTaskFunc のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// $Id: VlTaskFunc.h 2507 2009-10-17 16:24:02Z matsunaga $
+///
+/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include <ym_verilog/vl/VlNamedObj.h>
+
+
+BEGIN_NAMESPACE_YM_VERILOG
+
+class VlIODecl;
+class VlStmt;
+class VlExpr;
+
+//////////////////////////////////////////////////////////////////////
+/// @class VlFunction VlTaskFunc.h "VlTaskFunc.h"
+/// @brief elaboration 中の function を表すクラス
+/// IEEE Std 1364-2001 26.6.18 Task, function declaration
+//////////////////////////////////////////////////////////////////////
+class VlFunction :
+  public VlNamedObj
+{
+protected:
+	      
+  /// @brief デストラクタ
+  virtual
+  ~VlFunction() { }
+  
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlFunction の仮想関数
+  //////////////////////////////////////////////////////////////////////
+  
+  /// @brief function type を返す．
+  virtual
+  tVpiFuncType
+  func_type() const = 0;
+  
+  /// @brief automatic 宣言されていたら true を返す．
+  virtual
+  bool
+  automatic() const = 0;
+
+  /// @brief 符号の取得
+  /// @retval true 符号つき
+  /// @retval false 符号なし
+  virtual
+  bool
+  is_signed() const = 0;
+  
+  /// @brief 範囲のMSBの取得
+  /// @retval 範囲のMSB 範囲を持つとき
+  /// @retval NULL 範囲を持たないとき
+  virtual
+  const VlExpr*
+  left_range() const = 0;
+
+  /// @brief 範囲のLSBの取得
+  /// @retval 範囲のLSB 範囲を持つとき
+  /// @retval NULL 範囲を持たないとき
+  virtual
+  const VlExpr*
+  right_range() const = 0;
+  
+  /// @brief 出力のビット幅を返す．
+  virtual
+  ymuint32
+  bit_size() const = 0;
+  
+  /// @brief 入出力数を得る．
+  virtual
+  ymuint32
+  io_num() const = 0;
+
+  /// @brief 入出力の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
+  virtual
+  const VlIODecl*
+  io(ymuint32 pos) const = 0;
+  
+  /// @brief 本体のステートメントを得る．
+  virtual
+  const VlStmt*
+  stmt() const = 0;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VlTask VlTaskFunc.h "VlTaskFunc.h"
+/// @brief elaboration 中の task を表すクラス
+/// IEEE Std 1364-2001 26.6.18 Task, function declaration
+//////////////////////////////////////////////////////////////////////
+class VlTask :
+  public VlNamedObj
+{
+protected:
+	      
+  /// @brief デストラクタ
+  virtual
+  ~VlTask() { }
+  
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlTask の仮想関数
+  //////////////////////////////////////////////////////////////////////
+  
+  /// @brief automatic 宣言されていたら true を返す．
+  virtual
+  bool
+  automatic() const = 0;
+  
+  /// @brief 入出力数を得る．
+  virtual
+  ymuint32
+  io_num() const = 0;
+
+  /// @brief 入出力の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
+  virtual
+  const VlIODecl*
+  io(ymuint32 pos) const = 0;
+  
+  /// @brief 本体のステートメントを得る．
+  virtual
+  const VlStmt*
+  stmt() const = 0;
+  
+};
+
+END_NAMESPACE_YM_VERILOG
+
+#endif // LiBYM_VERILOG_ELABORATOR_VLTASKFUNC_H

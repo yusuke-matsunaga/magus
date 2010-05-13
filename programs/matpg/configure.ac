@@ -1,0 +1,170 @@
+# Process this file with autoconf to produce a configure script
+dnl
+# $Id: configure.ac 2507 2009-10-17 16:24:02Z matsunaga $
+
+# ===================================================================
+# Initial block
+# ===================================================================
+AC_REVISION($Rev: 2507 $)dnl
+
+AC_INIT([matpg], [1.0],
+        [yusuke_matsunaga@ieee.org], 
+        [matpg])dnl
+
+AC_PREREQ(2.57)dnl
+
+AC_COPYRIGHT([
+Copyright (C) 2006-2009 Yusuke Matsunaga
+All rights reserved.
+])dnl
+
+AC_CONFIG_SRCDIR([include/matpg_nsdef.h])dnl
+
+AC_CONFIG_AUX_DIR([config])dnl
+AC_CONFIG_MACRO_DIR([config])dnl
+AC_SUBST(ac_aux_dir)dnl
+
+AM_INIT_AUTOMAKE()dnl
+
+AC_CONFIG_HEADERS([matpg_config.h])dnl
+
+AC_DEFINE_UNQUOTED(MATPG_VERSION, "${VERSION}", [ATPG version])dnl
+
+# ===================================================================
+# Checks for programs
+# ===================================================================
+AC_ISC_POSIX
+AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_LN_S
+AC_PROG_INSTALL
+AC_PROG_YACC
+AM_PROG_LEX
+AC_PROG_LIBTOOL
+AC_CHECK_PROG([DOXYGEN],
+	      [doxygen], 
+	      [doxygen Doxyfile],
+	      [@echo \"You'll need to install 'doxygen'\"])
+AC_SUBST(DOXYGEN)
+
+if test $enable_shared = no; then
+  AC_DEFINE(BUILD_STATIC, 1, [Define for doing static link])
+  AM_LDFLAGS="-static"
+  AC_SUBST(AM_LDFLAGS)
+fi
+
+# ===================================================================
+# Checks for libraries
+# ===================================================================
+
+# ===================================================================
+# Checks for header files
+# ===================================================================
+AC_HEADER_STDC
+AC_HEADER_TIME
+AC_CHECK_HEADERS([limits.h strings.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([pwd.h sys/stat.h sys/param.h])
+AC_CHECK_HEADERS([math.h])
+AC_CHECK_HEADERS([zlib.h], [has_zlib_h=1], [has_zlib_h=0])
+
+# ===================================================================
+# Checks for typedefs, structures, and compiler characteristics
+# ===================================================================
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+# ===================================================================
+# Check for size of built-in types
+# ===================================================================
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(unsigned char)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(unsigned int)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(unsigned long)
+AC_CHECK_SIZEOF(void*)
+AC_CHECK_SIZEOF(size_t)
+
+_AC_COMPUTE_INT([__alignof__ (double)], ym_alignof_double)
+AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
+
+# ===================================================================
+# Check for return type of signal handler
+# ===================================================================
+AC_TYPE_SIGNAL
+
+# ===================================================================
+# Checks for library functions
+# ===================================================================
+AC_FUNC_ALLOCA
+AC_CHECK_FUNCS([random lrand48], break)
+AC_CHECK_FUNCS([getrusage times], break)
+AC_CHECK_FUNCS([getcwd gettimeofday strtod])
+
+# ===================================================================
+# Check for popt
+# ===================================================================
+YM_CHECK_POPT
+
+# ===================================================================
+# Check for TCL environment
+# ===================================================================
+YM_CHECK_TCL
+
+# ===================================================================
+# Check for tclreadline
+# ===================================================================
+YM_CHECK_TCLREADLINE
+
+# ===================================================================
+# Check for ymtools
+# ===================================================================
+YM_CHECK_YMLIBS
+
+YM_CHECK_LIBS([libym_utils])
+YM_CHECK_LIBS([libym_tclpp])
+YM_CHECK_LIBS([libym_blif])
+YM_CHECK_LIBS([libym_iscas89])
+YM_CHECK_LIBS([libym_lexp])
+YM_CHECK_LIBS([libym_tgnet])
+
+# ===================================================================
+# Check for C++ language
+# ===================================================================
+AC_LANG_CPLUSPLUS
+
+# ===================================================================
+# Set 'matpg' directory
+# ===================================================================
+AC_ARG_WITH(matpg-library,
+[  --with-matpg-library=DIR package dependent directory],
+[MATPG_LIBDIR=$withval],
+[MATPG_LIBDIR='${prefix}/lib/AC_PACKAGE_NAME[]AC_PACKAGE_VERSION'])dnl
+AC_SUBST(MATPG_LIBDIR)dnl
+
+MATPG_DATADIR='${prefix}/share/AC_PACKAGE_NAME[]AC_PACKAGE_VERSION'
+AC_SUBST(MATPG_DATADIR)dnl
+
+MATPG_BINDIR='${bindir}'
+AC_SUBST(MATPG_BINDIR)dnl
+
+# ===================================================================
+# Declare files to be generated by configure script
+# ===================================================================
+AC_CONFIG_FILES([
+	Makefile
+	include/Makefile
+	src/Makefile
+	src/libmatpg/Makefile
+	src/matpg_tclsh/Makefile
+	tclsrc/Makefile
+	])
+
+# ===================================================================
+# Generate configured files
+# ===================================================================
+AC_OUTPUT
+
+# End-Of-File
