@@ -4,8 +4,8 @@
 
 
 SUBDIRS = \
-	ym_utils \
 	. \
+	ym_utils \
 	tests
 
 MAINTAINERCLEANFILES = Makefile.in

@@ -61,6 +61,8 @@ _AC_COMPUTE_INT([__GNUC__], ym_gnuc)
 # Checks for libraries
 # ===================================================================
 
+AC_CHECK_LIB([z], [compress], [ym_have_libz=yes])
+
 
 # ===================================================================
 # Checks for header files
@@ -128,6 +130,14 @@ AC_CACHE_SAVE
 # ===================================================================
 # Checks for other packages
 # ===================================================================
+
+# Check for zlib
+if test "x$ym_have_zlib_h" = xyes -a "x$ym_have_libz" = xyes; then
+   ym_have_zlib=1
+else
+   ym_have_zlib=0
+fi
+AC_DEFINE_UNQUOTED([HAVE_ZLIB], $ym_have_zlib, [Define if you have zlib.h])
 
 # Check for gmp
 YM_CHECK_GMP
@@ -468,6 +478,14 @@ YM_ADD_LIBRARIES_SUBDIRS([libym_utils])
 AC_CONFIG_FILES([libraries/libym_utils/Makefile])
 AC_CONFIG_FILES([libraries/libym_utils/ym_utils/Makefile])
 AC_CONFIG_FILES([libraries/libym_utils/tests/Makefile])
+
+# libym_zstream
+if test "$ym_have_zlib" = 1; then
+YM_ADD_LIBRARIES_SUBDIRS([libym_zstream])
+AC_CONFIG_FILES([libraries/libym_zstream/Makefile])
+AC_CONFIG_FILES([libraries/libym_zstream/ym_zstream/Makefile])
+AC_CONFIG_FILES([libraries/libym_zstream/tests/Makefile])
+fi
 
 YM_FINISH_LIBRARIES_SUBDIRS
 

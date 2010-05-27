@@ -10,7 +10,7 @@ fi
 . ${srcdir}/local_defs
 
 # this is the test data
-TEST_SRC=${top_srcdir}/data/libym_sat/frb30-15-cnf/frb30-15-1.cnf
+TEST_SRC=${top_srcdir}/libraries/libym_zstream/tests/frb30-15-1.cnf
 TEST_DST=zstream_test_data.1
 TEST_DST2=zstream_test_data.2
 

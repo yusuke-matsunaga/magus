@@ -16,6 +16,7 @@
 # ===================================================================
 # Checks for popt package
 AC_DEFUN([YM_CHECK_POPT],[dnl
+AC_MSG_NOTICE([checking if popt is available])
 #
 arch=`uname -p`
 if test "X$arch" = "Xx86_64"; then
@@ -57,6 +58,10 @@ for p in $popt_list; do
   fi
 done
 LIBS=$libs_old
-AS_IF([test $popt_found = 1], [$1], [$2])
+if test $gmp_found = 1; then
+   AC_MSG_RESULT([popt is found at $POPT_LIBS])
+else
+   AC_MSG_RESULT([popt is not found])
+fi
 ])dnl
 # end of popt.m4

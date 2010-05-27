@@ -2,7 +2,10 @@
 
 ## $Id: Makefile.am 467 2007-03-22 07:54:05Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = \
+	. \
+	ym_zstream \
+	tests
 
 MAINTAINERCLEANFILES = Makefile.in
 

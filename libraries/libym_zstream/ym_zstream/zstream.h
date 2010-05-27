@@ -11,13 +11,13 @@
 /// All rights reserved.
 
 
-#if !defined(HAVE_ZLIB_H)
-#error "<ym_utils/zstream.h> requires <zlib.h>"
-#endif
-
-
 #include "ymtools.h"
+
+#if defined(HAVE_ZLIB)
 #include <zlib.h>
+#else
+#error "\"ym_utils/zstream.h\" requires <zlib.h>"
+#endif
 
 
 BEGIN_NAMESPACE_YM
