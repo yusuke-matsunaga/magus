@@ -7,11 +7,11 @@
 ///
 /// $Id: RefCount.h 1143 2008-01-04 07:27:17Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 
 BEGIN_NAMESPACE_YM

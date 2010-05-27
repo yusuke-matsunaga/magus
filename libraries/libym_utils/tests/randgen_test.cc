@@ -3,11 +3,8 @@
 // RandGen のテスト
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
+#include "ym_utils/RandGen.h"
 
-#include <ym_utils/RandGen.h>
 
 int
 main(int argc,

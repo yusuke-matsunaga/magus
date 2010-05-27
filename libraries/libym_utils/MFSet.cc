@@ -5,16 +5,11 @@
 ///
 /// $Id: MFSet.cc 958 2007-08-28 05:38:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-// 併合と検索のみの演算を対象とした集合の抽象データ型
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_utils/MFSet.h>
+#include "ym_utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -36,6 +31,9 @@ private:
   
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
 
   // 一つの母集合の中でユニークなID番号
   id_type mId;

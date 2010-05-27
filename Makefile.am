@@ -7,7 +7,7 @@ SUBDIRS = \
 	libraries \
 	programs
 
-CLEANFILES = ymConfig.sh ymconfig.h ymtools.h
+CLEANFILES = ymconfig.h ymtools.h
 CLEANFILES += doxygen.warnings
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -25,7 +25,7 @@ EXTRA_DIST = \
 	etc/common_defs \
 	etc/mk.subr \
 	m4macros/autotroll.m4 \
-	m4macros/gmp.m4 \
+	m4macros/gmp.m4 
 	m4macros/popt.m4 \
 	m4macros/qscintilla2.m4 \
 	m4macros/tcl.m4 \
@@ -33,13 +33,6 @@ EXTRA_DIST = \
 	mkautogen \
 	modules \
 	ymconfig.h.in
-
-ymincludedir = $(YMINCLUDEDIR)
-yminclude_HEADERS = \
-	ymtools.h
-
-ymlibdir = $(YMLIBDIR)
-ymlib_SCRIPTS = ymConfig.sh
 
 
 dox:

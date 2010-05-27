@@ -2,11 +2,9 @@
 
 // HeapTree のテスト
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_utils/HeapTree.h>
+#include "ym_utils/HeapTree.h"
+
 
 using namespace std;
 using namespace nsYm;

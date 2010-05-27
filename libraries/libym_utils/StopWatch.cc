@@ -5,13 +5,11 @@
 ///
 /// $Id: StopWatch.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
+#include "ym_utils/StopWatch.h"
 
 #if HAVE_GETRUSAGE
 #  include <sys/resource.h>
@@ -22,8 +20,6 @@
 #else
 #  error "neither getrusage() nor times() are found."
 #endif
-
-#include <ym_utils/StopWatch.h>
 
 
 BEGIN_NAMESPACE_YM

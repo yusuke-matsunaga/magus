@@ -5,10 +5,11 @@
 ///
 /// $Id: Binder.cc 33 2006-07-16 14:58:17Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // もとは MT19937 のコードを流用している．
+// 以下はオリジナルの copyright notice
 /* 
    A C-program for MT19937, with initialization improved 2002/1/26.
    Coded by Takuji Nishimura and Makoto Matsumoto.
@@ -55,11 +56,7 @@
 */
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_utils/RandGen.h>
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM

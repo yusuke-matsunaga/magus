@@ -5,15 +5,11 @@
 ///
 /// $Id: UnitAlloc.cc 958 2007-08-28 05:38:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_utils/Alloc.h>
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM

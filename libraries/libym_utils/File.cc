@@ -5,13 +5,12 @@
 ///
 /// $Id: File.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
+#include "ym_utils/File.h"
+
 
 /// @todo pwd.h や sys/param.h がないときの対処
 #if HAVE_PWD_H
@@ -20,8 +19,6 @@
 #if HAVE_SYS_PARAM_H
 #  include <sys/param.h>
 #endif
-
-#include <ym_utils/File.h>
 
 
 BEGIN_NAMESPACE_YM

@@ -7,11 +7,11 @@
 ///
 /// $Id: random.h 400 2007-03-06 17:58:07Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 
 BEGIN_NAMESPACE_YM

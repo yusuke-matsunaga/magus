@@ -2,14 +2,12 @@
 
 // nsMagus::MultiCombiGen のテスト
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_utils/Generator.h>
+#include "ym_utils/Generator.h"
 
 int
-main(int argc, char** argv)
+main(int argc,
+     char** argv)
 {
   using namespace nsYm;
   try {

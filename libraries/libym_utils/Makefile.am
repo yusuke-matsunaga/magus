@@ -10,15 +10,10 @@ SUBDIRS = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_utils.la
+noinst_LTLIBRARIES = libym_utils.la
 
-libym_utils_CPPFLAGS = \
-	-I$(top_srcdir)/../../include \
-	-I$(top_builddir)/../..
-
-INCLUDES = \
-	-I$(top_srcdir)/../../include \
-	-I$(top_builddir)/../..
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/include
 
 libym_utils_la_SOURCES = \
 	ItvlCell.h \

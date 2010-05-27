@@ -2,11 +2,8 @@
 
 // StrBuff のテスト
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_utils/StrBuff.h>
+#include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -43,7 +40,8 @@ dump_pos(StrBuff::size_type pos)
 END_NAMESPACE_YM
 
 int
-main(int argc, char** argv)
+main(int argc,
+     char** argv)
 {
   using namespace nsYm;
 

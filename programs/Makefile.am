@@ -4,36 +4,8 @@
 
 
 SUBDIRS = \
-	libraries \
+	$(YM_PROGRAMS_SUBDIRS)
 	programs
 
-CLEANFILES = doxygen.warnings
-
 MAINTAINERCLEANFILES = Makefile.in
-
-EXTRA_DIST = \
-	BUILDING \
-	Doxyfile.in \
-	acinclude.m4 \
-	aclocal.m4 \
-	configure \
-	configure.ac \
-	mk \
-	mkautogen \
-	modules \
-	etc/autogen.tmpl \
-	etc/autotroll.mk \
-	etc/common_defs \
-	etc/mk.subr \
-	m4macros/autotroll.m4 \
-	m4macros/gmp.m4 \
-	m4macros/popt.m4 \
-	m4macros/qscintilla2.m4 \
-	m4macros/tcl.m4 \
-	m4macros/ymlibs.m4
-
-dox:
-	@DOXYGEN@
-
-
 

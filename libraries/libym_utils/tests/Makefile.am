@@ -43,7 +43,7 @@ noinst_PROGRAMS = \
 	dllist_test \
 	heaptree_test
 
-YMUTILS = $(top_builddir)/libym_utils/libym_utils.la
+YMUTILS = ../libym_utils.la
 
 file_test_SOURCES = \
 	file_test.cc 

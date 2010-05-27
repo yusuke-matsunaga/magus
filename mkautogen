@@ -41,7 +41,7 @@ testdir="$BASEDIR/test/$BASENAME"
 MODES="opt debug prof"
 for mode in $MODES
 do
-  ./mk autogen $builddir/$mode $testdir/$mode $mode
+  ./boot.sh autogen $builddir/$mode $testdir/$mode $mode
 done
 
 # 根元の Makefile の生成

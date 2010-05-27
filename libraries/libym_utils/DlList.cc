@@ -5,11 +5,11 @@
 ///
 /// $Id: DlList.cc 461 2007-03-21 18:07:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_utils/DlList.h>
+#include "ym_utils/DlList.h"
 
 
 BEGIN_NAMESPACE_YM

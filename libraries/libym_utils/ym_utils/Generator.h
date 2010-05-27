@@ -7,7 +7,7 @@
 ///
 /// $Id: Generator.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup GeneratorGroup 組み合わせ生成器と順列生成器
@@ -26,7 +26,7 @@
 /// 反復子から値を取り出すには () 演算子を用いる．
 
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 
 BEGIN_NAMESPACE_YM

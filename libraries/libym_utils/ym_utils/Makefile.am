@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymutilsincludedir = $(YMINCLUDEDIR)/ym_utils
-ymutilsinclude_HEADERS = \
+noinst_HEADERS = \
 	Alloc.h \
 	Binder.h \
 	DlList.h \
@@ -27,5 +26,4 @@ ymutilsinclude_HEADERS = \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \
-	random.h \
-	zstream.h
+	random.h

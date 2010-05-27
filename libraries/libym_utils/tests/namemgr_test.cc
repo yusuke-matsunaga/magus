@@ -2,14 +2,12 @@
 
 // NameMgr のテスト
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_utils/NameMgr.h>
+#include "ym_utils/NameMgr.h"
 
 int
-main(int argc, char** argv)
+main(int argc,
+     char** argv)
 {
   using namespace nsYm;
 

@@ -7,7 +7,7 @@
 ///
 /// $Id: Binder.h 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BinderGroup 汎用バインダ
@@ -28,7 +28,7 @@
 /// データを伝えるテンプレートクラス T<n>Binder を用意している．
 
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 
 BEGIN_NAMESPACE_YM

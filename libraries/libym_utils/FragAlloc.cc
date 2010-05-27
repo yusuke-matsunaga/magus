@@ -5,15 +5,11 @@
 ///
 /// $Id: FragAlloc.cc 1052 2007-10-24 11:08:51Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_utils/Alloc.h>
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM

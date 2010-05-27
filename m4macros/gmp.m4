@@ -6,7 +6,7 @@
 # All rights reserved.
 
 # ===================================================================
-# YM_CHECK_GMP(action-if-found, action-if-not-found)
+# YM_CHECK_GMP
 # if found, the following shell-variables are defined
 # GMP_INCLUDES
 # GMP_LIBS
@@ -16,6 +16,7 @@
 # ===================================================================
 # Checks for gmp package
 AC_DEFUN([YM_CHECK_GMP],[dnl
+AC_MSG_NOTICE([checking if gmp is available])
 #
 arch=`uname -p`
 if test "X$arch" = "Xx86_64"; then
@@ -59,6 +60,10 @@ for p in $gmp_list; do
   fi
 done
 LIBS=$libs_old
-AS_IF([test $gmp_found = 1], [$1], [$2])
+if test $gmp_found = 1; then
+   AC_MSG_RESULT([gmp is found at $GMP_LIBS])
+else
+   AC_MSG_RESULT([gmp is not found, see http://gmplib.org/])
+fi
 ])dnl
-# end of popt.m4
+# end of gmp.m4

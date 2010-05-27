@@ -106,3 +106,67 @@ else
 fi
 ])
 ]
+
+
+# ==================================================================
+# YM_INIT_LIBRARIES_SUBDIRS
+# 
+# Description: Initialize 'YM_LIBRARIES_DSUBIRS'
+# ==================================================================
+AC_DEFUN([YM_INIT_LIBRARIES_SUBDIRS], 
+[
+ym_libraries_subdirs=""
+])
+
+
+# ==================================================================
+# YM_ADD_LIBRARIES_SUBDIRS(dirname)
+#
+# Description: add <dirname> to 'YM_LIBRARIES_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_ADD_LIBRARIES_SUBDIRS], 
+[
+ym_libraries_subdirs="$ym_libraries_subdirs $1"
+])
+
+
+# ==================================================================
+# YM_FINISH_LIBRARIES_SUBDIRS
+#
+# Description: finalize 'YM_LIBRARIES_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_FINISH_LIBRARIES_SUBDIRS], [
+AC_SUBST(YM_LIBRARIES_SUBDIRS, $ym_libraries_subdirs)
+])
+
+
+# ==================================================================
+# YM_INIT_PROGRAMS_SUBDIRS
+# 
+# Description: Initialize 'YM_PROGRAMS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_INIT_PROGRAMS_SUBDIRS], 
+[
+ym_pgorams_subdirs=""
+])
+
+
+# ==================================================================
+# YM_ADD_PROGRAMS_SUBDIRS(dirname)
+#
+# Description: add <dirname> to 'YM_PROGRAMS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_ADD_PROGRAMS_SUBDIRS], 
+[
+ym_programs_subdirs="$ym_programs_subdirs $1"
+])
+
+
+# ==================================================================
+# YM_FINISH_PROGRAMS_SUBDIRS
+#
+# Description: finalize 'YM_PROGRAMS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_FINISH_PROGRAMS_SUBDIRS], [
+AC_SUBST(YM_PROGRAMS_SUBDIRS, $ym_programs_subdirs)
+])
