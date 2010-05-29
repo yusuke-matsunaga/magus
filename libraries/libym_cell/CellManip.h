@@ -7,14 +7,15 @@
 ///
 /// $Id: CellManip.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_cell/cell_nsdef.h>
-#include <ym_cell/cell_type.h>
+
+#include "ym_cell/cell_nsdef.h"
+#include "ym_cell/cell_type.h"
 #include "CellPinImpl.h"
-#include <ym_cell/CellLut.h>
-#include <ym_cell/CellBus.h>
+#include "ym_cell/CellLut.h"
+#include "ym_cell/CellBus.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

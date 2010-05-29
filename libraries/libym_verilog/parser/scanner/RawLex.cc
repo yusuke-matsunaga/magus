@@ -5,17 +5,13 @@
 ///
 /// $Id: RawLex.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include "RawLex.h"
 
-#include <ym_verilog/VlLineWatcher.h>
+#include "ym_verilog/VlLineWatcher.h"
 
 #include "LexPlugin.h"
 #include "LexState.h"

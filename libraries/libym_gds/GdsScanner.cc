@@ -5,18 +5,14 @@
 ///
 /// $Id: GdsScanner.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_gds/GdsScanner.h>
-#include <ym_gds/GdsRecMgr.h>
-#include <ym_gds/GdsRecord.h>
-#include <ym_gds/Msg.h>
+#include "ym_gds/GdsScanner.h"
+#include "ym_gds/GdsRecMgr.h"
+#include "ym_gds/GdsRecord.h"
+#include "ym_gds/Msg.h"
 #include "GdsRecTable.h"
 
 

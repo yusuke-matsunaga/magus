@@ -12,11 +12,11 @@ INCLUDES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_bdn.la
+noinst_LTLIBRARIES = libym_bdn.la
 
 libym_bdn_la_LIBADD = \
-	$(top_builddir)/libym_blif/libym_blif.la \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_blif/libym_blif.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 libym_bdn_la_LDFLAGS = 
 

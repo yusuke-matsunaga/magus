@@ -487,6 +487,123 @@ AC_CONFIG_FILES([libraries/libym_zstream/ym_zstream/Makefile])
 AC_CONFIG_FILES([libraries/libym_zstream/tests/Makefile])
 fi
 
+# libym_lexp
+YM_ADD_LIBRARIES_SUBDIRS([libym_lexp])
+AC_CONFIG_FILES([libraries/libym_lexp/Makefile])
+AC_CONFIG_FILES([libraries/libym_lexp/ym_lexp/Makefile])
+AC_CONFIG_FILES([libraries/libym_lexp/tests/Makefile])
+
+# libym_bdd
+YM_ADD_LIBRARIES_SUBDIRS([libym_bdd])
+AC_CONFIG_FILES([libraries/libym_bdd/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdd/ym_bdd/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdd/base/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdd/bmc/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdd/bmm/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdd/dec/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdd/tests/Makefile])
+
+# libym_npn
+YM_ADD_LIBRARIES_SUBDIRS([libym_npn])
+AC_CONFIG_FILES([libraries/libym_npn/Makefile])
+AC_CONFIG_FILES([libraries/libym_npn/ym_npn/Makefile])
+AC_CONFIG_FILES([libraries/libym_npn/utils/Makefile])
+AC_CONFIG_FILES([libraries/libym_npn/tests/Makefile])
+
+# libym_sat
+YM_ADD_LIBRARIES_SUBDIRS([libym_sat])
+AC_CONFIG_FILES([libraries/libym_sat/Makefile])
+AC_CONFIG_FILES([libraries/libym_sat/ym_sat/Makefile])
+AC_CONFIG_FILES([libraries/libym_sat/analyzer/Makefile])
+AC_CONFIG_FILES([libraries/libym_sat/MiniSat/Makefile])
+AC_CONFIG_FILES([libraries/libym_sat/tests/Makefile])
+
+# libym_mincov
+YM_ADD_LIBRARIES_SUBDIRS([libym_mincov])
+AC_CONFIG_FILES([libraries/libym_mincov/Makefile])
+AC_CONFIG_FILES([libraries/libym_mincov/ym_mincov/Makefile])
+AC_CONFIG_FILES([libraries/libym_mincov/tests/Makefile])
+
+# libym_blif
+YM_ADD_LIBRARIES_SUBDIRS([libym_blif])
+AC_CONFIG_FILES([libraries/libym_blif/Makefile])
+AC_CONFIG_FILES([libraries/libym_blif/ym_blif/Makefile])
+AC_CONFIG_FILES([libraries/libym_blif/tests/Makefile])
+
+# libym_iscas89
+YM_ADD_LIBRARIES_SUBDIRS([libym_iscas89])
+AC_CONFIG_FILES([libraries/libym_iscas89/Makefile])
+AC_CONFIG_FILES([libraries/libym_iscas89/ym_iscas89/Makefile])
+AC_CONFIG_FILES([libraries/libym_iscas89/tests/Makefile])
+
+# libym_cell
+YM_ADD_LIBRARIES_SUBDIRS([libym_cell])
+AC_CONFIG_FILES([libraries/libym_cell/Makefile])
+AC_CONFIG_FILES([libraries/libym_cell/ym_cell/Makefile])
+AC_CONFIG_FILES([libraries/libym_cell/mislib/Makefile])
+AC_CONFIG_FILES([libraries/libym_cell/dotlib/Makefile])
+AC_CONFIG_FILES([libraries/libym_cell/tests/Makefile])
+
+# libym_verilog
+YM_ADD_LIBRARIES_SUBDIRS([libym_verilog])
+AC_CONFIG_FILES([libraries/libym_verilog/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/ym_verilog/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/ym_verilog/pt/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/ym_verilog/vl/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/common/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/parser/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/parser/include/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/parser/main/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/parser/scanner/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/parser/pt_mgr/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/parser/spt/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/parser/cpt/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/elaborator/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/elaborator/include/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/elaborator/main/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/elaborator/elb_mgr/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/elaborator/ei/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/tests/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/tests/vltest/Makefile])
+AC_CONFIG_FILES([libraries/libym_verilog/tests/vlview/Makefile])
+
+# libym_bnet
+YM_ADD_LIBRARIES_SUBDIRS([libym_bnet])
+AC_CONFIG_FILES([libraries/libym_bnet/Makefile])
+AC_CONFIG_FILES([libraries/libym_bnet/ym_bnet/Makefile])
+AC_CONFIG_FILES([libraries/libym_bnet/tests/Makefile])
+
+# libym_bdn
+YM_ADD_LIBRARIES_SUBDIRS([libym_bdn])
+AC_CONFIG_FILES([libraries/libym_bdn/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdn/ym_bdn/Makefile])
+AC_CONFIG_FILES([libraries/libym_bdn/tests/Makefile])
+
+# libym_aig
+YM_ADD_LIBRARIES_SUBDIRS([libym_aig])
+AC_CONFIG_FILES([libraries/libym_aig/Makefile])
+AC_CONFIG_FILES([libraries/libym_aig/ym_aig/Makefile])
+AC_CONFIG_FILES([libraries/libym_aig/tests/Makefile])
+
+# libym_tgnet
+YM_ADD_LIBRARIES_SUBDIRS([libym_tgnet])
+AC_CONFIG_FILES([libraries/libym_tgnet/Makefile])
+AC_CONFIG_FILES([libraries/libym_tgnet/ym_tgnet/Makefile])
+AC_CONFIG_FILES([libraries/libym_tgnet/tests/Makefile])
+
+# libym_gds
+YM_ADD_LIBRARIES_SUBDIRS([libym_gds])
+AC_CONFIG_FILES([libraries/libym_gds/Makefile])
+AC_CONFIG_FILES([libraries/libym_gds/ym_gds/Makefile])
+AC_CONFIG_FILES([libraries/libym_gds/tests/Makefile])
+
+# libym_tclpp
+YM_ADD_LIBRARIES_SUBDIRS([libym_tclpp])
+AC_CONFIG_FILES([libraries/libym_tclpp/Makefile])
+AC_CONFIG_FILES([libraries/libym_tclpp/ym_tclpp/Makefile])
+AC_CONFIG_FILES([libraries/libym_tclpp/examples/Makefile])
+
+
 YM_FINISH_LIBRARIES_SUBDIRS
 
 

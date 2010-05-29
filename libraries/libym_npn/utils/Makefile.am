@@ -10,7 +10,7 @@ CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-YM_BASE = $(top_builddir)/libym_utils/libym_utils.la
+YM_BASE = $(top_builddir)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
 	symtablegen \

@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymbnetincludedir = $(YMINCLUDEDIR)/ym_bnet
-ymbnetinclude_HEADERS = \
+noinst_HEADERS = \
 	bnet_nsdef.h \
 	BNetwork.h \
 	BNetManip.h \

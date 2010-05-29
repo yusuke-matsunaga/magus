@@ -24,6 +24,6 @@ ym_tclsh_SOURCES = \
 
 
 ym_tclsh_LDADD = \
-	$(top_builddir)/libym_tclpp/libym_tclpp.la \
-	$(top_builddir)/libym_utils/libym_utils.la \
+	$(top_builddir)/libraries/libym_tclpp/libym_tclpp.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la \
 	$(TCL_LDADD)

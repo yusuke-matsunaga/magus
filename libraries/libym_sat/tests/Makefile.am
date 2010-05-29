@@ -22,6 +22,8 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+LIBYM_SAT = $(top_builddir)/libraries/libym_sat/libym_sat.la
+
 noinst_PROGRAMS = \
 	dimacstest
 
@@ -32,14 +34,14 @@ bin_PROGRAMS = \
 dimacstest_SOURCES = \
 	dimacstest.cc
 dimacstest_LDADD = \
-	$(top_builddir)/libym_sat/libym_sat.la
+	$(LIBYM_SAT)
 
 ymsat_SOURCES = \
 	ymsat.cc
 ymsat_LDADD = \
-	$(top_builddir)/libym_sat/libym_sat.la
+	$(LIBYM_SAT)
 
 ymsat2_SOURCES = \
 	ymsat2.cc
 ymsat2_LDADD = \
-	$(top_builddir)/libym_sat/libym_sat.la
+	$(LIBYM_SAT)

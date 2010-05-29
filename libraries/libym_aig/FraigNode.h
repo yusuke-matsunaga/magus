@@ -7,13 +7,13 @@
 /// 
 /// $Id: FraigNode.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_aig/aig_nsdef.h>
-#include <ym_aig/FraigHandle.h>
-#include <ym_utils/RandGen.h>
+#include "ym_aig/aig_nsdef.h"
+#include "ym_aig/FraigHandle.h"
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_AIG

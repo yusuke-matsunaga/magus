@@ -7,11 +7,11 @@
 ///
 /// $Id: BmmFactory.h 497 2007-03-26 15:22:14Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

@@ -5,13 +5,9 @@
 ///
 /// $Id: IdHash.cc 1921 2008-12-21 13:55:05Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "IdHash.h"
 

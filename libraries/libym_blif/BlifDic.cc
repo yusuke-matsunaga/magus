@@ -5,13 +5,9 @@
 ///
 /// $Id: BlifDic.cc 1293 2008-02-21 02:25:52Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "BlifScanner.h"
 

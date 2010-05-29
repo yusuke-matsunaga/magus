@@ -7,12 +7,12 @@
 ///
 /// $Id: BNetIscas89Reader.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bnet/bnet_nsdef.h>
-#include <ym_iscas89/Iscas89Parser.h>
+#include "ym_bnet/bnet_nsdef.h"
+#include "ym_iscas89/Iscas89Parser.h"
 
 
 BEGIN_NAMESPACE_YM_BNET

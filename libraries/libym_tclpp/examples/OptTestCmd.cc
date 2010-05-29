@@ -5,15 +5,12 @@
 ///
 /// $Id: OptTestCmd.cc 1417 2008-05-06 18:12:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "OptTestCmd.h"
-#include <ym_tclpp/TclPopt.h>
+#include "ym_tclpp/TclPopt.h"
 #include <sstream>
 
 

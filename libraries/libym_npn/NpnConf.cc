@@ -5,18 +5,14 @@
 ///
 /// $Id: NpnConf.cc 1508 2008-06-30 04:55:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ymtools.h>
+#include "ymtools.h"
 
 #include "NpnConf.h"
-#include <ym_npn/NpnMgr.h>
+#include "ym_npn/NpnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

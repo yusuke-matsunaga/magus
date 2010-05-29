@@ -5,16 +5,12 @@
 ///
 /// $Id: GdsRecMgr.cc 997 2007-09-07 09:58:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_gds/GdsRecMgr.h>
-#include <ym_gds/GdsRecord.h>
+#include "ym_gds/GdsRecMgr.h"
+#include "ym_gds/GdsRecord.h"
 
 
 BEGIN_NAMESPACE_YM_GDS

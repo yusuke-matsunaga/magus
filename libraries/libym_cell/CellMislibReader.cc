@@ -5,20 +5,16 @@
 ///
 /// $Id: CellMislibReader.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-
-#include <ym_cell/CellMislibReader.h>
-#include <ym_cell/Cell.h>
-#include <ym_cell/CellBus.h>
-#include <ym_cell/CellBundle.h>
-#include <ym_cell/CellTiming.h>
-#include <ym_cell/Msg.h>
+#include "ym_cell/CellMislibReader.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellBus.h"
+#include "ym_cell/CellBundle.h"
+#include "ym_cell/CellTiming.h"
+#include "ym_cell/Msg.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

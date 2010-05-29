@@ -20,6 +20,8 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+LIBYM_GDS = $(top_builddir)/libraries/libym_gds/libym_gds.la
+
 noinst_PROGRAMS = \
 	gdsparse \
 	gdsprint \
@@ -28,12 +30,12 @@ noinst_PROGRAMS = \
 gdsparse_SOURCES = \
 	gdsparse.cc
 gdsparse_LDADD = \
-	../libym_gds.la
+	$(LIBYM_GDS)
 
 gdsprint_SOURCES = \
 	gdsprint.cc
 gdsprint_LDADD = \
-	../libym_gds.la
+	$(LIBYM_GDS)
 
 gdsencode_SOURCES = \
 	gdsencode.cc

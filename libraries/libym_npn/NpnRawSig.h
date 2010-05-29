@@ -7,12 +7,12 @@
 ///
 /// $Id: NpnRawSig.h 1508 2008-06-30 04:55:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_npn/NpnMap.h>
-#include <ym_npn/TvFunc.h>
+#include "ym_npn/NpnMap.h"
+#include "ym_npn/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

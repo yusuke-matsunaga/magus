@@ -5,16 +5,12 @@
 /// 
 /// $Id: MincovMatrix.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_mincov/MincovMatrix.h>
-#include <ym_mincov/MincovCost.h>
+#include "ym_mincov/MincovMatrix.h"
+#include "ym_mincov/MincovCost.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV

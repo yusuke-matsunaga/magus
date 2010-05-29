@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymcellincludedir = $(YMINCLUDEDIR)/ym_cell
-ymcellinclude_HEADERS = \
+noinst_HEADERS = \
 	cell_nsdef.h \
 	cell_type.h \
 	CellPin.h \

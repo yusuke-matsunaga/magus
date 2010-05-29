@@ -29,4 +29,4 @@ noinst_PROGRAMS = \
 parsertest_SOURCES = \
 	parsertest.cc
 parsertest_LDADD = \
-	$(top_builddir)/libym_iscas89/libym_iscas89.la
+	$(top_builddir)/libraries/libym_iscas89/libym_iscas89.la

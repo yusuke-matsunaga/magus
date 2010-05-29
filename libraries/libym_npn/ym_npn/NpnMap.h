@@ -7,12 +7,12 @@
 ///
 /// $Id: NpnMap.h 1594 2008-07-18 10:26:12Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_npn/npn_nsdef.h>
-#include <ym_lexp/Literal.h>
+#include "ym_npn/npn_nsdef.h"
+#include "ym_lexp/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

@@ -6,19 +6,16 @@
 ///
 /// $Id: test_parser.yy 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-  
-#include <ym_mincov/mincov_nsdef.h>
+#include "ym_mincov/mincov_nsdef.h"
 #include "TestMatrix.h"
-  
+
+
 using namespace std;
-  
+
 extern
 int yylex();
 int yyerror(const char*);

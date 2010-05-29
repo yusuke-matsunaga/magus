@@ -5,10 +5,6 @@
 
 /// 単位を表すクラス
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include "Unit.h"
 #include <sstream>
 

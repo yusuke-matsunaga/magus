@@ -7,11 +7,11 @@
 ///
 /// $Id: lexp_types.h 958 2007-08-28 05:38:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_lexp/LogExpr.h>
+#include "ym_lexp/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP

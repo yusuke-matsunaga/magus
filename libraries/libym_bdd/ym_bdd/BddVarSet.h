@@ -7,11 +7,11 @@
 ///
 /// $Id: BddVarSet.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

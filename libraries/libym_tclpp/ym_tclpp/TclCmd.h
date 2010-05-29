@@ -7,12 +7,13 @@
 ///
 /// $Id: TclCmd.h 1417 2008-05-06 18:12:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_tclpp/tclpp_nsdef.h>
-#include <ym_tclpp/TclBase.h>
-#include <ym_tclpp/TclObj.h>
+
+#include "ym_tclpp/tclpp_nsdef.h"
+#include "ym_tclpp/TclBase.h"
+#include "ym_tclpp/TclObj.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP

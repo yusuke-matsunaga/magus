@@ -6,7 +6,7 @@ SUBDIRS =
 
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_mincov
+	-I$(top_srcdir)/libraries/libym_mincov
 
 YFLAGS = -d -v
 
@@ -33,6 +33,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+LIBYM_MINCOV = $(top_builddir)/libraries/libym_mincov/libym_mincov.la
 
 noinst_PROGRAMS = \
 	matrix_test \
@@ -45,17 +46,14 @@ matrix_test_SOURCES = \
 	test_parser.yy \
 	test_lex.ll
 
-matrix_test_LDADD = \
-	$(top_builddir)/libym_mincov/libym_mincov.la
+matrix_test_LDADD = $(LIBYM_MINCOV)
 
 maxclique_test_SOURCES = \
 	maxclique_test.cc
 
-maxclique_test_LDADD = \
-	$(top_builddir)/libym_mincov/libym_mincov.la
+maxclique_test_LDADD = $(LIBYM_MINCOV)
 
 mincov_SOURCES = \
 	mincov.cc
 
-mincov_LDADD = \
-	$(top_builddir)/libym_mincov/libym_mincov.la
+mincov_LDADD = $(LIBYM_MINCOV)

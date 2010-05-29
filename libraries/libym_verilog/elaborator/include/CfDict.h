@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include <ym_verilog/verilog.h>
-#include <ym_utils/Alloc.h>
+#include "ym_verilog/verilog.h"
+#include "ym_utils/Alloc.h"
 
 #include "ElbFwd.h"
 

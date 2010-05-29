@@ -7,7 +7,7 @@
 ///
 /// $Id: verilog.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @namespace nsYm::nsVerilog
@@ -22,8 +22,8 @@
 /// フロントエンド
 
 
-#include <ymtools.h>
-#include <vpi_user.h>
+#include "ymtools.h"
+#include "vpi_user.h"
 
 /// @brief ym_verilog 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_VERILOG \

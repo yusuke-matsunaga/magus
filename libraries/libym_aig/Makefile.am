@@ -15,12 +15,12 @@ INCLUDES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_aig.la
+noinst_LTLIBRARIES = libym_aig.la
 
 libym_aig_la_LIBADD = \
-	$(top_builddir)/libym_sat/libym_sat.la \
-	$(top_builddir)/libym_npn/libym_npn.la \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_sat/libym_sat.la \
+	$(top_builddir)/libraries/libym_npn/libym_npn.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 libym_aig_la_LDFLAGS = 
 

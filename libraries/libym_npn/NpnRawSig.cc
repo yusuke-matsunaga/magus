@@ -5,16 +5,12 @@
 ///
 /// $Id: NpnRawSig.cc 1510 2008-06-30 05:11:10Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ymtools.h>
-#include <ym_npn/TvFunc.h>
+#include "ymtools.h"
+#include "ym_npn/TvFunc.h"
 
 #include "NpnRawSig.h"
 #include "NpnConf.h"

@@ -7,14 +7,14 @@
 ///
 /// $Id: SatSolverImpl.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_sat/SatSolver.h>
-#include <ym_utils/Alloc.h>
-#include <ym_utils/RandGen.h>
-#include <ym_utils/StopWatch.h>
+#include "ym_sat/SatSolver.h"
+#include "ym_utils/Alloc.h"
+#include "ym_utils/RandGen.h"
+#include "ym_utils/StopWatch.h"
 #include "SatClause.h"
 #include "SatReason.h"
 #include "AssignList.h"

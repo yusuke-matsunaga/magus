@@ -4,11 +4,12 @@
 
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_verilog
+	-I$(top_srcdir)/libraries/libym_verilog
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_vl_sim.la
+noinst_LTLIBRARIES = libym_vl_sim.la
+
 libym_vl_sim_la_LIBADD =
 libym_vl_sim_la_LDFLAGS =
 libym_vl_sim_la_SOURCES = \

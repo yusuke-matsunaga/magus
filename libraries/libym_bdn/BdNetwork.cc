@@ -7,13 +7,9 @@
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdn/BdNetwork.h>
-#include <ym_bdn/BdnNode.h>
-#include <ym_bdn/BdnNodeHandle.h>
+#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNode.h"
+#include "ym_bdn/BdnNodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM_BDN

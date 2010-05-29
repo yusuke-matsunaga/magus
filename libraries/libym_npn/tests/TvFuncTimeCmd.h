@@ -7,13 +7,13 @@
 ///
 /// $Id: TvFuncTimeCmd.h 1508 2008-06-30 04:55:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_utils/StopWatch.h>
-#include <ym_tclpp/TclCmd.h>
-#include <ym_npn/common.h>
+#include "ym_utils/StopWatch.h"
+#include "ym_tclpp/TclCmd.h"
+#include "ym_npn/common.h"
 
 #include "TvFuncTest.h"
 

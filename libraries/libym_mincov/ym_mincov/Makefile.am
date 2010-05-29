@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymmincovincludedir = $(YMINCLUDEDIR)/ym_mincov
-ymmincovinclude_HEADERS = \
+noinst_HEADERS = \
 	mincov_nsdef.h \
 	MincovCost.h \
 	MincovCost1.h \

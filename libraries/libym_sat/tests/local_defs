@@ -2,4 +2,4 @@
 
 . ${top_srcdir}/etc/common_defs
 
-TEST_PATH=${top_builddir}/src/libym_bnet/tests
+TEST_PATH=${top_builddir}/librareis/libym_sat/tests

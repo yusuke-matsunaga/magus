@@ -4,20 +4,16 @@
 ///
 /// $Id: enum_pat3.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
+#include "ym_npn/TvFunc.h"
+#include "ym_npn/NpnMgr.h"
+#include "ym_npn/NpnMap.h"
+#include "ym_aig/AigMgr.h"
 
-#include <ym_npn/TvFunc.h>
-#include <ym_npn/NpnMgr.h>
-#include <ym_npn/NpnMap.h>
-#include <ym_aig/AigMgr.h>
-
-#include <ym_sat/SatSolver.h>
+#include "ym_sat/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM

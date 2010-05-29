@@ -7,13 +7,13 @@
 ///
 /// $Id: Iscas89Handler.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_iscas89/iscas89_nsdef.h>
-#include <ym_utils/FileRegion.h>
-#include <ym_utils/MsgHandler.h>
+#include "ym_iscas89/iscas89_nsdef.h"
+#include "ym_utils/FileRegion.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM

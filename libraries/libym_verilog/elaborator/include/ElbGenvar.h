@@ -12,7 +12,7 @@
 
 
 #include "ElbDecl.h"
-#include <ym_verilog/pt/PtP.h>
+#include "ym_verilog/pt/PtP.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

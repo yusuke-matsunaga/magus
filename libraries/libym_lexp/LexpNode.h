@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include <ym_lexp/LogExpr.h>
+#include "ym_lexp/LogExpr.h"
 #include "lexp_types.h"
 
 

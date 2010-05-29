@@ -6,15 +6,12 @@
 ///
 /// $Id: verilog_grammer.yy 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_utils/FileRegion.h>
-#include <ym_verilog/pt/PtP.h>
+#include "ym_utils/FileRegion.h"
+#include "ym_verilog/pt/PtP.h"
 
 #include "Parser.h"
 #include "Parser_port.h"

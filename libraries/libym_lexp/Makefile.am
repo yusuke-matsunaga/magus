@@ -3,8 +3,8 @@
 ## $Id: Makefile.am 958 2007-08-28 05:38:02Z matsunaga $
 
 SUBDIRS = \
-	ym_lexp \
 	. \
+	ym_lexp \
 	tests
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -12,9 +12,10 @@ MAINTAINERCLEANFILES = Makefile.in
 INCLUDES = \
 	-I$(top_srcdir)/include
 
-lib_LTLIBRARIES = libym_lexp.la
+noinst_LTLIBRARIES = libym_lexp.la
+
 libym_lexp_la_LIBADD = \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 libym_lexp_la_LDFLAGS = 
 libym_lexp_la_SOURCES = \
 	lexp_types.h \

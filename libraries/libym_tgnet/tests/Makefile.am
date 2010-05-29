@@ -14,4 +14,4 @@ lmtest_SOURCES = \
 	lmtest.cc
 
 lmtest_LDADD = \
-	$(top_builddir)/libym_tgnet/libym_tgnet.la
+	$(top_builddir)/libraries/libym_tgnet/libym_tgnet.la

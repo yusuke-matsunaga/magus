@@ -5,15 +5,16 @@
 ///
 /// $Id: bnet2aig.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_blif/BlifNetwork.h>
-#include <ym_blif/BlifNetworkReader.h>
-#include <ym_bnet/BNetwork.h>
-#include <ym_bnet/BlifBNetConv.h>
-#include <ym_aig/AigMgr.h>
-#include <ym_aig/AigHandle.h>
+
+#include "ym_blif/BlifNetwork.h"
+#include "ym_blif/BlifNetworkReader.h"
+#include "ym_bnet/BNetwork.h"
+#include "ym_bnet/BlifBNetConv.h"
+#include "ym_aig/AigMgr.h"
+#include "ym_aig/AigHandle.h"
 
 
 BEGIN_NAMESPACE_YM

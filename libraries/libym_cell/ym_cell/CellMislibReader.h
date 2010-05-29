@@ -7,11 +7,11 @@
 ///
 /// $Id: CellMislibReader.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_cell/cell_type.h>
+#include "ym_cell/cell_type.h"
 
 
 BEGIN_NAMESPACE_YM_BNET

@@ -14,10 +14,10 @@ CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_mincov.la
+noinst_LTLIBRARIES = libym_mincov.la
 
 libym_mincov_la_LIBADD = \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 libym_mincov_la_LDFLAGS = 
 

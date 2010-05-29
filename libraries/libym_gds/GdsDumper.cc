@@ -5,17 +5,13 @@
 ///
 /// $Id: GdsDumper.cc 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_gds/gds_nsdef.h>
-#include <ym_gds/GdsDumper.h>
-#include <ym_gds/GdsRecord.h>
+#include "ym_gds/gds_nsdef.h"
+#include "ym_gds/GdsDumper.h"
+#include "ym_gds/GdsRecord.h"
 #include "GdsRecTable.h"
 
 

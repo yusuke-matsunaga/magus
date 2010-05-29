@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymtgnetincludedir = $(YMINCLUDEDIR)/ym_tgnet
-ymtgnetinclude_HEADERS = \
+noinst_HEADERS = \
 	TgBlifReader.h \
 	TgGateTemplate.h \
 	TgIscas89Reader.h \

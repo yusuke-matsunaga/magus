@@ -8,8 +8,7 @@ INCLUDES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymnpnincludedir = $(YMINCLUDEDIR)/ym_npn
-ymnpninclude_HEADERS = \
+noinst_HEADERS = \
 	npn_nsdef.h \
 	NpnMap.h \
 	NpnMgr.h \

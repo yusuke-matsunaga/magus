@@ -5,18 +5,16 @@
 
 // Yacc のテストプログラム
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
+
+#include "ym_utils/StopWatch.h"
+#include "../mislib/Lex.h"
+#include "../mislib/Pt.h"
+#include "../utils/Msg.h"
 
 #if HAVE_POPT
 #include <popt.h>
 #endif
 
-#include <ymtools/StopWatch.h>
-#include "../mislib/Lex.h"
-#include "../mislib/Pt.h"
-#include "../utils/Msg.h"
 
 BEGIN_NAMESPACE_YM_CELL
 

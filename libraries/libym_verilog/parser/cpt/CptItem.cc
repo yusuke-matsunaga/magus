@@ -5,19 +5,15 @@
 ///
 /// $Id: CptItem.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "CptItem.h"
 #include "CptFactory.h"
 
-#include <ym_verilog/pt/PtStmt.h>
-#include <ym_verilog/pt/PtExpr.h>
+#include "ym_verilog/pt/PtStmt.h"
+#include "ym_verilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

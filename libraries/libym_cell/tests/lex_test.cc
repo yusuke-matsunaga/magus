@@ -5,13 +5,10 @@
 
 // Lex のテストプログラム
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include <iomanip>
 
-#include <ymtools/StopWatch.h>
+#include "ymtools/StopWatch.h"
 #include "../mislib/Lex.h"
 
 

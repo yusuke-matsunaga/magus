@@ -7,10 +7,12 @@
 ///
 /// $Id:
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_cell/cell_nsdef.h>
+
+#include "ym_cell/cell_nsdef.h"
+
 
 // クラス名宣言
 class Cell;

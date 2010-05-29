@@ -17,10 +17,10 @@ CLEANFILES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_iscas89.la
+noinst_LTLIBRARIES = libym_iscas89.la
 
 libym_iscas89_la_LIBADD = \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 libym_iscas89_la_LDFLAGS = 
 

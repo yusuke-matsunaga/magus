@@ -5,17 +5,13 @@
 ///
 /// $Id: Iscas89ParserImpl.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include "Iscas89ParserImpl.h"
-#include <ym_iscas89/Iscas89Handler.h>
-#include <ym_utils/FileDescMgr.h>
+#include "ym_iscas89/Iscas89Handler.h"
+#include "ym_utils/FileDescMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89

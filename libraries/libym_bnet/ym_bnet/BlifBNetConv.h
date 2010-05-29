@@ -7,12 +7,12 @@
 ///
 /// $Id: BlifBNetConv.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bnet/bnet_nsdef.h>
-#include <ym_blif/blif_nsdef.h>
+#include "ym_bnet/bnet_nsdef.h"
+#include "ym_blif/blif_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BNET

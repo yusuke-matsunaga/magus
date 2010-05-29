@@ -6,15 +6,12 @@
 ///
 /// $Id:
 ///
-/// Copyright (C) 2007 Yusuke Matsunaga
+/// Copyright (C) 2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_iscas89/iscas89_nsdef.h>
-#include <ym_iscas89/Iscas89Handler.h>
+#include "ym_iscas89/iscas89_nsdef.h"
+#include "ym_iscas89/Iscas89Handler.h"
   
 #include "Iscas89ParserImpl.h"
 #include "Iscas89Scanner.h"

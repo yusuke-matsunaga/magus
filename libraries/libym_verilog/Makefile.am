@@ -12,14 +12,14 @@ SUBDIRS = \
 
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_verilog/parser/include \
-	-I$(top_srcdir)/libym_verilog/elaborator/include
+	-I$(top_srcdir)/libraries/libym_verilog/parser/include \
+	-I$(top_srcdir)/libraries/libym_verilog/elaborator/include
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_verilog.la
+noinst_LTLIBRARIES = libym_verilog.la
 
 libym_verilog_la_SOURCES = \
 	VlMgr.cc

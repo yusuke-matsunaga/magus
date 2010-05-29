@@ -7,12 +7,12 @@
 ///
 /// $Id: EiFactory.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ElbFactory.h"
-#include <ym_utils/Alloc.h>
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

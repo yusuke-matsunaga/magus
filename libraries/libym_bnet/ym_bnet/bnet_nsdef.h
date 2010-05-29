@@ -7,7 +7,7 @@
 ///
 /// $Id: bnet_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BnetGroup Boolean Network パッケージ
@@ -17,8 +17,8 @@
 /// で表しているということ
 
 
-#include <ymtools.h>
-#include <ym_utils/DlList.h>
+#include "ymtools.h"
+#include "ym_utils/DlList.h"
 
 
 /// @brief ymbnet 用の名前空間の開始

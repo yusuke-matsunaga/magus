@@ -5,19 +5,15 @@
 ///
 /// $Id: BlifBdnConv.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdn/BlifBdnConv.h>
-#include <ym_bdn/BdNetwork.h>
-#include <ym_bdn/BdnNode.h>
-#include <ym_bdn/BdnNodeHandle.h>
-#include <ym_blif/BlifNetwork.h>
+#include "ym_bdn/BlifBdnConv.h"
+#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNode.h"
+#include "ym_bdn/BdnNodeHandle.h"
+#include "ym_blif/BlifNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_BDN

@@ -4,19 +4,15 @@
 ///
 /// $Id: optaig3.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_npn/TvFunc.h>
-#include <ym_npn/NpnMgr.h>
-#include <ym_npn/NpnMap.h>
+#include "ym_npn/TvFunc.h"
+#include "ym_npn/NpnMgr.h"
+#include "ym_npn/NpnMap.h"
 #include "AigTemplate.h"
-#include <ym_sat/SatSolver.h>
+#include "ym_sat/SatSolver.h"
 
 
 #define VERIFY_FF2TABLE 0

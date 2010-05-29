@@ -2,12 +2,8 @@
 
 // NPN パッケージのテスト
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ymtools.h>
-#include <ym_utils/Generator.h>
+#include "ymtools.h"
+#include "ym_utils/Generator.h"
 
 //#define DEBUG
 

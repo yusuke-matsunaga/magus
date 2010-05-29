@@ -8,8 +8,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymaigincludedir = $(YMINCLUDEDIR)/ym_aig
-ymaiginclude_HEADERS = \
+noinst_HEADERS = \
 	aig_nsdef.h \
 	AigHandle.h \
 	AigMgr.h \

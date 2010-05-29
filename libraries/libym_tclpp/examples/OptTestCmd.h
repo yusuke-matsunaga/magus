@@ -7,13 +7,13 @@
 ///
 /// $Id: OptTestCmd.h 1417 2008-05-06 18:12:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // コマンドの製作例
 
 
-#include <ym_tclpp/TclCmd.h>
+#include "ym_tclpp/TclCmd.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP

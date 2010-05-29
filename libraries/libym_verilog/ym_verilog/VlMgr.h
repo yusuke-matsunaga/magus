@@ -7,16 +7,16 @@
 ///
 /// $Id: VlMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_verilog/verilog.h>
-#include <ym_verilog/pt/PtP.h>
-#include <ym_verilog/vl/VlFwd.h>
-#include <ym_utils/File.h>
-#include <ym_utils/MsgHandler.h>
-#include <ym_utils/Alloc.h>
+#include "ym_verilog/verilog.h"
+#include "ym_verilog/pt/PtP.h"
+#include "ym_verilog/vl/VlFwd.h"
+#include "ym_utils/File.h"
+#include "ym_utils/MsgHandler.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

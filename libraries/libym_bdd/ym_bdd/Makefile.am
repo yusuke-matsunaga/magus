@@ -8,8 +8,7 @@ INCLUDES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymbddincludedir = $(YMINCLUDEDIR)/ym_bdd
-ymbddinclude_HEADERS = \
+noinst_HEADERS = \
 	bdd_nsdef.h \
 	Bdd.h \
 	BddVarSet.h \

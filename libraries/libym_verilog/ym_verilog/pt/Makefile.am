@@ -8,8 +8,7 @@ INCLUDES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ptincludedir = $(YMINCLUDEDIR)/ym_verilog/pt
-ptinclude_HEADERS = \
+noinst_HEADERS = \
 	Pt.h \
 	PtArray.h \
 	PtBase.h \

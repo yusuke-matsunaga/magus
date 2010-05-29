@@ -25,6 +25,8 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+LIBYM_AIG = $(top_builddir)/libraries/libym_aig/libym_aig.la
+
 bin_PROGRAMS = \
 	bnet2aig \
 	genpat \
@@ -34,8 +36,8 @@ bin_PROGRAMS = \
 bnet2aig_SOURCES = \
 	bnet2aig.cc
 bnet2aig_LDADD = \
-	$(top_builddir)/libym_aig/libym_aig.la \
-	$(top_builddir)/libym_bnet/libym_bnet.la
+	$(LIBYM_AIG) \
+	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
 
 genpat_SOURCES = \
 	GpNode.h \
@@ -43,7 +45,7 @@ genpat_SOURCES = \
 	genpat.cc
 
 genpat_LDADD = \
-	$(top_builddir)/libym_aig/libym_aig.la
+	$(LIBYM_AIG)
 
 genpat2_SOURCES = \
 	genpat2.cc
@@ -54,4 +56,4 @@ enum_pat3_SOURCES = \
 	enum_pat3.cc
 
 enum_pat3_LDADD = \
-	$(top_builddir)/libym_aig/libym_aig.la
+	$(LIBYM_AIG)

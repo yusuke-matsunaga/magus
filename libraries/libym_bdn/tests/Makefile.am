@@ -23,6 +23,8 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+LIBYM_BDN = $(top_builddir)/libraries/libym_bdn/libym_bdn.la
+
 bin_PROGRAMS = \
 	base_test \
 	bliftest \
@@ -31,16 +33,16 @@ bin_PROGRAMS = \
 base_test_SOURCES = \
 	base_test.cc
 base_test_LDADD = \
-	$(top_builddir)/libym_bdn/libym_bdn.la
+	$(LIBYM_BDN)
 
 bliftest_SOURCES = \
 	bliftest.cc
 
 bliftest_LDADD = \
-	$(top_builddir)/libym_bdn/libym_bdn.la
+	$(LIBYM_BDN)
 
 change_test_SOURCES = \
 	change_test.cc
 
 change_test_LDADD = \
-	$(top_builddir)/libym_bdn/libym_bdn.la
+	$(LIBYM_BDN)

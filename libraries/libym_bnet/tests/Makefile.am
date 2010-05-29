@@ -23,6 +23,8 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+LIBYM_BNET = $(top_builddir)/libraries/libym_bnet/libym_bnet.la
+
 bin_PROGRAMS = \
 	makenode \
 	bliftest \
@@ -31,14 +33,14 @@ bin_PROGRAMS = \
 makenode_SOURCES = \
 	makenode.cc
 makenode_LDADD = \
-	$(top_builddir)/libym_bnet/libym_bnet.la
+	$(LIBYM_BNET)
 
 bliftest_SOURCES = \
 	bliftest.cc
 bliftest_LDADD = \
-	$(top_builddir)/libym_bnet/libym_bnet.la
+	$(LIBYM_BNET)
 
 iscas89test_SOURCES = \
 	iscas89test.cc
 iscas89test_LDADD = \
-	$(top_builddir)/libym_bnet/libym_bnet.la
+	$(LIBYM_BNET)

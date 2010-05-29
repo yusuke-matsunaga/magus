@@ -7,16 +7,16 @@
 ///
 /// $Id: BNetwork.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bnet/bnet_nsdef.h>
-#include <ym_utils/DlList.h>
-#include <ym_utils/ItvlMgr.h>
-#include <ym_utils/NameMgr.h>
-#include <ym_utils/Binder.h>
-#include <ym_lexp/LogExpr.h>
+#include "ym_bnet/bnet_nsdef.h"
+#include "ym_utils/DlList.h"
+#include "ym_utils/ItvlMgr.h"
+#include "ym_utils/NameMgr.h"
+#include "ym_utils/Binder.h"
+#include "ym_lexp/LogExpr.h"
 
 // Glossary
 //   ネットワーク: 複数の入力，複数の出力を持つ論理ネットワーク

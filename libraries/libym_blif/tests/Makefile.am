@@ -23,6 +23,8 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+LIBYM_BLIF = $(top_builddir)/libraries/libym_blif/libym_blif.la
+
 noinst_PROGRAMS = \
 	parsertest \
 	nullparser \
@@ -31,21 +33,17 @@ noinst_PROGRAMS = \
 
 parsertest_SOURCES = \
 	parsertest.cc
-parsertest_LDADD = \
-	$(top_builddir)/libym_blif/libym_blif.la
+parsertest_LDADD = $(LIBYM_BLIF)
 
 nullparser_SOURCES = \
 	nullparser.cc
-nullparser_LDADD = \
-	$(top_builddir)/libym_blif/libym_blif.la
+nullparser_LDADD = $(LIBYM_BLIF)
 
 lexptest_SOURCES = \
 	lexptest.cc
-lexptest_LDADD = \
-	$(top_builddir)/libym_blif/libym_blif.la \
-	$(top_builddir)/libym_lexp/libym_lexp.la
+lexptest_LDADD = $(LIBYM_BLIF) \
+	$(top_builddir)/libraries/libym_lexp/libym_lexp.la
 
 reader_test_SOURCES = \
 	reader_test.cc
-reader_test_LDADD = \
-	$(top_builddir)/libym_blif/libym_blif.la
+reader_test_LDADD = $(LIBYM_BLIF)

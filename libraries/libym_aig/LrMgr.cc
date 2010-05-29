@@ -5,19 +5,19 @@
 /// 
 /// $Id: LrMgr.cc 1594 2008-07-18 10:26:12Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "LrMgr.h"
-#include <ym_aig/AigNode.h>
-#include <ym_aig/AigNetwork.h>
-#include <ym_aig/AigManip.h>
-#include <ym_aig/AigCutHolder.h>
-#include <ym_aig/AigCut.h>
-#include <ym_npn/NpnMgr.h>
-#include <ym_npn/TvFunc.h>
-#include <ym_aig/AigBlifWriter.h>
+#include "ym_aig/AigNode.h"
+#include "ym_aig/AigNetwork.h"
+#include "ym_aig/AigManip.h"
+#include "ym_aig/AigCutHolder.h"
+#include "ym_aig/AigCut.h"
+#include "ym_npn/NpnMgr.h"
+#include "ym_npn/TvFunc.h"
+#include "ym_aig/AigBlifWriter.h"
 
 
 #if defined(YM_DEBUG)

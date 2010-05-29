@@ -7,10 +7,11 @@
 /// 
 /// $Id: MincovCost.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_mincov/mincov_nsdef.h>
+#include "ym_mincov/mincov_nsdef.h"
+
 
 //#define USE_MINCOVCOST1 1
 #define USE_MINCOVCOST2 1

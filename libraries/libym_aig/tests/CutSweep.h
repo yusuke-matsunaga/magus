@@ -7,14 +7,14 @@
 ///
 /// $Id: CutSweep.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_aig/AigNetwork.h>
-#include <ym_aig/AigBlifReader.h>
-#include <ym_aig/AigBlifWriter.h>
-#include <ym_aig/AigCutEnum.h>
+#include "ym_aig/AigNetwork.h"
+#include "ym_aig/AigBlifReader.h"
+#include "ym_aig/AigBlifWriter.h"
+#include "ym_aig/AigCutEnum.h"
 
 
 BEGIN_NAMESPACE_YM_AIG

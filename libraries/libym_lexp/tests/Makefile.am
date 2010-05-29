@@ -24,9 +24,9 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-YM_BASE = $(top_builddir)/libym_utils/libym_utils.la
+YM_BASE = $(top_builddir)/libraries/libym_utils/libym_utils.la
 
-YM_LEXP = $(top_builddir)/libym_lexp/libym_lexp.la
+YM_LEXP = $(top_builddir)/libraries/libym_lexp/libym_lexp.la
 
 #noinst_PROGRAMS = \
 #	base_test

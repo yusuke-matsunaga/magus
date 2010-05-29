@@ -9,11 +9,7 @@
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_lexp/Literal.h>
+#include "ym_lexp/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP

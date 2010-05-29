@@ -5,16 +5,11 @@
 ///
 /// $Id: TvFuncTest.cc 1594 2008-07-18 10:26:12Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-
-#include <ym_npn/TvFunc.h>
+#include "ym_npn/TvFunc.h"
 
 #include "TvFuncTest.h"
 

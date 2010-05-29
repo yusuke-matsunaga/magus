@@ -13,6 +13,7 @@ INCLUDES = \
 	-I$(top_srcdir)/include
 
 noinst_LTLIBRARIES = libym_zstream.la
+
 libym_zstream_la_LIBADD = 
 libym_zstream_la_LDFLAGS = -lz
 libym_zstream_la_SOURCES = \

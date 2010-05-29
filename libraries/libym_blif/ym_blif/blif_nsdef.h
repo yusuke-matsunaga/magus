@@ -7,7 +7,7 @@
 ///
 /// $Id: blif_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BlifGroup BLIF パーサ
@@ -16,7 +16,8 @@
 /// BLIF(Berkeley Logic Interchange Format) 用のパーサ
 
 
-#include <ymtools.h>
+#include "ymtools.h"
+
 
 /// @brief ym_bli 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_BLIF \

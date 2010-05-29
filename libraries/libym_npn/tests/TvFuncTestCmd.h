@@ -7,12 +7,12 @@
 ///
 /// $Id: TvFuncTestCmd.h 84 2006-08-03 06:20:07Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_tclpp/TclCmd.h>
-#include <ym_npn/common.h>
+#include "ym_tclpp/TclCmd.h"
+#include "ym_npn/common.h"
 
 #include "TvFuncTest.h"
 

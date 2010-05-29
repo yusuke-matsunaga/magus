@@ -2,20 +2,18 @@
 
 // CvFunc パッケージのテスト
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
+#include "ymtools.h"
+
+#include "ym_utils/random.h"
+#include "ym_utils/Generator.h"
+#include "ym_npn/CvFunc.h"
+
+#include "ym_utils/StopWatch.h"
+
 
 #if HAVE_POPT
 #include <popt.h>
 #endif
-
-#include <ymtools.h>
-#include <ym_utils/random.h>
-#include <ym_utils/Generator.h>
-#include <ym_npn/CvFunc.h>
-
-#include <ym_utils/StopWatch.h>
 
 using namespace std;
 using namespace nsYm;

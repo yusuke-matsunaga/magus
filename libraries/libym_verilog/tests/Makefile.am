@@ -46,8 +46,8 @@ bvcalc_SOURCES = \
 	bvlex.ll
 
 bvcalc_LDADD = \
-	$(top_builddir)/libym_verilog/libym_verilog.la \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_verilog/libym_verilog.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 
 #############################################################

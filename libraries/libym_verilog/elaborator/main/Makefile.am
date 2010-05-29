@@ -6,8 +6,8 @@ SUBDIRS =
 
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_verilog/parser/include \
-	-I$(top_srcdir)/libym_verilog/elaborator/include
+	-I$(top_srcdir)/libraries/libym_verilog/parser/include \
+	-I$(top_srcdir)/libraries/libym_verilog/elaborator/include
 
 CLEANFILES =
 
@@ -55,6 +55,6 @@ libym_vl_elab_main_la_SOURCES = \
 
 
 libym_vl_elab_main_la_LIBADD = \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 libym_vl_elab_main_la_LDFLAGS =

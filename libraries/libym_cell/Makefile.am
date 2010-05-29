@@ -17,12 +17,12 @@ INCLUDES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_cell.la
+noinst_LTLIBRARIES = libym_cell.la
 
 libym_cell_la_LIBADD = \
 	dotlib/libym_cell_dotlib.la \
-	$(top_builddir)/libym_lexp/libym_lexp.la \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_lexp/libym_lexp.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 libym_cell_la_LDFLAGS = 
 

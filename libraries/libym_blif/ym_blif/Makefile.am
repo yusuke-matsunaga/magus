@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymblifincludedir = $(YMINCLUDEDIR)/ym_blif
-ymblifinclude_HEADERS = \
+noinst_HEADERS = \
 	blif_nsdef.h \
 	BlifParser.h \
 	BlifHandler.h \

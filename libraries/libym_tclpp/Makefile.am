@@ -12,7 +12,8 @@ MAINTAINERCLEANFILES = Makefile.in
 INCLUDES = $(TCL_INCLUDES) \
 	-I$(top_srcdir)/include
 
-lib_LTLIBRARIES = libym_tclpp.la
+noinst_LTLIBRARIES = libym_tclpp.la
+
 libym_tclpp_la_LIBADD = \
 	$(TCL_LDADD)
 libym_tclpp_la_LDFLAGS = 

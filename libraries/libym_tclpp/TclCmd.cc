@@ -5,17 +5,13 @@
 ///
 /// $Id: TclCmd.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "ymconfig.h"
-#endif
-
-#include <ym_tclpp/TclCmd.h>
-#include <ym_tclpp/TclPopt.h>
-#include <ym_tclpp/TclObj.h>
+#include "ym_tclpp/TclCmd.h"
+#include "ym_tclpp/TclPopt.h"
+#include "ym_tclpp/TclObj.h"
 
 #include "TclPoptGroup.h"
 #include "StrBuf.h"

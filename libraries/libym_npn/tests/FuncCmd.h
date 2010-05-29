@@ -7,12 +7,12 @@
 ///
 /// $Id: FuncCmd.h 33 2006-07-16 14:58:17Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_tclpp/TclCmd.h>
-#include <ym_npn/common.h>
+#include "ym_tclpp/TclCmd.h"
+#include "ym_npn/common.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

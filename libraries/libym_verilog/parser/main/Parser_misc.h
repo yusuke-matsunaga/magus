@@ -7,13 +7,13 @@
 ///
 /// $Id: Parser_misc.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Parser.h"
 
-#include <ym_verilog/pt/PtMisc.h>
+#include "ym_verilog/pt/PtMisc.h"
 
 #include "PtMgr.h"
 #include "PtiFactory.h"

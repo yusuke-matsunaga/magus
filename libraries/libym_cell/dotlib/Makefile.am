@@ -20,8 +20,8 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_cell_dotlib.la
 
 libym_cell_dotlib_la_LIBADD = \
-	$(top_builddir)/libym_lexp/libym_lexp.la \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_lexp/libym_lexp.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 
 libym_cell_dotlib_la_LDFLAGS = 
 

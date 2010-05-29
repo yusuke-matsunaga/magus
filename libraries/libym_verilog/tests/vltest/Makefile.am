@@ -4,11 +4,11 @@
 
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_verilog \
-	-I$(top_builddir)/libym_verilog \
-	-I$(top_srcdir)/libym_verilog/parser/include \
-	-I$(top_builddir)/libym_verilog/parser/main \
-	-I$(top_srcdir)/libym_verilog/parser/scanner \
+	-I$(top_srcdir)/libraries/libym_verilog \
+	-I$(top_builddir)/libraries/libym_verilog \
+	-I$(top_srcdir)/libraries/libym_verilog/parser/include \
+	-I$(top_builddir)/libraries/libym_verilog/parser/main \
+	-I$(top_srcdir)/libraries/libym_verilog/parser/scanner \
 	@POPT_INCLUDES@
 
 YFLAGS=-d -v
@@ -47,6 +47,6 @@ vltest_SOURCES = \
 	vltest_main.cc
 
 vltest_LDADD = \
-	$(top_builddir)/libym_verilog/libym_verilog.la \
-	$(top_builddir)/libym_utils/libym_utils.la \
+	$(top_builddir)/libraries/libym_verilog/libym_verilog.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la \
 	@POPT_LIBS@

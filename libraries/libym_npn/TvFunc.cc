@@ -5,15 +5,12 @@
 ///
 /// $Id: TvFunc.cc 1508 2008-06-30 04:55:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
+#include "ym_npn/TvFunc.h"
 
-#include <ym_npn/TvFunc.h>
 
 #if SIZEOF_SIZE_T == 8
 // 1 ワード 64 ビットの時 1 となるマクロ

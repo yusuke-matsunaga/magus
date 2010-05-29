@@ -6,11 +6,11 @@ SUBDIRS =
 
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_sat
+	-I$(top_srcdir)/libraries/libym_sat
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_satanalyzer.la
+noinst_LTLIBRARIES = libym_satanalyzer.la
 
 libym_satanalyzer_la_LIBADD = 
 

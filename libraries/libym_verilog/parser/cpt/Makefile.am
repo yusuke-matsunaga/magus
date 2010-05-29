@@ -4,7 +4,7 @@
 
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_verilog/parser/include
+	-I$(top_srcdir)/libraries/libym_verilog/parser/include
 
 MAINTAINERCLEANFILES = Makefile.in
 

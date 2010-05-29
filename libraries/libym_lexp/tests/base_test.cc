@@ -5,15 +5,11 @@
 ///
 /// $Id: base_test.cc 1920 2008-12-20 15:52:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_lexp/LogExpr.h>
+#include "ym_lexp/LogExpr.h"
 
 
 using namespace nsYm;

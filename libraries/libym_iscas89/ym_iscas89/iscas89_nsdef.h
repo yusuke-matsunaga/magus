@@ -7,7 +7,7 @@
 ///
 /// $Id: iscas89_nsdef.h 2043 2009-02-21 07:08:48Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup Iscas89Group ISCAS89フォーマットパーサ
@@ -15,7 +15,8 @@
 /// ISCAS89 ベンチマーク回路フォーマット用パーサ
 
 
-#include <ymtools.h>
+#include "ymtools.h"
+
 
 /// @brief ym_iscas89 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_ISCAS89 \

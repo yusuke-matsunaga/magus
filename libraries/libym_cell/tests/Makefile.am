@@ -44,4 +44,4 @@ dotlib_lex_test_SOURCES = \
 dotlib_lex_test_LDFLAGS =
 
 dotlib_lex_test_LDADD = \
-	$(top_builddir)/libym_cell/libym_cell.la
+	$(top_builddir)/libraries/libym_cell/libym_cell.la

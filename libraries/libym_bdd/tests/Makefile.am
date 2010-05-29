@@ -29,9 +29,9 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-YM_BASE = $(top_builddir)/libym_utils/libym_utils.la
+YM_BASE = $(top_builddir)/libraries/libym_utils/libym_utils.la
 
-YM_BDD = $(top_builddir)/libym_bdd/libym_bdd.la
+YM_BDD = $(top_builddir)/libraries/libym_bdd/libym_bdd.la
 
 noinst_LTLIBRARIES = libymbddtest.la
 libymbddtest_la_LIBADD = \

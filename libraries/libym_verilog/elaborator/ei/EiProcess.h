@@ -7,7 +7,7 @@
 ///
 /// $Id: ElbStmt.h 1752 2008-08-22 03:45:47Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 

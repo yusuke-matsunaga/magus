@@ -7,10 +7,11 @@
 /// 
 /// $Id: aig_nsdef.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ymtools.h>
+
+#include "ymtools.h"
 
 
 /// @brief ym_aig 用の名前空間の開始

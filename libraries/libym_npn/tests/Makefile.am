@@ -27,13 +27,13 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-YM_BASE = $(top_builddir)/libym_utils/libym_utils.la
+YM_BASE = $(top_builddir)/libraries/libym_utils/libym_utils.la
 
-YM_TCLPP = $(top_builddir)/libym_tclpp/libym_tclpp.la 
+YM_TCLPP = $(top_builddir)/libraries/libym_tclpp/libym_tclpp.la 
 
-YM_BDD = $(top_builddir)/libym_bdd/libym_bdd.la
+YM_BDD = $(top_builddir)/libraries/libym_bdd/libym_bdd.la
 
-YM_NPN = $(top_builddir)/libym_npn/libym_npn.la
+YM_NPN = $(top_builddir)/libraries/libym_npn/libym_npn.la
 
 #if BUILD_LIBYM_TCLPP
 #NPN_CHECK = npn_check

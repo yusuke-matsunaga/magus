@@ -10,8 +10,7 @@ CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-vlincludedir = $(YMINCLUDEDIR)/ym_verilog/vl
-vlinclude_HEADERS = \
+noinst_HEADERS = \
 	VlArrayObj.h \
 	VlAttribute.h \
 	VlContAssign.h \

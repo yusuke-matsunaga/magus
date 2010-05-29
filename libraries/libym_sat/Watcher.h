@@ -7,11 +7,11 @@
 ///
 /// $Id: Watcher.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_sat/sat_nsdef.h>
+#include "ym_sat/sat_nsdef.h"
 #include "SatReason.h"
 
 

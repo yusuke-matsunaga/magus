@@ -5,7 +5,7 @@
 SUBDIRS =
 
 INCLUDES = -I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_bdd \
+	-I$(top_srcdir)/libraries/libym_bdd \
 	$(GMP_INCLUDES)
 
 MAINTAINERCLEANFILES = Makefile.in

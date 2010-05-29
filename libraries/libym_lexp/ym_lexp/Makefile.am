@@ -8,8 +8,7 @@ INCLUDES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymlexpincludedir = $(YMINCLUDEDIR)/ym_lexp
-ymlexpinclude_HEADERS = \
+noinst_HEADERS = \
 	lexp.h \
 	Literal.h \
 	LogExpr.h \

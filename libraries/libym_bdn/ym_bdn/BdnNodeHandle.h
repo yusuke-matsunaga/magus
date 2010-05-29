@@ -161,7 +161,7 @@ inline
 BdnNodeHandle
 BdnNodeHandle::make_zero()
 {
-  return BdnNodeHandle(0UL);
+  return BdnNodeHandle(static_cast<ympuint>(0UL));
 }
 
 // @brief 定数1を返す．
@@ -169,7 +169,7 @@ inline
 BdnNodeHandle
 BdnNodeHandle::make_one()
 {
-  return BdnNodeHandle(1UL);
+  return BdnNodeHandle(static_cast<ympuint>(1UL));
 }
 
 // @brief 極性を否定したハンドルを返す．

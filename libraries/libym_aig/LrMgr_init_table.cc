@@ -5,7 +5,7 @@
 /// 
 /// $Id: LrMgr_init_table.cc 1594 2008-07-18 10:26:12Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 

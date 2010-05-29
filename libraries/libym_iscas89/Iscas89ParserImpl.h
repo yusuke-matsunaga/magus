@@ -7,16 +7,16 @@
 ///
 /// $Id: Iscas89ParserImpl.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_iscas89/iscas89_nsdef.h>
-#include <ym_iscas89/Iscas89Handler.h>
-#include <ym_utils/MsgHandler.h>
+#include "ym_iscas89/iscas89_nsdef.h"
+#include "ym_iscas89/Iscas89Handler.h"
+#include "ym_utils/MsgHandler.h"
 #include "Iscas89Scanner.h"
 
-#include <ym_utils/StrBuff.h>
+#include "ym_utils/StrBuff.h"
 #include "IdHash.h"
 
 

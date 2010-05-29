@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymbdnincludedir = $(YMINCLUDEDIR)/ym_bdn
-ymbdninclude_HEADERS = \
+noinst_HEADERS = \
 	BdNetwork.h \
 	BdnBlifWriter.h \
 	BdnNode.h \

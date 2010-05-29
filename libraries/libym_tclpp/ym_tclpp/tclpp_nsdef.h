@@ -7,7 +7,7 @@
 ///
 /// $Id: tclpp_nsdef.h 1417 2008-05-06 18:12:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup Tclpp Tcl++ サブモジュール
@@ -19,7 +19,7 @@
 /// そこで Tcl_Obj に C++ のラッパをかぶせたクラスがこれ
 
 #include <tcl.h>
-#include <ymtools.h>
+#include "ymtools.h"
 
 // tcl8.4 で定義されている const マクロ
 #if !defined(CONST84)

@@ -17,9 +17,10 @@ CLEANFILES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_gds.la
+noinst_LTLIBRARIES = libym_gds.la
+
 libym_gds_la_LIBADD = \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 libym_gds_la_LDFLAGS = 
 libym_gds_la_SOURCES = \
 	Msg.cc \

@@ -2,6 +2,6 @@
 
 . ${top_srcdir}/etc/common_defs
 
-TEST_PATH=${top_builddir}/libym_blif/tests
-TEST_SRC=${top_srcdir}/data/libym_blif/in
-TEST_OUT=${top_srcdir}/data/libym_blif/out
+TEST_PATH=${top_builddir}/libraries/libym_blif/tests
+TEST_SRC=${top_srcdir}/libraries/libym_blif/test/in
+TEST_OUT=${top_srcdir}/libraries/libym_blif/test/out

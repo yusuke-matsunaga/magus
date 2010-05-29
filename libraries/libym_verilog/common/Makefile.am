@@ -18,5 +18,5 @@ libym_vl_common_la_SOURCES = \
 	udpval.cc
 
 libym_vl_common_la_LIBADD = \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
 libym_vl_common_la_LDFLAGS =

@@ -5,13 +5,9 @@
 ///
 /// $Id: LexpNode.cc 1143 2008-01-04 07:27:17Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "LexpNode.h"
 #include "LexpMgr.h"

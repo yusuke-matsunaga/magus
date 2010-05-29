@@ -8,8 +8,7 @@ INCLUDES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymtclppincludedir = $(YMINCLUDEDIR)/ym_tclpp
-ymtclppinclude_HEADERS = \
+noinst_HEADERS = \
 	TclBase.h \
 	TclCmd.h \
 	TclHandler.h \

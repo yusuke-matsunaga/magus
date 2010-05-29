@@ -5,23 +5,19 @@
 ///
 /// $Id: UdpGen.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "UdpGen.h"
 #include "ElbEnv.h"
 
-#include <ym_verilog/pt/PtUdp.h>
-#include <ym_verilog/pt/PtPort.h>
-#include <ym_verilog/pt/PtDecl.h>
-#include <ym_verilog/pt/PtExpr.h>
-#include <ym_verilog/pt/PtArray.h>
-#include <ym_verilog/vl/VlExpr.h>
+#include "ym_verilog/pt/PtUdp.h"
+#include "ym_verilog/pt/PtPort.h"
+#include "ym_verilog/pt/PtDecl.h"
+#include "ym_verilog/pt/PtExpr.h"
+#include "ym_verilog/pt/PtArray.h"
+#include "ym_verilog/vl/VlExpr.h"
 
 #include "ElbUdp.h"
 #include "ElbExpr.h"

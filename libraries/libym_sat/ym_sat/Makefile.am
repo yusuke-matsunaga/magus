@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymsatincludedir = $(YMINCLUDEDIR)/ym_sat
-ymsatinclude_HEADERS = \
+noinst_HEADERS = \
 	sat_nsdef.h \
 	DimacsParser.h \
 	Bool3.h \

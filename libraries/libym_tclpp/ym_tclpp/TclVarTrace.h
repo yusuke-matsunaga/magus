@@ -7,11 +7,12 @@
 ///
 /// $Id: TclVarTrace.h 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_tclpp/tclpp_nsdef.h>
-#include <ym_tclpp/TclBase.h>
+
+#include "ym_tclpp/tclpp_nsdef.h"
+#include "ym_tclpp/TclBase.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP

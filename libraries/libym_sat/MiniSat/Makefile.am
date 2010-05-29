@@ -5,7 +5,6 @@
 SUBDIRS =
 
 INCLUDES = \
-	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in

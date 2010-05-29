@@ -8,8 +8,7 @@ INCLUDES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-verilogincludedir = $(YMINCLUDEDIR)/ym_verilog
-veriloginclude_HEADERS = \
+noinst_HEADERS = \
 	verilog.h \
 	VlTime.h \
 	BitVector.h \

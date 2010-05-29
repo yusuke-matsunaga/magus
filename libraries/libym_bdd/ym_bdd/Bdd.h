@@ -8,14 +8,14 @@
 ///
 /// $Id: Bdd.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/bdd_nsdef.h>
-#include <ym_lexp/LogExpr.h>
-#include <gmpxx.h>
-#include <ym_utils/Binder.h>
+#include "ym_bdd/bdd_nsdef.h"
+#include "ym_lexp/LogExpr.h"
+#include "gmpxx.h"
+#include "ym_utils/Binder.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

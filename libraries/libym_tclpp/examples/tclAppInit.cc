@@ -14,20 +14,16 @@
  * RCS: @(#) $Id: tclAppInit.cc 2507 2009-10-17 16:24:02Z matsunaga $
  */
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <tcl.h>
-
-#ifdef HAVE_TCLREADLINE
-#include <tclreadline.h>
-#endif
 
 #include "HelloCmd.h"
 #include "RandCmd.h"
 #include "TimeCmd.h"
 #include "OptTestCmd.h"
+
+#ifdef HAVE_TCLREADLINE
+#include <tclreadline.h>
+#endif
+
 
 
 #ifdef TCL_TEST

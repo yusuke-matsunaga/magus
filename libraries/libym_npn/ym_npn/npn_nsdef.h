@@ -7,14 +7,15 @@
 ///
 /// $Id: npn_nsdef.h 1508 2008-06-30 04:55:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup NpnGroup NPN 同値類判定パッケージ
 ///
 /// NPN 同値類の判定を行うためのクラス
 
-#include <ymtools.h>
+
+#include "ymtools.h"
 
 
 //////////////////////////////////////////////////////////////////////

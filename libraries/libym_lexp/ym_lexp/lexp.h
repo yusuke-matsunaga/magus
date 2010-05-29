@@ -7,7 +7,7 @@
 ///
 /// $Id: lexp.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup LexpGroup 論理式を扱うクラス
@@ -16,7 +16,7 @@
 /// C++ の機能を活かして論理演算子のオーバーロードを使っている．
 
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 
 /// @brief ymlexp 用の名前空間の開始

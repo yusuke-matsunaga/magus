@@ -7,14 +7,13 @@
 ///
 /// $Id: RandCmd.h 997 2007-09-07 09:58:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // 乱数を発生させるコマンドクラス
-// 実はこのパッケージは Magus には依存していないので汎用である．
 
 
-#include <ym_tclpp/TclCmd.h>
+#include "ym_tclpp/TclCmd.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP

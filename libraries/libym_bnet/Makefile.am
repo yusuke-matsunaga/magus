@@ -12,13 +12,16 @@ INCLUDES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-lib_LTLIBRARIES = libym_bnet.la
+noinst_LTLIBRARIES = libym_bnet.la
+
 libym_bnet_la_LIBADD = \
-	$(top_builddir)/libym_blif/libym_blif.la \
-	$(top_builddir)/libym_iscas89/libym_iscas89.la \
-	$(top_builddir)/libym_lexp/libym_lexp.la \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(top_builddir)/libraries/libym_blif/libym_blif.la \
+	$(top_builddir)/libraries/libym_iscas89/libym_iscas89.la \
+	$(top_builddir)/libraries/libym_lexp/libym_lexp.la \
+	$(top_builddir)/libraries/libym_utils/libym_utils.la
+
 libym_bnet_la_LDFLAGS = 
+
 libym_bnet_la_SOURCES = \
 	StrBNodeMap.h \
 	StrBNodeMap.cc \
