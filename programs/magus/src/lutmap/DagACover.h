@@ -7,8 +7,9 @@
 ///
 /// $Id: DagACover.h 1077 2007-12-03 10:18:47Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
+
 
 #include "lutmap.h"
 

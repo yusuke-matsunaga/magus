@@ -5,19 +5,10 @@
 ///
 /// $Id: BaseCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
-#if defined(USE_LIBCELL)
-#include <synth/hf_Cell.h>
-#include <synth/hf_LoadInfo.h>
-#include <synth/Mag_CCellMgr.h>
-#endif
 #include "BaseCmd.h"
 #include "NetMgr.h"
 

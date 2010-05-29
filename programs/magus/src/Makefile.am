@@ -4,7 +4,6 @@
 
 SUBDIRS = \
 	equiv \
-	lutmap.old \
 	lutmap \
 	seal \
 	magus_tclsh

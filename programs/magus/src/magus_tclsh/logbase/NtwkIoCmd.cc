@@ -5,23 +5,19 @@
 ///
 /// $Id: NtwkIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
 #include "NtwkIoCmd.h"
 
-#include <ym_blif/BlifNetwork.h>
-#include <ym_blif/BlifNetworkReader.h>
-#include <ym_bnet/BlifBNetConv.h>
-#include <ym_bnet/BNetBlifWriter.h>
-#include <ym_bnet/BNetEquWriter.h>
-#include <ym_bnet/BNetVerilogWriter.h>
-#include <ym_utils/FileRegion.h>
+#include "ym_blif/BlifNetwork.h"
+#include "ym_blif/BlifNetworkReader.h"
+#include "ym_bnet/BlifBNetConv.h"
+#include "ym_bnet/BNetBlifWriter.h"
+#include "ym_bnet/BNetEquWriter.h"
+#include "ym_bnet/BNetVerilogWriter.h"
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_MAGUS

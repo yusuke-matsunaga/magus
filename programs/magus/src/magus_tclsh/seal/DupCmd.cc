@@ -5,17 +5,13 @@
 ///
 /// $Id: DupCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
 #include "DupCmd.h"
-#include <ym_bnet/BNetManip.h>
-#include <ym_utils/RandGen.h>
+#include "ym_bnet/BNetManip.h"
+#include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_MAGUS_SEAL

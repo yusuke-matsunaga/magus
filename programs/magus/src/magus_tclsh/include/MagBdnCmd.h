@@ -8,12 +8,12 @@
 ///
 /// $Id: MagCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BaseCmd.h"
-#include <ym_bdn/bdn_nsdef.h>
+#include "ym_bdn/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_MAGUS

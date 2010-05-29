@@ -5,7 +5,6 @@
 
 SUBDIRS = \
 	$(YM_PROGRAMS_SUBDIRS)
-	programs
 
 MAINTAINERCLEANFILES = Makefile.in
 

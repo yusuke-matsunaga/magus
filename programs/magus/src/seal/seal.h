@@ -7,11 +7,11 @@
 ///
 /// $Id: seal.h 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <magus.h>
+#include "magus.h"
 
 /// @brief seal 用の名前空間の開始
 #define BEGIN_NAMESPACE_MAGUS_SEAL \

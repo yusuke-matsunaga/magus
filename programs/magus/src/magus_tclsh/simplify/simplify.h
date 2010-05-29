@@ -7,11 +7,11 @@
 ///
 /// $Id: simplify.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <magus.h>
+#include "magus.h"
 
 /// @brief simplify 用の名前空間の開始
 #define BEGIN_NAMESPACE_MAGUS_SIMPLIFY \

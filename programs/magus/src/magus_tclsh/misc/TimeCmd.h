@@ -7,16 +7,16 @@
 ///
 /// $Id: TimeCmd.h 1417 2008-05-06 18:12:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // 時間計測を行うパッケージ
 // 実はこのパッケージは Magus には依存していないので汎用である．
 
 
-#include <ym_tclpp/TclCmd.h>
-#include <ym_utils/StopWatch.h>
-#include <magus.h>
+#include "ym_tclpp/TclCmd.h"
+#include "ym_utils/StopWatch.h"
+#include "magus.h"
 
 
 BEGIN_NAMESPACE_MAGUS

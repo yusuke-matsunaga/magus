@@ -5,17 +5,13 @@
 ///
 /// $Id: LrwCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
 #include "LrwCmd.h"
-#include <NetHandle.h>
-#include <ym_bnet/BNetManip.h>
+#include "NetHandle.h"
+#include "ym_bnet/BNetManip.h"
 
 
 BEGIN_NAMESPACE_MAGUS_SIMPLIFY

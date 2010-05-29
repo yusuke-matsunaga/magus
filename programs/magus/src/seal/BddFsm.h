@@ -7,13 +7,13 @@
 ///
 /// $Id: BddFsm.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "seal.h"
-#include <ym_bdd/Bdd.h>
-#include <ym_bdd/BddVarSet.h>
+#include "ym_bdd/Bdd.h"
+#include "ym_bdd/BddVarSet.h"
 
 
 BEGIN_NAMESPACE_MAGUS_SEAL

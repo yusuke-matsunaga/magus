@@ -10,13 +10,7 @@ SUBDIRS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 EXTRA_DIST = \
-	magus_config.h.in \
-	configure \
-	configure.ac \
-	mk \
-	etc/autogen.tmpl \
-	etc/common_defs \
-	etc/mk.subr
+	etc/common_defs
 
 
 

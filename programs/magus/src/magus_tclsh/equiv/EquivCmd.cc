@@ -5,17 +5,13 @@
 ///
 /// $Id: EquivCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
 #include "EquivCmd.h"
 #include "equiv_nsdef.h"
-#include <ym_tclpp/TclPopt.h>
+#include "ym_tclpp/TclPopt.h"
 
 
 #define DEBUG_OUTPUTS 1

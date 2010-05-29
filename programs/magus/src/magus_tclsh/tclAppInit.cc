@@ -14,9 +14,7 @@
  * RCS: @(#) $Id: tclAppInit.cc 2274 2009-06-10 07:45:29Z matsunaga $
  */
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
+#include "magus.h"
 
 #define ERRORCODE_HACK 1
 
@@ -26,7 +24,6 @@
 #include <tclreadline.h>
 #endif
 
-#include <magus.h>
 
 #ifdef TCL_TEST
 

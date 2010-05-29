@@ -5,20 +5,16 @@
 ///
 /// $Id: RandCmd.cc 1417 2008-05-06 18:12:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // 乱数を発生させるコマンドクラス
 // 実はこのパッケージは Magus には依存していないので汎用になる．
 
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
 #include "RandCmd.h"
 
-#include <ym_utils/random.h>
+#include "ym_utils/random.h"
 
 
 BEGIN_NAMESPACE_MAGUS

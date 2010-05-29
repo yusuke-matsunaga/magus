@@ -7,11 +7,11 @@
 ///
 /// $Id: lutmap.h 555 2007-04-08 07:20:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <magus.h>
+#include "magus.h"
 
 /// @brief lutmap 用の名前空間の開始
 #define BEGIN_NAMESPACE_MAGUS_LUTMAP \

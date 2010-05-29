@@ -5,19 +5,15 @@
 ///
 /// $Id: NtwkNdCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // ノードに対して処理を行うコマンド
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
 #include "NtwkNdCmd.h"
-#include <ym_tclpp/TclPopt.h>
-#include <ym_lexp/LogExprWriter.h>
-#include <ym_bnet/BNetManip.h>
+#include "ym_tclpp/TclPopt.h"
+#include "ym_lexp/LogExprWriter.h"
+#include "ym_bnet/BNetManip.h"
 
 
 BEGIN_NAMESPACE_MAGUS

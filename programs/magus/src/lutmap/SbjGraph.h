@@ -7,12 +7,12 @@
 ///
 /// $Id: SbjGraph.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_utils/Alloc.h>
-#include <ym_utils/DlList.h>
-#include <ym_utils/ItvlMgr.h>
+#include "ym_utils/Alloc.h"
+#include "ym_utils/DlList.h"
+#include "ym_utils/ItvlMgr.h"
 
 #include "lutmap.h"
 

@@ -5,17 +5,13 @@
 ///
 /// $Id: GateObj.cc 347 2007-01-16 02:37:45Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
-
 #include <tcl.h>
 
-#include <NetMgr.h>
+#include "NetMgr.h"
 #include "NtwkBaseCmd.h"
 #include "NtwkInfoCmd.h"
 #include "NtwkIoCmd.h"

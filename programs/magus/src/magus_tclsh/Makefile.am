@@ -2,7 +2,16 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = include logbase equiv lutmap seal simplify misc test .
+SUBDIRS = \
+	include \
+	logbase \
+	equiv \
+	lutmap \
+	seal \
+	simplify \
+	misc \
+	test \
+	.
 
 AM_CXXFLAGS = \
 	-DMAGUS_LIBDIR='"$(MAGUS_LIBDIR)"' \
@@ -12,9 +21,9 @@ AM_CXXFLAGS = \
 INCLUDES = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
-	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src/magus_tclsh/include
+	-I$(top_srcdir)/programs/magus/include \
+	-I$(top_srcdir)/programs/magus/src/magus_tclsh/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -34,7 +43,7 @@ magus_tclsh_LDADD = \
 	../equiv/libmagus_equiv.la \
 	../lutmap/libmagus_lutmap.la \
 	../seal/libmagus_seal.la \
-	$(YM_LIBS_LIBYM_TCLPP) \
+	$(top_builddir)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)
 

@@ -19,7 +19,6 @@
 #include "ym_utils/FileRegion.h"
 
 #include "ym_verilog/verilog.h"
-#include "ym_verilog/BitVector.h"
 
 #include "ym_verilog/pt/PtUdp.h"
 #include "ym_verilog/pt/PtModule.h"

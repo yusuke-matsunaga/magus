@@ -28,6 +28,8 @@ AM_INIT_AUTOMAKE()dnl
 
 AC_CONFIG_HEADERS([ymconfig.h])dnl
 
+AC_DEFINE_UNQUOTED(MAGUS_VERSION, "${VERSION}", [Magus version])dnl
+
 
 # ===================================================================
 # Checks for programs
@@ -603,7 +605,6 @@ AC_CONFIG_FILES([libraries/libym_tclpp/Makefile])
 AC_CONFIG_FILES([libraries/libym_tclpp/ym_tclpp/Makefile])
 AC_CONFIG_FILES([libraries/libym_tclpp/examples/Makefile])
 
-
 YM_FINISH_LIBRARIES_SUBDIRS
 
 
@@ -613,7 +614,40 @@ YM_FINISH_LIBRARIES_SUBDIRS
 
 YM_INIT_PROGRAMS_SUBDIRS
 
+# magus
+YM_ADD_PROGRAMS_SUBDIRS([magus])
+AC_CONFIG_FILES([programs/magus/Makefile])
+AC_CONFIG_FILES([programs/magus/include/Makefile])
+AC_CONFIG_FILES([programs/magus/src/Makefile])
+AC_CONFIG_FILES([programs/magus/src/equiv/Makefile])
+AC_CONFIG_FILES([programs/magus/src/lutmap/Makefile])
+AC_CONFIG_FILES([programs/magus/src/seal/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/include/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/logbase/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/equiv/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/lutmap/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/seal/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/simplify/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/misc/Makefile])
+AC_CONFIG_FILES([programs/magus/src/magus_tclsh/test/Makefile])
+
 YM_FINISH_PROGRAMS_SUBDIRS
+
+# ===================================================================
+# Set 'magus' directory
+# ===================================================================
+AC_ARG_WITH(magus-library,
+[  --with-magus-library=DIR Magus directory [PREFIX/lib/magus]],
+[MAGUS_LIBDIR=$withval],
+[MAGUS_LIBDIR='${prefix}/lib/AC_PACKAGE_NAME[]AC_PACKAGE_VERSION]')dnl
+AC_SUBST(MAGUS_LIBDIR)dnl
+
+MAGUS_DATADIR='${prefix}/share/AC_PACKAGE_NAME[]AC_PACKAGE_VERSION'
+AC_SUBST(MAGUS_DATADIR)dnl
+
+MAGUS_BINDIR='${bindir}'
+AC_SUBST(MAGUS_BINDIR)dnl
 
 
 # ===================================================================

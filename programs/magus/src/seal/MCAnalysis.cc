@@ -5,16 +5,13 @@
 ///
 /// $Id: MCAnalysis.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include "magus_config.h"
-#endif
 
 #include "MCAnalysis.h"
-#include <ym_bnet/BNetwork.h>
-#include <ym_utils/StopWatch.h>
+#include "ym_bnet/BNetwork.h"
+#include "ym_utils/StopWatch.h"
 #include "Matrix.h"
 
 

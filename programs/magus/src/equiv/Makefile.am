@@ -5,17 +5,17 @@
 SUBDIRS =
 
 INCLUDES = \
-	$(YM_INCLUDES) \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/programs/magus/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libmagus_equiv.la
 
 libmagus_equiv_la_LIBADD = \
-	$(YM_LIBS_LIBYM_AIG) \
-	$(YM_LIBS_LIBYM_SAT) \
-	$(YM_LIBS_LIBYM_BNET)
+	$(top_builddir)/libraries/libym_aig/libym_aig.la \
+	$(top_builddir)/libraries/libym_sat/libym_sat.la \
+	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
 
 libmagus_equiv_la_LDFLAGS =
 

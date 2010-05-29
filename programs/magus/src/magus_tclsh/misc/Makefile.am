@@ -7,9 +7,8 @@ SUBDIRS =
 INCLUDES = \
 	$(TCL_INCLUDES) \
 	$(TK_INCLUDES) \
-	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)
+	-I$(top_srcdir)/programs/magus/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -23,4 +22,4 @@ libmagus_misc_tcl_la_SOURCES = \
 	misc_init.cc
 
 libmagus_misc_tcl_la_LIBADD = \
-	$(YM_LIBS_LIBYM_TCLPP)
+	$(top_builddir)/libraries/libym_tclpp/libym_tclpp.la

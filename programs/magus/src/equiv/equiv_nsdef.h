@@ -7,12 +7,13 @@
 ///
 /// $Id: equiv_nsdef.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <magus.h>
-#include <ym_bnet/BNetwork.h>
-#include <ym_sat/Bool3.h>
+
+#include "magus.h"
+#include "ym_bnet/BNetwork.h"
+#include "ym_sat/Bool3.h"
 
 
 // 名前空間の定義
