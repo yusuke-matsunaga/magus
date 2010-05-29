@@ -104,17 +104,14 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       }
     }
     else {
-      LogExpr expr;
       vector<int> tv(1);
       if ( inv ) {
-	expr = LogExpr::make_one();
 	tv[0] = 1;
       }
       else {
-	expr = LogExpr::make_zero();
 	tv[0] = 0;
       }
-      mapnode = mapgraph.new_lut(name, vector<LnNode*>(0), expr, tv);
+      mapnode = mapgraph.new_lut(name, vector<LnNode*>(0), tv);
     }
     mapgraph.new_output(name, mapnode);
   }
@@ -200,11 +197,10 @@ MapRecord::back_trace(SbjNode* node,
     assert_cond(inv, __FILE__, __LINE__);
     // NOT ゲートを表す LUT を作る．
     vector<LnNode*> inputs(1, node_info.mMapNode[0]);
-    LogExpr expr; // ダミー
     vector<int> tv(2);
     tv[0] = 1;
     tv[1] = 0;
-    LnNode* mapnode1 = mapnetwork.new_lut(oname, inputs, expr, tv);
+    LnNode* mapnode1 = mapnetwork.new_lut(oname, inputs, tv);
     node_info.mMapNode[1] = mapnode1;
     return mapnode1;
   }
@@ -245,7 +241,7 @@ MapRecord::back_trace(SbjNode* node,
   
   // 新しいノードを作り mNodeMap に登録する．
   string name = (inv) ? oname : node->name();
-  mapnode = mapnetwork.new_lut(name, mTmpFanins, expr, tv);
+  mapnode = mapnetwork.new_lut(name, mTmpFanins, tv);
   node_info.mMapNode[idx] = mapnode;
   node_info.mDepth = idepth + 1;
   

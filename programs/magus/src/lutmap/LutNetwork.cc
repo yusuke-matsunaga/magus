@@ -144,7 +144,6 @@ LnGraph::copy(const LnGraph& src,
     LnNode* src_node = node_list[i];
     ymuint ni = src_node->ni();
     vector<LnNode*> dst_inputs(ni);
-    LogExpr expr = src_node->expr();
     vector<int> tv;
     for (ymuint j = 0; j < ni; ++ j) {
       LnNode* src_inode = src_node->fanin(j);
@@ -154,7 +153,7 @@ LnGraph::copy(const LnGraph& src,
     }
     src_node->tv(tv);
     
-    LnNode* dst_node = new_lut(src_node->name(), dst_inputs, expr, tv);
+    LnNode* dst_node = new_lut(src_node->name(), dst_inputs, tv);
     dst_node->mMark = src_node->mMark;
     nodemap[src_node->id()] = dst_node;
   }
@@ -357,12 +356,10 @@ LnGraph::new_output(const string& name,
 // @brief LUTノードを作る．
 // @param[in] name 名前
 // @param[in] inodes 入力ノードのベクタ
-// @param[in] expr 論理式
 // @param[in] tv 真理値ベクタ
 LnNode*
 LnGraph::new_lut(const string& name,
 		 const vector<LnNode*>& inodes,
-		 const LogExpr& expr,
 		 const vector<int>& tv)
 {
   ymuint ni = inodes.size();
@@ -373,7 +370,7 @@ LnGraph::new_lut(const string& name,
   // 論理ノードリストに登録
   mLnodeList.push_back(node);
 
-  change_lut(node, inodes, expr, tv);
+  change_lut(node, inodes, tv);
   
   return node;
 }
@@ -478,16 +475,13 @@ LnGraph::change_output(LnNode* node,
 // @brief 論理ノードの内容を再設定する．
 // @param[in] node 変更対象の論理ノード
 // @param[in] inodes 入力ノードの配列
-// @param[in] expr 論理式
 // @param[in] tv 真理値ベクタ
 void
 LnGraph::change_lut(LnNode* node,
 		    const vector<LnNode*>& inodes,
-		    const LogExpr& expr,
 		    const vector<int>& tv)
 {
   node->set_lut();
-  node->mExpr = expr;
   assert_cond(tv.size() == (1U << inodes.size()), __FILE__, __LINE__);
   node->mTv = tv;
   change_node_fanins(node, inodes);

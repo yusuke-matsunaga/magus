@@ -251,11 +251,7 @@ public:
   /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
   pomark() const;
-  
-  /// @brief LUT ノードの場合に論理式を得る．
-  LogExpr
-  expr() const;
-  
+
   /// @brief LUTノードの場合に真理値ベクタを得る．
   /// @param[out] tv 真理値を格納するベクタ
   void
@@ -314,8 +310,10 @@ private:
   // ファンアウトの枝のリスト
   LnEdgeList mFanoutList;
   
+#if 0
   // 論理式
   LogExpr mExpr;
+#endif
   
   // 真理値ベクタ
   vector<int> mTv;
@@ -467,14 +465,12 @@ public:
   /// @brief LUTノードを作る．
   /// @param[in] name 名前
   /// @param[in] inodes 入力ノードのベクタ
-  /// @param[in] expr 論理式
   /// @param[in] tv 真理値ベクタ
   /// @return 作成したノードを返す．
   /// @note tv のサイズは inodes のサイズの冪乗
   LnNode*
   new_lut(const string& name,
 	  const vector<LnNode*>& inodes,
-	  const LogExpr& expr,
 	  const vector<int>& tv);
 
   /// @brief 入力ノードの削除
@@ -503,13 +499,11 @@ public:
   /// @brief LUTノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード
   /// @param[in] inodes 入力ノードのベクタ
-  /// @param[in] expr 論理式
   /// @param[in] tv 真理値ベクタ
   /// @note tv のサイズは inodes のサイズの冪乗
   void
   change_lut(LnNode* node,
 	     const vector<LnNode*>& inodes,
-	     const LogExpr& expr,
 	     const vector<int>& tv);
   
   /// @brief LUT ノードのファンインのみ変更する．
@@ -734,14 +728,6 @@ const string&
 LnNode::name() const
 {
   return mName;
-}
-  
-// @brief LUT ノードの場合に論理式を得る．
-inline
-LogExpr
-LnNode::expr() const
-{
-  return mExpr;
 }
 
 // @brief LUTノードの場合に真理値ベクタを得る．
