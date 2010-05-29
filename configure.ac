@@ -150,6 +150,9 @@ YM_CHECK_POPT
 # Check for TCL environment
 YM_CHECK_TCL
 
+# Check for tclreadline
+YM_CHECK_TCLREADLINE
+
 AC_CACHE_SAVE
 
 

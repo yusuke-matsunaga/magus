@@ -15,6 +15,8 @@
  */
 
 
+#include "ymtools.h"
+
 #include "HelloCmd.h"
 #include "RandCmd.h"
 #include "TimeCmd.h"
@@ -125,6 +127,7 @@ main(int argc,
 int
 Tcl_AppInit(Tcl_Interp* interp)
 {
+  using namespace std;
   using namespace nsYm::nsTclpp;
 
   if ( Tcl_Init(interp) == TCL_ERROR ) {
