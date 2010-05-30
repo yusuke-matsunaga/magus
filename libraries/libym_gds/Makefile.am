@@ -8,7 +8,8 @@ SUBDIRS = \
 	tests
 
 INCLUDES = \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)
 
 YFLAGS = -d -v
 

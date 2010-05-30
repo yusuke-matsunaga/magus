@@ -4,9 +4,13 @@
 
 SUBDIRS =
 
+YMLIBS_SRCDIR = $(top_srcdir)/../..
+YMLIBS_BUILDDIR = $(top_builddir)/../..
+
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/programs/magus/include
+	-I$(YMLIBS_SRCDIR)/include \
+	-I$(YMLIBS_BUILDDIR) \
+	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -50,7 +54,7 @@ libmagus_lutmap_la_SOURCES = \
 	WeightDCover.cc
 
 libmagus_lutmap_la_LIBADD = \
-	$(top_builddir)/libraries/libym_bdd/libym_bdd.la \
-	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
+	$(YMLIBS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 libmagus_lutmap_la_LDFLAGS =

@@ -3,6 +3,7 @@
 ## $Id: Makefile.am 958 2007-08-28 05:38:02Z matsunaga $
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 EXTRA_DIST = local_defs $(TESTS)

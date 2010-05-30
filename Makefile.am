@@ -15,7 +15,6 @@ MAINTAINERCLEANFILES = Makefile.in
 EXTRA_DIST = \
 	BUILDING \
 	Doxyfile.in \
-	acinclude.m4 \
 	aclocal.m4 \
 	boot.sh \
 	configure \
@@ -31,7 +30,6 @@ EXTRA_DIST = \
 	m4macros/tcl.m4 \
 	m4macros/ymlibs.m4 \
 	mkautogen \
-	modules \
 	ymconfig.h.in
 
 

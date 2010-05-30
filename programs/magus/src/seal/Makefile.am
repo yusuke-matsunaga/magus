@@ -4,11 +4,15 @@
 
 SUBDIRS =
 
+YMLIBS_SRCDIR = $(top_srcdir)/../..
+YMLIBS_BUILDDIR = $(top_builddir)/../..
+
 INCLUDES = \
 	$(TCL_INCLUDES) \
 	$(GMP_INCLUDES) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/programs/magus/include
+	-I$(YMLIBS_SRCDIR)/include \
+	-I$(YMLIBS_BUILDDIR) \
+	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -30,8 +34,8 @@ libmagus_seal_la_SOURCES = \
 	MCAnalysis.cc
 
 libmagus_seal_la_LIBADD = \
-	$(top_builddir)/libraries/libym_bdd/libym_bdd.la \
-	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
+	$(YMLIBS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 libmagus_seal_la_LDFLAGS = \
 	$(GMP_LIBS)

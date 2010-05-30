@@ -8,6 +8,7 @@ SUBDIRS += vlview
 endif
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 YFLAGS=-d -v

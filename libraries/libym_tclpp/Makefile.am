@@ -10,7 +10,8 @@ SUBDIRS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = $(TCL_INCLUDES) \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)
 
 noinst_LTLIBRARIES = libym_tclpp.la
 

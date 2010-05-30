@@ -5,6 +5,7 @@
 include $(top_srcdir)/etc/autotroll.mk
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/libym_verilog \
 	-I$(top_builddir)/libym_verilog \

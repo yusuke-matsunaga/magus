@@ -5,7 +5,9 @@
 ## $Revision: 1.3 $
 ## $Date: 2006/05/31 03:24:25 $
 
-INCLUDES = -I$(top_srcdir) \
+INCLUDES = \
+	-I$(top_builddir) \
+	-I$(top_srcdir) \
 	$(GMP_INCLUDES)
 
 MAINTAINERCLEANFILES = Makefile.in

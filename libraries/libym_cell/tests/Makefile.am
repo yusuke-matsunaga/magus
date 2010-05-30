@@ -6,6 +6,7 @@
 ## $Date: 2005/12/11 17:07:26 $
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 EXTRA_DIST = local_defs $(TESTS)

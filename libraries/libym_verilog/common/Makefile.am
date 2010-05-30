@@ -5,6 +5,7 @@
 SUBDIRS =
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 CLEANFILES =

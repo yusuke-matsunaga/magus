@@ -11,6 +11,3 @@ MAINTAINERCLEANFILES = Makefile.in
 
 EXTRA_DIST = \
 	etc/common_defs
-
-
-

@@ -10,7 +10,9 @@ SUBDIRS = \
 	tests
 
 INCLUDES = \
-	-I$(top_srcdir)/include
+	-I$(top_builddir) \
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)
 
 MAINTAINERCLEANFILES = Makefile.in
 

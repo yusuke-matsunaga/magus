@@ -3,6 +3,7 @@
 ## $Id: Makefile.am 169 2006-08-22 09:17:46Z matsunaga $
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/libraries/libym_verilog
 

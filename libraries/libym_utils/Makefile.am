@@ -12,8 +12,9 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_utils.la
 
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/include
+INCLUDES = \
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)
 
 libym_utils_la_SOURCES = \
 	ItvlCell.h \

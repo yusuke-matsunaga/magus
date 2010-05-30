@@ -112,7 +112,7 @@ CONFIG_DIR=config
 AUTOGEN_COMMON=autogen.common
 
 # サブモジュールのディレクトリ名
-SUBMODULE=`cat $BASEDIR/modules`
+#SUBMODULE=`cat $BASEDIR/modules`
 
 # 第1引数に応じた処理を行う．
 case "$1" in
@@ -120,7 +120,9 @@ case "$1" in
     case $# in
       0|1)
 	clean $BASEDIR
+	clean $BASEDIR/programs/magus no_autoheader
         boot $BASEDIR
+	boot $BASEDIR/programs/magus no_autoheader
         ;;
       2)
 	clean $2
@@ -137,6 +139,7 @@ case "$1" in
     case $# in
       1)
 	clean $BASEDIR
+	clean $BASEDIR/programs/magus
 	;;
       2)
 	clean $2

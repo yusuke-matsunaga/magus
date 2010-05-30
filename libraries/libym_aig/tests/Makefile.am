@@ -8,6 +8,7 @@
 SUBDIRS =
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 EXTRA_DIST = local_defs $(TESTS)
@@ -27,7 +28,7 @@ distclean-local:
 
 LIBYM_AIG = $(top_builddir)/libraries/libym_aig/libym_aig.la
 
-bin_PROGRAMS = \
+noinst_PROGRAMS = \
 	bnet2aig \
 	genpat \
 	genpat2 \

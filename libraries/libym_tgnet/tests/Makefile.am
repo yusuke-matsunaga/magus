@@ -3,6 +3,7 @@
 ## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in

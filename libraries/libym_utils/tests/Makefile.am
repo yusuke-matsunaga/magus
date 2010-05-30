@@ -2,8 +2,6 @@
 
 ## $Id: Makefile.am 1978 2009-02-06 12:29:16Z matsunaga $
 
-INCLUDES = \
-	-I$(top_srcdir)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -28,6 +26,10 @@ testsubdir = testSubDir
 
 distclean-local:
 	-rm -rf $(testsubdir)
+
+INCLUDES = \ 
+	-I$(top_builddir) \
+	-I$(top_srcdir)/include
 
 noinst_PROGRAMS = \
 	file_test \

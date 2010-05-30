@@ -5,6 +5,7 @@
 SUBDIRS =
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/libraries/libym_verilog/elaborator/include
 

@@ -10,7 +10,8 @@ SUBDIRS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)
 
 noinst_LTLIBRARIES = libym_lexp.la
 

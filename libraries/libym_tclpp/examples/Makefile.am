@@ -5,6 +5,7 @@
 INCLUDES = \
 	$(TCL_INCLUDES) \
 	$(TCLRL_INCLUDES) \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in

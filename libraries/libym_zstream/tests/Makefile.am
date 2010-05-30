@@ -4,6 +4,7 @@
 
 
 INCLUDES = \
+	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
 EXTRA_DIST = local_defs $(TESTS)
