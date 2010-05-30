@@ -18,15 +18,13 @@ Copyright (C) 2005-2010 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-#AC_CONFIG_SRCDIR([ymconfig.h.in])dnl
+AC_CONFIG_SRCDIR([include/ymnsdef.h])dnl
 
 AC_CONFIG_AUX_DIR([config])dnl
 AC_CONFIG_MACRO_DIR([config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
-
-#AC_CONFIG_HEADERS([ymconfig.h])dnl
 
 
 # ===================================================================
@@ -618,6 +616,10 @@ YM_INIT_PROGRAMS_SUBDIRS
 # magus
 YM_ADD_PROGRAMS_SUBDIRS([magus])
 AC_CONFIG_SUBDIRS([programs/magus])
+
+# atpg
+YM_ADD_PROGRAMS_SUBDIRS([atpg])
+AC_CONFIG_SUBDIRS([programs/atpg])
 
 YM_FINISH_PROGRAMS_SUBDIRS
 

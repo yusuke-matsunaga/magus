@@ -8,7 +8,7 @@
 ///
 /// $Id: atpg_nsdef.h 2128 2009-03-12 07:25:33Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // 名前空間の定義ファイル
@@ -16,7 +16,7 @@
 
 // namespace でネストするのがいやなので define マクロでごまかす．
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 #define BEGIN_NAMESPACE_YM_ATPG \
 BEGIN_NAMESPACE_YM \

@@ -7,12 +7,12 @@
 ///
 /// $Id: dtpgcl_nsdef.h 2128 2009-03-12 07:25:33Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "atpg_nsdef.h"
-#include <ym_utils/StopWatch.h>
+#include "ym_utils/StopWatch.h"
 
 
 // DtpgCl 用の名前空間の定義

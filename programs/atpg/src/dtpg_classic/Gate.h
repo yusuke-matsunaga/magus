@@ -7,13 +7,13 @@
 ///
 /// $Id: Gate.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "dtpgcl_nsdef.h"
 #include "Val3.h"
-#include <ym_tgnet/TgGateTemplate.h>
+#include "ym_tgnet/TgGateTemplate.h"
 #include "LqElem.h"
 
 

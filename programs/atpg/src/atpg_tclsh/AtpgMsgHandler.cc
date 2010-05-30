@@ -5,17 +5,12 @@
 ///
 /// $Id: AtpgMsgHandler.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-// ネットワークのファイル入出力関係のコマンド
-
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
 
 #include "AtpgMsgHandler.h"
-#include <ym_utils/FileRegion.h>
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

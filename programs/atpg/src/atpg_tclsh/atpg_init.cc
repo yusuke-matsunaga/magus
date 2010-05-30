@@ -5,17 +5,13 @@
 ///
 /// $Id: atpg_init.cc 2128 2009-03-12 07:25:33Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
-
 #include <tcl.h>
-#include <ym_tclpp/TclCmd.h>
-#include "main/AtpgMgr.h"
+#include "ym_tclpp/TclCmd.h"
+#include "AtpgMgr.h"
 #include "AtpgCmd.h"
 #include "NtwkIoCmd.h"
 #include "FaultCmd.h"

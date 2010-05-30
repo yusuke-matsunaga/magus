@@ -5,13 +5,9 @@
 ///
 /// $Id: misc_init.cc 2043 2009-02-21 07:08:48Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <atpg_config.h>
-#endif
 
 #include <tcl.h>
 

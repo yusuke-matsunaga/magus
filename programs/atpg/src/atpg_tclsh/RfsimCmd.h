@@ -7,12 +7,11 @@
 ///
 /// $Id: RfsimCmd.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "AtpgCmd.h"
-//#include "main/Rtpg.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

@@ -8,12 +8,12 @@
 ///
 /// $Id: DtpgCl.h 2128 2009-03-12 07:25:33Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "dtpgcl_nsdef.h"
-#include "main/ModBase.h"
+#include "ModBase.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

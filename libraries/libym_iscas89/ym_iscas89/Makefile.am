@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymiscas89includedir = $(YMINCLUDEDIR)/ym_iscas89
-ymiscas89include_HEADERS = \
+noinst_HEADERS = \
 	iscas89_nsdef.h \
 	Iscas89Parser.h \
 	Iscas89Handler.h

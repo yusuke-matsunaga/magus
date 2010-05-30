@@ -5,19 +5,14 @@
 ///
 /// $Id: PrintStatsCmd.cc 2128 2009-03-12 07:25:33Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
-
-
 #include "PrintStatsCmd.h"
-#include "main/AtpgMgr.h"
-#include "base/FaultMgr.h"
-#include "base/TvMgr.h"
+#include "AtpgMgr.h"
+#include "FaultMgr.h"
+#include "TvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

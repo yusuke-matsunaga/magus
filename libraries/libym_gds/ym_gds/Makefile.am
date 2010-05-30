@@ -4,8 +4,7 @@
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymgdsincludedir = $(YMINCLUDEDIR)/ym_gds
-ymgdsinclude_HEADERS = \
+noinst_HEADERS = \
 	gds_nsdef.h \
 	Msg.h \
 	GdsRecMgr.h \

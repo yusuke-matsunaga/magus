@@ -14,9 +14,8 @@
  * RCS: @(#) $Id: tclAppInit.cc 2043 2009-02-21 07:08:48Z matsunaga $
  */
 
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
+
+#include "atpg_nsdef.h"
 
 #define ERRORCODE_HACK 1
 
@@ -25,8 +24,6 @@
 #ifdef HAVE_TCLREADLINE
 #include <tclreadline.h>
 #endif
-
-#include "atpg_nsdef.h"
 
 #ifdef TCL_TEST
 

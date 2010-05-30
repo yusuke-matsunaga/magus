@@ -5,20 +5,15 @@
 ///
 /// $Id$
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
-
-
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
 
 
 #include "DtpgCl.h"
 #include "Network.h"
 #include "GateSa.h"
-#include "base/SaFault.h"
-#include "base/TestVector.h"
+#include "SaFault.h"
+#include "TestVector.h"
 #include "SearchMgr.h"
 #include "Cfna.h"
 

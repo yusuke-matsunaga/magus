@@ -5,12 +5,8 @@
 /// 
 /// $Id: SnXor.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
-
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
 
 
 #include "SnXor.h"

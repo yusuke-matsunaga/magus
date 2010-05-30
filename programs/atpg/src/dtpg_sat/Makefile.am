@@ -4,11 +4,14 @@
 
 SUBDIRS = 
 
+YMLIBS_SRCDIR = $(top_srcdir)/../..
+YMLIBS_BUILDDIR = $(top_builddir)/../..
+
 INCLUDES = \
 	$(TCL_INCLUDES) \
-	$(YM_INCLUDES) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src
+	-I$(YMLIBS_BUILDDIR) \
+	-I$(YMLIBS_SRCDIR)/include \
+	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -22,6 +25,6 @@ libatpg_dtpg_sat_la_SOURCES = \
 libatpg_dtpg_sat_la_LDFLAGS =
 
 libatpg_dtpg_sat_la_LIBADD = \
-	$(YM_LIBS_LIBYM_LEXP) \
-	$(YM_LIBS_LIBYM_AIG) \
-	$(YM_LIBS_LIBYM_SAT)
+	$(YMLIBS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_sat/libym_sat.la

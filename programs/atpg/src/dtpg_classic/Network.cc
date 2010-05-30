@@ -5,13 +5,8 @@
 ///
 /// $Id: Network.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
-
-
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
 
 
 #include "Network.h"
@@ -23,9 +18,9 @@
 #include "GateOr.h"
 #include "GateXor.h"
 #include "GateSa.h"
-#include "base/SaFault.h"
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tgnet/TgNode.h>
+#include "SaFault.h"
+#include "ym_tgnet/TgNetwork.h"
+#include "ym_tgnet/TgNode.h"
 #include "LvlQ.h"
 #include "SearchMgr.h"
 

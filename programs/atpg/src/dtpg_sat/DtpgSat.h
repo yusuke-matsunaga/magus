@@ -8,14 +8,14 @@
 ///
 /// $Id: DtpgSat.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "dtpgsat_nsdef.h"
-#include <ym_tgnet/tgnet_nsdef.h>
-#include <ym_tgnet/TgNode.h>
-#include <ym_sat/SatSolver.h>
+#include "ym_tgnet/tgnet_nsdef.h"
+#include "ym_tgnet/TgNode.h"
+#include "ym_sat/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

@@ -8,9 +8,19 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	atpg_nsdef.h \
-	Val3.h \
+	AtpgFunctor.h \
+	AtpgMgr.h \
+	Dtpg.h \
+	FaultMgr.h \
+	ModBase.h \
 	PackedVal.h \
 	PackedVal3.h \
+	Rtpg.h \
+	SaFault.h \
+	TestVector.h
+	TvBuff.h \
+	TvMgr.h \
+	Val3.h \
 	fsim_nsdef.h \
 	fsim3_nsdef.h \
 	fsimx_nsdef.h \

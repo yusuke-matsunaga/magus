@@ -5,20 +5,16 @@
 ///
 /// $Id: Rtpg.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
-
 #include "Rtpg.h"
 #include "fsim/Fsim.h"
-#include "base/SaFault.h"
-#include "base/FaultMgr.h"
-#include "base/TvMgr.h"
-#include <ym_utils/StopWatch.h>
+#include "SaFault.h"
+#include "FaultMgr.h"
+#include "TvMgr.h"
+#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

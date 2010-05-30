@@ -4,8 +4,12 @@
 
 SUBDIRS =
 
+YMLIBS_SRCDIR = $(top_srcdir)/../..
+YMLIBS_BUILDDIR = $(top_builddir)/../..
+
 INCLUDES = \
-	$(YM_INCLUDES) \
+	-I$(YMLIBS_BUILDDIR) \
+	-I$(YMLIBS_SRCDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src
 
@@ -14,15 +18,9 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libatpg_main.la
 
 libatpg_main_la_SOURCES = \
-	ModBase.h \
-	AtpgMgr.h \
 	AtpgMgr.cc \
-	AtpgFunctor.h \
-	Rtpg.h \
 	Rtpg.cc \
-	Dtpg.h \
 	Dtpg.cc \
-	TvBuff.h \
 	TvBuff.cc
 
 libatpg_main_la_LDFLAGS =
@@ -34,4 +32,4 @@ libatpg_main_la_LIBADD = \
 	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
 	$(top_builddir)/src/base/libatpg_base.la \
-	$(YM_LIBS_LIBYM_TGNET)
+	$(YMLIBS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la

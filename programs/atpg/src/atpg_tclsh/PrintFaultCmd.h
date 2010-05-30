@@ -7,7 +7,7 @@
 ///
 /// $Id: PrintFaultCmd.h 2043 2009-02-21 07:08:48Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 

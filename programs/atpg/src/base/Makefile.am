@@ -4,26 +4,25 @@
 
 SUBDIRS =
 
+YMLIBS_SRCDIR = $(top_srcdir)/../..
+YMLIBS_BUILDDIR = $(top_builddir)/../..
+
 INCLUDES = \
-	$(YM_INCLUDES) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)
+	-I$(YMLIBS_BUILDDIR) \
+	-I$(YMLIBS_SRCDIR)/include \
+	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libatpg_base.la
 
 libatpg_base_la_SOURCES = \
-	SaFault.h \
 	SaFault.cc \
-	FaultMgr.h \
 	FaultMgr.cc \
-	TestVector.h \
 	TestVector.cc \
-	TvMgr.h \
 	TvMgr.cc
 
 libatpg_base_la_LDFLAGS =
 
 libatpg_base_la_LIBADD = \
-	$(YM_LIBS_LIBYM_TGNET)
+	$(YMLIBS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la

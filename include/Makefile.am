@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymincludedir = $(YMINCLUDEDIR)
-yminclude_HEADERS = \
+noinst_HEADERS = \
 	ymnsdef.h \
 	ymassert.h \
 	ymmath.h \

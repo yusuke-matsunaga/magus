@@ -5,19 +5,15 @@
 ///
 /// $Id: AtpgCmd.cc 2128 2009-03-12 07:25:33Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
-
 #include "AtpgCmd.h"
-#include "main/AtpgMgr.h"
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tgnet/TgNode.h>
-#include "base/SaFault.h"
+#include "AtpgMgr.h"
+#include "ym_tgnet/TgNetwork.h"
+#include "ym_tgnet/TgNode.h"
+#include "SaFault.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

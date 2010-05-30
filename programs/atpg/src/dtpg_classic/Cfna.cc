@@ -5,22 +5,17 @@
 ///
 /// $Id: Cfna.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
-
-
-#if HAVE_CONFIG_H
-#include "atpg_config.h"
-#endif
 
 
 #include "Cfna.h"
 #include "Network.h"
 #include "SearchMgr.h"
 #include "backtrace.h"
-#include "base/TestVector.h"
-#include "base/TvMgr.h"
-#include <ym_tgnet/TgNode.h>
+#include "TestVector.h"
+#include "TvMgr.h"
+#include "ym_tgnet/TgNode.h"
 
 //#define DEBUG 1
 

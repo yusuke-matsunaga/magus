@@ -6,8 +6,7 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-ymmislibincludedir = $(YMINCLUDEDIR)/ym_mislib
-ymmislibinclude_HEADERS = \
+noinst_HEADERS = \
 	MislibHandler.h \
 	MislibParser.h \
 	mislib_nsdef.h
