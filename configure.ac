@@ -621,6 +621,10 @@ AC_CONFIG_SUBDIRS([programs/magus])
 YM_ADD_PROGRAMS_SUBDIRS([atpg])
 AC_CONFIG_SUBDIRS([programs/atpg])
 
+# matpg
+YM_ADD_PROGRAMS_SUBDIRS([matpg])
+AC_CONFIG_SUBDIRS([programs/matpg])
+
 YM_FINISH_PROGRAMS_SUBDIRS
 
 

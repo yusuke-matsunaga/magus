@@ -122,9 +122,11 @@ case "$1" in
 	clean $BASEDIR
 	clean $BASEDIR/programs/magus
 	clean $BASEDIR/programs/atpg
+	clean $BASEDIR/programs/matpg
         boot $BASEDIR
 	boot $BASEDIR/programs/magus no_autoheader
 	boot $BASEDIR/programs/atpg no_autoheader
+	boot $BASEDIR/programs/matpg no_autoheader
         ;;
       2)
 	clean $2
@@ -143,6 +145,7 @@ case "$1" in
 	clean $BASEDIR
 	clean $BASEDIR/programs/magus
 	clean $BASEDIR/programs/aptg
+	clean $BASEDIR/programs/maptg
 	;;
       2)
 	clean $2

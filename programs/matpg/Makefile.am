@@ -7,7 +7,6 @@ SUBDIRS = include src tclsrc
 MAINTAINERCLEANFILES = Makefile.in
 
 EXTRA_DIST = \
-	matpg_config.h.in \
 	configure \
 	configure.ac \
 	mk \

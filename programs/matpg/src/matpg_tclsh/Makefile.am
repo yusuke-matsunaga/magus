@@ -9,10 +9,14 @@ AM_CXXFLAGS = \
 	-DMATPG_DATADIR='"$(MATPG_DATADIR)"' \
 	-DMATPG_BINDIR='"$(MATPG_BINDIR)"'
 
+YMLIBS_SRCDIR = $(top_srcdir)/../..
+YMLIBS_BUILDDIR = $(top_builddir)/../..
+
 INCLUDES = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
-	$(YM_INCLUDES) \
+	-I$(YMLIBS_BUILDDIR) \
+	-I$(YMLIBS_SRCDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/libmatpg
 
@@ -50,11 +54,10 @@ libmatpg_tcl_la_SOURCES = \
 	matpg_init.cc
 
 libmatpg_tcl_la_LIBADD = \
-	$(YM_LIBS_LIBYM_TGNET) \
-	$(YM_LIBS_LIBYM_LEXP) \
-	$(YM_LIBS_LIBYM_TCLPP) \
-	$(YM_LIBS_LIBYM_UTILS)
-
+	$(YMLIBS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 matpg_tclsh_SOURCES = \
 	tclAppInit.cc
