@@ -2,21 +2,21 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS =
-
-YMLIBS_SRCDIR = $(top_srcdir)/../..
-YMLIBS_BUILDDIR = $(top_builddir)/../..
-
-INCLUDES = \
-	-I$(YMLIBS_SRCDIR)/include \
-	-I$(YMLIBS_BUILDDIR) \
-	-I$(top_srcdir)/include
+SUBDIRS = \
+	ym_lutmap \
+	. \
+	tests
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libmagus_lutmap.la
+noinst_LTLIBRARIES = libym_lutmap.la
 
-libmagus_lutmap_la_SOURCES = \
+INCLUDES = \
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)
+
+libym_lutmap_la_SOURCES = \
+
 	lutmap.h \
 	SbjGraph.h \
 	SbjGraph.cc \
@@ -53,8 +53,8 @@ libmagus_lutmap_la_SOURCES = \
 	WeightDCover.h \
 	WeightDCover.cc
 
-libmagus_lutmap_la_LIBADD = \
+libym_lutmap_la_LIBADD = \
 	$(YMLIBS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
 	$(YMLIBS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
-libmagus_lutmap_la_LDFLAGS =
+libym_lutmap_la_LDFLAGS =
