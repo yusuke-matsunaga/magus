@@ -7,12 +7,10 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	ymnsdef.h \
+	acc_user.h \
+	mainpage.h \
+	veriuser.h \
+	vpi_user.h \
 	ymassert.h \
 	ymmath.h \
-	acc_user.h \
-	veriuser.h \
-	vpi_user.h
-
-noinst_HEADERS = \
-	mainpage.h
+	ymnsdef.h

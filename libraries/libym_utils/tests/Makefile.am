@@ -27,7 +27,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-INCLUDES = \ 
+INCLUDES = \
 	-I$(top_builddir) \
 	-I$(top_srcdir)/include
 
