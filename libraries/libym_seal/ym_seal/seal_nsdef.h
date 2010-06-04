@@ -1,7 +1,7 @@
-#ifndef MAGUS_SEAL_SEAL_H
-#define MAGUS_SEAL_SEAL_H
+#ifndef YM_SEAL_SEAL_NSDEF_H
+#define YM_SEAL_SEAL_NSDEF_H
 
-/// @file magus/seal/seal.h
+/// @file ym_seal/seal_nsdef.h
 /// @brief seal パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,16 +11,16 @@
 /// All rights reserved.
 
 
-#include "magus.h"
+#include "ymtools.h"
 
 /// @brief seal 用の名前空間の開始
-#define BEGIN_NAMESPACE_MAGUS_SEAL \
-BEGIN_NAMESPACE_MAGUS \
+#define BEGIN_NAMESPACE_YM_SEAL \
+BEGIN_NAMESPACE_YM \
 BEGIN_NAMESPACE(nsSeal)
 
 /// @brief seal 用の名前空間の終了
-#define END_NAMESPACE_MAGUS_SEAL \
+#define END_NAMESPACE_YM_SEAL \
 END_NAMESPACE(nsSeal) \
-END_NAMESPACE_MAGUS
+END_NAMESPACE_YM
 
-#endif // MAGUS_SEAL_SEAL_H
+#endif // YM_SEAL_SEAL_NSDEF_H

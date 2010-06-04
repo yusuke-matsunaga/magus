@@ -1,7 +1,7 @@
-#ifndef SRC_SEAL_LOGICSIM_H
-#define SRC_SEAL_LOGICSIM_H
+#ifndef LIBYM_SEAL_LOGICSIM_H
+#define LIBYM_SEAL_LOGICSIM_H
 
-/// @file src/seal/LogicSim.h
+/// @file libym_seal/LogicSim.h
 /// @brief LogicSim のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "seal.h"
+#include "ym_seal/seal_nsdef.h"
 #include "ym_bnet/BNetwork.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 typedef string State;
 
@@ -65,6 +65,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL
 
-#endif // SRC_SEAL_LOGICSIM_H
+#endif // LIBYM_SEAL_LOGICSIM_H

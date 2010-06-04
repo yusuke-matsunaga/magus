@@ -22,11 +22,11 @@ int
 seal_init(Tcl_Interp* interp,
 	  NetMgr* mgr)
 {
-  TclCmdBinder1<nsSeal::SealCmd, NetMgr*>::reg(interp, mgr, "magus::seal");
-  TclCmdBinder1<nsSeal::TMRCmd, NetMgr*>::reg(interp, mgr, "magus::tmr");
-  TclCmdBinder1<nsSeal::DupCmd, NetMgr*>::reg(interp, mgr, "magus::dup_node");
-  TclCmdBinder1<nsSeal::McaCmd, NetMgr*>::reg(interp, mgr, "magus::mc_analysis");
-  TclCmdBinder1<nsSeal::McaCmd2, NetMgr*>::reg(interp, mgr, "magus::mc_analysis2");
+  TclCmdBinder1<SealCmd, NetMgr*>::reg(interp, mgr, "magus::seal");
+  TclCmdBinder1<TMRCmd, NetMgr*>::reg(interp, mgr, "magus::tmr");
+  TclCmdBinder1<DupCmd, NetMgr*>::reg(interp, mgr, "magus::dup_node");
+  TclCmdBinder1<McaCmd, NetMgr*>::reg(interp, mgr, "magus::mc_analysis");
+  TclCmdBinder1<McaCmd2, NetMgr*>::reg(interp, mgr, "magus::mc_analysis2");
 
   const char* init =
     "namespace eval tclreadline {\n"

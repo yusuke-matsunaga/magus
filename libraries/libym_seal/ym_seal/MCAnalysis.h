@@ -1,7 +1,7 @@
-#ifndef SRC_SEAL_MCANALYSIS_H
-#define SRC_SEAL_MCANALYSIS_H
+#ifndef YM_SEAL_MCANALYSIS_H
+#define YM_SEAL_MCANALYSIS_H
 
-/// @file src/seal/MCAnalysis.h
+/// @file ym_seal/MCAnalysis.h
 /// @brief MCAnalysis のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "seal.h"
+#include "ym_seal/seal_nsdef.h"
 #include "ym_bnet/bnet_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 typedef string State;
 
@@ -98,6 +98,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL
 
-#endif // SRC_SEAL_MCANALYSIS_H
+#endif // YM_SEAL_MCANALYSIS_H

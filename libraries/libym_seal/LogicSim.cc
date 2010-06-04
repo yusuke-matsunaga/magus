@@ -1,5 +1,5 @@
 
-/// @file magus/src/seal/LogicSim.cc
+/// @file libym_seal/LogicSim.cc
 /// @brief LogicSim の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "LogicSim.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 // @brief コンストラクタ
 // @param[in] bnetwork ネットワーク
@@ -100,4 +100,4 @@ LogicSim::operator()(ymuint input_vector,
   }
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL

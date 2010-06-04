@@ -1,5 +1,5 @@
 
-/// @file magus/src/seal/fsm_analysis2.cc
+/// @file libym_seal/fsm_analysis2.cc
 /// @brief fsm_analysis2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "LogicSim.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 BEGIN_NONAMESPACE
 
@@ -207,4 +207,4 @@ fsm_analysis2(const BNetwork& bnetwork,
   }
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL

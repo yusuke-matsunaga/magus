@@ -1,5 +1,5 @@
 
-/// @file magus/src/seal/fsm_analysis.cc
+/// @file libym_seal/fsm_analysis.cc
 /// @brief fsm_analysis の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "MCAnalysis.h"
+#include "ym_seal/MCAnalysis.h"
 #include "BddFsm.h"
 #include "IdxMapper.h"
 #include "ym_utils/StopWatch.h"
@@ -38,7 +38,7 @@ const bool report_size = REPORT_SIZE;
 END_NONAMESPACE
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 // 与えられた回路の到達可能状態および遷移確率を求める．
 // 同時に正常回路と故障回路の対の到達可能状態および遷移確率も求める．
@@ -592,4 +592,4 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
   }
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL

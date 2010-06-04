@@ -1,7 +1,7 @@
-#ifndef SRC_SEAL_BDDFSM_H
-#define SRC_SEAL_BDDFSM_H
+#ifndef LIBYM_SEAL_BDDFSM_H
+#define LIBYM_SEAL_BDDFSM_H
 
-/// @file src/seal/BddFsm.h
+/// @file libym_seal/BddFsm.h
 /// @brief BddFsm のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "seal.h"
+#include "ym_seal/seal_nsdef.h"
 #include "ym_bdd/Bdd.h"
 #include "ym_bdd/BddVarSet.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 typedef string State;
 typedef string StatePair;
@@ -265,6 +265,6 @@ BddFsm::next_states2cur_states(const Bdd& next_bdd) const
   return next_bdd.remap_var(mNext2CurMap);
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL
 
-#endif // SRC_SEAL_BDDFSM_H
+#endif // LIBYM_SEAL_BDDFSM_H

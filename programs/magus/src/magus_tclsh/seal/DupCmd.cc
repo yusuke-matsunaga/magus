@@ -14,7 +14,7 @@
 #include "ym_utils/RandGen.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // 回路を部分的に多重化するコマンド
@@ -195,4 +195,4 @@ DupCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_MAGUS

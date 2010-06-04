@@ -12,10 +12,9 @@
 
 
 #include "MagBNetCmd.h"
-#include "seal.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // 回路を3重化するコマンド
@@ -42,6 +41,6 @@ protected:
 
 };
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_MAGUS
 
 #endif // SRC_SEAL_TMRCMD_H

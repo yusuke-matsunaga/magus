@@ -1,5 +1,5 @@
 
-/// @file magus/src/seal/Matrix.cc
+/// @file libym_seal/Matrix.cc
 /// @brief Matrix の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "Matrix.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 // @brief コンストラクタ
 // @param[in] row_num 行数
@@ -77,4 +77,4 @@ display(ostream& s,
   }
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL

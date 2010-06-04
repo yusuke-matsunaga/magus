@@ -1,7 +1,7 @@
-#ifndef SRC_SEAL_IDXMAPPER_H
-#define SRC_SEAL_IDXMAPPER_H
+#ifndef LIBYM_SEAL_IDXMAPPER_H
+#define LIBYM_SEAL_IDXMAPPER_H
 
-/// @file magus/src/seal/IdxMapper.h
+/// @file libym_seal/IdxMapper.h
 /// @brief fsm_analysis の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,9 @@
 /// All rights reserved.
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+#include "ym_seal/seal_nsdef.h"
+
+BEGIN_NAMESPACE_YM_SEAL
 
 //////////////////////////////////////////////////////////////////////
 /// @class IdxMapper
@@ -214,6 +216,6 @@ IdxMapper::make_error_state(State normal_state,
   return normal_state + error_state + "00";
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL
 
-#endif // SRC_SEAL_IDXMAPPER_H
+#endif // LIBYM_SEAL_IDXMAPPER_H

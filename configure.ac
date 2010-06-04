@@ -610,6 +610,12 @@ AC_CONFIG_FILES([libraries/libym_lutmap/Makefile])
 AC_CONFIG_FILES([libraries/libym_lutmap/ym_lutmap/Makefile])
 AC_CONFIG_FILES([libraries/libym_lutmap/tests/Makefile])
 
+# libym_seal
+YM_ADD_LIBRARIES_SUBDIRS([libym_seal])
+AC_CONFIG_FILES([libraries/libym_seal/Makefile])
+AC_CONFIG_FILES([libraries/libym_seal/ym_seal/Makefile])
+AC_CONFIG_FILES([libraries/libym_seal/tests/Makefile])
+
 # libym_tclpp
 YM_ADD_LIBRARIES_SUBDIRS([libym_tclpp])
 AC_CONFIG_FILES([libraries/libym_tclpp/Makefile])

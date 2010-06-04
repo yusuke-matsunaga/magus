@@ -1,7 +1,7 @@
-#ifndef SRC_SEAL_MATRIX_H
-#define SRC_SEAL_MATRIX_H
+#ifndef LIBYM_SEAL_MATRIX_H
+#define LIBYM_SEAL_MATRIX_H
 
-/// @file src/seal/Matrix.h
+/// @file libym_seal/Matrix.h
 /// @brief Matrix のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "seal.h"
+#include "ym_seal/seal_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 //////////////////////////////////////////////////////////////////////
 /// @class Matrix Matrix.h "Matrix.h"
@@ -142,6 +142,6 @@ Matrix::elem(ymuint32 r_pos,
   return mBody[r_pos * mColNum + c_pos];
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL
 
-#endif // SRC_SEAL_LOGICSIM_H
+#endif // LIBYM_SEAL_MATRIX_H

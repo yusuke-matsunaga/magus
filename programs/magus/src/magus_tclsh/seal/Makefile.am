@@ -12,7 +12,6 @@ INCLUDES = \
 	-I$(YMLIBS_SRCDIR)/include \
 	-I$(YMLIBS_BUILDDIR) \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src/seal \
 	-I$(top_srcdir)/src/magus_tclsh/include
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -33,6 +32,7 @@ libmagus_seal_tcl_la_SOURCES = \
 	seal_init.cc
 
 libmagus_seal_tcl_la_LIBADD = \
+	$(YMLIBS_BUILDDIR)/libraries/libym_seal/libym_seal.la \
 	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 libmagus_seal_tcl_la_LDFLAGS =

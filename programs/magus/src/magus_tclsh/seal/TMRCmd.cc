@@ -13,7 +13,7 @@
 #include "ym_bnet/BNetManip.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // 回路を3重化するコマンド
@@ -116,4 +116,4 @@ TMRCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_MAGUS

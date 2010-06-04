@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 #include "McaCmd.h"
-#include "MCAnalysis.h"
+#include "ym_seal/MCAnalysis.h"
 #include "ym_bnet/BNetwork.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 McaCmd::McaCmd(NetMgr* mgr) :
@@ -71,7 +71,7 @@ McaCmd::cmd_proc(TclObjVector& objv)
     init_states.push_back(s);
   }
   
-  MCAnalysis mca;
+  nsSeal::MCAnalysis mca;
   
   mca.analyze(*bnetwork, init_states);
   
@@ -113,4 +113,4 @@ McaCmd::read_kiss(ifstream &fi,
   }
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_MAGUS

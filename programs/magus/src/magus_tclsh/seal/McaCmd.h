@@ -11,12 +11,11 @@
 /// All rights reserved.
 
 
-#include "seal.h"
 #include "MagBNetCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_MAGUS
 
 typedef string State;
 
@@ -63,6 +62,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_MAGUS
 
 #endif // SRC_SEAL_MCACMD_H

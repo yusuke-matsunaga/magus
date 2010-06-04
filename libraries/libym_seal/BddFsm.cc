@@ -1,6 +1,6 @@
 
-/// @file magus/src/seal/Fsm.cc
-/// @brief Fsm の実装ファイル
+/// @file libym_seal/BddFsm.cc
+/// @brief BddFsm の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BddFsm.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -16,7 +16,7 @@
 #include "ym_utils/StopWatch.h"
 
 
-BEGIN_NAMESPACE_MAGUS_SEAL
+BEGIN_NAMESPACE_YM_SEAL
 
 // @brief コンストラクタ
 // @param[in] bdd_mgr BDD マネージャ
@@ -359,4 +359,4 @@ BddFsm::bdd2next_states(Bdd bdd_states,
   }
 }
 
-END_NAMESPACE_MAGUS_SEAL
+END_NAMESPACE_YM_SEAL
