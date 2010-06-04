@@ -10,18 +10,12 @@
 
 
 #include "LutmapCmd.h"
-#include "SbjGraph.h"
-#include "LutNetwork.h"
-#include "CutHolder.h"
-#include "MapRecord.h"
-#include "CutResub.h"
-#include "DagDCover.h"
 #include "ym_tclpp/TclPopt.h"
 
 #include "ym_utils/StopWatch.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // delay map コマンド
@@ -56,15 +50,14 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
   int slack = 0;
   bool verbose = false;
   
-  string fargs = "dag";
-
+  ymuint mode = 0;
   if ( mPoptMethod->is_specified() ) {
     string method = mPoptMethod->val();
     if ( method == "dag" ) {
-      fargs = "dag";
+      mode = 1;
     }
     else if ( method == "fo" ) {
-      fargs = "fo";
+      mode = 0;
     }
     else {
       string emsg = method + ": unknown method";
@@ -78,7 +71,7 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
   }
 
   if ( mPoptResub->is_specified() ) {
-    fargs += "-r";
+    mode |= 2;
   }
 
   if ( mPoptVerbose->is_specified() ) {
@@ -97,16 +90,11 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
     if ( code != TCL_OK ) {
       return code;
     }
-
-    DagDCoverFactory ddfactory;
-    DagDCover* dagdcov = ddfactory(fargs);
-    MapRecord maprec;
-    dagdcov->record_cuts(sbjgraph(), limit, slack, maprec);
     
-    int lut_num;
-    int depth;
-    maprec.gen_mapgraph(sbjgraph(), lutnetwork(), lut_num, depth);
-    delete dagdcov;
+    ymuint lut_num;
+    ymuint depth;
+    delay_map(sbjgraph(), limit, slack, mode, lutnetwork(), lut_num, depth);
+
     set_var("::magus::lutmap_stats", "lut_num",
 	    lut_num,
 	    TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
@@ -126,4 +114,4 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

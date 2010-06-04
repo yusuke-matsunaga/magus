@@ -7,11 +7,11 @@
 ///
 /// $Id: gds_nsdef.h 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 /// @brief gds 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_GDS \

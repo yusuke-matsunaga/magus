@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/CrLevelQ.cc
+/// @file libym_lutmap/CrLevelQ.cc
 /// @brief CrLevelQ の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 
 #include "CrLevelQ.h"
 #include "CrNode.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス CrLevelQ
@@ -114,4 +114,4 @@ CrLevelQ::getmax()
   return NULL;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

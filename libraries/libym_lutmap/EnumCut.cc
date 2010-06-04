@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/EnumCut.cc 
+/// @file libym_lutmap/EnumCut.cc 
 /// @brief EnumCut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 #include "EnumCut.h"
 
 //#define DEBUG_ENUM_RECUR
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス EnumCut
@@ -455,4 +455,4 @@ EnumCut::set_cut_node_list_recur(SbjNode* node,
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

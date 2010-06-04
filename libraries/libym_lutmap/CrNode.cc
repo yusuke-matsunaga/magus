@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/CrNode.cc
+/// @file libym_lutmap/CrNode.cc
 /// @brief CrNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,10 +10,10 @@
 
 
 #include "CrNode.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス CrNode
@@ -98,4 +98,4 @@ compare(CrNode* node1,
   return node1->sbjnode()->id() < node2->sbjnode()->id();
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

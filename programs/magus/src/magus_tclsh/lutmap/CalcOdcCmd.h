@@ -12,11 +12,10 @@
 
 
 #include "MagBNetCmd.h"
-#include "lutmap.h"
 #include "CalcOdc.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CalcOdcCmd CalcOdcCmd.h "CalcOdcCmd.h"
@@ -53,6 +52,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS
 
 #endif // MAGUS_LUTMAP_CALCODCCMD_H

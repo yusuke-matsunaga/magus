@@ -10,11 +10,11 @@
 
 
 #include "LutmapCmd.h"
-#include "SbjGraph.h"
-#include "LutNetwork.h"
+#include "ym_lutmap/SbjGraph.h"
+#include "ym_lutmap/LnGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // LUT mapping の基底クラス
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS_LUTMAP
 
 // @brief コンストラクタ
 LutmapCmd::LutmapCmd(NetMgr* mgr,
-		       LutmapData* data) :
+		     LutmapData* data) :
   MagBNetCmd(mgr),
   mData(data)
 {
@@ -47,37 +47,27 @@ LutmapCmd::lutnetwork()
   return mData->mLutNetwork;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
-
-BEGIN_NAMESPACE_MAGUS
 
 int
 lutmap_init(Tcl_Interp* interp,
 	    NetMgr* mgr)
 {
-  nsLutmap::LutmapData* data = new nsLutmap::LutmapData;
+  LutmapData* data = new LutmapData;
   
-  TclCmdBinder2<nsLutmap::Conv2SbjCmd,
-    NetMgr*, nsLutmap::LutmapData*>::reg(interp, mgr, data,
-					 "magus::lutmap::conv2sbj");
-  TclCmdBinder2<nsLutmap::DumpSbjCmd,
-    NetMgr*, nsLutmap::LutmapData*>::reg(interp, mgr, data,
-					 "magus::lutmap::dump_sbjgraph");
-  TclCmdBinder2<nsLutmap::AreaMapCmd,
-    NetMgr*, nsLutmap::LutmapData*>::reg(interp, mgr, data,
-					 "magus::lutmap::area_map");
-  TclCmdBinder2<nsLutmap::DelayMapCmd,
-    NetMgr*, nsLutmap::LutmapData*>::reg(interp, mgr, data,
-					 "magus::lutmap::delay_map");
-  TclCmdBinder2<nsLutmap::DumpLutCmd,
-    NetMgr*, nsLutmap::LutmapData*>::reg(interp, mgr, data,
-					 "magus::lutmap::dump_lutnetwork");
-  TclCmdBinder2<nsLutmap::Conv2BNetCmd,
-    NetMgr*, nsLutmap::LutmapData*>::reg(interp, mgr, data,
-					 "magus::lutmap::conv2bnet");
-  TclCmdBinder2<nsLutmap::WriteVqmCmd,
-    NetMgr*, nsLutmap::LutmapData*>::reg(interp, mgr, data,
-					 "magus::lutmap::write_vqm");
+  TclCmdBinder2<Conv2SbjCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+							"magus::lutmap::conv2sbj");
+  TclCmdBinder2<DumpSbjCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+						       "magus::lutmap::dump_sbjgraph");
+  TclCmdBinder2<AreaMapCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+						       "magus::lutmap::area_map");
+  TclCmdBinder2<DelayMapCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+							"magus::lutmap::delay_map");
+  TclCmdBinder2<DumpLutCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+						       "magus::lutmap::dump_lutnetwork");
+  TclCmdBinder2<Conv2BNetCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+							 "magus::lutmap::conv2bnet");
+  TclCmdBinder2<WriteVqmCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+							"magus::lutmap::write_vqm");
   
   
   const char* init =

@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/bnet2sbj.cc
+/// @file libym_lutmap/bnet2sbj.cc
 /// @brief bnet2sbj() の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,10 +10,10 @@
 
 
 #include "ym_bnet/BNetwork.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // BNode へのポインタをキーにして SbjNode と極性を保持する連想配列．
@@ -254,4 +254,4 @@ bnet2sbj(const BNetwork& network,
   return true;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

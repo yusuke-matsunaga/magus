@@ -12,7 +12,6 @@ INCLUDES = \
 	-I$(YMLIBS_SRCDIR)/include \
 	-I$(YMLIBS_BUILDDIR) \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src/lutmap \
 	-I$(top_srcdir)/src/magus_tclsh/include
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -31,6 +30,7 @@ libmagus_lutmap_tcl_la_SOURCES = \
 	WriteVqmCmd.cc
 
 libmagus_lutmap_tcl_la_LIBADD = \
+	$(YMLIBS_BUILDDIR)/libraries/libym_lutmap/libym_lutmap.la \
 	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 libmagus_lutmap_tcl_la_LDFLAGS =

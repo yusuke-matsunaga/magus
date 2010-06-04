@@ -11,16 +11,11 @@
 
 #include "LutmapCmd.h"
 #include "NetHandle.h"
-#include "LutNetwork.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_tclpp/TclPopt.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
-
-void
-lut2bnet(const LnGraph& src_network,
-	 BNetwork& dst_network);
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // マッピングを行うコマンド
@@ -80,4 +75,4 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

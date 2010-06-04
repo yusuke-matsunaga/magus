@@ -7,23 +7,6 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	Alloc.h \
-	Binder.h \
-	DlList.h \
-	File.h \
-	FileDescMgr.h \
-	FileDesc.h \
-	FileLoc.h \
-	FileRegion.h \
-	Generator.h \
-	HeapTree.h \
-	ItvlMgr.h \
-	MFSet.h \
-	MsgHandler.h \
-	NameMgr.h \
-	RandGen.h \
-	RefCount.h \
-	ShString.h \
-	StopWatch.h \
-	StrBuff.h \
-	random.h
+	lutmap_nsdef.h \
+	LnGraph.h \
+	SbjGraph.h

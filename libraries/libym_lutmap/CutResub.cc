@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/CutResub.cc
+/// @file libym_lutmap/CutResub.cc
 /// @brief CutResub の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,14 +10,14 @@
 
 
 #include "CutResub.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
 
 //#define DEBUG_UPDATE
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス CutResub
@@ -760,4 +760,4 @@ CutResub::free_node(CrNode* node)
   mGarbageList.push_back(node);
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

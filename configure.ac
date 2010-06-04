@@ -604,6 +604,12 @@ AC_CONFIG_FILES([libraries/libym_tclpp/Makefile])
 AC_CONFIG_FILES([libraries/libym_tclpp/ym_tclpp/Makefile])
 AC_CONFIG_FILES([libraries/libym_tclpp/examples/Makefile])
 
+# libym_lutmap
+YM_ADD_LIBRARIES_SUBDIRS([libym_lutmap])
+AC_CONFIG_FILES([libraries/libym_lutmap/Makefile])
+AC_CONFIG_FILES([libraries/libym_lutmap/ym_lutmap/Makefile])
+AC_CONFIG_FILES([libraries/libym_lutmap/tests/Makefile])
+
 YM_FINISH_LIBRARIES_SUBDIRS
 
 

@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/Cut.cc 
+/// @file libym_lutmap/Cut.cc 
 /// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,10 +10,10 @@
 
 
 #include "Cut.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // 空のコンストラクタ
 Cut::Cut() :
@@ -173,4 +173,4 @@ Cut::dump(ostream& s) const
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

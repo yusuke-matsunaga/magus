@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/CrHeap.cc
+/// @file libym_lutmap/CrHeap.cc
 /// @brief CrHeap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 
 #include "CrHeap.h"
 #include "CrNode.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス CrHeap
@@ -178,4 +178,4 @@ CrHeap::get(ymuint pos)
   return mHeap[pos];
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

@@ -7,11 +7,11 @@
 ///
 /// $Id: Glv.h 346 2007-01-12 13:56:03Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 #include <gtkmm.h>
 #include <gtkglmm.h>

@@ -7,7 +7,7 @@
 ///
 /// $Id: bdn_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BdnGroup Binary Decomposed Network パッケージ
@@ -68,8 +68,8 @@
 ///   反転属性なしで 0，反転属性ありで 1 を表す．
 
 
-#include <ymtools.h>
-#include <ym_utils/DlList.h>
+#include "ymtools.h"
+#include "ym_utils/DlList.h"
 
 
 /// @brief ym_bdn 用の名前空間の開始

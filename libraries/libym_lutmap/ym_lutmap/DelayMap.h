@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_DAGDCOVER_H
-#define MAGUS_LUTMAP_DAGDCOVER_H
+#ifndef YM_LUTMAP_DAGDCOVER_H
+#define YM_LUTMAP_DAGDCOVER_H
 
-/// @file magus/lutmap/DagDCover.h
+/// @file ym_lutmap/DagDCover.h
 /// @brief DagDCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "lutmap.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjGraph;
 class MapRecord;
@@ -41,12 +41,14 @@ public:
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] limit LUT の入力数
   /// @param[in] slack 最小段数に対するスラック
+  /// @param[in] resub cut resubstitution を行うとき true にするフラグ
   /// @param[out] maprec マッピング結果を記録するオブジェクト
   virtual
   void
   record_cuts(const SbjGraph& sbjgraph,
 	      int limit,
 	      ymuint slack,
+	      bool resub,
 	      MapRecord& maprec) = 0;
   
 };
@@ -76,6 +78,6 @@ public:
 
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_DAGDCOVER_H
+#endif // YM_LUTMAP_DAGDCOVER_H

@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_MAP_H
-#define MAGUS_LUTMAP_MAP_H
+#ifndef LIBYM_LUTMAP_MAPRECORD_H
+#define LIBYM_LUTMAP_MAPRECORD_H
 
-/// @file magus/lutmap/MapRecord.h
+/// @file libym_lutmap/MapRecord.h
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "lutmap.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjGraph;
 class SbjNode;
@@ -71,8 +71,8 @@ public:
   void
   gen_mapgraph(const SbjGraph& sbjgraph,
 	       LnGraph& mapgraph,
-	       int& lut_num,
-	       int& depth);
+	       ymuint& lut_num,
+	       ymuint& depth);
 
   /// @brief マッピング結果の LUT 数を数える．
   int
@@ -162,6 +162,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_MAPPERBASE_H
+#endif // LIBYM_LUTMAP_MAPRECORD_H

@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/CutHolder.cc
+/// @file libym_lutmap/CutHolder.cc
 /// @brief CutHolder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 
 #include "CutHolder.h"
 #include "Cut.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
 CutHolder::CutHolder()
@@ -110,4 +110,4 @@ CutHolder::alloc_cut(ymuint ni)
   return reinterpret_cast<Cut*>(top);
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

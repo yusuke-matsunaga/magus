@@ -1,59 +1,79 @@
-#ifndef MAGUS_LUTMAP_WEIGHTDCOVER_H
-#define MAGUS_LUTMAP_WEIGHTDCOVER_H
+#ifndef LIBYM_LUTMAP_DELAYCOVER_H
+#define LIBYM_LUTMAP_DELAYCOVER_H
 
-/// @file magus/lutmap/WeightDCover.h
-/// @brief WeightDCover のヘッダファイル
+/// @file libym_lutmap/DelayCover.h
+/// @brief DelayCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: WeightDCover.h 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: DelayCover.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DagDCover.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 #include "ADCost.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class WeightDCover WeightDCover.h "WeightDCover.h"
+/// @class DelayCover DelayCover.h "DelayCover.h"
 /// @brief depth/area optimal cover を求めるためのクラス
 //////////////////////////////////////////////////////////////////////
-class WeightDCover :
-  public DagDCover
+class DelayCover
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mode モード
-  WeightDCover(int mode);
+  DelayCover();
 
   /// @brief デストラクタ
-  virtual
-  ~WeightDCover();
+  ~DelayCover();
 
 
 public:
+  
+  /// @brief 遅延最小化マッピングを行う．
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] limit LUT の入力数
+  /// @param[in] slack 最小段数に対するスラック
+  /// @param[in] mode モード
+  ///  - 0: fanout フロー, resub なし
+  ///  - 1: weighted フロー, resub なし
+  ///  - 2: fanout フロー, resub あり
+  ///  - 3: weighted フロー, resub あり
+  /// @param[out] mapnetwork マッピング結果
+  /// @param[out] lut_num LUT数
+  /// @param[out] depth 段数
+  void
+  operator()(const SbjGraph& sbjgraph,
+	     ymuint limit,
+	     ymuint slack,
+	     ymuint mode,
+	     LnGraph& mapnetwork,
+	     ymuint& lut_num,
+	     ymuint& depth);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請けの関数
+  //////////////////////////////////////////////////////////////////////
+  
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] limit LUT の入力数
   /// @param[in] slack 最小段数に対するスラック
-  virtual
   void
   record_cuts(const SbjGraph& sbjgraph,
-	      int limit,
+	      ymuint limit,
 	      ymuint slack,
 	      MapRecord& maprec);
-
-
-private:
   
   // node のカットを記録する．
   void
@@ -95,7 +115,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // モード
-  int mMode;
+  ymuint mMode;
   
   // カットを保持するオブジェクト
   CutHolder mCutHolder;
@@ -117,6 +137,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_WEIGHTDCOVER_H
+#endif // LIBYM_LUTMAP_DELAYCOVER_H

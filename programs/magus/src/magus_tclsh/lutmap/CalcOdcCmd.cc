@@ -16,7 +16,7 @@
 #include "OdcMgr.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // calc_odc コマンド
@@ -47,4 +47,4 @@ CalcOdcCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

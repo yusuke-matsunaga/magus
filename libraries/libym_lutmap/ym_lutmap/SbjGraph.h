@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_SBJGRAPH_H
-#define MAGUS_LUTMAP_SBJGRAPH_H
+#ifndef YM_LUTMAP_SBJGRAPH_H
+#define YM_LUTMAP_SBJGRAPH_H
 
-/// @file magus/lutmap/SbjGraph.h 
+/// @file ym_lutmap/SbjGraph.h 
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,14 +10,16 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
+
+#include "ym_lutmap/lutmap_nsdef.h"
+
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
+#include "ym_bnet/BNetwork.h"
 
-#include "lutmap.h"
 
-
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjEdge;
 class SbjNode;
@@ -27,6 +29,11 @@ typedef DlList<SbjEdge> SbjEdgeList;
 typedef DlListConstIter<SbjEdge> SbjEdgeListConstIter;
 typedef DlList<SbjNode> SbjNodeList;
 typedef DlListConstIter<SbjNode> SbjNodeListConstIter;
+
+bool
+bnet2sbj(const BNetwork& network,
+	 SbjGraph& sbjgraph,
+	 ostream& err_out);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1407,6 +1414,12 @@ SbjGraph::lnode_list() const
   return mLnodeList;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_SBJGRAPH_H
+BEGIN_NAMESPACE_YM
+
+using nsLutmap::bnet2sbj;
+
+END_NAMESPACE_YM
+
+#endif // YM_LUTMAP_SBJGRAPH_H

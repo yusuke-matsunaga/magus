@@ -8,14 +8,14 @@
 ///
 /// $Id: mislib_nsdef.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup CellGroup セルライブラリ
 ///
 /// セルライブラリを扱うためのクラスライブラリ
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 
 //////////////////////////////////////////////////////////////////////

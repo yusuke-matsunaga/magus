@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/MapRecord.cc
+/// @file libym_lutmap/MapRecord.cc
 /// @brief MapRecord の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,12 +10,12 @@
 
 
 #include "MapRecord.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
+#include "ym_lutmap/LnGraph.h"
 #include "Cut.h"
-#include "LutNetwork.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
 MapRecord::MapRecord()
@@ -70,8 +70,8 @@ MapRecord::get_cut(SbjNode* node)
 void
 MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
 			LnGraph& mapgraph,
-			int& lut_num,
-			int& depth)
+			ymuint& lut_num,
+			ymuint& depth)
 {
   mapgraph.clear();
   
@@ -375,4 +375,4 @@ MapRecord::clear_mark(SbjNode* node)
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

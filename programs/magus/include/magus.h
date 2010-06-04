@@ -8,12 +8,12 @@
 ///
 /// $Id: magus.h 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup MagusGroup Magus 関連クラス
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 #define BEGIN_NAMESPACE_MAGUS \
 BEGIN_NAMESPACE_YM \

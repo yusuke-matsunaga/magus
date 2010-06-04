@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_ENUMCUTOP_H
-#define MAGUS_LUTMAP_ENUMCUTOP_H
+#ifndef LIBYM_LUTMAP_ENUMCUTOP_H
+#define LIBYM_LUTMAP_ENUMCUTOP_H
 
-/// @file magus/lutmap/EnumCutOp.h
+/// @file libym_lutmap/EnumCutOp.h
 /// @brief EnumCutOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,15 +11,14 @@
 /// All rights reserved.
 
 
-#include "lutmap.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjGraph;
 class SbjNode;
 class EnumCut;
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class EnumCutOp
@@ -115,6 +114,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_ENUMCUTOP_H
+#endif // LIBYM_LUTMAP_ENUMCUTOP_H

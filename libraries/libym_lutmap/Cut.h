@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_CUT_H
-#define MAGUS_LUTMAP_CUT_H
+#ifndef LIBYM_LUTMAP_CUT_H
+#define LIBYM_LUTMAP_CUT_H
 
-/// @file magus/lutmap/Cut.h 
+/// @file libym_lutmap/Cut.h 
 /// @brief Cut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,11 +11,12 @@
 /// All rights reserved.
 
 
+#include "ym_lutmap/lutmap_nsdef.h"
+
 #include "ym_lexp/LogExpr.h"
-#include "lutmap.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjNode;
 
@@ -368,6 +369,6 @@ CutList::empty() const
   return mTop == NULL;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CUT_H
+#endif // YM_LUTMAP_CUT_H

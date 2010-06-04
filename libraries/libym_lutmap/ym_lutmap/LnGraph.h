@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_LUTNETWORK_H
-#define MAGUS_LUTMAP_LUTNETWORK_H
+#ifndef YM_LUTMAP_LNGRAPH_H
+#define YM_LUTMAP_LNGRAPH_H
 
-/// @file magus/lutmap/LutNetwork.h 
+/// @file ym_lutmap/LnGraph.h 
 /// @brief LutNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,15 +11,16 @@
 /// All rights reserved.
 
 
+#include "ym_lutmap/lutmap_nsdef.h"
+
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 #include "ym_lexp/LogExpr.h"
+#include "ym_bnet/BNetwork.h"
 
-#include "lutmap.h"
 
-
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class LnEdge;
 class LnNode;
@@ -29,6 +30,10 @@ typedef DlList<LnEdge> LnEdgeList;
 typedef DlListConstIter<LnEdge> LnEdgeListConstIter;
 typedef DlList<LnNode> LnNodeList;
 typedef DlListConstIter<LnNode> LnNodeListConstIter;
+
+void
+lut2bnet(const LnGraph& src_network,
+	 BNetwork& dst_network);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -309,11 +314,6 @@ private:
   
   // ファンアウトの枝のリスト
   LnEdgeList mFanoutList;
-  
-#if 0
-  // 論理式
-  LogExpr mExpr;
-#endif
   
   // 真理値ベクタ
   vector<int> mTv;
@@ -965,6 +965,17 @@ LnGraph::lnode_list() const
   return mLnodeList;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_LUTNETWORK_H
+BEGIN_NAMESPACE_YM
+
+using nsLutmap::LnEdgeList;
+using nsLutmap::LnEdgeListConstIter;
+using nsLutmap::LnNodeList;
+using nsLutmap::LnNodeListConstIter;
+
+using nsLutmap::lut2bnet;
+
+END_NAMESPACE_YM
+
+#endif // YM_LUTMAP_LUTNETWORK_H

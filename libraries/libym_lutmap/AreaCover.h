@@ -1,5 +1,5 @@
-#ifndef MAGUS_LUTMAP_WEIGHTCOVER_H
-#define MAGUS_LUTMAP_WEIGHTCOVER_H
+#ifndef LIBYM_LUTMAP_AREACOVER_H
+#define LIBYM_LUTMAP_AREACOVER_H
 
 /// @file magus/lutmap/WeightCover.h
 /// @brief DAG covering のヒューリスティック
@@ -11,48 +11,65 @@
 /// All rights reserved.
 
 
-#include "DagACover.h"
+#include "ym_lutmap/lutmap_nsdef.h"
+#include "CutHolder.h"
 #include "CutResub.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjNode;
-class Cut;
+class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
-// DAG covering のヒューリスティック
+/// @brief 面積モードの DAG covering のヒューリスティック
 //////////////////////////////////////////////////////////////////////
-class WeightCover :
-  public DagACover
+class AreaCover
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] mode 重みの計算方法
-  ///  - 1: 根の出力のファンアウト数で割る．
-  ///  - 2: 入力から根の出力までのファンアウト数で割る．
-  WeightCover(int mode = 2);
+  AreaCover();
 
   /// @brief デストラクタ
-  virtual
-  ~WeightCover();
+  ~AreaCover();
 
 
 public:
-
-  /// @brief best cut の記録を行う．
+  
+  /// @brief 面積最小化マッピングを行う．
   /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder カットを保持するオブジェクト
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
-  virtual
-  int
-  record_cuts(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder,
-	      MapRecord& maprec);
+  /// @param[in] limit LUT の入力数
+  /// @param[in] mode モード
+  ///  - 0: fanout フロー, resub なし
+  ///  - 1: weighted フロー, resub なし
+  ///  - 2: fanout フロー, resub あり
+  ///  - 3: weighted フロー, resub あり
+  /// @param[out] mapnetwork マッピング結果
+  /// @param[out] lut_num LUT数
+  /// @param[out] depth 段数
+  void
+  operator()(const SbjGraph& sbjgraph,
+	     ymuint limit,
+	     ymuint mode,
+	     LnGraph& mapnetwork,
+	     ymuint& lut_num,
+	     ymuint& depth);
 
   
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief best cut の記録を行う．
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] limit LUT の入力数
+  /// @param[out] maprec マッピング結果を記録するオブジェクト
+  void
+  record_cuts(const SbjGraph& sbjgraph,
+	      ymuint limit,
+	      MapRecord& maprec);
 
   // node から各入力にいたる経路の重みを計算する．
   void
@@ -66,6 +83,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // モード
+  ymuint mMode;
+  
+  // カットを保持するオブジェクト
+  CutHolder mCutHolder;
+
   // cut resubstitution を実行するファンクター
   CutResub mCutResub;
   
@@ -74,12 +97,9 @@ private:
 
   // 各入力から根の出力に抜ける経路上の重みを入れる配列
   vector<double> mWeight;
-
-  // モード
-  int mMode;
   
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_WEIGHTCOVER_H
+#endif // LIBYM_LUTMAP_AREACOVER_H

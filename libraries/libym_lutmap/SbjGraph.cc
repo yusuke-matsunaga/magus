@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/SbjGraph.cc 
+/// @file libym_lutmap/SbjGraph.cc 
 /// @brief SbjGraph の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 ///////////////////////////////////////////////////////////////////////
 // クラス SbjNode
@@ -794,4 +794,4 @@ write_blif(ostream& s,
   s << ".end" << endl;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

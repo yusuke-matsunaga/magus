@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "DagDCover.h"
-#include "WeightDCover.h"
+#include "ym_lutmap/DagDCover.h"
+#include "ym_lutmap/WeightDCover.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス DagDCoverFactory
@@ -49,4 +49,4 @@ DagDCoverFactory::operator()(const string& args)
   return NULL;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

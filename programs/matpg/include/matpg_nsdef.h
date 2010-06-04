@@ -8,7 +8,7 @@
 ///
 /// $Id: matpg_nsdef.h 2043 2009-02-21 07:08:48Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // 名前空間の定義ファイル
@@ -16,7 +16,7 @@
 
 // namespace でネストするのがいやなので define マクロでごまかす．
 
-#include <ymtools.h>
+#include "ymtools.h"
 
 #define BEGIN_NAMESPACE_YM_MATPG \
 BEGIN_NAMESPACE_YM \

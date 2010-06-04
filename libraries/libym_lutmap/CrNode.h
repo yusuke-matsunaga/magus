@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_CRNODE_H
-#define MAGUS_LUTMAP_CRNODE_H
+#ifndef LIBYM_LUTMAP_CRNODE_H
+#define LIBYM_LUTMAP_CRNODE_H
 
-/// @file magus/lutmap/CrNode.h
+/// @file libym_lutmap/CrNode.h
 /// @brief CrNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "lutmap.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjNode;
 class Cut;
@@ -527,6 +527,6 @@ CrNode::newmark()
   return static_cast<bool>((mFlags >> kNewShift) & 1U);
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CRNODE_H
+#endif // LIBYM_LUTMAP_CRNODE_H

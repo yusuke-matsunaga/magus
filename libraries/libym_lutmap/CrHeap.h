@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_CRHEAP_H
-#define MAGUS_LUTMAP_CRHEAP_H
+#ifndef LIBYM_LUTMAP_CRHEAP_H
+#define LIBYM_LUTMAP_CRHEAP_H
 
-/// @file magus/lutmap/CrHeap.h
+/// @file libym_lutmap/CrHeap.h
 /// @brief CrHeap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "lutmap.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class CrNode;
 
@@ -91,6 +91,6 @@ private:
 
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CRHEAP_H
+#endif // LIBYM_LUTMAP_CRHEAP_H

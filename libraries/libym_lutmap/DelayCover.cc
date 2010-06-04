@@ -1,32 +1,70 @@
 
-/// @file magus/lutmap/WeightDCover.cc
-/// @brief WeightDCover の実装ファイル
+/// @file libym_lutmap/DelayCover.cc
+/// @brief DelayCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: WeightDCover.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: DelayCover.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "WeightDCover.h"
-#include "SbjGraph.h"
+#include "DelayCover.h"
+#include "ym_lutmap/SbjGraph.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
-WeightDCover::WeightDCover(int mode) :
-  mMode(mode)
+DelayCover::DelayCover()
 {
 }
 
 // デストラクタ
-WeightDCover::~WeightDCover()
+DelayCover::~DelayCover()
 {
+}
+
+// @brief 遅延最小化マッピングを行う．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] limit LUT の入力数
+// @param[in] slack 最小段数に対するスラック
+// @param[in] mode モード
+//  - 0: fanout フロー, resub なし
+//  - 1: weighted フロー, resub なし
+//  - 2: fanout フロー, resub あり
+//  - 3: weighted フロー, resub あり
+// @param[out] mapnetwork マッピング結果
+// @param[out] lut_num LUT数
+// @param[out] depth 段数
+void
+DelayCover::operator()(const SbjGraph& sbjgraph,
+		       ymuint limit,
+		       ymuint slack,
+		       ymuint mode,
+		       LnGraph& mapnetwork,
+		       ymuint& lut_num,
+		       ymuint& depth)
+{
+  mMode = mode;
+  
+  // カットを列挙する．
+  mCutHolder.enum_cut(sbjgraph, limit);
+  
+  // 最良カットを記録する．
+  MapRecord maprec;
+  record_cuts(sbjgraph, limit, slack, maprec);
+
+  if ( mode & 2 ) {
+    // cut resubstituion
+    mCutResub(sbjgraph, mCutHolder, maprec, slack);
+  }
+  
+  // 最終的なネットワークを生成する．
+  maprec.gen_mapgraph(sbjgraph, mapnetwork, lut_num, depth);
 }
 
 // @brief best cut の記録を行う．
@@ -35,10 +73,10 @@ WeightDCover::~WeightDCover()
 // @param[in] slack 最小段数に対するスラック
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-WeightDCover::record_cuts(const SbjGraph& sbjgraph,
-			  int limit,
-			  ymuint slack,
-			  MapRecord& maprec)
+DelayCover::record_cuts(const SbjGraph& sbjgraph,
+			ymuint limit,
+			ymuint slack,
+			MapRecord& maprec)
 {
   const SbjNodeList& input_list = sbjgraph.input_list();
   const SbjNodeList& output_list = sbjgraph.output_list();
@@ -63,9 +101,6 @@ WeightDCover::record_cuts(const SbjGraph& sbjgraph,
     t.mCostList.insert(NULL, 0, 0.0);
     t.mMinDepth = 0;
   }
-  
-  // カットを列挙する．
-  mCutHolder.enum_cut(sbjgraph, limit);
   
   // 各ノードごとにカットを記録
   vector<SbjNode*> snode_list;
@@ -109,16 +144,11 @@ WeightDCover::record_cuts(const SbjGraph& sbjgraph,
     SbjNode* node = *p;
     select(node, maprec);
   }
-
-  if ( mMode & 2 ) {
-    // cut resubstituion
-    mCutResub(sbjgraph, mCutHolder, maprec, slack);
-  }
 }
 
 // node のカットを選択する．
 void
-WeightDCover::record(SbjNode* node)
+DelayCover::record(SbjNode* node)
 {
   int min_depth = INT_MAX;
   NodeInfo& t = mNodeInfo[node->id()];
@@ -204,7 +234,7 @@ WeightDCover::record(SbjNode* node)
 
 // node から各入力にいたる経路の重みを計算する．
 void
-WeightDCover::calc_weight(SbjNode* node,
+DelayCover::calc_weight(SbjNode* node,
 			  const Cut* cut,
 			  double cur_weight)
 {
@@ -226,7 +256,7 @@ WeightDCover::calc_weight(SbjNode* node,
 
 // node のカットを選択する．
 void
-WeightDCover::select(SbjNode* node,
+DelayCover::select(SbjNode* node,
 		     MapRecord& maprec)
 {
   NodeInfo& t = mNodeInfo[node->id()];
@@ -256,4 +286,30 @@ WeightDCover::select(SbjNode* node,
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+// @brief 段数最小化 DAG covering のヒューリスティック関数
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] limit カットサイズ
+// @param[in] slack 最小段数に対するスラック
+// @param[in] mode モード
+//  - 0: fanout フロー, resub なし
+//  - 1: weighted フロー, resub なし
+//  - 2: fanout フロー, resub あり
+//  - 3: weighted フロー, resub あり
+// @param[out] mapnetwork マッピング結果
+// @param[out] lut_num LUT数
+// @param[out] depth 段数
+void
+delay_map(const SbjGraph& sbjgraph,
+	  ymuint limit,
+	  ymuint slack,
+	  ymuint mode,
+	  LnGraph& mapnetwork,
+	  ymuint& lut_num,
+	  ymuint& depth)
+{
+  DelayCover delay_cover;
+
+  delay_cover(sbjgraph, limit, slack, mode, mapnetwork, lut_num, depth);
+}
+
+END_NAMESPACE_YM_LUTMAP

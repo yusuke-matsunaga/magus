@@ -10,10 +10,9 @@
 
 
 #include "LutmapCmd.h"
-#include "LutNetwork.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // マッピングを行うコマンド
@@ -67,4 +66,4 @@ DumpLutCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

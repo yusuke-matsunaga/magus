@@ -10,11 +10,11 @@
 
 
 #include "LutmapCmd.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 #include "ym_tclpp/TclPopt.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // SbjGraph の内容をダンプするコマンド
@@ -76,4 +76,4 @@ DumpSbjCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

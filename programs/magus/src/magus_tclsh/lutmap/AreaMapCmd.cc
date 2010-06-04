@@ -10,16 +10,10 @@
 
 
 #include "LutmapCmd.h"
-#include "SbjGraph.h"
-#include "LutNetwork.h"
-#include "CutHolder.h"
-#include "MapRecord.h"
-#include "CutResub.h"
-#include "DagACover.h"
 #include "ym_tclpp/TclPopt.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // area map コマンド
@@ -49,24 +43,25 @@ AreaMapCmd::~AreaMapCmd()
 int
 AreaMapCmd::cmd_proc(TclObjVector& objv)
 {
-  bool resub = mPoptResub->is_specified();
   bool verbose = mPoptVerbose->is_specified();
   
-  string fargs = "dag";
-
+  ymuint mode = 0;
   if ( mPoptMethod->is_specified() ) {
     string method = mPoptMethod->val();
     if ( method == "dag" ) {
-      fargs = "dag";
+      mode = 1;
     }
     else if ( method == "fo" ) {
-      fargs = "fo";
+      mode = 0;
     }
     else {
       string emsg = method + ": unknown method";
       set_result(emsg);
       return TCL_ERROR;
     }
+  }
+  if ( mPoptResub->is_specified() ) {
+    mode |= 2;
   }
 
   ymuint objc = objv.size();
@@ -81,21 +76,12 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     if ( code != TCL_OK ) {
       return code;
     }
-
-    DagACoverFactory factory;
-    DagACover* dagcov = factory(fargs);
-    CutHolder ch;
-    ch.enum_cut(sbjgraph(), limit);
-    MapRecord maprec;
-    dagcov->record_cuts(sbjgraph(), ch, maprec);
-    if ( resub ) {
-      CutResub cutresub;
-      cutresub(sbjgraph(), ch, maprec);
-    }
-    int lut_num;
-    int depth;
-    maprec.gen_mapgraph(sbjgraph(), lutnetwork(), lut_num, depth);
-    delete dagcov;
+    
+    ymuint lut_num;
+    ymuint depth;
+    
+    area_map(sbjgraph(), limit, mode, lutnetwork(), lut_num, depth);
+    
     set_var("::magus::lutmap_stats", "lut_num",
 	    lut_num,
 	    TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
@@ -115,4 +101,4 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

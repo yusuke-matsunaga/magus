@@ -10,16 +10,11 @@
 
 
 #include "LutmapCmd.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 #include "ym_bnet/bnet_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
-
-bool
-bnet2sbj(const BNetwork& network,
-	 SbjGraph& sbjgraph,
-	 ostream& err_out);
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 // BNetwork から SbjGraph に変換するコマンド
@@ -65,4 +60,4 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

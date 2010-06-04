@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/SbjGraph_mindepth.cc 
+/// @file libym_lutmap/SbjGraph_mindepth.cc 
 /// @brief SbjGraph の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // minimum depth 関係のコード
@@ -236,4 +236,4 @@ SbjGraph::get_min_depth(ymuint k) const
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/lut2bnet.cc
+/// @file libym_lutmap/lut2bnet.cc
 /// @brief lut2bnet() の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "LutNetwork.h"
+#include "ym_lutmap/LnGraph.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetManip.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // LutNetwork を BNetwork に変換する．
 void
@@ -99,4 +99,4 @@ lut2bnet(const LnGraph& src_network,
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

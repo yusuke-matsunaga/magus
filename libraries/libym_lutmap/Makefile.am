@@ -16,14 +16,10 @@ INCLUDES = \
 	-I$(top_builddir)
 
 libym_lutmap_la_SOURCES = \
-
-	lutmap.h \
-	SbjGraph.h \
 	SbjGraph.cc \
 	SbjGraph_mindepth.cc \
 	bnet2sbj.cc \
-	LutNetwork.h \
-	LutNetwork.cc \
+	LnGraph.cc \
 	lut2bnet.cc \
 	EnumCutOp.h \
 	EnumCutOp.cc \
@@ -31,7 +27,6 @@ libym_lutmap_la_SOURCES = \
 	EnumCut.cc \
 	Cut.h \
 	Cut.cc \
-	CutHolder.h \
 	CutHolder.cc \
 	MapRecord.h \
 	MapRecord.cc \
@@ -44,17 +39,12 @@ libym_lutmap_la_SOURCES = \
 	CrLevelQ.h \
 	CrLevelQ.cc \
 	ADCost.h \
-	DagACover.h \
-	DagACover.cc \
-	WeightCover.h \
-	WeightCover.cc \
-	DagDCover.h \
-	DagDCover.cc \
-	WeightDCover.h \
-	WeightDCover.cc
+	AreaCover.h \
+	AreaCover.cc \
+	DelayCover.h \
+	DelayCover.cc
 
 libym_lutmap_la_LIBADD = \
-	$(YMLIBS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
+	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
 
 libym_lutmap_la_LDFLAGS =

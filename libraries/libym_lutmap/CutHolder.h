@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_CUTHOLDER_H
-#define MAGUS_LUTMAP_CUTHOLDER_H
+#ifndef LIBYM_LUTMAP_CUTHOLDER_H
+#define LIBYM_LUTMAP_CUTHOLDER_H
 
-/// @file magus/lutmap/CutHolder.h
+/// @file libym_lutmap/CutHolder.h
 /// @brief CutHolder のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -13,10 +13,10 @@
 
 #include "EnumCutOp.h"
 #include "Cut.h"
-#include "SbjGraph.h"
+#include "ym_lutmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class CutHolder
@@ -158,6 +158,6 @@ CutHolder::limit() const
   return mLimit;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CUTHOLDER_H
+#endif // LIBYM_LUTMAP_CUTHOLDER_H

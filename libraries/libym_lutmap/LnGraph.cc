@@ -1,5 +1,5 @@
 
-/// @file magus/lutmap/LutNetwork.cc
+/// @file libym_lutmap/LnGraph.cc
 /// @brief LutNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "LutNetwork.h"
+#include "ym_lutmap/LnGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 ///////////////////////////////////////////////////////////////////////
 // クラス LnNode
@@ -675,4 +675,4 @@ LnGraph::dump(ostream& s) const
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP

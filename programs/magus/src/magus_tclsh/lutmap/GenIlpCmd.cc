@@ -10,12 +10,12 @@
 
 
 #include "LutmapCmd.h"
-#include "SbjGraph.h"
-#include "EnumCutOp.h"
+#include "ym_lutmap/SbjGraph.h"
+#include "ym_lutmap/EnumCutOp.h"
 #include "ILPGen.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 BEGIN_NONAMESPACE
 
@@ -305,4 +305,4 @@ GenIlpCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS

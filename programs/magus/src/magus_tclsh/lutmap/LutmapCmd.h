@@ -12,12 +12,11 @@
 
 
 #include "MagBNetCmd.h"
-#include "lutmap.h"
-#include "SbjGraph.h"
-#include "LutNetwork.h"
+#include "ym_lutmap/SbjGraph.h"
+#include "ym_lutmap/LnGraph.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 /// @class LutmapData LutmapCmd.h "LutmapCmd.h"
@@ -46,7 +45,7 @@ public:
 
   /// @brief コンストラクタ
   LutmapCmd(NetMgr* mgr,
-	     LutmapData* data);
+	    LutmapData* data);
 
   /// @brief デストラクタ
   virtual
@@ -422,7 +421,6 @@ protected:
   
 };
 
-
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_MAGUS
 
 #endif // MAGUS_LUTMAP_LUTMAPCMD_H

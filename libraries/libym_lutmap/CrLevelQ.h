@@ -1,19 +1,19 @@
-#ifndef MAGUS_LUTMAP_CRLEVELQ_H
-#define MAGUS_LUTMAP_CRLEVELQ_H
+#ifndef LIBYM_LUTMAP_CRLEVELQ_H
+#define LIBYM_LUTMAP_CRLEVELQ_H
 
-/// @file magus/lutmap/CrLevelQ.h
+/// @file libym_lutmap/CrLevelQ.h
 /// @brief CrLevelQ のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: CrLevelQ.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "lutmap.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class CrNode;
 
@@ -79,6 +79,6 @@ private:
 
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CRLEVELQ_H
+#endif // LIBYM_LUTMAP_CRLEVELQ_H

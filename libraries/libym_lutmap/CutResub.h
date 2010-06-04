@@ -1,7 +1,7 @@
-#ifndef MAGUS_LUTMAP_CUTRESUB_H
-#define MAGUS_LUTMAP_CUTRESUB_H
+#ifndef LIBYM_LUTMAP_CUTRESUB_H
+#define LIBYM_LUTMAP_CUTRESUB_H
 
-/// @file magus/lutmap/CutResub.h
+/// @file libym_lutmap/CutResub.h
 /// @brief CutResub のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,15 +11,15 @@
 /// All rights reserved.
 
 
-#include "ym_utils/Alloc.h"
+#include "ym_lutmap/lutmap_nsdef.h"
 
-#include "lutmap.h"
+#include "ym_utils/Alloc.h"
 #include "CrNode.h"
 #include "CrHeap.h"
 #include "CrLevelQ.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjGraph;
 class Cut;
@@ -179,6 +179,6 @@ private:
   
 };
 
-END_NAMESPACE_MAGUS_LUTMAP
+END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CUTRESUB_H
+#endif // YM_LUTMAP_CUTRESUB_H

@@ -9,36 +9,70 @@
 /// All rights reserved.
 
 
-#include "WeightCover.h"
-#include "SbjGraph.h"
+#include "AreaCover.h"
+#include "ym_lutmap/SbjGraph.h"
 #include "Cut.h"
-#include "CutHolder.h"
 #include "MapRecord.h"
 
 
-BEGIN_NAMESPACE_MAGUS_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
-WeightCover::WeightCover(int mode) :
-  mMode(mode)
+AreaCover::AreaCover()
 {
 }
 
 // デストラクタ
-WeightCover::~WeightCover()
+AreaCover::~AreaCover()
 {
+}
+
+// @brief 面積最小化マッピングを行う．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] limit LUT の入力数
+// @param[in] mode モード
+//  - 0: fanout フロー, resub なし
+//  - 1: weighted フロー, resub なし
+//  - 2: fanout フロー, resub あり
+//  - 3: weighted フロー, resub あり
+// @param[out] mapnetwork マッピング結果
+// @param[out] lut_num LUT数
+// @param[out] depth 段数
+void
+AreaCover::operator()(const SbjGraph& sbjgraph,
+		      ymuint limit,
+		      ymuint mode,
+		      LnGraph& mapnetwork,
+		      ymuint& lut_num,
+		      ymuint& depth)
+{
+  mMode = mode;
+  
+  // カットを列挙する．
+  mCutHolder.enum_cut(sbjgraph, limit);
+  
+  // 最良カットを記録する．
+  MapRecord maprec;
+  record_cuts(sbjgraph, limit, maprec);
+
+  if ( mode & 2 ) {
+    // cut resubstituion
+    mCutResub(sbjgraph, mCutHolder, maprec);
+  }
+  
+  // 最終的なネットワークを生成する．
+  maprec.gen_mapgraph(sbjgraph, mapnetwork, lut_num, depth);
 }
 
 // @brief best cut の記録を行う．
 // @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cut_holder カットを保持するオブジェクト
+// @param[in] limit LUT の入力数
 // @param[out] maprec マッピング結果を記録するオブジェクト
-int
-WeightCover::record_cuts(const SbjGraph& sbjgraph,
-			 const CutHolder& cut_holder,
-			 MapRecord& maprec)
+void
+AreaCover::record_cuts(const SbjGraph& sbjgraph,
+		       ymuint limit,
+		       MapRecord& maprec)
 {
-  ymuint limit = cut_holder.limit();
   ymuint n = sbjgraph.max_node_id();
   mBestCost.clear();
   mBestCost.resize(n);
@@ -65,7 +99,7 @@ WeightCover::record_cuts(const SbjGraph& sbjgraph,
     double min_cost = DBL_MAX;
     if ( !node->is_unselected() ) {
       const Cut* best_cut = NULL;
-      const CutList& cut_list = cut_holder.cut_list(node);
+      const CutList& cut_list = mCutHolder.cut_list(node);
       for (CutListIterator p = cut_list.begin();
 	   p != cut_list.end(); ++ p) {
 	const Cut* cut = *p;
@@ -115,35 +149,13 @@ WeightCover::record_cuts(const SbjGraph& sbjgraph,
     }
     mBestCost[node->id()] = min_cost;
   }
-    
-  double cost = 0.0;
-  const SbjNodeList& node_list = sbjgraph.lnode_list();
-  for (SbjNodeList::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    SbjNode* node = *p;
-    if ( node->pomark() || node->is_fo() ) {
-      if ( mBestCost[node->id()] == DBL_MAX ) {
-	return -1;
-      }
-      cost += mBestCost[node->id()];
-    }
-  }
-  mBestCost.clear();
-  int lb = static_cast<int>(ceil(cost));
-
-  if ( mMode & 2 ) {
-    // cut resubstitution
-    mCutResub(sbjgraph, cut_holder, maprec);
-  }
-
-  return lb;
 }
 
 // node から各入力にいたる経路の重みを計算する．
 void
-WeightCover::calc_weight(SbjNode* node,
-			 const Cut* cut,
-			 double cur_weight)
+AreaCover::calc_weight(SbjNode* node,
+		       const Cut* cut,
+		       double cur_weight)
 {
   for ( ; ; ) {
     for (ymuint i = 0; i < cut->ni(); ++ i) {
@@ -163,4 +175,28 @@ WeightCover::calc_weight(SbjNode* node,
   }
 }
 
-END_NAMESPACE_MAGUS_LUTMAP
+// @brief 面積最小化 DAG covering のヒューリスティック関数
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] limit カットサイズ
+// @param[in] mode モード
+//  - 0: fanout フロー, resub なし
+//  - 1: weighted フロー, resub なし
+//  - 2: fanout フロー, resub あり
+//  - 3: weighted フロー, resub あり
+// @param[out] mapnetwork マッピング結果
+// @param[out] lut_num LUT数
+// @param[out] depth 段数
+void
+area_map(const SbjGraph& sbjgraph,
+	 ymuint limit,
+	 ymuint mode,
+	 LnGraph& mapnetwork,
+	 ymuint& lut_num,
+	 ymuint& depth)
+{
+  AreaCover area_cover;
+  
+  area_cover(sbjgraph, limit, mode, mapnetwork, lut_num, depth);
+}
+
+END_NAMESPACE_YM_LUTMAP
