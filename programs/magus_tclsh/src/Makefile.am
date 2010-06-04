@@ -47,5 +47,3 @@ magus_tclsh_LDADD = \
 	$(TCL_LDADD)
 
 
-
-

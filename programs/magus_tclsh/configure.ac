@@ -151,14 +151,13 @@ AC_SUBST(MAGUS_BINDIR)dnl
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/logbase/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/equiv/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/lutmap/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/seal/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/simplify/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/misc/Makefile])
-AC_CONFIG_FILES([src/magus_tclsh/test/Makefile])
+AC_CONFIG_FILES([src/logbase/Makefile])
+AC_CONFIG_FILES([src/equiv/Makefile])
+AC_CONFIG_FILES([src/lutmap/Makefile])
+AC_CONFIG_FILES([src/seal/Makefile])
+AC_CONFIG_FILES([src/simplify/Makefile])
+AC_CONFIG_FILES([src/misc/Makefile])
+AC_CONFIG_FILES([src/test/Makefile])
 
 
 # ===================================================================

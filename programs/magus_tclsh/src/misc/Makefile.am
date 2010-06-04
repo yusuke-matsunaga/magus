@@ -11,7 +11,8 @@ INCLUDES = \
 	$(TCL_INCLUDES) \
 	$(TK_INCLUDES) \
 	-I$(YMLIBS_SRCDIR)/include \
-	-I$(YMLIBS_BUILDDIR)
+	-I$(YMLIBS_BUILDDIR) \
+	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 

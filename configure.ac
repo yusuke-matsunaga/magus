@@ -631,9 +631,9 @@ YM_FINISH_LIBRARIES_SUBDIRS
 
 YM_INIT_PROGRAMS_SUBDIRS
 
-# magus
-YM_ADD_PROGRAMS_SUBDIRS([magus])
-AC_CONFIG_SUBDIRS([programs/magus])
+# magus_tclsh
+YM_ADD_PROGRAMS_SUBDIRS([magus_tclsh])
+AC_CONFIG_SUBDIRS([programs/magus_tclsh])
 
 # atpg
 YM_ADD_PROGRAMS_SUBDIRS([atpg])
