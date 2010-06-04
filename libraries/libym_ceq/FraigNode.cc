@@ -1,5 +1,5 @@
 
-/// @file libym_aig/FraigNode.cc
+/// @file libym_ceq/FraigNode.cc
 /// @brief FraigNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -12,7 +12,7 @@
 #include "FraigNode.h"
 
 
-BEGIN_NAMESPACE_YM_AIG
+BEGIN_NAMESPACE_YM_CEQ
 
 // 本当は 1 は素数ではないがここの目的としては可
 ymuint32 FraigNode::mPrimes[] = {
@@ -229,4 +229,4 @@ FraigNode::calc_hash(ymuint start,
   }
 }
 
-END_NAMESPACE_YM_AIG
+END_NAMESPACE_YM_CEQ

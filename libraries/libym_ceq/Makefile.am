@@ -16,6 +16,14 @@ INCLUDES = \
 	-I$(top_builddir)
 
 libym_ceq_la_SOURCES = \
+	FraigHash.h \
+	FraigHandle.h \
+	FraigNode.h \
+	FraigNode.cc \
+	FraigMgrImpl.h \
+	FraigMgrImpl.cc \
+	FraigMgr.h \
+	FraigMgr.cc \
 	check_ceq.cc
 
 libym_ceq_la_LIBADD = \

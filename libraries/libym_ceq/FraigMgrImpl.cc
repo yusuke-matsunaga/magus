@@ -1,5 +1,5 @@
 
-/// @file libym_aig/FraigMgrImpl.cc
+/// @file libym_ceq/FraigMgrImpl.cc
 /// @brief FraigMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -11,7 +11,7 @@
 
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
-#include "ym_aig/FraigMgr.h"
+#include "FraigMgr.h"
 
 
 #if defined(YM_DEBUG)
@@ -26,7 +26,7 @@
 // #define VERIFY_SATSOLVER
 
 
-BEGIN_NAMESPACE_YM_AIG
+BEGIN_NAMESPACE_YM_CEQ
 
 BEGIN_NONAMESPACE
 
@@ -943,4 +943,4 @@ FraigMgrImpl::SatStat::dump(ostream& s) const
   }
 }
 
-END_NAMESPACE_YM_AIG
+END_NAMESPACE_YM_CEQ

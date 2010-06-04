@@ -31,10 +31,4 @@ libym_aig_la_SOURCES = \
 	AigMgrImpl.h \
 	AigMgrImpl.cc \
 	AigTemplate.h \
-	AigTemplate.cc \
-	FraigHash.h \
-	FraigNode.h \
-	FraigNode.cc \
-	FraigMgrImpl.h \
-	FraigMgrImpl.cc \
-	FraigMgr.cc
+	AigTemplate.cc

@@ -1,5 +1,5 @@
 
-/// @file libym_aig/FraigMgr.cc
+/// @file libym_ceq/FraigMgr.cc
 /// @brief FraigMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -9,14 +9,14 @@
 /// All rights reserved.
 
 
-#include "ym_aig/FraigMgr.h"
+#include "FraigMgr.h"
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
 
 #define DEBUG 0
 
 
-BEGIN_NAMESPACE_YM_AIG
+BEGIN_NAMESPACE_YM_CEQ
 
 //////////////////////////////////////////////////////////////////////
 // FraigMgr
@@ -250,4 +250,4 @@ FraigMgr::dump_stats(ostream& s)
   mImpl->dump_stats(s);
 }
 
-END_NAMESPACE_YM_AIG
+END_NAMESPACE_YM_CEQ

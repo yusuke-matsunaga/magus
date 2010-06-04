@@ -12,7 +12,7 @@
 #include "ym_ceq/ceq_nsdef.h"
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigNode.h"
-#include "ym_aig/FraigMgr.h"
+#include "FraigMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CEQ
