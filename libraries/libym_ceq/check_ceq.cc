@@ -1,5 +1,5 @@
 
-/// @file magus/equiv/check_equiv.cc
+/// @file libym_ceq/check_ceq.cc
 /// @brief 組み合わせ回路の検証を行う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "equiv_nsdef.h"
+#include "ym_ceq/ceq_nsdef.h"
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigNode.h"
 #include "ym_aig/FraigMgr.h"
 
 
-BEGIN_NAMESPACE_MAGUS_EQUIV
+BEGIN_NAMESPACE_YM_CEQ
 
 BEGIN_NONAMESPACE
 
@@ -156,17 +156,17 @@ END_NONAMESPACE
 
 // 新しい関数
 void
-check_equiv(const BNetwork& src_network1,
-	    const BNetwork& src_network2,
-	    const vector<pair<ymuint32, ymuint32> >& iassoc,
-	    const vector<pair<ymuint32, ymuint32> >& oassoc,
-	    ymint log_level,
-	    ostream* log_out,
-	    const string& sat_type,
-	    const string& sat_option,
-	    ostream* sat_out,
-	    ymuint sigsize,
-	    vector<Bool3>& stats)
+check_ceq(const BNetwork& src_network1,
+	  const BNetwork& src_network2,
+	  const vector<pair<ymuint32, ymuint32> >& iassoc,
+	  const vector<pair<ymuint32, ymuint32> >& oassoc,
+	  ymint log_level,
+	  ostream* log_out,
+	  const string& sat_type,
+	  const string& sat_option,
+	  ostream* sat_out,
+	  ymuint sigsize,
+	  vector<Bool3>& stats)
 {
   // 2つのネットワークの出力の miter 構造を AigMgr に設定する．
   AigMgr aig_mgr;
@@ -207,4 +207,4 @@ check_equiv(const BNetwork& src_network1,
   }
 }
 
-END_NAMESPACE_MAGUS_EQUIV
+END_NAMESPACE_YM_CEQ

@@ -2,6 +2,9 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = \
-	seal \
-	magus_tclsh
+SUBDIRS =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_HEADERS = \
+	ceq_nsdef.h

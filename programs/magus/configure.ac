@@ -151,7 +151,6 @@ AC_SUBST(MAGUS_BINDIR)dnl
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([src/equiv/Makefile])
 AC_CONFIG_FILES([src/seal/Makefile])
 AC_CONFIG_FILES([src/magus_tclsh/Makefile])
 AC_CONFIG_FILES([src/magus_tclsh/include/Makefile])

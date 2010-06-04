@@ -598,17 +598,23 @@ AC_CONFIG_FILES([libraries/libym_gds/Makefile])
 AC_CONFIG_FILES([libraries/libym_gds/ym_gds/Makefile])
 AC_CONFIG_FILES([libraries/libym_gds/tests/Makefile])
 
-# libym_tclpp
-YM_ADD_LIBRARIES_SUBDIRS([libym_tclpp])
-AC_CONFIG_FILES([libraries/libym_tclpp/Makefile])
-AC_CONFIG_FILES([libraries/libym_tclpp/ym_tclpp/Makefile])
-AC_CONFIG_FILES([libraries/libym_tclpp/examples/Makefile])
+# libym_ceq
+YM_ADD_LIBRARIES_SUBDIRS([libym_ceq])
+AC_CONFIG_FILES([libraries/libym_ceq/Makefile])
+AC_CONFIG_FILES([libraries/libym_ceq/ym_ceq/Makefile])
+AC_CONFIG_FILES([libraries/libym_ceq/tests/Makefile])
 
 # libym_lutmap
 YM_ADD_LIBRARIES_SUBDIRS([libym_lutmap])
 AC_CONFIG_FILES([libraries/libym_lutmap/Makefile])
 AC_CONFIG_FILES([libraries/libym_lutmap/ym_lutmap/Makefile])
 AC_CONFIG_FILES([libraries/libym_lutmap/tests/Makefile])
+
+# libym_tclpp
+YM_ADD_LIBRARIES_SUBDIRS([libym_tclpp])
+AC_CONFIG_FILES([libraries/libym_tclpp/Makefile])
+AC_CONFIG_FILES([libraries/libym_tclpp/ym_tclpp/Makefile])
+AC_CONFIG_FILES([libraries/libym_tclpp/examples/Makefile])
 
 YM_FINISH_LIBRARIES_SUBDIRS
 

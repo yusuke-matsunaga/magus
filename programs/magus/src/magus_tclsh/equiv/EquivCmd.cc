@@ -10,7 +10,7 @@
 
 
 #include "EquivCmd.h"
-#include "equiv_nsdef.h"
+#include "ym_ceq/ceq_nsdef.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -403,8 +403,6 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     return stat1;
   }
   
-  using nsEquiv::check_equiv;
-  
   try {
     ymuint sigsize = 1;
     if ( mPoptSigSize->is_specified() ) {
@@ -415,12 +413,12 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     const BNetwork& src_network2 = *network2();
     
     vector<Bool3> comp_stats;
-    check_equiv(src_network1, src_network2,
-		input_match(), output_match(),
-		log_level(), &cout,
-		sat_type(), sat_option(), sat_out(),
-		sigsize,
-		comp_stats);
+    check_ceq(src_network1, src_network2,
+	      input_match(), output_match(),
+	      log_level(), &cout,
+	      sat_type(), sat_option(), sat_out(),
+	      sigsize,
+	      comp_stats);
     
     bool has_neq = false;
     bool has_abt = false;

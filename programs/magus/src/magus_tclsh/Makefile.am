@@ -44,7 +44,6 @@ magus_tclsh_LDADD = \
 	lutmap/libmagus_lutmap_tcl.la \
 	seal/libmagus_seal_tcl.la \
 	misc/libmagus_misc_tcl.la \
-	../equiv/libmagus_equiv.la \
 	../seal/libmagus_seal.la \
 	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
