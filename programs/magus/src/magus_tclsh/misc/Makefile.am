@@ -11,8 +11,7 @@ INCLUDES = \
 	$(TCL_INCLUDES) \
 	$(TK_INCLUDES) \
 	-I$(YMLIBS_SRCDIR)/include \
-	-I$(YMLIBS_BUILDDIR) \
-	-I$(top_srcdir)/include
+	-I$(YMLIBS_BUILDDIR)
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -26,4 +25,6 @@ libmagus_misc_tcl_la_SOURCES = \
 	misc_init.cc
 
 libmagus_misc_tcl_la_LIBADD = \
-	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
+	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMLIBS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+

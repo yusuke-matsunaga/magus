@@ -3,7 +3,6 @@
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
 SUBDIRS = \
-	include \
 	logbase \
 	equiv \
 	lutmap \
@@ -26,8 +25,7 @@ INCLUDES = \
 	$(TCL_INCLUDES) \
 	-I$(YMLIBS_SRCDIR)/include \
 	-I$(YMLIBS_BUILDDIR) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src/magus_tclsh/include
+	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -44,7 +42,6 @@ magus_tclsh_LDADD = \
 	lutmap/libmagus_lutmap_tcl.la \
 	seal/libmagus_seal_tcl.la \
 	misc/libmagus_misc_tcl.la \
-	../seal/libmagus_seal.la \
 	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)

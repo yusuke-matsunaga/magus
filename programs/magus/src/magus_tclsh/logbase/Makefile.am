@@ -9,8 +9,7 @@ INCLUDES = \
 	$(TCL_INCLUDES) \
 	-I$(YMLIBS_SRCDIR)/include \
 	-I$(YMLIBS_BUILDDIR) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src/magus_tclsh/include
+	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
