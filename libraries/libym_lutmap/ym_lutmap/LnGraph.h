@@ -293,7 +293,7 @@ private:
   // 名前
   string mName;
 
-  // タイプ (+ 入力／出力番号)
+  // タイプ (+ 入力／出力番号/PoMask)
   ymuint32 mFlags;
 
   // 入力数
@@ -308,9 +308,6 @@ private:
   // 真理値ベクタ
   vector<int> mTv;
   
-  // 作業用のマーク
-  ymuint32 mMark;
-  
   // レベル
   ymuint32 mLevel;
 
@@ -321,7 +318,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const int kPoShift = 5;
+  const int kPoShift = 3;
 
   static
   const ymuint32 kPoMask = 1U << kPoShift;
@@ -820,7 +817,7 @@ inline
 bool
 LnNode::pomark() const
 {
-  return static_cast<bool>((mMark >> kPoShift) & 1U);
+  return static_cast<bool>((mFlags >> kPoShift) & 1U);
 }
 
 // @brief レベルを得る．

@@ -20,9 +20,9 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
 LnNode::LnNode() :
+  mFlags(0),
   mNi(0),
   mFanins(NULL),
-  mMark(0),
   mLevel(0)
 {
 }
@@ -36,12 +36,12 @@ LnNode::~LnNode()
 void
 LnNode::scan_po()
 {
-  mMark &= ~kPoMask;
+  mFlags &= ~kPoMask;
   for (LnEdgeList::iterator p = mFanoutList.begin();
        p != mFanoutList.end(); ++ p) {
     LnEdge* e = *p;
     if ( e->to()->is_output() ) {
-      mMark |= kPoMask;
+      mFlags |= kPoMask;
       break;
     }
   }
@@ -144,7 +144,9 @@ LnGraph::copy(const LnGraph& src,
     src_node->tv(tv);
     
     LnNode* dst_node = new_lut(src_node->name(), dst_inputs, tv);
-    dst_node->mMark = src_node->mMark;
+    if ( src_node->pomark() ) {
+      dst_node->mFlags |= LnNode::kPoMask;
+    }
     nodemap[src_node->id()] = dst_node;
   }
 
@@ -353,7 +355,6 @@ LnGraph::new_node(ymuint ni)
     node->mFanins = NULL;
   }
   node->mId = uid;
-  node->mMark = 0;
 
   return node;
 }
