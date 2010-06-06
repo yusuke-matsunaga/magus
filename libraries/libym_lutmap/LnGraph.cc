@@ -90,16 +90,6 @@ LnGraph::LnGraph(const LnGraph& src) :
   copy(src, nodemap);
 }
 
-// @brief 特殊なコピーコンストラクタ
-// nodemap に対応関係が入る．
-LnGraph::LnGraph(const LnGraph& src,
-		   vector<LnNode*>& nodemap) :
-  mAlloc(4096),
-  mAlloc2(4096)
-{
-  copy(src, nodemap);
-}
-
 // 代入演算子
 const LnGraph&
 LnGraph::operator=(const LnGraph& src)
@@ -171,59 +161,6 @@ LnGraph::copy(const LnGraph& src,
     }
     (void) new_output(name, dst_inode);
   }
-}
-
-// 空にする．
-void
-LnGraph::clear()
-{
-  // まず最初に接続を切る．
-  for (LnNodeList::iterator p = mOutputList.begin();
-       p != mOutputList.end(); ++ p) {
-    LnNode* node = *p;
-    connect(NULL, node, 0);
-  }
-  for (LnNodeList::iterator p = mLnodeList.begin();
-       p != mLnodeList.end(); ++ p) {
-    LnNode* node = *p;
-    ymuint ni = node->ni();
-    for (ymuint i = 0; i < ni; ++ i) {
-      connect(NULL, node, i);
-    }
-  }
-
-  for (LnNodeList::iterator p = mInputList.begin();
-       p != mInputList.end(); ) {
-    // p は実際にはノード内のメンバをアクセスするので delete する前に
-    // 進めておく必要がある．
-    LnNode* node = *p;
-    ++ p;
-    delete_input(node);
-  }
-  assert_cond(mInputList.empty(), __FILE__, __LINE__);
-
-  for (LnNodeList::iterator p = mOutputList.begin();
-       p != mOutputList.end(); ) {
-    // p は実際にはノード内のメンバをアクセスするので delete する前に
-    // 進めておく必要がある．
-    LnNode* node = *p;
-    ++ p;
-    delete_output(node);
-  }
-  assert_cond(mOutputList.empty(), __FILE__, __LINE__);
-
-  for (LnNodeList::iterator p = mLnodeList.begin();
-       p != mLnodeList.end(); ) {
-    // p は実際にはノード内のメンバをアクセスするので delete する前に
-    // 進めておく必要がある．
-    LnNode* node = *p;
-    ++ p;
-    delete_lut(node);
-  }
-  assert_cond(mLnodeList.empty(), __FILE__, __LINE__);
-
-  mInputArray.clear();
-  mOutputArray.clear();
 }
 
 // @brief ソートされたノードのリストを得る．
@@ -370,45 +307,19 @@ LnGraph::new_lut(const string& name,
   // 論理ノードリストに登録
   mLnodeList.push_back(node);
 
-  change_lut(node, inodes, tv);
+  // 論理ノードタイプに設定
+  node->set_lut();
+
+  // 真理値ベクタを設定
+  assert_cond(tv.size() == (1U << ni), __FILE__, __LINE__);
+  node->mTv = tv;
+
+  // ファンインの設定
+  for (ymuint i = 0; i < ni; ++ i) {
+    connect(inodes[i], node, i);
+  }
   
   return node;
-}
-
-// 入力ノードの削除
-void
-LnGraph::delete_input(LnNode* node)
-{
-  assert_cond(node->is_input(), __FILE__, __LINE__);
-  mInputList.erase(node);
-  delete_node(node);
-}
-
-// 出力ノードの削除
-void
-LnGraph::delete_output(LnNode* node)
-{
-  assert_cond(node->is_output(), __FILE__, __LINE__);
-  mOutputList.erase(node);
-  delete_node(node);
-
-  mLevel = 0;
-  mLevelValid = false;
-}
-
-// LUTノードの削除
-void
-LnGraph::delete_lut(LnNode* node)
-{
-  assert_cond(node->is_lut(), __FILE__, __LINE__);
-  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
-  ymuint ni = node->ni();
-  for (ymuint i = 0; i < ni; ++ i) {
-    connect(NULL, node, i);
-  }
-
-  mLnodeList.erase(node);
-  delete_node(node);
 }
 
 // 新しいノードを作成する．
@@ -447,6 +358,95 @@ LnGraph::new_node(ymuint ni)
   return node;
 }
 
+// 空にする．
+void
+LnGraph::clear()
+{
+  // まず最初に接続を切る．
+  for (LnNodeList::iterator p = mOutputList.begin();
+       p != mOutputList.end(); ++ p) {
+    LnNode* node = *p;
+    connect(NULL, node, 0);
+  }
+  for (LnNodeList::iterator p = mLnodeList.begin();
+       p != mLnodeList.end(); ++ p) {
+    LnNode* node = *p;
+    ymuint ni = node->ni();
+    for (ymuint i = 0; i < ni; ++ i) {
+      connect(NULL, node, i);
+    }
+  }
+
+  for (LnNodeList::iterator p = mInputList.begin();
+       p != mInputList.end(); ) {
+    // p は実際にはノード内のメンバをアクセスするので delete する前に
+    // 進めておく必要がある．
+    LnNode* node = *p;
+    ++ p;
+    delete_input(node);
+  }
+  assert_cond(mInputList.empty(), __FILE__, __LINE__);
+
+  for (LnNodeList::iterator p = mOutputList.begin();
+       p != mOutputList.end(); ) {
+    // p は実際にはノード内のメンバをアクセスするので delete する前に
+    // 進めておく必要がある．
+    LnNode* node = *p;
+    ++ p;
+    delete_output(node);
+  }
+  assert_cond(mOutputList.empty(), __FILE__, __LINE__);
+
+  for (LnNodeList::iterator p = mLnodeList.begin();
+       p != mLnodeList.end(); ) {
+    // p は実際にはノード内のメンバをアクセスするので delete する前に
+    // 進めておく必要がある．
+    LnNode* node = *p;
+    ++ p;
+    delete_lut(node);
+  }
+  assert_cond(mLnodeList.empty(), __FILE__, __LINE__);
+
+  mInputArray.clear();
+  mOutputArray.clear();
+}
+
+// 入力ノードの削除
+void
+LnGraph::delete_input(LnNode* node)
+{
+  assert_cond(node->is_input(), __FILE__, __LINE__);
+  mInputList.erase(node);
+  delete_node(node);
+}
+
+// 出力ノードの削除
+void
+LnGraph::delete_output(LnNode* node)
+{
+  assert_cond(node->is_output(), __FILE__, __LINE__);
+  mOutputList.erase(node);
+  delete_node(node);
+
+  mLevel = 0;
+  mLevelValid = false;
+}
+
+// LUTノードの削除
+void
+LnGraph::delete_lut(LnNode* node)
+{
+  assert_cond(node->is_lut(), __FILE__, __LINE__);
+  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+  ymuint ni = node->ni();
+  for (ymuint i = 0; i < ni; ++ i) {
+    connect(NULL, node, i);
+  }
+
+  mLnodeList.erase(node);
+  delete_node(node);
+}
+
 // node を削除する．
 void
 LnGraph::delete_node(LnNode* node)
@@ -457,99 +457,6 @@ LnGraph::delete_node(LnNode* node)
   // 省略する．
   if ( node->ni() ) {
     mAlloc2.put_memory(sizeof(LnEdge)* node->ni(), node->mFanins);
-  }
-}
-    
-// @brief 出力ノードの内容を変更する
-// @param[in] 変更対象の出力ノード
-// @param[in] inode 入力のノード
-// @param[in] inv 反転している時 true をあたえる．
-void
-LnGraph::change_output(LnNode* node,
-		       LnNode* inode)
-{
-  node->set_output(node->subid());
-  connect(inode, node, 0);
-}
-
-// @brief 論理ノードの内容を再設定する．
-// @param[in] node 変更対象の論理ノード
-// @param[in] inodes 入力ノードの配列
-// @param[in] tv 真理値ベクタ
-void
-LnGraph::change_lut(LnNode* node,
-		    const vector<LnNode*>& inodes,
-		    const vector<int>& tv)
-{
-  node->set_lut();
-  assert_cond(tv.size() == (1U << inodes.size()), __FILE__, __LINE__);
-  node->mTv = tv;
-  change_node_fanins(node, inodes);
-}
-  
-// @brief LUT ノードのファンインのみ変更する．
-// @param[in] node 変更対象の論理ノード
-// @param[in] inodes 入力ノードのベクタ
-void
-LnGraph::change_node_fanins(LnNode* node,
-			    const vector<LnNode*>& inodes)
-{
-  ymuint ni = inodes.size();
-  if ( node->ni() != ni ) {
-    if ( node->ni() ) {
-      mAlloc2.put_memory(sizeof(LnEdge)* node->ni(), node->mFanins);
-    }
-    if ( ni ) {
-      void* q = mAlloc2.get_memory(sizeof(LnEdge) * ni);
-      node->mFanins = new (q) LnEdge[ni];
-      for (ymuint i = 0; i < ni; ++ i) {
-	node->mFanins[i].set_to(node, i);
-      }
-    }
-    else {
-      node->mFanins = NULL;
-    }
-    node->mNi = ni;
-  }
-  for (ymuint i = 0; i < ni; ++ i) {
-    connect(inodes[i], node, i);
-  }
-}
-  
-// @brief ノードの置き換えを行う．
-// @param[in] old_node 置き換え対象のノード
-// @param[in] new_node 置き換わる新しいノード
-// @param[in] inv true なら極性を反転させる．
-void
-LnGraph::subst_node(LnNode* old_node,
-		    LnNode* new_node,
-		    bool inv)
-{
-  // old_node のファンアウトは変化するのでファンアウトリストをコピーしておく
-  const LnEdgeList& fo_list = old_node->fanout_list();
-  vector<LnEdge*> tmp_list;
-  tmp_list.reserve(old_node->n_fanout());
-  for (LnEdgeList::const_iterator r = fo_list.begin();
-       r != fo_list.end(); ++ r) {
-    tmp_list.push_back(*r);
-  }
-  
-  for (vector<LnEdge*>::iterator r = tmp_list.begin();
-       r != tmp_list.end(); ++ r) {
-    LnEdge* edge = *r;
-    assert_cond(edge->from() == old_node, __FILE__, __LINE__);
-    LnNode* onode = edge->to();
-    ymuint ni = onode->ni();
-    vector<LnNode*> inodes(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      if ( i != edge->pos() ) {
-	inodes[i] = onode->fanin(i);
-      }
-      else {
-	inodes[i] = new_node;
-      }
-    }
-    change_node_fanins(onode, inodes);
   }
 }
 

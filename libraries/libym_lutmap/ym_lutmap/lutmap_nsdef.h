@@ -12,6 +12,8 @@
 
 
 #include "ymtools.h"
+#include "ym_utils/DlList.h"
+
 
 /// @brief lutmap 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_LUTMAP \
@@ -30,6 +32,11 @@ class SbjGraph;
 class LnGraph;
 class LnEdge;
 class LnNode;
+
+typedef DlList<LnEdge> LnEdgeList;
+typedef DlListConstIter<LnEdge> LnEdgeListConstIter;
+typedef DlList<LnNode> LnNodeList;
+typedef DlListConstIter<LnNode> LnNodeListConstIter;
 
 
 /// @brief 面積最小化 DAG covering のヒューリスティック関数
@@ -82,6 +89,11 @@ using nsLutmap::area_map;
 using nsLutmap::delay_map;
 using nsLutmap::LnEdge;
 using nsLutmap::LnNode;
+
+using nsLutmap::LnEdgeList;
+using nsLutmap::LnEdgeListConstIter;
+using nsLutmap::LnNodeList;
+using nsLutmap::LnNodeListConstIter;
 
 END_NAMESPACE_YM
 

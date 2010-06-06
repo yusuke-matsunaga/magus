@@ -16,20 +16,10 @@
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
-#include "ym_lexp/LogExpr.h"
 #include "ym_bnet/BNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-class LnEdge;
-class LnNode;
-class LnGraph;
-
-typedef DlList<LnEdge> LnEdgeList;
-typedef DlListConstIter<LnEdge> LnEdgeListConstIter;
-typedef DlList<LnNode> LnNodeList;
-typedef DlListConstIter<LnNode> LnNodeListConstIter;
 
 void
 lut2bnet(const LnGraph& src_network,
@@ -59,13 +49,13 @@ public:
   /// @name 関数処理に関する情報にアクセスする関数
   /// @{
   
-  /// @brief 入力側のノードを得る．
+  /// @brief 入力側のノードを得る．(const 版)
   /// @retval 入力側のノード 通常の枝の場合
   /// @retval NULL 定数0に接続している枝の場合
   const LnNode*
   from() const;
   
-  /// @brief 出力側のノードを得る．
+  /// @brief 出力側のノードを得る．(const 版)
   /// @return 出力側のノードを返す．
   const LnNode*
   to() const;
@@ -231,7 +221,7 @@ public:
   LnNode*
   fanin(ymuint pos);
   
-  /// @brief ファンインの枝を得る．
+  /// @brief ファンインの枝を得る．(const 版)
   /// @param[in] pos 入力番号
   /// @return pos 番目の入力の枝
   /// @note 該当するファンインの枝がなければ NULL を返す．
@@ -362,14 +352,12 @@ public:
   LnGraph();
 
   /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
   LnGraph(const LnGraph& src);
 
-  /// @brief 特殊なコピーコンストラクタ
-  /// nodemap に対応関係が入る．
-  LnGraph(const LnGraph& src,
-	  vector<LnNode*>& nodemap);
-
   /// @brief 代入演算子
+  /// @param[in] src コピー元のオブジェクト
+  /// @return 自分自身への参照を返す．
   const LnGraph&
   operator=(const LnGraph& src);
 
@@ -383,6 +371,7 @@ public:
 
   /// @brief ノードIDの最大値 + 1 の取得
   /// @return ノードIDの最大値 + 1 を返す．
+  /// @note ノードIDは間が抜けている場合がある．
   ymuint
   max_node_id() const;
   
@@ -436,7 +425,7 @@ public:
   void
   sort(vector<LnNode*>& node_list) const;
 
-  /// @brief 段数を求める．
+  /// @brief 最大段数を求める．
   ymuint
   level() const;
 
@@ -473,55 +462,6 @@ public:
 	  const vector<LnNode*>& inodes,
 	  const vector<int>& tv);
 
-  /// @brief 入力ノードの削除
-  /// @param[in] node 対象のノード
-  void
-  delete_input(LnNode* node);
-
-  /// @brief 出力ノードの削除
-  /// @param[in] node 対象のノード
-  void
-  delete_output(LnNode* node);
-  
-  /// @brief LUTノードを削除する．
-  /// @param[in] node 対象のノード
-  /// @note node のファンアウトは空でなければならない．
-  void
-  delete_lut(LnNode* node);
-  
-  /// @brief 出力ノードの内容を変更する
-  /// @param[in] 変更対象の出力ノード
-  /// @param[in] inode 入力のノード
-  void
-  change_output(LnNode* node,
-		LnNode* inode);
-  
-  /// @brief LUTノードの内容を再設定する．
-  /// @param[in] node 変更対象の論理ノード
-  /// @param[in] inodes 入力ノードのベクタ
-  /// @param[in] tv 真理値ベクタ
-  /// @note tv のサイズは inodes のサイズの冪乗
-  void
-  change_lut(LnNode* node,
-	     const vector<LnNode*>& inodes,
-	     const vector<int>& tv);
-  
-  /// @brief LUT ノードのファンインのみ変更する．
-  /// @param[in] node 変更対象の論理ノード
-  /// @param[in] inodes 入力ノードのベクタ
-  void
-  change_node_fanins(LnNode* node,
-		     const vector<LnNode*>& inodes);
-  
-  /// @brief ノードの置き換えを行う．
-  /// @param[in] old_node 置き換え対象のノード
-  /// @param[in] new_node 置き換わる新しいノード
-  /// @param[in] inv true なら極性を反転させる．
-  void
-  subst_node(LnNode* old_node,
-	     LnNode* new_node,
-	     bool inv = false);
-  
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -557,9 +497,21 @@ private:
   LnNode*
   new_node(ymuint ni);
 
-  // new_node で用いられる低レベル関数
-  LnNode*
-  alloc_node();
+  /// @brief 入力ノードの削除
+  /// @param[in] node 対象のノード
+  void
+  delete_input(LnNode* node);
+
+  /// @brief 出力ノードの削除
+  /// @param[in] node 対象のノード
+  void
+  delete_output(LnNode* node);
+  
+  /// @brief LUTノードを削除する．
+  /// @param[in] node 対象のノード
+  /// @note node のファンアウトは空でなければならない．
+  void
+  delete_lut(LnNode* node);
   
   // node を削除する．
   void
@@ -968,11 +920,6 @@ LnGraph::lnode_list() const
 END_NAMESPACE_YM_LUTMAP
 
 BEGIN_NAMESPACE_YM
-
-using nsLutmap::LnEdgeList;
-using nsLutmap::LnEdgeListConstIter;
-using nsLutmap::LnNodeList;
-using nsLutmap::LnNodeListConstIter;
 
 using nsLutmap::lut2bnet;
 
