@@ -123,10 +123,12 @@ case "$1" in
 	clean $BASEDIR/programs/magus_tclsh
 	clean $BASEDIR/programs/atpg
 	clean $BASEDIR/programs/matpg
+	clean $BASEDIR/programs/lutmap
         boot $BASEDIR
 	boot $BASEDIR/programs/magus_tclsh no_autoheader
 	boot $BASEDIR/programs/atpg no_autoheader
 	boot $BASEDIR/programs/matpg no_autoheader
+	boot $BASEDIR/programs/lutmap no_autoheader
         ;;
       2)
 	clean $2
@@ -146,6 +148,7 @@ case "$1" in
 	clean $BASEDIR/programs/magus_tclsh
 	clean $BASEDIR/programs/aptg
 	clean $BASEDIR/programs/maptg
+	clean $BASEDIR/programs/lutmap
 	;;
       2)
 	clean $2

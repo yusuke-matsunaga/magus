@@ -643,6 +643,10 @@ AC_CONFIG_SUBDIRS([programs/atpg])
 YM_ADD_PROGRAMS_SUBDIRS([matpg])
 AC_CONFIG_SUBDIRS([programs/matpg])
 
+# lutmap
+YM_ADD_PROGRAMS_SUBDIRS([lutmap])
+AC_CONFIG_SUBDIRS([programs/lutmap])
+
 YM_FINISH_PROGRAMS_SUBDIRS
 
 
