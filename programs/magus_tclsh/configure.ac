@@ -14,19 +14,17 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2007 Yusuke Matsunaga
+Copyright (C) 2007-2010 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
 AC_CONFIG_SRCDIR([include/magus.h])dnl
 
-AC_CONFIG_AUX_DIR([config])dnl
-AC_CONFIG_MACRO_DIR([config])dnl
+AC_CONFIG_AUX_DIR([../../config])dnl
+AC_CONFIG_MACRO_DIR([../../config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
-
-#AC_CONFIG_HEADERS([magus_config.h])dnl
 
 AC_DEFINE_UNQUOTED(MAGUS_VERSION, "${VERSION}", [Magus version])dnl
 
@@ -55,67 +53,42 @@ fi
 # Checks for libraries
 # ===================================================================
 
+
 # ===================================================================
 # Checks for header files
 # ===================================================================
-#AC_HEADER_STDC
-#AC_HEADER_TIME
-#AC_CHECK_HEADERS([limits.h strings.h sys/time.h unistd.h])
-#AC_CHECK_HEADERS([pwd.h sys/stat.h sys/param.h])
-#AC_CHECK_HEADERS([math.h])
-#AC_CHECK_HEADERS([zlib.h], [has_zlib_h=1], [has_zlib_h=0])
+
 
 # ===================================================================
 # Checks for typedefs, structures, and compiler characteristics
 # ===================================================================
-#AC_C_CONST
-#AC_C_INLINE
-#AC_TYPE_SIZE_T
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
 
 # ===================================================================
 # Check for size of built-in types
 # ===================================================================
-#AC_CHECK_SIZEOF(char)
-#AC_CHECK_SIZEOF(unsigned char)
-#AC_CHECK_SIZEOF(int)
-#AC_CHECK_SIZEOF(unsigned int)
-#AC_CHECK_SIZEOF(long)
-#AC_CHECK_SIZEOF(unsigned long)
-#AC_CHECK_SIZEOF(void*)
-#AC_CHECK_SIZEOF(size_t)
 
-#_AC_COMPUTE_INT([__alignof__ (double)], ym_alignof_double)
-#AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
 
 # ===================================================================
 # Check for return type of signal handler
 # ===================================================================
-#AC_TYPE_SIGNAL
+
 
 # ===================================================================
 # Checks for library functions
 # ===================================================================
-#AC_FUNC_ALLOCA
-#AC_CHECK_FUNCS([random lrand48], break)
-#AC_CHECK_FUNCS([getrusage times], break)
-#AC_CHECK_FUNCS([getcwd gettimeofday strtod])
 
 AC_PATH_XTRA
 
-# ===================================================================
-# Check for gmp
-# ===================================================================
-YM_CHECK_GMP
-
-# ===================================================================
-# Check for popt
-# ===================================================================
-YM_CHECK_POPT
 
 # ===================================================================
 # Check for TCL environment
 # ===================================================================
 YM_CHECK_TCL
+
 
 # ===================================================================
 # Check for tclreadline

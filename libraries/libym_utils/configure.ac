@@ -48,20 +48,13 @@ fi
 
 
 # ===================================================================
+# Checks for libraries
+# ===================================================================
+
+
+# ===================================================================
 # Checks for header files
 # ===================================================================
-AC_HEADER_STDC
-AC_HEADER_TIME
-AC_CHECK_HEADERS([strings.h])
-AC_CHECK_HEADERS([unistd.h])
-AC_CHECK_HEADERS([limits.h])
-AC_CHECK_HEADERS([float.h])
-AC_CHECK_HEADERS([math.h])
-AC_CHECK_HEADERS([pwd.h])
-AC_CHECK_HEADERS([sys/time.h])
-AC_CHECK_HEADERS([sys/stat.h])
-AC_CHECK_HEADERS([sys/param.h])
-AC_CHECK_HEADERS([zlib.h])
 
 
 # ===================================================================

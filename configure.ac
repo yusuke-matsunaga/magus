@@ -32,12 +32,12 @@ AM_INIT_AUTOMAKE()dnl
 # ===================================================================
 AC_ISC_POSIX
 AC_PROG_MAKE_SET
-AC_PROG_CC
-AC_PROG_CXX
-AC_PROG_LN_S
-AC_PROG_INSTALL
-AC_PROG_YACC
-AM_PROG_LEX
+#AC_PROG_CC
+#AC_PROG_CXX
+#AC_PROG_LN_S
+#AC_PROG_INSTALL
+#AC_PROG_YACC
+#AM_PROG_LEX
 AC_PROG_LIBTOOL
 AC_CHECK_PROG([DOXYGEN],
 	      [doxygen], 
@@ -80,8 +80,6 @@ AC_CHECK_HEADERS([zlib.h], [ym_have_zlib_h=yes])
 # ===================================================================
 # Checks for typedefs, structures, and compiler characteristics
 # ===================================================================
-AC_C_CONST
-AC_C_INLINE
 AC_TYPE_SIZE_T
 
 
@@ -100,24 +98,11 @@ AC_CHECK_SIZEOF(size_t)
 # ===================================================================
 # Check for return type of signal handler
 # ===================================================================
-AC_TYPE_SIGNAL
-
-
-# ===================================================================
-# Checks for library functions
-# ===================================================================
-#AC_FUNC_ALLOCA
-#AC_CHECK_FUNCS([random lrand48], break)
-#AC_CHECK_FUNCS([getrusage times], break)
-#AC_CHECK_FUNCS([getcwd gettimeofday strtod])
 
 
 # ===================================================================
 # Checks for system services
 # ===================================================================
-AC_PATH_XTRA
-
-AC_CACHE_SAVE
 
 
 # ===================================================================
@@ -130,18 +115,6 @@ if test "x$ym_have_zlib_h" = xyes -a "x$ym_have_libz" = xyes; then
 else
    ym_have_zlib=0
 fi
-
-# Check for gmp
-YM_CHECK_GMP
-
-# Check for popt
-YM_CHECK_POPT
-
-# Check for TCL environment
-YM_CHECK_TCL
-
-# Check for tclreadline
-YM_CHECK_TCLREADLINE
 
 AC_CACHE_SAVE
 
@@ -455,24 +428,24 @@ AC_CONFIG_FILES([Doxyfile])
 # ===================================================================
 
 ym_libym_utils_enable=1
-ym_libym_zstream_enable=0
+ym_libym_zstream_enable=1
 ym_libym_lexp_enable=1
-ym_libym_bdd_enable=0
-ym_libym_npn_enable=0
-ym_libym_sat_enable=0
+ym_libym_bdd_enable=1
+ym_libym_npn_enable=1
+ym_libym_sat_enable=1
 ym_libym_blif_enable=1
 ym_libym_iscas89_enable=1
-ym_libym_cell_enable=0
-ym_libym_verilog_enable=0
+ym_libym_cell_enable=1
+ym_libym_verilog_enable=1
 ym_libym_bnet_enable=1
-ym_libym_bdn_enable=0
-ym_libym_aig_enable=0
-ym_libym_tgnet_enable=0
-ym_libym_gds_enable=0
-ym_libym_ceq_enable=0
+ym_libym_bdn_enable=1
+ym_libym_aig_enable=1
+ym_libym_tgnet_enable=1
+ym_libym_gds_enable=1
+ym_libym_ceq_enable=1
 ym_libym_lutmap_enable=1
-ym_libym_seal_enable=0
-ym_libym_tclpp_enable=0
+ym_libym_seal_enable=1
+ym_libym_tclpp_enable=1
 
 
 YM_INIT_LIBRARIES_SUBDIRS
@@ -578,23 +551,28 @@ YM_FINISH_LIBRARIES_SUBDIRS
 # Declare files in 'programs' subdirectories
 # ===================================================================
 
+ym_magus_tclsh_enable=1
+ym_atpg_enable=1
+ym_matpg_enable=1
+ym_lutmap_enable=1
+
 YM_INIT_PROGRAMS_SUBDIRS
 
 # magus_tclsh
-#YM_ADD_PROGRAMS_SUBDIRS([magus_tclsh])
-#AC_CONFIG_SUBDIRS([programs/magus_tclsh])
+YM_BUILD_PROGRAM([magus_tclsh],
+		 [])
 
 # atpg
-#YM_ADD_PROGRAMS_SUBDIRS([atpg])
-#AC_CONFIG_SUBDIRS([programs/atpg])
+YM_BUILD_PROGRAM([atpg],
+		 [])
 
 # matpg
-#YM_ADD_PROGRAMS_SUBDIRS([matpg])
-#AC_CONFIG_SUBDIRS([programs/matpg])
+YM_BUILD_PROGRAM([matpg],
+		 [])
 
 # lutmap
-YM_ADD_PROGRAMS_SUBDIRS([lutmap])
-AC_CONFIG_SUBDIRS([programs/lutmap])
+YM_BUILD_PROGRAM([lutmap],
+		 [ym_libym_lutmap_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS
 
