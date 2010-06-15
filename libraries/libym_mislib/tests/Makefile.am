@@ -6,8 +6,8 @@
 ## $Date: 2005/12/11 17:07:26 $
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -33,4 +33,4 @@ mislib_test_SOURCES = \
 mislib_test_LDFLAGS =
 
 mislib_test_LDADD = \
-	$(top_builddir)/libym_mislib/libym_mislib.la
+	$(YMTOOLS_BUILDDIR)/libym_mislib/libym_mislib.la

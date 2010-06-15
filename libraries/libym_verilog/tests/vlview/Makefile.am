@@ -2,16 +2,14 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-include $(top_srcdir)/etc/autotroll.mk
+include $(YMTOOLS_SRCDIR)/etc/autotroll.mk
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_verilog \
-	-I$(top_builddir)/libym_verilog \
-	-I$(top_srcdir)/libym_verilog/parser/include \
-	-I$(top_builddir)/libym_verilog/parser/main \
-	-I$(top_srcdir)/libym_verilog/parser/scanner
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(top_srcdir)/parser/include \
+	-I$(top_srcdir)/parser/scanner \
+	-I$(top_builddir)/parser/main
 
 EXTRA_DIST =
 
@@ -65,8 +63,8 @@ vlview_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
 vlview_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
 
 vlview_LDADD = \
-	$(top_builddir)/libym_verilog/libym_verilog.la \
-	$(top_builddir)/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libym_utils/libym_utils.la \
 	$(QT_LIBS) \
 	$(LIDADD)
 

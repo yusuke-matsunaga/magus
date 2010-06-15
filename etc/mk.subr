@@ -52,10 +52,10 @@ boot() {
 
     echo "$LIBTOOLIZE $LIBTOOLIZE_FLAGS --automake --copy" | tee -a $MK_LOG
     $LIBTOOLIZE $LIBTOOLIZE_FLAGS --automake --copy 2>> $MK_LOG
-    if test "x$2" != xno_autoheader; then
-       echo "$AUTOHEADER $AUTOHEADER_FLAGS" >> $MK_LOG
-       $AUTOHEADER $AUTOHEADER_FLAGS 2>> $MK_LOG
-    fi
+#    if test "x$2" != xno_autoheader; then
+#       echo "$AUTOHEADER $AUTOHEADER_FLAGS" >> $MK_LOG
+#       $AUTOHEADER $AUTOHEADER_FLAGS 2>> $MK_LOG
+#    fi
     echo "$AUTOMAKE $AUTOMAKE_FLAGS --add-missing --copy --foreign" | tee -a $MK_LOG
     $AUTOMAKE $AUTOMAKE_FLAGS --add-missing --copy --foreign 2>> $MK_LOG
     echo "$AUTOCONF $AUTOCONF_FLAGS" | tee -a $MK_LOG

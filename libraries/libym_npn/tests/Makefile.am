@@ -5,9 +5,9 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libym_npn \
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(top_srcdir) \
 	$(TCL_INCLUDES) \
 	@POPT_INCLUDES@
 
@@ -28,13 +28,13 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-YM_BASE = $(top_builddir)/libraries/libym_utils/libym_utils.la
+YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-YM_TCLPP = $(top_builddir)/libraries/libym_tclpp/libym_tclpp.la 
+YM_TCLPP = $(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la 
 
-YM_BDD = $(top_builddir)/libraries/libym_bdd/libym_bdd.la
+YM_BDD = $(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la
 
-YM_NPN = $(top_builddir)/libraries/libym_npn/libym_npn.la
+YM_NPN = $(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la
 
 #if BUILD_LIBYM_TCLPP
 #NPN_CHECK = npn_check

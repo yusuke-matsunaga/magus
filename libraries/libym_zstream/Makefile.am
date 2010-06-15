@@ -10,8 +10,8 @@ SUBDIRS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 noinst_LTLIBRARIES = libym_zstream.la
 

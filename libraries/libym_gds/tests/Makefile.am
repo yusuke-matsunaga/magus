@@ -3,8 +3,8 @@
 ## $Id: Makefile.am 958 2007-08-28 05:38:02Z matsunaga $
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -21,7 +21,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_GDS = $(top_builddir)/libraries/libym_gds/libym_gds.la
+LIBYM_GDS = $(YMTOOLS_BUILDDIR)/libraries/libym_gds/libym_gds.la
 
 noinst_PROGRAMS = \
 	gdsparse \

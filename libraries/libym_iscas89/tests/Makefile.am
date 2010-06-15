@@ -5,8 +5,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -30,4 +30,4 @@ noinst_PROGRAMS = \
 parsertest_SOURCES = \
 	parsertest.cc
 parsertest_LDADD = \
-	$(top_builddir)/libraries/libym_iscas89/libym_iscas89.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la

@@ -6,8 +6,8 @@
 ## $Date: 2005/12/11 17:07:26 $
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -37,7 +37,7 @@ bin_PROGRAMS = \
 #mislib_test_LDFLAGS =
 #
 #mislib_test_LDADD = \
-#	$(top_builddir)/libym_cell/libym_cell.la
+#	$(YMTOOLS_BUILDDIR)/libym_cell/libym_cell.la
 
 dotlib_lex_test_SOURCES = \
 	dotlib_lex_test.cc
@@ -45,4 +45,4 @@ dotlib_lex_test_SOURCES = \
 dotlib_lex_test_LDFLAGS =
 
 dotlib_lex_test_LDADD = \
-	$(top_builddir)/libraries/libym_cell/libym_cell.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la

@@ -105,7 +105,30 @@ else
   AC_MSG_RESULT([$YM_LIBS_$2])
 fi
 ])
-]
+
+
+#==================================================================
+# YM_BUILD_LIBRARY(libname, required-conditions)
+#
+# Description: libname をビルドするかどうかを判断し，設定する．
+#==================================================================
+AC_DEFUN([YM_BUILD_LIBRARY],
+[
+ym_tmp_enable=${ym_[]$1[]_enable}
+m4_ifval([$2], [
+    m4_foreach([XXX], [$2], [
+       if test $ym_tmp_enable = 1 -a "X$XXX"!=X1; then
+           ym_tmp_enable=0
+	   AC_MSG_NOTICE(['$1' will be disabled because 'XXX' is disabled])
+       fi
+    ])
+])
+ym_tmp_enable=1
+if test "$ym_tmp_enable"=1; then
+    YM_ADD_LIBRARIES_SUBDIRS([$1])
+    AC_CONFIG_SUBDIRS([libraries/$1])
+fi
+])
 
 
 # ==================================================================

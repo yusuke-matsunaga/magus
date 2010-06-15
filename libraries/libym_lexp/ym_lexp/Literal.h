@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_lexp/lexp.h"
+#include "ym_lexp/lexp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP

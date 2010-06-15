@@ -12,8 +12,8 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_ceq.la
 
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 libym_ceq_la_SOURCES = \
 	FraigHash.h \
@@ -27,9 +27,9 @@ libym_ceq_la_SOURCES = \
 	check_ceq.cc
 
 libym_ceq_la_LIBADD = \
-	$(top_builddir)/libraries/libym_aig/libym_aig.la \
-	$(top_builddir)/libraries/libym_sat/libym_sat.la \
-	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 libym_ceq_la_LDFLAGS =
 

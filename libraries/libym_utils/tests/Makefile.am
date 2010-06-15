@@ -28,8 +28,8 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 noinst_PROGRAMS = \
 	file_test \

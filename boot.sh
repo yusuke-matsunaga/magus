@@ -113,6 +113,34 @@ AUTOGEN_COMMON=autogen.common
 
 # サブモジュールのディレクトリ名
 #SUBMODULE=`cat $BASEDIR/modules`
+LIBRARIES=\
+"libym_utils \
+ libym_zstream \
+ libym_lexp \
+ libym_bdd \
+ libym_npn \
+ libym_sat \
+ libym_mincov \
+ libym_blif \
+ libym_iscas89 \
+ libym_cell \
+ libym_verilog \
+ libym_bnet \
+ libym_bdn \
+ libym_aig \
+ libym_tgnet \
+ libym_gds \
+ libym_ceq \
+ libym_lutmap \
+ libym_seal \
+ libym_tclpp"
+
+PROGRAMS=\
+"magus_tclsh \
+ matpg \
+ atpg \
+ seal \
+ lutmap"
 
 # 第1引数に応じた処理を行う．
 case "$1" in
@@ -120,15 +148,19 @@ case "$1" in
     case $# in
       0|1)
 	clean $BASEDIR
-	clean $BASEDIR/programs/magus_tclsh
-	clean $BASEDIR/programs/atpg
-	clean $BASEDIR/programs/matpg
-	clean $BASEDIR/programs/lutmap
+	for lib in $LIBRARIES; do
+	    clean $BASEDIR/libraries/$lib
+	done
+	for prog in $PROGRAMS; do
+	    clean $BASEDIR/programs/$prog
+	done
         boot $BASEDIR
-	boot $BASEDIR/programs/magus_tclsh no_autoheader
-	boot $BASEDIR/programs/atpg no_autoheader
-	boot $BASEDIR/programs/matpg no_autoheader
-	boot $BASEDIR/programs/lutmap no_autoheader
+	for lib in $LIBRARIES; do
+	    boot $BASEDIR/libraries/$lib
+	done
+	for prog in $PROGRAMS; do
+	    boot $BASEDIR/programs/$prog
+	done
         ;;
       2)
 	clean $2
@@ -145,10 +177,12 @@ case "$1" in
     case $# in
       1)
 	clean $BASEDIR
-	clean $BASEDIR/programs/magus_tclsh
-	clean $BASEDIR/programs/aptg
-	clean $BASEDIR/programs/maptg
-	clean $BASEDIR/programs/lutmap
+	for lib in $LIBRARIES; do
+	    clean $BASEDIR/libraries/$lib
+	done
+	for prog in $PROGRAMS; do
+	    clean $BASEDIR/programs/$prog
+	done
 	;;
       2)
 	clean $2

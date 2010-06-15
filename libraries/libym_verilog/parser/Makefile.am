@@ -25,6 +25,6 @@ libym_vl_parser_la_LIBADD = \
 	pt_mgr/libym_vl_parser_pt_mgr.la \
 	spt/libym_vl_parser_spt.la \
 	cpt/libym_vl_parser_cpt.la \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_vl_parser_la_LDFLAGS =

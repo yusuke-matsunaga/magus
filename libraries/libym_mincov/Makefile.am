@@ -8,8 +8,8 @@ SUBDIRS = \
 	tests
 
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 CLEANFILES =
 
@@ -18,7 +18,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_mincov.la
 
 libym_mincov_la_LIBADD = \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_mincov_la_LDFLAGS = 
 

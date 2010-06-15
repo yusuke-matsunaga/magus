@@ -8,8 +8,8 @@ SUBDIRS = \
 	tests
 
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 YFLAGS=-d -v
 
@@ -21,8 +21,8 @@ MAINTAINERCLEANFILES = Makefile.in
 lib_LTLIBRARIES = libym_mislib.la
 
 libym_mislib_la_LIBADD = \
-	$(top_builddir)/libym_lexp/libym_lexp.la \
-	$(top_builddir)/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libym_utils/libym_utils.la
 
 libym_mislib_la_LDFLAGS = 
 

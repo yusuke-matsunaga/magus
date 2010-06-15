@@ -3,9 +3,9 @@
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libraries/libym_verilog/parser/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(top_srcdir)/parser/include
 
 MAINTAINERCLEANFILES = Makefile.in
 

@@ -5,9 +5,9 @@
 SUBDIRS = 
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libraries/libym_sat
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(top_srcdir)
 
 MAINTAINERCLEANFILES = Makefile.in
 

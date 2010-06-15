@@ -11,10 +11,10 @@ SUBDIRS = \
 	tests
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libraries/libym_verilog/parser/include \
-	-I$(top_srcdir)/libraries/libym_verilog/elaborator/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/include
 
 CLEANFILES =
 

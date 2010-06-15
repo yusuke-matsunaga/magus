@@ -5,8 +5,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include \
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
 	$(GMP_INCLUDES)
 
 YFLAGS=-d -v
@@ -31,9 +31,9 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-YM_BASE = $(top_builddir)/libraries/libym_utils/libym_utils.la
+YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-YM_BDD = $(top_builddir)/libraries/libym_bdd/libym_bdd.la
+YM_BDD = $(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la
 
 noinst_LTLIBRARIES = libymbddtest.la
 libymbddtest_la_LIBADD = \

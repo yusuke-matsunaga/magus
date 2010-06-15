@@ -5,8 +5,8 @@
 INCLUDES = \
 	$(TCL_INCLUDES) \
 	$(TCLRL_INCLUDES) \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -26,7 +26,7 @@ ym_tclsh_SOURCES = \
 
 
 ym_tclsh_LDADD = \
-	$(top_builddir)/libraries/libym_tclpp/libym_tclpp.la \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)

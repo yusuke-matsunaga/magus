@@ -8,8 +8,8 @@ SUBDIRS += vlview
 endif
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 YFLAGS=-d -v
 
@@ -47,8 +47,8 @@ bvcalc_SOURCES = \
 	bvlex.ll
 
 bvcalc_LDADD = \
-	$(top_builddir)/libraries/libym_verilog/libym_verilog.la \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 
 #############################################################

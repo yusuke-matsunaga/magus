@@ -8,8 +8,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -26,7 +26,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_AIG = $(top_builddir)/libraries/libym_aig/libym_aig.la
+LIBYM_AIG = $(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la
 
 noinst_PROGRAMS = \
 	bnet2aig \
@@ -38,7 +38,7 @@ bnet2aig_SOURCES = \
 	bnet2aig.cc
 bnet2aig_LDADD = \
 	$(LIBYM_AIG) \
-	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 genpat_SOURCES = \
 	GpNode.h \

@@ -3,13 +3,12 @@
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libraries/libym_verilog \
-	-I$(top_builddir)/libraries/libym_verilog \
-	-I$(top_srcdir)/libraries/libym_verilog/parser/include \
-	-I$(top_builddir)/libraries/libym_verilog/parser/main \
-	-I$(top_srcdir)/libraries/libym_verilog/parser/scanner \
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog \
+	-I$(top_srcdir)/parser/include \
+	-I$(top_srcdir)/parser/scanner \
+	-I$(top_builddir)/parser/main \
 	@POPT_INCLUDES@
 
 YFLAGS=-d -v
@@ -48,6 +47,6 @@ vltest_SOURCES = \
 	vltest_main.cc
 
 vltest_LDADD = \
-	$(top_builddir)/libraries/libym_verilog/libym_verilog.la \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	@POPT_LIBS@

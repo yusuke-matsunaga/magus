@@ -23,6 +23,6 @@ libym_vl_elab_la_LIBADD = \
 	main/libym_vl_elab_main.la \
 	elb_mgr/libym_vl_elab_elb_mgr.la \
 	ei/libym_vl_elab_ei.la \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_vl_elab_la_LDFLAGS =

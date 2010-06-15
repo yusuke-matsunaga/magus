@@ -12,8 +12,8 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_lutmap.la
 
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 libym_lutmap_la_SOURCES = \
 	SbjGraph.cc \
@@ -27,6 +27,7 @@ libym_lutmap_la_SOURCES = \
 	EnumCut.cc \
 	Cut.h \
 	Cut.cc \
+	CutHolder.h \
 	CutHolder.cc \
 	MapRecord.h \
 	MapRecord.cc \
@@ -45,6 +46,6 @@ libym_lutmap_la_SOURCES = \
 	DelayCover.cc
 
 libym_lutmap_la_LIBADD = \
-	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 libym_lutmap_la_LDFLAGS =

@@ -12,9 +12,12 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_utils.la
 
+#YMTOOLS_SRCDIR = $(top_srcdir)/../..
+#YMTOOLS_BUILDDIR = $(top_builddir)/../..
+
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 libym_utils_la_SOURCES = \
 	ItvlCell.h \

@@ -5,8 +5,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 CLEANFILES =
 
@@ -19,5 +19,5 @@ libym_vl_common_la_SOURCES = \
 	udpval.cc
 
 libym_vl_common_la_LIBADD = \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 libym_vl_common_la_LDFLAGS =

@@ -4,6 +4,7 @@
 
 
 SUBDIRS = \
+	include \
 	libraries \
 	programs
 

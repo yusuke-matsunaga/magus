@@ -8,18 +8,18 @@ SUBDIRS = \
 	tests
 
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bnet.la
 
 libym_bnet_la_LIBADD = \
-	$(top_builddir)/libraries/libym_blif/libym_blif.la \
-	$(top_builddir)/libraries/libym_iscas89/libym_iscas89.la \
-	$(top_builddir)/libraries/libym_lexp/libym_lexp.la \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_bnet_la_LDFLAGS = 
 

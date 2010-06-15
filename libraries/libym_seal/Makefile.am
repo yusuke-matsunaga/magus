@@ -9,8 +9,8 @@ SUBDIRS = \
 
 INCLUDES = \
 	$(GMP_INCLUDES) \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -30,8 +30,8 @@ libym_seal_la_SOURCES = \
 	MCAnalysis.cc
 
 libym_seal_la_LIBADD = \
-	$(top_builddir)/libraries/libym_bdd/libym_bdd.la \
-	$(top_builddir)/libraries/libym_bnet/libym_bnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 libym_seal_la_LDFLAGS = \
 	$(GMP_LIBS)

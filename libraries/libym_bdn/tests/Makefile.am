@@ -5,8 +5,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -24,7 +24,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_BDN = $(top_builddir)/libraries/libym_bdn/libym_bdn.la
+LIBYM_BDN = $(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la
 
 bin_PROGRAMS = \
 	base_test \

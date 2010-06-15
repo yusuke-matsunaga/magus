@@ -3,8 +3,8 @@
 ## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -15,4 +15,4 @@ lmtest_SOURCES = \
 	lmtest.cc
 
 lmtest_LDADD = \
-	$(top_builddir)/libraries/libym_tgnet/libym_tgnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la

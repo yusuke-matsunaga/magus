@@ -12,8 +12,8 @@ SUBDIRS = \
 	tests
 
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -24,8 +24,8 @@ libym_bdd_la_LIBADD = \
 	bmc/libym_bdd_bmc.la \
 	bmm/libym_bdd_bmm.la \
 	dec/libym_bdd_dec.la \
-	$(top_builddir)/libraries/libym_lexp/libym_lexp.la \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_bdd_la_LDFLAGS =
 

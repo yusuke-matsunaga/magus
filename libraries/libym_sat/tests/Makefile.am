@@ -5,8 +5,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -23,7 +23,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_SAT = $(top_builddir)/libraries/libym_sat/libym_sat.la
+LIBYM_SAT = $(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la
 
 noinst_PROGRAMS = \
 	dimacstest

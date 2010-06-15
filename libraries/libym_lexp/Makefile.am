@@ -10,13 +10,13 @@ SUBDIRS = \
 MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = \
-	-I$(top_srcdir)/include \
-	-I$(top_builddir)
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)
 
 noinst_LTLIBRARIES = libym_lexp.la
 
 libym_lexp_la_LIBADD = \
-	$(top_builddir)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 libym_lexp_la_LDFLAGS = 
 libym_lexp_la_SOURCES = \
 	lexp_types.h \

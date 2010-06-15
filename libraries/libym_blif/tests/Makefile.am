@@ -5,8 +5,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -24,7 +24,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_BLIF = $(top_builddir)/libraries/libym_blif/libym_blif.la
+LIBYM_BLIF = $(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la
 
 noinst_PROGRAMS = \
 	parsertest \
@@ -43,7 +43,7 @@ nullparser_LDADD = $(LIBYM_BLIF)
 lexptest_SOURCES = \
 	lexptest.cc
 lexptest_LDADD = $(LIBYM_BLIF) \
-	$(top_builddir)/libraries/libym_lexp/libym_lexp.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la
 
 reader_test_SOURCES = \
 	reader_test.cc

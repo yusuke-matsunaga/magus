@@ -72,10 +72,8 @@ AC_CHECK_HEADERS([unistd.h], [ym_have_unistd_h=yes])
 AC_CHECK_HEADERS([limits.h], [ym_have_limits_h=yes])
 AC_CHECK_HEADERS([float.h], [ym_have_float_h=yes])
 AC_CHECK_HEADERS([math.h], [ym_have_math_h=yes])
-AC_CHECK_HEADERS([pwd.h], [ym_have_pwd_h=yes])
 AC_CHECK_HEADERS([sys/time.h], [ym_have_sys_time_h=yes])
 AC_CHECK_HEADERS([sys/stat.h], [ym_have_sys_stat_h=yes])
-AC_CHECK_HEADERS([sys/param.h], [ym_have_sys_param_h=yes])
 AC_CHECK_HEADERS([zlib.h], [ym_have_zlib_h=yes])
 
 
@@ -98,9 +96,6 @@ AC_CHECK_SIZEOF(long long)
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(size_t)
 
-_AC_COMPUTE_INT([__alignof__ (double)], ym_alignof_double)
-AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
-
 
 # ===================================================================
 # Check for return type of signal handler
@@ -111,10 +106,10 @@ AC_TYPE_SIGNAL
 # ===================================================================
 # Checks for library functions
 # ===================================================================
-AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([random lrand48], break)
-AC_CHECK_FUNCS([getrusage times], break)
-AC_CHECK_FUNCS([getcwd gettimeofday strtod])
+#AC_FUNC_ALLOCA
+#AC_CHECK_FUNCS([random lrand48], break)
+#AC_CHECK_FUNCS([getrusage times], break)
+#AC_CHECK_FUNCS([getcwd gettimeofday strtod])
 
 
 # ===================================================================
@@ -135,7 +130,6 @@ if test "x$ym_have_zlib_h" = xyes -a "x$ym_have_libz" = xyes; then
 else
    ym_have_zlib=0
 fi
-AC_DEFINE_UNQUOTED([HAVE_ZLIB], $ym_have_zlib, [Define if you have zlib.h])
 
 # Check for gmp
 YM_CHECK_GMP
@@ -150,23 +144,6 @@ YM_CHECK_TCL
 YM_CHECK_TCLREADLINE
 
 AC_CACHE_SAVE
-
-
-# ===================================================================
-# Check for QT
-# It's a kind of magic!
-# ===================================================================
-AC_ARG_ENABLE([qt],
-[  --enable-qt    Turn on QT],
-[case "${enableval}" in
- yes) qt=true ;;
- no)  qt=false ;;
- *) AC_MSG_ERROR([bad value ${enableval} for --enable-qt]) ;;
- esac],[qt=false])
-AM_CONDITIONAL([WITH_QT], [test x$qt = xtrue])
-if test x$qt = xtrue; then
-  AT_WITH_QT
-fi
 
 
 # ===================================================================
@@ -288,6 +265,13 @@ cat >> $ymtools << ___EOF___
 #include <ymmath.h>
 ___EOF___
 
+if test $ym_have_zlib=1; then
+  cat >> $ymtools << ___EOF___
+/* Define if you have zlib.h */
+#define HAVE_ZLIB 1
+___EOF___
+fi
+
 cat >> $ymtools << ___EOF___
 
 //////////////////////////////////////////////////////////////////////
@@ -402,10 +386,8 @@ ym_have_unistd_h=$ym_have_unistd_h
 ym_have_limits_h=$ym_have_limits_h
 ym_have_float_h=$ym_have_float_h
 ym_have_math_h=$ym_have_math_h
-ym_have_pwd_h=$ym_have_pwd_h
 ym_have_sys_time_h=$ym_have_sys_time_h
 ym_have_sys_stat_h=$ym_have_sys_stat_h
-ym_have_sys_param_h=$ym_have_sys_param_h
 ym_gnuc=$ym_gnuc
 ymint8=char
 case 2 in
@@ -472,155 +454,122 @@ AC_CONFIG_FILES([Doxyfile])
 # Declare files in 'libraries' subdirectories
 # ===================================================================
 
+ym_libym_utils_enable=1
+ym_libym_zstream_enable=0
+ym_libym_lexp_enable=1
+ym_libym_bdd_enable=0
+ym_libym_npn_enable=0
+ym_libym_sat_enable=0
+ym_libym_blif_enable=1
+ym_libym_iscas89_enable=1
+ym_libym_cell_enable=0
+ym_libym_verilog_enable=0
+ym_libym_bnet_enable=1
+ym_libym_bdn_enable=0
+ym_libym_aig_enable=0
+ym_libym_tgnet_enable=0
+ym_libym_gds_enable=0
+ym_libym_ceq_enable=0
+ym_libym_lutmap_enable=1
+ym_libym_seal_enable=0
+ym_libym_tclpp_enable=0
+
+
 YM_INIT_LIBRARIES_SUBDIRS
 
 # libym_utils
-YM_ADD_LIBRARIES_SUBDIRS([libym_utils])
-AC_CONFIG_FILES([libraries/libym_utils/Makefile])
-AC_CONFIG_FILES([libraries/libym_utils/ym_utils/Makefile])
-AC_CONFIG_FILES([libraries/libym_utils/tests/Makefile])
+YM_BUILD_LIBRARY([libym_utils],
+		 [])
 
 # libym_zstream
-if test "$ym_have_zlib" = 1; then
-YM_ADD_LIBRARIES_SUBDIRS([libym_zstream])
-AC_CONFIG_FILES([libraries/libym_zstream/Makefile])
-AC_CONFIG_FILES([libraries/libym_zstream/ym_zstream/Makefile])
-AC_CONFIG_FILES([libraries/libym_zstream/tests/Makefile])
-fi
+YM_BUILD_LIBRARY([libym_zstream],
+		 [ym_have_zlib])
 
 # libym_lexp
-YM_ADD_LIBRARIES_SUBDIRS([libym_lexp])
-AC_CONFIG_FILES([libraries/libym_lexp/Makefile])
-AC_CONFIG_FILES([libraries/libym_lexp/ym_lexp/Makefile])
-AC_CONFIG_FILES([libraries/libym_lexp/tests/Makefile])
+YM_BUILD_LIBRARY([libym_lexp],
+		 [])
 
 # libym_bdd
-YM_ADD_LIBRARIES_SUBDIRS([libym_bdd])
-AC_CONFIG_FILES([libraries/libym_bdd/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdd/ym_bdd/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdd/base/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdd/bmc/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdd/bmm/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdd/dec/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdd/tests/Makefile])
+YM_BUILD_LIBRARY([libym_bdd],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
 
 # libym_npn
-YM_ADD_LIBRARIES_SUBDIRS([libym_npn])
-AC_CONFIG_FILES([libraries/libym_npn/Makefile])
-AC_CONFIG_FILES([libraries/libym_npn/ym_npn/Makefile])
-AC_CONFIG_FILES([libraries/libym_npn/utils/Makefile])
-AC_CONFIG_FILES([libraries/libym_npn/tests/Makefile])
+YM_BUILD_LIBRARY([libym_npn],
+		 [ym_libym_utils_enable])
 
 # libym_sat
-YM_ADD_LIBRARIES_SUBDIRS([libym_sat])
-AC_CONFIG_FILES([libraries/libym_sat/Makefile])
-AC_CONFIG_FILES([libraries/libym_sat/ym_sat/Makefile])
-AC_CONFIG_FILES([libraries/libym_sat/analyzer/Makefile])
-AC_CONFIG_FILES([libraries/libym_sat/MiniSat/Makefile])
-AC_CONFIG_FILES([libraries/libym_sat/tests/Makefile])
+YM_BUILD_LIBRARY([libym_sat],
+		 [ym_libym_utils_enable])
 
 # libym_mincov
-YM_ADD_LIBRARIES_SUBDIRS([libym_mincov])
-AC_CONFIG_FILES([libraries/libym_mincov/Makefile])
-AC_CONFIG_FILES([libraries/libym_mincov/ym_mincov/Makefile])
-AC_CONFIG_FILES([libraries/libym_mincov/tests/Makefile])
+YM_BUILD_LIBRARY([libym_mincov],
+		 [ym_libym_utils_enable])
 
 # libym_blif
-YM_ADD_LIBRARIES_SUBDIRS([libym_blif])
-AC_CONFIG_FILES([libraries/libym_blif/Makefile])
-AC_CONFIG_FILES([libraries/libym_blif/ym_blif/Makefile])
-AC_CONFIG_FILES([libraries/libym_blif/tests/Makefile])
+YM_BUILD_LIBRARY([libym_blif],
+		 [ym_libym_utils_enable])
 
 # libym_iscas89
-YM_ADD_LIBRARIES_SUBDIRS([libym_iscas89])
-AC_CONFIG_FILES([libraries/libym_iscas89/Makefile])
-AC_CONFIG_FILES([libraries/libym_iscas89/ym_iscas89/Makefile])
-AC_CONFIG_FILES([libraries/libym_iscas89/tests/Makefile])
+YM_BUILD_LIBRARY([libym_iscas89],
+		 [ym_libym_utils_enable])
 
 # libym_cell
-YM_ADD_LIBRARIES_SUBDIRS([libym_cell])
-AC_CONFIG_FILES([libraries/libym_cell/Makefile])
-AC_CONFIG_FILES([libraries/libym_cell/ym_cell/Makefile])
-AC_CONFIG_FILES([libraries/libym_cell/mislib/Makefile])
-AC_CONFIG_FILES([libraries/libym_cell/dotlib/Makefile])
-AC_CONFIG_FILES([libraries/libym_cell/tests/Makefile])
+YM_BUILD_LIBRARY([libym_cell],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
 
 # libym_verilog
-YM_ADD_LIBRARIES_SUBDIRS([libym_verilog])
-AC_CONFIG_FILES([libraries/libym_verilog/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/ym_verilog/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/ym_verilog/pt/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/ym_verilog/vl/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/common/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/parser/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/parser/include/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/parser/main/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/parser/scanner/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/parser/pt_mgr/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/parser/spt/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/parser/cpt/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/elaborator/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/elaborator/include/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/elaborator/main/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/elaborator/elb_mgr/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/elaborator/ei/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/tests/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/tests/vltest/Makefile])
-AC_CONFIG_FILES([libraries/libym_verilog/tests/vlview/Makefile])
+YM_BUILD_LIBRARY([libym_verilog],
+		 [ym_libym_utils_enable])
 
 # libym_bnet
-YM_ADD_LIBRARIES_SUBDIRS([libym_bnet])
-AC_CONFIG_FILES([libraries/libym_bnet/Makefile])
-AC_CONFIG_FILES([libraries/libym_bnet/ym_bnet/Makefile])
-AC_CONFIG_FILES([libraries/libym_bnet/tests/Makefile])
+YM_BUILD_LIBRARY([libym_bnet],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable,
+		  ym_libym_blif_enable,
+		  ym_libym_iscas89_enable])
 
 # libym_bdn
-YM_ADD_LIBRARIES_SUBDIRS([libym_bdn])
-AC_CONFIG_FILES([libraries/libym_bdn/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdn/ym_bdn/Makefile])
-AC_CONFIG_FILES([libraries/libym_bdn/tests/Makefile])
+YM_BUILD_LIBRARY([libym_bdn],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
 
 # libym_aig
-YM_ADD_LIBRARIES_SUBDIRS([libym_aig])
-AC_CONFIG_FILES([libraries/libym_aig/Makefile])
-AC_CONFIG_FILES([libraries/libym_aig/ym_aig/Makefile])
-AC_CONFIG_FILES([libraries/libym_aig/tests/Makefile])
+YM_BUILD_LIBRARY([libym_aig],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable,
+		  ym_libym_sat_enable])
 
 # libym_tgnet
-YM_ADD_LIBRARIES_SUBDIRS([libym_tgnet])
-AC_CONFIG_FILES([libraries/libym_tgnet/Makefile])
-AC_CONFIG_FILES([libraries/libym_tgnet/ym_tgnet/Makefile])
-AC_CONFIG_FILES([libraries/libym_tgnet/tests/Makefile])
+YM_BUILD_LIBRARY([libym_tgnet],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable,
+		  ym_libym_blif_enable,
+		  ym_libym_iscas89_enable])
 
 # libym_gds
-YM_ADD_LIBRARIES_SUBDIRS([libym_gds])
-AC_CONFIG_FILES([libraries/libym_gds/Makefile])
-AC_CONFIG_FILES([libraries/libym_gds/ym_gds/Makefile])
-AC_CONFIG_FILES([libraries/libym_gds/tests/Makefile])
+YM_BUILD_LIBRARY([libym_gds],
+		 [])
 
 # libym_ceq
-YM_ADD_LIBRARIES_SUBDIRS([libym_ceq])
-AC_CONFIG_FILES([libraries/libym_ceq/Makefile])
-AC_CONFIG_FILES([libraries/libym_ceq/ym_ceq/Makefile])
-AC_CONFIG_FILES([libraries/libym_ceq/tests/Makefile])
+YM_BUILD_LIBRARY([libym_ceq],
+		 [ym_libym_bnet_enable,
+		  ym_libym_sat_enable,
+		  ym_libym_aig_enable])
 
 # libym_lutmap
-YM_ADD_LIBRARIES_SUBDIRS([libym_lutmap])
-AC_CONFIG_FILES([libraries/libym_lutmap/Makefile])
-AC_CONFIG_FILES([libraries/libym_lutmap/ym_lutmap/Makefile])
-AC_CONFIG_FILES([libraries/libym_lutmap/tests/Makefile])
+YM_BUILD_LIBRARY([libym_lutmap],
+		 [ym_libym_bnet_enable])
 
 # libym_seal
-YM_ADD_LIBRARIES_SUBDIRS([libym_seal])
-AC_CONFIG_FILES([libraries/libym_seal/Makefile])
-AC_CONFIG_FILES([libraries/libym_seal/ym_seal/Makefile])
-AC_CONFIG_FILES([libraries/libym_seal/tests/Makefile])
+YM_BUILD_LIBRARY([libym_seal],
+		 [ym_libym_bdd_enable,
+		  ym_libym_bnet_enable])
 
 # libym_tclpp
-YM_ADD_LIBRARIES_SUBDIRS([libym_tclpp])
-AC_CONFIG_FILES([libraries/libym_tclpp/Makefile])
-AC_CONFIG_FILES([libraries/libym_tclpp/ym_tclpp/Makefile])
-AC_CONFIG_FILES([libraries/libym_tclpp/examples/Makefile])
+YM_BUILD_LIBRARY([libym_tclpp],
+		 [])
 
 YM_FINISH_LIBRARIES_SUBDIRS
 
@@ -632,16 +581,16 @@ YM_FINISH_LIBRARIES_SUBDIRS
 YM_INIT_PROGRAMS_SUBDIRS
 
 # magus_tclsh
-YM_ADD_PROGRAMS_SUBDIRS([magus_tclsh])
-AC_CONFIG_SUBDIRS([programs/magus_tclsh])
+#YM_ADD_PROGRAMS_SUBDIRS([magus_tclsh])
+#AC_CONFIG_SUBDIRS([programs/magus_tclsh])
 
 # atpg
-YM_ADD_PROGRAMS_SUBDIRS([atpg])
-AC_CONFIG_SUBDIRS([programs/atpg])
+#YM_ADD_PROGRAMS_SUBDIRS([atpg])
+#AC_CONFIG_SUBDIRS([programs/atpg])
 
 # matpg
-YM_ADD_PROGRAMS_SUBDIRS([matpg])
-AC_CONFIG_SUBDIRS([programs/matpg])
+#YM_ADD_PROGRAMS_SUBDIRS([matpg])
+#AC_CONFIG_SUBDIRS([programs/matpg])
 
 # lutmap
 YM_ADD_PROGRAMS_SUBDIRS([lutmap])

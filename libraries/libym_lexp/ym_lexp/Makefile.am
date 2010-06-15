@@ -9,7 +9,7 @@ INCLUDES =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	lexp.h \
+	lexp_nsdef.h \
 	Literal.h \
 	LogExpr.h \
 	LogExprWriter.h
