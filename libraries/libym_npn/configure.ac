@@ -114,6 +114,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_npn/Makefile])
+AC_CONFIG_FILES([utils/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

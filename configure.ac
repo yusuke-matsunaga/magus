@@ -32,12 +32,6 @@ AM_INIT_AUTOMAKE()dnl
 # ===================================================================
 AC_ISC_POSIX
 AC_PROG_MAKE_SET
-#AC_PROG_CC
-#AC_PROG_CXX
-#AC_PROG_LN_S
-#AC_PROG_INSTALL
-#AC_PROG_YACC
-#AM_PROG_LEX
 AC_PROG_LIBTOOL
 AC_CHECK_PROG([DOXYGEN],
 	      [doxygen], 
@@ -339,8 +333,6 @@ hash<const std::string>
 
 END_NAMESPACE_HASH
 
-
-//#include "ymconfig.h"
 
 #endif // YMTOOLS_H
 ___EOF___

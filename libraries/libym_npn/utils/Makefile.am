@@ -5,14 +5,14 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir)/include
+	-I$(YMTOOLS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-YM_BASE = $(top_builddir)/libraries/libym_utils/libym_utils.la
+YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
 	symtablegen \
