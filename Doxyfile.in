@@ -495,9 +495,10 @@ WARN_LOGFILE           = doxygen.warnings
 # with spaces.
 
 INPUT                  =
-INPUT		      += @srcdir@/ymlibs/include
-INPUT                 += @srcdir@/magus/include
-INPUT		      += @builddir@/ymlibs/ymtools.h
+INPUT		      += @srcdir@/include
+INPUT                 += @srcdir@/programs/magus_tclsh/include
+INPUT                 += @srcdir@/programs/atpg/include
+INPUT		      += @builddir@/ymtools.h
 #INPUT                 += @srcdir@/led
 #INPUT                 += @srcdir@/atpg
 
