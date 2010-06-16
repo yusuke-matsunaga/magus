@@ -20,13 +20,14 @@ All rights reserved.
 
 AC_CONFIG_SRCDIR([include/seal_nsdef.h])dnl
 
-AC_CONFIG_AUX_DIR([config])dnl
-AC_CONFIG_MACRO_DIR([config])dnl
+AC_CONFIG_AUX_DIR([../../config])dnl
+AC_CONFIG_MACRO_DIR([../../config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
 
 AC_DEFINE_UNQUOTED(SEAL_VERSION, "${VERSION}", [SEAL version])dnl
+
 
 # ===================================================================
 # Checks for programs
@@ -57,23 +58,15 @@ fi
 # Checks for libraries
 # ===================================================================
 
+
 # ===================================================================
 # Checks for header files
 # ===================================================================
-#AC_HEADER_STDC
-#AC_HEADER_TIME
-#AC_CHECK_HEADERS([limits.h strings.h sys/time.h unistd.h])
-#AC_CHECK_HEADERS([pwd.h sys/stat.h sys/param.h])
-#AC_CHECK_HEADERS([math.h])
-#AC_CHECK_HEADERS([zlib.h], [has_zlib_h=1], [has_zlib_h=0])
 
 
 # ===================================================================
 # Checks for typedefs, structures, and compiler characteristics
 # ===================================================================
-#AC_C_CONST
-#AC_C_INLINE
-#AC_TYPE_SIZE_T
 
 
 # ===================================================================
@@ -163,6 +156,7 @@ AC_CONFIG_FILES([
 	src/calc_svf/Makefile
 	tclsrc/Makefile
 	])
+
 
 # ===================================================================
 # Generate configured files

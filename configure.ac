@@ -552,19 +552,27 @@ YM_INIT_PROGRAMS_SUBDIRS
 
 # magus_tclsh
 YM_BUILD_PROGRAM([magus_tclsh],
-		 [])
+		 [ym_libym_tclpp_enable])
 
 # atpg
 YM_BUILD_PROGRAM([atpg],
-		 [])
+		 [ym_libym_utils_enable,
+		  ym_libym_tgnet_enable,
+		  ym_libym_tclpp_enable])
 
 # matpg
 YM_BUILD_PROGRAM([matpg],
-		 [])
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable,
+		  ym_libym_tgnet_enable,
+		  ym_libym_tclpp_enable])
 
 # lutmap
 YM_BUILD_PROGRAM([lutmap],
-		 [ym_libym_lutmap_enable])
+		 [ym_libym_utils_enable,
+		  ym_libym_blif_enable,
+		  ym_libym_bnet_enable,
+		  ym_libym_lutmap_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS
 
