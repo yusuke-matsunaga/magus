@@ -8,8 +8,7 @@ SUBDIRS = \
 	libraries \
 	programs
 
-CLEANFILES = ymconfig.h ymtools.h
-CLEANFILES += doxygen.warnings
+CLEANFILES = doxygen.warnings
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -30,8 +29,7 @@ EXTRA_DIST = \
 	m4macros/qscintilla2.m4 \
 	m4macros/tcl.m4 \
 	m4macros/ymlibs.m4 \
-	mkautogen \
-	ymconfig.h.in
+	mkautogen
 
 
 dox:

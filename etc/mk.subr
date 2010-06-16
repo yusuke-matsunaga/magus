@@ -22,16 +22,19 @@ clean() {
     for file in aclocal.m4 autom4te.cache configure; do
 	$RM -r -f $dirname/$file 2>> $MK_LOG
     done
-    if test "x$CONFIG_DIR" != x; then
-	for file in config.guess config.sub install-sh ltconfig ltmain.sh \
-	    missing mkinstalldirs stamp-h.in depcomp ylwrap \
-	    ltsugar.m4 libtool.m4 ltversion.m4 lt~obsolete.m4 ltoptions.m4; do
-	  $RM -r -f $dirname/$CONFIG_DIR/$file 2>> $MK_LOG
-	done
-    fi
-    if test "x$CONFIG_H" != x; then
-	$RM -f $CONFIG_H.in
-    fi
+    echo "  done" | tee -a $MK_LOG
+}
+
+# config ディレクトリを削除する．
+# 生成されるファイルを指定しているのでツールのバージョンが上がると
+# 変更しなければならないかも
+clean_config() {
+    echo "Cleaning config files in $1 ..." | tee -a $MK_LOG
+    for file in config.guess config.sub install-sh ltconfig ltmain.sh \
+	missing mkinstalldirs stamp-h.in depcomp ylwrap \
+	ltsugar.m4 libtool.m4 ltversion.m4 lt~obsolete.m4 ltoptions.m4; do
+	$RM -r -f $1/$file 2>> $MK_LOG
+    done
     echo "  done" | tee -a $MK_LOG
 }
 

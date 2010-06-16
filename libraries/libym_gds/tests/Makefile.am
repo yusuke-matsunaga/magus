@@ -3,8 +3,8 @@
 ## $Id: Makefile.am 958 2007-08-28 05:38:02Z matsunaga $
 
 INCLUDES = \
-	-I$(YMTOOLS_BUILDDIR) \
-	-I$(YMTOOLS_SRCDIR)/include
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 

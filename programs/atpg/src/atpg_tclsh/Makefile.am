@@ -4,9 +4,6 @@
 
 SUBDIRS =
 
-YMLIBS_SRCDIR = $(top_srcdir)/../..
-YMLIBS_BUILDDIR = $(top_builddir)/../..
-
 AM_CXXFLAGS = \
 	-DATPG_LIBDIR='"$(ATPG_LIBDIR)"' \
 	-DATPG_DATADIR='"$(ATPG_DATADIR)"' \
@@ -15,8 +12,8 @@ AM_CXXFLAGS = \
 INCLUDES = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
-	-I$(YMLIBS_BUILDDIR) \
-	-I$(YMLIBS_SRCDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -55,8 +52,8 @@ atpg_tclsh_LDADD = \
 	$(top_builddir)/src/fsim/libatpg_fsim.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
 	$(top_builddir)/src/base/libatpg_base.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)

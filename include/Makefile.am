@@ -4,6 +4,8 @@
 
 SUBDIRS =
 
+CLEANFILES = ymtools.h
+
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \

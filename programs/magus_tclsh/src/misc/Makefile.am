@@ -4,14 +4,11 @@
 
 SUBDIRS =
 
-YMLIBS_SRCDIR = $(top_srcdir)/../..
-YMLIBS_BUILDDIR = $(top_builddir)/../..
-
 INCLUDES = \
 	$(TCL_INCLUDES) \
 	$(TK_INCLUDES) \
-	-I$(YMLIBS_SRCDIR)/include \
-	-I$(YMLIBS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -26,6 +23,6 @@ libmagus_misc_tcl_la_SOURCES = \
 	misc_init.cc
 
 libmagus_misc_tcl_la_LIBADD = \
-	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

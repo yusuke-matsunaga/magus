@@ -13,7 +13,7 @@ noinst_LTLIBRARIES = libym_lutmap.la
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_lutmap_la_SOURCES = \
 	SbjGraph.cc \

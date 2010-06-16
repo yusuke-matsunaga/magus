@@ -6,8 +6,8 @@
 ## $Date: 2005/12/11 17:07:26 $
 
 INCLUDES = \
-	-I$(YMTOOLS_BUILDDIR) \
-	-I$(YMTOOLS_SRCDIR)/include
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 

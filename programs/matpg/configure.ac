@@ -103,6 +103,16 @@ AC_LANG_CPLUSPLUS
 
 
 # ===================================================================
+# Local definitions
+# ===================================================================
+
+YMTOOLS_SRCDIR="\$(top_srcdir)/../.."
+YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
+AC_SUBST([YMTOOLS_SRCDIR])
+AC_SUBST([YMTOOLS_BUILDDIR])
+
+
+# ===================================================================
 # Set 'matpg' directory
 # ===================================================================
 AC_ARG_WITH(matpg-library,

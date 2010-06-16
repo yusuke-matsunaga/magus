@@ -5,8 +5,8 @@
 SUBDIRS =
 
 INCLUDES = \
-	-I$(YMTOOLS_BUILDDIR) \
-	-I$(YMTOOLS_SRCDIR)/include
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 CLEANFILES =
 

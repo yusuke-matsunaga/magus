@@ -4,12 +4,9 @@
 
 SUBDIRS =
 
-YMLIBS_SRCDIR = $(top_srcdir)/../..
-YMLIBS_BUILDDIR = $(top_builddir)/../..
-
 INCLUDES = \
-	-I$(YMLIBS_BUILDDIR) \
-	-I$(YMLIBS_SRCDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src
 
@@ -32,4 +29,4 @@ libatpg_main_la_LIBADD = \
 	$(top_builddir)/src/fsim3/libatpg_fsim3.la \
 	$(top_builddir)/src/fsimx/libatpg_fsimx.la \
 	$(top_builddir)/src/base/libatpg_base.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la

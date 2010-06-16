@@ -5,8 +5,8 @@
 include $(YMTOOLS_SRCDIR)/etc/autotroll.mk
 
 INCLUDES = \
-	-I$(YMTOOLS_BUILDDIR) \
 	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/parser/include \
 	-I$(top_srcdir)/parser/scanner \
 	-I$(top_builddir)/parser/main

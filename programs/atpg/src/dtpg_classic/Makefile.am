@@ -4,14 +4,11 @@
 
 SUBDIRS =
 
-YMLIBS_SRCDIR = $(top_srcdir)/../..
-YMLIBS_BUILDDIR = $(top_builddir)/../..
-
 INCLUDES = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
-	-I$(YMLIBS_BUILDDIR) \
-	-I$(YMLIBS_SRCDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -59,6 +56,6 @@ libatpg_dtpg_cl_la_SOURCES = \
 
 libatpg_dtpg_cl_la_LIBADD = \
 	$(top_builddir)/src/base/libatpg_base.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

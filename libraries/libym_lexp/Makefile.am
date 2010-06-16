@@ -11,7 +11,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)
+	-I$(YMTOOLS_BUILDDIR)/include
 
 noinst_LTLIBRARIES = libym_lexp.la
 

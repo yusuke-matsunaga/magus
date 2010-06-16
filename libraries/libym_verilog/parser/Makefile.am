@@ -2,7 +2,14 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = include main scanner pt_mgr spt cpt .
+SUBDIRS = \
+	include \
+	main \
+	scanner \
+	pt_mgr \
+	spt \
+	cpt \
+	.
 
 INCLUDES =
 

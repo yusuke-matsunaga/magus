@@ -3,8 +3,8 @@
 ## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
 INCLUDES = \
-	-I$(YMTOOLS_BUILDDIR) \
-	-I$(YMTOOLS_SRCDIR)/include
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 MAINTAINERCLEANFILES = Makefile.in
 

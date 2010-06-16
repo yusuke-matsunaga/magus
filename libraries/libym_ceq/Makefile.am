@@ -13,7 +13,7 @@ noinst_LTLIBRARIES = libym_ceq.la
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_ceq_la_SOURCES = \
 	FraigHash.h \

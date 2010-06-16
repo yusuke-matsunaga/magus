@@ -4,12 +4,9 @@
 
 SUBDIRS =
 
-YMLIBS_SRCDIR = $(top_srcdir)/../..
-YMLIBS_BUILDDIR = $(top_builddir)/../..
-
 INCLUDES = \
-	-I$(YMLIBS_BUILDDIR) \
-	-I$(YMLIBS_SRCDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -62,4 +59,4 @@ libmatpg_la_SOURCES = \
 	val.h
 
 libmatpg_la_LIBADD = \
-	$(YMLIBS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

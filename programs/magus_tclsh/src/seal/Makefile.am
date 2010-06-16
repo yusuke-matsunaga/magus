@@ -4,13 +4,10 @@
 
 SUBDIRS =
 
-YMLIBS_SRCDIR = $(top_srcdir)/../..
-YMLIBS_BUILDDIR = $(top_builddir)/../..
-
 INCLUDES = \
 	$(TCL_INCLUDES) \
-	-I$(YMLIBS_SRCDIR)/include \
-	-I$(YMLIBS_BUILDDIR) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -31,7 +28,7 @@ libmagus_seal_tcl_la_SOURCES = \
 	seal_init.cc
 
 libmagus_seal_tcl_la_LIBADD = \
-	$(YMLIBS_BUILDDIR)/libraries/libym_seal/libym_seal.la \
-	$(YMLIBS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_seal/libym_seal.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 libmagus_seal_tcl_la_LDFLAGS =

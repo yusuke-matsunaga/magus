@@ -108,7 +108,6 @@ BASEDIR=`cd $basedir; pwd`
 set_program
 
 # 必要な変数の設定
-CONFIG_DIR=config
 AUTOGEN_COMMON=autogen.common
 
 # サブモジュールのディレクトリ名
@@ -147,7 +146,9 @@ case "$1" in
   ""|boot)
     case $# in
       0|1)
+	clean_config $BASEDIR/config
 	clean $BASEDIR
+	clean $BASEDIR/include
 	for lib in $LIBRARIES; do
 	    clean $BASEDIR/libraries/$lib
 	done
@@ -155,6 +156,7 @@ case "$1" in
 	    clean $BASEDIR/programs/$prog
 	done
         boot $BASEDIR
+	boot $BASEDIR/include
 	for lib in $LIBRARIES; do
 	    boot $BASEDIR/libraries/$lib
 	done
@@ -163,12 +165,10 @@ case "$1" in
 	done
         ;;
       2)
+	clean_config $BASEDIR/config
 	clean $2
+	boot $BASEDIR
         boot $2
-        ;;
-      3)
-	clean $2
-        boot $2 $3
         ;;
       *) usage;;
     esac
@@ -176,7 +176,9 @@ case "$1" in
   clean)
     case $# in
       1)
+        clean_config $BASEDIR/config
 	clean $BASEDIR
+	clean $BASEDIR/include
 	for lib in $LIBRARIES; do
 	    clean $BASEDIR/libraries/$lib
 	done
@@ -185,6 +187,7 @@ case "$1" in
 	done
 	;;
       2)
+        clean_config $BASEDIR/config
 	clean $2
 	;;
       *) usage;;

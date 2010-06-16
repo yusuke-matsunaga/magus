@@ -9,7 +9,7 @@ SUBDIRS = \
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)
+	-I$(YMTOOLS_BUILDDIR)/include
 
 YFLAGS=-d -v
 
