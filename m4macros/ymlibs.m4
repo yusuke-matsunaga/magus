@@ -162,7 +162,7 @@ ym_libraries_subdirs="$ym_libraries_subdirs $1"
 # Description: finalize 'YM_LIBRARIES_SUBDIRS'
 # ==================================================================
 AC_DEFUN([YM_FINISH_LIBRARIES_SUBDIRS], [
-AC_SUBST(YM_LIBRARIES_SUBDIRS, $ym_libraries_subdirs)
+AC_SUBST([YM_LIBRARIES_SUBDIRS], $ym_libraries_subdirs)
 ])
 
 
@@ -221,5 +221,5 @@ ym_programs_subdirs="$ym_programs_subdirs $1"
 # Description: finalize 'YM_PROGRAMS_SUBDIRS'
 # ==================================================================
 AC_DEFUN([YM_FINISH_PROGRAMS_SUBDIRS], [
-AC_SUBST(YM_PROGRAMS_SUBDIRS, $ym_programs_subdirs)
+AC_SUBST([YM_PROGRAMS_SUBDIRS], $ym_programs_subdirs)
 ])
