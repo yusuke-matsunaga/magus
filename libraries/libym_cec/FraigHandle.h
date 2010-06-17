@@ -1,7 +1,7 @@
-#ifndef LIBYM_CEQ_FRAIGHANDLE_H
-#define LIBYM_CEQ_FRAIGHANDLE_H
+#ifndef LIBYM_CEC_FRAIGHANDLE_H
+#define LIBYM_CEC_FRAIGHANDLE_H
 
-/// @file libym_ceq/FraigHandle.h
+/// @file libym_cec/FraigHandle.h
 /// @brief FraigHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "ym_ceq/ceq_nsdef.h"
+#include "ym_cec/cec_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 class FraigNode;
 
@@ -299,19 +299,19 @@ operator!=(FraigHandle src1,
   return !operator==(src1, src2);
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC
 
 BEGIN_NAMESPACE_HASH
 // FraigHandleをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsCeq::FraigHandle>
+struct hash<nsYm::nsCec::FraigHandle>
 {
   ymuint
-  operator()(nsYm::nsCeq::FraigHandle aig) const
+  operator()(nsYm::nsCec::FraigHandle aig) const
   {
     return aig.hash_func();
   }
 };
 END_NAMESPACE_HASH
 
-#endif // LIBYM_CEQ_FRAIGHANDLE_H
+#endif // LIBYM_CEC_FRAIGHANDLE_H

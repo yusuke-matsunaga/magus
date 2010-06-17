@@ -7,4 +7,4 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	ceq_nsdef.h
+	cec_nsdef.h

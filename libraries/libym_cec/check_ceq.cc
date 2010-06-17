@@ -1,5 +1,5 @@
 
-/// @file libym_ceq/check_ceq.cc
+/// @file libym_cec/check_ceq.cc
 /// @brief 組み合わせ回路の検証を行う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "ym_ceq/ceq_nsdef.h"
+#include "ym_cec/cec_nsdef.h"
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigNode.h"
 #include "FraigMgr.h"
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 BEGIN_NONAMESPACE
 
@@ -207,4 +207,4 @@ check_ceq(const BNetwork& src_network1,
   }
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC

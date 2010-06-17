@@ -1,7 +1,7 @@
-#ifndef LIBYM_CEQ_FRAIGMGRIMPL_H
-#define LIBYM_CEQ_FRAIGMGRIMPL_H
+#ifndef LIBYM_CEC_FRAIGMGRIMPL_H
+#define LIBYM_CEC_FRAIGMGRIMPL_H
 
-/// @file libym_ceq/FraigMgrImpl.h
+/// @file libym_cec/FraigMgrImpl.h
 /// @brief FraigMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_ceq/ceq_nsdef.h"
+#include "ym_cec/cec_nsdef.h"
 #include "FraigHandle.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/RandGen.h"
@@ -19,7 +19,7 @@
 #include "FraigHash.h"
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 class FraigNode;
 
@@ -356,6 +356,6 @@ FraigMgrImpl::hash_func(FraigHandle handle1,
   return handle1.mPackedData + handle2.mPackedData;
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC
 
-#endif // LIBYM_CEQ_FRAIGMGRIMPL_H
+#endif // LIBYM_CEC_FRAIGMGRIMPL_H

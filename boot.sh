@@ -129,7 +129,7 @@ LIBRARIES=\
  libym_aig \
  libym_tgnet \
  libym_gds \
- libym_ceq \
+ libym_cec \
  libym_lutmap \
  libym_seal \
  libym_tclpp"

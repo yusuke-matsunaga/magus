@@ -10,7 +10,7 @@
 
 
 #include "EquivCmd.h"
-#include "ym_ceq/ceq_nsdef.h"
+#include "ym_cec/cec_nsdef.h"
 #include "ym_tclpp/TclPopt.h"
 
 

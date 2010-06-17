@@ -19,7 +19,7 @@ libmagus_equiv_tcl_la_SOURCES = \
 	EquivCmd.cc
 
 libmagus_equiv_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_ceq/libym_ceq.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cec/libym_cec.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 libmagus_equiv_tcl_la_LDFLAGS =

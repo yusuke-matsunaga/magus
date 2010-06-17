@@ -1,5 +1,5 @@
 
-/// @file libym_ceq/FraigMgrImpl.cc
+/// @file libym_cec/FraigMgrImpl.cc
 /// @brief FraigMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -26,7 +26,7 @@
 // #define VERIFY_SATSOLVER
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 BEGIN_NONAMESPACE
 
@@ -943,4 +943,4 @@ FraigMgrImpl::SatStat::dump(ostream& s) const
   }
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC

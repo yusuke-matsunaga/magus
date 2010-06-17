@@ -1,5 +1,5 @@
-#ifndef YM_CEQ_CEQ_NSDEF
-#define YM_CEQ_CEQ_NSDEF
+#ifndef YM_CEC_CEC_NSDEF
+#define YM_CEC_CEC_NSDEF
 
 /// @file magus/equiv/equiv_nsdef.h
 /// @brief equiv2 の名前空間の定義ファイル
@@ -17,16 +17,16 @@
 
 
 // 名前空間の定義
-#define BEGIN_NAMESPACE_YM_CEQ \
+#define BEGIN_NAMESPACE_YM_CEC \
 BEGIN_NAMESPACE_YM \
-BEGIN_NAMESPACE(nsCeq)
+BEGIN_NAMESPACE(nsCec)
 
-#define END_NAMESPACE_YM_CEQ \
-END_NAMESPACE(nsCeq) \
+#define END_NAMESPACE_YM_CEC \
+END_NAMESPACE(nsCec) \
 END_NAMESPACE_YM
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
   
 /// @brief 組み合わせ回路の等価検証を行う関数 
 void
@@ -42,12 +42,12 @@ check_ceq(const BNetwork& src_network1,
 	  ymuint sigsize,
 	  vector<Bool3>& stats);
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC
 
 BEGIN_NAMESPACE_YM
 
-using nsCeq::check_ceq;
+using nsCec::check_ceq;
 
 END_NAMESPACE_YM
 
-#endif // YM_CEQ_CEQ_NSDEF
+#endif // YM_CEC_CEC_NSDEF

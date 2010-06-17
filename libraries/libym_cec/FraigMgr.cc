@@ -1,5 +1,5 @@
 
-/// @file libym_ceq/FraigMgr.cc
+/// @file libym_cec/FraigMgr.cc
 /// @brief FraigMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -16,7 +16,7 @@
 #define DEBUG 0
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 //////////////////////////////////////////////////////////////////////
 // FraigMgr
@@ -250,4 +250,4 @@ FraigMgr::dump_stats(ostream& s)
   mImpl->dump_stats(s);
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC

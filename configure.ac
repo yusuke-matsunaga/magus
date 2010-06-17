@@ -70,7 +70,7 @@ ym_libym_bdn_enable=1
 ym_libym_aig_enable=1
 ym_libym_tgnet_enable=1
 ym_libym_gds_enable=1
-ym_libym_ceq_enable=1
+ym_libym_cec_enable=1
 ym_libym_lutmap_enable=1
 ym_libym_seal_enable=1
 ym_libym_tclpp_enable=1
@@ -153,8 +153,8 @@ YM_BUILD_LIBRARY([libym_tgnet],
 YM_BUILD_LIBRARY([libym_gds],
 		 [])
 
-# libym_ceq
-YM_BUILD_LIBRARY([libym_ceq],
+# libym_cec
+YM_BUILD_LIBRARY([libym_cec],
 		 [ym_libym_bnet_enable,
 		  ym_libym_sat_enable,
 		  ym_libym_aig_enable])

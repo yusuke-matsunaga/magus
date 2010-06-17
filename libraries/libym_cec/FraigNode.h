@@ -1,7 +1,7 @@
-#ifndef LIBYM_CEQ_FRAIGNODE_H
-#define LIBYM_CEQ_FRAIGNODE_H
+#ifndef LIBYM_CEC_FRAIGNODE_H
+#define LIBYM_CEC_FRAIGNODE_H
 
-/// @file libym_ceq/FraigNode.h
+/// @file libym_cec/FraigNode.h
 /// @brief FraigNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_ceq/ceq_nsdef.h"
+#include "ym_cec/cec_nsdef.h"
 #include "FraigHandle.h"
 #include "ym_utils/RandGen.h"
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 //////////////////////////////////////////////////////////////////////
 /// @class FraigNode FraigNode.h "FraigNode.h"
@@ -596,6 +596,6 @@ FraigNode::calc_pat(ymuint start,
   calc_hash(start, end);
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC
 
-#endif // LIBYM_CEQ_FRAIGNODE_H
+#endif // LIBYM_CEC_FRAIGNODE_H

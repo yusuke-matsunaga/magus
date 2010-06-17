@@ -1,7 +1,7 @@
-#ifndef LIBYM_CEQ_FRAIGHASH_H
-#define LIBYM_CEQ_FRAIGHASH_H
+#ifndef LIBYM_CEC_FRAIGHASH_H
+#define LIBYM_CEC_FRAIGHASH_H
 
-/// @file libym_ceq/FraigHash.h
+/// @file libym_cec/FraigHash.h
 /// @brief FraigHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "ym_ceq/ceq_nsdef.h"
+#include "ym_cec/cec_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 class FraigNode;
 
@@ -158,6 +158,6 @@ FraigHash::add_elem(ymuint hash_val,
   ++ mNum;
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC
 
-#endif // LIBYM_CEQ_FRAIGHASH_H
+#endif // LIBYM_CEC_FRAIGHASH_H

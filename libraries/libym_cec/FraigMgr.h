@@ -1,7 +1,7 @@
-#ifndef LIBYM_CEQ_FRAIGMGR_H
-#define LIBYM_CEQ_FRAIGMGR_H
+#ifndef LIBYM_CEC_FRAIGMGR_H
+#define LIBYM_CEC_FRAIGMGR_H
 
-/// @file ym_ceq/FraigMgr.h
+/// @file ym_cec/FraigMgr.h
 /// @brief FraigMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 /// 
@@ -11,13 +11,13 @@
 /// All rights reserved.
 
 
-#include "ym_ceq/ceq_nsdef.h"
+#include "ym_cec/cec_nsdef.h"
 #include "FraigHandle.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_sat/Bool3.h"
 
 
-BEGIN_NAMESPACE_YM_CEQ
+BEGIN_NAMESPACE_YM_CEC
 
 class FraigMgrImpl;
 
@@ -182,6 +182,6 @@ FraigMgr::make_xor(FraigHandle edge1,
   return make_or(tmp1, tmp2);
 }
 
-END_NAMESPACE_YM_CEQ
+END_NAMESPACE_YM_CEC
 
-#endif // LIBYM_CEQ_FRAIGMGR_H
+#endif // LIBYM_CEC_FRAIGMGR_H
