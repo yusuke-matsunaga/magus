@@ -23,4 +23,6 @@ libym_bnetiscas89reader_la_LIBADD = \
 libym_bnetiscas89reader_la_LDFLAGS = 
 
 libym_bnetiscas89reader_la_SOURCES = \
+	BNetIscas89Handler.h \
+	BNetIscas89Handler.cc \
 	BNetIscas89Reader.cc
