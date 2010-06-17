@@ -95,6 +95,128 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class BNodeList BNetwork.h <ym_bnet/BNetwork.h>
+/// @ingroup BnetGroup
+/// @brief BNode のリストを表すクラス
+/// @sa BNode
+//////////////////////////////////////////////////////////////////////
+class BNodeList
+{
+  friend class BNetwork;
+public:
+
+  //////////////////////////////////////////////////////////////////////
+  /// @class BNodeListConstIter BNetwork.h <ym_bnet/BNetwork.h>
+  /// @ingroup BnetGroup
+  /// @brief BNodeList の反復子
+  /// @sa BNodeList
+  //////////////////////////////////////////////////////////////////////
+  class const_iterator
+  {
+    friend class BNodeList;
+  public:
+
+    /// @brief コンストラクタ
+    const_iterator();
+
+    /// @brief デストラクタ
+    ~const_iterator();
+
+
+  public:
+
+    /// @brief 指している BNode を取り出す．
+    BNode*
+    operator*() const;
+
+    /// @brief 次の要素を指す
+    void
+    operator++();
+
+    friend
+    bool
+    operator==(const BNodeList::const_iterator& a,
+	       const BNodeList::const_iterator& b);
+
+
+  private:
+
+    /// @brief BNodeList のみが用いるコンストラクタ
+    const_iterator(ymuint which,
+		   BNode* node);
+
+
+  private:
+    //////////////////////////////////////////////////////////////////////
+    // データメンバ
+    //////////////////////////////////////////////////////////////////////
+
+    // BNode::mLink のどちらを使うかを示す．
+    ymuint32 mWhich;
+
+    // 現在指しているノード
+    BNode* mNode;
+
+  };
+  
+private:
+
+  /// @brief コンストラクタ
+  BNodeList(ymuint which);
+
+  /// @brief デストラクタ
+  ~BNodeList();
+
+
+public:
+
+  /// @brief 要素を追加する．
+  void
+  push_back(BNode* node);
+
+  /// @brief 要素を削除する．
+  void
+  remove(BNode* node);
+
+  /// @brief 先頭の反復子を得る．
+  const_iterator
+  begin() const;
+
+  /// @brief 末尾の反復子を得る．
+  const_iterator
+  end() const;
+
+  /// @brief 要素数を返す．
+  ymuint
+  size() const;
+
+
+private:
+
+  /// @brief クリアする．
+  /// @note 危険なのでむやみに使ってはいけない．
+  void
+  clear();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // BNode::mLink のどちらを使うかを示す．
+  ymuint32 mWhich;
+
+  // ダミーの BNode
+  BNode* mDummyHead;
+
+  // 要素数
+  ymuint32 mNum;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class BNode BNetwork.h <ym_bnet/BNetwork.h>
 /// @ingroup BnetGroup
 /// @brief ブーリアン・ネットワークの節点のクラス
@@ -122,6 +244,7 @@ class BNode
 {
   friend class BNetwork;
   friend class BNodeList;
+  friend class BNodeList::const_iterator;
   friend class BNodeMgr;
 public:
 
@@ -511,128 +634,6 @@ private:
 
   // 該当ノードのID番号(意味を持たない場合もある．)
   BNode::tId mId;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class BNodeList BNetwork.h <ym_bnet/BNetwork.h>
-/// @ingroup BnetGroup
-/// @brief BNode のリストを表すクラス
-/// @sa BNode
-//////////////////////////////////////////////////////////////////////
-class BNodeList
-{
-  friend class BNetwork;
-public:
-
-  //////////////////////////////////////////////////////////////////////
-  /// @class BNodeListConstIter BNetwork.h <ym_bnet/BNetwork.h>
-  /// @ingroup BnetGroup
-  /// @brief BNodeList の反復子
-  /// @sa BNodeList
-  //////////////////////////////////////////////////////////////////////
-  class const_iterator
-  {
-    friend class BNodeList;
-  public:
-
-    /// @brief コンストラクタ
-    const_iterator();
-
-    /// @brief デストラクタ
-    ~const_iterator();
-
-
-  public:
-
-    /// @brief 指している BNode を取り出す．
-    BNode*
-    operator*() const;
-
-    /// @brief 次の要素を指す
-    void
-    operator++();
-
-    friend
-    bool
-    operator==(const BNodeList::const_iterator& a,
-	       const BNodeList::const_iterator& b);
-
-
-  private:
-
-    /// @brief BNodeList のみが用いるコンストラクタ
-    const_iterator(ymuint which,
-		   BNode* node);
-
-
-  private:
-    //////////////////////////////////////////////////////////////////////
-    // データメンバ
-    //////////////////////////////////////////////////////////////////////
-
-    // BNode::mLink のどちらを使うかを示す．
-    ymuint32 mWhich;
-
-    // 現在指しているノード
-    BNode* mNode;
-
-  };
-  
-private:
-
-  /// @brief コンストラクタ
-  BNodeList(ymuint which);
-
-  /// @brief デストラクタ
-  ~BNodeList();
-
-
-public:
-
-  /// @brief 要素を追加する．
-  void
-  push_back(BNode* node);
-
-  /// @brief 要素を削除する．
-  void
-  remove(BNode* node);
-
-  /// @brief 先頭の反復子を得る．
-  const_iterator
-  begin() const;
-
-  /// @brief 末尾の反復子を得る．
-  const_iterator
-  end() const;
-
-  /// @brief 要素数を返す．
-  ymuint
-  size() const;
-
-
-private:
-
-  /// @brief クリアする．
-  /// @note 危険なのでむやみに使ってはいけない．
-  void
-  clear();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // BNode::mLink のどちらを使うかを示す．
-  ymuint32 mWhich;
-
-  // ダミーの BNode
-  BNode* mDummyHead;
-
-  // 要素数
-  ymuint32 mNum;
 
 };
 
