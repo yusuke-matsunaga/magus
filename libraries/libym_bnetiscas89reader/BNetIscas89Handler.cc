@@ -141,7 +141,7 @@ BNetIscas89Handler::read_gate(const FileRegion& loc,
 
   case kGt89DFF:
     assert_cond(mCurFanins.size() == 1, __FILE__, __LINE__);
-    status = mManip->change_latch(onode, mCurFanins[0], 0);
+    status = mManip->change_latch(onode, mCurFanins[0], 2);
   }
   return status;
 }

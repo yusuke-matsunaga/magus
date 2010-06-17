@@ -525,7 +525,8 @@ BNetManip::change_latch(BNode* node,
 
   // 内容をセットしなおす．
   mNetwork->set_node_fanins(node, vector<BNode*>(1, fanin));
-
+  mNetwork->set_node_reset_value(node, reset_value);
+  
   // 正常終了
   return true;
 }

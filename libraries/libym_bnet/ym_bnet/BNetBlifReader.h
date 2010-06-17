@@ -1,44 +1,44 @@
-#ifndef YM_BNET_BNETISCAS89READER_H
-#define YM_BNET_BNETISCAS89READER_H
+#ifndef YM_BNET_BNETBLIFREADER_H
+#define YM_BNET_BNETBLIFREADER_H
 
-/// @file ym_bnet/BNetIscas89Reader.h
-/// @brief BNetIscas89Reader のヘッダファイル
+/// @file ym_bnet/BNetBlifReader.h
+/// @brief BNetBlifReader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIscas89Reader.h 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: BNetBlifReader.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_bnet/bnet_nsdef.h"
-#include "ym_iscas89/Iscas89Parser.h"
+#include "ym_blif/BlifParser.h"
 
 
 BEGIN_NAMESPACE_YM_BNET
 
-class BNetIscas89Handler;
+class BNetBlifHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BNetIscas89Reader BNetIscas89Reader.h "ym_bnet/BNetIscas89Reader.h"
+/// @class BNetBlifReader BNetBlifReader.h "ym_bnet/BNetBlifReader.h"
 /// @ingroup BnetGroup
 /// @brief iscas89 形式のファイルを読み込んで BNetwork に設定するクラス
-/// @sa BNetwork nsYm::nsIscas89::Iscas89Parser
+/// @sa BNetwork nsYm::nsBlif::BlifParser
 //////////////////////////////////////////////////////////////////////
-class BNetIscas89Reader
+class BNetBlifReader
 {
 public:
 
   /// @brief コンストラクタ
-  BNetIscas89Reader();
+  BNetBlifReader();
 
   /// @brief デストラクタ
-  ~BNetIscas89Reader();
+  ~BNetBlifReader();
 
   
 public:
 
-  /// @brief ISCAS89 形式のファイルを読み込む
+  /// @brief blif 形式のファイルを読み込む
   /// @param[in] filename ファイル名
   /// @param[in] network 読み込んだ内容を設定するネットワーク
   /// @retval true 正常に読み込めた
@@ -58,10 +58,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // iscas89 パーサー
-  Iscas89Parser mParser;
+  BlifParser mParser;
 
   // ハンドラ
-  BNetIscas89Handler* mHandler;
+  BNetBlifHandler* mHandler;
   
 };
 
@@ -70,8 +70,8 @@ END_NAMESPACE_YM_BNET
 BEGIN_NAMESPACE_YM
 
 // クラス名をインポートしておく
-using nsBnet::BNetIscas89Reader;
+using nsBnet::BNetBlifReader;
 
 END_NAMESPACE_YM
 
-#endif // YM_BNET_BNETISCAS89READER_H
+#endif // YM_BNET_BNETBLIFREADER_H

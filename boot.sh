@@ -126,6 +126,7 @@ LIBRARIES=\
  libym_verilog \
  libym_bnet \
  libym_blifbnetconv \
+ libym_bnetblifreader \
  libym_bnetiscas89reader \
  libym_bdn \
  libym_aig \

@@ -834,6 +834,21 @@ BNetwork::set_node_func(BNode* node,
   mTraceMgr.prop_event(BNetChg::node_func(node->id()));
 }
 
+// ノードのリセット値をセットする．
+// latch ノードの場合のみ意味を持つ．
+void
+BNetwork::set_node_reset_value(BNode* node,
+			       int reset_value)
+{
+  if ( node->parent() != this ) {
+    // 他のネットワークのノードなのでエラー
+    BNET_ERROR("node is not belong to the network.");
+    return;
+  }
+
+  node->flags_set_reset_value(reset_value);
+}
+
 // @brief 入力からのトポロジカルソート順を求める．
 // @param[out] node_list 結果のノード配列
 // @param[in] reverse true の時は出力からのトポロジカルソートを行う．

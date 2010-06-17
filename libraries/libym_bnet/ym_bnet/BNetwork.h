@@ -235,9 +235,21 @@ private:
 /// 具体的には，mod 4の値で，
 ///   0: 外部入力
 ///   1: 外部出力
-///   2: 中間ノード
+///   2: 論理ノード
 ///   3: latch ノード
 /// としておく．
+///
+/// 外部入力ノードは名前のみの情報を持つ．
+///
+/// 外部出力ノードは名前とファンインのノードの情報を持つ．
+/// 外部出力ノードの名前空間はその他のノードの名前空間とは別に考える．
+/// 場合によってはファンインのノードと同じ名前の場合もありうる．
+///
+/// 論理ノードは名前とファンインのノード配列と論理式の情報を持つ．
+///
+/// latchノードは名前とファンインのノードとリセット値の情報を持つ．
+/// リセット値は 0, 1, 2(不定) のいずれかの値をとる．
+///
 /// @sa BNetwork BNodeEdge
 //////////////////////////////////////////////////////////////////////
 class BNode
@@ -389,6 +401,9 @@ public:
   func() const;
 
   /// @brief latch ノードの時の初期値を取り出す．
+  /// @retval 0 0
+  /// @retval 1 1
+  /// @retval 2 不定
   int
   reset_value() const;
 
@@ -492,13 +507,13 @@ private:
   static
   const int kShiftReset = 2;
   static
-  const int kShiftTemp  = 3;
+  const int kShiftTemp  = 4;
   static
-  const int kShiftNI    = 4;
+  const int kShiftNI    = 5;
   static
   const ymuint32 kMaskType   = (3 << kShiftType);
   static
-  const ymuint32 kMaskReset  = (1 << kShiftReset);
+  const ymuint32 kMaskReset  = (3 << kShiftReset);
   static
   const ymuint32 kMaskTemp   = (1 << kShiftTemp);
   static
@@ -1027,6 +1042,12 @@ private:
   set_node_func(BNode* node,
 		const LogExpr& lexp);
 
+  // ノードのリセット値をセットする．
+  // latch ノードの場合のみ意味を持つ．
+  void
+  set_node_reset_value(BNode* node,
+		       int reset_value);
+
   // tsortのためのサブルーティン
   void
   tsort_sub(BNode* node,
@@ -1399,7 +1420,7 @@ inline
 int
 BNode::flags_get_reset_value() const
 {
-  return (mFlags >> kShiftReset) & 1;
+  return (mFlags & kMaskReset) >> kShiftReset;
 }
 
 // latch ノードの場合の初期値を設定する．
@@ -1407,12 +1428,8 @@ inline
 void
 BNode::flags_set_reset_value(int value)
 {
-  if ( value ) {
-    mFlags |= kMaskReset;
-  }
-  else {
-    mFlags &= ~kMaskReset;
-  }
+  mFlags &= ~kMaskReset;
+  mFlags |= (value << kShiftReset) & kMaskReset;
 }
 
 // temporary マークを得る．

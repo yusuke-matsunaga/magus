@@ -190,12 +190,14 @@ BNetBlifWriter::dump(ostream& s,
     BNode* node = *p;
     BNode* inode = node->fanin(0);
     int reset_val = node->reset_value();
-    s << ".latch " << inode->name() << " " << node->name() << " ";
-    if ( reset_val ) {
-      s << "1";
-    }
-    else {
-      s << "0";
+    s << ".latch " << inode->name() << " " << node->name();
+    switch ( reset_val ) {
+    case 0:
+      s << " 0";
+      break;
+    case 1:
+      s << " 1";
+      break;
     }
     s << endl;
   }

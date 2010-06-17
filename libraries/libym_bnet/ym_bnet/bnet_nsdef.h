@@ -62,10 +62,8 @@ class BNetworkTrace;
 
 class BNodeList;
 
-class BlifBNetConv;
 class BNetBlifWriter;
 class BNetEquWriter;
-class BNetIscas89Reader;
 class BNetVerilogWriter;
 
 
@@ -103,10 +101,8 @@ using nsBnet::BNodeFoList;
 using nsBnet::BNetChg;
 using nsBnet::BNetworkTrace;
 
-using nsBnet::BlifBNetConv;
 using nsBnet::BNetBlifWriter;
 using nsBnet::BNetEquWriter;
-using nsBnet::BNetIscas89Reader;
 using nsBnet::BNetVerilogWriter;
 
 END_NAMESPACE_YM
