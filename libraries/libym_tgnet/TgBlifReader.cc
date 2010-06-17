@@ -5,15 +5,11 @@
 ///
 /// $Id: TgBlifReader.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "ymconfig.h"
-#endif
-
-#include <ym_tgnet/TgBlifReader.h>
+#include "ym_tgnet/TgBlifReader.h"
 #include "TgBlifHandler.h"
 
 

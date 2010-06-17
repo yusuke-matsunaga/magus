@@ -5,18 +5,14 @@
 ///
 /// $Id: TgIscas89Handler.cc 2043 2009-02-21 07:08:48Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "ymconfig.h"
-#endif
-
 #include "TgIscas89Handler.h"
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tgnet/TgNode.h>
-#include <ym_tgnet/TgGateTemplate.h>
+#include "ym_tgnet/TgNetwork.h"
+#include "ym_tgnet/TgNode.h"
+#include "ym_tgnet/TgGateTemplate.h"
 #include "LogicMgr.h"
 
 
