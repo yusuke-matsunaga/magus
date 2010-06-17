@@ -66,6 +66,7 @@ ym_libym_iscas89_enable=1
 ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_bnet_enable=1
+ym_libym_blifbnetconv_enable=1
 ym_libym_bdn_enable=1
 ym_libym_aig_enable=1
 ym_libym_tgnet_enable=1
@@ -128,8 +129,14 @@ YM_BUILD_LIBRARY([libym_verilog],
 YM_BUILD_LIBRARY([libym_bnet],
 		 [ym_libym_utils_enable,
 		  ym_libym_lexp_enable,
-		  ym_libym_blif_enable,
 		  ym_libym_iscas89_enable])
+
+# libym_blifbnetconv
+YM_BUILD_LIBRARY([libym_blifbnetconv],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable,
+		  ym_libym_blif_enable,
+		  ym_libym_bnet_enable])
 
 # libym_bdn
 YM_BUILD_LIBRARY([libym_bdn],

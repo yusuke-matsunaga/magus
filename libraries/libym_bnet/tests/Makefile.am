@@ -16,8 +16,7 @@ TESTS_ENVIRONMENT = \
 	top_builddir=$(top_builddir) \
 	top_srcdir=$(top_srcdir)
 
-#TESTS = \
-#	read_blif.test
+TESTS =
 
 testsubdir = testSubDir
 
@@ -28,17 +27,11 @@ LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
 	makenode \
-	bliftest \
 	iscas89test
 
 makenode_SOURCES = \
 	makenode.cc
 makenode_LDADD = \
-	$(LIBYM_BNET)
-
-bliftest_SOURCES = \
-	bliftest.cc
-bliftest_LDADD = \
 	$(LIBYM_BNET)
 
 iscas89test_SOURCES = \

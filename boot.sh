@@ -125,6 +125,7 @@ LIBRARIES=\
  libym_cell \
  libym_verilog \
  libym_bnet \
+ libym_blifbnetconv \
  libym_bdn \
  libym_aig \
  libym_tgnet \

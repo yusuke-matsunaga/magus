@@ -12,7 +12,7 @@
 #include "ym_lutmap/lutmap_nsdef.h"
 #include "ym_lutmap/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
-#include "ym_bnet/BlifBNetConv.h"
+#include "ym_blifbnetconv/BlifBNetConv.h"
 #include "ym_bnet/BNetDecomp.h"
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"

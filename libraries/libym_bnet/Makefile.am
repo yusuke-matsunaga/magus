@@ -16,7 +16,6 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_bnet.la
 
 libym_bnet_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
@@ -38,5 +37,4 @@ libym_bnet_la_SOURCES = \
 	BNetIscas89Reader.cc \
 	BNetBlifWriter.cc \
 	BNetEquWriter.cc \
-	BNetVerilogWriter.cc \
-	BlifBNetConv.cc
+	BNetVerilogWriter.cc

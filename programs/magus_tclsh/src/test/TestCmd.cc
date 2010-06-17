@@ -13,7 +13,7 @@
 #include "ym_bnet/BNetwork.h"
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"
-#include "ym_bnet/BlifBNetConv.h"
+#include "ym_blifbnetconv/BlifBNetConv.h"
 #include "ym_bnet/BNetVerilogWriter.h"
 
 

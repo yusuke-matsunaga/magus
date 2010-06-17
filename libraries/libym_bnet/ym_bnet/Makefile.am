@@ -16,5 +16,4 @@ noinst_HEADERS = \
 	BNetIscas89Reader.h \
 	BNetBlifWriter.h \
 	BNetEquWriter.h \
-	BNetVerilogWriter.h \
-	BlifBNetConv.h
+	BNetVerilogWriter.h

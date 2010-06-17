@@ -1,7 +1,7 @@
-#ifndef YM_BNET_BLIFBNETCONV_H
-#define YM_BNET_BLIFBNETCONV_H
+#ifndef YM_BLIFBNETCONV_BLIFBNETCONV_H
+#define YM_BLIFBNETCONV_BLIFBNETCONV_H
 
-/// @file ym_bnet/BlifBNetConv.h
+/// @file ym_blifbnetconv/BlifBNetConv.h
 /// @brief BlifBNetConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -15,7 +15,7 @@
 #include "ym_blif/blif_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class BlifBNetConv BlifBNetConv.h <ym_bnet/BlifBNetConv.h>
@@ -64,6 +64,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM
 
-#endif // YM_BNET_BLIFBNETCONV_H
+#endif // YM_BLIFBNETCONV_BLIFBNETCONV_H

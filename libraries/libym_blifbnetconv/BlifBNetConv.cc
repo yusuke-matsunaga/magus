@@ -9,13 +9,14 @@
 /// All rights reserved.
 
 
-#include "ym_bnet/BlifBNetConv.h"
+#include "ym_blifbnetconv/BlifBNetConv.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetManip.h"
 #include "ym_blif/BlifNetwork.h"
+#include "ym_lexp/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 BlifBNetConv::BlifBNetConv() :
@@ -156,4 +157,4 @@ BlifBNetConv::make_node(const BlifNode* blif_node)
   return node;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM

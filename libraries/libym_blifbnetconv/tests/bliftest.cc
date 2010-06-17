@@ -1,20 +1,16 @@
 
-/// @file libym_bnet/tests/bliftest.cc
+/// @file libym_blifbnetconv/tests/bliftest.cc
 /// @brief blif ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: bliftest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include <ym_bnet/BNetwork.h>
-#include <ym_bnet/BlifBNetConv.h>
+#include <ym_blifbnetconv/BlifBNetConv.h>
 #include <ym_bnet/BNetBlifWriter.h>
 #include <ym_blif/BlifNetwork.h>
 #include <ym_blif/BlifNetworkReader.h>
