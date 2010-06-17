@@ -31,4 +31,7 @@ libym_blif_la_SOURCES = \
 	BlifParserImpl.cc \
 	BlifHandler.cc \
 	BlifParser.cc \
+	BlifNetwork.cc \
+	BlifNetworkHandler.h \
+	BlifNetworkHandler.cc \
 	BlifNetworkReader.cc
