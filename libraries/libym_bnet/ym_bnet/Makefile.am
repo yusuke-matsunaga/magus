@@ -13,7 +13,7 @@ noinst_HEADERS = \
 	BNetDecomp.h \
 	BNetGateDecomp.h \
 	BNetSopDecomp.h \
-	BNetIscas89Reader.h \
 	BNetBlifWriter.h \
 	BNetEquWriter.h \
-	BNetVerilogWriter.h
+	BNetVerilogWriter.h \
+	BNetIscas89Reader.h

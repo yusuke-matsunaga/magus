@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
+#include "ym_bnet/BNetIscas89Reader.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetManip.h"
-#include "ym_bnet/BNetIscas89Reader.h"
 #include "ym_iscas89/Iscas89Handler.h"
 
 

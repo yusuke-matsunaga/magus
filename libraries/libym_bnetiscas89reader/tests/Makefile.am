@@ -23,12 +23,13 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
+LIBYM_BNET = 
 
 bin_PROGRAMS = \
-	makenode
+	iscas89test
 
-makenode_SOURCES = \
-	makenode.cc
-makenode_LDADD = \
-	$(LIBYM_BNET)
+iscas89test_SOURCES = \
+	iscas89test.cc
+iscas89test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bnetiscas89reader/libym_bnetiscas89reader.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la

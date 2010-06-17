@@ -3,7 +3,6 @@
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
 SUBDIRS = \
-	ym_bnet \
 	. \
 	tests
 
@@ -13,26 +12,15 @@ INCLUDES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_bnet.la
+noinst_LTLIBRARIES = libym_bnetiscas89reader.la
 
-libym_bnet_la_LIBADD = \
+libym_bnetiscas89reader_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_bnet_la_LDFLAGS = 
+libym_bnetiscas89reader_la_LDFLAGS = 
 
-libym_bnet_la_SOURCES = \
-	StrBNodeMap.h \
-	StrBNodeMap.cc \
-	BNodeMgr.h \
-	BNodeMgr.cc \
-	BNetwork.cc \
-	eliminate.cc \
-	BNode.cc \
-	BNetManip.cc \
-	BNetDecomp.cc \
-	BNetGateDecomp.cc \
-	BNetSopDecomp.cc \
-	BNetBlifWriter.cc \
-	BNetEquWriter.cc \
-	BNetVerilogWriter.cc
+libym_bnetiscas89reader_la_SOURCES = \
+	BNetIscas89Reader.cc
