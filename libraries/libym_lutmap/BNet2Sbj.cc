@@ -116,13 +116,22 @@ BNet2Sbj::operator()(const BNetwork& network,
     assoc.put(bnode, node, false);
   }
   
-  // 定数0に縮退している外部出力を求めておく
+  // 定数0に縮退している外部出力/DFFを求めておく
   vector<bool> zero_outs(n, false);
   for (BNodeList::const_iterator p = network.outputs_begin();
        p != network.outputs_end(); ++ p) {
     // 外部出力
     BNode* obnode = *p;
     // 外部出力から参照されているノード
+    BNode* ibnode = obnode->fanin(0);
+    if ( ibnode->ni() == 0 ) {
+      zero_outs[ibnode->id()] = true;
+    }
+  }
+  for (BNodeList::const_iterator p = network.latch_nodes_begin();
+       p != network.latch_nodes_end(); ++ p) {
+    BNode* obnode = *p;
+    // ラッチから参照されているノード
     BNode* ibnode = obnode->fanin(0);
     if ( ibnode->ni() == 0 ) {
       zero_outs[ibnode->id()] = true;
