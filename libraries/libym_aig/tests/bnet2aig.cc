@@ -9,10 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
 #include "ym_bnet/BNetwork.h"
-#include "ym_blifbnetconv/BlifBNetConv.h"
+#include "ym_bnet/BNetBlifReader.h"
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigHandle.h"
 
@@ -99,18 +97,12 @@ main(int argc,
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
 
-    BlifNetwork blif_network;
-    BlifNetworkReader reader;
+    BNetwork network;
+    BNetBlifReader reader;
     reader.add_msg_handler(msg_handler);
-    if ( !reader.read(filename, blif_network) ) {
+    if ( !reader.read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
-    }
-    BlifBNetConv conv;
-    BNetwork network;
-    if ( !conv(blif_network, network) ) {
-      cerr << "Error in converting BlifNetwork to BNetwork" << endl;
-      return 5;
     }
 
     AigMgr aig_mgr;
