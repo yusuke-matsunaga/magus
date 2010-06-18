@@ -36,7 +36,7 @@ main(int argc,
     
     BNetwork network;
 
-    if ( !reader.read(filename, &network) ) {
+    if ( !reader.read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }

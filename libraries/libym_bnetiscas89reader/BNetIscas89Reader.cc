@@ -40,9 +40,9 @@ BNetIscas89Reader::~BNetIscas89Reader()
 // @retval false 読み込み中にエラーが起こった．
 bool
 BNetIscas89Reader::read(const string& filename,
-			BNetwork* network)
+			BNetwork& network)
 {
-  mHandler->set_network(network);
+  mHandler->set_network(&network);
   
   bool stat = mParser.read(filename);
   if ( !stat ) {

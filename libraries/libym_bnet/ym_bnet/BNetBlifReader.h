@@ -45,7 +45,7 @@ public:
   /// @retval false 読み込み中にエラーが起こった．
   bool
   read(const string& filename,
-       BNetwork* network);
+       BNetwork& network);
 
   /// @brief メッセージハンドラを付加する．
   void

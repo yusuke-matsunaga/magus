@@ -12,10 +12,9 @@
 #include "ym_lutmap/lutmap_nsdef.h"
 #include "ym_lutmap/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
-#include "ym_blifbnetconv/BlifBNetConv.h"
+#include "ym_bnet/BNetwork.h"
+#include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -34,23 +33,15 @@ main(int argc,
   
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    BlifNetworkReader reader;
+    BNetBlifReader reader;
 
     reader.add_msg_handler(msg_handler);
     
-    BlifNetwork blif_network;
-
-    if ( !reader.read(filename, blif_network) ) {
-      cerr << "Error in reading " << filename << endl;
-      return 4;
-    }
-
     BNetwork network;
 
-    BlifBNetConv conv;
-    if ( !conv(blif_network, network) ) {
-      cerr << "Error in converting BlifNetwork to BNetwork" << endl;
-      return 5;
+    if ( !reader.read(filename, network) ) {
+      cerr << "Error in reading " << filename << endl;
+      return 4;
     }
 
     // 2入力ノードに分解

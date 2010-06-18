@@ -13,7 +13,7 @@
 
 #include "MagBNetCmd.h"
 #include "ym_utils/MsgHandler.h"
-#include "ym_blif/BlifNetworkReader.h"
+#include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetIscas89Reader.h"
 
 
@@ -106,7 +106,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // Blif ファイルを読み込むためのパーサ
-  BlifNetworkReader mReader;
+  BNetBlifReader mReader;
 
   // メッセージハンドラ
   TclObjMsgHandler mMsgHandler;

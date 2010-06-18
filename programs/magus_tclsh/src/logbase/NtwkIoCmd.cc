@@ -11,9 +11,7 @@
 
 #include "NtwkIoCmd.h"
 
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
-#include "ym_blifbnetconv/BlifBNetConv.h"
+#include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetBlifWriter.h"
 #include "ym_bnet/BNetEquWriter.h"
 #include "ym_bnet/BNetVerilogWriter.h"
@@ -125,8 +123,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
 #else
-    BlifNetwork blif_network;
-    bool result = mReader.read(ex_file_name, blif_network);
+    bool result = mReader.read(ex_file_name, *network);
 
     // エラーが起きていないか調べる．
     if ( !result ) {
@@ -136,9 +133,6 @@ ReadBlif::cmd_proc(TclObjVector& objv)
       set_result(emsg);
       return TCL_ERROR;
     }
-
-    BlifBNetConv conv;
-    conv(blif_network, *network);
 #endif
   }
   catch ( AssertError x ) {
@@ -198,7 +192,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
   
   // 実際の読み込みを行う．
   try {
-    bool result = mReader.read(ex_file_name, network);
+    bool result = mReader.read(ex_file_name, *network);
 
     // エラーが起きていないか調べる．
     if ( !result ) {
