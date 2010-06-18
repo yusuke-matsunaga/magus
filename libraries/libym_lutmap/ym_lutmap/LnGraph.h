@@ -130,7 +130,8 @@ private:
 /// - 入力ノード
 /// - 出力ノード
 /// - LUTノード
-/// の 3種類がある．
+/// - DFFノード
+/// の 4種類がある．
 /// @sa LnEdge LnGraph
 //////////////////////////////////////////////////////////////////////
 class LnNode :
@@ -145,8 +146,10 @@ public:
     kINPUT  = 0,
     /// @brief 出力ノード
     kOUTPUT = 1,
-    /// @brief LUTード
-    kLUT = 2
+    /// @brief LUTノード
+    kLUT = 2,
+    /// @brief DFFノード
+    kDFF = 3
   };
 
 
@@ -197,6 +200,10 @@ public:
   /// @brief LUTノードの時に true を返す．
   bool
   is_lut() const;
+  
+  /// @brief DFFノードの時に true を返す．
+  bool
+  is_dff() const;
 
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
@@ -277,6 +284,10 @@ private:
   void
   set_lut();
   
+  /// @brief タイプをDFFに設定する．
+  void
+  set_dff();
+  
   /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
   void
   scan_po();
@@ -330,14 +341,14 @@ private:
 /// @class LnGraph LnGraph.h "LnGraph.h"
 /// @brief LUTネットワークを表すクラス
 ///
-/// 入力ノード，出力ノード，LUT ノードを分けてリストで持つ
-/// ( @sa input_list(), output_list(), lnode_list() )．
+/// 入力ノード，出力ノード，LUT ノード，DFF ノードを分けてリストで持つ
+/// ( @sa input_list(), output_list(), lnode_list(), dff_list() )．
 /// また，すべてのノードに唯一な ID 番号を割り振っており，その ID 番号
 /// からノードを取り出すこともできる( @sa node(ymuint id) )．
 /// 入力ノード，出力ノードは ID 番号とは別に入力 ID 番号，および出力
 /// ID 番号を持っており，それらの ID 番号からノードを取り出すこともできる．
 /// ( @sa input(ymuint id), output(ymuint id) )
-/// binary ノードを入力からのトポロジカル順で処理するためには sort()
+/// LUT ノードを入力からのトポロジカル順で処理するためには sort()
 /// を用いてソートされたノードのベクタを得る．
 /// @sa LnEdge LnNode
 //////////////////////////////////////////////////////////////////////
@@ -416,11 +427,26 @@ public:
   const LnNodeList&
   lnode_list() const;
 
-  /// @brief ソートされたノードのリストを得る．
+  /// @brief LUTノード数を得る．
+  ymuint
+  n_luts() const;
+  
+  /// @brief LUTノードのリストを得る．
+  const LnNodeList&
+  lut_list() const;
+
+  /// @brief ソートされたLUTノードのリストを得る．
   /// @param[out] node_list
-  /// @note 入力ノードと出力ノードは含まない．
   void
   sort(vector<LnNode*>& node_list) const;
+
+  /// @brief DFFノード数を得る．
+  ymuint
+  n_dffs() const;
+  
+  /// @brief DFFノードのリストを得る．
+  const LnNodeList&
+  dff_list() const;
 
   /// @brief 最大段数を求める．
   ymuint
@@ -458,6 +484,14 @@ public:
   new_lut(const string& name,
 	  const vector<LnNode*>& inodes,
 	  const vector<int>& tv);
+  
+  /// @brief DFFノードを作る．
+  /// @param[in] name 名前
+  /// @param[in] inode 入力ノード
+  /// @return 作成したノードを返す．
+  LnNode*
+  new_dff(const string& name,
+	  LnNode* inode);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -510,6 +544,12 @@ private:
   void
   delete_lut(LnNode* node);
   
+  /// @brief DFFノードを削除する．
+  /// @param[in] node 対象のノード
+  /// @note node のファンアウトは空でなければならない．
+  void
+  delete_dff(LnNode* node);
+  
   // node を削除する．
   void
   delete_node(LnNode* node);
@@ -555,7 +595,10 @@ private:
   LnNodeList mOutputList;
   
   // LUTノードのリスト
-  LnNodeList mLnodeList;
+  LnNodeList mLutList;
+  
+  // DFFノードのリスト
+  LnNodeList mDffList;
   
   // 最大レベル
   mutable
@@ -712,6 +755,14 @@ LnNode::set_lut()
   mFlags = static_cast<ymuint>(kLUT);
 }
 
+// @brief タイプをDFFに設定する．
+inline
+void
+LnNode::set_dff()
+{
+  mFlags = static_cast<ymuint>(kDFF);
+}
+
 // タイプを得る．
 inline
 LnNode::tType
@@ -742,6 +793,14 @@ bool
 LnNode::is_lut() const
 {
   return type() == kLUT;
+}
+
+// @brief DFFノードの時に true を返す．
+inline
+bool
+LnNode::is_dff() const
+{
+  return type() == kDFF;
 }
 
 // @brief サブID (入力／出力番号)を得る．
@@ -903,7 +962,7 @@ inline
 ymuint
 LnGraph::n_lnodes() const
 {
-  return mLnodeList.size();
+  return mLutList.size();
 }
 
 // LUTノードのリストを得る．
@@ -911,7 +970,39 @@ inline
 const LnNodeList&
 LnGraph::lnode_list() const
 {
-  return mLnodeList;
+  return mLutList;
+}
+
+// @brief LUTノード数を得る．
+inline
+ymuint
+LnGraph::n_luts() const
+{
+  return mLutList.size();
+}
+
+// @brief LUTノードのリストを得る．
+inline
+const LnNodeList&
+LnGraph::lut_list() const
+{
+  return mLutList;
+}
+
+// @brief DFFノード数を得る．
+inline
+ymuint
+LnGraph::n_dffs() const
+{
+  return mDffList.size();
+}
+
+// @brief DFFノードのリストを得る．
+inline
+const LnNodeList&
+LnGraph::dff_list() const
+{
+  return mDffList;
 }
 
 END_NAMESPACE_YM_LUTMAP

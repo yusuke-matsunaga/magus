@@ -55,11 +55,14 @@ LnNode::id_str() const
   if ( is_input() ) {
     buf << "I" << id();
   }
+  else if ( is_output() ) {
+    buf << "O" << id();
+  }
   else if ( is_lut() ) {
     buf << "L" << id();
   }
-  else if ( is_output() ) {
-    buf << "O" << id();
+  else if ( is_dff() ) {
+    buf << "D" << id();
   }
   else {
     buf << "X" << id();
@@ -126,6 +129,15 @@ LnGraph::copy(const LnGraph& src,
     nodemap[src_node->id()] = dst_node;
   }
 
+  // DFFノードの生成
+  const LnNodeList& dff_list = src.dff_list();
+  for (LnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    LnNode* src_node = *p;
+    LnNode* dst_node = new_dff(src_node->name(), NULL);
+    nodemap[src_node->id()] = dst_node;
+  }
+  
   // LUTノードの生成
   vector<LnNode*> node_list;
   src.sort(node_list);
@@ -150,6 +162,16 @@ LnGraph::copy(const LnGraph& src,
     nodemap[src_node->id()] = dst_node;
   }
 
+  // DFFノードの入力の接続
+  for (LnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    LnNode* src_node = *p;
+    LnNode* dst_node = nodemap[src_node->id()];
+    LnNode* src_inode = src_node->fanin(0);
+    LnNode* dst_inode = nodemap[src_inode->id()];
+    connect(dst_inode, dst_node, 0);
+  }
+  
   // 外部出力の生成
   const LnNodeList& output_list = src.output_list();
   for (LnNodeList::const_iterator p = output_list.begin();
@@ -165,6 +187,39 @@ LnGraph::copy(const LnGraph& src,
   }
 }
 
+BEGIN_NONAMESPACE
+
+// node のファンアウトのうちファンインがすべてマークされているノード
+// をリストに加える．
+void
+sort_sub(LnNode* node,
+	 vector<bool>& mark,
+	 vector<LnNode*>& node_list)
+{
+  const LnEdgeList& fo_list = node->fanout_list();
+  for (LnEdgeList::const_iterator p = fo_list.begin();
+       p != fo_list.end(); ++ p) {
+    LnEdge* e = *p;
+    LnNode* onode = e->to();
+    if ( mark[onode->id()] || !onode->is_lut() ) continue;
+    bool ready = true;
+    ymuint ni = onode->ni();
+    for (ymuint i = 0; i < ni; ++ i) {
+      LnNode* inode0 = onode->fanin(i);
+      if ( !mark[inode0->id()] ) {
+	ready = false;
+	break;
+      }
+    }
+    if ( ready ) {
+      mark[onode->id()] = true;
+      node_list.push_back(onode);
+    }
+  }
+}
+
+END_NONAMESPACE
+
 // @brief ソートされたノードのリストを得る．
 void
 LnGraph::sort(vector<LnNode*>& node_list) const
@@ -175,38 +230,23 @@ LnGraph::sort(vector<LnNode*>& node_list) const
   ymuint n = max_node_id();
   vector<bool> mark(n, false);
     
-  ymuint rpos = 0;
-  
-  // 外部入力のみをファンインにするノードを node_list に追加する．
+  // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
   for (LnNodeList::const_iterator p = mInputList.begin();
        p != mInputList.end(); ++ p) {
     LnNode* node = *p;
     mark[node->id()] = true;
-    const LnEdgeList& fo_list = node->fanout_list();
-    for (LnEdgeList::const_iterator p = fo_list.begin();
-	 p != fo_list.end(); ++ p) {
-      LnEdge* e = *p;
-      LnNode* onode = e->to();
-      if ( mark[onode->id()] || onode->is_output() ) continue;
-      bool ready = true;
-      ymuint ni = onode->ni();
-      for (ymuint i = 0; i < ni; ++ i) {
-	LnNode* inode0 = onode->fanin(i);
-	if ( !mark[inode0->id()] ) {
-	  ready = false;
-	  break;
-	}
-      }
-      if ( ready ) {
-	mark[onode->id()] = true;
-	node_list.push_back(onode);
-      }
-    }
+    sort_sub(node, mark, node_list);
+  }
+  for (LnNodeList::const_iterator p = mDffList.begin();
+       p != mDffList.end(); ++ p) {
+    LnNode* node = *p;
+    mark[node->id()] = true;
+    sort_sub(node, mark, node_list);
   }
 
-  // 入力を持たないノードを node_list に追加する．
-  for (LnNodeListConstIter p = mLnodeList.begin();
-       p != mLnodeList.end(); ++ p) {
+  // 入力を持たないノード(定数ノード)を node_list に追加する．
+  for (LnNodeListConstIter p = mLutList.begin();
+       p != mLutList.end(); ++ p) {
     LnNode* node = *p;
     if ( node->ni() == 0 && !mark[node->id()] ) {
       mark[node->id()] = true;
@@ -214,29 +254,11 @@ LnGraph::sort(vector<LnNode*>& node_list) const
     }
   }
   
+  ymuint rpos = 0;
   while ( rpos < node_list.size() ) {
     LnNode* node = node_list[rpos];
     ++ rpos;
-    const LnEdgeList& fo_list = node->fanout_list();
-    for (LnEdgeList::const_iterator p = fo_list.begin();
-	 p != fo_list.end(); ++ p) {
-      LnEdge* e = *p;
-      LnNode* onode = e->to();
-      if ( mark[onode->id()] || onode->is_output() ) continue;
-      bool ready = true;
-      ymuint ni = onode->ni();
-      for (ymuint i = 0; i < ni; ++ i) {
-	LnNode* inode0 = onode->fanin(i);
-	if ( !mark[inode0->id()] ) {
-	  ready = false;
-	  break;
-	}
-      }
-      if ( ready ) {
-	mark[onode->id()] = true;
-	node_list.push_back(onode);
-      }
-    }
+    sort_sub(node, mark, node_list);
   }
   assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
 }
@@ -306,10 +328,10 @@ LnGraph::new_lut(const string& name,
 
   node->mName = name;
   
-  // 論理ノードリストに登録
-  mLnodeList.push_back(node);
+  // LUTノードリストに登録
+  mLutList.push_back(node);
 
-  // 論理ノードタイプに設定
+  // LUTノードタイプに設定
   node->set_lut();
 
   // 真理値ベクタを設定
@@ -321,6 +343,32 @@ LnGraph::new_lut(const string& name,
     connect(inodes[i], node, i);
   }
   
+  return node;
+}
+
+// @brief DFFノードを作る．
+// @param[in] name 名前
+// @param[in] inode 入力ノード
+// @return 作成したノードを返す．
+LnNode*
+LnGraph::new_dff(const string& name,
+		 LnNode* inode)
+{
+  LnNode* node = new_node(1);
+
+  node->mName = name;
+
+  // DFFノードリストに登録
+  mDffList.push_back(node);
+
+  // DFFノードタイプに設定
+  node->set_dff();
+
+  // ファンインの設定
+  if ( inode ) {
+    connect(inode, node, 0);
+  }
+
   return node;
 }
 
@@ -369,13 +417,18 @@ LnGraph::clear()
     LnNode* node = *p;
     connect(NULL, node, 0);
   }
-  for (LnNodeList::iterator p = mLnodeList.begin();
-       p != mLnodeList.end(); ++ p) {
+  for (LnNodeList::iterator p = mLutList.begin();
+       p != mLutList.end(); ++ p) {
     LnNode* node = *p;
     ymuint ni = node->ni();
     for (ymuint i = 0; i < ni; ++ i) {
       connect(NULL, node, i);
     }
+  }
+  for (LnNodeList::iterator p = mDffList.begin();
+       p != mDffList.end(); ++ p) {
+    LnNode* node = *p;
+    connect(NULL, node, 0);
   }
 
   for (LnNodeList::iterator p = mInputList.begin();
@@ -398,15 +451,25 @@ LnGraph::clear()
   }
   assert_cond(mOutputList.empty(), __FILE__, __LINE__);
 
-  for (LnNodeList::iterator p = mLnodeList.begin();
-       p != mLnodeList.end(); ) {
+  for (LnNodeList::iterator p = mLutList.begin();
+       p != mLutList.end(); ) {
     // p は実際にはノード内のメンバをアクセスするので delete する前に
     // 進めておく必要がある．
     LnNode* node = *p;
     ++ p;
     delete_lut(node);
   }
-  assert_cond(mLnodeList.empty(), __FILE__, __LINE__);
+  assert_cond(mLutList.empty(), __FILE__, __LINE__);
+
+  for (LnNodeList::iterator p = mDffList.begin();
+       p != mDffList.end(); ) {
+    // p は実際にはノード内のメンバをアクセスするので delete する前に
+    // 進めておく必要がある．
+    LnNode* node = *p;
+    ++ p;
+    delete_dff(node);
+  }
+  assert_cond(mDffList.empty(), __FILE__, __LINE__);
 
   mInputArray.clear();
   mOutputArray.clear();
@@ -444,7 +507,21 @@ LnGraph::delete_lut(LnNode* node)
     connect(NULL, node, i);
   }
 
-  mLnodeList.erase(node);
+  mLutList.erase(node);
+  delete_node(node);
+}
+
+// @brief DFFノードを削除する．
+// @param[in] node 対象のノード
+// @note node のファンアウトは空でなければならない．
+void
+LnGraph::delete_dff(LnNode* node)
+{
+  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+  connect(NULL, node, 0);
+
+  mDffList.erase(node);
   delete_node(node);
 }
 
@@ -496,6 +573,11 @@ LnGraph::level() const
       LnNode* node = *p;
       node->mLevel = 0;
     }
+    for (LnNodeListConstIter p = dff_list().begin();
+	 p != dff_list().end(); ++ p) {
+      LnNode* node = *p;
+      node->mLevel = 0;
+    }
     
     vector<LnNode*> node_list;
     sort(node_list);
@@ -526,6 +608,17 @@ LnGraph::level() const
 	}
       }
     }
+    for (LnNodeListConstIter p = dff_list().begin();
+	 p != dff_list().end(); ++ p) {
+      LnNode* node = *p;
+      LnNode* inode = node->fanin(0);
+      if ( inode ) {
+	ymuint l1 = inode->mLevel;
+	if ( max_l < l1 ) {
+	  max_l = l1;
+	}
+      }
+    }
     mLevel = max_l;
     mLevelValid = true;
   }
@@ -542,8 +635,33 @@ LnGraph::dump(ostream& s) const
     s << "I" << node->subid() << "(" << node->id_str() << "): "
       << node->name() << endl;
   }
-  for (LnNodeList::const_iterator p = mLnodeList.begin();
-       p != mLnodeList.end(); ++ p) {
+  for (LnNodeList::const_iterator p = mOutputList.begin();
+       p != mOutputList.end(); ++ p) {
+    const LnNode* node = *p;
+    const LnEdge* e = node->fanin_edge(0);
+    s << "O" << node->subid() << "(" << node->id_str() << "): "
+      << node->name() << " = ";
+    const LnNode* inode = e->from();
+    if ( inode ) {
+      // 普通のノードの場合
+      s << inode->id_str();
+    }
+    else {
+      // 定数ノードの場合
+      s << "0";
+    }
+    s << endl;
+  }
+  for (LnNodeList::const_iterator p = mDffList.begin();
+       p != mDffList.end(); ++ p) {
+    const LnNode* node = *p;
+    const LnNode* inode = node->fanin(0);
+    s << node->id_str() << "(" << node->name() << ") = DFF("
+      << inode->id_str() << ")" << endl;
+  }
+  
+  for (LnNodeList::const_iterator p = mLutList.begin();
+       p != mLutList.end(); ++ p) {
     const LnNode* node = *p;
     s << node->id_str() << "(" << node->name() << ") = LUT(";
     const char* comma = "";
@@ -561,23 +679,6 @@ LnGraph::dump(ostream& s) const
     s << "\t";
     for (ymuint i = 0; i < np; ++ i) {
       s << tv[i];
-    }
-    s << endl;
-  }
-  for (LnNodeList::const_iterator p = mOutputList.begin();
-       p != mOutputList.end(); ++ p) {
-    const LnNode* node = *p;
-    const LnEdge* e = node->fanin_edge(0);
-    s << "O" << node->subid() << "(" << node->id_str() << "): "
-      << node->name() << " = ";
-    const LnNode* inode = e->from();
-    if ( inode ) {
-      // 普通のノードの場合
-      s << inode->id_str();
-    }
-    else {
-      // 定数ノードの場合
-      s << "0";
     }
     s << endl;
   }
