@@ -41,7 +41,7 @@ void
 CrNode::set_sbjnode(SbjNode* node)
 {
   mNode = node;
-  if ( node->is_input() ) {
+  if ( node->is_input() || node->is_dff() ) {
     mFlags |= (1U << kInputShift);
   }
   if ( node->pomark() ) {

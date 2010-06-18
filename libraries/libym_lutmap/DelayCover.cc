@@ -80,6 +80,7 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 {
   const SbjNodeList& input_list = sbjgraph.input_list();
   const SbjNodeList& output_list = sbjgraph.output_list();
+  const SbjNodeList& dff_list = sbjgraph.dff_list();
   ymuint n = sbjgraph.max_node_id();
 
   maprec.init(sbjgraph);
@@ -101,6 +102,13 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
     t.mCostList.insert(NULL, 0, 0.0);
     t.mMinDepth = 0;
   }
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* node = *p;
+    NodeInfo& t = mNodeInfo[node->id()];
+    t.mCostList.insert(NULL, 0, 0.0);
+    t.mMinDepth = 0;
+  }
   
   // 各ノードごとにカットを記録
   vector<SbjNode*> snode_list;
@@ -113,14 +121,28 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 
   // 最小段数の最大値をもとめる．
   vector<SbjNode*> onode_list;
-  onode_list.reserve(output_list.size());
+  onode_list.reserve(output_list.size() + dff_list.size());
   int min_depth = 0;
   for (SbjNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     SbjNode* onode = *p;
     SbjNode* node = onode->fanin(0);
     if ( node == NULL) continue;
-    if ( !node->is_input() ) {
+    if ( node->is_logic() ) {
+      onode_list.push_back(node);
+    }
+    NodeInfo& node_info = mNodeInfo[node->id()];
+    int depth = node_info.mMinDepth;
+    if ( min_depth < depth ) {
+      min_depth = depth;
+    }
+  }
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* onode = *p;
+    SbjNode* node = onode->fanin(0);
+    if ( node == NULL) continue;
+    if ( node->is_logic() ) {
       onode_list.push_back(node);
     }
     NodeInfo& node_info = mNodeInfo[node->id()];

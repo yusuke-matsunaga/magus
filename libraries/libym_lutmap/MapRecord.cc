@@ -85,6 +85,17 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     node_info.mMapNode[0] = mapnode;
     node_info.mDepth = 0;
   }
+  
+  // DFFの生成
+  const SbjNodeList& dff_list = sbjgraph.dff_list();
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* node = *p;
+    LnNode* mapnode = mapgraph.new_dff(node->name());
+    NodeInfo& node_info = mNodeInfo[node->id()];
+    node_info.mMapNode[0] = mapnode;
+    node_info.mDepth = 0;
+  }
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   const SbjNodeList& output_list = sbjgraph.output_list();
@@ -115,6 +126,36 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     }
     mapgraph.new_output(name, mapnode);
   }
+
+  // DFFからバックトレースを行い全ノードの生成を行う．
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* onode = *p;
+    SbjNode* node = onode->fanin(0);
+    bool inv = onode->output_inv();
+    const string& name = onode->name();
+    LnNode* mapnode = NULL;
+    if ( node ) {
+      mapnode = back_trace(node, inv, mapgraph, name);
+      int depth1 = mNodeInfo[node->id()].mDepth;
+      if ( max_depth < depth1 ) {
+	max_depth = depth1;
+      }
+    }
+    else {
+      vector<int> tv(1);
+      if ( inv ) {
+	tv[0] = 1;
+      }
+      else {
+	tv[0] = 0;
+      }
+      mapnode = mapgraph.new_lut(name, vector<LnNode*>(0), tv);
+    }
+    LnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
+    mapgraph.set_dff_input(omapnode, mapnode);
+  }
+
   lut_num = mapgraph.n_lnodes();
   depth = max_depth;
 }

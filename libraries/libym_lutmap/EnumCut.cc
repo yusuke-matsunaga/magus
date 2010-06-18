@@ -59,7 +59,8 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
   // 外部入力用の(ダミーの)クラスタを作る．
   ymuint ni = sbjgraph.n_inputs();
-  mNall = ni + sbjgraph.n_lnodes();
+  ymuint nf = sbjgraph.n_dffs();
+  mNall = ni + nf + sbjgraph.n_lnodes();
   mNcAll = 0;
   mCurPos = 0;
   for (ymuint i = 0; i < ni; ++ i) {
@@ -81,7 +82,28 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     
     ++ mCurPos;
   }
+  const SbjNodeList& dff_list = sbjgraph.dff_list();
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* node = *p;
 
+    mNcCur = 0;
+  
+    mOp->node_init(node, mCurPos);
+
+    // 自分自身のみからなるクラスタを登録する．
+    mOp->found(node);
+    ++ mNcAll;
+    ++ mNcCur;
+
+    // 今の列挙で用いたノードを cut_node_list に格納しておく
+    cnode_list(node).push_back(node);
+  
+    mOp->node_end(node, mCurPos, mNcCur);
+    
+    ++ mCurPos;
+  }
+  
   // 入力側から内部ノード用のクラスタを作る．
   vector<SbjNode*> node_list;
   sbjgraph.sort(node_list);

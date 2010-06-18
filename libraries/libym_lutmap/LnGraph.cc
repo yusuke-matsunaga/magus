@@ -52,21 +52,7 @@ string
 LnNode::id_str() const
 {
   ostringstream buf;
-  if ( is_input() ) {
-    buf << "I" << id();
-  }
-  else if ( is_output() ) {
-    buf << "O" << id();
-  }
-  else if ( is_lut() ) {
-    buf << "L" << id();
-  }
-  else if ( is_dff() ) {
-    buf << "D" << id();
-  }
-  else {
-    buf << "X" << id();
-  }
+  buf << id();
   return buf.str();
 }
 
@@ -134,7 +120,7 @@ LnGraph::copy(const LnGraph& src,
   for (LnNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     LnNode* src_node = *p;
-    LnNode* dst_node = new_dff(src_node->name(), NULL);
+    LnNode* dst_node = new_dff(src_node->name());
     nodemap[src_node->id()] = dst_node;
   }
   
@@ -169,7 +155,7 @@ LnGraph::copy(const LnGraph& src,
     LnNode* dst_node = nodemap[src_node->id()];
     LnNode* src_inode = src_node->fanin(0);
     LnNode* dst_inode = nodemap[src_inode->id()];
-    connect(dst_inode, dst_node, 0);
+    set_dff_input(dst_node, dst_inode);
   }
   
   // 外部出力の生成
@@ -348,11 +334,9 @@ LnGraph::new_lut(const string& name,
 
 // @brief DFFノードを作る．
 // @param[in] name 名前
-// @param[in] inode 入力ノード
 // @return 作成したノードを返す．
 LnNode*
-LnGraph::new_dff(const string& name,
-		 LnNode* inode)
+LnGraph::new_dff(const string& name)
 {
   LnNode* node = new_node(1);
 
@@ -364,12 +348,19 @@ LnGraph::new_dff(const string& name,
   // DFFノードタイプに設定
   node->set_dff();
 
-  // ファンインの設定
-  if ( inode ) {
-    connect(inode, node, 0);
-  }
-
   return node;
+}
+
+// @brief DFFノードの入力を設定する．
+// @param[in] node 対象の DFF ノード
+// @param[in] inode 入力のノード
+void
+LnGraph::set_dff_input(LnNode* node,
+		       LnNode* inode)
+{
+  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  
+  connect(inode, node, 0);
 }
 
 // 新しいノードを作成する．
@@ -632,14 +623,14 @@ LnGraph::dump(ostream& s) const
   for (LnNodeList::const_iterator p = mInputList.begin();
        p != mInputList.end(); ++ p) {
     const LnNode* node = *p;
-    s << "I" << node->subid() << "(" << node->id_str() << "): "
+    s << "INPUT#" << node->subid() << "(" << node->id_str() << "): "
       << node->name() << endl;
   }
   for (LnNodeList::const_iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
     const LnNode* node = *p;
     const LnEdge* e = node->fanin_edge(0);
-    s << "O" << node->subid() << "(" << node->id_str() << "): "
+    s << "OUTPUT#" << node->subid() << "(" << node->id_str() << "): "
       << node->name() << " = ";
     const LnNode* inode = e->from();
     if ( inode ) {
@@ -656,14 +647,14 @@ LnGraph::dump(ostream& s) const
        p != mDffList.end(); ++ p) {
     const LnNode* node = *p;
     const LnNode* inode = node->fanin(0);
-    s << node->id_str() << "(" << node->name() << ") = DFF("
-      << inode->id_str() << ")" << endl;
+    s << "DFF(" << node->id_str() << "): " << node->name() << " = "
+      << inode->id_str() << endl;
   }
   
   for (LnNodeList::const_iterator p = mLutList.begin();
        p != mLutList.end(); ++ p) {
     const LnNode* node = *p;
-    s << node->id_str() << "(" << node->name() << ") = LUT(";
+    s << "LUT(" << node->id_str() << "): " << node->name() << " = (";
     const char* comma = "";
     ymuint ni = node->ni();
     for (ymuint i = 0; i < ni; ++ i) {

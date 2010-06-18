@@ -68,11 +68,31 @@ CutResub::operator()(const SbjGraph& sbjgraph,
     mNodeArray[sbjnode->id()] = node;
     node->set_sbjnode(sbjnode);
   }
+
+  // DFFノードの対応付けを行う．
+  const SbjNodeList& dff_list = sbjgraph.dff_list();
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* sbjnode = *p;
+    CrNode* node = alloc_node();
+    mNodeArray[sbjnode->id()] = node;
+    node->set_sbjnode(sbjnode);
+  }
   
   // 外部出力からバックトレースを行う．
   const SbjNodeList& output_list = sbjgraph.output_list();
   for (SbjNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
+    SbjNode* onode = *p;
+    SbjNode* sbjnode = onode->fanin(0);
+    if ( sbjnode && !sbjnode->is_input() ) {
+      back_trace(sbjnode, maprec, NULL);
+    }
+  }
+  
+  // DFFからバックトレースを行う．
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
     SbjNode* onode = *p;
     SbjNode* sbjnode = onode->fanin(0);
     if ( sbjnode && !sbjnode->is_input() ) {

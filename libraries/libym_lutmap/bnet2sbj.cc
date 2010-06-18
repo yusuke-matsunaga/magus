@@ -98,6 +98,14 @@ bnet2sbj(const BNetwork& network,
     assoc.put(bnode, node, false);
   }
 
+  // DFFを作る．
+  for (BNodeList::const_iterator p = network.latch_nodes_begin();
+       p != network.latch_nodes_end(); ++ p) {
+    BNode* bnode = *p;
+    SbjNode* node = sbjgraph.new_dff(bnode->name());
+    assoc.put(bnode, node, false);
+  }
+  
   // 定数0に縮退している外部出力を求めておく
   vector<bool> zero_outs(n, false);
   for (BNodeList::const_iterator p = network.outputs_begin();
@@ -238,6 +246,20 @@ bnet2sbj(const BNetwork& network,
     }
   }
 
+  // DFFノードの入力を接続する．
+  for (BNodeList::const_iterator p = network.latch_nodes_begin();
+       p != network.latch_nodes_end(); ++ p) {
+    BNode* obnode = *p;
+    bool inv;
+    SbjNode* onode = NULL;
+    assoc.get(obnode, onode, inv);
+    assert_cond(inv == false, __FILE__, __LINE__);
+    BNode* ibnode = obnode->fanin(0);
+    SbjNode* inode = NULL;
+    assoc.get(ibnode, inode, inv);
+    sbjgraph.change_dff(onode, inode, inv);
+  }
+  
   // 外部出力ノードを作る．
   for (BNodeList::const_iterator p = network.outputs_begin();
        p != network.outputs_end(); ++ p) {

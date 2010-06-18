@@ -57,7 +57,8 @@ SbjNode::scan_po()
   for (SbjEdgeList::iterator p = mFanoutList.begin();
        p != mFanoutList.end(); ++ p) {
     SbjEdge* e = *p;
-    if ( e->to()->is_output() ) {
+    SbjNode* to = e->to();
+    if ( to->is_output() || to->is_dff() ) {
       mMark |= kPoMask;
       break;
     }
@@ -72,11 +73,14 @@ SbjNode::id_str() const
   if ( is_input() ) {
     buf << "I" << id();
   }
+  else if ( is_output() ) {
+    buf << "O" << id();
+  }
   else if ( is_logic() ) {
     buf << "L" << id();
   }
-  else if ( is_output() ) {
-    buf << "O" << id();
+  else if ( is_dff() ) {
+    buf << "D" << id();
   }
   else {
     buf << "X" << id();
@@ -141,6 +145,15 @@ SbjGraph::copy(const SbjGraph& src,
     nodemap[src_node->id()] = dst_node;
   }
 
+  // DFF の生成
+  const SbjNodeList& dff_list = src.dff_list();
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* src_node = *p;
+    SbjNode* dst_node = new_dff(src_node->name());
+    nodemap[src_node->id()] = dst_node;
+  }
+  
   // 論理ノードの生成
   vector<SbjNode*> node_list;
   src.sort(node_list);
@@ -163,6 +176,16 @@ SbjGraph::copy(const SbjGraph& src,
     nodemap[src_node->id()] = dst_node;
   }
 
+  // DFF の入力の接続
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    SbjNode* src_onode = *p;
+    SbjNode* src_inode = src_onode->fanin(0);
+    SbjNode* dst_onode = nodemap[src_onode->id()];
+    SbjNode* dst_inode = nodemap[src_inode->id()];
+    change_dff(dst_onode, dst_inode, src_onode->output_inv());
+  }
+  
   // 外部出力の生成
   const SbjNodeList& output_list = src.output_list();
   for (SbjNodeList::const_iterator p = output_list.begin();
@@ -185,6 +208,11 @@ SbjGraph::clear()
   // まず最初に接続を切る．
   for (SbjNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
+    SbjNode* node = *p;
+    connect(NULL, node, 0);
+  }
+  for (SbjNodeList::iterator p = mDffList.begin();
+       p != mDffList.end(); ++ p) {
     SbjNode* node = *p;
     connect(NULL, node, 0);
   }
@@ -225,81 +253,116 @@ SbjGraph::clear()
   }
   assert_cond(mLnodeList.empty(), __FILE__, __LINE__);
 
+  for (SbjNodeList::iterator p = mDffList.begin();
+       p != mDffList.end(); ) {
+    // p は実際にはノード内のメンバをアクセスするので delete する前に
+    // 進めておく必要がある．
+    SbjNode* node = *p;
+    ++ p;
+    delete_dff(node);
+  }
+  assert_cond(mDffList.empty(), __FILE__, __LINE__);
+
   mInputArray.clear();
   mOutputArray.clear();
 }
 
-// @brief ソートされたノードのリストを得る．
+BEGIN_NONAMESPACE
+
+// node のファンアウトのノードのうち，ファンインがすべてマークされている
+// ノード を node_list に積む．
+void
+sort_sub(SbjNode* node,
+	 vector<bool>& mark,
+	 vector<SbjNode*>& node_list)
+{
+  const SbjEdgeList& fo_list = node->fanout_list();
+  for (SbjEdgeList::const_iterator p = fo_list.begin();
+       p != fo_list.end(); ++ p) {
+    SbjEdge* e = *p;
+    SbjNode* onode = e->to();
+    if ( mark[onode->id()] || !onode->is_logic() ) continue;
+    bool ready = true;
+    for (ymuint i = 0; i < 2; ++ i) {
+      SbjNode* inode0 = onode->fanin(i);
+      if ( !mark[inode0->id()] ) {
+	ready = false;
+	break;
+      }
+    }
+    if ( ready ) {
+      mark[onode->id()] = true;
+      node_list.push_back(onode);
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief ソートされた論理ノードのリストを得る．
 void
 SbjGraph::sort(vector<SbjNode*>& node_list) const
 {
   node_list.clear();
   node_list.reserve(n_lnodes());
 
-  ymuint rpos = 0;
+  vector<bool> mark(max_node_id(), false);
   
-  // 外部入力のみをファンインにするノードを node_list に追加する．
+  // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
   for (SbjNodeList::const_iterator p = mInputList.begin();
        p != mInputList.end(); ++ p) {
     SbjNode* node = *p;
-    node->set_umark();
-    const SbjEdgeList& fo_list = node->fanout_list();
-    for (SbjEdgeList::const_iterator p = fo_list.begin();
-	 p != fo_list.end(); ++ p) {
-      SbjEdge* e = *p;
-      SbjNode* onode = e->to();
-      if ( onode->umark() || onode->is_output() ) continue;
-      bool ready = true;
-      for (ymuint i = 0; i < 2; ++ i) {
-	SbjNode* inode0 = onode->fanin(i);
-	if ( !inode0->umark() ) {
-	  ready = false;
-	  break;
-	}
-      }
-      if ( ready ) {
-	onode->set_umark();
-	node_list.push_back(onode);
-      }
-    }
+    mark[node->id()] = true;
+    sort_sub(node, mark, node_list);
+  }
+  for (SbjNodeList::const_iterator p = mDffList.begin();
+       p != mDffList.end(); ++ p) {
+    SbjNode* node = *p;
+    mark[node->id()] = true;
+    sort_sub(node, mark, node_list);
   }
 
+  ymuint rpos = 0;
   while ( rpos < node_list.size() ) {
     SbjNode* node = node_list[rpos];
     ++ rpos;
-    const SbjEdgeList& fo_list = node->fanout_list();
+    sort_sub(node, mark, node_list);
+  }
+  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+}
+
+BEGIN_NONAMESPACE
+
+// node のファンアウトのノードのうち，ファンインがすべてマークされている
+// ノード を node_list に積む．
+void
+rsort_sub(SbjNode* node,
+	  vector<bool>& mark,
+	  vector<SbjNode*>& node_list)
+{
+  ymuint ni = node->is_logic() ? 2 : 1;
+  for (ymuint i = 0; i < ni; ++ i) {
+    SbjNode* inode = node->fanin(i);
+    if ( inode == NULL || mark[inode->id()] || !inode->is_logic() ) continue;
+    const SbjEdgeList& fo_list = inode->fanout_list();
+    bool ready = true;
     for (SbjEdgeList::const_iterator p = fo_list.begin();
 	 p != fo_list.end(); ++ p) {
       SbjEdge* e = *p;
       SbjNode* onode = e->to();
-      if ( onode->umark() || onode->is_output() ) continue;
-      bool ready = true;
-      for (ymuint i = 0; i < 2; ++ i) {
-	SbjNode* inode0 = onode->fanin(i);
-	if ( !inode0->umark() ) {
-	  ready = false;
-	  break;
-	}
-      }
-      if ( ready ) {
-	onode->set_umark();
-	node_list.push_back(onode);
+      if ( !mark[onode->id()] ) {
+	ready = false;
+	break;
       }
     }
-  }
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
-
-  for (SbjNodeList::const_iterator p = mInputList.begin();
-       p != mInputList.end(); ++ p) {
-    SbjNode* node = *p;
-    node->clear_umark();
-  }
-  for (vector<SbjNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    SbjNode* node = *p;
-    node->clear_umark();
+    if ( ready ) {
+      mark[inode->id()] = true;
+      node_list.push_back(inode);
+    }
   }
 }
+
+END_NONAMESPACE
 
 // @brief 逆順でソートされたノードのリストを得る．
 void
@@ -308,68 +371,30 @@ SbjGraph::rsort(vector<SbjNode*>& node_list) const
   node_list.clear();
   node_list.reserve(n_lnodes());
 
-  ymuint rpos = 0;
+  vector<bool> mark(max_node_id(), false);
 
-  // 外部出力のみをファンアウトにするノードを node_list に追加する．
+  // 外部出力とDFFのみをファンアウトにするノードを node_list に追加する．
   for (SbjNodeList::const_iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
     SbjNode* node = *p;
-    node->set_umark();
-    SbjNode* inode = node->fanin(0);
-    if ( inode == NULL || inode->umark() || inode->is_input() ) continue;
-    const SbjEdgeList& fo_list = inode->fanout_list();
-    bool ready = true;
-    for (SbjEdgeList::const_iterator p = fo_list.begin();
-	 p != fo_list.end(); ++ p) {
-      SbjEdge* e = *p;
-      SbjNode* onode = e->to();
-      if ( !onode->umark() ) {
-	ready = false;
-	break;
-      }
-    }
-    if ( ready ) {
-      inode->set_umark();
-      node_list.push_back(inode);
-    }
+    mark[node->id()] = true;
+    rsort_sub(node, mark, node_list);
+  }
+  for (SbjNodeList::const_iterator p = mDffList.begin();
+       p != mDffList.end(); ++ p) {
+    SbjNode* node = *p;
+    mark[node->id()] = true;
+    rsort_sub(node, mark, node_list);
   }
 
   // node_list からノードを取り出し，同様の処理を行う．
+  ymuint rpos = 0;
   while ( rpos < node_list.size() ) {
     SbjNode* node = node_list[rpos];
     ++ rpos;
-    for (ymuint i = 0; i < 2; ++ i) {
-      SbjNode* inode = node->fanin(i);
-      if ( inode->umark() || inode->is_input() ) continue;
-      const SbjEdgeList& fo_list = inode->fanout_list();
-      bool ready = true;
-      for (SbjEdgeList::const_iterator p = fo_list.begin();
-	   p != fo_list.end(); ++ p) {
-	SbjEdge* e = *p;
-	SbjNode* onode = e->to();
-	if ( !onode->umark() ) {
-	  ready = false;
-	  break;
-	}
-      }
-      if ( ready ) {
-	inode->set_umark();
-	node_list.push_back(inode);
-      }
-    }
+    rsort_sub(node, mark, node_list);
   }
   assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
-
-  for (SbjNodeList::const_iterator p = mOutputList.begin();
-       p != mOutputList.end(); ++ p) {
-    SbjNode* node = *p;
-    node->clear_umark();
-  }
-  for (vector<SbjNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    SbjNode* node = *p;
-    node->clear_umark();
-  }
 }
 
 // 入力ノードを作る．
@@ -432,6 +457,23 @@ SbjGraph::new_logic(const string& name,
   return node;
 }
 
+// DFFノードを作る．
+SbjNode*
+SbjGraph::new_dff(const string& name,
+		  SbjNode* inode,
+		  bool inv)
+{
+  SbjNode* node = new_node(name);
+
+  // DFFリストに登録
+  mDffList.push_back(node);
+
+  node->set_dff(inv);
+  connect(inode, node, 0);
+
+  return node;
+}
+
 // 入力ノードの削除
 void
 SbjGraph::delete_input(SbjNode* node)
@@ -464,6 +506,18 @@ SbjGraph::delete_logic(SbjNode* node)
 
   mLnodeList.erase(node);
   delete_node(node);
+}
+
+// 出力ノードの削除
+void
+SbjGraph::delete_dff(SbjNode* node)
+{
+  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  mDffList.erase(node);
+  delete_node(node);
+
+  mLevel = 0;
+  mLevelValid = false;
 }
 
 // 新しいノードを作成する．
@@ -499,10 +553,11 @@ SbjGraph::delete_node(SbjNode* node)
   // new_node の逆の処理を行なう．
   mItvlMgr.add(static_cast<int>(node->mId));
 }
-    
+
 // @brief 出力ノードの内容を変更する
 // @param[in] 変更対象の出力ノード
 // @param[in] inode 入力のノード
+// @param[in] inv 極性
 void
 SbjGraph::change_output(SbjNode* node,
 			SbjNode* inode,
@@ -526,6 +581,19 @@ SbjGraph::change_logic(SbjNode* node,
   node->set_logic(fcode);
   connect(inode1, node, 0);
   connect(inode2, node, 1);
+}
+
+// @brief DFFノードの内容を変更する
+// @param[in] 変更対象の出力ノード
+// @param[in] inode 入力のノード
+// @param[in] inv 極性
+void
+SbjGraph::change_dff(SbjNode* node,
+		     SbjNode* inode,
+		     bool inv)
+{
+  node->set_dff(inv);
+  connect(inode, node, 0);
 }
 
 // from を to の pos 番目のファンインとする．
@@ -563,6 +631,11 @@ SbjGraph::level() const
       SbjNode* node = *p;
       node->mLevel = 0;
     }
+    for (SbjNodeListConstIter p = dff_list().begin();
+	 p != dff_list().end(); ++ p) {
+      SbjNode* node = *p;
+      node->mLevel = 0;
+    }
     
     vector<SbjNode*> node_list;
     sort(node_list);
@@ -583,6 +656,17 @@ SbjGraph::level() const
     ymuint max_l = 0;
     for (SbjNodeListConstIter p = output_list().begin();
 	 p != output_list().end(); ++ p) {
+      SbjNode* node = *p;
+      SbjNode* inode = node->fanin(0);
+      if ( inode ) {
+	ymuint l1 = inode->mLevel;
+	if ( max_l < l1 ) {
+	  max_l = l1;
+	}
+      }
+    }
+    for (SbjNodeListConstIter p = dff_list().begin();
+	 p != dff_list().end(); ++ p) {
       SbjNode* node = *p;
       SbjNode* inode = node->fanin(0);
       if ( inode ) {
@@ -649,20 +733,6 @@ dump(ostream& s,
       << node->name() << endl;
   }
 
-  const SbjNodeList& lnode_list = sbjgraph.lnode_list();
-  for (SbjNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    s << node->id_str() << ": " << node->name() << " = LOGIC[";
-    ymuint fcode = node->fcode();
-    s << ((fcode >> 3) & 1) << ((fcode >> 2) & 1)
-      << ((fcode >> 1) & 1) << (fcode & 1) << "] ("
-      << " " << node->fanin(0)->id_str()
-      << ", " << node->fanin(1)->id_str()
-      << ")" << endl;
-    s << endl;
-  }
-
   const SbjNodeList& output_list = sbjgraph.output_list();
   for (SbjNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
@@ -687,6 +757,47 @@ dump(ostream& s,
 	s << "0";
       }
     }
+    s << endl;
+  }
+
+  const SbjNodeList& dff_list = sbjgraph.dff_list();
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const SbjNode* node = *p;
+    const SbjEdge* e = node->fanin_edge(0);
+    s << "DFF" << "(" << node->id_str() << "): "
+      << node->name() << " = ";
+    const SbjNode* inode = e->from();
+    if ( inode ) {
+      // 普通のノードの場合
+      if ( node->output_inv() ) {
+	s << "~";
+      }
+      s << inode->id_str();
+    }
+    else {
+      // 定数ノードの場合
+      if ( node->output_inv() ) {
+	s << "1";
+      }
+      else {
+	s << "0";
+      }
+    }
+    s << endl;
+  }
+
+  const SbjNodeList& lnode_list = sbjgraph.lnode_list();
+  for (SbjNodeList::const_iterator p = lnode_list.begin();
+       p != lnode_list.end(); ++ p) {
+    const SbjNode* node = *p;
+    s << node->id_str() << ": " << node->name() << " = LOGIC[";
+    ymuint fcode = node->fcode();
+    s << ((fcode >> 3) & 1) << ((fcode >> 2) & 1)
+      << ((fcode >> 1) & 1) << (fcode & 1) << "] ("
+      << " " << node->fanin(0)->id_str()
+      << ", " << node->fanin(1)->id_str()
+      << ")" << endl;
     s << endl;
   }
 }
@@ -734,6 +845,15 @@ write_blif(ostream& s,
       }
     }
     s << endl;
+  }
+
+  const SbjNodeList& dff_list = sbjgraph.dff_list();
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const SbjNode* node = *p;
+    const SbjNode* inode = node->fanin(0);
+    s << ".latch " << node->name() << " "
+      << inode->name() << endl;
   }
   
   const SbjNodeList& lnode_list = sbjgraph.lnode_list();

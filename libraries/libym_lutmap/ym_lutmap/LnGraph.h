@@ -329,10 +329,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const int kPoShift = 3;
+  const int kTypeShift  = 0;
+  static
+  const int kPoShift    = 3;
+  static
+  const int kSubidShift = 4;
 
   static
-  const ymuint32 kPoMask = 1U << kPoShift;
+  const ymuint32 kTypeMask  = 3U << kTypeShift;
+  static
+  const ymuint32 kPoMask    = 1U << kPoShift;
 
 };
 
@@ -487,11 +493,16 @@ public:
   
   /// @brief DFFノードを作る．
   /// @param[in] name 名前
-  /// @param[in] inode 入力ノード
   /// @return 作成したノードを返す．
   LnNode*
-  new_dff(const string& name,
-	  LnNode* inode);
+  new_dff(const string& name);
+
+  /// @brief DFFノードの入力を設定する．
+  /// @param[in] node 対象の DFF ノード
+  /// @param[in] inode 入力のノード
+  void
+  set_dff_input(LnNode* node,
+		LnNode* inode);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -736,7 +747,7 @@ inline
 void
 LnNode::set_input(ymuint subid)
 {
-  mFlags = static_cast<ymuint>(kINPUT) | (subid << 3);
+  mFlags = static_cast<ymuint>(kINPUT) | (subid << kSubidShift);
 }
 
 // タイプを出力に設定する．
@@ -744,7 +755,7 @@ inline
 void
 LnNode::set_output(ymuint subid)
 {
-  mFlags = static_cast<ymuint>(kOUTPUT) | (subid << 3);
+  mFlags = static_cast<ymuint>(kOUTPUT) | (subid << kSubidShift);
 }
 
 // タイプをLUTに設定する．
@@ -768,7 +779,7 @@ inline
 LnNode::tType
 LnNode::type() const
 {
-  return static_cast<tType>(mFlags & 3);
+  return static_cast<tType>((mFlags & kTypeMask) >> kTypeShift);
 }
 
 // 入力ノードの時に true を返す．
@@ -808,7 +819,7 @@ inline
 ymuint
 LnNode::subid() const
 {
-  return mFlags >> 3;
+  return (mFlags >> kSubidShift);
 }
 
 // @brief 入力数を得る．

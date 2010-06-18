@@ -175,7 +175,8 @@ private:
 /// - 入力ノード
 /// - 出力ノード
 /// - 論理ノード
-/// の 3種類がある．
+/// - DFFノード
+/// の 4種類がある．
 /// @sa SbjEdge SbjGraph
 //////////////////////////////////////////////////////////////////////
 class SbjNode :
@@ -191,7 +192,9 @@ public:
     /// @brief 出力ノード
     kOUTPUT = 1,
     /// @brief 論理ノード
-    kLOGIC = 2
+    kLOGIC = 2,
+    /// @brief DFFノード
+    kDFF = 3
   };
 
 
@@ -242,6 +245,10 @@ public:
   /// @brief 論理ノードの時に true を返す．
   bool
   is_logic() const;
+  
+  /// @brief DFFノードの時に true を返す．
+  bool
+  is_dff() const;
 
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
@@ -417,6 +424,7 @@ private:
   set_input(ymuint subid);
   
   /// @brief タイプを出力に設定する．
+  /// @param[in] inv 反転属性
   void
   set_output(ymuint subid,
 	     bool inv);
@@ -424,6 +432,11 @@ private:
   /// @brief タイプを論理に設定する．
   void
   set_logic(ymuint fcode);
+  
+  /// @brief タイプをDFFに設定する．
+  /// @param[in] inv 反転属性
+  void
+  set_dff(bool inv);
 
   /// @brief 実効的なファンアウト数を計算する．
   void
@@ -433,6 +446,7 @@ private:
   void
   scan_po();
 
+#if 0
   /// @brief sort mark をつける．
   void
   set_umark();
@@ -444,7 +458,7 @@ private:
   /// @brief sort mark を得る．
   bool
   umark() const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -530,14 +544,14 @@ private:
 /// @class SbjGraph SbjGraph.h "SbjGraph.h"
 /// @brief サブジェクトグラフを表すクラス
 ///
-/// 入力ノード，出力ノード，論理ノードを分けてリストで持つ
-/// ( @sa input_list(), output_list(), lnode_list() )．
+/// 入力ノード，出力ノード，論理ノード，DFFノードを分けてリストで持つ
+/// ( @sa input_list(), output_list(), lnode_list(), dff_list() )．
 /// また，すべてのノードに唯一な ID 番号を割り振っており，その ID 番号
 /// からノードを取り出すこともできる( @sa node(ymuint id) )．
 /// 入力ノード，出力ノードは ID 番号とは別に入力 ID 番号，および出力
 /// ID 番号を持っており，それらの ID 番号からノードを取り出すこともできる．
 /// ( @sa input(ymuint id), output(ymuint id) )
-/// binary ノードを入力からのトポロジカル順で処理するためには sort()
+/// 論理ノードを入力からのトポロジカル順で処理するためには sort()
 /// を用いてソートされたノードのベクタを得る．
 /// @sa SbjEdge SbjNode
 //////////////////////////////////////////////////////////////////////
@@ -613,13 +627,19 @@ public:
   const SbjNodeList&
   lnode_list() const;
 
-  /// @brief ソートされたノードのリストを得る．
-  /// @note 入力ノードと出力ノードは含まない．
+  /// @brief DFFノード数を得る．
+  ymuint
+  n_dffs() const;
+  
+  /// @brief DFFノードのリストを得る．
+  const SbjNodeList&
+  dff_list() const;
+
+  /// @brief ソートされた論理ノードのリストを得る．
   void
   sort(vector<SbjNode*>& node_list) const;
 
-  /// @brief 逆順でソートされたノードのリストを得る．
-  /// @note 入力ノードと出力ノードは含まない．
+  /// @brief 逆順で論理ソートされたノードのリストを得る．
   void
   rsort(vector<SbjNode*>& node_list) const;
 
@@ -663,6 +683,16 @@ public:
 	    SbjNode* inode1,
 	    SbjNode* inode2);
   
+  /// @brief DFFノードを作る．
+  /// @param[in] name 名前
+  /// @param[in] inode 入力のノード
+  /// @param[in] inv 極性
+  /// @return 作成したノードを返す．
+  SbjNode*
+  new_dff(const string& name,
+	  SbjNode* inode = NULL,
+	  bool inv = false);
+  
   /// @brief 出力ノードの内容を変更する
   /// @param[in] 変更対象の出力ノード
   /// @param[in] inode 入力のノード
@@ -682,6 +712,15 @@ public:
 	       ymuint fcode,
 	       SbjNode* inode1,
 	       SbjNode* inode2);
+  
+  /// @brief DFFノードの内容を変更する
+  /// @param[in] 変更対象のDFFノード
+  /// @param[in] inode 入力のノード
+  /// @param[in] inv 極性
+  void
+  change_dff(SbjNode* node,
+	     SbjNode* inode,
+	     bool inv);
   
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -747,6 +786,10 @@ private:
   // 論理ノードの削除
   void
   delete_logic(SbjNode* node);
+
+  // DFFノードの削除
+  void
+  delete_dff(SbjNode* node);
   
   // node を削除する．
   void
@@ -798,6 +841,9 @@ private:
   // 論理ノードのリスト
   SbjNodeList mLnodeList;
   
+  // DFFノードのリスト
+  SbjNodeList mDffList;
+  
   // 最大レベル
   mutable
   ymuint32 mLevel;
@@ -821,7 +867,7 @@ void
 write_blif(ostream& s,
 	   const SbjGraph& sbjgraph,
 	   const string& module_name = "sbjgraph");
-  
+
 
 //////////////////////////////////////////////////////////////////////
 // inline 関数の定義
@@ -996,6 +1042,14 @@ SbjNode::set_logic(ymuint fcode)
   mFlags = static_cast<ymuint>(kLOGIC) | (fcode << 3);
 }
 
+// @brief タイプをDFFに設定する．
+inline
+void
+SbjNode::set_dff(bool inv)
+{
+  mFlags = static_cast<ymuint>(kDFF) | (inv << 3);
+}
+
 // タイプを得る．
 inline
 SbjNode::tType
@@ -1026,6 +1080,14 @@ bool
 SbjNode::is_logic() const
 {
   return type() == kLOGIC;
+}
+
+// DFFノードの時に true を返す．
+inline
+bool
+SbjNode::is_dff() const
+{
+  return type() == kDFF;
 }
 
 // @brief サブID (入力／出力番号)を得る．
@@ -1304,6 +1366,7 @@ SbjNode::level() const
   return mLevel;
 }
 
+#if 0
 // @brief sort mark をつける．
 inline
 void
@@ -1327,6 +1390,7 @@ SbjNode::umark() const
 {
   return static_cast<bool>((mMark >> kSortShift) & 1U);
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1412,6 +1476,22 @@ const SbjNodeList&
 SbjGraph::lnode_list() const
 {
   return mLnodeList;
+}
+
+// DFFノード数を得る．
+inline
+ymuint
+SbjGraph::n_dffs() const
+{
+  return mDffList.size();
+}
+
+// DFFノードのリストを得る．
+inline
+const SbjNodeList&
+SbjGraph::dff_list() const
+{
+  return mDffList;
 }
 
 END_NAMESPACE_YM_LUTMAP
