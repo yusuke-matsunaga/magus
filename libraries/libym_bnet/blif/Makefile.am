@@ -2,9 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = \
-	. \
-	tests
+SUBDIRS =
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -16,9 +14,7 @@ noinst_LTLIBRARIES = libym_bnetblifreader.la
 
 libym_bnetblifreader_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la
 
 libym_bnetblifreader_la_LDFLAGS = 
 

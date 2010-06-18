@@ -15,8 +15,6 @@ noinst_LTLIBRARIES = libmagus_logbase_tcl.la
 libmagus_logbase_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnetblifreader/libym_bnetblifreader.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnetiscas89reader/libym_bnetiscas89reader.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 libmagus_logbase_tcl_la_LDFLAGS = 
 libmagus_logbase_tcl_la_SOURCES = \

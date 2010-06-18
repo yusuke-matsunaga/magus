@@ -4,6 +4,7 @@
 
 SUBDIRS = \
 	ym_bnet \
+	$(YM_EXTRA_SUBDIRS) \
 	. \
 	tests
 
@@ -16,6 +17,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_bnet.la
 
 libym_bnet_la_LIBADD = \
+	$(YM_EXTRA_LIBADD) \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
