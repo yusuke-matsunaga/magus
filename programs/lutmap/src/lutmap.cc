@@ -12,6 +12,8 @@
 #include "ym_lutmap/lutmap_nsdef.h"
 #include "ym_lutmap/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
+#include "ym_lutmap/BNet2Sbj.h"
+#include "ym_lutmap/Ln2BNet.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
@@ -50,7 +52,11 @@ main(int argc,
 
     // SbjGraph に変換
     SbjGraph sbj_network;
-    bnet2sbj(network, sbj_network, cerr);
+    BNet2Sbj conv1;
+    bool stat = conv1(network, sbj_network, cerr);
+    if ( !stat ) {
+      return 10;
+    }
 
     // LUT にマッピング
     LnGraph lut_network;

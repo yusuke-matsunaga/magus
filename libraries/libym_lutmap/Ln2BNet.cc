@@ -1,6 +1,6 @@
 
-/// @file libym_lutmap/lut2bnet.cc
-/// @brief lut2bnet() の実装ファイル
+/// @file libym_lutmap/Ln2BNet.cc
+/// @brief Ln2BNet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: lut2bnet.cc 2274 2009-06-10 07:45:29Z matsunaga $
@@ -9,17 +9,20 @@
 /// All rights reserved.
 
 
+#include "ym_lutmap/Ln2BNet.h"
 #include "ym_lutmap/LnGraph.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetManip.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM
 
-// LutNetwork を BNetwork に変換する．
+// @brief LnGraph を BNetwork に変換する．
+// @param[in] src_network 変換元のネットワーク
+// @param[out] dst_network 変換先のネットワーク
 void
-lut2bnet(const LnGraph& src_network,
-	 BNetwork& dst_network)
+Ln2BNet::operator()(const LnGraph& src_network,
+		    BNetwork& dst_network)
 {
   ymuint n = src_network.max_node_id();
   vector<BNode*> node_assoc(n);
@@ -37,6 +40,15 @@ lut2bnet(const LnGraph& src_network,
     node_assoc[src_node->id()] = dst_node;
   }
 
+  // DFF を作る．
+  const LnNodeList& dff_list = src_network.dff_list();
+  for (LnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    LnNode* src_node = *p;
+    BNode* dst_node = manip.new_latch(src_node->name());
+    node_assoc[src_node->id()] = dst_node;
+  }
+  
   // 内部ノードを作る．
   vector<LnNode*> node_list;
   src_network.sort(node_list);
@@ -97,6 +109,18 @@ lut2bnet(const LnGraph& src_network,
     bool stat = manip.change_output(dst_onode, dst_inode);
     assert_cond(stat, __FILE__, __LINE__);
   }
+
+  // DFF ノードの入力を接続を行う．
+  for (LnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    LnNode* onode = *p;
+    LnNode* inode = onode->fanin(0);
+    BNode* dst_inode = node_assoc[inode->id()];
+    assert_cond(dst_inode, __FILE__, __LINE__);
+    BNode* dst_onode = node_assoc[onode->id()];
+    bool stat = manip.change_latch(dst_onode, dst_inode, 2);
+    assert_cond(stat, __FILE__, __LINE__);
+  }
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM

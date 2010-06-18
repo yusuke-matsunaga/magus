@@ -1,6 +1,6 @@
 
-/// @file libym_lutmap/bnet2sbj.cc
-/// @brief bnet2sbj() の実装ファイル
+/// @file libym_lutmap/BNet2Sbj.cc
+/// @brief BNet2Sbj の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: bnet2sbj.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,6 +9,7 @@
 /// All rights reserved.
 
 
+#include "ym_lutmap/BNet2Sbj.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_lutmap/SbjGraph.h"
 
@@ -75,15 +76,24 @@ BNodeMap::get(BNode* bnode,
   return sbjnode != NULL;
 }
 
+END_NAMESPACE_YM_LUTMAP
 
-// BNetwork を SbjGraph に変換する．
-// network はすでに 2-feasible ネットワークに分解されているとする．
-// 2-feasible でない場合には false を返す．
+
+BEGIN_NAMESPACE_YM
+
+// @brief BNetwork を SbjGraph へ変換する
+// @param[in] network 変換元のネットワーク
+// @param[out] sbjgraph 変換先のネットワーク
+// @param[in] err_out エラーメッセージの出力先
+// @note network はすでに 2-feasible ネットワークに分解されているとする．
+// @return 2-feasible でない場合には false を返す．
 bool
-bnet2sbj(const BNetwork& network,
-	 SbjGraph& sbjgraph,
-	 ostream& err_out)
+BNet2Sbj::operator()(const BNetwork& network,
+		     SbjGraph& sbjgraph,
+		     ostream& err_out)
 {
+  using nsYm::nsLutmap::BNodeMap;
+
   ymuint n = network.max_node_id();
   // BNetwork 中のノードと BinGraph 中のノードの対応を持つ連想配列
   BNodeMap assoc(n);
@@ -276,4 +286,4 @@ bnet2sbj(const BNetwork& network,
   return true;
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM

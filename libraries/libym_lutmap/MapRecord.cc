@@ -233,7 +233,7 @@ MapRecord::back_trace(SbjNode* node,
     return mapnode;
   }
 
-  if ( node->is_input() ) {
+  if ( node->is_ppi() ) {
     // ということは inv = true のはず．
     assert_cond(inv, __FILE__, __LINE__);
     // NOT ゲートを表す LUT を作る．
@@ -303,9 +303,10 @@ MapRecord::estimate(const SbjGraph& sbjgraph)
   }
 
   // 外部入力の生成
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
+  list<SbjNode*> tmp_list;
+  sbjgraph.ppi_list(tmp_list);
+  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     SbjNode* node = *p;
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.mMapCount[0] = 1;
@@ -313,12 +314,12 @@ MapRecord::estimate(const SbjGraph& sbjgraph)
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   int lut_num = 0;
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
+  sbjgraph.ppo_list(tmp_list);
+  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     SbjNode* onode = *p;
     SbjNode* node = onode->fanin(0);
-    if ( node && !node->is_input() ) {
+    if ( node && node->is_logic() ) {
       if ( mNodeInfo[node->id()].mCut == NULL ) {
 	lut_num = -1;
 	break;
@@ -343,7 +344,7 @@ MapRecord::back_trace2(SbjNode* node,
     return 0;
   }
 
-  if ( node->is_input() ) {
+  if ( node->is_ppi() ) {
     // ということは inv = true のはず．
     node_info.mMapCount[1] = 1;
     // インバーターが必要ということ
@@ -409,7 +410,7 @@ MapRecord::clear_mark(SbjNode* node)
   NodeInfo& node_info = mNodeInfo[node->id()];
   if ( node_info.mTmpFlag ) {
     node_info.mTmpFlag = false;
-    if ( !node->is_input() ) {
+    if ( node->is_logic() ) {
       clear_mark(node->fanin(0));
       clear_mark(node->fanin(1));
     }

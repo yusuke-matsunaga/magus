@@ -1,7 +1,7 @@
 #ifndef YM_LUTMAP_SBJGRAPH_H
 #define YM_LUTMAP_SBJGRAPH_H
 
-/// @file ym_lutmap/SbjGraph.h 
+/// @file ym_lutmap/SbjGraph.h
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -16,25 +16,9 @@
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
-#include "ym_bnet/BNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-class SbjEdge;
-class SbjNode;
-class SbjGraph;
-
-typedef DlList<SbjEdge> SbjEdgeList;
-typedef DlListConstIter<SbjEdge> SbjEdgeListConstIter;
-typedef DlList<SbjNode> SbjNodeList;
-typedef DlListConstIter<SbjNode> SbjNodeListConstIter;
-
-bool
-bnet2sbj(const BNetwork& network,
-	 SbjGraph& sbjgraph,
-	 ostream& err_out);
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class SbjEdge SbjGraph.h "SbjGraph.h"
@@ -250,6 +234,14 @@ public:
   bool
   is_dff() const;
 
+  /// @brief 入力ノードか DFF ノードの時に true を返す．
+  bool
+  is_ppi() const;
+
+  /// @brief 出力ノードか DFF ノードの時に true を返す．
+  bool
+  is_ppo() const;
+  
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
   ymuint
@@ -446,19 +438,6 @@ private:
   void
   scan_po();
 
-#if 0
-  /// @brief sort mark をつける．
-  void
-  set_umark();
-
-  /// @brief sort mark を消す．
-  void
-  clear_umark();
-
-  /// @brief sort mark を得る．
-  bool
-  umark() const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -512,11 +491,9 @@ private:
   static
   const int kPoShift = 5;
   static
-  const int kSortShift = 6;
+  const int kV1Shift = 6;
   static
-  const int kV1Shift = 7;
-  static
-  const int kV2Shift = 8;
+  const int kV2Shift = 7;
   
   static
   const ymuint kFoMask = 1U << kFoShift;
@@ -530,8 +507,6 @@ private:
   const ymuint kFlowMask = 1U << kFlowShift;
   static
   const ymuint kPoMask = 1U << kPoShift;
-  static
-  const ymuint kSortMask = 1U << kSortShift;
   static
   const ymuint kV1Mask = 1U << kV1Shift;
   static
@@ -605,6 +580,12 @@ public:
   const SbjNodeList&
   input_list() const;
 
+  /// @brief 入力ノードと DFF ノードのリストを返す．
+  /// @param[out] node_list ノードを格納するリスト
+  /// @return 要素数を返す．
+  ymuint
+  ppi_list(list<SbjNode*>& node_list) const;
+
   /// @brief 出力のノード数を得る．
   ymuint
   n_outputs() const;
@@ -615,9 +596,15 @@ public:
   SbjNode*
   output(ymuint id) const;
 
-  /// @brief 入力ノードのリストを得る．
+  /// @brief 出力ノードのリストを得る．
   const SbjNodeList&
   output_list() const;
+
+  /// @brief 出力ノードと DFF ノードのリストを返す．
+  /// @param[out] node_list ノードを格納するリスト
+  /// @return 要素数を返す．
+  ymuint
+  ppo_list(list<SbjNode*>& node_list) const;
 
   /// @brief 論理ノード数を得る．
   ymuint
@@ -1090,6 +1077,22 @@ SbjNode::is_dff() const
   return type() == kDFF;
 }
 
+// @brief 入力ノードか DFF ノードの時に true を返す．
+inline
+bool
+SbjNode::is_ppi() const
+{
+  return type() == kINPUT || type() == kDFF;
+}
+
+// @brief 出力ノードか DFF ノードの時に true を返す．
+inline
+bool
+SbjNode::is_ppo() const
+{
+  return type() == kOUTPUT || type() == kDFF;
+}
+
 // @brief サブID (入力／出力番号)を得る．
 inline
 ymuint
@@ -1366,32 +1369,6 @@ SbjNode::level() const
   return mLevel;
 }
 
-#if 0
-// @brief sort mark をつける．
-inline
-void
-SbjNode::set_umark()
-{
-  mMark |= kSortMask;
-}
-
-// @brief sort mark を消す．
-inline
-void
-SbjNode::clear_umark()
-{
-  mMark &= ~kSortMask;
-}
-
-// @brief sort mark を得る．
-inline
-bool
-SbjNode::umark() const
-{
-  return static_cast<bool>((mMark >> kSortShift) & 1U);
-}
-#endif
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス SbjGraph
@@ -1495,11 +1472,5 @@ SbjGraph::dff_list() const
 }
 
 END_NAMESPACE_YM_LUTMAP
-
-BEGIN_NAMESPACE_YM
-
-using nsLutmap::bnet2sbj;
-
-END_NAMESPACE_YM
 
 #endif // YM_LUTMAP_SBJGRAPH_H

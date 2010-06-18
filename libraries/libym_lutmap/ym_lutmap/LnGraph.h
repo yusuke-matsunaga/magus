@@ -16,15 +16,9 @@
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
-#include "ym_bnet/BNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-void
-lut2bnet(const LnGraph& src_network,
-	 BNetwork& dst_network);
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class LnEdge LnGraph.h "LnGraph.h"
@@ -205,6 +199,14 @@ public:
   bool
   is_dff() const;
 
+  /// @brief 入力ノードか DFF ノードの時に true を返す．
+  bool
+  is_ppi() const;
+
+  /// @brief 出力ノードか DFF ノードの時に true を返す．
+  bool
+  is_ppo() const;
+  
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
   ymuint
@@ -411,6 +413,12 @@ public:
   const LnNodeList&
   input_list() const;
 
+  /// @brief 入力ノードと DFF ノードのリストを得る．
+  /// @param[out] node_list ノードを格納するリスト
+  /// @return 要素数を返す．
+  ymuint
+  ppi_list(list<LnNode*>& node_list) const;
+  
   /// @brief 出力のノード数を得る．
   ymuint
   n_outputs() const;
@@ -421,9 +429,15 @@ public:
   LnNode*
   output(ymuint id) const;
 
-  /// @brief 入力ノードのリストを得る．
+  /// @brief 出力ノードのリストを得る．
   const LnNodeList&
   output_list() const;
+
+  /// @brief 出力ノードと DFF ノードのリストを得る．
+  /// @param[out] node_list ノードを格納するリスト
+  /// @return 要素数を返す．
+  ymuint
+  ppo_list(list<LnNode*>& node_list) const;
 
   /// @brief LUTノード数を得る．
   ymuint
@@ -814,6 +828,22 @@ LnNode::is_dff() const
   return type() == kDFF;
 }
 
+// @brief 入力ノードか DFF ノードの時に true を返す．
+inline
+bool
+LnNode::is_ppi() const
+{
+  return type() == kINPUT || type() == kDFF;
+}
+
+// @brief 出力ノードか DFF ノードの時に true を返す．
+inline
+bool
+LnNode::is_ppo() const
+{
+  return type() == kOUTPUT || type() == kDFF;
+}
+
 // @brief サブID (入力／出力番号)を得る．
 inline
 ymuint
@@ -1017,11 +1047,5 @@ LnGraph::dff_list() const
 }
 
 END_NAMESPACE_YM_LUTMAP
-
-BEGIN_NAMESPACE_YM
-
-using nsLutmap::lut2bnet;
-
-END_NAMESPACE_YM
 
 #endif // YM_LUTMAP_LUTNETWORK_H

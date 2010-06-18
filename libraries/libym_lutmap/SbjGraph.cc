@@ -58,7 +58,7 @@ SbjNode::scan_po()
        p != mFanoutList.end(); ++ p) {
     SbjEdge* e = *p;
     SbjNode* to = e->to();
-    if ( to->is_output() || to->is_dff() ) {
+    if ( to->is_ppo() ) {
       mMark |= kPoMask;
       break;
     }
@@ -267,6 +267,43 @@ SbjGraph::clear()
   mOutputArray.clear();
 }
 
+// @brief 入力ノードと DFF ノードのリストを返す．
+// @param[out] node_list ノードを格納するリスト
+// @return 要素数を返す．
+ymuint
+SbjGraph::ppi_list(list<SbjNode*>& node_list) const
+{
+  node_list.clear();
+  for (SbjNodeList::const_iterator p = input_list().begin();
+       p != input_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  for (SbjNodeList::const_iterator p = dff_list().begin();
+       p != dff_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  return node_list.size();
+}
+
+// @brief 出力ノードと DFF ノードのリストを返す．
+// @param[out] node_list ノードを格納するリスト
+// @return 要素数を返す．
+ymuint
+SbjGraph::ppo_list(list<SbjNode*>& node_list) const
+{
+  node_list.clear();
+  for (SbjNodeList::const_iterator p = output_list().begin();
+       p != output_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  for (SbjNodeList::const_iterator p = dff_list().begin();
+       p != dff_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  return node_list.size();
+}
+
+
 BEGIN_NONAMESPACE
 
 // node のファンアウトのノードのうち，ファンインがすべてマークされている
@@ -309,14 +346,10 @@ SbjGraph::sort(vector<SbjNode*>& node_list) const
   vector<bool> mark(max_node_id(), false);
   
   // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
-  for (SbjNodeList::const_iterator p = mInputList.begin();
-       p != mInputList.end(); ++ p) {
-    SbjNode* node = *p;
-    mark[node->id()] = true;
-    sort_sub(node, mark, node_list);
-  }
-  for (SbjNodeList::const_iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
+  list<SbjNode*> tmp_list;
+  ppi_list(tmp_list);
+  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     SbjNode* node = *p;
     mark[node->id()] = true;
     sort_sub(node, mark, node_list);
@@ -330,6 +363,7 @@ SbjGraph::sort(vector<SbjNode*>& node_list) const
   }
   assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
 }
+
 
 BEGIN_NONAMESPACE
 
@@ -374,14 +408,10 @@ SbjGraph::rsort(vector<SbjNode*>& node_list) const
   vector<bool> mark(max_node_id(), false);
 
   // 外部出力とDFFのみをファンアウトにするノードを node_list に追加する．
-  for (SbjNodeList::const_iterator p = mOutputList.begin();
-       p != mOutputList.end(); ++ p) {
-    SbjNode* node = *p;
-    mark[node->id()] = true;
-    rsort_sub(node, mark, node_list);
-  }
-  for (SbjNodeList::const_iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
+  list<SbjNode*> tmp_list;
+  ppo_list(tmp_list);
+  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     SbjNode* node = *p;
     mark[node->id()] = true;
     rsort_sub(node, mark, node_list);
@@ -626,13 +656,10 @@ ymuint
 SbjGraph::level() const
 {
   if ( !mLevelValid ) {
-    for (SbjNodeListConstIter p = input_list().begin();
-	 p != input_list().end(); ++ p) {
-      SbjNode* node = *p;
-      node->mLevel = 0;
-    }
-    for (SbjNodeListConstIter p = dff_list().begin();
-	 p != dff_list().end(); ++ p) {
+    list<SbjNode*> tmp_list;
+    ppi_list(tmp_list);
+    for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+	 p != tmp_list.end(); ++ p) {
       SbjNode* node = *p;
       node->mLevel = 0;
     }
@@ -654,8 +681,9 @@ SbjGraph::level() const
     }
     
     ymuint max_l = 0;
-    for (SbjNodeListConstIter p = output_list().begin();
-	 p != output_list().end(); ++ p) {
+    ppo_list(tmp_list);
+    for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+	 p != tmp_list.end(); ++ p) {
       SbjNode* node = *p;
       SbjNode* inode = node->fanin(0);
       if ( inode ) {
@@ -665,17 +693,7 @@ SbjGraph::level() const
 	}
       }
     }
-    for (SbjNodeListConstIter p = dff_list().begin();
-	 p != dff_list().end(); ++ p) {
-      SbjNode* node = *p;
-      SbjNode* inode = node->fanin(0);
-      if ( inode ) {
-	ymuint l1 = inode->mLevel;
-	if ( max_l < l1 ) {
-	  max_l = l1;
-	}
-      }
-    }
+
     mLevel = max_l;
     mLevelValid = true;
   }

@@ -18,9 +18,9 @@ INCLUDES = \
 libym_lutmap_la_SOURCES = \
 	SbjGraph.cc \
 	SbjGraph_mindepth.cc \
-	bnet2sbj.cc \
+	BNet2Sbj.cc \
 	LnGraph.cc \
-	lut2bnet.cc \
+	Ln2BNet.cc \
 	EnumCutOp.h \
 	EnumCutOp.cc \
 	EnumCut.h \

@@ -11,7 +11,7 @@
 
 #include "LutmapCmd.h"
 #include "NetHandle.h"
-#include "ym_bnet/BNetwork.h"
+#include "ym_lutmap/Ln2BNet.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -61,7 +61,8 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
       neth = cur_nethandle();
     }
     BNetwork& dst_network = *neth->bnetwork();
-    lut2bnet(lutnetwork(), dst_network);
+    Ln2BNet conv;
+    conv(lutnetwork(), dst_network);
     return TCL_OK;
   }
   catch ( AssertError x ) {

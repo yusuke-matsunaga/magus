@@ -60,19 +60,10 @@ CutResub::operator()(const SbjGraph& sbjgraph,
   sbjgraph.sort(snode_list);
 
   // 外部入力ノードの対応付けを行う．
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    SbjNode* sbjnode = *p;
-    CrNode* node = alloc_node();
-    mNodeArray[sbjnode->id()] = node;
-    node->set_sbjnode(sbjnode);
-  }
-
-  // DFFノードの対応付けを行う．
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
+  list<SbjNode*> tmp_list;
+  sbjgraph.ppi_list(tmp_list);
+  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     SbjNode* sbjnode = *p;
     CrNode* node = alloc_node();
     mNodeArray[sbjnode->id()] = node;
@@ -80,22 +71,12 @@ CutResub::operator()(const SbjGraph& sbjgraph,
   }
   
   // 外部出力からバックトレースを行う．
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
+  sbjgraph.ppo_list(tmp_list);
+  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     SbjNode* onode = *p;
     SbjNode* sbjnode = onode->fanin(0);
-    if ( sbjnode && !sbjnode->is_input() ) {
-      back_trace(sbjnode, maprec, NULL);
-    }
-  }
-  
-  // DFFからバックトレースを行う．
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    SbjNode* onode = *p;
-    SbjNode* sbjnode = onode->fanin(0);
-    if ( sbjnode && !sbjnode->is_input() ) {
+    if ( sbjnode && !sbjnode->is_ppi() ) {
       back_trace(sbjnode, maprec, NULL);
     }
   }
@@ -273,7 +254,7 @@ CutResub::back_trace(SbjNode* sbjnode,
     // 同時にファンアウトリストを構築する．
     for (ymuint i = 0; i < cut->ni(); ++ i) {
       SbjNode* inode = cut->input(i);
-      if ( !inode->is_input() ) {
+      if ( !inode->is_ppi() ) {
 	back_trace(inode, maprec, node);
       }
     }

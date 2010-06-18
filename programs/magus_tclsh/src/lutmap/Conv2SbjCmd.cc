@@ -10,8 +10,8 @@
 
 
 #include "LutmapCmd.h"
-#include "ym_lutmap/SbjGraph.h"
-#include "ym_bnet/bnet_nsdef.h"
+#include "ym_lutmap/BNet2Sbj.h"
+
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -44,7 +44,8 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
   try {
     ostringstream err_out;
     BNetwork& src_network = *cur_network();
-    bool stat = bnet2sbj(src_network, sbjgraph(), err_out);
+    BNet2Sbj conv;
+    bool stat = conv(src_network, sbjgraph(), err_out);
     TclObj emsg = err_out.str();
     set_result(emsg);
     return stat ? TCL_OK : TCL_ERROR;

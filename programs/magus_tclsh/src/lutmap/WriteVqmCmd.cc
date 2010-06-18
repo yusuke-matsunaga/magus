@@ -46,12 +46,14 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   fout << " clk ," << endl;
 
   const char* comma = "";
-  for ( LnNodeListConstIter i = pi_list.begin(); i != pi_list.end(); ++i ) {
+  for (LnNodeList::const_iterator i = pi_list.begin();
+       i != pi_list.end(); ++i ) {
     const LnNode* pi = *i;
     fout << comma << " pi_" << pi->name();
     comma = ", ";
   }
-  for ( LnNodeListConstIter i = po_list.begin(); i != po_list.end(); ++i ) {
+  for ( LnNodeList::const_iterator i = po_list.begin();
+	i != po_list.end(); ++i ) {
     fout << " ," << endl;
     const LnNode* po = *i;
     fout << " po_" << po->name();
@@ -60,26 +62,31 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
        << ");" << endl;
   
   fout << " input clk ;" << endl;
-  for ( LnNodeListConstIter i = pi_list.begin(); i != pi_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = pi_list.begin();
+	i != pi_list.end(); ++i ){
     const LnNode* pi = *i;
     fout << " input pi_" << pi->name() << " ;" << endl;
   }
-  for ( LnNodeListConstIter i = po_list.begin(); i != po_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = po_list.begin();
+	i != po_list.end(); ++i ){
     const LnNode* po = *i;
     fout << " output po_" << po->name() << " ;" << endl;
   }
-  for ( LnNodeListConstIter i = pi_list.begin(); i != pi_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = pi_list.begin();
+	i != pi_list.end(); ++i ){
     const LnNode* pi = *i;
     fout << " wire w_" << pi->name() << " ;" << endl;
   }
-  for ( LnNodeListConstIter i = po_list.begin(); i != po_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = po_list.begin();
+	i != po_list.end(); ++i ){
     const LnNode* po = *i;
     const LnNode* po_fi = po->fanin(0);
     if ( po_fi->name() != po->name() ){
       fout << " wire w_" << po->name() << " ;" << endl;
     }
   }
-  for ( LnNodeListConstIter i = lut_list.begin(); i != lut_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = lut_list.begin();
+	i != lut_list.end(); ++i ){
     const LnNode* lut = *i;
     fout << " wire w_" << lut->name() << " ;" << endl;
   }
@@ -90,7 +97,8 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   fout << "assign w_gnd = 1'b0 ;" << endl;
   fout << endl;
   
-  for ( LnNodeListConstIter i = pi_list.begin(); i != pi_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = pi_list.begin();
+	i != pi_list.end(); ++i ){
     const LnNode* pi = *i;
     fout << " DFFE FI" << pi->name()
 	 << "( .Q(w_" << pi->name() << ")"
@@ -98,7 +106,8 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
 	 << ", .D(pi_" << pi->name() << ")"
 	 << ", .CLRN(w_one),　.PRN(w_one));" << endl;
   }
-  for ( LnNodeListConstIter i = po_list.begin(); i != po_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = po_list.begin();
+	i != po_list.end(); ++i ){
     const LnNode* po = *i;
     const LnNode* po_fanin = po->fanin(0);
     fout << " DFFE FO" << po->name()
@@ -113,7 +122,8 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   lut_in[2] = "datac";
   lut_in[3] = "datad";
   
-  for ( LnNodeListConstIter i = lut_list.begin(); i != lut_list.end(); ++i ){
+  for ( LnNodeList::const_iterator i = lut_list.begin();
+	i != lut_list.end(); ++i ){
     const LnNode* lut = *i;
     vector<int> bool_table;
     lut->tv( bool_table ); // 真理値表を得る

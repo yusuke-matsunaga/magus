@@ -29,14 +29,18 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_LUTMAP
 
 class SbjGraph;
+class SbjEdge;
+class SbjNode;
+
+typedef DlList<SbjEdge> SbjEdgeList;
+typedef DlList<SbjNode> SbjNodeList;
+
 class LnGraph;
 class LnEdge;
 class LnNode;
 
 typedef DlList<LnEdge> LnEdgeList;
-typedef DlListConstIter<LnEdge> LnEdgeListConstIter;
 typedef DlList<LnNode> LnNodeList;
-typedef DlListConstIter<LnNode> LnNodeListConstIter;
 
 
 /// @brief 面積最小化 DAG covering のヒューリスティック関数
@@ -84,16 +88,21 @@ END_NAMESPACE_YM_LUTMAP
 BEGIN_NAMESPACE_YM
 
 using nsLutmap::SbjGraph;
+using nsLutmap::SbjEdge;
+using nsLutmap::SbjNode;
+
+using nsLutmap::SbjEdgeList;
+using nsLutmap::SbjNodeList;
+
 using nsLutmap::LnGraph;
-using nsLutmap::area_map;
-using nsLutmap::delay_map;
 using nsLutmap::LnEdge;
 using nsLutmap::LnNode;
 
 using nsLutmap::LnEdgeList;
-using nsLutmap::LnEdgeListConstIter;
 using nsLutmap::LnNodeList;
-using nsLutmap::LnNodeListConstIter;
+
+using nsLutmap::area_map;
+using nsLutmap::delay_map;
 
 END_NAMESPACE_YM
 

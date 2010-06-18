@@ -40,7 +40,8 @@ LnNode::scan_po()
   for (LnEdgeList::iterator p = mFanoutList.begin();
        p != mFanoutList.end(); ++ p) {
     LnEdge* e = *p;
-    if ( e->to()->is_output() ) {
+    LnNode* to = e->to();
+    if ( to->is_ppo() ) {
       mFlags |= kPoMask;
       break;
     }
@@ -173,6 +174,43 @@ LnGraph::copy(const LnGraph& src,
   }
 }
 
+// @brief 入力ノードと DFF ノードのリストを得る．
+// @param[out] node_list ノードを格納するリスト
+// @return 要素数を返す．
+ymuint
+LnGraph::ppi_list(list<LnNode*>& node_list) const
+{
+  node_list.clear();
+  for (LnNodeList::const_iterator p = input_list().begin();
+       p != input_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  for (LnNodeList::const_iterator p = dff_list().begin();
+       p != dff_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  return node_list.size();
+}
+
+// @brief 出力ノードと DFF ノードのリストを得る．
+// @param[out] node_list ノードを格納するリスト
+// @return 要素数を返す．
+ymuint
+LnGraph::ppo_list(list<LnNode*>& node_list) const
+{
+  node_list.clear();
+  for (LnNodeList::const_iterator p = output_list().begin();
+       p != output_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  for (LnNodeList::const_iterator p = dff_list().begin();
+       p != dff_list().end(); ++ p) {
+    node_list.push_back(*p);
+  }
+  return node_list.size();
+}
+
+
 BEGIN_NONAMESPACE
 
 // node のファンアウトのうちファンインがすべてマークされているノード
@@ -217,21 +255,17 @@ LnGraph::sort(vector<LnNode*>& node_list) const
   vector<bool> mark(n, false);
     
   // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
-  for (LnNodeList::const_iterator p = mInputList.begin();
-       p != mInputList.end(); ++ p) {
-    LnNode* node = *p;
-    mark[node->id()] = true;
-    sort_sub(node, mark, node_list);
-  }
-  for (LnNodeList::const_iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
+  list<LnNode*> tmp_list;
+  ppi_list(tmp_list);
+  for (list<LnNode*>::const_iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     LnNode* node = *p;
     mark[node->id()] = true;
     sort_sub(node, mark, node_list);
   }
 
   // 入力を持たないノード(定数ノード)を node_list に追加する．
-  for (LnNodeListConstIter p = mLutList.begin();
+  for (LnNodeList::const_iterator p = mLutList.begin();
        p != mLutList.end(); ++ p) {
     LnNode* node = *p;
     if ( node->ni() == 0 && !mark[node->id()] ) {
@@ -559,13 +593,10 @@ ymuint
 LnGraph::level() const
 {
   if ( !mLevelValid ) {
-    for (LnNodeListConstIter p = input_list().begin();
-	 p != input_list().end(); ++ p) {
-      LnNode* node = *p;
-      node->mLevel = 0;
-    }
-    for (LnNodeListConstIter p = dff_list().begin();
-	 p != dff_list().end(); ++ p) {
+    list<LnNode*> tmp_list;
+    ppi_list(tmp_list);
+    for (list<LnNode*>::const_iterator p = tmp_list.begin();
+	 p != tmp_list.end(); ++ p) {
       LnNode* node = *p;
       node->mLevel = 0;
     }
@@ -588,19 +619,9 @@ LnGraph::level() const
     }
     
     ymuint max_l = 0;
-    for (LnNodeListConstIter p = output_list().begin();
-	 p != output_list().end(); ++ p) {
-      LnNode* node = *p;
-      LnNode* inode = node->fanin(0);
-      if ( inode ) {
-	ymuint l1 = inode->mLevel;
-	if ( max_l < l1 ) {
-	  max_l = l1;
-	}
-      }
-    }
-    for (LnNodeListConstIter p = dff_list().begin();
-	 p != dff_list().end(); ++ p) {
+    ppo_list(tmp_list);
+    for (list<LnNode*>::const_iterator p = tmp_list.begin();
+	 p != tmp_list.end(); ++ p) {
       LnNode* node = *p;
       LnNode* inode = node->fanin(0);
       if ( inode ) {

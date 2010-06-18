@@ -135,7 +135,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 	    }
 	  }
 	}
-	else { // is_input() == true
+	else { // is_ppi() == true
 	  set_temp2mark(node);
 	}
       }
