@@ -1,0 +1,58 @@
+#ifndef YM_MVN_MVN_NSDEF_H
+#define YM_MVN_MVN_NSDEF_H
+
+/// @file ym_mvn/mvn_nsdef.h
+/// @brief mvn の名前空間の定義ファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ymtools.h"
+#include "ym_utils/DlList.h"
+
+
+/// @brief mvn 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_MVN \
+BEGIN_NAMESPACE_YM \
+BEGIN_NAMESPACE(nsMvn)
+
+/// @brief mvn 用の名前空間の終了
+#define END_NAMESPACE_YM_MVN \
+END_NAMESPACE(nsMvn) \
+END_NAMESPACE_YM
+
+
+BEGIN_NAMESPACE_YM_MVN
+
+// クラス名の先行宣言
+
+class MvMgr;
+class MvModule;
+class MvPort;
+class MvNode;
+class MvInputPin;
+class MvOutputPin;
+class MvNet;
+
+typedef DlList<MvNode> MvNodeList;
+typedef DlList<MvNet> MvNetList;
+
+END_NAMESPACE_YM_MVN
+
+BEGIN_NAMESPACE_YM
+
+using nsMvn::MvMgr;
+using nsMvn::MvModule;
+using nsMvn::MvPort;
+using nsMvn::MvNode;
+using nsMvn::MvNodeList;
+using nsMvn::MvInputPin;
+using nsMvn::MvOutputPin;
+using nsMvn::MvNet;
+using nsMvn::MvNetList;
+
+END_NAMESPACE_YM
+
+#endif // YM_MVN_MVN_NSDEF_H
