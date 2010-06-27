@@ -47,11 +47,11 @@ public:
     kXor,
 
     /// @brief reduction and ( 1入力, 1出力 )
-    kRAnd,
+    kRand,
     /// @brief reduction or ( 1入力, 1出力 )
-    kROr,
+    kRor,
     /// @brief reduction xor ( 1入力, 1出力 )
-    kRXor,
+    kRxor,
 
     /// @brief equal ( 2入力, 1出力 )
     kEq,
@@ -94,7 +94,10 @@ public:
     
     /// @brief module instance ( n入力, m出力 )
     kInst,
-    
+
+    /// @brief constant ( 0入力, 1出力 )
+    kConst
+
   };
 
 
@@ -120,9 +123,8 @@ public:
 
   /// @brief 入力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
-  virtual
   const MvInputPin*
-  input(ymuint pos) const = 0;
+  input(ymuint pos) const;
 
   /// @brief 出力ピン数を得る．
   virtual
@@ -131,9 +133,8 @@ public:
 
   /// @brief 出力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
-  virtual
   const MvOutputPin*
-  output(ymuint pos) const = 0;
+  output(ymuint pos) const;
 
   /// @brief 入力ノード/出力ノードの場合に位置を返す．
   /// @note type() が kInput と kOutput の時のみ意味を持つ．
@@ -149,6 +150,14 @@ public:
   const MvModule*
   module() const;
 
+  /// @brief 定数値を得る．
+  /// @param[out] val 値を格納するベクタ
+  /// @note type() が kConst の時のみ意味を持つ．
+  /// @note デフォルトの実装ではなにもしない．
+  virtual
+  void
+  const_value(vector<ymuint32>& val) const;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -156,11 +165,27 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  MvNode() { }
+  /// @param[in] module 親のモジュール
+  MvNode(MvModule* parent);
 
   /// @brief デストラクタ
   virtual
-  ~MvNode() { }
+  ~MvNode();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスで用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @param[in] ピンを初期化する．
+  /// @param[in] pin 対象のピン
+  /// @param[in] pos 位置
+  /// @param[in] bit_width ビット幅
+  void
+  init_pin(MvPin* pin,
+	   ymuint pos,
+	   ymuint bit_width);
 
 
 private:
@@ -192,23 +217,6 @@ private:
   // 親のモジュール
   MvModule* mParent;
 
-#if 0
-  // ノードの種類
-  tType mType;
-  
-  // 入力ピン数
-  ymuint32 mInputNum;
-
-  // 入力ピンの実体の配列
-  MvInputPin* mInputArray;
-
-  // 出力ピン
-  ymuint32 mOutputNum;
-
-  // 出力ピンの実体の配列
-  MvOutputPin* mOutputArray;
-#endif
-
 };
 
 
@@ -232,47 +240,13 @@ MvNode::parent() const
   return mParent;
 }
 
-#if 0
-// @brief ノードの種類を得る．
-inline
-tType
-MvNode::type() const
-{
-  return mType;
-}
-
-// @brief 入力ピン数を得る．
-inline
-ymuint
-MvNode::input_num() const
-{
-  return mInputNum;
-}
-
 // @brief 入力ピンを得る．
 // @param[in] pos 位置 ( 0 <= pos < input_num() )
 inline
 const MvInputPin*
 MvNode::input(ymuint pos) const
 {
-  return &mInputArray[pos];
-}
-
-// @brief 入力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < input_num() )
-inline
-MvInputPin*
-MvNode::input(ymuint pos)
-{
-  return &mInputArray[pos];
-}
-
-// @brief 出力ピン数を得る．
-inline
-ymuint
-MvNode::output_num() const
-{
-  return mOutputNum;
+  return const_cast<MvNode*>(this)->input(pos);
 }
 
 // @brief 出力ピンを得る．
@@ -281,18 +255,8 @@ inline
 const MvOutputPin*
 MvNode::output(ymuint pos) const
 {
-  return &mOutputArray[pos];
+  return const_cast<MvNode*>(this)->output(pos);
 }
-
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-inline
-MvOutputPin*
-MvNode::output(ymuint pos)
-{
-  return &mOutputArray[pos];
-}
-#endif
 
 END_NAMESPACE_YM_MVN
 

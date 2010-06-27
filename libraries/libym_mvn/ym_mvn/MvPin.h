@@ -20,7 +20,13 @@ BEGIN_NAMESPACE_YM_MVN
 //////////////////////////////////////////////////////////////////////
 class MvPin
 {
+  friend class MvNode;
+
 public:
+
+  /// @breif 属しているノードを得る．
+  MvNode*
+  node() const;
 
   /// @brief ビット幅を得る．
   ymuint
@@ -49,6 +55,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 親のノード
+  MvNode* mNode;
+  
   // ビット幅
   ymuint32 mBitWidth;
 
@@ -65,16 +74,9 @@ private:
 class MvInputPin :
   public MvPin
 {
-  friend class MvNode;
+  friend class MvMgr;
 
 public:
-
-  /// @brief 接続しているネットを得る．
-  MvNet*
-  net() const;
-
-
-private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
   //////////////////////////////////////////////////////////////////////
@@ -84,6 +86,13 @@ private:
 
   /// @brief デストラクタ
   ~MvInputPin();
+
+
+public:
+
+  /// @brief 接続しているネットを得る．
+  MvNet*
+  net() const;
 
 
 private:
@@ -104,16 +113,9 @@ private:
 class MvOutputPin :
   public MvPin
 {
-  friend class MvNode;
+  friend class MvMgr;
 
 public:
-
-  /// @brief 接続しているネットのリストを得る．
-  const MvNetList&
-  net_list() const;
-
-
-private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
   //////////////////////////////////////////////////////////////////////
@@ -123,6 +125,13 @@ private:
 
   /// @brief デストラクタ
   ~MvOutputPin();
+
+
+public:
+
+  /// @brief 接続しているネットのリストを得る．
+  const MvNetList&
+  net_list() const;
 
 
 private:
@@ -139,6 +148,14 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @breif 属しているノードを得る．
+inline
+MvNode*
+MvPin::node() const
+{
+  return mNode;
+}
 
 // @brief ビット幅を得る．
 inline

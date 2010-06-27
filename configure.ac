@@ -67,6 +67,7 @@ ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_bnet_enable=1
 ym_libym_bdn_enable=1
+ym_libym_mvn_enable=1
 ym_libym_aig_enable=1
 ym_libym_tgnet_enable=1
 ym_libym_gds_enable=1
@@ -133,6 +134,10 @@ YM_BUILD_LIBRARY([libym_bnet],
 YM_BUILD_LIBRARY([libym_bdn],
 		 [ym_libym_utils_enable,
 		  ym_libym_lexp_enable])
+
+# libym_mvn
+YM_BUILD_LIBRARY([libym_mvn],
+		 [ym_libym_utils_enable])
 
 # libym_aig
 YM_BUILD_LIBRARY([libym_aig],

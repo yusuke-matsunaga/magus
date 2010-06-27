@@ -65,13 +65,11 @@ public:
 
   /// @brief モジュールを生成する．
   /// @param[in] name 名前
-  /// @param[in] np ポート数
   /// @param[in] ni 入力ノード数
   /// @param[in] no 出力ノード数
   /// @return 生成したモジュールを返す．
   MvModule*
   new_module(const char* name,
-	     ymuint np,
 	     ymuint ni,
 	     ymuint no);
 
@@ -80,18 +78,6 @@ public:
   /// @note モジュールインスタンスとして使われているモジュールは削除できない．
   void
   delete_module(MvModule* module);
-
-  /// @brief ポートを生成する．
-  /// @param[in] module ポートが属するモジュール
-  /// @param[in] pos 位置
-  /// @param[in] name 名前(NULLもあり)
-  /// @param[in] portref_list ポートが参照する実体のリスト
-  /// @return 生成したポートを返す．
-  MvPort*
-  new_port(MvModule* module,
-	   ymuint pos,
-	   const char* name,
-	   list<MvNode*>& portref_list);
 
   /// @brief 入力ノードを生成する．
   /// @param[in] module 入力ノードが属するモジュール
@@ -115,123 +101,212 @@ public:
 
   /// @brief through ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_through(MvModule* module);
+  new_through(MvModule* module,
+	      ymuint bit_width);
 
   /// @brief not ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_not(MvModule* module);
+  new_not(MvModule* module,
+	  ymuint bit_width);
 
   /// @brief and ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_and(MvModule* module);
+  new_and(MvModule* module,
+	  ymuint bit_width);
   
   /// @brief or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_or(MvModule* module);
+  new_or(MvModule* module,
+	 ymuint bit_width);
+  
+  /// @brief xor ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  /// @return 生成したノードを返す．
+  MvNode*
+  new_xor(MvModule* module,
+	  ymuint bit_width);
 
   /// @brief reduction and ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_rand(MvModule* module);
+  new_rand(MvModule* module,
+	   ymuint bit_width);
 
   /// @brief reduction or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_ror(MvModule* module);
+  new_ror(MvModule* module,
+	  ymuint bit_width);
 
   /// @brief reduction xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_rxor(MvModule* module);
+  new_rxor(MvModule* module,
+	   ymuint bit_width);
 
   /// @brief equal ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_eqal(MvModule* module);
+  new_equal(MvModule* module,
+	    ymuint bit_width);
 
   /// @brief less than ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_lt(MvModule* module);
+  new_lt(MvModule* module,
+	 ymuint bit_width);
 
   /// @brief shift left logical ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力データのビット幅
+  /// @param[in] bit_width2 シフト量のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_sll(MvModule* module);
+  new_sll(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief shift right logical ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力データのビット幅
+  /// @param[in] bit_width2 シフト量のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_srl(MvModule* module);
+  new_srl(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief shift left arithmetic ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力データのビット幅
+  /// @param[in] bit_width2 シフト量のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_sla(MvModule* module);
+  new_sla(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief shift right arithmetic ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力データのビット幅
+  /// @param[in] bit_width2 シフト量のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_sra(MvModule* module);
+  new_sra(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief add ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力1のビット幅
+  /// @param[in] bit_width2 入力2のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_add(MvModule* module);
+  new_add(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
+
 
   /// @brief sub ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力1のビット幅
+  /// @param[in] bit_width2 入力2のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_sub(MvModule* module);
+  new_sub(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief mult ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力1のビット幅
+  /// @param[in] bit_width2 入力2のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_mult(MvModule* module);
+  new_mult(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief div ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力1のビット幅
+  /// @param[in] bit_width2 入力2のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_div(MvModule* module);
+  new_div(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief modulo ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力1のビット幅
+  /// @param[in] bit_width2 入力2のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_mod(MvModule* module);
+  new_mod(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
   
   /// @brief power ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力1のビット幅
+  /// @param[in] bit_width2 入力2のビット幅
+  /// @param[in] bit_width3 出力のビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_pow(MvModule* module);
+  new_pow(MvModule* module,
+	  ymuint bit_width1,
+	  ymuint bit_width2,
+	  ymuint bit_width3);
 
   /// @brief condition ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_ite(MvModule* module);
+  new_ite(MvModule* module,
+	  ymuint bit_width);
 
   /// @brief concatenate ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -243,15 +318,25 @@ public:
 
   /// @brief bit selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  /// @param[in] idx ビット位置を表す定数ノード
   /// @return 生成したノードを返す．
   MvNode*
-  new_bitselect(MvModule* module);
+  new_bitselect(MvModule* module,
+		ymuint bit_width,
+		MvNode* idx);
 
   /// @brief part select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  /// @param[in] msb 範囲指定の MSB
+  /// @param[in] lsb 範囲指定の LSB
   /// @return 生成したノードを返す．
   MvNode*
-  new_partselect(MvModule* module);
+  new_partselect(MvModule* module,
+		 ymuint bit_width,
+		 MvNode* msb,
+		 MvNode* lsb);
 
   /// @brief module instance ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -261,6 +346,15 @@ public:
   new_inst(MvModule* module,
 	   MvModule* submodule);
 
+  /// @brief constant ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  /// @param[in] val 値
+  MvNode*
+  new_const(MvModule* module,
+	    ymuint bit_width,
+	    const vector<ymuint32>& val);
+
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード
   /// @note 入力ノード, 出力ノードは削除できない
@@ -268,13 +362,15 @@ public:
   void
   delete_node(MvNode* node);
 
+#if 0
   /// @brief ピンのビット幅を設定する．
   /// @param[in] pin 対象のピン
   /// @param[in] bit_width 設定するビット幅
   void
   set_bit_width(MvPin* pin,
 		ymuint bit_width);
-
+#endif
+  
   /// @brief ピンとピンを接続する．
   /// @param[in] src_pin 入力元のピン
   /// @param[in] dst_pin 出力先のピン
@@ -295,6 +391,22 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードを登録する．
+  /// @param[in] node 対象のノード
+  void
+  reg_node(MvNode* node);
+
+  /// @brief ノードの登録を削除する．
+  /// @param[in] node 対象のノード
+  void
+  unreg_node(MvNode* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -307,5 +419,7 @@ private:
   ItvlMgr mItvlMgr;
   
 };
+
+END_NAMESPACE_YM_MVN
 
 #endif // YM_MVN_MVMGR_H

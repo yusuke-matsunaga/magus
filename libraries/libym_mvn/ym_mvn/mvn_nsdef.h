@@ -32,6 +32,7 @@ class MvMgr;
 class MvModule;
 class MvPort;
 class MvNode;
+class MvPin;
 class MvInputPin;
 class MvOutputPin;
 class MvNet;

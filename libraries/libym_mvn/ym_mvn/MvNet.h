@@ -40,7 +40,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  MvNet();
+  /// @param[in] src 入力元のピン
+  /// @param[in] dst 出力先のピン
+  MvNet(MvOutputPin* src,
+	MvInputPin* dst);
 
   /// @brief デストラクタ
   ~MvNet();

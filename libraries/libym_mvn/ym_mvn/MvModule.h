@@ -41,15 +41,6 @@ public:
   MvNode*
   parent() const;
 
-  /// @brief ポート数を得る．
-  ymuint
-  port_num() const;
-
-  /// @brief ポートを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < port_num() )
-  MvPort*
-  port(ymuint pos) const;
-
   /// @brief 入力ノード数を得る．
   ymuint
   input_num() const;
@@ -73,7 +64,7 @@ public:
   node_num() const;
 
   /// @brief 内部ノードのリストを得る．
-  MvNodeList&
+  const MvNodeList&
   node_list() const;
 
   /// @brief 内部ノードのリストの先頭の反復子を得る．
@@ -91,8 +82,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @note 空のネットワークを作る．
-  MvModule();
+  /// @param[in] name 名前
+  /// @param[in] ni 入力ノード数
+  /// @param[in] no 出力ノード数
+  MvModule(const char* name,
+	   ymuint ni,
+	   ymuint no);
 
   /// @brief デストラクタ
   ~MvModule();
@@ -111,9 +106,6 @@ private:
 
   // 親のノード
   MvNode* mParent;
-
-  // ポートの配列
-  vector<MvPort*> mPortArray;
 
   // 入力ノードの配列
   vector<MvNode*> mInputArray;
@@ -162,23 +154,6 @@ MvModule::parent() const
   return mParent;
 }
 
-// @brief ポート数を得る．
-inline
-ymuint
-MvModule::port_num() const
-{
-  return mPortArray.size();
-}
-
-// @brief ポートを得る．
-// @param[in] pos 位置 ( 0 <= pos < port_num() )
-inline
-MvPort*
-MvModule::port(ymuint pos) const
-{
-  return mPortArray[pos];
-}
-
 // @brief 入力ノード数を得る．
 inline
 ymuint
@@ -223,7 +198,7 @@ MvModule::node_num() const
 
 // @brief 内部ノードのリストを得る．
 inline
-MvNodeList&
+const MvNodeList&
 MvModule::node_list() const
 {
   return mNodeList;
