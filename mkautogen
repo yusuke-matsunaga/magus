@@ -70,15 +70,15 @@ configure:
 EOF
 
 # サブモジュールのディレクトリ名
-SUBMODULE=`cat ./modules`
-for dir in $SUBMODULE
-do
-    echo "configure-${dir}:" >> $mkfile
-    for mode in $MODES
-    do
-	echo "	cd $mode/$dir; ./autogen" >> $mkfile
-    done
-    echo "" >> $mkfile
-done
+#SUBMODULE=`cat ./modules`
+#for dir in $SUBMODULE
+#do
+#    echo "configure-${dir}:" >> $mkfile
+#    for mode in $MODES
+#    do
+#	echo "	cd $mode/$dir; ./autogen" >> $mkfile
+#    done
+#    echo "" >> $mkfile
+#done
 
 # end of mkautogen

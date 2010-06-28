@@ -54,11 +54,14 @@ gaussian_elimination(const Matrix& src_matrix,
     ymuint32 max_j = 0;
     for (ymuint32 j = i; j < nr; ++ j) {
       ymuint32 r = row_idx[j];
-      double v = fabs(work.elem(r, i));
-      v /= max_elem[r];
-      if ( max < v ) {
-	max = v;
-	max_j = j;
+      double v = work.elem(r, i);
+      if ( v != 0.0 ) {
+	v = fabs(v);
+	v /= max_elem[r];
+	if ( max < v ) {
+	  max = v;
+	  max_j = j;
+	}
       }
     }
     if ( max == 0.0 ) {
@@ -74,20 +77,24 @@ gaussian_elimination(const Matrix& src_matrix,
     }
 
     // i 番め以降の行からこの変数を消去する．
+    ymuint32 r_i = row_idx[i];
+    double v_i = work.elem(r_i, i);
     for (ymuint32 j = i + 1; j < nr; ++ j) {
-      ymuint32 r_i = row_idx[i];
       ymuint32 r_j = row_idx[j];
-      double d = work.elem(r_j, i) / work.elem(r_i, i);
-      // max_elem の更新
-      double max = 0.0;
-      for (ymuint32 k = i; k < nc; ++ k) {
-	work.elem(r_j, k) -= work.elem(r_i, k) * d;
-	double v = fabs(work.elem(r_j, k));
-	if ( max < v ) {
-	  max = v;
+      double v = work.elem(r_j, i);
+      if (  v != 0.0 ) {
+	double d = v / v_i;
+	// max_elem の更新
+	double max = 0.0;
+	for (ymuint32 k = i; k < nc; ++ k) {
+	  work.elem(r_j, k) -= work.elem(r_i, k) * d;
+	  double v = fabs(work.elem(r_j, k));
+	  if ( max < v ) {
+	    max = v;
+	  }
 	}
+	max_elem[r_j] = max;
       }
-      max_elem[r_j] = max;
     }
   }
   
