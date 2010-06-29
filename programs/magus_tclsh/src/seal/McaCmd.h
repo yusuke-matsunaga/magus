@@ -57,6 +57,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // -use_bdd オプションの解析用
+  TclPopt* mPoptBdd;
+
+  // -dump_trans オプションの解析用
+  TclPopt* mPoptDump;
+  
   // -kiss オプションの解析用
   TclPoptStr* mPoptKiss;
   

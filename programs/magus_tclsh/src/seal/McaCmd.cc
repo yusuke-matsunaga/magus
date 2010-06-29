@@ -19,6 +19,12 @@ BEGIN_NAMESPACE_MAGUS
 McaCmd::McaCmd(NetMgr* mgr) :
   MagBNetCmd(mgr)
 {
+  mPoptBdd = new TclPopt(this, "use_bdd",
+			 "use BDD");
+
+  mPoptDump = new TclPopt(this, "dump_trans",
+			 "dump transition probability");
+
   mPoptKiss = new TclPoptStr(this, "kiss",
 			     "specify KISS file",
 			     "<file-name>");
@@ -43,7 +49,15 @@ McaCmd::cmd_proc(TclObjVector& objv)
   
   BNetwork* bnetwork = cur_network();
   vector<State> init_states;
+  bool use_bdd = false;
+  bool dump_trans = false;
   
+  if ( mPoptBdd->is_specified() ) {
+    use_bdd = true;
+  }
+  if ( mPoptDump->is_specified() ) {
+    dump_trans = true;
+  }
   if ( mPoptKiss->is_specified() ) {
     string file_name = mPoptKiss->val();
     // ファイル名の展開を行う．
@@ -73,7 +87,7 @@ McaCmd::cmd_proc(TclObjVector& objv)
   
   nsSeal::MCAnalysis mca;
   
-  mca.analyze(*bnetwork, init_states);
+  mca.analyze(*bnetwork, init_states, use_bdd, dump_trans);
   
   return TCL_OK;
 }

@@ -43,7 +43,9 @@ public:
   /// @param[in] init_states 初期状態の集合
   void
   analyze(const BNetwork& network,
-	  const vector<State>& init_states);
+	  const vector<State>& init_states,
+	  bool use_bdd = true,
+	  bool dump_trans = false);
 
   
 private:
@@ -68,12 +70,23 @@ private:
   /// @note 結果は mFailureProb に格納される．
   void
   calc_failure_prob();
+
+  /// @brief 回路対の状態遷移確率行列をダンプする．
+  void
+  dump_trans(ostream& s);
+
+  /// @brief 回路対の状態遷移確率行列を読み込む．
+  void
+  restore_trans(istream& s);
   
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // BDD を使うかどうかを制御するフラグ
+  bool mUseBdd;
   
   // 正常回路の到達可能状態の集合
   vector<State> mReachableStates1;
