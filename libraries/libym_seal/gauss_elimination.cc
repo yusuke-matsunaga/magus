@@ -24,6 +24,7 @@ gaussian_elimination(const Matrix& src_matrix,
   
   if ( nr + 1 != nc ) {
     // 1列は右辺の定数だとして変数と数と方程式の数は等しくなければならない．
+    cout << "nr + 1 != nc" << endl;
     return false;
   }
   
@@ -42,6 +43,7 @@ gaussian_elimination(const Matrix& src_matrix,
     }
     if ( max == 0.0 ) {
       // すべて 0 の行がある．
+      cout << "all 0 row" << endl;
       return false;
     }
     max_elem[i] = max;
@@ -66,6 +68,7 @@ gaussian_elimination(const Matrix& src_matrix,
     }
     if ( max == 0.0 ) {
       // 全ての行でこの変数が消えてしまった．
+      cout << "all 0 col" << endl;
       return false;
     }
 
@@ -100,6 +103,7 @@ gaussian_elimination(const Matrix& src_matrix,
   
   // 最後のチェック
   if ( work.elem(row_idx[nr - 1], nr - 1) == 0.0 ) {
+    cout << "work.elem(row_idx[nr - 1], nr - 1) == 0.0" << endl;
     return false;
   }
 

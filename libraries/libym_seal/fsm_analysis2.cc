@@ -20,18 +20,20 @@ void
 enum_loop(LogicSim& logic_sim,
 	  ymuint input_num,
 	  const vector<State>& init_states,
-	  vector<State>& reachable_states)
+	  vector<State>& reachable_states,
+	  hash_map<State, ymuint>& state_map)
 {
-  hash_set<State> check_hash;
   list<State> state_queue;
   reachable_states.clear();
+  state_map.clear();
   for (vector<State>::const_iterator p = init_states.begin();
        p != init_states.end(); ++ p) {
     State state = *p;
-    if ( check_hash.count(state) == 0 ) {
-      check_hash.insert(state);
-      state_queue.push_back(state);
+    if ( state_map.count(state) == 0 ) {
+      ymuint id = reachable_states.size();
       reachable_states.push_back(state);
+      state_map.insert(make_pair(state, id));
+      state_queue.push_back(state);
     }
   }
   ymuint n = 1U << input_num;
@@ -42,10 +44,11 @@ enum_loop(LogicSim& logic_sim,
       ymuint output_vector;
       State next_state;
       logic_sim(input_vector, cur_state, output_vector, next_state);
-      if ( check_hash.count(next_state) == 0 ) {
-	check_hash.insert(next_state);
-	state_queue.push_back(next_state);
+      if ( state_map.count(next_state) == 0 ) {
+	ymuint id = reachable_states.size();
 	reachable_states.push_back(next_state);
+	state_map.insert(make_pair(next_state, id));
+	state_queue.push_back(next_state);
       }
     }
   }
@@ -56,18 +59,20 @@ enum_pair_loop(LogicSim& logic_sim,
 	       ymuint input_num,
 	       ymuint ff_num,
 	       const vector<State>& init_states,
-	       vector<State>& reachable_states)
+	       vector<State>& reachable_states,
+	       hash_map<State, ymuint>& state_map)
 {
-  hash_set<State> check_hash;
   list<State> state_queue;
   reachable_states.clear();
+  state_map.clear();
   for (vector<State>::const_iterator p = init_states.begin();
        p != init_states.end(); ++ p) {
     State state = *p;
-    if ( check_hash.count(state) == 0 ) {
-      state_queue.push_back(state);
-      check_hash.insert(state);
+    if ( state_map.count(state) == 0 ) {
+      ymuint id = reachable_states.size();
       reachable_states.push_back(state);
+      state_map.insert(make_pair(state, id));
+      state_queue.push_back(state);
     }
   }
   ymuint n = 1U << input_num;
@@ -86,10 +91,11 @@ enum_pair_loop(LogicSim& logic_sim,
       if ( c_output_vector == e_output_vector &&
 	   c_next_state != e_next_state ) {
 	State sp = c_next_state + e_next_state;
-	if ( check_hash.count(sp) == 0 ) {
-	  check_hash.insert(sp);
-	  state_queue.push_back(sp);
+	if ( state_map.count(sp) == 0 ) {
+	  ymuint id = reachable_states.size();
 	  reachable_states.push_back(sp);
+	  state_map.insert(make_pair(sp, id));
+	  state_queue.push_back(sp);
 	}
       }
     }
@@ -105,45 +111,50 @@ void
 fsm_analysis2(const BNetwork& bnetwork,
 	      const vector<State>& init_states,
 	      vector<State>& reachable_states1,
-	      hash_map<State, double>& trans_map1,
+	      hash_map<ymuint, double>& trans_map1,
 	      vector<State>& reachable_states2,
-	      hash_map<State, double>& trans_map2)
+	      hash_map<ymuint, double>& trans_map2,
+	      vector<double>& failure_prob)
 {
   LogicSim logic_sim(&bnetwork);
 
   ymuint input_num = bnetwork.input_num();
   ymuint ff_num = bnetwork.latch_node_num();
+
+  hash_map<State, ymuint> state_map1;
+  enum_loop(logic_sim, input_num, init_states, reachable_states1, state_map1);
   
-  enum_loop(logic_sim, input_num, init_states, reachable_states1);
-    
   ymuint n = reachable_states1.size();
   
   ymuint sim_num = 1U << input_num;
   double m_weight = 1.0 / sim_num;
   for (ymuint i = 0; i < n; ++ i) {
     State cur_state = reachable_states1[i];
-
-    hash_map<State, ymuint> count_map;
+    hash_map<ymuint, ymuint> count_map;
     for (ymuint input_vector = 0U; input_vector < sim_num; ++ input_vector) {
       ymuint output_vector;
       State next_state;
       logic_sim(input_vector, cur_state, output_vector, next_state);
-      hash_map<State, ymuint>::iterator p = count_map.find(next_state);
+      hash_map<State, ymuint>::iterator q = state_map1.find(next_state);
+      assert_cond( q != state_map1.end(), __FILE__, __LINE__);
+
+      ymuint nid = q->second;
+      hash_map<ymuint, ymuint>::iterator p = count_map.find(nid);
       if ( p == count_map.end() ) {
-	count_map.insert(make_pair(next_state, 1));
+	count_map.insert(make_pair(nid, 1));
       }
       else {
 	++ p->second;
       }
     }
       
-    for (hash_map<State, ymuint>::iterator p = count_map.begin();
+    for (hash_map<ymuint, ymuint>::iterator p = count_map.begin();
 	 p != count_map.end(); ++ p) {
-      State next_state = p->first;
+      ymuint nid = p->first;
       ymuint count = p->second;
-      State sp = cur_state + next_state;
+      ymuint tmp = i * n + nid;
       double prob = count * m_weight;
-      trans_map1.insert(make_pair(sp, prob));
+      trans_map1.insert(make_pair(tmp, prob));
     }
   }
 
@@ -163,14 +174,18 @@ fsm_analysis2(const BNetwork& bnetwork,
     }
   }
   
-  enum_pair_loop(logic_sim, input_num, ff_num, init_states2, reachable_states2);
+  hash_map<State, ymuint> state_map2;
+  enum_pair_loop(logic_sim, input_num, ff_num, init_states2,
+		 reachable_states2, state_map2);
   
   ymuint pair_num = reachable_states2.size();
+  failure_prob.resize(pair_num);
   for (ymuint i = 0; i < pair_num; ++ i) {
     State p_pair = reachable_states2[i];
     State c_state = p_pair.substr(0, ff_num);
     State e_state = p_pair.substr(ff_num, ff_num);
-    hash_map<State, ymuint> count_map;
+    hash_map<ymuint, ymuint> count_map;
+    ymuint fcount = 0;
     for (ymuint input_vector = 0U; input_vector < sim_num; ++ input_vector) {
       ymuint c_output;
       State c_next;
@@ -178,32 +193,32 @@ fsm_analysis2(const BNetwork& bnetwork,
       ymuint e_output;
       State e_next;
       logic_sim(input_vector, e_state, e_output, e_next);
-      State n_pair;
       if ( c_output != e_output ) {
-	n_pair = "ERROR";
+	++ fcount;
       }
-      else if ( c_next == e_next ) {
-	n_pair = "IDENT";
-      }
-      else{
-	n_pair = c_next + e_next;
-      }
-      hash_map<State, ymuint>::iterator p = count_map.find(n_pair);
-      if ( p == count_map.end() ) {
-	count_map.insert(make_pair(n_pair, 1));
-      }
-      else {
-	++ p->second;
+      else if ( c_next != e_next ) {
+	State n_pair = c_next + e_next;
+	hash_map<State, ymuint>::iterator q = state_map2.find(n_pair);
+	assert_cond( q != state_map2.end(), __FILE__, __LINE__);
+	ymuint nid = q->second;
+	hash_map<ymuint, ymuint>::iterator p = count_map.find(nid);
+	if ( p == count_map.end() ) {
+	  count_map.insert(make_pair(nid, 1));
+	}
+	else {
+	  ++ p->second;
+	}
       }
     }
     
-    for (hash_map<State, ymuint>::iterator p = count_map.begin();
+    for (hash_map<ymuint, ymuint>::iterator p = count_map.begin();
 	 p != count_map.end(); ++ p) {
-      State n_pair = p->first;
-      double prob = p->second * m_weight;
-      State tmp = p_pair + n_pair;
+      ymuint nid = p->first;
+      double prob = static_cast<double>(p->second) * m_weight;
+      ymuint tmp = i * pair_num + nid;
       trans_map2.insert(make_pair(tmp, prob));
     }
+    failure_prob[i] = static_cast<double>(fcount) * m_weight;
   }
 }
 

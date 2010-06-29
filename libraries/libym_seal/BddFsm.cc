@@ -121,10 +121,12 @@ BddFsm::enum_reachable_states(const vector<State>& init_states)
 
 // @brief 状態遷移確率を求める．
 // @param[in] reachable_states_bdd 到達可能状態を表す BDD
+// @param[in] reachable_states 到達可能状態を収めたベクタ
 // @param[out] trans_prob_map 状態遷移確率を格納するハッシュ表
 void
 BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
-			hash_map<StatePair, double>& trans_prob_map)
+			const vector<State>& reachable_states,
+			hash_map<ymuint, double>& trans_prob_map)
 {
   StopWatch sw;
   sw.reset();
@@ -132,8 +134,17 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
   
   // 状態遷移関係を到達可能状態のみに制約する．
   Bdd trans2 = mTransRel & reachable_states_bdd;
+
+  // 状態文字列から状態番号のハッシュ表を作る．
+  ymuint ns = reachable_states.size();
+  hash_map<State, ymuint> state_hash;
+  for (ymuint i = 0; i < ns; ++ i) {
+    state_hash.insert(make_pair(reachable_states[i], i));
+  }
+  
   vector<ymuint> st_vec(ff_num() * 2, 0);
-  rs_sub(trans2, st_vec, trans_prob_map);
+
+  rs_sub(trans2, ns, state_hash, st_vec, trans_prob_map);
   
   sw.stop();
   
@@ -141,10 +152,18 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
        << sw.time() << endl;
 }
 
+// @brief calc_trans_prob の下請け関数
+// @param[in] rel 状態遷移関係
+// @param[in] ns 到達可能状態数
+// @param[in] state_hash 状態文字列から状態番号を得るためのハッシュ表
+// @param[in] st_vec 現在たどっている状態を入れる作業領域
+// @param[in] trans_prob_map 確率を収めるハッシュ表
 void
 BddFsm::rs_sub(Bdd rel,
+	       ymuint ns,
+	       const hash_map<State, ymuint>& state_hash,
 	       vector<ymuint>& st_vec,
-	       hash_map<StatePair, double>& trans_prob_map)
+	       hash_map<ymuint, double>& trans_prob_map)
 {
   if ( rel.is_zero() ) {
     return;
@@ -155,17 +174,17 @@ BddFsm::rs_sub(Bdd rel,
   ymuint pos;
   if ( cur_varid2pos(root_idx, pos) ) {
     st_vec[pos] = 1;
-    rs_sub(l, st_vec, trans_prob_map);
+    rs_sub(l, ns, state_hash, st_vec, trans_prob_map);
     st_vec[pos] = 2;
-    rs_sub(r, st_vec, trans_prob_map);
+    rs_sub(r, ns, state_hash, st_vec, trans_prob_map);
     st_vec[pos] = 0;
   }
   else if ( next_varid2pos(root_idx, pos) ) {
     pos += ff_num();
     st_vec[pos] = 1;
-    rs_sub(l, st_vec, trans_prob_map);
+    rs_sub(l, ns, state_hash, st_vec, trans_prob_map);
     st_vec[pos] = 2;
-    rs_sub(r, st_vec, trans_prob_map);
+    rs_sub(r, ns, state_hash, st_vec, trans_prob_map);
     st_vec[pos] = 0;
   }
   else {
@@ -204,7 +223,15 @@ BddFsm::rs_sub(Bdd rel,
 	  tmp[pos] = '0';
 	}
       }
-      trans_prob_map.insert(make_pair(tmp, prob));
+      State cur_state = tmp.substr(0, ff_num());
+      hash_map<State, ymuint>::const_iterator q = state_hash.find(cur_state);
+      assert_cond( q != state_hash.end(), __FILE__, __LINE__);
+      ymuint cur_state_id = q->second;
+      State next_state = tmp.substr(ff_num(), ff_num());
+      hash_map<State, ymuint>::const_iterator r = state_hash.find(next_state);
+      assert_cond( r != state_hash.end(), __FILE__, __LINE__);
+      ymuint next_state_id = r->second;
+      trans_prob_map.insert(make_pair(cur_state_id * ns + next_state_id, prob));
     }
   }
 }

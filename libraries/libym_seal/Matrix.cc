@@ -23,6 +23,9 @@ Matrix::Matrix(ymuint32 row_num,
   mColNum(col_num),
   mBody(new double[row_num * col_num])
 {
+  for (ymuint i = 0; i < row_num * col_num; ++ i) {
+    mBody[i] = 0.0;
+  }
 }
   
 // @brief コピーコンストラクタ

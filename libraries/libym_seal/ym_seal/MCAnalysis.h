@@ -87,21 +87,29 @@ private:
 
   // BDD を使うかどうかを制御するフラグ
   bool mUseBdd;
+
+  // FF 数
+  ymuint32 mFFNum;
   
   // 正常回路の到達可能状態の集合
   vector<State> mReachableStates1;
   
   // 正常回路の遷移確率を保持するハッシュ表
-  hash_map<StatePair, double> mTransProb1;
+  // キーは '現状態番号' * 状態数 + '次状態番号'
+  hash_map<ymuint, double> mTransProb1;
 
   // 正常回路の各状態の定常状態における存在確率
   vector<double> mSteadyProb;
   
-  // 回路対の到達可能状態の集合
+  // 回路対の一時状態の集合
   vector<State> mReachableStates2;
   
   // 回路対の遷移確率を保持するハッシュ表
-  hash_map<StatePair, double> mTransProb2;
+  // キーは '現状態番号' * 状態数 + '次状態番号'
+  hash_map<ymuint, double> mTransProb2;
+
+  // 回路対の一時状態から failure 状態への遷移確率
+  vector<double> mFailureProb0;
   
   // 回路対の各状態の初期存在確率
   hash_map<State, double> mInitialProb;

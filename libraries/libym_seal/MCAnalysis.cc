@@ -17,7 +17,7 @@
 
 BEGIN_NONAMESPACE
 
-#define VERIFY_TRANS1 true
+#define VERIFY_TRANS1 false;
 
 #ifndef VERIFY_TRANS1
 #define VERIFY_TRANS1 false
@@ -36,9 +36,10 @@ void
 fsm_analysis(const BNetwork& bnetwork,
 	     const vector<State>& init_states,
 	     vector<State>& reachable_states1,
-	     hash_map<State, double>& trans_map1,
+	     hash_map<ymuint, double>& trans_map1,
 	     vector<State>& reachable_states2,
-	     hash_map<State, double>& trans_map2);
+	     hash_map<ymuint, double>& trans_map2,
+	     vector<double>& failure_prob);
 
 // 与えられた回路の到達可能状態および遷移確率を求める．
 // 同時に正常回路と故障回路の対の到達可能状態および遷移確率も求める．
@@ -46,9 +47,10 @@ void
 fsm_analysis2(const BNetwork& bnetwork,
 	      const vector<State>& init_states,
 	      vector<State>& reachable_states1,
-	      hash_map<State, double>& trans_map1,
+	      hash_map<ymuint, double>& trans_map1,
 	      vector<State>& reachable_states2,
-	      hash_map<State, double>& trans_map2);
+	      hash_map<ymuint, double>& trans_map2,
+	      vector<double>& failure_prob);
 
 // @brief コンストラクタ
 MCAnalysis::MCAnalysis()
@@ -77,6 +79,9 @@ MCAnalysis::analyze(const BNetwork& network,
   total_timer.start();
 
   mUseBdd = use_bdd_flag;
+
+  ymuint ff_num = network.latch_node_num();
+  mFFNum = ff_num;
   
   watch.start();
   enum_states(network, init_states);
@@ -96,7 +101,6 @@ MCAnalysis::analyze(const BNetwork& network,
 
   watch.reset();
   watch.start();
-  ymuint ff_num = network.latch_node_num();
   vector<double> error_rate(ff_num, 1.0e-10);
   calc_error_prob(error_rate);
   watch.stop();
@@ -140,49 +144,62 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
   if ( mUseBdd ) {
     fsm_analysis(bnetwork, init_states,
 		 mReachableStates1, mTransProb1,
-		 mReachableStates2, mTransProb2);
-  
+		 mReachableStates2, mTransProb2, mFailureProb0);
+
     if ( verify_trans1 ) {
       bool error = false;
-
+      ymuint ff_num = bnetwork.latch_node_num();
+      
       vector<State> c_states2;
-      hash_map<State, double> trans_map2;
+      hash_map<ymuint, double> trans_map2;
       vector<State> pair_vec2;
-      hash_map<State, double> trans2_map2;
-
+      hash_map<ymuint, double> trans2_map2;
+      vector<double> fprob2;
+      
       fsm_analysis2(bnetwork, init_states,
 		    c_states2, trans_map2,
-		    pair_vec2, trans2_map2);
+		    pair_vec2, trans2_map2, fprob2);
 
-      ymuint n = c_states2.size();
-      if ( mReachableStates1.size() != n ) {
-	cout << "mReachableStates1.size() != n" << endl;
+      // 正常回路の到達可能状態の比較
+      ymuint state_num = mReachableStates1.size();
+      if ( c_states2.size() != state_num ) {
+	cout << "mReachableStates1.size() != state_num" << endl;
 	error = true;
       }
     
-      hash_set<State> state_set1;
-      for (ymuint i = 0; i < mReachableStates1.size(); ++ i) {
-	state_set1.insert(mReachableStates1[i]);
+      hash_map<State, ymuint> state_map1;
+      for (ymuint i = 0; i < state_num; ++ i) {
+	state_map1.insert(make_pair(mReachableStates1[i], i));
       }
-      hash_set<State> state_set2;
-      for (ymuint i = 0; i < n; ++ i) {
-	state_set2.insert(c_states2[i]);
+      hash_map<State, ymuint> state_map2;
+      for (ymuint i = 0; i < c_states2.size(); ++ i) {
+	state_map2.insert(make_pair(c_states2[i], i));
       }
-      for (ymuint i = 0; i < n; ++ i) {
-	if ( state_set2.count(mReachableStates1[i]) == 0 ) {
+      for (ymuint i = 0; i < c_states2.size(); ++ i) {
+	if ( state_map2.count(mReachableStates1[i]) == 0 ) {
 	  cout << mReachableStates1[i] << " no found in c_states2" << endl;
 	  error = true;
 	}
       }
-      
-      ymuint ff_num = bnetwork.latch_node_num();
-      for (hash_map<State, double>::iterator p = mTransProb1.begin();
+      assert_cond( !error, __FILE__, __LINE__);
+
+      // 正常回路の遷移確率行列の比較
+      for (hash_map<ymuint, double>::iterator p = mTransProb1.begin();
 	   p != mTransProb1.end(); ++ p) {
-	State tmp = p->first;
-	State cur_state = tmp.substr(0, ff_num);
-	State next_state = tmp.substr(ff_num, ff_num);
+	ymuint tmp = p->first;
 	double prob = p->second;
-	hash_map<State, double>::iterator q = trans_map2.find(tmp);
+	ymuint csid = tmp / state_num;
+	ymuint nsid = tmp % state_num;
+	State cur_state = mReachableStates1[csid];
+	State next_state = mReachableStates1[nsid];
+	hash_map<State, ymuint>::iterator s = state_map2.find(cur_state);
+	assert_cond( s != state_map2.end(), __FILE__, __LINE__);
+	ymuint csid2 = s->second;
+	s = state_map2.find(next_state);
+	assert_cond( s != state_map2.end(), __FILE__, __LINE__);
+	ymuint nsid2 = s->second;
+	ymuint tmp2 = csid2 * state_num + nsid2;
+	hash_map<ymuint, double>::iterator q = trans_map2.find(tmp2);
 	if ( q == trans_map2.end() ) {
 	  cout << cur_state << " --> " << next_state
 	       << " not found in trans_map2" << endl;
@@ -195,12 +212,21 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	  error = true;
 	}
       }
-      for (hash_map<State, double>::iterator p = trans_map2.begin();
+      for (hash_map<ymuint, double>::iterator p = trans_map2.begin();
 	   p != trans_map2.end(); ++ p) {
-	State tmp = p->first;
-	State cur_state = tmp.substr(0, ff_num);
-	State next_state = tmp.substr(ff_num, ff_num);
-	hash_map<State, double>::iterator q = mTransProb1.find(tmp);
+	ymuint tmp = p->first;
+	ymuint csid = tmp / state_num;
+	ymuint nsid = tmp % state_num;
+	State cur_state = c_states2[csid];
+	State next_state = c_states2[nsid];
+	hash_map<State, ymuint>::iterator s = state_map1.find(cur_state);
+	assert_cond( s != state_map1.end(), __FILE__, __LINE__);
+	ymuint csid2 = s->second;
+	s = state_map1.find(next_state);
+	assert_cond( s != state_map1.end(), __FILE__, __LINE__);
+	ymuint nsid2 = s->second;
+	ymuint tmp2 = csid2 * state_num + nsid2;
+	hash_map<ymuint, double>::iterator q = mTransProb1.find(tmp2);
 	if ( q == mTransProb1.end() ) {
 	  cout << cur_state << " --> " << next_state
 	       << " not found in trans_map" << endl;
@@ -208,23 +234,25 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	}
       }
       assert_cond(!error, __FILE__, __LINE__);
-      
+
+      // 回路対の到達可能状態の比較
       ymuint pair_num = pair_vec2.size();
       if ( mReachableStates2.size() != pair_num ) {
 	cout << "mReachableStates2.size() != pair_num" << endl;
 	error = true;
       }
-      hash_set<State> pair_set1;
-      hash_set<State> pair_set2;
+
+      hash_map<State, ymuint> pair_map1;
       for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
-	pair_set1.insert(mReachableStates2[i]);
+	pair_map1.insert(make_pair(mReachableStates2[i], i));
       }
+      hash_map<State, ymuint> pair_map2;
       for (ymuint i = 0; i < pair_num; ++ i) {
-	pair_set2.insert(pair_vec2[i]);
+	pair_map2.insert(make_pair(pair_vec2[i], i));
       }
       for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
 	State tmp = mReachableStates2[i];
-	if ( pair_set2.count(tmp) == 0 ) {
+	if ( pair_map2.count(tmp) == 0 ) {
 	  State c_state = tmp.substr(0, ff_num);
 	  State e_state = tmp.substr(ff_num, ff_num);
 	  cout << tmp << "(" << c_state << ":" << e_state << ")"
@@ -232,9 +260,9 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	  error = true;
 	}
       }
-      for (ymuint i = 0; i < pair_vec2.size(); ++ i) {
+      for (ymuint i = 0; i < pair_num; ++ i) {
 	State tmp = pair_vec2[i];
-	if ( pair_set1.count(tmp) == 0 ) {
+	if ( pair_map1.count(tmp) == 0 ) {
 	  State c_state = tmp.substr(0, ff_num);
 	  State e_state = tmp.substr(ff_num, ff_num);
 	  cout << c_state << ":" << e_state
@@ -242,47 +270,78 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	  error = true;
 	}
       }
+      assert_cond( !error, __FILE__, __LINE__);
       
       if ( mTransProb2.size() != trans2_map2.size() ) {
 	cout << "mTransProb2.size() != trans2_map2.size()" << endl;
 	error = true;
       }
-      for (hash_map<State, double>::iterator p = mTransProb2.begin();
+      for (hash_map<ymuint, double>::iterator p = mTransProb2.begin();
 	   p != mTransProb2.end(); ++ p) {
-	State tmp = p->first;
-	State c_state = tmp.substr(0, ff_num);
-	State e_state = tmp.substr(ff_num, ff_num);
-	State last = tmp.substr(ff_num * 2);
-	if ( last != "ERROR" && last != "IDENT" ) {
-	  last = last.substr(0, ff_num) + ":" + last.substr(ff_num, ff_num);
-	}
+	ymuint tmp = p->first;
 	double prob = p->second;
-	hash_map<State, double>::iterator q = trans2_map2.find(tmp);
+	ymuint csid = tmp / pair_num;
+	ymuint nsid = tmp % pair_num;
+	State cur_state = mReachableStates2[csid];
+	State next_state = mReachableStates2[nsid];
+	hash_map<State, ymuint>::iterator s;
+	s = pair_map2.find(cur_state);
+	assert_cond( s != pair_map2.end(), __FILE__, __LINE__);
+	ymuint csid2 = s->second;
+	s = pair_map2.find(next_state);
+	assert_cond( s != pair_map2.end(), __FILE__, __LINE__);
+	ymuint nsid2 = s->second;
+	ymuint tmp2 = csid2 * pair_num + nsid2;
+	hash_map<ymuint, double>::iterator q = trans2_map2.find(tmp2);
+	State c_state = cur_state.substr(0, ff_num);
+	State e_state = cur_state.substr(ff_num);
 	if ( q == trans2_map2.end() ) {
-	  cout << c_state << ":" << e_state << " --> " << last
+	  cout << c_state << ":" << e_state << " --> " << next_state
 	       << " not found in trans2_map2" << endl;
 	  error = true;
 	}
 	else if ( prob != q->second ) {
-	  cout << c_state << ":" << e_state << " --> " << last
+	  cout << c_state << ":" << e_state << " --> " << next_state
 	       << " prob = " << prob
 	       << ", prob2 = " << q->second << endl;
 	  error = true;
 	}
       }
-      for (hash_map<State, double>::iterator p = trans2_map2.begin();
+      for (hash_map<ymuint, double>::iterator p = trans2_map2.begin();
 	   p != trans2_map2.end(); ++ p) {
-	State tmp = p->first;
-	State c_state = tmp.substr(0, ff_num);
-	State e_state = tmp.substr(ff_num, ff_num);
-	State last = tmp.substr(ff_num * 2);
-	if ( last != "ERROR" && last != "IDENT" ) {
-	  last = last.substr(0, ff_num) + ":" + last.substr(ff_num, ff_num);
-	}
-	hash_map<State, double>::iterator q = mTransProb2.find(tmp);
+	ymuint tmp = p->first;
+	ymuint csid = tmp / pair_num;
+	ymuint nsid = tmp % pair_num;
+	State cur_state = pair_vec2[csid];
+	State next_state = pair_vec2[nsid];
+	hash_map<State, ymuint>::iterator s;
+	s = pair_map1.find(cur_state);
+	assert_cond( s != pair_map1.end(), __FILE__, __LINE__);
+	ymuint csid2 = s->second;
+	s = pair_map1.find(next_state);
+	assert_cond( s != pair_map1.end(), __FILE__, __LINE__);
+	ymuint nsid2 = s->second;
+	ymuint tmp2 = csid2 * pair_num + nsid2;
+	hash_map<ymuint, double>::iterator q = mTransProb2.find(tmp2);
+	State c_state = cur_state.substr(0, ff_num);
+	State e_state = cur_state.substr(ff_num, ff_num);
 	if ( q == mTransProb2.end() ) {
-	  cout << c_state << ":" << e_state << " --> " << last
+	  cout << c_state << ":" << e_state << " --> " << next_state
 	       << " not found in mTransProb2" << endl;
+	  error = true;
+	}
+      }
+      for (ymuint i = 0; i < pair_num; ++ i) {
+	State cur_state = mReachableStates2[i];
+	hash_map<State, ymuint>::iterator p = pair_map2.find(cur_state);
+	assert_cond( p != state_map2.end(), __FILE__, __LINE__);
+	ymuint id2 = p->second;
+	assert_cond( pair_vec2[id2] == cur_state, __FILE__, __LINE__);
+	
+	if ( mFailureProb0[i] != fprob2[id2] ) {
+	  cout << cur_state << ": failure probability mismatch : "
+	       << "prob = " << mFailureProb0[i]
+	       << ", prob2 = " << fprob2[id2] << endl;
 	  error = true;
 	}
       }
@@ -292,7 +351,7 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
   else {
     fsm_analysis2(bnetwork, init_states,
 		  mReachableStates1, mTransProb1,
-		  mReachableStates2, mTransProb2);
+		  mReachableStates2, mTransProb2, mFailureProb0);
   }
 }
 
@@ -303,12 +362,31 @@ MCAnalysis::calc_steady_prob()
 {
   ymuint32 n = mReachableStates1.size();
   Matrix m(n, n + 1);
+  for (ymuint i = 0; i < n; ++ i) {
+    for (ymuint j = 0; j < n; ++ j) {
+      if ( i != j ) {
+	m.elem(i, j) += 1.0;
+      }
+    }
+  }
+  for (hash_map<ymuint, double>::const_iterator p = mTransProb1.begin();
+       p != mTransProb1.end(); ++ p) {
+    ymuint tmp = p->first;
+    ymuint prob = p->second;
+    ymuint row = tmp / n;
+    ymuint col = tmp % n;
+    m.elem(row, col) += prob;
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    m.elem(i, n) = 1.0;
+  }
+#if 0
   for (ymuint32 i = 0; i < n; ++ i) {
     State n_state = mReachableStates1[i];
     for(ymuint32 j = 0; j < n; ++ j) {
       State c_state = mReachableStates1[j];
       StatePair sp = c_state + n_state;
-      hash_map<StatePair, double>::const_iterator p = mTransProb1.find(sp);
+      hash_map<ymuint, double>::const_iterator p = mTransProb1.find(sp);
       double d = 0.0;
       if ( p != mTransProb1.end() ) {
 	d = p->second;
@@ -320,6 +398,7 @@ MCAnalysis::calc_steady_prob()
     }
     m.elem(i, n) = 1.0;
   }
+#endif
   bool stat = gaussian_elimination(m, mSteadyProb);
   assert_cond(stat, __FILE__, __LINE__);
 }
@@ -356,8 +435,25 @@ MCAnalysis::calc_failure_prob()
 {
   StopWatch timer;
   timer.start();
-  ymuint32 state_num = mReachableStates2.size();
+
+#if 1
+  ymuint state_num = mReachableStates2.size();
   Matrix m(state_num, state_num + 1);
+  for (hash_map<ymuint, double>::const_iterator p = mTransProb2.begin();
+       p != mTransProb2.end(); ++ p) {
+    ymuint sp_code = p->first;
+    double prob = p->second;
+    ymuint cur_state = sp_code / state_num;
+    ymuint next_state = sp_code % state_num;
+    m.elem(cur_state, next_state) = - prob;
+  }
+  for (ymuint i = 0; i < state_num; ++ i) {
+    m.elem(i, i) = m.elem(i, i) + 1.0;
+  }
+  for (ymuint i = 0; i < state_num; ++ i) {
+    m.elem(i, state_num) = mFailureProb0[i];
+  }
+#else
   for (ymuint32 i = 0; i < state_num; ++ i) {
     State cur_state = mReachableStates2[i];
     for (ymuint32 j = 0; j < state_num; ++ j) {
@@ -381,6 +477,7 @@ MCAnalysis::calc_failure_prob()
     }
     m.elem(i, state_num) = d;
   }
+#endif
   timer.stop();
   USTime time = timer.time();
   cout << "make prob. matrix: " << time << endl;
@@ -397,11 +494,46 @@ MCAnalysis::calc_failure_prob()
 void
 MCAnalysis::dump_trans(ostream& s)
 {
-  for (hash_map<StatePair, double>::const_iterator p = mTransProb2.begin();
-       p != mTransProb2.end(); ++ p) {
-    StatePair sp = p->first;
+  s << "# FF-num" << endl
+    << mFFNum << endl
+    << endl;
+  ymuint ns1 = mReachableStates1.size();
+  s << "# states num of original original circuit" << endl
+    << ns1 << endl;
+  for (ymuint i = 0; i < ns1; ++ i) {
+    s << mReachableStates1[i] << endl;
+  }
+  s << endl;
+  s << "# transition probability of original circuit" << endl;
+  for (hash_map<ymuint, double>::const_iterator p = mTransProb1.begin();
+       p != mTransProb1.end(); ++ p) {
+    ymuint sp = p->first;
+    ymuint csid = sp / ns1;
+    ymuint nsid = sp % ns1;
     double prob = p->second;
-    s << sp << " " << prob << endl;
+    s << csid << " " << nsid << " " << prob << endl;
+  }
+  s << endl;
+  ymuint ns2 = mReachableStates2.size();
+  s << "# states num of product machine" << endl
+    << ns2 << endl;
+  for (ymuint i = 0; i < ns2; ++ i) {
+    s << mReachableStates2[i] << endl;
+  }
+  s << endl;
+  s << "# transition probability of product machine" << endl;
+  for (hash_map<ymuint, double>::const_iterator p = mTransProb2.begin();
+       p != mTransProb2.end(); ++ p) {
+    ymuint sp = p->first;
+    ymuint csid = sp / ns2;
+    ymuint nsid = sp % ns2;
+    double prob = p->second;
+    s << csid << " " << nsid << " " << prob << endl;
+  }
+  s << endl;
+  s << "# failure probability of produc machine" << endl;
+  for (ymuint i = 0; i < ns2; ++ i) {
+    s << mFailureProb0[i] << endl;
   }
 }
 
@@ -409,9 +541,9 @@ MCAnalysis::dump_trans(ostream& s)
 void
 MCAnalysis::restore_trans(istream& s)
 {
-  mTrnasProb2.clear();
+  mTransProb2.clear();
   while ( s ) {
-    StatePair sp;
+    ymuint sp;
     double prob;
     s >> sp >> prob;
     mTransProb2.insert(make_pair(sp, prob));

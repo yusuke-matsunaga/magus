@@ -109,9 +109,10 @@ void
 fsm_analysis(const BNetwork& bnetwork,
 	     const vector<State>& init_states,
 	     vector<State>& reachable_states1,
-	     hash_map<State, double>& trans_map1,
+	     hash_map<ymuint, double>& trans_map1,
 	     vector<State>& reachable_states2,
-	     hash_map<State, double>& trans_map2)
+	     hash_map<ymuint, double>& trans_map2,
+	     vector<double>& failure_prob)
 {
   StopWatch sw;
   sw.start();
@@ -220,13 +221,13 @@ fsm_analysis(const BNetwork& bnetwork,
   
   // 正常回路の到達可能状態を列挙
   Bdd rs_bdd = fsm.enum_reachable_states(init_states);
-
-  // 正常回路の状態遷移確率を計算
-  fsm.calc_trans_prob(rs_bdd, trans_map1);
   
   // 到達可能状態集合を表す BDD を状態集合に変換する．
   fsm.bdd2cur_states(rs_bdd, reachable_states1);
-  
+
+  // 正常回路の状態遷移確率を計算
+  fsm.calc_trans_prob(rs_bdd, reachable_states1, trans_map1);
+
   // 正常回路の変数をエラー回路にシフトさせるためのマップ
   VarVarMap c2e_map;
   for (ymuint i = 0; i < ff_num; ++ i) {
@@ -376,10 +377,12 @@ fsm_analysis(const BNetwork& bnetwork,
   for(ymuint i = 0; i < reachable_states1.size(); ++ i) {
     State normal_state = reachable_states1[i];
     for(ymuint j = 0; j < ff_num; ++ j) {
-      init_statepairs.push_back(idxmap.make_error_state(normal_state, j));
+      StatePair sp = idxmap.make_error_state(normal_state, j);
+      init_statepairs.push_back(sp);
     }
   }
 
+#if 0
   // 回路対の到達可能状態の列挙
   Bdd tmp_bdd2 = fsm2.enum_reachable_states(init_statepairs);
   Bdd rs_bdd2 = tmp_bdd2 & cur_normal;
@@ -394,7 +397,7 @@ fsm_analysis(const BNetwork& bnetwork,
   
   // 回路対の状態遷移確率を計算
   hash_map<StatePair, double> tmp_map;
-  fsm2.calc_trans_prob(rs_bdd2, tmp_map);
+  fsm2.calc_trans_prob(rs_bdd2, reachable_states2, tmp_map);
   trans_map2.clear();
   for (hash_map<StatePair, double>::iterator p = tmp_map.begin();
        p != tmp_map.end(); ++ p) {
@@ -416,8 +419,55 @@ fsm_analysis(const BNetwork& bnetwork,
     }
     trans_map2.insert(make_pair(sp2, prob));
   }
+#else
+  // 回路対の到達可能状態の列挙
+  Bdd tmp_bdd2 = fsm2.enum_reachable_states(init_statepairs);
+  // ERROR と IDENT を取り除く
+  Bdd rs_bdd2 = tmp_bdd2 & cur_normal;
+
+  // 到達可能状態集合を表す BDD を状態集合に変換する．
+  fsm2.bdd2cur_states(rs_bdd2, reachable_states2);
+
+  vector<State> tmp_states(reachable_states2);
+  State error_state;
+  State ident_state;
+  for (ymuint i = 0; i < ff_num * 2; ++ i) {
+    error_state += "0";
+    ident_state += "0";
+  }
+  error_state += "10";
+  ident_state += "01";
+  tmp_states.push_back(error_state);
+  tmp_states.push_back(ident_state);
   
+  // 回路対の状態遷移確率を計算
+  hash_map<ymuint, double> tmp_map2;
+  fsm2.calc_trans_prob(rs_bdd2, tmp_states, tmp_map2);
+  trans_map2.clear();
+  failure_prob.clear();
   ymuint n = reachable_states2.size();
+  ymuint n2 = n + 2;
+  failure_prob.resize(n);
+  for (hash_map<ymuint, double>::iterator p = tmp_map2.begin();
+       p != tmp_map2.end(); ++ p) {
+    ymuint tmp = p->first;
+    double prob = p->second;
+    ymuint csid = tmp / n2;
+    ymuint nsid = tmp % n2;
+    assert_cond( csid < n, __FILE__, __LINE__);
+    if ( nsid < n ) {
+      trans_map2.insert(make_pair(csid * n + nsid, prob));
+    }
+    else if ( nsid == n ) {
+      failure_prob[csid] = prob;
+    }
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    reachable_states2[i] = reachable_states2[i].substr(0, ff_num * 2);
+  }
+  
+#endif
+  
   cout << "Reachable states analysis end" << endl;
   cout << "  " << n << " states" << endl;
   
@@ -431,7 +481,6 @@ fsm_analysis(const BNetwork& bnetwork,
   sw.stop();
   USTime time = sw.time();
   cout << "  " << time << endl;
-
 }
 
 END_NAMESPACE_YM_SEAL

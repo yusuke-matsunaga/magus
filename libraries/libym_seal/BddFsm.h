@@ -94,10 +94,12 @@ public:
   
   /// @brief 状態遷移確率を求める．
   /// @param[in] reachable_states_bdd 到達可能状態を表す BDD
+  /// @param[in] reachable_states 到達可能状態を収めたベクタ
   /// @param[out] trans_prob_map 状態遷移確率を格納するハッシュ表
   void
   calc_trans_prob(const Bdd& reachable_states_bdd,
-		  hash_map<StatePair, double>& trans_prob_map);
+		  const vector<State>& reachable_states,
+		  hash_map<ymuint, double>& trans_prob_map);
   
   /// @brief 現状態を BDD に変換する
   Bdd
@@ -120,10 +122,18 @@ public:
 
 private:
 
+  /// @brief calc_trans_prob の下請け関数
+  /// @param[in] rel 状態遷移関係
+  /// @param[in] ns 到達可能状態数
+  /// @param[in] state_hash 状態文字列から状態番号を得るためのハッシュ表
+  /// @param[in] st_vec 現在たどっている状態を入れる作業領域
+  /// @param[in] trans_prob_map 確率を収めるハッシュ表
   void
   rs_sub(Bdd rel,
+	 ymuint ns,
+	 const hash_map<State, ymuint>& state_hash,
 	 vector<ymuint>& st_vec,
-	 hash_map<StatePair, double>& trans_prob_map);
+	 hash_map<ymuint, double>& trans_prob_map);
   
   /// @brief 次状態集合の BDD を現状態集合の BDD に変換する．
   Bdd
