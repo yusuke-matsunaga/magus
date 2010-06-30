@@ -13,6 +13,7 @@
 #include "ym_bnet/BNetwork.h"
 #include "ym_utils/StopWatch.h"
 #include "Matrix.h"
+#include "SMatrix.h"
 
 
 BEGIN_NONAMESPACE
@@ -105,7 +106,7 @@ MCAnalysis::analyze(const BNetwork& network,
   calc_error_prob(error_rate);
   watch.stop();
   USTime time3 = watch.time();
-  
+
   watch.reset();
   watch.start();
   calc_failure_prob();
@@ -146,7 +147,8 @@ MCAnalysis::analyze2(istream& s)
   total_timer.start();
 
   restore_trans(s);
-  
+
+#if 0
   watch.reset();
   watch.start();
   calc_steady_prob();
@@ -159,13 +161,20 @@ MCAnalysis::analyze2(istream& s)
   calc_error_prob(error_rate);
   watch.stop();
   USTime time3 = watch.time();
-  
+#endif
+
   watch.reset();
   watch.start();
   calc_failure_prob();
   watch.stop();
   USTime time5 = watch.time();
-  
+#if 0
+  for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
+    cout << mFailureProb[i] << endl;
+  }
+#endif
+
+#if 0
   double abs_prob_sum = 0.0;
   for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
     State st_pair = mReachableStates2[i];
@@ -175,15 +184,18 @@ MCAnalysis::analyze2(istream& s)
       abs_prob_sum += mFailureProb[i] * init_prob;
     }
   }
-
+#endif
+  
   total_timer.stop();
   USTime ttime = total_timer.time();
   
   cout.precision(6);
 
+#if 0
   cout << " " << abs_prob_sum << endl;
   cout << "steady_prob: " << time2 << endl;
   cout << "init_prob  : " << time3 << endl;
+#endif
   cout << "abs_prob   : " << time5 << endl;
   cout << "total_time : " << ttime << endl;
 }
@@ -433,25 +445,6 @@ MCAnalysis::calc_steady_prob()
   for (ymuint i = 0; i < n; ++ i) {
     m.elem(i, n) = 1.0;
   }
-#if 0
-  for (ymuint32 i = 0; i < n; ++ i) {
-    State n_state = mReachableStates1[i];
-    for(ymuint32 j = 0; j < n; ++ j) {
-      State c_state = mReachableStates1[j];
-      StatePair sp = c_state + n_state;
-      hash_map<ymuint, double>::const_iterator p = mTransProb1.find(sp);
-      double d = 0.0;
-      if ( p != mTransProb1.end() ) {
-	d = p->second;
-      }
-      if ( i != j ) {
-	d += 1.0;
-      }
-      m.elem(i, j) = d;
-    }
-    m.elem(i, n) = 1.0;
-  }
-#endif
   bool stat = gaussian_elimination(m, mSteadyProb);
   assert_cond(stat, __FILE__, __LINE__);
 }
@@ -489,48 +482,28 @@ MCAnalysis::calc_failure_prob()
   StopWatch timer;
   timer.start();
 
-#if 1
   ymuint state_num = mReachableStates2.size();
-  Matrix m(state_num, state_num + 1);
+  SMatrix m(state_num);
   for (hash_map<ymuint, double>::const_iterator p = mTransProb2.begin();
        p != mTransProb2.end(); ++ p) {
     ymuint sp_code = p->first;
     double prob = p->second;
     ymuint cur_state = sp_code / state_num;
     ymuint next_state = sp_code % state_num;
-    m.elem(cur_state, next_state) = - prob;
+    m.set_value(cur_state, next_state, - prob);
   }
   for (ymuint i = 0; i < state_num; ++ i) {
-    m.elem(i, i) = m.elem(i, i) + 1.0;
+    SmCell* cell = m.find_elem(i, i);
+    double v = 1.0;
+    if ( cell ) {
+      v += cell->value();
+    }
+    m.set_value(i, i, v);
   }
   for (ymuint i = 0; i < state_num; ++ i) {
-    m.elem(i, state_num) = mFailureProb0[i];
+    m.set_const(i, mFailureProb0[i]);
   }
-#else
-  for (ymuint32 i = 0; i < state_num; ++ i) {
-    State cur_state = mReachableStates2[i];
-    for (ymuint32 j = 0; j < state_num; ++ j) {
-      State next_state = mReachableStates2[j];
-      StatePair tmp = cur_state + next_state;
-      hash_map<StatePair, double>::const_iterator p = mTransProb2.find(tmp);
-      double d = 0.0;
-      if ( p != mTransProb2.end() ) {
-	d = - p->second;
-      }
-      if ( i == j ) {
-	d += 1.0;
-      }
-      m.elem(i, j) = d;
-    }
-    StatePair tmp = cur_state + "ERROR";
-    hash_map<StatePair, double>::const_iterator p = mTransProb2.find(tmp);
-    double d = 0.0;
-    if ( p != mTransProb2.end() ) {
-      d = p->second;
-    }
-    m.elem(i, state_num) = d;
-  }
-#endif
+
   timer.stop();
   USTime time = timer.time();
   cout << "make prob. matrix: " << time << endl;
@@ -599,9 +572,11 @@ MCAnalysis::restore_trans(istream& s)
   while ( getline(s, buff) ) {
     if ( buff[0] == '#' || buff[0] == '\0' ) continue;
     mFFNum = atoi(buff.c_str());
+#if 0
     cout << "# FF-num" << endl
 	 << mFFNum << endl
 	 << endl;
+#endif
     break;
   }
 
@@ -609,8 +584,10 @@ MCAnalysis::restore_trans(istream& s)
   while ( getline(s, buff) ) {
     if ( buff[0] == '#' || buff[0] == '\0' ) continue;
     ns1 = atoi(buff.c_str());
+#if 0
     cout << "# states num of original original circuit" << endl
 	 << ns1 << endl;
+#endif
     break;
   }
   mReachableStates1.clear();
@@ -621,9 +598,13 @@ MCAnalysis::restore_trans(istream& s)
       return;
     }
     mReachableStates1[i] = buff;
+#if 0
     cout << mReachableStates1[i] << endl;
+#endif
   }
+#if 0
   cout << "# transition probability of original circuit" << endl;
+#endif
   mTransProb1.clear();
   bool first = true;
   while ( getline(s, buff) ) {
@@ -641,7 +622,9 @@ MCAnalysis::restore_trans(istream& s)
     ymuint nsid;
     double prob;
     tmp >> csid >> nsid >> prob;
+#if 0
     cout << csid << " " << nsid << " " << prob << endl;
+#endif
     mTransProb1.insert(make_pair(csid * ns1 + nsid, prob));
   }
 
@@ -649,8 +632,10 @@ MCAnalysis::restore_trans(istream& s)
   while ( getline(s, buff) ) {
     if ( buff[0] == '#' || buff[0] == '\0' ) continue;
     ns2 = atoi(buff.c_str());
+#if 0
     cout<< "# states num of product machine" << endl
 	<< ns2 << endl;
+#endif
     break;
   }
   mReachableStates2.clear();
@@ -663,9 +648,13 @@ MCAnalysis::restore_trans(istream& s)
       return;
     }
     mReachableStates2[i] = buff;
+#if 0
     cout << mReachableStates2[i] << endl;
+#endif
   }
+#if 0
   cout << "# transition probability of product machine" << endl;
+#endif
   first = true;
   mTransProb2.clear();
   while ( getline(s, buff) ) {
@@ -683,10 +672,14 @@ MCAnalysis::restore_trans(istream& s)
     ymuint nsid;
     double prob;
     tmp >> csid >> nsid >> prob;
+#if 0
     cout << csid << " " << nsid << " " << prob << endl;
+#endif
     mTransProb2.insert(make_pair(csid * ns2 + nsid, prob));
   }
+#if 0
   cout << "# failure probability of produc machine" << endl;
+#endif
   for (ymuint i = 0; i < ns2; ) {
     if ( !getline(s, buff) ) {
       cerr << "unexpected EOF" << endl;
@@ -695,7 +688,9 @@ MCAnalysis::restore_trans(istream& s)
     if ( buff[0] == '#' || buff[0] == '\0' ) continue;
     istringstream tmp(buff);
     tmp >> mFailureProb0[i];
+#if 0
     cout << mFailureProb0[i] << endl;
+#endif
     ++ i;
   }
 }
