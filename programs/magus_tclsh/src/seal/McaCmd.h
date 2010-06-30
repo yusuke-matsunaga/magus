@@ -62,6 +62,9 @@ private:
 
   // -dump_trans オプションの解析用
   TclPopt* mPoptDump;
+
+  // -restore オプションの解析用
+  TclPoptStr* mPoptRestore;
   
   // -kiss オプションの解析用
   TclPoptStr* mPoptKiss;

@@ -47,6 +47,10 @@ public:
 	  bool use_bdd = true,
 	  bool dump_trans = false);
 
+  /// @brief 解析を行う．
+  void
+  analyze2(istream& s);
+
   
 private:
 

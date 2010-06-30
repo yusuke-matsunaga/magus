@@ -25,6 +25,10 @@ McaCmd::McaCmd(NetMgr* mgr) :
   mPoptDump = new TclPopt(this, "dump_trans",
 			 "dump transition probability");
 
+  mPoptRestore = new TclPoptStr(this, "restore",
+				"restore transition probability",
+				"<probability filename>");
+  
   mPoptKiss = new TclPoptStr(this, "kiss",
 			     "specify KISS file",
 			     "<file-name>");
@@ -57,6 +61,26 @@ McaCmd::cmd_proc(TclObjVector& objv)
   }
   if ( mPoptDump->is_specified() ) {
     dump_trans = true;
+  }
+  if ( mPoptRestore->is_specified() ) {
+    string file_name = mPoptRestore->val();
+    // ファイル名の展開を行う．
+    string ex_file_name;
+    bool stat = tilde_subst(file_name, ex_file_name);
+    if ( !stat ) {
+      // ファイル名文字列の中に誤りがあった．
+      return TCL_ERROR;
+    }
+    ifstream fi(ex_file_name.c_str());
+    if( !fi ) {
+      TclObj emsg;
+      emsg << "Could not open file: " << ex_file_name;
+      set_result(emsg);
+      return TCL_ERROR;
+    }
+    nsSeal::MCAnalysis mca;
+    mca.analyze2(fi);
+    return TCL_OK;
   }
   if ( mPoptKiss->is_specified() ) {
     string file_name = mPoptKiss->val();

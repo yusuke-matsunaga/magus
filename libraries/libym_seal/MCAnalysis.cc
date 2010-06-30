@@ -135,6 +135,59 @@ MCAnalysis::analyze(const BNetwork& network,
   cout << "total_time : " << ttime << endl;
 }
 
+
+// @brief 解析を行う．
+void
+MCAnalysis::analyze2(istream& s)
+{
+  StopWatch watch;
+  StopWatch total_timer;
+  
+  total_timer.start();
+
+  restore_trans(s);
+  
+  watch.reset();
+  watch.start();
+  calc_steady_prob();
+  watch.stop();
+  USTime time2 = watch.time();
+
+  watch.reset();
+  watch.start();
+  vector<double> error_rate(mFFNum, 1.0e-10);
+  calc_error_prob(error_rate);
+  watch.stop();
+  USTime time3 = watch.time();
+  
+  watch.reset();
+  watch.start();
+  calc_failure_prob();
+  watch.stop();
+  USTime time5 = watch.time();
+  
+  double abs_prob_sum = 0.0;
+  for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
+    State st_pair = mReachableStates2[i];
+    hash_map<State, double>::iterator p = mInitialProb.find(st_pair);
+    if ( p != mInitialProb.end() ) {
+      double init_prob = p->second;
+      abs_prob_sum += mFailureProb[i] * init_prob;
+    }
+  }
+
+  total_timer.stop();
+  USTime ttime = total_timer.time();
+  
+  cout.precision(6);
+
+  cout << " " << abs_prob_sum << endl;
+  cout << "steady_prob: " << time2 << endl;
+  cout << "init_prob  : " << time3 << endl;
+  cout << "abs_prob   : " << time5 << endl;
+  cout << "total_time : " << ttime << endl;
+}
+
 // 与えられた回路の到達可能状態および遷移確率を求める．
 // 同時に正常回路と故障回路の対の到達可能状態および遷移確率も求める．
 void
@@ -541,12 +594,109 @@ MCAnalysis::dump_trans(ostream& s)
 void
 MCAnalysis::restore_trans(istream& s)
 {
-  mTransProb2.clear();
-  while ( s ) {
-    ymuint sp;
+  string buff;
+
+  while ( getline(s, buff) ) {
+    if ( buff[0] == '#' || buff[0] == '\0' ) continue;
+    mFFNum = atoi(buff.c_str());
+    cout << "# FF-num" << endl
+	 << mFFNum << endl
+	 << endl;
+    break;
+  }
+
+  ymuint ns1 = 0;
+  while ( getline(s, buff) ) {
+    if ( buff[0] == '#' || buff[0] == '\0' ) continue;
+    ns1 = atoi(buff.c_str());
+    cout << "# states num of original original circuit" << endl
+	 << ns1 << endl;
+    break;
+  }
+  mReachableStates1.clear();
+  mReachableStates1.resize(ns1);
+  for (ymuint i = 0; i < ns1; ++ i) {
+    if ( !getline(s, buff) ) {
+      cerr << "unexpected EOF" << endl;
+      return;
+    }
+    mReachableStates1[i] = buff;
+    cout << mReachableStates1[i] << endl;
+  }
+  cout << "# transition probability of original circuit" << endl;
+  mTransProb1.clear();
+  bool first = true;
+  while ( getline(s, buff) ) {
+    if ( buff[0] == '#' || buff[0] == '\0' ) {
+      if ( first ) {
+	continue;
+      }
+      else {
+	break;
+      }
+    }
+    first = false;
+    istringstream tmp(buff);
+    ymuint csid;
+    ymuint nsid;
     double prob;
-    s >> sp >> prob;
-    mTransProb2.insert(make_pair(sp, prob));
+    tmp >> csid >> nsid >> prob;
+    cout << csid << " " << nsid << " " << prob << endl;
+    mTransProb1.insert(make_pair(csid * ns1 + nsid, prob));
+  }
+
+  ymuint ns2 = 0;
+  while ( getline(s, buff) ) {
+    if ( buff[0] == '#' || buff[0] == '\0' ) continue;
+    ns2 = atoi(buff.c_str());
+    cout<< "# states num of product machine" << endl
+	<< ns2 << endl;
+    break;
+  }
+  mReachableStates2.clear();
+  mReachableStates2.resize(ns2);
+  mFailureProb0.clear();
+  mFailureProb0.resize(ns2);
+  for (ymuint i = 0; i < ns2; ++ i) {
+    if ( !getline(s, buff) ) {
+      cerr << "unexpected EOF" << endl;
+      return;
+    }
+    mReachableStates2[i] = buff;
+    cout << mReachableStates2[i] << endl;
+  }
+  cout << "# transition probability of product machine" << endl;
+  first = true;
+  mTransProb2.clear();
+  while ( getline(s, buff) ) {
+    if ( buff[0] == '#' || buff[0] == '\0' ) {
+      if ( first ) {
+	continue;
+      }
+      else {
+	break;
+      }
+    }
+    first = false;
+    istringstream tmp(buff);
+    ymuint csid;
+    ymuint nsid;
+    double prob;
+    tmp >> csid >> nsid >> prob;
+    cout << csid << " " << nsid << " " << prob << endl;
+    mTransProb2.insert(make_pair(csid * ns2 + nsid, prob));
+  }
+  cout << "# failure probability of produc machine" << endl;
+  for (ymuint i = 0; i < ns2; ) {
+    if ( !getline(s, buff) ) {
+      cerr << "unexpected EOF" << endl;
+      return;
+    }
+    if ( buff[0] == '#' || buff[0] == '\0' ) continue;
+    istringstream tmp(buff);
+    tmp >> mFailureProb0[i];
+    cout << mFailureProb0[i] << endl;
+    ++ i;
   }
 }
 
