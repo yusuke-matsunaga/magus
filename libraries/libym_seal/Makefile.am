@@ -26,6 +26,8 @@ libym_seal_la_SOURCES = \
 	fsm_analysis2.cc \
 	Matrix.h \
 	Matrix.cc \
+	SMatrix.h \
+	SMatrix.cc \
 	gauss_elimination.cc \
 	MCAnalysis.cc
 
