@@ -485,17 +485,21 @@ MCAnalysis::calc_failure_prob()
 
   ymuint state_num = mReachableStates2.size();
 
+  mFailureProb.clear();
+  mFailureProb.resize(state_num);
+  
   // 準failure状態を求める．
-  vector<bool> pfmark(state_num, false);
+  vector<bool> fixed(state_num, false);
   vector<ymuint> vmap(state_num, 0);
   vector<ymuint> vrmap(state_num, 0);
   ymuint state_num2 = 0;
   ymuint pfnum = 0;
   for (ymuint i = 0; i < state_num; ++ i) {
     if ( mFailureProb0[i] == 1.0 ) {
-      pfmark[i] = true;
+      fixed[i] = true;
       ++ pfnum;
       assert_cond( mTransProb2[i].empty(), __FILE__, __LINE__);
+      mFailureProb[i] = 1.0;
     }
     else {
       vmap[i] = state_num2;
@@ -515,26 +519,159 @@ MCAnalysis::calc_failure_prob()
     for (list<TransProb>::iterator p = mTransProb2[id].begin();
 	 p != mTransProb2[id].end(); ++ p) {
       ymuint nid = p->mNextState;
-      if ( pfmark[nid] ) continue;
+      if ( fixed[nid] ) continue;
       adjlist.push_back(vmap[nid]);
     }
     dfs.set_adjlist(i, adjlist);
   }
   ymuint nscc = dfs.scc();
   cout << "# of SCCs = " << nscc << endl;
-  ymuint nmax = 0;
-  for (ymuint i = 0; i < nscc; ++ i) {
-    ymuint c = 0;
-    for (DfsNode* node = dfs.repnode(i); node; node = node->mLink) {
-      ++ c;
+  ymuint zako = 0;
+  ymuint zako_sum = 0;
+  for (ymuint g = 0; g < nscc; ++ g) {
+    // 強連結成分ごとに行列を作る．
+    ymuint n = 0;
+    for (DfsNode* node = dfs.repnode(g); node; node = node->mLink) {
+      ++ n;
     }
-    if ( nmax < c ) {
-      nmax = c;
+    if ( n < 100 ) {
+      ++ zako;
+      zako_sum += n;
+    }
+    else {
+      cout << " " << n << endl;
+    }
+  }
+  cout << "zako: " << zako << ", total " << zako_sum << endl;
+  
+  ymuint nmax = 0;
+  for (ymuint g = 0; g < nscc; ++ g) {
+    // 強連結成分ごとに行列を作る．
+    ymuint n = 0;
+    for (DfsNode* node = dfs.repnode(g); node; node = node->mLink) {
+      ++ n;
+    }
+    if ( nmax < n ) {
+      nmax = n;
+    }
+    if ( n == 1 ) {
+      DfsNode* node = dfs.repnode(g);
+      ymuint gid = vrmap[node->mId];
+      double ans = mFailureProb0[gid];
+      double d = 1.0;
+      for (list<TransProb>::iterator p = mTransProb2[gid].begin();
+	   p != mTransProb2[gid].end(); ++ p) {
+	double prob = p->mProb;
+	ymuint nid = p->mNextState;
+	if ( fixed[nid] ) {
+	  ans += mFailureProb[nid] * prob;
+	}
+	else if ( nid == gid ) {
+	  d -= prob;
+	}
+	else {
+	  assert_not_reached(__FILE__, __LINE__);
+	}
+      }
+      mFailureProb[gid] = ans / d;
+      fixed[gid] = true;
+    }
+    else {
+#if 1
+      SMatrix m(n);
+      vector<ymuint> lmap(state_num, n);
+      vector<ymuint> gmap(n);
+      ymuint lid = 0;
+      for (DfsNode* node = dfs.repnode(g); node; node = node->mLink, ++ lid) {
+	ymuint gid = vrmap[node->mId];
+	lmap[gid] = lid;
+	gmap[lid] = gid;
+      }
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint id = gmap[i];
+	m.set_const(i, mFailureProb0[id]);
+	bool d = false;
+	for (list<TransProb>::iterator p = mTransProb2[id].begin();
+	     p != mTransProb2[id].end(); ++ p) {
+	  double prob = p->mProb;
+	  ymuint nid = p->mNextState;
+	  if ( fixed[nid] ) {
+	    m.set_const(i, m.const_elem(i) + prob * mFailureProb[nid]);
+	  }
+	  else {
+	    ymuint lnid = lmap[nid];
+	    assert_cond( lnid < n, __FILE__, __LINE__);
+	    if ( lnid == i ) {
+	      d = true;
+	      m.set_value(i, i, 1.0 - prob);
+	    }
+	    else {
+	      m.set_value(i, lnid, - prob);
+	    }
+	  }
+	}
+	if ( !d ) {
+	  m.set_value(i, i, 1.0);
+	}
+      }
+      vector<double> tmp_solution(n);
+      gaussian_elimination(m, tmp_solution);
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint id = gmap[i];
+	fixed[id] = true;
+	mFailureProb[id] = tmp_solution[i];
+      }
+#else
+      Matrix m(n, n + 1);
+      vector<ymuint> lmap(state_num, n);
+      vector<ymuint> gmap(n);
+      ymuint lid = 0;
+      for (DfsNode* node = dfs.repnode(g); node; node = node->mLink, ++ lid) {
+	ymuint gid = vrmap[node->mId];
+	lmap[gid] = lid;
+	gmap[lid] = gid;
+      }
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint id = gmap[i];
+	m.elem(i, n) =  mFailureProb0[id];
+	bool d = false;
+	for (list<TransProb>::iterator p = mTransProb2[id].begin();
+	     p != mTransProb2[id].end(); ++ p) {
+	  double prob = p->mProb;
+	  ymuint nid = p->mNextState;
+	  if ( fixed[nid] ) {
+	    m.elem(i, n) += prob * mFailureProb[nid];
+	  }
+	  else {
+	    ymuint lnid = lmap[nid];
+	    assert_cond( lnid < n, __FILE__, __LINE__);
+	    if ( lnid == i ) {
+	      d = true;
+	      m.elem(i, i) = 1.0 - prob;
+	    }
+	    else {
+	      m.elem(i, lnid) = -prob;
+	    }
+	  }
+	}
+	if ( !d ) {
+	  m.elem(i, i) = 1.0;
+	}
+      }
+      vector<double> tmp_solution(n);
+      gaussian_elimination(m, tmp_solution);
+      for (ymuint i = 0; i < n; ++ i) {
+	ymuint id = gmap[i];
+	fixed[id] = true;
+	mFailureProb[id] = tmp_solution[i];
+      }
+#endif
     }
   }
   cout << "# of maximum SCC = " << nmax << endl;
-#endif
-  
+
+#else
+
   SMatrix m(state_num2);
   for (ymuint i = 0; i < state_num2; ++ i) {
     ymuint j = vrmap[i];
@@ -545,7 +682,7 @@ MCAnalysis::calc_failure_prob()
 	 p != mTransProb2[j].end(); ++ p) {
       double prob = p->mProb;
       ymuint next_state = p->mNextState;
-      if ( pfmark[next_state] ) {
+      if ( fixed[next_state] ) {
 	m.set_const(i, m.const_elem(i) + prob);
       }
       else {
@@ -576,18 +713,12 @@ MCAnalysis::calc_failure_prob()
   timer.stop();
   time = timer.time();
 
-  mFailureProb.clear();
-  mFailureProb.resize(state_num);
-  for (ymuint i = 0; i < state_num; ++ i) {
-    if ( pfmark[i] ) {
-      mFailureProb[i] = 1.0;
-    }
-    else {
-      mFailureProb[i] = tmp_solution[vmap[i]];
-    }
+  for (ymuint i = 0; i < state_num2; ++ i) {
+    ymuint id = vrmap[i];
+    mFailureProb[id] = tmp_solution[i];
   }
-
   cout << "gausian elimination: " << time << endl;
+#endif
 }
 
 // @brief 回路対の状態遷移確率行列をダンプする．

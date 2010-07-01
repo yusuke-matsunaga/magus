@@ -204,13 +204,12 @@ SMatrix::set_value(ymuint row,
 
 // @brief ピボット演算を行う．
 void
-SMatrix::pivot(ymuint src_row,
-	       ymuint src_col,
+SMatrix::pivot(SmCell* pivot_cell,
 	       ymuint dst_row)
 {
-  SmCell* cell = find_elem(src_row, src_col);
-  assert_cond( cell , __FILE__, __LINE__);
-  double v0 = cell->value();
+  ymuint src_row = pivot_cell->row_pos();
+  ymuint src_col = pivot_cell->col_pos();
+  double v0 = pivot_cell->value();
   SmCell* src_top = row_top(src_row);
   SmCell* src_end = row_end(src_row);
   SmCell* dst_top = row_top(dst_row);
@@ -243,14 +242,16 @@ SMatrix::pivot(ymuint src_row,
       src_cell = src_cell->right();
     }
     else if ( src_col < dst_col ) {
-      SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
-      dst_prev->mRightLink = cell;
-      cell->mLeftLink = dst_prev;
-      cell->mRightLink = dst_cell;
-      dst_cell->mLeftLink = cell;
-      insert_col(cell);
+      if ( src_cell->value() * d != 0.0 ) {
+	SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
+	dst_prev->mRightLink = cell;
+	cell->mLeftLink = dst_prev;
+	cell->mRightLink = dst_cell;
+	dst_cell->mLeftLink = cell;
+	insert_col(cell);
+	dst_prev = cell;
+      }
       src_cell = src_cell->right();
-      dst_prev = cell;
     }
     else { // src_col > dst_col
       dst_prev = dst_cell;
@@ -259,14 +260,16 @@ SMatrix::pivot(ymuint src_row,
   }
   while ( src_cell != src_end ) {
     ymuint src_col = src_cell->col_pos();
-    SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
-    dst_prev->mRightLink = cell;
-    cell->mLeftLink = dst_prev;
-    cell->mRightLink = dst_end;
-    dst_end->mLeftLink = cell;
-    insert_col(cell);
+    if ( src_cell->value() * d != 0.0 ) {
+      SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
+      dst_prev->mRightLink = cell;
+      cell->mLeftLink = dst_prev;
+      cell->mRightLink = dst_end;
+      dst_end->mLeftLink = cell;
+      insert_col(cell);
+      dst_prev = cell;
+    }
     src_cell = src_cell->right();
-    dst_prev = cell;
   }
   mConstArray[dst_row] -= mConstArray[src_row] * d;
 

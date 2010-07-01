@@ -186,8 +186,7 @@ public:
 
   /// @brief ピボット演算を行う．
   void
-  pivot(ymuint src_row,
-	ymuint src_col,
+  pivot(SmCell* pivot_cell,
 	ymuint dst_row);
 
 
