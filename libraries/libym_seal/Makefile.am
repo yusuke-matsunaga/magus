@@ -28,6 +28,8 @@ libym_seal_la_SOURCES = \
 	Matrix.cc \
 	SMatrix.h \
 	SMatrix.cc \
+	Dfs.h \
+	Dfs.cc \
 	gauss_elimination.cc \
 	MCAnalysis.cc
 

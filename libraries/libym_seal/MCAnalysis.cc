@@ -14,6 +14,7 @@
 #include "ym_utils/StopWatch.h"
 #include "Matrix.h"
 #include "SMatrix.h"
+#include "Dfs.h"
 
 
 BEGIN_NONAMESPACE
@@ -473,7 +474,7 @@ MCAnalysis::calc_error_prob(const vector<double>& error_rate)
     }
   }
 }
-  
+
 // @brief エラー状態の吸収確率を求める．
 // @note 結果は mFailureProb に格納される．
 void
@@ -503,6 +504,37 @@ MCAnalysis::calc_failure_prob()
     }
   }
 
+#if 1
+  // 強連結成分を求める．
+  Dfs dfs(state_num2);
+  for (ymuint i = 0; i < state_num2; ++ i) {
+    ymuint id = vrmap[i];
+    ymuint n = mTransProb2[id].size();
+    vector<ymuint> adjlist;
+    adjlist.reserve(n);
+    for (list<TransProb>::iterator p = mTransProb2[id].begin();
+	 p != mTransProb2[id].end(); ++ p) {
+      ymuint nid = p->mNextState;
+      if ( pfmark[nid] ) continue;
+      adjlist.push_back(vmap[nid]);
+    }
+    dfs.set_adjlist(i, adjlist);
+  }
+  ymuint nscc = dfs.scc();
+  cout << "# of SCCs = " << nscc << endl;
+  ymuint nmax = 0;
+  for (ymuint i = 0; i < nscc; ++ i) {
+    ymuint c = 0;
+    for (DfsNode* node = dfs.repnode(i); node; node = node->mLink) {
+      ++ c;
+    }
+    if ( nmax < c ) {
+      nmax = c;
+    }
+  }
+  cout << "# of maximum SCC = " << nmax << endl;
+#endif
+  
   SMatrix m(state_num2);
   for (ymuint i = 0; i < state_num2; ++ i) {
     ymuint j = vrmap[i];
