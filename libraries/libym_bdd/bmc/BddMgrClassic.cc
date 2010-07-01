@@ -999,7 +999,7 @@ BddMgrClassic::dealloc_nodechunk(Node* chunk)
 void*
 BddMgrClassic::allocate(size_t size)
 {
-  if ( mUsedMem + size > mMemLimit ) {
+  if ( mMemLimit > 0 && mUsedMem + size > mMemLimit ) {
     // メモリ制限をオーバーしたので 0 を返す．
     return 0;
   }
