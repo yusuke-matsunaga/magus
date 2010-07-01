@@ -119,7 +119,11 @@ fsm_analysis(const BNetwork& bnetwork,
   
   BddMgrRef mgr(nsBdd::BmcFactory("classic mgr"));
   nsBdd::BddMgrParam param;
+#if 0
   param.mMemLimit = 1024 * 1024 * 1024;
+#else
+  param.mMemLimit = 0;
+#endif
   mgr.param(param, nsBdd::BddMgrParam::MEM_LIMIT);
   
   // 外部入力数
