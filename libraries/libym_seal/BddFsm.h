@@ -14,6 +14,7 @@
 #include "ym_seal/seal_nsdef.h"
 #include "ym_bdd/Bdd.h"
 #include "ym_bdd/BddVarSet.h"
+#include "ym_seal/MCAnalysis.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -99,7 +100,7 @@ public:
   void
   calc_trans_prob(const Bdd& reachable_states_bdd,
 		  const vector<State>& reachable_states,
-		  hash_map<ymuint, double>& trans_prob_map);
+		  vector<list<TransProb> >& trans_map);
   
   /// @brief 現状態を BDD に変換する
   Bdd
@@ -130,10 +131,9 @@ private:
   /// @param[in] trans_prob_map 確率を収めるハッシュ表
   void
   rs_sub(Bdd rel,
-	 ymuint ns,
 	 const hash_map<State, ymuint>& state_hash,
 	 vector<ymuint>& st_vec,
-	 hash_map<ymuint, double>& trans_prob_map);
+	 vector<list<TransProb> >& trans_map);
   
   /// @brief 次状態集合の BDD を現状態集合の BDD に変換する．
   Bdd

@@ -37,9 +37,9 @@ void
 fsm_analysis(const BNetwork& bnetwork,
 	     const vector<State>& init_states,
 	     vector<State>& reachable_states1,
-	     hash_map<ymuint, double>& trans_map1,
+	     vector<list<TransProb> >& trans_map1,
 	     vector<State>& reachable_states2,
-	     hash_map<ymuint, double>& trans_map2,
+	     vector<list<TransProb> >& trans_map2,
 	     vector<double>& failure_prob);
 
 // 与えられた回路の到達可能状態および遷移確率を求める．
@@ -48,9 +48,9 @@ void
 fsm_analysis2(const BNetwork& bnetwork,
 	      const vector<State>& init_states,
 	      vector<State>& reachable_states1,
-	      hash_map<ymuint, double>& trans_map1,
+	      vector<list<TransProb> >& trans_map1,
 	      vector<State>& reachable_states2,
-	      hash_map<ymuint, double>& trans_map2,
+	      vector<list<TransProb> >& trans_map2,
 	      vector<double>& failure_prob);
 
 // @brief コンストラクタ
@@ -212,13 +212,14 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 		 mReachableStates2, mTransProb2, mFailureProb0);
 
     if ( verify_trans1 ) {
+#if 0
       bool error = false;
       ymuint ff_num = bnetwork.latch_node_num();
       
       vector<State> c_states2;
-      hash_map<ymuint, double> trans_map2;
+      vector<list<TransProb> > trans_map2;
       vector<State> pair_vec2;
-      hash_map<ymuint, double> trans2_map2;
+      vector<list<TransProb> > trans2_map2;
       vector<double> fprob2;
       
       fsm_analysis2(bnetwork, init_states,
@@ -411,6 +412,7 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	}
       }
       assert_cond(!error, __FILE__, __LINE__);
+#endif
     }
   }
   else {
@@ -433,16 +435,14 @@ MCAnalysis::calc_steady_prob()
 	m.elem(i, j) += 1.0;
       }
     }
-  }
-  for (hash_map<ymuint, double>::const_iterator p = mTransProb1.begin();
-       p != mTransProb1.end(); ++ p) {
-    ymuint tmp = p->first;
-    ymuint prob = p->second;
-    ymuint row = tmp / n;
-    ymuint col = tmp % n;
-    m.elem(row, col) += prob;
-  }
-  for (ymuint i = 0; i < n; ++ i) {
+  
+    for (list<TransProb>::iterator p = mTransProb1[i].begin();
+	 p != mTransProb1[i].end(); ++ p) {
+      ymuint col = p->mNextState;
+      ymuint prob = p->mProb;
+      m.elem(i, col) += prob;
+    }
+
     m.elem(i, n) = 1.0;
   }
   bool stat = gaussian_elimination(m, mSteadyProb);
@@ -483,36 +483,78 @@ MCAnalysis::calc_failure_prob()
   timer.start();
 
   ymuint state_num = mReachableStates2.size();
-  SMatrix m(state_num);
-  for (hash_map<ymuint, double>::const_iterator p = mTransProb2.begin();
-       p != mTransProb2.end(); ++ p) {
-    ymuint sp_code = p->first;
-    double prob = p->second;
-    ymuint cur_state = sp_code / state_num;
-    ymuint next_state = sp_code % state_num;
-    m.set_value(cur_state, next_state, - prob);
-  }
+
+  // 準failure状態を求める．
+  vector<bool> pfmark(state_num, false);
+  vector<ymuint> vmap(state_num, 0);
+  vector<ymuint> vrmap(state_num, 0);
+  ymuint state_num2 = 0;
+  ymuint pfnum = 0;
   for (ymuint i = 0; i < state_num; ++ i) {
-    SmCell* cell = m.find_elem(i, i);
-    double v = 1.0;
-    if ( cell ) {
-      v += cell->value();
+    if ( mFailureProb0[i] == 1.0 ) {
+      pfmark[i] = true;
+      ++ pfnum;
+      assert_cond( mTransProb2[i].empty(), __FILE__, __LINE__);
     }
-    m.set_value(i, i, v);
-  }
-  for (ymuint i = 0; i < state_num; ++ i) {
-    m.set_const(i, mFailureProb0[i]);
+    else {
+      vmap[i] = state_num2;
+      vrmap[state_num2] = i;
+      ++ state_num2;
+    }
   }
 
+  SMatrix m(state_num2);
+  for (ymuint i = 0; i < state_num2; ++ i) {
+    ymuint j = vrmap[i];
+    m.set_const(i, mFailureProb0[j]);
+
+    bool d = false;
+    for (list<TransProb>::iterator p = mTransProb2[j].begin();
+	 p != mTransProb2[j].end(); ++ p) {
+      double prob = p->mProb;
+      ymuint next_state = p->mNextState;
+      if ( pfmark[next_state] ) {
+	m.set_const(i, m.const_elem(i) + prob);
+      }
+      else {
+	ymuint nsid = vmap[next_state];
+	if ( nsid == i ) {
+	  d = true;
+	  m.set_value(i, i, 1.0 - prob);
+	}
+	else {
+	  m.set_value(i, nsid, - prob);
+	}
+      }
+    }
+
+    if ( !d ) {
+      m.set_value(i, i, 1.0);
+    }
+  }
+  
   timer.stop();
   USTime time = timer.time();
   cout << "make prob. matrix: " << time << endl;
 
   timer.reset();
   timer.start();
-  gaussian_elimination(m, mFailureProb);
+  vector<double> tmp_solution(state_num2);
+  gaussian_elimination(m, tmp_solution);
   timer.stop();
   time = timer.time();
+
+  mFailureProb.clear();
+  mFailureProb.resize(state_num);
+  for (ymuint i = 0; i < state_num; ++ i) {
+    if ( pfmark[i] ) {
+      mFailureProb[i] = 1.0;
+    }
+    else {
+      mFailureProb[i] = tmp_solution[vmap[i]];
+    }
+  }
+
   cout << "gausian elimination: " << time << endl;
 }
 
@@ -531,13 +573,13 @@ MCAnalysis::dump_trans(ostream& s)
   }
   s << endl;
   s << "# transition probability of original circuit" << endl;
-  for (hash_map<ymuint, double>::const_iterator p = mTransProb1.begin();
-       p != mTransProb1.end(); ++ p) {
-    ymuint sp = p->first;
-    ymuint csid = sp / ns1;
-    ymuint nsid = sp % ns1;
-    double prob = p->second;
-    s << csid << " " << nsid << " " << prob << endl;
+  for (ymuint csid = 0; csid < ns1; ++ csid) {
+    for (list<TransProb>::iterator p = mTransProb1[csid].begin();
+	 p != mTransProb1[csid].end(); ++ p) {
+      ymuint nsid = p->mNextState;
+      double prob = p->mProb;
+      s << csid << " " << nsid << " " << prob << endl;
+    }
   }
   s << endl;
   ymuint ns2 = mReachableStates2.size();
@@ -548,13 +590,13 @@ MCAnalysis::dump_trans(ostream& s)
   }
   s << endl;
   s << "# transition probability of product machine" << endl;
-  for (hash_map<ymuint, double>::const_iterator p = mTransProb2.begin();
-       p != mTransProb2.end(); ++ p) {
-    ymuint sp = p->first;
-    ymuint csid = sp / ns2;
-    ymuint nsid = sp % ns2;
-    double prob = p->second;
-    s << csid << " " << nsid << " " << prob << endl;
+  for (ymuint csid = 0; csid < ns2; ++ csid) {
+    for (list<TransProb>::iterator p = mTransProb2[csid].begin();
+	 p != mTransProb2[csid].end(); ++ p) {
+      ymuint nsid = p->mNextState;
+      double prob = p->mProb;
+      s << csid << " " << nsid << " " << prob << endl;
+    }
   }
   s << endl;
   s << "# failure probability of produc machine" << endl;
@@ -606,6 +648,7 @@ MCAnalysis::restore_trans(istream& s)
   cout << "# transition probability of original circuit" << endl;
 #endif
   mTransProb1.clear();
+  mTransProb1.resize(ns1);
   bool first = true;
   while ( getline(s, buff) ) {
     if ( buff[0] == '#' || buff[0] == '\0' ) {
@@ -625,7 +668,7 @@ MCAnalysis::restore_trans(istream& s)
 #if 0
     cout << csid << " " << nsid << " " << prob << endl;
 #endif
-    mTransProb1.insert(make_pair(csid * ns1 + nsid, prob));
+    mTransProb1[csid].push_back(TransProb(nsid, prob));
   }
 
   ymuint ns2 = 0;
@@ -657,6 +700,7 @@ MCAnalysis::restore_trans(istream& s)
 #endif
   first = true;
   mTransProb2.clear();
+  mTransProb2.resize(ns2);
   while ( getline(s, buff) ) {
     if ( buff[0] == '#' || buff[0] == '\0' ) {
       if ( first ) {
@@ -675,7 +719,7 @@ MCAnalysis::restore_trans(istream& s)
 #if 0
     cout << csid << " " << nsid << " " << prob << endl;
 #endif
-    mTransProb2.insert(make_pair(csid * ns2 + nsid, prob));
+    mTransProb2[csid].push_back(TransProb(nsid, prob));
   }
 #if 0
   cout << "# failure probability of produc machine" << endl;

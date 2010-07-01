@@ -126,7 +126,7 @@ BddFsm::enum_reachable_states(const vector<State>& init_states)
 void
 BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
 			const vector<State>& reachable_states,
-			hash_map<ymuint, double>& trans_prob_map)
+			vector<list<TransProb> >& trans_map)
 {
   StopWatch sw;
   sw.reset();
@@ -144,7 +144,9 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
   
   vector<ymuint> st_vec(ff_num() * 2, 0);
 
-  rs_sub(trans2, ns, state_hash, st_vec, trans_prob_map);
+  trans_map.clear();
+  trans_map.resize(ns);
+  rs_sub(trans2, state_hash, st_vec, trans_map);
   
   sw.stop();
   
@@ -160,10 +162,9 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
 // @param[in] trans_prob_map 確率を収めるハッシュ表
 void
 BddFsm::rs_sub(Bdd rel,
-	       ymuint ns,
 	       const hash_map<State, ymuint>& state_hash,
 	       vector<ymuint>& st_vec,
-	       hash_map<ymuint, double>& trans_prob_map)
+	       vector<list<TransProb> >& trans_map)
 {
   if ( rel.is_zero() ) {
     return;
@@ -174,17 +175,17 @@ BddFsm::rs_sub(Bdd rel,
   ymuint pos;
   if ( cur_varid2pos(root_idx, pos) ) {
     st_vec[pos] = 1;
-    rs_sub(l, ns, state_hash, st_vec, trans_prob_map);
+    rs_sub(l, state_hash, st_vec, trans_map);
     st_vec[pos] = 2;
-    rs_sub(r, ns, state_hash, st_vec, trans_prob_map);
+    rs_sub(r, state_hash, st_vec, trans_map);
     st_vec[pos] = 0;
   }
   else if ( next_varid2pos(root_idx, pos) ) {
     pos += ff_num();
     st_vec[pos] = 1;
-    rs_sub(l, ns, state_hash, st_vec, trans_prob_map);
+    rs_sub(l, state_hash, st_vec, trans_map);
     st_vec[pos] = 2;
-    rs_sub(r, ns, state_hash, st_vec, trans_prob_map);
+    rs_sub(r, state_hash, st_vec, trans_map);
     st_vec[pos] = 0;
   }
   else {
@@ -231,7 +232,7 @@ BddFsm::rs_sub(Bdd rel,
       hash_map<State, ymuint>::const_iterator r = state_hash.find(next_state);
       assert_cond( r != state_hash.end(), __FILE__, __LINE__);
       ymuint next_state_id = r->second;
-      trans_prob_map.insert(make_pair(cur_state_id * ns + next_state_id, prob));
+      trans_map[cur_state_id].push_back(TransProb(next_state_id, prob));
     }
   }
 }

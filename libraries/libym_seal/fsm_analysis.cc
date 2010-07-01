@@ -109,9 +109,9 @@ void
 fsm_analysis(const BNetwork& bnetwork,
 	     const vector<State>& init_states,
 	     vector<State>& reachable_states1,
-	     hash_map<ymuint, double>& trans_map1,
+	     vector<list<TransProb> >& trans_map1,
 	     vector<State>& reachable_states2,
-	     hash_map<ymuint, double>& trans_map2,
+	     vector<list<TransProb> >& trans_map2,
 	     vector<double>& failure_prob)
 {
   StopWatch sw;
@@ -441,25 +441,25 @@ fsm_analysis(const BNetwork& bnetwork,
   tmp_states.push_back(ident_state);
   
   // 回路対の状態遷移確率を計算
-  hash_map<ymuint, double> tmp_map2;
-  fsm2.calc_trans_prob(rs_bdd2, tmp_states, tmp_map2);
-  trans_map2.clear();
-  failure_prob.clear();
   ymuint n = reachable_states2.size();
   ymuint n2 = n + 2;
+  vector<list<TransProb> > tmp_map2;
+  fsm2.calc_trans_prob(rs_bdd2, tmp_states, tmp_map2);
+  trans_map2.clear();
+  trans_map2.resize(n);
+  failure_prob.clear();
   failure_prob.resize(n);
-  for (hash_map<ymuint, double>::iterator p = tmp_map2.begin();
-       p != tmp_map2.end(); ++ p) {
-    ymuint tmp = p->first;
-    double prob = p->second;
-    ymuint csid = tmp / n2;
-    ymuint nsid = tmp % n2;
-    assert_cond( csid < n, __FILE__, __LINE__);
-    if ( nsid < n ) {
-      trans_map2.insert(make_pair(csid * n + nsid, prob));
-    }
-    else if ( nsid == n ) {
-      failure_prob[csid] = prob;
+  for (ymuint cur_state = 0; cur_state < n; ++ cur_state) {
+    for (list<TransProb>::iterator p = tmp_map2[cur_state].begin();
+	 p != tmp_map2[cur_state].end(); ++ p) {
+      double prob = p->mProb;
+      ymuint next_state = p->mNextState;
+      if ( next_state < n ) {
+	trans_map2[cur_state].push_back(TransProb(next_state, prob));
+      }
+      else if ( next_state == n ) {
+	failure_prob[cur_state] = prob;
+      }
     }
   }
   for (ymuint i = 0; i < n; ++ i) {

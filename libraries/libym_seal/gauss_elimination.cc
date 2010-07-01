@@ -266,7 +266,6 @@ gaussian_elimination(const SMatrix& src_matrix,
   vector<ymuint32> col_idx(nv);
   vector<double> max_elem(nv);
   for (ymuint i = 0; i < nv; ++ i) {
-    cout << " row#" << i << "/" << nv << endl;
     for (SmCell* cell = src_matrix.row_top(i);
 	 cell != src_matrix.row_end(i); cell = cell->right()) {
       ymuint j = cell->col_pos();

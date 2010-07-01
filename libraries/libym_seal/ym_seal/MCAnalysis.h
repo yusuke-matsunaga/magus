@@ -22,6 +22,25 @@ typedef string State;
 typedef string StatePair;
 
 
+/// @brief 遷移確率を表す構造体
+struct TransProb
+{
+  TransProb(ymuint next_state,
+	    double prob) :
+    mNextState(next_state),
+    mProb(prob)
+  {
+  }
+  
+  /// @brief 次状態番号
+  ymuint mNextState;
+
+  /// @brief 遷移確率
+  double mProb;
+
+};
+
+
 //////////////////////////////////////////////////////////////////////
 // 順序回路のソフトエラーレートの解析を行うクラス
 //////////////////////////////////////////////////////////////////////
@@ -100,7 +119,8 @@ private:
   
   // 正常回路の遷移確率を保持するハッシュ表
   // キーは '現状態番号' * 状態数 + '次状態番号'
-  hash_map<ymuint, double> mTransProb1;
+  //hash_map<ymuint, double> mTransProb1;
+  vector<list<TransProb> > mTransProb1;
 
   // 正常回路の各状態の定常状態における存在確率
   vector<double> mSteadyProb;
@@ -110,7 +130,8 @@ private:
   
   // 回路対の遷移確率を保持するハッシュ表
   // キーは '現状態番号' * 状態数 + '次状態番号'
-  hash_map<ymuint, double> mTransProb2;
+  //hash_map<ymuint, double> mTransProb2;
+  vector<list<TransProb> > mTransProb2;
 
   // 回路対の一時状態から failure 状態への遷移確率
   vector<double> mFailureProb0;

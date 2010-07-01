@@ -10,6 +10,7 @@
 
 
 #include "LogicSim.h"
+#include "ym_seal/MCAnalysis.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -111,9 +112,9 @@ void
 fsm_analysis2(const BNetwork& bnetwork,
 	      const vector<State>& init_states,
 	      vector<State>& reachable_states1,
-	      hash_map<ymuint, double>& trans_map1,
+	      vector<list<TransProb> >& trans_map1,
 	      vector<State>& reachable_states2,
-	      hash_map<ymuint, double>& trans_map2,
+	      vector<list<TransProb> >& trans_map2,
 	      vector<double>& failure_prob)
 {
   LogicSim logic_sim(&bnetwork);
@@ -128,6 +129,8 @@ fsm_analysis2(const BNetwork& bnetwork,
   
   ymuint sim_num = 1U << input_num;
   double m_weight = 1.0 / sim_num;
+  trans_map1.clear();
+  trans_map1.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     State cur_state = reachable_states1[i];
     hash_map<ymuint, ymuint> count_map;
@@ -152,9 +155,8 @@ fsm_analysis2(const BNetwork& bnetwork,
 	 p != count_map.end(); ++ p) {
       ymuint nid = p->first;
       ymuint count = p->second;
-      ymuint tmp = i * n + nid;
       double prob = count * m_weight;
-      trans_map1.insert(make_pair(tmp, prob));
+      trans_map1[i].push_back(TransProb(nid, prob));
     }
   }
 
@@ -180,6 +182,8 @@ fsm_analysis2(const BNetwork& bnetwork,
   
   ymuint pair_num = reachable_states2.size();
   failure_prob.resize(pair_num);
+  trans_map2.clear();
+  trans_map2.resize(pair_num);
   for (ymuint i = 0; i < pair_num; ++ i) {
     State p_pair = reachable_states2[i];
     State c_state = p_pair.substr(0, ff_num);
@@ -215,8 +219,7 @@ fsm_analysis2(const BNetwork& bnetwork,
 	 p != count_map.end(); ++ p) {
       ymuint nid = p->first;
       double prob = static_cast<double>(p->second) * m_weight;
-      ymuint tmp = i * pair_num + nid;
-      trans_map2.insert(make_pair(tmp, prob));
+      trans_map2[i].push_back(TransProb(nid, prob));
     }
     failure_prob[i] = static_cast<double>(fcount) * m_weight;
   }
