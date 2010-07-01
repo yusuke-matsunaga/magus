@@ -11,6 +11,7 @@
 
 #include "Matrix.h"
 #include "SMatrix.h"
+#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -94,6 +95,9 @@ gaussian_elimination(const Matrix& src_matrix,
       }
     }
     ++ last;
+    if ( last % 10000 ) {
+      cout << "# eliminated vars: " << last << endl;
+    }
   }
 #if 0
   vector<double> tmp_solution(nv, 0.0);
@@ -258,6 +262,7 @@ bool
 gaussian_elimination(const SMatrix& src_matrix,
 		     vector<double>& solution)
 {
+  StopWatch watch;
   ymuint32 nv = src_matrix.size();
 
   cout << "initializing SMatrix(" << nv << ")" << endl;
@@ -278,74 +283,62 @@ gaussian_elimination(const SMatrix& src_matrix,
   }
 
   cout << "singleton elimination" << endl;
+  watch.start();
   ymuint last = 0;
-#if 1
+  vector<ymuint> rows;
+  rows.reserve(nv);
   for ( ; ; ) {
-    ymuint r = 0;
-    bool found = false;
+    rows.clear();
     for (ymuint i = last; i < nv; ++ i) {
-      r = row_idx[i];
+      ymuint r = row_idx[i];
       if ( works.row_num(r) == 1 ) {
-	found = true;
-	break;
+	rows.push_back(r);
       }
     }
-    if ( !found ) {
+    if ( rows.empty() ) {
       break;
     }
-    SmCell* cell = works.row_top(r);
-    double v = works.const_elem(r) / cell->value();
-    ymuint c = cell->col_pos();
-    for (SmCell* cell = works.col_top(c);
-	 cell != works.col_end(c); ) {
-      SmCell* tmp = cell;
-      cell = tmp->down();
-      ymuint r1 = tmp->row_pos();
-      if ( r1 != r ) {
-	double v1 = tmp->value();
-	works.set_value(r1, c, 0.0);
-	double cval = works.const_elem(r1);
-	works.set_const(r1, cval - v * v1);
+    for (ymuint i = 0; i < rows.size(); ++ i) {
+      ymuint r = rows[i];
+      SmCell* cell = works.row_top(r);
+      double v = works.const_elem(r) / cell->value();
+      ymuint c = cell->col_pos();
+      for (SmCell* cell = works.col_top(c);
+	   cell != works.col_end(c); ) {
+	SmCell* tmp = cell;
+	cell = tmp->down();
+	ymuint r1 = tmp->row_pos();
+	if ( r1 != r ) {
+	  double v1 = tmp->value();
+	  works.set_value(r1, c, 0.0);
+	  double cval = works.const_elem(r1);
+	  works.set_const(r1, cval - v * v1);
+	}
       }
-    }
-    // 行 r と last を入れ替える．
-    for (ymuint i = last + 1; i < nv; ++ i) {
-      if ( row_idx[i] == r ) {
-	row_idx[i] = row_idx[last];
-	row_idx[last] = r;
-	break;
+      // 行 r と last を入れ替える．
+      for (ymuint i = last + 1; i < nv; ++ i) {
+	if ( row_idx[i] == r ) {
+	  row_idx[i] = row_idx[last];
+	  row_idx[last] = r;
+	  break;
+	}
       }
-    }
-    // 列 c と last を入れ替える．
-    for (ymuint i = last + 1; i < nv; ++ i) {
-      if ( col_idx[i] == c ) {
-	col_idx[i] = col_idx[last];
-	col_idx[last] = c;
-	break;
+      // 列 c と last を入れ替える．
+      for (ymuint i = last + 1; i < nv; ++ i) {
+	if ( col_idx[i] == c ) {
+	  col_idx[i] = col_idx[last];
+	  col_idx[last] = c;
+	  break;
+	}
       }
+      ++ last;
     }
-    ++ last;
+    cout << "# eliminated vars: " << last << endl;
   }
-#if 0
-  vector<double> tmp_solution(nv, 0.0);
-  vector<bool> mark(nv, false);
-  for (ymuint i = 0; i < last; ++ i) {
-    ymuint r = row_idx[i];
-    ymuint c = col_idx[i];
-    SmCell* cell = works.row_top(r);
-    assert_cond( cell->row_pos() == r, __FILE__, __LINE__);
-    assert_cond( cell->col_pos() == c, __FILE__, __LINE__);
-    assert_cond( works.row_num(r) == 1, __FILE__, __LINE__);
-    assert_cond( works.col_num(c) == 1, __FILE__, __LINE__);
-    double v = works.const_elem(r
-  }
-  for (ymuint i = 0; i < last; ++ i) {
-    ymuint r = row_idx[i];
-    
-  }
-#endif
-#endif
+  watch.stop();
   cout << "end, last = " << last << endl;
+  USTime time = watch.time();
+  cout << "  " << time << endl;
   // 以後は last 〜 (nv - 1) の間だけみればよい．
 
   // max_elem の計算
@@ -366,7 +359,7 @@ gaussian_elimination(const SMatrix& src_matrix,
     }
     max_elem[r] = max;
   }
-
+  
   // 変数を一つずつ選んでゆく
   for (ymuint i = last; i < nv; ++ i) {
     ymuint c = col_idx[i];
