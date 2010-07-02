@@ -21,27 +21,12 @@ SMatrix::SMatrix(ymuint size) :
   mSize(size)
 {
   mRowArray = new SmCell[mSize];
-  mColArray = new SmCell[mSize];
-  mRowNumArray = new ymuint[mSize];
-  mColNumArray = new ymuint[mSize];
   mConstArray = new double[mSize];
   for (ymuint i = 0; i < mSize; ++ i) {
     SmCell& cell = mRowArray[i];
-    cell.mRowPos = i;
     cell.mColPos = 0;
     cell.mVal = 0.0;
-    cell.mUpLink = cell.mDownLink = &cell;
-    cell.mLeftLink = cell.mRightLink = &cell;
-    mRowNumArray[i] = 0;
-  }
-  for (ymuint i = 0; i < mSize; ++ i) {
-    SmCell& cell = mColArray[i];
-    cell.mRowPos = 0;
-    cell.mColPos = i;
-    cell.mVal = 0.0;
-    cell.mUpLink = cell.mDownLink = &cell;
-    cell.mLeftLink = cell.mRightLink = &cell;
-    mColNumArray[i] = 0;
+    cell.mRightLink = &cell;
   }
   for (ymuint i = 0; i < mSize; ++ i) {
     mConstArray[i] = 0.0;
@@ -93,9 +78,6 @@ SMatrix::operator=(const SMatrix& src)
 SMatrix::~SMatrix()
 {
   delete [] mRowArray;
-  delete [] mColArray;
-  delete [] mRowNumArray;
-  delete [] mColNumArray;
   delete [] mConstArray;
 }
 
@@ -107,28 +89,14 @@ SmCell*
 SMatrix::find_elem(ymuint row,
 		   ymuint col) const
 {
-  if ( row_num(row) <= col_num(col) ) {
-    SmCell* end = row_end(row);
-    for (SmCell* cur = row_top(row); cur != end; cur = cur->right()) {
-      ymuint c = cur->col_pos();
-      if ( c == col ) {
-	return cur;
-      }
-      else if ( c > col ) {
-	return NULL;
-      }
+  SmCell* end = row_end(row);
+  for (SmCell* cur = row_top(row); cur != end; cur = cur->right()) {
+    ymuint c = cur->col_pos();
+    if ( c == col ) {
+      return cur;
     }
-  }
-  else {
-    SmCell* end = col_end(col);
-    for (SmCell* cur = col_top(col); cur != end; cur = cur->down()) {
-      ymuint r = cur->row_pos();
-      if ( r == row ) {
-	return cur;
-      }
-      else if ( r > row ) {
-	return NULL;
-      }
+    else if ( c > col ) {
+      return NULL;
     }
   }
   return NULL;
@@ -144,10 +112,20 @@ SMatrix::set_value(ymuint row,
 		   double val)
 {
   if ( val == 0.0 ) {
-    SmCell* cell = find_elem(row, col);
-    if ( cell ) {
-      // cell を削除する．
-      delete_cell(cell);
+    SmCell* end = row_end(row);
+    SmCell* prev = end;
+    for (SmCell* cur = prev->right(); cur != end; ) {
+      ymuint c = cur->col_pos();
+      if ( c == col ) {
+	// cur を削除する．
+	delete_cell(prev, cur);
+	return;
+      }
+      else if ( c > col ) {
+	return;
+      }
+      prev = cur;
+      cur = prev->right();
     }
   }
   else {
@@ -172,27 +150,7 @@ SMatrix::set_value(ymuint row,
       // prev と cur の間に新しいセルを挿入する．
       SmCell* cell = new_cell(row, col, val);
       prev->mRightLink = cell;
-      cell->mLeftLink = prev;
       cell->mRightLink = cur;
-      cur->mLeftLink = cell;
-    
-      top = &mColArray[col];
-      prev = top;
-      cur = prev->down();
-      while ( cur != top ) {
-	ymuint pos = cur->row_pos();
-	assert_cond ( pos != row, __FILE__, __LINE__);
-	if ( pos > row ) {
-	  break;
-	}
-	prev = cur;
-	cur = prev->down();
-      }
-      // prev と cur の間に新しいセルを挿入する．
-      prev->mDownLink = cell;
-      cell->mUpLink = prev;
-      cell->mDownLink = cur;
-      cur->mUpLink = cell;
     }
   }
 
@@ -205,9 +163,9 @@ SMatrix::set_value(ymuint row,
 // @brief ピボット演算を行う．
 void
 SMatrix::pivot(SmCell* pivot_cell,
+	       ymuint src_row,
 	       ymuint dst_row)
 {
-  ymuint src_row = pivot_cell->row_pos();
   ymuint src_col = pivot_cell->col_pos();
   double v0 = pivot_cell->value();
   SmCell* src_top = row_top(src_row);
@@ -233,7 +191,7 @@ SMatrix::pivot(SmCell* pivot_cell,
       dst_cell->mVal -= src_cell->value() * d;
       if ( dst_cell->mVal == 0.0 ) {
 	// dst_cell を削除
-	delete_cell(dst_cell);
+	delete_cell(dst_prev, dst_cell);
 	// dst_prev はそのままでよい．
       }
       else {
@@ -245,10 +203,7 @@ SMatrix::pivot(SmCell* pivot_cell,
       if ( src_cell->value() * d != 0.0 ) {
 	SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
 	dst_prev->mRightLink = cell;
-	cell->mLeftLink = dst_prev;
 	cell->mRightLink = dst_cell;
-	dst_cell->mLeftLink = cell;
-	insert_col(cell);
 	dst_prev = cell;
       }
       src_cell = src_cell->right();
@@ -263,10 +218,7 @@ SMatrix::pivot(SmCell* pivot_cell,
     if ( src_cell->value() * d != 0.0 ) {
       SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
       dst_prev->mRightLink = cell;
-      cell->mLeftLink = dst_prev;
       cell->mRightLink = dst_end;
-      dst_end->mLeftLink = cell;
-      insert_col(cell);
       dst_prev = cell;
     }
     src_cell = src_cell->right();
@@ -285,35 +237,6 @@ SMatrix::pivot(SmCell* pivot_cell,
 #endif
 }
 
-// @brief セルを列に挿入する．
-void
-SMatrix::insert_col(SmCell* cell)
-{
-  ymuint col = cell->col_pos();
-  ymuint row = cell->row_pos();
-  SmCell* end = col_end(col);
-  SmCell* prev = end;
-  SmCell* cur = prev->down();
-  while ( cur != end ) {
-    ymuint r1 = cur->row_pos();
-    if ( r1 < row ) {
-      prev = cur;
-      cur = prev->down();
-    }
-    else if ( r1 == row ) {
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    else { // r1 > row
-      break;
-    }
-  }
-  prev->mDownLink = cell;
-  cell->mUpLink = prev;
-  cell->mDownLink = cur;
-  cur->mUpLink = cell;
-}
-
-
 // @brief セルを確保する．
 SmCell*
 SMatrix::new_cell(ymuint row,
@@ -322,28 +245,18 @@ SMatrix::new_cell(ymuint row,
 {
   void* p = mAlloc.get_memory(sizeof(SmCell));
   SmCell* cell = new (p) SmCell();
-  cell->mRowPos = row;
   cell->mColPos = col;
   cell->mVal = val;
-  ++ mRowNumArray[row];
-  ++ mColNumArray[col];
   return cell;
 }
 
 // @brief セルを削除する．
 void
-SMatrix::delete_cell(SmCell* cell)
+SMatrix::delete_cell(SmCell* left,
+		     SmCell* cell)
 {
-  SmCell* up = cell->up();
-  SmCell* down = cell->down();
-  up->mDownLink = down;
-  down->mUpLink = up;
-  SmCell* left = cell->left();
   SmCell* right = cell->right();
   left->mRightLink = right;
-  right->mLeftLink = left;
-  -- mRowNumArray[cell->row_pos()];
-  -- mColNumArray[cell->col_pos()];
   mAlloc.put_memory(sizeof(SmCell), cell);
 }
 

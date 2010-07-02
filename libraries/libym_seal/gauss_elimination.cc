@@ -166,10 +166,9 @@ gaussian_elimination(const SMatrix& src_matrix,
   ymuint32 nv = src_matrix.size();
 
   watch.start();
-  cout << "initializing SMatrix(" << nv << ")" << endl;
+  cout << "gaussian_elimination(" << nv << ")" << endl;
   SMatrix works(nv);
   vector<ymuint32> row_idx(nv);
-  vector<ymuint32> col_idx(nv);
   vector<double> max_elem(nv);
   vector<bool> fixed(nv, false);
   for (ymuint i = 0; i < nv; ++ i) {
@@ -181,79 +180,11 @@ gaussian_elimination(const SMatrix& src_matrix,
     }
     works.set_const(i, src_matrix.const_elem(i));
     row_idx[i] = i;
-    col_idx[i] = i;
   }
-  cout << "end" << endl;
-
-#if 0
-  cout << "singleton elimination" << endl;
-  watch.start();
-  ymuint last = 0;
-  vector<ymuint> rows;
-  rows.reserve(nv);
-  for ( ; ; ) {
-    rows.clear();
-    for (ymuint i = last; i < nv; ++ i) {
-      ymuint r = row_idx[i];
-      if ( works.row_num(r) == 1 ) {
-	rows.push_back(r);
-      }
-    }
-    if ( rows.empty() ) {
-      break;
-    }
-    for (ymuint i = 0; i < rows.size(); ++ i) {
-      ymuint r = rows[i];
-      SmCell* cell = works.row_top(r);
-      double v = works.const_elem(r) / cell->value();
-      ymuint c = cell->col_pos();
-      for (SmCell* cell = works.col_top(c);
-	   cell != works.col_end(c); ) {
-	SmCell* tmp = cell;
-	cell = tmp->down();
-	ymuint r1 = tmp->row_pos();
-	if ( r1 != r ) {
-	  double v1 = tmp->value();
-	  works.set_value(r1, c, 0.0);
-	  double cval = works.const_elem(r1);
-	  works.set_const(r1, cval - v * v1);
-	}
-      }
-      // 行 r と last を入れ替える．
-      for (ymuint i = last + 1; i < nv; ++ i) {
-	if ( row_idx[i] == r ) {
-	  row_idx[i] = row_idx[last];
-	  row_idx[last] = r;
-	  fixed[r] = true;
-	  break;
-	}
-      }
-      // 列 c と last を入れ替える．
-      for (ymuint i = last + 1; i < nv; ++ i) {
-	if ( col_idx[i] == c ) {
-	  col_idx[i] = col_idx[last];
-	  col_idx[last] = c;
-	  break;
-	}
-      }
-      ++ last;
-    }
-    cout << "# eliminated vars: " << last << endl;
-  }
-  watch.stop();
-  cout << "end, last = " << last << endl;
-  USTime time = watch.time();
-  cout << "  " << time << endl;
-  // 以後は last 〜 (nv - 1) の間だけみればよい．
-#else
-  ymuint last = 0;
-#endif
 
   // max_elem の計算
   for (ymuint r = 0; r < nv; ++ r) {
-    if ( fixed[r] ) continue;
-
-    if ( works.row_num(r) == 0 ) {
+    if ( works.row_top(r) == works.row_end(r) ) {
       // すべて 0 の行がある．
       cout << "all 0 row" << endl;
       return false;
@@ -270,21 +201,20 @@ gaussian_elimination(const SMatrix& src_matrix,
   }
   
   // 変数を一つずつ選んでゆく
-  for (ymuint i = last; i < nv; ++ i) {
-#if 0
-    cout << i << " / " << nv;
+  for (ymuint c = 0; c < nv; ++ c) {
+#if 1
+    cout << c << " / " << nv;
     cout.flush();
 #endif
     
-    ymuint c = col_idx[i];
     // c 番めの係数が最大の行を選ぶ．
     double max = 0.0;
     ymuint max_r = 0;
     SmCell* max_cell = NULL;
-    for (SmCell* cell = works.col_top(c);
-	 cell != works.col_end(c); cell = cell->down()) {
-      ymuint r = cell->row_pos();
-      if ( !fixed[r] ) {
+    for (ymuint r = 0; r < nv; ++ r) {
+      if ( fixed[r] ) continue;
+      SmCell* cell = works.find_elem(r, c);
+      if ( cell ) {
 	double v = fabs(cell->value());
 	v /= max_elem[r];
 	if ( max < v ) {
@@ -294,31 +224,29 @@ gaussian_elimination(const SMatrix& src_matrix,
 	}
       }
     }
+
     if ( max == 0.0 ) {
       // 全ての行でこの変数が消えてしまった．
       cout << "all 0 col" << endl;
       return false;
     }
 
-#if 0
-    cout << " : --> " << max_r << "(" << works.row_num(max_r)
-	 << ", " << works.col_num(c) << ")" << endl;
+#if 1
+    cout << " : --> " << max_r << endl;
 #endif
 
-    // i 番め行として max_r 行を選ぶ．
-    row_idx[i] = max_r;
+    // c 番めの行として max_r 行を選ぶ．
+    row_idx[c] = max_r;
     fixed[max_r] = true;
 
     // i 番め以降の行からこの変数を消去する．
     // 具体的には i番目以降の行 (j行)から i行 に A_ji / A_ii をかけた
     // ものを引く．
     // ただし， A_ji = 0 の時はなにもしない．
-    for (SmCell* cell = works.col_top(c); cell != works.col_end(c); ) {
-      SmCell* tmp = cell;
-      cell = tmp->down();
-      ymuint r = tmp->row_pos();
-      if ( !fixed[r] ) {
-	works.pivot(max_cell, r);
+    for (ymuint r = 0; r < nv; ++r) {
+      if ( fixed[r] ) continue;
+      if ( works.find_elem(r, c) ) {
+	works.pivot(max_cell, max_r, r);
 	
 	// max_elem の更新
 	double max = 0.0;
@@ -347,7 +275,7 @@ gaussian_elimination(const SMatrix& src_matrix,
   solution.resize(nv);
   for (ymuint i = nv; i -- > 0; ) {
     ymuint r = row_idx[i];
-    ymuint c = col_idx[i];
+    ymuint c = i;
     double v = works.const_elem(r);
     double k = 0;
     for (SmCell* cell = works.row_top(r);
@@ -392,9 +320,8 @@ gaussian_elimination(const SMatrix& src_matrix,
 #endif
 
   watch.stop();
-  cout << "end" << endl;
   USTime time = watch.time();
-  cout << "  " << time << endl;
+  cout << "end" << "  " << time << endl;
   
   return true;
 }

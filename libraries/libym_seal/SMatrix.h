@@ -27,10 +27,6 @@ class SmCell
   friend class SMatrix;
 public:
 
-  /// @brief 行番号を得る．
-  ymuint
-  row_pos() const;
-
   /// @brief 列番号を得る．
   ymuint
   col_pos() const;
@@ -42,18 +38,6 @@ public:
   /// @brief 値を設定する．
   void
   set_value(double val);
-  
-  /// @brief 上に隣接したセルを得る．
-  SmCell*
-  up() const;
-
-  /// @brief 下に隣接したセルを得る．
-  SmCell*
-  down() const;
-
-  /// @brief 左に隣接したセルを得る．
-  SmCell*
-  left() const;
 
   /// @brief 右に隣接したセルを得る．
   SmCell*
@@ -65,23 +49,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 行番号
-  ymuint32 mRowPos;
-
   // 列番号
   ymuint32 mColPos;
 
   // 値
   double mVal;
-
-  // 上方向のリンク
-  SmCell* mUpLink;
-
-  // 下方向のリンク
-  SmCell* mDownLink;
-
-  // 左方向のリンク
-  SmCell* mLeftLink;
 
   // 右方向のリンク
   SmCell* mRightLink;
@@ -132,26 +104,6 @@ public:
   SmCell*
   row_end(ymuint pos) const;
 
-  /// @brief 行の要素数を得る．
-  /// @param[in] pos 行番号 ( 0 <= pos < size() )
-  ymuint
-  row_num(ymuint pos) const;
-
-  /// @brief 列の先頭を得る．
-  /// @param[in] pos 列番号 ( 0 <= pos < size() )
-  SmCell*
-  col_top(ymuint pos) const;
-
-  /// @brief 列の末尾を得る．
-  /// @param[in] pos 列番号 ( 0 <= pos < size() )
-  /// @note このセルはダミー
-  SmCell*
-  col_end(ymuint pos) const;
-
-  /// @brief 列の要素数を得る．
-  ymuint
-  col_num(ymuint pos) const;
-
   /// @brief 要素を取り出す．
   /// @param[in] row 行番号
   /// @param[in] col 列番号
@@ -187,6 +139,7 @@ public:
   /// @brief ピボット演算を行う．
   void
   pivot(SmCell* pivot_cell,
+	ymuint src_row,
 	ymuint dst_row);
 
 
@@ -198,10 +151,6 @@ public:
 
 private:
 
-  /// @brief セルを列に挿入する．
-  void
-  insert_col(SmCell* cell);
-
   /// @brief セルを確保する．
   SmCell*
   new_cell(ymuint row,
@@ -210,7 +159,8 @@ private:
 
   /// @brief セルを削除する．
   void
-  delete_cell(SmCell* cell);
+  delete_cell(SmCell* left,
+	      SmCell* cell);
   
 
 private:
@@ -226,16 +176,7 @@ private:
 
   // 行の先頭の配列
   SmCell* mRowArray;
-
-  // 行の要素数の配列
-  ymuint32* mRowNumArray;
-
-  // 列の先頭の配列
-  SmCell* mColArray;
-
-  // 列の要素数の配列
-  ymuint32* mColNumArray;
-
+  
   // 定数項の配列
   double* mConstArray;
 
@@ -266,14 +207,6 @@ gaussian_elimination(const SMatrix& src_matrix,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 行番号を得る．
-inline
-ymuint
-SmCell::row_pos() const
-{
-  return mRowPos;
-}
-
 // @brief 列番号を得る．
 inline
 ymuint
@@ -296,30 +229,6 @@ void
 SmCell::set_value(double val)
 {
   mVal = val;
-}
-
-// @brief 上に隣接したセルを得る．
-inline
-SmCell*
-SmCell::up() const
-{
-  return mUpLink;
-}
-
-// @brief 下に隣接したセルを得る．
-inline
-SmCell*
-SmCell::down() const
-{
-  return mDownLink;
-}
-
-// @brief 左に隣接したセルを得る．
-inline
-SmCell*
-SmCell::left() const
-{
-  return mLeftLink;
 }
 
 // @brief 右に隣接したセルを得る．
@@ -355,42 +264,6 @@ SmCell*
 SMatrix::row_end(ymuint pos) const
 {
   return &mRowArray[pos];
-}
-
-// @brief 行の要素数を得る．
-// @param[in] pos 行番号 ( 0 <= pos < size() )
-inline
-ymuint
-SMatrix::row_num(ymuint pos) const
-{
-  return mRowNumArray[pos];
-}
-
-// @brief 列の先頭を得る．
-// @param[in] pos 列番号 ( 0 <= pos < size() )
-inline
-SmCell*
-SMatrix::col_top(ymuint pos) const
-{
-  return mColArray[pos].down();
-}
-
-// @brief 列の末尾を得る．
-// @param[in] pos 列番号 ( 0 <= pos < size() )
-// @note このセルはダミー
-inline
-SmCell*
-SMatrix::col_end(ymuint pos) const
-{
-  return &mColArray[pos];
-}
-
-// @brief 列の要素数を得る．
-inline
-ymuint
-SMatrix::col_num(ymuint pos) const
-{
-  return mColNumArray[pos];
 }
 
 // @brief 定数項を取り出す．
