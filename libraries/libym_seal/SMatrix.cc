@@ -186,7 +186,7 @@ SMatrix::pivot(SmCell* pivot_cell,
   SmCell* dst_cell = dst_prev->right();
   ymuint src_col = src_cell->col_pos();
   ymuint dst_col = dst_cell->col_pos();
-  while ( src_cell != src_end /*&& dst_cell != dst_end*/ ) {
+  while ( src_cell != src_end ) {
     if ( src_col == dst_col ) {
       dst_cell->mVal -= src_cell->value() * d;
       if ( dst_cell->mVal == 0.0 ) {
@@ -228,18 +228,6 @@ SMatrix::pivot(SmCell* pivot_cell,
       }
     }
   }
-#if 0
-  while ( src_cell != src_end ) {
-    if ( src_cell->value() * d != 0.0 ) {
-      SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
-      dst_prev->mRightLink = cell;
-      cell->mRightLink = dst_end;
-      dst_prev = cell;
-    }
-    src_cell = src_cell->right();
-    src_col = src_cell->col_pos();
-  }
-#endif
   mConstArray[dst_row] -= mConstArray[src_row] * d;
 
 #ifdef SANITY_CHECK
