@@ -290,17 +290,18 @@ gaussian_elimination(const SMatrix& src_matrix,
     solution[c] = v / k;
   }
   
-#if 0
+#if 1
   // 解の検証
   bool error = false;
   for (ymuint i = 0; i < nv; ++ i) {
     double v = 0.0;
-    for (ymuint j = 0; j < nv; ++ j) {
-      v += src_matrix.elem(i, j) * solution[j];
+    for (SmCell* cell = src_matrix.row_top(i);
+	 cell != src_matrix.row_end(i); cell = cell->right()) {
+      v += cell->value() * solution[cell->col_pos()];
     }
-    double c = src_matrix.elem(i, nv);
-    double delta = v - src_matrix.elem(i, nv);
-    if ( fabs(delta) >= 1e-10 ) {
+    double c = src_matrix.const_elem(i);
+    double delta = v - c;
+    if ( fabs(delta) >= 1e-15 ) {
       cout << "error at " << i << "th row" << endl
 	   << " v = " << v << ", c = " << c << endl
 	   << " delta = " << delta << endl;
