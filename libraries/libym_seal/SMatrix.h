@@ -137,10 +137,13 @@ public:
 	    double value);
 
   /// @brief ピボット演算を行う．
-  void
-  pivot(SmCell* pivot_cell,
-	ymuint src_row,
-	ymuint dst_row);
+  /// @param[in] src_row 参照元の行
+  /// @param[in] dst_row 対象の行
+  /// @param[in] denom 係数
+  double
+  pivot(ymuint src_row,
+	ymuint dst_row,
+	double denom);
 
 
 #ifdef SANITY_CHECK

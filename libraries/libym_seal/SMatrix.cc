@@ -161,26 +161,16 @@ SMatrix::set_value(ymuint row,
 }
 
 // @brief ピボット演算を行う．
-void
-SMatrix::pivot(SmCell* pivot_cell,
-	       ymuint src_row,
-	       ymuint dst_row)
+double
+SMatrix::pivot(ymuint src_row,
+	       ymuint dst_row,
+	       double denom)
 {
-  ymuint src_col0 = pivot_cell->col_pos();
-  double v0 = pivot_cell->value();
   SmCell* src_top = row_top(src_row);
   SmCell* src_end = row_end(src_row);
-  SmCell* dst_top = row_top(dst_row);
   SmCell* dst_end = row_end(dst_row);
-  double d = 0.0;
-  for (SmCell* cell = dst_top; cell != dst_end; cell = cell->right()) {
-    if ( cell->col_pos() == src_col0 ) {
-      d = cell->value() / v0;
-      break;
-    }
-  }
-  assert_cond( d != 0.0, __FILE__, __LINE__);
 
+  double max_value = 0.0;
   SmCell* src_cell = src_top;
   SmCell* dst_prev = dst_end;
   SmCell* dst_cell = dst_prev->right();
@@ -188,13 +178,17 @@ SMatrix::pivot(SmCell* pivot_cell,
   ymuint dst_col = dst_cell->col_pos();
   while ( src_cell != src_end ) {
     if ( src_col == dst_col ) {
-      dst_cell->mVal -= src_cell->value() * d;
+      dst_cell->mVal -= src_cell->value() * denom;
       if ( dst_cell->mVal == 0.0 ) {
 	// dst_cell を削除
 	delete_cell(dst_prev, dst_cell);
 	// dst_prev はそのままでよい．
       }
       else {
+	double v = fabs(dst_cell->value());
+	if ( max_value < v ) {
+	  max_value = v;
+	}
 	dst_prev = dst_cell;
       }
       src_cell = src_cell->right();
@@ -208,16 +202,25 @@ SMatrix::pivot(SmCell* pivot_cell,
       }
     }
     else if ( src_col < dst_col ) {
-      if ( src_cell->value() * d != 0.0 ) {
-	SmCell* cell = new_cell(dst_row, src_col, - src_cell->value() * d);
+      double v = src_cell->value() * denom;
+      if ( v != 0.0 ) {
+	SmCell* cell = new_cell(dst_row, src_col, - v);
 	dst_prev->mRightLink = cell;
 	cell->mRightLink = dst_cell;
 	dst_prev = cell;
+	v = fabs(v);
+	if ( max_value < v ) {
+	  max_value = v;
+	}
       }
       src_cell = src_cell->right();
       src_col = src_cell->col_pos();
     }
     else { // src_col > dst_col
+      double v = fabs(dst_cell->value());
+      if ( max_value < v ) {
+	max_value = v;
+      }
       dst_prev = dst_cell;
       dst_cell = dst_prev->right();
       if ( dst_cell == dst_end ) {
@@ -228,7 +231,13 @@ SMatrix::pivot(SmCell* pivot_cell,
       }
     }
   }
-  mConstArray[dst_row] -= mConstArray[src_row] * d;
+  for ( ; dst_cell != dst_end; dst_cell = dst_cell->right()) {
+    double v = fabs(dst_cell->value());
+    if ( max_value < v ) {
+      max_value = v;
+    }
+  }
+  mConstArray[dst_row] -= mConstArray[src_row] * denom;
 
 #ifdef SANITY_CHECK
   {
@@ -240,6 +249,8 @@ SMatrix::pivot(SmCell* pivot_cell,
   }
   sanity_check("pivot");
 #endif
+
+  return max_value;
 }
 
 // @brief セルを確保する．

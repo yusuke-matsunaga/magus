@@ -201,6 +201,8 @@ gaussian_elimination(const SMatrix& src_matrix,
   }
   
   // 変数を一つずつ選んでゆく
+  vector<pair<ymuint, SmCell*> > cur_rows;
+  cur_rows.reserve(nv);
   for (ymuint c = 0; c < nv; ++ c) {
 #if 1
     cout << c << " / " << nv;
@@ -211,10 +213,12 @@ gaussian_elimination(const SMatrix& src_matrix,
     double max = 0.0;
     ymuint max_r = 0;
     SmCell* max_cell = NULL;
+    cur_rows.clear();
     for (ymuint r = 0; r < nv; ++ r) {
       if ( fixed[r] ) continue;
       SmCell* cell = works.find_elem(r, c);
       if ( cell ) {
+	cur_rows.push_back(make_pair(r, cell));
 	double v = fabs(cell->value());
 	v /= max_elem[r];
 	if ( max < v ) {
@@ -232,34 +236,33 @@ gaussian_elimination(const SMatrix& src_matrix,
     }
 
 #if 1
-    cout << " : --> " << max_r << endl;
+    cout << " : --> " << max_r
+	 << " / " << cur_rows.size();
+    cout.flush();
 #endif
 
     // c 番めの行として max_r 行を選ぶ．
     row_idx[c] = max_r;
     fixed[max_r] = true;
 
-    // i 番め以降の行からこの変数を消去する．
+    // 残りの行からこの変数を消去する．
     // 具体的には i番目以降の行 (j行)から i行 に A_ji / A_ii をかけた
     // ものを引く．
     // ただし， A_ji = 0 の時はなにもしない．
-    for (ymuint r = 0; r < nv; ++r) {
-      if ( fixed[r] ) continue;
-      if ( works.find_elem(r, c) ) {
-	works.pivot(max_cell, max_r, r);
-	
-	// max_elem の更新
-	double max = 0.0;
-	for (SmCell* cell1 = works.row_top(r);
-	     cell1 != works.row_end(r); cell1 = cell1->right()) {
-	  double v = fabs(cell1->value());
-	  if ( max < v ) {
-	    max = v;
-	  }
-	}
-	max_elem[r] = max;
+    double v0 = max_cell->value();
+    for (vector<pair<ymuint, SmCell*> >::iterator p = cur_rows.begin();
+	 p != cur_rows.end(); ++ p) {
+      ymuint r = p->first;
+      SmCell* cell = p->second;
+      if ( r != max_r ) {
+	double d = cell->value() / v0;
+	double v = works.pivot(max_r, r, d);
+	max_elem[r] = v;
       }
     }
+#if 1
+    cout << " end" << endl;
+#endif
   }
 
 #if 0
@@ -307,12 +310,11 @@ gaussian_elimination(const SMatrix& src_matrix,
 	   << " delta = " << delta << endl;
       error = true;
     }
-#if 0
-    if ( !is_similar(v, src_matrix.elem(i, nv)) ) {
+#if 1
+    if ( !is_similar(v, c) ) {
       cout << "error at " << i << "th row" << endl
-	   << " v = " << v << ", c = " << src_matrix.elem(i, nv) << endl;
-      double delta = v - src_matrix.elem(i, nv);
-      cout << " delta = " << delta << endl;
+	   << " v = " << v << ", c = " << c << endl
+	   << " delta = " << delta << endl;
       error = true;
     }
 #endif
