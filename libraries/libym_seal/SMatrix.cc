@@ -31,7 +31,8 @@ SMatrix::SMatrix(ymuint size) :
   for (ymuint i = 0; i < mSize; ++ i) {
     mConstArray[i] = 0.0;
   }
-
+  mCellNum = 0;
+  
 #ifdef SANITY_CHECK
   mShadowArray = new double[mSize * mSize];
   for (ymuint i = 0; i < mSize * mSize; ++ i) {
@@ -253,6 +254,20 @@ SMatrix::pivot(ymuint src_row,
   return max_value;
 }
 
+// @brief 使用中のセル数を得る．
+size_t
+SMatrix::cell_num() const
+{
+  return mCellNum;
+}
+
+// @brief 使用中のメモリ量を得る．
+size_t
+SMatrix::used_mem() const
+{
+  return mAlloc.used_size();
+}
+
 // @brief セルを確保する．
 SmCell*
 SMatrix::new_cell(ymuint row,
@@ -263,6 +278,7 @@ SMatrix::new_cell(ymuint row,
   SmCell* cell = new (p) SmCell();
   cell->mColPos = col;
   cell->mVal = val;
+  ++ mCellNum;
   return cell;
 }
 
@@ -274,6 +290,7 @@ SMatrix::delete_cell(SmCell* left,
   SmCell* right = cell->right();
   left->mRightLink = right;
   mAlloc.put_memory(sizeof(SmCell), cell);
+  -- mCellNum;
 }
 
 // @brief 行列の内容を出力する．

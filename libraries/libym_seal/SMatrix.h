@@ -151,7 +151,15 @@ public:
   sanity_check(const char* msg);
 #endif
 
+  /// @brief 使用中のセル数を得る．
+  size_t
+  cell_num() const;
 
+  /// @brief 使用中のメモリ量を得る．
+  size_t
+  used_mem() const;
+
+  
 private:
 
   /// @brief セルを確保する．
@@ -183,6 +191,9 @@ private:
   // 定数項の配列
   double* mConstArray;
 
+  // 使用中のセル数
+  ymuint64 mCellNum;
+  
 #ifdef SANITY_CHECK
   double* mShadowArray;
 #endif

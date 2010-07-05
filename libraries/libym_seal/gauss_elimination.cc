@@ -261,7 +261,11 @@ gaussian_elimination(const SMatrix& src_matrix,
       }
     }
 #if 1
-    cout << " end" << endl;
+    cout << " end (# of cells: "
+	 << works.cell_num()
+	 << ", used mem: "
+	 << works.used_mem() / (1024 * 1024)
+	 << "M)" << endl;
 #endif
   }
 
