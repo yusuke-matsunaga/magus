@@ -51,6 +51,7 @@ UnitAlloc::get_memory(size_t n)
   }
 
   if ( n != mUnitSize ) {
+    mAllocSize += n;
     return ::operator new(n);
   }
   
@@ -80,6 +81,7 @@ UnitAlloc::put_memory(size_t n,
   mUsedSize -= n;
 
   if ( n != mUnitSize ) {
+    mAllocSize -= n;
     ::operator delete(block);
   }
   else {
