@@ -420,6 +420,15 @@ private:
   
 };
 
+
+/// @brief 内容を出力する
+/// @param[in] s 出力先のストリーム
+/// @param[in] mgr MvMgr
+/// @note デバッグ用
+void
+dump(ostream& s,
+     const MvMgr& mgr);
+
 END_NAMESPACE_YM_MVN
 
 #endif // YM_MVN_MVMGR_H

@@ -47,7 +47,7 @@ MvConst::input_num() const
 /// @brief 入力ピンを得る．
 /// @param[in] pos 位置 ( 0 <= pos < input_num() )
 MvInputPin*
-input(ymuint pos)
+MvConst::input(ymuint pos)
 {
   return NULL;
 }

@@ -8,6 +8,7 @@
 
 
 #include "MvInst.h"
+#include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPin.h"
 
 
@@ -22,16 +23,16 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] submodule 子のモジュール
 MvInst::MvInst(MvModule* module,
 	       MvModule* submodule) :
-  MvNode(module)
+  MvNode(module),
+  mNi(submodule->input_num()),
+  mNo(submodule->output_num())
 {
-  ymuint ni;
-  ymuint no;
-  mInput = new MvInputPin[ni];
-  for (ymuint i = 0; i < ni; ++ i) {
+  mInput = new MvInputPin[mNi];
+  for (ymuint i = 0; i < mNi; ++ i) {
     init_pin(&mInput[i], i, 0);
   }
-  mOutput = new MvOutputPin[no];
-  for (ymuint i = 0; i < no; ++ i) {
+  mOutput = new MvOutputPin[mNo];
+  for (ymuint i = 0; i < mNo; ++ i) {
     init_pin(&mOutput[i], i, 0);
   }
 }
@@ -39,6 +40,8 @@ MvInst::MvInst(MvModule* module,
 // @brief デストラクタ
 MvInst::~MvInst()
 {
+  delete [] mInput;
+  delete [] mOutput;
 }
 
 // @brief ノードの種類を得る．

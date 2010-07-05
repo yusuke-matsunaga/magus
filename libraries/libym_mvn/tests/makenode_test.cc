@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_mvn/MvMgr"
+#include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvNode.h"
 
@@ -74,7 +74,7 @@ main(int argc,
 
     MvNode* node24 = mgr.new_concat(module, 2);
 
-    MvNode* module1 = mgr_new_module("sub", 4, 4);
+    MvModule* module1 = mgr.new_module("sub", 4, 4);
     
     MvNode* node25 = mgr.new_inst(module, module1);
 
