@@ -24,9 +24,13 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-#LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
+LIBYM_MVN = ../libym_mvn.la
 
-#bin_PROGRAMS = \
-#	makenode \
-#	bliftest \
-#	iscas89test
+noinst_PROGRAMS = \
+	makenode_test
+
+makenode_test_SOURCES = \
+	makenode_test.cc
+
+makenode_test_LDADD = \
+	$(LIBYM_MVN)
