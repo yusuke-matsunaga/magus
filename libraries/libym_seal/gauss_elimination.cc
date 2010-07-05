@@ -212,6 +212,7 @@ gaussian_elimination(const SMatrix& src_matrix,
     // c 番めの係数が最大の行を選ぶ．
     double max = 0.0;
     ymuint max_r = 0;
+    ymuint min_c = nv;
     SmCell* max_cell = NULL;
     cur_rows.clear();
     for (ymuint r = 0; r < nv; ++ r) {
@@ -261,10 +262,12 @@ gaussian_elimination(const SMatrix& src_matrix,
       }
     }
 #if 1
-    cout << " end (# of cells: "
-	 << works.cell_num()
+    cout << " end (# of cells(K): "
+	 << works.cell_num() / 1024
 	 << ", used mem: "
 	 << works.used_mem() / (1024 * 1024)
+	 << "M, allocated: "
+	 << works.allocated_mem() / (1024 * 1024)
 	 << "M)" << endl;
 #endif
   }

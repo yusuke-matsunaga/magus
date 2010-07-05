@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_SEAL
 // @brief コンストラクタ
 // @param[in] size 変数の数
 SMatrix::SMatrix(ymuint size) :
-  mAlloc(1024, sizeof(SmCell)),
+  mAlloc(sizeof(SmCell), 1024),
   mSize(size)
 {
   mRowArray = new SmCell[mSize];
@@ -266,6 +266,13 @@ size_t
 SMatrix::used_mem() const
 {
   return mAlloc.used_size();
+}
+
+// @brief 実際に確保されたメモリ量を得る．
+size_t
+SMatrix::allocated_mem() const
+{
+  return mAlloc.allocated_size();
 }
 
 // @brief セルを確保する．

@@ -159,6 +159,10 @@ public:
   size_t
   used_mem() const;
 
+  /// @brief 実際に確保されたメモリ量を得る．
+  size_t
+  allocated_mem() const;
+
   
 private:
 
