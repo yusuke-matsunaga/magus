@@ -848,16 +848,16 @@ dump_inputpin(ostream& s,
 	      const MvInputPin* pin)
 {
   s << "InputPin#" << pin->pos()
-    << "(" pin->bit_widht() << ")" << endl;
+    << "(" << pin->bit_width() << ")" << endl;
 }
 
 // MvOutputPin の内容を出力する．
 void
 dump_outputpin(ostream& s,
-	       const MvInputPin* pin)
+	       const MvOutputPin* pin)
 {
   s << "OutputPin#" << pin->pos()
-    << "(" pin->bit_widht() << ")" << endl;
+    << "(" << pin->bit_width() << ")" << endl;
 }
 
 // MvNode の内容を出力する．
@@ -895,7 +895,7 @@ dump_node(ostream& s,
   case MvNode::kBitSelect:  s << "BitSelect"; break;
   case MvNode::kPartSelect: s << "PartSelect"; break;
   case MvNode::kInst:       s << "Inst of Module#"
-			      << node->module->id(); break;
+			      << node->module()->id(); break;
   case MvNode::kConst:      s << "Const"; break;
   default:
     assert_not_reached(__FILE__, __LINE__);
