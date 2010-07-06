@@ -492,6 +492,7 @@ MCAnalysis::calc_failure_prob()
 
   // 強連結成分を求める．
   Dfs dfs(state_num);
+  vector<list<ymuint> > from_list(state_num);
   for (ymuint id = 0; id < state_num; ++ id) {
     ymuint n = mTransProb2[id].size();
     vector<ymuint> adjlist;
@@ -501,9 +502,14 @@ MCAnalysis::calc_failure_prob()
       ymuint nid = p->mNextState;
       if ( fixed[nid] ) continue;
       adjlist.push_back(nid);
+      from_list[nid].push_back(id);
     }
     dfs.set_adjlist(id, adjlist);
   }
+  for (ymuint id = 0; id < state_num; ++ id) {
+    dfs.set_fromlist(id, from_list[id]);
+  }
+
   ymuint nscc = dfs.scc();
   cout << "# of SCCs = " << nscc << endl;
   ymuint zako = 0;
@@ -557,15 +563,57 @@ MCAnalysis::calc_failure_prob()
       fixed[gid] = true;
     }
     else {
-      SMatrix m(n);
       vector<ymuint> lmap(state_num, n);
       vector<ymuint> gmap(n);
-      ymuint lid = 0;
-      for (DfsNode* node = dfs.repnode(g); node; node = node->mLink, ++ lid) {
-	ymuint gid = node->mId;
-	lmap[gid] = lid;
-	gmap[lid] = gid;
+      {
+	// 遷移先がもっとも少ないノードを探す．
+	DfsHeap heaptree(n);
+	for (DfsNode* node = dfs.repnode(g); node; node = node->mLink) {
+	  // 遷移先の数を計算
+	  ymuint d = 0;
+	  for (vector<DfsNode*>::iterator p = node->mAdjList.begin();
+	       p != node->mAdjList.end(); ++ p) {
+	    DfsNode* next = *p;
+	    if ( !fixed[next->mId] ) {
+	      ++ d;
+	    }
+	  }
+	  node->mCost = d;
+	  node->mSelected = false;
+	  // ヒープ木に積む．
+	  heaptree.push(node);
+	}
+
+	for (ymuint lid = 0; !heaptree.empty(); ++ lid) {
+	  // コスト最小のノードを取り出す．
+	  DfsNode* node = heaptree.get_min();
+	  ymuint gid = node->mId;
+	  lmap[gid] = lid;
+	  gmap[lid] = gid;
+	  node->mSelected = true;
+
+	  // 関係するノードのコストを更新する．
+	  for (vector<DfsNode*>::iterator p = node->mFromList.begin();
+	       p != node->mFromList.end(); ++ p) {
+	    DfsNode* from = *p;
+	    -- from->mCost;
+	    heaptree.rebalance(from);
+	  }
+	}
+	{ // 検証
+	  for (DfsNode* node = dfs.repnode(g); node; node = node->mLink) {
+	    assert_cond( node->mSelected , __FILE__, __LINE__);
+	    for (vector<DfsNode*>::iterator p = node->mAdjList.begin();
+		 p != node->mAdjList.end(); ++ p) {
+	      DfsNode* next = *p;
+	      assert_cond( fixed[next->mId] ||
+			   next->mSelected,  __FILE__, __LINE__);
+	    }
+	  }
+	}
       }
+
+      SMatrix m(n);
       for (ymuint i = 0; i < n; ++ i) {
 	ymuint id = gmap[i];
 	m.set_const(i, mFailureProb0[id]);

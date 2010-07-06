@@ -212,7 +212,6 @@ gaussian_elimination(const SMatrix& src_matrix,
     // c 番めの係数が最大の行を選ぶ．
     double max = 0.0;
     ymuint max_r = 0;
-    ymuint min_c = nv;
     SmCell* max_cell = NULL;
     cur_rows.clear();
     for (ymuint r = 0; r < nv; ++ r) {
@@ -317,7 +316,7 @@ gaussian_elimination(const SMatrix& src_matrix,
 	   << " delta = " << delta << endl;
       error = true;
     }
-#if 1
+#if 0
     if ( !is_similar(v, c) ) {
       cout << "error at " << i << "th row" << endl
 	   << " v = " << v << ", c = " << c << endl

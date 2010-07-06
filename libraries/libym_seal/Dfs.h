@@ -42,8 +42,20 @@ struct DfsNode
   // 遷移先のリスト
   vector<DfsNode*> mAdjList;
 
+  // 遷移元のリスト
+  vector<DfsNode*> mFromList;
+  
   // 同じ強連結成分をつなぐリンク
   DfsNode* mLink;
+
+  // ヒープ用の値
+  ymuint32 mCost;
+  
+  // ヒープ上の位置
+  ymuint32 mHeapPos;
+
+  // 選ばれたかどうかを表すフラグ
+  bool mSelected;
   
 };
 
@@ -72,6 +84,13 @@ public:
   void
   set_adjlist(ymuint id,
 	      const vector<ymuint>& adjlist);
+
+  /// @brief 遷移元のノードのリストを設定する．
+  /// @param[in] id ノード番号
+  /// @param[in] fromlist 遷移元のノード番号のリスト
+  void
+  set_fromlist(ymuint id,
+	       const list<ymuint>& fromlist);
 
   /// @brief dfs を行って強連結成分を求める．
   /// @return 強連結成分の数を返す．
@@ -115,8 +134,63 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-// インライン関数の定義
+/// @class DfsHeap Dfs.h "Dfs.h"
+/// @brief DfsNode 用のヒープ木
 //////////////////////////////////////////////////////////////////////
+class DfsHeap
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] size_hint 容量のヒント
+  DfsHeap(ymuint size_hint = 0);
+
+  /// @brief デストラクタ
+  ~DfsHeap();
+
+
+public:
+  
+  /// @brief 要素が空の時 true を返す．
+  bool
+  empty() const;
+
+  /// @brief ノードを追加する．
+  void
+  push(DfsNode* node);
+
+  /// @brief 最小値を持つノードを取り出す．
+  DfsNode*
+  get_min();
+
+  /// @brief ノードをコストが変化した時の更新処理
+  void
+  rebalance(DfsNode* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部でのみ使用される関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードを適切な位置まで沈めてゆく関数
+  void
+  pushdown(ymuint pos);
+
+  /// @brief ノードを適切な位置まで浮かび上がらせる関数
+  void
+  popup(ymuint pos);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ヒープ木本体
+  vector<DfsNode*> mArray;
+  
+};
 
 END_NAMESPACE_YM_SEAL
 

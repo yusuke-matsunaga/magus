@@ -52,6 +52,23 @@ Dfs::set_adjlist(ymuint id,
   }
 }
 
+// @brief 遷移元のノードのリストを設定する．
+// @param[in] id ノード番号
+// @param[in] fromlist 遷移元のノード番号のリスト
+void
+Dfs::set_fromlist(ymuint id,
+		  const list<ymuint>& fromlist)
+{
+  DfsNode* node = &mNodeArray[id];
+  ymuint n = fromlist.size();
+  node->mFromList.clear();
+  node->mFromList.reserve(n);
+  for (list<ymuint>::const_iterator p = fromlist.begin();
+       p != fromlist.end(); ++ p) {
+    node->mFromList.push_back(&mNodeArray[*p]);
+  }
+}
+
 // @brief dfs を行って強連結成分を求める．
 ymuint
 Dfs::scc()
@@ -118,6 +135,143 @@ Dfs::dfs(DfsNode* node)
       last = node1;
     }
     mRepNodes.push_back(node);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス DfsHeap
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] size_hint 容量のヒント
+DfsHeap::DfsHeap(ymuint size_hint)
+{
+  mArray.reserve(size_hint);
+}
+
+// @brief デストラクタ
+DfsHeap::~DfsHeap()
+{
+}
+  
+// @brief 要素が空の時 true を返す．
+bool
+DfsHeap::empty() const
+{
+  return mArray.empty();
+}
+
+// @brief ノードを追加する．
+void
+DfsHeap::push(DfsNode* node)
+{
+  mArray.push_back(node);
+  ymuint pos = mArray.size() - 1;
+  node->mHeapPos = pos;
+  popup(pos);
+}
+
+// @brief 最小値を持つノードを取り出す．
+DfsNode*
+DfsHeap::get_min()
+{
+  ymuint n = mArray.size();
+  if ( n > 0 ) {
+    DfsNode* node = mArray[0];
+    -- n;
+    DfsNode* node0 = mArray[n];
+    mArray[0] = node0;
+    node0->mHeapPos = 0;
+    mArray.pop_back();
+    pushdown(0);
+    return node;
+  }
+  else {
+    return NULL;
+  }
+}
+
+// @brief ノードをコストが変化した時の更新処理
+void
+DfsHeap::rebalance(DfsNode* node)
+{
+  popup(node->mHeapPos);
+}
+
+// @brief ノードを適切な位置まで沈めてゆく関数
+void
+DfsHeap::pushdown(ymuint ppos)
+{
+  ymuint n = mArray.size();
+  for ( ; ; ) {
+    ymuint lpos = ppos + ppos + 1;
+    ymuint rpos = lpos + 1;
+    if ( rpos > n ) {
+      // 左右の子供を持たない場合
+      break;
+    }
+    DfsNode* node_p = mArray[ppos];
+    DfsNode* node_l = mArray[lpos];
+    if ( rpos == n ) {
+      // 右の子供を持たない場合
+      if ( node_p->mCost > node_l->mCost ) {
+	// 逆転
+	mArray[ppos] = node_l;
+	node_l->mHeapPos = ppos;
+	mArray[lpos] = node_p;
+	node_p->mHeapPos = lpos;
+      }
+      // どちらにせよ最低れべるまで下げられたので次はない．
+      break;
+    }
+    else {
+      // 左右の子供を持つ場合
+      DfsNode* node_r = mArray[rpos];
+      if ( node_p->mCost > node_l->mCost &&
+	   node_l->mCost <= node_r->mCost ) {
+	// 左の子供と入れ替える．次は左の子供で同じ処理をする．
+	mArray[ppos] = node_l;
+	node_l->mHeapPos = ppos;
+	mArray[lpos] = node_p;
+	node_p->mHeapPos = lpos;
+	ppos = lpos;
+      }
+      else if ( node_p->mCost > node_r->mCost &&
+		node_r->mCost < node_l->mCost ) {
+	// 右の子供と取り替える．次は右の子供で同じ処理をする．
+	mArray[ppos] = node_r;
+	node_r->mHeapPos = ppos;
+	mArray[rpos] = node_p;
+	node_p->mHeapPos = rpos;
+	ppos = rpos;
+      }
+      else {
+	break;
+      }
+    }
+  }
+}
+
+// @brief ノードを適切な位置まで浮かび上がらせる関数
+void
+DfsHeap::popup(ymuint pos)
+{
+  while ( pos > 0 ) {
+    DfsNode* node = mArray[pos];
+    ymuint ppos = (pos - 1) >> 1;
+    DfsNode* pnode = mArray[ppos];
+    if ( pnode->mCost > node->mCost ) {
+      // pnode と node を入れ替える．
+      mArray[ppos] = node;
+      node->mHeapPos = ppos;
+      mArray[pos] = pnode;
+      pnode->mHeapPos = pos;
+      pos = ppos;
+    }
+    else {
+      break;
+    }
   }
 }
 
