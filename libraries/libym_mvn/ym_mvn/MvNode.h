@@ -217,7 +217,12 @@ private:
   // 親のモジュール
   MvModule* mParent;
 
+  // mNodeList からの削除で用いる反復子
+  list<MvNode*>::iterator mSelfRef;
+  
 };
+
+typedef DlList<MvNode> MvNodeList;
 
 
 //////////////////////////////////////////////////////////////////////

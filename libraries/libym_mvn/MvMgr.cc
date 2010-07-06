@@ -854,10 +854,12 @@ MvMgr::reg_node(MvNode* node)
   module->mNodeArray[id] = node;
 
   if ( node->type() != MvNode::kInput && node->type() != MvNode::kOutput ) {
-    module->mNodeList.push_back(node);
+    list<MvNode*>& nodelist = module->mNodeList;
+    nodelist.push_back(node);
+    node->mSelfRef = nodelist.end();
+    -- node->mSelfRef;
+    assert_cond( *node->mSelfRef == node , __FILE__, __LINE__);
   }
-  cout << "reg_node" << endl;
-  dump_node(cout, node);
 }
 
 // @brief ノードの登録を削除する．
@@ -868,11 +870,9 @@ MvMgr::unreg_node(MvNode* node)
   MvModule* module = node->parent();
   module->mItvlMgr.add(node->id());
   module->mNodeArray[node->id()] = NULL;
-#if 0
   if ( node->type() != MvNode::kInput && node->type() != MvNode::kOutput ) {
-    module->mNodeList.erase(node);
+    module->mNodeList.erase(node->mSelfRef);
   }
-#endif
 }
 
 
@@ -970,7 +970,8 @@ dump(ostream& s,
     else {
       s << "  toplevel module" << endl;
     }
-    
+
+#if 1
     ymuint ni = module->input_num();
     for (ymuint j = 0; j < ni; ++ j) {
       dump_node(s, module->input(j));
@@ -979,11 +980,20 @@ dump(ostream& s,
     for (ymuint j = 0;j < no; ++ j) {
       dump_node(s, module->output(j));
     }
-    for (MvNodeList::const_iterator p = module->nodes_begin();
+    for (list<MvNode*>::const_iterator p = module->nodes_begin();
 	 p != module->nodes_end(); ++ p) {
       MvNode* node = *p;
       dump_node(s, node);
     }
+#else
+    ymuint n = module->max_node_id();
+    for (ymuint i = 0; i < n; ++ i) {
+      MvNode* node = module->node(i);
+      if ( node ) {
+	dump_node(s, node);
+      }
+    }
+#endif
     s << endl;
   }
 }

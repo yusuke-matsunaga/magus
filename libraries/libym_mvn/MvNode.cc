@@ -23,6 +23,7 @@ MvNode::MvNode(MvModule* parent) :
 // @brief デストラクタ
 MvNode::~MvNode()
 {
+  cout << "MvNode is deleted" << endl;
 }
 
 // @param[in] ピンを初期化する．

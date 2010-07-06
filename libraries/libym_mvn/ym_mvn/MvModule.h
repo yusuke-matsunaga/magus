@@ -41,6 +41,16 @@ public:
   MvNode*
   parent() const;
 
+  /// @brief ノードの ID番号の最大値 + 1 を返す．
+  ymuint
+  max_node_id() const;
+
+  /// @brief ノードを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
+  /// @note NULL が還されることもある．
+  MvNode*
+  node(ymuint id) const;
+
   /// @brief 入力ノード数を得る．
   ymuint
   input_num() const;
@@ -64,17 +74,17 @@ public:
   node_num() const;
 
   /// @brief 内部ノードのリストを得る．
-  const MvNodeList&
+  const list<MvNode*>&
   node_list() const;
 
   /// @brief 内部ノードのリストの先頭の反復子を得る．
-  MvNodeList::const_iterator
+  list<MvNode*>::const_iterator
   nodes_begin() const;
 
   /// @brief 内部ノードのリストの末尾の反復子を得る．
-  MvNodeList::const_iterator
+  list<MvNode*>::const_iterator
   nodes_end() const;
-
+  
   
 private:
   //////////////////////////////////////////////////////////////////////
@@ -114,7 +124,7 @@ private:
   vector<MvNode*> mOutputArray;
 
   // 内部ノードのリスト
-  MvNodeList mNodeList;
+  list<MvNode*> mNodeList;
 
   // 全ノードを ID 番号をキーにして格納する配列
   vector<MvNode*> mNodeArray;
@@ -152,6 +162,24 @@ MvNode*
 MvModule::parent() const
 {
   return mParent;
+}
+
+// @brief ノードの ID番号の最大値 + 1 を返す．
+inline
+ymuint
+MvModule::max_node_id() const
+{
+  return mNodeArray.size();
+}
+
+// @brief ノードを得る．
+// @param[in] id ID番号 ( 0 <= id < max_node_id() )
+// @note NULL が還されることもある．
+inline
+MvNode*
+MvModule::node(ymuint id) const
+{
+  return mNodeArray[id];
 }
 
 // @brief 入力ノード数を得る．
@@ -198,7 +226,7 @@ MvModule::node_num() const
 
 // @brief 内部ノードのリストを得る．
 inline
-const MvNodeList&
+const list<MvNode*>&
 MvModule::node_list() const
 {
   return mNodeList;
@@ -206,7 +234,7 @@ MvModule::node_list() const
 
 // @brief 内部ノードのリストの先頭の反復子を得る．
 inline
-MvNodeList::const_iterator
+list<MvNode*>::const_iterator
 MvModule::nodes_begin() const
 {
   return mNodeList.begin();
@@ -214,7 +242,7 @@ MvModule::nodes_begin() const
 
 // @brief 内部ノードのリストの末尾の反復子を得る．
 inline
-MvNodeList::const_iterator
+list<MvNode*>::const_iterator
 MvModule::nodes_end() const
 {
   return mNodeList.end();
