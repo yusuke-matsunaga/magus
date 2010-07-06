@@ -81,7 +81,8 @@ main(int argc,
     vector<ymuint32> val(1);
     val[0] = 10;
     MvNode* node26 = mgr.new_const(module, 8, val);
-    
+
+    dump(cout, mgr);
   }
   catch ( AssertError x) {
     cout << x << endl;

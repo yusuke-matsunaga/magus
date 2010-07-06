@@ -918,6 +918,15 @@ void
 dump_net(ostream& s,
 	 const MvNet* net)
 {
+  const MvOutputPin* src_pin = net->src_pin();
+  const MvInputPin* dst_pin = net->dst_pin();
+  
+  s << "Output#" << src_pin->pos() << "@Node#" << src_pin->node()->id()
+    << "@Module#" << src_pin->node()->parent()->id() << endl
+    << " ==>"
+    << "Input#" << dst_pin->pos() << "@Node#" << dst_pin->node()->id()
+    << "@Module#" << dst_pin->node()->parent()->id() << endl
+    << endl;
 }
 
 END_NONAMESPACE
@@ -949,7 +958,19 @@ dump(ostream& s,
       s << "  toplevel module" << endl;
     }
     
-    
+    ymuint ni = module->input_num();
+    for (ymuint j = 0; j < ni; ++ j) {
+      dump_node(s, module->input(j));
+    }
+    ymuint no = module->output_num();
+    for (ymuint j = 0;j < no; ++ j) {
+      dump_node(s, module->output(j));
+    }
+    for (MvNodeList::const_iterator p = module->nodes_begin();
+	 p != module->nodes_begin(); ++ p) {
+      MvNode* node = *p;
+      dump_node(s, node);
+    }
   }
 }
 
