@@ -39,6 +39,12 @@ public:
   ymuint
   output_num() const;
 
+  /// @brief 下位モジュールを得る．
+  /// @note type() が kInst の時のみ意味を持つ．
+  virtual
+  const MvModule*
+  module() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

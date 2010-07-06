@@ -75,12 +75,22 @@ main(int argc,
     MvNode* node24 = mgr.new_concat(module, 2);
 
     MvModule* module1 = mgr.new_module("sub", 4, 4);
+
+    MvNode* node26 = mgr.new_input(module1, 0, 1);
+    MvNode* node27 = mgr.new_input(module1, 1, 1);
+    MvNode* node28 = mgr.new_input(module1, 2, 1);
+    MvNode* node29 = mgr.new_input(module1, 3, 1);
+
+    MvNode* node30 = mgr.new_output(module1, 0, 1);
+    MvNode* node31 = mgr.new_output(module1, 1, 1);
+    MvNode* node32 = mgr.new_output(module1, 2, 1);
+    MvNode* node33 = mgr.new_output(module1, 3, 1);
     
-    MvNode* node25 = mgr.new_inst(module, module1);
+    MvNode* node40 = mgr.new_inst(module, module1);
 
     vector<ymuint32> val(1);
     val[0] = 10;
-    MvNode* node26 = mgr.new_const(module, 8, val);
+    MvNode* node41 = mgr.new_const(module, 8, val);
 
     dump(cout, mgr);
   }

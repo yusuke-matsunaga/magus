@@ -25,7 +25,8 @@ MvInst::MvInst(MvModule* module,
 	       MvModule* submodule) :
   MvNode(module),
   mNi(submodule->input_num()),
-  mNo(submodule->output_num())
+  mNo(submodule->output_num()),
+  mSubmodule(submodule)
 {
   mInput = new MvInputPin[mNi];
   for (ymuint i = 0; i < mNi; ++ i) {
@@ -81,6 +82,14 @@ MvInst::output(ymuint pos)
 {
   assert_cond( pos < mNo, __FILE__, __LINE__);
   return &mOutput[pos];
+}
+
+// @brief 下位モジュールを得る．
+// @note type() が kInst の時のみ意味を持つ．
+const MvModule*
+MvInst::module() const
+{
+  return mSubmodule;
 }
 
 END_NAMESPACE_YM_MVN
