@@ -149,7 +149,6 @@ MCAnalysis::analyze2(istream& s)
 
   restore_trans(s);
 
-#if 0
   watch.reset();
   watch.start();
   calc_steady_prob();
@@ -162,7 +161,6 @@ MCAnalysis::analyze2(istream& s)
   calc_error_prob(error_rate);
   watch.stop();
   USTime time3 = watch.time();
-#endif
 
   watch.reset();
   watch.start();
@@ -174,8 +172,6 @@ MCAnalysis::analyze2(istream& s)
     cout << mFailureProb[i] << endl;
   }
 #endif
-
-#if 0
   double abs_prob_sum = 0.0;
   for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
     State st_pair = mReachableStates2[i];
@@ -185,18 +181,15 @@ MCAnalysis::analyze2(istream& s)
       abs_prob_sum += mFailureProb[i] * init_prob;
     }
   }
-#endif
   
   total_timer.stop();
   USTime ttime = total_timer.time();
   
   cout.precision(6);
 
-#if 0
   cout << " " << abs_prob_sum << endl;
   cout << "steady_prob: " << time2 << endl;
   cout << "init_prob  : " << time3 << endl;
-#endif
   cout << "abs_prob   : " << time5 << endl;
   cout << "total_time : " << ttime << endl;
 }
@@ -428,6 +421,7 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 void
 MCAnalysis::calc_steady_prob()
 {
+  cout << "calculate steady state probability" << endl;
   ymuint32 n = mReachableStates1.size();
   Matrix m(n, n + 1);
   for (ymuint i = 0; i < n; ++ i) {
@@ -446,7 +440,11 @@ MCAnalysis::calc_steady_prob()
 
     m.elem(i, n) = 1.0;
   }
+#if 1
   bool stat = gaussian_elimination(m, mSteadyProb);
+#else
+  bool stat = lu_decomp(m, mSteadyProb);
+#endif
   assert_cond(stat, __FILE__, __LINE__);
 }
 
@@ -582,6 +580,7 @@ MCAnalysis::calc_failure_prob()
 	  node->mSelected = false;
 	  // ヒープ木に積む．
 	  heaptree.push(node);
+	  node->mOnStack = true;
 	}
 
 	for (ymuint lid = 0; !heaptree.empty(); ++ lid) {
@@ -596,8 +595,10 @@ MCAnalysis::calc_failure_prob()
 	  for (vector<DfsNode*>::iterator p = node->mFromList.begin();
 	       p != node->mFromList.end(); ++ p) {
 	    DfsNode* from = *p;
-	    -- from->mCost;
-	    heaptree.rebalance(from);
+	    if ( from->mOnStack ) {
+	      -- from->mCost;
+	      heaptree.rebalance(from);
+	    }
 	  }
 	}
 	{ // 検証

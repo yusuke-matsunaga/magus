@@ -31,6 +31,7 @@ libym_seal_la_SOURCES = \
 	Dfs.h \
 	Dfs.cc \
 	gauss_elimination.cc \
+	lu_decomp.cc \
 	MCAnalysis.cc
 
 libym_seal_la_LIBADD = \

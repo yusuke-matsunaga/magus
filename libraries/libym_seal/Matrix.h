@@ -99,6 +99,14 @@ bool
 gaussian_elimination(const Matrix& src_matrix,
 		     vector<double>& solution);
 
+/// @brief LU分解を行って連立方程式の解を得る．
+/// @param[in] src_matrix 対象の行列
+/// @param[in] solution 解を格納するベクタ
+/// @return 解が得られたら true を返す．
+bool
+lu_decomp(const Matrix& src_matrix,
+	  vector<double>& solution);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
