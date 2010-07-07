@@ -74,31 +74,21 @@ public:
 	     ymuint ni,
 	     ymuint no);
 
+  /// @brief モジュールを生成する．
+  /// @param[in] name 名前
+  /// @param[in] ibitwidth_array 入力のビット幅の配列
+  /// @param[in] obitwidth_array 出力のビット幅の配列
+  /// @return 生成したモジュールを返す．
+  MvModule*
+  new_module(const char* name,
+	     const vector<ymuint>& ibitwidth_array,
+	     const vector<ymuint>& obitwidth_array);
+
   /// @brief モジュールを削除する．
   /// @param[in] module 対象のモジュール
   /// @note モジュールインスタンスとして使われているモジュールは削除できない．
   void
   delete_module(MvModule* module);
-
-  /// @brief 入力ノードを生成する．
-  /// @param[in] module 入力ノードが属するモジュール
-  /// @param[in] pos 位置
-  /// @param[in] bit_width ビット幅
-  /// @return 生成したノードを返す．
-  MvNode*
-  new_input(MvModule* module,
-	    ymuint pos,
-	    ymuint bit_width = 1);
-
-  /// @brief 出力ノードを生成する．
-  /// @param[in] module 出力ノードが属するモジュール
-  /// @param[in] pos 位置
-  /// @param[in] bit_width ビット幅
-  /// @return 生成したノードを返す．
-  MvNode*
-  new_output(MvModule* module,
-	     ymuint pos,
-	     ymuint bit_width = 1);
 
   /// @brief through ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -311,11 +301,12 @@ public:
 
   /// @brief concatenate ノードを生成する．
   /// @param[in] module ノードが属するモジュール
-  /// @param[in] ni 入力数
+  /// @param[in] ibitwidth_array 入力のビット幅の配列
   /// @return 生成したノードを返す．
+  /// @note 出力のビット幅は入力のビット幅の和となる．
   MvNode*
   new_concat(MvModule* module,
-	     ymuint ni);
+	     const vector<ymuint>& ibitwidth_arary);
 
   /// @brief bit selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -362,15 +353,6 @@ public:
   /// @note 接続が残っているノードは削除できない．
   void
   delete_node(MvNode* node);
-
-#if 0
-  /// @brief ピンのビット幅を設定する．
-  /// @param[in] pin 対象のピン
-  /// @param[in] bit_width 設定するビット幅
-  void
-  set_bit_width(MvPin* pin,
-		ymuint bit_width);
-#endif
   
   /// @brief ピンとピンを接続する．
   /// @param[in] src_pin 入力元のピン

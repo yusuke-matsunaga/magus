@@ -183,6 +183,21 @@ MvMgr::new_module(const char* name,
 		  ymuint ni,
 		  ymuint no)
 {
+  vector<ymuint> ibitwidth_array(ni, 1);
+  vector<ymuint> obitwidth_array(no, 1);
+  return new_module(name, ibitwidth_array, obitwidth_array);
+}
+
+// @brief モジュールを生成する．
+// @param[in] name 名前
+// @param[in] ibitwidth_array 入力のビット幅の配列
+// @param[in] obitwidth_array 出力のビット幅の配列
+// @return 生成したモジュールを返す．
+MvModule*
+MvMgr::new_module(const char* name,
+		  const vector<ymuint>& ibitwidth_array,
+		  const vector<ymuint>& obitwidth_array)
+{
   int tmp = mItvlMgr.avail_num();
   if ( tmp == -1 ) {
     // IDが枯渇？
@@ -190,6 +205,9 @@ MvMgr::new_module(const char* name,
   }
   mItvlMgr.erase(tmp);
   ymuint id = tmp;
+
+  ymuint ni = ibitwidth_array.size();
+  ymuint no = obitwidth_array.size();
   MvModule* module = new MvModule(name, ni, no);
   module->mId = id;
   while ( mModuleArray.size() <= id ) {
@@ -198,10 +216,14 @@ MvMgr::new_module(const char* name,
   mModuleArray[id] = module;
 
   for (ymuint i = 0; i < ni; ++ i) {
-    new_input(module, i, 1);
+    MvNode* node = new MvInput(module, i, ibitwidth_array[i]);
+    reg_node(node);
+    module->mInputArray[i] = node;
   }
   for (ymuint i = 0; i < no; ++ i) {
-    new_output(module, i, 1);
+    MvNode* node = new MvOutput(module, i, obitwidth_array[i]);
+    reg_node(node);
+    module->mOutputArray[i] = node;
   }
   return module;
 }
@@ -223,50 +245,6 @@ MvMgr::delete_module(MvModule* module)
   mItvlMgr.add(module->mId);
   mModuleArray[module->mId] = NULL;
   delete module;
-}
-
-// @brief 入力ノードを生成する．
-// @param[in] module 入力ノードが属するモジュール
-// @param[in] pos 位置
-// @param[in] bit_width ビット幅
-// @return 生成したノードを返す．
-MvNode*
-MvMgr::new_input(MvModule* module,
-		 ymuint pos,
-		 ymuint bit_width)
-{
-  MvNode* node = new MvInput(module, pos, bit_width);
-  reg_node(node);
-
-  assert_cond( pos < module->input_num(), __FILE__, __LINE__);
-  module->mInputArray[pos] = node;
-
-  assert_cond( node->input_num() == 0, __FILE__, __LINE__);
-  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
-
-  return node;
-}
-
-// @brief 出力ノードを生成する．
-// @param[in] module 出力ノードが属するモジュール
-// @param[in] pos 位置
-// @param[in] bit_width ビット幅
-// @return 生成したノードを返す．
-MvNode*
-MvMgr::new_output(MvModule* module,
-		  ymuint pos,
-		  ymuint bit_width)
-{
-  MvNode* node = new MvOutput(module, pos, bit_width);
-  reg_node(node);
-
-  assert_cond( pos < module->output_num(), __FILE__, __LINE__);
-  module->mOutputArray[pos] = node;
-  
-  assert_cond( node->input_num() == 1, __FILE__, __LINE__);
-  assert_cond( node->output_num() == 0, __FILE__, __LINE__);
-
-  return node;
 }
 
 // @brief through ノードを生成する．
@@ -668,13 +646,14 @@ MvMgr::new_ite(MvModule* module,
 
 // @brief concatenate ノードを生成する．
 // @param[in] module ノードが属するモジュール
-// @param[in] ni 入力数
+// @param[in] ibitwidth_array 入力のビット幅の配列
 // @return 生成したノードを返す．
+// @note 出力のビット幅は入力のビット幅の和となる．
 MvNode*
 MvMgr::new_concat(MvModule* module,
-		  ymuint ni)
+		  const vector<ymuint>& ibitwidth_array)
 {
-  MvNode* node = new MvConcat(module, ni);
+  MvNode* node = new MvConcat(module, ibitwidth_array);
   reg_node(node);
 
   return node;

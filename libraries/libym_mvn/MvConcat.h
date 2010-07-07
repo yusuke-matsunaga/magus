@@ -37,9 +37,9 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
-  /// @param[in] ni 入力数
+  /// @param[in] ibitwidth_array 入力のビット幅の配列
   MvConcat(MvModule* module,
-	   ymuint ni);
+	   const vector<ymuint>& ibitwidth_array);
 
   /// @brief デストラクタ
   ~MvConcat();

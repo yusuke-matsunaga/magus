@@ -68,7 +68,10 @@ main(int argc,
 
     MvNode* node23 = mgr.new_ite(module, 32);
 
-    MvNode* node24 = mgr.new_concat(module, 2);
+    vector<ymuint> ibw_array(2);
+    ibw_array[0] = 32;
+    ibw_array[1] = 30;
+    MvNode* node24 = mgr.new_concat(module, ibw_array);
 
     MvModule* module1 = mgr.new_module("sub", 4, 4);
     

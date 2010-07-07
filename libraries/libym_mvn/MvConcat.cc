@@ -18,11 +18,19 @@ BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
-// @param[in] ni 入力数
+// @param[in] ibitwidth_array 入力のビット幅の配列
 MvConcat::MvConcat(MvModule* module,
-		   ymuint ni) :
-  MvNode(module, ni, 1)
+		   const vector<ymuint>& ibitwidth_array) :
+  MvNode(module, ibitwidth_array.size(), 1)
 {
+  ymuint ni = ibitwidth_array.size();
+  ymuint obitwidth = 0;
+  for (ymuint i = 0; i < ni; ++ i) {
+    ymuint ibitwidth = ibitwidth_array[i];
+    obitwidth += ibitwidth;
+    set_bit_width(input(i), ibitwidth);
+  }
+  set_bit_width(output(0), obitwidth);
 }
 
 // @brief デストラクタ
