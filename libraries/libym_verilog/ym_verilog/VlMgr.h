@@ -25,7 +25,6 @@ class PtMgr;
 class PtiFactory;
 class ElbMgr;
 class ElbFactory;
-class VlLineWatcher;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VlMgr VlMgr.h <ym_verilog/vl/VlMgr.h>

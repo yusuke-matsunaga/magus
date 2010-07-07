@@ -38,8 +38,10 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-class VlTime;
 class BitVector;
+class VlLineWatcher;
+class VlMgr;
+class VlTime;
 
 /// @defgroup VlCommon Verilog 用基本ユーティリティ
 /// @ingroup VlGroup
@@ -877,5 +879,14 @@ merge_udp_value(tVpiUdpVal symbol1,
 /// @}
 
 END_NAMESPACE_YM_VERILOG
+
+BEGIN_NAMESPACE_YM
+
+using nsVerilog::BitVector;
+using nsVerilog::VlLineWatcher;
+using nsVerilog::VlMgr;
+using nsVerilog::VlTime;
+
+END_NAMESPACE_YM
 
 #endif // YM_VERILOG_VERILOG_H
