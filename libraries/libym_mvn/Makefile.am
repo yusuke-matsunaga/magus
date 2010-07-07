@@ -5,6 +5,7 @@
 SUBDIRS = \
 	ym_mvn \
 	. \
+	verilog \
 	tests
 
 INCLUDES = \
