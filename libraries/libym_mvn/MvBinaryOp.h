@@ -10,7 +10,6 @@
 
 
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvPin.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -22,37 +21,6 @@ BEGIN_NAMESPACE_YM_MVN
 class MvBinaryOp :
   public MvNode
 {
-public:
-
-  /// @brief 入力ピン数を得る．
-  virtual
-  ymuint
-  input_num() const;
-
-  /// @brief 出力ピン数を得る．
-  virtual
-  ymuint
-  output_num() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力ピンを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < input_num() )
-  virtual
-  MvInputPin*
-  input(ymuint pos);
-
-  /// @brief 出力ピンを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < output_num() )
-  virtual
-  MvOutputPin*
-  output(ymuint pos);
-
-
 protected:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
@@ -70,18 +38,6 @@ protected:
 
   /// @brief デストラクタ
   ~MvBinaryOp();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 入力ピン
-  MvInputPin mInput[2];
-  
-  // 出力ピン
-  MvOutputPin mOutput;
 
 };
 

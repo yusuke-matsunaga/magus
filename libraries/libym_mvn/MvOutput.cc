@@ -19,10 +19,10 @@ BEGIN_NAMESPACE_YM_MVN
 MvOutput::MvOutput(MvModule* module,
 		   ymuint pos,
 		   ymuint bit_width) :
-  MvNode(module),
+  MvNode(module, 1, 0),
   mPos(pos)
 {
-  init_pin(&mPin, 0, bit_width);
+  set_bit_width(input(0), bit_width);
 }
 
 // @brief デストラクタ
@@ -35,37 +35,6 @@ MvNode::tType
 MvOutput::type() const
 {
   return kOutput;
-}
-
-// @brief 入力ピン数を得る．
-ymuint
-MvOutput::input_num() const
-{
-  return 1;
-}
-
-// @brief 入力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < input_num() )
-MvInputPin*
-MvOutput::input(ymuint pos)
-{
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return &mPin;
-}
-
-// @brief 出力ピン数を得る．
-ymuint
-MvOutput::output_num() const
-{
-  return 0;
-}
-
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-MvOutputPin*
-MvOutput::output(ymuint pos)
-{
-  return NULL;
 }
 
 // @brief 入力ノード/出力ノードの場合に位置を返す．

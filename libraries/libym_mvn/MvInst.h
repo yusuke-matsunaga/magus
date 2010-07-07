@@ -29,39 +29,11 @@ public:
   tType
   type() const;
 
-  /// @brief 入力ピン数を得る．
-  virtual
-  ymuint
-  input_num() const;
-
-  /// @brief 出力ピン数を得る．
-  virtual
-  ymuint
-  output_num() const;
-
   /// @brief 下位モジュールを得る．
   /// @note type() が kInst の時のみ意味を持つ．
   virtual
   const MvModule*
   module() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力ピンを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < input_num() )
-  virtual
-  MvInputPin*
-  input(ymuint pos);
-
-  /// @brief 出力ピンを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < output_num() )
-  virtual
-  MvOutputPin*
-  output(ymuint pos);
 
 
 private:
@@ -83,18 +55,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 入力数
-  ymuint mNi;
-  
-  // 入力ピン
-  MvInputPin* mInput;
-
-  // 出力数
-  ymuint mNo;
-  
-  // 出力ピン
-  MvOutputPin* mOutput;
 
   // 子のモジュール
   MvModule* mSubmodule;

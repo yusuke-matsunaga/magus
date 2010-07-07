@@ -10,6 +10,7 @@
 
 
 #include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/MvPin.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -117,9 +118,8 @@ public:
   type() const = 0;
 
   /// @brief 入力ピン数を得る．
-  virtual
   ymuint
-  input_num() const = 0;
+  input_num() const;
 
   /// @brief 入力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
@@ -127,9 +127,8 @@ public:
   input(ymuint pos) const;
 
   /// @brief 出力ピン数を得る．
-  virtual
   ymuint
-  output_num() const = 0;
+  output_num() const;
 
   /// @brief 出力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
@@ -166,7 +165,11 @@ protected:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
-  MvNode(MvModule* parent);
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  MvNode(MvModule* parent,
+	 ymuint ni,
+	 ymuint no);
 
   /// @brief デストラクタ
   virtual
@@ -175,35 +178,25 @@ protected:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // 継承クラスで用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @param[in] ピンを初期化する．
-  /// @param[in] pin 対象のピン
-  /// @param[in] pos 位置
-  /// @param[in] bit_width ビット幅
-  void
-  init_pin(MvPin* pin,
-	   ymuint pos,
-	   ymuint bit_width);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
-  virtual
   MvInputPin*
-  input(ymuint pos) = 0;
+  input(ymuint pos);
 
   /// @brief 出力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
-  virtual
   MvOutputPin*
-  output(ymuint pos) =0;
+  output(ymuint pos);
+
+  /// @brief ピンのビット幅を設定する．
+  /// @param[in] pin 対象のピン
+  /// @param[in] bit_width ビット幅
+  void
+  set_bit_width(MvPin* pin,
+		ymuint bit_width);
 
 
 private:
@@ -219,7 +212,19 @@ private:
 
   // mNodeList からの削除で用いる反復子
   list<MvNode*>::iterator mSelfRef;
-  
+
+  // 入力ピン数
+  ymuint32 mNi;
+
+  // 入力ピンの配列
+  MvInputPin* mInputPins;
+
+  // 出力ピン数
+  ymuint32 mNo;
+
+  // 出力ピンの配列
+  MvOutputPin* mOutputPins;
+
 };
 
 typedef DlList<MvNode> MvNodeList;
@@ -245,13 +250,38 @@ MvNode::parent() const
   return mParent;
 }
 
+// @brief 入力ピン数を得る．
+inline
+ymuint
+MvNode::input_num() const
+{
+  return mNi;
+}
+
 // @brief 入力ピンを得る．
 // @param[in] pos 位置 ( 0 <= pos < input_num() )
 inline
 const MvInputPin*
 MvNode::input(ymuint pos) const
 {
-  return const_cast<MvNode*>(this)->input(pos);
+  return &mInputPins[pos];
+}
+
+// @brief 入力ピンを得る．
+// @param[in] pos 位置 ( 0 <= pos < input_num() )
+inline
+MvInputPin*
+MvNode::input(ymuint pos)
+{
+  return &mInputPins[pos];
+}
+
+// @brief 出力ピン数を得る．
+inline
+ymuint
+MvNode::output_num() const
+{
+  return mNo;
 }
 
 // @brief 出力ピンを得る．
@@ -260,7 +290,16 @@ inline
 const MvOutputPin*
 MvNode::output(ymuint pos) const
 {
-  return const_cast<MvNode*>(this)->output(pos);
+  return &mOutputPins[pos];
+}
+
+// @brief 出力ピンを得る．
+// @param[in] pos 位置 ( 0 <= pos < output_num() )
+inline
+MvOutputPin*
+MvNode::output(ymuint pos)
+{
+  return &mOutputPins[pos];
 }
 
 END_NAMESPACE_YM_MVN

@@ -27,49 +27,17 @@ MvTernaryOp::MvTernaryOp(MvModule* module,
 			 ymuint bit_width2,
 			 ymuint bit_width3,
 			 ymuint bit_width4) :
-  MvNode(module)
+  MvNode(module, 3, 1)
 {
-  init_pin(&mInput[0], 0, bit_width1);
-  init_pin(&mInput[1], 1, bit_width2);
-  init_pin(&mInput[2], 2, bit_width3);
-  init_pin(&mOutput, 0, bit_width4);
+  set_bit_width(input(0), bit_width1);
+  set_bit_width(input(1), bit_width2);
+  set_bit_width(input(2), bit_width3);
+  set_bit_width(output(0), bit_width4);
 }
 
 // @brief デストラクタ
 MvTernaryOp::~MvTernaryOp()
 {
-}
-
-// @brief 入力ピン数を得る．
-ymuint
-MvTernaryOp::input_num() const
-{
-  return 3;
-}
-
-/// @brief 入力ピンを得る．
-/// @param[in] pos 位置 ( 0 <= pos < input_num() )
-MvInputPin*
-MvTernaryOp::input(ymuint pos)
-{
-  assert_cond( pos < 3, __FILE__, __LINE__);
-  return &mInput[pos];
-}
-
-// @brief 出力ピン数を得る．
-ymuint
-MvTernaryOp::output_num() const
-{
-  return 1;
-}
-
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-MvOutputPin*
-MvTernaryOp::output(ymuint pos)
-{
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return &mOutput;
 }
 
 END_NAMESPACE_YM_MVN

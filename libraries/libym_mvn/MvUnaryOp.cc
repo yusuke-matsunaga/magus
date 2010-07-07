@@ -19,47 +19,15 @@ BEGIN_NAMESPACE_YM_MVN
 MvUnaryOp::MvUnaryOp(MvModule* module,
 		     ymuint bit_width1,
 		     ymuint bit_width2) :
-  MvNode(module)
+  MvNode(module, 1, 1)
 {
-  init_pin(&mInput, 0, bit_width1);
-  init_pin(&mOutput, 0, bit_width2);
+  set_bit_width(input(0), bit_width1);
+  set_bit_width(output(0), bit_width2);
 }
 
 // @brief デストラクタ
 MvUnaryOp::~MvUnaryOp()
 {
-}
-
-// @brief 入力ピン数を得る．
-ymuint
-MvUnaryOp::input_num() const
-{
-  return 1;
-}
-
-/// @brief 入力ピンを得る．
-/// @param[in] pos 位置 ( 0 <= pos < input_num() )
-MvInputPin*
-MvUnaryOp::input(ymuint pos)
-{
-  assert_cond( pos == 0 , __FILE__, __LINE__);
-  return &mInput;
-}
-
-// @brief 出力ピン数を得る．
-ymuint
-MvUnaryOp::output_num() const
-{
-  return 1;
-}
-
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-MvOutputPin*
-MvUnaryOp::output(ymuint pos)
-{
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return &mOutput;
 }
 
 END_NAMESPACE_YM_MVN

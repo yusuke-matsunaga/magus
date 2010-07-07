@@ -8,36 +8,42 @@
 
 
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvPin.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
-MvNode::MvNode(MvModule* parent) :
-  mParent(parent)
+// @param[in] ni 入力ピン数
+// @param[in] no 出力ピン数
+MvNode::MvNode(MvModule* parent,
+	       ymuint ni,
+	       ymuint no) :
+  mParent(parent),
+  mNi(ni),
+  mInputPins(new MvInputPin[ni]),
+  mNo(no),
+  mOutputPins(new MvOutputPin[no])
 {
+  for (ymuint i = 0; i < ni; ++ i) {
+    MvInputPin* pin = &mInputPins[i];
+    pin->mNode = this;
+    pin->mPos = i;
+    pin->mBitWidth = 1;
+  }
+  for (ymuint i = 0; i < no; ++ i) {
+    MvOutputPin* pin = &mOutputPins[i];
+    pin->mNode = this;
+    pin->mPos = i;
+    pin->mBitWidth = 1;
+  }
 }
 
 // @brief デストラクタ
 MvNode::~MvNode()
 {
-  cout << "MvNode is deleted" << endl;
-}
-
-// @param[in] ピンを初期化する．
-// @param[in] pin 対象のピン
-// @param[in] pos 位置
-// @param[in] bit_width ビット幅
-void
-MvNode::init_pin(MvPin* pin,
-		 ymuint pos,
-		 ymuint bit_width)
-{
-  pin->mNode = this;
-  pin->mPos = pos;
-  pin->mBitWidth = bit_width;
+  delete [] mInputPins;
+  delete [] mOutputPins;
 }
 
 // @brief 入力ノード/出力ノードの場合に位置を返す．
@@ -65,6 +71,16 @@ MvNode::module() const
 void
 MvNode::const_value(vector<ymuint32>& val) const
 {
+}
+
+// @brief ピンのビット幅を設定する．
+// @param[in] pin 対象のピン
+// @param[in] bit_width ビット幅
+void
+MvNode::set_bit_width(MvPin* pin,
+		      ymuint bit_width)
+{
+  pin->mBitWidth = bit_width;
 }
 
 END_NAMESPACE_YM_MVN
