@@ -43,7 +43,7 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
 			    const VlNamedObj* scope)
 {
   vector<const VlDecl*> decl_list;
-  if ( mgr.find_decl_list(scope, vpiParameter, decl_list) ) {
+  if ( mgr.find_param_list(scope, decl_list) ) {
     put_decl_list("vpiParameter", mgr, decl_list);
   }
   vector<const VlParamAssign*> paramassign_list;

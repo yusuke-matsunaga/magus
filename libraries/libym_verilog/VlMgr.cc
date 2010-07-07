@@ -177,6 +177,20 @@ VlMgr::find_decl_list(const VlNamedObj* parent,
   return mElbMgr->find_decl_list(parent, tag, decl_list);
 }
 
+// @brief スコープに属する parameter 宣言を取り出す．
+// @param[in] parent 検索対象のスコープ
+// @param[out] param_list 結果を格納するリスト
+// @retval true 該当する要素が1つ以上あった．
+// @retval false 該当する要素がなかった．
+// @note scope というスコープ内の paramter 宣言を
+// param_list に入れる．
+bool
+VlMgr::find_param_list(const VlNamedObj* parent,
+		       vector<const VlDecl*>& param_list) const
+{
+  return mElbMgr->find_param_list(parent, param_list);
+}
+
 // @brief スコープに属する defparam のリストを取り出す．
 // @param[in] parent 検索対象のスコープ
 // @param[out] defparam_list 結果を格納するリスト
