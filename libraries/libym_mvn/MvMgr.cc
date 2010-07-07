@@ -177,6 +177,7 @@ MvMgr::module(ymuint id) const
 // @param[in] ni 入力ノード数
 // @param[in] no 出力ノード数
 // @return 生成したモジュールを返す．
+// @note 入出力ノードのビット幅は1で初期化される．
 MvModule*
 MvMgr::new_module(const char* name,
 		  ymuint ni,
@@ -196,6 +197,12 @@ MvMgr::new_module(const char* name,
   }
   mModuleArray[id] = module;
 
+  for (ymuint i = 0; i < ni; ++ i) {
+    new_input(module, i, 1);
+  }
+  for (ymuint i = 0; i < no; ++ i) {
+    new_output(module, i, 1);
+  }
   return module;
 }
 
