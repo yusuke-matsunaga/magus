@@ -312,27 +312,27 @@ public:
   new_concat(MvModule* module,
 	     const vector<ymuint>& ibitwidth_arary);
 
-  /// @brief bit selectノードを生成する．
+  /// @brief bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bitpos ビット位置
   /// @param[in] bit_width ビット幅
-  /// @param[in] idx ビット位置を表す定数ノード
   /// @return 生成したノードを返す．
   MvNode*
   new_bitselect(MvModule* module,
-		ymuint bit_width,
-		MvNode* idx);
+		ymuint bitpos,
+		ymuint bit_width);
 
-  /// @brief part select ノードを生成する．
+  /// @brief part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
-  /// @param[in] bit_width ビット幅
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
   new_partselect(MvModule* module,
-		 ymuint bit_width,
-		 MvNode* msb,
-		 MvNode* lsb);
+		 ymuint msb,
+		 ymuint lsb,
+		 ymuint bit_width);
 
   /// @brief module instance ノードを生成する．
   /// @param[in] module ノードが属するモジュール

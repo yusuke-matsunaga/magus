@@ -25,6 +25,10 @@ libym_mvn_la_SOURCES = \
 	MvConcat.cc \
 	MvConst.h \
 	MvConst.cc \
+	MvConstBitSelect.h \
+	MvConstBitSelect.cc \
+	MvConstPartSelect.h \
+	MvConstPartSelect.cc \
 	MvInput.h \
 	MvInput.cc \
 	MvInst.h \

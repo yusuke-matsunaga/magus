@@ -87,10 +87,16 @@ public:
     /// @brief concatenate ( n入力, 1出力 )
     kConcat,
 
-    /// @brief bit select ( 2入力, 1出力 )
+    /// @brief constant bit-select ( 1入力, 1出力 )
+    kConstBitSelect,
+
+    /// @brief constant part-select ( 1入力, 1出力 )
+    kConstPartSelect,
+
+    /// @brief bit-select ( 2入力, 1出力 )
     kBitSelect,
 
-    /// @brief part select ( 3入力, 1出力 )
+    /// @brief part-select ( 3入力, 1出力 )
     kPartSelect,
     
     /// @brief module instance ( n入力, m出力 )
@@ -149,6 +155,27 @@ public:
   const MvModule*
   module() const;
 
+  /// @brief ビット位置を得る．
+  /// @note type() が kConstBitSelect の時のみ意味を持つ．
+  /// @note デフォルトの実装では 0 を返す．
+  virtual
+  ymuint
+  bitpos() const;
+
+  /// @brief 範囲指定の MSB を得る．
+  /// @note type() が kConstPartSelect の時のみ意味を持つ．
+  /// @note デフォルトの実装では 0 を返す．
+  virtual
+  ymuint
+  msb() const;
+
+  /// @brief 範囲指定の LSB を得る．
+  /// @note type() が kConstPartSelect の時のみ意味を持つ．
+  /// @note デフォルトの実装では 0 を返す．
+  virtual
+  ymuint
+  lsb() const;
+  
   /// @brief 定数値を得る．
   /// @param[out] val 値を格納するベクタ
   /// @note type() が kConst の時のみ意味を持つ．

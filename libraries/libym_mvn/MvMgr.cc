@@ -23,6 +23,8 @@
 #include "MvConcat.h"
 #include "MvInst.h"
 #include "MvConst.h"
+#include "MvConstBitSelect.h"
+#include "MvConstPartSelect.h"
 
 #include "ym_mvn/MvNet.h"
 
@@ -663,66 +665,39 @@ MvMgr::new_concat(MvModule* module,
   return node;
 }
 
-#if 0
-// @brief bit selectノードを生成する．
+// @brief bit-selectノードを生成する．
 // @param[in] module ノードが属するモジュール
+// @param[in] bitpos ビット位置
 // @param[in] bit_width ビット幅
-// @param[in] idx ビット位置を表す定数ノード
 // @return 生成したノードを返す．
 MvNode*
 MvMgr::new_bitselect(MvModule* module,
-		     ymuint bit_width,
-		     MvNode* idx)
+		     ymuint bitpos,
+		     ymuint bit_width)
 {
-  MvNode* node = new MvBitSelect(module);
+  MvNode* node = new MvConstBitSelect(module, bitpos, bit_width);
   reg_node(node);
 
-  assert_cond( idx->type() == MvNode::kConst, __FILE__, __LINE__);
-  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
-  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
-#if 0
-  set_bit_width(node->input(0), bit_width);
-  set_bit_width(node->input(1), idx->output(0)->bit_width());
-  set_bit_width(node->output(0), 1);
-#endif
-
-  connect(idx->output(0), node->input(1));
-  
   return node;
 }
 
-// @brief part select ノードを生成する．
+// @brief part-select ノードを生成する．
 // @param[in] module ノードが属するモジュール
-// @param[in] bit_width ビット幅
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
+// @param[in] bit_width ビット幅
 // @return 生成したノードを返す．
 MvNode*
 MvMgr::new_partselect(MvModule* module,
-		      ymuint bit_width,
-		      MvNode* msb,
-		      MvNode* lsb)
+		      ymuint msb,
+		      ymuint lsb,
+		      ymuint bit_width)
 {
-  MvNode* node = new MvPartSelect(module);
+  MvNode* node = new MvConstPartSelect(module, msb, lsb, bit_width);
   reg_node(node);
 
-  assert_cond( msb->type() == MvNode::kConst, __FILE__, __LINE__);
-  assert_cond( lsb->type() == MvNode::kConst, __FILE__, __LINE__);
-  assert_cond( node->input_num() == 3, __FILE__, __LINE__);
-  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
-#if 0
-  set_bit_width(node->input(0), bit_width);
-  set_bit_width(node->input(1), msb->output(0)->bit_width());
-  set_bit_width(node->input(2), lsb->output(0)->bit_width());
-  set_bit_width(node->output(0), 1);
-#endif
-  
-  connect(msb->output(0), node->input(1));
-  connect(lsb->output(0), node->input(2));
-  
   return node;
 }
-#endif
 
 // @brief module instance ノードを生成する．
 // @param[in] module ノードが属するモジュール

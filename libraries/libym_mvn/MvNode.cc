@@ -64,6 +64,33 @@ MvNode::module() const
   return NULL;
 }
 
+// @brief ビット位置を得る．
+// @note type() が kConstBitSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvNode::bitpos() const
+{
+  return 0;
+}
+
+// @brief 範囲指定の MSB を得る．
+// @note type() が kConstPartSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvNode::msb() const
+{
+  return 0;
+}
+
+// @brief 範囲指定の LSB を得る．
+// @note type() が kConstPartSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvNode::lsb() const
+{
+  return 0;
+}
+
 // @brief 定数値を得る．
 // @param[out] val 値を格納するベクタ
 // @note type() が kConst の時のみ意味を持つ．
