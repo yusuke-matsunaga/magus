@@ -25,7 +25,7 @@ MvAdd::MvAdd(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -55,7 +55,7 @@ MvSub::MvSub(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -85,7 +85,7 @@ MvMult::MvMult(MvModule* module,
 	       ymuint bit_width1,
 	       ymuint bit_width2,
 	       ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -115,7 +115,7 @@ MvDiv::MvDiv(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -145,7 +145,7 @@ MvMod::MvMod(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -175,7 +175,7 @@ MvPow::MvPow(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -205,7 +205,7 @@ MvSll::MvSll(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -235,7 +235,7 @@ MvSrl::MvSrl(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -265,7 +265,7 @@ MvSla::MvSla(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 
@@ -295,7 +295,7 @@ MvSra::MvSra(MvModule* module,
 	     ymuint bit_width1,
 	     ymuint bit_width2,
 	     ymuint bit_width3) :
-  MvBinaryOp(module, bit_width1, bit_width2, bit_width2)
+  MvBinaryOp(module, bit_width1, bit_width2, bit_width3)
 {
 }
 

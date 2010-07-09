@@ -25,6 +25,8 @@
 #include "MvConst.h"
 #include "MvConstBitSelect.h"
 #include "MvConstPartSelect.h"
+#include "MvBitSelect.h"
+#include "MvPartSelect.h"
 
 #include "ym_mvn/MvNet.h"
 
@@ -83,6 +85,8 @@ dump_node(ostream& s,
   case MvNode::kPow:        s << "Pow"; break;
   case MvNode::kIte:        s << "Ite"; break;
   case MvNode::kConcat:     s << "Concat"; break;
+  case MvNode::kConstBitSelect:  s << "BitSelect"; break;
+  case MvNode::kConstPartSelect: s << "PartSelect"; break;
   case MvNode::kBitSelect:  s << "BitSelect"; break;
   case MvNode::kPartSelect: s << "PartSelect"; break;
   case MvNode::kInst:       s << "Inst of Module#"
@@ -671,9 +675,9 @@ MvMgr::new_concat(MvModule* module,
 // @param[in] bit_width ビット幅
 // @return 生成したノードを返す．
 MvNode*
-MvMgr::new_bitselect(MvModule* module,
-		     ymuint bitpos,
-		     ymuint bit_width)
+MvMgr::new_constbitselect(MvModule* module,
+			  ymuint bitpos,
+			  ymuint bit_width)
 {
   MvNode* node = new MvConstBitSelect(module, bitpos, bit_width);
   reg_node(node);
@@ -688,12 +692,46 @@ MvMgr::new_bitselect(MvModule* module,
 // @param[in] bit_width ビット幅
 // @return 生成したノードを返す．
 MvNode*
-MvMgr::new_partselect(MvModule* module,
-		      ymuint msb,
-		      ymuint lsb,
-		      ymuint bit_width)
+MvMgr::new_constpartselect(MvModule* module,
+			   ymuint msb,
+			   ymuint lsb,
+			   ymuint bit_width)
 {
   MvNode* node = new MvConstPartSelect(module, msb, lsb, bit_width);
+  reg_node(node);
+
+  return node;
+}
+
+// @brief 可変 bit-selectノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力のビット幅
+// @param[in] bit_width2 ビット指定入力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_bitselect(MvModule* module,
+		     ymuint bit_width1,
+		     ymuint bit_width2)
+{
+  MvNode* node = new MvBitSelect(module, bit_width1, bit_width2);
+  reg_node(node);
+
+  return node;
+}
+
+// @brief 可変 part-select ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力のビット幅
+// @param[in] bit_width2 範囲指定入力のビット幅
+// @param[in] bit_width3 範囲のビット幅(出力のビット幅)
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_partselect(MvModule* module,
+		      ymuint bit_width1,
+		      ymuint bit_width2,
+		      ymuint bit_width3)
+{
+  MvNode* node = new MvPartSelect(module, bit_width1, bit_width2, bit_width3);
   reg_node(node);
 
   return node;

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_mvn/MvNode.h"
+#include "MvUnaryOp.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_MVN
 /// @brief 定数ビット指定を表すノード
 //////////////////////////////////////////////////////////////////////
 class MvConstPartSelect :
-  public MvNode
+  public MvUnaryOp
 {
   friend class MvMgr;
 public:
@@ -53,11 +53,11 @@ public:
   /// @param[in] module 親のモジュール
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
-  /// @param[in] bitwidth 入力のビット幅
+  /// @param[in] bit_width 入力のビット幅
   MvConstPartSelect(MvModule* module,
 		    ymuint msb,
 		    ymuint lsb,
-		    ymuint bitwidth);
+		    ymuint bit_width);
 
   /// @brief デストラクタ
   ~MvConstPartSelect();

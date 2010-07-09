@@ -318,9 +318,9 @@ public:
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
-  new_bitselect(MvModule* module,
-		ymuint bitpos,
-		ymuint bit_width);
+  new_constbitselect(MvModule* module,
+		     ymuint bitpos,
+		     ymuint bit_width);
 
   /// @brief part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -329,10 +329,32 @@ public:
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
+  new_constpartselect(MvModule* module,
+		      ymuint msb,
+		      ymuint lsb,
+		      ymuint bit_width);
+
+  /// @brief 可変 bit-selectノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力のビット幅
+  /// @param[in] bit_widht2 ビット指定入力のビット幅
+  /// @return 生成したノードを返す．
+  MvNode*
+  new_bitselect(MvModule* module,
+		ymuint bit_width1,
+		ymuint bit_width2);
+
+  /// @brief 可変 part-select ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width1 入力のビット幅
+  /// @param[in] bit_width2 範囲指定入力のビット幅
+  /// @param[in] bit_width3 範囲のビット幅(出力のビット幅)
+  /// @return 生成したノードを返す．
+  MvNode*
   new_partselect(MvModule* module,
-		 ymuint msb,
-		 ymuint lsb,
-		 ymuint bit_width);
+		 ymuint bit_width1,
+		 ymuint bit_width2,
+		 ymuint bit_width3);
 
   /// @brief module instance ノードを生成する．
   /// @param[in] module ノードが属するモジュール

@@ -15,15 +15,13 @@ BEGIN_NAMESPACE_YM_MVN
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
 // @param[in] bitpos ビット位置
-// @param[in] bitwidth 入力のビット幅
+// @param[in] bit_width 入力のビット幅
 MvConstBitSelect::MvConstBitSelect(MvModule* module,
 				   ymuint bitpos,
-				   ymuint bitwidth) :
-  MvNode(module, 1, 1),
+				   ymuint bit_width) :
+  MvUnaryOp(module, bit_width, 1),
   mBitPos(bitpos)
 {
-  set_bit_width(input(0), bitwidth);
-  set_bit_width(output(0), 1);
 }
 
 // @brief デストラクタ

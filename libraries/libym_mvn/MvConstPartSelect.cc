@@ -16,17 +16,15 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] module 親のモジュール
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
-// @param[in] bitwidth 入力のビット幅
+// @param[in] bit_width 入力のビット幅
 MvConstPartSelect::MvConstPartSelect(MvModule* module,
 				     ymuint msb,
 				     ymuint lsb,
-				     ymuint bitwidth) :
-  MvNode(module, 1, 1),
+				     ymuint bit_width) :
+  MvUnaryOp(module, bit_width, 1),
   mMsb(msb),
   mLsb(lsb)
 {
-  set_bit_width(input(0), bitwidth);
-  set_bit_width(output(0), 1);
 }
 
 // @brief デストラクタ

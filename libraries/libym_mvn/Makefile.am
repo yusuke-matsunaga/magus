@@ -21,6 +21,8 @@ libym_mvn_la_SOURCES = \
 	MvArithOp.cc \
 	MvBinaryOp.h \
 	MvBinaryOp.cc \
+	MvBitSelect.h \
+	MvBitSelect.cc \
 	MvConcat.h \
 	MvConcat.cc \
 	MvConst.h \
@@ -44,6 +46,8 @@ libym_mvn_la_SOURCES = \
 	MvNot.cc \
 	MvOutput.h \
 	MvOutput.cc \
+	MvPartSelect.h \
+	MvPartSelect.cc \
 	MvPort.cc \
 	MvRelOp.h \
 	MvRelOp.cc \
