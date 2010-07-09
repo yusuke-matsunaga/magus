@@ -41,6 +41,15 @@ public:
   MvNode*
   parent() const;
 
+  /// @brief ポート数を得る．
+  ymuint
+  port_num() const;
+
+  /// @brief ポートを得る．
+  /// @param[in] pos 位置 ( 0 <= pos < port_num() )
+  MvPort*
+  port(ymuint pos);
+  
   /// @brief ノードの ID番号の最大値 + 1 を返す．
   ymuint
   max_node_id() const;
@@ -93,9 +102,11 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
+  /// @param[in] np ポート数
   /// @param[in] ni 入力ノード数
   /// @param[in] no 出力ノード数
   MvModule(const char* name,
+	   ymuint np,
 	   ymuint ni,
 	   ymuint no);
 
@@ -117,6 +128,9 @@ private:
   // 親のノード
   MvNode* mParent;
 
+  // ポートの配列
+  vector<MvPort*> mPortArray;
+  
   // 入力ノードの配列
   vector<MvNode*> mInputArray;
 
@@ -162,6 +176,23 @@ MvNode*
 MvModule::parent() const
 {
   return mParent;
+}
+
+// @brief ポート数を得る．
+inline
+ymuint
+MvModule::port_num() const
+{
+  return mPortArray.size();
+}
+
+// @brief ポートを得る．
+// @param[in] pos 位置 ( 0 <= pos < port_num() )
+inline
+MvPort*
+MvModule::port(ymuint pos)
+{
+  return mPortArray[pos];
 }
 
 // @brief ノードの ID番号の最大値 + 1 を返す．

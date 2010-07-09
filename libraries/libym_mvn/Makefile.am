@@ -40,6 +40,7 @@ libym_mvn_la_SOURCES = \
 	MvNot.cc \
 	MvOutput.h \
 	MvOutput.cc \
+	MvPort.cc \
 	MvRelOp.h \
 	MvRelOp.cc \
 	MvRop.h \

@@ -65,22 +65,26 @@ public:
 
   /// @brief モジュールを生成する．
   /// @param[in] name 名前
+  /// @param[in] np ポート数
   /// @param[in] ni 入力ノード数
   /// @param[in] no 出力ノード数
   /// @return 生成したモジュールを返す．
   /// @note 入出力ノードのビット幅は1で初期化される．
   MvModule*
   new_module(const char* name,
+	     ymuint np,
 	     ymuint ni,
 	     ymuint no);
 
   /// @brief モジュールを生成する．
   /// @param[in] name 名前
+  /// @param[in] np ポート数
   /// @param[in] ibitwidth_array 入力のビット幅の配列
   /// @param[in] obitwidth_array 出力のビット幅の配列
   /// @return 生成したモジュールを返す．
   MvModule*
   new_module(const char* name,
+	     ymuint np,
 	     const vector<ymuint>& ibitwidth_array,
 	     const vector<ymuint>& obitwidth_array);
 

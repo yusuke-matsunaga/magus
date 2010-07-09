@@ -174,27 +174,31 @@ MvMgr::module(ymuint id) const
 
 // @brief モジュールを生成する．
 // @param[in] name 名前
+// @param[in] np ポート数
 // @param[in] ni 入力ノード数
 // @param[in] no 出力ノード数
 // @return 生成したモジュールを返す．
 // @note 入出力ノードのビット幅は1で初期化される．
 MvModule*
 MvMgr::new_module(const char* name,
+		  ymuint np,
 		  ymuint ni,
 		  ymuint no)
 {
   vector<ymuint> ibitwidth_array(ni, 1);
   vector<ymuint> obitwidth_array(no, 1);
-  return new_module(name, ibitwidth_array, obitwidth_array);
+  return new_module(name, np, ibitwidth_array, obitwidth_array);
 }
 
 // @brief モジュールを生成する．
 // @param[in] name 名前
+// @param[in] np ポート数
 // @param[in] ibitwidth_array 入力のビット幅の配列
 // @param[in] obitwidth_array 出力のビット幅の配列
 // @return 生成したモジュールを返す．
 MvModule*
 MvMgr::new_module(const char* name,
+		  ymuint np,
 		  const vector<ymuint>& ibitwidth_array,
 		  const vector<ymuint>& obitwidth_array)
 {
@@ -208,7 +212,7 @@ MvMgr::new_module(const char* name,
 
   ymuint ni = ibitwidth_array.size();
   ymuint no = obitwidth_array.size();
-  MvModule* module = new MvModule(name, ni, no);
+  MvModule* module = new MvModule(name, np, ni, no);
   module->mId = id;
   while ( mModuleArray.size() <= id ) {
     mModuleArray.push_back(NULL);
