@@ -32,6 +32,8 @@ MvVerilogReader::clear()
 
 // @brief verilog 形式のファイルを読み込む．
 // @param[in] filename ファイル名
+// @param[in] searchpath サーチパス
+// @param[in] watcher_list 行番号ウォッチャーのリスト
 // @retval true 正常に読み込めた．
 // @retval false 読込中にエラーが起こった．
 bool
@@ -44,8 +46,6 @@ MvVerilogReader::read(const string& filename,
 
 // @brief 今まで読み込んだ情報からネットワークを生成する．
 // @param[in] mgr ネットワーク生成用のマネージャ
-// @param[in] searchpath サーチパス
-// @param[in] watcher_list 行番号ウォッチャーのリスト
 // @retval true 正常に処理を行った．
 // @retval false 生成中にエラーが起こった．
 bool
