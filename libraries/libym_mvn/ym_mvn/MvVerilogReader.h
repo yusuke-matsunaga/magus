@@ -11,6 +11,7 @@
 
 #include "ym_mvn/mvn_nsdef.h"
 #include "ym_verilog/VlMgr.h"
+#include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -60,6 +61,19 @@ public:
   /// @note このハンドラはこのオブジェクトの破壊に伴って破壊される．
   void
   add_msg_handler(MsgHandler* msg_handler);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief module を生成する．
+  /// @param[in] mgr MvMgr
+  /// @param[in] vl_module 対象のモジュール
+  MvModule*
+  gen_module(MvMgr& mgr,
+	     const nsVerilog::VlModule* vl_module);
 
 
 private:
