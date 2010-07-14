@@ -58,7 +58,7 @@ public:
   string
   full_name();
   
-  /// @brief 配列要素の VlScope を返す．
+  /// @brief 配列要素を返す．
   /// @note このクラスでは NULL を返す．
   virtual
   const VlNamedObj*
@@ -371,7 +371,7 @@ public:
   const VlNamedObj*
   obj();
   
-  /// @brief 配列要素の VlScope を返す．
+  /// @brief 配列要素を返す．
   virtual
   const VlNamedObj*
   array_elem(int index);
@@ -539,7 +539,7 @@ public:
   const VlNamedObj*
   obj();
   
-  /// @brief 配列要素の VlScope を返す．
+  /// @brief 配列要素を返す．
   virtual
   const VlNamedObj*
   array_elem(int index);

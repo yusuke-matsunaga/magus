@@ -59,7 +59,7 @@ public:
   /// @param[in] parent 親のスコープ環境
   /// @param[in] pt_item 対応するパース木の要素
   virtual
-  const VlNamedObj*
+  ElbScope*
   new_GenBlock(const VlNamedObj* parent,
 	       const PtItem* pt_item) = 0;
 
@@ -74,7 +74,7 @@ public:
   /// @param[in] pt_item 対応するパース木の要素
   /// @param[in] int gvi 対応する genvar の値
   virtual
-  const VlNamedObj*
+  ElbScope*
   new_GfBlock(const VlNamedObj* parent,
 	      const PtItem* pt_item,
 	      int gvi) = 0;
@@ -516,7 +516,7 @@ public:
   /// @param[in] parent 親のスコープ環境
   /// @param[in] pt_stmt 対応するパース木の要素
   virtual
-  const VlNamedObj*
+  ElbScope*
   new_StmtScope(const VlNamedObj* parent,
 		const PtStmt* pt_stmt) = 0;
   

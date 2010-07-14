@@ -262,11 +262,11 @@ MvVerilogReader::gen_scopeitem(MvMgr& mgr,
     }
   }
 
-  // 下位スコープ要素の生成
+  // 内部スコープ要素の生成
   {
-    vector<const VlScope*> scope_list;
-    if ( mVlMgr.find_internalscope_list(vl_scope, scope_list) ) {
-      for (vector<const VlScope*>::iterator p = scope_list.begin();
+    vector<const VlNamedObj*> scope_list;
+    if ( mVlMgr.find_scope_list(vl_scope, scope_list) ) {
+      for (vector<const VlNamedObj*>::iterator p = scope_list.begin();
 	   p != scope_list.end(); ++ p) {
 	const VlNamedObj* vl_scope1 = *p;
 	bool stat = gen_scopeitem(mgr, module, vl_scope1);

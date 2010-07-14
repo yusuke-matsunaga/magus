@@ -216,7 +216,7 @@ ElbExpr::declarray_index(ymuint32 pos) const
 }
 
 // @brief 対象のオブジェクトを返す．
-// @note 対象が VlScope の時，意味を持つ．
+// @note 対象がスコープの時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlNamedObj*
 ElbExpr::scope_obj() const

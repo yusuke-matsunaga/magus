@@ -117,14 +117,14 @@ public:
   find_obj(const VlNamedObj* parent,
 	   const char* name) const;
 
-  /// @brief スコープに属する internal scop のリストを取り出す．
+  /// @brief スコープに属する内部のスコープのリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[out] scope_list 結果を格納するリスト
   /// @retval true 該当する要素が1つ以上あった．
   /// @retval false 該当する要素がなかった．
   bool
-  find_internalscope_list(const VlNamedObj* parent,
-			  vector<const VlScope*>& scope_list) const;
+  find_scope_list(const VlNamedObj* parent,
+		  vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief スコープとタグから宣言要素を取り出す．
   /// @param[in] parent 検索対象のスコープ

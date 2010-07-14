@@ -1,11 +1,11 @@
-#ifndef LIBYM_VERILOG_ELB_TAGHASH_H
-#define LIBYM_VERILOG_ELB_TAGHASH_H
+#ifndef LIBYM_VERILOG_ELB_TAGDICT_H
+#define LIBYM_VERILOG_ELB_TAGDICT_H
 
-/// @file libym_verilog/elaborator/include/TagHash.h
-/// @brief TagHash のヘッダファイル
+/// @file libym_verilog/elaborator/include/TagDict.h
+/// @brief TagDict のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TagHash.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: TagDict.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -19,24 +19,24 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class TagHashCell TagHashCell.h "TagHashCell.h"
-/// @brief TagHash 用のセル
+/// @class TagDictCell TagDictCell.h "TagDictCell.h"
+/// @brief TagDict 用のセル
 //////////////////////////////////////////////////////////////////////
-class TagHashCell
+class TagDictCell
 {
-  friend class TagHash;
+  friend class TagDict;
   
 private:
   
-  /// @brief  internal scope を追加する．
+  /// @brief scope を追加する．
   virtual
   void
-  add_internalscope(ElbScopeHandle* obj);
+  add_scope(ElbScope* obj);
   
-  /// @brief  internal scope の先頭を得る．
+  /// @brief scope の先頭を得る．
   virtual
-  ElbScopeHandle*
-  internalscope();
+  const ElbScope*
+  scope();
   
   /// @brief  宣言要素を追加する．
   virtual
@@ -45,7 +45,7 @@ private:
   
   /// @brief  宣言要素の先頭を得る．
   virtual
-  ElbDeclBase*
+  const ElbDeclBase*
   decl();
   
   /// @brief parameter 宣言を追加する．
@@ -55,7 +55,7 @@ private:
   
   /// @brief parameter 宣言の先頭を得る．
   virtual
-  ElbParameter*
+  const ElbParameter*
   parameter();
   
   /// @brief  defparam を追加する．
@@ -65,7 +65,7 @@ private:
   
   /// @brief  defparam の先頭を得る．
   virtual
-  ElbDefParam*
+  const ElbDefParam*
   defparam();
   
   /// @brief  param assign を追加する．
@@ -75,7 +75,7 @@ private:
   
   /// @brief  param assign の先頭を得る．
   virtual
-  ElbParamAssign*
+  const ElbParamAssign*
   paramassign();
   
   /// @brief module array を追加する．
@@ -85,7 +85,7 @@ private:
   
   /// @brief module array の先頭を得る．
   virtual
-  ElbModuleArray*
+  const ElbModuleArray*
   modulearray();
   
   /// @brief  module を追加する．
@@ -95,7 +95,7 @@ private:
   
   /// @brief  module の先頭を得る．
   virtual
-  ElbModule*
+  const ElbModule*
   module();
   
   /// @brief  primitive array を追加する．
@@ -105,7 +105,7 @@ private:
   
   /// @brief  primitive array の先頭を得る．
   virtual
-  ElbPrimArray*
+  const ElbPrimArray*
   primarray();
   
   /// @brief  primitive を追加する．
@@ -115,7 +115,7 @@ private:
   
   /// @brief  primitive の先頭を得る．
   virtual
-  ElbPrimitive*
+  const ElbPrimitive*
   primitive();
   
   /// @brief タスクを追加する．
@@ -125,7 +125,7 @@ private:
 
   /// @brief タスクの先頭を得る．
   virtual
-  ElbTask*
+  const ElbTask*
   task();
 
   /// @brief 関数を追加する．
@@ -135,7 +135,7 @@ private:
 
   /// @brief 関数の先頭を得る．
   virtual
-  ElbFunction*
+  const ElbFunction*
   function();
   
   /// @brief continuous assignment を追加する．
@@ -145,7 +145,7 @@ private:
   
   /// @brief  continuous assignment の先頭を得る．
   virtual
-  ElbContAssign*
+  const ElbContAssign*
   contassign();
   
   /// @brief  process を追加する．
@@ -155,7 +155,7 @@ private:
   
   /// @brief  process の先頭を得る．
   virtual
-  ElbProcess*
+  const ElbProcess*
   process();
   
   /// @brief  要素数を得る．
@@ -176,25 +176,25 @@ private:
   int mTag;
 
   // ハッシュ上の次の要素を指すポインタ
-  TagHashCell* mLink;
+  TagDictCell* mLink;
   
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TagHash TagHash.h "TagHash.h"
+/// @class TagDict TagDict.h "TagDict.h"
 /// @brief 各スコープの構成要素リストを格納するハッシュ表
 //////////////////////////////////////////////////////////////////////
-class TagHash
+class TagDict
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のオブジェクト
-  TagHash(AllocBase& alloc);
+  TagDict(AllocBase& alloc);
 
   /// @brief デストラクタ
-  ~TagHash();
+  ~TagDict();
 
 
 public:
@@ -203,19 +203,19 @@ public:
   void
   clear();
   
-  /// @brief internal scope を追加する．
+  /// @brief scope を追加する．
   /// @param[in] scope 登録する要素
   void
-  add_internalscope(ElbScopeHandle* scope);
+  add_scope(ElbScope* scope);
 
-  /// @brief internal scope のリストを取り出す．
+  /// @brief scope のリストを取り出す．
   /// @param[in] parent 親のスコープ
   /// @param[out] scope_list 結果を格納するリスト
   /// @retval true 該当する要素が1つ以上あった．
   /// @retval false 該当する要素がなかった．
   bool
-  find_internalscope_list(const VlNamedObj* parent,
-			  vector<const VlScope*>& scope_list) const;
+  find_scope_list(const VlNamedObj* parent,
+		  vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief 宣言要素を追加する．
   /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
@@ -407,12 +407,12 @@ private:
   void
   put_cell(const VlNamedObj* parent,
 	   int tag,
-	   TagHashCell* cell);
+	   TagDictCell* cell);
   
   /// @brief タグから該当する Cell を探す．
   /// @param[in] parent 親のスコープ
   /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
-  TagHashCell*
+  TagDictCell*
   find_cell(const VlNamedObj* parent,
 	    int tag) const;
 
@@ -441,7 +441,7 @@ private:
   ymuint32 mSize;
 
   // ハッシュ表
-  TagHashCell** mTable;
+  TagDictCell** mTable;
 
   // ハッシュ表を拡大するしきい値
   ymuint32 mLimit;
@@ -453,4 +453,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_TAGHASH_H
+#endif // LIBYM_VERILOG_ELB_TAGDICT_H

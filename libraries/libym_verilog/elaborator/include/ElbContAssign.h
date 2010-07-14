@@ -25,11 +25,11 @@ class ElbCaHead
 protected:
   
   /// @brief コンストラクタ
-  ElbCaHead() { }
+  ElbCaHead();
   
   /// @brief デストラクタ
   virtual
-  ~ElbCaHead() { }
+  ~ElbCaHead();
 
 
 public:
@@ -68,17 +68,29 @@ public:
 class ElbContAssign :
   public VlContAssign
 {
+  friend class CellContAssign;
+  
 protected:
   
   /// @brief コンストラクタ
-  ElbContAssign() : mNext(NULL) { }
+  ElbContAssign();
   
   /// @brief デストラクタ
   virtual
-  ~ElbContAssign() { }
-  
-  
+  ~ElbContAssign();
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbContAssign の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を得る．
+  const ElbContAssign*
+  next() const;
+
+  
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -87,6 +99,44 @@ public:
   ElbContAssign* mNext;
   
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+ElbCaHead::ElbCaHead()
+{
+}
+
+// @brief デストラクタ
+inline
+ElbCaHead::~ElbCaHead()
+{
+}
+
+// @brief コンストラクタ
+inline
+ElbContAssign::ElbContAssign() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbContAssign::~ElbContAssign()
+{
+}
+
+// @brief 次の要素を得る．
+inline
+const ElbContAssign*
+ElbContAssign::next() const
+{
+  return mNext;
+}
 
 END_NAMESPACE_YM_VERILOG
 

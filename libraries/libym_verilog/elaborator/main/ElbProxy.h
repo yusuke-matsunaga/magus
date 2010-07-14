@@ -153,10 +153,10 @@ protected:
   reg_udp(const char* def_name,
 	  const ElbUdpDefn* udp);
   
-  /// @brief スコープを登録する．
+  /// @brief scope を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
-  reg_scope(const VlNamedObj* obj);
+  reg_scope(ElbScope* obj);
   
   /// @brief タスクを登録する．
   /// @param[in] obj 登録するオブジェクト
@@ -733,11 +733,11 @@ ElbProxy::reg_udp(const char* def_name,
   mMgr.reg_udp(def_name, udp);
 }
 
-// @brief スコープを登録する．
+// @brief scope を登録する．
 // @param[in] obj 登録するオブジェクト
 inline
 void
-ElbProxy::reg_scope(const VlNamedObj* obj)
+ElbProxy::reg_scope(ElbScope* obj)
 {
   mMgr.reg_scope(obj);
 }

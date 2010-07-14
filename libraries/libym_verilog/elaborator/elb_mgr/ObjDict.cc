@@ -12,7 +12,6 @@
 #include "ObjDict.h"
 
 #include "ym_verilog/vl/VlNamedObj.h"
-#include "ym_verilog/vl/VlScope.h"
 
 #include "ElbDecl.h"
 #include "ElbParameter.h"

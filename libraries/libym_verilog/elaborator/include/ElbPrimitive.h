@@ -27,11 +27,11 @@ class ElbPrimHead
 protected:
   
   /// @brief コンストラクタ
-  ElbPrimHead() { }
+  ElbPrimHead();
   
   /// @brief デストラクタ
   virtual
-  ~ElbPrimHead() { }
+  ~ElbPrimHead();
 
   
 public:
@@ -90,14 +90,16 @@ public:
 class ElbPrimArray :
   public VlPrimArray
 {
+  friend class CellPrimArray;
+  
 protected:
   
   /// @brief コンストラクタ
-  ElbPrimArray() : mNext(NULL) { }
+  ElbPrimArray();
   
   /// @brief デストラクタ
   virtual
-  ~ElbPrimArray() { }
+  ~ElbPrimArray();
   
 
 public:
@@ -119,9 +121,19 @@ public:
   virtual
   ElbPrimHead*
   head() const = 0;
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbPrimArray の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を得る．
+  const ElbPrimArray*
+  next() const;
+
+
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -139,14 +151,16 @@ public:
 class ElbPrimitive :
   public VlPrimitive
 {
+  friend class CellPrimitive;
+
 protected:
   
   /// @brief コンストラクタ
-  ElbPrimitive() : mNext(NULL) { }
+  ElbPrimitive();
   
   /// @brief デストラクタ
   virtual
-  ~ElbPrimitive() { }
+  ~ElbPrimitive();
 
   
 public:
@@ -166,7 +180,17 @@ public:
   virtual
   ElbPrimHead*
   head() const = 0;
-  
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbPrimitive の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を得る．
+  const ElbPrimitive*
+  next() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -191,7 +215,7 @@ public:
 		ymuint32& input_num);
   
   
-public:
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -233,6 +257,65 @@ public:
       tVpiDirection dir) = 0;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+ElbPrimHead::ElbPrimHead()
+{
+}
+
+// @brief デストラクタ
+inline
+ElbPrimHead::~ElbPrimHead()
+{
+}
+
+// @brief コンストラクタ
+inline
+ElbPrimArray::ElbPrimArray() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbPrimArray::~ElbPrimArray()
+{
+}
+
+// @brief 次の要素を得る．
+inline
+const ElbPrimArray*
+ElbPrimArray::next() const
+{
+  return mNext;
+}
+
+// @brief コンストラクタ
+inline
+ElbPrimitive::ElbPrimitive() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbPrimitive::~ElbPrimitive()
+{
+}
+
+// @brief 次の要素を得る．
+inline
+const ElbPrimitive*
+ElbPrimitive::next() const
+{
+  return mNext;
+}
 
 
 END_NAMESPACE_YM_VERILOG

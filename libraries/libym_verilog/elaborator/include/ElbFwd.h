@@ -61,6 +61,9 @@ class ElbPrimTerm;
 // in ElbProcess.h
 class ElbProcess;
 
+// in ElbScope.h
+class ElbScope;
+
 // in ElbStmt.h
 class ElbStmt;
 class ElbCaseItem;
@@ -85,7 +88,7 @@ class ElbTableEntry;
 // in ElbUserSystf.h
 class ElbUserSystf;
 
-// in ElbGenBlock.h
+// in ElbGfRoot.h
 class ElbGfRoot;
 
 // in ElbGenvar.h

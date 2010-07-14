@@ -16,7 +16,6 @@
 #include "VlDumperImpl.h"
 
 #include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlScope.h>
 #include <ym_verilog/vl/VlModule.h>
 #include <ym_verilog/vl/VlTaskFunc.h>
 
@@ -79,23 +78,15 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
     put_decl_list("vpiNamedEventArray", mgr, decl_list);
   }
   
-#if 0
-  vector<const VlScope*> scope_list;
-  if ( mgr.find_blockscope_list(scope, scope_list) ) {
+  vector<const VlNamedObj*> scope_list;
+  if ( mgr.find_scope_list(scope, scope_list) ) {
     VlDumpHeader x(this, "vpiInternalScope", "ScopeList");
-    for (vector<const VlScope*>::iterator p = scope_list.begin();
+    for (vector<const VlNamedObj*>::iterator p = scope_list.begin();
 	 p != scope_list.end(); ++ p) {
       put_scope("vpiInternalScope", mgr, *p);
     }
   }
-  if ( mgr.find_genblock_list(scope, scope_list) ) {
-    VlDumpHeader x(this, "vpiInternalScope", "ScopeList");
-    for (vector<const VlScope*>::iterator p = scope_list.begin();
-	 p != scope_list.end(); ++ p) {
-      put_scope("vpiInternalScope", mgr, *p);
-    }
-  }
-#endif
+
   vector<const VlTask*> task_list;
   if ( mgr.find_task_list(scope, task_list) ) {
     for (vector<const VlTask*>::const_iterator p = task_list.begin();

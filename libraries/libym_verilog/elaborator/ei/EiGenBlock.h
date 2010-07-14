@@ -11,9 +11,9 @@
 /// All rights reserved.
 
 
-#include <ym_verilog/vl/VlNamedObj.h>
-#include <ym_verilog/pt/PtP.h>
+#include "ElbScope.h"
 #include "ElbGfRoot.h"
+#include <ym_verilog/pt/PtP.h>
 #include <ym_utils/StrBuff.h>
 
 
@@ -26,7 +26,7 @@ class EiGfBlock;
 /// @brief elaboration 中の generate block を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiGenBlock :
-  public VlNamedObj
+  public ElbScope
 {
   friend class EiFactory;
   

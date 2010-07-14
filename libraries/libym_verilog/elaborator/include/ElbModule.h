@@ -25,14 +25,16 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbModuleArray :
   public VlModuleArray
 {
+  friend class CellModuleArray;
+  
 protected:
   
   /// @brief コンストラクタ
-  ElbModuleArray() : mNext(NULL) { }
+  ElbModuleArray();
   
   /// @brief デストラクタ
   virtual
-  ~ElbModuleArray() { }
+  ~ElbModuleArray();
 
 
 public:
@@ -44,9 +46,19 @@ public:
   virtual
   ElbModule*
   _module(ymuint32 offset) = 0;
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbModuleArray の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を返す．
+  const ElbModuleArray*
+  next() const;
+
+
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -64,14 +76,16 @@ public:
 class ElbModule :
   public VlModule
 {
+  friend class CellModule;
+  
 protected:
   
   /// @brief コンストラクタ
-  ElbModule() : mNext(NULL) { }
+  ElbModule();
   
   /// @brief デストラクタ
   virtual
-  ~ElbModule() { }
+  ~ElbModule();
 
 
 public:
@@ -112,8 +126,19 @@ public:
   set_port_high_conn(ymuint32 index,
 		     ElbExpr* high_conn,
 		     bool conn_by_name) = 0;
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbModule の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を得る．
+  const ElbModule*
+  next() const;
+
+
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -122,6 +147,53 @@ public:
   ElbModule* mNext;
   
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+ElbModuleArray::ElbModuleArray() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbModuleArray::~ElbModuleArray()
+{
+}
+
+// @brief 次の要素を返す．
+inline
+const ElbModuleArray*
+ElbModuleArray::next() const
+{
+  return mNext;
+}
+
+// @brief コンストラクタ
+inline
+ElbModule::ElbModule() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbModule::~ElbModule()
+{
+}
+
+// 次の要素を得る．
+inline
+const ElbModule*
+ElbModule::next() const
+{
+  return mNext;
+}
 
 END_NAMESPACE_YM_VERILOG
 

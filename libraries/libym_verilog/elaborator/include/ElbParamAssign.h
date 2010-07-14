@@ -24,6 +24,8 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbParamAssign :
   public VlParamAssign
 {
+  friend class CellParamAssign;
+  
 protected:
   
   /// @brief コンストラクタ
@@ -32,9 +34,19 @@ protected:
   /// @brief デストラクタ
   virtual
   ~ElbParamAssign();
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbParamAssign の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を得る．
+  const ElbParamAssign*
+  next() const;
+  
+
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -53,6 +65,8 @@ public:
 class ElbDefParam :
   public VlDefParam
 {
+  friend class CellDefParam;
+  
 protected:
   
   /// @brief コンストラクタ
@@ -61,9 +75,19 @@ protected:
   /// @brief デストラクタ
   virtual
   ~ElbDefParam();
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbDefParam の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を得る．
+  const ElbDefParam*
+  next() const;
+  
+  
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -73,6 +97,52 @@ public:
   
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+ElbParamAssign::ElbParamAssign() :
+  mNext(NULL)
+{
+}
+  
+// @brief デストラクタ
+inline
+ElbParamAssign::~ElbParamAssign()
+{
+}
+
+// @brief 次の要素を得る．
+inline
+const ElbParamAssign*
+ElbParamAssign::next() const
+{
+  return mNext;
+}
+  
+// @brief コンストラクタ
+inline
+ElbDefParam::ElbDefParam() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbDefParam::~ElbDefParam()
+{
+}
+
+// @brief 次の要素を得る．
+inline
+const ElbDefParam*
+ElbDefParam::next() const
+{
+  return mNext;
+}
 
 END_NAMESPACE_YM_VERILOG
 

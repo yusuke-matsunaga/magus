@@ -27,12 +27,11 @@ libym_vl_elab_elb_mgr_la_SOURCES = \
 	ElbMgr.cc \
 	ElbParameter.cc \
 	ElbPrimitive.cc \
-	ElbScopeHandle.h \
 	ElbStmt.cc \
 	ElbUserSystf.cc \
 	ModuleHash.cc \
 	ObjDict.cc \
-	TagHash.cc \
+	TagDict.cc \
 	VlNamedObj.cc
 
 

@@ -16,7 +16,6 @@
 #include "ElbPrimitive.h"
 
 #include "ym_verilog/BitVector.h"
-#include "ym_verilog/vl/VlScope.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

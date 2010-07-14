@@ -22,9 +22,6 @@ class VlObj;
 // in VlNamedObj.h
 class VlNamedObj;
 
-// in VlScope.h
-class VlScope;
-
 // in VlDecl.h
 class VlDecl;
 

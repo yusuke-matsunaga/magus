@@ -1,17 +1,17 @@
 
-/// @file libym_verilog/elb/TagHash.cc
-/// @brief TagHash の実装ファイル
+/// @file libym_verilog/elb/TagDict.cc
+/// @brief TagDict の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TagHash.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: TagDict.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "TagHash.h"
+#include "TagDict.h"
 #include "ym_verilog/vl/VlObj.h"
-#include "ElbScopeHandle.h"
+#include "ElbScope.h"
 #include "ElbModule.h"
 #include "ElbParamAssign.h"
 #include "ElbDecl.h"
@@ -25,12 +25,12 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-// クラス TagHash
+// クラス TagDict
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] alloc メモリ確保用のオブジェクト
-TagHash::TagHash(AllocBase& alloc) :
+TagDict::TagDict(AllocBase& alloc) :
   mAlloc(alloc),
   mNum(0)
 {
@@ -38,14 +38,14 @@ TagHash::TagHash(AllocBase& alloc) :
 }
 
 // @brief デストラクタ
-TagHash::~TagHash()
+TagDict::~TagDict()
 {
   delete [] mTable;
 }
   
 // @brief 内容を空にする
 void
-TagHash::clear()
+TagDict::clear()
 {
   for (ymuint32 i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
@@ -58,18 +58,18 @@ TagHash::clear()
 // @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
 // @param[in] cell 対象の Cell
 void
-TagHash::put_cell(const VlNamedObj* parent,
+TagDict::put_cell(const VlNamedObj* parent,
 		  int tag,
-		  TagHashCell* cell)
+		  TagDictCell* cell)
 {
   if ( mNum >= mLimit ) {
     // テーブルを拡張する．
     ymuint32 old_size = mSize;
-    TagHashCell** old_table = mTable;
+    TagDictCell** old_table = mTable;
     alloc_table(old_size << 1);
     for (ymuint32 i = 0; i < old_size; ++ i) {
-      for (TagHashCell* cell = old_table[i]; cell; ) {
-	TagHashCell* next = cell->mLink;
+      for (TagDictCell* cell = old_table[i]; cell; ) {
+	TagDictCell* next = cell->mLink;
 	ymuint32 pos = hash_func(cell->mParent, cell->mTag);
 	cell->mLink = mTable[pos];
 	mTable[pos] = cell;
@@ -89,12 +89,12 @@ TagHash::put_cell(const VlNamedObj* parent,
 // @brief タグから該当する Cell を探す．
 // @param[in] parent 親のスコープ
 // @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
-TagHashCell*
-TagHash::find_cell(const VlNamedObj* parent,
+TagDictCell*
+TagDict::find_cell(const VlNamedObj* parent,
 		   int tag) const
 {
   ymuint32 pos = hash_func(parent, tag);
-  for (TagHashCell* cell = mTable[pos]; cell; cell = cell->mLink) {
+  for (TagDictCell* cell = mTable[pos]; cell; cell = cell->mLink) {
     if ( cell->mParent == parent && cell->mTag == tag ) {
       return cell;
     }
@@ -104,18 +104,18 @@ TagHash::find_cell(const VlNamedObj* parent,
 
 // @brief このオブジェクトが使用しているメモリ量を返す．
 size_t
-TagHash::allocated_size() const
+TagDict::allocated_size() const
 {
-  return sizeof(TagHashCell*) * mSize;
+  return sizeof(TagDictCell*) * mSize;
 }
 
 // @brief テーブルの領域を確保する．
 void
-TagHash::alloc_table(ymuint32 size)
+TagDict::alloc_table(ymuint32 size)
 {
   mSize = size;
   mLimit = static_cast<ymuint32>(mSize * 1.8);
-  mTable = new TagHashCell*[mSize];
+  mTable = new TagDictCell*[mSize];
   for (ymuint32 i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
@@ -123,7 +123,7 @@ TagHash::alloc_table(ymuint32 size)
 
 // @brief ハッシュ値を計算する．
 ymuint32
-TagHash::hash_func(const VlNamedObj* parent,
+TagDict::hash_func(const VlNamedObj* parent,
 		   int tag) const
 {
   return ((reinterpret_cast<ympuint>(parent) * tag) >> 8) % mSize;
@@ -131,41 +131,34 @@ TagHash::hash_func(const VlNamedObj* parent,
 
 
 //////////////////////////////////////////////////////////////////////
-// TagHashCell
+// TagDictCell
 //////////////////////////////////////////////////////////////////////
 
-// internal scope を追加する．
+// scope を追加する．
 void
-TagHashCell::add_internalscope(ElbScopeHandle* obj)
+TagDictCell::add_scope(ElbScope* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // internal scope の先頭を得る．
-ElbScopeHandle*
-TagHashCell::internalscope()
+const ElbScope*
+TagDictCell::scope()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-    
-// module array を追加する．
-void
-TagHashCell::add_modulearray(ElbModuleArray* obj)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
 
 // 宣言要素を追加する．
 void
-TagHashCell::add_decl(ElbDeclBase* obj)
+TagDictCell::add_decl(ElbDeclBase* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // 宣言要素の先頭を得る．
-ElbDeclBase*
-TagHashCell::decl()
+const ElbDeclBase*
+TagDictCell::decl()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -173,14 +166,14 @@ TagHashCell::decl()
 
 // parameter 宣言を追加する．
 void
-TagHashCell::add_parameter(ElbParameter* obj)
+TagDictCell::add_parameter(ElbParameter* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // parameter 宣言の先頭を得る．
-ElbParameter*
-TagHashCell::parameter()
+const ElbParameter*
+TagDictCell::parameter()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -188,14 +181,14 @@ TagHashCell::parameter()
     
 // defparam を追加する．
 void
-TagHashCell::add_defparam(ElbDefParam* obj)
+TagDictCell::add_defparam(ElbDefParam* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // defparam の先頭を得る．
-ElbDefParam*
-TagHashCell::defparam()
+const ElbDefParam*
+TagDictCell::defparam()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -203,22 +196,29 @@ TagHashCell::defparam()
 
 // param assign を追加する．
 void
-TagHashCell::add_paramassign(ElbParamAssign* obj)
+TagDictCell::add_paramassign(ElbParamAssign* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
       
 // param assign の先頭を得る．
-ElbParamAssign*
-TagHashCell::paramassign()
+const ElbParamAssign*
+TagDictCell::paramassign()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
+// module array を追加する．
+void
+TagDictCell::add_modulearray(ElbModuleArray* obj)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
 // module array の先頭を得る．
-ElbModuleArray*
-TagHashCell::modulearray()
+const ElbModuleArray*
+TagDictCell::modulearray()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -226,14 +226,14 @@ TagHashCell::modulearray()
     
 // module を追加する．
 void
-TagHashCell::add_module(ElbModule* obj)
+TagDictCell::add_module(ElbModule* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // module の先頭を得る．
-ElbModule*
-TagHashCell::module()
+const ElbModule*
+TagDictCell::module()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -241,14 +241,14 @@ TagHashCell::module()
     
 // primitive array を追加する．
 void
-TagHashCell::add_primarray(ElbPrimArray* obj)
+TagDictCell::add_primarray(ElbPrimArray* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // primitive array の先頭を得る．
-ElbPrimArray*
-TagHashCell::primarray()
+const ElbPrimArray*
+TagDictCell::primarray()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -256,14 +256,14 @@ TagHashCell::primarray()
     
 // primitive を追加する．
 void
-TagHashCell::add_primitive(ElbPrimitive* obj)
+TagDictCell::add_primitive(ElbPrimitive* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // primitive の先頭を得る．
-ElbPrimitive*
-TagHashCell::primitive()
+const ElbPrimitive*
+TagDictCell::primitive()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -271,14 +271,14 @@ TagHashCell::primitive()
   
 // @brief タスクを追加する．
 void
-TagHashCell::add_task(ElbTask* obj)
+TagDictCell::add_task(ElbTask* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief タスクの先頭を得る．
-ElbTask*
-TagHashCell::task()
+const ElbTask*
+TagDictCell::task()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -286,14 +286,14 @@ TagHashCell::task()
 
 // @brief 関数を追加する．
 void
-TagHashCell::add_function(ElbFunction* obj)
+TagDictCell::add_function(ElbFunction* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief 関数の先頭を得る．
-ElbFunction*
-TagHashCell::function()
+const ElbFunction*
+TagDictCell::function()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -301,14 +301,14 @@ TagHashCell::function()
 
 // continuous assignment を追加する．
 void
-TagHashCell::add_contassign(ElbContAssign* obj)
+TagDictCell::add_contassign(ElbContAssign* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // continuous assignment の先頭を得る．
-ElbContAssign*
-TagHashCell::contassign()
+const ElbContAssign*
+TagDictCell::contassign()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -316,14 +316,14 @@ TagHashCell::contassign()
 
 // process を追加する．
 void
-TagHashCell::add_process(ElbProcess* process)
+TagDictCell::add_process(ElbProcess* process)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // process の先頭を得る．
-ElbProcess*
-TagHashCell::process()
+const ElbProcess*
+TagDictCell::process()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -331,25 +331,25 @@ TagHashCell::process()
 
 
 //////////////////////////////////////////////////////////////////////
-// internal scope 用のセル
+// scope 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellScope :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
   /// @brief コンストラクタ
-  CellScope(ElbScopeHandle* obj);
+  CellScope(ElbScope* obj);
   
   /// @brief 要素の追加
   virtual
   void
-  add_internalscope(ElbScopeHandle* obj);
+  add_scope(ElbScope* obj);
 
   /// @brief block scope の先頭を得る．
   virtual
-  ElbScopeHandle*
-  internalscope();
+  const ElbScope*
+  scope();
   
   /// @brief 要素数の取得
   virtual
@@ -363,10 +363,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 先頭の要素
-  ElbScopeHandle* mTop;
+  ElbScope* mTop;
 
   // 末尾の要素
-  ElbScopeHandle* mTail;
+  ElbScope* mTail;
 
   // 要素数
   ymuint32 mNum;
@@ -374,7 +374,7 @@ private:
 };
 
 // @brief コンストラクタ
-CellScope::CellScope(ElbScopeHandle* obj) :
+CellScope::CellScope(ElbScope* obj) :
   mTop(obj),
   mTail(obj),
   mNum(1)
@@ -383,7 +383,7 @@ CellScope::CellScope(ElbScopeHandle* obj) :
   
 // @brief 要素の追加
 void
-CellScope::add_internalscope(ElbScopeHandle* obj)
+CellScope::add_scope(ElbScope* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
@@ -391,8 +391,8 @@ CellScope::add_internalscope(ElbScopeHandle* obj)
 }
 
 // @brief internal scope の先頭を得る．
-ElbScopeHandle*
-CellScope::internalscope()
+const ElbScope*
+CellScope::scope()
 {
   return mTop;
 }
@@ -407,37 +407,38 @@ CellScope::num()
 // @brief internal scope を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_internalscope(ElbScopeHandle* obj)
+TagDict::add_scope(ElbScope* obj)
 {
-  const VlNamedObj* parent = obj->obj()->parent();
+  const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiInternalScope);
+  TagDictCell* cell = find_cell(parent, vpiInternalScope);
   if ( cell ) {
-    cell->add_internalscope(obj);
+    cell->add_scope(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellScope));
-    TagHashCell* cell = new (p) CellScope(obj);
+    TagDictCell* cell = new (p) CellScope(obj);
     put_cell(parent, vpiInternalScope, cell);
   }
 }
 
-// @brief internal scope のリストを取り出す．
+// @brief scope のリストを取り出す．
 // @param[in] parent 親のスコープ
 // @param[out] obj_list 結果を格納するリスト
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_internalscope_list(const VlNamedObj* parent,
-				 vector<const VlScope*>& obj_list) const
+TagDict::find_scope_list(const VlNamedObj* parent,
+			 vector<const VlNamedObj*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiInternalScope);
+  TagDictCell* cell = find_cell(parent, vpiInternalScope);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbScopeHandle* obj = cell->internalscope(); obj; obj = obj->mNext) {
+    for (const ElbScope* obj = cell->scope();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -450,7 +451,7 @@ TagHash::find_internalscope_list(const VlNamedObj* parent,
 // 宣言要素用のセル
 //////////////////////////////////////////////////////////////////////
 class CellDecl :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -524,19 +525,19 @@ CellDecl::num()
 // @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
 // @param[in] obj 登録する要素
 void
-TagHash::add_decl(int tag,
+TagDict::add_decl(int tag,
 		  ElbDeclBase* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, tag);
+  TagDictCell* cell = find_cell(parent, tag);
   if ( cell ) {
     cell->add_decl(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellDecl));
-    TagHashCell* cell = new (p) CellDecl(obj);
+    TagDictCell* cell = new (p) CellDecl(obj);
     put_cell(parent, tag, cell);
   }
 }
@@ -550,16 +551,17 @@ TagHash::add_decl(int tag,
 // @note scope というスコープ内の tag というタグを持つ要素を
 // decl_list に入れる．
 bool
-TagHash::find_decl_list(const VlNamedObj* parent,
+TagDict::find_decl_list(const VlNamedObj* parent,
 			int tag,
 			vector<const VlDecl*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, tag);
+  TagDictCell* cell = find_cell(parent, tag);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbDeclBase* obj = cell->decl(); obj; obj = obj->mNext) {
+    for (const ElbDeclBase* obj = cell->decl();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -572,7 +574,7 @@ TagHash::find_decl_list(const VlNamedObj* parent,
 // parameter 宣言用のセル
 //////////////////////////////////////////////////////////////////////
 class CellParam :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -645,18 +647,18 @@ CellParam::num()
 // @brief parameter 宣言を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_parameter(ElbParameter* obj)
+TagDict::add_parameter(ElbParameter* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiParameter);
+  TagDictCell* cell = find_cell(parent, vpiParameter);
   if ( cell ) {
     cell->add_parameter(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellParam));
-    TagHashCell* cell = new (p) CellParam(obj);
+    TagDictCell* cell = new (p) CellParam(obj);
     put_cell(parent, vpiParameter, cell);
   }
 }
@@ -670,15 +672,16 @@ TagHash::add_parameter(ElbParameter* obj)
 // @note scope というスコープ内の tag というタグを持つ要素を
 // decl_list に入れる．
 bool
-TagHash::find_param_list(const VlNamedObj* parent,
+TagDict::find_param_list(const VlNamedObj* parent,
 			 vector<const VlDecl*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiParameter);
+  TagDictCell* cell = find_cell(parent, vpiParameter);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbParameter* obj = cell->parameter(); obj; obj = obj->mNext) {
+    for (const ElbParameter* obj = cell->parameter();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -691,7 +694,7 @@ TagHash::find_param_list(const VlNamedObj* parent,
 // defparam 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellDefParam :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -764,18 +767,18 @@ CellDefParam::num()
 // @brief defparam を追加する．
 // @param[in] dobj 登録する要素
 void
-TagHash::add_defparam(ElbDefParam* obj)
+TagDict::add_defparam(ElbDefParam* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiDefParam);
+  TagDictCell* cell = find_cell(parent, vpiDefParam);
   if ( cell ) {
     cell->add_defparam(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellDefParam));
-    TagHashCell* cell = new (p) CellDefParam(obj);
+    TagDictCell* cell = new (p) CellDefParam(obj);
     put_cell(parent, vpiDefParam, cell);
   }
 }
@@ -786,15 +789,16 @@ TagHash::add_defparam(ElbDefParam* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_defparam_list(const VlNamedObj* parent,
+TagDict::find_defparam_list(const VlNamedObj* parent,
 			    vector<const VlDefParam*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiDefParam);
+  TagDictCell* cell = find_cell(parent, vpiDefParam);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbDefParam* obj = cell->defparam(); obj; obj = obj->mNext) {
+    for (const ElbDefParam* obj = cell->defparam();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -807,7 +811,7 @@ TagHash::find_defparam_list(const VlNamedObj* parent,
 // param assign 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellParamAssign :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -880,18 +884,18 @@ CellParamAssign::num()
 // @brief param assign を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_paramassign(ElbParamAssign* obj)
+TagDict::add_paramassign(ElbParamAssign* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiParamAssign);
+  TagDictCell* cell = find_cell(parent, vpiParamAssign);
   if ( cell ) {
     cell->add_paramassign(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellParamAssign));
-    TagHashCell* cell = new (p) CellParamAssign(obj);
+    TagDictCell* cell = new (p) CellParamAssign(obj);
     put_cell(parent, vpiParamAssign, cell);
   }
 }
@@ -902,15 +906,16 @@ TagHash::add_paramassign(ElbParamAssign* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_paramassign_list(const VlNamedObj* parent,
+TagDict::find_paramassign_list(const VlNamedObj* parent,
 			       vector<const VlParamAssign*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiParamAssign);
+  TagDictCell* cell = find_cell(parent, vpiParamAssign);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbParamAssign* obj = cell->paramassign(); obj; obj = obj->mNext) {
+    for (const ElbParamAssign* obj = cell->paramassign();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -923,7 +928,7 @@ TagHash::find_paramassign_list(const VlNamedObj* parent,
 // module array 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellModuleArray :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -996,18 +1001,18 @@ CellModuleArray::num()
 // @brief module array を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_modulearray(ElbModuleArray* obj)
+TagDict::add_modulearray(ElbModuleArray* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiModuleArray);
+  TagDictCell* cell = find_cell(parent, vpiModuleArray);
   if ( cell ) {
     cell->add_modulearray(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellModuleArray));
-    TagHashCell* cell = new (p) CellModuleArray(obj);
+    TagDictCell* cell = new (p) CellModuleArray(obj);
     put_cell(parent, vpiModuleArray, cell);
   }
 }
@@ -1018,15 +1023,16 @@ TagHash::add_modulearray(ElbModuleArray* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_modulearray_list(const VlNamedObj* parent,
+TagDict::find_modulearray_list(const VlNamedObj* parent,
 			       vector<const VlModuleArray*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiModuleArray);
+  TagDictCell* cell = find_cell(parent, vpiModuleArray);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbModuleArray* obj = cell->modulearray(); obj; obj = obj->mNext) {
+    for (const ElbModuleArray* obj = cell->modulearray();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -1039,7 +1045,7 @@ TagHash::find_modulearray_list(const VlNamedObj* parent,
 // module 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellModule :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -1112,18 +1118,18 @@ CellModule::num()
 // @brief module を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_module(ElbModule* obj)
+TagDict::add_module(ElbModule* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiModule);
+  TagDictCell* cell = find_cell(parent, vpiModule);
   if ( cell ) {
     cell->add_module(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellModule));
-    TagHashCell* cell = new (p) CellModule(obj);
+    TagDictCell* cell = new (p) CellModule(obj);
     put_cell(parent, vpiModule, cell);
   }
 }
@@ -1134,15 +1140,16 @@ TagHash::add_module(ElbModule* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_module_list(const VlNamedObj* parent,
+TagDict::find_module_list(const VlNamedObj* parent,
 			  vector<const VlModule*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiModule);
+  TagDictCell* cell = find_cell(parent, vpiModule);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbModule* obj = cell->module(); obj; obj = obj->mNext) {
+    for (const ElbModule* obj = cell->module();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -1155,7 +1162,7 @@ TagHash::find_module_list(const VlNamedObj* parent,
 // primitive array 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellPrimArray :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -1229,18 +1236,18 @@ CellPrimArray::num()
 // @param[in] parent 親のスコープ
 // @param[in] obj 登録する要素
 void
-TagHash::add_primarray(ElbPrimArray* obj)
+TagDict::add_primarray(ElbPrimArray* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiPrimitiveArray);
+  TagDictCell* cell = find_cell(parent, vpiPrimitiveArray);
   if ( cell ) {
     cell->add_primarray(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellPrimArray));
-    TagHashCell* cell = new (p) CellPrimArray(obj);
+    TagDictCell* cell = new (p) CellPrimArray(obj);
     put_cell(parent, vpiPrimitiveArray, cell);
   }
 }
@@ -1251,15 +1258,16 @@ TagHash::add_primarray(ElbPrimArray* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_primarray_list(const VlNamedObj* parent,
+TagDict::find_primarray_list(const VlNamedObj* parent,
 			     vector<const VlPrimArray*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiPrimitiveArray);
+  TagDictCell* cell = find_cell(parent, vpiPrimitiveArray);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbPrimArray* obj = cell->primarray(); obj; obj = obj->mNext) {
+    for (const ElbPrimArray* obj = cell->primarray();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -1272,7 +1280,7 @@ TagHash::find_primarray_list(const VlNamedObj* parent,
 // primitive 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellPrimitive :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -1345,18 +1353,18 @@ CellPrimitive::num()
 // @brief primitive を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_primitive(ElbPrimitive* obj)
+TagDict::add_primitive(ElbPrimitive* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiPrimitive);
+  TagDictCell* cell = find_cell(parent, vpiPrimitive);
   if ( cell ) {
     cell->add_primitive(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellPrimitive));
-    TagHashCell* cell = new (p) CellPrimitive(obj);
+    TagDictCell* cell = new (p) CellPrimitive(obj);
     put_cell(parent, vpiPrimitive, cell);
   }
 }
@@ -1367,15 +1375,16 @@ TagHash::add_primitive(ElbPrimitive* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_primitive_list(const VlNamedObj* parent,
+TagDict::find_primitive_list(const VlNamedObj* parent,
 			     vector<const VlPrimitive*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiPrimitive);
+  TagDictCell* cell = find_cell(parent, vpiPrimitive);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbPrimitive* obj = cell->primitive(); obj; obj = obj->mNext) {
+    for (const ElbPrimitive* obj = cell->primitive();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -1388,7 +1397,7 @@ TagHash::find_primitive_list(const VlNamedObj* parent,
 // タスク用のセル
 //////////////////////////////////////////////////////////////////////
 class CellTask :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -1461,18 +1470,18 @@ CellTask::num()
 // @brief タスクを追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_task(ElbTask* obj)
+TagDict::add_task(ElbTask* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiTask);
+  TagDictCell* cell = find_cell(parent, vpiTask);
   if ( cell ) {
     cell->add_task(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellTask));
-    TagHashCell* cell = new (p) CellTask(obj);
+    TagDictCell* cell = new (p) CellTask(obj);
     put_cell(parent, vpiTask, cell);
   }
 }
@@ -1483,15 +1492,16 @@ TagHash::add_task(ElbTask* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_task_list(const VlNamedObj* parent,
+TagDict::find_task_list(const VlNamedObj* parent,
 			vector<const VlTask*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiTask);
+  TagDictCell* cell = find_cell(parent, vpiTask);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbTask* obj = cell->task(); obj; obj = obj->mNext) {
+    for (const ElbTask* obj = cell->task();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -1504,7 +1514,7 @@ TagHash::find_task_list(const VlNamedObj* parent,
 // 関数用のセル
 //////////////////////////////////////////////////////////////////////
 class CellFunction :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -1577,18 +1587,18 @@ CellFunction::num()
 // @brief function を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_function(ElbFunction* obj)
+TagDict::add_function(ElbFunction* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiFunction);
+  TagDictCell* cell = find_cell(parent, vpiFunction);
   if ( cell ) {
     cell->add_function(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellFunction));
-    TagHashCell* cell = new (p) CellFunction(obj);
+    TagDictCell* cell = new (p) CellFunction(obj);
     put_cell(parent, vpiFunction, cell);
   }
 }
@@ -1599,15 +1609,16 @@ TagHash::add_function(ElbFunction* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_function_list(const VlNamedObj* parent,
+TagDict::find_function_list(const VlNamedObj* parent,
 			    vector<const VlFunction*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiFunction);
+  TagDictCell* cell = find_cell(parent, vpiFunction);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbFunction* obj = cell->function(); obj; obj = obj->mNext) {
+    for (const ElbFunction* obj = cell->function();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -1620,7 +1631,7 @@ TagHash::find_function_list(const VlNamedObj* parent,
 // continuous assignment 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellContAssign :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -1693,18 +1704,18 @@ CellContAssign::num()
 // @brief continuous assignment を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_contassign(ElbContAssign* obj)
+TagDict::add_contassign(ElbContAssign* obj)
 {
   const VlNamedObj* parent = obj->module();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiContAssign);
+  TagDictCell* cell = find_cell(parent, vpiContAssign);
   if ( cell ) {
     cell->add_contassign(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellContAssign));
-    TagHashCell* cell = new (p) CellContAssign(obj);
+    TagDictCell* cell = new (p) CellContAssign(obj);
     put_cell(parent, vpiContAssign, cell);
   }
 }
@@ -1715,15 +1726,16 @@ TagHash::add_contassign(ElbContAssign* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_contassign_list(const VlNamedObj* parent,
+TagDict::find_contassign_list(const VlNamedObj* parent,
 			      vector<const VlContAssign*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiContAssign);
+  TagDictCell* cell = find_cell(parent, vpiContAssign);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbContAssign* obj = cell->contassign(); obj; obj = obj->mNext) {
+    for (const ElbContAssign* obj = cell->contassign();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;
@@ -1736,7 +1748,7 @@ TagHash::find_contassign_list(const VlNamedObj* parent,
 // process 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellProcess :
-  public TagHashCell
+  public TagDictCell
 {
 public:
 
@@ -1809,18 +1821,18 @@ CellProcess::num()
 // @brief process を追加する．
 // @param[in] obj 登録する要素
 void
-TagHash::add_process(ElbProcess* obj)
+TagDict::add_process(ElbProcess* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiProcess);
+  TagDictCell* cell = find_cell(parent, vpiProcess);
   if ( cell ) {
     cell->add_process(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellProcess));
-    TagHashCell* cell = new (p) CellProcess(obj);
+    TagDictCell* cell = new (p) CellProcess(obj);
     put_cell(parent, vpiProcess, cell);
   }
 }
@@ -1831,15 +1843,16 @@ TagHash::add_process(ElbProcess* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagHash::find_process_list(const VlNamedObj* parent,
+TagDict::find_process_list(const VlNamedObj* parent,
 			   vector<const VlProcess*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagHashCell* cell = find_cell(parent, vpiProcess);
+  TagDictCell* cell = find_cell(parent, vpiProcess);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (ElbProcess* obj = cell->process(); obj; obj = obj->mNext) {
+    for (const ElbProcess* obj = cell->process();
+	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
     return true;

@@ -28,7 +28,6 @@ noinst_HEADERS = \
 	VlPrimitive.h \
 	VlProcess.h \
 	VlRange.h \
-	VlScope.h \
 	VlStmt.h \
 	VlTaskFunc.h \
 	VlUdp.h \

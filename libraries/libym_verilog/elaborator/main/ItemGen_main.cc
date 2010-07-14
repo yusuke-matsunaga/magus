@@ -26,6 +26,7 @@
 #include "ElbParamAssign.h"
 #include "ElbContAssign.h"
 #include "ElbProcess.h"
+#include "ElbScope.h"
 #include "ElbGfRoot.h"
 #include "ElbGenvar.h"
 #include "ElbExpr.h"
@@ -296,7 +297,7 @@ ItemGen::phase1_genblock(const VlNamedObj* parent,
 {
   const char* name = pt_genblock->name();
   if ( name != NULL ) {
-    const VlNamedObj* genblock = factory().new_GenBlock(parent, pt_genblock);
+    ElbScope* genblock = factory().new_GenBlock(parent, pt_genblock);
     reg_scope(genblock);
     
     parent = genblock;
@@ -453,12 +454,12 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
     // スコープ名生成のために genvar の値を取得
     {
       int gvi = genvar->value();
-      const VlNamedObj* genblock = factory().new_GfBlock(parent, pt_genfor, gvi);
+      ElbScope* genblock = factory().new_GfBlock(parent, pt_genfor, gvi);
       gfroot->add(gvi, genblock);
       reg_scope(genblock);
       
-      ElbGenvar* genvar1 = factory().new_Genvar(genblock, genvar->pt_item(),
-						gvi);
+      ElbGenvar* genvar1
+	= factory().new_Genvar(genblock, genvar->pt_item(), gvi);
       reg_genvar(genvar1);
       
       phase1_generate(genblock, pt_genfor);

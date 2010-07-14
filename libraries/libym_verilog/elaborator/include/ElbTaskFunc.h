@@ -24,14 +24,16 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbFunction :
   public VlFunction
 {
+  friend class CellFunction;
+  
 protected:
   
   /// @brief コンストラクタ
-  ElbFunction() { }
+  ElbFunction();
   
   /// @brief デストラクタ
   virtual
-  ~ElbFunction() { }
+  ~ElbFunction();
   
 
 public:
@@ -108,9 +110,19 @@ public:
   virtual
   ElbStmt*
   _stmt() const = 0;
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbFunction の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を返す．
+  const ElbFunction*
+  next() const;
+
+  
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -129,14 +141,16 @@ public:
 class ElbTask :
   public VlTask
 {
+  friend class CellTask;
+  
 protected:
   
   /// @brief コンストラクタ
-  ElbTask() { }
+  ElbTask();
   
   /// @brief デストラクタ
   virtual
-  ~ElbTask() { }
+  ~ElbTask();
   
 
 public:
@@ -172,9 +186,19 @@ public:
   virtual
   ElbStmt*
   _stmt() const = 0;
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbTask の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を返す．
+  const ElbTask*
+  next() const;
+
+  
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -183,6 +207,53 @@ public:
   ElbTask* mNext;
   
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+  
+// @brief コンストラクタ
+inline
+ElbFunction::ElbFunction() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbFunction::~ElbFunction()
+{
+}
+
+// @brief 次の要素を返す．
+inline
+const ElbFunction*
+ElbFunction::next() const
+{
+  return mNext;
+}
+
+// @brief コンストラクタ
+inline
+ElbTask::ElbTask() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+ElbTask::~ElbTask()
+{
+}
+
+// @brief 次の要素を返す．
+inline
+const ElbTask*
+ElbTask::next() const
+{
+  return mNext;
+}
 
 END_NAMESPACE_YM_VERILOG
 

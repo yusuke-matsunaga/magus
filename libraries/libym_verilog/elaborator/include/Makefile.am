@@ -41,4 +41,4 @@ noinst_HEADERS = \
 	ElbUserSystf.h \
 	ModuleHash.h \
 	ObjDict.h \
-	TagHash.h
+	TagDict.h

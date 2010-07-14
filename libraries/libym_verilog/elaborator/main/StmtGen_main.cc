@@ -18,6 +18,7 @@
 
 #include "ElbStmt.h"
 #include "ElbTaskFunc.h"
+#include "ElbScope.h"
 
 #include "ElbStub.h"
 
@@ -111,7 +112,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
   case kPtNamedParBlockStmt:
   case kPtNamedSeqBlockStmt:
     {
-      const VlNamedObj* block_scope = factory().new_StmtScope(parent, pt_stmt);
+      ElbScope* block_scope = factory().new_StmtScope(parent, pt_stmt);
       reg_scope(block_scope);
       
       for (ymuint32 i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
@@ -123,7 +124,8 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
       }
       else {
 	add_phase2stub(make_stub(this, &StmtGen::phase2_namedblock,
-				 block_scope, pt_stmt->declhead_array()));
+				 static_cast<const VlNamedObj*>(block_scope),
+				 pt_stmt->declhead_array()));
       }
     }
     break;

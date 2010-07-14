@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_verilog/vl/VlScope.h"
+#include "ym_verilog/vl/VlNamedObj.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

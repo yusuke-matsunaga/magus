@@ -17,6 +17,7 @@
 #include "ElbUdp.h"
 #include "ElbModule.h"
 #include "ElbTaskFunc.h"
+#include "ElbScope.h"
 #include "ElbGfRoot.h"
 #include "ElbDecl.h"
 #include "ElbParameter.h"
@@ -144,10 +145,10 @@ ElbMgr::reg_user_systf(const ElbUserSystf* systf)
   mSystfHash.insert(make_pair(systf->_name(), systf));
 }
 
-// @brief スコープを登録する．
+// @brief scope を登録する．
 // @param[in] obj 登録するオブジェクト
 void
-ElbMgr::reg_scope(const VlNamedObj* obj)
+ElbMgr::reg_scope(ElbScope* obj)
 {
   if ( debug & debug_objdict ) {
     dout << "reg_scope( " << obj->name() << " @ "
@@ -158,9 +159,7 @@ ElbMgr::reg_scope(const VlNamedObj* obj)
 	 << endl;
   }
   mObjDict.add(obj);
-#if 0
-  mTagDict.add_internalscope(obj);
-#endif
+  mTagDict.add_scope(obj);
 }
 
 // @brief 宣言要素を登録する．

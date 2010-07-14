@@ -99,6 +99,8 @@ public:
 class ElbParameter :
   public VlDecl
 {
+  friend class CellParam;
+  
 protected:
   
   /// @brief コンストラクタ
@@ -279,9 +281,19 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const = 0;
-  
-  
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbParameter の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を返す．
+  const ElbParameter*
+  next() const;
+  
+
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
@@ -290,6 +302,44 @@ public:
   ElbParameter* mNext;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+  
+// @brief コンストラクタ
+inline
+ElbParamHead::ElbParamHead()
+{
+}
+
+// @brief デストラクタ
+inline
+ElbParamHead::~ElbParamHead()
+{
+}
+  
+// @brief コンストラクタ
+inline
+ElbParameter::ElbParameter() :
+  mNext(NULL)
+{
+}
+  
+// @brief デストラクタ
+inline
+ElbParameter::~ElbParameter()
+{
+}
+
+// @brief 次の要素を返す．
+inline
+const ElbParameter*
+ElbParameter::next() const
+{
+  return mNext;
+}
 
 END_NAMESPACE_YM_VERILOG
 
