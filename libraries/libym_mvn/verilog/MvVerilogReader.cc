@@ -134,97 +134,150 @@ MvVerilogReader::gen_module(MvMgr& mgr,
   
   MvModule* module = mgr.new_module(vl_module->name(), np, ibw_array, obw_array);
 
+  // モジュールの要素を生成する．
+  bool stat = gen_scopeitem(mgr, module, vl_module);
+  if ( !stat ) {
+    return NULL;
+  }
+
+  return module;
+}
+
+// @brief scope item を生成する．
+// @param[in] mgr MvMgr
+// @param[in] module モジュール
+// @param[in] vl_scope 対象のスコープ
+// @retval true 成功した．
+// @retval false エラーが起こった．
+bool
+MvVerilogReader::gen_scopeitem(MvMgr& mgr,
+			       MvModule* module,
+			       const nsVerilog::VlNamedObj* vl_scope)
+{
+  using namespace nsVerilog;
+
   // モジュールインスタンスの生成
-  vector<const VlModule*> module_list;
-  if ( mVlMgr.find_module_list(vl_module, module_list) ) {
-    for (vector<const VlModule*>::iterator p = module_list.begin();
-	 p != module_list.end(); ++ p) {
-      const VlModule* vl_module1 = *p;
-      MvModule* module1 = gen_module(mgr, vl_module1);
-      if ( module1 == NULL ) {
-	return NULL;
+  {
+    vector<const VlModule*> module_list;
+    if ( mVlMgr.find_module_list(vl_scope, module_list) ) {
+      for (vector<const VlModule*>::iterator p = module_list.begin();
+	   p != module_list.end(); ++ p) {
+	const VlModule* vl_scope1 = *p;
+	MvModule* module1 = gen_module(mgr, vl_scope1);
+	if ( module1 == NULL ) {
+	  return false;
+	}
+	MvNode* node = mgr.new_inst(module, module1);
       }
-      MvNode* node = mgr.new_inst(module, module1);
     }
   }
 
   // モジュール配列インスタンスの生成
-  vector<const VlModuleArray*> modulearray_list;
-  if ( mVlMgr.find_modulearray_list(vl_module, modulearray_list) ) {
-    for (vector<const VlModuleArray*>::iterator p = modulearray_list.begin();
-	 p != modulearray_list.end(); ++ p) {
-      const VlModuleArray* vl_module_array = *p;
-      ymuint n = vl_module_array->elem_num();
-      for (ymuint i = 0; i < n; ++ i) {
-	const VlModule* vl_module1 = vl_module_array->elem_by_offset(i);
-	MvModule* module1 = gen_module(mgr, vl_module1);
-	if ( module1 == NULL ) {
-	  return NULL;
+  {
+    vector<const VlModuleArray*> modulearray_list;
+    if ( mVlMgr.find_modulearray_list(vl_scope, modulearray_list) ) {
+      for (vector<const VlModuleArray*>::iterator p = modulearray_list.begin();
+	   p != modulearray_list.end(); ++ p) {
+	const VlModuleArray* vl_scope_array = *p;
+	ymuint n = vl_scope_array->elem_num();
+	for (ymuint i = 0; i < n; ++ i) {
+	  const VlModule* vl_scope1 = vl_scope_array->elem_by_offset(i);
+	  MvModule* module1 = gen_module(mgr, vl_scope1);
+	  if ( module1 == NULL ) {
+	    return false;;
+	  }
+	  MvNode* node1 = mgr.new_inst(module, module1);
 	}
-	MvNode* node1 = mgr.new_inst(module, module1);
       }
     }
   }
 
   // プリミティブインスタンスの生成
-  vector<const VlPrimitive*> primitive_list;
-  if ( mVlMgr.find_primitive_list(vl_module, primitive_list) ) {
-    for (vector<const VlPrimitive*>::iterator p = primitive_list.begin();
-	 p != primitive_list.end(); ++ p) {
-      const VlPrimitive* vl_prim = *p;
+  {
+    vector<const VlPrimitive*> primitive_list;
+    if ( mVlMgr.find_primitive_list(vl_scope, primitive_list) ) {
+      for (vector<const VlPrimitive*>::iterator p = primitive_list.begin();
+	   p != primitive_list.end(); ++ p) {
+	const VlPrimitive* vl_prim = *p;
+      }
     }
   }
+  
   // プリミティブ配列インスタンスの生成
-  vector<const VlPrimArray*> primarray_list;
-  if ( mVlMgr.find_primarray_list(vl_module, primarray_list) ) {
-    for (vector<const VlPrimArray*>::iterator p = primarray_list.begin();
-	 p != primarray_list.end(); ++ p) {
-      const VlPrimArray* vl_primarray = *p;
-      ymuint n = vl_primarray->elem_num();
-      for (ymuint i = 0; i < n; ++ i) {
-	const VlPrimitive* vl_prim = vl_primarray->elem_by_offset(i);
+  {
+    vector<const VlPrimArray*> primarray_list;
+    if ( mVlMgr.find_primarray_list(vl_scope, primarray_list) ) {
+      for (vector<const VlPrimArray*>::iterator p = primarray_list.begin();
+	   p != primarray_list.end(); ++ p) {
+	const VlPrimArray* vl_primarray = *p;
+	ymuint n = vl_primarray->elem_num();
+	for (ymuint i = 0; i < n; ++ i) {
+	  const VlPrimitive* vl_prim = vl_primarray->elem_by_offset(i);
+	}
       }
     }
   }
 
   // ネットの生成
-  vector<const VlDecl*> net_list;
-  if ( mVlMgr.find_decl_list(vl_module, vpiNet, net_list) ) {
-    for (vector<const VlDecl*>::iterator p = net_list.begin();
-	 p != net_list.end(); ++ p) {
-      const VlDecl* vl_decl = *p;
-      // 仮の through ノードに対応させる．
-      ymuint bw = vl_decl->bit_size();
-      MvNode* node = mgr.new_through(module, bw);
-      
+  {
+    vector<const VlDecl*> net_list;
+    if ( mVlMgr.find_decl_list(vl_scope, vpiNet, net_list) ) {
+      for (vector<const VlDecl*>::iterator p = net_list.begin();
+	   p != net_list.end(); ++ p) {
+	const VlDecl* vl_decl = *p;
+	// 仮の through ノードに対応させる．
+	ymuint bw = vl_decl->bit_size();
+	MvNode* node = mgr.new_through(module, bw);
+	
+      }
     }
   }
 
   // ネット配列の生成
-  vector<const VlDecl*> netarray_list;
-  if ( mVlMgr.find_decl_list(vl_module, vpiNetArray, netarray_list) ) {
-    for (vector<const VlDecl*>::iterator p = netarray_list.begin();
-	 p != netarray_list.end(); ++ p) {
-      const VlDecl* vl_decl = *p;
-      ymuint d = vl_decl->dimension();
+  {
+    vector<const VlDecl*> netarray_list;
+    if ( mVlMgr.find_decl_list(vl_scope, vpiNetArray, netarray_list) ) {
+      for (vector<const VlDecl*>::iterator p = netarray_list.begin();
+	   p != netarray_list.end(); ++ p) {
+	const VlDecl* vl_decl = *p;
+	ymuint d = vl_decl->dimension();
 #if 0
-      // 仮の through ノードに対応させる．
-      ymuint bw = vl_decl->bit_size();
-      MvNode* node = mgr.new_through(bw);
+	// 仮の through ノードに対応させる．
+	ymuint bw = vl_decl->bit_size();
+	MvNode* node = mgr.new_through(bw);
 #endif 
+      }
     }
   }
 
   // 継続的代入文の生成
-  vector<const VlContAssign*> contassign_list;
-  if ( mVlMgr.find_contassign_list(vl_module, contassign_list) ) {
-    for (vector<const VlContAssign*>::iterator p = contassign_list.begin();
-	 p != contassign_list.end(); ++ p) {
-      const VlContAssign* vl_contassign = *p;
-      
+  {
+    vector<const VlContAssign*> contassign_list;
+    if ( mVlMgr.find_contassign_list(vl_scope, contassign_list) ) {
+      for (vector<const VlContAssign*>::iterator p = contassign_list.begin();
+	   p != contassign_list.end(); ++ p) {
+	const VlContAssign* vl_contassign = *p;
+	
+      }
+    }
+  }
+
+  // 下位スコープ要素の生成
+  {
+    vector<const VlScope*> scope_list;
+    if ( mVlMgr.find_internalscope_list(vl_scope, scope_list) ) {
+      for (vector<const VlScope*>::iterator p = scope_list.begin();
+	   p != scope_list.end(); ++ p) {
+	const VlNamedObj* vl_scope1 = *p;
+	bool stat = gen_scopeitem(mgr, module, vl_scope1);
+	if ( !stat ) {
+	  return false;
+	}
+      }
     }
   }
   
+  return true;
 }
 
 END_NAMESPACE_YM_MVN

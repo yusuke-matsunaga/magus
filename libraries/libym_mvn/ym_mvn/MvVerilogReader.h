@@ -75,6 +75,17 @@ private:
   gen_module(MvMgr& mgr,
 	     const nsVerilog::VlModule* vl_module);
 
+  /// @brief scope item を生成する．
+  /// @param[in] mgr MvMgr
+  /// @param[in] module モジュール
+  /// @param[in] vl_scope 対象のスコープ
+  /// @retval true 成功した．
+  /// @retval false エラーが起こった．
+  bool
+  gen_scopeitem(MvMgr& mgr,
+		MvModule* module,
+		const nsVerilog::VlNamedObj* vl_scope);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
