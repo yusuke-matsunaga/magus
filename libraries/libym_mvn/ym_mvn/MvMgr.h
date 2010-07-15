@@ -94,6 +94,56 @@ public:
   void
   delete_module(MvModule* module);
 
+  /// @brief モジュールのポートを初期化する．
+  /// @param[in] module 対象のモジュール
+  /// @param[in] pos ポート番号
+  /// @param[in] name 名前
+  /// @param[in] port_ref_num ポート参照式の数
+  void
+  init_port(MvModule* module,
+	    ymuint pos,
+	    const char* name,
+	    ymuint port_ref_num);
+
+  /// @brief ポート参照式の内容を設定する(単純な形式)．
+  /// @param[in] module 対象のモジュール
+  /// @param[in] pos ポート番号
+  /// @param[in] port_ref_pos ポート参照式の番号
+  /// @param[in] node 対応する入出力ノード
+  void
+  set_port_ref(MvModule* module,
+	       ymuint pos,
+	       ymuint port_ref_pos,
+	       MvNode* node);
+
+  /// @brief ポート参照式の内容を設定する(ビット指定形式)．
+  /// @param[in] module 対象のモジュール
+  /// @param[in] pos ポート番号
+  /// @param[in] port_ref_pos ポート参照式の番号
+  /// @param[in] node 対応する入出力ノード
+  /// @param[in] index ビット指定位置
+  void
+  set_port_ref(MvModule* module,
+	       ymuint pos,
+	       ymuint port_ref_pos,
+	       MvNode* node,
+	       ymuint index);
+
+  /// @brief ポート参照式の内容を設定する(範囲指定形式)．
+  /// @param[in] module 対象のモジュール
+  /// @param[in] pos ポート番号
+  /// @param[in] port_ref_pos ポート参照式の番号
+  /// @param[in] node 対応する入出力ノード
+  /// @param[in] msb 範囲指定の MSB
+  /// @param[in] lsb 範囲指定の LSB
+  void
+  set_port_ref(MvModule* module,
+	       ymuint pos,
+	       ymuint port_ref_pos,
+	       MvNode* node,
+	       ymuint msb,
+	       ymuint lsb);
+  
   /// @brief through ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅

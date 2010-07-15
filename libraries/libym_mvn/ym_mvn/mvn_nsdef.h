@@ -14,14 +14,24 @@
 
 
 /// @brief mvn 用の名前空間の開始
-#define BEGIN_NAMESPACE_YM_MVN \
-BEGIN_NAMESPACE_YM \
-BEGIN_NAMESPACE(nsMvn)
+#define BEGIN_NAMESPACE_YM_MVN			\
+  BEGIN_NAMESPACE_YM				\
+  BEGIN_NAMESPACE(nsMvn)
 
 /// @brief mvn 用の名前空間の終了
-#define END_NAMESPACE_YM_MVN \
-END_NAMESPACE(nsMvn) \
-END_NAMESPACE_YM
+#define END_NAMESPACE_YM_MVN			\
+  END_NAMESPACE(nsMvn)				\
+  END_NAMESPACE_YM
+
+/// @brief verilog reader 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_MVN_VERILOG		\
+  BEGIN_NAMESPACE_YM_MVN			\
+  BEGIN_NAMESPACE(nsVerilog)
+
+/// @brief verilog reader 用の名前空間の終了
+#define END_NAMESPACE_YM_MVN_VERILOG		\
+  END_NAMESPACE(nsVerilog)			\
+  END_NAMESPACE_YM_MVN
 
 
 BEGIN_NAMESPACE_YM_MVN

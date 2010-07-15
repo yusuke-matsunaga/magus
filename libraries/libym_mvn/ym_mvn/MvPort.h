@@ -31,7 +31,8 @@ BEGIN_NAMESPACE_YM_MVN
 class MvPortRef
 {
   friend class MvPort;
-
+  friend class MvMgr;
+  
 public:
 
   /// @brief ノードを返す．
@@ -39,6 +40,10 @@ public:
   MvNode*
   node() const;
 
+  /// @brief 単純な形式の場合 true を返す．
+  bool
+  is_simple() const;
+  
   /// @brief ビット指定ありの場合 true を返す．
   bool
   has_bitselect() const;
@@ -82,7 +87,7 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // MvPort が用いる設定用の関数
+  // MvMgr が用いる設定用の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 通常タイプに設定する．
@@ -203,6 +208,14 @@ MvNode*
 MvPortRef::node() const
 {
   return mNode;
+}
+
+// @brief 単純な形式の場合 true を返す．
+inline
+bool
+MvPortRef::is_simple() const
+{
+  return mMsb == 0U && mLsb == 0U;
 }
 
 // @brief ビット指定ありの場合 true を返す．

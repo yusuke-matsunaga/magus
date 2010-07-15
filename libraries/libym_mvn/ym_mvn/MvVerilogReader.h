@@ -10,9 +10,16 @@
 
 
 #include "ym_mvn/mvn_nsdef.h"
-#include "ym_verilog/VlMgr.h"
-#include "ym_verilog/vl/VlFwd.h"
+#include "ym_verilog/verilog.h"
+#include "ym_utils/File.h"
 #include "ym_utils/MsgHandler.h"
+
+
+BEGIN_NAMESPACE_YM_MVN_VERILOG
+
+class ReaderImpl;
+
+END_NAMESPACE_YM_MVN_VERILOG
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -65,38 +72,11 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief module を生成する．
-  /// @param[in] mgr MvMgr
-  /// @param[in] vl_module 対象のモジュール
-  MvModule*
-  gen_module(MvMgr& mgr,
-	     const nsVerilog::VlModule* vl_module);
-
-  /// @brief scope item を生成する．
-  /// @param[in] mgr MvMgr
-  /// @param[in] module モジュール
-  /// @param[in] vl_scope 対象のスコープ
-  /// @retval true 成功した．
-  /// @retval false エラーが起こった．
-  bool
-  gen_scopeitem(MvMgr& mgr,
-		MvModule* module,
-		const nsVerilog::VlNamedObj* vl_scope);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
-  // メッセージハンドラの管理者
-  MsgMgr mMsgMgr;
 
-  // Verilog を扱うマネージャ
-  VlMgr mVlMgr;
+  // 実際の読み込みを行うオブジェクト
+  nsVerilog::ReaderImpl* mImpl;
   
 };
 

@@ -10,6 +10,7 @@
 #include "ym_mvn/MvMgr.h"
 
 #include "ym_mvn/MvModule.h"
+#include "ym_mvn/MvPort.h"
 
 #include "MvInput.h"
 #include "MvOutput.h"
@@ -255,6 +256,68 @@ MvMgr::delete_module(MvModule* module)
   mItvlMgr.add(module->mId);
   mModuleArray[module->mId] = NULL;
   delete module;
+}
+
+// @brief モジュールのポートを初期化する．
+// @param[in] module 対象のモジュール
+// @param[in] pos ポート番号
+// @param[in] name 名前
+// @param[in] port_ref_num ポート参照式の数
+void
+MvMgr::init_port(MvModule* module,
+		 ymuint pos,
+		 const char* name,
+		 ymuint port_ref_num)
+{
+  module->mPortArray[pos] = new MvPort(name, port_ref_num);
+}
+
+// @brief ポート参照式の内容を設定する(単純な形式)．
+// @param[in] module 対象のモジュール
+// @param[in] pos ポート番号
+// @param[in] port_ref_pos ポート参照式の番号
+// @param[in] node 対応する入出力ノード
+void
+MvMgr::set_port_ref(MvModule* module,
+		    ymuint pos,
+		    ymuint port_ref_pos,
+		    MvNode* node)
+{
+  module->mPortArray[pos]->mPortRefArray[port_ref_pos].set(node);
+}
+
+// @brief ポート参照式の内容を設定する(ビット指定形式)．
+// @param[in] module 対象のモジュール
+// @param[in] pos ポート番号
+// @param[in] port_ref_pos ポート参照式の番号
+// @param[in] node 対応する入出力ノード
+// @param[in] index ビット指定位置
+void
+MvMgr::set_port_ref(MvModule* module,
+		    ymuint pos,
+		    ymuint port_ref_pos,
+		    MvNode* node,
+		    ymuint index)
+{
+  module->mPortArray[pos]->mPortRefArray[port_ref_pos].set(node, index);
+}
+
+// @brief ポート参照式の内容を設定する(範囲指定形式)．
+// @param[in] module 対象のモジュール
+// @param[in] pos ポート番号
+// @param[in] port_ref_pos ポート参照式の番号
+// @param[in] node 対応する入出力ノード
+// @param[in] msb 範囲指定の MSB
+// @param[in] lsb 範囲指定の LSB
+void
+MvMgr::set_port_ref(MvModule* module,
+		    ymuint pos,
+		    ymuint port_ref_pos,
+		    MvNode* node,
+		    ymuint msb,
+		    ymuint lsb)
+{
+  module->mPortArray[pos]->mPortRefArray[port_ref_pos].set(node, msb, lsb);
 }
 
 // @brief through ノードを生成する．
