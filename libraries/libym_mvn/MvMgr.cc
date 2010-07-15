@@ -870,20 +870,26 @@ MvMgr::set_bit_width(MvPin* pin,
 #endif
 
 // @brief ピンとピンを接続する．
-// @param[in] src_pin 入力元のピン
-// @param[in] dst_pin 出力先のピン
+// @param[in] src_node 入力元のノード
+// @param[in] src_pin_pos 入力元のピン番号
+// @param[in] dst_node 出力先のノード
+// @param[in] dst_pin 出力先のピン番号
 // @return 接続を表すネットを返す．
 // @note 接続が失敗したら NULLを返す．
 // @note 接続が失敗するのは，
 //  - ピンが異なるモジュールに属していた．
 //  - ピンのビット幅が異なっていた．
 MvNet*
-MvMgr::connect(MvOutputPin* src_pin,
-	       MvInputPin* dst_pin)
+MvMgr::connect(MvNode* src_node,
+	       ymuint src_pin_pos,
+	       MvNode* dst_node,
+	       ymuint dst_pin_pos)
 {
-  if ( src_pin->node()->parent() != dst_pin->node()->parent() ) {
+  if ( src_node->parent() != dst_node->parent() ) {
     return NULL;
   }
+  MvOutputPin* src_pin = src_node->output(src_pin_pos);
+  MvInputPin* dst_pin = dst_node->input(dst_pin_pos);
   if ( src_pin->bit_width() != dst_pin->bit_width() ) {
     return NULL;
   }

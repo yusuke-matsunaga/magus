@@ -19,91 +19,7 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 using namespace nsYm::nsVerilog;
 
-#if 0
-//////////////////////////////////////////////////////////////////////
-/// @calss TmpPortRef ReaderImpl.h "ReaderImpl.h"
-/// @brief 一時的に port ref の情報を保持しておく構造体
-//////////////////////////////////////////////////////////////////////
-class TmpPortRef
-{
-public:
-
-  /// @brief 空のコンストラクタ
-  TmpPortRef();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を取り出す関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ノードを取り出す．
-  MvNode*
-  node() const;
-
-  /// @brief 単純な参照の時 true を返す．
-  bool
-  is_simple() const;
-
-  /// @brief ビット指定の時 true を返す．
-  bool
-  is_bit_select() const;
-
-  /// @brief 範囲指定の時の true を返す．
-  bool
-  is_part_select() const;
-
-  /// @brief ビット指定位置を返す．
-  ymuint
-  index() const;
-
-  /// @brief 範囲指定の MSB を返す．
-  ymuint
-  msb() const;
-
-  /// @brief 範囲指定の LSB を返す．
-  ymuint
-  lsb() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 単純な参照の場合の設定
-  void
-  set(MvNode* node);
-
-  /// @brief ビット指定の場合の設定
-  void
-  set(MvNode* node,
-      ymuint index);
-
-  /// @brief 範囲指定の場合の設定
-  void
-  set(MvNode* node,
-      ymuint msb,
-      ymuint lsb);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ノード
-  MvNode* mNode;
-
-  /// @brief ビット選択の index または範囲選択の MSB
-  ymuint32 mMsb;
-
-  /// @brief 範囲選択の LSB
-  ymuint32 mLsb;
-  
-};
-#endif
-
+class DeclMap;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ReaderImpl ReaderImpl.h "ReaderImpl.h"
@@ -161,21 +77,29 @@ private:
   MvModule*
   gen_module(const VlModule* vl_module);
 
-  /// @brief scope item を生成する．
+  /// @brief 宣言要素を生成する．
   /// @param[in] module モジュール
+  /// @param[in] decl_map 宣言要素とノードの対応表
   /// @param[in] vl_scope 対象のスコープ
   /// @retval true 成功した．
   /// @retval false エラーが起こった．
+  /// @note 内部に下位のスコープを含む場合には再帰する．
   bool
-  gen_scopeitem(MvModule* module,
-		const VlNamedObj* vl_scope);
+  gen_decl(MvModule* module,
+	   DeclMap& decl_map,
+	   const VlNamedObj* vl_scope);
 
-  /// @brief scope item 間の接続を行う．
+  /// @brief 要素を生成する．
+  /// @param[in] module モジュール
+  /// @param[in] decl_map 宣言要素とノードの対応表
   /// @param[in] vl_scope 対象のスコープ
   /// @retval true 成功した．
   /// @retval false エラーが起こった．
+  /// @note 内部に下位のスコープを含む場合には再帰する．
   bool
-  link_scopeitem(const VlNamedObj* vl_scope);
+  gen_item(MvModule* module,
+	   DeclMap& decl_map,
+	   const VlNamedObj* vl_scope);
 
   /// @brief portref の実体化を行う．
   /// @param[in] expr 対象の式
@@ -188,11 +112,81 @@ private:
   /// @retval 2 範囲指定形式だった．
   int
   gen_portref(const VlExpr* expr,
-	      const hash_map<ympuint, MvNode*>& iomap,
+	      const DeclMap& iomap,
 	      MvNode*& node,
 	      ymuint& msb,
 	      ymuint& lsb);
-  
+
+  /// @brief モジュールインスタンスの生成を行う．
+  /// @param[in] vl_module モジュール
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] decl_map 宣言要素の対応表
+  /// @return 対応するノードを返す．
+  MvNode*
+  gen_moduleinst(const VlModule* vl_module,
+		 MvModule* parent_module,
+		 const DeclMap& decl_map);
+
+  /// @brief プリミティブインスタンスの生成を行う．
+  /// @param[in] prim プリミティブ
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] decl_map 宣言要素の対応表
+  void
+  gen_priminst(const VlPrimitive* prim,
+	       MvModule* parent_module,
+	       const DeclMap& decl_map);
+
+  /// @brief AND のバランス木を作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] ni 入力数
+  /// @param[in] inputs 入力ピンを格納する配列
+  /// @param[in] offset inputs のオフセット
+  MvNode*
+  gen_andtree(MvModule* parent_module,
+	      ymuint ni,
+	      vector<pair<MvNode*, ymuint> >& inputs,
+	      ymuint offset);
+
+  /// @brief OR のバランス木を作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] ni 入力数
+  /// @param[in] inputs 入力ピンを格納する配列
+  /// @param[in] offset inputs のオフセット
+  MvNode*
+  gen_ortree(MvModule* parent_module,
+	     ymuint ni,
+	     vector<pair<MvNode*, ymuint> >& inputs,
+	     ymuint offset);
+
+  /// @brief XOR のバランス木を作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] ni 入力数
+  /// @param[in] inputs 入力ピンを格納する配列
+  /// @param[in] offset inputs のオフセット
+  MvNode*
+  gen_xortree(MvModule* parent_module,
+	      ymuint ni,
+	      vector<pair<MvNode*, ymuint> >& inputs,
+	      ymuint offset);
+
+  /// @brief 式に対応したノードの木を作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 式
+  /// @param[in] decl_map 宣言要素の対応表
+  MvNode*
+  gen_expr1(MvModule* parent_module,
+	    const VlExpr* expr,
+	    const DeclMap& decl_map);
+
+  /// @brief 宣言要素への参照に対応するノードを作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 式
+  /// @param[in] decl_map 宣言要素の対応表
+  MvNode*
+  gen_expr2(MvModule* parent_module,
+	    const VlExpr* expr,
+	    const DeclMap& decl_map);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -210,107 +204,6 @@ private:
   
 };
 
-#if 0
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 空のコンストラクタ
-inline
-TmpPortRef::TmpPortRef()
-{
-}
-
-// @brief ノードを取り出す．
-inline
-MvNode*
-TmpPortRef::node() const
-{
-  return mNode;
-}
-
-// @brief 単純な参照の時 true を返す．
-inline
-bool
-TmpPortRef::is_simple() const
-{
-  return mMsb == 0U && mLsb == 0U;
-}
-
-// @brief ビット指定の時 true を返す．
-inline
-bool
-TmpPortRef::is_bit_select() const
-{
-  return static_cast<bool>(mMsb & 1U);
-}
-
-// @brief 範囲指定の時の true を返す．
-inline
-bool
-TmpPortRef::is_part_select() const
-{
-  return static_cast<bool>(mLsb & 1U);
-}
-
-// @brief ビット指定位置を返す．
-inline
-ymuint
-TmpPortRef::index() const
-{
-  return mMsb >> 1;
-}
-
-// @brief 範囲指定の MSB を返す．
-inline
-ymuint
-TmpPortRef::msb() const
-{
-  return mMsb >> 1;
-}
-
-// @brief 範囲指定の LSB を返す．
-inline
-ymuint
-TmpPortRef::lsb() const
-{
-  return mLsb >> 1;
-}
-
-// @brief 単純な参照の場合の設定
-inline
-void
-TmpPortRef::set(MvNode* node)
-{
-  mNode = node;
-  mMsb = 0U;
-  mLsb = 0U;
-}
-
-// @brief ビット指定の場合の設定
-inline
-void
-TmpPortRef::set(MvNode* node,
-		ymuint index)
-{
-  mNode = node;
-  mMsb = (index << 1) | 1U;
-  mLsb = 0U;
-}
-
-// @brief 範囲指定の場合の設定
-inline
-void
-TmpPortRef::set(MvNode* node,
-		ymuint msb,
-		ymuint lsb)
-{
-  mNode = node;
-  mMsb = (msb << 1);
-  mLsb = (lsb << 1) | 1U;
-}
-#endif
 END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // LIBYM_MVN_VERILOG_READERIMPL_H

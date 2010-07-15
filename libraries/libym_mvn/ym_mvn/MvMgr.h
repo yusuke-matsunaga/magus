@@ -431,16 +431,20 @@ public:
   delete_node(MvNode* node);
   
   /// @brief ピンとピンを接続する．
-  /// @param[in] src_pin 入力元のピン
-  /// @param[in] dst_pin 出力先のピン
+  /// @param[in] src_node 入力元のノード
+  /// @param[in] src_pin_pos 入力元のピン番号
+  /// @param[in] dst_node 出力先のノード
+  /// @param[in] dst_pin 出力先のピン番号
   /// @return 接続を表すネットを返す．
   /// @note 接続が失敗したら NULLを返す．
   /// @note 接続が失敗するのは，
   ///  - ピンが異なるモジュールに属していた．
   ///  - ピンのビット幅が異なっていた．
   MvNet*
-  connect(MvOutputPin* src_pin,
-	  MvInputPin* dst_pin);
+  connect(MvNode* src_node,
+	  ymuint src_pin_pos,
+	  MvNode* dst_node,
+	  ymuint dst_pin_pos);
 
   /// @brief 接続を取り除く
   /// @param[in] net 接続を表すネット
