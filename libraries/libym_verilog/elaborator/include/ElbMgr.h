@@ -79,14 +79,14 @@ public:
   const ElbUserSystf*
   find_user_systf(const char* name) const;
 
-  /// @brief スコープに属する scope のリストを取り出す．
+  /// @brief スコープに属する generate block のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[out] scope_list 結果を格納するリスト
   /// @retval true 該当する要素が1つ以上あった．
   /// @retval false 該当する要素がなかった．
   bool
-  find_scope_list(const VlNamedObj* parent,
-		  vector<const VlNamedObj*>& scope_list) const;
+  find_genblock_list(const VlNamedObj* parent,
+		     vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief スコープとタグから宣言要素を取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -246,10 +246,15 @@ public:
   void
   reg_toplevel(const VlNamedObj* toplevel);
   
-  /// @brief scope を登録する．
+  /// @brief generate block を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
-  reg_scope(ElbScope* obj);
+  reg_genblock(ElbScope* obj);
+  
+  /// @brief block scope を登録する．
+  /// @param[in] obj 登録するオブジェクト
+  void
+  reg_blockscope(ElbScope* obj);
   
   /// @brief 宣言要素を登録する．
   /// @param[in] tag タグ
@@ -422,17 +427,17 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief スコープに属する scope のリストを取り出す．
+// @brief スコープに属する generate block のリストを取り出す．
 // @param[in] parent 検索対象のスコープ
 // @param[out] scope_list 結果を格納するリスト
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 inline
 bool
-ElbMgr::find_scope_list(const VlNamedObj* parent,
-			vector<const VlNamedObj*>& scope_list) const
+ElbMgr::find_genblock_list(const VlNamedObj* parent,
+			   vector<const VlNamedObj*>& scope_list) const
 {
-  return mTagDict.find_scope_list(parent, scope_list);
+  return mTagDict.find_genblock_list(parent, scope_list);
 }
 
 // @brief スコープとタグから宣言要素を取り出す．

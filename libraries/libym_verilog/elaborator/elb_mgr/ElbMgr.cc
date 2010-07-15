@@ -145,13 +145,13 @@ ElbMgr::reg_user_systf(const ElbUserSystf* systf)
   mSystfHash.insert(make_pair(systf->_name(), systf));
 }
 
-// @brief scope を登録する．
+// @brief generate block を登録する．
 // @param[in] obj 登録するオブジェクト
 void
-ElbMgr::reg_scope(ElbScope* obj)
+ElbMgr::reg_genblock(ElbScope* obj)
 {
   if ( debug & debug_objdict ) {
-    dout << "reg_scope( " << obj->name() << " @ "
+    dout << "reg_genblock( " << obj->name() << " @ "
 	 << obj->parent()->full_name()
 	 << " ["
 	 << hex << reinterpret_cast<ympuint>(obj->parent()) << dec
@@ -159,7 +159,26 @@ ElbMgr::reg_scope(ElbScope* obj)
 	 << endl;
   }
   mObjDict.add(obj);
-  mTagDict.add_scope(obj);
+  mTagDict.add_genblock(obj);
+}
+
+// @brief block scope を登録する．
+// @param[in] obj 登録するオブジェクト
+void
+ElbMgr::reg_blockscope(ElbScope* obj)
+{
+  if ( debug & debug_objdict ) {
+    dout << "reg_blockscope( " << obj->name() << " @ "
+	 << obj->parent()->full_name()
+	 << " ["
+	 << hex << reinterpret_cast<ympuint>(obj->parent()) << dec
+	 << "] )" << endl
+	 << endl;
+  }
+  mObjDict.add(obj);
+#if 0 // TagDict::add_blockscope() は作ってない．
+  mTagDict.add_blockscope(obj);
+#endif
 }
 
 // @brief 宣言要素を登録する．

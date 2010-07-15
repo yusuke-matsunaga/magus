@@ -113,7 +113,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
   case kPtNamedSeqBlockStmt:
     {
       ElbScope* block_scope = factory().new_StmtScope(parent, pt_stmt);
-      reg_scope(block_scope);
+      reg_blockscope(block_scope);
       
       for (ymuint32 i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
 	const PtStmt* pt_stmt1 = pt_stmt->stmt_array()[i];

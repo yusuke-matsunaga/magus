@@ -149,16 +149,16 @@ VlMgr::find_obj(const VlNamedObj* parent,
   return NULL;
 }
 
-// @brief スコープに属する内部のスコープのリストを取り出す．
+// @brief スコープに属する generate block のリストを取り出す．
 // @param[in] parent 検索対象のスコープ
 // @param[out] scope_list 結果を格納するリスト
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-VlMgr::find_scope_list(const VlNamedObj* parent,
-		       vector<const VlNamedObj*>& scope_list) const
+VlMgr::find_genblock_list(const VlNamedObj* parent,
+			  vector<const VlNamedObj*>& scope_list) const
 {
-  return mElbMgr->find_scope_list(parent, scope_list);
+  return mElbMgr->find_genblock_list(parent, scope_list);
 }
 
 // @brief スコープとタグから宣言要素を取り出す．

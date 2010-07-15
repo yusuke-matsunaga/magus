@@ -28,16 +28,6 @@ class TagDictCell
   
 private:
   
-  /// @brief scope を追加する．
-  virtual
-  void
-  add_scope(ElbScope* obj);
-  
-  /// @brief scope の先頭を得る．
-  virtual
-  const ElbScope*
-  scope();
-  
   /// @brief  宣言要素を追加する．
   virtual
   void
@@ -158,6 +148,16 @@ private:
   const ElbProcess*
   process();
   
+  /// @brief generate block を追加する．
+  virtual
+  void
+  add_genblock(ElbScope* obj);
+  
+  /// @brief generate block の先頭を得る．
+  virtual
+  const ElbScope*
+  genblock();
+  
   /// @brief  要素数を得る．
   virtual
   ymuint32
@@ -202,20 +202,6 @@ public:
   /// @brief 内容を空にする
   void
   clear();
-  
-  /// @brief scope を追加する．
-  /// @param[in] scope 登録する要素
-  void
-  add_scope(ElbScope* scope);
-
-  /// @brief scope のリストを取り出す．
-  /// @param[in] parent 親のスコープ
-  /// @param[out] scope_list 結果を格納するリスト
-  /// @retval true 該当する要素が1つ以上あった．
-  /// @retval false 該当する要素がなかった．
-  bool
-  find_scope_list(const VlNamedObj* parent,
-		  vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief 宣言要素を追加する．
   /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
@@ -392,6 +378,20 @@ public:
   bool
   find_process_list(const VlNamedObj* parent,
 		    vector<const VlProcess*>& process_list) const;
+  
+  /// @brief generate block を追加する．
+  /// @param[in] scope 登録する要素
+  void
+  add_genblock(ElbScope* scope);
+
+  /// @brief generate block のリストを取り出す．
+  /// @param[in] parent 親のスコープ
+  /// @param[out] scope_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  bool
+  find_genblock_list(const VlNamedObj* parent,
+		     vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief このオブジェクトが使用しているメモリ量を返す．
   size_t
