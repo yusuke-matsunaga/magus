@@ -17,6 +17,7 @@
 #include "ym_verilog/vl/VlIODecl.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlPort.h"
+#include "ym_verilog/vl/VlContAssign.h"
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlRange.h"
 
