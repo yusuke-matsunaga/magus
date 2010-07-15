@@ -373,7 +373,9 @@ ReaderImpl::gen_item(MvModule* module,
       for (vector<const VlContAssign*>::iterator p = contassign_list.begin();
 	   p != contassign_list.end(); ++ p) {
 	const VlContAssign* vl_contassign = *p;
-	
+	const VlExpr* lhs = vl_contassign->lhs();
+	const VlExpr* rhs = vl_contassign->rhs();
+	MvNode* node = gen_expr1(module, rhs, decl_map);
       }
     }
   }
