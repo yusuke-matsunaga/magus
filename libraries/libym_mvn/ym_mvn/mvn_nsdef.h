@@ -41,6 +41,7 @@ BEGIN_NAMESPACE_YM_MVN
 class MvMgr;
 class MvModule;
 class MvPort;
+class MvPortRef;
 class MvNode;
 class MvPin;
 class MvInputPin;
@@ -56,6 +57,7 @@ BEGIN_NAMESPACE_YM
 using nsMvn::MvMgr;
 using nsMvn::MvModule;
 using nsMvn::MvPort;
+using nsMvn::MvPortRef;
 using nsMvn::MvNode;
 using nsMvn::MvInputPin;
 using nsMvn::MvOutputPin;

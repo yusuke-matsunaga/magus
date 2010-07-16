@@ -11,6 +11,7 @@
 #include "DeclMap.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
+#include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
@@ -222,11 +223,6 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
     return NULL;
   }
   
-#if 0
-  // 接続を行う．
-  bool stat = link_scopeitem(vl_module);
-#endif
-  
   return module;
 }
 
@@ -318,7 +314,7 @@ ReaderImpl::gen_item(MvModule* module,
       for (vector<const VlModule*>::iterator p = module_list.begin();
 	   p != module_list.end(); ++ p) {
 	const VlModule* vl_module = *p;
-	MvNode* node = gen_moduleinst(vl_module, module, decl_map);
+	gen_moduleinst(vl_module, module, decl_map);
       }
     }
   }
@@ -333,7 +329,7 @@ ReaderImpl::gen_item(MvModule* module,
 	ymuint n = vl_module_array->elem_num();
 	for (ymuint i = 0; i < n; ++ i) {
 	  const VlModule* vl_module = vl_module_array->elem_by_offset(i);
-	  MvNode* node = gen_moduleinst(vl_module, module, decl_map);
+	  gen_moduleinst(vl_module, module, decl_map);
 	}
       }
     }
@@ -377,6 +373,7 @@ ReaderImpl::gen_item(MvModule* module,
 	const VlExpr* lhs = vl_contassign->lhs();
 	const VlExpr* rhs = vl_contassign->rhs();
 	MvNode* node = gen_expr1(module, rhs, decl_map);
+	connect_lhs(module, lhs, node, decl_map);
       }
     }
   }
@@ -468,14 +465,20 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
       // 普通の式が書ける．
       {
 	MvNode* node = gen_expr1(parent_module, hi, decl_map);
-	//connect_port1(node, port);
+	connect_port1(parent_module, port, node);
       }
       break;
       
     case kVpiOutput:
+      {
+	MvNode* node = port_to_node(parent_module, port);
+	connect_lhs(parent_module, hi, node, decl_map);
+      }
+      break;
+      
     case kVpiMixedIO:
       // 単純な参照か連結のみ
-      //connect_port2(hi, port);
+      //connect_port2(port, hi);
       break;
       
     default:
@@ -485,6 +488,221 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
   }
 
   return node;
+}
+
+// @brief ポートに接続する．
+// @param[in] parent_module 親のモジュール
+// @param[in] port 対象のポート
+// @param[in] node 接続するノード
+void
+ReaderImpl::connect_port1(MvModule* parent_module,
+			  const MvPort* port,
+			  MvNode* node)
+{
+  ymuint n = port->port_ref_num();
+  ymuint bit_width = static_cast<const MvNode*>(node)->output(0)->bit_width();
+  if ( n == 1 ) {
+    const MvPortRef* port_ref = port->port_ref(0);
+    assert_cond( port_ref->bit_width() == bit_width, __FILE__, __LINE__);
+    if ( port_ref->is_simple() ) {
+      mMvMgr->connect(node, 0, port_ref->node(), 0);
+    }
+    else if ( port_ref->has_bitselect() ) {
+      // 未完
+    }
+    else if ( port_ref->has_partselect() ) {
+      // 未完
+    }
+  }
+  else {
+    ymuint last = 0;
+    for (ymuint i = 0; i < n; ++ i) {
+      const MvPortRef* port_ref = port->port_ref(i);
+      ymuint bw = port_ref->bit_width();
+      MvNode* node1 = NULL;
+      if ( bw == 1 ) {
+	node1 = mMvMgr->new_constbitselect(parent_module,
+					   last,
+					   bit_width);
+      }
+      else {
+	node1 = mMvMgr->new_constpartselect(parent_module,
+					    last + bw - 1,
+					    last,
+					    bit_width);
+      }
+      mMvMgr->connect(node, 0, node1, 0);
+      last += bw;
+      if ( port_ref->is_simple() ) {
+	mMvMgr->connect(node1, 0, port_ref->node(), 0);
+      }
+      else if ( port_ref->has_bitselect() ) {
+	// 未完
+      }
+      else if ( port_ref->has_partselect() ) {
+	// 未完
+      }
+    }
+  }
+}
+
+// @brief ポートの内容に対応するノードを作る．
+// @param[in] parent_module 親のモジュール
+// @param[in] port 対象のポート
+MvNode*
+ReaderImpl::port_to_node(MvModule* parent_module,
+			 const MvPort* port)
+{
+  ymuint n = port->port_ref_num();
+  if ( n == 1 ) {
+    const MvPortRef* port_ref = port->port_ref(0);
+    MvNode* node = port_ref_to_node(parent_module, port_ref);
+    return node;
+  }
+  
+  vector<ymuint> bw_array(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    const MvPortRef* port_ref = port->port_ref(i);
+    bw_array[i] = port_ref->bit_width();
+  }
+  MvNode* node_o = mMvMgr->new_concat(parent_module, bw_array);
+  for (ymuint i = 0; i < n; ++ i) {
+    const MvPortRef* port_ref = port->port_ref(i);
+    MvNode* node = port_ref_to_node(parent_module, port_ref);
+    mMvMgr->connect(node, 0, node_o, i);
+  }
+  return node_o;
+}
+
+// @brief ポート参照式に対応するノードを作る．
+// @param[in] parent_module 親のモジュール
+// @param[in] port_ref 対象のポート参照式
+MvNode*
+ReaderImpl::port_ref_to_node(MvModule* parent_module,
+			     const MvPortRef* port_ref)
+{
+  MvNode* node = port_ref->node();
+  ymuint bw = static_cast<const MvNode*>(node)->output(0)->bit_width();
+  MvNode* node1 = NULL;
+  if ( port_ref->is_simple() ) {
+    node1 = node;
+  }
+  else if ( port_ref->has_bitselect() ) {
+    node1 = mMvMgr->new_constbitselect(parent_module,
+				       port_ref->bitpos(),
+				       bw);
+    mMvMgr->connect(node, 0, node1, 0);
+  }
+  else if ( port_ref->has_partselect() ) {
+    MvNode* node1 = mMvMgr->new_constpartselect(parent_module,
+						port_ref->msb(),
+						port_ref->lsb(),
+						bw);
+    mMvMgr->connect(node, 0, node1, 0);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  return node1;
+}
+
+// @brief 左辺式に接続する．
+// @param[in] parent_module 親のモジュール
+// @param[in] expr 左辺式
+// @param[in] node 右辺に対応するノード
+// @param[in] decl_map 宣言要素の対応表
+void
+ReaderImpl::connect_lhs(MvModule* parent_module,
+			const VlExpr* expr,
+			MvNode* node,
+			const DeclMap& decl_map)
+{
+  switch ( expr->type() ) {
+  case kVpiBitSelect:
+    // 未完
+    break;
+    
+  case kVpiPartSelect:
+    // 未完
+    break;
+
+  case kVpiOperation:
+    assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
+    {
+      ymuint n = expr->operand_num();
+      ymuint offset = 0;
+      for (ymuint i = 0; i < n; ++ i) {
+	const VlExpr* expr1 = expr->operand(i);
+	connect_lhs_sub(parent_module, expr1, node, decl_map, offset);
+	offset += expr1->bit_size();
+      }
+    }
+    break;
+
+  default:
+    {
+      MvNode* node1 = gen_expr2(expr, decl_map);
+      mMvMgr->connect(node, 0, node1, 0);
+    }
+    break;
+  }
+}
+
+// @brief 左辺式に接続する．
+// @param[in] parent_module 親のモジュール
+// @param[in] expr 左辺式
+// @param[in] node 右辺に対応するノード
+// @param[in] decl_map 宣言要素の対応表
+void
+ReaderImpl::connect_lhs_sub(MvModule* parent_module,
+			    const VlExpr* expr,
+			    MvNode* node,
+			    const DeclMap& decl_map,
+			    ymuint offset)
+{
+  switch ( expr->type() ) {
+  case kVpiBitSelect:
+    // 未完
+    break;
+    
+  case kVpiPartSelect:
+    // 未完
+    break;
+
+  case kVpiOperation:
+    assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
+    {
+      ymuint n = expr->operand_num();
+      ymuint offset1 = 0;
+      for (ymuint i = 0; i < n; ++ i) {
+	const VlExpr* expr1 = expr->operand(i);
+	connect_lhs_sub(parent_module, expr1, node, decl_map, offset + offset1);
+	offset1 += expr1->bit_size();
+      }
+    }
+    break;
+
+  default:
+    {
+      MvNode* node1 = gen_expr2(expr, decl_map);
+      ymuint bw = static_cast<const MvNode*>(node1)->input(0)->bit_width();
+      MvNode* node2 = NULL;
+      if ( bw == 1 ) {
+	node2 = mMvMgr->new_constbitselect(parent_module,
+					   offset,
+					   bw);
+      }
+      else {
+	node2 = mMvMgr->new_constpartselect(parent_module,
+					    offset + bw - 1,
+					    offset,
+					    bw);
+      }
+      mMvMgr->connect(node, 0, node2, 0);
+      mMvMgr->connect(node2, 0, node1, 0);
+    }
+    break;
+  }
 }
 
 // @brief プリミティブインスタンスの生成を行う．
@@ -509,7 +727,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
   }
 
   vector<pair<MvNode*, ymuint> > inputs(ni);
-  vector<pair<MvNode*, ymuint> > outputs(no);
+  vector<MvNode*> outputs(no);
 
   switch ( prim->prim_type() ) {
   case kVpiBufPrim:
@@ -517,7 +735,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       MvNode* node = mMvMgr->new_through(parent_module, 1);
       inputs[0] = make_pair(node, 0);
       for (ymuint i = 0; i < no; ++ i) {
-	outputs[i] = make_pair(node, 0);
+	outputs[i] = node;
       }
     }
     break;
@@ -526,14 +744,14 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
     {
       MvNode* node = mMvMgr->new_not(parent_module, 1);
       inputs[0] = make_pair(node, 0);
-      outputs[0] = make_pair(node, 0);
+      outputs[0] = node;
     }
     break;
 
   case kVpiAndPrim:
     {
       MvNode* node = gen_andtree(parent_module, ni, inputs, 0);
-      outputs[0] = make_pair(node, 0);
+      outputs[0] = node;
     }
     break;
     
@@ -542,14 +760,14 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       MvNode* node = gen_andtree(parent_module, ni, inputs, 0);
       MvNode* node1 = mMvMgr->new_not(parent_module, 1);
       mMvMgr->connect(node, 0, node1, 0);
-      outputs[0] = make_pair(node1, 0);
+      outputs[0] = node1;
     }
     break;
     
   case kVpiOrPrim:
     {
       MvNode* node = gen_ortree(parent_module, ni, inputs, 0);
-      outputs[0] = make_pair(node, 0);
+      outputs[0] = node;
     }
     break;
     
@@ -558,14 +776,14 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       MvNode* node = gen_ortree(parent_module, ni, inputs, 0);
       MvNode* node1 = mMvMgr->new_not(parent_module, 1);
       mMvMgr->connect(node, 0, node1, 0);
-      outputs[0] = make_pair(node1, 0);
+      outputs[0] = node1;
     }
     break;
     
   case kVpiXorPrim:
     {
       MvNode* node = gen_xortree(parent_module, ni, inputs, 0);
-      outputs[0] = make_pair(node, 0);
+      outputs[0] = node;
     }
     break;
     
@@ -574,7 +792,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       MvNode* node = gen_xortree(parent_module, ni, inputs, 0);
       MvNode* node1 = mMvMgr->new_not(parent_module, 1);
       mMvMgr->connect(node, 0, node1, 0);
-      outputs[0] = make_pair(node1, 0);
+      outputs[0] = node1;
     }
     break;
     
@@ -590,8 +808,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
     const VlPrimTerm* term = prim->prim_term(pos);
     ++ pos;
     const VlExpr* expr = term->expr();
-    const pair<MvNode*, ymuint>& p = outputs[i];
-    //connect_term(expr, p.first, p.second);
+    connect_lhs(parent_module, expr, outputs[i], decl_map);
   }
   for (ymuint i = 0; i < ni; ++ i) {
     const VlPrimTerm* term = prim->prim_term(pos);
@@ -738,7 +955,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
   switch ( expr->type() ) {
   case kVpiBitSelect:
     {
-      MvNode* node = gen_expr2(parent_module, expr, decl_map);
+      MvNode* node = gen_expr2(expr, decl_map);
       if ( expr->is_constant_select() ) {
 	ymuint bitpos = expr->index_val();
 	const MvOutputPin* pin = static_cast<const MvNode*>(node)->output(0);
@@ -764,7 +981,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 
   case kVpiPartSelect:
     {
-      MvNode* node = gen_expr2(parent_module, expr, decl_map);
+      MvNode* node = gen_expr2(expr, decl_map);
       if ( expr->is_constant_select() ) {
 	ymuint msb = expr->left_range_val();
 	ymuint lsb = expr->right_range_val();
@@ -795,18 +1012,16 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     break;
 
   default:
-    return gen_expr2(parent_module, expr, decl_map);
+    return gen_expr2(expr, decl_map);
   }
   return NULL;
 }
 
 // @brief 宣言要素への参照に対応するノードを作る．
-// @param[in] parent_module 親のモジュール
 // @param[in] expr 式
 // @param[in] decl_map 宣言要素の対応表
 MvNode*
-ReaderImpl::gen_expr2(MvModule* parent_module,
-		      const VlExpr* expr,
+ReaderImpl::gen_expr2(const VlExpr* expr,
 		      const DeclMap& decl_map)
 {
   const VlDecl* decl = expr->decl_obj();

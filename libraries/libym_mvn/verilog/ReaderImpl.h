@@ -101,9 +101,9 @@ private:
 	   DeclMap& decl_map,
 	   const VlNamedObj* vl_scope);
 
-  /// @brief portref の実体化を行う．
+  /// @brief ポート参照式の実体化を行う．
   /// @param[in] expr 対象の式
-  /// @param[in] iomap 入出力ノードの対応表
+  /// @param[in] decl_map 宣言要素の対応表
   /// @param[out] node 対応するノードを格納する変数
   /// @param[out] msb ビット指定位置か範囲指定の MSB を格納する変数
   /// @param[out] lsb 範囲指定の LSB を格納する変数
@@ -112,7 +112,7 @@ private:
   /// @retval 2 範囲指定形式だった．
   int
   gen_portref(const VlExpr* expr,
-	      const DeclMap& iomap,
+	      const DeclMap& decl_map,
 	      MvNode*& node,
 	      ymuint& msb,
 	      ymuint& lsb);
@@ -127,6 +127,53 @@ private:
 		 MvModule* parent_module,
 		 const DeclMap& decl_map);
 
+  /// @brief ポートに接続する．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] port 対象のポート
+  /// @param[in] node 接続するノード
+  void
+  connect_port1(MvModule* parent_module,
+		const MvPort* port,
+		MvNode* node);
+
+  /// @brief ポートの内容に対応するノードを作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] port 対象のポート
+  MvNode*
+  port_to_node(MvModule* parent_module,
+	       const MvPort* port);
+
+  /// @brief ポート参照式に対応するノードを作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] port_ref 対象のポート参照式
+  MvNode*
+  port_ref_to_node(MvModule* parent_module,
+		   const MvPortRef* port_ref);
+
+  /// @brief 左辺式に接続する．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 左辺式
+  /// @param[in] node 右辺に対応するノード
+  /// @param[in] decl_map 宣言要素の対応表
+  void
+  connect_lhs(MvModule* parent_module,
+	      const VlExpr* expr,
+	      MvNode* node,
+	      const DeclMap& decl_map);
+
+  /// @brief 左辺式に接続する．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 左辺式
+  /// @param[in] node 右辺に対応するノード
+  /// @param[in] decl_map 宣言要素の対応表
+  /// @param[in] offset node に対するオフセット
+  void
+  connect_lhs_sub(MvModule* parent_module,
+		  const VlExpr* expr,
+		  MvNode* node,
+		  const DeclMap& decl_map,
+		  ymuint offset);
+  
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] prim プリミティブ
   /// @param[in] parent_module 親のモジュール
@@ -179,12 +226,10 @@ private:
 	    const DeclMap& decl_map);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
-  /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式
   /// @param[in] decl_map 宣言要素の対応表
   MvNode*
-  gen_expr2(MvModule* parent_module,
-	    const VlExpr* expr,
+  gen_expr2(const VlExpr* expr,
 	    const DeclMap& decl_map);
 
 
