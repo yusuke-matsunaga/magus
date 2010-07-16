@@ -38,7 +38,7 @@ DeclMap::clear()
 
 // @brief Cell を登録する．
 void
-DeclMap::put_cell(const VlObj* decl,
+DeclMap::put_cell(const VlDecl* decl,
 		  ymuint offset,
 		  MvNode* node)
 {
@@ -71,7 +71,7 @@ DeclMap::put_cell(const VlObj* decl,
 
 // @brief Cell を探す．
 DeclMap::Cell*
-DeclMap::find_cell(const VlObj* decl,
+DeclMap::find_cell(const VlDecl* decl,
 		   ymuint offset) const
 {
   ymuint pos = hash_func(decl, offset);
@@ -98,7 +98,7 @@ DeclMap::alloc_table(ymuint size)
 
 // @brief ハッシュ値を計算する．
 ymuint
-DeclMap::hash_func(const VlObj* decl,
+DeclMap::hash_func(const VlDecl* decl,
 		   ymuint offset) const
 {
   return (reinterpret_cast<ympuint>(decl) * (offset + 1) + offset) % mSize;

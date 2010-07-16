@@ -67,12 +67,16 @@ ReaderImpl::gen_network(MvMgr& mgr)
 {
   using namespace nsVerilog;
 
+  mVlMgr.elaborate();
+  
   mMvMgr = &mgr;
   
   list<const VlModule*> tmp_list(mVlMgr.topmodule_list());
   for (list<const VlModule*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     const VlModule* vl_module = *p;
+
+    if ( vl_module->is_cell_instance() ) continue;
 
     // module を実体化
     MvModule* module = gen_module(vl_module);
@@ -141,12 +145,14 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
     case kVpiInput:
-      decl_map.add(io, module->input(i1));
+      cout << "decl_map.add(" << io->name() << ")" << endl;
+      decl_map.add(io->decl(), module->input(i1));
       ++ i1;
       break;
 
     case kVpiOutput:
-      decl_map.add(io, module->output(i2));
+      cout << "decl_map.add(" << io->name() << ")" << endl;
+      decl_map.add(io->decl(), module->output(i2));
       ++ i2;
       break;
 
@@ -415,6 +421,9 @@ ReaderImpl::gen_portref(const VlExpr* expr,
   const VlDecl* decl = expr->decl_obj();
   assert_cond( decl != NULL, __FILE__, __LINE__);
   node = decl_map.get(decl);
+  if ( node == NULL ) {
+    cout << decl->full_name() << " is not found in decl_map" << endl;
+  }
   assert_cond( node != NULL, __FILE__, __LINE__);
 
   switch ( expr->type() ) {
@@ -797,7 +806,11 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
     break;
     
   case kVpiCombPrim:
+    break;
+
   case kVpiSeqPrim:
+    break;
+
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;

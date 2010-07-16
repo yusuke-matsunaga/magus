@@ -14,6 +14,7 @@
 
 #include "MvInput.h"
 #include "MvOutput.h"
+#include "MvDff.h"
 #include "MvThrough.h"
 #include "MvNot.h"
 #include "MvLogOp.h"
@@ -318,6 +319,34 @@ MvMgr::set_port_ref(MvModule* module,
 		    ymuint lsb)
 {
   module->mPortArray[pos]->mPortRefArray[port_ref_pos].set(node, msb, lsb);
+}
+
+// @brief 非同期セット/リセットタイプの FF ノードを生成する．
+MvNode*
+MvMgr::new_dff1(MvModule* module,
+		ymuint bit_width)
+{
+  MvNode* node = new MvDff1(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 4, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+  
+  return node;
+}
+
+// @brief 同期セット/リセットタイプの FF ノードを生成する．
+MvNode*
+MvMgr::new_dff2(MvModule* module,
+		ymuint bit_width)
+{
+  MvNode* node = new MvDff2(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 4, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+  
+  return node;
 }
 
 // @brief through ノードを生成する．

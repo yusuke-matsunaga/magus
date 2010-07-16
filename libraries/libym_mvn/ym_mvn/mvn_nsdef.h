@@ -39,6 +39,7 @@ BEGIN_NAMESPACE_YM_MVN
 // クラス名の先行宣言
 
 class MvMgr;
+class MvVerilogReader;
 class MvModule;
 class MvPort;
 class MvPortRef;
@@ -55,6 +56,7 @@ END_NAMESPACE_YM_MVN
 BEGIN_NAMESPACE_YM
 
 using nsMvn::MvMgr;
+using nsMvn::MvVerilogReader;
 using nsMvn::MvModule;
 using nsMvn::MvPort;
 using nsMvn::MvPortRef;

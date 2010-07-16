@@ -16,11 +16,11 @@
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
-using nsYm::nsVerilog::VlObj;
+using nsYm::nsVerilog::VlDecl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DeclMap DeclMap.h "DeclMap.h"
-/// @brief VlObj と MvNode の対応付けを行うハッシュ表
+/// @brief VlDecl と MvNode の対応付けを行うハッシュ表
 //////////////////////////////////////////////////////////////////////
 class DeclMap
 {
@@ -43,7 +43,7 @@ public:
   /// @param[in] decl 宣言要素
   /// @param[in] node 対応するノード
   void
-  add(const VlObj* decl,
+  add(const VlDecl* decl,
       MvNode* node);
 
   /// @brief 登録する(配列の場合)
@@ -51,7 +51,7 @@ public:
   /// @param[in] offset
   /// @param[in] node 対応するノード
   void
-  add(const VlObj* decl,
+  add(const VlDecl* decl,
       ymuint offset,
       MvNode* node);
 
@@ -60,7 +60,7 @@ public:
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
   MvNode*
-  get(const VlObj* decl) const;
+  get(const VlDecl* decl) const;
 
   /// @brief 対応するノードを取り出す(配列型)．
   /// @param[in] decl 宣言要素
@@ -69,7 +69,7 @@ public:
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
   MvNode*
-  get(const VlObj* decl,
+  get(const VlDecl* decl,
       ymuint offset) const;
 
 
@@ -81,7 +81,7 @@ private:
   struct Cell
   {
     // 宣言要素
-    const VlObj* mDecl;
+    const VlDecl* mDecl;
 
     // オフセット
     ymuint32 mOffset;
@@ -102,13 +102,13 @@ private:
 
   /// @brief Cell を登録する．
   void
-  put_cell(const VlObj* decl,
+  put_cell(const VlDecl* decl,
 	   ymuint offset,
 	   MvNode* node);
 
   /// @brief Cell を探す．
   Cell*
-  find_cell(const VlObj* decl,
+  find_cell(const VlDecl* decl,
 	    ymuint offset) const;
 
   /// @brief テーブルの領域を確保する．
@@ -118,7 +118,7 @@ private:
 
   /// @brief ハッシュ値を計算する．
   ymuint
-  hash_func(const VlObj* decl,
+  hash_func(const VlDecl* decl,
 	    ymuint offset) const;
 
 
@@ -154,7 +154,7 @@ private:
 // @param[in] node 対応するノード
 inline
 void
-DeclMap::add(const VlObj* decl,
+DeclMap::add(const VlDecl* decl,
 	     MvNode* node)
 {
   Cell* cell = find_cell(decl, 0);
@@ -172,7 +172,7 @@ DeclMap::add(const VlObj* decl,
 // @param[in] node 対応するノード
 inline
 void
-DeclMap::add(const VlObj* decl,
+DeclMap::add(const VlDecl* decl,
 	     ymuint offset,
 	     MvNode* node)
 {
@@ -191,7 +191,7 @@ DeclMap::add(const VlObj* decl,
 // @note 登録されていない場合と配列型の場合には NULL を返す．
 inline
 MvNode*
-DeclMap::get(const VlObj* decl) const
+DeclMap::get(const VlDecl* decl) const
 {
   Cell* cell = find_cell(decl, 0);
   if ( cell ) {
@@ -208,7 +208,7 @@ DeclMap::get(const VlObj* decl) const
 // オフセットが範囲外の場合には NULL を返す．
 inline
 MvNode*
-DeclMap::get(const VlObj* decl,
+DeclMap::get(const VlDecl* decl,
 	     ymuint offset) const
 {
   Cell* cell = find_cell(decl, offset);

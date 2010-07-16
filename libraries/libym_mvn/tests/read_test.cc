@@ -1,0 +1,64 @@
+
+/// @file libym_mvn/tests/read_test.cc
+/// @brief MvNode を生成するテスト
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// $Id: read.cc 1343 2008-03-25 17:15:35Z matsunaga $
+///
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ym_mvn/MvMgr.h"
+#include "ym_mvn/MvVerilogReader.h"
+
+
+int
+main(int argc,
+     char** argv)
+{
+  using namespace std;
+  using namespace nsYm;
+
+  list<string> filename_list;
+  for (ymuint i = 1; i < argc; ++ i) {
+    filename_list.push_back(argv[i]);
+  }
+
+#if 0
+  try {
+#endif
+    MvMgr mgr;
+    MvVerilogReader reader;
+    MsgHandler* mh = new StreamMsgHandler(&cerr);
+    mh->set_mask(MsgHandler::kMaskAll);
+    mh->delete_mask(kMsgInfo);
+    mh->delete_mask(kMsgDebug);
+    
+    for (list<string>::const_iterator p = filename_list.begin();
+	 p != filename_list.end(); ++ p) {
+      const string& name = *p;
+      cerr << "Reading " << name;
+      cerr.flush();
+      bool stat = reader.read(name);
+      cerr << " end" << endl;
+      if ( !stat ) {
+	return 1;
+      }
+    }
+    cerr << "Generating MvNetwork" << endl;
+    bool stat = reader.gen_network(mgr);
+    cerr << " End" << endl;
+    if ( !stat ) {
+      return 2;
+    }
+    
+    dump(cout, mgr);
+#if 0
+  }
+  catch ( AssertError x) {
+    cout << x << endl;
+  }
+#endif
+  return 0;
+}

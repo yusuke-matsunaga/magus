@@ -4,8 +4,8 @@
 
 SUBDIRS = \
 	ym_mvn \
-	. \
 	verilog \
+	. \
 	tests
 
 INCLUDES = \
@@ -31,6 +31,8 @@ libym_mvn_la_SOURCES = \
 	MvConstBitSelect.cc \
 	MvConstPartSelect.h \
 	MvConstPartSelect.cc \
+	MvDff.h \
+	MvDff.cc \
 	MvInput.h \
 	MvInput.cc \
 	MvInst.h \
@@ -63,5 +65,6 @@ libym_mvn_la_SOURCES = \
 libym_mvn_la_LDFLAGS =
 
 libym_mvn_la_LIBADD = \
+	verilog/libym_mvn_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
