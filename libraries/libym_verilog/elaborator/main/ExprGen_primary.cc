@@ -792,6 +792,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
 	return NULL;
       }
       decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
+      reg_decl(vpiNet, decl);
     }
   }
   
