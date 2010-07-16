@@ -23,6 +23,7 @@ MvModule::MvModule(const char* name,
 		   ymuint ni,
 		   ymuint no) :
   mName(name),
+  mParent(NULL),
   mPortArray(np),
   mInputArray(ni),
   mOutputArray(no)

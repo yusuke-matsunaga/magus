@@ -112,6 +112,12 @@ public:
     /// @brief module instance ( n入力, m出力 )
     kInst,
 
+    /// @brief combinational UDP ( n入力, 1出力 )
+    kCombUdp,
+
+    /// @brief sequential UDP ( n入力, 1出力 )
+    kSeqUdp,
+    
     /// @brief constant ( 0入力, 1出力 )
     kConst
 

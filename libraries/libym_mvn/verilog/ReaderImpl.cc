@@ -15,6 +15,7 @@
 #include "ym_mvn/MvNode.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
+#include "ym_verilog/vl/VlUdp.h"
 #include "ym_verilog/vl/VlIODecl.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlPort.h"
@@ -458,6 +459,49 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 			   MvModule* parent_module,
 			   const DeclMap& decl_map)
 {
+  cout << "gen_moduleinst(" << vl_module->def_name() << ")" << endl;
+  if ( strcmp(vl_module->def_name(), "GTECH_FD2") == 0 ) {
+    // GTECH_FD2( input D, input CP, input CD, output Q );
+    //   D:  データ入力
+    //   CP: クロック
+    //   CD: 非同期リセット
+    //   Q:  データ出力
+    MvNode* node = mMvMgr->new_dff1(parent_module, 1);
+    ymuint np = vl_module->port_num();
+    assert_cond( np == 5, __FILE__, __LINE__);
+    for (ymuint i = 0; i < 5; ++ i) {
+      const VlPort* vl_port = vl_module->port(i);
+      const char* port_name = vl_port->name();
+      const VlExpr* expr = vl_port->high_conn();
+      if ( strcmp(port_name, "D") == 0 ) {
+	MvNode* node1 = gen_expr1(parent_module, expr, decl_map);
+	mMvMgr->connect(node1, 0, node, 0);
+      }
+      else if ( strcmp(port_name, "CP") == 0 ) {
+	MvNode* node1 = gen_expr1(parent_module, expr, decl_map);
+	mMvMgr->connect(node1, 0, node, 1);
+      }
+      else if ( strcmp(port_name, "CD") == 0 ) {
+	MvNode* node1 = gen_expr1(parent_module, expr, decl_map);
+	mMvMgr->connect(node1, 0, node, 2);
+      }
+      else if ( strcmp(port_name, "Q") == 0 ) {
+	connect_lhs(parent_module, expr, node, decl_map);
+      }
+      else if ( strcmp(port_name, "QN") == 0 ) {
+	if ( expr != NULL ) {
+	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
+	  mMvMgr->connect(node, 0, node1, 0);
+	  connect_lhs(parent_module, expr, node1, decl_map);
+	}
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+    return node;
+  }
+  
   MvModule* module = gen_module(vl_module);
   if ( module == NULL ) {
     return NULL;
@@ -806,9 +850,27 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
     break;
     
   case kVpiCombPrim:
+    {
+      const VlUdpDefn* udp = prim->udp_defn();
+      ymuint ni = udp->port_num() - 1;
+      MvNode* node = mMvMgr->new_combudp(parent_module, ni);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
+      outputs[0] = node;
+    }
     break;
 
   case kVpiSeqPrim:
+    {
+      const VlUdpDefn* udp = prim->udp_defn();
+      ymuint ni = udp->port_num() - 1;
+      MvNode* node = mMvMgr->new_sequdp(parent_module, ni);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
+      outputs[0] = node;
+    }
     break;
 
   default:
@@ -1054,11 +1116,17 @@ ReaderImpl::gen_expr2(const VlExpr* expr,
       mlt *= decl->range(i)->size();
     }
     MvNode* node = decl_map.get(decl, offset);
+    if ( node == NULL ) {
+      cout << decl->name() << " is not found in decl_map" << endl;
+    }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
   }
   else {
     MvNode* node = decl_map.get(decl);
+    if ( node == NULL ) {
+      cout << decl->name() << " is not found in decl_map" << endl;
+    }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
   }

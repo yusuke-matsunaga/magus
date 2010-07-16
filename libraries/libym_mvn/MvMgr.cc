@@ -29,6 +29,7 @@
 #include "MvConstPartSelect.h"
 #include "MvBitSelect.h"
 #include "MvPartSelect.h"
+#include "MvUdp.h"
 
 #include "ym_mvn/MvNet.h"
 
@@ -65,6 +66,8 @@ dump_node(ostream& s,
   switch ( node->type() ) {
   case MvNode::kInput:      s << "Input[" << node->pos() << "]"; break;
   case MvNode::kOutput:     s << "Output[" << node->pos() << "]"; break;
+  case MvNode::kDff1:       s << "DFF1"; break;
+  case MvNode::kDff2:       s << "DFF2"; break;
   case MvNode::kThrough:    s << "Through"; break;
   case MvNode::kNot:        s << "Not"; break;
   case MvNode::kAnd:        s << "And"; break;
@@ -93,6 +96,8 @@ dump_node(ostream& s,
   case MvNode::kPartSelect: s << "PartSelect"; break;
   case MvNode::kInst:       s << "Inst of Module#"
 			      << node->module()->id(); break;
+  case MvNode::kCombUdp:    s << "Combinational UDP"; break;
+  case MvNode::kSeqUdp:    s << "Sequential UDP"; break;
   case MvNode::kConst:      s << "Const"; break;
   default:
     assert_not_reached(__FILE__, __LINE__);
@@ -839,6 +844,34 @@ MvMgr::new_inst(MvModule* module,
 {
   MvNode* node = new MvInst(module, submodule);
   submodule->mParent = node;
+  reg_node(node);
+
+  return node;
+}
+
+// @brief combinational UDP ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] ni 入力数
+// @note ビット幅はすべて1ビット
+MvNode*
+MvMgr::new_combudp(MvModule* module,
+		   ymuint ni)
+{
+  MvNode* node = new MvCombUdp(module, ni);
+  reg_node(node);
+
+  return node;
+}
+
+// @brief sequential UDP ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] ni 入力数
+// @note ビット幅はすべて1ビット
+MvNode*
+MvMgr::new_sequdp(MvModule* module,
+		  ymuint ni)
+{
+  MvNode* node = new MvSeqUdp(module, ni);
   reg_node(node);
 
   return node;

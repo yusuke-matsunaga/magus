@@ -424,6 +424,22 @@ public:
   new_inst(MvModule* module,
 	   MvModule* submodule);
 
+  /// @brief combinational UDP ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] ni 入力数
+  /// @note ビット幅はすべて1ビット
+  MvNode*
+  new_combudp(MvModule* module,
+	      ymuint ni);
+
+  /// @brief sequential UDP ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] ni 入力数
+  /// @note ビット幅はすべて1ビット
+  MvNode*
+  new_sequdp(MvModule* module,
+	     ymuint ni);
+  
   /// @brief constant ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅

@@ -59,6 +59,8 @@ libym_mvn_la_SOURCES = \
 	MvTernaryOp.cc \
 	MvThrough.h \
 	MvThrough.cc \
+	MvUdp.h \
+	MvUdp.cc \
 	MvUnaryOp.h \
 	MvUnaryOp.cc
 
