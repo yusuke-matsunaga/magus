@@ -22,7 +22,7 @@ MvOutput::MvOutput(MvModule* module,
   MvNode(module, 1, 0),
   mPos(pos)
 {
-  set_bit_width(input(0), bit_width);
+  set_bit_width(_input(0), bit_width);
 }
 
 // @brief デストラクタ

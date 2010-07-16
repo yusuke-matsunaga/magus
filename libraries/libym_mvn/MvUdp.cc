@@ -24,9 +24,9 @@ MvCombUdp::MvCombUdp(MvModule* module,
   MvNode(module, ni, 1)
 {
   for (ymuint i = 0; i < ni; ++ i) {
-    set_bit_width(input(i), 1);
+    set_bit_width(_input(i), 1);
   }
-  set_bit_width(output(0), 1);
+  set_bit_width(_output(0), 1);
 }
 
 // @brief デストラクタ
@@ -54,9 +54,9 @@ MvSeqUdp::MvSeqUdp(MvModule* module,
   MvNode(module, ni, 1)
 {
   for (ymuint i = 0; i < ni; ++ i) {
-    set_bit_width(input(i), 1);
+    set_bit_width(_input(i), 1);
   }
-  set_bit_width(output(0), 1);
+  set_bit_width(_output(0), 1);
 }
 
 // @brief デストラクタ

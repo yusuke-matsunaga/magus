@@ -550,7 +550,7 @@ ReaderImpl::connect_port1(MvModule* parent_module,
 			  MvNode* node)
 {
   ymuint n = port->port_ref_num();
-  ymuint bit_width = static_cast<const MvNode*>(node)->output(0)->bit_width();
+  ymuint bit_width = node->output(0)->bit_width();
   if ( n == 1 ) {
     const MvPortRef* port_ref = port->port_ref(0);
     assert_cond( port_ref->bit_width() == bit_width, __FILE__, __LINE__);
@@ -632,7 +632,7 @@ ReaderImpl::port_ref_to_node(MvModule* parent_module,
 			     const MvPortRef* port_ref)
 {
   MvNode* node = port_ref->node();
-  ymuint bw = static_cast<const MvNode*>(node)->output(0)->bit_width();
+  ymuint bw = node->output(0)->bit_width();
   MvNode* node1 = NULL;
   if ( port_ref->is_simple() ) {
     node1 = node;
@@ -735,7 +735,7 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
   default:
     {
       MvNode* node1 = gen_expr2(expr, decl_map);
-      ymuint bw = static_cast<const MvNode*>(node1)->input(0)->bit_width();
+      ymuint bw = node1->input(0)->bit_width();
       MvNode* node2 = NULL;
       if ( bw == 1 ) {
 	node2 = mMvMgr->new_constbitselect(parent_module,
@@ -1030,7 +1030,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
       MvNode* node = gen_expr2(expr, decl_map);
       if ( expr->is_constant_select() ) {
 	ymuint bitpos = expr->index_val();
-	const MvOutputPin* pin = static_cast<const MvNode*>(node)->output(0);
+	const MvOutputPin* pin = node->output(0);
 	MvNode* node1 = mMvMgr->new_constbitselect(parent_module,
 						   bitpos,
 						   pin->bit_width());
@@ -1039,8 +1039,8 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
       }
       else {
 	MvNode* node1 = gen_expr1(parent_module, expr->index(), decl_map);
-	const MvOutputPin* pin0 = static_cast<const MvNode*>(node)->output(0);
-	const MvOutputPin* pin1 = static_cast<const MvNode*>(node1)->output(0);
+	const MvOutputPin* pin0 = node->output(0);
+	const MvOutputPin* pin1 = node1->output(0);
 	MvNode* node2 = mMvMgr->new_bitselect(parent_module,
 					      pin0->bit_width(),
 					      pin1->bit_width());
@@ -1057,7 +1057,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
       if ( expr->is_constant_select() ) {
 	ymuint msb = expr->left_range_val();
 	ymuint lsb = expr->right_range_val();
-	const MvOutputPin* pin = static_cast<const MvNode*>(node)->output(0);
+	const MvOutputPin* pin = node->output(0);
 	MvNode* node1 = mMvMgr->new_constpartselect(parent_module,
 						    msb, lsb,
 						    pin->bit_width());

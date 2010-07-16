@@ -58,8 +58,8 @@ MvNode::pos() const
 // @brief 下位モジュールを得る．
 // @note type() が kInst の時のみ意味を持つ．
 // @note デフォルトの実装では NULL を返す．
-const MvModule*
-MvNode::module() const
+MvModule*
+MvNode::_module() const
 {
   return NULL;
 }

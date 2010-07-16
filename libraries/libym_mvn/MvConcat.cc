@@ -28,9 +28,9 @@ MvConcat::MvConcat(MvModule* module,
   for (ymuint i = 0; i < ni; ++ i) {
     ymuint ibitwidth = ibitwidth_array[i];
     obitwidth += ibitwidth;
-    set_bit_width(input(i), ibitwidth);
+    set_bit_width(_input(i), ibitwidth);
   }
-  set_bit_width(output(0), obitwidth);
+  set_bit_width(_output(0), obitwidth);
 }
 
 // @brief デストラクタ

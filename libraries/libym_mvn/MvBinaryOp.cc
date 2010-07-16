@@ -23,9 +23,9 @@ MvBinaryOp::MvBinaryOp(MvModule* module,
 		       ymuint bit_width3) :
   MvNode(module, 2, 1)
 {
-  set_bit_width(input(0), bit_width1);
-  set_bit_width(input(1), bit_width2);
-  set_bit_width(output(0), bit_width3);
+  set_bit_width(_input(0), bit_width1);
+  set_bit_width(_input(1), bit_width2);
+  set_bit_width(_output(0), bit_width3);
 }
 
 // @brief デストラクタ

@@ -131,7 +131,7 @@ public:
   id() const;
 
   /// @brief 親のモジュールを得る．
-  MvModule*
+  const MvModule*
   parent() const;
 
   /// @brief ノードの種類を得る．
@@ -167,7 +167,6 @@ public:
   /// @brief 下位モジュールを得る．
   /// @note type() が kInst の時のみ意味を持つ．
   /// @note デフォルトの実装では NULL を返す．
-  virtual
   const MvModule*
   module() const;
 
@@ -227,12 +226,12 @@ protected:
   /// @brief 入力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
   MvInputPin*
-  input(ymuint pos);
+  _input(ymuint pos);
 
   /// @brief 出力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
   MvOutputPin*
-  output(ymuint pos);
+  _output(ymuint pos);
 
   /// @brief ピンのビット幅を設定する．
   /// @param[in] pin 対象のピン
@@ -240,6 +239,19 @@ protected:
   void
   set_bit_width(MvPin* pin,
 		ymuint bit_width);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // MvMgr が用いる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 下位モジュールを得る．
+  /// @note type() が kInst の時のみ意味を持つ．
+  /// @note デフォルトの実装では NULL を返す．
+  virtual
+  MvModule*
+  _module() const;
 
 
 private:
@@ -285,7 +297,7 @@ MvNode::id() const
 
 // @brief 親のモジュールを得る．
 inline
-MvModule*
+const MvModule*
 MvNode::parent() const
 {
   return mParent;
@@ -312,7 +324,7 @@ MvNode::input(ymuint pos) const
 // @param[in] pos 位置 ( 0 <= pos < input_num() )
 inline
 MvInputPin*
-MvNode::input(ymuint pos)
+MvNode::_input(ymuint pos)
 {
   return &mInputPins[pos];
 }
@@ -338,9 +350,19 @@ MvNode::output(ymuint pos) const
 // @param[in] pos 位置 ( 0 <= pos < output_num() )
 inline
 MvOutputPin*
-MvNode::output(ymuint pos)
+MvNode::_output(ymuint pos)
 {
   return &mOutputPins[pos];
+}
+
+// @brief 下位モジュールを得る．
+// @note type() が kInst の時のみ意味を持つ．
+// @note デフォルトの実装では NULL を返す．
+inline
+const MvModule*
+MvNode::module() const
+{
+  return _module();
 }
 
 END_NAMESPACE_YM_MVN

@@ -42,6 +42,7 @@ libym_mvn_la_SOURCES = \
 	MvLogOp.h \
 	MvLogOp.cc \
 	MvMgr.cc \
+	MvMgr_flatten.cc \
 	MvModule.cc \
 	MvNode.cc \
 	MvNot.h \

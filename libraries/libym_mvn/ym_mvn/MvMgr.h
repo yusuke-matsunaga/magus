@@ -294,7 +294,6 @@ public:
 	  ymuint bit_width2,
 	  ymuint bit_width3);
 
-
   /// @brief sub ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width1 入力1のビット幅
@@ -478,11 +477,33 @@ public:
   disconnect(MvNet* net);
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ネットワークの変形を行う関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 階層構造をなくす．
+  void
+  flatten();
+
+  /// @brief 自明な冗長性を取り除く
+  void
+  simplify();
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief flatten() の下請け関数
+  /// @param[in] module 対象のモジュール
+  /// @param[in] top_module トップモジュール
+  /// @note 大まかには module のノードを top_module に移す．
+  void
+  flatten_sub(MvModule* module,
+	      MvModule* top_module);
+  
   /// @brief ノードを登録する．
   /// @param[in] node 対象のノード
   void

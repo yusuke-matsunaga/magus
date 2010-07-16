@@ -950,8 +950,8 @@ MvMgr::connect(MvNode* src_node,
   if ( src_node->parent() != dst_node->parent() ) {
     return NULL;
   }
-  MvOutputPin* src_pin = src_node->output(src_pin_pos);
-  MvInputPin* dst_pin = dst_node->input(dst_pin_pos);
+  MvOutputPin* src_pin = src_node->_output(src_pin_pos);
+  MvInputPin* dst_pin = dst_node->_input(dst_pin_pos);
   if ( src_pin->bit_width() != dst_pin->bit_width() ) {
     return NULL;
   }
@@ -973,7 +973,7 @@ MvMgr::disconnect(MvNet* net)
 void
 MvMgr::reg_node(MvNode* node)
 {
-  MvModule* module = node->parent();
+  MvModule* module = node->mParent;
   int tmp = module->mItvlMgr.avail_num();
   if ( tmp == -1 ) {
     // ID番号が枯渇？
@@ -1001,7 +1001,7 @@ MvMgr::reg_node(MvNode* node)
 void
 MvMgr::unreg_node(MvNode* node)
 {
-  MvModule* module = node->parent();
+  MvModule* module = node->mParent;
   module->mItvlMgr.add(node->id());
   module->mNodeArray[node->id()] = NULL;
   if ( node->type() != MvNode::kInput && node->type() != MvNode::kOutput ) {
@@ -1082,7 +1082,7 @@ MvOutputPin::~MvOutputPin()
 // @brief 内容を出力する
 // @param[in] s 出力先のストリーム
 // @param[in] mgr MvMgr
-/// @note デバッグ用
+// @note デバッグ用
 void
 dump(ostream& s,
      const MvMgr& mgr)
