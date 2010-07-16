@@ -146,13 +146,11 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
     case kVpiInput:
-      cout << "decl_map.add(" << io->name() << ")" << endl;
       decl_map.add(io->decl(), module->input(i1));
       ++ i1;
       break;
 
     case kVpiOutput:
-      cout << "decl_map.add(" << io->name() << ")" << endl;
       decl_map.add(io->decl(), module->output(i2));
       ++ i2;
       break;
@@ -459,7 +457,6 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 			   MvModule* parent_module,
 			   const DeclMap& decl_map)
 {
-  cout << "gen_moduleinst(" << vl_module->def_name() << ")" << endl;
   if ( strcmp(vl_module->def_name(), "GTECH_FD2") == 0 ) {
     // GTECH_FD2( input D, input CP, input CD, output Q );
     //   D:  データ入力
