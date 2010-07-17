@@ -8,8 +8,9 @@
 
 
 #include "MvInst.h"
+#include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
-#include "ym_mvn/MvPin.h"
+
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -46,6 +47,21 @@ const MvModule*
 MvInst::module() const
 {
   return mSubmodule;
+}
+
+// @brief module instance ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] submodule 下位モジュール
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_inst(MvModule* module,
+		MvModule* submodule)
+{
+  MvNode* node = new MvInst(module, submodule);
+  submodule->mParent = node;
+  reg_node(node);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

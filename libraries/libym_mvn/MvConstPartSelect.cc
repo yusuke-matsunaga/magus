@@ -8,6 +8,7 @@
 
 
 #include "MvConstPartSelect.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -55,6 +56,24 @@ ymuint
 MvConstPartSelect::lsb() const
 {
   return mLsb;
+}
+
+// @brief part-select ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] msb 範囲指定の MSB
+// @param[in] lsb 範囲指定の LSB
+// @param[in] bit_width ビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_constpartselect(MvModule* module,
+			   ymuint msb,
+			   ymuint lsb,
+			   ymuint bit_width)
+{
+  MvNode* node = new MvConstPartSelect(module, msb, lsb, bit_width);
+  reg_node(node);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

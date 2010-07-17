@@ -8,6 +8,7 @@
 
 
 #include "MvUdp.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -41,6 +42,20 @@ MvCombUdp::type() const
   return kCombUdp;
 }
 
+// @brief combinational UDP ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] ni 入力数
+// @note ビット幅はすべて1ビット
+MvNode*
+MvMgr::new_combudp(MvModule* module,
+		   ymuint ni)
+{
+  MvNode* node = new MvCombUdp(module, ni);
+  reg_node(node);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvSeqUdp
@@ -69,6 +84,20 @@ MvNode::tType
 MvSeqUdp::type() const
 {
   return kSeqUdp;
+}
+
+// @brief sequential UDP ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] ni 入力数
+// @note ビット幅はすべて1ビット
+MvNode*
+MvMgr::new_sequdp(MvModule* module,
+		  ymuint ni)
+{
+  MvNode* node = new MvSeqUdp(module, ni);
+  reg_node(node);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

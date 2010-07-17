@@ -8,6 +8,7 @@
 
 
 #include "MvConst.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -44,6 +45,24 @@ void
 MvConst::const_value(vector<ymuint32>& val) const
 {
   val = mVal;
+}
+
+// @brief constant ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width ビット幅
+// @param[in] val 値
+MvNode*
+MvMgr::new_const(MvModule* module,
+		 ymuint bit_width,
+		 const vector<ymuint32>& val)
+{
+  MvNode* node = new MvConst(module, bit_width, val);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 0, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

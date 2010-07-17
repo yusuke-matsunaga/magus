@@ -8,6 +8,7 @@
 
 
 #include "MvConstBitSelect.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -43,6 +44,22 @@ ymuint
 MvConstBitSelect::bitpos() const
 {
   return mBitPos;
+}
+
+// @brief bit-selectノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bitpos ビット位置
+// @param[in] bit_width ビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_constbitselect(MvModule* module,
+			  ymuint bitpos,
+			  ymuint bit_width)
+{
+  MvNode* node = new MvConstBitSelect(module, bitpos, bit_width);
+  reg_node(node);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

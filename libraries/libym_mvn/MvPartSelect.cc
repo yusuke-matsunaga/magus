@@ -8,6 +8,7 @@
 
 
 #include "MvPartSelect.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -39,6 +40,24 @@ MvNode::tType
 MvPartSelect::type() const
 {
   return kPartSelect;
+}
+
+// @brief 可変 part-select ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力のビット幅
+// @param[in] bit_width2 範囲指定入力のビット幅
+// @param[in] bit_width3 範囲のビット幅(出力のビット幅)
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_partselect(MvModule* module,
+		      ymuint bit_width1,
+		      ymuint bit_width2,
+		      ymuint bit_width3)
+{
+  MvNode* node = new MvPartSelect(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

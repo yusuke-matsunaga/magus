@@ -8,6 +8,7 @@
 
 
 #include "MvIte.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -35,6 +36,23 @@ MvNode::tType
 MvIte::type() const
 {
   return kIte;
+}
+
+// @brief condition ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width ビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_ite(MvModule* module,
+	       ymuint bit_width)
+{
+  MvNode* node = new MvIte(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 3, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

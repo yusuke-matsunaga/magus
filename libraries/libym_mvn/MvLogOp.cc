@@ -8,6 +8,7 @@
 
 
 #include "MvLogOp.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -37,6 +38,23 @@ MvAnd::type() const
   return kAnd;
 }
 
+// @brief and ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width ビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_and(MvModule* module,
+	       ymuint bit_width)
+{
+  MvNode* node = new MvAnd(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvOr
@@ -63,6 +81,23 @@ MvOr::type() const
   return kOr;
 }
 
+// @brief or ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width ビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_or(MvModule* module,
+	      ymuint bit_width)
+{
+  MvNode* node = new MvOr(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvXor
@@ -87,6 +122,23 @@ MvNode::tType
 MvXor::type() const
 {
   return kXor;
+}
+
+// @brief xor ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width ビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_xor(MvModule* module,
+	       ymuint bit_width)
+{
+  MvNode* node = new MvXor(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

@@ -8,6 +8,7 @@
 
 
 #include "MvDff.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -61,6 +62,20 @@ MvDff1::type() const
   return kDff1;
 }
 
+// @brief 非同期セット/リセットタイプの FF ノードを生成する．
+MvNode*
+MvMgr::new_dff1(MvModule* module,
+		ymuint bit_width)
+{
+  MvNode* node = new MvDff1(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 4, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+  
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvDff2
@@ -85,6 +100,20 @@ MvNode::tType
 MvDff2::type() const
 {
   return kDff2;
+}
+
+// @brief 同期セット/リセットタイプの FF ノードを生成する．
+MvNode*
+MvMgr::new_dff2(MvModule* module,
+		ymuint bit_width)
+{
+  MvNode* node = new MvDff2(module, bit_width);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 4, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+  
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

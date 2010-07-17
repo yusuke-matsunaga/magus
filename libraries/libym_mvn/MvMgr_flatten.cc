@@ -34,10 +34,10 @@ void
 MvMgr::flatten_sub(MvModule* module,
 		   MvModule* top_module)
 {
-  ymuint n = module->max_node_id();
-  for (ymuint i = 0; i < n; ++ i) {
-    MvNode* node = module->node(i);
-    if ( node == NULL ) continue;
+  const list<MvNode*>& node_list = module->node_list();
+  for (list<MvNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    MvNode* node = *p;
     if ( node->type() == MvNode::kInst ) {
       MvModule* module1 = node->_module();
       flatten_sub(module1, top_module);

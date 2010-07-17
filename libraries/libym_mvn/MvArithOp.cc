@@ -8,6 +8,7 @@
 
 
 #include "MvArithOp.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -41,6 +42,27 @@ MvAdd::type() const
   return kAdd;
 }
 
+// @brief add ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力1のビット幅
+// @param[in] bit_width2 入力2のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_add(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvAdd(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvSub
@@ -69,6 +91,27 @@ MvNode::tType
 MvSub::type() const
 {
   return kSub;
+}
+
+// @brief sub ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力1のビット幅
+// @param[in] bit_width2 入力2のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_sub(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvSub(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 
@@ -101,6 +144,27 @@ MvMult::type() const
   return kMult;
 }
 
+// @brief mult ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力1のビット幅
+// @param[in] bit_width2 入力2のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_mult(MvModule* module,
+		ymuint bit_width1,
+		ymuint bit_width2,
+		ymuint bit_width3)
+{
+  MvNode* node = new MvMult(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvDiv
@@ -129,6 +193,27 @@ MvNode::tType
 MvDiv::type() const
 {
   return kDiv;
+}
+
+// @brief div ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力1のビット幅
+// @param[in] bit_width2 入力2のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_div(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvDiv(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 
@@ -161,6 +246,27 @@ MvMod::type() const
   return kMod;
 }
 
+// @brief modulo ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力1のビット幅
+// @param[in] bit_width2 入力2のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_mod(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvMod(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvPow
@@ -189,6 +295,27 @@ MvNode::tType
 MvPow::type() const
 {
   return kPow;
+}
+
+// @brief power ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力1のビット幅
+// @param[in] bit_width2 入力2のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_pow(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvPow(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 
@@ -221,6 +348,27 @@ MvSll::type() const
   return kSll;
 }
 
+// @brief shift left logical ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力データのビット幅
+// @param[in] bit_width2 シフト量のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_sll(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvSll(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvSrl
@@ -249,6 +397,27 @@ MvNode::tType
 MvSrl::type() const
 {
   return kSrl;
+}
+
+// @brief shift right logical ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力データのビット幅
+// @param[in] bit_width2 シフト量のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_srl(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvSrl(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 
@@ -281,6 +450,27 @@ MvSla::type() const
   return kSla;
 }
 
+// @brief shift left arithmetic ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力データのビット幅
+// @param[in] bit_width2 シフト量のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_sla(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvSla(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvSra
@@ -309,6 +499,27 @@ MvNode::tType
 MvSra::type() const
 {
   return kSra;
+}
+
+// @brief shift right arithmetic ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] bit_width1 入力データのビット幅
+// @param[in] bit_width2 シフト量のビット幅
+// @param[in] bit_width3 出力のビット幅
+// @return 生成したノードを返す．
+MvNode*
+MvMgr::new_sra(MvModule* module,
+	       ymuint bit_width1,
+	       ymuint bit_width2,
+	       ymuint bit_width3)
+{
+  MvNode* node = new MvSra(module, bit_width1, bit_width2, bit_width3);
+  reg_node(node);
+
+  assert_cond( node->input_num() == 2, __FILE__, __LINE__);
+  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

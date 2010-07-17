@@ -8,6 +8,7 @@
 
 
 #include "MvConcat.h"
+#include "ym_mvn/MvMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -43,6 +44,21 @@ MvNode::tType
 MvConcat::type() const
 {
   return kConcat;
+}
+
+// @brief concatenate ノードを生成する．
+// @param[in] module ノードが属するモジュール
+// @param[in] ibitwidth_array 入力のビット幅の配列
+// @return 生成したノードを返す．
+// @note 出力のビット幅は入力のビット幅の和となる．
+MvNode*
+MvMgr::new_concat(MvModule* module,
+		  const vector<ymuint>& ibitwidth_array)
+{
+  MvNode* node = new MvConcat(module, ibitwidth_array);
+  reg_node(node);
+
+  return node;
 }
 
 END_NAMESPACE_YM_MVN

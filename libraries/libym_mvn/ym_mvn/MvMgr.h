@@ -56,6 +56,16 @@ public:
   /// @note 該当するモジュールがない場合は NULL を返す．
   MvModule*
   module(ymuint id) const;
+  
+  /// @brief ノードの ID番号の最大値 + 1 を返す．
+  ymuint
+  max_node_id() const;
+
+  /// @brief ノードを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
+  /// @note NULL が還されることもある．
+  MvNode*
+  node(ymuint id) const;
 
 
 public:
@@ -525,8 +535,14 @@ private:
   // 場合によっては穴が空いている．
   vector<MvModule*> mModuleArray;
 
-  // ID番号を管理するためのオブジェクト
-  ItvlMgr mItvlMgr;
+  // モジュールのID番号を管理するためのオブジェクト
+  ItvlMgr mModuleItvlMgr;
+
+  // 全ノードを ID 番号をキーにして格納する配列
+  vector<MvNode*> mNodeArray;
+
+  // ノードのID番号を管理するためのオブジェクト
+  ItvlMgr mNodeItvlMgr;
   
 };
 
