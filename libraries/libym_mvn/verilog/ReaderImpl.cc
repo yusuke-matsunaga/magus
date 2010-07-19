@@ -458,11 +458,13 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 			   const DeclMap& decl_map)
 {
   if ( strcmp(vl_module->def_name(), "GTECH_FD2") == 0 ) {
-    // GTECH_FD2( input D, input CP, input CD, output Q );
+    // 特例
+    // GTECH_FD2( input D, input CP, input CD, output Q, output QN );
     //   D:  データ入力
     //   CP: クロック
     //   CD: 非同期リセット
     //   Q:  データ出力
+    //   QN: データ出力(反転)
     MvNode* node = mMvMgr->new_dff1(parent_module, 1);
     ymuint np = vl_module->port_num();
     assert_cond( np == 5, __FILE__, __LINE__);
@@ -498,7 +500,8 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
     }
     return node;
   }
-  
+
+  // 通常の処理
   MvModule* module = gen_module(vl_module);
   if ( module == NULL ) {
     return NULL;
@@ -512,7 +515,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
     const VlExpr* hi = vl_port->high_conn();
     switch ( vl_port->direction() ) {
     case kVpiInput:
-      // 普通の式が書ける．
+      // hi には普通の式が書ける．
       {
 	MvNode* node = gen_expr1(parent_module, hi, decl_map);
 	connect_port1(parent_module, port, node);
@@ -520,6 +523,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
       break;
       
     case kVpiOutput:
+      // hi は左辺式
       {
 	MvNode* node = port_to_node(parent_module, port);
 	connect_lhs(parent_module, hi, node, decl_map);
@@ -527,7 +531,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
       break;
       
     case kVpiMixedIO:
-      // 単純な参照か連結のみ
+      // hi は単純な参照か連結のみ
       //connect_port2(port, hi);
       break;
       
