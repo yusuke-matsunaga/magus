@@ -19,8 +19,7 @@ BEGIN_NAMESPACE_YM_MVN
 /// @class MvNode MvNode.h "ym_mvn/MvNode.h"
 /// @brief MvNetwork のノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvNode :
-  public DlElem
+class MvNode
 {
   friend class MvMgr;
 

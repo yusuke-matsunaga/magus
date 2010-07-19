@@ -34,6 +34,7 @@ DeclMap::clear()
     mTable[i] = NULL;
   }
   mNum = 0;
+  mAlloc.destroy();
 }
 
 // @brief Cell を登録する．

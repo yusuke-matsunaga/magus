@@ -13,13 +13,13 @@
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/MsgHandler.h"
+#include "DeclMap.h"
+#include "Driver.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 using namespace nsYm::nsVerilog;
-
-class DeclMap;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ReaderImpl ReaderImpl.h "ReaderImpl.h"
@@ -79,31 +79,26 @@ private:
 
   /// @brief 宣言要素を生成する．
   /// @param[in] module モジュール
-  /// @param[in] decl_map 宣言要素とノードの対応表
   /// @param[in] vl_scope 対象のスコープ
   /// @retval true 成功した．
   /// @retval false エラーが起こった．
   /// @note 内部に下位のスコープを含む場合には再帰する．
   bool
   gen_decl(MvModule* module,
-	   DeclMap& decl_map,
 	   const VlNamedObj* vl_scope);
 
   /// @brief 要素を生成する．
   /// @param[in] module モジュール
-  /// @param[in] decl_map 宣言要素とノードの対応表
   /// @param[in] vl_scope 対象のスコープ
   /// @retval true 成功した．
   /// @retval false エラーが起こった．
   /// @note 内部に下位のスコープを含む場合には再帰する．
   bool
   gen_item(MvModule* module,
-	   DeclMap& decl_map,
 	   const VlNamedObj* vl_scope);
 
   /// @brief ポート参照式の実体化を行う．
   /// @param[in] expr 対象の式
-  /// @param[in] decl_map 宣言要素の対応表
   /// @param[out] node 対応するノードを格納する変数
   /// @param[out] msb ビット指定位置か範囲指定の MSB を格納する変数
   /// @param[out] lsb 範囲指定の LSB を格納する変数
@@ -112,7 +107,6 @@ private:
   /// @retval 2 範囲指定形式だった．
   int
   gen_portref(const VlExpr* expr,
-	      const DeclMap& decl_map,
 	      MvNode*& node,
 	      ymuint& msb,
 	      ymuint& lsb);
@@ -120,12 +114,10 @@ private:
   /// @brief モジュールインスタンスの生成を行う．
   /// @param[in] vl_module モジュール
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] decl_map 宣言要素の対応表
   /// @return 対応するノードを返す．
   MvNode*
   gen_moduleinst(const VlModule* vl_module,
-		 MvModule* parent_module,
-		 const DeclMap& decl_map);
+		 MvModule* parent_module);
 
   /// @brief ポートに接続する．
   /// @param[in] parent_module 親のモジュール
@@ -154,34 +146,28 @@ private:
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 左辺式
   /// @param[in] node 右辺に対応するノード
-  /// @param[in] decl_map 宣言要素の対応表
   void
   connect_lhs(MvModule* parent_module,
 	      const VlExpr* expr,
-	      MvNode* node,
-	      const DeclMap& decl_map);
+	      MvNode* node);
 
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 左辺式
   /// @param[in] node 右辺に対応するノード
-  /// @param[in] decl_map 宣言要素の対応表
   /// @param[in] offset node に対するオフセット
   void
   connect_lhs_sub(MvModule* parent_module,
 		  const VlExpr* expr,
 		  MvNode* node,
-		  const DeclMap& decl_map,
 		  ymuint offset);
   
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] prim プリミティブ
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] decl_map 宣言要素の対応表
   void
   gen_priminst(const VlPrimitive* prim,
-	       MvModule* parent_module,
-	       const DeclMap& decl_map);
+	       MvModule* parent_module);
 
   /// @brief AND のバランス木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -219,19 +205,21 @@ private:
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式
-  /// @param[in] decl_map 宣言要素の対応表
   MvNode*
   gen_expr1(MvModule* parent_module,
-	    const VlExpr* expr,
-	    const DeclMap& decl_map);
+	    const VlExpr* expr);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
-  /// @param[in] decl_map 宣言要素の対応表
   MvNode*
-  gen_expr2(const VlExpr* expr,
-	    const DeclMap& decl_map);
+  gen_expr2(const VlExpr* expr);
 
+  /// @brief ドライバーを登録する．
+  /// @param[in] node 左辺に対応するノード
+  /// @param[in] driver ドライバー
+  void
+  reg_driver(MvNode* node,
+	     const Driver& driver);
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -246,6 +234,12 @@ private:
 
   // MvNetwork を扱うマネージャ
   MvMgr* mMvMgr;
+
+  // VlDecl と MvNode の対応付けをとるハッシュ表
+  DeclMap mDeclMap;
+
+  // VlDecl のドライバーのリスト
+  vector<vector<Driver> > mDriverList;
   
 };
 
