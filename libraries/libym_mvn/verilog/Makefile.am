@@ -15,6 +15,7 @@ noinst_LTLIBRARIES = libym_mvn_verilog.la
 libym_mvn_verilog_la_SOURCES = \
 	DeclMap.h \
 	DeclMap.cc \
+	Driver.h \
 	MvVerilogReader.cc \
 	ReaderImpl.h \
 	ReaderImpl.cc
