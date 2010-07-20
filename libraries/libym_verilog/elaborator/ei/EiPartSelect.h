@@ -76,6 +76,12 @@ public:
   const VlDecl*
   decl_obj() const;
   
+  /// @brief 固定選択子の時 true を返す．
+  /// @note ビット選択，部分選択の時，意味を持つ．
+  virtual
+  bool
+  is_constant_select() const;
+  
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
   virtual
@@ -87,6 +93,18 @@ public:
   virtual
   const VlExpr*
   right_range() const;
+  
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 式に対する範囲選択の時，意味を持つ．
+  virtual
+  int
+  left_range_val() const;
+
+  /// @brief 範囲の LSB の値を返す．
+  /// @note 式に対する範囲選択の時，意味を持つ．
+  virtual
+  int
+  right_range_val() const;
 
   /// @brief スカラー値を返す．
   virtual

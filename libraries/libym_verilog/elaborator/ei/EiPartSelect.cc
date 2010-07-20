@@ -174,6 +174,15 @@ EiPartSelect::decl_obj() const
   return mObj;
 }
 
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
+bool
+EiPartSelect::is_constant_select() const
+{
+  // mIndex2 は常に定数のはず
+  return mIndex1->is_const();
+}
+
 // @brief 範囲の MSB の式を返す．
 // @note 通常の範囲選択の時，意味を持つ．
 const VlExpr*
@@ -188,6 +197,30 @@ const VlExpr*
 EiPartSelect::right_range() const
 {
   return mIndex2;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 式に対する範囲選択の時，意味を持つ．
+int
+EiPartSelect::left_range_val() const
+{
+  int ans;
+  if ( !mIndex1->eval_int(ans) ) {
+    return 0;
+  }
+  return ans;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 式に対する範囲選択の時，意味を持つ．
+int
+EiPartSelect::right_range_val() const
+{
+  int ans;
+  if ( !mIndex2->eval_int(ans) ) {
+    return 0;
+  }
+  return ans;
 }
 
 // @brief スカラー値を返す．
