@@ -72,6 +72,12 @@ public:
   const VlDecl*
   decl_obj() const;
   
+  /// @brief 固定選択子の時 true を返す．
+  /// @note ビット選択，部分選択の時，意味を持つ．
+  virtual
+  bool
+  is_constant_select() const;
+  
   /// @brief インデックス式を返す．
   virtual
   const VlExpr*

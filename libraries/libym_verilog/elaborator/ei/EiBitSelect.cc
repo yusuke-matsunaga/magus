@@ -145,6 +145,14 @@ EiBitSelect::decl_obj() const
 {
   return mObj;
 }
+  
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
+bool
+EiBitSelect::is_constant_select() const
+{
+  return mIndex->is_const();
+}
 
 // @brief インデックス式を返す．
 const VlExpr*
