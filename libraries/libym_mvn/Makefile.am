@@ -35,14 +35,11 @@ libym_mvn_la_SOURCES = \
 	MvDff.cc \
 	MvInput.h \
 	MvInput.cc \
-	MvInst.h \
-	MvInst.cc \
 	MvIte.h \
 	MvIte.cc \
 	MvLogOp.h \
 	MvLogOp.cc \
 	MvMgr.cc \
-	MvMgr_flatten.cc \
 	MvModule.cc \
 	MvNode.cc \
 	MvNot.h \

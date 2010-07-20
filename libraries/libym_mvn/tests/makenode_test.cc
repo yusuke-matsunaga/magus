@@ -74,8 +74,6 @@ main(int argc,
     MvNode* node24 = mgr.new_concat(module, ibw_array);
 
     MvModule* module1 = mgr.new_module("sub", 8, 4, 4);
-    
-    MvNode* node40 = mgr.new_inst(module, module1);
 
     vector<ymuint32> val(1);
     val[0] = 10;

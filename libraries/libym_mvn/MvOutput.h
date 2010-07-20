@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_mvn/MvNode.h"
+#include "MvUnaryOp.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_MVN
 /// @brief 出力ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
 class MvOutput :
-  public MvNode
+  public MvUnaryOp
 {
   friend class MvMgr;
 
@@ -30,12 +30,6 @@ public:
   tType
   type() const;
 
-  /// @brief 入力ノード/出力ノードの場合に位置を返す．
-  /// @note type() が kOutput と kOutput の時のみ意味を持つ．
-  virtual
-  ymuint
-  pos() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -44,23 +38,12 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
-  /// @param[in] pos 位置
   /// @param[in] bit_width ビット幅
   MvOutput(MvModule* module,
-	   ymuint pos,
 	   ymuint bit_width);
 
   /// @brief デストラクタ
   ~MvOutput();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-  
-  // 位置
-  ymuint32 mPos;
 
 };
 

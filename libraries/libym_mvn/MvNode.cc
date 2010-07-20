@@ -46,24 +46,6 @@ MvNode::~MvNode()
   delete [] mOutputPins;
 }
 
-// @brief 入力ノード/出力ノードの場合に位置を返す．
-// @note type() が kInput と kOutput の時のみ意味を持つ．
-// @note デフォルトの実装では 0 を返す．
-ymuint
-MvNode::pos() const
-{
-  return 0;
-}
-
-// @brief 下位モジュールを得る．
-// @note type() が kInst の時のみ意味を持つ．
-// @note デフォルトの実装では NULL を返す．
-MvModule*
-MvNode::_module() const
-{
-  return NULL;
-}
-
 // @brief ビット位置を得る．
 // @note type() が kConstBitSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．

@@ -48,8 +48,8 @@ dump_node(ostream& s,
   s << "Node#" << node->id()
     << ":";
   switch ( node->type() ) {
-  case MvNode::kInput:      s << "Input[" << node->pos() << "]"; break;
-  case MvNode::kOutput:     s << "Output[" << node->pos() << "]"; break;
+  case MvNode::kInput:      s << "Input"; break;
+  case MvNode::kOutput:     s << "Output"; break;
   case MvNode::kDff1:       s << "DFF1"; break;
   case MvNode::kDff2:       s << "DFF2"; break;
   case MvNode::kThrough:    s << "Through"; break;
@@ -78,8 +78,6 @@ dump_node(ostream& s,
   case MvNode::kConstPartSelect: s << "PartSelect"; break;
   case MvNode::kBitSelect:  s << "BitSelect"; break;
   case MvNode::kPartSelect: s << "PartSelect"; break;
-  case MvNode::kInst:       s << "Inst of Module#"
-			      << node->module()->id(); break;
   case MvNode::kCombUdp:    s << "Combinational UDP"; break;
   case MvNode::kSeqUdp:    s << "Sequential UDP"; break;
   case MvNode::kConst:      s << "Const"; break;
@@ -233,12 +231,12 @@ MvMgr::new_module(const char* name,
   mModuleArray[id] = module;
 
   for (ymuint i = 0; i < ni; ++ i) {
-    MvNode* node = new MvInput(module, i, ibitwidth_array[i]);
+    MvNode* node = new MvInput(module, ibitwidth_array[i]);
     reg_node(node);
     module->mInputArray[i] = node;
   }
   for (ymuint i = 0; i < no; ++ i) {
-    MvNode* node = new MvOutput(module, i, obitwidth_array[i]);
+    MvNode* node = new MvOutput(module, obitwidth_array[i]);
     reg_node(node);
     module->mOutputArray[i] = node;
   }

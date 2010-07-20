@@ -114,8 +114,7 @@ private:
   /// @brief モジュールインスタンスの生成を行う．
   /// @param[in] vl_module モジュール
   /// @param[in] parent_module 親のモジュール
-  /// @return 対応するノードを返す．
-  MvNode*
+  void
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
 

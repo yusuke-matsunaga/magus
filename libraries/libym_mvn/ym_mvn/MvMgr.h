@@ -425,14 +425,6 @@ public:
 		 ymuint bit_width2,
 		 ymuint bit_width3);
 
-  /// @brief module instance ノードを生成する．
-  /// @param[in] module ノードが属するモジュール
-  /// @param[in] submodule 下位モジュール
-  /// @return 生成したノードを返す．
-  MvNode*
-  new_inst(MvModule* module,
-	   MvModule* submodule);
-
   /// @brief combinational UDP ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] ni 入力数

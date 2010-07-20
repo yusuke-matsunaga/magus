@@ -107,9 +107,6 @@ public:
 
     /// @brief part-select ( 3入力, 1出力 )
     kPartSelect,
-    
-    /// @brief module instance ( n入力, m出力 )
-    kInst,
 
     /// @brief combinational UDP ( n入力, 1出力 )
     kCombUdp,
@@ -155,19 +152,6 @@ public:
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
   const MvOutputPin*
   output(ymuint pos) const;
-
-  /// @brief 入力ノード/出力ノードの場合に位置を返す．
-  /// @note type() が kInput と kOutput の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  virtual
-  ymuint
-  pos() const;
-
-  /// @brief 下位モジュールを得る．
-  /// @note type() が kInst の時のみ意味を持つ．
-  /// @note デフォルトの実装では NULL を返す．
-  const MvModule*
-  module() const;
 
   /// @brief ビット位置を得る．
   /// @note type() が kConstBitSelect の時のみ意味を持つ．
@@ -238,19 +222,6 @@ protected:
   void
   set_bit_width(MvPin* pin,
 		ymuint bit_width);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // MvMgr が用いる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 下位モジュールを得る．
-  /// @note type() が kInst の時のみ意味を持つ．
-  /// @note デフォルトの実装では NULL を返す．
-  virtual
-  MvModule*
-  _module() const;
 
 
 private:
@@ -352,16 +323,6 @@ MvOutputPin*
 MvNode::_output(ymuint pos)
 {
   return &mOutputPins[pos];
-}
-
-// @brief 下位モジュールを得る．
-// @note type() が kInst の時のみ意味を持つ．
-// @note デフォルトの実装では NULL を返す．
-inline
-const MvModule*
-MvNode::module() const
-{
-  return _module();
 }
 
 END_NAMESPACE_YM_MVN

@@ -10,7 +10,7 @@
 
 
 #include "ym_mvn/mvn_nsdef.h"
-#include "ym_utils/DlList.h"
+#include "ym_mvn/MvNode.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
@@ -19,8 +19,7 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 /// @class Driver Driver.h "Driver.h"
 /// @brief ドライバーを表すクラス
 //////////////////////////////////////////////////////////////////////
-class Driver :
-  public DlElem
+class Driver
 {
 public:
 
