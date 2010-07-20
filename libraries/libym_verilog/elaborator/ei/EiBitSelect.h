@@ -76,6 +76,12 @@ public:
   virtual
   const VlExpr*
   index() const;
+  
+  /// @brief インデックス値を返す．
+  /// @note 式に対するビット選択の時，意味を持つ．
+  virtual
+  int
+  index_val() const;
 
   /// @brief スカラー値を返す．
   virtual

@@ -344,8 +344,10 @@ ModuleGen::instantiate_iodecl(ElbModule* module,
 		      kMsgError,
 		      "ELAB",
 		      buf.str());
-	      cout << "IO range: [" << left_val << ":" << right_val << "]" << endl
-		   << "Decl range: [" << left2_val << ":" << right2_val << "]" << endl;
+	      cout << "IO range: [" << left_val << ":" << right_val << "]"
+		   << endl
+		   << "Decl range: [" << left2_val << ":" << right2_val << "]"
+		   << endl;
 	      continue;
 	    }
 	  }
@@ -394,7 +396,8 @@ ModuleGen::instantiate_iodecl(ElbModule* module,
 	}
 
 	ElbDeclHead* head = factory().new_DeclHead(module, pt_head, aux_type,
-						   left, right);
+						   left, right,
+						   left_val, right_val);
 	
 	const PtExpr* pt_init = pt_item->init_value();
 	ElbExpr* init = NULL;

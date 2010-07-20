@@ -153,6 +153,18 @@ EiBitSelect::index() const
   return mIndex;
 }
 
+// @brief インデックス値を返す．
+// @note 式に対するビット選択の時，意味を持つ．
+int
+EiBitSelect::index_val() const
+{
+  int ans;
+  if ( !mIndex->eval_int(ans) ) {
+    return 0;
+  }
+  return ans;
+}
+
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiBitSelect::eval_scalar() const
