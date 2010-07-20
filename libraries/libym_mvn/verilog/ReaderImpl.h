@@ -77,6 +77,13 @@ private:
   MvModule*
   gen_module(const VlModule* vl_module);
 
+  /// @brief モジュール内部の要素を生成する．
+  /// @param[in] module 親のモジュール
+  /// @param[in] vl_module 対象のモジュール
+  void
+  gen_moduleitem(MvModule* module,
+		 const VlModule* vl_module);
+
   /// @brief 宣言要素を生成する．
   /// @param[in] module モジュール
   /// @param[in] vl_scope 対象のスコープ
@@ -117,30 +124,7 @@ private:
   void
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
-
-  /// @brief ポートに接続する．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] port 対象のポート
-  /// @param[in] node 接続するノード
-  void
-  connect_port1(MvModule* parent_module,
-		const MvPort* port,
-		MvNode* node);
-
-  /// @brief ポートの内容に対応するノードを作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] port 対象のポート
-  MvNode*
-  port_to_node(MvModule* parent_module,
-	       const MvPort* port);
-
-  /// @brief ポート参照式に対応するノードを作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] port_ref 対象のポート参照式
-  MvNode*
-  port_ref_to_node(MvModule* parent_module,
-		   const MvPortRef* port_ref);
-
+  
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 左辺式

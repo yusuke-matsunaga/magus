@@ -218,10 +218,22 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
     }
   }
 
+  gen_moduleitem(module, vl_module);
+  
+  return module;
+}
+
+// @brief モジュール内部の要素を生成する．
+// @param[in] module 親のモジュール
+// @param[in] vl_module 対象のモジュール
+void
+ReaderImpl::gen_moduleitem(MvModule* module,
+			   const VlModule* vl_module)
+{
   // 宣言要素を生成する．
   bool stat = gen_decl(module, vl_module);
   if ( !stat ) {
-    return NULL;
+    return;
   }
 
   ymuint n = mMvMgr->max_node_id();
@@ -234,9 +246,10 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
   // 要素を生成する．
   stat = gen_item(module, vl_module);
   if ( !stat ) {
-    return NULL;
+    return;
   }
 
+  // 結線を行う．
   n = mMvMgr->max_node_id();
   for (ymuint i = 0; i < n; ++ i) {
     MvNode* node = mMvMgr->node(i);
@@ -331,8 +344,6 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
       }
     }
   }
-  
-  return module;
 }
 
 // @brief 宣言要素を生成する．
@@ -598,30 +609,38 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
   }
 
   // 通常の処理
-  MvModule* module = gen_module(vl_module);
-  if ( module == NULL ) {
-    return;
+
+  // 入出力ノードに対応する through ノードを作る．
+  ymuint nio = vl_module->io_num();
+  for (ymuint i = 0; i < nio; ++ i) {
+    const VlIODecl* io = vl_module->io(i);
+    MvNode* node = mMvMgr->new_through(parent_module, io->bit_size());
+    mDeclMap.add(io->decl(), node);
   }
 
+  gen_moduleitem(parent_module, vl_module);
+
+  // ポートの接続を行う．
   ymuint np = vl_module->port_num();
   for (ymuint i = 0; i < np; ++ i) {
     const VlPort* vl_port = vl_module->port(i);
-    MvPort* port = module->port(i);
-
     const VlExpr* hi = vl_port->high_conn();
+    const VlExpr* lo = vl_port->low_conn();
     switch ( vl_port->direction() ) {
     case kVpiInput:
-      // hi には普通の式が書ける．
+      // hi は右辺式
+      // lo は左辺式
       {
 	MvNode* node1 = gen_expr1(parent_module, hi);
-	connect_port1(parent_module, port, node1);
+	connect_lhs(parent_module, lo, node1);
       }
       break;
       
     case kVpiOutput:
       // hi は左辺式
+      // lo は右辺式
       {
-	MvNode* node1 = port_to_node(parent_module, port);
+	MvNode* node1 = gen_expr1(parent_module, lo);
 	connect_lhs(parent_module, hi, node1);
       }
       break;
@@ -630,6 +649,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
       // hi は単純な参照か連結のみ
       //connect_port2(port, hi);
       // TODO: connect_port2 を作る
+      assert_not_reached(__FILE__, __LINE__);
       break;
       
     default:
@@ -639,123 +659,6 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
   }
 }
 
-// @brief ポートに接続する．
-// @param[in] parent_module 親のモジュール
-// @param[in] port 対象のポート
-// @param[in] node 接続するノード
-void
-ReaderImpl::connect_port1(MvModule* parent_module,
-			  const MvPort* port,
-			  MvNode* node)
-{
-  ymuint n = port->port_ref_num();
-  ymuint bit_width = node->output(0)->bit_width();
-  if ( n == 1 ) {
-    const MvPortRef* port_ref = port->port_ref(0);
-    assert_cond( port_ref->bit_width() == bit_width, __FILE__, __LINE__);
-    MvNode* lhs_node = port_ref->node();
-    if ( port_ref->is_simple() ) {
-      reg_driver(lhs_node, Driver(node));
-    }
-    else if ( port_ref->has_bitselect() ) {
-      reg_driver(lhs_node, Driver(node, port_ref->bitpos()));
-    }
-    else if ( port_ref->has_partselect() ) {
-      reg_driver(lhs_node, Driver(node, port_ref->msb(), port_ref->lsb()));
-    }
-  }
-  else {
-    ymuint last = 0;
-    for (ymuint i = 0; i < n; ++ i) {
-      const MvPortRef* port_ref = port->port_ref(i);
-      ymuint bw = port_ref->bit_width();
-      MvNode* node1 = NULL;
-      if ( bw == 1 ) {
-	node1 = mMvMgr->new_constbitselect(parent_module,
-					   last,
-					   bit_width);
-      }
-      else {
-	node1 = mMvMgr->new_constpartselect(parent_module,
-					    last + bw - 1,
-					    last,
-					    bit_width);
-      }
-      mMvMgr->connect(node, 0, node1, 0);
-      last += bw;
-      MvNode* lhs_node = port_ref->node();
-      if ( port_ref->is_simple() ) {
-	reg_driver(lhs_node, Driver(node1));
-      }
-      else if ( port_ref->has_bitselect() ) {
-	reg_driver(lhs_node, Driver(node1, port_ref->bitpos()));
-      }
-      else if ( port_ref->has_partselect() ) {
-	reg_driver(lhs_node, Driver(node1, port_ref->msb(), port_ref->lsb()));
-      }
-    }
-  }
-}
-
-// @brief ポートの内容に対応するノードを作る．
-// @param[in] parent_module 親のモジュール
-// @param[in] port 対象のポート
-MvNode*
-ReaderImpl::port_to_node(MvModule* parent_module,
-			 const MvPort* port)
-{
-  ymuint n = port->port_ref_num();
-  if ( n == 1 ) {
-    const MvPortRef* port_ref = port->port_ref(0);
-    MvNode* node = port_ref_to_node(parent_module, port_ref);
-    return node;
-  }
-  
-  vector<ymuint> bw_array(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const MvPortRef* port_ref = port->port_ref(i);
-    bw_array[i] = port_ref->bit_width();
-  }
-  MvNode* node_o = mMvMgr->new_concat(parent_module, bw_array);
-  for (ymuint i = 0; i < n; ++ i) {
-    const MvPortRef* port_ref = port->port_ref(i);
-    MvNode* node = port_ref_to_node(parent_module, port_ref);
-    mMvMgr->connect(node, 0, node_o, i);
-  }
-  return node_o;
-}
-
-// @brief ポート参照式に対応するノードを作る．
-// @param[in] parent_module 親のモジュール
-// @param[in] port_ref 対象のポート参照式
-MvNode*
-ReaderImpl::port_ref_to_node(MvModule* parent_module,
-			     const MvPortRef* port_ref)
-{
-  MvNode* node = port_ref->node();
-  ymuint bw = node->output(0)->bit_width();
-  MvNode* node1 = NULL;
-  if ( port_ref->is_simple() ) {
-    node1 = node;
-  }
-  else if ( port_ref->has_bitselect() ) {
-    node1 = mMvMgr->new_constbitselect(parent_module,
-				       port_ref->bitpos(),
-				       bw);
-    mMvMgr->connect(node, 0, node1, 0);
-  }
-  else if ( port_ref->has_partselect() ) {
-    MvNode* node1 = mMvMgr->new_constpartselect(parent_module,
-						port_ref->msb(),
-						port_ref->lsb(),
-						bw);
-    mMvMgr->connect(node, 0, node1, 0);
-  }
-  else {
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  return node1;
-}
 
 // @brief 左辺式に接続する．
 // @param[in] parent_module 親のモジュール
