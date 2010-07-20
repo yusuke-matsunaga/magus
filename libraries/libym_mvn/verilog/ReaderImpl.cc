@@ -246,22 +246,11 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
     if ( dlist.empty() ) {
       continue;
     }
-    cout << "dlist[" << node->id() << "]" << endl;
     ymuint bw = node->input(0)->bit_width();
     vector<const Driver*> tmp(bw, NULL);
     for (vector<Driver>::const_iterator p = dlist.begin();
 	 p != dlist.end(); ++ p) {
       const Driver* driver = &*p;
-      cout << "Driver(" << driver->rhs_node()->id();
-      if ( driver->has_bitselect() ) {
-	cout << ", " << driver->index();
-      }
-      else if ( driver->has_partselect() ) {
-	cout << ", " << driver->msb()
-	     << ", " << driver->lsb();
-      }
-      cout << ")" << endl;
-
       if ( driver->is_simple() ) {
 	for (ymuint i = 0; i < bw; ++ i) {
 	  if ( tmp[i] != NULL ) {
@@ -666,24 +655,12 @@ ReaderImpl::connect_port1(MvModule* parent_module,
     assert_cond( port_ref->bit_width() == bit_width, __FILE__, __LINE__);
     MvNode* lhs_node = port_ref->node();
     if ( port_ref->is_simple() ) {
-      cout << "reg_driver(" << lhs_node->id()
-	   << ", Driver(" << node->id()
-	   << "))" << endl;
       reg_driver(lhs_node, Driver(node));
     }
     else if ( port_ref->has_bitselect() ) {
-      cout << "reg_driver(" << lhs_node->id()
-	   << ", Driver(" << node->id()
-	   << ", " << port_ref->bitpos()
-	   << "))" << endl;
       reg_driver(lhs_node, Driver(node, port_ref->bitpos()));
     }
     else if ( port_ref->has_partselect() ) {
-      cout << "reg_driver(" << lhs_node->id()
-	   << ", Driver(" << node->id()
-	   << ", " << port_ref->msb()
-	   << ", " << port_ref->lsb()
-	   << "))" << endl;
       reg_driver(lhs_node, Driver(node, port_ref->msb(), port_ref->lsb()));
     }
   }
@@ -708,24 +685,12 @@ ReaderImpl::connect_port1(MvModule* parent_module,
       last += bw;
       MvNode* lhs_node = port_ref->node();
       if ( port_ref->is_simple() ) {
-	cout << "reg_driverB(" << lhs_node->id()
-	     << ", Driver(" << node1->id()
-	     << "))" << endl;
 	reg_driver(lhs_node, Driver(node1));
       }
       else if ( port_ref->has_bitselect() ) {
-	cout << "reg_driverB(" << lhs_node->id()
-	     << ", Driver(" << node1->id()
-	     << ", " << port_ref->bitpos()
-	     << "))" << endl;
 	reg_driver(lhs_node, Driver(node1, port_ref->bitpos()));
       }
       else if ( port_ref->has_partselect() ) {
-	cout << "reg_driverB(" << lhs_node->id()
-	     << ", Driver(" << node1->id()
-	     << ", " << port_ref->msb()
-	     << ", " << port_ref->lsb()
-	     << "))" << endl;
 	reg_driver(lhs_node, Driver(node1, port_ref->msb(), port_ref->lsb()));
       }
     }
@@ -801,56 +766,38 @@ ReaderImpl::connect_lhs(MvModule* parent_module,
 			const VlExpr* expr,
 			MvNode* node)
 {
-  cout << "connect_lhs(" << expr->decompile() << ")" << endl;
   switch ( expr->type() ) {
   case kVpiBitSelect:
     {
-      cout << "expr->type() == kVpiBitSelect" << endl;
       assert_cond( node->output(0)->bit_width() == 1, __FILE__, __LINE__);
       assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
       MvNode* node1 = gen_expr2(expr);
-      cout << "reg_driverC(" << node1->id()
-	   << ", Driver(" << node->id()
-	   << ", " << expr->index_val()
-	   << "))" << endl;
       reg_driver(node1, Driver(node, expr->index_val()));
     }
     break;
 
   case kVpiNetBit:
     {
-      cout << "expr->type() == kVpiNetBit" << endl;
       assert_cond( node->output(0)->bit_width() == 1, __FILE__, __LINE__);
       MvNode* node1 = gen_expr2(expr);
-      cout << "reg_driverC(" << node1->id()
-	   << ", Driver(" << node->id()
-	   << ", " << expr->index_val()
-	   << "))" << endl;
       reg_driver(node1, Driver(node, expr->index_val()));
     }
     break;
     
   case kVpiPartSelect:
     {
-      cout << "expr->type() == kVpiPartSelect" << endl;
       assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
       MvNode* node1 = gen_expr2(expr);
       ymuint msb = expr->left_range_val();
       ymuint lsb = expr->right_range_val();
       assert_cond( node->output(0)->bit_width() == msb - lsb + 1,
 		   __FILE__, __LINE__);
-      cout << "reg_driverC(" << node1->id()
-	   << ", Driver(" << node->id()
-	   << ", " << msb
-	   << ", " << lsb
-	   << "))" << endl;
       reg_driver(node1, Driver(node, msb, lsb));
     }
     break;
 
   case kVpiOperation:
     {
-      cout << "expr->type() == kVpiOperation" << endl;
       assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
       ymuint n = expr->operand_num();
       ymuint offset = 0;
@@ -864,13 +811,9 @@ ReaderImpl::connect_lhs(MvModule* parent_module,
 
   default:
     {
-      cout << "expr->type() == " << expr->type() << endl;
       assert_cond( node->output(0)->bit_width() == expr->bit_size(),
 		   __FILE__, __LINE__);
       MvNode* node1 = gen_expr2(expr);
-      cout << "reg_driverC(" << node1->id()
-	   << ", Driver(" << node->id()
-	   << "))" << endl;
       reg_driver(node1, Driver(node));
     }
     break;
@@ -897,10 +840,6 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
 						 offset,
 						 bw);
       mMvMgr->connect(node, 0, node2, 0);
-      cout << "reg_driverD(" << node1->id()
-	   << ", Driver(" << node2->id()
-	   << ", " << expr->index_val()
-	   << "))" << endl;
       reg_driver(node1, Driver(node2, expr->index_val()));
     }
     break;
@@ -917,11 +856,6 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
 						  offset,
 						  bw);
       mMvMgr->connect(node, 0, node2, 0);
-      cout << "reg_driverD(" << node1->id()
-	   << ", Driver(" << node2->id()
-	   << ", " << msb
-	   << ", " << lsb
-	   << "))" << endl;
       reg_driver(node1, Driver(node2, msb, lsb));
     }
     break;
@@ -1229,7 +1163,8 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 {
   switch ( expr->type() ) {
   case kVpiBitSelect:
-    {
+  case kVpiNetBit:
+   {
       MvNode* node = gen_expr2(expr);
       if ( expr->is_constant_select() ) {
 	ymuint bitpos = expr->index_val();
@@ -1270,6 +1205,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
       else {
 	// まだできてない．
 	// というか可変 part_select は VPI がおかしいと思う．
+	assert_not_reached(__FILE__, __LINE__);
 	return NULL;
       }
     }
@@ -1277,12 +1213,13 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 
   case kVpiOperation:
     {
+      assert_not_reached(__FILE__, __LINE__);
     }
     break;
 
   case kVpiConstant:
     {
-      
+      assert_not_reached(__FILE__, __LINE__);
     }
     break;
 

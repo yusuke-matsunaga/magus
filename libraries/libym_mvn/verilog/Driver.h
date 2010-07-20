@@ -10,7 +10,6 @@
 
 
 #include "ym_mvn/mvn_nsdef.h"
-#include "ym_mvn/MvNode.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
