@@ -154,6 +154,10 @@ public:
 	       ymuint msb,
 	       ymuint lsb);
 
+  /// @brief 冗長な through ノードを取り除く
+  void
+  sweep();
+
   /// @brief 非同期セット/リセットタイプの FF ノードを生成する．
   MvNode*
   new_dff1(MvModule* module,

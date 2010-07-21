@@ -17,6 +17,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_mvn.la
 
 libym_mvn_la_SOURCES = \
+	dump.cc \
 	MvArithOp.h \
 	MvArithOp.cc \
 	MvBinaryOp.h \

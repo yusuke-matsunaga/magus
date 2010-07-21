@@ -49,16 +49,6 @@ public:
   /// @param[in] pos 位置 ( 0 <= pos < port_num() )
   MvPort*
   port(ymuint pos);
-  
-  /// @brief ノードの ID番号の最大値 + 1 を返す．
-  ymuint
-  max_node_id() const;
-
-  /// @brief ノードを得る．
-  /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
-  /// @note NULL が還されることもある．
-  MvNode*
-  node(ymuint id) const;
 
   /// @brief 入力ノード数を得る．
   ymuint
@@ -140,12 +130,6 @@ private:
   // 内部ノードのリスト
   list<MvNode*> mNodeList;
 
-  // 全ノードを ID 番号をキーにして格納する配列
-  vector<MvNode*> mNodeArray;
-
-  // ID番号を管理するためのオブジェクト
-  ItvlMgr mItvlMgr;
-  
 };
 
 
@@ -193,24 +177,6 @@ MvPort*
 MvModule::port(ymuint pos)
 {
   return mPortArray[pos];
-}
-
-// @brief ノードの ID番号の最大値 + 1 を返す．
-inline
-ymuint
-MvModule::max_node_id() const
-{
-  return mNodeArray.size();
-}
-
-// @brief ノードを得る．
-// @param[in] id ID番号 ( 0 <= id < max_node_id() )
-// @note NULL が還されることもある．
-inline
-MvNode*
-MvModule::node(ymuint id) const
-{
-  return mNodeArray[id];
 }
 
 // @brief 入力ノード数を得る．

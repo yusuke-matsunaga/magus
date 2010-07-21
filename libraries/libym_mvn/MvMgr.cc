@@ -20,102 +20,6 @@
 
 BEGIN_NAMESPACE_YM_MVN
 
-BEGIN_NONAMESPACE
-
-// MvInputPin の内容を出力する．
-void
-dump_inputpin(ostream& s,
-	      const MvInputPin* pin)
-{
-  s << "InputPin#" << pin->pos()
-    << "(" << pin->bit_width() << ")" << endl;
-}
-
-// MvOutputPin の内容を出力する．
-void
-dump_outputpin(ostream& s,
-	       const MvOutputPin* pin)
-{
-  s << "OutputPin#" << pin->pos()
-    << "(" << pin->bit_width() << ")" << endl;
-}
-
-// MvNode の内容を出力する．
-void
-dump_node(ostream& s,
-	  const MvNode* node)
-{
-  s << "Node#" << node->id()
-    << ":";
-  switch ( node->type() ) {
-  case MvNode::kInput:      s << "Input"; break;
-  case MvNode::kOutput:     s << "Output"; break;
-  case MvNode::kDff1:       s << "DFF1"; break;
-  case MvNode::kDff2:       s << "DFF2"; break;
-  case MvNode::kThrough:    s << "Through"; break;
-  case MvNode::kNot:        s << "Not"; break;
-  case MvNode::kAnd:        s << "And"; break;
-  case MvNode::kOr:         s << "Or"; break;
-  case MvNode::kXor:        s << "Xor"; break;
-  case MvNode::kRand:       s << "Rand"; break;
-  case MvNode::kRor:        s << "Ror"; break;
-  case MvNode::kRxor:       s << "Rxor"; break;
-  case MvNode::kEq:         s << "Eq"; break;
-  case MvNode::kLt:         s << "Lt"; break;
-  case MvNode::kSll:        s << "Sll"; break;
-  case MvNode::kSrl:        s << "Srl"; break;
-  case MvNode::kSla:        s << "Sla"; break;
-  case MvNode::kSra:        s << "Sra"; break;
-  case MvNode::kAdd:        s << "Add"; break;
-  case MvNode::kSub:        s << "Sub"; break;
-  case MvNode::kMult:       s << "Mult"; break;
-  case MvNode::kDiv:        s << "Div"; break;
-  case MvNode::kMod:        s << "Mod"; break;
-  case MvNode::kPow:        s << "Pow"; break;
-  case MvNode::kIte:        s << "Ite"; break;
-  case MvNode::kConcat:     s << "Concat"; break;
-  case MvNode::kConstBitSelect:  s << "BitSelect"; break;
-  case MvNode::kConstPartSelect: s << "PartSelect"; break;
-  case MvNode::kBitSelect:  s << "BitSelect"; break;
-  case MvNode::kPartSelect: s << "PartSelect"; break;
-  case MvNode::kCombUdp:    s << "Combinational UDP"; break;
-  case MvNode::kSeqUdp:    s << "Sequential UDP"; break;
-  case MvNode::kConst:      s << "Const"; break;
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  s << endl;
-  ymuint ni = node->input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const MvInputPin* pin = node->input(i);
-    dump_inputpin(s, pin);
-  }
-  ymuint no = node->output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    const MvOutputPin* pin = node->output(i);
-    dump_outputpin(s, pin);
-  }
-}
-
-// MvNet の内容を出力する．
-void
-dump_net(ostream& s,
-	 const MvNet* net)
-{
-  const MvOutputPin* src_pin = net->src_pin();
-  const MvInputPin* dst_pin = net->dst_pin();
-  
-  s << "Output#" << src_pin->pos() << "@Node#" << src_pin->node()->id()
-    << "@Module#" << src_pin->node()->parent()->id() << endl
-    << " ==>"
-    << "Input#" << dst_pin->pos() << "@Node#" << dst_pin->node()->id()
-    << "@Module#" << dst_pin->node()->parent()->id() << endl
-    << endl;
-}
-
-END_NONAMESPACE
-
-
 //////////////////////////////////////////////////////////////////////
 // クラス MvMgr
 //////////////////////////////////////////////////////////////////////
@@ -374,6 +278,7 @@ MvMgr::connect(MvNode* src_node,
   }
   MvNet* net = new MvNet(src_pin, dst_pin);
   src_pin->mNetList.push_back(net);
+  dst_pin->mNet = net;
   return net;
 }
 
@@ -382,7 +287,57 @@ MvMgr::connect(MvNode* src_node,
 void
 MvMgr::disconnect(MvNet* net)
 {
-  net->src_pin()->mNetList.erase(net);
+  MvOutputPin* opin = net->src_pin();
+  opin->mNetList.erase(net);
+  MvInputPin* ipin = net->dst_pin();
+  ipin->mNet = NULL;
+}
+
+// @brief 冗長な through ノードを取り除く
+void
+MvMgr::sweep()
+{
+  vector<MvNode*> node_list;
+  ymuint n = max_node_id();
+  node_list.reserve(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    MvNode* node = this->node(i);
+    if ( node == NULL ) continue;
+    node_list.push_back(node);
+  }
+  for (vector<MvNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    MvNode* node = *p;
+    if ( node->type() != MvNode::kThrough ) continue;
+
+    const MvInputPin* ipin = node->input(0);
+    MvNet* src_net = ipin->net();
+    if ( src_net == NULL ) continue;
+    
+    const MvOutputPin* src_pin = src_net->src_pin();
+    MvNode* src_node = src_pin->node();
+    ymuint src_pos = src_pin->pos();
+    disconnect(src_net);
+    const MvOutputPin* opin = node->output(0);
+    const MvNetList& fo_list = opin->net_list();
+    vector<MvNet*> tmp_list;
+    tmp_list.reserve(fo_list.size());
+    for (MvNetList::const_iterator q = fo_list.begin();
+	 q != fo_list.end(); ++ q) {
+      MvNet* net = *q;
+      tmp_list.push_back(net);
+    }
+    for (vector<MvNet*>::iterator q = tmp_list.begin();
+	 q != tmp_list.end(); ++ q) {
+      MvNet* net = *q;
+      MvInputPin* dst_pin = net->dst_pin();
+      MvNode* dst_node = dst_pin->node();
+      ymuint dst_pos = dst_pin->pos();
+      disconnect(net);
+      connect(src_node, src_pos, dst_node, dst_pos);
+    }
+    delete_node(node);
+  }
 }
 
 // @brief ノードを登録する．
@@ -452,7 +407,10 @@ MvNet::~MvNet()
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MvPin::MvPin()
+MvPin::MvPin() :
+  mNode(NULL),
+  mBitWidth(0),
+  mPos(0)
 {
 }
 
@@ -467,7 +425,8 @@ MvPin::~MvPin()
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MvInputPin::MvInputPin()
+MvInputPin::MvInputPin() :
+  mNet(NULL)
 {
 }
 
@@ -489,64 +448,6 @@ MvOutputPin::MvOutputPin()
 // @brief デストラクタ
 MvOutputPin::~MvOutputPin()
 {
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// グローバル関数
-//////////////////////////////////////////////////////////////////////
-
-// @brief 内容を出力する
-// @param[in] s 出力先のストリーム
-// @param[in] mgr MvMgr
-// @note デバッグ用
-void
-dump(ostream& s,
-     const MvMgr& mgr)
-{
-  ymuint n = mgr.max_module_id();
-  for (ymuint i = 0; i < n; ++ i) {
-    MvModule* module = mgr.module(i);
-    if ( module == NULL ) continue;
-    s << "Module#" << module->id() << "(";
-    if ( module->name() ) {
-      s << module->name();
-    }
-    s << ")" << endl;
-    const MvNode* pnode = module->parent();
-    if ( pnode ) {
-      s << "  parent node: Module#" << pnode->parent()->id()
-	<< ":" << pnode->id() << endl;
-    }
-    else {
-      s << "  toplevel module" << endl;
-    }
-
-#if 1
-    ymuint ni = module->input_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      dump_node(s, module->input(j));
-    }
-    ymuint no = module->output_num();
-    for (ymuint j = 0;j < no; ++ j) {
-      dump_node(s, module->output(j));
-    }
-    for (list<MvNode*>::const_iterator p = module->nodes_begin();
-	 p != module->nodes_end(); ++ p) {
-      MvNode* node = *p;
-      dump_node(s, node);
-    }
-#else
-    ymuint n = module->max_node_id();
-    for (ymuint i = 0; i < n; ++ i) {
-      MvNode* node = module->node(i);
-      if ( node ) {
-	dump_node(s, node);
-      }
-    }
-#endif
-    s << endl;
-  }
 }
 
 END_NAMESPACE_YM_MVN

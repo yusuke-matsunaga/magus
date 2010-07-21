@@ -27,6 +27,14 @@
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
+BEGIN_NONAMESPACE
+
+const
+bool debug_driver = false;
+
+END_NONAMESPACE
+
+
 // @brief コンストラクタ
 ReaderImpl::ReaderImpl() :
   mVlMgr(mMsgMgr)
@@ -74,7 +82,9 @@ ReaderImpl::gen_network(MvMgr& mgr)
   mMvMgr = &mgr;
 
   mDeclMap.clear();
-  
+  mDriverList.clear();
+
+  MvModule* module0 = NULL;
   list<const VlModule*> tmp_list(mVlMgr.topmodule_list());
   for (list<const VlModule*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
@@ -87,170 +97,16 @@ ReaderImpl::gen_network(MvMgr& mgr)
     if ( module == NULL ) {
       return false;
     }
-  }
-
-  return true;
-}
-
-// @brief メッセージハンドラを付加する．
-void
-ReaderImpl::add_msg_handler(MsgHandler* msg_handler)
-{
-  mMsgMgr.reg_handler(msg_handler);
-}
-
-// @brief module を生成する．
-// @param[in] vl_module 対象のモジュール
-MvModule*
-ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
-{
-  using namespace nsVerilog;
-  
-  // ポート数，入出力のビット幅を調べる．
-  ymuint np = vl_module->port_num();
-  ymuint nio = vl_module->io_num();
-  ymuint ni = 0;
-  ymuint no = 0;
-  for (ymuint i = 0; i < nio; ++ i) {
-    const VlIODecl* io = vl_module->io(i);
-    switch ( io->direction() ) {
-    case kVpiInput:  ++ ni; break;
-    case kVpiOutput: ++ no; break;
-    default:
-      mMsgMgr.put_msg(__FILE__, __LINE__,
-		      io->file_region(),
-		      kMsgError,
-		      "MVN_VL01",
-		      "Only Input/Output types are supported");
-      return NULL;
-    }
-  }
-  vector<ymuint> ibw_array(ni);
-  vector<ymuint> obw_array(no);
-  ni = 0;
-  no = 0;
-  for (ymuint i = 0; i < nio; ++ i) {
-    const VlIODecl* io = vl_module->io(i);
-    switch ( io->direction() ) {
-    case kVpiInput:  ibw_array[ni] = io->bit_size(); ++ ni; break;
-    case kVpiOutput: obw_array[no] = io->bit_size(); ++ no; break;
-    default: break;
-    }
-  }
-  
-  MvModule* module = mMvMgr->new_module(vl_module->name(),
-					np, ibw_array, obw_array);
-
-  // 入出力ノードの対応表を作る．
-  ymuint i1 = 0;
-  ymuint i2 = 0;
-  for (ymuint i = 0; i < nio; ++ i) {
-    const VlIODecl* io = vl_module->io(i);
-    switch ( io->direction() ) {
-    case kVpiInput:
-      mDeclMap.add(io->decl(), module->input(i1));
-      ++ i1;
-      break;
-
-    case kVpiOutput:
-      mDeclMap.add(io->decl(), module->output(i2));
-      ++ i2;
-      break;
-
-    default:
-      break;
-    }
-  }
-  
-  // ポートの接続を行う．
-  for (ymuint i = 0; i < np; ++ i) {
-    const VlPort* port = vl_module->port(i);
-    const VlExpr* expr = port->low_conn();
-    if ( expr->type() == kVpiOperation ) {
-      assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
-      ymuint n = expr->operand_num();
-      mMvMgr->init_port(module, i, port->name(), n);
-      for (ymuint j = 0; j < n; ++ j) {
-	MvNode* node;
-	ymuint msb;
-	ymuint lsb;
-	switch ( gen_portref(expr->operand(j), node, msb, lsb) ) {
-	case 0:
-	  mMvMgr->set_port_ref(module, i, j, node);
-	  break;
-	  
-	case 1:
-	  mMvMgr->set_port_ref(module, i, j, node, msb);
-	  break;
-	  
-	case 2:
-	  mMvMgr->set_port_ref(module, i, j, node, msb, lsb);
-	  break;
-	  
-	default:
-	  assert_not_reached(__FILE__, __LINE__);
-	  break;
-	}
-      }
+    if ( module0 == NULL ) {
+      module0 = module;
     }
     else {
-      mMvMgr->init_port(module, i, port->name(), 1);
-      MvNode* node;
-      ymuint msb;
-      ymuint lsb;
-      switch ( gen_portref(expr, node, msb, lsb) ) {
-      case 0:
-	mMvMgr->set_port_ref(module, i, 0, node);
-	break;
-
-      case 1:
-	mMvMgr->set_port_ref(module, i, 0, node, msb);
-	break;
-
-      case 2:
-	mMvMgr->set_port_ref(module, i, 0, node, msb, lsb);
-	break;
-
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
-      }
+      cout << "more than one top modules" << endl;
     }
-  }
-
-  gen_moduleitem(module, vl_module);
-  
-  return module;
-}
-
-// @brief モジュール内部の要素を生成する．
-// @param[in] module 親のモジュール
-// @param[in] vl_module 対象のモジュール
-void
-ReaderImpl::gen_moduleitem(MvModule* module,
-			   const VlModule* vl_module)
-{
-  // 宣言要素を生成する．
-  bool stat = gen_decl(module, vl_module);
-  if ( !stat ) {
-    return;
-  }
-
-  ymuint n = mMvMgr->max_node_id();
-  mDriverList.clear();
-  mDriverList.reserve(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    mDriverList.push_back(vector<Driver>());
-  }
-  
-  // 要素を生成する．
-  stat = gen_item(module, vl_module);
-  if ( !stat ) {
-    return;
   }
 
   // 結線を行う．
-  n = mMvMgr->max_node_id();
+  ymuint n = mMvMgr->max_node_id();
   for (ymuint i = 0; i < n; ++ i) {
     MvNode* node = mMvMgr->node(i);
     if ( node == NULL ) continue;
@@ -336,7 +192,7 @@ ReaderImpl::gen_moduleitem(MvModule* module,
 	  assert_not_reached(__FILE__, __LINE__);
 	}
       }
-      MvNode* node1 = mMvMgr->new_concat(module, bw_array);
+      MvNode* node1 = mMvMgr->new_concat(module0, bw_array);
       mMvMgr->connect(node1, 0, node, 0);
       for (ymuint i = 0; i < n; ++ i) {
 	const Driver* driver = tmp2[i];
@@ -344,6 +200,154 @@ ReaderImpl::gen_moduleitem(MvModule* module,
       }
     }
   }
+
+  // 冗長な through ノードを削除する．
+  mMvMgr->sweep();
+  
+  return true;
+}
+
+// @brief メッセージハンドラを付加する．
+void
+ReaderImpl::add_msg_handler(MsgHandler* msg_handler)
+{
+  mMsgMgr.reg_handler(msg_handler);
+}
+
+// @brief module を生成する．
+// @param[in] vl_module 対象のモジュール
+MvModule*
+ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
+{
+  using namespace nsVerilog;
+  
+  // ポート数，入出力のビット幅を調べる．
+  ymuint np = vl_module->port_num();
+  ymuint nio = vl_module->io_num();
+  ymuint ni = 0;
+  ymuint no = 0;
+  for (ymuint i = 0; i < nio; ++ i) {
+    const VlIODecl* io = vl_module->io(i);
+    switch ( io->direction() ) {
+    case kVpiInput:  ++ ni; break;
+    case kVpiOutput: ++ no; break;
+    default:
+      mMsgMgr.put_msg(__FILE__, __LINE__,
+		      io->file_region(),
+		      kMsgError,
+		      "MVN_VL01",
+		      "Only Input/Output types are supported");
+      return NULL;
+    }
+  }
+  vector<ymuint> ibw_array(ni);
+  vector<ymuint> obw_array(no);
+  ni = 0;
+  no = 0;
+  for (ymuint i = 0; i < nio; ++ i) {
+    const VlIODecl* io = vl_module->io(i);
+    switch ( io->direction() ) {
+    case kVpiInput:  ibw_array[ni] = io->bit_size(); ++ ni; break;
+    case kVpiOutput: obw_array[no] = io->bit_size(); ++ no; break;
+    default: break;
+    }
+  }
+  
+  MvModule* module = mMvMgr->new_module(vl_module->name(),
+					np, ibw_array, obw_array);
+
+  // 宣言要素を生成する．
+  bool stat = gen_decl(module, vl_module);
+  if ( !stat ) {
+    return NULL;
+  }
+  
+  // 要素を生成する．
+  stat = gen_item(module, vl_module);
+  if ( !stat ) {
+    return NULL;
+  }
+
+  // 入出力ノードの対応表を作る．
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  for (ymuint i = 0; i < nio; ++ i) {
+    const VlIODecl* io = vl_module->io(i);
+    MvNode* node = mDeclMap.get(io->decl());
+    assert_cond( node != NULL, __FILE__, __LINE__);
+    switch ( io->direction() ) {
+    case kVpiInput:
+      mMvMgr->connect(module->input(i1), 0, node, 0);
+      ++ i1;
+      break;
+
+    case kVpiOutput:
+      mMvMgr->connect(node, 0, module->output(i2), 0);
+      ++ i2;
+      break;
+
+    default:
+      break;
+    }
+  }
+  
+  // ポートの接続を行う．
+  for (ymuint i = 0; i < np; ++ i) {
+    const VlPort* port = vl_module->port(i);
+    const VlExpr* expr = port->low_conn();
+    if ( expr->type() == kVpiOperation ) {
+      assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
+      ymuint n = expr->operand_num();
+      mMvMgr->init_port(module, i, port->name(), n);
+      for (ymuint j = 0; j < n; ++ j) {
+	MvNode* node;
+	ymuint msb;
+	ymuint lsb;
+	switch ( gen_portref(expr->operand(j), node, msb, lsb) ) {
+	case 0:
+	  mMvMgr->set_port_ref(module, i, j, node);
+	  break;
+	  
+	case 1:
+	  mMvMgr->set_port_ref(module, i, j, node, msb);
+	  break;
+	  
+	case 2:
+	  mMvMgr->set_port_ref(module, i, j, node, msb, lsb);
+	  break;
+	  
+	default:
+	  assert_not_reached(__FILE__, __LINE__);
+	  break;
+	}
+      }
+    }
+    else {
+      mMvMgr->init_port(module, i, port->name(), 1);
+      MvNode* node;
+      ymuint msb;
+      ymuint lsb;
+      switch ( gen_portref(expr, node, msb, lsb) ) {
+      case 0:
+	mMvMgr->set_port_ref(module, i, 0, node);
+	break;
+
+      case 1:
+	mMvMgr->set_port_ref(module, i, 0, node, msb);
+	break;
+
+      case 2:
+	mMvMgr->set_port_ref(module, i, 0, node, msb, lsb);
+	break;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__);
+	break;
+      }
+    }
+  }
+  
+  return module;
 }
 
 // @brief 宣言要素を生成する．
@@ -610,15 +614,17 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 
   // 通常の処理
 
-  // 入出力ノードに対応する through ノードを作る．
-  ymuint nio = vl_module->io_num();
-  for (ymuint i = 0; i < nio; ++ i) {
-    const VlIODecl* io = vl_module->io(i);
-    MvNode* node = mMvMgr->new_through(parent_module, io->bit_size());
-    mDeclMap.add(io->decl(), node);
+  // 宣言要素を生成する．
+  bool stat = gen_decl(parent_module, vl_module);
+  if ( !stat ) {
+    return;
   }
-
-  gen_moduleitem(parent_module, vl_module);
+  
+  // 要素を生成する．
+  stat = gen_item(parent_module, vl_module);
+  if ( !stat ) {
+    return;
+  }
 
   // ポートの接続を行う．
   ymuint np = vl_module->port_num();
@@ -1177,6 +1183,17 @@ void
 ReaderImpl::reg_driver(MvNode* node,
 		       const Driver& driver)
 {
+  if ( debug_driver ) {
+    cout << "reg_driver(" << node->id()
+	 << ", " << driver.rhs_node()->id();
+    if ( driver.has_bitselect() ) {
+      cout << "[" << driver.index() << "]";
+    }
+    else if ( driver.has_partselect() ) {
+      cout << "[" << driver.msb() << ":" << driver.lsb() << "]";
+    }
+    cout << ")" << endl;
+  }
   ymuint id = node->id();
   while ( mDriverList.size() <= id ) {
     mDriverList.push_back(vector<Driver>());

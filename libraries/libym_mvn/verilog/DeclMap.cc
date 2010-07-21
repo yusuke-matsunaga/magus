@@ -8,9 +8,19 @@
 
 
 #include "DeclMap.h"
+#include "ym_mvn/MvNode.h"
+#include "ym_verilog/vl/VlDecl.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
+
+BEGIN_NONAMESPACE
+
+const
+bool debug_declmap = false;
+
+END_NONAMESPACE
+
 
 // @brief コンストラクタ
 DeclMap::DeclMap() :
@@ -35,6 +45,82 @@ DeclMap::clear()
   }
   mNum = 0;
   mAlloc.destroy();
+}
+
+// @brief 登録する(単一要素の場合)
+// @param[in] decl 宣言要素
+// @param[in] node 対応するノード
+void
+DeclMap::add(const VlDecl* decl,
+	     MvNode* node)
+{
+  if ( debug_declmap ) {
+    cout << "DeclMap::add(" << decl->full_name()
+	 << ", Node#" << node->id() << ")"
+	 << endl;
+  }
+  Cell* cell = find_cell(decl, 0);
+  if ( cell ) {
+    cell->mNode = node;
+  }
+  else {
+    put_cell(decl, 0, node);
+  }
+}
+
+// @brief 登録する(配列の場合)
+// @param[in] decl 宣言要素
+// @param[in] offset
+// @param[in] node 対応するノード
+void
+DeclMap::add(const VlDecl* decl,
+	     ymuint offset,
+	     MvNode* node)
+{
+  if ( debug_declmap ) {
+    cout << "DeclMap::add(" << decl->full_name()
+	 << "[" << offset << "]"
+	 << ", Node#" << node->id() << ")"
+	 << endl;
+  }
+  Cell* cell = find_cell(decl, offset);
+  if ( cell ) {
+    cell->mNode = node;
+  }
+  else {
+    put_cell(decl, offset, node);
+  }
+}
+
+// @brief 対応するノードを取り出す．
+// @param[in] decl 宣言要素
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型の場合には NULL を返す．
+MvNode*
+DeclMap::get(const VlDecl* decl) const
+{
+  Cell* cell = find_cell(decl, 0);
+  if ( cell ) {
+    return cell->mNode;
+  }
+  return NULL;
+}
+
+// @brief 対応するノードを取り出す(配列型)．
+// @param[in] decl 宣言要素
+// @param[in] offset オフセット
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型でない場合，
+// オフセットが範囲外の場合には NULL を返す．
+MvNode*
+DeclMap::get(const VlDecl* decl,
+	     ymuint offset) const
+{
+  Cell* cell = find_cell(decl, offset);
+  if ( cell ) {
+    return cell->mNode;
+  }
+  return NULL;
 }
 
 // @brief Cell を登録する．
