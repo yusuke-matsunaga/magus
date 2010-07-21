@@ -54,8 +54,15 @@ public:
   /// @param[in] id モジュールID ( 0 <= id < max_module_id() )
   /// @return 該当するモジュールを返す．
   /// @note 該当するモジュールがない場合は NULL を返す．
-  MvModule*
+  const MvModule*
   module(ymuint id) const;
+
+  /// @brief モジュールIDをキーにしてモジュールにアクセスする．
+  /// @param[in] id モジュールID ( 0 <= id < max_module_id() )
+  /// @return 該当するモジュールを返す．
+  /// @note 該当するモジュールがない場合は NULL を返す．
+  MvModule*
+  _module(ymuint id);
   
   /// @brief ノードの ID番号の最大値 + 1 を返す．
   ymuint
@@ -64,8 +71,28 @@ public:
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
   /// @note NULL が還されることもある．
-  MvNode*
+  const MvNode*
   node(ymuint id) const;
+
+  /// @brief ノードを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
+  /// @note NULL が還されることもある．
+  MvNode*
+  _node(ymuint id);
+
+  /// @brief ネットの ID番号の最大値 + 1 を返す．
+  ymuint
+  max_net_id() const;
+
+  /// @brief ネットを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_net_id() )
+  const MvNet*
+  net(ymuint id) const;
+
+  /// @brief ネットを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_net_id() )
+  MvNet*
+  _net(ymuint id);
 
 
 public:
@@ -539,6 +566,12 @@ private:
 
   // ノードのID番号を管理するためのオブジェクト
   ItvlMgr mNodeItvlMgr;
+
+  // 全ネットを ID 番号をキーにして格納する配列
+  vector<MvNet*> mNetArray;
+
+  // ネットの ID番号を管理するためのオブジェクト
+  ItvlMgr mNetItvlMgr;
   
 };
 
@@ -550,6 +583,14 @@ private:
 void
 dump(ostream& s,
      const MvMgr& mgr);
+
+
+/// @brief 内容を Verilog-HDL 形式で出力する
+/// @param[in] s 出力先のストリーム
+/// @param[in] mgr MvMgr
+void
+dump_verilog(ostream& s,
+	     const MvMgr& mgr);
 
 END_NAMESPACE_YM_MVN
 

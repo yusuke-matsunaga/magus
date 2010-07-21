@@ -65,8 +65,18 @@ MvMgr::max_module_id() const
 // @param[in] id モジュールID ( 0 <= id < max_module_id() )
 // @return 該当するモジュールを返す．
 // @note 該当するモジュールがない場合は NULL を返す．
-MvModule*
+const MvModule*
 MvMgr::module(ymuint id) const
+{
+  return mModuleArray[id];
+}
+
+// @brief モジュールIDをキーにしてモジュールにアクセスする．
+// @param[in] id モジュールID ( 0 <= id < max_module_id() )
+// @return 該当するモジュールを返す．
+// @note 該当するモジュールがない場合は NULL を返す．
+MvModule*
+MvMgr::_module(ymuint id)
 {
   return mModuleArray[id];
 }
@@ -81,10 +91,42 @@ MvMgr::max_node_id() const
 // @brief ノードを得る．
 // @param[in] id ID番号 ( 0 <= id < max_node_id() )
 // @note NULL が還されることもある．
-MvNode*
+const MvNode*
 MvMgr::node(ymuint id) const
 {
   return mNodeArray[id];
+}
+
+// @brief ノードを得る．
+// @param[in] id ID番号 ( 0 <= id < max_node_id() )
+// @note NULL が還されることもある．
+MvNode*
+MvMgr::_node(ymuint id)
+{
+  return mNodeArray[id];
+}
+
+// @brief ネットの ID番号の最大値 + 1 を返す．
+ymuint
+MvMgr::max_net_id() const
+{
+  return mNetArray.size();
+}
+
+// @brief ネットを得る．
+// @param[in] id ID番号 ( 0 <= id < max_net_id() )
+const MvNet*
+MvMgr::net(ymuint id) const
+{
+  return mNetArray[id];
+}
+
+// @brief ネットを得る．
+// @param[in] id ID番号 ( 0 <= id < max_net_id() )
+MvNet*
+MvMgr::_net(ymuint id)
+{
+  return mNetArray[id];
 }
 
 // @brief モジュールを生成する．
@@ -276,9 +318,23 @@ MvMgr::connect(MvNode* src_node,
   if ( src_pin->bit_width() != dst_pin->bit_width() ) {
     return NULL;
   }
+  int tmp = mNetItvlMgr.avail_num();
+  if ( tmp == -1 ) {
+    // IDが枯渇？
+    return NULL;
+  }
+  mNetItvlMgr.erase(tmp);
+  ymuint id = tmp;
+  
   MvNet* net = new MvNet(src_pin, dst_pin);
   src_pin->mNetList.push_back(net);
   dst_pin->mNet = net;
+  net->mId = id;
+  while ( mNetArray.size() <= id ) {
+    mNetArray.push_back(NULL);
+  }
+  mNetArray[id] = net;
+
   return net;
 }
 
@@ -287,10 +343,14 @@ MvMgr::connect(MvNode* src_node,
 void
 MvMgr::disconnect(MvNet* net)
 {
-  MvOutputPin* opin = net->src_pin();
+  MvOutputPin* opin = net->mSrc;
   opin->mNetList.erase(net);
-  MvInputPin* ipin = net->dst_pin();
+  MvInputPin* ipin = net->mDst;
   ipin->mNet = NULL;
+
+  mNetItvlMgr.add(net->mId);
+  mNetArray[net->mId] = NULL;
+  delete net;
 }
 
 // @brief 冗長な through ノードを取り除く
@@ -301,7 +361,7 @@ MvMgr::sweep()
   ymuint n = max_node_id();
   node_list.reserve(n);
   for (ymuint i = 0; i < n; ++ i) {
-    MvNode* node = this->node(i);
+    MvNode* node = _node(i);
     if ( node == NULL ) continue;
     node_list.push_back(node);
   }
@@ -330,7 +390,7 @@ MvMgr::sweep()
     for (vector<MvNet*>::iterator q = tmp_list.begin();
 	 q != tmp_list.end(); ++ q) {
       MvNet* net = *q;
-      MvInputPin* dst_pin = net->dst_pin();
+      MvInputPin* dst_pin = net->mDst;
       MvNode* dst_node = dst_pin->node();
       ymuint dst_pos = dst_pin->pos();
       disconnect(net);
@@ -391,6 +451,7 @@ MvMgr::unreg_node(MvNode* node)
 // @param[in] dst 出力先のピン
 MvNet::MvNet(MvOutputPin* src,
 	     MvInputPin* dst) :
+  mId(0),
   mSrc(src),
   mDst(dst)
 {

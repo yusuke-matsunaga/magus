@@ -25,12 +25,16 @@ class MvNet :
 
 public:
 
+  /// @brief ID 番号を得る．
+  ymuint
+  id() const;
+
   /// @brief 入力元のピンを得る．
-  MvOutputPin*
+  const MvOutputPin*
   src_pin() const;
 
   /// @brief 出力先のピンを得る．
-  MvInputPin*
+  const MvInputPin*
   dst_pin() const;
 
 
@@ -54,6 +58,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ID 番号
+  ymuint32 mId;
+  
   // 入力元のピン
   MvOutputPin* mSrc;
 
@@ -67,9 +74,17 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief ID 番号を得る．
+inline
+ymuint
+MvNet::id() const
+{
+  return mId;
+}
+
 // @brief 入力元のピンを得る．
 inline
-MvOutputPin*
+const MvOutputPin*
 MvNet::src_pin() const
 {
   return mSrc;
@@ -77,7 +92,7 @@ MvNet::src_pin() const
 
 // @brief 出力先のピンを得る．
 inline
-MvInputPin*
+const MvInputPin*
 MvNet::dst_pin() const
 {
   return mDst;

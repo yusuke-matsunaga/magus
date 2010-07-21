@@ -47,8 +47,8 @@ public:
 
   /// @brief ポートを得る．
   /// @param[in] pos 位置 ( 0 <= pos < port_num() )
-  MvPort*
-  port(ymuint pos);
+  const MvPort*
+  port(ymuint pos) const;
 
   /// @brief 入力ノード数を得る．
   ymuint
@@ -173,8 +173,8 @@ MvModule::port_num() const
 // @brief ポートを得る．
 // @param[in] pos 位置 ( 0 <= pos < port_num() )
 inline
-MvPort*
-MvModule::port(ymuint pos)
+const MvPort*
+MvModule::port(ymuint pos) const
 {
   return mPortArray[pos];
 }

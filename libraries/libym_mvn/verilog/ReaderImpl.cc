@@ -108,7 +108,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
   // 結線を行う．
   ymuint n = mMvMgr->max_node_id();
   for (ymuint i = 0; i < n; ++ i) {
-    MvNode* node = mMvMgr->node(i);
+    MvNode* node = mMvMgr->_node(i);
     if ( node == NULL ) continue;
     if ( mDriverList.size() <= i ) break;
     const vector<Driver>& dlist = mDriverList[node->id()];

@@ -18,6 +18,7 @@ noinst_LTLIBRARIES = libym_mvn.la
 
 libym_mvn_la_SOURCES = \
 	dump.cc \
+	dump_verilog.cc \
 	MvArithOp.h \
 	MvArithOp.cc \
 	MvBinaryOp.h \

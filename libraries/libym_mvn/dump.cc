@@ -29,7 +29,7 @@ dump_inputpin(ostream& s,
     << "(" << pin->bit_width() << ")" << endl;
   MvNet* net = pin->net();
   if ( net ) {
-    MvOutputPin* opin = net->src_pin();
+    const MvOutputPin* opin = net->src_pin();
     s << "    <== OutputPin#" << opin->pos()
       << "@node#" << opin->node()->id() << endl;
   }
@@ -45,9 +45,9 @@ dump_outputpin(ostream& s,
   const MvNetList& fo_list = pin->net_list();
   for (MvNetList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    MvNet* net = *p;
+    const MvNet* net = *p;
     assert_cond( net->src_pin() == pin, __FILE__, __LINE__);
-    MvInputPin* ipin = net->dst_pin();
+    const MvInputPin* ipin = net->dst_pin();
     s << "    ==> InputPin#" << ipin->pos()
       << "@node#" << ipin->node()->id() << endl;
   }
@@ -128,7 +128,7 @@ dump(ostream& s,
 {
   ymuint n = mgr.max_module_id();
   for (ymuint i = 0; i < n; ++ i) {
-    MvModule* module = mgr.module(i);
+    const MvModule* module = mgr.module(i);
     if ( module == NULL ) continue;
 
     s << "Module#" << module->id() << "(";
@@ -147,7 +147,7 @@ dump(ostream& s,
 
     ymuint np = module->port_num();
     for (ymuint j = 0; j < np; ++ j) {
-      MvPort* port = module->port(j);
+      const MvPort* port = module->port(j);
       s << "  Port#" << j << "(";
       if ( port->name() ) {
 	s << port->name();
