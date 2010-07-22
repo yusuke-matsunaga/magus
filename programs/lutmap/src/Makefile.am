@@ -19,10 +19,12 @@ bin_PROGRAMS = \
 	lutmap
 
 lutmap_SOURCES = \
-	lutmap.cc
+	lutmap.cc \
+	mvn2sbj.cc
 
 lutmap_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lutmap/libym_lutmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mvn/libym_mvn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

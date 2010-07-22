@@ -17,7 +17,19 @@
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
+#include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/MvMgr.h"
+#include "ym_mvn/MvVerilogReader.h"
 #include "ym_utils/MsgHandler.h"
+
+
+BEGIN_NAMESPACE_YM_LUTMAP
+
+void
+mvn2sbj(const MvMgr& mvmgr,
+	SbjGraph& sbjgraph);
+
+END_NAMESPACE_YM_LUTMAP
 
 
 int
@@ -27,13 +39,18 @@ main(int argc,
   using namespace std;
   using namespace nsYm;
   
-  if ( argc != 2 ) {
-    cerr << "USAGE : " << argv[0] << " blif-file" << endl;
+  if ( argc < 2 ) {
+    cerr << "USAGE : " << argv[0] << " verilog-file" << endl;
     return 2;
   }
-  string filename = argv[1];
+
+  list<string> filename_list;
+  for (ymuint i = 1; i < argc; ++ i) {
+    filename_list.push_back(argv[i]);
+  }
   
   try {
+#if 0
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     BNetBlifReader reader;
 
@@ -57,7 +74,37 @@ main(int argc,
     if ( !stat ) {
       return 10;
     }
+#else
+    MvMgr mgr;
+    MvVerilogReader reader;
+    MsgHandler* mh = new StreamMsgHandler(&cerr);
+    mh->set_mask(MsgHandler::kMaskAll);
+    mh->delete_mask(kMsgInfo);
+    mh->delete_mask(kMsgDebug);
+    
+    for (list<string>::const_iterator p = filename_list.begin();
+	 p != filename_list.end(); ++ p) {
+      const string& name = *p;
+      cerr << "Reading " << name;
+      cerr.flush();
+      bool stat = reader.read(name);
+      cerr << " end" << endl;
+      if ( !stat ) {
+	return 1;
+      }
+    }
+    // MvNetwork に変換
+    bool stat = reader.gen_network(mgr);
+    if ( !stat ) {
+      cerr << "error occured" << endl;
+      return 2;
+    }
 
+    // SbjGraph に変換
+    SbjGraph sbj_network;
+    mvn2sbj(mgr, sbj_network);
+#endif
+    
     // LUT にマッピング
     LnGraph lut_network;
     ymuint lut_num;
