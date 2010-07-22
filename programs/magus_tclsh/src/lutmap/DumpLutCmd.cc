@@ -52,7 +52,7 @@ DumpLutCmd::cmd_proc(TclObjVector& objv)
       }
       outp = &ofs;
     }
-    lutnetwork().dump(*outp);
+    dump(*outp, lutnetwork());
     return TCL_OK;
   }
   catch ( AssertError x ) {

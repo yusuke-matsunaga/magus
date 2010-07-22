@@ -49,14 +49,14 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   for (LnNodeList::const_iterator i = pi_list.begin();
        i != pi_list.end(); ++i ) {
     const LnNode* pi = *i;
-    fout << comma << " pi_" << pi->name();
+    fout << comma << " pi_" << pi->id_str();
     comma = ", ";
   }
   for ( LnNodeList::const_iterator i = po_list.begin();
 	i != po_list.end(); ++i ) {
     fout << " ," << endl;
     const LnNode* po = *i;
-    fout << " po_" << po->name();
+    fout << " po_" << po->id_str();
   }
   fout << endl
        << ");" << endl;
@@ -65,30 +65,30 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   for ( LnNodeList::const_iterator i = pi_list.begin();
 	i != pi_list.end(); ++i ){
     const LnNode* pi = *i;
-    fout << " input pi_" << pi->name() << " ;" << endl;
+    fout << " input pi_" << pi->id_str() << " ;" << endl;
   }
   for ( LnNodeList::const_iterator i = po_list.begin();
 	i != po_list.end(); ++i ){
     const LnNode* po = *i;
-    fout << " output po_" << po->name() << " ;" << endl;
+    fout << " output po_" << po->id_str() << " ;" << endl;
   }
   for ( LnNodeList::const_iterator i = pi_list.begin();
 	i != pi_list.end(); ++i ){
     const LnNode* pi = *i;
-    fout << " wire w_" << pi->name() << " ;" << endl;
+    fout << " wire w_" << pi->id_str() << " ;" << endl;
   }
   for ( LnNodeList::const_iterator i = po_list.begin();
 	i != po_list.end(); ++i ){
     const LnNode* po = *i;
     const LnNode* po_fi = po->fanin(0);
-    if ( po_fi->name() != po->name() ){
-      fout << " wire w_" << po->name() << " ;" << endl;
+    if ( po_fi->id_str() != po->id_str() ){
+      fout << " wire w_" << po->id_str() << " ;" << endl;
     }
   }
   for ( LnNodeList::const_iterator i = lut_list.begin();
 	i != lut_list.end(); ++i ){
     const LnNode* lut = *i;
-    fout << " wire w_" << lut->name() << " ;" << endl;
+    fout << " wire w_" << lut->id_str() << " ;" << endl;
   }
   fout << " wire w_one ;" << endl;
   fout << " wire w_gnd ;" << endl;
@@ -100,20 +100,20 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   for ( LnNodeList::const_iterator i = pi_list.begin();
 	i != pi_list.end(); ++i ){
     const LnNode* pi = *i;
-    fout << " DFFE FI" << pi->name()
-	 << "( .Q(w_" << pi->name() << ")"
+    fout << " DFFE FI" << pi->id_str()
+	 << "( .Q(w_" << pi->id_str() << ")"
 	 << ", .CLK(clk), .ENA(w_one)"
-	 << ", .D(pi_" << pi->name() << ")"
+	 << ", .D(pi_" << pi->id_str() << ")"
 	 << ", .CLRN(w_one),　.PRN(w_one));" << endl;
   }
   for ( LnNodeList::const_iterator i = po_list.begin();
 	i != po_list.end(); ++i ){
     const LnNode* po = *i;
     const LnNode* po_fanin = po->fanin(0);
-    fout << " DFFE FO" << po->name()
-	 << "( .Q(po_" << po->name() << ")"
+    fout << " DFFE FO" << po->id_str()
+	 << "( .Q(po_" << po->id_str() << ")"
 	 << ", .CLK(clk), .ENA(w_one)"
-	 << ", .D(w_" << po_fanin->name() << ")"
+	 << ", .D(w_" << po_fanin->id_str() << ")"
 	 << ",　.CLRN(w_one), .PRN(w_one));" << endl;
   }
   string lut_in[4];
@@ -133,25 +133,25 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
     fout << endl;
     
     if ( ni == 0 ){
-      fout << "assign w_" << lut->name() << " = "
+      fout << "assign w_" << lut->id_str() << " = "
 	   << bool_table[0] << endl << endl;
     }
     else {
-      fout << " cycloneiii_lcell_comb lut_" << lut->name() << " (" << endl;
+      fout << " cycloneiii_lcell_comb lut_" << lut->id_str() << " (" << endl;
       for ( ymuint j = 0; j != 4; ++j ){
 	const LnNode* fanin = lut->fanin(j);
 	fout << " ." << lut_in[j] << "(w_";
 	if ( j < ni ) {
-	  fout << fanin->name() << ")," << endl;
+	  fout << fanin->id_str() << ")," << endl;
 	}
 	else {
 	  fout << "gnd )," << endl;
 	}
       }
-      fout << " .combout(w_" << lut->name() << ") );" << endl;
-      fout << " defparam lut_" << lut->name()
+      fout << " .combout(w_" << lut->id_str() << ") );" << endl;
+      fout << " defparam lut_" << lut->id_str()
 	   << " .sum_lutc_input =\"datac\";" << endl;
-      fout << " defparam lut_" << lut->name()
+      fout << " defparam lut_" << lut->id_str()
 	   << " .lut_mask = 16'b";
       for ( ymuint j = 16; j != 0; --j ){
 	if ( j > table_size ){

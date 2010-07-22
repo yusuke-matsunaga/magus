@@ -80,7 +80,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   for (SbjNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     SbjNode* node = *p;
-    LnNode* mapnode = mapgraph.new_input(node->name());
+    LnNode* mapnode = mapgraph.new_input();
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.mMapNode[0] = mapnode;
     node_info.mDepth = 0;
@@ -91,7 +91,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     SbjNode* node = *p;
-    LnNode* mapnode = mapgraph.new_dff(node->name());
+    LnNode* mapnode = mapgraph.new_dff();
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.mMapNode[0] = mapnode;
     node_info.mDepth = 0;
@@ -105,10 +105,9 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     SbjNode* onode = *p;
     SbjNode* node = onode->fanin(0);
     bool inv = onode->output_inv();
-    const string& name = onode->name();
     LnNode* mapnode = NULL;
     if ( node ) {
-      mapnode = back_trace(node, inv, mapgraph, name);
+      mapnode = back_trace(node, inv, mapgraph);
       int depth1 = mNodeInfo[node->id()].mDepth;
       if ( max_depth < depth1 ) {
 	max_depth = depth1;
@@ -122,9 +121,9 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       else {
 	tv[0] = 0;
       }
-      mapnode = mapgraph.new_lut(name, vector<LnNode*>(0), tv);
+      mapnode = mapgraph.new_lut(vector<LnNode*>(0), tv);
     }
-    LnNode* omapnode = mapgraph.new_output(name, mapnode);
+    LnNode* omapnode = mapgraph.new_output(mapnode);
     mNodeInfo[onode->id()].mMapNode[0] = omapnode;
   }
 
@@ -134,10 +133,9 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     SbjNode* onode = *p;
     SbjNode* node = onode->fanin(0);
     bool inv = onode->output_inv();
-    const string& name = onode->name();
     LnNode* mapnode = NULL;
     if ( node ) {
-      mapnode = back_trace(node, inv, mapgraph, name);
+      mapnode = back_trace(node, inv, mapgraph);
       int depth1 = mNodeInfo[node->id()].mDepth;
       if ( max_depth < depth1 ) {
 	max_depth = depth1;
@@ -151,7 +149,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       else {
 	tv[0] = 0;
       }
-      mapnode = mapgraph.new_lut(name, vector<LnNode*>(0), tv);
+      mapnode = mapgraph.new_lut(vector<LnNode*>(0), tv);
     }
     LnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
     mapgraph.set_dff_input(omapnode, mapnode);
@@ -238,8 +236,7 @@ END_NONAMESPACE
 LnNode*
 MapRecord::back_trace(SbjNode* node,
 		      bool inv,
-		      LnGraph& mapnetwork,
-		      const string& oname)
+		      LnGraph& mapnetwork)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   ymuint idx = (inv) ? 1 : 0;
@@ -257,7 +254,7 @@ MapRecord::back_trace(SbjNode* node,
     vector<int> tv(2);
     tv[0] = 1;
     tv[1] = 0;
-    LnNode* mapnode1 = mapnetwork.new_lut(oname, inputs, tv);
+    LnNode* mapnode1 = mapnetwork.new_lut(inputs, tv);
     node_info.mMapNode[1] = mapnode1;
     return mapnode1;
   }
@@ -269,7 +266,7 @@ MapRecord::back_trace(SbjNode* node,
   ymuint ni = cut->ni();
   for (ymuint i = 0; i < ni; ++ i) {
     SbjNode* inode = cut->input(i);
-    back_trace(inode, false, mapnetwork, string());
+    back_trace(inode, false, mapnetwork);
   }
 
   mTmpFanins.clear();
@@ -297,8 +294,7 @@ MapRecord::back_trace(SbjNode* node,
   make_tv(ni, expr, tv);
   
   // 新しいノードを作り mNodeMap に登録する．
-  string name = (inv) ? oname : node->name();
-  mapnode = mapnetwork.new_lut(name, mTmpFanins, tv);
+  mapnode = mapnetwork.new_lut(mTmpFanins, tv);
   node_info.mMapNode[idx] = mapnode;
   node_info.mDepth = idepth + 1;
   

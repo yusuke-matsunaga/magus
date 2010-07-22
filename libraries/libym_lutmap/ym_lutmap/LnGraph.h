@@ -174,11 +174,6 @@ public:
   string
   id_str() const;
 
-  /// @brief 名前を得る．
-  /// @note 名前がない場合もある．
-  const string&
-  name() const;
-
   /// @brief タイプを得る．
   tType
   type() const;
@@ -302,9 +297,6 @@ private:
   
   // ID 番号
   ymuint32 mId;
-
-  // 名前
-  string mName;
 
   // タイプ (+ 入力／出力番号/PoMask)
   ymuint32 mFlags;
@@ -439,9 +431,13 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name ポートの情報の取得
+  /// @name 外部インターフェイス情報の取得
   /// @{
 
+  /// @brief モジュール名を得る．
+  string
+  name() const;
+  
   /// @brief ポート数を得る．
   ymuint
   port_num() const;
@@ -457,8 +453,12 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name ポートの情報の設定
+  /// @name 外部インターフェイス情報の設定
   /// @{
+
+  /// @brief モジュール名を設定する．
+  void
+  set_name(const string& name);
 
   /// @brief ポートを追加する(1ビット版)．
   /// @param[in] name ポート名
@@ -579,36 +579,34 @@ public:
   /// @name ノードの生成／変更
   /// @{
 
+  /// @brief 空にする．
+  void
+  clear();
+
   /// @brief 入力ノードを作る．
-  /// @param[in] name 名前
   /// @return 作成したノードを返す．
   LnNode*
-  new_input(const string& name);
+  new_input();
   
   /// @brief 出力ノードを作る．
-  /// @param[in] name 名前
   /// @param[in] inode 入力のノード
   /// @return 作成したノードを返す．
   LnNode*
-  new_output(const string& name,
-	     LnNode* inode);
+  new_output(LnNode* inode);
   
   /// @brief LUTノードを作る．
-  /// @param[in] name 名前
   /// @param[in] inodes 入力ノードのベクタ
   /// @param[in] tv 真理値ベクタ
   /// @return 作成したノードを返す．
   /// @note tv のサイズは inodes のサイズの冪乗
   LnNode*
-  new_lut(const string& name,
-	  const vector<LnNode*>& inodes,
+  new_lut(const vector<LnNode*>& inodes,
 	  const vector<int>& tv);
   
   /// @brief DFFノードを作る．
-  /// @param[in] name 名前
   /// @return 作成したノードを返す．
   LnNode*
-  new_dff(const string& name);
+  new_dff();
 
   /// @brief DFFノードの入力を設定する．
   /// @param[in] node 対象の DFF ノード
@@ -616,24 +614,6 @@ public:
   void
   set_dff_input(LnNode* node,
 		LnNode* inode);
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name その他の関数
-  /// @{
-
-  /// @brief 空にする．
-  void
-  clear();
-  
-  /// @brief 内容を s に出力する．
-  void
-  dump(ostream& s) const;
-  
   /// @}
   //////////////////////////////////////////////////////////////////////
   
@@ -698,7 +678,10 @@ private:
   // ノードのファンインの枝の配列を確保するためのアロケータ
   FragAlloc mAlloc2;
 
-  // ポーの配列
+  // モジュール名
+  string mName;
+
+  // ポートの配列
   vector<LnPort*> mPortArray;
   
   // ID 番号をキーにしたノードの配列
@@ -737,6 +720,11 @@ private:
   bool mLevelValid;
   
 };
+
+// @brief 内容を s に出力する．
+void
+dump(ostream& s,
+     const LnGraph& lngraph);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -841,6 +829,7 @@ LnNode::id() const
   return mId;
 }
 
+#if 0
 // @brief 名前を得る．
 // @note 名前がない場合もある．
 inline
@@ -849,6 +838,7 @@ LnNode::name() const
 {
   return mName;
 }
+#endif
 
 // @brief LUTノードの場合に真理値ベクタを得る．
 // @param[out] tv 真理値を格納するベクタ
@@ -1065,6 +1055,14 @@ LnPort::bit(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 // クラス LnGraph
 //////////////////////////////////////////////////////////////////////
+
+// @brief モジュール名を得る．
+inline
+string
+LnGraph::name() const
+{
+  return mName;
+}
 
 // @brief ポート数を得る．
 inline

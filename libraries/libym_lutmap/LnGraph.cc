@@ -123,6 +123,8 @@ void
 LnGraph::copy(const LnGraph& src,
 	      vector<LnNode*>& nodemap)
 {
+  mName = src.mName;
+  
   ymuint n = src.max_node_id();
   nodemap.clear();
   nodemap.resize(n);
@@ -132,7 +134,7 @@ LnGraph::copy(const LnGraph& src,
   for (LnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     LnNode* src_node = *p;
-    LnNode* dst_node = new_input(src_node->name());
+    LnNode* dst_node = new_input();
     nodemap[src_node->id()] = dst_node;
   }
 
@@ -141,7 +143,7 @@ LnGraph::copy(const LnGraph& src,
   for (LnNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     LnNode* src_node = *p;
-    LnNode* dst_node = new_dff(src_node->name());
+    LnNode* dst_node = new_dff();
     nodemap[src_node->id()] = dst_node;
   }
   
@@ -162,7 +164,7 @@ LnGraph::copy(const LnGraph& src,
     }
     src_node->tv(tv);
     
-    LnNode* dst_node = new_lut(src_node->name(), dst_inputs, tv);
+    LnNode* dst_node = new_lut(dst_inputs, tv);
     if ( src_node->pomark() ) {
       dst_node->mFlags |= LnNode::kPoMask;
     }
@@ -185,12 +187,11 @@ LnGraph::copy(const LnGraph& src,
        p != output_list.end(); ++ p) {
     LnNode* src_onode = *p;
     LnNode* src_inode = src_onode->fanin(0);
-    const string& name = src_onode->name();
     LnNode* dst_inode = NULL;
     if ( src_inode ) {
       dst_inode = nodemap[src_inode->id()];
     }
-    (void) new_output(name, dst_inode);
+    (void) new_output(dst_inode);
   }
 
   // ポートの複製
@@ -317,6 +318,13 @@ LnGraph::sort(vector<LnNode*>& node_list) const
   assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
 }
 
+// @brief モジュール名を設定する．
+void
+LnGraph::set_name(const string& name)
+{
+  mName = name;
+}
+
 // @brief ポートを追加する(ベクタ版)．
 // @param[in] name ポート名
 // @param[in] io_node_vec 対応する入出力ノードのベクタ
@@ -329,15 +337,11 @@ LnGraph::add_port(const string& name,
 }
 
 // @brief 入力ノードを作る．
-// @param[in] name 名前
 // @return 作成したノードを返す．
 LnNode*
-LnGraph::new_input(const string& name)
+LnGraph::new_input()
 {
   LnNode* node = new_node(0);
-
-  // 名前を設定
-  node->mName = name;
   
   // 入力ノード配列に登録
   ymuint subid = mInputArray.size();
@@ -354,17 +358,12 @@ LnGraph::new_input(const string& name)
 }
 
 // @brief 出力ノードを作る．
-// @param[in] name 名前
 // @param[in] inode 入力のノード
 // @return 作成したノードを返す．
 LnNode*
-LnGraph::new_output(const string& name,
-		    LnNode* inode)
+LnGraph::new_output(LnNode* inode)
 {
   LnNode* node = new_node(1);
-
-  // 名前を設定
-  node->mName = name;
   
   // 出力ノード配列に登録
   ymuint subid = mOutputArray.size();
@@ -380,18 +379,14 @@ LnGraph::new_output(const string& name,
 }
 
 // @brief LUTノードを作る．
-// @param[in] name 名前
 // @param[in] inodes 入力ノードのベクタ
 // @param[in] tv 真理値ベクタ
 LnNode*
-LnGraph::new_lut(const string& name,
-		 const vector<LnNode*>& inodes,
+LnGraph::new_lut(const vector<LnNode*>& inodes,
 		 const vector<int>& tv)
 {
   ymuint ni = inodes.size();
   LnNode* node = new_node(ni);
-
-  node->mName = name;
   
   // LUTノードリストに登録
   mLutList.push_back(node);
@@ -412,14 +407,11 @@ LnGraph::new_lut(const string& name,
 }
 
 // @brief DFFノードを作る．
-// @param[in] name 名前
 // @return 作成したノードを返す．
 LnNode*
-LnGraph::new_dff(const string& name)
+LnGraph::new_dff()
 {
   LnNode* node = new_node(1);
-
-  node->mName = name;
 
   // DFFノードリストに登録
   mDffList.push_back(node);
@@ -481,6 +473,8 @@ LnGraph::new_node(ymuint ni)
 void
 LnGraph::clear()
 {
+  mName.clear();
+  
   // ポートを削除する．
   for (vector<LnPort*>::iterator p = mPortArray.begin();
        p != mPortArray.end(); ++ p) {
@@ -692,11 +686,12 @@ LnGraph::level() const
 
 // 内容を s に出力する．
 void
-LnGraph::dump(ostream& s) const
+dump(ostream& s,
+     const LnGraph& lngraph)
 {
-  ymuint np = port_num();
+  ymuint np = lngraph.port_num();
   for (ymuint i = 0; i < np; ++ i) {
-    const LnPort* port = this->port(i);
+    const LnPort* port = lngraph.port(i);
     s << "PORT#" << i << "(" << port->name() << "): ";
     
     ymuint nb = port->bit_width();
@@ -718,18 +713,20 @@ LnGraph::dump(ostream& s) const
     s << endl;
   }
 
-  for (LnNodeList::const_iterator p = mInputList.begin();
-       p != mInputList.end(); ++ p) {
+  const LnNodeList& input_list = lngraph.input_list();
+  for (LnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
     const LnNode* node = *p;
-    s << "INPUT#" << node->subid() << "(" << node->id_str() << "): "
-      << node->name() << endl;
+    s << "INPUT#" << node->subid() << "(" << node->id_str() << ")"
+      << endl;
   }
-  for (LnNodeList::const_iterator p = mOutputList.begin();
-       p != mOutputList.end(); ++ p) {
+  const LnNodeList& output_list = lngraph.output_list();
+  for (LnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
     const LnNode* node = *p;
     const LnEdge* e = node->fanin_edge(0);
-    s << "OUTPUT#" << node->subid() << "(" << node->id_str() << "): "
-      << node->name() << " = ";
+    s << "OUTPUT#" << node->subid() << "(" << node->id_str()
+      << ") = ";
     const LnNode* inode = e->from();
     if ( inode ) {
       // 普通のノードの場合
@@ -741,18 +738,20 @@ LnGraph::dump(ostream& s) const
     }
     s << endl;
   }
-  for (LnNodeList::const_iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
+  const LnNodeList& dff_list = lngraph.dff_list();
+  for (LnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
     const LnNode* node = *p;
     const LnNode* inode = node->fanin(0);
-    s << "DFF(" << node->id_str() << "): " << node->name() << " = "
+    s << "DFF(" << node->id_str() << ")  = "
       << inode->id_str() << endl;
   }
-  
-  for (LnNodeList::const_iterator p = mLutList.begin();
-       p != mLutList.end(); ++ p) {
+
+  const LnNodeList& lut_list = lngraph.lut_list();
+  for (LnNodeList::const_iterator p = lut_list.begin();
+       p != lut_list.end(); ++ p) {
     const LnNode* node = *p;
-    s << "LUT(" << node->id_str() << "): " << node->name() << " = (";
+    s << "LUT(" << node->id_str() << ")  = (";
     const char* comma = "";
     ymuint ni = node->ni();
     for (ymuint i = 0; i < ni; ++ i) {

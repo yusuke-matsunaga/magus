@@ -36,7 +36,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
   for (LnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     LnNode* src_node = *p;
-    BNode* dst_node = manip.new_input(src_node->name());
+    BNode* dst_node = manip.new_input(string());
     node_assoc[src_node->id()] = dst_node;
   }
 
@@ -45,7 +45,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
   for (LnNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     LnNode* src_node = *p;
-    BNode* dst_node = manip.new_latch(src_node->name());
+    BNode* dst_node = manip.new_latch();
     node_assoc[src_node->id()] = dst_node;
   }
   
@@ -86,11 +86,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
 	  expr |= prd;
 	}
       }
-      string name = src_node->name();
-      if ( dst_network.find_node(name) ) {
-	name = "";
-      }
-      dst_node = manip.new_logic(name);
+      dst_node = manip.new_logic();
       bool stat = manip.change_logic(dst_node, expr, dst_inodes, false);
       assert_cond(stat, __FILE__, __LINE__);
     }
@@ -105,7 +101,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
     LnNode* inode = onode->fanin(0);
     BNode* dst_inode = node_assoc[inode->id()];
     assert_cond(dst_inode, __FILE__, __LINE__);
-    BNode* dst_onode = manip.new_output(onode->name());
+    BNode* dst_onode = manip.new_output(string());
     bool stat = manip.change_output(dst_onode, dst_inode);
     assert_cond(stat, __FILE__, __LINE__);
   }

@@ -118,7 +118,7 @@ main(int argc,
 	      depth);
 
     // とりあえず内容を出力する．
-    lut_network.dump(cout);
+    dump(cout, lut_network);
     
   }
   catch ( AssertError x) {

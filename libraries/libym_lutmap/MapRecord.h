@@ -96,8 +96,7 @@ private:
   LnNode*
   back_trace(SbjNode* node,
 	     bool inv,
-	     LnGraph& mapnetwork,
-	     const string& oname);
+	     LnGraph& mapnetwork);
 
   // estimate() で用いるバックトレース
   int
