@@ -24,8 +24,8 @@ MvDff::MvDff(MvModule* module,
 	     ymuint bit_width) :
   MvNode(module, 4, 1)
 {
-  set_bit_width(_input(0), 1);
-  set_bit_width(_input(1), bit_width);
+  set_bit_width(_input(0), bit_width);
+  set_bit_width(_input(1), 1);
   set_bit_width(_input(2), 1);
   set_bit_width(_input(3), 1);
   set_bit_width(_output(0), bit_width);

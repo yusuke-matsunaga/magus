@@ -25,6 +25,8 @@ libym_mvn_la_SOURCES = \
 	MvBinaryOp.cc \
 	MvBitSelect.h \
 	MvBitSelect.cc \
+	MvCmpl.h \
+	MvCmpl.cc \
 	MvConcat.h \
 	MvConcat.cc \
 	MvConst.h \

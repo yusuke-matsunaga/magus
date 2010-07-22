@@ -323,6 +323,15 @@ public:
 	  ymuint bit_width2,
 	  ymuint bit_width3);
 
+  /// @brief cmpl ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  /// @return 生成したノードを返す．
+  /// @note 2の補数を計算する．
+  MvNode*
+  new_cmpl(MvModule* module,
+	   ymuint bit_width);
+
   /// @brief add ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width1 入力1のビット幅

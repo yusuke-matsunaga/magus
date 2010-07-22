@@ -76,7 +76,10 @@ public:
     kSla,
     /// @brief shift right arithmetic ( 2入力, 1出力 )
     kSra,
-    
+
+    /// @brief cmpl ( 1入力, 1出力 )
+    /// 2の補数
+    kCmpl,
     /// @brief add ( 2入力, 1出力 )
     kAdd,
     /// @brief sub ( 2入力, 1出力 )

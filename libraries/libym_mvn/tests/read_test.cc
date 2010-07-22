@@ -50,10 +50,12 @@ main(int argc,
     bool stat = reader.gen_network(mgr);
     cerr << " End" << endl;
     if ( !stat ) {
+      cerr << "error occured" << endl;
       return 2;
     }
     
-    dump(cout, mgr);
+    //dump(cout, mgr);
+    dump_verilog(cout, mgr);
 #if 0
   }
   catch ( AssertError x) {
