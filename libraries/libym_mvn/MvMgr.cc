@@ -41,7 +41,7 @@ MvMgr::~MvMgr()
 // @note この関数はトップモジュール数ではなく全モジュール数に比例した
 // 実行時間を要する．
 ymuint
-MvMgr::topmodule_list(list<MvModule*>& module_list) const
+MvMgr::topmodule_list(list<const MvModule*>& module_list) const
 {
   module_list.clear();
   for (vector<MvModule*>::const_iterator p = mModuleArray.begin();

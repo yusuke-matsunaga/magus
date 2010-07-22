@@ -44,7 +44,7 @@ public:
   /// @note この関数はトップモジュール数ではなく全モジュール数に比例した
   /// 実行時間を要する．
   ymuint
-  topmodule_list(list<MvModule*>& module_list) const;
+  topmodule_list(list<const MvModule*>& module_list) const;
 
   /// @brief モジュール番号の最大値+1を得る．
   ymuint
