@@ -89,6 +89,27 @@ SbjNode::id_str() const
 }
 
 
+//////////////////////////////////////////////////////////////////////
+// クラス SbjPort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] body 入出力ノードのベクタ
+SbjPort::SbjPort(const string& name,
+		 const vector<SbjNode*>& body) :
+  mName(name),
+  mBody(body)
+{
+}
+
+// @brief デストラクタ
+SbjPort::~SbjPort()
+{
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // クラス SbjGraph
 ///////////////////////////////////////////////////////////////////////
@@ -199,12 +220,33 @@ SbjGraph::copy(const SbjGraph& src,
     }
     (void) new_output(name, dst_inode, src_onode->output_inv());
   }
+
+  // ポートの複製
+  ymuint np = src.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const SbjPort* src_port = src.port(i);
+    ymuint nb = src_port->bit_width();
+    vector<SbjNode*> tmp(nb);
+    for (ymuint j = 0; j < nb; ++ j) {
+      const SbjNode* src_node = src_port->bit(j);
+      SbjNode* dst_node = nodemap[src_node->id()];
+      tmp[j] = dst_node;
+    }
+    add_port(src_port->name(), tmp);
+  }
 }
 
 // 空にする．
 void
 SbjGraph::clear()
 {
+  // ポートをクリアする．
+  for (vector<SbjPort*>::iterator p = mPortArray.begin();
+       p != mPortArray.end(); ++ p) {
+    delete *p;
+  }
+  mPortArray.clear();
+  
   // まず最初に接続を切る．
   for (SbjNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
@@ -265,6 +307,17 @@ SbjGraph::clear()
 
   mInputArray.clear();
   mOutputArray.clear();
+}
+
+// @brief ポートを追加する(ベクタ版)．
+// @param[in] name ポート名
+// @param[in] body 対応付ける入出力ノードのベクタ
+void
+SbjGraph::add_port(const string& name,
+		   const vector<SbjNode*>& body)
+{
+  SbjPort* port = new SbjPort(name, body);
+  mPortArray.push_back(port);
 }
 
 // @brief 入力ノードと DFF ノードのリストを返す．
@@ -743,12 +796,35 @@ void
 dump(ostream& s,
      const SbjGraph& sbjgraph)
 {
+  ymuint np = sbjgraph.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    s << "Port#" << i << ":";
+    const SbjPort* port = sbjgraph.port(i);
+    ymuint nb = port->bit_width();
+    assert_cond( nb > 0, __FILE__, __LINE__);
+    if ( nb == 1 ) {
+      const SbjNode* node = port->bit(0);
+      s << " " << node->id_str();
+    }
+    else {
+      s << "{";
+      const char* comma = "";
+      for (ymuint i = 0; i < nb; ++ i) {
+	const SbjNode* node = port->bit(i);
+	s << comma << node->id_str();
+	comma = ", ";
+      }
+      s << "}";
+    }
+    s << endl;
+  }
+  s << endl;
+  
   const SbjNodeList& input_list = sbjgraph.input_list();
   for (SbjNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const SbjNode* node = *p;
-    s << "I" << node->subid() << "(" << node->id_str() << "): "
-      << node->name() << endl;
+    s << "Input#" << node->subid() << ": " << node->id_str() << endl;
   }
 
   const SbjNodeList& output_list = sbjgraph.output_list();
@@ -756,8 +832,8 @@ dump(ostream& s,
        p != output_list.end(); ++ p) {
     const SbjNode* node = *p;
     const SbjEdge* e = node->fanin_edge(0);
-    s << "O" << node->subid() << "(" << node->id_str() << "): "
-      << node->name() << " = ";
+    s << "Output#" << node->subid() << ": " << node->id_str()
+      << " = ";
     const SbjNode* inode = e->from();
     if ( inode ) {
       // 普通のノードの場合
@@ -783,8 +859,7 @@ dump(ostream& s,
        p != dff_list.end(); ++ p) {
     const SbjNode* node = *p;
     const SbjEdge* e = node->fanin_edge(0);
-    s << "DFF" << "(" << node->id_str() << "): "
-      << node->name() << " = ";
+    s << "DFF(" << node->id_str() << ") = ";
     const SbjNode* inode = e->from();
     if ( inode ) {
       // 普通のノードの場合
@@ -809,7 +884,7 @@ dump(ostream& s,
   for (SbjNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const SbjNode* node = *p;
-    s << node->id_str() << ": " << node->name() << " = LOGIC[";
+    s << "Logic(" << node->id_str() << ") = [";
     ymuint fcode = node->fcode();
     s << ((fcode >> 3) & 1) << ((fcode >> 2) & 1)
       << ((fcode >> 1) & 1) << (fcode & 1) << "] ("

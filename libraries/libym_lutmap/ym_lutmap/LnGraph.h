@@ -346,6 +346,62 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class LnPort LnGraph.h "LnGraph.h"
+/// @brief ポートを表すクラス
+//////////////////////////////////////////////////////////////////////
+class LnPort
+{
+  friend class LnGraph;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  /// @param[in] name 名前
+  /// @param[in] io_node_vec 対応する入出力ノードのベクタ
+  LnPort(const string& name,
+	 const vector<LnNode*>& io_node_vec);
+
+  /// @brief デストラクタ
+  ~LnPort();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を得る．
+  string
+  name() const;
+
+  /// @brief ビット数を得る．
+  ymuint
+  bit_width() const;
+
+  /// @brief pos ビット目の内容を得る．
+  /// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
+  const LnNode*
+  bit(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  string mName;
+
+  // 入出力ノードの配列
+  vector<LnNode*> mBody;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class LnGraph LnGraph.h "LnGraph.h"
 /// @brief LUTネットワークを表すクラス
 ///
@@ -380,7 +436,49 @@ public:
   /// @brief デストラクタ
   ~LnGraph();
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name ポートの情報の取得
+  /// @{
+
+  /// @brief ポート数を得る．
+  ymuint
+  port_num() const;
+
+  /// @brief ポートを得る．
+  /// @param[in] pos ポート位置 ( 0 <= pos < port_num() )
+  const LnPort*
+  port(ymuint pos) const;
   
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name ポートの情報の設定
+  /// @{
+
+  /// @brief ポートを追加する(1ビット版)．
+  /// @param[in] name ポート名
+  /// @param[in] io_node 対応する入出力ノード
+  void
+  add_port(const string& name,
+	   LnNode* io_node);
+
+  /// @brief ポートを追加する(ベクタ版)．
+  /// @param[in] name ポート名
+  /// @param[in] io_node_vec 対応する入出力ノードのベクタ
+  void
+  add_port(const string& name,
+	   const vector<LnNode*>& io_node_vec);
+  
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name ノード関連の情報の取得
   /// @{
@@ -395,7 +493,7 @@ public:
   /// @param[in] id ID 番号
   /// @return ID 番号が id のノードを返す．
   /// @retrun 該当するノードが無い場合には NULL を返す．
-  LnNode*
+  const LnNode*
   node(ymuint id) const;
   
   /// @brief 入力ノード数の取得
@@ -406,7 +504,7 @@ public:
   /// @brief 入力 ID 番号による入力ノードの取得
   /// @param[in] id 入力 ID 番号
   /// @return 入力 ID 番号が id のノードを返す．
-  LnNode*
+  const LnNode*
   input(ymuint id) const;
 
   /// @brief 入力ノードのリストを得る．
@@ -426,7 +524,7 @@ public:
   /// @brief 出力 ID 番号による出力ノードの取得
   /// @param[in] id 出力 ID 番号
   /// @return 出力 ID 番号が id のノードを返す．
-  LnNode*
+  const LnNode*
   output(ymuint id) const;
 
   /// @brief 出力ノードのリストを得る．
@@ -475,7 +573,8 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name ノードの生成／変更
   /// @{
@@ -521,7 +620,8 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name その他の関数
   /// @{
@@ -597,6 +697,9 @@ private:
 
   // ノードのファンインの枝の配列を確保するためのアロケータ
   FragAlloc mAlloc2;
+
+  // ポーの配列
+  vector<LnPort*> mPortArray;
   
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
@@ -930,8 +1033,66 @@ LnNode::level() const
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス LnPort
+//////////////////////////////////////////////////////////////////////
+
+// @brief 名前を得る．
+inline
+string
+LnPort::name() const
+{
+  return mName;
+}
+
+// @brief ビット数を得る．
+inline
+ymuint
+LnPort::bit_width() const
+{
+  return mBody.size();
+}
+
+// @brief pos ビット目の内容を得る．
+// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
+inline
+const LnNode*
+LnPort::bit(ymuint pos) const
+{
+  return mBody[pos];
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス LnGraph
 //////////////////////////////////////////////////////////////////////
+
+// @brief ポート数を得る．
+inline
+ymuint
+LnGraph::port_num() const
+{
+  return mPortArray.size();
+}
+
+// @brief ポートを得る．
+// @param[in] pos ポート位置 ( 0 <= pos < port_num() )
+inline
+const LnPort*
+LnGraph::port(ymuint pos) const
+{
+  return mPortArray[pos];
+}
+
+// @brief ポートを追加する(1ビット版)．
+// @param[in] name ポート名
+// @param[in] io_node 対応する入出力ノード
+inline
+void
+LnGraph::add_port(const string& name,
+		  LnNode* io_node)
+{
+  add_port(name, vector<LnNode*>(1, io_node));
+}
 
 // ノード番号の最大値 + 1 を返す．
 inline
@@ -944,7 +1105,7 @@ LnGraph::max_node_id() const
 // ID 番号が id のノードを取り出す．
 // 該当するノードが無い場合には NULL を返す．
 inline
-LnNode*
+const LnNode*
 LnGraph::node(ymuint id) const
 {
   return mNodeArray[id];
@@ -960,7 +1121,7 @@ LnGraph::n_inputs() const
 
 // ID 番号が id の入力ノードを取り出す．
 inline
-LnNode*
+const LnNode*
 LnGraph::input(ymuint id) const
 {
   return mInputArray[id];
@@ -984,7 +1145,7 @@ LnGraph::n_outputs() const
 
 // ID 番号が id の出力ノードを取り出す．
 inline
-LnNode*
+const LnNode*
 LnGraph::output(ymuint id) const
 {
   return mOutputArray[id];

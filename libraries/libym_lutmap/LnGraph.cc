@@ -58,6 +58,26 @@ LnNode::id_str() const
 }
 
 
+//////////////////////////////////////////////////////////////////////
+// クラス LnPort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] io_node_vec 対応する入出力ノードのベクタ
+LnPort::LnPort(const string& name,
+	       const vector<LnNode*>& io_node_vec) :
+  mName(name),
+  mBody(io_node_vec)
+{
+}
+
+// @brief デストラクタ
+LnPort::~LnPort()
+{
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 // クラス LnGraph
 ///////////////////////////////////////////////////////////////////////
@@ -95,7 +115,7 @@ LnGraph::operator=(const LnGraph& src)
 // デストラクタ
 LnGraph::~LnGraph()
 {
-  //clear();
+  clear();
 }
 
 // 複製する．
@@ -171,6 +191,20 @@ LnGraph::copy(const LnGraph& src,
       dst_inode = nodemap[src_inode->id()];
     }
     (void) new_output(name, dst_inode);
+  }
+
+  // ポートの複製
+  ymuint np = src.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const LnPort* src_port = src.port(i);
+    ymuint nb = src_port->bit_width();
+    vector<LnNode*> tmp(nb);
+    for (ymuint j = 0; j < nb; ++ j) {
+      const LnNode* src_node = src_port->bit(j);
+      LnNode* dst_node = nodemap[src_node->id()];
+      tmp[j] = dst_node;
+    }
+    add_port(src_port->name(), tmp);
   }
 }
 
@@ -281,6 +315,17 @@ LnGraph::sort(vector<LnNode*>& node_list) const
     sort_sub(node, mark, node_list);
   }
   assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+}
+
+// @brief ポートを追加する(ベクタ版)．
+// @param[in] name ポート名
+// @param[in] io_node_vec 対応する入出力ノードのベクタ
+void
+LnGraph::add_port(const string& name,
+		  const vector<LnNode*>& io_node_vec)
+{
+  LnPort* port = new LnPort(name, io_node_vec);
+  mPortArray.push_back(port);
 }
 
 // @brief 入力ノードを作る．
@@ -436,6 +481,14 @@ LnGraph::new_node(ymuint ni)
 void
 LnGraph::clear()
 {
+  // ポートを削除する．
+  for (vector<LnPort*>::iterator p = mPortArray.begin();
+       p != mPortArray.end(); ++ p) {
+    LnPort* port = *p;
+    delete port;
+  }
+  mPortArray.clear();
+  
   // まず最初に接続を切る．
   for (LnNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
@@ -641,6 +694,30 @@ LnGraph::level() const
 void
 LnGraph::dump(ostream& s) const
 {
+  ymuint np = port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const LnPort* port = this->port(i);
+    s << "PORT#" << i << "(" << port->name() << "): ";
+    
+    ymuint nb = port->bit_width();
+    assert_cond( nb > 0 , __FILE__, __LINE__);
+    if ( nb == 1 ) {
+      const LnNode* node = port->bit(0);
+      s << node->id_str();
+    }
+    else {
+      s << "{";
+      const char* comma = "";
+      for (ymuint j = 0; j < nb; ++ j) {
+	const LnNode* node = port->bit(j);
+	s << comma << node->id_str();
+	comma = ", ";
+      }
+      s << "}";
+    }
+    s << endl;
+  }
+
   for (LnNodeList::const_iterator p = mInputList.begin();
        p != mInputList.end(); ++ p) {
     const LnNode* node = *p;

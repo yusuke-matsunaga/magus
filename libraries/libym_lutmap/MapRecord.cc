@@ -124,7 +124,8 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       }
       mapnode = mapgraph.new_lut(name, vector<LnNode*>(0), tv);
     }
-    mapgraph.new_output(name, mapnode);
+    LnNode* omapnode = mapgraph.new_output(name, mapnode);
+    mNodeInfo[onode->id()].mMapNode[0] = omapnode;
   }
 
   // DFFからバックトレースを行い全ノードの生成を行う．
@@ -156,6 +157,21 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     mapgraph.set_dff_input(omapnode, mapnode);
   }
 
+  // ポートを生成する．
+  ymuint np = sbjgraph.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const SbjPort* sbjport = sbjgraph.port(i);
+    ymuint nb = sbjport->bit_width();
+    vector<LnNode*> tmp(nb);
+    for (ymuint j = 0; j < nb; ++ j) {
+      const SbjNode* sbjnode = sbjport->bit(j);
+      LnNode* node = mNodeInfo[sbjnode->id()].mMapNode[0];
+      assert_cond( node != NULL, __FILE__, __LINE__);
+      tmp[j] = node;
+    }
+    mapgraph.add_port(sbjport->name(), tmp);
+  }
+  
   lut_num = mapgraph.n_lnodes();
   depth = max_depth;
 }

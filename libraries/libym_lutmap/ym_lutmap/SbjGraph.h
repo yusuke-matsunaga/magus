@@ -182,7 +182,7 @@ public:
   };
 
 
-public:
+private:
 
   /// @brief コンストラクタ
   SbjNode();
@@ -516,6 +516,65 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class SbjPort SbjGraph.h "SbjGraph.h"
+/// @brief ポートを表すクラス
+///
+/// ポートは通常，名前を持ち，1つもしくは複数の入出力ノード
+/// と対応づけられる．
+//////////////////////////////////////////////////////////////////////
+class SbjPort
+{
+  friend class SbjGraph;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  /// @param[in] name 名前
+  /// @param[in] body 入出力ノードのベクタ
+  SbjPort(const string& name,
+	  const vector<SbjNode*>& body);
+
+  /// @brief デストラクタ
+  ~SbjPort();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を得る．
+  string
+  name() const;
+
+  /// @brief ビット数を得る．
+  ymuint
+  bit_width() const;
+
+  /// @brief pos ビット目の内容を得る．
+  /// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
+  const SbjNode*
+  bit(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  string mName;
+
+  // 入出力ノードのベクタ
+  vector<SbjNode*> mBody;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class SbjGraph SbjGraph.h "SbjGraph.h"
 /// @brief サブジェクトグラフを表すクラス
 ///
@@ -547,7 +606,47 @@ public:
   /// @brief デストラクタ
   ~SbjGraph();
 
-  
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name ポート関連の情報の取得
+  /// @{
+
+  /// @brief ポート数を得る．
+  ymuint
+  port_num() const;
+
+  /// @brief ポートを得る．
+  /// @param[in] pos 位置 ( 0 <= pos < port_num() )
+  const SbjPort*
+  port(ymuint pos) const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name ポートの生成
+
+  /// @brief ポートを追加する(1ビット版)．
+  /// @param[in] name ポート名
+  /// @param[in] io_node 対応付ける入出力ノード
+  void
+  add_port(const string& name,
+	   SbjNode* io_node);
+
+  /// @brief ポートを追加する(ベクタ版)．
+  /// @param[in] name ポート名
+  /// @param[in] body 対応付ける入出力ノードのベクタ
+  void
+  add_port(const string& name,
+	   const vector<SbjNode*>& body);
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name ノード関連の情報の取得
@@ -562,7 +661,7 @@ public:
   /// @param[in] id ID 番号 ( 0 <= id < max_node_id() )
   /// @return ID 番号が id のノードを返す．
   /// @retrun 該当するノードが無い場合には NULL を返す．
-  SbjNode*
+  const SbjNode*
   node(ymuint id) const;
   
   /// @brief 入力ノード数の取得
@@ -637,7 +736,8 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name ノードの生成／変更
   /// @{
@@ -712,7 +812,8 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name minimum depth 関係の関数
   /// @{
@@ -724,9 +825,8 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  void
-  set_efo() const;
-  
+
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name その他の関数
   /// @{
@@ -738,6 +838,9 @@ public:
   /// @brief 内容を s に出力する．
   void
   dump(ostream& s) const;
+
+  void
+  set_efo() const;
   
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -803,6 +906,9 @@ private:
 
   // ノードを確保するためのアロケータ
   SimpleAlloc mAlloc;
+
+  // ポートの配列
+  vector<SbjPort*> mPortArray;
   
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
@@ -1371,8 +1477,66 @@ SbjNode::level() const
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス SbjPort
+//////////////////////////////////////////////////////////////////////
+
+// @brief 名前を得る．
+inline
+string
+SbjPort::name() const
+{
+  return mName;
+}
+
+// @brief ビット数を得る．
+inline
+ymuint
+SbjPort::bit_width() const
+{
+  return mBody.size();
+}
+
+// @brief pos ビット目の内容を得る．
+// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
+inline
+const SbjNode*
+SbjPort::bit(ymuint pos) const
+{
+  return mBody[pos];
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス SbjGraph
 //////////////////////////////////////////////////////////////////////
+
+// @brief ポート数を得る．
+inline
+ymuint
+SbjGraph::port_num() const
+{
+  return mPortArray.size();
+}
+
+// @brief ポートを得る．
+// @param[in] pos 位置 ( 0 <= pos < port_num() )
+inline
+const SbjPort*
+SbjGraph::port(ymuint pos) const
+{
+  return mPortArray[pos];
+}
+
+// @brief ポートを追加する(1ビット版)．
+// @param[in] name ポート名
+// @param[in] io_node 対応付ける入出力ノード
+inline
+void
+SbjGraph::add_port(const string& name,
+		   SbjNode* io_node)
+{
+  add_port(name, vector<SbjNode*>(1, io_node));
+}
 
 // ノード番号の最大値 + 1 を返す．
 inline
@@ -1385,7 +1549,7 @@ SbjGraph::max_node_id() const
 // ID 番号が id のノードを取り出す．
 // 該当するノードが無い場合には NULL を返す．
 inline
-SbjNode*
+const SbjNode*
 SbjGraph::node(ymuint id) const
 {
   return mNodeArray[id];

@@ -10,6 +10,7 @@
 #include "ym_lutmap/SbjGraph.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
+#include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvPin.h"
 #include "ym_mvn/MvNet.h"
@@ -632,6 +633,55 @@ mvn2sbj(const MvMgr& mvmgr,
       SbjNode* osbjnode = sbjgraph.new_output(string(), sbjnode, inv);
       mvmap.put(node, j, osbjnode, false);
     }
+  }
+
+  // ポートを生成する．
+  ymuint np = module->port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const MvPort* port = module->port(i);
+    ymuint nb = port->bit_width();
+    vector<SbjNode*> tmp;
+    tmp.reserve(nb);
+    ymuint n = port->port_ref_num();
+    for (ymuint j = 0; j < n; ++ j) {
+      const MvPortRef* port_ref = port->port_ref(j);
+      ymuint nb1 = port_ref->bit_width();
+      const MvNode* node = port_ref->node();
+      if ( port_ref->is_simple() ) {
+	for (ymuint k = 0; k < nb1; ++ k) {
+	  SbjNode* sbjnode;
+	  bool inv;
+	  bool stat = mvmap.get(node, k, sbjnode, inv);
+	  assert_cond( stat , __FILE__, __LINE__);
+	  assert_cond( inv == false, __FILE__, __LINE__);
+	  tmp.push_back(sbjnode);
+	}
+      }
+      else if ( port_ref->has_bitselect() ) {
+	SbjNode* sbjnode;
+	bool inv;
+	bool stat = mvmap.get(node, port_ref->bitpos(), sbjnode, inv);
+	assert_cond( stat , __FILE__, __LINE__);
+	assert_cond( inv == false, __FILE__, __LINE__);
+	tmp.push_back(sbjnode);
+      }
+      else if ( port_ref->has_partselect() ) {
+	ymuint msb = port_ref->msb();
+	ymuint lsb = port_ref->lsb();
+	for (ymuint k = lsb; k <= msb; ++ k) {
+	  SbjNode* sbjnode;
+	  bool inv;
+	  bool stat = mvmap.get(node, k, sbjnode, inv);
+	  assert_cond( stat , __FILE__, __LINE__);
+	  assert_cond( inv == false, __FILE__, __LINE__);
+	  tmp.push_back(sbjnode);
+	}
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+    sbjgraph.add_port(port->name(), tmp);
   }
 }
 
