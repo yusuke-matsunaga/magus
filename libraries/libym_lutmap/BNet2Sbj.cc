@@ -104,7 +104,7 @@ BNet2Sbj::operator()(const BNetwork& network,
   for (BNodeList::const_iterator p = network.inputs_begin();
        p != network.inputs_end(); ++p) {
     BNode* bnode = *p;
-    SbjNode* node = sbjgraph.new_input(bnode->name());
+    SbjNode* node = sbjgraph.new_input();
     assoc.put(bnode, node, false);
   }
 
@@ -112,7 +112,7 @@ BNet2Sbj::operator()(const BNetwork& network,
   for (BNodeList::const_iterator p = network.latch_nodes_begin();
        p != network.latch_nodes_end(); ++ p) {
     BNode* bnode = *p;
-    SbjNode* node = sbjgraph.new_dff(bnode->name());
+    SbjNode* node = sbjgraph.new_dff();
     assoc.put(bnode, node, false);
   }
   
@@ -254,8 +254,7 @@ BNet2Sbj::operator()(const BNetwork& network,
       else {
 	assert_not_reached(__FILE__, __LINE__);
       }
-      SbjNode* node = sbjgraph.new_logic(bnode->name(), fcode,
-					 inode0, inode1);
+      SbjNode* node = sbjgraph.new_logic(fcode, inode0, inode1);
       assoc.put(bnode, node, false);
     }
     else { // ni > 2
@@ -276,7 +275,7 @@ BNet2Sbj::operator()(const BNetwork& network,
     BNode* ibnode = obnode->fanin(0);
     SbjNode* inode = NULL;
     assoc.get(ibnode, inode, inv);
-    sbjgraph.change_dff(onode, inode, inv);
+    sbjgraph.set_dff_data(onode, inode, inv);
   }
   
   // 外部出力ノードを作る．
@@ -287,7 +286,7 @@ BNet2Sbj::operator()(const BNetwork& network,
     SbjNode* inode = NULL;
     bool inv;
     assoc.get(ibnode, inode, inv);
-    (void) sbjgraph.new_output(obnode->name(), inode, inv);
+    (void) sbjgraph.new_output(inode, inv);
   }
 
   sbjgraph.set_efo();

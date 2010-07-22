@@ -209,11 +209,6 @@ public:
   string
   id_str() const;
 
-  /// @brief 名前を得る．
-  /// @note 名前がない場合もある．
-  const string&
-  name() const;
-
   /// @brief タイプを得る．
   tType
   type() const;
@@ -301,6 +296,54 @@ public:
   /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
   pomark() const;
+
+  /// @brief DFFノードの場合のデータ入力を得る．
+  const SbjNode*
+  data_input() const;
+
+  /// @brief DFFノードの場合のデータ入力を得る．
+  SbjNode*
+  data_input();
+
+  /// @brief DFFノードの場合のデータ入力の反転属性を得る．
+  bool
+  data_inv() const;
+  
+  /// @brief DFFノードの場合のクロック入力を得る．
+  const SbjNode*
+  clock_input() const;
+
+  /// @brief DFFノードの場合のクロック入力を得る．
+  SbjNode*
+  clock_input();
+
+  /// @brief DFFノードの場合のクロック入力の反転属性を得る．
+  bool
+  clock_inv() const;
+
+  /// @brief DFFノードの場合のセット入力を得る．
+  const SbjNode*
+  set_input() const;
+
+  /// @brief DFFノードの場合のセット入力を得る．
+  SbjNode*
+  set_input();
+
+  /// @brief DFFノードの場合のセット入力の反転属性を得る．
+  bool
+  set_inv() const;
+
+  /// @brief DFFノードの場合のリセット入力を得る．
+  const SbjNode*
+  rst_input() const;
+
+  /// @brief DFFノードの場合のリセット入力を得る．
+  SbjNode*
+  rst_input();
+
+  /// @brief DFFノードの場合のリセット入力の反転属性を得る．
+  bool
+  rst_inv() const;
   
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -430,6 +473,18 @@ private:
   void
   set_dff(bool inv);
 
+  /// @brief DFFノードのクロック極性を設定する．
+  void
+  set_dff_clock(bool inv);
+
+  /// @brief DFFノードのセット極性を設定する．
+  void
+  set_dff_set(bool inv);
+
+  /// @brief DFFノードのリセット極性を設定する．
+  void
+  set_dff_rst(bool inv);
+  
   /// @brief 実効的なファンアウト数を計算する．
   void
   scan_efo(hash_set<ymuint>& mark) const;
@@ -447,14 +502,12 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // 名前
-  string mName;
-
   // タイプ (+ 入力／出力番号/機能コード)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
-  SbjEdge mFanins[2];
+  // 要素数は通常2だが DFF の場合は4
+  SbjEdge* mFanins;
   
   // ファンアウトの枝のリスト
   SbjEdgeList mFanoutList;
@@ -477,7 +530,7 @@ private:
   // 定数の定義
   //////////////////////////////////////////////////////////////////////
 
-  // mFlags の演算で用いる定数
+  // mMark の演算で用いる定数
   static
   const int kFoShift = 0;
   static
@@ -743,41 +796,34 @@ public:
   /// @{
 
   /// @brief 入力ノードを作る．
-  /// @param[in] name 名前
   /// @return 作成したノードを返す．
   SbjNode*
-  new_input(const string& name);
+  new_input();
   
   /// @brief 出力ノードを作る．
-  /// @param[in] name 名前
   /// @param[in] inode 入力のノード
   /// @param[in] inv 極性
   /// @return 作成したノードを返す．
   SbjNode*
-  new_output(const string& name,
-	     SbjNode* inode,
+  new_output(SbjNode* inode,
 	     bool inv);
   
   /// @brief 論理ノードを作る．
-  /// @param[in] name 名前
   /// @param[in] fcode 機能コード
   /// @param[in] inode1 1番めの入力ノード
   /// @param[in] inode2 2番めの入力ノード
   /// @return 作成したノードを返す．
   SbjNode*
-  new_logic(const string& name,
-	    ymuint fcode,
+  new_logic(ymuint fcode,
 	    SbjNode* inode1,
 	    SbjNode* inode2);
   
   /// @brief DFFノードを作る．
-  /// @param[in] name 名前
   /// @param[in] inode 入力のノード
   /// @param[in] inv 極性
   /// @return 作成したノードを返す．
   SbjNode*
-  new_dff(const string& name,
-	  SbjNode* inode = NULL,
+  new_dff(SbjNode* inode = NULL,
 	  bool inv = false);
   
   /// @brief 出力ノードの内容を変更する
@@ -805,9 +851,36 @@ public:
   /// @param[in] inode 入力のノード
   /// @param[in] inv 極性
   void
-  change_dff(SbjNode* node,
-	     SbjNode* inode,
-	     bool inv);
+  set_dff_data(SbjNode* node,
+	       SbjNode* inode,
+	       bool inv);
+
+  /// @brief DFFノードのクロック入力を設定する．
+  /// @param[in] 変更対象のDFFノード
+  /// @param[in] inode 入力のノード
+  /// @param[in] inv 極性
+  void
+  set_dff_clock(SbjNode* node,
+		SbjNode* inode,
+		bool inv);
+
+  /// @brief DFFノードのセット入力を設定する．
+  /// @param[in] 変更対象のDFFノード
+  /// @param[in] inode 入力のノード
+  /// @param[in] inv 極性
+  void
+  set_dff_set(SbjNode* node,
+	      SbjNode* inode,
+	      bool inv);
+
+  /// @brief DFFノードのリセット入力を設定する．
+  /// @param[in] 変更対象のDFFノード
+  /// @param[in] inode 入力のノード
+  /// @param[in] inv 極性
+  void
+  set_dff_rst(SbjNode* node,
+	      SbjNode* inode,
+	      bool inv);
   
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -859,11 +932,7 @@ private:
   // 新しいノードを作成し mNodeList に登録する．
   // 作成されたノードを返す．
   SbjNode*
-  new_node(const string& name);
-
-  // new_node で用いられる低レベル関数
-  SbjNode*
-  alloc_node();
+  new_node(ymuint ni);
 
   // 入力ノードの削除
   void
@@ -883,7 +952,8 @@ private:
   
   // node を削除する．
   void
-  delete_node(SbjNode* node);
+  delete_node(SbjNode* node,
+	      ymuint ni);
   
   // from を to の pos 番目のファンインとする．
   // to の pos 番目にすでに接続があった場合には自動的に削除される．
@@ -907,6 +977,9 @@ private:
   // ノードを確保するためのアロケータ
   SimpleAlloc mAlloc;
 
+  // SbjEdge の配列を確保するためのアロケータ
+  FragAlloc mAlloc2;
+  
   // ポートの配列
   vector<SbjPort*> mPortArray;
   
@@ -1101,15 +1174,6 @@ SbjNode::id() const
   return mId;
 }
 
-// @brief 名前を得る．
-// @note 名前がない場合もある．
-inline
-const string&
-SbjNode::name() const
-{
-  return mName;
-}
-
 // タイプを入力に設定する．
 inline
 void
@@ -1141,6 +1205,33 @@ void
 SbjNode::set_dff(bool inv)
 {
   mFlags = static_cast<ymuint>(kDFF) | (inv << 3);
+}
+
+// @brief DFFノードのクロック極性を設定する．
+inline
+void
+SbjNode::set_dff_clock(bool inv)
+{
+  mFlags &= ~(1UL << 4);
+  mFlags |= (static_cast<ymuint>(inv & 1U) << 4);
+}
+
+// @brief DFFノードのセット極性を設定する．
+inline
+void
+SbjNode::set_dff_set(bool inv)
+{
+  mFlags &= ~(1UL << 5);
+  mFlags |= (static_cast<ymuint>(inv & 1U) << 5);
+}
+
+// @brief DFFノードのリセット極性を設定する．
+inline
+void
+SbjNode::set_dff_rst(bool inv)
+{
+  mFlags &= ~(1UL << 6);
+  mFlags |= (static_cast<ymuint>(inv & 1U) << 6);
 }
 
 // タイプを得る．
@@ -1188,7 +1279,7 @@ inline
 bool
 SbjNode::is_ppi() const
 {
-  return type() == kINPUT || type() == kDFF;
+  return is_input() || is_dff();
 }
 
 // @brief 出力ノードか DFF ノードの時に true を返す．
@@ -1196,7 +1287,7 @@ inline
 bool
 SbjNode::is_ppo() const
 {
-  return type() == kOUTPUT || type() == kDFF;
+  return is_output() || is_dff();
 }
 
 // @brief サブID (入力／出力番号)を得る．
@@ -1204,7 +1295,7 @@ inline
 ymuint
 SbjNode::subid() const
 {
-  return mFlags >> 4;
+  return mFlags >> 5;
 }
 
 // @brief 出力ノードの極性を得る．
@@ -1229,7 +1320,7 @@ const SbjNode*
 SbjNode::fanin(ymuint pos) const
 {
   // pos の範囲チェックはしていない！！！
-  return mFanins[pos & 1U].from();
+  return mFanins[pos].from();
 }
 
 // @brief ファンインのノードを得る．
@@ -1238,7 +1329,7 @@ SbjNode*
 SbjNode::fanin(ymuint pos)
 {
   // pos の範囲チェックはしていない！！！
-  return mFanins[pos & 1U].from();
+  return mFanins[pos].from();
 }
 
 // ファンインの枝を得る．
@@ -1247,7 +1338,7 @@ const SbjEdge*
 SbjNode::fanin_edge(ymuint pos) const
 {
   // pos の範囲チェックはしていない！！！
-  return &mFanins[pos & 1U];
+  return &mFanins[pos];
 }
 
 // ファンインの枝を得る．
@@ -1256,7 +1347,7 @@ SbjEdge*
 SbjNode::fanin_edge(ymuint pos)
 {
   // pos の範囲チェックはしていない！！！
-  return &mFanins[pos & 1U];
+  return &mFanins[pos];
 }
 
 // ファンアウトリストを得る．
@@ -1289,6 +1380,102 @@ bool
 SbjNode::pomark() const
 {
   return static_cast<bool>((mMark >> kPoShift) & 1U);
+}
+
+// @brief DFFノードの場合のデータ入力を得る．
+inline
+const SbjNode*
+SbjNode::data_input() const
+{
+  return fanin(0);
+}
+
+// @brief DFFノードの場合のデータ入力を得る．
+inline
+SbjNode*
+SbjNode::data_input()
+{
+  return fanin(0);
+}
+
+// @brief DFFノードの場合のデータ入力の反転属性を得る．
+inline
+bool
+SbjNode::data_inv() const
+{
+  return static_cast<bool>((mFlags >> 3) & 1U);
+}
+
+// @brief DFFノードの場合のクロック入力を得る．
+inline
+const SbjNode*
+SbjNode::clock_input() const
+{
+  return fanin(1);
+}
+
+// @brief DFFノードの場合のクロック入力を得る．
+inline
+SbjNode*
+SbjNode::clock_input()
+{
+  return fanin(1);
+}
+
+// @brief DFFノードの場合のクロック入力の反転属性を得る．
+inline
+bool
+SbjNode::clock_inv() const
+{
+  return static_cast<bool>((mFlags >> 4) & 1U);
+}
+
+// @brief DFFノードの場合のセット入力を得る．
+inline
+const SbjNode*
+SbjNode::set_input() const
+{
+  return fanin(2);
+}
+
+// @brief DFFノードの場合のセット入力を得る．
+inline
+SbjNode*
+SbjNode::set_input()
+{
+  return fanin(2);
+}
+
+// @brief DFFノードの場合のセット入力の反転属性を得る．
+inline
+bool
+SbjNode::set_inv() const
+{
+  return static_cast<bool>((mFlags >> 5) & 1U);
+}
+
+// @brief DFFノードの場合のリセット入力を得る．
+inline
+const SbjNode*
+SbjNode::rst_input() const
+{
+  return fanin(3);
+}
+
+// @brief DFFノードの場合のリセット入力を得る．
+inline
+SbjNode*
+SbjNode::rst_input()
+{
+  return fanin(3);
+}
+
+// @brief DFFノードの場合のリセット入力の反転属性を得る．
+inline
+bool
+SbjNode::rst_inv() const
+{
+  return static_cast<bool>((mFlags >> 6) & 1U);
 }
 
 // @brief fanout マークを返す．

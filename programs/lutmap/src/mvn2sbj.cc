@@ -163,7 +163,7 @@ mvn2sbj(const MvMgr& mvmgr,
     const MvNode* node = module->input(i);
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
-      SbjNode* sbjnode = sbjgraph.new_input(string());
+      SbjNode* sbjnode = sbjgraph.new_input();
       mvmap.put(node, j, sbjnode, false);
     }
     mark[node->id()] = true;
@@ -179,7 +179,7 @@ mvn2sbj(const MvMgr& mvmgr,
     }
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
-      SbjNode* sbjnode = sbjgraph.new_dff(string());
+      SbjNode* sbjnode = sbjgraph.new_dff();
       mvmap.put(node, j, sbjnode, false);
     }
     mark[node->id()] = true;
@@ -297,8 +297,7 @@ mvn2sbj(const MvMgr& mvmgr,
 		fcode = 0x8; // 1000
 	      }
 	    }
-	    SbjNode* sbjnode = sbjgraph.new_logic(string(),
-						  fcode, sbjnode0, sbjnode1);
+	    SbjNode* sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
 	    mvmap.put(node, i, sbjnode, false);
 	  }
 	}
@@ -344,8 +343,7 @@ mvn2sbj(const MvMgr& mvmgr,
 		fcode = 0xe; // 1110
 	      }
 	    }
-	    SbjNode* sbjnode = sbjgraph.new_logic(string(),
-						  fcode, sbjnode0, sbjnode1);
+	    SbjNode* sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
 	    mvmap.put(node, i, sbjnode, false);
 	  }
 	}
@@ -381,8 +379,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	    else {
 	      fcode = 0x6; // 0110
 	    }
-	    SbjNode* sbjnode = sbjgraph.new_logic(string(),
-						  fcode, sbjnode0, sbjnode1);
+	    SbjNode* sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
 	    mvmap.put(node, i, sbjnode, false);
 	  }
 	}
@@ -464,8 +461,7 @@ mvn2sbj(const MvMgr& mvmgr,
 		fcode1 = 0x8;
 	      }
 	    }
-	    SbjNode* and1 = sbjgraph.new_logic(string(),
-					       fcode1, sbjnode0, sbjnode1);
+	    SbjNode* and1 = sbjgraph.new_logic(fcode1, sbjnode0, sbjnode1);
 	    ymuint fcode2 = 0U;
 	    if ( inv0 ) {
 	      if ( inv2 ) {
@@ -483,10 +479,8 @@ mvn2sbj(const MvMgr& mvmgr,
 		fcode2 = 0x4;
 	      }
 	    }
-	    SbjNode* and2 = sbjgraph.new_logic(string(),
-					       fcode2, sbjnode0, sbjnode2);
-	    SbjNode* or1 = sbjgraph.new_logic(string(),
-					      0xe, and1, and2);
+	    SbjNode* and2 = sbjgraph.new_logic(fcode2, sbjnode0, sbjnode2);
+	    SbjNode* or1 = sbjgraph.new_logic(0xe, and1, and2);
 	    mvmap.put(node, i, or1, false);
 	  }
 	}
@@ -609,7 +603,63 @@ mvn2sbj(const MvMgr& mvmgr,
 	bool stat1 = mvmap.get(src_node, j, isbjnode, iinv);
 	assert_cond( stat && stat1 , __FILE__, __LINE__);
 	assert_cond( inv == false, __FILE__, __LINE__);
-	sbjgraph.change_dff(sbjnode, isbjnode, iinv);
+	sbjgraph.set_dff_data(sbjnode, isbjnode, iinv);
+      }
+
+      const MvInputPin* ipin1 = node->input(1);
+      const MvNet* net1 = ipin1->net();
+      assert_cond( net1 != NULL, __FILE__, __LINE__);
+      const MvOutputPin* opin1 = net1->src_pin();
+      assert_cond( opin1->bit_width() == 1, __FILE__, __LINE__);
+      const MvNode* src_node1 = opin1->node();
+      SbjNode* isbjnode1;
+      bool iinv1;
+      bool stat1 = mvmap.get(src_node1, isbjnode1, iinv1);
+      assert_cond( stat1 , __FILE__, __LINE__);
+      for (ymuint j = 0; j < bw; ++ j) {
+	SbjNode* sbjnode;
+	bool inv;
+	bool stat = mvmap.get(node, j, sbjnode, inv);
+	assert_cond( stat, __FILE__, __LINE__);
+	sbjgraph.set_dff_clock(sbjnode, isbjnode1, iinv1);
+      }
+
+      const MvInputPin* ipin2 = node->input(2);
+      const MvNet* net2 = ipin2->net();
+      if ( net2 ) {
+	const MvOutputPin* opin2 = net2->src_pin();
+	assert_cond( opin2->bit_width() == 1, __FILE__, __LINE__);
+	const MvNode* src_node2 = opin2->node();
+	SbjNode* isbjnode2;
+	bool iinv2;
+	bool stat2 = mvmap.get(src_node2, isbjnode2, iinv2);
+	assert_cond( stat2 , __FILE__, __LINE__);
+	for (ymuint j = 0; j < bw; ++ j) {
+	  SbjNode* sbjnode;
+	  bool inv;
+	  bool stat = mvmap.get(node, j, sbjnode, inv);
+	  assert_cond( stat, __FILE__, __LINE__);
+	  sbjgraph.set_dff_rst(sbjnode, isbjnode2, iinv2);
+	}
+      }
+
+      const MvInputPin* ipin3 = node->input(3);
+      const MvNet* net3 = ipin3->net();
+      if ( net3 ) {
+	const MvOutputPin* opin3 = net3->src_pin();
+	assert_cond( opin3->bit_width() == 1, __FILE__, __LINE__);
+	const MvNode* src_node3 = opin3->node();
+	SbjNode* isbjnode3;
+	bool iinv3;
+	bool stat3 = mvmap.get(src_node3, isbjnode3, iinv3);
+	assert_cond( stat3 , __FILE__, __LINE__);
+	for (ymuint j = 0; j < bw; ++ j) {
+	  SbjNode* sbjnode;
+	  bool inv;
+	  bool stat = mvmap.get(node, j, sbjnode, inv);
+	  assert_cond( stat, __FILE__, __LINE__);
+	  sbjgraph.set_dff_set(sbjnode, isbjnode3, iinv3);
+	}
       }
     }
   }
@@ -630,7 +680,7 @@ mvn2sbj(const MvMgr& mvmgr,
       bool inv;
       bool stat = mvmap.get(src_node, j, sbjnode, inv);
       assert_cond( stat, __FILE__, __LINE__);
-      SbjNode* osbjnode = sbjgraph.new_output(string(), sbjnode, inv);
+      SbjNode* osbjnode = sbjgraph.new_output(sbjnode, inv);
       mvmap.put(node, j, osbjnode, false);
     }
   }

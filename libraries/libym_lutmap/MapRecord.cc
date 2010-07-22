@@ -131,28 +131,73 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     SbjNode* onode = *p;
-    SbjNode* node = onode->fanin(0);
-    bool inv = onode->output_inv();
-    LnNode* mapnode = NULL;
-    if ( node ) {
-      mapnode = back_trace(node, inv, mapgraph);
-      int depth1 = mNodeInfo[node->id()].mDepth;
-      if ( max_depth < depth1 ) {
-	max_depth = depth1;
-      }
-    }
-    else {
-      vector<int> tv(1);
-      if ( inv ) {
-	tv[0] = 1;
+
+    {
+      SbjNode* node = onode->data_input();
+      bool inv = onode->data_inv();
+      LnNode* mapnode = NULL;
+      if ( node ) {
+	mapnode = back_trace(node, inv, mapgraph);
+	int depth1 = mNodeInfo[node->id()].mDepth;
+	if ( max_depth < depth1 ) {
+	  max_depth = depth1;
+	}
       }
       else {
-	tv[0] = 0;
+	vector<int> tv(1);
+	if ( inv ) {
+	  tv[0] = 1;
+	}
+	else {
+	  tv[0] = 0;
+	}
+	mapnode = mapgraph.new_lut(vector<LnNode*>(0), tv);
       }
-      mapnode = mapgraph.new_lut(vector<LnNode*>(0), tv);
+      LnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
+      mapgraph.set_dff_input(omapnode, mapnode);
     }
-    LnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
-    mapgraph.set_dff_input(omapnode, mapnode);
+    {
+      SbjNode* node = onode->clock_input();
+      bool inv = onode->clock_inv();
+      LnNode* mapnode = NULL;
+      if ( node ) {
+	mapnode = back_trace(node, inv, mapgraph);
+	int depth1 = mNodeInfo[node->id()].mDepth;
+	if ( max_depth < depth1 ) {
+	  max_depth = depth1;
+	}
+	LnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
+	mapgraph.set_dff_clock(omapnode, mapnode);
+      }
+    }
+    {
+      SbjNode* node = onode->set_input();
+      bool inv = onode->set_inv();
+      LnNode* mapnode = NULL;
+      if ( node ) {
+	mapnode = back_trace(node, inv, mapgraph);
+	int depth1 = mNodeInfo[node->id()].mDepth;
+	if ( max_depth < depth1 ) {
+	  max_depth = depth1;
+	}
+	LnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
+	mapgraph.set_dff_set(omapnode, mapnode);
+      }
+    }
+    {
+      SbjNode* node = onode->rst_input();
+      bool inv = onode->rst_inv();
+      LnNode* mapnode = NULL;
+      if ( node ) {
+	mapnode = back_trace(node, inv, mapgraph);
+	int depth1 = mNodeInfo[node->id()].mDepth;
+	if ( max_depth < depth1 ) {
+	  max_depth = depth1;
+	}
+	LnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
+	mapgraph.set_dff_rst(omapnode, mapnode);
+      }
+    }
   }
 
   // ポートを生成する．

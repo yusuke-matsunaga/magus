@@ -81,7 +81,8 @@ main(int argc,
     mh->set_mask(MsgHandler::kMaskAll);
     mh->delete_mask(kMsgInfo);
     mh->delete_mask(kMsgDebug);
-    
+
+    // verilog ファイルの読み込み
     for (list<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
       const string& name = *p;
@@ -103,6 +104,7 @@ main(int argc,
     // SbjGraph に変換
     SbjGraph sbj_network;
     mvn2sbj(mgr, sbj_network);
+
 #endif
     
     // LUT にマッピング

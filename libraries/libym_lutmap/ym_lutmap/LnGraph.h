@@ -608,12 +608,34 @@ public:
   LnNode*
   new_dff();
 
-  /// @brief DFFノードの入力を設定する．
+  /// @brief DFFノードのデータ入力を設定する．
   /// @param[in] node 対象の DFF ノード
   /// @param[in] inode 入力のノード
   void
   set_dff_input(LnNode* node,
 		LnNode* inode);
+
+  /// @brief DFFノードのクロック入力を設定する．
+  /// @param[in] node 対象の DFF ノード
+  /// @param[in] inode 入力のノード
+  void
+  set_dff_clock(LnNode* node,
+		LnNode* inode);
+
+  /// @brief DFFノードのセット入力を設定する．
+  /// @param[in] node 対象の DFF ノード
+  /// @param[in] inode 入力のノード
+  void
+  set_dff_set(LnNode* node,
+	      LnNode* inode);
+
+  /// @brief DFFノードのリセット入力を設定する．
+  /// @param[in] node 対象の DFF ノード
+  /// @param[in] inode 入力のノード
+  void
+  set_dff_rst(LnNode* node,
+	      LnNode* inode);
+
   /// @}
   //////////////////////////////////////////////////////////////////////
   

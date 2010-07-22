@@ -411,7 +411,7 @@ LnGraph::new_lut(const vector<LnNode*>& inodes,
 LnNode*
 LnGraph::new_dff()
 {
-  LnNode* node = new_node(1);
+  LnNode* node = new_node(4);
 
   // DFFノードリストに登録
   mDffList.push_back(node);
@@ -432,6 +432,42 @@ LnGraph::set_dff_input(LnNode* node,
   assert_cond(node->is_dff(), __FILE__, __LINE__);
   
   connect(inode, node, 0);
+}
+
+// @brief DFFノードのクロック入力を設定する．
+// @param[in] node 対象の DFF ノード
+// @param[in] inode 入力のノード
+void
+LnGraph::set_dff_clock(LnNode* node,
+		       LnNode* inode)
+{
+  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  
+  connect(inode, node, 1);
+}
+
+// @brief DFFノードのセット入力を設定する．
+// @param[in] node 対象の DFF ノード
+// @param[in] inode 入力のノード
+void
+LnGraph::set_dff_set(LnNode* node,
+		     LnNode* inode)
+{
+  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  
+  connect(inode, node, 2);
+}
+
+// @brief DFFノードのリセット入力を設定する．
+// @param[in] node 対象の DFF ノード
+// @param[in] inode 入力のノード
+void
+LnGraph::set_dff_rst(LnNode* node,
+		     LnNode* inode)
+{
+  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  
+  connect(inode, node, 3);
 }
 
 // 新しいノードを作成する．
@@ -500,7 +536,9 @@ LnGraph::clear()
   for (LnNodeList::iterator p = mDffList.begin();
        p != mDffList.end(); ++ p) {
     LnNode* node = *p;
-    connect(NULL, node, 0);
+    for (ymuint i = 0; i < 4; ++ i) {
+      connect(NULL, node, i);
+    }
   }
 
   for (LnNodeList::iterator p = mInputList.begin();
@@ -743,8 +781,19 @@ dump(ostream& s,
        p != dff_list.end(); ++ p) {
     const LnNode* node = *p;
     const LnNode* inode = node->fanin(0);
-    s << "DFF(" << node->id_str() << ")  = "
-      << inode->id_str() << endl;
+    const LnNode* cnode = node->fanin(1);
+    s << "DFF(" << node->id_str() << "):"
+      << " DATA = " << inode->id_str()
+      << " , CLOCK = " << cnode->id_str();
+    const LnNode* snode = node->fanin(2);
+    if ( snode ) {
+      s << ", SET = " << snode->id_str();
+    }
+    const LnNode* rnode = node->fanin(3);
+    if ( rnode ) {
+      s << ", RST = " << rnode->id_str();
+    }
+    s << endl;
   }
 
   const LnNodeList& lut_list = lngraph.lut_list();
