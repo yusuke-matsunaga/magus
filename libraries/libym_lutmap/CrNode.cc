@@ -38,7 +38,7 @@ CrNode::~CrNode()
 
 // @brief 対応する SbjNode を設定する．
 void
-CrNode::set_sbjnode(SbjNode* node)
+CrNode::set_sbjnode(const SbjNode* node)
 {
   mNode = node;
   if ( node->is_ppi() ) {

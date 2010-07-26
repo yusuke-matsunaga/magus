@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_LUTMAP
 EnumCut::EnumCut()
 {
   mFsSize = 1024;
-  mFrontierStack = new SbjNode*[mFsSize];
+  mFrontierStack = new const SbjNode*[mFsSize];
   mFsPos = &mFrontierStack[0];
 }
 
@@ -52,7 +52,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
   mOp->all_init(sbjgraph, limit);
   
-  mInputs = new SbjNode*[limit];
+  mInputs = new const SbjNode*[limit];
 
   mInodeStack = new ymuint32[sbjgraph.n_lnodes()];
   mIsPos = &mInodeStack[0];
@@ -64,7 +64,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   mNcAll = 0;
   mCurPos = 0;
   for (ymuint i = 0; i < ni; ++ i) {
-    SbjNode* node = sbjgraph.input(i);
+    const SbjNode* node = sbjgraph.input(i);
 
     mNcCur = 0;
   
@@ -85,7 +85,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   const SbjNodeList& dff_list = sbjgraph.dff_list();
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
 
     mNcCur = 0;
   
@@ -105,18 +105,18 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   }
   
   // 入力側から内部ノード用のクラスタを作る．
-  vector<SbjNode*> node_list;
+  vector<const SbjNode*> node_list;
   sbjgraph.sort(node_list);
-  for (vector<SbjNode*>::const_iterator p = node_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     assert_cond( node->is_logic(), __FILE__, __LINE__);
 
     mMarkedNodesLast = 0;
     
     for (ymuint i = 0; i < 2; ++ i) {
       // ファンインの cut に含まれるノードに c1mark をつける．
-      SbjNode* inode = node->fanin(i);
+      const SbjNode* inode = node->fanin(i);
       mark_cnode(inode);
     }
 
@@ -124,11 +124,11 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     // ノードに c2mark をつける．
     // c2mark のついたノードが境界ノードとなる．
     for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
-      SbjNode* node = mMarkedNodes[i];
+      const SbjNode* node = mMarkedNodes[i];
       if ( temp1mark(node) ) {
 	if ( node->is_logic() ) {
 	  for (ymuint i = 0; i < 2; ++ i) {
-	    SbjNode* inode = node->fanin(i);
+	    const SbjNode* inode = node->fanin(i);
 	    if ( !temp1mark(inode) ) {
 	      set_temp2mark(node);
 	      break;
@@ -158,7 +158,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     assert_cond(mInputPos == 0, __FILE__, __LINE__);
 
     // 今の列挙で用いたノードを cut_node_list に格納しておく
-    vector<SbjNode*>& clist = cnode_list(node);
+    vector<const SbjNode*>& clist = cnode_list(node);
     clist.reserve(mMarkedNodesLast);
     set_cut_node_list_recur(node, clist);
 
@@ -168,7 +168,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
     // マークを消しておく
     for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
-      SbjNode* node = mMarkedNodes[i];
+      const SbjNode* node = mMarkedNodes[i];
       clear_tempmark(node);
     }
   }
@@ -183,12 +183,12 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
 // node のカットになったノードに c1mark を付け，mMarkedNodes に入れる．
 void
-EnumCut::mark_cnode(SbjNode* node)
+EnumCut::mark_cnode(const SbjNode* node)
 {
-  const vector<SbjNode*>& cnode_list1 = cnode_list(node);
-  for (vector<SbjNode*>::const_iterator p = cnode_list1.begin();
+  const vector<const SbjNode*>& cnode_list1 = cnode_list(node);
+  for (vector<const SbjNode*>::const_iterator p = cnode_list1.begin();
        p != cnode_list1.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     if ( !temp1mark(node) ) {
       set_temp1mark(node);
       mMarkedNodes[mMarkedNodesLast] = node;
@@ -199,7 +199,7 @@ EnumCut::mark_cnode(SbjNode* node)
 
 // node の TFI に c1mark を付ける．
 void
-EnumCut::mark_cnode2(SbjNode* node)
+EnumCut::mark_cnode2(const SbjNode* node)
 {
   if ( !temp1mark(node) ) {
     set_temp1mark(node);
@@ -214,12 +214,12 @@ EnumCut::mark_cnode2(SbjNode* node)
 
 // node のカットになったノードに c1mark を付け，marked_nodes に入れる．
 void
-EnumCut::mark_cnode3(SbjNode* node)
+EnumCut::mark_cnode3(const SbjNode* node)
 {
-  const vector<SbjNode*>& cnode_list1 = cnode_list(node);
-  for (vector<SbjNode*>::const_iterator p = cnode_list1.begin();
+  const vector<const SbjNode*>& cnode_list1 = cnode_list(node);
+  for (vector<const SbjNode*>::const_iterator p = cnode_list1.begin();
        p != cnode_list1.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     if ( !temp1mark(node) ) {
       set_temp1mark(node);
       mMarkedNodes[mMarkedNodesLast] = node;
@@ -233,7 +233,7 @@ EnumCut::mark_cnode3(SbjNode* node)
 
 // root_depth よりも小さな depth を持つノードを frontier stack に積む．
 void
-EnumCut::get_frontier(SbjNode* node,
+EnumCut::get_frontier(const SbjNode* node,
 		      ymuint root_depth)
 {
   if ( state(node) ) {
@@ -263,7 +263,7 @@ EnumCut::get_frontier(SbjNode* node,
 
 // get_frontier でつけた印を消す．
 void
-EnumCut::clear_frontier(SbjNode* node)
+EnumCut::clear_frontier(const SbjNode* node)
 {
   if ( state(node) ) {
     clear_state(node);
@@ -277,14 +277,14 @@ EnumCut::clear_frontier(SbjNode* node)
 // frontier stack にノードをプッシュする
 inline
 void
-EnumCut::push_node(SbjNode* node)
+EnumCut::push_node(const SbjNode* node)
 {
   if ( mFsPos == mFrontierStack + mFsSize ) {
-    SbjNode** old_stack = mFrontierStack;
+    const SbjNode** old_stack = mFrontierStack;
     mFsSize <<= 1;
-    mFrontierStack = new SbjNode*[mFsSize];
-    SbjNode** sp = old_stack;
-    SbjNode** dp = mFrontierStack;
+    mFrontierStack = new const SbjNode*[mFsSize];
+    const SbjNode** sp = old_stack;
+    const SbjNode** dp = mFrontierStack;
     for ( ; dp != mFsPos; ++ sp, ++ dp) {
       *dp = *sp;
     }
@@ -297,7 +297,7 @@ EnumCut::push_node(SbjNode* node)
 
 // frontier stack からノードをポップする
 inline
-SbjNode*
+const SbjNode*
 EnumCut::pop_node()
 {
   -- mFsPos;
@@ -334,7 +334,7 @@ EnumCut::enum_recur()
     return true;
   }
   else {
-    SbjNode* node = pop_node();
+    const SbjNode* node = pop_node();
 
 #if defined(DEBUG_ENUM_RECUR)
     cout << "POP[1] " << node->id_str() << endl;
@@ -365,11 +365,11 @@ EnumCut::enum_recur()
 #endif
     }
 
-    SbjNode** old_fs_pos = mFsPos;
+    const SbjNode** old_fs_pos = mFsPos;
     ymuint old_input_pos = mInputPos;
     bool recur = true;
     bool inode0_stat = false;
-    SbjNode* inode0 = node->fanin(0);
+    const SbjNode* inode0 = node->fanin(0);
     if ( state(inode0) == 0 ) {
       if ( !temp2mark(inode0) ) {
 	push_node(inode0);
@@ -397,7 +397,7 @@ EnumCut::enum_recur()
     }
     if ( recur ) {
       bool inode1_stat = false;
-      SbjNode* inode1 = node->fanin(1);
+      const SbjNode* inode1 = node->fanin(1);
       if ( state(inode1) == 0 ) {
 	if ( !temp2mark(inode1) ) {
 	  push_node(inode1);
@@ -463,8 +463,8 @@ EnumCut::enum_recur()
 
 // cmark の付いているノードを cnode_list に入れて cmark を消す．
 void
-EnumCut::set_cut_node_list_recur(SbjNode* node,
-				 vector<SbjNode*>& cnode_list)
+EnumCut::set_cut_node_list_recur(const SbjNode* node,
+				 vector<const SbjNode*>& cnode_list)
 {
   if ( !cmark(node) ) {
     return;

@@ -77,16 +77,16 @@ private:
   
   // node のカットを記録する．
   void
-  record(SbjNode* node);
+  record(const SbjNode* node);
 
   // node のカットを選択する．
   void
-  select(SbjNode* node,
+  select(const SbjNode* node,
 	 MapRecord& maprec);
   
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(SbjNode* node,
+  calc_weight(const SbjNode* node,
 	      const Cut* cut,
 	      double cur_weight);
 

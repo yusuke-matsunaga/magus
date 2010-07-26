@@ -26,42 +26,6 @@ Cut::~Cut()
 {
 }
 
-// @brief 内部に fo-mark の付いたノードを含んでいたら true を返す．
-bool
-Cut::fo_check() const
-{
-  for (ymuint i = 0; i < ni(); ++ i) {
-    SbjNode* node = input(i);
-    node->set_tmark();
-  }
-  bool ans = fo_check_sub(root());
-  for (ymuint i = 0; i < ni(); ++ i) {
-    SbjNode* node = input(i);
-    node->clear_tmark();
-  }
-  return ans;
-}
-
-// fo_check のサブルーティン
-bool
-Cut::fo_check_sub(SbjNode* node) const
-{
-  for ( ; ; ) {
-    if ( node->tmark() ) {
-      // node は cut の葉だった．
-      return false;
-    }
-    if ( node->is_fo() && node != root() ) {
-      return true;
-    }
-    SbjNode* inode0 = node->fanin(0);
-    if ( fo_check_sub(inode0) ) {
-      return true;
-    }
-    node = node->fanin(1);
-  }
-}
-
 
 BEGIN_NONAMESPACE
 

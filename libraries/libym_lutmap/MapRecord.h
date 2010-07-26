@@ -54,13 +54,13 @@ public:
   /// @param[in] node 該当のノード
   /// @param[in] cut 対応するカット
   void
-  set_cut(SbjNode* node,
+  set_cut(const SbjNode* node,
 	  const Cut* cut);
 
   /// @brief カットを取り出す．
   /// @param[in] node 該当のノード
   const Cut*
-  get_cut(SbjNode* node);
+  get_cut(const SbjNode* node);
   
   /// @brief マッピング結果を LnGraph にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -80,11 +80,11 @@ public:
 
   /// @brief 直前の estimate の結果 node が fanout node なら true を返す．
   bool
-  check_fonode(SbjNode* node);
+  check_fonode(const SbjNode* node);
 
   /// @brief 直前の estimate の結果で node のカバーされている回数を返す．
   int
-  cover_count(SbjNode* node);
+  cover_count(const SbjNode* node);
 
 
 private:
@@ -94,23 +94,23 @@ private:
 
   // 最終結果を作るためのバックトレースを行う．
   LnNode*
-  back_trace(SbjNode* node,
+  back_trace(const SbjNode* node,
 	     bool inv,
 	     LnGraph& mapnetwork);
 
   // estimate() で用いるバックトレース
   int
-  back_trace2(SbjNode* node,
+  back_trace2(const SbjNode* node,
 	      bool inv);
 
   // cut でカバーされるノードの mCovCount を一つ増やす．
   void
-  mark_cover(SbjNode* node,
+  mark_cover(const SbjNode* node,
 	     const Cut* cut);
 
   // mark_cover でつけた mTmpFlag を下ろす．
   void
-  clear_mark(SbjNode* node);
+  clear_mark(const SbjNode* node);
 
 
 private:

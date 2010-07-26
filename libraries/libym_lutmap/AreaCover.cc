@@ -84,76 +84,71 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   const SbjNodeList& input_list = sbjgraph.input_list();
   for (SbjNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     maprec.set_cut(node, NULL);
     mBestCost[node->id()] = 0.0;
   }
 
   // 論理ノードのコストを入力側から計算
-  vector<SbjNode*> snode_list;
+  vector<const SbjNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<SbjNode*>::const_iterator p = snode_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
 
     double min_cost = DBL_MAX;
-    if ( !node->is_unselected() ) {
-      const Cut* best_cut = NULL;
-      const CutList& cut_list = mCutHolder.cut_list(node);
-      for (CutListIterator p = cut_list.begin();
-	   p != cut_list.end(); ++ p) {
-	const Cut* cut = *p;
+    const Cut* best_cut = NULL;
+    const CutList& cut_list = mCutHolder.cut_list(node);
+    for (CutListIterator p = cut_list.begin();
+	 p != cut_list.end(); ++ p) {
+      const Cut* cut = *p;
       
-	ymuint ni = cut->ni();
-	bool ng = false;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  SbjNode* inode = cut->input(i);
-	  if ( mBestCost[inode->id()] == DBL_MAX ) {
-	    ng = true;
-	    break;
-	  }
-	}
-	if ( ng ) continue;
-	if ( cut->fo_check() ) continue;
-
-	if ( mMode & 1 ) {
-	  // ファンアウトモード
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    SbjNode* inode = cut->input(i);
-	    mWeight[i] = 1.0 / inode->n_fanout();
-	  }
-	}
-	else {
-	  // フローモード
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    mWeight[i] = 0.0;
-	  }
-	  calc_weight(node, cut, 1.0);
-	}
-      
-	double cur_cost = 1.0;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  SbjNode* inode = cut->input(i);
-	  cur_cost += mBestCost[inode->id()] * mWeight[i];
-	}
-	if ( min_cost > cur_cost ) {
-	  min_cost = cur_cost;
-	  best_cut = cut;
+      ymuint ni = cut->ni();
+      bool ng = false;
+      for (ymuint i = 0; i < ni; ++ i) {
+	const SbjNode* inode = cut->input(i);
+	if ( mBestCost[inode->id()] == DBL_MAX ) {
+	  ng = true;
+	  break;
 	}
       }
-      //assert_cond(min_cost < DBL_MAX, __FILE__, __LINE__);
-      // unselected の状態によっては解がない場合もある．
-      if ( best_cut ) {
-	maprec.set_cut(node, best_cut);
+      if ( ng ) continue;
+
+      if ( mMode & 1 ) {
+	// ファンアウトモード
+	for (ymuint i = 0; i < ni; ++ i) {
+	  const SbjNode* inode = cut->input(i);
+	  mWeight[i] = 1.0 / inode->n_fanout();
+	}
+      }
+      else {
+	// フローモード
+	for (ymuint i = 0; i < ni; ++ i) {
+	  mWeight[i] = 0.0;
+	}
+	calc_weight(node, cut, 1.0);
+      }
+      
+      double cur_cost = 1.0;
+      for (ymuint i = 0; i < ni; ++ i) {
+	const SbjNode* inode = cut->input(i);
+	cur_cost += mBestCost[inode->id()] * mWeight[i];
+      }
+      if ( min_cost > cur_cost ) {
+	min_cost = cur_cost;
+	best_cut = cut;
       }
     }
+    assert_cond(min_cost < DBL_MAX, __FILE__, __LINE__);
+    assert_cond( best_cut != NULL, __FILE__, __LINE__);
+    maprec.set_cut(node, best_cut);
     mBestCost[node->id()] = min_cost;
   }
 }
 
 // node から各入力にいたる経路の重みを計算する．
 void
-AreaCover::calc_weight(SbjNode* node,
+AreaCover::calc_weight(const SbjNode* node,
 		       const Cut* cut,
 		       double cur_weight)
 {
@@ -161,17 +156,17 @@ AreaCover::calc_weight(SbjNode* node,
     for (ymuint i = 0; i < cut->ni(); ++ i) {
       if ( cut->input(i) == node ) {
 	// node は cut の葉だった．
-	if  ( !node->pomark() && !node->is_fo() ) {
+	if  ( !node->pomark() ) {
 	  mWeight[i] += cur_weight;
 	}
 	return;
       }
     }
-    SbjNode* inode0 = node->fanin(0);
-    double cur_weight0 = cur_weight / inode0->n_efo();
+    const SbjNode* inode0 = node->fanin(0);
+    double cur_weight0 = cur_weight / inode0->n_fanout();
     calc_weight(inode0, cut, cur_weight0);
     node = node->fanin(1);
-    cur_weight /= node->n_efo();
+    cur_weight /= node->n_fanout();
   }
 }
 

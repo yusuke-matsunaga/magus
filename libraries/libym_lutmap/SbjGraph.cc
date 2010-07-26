@@ -34,22 +34,6 @@ SbjNode::~SbjNode()
 {
 }
 
-// @brief 実効的なファンアウト数を計算する．
-void
-SbjNode::scan_efo(hash_set<ymuint>& mark) const
-{
-  if ( !is_unselected() ) {
-    mark.insert(id());
-    return;
-  }
-  for (SbjEdgeList::const_iterator p = mFanoutList.begin();
-       p != mFanoutList.end(); ++ p) {
-    SbjEdge* e = *p;
-    SbjNode* fonode = e->to();
-    fonode->scan_efo(mark);
-  }
-}
-
 // @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
 void
 SbjNode::scan_po()
@@ -179,17 +163,17 @@ SbjGraph::copy(const SbjGraph& src,
   }
   
   // 論理ノードの生成
-  vector<SbjNode*> node_list;
+  vector<const SbjNode*> node_list;
   src.sort(node_list);
   ymuint nl = node_list.size();
   for (ymuint i = 0; i < nl; ++ i) {
-    SbjNode* src_node = node_list[i];
+    const SbjNode* src_node = node_list[i];
 
-    SbjNode* src_inode0 = src_node->fanin(0);
+    const SbjNode* src_inode0 = src_node->fanin(0);
     SbjNode* input0 = nodemap[src_inode0->id()];
     assert_cond(input0, __FILE__, __LINE__);
 
-    SbjNode* src_inode1 = src_node->fanin(1);
+    const SbjNode* src_inode1 = src_node->fanin(1);
     SbjNode* input1 = nodemap[src_inode1->id()];
     assert_cond(input1, __FILE__, __LINE__);
 
@@ -202,29 +186,29 @@ SbjGraph::copy(const SbjGraph& src,
   // DFF の入力の接続
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
-    SbjNode* src_onode = *p;
+    const SbjNode* src_onode = *p;
     SbjNode* dst_onode = nodemap[src_onode->id()];
 
-    SbjNode* src_inode0 = src_onode->data_input();
+    const SbjNode* src_inode0 = src_onode->fanin_data();
     SbjNode* dst_inode0 = nodemap[src_inode0->id()];
-    set_dff_data(dst_onode, dst_inode0, src_onode->data_inv());
+    set_dff_data(dst_onode, dst_inode0, src_onode->fanin_data_inv());
 
-    SbjNode* src_inode1 = src_onode->clock_input();
+    const SbjNode* src_inode1 = src_onode->fanin_clock();
     if ( src_inode1 ) {
       SbjNode* dst_inode1 = nodemap[src_inode1->id()];
-      set_dff_clock(dst_onode, dst_inode1, src_onode->clock_inv());
+      set_dff_clock(dst_onode, dst_inode1, src_onode->fanin_clock_inv());
     }
 
-    SbjNode* src_inode2 = src_onode->set_input();
+    const SbjNode* src_inode2 = src_onode->fanin_set();
     if ( src_inode2 ) {
       SbjNode* dst_inode2 = nodemap[src_inode2->id()];
-      set_dff_set(dst_onode, dst_inode2, src_onode->set_inv());
+      set_dff_set(dst_onode, dst_inode2, src_onode->fanin_set_inv());
     }
 
-    SbjNode* src_inode3 = src_onode->rst_input();
+    const SbjNode* src_inode3 = src_onode->fanin_rst();
     if ( src_inode3 ) {
       SbjNode* dst_inode3 = nodemap[src_inode3->id()];
-      set_dff_rst(dst_onode, dst_inode3, src_onode->rst_inv());
+      set_dff_rst(dst_onode, dst_inode3, src_onode->fanin_rst_inv());
     }
   }
   
@@ -232,8 +216,8 @@ SbjGraph::copy(const SbjGraph& src,
   const SbjNodeList& output_list = src.output_list();
   for (SbjNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
-    SbjNode* src_onode = *p;
-    SbjNode* src_inode = src_onode->fanin(0);
+    const SbjNode* src_onode = *p;
+    const SbjNode* src_inode = src_onode->fanin(0);
     SbjNode* dst_inode = NULL;
     if ( src_inode ) {
       dst_inode = nodemap[src_inode->id()];
@@ -348,7 +332,7 @@ SbjGraph::add_port(const string& name,
 // @param[out] node_list ノードを格納するリスト
 // @return 要素数を返す．
 ymuint
-SbjGraph::ppi_list(list<SbjNode*>& node_list) const
+SbjGraph::ppi_list(list<const SbjNode*>& node_list) const
 {
   node_list.clear();
   for (SbjNodeList::const_iterator p = input_list().begin();
@@ -366,7 +350,7 @@ SbjGraph::ppi_list(list<SbjNode*>& node_list) const
 // @param[out] node_list ノードを格納するリスト
 // @return 要素数を返す．
 ymuint
-SbjGraph::ppo_list(list<SbjNode*>& node_list) const
+SbjGraph::ppo_list(list<const SbjNode*>& node_list) const
 {
   node_list.clear();
   for (SbjNodeList::const_iterator p = output_list().begin();
@@ -386,19 +370,19 @@ BEGIN_NONAMESPACE
 // node のファンアウトのノードのうち，ファンインがすべてマークされている
 // ノード を node_list に積む．
 void
-sort_sub(SbjNode* node,
+sort_sub(const SbjNode* node,
 	 vector<bool>& mark,
-	 vector<SbjNode*>& node_list)
+	 vector<const SbjNode*>& node_list)
 {
   const SbjEdgeList& fo_list = node->fanout_list();
   for (SbjEdgeList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    SbjEdge* e = *p;
-    SbjNode* onode = e->to();
+    const SbjEdge* e = *p;
+    const SbjNode* onode = e->to();
     if ( mark[onode->id()] || !onode->is_logic() ) continue;
     bool ready = true;
     for (ymuint i = 0; i < 2; ++ i) {
-      SbjNode* inode0 = onode->fanin(i);
+      const SbjNode* inode0 = onode->fanin(i);
       if ( !mark[inode0->id()] ) {
 	ready = false;
 	break;
@@ -415,7 +399,7 @@ END_NONAMESPACE
 
 // @brief ソートされた論理ノードのリストを得る．
 void
-SbjGraph::sort(vector<SbjNode*>& node_list) const
+SbjGraph::sort(vector<const SbjNode*>& node_list) const
 {
   node_list.clear();
   node_list.reserve(n_lnodes());
@@ -423,18 +407,18 @@ SbjGraph::sort(vector<SbjNode*>& node_list) const
   vector<bool> mark(max_node_id(), false);
   
   // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
-  list<SbjNode*> tmp_list;
+  list<const SbjNode*> tmp_list;
   ppi_list(tmp_list);
-  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     mark[node->id()] = true;
     sort_sub(node, mark, node_list);
   }
 
   ymuint rpos = 0;
   while ( rpos < node_list.size() ) {
-    SbjNode* node = node_list[rpos];
+    const SbjNode* node = node_list[rpos];
     ++ rpos;
     sort_sub(node, mark, node_list);
   }
@@ -447,20 +431,20 @@ BEGIN_NONAMESPACE
 // node のファンアウトのノードのうち，ファンインがすべてマークされている
 // ノード を node_list に積む．
 void
-rsort_sub(SbjNode* node,
+rsort_sub(const SbjNode* node,
 	  vector<bool>& mark,
-	  vector<SbjNode*>& node_list)
+	  vector<const SbjNode*>& node_list)
 {
   ymuint ni = node->is_logic() ? 2 : 1;
   for (ymuint i = 0; i < ni; ++ i) {
-    SbjNode* inode = node->fanin(i);
+    const SbjNode* inode = node->fanin(i);
     if ( inode == NULL || mark[inode->id()] || !inode->is_logic() ) continue;
     const SbjEdgeList& fo_list = inode->fanout_list();
     bool ready = true;
     for (SbjEdgeList::const_iterator p = fo_list.begin();
 	 p != fo_list.end(); ++ p) {
-      SbjEdge* e = *p;
-      SbjNode* onode = e->to();
+      const SbjEdge* e = *p;
+      const SbjNode* onode = e->to();
       if ( !mark[onode->id()] ) {
 	ready = false;
 	break;
@@ -477,7 +461,7 @@ END_NONAMESPACE
 
 // @brief 逆順でソートされたノードのリストを得る．
 void
-SbjGraph::rsort(vector<SbjNode*>& node_list) const
+SbjGraph::rsort(vector<const SbjNode*>& node_list) const
 {
   node_list.clear();
   node_list.reserve(n_lnodes());
@@ -485,11 +469,11 @@ SbjGraph::rsort(vector<SbjNode*>& node_list) const
   vector<bool> mark(max_node_id(), false);
 
   // 外部出力とDFFのみをファンアウトにするノードを node_list に追加する．
-  list<SbjNode*> tmp_list;
+  list<const SbjNode*> tmp_list;
   ppo_list(tmp_list);
-  for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     mark[node->id()] = true;
     rsort_sub(node, mark, node_list);
   }
@@ -497,7 +481,7 @@ SbjGraph::rsort(vector<SbjNode*>& node_list) const
   // node_list からノードを取り出し，同様の処理を行う．
   ymuint rpos = 0;
   while ( rpos < node_list.size() ) {
-    SbjNode* node = node_list[rpos];
+    const SbjNode* node = node_list[rpos];
     ++ rpos;
     rsort_sub(node, mark, node_list);
   }
@@ -780,42 +764,44 @@ SbjGraph::connect(SbjNode* from,
 }
 
 // @brief 段数を求める．
+// @note 副作用として各 SbjNode のレベルが設定される．
 ymuint
 SbjGraph::level() const
 {
   if ( !mLevelValid ) {
-    list<SbjNode*> tmp_list;
+    list<const SbjNode*> tmp_list;
     ppi_list(tmp_list);
-    for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+    for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
 	 p != tmp_list.end(); ++ p) {
-      SbjNode* node = *p;
-      node->mLevel = 0;
+      const SbjNode* node = *p;
+      // node の const を取り去るギミック
+      mNodeArray[node->id()]->mLevel = 0;
     }
     
-    vector<SbjNode*> node_list;
+    vector<const SbjNode*> node_list;
     sort(node_list);
-    for (vector<SbjNode*>::const_iterator p = node_list.begin();
+    for (vector<const SbjNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
-      SbjNode* node = *p;
-      ymuint l = 0;
-      for (ymuint i = 0; i < 2; ++ i) {
-	SbjNode* inode = node->fanin(i);
-	ymuint l1 = inode->mLevel;
-	if ( l < l1 ) {
-	  l = l1;
-	}
+      const SbjNode* node = *p;
+      const SbjNode* inode0 = node->fanin(0);
+      ymuint l = inode0->level();
+      const SbjNode* inode1 = node->fanin(1);
+      ymuint l1 = inode1->level();
+      if ( l < l1 ) {
+	l = l1;
       }
-      node->mLevel = l + 1;
+      // node の const を取り去るギミック
+      mNodeArray[node->id()]->mLevel = l + 1;
     }
     
     ymuint max_l = 0;
     ppo_list(tmp_list);
-    for (list<SbjNode*>::const_iterator p = tmp_list.begin();
+    for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
 	 p != tmp_list.end(); ++ p) {
-      SbjNode* node = *p;
-      SbjNode* inode = node->fanin(0);
+      const SbjNode* node = *p;
+      const SbjNode* inode = node->fanin(0);
       if ( inode ) {
-	ymuint l1 = inode->mLevel;
+	ymuint l1 = inode->level();
 	if ( max_l < l1 ) {
 	  max_l = l1;
 	}
@@ -826,44 +812,6 @@ SbjGraph::level() const
     mLevelValid = true;
   }
   return mLevel;
-}
-
-
-// @brief efo の計算をする．
-void
-SbjGraph::set_efo() const
-{
-  for (SbjNodeList::const_iterator p = mInputList.begin();
-       p != mInputList.end(); ++ p) {
-    SbjNode* node = *p;
-    hash_set<ymuint> mark;
-    for (SbjEdgeList::iterator p = node->mFanoutList.begin();
-	 p != node->mFanoutList.end(); ++ p) {
-      SbjEdge* e = *p;
-      SbjNode* fonode = e->to();
-      fonode->scan_efo(mark);
-    }
-    node->mNefo = mark.size();
-  }
-  for (SbjNodeList::const_iterator p = mLnodeList.begin();
-       p != mLnodeList.end(); ++ p) {
-    SbjNode* node = *p;
-    ymuint n = 0;
-    if ( node->is_unselected() ) {
-      n = 1;
-    }
-    else {
-      hash_set<ymuint> mark;
-      for (SbjEdgeList::iterator p = node->mFanoutList.begin();
-	   p != node->mFanoutList.end(); ++ p) {
-	SbjEdge* e = *p;
-	SbjNode* fonode = e->to();
-	fonode->scan_efo(mark);
-      }
-      n =mark.size();
-    }
-    node->mNefo = n;
-  }
 }
 
 // @brief SbjGraph の内容をダンプする関数
@@ -936,17 +884,17 @@ dump(ostream& s,
     const SbjNode* node = *p;
     s << "DFF(" << node->id_str() << ") :";
     s << "DATA = ";
-    const SbjNode* inode = node->data_input();
+    const SbjNode* inode = node->fanin_data();
     if ( inode ) {
       // 普通のノードの場合
-      if ( node->data_inv() ) {
+      if ( node->fanin_data_inv() ) {
 	s << "~";
       }
       s << inode->id_str();
     }
     else {
       // 定数ノードの場合
-      if ( node->data_inv() ) {
+      if ( node->fanin_data_inv() ) {
 	s << "1";
       }
       else {
@@ -954,28 +902,28 @@ dump(ostream& s,
       }
     }
 
-    const SbjNode* cnode = node->clock_input();
+    const SbjNode* cnode = node->fanin_clock();
     if ( cnode ) {
       s << ", CLOCK = ";
-      if ( node->clock_inv() ) {
+      if ( node->fanin_clock_inv() ) {
 	s << "~";
       }
       s << cnode->id_str();
     }
 
-    const SbjNode* snode = node->set_input();
+    const SbjNode* snode = node->fanin_set();
     if ( snode ) {
       s << ", SET = ";
-      if ( node->set_inv() ) {
+      if ( node->fanin_set_inv() ) {
 	s << "~";
       }
       s << snode->id_str();
     }
 
-    const SbjNode* rnode = node->rst_input();
+    const SbjNode* rnode = node->fanin_rst();
     if ( rnode ) {
       s << ", RST = ";
-      if ( node->rst_inv() ) {
+      if ( node->fanin_rst_inv() ) {
 	s << "~";
       }
       s << rnode->id_str();

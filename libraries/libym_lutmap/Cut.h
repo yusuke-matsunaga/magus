@@ -43,7 +43,7 @@ private:
 public:
 
   /// @brief 根のノードを得る．
-  SbjNode*
+  const SbjNode*
   root() const;
   
   /// @brief 入力のサイズを得る．
@@ -51,12 +51,8 @@ public:
   ni() const;
 
   /// @brief pos 番目の入力を得る．
-  SbjNode*
+  const SbjNode*
   input(ymuint pos) const;
-
-  /// @brief 内部に fo-mark の付いたノードを含んでいたら true を返す．
-  bool
-  fo_check() const;
 
   /// @brief 内容を表す論理式を得る．
   LogExpr
@@ -67,13 +63,6 @@ public:
   void
   dump(ostream& s) const;
 
-
-private:
-
-  // fo_check のサブルーティン
-  bool
-  fo_check_sub(SbjNode* node) const;
-
   
 private:
   //////////////////////////////////////////////////////////////////////
@@ -81,7 +70,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 根のノード
-  SbjNode* mRoot;
+  const SbjNode* mRoot;
 
   // 次のカットを指すポインタ
   Cut* mLink;
@@ -90,7 +79,7 @@ private:
   ymuint32 mNi;
 
   // 入力のノード配列
-  SbjNode* mInputs[1];
+  const SbjNode* mInputs[1];
 
 };
 
@@ -216,7 +205,7 @@ private:
 
 // 根のノードを得る．
 inline
-SbjNode*
+const SbjNode*
 Cut::root() const
 {
   return mRoot;
@@ -232,7 +221,7 @@ Cut::ni() const
 
 // pos 番目の入力を得る．
 inline
-SbjNode*
+const SbjNode*
 Cut::input(ymuint pos) const
 {
   return mInputs[pos];

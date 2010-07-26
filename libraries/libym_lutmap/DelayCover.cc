@@ -97,36 +97,36 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   // 入力のコストの設定
   for (SbjNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     NodeInfo& t = mNodeInfo[node->id()];
     t.mCostList.insert(NULL, 0, 0.0);
     t.mMinDepth = 0;
   }
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     NodeInfo& t = mNodeInfo[node->id()];
     t.mCostList.insert(NULL, 0, 0.0);
     t.mMinDepth = 0;
   }
   
   // 各ノードごとにカットを記録
-  vector<SbjNode*> snode_list;
+  vector<const SbjNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<SbjNode*>::const_iterator p = snode_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     record(node);
   }
 
   // 最小段数の最大値をもとめる．
-  vector<SbjNode*> onode_list;
+  vector<const SbjNode*> onode_list;
   onode_list.reserve(output_list.size() + dff_list.size());
   int min_depth = 0;
   for (SbjNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
-    SbjNode* onode = *p;
-    SbjNode* node = onode->fanin(0);
+    const SbjNode* onode = *p;
+    const SbjNode* node = onode->fanin(0);
     if ( node == NULL) continue;
     if ( node->is_logic() ) {
       onode_list.push_back(node);
@@ -139,8 +139,8 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   }
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
-    SbjNode* onode = *p;
-    SbjNode* node = onode->fanin(0);
+    const SbjNode* onode = *p;
+    const SbjNode* node = onode->fanin(0);
     if ( node == NULL) continue;
     if ( node->is_logic() ) {
       onode_list.push_back(node);
@@ -154,23 +154,23 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 
   // それに slack を足したものが制約となる．
   min_depth += slack;
-  for (vector<SbjNode*>::const_iterator p = onode_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = onode_list.begin();
        p != onode_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     mNodeInfo[node->id()].mReqDepth = min_depth;
   }
 
   // 要求された段数制約を満たす中でコスト最小の解を選ぶ．
-  for (vector<SbjNode*>::reverse_iterator p = snode_list.rbegin();
+  for (vector<const SbjNode*>::reverse_iterator p = snode_list.rbegin();
        p != snode_list.rend(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     select(node, maprec);
   }
 }
 
 // node のカットを選択する．
 void
-DelayCover::record(SbjNode* node)
+DelayCover::record(const SbjNode* node)
 {
   int min_depth = INT_MAX;
   NodeInfo& t = mNodeInfo[node->id()];
@@ -179,19 +179,11 @@ DelayCover::record(SbjNode* node)
        p != cut_list.end(); ++ p) {
     const Cut* cut = *p;
     ymuint ni = cut->ni();
-    bool ng = false;
-    for (ymuint i = 0; i < ni; ++ i) {
-      if ( cut->input(i)->is_unselected() ) {
-	ng = true;
-	break;
-      }
-    }
-    if ( ng ) continue;
 
     if ( mMode & 1 ) {
       // ファンアウトモード
       for (ymuint i = 0; i < ni; ++ i) {
-	SbjNode* inode = cut->input(i);
+	const SbjNode* inode = cut->input(i);
 	mWeight[i] = 1.0 / inode->n_fanout();
       }
     }
@@ -205,7 +197,7 @@ DelayCover::record(SbjNode* node)
 
     int max_input_depth = 0;
     for (ymuint i = 0; i < ni; ++ i) {
-      SbjNode* inode = cut->input(i);
+      const SbjNode* inode = cut->input(i);
       NodeInfo& u = mNodeInfo[inode->id()];
       if ( max_input_depth < u.mMinDepth ) {
 	max_input_depth = u.mMinDepth;
@@ -256,9 +248,9 @@ DelayCover::record(SbjNode* node)
 
 // node から各入力にいたる経路の重みを計算する．
 void
-DelayCover::calc_weight(SbjNode* node,
-			  const Cut* cut,
-			  double cur_weight)
+DelayCover::calc_weight(const SbjNode* node,
+			const Cut* cut,
+			double cur_weight)
 {
   for ( ; ; ) {
     for (ymuint i = 0; i < cut->ni(); ++ i) {
@@ -269,7 +261,7 @@ DelayCover::calc_weight(SbjNode* node,
 	return;
       }
     }
-    SbjNode* inode0 = node->fanin(0);
+    const SbjNode* inode0 = node->fanin(0);
     calc_weight(inode0, cut, cur_weight / inode0->n_fanout());
     node = node->fanin(1);
     cur_weight /= node->n_fanout();
@@ -278,8 +270,8 @@ DelayCover::calc_weight(SbjNode* node,
 
 // node のカットを選択する．
 void
-DelayCover::select(SbjNode* node,
-		     MapRecord& maprec)
+DelayCover::select(const SbjNode* node,
+		   MapRecord& maprec)
 {
   NodeInfo& t = mNodeInfo[node->id()];
   int rd = t.mReqDepth;
@@ -300,7 +292,7 @@ DelayCover::select(SbjNode* node,
   maprec.set_cut(node, cut);
   -- rd;
   for (ymuint i = 0; i < cut->ni(); ++ i) {
-    SbjNode* inode = cut->input(i);
+    const SbjNode* inode = cut->input(i);
     NodeInfo& u = mNodeInfo[inode->id()];
     if ( u.mReqDepth == 0 || u.mReqDepth > rd ) {
       u.mReqDepth = rd;

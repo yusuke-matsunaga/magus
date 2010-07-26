@@ -40,10 +40,10 @@ public:
 
   /// @brief 対応する SbjNode を設定する．
   void
-  set_sbjnode(SbjNode* node);
+  set_sbjnode(const SbjNode* node);
 
   /// @brief 対応する SbjNode を返す．
-  SbjNode*
+  const SbjNode*
   sbjnode() const;
 
   /// @brief 外部入力ノードのとき true を返す．
@@ -192,7 +192,7 @@ public:
 private:
 
   // 根のノード
-  SbjNode* mNode;
+  const SbjNode* mNode;
   
   // このノードを根とする最適カット
   const Cut* mCurCut;
@@ -273,7 +273,7 @@ compare(CrNode* node1,
 
 // @brief 対応する SbjNode を返す．
 inline
-SbjNode*
+const SbjNode*
 CrNode::sbjnode() const
 {
   return mNode;

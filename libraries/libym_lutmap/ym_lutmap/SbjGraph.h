@@ -176,13 +176,17 @@ public:
     /// @brief 出力ノード
     kOUTPUT = 1,
     /// @brief 論理ノード
-    kLOGIC = 2,
+    kLOGIC  = 2,
     /// @brief DFFノード
-    kDFF = 3
+    kDFF    = 3
   };
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  // SbjGraph のみが呼び出せる．
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
   SbjNode();
@@ -192,7 +196,6 @@ private:
 
   
 public:
-
   //////////////////////////////////////////////////////////////////////
   /// @name 構造に関する情報を取り出す関数
   /// @{
@@ -259,6 +262,74 @@ public:
   /// @note 該当するファンインがなければ NULL を返す．
   const SbjNode*
   fanin(ymuint pos) const;
+  
+  /// @brief ファンインの枝を得る．
+  /// @param[in] pos 入力番号(0 or 1)
+  /// @return pos 番目の入力の枝
+  /// @note 該当するファンインの枝がなければ NULL を返す．
+  const SbjEdge*
+  fanin_edge(ymuint pos) const;
+  
+  /// @brief ファンアウト数を得る．
+  ymuint
+  n_fanout() const;
+  
+  /// @brief ファンアウトリストを得る．
+  const SbjEdgeList&
+  fanout_list() const;
+
+  /// @brief 出力ノードにファンアウトしているとき true を返す．
+  bool
+  pomark() const;
+
+  /// @brief DFFノードの場合のデータ入力を得る．
+  const SbjNode*
+  fanin_data() const;
+
+  /// @brief DFFノードの場合のデータ入力の反転属性を得る．
+  bool
+  fanin_data_inv() const;
+  
+  /// @brief DFFノードの場合のクロック入力を得る．
+  const SbjNode*
+  fanin_clock() const;
+
+  /// @brief DFFノードの場合のクロック入力の反転属性を得る．
+  bool
+  fanin_clock_inv() const;
+
+  /// @brief DFFノードの場合のセット入力を得る．
+  const SbjNode*
+  fanin_set() const;
+
+  /// @brief DFFノードの場合のセット入力の反転属性を得る．
+  bool
+  fanin_set_inv() const;
+
+  /// @brief DFFノードの場合のリセット入力を得る．
+  const SbjNode*
+  fanin_rst() const;
+
+  /// @brief DFFノードの場合のリセット入力の反転属性を得る．
+  bool
+  fanin_rst_inv() const;
+
+  /// @brief 深さを得る．
+  ymuint
+  depth() const;
+
+  /// @brief レベルを得る．
+  ymuint
+  level() const;
+  
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内容の設定に用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号(0 or 1)
@@ -271,111 +342,65 @@ public:
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番目の入力の枝
   /// @note 該当するファンインの枝がなければ NULL を返す．
-  const SbjEdge*
-  fanin_edge(ymuint pos) const;
-  
-  /// @brief ファンインの枝を得る．
-  /// @param[in] pos 入力番号(0 or 1)
-  /// @return pos 番目の入力の枝
-  /// @note 該当するファンインの枝がなければ NULL を返す．
   SbjEdge*
   fanin_edge(ymuint pos);
-  
-  /// @brief ファンアウト数を得る．
-  ymuint
-  n_fanout() const;
-  
-  /// @brief ファンアウトリストを得る．
-  const SbjEdgeList&
-  fanout_list() const;
-
-  /// @brief fo マークを考慮した実効的なファンアウト数を返す．
-  ymuint
-  n_efo() const;
-
-  /// @brief 出力ノードにファンアウトしているとき true を返す．
-  bool
-  pomark() const;
-
-  /// @brief DFFノードの場合のデータ入力を得る．
-  const SbjNode*
-  data_input() const;
 
   /// @brief DFFノードの場合のデータ入力を得る．
   SbjNode*
-  data_input();
-
-  /// @brief DFFノードの場合のデータ入力の反転属性を得る．
-  bool
-  data_inv() const;
-  
-  /// @brief DFFノードの場合のクロック入力を得る．
-  const SbjNode*
-  clock_input() const;
+  fanin_data();
 
   /// @brief DFFノードの場合のクロック入力を得る．
   SbjNode*
-  clock_input();
-
-  /// @brief DFFノードの場合のクロック入力の反転属性を得る．
-  bool
-  clock_inv() const;
-
-  /// @brief DFFノードの場合のセット入力を得る．
-  const SbjNode*
-  set_input() const;
+  fanin_clock();
 
   /// @brief DFFノードの場合のセット入力を得る．
   SbjNode*
-  set_input();
-
-  /// @brief DFFノードの場合のセット入力の反転属性を得る．
-  bool
-  set_inv() const;
-
-  /// @brief DFFノードの場合のリセット入力を得る．
-  const SbjNode*
-  rst_input() const;
+  fanin_set();
 
   /// @brief DFFノードの場合のリセット入力を得る．
   SbjNode*
-  rst_input();
+  fanin_rst();
 
-  /// @brief DFFノードの場合のリセット入力の反転属性を得る．
-  bool
-  rst_inv() const;
+  /// @brief タイプを入力に設定する．
+  void
+  set_input(ymuint subid);
   
-  /// @}
-  //////////////////////////////////////////////////////////////////////
+  /// @brief タイプを出力に設定する．
+  /// @param[in] inv 反転属性
+  void
+  set_output(ymuint subid,
+	     bool inv);
+  
+  /// @brief タイプを論理に設定する．
+  void
+  set_logic(ymuint fcode);
+  
+  /// @brief タイプをDFFに設定する．
+  /// @param[in] inv 反転属性
+  void
+  set_dff(bool inv);
 
+  /// @brief DFFノードのクロック極性を設定する．
+  void
+  set_dff_clock(bool inv);
+
+  /// @brief DFFノードのセット極性を設定する．
+  void
+  set_dff_set(bool inv);
+
+  /// @brief DFFノードのリセット極性を設定する．
+  void
+  set_dff_rst(bool inv);
+
+  /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
+  void
+  scan_po();
   
+
+private:
   //////////////////////////////////////////////////////////////////////
-  /// @name cut 列挙用の関数
+  /// @name mindepth で用いるの関数
   /// @{
-
-  /// @brief fanout マークを返す．
-  bool
-  is_fo() const;
-
-  /// @brief fanout マークをつける．
-  void
-  set_fo();
-
-  /// @brief fanout マークを消す．
-  void
-  clear_fo();
-
-  /// @brief unselected マークを返す．
-  bool
-  is_unselected() const;
-
-  /// @brief unselected マークをつける．
-  void
-  set_unselected();
-
-  /// @brief unselected マークを消す．
-  void
-  clear_unselected();
 
   /// @brief range マークを返す．
   bool
@@ -437,61 +462,8 @@ public:
   void
   clear_vmark2();
 
-  /// @brief 深さを得る．
-  ymuint
-  depth() const;
-
-  /// @brief レベルを得る．
-  ymuint
-  level() const;
-
   /// @}
   //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // プライベートメンバ関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief タイプを入力に設定する．
-  void
-  set_input(ymuint subid);
-  
-  /// @brief タイプを出力に設定する．
-  /// @param[in] inv 反転属性
-  void
-  set_output(ymuint subid,
-	     bool inv);
-  
-  /// @brief タイプを論理に設定する．
-  void
-  set_logic(ymuint fcode);
-  
-  /// @brief タイプをDFFに設定する．
-  /// @param[in] inv 反転属性
-  void
-  set_dff(bool inv);
-
-  /// @brief DFFノードのクロック極性を設定する．
-  void
-  set_dff_clock(bool inv);
-
-  /// @brief DFFノードのセット極性を設定する．
-  void
-  set_dff_set(bool inv);
-
-  /// @brief DFFノードのリセット極性を設定する．
-  void
-  set_dff_rst(bool inv);
-  
-  /// @brief 実効的なファンアウト数を計算する．
-  void
-  scan_efo(hash_set<ymuint>& mark) const;
-
-  /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
-  void
-  scan_po();
 
 
 private:
@@ -511,9 +483,6 @@ private:
   
   // ファンアウトの枝のリスト
   SbjEdgeList mFanoutList;
-
-  // 実効的なファンアウト数
-  ymuint32 mNefo;
   
   // 作業用のマーク
   ymuint32 mMark;
@@ -736,7 +705,7 @@ public:
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppi_list(list<SbjNode*>& node_list) const;
+  ppi_list(list<const SbjNode*>& node_list) const;
 
   /// @brief 出力のノード数を得る．
   ymuint
@@ -756,7 +725,7 @@ public:
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppo_list(list<SbjNode*>& node_list) const;
+  ppo_list(list<const SbjNode*>& node_list) const;
 
   /// @brief 論理ノード数を得る．
   ymuint
@@ -776,13 +745,14 @@ public:
 
   /// @brief ソートされた論理ノードのリストを得る．
   void
-  sort(vector<SbjNode*>& node_list) const;
+  sort(vector<const SbjNode*>& node_list) const;
 
   /// @brief 逆順で論理ソートされたノードのリストを得る．
   void
-  rsort(vector<SbjNode*>& node_list) const;
+  rsort(vector<const SbjNode*>& node_list) const;
 
   /// @brief 段数を求める．
+  /// @note 副作用として各 SbjNode のレベルが設定される．
   ymuint
   level() const;
 
@@ -911,9 +881,6 @@ public:
   /// @brief 内容を s に出力する．
   void
   dump(ostream& s) const;
-
-  void
-  set_efo() const;
   
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -962,11 +929,38 @@ private:
 	  SbjNode* to,
 	  ymuint pos);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  /// @name mindepth 関係の関数
+  /// @{
+
+  /// node およびその TFI に rmark を付ける．
+  /// depth が d のノードに tmark を付ける．
+  static
+  void
+  mark_tfi(SbjNode* node,
+	   ymuint d,
+	   list<SbjNode*>& node_list);
+
+  // node のファンアウトを探索する．
+  static
+  bool
+  dfs_fanout(SbjNode* node);
+
+  static
+  bool
+  dfs(SbjNode* cur_node,
+      int dir);
+
   // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
   bool
   find_k_cut(SbjNode* node,
 	     ymuint k,
 	     ymuint d) const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
 
   
 private:
@@ -1366,14 +1360,6 @@ SbjNode::n_fanout() const
   return mFanoutList.size();
 }
 
-// @brief fo マークを考慮した実効的なファンアウト数を返す．
-inline
-ymuint
-SbjNode::n_efo() const
-{
-  return mNefo;
-}
-
 // @brief 出力ノードにファンアウトしているとき true を返す．
 inline
 bool
@@ -1385,7 +1371,7 @@ SbjNode::pomark() const
 // @brief DFFノードの場合のデータ入力を得る．
 inline
 const SbjNode*
-SbjNode::data_input() const
+SbjNode::fanin_data() const
 {
   return fanin(0);
 }
@@ -1393,7 +1379,7 @@ SbjNode::data_input() const
 // @brief DFFノードの場合のデータ入力を得る．
 inline
 SbjNode*
-SbjNode::data_input()
+SbjNode::fanin_data()
 {
   return fanin(0);
 }
@@ -1401,7 +1387,7 @@ SbjNode::data_input()
 // @brief DFFノードの場合のデータ入力の反転属性を得る．
 inline
 bool
-SbjNode::data_inv() const
+SbjNode::fanin_data_inv() const
 {
   return static_cast<bool>((mFlags >> 3) & 1U);
 }
@@ -1409,7 +1395,7 @@ SbjNode::data_inv() const
 // @brief DFFノードの場合のクロック入力を得る．
 inline
 const SbjNode*
-SbjNode::clock_input() const
+SbjNode::fanin_clock() const
 {
   return fanin(1);
 }
@@ -1417,7 +1403,7 @@ SbjNode::clock_input() const
 // @brief DFFノードの場合のクロック入力を得る．
 inline
 SbjNode*
-SbjNode::clock_input()
+SbjNode::fanin_clock()
 {
   return fanin(1);
 }
@@ -1425,7 +1411,7 @@ SbjNode::clock_input()
 // @brief DFFノードの場合のクロック入力の反転属性を得る．
 inline
 bool
-SbjNode::clock_inv() const
+SbjNode::fanin_clock_inv() const
 {
   return static_cast<bool>((mFlags >> 4) & 1U);
 }
@@ -1433,7 +1419,7 @@ SbjNode::clock_inv() const
 // @brief DFFノードの場合のセット入力を得る．
 inline
 const SbjNode*
-SbjNode::set_input() const
+SbjNode::fanin_set() const
 {
   return fanin(2);
 }
@@ -1441,7 +1427,7 @@ SbjNode::set_input() const
 // @brief DFFノードの場合のセット入力を得る．
 inline
 SbjNode*
-SbjNode::set_input()
+SbjNode::fanin_set()
 {
   return fanin(2);
 }
@@ -1449,7 +1435,7 @@ SbjNode::set_input()
 // @brief DFFノードの場合のセット入力の反転属性を得る．
 inline
 bool
-SbjNode::set_inv() const
+SbjNode::fanin_set_inv() const
 {
   return static_cast<bool>((mFlags >> 5) & 1U);
 }
@@ -1457,7 +1443,7 @@ SbjNode::set_inv() const
 // @brief DFFノードの場合のリセット入力を得る．
 inline
 const SbjNode*
-SbjNode::rst_input() const
+SbjNode::fanin_rst() const
 {
   return fanin(3);
 }
@@ -1465,7 +1451,7 @@ SbjNode::rst_input() const
 // @brief DFFノードの場合のリセット入力を得る．
 inline
 SbjNode*
-SbjNode::rst_input()
+SbjNode::fanin_rst()
 {
   return fanin(3);
 }
@@ -1473,57 +1459,9 @@ SbjNode::rst_input()
 // @brief DFFノードの場合のリセット入力の反転属性を得る．
 inline
 bool
-SbjNode::rst_inv() const
+SbjNode::fanin_rst_inv() const
 {
   return static_cast<bool>((mFlags >> 6) & 1U);
-}
-
-// @brief fanout マークを返す．
-inline
-bool
-SbjNode::is_fo() const
-{
-  return static_cast<bool>((mMark >> kFoShift) & 1U);
-}
-
-// @brief fanout マークをつける．
-inline
-void
-SbjNode::set_fo()
-{
-  mMark |= kFoMask;
-}
-
-// @brief fanout マークを消す．
-inline
-void
-SbjNode::clear_fo()
-{
-  mMark &= ~kFoMask;
-}
-
-// @brief unselected マークを返す．
-inline
-bool
-SbjNode::is_unselected() const
-{
-  return static_cast<bool>((mMark >> kUnselShift) & 1U);
-}
-
-// @brief unselected マークをつける．
-inline
-void
-SbjNode::set_unselected()
-{
-  mMark |= kUnselMask;
-}
-
-// @brief unselected マークを消す．
-inline
-void
-SbjNode::clear_unselected()
-{
-  mMark &= ~kUnselMask;
 }
 
 // @brief range マークを返す．

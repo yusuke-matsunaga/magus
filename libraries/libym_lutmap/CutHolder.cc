@@ -56,20 +56,20 @@ CutHolder::all_init(const SbjGraph& sbjgraph,
 }
 
 void
-CutHolder::node_init(SbjNode* node,
+CutHolder::node_init(const SbjNode* node,
 		     ymuint pos)
 {
 }
 
 void
-CutHolder::found(SbjNode* root)
+CutHolder::found(const SbjNode* root)
 {
 }
 
 void
-CutHolder::found(SbjNode* root,
+CutHolder::found(const SbjNode* root,
 		 ymuint ni,
-		 SbjNode* inputs[])
+		 const SbjNode* inputs[])
 {
   Cut* cut = alloc_cut(ni);
   cut->mRoot = root;
@@ -81,7 +81,7 @@ CutHolder::found(SbjNode* root,
 }
 
 void
-CutHolder::node_end(SbjNode* node,
+CutHolder::node_end(const SbjNode* node,
 		    ymuint pos,
 		    ymuint ncuts)
 {
@@ -98,7 +98,7 @@ CutHolder::all_end(const SbjGraph& sbjgraph,
 Cut*
 CutHolder::alloc_cut(ymuint ni)
 {
-  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(SbjNode*);
+  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const SbjNode*);
   assert_cond(size < kPageSize, __FILE__, __LINE__);
   if ( mCurChunk == NULL || mLast + size > kPageSize ) {
     mCurChunk = new char[kPageSize];

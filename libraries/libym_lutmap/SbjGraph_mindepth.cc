@@ -18,18 +18,12 @@ BEGIN_NAMESPACE_YM_LUTMAP
 // minimum depth 関係のコード
 //////////////////////////////////////////////////////////////////////
 
-BEGIN_NONAMESPACE
-
-bool
-dfs(SbjNode* cur_node,
-    int dir);
-
 // node およびその TFI に rmark を付ける．
 // depth が d のノードに tmark を付ける．
 void
-mark_tfi(SbjNode* node,
-	 ymuint d,
-	 list<SbjNode*>& node_list)
+SbjGraph::mark_tfi(SbjNode* node,
+		   ymuint d,
+		   list<SbjNode*>& node_list)
 {
   if ( !node->rmark() ) {
     node->set_rmark();
@@ -46,7 +40,7 @@ mark_tfi(SbjNode* node,
 
 // node のファンアウトを探索する．
 bool
-dfs_fanout(SbjNode* node)
+SbjGraph::dfs_fanout(SbjNode* node)
 {
   const SbjEdgeList& fanout_list = node->fanout_list();
   for (SbjEdgeList::const_iterator p = fanout_list.begin();
@@ -72,8 +66,8 @@ dfs_fanout(SbjNode* node)
 }
 
 bool
-dfs(SbjNode* cur_node,
-    int dir)
+SbjGraph::dfs(SbjNode* cur_node,
+	      int dir)
 {
   if ( cur_node->tmark() ) {
     // target にたどり着いた
@@ -139,8 +133,6 @@ dfs(SbjNode* cur_node,
   }
   return false;
 }
-
-END_NONAMESPACE
 
 
 // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
@@ -211,15 +203,15 @@ SbjGraph::get_min_depth(ymuint k) const
   }
 
   // 入力側から depth を計算してゆく
-  vector<SbjNode*> node_list;
+  vector<const SbjNode*> node_list;
   sort(node_list);
-  for (vector<SbjNode*>::const_iterator p = node_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    SbjNode* node = *p;
+    const SbjNode* node = *p;
     // ファンインの depth の最大値を max_depth に入れる．
     ymuint max_depth = 0;
     for (ymuint i = 0; i < 2; ++ i) {
-      SbjNode* inode0 = node->fanin(i);
+      const SbjNode* inode0 = node->fanin(i);
       ymuint d0 = inode0->depth();
       if ( max_depth < d0 ) {
 	max_depth = d0;
@@ -229,10 +221,11 @@ SbjGraph::get_min_depth(ymuint k) const
     // max_depth 以下の depth を持つノードのみで構成される k-feasible cut を
     // 見つけることができたら node の depth も max_depth となる．
     // そうでなければ max_depth + 1
-    if ( !find_k_cut(node, k, max_depth) ) {
+    SbjNode* node1 = mNodeArray[node->id()];
+    if ( !find_k_cut(node1, k, max_depth) ) {
       ++ max_depth;
     }
-    node->mDepth = max_depth;
+    node1->mDepth = max_depth;
   }
 }
 

@@ -73,7 +73,7 @@ private:
 
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(SbjNode* node,
+  calc_weight(const SbjNode* node,
 	      const Cut* cut,
 	      double cur_weight);
 

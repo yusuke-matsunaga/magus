@@ -62,7 +62,7 @@ private:
 
   // node の最適カットを選ぶ．
   void
-  back_trace(SbjNode* node,
+  back_trace(const SbjNode* node,
 	     MapRecord& maprec,
 	     CrNode* from);
 

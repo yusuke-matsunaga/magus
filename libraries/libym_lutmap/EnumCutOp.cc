@@ -60,7 +60,7 @@ EnumCutOp::all_init(const SbjGraph& sbjgraph,
 // @param[in] cur_pos node の処理順
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::node_init(SbjNode* node,
+EnumCutOp::node_init(const SbjNode* node,
 		     ymuint cur_pos)
 {
 }
@@ -69,7 +69,7 @@ EnumCutOp::node_init(SbjNode* node,
 // @param[in] root 根のノード
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::found(SbjNode* root)
+EnumCutOp::found(const SbjNode* root)
 {
 }
 
@@ -79,9 +79,9 @@ EnumCutOp::found(SbjNode* root)
 // @param[in] inputs 入力ノードの配列
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::found(SbjNode* root,
+EnumCutOp::found(const SbjNode* root,
 		 ymuint ni,
-		 SbjNode* inputs[])
+		 const SbjNode* inputs[])
 {
 }
 
@@ -91,7 +91,7 @@ EnumCutOp::found(SbjNode* root,
 // @param[in] ncuts 列挙されたカット数
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::node_end(SbjNode* node,
+EnumCutOp::node_end(const SbjNode* node,
 		    ymuint cur_pos,
 		    ymuint ncuts)
 {

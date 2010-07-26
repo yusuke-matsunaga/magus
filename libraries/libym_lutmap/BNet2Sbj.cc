@@ -289,8 +289,6 @@ BNet2Sbj::operator()(const BNetwork& network,
     (void) sbjgraph.new_output(inode, inv);
   }
 
-  sbjgraph.set_efo();
-
   return true;
 }
 

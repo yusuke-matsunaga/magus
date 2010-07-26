@@ -73,7 +73,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  node_init(SbjNode* node,
+  node_init(const SbjNode* node,
 	    ymuint cur_pos);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
@@ -81,7 +81,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  found(SbjNode* root);
+  found(const SbjNode* root);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
   /// @param[in] root 根のノード
@@ -90,9 +90,9 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  found(SbjNode* root,
+  found(const SbjNode* root,
 	ymuint ni,
-	SbjNode* inputs[]);
+	const SbjNode* inputs[]);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
@@ -101,7 +101,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  node_end(SbjNode* node,
+  node_end(const SbjNode* node,
 	   ymuint cur_pos,
 	   ymuint ncuts);
 

@@ -39,7 +39,7 @@ public:
 
   /// @brief node を根とするカットのリストを取り出す．
   const CutList&
-  cut_list(SbjNode* node) const;
+  cut_list(const SbjNode* node) const;
 
   /// @brief 現在のカットを列挙したときのカットサイズを返す．
   ymuint
@@ -68,14 +68,14 @@ private:
   /// @param[in] cur_pos node の処理順
   virtual
   void
-  node_init(SbjNode* node,
+  node_init(const SbjNode* node,
 	    ymuint cur_pos);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
   /// @param[in] root 根のノード
   virtual
   void
-  found(SbjNode* root);
+  found(const SbjNode* root);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
   /// @param[in] root 根のノード
@@ -83,9 +83,9 @@ private:
   /// @param[in] inputs 入力ノードの配列
   virtual
   void
-  found(SbjNode* root,
+  found(const SbjNode* root,
 	ymuint ni,
-	SbjNode* inputs[]);
+	const SbjNode* inputs[]);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
@@ -93,7 +93,7 @@ private:
   /// @param[in] ncuts 列挙されたカット数
   virtual
   void
-  node_end(SbjNode* node,
+  node_end(const SbjNode* node,
 	   ymuint cur_pos,
 	   ymuint ncuts);
 
@@ -145,7 +145,7 @@ private:
 // @brief node を根とするカットのリストを取り出す．
 inline
 const CutList&
-CutHolder::cut_list(SbjNode* node) const
+CutHolder::cut_list(const SbjNode* node) const
 {
   return mCutList[node->id()];
 }
