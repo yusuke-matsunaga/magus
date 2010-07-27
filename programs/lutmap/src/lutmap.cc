@@ -12,14 +12,17 @@
 #include "ym_lutmap/lutmap_nsdef.h"
 #include "ym_lutmap/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
+#if 0
 #include "ym_lutmap/BNet2Sbj.h"
 #include "ym_lutmap/Ln2BNet.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
+#else
 #include "ym_mvn/mvn_nsdef.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
+#endif
 #include "ym_utils/MsgHandler.h"
 
 

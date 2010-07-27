@@ -18,9 +18,7 @@ INCLUDES = \
 libym_lutmap_la_SOURCES = \
 	SbjGraph.cc \
 	SbjGraph_mindepth.cc \
-	BNet2Sbj.cc \
 	LnGraph.cc \
-	Ln2BNet.cc \
 	EnumCutOp.h \
 	EnumCutOp.cc \
 	EnumCut.h \
@@ -46,6 +44,7 @@ libym_lutmap_la_SOURCES = \
 	DelayCover.cc
 
 libym_lutmap_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_lutmap_la_LDFLAGS =
