@@ -58,7 +58,7 @@ for p in $popt_list; do
   fi
 done
 LIBS=$libs_old
-if test $gmp_found = 1; then
+if test $popt_found = 1; then
    AC_MSG_RESULT([popt is found at $POPT_LIBS])
 else
    AC_MSG_RESULT([popt is not found])
