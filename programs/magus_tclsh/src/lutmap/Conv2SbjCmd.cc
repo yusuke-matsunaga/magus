@@ -10,7 +10,7 @@
 
 
 #include "LutmapCmd.h"
-#include "ym_lutmap/BNet2Sbj.h"
+#include "BNet2Sbj.h"
 
 
 

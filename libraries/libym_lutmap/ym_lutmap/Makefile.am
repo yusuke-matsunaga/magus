@@ -9,6 +9,4 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	lutmap_nsdef.h \
 	LnGraph.h \
-	SbjGraph.h \
-	BNet2Sbj.h \
-	Ln2BNet.h
+	SbjGraph.h

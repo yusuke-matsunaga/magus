@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/BNet2Sbj.h"
+#include "BNet2Sbj.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_lutmap/SbjGraph.h"
 

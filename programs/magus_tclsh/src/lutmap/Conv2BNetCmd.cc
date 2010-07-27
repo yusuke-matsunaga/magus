@@ -11,7 +11,7 @@
 
 #include "LutmapCmd.h"
 #include "NetHandle.h"
-#include "ym_lutmap/Ln2BNet.h"
+#include "Ln2BNet.h"
 #include "ym_tclpp/TclPopt.h"
 
 
