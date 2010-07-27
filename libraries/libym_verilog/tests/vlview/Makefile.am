@@ -23,17 +23,14 @@ bin_PROGRAMS = \
 vlview_SOURCES = \
 	VlView.h \
 	VlView.cc \
-	VlView.moc.cc \
 	VlTokenList.h \
 	VlTokenList.cc \
 	VlTokenView.h \
 	VlTokenView.cc \
-	VlTokenView.moc.cc \
 	VlParseTreeModel.h \
 	VlParseTreeModel.cc \
 	VlParseTreeView.h \
 	VlParseTreeView.cc \
-	VlParseTreeView.moc.cc \
 	VlPtNode.h \
 	VlPtNode.cc \
 	VlPtNode_root.h \
@@ -56,6 +53,11 @@ vlview_SOURCES = \
 	VlPtNode_misc.cc \
 	vlview_main.cc
 
+nodist_vlview_SOURCES = \
+	VlView.moc.cc \
+	VlTokenView.moc.cc \
+	VlParseTreeView.moc.cc
+
 vlview_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
 
 vlview_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
@@ -72,3 +74,4 @@ BUILT_SOURCES = \
 	VlView.moc.cc \
 	VlTokenView.moc.cc \
 	VlParseTreeView.moc.cc
+

@@ -34,6 +34,7 @@ noinst_HEADERS = \
 	ElbPrimitive.h \
 	ElbProcess.h \
 	ElbRange.h \
+	ElbScope.h \
 	ElbStmt.h \
 	ElbStub.h \
 	ElbTaskFunc.h \
