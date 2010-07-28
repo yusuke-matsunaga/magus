@@ -1283,7 +1283,6 @@ public:
   /// @param[in] event event control (event control 文とは別物)
   /// @param[in] body 本体のステートメント
   /// @return 生成された event control 文
-  virtual
   PtStmt*
   new_EcStmt(const FileRegion& fr,
 	     PtControl* event,
