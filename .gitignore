@@ -4,17 +4,3 @@ ymconfig.h.in
 aclocal.m4
 autom4te.cache
 configure
-
-config/install-sh
-config/libtool.m4
-config/ltmain.sh
-config/ltoptions.m4
-config/ltsugar.m4
-config/ltversion.m4
-config/lt~obsolete.m4
-config/missing
-config/config.guess
-config/config.sub
-config/depcomp
-config/ylwrap
-config/
