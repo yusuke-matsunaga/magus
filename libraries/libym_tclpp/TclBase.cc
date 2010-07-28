@@ -853,10 +853,10 @@ TclBase::open_ofile(ofstream& ofs,
 // イヤなら Tcl の素の関数を呼べば良い．
 // マッチした場合には 1 を，マッチしなかった場合には 0 を返す．
 int
-TclBase::string_match(const string& string,
+TclBase::string_match(const string& str,
 		      const string& pat) const
 {
-  StrBuf sptr1(string);
+  StrBuf sptr1(str);
   StrBuf sptr2(pat);
   return Tcl_StringMatch(sptr1, sptr2);
 }
@@ -866,10 +866,10 @@ TclBase::string_match(const string& string,
 // パタンが正しくないときは -1 を返し，インタプリタにエラーメッセージ
 // をセットする．
 int
-TclBase::regexp_match(const string& string,
+TclBase::regexp_match(const string& str,
 		      const string& pat) const
 {
-  StrBuf sptr1(string);
+  StrBuf sptr1(str);
   StrBuf sptr2(pat);
   return Tcl_RegExpMatch(interp(), sptr1, sptr2);
 }

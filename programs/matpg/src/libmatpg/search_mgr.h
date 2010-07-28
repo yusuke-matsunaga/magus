@@ -38,19 +38,19 @@ extern
 void
 set_request(gate_t* gate,
 	    val3 gval,
-	    val3 gval);
+	    val3 fval);
 
 extern
 void
 opt_assign(gate_t* gate,
 	   val3 gval,
-	   val3 gval);
+	   val3 fval);
 
 extern
 void
 mand_assign(gate_t* gate,
 	    val3 gval,
-	    val3 gval);
+	    val3 fval);
 
 extern
 bool

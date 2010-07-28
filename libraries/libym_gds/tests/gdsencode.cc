@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <ctype.h>
+#include <stdlib.h>
+
 
 // c を16進数用の文字と見なして変換する
 // 0-9a-hA-H 以外の場合には 16 を返す．

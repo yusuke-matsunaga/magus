@@ -56,6 +56,9 @@ public:
   /// @brief char* へのキャスト演算子
   operator char*();
   
+  /// @brief const char* へのキャスト演算子
+  operator const char*() const;
+  
 
 private:
 
@@ -130,6 +133,13 @@ StrBuf::~StrBuf()
 // 中身を取り出す．
 inline
 StrBuf::operator char*()
+{
+  return mBuf;
+}
+
+// @brief const char* へのキャスト演算子
+inline
+StrBuf::operator const char*() const
 {
   return mBuf;
 }

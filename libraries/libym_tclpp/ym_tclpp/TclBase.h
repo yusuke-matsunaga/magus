@@ -841,7 +841,7 @@ public:
 	     const string& name) const;
 
   /// @brief glob 形式のマッチング関数
-  /// @param[in] string マッチング対象の文字列
+  /// @param[in] str マッチング対象の文字列
   /// @param[in] pat glob 形式のパタン
   /// @retval 1 マッチが成功した．
   /// @retval 0 マッチが見つからなかった．
@@ -852,22 +852,22 @@ public:
   /// 名前空間の問題もあるのでメンバ関数にしている．
   /// イヤなら Tcl の素の関数を呼べば良い．
   int
-  string_match(const string& string,
+  string_match(const string& str,
 	       const string& pat) const;
 
   /// @brief 正規表現のマッチング関数
-  /// @param[in] string マッチング対象の文字列
+  /// @param[in] str マッチング対象の文字列
   /// @param[in] pat 正規表現のパタン
   /// @retval 1 マッチが成功した．
   /// @retval 0 マッチが見つからなかった．
   /// @retval -1 パタンが正規表現でない．
   ///
-  /// string が正規表現 pat にマッチするか調べる．
+  /// str が正規表現 pat にマッチするか調べる．
   ///
   /// パタンが正しくないときは -1 を返し，
   /// インタプリタにエラーメッセージをセットする．
   int
-  regexp_match(const string& string,
+  regexp_match(const string& str,
 	       const string& pat) const;
 
   /// @}

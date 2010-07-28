@@ -243,15 +243,21 @@ fi
 # ========================================================
 AC_DEFUN([YM_CHECK_TCLREADLINE],[
 AC_MSG_CHECKING([for tclreadline])
+arch=`uname -p`
+if test "X$arch" = "Xx86_64"; then
+  ym_tmp_lib="lib64"
+else
+  ym_tmp_lib="lib"
+fi
 ym_tmp_found=no
 ym_tmp_builtin_tclreadline=no
 AC_ARG_WITH([tclreadline],
 	AS_HELP_STRING([--with-tclreadline=DIR], [libtclreadline.la is in DIR]),
 	[
 if test "x$withval" != x; then
-  if test $withval = builtin && test -r ../tclreadline/libtclreadline.la; then
+  if test $withval = builtin && test -r ../../tclreadline/libtclreadline.la; then
     ym_tmp_found=yes
-    YM_LIBS_LIBTCLREADLINE='$(top_builddir)/../tclreadline/libtclreadline.la'
+    YM_LIBS_LIBTCLREADLINE='$(top_builddir)/../../tclreadline/libtclreadline.la'
     ym_tmp_builtin_tclreadline=yes
   else
     if test -r $withval/libtclreadline.la; then
@@ -265,7 +271,7 @@ fi],[
 #fi
 if test $ym_tmp_found = no; then
   for dir in $prefix /usr /usr/local /opt; do
-    ym_tmp_dir=$dir/lib
+    ym_tmp_dir=$dir/$ym_tmp_lib
     if test -r $ym_tmp_dir/libtclreadline.la; then
       ym_tmp_found=yes
       YM_LIBS_LIBTCLREADLINE=$ym_tmp_dir/libtclreadline.la

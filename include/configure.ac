@@ -216,9 +216,9 @@ ___EOF___
 fi
 
 cat >> $ymtools << ___EOF___
-#include <ymnsdef.h>
-#include <ymassert.h>
-#include <ymmath.h>
+#include "ymnsdef.h"
+#include "ymassert.h"
+#include "ymmath.h"
 ___EOF___
 
 if test $ym_have_zlib=1; then
