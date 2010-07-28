@@ -391,9 +391,9 @@ private:
   /// @param[in] obj1, obj2, obj3 ブロードキャストする情報を表すオブジェクト
   virtual
   void
-  event_proc(T1 obj,
-	     T2 obj,
-	     T3 obj) = 0;
+  event_proc(T1 obj1,
+	     T2 obj2,
+	     T3 obj3) = 0;
   
 };
 
