@@ -22,6 +22,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #define USE_BINCLAUSE 1
 #define DONT_PROPAGATE_SAT_LITERAL 1
@@ -66,13 +67,13 @@ operator<<(ostream& s,
   return s;
 }
 
+
 ostream&
 operator<<(ostream& s,
 	   Clause& c)
 {
-  using std::vector;
   int n = c.size();
-  vector<Lit> tmp(n);
+  std::vector<Lit> tmp(n);
   for (int i = 0; i < n; ++ i) {
     tmp[i] = c[i];
   }
