@@ -108,7 +108,7 @@ BASEDIR=`cd $basedir; pwd`
 set_program
 
 # 必要な変数の設定
-AUTOGEN_COMMON=autogen.common
+AUTOGEN_COMMON="./autogen.common"
 
 # サブモジュールのディレクトリ名
 #SUBMODULE=`cat $BASEDIR/modules`
