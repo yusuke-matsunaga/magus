@@ -167,10 +167,10 @@ int
 EiBitSelect::index_val() const
 {
   int ans;
-  if ( !mIndex->eval_int(ans) ) {
-    return 0;
+  if ( mIndex->eval_int(ans) ) {
+    return ans;
   }
-  return ans;
+  return 0;
 }
 
 // @brief スカラー値を返す．
@@ -298,6 +298,17 @@ EiParamBitSelect::index() const
   return mIndex;
 }
 
+// @brief インデックス値を返す．
+int
+EiParamBitSelect::index_val() const
+{
+  int ans;
+  if ( mIndex->eval_int(ans) ) {
+    return ans;
+  }
+  return 0;
+}
+
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiParamBitSelect::eval_scalar() const
@@ -419,6 +430,17 @@ const VlExpr*
 EiArrayElemBitSelect::index() const
 {
   return mIndex;
+}
+
+// @brief インデックス値を返す．
+int
+EiArrayElemBitSelect::index_val() const
+{
+  int ans;
+  if ( mIndex->eval_int(ans) ) {
+    return ans;
+  }
+  return 0;
 }
 
 // @brief スカラー値を返す．

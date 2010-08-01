@@ -275,7 +275,7 @@ ExprGen::instantiate_const_primary(const VlNamedObj* parent,
 	    buf.str());
     return NULL;
   }
-  return instantiate_primary_sub3(parent, env, pt_expr, param);
+  return instantiate_param_primary(parent, env, pt_expr, param);
 }
 
 // @brief constant function 内で用いられるプライマリ式を生成する．
@@ -337,7 +337,8 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
   }
   else {
     // 関数内で見つからなかった場合，モジュール内の識別子を探索する．
-    handle = find_obj_up(parent, PtNameBranchArray(), name, parent->parent_module());
+    handle = find_obj_up(parent, PtNameBranchArray(), name,
+			 parent->parent_module());
     if ( handle ) {
       // 対象が genvar だった場合
       ElbGenvar* genvar = handle->genvar();
@@ -386,10 +387,10 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
     }
   }
   if ( decl ) {
-    return instantiate_primary_sub1(parent, env, pt_expr, decl);
+    return instantiate_decl_primary(parent, env, pt_expr, decl);
   }
   else {
-    return instantiate_primary_sub3(parent, env, pt_expr, param);
+    return instantiate_param_primary(parent, env, pt_expr, param);
   }
 }
   
@@ -510,16 +511,16 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
   
   ElbDecl* decl = handle->decl();
   if ( decl ) {
-    return instantiate_primary_sub1(parent, env, pt_expr, decl);
+    return instantiate_decl_primary(parent, env, pt_expr, decl);
   }
   
   ElbDeclArray* decl_array = handle->decl_array();
   if ( decl_array ) {
-    return instantiate_primary_sub2(parent, env, pt_expr, decl_array);
+    return instantiate_array_primary(parent, env, pt_expr, decl_array);
   }
   ElbParameter* param = handle->parameter();
   if ( param ) {
-    return instantiate_primary_sub3(parent, env, pt_expr, param);
+    return instantiate_param_primary(parent, env, pt_expr, param);
   }
   
   ostringstream buf;
@@ -541,7 +542,7 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
 // @return 生成された式を返す．
 // @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
 ElbExpr*
-ExprGen::instantiate_primary_sub1(const VlNamedObj* parent,
+ExprGen::instantiate_decl_primary(const VlNamedObj* parent,
 				  const ElbEnv& env,
 				  const PtExpr* pt_expr,
 				  ElbDecl* decl)
@@ -598,10 +599,10 @@ ExprGen::instantiate_primary_sub1(const VlNamedObj* parent,
 // @return 生成された式を返す．
 // @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
 ElbExpr*
-ExprGen::instantiate_primary_sub2(const VlNamedObj* parent,
-				  const ElbEnv& env,
-				  const PtExpr* pt_expr,
-				  ElbDeclArray* decl_array)
+ExprGen::instantiate_array_primary(const VlNamedObj* parent,
+				   const ElbEnv& env,
+				   const PtExpr* pt_expr,
+				   ElbDeclArray* decl_array)
 {
   vector<ElbExpr*> index_list;
   bool has_range_select;
@@ -658,10 +659,10 @@ ExprGen::instantiate_primary_sub2(const VlNamedObj* parent,
 // @return 生成された式を返す．
 // @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
 ElbExpr*
-ExprGen::instantiate_primary_sub3(const VlNamedObj* parent,
-				  const ElbEnv& env,
-				  const PtExpr* pt_expr,
-				  ElbParameter* param)
+ExprGen::instantiate_param_primary(const VlNamedObj* parent,
+				   const ElbEnv& env,
+				   const PtExpr* pt_expr,
+				   ElbParameter* param)
 {
   bool has_range_select;
   bool has_bit_select;

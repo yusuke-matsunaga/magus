@@ -268,7 +268,7 @@ private:
   /// @return 生成された式を返す．
   /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
   ElbExpr*
-  instantiate_primary_sub1(const VlNamedObj* parent,
+  instantiate_decl_primary(const VlNamedObj* parent,
 			   const ElbEnv& env,
 			   const PtExpr* pt_expr,
 			   ElbDecl* decl);
@@ -281,10 +281,10 @@ private:
   /// @return 生成された式を返す．
   /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
   ElbExpr*
-  instantiate_primary_sub2(const VlNamedObj* parent,
-			   const ElbEnv& env,
-			   const PtExpr* pt_expr,
-			   ElbDeclArray* decl);
+  instantiate_array_primary(const VlNamedObj* parent,
+			    const ElbEnv& env,
+			    const PtExpr* pt_expr,
+			    ElbDeclArray* decl);
   
   /// @brief parameter 宣言用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
@@ -294,10 +294,10 @@ private:
   /// @return 生成された式を返す．
   /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
   ElbExpr*
-  instantiate_primary_sub3(const VlNamedObj* parent,
-			   const ElbEnv& env,
-			   const PtExpr* pt_expr,
-			   ElbParameter* param);
+  instantiate_param_primary(const VlNamedObj* parent,
+			    const ElbEnv& env,
+			    const PtExpr* pt_expr,
+			    ElbParameter* param);
   
   /// @brief 添字の部分を実体化する．(単体のオブジェクト用)
   /// @param[in] parent 親のスコープ
