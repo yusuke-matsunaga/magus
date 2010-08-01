@@ -293,7 +293,7 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
   for (ymuint i = 0; i < np; ++ i) {
     const VlPort* port = vl_module->port(i);
     const VlExpr* expr = port->low_conn();
-    if ( expr->type() == kVpiOperation ) {
+    if ( expr->is_operation() ) {
       assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
       ymuint n = expr->operand_num();
       mMvMgr->init_port(module, i, port->name(), n);
@@ -539,24 +539,20 @@ ReaderImpl::gen_portref(const VlExpr* expr,
   }
   assert_cond( node != NULL, __FILE__, __LINE__);
 
-  switch ( expr->type() ) {
-  case kVpiBitSelect:
+  if ( expr->is_bitselect() ) {
     assert_cond( node != NULL, __FILE__, __LINE__);
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     assert_cond( expr->declarray_dimension() == 0, __FILE__, __LINE__);
     msb = expr->index_val();
     return 1;
-
-  case kVpiPartSelect:
+  }
+  if ( expr->is_partselect() ) {
     assert_cond( node != NULL, __FILE__, __LINE__);
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     assert_cond( expr->declarray_dimension() == 0, __FILE__, __LINE__);
     msb = expr->left_range_val();
     lsb = expr->right_range_val();
     return 2;
-
-  default:
-    break;
   }
   return 0;
 }
@@ -710,57 +706,39 @@ ReaderImpl::connect_lhs(MvModule* parent_module,
 			const VlExpr* expr,
 			MvNode* node)
 {
-  switch ( expr->type() ) {
-  case kVpiBitSelect:
-    {
-      assert_cond( node->output(0)->bit_width() == 1, __FILE__, __LINE__);
-      assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-      MvNode* node1 = gen_expr2(expr);
-      reg_driver(node1, Driver(node, expr->index_val()));
+  if ( expr->is_primary() ) {
+    assert_cond( node->output(0)->bit_width() == expr->bit_size(),
+		 __FILE__, __LINE__);
+    MvNode* node1 = gen_expr2(expr);
+    reg_driver(node1, Driver(node));
+  }
+  else if ( expr->is_bitselect() ) {
+    assert_cond( node->output(0)->bit_width() == 1, __FILE__, __LINE__);
+    assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
+    MvNode* node1 = gen_expr2(expr);
+    reg_driver(node1, Driver(node, expr->index_val()));
+  }
+  else if ( expr->is_partselect() ) {
+    assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
+    MvNode* node1 = gen_expr2(expr);
+    ymuint msb = expr->left_range_val();
+    ymuint lsb = expr->right_range_val();
+    assert_cond( node->output(0)->bit_width() == msb - lsb + 1,
+		 __FILE__, __LINE__);
+    reg_driver(node1, Driver(node, msb, lsb));
+  }
+  else if ( expr->is_operation() ) {
+    assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
+    ymuint n = expr->operand_num();
+    ymuint offset = 0;
+    for (ymuint i = 0; i < n; ++ i) {
+      const VlExpr* expr1 = expr->operand(i);
+      connect_lhs_sub(parent_module, expr1, node, offset);
+      offset += expr1->bit_size();
     }
-    break;
-
-  case kVpiNetBit:
-    {
-      assert_cond( node->output(0)->bit_width() == 1, __FILE__, __LINE__);
-      MvNode* node1 = gen_expr2(expr);
-      reg_driver(node1, Driver(node, expr->index_val()));
-    }
-    break;
-    
-  case kVpiPartSelect:
-    {
-      assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-      MvNode* node1 = gen_expr2(expr);
-      ymuint msb = expr->left_range_val();
-      ymuint lsb = expr->right_range_val();
-      assert_cond( node->output(0)->bit_width() == msb - lsb + 1,
-		   __FILE__, __LINE__);
-      reg_driver(node1, Driver(node, msb, lsb));
-    }
-    break;
-
-  case kVpiOperation:
-    {
-      assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
-      ymuint n = expr->operand_num();
-      ymuint offset = 0;
-      for (ymuint i = 0; i < n; ++ i) {
-	const VlExpr* expr1 = expr->operand(i);
-	connect_lhs_sub(parent_module, expr1, node, offset);
-	offset += expr1->bit_size();
-      }
-    }
-    break;
-
-  default:
-    {
-      assert_cond( node->output(0)->bit_width() == expr->bit_size(),
-		   __FILE__, __LINE__);
-      MvNode* node1 = gen_expr2(expr);
-      reg_driver(node1, Driver(node));
-    }
-    break;
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
   }
 }
 
@@ -774,69 +752,58 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
 			    MvNode* node,
 			    ymuint offset)
 {
-  switch ( expr->type() ) {
-  case kVpiBitSelect:
-  case kVpiNetBit:
-    {
-      MvNode* node1 = gen_expr2(expr);
-      ymuint bw = node->output(0)->bit_width();
-      MvNode* node2 = mMvMgr->new_constbitselect(parent_module,
-						 offset,
-						 bw);
-      mMvMgr->connect(node, 0, node2, 0);
-      reg_driver(node1, Driver(node2, expr->index_val()));
+  if ( expr->is_primary() ) {
+    MvNode* node1 = gen_expr2(expr);
+    ymuint bw = node1->input(0)->bit_width();
+    MvNode* node2 = NULL;
+    if ( bw == 1 ) {
+      node2 = mMvMgr->new_constbitselect(parent_module,
+					 offset,
+					 bw);
     }
-    break;
-    
-  case kVpiPartSelect:
-    {
-      MvNode* node1 = gen_expr2(expr);
-      ymuint msb = expr->left_range_val();
-      ymuint lsb = expr->right_range_val();
-      ymuint bw = node->output(0)->bit_width();
-      ymuint bw1 = msb - lsb + 1;
-      MvNode* node2 = mMvMgr->new_constpartselect(parent_module,
-						  offset + bw1 - 1,
-						  offset,
-						  bw);
-      mMvMgr->connect(node, 0, node2, 0);
-      reg_driver(node1, Driver(node2, msb, lsb));
+    else {
+      node2 = mMvMgr->new_constpartselect(parent_module,
+					  offset + bw - 1,
+					  offset,
+					  bw);
     }
-    break;
-
-  case kVpiOperation:
+    mMvMgr->connect(node, 0, node2, 0);
+    mMvMgr->connect(node2, 0, node1, 0);
+  }
+  else if ( expr->is_bitselect() ) {
+    MvNode* node1 = gen_expr2(expr);
+    ymuint bw = node->output(0)->bit_width();
+    MvNode* node2 = mMvMgr->new_constbitselect(parent_module,
+					       offset,
+					       bw);
+    mMvMgr->connect(node, 0, node2, 0);
+    reg_driver(node1, Driver(node2, expr->index_val()));
+  }
+  else if ( expr->is_partselect() ) {
+    MvNode* node1 = gen_expr2(expr);
+    ymuint msb = expr->left_range_val();
+    ymuint lsb = expr->right_range_val();
+    ymuint bw = node->output(0)->bit_width();
+    ymuint bw1 = msb - lsb + 1;
+    MvNode* node2 = mMvMgr->new_constpartselect(parent_module,
+						offset + bw1 - 1,
+						offset,
+						bw);
+    mMvMgr->connect(node, 0, node2, 0);
+    reg_driver(node1, Driver(node2, msb, lsb));
+  }
+  else if ( expr->is_operation() ) {
     assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
-    {
-      ymuint n = expr->operand_num();
-      ymuint offset1 = 0;
-      for (ymuint i = 0; i < n; ++ i) {
-	const VlExpr* expr1 = expr->operand(i);
-	connect_lhs_sub(parent_module, expr1, node, offset + offset1);
-	offset1 += expr1->bit_size();
-      }
+    ymuint n = expr->operand_num();
+    ymuint offset1 = 0;
+    for (ymuint i = 0; i < n; ++ i) {
+      const VlExpr* expr1 = expr->operand(i);
+      connect_lhs_sub(parent_module, expr1, node, offset + offset1);
+      offset1 += expr1->bit_size();
     }
-    break;
-
-  default:
-    {
-      MvNode* node1 = gen_expr2(expr);
-      ymuint bw = node1->input(0)->bit_width();
-      MvNode* node2 = NULL;
-      if ( bw == 1 ) {
-	node2 = mMvMgr->new_constbitselect(parent_module,
-					   offset,
-					   bw);
-      }
-      else {
-	node2 = mMvMgr->new_constpartselect(parent_module,
-					    offset + bw - 1,
-					    offset,
-					    bw);
-      }
-      mMvMgr->connect(node, 0, node2, 0);
-      mMvMgr->connect(node2, 0, node1, 0);
-    }
-    break;
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
   }
 }
 
@@ -1105,445 +1072,434 @@ MvNode*
 ReaderImpl::gen_expr1(MvModule* parent_module,
 		      const VlExpr* expr)
 {
-  switch ( expr->type() ) {
-  case kVpiBitSelect:
-  case kVpiNetBit:
-   {
-      MvNode* node = gen_expr2(expr);
-      if ( expr->is_constant_select() ) {
-	ymuint bitpos = expr->index_val();
-	const MvOutputPin* pin = node->output(0);
-	MvNode* node1 = mMvMgr->new_constbitselect(parent_module,
-						   bitpos,
-						   pin->bit_width());
-	mMvMgr->connect(node, 0, node1, 0);
-	return node1;
-      }
-      else {
-	MvNode* node1 = gen_expr1(parent_module, expr->index());
-	const MvOutputPin* pin0 = node->output(0);
-	const MvOutputPin* pin1 = node1->output(0);
-	MvNode* node2 = mMvMgr->new_bitselect(parent_module,
-					      pin0->bit_width(),
-					      pin1->bit_width());
-	mMvMgr->connect(node, 0, node2, 0);
-	mMvMgr->connect(node1, 0, node2, 1);
-	return node2;
-      }
-    }
-    break;
-
-  case kVpiPartSelect:
-    {
-      MvNode* node = gen_expr2(expr);
-      if ( expr->is_constant_select() ) {
-	ymuint msb = expr->left_range_val();
-	ymuint lsb = expr->right_range_val();
-	const MvOutputPin* pin = node->output(0);
-	MvNode* node1 = mMvMgr->new_constpartselect(parent_module,
-						    msb, lsb,
-						    pin->bit_width());
-	mMvMgr->connect(node, 0, node1, 0);
-	return node1;
-      }
-      else {
-	// まだできてない．
-	// というか可変 part_select は VPI がおかしいと思う．
-	assert_not_reached(__FILE__, __LINE__);
-	return NULL;
-      }
-    }
-    break;
-
-  case kVpiOperation:
-    {
-      ymuint n = expr->operand_num();
-      vector<MvNode*> inputs(n);
-      for (ymuint i = 0; i < n; ++ i) {
-	inputs[i] = gen_expr1(parent_module, expr->operand(i));
-      }
-
-      switch ( expr->op_type() ) {
-      case kVpiNullOp:
-	break;
-	
-      case kVpiMinusOp:
-	{
-	  MvNode* node = mMvMgr->new_cmpl(parent_module, expr->bit_size());
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  return node;
-	}
-
-      case kVpiNotOp:
-	{
-	  MvNode* node = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  return node;
-	}
-
-      case kVpiBitNegOp:
-	{
-	  MvNode* node = mMvMgr->new_not(parent_module, expr->bit_size());
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  return node;
-	}
-
-      case kVpiPlusOp:
-	return inputs[0];
-	
-      case kVpiUnaryAndOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_rand(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  return node;
-	}
-
-      case kVpiUnaryNandOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_rand(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  return node1;
-	}
-
-      case kVpiUnaryOrOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_ror(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  return node;
-	}
-
-      case kVpiUnaryNorOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_ror(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  return node1;
-	}
-
-      case kVpiUnaryXorOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_rxor(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  return node;
-	}
-
-      case kVpiUnaryXNorOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_rxor(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  return node1;
-	}
-
-      case kVpiPosedgeOp:
-      case kVpiNegedgeOp:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
-
-      case kVpiAddOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_add(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-	
-      case kVpiSubOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_sub(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiMultOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_mult(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiDivOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_div(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiModOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_mod(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiPowerOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_pow(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiLShiftOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_sll(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-	
-      case kVpiRShiftOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_srl(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiArithLShiftOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_sla(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiArithRShiftOp:
-	{
-	  ymuint bw1 = inputs[0]->output(0)->bit_width();
-	  ymuint bw2 = inputs[1]->output(0)->bit_width();
-	  ymuint bw3 = expr->bit_size();
-	  MvNode* node = mMvMgr->new_sra(parent_module, bw1, bw2, bw3);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiBitAndOp:
-	{
-	  ymuint bw = expr->bit_size();
-	  MvNode* node = mMvMgr->new_and(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiBitOrOp:
-	{
-	  ymuint bw = expr->bit_size();
-	  MvNode* node = mMvMgr->new_or(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiBitXNorOp:
-	{
-	  ymuint bw = expr->bit_size();
-	  MvNode* node = mMvMgr->new_xor(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  MvNode* node1 = mMvMgr->new_not(parent_module, bw);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  return node1;
-	}
-
-      case kVpiBitXorOp:
-	{
-	  ymuint bw = expr->bit_size();
-	  MvNode* node = mMvMgr->new_xor(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiLogAndOp:
-	{
-	  MvNode* node = mMvMgr->new_and(parent_module, 1);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiLogOrOp:
-	{
-	  MvNode* node = mMvMgr->new_or(parent_module, 1);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-
-      case kVpiCaseEqOp:
-      case kVpiCaseNeqOp:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
-
-      case kVpiEqOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_equal(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-	
-      case kVpiNeqOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_equal(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  return node1;
-	}
-	
-      case kVpiLtOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_lt(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  return node;
-	}
-	
-      case kVpiGeOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_lt(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  return node1;
-	}
-	
-      case kVpiGtOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_lt(parent_module, bw);
-	  mMvMgr->connect(inputs[1], 0, node, 0);
-	  mMvMgr->connect(inputs[0], 0, node, 1);
-	  return node;
-	}
-	
-      case kVpiLeOp:
-	{
-	  ymuint bw = inputs[0]->output(0)->bit_width();
-	  MvNode* node = mMvMgr->new_lt(parent_module, bw);
-	  mMvMgr->connect(inputs[1], 0, node, 0);
-	  mMvMgr->connect(inputs[0], 0, node, 1);
-	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  return node1;
-	}
-
-      case kVpiConditionOp:
-	{
-	  ymuint bw = expr->bit_size();
-	  MvNode* node = mMvMgr->new_ite(parent_module, bw);
-	  mMvMgr->connect(inputs[0], 0, node, 0);
-	  mMvMgr->connect(inputs[1], 0, node, 1);
-	  mMvMgr->connect(inputs[2], 0, node, 2);
-	  return node;
-	}
-
-      case kVpiMinTypMaxOp:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
-
-      case kVpiConcatOp:
-	{
-	  ymuint n = expr->operand_num();
-	  vector<ymuint> bw_array(n);
-	  for (ymuint i = 0; i < n; ++ i) {
-	    bw_array[i] = inputs[i]->output(0)->bit_width();
-	  }
-	  MvNode* node = mMvMgr->new_concat(parent_module, bw_array);
-	  for (ymuint i = 0; i < n; ++ i) {
-	    mMvMgr->connect(inputs[i], 0, node, i);
-	  }
-	  return node;
-	}
-
-      case kVpiMultiConcatOp:
-	{
-	  ymint r;
-	  bool stat = expr->operand(0)->eval_int(r);
-	  assert_cond( stat , __FILE__, __LINE__);
-	  ymuint n = expr->operand_num() - 1;
-	  vector<ymuint> bw_array(n * r);
-	  for (ymuint i = 0; i < n; ++ i) {
-	    for (ymuint j = 0; j < r; ++ j) {
-	      bw_array[j * r + i] = inputs[i + 1]->output(0)->bit_width();
-	    }
-	  }
-	  MvNode* node = mMvMgr->new_concat(parent_module, bw_array);
-	  for (ymuint i = 0; i < n; ++ i) {
-	    for (ymuint j = 0; j < r; ++ j) {
-	      mMvMgr->connect(inputs[i + 1], 0, node, j * r + i);
-	    }
-	  }
-	  return node;
-	}
-
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
-      }
-    }
-    break;
-
-  case kVpiConstant:
-    {
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    break;
-
-  default:
+  if ( expr->is_primary() ) {
     return gen_expr2(expr);
   }
+  if ( expr->is_bitselect() ) {
+    MvNode* node = gen_expr2(expr);
+    if ( expr->is_constant_select() ) {
+      ymuint bitpos = expr->index_val();
+      const MvOutputPin* pin = node->output(0);
+      MvNode* node1 = mMvMgr->new_constbitselect(parent_module,
+						 bitpos,
+						 pin->bit_width());
+      mMvMgr->connect(node, 0, node1, 0);
+      return node1;
+    }
+    else {
+      MvNode* node1 = gen_expr1(parent_module, expr->index());
+      const MvOutputPin* pin0 = node->output(0);
+      const MvOutputPin* pin1 = node1->output(0);
+      MvNode* node2 = mMvMgr->new_bitselect(parent_module,
+					    pin0->bit_width(),
+					    pin1->bit_width());
+      mMvMgr->connect(node, 0, node2, 0);
+      mMvMgr->connect(node1, 0, node2, 1);
+      return node2;
+    }
+  }
+  if ( expr->is_partselect() ) {
+    MvNode* node = gen_expr2(expr);
+    if ( expr->is_constant_select() ) {
+      ymuint msb = expr->left_range_val();
+      ymuint lsb = expr->right_range_val();
+      const MvOutputPin* pin = node->output(0);
+      MvNode* node1 = mMvMgr->new_constpartselect(parent_module,
+						  msb, lsb,
+						  pin->bit_width());
+      mMvMgr->connect(node, 0, node1, 0);
+      return node1;
+    }
+    else {
+      // まだできてない．
+      // というか可変 part_select は VPI がおかしいと思う．
+      assert_not_reached(__FILE__, __LINE__);
+      return NULL;
+    }
+  }
+  if ( expr->is_operation() ) {
+    ymuint n = expr->operand_num();
+    vector<MvNode*> inputs(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      inputs[i] = gen_expr1(parent_module, expr->operand(i));
+    }
+
+    switch ( expr->op_type() ) {
+    case kVpiNullOp:
+      break;
+	
+    case kVpiMinusOp:
+      {
+	MvNode* node = mMvMgr->new_cmpl(parent_module, expr->bit_size());
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	return node;
+      }
+      
+    case kVpiNotOp:
+      {
+	MvNode* node = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	return node;
+      }
+
+    case kVpiBitNegOp:
+      {
+	MvNode* node = mMvMgr->new_not(parent_module, expr->bit_size());
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	return node;
+      }
+
+    case kVpiPlusOp:
+      return inputs[0];
+	
+    case kVpiUnaryAndOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_rand(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	return node;
+      }
+
+    case kVpiUnaryNandOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_rand(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	MvNode* node1 = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(node, 0, node1, 0);
+	return node1;
+      }
+
+    case kVpiUnaryOrOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_ror(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	return node;
+      }
+
+    case kVpiUnaryNorOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_ror(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	MvNode* node1 = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(node, 0, node1, 0);
+	return node1;
+      }
+
+    case kVpiUnaryXorOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_rxor(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	return node;
+      }
+
+    case kVpiUnaryXNorOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_rxor(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	MvNode* node1 = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(node, 0, node1, 0);
+	return node1;
+      }
+
+    case kVpiPosedgeOp:
+    case kVpiNegedgeOp:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case kVpiAddOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_add(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+	
+    case kVpiSubOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_sub(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiMultOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_mult(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiDivOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_div(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiModOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_mod(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+      
+    case kVpiPowerOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_pow(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiLShiftOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_sll(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+	
+    case kVpiRShiftOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_srl(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiArithLShiftOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_sla(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiArithRShiftOp:
+      {
+	ymuint bw1 = inputs[0]->output(0)->bit_width();
+	ymuint bw2 = inputs[1]->output(0)->bit_width();
+	ymuint bw3 = expr->bit_size();
+	MvNode* node = mMvMgr->new_sra(parent_module, bw1, bw2, bw3);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiBitAndOp:
+      {
+	ymuint bw = expr->bit_size();
+	MvNode* node = mMvMgr->new_and(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiBitOrOp:
+      {
+	ymuint bw = expr->bit_size();
+	MvNode* node = mMvMgr->new_or(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+      
+    case kVpiBitXNorOp:
+      {
+	ymuint bw = expr->bit_size();
+	MvNode* node = mMvMgr->new_xor(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	MvNode* node1 = mMvMgr->new_not(parent_module, bw);
+	mMvMgr->connect(node, 0, node1, 0);
+	return node1;
+      }
+
+    case kVpiBitXorOp:
+      {
+	ymuint bw = expr->bit_size();
+	MvNode* node = mMvMgr->new_xor(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiLogAndOp:
+      {
+	MvNode* node = mMvMgr->new_and(parent_module, 1);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiLogOrOp:
+      {
+	MvNode* node = mMvMgr->new_or(parent_module, 1);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+
+    case kVpiCaseEqOp:
+    case kVpiCaseNeqOp:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case kVpiEqOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_equal(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+	
+    case kVpiNeqOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_equal(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	MvNode* node1 = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(node, 0, node1, 0);
+	return node1;
+      }
+      
+    case kVpiLtOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_lt(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	return node;
+      }
+      
+    case kVpiGeOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_lt(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	MvNode* node1 = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(node, 0, node1, 0);
+	return node1;
+      }
+	
+    case kVpiGtOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_lt(parent_module, bw);
+	mMvMgr->connect(inputs[1], 0, node, 0);
+	mMvMgr->connect(inputs[0], 0, node, 1);
+	return node;
+      }
+	
+    case kVpiLeOp:
+      {
+	ymuint bw = inputs[0]->output(0)->bit_width();
+	MvNode* node = mMvMgr->new_lt(parent_module, bw);
+	mMvMgr->connect(inputs[1], 0, node, 0);
+	mMvMgr->connect(inputs[0], 0, node, 1);
+	MvNode* node1 = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(node, 0, node1, 0);
+	return node1;
+      }
+
+    case kVpiConditionOp:
+      {
+	ymuint bw = expr->bit_size();
+	MvNode* node = mMvMgr->new_ite(parent_module, bw);
+	mMvMgr->connect(inputs[0], 0, node, 0);
+	mMvMgr->connect(inputs[1], 0, node, 1);
+	mMvMgr->connect(inputs[2], 0, node, 2);
+	return node;
+      }
+
+    case kVpiMinTypMaxOp:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case kVpiConcatOp:
+      {
+	ymuint n = expr->operand_num();
+	vector<ymuint> bw_array(n);
+	for (ymuint i = 0; i < n; ++ i) {
+	  bw_array[i] = inputs[i]->output(0)->bit_width();
+	}
+	MvNode* node = mMvMgr->new_concat(parent_module, bw_array);
+	for (ymuint i = 0; i < n; ++ i) {
+	  mMvMgr->connect(inputs[i], 0, node, i);
+	}
+	return node;
+      }
+
+    case kVpiMultiConcatOp:
+      {
+	ymint r;
+	bool stat = expr->operand(0)->eval_int(r);
+	assert_cond( stat , __FILE__, __LINE__);
+	ymuint n = expr->operand_num() - 1;
+	vector<ymuint> bw_array(n * r);
+	for (ymuint i = 0; i < n; ++ i) {
+	  for (ymint j = 0; j < r; ++ j) {
+	    bw_array[j * r + i] = inputs[i + 1]->output(0)->bit_width();
+	  }
+	}
+	MvNode* node = mMvMgr->new_concat(parent_module, bw_array);
+	for (ymuint i = 0; i < n; ++ i) {
+	  for (ymint j = 0; j < r; ++ j) {
+	    mMvMgr->connect(inputs[i + 1], 0, node, j * r + i);
+	  }
+	}
+	return node;
+      }
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+  }
+  if ( expr->is_const() ) {
+    // 未実装
+    assert_not_reached(__FILE__, __LINE__);
+    return NULL;
+  }
+  assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 

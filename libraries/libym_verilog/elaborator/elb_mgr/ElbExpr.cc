@@ -43,6 +43,34 @@ ElbExpr::is_const() const
   return false;
 }
 
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+ElbExpr::is_primary() const
+{
+  return false;
+}
+
+// @brief ビット指定の時に true を返す．
+bool
+ElbExpr::is_bitselect() const
+{
+  return false;
+}
+
+// @brief 範囲指定の時に true を返す．
+bool
+ElbExpr::is_partselect() const
+{
+  return false;
+}
+
+// @brief 演算子の時に true を返す．
+bool
+ElbExpr::is_operation() const
+{
+  return false;
+}
+
 // @brief 固定選択子の時 true を返す．
 // @note ビット選択，部分選択の時，意味を持つ．
 // @note このクラスでは false を返す．

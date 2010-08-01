@@ -139,6 +139,13 @@ EiBitSelect::is_const() const
   return mObj->is_consttype() && mIndex->is_const();
 }
 
+// @brief ビット指定の時に true を返す．
+bool
+EiBitSelect::is_bitselect() const
+{
+  return true;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 const VlDecl*
 EiBitSelect::decl_obj() const
@@ -284,6 +291,13 @@ EiParamBitSelect::is_const() const
   return true;
 }
 
+// @brief ビット指定の時に true を返す．
+bool
+EiParamBitSelect::is_bitselect() const
+{
+  return true;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 const VlDecl*
 EiParamBitSelect::decl_obj() const
@@ -425,6 +439,13 @@ EiArrayElemBitSelect::is_const() const
   return decl_array()->is_consttype() && mIndex->is_const();
 }
 
+// @brief ビット指定の時に true を返す．
+bool
+EiArrayElemBitSelect::is_bitselect() const
+{
+  return true;
+}
+
 // @brief インデックス式を返す．
 const VlExpr*
 EiArrayElemBitSelect::index() const
@@ -557,7 +578,14 @@ EiExprBitSelect::is_const() const
 {
   return mExpr->is_const();
 }
-  
+
+// @brief ビット指定の時に true を返す．
+bool
+EiExprBitSelect::is_bitselect() const
+{
+  return true;
+}
+
 // @brief 親の式を返す．
 // @note 正確には式に対するビット選択/部分選択の時のみ意味を持つ．
 const VlExpr*

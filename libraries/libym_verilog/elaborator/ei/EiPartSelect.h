@@ -71,6 +71,11 @@ public:
   bool
   is_const() const;
 
+  /// @brief 範囲指定の時に true を返す．
+  virtual
+  bool
+  is_partselect() const;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
   const VlDecl*
@@ -237,6 +242,11 @@ public:
   bool
   is_const() const;
 
+  /// @brief 範囲指定の時に true を返す．
+  virtual
+  bool
+  is_partselect() const;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
   const VlDecl*
@@ -386,6 +396,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief 範囲指定の時に true を返す．
+  virtual
+  bool
+  is_partselect() const;
   
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
@@ -529,6 +544,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief 範囲指定の時に true を返す．
+  virtual
+  bool
+  is_partselect() const;
   
   /// @brief 親の式を返す．
   /// @note 式に対するビット選択/範囲選択の時，意味を持つ．

@@ -54,6 +54,26 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+  virtual
+  bool
+  is_primary() const;
+
+  /// @brief ビット指定の時に true を返す．
+  virtual
+  bool
+  is_bitselect() const;
+
+  /// @brief 範囲指定の時に true を返す．
+  virtual
+  bool
+  is_partselect() const;
+
+  /// @brief 演算子の時に true を返す．
+  virtual
+  bool
+  is_operation() const;
   
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note このクラスでは NULL を返す．

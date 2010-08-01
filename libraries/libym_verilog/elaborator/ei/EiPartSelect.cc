@@ -167,6 +167,13 @@ EiPartSelect::is_const() const
   return mObj->is_consttype();
 }
 
+// @brief 範囲指定の時に true を返す．
+bool
+EiPartSelect::is_partselect() const
+{
+  return true;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 const VlDecl*
 EiPartSelect::decl_obj() const
@@ -357,6 +364,13 @@ EiParamPartSelect::is_const() const
   return true;
 }
 
+// @brief 範囲指定の時に true を返す．
+bool
+EiParamPartSelect::is_partselect() const
+{
+  return true;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 const VlDecl*
 EiParamPartSelect::decl_obj() const
@@ -516,6 +530,13 @@ EiArrayElemPartSelect::is_const() const
   return decl_array()->is_consttype();
 }
 
+// @brief 範囲指定の時に true を返す．
+bool
+EiArrayElemPartSelect::is_partselect() const
+{
+  return true;
+}
+
 // @brief 範囲の MSB の式を返す．
 // @note 通常の範囲選択の時，意味を持つ．
 const VlExpr*
@@ -670,7 +691,14 @@ EiExprPartSelect::is_const() const
 {
   return mExpr->is_const();
 }
-  
+
+// @brief 範囲指定の時に true を返す．
+bool
+EiExprPartSelect::is_partselect() const
+{
+  return true;
+}
+
 // @brief 親の式を返す．
 // @note 式に対するビット選択/範囲選択の時，意味を持つ．
 const VlExpr*

@@ -133,7 +133,14 @@ EiPrimary::is_const() const
 {
   return mObj->is_consttype();
 }
-  
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiPrimary::is_primary() const
+{
+  return true;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*
@@ -255,7 +262,14 @@ EiParamPrimary::is_const() const
 {
   return true;
 }
-  
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiParamPrimary::is_primary() const
+{
+  return true;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*
@@ -382,7 +396,14 @@ EiArrayElemPrimary::is_const() const
 {
   return mObj->is_consttype();
 }
-  
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiArrayElemPrimary::is_primary() const
+{
+  return true;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*

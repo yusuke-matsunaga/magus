@@ -64,6 +64,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+  virtual
+  bool
+  is_primary() const;
   
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
@@ -192,6 +197,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+  virtual
+  bool
+  is_primary() const;
   
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
@@ -322,6 +332,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+  virtual
+  bool
+  is_primary() const;
   
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．

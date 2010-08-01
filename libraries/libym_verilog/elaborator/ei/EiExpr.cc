@@ -92,7 +92,14 @@ EiOperation::type() const
 {
   return kVpiOperation;
 }
-  
+
+// @brief 演算子の時に true を返す．
+bool
+EiOperation::is_operation() const
+{
+  return true;
+}
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -277,6 +284,5 @@ EiOperation::decompile_impl(int ppri) const
   }
   return ans;
 }
-
 
 END_NAMESPACE_YM_VERILOG

@@ -67,6 +67,11 @@ public:
   bool
   is_const() const;
 
+  /// @brief ビット指定の時に true を返す．
+  virtual
+  bool
+  is_bitselect() const;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
   const VlDecl*
@@ -201,6 +206,11 @@ public:
   bool
   is_const() const;
 
+  /// @brief ビット指定の時に true を返す．
+  virtual
+  bool
+  is_bitselect() const;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
   const VlDecl*
@@ -330,6 +340,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief ビット指定の時に true を返す．
+  virtual
+  bool
+  is_bitselect() const;
   
   /// @brief インデックス式を返す．
   virtual
@@ -450,6 +465,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief ビット指定の時に true を返す．
+  virtual
+  bool
+  is_bitselect() const;
   
   /// @brief 親の式を返す．
   /// @note 正確には式に対するビット選択/部分選択の時のみ意味を持つ．
