@@ -123,6 +123,11 @@ public:
   bool
   is_const() const;
 
+  /// @brief 関数呼び出しの時に true を返す．
+  virtual
+  bool
+  is_funccall() const;
+
   /// @brief 対象の関数を返す．
   /// @note kVpiFuncCall の時，意味を持つ．
   virtual
@@ -243,6 +248,11 @@ public:
   virtual
   bool
   is_const() const;
+
+  /// @brief システム関数よびあどい時に true を返す．
+  virtual
+  bool
+  is_sysfunccall() const;
   
   /// @brief 対象のシステム関数を返す．
   /// @note kVpiSysFuncCall の時，意味を持つ．

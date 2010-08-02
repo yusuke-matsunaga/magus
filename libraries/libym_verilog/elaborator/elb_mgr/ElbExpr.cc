@@ -71,6 +71,20 @@ ElbExpr::is_operation() const
   return false;
 }
 
+// @brief 関数呼び出しの時に true を返す．
+bool
+ElbExpr::is_funccall() const
+{
+  return false;
+}
+
+// @brief システム関数よびあどい時に true を返す．
+bool
+ElbExpr::is_sysfunccall() const
+{
+  return false;
+}
+
 // @brief 固定選択子の時 true を返す．
 // @note ビット選択，部分選択の時，意味を持つ．
 // @note このクラスでは false を返す．

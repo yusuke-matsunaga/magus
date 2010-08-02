@@ -41,7 +41,7 @@ public:
   // VlExpr の派生クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 式のタイプを返す．
+  /// @brief 式の値のタイプを返す．
   virtual
   tVpiValueType
   value_type() const = 0;
@@ -56,7 +56,7 @@ public:
   ymuint32
   bit_size() const = 0;
   
-  /// @brief 定数の時 true を返す．
+  /// @brief 定数式の時 true を返す．
   virtual
   bool
   is_const() const = 0;
@@ -81,6 +81,16 @@ public:
   bool
   is_operation() const = 0;
 
+  /// @brief 関数呼び出しの時に true を返す．
+  virtual
+  bool
+  is_funccall() const = 0;
+
+  /// @brief システム関数よびあどい時に true を返す．
+  virtual
+  bool
+  is_sysfunccall() const = 0;
+  
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
   /// @note それ以外では NULL を返す．

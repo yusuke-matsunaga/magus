@@ -74,6 +74,16 @@ public:
   virtual
   bool
   is_operation() const;
+
+  /// @brief 関数呼び出しの時に true を返す．
+  virtual
+  bool
+  is_funccall() const;
+
+  /// @brief システム関数よびあどい時に true を返す．
+  virtual
+  bool
+  is_sysfunccall() const;
   
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note このクラスでは NULL を返す．

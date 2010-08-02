@@ -168,6 +168,13 @@ EiFuncCall::is_const() const
   return false;
 }
 
+// @brief 関数呼び出しの時に true を返す．
+bool
+EiFuncCall::is_funccall() const
+{
+  return true;
+}
+
 // @brief 対象の関数を返す．
 // @note kVpiFuncCall の時，意味を持つ．
 const VlFunction*
@@ -322,7 +329,14 @@ EiSysFuncCall::is_const() const
 {
   return false;
 }
-  
+
+// @brief システム関数よびあどい時に true を返す．
+bool
+EiSysFuncCall::is_sysfunccall() const
+{
+  return true;
+}
+
 // @brief 対象のシステム関数を返す．
 // @note kVpiSysFuncCall の時，意味を持つ．
 const VlUserSystf*
