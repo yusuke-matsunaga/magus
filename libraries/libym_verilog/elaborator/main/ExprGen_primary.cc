@@ -48,34 +48,28 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   // 名前をキーにして要素を探索する．
   ElbObjHandle* handle = find_obj_up(parent, nb_array, name, NULL);
   if ( !handle ) {
-    ostringstream buf;
-    buf << expand_full_name(nb_array, name)
-	<< ": Not found.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_not_found(pt_expr);
     return NULL;
   }
+
   ElbDecl* decl = handle->decl();
   if ( decl ) {
-    return instantiate_namedevent_primary1(parent, pt_expr, decl);
+    if ( decl->type() == kVpiNamedEvent ) {
+      // 単独の named event オブジェクトの場合
+      return instantiate_namedevent_primary1(parent, pt_expr, decl);
+    }
   }
 
   ElbDeclArray* decl_array = handle->decl_array();
   if ( decl_array ) {
-    return instantiate_namedevent_primary2(parent, pt_expr, decl_array);
+    if ( decl_array->elem_type() == kVpiNamedEvent ) {
+      // 配列要素の named event オブジェクトの場合
+      return instantiate_namedevent_primary2(parent, pt_expr, decl_array);
+    }
   }
-  
-  ostringstream buf;
-  buf << decl->full_name()
-      << ": Not a named-event.";
-  put_msg(__FILE__, __LINE__,
-	  fr,
-	  kMsgError,
-	  "ELAB",
-	  buf.str());
+
+  // ここに来たら型が違うということ．
+  error_not_a_namedevent(pt_expr);
   return NULL;
 }
   
@@ -90,20 +84,6 @@ ExprGen::instantiate_namedevent_primary1(const VlNamedObj* parent,
 					 const PtExpr* pt_expr,
 					 ElbDecl* decl)
 {
-  const FileRegion& fr = pt_expr->file_region();
-  
-  if ( decl->type() != kVpiNamedEvent ) {
-    ostringstream buf;
-    buf << decl->full_name()
-	<< ": Not a named-event.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
-    return NULL;
-  }
-    
   // 添字の部分を実体化する．
   // といってもここでは添字がないことをチェックするだけ．
   bool has_bit_select;
@@ -132,20 +112,6 @@ ExprGen::instantiate_namedevent_primary2(const VlNamedObj* parent,
 					 const PtExpr* pt_expr,
 					 ElbDeclArray* decl_array)
 {
-  const FileRegion& fr = pt_expr->file_region();
-  
-  if ( decl_array->elem_type() != kVpiNamedEvent ) {
-    ostringstream buf;
-    buf << decl_array->full_name()
-	<< ": Not a named-event.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
-    return NULL;
-  }
-    
   // 添字の部分を実体化する．
   vector<ElbExpr*> index_list;
   bool has_bit_select;
@@ -162,16 +128,11 @@ ExprGen::instantiate_namedevent_primary2(const VlNamedObj* parent,
   }
 
   if ( has_bit_select ) {
-    ostringstream buf;
-    buf << decl_array->full_name()
-	<< " : Dimension mismatch.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    // named event はビット選択できない．
+    error_dimension_mismatch(pt_expr);
     return NULL;
   }
+
   return factory().new_Primary(pt_expr, decl_array, index_list);
 }
 
@@ -185,11 +146,14 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 			     const PtExpr* pt_expr)
 {
   if ( env.is_constant() ) {
+    // 定数式用のインスタンス化
     return instantiate_const_primary(parent, env, pt_expr);
   }
   if ( env.inside_constant_function() ) {
+    // constant function 内の式用のインスタンス化
     return instantiate_cf_primary(parent, env, pt_expr, env.function());
   }
+  // 通常のインスタンス化
   return instantiate_normal_primary(parent, env, pt_expr);
 }
 
@@ -204,8 +168,6 @@ ExprGen::instantiate_const_primary(const VlNamedObj* parent,
 				   const ElbEnv& env,
 				   const PtExpr* pt_expr)
 {
-  const FileRegion& fr = pt_expr->file_region();
-
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   // 識別子の名前
@@ -216,14 +178,7 @@ ExprGen::instantiate_const_primary(const VlNamedObj* parent,
 
   if ( nb_array.size() > 0 ) {
     // 階層つき識別子はだめ
-    ostringstream buf;
-    buf << expand_full_name(nb_array, name)
-	<< " : hierarchical name cannot be used in constant expression.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_hname_in_ce(pt_expr);
     return NULL;
   }
 
@@ -231,48 +186,22 @@ ExprGen::instantiate_const_primary(const VlNamedObj* parent,
   ElbObjHandle* handle = find_obj_up(parent, PtNameBranchArray(), name,
 				     parent->parent_module());
   if ( !handle ) {
-    ostringstream buf;
-    buf << expand_full_name(nb_array, name)
-	<< " : Not found.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    // 見つからなかった．
+    error_not_found(pt_expr);
     return NULL;
   }
     
   // そのオブジェクトが genvar の場合
   ElbGenvar* genvar = handle->genvar();
   if ( genvar ) {
-    if ( isize != 0 ) {
-      // genvar は配列型ではない．
-      ostringstream buf;
-      buf << handle->full_name()
-	  << " : Dimension mismatch.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
-      return NULL;
-    }
-    // genvar に対応した定数式を生成
-    return factory().new_GenvarConstant(pt_expr, genvar->value());
+    return instantiate_genvar(pt_expr, genvar->value());
   }
     
   // それ以外の宣言要素の場合
   // しかしこの場合には parameter でなければならない．
   ElbParameter* param = handle->parameter();
   if ( !param ) {
-    ostringstream buf;
-    buf << handle->full_name()
-	<< " : Not a parameter.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_not_a_parameter(pt_expr);
     return NULL;
   }
   return instantiate_param_primary(parent, env, pt_expr, param);
@@ -291,8 +220,6 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
 				const PtExpr* pt_expr,
 				const VlNamedObj* func)
 {
-  const FileRegion& fr = pt_expr->file_region();
-
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   // 識別子の名前
@@ -303,14 +230,7 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
   
   if ( nb_array.size() > 0 ) {
     // 階層つき識別子はだめ
-    ostringstream buf;
-    buf << expand_full_name(nb_array, name)
-	<< " : hierarchical name cannot be used in constant expression.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_hname_in_cf(pt_expr);
     return NULL;
   }
   
@@ -324,14 +244,7 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
     decl = handle->decl();
     param = handle->parameter();
     if ( !decl || !param ) {
-      ostringstream buf;
-      buf << handle->full_name()
-	  << " : Not valid inside constant function.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_illegal_object_cf(pt_expr);
       return NULL;
     }
   }
@@ -343,46 +256,20 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
       // 対象が genvar だった場合
       ElbGenvar* genvar = handle->genvar();
       if ( genvar ) {
-	if ( isize != 0 ) {
-	  ostringstream buf;
-	  buf << handle->full_name()
-	      << " : Dimension mismatch.";
-	  put_msg(__FILE__, __LINE__,
-		  fr,
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
-	  return NULL;
-	}
-	// genvar に対応した定数式を返す．
-	return factory().new_GenvarConstant(pt_expr, genvar->value());
+	return instantiate_genvar(pt_expr, genvar->value());
       }
 
       // それ以外の宣言要素の場合
       // しかしこの場合には paramter でなければならない．
       param = handle->parameter();
       if ( !param ) {
-	ostringstream buf;
-	buf << handle->full_name()
-	    << " : Not a parameter.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+	error_not_a_parameter(pt_expr);
 	return NULL;
       }
     }
     else {
       // その名前のオブジェクトが存在しなかった．
-      ostringstream buf;
-      buf << expand_full_name(nb_array, name)
-	  << " : Not found.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_not_found(pt_expr);
       return NULL;
     }
   }
@@ -405,8 +292,6 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
 				    const ElbEnv& env,
 				    const PtExpr* pt_expr)
 {
-  const FileRegion& fr = pt_expr->file_region();
-
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   // 識別子の名前
@@ -421,18 +306,7 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
     // genvar の場合
     ElbGenvar* genvar = handle->genvar();
     if ( genvar ) {
-      if ( isize != 0 ) {
-	ostringstream buf;
-	buf << handle->full_name()
-	    << " : Dimension mismatch.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
-	return NULL;
-      }
-      return factory().new_GenvarConstant(pt_expr, genvar->value());
+      return instantiate_genvar(pt_expr, genvar->value());
     }
   }
   else {
@@ -445,14 +319,7 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
 	 nb_array.size() > 0 ||
 	 isize != 0 ||
 	 def_nettype == kVpiNone ) {
-      ostringstream buf;
-      buf << expand_full_name(nb_array, name)
-	  << " : Not declared.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_not_found(pt_expr);
       return NULL;
     }
     ElbDecl* decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
@@ -498,14 +365,7 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
 	}
       }
     }
-    ostringstream buf;
-    buf << handle->full_name()
-	<< " : Illegal object for an argument.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_illegal_object(pt_expr);
     return NULL;
   }
   
@@ -518,19 +378,14 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
   if ( decl_array ) {
     return instantiate_array_primary(parent, env, pt_expr, decl_array);
   }
+
   ElbParameter* param = handle->parameter();
   if ( param ) {
     return instantiate_param_primary(parent, env, pt_expr, param);
   }
-  
-  ostringstream buf;
-  buf << expand_full_name(nb_array, name)
-      << " : Not a net/reg/variables/constants.";
-  put_msg(__FILE__, __LINE__,
-	  fr,
-	  kMsgError,
-	  "ELAB",
-	  buf.str());
+
+  // ここまで来たら適切な型ではなかったということ．
+  error_illegal_object(pt_expr);
   return NULL;
 }
 
@@ -561,14 +416,7 @@ ExprGen::instantiate_decl_primary(const VlNamedObj* parent,
     
   tVpiObjType type = decl->type();
   if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
-    ostringstream buf;
-    buf << decl->full_name()
-	<< " : Invalid object type";
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_illegal_object(pt_expr);
     return NULL;
   }
   
@@ -620,14 +468,7 @@ ExprGen::instantiate_array_primary(const VlNamedObj* parent,
   
   tVpiObjType type = decl_array->elem_type();
   if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
-    ostringstream buf;
-    buf << decl_array->full_name()
-	<< " : Invalid object type";
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_illegal_object(pt_expr);
     return NULL;
   }
   
@@ -650,7 +491,7 @@ ExprGen::instantiate_array_primary(const VlNamedObj* parent,
   }
   return factory().new_Primary(pt_expr, decl_array, index_list);
 }
-  
+
 // @brief parameter 宣言用のプライマリ式を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] env 生成時の環境
@@ -678,14 +519,7 @@ ExprGen::instantiate_param_primary(const VlNamedObj* parent,
     
   tVpiObjType type = param->type();
   if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
-    ostringstream buf;
-    buf << param->full_name()
-	<< " : Invalid object type";
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_illegal_object(pt_expr);
     return NULL;
   }
   
@@ -717,8 +551,6 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
 				 const ElbEnv& env,
 				 const PtExpr* pt_expr)
 {
-  const FileRegion& fr = pt_expr->file_region();
-
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   // 識別子の名前
@@ -734,14 +566,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
     // constant function 中の式の場合
     if ( nb_array.size() > 0 ) {
       // 階層つき識別子はだめ
-      ostringstream buf;
-      buf << expand_full_name(nb_array, name)
-	  << " : Hierarchical name shall not be used inside constant-function.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_hname_in_cf(pt_expr);
       return NULL;
     }
   
@@ -752,14 +577,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
     // 名前をキーにして func 内の要素を探索する．
     ElbObjHandle* handle = find_obj_up(parent, PtNameBranchArray(), name, func);
     if ( !handle ) {
-      ostringstream buf;
-      buf << expand_full_name(nb_array, name)
-	  << " : Not found.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_not_found(pt_expr);
       return NULL;
     }
     decl = handle->decl();
@@ -782,14 +600,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
 	   nb_array.size() > 0 ||
 	   isize != 0 ||
 	   def_nettype == kVpiNone ) {
-	ostringstream buf;
-	buf << expand_full_name(nb_array, name)
-	    << " : Not declared.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+	error_not_found(pt_expr);
 	return NULL;
       }
       decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
@@ -818,14 +629,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
     if ( env.is_net_lhs() ) {
       // net/net-array 型のみが有効
       if ( type != kVpiNet ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Illegal object for LHS in assignment.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+	error_illegal_object(pt_expr);
 	return NULL;
       }
     }
@@ -835,14 +639,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
 	   type != kVpiIntegerVar &&
 	   type != kVpiRealVar &&
 	   type != kVpiTimeVar ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Illegal object for LHS in assignment.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+	error_illegal_object(pt_expr);
 	return NULL;
       }
     }
@@ -852,38 +649,11 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
 	   type != kVpiIntegerVar &&
 	   type != kVpiRealVar &&
 	   type != kVpiTimeVar ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Illegal object for LHS in procedural continuous assignment.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+	error_illegal_object(pt_expr);
 	return NULL;
       }
-      if ( has_range_select ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Part select shall not be used in LHS"
-	    << " for assign/deassign statement.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
-	return NULL;
-      }
-      if ( has_bit_select ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Bit select shall not be used in LHS"
-	    << " for assign/deassign statement.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+      if ( has_range_select || has_bit_select ) {
+	error_select_in_pca(pt_expr);
 	return NULL;
       }
     }
@@ -894,38 +664,11 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
 	   type != kVpiIntegerVar &&
 	   type != kVpiRealVar &&
 	   type != kVpiTimeVar ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Illegal object for procedural continuous assignment.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+	error_illegal_object(pt_expr);
 	return NULL;
       }
-      if ( has_range_select ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Part select shall not be used in LHS"
-	    << " for force/release statement.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
-	return NULL;
-      }
-      if ( has_bit_select ) {
-	ostringstream buf;
-	buf << decl->name()
-	    << " : Bit select shall not be used in LHS"
-	    << " for force/release statement.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+      if ( has_range_select || has_bit_select ) {
+	error_select_in_force(pt_expr);
 	return NULL;
       }
     }
@@ -949,38 +692,15 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
   }
   else if ( decl_array ) {
     if ( env.is_pca_lhs() ) {
-      ostringstream buf;
-      buf << decl_array->name()
-	  << " : Array element shall not be used in LHS"
-	  << " for assign/deassign statement.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_array_in_pca(pt_expr);
       return NULL;
     }
     if ( env.is_force_lhs() ) {
-      ostringstream buf;
-      buf << decl_array->name()
-	  << " : Array element shall not be used in LHS"
-	  << " for force/release statement.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_array_in_force(pt_expr);
       return NULL;
     }
     if ( decl_array->dimension() != isize ) {
-      ostringstream buf;
-      buf << decl_array->name()
-	  << " : Dimension mismatch.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_dimension_mismatch(pt_expr);
       return NULL;
     }
 
@@ -1005,15 +725,8 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
     if ( env.is_net_lhs() ) {
       // net/net-array 型のみが有効
       if ( type != kVpiNet ) {
-	ostringstream buf;
-	buf << decl_array->name()
-	    << " : Illegal object for LHS in assignment.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
-      return NULL;
+	error_illegal_object(pt_expr);
+	return NULL;
       }
     }
     else if ( env.is_var_lhs() ) {
@@ -1022,14 +735,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
 	   type != kVpiIntegerVar &&
 	   type != kVpiRealVar &&
 	   type != kVpiTimeVar ) {
-	ostringstream buf;
-	buf << decl_array->name()
-	    << " : Illegal object for LHS in assignment.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		buf.str());
+	error_illegal_object(pt_expr);
 	return NULL;
       }
     }
@@ -1055,17 +761,27 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
       return factory().new_Primary(pt_expr, decl_array, index_list);
     }
   }
-  
-  ostringstream buf;
-  buf << decl->full_name()
-      << " : Not a net/reg/variable.";
-  put_msg(__FILE__, __LINE__,
-	  fr,
-	  kMsgError,
-	  "ELAB",
-	  buf.str());
-  
+
+  // ここに来たら decl も decl_array も NULL だったということ．
+  error_illegal_object(pt_expr);
   return NULL;
+}
+
+// @brief genvar に対応した定数を生成する．
+// @param[in] pt_expr 式を表すパース木
+// @param[in] val 値
+// @note pt_expr に添字が付いていたらエラーとなる．
+ElbExpr*
+ExprGen::instantiate_genvar(const PtExpr* pt_expr,
+			    int val)
+{
+  if ( pt_expr->index_num() != 0 ) {
+    // genvar は配列型ではない．
+    error_dimension_mismatch(pt_expr);
+    return NULL;
+  }
+  // genvar に対応した定数式を生成
+  return factory().new_GenvarConstant(pt_expr, val);
 }
 
 // @brief 添字の部分を実体化する．(単体のオブジェクト用)
@@ -1103,15 +819,7 @@ ExprGen::resolve1(const VlNamedObj* parent,
   }
   
   if ( isize != 0 ) {
-    ostringstream buf;
-    buf << decl->name()
-	<< " : Dimension mismatch.";
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
-
+    error_dimension_mismatch(pt_expr);
     return false;
   }
   
@@ -1121,14 +829,7 @@ ExprGen::resolve1(const VlNamedObj* parent,
   bool const_mode = pt_expr->is_const_index() || decl->is_consttype();
   if ( has_bit_select ) {
     if ( decl->value_type() == kVpiValueReal ) {
-      ostringstream buf;
-      buf << decl->full_name()
-	  << " : Illegal bit-select.";
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_select_for_real(pt_expr);
       return false;
     }
     const PtExpr* pt_expr1 = pt_expr->index(0);
@@ -1148,14 +849,7 @@ ExprGen::resolve1(const VlNamedObj* parent,
   }
   else if ( has_range_select ) {
     if ( decl->value_type() == kVpiValueReal ) {
-      ostringstream buf;
-      buf << decl->full_name()
-	  << " : Illegal part-select.";
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_select_for_real(pt_expr);
       return false;
     }
     if ( const_mode || ( pt_expr->range_mode() == ':' ) ) {
@@ -1220,15 +914,7 @@ ExprGen::resolve2(const VlNamedObj* parent,
     has_bit_select = true;
   }
   else if ( isize != dsize ) {
-    ostringstream buf;
-    buf << decl->full_name()
-	<< " : Dimension mismatch.";
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
-
+    error_dimension_mismatch(pt_expr);
     return false;
   }
   
@@ -1266,29 +952,13 @@ ExprGen::resolve2(const VlNamedObj* parent,
 
   if ( has_bit_select ) {
     if ( decl->value_type() == kVpiValueReal ) {
-      ostringstream buf;
-      buf << decl->full_name()
-	  << " : Illegal bit-select.";
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
-
+      error_select_for_real(pt_expr);
       return false;
     }
   }
   else if ( has_range_select ) {
     if ( decl->value_type() == kVpiValueReal ) {
-      ostringstream buf;
-      buf << decl->full_name()
-	  << " : Illegal part-select.";
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
-
+      error_select_for_real(pt_expr);
       return false;
     }
     if ( const_mode || ( pt_expr->range_mode() == ':' ) ) {
@@ -1313,6 +983,139 @@ ExprGen::resolve2(const VlNamedObj* parent,
   }
 
   return true;
+}
+
+// @brief オブジェクトが存在しない場合のエラーメッセージを生成する．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_not_found(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX", "Not found.");
+}
+
+// @brief オブジェクトの型が不適切だった場合のエラーメッセージを生成する．
+void
+ExprGen::error_illegal_object(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX", "Illegal object type.");
+}
+  
+// @brief オブジェクトの型が constant function 用として不適切だった場合のエラー生成．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_object_cf(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Illegal object type inside constant function.");
+}
+
+// @brief 階層名が constant expression 中にあった場合のエラーメッセージを生成する．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_hname_in_ce(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Hierarchical name shall not be used in constant expression.");
+}
+
+// @brief 階層名が constant function 中にあった場合のエラーメッセージを生成する．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_hname_in_cf(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Hierarchical name shall not be used inside constant function.");
+}
+
+// @brief オブジェクトが parameter でなかった場合のエラーメッセージを生成する．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_not_a_parameter(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX", "Not a parameter.");
+}
+  
+// @brief オブジェクトが named-event でなかった場合のエラー生成．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_not_a_namedevent(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX", "Not a named-event.");
+}
+
+// @brief assign/deassign に不適切なビット/範囲指定のエラー生成
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_select_in_pca(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Bit/part-select shall not be used"
+	       "in LHS of assign/deassign statement.");
+}
+
+// @brief force/release に不適切なビット/範囲指定のエラー生成
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_select_in_force(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Bit/part-select shall not be used"
+	       "in LHS of force/release statement.");
+}
+
+// @brief assign/deassign に不適切な配列要素のエラー生成
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_array_in_pca(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Array element shall not be used"
+	       "in LHS of assign/deassign statement.");
+}
+
+// @brief force/release に不適切な配列要素のエラー生成
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_array_in_force(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Array element shall not be used"
+	       "in LHS of force/release statement.");
+}
+
+// @brief 配列の次元が合わない場合のエラーメッセージを生成する．
+void
+ExprGen::error_dimension_mismatch(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX", "Dimension mismatch.");
+}
+
+// @brief real 型に対するビット選択あるいは部分選択があった場合のエラー生成
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_select_for_real(const PtExpr* pt_expr)
+{
+  error_common(pt_expr, "ELABXXX",
+	       "Bit-select/Part-select for real.");
+}
+
+// @brief エラーメッセージを生成する共通部分
+// @param[in] pt_expr 式を表すパース木
+// @param[in] label エラーラベル
+// @param[in] msg エラーメッセージ
+void
+ExprGen::error_common(const PtExpr* pt_expr,
+		      const char* label,
+		      const char* msg)
+{
+  ostringstream buf;
+  buf << expand_full_name(pt_expr->namebranch_array(), pt_expr->name())
+      << " : " << msg;
+  put_msg(__FILE__, __LINE__,
+	  pt_expr->file_region(),
+	  kMsgError,
+	  label,
+	  buf.str());
 }
 
 END_NAMESPACE_YM_VERILOG

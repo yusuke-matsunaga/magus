@@ -298,6 +298,14 @@ private:
 			    const ElbEnv& env,
 			    const PtExpr* pt_expr,
 			    ElbParameter* param);
+
+  /// @brief genvar に対応した定数を生成する．
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] val 値
+  /// @note pt_expr に添字が付いていたらエラーとなる．
+  ElbExpr*
+  instantiate_genvar(const PtExpr* pt_expr,
+		     int val);
   
   /// @brief 添字の部分を実体化する．(単体のオブジェクト用)
   /// @param[in] parent 親のスコープ
@@ -336,6 +344,80 @@ private:
 	   bool& has_bit_select,
 	   ElbExpr*& index1,
 	   ElbExpr*& index2);
+
+  /// @brief オブジェクトが存在しない場合のエラーメッセージを生成する．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_not_found(const PtExpr* pt_expr);
+  
+  /// @brief オブジェクトの型が不適切だった場合のエラーメッセージを生成する．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_object(const PtExpr* pt_expr);
+  
+  /// @brief オブジェクトの型が constant function 用として不適切だった場合のエラー生成．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_object_cf(const PtExpr* pt_expr);
+
+  /// @brief 階層名が constant expression 中にあった場合のエラー生成
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_hname_in_ce(const PtExpr* pt_expr);
+
+  /// @brief 階層名が constant function 中にあった場合のエラー生成
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_hname_in_cf(const PtExpr* pt_expr);
+  
+  /// @brief オブジェクトが parameter でなかった場合のエラーメッセージを生成する．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_not_a_parameter(const PtExpr* pt_expr);
+  
+  /// @brief オブジェクトが named-event でなかった場合のエラー生成．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_not_a_namedevent(const PtExpr* pt_expr);
+
+  /// @brief assign/deassign に不適切なビット/範囲指定のエラー生成
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_select_in_pca(const PtExpr* pt_expr);
+
+  /// @brief force/release に不適切なビット/範囲指定のエラー生成
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_select_in_force(const PtExpr* pt_expr);
+
+  /// @brief assign/deassign に不適切な配列要素のエラー生成
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_array_in_pca(const PtExpr* pt_expr);
+
+  /// @brief force/release に不適切な配列要素のエラー生成
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_array_in_force(const PtExpr* pt_expr);
+  
+  /// @brief 配列の次元が合わない場合のエラーメッセージを生成する．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_dimension_mismatch(const PtExpr* pt_expr);
+
+  /// @brief real 型に対するビット選択あるいは部分選択があった場合のエラー生成
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_select_for_real(const PtExpr* pt_expr);
+
+  /// @brief エラーメッセージを生成する共通部分
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] label エラーラベル
+  /// @param[in] msg エラーメッセージ
+  void
+  error_common(const PtExpr* pt_expr,
+	       const char* label,
+	       const char* msg);
   
 };
 
