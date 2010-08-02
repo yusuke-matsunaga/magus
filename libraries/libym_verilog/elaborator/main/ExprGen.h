@@ -277,14 +277,14 @@ private:
   /// @param[in] parent 親のスコープ
   /// @param[in] env 生成時の環境
   /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 対象の配列
+  /// @param[in] decl_array 対象の配列
   /// @return 生成された式を返す．
   /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
   ElbExpr*
-  instantiate_array_primary(const VlNamedObj* parent,
-			    const ElbEnv& env,
-			    const PtExpr* pt_expr,
-			    ElbDeclArray* decl);
+  instantiate_declarray_primary(const VlNamedObj* parent,
+				const ElbEnv& env,
+				const PtExpr* pt_expr,
+				ElbDeclArray* decl_array);
   
   /// @brief parameter 宣言用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
@@ -298,6 +298,32 @@ private:
 			    const ElbEnv& env,
 			    const PtExpr* pt_expr,
 			    ElbParameter* param);
+
+  /// @brief 宣言要素の左辺式を生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] env 生成時の環境
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] decl 対象の宣言要素
+  /// @return 生成された式を返す．
+  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
+  ElbExpr*
+  instantiate_decl_lhs(const VlNamedObj* parent,
+		       const ElbEnv& env,
+		       const PtExpr* pt_expr,
+		       ElbDecl* decl);
+
+  /// @brief 配列要素の左辺式を生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] env 生成時の環境
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] decl_array 対象の配列
+  /// @return 生成された式を返す．
+  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
+  ElbExpr*
+  instantiate_declarray_lhs(const VlNamedObj* parent,
+			    const ElbEnv& env,
+			    const PtExpr* pt_expr,
+			    ElbDeclArray* decl_array);
 
   /// @brief genvar に対応した定数を生成する．
   /// @param[in] pt_expr 式を表すパース木

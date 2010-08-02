@@ -747,10 +747,14 @@ const tVpiValueType kVpiValueTime = pack(kVpiValueUS, kVpiSizeTime);
 /// @brief 範囲指定のモード
 //////////////////////////////////////////////////////////////////////
 enum tVpiRangeMode {
+  /// @brief 範囲指定なし
   kVpiNoRange    = 0,
-  kVpiConstRange = 1, /// [ a : b ]
-  kVpiPlusRange  = 2, /// [ a +: b ]
-  kVpiMinusRange = 3  /// [ a -: b ]
+  /// @brief 固定
+  kVpiConstRange = 1, // [ a : b ]
+  /// @brief 可変(プラス)
+  kVpiPlusRange  = 2, // [ a +: b ]
+  /// @brief 可変(マイナス)
+  kVpiMinusRange = 3  // [ a -: b ]
 };
 
 
@@ -758,9 +762,13 @@ enum tVpiRangeMode {
 /// @brief IO宣言で用いられる補助的な型
 //////////////////////////////////////////////////////////////////////
 enum tVpiAuxType {
+  /// @brief 型無し
   kVpiAuxNone = 0,
+  /// @brief net 型
   kVpiAuxNet  = 1,
+  /// @brief reg 型
   kVpiAuxReg  = 2,
+  /// @brief 変数型
   kVpiAuxVar  = 3
 };
 
@@ -769,8 +777,11 @@ enum tVpiAuxType {
 /// @brief vectored/scalared 指定の値
 //////////////////////////////////////////////////////////////////////
 enum tVpiVsType {
+  /// @brief 指定なし
   kVpiVsNone   = 0,
+  /// @brief ベクター型
   kVpiVectored = 1,
+  /// @brief スカラー型
   kVpiScalared = 2
 };
 

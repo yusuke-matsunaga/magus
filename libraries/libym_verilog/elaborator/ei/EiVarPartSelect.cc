@@ -248,10 +248,10 @@ EiVarPartSelect::decompile_impl(int ppri) const
   ostringstream buf;
   buf << mObj->name() << "[" << mBase->decompile();
   if ( mRangeVal > 0 ) {
-    buf << ":+ " << mRangeVal;
+    buf << "+: " << mRangeVal;
   }
   else {
-    buf << ":- " << - mRangeVal;
+    buf << "-: " << - mRangeVal;
   }
   buf << "]";
   return buf.str();
@@ -448,10 +448,10 @@ EiParamVarPartSelect::decompile_impl(int ppri) const
   ostringstream buf;
   buf << mObj->name() << "[" << mBase->decompile();
   if ( mRangeVal > 0 ) {
-    buf << ":+ " << mRangeVal;
+    buf << "+: " << mRangeVal;
   }
   else {
-    buf << ":- " << - mRangeVal;
+    buf << "-: " << - mRangeVal;
   }
   buf << "]";
   return buf.str();
@@ -644,10 +644,10 @@ EiArrayElemVarPartSelect::decompile_impl(int ppri) const
   buf << decl_array()->name() << decompile_index()
       << "[" << mBase->decompile();
   if ( mRangeVal > 0 ) {
-    buf << ":+ " << mRangeVal;
+    buf << "+: " << mRangeVal;
   }
   else {
-    buf << ":- " << - mRangeVal;
+    buf << "-: " << - mRangeVal;
   }
   buf << "]";
   return buf.str();
