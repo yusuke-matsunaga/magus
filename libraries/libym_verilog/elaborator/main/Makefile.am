@@ -50,6 +50,7 @@ libym_vl_elab_main_la_SOURCES = \
 	ExprGen_operation.cc \
 	ExprGen_primary.cc \
 	ExprGen_funccall.cc \
+	ExprGen_error.cc \
 	AttrGen.h \
 	AttrGen.cc \
 	Elaborator.cc

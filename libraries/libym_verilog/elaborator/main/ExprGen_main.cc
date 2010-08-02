@@ -105,6 +105,19 @@ ExprGen::instantiate_expr(const VlNamedObj* parent,
   return NULL;
 }
 
+// @brief PtExpr から定数式の ElbExpr を生成する
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+// @return 生成された ElbExpr のポインタを返す．
+// @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
+ElbExpr*
+ExprGen::instantiate_constant_expr(const VlNamedObj* parent,
+				   const PtExpr* pt_expr)
+{
+  ElbConstantEnv env;
+  return instantiate_expr(parent, env, pt_expr);
+}
+
 // @brief PtExpr からイベント式を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] env 生成時の環境

@@ -176,8 +176,7 @@ ElbExpr*
 ElbProxy::instantiate_constant_expr(const VlNamedObj* parent,
 				    const PtExpr* pt_expr)
 {
-  ElbConstantEnv env;
-  return mExprGen->instantiate_expr(parent, env, pt_expr);
+  return mExprGen->instantiate_constant_expr(parent, pt_expr);
 }
 
 // @brief PtExpr からイベント式の ElbiExpr を生成する

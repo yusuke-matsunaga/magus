@@ -29,7 +29,6 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 			 const ElbEnv& env,
 			 const PtExpr* pt_expr)
 {
-  const FileRegion& fr = pt_expr->file_region();
   tVpiOpType op_type = pt_expr->opr_type();
   ymuint32 opr_size = pt_expr->operand_num();
   
@@ -42,11 +41,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
   case kVpiPosedgeOp:
   case kVpiNegedgeOp:
     assert_cond(opr_size == 1, __FILE__, __LINE__);
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    "Edge descriptor in an expression.");
+    error_illegal_edge_descriptor(pt_expr);
     return NULL;
 
   case kVpiBitNegOp:
@@ -65,11 +60,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
       return NULL;
     }
     if ( real_check && opr0->value_type() == kVpiValueReal ) {
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      "Should not have real type operand.");
+      error_illegal_real_type(pt_expr->operand(0));
       return NULL;
     }
     return factory().new_UnaryOp(pt_expr, op_type, opr0);
@@ -104,13 +95,15 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
     if ( !opr0 || !opr1 ) {
       return NULL;
     }
-    if ( real_check && opr0->value_type() == kVpiValueReal ) {
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      "Should not have real type operand.");
-      return NULL;
+    if ( real_check ) {
+      if ( opr0->value_type() == kVpiValueReal ) {
+	error_illegal_real_type(pt_expr->operand(0));
+	return NULL;
+      }
+      if ( opr1->value_type() == kVpiValueReal ) {
+	error_illegal_real_type(pt_expr->operand(1));
+	return NULL;
+      }
     }
     expr = factory().new_BinaryOp(pt_expr, op_type, opr0, opr1);
     break;
@@ -137,11 +130,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	  return NULL;
 	}
 	if ( expr1->value_type() == kVpiValueReal ) {
-	  put_msg(__FILE__, __LINE__,
-		  fr,
-		  kMsgError,
-		  "ELAB",
-		  "Should not have real type operand.");
+	  error_illegal_real_type(pt_expr1);
 	  return NULL;
 	}
 	opr_list[i] = expr1;
@@ -171,11 +160,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	  return NULL;
 	}
 	if ( expr1->value_type() == kVpiValueReal ) {
-	  put_msg(__FILE__, __LINE__,
-		  fr,
-		  kMsgError,
-		  "ELAB",
-		  "Should not have real type operand.");
+	  error_illegal_real_type(pt_expr1);
 	  return NULL;
 	}
 	opr_list[i - 1] = expr1;
