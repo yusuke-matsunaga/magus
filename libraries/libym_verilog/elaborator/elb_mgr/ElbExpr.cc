@@ -64,6 +64,13 @@ ElbExpr::is_partselect() const
   return false;
 }
 
+// @brief 可変範囲指定の時に true を返す．
+bool
+ElbExpr::is_varpartselect() const
+{
+  return false;
+}
+
 // @brief 演算子の時に true を返す．
 bool
 ElbExpr::is_operation() const
@@ -120,7 +127,25 @@ ElbExpr::right_range() const
 {
   return NULL;
 }
-  
+
+// @brief 範囲のベースアドレスの式を返す．
+// @note 可変範囲選択の時，意味を持つ．
+// @note それ以外では NULL を返す．
+const VlExpr*
+ElbExpr::range_base() const
+{
+  return NULL;
+}
+
+// @brief 範囲のビット幅を表す式を返す．
+// @note 可変範囲選択の時，意味を持つ．
+// @note それ以外では NULL を返す．
+const VlExpr*
+ElbExpr::range_expr() const
+{
+  return NULL;
+}
+
 // @brief 親の式を返す．
 // @note 式に対するビット選択/範囲選択の時，意味を持つ．
 // @note このクラスでは NULL を返す．
@@ -153,6 +178,24 @@ ElbExpr::left_range_val() const
 // @note このクラスでは 0 を返す．
 int
 ElbExpr::right_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲のベースアドレスの値を返す．
+// @note 可変範囲選択の時，意味を持つ．
+// @note それ以外では 0 を返す．
+int
+ElbExpr::range_base_val() const
+{
+  return 0;
+}
+
+// @brief 範囲のビット幅を返す．
+// @note 可変範囲選択の時，意味を持つ．
+// @note それ以外では 0 を返す．
+int
+ElbExpr::range_val() const
 {
   return 0;
 }

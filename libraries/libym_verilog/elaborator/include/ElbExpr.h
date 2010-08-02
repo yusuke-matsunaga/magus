@@ -70,6 +70,11 @@ public:
   bool
   is_partselect() const;
 
+  /// @brief 可変範囲指定の時に true を返す．
+  virtual
+  bool
+  is_varpartselect() const;
+
   /// @brief 演算子の時に true を返す．
   virtual
   bool
@@ -128,27 +133,6 @@ public:
   virtual
   const VlExpr*
   index() const;
-
-  /// @brief 範囲の MSB を返す．
-  /// @note 部分選択の時，意味を持つ．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlExpr*
-  left_range() const;
-
-  /// @brief 範囲の LSB を返す．
-  /// @note 部分選択の時，意味を持つ．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlExpr*
-  right_range() const;
-  
-  /// @brief 親の式を返す．
-  /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlExpr*
-  parent_expr() const;
   
   /// @brief インデックス値を返す．
   /// @note 式に対するビット選択の時，意味を持つ．
@@ -156,6 +140,13 @@ public:
   virtual
   int
   index_val() const;
+
+  /// @brief 範囲の MSB を返す．
+  /// @note 部分選択の時，意味を持つ．
+  /// @note このクラスでは NULL を返す．
+  virtual
+  const VlExpr*
+  left_range() const;
   
   /// @brief 範囲の MSB の値を返す．
   /// @note 式に対する範囲選択の時，意味を持つ．
@@ -164,12 +155,54 @@ public:
   int
   left_range_val() const;
 
+  /// @brief 範囲の LSB を返す．
+  /// @note 部分選択の時，意味を持つ．
+  /// @note このクラスでは NULL を返す．
+  virtual
+  const VlExpr*
+  right_range() const;
+
   /// @brief 範囲の LSB の値を返す．
   /// @note 式に対する範囲選択の時，意味を持つ．
   /// @note このクラスでは 0 を返す．
   virtual
   int
   right_range_val() const;
+
+  /// @brief 範囲のベースアドレスの式を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlExpr*
+  range_base() const;
+
+  /// @brief 範囲のベースアドレスの値を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では 0 を返す．
+  virtual
+  int
+  range_base_val() const;
+
+  /// @brief 範囲のビット幅を表す式を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlExpr*
+  range_expr() const;
+
+  /// @brief 範囲のビット幅を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では 0 を返す．
+  virtual
+  int
+  range_val() const;
+  
+  /// @brief 親の式を返す．
+  /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
+  /// @note このクラスでは NULL を返す．
+  virtual
+  const VlExpr*
+  parent_expr() const;
   
   /// @brief 演算子のタイプを返す．
   /// @note 演算子の時，意味を持つ．

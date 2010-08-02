@@ -76,6 +76,11 @@ public:
   bool
   is_partselect() const = 0;
 
+  /// @brief 可変範囲指定の時に true を返す．
+  virtual
+  bool
+  is_varpartselect() const = 0;
+
   /// @brief 演算子の時に true を返す．
   virtual
   bool
@@ -86,7 +91,7 @@ public:
   bool
   is_funccall() const = 0;
 
-  /// @brief システム関数よびあどい時に true を返す．
+  /// @brief システム関数呼び出しの時に true を返す．
   virtual
   bool
   is_sysfunccall() const = 0;
@@ -149,6 +154,20 @@ public:
   virtual
   const VlExpr*
   right_range() const = 0;
+
+  /// @brief 範囲のベースアドレスの式を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlExpr*
+  range_base() const = 0;
+
+  /// @brief 範囲のビット幅を表す式を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlExpr*
+  range_expr() const = 0;
   
   /// @brief 親の式を返す．
   /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
@@ -177,6 +196,20 @@ public:
   virtual
   int
   right_range_val() const = 0;
+
+  /// @brief 範囲のベースアドレスの値を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では 0 を返す．
+  virtual
+  int
+  range_base_val() const = 0;
+
+  /// @brief 範囲のビット幅を返す．
+  /// @note 可変範囲選択の時，意味を持つ．
+  /// @note それ以外では 0 を返す．
+  virtual
+  int
+  range_val() const = 0;
   
   /// @brief 演算子の型を返す．
   /// @note kVpiOperation の時，意味を持つ．
