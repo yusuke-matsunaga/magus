@@ -70,27 +70,11 @@ ExprGen::instantiate_expr(const VlNamedObj* parent,
 
   case kPtSysFuncCallExpr:
     if ( env.inside_constant_function() ) {
-      // constant function 中で system function は使えない．
-      ostringstream buf;
-      buf << pt_expr->name()
-	  << " : system-function call shall not be used in constant function.";
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_illegal_sysfunccall_in_cf(pt_expr);
       return NULL;
     }
     if ( env.is_constant() ) {
-      // constant expression 中では system function は使えない．
-      ostringstream buf;
-      buf << pt_expr->name()
-	  << " : system-function call shall not be used in constant expresson.";
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_illegal_sysfunccall_in_ce(pt_expr);
       return NULL;
     }
     return instantiate_sysfunccall(parent, env, pt_expr);
@@ -133,8 +117,6 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
 	  pt_expr->opr_type() == kVpiNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
-  
-  const FileRegion& fr = pt_expr->file_region();
 
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
@@ -171,34 +153,17 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
     
   case kPtConstExpr:
     // イベント式の根元には定数は使えない．
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    "Constant shall not be used in event description.");
+    error_illegal_constant_in_event_expression(pt_expr);
     return NULL;
 
   case kPtFuncCallExpr:
     // イベント式の根元には関数呼び出しは使えない．
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    "Function call shall not be used in event description.");
+    error_illegal_funccall_in_event_expression(pt_expr);
     return NULL;
 
   case kPtSysFuncCallExpr:
     // イベント式の根元にはシステム関数呼び出しは使えない．
-    {
-      ostringstream buf;
-      buf << pt_expr->name()
-	  << " : system-function call shall not be used in event description.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
-    }
+    error_illegal_sysfunccall_in_event_expression(pt_expr);
     return NULL;
 
   default:
@@ -270,11 +235,8 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
 	
       return expr;
     }
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    "Illegal operator in LHS.");
+    // それ以外の演算子はエラー
+    error_illegal_operator_in_lhs(pt_expr);
     return NULL;
 
 
@@ -282,27 +244,15 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
     return instantiate_lhs_primary(parent, env, pt_expr);
 
   case kPtConstExpr:
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    "Constant shall not be used in LHS.");
+    error_illegal_constant_in_lhs(pt_expr);
     return NULL;
     
   case kPtFuncCallExpr:
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    "Function call shall not be used in LHS.");
+    error_illegal_funccall_in_lhs(pt_expr);
     return NULL;
     
   case kPtSysFuncCallExpr:
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    "System-function call shall not be used in LHS.");
+    error_illegal_sysfunccall_in_lhs(pt_expr);
     return NULL;
     
   default:
@@ -379,58 +329,63 @@ ExprGen::evaluate_expr_bitvector(const VlNamedObj* parent,
   return true;
 }
 
-// PtDelay から ElbDelay を生成する．
+// @brief PtDelay から ElbExpr を生成する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_delay 遅延を表すパース木
 ElbDelay*
 ExprGen::instantiate_delay(const VlNamedObj* parent,
 			   const PtDelay* pt_delay)
 {
   ymuint32 n = 0;
+  const PtExpr* expr_array[3];
   for ( ; n < 3; ++ n) {
-    if ( pt_delay->value(n) == NULL ) break;
+    const PtExpr* expr = pt_delay->value(n);
+    if ( expr == NULL ) break;
+    expr_array[n] = expr;
   }
   assert_cond(n > 0, __FILE__, __LINE__);
 
-  // TODO : 環境の条件をチェック
-  ElbEnv env;
-  ElbExpr** expr_list = factory().new_ExprList(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
-    const PtExpr* pt_expr = pt_delay->value(i);
-    ElbExpr* expr = instantiate_expr(parent, env, pt_expr);
-    if ( !expr ) {
-      return NULL;
-    }
-    expr_list[i] = expr;
-  }
-  
-  ElbDelay* delay = factory().new_Delay(pt_delay, n, expr_list);
-
-  return delay;
+  return instantiate_delay_sub(parent, pt_delay, n, expr_array);
 }
 
-// PtOrderedCon から ElbDelay を生成する．
-// これは PtMuInst の前にある # つきの式がパラメータ割り当てなのか
+// @brief PtOrderedCon から ElbExpr を生成する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_head 順序付き割り当て式
+// これは PtInst の前にある # つきの式がパラメータ割り当てなのか
 // 遅延なのかわからないので PtOrderedCon で表していることによる．
 ElbDelay*
 ExprGen::instantiate_delay(const VlNamedObj* parent,
 			   const PtItem* pt_header)
 {
   ymuint32 n = pt_header->paramassign_array().size();
-  if ( n > 2 ) {
-    const PtConnection* pt_con = pt_header->paramassign_array()[1];
-    put_msg(__FILE__, __LINE__,
-	    pt_con->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    "Too many values in this field.");
-    return NULL;
-  }
+  assert_cond( n == 1, __FILE__, __LINE__);
+
+  const PtExpr* expr_array[1];
+  const PtConnection* pt_con = pt_header->paramassign_array()[0];
+  expr_array[0] = pt_con->expr();
+  return instantiate_delay_sub(parent, pt_header, 1, expr_array);
+}
+
+// @brief instantiate_delay の下請け関数
+// @param[in] parent 親のスコープ
+// @param[in] pt_obj 遅延式を表すパース木
+// @param[in] n 要素数
+// @param[in] expr_array 遅延式の配列
+// @note pt_obj は PtDelay か PtItem のどちらか
+// @note n は最大で 3
+ElbDelay*
+ExprGen::instantiate_delay_sub(const VlNamedObj* parent,
+			       const PtBase* pt_obj,
+			       ymuint n,
+			       const PtExpr* expr_array[])
+{
+  assert_cond( n <= 3, __FILE__, __LINE__);
 
   // TODO : 環境の条件をチェック
   ElbEnv env;
   ElbExpr** expr_list = factory().new_ExprList(n);
-  for (ymuint32 i = 0; i < n; ++ i ) {
-    const PtConnection* pt_con = pt_header->paramassign_array()[i];
-    const PtExpr* pt_expr = pt_con->expr();
+  for (ymuint i = 0; i < n; ++ i) {
+    const PtExpr* pt_expr = expr_array[i];
     ElbExpr* expr = instantiate_expr(parent, env, pt_expr);
     if ( !expr ) {
       return NULL;
@@ -438,9 +393,8 @@ ExprGen::instantiate_delay(const VlNamedObj* parent,
     expr_list[i] = expr;
   }
   
-  ElbDelay* delay = factory().new_Delay(pt_header, n, expr_list);
+  ElbDelay* delay = factory().new_Delay(pt_obj, n, expr_list);
 
-  
   return delay;
 }
 

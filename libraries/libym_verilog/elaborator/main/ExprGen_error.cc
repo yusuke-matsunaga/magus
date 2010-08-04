@@ -17,6 +17,96 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+// @brief constant function 中にシステム関数呼び出し
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_sysfunccall_in_cf(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "System-function call shall not be used in constant function.");
+}
+
+// @brief constant expression 中にシステム関数呼び出し
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_sysfunccall_in_ce(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "System-function call shall not be used in constant expression.");
+}
+
+// @brief イベント式の根元に定数
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_constant_in_event_expression(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "Constant shall not be used in event description.");
+}
+
+// @brief イベント式の根元に関数呼び出し
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_funccall_in_event_expression(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "Function call shall not be used in event description.");
+}
+
+// @brief イベント式の根元にシステム関数呼び出し
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_sysfunccall_in_event_expression(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "System-function call shall not be used in event description.");
+}
+
+// @brief 左辺式で用いることのできない演算子
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_operator_in_lhs(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "Illegal operator in LHS.");
+}
+
+// @brief 左辺式に定数
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_constant_in_lhs(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "Constant shall not be used in LHS.");
+}
+
+// @brief 左辺式に関数呼び出し
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_funccall_in_lhs(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "Function call shall not be used in LHS.");
+}
+
+// @brief 左辺式にシステム関数呼び出し
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_sysfunccall_in_lhs(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "System-function call shall not be used in LHS.");
+}
+
 // @brief 通常の式中に edge descriptor
 // @param[in] pt_expr 式を表すパース木
 void

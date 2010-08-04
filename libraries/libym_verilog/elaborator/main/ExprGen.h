@@ -144,12 +144,25 @@ public:
 
   /// @brief PtOrderedCon から ElbExpr を生成する．
   /// @param[in] parent 親のスコープ
-  /// @param[in] pt_head 順序付きわりあて式
+  /// @param[in] pt_head 順序付き割り当て式
   /// これは PtInst の前にある # つきの式がパラメータ割り当てなのか
   /// 遅延なのかわからないので PtOrderedCon で表していることによる．
   ElbDelay*
   instantiate_delay(const VlNamedObj* parent,
 		    const PtItem* pt_head);
+
+  /// @brief instantiate_delay の下請け関数
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_obj 遅延式を表すパース木
+  /// @param[in] n 要素数
+  /// @param[in] expr_array 遅延式の配列
+  /// @note pt_obj は PtDelay か PtItem のどちらか
+  /// @note n は最大で 3
+  ElbDelay*
+  instantiate_delay_sub(const VlNamedObj* parent,
+			const PtBase* pt_obj,
+			ymuint n,
+			const PtExpr* expr_array[]);
 
 
 private:
@@ -386,6 +399,51 @@ private:
   // エラーメッセージ生成用の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief constant function 中にシステム関数呼び出し
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_sysfunccall_in_cf(const PtExpr* pt_expr);
+
+  /// @brief constant expression 中にシステム関数呼び出し
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_sysfunccall_in_ce(const PtExpr* pt_expr);
+
+  /// @brief イベント式の根元に定数
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_constant_in_event_expression(const PtExpr* pt_expr);
+
+  /// @brief イベント式の根元に関数呼び出し
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_funccall_in_event_expression(const PtExpr* pt_expr);
+
+  /// @brief イベント式の根元にシステム関数呼び出し
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_sysfunccall_in_event_expression(const PtExpr* pt_expr);
+
+  /// @brief 左辺式で用いることのできない演算子
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_operator_in_lhs(const PtExpr* pt_expr);
+
+  /// @brief 左辺式に定数
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_constant_in_lhs(const PtExpr* pt_expr);
+
+  /// @brief 左辺式に関数呼び出し
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_funccall_in_lhs(const PtExpr* pt_expr);
+
+  /// @brief 左辺式にシステム関数呼び出し
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_sysfunccall_in_lhs(const PtExpr* pt_expr);
+  
   /// @brief 通常の式中に edge descriptor
   /// @param[in] pt_expr 式を表すパース木
   void
