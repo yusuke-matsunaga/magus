@@ -66,6 +66,24 @@ public:
   void
   add_msg_handler(MsgHandler* msg_handler);
 
+  /// @brief フリップフロップのセル名，ピン名を設定する．
+  /// @param[in] cell_name セル名
+  /// @param[in] data_pin_name データ入力ピン名
+  /// @param[in] clock_pin_name クロック入力ピン名
+  /// @param[in] q_pin_name ノーマル出力ピン名
+  /// @param[in] qn_pin_name 反転出力ピン名
+  /// @param[in] set_pin_name セットピン名
+  /// @param[in] reset_pin_name リセットピン名
+  /// @note 存在しない場合には空文字列を渡す．
+  void
+  set_ffname(const string& cell_name,
+	     const string& data_pin_name,
+	     const string& clock_pin_name,
+	     const string& q_pin_name,
+	     const string& qn_pin_name,
+	     const string& set_pin_name,
+	     const string& reset_pin_name);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -204,6 +222,38 @@ private:
   reg_driver(MvNode* node,
 	     const Driver& driver);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief FF のセル名，ピン名を表す構造体
+  struct FFInfo
+  {
+    /// @brief コンストラクタ
+    FFInfo(const string& data_pin_name,
+	   const string& clock_pin_name,
+	   const string& q_pin_name,
+	   const string& qn_pin_name,
+	   const string& set_pin_name,
+	   const string& reset_pin_name);
+    
+    /// @brief データ入力ピン名
+    string mDataPinName;
+    /// @brief クロック入力ピン名
+    string mClockPinName;
+    /// @brief ノーマル出力ピン名
+    string mQPinName;
+    /// @brief 反転出力ピン名
+    string mQnPinName;
+    /// @brief セットピン名
+    string mSetPinName;
+    /// @brief リセットピン名
+    string mResetPinName;
+  };
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -215,6 +265,9 @@ private:
   // Verilog を扱うマネージャ
   VlMgr mVlMgr;
 
+  // FF セルの情報を保持するハッシュ表
+  hash_map<string, FFInfo> mFFInfoDict;
+
   // MvNetwork を扱うマネージャ
   MvMgr* mMvMgr;
 
@@ -223,8 +276,30 @@ private:
 
   // VlDecl のドライバーのリスト
   vector<vector<Driver> > mDriverList;
-  
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+ReaderImpl::FFInfo::FFInfo(const string& data_pin_name,
+			   const string& clock_pin_name,
+			   const string& q_pin_name,
+			   const string& qn_pin_name,
+			   const string& set_pin_name,
+			   const string& reset_pin_name) :
+  mDataPinName(data_pin_name),
+  mClockPinName(clock_pin_name),
+  mQPinName(q_pin_name),
+  mQnPinName(qn_pin_name),
+  mSetPinName(set_pin_name),
+  mResetPinName(reset_pin_name)
+{
+}
 
 END_NAMESPACE_YM_MVN_VERILOG
 

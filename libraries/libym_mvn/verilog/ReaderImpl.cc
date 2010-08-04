@@ -52,6 +52,7 @@ void
 ReaderImpl::clear()
 {
   mVlMgr.clear();
+  mFFInfoDict.clear();
 }
 
 // @brief verilog 形式のファイルを読み込む．
@@ -212,6 +213,32 @@ void
 ReaderImpl::add_msg_handler(MsgHandler* msg_handler)
 {
   mMsgMgr.reg_handler(msg_handler);
+}
+
+// @brief フリップフロップのセル名，ピン名を設定する．
+// @param[in] cell_name セル名
+// @param[in] data_pin_name データ入力ピン名
+// @param[in] clock_pin_name クロック入力ピン名
+// @param[in] q_pin_name ノーマル出力ピン名
+// @param[in] qn_pin_name 反転出力ピン名
+// @param[in] set_pin_name セットピン名
+// @param[in] reset_pin_name リセットピン名
+// @note 存在しない場合には空文字列を渡す．
+void
+ReaderImpl::set_ffname(const string& cell_name,
+		       const string& data_pin_name,
+		       const string& clock_pin_name,
+		       const string& q_pin_name,
+		       const string& qn_pin_name,
+		       const string& set_pin_name,
+		       const string& reset_pin_name)
+{
+  mFFInfoDict.insert(make_pair(cell_name, FFInfo(data_pin_name,
+						 clock_pin_name,
+						 q_pin_name,
+						 qn_pin_name,
+						 set_pin_name,
+						 reset_pin_name)));
 }
 
 // @brief module を生成する．
@@ -565,37 +592,41 @@ void
 ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 			   MvModule* parent_module)
 {
-  if ( strcmp(vl_module->def_name(), "GTECH_FD2") == 0 ) {
-    // 特例
-    // GTECH_FD2( input D, input CP, input CD, output Q, output QN );
-    //   D:  データ入力
-    //   CP: クロック
-    //   CD: 非同期リセット
-    //   Q:  データ出力
-    //   QN: データ出力(反転)
+  hash_map<string, FFInfo>::const_iterator p
+    = mFFInfoDict.find(vl_module->def_name());
+  if ( p != mFFInfoDict.end() ) {
+    // 特例．FFセルに置き換える．
+    const FFInfo& ff_info = p->second;
     MvNode* node = mMvMgr->new_dff1(parent_module, 1);
     ymuint np = vl_module->port_num();
-    assert_cond( np == 5, __FILE__, __LINE__);
-    for (ymuint i = 0; i < 5; ++ i) {
+    for (ymuint i = 0; i < np; ++ i) {
       const VlPort* vl_port = vl_module->port(i);
-      const char* port_name = vl_port->name();
+      string port_name = vl_port->name();
       const VlExpr* expr = vl_port->high_conn();
-      if ( strcmp(port_name, "D") == 0 ) {
+      if ( port_name == ff_info.mDataPinName ) {
 	MvNode* node1 = gen_expr1(parent_module, expr);
 	mMvMgr->connect(node1, 0, node, 0);
       }
-      else if ( strcmp(port_name, "CP") == 0 ) {
+      else if ( port_name == ff_info.mClockPinName ) {
 	MvNode* node1 = gen_expr1(parent_module, expr);
 	mMvMgr->connect(node1, 0, node, 1);
       }
-      else if ( strcmp(port_name, "CD") == 0 ) {
-	MvNode* node1 = gen_expr1(parent_module, expr);
-	mMvMgr->connect(node1, 0, node, 2);
+      else if ( port_name == ff_info.mResetPinName ) {
+	if ( expr != NULL ) {
+	  MvNode* node1 = gen_expr1(parent_module, expr);
+	  mMvMgr->connect(node1, 0, node, 2);
+	}
       }
-      else if ( strcmp(port_name, "Q") == 0 ) {
+      else if ( port_name == ff_info.mSetPinName ) {
+	if ( expr != NULL ) {
+	  MvNode* node1 = gen_expr1(parent_module, expr);
+	  mMvMgr->connect(node1, 0, node, 3);
+	}
+      }
+      else if ( port_name == ff_info.mQPinName ) {
 	connect_lhs(parent_module, expr, node);
       }
-      else if ( strcmp(port_name, "QN") == 0 ) {
+      else if ( port_name == ff_info.mQnPinName ) {
 	if ( expr != NULL ) {
 	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
 	  mMvMgr->connect(node, 0, node1, 0);
@@ -603,41 +634,16 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 	}
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-    }
-    return;
-  }
-  if ( strcmp(vl_module->def_name(), "GTECH_MUX2") == 0 ) {
-    // 特例
-    // GTECH_MUX2( input A, input B, input S, output Z );
-    //  A, B: データ入力
-    //  S   : 選択信号
-    //  Z   : データ出力
-    MvNode* node = mMvMgr->new_ite(parent_module, 1);
-    ymuint np = vl_module->port_num();
-    assert_cond( np == 4, __FILE__, __LINE__);
-    for (ymuint i = 0; i < 4; ++ i) {
-      const VlPort* vl_port = vl_module->port(i);
-      const char* port_name = vl_port->name();
-      const VlExpr* expr = vl_port->high_conn();
-      if ( strcmp(port_name, "A") == 0 ) {
-	MvNode* node1 = gen_expr1(parent_module, expr);
-	mMvMgr->connect(node1, 0, node, 1);
-      }
-      else if ( strcmp(port_name, "B") == 0 ) {
-	MvNode* node1 = gen_expr1(parent_module, expr);
-	mMvMgr->connect(node1, 0, node, 2);
-      }
-      else if ( strcmp(port_name, "S") == 0 ) {
-	MvNode* node1 = gen_expr1(parent_module, expr);
-	mMvMgr->connect(node1, 0, node, 0);
-      }
-      else if ( strcmp(port_name, "Z") == 0 ) {
-	connect_lhs(parent_module, expr, node);
-      }
-      else {
-	assert_not_reached(__FILE__, __LINE__);
+	ostringstream buf;
+	buf << port_name
+	    << " : No such pin in "
+	    << vl_module->def_name()
+	    << ".";
+	mMsgMgr.put_msg(__FILE__, __LINE__,
+			vl_port->file_region(),
+			kMsgError,
+			"MVNXXX",
+			buf.str());
       }
     }
     return;
