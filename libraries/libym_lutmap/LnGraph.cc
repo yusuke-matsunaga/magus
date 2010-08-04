@@ -209,6 +209,38 @@ LnGraph::copy(const LnGraph& src,
   }
 }
 
+// @brief 入出力ノードに関連づけられたポートを得る．
+// @param[in] node 入出力ノード
+const LnPort*
+LnGraph::port(const LnNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputPortArray[node->subid()].mPort;
+  }
+  else if ( node->is_output() ) {
+    return mOutputPortArray[node->subid()].mPort;
+  }
+  else {
+    return NULL;
+  }
+}
+
+// @brief 入出力ノードのポートにおけるビット位置を得る．
+// @param[in] node 入出力ノード
+ymuint
+LnGraph::port_pos(const LnNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputPortArray[node->subid()].mPos;
+  }
+  else if ( node->is_output() ) {
+    return mOutputPortArray[node->subid()].mPos;
+  }
+  else {
+    return NULL;
+  }
+}
+
 // @brief 入力ノードと DFF ノードのリストを得る．
 // @param[out] node_list ノードを格納するリスト
 // @return 要素数を返す．
@@ -334,6 +366,23 @@ LnGraph::add_port(const string& name,
 {
   LnPort* port = new LnPort(name, io_node_vec);
   mPortArray.push_back(port);
+  ymuint n = io_node_vec.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    LnNode* node = io_node_vec[i];
+    if ( node->is_input() ) {
+      PortInfo& port_info = mInputPortArray[node->subid()];
+      port_info.mPort = port;
+      port_info.mPos = i;
+    }
+    else if ( node->is_output() ) {
+      PortInfo& port_info = mOutputPortArray[node->subid()];
+      port_info.mPort = port;
+      port_info.mPos = i;
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
 }
 
 // @brief 入力ノードを作る．
@@ -346,6 +395,8 @@ LnGraph::new_input()
   // 入力ノード配列に登録
   ymuint subid = mInputArray.size();
   mInputArray.push_back(node);
+  // ダミーの place-holder を追加する．
+  mInputPortArray.push_back(PortInfo());
 
   // 入力リストに登録
   mInputList.push_back(node);
@@ -368,6 +419,8 @@ LnGraph::new_output(LnNode* inode)
   // 出力ノード配列に登録
   ymuint subid = mOutputArray.size();
   mOutputArray.push_back(node);
+  // ダミーの place-holder を追加する．
+  mOutputPortArray.push_back(PortInfo());
 
   // 出力リストに登録
   mOutputList.push_back(node);
@@ -756,6 +809,8 @@ dump(ostream& s,
        p != input_list.end(); ++ p) {
     const LnNode* node = *p;
     s << "INPUT#" << node->subid() << "(" << node->id_str() << ")"
+      << " : " << lngraph.port(node)->name()
+      << "[" << lngraph.port_pos(node) << "]"
       << endl;
   }
   const LnNodeList& output_list = lngraph.output_list();
@@ -763,8 +818,10 @@ dump(ostream& s,
        p != output_list.end(); ++ p) {
     const LnNode* node = *p;
     const LnEdge* e = node->fanin_edge(0);
-    s << "OUTPUT#" << node->subid() << "(" << node->id_str()
-      << ") = ";
+    s << "OUTPUT#" << node->subid() << "(" << node->id_str() << ")"
+      << " : " << lngraph.port(node)->name()
+      << "[" << lngraph.port_pos(node) << "]"
+      << " = ";
     const LnNode* inode = e->from();
     if ( inode ) {
       // 普通のノードの場合

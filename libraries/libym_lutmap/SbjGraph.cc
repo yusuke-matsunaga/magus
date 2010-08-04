@@ -314,7 +314,9 @@ SbjGraph::clear()
   assert_cond(mDffList.empty(), __FILE__, __LINE__);
 
   mInputArray.clear();
+  mInputPortArray.clear();
   mOutputArray.clear();
+  mOutputPortArray.clear();
 }
 
 // @brief ポートを追加する(ベクタ版)．
@@ -326,6 +328,55 @@ SbjGraph::add_port(const string& name,
 {
   SbjPort* port = new SbjPort(name, body);
   mPortArray.push_back(port);
+  ymuint n = body.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    SbjNode* node = body[i];
+    if ( node->is_input() ) {
+      PortInfo& port_info = mInputPortArray[node->subid()];
+      port_info.mPort = port;
+      port_info.mPos = i;
+    }
+    else if ( node->is_output() ) {
+      PortInfo& port_info = mOutputPortArray[node->subid()];
+      port_info.mPort = port;
+      port_info.mPos = i;
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
+}
+
+// @brief 入出力ノードに関連づけられたポートを得る．
+// @param[in] node 入出力ノード
+const SbjPort*
+SbjGraph::port(const SbjNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputPortArray[node->subid()].mPort;
+  }
+  else if ( node->is_output() ) {
+    return mOutputPortArray[node->subid()].mPort;
+  }
+  else {
+    return NULL;
+  }
+}
+
+// @brief 入出力ノードのポートにおけるビット位置を得る．
+// @param[in] node 入出力ノード
+ymuint
+SbjGraph::port_pos(const SbjNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputPortArray[node->subid()].mPos;
+  }
+  else if ( node->is_output() ) {
+    return mOutputPortArray[node->subid()].mPos;
+  }
+  else {
+    return 0;
+  }
 }
 
 // @brief 入力ノードと DFF ノードのリストを返す．
@@ -497,6 +548,8 @@ SbjGraph::new_input()
   // 入力ノード配列に登録
   ymuint subid = mInputArray.size();
   mInputArray.push_back(node);
+  // ダミーの place-holder を追加
+  mInputPortArray.push_back(PortInfo());
 
   // 入力リストに登録
   mInputList.push_back(node);
@@ -518,6 +571,8 @@ SbjGraph::new_output(SbjNode* inode,
   // 出力ノード配列に登録
   ymuint subid = mOutputArray.size();
   mOutputArray.push_back(node);
+  // ダミーの place-holder を追加
+  mOutputPortArray.push_back(PortInfo());
 
   // 出力リストに登録
   mOutputList.push_back(node);
@@ -848,7 +903,10 @@ dump(ostream& s,
   for (SbjNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const SbjNode* node = *p;
-    s << "Input#" << node->subid() << ": " << node->id_str() << endl;
+    s << "Input#" << node->subid() << ": " << node->id_str()
+      << " : " << sbjgraph.port(node)->name()
+      << "[" << sbjgraph.port_pos(node) << "]"
+      << endl;
   }
 
   const SbjNodeList& output_list = sbjgraph.output_list();
@@ -857,6 +915,8 @@ dump(ostream& s,
     const SbjNode* node = *p;
     const SbjEdge* e = node->fanin_edge(0);
     s << "Output#" << node->subid() << ": " << node->id_str()
+      << " : " << sbjgraph.port(node)->name()
+      << "[" << sbjgraph.port_pos(node) << "]"
       << " = ";
     const SbjNode* inode = e->from();
     if ( inode ) {

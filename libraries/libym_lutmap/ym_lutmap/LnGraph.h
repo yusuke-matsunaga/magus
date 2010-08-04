@@ -446,6 +446,16 @@ public:
   /// @param[in] pos ポート位置 ( 0 <= pos < port_num() )
   const LnPort*
   port(ymuint pos) const;
+
+  /// @brief 入出力ノードに関連づけられたポートを得る．
+  /// @param[in] node 入出力ノード
+  const LnPort*
+  port(const LnNode* node) const;
+
+  /// @brief 入出力ノードのポートにおけるビット位置を得る．
+  /// @param[in] node 入出力ノード
+  ymuint
+  port_pos(const LnNode* node) const;
   
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -687,6 +697,20 @@ private:
   connect(LnNode* from,
 	  LnNode* to,
 	  ymuint pos);
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入出力ノードに関係するポートの情報
+  struct PortInfo
+  {
+    /// @brief ポート
+    LnPort* mPort;
+    /// @brief ビット位置
+    ymuint32 mPos;
+  };
   
   
 private:
@@ -717,12 +741,18 @@ private:
   // 穴はあいていない．
   vector<LnNode*> mInputArray;
 
+  // 入力番号をキーにしたポート情報の配列
+  vector<PortInfo> mInputPortArray;
+  
   // 入力ノードのリスト
   LnNodeList mInputList;
 
   // 出力番号をキーにした出力ノードの配列
   // 穴はあいていない．
   vector<LnNode*> mOutputArray;
+
+  // 出力番号をキーにしたポート情報の配列
+  vector<PortInfo> mOutputPortArray;
 
   // 出力ノードのリスト
   LnNodeList mOutputList;
@@ -850,17 +880,6 @@ LnNode::id() const
 {
   return mId;
 }
-
-#if 0
-// @brief 名前を得る．
-// @note 名前がない場合もある．
-inline
-const string&
-LnNode::name() const
-{
-  return mName;
-}
-#endif
 
 // @brief LUTノードの場合に真理値ベクタを得る．
 // @param[out] tv 真理値を格納するベクタ

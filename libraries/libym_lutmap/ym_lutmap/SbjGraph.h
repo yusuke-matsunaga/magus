@@ -643,6 +643,16 @@ public:
   const SbjPort*
   port(ymuint pos) const;
 
+  /// @brief 入出力ノードに関連づけられたポートを得る．
+  /// @param[in] node 入出力ノード
+  const SbjPort*
+  port(const SbjNode* node) const;
+
+  /// @brief 入出力ノードのポートにおけるビット位置を得る．
+  /// @param[in] node 入出力ノード
+  ymuint
+  port_pos(const SbjNode* node) const;
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -962,6 +972,20 @@ private:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入出力ノードに関係するポートの情報
+  struct PortInfo
+  {
+    /// @brief ポート
+    SbjPort* mPort;
+    /// @brief ビット位置
+    ymuint32 mPos;
+  };
+
   
 private:
   //////////////////////////////////////////////////////////////////////
@@ -988,6 +1012,9 @@ private:
   // 穴はあいていない．
   vector<SbjNode*> mInputArray;
 
+  // 入力番号をキーにしたポート情報の配列
+  vector<PortInfo> mInputPortArray;
+  
   // 入力ノードのリスト
   SbjNodeList mInputList;
 
@@ -995,6 +1022,9 @@ private:
   // 穴はあいていない．
   vector<SbjNode*> mOutputArray;
 
+  // 出力番号をキーにしたポート情報の配列
+  vector<PortInfo> mOutputPortArray;
+  
   // 出力ノードのリスト
   SbjNodeList mOutputList;
   
