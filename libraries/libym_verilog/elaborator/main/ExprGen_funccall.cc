@@ -72,20 +72,12 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
 			      const ElbEnv& env,
 			      const PtExpr* pt_expr)
 {
-  const FileRegion& fr = pt_expr->file_region();
-  
   const ElbFunction* child_func = NULL;
   if ( env.is_constant() ) {
     // 定数関数を探し出す．
     PtNameBranchArray nb_array = pt_expr->namebranch_array();
     if ( nb_array.size() > 0 ) {
-      // 階層付きはダメ
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      "Hierarchical name cannot be used "
-	      "in constant expression.");
+      error_hname_in_ce(pt_expr);
       return NULL;
     }
 
@@ -99,25 +91,12 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
     const PtModule* pt_module = find_moduledef(module->def_name());
     const PtItem* pt_func = pt_module->find_function(name);
     if ( !pt_func ) {
-      ostringstream buf;
-      buf << expand_full_name(nb_array, name)
-	  << " : No such function.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_no_such_function(pt_expr);
       return NULL;
     }
   
     if ( pt_func->is_in_use() ) {
-      ostringstream buf;
-      buf << name << " : uses itself.";
-      put_msg(__FILE__, __LINE__,
-	      pt_func->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_uses_itself(pt_expr);
       return NULL;
     }
     
@@ -129,14 +108,7 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
       pt_func->clear_in_use();
     }
     if ( !child_func ) {
-      ostringstream buf;
-      buf << expand_full_name(nb_array, name)
-	  << " : Not a constant function.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_not_a_constant_function(pt_expr);
       return NULL;
     }
   }
@@ -146,25 +118,11 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
     const char* name = pt_expr->name();
     ElbObjHandle* handle = find_obj_up(parent, nb_array, name, NULL);
     if ( handle == NULL ) {
-      ostringstream buf;
-      buf << expand_full_name(nb_array, name)
-	  << " : No such function.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_no_such_function(pt_expr);
       return NULL;
     }
     if ( handle->type() != kVpiFunction ) {
-      ostringstream buf;
-      buf << handle->full_name()
-	  << " : Not a function.";
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      error_not_a_function(pt_expr);
       return NULL;
     }
     child_func = handle->function();
@@ -174,11 +132,7 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
   // 引数の生成
   ymuint32 n = pt_expr->operand_num();
   if ( n != child_func->io_num() ) {
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    "Number of arguments does not match.");
+    error_n_of_arguments_mismatch(pt_expr);
     return NULL;
   }
   
@@ -193,12 +147,7 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
     ElbIODecl* io_decl = child_func->_io(i);
     ElbDecl* decl = io_decl->_decl();
     if ( decl->value_type() != expr1->value_type() ) {
-      put_msg(__FILE__, __LINE__,
-	      pt_expr1->file_region(),
-	      kMsgWarning,
-	      "ELAB",
-	      "Actual argument type does not match "
-	      "with formal argument.");
+      error_illegal_argument_type(pt_expr);
 #if DEBUG
       cout << "decl->value_type() = ";
       put_value_type(cout, decl->value_type());
@@ -229,19 +178,12 @@ ExprGen::instantiate_sysfunccall(const VlNamedObj* parent,
 				 const ElbEnv& env,
 				 const PtExpr* pt_expr)
 {
-  const FileRegion& fr = pt_expr->file_region();
   const char* name = pt_expr->name();
 
   // system function を探し出す．
   const ElbUserSystf* user_systf = find_user_systf(name);
   if ( user_systf == NULL ) {
-    ostringstream buf;
-    buf << name << " : No such system function.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    error_no_such_sysfunction(pt_expr);
     return NULL;
   }
   

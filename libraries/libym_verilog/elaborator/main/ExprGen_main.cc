@@ -211,8 +211,6 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
 			 const ElbEnv& env,
 			 const PtExpr* pt_expr)
 {
-  const FileRegion& fr = pt_expr->file_region();
-
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
     // 左辺では concatination しか適当でない．
@@ -305,8 +303,8 @@ ExprGen::evaluate_expr_bool(const VlNamedObj* parent,
   if ( !expr ) {
     return false;
   }
-  value = expr->eval_scalar() == kVpiScalar1;
-  // たしか vpi_expr は自動的に開放されるはず
+  value = (expr->eval_scalar() == kVpiScalar1);
+  // TODO: expr の開放
   return true;
 }
 
@@ -325,7 +323,7 @@ ExprGen::evaluate_expr_bitvector(const VlNamedObj* parent,
     return false;
   }
   expr->eval_bitvector(value);
-  // たしか vpi_expr は自動的に開放されるはず
+  // TODO: expr の開放
   return true;
 }
 

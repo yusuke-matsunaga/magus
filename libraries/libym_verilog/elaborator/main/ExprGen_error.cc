@@ -127,19 +127,94 @@ ExprGen::error_illegal_real_type(const PtExpr* pt_expr)
 	       "Shall not have a real-type operand.");
 }
 
+// @brief 該当する関数が存在しない．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_no_such_function(const PtExpr* pt_expr)
+{
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "No such function.");
+}
+
+// @brief 該当するシステム関数が存在しない．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_no_such_sysfunction(const PtExpr* pt_expr)
+{
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "No such system function.");
+}
+
+// @brief 定数関数は自己再帰できない．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_uses_itself(const PtExpr* pt_expr)
+{
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Uses itself.");
+}
+
+// @brief 定数関数ではない．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_not_a_constant_function(const PtExpr* pt_expr)
+{
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Not a constant function.");
+}
+
+// @brief 関数ではない．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_not_a_function(const PtExpr* pt_expr)
+{
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Not a function.");
+}
+
+// @brief 引数の数が合わない．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_n_of_arguments_mismatch(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "# of arguments does not match.");
+}
+
+// @brief 引数の型が合わない．
+// @param[in] pt_expr 式を表すパース木
+void
+ExprGen::error_illegal_argument_type(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "Actual argument type does not match"
+	       " with formal argument.");
+}
+
 // @brief オブジェクトが存在しない
 // @param[in] pt_expr 式を表すパース木
 void
 ExprGen::error_not_found(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX", "Not found.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Not found.");
 }
 
 // @brief オブジェクトの型が不適切だった
 void
 ExprGen::error_illegal_object(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX", "Illegal object type.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Illegal object type.");
 }
   
 // @brief オブジェクトの型が constant function 用として不適切だった
@@ -147,8 +222,9 @@ ExprGen::error_illegal_object(const PtExpr* pt_expr)
 void
 ExprGen::error_illegal_object_cf(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Illegal object type inside constant function.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Illegal object type inside constant function.");
 }
 
 // @brief 階層名が constant expression 中にあった
@@ -156,9 +232,10 @@ ExprGen::error_illegal_object_cf(const PtExpr* pt_expr)
 void
 ExprGen::error_hname_in_ce(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Hierarchical name shall not be used"
-		" in constant expression.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Hierarchical name shall not be used"
+		   " in constant expression.");
 }
 
 // @brief 階層名が constant function 中にあった
@@ -166,9 +243,10 @@ ExprGen::error_hname_in_ce(const PtExpr* pt_expr)
 void
 ExprGen::error_hname_in_cf(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Hierarchical name shall not be used"
-		" inside constant function.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Hierarchical name shall not be used"
+		   " inside constant function.");
 }
 
 // @brief オブジェクトが parameter でなかった
@@ -176,7 +254,9 @@ ExprGen::error_hname_in_cf(const PtExpr* pt_expr)
 void
 ExprGen::error_not_a_parameter(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX", "Not a parameter.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Not a parameter.");
 }
   
 // @brief オブジェクトが named-event でなかった
@@ -184,7 +264,9 @@ ExprGen::error_not_a_parameter(const PtExpr* pt_expr)
 void
 ExprGen::error_not_a_namedevent(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX", "Not a named-event.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Not a named-event.");
 }
 
 // @brief assign/deassign に不適切なビット/範囲指定
@@ -192,9 +274,10 @@ ExprGen::error_not_a_namedevent(const PtExpr* pt_expr)
 void
 ExprGen::error_select_in_pca(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Bit/part-select shall not be used"
-		" in LHS of assign/deassign statement.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Bit/part-select shall not be used"
+		   " in LHS of assign/deassign statement.");
 }
 
 // @brief force/release に不適切なビット/範囲指定
@@ -202,9 +285,10 @@ ExprGen::error_select_in_pca(const PtExpr* pt_expr)
 void
 ExprGen::error_select_in_force(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Bit/part-select shall not be used"
-		" in LHS of force/release statement.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Bit/part-select shall not be used"
+		   " in LHS of force/release statement.");
 }
 
 // @brief assign/deassign に不適切な配列要素
@@ -212,9 +296,10 @@ ExprGen::error_select_in_force(const PtExpr* pt_expr)
 void
 ExprGen::error_array_in_pca(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Array element shall not be used"
-		"in LHS of assign/deassign statement.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Array element shall not be used"
+		   "in LHS of assign/deassign statement.");
 }
 
 // @brief force/release に不適切な配列要素
@@ -222,16 +307,19 @@ ExprGen::error_array_in_pca(const PtExpr* pt_expr)
 void
 ExprGen::error_array_in_force(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Array element shall not be used"
-		"in LHS of force/release statement.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Array element shall not be used"
+		   "in LHS of force/release statement.");
 }
 
 // @brief 配列の次元が合わない
 void
 ExprGen::error_dimension_mismatch(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX", "Dimension mismatch.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Dimension mismatch.");
 }
 
 // @brief real 型に対するビット選択あるいは部分選択があった
@@ -239,18 +327,19 @@ ExprGen::error_dimension_mismatch(const PtExpr* pt_expr)
 void
 ExprGen::error_select_for_real(const PtExpr* pt_expr)
 {
-  error_primary(pt_expr, "ELABXXX",
-		"Bit-select/Part-select for real.");
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Bit-select/Part-select for real.");
 }
 
-// @brief エラーメッセージを生成する共通部分
+// @brief 階層名付きのエラーメッセージを生成する共通部分
 // @param[in] pt_expr 式を表すパース木
 // @param[in] label エラーラベル
 // @param[in] msg エラーメッセージ
 void
-ExprGen::error_primary(const PtExpr* pt_expr,
-		       const char* label,
-		       const char* msg)
+ExprGen::error_with_hname(const PtExpr* pt_expr,
+			  const char* label,
+			  const char* msg)
 {
   ostringstream buf;
   buf << expand_full_name(pt_expr->namebranch_array(), pt_expr->name())

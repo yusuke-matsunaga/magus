@@ -453,6 +453,41 @@ private:
   /// @param[in] pt_expr 式を表すパース木
   void
   error_illegal_real_type(const PtExpr* pt_expr);
+
+  /// @brief 該当する関数が存在しない．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_no_such_function(const PtExpr* pt_expr);
+
+  /// @brief 該当するシステム関数が存在しない．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_no_such_sysfunction(const PtExpr* pt_expr);
+
+  /// @brief 定数関数は自己再帰できない．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_uses_itself(const PtExpr* pt_expr);
+
+  /// @brief 定数関数ではない．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_not_a_constant_function(const PtExpr* pt_expr);
+
+  /// @brief 関数ではない．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_not_a_function(const PtExpr* pt_expr);
+
+  /// @brief 引数の数が合わない．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_n_of_arguments_mismatch(const PtExpr* pt_expr);
+
+  /// @brief 引数の型が合わない．
+  /// @param[in] pt_expr 式を表すパース木
+  void
+  error_illegal_argument_type(const PtExpr* pt_expr);
   
   /// @brief オブジェクトが存在しない
   /// @param[in] pt_expr 式を表すパース木
@@ -519,14 +554,14 @@ private:
   void
   error_select_for_real(const PtExpr* pt_expr);
 
-  /// @brief primary 式用のエラーメッセージを生成する共通部分
+  /// @brief 階層名付きのエラーメッセージを生成する共通部分
   /// @param[in] pt_expr 式を表すパース木
   /// @param[in] label エラーラベル
   /// @param[in] msg エラーメッセージ
   void
-  error_primary(const PtExpr* pt_expr,
-		const char* label,
-		const char* msg);
+  error_with_hname(const PtExpr* pt_expr,
+		   const char* label,
+		   const char* msg);
 
   /// @brief エラーメッセージを生成する共通部分
   /// @param[in] pt_expr 式を表すパース木
