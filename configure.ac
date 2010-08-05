@@ -5,7 +5,7 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([ymtools], [1.0], 
+AC_INIT([ymtools], [1.2], 
         [yusuke_matsunaga@ieee.org],
         [ymtools])dnl
 
@@ -171,7 +171,8 @@ YM_BUILD_LIBRARY([libym_cec],
 
 # libym_lutmap
 YM_BUILD_LIBRARY([libym_lutmap],
-		 [ym_libym_bnet_enable])
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
 
 # libym_seal
 YM_BUILD_LIBRARY([libym_seal],
@@ -216,8 +217,8 @@ YM_BUILD_PROGRAM([matpg],
 # lutmap
 YM_BUILD_PROGRAM([lutmap],
 		 [ym_libym_utils_enable,
-		  ym_libym_blif_enable,
-		  ym_libym_bnet_enable,
+		  ym_libym_verilog_enable,
+		  ym_libym_mvn_enable,
 		  ym_libym_lutmap_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS
