@@ -62,164 +62,58 @@ enum tVpiScalarVal {
 };
 
 /// @brief tVpiScalarVal から bool への変換
-inline
 bool
-conv_to_bool(tVpiScalarVal src)
-{
-  return src == kVpiScalar1;
-}
+conv_to_bool(tVpiScalarVal src);
 
 /// @brief tVpiScalarVal から論理値への変換
 /// @note kVpiScalarZ -> kVpiScalarX をやっている
-inline
 tVpiScalarVal
-conv_to_logic(tVpiScalarVal src)
-{
-  switch ( src ) {
-  case kVpiScalar0: return kVpiScalar0;
-  case kVpiScalar1: return kVpiScalar1;
-  case kVpiScalarX:
-  case kVpiScalarZ: return kVpiScalarX;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  // ダミー
-  return kVpiScalarX;
-}
+conv_to_logic(tVpiScalarVal src);
 
 /// @brief tVpiScalarVal から int への変換
 /// @note kVpiScalar1 以外はすべての 0 にマッピングする．
-inline
 int
-conv_to_int(tVpiScalarVal src)
-{
-  if ( src == kVpiScalar1 ) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
-}
+conv_to_int(tVpiScalarVal src);
 
 /// @brief tVpiScalarVal から実数値への変換
 /// @note kVpiScalar1 を 1.0 に，それい以外はすべての 0.0 にマッピングする．
-inline
 double
-conv_to_real(tVpiScalarVal src)
-{
-  if ( src == kVpiScalar1 ) {
-    return 1.0;
-  }
-  else {
-    return 0.0;
-  }
-}
+conv_to_real(tVpiScalarVal src);
 
 /// @brief int から tVpiScalarVal への変換
 /// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
 tVpiScalarVal
-conv_from_int(int src)
-{
-  if ( src == 0 ) {
-    return kVpiScalar0;
-  }
-  else {
-    return kVpiScalar1;
-  }
-}
+conv_from_int(int src);
 
 /// @brief 実数値から tVpiScalarVal への変換
 /// @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
 tVpiScalarVal
-conv_from_real(double src)
-{
-  if ( src == 0.0 ) {
-    return kVpiScalar0;
-  }
-  else {
-    return kVpiScalar1;
-  }
-}
+conv_from_real(double src);
 
 /// @brief tVpiScalarVal の否定
 /// @note kVpiScalarZ は kVpiScalarX と同様に扱われる．
-inline
 tVpiScalarVal
-operator!(tVpiScalarVal src)
-{
-  switch ( src ) {
-  case kVpiScalar0: return kVpiScalar1;
-  case kVpiScalar1: return kVpiScalar0;
-  case kVpiScalarX:
-  case kVpiScalarZ: return kVpiScalarX;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  // ダミー
-  return kVpiScalarX;
-}
+operator!(tVpiScalarVal src);
 
 /// @brief tVpiScalarVal の AND
-inline
 tVpiScalarVal
 operator&&(tVpiScalarVal src1,
-	   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalar0 || src2 == kVpiScalar0 ) {
-    return kVpiScalar0;
-  }
-  if ( src1 == kVpiScalar1 && src2 == kVpiScalar1 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalarX;
-}
+	   tVpiScalarVal src2);
 
 /// @brief tVpiScalarVal の OR
-inline
 tVpiScalarVal
 operator||(tVpiScalarVal src1,
-	   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalar1 || src2 == kVpiScalar1 ) {
-    return kVpiScalar1;
-  }
-  if ( src1 == kVpiScalar0 && src2 == kVpiScalar0 ) {
-    return kVpiScalar0;
-  }
-  return kVpiScalarX;
-}
+	   tVpiScalarVal src2);
 
 /// @brief tVpiScalarVal の等価比較
-inline
 tVpiScalarVal
 eq(tVpiScalarVal src1,
-   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
-       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
-    return kVpiScalarX;
-  }
-  if ( src1 == src2 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalar0;
-}
+   tVpiScalarVal src2);
 
 /// @brief tVpiScalarVal の等価比較
-inline
 tVpiScalarVal
 neq(tVpiScalarVal src1,
-    tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
-       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
-    return kVpiScalarX;
-  }
-  if ( src1 != src2 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalar0;
-}
+    tVpiScalarVal src2);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -661,68 +555,45 @@ enum tVpiValueType {
 };
 
 /// @brief ビットベクタ型を作る．
-inline
+/// @param[in] type 元となるタイプ
+/// @param[in] size サイズ
 tVpiValueType
 pack(tVpiValueType type,
-     ymuint32 size)
-{
-  ymuint32 tmp = type | (size << 4);
-  return static_cast<tVpiValueType>(tmp);
-}
+     ymuint32 size);
 
 /// @brief 2つの型をマージする．
-inline
+/// @param[in] vtype1, vtype2 型
 tVpiValueType
 merge(tVpiValueType vtype1,
-      tVpiValueType vtype2)
-{
-  ymuint32 tmp = static_cast<ymuint32>(vtype1) | static_cast<ymuint32>(vtype2);
-  return static_cast<tVpiValueType>(tmp);
-}
+      tVpiValueType vtype2);
 
 /// @brief 型を取り出す．
-inline
+/// @param[in] packed_type 型とサイズをパックしたもの．
 tVpiValueType
-unpack_type(tVpiValueType packed_type)
-{
-  ymuint32 tmp = static_cast<ymuint32>(packed_type) & 0xF;
-  return static_cast<tVpiValueType>(tmp);
-}
+unpack_type(tVpiValueType packed_type);
 
 /// @brief サイズを取り出す．
-inline
+/// @param[in] packed_type 型とサイズをパックしたもの．
 ymuint32
-unpack_size(tVpiValueType type)
-{
-  return (static_cast<ymuint32>(type) >> 4);
-}
+unpack_size(tVpiValueType type);
 
 /// @brief 符号つきの型かどうかのチェック
+/// @param[in] type 型
 /// @return 符号つきの型の時 true を返す．
-inline
 bool
-is_signed_type(tVpiValueType type)
-{
-  return (static_cast<ymuint32>(type) & kVpiValueSigned) == kVpiValueSigned;
-}
+is_signed_type(tVpiValueType type);
 
 /// @brief サイズつきの型かどうかのチェック
+/// @param[in] type 型
 /// @return サイズつきの型の時 true を返す．
-inline
 bool
-is_sized_type(tVpiValueType type)
-{
-  return (static_cast<ymuint32>(type) & kVpiValueSized) == kVpiValueSized;
-}
+is_sized_type(tVpiValueType type);
 
 /// @brief ビットベクタ型かどうかのチェック
+/// @param[in] type 型
 /// @return ビットベクタ型の時 true を返す．
-inline
 bool
-is_bitvector_type(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) & kVpiValueBitVector) == kVpiValueBitVector;
-}
+is_bitvector_type(tVpiValueType type);
 
 /// @brief integer 型のサイズ
 const ymuint32 kVpiSizeInteger = 32U;
@@ -857,14 +728,10 @@ enum tVpiUdpVal {
 };
 
 /// @brief 遷移シンボル (エッジシンボル) のチェック
-/// @param[in] val
+/// @param[in] val UDP テーブル中のシンボル値
 /// @return val が遷移シンボル(エッジシンボル)なら true を返す．
-inline
 bool
-is_edge_symbol(tVpiUdpVal val)
-{
-  return (val >= 8);
-}
+is_edge_symbol(tVpiUdpVal val);
 
 /// @brief UDP テーブルのシンボルを表す文字列を得る．
 /// @param[in] val UDP テーブル中のシンボル値
@@ -888,6 +755,246 @@ merge_udp_value(tVpiUdpVal symbol1,
 		tVpiUdpVal symbol2);
 
 /// @}
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief tVpiScalarVal から bool への変換
+inline
+bool
+conv_to_bool(tVpiScalarVal src)
+{
+  return src == kVpiScalar1;
+}
+
+// @brief tVpiScalarVal から論理値への変換
+// @note kVpiScalarZ -> kVpiScalarX をやっている
+inline
+tVpiScalarVal
+conv_to_logic(tVpiScalarVal src)
+{
+  switch ( src ) {
+  case kVpiScalar0: return kVpiScalar0;
+  case kVpiScalar1: return kVpiScalar1;
+  case kVpiScalarX:
+  case kVpiScalarZ: return kVpiScalarX;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  // ダミー
+  return kVpiScalarX;
+}
+
+// @brief tVpiScalarVal から int への変換
+// @note kVpiScalar1 以外はすべての 0 にマッピングする．
+inline
+int
+conv_to_int(tVpiScalarVal src)
+{
+  if ( src == kVpiScalar1 ) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+// @brief tVpiScalarVal から実数値への変換
+// @note kVpiScalar1 を 1.0 に，それい以外はすべての 0.0 にマッピングする．
+inline
+double
+conv_to_real(tVpiScalarVal src)
+{
+  if ( src == kVpiScalar1 ) {
+    return 1.0;
+  }
+  else {
+    return 0.0;
+  }
+}
+
+// @brief int から tVpiScalarVal への変換
+// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
+inline
+tVpiScalarVal
+conv_from_int(int src)
+{
+  if ( src == 0 ) {
+    return kVpiScalar0;
+  }
+  else {
+    return kVpiScalar1;
+  }
+}
+
+// @brief 実数値から tVpiScalarVal への変換
+// @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
+inline
+tVpiScalarVal
+conv_from_real(double src)
+{
+  if ( src == 0.0 ) {
+    return kVpiScalar0;
+  }
+  else {
+    return kVpiScalar1;
+  }
+}
+
+// @brief tVpiScalarVal の否定
+// @note kVpiScalarZ は kVpiScalarX と同様に扱われる．
+inline
+tVpiScalarVal
+operator!(tVpiScalarVal src)
+{
+  switch ( src ) {
+  case kVpiScalar0: return kVpiScalar1;
+  case kVpiScalar1: return kVpiScalar0;
+  case kVpiScalarX:
+  case kVpiScalarZ: return kVpiScalarX;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  // ダミー
+  return kVpiScalarX;
+}
+
+// @brief tVpiScalarVal の AND
+inline
+tVpiScalarVal
+operator&&(tVpiScalarVal src1,
+	   tVpiScalarVal src2)
+{
+  if ( src1 == kVpiScalar0 || src2 == kVpiScalar0 ) {
+    return kVpiScalar0;
+  }
+  if ( src1 == kVpiScalar1 && src2 == kVpiScalar1 ) {
+    return kVpiScalar1;
+  }
+  return kVpiScalarX;
+}
+
+// @brief tVpiScalarVal の OR
+inline
+tVpiScalarVal
+operator||(tVpiScalarVal src1,
+	   tVpiScalarVal src2)
+{
+  if ( src1 == kVpiScalar1 || src2 == kVpiScalar1 ) {
+    return kVpiScalar1;
+  }
+  if ( src1 == kVpiScalar0 && src2 == kVpiScalar0 ) {
+    return kVpiScalar0;
+  }
+  return kVpiScalarX;
+}
+
+// @brief tVpiScalarVal の等価比較
+inline
+tVpiScalarVal
+eq(tVpiScalarVal src1,
+   tVpiScalarVal src2)
+{
+  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
+       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
+    return kVpiScalarX;
+  }
+  if ( src1 == src2 ) {
+    return kVpiScalar1;
+  }
+  return kVpiScalar0;
+}
+
+// @brief tVpiScalarVal の等価比較
+inline
+tVpiScalarVal
+neq(tVpiScalarVal src1,
+    tVpiScalarVal src2)
+{
+  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
+       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
+    return kVpiScalarX;
+  }
+  if ( src1 != src2 ) {
+    return kVpiScalar1;
+  }
+  return kVpiScalar0;
+}
+
+// @brief ビットベクタ型を作る．
+inline
+tVpiValueType
+pack(tVpiValueType type,
+     ymuint32 size)
+{
+  ymuint32 tmp = type | (size << 4);
+  return static_cast<tVpiValueType>(tmp);
+}
+
+// @brief 2つの型をマージする．
+inline
+tVpiValueType
+merge(tVpiValueType vtype1,
+      tVpiValueType vtype2)
+{
+  ymuint32 tmp
+    = static_cast<ymuint32>(vtype1) | static_cast<ymuint32>(vtype2);
+  return static_cast<tVpiValueType>(tmp);
+}
+
+// @brief 型を取り出す．
+inline
+tVpiValueType
+unpack_type(tVpiValueType packed_type)
+{
+  ymuint32 tmp = static_cast<ymuint32>(packed_type) & 0xF;
+  return static_cast<tVpiValueType>(tmp);
+}
+
+// @brief サイズを取り出す．
+inline
+ymuint32
+unpack_size(tVpiValueType type)
+{
+  return (static_cast<ymuint32>(type) >> 4);
+}
+
+// @brief 符号つきの型かどうかのチェック
+// @return 符号つきの型の時 true を返す．
+inline
+bool
+is_signed_type(tVpiValueType type)
+{
+  return (static_cast<ymuint32>(type) & kVpiValueSigned) == kVpiValueSigned;
+}
+
+// @brief サイズつきの型かどうかのチェック
+// @return サイズつきの型の時 true を返す．
+inline
+bool
+is_sized_type(tVpiValueType type)
+{
+  return (static_cast<ymuint32>(type) & kVpiValueSized) == kVpiValueSized;
+}
+
+// @brief ビットベクタ型かどうかのチェック
+// @return ビットベクタ型の時 true を返す．
+inline
+bool
+is_bitvector_type(tVpiValueType type)
+{
+  return (static_cast<ymuint>(type) & kVpiValueBitVector) == kVpiValueBitVector;
+}
+
+/// @brief 遷移シンボル (エッジシンボル) のチェック
+/// @param[in] val
+/// @return val が遷移シンボル(エッジシンボル)なら true を返す．
+inline
+bool
+is_edge_symbol(tVpiUdpVal val)
+{
+  return (val >= 8);
+}
 
 END_NAMESPACE_YM_VERILOG
 
