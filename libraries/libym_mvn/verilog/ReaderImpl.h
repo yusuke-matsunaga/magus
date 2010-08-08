@@ -19,8 +19,6 @@
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
-using namespace nsYm::nsVerilog;
-
 //////////////////////////////////////////////////////////////////////
 /// @class ReaderImpl ReaderImpl.h "ReaderImpl.h"
 /// @brief 合成可能な Verilog 記述を読み込んで MVN に設定するクラス

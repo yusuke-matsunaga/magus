@@ -27,6 +27,9 @@
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
+using namespace nsYm::nsVerilog;
+  
+
 BEGIN_NONAMESPACE
 
 const
@@ -76,8 +79,6 @@ ReaderImpl::read(const string& filename,
 bool
 ReaderImpl::gen_network(MvMgr& mgr)
 {
-  using namespace nsVerilog;
-
   mVlMgr.elaborate();
   
   mMvMgr = &mgr;
@@ -244,10 +245,8 @@ ReaderImpl::set_ffname(const string& cell_name,
 // @brief module を生成する．
 // @param[in] vl_module 対象のモジュール
 MvModule*
-ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
+ReaderImpl::gen_module(const VlModule* vl_module)
 {
-  using namespace nsVerilog;
-  
   // ポート数，入出力のビット幅を調べる．
   ymuint np = vl_module->port_num();
   ymuint nio = vl_module->io_num();
@@ -382,10 +381,8 @@ ReaderImpl::gen_module(const nsVerilog::VlModule* vl_module)
 // @retval false エラーが起こった．
 bool
 ReaderImpl::gen_decl(MvModule* module,
-		     const nsVerilog::VlNamedObj* vl_scope)
+		     const VlNamedObj* vl_scope)
 {
-  using namespace nsVerilog;
-
   // ネットの生成
   {
     vector<const VlDecl*> net_list;
@@ -451,10 +448,8 @@ ReaderImpl::gen_decl(MvModule* module,
 // @retval false エラーが起こった．
 bool
 ReaderImpl::gen_item(MvModule* module,
-		     const nsVerilog::VlNamedObj* vl_scope)
+		     const VlNamedObj* vl_scope)
 {
-  using namespace nsVerilog;
-
   // モジュールインスタンスの生成
   {
     vector<const VlModule*> module_list;
