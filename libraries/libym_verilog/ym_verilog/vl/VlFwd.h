@@ -83,4 +83,36 @@ class VlAttrList;
 
 END_NAMESPACE_YM_VERILOG
 
+BEGIN_NAMESPACE_YM
+
+using nsVerilog::VlObj;
+using nsVerilog::VlNamedObj;
+using nsVerilog::VlDecl;
+using nsVerilog::VlModule;
+using nsVerilog::VlModuleArray;
+using nsVerilog::VlPort;
+using nsVerilog::VlIODecl;
+using nsVerilog::VlParamAssign;
+using nsVerilog::VlDefParam;
+using nsVerilog::VlContAssign;
+using nsVerilog::VlFunction;
+using nsVerilog::VlTask;
+using nsVerilog::VlPrimitive;
+using nsVerilog::VlPrimArray;
+using nsVerilog::VlPrimTerm;
+using nsVerilog::VlProcess;
+using nsVerilog::VlStmt;
+using nsVerilog::VlCaseItem;
+using nsVerilog::VlControl;
+using nsVerilog::VlExpr;
+using nsVerilog::VlDelay;
+using nsVerilog::VlRange;
+using nsVerilog::VlUdpDefn;
+using nsVerilog::VlTableEntry;
+using nsVerilog::VlUserSystf;
+using nsVerilog::VlAttribute;
+using nsVerilog::VlAttrList;
+
+END_NAMESPACE_YM
+
 #endif // YM_VERILOG_VL_VLFWD_H
