@@ -158,6 +158,39 @@ EiParamHead::right_range() const
   return NULL;
 }
 
+// @brief MSB の値を返す．
+int
+EiParamHead::left_range_const() const
+{
+  switch ( mPtHead->data_type() ) {
+  case kVpiVarInteger:
+    return kVpiSizeInteger - 1;
+      
+  case kVpiVarReal:
+    return -1;
+      
+  case kVpiVarTime:
+    return kVpiSizeTime - 1;
+      
+  default:
+    break;
+  }
+  // int とみなす．
+  return kVpiSizeInteger - 1;
+}
+
+// @brief LSB の値を返す．
+int
+EiParamHead::right_range_const() const
+{
+  if ( mPtHead->data_type() == kVpiVarReal ) {
+    return -1;
+  }
+  else {
+    return 0;
+  }
+}
+
 // @brief ビット幅を返す．
 ymuint32
 EiParamHead::bit_size() const
@@ -258,6 +291,20 @@ ElbExpr*
 EiParamHeadV::right_range() const
 {
   return mRange.right_range();
+}
+
+// @brief MSB の値を返す．
+int
+EiParamHeadV::left_range_const() const
+{
+  return mRange.left_range_const();
+}
+
+// @brief LSB の値を返す．
+int
+EiParamHeadV::right_range_const() const
+{
+  return mRange.right_range_const();
 }
 
 // @brief ビット幅を返す．
@@ -376,11 +423,35 @@ EiParameter::is_signed() const
   return mHead->is_signed();
 }
 
+// @brief MSB の値を返す．
+int
+EiParameter::left_range_const() const
+{
+  return mHead->left_range_const();
+}
+
+// @brief LSB の値を返す．
+int
+EiParameter::right_range_const() const
+{
+  return mHead->right_range_const();
+}
+
 // @brief ビット幅を返す．
 ymuint32
 EiParameter::bit_size() const
 {
   return mHead->bit_size();
+}
+
+// @brief オフセット値の取得
+// @param[in] index インデックス
+// @retval index のオフセット index が範囲内に入っている．
+// @retval -1 index が範囲外
+int
+EiParameter::bit_offset(int index) const
+{
+  return mHead->bit_offset(index);
 }
 
 // @brief データ型の取得
@@ -488,16 +559,6 @@ EiParameter::eval_bitvector(BitVector& bitvector,
 			    tVpiValueType req_type) const
 {
   mExpr->eval_bitvector(bitvector, req_type);
-}
-
-// @brief LSB からのオフセット値の取得
-// @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiParameter::bit_offset(int index) const
-{
-  return mHead->bit_offset(index);
 }
 
 

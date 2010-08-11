@@ -185,11 +185,39 @@ EiDeclArray::is_signed() const
   return mHead->is_signed();
 }
 
+// @brief MSB の値を返す．
+// @retval 範囲のMSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiDeclArray::left_range_const() const
+{
+  return mHead->left_range_const();
+}
+
+// @brief LSB の値を返す．
+// @retval 範囲のLSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiDeclArray::right_range_const() const
+{
+  return mHead->right_range_const();
+}
+
 // @brief ビット幅を返す．
 ymuint32
 EiDeclArray::bit_size() const
 {
   return mHead->bit_size();
+}
+
+// @brief オフセット値の取得
+// @param[in] index インデックス
+// @retval index に対するオフセット値 index が範囲内に入っている時．
+// @retval -1 index が範囲外の時
+int
+EiDeclArray::bit_offset(int index) const
+{
+  return mHead->bit_offset(index);
 }
 
 // @brief データ型の取得
@@ -296,16 +324,6 @@ ymuint32
 EiDeclArray::calc_offset(const vector<int>& index_array) const
 {
   return mRangeList.offset(index_array);
-}
-
-// @brief LSB からのオフセット値の取得
-// @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDeclArray::bit_offset(int index) const
-{
-  return mHead->bit_offset(index);
 }
 
 

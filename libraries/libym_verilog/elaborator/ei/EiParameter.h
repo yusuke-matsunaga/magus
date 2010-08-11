@@ -73,6 +73,16 @@ public:
   virtual
   ElbExpr*
   right_range() const;
+  
+  /// @brief MSB の値を返す．
+  virtual
+  int
+  left_range_const() const;
+  
+  /// @brief LSB の値を返す．
+  virtual
+  int
+  right_range_const() const;
 
   /// @brief ビット幅を返す．
   virtual
@@ -156,6 +166,16 @@ public:
   virtual
   ElbExpr*
   right_range() const;
+  
+  /// @brief MSB の値を返す．
+  virtual
+  int
+  left_range_const() const;
+  
+  /// @brief LSB の値を返す．
+  virtual
+  int
+  right_range_const() const;
 
   /// @brief ビット幅を返す．
   ymuint32
@@ -252,11 +272,29 @@ public:
   virtual
   bool
   is_signed() const;
+  
+  /// @brief MSB の値を返す．
+  virtual
+  int
+  left_range_const() const;
+  
+  /// @brief LSB の値を返す．
+  virtual
+  int
+  right_range_const() const;
 
   /// @brief ビット幅を返す．
   virtual
   ymuint32
   bit_size() const;
+
+  /// @brief オフセット値の取得
+  /// @param[in] index インデックス
+  /// @retval index のオフセット index が範囲内に入っている．
+  /// @retval -1 index が範囲外
+  virtual
+  int
+  bit_offset(int index) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -344,19 +382,6 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiParameter の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief LSB からのオフセット値の取得
-  /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
-  int
-  bit_offset(int index) const;
 
   
 private:

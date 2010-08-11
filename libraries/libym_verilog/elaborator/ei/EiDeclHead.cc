@@ -466,6 +466,20 @@ EiDeclHeadPtV::right_range() const
   return mRange.right_range();
 }
 
+// @brief MSB の値を返す．
+int
+EiDeclHeadPtV::left_range_const() const
+{
+  return mRange.left_range_const();
+}
+
+// @brief LSB の値を返す．
+int
+EiDeclHeadPtV::right_range_const() const
+{
+  return mRange.right_range_const();
+}
+
 // @brief ビット幅を返す．
 ymuint32
 EiDeclHeadPtV::bit_size() const

@@ -68,6 +68,16 @@ public:
   virtual
   ElbExpr*
   right_range() const = 0;
+  
+  /// @brief MSB の値を返す．
+  virtual
+  int
+  left_range_const() const = 0;
+  
+  /// @brief LSB の値を返す．
+  virtual
+  int
+  right_range_const() const = 0;
 
   /// @brief ビット幅を返す．
   /// @note このクラスでは 1 を返す．

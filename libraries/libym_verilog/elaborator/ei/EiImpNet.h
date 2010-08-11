@@ -81,12 +81,30 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+  
+  /// @brief MSB の値を返す．
+  virtual
+  int
+  left_range_const() const;
+  
+  /// @brief LSB の値を返す．
+  virtual
+  int
+  right_range_const() const;
 
   /// @brief ビット幅を返す．
   /// @note このクラスは 1 を返す．
   virtual
   ymuint32
   bit_size() const;
+
+  /// @brief オフセット値の取得
+  /// @param[in] index インデックス
+  /// @retval index のオフセット index が範囲内に入っている．
+  /// @retval -1 index が範囲外
+  virtual
+  int
+  bit_offset(int index) const;
   
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合

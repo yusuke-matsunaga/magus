@@ -71,17 +71,28 @@ public:
   virtual
   ElbExpr*
   right_range() const;
+  
+  /// @brief MSB の値を返す．
+  /// @note このクラスでは -1 を返す．
+  virtual
+  int
+  left_range_const() const;
+  
+  /// @brief LSB の値を返す．
+  /// @note このクラスでは -1 を返す．
+  virtual
+  int
+  right_range_const() const;
 
   /// @brief ビット幅を返す．
-  /// @note このクラスでは 1 を返す．
   virtual
   ymuint32
   bit_size() const = 0;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @retval index に対するオフセット index が範囲内に入っている時．
+  /// @retval -1 index が範囲外の時
   virtual
   int
   bit_offset(int index) const = 0;

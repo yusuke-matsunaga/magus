@@ -91,11 +91,40 @@ EiImpNet::value_type() const
   return pack(kVpiValueUS, 1);
 }
 
+// @brief MSB の値を返す．
+int
+EiImpNet::left_range_const() const
+{
+  return 0;
+}
+
+// @brief LSB の値を返す．
+int
+EiImpNet::right_range_const() const
+{
+  return 0;
+}
+
 // @brief ビット幅を返す．
 ymuint32
 EiImpNet::bit_size() const
 {
   return 1;
+}
+
+// @brief LSB からのオフセット値の取得
+// @param[in] index インデックス
+// @retval index の LSB からのオフセット index が範囲内に入っている．
+// @retval -1 index が範囲外
+int
+EiImpNet::bit_offset(int index) const
+{
+  if ( index == 0 ) {
+    return 0;
+  }
+  else {
+    return -1;
+  }
 }
   
 // @brief net 型の取得

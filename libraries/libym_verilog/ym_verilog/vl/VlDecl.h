@@ -58,23 +58,45 @@ public:
   is_signed() const = 0;
   
   /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
+  /// @retval 範囲のMSB 範囲指定を持つとき
+  /// @retval NULL 範囲指定を持たないとき
   virtual
   const VlExpr*
   left_range() const = 0;
 
   /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
+  /// @retval 範囲のLSB 範囲指定を持つとき
+  /// @retval NULL 範囲指定を持たないとき
   virtual
   const VlExpr*
   right_range() const = 0;
+  
+  /// @brief MSB の値を返す．
+  /// @retval 範囲のMSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  left_range_const() const = 0;
+  
+  /// @brief LSB の値を返す．
+  /// @retval 範囲のLSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  right_range_const() const = 0;
 
   /// @brief ビット幅を返す．
   virtual
   ymuint32
   bit_size() const = 0;
+
+  /// @brief オフセット値の取得
+  /// @param[in] index インデックス
+  /// @retval index に対するオフセット値 index が範囲内に入っている時．
+  /// @retval -1 index が範囲外の時
+  virtual
+  int
+  bit_offset(int index) const = 0;
 
   /// @brief データ型の取得
   /// @retval データ型 パラメータや変数の場合

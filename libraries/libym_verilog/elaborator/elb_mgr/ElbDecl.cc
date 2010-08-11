@@ -60,6 +60,22 @@ ElbDeclHead::right_range() const
   return NULL;
 }
 
+// @brief MSB の値を返す．
+// @note このクラスでは -1 を返す．
+int
+ElbDeclHead::left_range_const() const
+{
+  return -1;
+}
+
+// @brief LSB の値を返す．
+// @note このクラスでは -1 を返す．
+int
+ElbDeclHead::right_range_const() const
+{
+  return -1;
+}
+
 // @brief データ型の取得
 // @retval データ型 kParam, kLocalParam, kVar の場合
 // @retval kVpiVarNone 上記以外
@@ -361,12 +377,41 @@ ElbGenvar::is_signed() const
 {
   return true;
 }
+  
+// @brief MSB の値を返す．
+int
+ElbGenvar::left_range_const() const
+{
+  return kVpiSizeInteger - 1;
+}
+
+// @brief LSB の値を返す．
+int
+ElbGenvar::right_range_const() const
+{
+  return 0;
+}
 
 // @brief ビット幅を返す．
 ymuint32
 ElbGenvar::bit_size() const
 {
   return kVpiSizeInteger;
+}
+
+// @brief オフセット値の取得
+// @param[in] index インデックス
+// @retval index のオフセット index が範囲内に入っている．
+// @retval -1 index が範囲外
+int
+ElbGenvar::bit_offset(int index) const
+{
+  if ( 0 <= index && index < kVpiSizeInteger ) {
+    return index;
+  }
+  else {
+    return -1;
+  }
 }
 
 // @brief データ型の取得

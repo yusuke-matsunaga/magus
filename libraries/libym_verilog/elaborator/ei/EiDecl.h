@@ -94,11 +94,33 @@ public:
   virtual
   bool
   is_signed() const;
+  
+  /// @brief MSB の値を返す．
+  /// @retval 範囲のMSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  left_range_const() const;
+  
+  /// @brief LSB の値を返す．
+  /// @retval 範囲のLSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  right_range_const() const;
 
   /// @brief ビット幅を返す．
   virtual
   ymuint32
   bit_size() const;
+
+  /// @brief オフセット値の取得
+  /// @param[in] index インデックス
+  /// @retval index に対するオフセット値 index が範囲内に入っている時．
+  /// @retval -1 index が範囲外の時
+  virtual
+  int
+  bit_offset(int index) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -174,19 +196,6 @@ public:
   virtual
   ElbExpr*
   _right_range() const;
-  
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiDecl の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief LSB からのオフセット値の取得
-  /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
-  int
-  bit_offset(int index) const;
 
   
 private:

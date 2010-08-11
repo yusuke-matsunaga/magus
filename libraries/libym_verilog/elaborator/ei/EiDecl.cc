@@ -199,11 +199,39 @@ EiDecl::is_signed() const
   return mHead->is_signed() || mAuxSign;
 }
 
+// @brief MSB の値を返す．
+// @retval 範囲のMSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiDecl::left_range_const() const
+{
+  return mHead->left_range_const();
+}
+
+// @brief LSB の値を返す．
+// @retval 範囲のLSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiDecl::right_range_const() const
+{
+  return mHead->right_range_const();
+}
+
 // @brief ビット幅を返す．
 ymuint32
 EiDecl::bit_size() const
 {
   return mHead->bit_size();
+}
+
+// @brief オフセット値の取得
+// @param[in] index インデックス
+// @retval index に対するオフセット値 index が範囲内に入っている時．
+// @retval -1 index が範囲外の時
+int
+EiDecl::bit_offset(int index) const
+{
+  return mHead->bit_offset(index);
 }
 
 // @brief データ型の取得
@@ -293,16 +321,6 @@ ElbExpr*
 EiDecl::_right_range() const
 {
   return mHead->right_range();
-}
-
-// @brief LSB からのオフセット値の取得
-// @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDecl::bit_offset(int index) const
-{
-  return mHead->bit_offset(index);
 }
 
 
