@@ -133,6 +133,7 @@ AC_CONFIG_FILES([elaborator/elb_mgr/Makefile])
 AC_CONFIG_FILES([elaborator/ei/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/vltest/Makefile])
+AC_CONFIG_FILES([tests/ptview/Makefile])
 AC_CONFIG_FILES([tests/vlview/Makefile])
 
 

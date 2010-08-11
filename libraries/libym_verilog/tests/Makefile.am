@@ -4,7 +4,7 @@
 
 SUBDIRS = . vltest 
 if WITH_QT
-SUBDIRS += vlview
+SUBDIRS += ptview vlview
 endif
 
 INCLUDES = \

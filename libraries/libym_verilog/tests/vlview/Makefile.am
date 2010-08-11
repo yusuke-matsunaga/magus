@@ -2,7 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-include $(YMTOOLS_SRCDIR)/etc/autotroll.mk
+include $(top_srcdir)/../../etc/autotroll.mk
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -65,8 +65,8 @@ vlview_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
 vlview_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
 
 vlview_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(QT_LIBS) \
 	$(LIDADD)
 
