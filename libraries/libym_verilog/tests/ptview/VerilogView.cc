@@ -1,15 +1,15 @@
 
-/// @file libym_verilog/tests/ptview/PtView.cc
-/// @brief PtView の実装ファイル
+/// @file libym_verilog/tests/ptview/VerilogView.cc
+/// @brief VerilogView の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: PtView.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VerilogView.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "PtView.h"
+#include "VerilogView.h"
 #include <QTextEdit>
 #include <QHBoxLayout>
 #include <QFile>
@@ -19,7 +19,7 @@
   
 // @brief コンストラクタ
 // @param[in] parent 親のウィジェット
-PtView::PtView(QWidget* parent) :
+VerilogView::VerilogView(QWidget* parent) :
   QWidget(parent)
 {
   mTextEdit = new QTextEdit;
@@ -32,7 +32,7 @@ PtView::PtView(QWidget* parent) :
 }
 
 // @brief デストラクタ
-PtView::~PtView()
+VerilogView::~VerilogView()
 {
 }
 
@@ -40,7 +40,7 @@ PtView::~PtView()
 // @param[in] file_name ファイル名
 // @return 読み込みに成功したら true を返す．
 bool
-PtView::open(const char* file_name)
+VerilogView::open(const char* file_name)
 {
   using namespace std;
   
@@ -64,26 +64,29 @@ PtView::open(const char* file_name)
   return true;
 }
 
-// @brief 該当する箇所を表すカーソルを返す．
+// @brief カーソルの位置を該当する箇所にセットする．
+// @param[in] cursor 対象のカーソル
 // @param[in] start_line 開始位置の行番号
 // @param[in] start_column 開始位置のコラム番号
 // @param[in] end_line 終了位置の行番号
 // @param[in] end_column 終了位置のコラム番号
-QTextCursor*
-PtView::cursor(int start_line,
-	       int start_column,
-	       int end_line,
-	       int end_column)
+void
+VerilogView::set_cursor_pos(QTextCursor& cursor,
+			    int start_line,
+			    int start_column,
+			    int end_line,
+			    int end_column)
 {
-  QTextCursor* cursor = new QTextCursor(mTextEdit->document());
-  cursor->setPosition(xy2pos(start_line, start_column), QTextCursor::MoveAnchor);
-  cursor->setPosition(xy2pos(end_line, end_column), QTextCursor::KeepAnchor);
-  return cursor;
+  int start_pos = xy2pos(start_line, start_column) - 1;
+  int end_pos = xy2pos(end_line, end_column);
+  cursor.setPosition(start_pos, QTextCursor::MoveAnchor);
+  cursor.setPosition(end_pos, QTextCursor::KeepAnchor);
 }
-  
+
+#if 0
 // @brief 指定された領域を強調表示する．
 void
-PtView::hilight(QTextCursor* cursor)
+VerilogView::hilight(QTextCursor* cursor)
 {
   QList<QTextEdit::ExtraSelection> selections;
 
@@ -94,6 +97,7 @@ PtView::hilight(QTextCursor* cursor)
   selections.push_back(selection);
   mTextEdit->setExtraSelections(selections);
 }
+#endif
 
 // @brief 指定された領域を強調表示する．
 // @param[in] start_line 開始位置の行番号
@@ -101,17 +105,13 @@ PtView::hilight(QTextCursor* cursor)
 // @param[in] end_line 終了位置の行番号
 // @param[in] end_column 終了位置のコラム番号
 void
-PtView::hilight(int start_line,
-		int start_column,
-		int end_line,
-		int end_column)
+VerilogView::hilight(int start_line,
+		     int start_column,
+		     int end_line,
+		     int end_column)
 {
   QTextCursor cursor(mTextEdit->document());
-  int end_pos = xy2pos(end_line, end_column) + 1;
-  cursor.setPosition(end_pos, QTextCursor::MoveAnchor);
-  int start_pos = xy2pos(start_line, start_column);
-  cursor.setPosition(start_pos, QTextCursor::KeepAnchor);
-  
+  set_cursor_pos(cursor, start_line, start_column, end_line, end_column);
   mTextEdit->setTextCursor(cursor);
   mTextEdit->ensureCursorVisible();
 }
@@ -120,8 +120,8 @@ PtView::hilight(int start_line,
 // @param[in] line 行番号
 // @param[in] column コラム番号
 int
-PtView::xy2pos(int line,
-	       int column) const
+VerilogView::xy2pos(int line,
+		    int column) const
 {
   return mStartPos[line - 1] + column - 1;
 }

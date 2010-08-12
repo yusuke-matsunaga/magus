@@ -21,8 +21,8 @@ bin_PROGRAMS = \
 	ptview
 
 ptview_SOURCES = \
-	PtView.h \
-	PtView.cc \
+	VerilogView.h \
+	VerilogView.cc \
 	TokenList.h \
 	TokenList.cc \
 	TokenView.h \
@@ -54,7 +54,7 @@ ptview_SOURCES = \
 	ptview_main.cc
 
 nodist_ptview_SOURCES = \
-	PtView.moc.cc \
+	VerilogView.moc.cc \
 	TokenView.moc.cc \
 	ParseTreeView.moc.cc
 
@@ -71,7 +71,7 @@ ptview_LDADD = \
 	$(LIDADD)
 
 BUILT_SOURCES = \
-	PtView.moc.cc \
+	VerilogView.moc.cc \
 	TokenView.moc.cc \
 	ParseTreeView.moc.cc
 

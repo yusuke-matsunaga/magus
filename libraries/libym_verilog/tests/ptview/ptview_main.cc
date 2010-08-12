@@ -11,7 +11,7 @@
 
 #include <QApplication>
 #include <QSplitter>
-#include "PtView.h"
+#include "VerilogView.h"
 #include "TokenView.h"
 #include "TokenList.h"
 #include "ParseTreeModel.h"
@@ -44,7 +44,7 @@ main(int argc,
     lex.set_searchpath(splist);
   }
 
-  PtView* vlview = new PtView;
+  VerilogView* vlview = new VerilogView;
   TokenView* token_view = new TokenView;
   
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
@@ -89,7 +89,7 @@ main(int argc,
     return 1;
   }
   
-  PtView* vlview = new PtView;
+  VerilogView* vlview = new VerilogView;
   ParseTreeView* pt_view = new ParseTreeView;
   
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
