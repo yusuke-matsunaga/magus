@@ -1,11 +1,11 @@
-#ifndef TOKENLIST_H
-#define TOKENLIST_H
+#ifndef TOKENLISTMODEL_H
+#define TOKENLISTMODEL_H
 
-/// @file libym_verilog/tests/ptview/TokenList.h
-/// @brief TokenList のヘッダファイル
+/// @file libym_verilog/tests/ptview/TokenListModel.h
+/// @brief TokenListModel のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TokenList.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: TokenListModel.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
@@ -16,10 +16,10 @@
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TokenList TokenList.h
+/// @class TokenListModel TokenListModel.h
 /// @brief verilog のトークンリストを表すモデル
 //////////////////////////////////////////////////////////////////////
-class TokenList :
+class TokenListModel :
   public QAbstractTableModel
 {
   
@@ -29,10 +29,10 @@ public:
   
   /// @brief コンストラクタ
   /// @param[in] parent 親のオブジェクト
-  TokenList(QObject* parent = NULL);
+  TokenListModel(QObject* parent = NULL);
 
   /// @brief デストラクタ
-  ~TokenList();
+  ~TokenListModel();
   
 
 public:
@@ -106,4 +106,4 @@ private:
   
 };
 
-#endif // TOKENLIST_H
+#endif // TOKENLISTMODEL_H

@@ -13,7 +13,7 @@
 #include <QSplitter>
 #include "VerilogView.h"
 #include "TokenView.h"
-#include "TokenList.h"
+#include "TokenListModel.h"
 #include "ParseTreeModel.h"
 #include "ParseTreeView.h"
 
@@ -30,7 +30,7 @@ main(int argc,
   
   QApplication app(argc, argv);
   
-#if 0
+#if 1
   // Lexer を作る．
   MsgMgr msg_mgr;
   FileDescMgr fd_mgr;
@@ -54,7 +54,7 @@ main(int argc,
   splitter->setStretchFactor(1, 1);
   splitter->resize(800, 800);
 
-  TokenList* token_list = new TokenList;
+  TokenListModel* token_list_model = new TokenListModel;
   // ファイルのオープン
   if ( !lex.open_file(argv[1]) ) {
     cerr << argv[1] << " : could not open" << endl;
@@ -70,9 +70,9 @@ main(int argc,
     if ( id == EOF ) {
       break;
     }
-    token_list->add_token(id, lex.cur_token_loc(), lex.cur_string());
+    token_list_model->add_token(id, lex.cur_token_loc(), lex.cur_string());
   }
-  token_view->setModel(token_list);
+  token_view->setModel(token_list_model);
   
   if ( !vlview->open(argv[1]) ) {
     return 2;
@@ -110,7 +110,6 @@ main(int argc,
 
   QObject::connect(pt_view, SIGNAL(select_token(int, int, int, int)),
 		   vlview, SLOT(hilight(int, int, int, int)));
-
   
 #endif
   

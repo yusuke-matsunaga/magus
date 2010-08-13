@@ -15,7 +15,7 @@
 #include <ym_utils/FileRegion.h>
 
 
-class TokenList;
+class TokenListModel;
 class QItemSelection;
 
 //////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ public:
 
   /// @brief モデルをセットする．
   void
-  setModel(TokenList* token_list);
+  setModel(TokenListModel* model);
 
   
 signals:
@@ -75,7 +75,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 内容を表すモデル．
-  TokenList* mTokenList;
+  TokenListModel* mModel;
   
 };
 

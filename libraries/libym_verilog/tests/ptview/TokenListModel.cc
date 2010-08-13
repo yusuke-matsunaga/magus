@@ -1,15 +1,15 @@
 
-/// @file libym_verilog/tests/vlview/TokenList.cc
-/// @brief TokenList の実装ファイル
+/// @file libym_verilog/tests/vlview/TokenListModel.cc
+/// @brief TokenListModel の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TokenList.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: TokenListModel.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "TokenList.h"
+#include "TokenListModel.h"
 #include "Lex.h"
 #include "parser.h"
 #include "RsrvWordDic.h"
@@ -17,34 +17,34 @@
   
 // @brief コンストラクタ
 // @param[in] parent 親のオブジェクト
-TokenList::TokenList(QObject* parent) :
+TokenListModel::TokenListModel(QObject* parent) :
   QAbstractTableModel(parent)
 {
 }
 
 // @brief デストラクタ
-TokenList::~TokenList()
+TokenListModel::~TokenListModel()
 {
 }
 
 // @brief コラム数を返す．
 int
-TokenList::columnCount(const QModelIndex& /* parent */) const
+TokenListModel::columnCount(const QModelIndex& /* parent */) const
 {
   return 2;
 }
 
 // @brief 行数を返す．
 int
-TokenList::rowCount(const QModelIndex& /* parent */) const
+TokenListModel::rowCount(const QModelIndex& /* parent */) const
 {
   return mList.size();
 }
 
 // @brief 該当するデータを返す．
 QVariant
-TokenList::data(const QModelIndex& index,
-		  int role) const
+TokenListModel::data(const QModelIndex& index,
+		     int role) const
 {
   if ( !index.isValid() ) {
     return QVariant();
@@ -158,9 +158,9 @@ TokenList::data(const QModelIndex& index,
 // @param[in] file_region トークンのファイル上の位置
 // @param[in] str 文字列
 void
-TokenList::add_token(int id,
-		     const FileRegion& file_region,
-		     const char* str)
+TokenListModel::add_token(int id,
+			  const FileRegion& file_region,
+			  const char* str)
 {
   int row = mList.size();
   mList.push_back(Token(id, file_region, str));
@@ -170,15 +170,15 @@ TokenList::add_token(int id,
 }
   
 // @brief トークンのファイル上の位置を返す．
-const TokenList::FileRegion&
-TokenList::loc(int row_pos)
+const TokenListModel::FileRegion&
+TokenListModel::loc(int row_pos)
 {
   return mList.at(row_pos).mLoc;
 }
 
-TokenList::Token::Token(int id,
-			const FileRegion& file_region,
-			const char* str) :
+TokenListModel::Token::Token(int id,
+			     const FileRegion& file_region,
+			     const char* str) :
   mId(id),
   mLoc(file_region),
   mStr(str)

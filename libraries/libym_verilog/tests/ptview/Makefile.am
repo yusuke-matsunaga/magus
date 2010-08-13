@@ -23,8 +23,8 @@ bin_PROGRAMS = \
 ptview_SOURCES = \
 	VerilogView.h \
 	VerilogView.cc \
-	TokenList.h \
-	TokenList.cc \
+	TokenListModel.h \
+	TokenListModel.cc \
 	TokenView.h \
 	TokenView.cc \
 	ParseTreeModel.h \

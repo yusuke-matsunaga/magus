@@ -11,7 +11,7 @@
 
 #include "TokenView.h"
 #include <QTableView>
-#include "TokenList.h"
+#include "TokenListModel.h"
 
   
 // @brief コンストラクタ
@@ -30,10 +30,10 @@ TokenView::~TokenView()
 
 // @brief モデルをセットする．
 void
-TokenView::setModel(TokenList* token_list)
+TokenView::setModel(TokenListModel* model)
 {
-  mTokenList = token_list;
-  QTableView::setModel(token_list);
+  mModel = model;
+  QTableView::setModel(model);
 }
 
 // @brief selection が変化したときに呼ばれる関数
@@ -48,7 +48,7 @@ TokenView::selectionChanged(const QItemSelection& selected,
   if ( p.hasNext() ) {
     const QModelIndex& index = p.next();
     int row = index.row();
-    const FileRegion& file_region = mTokenList->loc(row);
+    const FileRegion& file_region = mModel->loc(row);
     emit select_token(file_region.start_line(),
 		      file_region.start_column(),
 		      file_region.end_line(),
