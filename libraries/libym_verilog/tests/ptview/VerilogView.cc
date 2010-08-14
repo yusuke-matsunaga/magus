@@ -50,17 +50,23 @@ VerilogView::open(const char* file_name)
 	 << qPrintable(file.errorString()) << endl;
     return false;
   }
-
-  int pos = 0;
+  // 全体を一回 contents に格納する．
   QTextStream in(&file);
-  while ( !in.atEnd() ) {
-    QString line = in.readLine();
-    mTextEdit->append(line);
-    mStartPos.push_back(pos);
-    pos += line.length() + 1;
+  QString contents = in.readAll();
+
+  // それを mTextEdit に設定する．
+  mTextEdit->clear();
+  mTextEdit->append(contents);
+
+  // 改行を調べて各行の開始位置を mStartPos に記録する．
+  int l = contents.length();
+  mStartPos.clear();
+  mStartPos.append(0);
+  for (int pos = 0; pos < l; ++ pos) {
+    if ( contents[pos] == '\n' ) {
+      mStartPos.append(pos + 1);
+    }
   }
-  // ちょっと美しくない Hack
-  mTextEdit->append(" ");
   return true;
 }
 
@@ -77,8 +83,24 @@ VerilogView::set_cursor_pos(QTextCursor& cursor,
 			    int end_line,
 			    int end_column)
 {
-  int start_pos = xy2pos(start_line, start_column) - 1;
-  int end_pos = xy2pos(end_line, end_column);
+  int start_pos = xy2pos(start_line, start_column);
+  int end_pos = xy2pos(end_line, end_column) + 1;
+  cursor.setPosition(start_pos, QTextCursor::MoveAnchor);
+  cursor.setPosition(end_pos, QTextCursor::KeepAnchor);
+}
+
+// @brief カーソルの位置を該当する箇所にセットする．
+// @param[in] cursor 対象のカーソル
+// @param[in] start_line 開始位置の行番号
+// @param[in] end_line 終了位置の行番号
+// @note こちらは行の先頭から行の末尾までを領域とする．
+void
+VerilogView::set_cursor_pos(QTextCursor& cursor,
+			    int start_line,
+			    int end_line)
+{
+  int start_pos = this->start_pos(start_line);
+  int end_pos = this->end_pos(end_line);
   cursor.setPosition(start_pos, QTextCursor::MoveAnchor);
   cursor.setPosition(end_pos, QTextCursor::KeepAnchor);
 }
@@ -116,6 +138,28 @@ VerilogView::hilight(int start_line,
   mTextEdit->ensureCursorVisible();
 }
 
+// @brief 指定された領域を強調表示する．
+// @param[in] start_line 開始位置の行番号
+// @param[in] end_line 終了位置の行番号
+// @note こちらは行の先頭から行の末尾までを領域とする．
+void
+VerilogView::hilight(int start_line,
+		     int end_line)
+{
+  QTextCursor cursor(mTextEdit->document());
+  set_cursor_pos(cursor, start_line, end_line);
+  mTextEdit->setTextCursor(cursor);
+  mTextEdit->ensureCursorVisible();
+}
+
+// @brief 指定された行を強調表示する．
+// @param[in] line 行番号
+void
+VerilogView::hilight(int line)
+{
+  hilight(line, line);
+}
+
 // @brief 行番号とコラム番号から絶対位置を取り出す．
 // @param[in] line 行番号
 // @param[in] column コラム番号
@@ -124,4 +168,20 @@ VerilogView::xy2pos(int line,
 		    int column) const
 {
   return mStartPos[line - 1] + column - 1;
+}
+
+// @brief 行頭の絶対位置を取り出す．
+// @param[in] line 行番号
+int
+VerilogView::start_pos(int line) const
+{
+  return mStartPos[line - 1];
+}
+
+// @brief 行末の絶対位置を取り出す．
+// @param[in] line 行番号
+int
+VerilogView::end_pos(int line) const
+{
+  return mStartPos[line] - 1;
 }

@@ -51,12 +51,15 @@ ptview_SOURCES = \
 	PtNode_expr.cc \
 	PtNode_misc.h \
 	PtNode_misc.cc \
+	GoToLine.h \
+	GoToLine.cc \
 	ptview_main.cc
 
 nodist_ptview_SOURCES = \
 	VerilogView.moc.cc \
 	TokenView.moc.cc \
-	ParseTreeView.moc.cc
+	ParseTreeView.moc.cc \
+	GoToLine.moc.cc
 
 ptview_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
 
@@ -73,5 +76,6 @@ ptview_LDADD = \
 BUILT_SOURCES = \
 	VerilogView.moc.cc \
 	TokenView.moc.cc \
-	ParseTreeView.moc.cc
+	ParseTreeView.moc.cc \
+	GoToLine.moc.cc
 
