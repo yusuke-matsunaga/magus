@@ -16,6 +16,7 @@
 
 class QTextEdit;
 class QTextCursor;
+class VerilogSyntaxHighlighter;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VerilogView VerilogView.h
@@ -129,6 +130,9 @@ private:
   
   // 各行の先頭の位置を記録する配列
   QList<int> mStartPos;
+
+  // syntax highlighter
+  VerilogSyntaxHighlighter* mHighlighter;
   
 };
 

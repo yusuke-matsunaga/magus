@@ -23,6 +23,8 @@ bin_PROGRAMS = \
 ptview_SOURCES = \
 	VerilogView.h \
 	VerilogView.cc \
+	VerilogSyntaxHighlighter.h \
+	VerilogSyntaxHighlighter.cc \
 	TokenListModel.h \
 	TokenListModel.cc \
 	TokenView.h \

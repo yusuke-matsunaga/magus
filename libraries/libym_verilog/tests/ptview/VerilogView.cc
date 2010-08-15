@@ -10,6 +10,7 @@
 
 
 #include "VerilogView.h"
+#include "VerilogSyntaxHighlighter.h"
 #include <QTextEdit>
 #include <QHBoxLayout>
 #include <QFile>
@@ -25,6 +26,8 @@ VerilogView::VerilogView(QWidget* parent) :
   mTextEdit = new QTextEdit;
   
   mTextEdit->setReadOnly(true);
+
+  mHighlighter = new VerilogSyntaxHighlighter(mTextEdit);
   
   QHBoxLayout* layout = new QHBoxLayout;
   layout->addWidget(mTextEdit);
