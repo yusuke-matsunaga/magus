@@ -1,11 +1,11 @@
-#ifndef VLPARSETREEMODEL_H
-#define VLPARSETREEMODEL_H
+#ifndef VERILOGMODEL_H
+#define VERILOGMODEL_H
 
-/// @file libym_verilog/tests/vlview/VlParseTreeModel.h
-/// @brief VlParseTreeModel のヘッダファイル
+/// @file libym_verilog/tests/vlview/VerilogModel.h
+/// @brief VerilogModel のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlParseTreeModel.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VerilogModel.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
@@ -19,23 +19,23 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 class VlMgr;
-class VlPtNode;
+class VmNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlParseTreeModel VlParseTreeModel.h
-/// @brief verilog のパース木を表すモデル
+/// @class VerilogModel VerilogModel.h
+/// @brief verilog の構造を表すモデル
 //////////////////////////////////////////////////////////////////////
-class VlParseTreeModel :
+class VerilogModel :
   public QAbstractItemModel
 {
 public:
   
   /// @brief コンストラクタ
   /// @param[in] parent 親のオブジェクト
-  VlParseTreeModel(QObject* parent = NULL);
+  VerilogModel(QObject* parent = NULL);
 
   /// @brief デストラクタ
-  ~VlParseTreeModel();
+  ~VerilogModel();
   
 
 public:
@@ -85,9 +85,9 @@ public:
   
 public:
 
-  /// @brief 関連するパース木をセットする．
+  /// @brief 関連するVerilog構造をセットする．
   void
-  set_pt(const VlMgr& vl_mgr);
+  set_vlmgr(const VlMgr& vl_mgr);
   
   /// @brief トークンのファイル上の位置を返す．
   FileRegion
@@ -97,7 +97,7 @@ public:
 private:
 
   /// @brief インデックスをノードに変換する．
-  VlPtNode*
+  VmNode*
   index2node(const QModelIndex& index) const;
 
   
@@ -107,10 +107,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 根のノード
-  VlPtNode* mRootNode;
+  VmNode* mRootNode;
   
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // VLPARSETREEMODEL_H
+#endif // VERILOGMODEL_H

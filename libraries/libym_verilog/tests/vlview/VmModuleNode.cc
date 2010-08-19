@@ -1,37 +1,36 @@
 
-/// @file libym_verilog/tests/vlview/VlPtNode_module.cc
+/// @file libym_verilog/tests/vlview/VmModuleNode.cc
 /// @brief VlPtNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_module.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VmModuleNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VlPtNode_module.h"
+#include "VmModuleNode.h"
 #include "VlPtNode_port.h"
 #include "VlPtNode_decl.h"
 #include "VlPtNode_item.h"
 #include "VlPtNode_misc.h"
-#include <ym_verilog/pt/PtModule.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-// クラス ModuleNode
+// クラス VmModuleNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] module Module を表すパース木
-ModuleNode::ModuleNode(const PtModule* module) :
+// @param[in] module Module の構造を表すオブジェクト
+VmModuleNode::VmModuleNode(const VlModule* module) :
   mModule(module)
 {
 }
 
 // @brief デストラクタ
-ModuleNode::~ModuleNode()
+VmModuleNode::~VmModuleNode()
 {
 }
 
@@ -39,12 +38,12 @@ ModuleNode::~ModuleNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-ModuleNode::data(int column,
-		 int role) const
+VmModuleNode::data(int column,
+		   int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Module";
+      return "vpiModule";
     }
     else if ( column == 1 ) {
       return mModule->name();
@@ -55,7 +54,7 @@ ModuleNode::data(int column,
 
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-ModuleNode::loc() const
+VmModuleNode::loc() const
 {
   return mModule->file_region();
 }
@@ -92,65 +91,90 @@ END_NONAMESPACE
 
 // @brief 子供の配列を作る．
 void
-ModuleNode::expand() const
+VmModuleNode::expand() const
 {
-  mChildren.push_back( new BoolNode("Cell Define", mModule->is_cell()) );
-  mChildren.push_back( new BoolNode("Protected", mModule->is_protected()) );
-  mChildren.push_back( new BoolNode("MacroModule", mModule->is_macromodule()) );
-  if ( mModule->time_unit() != -16 ) {
-    mChildren.push_back( new StrNode("Time Unit", unit2str(mModule->time_unit())) );
-    mChildren.push_back( new StrNode("Time Precision", unit2str(mModule->time_precision())) );
+  add_child("vpiDefName", mModule->def_name());
+  add_child("vpiFullName", mModule->full_name());
+  // vpiDefFile
+
+  const VlModuleArray* module_array = mModule->module_array();
+  bool is_array = (module_array != NULL);
+  add_child( new VmBoolNode("vpiArray", is_array) );
+  if ( is_array ) {
+    add_child("vpiModuleArray", module_array->full_name());
+    add_child( new VmIntNode("vpiIndex", mModule->index()) );
   }
-  mChildren.push_back( new NetTypeNode("Default Net Type", mModule->nettype()) );
-  mChildren.push_back( new UdNode(mModule->unconn_drive()) );
-  mChildren.push_back( new DelayModeNode(mModule->delay_mode()) );
+  add_child("vpiTopModule", mModule->is_top_module());
+  add_child("vpiCellInstance", mModule->is_cell());
+  add_child("vpiProtected", mModule->is_protected());
+  if ( mModule->time_unit() != -16 ) {
+    add_child("vpiTimeUnit", unit2str(mModule->time_unit())) );
+    add_child("vpiTimePrecision", unit2str(mModule->time_precision())) );
+  }
+  add_child( new VmNetTypeNode("vpiDefaultNetType", mModule->def_nettype()) );
+  add_child( new VmUdNode(mModule->unconn_drive()) );
+  add_child( new VmDelayModeNode(mModule->def_delay_mode()) );
+  add_child( new VmDelayModeNode(mModule->def_decay_time()) );
   
-  mChildren.push_back( new StrNode("Config", mModule->config().c_str()) );
-  mChildren.push_back( new StrNode("Library", mModule->library().c_str()) );
-  mChildren.push_back( new StrNode("Cell", mModule->cell().c_str()) );
+  add_child("Config", mModule->config().c_str()) );
+  add_child("Library", mModule->library().c_str()) );
+  add_child("Cell", mModule->cell().c_str()) );
   
+  for (ymuint i = 0; i < mModule->port_num(); ++ i) {
+    put_port("vpiPort", mgr, module->port(i));
+  }
+  for (ymuint i = 0; i < mModule->io_num(); ++ i) {
+    put_iodecl("vpiIODecl", mgr, module->io(i));
+  }
+  
+  put_scope_sub(mgr, module);
+  
+  vector<const VlProcess*> process_list;
+  if ( mgr.find_process_list(mModule, process_list) ) {
+    put_process_list("vpiProcess", mgr, process_list);
+  }
   if ( mModule->paramport_array().size() > 0 ) {
-    mChildren.push_back( new DeclHeadListNode("Parameter Port",
+    add_child( new DeclHeadListNode("Parameter Port",
 					      mModule->paramport_array()) );
   }
   if ( mModule->port_num() > 0 ) {
-    mChildren.push_back( new ModulePortListNode(mModule) );
+    add_child( new ModulePortListNode(mModule) );
   }
   if ( mModule->iohead_array().size() > 0 ) {
-    mChildren.push_back( new IOHeadListNode(mModule->iohead_array()) );
+    add_child( new IOHeadListNode(mModule->iohead_array()) );
   }
   if ( mModule->paramhead_array().size() > 0 ) {
-    mChildren.push_back( new DeclHeadListNode("Parameter",
+    add_child( new DeclHeadListNode("Parameter",
 					      mModule->paramhead_array()) );
   }
   if ( mModule->localparamhead_array().size() > 0 ) {
-    mChildren.push_back( new DeclHeadListNode("Localparam",
+    add_child( new DeclHeadListNode("Localparam",
 					      mModule->localparamhead_array()) );
   }
   if ( mModule->declhead_array().size() > 0 ) {
-    mChildren.push_back( new DeclHeadListNode("Decl",
+    add_child( new DeclHeadListNode("Decl",
 					      mModule->declhead_array()) );
   }
   if ( mModule->item_array().size() > 0 ) {
-    mChildren.push_back( new ItemListNode("Item",
+    add_child( new ItemListNode("Item",
 					  mModule->item_array()) );
   }
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ModulePortListNode
+// クラス VmModulePortListNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] module Module を表すパース木
-ModulePortListNode::ModulePortListNode(const PtModule* module) :
+VmModulePortListNode::VmModulePortListNode(const VlModule* module) :
   mModule(module)
 {
 }
 
 // @brief デストラクタ
-ModulePortListNode::~ModulePortListNode()
+VmModulePortListNode::~VmModulePortListNode()
 {
 }
 
@@ -158,12 +182,12 @@ ModulePortListNode::~ModulePortListNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-ModulePortListNode::data(int column,
-			 int role) const
+VmModulePortListNode::data(int column,
+			   int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Module Port List";
+      return "vpiPortList";
     }
     else if ( column == 1 ) {
       return "";
@@ -174,18 +198,17 @@ ModulePortListNode::data(int column,
     
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-ModulePortListNode::loc() const
+VmModulePortListNode::loc() const
 {
   return FileRegion();
 }
 
 // @brief 子供の配列を作る．
 void
-ModulePortListNode::expand() const
+VmModulePortListNode::expand() const
 {
-  mChildren.resize(mModule->port_num());
-  for (ymuint32 i = 0; i < mModule->port_num(); ++ i) {
-    mChildren[i] = new PortNode(mModule->port(i));
+  for (ymuint i = 0; i < mModule->port_num(); ++ i) {
+    add_child( new VmPortNode(mModule->port(i)) );
   }
 }
 

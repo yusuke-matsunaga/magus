@@ -1,5 +1,5 @@
-#ifndef VLPTNODE_MODULE_H
-#define VLPTNODE_MODULE_H
+#ifndef VMMODULEMODE_H
+#define VMMODULEMODE_H
 
 /// @file libym_verilog/tests/vlview/VlPtNode_module.h
 /// @brief VlPtNode のヘッダファイル
@@ -11,29 +11,30 @@
 /// All rights reserved.
 
 
-#include "VlPtNode.h"
+#include "VmNode.h"
 #include <ym_verilog/verilog.h>
-#include <ym_verilog/pt/PtP.h>
+#include <ym_verilog/vl/VlModule.h>
+#include <ym_verilog/vl/VlPort.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class ModuleNode VlPtNodeImpl.h
+/// @class VmModuleNode VmModuleNode.h "VmModuleNode.h"
 /// @brief Module を表すノード
 //////////////////////////////////////////////////////////////////////
-class ModuleNode :
-  public VlPtNode
+class VmModuleNode :
+  public VmNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] module Module を表すパース木
-  ModuleNode(const PtModule* module);
+  /// @param[in] module Module の構造を表すオブジェクト
+  VmModuleNode(const VlModule* module);
 
   /// @brief デストラクタ
   virtual
-  ~ModuleNode();
+  ~VmModuleNode();
 
 
 public:
@@ -66,27 +67,27 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対応する Module
-  const PtModule* mModule;
+  const VlModule* mModule;
   
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ModulePortListNode VlPtNodeImpl.h
+/// @class VmModulePortListNode VmModuleNodeImpl.h
 /// @brief Module Port のリストを表すノード
 //////////////////////////////////////////////////////////////////////
-class ModulePortListNode :
+class VmModulePortListNode :
   public VlPtNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] module Module を表すパース木
-  ModulePortListNode(const PtModule* module);
+  /// @param[in] module Module の構造を表すオブジェクト
+  VmModulePortListNode(const VlModule* module);
 
   /// @brief デストラクタ
   virtual
-  ~ModulePortListNode();
+  ~VmModulePortListNode();
 
 
 public:
@@ -119,10 +120,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対応する Module
-  const PtModule* mModule;
+  const VlModule* mModule;
   
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // VLPARSETREEMODEL_H
+#endif // VMMODULEMODE_H

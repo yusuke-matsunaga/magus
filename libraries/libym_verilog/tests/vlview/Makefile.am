@@ -6,10 +6,7 @@ include $(top_srcdir)/../../etc/autotroll.mk
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/parser/include \
-	-I$(top_srcdir)/parser/scanner \
-	-I$(top_builddir)/parser/main
+	-I$(YMTOOLS_BUILDDIR)/include
 
 EXTRA_DIST =
 
@@ -23,40 +20,35 @@ bin_PROGRAMS = \
 vlview_SOURCES = \
 	VlView.h \
 	VlView.cc \
-	VlTokenList.h \
-	VlTokenList.cc \
-	VlTokenView.h \
-	VlTokenView.cc \
-	VlParseTreeModel.h \
-	VlParseTreeModel.cc \
-	VlParseTreeView.h \
-	VlParseTreeView.cc \
-	VlPtNode.h \
-	VlPtNode.cc \
-	VlPtNode_root.h \
-	VlPtNode_root.cc \
-	VlPtNode_udp.h \
-	VlPtNode_udp.cc \
-	VlPtNode_module.h \
-	VlPtNode_module.cc \
-	VlPtNode_port.h \
-	VlPtNode_port.cc \
-	VlPtNode_decl.h \
-	VlPtNode_decl.cc \
-	VlPtNode_item.h \
-	VlPtNode_item.cc \
-	VlPtNode_stmt.h \
-	VlPtNode_stmt.cc \
-	VlPtNode_expr.h \
-	VlPtNode_expr.cc \
-	VlPtNode_misc.h \
-	VlPtNode_misc.cc \
+	VerilogModel.h \
+	VerilogModel.cc \
+	VerilogView.h \
+	VerilogView.cc \
+	VmNode.h \
+	VmNode.cc \
+	VmNode_root.h \
+	VmNode_root.cc \
+	VmNode_udp.h \
+	VmNode_udp.cc \
+	VmNode_module.h \
+	VmNode_module.cc \
+	VmNode_port.h \
+	VmNode_port.cc \
+	VmNode_decl.h \
+	VmNode_decl.cc \
+	VmNode_item.h \
+	VmNode_item.cc \
+	VmNode_stmt.h \
+	VmNode_stmt.cc \
+	VmNode_expr.h \
+	VmNode_expr.cc \
+	VmNode_misc.h \
+	VmNode_misc.cc \
 	vlview_main.cc
 
 nodist_vlview_SOURCES = \
 	VlView.moc.cc \
-	VlTokenView.moc.cc \
-	VlParseTreeView.moc.cc
+	VerilogView.moc.cc
 
 vlview_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
 
@@ -72,6 +64,5 @@ vlview_LDADD = \
 
 BUILT_SOURCES = \
 	VlView.moc.cc \
-	VlTokenView.moc.cc \
-	VlParseTreeView.moc.cc
+	VerilogView.moc.cc
 

@@ -1,11 +1,11 @@
-#ifndef VLPTNODE_H
-#define VLPTNODE_H
+#ifndef VMNODE_H
+#define VMNODE_H
 
-/// @file libym_verilog/tests/vlview/VlPtNode.h
-/// @brief VlPtNode のヘッダファイル
+/// @file libym_verilog/tests/vlview/VmNode.h
+/// @brief VmNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VmNode.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
@@ -19,21 +19,21 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPtNode VlPtNode.h
-/// @brief verilog のパース木を表示するためのモデル
+/// @class VmNode VmNode.h
+/// @brief verilog の構造を表示するためのモデル
 //////////////////////////////////////////////////////////////////////
-class VlPtNode
+class VmNode
 {
-  friend class VlParseTreeModel;
+  friend class VerilogModel;
   
 public:
   
   /// @brief コンストラクタ
-  VlPtNode();
+  VmNode();
 
   /// @brief デストラクタ
   virtual
-  ~VlPtNode();
+  ~VmNode();
   
   
 public:
@@ -48,7 +48,7 @@ public:
 
   /// @brief 子供を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < row_num() )
-  VlPtNode*
+  VmNode*
   child(int pos) const;
 
   /// @brief データを返す．
@@ -63,8 +63,32 @@ public:
   virtual
   FileRegion
   loc() const = 0;
-  
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスが用いる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 子供を追加する．
+  void
+  add_child(VmNode* node) const;
+
+  /// @brief 文字列型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  add_child(const QString& label,
+	    const QString& value) const;
+
+  /// @brief ブール型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  add_child(const QString& label,
+	    bool value) const;
     
+
 private:
 
   /// @brief 子供の配列を作る．
@@ -84,50 +108,10 @@ private:
   // 子供の配列を作っているかを示すフラグ
   mutable
   bool mExpanded;
-
-
-protected:
   
   // 子供の配列
   mutable
-  std::vector<VlPtNode*> mChildren;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class VlPtScalarNode VlPtNode_misc.h
-/// @brief スカラー値を表すノード
-//////////////////////////////////////////////////////////////////////
-class VlPtScalarNode :
-  public VlPtNode
-{
-public:
-
-  /// @brief コンストラクタ
-  VlPtScalarNode();
-
-  /// @brief デストラクタ
-  virtual
-  ~VlPtScalarNode();
-
-
-public:
-    
-  /// @brief 対象のファイル上での位置を返す．
-  /// @note このクラスでは空の FileRegion を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-
-  /// @brief 子供の配列を作る．
-  /// @note このクラスではなにもしない．
-  virtual
-  void
-  expand() const;
+  std::vector<VmNode*> mChildren;
   
 };
 
@@ -139,7 +123,7 @@ private:
 // @brief 親のインデックスを返す．
 inline
 QModelIndex
-VlPtNode::parent_index() const
+VmNode::parent_index() const
 {
   return mParentIndex;
 }
@@ -147,7 +131,7 @@ VlPtNode::parent_index() const
 // @brief 子供の数を返す．
 inline
 int
-VlPtNode::child_num() const
+VmNode::child_num() const
 {
   if ( !mExpanded ) {
     expand();
@@ -159,8 +143,8 @@ VlPtNode::child_num() const
 // @brief 子供を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < row_num() )
 inline
-VlPtNode*
-VlPtNode::child(int pos) const
+VmNode*
+VmNode::child(int pos) const
 {
   if ( !mExpanded ) {
     expand();
@@ -171,4 +155,4 @@ VlPtNode::child(int pos) const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // VLPARSETREEMODEL_H
+#endif // VMNODE_H

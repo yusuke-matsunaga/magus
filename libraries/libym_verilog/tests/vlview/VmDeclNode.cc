@@ -1,146 +1,31 @@
 
-/// @file libym_verilog/tests/vlview/VlPtNode_decl.cc
-/// @brief VlPtNode の実装ファイル
+/// @file libym_verilog/tests/vlview/VmDeclNode.cc
+/// @brief VlDeclNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_decl.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VmDeclNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VlPtNode_decl.h"
-#include "VlPtNode_expr.h"
-#include "VlPtNode_misc.h"
-#include <ym_verilog/pt/PtDecl.h>
-#include <ym_verilog/pt/PtArray.h>
+#include "VmDeclNode.h"
+#include "VmExprNode.h"
+#include "VmMiscNode.h"
+#include "ym_verilog/vl/VlIODecl.h"
+#include "ym_verilog/vl/VlDecl.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+#if 0
 //////////////////////////////////////////////////////////////////////
-// クラス IOHeadListNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] iohead_array IO宣言ヘッダの配列
-IOHeadListNode::IOHeadListNode(const PtIOHeadArray& iohead_array) :
-  mIOHeadArray(iohead_array)
-{
-}
-
-// @brief デストラクタ
-IOHeadListNode::~IOHeadListNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-IOHeadListNode::data(int column,
-		     int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "IO Header List";
-    }
-    else if ( column == 1 ) {
-      return "";
-    }
-  }
-  return QVariant();
-}
-    
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-IOHeadListNode::loc() const
-{
-  return FileRegion();
-}
-
-// @brief 子供の配列を作る．
-void
-IOHeadListNode::expand() const
-{
-   ymuint32 n = mIOHeadArray.size();
-   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
-    mChildren[i] = new IOHeadNode(mIOHeadArray[i]);
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス IOHeadNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] expr 式
-IOHeadNode::IOHeadNode(const PtIOHead* iohead) :
-  mIOHead(iohead)
-{
-}
-
-// @brief デストラクタ
-IOHeadNode::~IOHeadNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-IOHeadNode::data(int column,
-		 int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      switch ( mIOHead->type() ) {
-      case kPtIO_Input:  return "Input";
-      case kPtIO_Output: return "Output";
-      case kPtIO_Inout:  return "Inout";
-      }
-    }
-    else if ( column == 1 ) {
-      return "";
-    }
-  }
-  return QVariant();
-}
-    
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-IOHeadNode::loc() const
-{
-  return mIOHead->file_region();
-}
-
-// @brief 子供の配列を作る．
-void
-IOHeadNode::expand() const
-{
-  if ( mIOHead->aux_type() != kVpiAuxNone ) {
-    mChildren.push_back( new AuxTypeNode(mIOHead->aux_type(),
-					 mIOHead->net_type(),
-					 mIOHead->var_type()) );
-  }
-  mChildren.push_back( new BoolNode("Signed", mIOHead->is_signed()) );
-  if ( mIOHead->left_range() ) {
-    mChildren.push_back( new ExprNode("Left Range", mIOHead->left_range()) );
-    mChildren.push_back( new ExprNode("Right Range", mIOHead->right_range()) );
-  }
-  mChildren.push_back( new IOItemListNode(mIOHead) );
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス IOItemListNode
+// クラス VmIODeclListNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] iohead IO宣言ヘッダ
-IOItemListNode::IOItemListNode(const PtIOHead* iohead) :
+VmIODeclListNode::VmIODeclListNode(const PtIOHead* iohead) :
   mIOHead(iohead)
 {
 }
@@ -185,21 +70,21 @@ IOItemListNode::expand() const
     mChildren[i] = new IOItemNode(mIOHead->item(i));
   }
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
-// クラス IOItemNode
+// クラス VmIODeclNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] expr 式
-IOItemNode::IOItemNode(const PtIOItem* item) :
-  mIOItem(item)
+VlIODeclNode::VlIODeclNode(const VlIODecl* io) :
+  mIODecl(io)
 {
 }
 
 // @brief デストラクタ
-IOItemNode::~IOItemNode()
+VlIODeclNode::~VlIODeclNode()
 {
 }
 
@@ -207,15 +92,15 @@ IOItemNode::~IOItemNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-IOItemNode::data(int column,
-		 int role) const
+VlIODeclNode::data(int column,
+		   int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "IO Item";
+      return "IO decl";
     }
     else if ( column == 1 ) {
-      return mIOItem->name();
+      return mIODecl->name();
     }
   }
   return QVariant();
@@ -223,15 +108,39 @@ IOItemNode::data(int column,
     
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-IOItemNode::loc() const
+VlIODeclNode::loc() const
 {
-  return mIOItem->file_region();
+  return mIODecl->file_region();
 }
 
 // @brief 子供の配列を作る．
 void
-IOItemNode::expand() const
+VlIODeclNode::expand() const
 {
+  add_child( new VmDirectionNode(mIODecl->direction()) );
+  add_child("vpiSigned", mIODecl->is_signed());
+  add_child("vpiScalar", mIODecl->is_scalar());
+  add_child("vpiVector", mIODecl->is_vector());
+  add_child("vpiSize", mIODecl->bit_size());
+
+  const VlModule* module = mIODecl->module();
+  if ( module ) {
+    add_child("vpiModule", module->full_name());
+  }
+  const VlUdpDefn* udp = mIODecl->udp_defn();
+  if ( udp ) {
+    add_child("vpiUdpDefn", udp->def_name());
+  }
+  const VlTask* task = mIODecl->task();
+  if ( task ) {
+    add_child("vpiTask", task->full_name());
+  }
+  const VlFunction* func = mIODecl->function();
+  if ( func ) {
+    add_child("vpiFunction", func->full_name());
+  }
+  add_child("vpiLeftRange", mIODecl->left_range());
+  add_child("vpiRightRange", mIODecl->right_range());
 }
 
 
@@ -460,18 +369,18 @@ DeclItemListNode::expand() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス DeclItemNode
+// クラス VmDeclNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] expr 式
-DeclItemNode::DeclItemNode(const PtDeclItem* item) :
-  mDeclItem(item)
+VmDeclNode::VmDeclNode(const VlDecl* decl) :
+  mDecl(decl)
 {
 }
 
 // @brief デストラクタ
-DeclItemNode::~DeclItemNode()
+VmDeclNode::~VmDeclNode()
 {
 }
 
@@ -479,15 +388,15 @@ DeclItemNode::~DeclItemNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-DeclItemNode::data(int column,
+VmDeclNode::data(int column,
 		 int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Decl Item";
+      return "Decl";
     }
     else if ( column == 1 ) {
-      return mDeclItem->name();
+      return mDecl->name();
     }
   }
   return QVariant();
@@ -495,20 +404,72 @@ DeclItemNode::data(int column,
     
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-DeclItemNode::loc() const
+VmDeclNode::loc() const
 {
-  return mDeclItem->file_region();
+  return mDecl->file_region();
 }
 
 // @brief 子供の配列を作る．
 void
-DeclItemNode::expand() const
+VmDeclNode::expand() const
 {
-  if ( mDeclItem->dimension_list_size() > 0 ) {
-    mChildren.push_back( new RangeListNode(mDeclItem) );
+  const char* nm = NULL;
+  switch ( mDecl->type() ) {
+  case kVpiNet:             nm = "Net"; break;
+  case kVpiNetArray:        nm = "NetArray"; break;
+  case kVpiReg:             nm = "Reg"; break;
+  case kVpiRegArray:        nm = "RegArray"; break;
+  case kVpiIntegerVar:      nm = "IntegerVar"; break;
+  case kVpiRealVar:         nm = "RealVar"; break;
+  case kVpiTimeVar:         nm = "TimeVar"; break;
+  case kVpiVarSelect:       nm = "VarSelect"; break;
+  case kVpiNamedEvent:      nm = "NamedEvent"; break;
+  case kVpiNamedEventArray: nm = "NamedEventArray"; break;
+  case kVpiParameter:       nm = "Parameter"; break;
+  case kVpiSpecParam:       nm = "SpecParam"; break;
+  default: assert_not_reached( __FILE__, __LINE__ );
   }
-  if ( mDeclItem->init_value() ) {
-    mChildren.push_back( new ExprNode("Initial Value", mDeclItem->init_value()) );
+  add_child("vpiType", nm);
+  add_child("vpiFullName", mDecl->full_name());
+  add_child("vpiExpanded", mDecl->is_expanded());
+  add_child("vpiImplicitDecl", mDecl->is_implicit_decl());
+  add_child("vpiNetDeclAssign", mDecl->has_net_decl_assign());
+  add_child("vpiScalar", mDecl->is_scalar());
+  add_child("vpiVector", mDecl->is_vector());
+  add_child("vpiExplicitScalar", mDecl->is_explicit_scalar());
+  add_child("vpiExplicitVector", mDecl->is_explicit_vector());
+  add_child("vpiSigned", mDecl->is_signed());
+  add_child("vpiSize", mDecl->bit_size());
+  add_child("vpiModule", mDecl->parent_module()->full_name());
+  add_child("vpiScope", mDecl->parent()->full_name());
+  add_child("vpiArray", mDecl->is_array());
+  add_child("vpiMultiArray", mDecl->is_multi_array());
+  // 親の配列
+
+  ymuint n = mDecl->dimension();
+  for (ymuint i = 0; i < n; ++ i) {
+    add_child( new VmRangeNode("vpiRange", mDecl->range(i)) );
+  }
+
+  if ( mDecl->type() == kVpiNet ) {
+    add_child( new VmStrengthValNode("vpiStrength0", mDecl->drive0()) );
+    add_child( new VmStrengthValNode("vpiStrength1", mDecl->drive1()) );
+    add_child( new VmStrengthValNode("vpiChargeStrength", mDecl->charge()) );
+    add_child( new VmDelayNode("vpiDelay", mDecl->delay()) );
+  }
+
+  add_child( new VmExprNode("vpiIndex", mDecl->index()) );
+
+  if ( mDecl->port_inst() ) {
+    add_child( new VmExprNode("vpiPortInst", mDecl->port_inst()) );
+  }
+  if ( mDecl->ports() ) {
+    add_child( new VmExprNode("vpiPorts", mDecl->ports()) );
+  }
+
+  if ( mDecl->left_range() ) {
+    add_child( new VmExprNode("vpiLeftRange", mDecl->left_range()) );
+    add_child( new VmExprNode("vpiRightRange", mDecl->right_range()) );
   }
 }
 
@@ -567,18 +528,18 @@ RangeListNode::expand() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス RangeNode
+// クラス VmRangeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] range 範囲
-RangeNode::RangeNode(const PtRange* range) :
+VmRangeNode::VmRangeNode(const VlRange* range) :
   mRange(range)
 {
 }
 
 // @brief デストラクタ
-RangeNode::~RangeNode()
+VmRangeNode::~VmRangeNode()
 {
 }
 
@@ -586,8 +547,8 @@ RangeNode::~RangeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-RangeNode::data(int column,
-		int role) const
+VmRangeNode::data(int column,
+		  int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -611,11 +572,8 @@ RangeNode::loc() const
 void
 RangeNode::expand() const
 {
-  mChildren.resize(2);
-  mChildren[0] = new ExprNode("Left Range", mRange->left());
-  mChildren[1] = new ExprNode("Right Range", mRange->left());
+  add_child( new VmExprNode("vpiLeftRange", mRange->left()) );
+  add_child( new VmExprNode("vpiRightRange", mRange->right()) );
 }
-
-
 
 END_NAMESPACE_YM_VERILOG

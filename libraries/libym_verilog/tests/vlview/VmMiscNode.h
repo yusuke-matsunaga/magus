@@ -1,30 +1,29 @@
-#ifndef VLPTNODE_MISC_H
-#define VLPTNODE_MISC_H
+#ifndef VMMISCNODE_H
+#define VMMISCNODE_H
 
-/// @file libym_verilog/tests/vlview/VlPtNode_misc.h
-/// @brief VlPtNode のヘッダファイル
+/// @file libym_verilog/tests/vlview/VmMiscNode.h
+/// @brief VmNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_misc.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VmMiscNode.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VlPtNode.h"
+#include "VmNode.h"
 #include <ym_verilog/verilog.h>
-#include <ym_verilog/pt/PtP.h>
-#include <ym_verilog/pt/PtArray.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+#if 0
 //////////////////////////////////////////////////////////////////////
-/// @class ControlNode VlPtNode_misc.h
+/// @class ControlNode VmMiscNode.h
 /// @brief Control を表すノード
 //////////////////////////////////////////////////////////////////////
 class ControlNode :
-  public VlPtNode
+  public VmNode
 {
 public:
 
@@ -72,167 +71,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ConnectionListNode VlPtNode_misc.h
-/// @brief Connection のリストを表すノード
-//////////////////////////////////////////////////////////////////////
-class ConnectionListNode :
-  public VlPtNode
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] con_array 接続のリスト
-  ConnectionListNode(const PtConnectionArray& con_array);
-
-  /// @brief デストラクタ
-  ~ConnectionListNode();
-
-
-public:
-
-  /// @brief データを返す．
-  /// @param[in] column コラム番号
-  /// @param[in] role 
-  virtual
-  QVariant
-  data(int column,
-       int role) const;
-    
-  /// @brief 対象のファイル上での位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-
-  /// @brief 子供の配列を作る．
-  virtual
-  void
-  expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 接続のリスト
-  PtConnectionArray mConArray;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class ConnectionNode VlPtNode_misc.h
-/// @brief Connection を表すノード
-//////////////////////////////////////////////////////////////////////
-class ConnectionNode :
-  public VlPtNode
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] con 接続
-  ConnectionNode(const PtConnection* con);
-
-  /// @brief デストラクタ
-  ~ConnectionNode();
-
-
-public:
-
-  /// @brief データを返す．
-  /// @param[in] column コラム番号
-  /// @param[in] role 
-  virtual
-  QVariant
-  data(int column,
-       int role) const;
-    
-  /// @brief 対象のファイル上での位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-
-  /// @brief 子供の配列を作る．
-  virtual
-  void
-  expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 接続を表すパース木
-  const PtConnection* mCon;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class StrengthNode VlPtNode_misc.h
-/// @brief strength 情報を表すノード
-//////////////////////////////////////////////////////////////////////
-class StrengthNode :
-  public VlPtNode
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] strength strength 情報
-  StrengthNode(const PtStrength* strength);
-
-  /// @brief デストラクタ
-  ~StrengthNode();
-
-
-public:
-
-  /// @brief データを返す．
-  /// @param[in] column コラム番号
-  /// @param[in] role 
-  virtual
-  QVariant
-  data(int column,
-       int role) const;
-    
-  /// @brief 対象のファイル上での位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-
-  /// @brief 子供の配列を作る．
-  virtual
-  void
-  expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // strength 情報
-  const PtStrength* mStrength;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class DelayNode VlPtNode_misc.h
+/// @class DelayNode VmMiscNode.h
 /// @brief 遅延情報を表すノード
 //////////////////////////////////////////////////////////////////////
 class DelayNode :
-  public VlPtNode
+  public VmNode
 {
 public:
 
@@ -277,36 +120,30 @@ private:
   const PtDelay* mDelay;
   
 };
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class NameBranchListNode VlPtNode_misc.h
-/// @brief NameBranch のリストを表すノード
+/// @class VmScalarNode VmMiscNode.h
+/// @brief スカラー値を表すノード
 //////////////////////////////////////////////////////////////////////
-class NameBranchListNode :
-  public VlPtNode
+class VmScalarNode :
+  public VmNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name_branch_list 階層名のリスト
-  NameBranchListNode(const PtNameBranchArray& name_branch_list);
+  VmScalarNode();
 
   /// @brief デストラクタ
-  ~NameBranchListNode();
+  virtual
+  ~VmScalarNode();
 
 
 public:
-
-  /// @brief データを返す．
-  /// @param[in] column コラム番号
-  /// @param[in] role 
-  virtual
-  QVariant
-  data(int column,
-       int role) const;
     
   /// @brief 対象のファイル上での位置を返す．
+  /// @note このクラスでは空の FileRegion を返す．
   virtual
   FileRegion
   loc() const;
@@ -315,80 +152,20 @@ public:
 private:
 
   /// @brief 子供の配列を作る．
+  /// @note このクラスではなにもしない．
   virtual
   void
   expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 階層名の配列
-  PtNameBranchArray mNameBranchArray;
   
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class NameBranchNode VlPtNode_misc.h
-/// @brief NameBranch を表すノード
-//////////////////////////////////////////////////////////////////////
-class NameBranchNode :
-  public VlPtNode
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] name_branch 1階層分のデータ
-  NameBranchNode(const PtNameBranch* name_branch);
-
-  /// @brief デストラクタ
-  ~NameBranchNode();
-
-
-public:
-
-  /// @brief データを返す．
-  /// @param[in] column コラム番号
-  /// @param[in] role 
-  virtual
-  QVariant
-  data(int column,
-       int role) const;
-    
-  /// @brief 対象のファイル上での位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-
-  /// @brief 子供の配列を作る．
-  virtual
-  void
-  expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 階層名のデータ
-  const PtNameBranch* mNameBranch;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class StrNode VlPtNode_misc.h
+/// @class VmStrNode VmMiscNode.h
 /// @brief 文字列を表すノード
 //////////////////////////////////////////////////////////////////////
-class StrNode :
-  public VlPtScalarNode
+class VmStrNode :
+  public VmScalarNode
 {
   
 public:
@@ -396,12 +173,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] str 文字列
-  StrNode(const QString& label,
+  VmStrNode(const QString& label,
 	  const QString& str);
 
   /// @brief デストラクタ
   virtual
-  ~StrNode();
+  ~VmStrNode();
 
 
 public:
@@ -430,11 +207,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AuxTypeNode VlPtNode_misc.h
+/// @class VmAuxTypeNode VmMiscNode.h
 /// @brief 補助的なデータ型を表すノード
 //////////////////////////////////////////////////////////////////////
-class AuxTypeNode :
-  public VlPtScalarNode
+class VmAuxTypeNode :
+  public VmScalarNode
 {
 public:
 
@@ -442,13 +219,13 @@ public:
   /// @param[in] aux_type 補助的なデータ型
   /// @param[in] net_type ネットの型
   /// @param[in] var_type 変数の型
-  AuxTypeNode(tVpiAuxType aux_type,
-	      tVpiNetType net_type,
-	      tVpiVarType var_type);
+  VmAuxTypeNode(tVpiAuxType aux_type,
+		tVpiNetType net_type,
+		tVpiVarType var_type);
 
   /// @brief デストラクタ
   virtual
-  ~AuxTypeNode();
+  ~VmAuxTypeNode();
 
 
 public:
@@ -480,11 +257,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class NetTypeNode VlPtNode_misc.h
+/// @class VmNetTypeNode VmMiscNode.h
 /// @brief ネットの型を表すノード
 //////////////////////////////////////////////////////////////////////
-class NetTypeNode :
-  public VlPtScalarNode
+class VmNetTypeNode :
+  public VmScalarNode
 {
 public:
 
@@ -525,21 +302,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VarTypeNode VlPtNode_misc.h
+/// @class VmVarTypeNode VmMiscNode.h
 /// @brief 変数の型を表すノード
 //////////////////////////////////////////////////////////////////////
-class VarTypeNode :
-  public VlPtScalarNode
+class VmVarTypeNode :
+  public VmScalarNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] var_type 変数の型
-  VarTypeNode(tVpiVarType var_type);
+  VmVarTypeNode(tVpiVarType var_type);
 
   /// @brief デストラクタ
   virtual
-  ~VarTypeNode();
+  ~VmVarTypeNode();
 
 
 public:
@@ -565,22 +342,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DirNode VlPtNode_misc.h
+/// @class VmDirNode VmMiscNode.h
 /// @brief 入出力の方向を表すノード
 //////////////////////////////////////////////////////////////////////
 class DirNode :
-  public VlPtScalarNode
+  public VmScalarNode
 {
   
 public:
   
   /// @brief コンストラクタ
   /// @param[in] dir 入出力の方向
-  DirNode(tVpiDirection dir);
+  VmDirNode(tVpiDirection dir);
 
   /// @brief デストラクタ
   virtual
-  ~DirNode();
+  ~VmDirNode();
 
 
 public:
@@ -606,21 +383,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class UdNode VlPtNode_misc.h
+/// @class VmUdNode VmMiscNode.h
 /// @brief unconnected drive の型を表すノード
 //////////////////////////////////////////////////////////////////////
-class UdNode :
-  public VlPtScalarNode
+class VmUdNode :
+  public VmScalarNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] ud unconnected drive の型
-  UdNode(tVpiUnconnDrive ud);
+  VmUdNode(tVpiUnconnDrive ud);
 
   /// @brief デストラクタ
   virtual
-  ~UdNode();
+  ~VmUdNode();
 
 
 public:
@@ -646,21 +423,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DelayModeNode VlPtNode_misc.h
+/// @class VmDelayModeNode VmMiscNode.h
 /// @brief delay mode の型を表すノード
 //////////////////////////////////////////////////////////////////////
-class DelayModeNode :
-  public VlPtScalarNode
+class VmDelayModeNode :
+  public VmScalarNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] delay_mode delay mode の型
-  DelayModeNode(tVpiDefDelayMode delay_mode);
+  VmDelayModeNode(tVpiDefDelayMode delay_mode);
 
   /// @brief デストラクタ
   virtual
-  ~DelayModeNode();
+  ~VmDelayModeNode();
 
 
 public:
@@ -686,21 +463,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PrimTypeNode VlPtNode_misc.h
+/// @class VmPrimTypeNode VmMiscNode.h
 /// @brief Primitive の型を表すノード
 //////////////////////////////////////////////////////////////////////
-class PrimTypeNode :
-  public VlPtScalarNode
+class VmPrimTypeNode :
+  public VmScalarNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] prim_type primitive の型
-  PrimTypeNode(tVpiPrimType prim_type);
+  VmPrimTypeNode(tVpiPrimType prim_type);
 
   /// @brief デストラクタ
   virtual
-  ~PrimTypeNode();
+  ~VmPrimTypeNode();
 
 
 public:
@@ -726,22 +503,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class OpTypeNode VlPtNode_misc.h
+/// @class VmOpTypeNode VmMiscNode.h
 /// @brief 演算子の型を表すノード
 //////////////////////////////////////////////////////////////////////
-class OpTypeNode :
-  public VlPtScalarNode
+class VmOpTypeNode :
+  public VmScalarNode
 {
   
 public:
   
   /// @brief コンストラクタ
   /// @param[in] op_type 演算子の型
-  OpTypeNode(tVpiOpType op_type);
+  VmOpTypeNode(tVpiOpType op_type);
 
   /// @brief デストラクタ
   virtual
-  ~OpTypeNode();
+  ~VmOpTypeNode();
 
 
 public:
@@ -767,22 +544,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ConstTypeNode VlPtNode_misc.h
+/// @class VmConstTypeNode VmMiscNode.h
 /// @brief 定数の型を表すノード
 //////////////////////////////////////////////////////////////////////
-class ConstTypeNode :
-  public VlPtScalarNode
+class VmConstTypeNode :
+  public VmScalarNode
 {
   
 public:
   
   /// @brief コンストラクタ
   /// @param[in] const_type 定数の型
-  ConstTypeNode(tVpiConstType const_type);
+  VmConstTypeNode(tVpiConstType const_type);
 
   /// @brief デストラクタ
   virtual
-  ~ConstTypeNode();
+  ~VmConstTypeNode();
 
 
 public:
@@ -808,22 +585,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class RangeModeNode VlPtNode_misc.h
+/// @class VmRangeModeNode VmMiscNode.h
 /// @brief 範囲指定の型を表すノード
 //////////////////////////////////////////////////////////////////////
-class RangeModeNode :
-  public VlPtScalarNode
+class VmRangeModeNode :
+  public VmScalarNode
 {
   
 public:
   
   /// @brief コンストラクタ
   /// @param[in] range_mode 範囲指定の型
-  RangeModeNode(tVpiRangeMode range_mode);
+  VmRangeModeNode(tVpiRangeMode range_mode);
 
   /// @brief デストラクタ
   virtual
-  ~RangeModeNode();
+  ~VmRangeModeNode();
 
 
 public:
@@ -849,22 +626,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class StrengthValNode VlPtNode_misc.h
+/// @class VmStrengthValNode VmMiscNode.h
 /// @brief strength 値を表すノード
 //////////////////////////////////////////////////////////////////////
-class StrengthValNode :
-  public VlPtScalarNode
+class VmStrengthValNode :
+  public VmScalarNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] strength strength
-  StrengthValNode(const QString& label,
+  VmStrengthValNode(const QString& label,
 		  tVpiStrength strength);
 
   /// @brief デストラクタ
-  ~StrengthValNode();
+  ~VmStrengthValNode();
 
 
 public:
@@ -893,22 +670,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VsNode VlPtNode_misc.h
+/// @class VmVsNode VmMiscNode.h
 /// @brief vectored/scalared 情報を表すノード
 //////////////////////////////////////////////////////////////////////
-class VsNode :
-  public VlPtScalarNode
+class VmVsNode :
+  public VmScalarNode
 {
   
 public:
   
   /// @brief コンストラクタ
   /// @param[in] vs vectored/scalared 情報
-  VsNode(tVpiVsType vs);
+  VmVsNode(tVpiVsType vs);
 
   /// @brief デストラクタ
   virtual
-  ~VsNode();
+  ~VmVsNode();
 
 
 public:
@@ -934,11 +711,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class BoolNode VlPtNode_misc.h
+/// @class VmBoolNode VmMiscNode.h
 /// @brief 真理値を表すノード
 //////////////////////////////////////////////////////////////////////
-class BoolNode :
-  public VlPtScalarNode
+class VmBoolNode :
+  public VmScalarNode
 {
   
 public:
@@ -946,12 +723,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] val 真理値
-  BoolNode(const QString& label,
+  VmBoolNode(const QString& label,
 	   bool val);
 
   /// @brief デストラクタ
   virtual
-  ~BoolNode();
+  ~VmBoolNode();
 
 
 public:
@@ -980,4 +757,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // VLPARSETREEMODEL_H
+#endif // VMMISCNODE_H

@@ -1,21 +1,22 @@
 
-/// @file libym_verilog/tests/vlview/VlPtNode_misc.cc
+/// @file libym_verilog/tests/vlview/VmMiscNode.cc
 /// @brief VlPtNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_misc.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VmMiscNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VlPtNode_misc.h"
+#include "VmMiscNode.h"
 #include "VlPtNode_expr.h"
 #include <ym_verilog/pt/PtMisc.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス ControlNode
 //////////////////////////////////////////////////////////////////////
@@ -96,177 +97,6 @@ ControlNode::expand() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ConnectionListNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] con_array 接続のリスト
-ConnectionListNode::ConnectionListNode(const PtConnectionArray& con_array) :
-  mConArray(con_array)
-{
-}
-
-// @brief デストラクタ
-ConnectionListNode::~ConnectionListNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-ConnectionListNode::data(int column,
-			 int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "Connection List";
-    }
-    else if ( column == 1 ) {
-      return "";
-    }
-  }
-  return QVariant();
-}
-    
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-ConnectionListNode::loc() const
-{
-  return FileRegion();
-}
-
-// @brief 子供の配列を作る．
-void
-ConnectionListNode::expand() const
-{
-  ymuint32 n = mConArray.size();
-  mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
-    mChildren[i] = new ConnectionNode(mConArray[i]);
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ConnectionNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] con 接続
-ConnectionNode::ConnectionNode(const PtConnection* con) :
-  mCon(con)
-{
-}
-
-// @brief デストラクタ
-ConnectionNode::~ConnectionNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-ConnectionNode::data(int column,
-		     int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "Connection";
-    }
-    else if ( column == 1 ) {
-      if ( mCon->name() ) {
-	return mCon->name();
-      }
-      else {
-	return "";
-      }
-    }
-  }
-  return QVariant();
-}
-    
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-ConnectionNode::loc() const
-{
-  return mCon->file_region();
-}
-
-// @brief 子供の配列を作る．
-void
-ConnectionNode::expand() const
-{
-  if ( mCon->expr() ) {
-    mChildren.reserve(1);
-    mChildren.push_back( new ExprNode("Expression", mCon->expr()) );
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス StrengthNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] con 接続
-StrengthNode::StrengthNode(const PtStrength* strength) :
-  mStrength(strength)
-{
-}
-
-// @brief デストラクタ
-StrengthNode::~StrengthNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-StrengthNode::data(int column,
-		   int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "Strength";
-    }
-    else if ( column == 1 ) {
-      return "";
-    }
-  }
-  return QVariant();
-}
-    
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-StrengthNode::loc() const
-{
-  return mStrength->file_region();
-}
-
-// @brief 子供の配列を作る．
-void
-StrengthNode::expand() const
-{
-  if ( mStrength->drive0() != kVpiNoStrength ) {
-    assert_cond(mStrength->drive1() != kVpiNoStrength, __FILE__, __LINE__);
-    assert_cond(mStrength->charge() == kVpiNoStrength, __FILE__, __LINE__);
-    mChildren.reserve(2);
-    mChildren.push_back( new StrengthValNode("Drive 0", mStrength->drive0()) );
-    mChildren.push_back( new StrengthValNode("Drive 1", mStrength->drive1()) );
-  }
-  else {
-    assert_cond(mStrength->drive1() == kVpiNoStrength, __FILE__, __LINE__);
-    assert_cond(mStrength->charge() != kVpiNoStrength, __FILE__, __LINE__);
-    mChildren.reserve(1);
-    mChildren.push_back( new StrengthValNode("Charge", mStrength->charge()) );
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス DelayNode
 //////////////////////////////////////////////////////////////////////
 
@@ -329,126 +159,51 @@ DelayNode::expand() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス NameBranchListNode
+// クラス VmScalarNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] name_branch_list 階層名のリスト
-NameBranchListNode::NameBranchListNode(const PtNameBranchArray& nb_list) :
-  mNameBranchArray(nb_list)
+VmScalarNode::VmScalarNode()
 {
 }
 
 // @brief デストラクタ
-NameBranchListNode::~NameBranchListNode()
+VmScalarNode::~VmScalarNode()
 {
 }
 
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-NameBranchListNode::data(int column,
-			 int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "Name Branch List";
-    }
-    else if ( column == 1 ) {
-      return "";
-    }
-  }
-  return QVariant();
-}
-    
 // @brief 対象のファイル上での位置を返す．
+// @note このクラスでは空の FileRegion を返す．
 FileRegion
-NameBranchListNode::loc() const
+VmScalarNode::loc() const
 {
   return FileRegion();
 }
 
 // @brief 子供の配列を作る．
+// @note このクラスではなにもしない．
 void
-NameBranchListNode::expand() const
-{
-  ymuint32 n = mNameBranchArray.size();
-  mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
-    mChildren[i] = new NameBranchNode(mNameBranchArray[i]);
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス NameBranchNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] name_branch 階層名
-NameBranchNode::NameBranchNode(const PtNameBranch* name_branch) :
-  mNameBranch(name_branch)
-{
-}
-
-// @brief デストラクタ
-NameBranchNode::~NameBranchNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-NameBranchNode::data(int column,
-		     int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "Name Branch";
-    }
-    else if ( column == 1 ) {
-      QString name = mNameBranch->name();
-      if ( mNameBranch->index() ) {
-	name += static_cast<char>('0' + mNameBranch->index());
-      }
-      return name;
-    }
-  }
-  return QVariant();
-}
-    
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-NameBranchNode::loc() const
-{
-  return FileRegion();
-}
-
-// @brief 子供の配列を作る．
-void
-NameBranchNode::expand() const
+VmScalarNode::expand() const
 {
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス StrNode
+// クラス VmStrNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] label ラベル
 // @param[in] str 文字列
-StrNode::StrNode(const QString& label,
-		 const QString& str) :
+VmStrNode::VmStrNode(const QString& label,
+		     const QString& str) :
   mLabel(label),
   mStr(str)
 {
 }
 
 // @brief デストラクタ
-StrNode::~StrNode()
+VmStrNode::~VmStrNode()
 {
 }
 
@@ -456,8 +211,8 @@ StrNode::~StrNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-StrNode::data(int column,
-	      int role) const
+VmStrNode::data(int column,
+		int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -472,16 +227,16 @@ StrNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス AuxTypeNode
+// クラス VmAuxTypeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] aux_type 補助的なデータ型
 // @param[in] net_type ネットの型
 // @param[in] var_type 変数の型
-AuxTypeNode::AuxTypeNode(tVpiAuxType aux_type,
-			 tVpiNetType net_type,
-			 tVpiVarType var_type) :
+VmAuxTypeNode::VmAuxTypeNode(tVpiAuxType aux_type,
+			     tVpiNetType net_type,
+			     tVpiVarType var_type) :
   mAuxType(aux_type),
   mNetType(net_type),
   mVarType(var_type)
@@ -489,7 +244,7 @@ AuxTypeNode::AuxTypeNode(tVpiAuxType aux_type,
 }
 
 // @brief デストラクタ
-AuxTypeNode::~AuxTypeNode()
+VmAuxTypeNode::~VmAuxTypeNode()
 {
 }
 
@@ -497,12 +252,12 @@ AuxTypeNode::~AuxTypeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-AuxTypeNode::data(int column,
-		   int role) const
+VmAuxTypeNode::data(int column,
+		    int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "AuxType";
+      return "vpiAuxType";
     }
     else if ( column == 1 ) {
       switch ( mAuxType ) {
@@ -539,21 +294,21 @@ AuxTypeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス NetTypeNode
+// クラス VmNetTypeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] label ラベル
 // @param[in] net_type ネットの型
-NetTypeNode::NetTypeNode(const QString& label,
-			 tVpiNetType net_type) :
+VmNetTypeNode::VmNetTypeNode(const QString& label,
+			     tVpiNetType net_type) :
   mLabel(label),
   mNetType(net_type)
 {
 }
 
 // @brief デストラクタ
-NetTypeNode::~NetTypeNode()
+VmNetTypeNode::~VmNetTypeNode()
 {
 }
 
@@ -561,8 +316,8 @@ NetTypeNode::~NetTypeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-NetTypeNode::data(int column,
-		  int role) const
+VmNetTypeNode::data(int column,
+		    int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -590,18 +345,18 @@ NetTypeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス VarTypeNode
+// クラス VmVarTypeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] var_type 変数の型
-VarTypeNode::VarTypeNode(tVpiVarType var_type) :
+VmVarTypeNode::VmVarTypeNode(tVpiVarType var_type) :
   mVarType(var_type)
 {
 }
 
 // @brief デストラクタ
-VarTypeNode::~VarTypeNode()
+VmVarTypeNode::~VmVarTypeNode()
 {
 }
 
@@ -609,12 +364,12 @@ VarTypeNode::~VarTypeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-VarTypeNode::data(int column,
-		  int role) const
+VmVarTypeNode::data(int column,
+		    int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "VarType";
+      return "vpiVarType";
     }
     else if ( column == 1 ) {
       switch ( mVarType ) {
@@ -631,18 +386,18 @@ VarTypeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス DirNode
+// クラス VmDirNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] dir 入出力の方向
-DirNode::DirNode(tVpiDirection dir) :
+VmDirNode::VmDirNode(tVpiDirection dir) :
   mDir(dir)
 {
 }
 
 // @brief デストラクタ
-DirNode::~DirNode()
+VmDirNode::~VmDirNode()
 {
 }
 
@@ -650,12 +405,12 @@ DirNode::~DirNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-DirNode::data(int column,
-	      int role) const
+VmDirNode::data(int column,
+		int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Direction";
+      return "vpiDirection";
     }
     else if ( column == 1 ) {
       switch ( mDir ) {
@@ -672,18 +427,18 @@ DirNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス UdNode
+// クラス VmUdNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] ud unconnected drive の型
-UdNode::UdNode(tVpiUnconnDrive ud) :
+VmUdNode::VmUdNode(tVpiUnconnDrive ud) :
   mUd(ud)
 {
 }
 
 // @brief デストラクタ
-UdNode::~UdNode()
+VmUdNode::~VmUdNode()
 {
 }
 
@@ -691,12 +446,12 @@ UdNode::~UdNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-UdNode::data(int column,
-	     int role) const
+VmUdNode::data(int column,
+	       int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Unconnected Drive";
+      return "vpiUnconnectedDrive";
     }
     else if ( column == 1 ) {
       switch ( mUd ) {
@@ -711,18 +466,18 @@ UdNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス DelayModeNode
+// クラス VmDelayModeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] delay mode の型
-DelayModeNode::DelayModeNode(tVpiDefDelayMode delay_mode) :
+VmDelayModeNode::VmDelayModeNode(tVpiDefDelayMode delay_mode) :
   mDelayMode(delay_mode)
 {
 }
 
 // @brief デストラクタ
-DelayModeNode::~DelayModeNode()
+VmDelayModeNode::~VmDelayModeNode()
 {
 }
 
@@ -730,12 +485,12 @@ DelayModeNode::~DelayModeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-DelayModeNode::data(int column,
-		    int role) const
+VmDelayModeNode::data(int column,
+		      int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Default Delay Mode";
+      return "vpiDefaultDelayMode";
     }
     else if ( column == 1 ) {
       switch ( mDelayMode ) {
@@ -753,18 +508,18 @@ DelayModeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス PrimTypeNode
+// クラス VmPrimTypeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] prim_type primitive タイプ
-PrimTypeNode::PrimTypeNode(tVpiPrimType prim_type) :
+VmPrimTypeNode::VmPrimTypeNode(tVpiPrimType prim_type) :
   mPrimType(prim_type)
 {
 }
 
 // @brief デストラクタ
-PrimTypeNode::~PrimTypeNode()
+VmPrimTypeNode::~VmPrimTypeNode()
 {
 }
 
@@ -772,12 +527,12 @@ PrimTypeNode::~PrimTypeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-PrimTypeNode::data(int column,
-		   int role) const
+VmPrimTypeNode::data(int column,
+		     int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "PrimType";
+      return "vpiPrimType";
     }
     else if ( column == 1 ) {
       switch ( mPrimType ) {
@@ -817,18 +572,18 @@ PrimTypeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス OpTypeNode
+// クラス VmOpTypeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] op_type 演算子のタイプ
-OpTypeNode::OpTypeNode(tVpiOpType op_type) :
+VmOpTypeNode::VmOpTypeNode(tVpiOpType op_type) :
   mOpType(op_type)
 {
 }
 
 // @brief デストラクタ
-OpTypeNode::~OpTypeNode()
+VmOpTypeNode::~VmOpTypeNode()
 {
 }
 
@@ -836,12 +591,12 @@ OpTypeNode::~OpTypeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-OpTypeNode::data(int column,
-		 int role) const
+VmOpTypeNode::data(int column,
+		   int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "OpType";
+      return "vpiOpType";
     }
     else if ( column == 1 ) {
       switch ( mOpType ) {
@@ -896,18 +651,18 @@ OpTypeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ConstTypeNode
+// クラス VmConstTypeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] const_type 定数の型
-ConstTypeNode::ConstTypeNode(tVpiConstType const_type) :
+VmConstTypeNode::VmConstTypeNode(tVpiConstType const_type) :
   mConstType(const_type)
 {
 }
 
 // @brief デストラクタ
-ConstTypeNode::~ConstTypeNode()
+VmConstTypeNode::~VmConstTypeNode()
 {
 }
 
@@ -915,12 +670,12 @@ ConstTypeNode::~ConstTypeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-ConstTypeNode::data(int column,
-		    int role) const
+VmConstTypeNode::data(int column,
+		      int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Const Type";
+      return "vpiConstType";
     }
     else if ( column == 1 ) {
       switch ( mConstType ) {
@@ -943,18 +698,18 @@ ConstTypeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス RangeModeNode
+// クラス VmRangeModeNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] range_mode 範囲指定の型
-RangeModeNode::RangeModeNode(tVpiRangeMode range_mode) :
+VmRangeModeNode::VmRangeModeNode(tVpiRangeMode range_mode) :
   mRangeMode(range_mode)
 {
 }
 
 // @brief デストラクタ
-RangeModeNode::~RangeModeNode()
+VmRangeModeNode::~VmRangeModeNode()
 {
 }
 
@@ -962,12 +717,12 @@ RangeModeNode::~RangeModeNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-RangeModeNode::data(int column,
-		    int role) const
+VmRangeModeNode::data(int column,
+		      int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "RangeMode";
+      return "vpiRangeMode";
     }
     else if ( column == 1 ) {
       switch ( mRangeMode ) {
@@ -983,21 +738,21 @@ RangeModeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス StrengthValNode
+// クラス VmStrengthValNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] label ラベル
 // @param[in] strength 値を表すノード
-StrengthValNode::StrengthValNode(const QString& label,
-				 tVpiStrength strength) :
+VmStrengthValNode::VmStrengthValNode(const QString& label,
+				     tVpiStrength strength) :
   mLabel(label),
   mStrength(strength)
 {
 }
 
 // @brief デストラクタ
-StrengthValNode::~StrengthValNode()
+VmStrengthValNode::~VmStrengthValNode()
 {
 }
 
@@ -1005,12 +760,12 @@ StrengthValNode::~StrengthValNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-StrengthValNode::data(int column,
-		      int role) const
+VmStrengthValNode::data(int column,
+			int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Strength";
+      return "vpiStrength";
     }
     else if ( column == 1 ) {
       switch ( mStrength ) {
@@ -1031,18 +786,18 @@ StrengthValNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス VsNode
+// クラス VmVsNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] vs vectored/scalared 情報
-VsNode::VsNode(tVpiVsType vs) :
+VmVsNode::VmVsNode(tVpiVsType vs) :
   mVs(vs)
 {
 }
 
 // @brief デストラクタ
-VsNode::~VsNode()
+VmVsNode::~VmVsNode()
 {
 }
 
@@ -1050,8 +805,8 @@ VsNode::~VsNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-VsNode::data(int column,
-	     int role) const
+VmVsNode::data(int column,
+	       int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -1070,21 +825,21 @@ VsNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス BoolNode
+// クラス VmBoolNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] label ラベル
 // @param[in] val 真理値
-BoolNode::BoolNode(const QString& label,
-		   bool val) :
+VmBoolNode::VmBoolNode(const QString& label,
+		       bool val) :
   mLabel(label),
   mVal(val)
 {
 }
 
 // @brief デストラクタ
-BoolNode::~BoolNode()
+VmBoolNode::~VmBoolNode()
 {
 }
 
@@ -1092,8 +847,8 @@ BoolNode::~BoolNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-BoolNode::data(int column,
-	       int role) const
+VmBoolNode::data(int column,
+		 int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
