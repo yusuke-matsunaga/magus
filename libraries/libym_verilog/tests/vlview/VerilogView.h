@@ -12,16 +12,16 @@
 
 
 #include <QTreeView>
-#include <ym_verilog/verilog.h>
-#include "VlParseTreeModel.h"
+#include "ym_verilog/verilog.h"
+#include "VerilogModel.h"
 
 class QItemSelection;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlParseTreeView VlParseTreeView.h
+/// @class VerilogView VerilogView.h
 /// @brief verilog のパース木を表示するウィジェット
 //////////////////////////////////////////////////////////////////////
-class VlParseTreeView :
+class VerilogView :
   public QTreeView
 {
   Q_OBJECT
@@ -30,17 +30,17 @@ public:
   
   /// @brief コンストラクタ
   /// @param[in] parent 親のウィジェット
-  VlParseTreeView(QWidget* parent = NULL);
+  VerilogView(QWidget* parent = NULL);
 
   /// @brief デストラクタ
-  ~VlParseTreeView();
+  ~VerilogView();
 
 
 public:
 
   /// @brief モデルをセットする．
   void
-  setModel(nsYm::nsVerilog::VlParseTreeModel* model);
+  setModel(nsYm::nsVerilog::VerilogModel* model);
 
   
 signals:
@@ -72,7 +72,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 内容を表すモデル．
-  nsYm::nsVerilog::VlParseTreeModel* mModel;
+  nsYm::nsVerilog::VerilogModel* mModel;
   
 };
 

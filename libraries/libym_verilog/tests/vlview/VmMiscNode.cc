@@ -1,17 +1,15 @@
 
 /// @file libym_verilog/tests/vlview/VmMiscNode.cc
-/// @brief VlPtNode の実装ファイル
+/// @brief VmMiscNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: VmMiscNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmMiscNode.h"
-#include "VlPtNode_expr.h"
-#include <ym_verilog/pt/PtMisc.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -861,6 +859,44 @@ VmBoolNode::data(int column,
       else {
 	return "False";
       }
+    }
+  }
+  return QVariant();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmIntNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] label ラベル
+// @param[in] val 値
+VmIntNode::VmIntNode(const QString& label,
+		     int val) :
+  mLabel(label),
+  mVal(val)
+{
+}
+
+// @brief デストラクタ
+VmIntNode::~VmBoolNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmIntNode::data(int column,
+		 int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return mLabel;
+    }
+    else if ( column == 1 ) {
+      return mVal;
     }
   }
   return QVariant();

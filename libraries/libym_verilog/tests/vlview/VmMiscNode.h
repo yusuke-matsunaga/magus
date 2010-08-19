@@ -2,7 +2,7 @@
 #define VMMISCNODE_H
 
 /// @file libym_verilog/tests/vlview/VmMiscNode.h
-/// @brief VmNode のヘッダファイル
+/// @brief VmMiscNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: VmMiscNode.h 2507 2009-10-17 16:24:02Z matsunaga $
@@ -12,7 +12,7 @@
 
 
 #include "VmNode.h"
-#include <ym_verilog/verilog.h>
+#include "ym_verilog/verilog.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -268,12 +268,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] net_type ネットの型
-  NetTypeNode(const QString& label,
+  VmNetTypeNode(const QString& label,
 	      tVpiNetType net_type);
 
   /// @brief デストラクタ
   virtual
-  ~NetTypeNode();
+  ~VmNetTypeNode();
 
 
 public:
@@ -345,7 +345,7 @@ private:
 /// @class VmDirNode VmMiscNode.h
 /// @brief 入出力の方向を表すノード
 //////////////////////////////////////////////////////////////////////
-class DirNode :
+class VmDirNode :
   public VmScalarNode
 {
   
@@ -752,6 +752,52 @@ private:
   
   // 真理値
   bool mVal;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmIntNode VmMiscNode.h
+/// @brief 整数値を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmIntNode :
+  public VmScalarNode
+{
+  
+public:
+  
+  /// @brief コンストラクタ
+  /// @param[in] label ラベル
+  /// @param[in] val 値
+  VmIntNode(const QString& label,
+	    int val);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmIntNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // ラベル
+  QString mLabel;
+  
+  // 値
+  int mVal;
   
 };
 

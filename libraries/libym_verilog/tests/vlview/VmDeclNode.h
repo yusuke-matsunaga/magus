@@ -20,21 +20,21 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VmIODeclNode VmDeclNode.h
+/// @class VmIODeclListNode VmDeclNode.h
 /// @brief IO宣言要素のリストを表すノード
 //////////////////////////////////////////////////////////////////////
-class IOItemListNode :
+class VmIODeclListNode :
   public VmNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] iohead IO宣言ヘッダ
-  IOItemListNode(const PtIOHead* iohead);
+  /// @param[in] io_array IO宣言の配列
+  VmIODeclListNode(const vector<const VlIODecl*>& io_array);
 
   /// @brief デストラクタ
   virtual
-  ~IOItemListNode();
+  ~VmIODeclListNode();
 
 
 public:
@@ -66,8 +66,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // IO宣言ヘッダ
-  const PtIOHead* mIOHead;
+  // IO宣言の配列
+  vector<const VlIODecl*> mIOArray;
   
 };
 
@@ -126,21 +126,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DeclItemListNode VmDeclNode.h
+/// @class VmDeclListNode VmDeclNode.h
 /// @brief Decl宣言要素のリストを表すノード
 //////////////////////////////////////////////////////////////////////
-class DeclItemListNode :
+class VmDeclListNode :
   public VmNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] declhead IO宣言ヘッダ
-  DeclItemListNode(const PtDeclHead* iohead);
+  /// @param[in] decl_array 宣言要素の配列
+  VmDeclListNode(const vector<const VlDecl*>& decl_array);
 
   /// @brief デストラクタ
   virtual
-  ~DeclItemListNode();
+  ~VmDeclListNode();
 
 
 public:
@@ -172,8 +172,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 宣言ヘッダ
-  const PtDeclHead* mDeclHead;
+  // 宣言の配列
+  vector<const VlDecl*> mDeclArray;
   
 };
 
@@ -229,6 +229,7 @@ private:
   const VlDecl* mDecl;
   
 };
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class VmRangeListNode VmDeclNode.h

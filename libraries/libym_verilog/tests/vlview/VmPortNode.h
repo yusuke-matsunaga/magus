@@ -2,7 +2,7 @@
 #define VMPORTNODE_H
 
 /// @file libym_verilog/tests/vlview/VmPortNode.h
-/// @brief VlPtNode のヘッダファイル
+/// @brief VmPortNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: VmPortNode.h 2507 2009-10-17 16:24:02Z matsunaga $
@@ -12,8 +12,8 @@
 
 
 #include "VmNode.h"
-#include <ym_verilog/verilog.h>
-#include <ym_verilog/vl/VlFwd.h>
+#include "ym_verilog/verilog.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

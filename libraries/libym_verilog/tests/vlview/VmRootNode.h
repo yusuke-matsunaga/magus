@@ -1,44 +1,42 @@
-#ifndef VLPTNODE_EXPR_H
-#define VLPTNODE_EXPR_H
+#ifndef VMROOTNODE_H
+#define VMROOTNODE_H
 
-/// @file libym_verilog/tests/vlview/VlPtNode_expr.h
+/// @file libym_verilog/tests/vlview/VlPtNodeImpl.h
 /// @brief VlPtNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_expr.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VlPtNode_root.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VlPtNode.h"
+#include "VmNode.h"
 #include <ym_verilog/verilog.h>
-#include <ym_verilog/pt/PtP.h>
-#include <ym_verilog/pt/PtArray.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+class VlMgr;
+
 //////////////////////////////////////////////////////////////////////
-/// @class ExprListNode VlPtNode_expr.h
-/// @brief 式のリストを表すノード
+/// @class VmRootNode VmRootNode.h
+/// @brief 根のノード
 //////////////////////////////////////////////////////////////////////
-class ExprListNode :
-  public VlPtNode
+class VmRootNode :
+  public VmNode
 {
 public:
-
+  
   /// @brief コンストラクタ
-  /// @param[in] label ラベル
-  /// @param[in] expr_array 式の配列
-  ExprListNode(const QString& label,
-	       const PtExprArray& expr_array);
+  /// @param[in] vl_mgr VlMgr
+  VmRootNode(const VlMgr& vl_mgr);
 
   /// @brief デストラクタ
   virtual
-  ~ExprListNode();
-
-
+  ~VmRootNode();
+  
+  
 public:
 
   /// @brief データを返す．
@@ -48,12 +46,12 @@ public:
   QVariant
   data(int column,
        int role) const;
-    
+  
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
   loc() const;
-
+  
 
 private:
 
@@ -68,33 +66,81 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ラベル
-  QString mLabel;
-  
-  // 式の配列
-  PtExprArray mExprArray;
+  // VlMgr
+  const VlMgr& mVlMgr;
   
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ExprNode VlPtNode_expr.h
-/// @brief 式を表すノード
+/// @class VmUdpListNode VmRootNode.h
+/// @brief UDP のリストを表すノード
 //////////////////////////////////////////////////////////////////////
-class ExprNode :
-  public VlPtNode
+class VmUdpListNode :
+  public VmNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] label ラベル
-  /// @param[in] expr 式
-  ExprNode(const QString& label,
-	   const PtExpr* expr);
+  /// @param[in] vl_mgr VlMgr
+  VmUdpListNode(const VlMgr& vl_mgr);
 
   /// @brief デストラクタ
   virtual
-  ~ExprNode();
+  ~VmUdpListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+  
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+  
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // VlMgr
+  const VlMgr& mVlMgr;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmModuleListNode VmRootNode.h
+/// @brief VmModule のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmModuleListNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  VmModuleListNode(const VlMgr& vl_mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmModuleListNode();
 
 
 public:
@@ -126,14 +172,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ラベル
-  QString mLabel;
-
-  // 式
-  const PtExpr* mExpr;
+  // VlMgr
+  const VlMgr& mVlMgr;
   
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // VLPTNODE_EXPR_H
+#endif // VMROOTNODE_H

@@ -1,5 +1,5 @@
 
-/// @file libym_verilog/tests/vlview/VlPtNodeImpl.cc
+/// @file libym_verilog/tests/vlview/VmRootNode.cc
 /// @brief VlPtNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,27 +9,27 @@
 /// All rights reserved.
 
 
-#include "VlPtNode_root.h"
-#include "VlPtNode_udp.h"
-#include "VlPtNode_module.h"
-#include <ym_verilog/VlMgr.h>
+#include "VmRootNode.h"
+#include "VmUdpNode.h"
+#include "VmModuleNode.h"
+#include "ym_verilog/VlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-// クラス RootNode
+// クラス VmRootNode
 //////////////////////////////////////////////////////////////////////
   
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
-RootNode::RootNode(const VlMgr& vl_mgr) :
+VmRootNode::VmRootNode(const VlMgr& vl_mgr) :
   mVlMgr(vl_mgr)
 {
 }
 
 // @brief デストラクタ
-RootNode::~RootNode()
+VmRootNode::~VmRootNode()
 {
 }
 
@@ -37,7 +37,7 @@ RootNode::~RootNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-RootNode::data(int column,
+VmRootNode::data(int column,
 	       int role) const
 {
   if ( role == Qt::DisplayRole ) {
@@ -53,38 +53,37 @@ RootNode::data(int column,
 
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-RootNode::loc() const
+VmRootNode::loc() const
 {
   return FileRegion();
 }
 
 // @brief 子供の配列を作る．
 void
-RootNode::expand() const
+VmRootNode::expand() const
 {
-  mChildren.reserve(2);
-  if ( mVlMgr.pt_udp_list().size() > 0 ) {
-    mChildren.push_back( new UdpListNode(mVlMgr) );
+  if ( !mVlMgr.udp_list().empty() ) {
+    add_child( new VmUdpListNode(mVlMgr) );
   }
-  if ( mVlMgr.pt_module_list().size() > 0 ) {
-    mChildren.push_back( new ModuleListNode(mVlMgr) );
+  if ( !mVlMgr.topmodule_list().empty() ) {
+    add_child( new VmModuleListNode(mVlMgr) );
   }
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス UdpListNode
+// クラス VmUdpListNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
-UdpListNode::UdpListNode(const VlMgr& vl_mgr) :
+VmUdpListNode::VmUdpListNode(const VlMgr& vl_mgr) :
   mVlMgr(vl_mgr)
 {
 }
 
 // @brief デストラクタ
-UdpListNode::~UdpListNode()
+VmUdpListNode::~VmUdpListNode()
 {
 }
 
@@ -92,8 +91,8 @@ UdpListNode::~UdpListNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-UdpListNode::data(int column,
-		  int role) const
+VmUdpListNode::data(int column,
+		    int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -108,39 +107,37 @@ UdpListNode::data(int column,
 
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-UdpListNode::loc() const
+VmUdpListNode::loc() const
 {
   return FileRegion();
 }
 
 // @brief 子供の配列を作る．
 void
-UdpListNode::expand() const
+VmUdpListNode::expand() const
 {
-  const list<const PtUdp*>& udp_list = mVlMgr.pt_udp_list();
-  mChildren.resize(udp_list.size());
-  ymuint32 i = 0;
-  for (list<const PtUdp*>::const_iterator p = udp_list.begin();
-       p != udp_list.end(); ++ p, ++ i) {
-    const PtUdp* udp = *p;
-    mChildren[i] = new UdpNode(udp);
+  const list<const VlUdpDefn*>& udp_list = mVlMgr.udp_list();
+  for (list<const VlUdpDefn*>::const_iterator p = udp_list.begin();
+       p != udp_list.end(); ++ p) {
+    const VlUdpDefn* udp = *p;
+    add_child( new VmUdpNode(udp) );
   }
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ModuleListNode
+// クラス VmModuleListNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
-ModuleListNode::ModuleListNode(const VlMgr& vl_mgr) :
+VmModuleListNode::VmModuleListNode(const VlMgr& vl_mgr) :
   mVlMgr(vl_mgr)
 {
 }
 
 // @brief デストラクタ
-ModuleListNode::~ModuleListNode()
+VmModuleListNode::~VmModuleListNode()
 {
 }
 
@@ -148,8 +145,8 @@ ModuleListNode::~ModuleListNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-ModuleListNode::data(int column,
-		     int role) const
+VmModuleListNode::data(int column,
+		       int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -164,22 +161,20 @@ ModuleListNode::data(int column,
 
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-ModuleListNode::loc() const
+VmModuleListNode::loc() const
 {
   return FileRegion();
 }
 
 // @brief 子供の配列を作る．
 void
-ModuleListNode::expand() const
+VmModuleListNode::expand() const
 {
-  const list<const PtModule*>& module_list = mVlMgr.pt_module_list();
-  mChildren.resize(module_list.size());
-  ymuint32 i = 0;
-  for (list<const PtModule*>::const_iterator p = module_list.begin();
-       p != module_list.end(); ++ p, ++ i) {
-    const PtModule* module = *p;
-    mChildren[i] = new ModuleNode(module);
+  const list<const VlModule*>& module_list = mVlMgr.topmodule_list();
+  for (list<const VlModule*>::const_iterator p = module_list.begin();
+       p != module_list.end(); ++ p) {
+    const VlModule* module = *p;
+    add_child( new VmModuleNode(module) );
   }
 }
 

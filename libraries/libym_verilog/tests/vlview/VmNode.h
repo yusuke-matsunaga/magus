@@ -7,13 +7,15 @@
 ///
 /// $Id: VmNode.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include <QAbstractItemModel>
-#include <ym_verilog/verilog.h>
-#include <ym_utils/FileRegion.h>
+#include "ym_verilog/verilog.h"
+#include "ym_utils/FileRegion.h"
+#include "ym_verilog/vl/VlFwd.h"
+
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -74,6 +76,13 @@ protected:
   void
   add_child(VmNode* node) const;
 
+  /// @brief Expr型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] expr 式
+  void
+  add_child(const QString& label,
+	    const VlExpr* expr) const;
+
   /// @brief 文字列型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
@@ -81,12 +90,33 @@ protected:
   add_child(const QString& label,
 	    const QString& value) const;
 
+  /// @brief 文字列型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  add_child(const QString& label,
+	    const string& value) const;
+
   /// @brief ブール型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
   void
   add_child(const QString& label,
 	    bool value) const;
+
+  /// @brief 整数型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  add_child(const QString& label,
+	    int value) const;
+
+  /// @brief 整数型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  add_child(const QString& label,
+	    ymuint value) const;
     
 
 private:

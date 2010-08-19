@@ -26,24 +26,20 @@ vlview_SOURCES = \
 	VerilogView.cc \
 	VmNode.h \
 	VmNode.cc \
-	VmNode_root.h \
-	VmNode_root.cc \
-	VmNode_udp.h \
-	VmNode_udp.cc \
-	VmNode_module.h \
-	VmNode_module.cc \
-	VmNode_port.h \
-	VmNode_port.cc \
-	VmNode_decl.h \
-	VmNode_decl.cc \
-	VmNode_item.h \
-	VmNode_item.cc \
-	VmNode_stmt.h \
-	VmNode_stmt.cc \
-	VmNode_expr.h \
-	VmNode_expr.cc \
-	VmNode_misc.h \
-	VmNode_misc.cc \
+	VmRootNode.h \
+	VmRootNode.cc \
+	VmUdpNode.h \
+	VmUdpNode.cc \
+	VmModuleNode.h \
+	VmModuleNode.cc \
+	VmDeclNode.h \
+	VmDeclNode.cc \
+	VmStmtNode.h \
+	VmStmtNode.cc \
+	VmExprNode.h \
+	VmExprNode.cc \
+	VmMiscNode.h \
+	VmMiscNode.cc \
 	vlview_main.cc
 
 nodist_vlview_SOURCES = \

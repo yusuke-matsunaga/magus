@@ -1,6 +1,6 @@
 
-/// @file libym_verilog/tests/vlview/VlParseTreeView.cc
-/// @brief VlParseTreeView の実装ファイル
+/// @file libym_verilog/tests/vlview/VerilogView.cc
+/// @brief VerilogView の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: VlParseTreeView.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,13 +9,12 @@
 /// All rights reserved.
 
 
-#include "VlParseTreeView.h"
-#include "VlParseTreeModel.h"
+#include "VerilogView.h"
 
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のウィジェット
-VlParseTreeView::VlParseTreeView(QWidget* parent) :
+VerilogView::VerilogView(QWidget* parent) :
   QTreeView(parent)
 {
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -23,13 +22,13 @@ VlParseTreeView::VlParseTreeView(QWidget* parent) :
 }
 
 // @brief デストラクタ
-VlParseTreeView::~VlParseTreeView()
+VerilogView::~VerilogView()
 {
 }
 
 // @brief モデルをセットする．
 void
-VlParseTreeView::setModel(nsYm::nsVerilog::VlParseTreeModel* model)
+VerilogView::setModel(nsYm::nsVerilog::VerilogModel* model)
 {
   mModel = model;
   QTreeView::setModel(model);
@@ -38,8 +37,8 @@ VlParseTreeView::setModel(nsYm::nsVerilog::VlParseTreeModel* model)
 
 // @brief selection が変化したときに呼ばれる関数
 void
-VlParseTreeView::selectionChanged(const QItemSelection& selected,
-				  const QItemSelection& deselected)
+VerilogView::selectionChanged(const QItemSelection& selected,
+			      const QItemSelection& deselected)
 {
   QAbstractItemView::selectionChanged(selected, deselected);
   
