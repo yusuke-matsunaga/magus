@@ -1,40 +1,39 @@
 
-/// @file libym_verilog/tests/vlview/VlPtNode_stmt.cc
-/// @brief VlPtNode の実装ファイル
+/// @file libym_verilog/tests/vlview/VmStmtNode.cc
+/// @brief VmStmtNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_stmt.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: VmStmtNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VlPtNode_stmt.h"
-#include "VlPtNode_decl.h"
-#include "VlPtNode_expr.h"
-#include "VlPtNode_misc.h"
-#include <ym_verilog/pt/PtStmt.h>
-#include <ym_verilog/pt/PtArray.h>
+#include "VmStmtNode.h"
+#include "VmDeclNode.h"
+#include "VmExprNode.h"
+#include "VmMiscNode.h"
+#include "ym_verilog/vl/VlStmt.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-// クラス StmtListNode
+// クラス VmStmtListNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] label ラベル
 // @param[in] stmt_array ステートメントの配列
-StmtListNode::StmtListNode(const QString& label,
-			   const PtStmtArray& stmt_array) :
+VmStmtListNode::VmStmtListNode(const QString& label,
+			       const vector<const VlStmt*>& stmt_array) :
   mLabel(label),
   mStmtArray(stmt_array)
 {
 }
 
 // @brief デストラクタ
-StmtListNode::~StmtListNode()
+VmStmtListNode::~VmStmtListNode()
 {
 }
 
@@ -42,7 +41,7 @@ StmtListNode::~StmtListNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-StmtListNode::data(int column,
+VmStmtListNode::data(int column,
 		   int role) const
 {
   if ( role == Qt::DisplayRole ) {
@@ -58,39 +57,45 @@ StmtListNode::data(int column,
     
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-StmtListNode::loc() const
+VmStmtListNode::loc() const
 {
-  return FileRegion();
+  if ( mStmtArray.empty() ) {
+    return FileRegion();
+  }
+  else {
+    FileRegion first = mStmtArray.front()->file_region();
+    FileRegion last = mStmtArray.back()->file_region();
+    return FileRegion(first, last);
+  }
 }
 
 // @brief 子供の配列を作る．
 void
-StmtListNode::expand() const
+VmStmtListNode::expand() const
 {
-  ymuint32 n = mStmtArray.size();
-  mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
-    mChildren[i] = new StmtNode("Stmt", mStmtArray[i]);
+  for (vector<const VlStmt*>::const_iterator p = mStmtArray.begin();
+       p != mStmtArray.end(); ++ p) {
+    add_child( new VmStmtNode("statement", *p) );
   }
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス StmtNode
+// クラス VmStmtNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] label
-// @param[in] stmt ステートの配列
-StmtNode::StmtNode(const QString& label,
-		   const PtStmt* stmt) :
+// @param[in] stmt ステートメント
+VmStmtNode::VmStmtNode(const QString& label,
+		       const SlStmt* stmt) :
   mLabel(label),
   mStmt(stmt)
 {
 }
 
 // @brief デストラクタ
-StmtNode::~StmtNode()
+VmStmtNode::~VmStmtNode()
 {
 }
 
@@ -98,8 +103,8 @@ StmtNode::~StmtNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-StmtNode::data(int column,
-	       int role) const
+VmStmtNode::data(int column,
+		 int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -141,14 +146,14 @@ StmtNode::data(int column,
     
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-StmtNode::loc() const
+VmStmtNode::loc() const
 {
   return mStmt->file_region();
 }
 
 // @brief 子供の配列を作る．
 void
-StmtNode::expand() const
+VmStmtNode::expand() const
 {
   ymuint32 n = 0;
   switch ( mStmt->type() ) {
@@ -182,13 +187,13 @@ StmtNode::expand() const
   case kPtEcStmt:
     mChildren.resize(2);
     mChildren[0] = new ControlNode(mStmt->control());
-    mChildren[1] = new StmtNode("Body", mStmt->body());
+    mChildren[1] = new VmStmtNode("Body", mStmt->body());
     break;
 
   case kPtWaitStmt:
     mChildren.resize(2);
     mChildren[0] = new ExprNode("Condition", mStmt->expr());
-    mChildren[1] = new StmtNode("Body", mStmt->body());
+    mChildren[1] = new VmStmtNode("Body", mStmt->body());
     break;
 
   case kPtAssignStmt:
@@ -224,9 +229,9 @@ StmtNode::expand() const
     }
     mChildren.resize(n);
     mChildren[0] = new ExprNode("Condition", mStmt->expr());
-    mChildren[1] = new StmtNode("Then body", mStmt->body());
+    mChildren[1] = new VmStmtNode("Then body", mStmt->body());
     if ( mStmt->else_body() ) {
-      mChildren[2] = new StmtNode("Else Body", mStmt->else_body());
+      mChildren[2] = new VmStmtNode("Else Body", mStmt->else_body());
     }
     break;
 
@@ -240,22 +245,22 @@ StmtNode::expand() const
 
   case kPtForeverStmt:
     mChildren.resize(1);
-    mChildren[0] = new StmtNode("Body", mStmt->body());
+    mChildren[0] = new VmStmtNode("Body", mStmt->body());
     break;
     
   case kPtRepeatStmt:
   case kPtWhileStmt:
     mChildren.resize(2);
     mChildren[0] = new ExprNode("Condition", mStmt->expr());
-    mChildren[1] = new StmtNode("Body", mStmt->body());
+    mChildren[1] = new VmStmtNode("Body", mStmt->body());
     break;
     
   case kPtForStmt:
     mChildren.resize(4);
-    mChildren[0] = new StmtNode("Initial Stmt", mStmt->init_stmt());
+    mChildren[0] = new VmStmtNode("Initial Stmt", mStmt->init_stmt());
     mChildren[1] = new ExprNode("Condition", mStmt->expr());
-    mChildren[2] = new StmtNode("Increent Stmt", mStmt->next_stmt());
-    mChildren[3] = new StmtNode("Body", mStmt->body());
+    mChildren[2] = new VmStmtNode("Increent Stmt", mStmt->next_stmt());
+    mChildren[3] = new VmStmtNode("Body", mStmt->body());
     break;
     
   case kPtNamedParBlockStmt:
@@ -274,7 +279,7 @@ StmtNode::expand() const
 						mStmt->declhead_array()) );
     }
     if ( mStmt->stmt_array().size() > 0 ) {
-      mChildren.push_back( new StmtListNode("Stmt List",
+      mChildren.push_back( new VmStmtListNode("Stmt List",
 					    mStmt->stmt_array()) );
     }
     break;
@@ -294,7 +299,7 @@ StmtNode::expand() const
 						mStmt->declhead_array()) );
     }
     if ( mStmt->stmt_array().size() > 0 ) {
-      mChildren.push_back( new StmtListNode("Stmt List",
+      mChildren.push_back( new VmStmtListNode("Stmt List",
 					    mStmt->stmt_array()) );
     }
     break;
@@ -465,7 +470,7 @@ CaseItemNode::expand() const
   if ( n == 0 ) {
     mChildren.push_back( new StrNode("Label", "Default") );
   }
-  mChildren.push_back( new StmtNode("Body", mCaseItem->body()) );
+  mChildren.push_back( new VmStmtNode("Body", mCaseItem->body()) );
 }
 
 END_NAMESPACE_YM_VERILOG
