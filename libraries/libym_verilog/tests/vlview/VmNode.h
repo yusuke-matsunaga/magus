@@ -76,7 +76,28 @@ protected:
   void
   add_child(VmNode* node) const;
 
-  /// @brief Expr型のノードを追加する．
+  /// @brief StmtListNodeを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] stmt_list ステートメントの配列
+  void
+  add_child(const QString& label,
+	    const vector<const VlStmt*>& stmt_list) const;
+  
+  /// @brief StmtNodeを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] stmt ステートメント
+  void
+  add_child(const QString& label,
+	    const VlStmt* stmt) const;
+  
+  /// @brief ExprListNode を追加する．
+  /// @param[in] label ラベル
+  /// @param[in] expr_list 式の配列
+  void
+  add_child(const QString& label,
+	    const vector<const VlExpr*>& expr_list) const;
+  
+  /// @brief ExprNode を追加する．
   /// @param[in] label ラベル
   /// @param[in] expr 式
   void

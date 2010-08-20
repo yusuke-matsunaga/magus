@@ -12,10 +12,8 @@
 #include <QApplication>
 #include <QSplitter>
 #include "VlView.h"
-#include "VlTokenView.h"
-#include "VlTokenList.h"
-#include "VlParseTreeModel.h"
-#include "VlParseTreeView.h"
+#include "VerilogModel.h"
+#include "VerilogView.h"
 
 #include <ym_verilog/VlMgr.h>
 
@@ -30,31 +28,41 @@ main(int argc,
   QApplication app(argc, argv);
   MsgMgr msg_mgr;
 
-  VlMgr vl_mgr(msg_mgr);
-  if ( !vl_mgr.read_file(argv[1]) ) {
-    return 1;
+  list<string> filename_list;
+  for (ymuint i = 1; i < argc; ++ i) {
+    filename_list.push_back(argv[i]);
   }
+
+  VlMgr vl_mgr(msg_mgr);
+  for (list<string>::const_iterator p = filename_list.begin();
+       p != filename_list.end(); ++ p) {
+    const string& name = *p;
+    if ( !vl_mgr.read_file(name) ) {
+      return 1;
+    }
+  }
+  vl_mgr.elaborate();
   
   VlView* vlview = new VlView;
-  VlParseTreeView* pt_view = new VlParseTreeView;
+  VerilogView* verilog_view = new VerilogView;
   
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
-  splitter->addWidget(pt_view);
+  splitter->addWidget(verilog_view);
   splitter->addWidget(vlview);
   splitter->setStretchFactor(0, 1);
   splitter->setStretchFactor(1, 1);
   splitter->resize(1024, 760);
 
-  VlParseTreeModel* model = new VlParseTreeModel;
-  model->set_pt(vl_mgr);
+  VerilogModel* model = new VerilogModel;
+  model->set_vlmgr(vl_mgr);
   
-  pt_view->setModel(model);
+  verilog_view->setModel(model);
   
   if ( !vlview->open(argv[1]) ) {
     return 2;
   }
 
-  QObject::connect(pt_view, SIGNAL(select_token(int, int, int, int)),
+  QObject::connect(verilog_view, SIGNAL(select_token(int, int, int, int)),
 		   vlview, SLOT(hilight(int, int, int, int)));
 
   

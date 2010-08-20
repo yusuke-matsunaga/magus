@@ -10,7 +10,6 @@
 
 
 #include "VmNode.h"
-#include "VmExprNode.h"
 #include "VmMiscNode.h"
 
 
@@ -40,16 +39,6 @@ void
 VmNode::add_child(VmNode* node) const
 {
   mChildren.push_back(node);
-}
-
-// @brief Expr型のノードを追加する．
-// @param[in] label ラベル
-// @param[in] expr 式
-void
-VmNode::add_child(const QString& label,
-		  const VlExpr* expr) const
-{
-  add_child( new VmExprNode(label, expr) );
 }
 
 // @brief 文字列型のノードを追加する．

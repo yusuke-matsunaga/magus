@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @class VmStmtNodeList VmStmtNode.h
 /// @brief ステートメントリストを表すノード
 //////////////////////////////////////////////////////////////////////
-class VmStmtNodeList :
+class VmStmtListNode :
   public VmNode
 {
 public:
@@ -30,12 +30,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] stmt_array ステートメントの配列
-  VmStmtNodeList(const QString& label,
+  VmStmtListNode(const QString& label,
 		 const vector<const VlStmt*>& stmt_array);
 
   /// @brief デストラクタ
   virtual
-  ~VmStmtNodeList();
+  ~VmStmtListNode();
 
 
 public:
@@ -251,7 +251,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] caseitem caseitem 文
-  VmCaseItemNode(const VltCaseItem* caseitem);
+  VmCaseItemNode(const VlCaseItem* caseitem);
 
   /// @brief デストラクタ
   virtual
@@ -289,6 +289,59 @@ private:
   
   // caseitem 文を表すオブジェクト
   const VlCaseItem* mCaseItem;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @Class VmControlNode VmStmtNode.h
+/// @brief control を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmControlNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] control コントロールを表すオブジェクト
+  VmControlNode(const VlControl* control);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmControlNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // コントロール
+  const VlControl* mControl;
   
 };
 

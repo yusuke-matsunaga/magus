@@ -15,84 +15,6 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 #if 0
-//////////////////////////////////////////////////////////////////////
-// クラス ControlNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] control コントロール
-ControlNode::ControlNode(const PtControl* control) :
-  mControl(control)
-{
-}
-
-// @brief デストラクタ
-ControlNode::~ControlNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-ControlNode::data(int column,
-		  int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      switch ( mControl->type() ) {
-      case kPtDelayControl:  return "DelayControl";
-      case kPtEventControl:  return "EventControl";
-      case kPtRepeatControl: return "RepeatControl";
-      }
-    }
-    else if ( column == 1 ) {
-      return "";
-    }
-  }
-  return QVariant();
-}
-    
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-ControlNode::loc() const
-{
-  return mControl->file_region();
-}
-
-// @brief 子供の配列を作る．
-void
-ControlNode::expand() const
-{
-  switch ( mControl->type() ) {
-  case kPtDelayControl:
-    mChildren.reserve(1);
-    mChildren.push_back( new ExprNode("Delay", mControl->delay()) );
-    break;
-    
-  case kPtEventControl:
-    {
-      ymuint32 n = mControl->event_num();
-      mChildren.reserve(n);
-      for (ymuint32 i = 0; i < n; ++ i) {
-	mChildren.push_back( new ExprNode("Event", mControl->event(i)) );
-      }
-    }
-    break;
-    
-  case kPtRepeatControl:
-    {
-      ymuint32 n = mControl->event_num();
-      mChildren.reserve(n + 1);
-      mChildren.push_back( new ExprNode("Repeat", mControl->rep_expr()) );
-      for (ymuint32 i = 0; i < n; ++ i) {
-	mChildren.push_back( new ExprNode("Event", mControl->event(i)) );
-      }
-    }
-    break;
-  }
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス DelayNode
@@ -154,7 +76,7 @@ DelayNode::expand() const
     }
   }
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス VmScalarNode
@@ -570,132 +492,6 @@ VmPrimTypeNode::data(int column,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス VmOpTypeNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] op_type 演算子のタイプ
-VmOpTypeNode::VmOpTypeNode(tVpiOpType op_type) :
-  mOpType(op_type)
-{
-}
-
-// @brief デストラクタ
-VmOpTypeNode::~VmOpTypeNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-VmOpTypeNode::data(int column,
-		   int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "vpiOpType";
-    }
-    else if ( column == 1 ) {
-      switch ( mOpType ) {
-      case kVpiMinusOp:       return "minus";
-      case kVpiPlusOp:        return "plus";
-      case kVpiNotOp:         return "not";
-      case kVpiBitNegOp:      return "bitneg";
-      case kVpiUnaryAndOp:    return "unary and";
-      case kVpiUnaryNandOp:   return "unary nand";
-      case kVpiUnaryOrOp:     return "unary or";
-      case kVpiUnaryNorOp:    return "unary nor";
-      case kVpiUnaryXorOp:    return "unary xor";
-      case kVpiUnaryXNorOp:   return "unary xnor";
-      case kVpiSubOp:         return "sub";
-      case kVpiDivOp:         return "div";
-      case kVpiModOp:         return "mod";
-      case kVpiEqOp:          return "eq";
-      case kVpiNeqOp:         return "neq";
-      case kVpiCaseEqOp:      return "caseeq";
-      case kVpiCaseNeqOp:     return "caseneq";
-      case kVpiGtOp:          return "gt";
-      case kVpiGeOp:          return "ge";
-      case kVpiLtOp:          return "lt";
-      case kVpiLeOp:          return "le";
-      case kVpiLShiftOp:      return "left shift";
-      case kVpiRShiftOp:      return "right shift";
-      case kVpiAddOp:         return "add";
-      case kVpiMultOp:        return "mult";
-      case kVpiLogAndOp:      return "logical and";
-      case kVpiLogOrOp:       return "logical or";
-      case kVpiBitAndOp:      return "bit and";
-      case kVpiBitOrOp:       return "bit or";
-      case kVpiBitXorOp:      return "bit xor";
-      case kVpiBitXNorOp:     return "bit xnor";
-      case kVpiConditionOp:   return "conditional";
-      case kVpiConcatOp:      return "concat";
-      case kVpiMultiConcatOp: return "multi concat";
-      case kVpiEventOrOp:     return "event or";
-      case kVpiNullOp:        return "null";
-      case kVpiListOp:        return "list";
-      case kVpiMinTypMaxOp:   return "min-typ-max";
-      case kVpiPosedgeOp:     return "posedge";
-      case kVpiNegedgeOp:     return "negedge";
-      case kVpiArithLShiftOp: return "arithmetic left shift";
-      case kVpiArithRShiftOp: return "arithmetic right shift";
-      case kVpiPowerOp:       return "power";
-      }
-    }
-  }
-  return QVariant();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス VmConstTypeNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] const_type 定数の型
-VmConstTypeNode::VmConstTypeNode(tVpiConstType const_type) :
-  mConstType(const_type)
-{
-}
-
-// @brief デストラクタ
-VmConstTypeNode::~VmConstTypeNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-VmConstTypeNode::data(int column,
-		      int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "vpiConstType";
-    }
-    else if ( column == 1 ) {
-      switch ( mConstType ) {
-      case kVpiDecConst:          return "dec";
-      case kVpiRealConst:         return "real";
-      case kVpiBinaryConst:       return "binary";
-      case kVpiOctConst:          return "oct";
-      case kVpiHexConst:          return "hex";
-      case kVpiStringConst:       return "string";
-      case kVpiIntConst:          return "int";
-      case kVpiSignedDecConst:    return "signed dec";
-      case kVpiSignedBinaryConst: return "signed binary";
-      case kVpiSignedOctConst:    return "signed oct";
-      case kVpiSignedHexConst:    return "signed hex";
-      }
-    }
-  }
-  return QVariant();
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス VmRangeModeNode
 //////////////////////////////////////////////////////////////////////
 
@@ -880,7 +676,7 @@ VmIntNode::VmIntNode(const QString& label,
 }
 
 // @brief デストラクタ
-VmIntNode::~VmBoolNode()
+VmIntNode::~VmIntNode()
 {
 }
 
