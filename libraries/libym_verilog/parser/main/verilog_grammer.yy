@@ -476,7 +476,7 @@ fr_merge(const FileRegion fr_array[],
                  edge_sensitive_path_declaration
 %type <expr> specify_terminal
 %type <pathdelay> path_delay_value list_of_path_delay_expressions
-%type <inttype> pol_op
+%type <inttype> pol_op pol_colon
 %type <inttype> edge
 
 /* まだできていない */
@@ -5184,6 +5184,16 @@ simple_path_declaration
 }
 ;
 
+pol_op
+: '+'
+{
+  $$ = '+';
+}
+| '-'
+{
+  $$ = '-';
+}
+;
 
 //////////////////////////////////////////////////////////////////////
 // A.7.3 Specify block terminals
@@ -5360,88 +5370,107 @@ path_delay_expression
 // simple_path_declaration と同じになるので省略はなし．
 // 要素数は常に1だがパーズの都合上 nzlist_of_terminals にしている．
 // あとで要素数が1であることを確認する必要がある．
+//
+// 2010.08.21追記
+// parallel_edge_sensitive_path_description や
+// full_edge_sensitive_path_description で '+'|'-'
+// の直後に':'が来る場合がある．
+// ところが連続した　"+:" や "-:" はそれぞれ PLUSCOLON，MINUSCOLON
+// というトークンになってしまう．
+// そのため，PLUSCOLON, MINUSCOLON を含んだ構文を追加する．
+// 具体的には pol_colon という非終端ノードを追加している．
 edge_sensitive_path_declaration
 : '('      nzlist_of_terminals EQGT
-    '(' specify_terminal        ':' expression ')' ')' '=' path_delay_value
+    '(' specify_terminal           expression ')' ')' '=' path_delay_value
 { // parallel_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, 0,
 			   $2, 0,
 			   kVpiPathParallel,
 			   $5, 0,
-			   $7, $11);
+			   $6, $10);
 }
 | '('      nzlist_of_terminals EQGT
-    '(' specify_terminal pol_op ':' expression ')' ')' '=' path_delay_value
+    '(' specify_terminal pol_colon expression ')' ')' '=' path_delay_value
 { // parallel_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, 0,
 			   $2, 0,
 			   kVpiPathParallel,
 			   $5, $6,
-			   $8, $12);
+			   $7, $11);
 }
 | '(' edge nzlist_of_terminals EQGT
-    '(' specify_terminal        ':' expression ')' ')' '=' path_delay_value
+    '(' specify_terminal          expression ')' ')' '=' path_delay_value
 { // parallel_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, $2,
 			   $3, 0,
 			   kVpiPathParallel,
 			   $6, 0,
-			   $8, $12);
+			   $7, $11);
 }
 | '(' edge nzlist_of_terminals EQGT
-    '(' specify_terminal pol_op ':' expression ')' ')' '=' path_delay_value
+    '(' specify_terminal pol_colon expression ')' ')' '=' path_delay_value
 { // parallel_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, $2,
 			   $3, 0,
 			   kVpiPathParallel,
 			   $6, $7,
-			   $9, $13);
+			   $8, $12);
 }
 | '('      nzlist_of_terminals STARGT
-    '(' nzlist_of_terminals        ':' expression ')' ')' '=' path_delay_value
+     '(' nzlist_of_terminals           expression ')' ')' '=' path_delay_value
 { // full_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, 0,
 			   $2, 0,
 			   kVpiPathFull,
 			   $5, 0,
-			   $7, $11);
+			   $6, $10);
 }
 | '('      nzlist_of_terminals STARGT
-    '(' nzlist_of_terminals pol_op ':' expression ')' ')' '=' path_delay_value
+     '(' nzlist_of_terminals pol_colon expression ')' ')' '=' path_delay_value
 { // full_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, 0,
 			   $2, 0,
 			   kVpiPathFull,
 			   $5, $6,
-			   $8, $12);
+			   $7, $11);
 }
 | '(' edge nzlist_of_terminals STARGT
-    '(' nzlist_of_terminals        ':' expression ')' ')' '=' path_delay_value
+    '(' nzlist_of_terminals           expression ')' ')' '=' path_delay_value
 { // full_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, $2,
 			   $3, 0,
 			   kVpiPathFull,
 			   $6, 0,
-			   $8, $12);
+			   $7, $11);
 }
 | '(' edge nzlist_of_terminals STARGT
-    '(' nzlist_of_terminals pol_op ':' expression ')' ')' '=' path_delay_value
+    '(' nzlist_of_terminals pol_colon expression ')' ')' '=' path_delay_value
 { // full_edge_sensitive_path_description
   $$ = parser.new_PathDecl(@$, $2,
 			   $3, 0,
 			   kVpiPathFull,
 			   $6, $7,
-			   $9, $13);
+			   $8, $12);
 }
 ;
 
-pol_op
-: '+'
+pol_colon
+: '+' ':'
 {
   $$ = '+';
 }
-| '-'
+| '-' ':'
 {
+  $$ = '-';
+}
+| PLUSCOLON
+{
+  // + と : がくっついていた
+  $$ = '+';
+}
+| MINUSCOLON
+{
+  // - と : がくっついていた
   $$ = '-';
 }
 ;
