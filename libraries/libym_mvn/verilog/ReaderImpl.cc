@@ -1139,7 +1139,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 
     switch ( expr->op_type() ) {
     case kVpiNullOp:
-      break;
+      return inputs[0];
 	
     case kVpiMinusOp:
       {
