@@ -674,6 +674,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
   for (ymuint i = 0; i < np; ++ i) {
     const VlPort* vl_port = vl_module->port(i);
     const VlExpr* hi = vl_port->high_conn();
+    if ( hi == NULL ) continue;
     const VlExpr* lo = vl_port->low_conn();
     switch ( vl_port->direction() ) {
     case kVpiInput:
