@@ -64,9 +64,18 @@ public:
   output_num() const;
 
   /// @brief 出力ノードを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < input_num() )
+  /// @param[in] pos 位置 ( 0 <= pos < output_num() )
   MvNode*
   output(ymuint pos) const;
+
+  /// @brief 入出力ノード数を得る．
+  ymuint
+  inout_num() const;
+
+  /// @brief 入出力ノードを得る．
+  /// @param[in] pos 位置 ( 0 <= pos < inout_num() )
+  MvNode*
+  inout(ymuint pos) const;
 
   /// @brief 内部ノードの数を得る．
   ymuint
@@ -95,10 +104,12 @@ private:
   /// @param[in] np ポート数
   /// @param[in] ni 入力ノード数
   /// @param[in] no 出力ノード数
+  /// @param[in] nio 入出力ノード数
   MvModule(const char* name,
 	   ymuint np,
 	   ymuint ni,
-	   ymuint no);
+	   ymuint no,
+	   ymuint nio);
 
   /// @brief デストラクタ
   ~MvModule();
@@ -126,6 +137,9 @@ private:
 
   // 出力ノードの配列
   vector<MvNode*> mOutputArray;
+
+  // 入出力ノードの配列
+  vector<MvNode*> mInoutArray;
 
   // 内部ノードのリスト
   list<MvNode*> mNodeList;
@@ -205,12 +219,29 @@ MvModule::output_num() const
 }
 
 // @brief 出力ノードを得る．
-// @param[in] pos 位置 ( 0 <= pos < input_num() )
+// @param[in] pos 位置 ( 0 <= pos < output_num() )
 inline
 MvNode*
 MvModule::output(ymuint pos) const
 {
   return mOutputArray[pos];
+}
+
+// @brief 入出力ノード数を得る．
+inline
+ymuint
+MvModule::inout_num() const
+{
+  return mInoutArray.size();
+}
+
+// @brief 入出力ノードを得る．
+// @param[in] pos 位置 ( 0 <= pos < inout_num() )
+inline
+MvNode*
+MvModule::inout(ymuint pos) const
+{
+  return mInoutArray[pos];
 }
 
 // @brief 内部ノードの数を得る．

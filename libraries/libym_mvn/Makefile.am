@@ -39,6 +39,8 @@ libym_mvn_la_SOURCES = \
 	MvDff.cc \
 	MvInput.h \
 	MvInput.cc \
+	MvInout.h \
+	MvInout.cc \
 	MvIte.h \
 	MvIte.cc \
 	MvLogOp.h \

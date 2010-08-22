@@ -14,6 +14,7 @@
 
 #include "MvInput.h"
 #include "MvOutput.h"
+#include "MvInout.h"
 
 #include "ym_mvn/MvNet.h"
 
@@ -134,17 +135,21 @@ MvMgr::_net(ymuint id)
 // @param[in] np ポート数
 // @param[in] ni 入力ノード数
 // @param[in] no 出力ノード数
+// @param[in] nio 入出力ノード数
 // @return 生成したモジュールを返す．
 // @note 入出力ノードのビット幅は1で初期化される．
 MvModule*
 MvMgr::new_module(const char* name,
 		  ymuint np,
 		  ymuint ni,
-		  ymuint no)
+		  ymuint no,
+		  ymuint nio)
 {
   vector<ymuint> ibitwidth_array(ni, 1);
   vector<ymuint> obitwidth_array(no, 1);
-  return new_module(name, np, ibitwidth_array, obitwidth_array);
+  vector<ymuint> iobitwidth_array(nio, 1);
+  return new_module(name, np,
+		    ibitwidth_array, obitwidth_array, iobitwidth_array);
 }
 
 // @brief モジュールを生成する．
@@ -152,12 +157,14 @@ MvMgr::new_module(const char* name,
 // @param[in] np ポート数
 // @param[in] ibitwidth_array 入力のビット幅の配列
 // @param[in] obitwidth_array 出力のビット幅の配列
+// @param[in] iobitwidth_array 入出力のビット幅の配列
 // @return 生成したモジュールを返す．
 MvModule*
 MvMgr::new_module(const char* name,
 		  ymuint np,
 		  const vector<ymuint>& ibitwidth_array,
-		  const vector<ymuint>& obitwidth_array)
+		  const vector<ymuint>& obitwidth_array,
+		  const vector<ymuint>& iobitwidth_array)
 {
   int tmp = mModuleItvlMgr.avail_num();
   if ( tmp == -1 ) {
@@ -169,7 +176,8 @@ MvMgr::new_module(const char* name,
 
   ymuint ni = ibitwidth_array.size();
   ymuint no = obitwidth_array.size();
-  MvModule* module = new MvModule(name, np, ni, no);
+  ymuint nio = iobitwidth_array.size();
+  MvModule* module = new MvModule(name, np, ni, no, nio);
   module->mId = id;
   while ( mModuleArray.size() <= id ) {
     mModuleArray.push_back(NULL);
@@ -185,6 +193,11 @@ MvMgr::new_module(const char* name,
     MvNode* node = new MvOutput(module, obitwidth_array[i]);
     reg_node(node);
     module->mOutputArray[i] = node;
+  }
+  for (ymuint i = 0; i < nio; ++ i) {
+    MvNode* node = new MvInout(module, iobitwidth_array[i]);
+    reg_node(node);
+    module->mInoutArray[i] = node;
   }
   return module;
 }

@@ -249,43 +249,49 @@ ReaderImpl::gen_module(const VlModule* vl_module)
 {
   // ポート数，入出力のビット幅を調べる．
   ymuint np = vl_module->port_num();
-  ymuint nio = vl_module->io_num();
+  ymuint nio_all = vl_module->io_num();
   ymuint ni = 0;
   ymuint no = 0;
-  for (ymuint i = 0; i < nio; ++ i) {
+  ymuint nio = 0;
+  for (ymuint i = 0; i < nio_all; ++ i) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
     case kVpiInput:  ++ ni; break;
     case kVpiOutput: ++ no; break;
+    case kVpiInout:  ++ nio; break;
     default:
       mMsgMgr.put_msg(__FILE__, __LINE__,
 		      io->file_region(),
 		      kMsgError,
 		      "MVN_VL01",
-		      "Only Input/Output types are supported");
+		      "Only Input/Output/Inout types are supported");
       return NULL;
     }
   }
   vector<ymuint> ibw_array(ni);
   vector<ymuint> obw_array(no);
+  vector<ymuint> iobw_array(nio);
   ni = 0;
   no = 0;
-  for (ymuint i = 0; i < nio; ++ i) {
+  nio = 0;
+  for (ymuint i = 0; i < nio_all; ++ i) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
     case kVpiInput:  ibw_array[ni] = io->bit_size(); ++ ni; break;
     case kVpiOutput: obw_array[no] = io->bit_size(); ++ no; break;
+    case kVpiInout:  iobw_array[nio] = io->bit_size(); ++ nio; break;
     default: break;
     }
   }
   
-  MvModule* module = mMvMgr->new_module(vl_module->name(),
-					np, ibw_array, obw_array);
+  MvModule* module = mMvMgr->new_module(vl_module->name(), np,
+					ibw_array, obw_array, iobw_array);
 
   // 入出力ノードの対応表を作る．
   ymuint i1 = 0;
   ymuint i2 = 0;
-  for (ymuint i = 0; i < nio; ++ i) {
+  ymuint i3 = 0;
+  for (ymuint i = 0; i < nio_all; ++ i) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
     case kVpiInput:
@@ -296,6 +302,11 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     case kVpiOutput:
       mDeclMap.add(io->decl(), module->output(i2));
       ++ i2;
+      break;
+
+    case kVpiInout:
+      mDeclMap.add(io->decl(), module->inout(i3));
+      ++ i3;
       break;
 
     default:

@@ -24,7 +24,7 @@ main(int argc,
   try {
     MvMgr mgr;
 
-    MvModule* module = mgr.new_module("test", 2, 1, 1);
+    MvModule* module = mgr.new_module("test", 2, 1, 1, 0);
 
     MvNode* node3 = mgr.new_through(module, 1);
 
@@ -73,7 +73,7 @@ main(int argc,
     ibw_array[1] = 30;
     MvNode* node24 = mgr.new_concat(module, ibw_array);
 
-    MvModule* module1 = mgr.new_module("sub", 8, 4, 4);
+    MvModule* module1 = mgr.new_module("sub", 8, 4, 4, 0);
 
     vector<ymuint32> val(1);
     val[0] = 10;

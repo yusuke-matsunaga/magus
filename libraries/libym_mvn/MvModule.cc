@@ -18,15 +18,18 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] np ポート数
 // @param[in] ni 入力ノード数
 // @param[in] no 出力ノード数
+// @param[in] nio 入出力ノード数
 MvModule::MvModule(const char* name,
 		   ymuint np,
 		   ymuint ni,
-		   ymuint no) :
+		   ymuint no,
+		   ymuint nio) :
   mName(name),
   mParent(NULL),
   mPortArray(np),
   mInputArray(ni),
-  mOutputArray(no)
+  mOutputArray(no),
+  mInoutArray(nio)
 {
 }
 
