@@ -14,6 +14,7 @@
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
+#include "ym_verilog/BitVector.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -693,6 +694,10 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 	MvNode* node1 = gen_expr1(parent_module, lo);
 	connect_lhs(parent_module, hi, node1);
       }
+      break;
+
+    case kVpiInout:
+      // hi は単純な参照か連結のみ
       break;
       
     case kVpiMixedIO:
@@ -1508,9 +1513,29 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     }
   }
   if ( expr->is_const() ) {
-    // 未実装
-    assert_not_reached(__FILE__, __LINE__);
-    return NULL;
+    assert_cond( is_bitvector_type(expr->value_type()), __FILE__, __LINE__);
+    BitVector bv;
+    expr->eval_bitvector(bv);
+    ymuint bit_size = bv.size();
+    ymuint n = (bit_size + 31) / 32;
+    vector<ymuint32> tmp(n);
+    for (ymuint i = 0; i < bit_size; ++ i) {
+      ymuint blk = i / 32;
+      ymuint pos = i % 32;
+      switch ( bv.value(i) ) {
+      case kVpiScalar1: tmp[blk] |= (1 << pos); break;
+      case kVpiScalar0: break;
+      case kVpiScalarX:
+      case kVpiScalarZ:
+	mMsgMgr.put_msg(__FILE__, __LINE__,
+			expr->file_region(),
+			kMsgError,
+			"MVN_VLXXX",
+			"'X' or 'Z' in constant expression");
+	break;
+      }
+    }
+    return mMvMgr->new_const(parent_module, bit_size, tmp);
   }
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
