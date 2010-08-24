@@ -34,6 +34,15 @@ main(int argc,
     mh->set_mask(MsgHandler::kMaskAll);
     mh->delete_mask(kMsgInfo);
     mh->delete_mask(kMsgDebug);
+    reader.add_msg_handler(mh);
+
+    reader.set_ffname("KTECH_DFF", // セル名
+		      "D",         // データ入力
+		      "CK",        // クロック
+		      "Q",         // ノーマル出力
+		      "QN",        // 反転出力
+		      "",          // セット
+		      "");         // リセット
     
     for (list<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
@@ -54,7 +63,7 @@ main(int argc,
       return 2;
     }
     
-    //dump(cout, mgr);
+    dump(cout, mgr);
     dump_verilog(cout, mgr);
 #if 0
   }
