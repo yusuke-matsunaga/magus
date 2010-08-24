@@ -156,7 +156,39 @@ EiPrimHead::prim_type() const
 const char*
 EiPrimHead::def_name() const
 {
-  return mPtHead->name();
+  const char* nm = NULL;
+  switch ( prim_type() ) {
+  case kVpiAndPrim:      nm = "and"; break;
+  case kVpiNandPrim:     nm = "nand"; break;
+  case kVpiNorPrim:      nm = "nor"; break;
+  case kVpiOrPrim:       nm = "or"; break;
+  case kVpiXorPrim:      nm = "xor"; break;
+  case kVpiXnorPrim:     nm = "xnor"; break;
+  case kVpiBufPrim:      nm = "buf"; break;
+  case kVpiNotPrim:      nm = "not"; break;
+  case kVpiBufif0Prim:   nm = "bufif0"; break;
+  case kVpiBufif1Prim:   nm = "bufif1"; break;
+  case kVpiNotif0Prim:   nm = "notif0"; break;
+  case kVpiNotif1Prim:   nm = "notif1"; break;
+  case kVpiNmosPrim:     nm = "nmos"; break;
+  case kVpiPmosPrim:     nm = "pmos"; break;
+  case kVpiCmosPrim:     nm = "cmos"; break;
+  case kVpiRnmosPrim:    nm = "rnmos"; break;
+  case kVpiRpmosPrim:    nm = "rpmos"; break;
+  case kVpiRcmosPrim:    nm = "rcmos"; break;
+  case kVpiRtranPrim:    nm = "rtran"; break;
+  case kVpiRtranif0Prim: nm = "rtranif0"; break;
+  case kVpiRtranif1Prim: nm = "rtranif1"; break;
+  case kVpiTranPrim:     nm = "tran"; break;
+  case kVpiTranif0Prim:  nm = "tranif0"; break;
+  case kVpiTranif1Prim:  nm = "tranif1"; break;
+  case kVpiPullupPrim:   nm = "pullup"; break;
+  case kVpiPulldownPrim: nm = "pulldown"; break;
+  case kVpiSeqPrim:
+  case kVpiCombPrim:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  return nm;
 }
 
 // @brief UDP 定義を返す．
