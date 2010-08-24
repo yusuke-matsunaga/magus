@@ -128,11 +128,12 @@ MvNodeMap::get(const MvNode* mvnode,
   if ( array.empty() ) {
     return false;
   }
-  assert_cond( array.size() == mvnode->output(0)->bit_width(), __FILE__, __LINE__);
+  assert_cond( array.size() == mvnode->output(0)->bit_width(),
+	       __FILE__, __LINE__);
   ympuint tmp = array[index];
   sbjnode = reinterpret_cast<SbjNode*>(tmp & ~1UL);
   inv = static_cast<bool>(tmp & 1U);
-  return sbjnode != NULL;
+  return true;
 }
 
 
@@ -161,6 +162,19 @@ mvn2sbj(const MvMgr& mvmgr,
   ymuint ni = module->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const MvNode* node = module->input(i);
+    ymuint bw = node->output(0)->bit_width();
+    for (ymuint j = 0; j < bw; ++ j) {
+      SbjNode* sbjnode = sbjgraph.new_input();
+      mvmap.put(node, j, sbjnode, false);
+    }
+    mark[node->id()] = true;
+    queue.push_back(node);
+  }
+
+  // 外部入出力を作る．
+  ymuint nio = module->inout_num();
+  for (ymuint i = 0; i < nio; ++ i) {
+    const MvNode* node = module->inout(i);
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       SbjNode* sbjnode = sbjgraph.new_input();

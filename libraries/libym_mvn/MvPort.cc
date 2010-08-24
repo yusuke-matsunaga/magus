@@ -36,6 +36,9 @@ MvPortRef::bit_width() const
     else if ( n->type() == MvNode::kOutput ) {
       return n->input(0)->bit_width();
     }
+    else if ( n->type() == MvNode::kInout ) {
+      return n->input(0)->bit_width();
+    }
   }
   assert_not_reached(__FILE__, __LINE__);
   return 0;
