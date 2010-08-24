@@ -87,8 +87,8 @@ dump_node(ostream& s,
   case MvNode::kPow:        s << "Pow"; break;
   case MvNode::kIte:        s << "Ite"; break;
   case MvNode::kConcat:     s << "Concat"; break;
-  case MvNode::kConstBitSelect:  s << "BitSelect"; break;
-  case MvNode::kConstPartSelect: s << "PartSelect"; break;
+  case MvNode::kConstBitSelect:  s << "ConstBitSelect"; break;
+  case MvNode::kConstPartSelect: s << "ConstPartSelect"; break;
   case MvNode::kBitSelect:  s << "BitSelect"; break;
   case MvNode::kPartSelect: s << "PartSelect"; break;
   case MvNode::kCombUdp:    s << "Combinational UDP"; break;
