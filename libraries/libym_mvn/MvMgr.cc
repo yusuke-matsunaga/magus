@@ -324,16 +324,21 @@ MvMgr::connect(MvNode* src_node,
 	       ymuint dst_pin_pos)
 {
   if ( src_node->parent() != dst_node->parent() ) {
+    cerr << "connecting between differnt module" << endl;
     return NULL;
   }
   MvOutputPin* src_pin = src_node->_output(src_pin_pos);
   MvInputPin* dst_pin = dst_node->_input(dst_pin_pos);
   if ( src_pin->bit_width() != dst_pin->bit_width() ) {
+    cout << "src_pin->bit_width() = " << src_pin->bit_width()
+	 << ", dst_pin->bit_width() = " << dst_pin->bit_width() << endl;
+    cerr << "bit_width mismatch" << endl;
     return NULL;
   }
   int tmp = mNetItvlMgr.avail_num();
   if ( tmp == -1 ) {
     // IDが枯渇？
+    cerr << "ID exhausted" << endl;
     return NULL;
   }
   mNetItvlMgr.erase(tmp);
