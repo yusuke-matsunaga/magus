@@ -648,6 +648,17 @@ VlDumperImpl::put(const char* label,
   mStream << str;
 }
 
+// @brief 文字列の出力
+// @param[in] label ラベル
+// @param[in] str 文字列
+void
+VlDumperImpl::put(const char* label,
+		  const char* str)
+{
+  VlDumpHeader x(this, label, "string", false);
+  mStream << str;
+}
+
 // @brief 開始マーカを出力する．
 // @param[in] label ラベル
 // @param[in] type 属性

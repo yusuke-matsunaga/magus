@@ -401,6 +401,13 @@ public:
   put(const char* label,
       const string& str);
 
+  /// @brief 文字列の出力
+  /// @param[in] label ラベル
+  /// @param[in] str 文字列
+  void
+  put(const char* label,
+      const char* str);
+
   /// @brief 開始マーカを出力する．
   /// @param[in] label ラベル
   /// @param[in] type 属性
