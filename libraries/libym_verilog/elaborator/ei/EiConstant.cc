@@ -189,6 +189,14 @@ EiIntConst::value_type() const
   return kVpiValueInteger;
 }
 
+// @brief 定数の型を返す．
+// @note 定数の時，意味を持つ．
+tVpiConstType
+EiIntConst::constant_type() const
+{
+  return kVpiIntConst;
+}
+
 // @brief int 型の値を返す．
 bool
 EiIntConst::eval_int(int& val) const
@@ -272,6 +280,14 @@ EiBitVectorConst::value_type() const
   else {
     return pack(kVpiValueUS, size);
   }
+}
+
+// @brief 定数の型を返す．
+// @note 定数の時，意味を持つ．
+tVpiConstType
+EiBitVectorConst::constant_type() const
+{
+  return mConstType;
 }
 
 // @brief スカラー値を返す．
@@ -359,6 +375,14 @@ EiRealConst::value_type() const
   return kVpiValueReal;
 }
 
+// @brief 定数の型を返す．
+// @note 定数の時，意味を持つ．
+tVpiConstType
+EiRealConst::constant_type() const
+{
+  return kVpiRealConst;
+}
+
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiRealConst::eval_scalar() const
@@ -426,6 +450,14 @@ EiStringConst::value_type() const
 {
   ymuint32 size = mValue.size();
   return pack(kVpiValueUS, size);
+}
+
+// @brief 定数の型を返す．
+// @note 定数の時，意味を持つ．
+tVpiConstType
+EiStringConst::constant_type() const
+{
+  return kVpiStringConst;
 }
 
 // @brief スカラー値を返す．

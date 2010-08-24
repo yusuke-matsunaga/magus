@@ -126,6 +126,12 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+  
+  /// @brief 定数の型を返す．
+  /// @note 定数の時，意味を持つ．
+  virtual
+  tVpiConstType
+  constant_type() const;
 
   /// @brief int 型の値を返す．
   virtual
@@ -210,6 +216,12 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+  
+  /// @brief 定数の型を返す．
+  /// @note 定数の時，意味を持つ．
+  virtual
+  tVpiConstType
+  constant_type() const;
 
   /// @brief スカラー値を返す．
   virtual
@@ -290,6 +302,12 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+  
+  /// @brief 定数の型を返す．
+  /// @note 定数の時，意味を持つ．
+  virtual
+  tVpiConstType
+  constant_type() const;
 
   /// @brief スカラー値を返す．
   virtual
@@ -367,6 +385,12 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+  
+  /// @brief 定数の型を返す．
+  /// @note 定数の時，意味を持つ．
+  virtual
+  tVpiConstType
+  constant_type() const;
 
   /// @brief スカラー値を返す．
   virtual
