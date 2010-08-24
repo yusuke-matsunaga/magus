@@ -595,6 +595,8 @@ const BitVector&
 BitVector::operator=(const BitVector& src)
 {
   if ( &src != this ) {
+    mSize = src.mSize;
+    mFlags = src.mFlags;
     ymuint32 n = block(mSize);
     mVal0 = new ymuint32[n];
     mVal1 = new ymuint32[n];

@@ -319,7 +319,7 @@ EiBitVectorConst::eval_bitvector(BitVector& bitvector,
   bitvector = mValue;
   bitvector.coerce(req_type);
 }
-  
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
