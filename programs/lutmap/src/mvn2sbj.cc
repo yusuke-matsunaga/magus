@@ -170,20 +170,48 @@ mvn2sbj(const MvMgr& mvmgr,
     queue.push_back(node);
   }
 
-  // DFF を作る．
-  for (ymuint i = 0; i < nmax; ++ i) {
-    const MvNode* node = mvmgr.node(i);
-    if ( node == NULL ) continue;
-    if ( node->type() != MvNode::kDff1 && node->type() != MvNode::kDff2 ) {
-      continue;
+  // DFF と定数ノードを作る．
+  const list<MvNode*>& node_list = module->node_list();
+  for (list<MvNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    const MvNode* node = *p;
+    if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
+      // DFF
+      ymuint bw = node->output(0)->bit_width();
+      for (ymuint j = 0; j < bw; ++ j) {
+	SbjNode* sbjnode = sbjgraph.new_dff();
+	mvmap.put(node, j, sbjnode, false);
+      }
+      mark[node->id()] = true;
+      queue.push_back(node);
     }
-    ymuint bw = node->output(0)->bit_width();
-    for (ymuint j = 0; j < bw; ++ j) {
-      SbjNode* sbjnode = sbjgraph.new_dff();
-      mvmap.put(node, j, sbjnode, false);
+    else if ( node->type() == MvNode::kConst ) {
+      // 定数
+      ymuint bw = node->output(0)->bit_width();
+      vector<ymuint32> value;
+      node->const_value(value);
+      ymuint bpos = 0;
+      ymuint32 pat = value[bpos];
+      for (ymuint j = 0; j < bw; ++ j) {
+	if ( pat & 1U ) {
+	  // 1
+	  mvmap.put(node, j, NULL, true);
+	}
+	else {
+	  // 0
+	  mvmap.put(node, j, NULL, false);
+	}
+	if ( j % 32 == 31 ) {
+	  ++ bpos;
+	  pat = value[bpos];
+	}
+	else {
+	  pat >>= 1;
+	}
+      }
+      mark[node->id()] = true;
+      queue.push_back(node);
     }
-    mark[node->id()] = true;
-    queue.push_back(node);
   }
 
   // 論理ノードを作る．
@@ -195,7 +223,9 @@ mvn2sbj(const MvMgr& mvmgr,
 	 p != folist.end(); ++ p) {
       const MvNet* net = *p;
       const MvNode* node = net->dst_pin()->node();
-      if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
+      if ( node->type() == MvNode::kDff1 ||
+	   node->type() == MvNode::kDff2 ||
+	   node->type() == MvNode::kConst ) {
 	continue;
       }
       ymuint ni = node->input_num();
