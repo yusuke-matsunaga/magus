@@ -656,7 +656,12 @@ VlDumperImpl::put(const char* label,
 		  const char* str)
 {
   VlDumpHeader x(this, label, "string", false);
-  mStream << str;
+  if ( str ) {
+    mStream << str;
+  }
+  else {
+    mStream << "<null-ptr>";
+  }
 }
 
 // @brief 開始マーカを出力する．
