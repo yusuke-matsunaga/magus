@@ -314,7 +314,7 @@ EiBitVectorConst::eval_real() const
 // @brief bitvector 型の値を返す．
 void
 EiBitVectorConst::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
+				 tVpiValueType req_type) const
 {
   bitvector = mValue;
   bitvector.coerce(req_type);
@@ -408,7 +408,7 @@ EiRealConst::eval_real() const
 // @brief bitvector 型の値を返す．
 void
 EiRealConst::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
+			    tVpiValueType req_type) const
 {
   bitvector = eval_real();
   bitvector.coerce(req_type);
