@@ -22,7 +22,7 @@ MvConstPartSelect::MvConstPartSelect(MvModule* module,
 				     ymuint msb,
 				     ymuint lsb,
 				     ymuint bit_width) :
-  MvUnaryOp(module, bit_width, 1),
+  MvUnaryOp(module, bit_width, msb - lsb + 1),
   mMsb(msb),
   mLsb(lsb)
 {

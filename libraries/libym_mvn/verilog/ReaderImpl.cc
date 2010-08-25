@@ -87,7 +87,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
 
   mDeclMap.clear();
   mDriverList.clear();
-
+  
   MvModule* module0 = NULL;
   list<const VlModule*> tmp_list(mVlMgr.topmodule_list());
   for (list<const VlModule*>::const_iterator p = tmp_list.begin();
@@ -156,20 +156,28 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	}
       }
     }
+
+    // 明示的なドライバがない場合の処理
+    for (ymuint i = 0; i < bw; ++ i) {
+      if ( tmp[i] == NULL ) {
+#warning "TODO: warning メッセージを出すようにする．"
+	vector<ymuint32> val(1, 0);
+	MvNode* ud_node = mMvMgr->new_const(module0, 1, val);
+	if ( bw == 1 ) {
+	  reg_driver(node, Driver(ud_node));
+	}
+	else {
+	  reg_driver(node, Driver(ud_node, i));
+	}
+	tmp[i] = &mDriverList[node->id()].back();
+      }
+    }
+    
     const Driver* prev = NULL;
     vector<const Driver*> tmp2;
     tmp2.reserve(bw);
     for (ymuint i = 0; i < bw; ++ i) {
       const Driver* driver = tmp[i];
-      if ( driver == NULL ) {
-	// TODO: エラーメッセージをちゃんとする．
-	// というか本当は warning で指定されていないビットは
-	// 0 にしなければならない．
-	cerr << "no driver" << endl;
-	cerr << "bw = " << bw
-	     << ", i = " << i << endl;
-	abort();
-      }
       if ( driver != prev ) {
 	tmp2.push_back(driver);
 	prev = driver;
@@ -206,8 +214,8 @@ ReaderImpl::gen_network(MvMgr& mgr)
   }
 
   // 冗長な through ノードを削除する．
-  //mMvMgr->sweep();
-  
+  mMvMgr->sweep();
+
   return true;
 }
 
@@ -632,7 +640,9 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 	}
       }
       else if ( port_name == ff_info.mQPinName ) {
-	connect_lhs(parent_module, expr, node);
+	if ( expr != NULL ) {
+	  connect_lhs(parent_module, expr, node);
+	}
       }
       else if ( port_name == ff_info.mQnPinName ) {
 	if ( expr != NULL ) {
@@ -733,6 +743,13 @@ ReaderImpl::connect_lhs(MvModule* parent_module,
   cout << "connect_lhs(" << expr->decompile() << ")" << endl
        << "  node = " << node->id() << endl;
   if ( expr->is_primary() ) {
+    if ( node->output(0)->bit_width() != expr->bit_size() ) {
+      cout << "node->output(0)->bit_width() = "
+	   << node->output(0)->bit_width()
+	   << ", expr->bit_size() = "
+	   << expr->bit_size()
+	   << endl;
+    }
     assert_cond( node->output(0)->bit_width() == expr->bit_size(),
 		 __FILE__, __LINE__);
     MvNode* node1 = gen_expr2(expr);
