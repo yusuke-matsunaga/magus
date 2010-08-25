@@ -136,6 +136,151 @@ MvNodeMap::get(const MvNode* mvnode,
   return true;
 }
 
+void
+make_and(SbjGraph& sbjgraph,
+	 SbjNode* sbjnode0,
+	 bool inv0,
+	 SbjNode* sbjnode1,
+	 bool inv1,
+	 SbjNode*& sbjnode,
+	 bool& inv)
+{
+  sbjnode = NULL;
+  inv = false;
+  if ( sbjnode0 == NULL ) {
+    if ( inv0 ) {
+      // 入力0が1固定
+      sbjnode = sbjnode1;
+      inv = inv1;
+    }
+    else {
+      // 入力0が0固定
+      sbjnode = NULL;
+      inv = false;
+    }
+  }
+  else if ( sbjnode1 == NULL ) {
+    if ( inv1 ) {
+      // 入力1が1固定
+      sbjnode = sbjnode0;
+      inv = inv0;
+    }
+    else {
+      // 入力1が0固定
+      sbjnode = NULL;
+      inv = false;
+    }
+  }
+  else {
+    ymuint fcode = 0U;
+    if ( inv0 ) {
+      if ( inv1 ) {
+	fcode = 0x1; // 0001
+      }
+      else {
+	fcode = 0x4; // 0100
+      }
+    }
+    else {
+      if ( inv1 ) {
+	fcode = 0x2; // 0010
+      }
+      else {
+	fcode = 0x8; // 1000
+      }
+    }
+    sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
+    inv = false;
+  }
+}
+
+void
+make_or(SbjGraph& sbjgraph,
+	SbjNode* sbjnode0,
+	bool inv0,
+	SbjNode* sbjnode1,
+	bool inv1,
+	SbjNode*& sbjnode,
+	bool& inv)
+{
+  sbjnode = NULL;
+  inv = false;
+  if ( sbjnode0 == NULL ) {
+    if ( inv0 ) {
+      // 入力0が1固定
+      sbjnode = NULL;
+      inv = true;
+    }
+    else {
+      // 入力0が0固定
+      sbjnode = sbjnode1;
+      inv = inv1;
+    }
+  }
+  else if ( sbjnode1 == NULL ) {
+    if ( inv1 ) {
+      // 入力1が1固定
+      sbjnode = NULL;
+      inv = true;
+    }
+    else {
+      // 入力1が0固定
+      sbjnode = sbjnode0;
+      inv = inv0;
+    }
+  }
+  else {
+    ymuint fcode = 0U;
+    if ( inv0 ) {
+      if ( inv1 ) {
+	fcode = 0x7; // 0111
+      }
+      else {
+	fcode = 0xd; // 1101
+      }
+    }
+    else {
+      if ( inv1 ) {
+	fcode = 0xb; // 1011
+      }
+      else {
+	fcode = 0xe; // 1110
+      }
+    }
+    sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
+    inv = false;
+  }
+}
+
+void
+make_xor(SbjGraph& sbjgraph,
+	 SbjNode* sbjnode0,
+	 bool inv0,
+	 SbjNode* sbjnode1,
+	 bool inv1,
+	 SbjNode*& sbjnode,
+	 bool& inv)
+{
+  sbjnode = NULL;
+  inv = inv0 ^ inv1;
+  if ( sbjnode0 == NULL ) {
+    sbjnode = sbjnode1;
+  }
+  else if ( sbjnode1 == NULL ) {
+    sbjnode = sbjnode0;
+  }
+  else {
+    ymuint fcode = 0U;
+    if ( inv ) {
+      fcode = 0x9; // 1001
+      inv = false;
+    }
+    else {
+      fcode = 0x6; // 0110
+    }
+    sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
+  }
+}
 
 void
 mvn2sbj(const MvMgr& mvmgr,
@@ -324,25 +469,10 @@ mvn2sbj(const MvMgr& mvmgr,
 	    bool inv1;
 	    bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
 	    assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	    ymuint fcode = 0U;
-	    if ( inv0 ) {
-	      if ( inv1 ) {
-		fcode = 0x1; // 0001
-	      }
-	      else {
-		fcode = 0x4; // 0100
-	      }
-	    }
-	    else {
-	      if ( inv1 ) {
-		fcode = 0x2; // 0010
-	      }
-	      else {
-		fcode = 0x8; // 1000
-	      }
-	    }
-	    SbjNode* sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
-	    mvmap.put(node, i, sbjnode, false);
+	    SbjNode* sbjnode = NULL;
+	    bool inv = false;
+	    make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
+	    mvmap.put(node, i, sbjnode, inv);
 	  }
 	}
 	break;
@@ -370,25 +500,10 @@ mvn2sbj(const MvMgr& mvmgr,
 	    bool inv1;
 	    bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
 	    assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	    ymuint fcode = 0U;
-	    if ( inv0 ) {
-	      if ( inv1 ) {
-		fcode = 0x7; // 0111
-	      }
-	      else {
-		fcode = 0xd; // 1101
-	      }
-	    }
-	    else {
-	      if ( inv1 ) {
-		fcode = 0xb; // 1011
-	      }
-	      else {
-		fcode = 0xe; // 1110
-	      }
-	    }
-	    SbjNode* sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
-	    mvmap.put(node, i, sbjnode, false);
+	    SbjNode* sbjnode = NULL;
+	    bool inv = false;
+	    make_or(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
+	    mvmap.put(node, i, sbjnode, inv);
 	  }
 	}
 	break;
@@ -416,15 +531,10 @@ mvn2sbj(const MvMgr& mvmgr,
 	    bool inv1;
 	    bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
 	    assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	    ymuint fcode = 0U;
-	    if ( inv0 ^ inv1 ) {
-	      fcode = 0x9; // 1001
-	    }
-	    else {
-	      fcode = 0x6; // 0110
-	    }
-	    SbjNode* sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
-	    mvmap.put(node, i, sbjnode, false);
+	    SbjNode* sbjnode = NULL;
+	    bool inv = false;
+	    make_xor(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
+	    mvmap.put(node, i, sbjnode, inv);
 	  }
 	}
 	break;
@@ -488,44 +598,16 @@ mvn2sbj(const MvMgr& mvmgr,
 	    bool inv2;
 	    bool stat2 = mvmap.get(src_node2, i, sbjnode2, inv2);
 	    assert_cond( stat1 && stat2 , __FILE__, __LINE__);
-	    ymuint fcode1 = 0U;
-	    if ( inv0 ) {
-	      if ( inv1 ) {
-		fcode1 = 0x1;
-	      }
-	      else {
-		fcode1 = 0x4;
-	      }
-	    }
-	    else {
-	      if ( inv1 ) {
-		fcode1 = 0x2;
-	      }
-	      else {
-		fcode1 = 0x8;
-	      }
-	    }
-	    SbjNode* and1 = sbjgraph.new_logic(fcode1, sbjnode0, sbjnode1);
-	    ymuint fcode2 = 0U;
-	    if ( inv0 ) {
-	      if ( inv2 ) {
-		fcode2 = 0x2;
-	      }
-	      else {
-		fcode2 = 0x8;
-	      }
-	    }
-	    else {
-	      if ( inv2 ) {
-		fcode2 = 0x1;
-	      }
-	      else {
-		fcode2 = 0x4;
-	      }
-	    }
-	    SbjNode* and2 = sbjgraph.new_logic(fcode2, sbjnode0, sbjnode2);
-	    SbjNode* or1 = sbjgraph.new_logic(0xe, and1, and2);
-	    mvmap.put(node, i, or1, false);
+	    SbjNode* and1 = NULL;
+	    bool and1_inv = false;
+	    make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, and1, and1_inv);
+	    SbjNode* and2 = NULL;
+	    bool and2_inv = false;
+	    make_and(sbjgraph, sbjnode0, !inv0, sbjnode2, inv2, and2, and2_inv);
+	    SbjNode* or1 = NULL;
+	    bool or1_inv = false;
+	    make_or(sbjgraph, and1, and1_inv, and2, and2_inv, or1, or1_inv);
+	    mvmap.put(node, i, or1, or1_inv);
 	  }
 	}
 	break;
