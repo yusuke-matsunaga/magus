@@ -35,7 +35,7 @@ using namespace nsYm::nsVerilog;
 BEGIN_NONAMESPACE
 
 const
-bool debug_driver = false;
+bool debug_driver = true;
 
 END_NONAMESPACE
 
@@ -116,19 +116,43 @@ ReaderImpl::gen_network(MvMgr& mgr)
     if ( node == NULL ) continue;
     if ( mDriverList.size() <= i ) break;
     const vector<Driver>& dlist = mDriverList[node->id()];
-    if ( dlist.empty() ) {
-      continue;
-    }
+    if ( dlist.empty() ) continue;
+    cout << endl;
+    cout << "connecting " << node->id() << endl;
     ymuint bw = node->input(0)->bit_width();
     vector<const Driver*> tmp(bw, NULL);
+    cout << "bw = " << bw << endl;
     for (vector<Driver>::const_iterator p = dlist.begin();
 	 p != dlist.end(); ++ p) {
       const Driver* driver = &*p;
+      cout << "current driver: "
+	   << driver->rhs_node()->id();
+      if ( driver->has_bitselect() ) {
+	cout << "[" << driver->index() << "]";
+      }
+      else if ( driver->has_partselect() ) {
+	cout << "[" << driver->msb() << ":" << driver->lsb()
+	     << "]";
+      }
+      cout << endl;
       if ( driver->is_simple() ) {
 	for (ymuint i = 0; i < bw; ++ i) {
 	  if ( tmp[i] != NULL ) {
 	    // TODO: エラーメッセージをちゃんとする．
-	    cerr << "more than one drivers" << endl;
+	    cout << "more than one drivers for "
+		 << node->id()
+		 << "@" << i
+		 << endl;
+	    cout << "previous driver: "
+		 << tmp[i]->rhs_node()->id();
+	    if ( tmp[i]->has_bitselect() ) {
+	      cout << "[" << tmp[i]->index() << "]";
+	    }
+	    else if ( tmp[i]->has_partselect() ) {
+	      cout << "[" << tmp[i]->msb() << ":" << tmp[i]->lsb()
+		   << "]";
+	    }
+	    cout << endl;
 	    abort();
 	  }
 	  tmp[i] = driver;
@@ -138,7 +162,20 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	ymuint index = driver->index();
 	if ( tmp[index] != NULL ) {
 	  // TODO: エラーメッセージをちゃんとする．
-	  cerr << "more than one drivers" << endl;
+	  cout << "more than one drivers for "
+	       << node->id()
+	       << "@" << index
+	       << endl;
+	  cout << "previous driver: "
+	       << tmp[index]->rhs_node()->id();
+	  if ( tmp[index]->has_bitselect() ) {
+	    cout << "[" << tmp[index]->index() << "]";
+	  }
+	  else if ( tmp[index]->has_partselect() ) {
+	    cout << "[" << tmp[index]->msb() << ":" << tmp[index]->lsb()
+		 << "]";
+	  }
+	  cout << endl;
 	  abort();
 	}
 	tmp[index] = driver;
@@ -149,7 +186,20 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	for (ymuint i = lsb; i <= msb; ++ i) {
 	  if ( tmp[i] != NULL ) {
 	    // TODO: エラーメッセージをちゃんとする．
-	    cerr << "more than one drivers" << endl;
+	    cout << "more than one drivers for "
+		 << node->id()
+		 << "@" << i
+		 << endl;
+	    cout << "previous driver: "
+		 << tmp[i]->rhs_node()->id();
+	    if ( tmp[i]->has_bitselect() ) {
+	      cout << "[" << tmp[i]->index() << "]";
+	    }
+	    else if ( tmp[i]->has_partselect() ) {
+	      cout << "[" << tmp[i]->msb() << ":" << tmp[i]->lsb()
+		   << "]";
+	    }
+	    cout << endl;
 	    abort();
 	  }
 	  tmp[i] = driver;
@@ -158,8 +208,11 @@ ReaderImpl::gen_network(MvMgr& mgr)
     }
 
     // 明示的なドライバがない場合の処理
+    bool again = false;
     for (ymuint i = 0; i < bw; ++ i) {
       if ( tmp[i] == NULL ) {
+	cout << "tmp[" << i << "] == NULL" << endl;
+	again = true;
 #warning "TODO: warning メッセージを出すようにする．"
 	vector<ymuint32> val(1, 0);
 	MvNode* ud_node = mMvMgr->new_const(module0, 1, val);
@@ -169,36 +222,79 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	else {
 	  reg_driver(node, Driver(ud_node, i));
 	}
-	tmp[i] = &mDriverList[node->id()].back();
+      }
+    }
+    if ( again ) {
+      tmp.clear();
+      tmp.resize(bw, NULL);
+      for (vector<Driver>::const_iterator p = dlist.begin();
+	   p != dlist.end(); ++ p) {
+	const Driver* driver = &*p;
+	if ( driver->is_simple() ) {
+	  for (ymuint i = 0; i < bw; ++ i) {
+	    if ( tmp[i] != NULL ) {
+	      // TODO: エラーメッセージをちゃんとする．
+	      cout << "tmp[" << i << "] != NULL" << endl;
+	      cout << "more than one drivers" << endl;
+	      abort();
+	    }
+	    tmp[i] = driver;
+	  }
+	}
+	else if ( driver->has_bitselect() ) {
+	  ymuint index = driver->index();
+	  if ( tmp[index] != NULL ) {
+	    // TODO: エラーメッセージをちゃんとする．
+	    cout << "tmp[" << index << "] != NULL" << endl;
+	    cout << "more than one drivers" << endl;
+	    abort();
+	  }
+	  tmp[index] = driver;
+	}
+	else {
+	  ymuint msb = driver->msb();
+	  ymuint lsb = driver->lsb();
+	  for (ymuint i = lsb; i <= msb; ++ i) {
+	    if ( tmp[i] != NULL ) {
+	      // TODO: エラーメッセージをちゃんとする．
+	      cout << "tmp[" << i << "] != NULL" << endl;
+	      cout << "more than one drivers" << endl;
+	      abort();
+	    }
+	    tmp[i] = driver;
+	  }
+	}
       }
     }
     
-    const Driver* prev = NULL;
-    vector<const Driver*> tmp2;
+    Driver prev;
+    vector<Driver> tmp2;
     tmp2.reserve(bw);
     for (ymuint i = 0; i < bw; ++ i) {
-      const Driver* driver = tmp[i];
+      const Driver& driver = *tmp[i];
       if ( driver != prev ) {
 	tmp2.push_back(driver);
 	prev = driver;
+	assert_cond( driver.rhs_node() != NULL, __FILE__, __LINE__);
       }
     }
 
-    ymuint n = tmp2.size();
-    if ( n == 1 ) {
-      const Driver* driver = tmp2[0];
-      MvNode* src_node = driver->rhs_node();
+    ymuint nd = tmp2.size();
+    if ( nd == 1 ) {
+      const Driver& driver = tmp2[0];
+      MvNode* src_node = driver.rhs_node();
       mMvMgr->connect(src_node, 0, node, 0);
     }
     else {
-      vector<ymuint> bw_array(n);
-      for (ymuint i = 0; i < n; ++ i) {
-	const Driver* driver = tmp2[i];
-	if ( driver->has_bitselect() ) {
+      vector<ymuint> bw_array(nd);
+      for (ymuint i = 0; i < nd; ++ i) {
+	const Driver& driver = tmp2[i];
+	assert_cond( driver.rhs_node() != NULL, __FILE__, __LINE__);
+	if ( driver.has_bitselect() ) {
 	  bw_array[i] = 1;
 	}
-	else if ( driver->has_partselect() ) {
-	  bw_array[i] = driver->msb() - driver->lsb() + 1;
+	else if ( driver.has_partselect() ) {
+	  bw_array[i] = driver.msb() - driver.lsb() + 1;
 	}
 	else {
 	  assert_not_reached(__FILE__, __LINE__);
@@ -206,9 +302,9 @@ ReaderImpl::gen_network(MvMgr& mgr)
       }
       MvNode* node1 = mMvMgr->new_concat(module0, bw_array);
       mMvMgr->connect(node1, 0, node, 0);
-      for (ymuint i = 0; i < n; ++ i) {
-	const Driver* driver = tmp2[i];
-	mMvMgr->connect(driver->rhs_node(), 0, node1, i);
+      for (ymuint i = 0; i < nd; ++ i) {
+	const Driver& driver = tmp2[i];
+	mMvMgr->connect(driver.rhs_node(), 0, node1, i);
       }
     }
   }
@@ -310,8 +406,14 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       break;
 
     case kVpiOutput:
-      mDeclMap.add(io->decl(), module->output(i2));
-      ++ i2;
+      {
+	MvNode* output = module->output(i2);
+	ymuint bw = output->input(0)->bit_width();
+	MvNode* node = mMvMgr->new_through(module, bw);
+	mDeclMap.add(io->decl(), node);
+	mMvMgr->connect(node, 0, output, 0);
+	++ i2;
+      }
       break;
 
     case kVpiInout:
@@ -759,14 +861,15 @@ ReaderImpl::connect_lhs(MvModule* parent_module,
   else if ( expr->is_bitselect() ) {
     assert_cond( node->output(0)->bit_width() == 1, __FILE__, __LINE__);
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-    MvNode* node1 = gen_expr2(expr);
-    reg_driver(node1, Driver(node, expr->index_val()));
+    ymuint offset;
+    MvNode* node1 = gen_expr3(expr, offset);
+    reg_driver(node1, Driver(node, offset));
   }
   else if ( expr->is_partselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-    MvNode* node1 = gen_expr2(expr);
-    ymuint msb = expr->left_range_val();
-    ymuint lsb = expr->right_range_val();
+    ymuint msb;
+    ymuint lsb;
+    MvNode* node1 = gen_expr4(expr, msb, lsb);
     assert_cond( node->output(0)->bit_width() == msb - lsb + 1,
 		 __FILE__, __LINE__);
     reg_driver(node1, Driver(node, msb, lsb));
@@ -823,20 +926,21 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
     MvNet* net = node2->input(0)->net();
   }
   else if ( expr->is_bitselect() ) {
-    MvNode* node1 = gen_expr2(expr);
+    ymuint index;
+    MvNode* node1 = gen_expr3(expr, index);
     MvNode* node2 = mMvMgr->new_constbitselect(parent_module,
 					       offset,
 					       bw);
     assert_cond( node, __FILE__, __LINE__);
     mMvMgr->connect(node, 0, node2, 0);
-    reg_driver(node1, Driver(node2, expr->index_val()));
+    reg_driver(node1, Driver(node2, index));
     cout << "connect_lhs_sub_end(bitselect)" << endl;
     cout << "==> node = " << node2->id() << endl;
   }
   else if ( expr->is_partselect() ) {
-    MvNode* node1 = gen_expr2(expr);
-    ymuint msb = expr->left_range_val();
-    ymuint lsb = expr->right_range_val();
+    ymuint msb;
+    ymuint lsb;
+    MvNode* node1 = gen_expr4(expr, msb, lsb);
     ymuint bw1 = msb - lsb + 1;
     MvNode* node2 = mMvMgr->new_constpartselect(parent_module,
 						offset + bw1 - 1,
@@ -1159,9 +1263,9 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     return gen_expr2(expr);
   }
   if ( expr->is_bitselect() ) {
-    MvNode* node = gen_expr2(expr);
     if ( expr->is_constant_select() ) {
-      ymuint bitpos = expr->index_val();
+      ymuint bitpos;
+      MvNode* node = gen_expr3(expr, bitpos);
       const MvOutputPin* pin = node->output(0);
       MvNode* node1 = mMvMgr->new_constbitselect(parent_module,
 						 bitpos,
@@ -1171,6 +1275,8 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
       return node1;
     }
     else {
+#warning "TODO: [msb:lsb] のオフセット変換をしていない"
+      MvNode* node = gen_expr2(expr);
       MvNode* node1 = gen_expr1(parent_module, expr->index());
       const MvOutputPin* pin0 = node->output(0);
       const MvOutputPin* pin1 = node1->output(0);
@@ -1183,10 +1289,10 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     }
   }
   if ( expr->is_partselect() ) {
-    MvNode* node = gen_expr2(expr);
     if ( expr->is_constant_select() ) {
-      ymuint msb = expr->left_range_val();
-      ymuint lsb = expr->right_range_val();
+      ymuint msb;
+      ymuint lsb;
+      MvNode* node = gen_expr4(expr, msb, lsb);
       const MvOutputPin* pin = node->output(0);
       MvNode* node1 = mMvMgr->new_constpartselect(parent_module,
 						  msb, lsb,
@@ -1195,6 +1301,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
       return node1;
     }
     else {
+#warning "TODO: [msb:lsb] のオフセット変換をしていない"
       // まだできてない．
       // というか可変 part_select は VPI がおかしいと思う．
       assert_not_reached(__FILE__, __LINE__);
@@ -1590,6 +1697,98 @@ ReaderImpl::gen_expr2(const VlExpr* expr)
   cout << "gen_expr2(" << expr->decompile() << ")" << endl;
   const VlDecl* decl = expr->decl_obj();
   assert_cond( decl != NULL, __FILE__, __LINE__);
+  ymuint dim = expr->declarray_dimension();
+  assert_cond( decl->dimension() == dim, __FILE__, __LINE__);
+  if ( dim > 1 ) {
+    // 配列型
+    ymuint offset = 0;
+    ymuint mlt = 1;
+    for (ymuint i = 0; i < dim; ++ i) {
+      const VlExpr* index = expr->declarray_index(i);
+      int index_val;
+      bool stat = index->eval_int(index_val);
+      assert_cond( stat, __FILE__, __LINE__);
+      offset += index_val * mlt;
+      mlt *= decl->range(i)->size();
+    }
+    MvNode* node = mDeclMap.get(decl, offset);
+    if ( node == NULL ) {
+      cout << decl->name() << " is not found in mDeclMap" << endl;
+    }
+    assert_cond( node != NULL, __FILE__, __LINE__);
+    cout << "gen_expr2 end(array)" << endl;
+    cout << "==> node = " << node->id() << endl;
+    return node;
+  }
+  else {
+    MvNode* node = mDeclMap.get(decl);
+    if ( node == NULL ) {
+      cout << decl->name() << " is not found in mDeclMap" << endl;
+    }
+    assert_cond( node != NULL, __FILE__, __LINE__);
+    cout << "gen_expr2 end(singleton)" << endl;
+    cout << "==> node = " << node->id() << endl;
+    return node;
+  }
+}
+
+// @brief 宣言要素への参照に対応するノードを作る．
+// @param[in] expr 式
+MvNode*
+ReaderImpl::gen_expr3(const VlExpr* expr,
+		      ymuint& bitpos)
+{
+  cout << "gen_expr3(" << expr->decompile() << ")" << endl;
+  const VlDecl* decl = expr->decl_obj();
+  assert_cond( decl != NULL, __FILE__, __LINE__);
+  bitpos = decl->bit_offset(expr->index_val());
+  ymuint dim = expr->declarray_dimension();
+  assert_cond( decl->dimension() == dim, __FILE__, __LINE__);
+  if ( dim > 1 ) {
+    // 配列型
+    ymuint offset = 0;
+    ymuint mlt = 1;
+    for (ymuint i = 0; i < dim; ++ i) {
+      const VlExpr* index = expr->declarray_index(i);
+      int index_val;
+      bool stat = index->eval_int(index_val);
+      assert_cond( stat, __FILE__, __LINE__);
+      offset += index_val * mlt;
+      mlt *= decl->range(i)->size();
+    }
+    MvNode* node = mDeclMap.get(decl, offset);
+    if ( node == NULL ) {
+      cout << decl->name() << " is not found in mDeclMap" << endl;
+    }
+    assert_cond( node != NULL, __FILE__, __LINE__);
+    cout << "gen_expr2 end(array)" << endl;
+    cout << "==> node = " << node->id() << endl;
+    return node;
+  }
+  else {
+    MvNode* node = mDeclMap.get(decl);
+    if ( node == NULL ) {
+      cout << decl->name() << " is not found in mDeclMap" << endl;
+    }
+    assert_cond( node != NULL, __FILE__, __LINE__);
+    cout << "gen_expr2 end(singleton)" << endl;
+    cout << "==> node = " << node->id() << endl;
+    return node;
+  }
+}
+
+// @brief 宣言要素への参照に対応するノードを作る．
+// @param[in] expr 式
+MvNode*
+ReaderImpl::gen_expr4(const VlExpr* expr,
+		      ymuint& msb,
+		      ymuint& lsb)
+{
+  cout << "gen_expr4(" << expr->decompile() << ")" << endl;
+  const VlDecl* decl = expr->decl_obj();
+  assert_cond( decl != NULL, __FILE__, __LINE__);
+  msb = decl->bit_offset(expr->left_range_val());
+  lsb = decl->bit_offset(expr->right_range_val());
   ymuint dim = expr->declarray_dimension();
   assert_cond( decl->dimension() == dim, __FILE__, __LINE__);
   if ( dim > 1 ) {

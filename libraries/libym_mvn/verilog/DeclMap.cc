@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 BEGIN_NONAMESPACE
 
 const
-bool debug_declmap = false;
+bool debug_declmap = true;
 
 END_NONAMESPACE
 

@@ -24,7 +24,8 @@ public:
 
   /// @brief 単純な形式のコンストラクタ
   /// @param[in] node 右辺のノード
-  Driver(MvNode* node);
+  explicit
+  Driver(MvNode* node = NULL);
 
   /// @brief ビット指定形式のコンストラクタ
   /// @param[in] node 右辺のノード
@@ -44,6 +45,10 @@ public:
   /// @param[in] src コピー元のオブジェクト
   Driver(const Driver& src);
 
+  /// @brief 代入演算子
+  const Driver&
+  operator=(const Driver& src);
+  
   /// @brief デストラクタ
   ~Driver();
 
@@ -81,7 +86,11 @@ public:
   ymuint
   lsb() const;
 
-  
+  /// @brief 等価比較演算子
+  bool
+  operator==(const Driver& rhs) const;
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -97,6 +106,11 @@ private:
   ymuint32 mLsb;
 
 };
+
+/// @brief 非等価比較演算子
+bool
+operator!=(const Driver& lhs,
+	   const Driver& rhs);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -147,6 +161,17 @@ Driver::Driver(const Driver& src) :
   mMsb(src.mMsb),
   mLsb(src.mLsb)
 {
+}
+
+// @brief 代入演算子
+inline
+const Driver&
+Driver::operator=(const Driver& src)
+{
+  mNode = src.mNode;
+  mMsb = src.mMsb;
+  mLsb = src.mLsb;
+  return *this;
 }
 
 // @brief デストラクタ
@@ -212,6 +237,23 @@ ymuint
 Driver::lsb() const
 {
   return mLsb >> 1;
+}
+
+// @brief 等価比較演算子
+inline
+bool
+Driver::operator==(const Driver& rhs) const
+{
+  return mNode == rhs.mNode && mMsb == rhs.mMsb && mLsb == rhs.mLsb;
+}
+
+// @brief 非等価比較演算子
+inline
+bool
+operator!=(const Driver& lhs,
+	   const Driver& rhs)
+{
+  return !(lhs == rhs);
 }
 
 END_NAMESPACE_YM_MVN_VERILOG

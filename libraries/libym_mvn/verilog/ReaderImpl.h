@@ -213,6 +213,22 @@ private:
   MvNode*
   gen_expr2(const VlExpr* expr);
 
+  /// @brief 宣言要素への参照に対応するノードを作る．
+  /// @param[in] expr 式
+  /// @param[in] bitpos ビット位置
+  MvNode*
+  gen_expr3(const VlExpr* expr,
+	    ymuint& bitpos);
+
+  /// @brief 宣言要素への参照に対応するノードを作る．
+  /// @param[in] expr 式
+  /// @param[in] msb MSBのビット位置
+  /// @param[in] lsb LSBのビット位置
+  MvNode*
+  gen_expr4(const VlExpr* expr,
+	    ymuint& msb,
+	    ymuint& lsb);
+
   /// @brief ドライバーを登録する．
   /// @param[in] node 左辺に対応するノード
   /// @param[in] driver ドライバー

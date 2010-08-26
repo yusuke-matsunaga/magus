@@ -163,11 +163,13 @@ dump_node(ostream& s,
     {
       const MvInputPin* ipin = node->input(0);
       const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
-      const MvNode* src_node = src_pin->node();
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node)
-	<< ";" << endl;
+      if ( net ) {
+	const MvOutputPin* src_pin = net->src_pin();
+	const MvNode* src_node = src_pin->node();
+	s << "  assign " << node_name(node)
+	  << " = " << node_name(src_node)
+	  << ";" << endl;
+      }
     }
     break;
 

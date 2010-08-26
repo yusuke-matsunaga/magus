@@ -377,6 +377,7 @@ mvn2sbj(const MvMgr& mvmgr,
   while ( !queue.empty() ) {
     const MvNode* node0 = queue.front();
     queue.pop_front();
+    cout << "node0 = " << node0->id() << endl;
     const MvNetList& folist = node0->output(0)->net_list();
     for (MvNetList::const_iterator p = folist.begin();
 	 p != folist.end(); ++ p) {
@@ -406,6 +407,8 @@ mvn2sbj(const MvMgr& mvmgr,
       }
       if ( !marked ) continue;
 
+      cout << "processing " << node->id() << endl;
+      
       // node に対応する SbjNode を作る．
       switch ( node->type() ) {
       case MvNode::kOutput:
@@ -790,6 +793,8 @@ mvn2sbj(const MvMgr& mvmgr,
     }
   }
 
+  cout << "A" << endl;
+  
   // 外部出力ノードを作る．
   ymuint no = module->output_num();
   for (ymuint i = 0; i < no; ++ i) {
@@ -811,6 +816,8 @@ mvn2sbj(const MvMgr& mvmgr,
     }
   }
 
+  cout << "B" << endl;
+  
   // ポートを生成する．
   ymuint np = module->port_num();
   for (ymuint i = 0; i < np; ++ i) {
@@ -859,6 +866,8 @@ mvn2sbj(const MvMgr& mvmgr,
     }
     sbjgraph.add_port(port->name(), tmp);
   }
+
+  cout << "mvn2sbj end" << endl;
 }
 
 END_NAMESPACE_YM_LUTMAP
