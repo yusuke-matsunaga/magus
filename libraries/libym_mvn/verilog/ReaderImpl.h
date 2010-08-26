@@ -288,6 +288,9 @@ private:
   // VlDecl と MvNode の対応付けをとるハッシュ表
   DeclMap mDeclMap;
 
+  // VlIODecl と MvNode の対応付けをとるハッシュ表
+  DeclMap mIODeclMap;
+  
   // VlDecl のドライバーのリスト
   vector<vector<Driver> > mDriverList;
   
