@@ -283,6 +283,57 @@ make_xor(SbjGraph& sbjgraph,
 }
 
 void
+enqueue(const MvNode* node0,
+	list<const MvNode*>& queue,
+	vector<bool>& mark)
+{
+  cout << "enqueue(" << node0->id() << ")" << endl;
+  const MvNetList& folist = node0->output(0)->net_list();
+  for (MvNetList::const_iterator p = folist.begin();
+       p != folist.end(); ++ p) {
+    const MvNet* net = *p;
+    const MvNode* node = net->dst_pin()->node();
+    if ( node->type() == MvNode::kDff1 ||
+	 node->type() == MvNode::kDff2 ||
+	 node->type() == MvNode::kConst ) {
+      continue;
+    }
+    if ( mark[node->id()] ) {
+      cout << "  [" << node->id() << "] already marked" << endl;
+      continue;
+    }
+    ymuint ni = node->input_num();
+    bool marked = true;
+    const MvNode* unmark = NULL;
+    for (ymuint i = 0; i < ni; ++ i) {
+      const MvInputPin* ipin = node->input(i);
+      const MvNet* net = ipin->net();
+      if ( net == NULL ) {
+	cout << "node" << node->id() << "->input(" << i
+	     << ") has no net" << endl;
+      }
+      assert_cond( net != NULL, __FILE__, __LINE__);
+      const MvOutputPin* opin = net->src_pin();
+      const MvNode* inode = opin->node();
+      if ( !mark[inode->id()] ) {
+	marked = false;
+	unmark = inode;
+	break;
+      }
+    }
+    if ( marked ) {
+      cout << "  [" << node->id() << "] is put into queue" << endl;
+      mark[node->id()] = true;
+      queue.push_back(node);
+    }
+    else {
+      cout << "  [" << node->id() << "] is not put into queue, "
+	   << "because [" << unmark->id() << "] is not marked" << endl;
+    }
+  }
+}
+
+void
 mvn2sbj(const MvMgr& mvmgr,
 	SbjGraph& sbjgraph)
 {
@@ -313,7 +364,7 @@ mvn2sbj(const MvMgr& mvmgr,
       mvmap.put(node, j, sbjnode, false);
     }
     mark[node->id()] = true;
-    queue.push_back(node);
+    enqueue(node, queue, mark);
   }
 
   // 外部入出力を作る．
@@ -326,7 +377,7 @@ mvn2sbj(const MvMgr& mvmgr,
       mvmap.put(node, j, sbjnode, false);
     }
     mark[node->id()] = true;
-    queue.push_back(node);
+    enqueue(node, queue, mark);
   }
 
   // DFF と定数ノードを作る．
@@ -342,7 +393,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	mvmap.put(node, j, sbjnode, false);
       }
       mark[node->id()] = true;
-      queue.push_back(node);
+      enqueue(node, queue, mark);
     }
     else if ( node->type() == MvNode::kConst ) {
       // 定数
@@ -369,347 +420,315 @@ mvn2sbj(const MvMgr& mvmgr,
 	}
       }
       mark[node->id()] = true;
-      queue.push_back(node);
+      enqueue(node, queue, mark);
     }
   }
 
   // 論理ノードを作る．
   while ( !queue.empty() ) {
-    const MvNode* node0 = queue.front();
+    const MvNode* node = queue.front();
     queue.pop_front();
-    cout << "node0 = " << node0->id() << endl;
-    const MvNetList& folist = node0->output(0)->net_list();
-    for (MvNetList::const_iterator p = folist.begin();
-	 p != folist.end(); ++ p) {
-      const MvNet* net = *p;
-      const MvNode* node = net->dst_pin()->node();
-      if ( node->type() == MvNode::kDff1 ||
-	   node->type() == MvNode::kDff2 ||
-	   node->type() == MvNode::kConst ) {
-	continue;
-      }
-      ymuint ni = node->input_num();
-      bool marked = true;
-      for (ymuint i = 0; i < ni; ++ i) {
-	const MvInputPin* ipin = node->input(i);
-	const MvNet* net = ipin->net();
-	if ( net == NULL ) {
-	  cout << "node" << node->id() << "->input(" << i
-	       << ") has no net" << endl;
-	}
-	assert_cond( net != NULL, __FILE__, __LINE__);
-	const MvOutputPin* opin = net->src_pin();
-	const MvNode* inode = opin->node();
-	if ( !mark[inode->id()] ) {
-	  marked = false;
-	  break;
-	}
-      }
-      if ( !marked ) continue;
 
-      cout << "processing " << node->id() << endl;
+    cout << "processing [" << node->id() << "]" << endl;
       
-      // node に対応する SbjNode を作る．
-      switch ( node->type() ) {
-      case MvNode::kOutput:
-	break;
+    // node に対応する SbjNode を作る．
+    switch ( node->type() ) {
+    case MvNode::kOutput:
+      break;
 	
-      case MvNode::kThrough:
-	{
-	  const MvInputPin* ipin = node->input(0);
-	  const MvNet* net = ipin->net();
-	  const MvOutputPin* opin = net->src_pin();
-	  const MvNode* src_node = opin->node();
-	  ymuint bw = opin->bit_width();
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    SbjNode* sbjnode;
-	    bool inv;
-	    bool stat = mvmap.get(src_node, i, sbjnode, inv);
-	    assert_cond( stat , __FILE__, __LINE__);
-	    mvmap.put(node, i, sbjnode, inv);
-	  }
+    case MvNode::kThrough:
+      {
+	const MvInputPin* ipin = node->input(0);
+	const MvNet* net = ipin->net();
+	const MvOutputPin* opin = net->src_pin();
+	const MvNode* src_node = opin->node();
+	ymuint bw = opin->bit_width();
+	for (ymuint i = 0; i < bw; ++ i) {
+	  SbjNode* sbjnode;
+	  bool inv;
+	  bool stat = mvmap.get(src_node, i, sbjnode, inv);
+	  assert_cond( stat , __FILE__, __LINE__);
+	  mvmap.put(node, i, sbjnode, inv);
 	}
-	break;
-	
-      case MvNode::kNot:
-	{
-	  const MvInputPin* ipin = node->input(0);
-	  const MvNet* net = ipin->net();
-	  const MvOutputPin* opin = net->src_pin();
-	  const MvNode* src_node = opin->node();
-	  ymuint bw = opin->bit_width();
-	  assert_cond( node->output(0)->bit_width(), __FILE__, __LINE__);
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    SbjNode* sbjnode;
-	    bool inv;
-	    bool stat = mvmap.get(src_node, i, sbjnode, inv);
-	    assert_cond( stat , __FILE__, __LINE__);
-	    mvmap.put(node, i, sbjnode, !inv);
-	  }
-	}
-	break;
-
-      case MvNode::kAnd:
-	{
-	  const MvInputPin* ipin0 = node->input(0);
-	  const MvNet* net0 = ipin0->net();
-	  const MvOutputPin* src_pin0 = net0->src_pin();
-	  const MvNode* src_node0 = src_pin0->node();
-
-	  const MvInputPin* ipin1 = node->input(1);
-	  const MvNet* net1 = ipin1->net();
-	  const MvOutputPin* src_pin1 = net1->src_pin();
-	  const MvNode* src_node1 = src_pin1->node();
-
-	  ymuint bw = node->output(0)->bit_width();
-	  assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-	  assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    SbjNode* sbjnode0;
-	    bool inv0;
-	    bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
-	    SbjNode* sbjnode1;
-	    bool inv1;
-	    bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
-	    assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	    SbjNode* sbjnode = NULL;
-	    bool inv = false;
-	    make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	    mvmap.put(node, i, sbjnode, inv);
-	  }
-	}
-	break;
-
-      case MvNode::kOr:
-	{
-	  const MvInputPin* ipin0 = node->input(0);
-	  const MvNet* net0 = ipin0->net();
-	  const MvOutputPin* src_pin0 = net0->src_pin();
-	  const MvNode* src_node0 = src_pin0->node();
-
-	  const MvInputPin* ipin1 = node->input(1);
-	  const MvNet* net1 = ipin1->net();
-	  const MvOutputPin* src_pin1 = net1->src_pin();
-	  const MvNode* src_node1 = src_pin1->node();
-
-	  ymuint bw = node->output(0)->bit_width();
-	  assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-	  assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    SbjNode* sbjnode0;
-	    bool inv0;
-	    bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
-	    SbjNode* sbjnode1;
-	    bool inv1;
-	    bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
-	    assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	    SbjNode* sbjnode = NULL;
-	    bool inv = false;
-	    make_or(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	    mvmap.put(node, i, sbjnode, inv);
-	  }
-	}
-	break;
-
-      case MvNode::kXor:
-	{
-	  const MvInputPin* ipin0 = node->input(0);
-	  const MvNet* net0 = ipin0->net();
-	  const MvOutputPin* src_pin0 = net0->src_pin();
-	  const MvNode* src_node0 = src_pin0->node();
-
-	  const MvInputPin* ipin1 = node->input(1);
-	  const MvNet* net1 = ipin1->net();
-	  const MvOutputPin* src_pin1 = net1->src_pin();
-	  const MvNode* src_node1 = src_pin1->node();
-
-	  ymuint bw = node->output(0)->bit_width();
-	  assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-	  assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    SbjNode* sbjnode0;
-	    bool inv0;
-	    bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
-	    SbjNode* sbjnode1;
-	    bool inv1;
-	    bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
-	    assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	    SbjNode* sbjnode = NULL;
-	    bool inv = false;
-	    make_xor(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	    mvmap.put(node, i, sbjnode, inv);
-	  }
-	}
-	break;
-
-      case MvNode::kRand:
-      case MvNode::kRor:
-      case MvNode::kRxor:
-	{
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	break;
-
-      case MvNode::kEq:
-      case MvNode::kLt:
-	{
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	break;
-
-      case MvNode::kAdd:
-      case MvNode::kSub:
-      case MvNode::kMult:
-      case MvNode::kDiv:
-      case MvNode::kMod:
-      case MvNode::kPow:
-	{
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	break;
-
-      case MvNode::kIte:
-	{
-	  const MvInputPin* ipin0 = node->input(0);
-	  const MvNet* net0 = ipin0->net();
-	  const MvOutputPin* src_pin0 = net0->src_pin();
-	  const MvNode* src_node0 = src_pin0->node();
-	  
-	  const MvInputPin* ipin1 = node->input(1);
-	  const MvNet* net1 = ipin1->net();
-	  const MvOutputPin* src_pin1 = net1->src_pin();
-	  const MvNode* src_node1 = src_pin1->node();
-	  
-	  const MvInputPin* ipin2 = node->input(2);
-	  const MvNet* net2 = ipin2->net();
-	  const MvOutputPin* src_pin2 = net2->src_pin();
-	  const MvNode* src_node2 = src_pin2->node();
-
-	  ymuint bw = node->output(0)->bit_width();
-	  assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	  assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
-	  SbjNode* sbjnode0;
-	  bool inv0;
-	  bool stat0 = mvmap.get(src_node0, sbjnode0, inv0);
-	  assert_cond( stat0, __FILE__, __LINE__);
-	  
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    SbjNode* sbjnode1;
-	    bool inv1;
-	    bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
-	    SbjNode* sbjnode2;
-	    bool inv2;
-	    bool stat2 = mvmap.get(src_node2, i, sbjnode2, inv2);
-	    assert_cond( stat1 && stat2 , __FILE__, __LINE__);
-	    SbjNode* and1 = NULL;
-	    bool and1_inv = false;
-	    make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, and1, and1_inv);
-	    SbjNode* and2 = NULL;
-	    bool and2_inv = false;
-	    make_and(sbjgraph, sbjnode0, !inv0, sbjnode2, inv2, and2, and2_inv);
-	    SbjNode* or1 = NULL;
-	    bool or1_inv = false;
-	    make_or(sbjgraph, and1, and1_inv, and2, and2_inv, or1, or1_inv);
-	    mvmap.put(node, i, or1, or1_inv);
-	  }
-	}
-	break;
-
-      case MvNode::kConcat:
-	{
-	  ymuint bw = node->output(0)->bit_width();
-	  ymuint ni = node->input_num();
-	  ymuint offset = 0U;
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    const MvInputPin* ipin = node->input(i);
-	    const MvNet* net = ipin->net();
-	    const MvOutputPin* opin = net->src_pin();
-	    const MvNode* src_node = opin->node();
-	    ymuint bw1 = opin->bit_width();
-	    for (ymuint j = 0; j < bw1; ++ j) {
-	      ymuint index = offset + j;
-
-	      SbjNode* sbjnode0;
-	      bool inv0;
-	      bool stat0 = mvmap.get(src_node, j, sbjnode0, inv0);
-	      assert_cond( stat0, __FILE__, __LINE__);
-	      mvmap.put(node, index, sbjnode0, inv0);
-	    }
-	    offset += bw1;
-	  }
-	  assert_cond( bw == offset, __FILE__, __LINE__);
-	}
-	break;
-
-      case MvNode::kConstBitSelect:
-	{
-	  const MvInputPin* ipin = node->input(0);
-	  const MvNet* net = ipin->net();
-	  const MvOutputPin* src_pin = net->src_pin();
-	  const MvNode* src_node = src_pin->node();
-
-	  SbjNode* sbjnode0;
-	  bool inv0;
-	  bool stat0 = mvmap.get(src_node, node->bitpos(), sbjnode0, inv0);
-	  assert_cond( stat0 , __FILE__, __LINE__);
-	  mvmap.put(node, sbjnode0, inv0);
-	}
-	break;
-
-      case MvNode::kConstPartSelect:
-	{
-	  const MvInputPin* ipin = node->input(0);
-	  const MvNet* net = ipin->net();
-	  const MvOutputPin* src_pin = net->src_pin();
-	  const MvNode* src_node = src_pin->node();
-
-	  ymuint bw = node->output(0)->bit_width();
-	  ymuint msb = node->msb();
-	  ymuint lsb = node->lsb();
-	  assert_cond( bw == msb - lsb + 1,
-		       __FILE__, __LINE__);
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    SbjNode* sbjnode0;
-	    bool inv0;
-	    bool stat0 = mvmap.get(src_node, i + lsb, sbjnode0, inv0);
-	    assert_cond( stat0 , __FILE__, __LINE__);
-	    mvmap.put(node, i, sbjnode0, inv0);
-	  }
-	}
-	break;
-
-      case MvNode::kBitSelect:
-	{
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	break;
-
-      case MvNode::kPartSelect:
-	{
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	break;
-
-      case MvNode::kCombUdp:
-	{
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	break;
-
-      case MvNode::kSeqUdp:
-	{
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	break;
-
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
       }
-      // node に処理済みの印をつける．
-      mark[node->id()] = true;
-      queue.push_back(node);
+      break;
+	
+    case MvNode::kNot:
+      {
+	const MvInputPin* ipin = node->input(0);
+	const MvNet* net = ipin->net();
+	const MvOutputPin* opin = net->src_pin();
+	const MvNode* src_node = opin->node();
+	ymuint bw = opin->bit_width();
+	assert_cond( node->output(0)->bit_width(), __FILE__, __LINE__);
+	for (ymuint i = 0; i < bw; ++ i) {
+	  SbjNode* sbjnode;
+	  bool inv;
+	  bool stat = mvmap.get(src_node, i, sbjnode, inv);
+	  assert_cond( stat , __FILE__, __LINE__);
+	  mvmap.put(node, i, sbjnode, !inv);
+	}
+      }
+      break;
+      
+    case MvNode::kAnd:
+      {
+	const MvInputPin* ipin0 = node->input(0);
+	const MvNet* net0 = ipin0->net();
+	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvNode* src_node0 = src_pin0->node();
+	
+	const MvInputPin* ipin1 = node->input(1);
+	const MvNet* net1 = ipin1->net();
+	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvNode* src_node1 = src_pin1->node();
+	
+	ymuint bw = node->output(0)->bit_width();
+	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
+	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
+	for (ymuint i = 0; i < bw; ++ i) {
+	  SbjNode* sbjnode0;
+	  bool inv0;
+	  bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
+	  SbjNode* sbjnode1;
+	  bool inv1;
+	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
+	  SbjNode* sbjnode = NULL;
+	  bool inv = false;
+	  make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
+	  mvmap.put(node, i, sbjnode, inv);
+	}
+      }
+      break;
+      
+    case MvNode::kOr:
+      {
+	const MvInputPin* ipin0 = node->input(0);
+	const MvNet* net0 = ipin0->net();
+	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvNode* src_node0 = src_pin0->node();
+	
+	const MvInputPin* ipin1 = node->input(1);
+	const MvNet* net1 = ipin1->net();
+	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvNode* src_node1 = src_pin1->node();
+	
+	ymuint bw = node->output(0)->bit_width();
+	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
+	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
+	for (ymuint i = 0; i < bw; ++ i) {
+	  SbjNode* sbjnode0;
+	  bool inv0;
+	  bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
+	  SbjNode* sbjnode1;
+	  bool inv1;
+	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
+	  SbjNode* sbjnode = NULL;
+	  bool inv = false;
+	  make_or(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
+	  mvmap.put(node, i, sbjnode, inv);
+	}
+      }
+      break;
+      
+    case MvNode::kXor:
+      {
+	const MvInputPin* ipin0 = node->input(0);
+	const MvNet* net0 = ipin0->net();
+	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvNode* src_node0 = src_pin0->node();
+	
+	const MvInputPin* ipin1 = node->input(1);
+	const MvNet* net1 = ipin1->net();
+	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvNode* src_node1 = src_pin1->node();
+	
+	ymuint bw = node->output(0)->bit_width();
+	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
+	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
+	for (ymuint i = 0; i < bw; ++ i) {
+	  SbjNode* sbjnode0;
+	  bool inv0;
+	  bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
+	  SbjNode* sbjnode1;
+	  bool inv1;
+	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
+	  SbjNode* sbjnode = NULL;
+	  bool inv = false;
+	  make_xor(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
+	  mvmap.put(node, i, sbjnode, inv);
+	}
+      }
+      break;
+
+    case MvNode::kRand:
+    case MvNode::kRor:
+    case MvNode::kRxor:
+      {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+      
+    case MvNode::kEq:
+    case MvNode::kLt:
+      {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+      
+    case MvNode::kAdd:
+    case MvNode::kSub:
+    case MvNode::kMult:
+    case MvNode::kDiv:
+    case MvNode::kMod:
+    case MvNode::kPow:
+      {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+      
+    case MvNode::kIte:
+      {
+	const MvInputPin* ipin0 = node->input(0);
+	const MvNet* net0 = ipin0->net();
+	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvNode* src_node0 = src_pin0->node();
+	
+	const MvInputPin* ipin1 = node->input(1);
+	const MvNet* net1 = ipin1->net();
+	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvNode* src_node1 = src_pin1->node();
+	
+	const MvInputPin* ipin2 = node->input(2);
+	const MvNet* net2 = ipin2->net();
+	const MvOutputPin* src_pin2 = net2->src_pin();
+	const MvNode* src_node2 = src_pin2->node();
+	
+	ymuint bw = node->output(0)->bit_width();
+	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
+	assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
+	SbjNode* sbjnode0;
+	bool inv0;
+	bool stat0 = mvmap.get(src_node0, sbjnode0, inv0);
+	assert_cond( stat0, __FILE__, __LINE__);
+	
+	for (ymuint i = 0; i < bw; ++ i) {
+	  SbjNode* sbjnode1;
+	  bool inv1;
+	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  SbjNode* sbjnode2;
+	  bool inv2;
+	  bool stat2 = mvmap.get(src_node2, i, sbjnode2, inv2);
+	  assert_cond( stat1 && stat2 , __FILE__, __LINE__);
+	  SbjNode* and1 = NULL;
+	  bool and1_inv = false;
+	  make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, and1, and1_inv);
+	  SbjNode* and2 = NULL;
+	  bool and2_inv = false;
+	  make_and(sbjgraph, sbjnode0, !inv0, sbjnode2, inv2, and2, and2_inv);
+	  SbjNode* or1 = NULL;
+	  bool or1_inv = false;
+	  make_or(sbjgraph, and1, and1_inv, and2, and2_inv, or1, or1_inv);
+	  mvmap.put(node, i, or1, or1_inv);
+	}
+      }
+      break;
+
+    case MvNode::kConcat:
+      {
+	ymuint bw = node->output(0)->bit_width();
+	ymuint ni = node->input_num();
+	ymuint offset = 0U;
+	for (ymuint i = 0; i < ni; ++ i) {
+	  const MvInputPin* ipin = node->input(i);
+	  const MvNet* net = ipin->net();
+	  const MvOutputPin* opin = net->src_pin();
+	  const MvNode* src_node = opin->node();
+	  ymuint bw1 = opin->bit_width();
+	  for (ymuint j = 0; j < bw1; ++ j) {
+	    ymuint index = offset + j;
+	    
+	    SbjNode* sbjnode0;
+	    bool inv0;
+	    bool stat0 = mvmap.get(src_node, j, sbjnode0, inv0);
+	    assert_cond( stat0, __FILE__, __LINE__);
+	    mvmap.put(node, index, sbjnode0, inv0);
+	  }
+	  offset += bw1;
+	}
+	assert_cond( bw == offset, __FILE__, __LINE__);
+      }
+      break;
+      
+    case MvNode::kConstBitSelect:
+      {
+	const MvInputPin* ipin = node->input(0);
+	const MvNet* net = ipin->net();
+	const MvOutputPin* src_pin = net->src_pin();
+	const MvNode* src_node = src_pin->node();
+	
+	SbjNode* sbjnode0;
+	bool inv0;
+	bool stat0 = mvmap.get(src_node, node->bitpos(), sbjnode0, inv0);
+	assert_cond( stat0 , __FILE__, __LINE__);
+	mvmap.put(node, sbjnode0, inv0);
+      }
+      break;
+      
+    case MvNode::kConstPartSelect:
+      {
+	const MvInputPin* ipin = node->input(0);
+	const MvNet* net = ipin->net();
+	const MvOutputPin* src_pin = net->src_pin();
+	const MvNode* src_node = src_pin->node();
+	
+	ymuint bw = node->output(0)->bit_width();
+	ymuint msb = node->msb();
+	ymuint lsb = node->lsb();
+	assert_cond( bw == msb - lsb + 1,
+		     __FILE__, __LINE__);
+	for (ymuint i = 0; i < bw; ++ i) {
+	  SbjNode* sbjnode0;
+	  bool inv0;
+	  bool stat0 = mvmap.get(src_node, i + lsb, sbjnode0, inv0);
+	  assert_cond( stat0 , __FILE__, __LINE__);
+	  mvmap.put(node, i, sbjnode0, inv0);
+	}
+      }
+      break;
+      
+    case MvNode::kBitSelect:
+      {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+      
+    case MvNode::kPartSelect:
+      {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+      
+    case MvNode::kCombUdp:
+      {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+      
+    case MvNode::kSeqUdp:
+      {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+      
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
     }
+    enqueue(node, queue, mark);
   }
 
   // DFFノードの入力を接続する．
@@ -717,6 +736,7 @@ mvn2sbj(const MvMgr& mvmgr,
     const MvNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
     if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
+      cout << "connecting input of [" << node->id() << "]" << endl;
       const MvInputPin* ipin = node->input(0);
       const MvNet* net = ipin->net();
       assert_cond( net != NULL, __FILE__, __LINE__);
@@ -730,6 +750,14 @@ mvn2sbj(const MvMgr& mvmgr,
 	SbjNode* isbjnode;
 	bool iinv;
 	bool stat1 = mvmap.get(src_node, j, isbjnode, iinv);
+	if ( !stat ) {
+	  cout << node->id() << ":" << j << " not found" << endl;
+	  cout << "mark[node->id()] = " << mark[node->id()] << endl;
+	}
+	if ( !stat1 ) {
+	  cout << src_node->id() << ":" << j << " not found" << endl;
+	  cout << "mark[src_node->id()] = " << mark[src_node->id()] << endl;
+	}
 	assert_cond( stat && stat1 , __FILE__, __LINE__);
 	assert_cond( inv == false, __FILE__, __LINE__);
 	sbjgraph.set_dff_data(sbjnode, isbjnode, iinv);
