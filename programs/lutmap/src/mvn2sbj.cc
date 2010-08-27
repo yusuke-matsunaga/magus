@@ -287,7 +287,6 @@ enqueue(const MvNode* node0,
 	list<const MvNode*>& queue,
 	vector<bool>& mark)
 {
-  cout << "enqueue(" << node0->id() << ")" << endl;
   const MvNetList& folist = node0->output(0)->net_list();
   for (MvNetList::const_iterator p = folist.begin();
        p != folist.end(); ++ p) {
@@ -299,7 +298,6 @@ enqueue(const MvNode* node0,
       continue;
     }
     if ( mark[node->id()] ) {
-      cout << "  [" << node->id() << "] already marked" << endl;
       continue;
     }
     ymuint ni = node->input_num();
@@ -309,7 +307,7 @@ enqueue(const MvNode* node0,
       const MvInputPin* ipin = node->input(i);
       const MvNet* net = ipin->net();
       if ( net == NULL ) {
-	cout << "node" << node->id() << "->input(" << i
+	cerr << "node" << node->id() << "->input(" << i
 	     << ") has no net" << endl;
       }
       assert_cond( net != NULL, __FILE__, __LINE__);
@@ -322,13 +320,8 @@ enqueue(const MvNode* node0,
       }
     }
     if ( marked ) {
-      cout << "  [" << node->id() << "] is put into queue" << endl;
       mark[node->id()] = true;
       queue.push_back(node);
-    }
-    else {
-      cout << "  [" << node->id() << "] is not put into queue, "
-	   << "because [" << unmark->id() << "] is not marked" << endl;
     }
   }
 }
@@ -342,7 +335,7 @@ mvn2sbj(const MvMgr& mvmgr,
   list<const MvModule*> module_list;
   ymuint n = mvmgr.topmodule_list(module_list);
   if ( n != 1 ) {
-    cout << "# of topmodules is not 1" << endl;
+    cerr << "# of topmodules is not 1" << endl;
     return;
   }
 
@@ -429,8 +422,6 @@ mvn2sbj(const MvMgr& mvmgr,
     const MvNode* node = queue.front();
     queue.pop_front();
 
-    cout << "processing [" << node->id() << "]" << endl;
-      
     // node に対応する SbjNode を作る．
     switch ( node->type() ) {
     case MvNode::kOutput:
