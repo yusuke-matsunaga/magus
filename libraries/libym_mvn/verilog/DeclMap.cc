@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 BEGIN_NONAMESPACE
 
 const
-bool debug_declmap = true;
+bool debug_declmap = false;
 
 END_NONAMESPACE
 
@@ -55,7 +55,7 @@ DeclMap::add(const VlDecl* decl,
 	     MvNode* node)
 {
   if ( debug_declmap ) {
-    cout << "DeclMap::add(" << decl->full_name()
+    cerr << "DeclMap::add(" << decl->full_name()
 	 << ", Node#" << node->id() << ")"
 	 << endl;
   }
@@ -78,7 +78,7 @@ DeclMap::add(const VlDecl* decl,
 	     MvNode* node)
 {
   if ( debug_declmap ) {
-    cout << "DeclMap::add(" << decl->full_name()
+    cerr << "DeclMap::add(" << decl->full_name()
 	 << "[" << offset << "]"
 	 << ", Node#" << node->id() << ")"
 	 << endl;

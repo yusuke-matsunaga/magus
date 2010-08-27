@@ -331,7 +331,7 @@ MvMgr::connect(MvNode* src_node,
   MvOutputPin* src_pin = src_node->_output(src_pin_pos);
   MvInputPin* dst_pin = dst_node->_input(dst_pin_pos);
   if ( src_pin->bit_width() != dst_pin->bit_width() ) {
-    cout << "src_pin->bit_width() = " << src_pin->bit_width()
+    cerr << "src_pin->bit_width() = " << src_pin->bit_width()
 	 << ", dst_pin->bit_width() = " << dst_pin->bit_width() << endl;
     cerr << "bit_width mismatch" << endl;
     abort();
@@ -418,6 +418,106 @@ MvMgr::sweep()
       connect(src_node, src_pos, dst_node, dst_pos);
     }
     delete_node(node);
+  }
+
+  // ビット/部分選択と接続している連結演算の削除を行う．
+  node_list.clear();
+  for (ymuint i = 0; i < n; ++ i) {
+    MvNode* node = _node(i);
+    if ( node == NULL ) continue;
+    node_list.push_back(node);
+  }
+  for (vector<MvNode*>::iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    MvNode* node = *p;
+    if ( node->type() == MvNode::kConstBitSelect ) {
+      MvNode* src_node = node->input(0)->net()->src_pin()->node();
+      if ( src_node->type() == MvNode::kConcat ) {
+	MvNode* alt_node = select(src_node, node->bitpos());
+	// node を alt_node に置き換える．
+	replace(node, alt_node);
+      }
+    }
+#if 0
+    else if ( node->type() == MvNode::kConstPartSelect ) {
+      MvNode* src_node = node->input(0)->net()->src_pin()->node();
+      if ( src_node->type() == MvNode::kConcat ) {
+	MvNdoe* alt_node = select(src_node, node->mbs(), node->lsb());
+	// node を alt_node に置き換える．
+	replace(node, alt_node);
+      }
+    }
+#endif
+  }
+}
+
+// @brief 連結演算からビットを抜き出す．
+// @param[in] src_node 連結演算ノード
+// @param[in] bitpos 抜き出すビット位置
+MvNode*
+MvMgr::select(MvNode* src_node,
+	      ymuint bitpos)
+{
+  assert_cond( src_node->type() == MvNode::kConcat, __FILE__, __LINE__);
+  ymuint ni = src_node->input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const MvInputPin* ipin = src_node->input(i);
+    ymuint bw = ipin->bit_width();
+    if ( bitpos < bw ) {
+      MvNode* inode = ipin->net()->src_pin()->node();
+      if ( inode->type() == MvNode::kConcat ) {
+	return select(inode, bitpos);
+      }
+      else {
+	MvNode* bitsel = new_constbitselect(src_node->mParent, bitpos, bw);
+	connect(inode, 0, bitsel, 0);
+	return bitsel;
+      }
+    }
+    bitpos -= bw;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 連結演算から部分を抜き出す．
+// @param[in] src_node 連結演算ノード
+// @param[in] msb 抜き出す部分の MSB
+// @param[in] lsb 抜き出す部分の LSB
+MvNode*
+MvMgr::select(MvNode* src_node,
+	      ymuint msb,
+	      ymuint lsb)
+{
+  return NULL;
+}
+
+// @brief node を alt_node に置き換える．
+// @param[in] node 置換元のノード
+// @param[in] alt_node 置換先のノード
+// @note node は削除される．
+void
+MvMgr::replace(MvNode* node,
+	       MvNode* alt_node)
+{
+  ymuint no = node->output_num();
+  assert_cond( no == alt_node->output_num(), __FILE__, __LINE__);
+  for (ymuint i = 0; i < no; ++ i) {
+    const MvOutputPin* opin = node->output(i);
+    const MvNetList& folist = opin->net_list();
+    vector<MvNet*> net_list;
+    for (MvNetList::const_iterator p = folist.begin();
+	 p != folist.end(); ++ p) {
+      net_list.push_back(*p);
+    }
+    for (vector<MvNet*>::iterator p = net_list.begin();
+	 p != net_list.end(); ++ p) {
+      MvNet* net = *p;
+      MvPin* dst_pin = net->mDst;
+      MvNode* dst_node = dst_pin->node();
+      disconnect(net);
+      connect(alt_node, i, dst_node, dst_pin->pos());
+    }
   }
 }
 

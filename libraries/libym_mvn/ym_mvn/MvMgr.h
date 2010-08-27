@@ -494,12 +494,36 @@ public:
 	    ymuint bit_width,
 	    const vector<ymuint32>& val);
 
+  /// @brief 連結演算からビットを抜き出す．
+  /// @param[in] src_node 連結演算ノード
+  /// @param[in] bitpos 抜き出すビット位置
+  MvNode*
+  select(MvNode* src_node,
+	 ymuint bitpos);
+
+  /// @brief 連結演算から部分を抜き出す．
+  /// @param[in] src_node 連結演算ノード
+  /// @param[in] msb 抜き出す部分の MSB
+  /// @param[in] lsb 抜き出す部分の LSB
+  MvNode*
+  select(MvNode* src_node,
+	 ymuint msb,
+	 ymuint lsb);
+  
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード
   /// @note 入力ノード, 出力ノードは削除できない
   /// @note 接続が残っているノードは削除できない．
   void
   delete_node(MvNode* node);
+
+  /// @brief node を alt_node に置き換える．
+  /// @param[in] node 置換元のノード
+  /// @param[in] alt_node 置換先のノード
+  /// @note node は削除される．
+  void
+  replace(MvNode* node,
+	  MvNode* alt_node);
   
   /// @brief ピンとピンを接続する．
   /// @param[in] src_node 入力元のノード

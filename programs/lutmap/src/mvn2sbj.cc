@@ -736,7 +736,6 @@ mvn2sbj(const MvMgr& mvmgr,
     const MvNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
     if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
-      cout << "connecting input of [" << node->id() << "]" << endl;
       const MvInputPin* ipin = node->input(0);
       const MvNet* net = ipin->net();
       assert_cond( net != NULL, __FILE__, __LINE__);
@@ -750,14 +749,6 @@ mvn2sbj(const MvMgr& mvmgr,
 	SbjNode* isbjnode;
 	bool iinv;
 	bool stat1 = mvmap.get(src_node, j, isbjnode, iinv);
-	if ( !stat ) {
-	  cout << node->id() << ":" << j << " not found" << endl;
-	  cout << "mark[node->id()] = " << mark[node->id()] << endl;
-	}
-	if ( !stat1 ) {
-	  cout << src_node->id() << ":" << j << " not found" << endl;
-	  cout << "mark[src_node->id()] = " << mark[src_node->id()] << endl;
-	}
 	assert_cond( stat && stat1 , __FILE__, __LINE__);
 	assert_cond( inv == false, __FILE__, __LINE__);
 	sbjgraph.set_dff_data(sbjnode, isbjnode, iinv);
@@ -820,8 +811,6 @@ mvn2sbj(const MvMgr& mvmgr,
       }
     }
   }
-
-  cout << "A" << endl;
   
   // 外部出力ノードを作る．
   ymuint no = module->output_num();
@@ -843,8 +832,6 @@ mvn2sbj(const MvMgr& mvmgr,
       mvmap.put(node, j, osbjnode, false);
     }
   }
-
-  cout << "B" << endl;
   
   // ポートを生成する．
   ymuint np = module->port_num();
@@ -894,8 +881,6 @@ mvn2sbj(const MvMgr& mvmgr,
     }
     sbjgraph.add_port(port->name(), tmp);
   }
-
-  cout << "mvn2sbj end" << endl;
 }
 
 END_NAMESPACE_YM_LUTMAP
