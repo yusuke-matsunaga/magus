@@ -295,11 +295,13 @@ MvMgr::delete_node(MvNode* node)
   }
   for (ymuint i = 0; i < node->input_num(); ++ i) {
     if ( node->input(i)->net() ) {
+      cerr << "node" << node->id() << " has fanin" << endl;
       return;
     }
   }
   for (ymuint i = 0; i < node->output_num(); ++ i) {
     if ( !node->output(i)->net_list().empty() ) {
+      cerr << "node" << node->id() << " has fanout" << endl;
       return;
     }
   }
@@ -374,6 +376,18 @@ MvMgr::disconnect(MvNet* net)
   delete net;
 }
 
+bool
+no_fanouts(MvNode* node)
+{
+  ymuint no = node->output_num();
+  for (ymuint j = 0; j < no; ++ j) {
+    if ( !node->output(j)->net_list().empty() ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // @brief 冗長な through ノードを取り除く
 void
 MvMgr::sweep()
@@ -433,7 +447,12 @@ MvMgr::sweep()
     if ( node->type() == MvNode::kConstBitSelect ) {
       MvNode* src_node = node->input(0)->net()->src_pin()->node();
       if ( src_node->type() == MvNode::kConcat ) {
-	MvNode* alt_node = select(src_node, node->bitpos());
+	MvNode* alt_node = select_from_concat(src_node, node->bitpos());
+	// node を alt_node に置き換える．
+	replace(node, alt_node);
+      }
+      else if ( src_node->type() == MvNode::kConstPartSelect ) {
+	MvNode* alt_node = select_from_partselect(src_node, node->bitpos());
 	// node を alt_node に置き換える．
 	replace(node, alt_node);
       }
@@ -449,15 +468,114 @@ MvMgr::sweep()
     }
 #endif
   }
+
+  // どこにも出力していないノードを削除する．
+  list<MvNode*> node_queue;
+  for (ymuint i = 0; i < n; ++ i) {
+    MvNode* node = _node(i);
+    if ( node == NULL ) continue;
+    if ( node->type() == MvNode::kOutput ) continue;
+    if ( no_fanouts(node) ) {
+      node_queue.push_back(node);
+    }
+  }
+  while ( !node_queue.empty() ) {
+    MvNode* node = node_queue.front();
+    node_queue.pop_front();
+    ymuint ni = node->input_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      MvNet* net = node->input(i)->net();
+      if ( net ) {
+	MvNode* src_node = net->src_pin()->node();
+	disconnect(net);
+	if ( no_fanouts(src_node) ) {
+	  node_queue.push_back(src_node);
+	}
+      }
+    }
+    delete_node(node);
+  }
 }
 
 // @brief 連結演算からビットを抜き出す．
 // @param[in] src_node 連結演算ノード
 // @param[in] bitpos 抜き出すビット位置
 MvNode*
-MvMgr::select(MvNode* src_node,
-	      ymuint bitpos)
+MvMgr::select_from_concat(MvNode* src_node,
+			  ymuint bitpos)
 {
+  assert_cond( src_node->type() == MvNode::kConcat, __FILE__, __LINE__);
+  ymuint ni = src_node->input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const MvInputPin* ipin = src_node->input(i);
+    ymuint bw = ipin->bit_width();
+    if ( bitpos < bw ) {
+      MvNode* inode = ipin->net()->src_pin()->node();
+      if ( inode->type() == MvNode::kConcat ) {
+	return select_from_concat(inode, bitpos);
+      }
+      else if ( inode->type() == MvNode::kConstPartSelect ) {
+	return select_from_partselect(inode, bitpos);
+      }
+      else if ( bw == 1 ) {
+	return inode;
+      }
+      else {
+	MvNode* bitsel = new_constbitselect(src_node->mParent, bitpos, bw);
+	connect(inode, 0, bitsel, 0);
+	return bitsel;
+      }
+    }
+    bitpos -= bw;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 部分指定子からビットを抜き出す．
+// @param[in] src_node 部分指定ノード
+// @param[in] bitpos 抜き出すビット位置
+MvNode*
+MvMgr::select_from_partselect(MvNode* src_node,
+			      ymuint bitpos)
+{
+  assert_cond( src_node->type() == MvNode::kConstPartSelect,
+	       __FILE__, __LINE__);
+  const MvInputPin* ipin = src_node->input(0);
+  ymuint bw = ipin->bit_width();
+  assert_cond( bitpos < bw, __FILE__, __LINE__);
+  ymuint msb = src_node->msb();
+  ymuint lsb = src_node->lsb();
+  if ( msb > lsb ) {
+    bitpos = bitpos + lsb;
+  }
+  else {
+    bitpos = lsb - bitpos;
+  }
+  MvNode* inode = ipin->net()->src_pin()->node();
+  if ( inode->type() == MvNode::kConcat ) {
+    return select_from_concat(inode, bitpos);
+  }
+  else if ( inode->type() == MvNode::kConstPartSelect ) {
+    return select_from_partselect(inode, bitpos);
+  }
+  else {
+    MvNode* bitsel = new_constbitselect(src_node->mParent, bitpos, bw);
+    connect(inode, 0, bitsel, 0);
+    return bitsel;
+  }
+}
+
+// @brief 連結演算から部分を抜き出す．
+// @param[in] src_node 連結演算ノード
+// @param[in] msb 抜き出す部分の MSB
+// @param[in] lsb 抜き出す部分の LSB
+MvNode*
+MvMgr::select(MvNode* src_node,
+	      ymuint msb,
+	      ymuint lsb)
+{
+#if 0
   assert_cond( src_node->type() == MvNode::kConcat, __FILE__, __LINE__);
   ymuint ni = src_node->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -477,18 +595,7 @@ MvMgr::select(MvNode* src_node,
     bitpos -= bw;
   }
   assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
-// @brief 連結演算から部分を抜き出す．
-// @param[in] src_node 連結演算ノード
-// @param[in] msb 抜き出す部分の MSB
-// @param[in] lsb 抜き出す部分の LSB
-MvNode*
-MvMgr::select(MvNode* src_node,
-	      ymuint msb,
-	      ymuint lsb)
-{
+#endif
   return NULL;
 }
 

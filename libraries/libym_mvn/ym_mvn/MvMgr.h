@@ -498,8 +498,15 @@ public:
   /// @param[in] src_node 連結演算ノード
   /// @param[in] bitpos 抜き出すビット位置
   MvNode*
-  select(MvNode* src_node,
-	 ymuint bitpos);
+  select_from_concat(MvNode* src_node,
+		     ymuint bitpos);
+
+  /// @brief 部分指定子からビットを抜き出す．
+  /// @param[in] src_node 部分指定ノード
+  /// @param[in] bitpos 抜き出すビット位置
+  MvNode*
+  select_from_partselect(MvNode* src_node,
+			 ymuint bitpos);
 
   /// @brief 連結演算から部分を抜き出す．
   /// @param[in] src_node 連結演算ノード
