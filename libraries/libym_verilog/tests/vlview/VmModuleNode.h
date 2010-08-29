@@ -19,6 +19,61 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
+/// @class VmModuleListNode VmRootNode.h
+/// @brief VmModule のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmModuleListNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
+  VmModuleListNode(const VlMgr& vl_mgr,
+		   const QString& label);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmModuleListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ラベル
+  QString mLabel;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class VmModuleNode VmModuleNode.h "VmModuleNode.h"
 /// @brief Module を表すノード
 //////////////////////////////////////////////////////////////////////
@@ -28,8 +83,12 @@ class VmModuleNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] module Module の構造を表すオブジェクト
-  VmModuleNode(const VlModule* module);
+  VmModuleNode(const VlMgr& vl_mgr,
+	       const QString& label,
+	       const VlModule* module);
 
   /// @brief デストラクタ
   virtual
@@ -65,6 +124,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+
   // 対応する Module
   const VlModule* mModule;
   
@@ -81,8 +143,12 @@ class VmPortListNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] module Module の構造を表すオブジェクト
-  VmPortListNode(const VlModule* module);
+  VmPortListNode(const VlMgr& vl_mgr,
+		 const QString& label,
+		 const VlModule* module);
 
   /// @brief デストラクタ
   virtual
@@ -118,6 +184,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+
   // 対応する Module
   const VlModule* mModule;
   
@@ -133,8 +202,12 @@ class VmPortNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] port ポートを表すオブジェクト
-  VmPortNode(const VlPort* port);
+  VmPortNode(const VlMgr& vl_mgr,
+	     const QString& label,
+	     const VlPort* port);
 
   /// @brief デストラクタ
   virtual
@@ -169,6 +242,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ラベル
+  QString mLabel;
 
   // 対応するポート
   const VlPort* mPort;

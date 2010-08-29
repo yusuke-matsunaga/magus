@@ -29,8 +29,12 @@ class VmIODeclListNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] io_array IO宣言の配列
-  VmIODeclListNode(const vector<const VlIODecl*>& io_array);
+  VmIODeclListNode(const VlMgr& vl_mgr,
+		   const QString& label,
+		   const vector<const VlIODecl*>& io_array);
 
   /// @brief デストラクタ
   virtual
@@ -66,6 +70,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // IO宣言の配列
   vector<const VlIODecl*> mIOArray;
   
@@ -82,8 +89,12 @@ class VmIODeclNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] io IO宣言要素
-  VmIODeclNode(const VlIODecl* io);
+  VmIODeclNode(const VlMgr& vl_mgr,
+	       const QString& label,
+	       const VlIODecl* io);
 
   /// @brief デストラクタ
   virtual
@@ -119,6 +130,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // IO宣言要素
   const VlIODecl* mIODecl;
   
@@ -135,8 +149,12 @@ class VmDeclListNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] decl_array 宣言要素の配列
-  VmDeclListNode(const vector<const VlDecl*>& decl_array);
+  VmDeclListNode(const VlMgr& vl_mgr,
+		 const QString& label,
+		 const vector<const VlDecl*>& decl_array);
 
   /// @brief デストラクタ
   virtual
@@ -172,6 +190,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // 宣言の配列
   vector<const VlDecl*> mDeclArray;
   
@@ -188,8 +209,12 @@ class VmDeclNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] declitem 宣言要素
-  VmDeclNode(const VlDecl* declitem);
+  VmDeclNode(const VlMgr& vl_mgr,
+	     const QString& label,
+	     const VlDecl* declitem);
 
   /// @brief デストラクタ
   virtual
@@ -225,6 +250,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // 宣言要素
   const VlDecl* mDecl;
   
@@ -241,8 +269,12 @@ class VmRangeListNode :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] declitem 親の宣言要素
-  VmRangeListNode(const VlDecl* decl);
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
+  /// @param[in] decl 親の宣言要素
+  VmRangeListNode(const VlMgr& vl_mgr,
+		  const QString& label,
+		  const VlDecl* decl);
 
   /// @brief デストラクタ
   ~VmRangeListNode();
@@ -277,6 +309,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // 親の宣言要素
   const VlDecl* mDecl;
   
@@ -293,8 +328,12 @@ class VmRangeNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] range 範囲
-  VmRangeNode(const VlRange* range);
+  VmRangeNode(const VlMgr& vl_mgr,
+	      const QString& label,
+	      const VlRange* range);
 
   /// @brief デストラクタ
   ~VmRangeNode();
@@ -329,6 +368,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // 範囲
   const VlRange* mRange;
   

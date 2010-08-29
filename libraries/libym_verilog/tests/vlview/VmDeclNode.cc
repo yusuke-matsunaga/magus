@@ -10,7 +10,6 @@
 
 
 #include "VmDeclNode.h"
-#include "VmExprNode.h"
 #include "VmMiscNode.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -22,13 +21,30 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+// @brief IODeclListNode を追加する．
+// @param[in] label ラベル
+// @param[in] iodecl_list IO宣言のリスト
+void
+VmNode::add_child(const QString& label,
+		  const vector<const VlIODecl*>& iodecl_list) const
+{
+  add_child( new VmIODeclListNode(vl_mgr(), label, iodecl_list) );
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス VmIODeclListNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] io_array IO宣言の配列
-VmIODeclListNode::VmIODeclListNode(const vector<const VlIODecl*>& io_array) :
+VmIODeclListNode::VmIODeclListNode(const VlMgr& vl_mgr,
+				   const QString& label,
+				   const vector<const VlIODecl*>& io_array) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mIOArray(io_array)
 {
 }
@@ -47,7 +63,7 @@ VmIODeclListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "IO Decl List";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return "";
@@ -77,7 +93,8 @@ VmIODeclListNode::expand() const
 {
   for (vector<const VlIODecl*>::const_iterator p = mIOArray.begin();
        p != mIOArray.end(); ++ p) {
-    add_child( new VmIODeclNode(*p) );
+    const VlIODecl* io = *p;
+    add_child( new VmIODeclNode(vl_mgr(), mLabel, io) );
   }
 }
 
@@ -87,8 +104,14 @@ VmIODeclListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] expr 式
-VmIODeclNode::VmIODeclNode(const VlIODecl* io) :
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
+// @param[in] io IO宣言要素
+VmIODeclNode::VmIODeclNode(const VlMgr& vl_mgr,
+			   const QString& label,
+			   const VlIODecl* io) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mIODecl(io)
 {
 }
@@ -107,7 +130,7 @@ VmIODeclNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "IO decl";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return mIODecl->name();
@@ -127,7 +150,7 @@ VmIODeclNode::loc() const
 void
 VmIODeclNode::expand() const
 {
-  add_child( new VmDirNode(mIODecl->direction()) );
+  add_child( new VmDirNode(vl_mgr(), mIODecl->direction()) );
   add_child("vpiSigned", mIODecl->is_signed());
 #if 0
   add_child("vpiScalar", mIODecl->is_scalar());
@@ -161,8 +184,14 @@ VmIODeclNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] decl_array 宣言要素の配列
-VmDeclListNode::VmDeclListNode(const vector<const VlDecl*>& decl_array) :
+VmDeclListNode::VmDeclListNode(const VlMgr& vl_mgr,
+			       const QString& label,
+			       const vector<const VlDecl*>& decl_array) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mDeclArray(decl_array)
 {
 }
@@ -181,7 +210,7 @@ VmDeclListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Decl Item List";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return "";
@@ -210,7 +239,7 @@ VmDeclListNode::expand() const
 {
   for (vector<const VlDecl*>::const_iterator p = mDeclArray.begin();
        p != mDeclArray.end(); ++ p) {
-    add_child( new VmDeclNode(*p) );
+    add_child(mLabel, *p);
   }
 }
 
@@ -220,8 +249,14 @@ VmDeclListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] expr 式
-VmDeclNode::VmDeclNode(const VlDecl* decl) :
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
+// @param[in] declitem 宣言要素
+VmDeclNode::VmDeclNode(const VlMgr& vl_mgr,
+		       const QString& label,
+		       const VlDecl* decl) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mDecl(decl)
 {
 }
@@ -240,7 +275,7 @@ VmDeclNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Decl";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return mDecl->name();
@@ -299,32 +334,32 @@ VmDeclNode::expand() const
 
   ymuint n = mDecl->dimension();
   for (ymuint i = 0; i < n; ++ i) {
-    add_child( new VmRangeNode(mDecl->range(i)) );
+    add_child( new VmRangeNode(vl_mgr(), "vpiRange", mDecl->range(i)) );
   }
 
   if ( mDecl->type() == kVpiNet ) {
-    add_child( new VmStrengthValNode("vpiStrength0", mDecl->drive0()) );
-    add_child( new VmStrengthValNode("vpiStrength1", mDecl->drive1()) );
-    add_child( new VmStrengthValNode("vpiChargeStrength", mDecl->charge()) );
+    add_child( new VmStrengthValNode(vl_mgr(), "vpiStrength0", mDecl->drive0()) );
+    add_child( new VmStrengthValNode(vl_mgr(), "vpiStrength1", mDecl->drive1()) );
+    add_child( new VmStrengthValNode(vl_mgr(), "vpiChargeStrength", mDecl->charge()) );
 #if 0
     add_child( new VmDelayNode("vpiDelay", mDecl->delay()) );
 #endif
   }
 
 #if 0
-  add_child( new VmExprNode("vpiIndex", mDecl->index()) );
+  add_child("vpiIndex", mDecl->index());
 
   if ( mDecl->port_inst() ) {
-    add_child( new VmExprNode("vpiPortInst", mDecl->port_inst()) );
+    add_child("vpiPortInst", mDecl->port_inst());
   }
   if ( mDecl->ports() ) {
-    add_child( new VmExprNode("vpiPorts", mDecl->ports()) );
+    add_child("vpiPorts", mDecl->ports());
   }
 #endif
 
   if ( mDecl->left_range() ) {
-    add_child( new VmExprNode("vpiLeftRange", mDecl->left_range()) );
-    add_child( new VmExprNode("vpiRightRange", mDecl->right_range()) );
+    add_child("vpiLeftRange", mDecl->left_range());
+    add_child("vpiRightRange", mDecl->right_range());
   }
 }
 
@@ -334,8 +369,14 @@ VmDeclNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] range 範囲
-VmRangeNode::VmRangeNode(const VlRange* range) :
+VmRangeNode::VmRangeNode(const VlMgr& vl_mgr,
+			 const QString& label,
+			 const VlRange* range) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mRange(range)
 {
 }
@@ -354,7 +395,7 @@ VmRangeNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Range";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return "";

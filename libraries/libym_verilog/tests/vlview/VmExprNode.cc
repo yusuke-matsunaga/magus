@@ -30,7 +30,7 @@ void
 VmNode::add_child(const QString& label,
 		  const vector<const VlExpr*>& expr_list) const
 {
-  add_child( new VmExprListNode(label, expr_list) );
+  add_child( new VmExprListNode(vl_mgr(), label, expr_list) );
 }
   
 // @brief ExprNode を追加する．
@@ -39,7 +39,7 @@ void
 VmNode::add_child(const QString& label,
 		  const VlExpr* expr) const
 {
-  add_child( new VmExprNode(label, expr) );
+  add_child( new VmExprNode(vl_mgr(), label, expr) );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -47,10 +47,13 @@ VmNode::add_child(const QString& label,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] expr_array 式の配列
-VmExprListNode::VmExprListNode(const QString& label,
+VmExprListNode::VmExprListNode(const VlMgr& vl_mgr,
+			       const QString& label,
 			       const vector<const VlExpr*>& expr_array) :
+  VmNode(vl_mgr),
   mLabel(label),
   mExprArray(expr_array)
 {
@@ -99,7 +102,7 @@ VmExprListNode::expand() const
 {
   for (vector<const VlExpr*>::const_iterator p = mExprArray.begin();
        p != mExprArray.end(); ++ p) {
-    add_child("", *p);
+    add_child(mLabel, *p);
   }
 }
 
@@ -109,10 +112,13 @@ VmExprListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] expr 式
-VmExprNode::VmExprNode(const QString& label,
+VmExprNode::VmExprNode(const VlMgr& vl_mgr,
+		       const QString& label,
 		       const VlExpr* expr) :
+  VmNode(vl_mgr),
   mLabel(label),
   mExpr(expr)
 {

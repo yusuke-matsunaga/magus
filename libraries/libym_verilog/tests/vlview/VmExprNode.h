@@ -28,9 +28,11 @@ class VmExprListNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] expr_array 式の配列
-  VmExprListNode(const QString& label,
+  VmExprListNode(const VlMgr& vl_mgr,
+		 const QString& label,
 		 const vector<const VlExpr*>& expr_array);
 
   /// @brief デストラクタ
@@ -86,9 +88,11 @@ class VmExprNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] expr 式
-  VmExprNode(const QString& label,
+  VmExprNode(const VlMgr& vl_mgr,
+	     const QString& label,
 	     const VlExpr* expr);
 
   /// @brief デストラクタ

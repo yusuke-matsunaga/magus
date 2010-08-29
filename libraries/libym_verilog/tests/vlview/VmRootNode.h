@@ -59,15 +59,6 @@ private:
   virtual
   void
   expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // VlMgr
-  const VlMgr& mVlMgr;
   
 };
 
@@ -112,68 +103,6 @@ private:
   virtual
   void
   expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // VlMgr
-  const VlMgr& mVlMgr;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class VmModuleListNode VmRootNode.h
-/// @brief VmModule のリストを表すノード
-//////////////////////////////////////////////////////////////////////
-class VmModuleListNode :
-  public VmNode
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] vl_mgr VlMgr
-  VmModuleListNode(const VlMgr& vl_mgr);
-
-  /// @brief デストラクタ
-  virtual
-  ~VmModuleListNode();
-
-
-public:
-
-  /// @brief データを返す．
-  /// @param[in] column コラム番号
-  /// @param[in] role 
-  virtual
-  QVariant
-  data(int column,
-       int role) const;
-    
-  /// @brief 対象のファイル上での位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-
-  /// @brief 子供の配列を作る．
-  virtual
-  void
-  expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // VlMgr
-  const VlMgr& mVlMgr;
   
 };
 

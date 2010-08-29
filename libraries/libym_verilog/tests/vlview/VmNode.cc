@@ -10,7 +10,6 @@
 
 
 #include "VmNode.h"
-#include "VmMiscNode.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -20,7 +19,8 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-VmNode::VmNode() :
+VmNode::VmNode(const VlMgr& mgr) :
+  mMgr(mgr),
   mExpanded(false)
 {
 }
@@ -34,61 +34,18 @@ VmNode::~VmNode()
   }
 }
 
+// @brief VlMgr を取り出す．
+const VlMgr&
+VmNode::vl_mgr() const
+{
+  return mMgr;
+}
+
 // @brief 子供を追加する．
 void
 VmNode::add_child(VmNode* node) const
 {
   mChildren.push_back(node);
-}
-
-// @brief 文字列型のノードを追加する．
-// @param[in] label ラベル
-// @param[in] value 値
-void
-VmNode::add_child(const QString& label,
-		  const QString& value) const
-{
-  add_child( new VmStrNode(label, value) );
-}
-
-// @brief 文字列型のノードを追加する．
-// @param[in] label ラベル
-// @param[in] value 値
-void
-VmNode::add_child(const QString& label,
-		  const string& value) const
-{
-  add_child( new VmStrNode(label, value.c_str()) );
-}
-
-// @brief ブール型のノードを追加する．
-// @param[in] label ラベル
-// @param[in] value 値
-void
-VmNode::add_child(const QString& label,
-		  bool value) const
-{
-  add_child( new VmBoolNode(label, value) );
-}
-
-// @brief 整数型のノードを追加する．
-// @param[in] label ラベル
-// @param[in] value 値
-void
-VmNode::add_child(const QString& label,
-		  int value) const
-{
-  add_child( new VmIntNode(label, value) );
-}
-
-// @brief 整数型のノードを追加する．
-// @param[in] label ラベル
-// @param[in] value 値
-void
-VmNode::add_child(const QString& label,
-		  ymuint value) const
-{
-  add_child( new VmIntNode(label, value) );
 }
 
 END_NAMESPACE_YM_VERILOG

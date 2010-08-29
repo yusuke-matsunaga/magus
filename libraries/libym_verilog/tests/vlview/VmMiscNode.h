@@ -81,7 +81,8 @@ class VmScalarNode :
 public:
 
   /// @brief コンストラクタ
-  VmScalarNode();
+  /// @param[in] vl_mgr VlMgr
+  VmScalarNode(const VlMgr& vl_mgr);
 
   /// @brief デストラクタ
   virtual
@@ -119,10 +120,12 @@ class VmStrNode :
 public:
   
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] str 文字列
-  VmStrNode(const QString& label,
-	  const QString& str);
+  VmStrNode(const VlMgr& vl_mgr,
+	    const QString& label,
+	    const QString& str);
 
   /// @brief デストラクタ
   virtual
@@ -164,10 +167,12 @@ class VmAuxTypeNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] aux_type 補助的なデータ型
   /// @param[in] net_type ネットの型
   /// @param[in] var_type 変数の型
-  VmAuxTypeNode(tVpiAuxType aux_type,
+  VmAuxTypeNode(const VlMgr& vl_mgr,
+		tVpiAuxType aux_type,
 		tVpiNetType net_type,
 		tVpiVarType var_type);
 
@@ -214,11 +219,13 @@ class VmNetTypeNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] net_type ネットの型
-  VmNetTypeNode(const QString& label,
-	      tVpiNetType net_type);
-
+  VmNetTypeNode(const VlMgr& vl_mgr,
+		const QString& label,
+		tVpiNetType net_type);
+  
   /// @brief デストラクタ
   virtual
   ~VmNetTypeNode();
@@ -259,8 +266,10 @@ class VmVarTypeNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] var_type 変数の型
-  VmVarTypeNode(tVpiVarType var_type);
+  VmVarTypeNode(const VlMgr& vl_mgr,
+		tVpiVarType var_type);
 
   /// @brief デストラクタ
   virtual
@@ -300,8 +309,10 @@ class VmDirNode :
 public:
   
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] dir 入出力の方向
-  VmDirNode(tVpiDirection dir);
+  VmDirNode(const VlMgr& vl_mgr,
+	    tVpiDirection dir);
 
   /// @brief デストラクタ
   virtual
@@ -340,8 +351,10 @@ class VmUdNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] ud unconnected drive の型
-  VmUdNode(tVpiUnconnDrive ud);
+  VmUdNode(const VlMgr& vl_mgr,
+	   tVpiUnconnDrive ud);
 
   /// @brief デストラクタ
   virtual
@@ -380,8 +393,10 @@ class VmDelayModeNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] delay_mode delay mode の型
-  VmDelayModeNode(tVpiDefDelayMode delay_mode);
+  VmDelayModeNode(const VlMgr& vl_mgr,
+		  tVpiDefDelayMode delay_mode);
 
   /// @brief デストラクタ
   virtual
@@ -420,8 +435,10 @@ class VmPrimTypeNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] prim_type primitive の型
-  VmPrimTypeNode(tVpiPrimType prim_type);
+  VmPrimTypeNode(const VlMgr& vl_mgr,
+		 tVpiPrimType prim_type);
 
   /// @brief デストラクタ
   virtual
@@ -461,8 +478,10 @@ class VmRangeModeNode :
 public:
   
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] range_mode 範囲指定の型
-  VmRangeModeNode(tVpiRangeMode range_mode);
+  VmRangeModeNode(const VlMgr& vl_mgr,
+		  tVpiRangeMode range_mode);
 
   /// @brief デストラクタ
   virtual
@@ -501,10 +520,12 @@ class VmStrengthValNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] strength strength
-  VmStrengthValNode(const QString& label,
-		  tVpiStrength strength);
+  VmStrengthValNode(const VlMgr& vl_mgr,
+		    const QString& label,
+		    tVpiStrength strength);
 
   /// @brief デストラクタ
   ~VmStrengthValNode();
@@ -546,8 +567,10 @@ class VmVsNode :
 public:
   
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] vs vectored/scalared 情報
-  VmVsNode(tVpiVsType vs);
+  VmVsNode(const VlMgr& vl_mgr,
+	   tVpiVsType vs);
 
   /// @brief デストラクタ
   virtual
@@ -587,10 +610,12 @@ class VmBoolNode :
 public:
   
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] val 真理値
-  VmBoolNode(const QString& label,
-	   bool val);
+  VmBoolNode(const VlMgr& vl_mgr,
+	     const QString& label,
+	     bool val);
 
   /// @brief デストラクタ
   virtual
@@ -633,9 +658,11 @@ class VmIntNode :
 public:
   
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] val 値
-  VmIntNode(const QString& label,
+  VmIntNode(const VlMgr& vl_mgr,
+	    const QString& label,
 	    int val);
 
   /// @brief デストラクタ

@@ -28,8 +28,12 @@ class VmUdpNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] udp UDP を表すオブジェクト
-  VmUdpNode(const VlUdpDefn* udp);
+  VmUdpNode(const VlMgr& vl_mgr,
+	    const QString& label,
+	    const VlUdpDefn* udp);
 
   /// @brief デストラクタ
   virtual
@@ -65,6 +69,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // 対応する UDP
   const VlUdpDefn* mUdp;
   
@@ -81,8 +88,12 @@ class VmUdpEntryListNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] udp UDP を表すオブジェクト
-  VmUdpEntryListNode(const VlUdpDefn* udp);
+  VmUdpEntryListNode(const VlMgr& vl_mgr,
+		     const QString& label,
+		     const VlUdpDefn* udp);
 
   /// @brief デストラクタ
   virtual
@@ -118,6 +129,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // UDP
   const VlUdpDefn* mUdp;
   
@@ -134,8 +148,12 @@ class VmUdpEntryNode :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] label ラベル
   /// @param[in] table テーブルの1行分
-  VmUdpEntryNode(const VlTableEntry* table);
+  VmUdpEntryNode(const VlMgr& vl_mgr,
+		 const QString& label,
+		 const VlTableEntry* table);
 
   /// @brief デストラクタ
   virtual
@@ -171,6 +189,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ラベル
+  QString mLabel;
+  
   // 対応するテーブル
   const VlTableEntry* mTable;
   

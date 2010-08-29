@@ -10,6 +10,8 @@
 
 
 #include "VmStmtNode.h"
+#include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlProcess.h"
 #include "ym_verilog/vl/VlStmt.h"
 #include "ym_verilog/vl/VlTaskFunc.h"
 #include "ym_verilog/vl/VlUserSystf.h"
@@ -24,6 +26,26 @@ BEGIN_NAMESPACE_YM_VERILOG
 // クラス VmNode の関数
 //////////////////////////////////////////////////////////////////////
 
+// @brief ProcessListNode を追加する．
+// @param[in] label ラベル
+// @param[in] process_list プロセスのリスト
+void
+VmNode::add_child(const QString& label,
+		  const vector<const VlProcess*>& process_list) const
+{
+  add_child( new VmProcessListNode(vl_mgr(), label, process_list) );
+}
+
+// @brief ProcessNode を追加する．
+// @param[in] label ラベル
+// @param[in] process プロセス
+void
+VmNode::add_child(const QString& label,
+		  const VlProcess* process) const
+{
+  add_child( new VmProcessNode(vl_mgr(), label, process) );
+}
+
 // @brief StmtListNodeを追加する．
 // @param[in] label ラベル
 // @param[in] stmt_list ステートメントの配列
@@ -31,7 +53,7 @@ void
 VmNode::add_child(const QString& label,
 		  const vector<const VlStmt*>& stmt_list) const
 {
-  add_child( new VmStmtListNode(label, stmt_list) );
+  add_child( new VmStmtListNode(vl_mgr(), label, stmt_list) );
 }
 
 // @brief StmtNodeを追加する．
@@ -41,7 +63,133 @@ void
 VmNode::add_child(const QString& label,
 		  const VlStmt* stmt) const
 {
-  add_child( new VmStmtNode(label, stmt) );
+  add_child( new VmStmtNode(vl_mgr(), label, stmt) );
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmProcessListNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
+// @param[in] process_array プロセスの配列
+VmProcessListNode::VmProcessListNode(const VlMgr& vl_mgr,
+				     const QString& label,
+				     const vector<const VlProcess*>& process_array) :
+  VmNode(vl_mgr),
+  mLabel(label),
+  mProcessArray(process_array)
+{
+}
+  
+
+// @brief デストラクタ
+VmProcessListNode::~VmProcessListNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmProcessListNode::data(int column,
+			int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return mLabel;
+    }
+    else if ( column == 1 ) {
+      return "";
+    }
+  }
+  return QVariant();
+}
+    
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+VmProcessListNode::loc() const
+{
+  if ( mProcessArray.empty() ) {
+    return FileRegion();
+  }
+  else {
+    FileRegion first = mProcessArray.front()->file_region();
+    FileRegion last = mProcessArray.back()->file_region();
+    return FileRegion(first, last);
+  }
+}
+
+// @brief 子供の配列を作る．
+void
+VmProcessListNode::expand() const
+{
+  for (vector<const VlProcess*>::const_iterator p = mProcessArray.begin();
+       p != mProcessArray.end(); ++ p) {
+    add_child("vpiProcess", *p);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmProcessNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
+// @param[in] process プロセス
+VmProcessNode::VmProcessNode(const VlMgr& vl_mgr,
+			     const QString& label,
+			     const VlProcess* process) :
+  VmNode(vl_mgr),
+  mLabel(label),
+  mProcess(process)
+{
+}
+
+// @brief デストラクタ
+VmProcessNode::~VmProcessNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmProcessNode::data(int column,
+		    int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return mLabel;
+    }
+    else if ( column == 1 ) {
+      switch ( mProcess->type() ) {
+      case kVpiInitial: return "vpiInitial";
+      case kVpiAlways:  return "vpiAlways";
+      default: assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+  }
+  return QVariant();
+}
+    
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+VmProcessNode::loc() const
+{
+  return mProcess->file_region();
+}
+
+// @brief 子供の配列を作る．
+void
+VmProcessNode::expand() const
+{
+  add_child("vpiModule", mProcess->parent()->parent_module()->full_name());
+  add_child("vpiStmt", mProcess->stmt());
 }
 
 
@@ -50,10 +198,13 @@ VmNode::add_child(const QString& label,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] stmt_array ステートメントの配列
-VmStmtListNode::VmStmtListNode(const QString& label,
+VmStmtListNode::VmStmtListNode(const VlMgr& vl_mgr,
+			       const QString& label,
 			       const vector<const VlStmt*>& stmt_array) :
+  VmNode(vl_mgr),
   mLabel(label),
   mStmtArray(stmt_array)
 {
@@ -102,7 +253,7 @@ VmStmtListNode::expand() const
 {
   for (vector<const VlStmt*>::const_iterator p = mStmtArray.begin();
        p != mStmtArray.end(); ++ p) {
-    add_child("statement", *p);
+    add_child("vpiStatement", *p);
   }
 }
 
@@ -112,10 +263,13 @@ VmStmtListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
 // @param[in] label
 // @param[in] stmt ステートメント
-VmStmtNode::VmStmtNode(const QString& label,
+VmStmtNode::VmStmtNode(const VlMgr& vl_mgr,
+		       const QString& label,
 		       const VlStmt* stmt) :
+  VmNode(vl_mgr),
   mLabel(label),
   mStmt(stmt)
 {
@@ -214,7 +368,7 @@ VmStmtNode::expand() const
     add_child("vpiLhs", mStmt->lhs());
     add_child("vpiRhs", mStmt->rhs());
     if ( mStmt->control() ) {
-      add_child( new VmControlNode(mStmt->control()) );
+      add_child( new VmControlNode(vl_mgr(), "vpiControl", mStmt->control()) );
     }
     break;
 
@@ -262,7 +416,7 @@ VmStmtNode::expand() const
       break;
     }
     add_child("vpiCondition", mStmt->expr());
-    add_child( new VmCaseItemListNode(mStmt) );
+    add_child( new VmCaseItemListNode(vl_mgr(), "vpiCaseItem", mStmt) );
     break;
 
   case kVpiAssignStmt:
@@ -278,12 +432,12 @@ VmStmtNode::expand() const
 
   case kVpiTaskCall:
     add_child("vpiTask", mStmt->task()->full_name());
-    add_child( new VmArgListNode(mStmt) );
+    add_child( new VmArgListNode(vl_mgr(), "vpiArgument", mStmt) );
     break;
 
   case kVpiSysTaskCall:
     add_child("vpiUserSystf", mStmt->user_systf()->name());
-    add_child( new VmArgListNode(mStmt) );
+    add_child( new VmArgListNode(vl_mgr(), "vpiArgument", mStmt) );
     break;
     
   case kVpiDisable:
@@ -292,7 +446,7 @@ VmStmtNode::expand() const
 
   case kVpiDelayControl:
   case kVpiEventControl:
-    add_child( new VmControlNode(mStmt->control()) );
+    add_child( new VmControlNode(vl_mgr(), "vpiControl", mStmt->control()) );
     add_child("vpiStmt", mStmt->body_stmt());
     break;
 
@@ -307,8 +461,14 @@ VmStmtNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] stmt 親のステートメント
-VmArgListNode::VmArgListNode(const VlStmt* stmt) :
+VmArgListNode::VmArgListNode(const VlMgr& vl_mgr,
+			     const QString& label,
+			     const VlStmt* stmt) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mStmt(stmt)
 {
 }
@@ -327,7 +487,7 @@ VmArgListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Argument List";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return "";
@@ -367,8 +527,14 @@ VmArgListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] stmt 親の case 文
-VmCaseItemListNode::VmCaseItemListNode(const VlStmt* stmt) :
+VmCaseItemListNode::VmCaseItemListNode(const VlMgr& vl_mgr,
+				       const QString& label,
+				       const VlStmt* stmt) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mStmt(stmt)
 {
 }
@@ -387,7 +553,7 @@ VmCaseItemListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Case Item List";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return "";
@@ -417,7 +583,7 @@ VmCaseItemListNode::expand() const
 {
   ymuint n = mStmt->caseitem_num();
   for (ymuint i = 0; i < n; ++ i) {
-    add_child( new VmCaseItemNode(mStmt->caseitem(i)) );
+    add_child( new VmCaseItemNode(vl_mgr(), "vpiCaseItem", mStmt->caseitem(i)) );
   }
 }
 
@@ -427,8 +593,14 @@ VmCaseItemListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] caseitem caseitem 文
-VmCaseItemNode::VmCaseItemNode(const VlCaseItem* caseitem) :
+VmCaseItemNode::VmCaseItemNode(const VlMgr& vl_mgr,
+			       const QString& label,
+			       const VlCaseItem* caseitem) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mCaseItem(caseitem)
 {
 }
@@ -447,7 +619,7 @@ VmCaseItemNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Case Item";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return "";
@@ -485,8 +657,14 @@ VmCaseItemNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] control コントロールを表すオブジェクト
-VmControlNode::VmControlNode(const VlControl* control) :
+VmControlNode::VmControlNode(const VlMgr& vl_mgr,
+			     const QString& label,
+			     const VlControl* control) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mControl(control)
 {
 }
@@ -505,6 +683,9 @@ VmControlNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
+      return mLabel;
+    }
+    else if ( column == 1 ) {
       if ( mControl->delay() ) {
 	return "vpiDelayControl";
       }
@@ -514,9 +695,6 @@ VmControlNode::data(int column,
       else {
 	return "vpiEventControl";
       }
-    }
-    else if ( column == 1 ) {
-      return "";
     }
   }
   return QVariant();

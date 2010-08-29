@@ -10,8 +10,6 @@
 
 
 #include "VmUdpNode.h"
-#include "VmDeclNode.h"
-#include "VmExprNode.h"
 #include "VmMiscNode.h"
 #include "ym_verilog/vl/VlUdp.h"
 
@@ -23,8 +21,14 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] udp UDP を表すオブジェクト
-VmUdpNode::VmUdpNode(const VlUdpDefn* udp) :
+VmUdpNode::VmUdpNode(const VlMgr& vl_mgr,
+		     const QString& label,
+		     const VlUdpDefn* udp) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mUdp(udp)
 {
 }
@@ -43,7 +47,7 @@ VmUdpNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "UDP";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return mUdp->def_name();
@@ -63,7 +67,7 @@ VmUdpNode::loc() const
 void
 VmUdpNode::expand() const
 {
-  add_child( new VmPrimTypeNode(mUdp->prim_type()) );
+  add_child( new VmPrimTypeNode(vl_mgr(), mUdp->prim_type()) );
   add_child("vpiProtected", mUdp->is_protected());
   ymuint n = mUdp->port_num();
   vector<const VlIODecl*> ioarray(n);
@@ -71,11 +75,11 @@ VmUdpNode::expand() const
     ioarray[i] = mUdp->input(i);
   }
   ioarray[n - 1] = mUdp->output();
-  add_child( new VmIODeclListNode(ioarray) );
+  add_child("vpiIO", ioarray);
   if ( mUdp->init_expr() ) {
     add_child("vpiInitial", mUdp->init_expr());
   }
-  add_child( new VmUdpEntryListNode(mUdp) );
+  add_child( new VmUdpEntryListNode(vl_mgr(), "vpiUdpEntry", mUdp) );
 }
 
 
@@ -84,8 +88,14 @@ VmUdpNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 /// @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 /// @param[in] udp UDP を表すオブジェクト
-VmUdpEntryListNode::VmUdpEntryListNode(const VlUdpDefn* udp) :
+VmUdpEntryListNode::VmUdpEntryListNode(const VlMgr& vl_mgr,
+				       const QString& label,
+				       const VlUdpDefn* udp) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mUdp(udp)
 {
 }
@@ -104,7 +114,7 @@ VmUdpEntryListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "UDP Table Entry List";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return "";
@@ -126,7 +136,7 @@ VmUdpEntryListNode::expand() const
 {
   ymuint n = mUdp->table_size();
   for (ymuint i = 0; i < n; ++ i) {
-    add_child( new VmUdpEntryNode(mUdp->table_entry(i)) );
+    add_child( new VmUdpEntryNode(vl_mgr(), mLabel, mUdp->table_entry(i)) );
   }
 }
 
@@ -136,8 +146,14 @@ VmUdpEntryListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] label ラベル
 // @param[in] table テーブルの1行分
-VmUdpEntryNode::VmUdpEntryNode(const VlTableEntry* table) :
+VmUdpEntryNode::VmUdpEntryNode(const VlMgr& vl_mgr,
+			       const QString& label,
+			       const VlTableEntry* table) :
+  VmNode(vl_mgr),
+  mLabel(label),
   mTable(table)
 {
 }
@@ -156,7 +172,7 @@ VmUdpEntryNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "UDP Table Entry";
+      return mLabel;
     }
     else if ( column == 1 ) {
       return mTable->str().c_str();
@@ -176,6 +192,7 @@ VmUdpEntryNode::loc() const
 void
 VmUdpEntryNode::expand() const
 {
+  // なにもしない．
 }
 
 END_NAMESPACE_YM_VERILOG

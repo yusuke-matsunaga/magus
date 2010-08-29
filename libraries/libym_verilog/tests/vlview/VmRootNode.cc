@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
 VmRootNode::VmRootNode(const VlMgr& vl_mgr) :
-  mVlMgr(vl_mgr)
+  VmNode(vl_mgr)
 {
 }
 
@@ -62,11 +62,11 @@ VmRootNode::loc() const
 void
 VmRootNode::expand() const
 {
-  if ( !mVlMgr.udp_list().empty() ) {
-    add_child( new VmUdpListNode(mVlMgr) );
+  if ( !vl_mgr().udp_list().empty() ) {
+    add_child( new VmUdpListNode(vl_mgr()) );
   }
-  if ( !mVlMgr.topmodule_list().empty() ) {
-    add_child( new VmModuleListNode(mVlMgr) );
+  if ( !vl_mgr().topmodule_list().empty() ) {
+    add_child( new VmModuleListNode(vl_mgr(), "vpiModule") );
   }
 }
 
@@ -78,7 +78,7 @@ VmRootNode::expand() const
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
 VmUdpListNode::VmUdpListNode(const VlMgr& vl_mgr) :
-  mVlMgr(vl_mgr)
+  VmNode(vl_mgr)
 {
 }
 
@@ -116,65 +116,11 @@ VmUdpListNode::loc() const
 void
 VmUdpListNode::expand() const
 {
-  const list<const VlUdpDefn*>& udp_list = mVlMgr.udp_list();
+  const list<const VlUdpDefn*>& udp_list = vl_mgr().udp_list();
   for (list<const VlUdpDefn*>::const_iterator p = udp_list.begin();
        p != udp_list.end(); ++ p) {
     const VlUdpDefn* udp = *p;
-    add_child( new VmUdpNode(udp) );
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス VmModuleListNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
-VmModuleListNode::VmModuleListNode(const VlMgr& vl_mgr) :
-  mVlMgr(vl_mgr)
-{
-}
-
-// @brief デストラクタ
-VmModuleListNode::~VmModuleListNode()
-{
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role 
-QVariant
-VmModuleListNode::data(int column,
-		       int role) const
-{
-  if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      return "Module list";
-    }
-    else if ( column == 1 ) {
-      return "";
-    }
-  }
-  return QVariant();
-}
-
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-VmModuleListNode::loc() const
-{
-  return FileRegion();
-}
-
-// @brief 子供の配列を作る．
-void
-VmModuleListNode::expand() const
-{
-  const list<const VlModule*>& module_list = mVlMgr.topmodule_list();
-  for (list<const VlModule*>::const_iterator p = module_list.begin();
-       p != module_list.end(); ++ p) {
-    const VlModule* module = *p;
-    add_child( new VmModuleNode(module) );
+    add_child( new VmUdpNode(vl_mgr(), "vpiUdp", udp) );
   }
 }
 
