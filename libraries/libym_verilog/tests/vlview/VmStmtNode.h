@@ -7,7 +7,7 @@
 ///
 /// $Id: VmStmtNode.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,16 +23,14 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief プロセスのリストを表すノード
 //////////////////////////////////////////////////////////////////////
 class VmProcessListNode :
-  public VmNode
+  public VmNode1
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] process_array プロセスの配列
   VmProcessListNode(const VlMgr& vl_mgr,
-		    const QString& label,
 		    const vector<const VlProcess*>& process_array);
 
   /// @brief デストラクタ
@@ -68,9 +66,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
-  // ラベル
-  QString mLabel;
 
   // プロセスの配列
   vector<const VlProcess*> mProcessArray;
@@ -83,16 +78,14 @@ private:
 /// @brief プロセスを表すノード
 //////////////////////////////////////////////////////////////////////
 class VmProcessNode :
-  public VmNode
+  public VmNode1
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] process プロセス
   VmProcessNode(const VlMgr& vl_mgr,
-		const QString& label,
 		const VlProcess* process);
 
   /// @brief デストラクタ
@@ -128,9 +121,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
-  // ラベル
-  QString mLabel;
 
   // プロセス
   const VlProcess* mProcess;
@@ -143,18 +133,17 @@ private:
 /// @brief ステートメントリストを表すノード
 //////////////////////////////////////////////////////////////////////
 class VmStmtListNode :
-  public VmNode
+  public VmNode1
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
-  /// @param[in] label ラベル
-  /// @param[in] stmt_array ステートメントの配列
+  /// @param[in] stmt 親のステートメント
   VmStmtListNode(const VlMgr& vl_mgr,
 		 const QString& label,
-		 const vector<const VlStmt*>& stmt_array);
+		 const VlStmt* stmt);
 
   /// @brief デストラクタ
   virtual
@@ -193,8 +182,8 @@ private:
   // ラベル
   QString mLabel;
   
-  // ステートメントの配列
-  vector<const VlStmt*> mStmtArray;
+  // 親のステートメント
+  const VlStmt* mStmt;
   
 };
 
@@ -204,7 +193,7 @@ private:
 /// @brief ステートメントを表すノード
 //////////////////////////////////////////////////////////////////////
 class VmStmtNode :
-  public VmNode
+  public VmNode1
 {
 public:
 
@@ -269,12 +258,8 @@ class VmArgListNode :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] stmt 親の enable 文
-  VmArgListNode(const VlMgr& vl_mgr,
-		const QString& label,
-		const VlStmt* stmt);
+  VmArgListNode(const VlStmt* stmt);
 
   /// @brief デストラクタ
   virtual
@@ -309,9 +294,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ラベル
-  QString mLabel;
   
   // 親の enable 文
   const VlStmt* mStmt;
@@ -324,16 +306,14 @@ private:
 /// @brief caseitem のリストを表すノード
 //////////////////////////////////////////////////////////////////////
 class VmCaseItemListNode :
-  public VmNode
+  public VmNode1
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] stmt 親の case 文
   VmCaseItemListNode(const VlMgr& vl_mgr,
-		     const QString& label,
 		     const VlStmt* stmt);
 
   /// @brief デストラクタ
@@ -369,9 +349,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ラベル
-  QString mLabel;
   
   // 親の case 文
   const VlStmt* mStmt;
@@ -384,16 +361,14 @@ private:
 /// @brief caseitem を表すノード
 //////////////////////////////////////////////////////////////////////
 class VmCaseItemNode :
-  public VmNode
+  public VmNode1
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] caseitem caseitem 文
   VmCaseItemNode(const VlMgr& vl_mgr,
-		 const QString& label,
 		 const VlCaseItem* caseitem);
 
   /// @brief デストラクタ
@@ -429,9 +404,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ラベル
-  QString mLabel;
   
   // caseitem 文を表すオブジェクト
   const VlCaseItem* mCaseItem;
@@ -449,12 +421,8 @@ class VmControlNode :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] control コントロールを表すオブジェクト
-  VmControlNode(const VlMgr& vl_mgr,
-		const QString& label,
-		const VlControl* control);
+  VmControlNode(const VlControl* control);
 
   /// @brief デストラクタ
   virtual
@@ -489,9 +457,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ラベル
-  QString mLabel;
   
   // コントロール
   const VlControl* mControl;

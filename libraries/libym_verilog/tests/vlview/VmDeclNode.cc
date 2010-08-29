@@ -1,11 +1,11 @@
 
 /// @file libym_verilog/tests/vlview/VmDeclNode.cc
-/// @brief VlDeclNode の実装ファイル
+/// @brief VmDeclNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: VmDeclNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -21,14 +21,26 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+//////////////////////////////////////////////////////////////////////
+// クラス VmNode
+//////////////////////////////////////////////////////////////////////
+
 // @brief IODeclListNode を追加する．
-// @param[in] label ラベル
 // @param[in] iodecl_list IO宣言のリスト
 void
-VmNode::add_child(const QString& label,
-		  const vector<const VlIODecl*>& iodecl_list) const
+VmNode::add_iolist(const vector<const VlIODecl*>& iodecl_list) const
 {
-  add_child( new VmIODeclListNode(vl_mgr(), label, iodecl_list) );
+  add_child( new VmIODeclListNode(iodecl_list) );
+}
+
+// @brief DeclListNode を追加する．
+// @param[in] label ラベル
+// @param[in] decl_list 宣言のリスト
+void
+VmNode::add_decllist(const QString& label,
+		     const vector<const VlDecl*>& decl_list) const
+{
+  add_child( new VmDeclListNode(label, decl_list) );
 }
 
 
@@ -37,14 +49,8 @@ VmNode::add_child(const QString& label,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
-// @param[in] label ラベル
 // @param[in] io_array IO宣言の配列
-VmIODeclListNode::VmIODeclListNode(const VlMgr& vl_mgr,
-				   const QString& label,
-				   const vector<const VlIODecl*>& io_array) :
-  VmNode(vl_mgr),
-  mLabel(label),
+VmIODeclListNode::VmIODeclListNode(const vector<const VlIODecl*>& io_array) :
   mIOArray(io_array)
 {
 }
@@ -63,7 +69,7 @@ VmIODeclListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return "vpiIODecl";
     }
     else if ( column == 1 ) {
       return "";
@@ -94,7 +100,7 @@ VmIODeclListNode::expand() const
   for (vector<const VlIODecl*>::const_iterator p = mIOArray.begin();
        p != mIOArray.end(); ++ p) {
     const VlIODecl* io = *p;
-    add_child( new VmIODeclNode(vl_mgr(), mLabel, io) );
+    add_child( new VmIODeclNode(io) );
   }
 }
 
@@ -104,14 +110,8 @@ VmIODeclListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
-// @param[in] label ラベル
 // @param[in] io IO宣言要素
-VmIODeclNode::VmIODeclNode(const VlMgr& vl_mgr,
-			   const QString& label,
-			   const VlIODecl* io) :
-  VmNode(vl_mgr),
-  mLabel(label),
+VmIODeclNode::VmIODeclNode(const VlIODecl* io) :
   mIODecl(io)
 {
 }
@@ -130,7 +130,7 @@ VmIODeclNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return "vpiIODecl";
     }
     else if ( column == 1 ) {
       return mIODecl->name();
@@ -150,7 +150,7 @@ VmIODeclNode::loc() const
 void
 VmIODeclNode::expand() const
 {
-  add_child( new VmDirNode(vl_mgr(), mIODecl->direction()) );
+  add_child( new VmDirNode(mIODecl->direction()) );
   add_child("vpiSigned", mIODecl->is_signed());
 #if 0
   add_child("vpiScalar", mIODecl->is_scalar());
@@ -174,8 +174,10 @@ VmIODeclNode::expand() const
   if ( func ) {
     add_child("vpiFunction", func->full_name());
   }
-  add_child("vpiLeftRange", mIODecl->left_range());
-  add_child("vpiRightRange", mIODecl->right_range());
+  if ( mIODecl->left_range() ) {
+    add_expr("vpiLeftRange", mIODecl->left_range());
+    add_expr("vpiRightRange", mIODecl->right_range());
+  }
 }
 
 
@@ -184,13 +186,10 @@ VmIODeclNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] decl_array 宣言要素の配列
-VmDeclListNode::VmDeclListNode(const VlMgr& vl_mgr,
-			       const QString& label,
+VmDeclListNode::VmDeclListNode(const QString& label,
 			       const vector<const VlDecl*>& decl_array) :
-  VmNode(vl_mgr),
   mLabel(label),
   mDeclArray(decl_array)
 {
@@ -239,7 +238,7 @@ VmDeclListNode::expand() const
 {
   for (vector<const VlDecl*>::const_iterator p = mDeclArray.begin();
        p != mDeclArray.end(); ++ p) {
-    add_child(mLabel, *p);
+    add_child( new VmDeclNode(mLabel, *p) );
   }
 }
 
@@ -249,13 +248,10 @@ VmDeclListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] declitem 宣言要素
-VmDeclNode::VmDeclNode(const VlMgr& vl_mgr,
-		       const QString& label,
+VmDeclNode::VmDeclNode(const QString& label,
 		       const VlDecl* decl) :
-  VmNode(vl_mgr),
   mLabel(label),
   mDecl(decl)
 {
@@ -297,18 +293,18 @@ VmDeclNode::expand() const
 {
   const char* nm = NULL;
   switch ( mDecl->type() ) {
-  case kVpiNet:             nm = "Net"; break;
-  case kVpiNetArray:        nm = "NetArray"; break;
-  case kVpiReg:             nm = "Reg"; break;
-  case kVpiRegArray:        nm = "RegArray"; break;
-  case kVpiIntegerVar:      nm = "IntegerVar"; break;
-  case kVpiRealVar:         nm = "RealVar"; break;
-  case kVpiTimeVar:         nm = "TimeVar"; break;
-  case kVpiVarSelect:       nm = "VarSelect"; break;
-  case kVpiNamedEvent:      nm = "NamedEvent"; break;
-  case kVpiNamedEventArray: nm = "NamedEventArray"; break;
-  case kVpiParameter:       nm = "Parameter"; break;
-  case kVpiSpecParam:       nm = "SpecParam"; break;
+  case kVpiNet:             nm = "vpiNet"; break;
+  case kVpiNetArray:        nm = "vpiNetArray"; break;
+  case kVpiReg:             nm = "vpiReg"; break;
+  case kVpiRegArray:        nm = "vpiRegArray"; break;
+  case kVpiIntegerVar:      nm = "vpiIntegerVar"; break;
+  case kVpiRealVar:         nm = "vpiRealVar"; break;
+  case kVpiTimeVar:         nm = "vpiTimeVar"; break;
+  case kVpiVarSelect:       nm = "vpiVarSelect"; break;
+  case kVpiNamedEvent:      nm = "vpiNamedEvent"; break;
+  case kVpiNamedEventArray: nm = "vpiNamedEventArray"; break;
+  case kVpiParameter:       nm = "vpiParameter"; break;
+  case kVpiSpecParam:       nm = "vpiSpecParam"; break;
   default: assert_not_reached( __FILE__, __LINE__ );
   }
   add_child("vpiType", nm);
@@ -321,8 +317,9 @@ VmDeclNode::expand() const
   add_child("vpiVector", mDecl->is_vector());
   add_child("vpiExplicitScalar", mDecl->is_explicit_scalar());
   add_child("vpiExplicitVector", mDecl->is_explicit_vector());
-  add_child("vpiSigned", mDecl->is_signed());
 #endif
+  add_child( new VmVsNode(mDecl->vs_type()) );
+  add_child("vpiSigned", mDecl->is_signed());
   add_child("vpiSize", mDecl->bit_size());
   add_child("vpiModule", mDecl->parent_module()->full_name());
   add_child("vpiScope", mDecl->parent()->full_name());
@@ -334,13 +331,13 @@ VmDeclNode::expand() const
 
   ymuint n = mDecl->dimension();
   for (ymuint i = 0; i < n; ++ i) {
-    add_child( new VmRangeNode(vl_mgr(), "vpiRange", mDecl->range(i)) );
+    add_child( new VmRangeNode(mDecl->range(i)) );
   }
 
   if ( mDecl->type() == kVpiNet ) {
-    add_child( new VmStrengthValNode(vl_mgr(), "vpiStrength0", mDecl->drive0()) );
-    add_child( new VmStrengthValNode(vl_mgr(), "vpiStrength1", mDecl->drive1()) );
-    add_child( new VmStrengthValNode(vl_mgr(), "vpiChargeStrength", mDecl->charge()) );
+    add_child( new VmStrengthValNode("vpiStrength0", mDecl->drive0()) );
+    add_child( new VmStrengthValNode("vpiStrength1", mDecl->drive1()) );
+    add_child( new VmStrengthValNode("vpiChargeStrength", mDecl->charge()) );
 #if 0
     add_child( new VmDelayNode("vpiDelay", mDecl->delay()) );
 #endif
@@ -350,16 +347,16 @@ VmDeclNode::expand() const
   add_child("vpiIndex", mDecl->index());
 
   if ( mDecl->port_inst() ) {
-    add_child("vpiPortInst", mDecl->port_inst());
+    add_expr("vpiPortInst", mDecl->port_inst());
   }
   if ( mDecl->ports() ) {
-    add_child("vpiPorts", mDecl->ports());
+    add_expr("vpiPorts", mDecl->ports());
   }
 #endif
 
   if ( mDecl->left_range() ) {
-    add_child("vpiLeftRange", mDecl->left_range());
-    add_child("vpiRightRange", mDecl->right_range());
+    add_expr("vpiLeftRange", mDecl->left_range());
+    add_expr("vpiRightRange", mDecl->right_range());
   }
 }
 
@@ -369,14 +366,8 @@ VmDeclNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
-// @param[in] label ラベル
 // @param[in] range 範囲
-VmRangeNode::VmRangeNode(const VlMgr& vl_mgr,
-			 const QString& label,
-			 const VlRange* range) :
-  VmNode(vl_mgr),
-  mLabel(label),
+VmRangeNode::VmRangeNode(const VlRange* range) :
   mRange(range)
 {
 }
@@ -395,7 +386,7 @@ VmRangeNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return "vpiRange";
     }
     else if ( column == 1 ) {
       return "";
@@ -415,8 +406,8 @@ VmRangeNode::loc() const
 void
 VmRangeNode::expand() const
 {
-  add_child("vpiLeftRange", mRange->left_range());
-  add_child("vpiRightRange", mRange->right_range());
+  add_expr("vpiLeftRange", mRange->left_range());
+  add_expr("vpiRightRange", mRange->right_range());
 }
 
 END_NAMESPACE_YM_VERILOG

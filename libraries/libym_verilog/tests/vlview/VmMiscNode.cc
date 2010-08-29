@@ -21,7 +21,7 @@ void
 VmNode::add_child(const QString& label,
 		  const QString& value) const
 {
-  add_child( new VmStrNode(vl_mgr(), label, value) );
+  add_child( new VmStrNode(label, value) );
 }
 
 // @brief 文字列型のノードを追加する．
@@ -31,7 +31,7 @@ void
 VmNode::add_child(const QString& label,
 		  const string& value) const
 {
-  add_child( new VmStrNode(vl_mgr(), label, value.c_str()) );
+  add_child( new VmStrNode(label, value.c_str()) );
 }
 
 // @brief ブール型のノードを追加する．
@@ -41,7 +41,7 @@ void
 VmNode::add_child(const QString& label,
 		  bool value) const
 {
-  add_child( new VmBoolNode(vl_mgr(), label, value) );
+  add_child( new VmBoolNode(label, value) );
 }
 
 // @brief 整数型のノードを追加する．
@@ -51,7 +51,7 @@ void
 VmNode::add_child(const QString& label,
 		  int value) const
 {
-  add_child( new VmIntNode(vl_mgr(), label, value) );
+  add_child( new VmIntNode(label, value) );
 }
 
 // @brief 整数型のノードを追加する．
@@ -61,7 +61,7 @@ void
 VmNode::add_child(const QString& label,
 		  ymuint value) const
 {
-  add_child( new VmIntNode(vl_mgr(), label, value) );
+  add_child( new VmIntNode(label, value) );
 }
 
 #if 0
@@ -133,9 +133,7 @@ DelayNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
-VmScalarNode::VmScalarNode(const VlMgr& vl_mgr) :
-  VmNode(vl_mgr)
+VmScalarNode::VmScalarNode()
 {
 }
 
@@ -165,13 +163,10 @@ VmScalarNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] str 文字列
-VmStrNode::VmStrNode(const VlMgr& vl_mgr,
-		     const QString& label,
+VmStrNode::VmStrNode(const QString& label,
 		     const QString& str) :
-  VmScalarNode(vl_mgr),
   mLabel(label),
   mStr(str)
 {
@@ -206,15 +201,12 @@ VmStrNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] aux_type 補助的なデータ型
 // @param[in] net_type ネットの型
 // @param[in] var_type 変数の型
-VmAuxTypeNode::VmAuxTypeNode(const VlMgr& vl_mgr,
-			     tVpiAuxType aux_type,
+VmAuxTypeNode::VmAuxTypeNode(tVpiAuxType aux_type,
 			     tVpiNetType net_type,
 			     tVpiVarType var_type) :
-  VmScalarNode(vl_mgr),
   mAuxType(aux_type),
   mNetType(net_type),
   mVarType(var_type)
@@ -276,13 +268,10 @@ VmAuxTypeNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] net_type ネットの型
-VmNetTypeNode::VmNetTypeNode(const VlMgr& vl_mgr,
-			     const QString& label,
+VmNetTypeNode::VmNetTypeNode(const QString& label,
 			     tVpiNetType net_type) :
-  VmScalarNode(vl_mgr),
   mLabel(label),
   mNetType(net_type)
 {
@@ -330,11 +319,8 @@ VmNetTypeNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] var_type 変数の型
-VmVarTypeNode::VmVarTypeNode(const VlMgr& vl_mgr,
-			     tVpiVarType var_type) :
-  VmScalarNode(vl_mgr),
+VmVarTypeNode::VmVarTypeNode(tVpiVarType var_type) :
   mVarType(var_type)
 {
 }
@@ -374,11 +360,8 @@ VmVarTypeNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] dir 入出力の方向
-VmDirNode::VmDirNode(const VlMgr& vl_mgr,
-		     tVpiDirection dir) :
-  VmScalarNode(vl_mgr),
+VmDirNode::VmDirNode(tVpiDirection dir) :
   mDir(dir)
 {
 }
@@ -418,11 +401,8 @@ VmDirNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] ud unconnected drive の型
-VmUdNode::VmUdNode(const VlMgr& vl_mgr,
-		   tVpiUnconnDrive ud) :
-  VmScalarNode(vl_mgr),
+VmUdNode::VmUdNode(tVpiUnconnDrive ud) :
   mUd(ud)
 {
 }
@@ -460,11 +440,8 @@ VmUdNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] delay mode の型
-VmDelayModeNode::VmDelayModeNode(const VlMgr& vl_mgr,
-				 tVpiDefDelayMode delay_mode) :
-  VmScalarNode(vl_mgr),
+VmDelayModeNode::VmDelayModeNode(tVpiDefDelayMode delay_mode) :
   mDelayMode(delay_mode)
 {
 }
@@ -505,11 +482,8 @@ VmDelayModeNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] prim_type primitive タイプ
-VmPrimTypeNode::VmPrimTypeNode(const VlMgr& vl_mgr,
-			       tVpiPrimType prim_type) :
-  VmScalarNode(vl_mgr),
+VmPrimTypeNode::VmPrimTypeNode(tVpiPrimType prim_type) :
   mPrimType(prim_type)
 {
 }
@@ -572,11 +546,8 @@ VmPrimTypeNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] range_mode 範囲指定の型
-VmRangeModeNode::VmRangeModeNode(const VlMgr& vl_mgr,
-				 tVpiRangeMode range_mode) :
-  VmScalarNode(vl_mgr),
+VmRangeModeNode::VmRangeModeNode(tVpiRangeMode range_mode) :
   mRangeMode(range_mode)
 {
 }
@@ -615,13 +586,10 @@ VmRangeModeNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] strength 値を表すノード
-VmStrengthValNode::VmStrengthValNode(const VlMgr& vl_mgr,
-				     const QString& label,
+VmStrengthValNode::VmStrengthValNode(const QString& label,
 				     tVpiStrength strength) :
-  VmScalarNode(vl_mgr),
   mLabel(label),
   mStrength(strength)
 {
@@ -666,11 +634,8 @@ VmStrengthValNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] vs vectored/scalared 情報
-VmVsNode::VmVsNode(const VlMgr& vl_mgr,
-		   tVpiVsType vs) :
-  VmScalarNode(vl_mgr),
+VmVsNode::VmVsNode(tVpiVsType vs) :
   mVs(vs)
 {
 }
@@ -708,13 +673,10 @@ VmVsNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] val 真理値
-VmBoolNode::VmBoolNode(const VlMgr& vl_mgr,
-		       const QString& label,
+VmBoolNode::VmBoolNode(const QString& label,
 		       bool val) :
-  VmScalarNode(vl_mgr),
   mLabel(label),
   mVal(val)
 {
@@ -754,13 +716,10 @@ VmBoolNode::data(int column,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] val 値
-VmIntNode::VmIntNode(const VlMgr& vl_mgr,
-		     const QString& label,
+VmIntNode::VmIntNode(const QString& label,
 		     int val) :
-  VmScalarNode(vl_mgr),
   mLabel(label),
   mVal(val)
 {
@@ -776,7 +735,7 @@ VmIntNode::~VmIntNode()
 // @param[in] role 
 QVariant
 VmIntNode::data(int column,
-		 int role) const
+		int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {

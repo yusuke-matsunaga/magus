@@ -17,7 +17,6 @@
 #include "ym_verilog/vl/VlFwd.h"
 
 
-
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
@@ -31,8 +30,7 @@ class VmNode
 public:
   
   /// @brief コンストラクタ
-  /// @param[in] mgr VlMgr
-  VmNode(const VlMgr& mgr);
+  VmNode();
 
   /// @brief デストラクタ
   virtual
@@ -72,82 +70,62 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスが用いる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief VlMgr を取り出す．
-  const VlMgr&
-  vl_mgr() const;
   
   /// @brief 子供を追加する．
   void
   add_child(VmNode* node) const;
 
   /// @brief UdpListNode を追加する．
-  /// @param[in] label ラベル
+  /// @param[in] vl_mgr VlMgr
   void
-  add_child(const QString& label) const;
+  add_udplist(const VlMgr& vl_mgr) const;
 
-  /// @brief UdpNode を追加する．
-  /// @param[in] label ラベル
-  /// @param[in] udp UDP
+  /// @brief ModuleListNode を追加する．
+  /// @param[in] vl_mgr VlMgr
   void
-  add_child(const QString& label,
-	    const VlUdpDefn* udp) const;
-
-  /// @brief ModuleNode を追加する．
-  /// @param[in] label ラベル
-  /// @param[in] module モジュール
-  void
-  add_child(const QString& label,
-	    const VlModule* module) const;
+  add_modulelist(const VlMgr& vl_mgr) const;
 
   /// @brief IODeclListNode を追加する．
-  /// @param[in] label ラベル
   /// @param[in] iodecl_list IO宣言のリスト
   void
-  add_child(const QString& label,
-	    const vector<const VlIODecl*>& iodecl_list) const;
+  add_iolist(const vector<const VlIODecl*>& iodecl_list) const;
 
-  /// @brief ProcessListNode を追加する．
+  /// @brief DeclListNode を追加する．
   /// @param[in] label ラベル
+  /// @param[in] decl_list 宣言のリスト
+  void
+  add_decllist(const QString& label,
+	       const vector<const VlDecl*>& decl_list) const;
+  
+  /// @brief ProcessListNode を追加する．
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] process_list プロセスのリスト
   void
-  add_child(const QString& label,
-	    const vector<const VlProcess*>& process_list) const;
-
-  /// @brief ProcessNode を追加する．
-  /// @param[in] label ラベル
-  /// @param[in] process プロセス
-  void
-  add_child(const QString& label,
-	    const VlProcess* process) const;
-
-  /// @brief StmtListNodeを追加する．
-  /// @param[in] label ラベル
-  /// @param[in] stmt_list ステートメントの配列
-  void
-  add_child(const QString& label,
-	    const vector<const VlStmt*>& stmt_list) const;
+  add_processlist(const VlMgr& vl_mgr,
+		  const vector<const VlProcess*>& process_list) const;
   
   /// @brief StmtNodeを追加する．
+  /// @param[in] vl_mgr VlMgr
   /// @param[in] label ラベル
   /// @param[in] stmt ステートメント
   void
-  add_child(const QString& label,
-	    const VlStmt* stmt) const;
+  add_stmt(const VlMgr& vl_mgr,
+	   const QString& label,
+	   const VlStmt* stmt) const;
   
   /// @brief ExprListNode を追加する．
   /// @param[in] label ラベル
   /// @param[in] expr_list 式の配列
   void
-  add_child(const QString& label,
-	    const vector<const VlExpr*>& expr_list) const;
+  add_exprlist(const QString& label,
+	       const vector<const VlExpr*>& expr_list) const;
   
   /// @brief ExprNode を追加する．
   /// @param[in] label ラベル
   /// @param[in] expr 式
   void
-  add_child(const QString& label,
-	    const VlExpr* expr) const;
+  add_expr(const QString& label,
+	   const VlExpr* expr) const;
 
   /// @brief 文字列型のノードを追加する．
   /// @param[in] label ラベル
@@ -197,9 +175,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // VlMgr
-  const VlMgr& mMgr;
   
   // 親のノード
   QModelIndex mParentIndex;
@@ -212,6 +187,45 @@ private:
   mutable
   std::vector<VmNode*> mChildren;
   
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmNode1 VmNode.h
+/// @brief VlMgr を持った VmNode の継承クラス
+//////////////////////////////////////////////////////////////////////
+class VmNode1 :
+  public VmNode
+{
+public:
+  
+  /// @brief コンストラクタ
+  /// @param[in] mgr VlMgr
+  VmNode1(const VlMgr& mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmNode1();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスが用いる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief VlMgr を取り出す．
+  const VlMgr&
+  vl_mgr() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // VlMgr
+  const VlMgr& mMgr;
+
 };
 
 

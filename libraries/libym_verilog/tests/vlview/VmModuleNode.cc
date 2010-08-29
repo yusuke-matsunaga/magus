@@ -5,7 +5,7 @@
 ///
 /// $Id: VmModuleNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -22,14 +22,12 @@ BEGIN_NAMESPACE_YM_VERILOG
 // クラス VmNode の関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief ModuleNode を追加する．
-// @param[in] label ラベル
-// @param[in] module モジュール
+// @brief ModuleListNode を追加する．
+// @param[in] vl_mgr VlMgr
 void
-VmNode::add_child(const QString& label,
-		  const VlModule* module) const
+VmNode::add_modulelist(const VlMgr& vl_mgr) const
 {
-  add_child( new VmModuleNode(vl_mgr(), label, module) );
+  add_child( new VmModuleListNode(vl_mgr) );
 }
 
 
@@ -39,11 +37,8 @@ VmNode::add_child(const QString& label,
 
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
-// @param[in] label ラベル
-VmModuleListNode::VmModuleListNode(const VlMgr& vl_mgr,
-				   const QString& label) :
-  VmNode(vl_mgr),
-  mLabel(label)
+VmModuleListNode::VmModuleListNode(const VlMgr& vl_mgr) :
+  VmNode1(vl_mgr)
 {
 }
 
@@ -61,7 +56,7 @@ VmModuleListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return "vpiModule";
     }
     else if ( column == 1 ) {
       return "";
@@ -84,7 +79,7 @@ VmModuleListNode::expand() const
   const list<const VlModule*>& module_list = vl_mgr().topmodule_list();
   for (list<const VlModule*>::const_iterator p = module_list.begin();
        p != module_list.end(); ++ p) {
-    add_child("vpiModule", *p);
+    add_child( new VmModuleNode(vl_mgr(), *p) );
   }
 }
 
@@ -95,13 +90,10 @@ VmModuleListNode::expand() const
 
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
-// @param[in] label ラベル
 // @param[in] module Module の構造を表すオブジェクト
 VmModuleNode::VmModuleNode(const VlMgr& vl_mgr,
-			   const QString& label,
 			   const VlModule* module) :
-  VmNode(vl_mgr),
-  mLabel(label),
+  VmNode1(vl_mgr),
   mModule(module)
 {
 }
@@ -120,7 +112,7 @@ VmModuleNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return "vpiModule";
     }
     else if ( column == 1 ) {
       return mModule->name();
@@ -188,22 +180,22 @@ VmModuleNode::expand() const
     add_child("vpiTimeUnit", unit2str(mModule->time_unit()));
     add_child("vpiTimePrecision", unit2str(mModule->time_precision()));
   }
-  add_child( new VmNetTypeNode(vl_mgr(), "vpiDefaultNetType", mModule->def_net_type()) );
-  add_child( new VmUdNode(vl_mgr(), mModule->unconn_drive()) );
-  add_child( new VmDelayModeNode(vl_mgr(), mModule->def_delay_mode()) );
+  add_child( new VmNetTypeNode("vpiDefaultNetType", mModule->def_net_type()) );
+  add_child( new VmUdNode(mModule->unconn_drive()) );
+  add_child( new VmDelayModeNode(mModule->def_delay_mode()) );
   add_child("vpiDefaultDecayTime", mModule->def_decay_time());
   
   add_child("Config", mModule->config().c_str());
   add_child("Library", mModule->library().c_str());
   add_child("Cell", mModule->cell().c_str());
 
-  add_child( new VmPortListNode(vl_mgr(), "vpiPort", mModule) );
+  add_child( new VmPortListNode(mModule) );
   ymuint n = mModule->io_num();
   vector<const VlIODecl*> io_array(n);
   for (ymuint i = 0; i < n; ++ i) {
     io_array[i] = mModule->io(i);
   }
-  add_child("vpiIO", io_array);
+  add_iolist(io_array);
 
 #if 0
   put_scope_sub(mgr, module);
@@ -211,7 +203,7 @@ VmModuleNode::expand() const
   
   vector<const VlProcess*> process_list;
   if ( vl_mgr().find_process_list(mModule, process_list) ) {
-    add_child("vpiProcess", process_list);
+    add_processlist(vl_mgr(), process_list);
   }
 }
 
@@ -221,14 +213,8 @@ VmModuleNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
-// @param[in] label ラベル
 // @param[in] module Module を表すパース木
-VmPortListNode::VmPortListNode(const VlMgr& vl_mgr,
-			       const QString& label,
-			       const VlModule* module) :
-  VmNode(vl_mgr),
-  mLabel(label),
+VmPortListNode::VmPortListNode(const VlModule* module) :
   mModule(module)
 {
 }
@@ -247,7 +233,7 @@ VmPortListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return "vpiPort";
     }
     else if ( column == 1 ) {
       return "";
@@ -269,7 +255,7 @@ VmPortListNode::expand() const
 {
   for (ymuint i = 0; i < mModule->port_num(); ++ i) {
     const VlPort* port = mModule->port(i);
-    add_child( new VmPortNode(vl_mgr(), mLabel, port) );
+    add_child( new VmPortNode(port) );
   }
 }
 
@@ -278,14 +264,8 @@ VmPortListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] vl_mgr VlMgr
-// @param[in] label ラベル
 // @param[in] port ポートを表すオブジェクト
-VmPortNode::VmPortNode(const VlMgr& vl_mgr,
-		       const QString& label,
-		       const VlPort* port) :
-  VmNode(vl_mgr),
-  mLabel(label),
+VmPortNode::VmPortNode(const VlPort* port) :
   mPort(port)
 {
 }
@@ -304,7 +284,7 @@ VmPortNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return "vpiPort";
     }
     else if ( column == 1 ) {
       if ( mPort->name() ) {

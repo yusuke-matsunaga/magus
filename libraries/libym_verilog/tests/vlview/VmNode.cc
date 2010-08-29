@@ -19,8 +19,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-VmNode::VmNode(const VlMgr& mgr) :
-  mMgr(mgr),
+VmNode::VmNode() :
   mExpanded(false)
 {
 }
@@ -34,18 +33,34 @@ VmNode::~VmNode()
   }
 }
 
-// @brief VlMgr を取り出す．
-const VlMgr&
-VmNode::vl_mgr() const
-{
-  return mMgr;
-}
-
 // @brief 子供を追加する．
 void
 VmNode::add_child(VmNode* node) const
 {
   mChildren.push_back(node);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmNode1
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+VmNode1::VmNode1(const VlMgr& mgr) :
+  mMgr(mgr)
+{
+}
+
+// @brief デストラクタ
+VmNode1::~VmNode1()
+{
+}
+
+// @brief VlMgr を取り出す．
+const VlMgr&
+VmNode1::vl_mgr() const
+{
+  return mMgr;
 }
 
 END_NAMESPACE_YM_VERILOG

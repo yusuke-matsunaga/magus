@@ -19,6 +19,50 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
+/// @class VmUdpListNode VmRootNode.h
+/// @brief UDP のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmUdpListNode :
+  public VmNode1
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  VmUdpListNode(const VlMgr& vl_mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmUdpListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+  
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+  
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class VmUdpNode VmUdpNode.h
 /// @brief UDP を表すノード
 //////////////////////////////////////////////////////////////////////
@@ -28,12 +72,8 @@ class VmUdpNode :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] udp UDP を表すオブジェクト
-  VmUdpNode(const VlMgr& vl_mgr,
-	    const QString& label,
-	    const VlUdpDefn* udp);
+  VmUdpNode(const VlUdpDefn* udp);
 
   /// @brief デストラクタ
   virtual
@@ -68,9 +108,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ラベル
-  QString mLabel;
   
   // 対応する UDP
   const VlUdpDefn* mUdp;
@@ -88,12 +125,8 @@ class VmUdpEntryListNode :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] udp UDP を表すオブジェクト
-  VmUdpEntryListNode(const VlMgr& vl_mgr,
-		     const QString& label,
-		     const VlUdpDefn* udp);
+  VmUdpEntryListNode(const VlUdpDefn* udp);
 
   /// @brief デストラクタ
   virtual
@@ -128,11 +161,8 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ラベル
-  QString mLabel;
   
-  // UDP
+  // 親のUDP
   const VlUdpDefn* mUdp;
   
 };
@@ -148,12 +178,8 @@ class VmUdpEntryNode :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
   /// @param[in] table テーブルの1行分
-  VmUdpEntryNode(const VlMgr& vl_mgr,
-		 const QString& label,
-		 const VlTableEntry* table);
+  VmUdpEntryNode(const VlTableEntry* table);
 
   /// @brief デストラクタ
   virtual
@@ -188,9 +214,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ラベル
-  QString mLabel;
   
   // 対応するテーブル
   const VlTableEntry* mTable;
