@@ -4380,12 +4380,12 @@ procedural_continuous_assignments
 //             "join"
 
 par_block
-: ai_list fork
+: ai_list FORK
   JOIN
 {
   $$ = parser.new_ParBlock(@$, NULL, $1);
 }
-| ai_list fork
+| ai_list FORK
     nzlist_of_stmt
   JOIN
 {
@@ -4393,23 +4393,22 @@ par_block
 }
 | ai_list fork ':' IDENTIFIER
     list_of_bitem_decl
-  JOIN
+  join
 {
   $$ = parser.new_NamedParBlock(@$, $4, NULL, $1);
 }
 | ai_list fork ':' IDENTIFIER
     list_of_bitem_decl
     nzlist_of_stmt
-  JOIN
+  join
 {
   $$ = parser.new_NamedParBlock(@$, $4, $6, $1);
 }
-| ai_list fork
+| ai_list FORK
     error
   JOIN
 {
   $$ = NULL;
-  parser.end_block();
   yyerrok;
 }
 ;
@@ -4421,18 +4420,25 @@ fork
 }
 ;
 
+join
+: JOIN
+{
+  parser.end_block();
+}
+;
+
 // [SPEC] seq_block ::=
 //             "begin" [':' block_identifier { block_item_declaration }]
 //                 { statement }
 //             "end"
 
 seq_block
-: ai_list begin
+: ai_list BEGIN
   END
 {
   $$ = parser.new_SeqBlock(@$, NULL, $1);
 }
-| ai_list begin
+| ai_list BEGIN
     nzlist_of_stmt
   END
 {
@@ -4440,23 +4446,22 @@ seq_block
 }
 | ai_list begin ':' IDENTIFIER
     list_of_bitem_decl
-  END
+  end
 {
   $$ = parser.new_NamedSeqBlock(@$, $4, NULL, $1);
 }
 | ai_list begin ':' IDENTIFIER
     list_of_bitem_decl
     nzlist_of_stmt
-  END
+  end
 {
   $$ = parser.new_NamedSeqBlock(@$, $4, $6, $1);
 }
-| ai_list begin
+| ai_list BEGIN
     error
   END
 {
   $$ = NULL;
-  parser.end_block();
   yyerrok;
 }
 ;
@@ -4467,6 +4472,12 @@ begin
   parser.init_block();
 }
 ;
+
+end
+: END
+{
+  parser.end_block();
+}
 
 // [SPEC*] list_of_stmt ::= { statement }
 nzlist_of_stmt

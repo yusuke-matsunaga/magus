@@ -531,7 +531,7 @@ Parser::new_NamedParBlock(const FileRegion& fr,
 					    get_decl_array(),
 					    to_array(stmt_list));
   reg_attrinst(stmt, ai_list);
-  end_block();
+
   return stmt;
 }
 
@@ -566,7 +566,7 @@ Parser::new_NamedSeqBlock(const FileRegion& fr,
 					    get_decl_array(),
 					    to_array(stmt_list));
   reg_attrinst(stmt, ai_list);
-  end_block();
+
   return stmt;
 }
 

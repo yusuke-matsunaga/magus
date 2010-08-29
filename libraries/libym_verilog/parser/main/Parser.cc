@@ -111,7 +111,7 @@ Parser::read_file(const string& filename,
   int stat = yyparse(*this);
     
   if ( check_memory_leak ) {
-    cout << endl
+    dout << endl
 	 << "Parser::mAlloc.allocated_size() = "
 	 << mTmpAlloc.allocated_size() << endl
 	 << "                     used_size()      = "
@@ -617,6 +617,7 @@ Parser::end_genif()
 void
 Parser::init_block()
 {
+  cout << "init_block()" << endl;
   push_declhead_list();
 
   mCurDeclHeadList = new_declhead_list();
@@ -626,6 +627,7 @@ Parser::init_block()
 void
 Parser::end_block()
 {
+  cout << "end_block()" << endl;
   delete_declhead_list(mCurDeclHeadList);
   
   pop_declhead_list();
