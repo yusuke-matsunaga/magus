@@ -162,32 +162,32 @@ END_NONAMESPACE
 void
 VmModuleNode::expand() const
 {
-  add_child("vpiDefName", mModule->def_name());
-  add_child("vpiFullName", mModule->full_name());
+  add_str("vpiDefName", mModule->def_name());
+  add_str("vpiFullName", mModule->full_name());
   // vpiDefFile
 
   const VlModuleArray* module_array = mModule->module_array();
   bool is_array = (module_array != NULL);
-  add_child("vpiArray", is_array);
+  add_bool("vpiArray", is_array);
   if ( is_array ) {
-    add_child("vpiModuleArray", module_array->full_name());
-    add_child("vpiIndex", mModule->index());
+    add_str("vpiModuleArray", module_array->full_name());
+    add_int("vpiIndex", mModule->index());
   }
-  add_child("vpiTopModule", mModule->is_top_module());
-  add_child("vpiCellInstance", mModule->is_cell_instance());
-  add_child("vpiProtected", mModule->is_protected());
+  add_bool("vpiTopModule", mModule->is_top_module());
+  add_bool("vpiCellInstance", mModule->is_cell_instance());
+  add_bool("vpiProtected", mModule->is_protected());
   if ( mModule->time_unit() != -16 ) {
-    add_child("vpiTimeUnit", unit2str(mModule->time_unit()));
-    add_child("vpiTimePrecision", unit2str(mModule->time_precision()));
+    add_str("vpiTimeUnit", unit2str(mModule->time_unit()));
+    add_str("vpiTimePrecision", unit2str(mModule->time_precision()));
   }
   add_child( new VmNetTypeNode("vpiDefaultNetType", mModule->def_net_type()) );
   add_child( new VmUdNode(mModule->unconn_drive()) );
   add_child( new VmDelayModeNode(mModule->def_delay_mode()) );
-  add_child("vpiDefaultDecayTime", mModule->def_decay_time());
+  add_int("vpiDefaultDecayTime", mModule->def_decay_time());
   
-  add_child("Config", mModule->config().c_str());
-  add_child("Library", mModule->library().c_str());
-  add_child("Cell", mModule->cell().c_str());
+  add_str("Config", mModule->config());
+  add_str("Library", mModule->library());
+  add_str("Cell", mModule->cell());
 
   add_child( new VmPortListNode(mModule) );
   ymuint n = mModule->io_num();
@@ -309,20 +309,20 @@ VmPortNode::loc() const
 void
 VmPortNode::expand() const
 {
-  add_child("vpiModule", mPort->module()->full_name());
-  add_child("vpiConnByName", mPort->is_conn_by_name());
-  add_child("vpiExplicitName", mPort->is_explicit_name());
-  add_child("vpiPortIndex", mPort->port_index());
+  add_str("vpiModule", mPort->module()->full_name());
+  add_bool("vpiConnByName", mPort->is_conn_by_name());
+  add_bool("vpiExplicitName", mPort->is_explicit_name());
+  add_int("vpiPortIndex", mPort->port_index());
 #if 0
-  add_child("vpiScalar", mPort->is_scalar());
-  add_child("vpiVector", mPort->is_vector());
+  add_bool("vpiScalar", mPort->is_scalar());
+  add_bool("vpiVector", mPort->is_vector());
 #endif
-  add_child("vpiSzie", mPort->bit_size());
+  add_int("vpiSzie", mPort->bit_size());
   if ( mPort->high_conn() ) {
-    add_child("vpiHighConn", mPort->high_conn());
+    add_expr("vpiHighConn", mPort->high_conn());
   }
   if ( mPort->low_conn() ) {
-    add_child("vpiLowConn", mPort->low_conn());
+    add_expr("vpiLowConn", mPort->low_conn());
   }
 }
 

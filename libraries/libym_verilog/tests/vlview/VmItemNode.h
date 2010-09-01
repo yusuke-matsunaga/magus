@@ -131,7 +131,8 @@ private:
 class VmPrimTermListNode :
   public VmNode
 {
-
+public:
+  
   /// @brief コンストラクタ
   /// @param[in] primitive 親のプリミティブ
   VmPrimTermListNode(const VlPrimitive* primitive);
@@ -233,18 +234,18 @@ private:
 /// @class VmContAssignListNode VmItemNode.h
 /// @brief continuous assign 文のリストを表すノード
 //////////////////////////////////////////////////////////////////////
-class VmContAssignNode :
+class VmContAssignListNode :
   public VmNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] ca_list 継続的代入文のリスト
-  VmContAssignNode(const vector<const VlContAssign*>& ca_list);
+  VmContAssignListNode(const vector<const VlContAssign*>& ca_list);
 
   /// @brief デストラクタ
   virtual
-  ~VmContAssignNode();
+  ~VmContAssignListNode();
 
 
 public:

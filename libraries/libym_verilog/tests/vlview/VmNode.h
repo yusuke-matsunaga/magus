@@ -127,40 +127,64 @@ protected:
   add_expr(const QString& label,
 	   const VlExpr* expr) const;
 
+  /// @brief strength 型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  add_strength(const QString& label,
+	       tVpiStrength value) const;
+
+  /// @brief 遅延値型のノードを追加する．
+  /// @param[in] value 値
+  void
+  add_delay(const VlDelay* value) const;
+
+  /// @brief dir 型のノードを追加する．
+  /// @param[in] value 値
+  void
+  add_dir(tVpiDirection dir) const;
+  
   /// @brief 文字列型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
   void
-  add_child(const QString& label,
-	    const QString& value) const;
+  add_str(const QString& label,
+	  const QString& value) const;
 
   /// @brief 文字列型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
   void
-  add_child(const QString& label,
-	    const string& value) const;
+  add_str(const QString& label,
+	  const string& value) const;
+
+  /// @brief 文字列型のノードを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  add_str(const QString& label,
+	  const char* value) const;
 
   /// @brief ブール型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
   void
-  add_child(const QString& label,
+  add_bool(const QString& label,
 	    bool value) const;
 
   /// @brief 整数型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
   void
-  add_child(const QString& label,
+  add_int(const QString& label,
 	    int value) const;
 
   /// @brief 整数型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
   void
-  add_child(const QString& label,
-	    ymuint value) const;
+  add_int(const QString& label,
+	  ymuint value) const;
     
 
 private:

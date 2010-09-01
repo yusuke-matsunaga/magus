@@ -34,6 +34,8 @@ vlview_SOURCES = \
 	VmModuleNode.cc \
 	VmDeclNode.h \
 	VmDeclNode.cc \
+	VmItemNode.h \
+	VmItemNode.cc \
 	VmStmtNode.h \
 	VmStmtNode.cc \
 	VmExprNode.h \

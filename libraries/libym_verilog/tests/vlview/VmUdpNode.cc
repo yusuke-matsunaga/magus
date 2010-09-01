@@ -130,7 +130,7 @@ void
 VmUdpNode::expand() const
 {
   add_child( new VmPrimTypeNode(mUdp->prim_type()) );
-  add_child("vpiProtected", mUdp->is_protected());
+  add_bool("vpiProtected", mUdp->is_protected());
   ymuint n = mUdp->port_num();
   vector<const VlIODecl*> ioarray(n);
   for (ymuint i = 0; i < n - 1; ++ i) {

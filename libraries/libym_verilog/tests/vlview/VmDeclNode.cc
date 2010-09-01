@@ -150,29 +150,29 @@ VmIODeclNode::loc() const
 void
 VmIODeclNode::expand() const
 {
-  add_child( new VmDirNode(mIODecl->direction()) );
-  add_child("vpiSigned", mIODecl->is_signed());
+  add_dir(mIODecl->direction());
+  add_bool("vpiSigned", mIODecl->is_signed());
 #if 0
-  add_child("vpiScalar", mIODecl->is_scalar());
-  add_child("vpiVector", mIODecl->is_vector());
+  add_bool("vpiScalar", mIODecl->is_scalar());
+  add_bool("vpiVector", mIODecl->is_vector());
 #endif
-  add_child("vpiSize", mIODecl->bit_size());
+  add_int("vpiSize", mIODecl->bit_size());
 
   const VlModule* module = mIODecl->module();
   if ( module ) {
-    add_child("vpiModule", module->full_name());
+    add_str("vpiModule", module->full_name());
   }
   const VlUdpDefn* udp = mIODecl->udp_defn();
   if ( udp ) {
-    add_child("vpiUdpDefn", udp->def_name());
+    add_str("vpiUdpDefn", udp->def_name());
   }
   const VlTask* task = mIODecl->task();
   if ( task ) {
-    add_child("vpiTask", task->full_name());
+    add_str("vpiTask", task->full_name());
   }
   const VlFunction* func = mIODecl->function();
   if ( func ) {
-    add_child("vpiFunction", func->full_name());
+    add_str("vpiFunction", func->full_name());
   }
   if ( mIODecl->left_range() ) {
     add_expr("vpiLeftRange", mIODecl->left_range());
@@ -307,25 +307,25 @@ VmDeclNode::expand() const
   case kVpiSpecParam:       nm = "vpiSpecParam"; break;
   default: assert_not_reached( __FILE__, __LINE__ );
   }
-  add_child("vpiType", nm);
-  add_child("vpiFullName", mDecl->full_name());
+  add_str("vpiType", nm);
+  add_str("vpiFullName", mDecl->full_name());
 #if 0
-  add_child("vpiExpanded", mDecl->is_expanded());
-  add_child("vpiImplicitDecl", mDecl->is_implicit_decl());
-  add_child("vpiNetDeclAssign", mDecl->has_net_decl_assign());
-  add_child("vpiScalar", mDecl->is_scalar());
-  add_child("vpiVector", mDecl->is_vector());
-  add_child("vpiExplicitScalar", mDecl->is_explicit_scalar());
-  add_child("vpiExplicitVector", mDecl->is_explicit_vector());
+  add_bool("vpiExpanded", mDecl->is_expanded());
+  add_bool("vpiImplicitDecl", mDecl->is_implicit_decl());
+  add_bool("vpiNetDeclAssign", mDecl->has_net_decl_assign());
+  add_bool("vpiScalar", mDecl->is_scalar());
+  add_bool("vpiVector", mDecl->is_vector());
+  add_bool("vpiExplicitScalar", mDecl->is_explicit_scalar());
+  add_bool("vpiExplicitVector", mDecl->is_explicit_vector());
 #endif
   add_child( new VmVsNode(mDecl->vs_type()) );
-  add_child("vpiSigned", mDecl->is_signed());
-  add_child("vpiSize", mDecl->bit_size());
-  add_child("vpiModule", mDecl->parent_module()->full_name());
-  add_child("vpiScope", mDecl->parent()->full_name());
+  add_bool("vpiSigned", mDecl->is_signed());
+  add_int("vpiSize", mDecl->bit_size());
+  add_str("vpiModule", mDecl->parent_module()->full_name());
+  add_str("vpiScope", mDecl->parent()->full_name());
 #if 0
-  add_child("vpiArray", mDecl->is_array());
-  add_child("vpiMultiArray", mDecl->is_multi_array());
+  add_bool("vpiArray", mDecl->is_array());
+  add_bool("vpiMultiArray", mDecl->is_multi_array());
 #endif
   // 親の配列
 
@@ -335,12 +335,10 @@ VmDeclNode::expand() const
   }
 
   if ( mDecl->type() == kVpiNet ) {
-    add_child( new VmStrengthValNode("vpiStrength0", mDecl->drive0()) );
-    add_child( new VmStrengthValNode("vpiStrength1", mDecl->drive1()) );
-    add_child( new VmStrengthValNode("vpiChargeStrength", mDecl->charge()) );
-#if 0
-    add_child( new VmDelayNode("vpiDelay", mDecl->delay()) );
-#endif
+    add_strength("vpiStrength0", mDecl->drive0());
+    add_strength("vpiStrength1", mDecl->drive1());
+    add_strength("vpiChargeStrength", mDecl->charge());
+    add_delay(mDecl->delay());
   }
 
 #if 0

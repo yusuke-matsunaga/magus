@@ -165,7 +165,7 @@ VmProcessNode::loc() const
 void
 VmProcessNode::expand() const
 {
-  add_child("vpiModule", mProcess->parent()->parent_module()->full_name());
+  add_str("vpiModule", mProcess->parent()->parent_module()->full_name());
   add_stmt(vl_mgr(), "vpiStmt", mProcess->stmt());
 }
 
@@ -313,7 +313,7 @@ VmStmtNode::loc() const
 void
 VmStmtNode::expand() const
 {
-  add_child("vpiScope", mStmt->parent()->full_name());
+  add_str("vpiScope", mStmt->parent()->full_name());
   
   switch ( mStmt->type() ) {
   case kVpiNamedBegin:
@@ -321,8 +321,8 @@ VmStmtNode::expand() const
     {
       const VlNamedObj* scope = mStmt->scope();
       assert_cond( scope, __FILE__, __LINE__);
-      add_child("vpiFullName", scope->full_name());
-      //pus_scope_sub(scope);
+      add_str("vpiFullName", scope->full_name());
+      //put_scope_sub(scope);
     }
     // わざと次に続く
   case kVpiBegin:
@@ -331,11 +331,11 @@ VmStmtNode::expand() const
     break;
 
   case kVpiEventStmt:
-    add_child("vpiNamedEvent", mStmt->named_event());
+    add_expr("vpiNamedEvent", mStmt->named_event());
     break;
 
   case kVpiAssignment:
-    add_child("vpiBlocking", mStmt->is_blocking());
+    add_bool("vpiBlocking", mStmt->is_blocking());
     add_expr("vpiLhs", mStmt->lhs());
     add_expr("vpiRhs", mStmt->rhs());
     if ( mStmt->control() ) {
@@ -375,15 +375,15 @@ VmStmtNode::expand() const
   case kVpiCase:
     switch ( mStmt->case_type() ) {
     case kVpiCaseExact:
-      add_child("vpiCaseType", "vpiCaseExact");
+      add_str("vpiCaseType", "vpiCaseExact");
       break;
 
     case kVpiCaseX:
-      add_child("vpiCaseType", "vpiCaseX");
+      add_str("vpiCaseType", "vpiCaseX");
       break;
 
     case kVpiCaseZ:
-      add_child("vpiCaseType", "vpiCaseZ");
+      add_str("vpiCaseType", "vpiCaseZ");
       break;
     }
     add_expr("vpiCondition", mStmt->expr());
@@ -402,17 +402,17 @@ VmStmtNode::expand() const
     break;
 
   case kVpiTaskCall:
-    add_child("vpiTask", mStmt->task()->full_name());
+    add_str("vpiTask", mStmt->task()->full_name());
     add_child( new VmArgListNode(mStmt) );
     break;
 
   case kVpiSysTaskCall:
-    add_child("vpiUserSystf", mStmt->user_systf()->name());
+    add_str("vpiUserSystf", mStmt->user_systf()->name());
     add_child( new VmArgListNode(mStmt) );
     break;
     
   case kVpiDisable:
-    add_child("vpiExpr", mStmt->scope()->full_name());
+    add_str("vpiExpr", mStmt->scope()->full_name());
     break;
 
   case kVpiDelayControl:
@@ -600,7 +600,7 @@ VmCaseItemNode::expand() const
 {
   ymuint n = mCaseItem->expr_num();
   if ( n == 0 ) {
-    add_child("vpiLabel", "Default");
+    add_str("vpiLabel", "Default");
   }
   else {
     for (ymuint i = 0; i < n; ++ i) {
@@ -665,7 +665,7 @@ void
 VmControlNode::expand() const
 {
   if ( mControl->delay() ) {
-    add_child("vpiDelay", mControl->delay());
+    add_expr("vpiDelay", mControl->delay());
   }
   else {
     if ( mControl->expr() ) {

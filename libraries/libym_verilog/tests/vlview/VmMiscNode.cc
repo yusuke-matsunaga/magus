@@ -10,16 +10,43 @@
 
 
 #include "VmMiscNode.h"
+#include "ym_verilog/vl/VlDelay.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
+
+// @brief strength 型のノードを追加する．
+// @param[in] label ラベル
+// @param[in] value 値
+void
+VmNode::add_strength(const QString& label,
+		     tVpiStrength value) const
+{
+  add_child( new VmStrengthValNode(label, value) );
+}
+
+// @brief 遅延値型のノードを追加する．
+// @param[in] value 値
+void
+VmNode::add_delay(const VlDelay* value) const
+{
+  add_child( new VmDelayNode(value) );
+}
+
+// @brief dir 型のノードを追加する．
+// @param[in] value 値
+void
+VmNode::add_dir(tVpiDirection dir) const
+{
+  add_child( new VmDirNode(dir) );
+}
 
 // @brief 文字列型のノードを追加する．
 // @param[in] label ラベル
 // @param[in] value 値
 void
-VmNode::add_child(const QString& label,
-		  const QString& value) const
+VmNode::add_str(const QString& label,
+		const QString& value) const
 {
   add_child( new VmStrNode(label, value) );
 }
@@ -28,18 +55,28 @@ VmNode::add_child(const QString& label,
 // @param[in] label ラベル
 // @param[in] value 値
 void
-VmNode::add_child(const QString& label,
-		  const string& value) const
+VmNode::add_str(const QString& label,
+		const string& value) const
 {
   add_child( new VmStrNode(label, value.c_str()) );
+}
+
+// @brief 文字列型のノードを追加する．
+// @param[in] label ラベル
+// @param[in] value 値
+void
+VmNode::add_str(const QString& label,
+		const char* value) const
+{
+  add_child( new VmStrNode(label, value) );
 }
 
 // @brief ブール型のノードを追加する．
 // @param[in] label ラベル
 // @param[in] value 値
 void
-VmNode::add_child(const QString& label,
-		  bool value) const
+VmNode::add_bool(const QString& label,
+		 bool value) const
 {
   add_child( new VmBoolNode(label, value) );
 }
@@ -48,7 +85,7 @@ VmNode::add_child(const QString& label,
 // @param[in] label ラベル
 // @param[in] value 値
 void
-VmNode::add_child(const QString& label,
+VmNode::add_int(const QString& label,
 		  int value) const
 {
   add_child( new VmIntNode(label, value) );
@@ -58,27 +95,26 @@ VmNode::add_child(const QString& label,
 // @param[in] label ラベル
 // @param[in] value 値
 void
-VmNode::add_child(const QString& label,
+VmNode::add_int(const QString& label,
 		  ymuint value) const
 {
   add_child( new VmIntNode(label, value) );
 }
 
-#if 0
 
 //////////////////////////////////////////////////////////////////////
-// クラス DelayNode
+// クラス VmDelayNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] con 接続
-DelayNode::DelayNode(const PtDelay* delay) :
+// @param[in] delay 遅延情報
+VmDelayNode::VmDelayNode(const VlDelay* delay) :
   mDelay(delay)
 {
 }
 
 // @brief デストラクタ
-DelayNode::~DelayNode()
+VmDelayNode::~VmDelayNode()
 {
 }
 
@@ -86,15 +122,16 @@ DelayNode::~DelayNode()
 // @param[in] column コラム番号
 // @param[in] role 
 QVariant
-DelayNode::data(int column,
-		int role) const
+VmDelayNode::data(int column,
+		  int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "Delay";
+      return "vpiDelay";
     }
     else if ( column == 1 ) {
-      return "";
+      // 手抜き
+      return mDelay->decompile().c_str();
     }
   }
   return QVariant();
@@ -102,31 +139,17 @@ DelayNode::data(int column,
     
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-DelayNode::loc() const
+VmDelayNode::loc() const
 {
   return mDelay->file_region();
 }
 
 // @brief 子供の配列を作る．
 void
-DelayNode::expand() const
+VmDelayNode::expand() const
 {
-  ymuint32 n = 0;
-  for (ymuint32 i = 0; i < 3; ++ i) {
-    if ( mDelay->value(i) ) {
-      ++ n;
-    }
-  }
-  mChildren.reserve(n);
-  for (ymuint32 i = 0; i < 3; ++ i) {
-    if ( mDelay->value(i) ) {
-      QString label("Delay");
-      label += static_cast<char>('0' + i);
-      mChildren.push_back( new ExprNode(label, mDelay->value(i)) );
-    }
-  }
 }
-#endif
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス VmScalarNode

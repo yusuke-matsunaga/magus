@@ -17,22 +17,21 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-#if 0
 //////////////////////////////////////////////////////////////////////
-/// @class DelayNode VmMiscNode.h
+/// @class VmDelayNode VmMiscNode.h
 /// @brief 遅延情報を表すノード
 //////////////////////////////////////////////////////////////////////
-class DelayNode :
+class VmDelayNode :
   public VmNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] delay 遅延情報
-  DelayNode(const PtDelay* delay);
+  VmDelayNode(const VlDelay* delay);
 
   /// @brief デストラクタ
-  ~DelayNode();
+  ~VmDelayNode();
 
 
 public:
@@ -65,10 +64,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 遅延情報
-  const PtDelay* mDelay;
+  const VlDelay* mDelay;
   
 };
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

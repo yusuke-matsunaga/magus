@@ -240,77 +240,77 @@ END_NONAMESPACE
 void
 VmExprNode::expand() const
 {
-  add_child("vpiDecompile", mExpr->decompile());
+  add_str("vpiDecompile", mExpr->decompile());
   switch ( mExpr->type() ) {
   case kVpiBitSelect:
-    add_child("vpiConstantSelect", mExpr->is_constant_select());
+    add_bool("vpiConstantSelect", mExpr->is_constant_select());
     if ( mExpr->decl_obj() ) {
-      add_child("vpiParent", mExpr->decl_obj()->full_name());
+      add_str("vpiParent", mExpr->decl_obj()->full_name());
       for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
-	add_child("array_index", mExpr->declarray_index(i));
+	add_expr("array_index", mExpr->declarray_index(i));
       }
-      add_child("vpiIndex", mExpr->index());
+      add_expr("vpiIndex", mExpr->index());
     }
     else {
-      add_child("vpiParent", mExpr->parent_expr());
-      add_child("vpiIndex", mExpr->index_val());
+      add_str("vpiParent", mExpr->parent_expr()->decompile());
+      add_int("vpiIndex", mExpr->index_val());
     }
     break;
 
   case kVpiPartSelect:
-    add_child("vpiConstantSelect", mExpr->is_constant_select());
+    add_bool("vpiConstantSelect", mExpr->is_constant_select());
     if ( mExpr->decl_obj() ) {
-      add_child("vpiParent", mExpr->decl_obj()->full_name());
+      add_str("vpiParent", mExpr->decl_obj()->full_name());
       for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
-	add_child("array_index", mExpr->declarray_index(i));
+	add_expr("array_index", mExpr->declarray_index(i));
       }
-      add_child("vpiLeftRange", mExpr->left_range());
-      add_child("vpiRightRange", mExpr->right_range());
+      add_expr("vpiLeftRange", mExpr->left_range());
+      add_expr("vpiRightRange", mExpr->right_range());
     }
     else {
-      add_child("vpiParent", mExpr->parent_expr());
-      add_child("vpiLeftRange", mExpr->left_range_val());
-      add_child("vpiRightRange", mExpr->right_range_val());
+      add_str("vpiParent", mExpr->parent_expr()->decompile());
+      add_int("vpiLeftRange", mExpr->left_range_val());
+      add_int("vpiRightRange", mExpr->right_range_val());
     }
     break;
     
   case kVpiOperation:
-    add_child("vpiOpType", op_type_str(mExpr->op_type()));
+    add_str("vpiOpType", op_type_str(mExpr->op_type()));
     for (ymuint i = 0; i < mExpr->operand_num(); ++ i) {
-      add_child("Operand", mExpr->operand(i));
+      add_expr("Operand", mExpr->operand(i));
     }
     break;
 
   case kVpiConstant:
-    add_child("vpiConstType", constant_type_str(mExpr->constant_type()));
+    add_str("vpiConstType", constant_type_str(mExpr->constant_type()));
     break;
 
   case kVpiFuncCall:
-    add_child("vpiFunction", mExpr->function()->full_name());
+    add_str("vpiFunction", mExpr->function()->full_name());
     for (ymuint i = 0; i < mExpr->argument_num(); ++ i) {
-      add_child("vpiArgument", mExpr->argument(i));
+      add_expr("vpiArgument", mExpr->argument(i));
     }
     break;
     
   case kVpiSysFuncCall:
-    add_child("vpiUserSystf", mExpr->user_systf()->name());
+    add_str("vpiUserSystf", mExpr->user_systf()->name());
     for (ymuint i = 0; i < mExpr->argument_num(); ++ i) {
-      add_child("vpiArgument", mExpr->argument(i));
+      add_expr("vpiArgument", mExpr->argument(i));
     }
     break;
 
   default:
     if ( mExpr->decl_obj() ) {
-      add_child("decl obj", mExpr->decl_obj()->full_name());
+      add_str("decl obj", mExpr->decl_obj()->full_name());
       for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
-	add_child("vpiArrayIndex", mExpr->declarray_index(i));
+	add_expr("vpiArrayIndex", mExpr->declarray_index(i));
       }
     }
     else if ( mExpr->scope_obj() ) {
-      add_child("scope obj", mExpr->scope_obj()->full_name());
+      add_str("scope obj", mExpr->scope_obj()->full_name());
     }
     else if ( mExpr->primitive_obj() ) {
-      add_child("primitive obj", mExpr->primitive_obj()->full_name());
+      add_str("primitive obj", mExpr->primitive_obj()->full_name());
     }
     else {
       assert_not_reached(__FILE__, __LINE__);
