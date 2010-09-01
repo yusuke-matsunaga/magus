@@ -1,6 +1,6 @@
 
-/// @file libym_verilog/tests/vlview/VlPtNode_item.cc
-/// @brief VlPtNode の実装ファイル
+/// @file libym_verilog/tests/vlview/VmItermNode.cc
+/// @brief VmItemNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: VlPtNode_item.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,15 +9,112 @@
 /// All rights reserved.
 
 
-#include "VlPtNode_item.h"
-#include "VlPtNode_decl.h"
-#include "VlPtNode_stmt.h"
-#include "VlPtNode_expr.h"
-#include "VlPtNode_misc.h"
-#include <ym_verilog/pt/PtItem.h>
+#include "VmItermNode.h"
+#include "ym_verilog/vl/VlPrimitive.h"
+#include "ym_verilog/vl/VlContAssign.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmPrimitiveListNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] prim_list プリミティブのリスト
+VmPrimitiveListNode::VmPrimitiveListNode(const vector<const VlPrimitive*>& prim_list) :
+  mPrimArray(prim_list)
+{
+}
+
+// @brief デストラクタ
+VmPrimitiveListNode::~VmPrimitiveListNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmPrimitiveListNode::data(int column,
+			  int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return "vpiPtimitive";
+    }
+    else if ( column == 1 ) {
+      return "";
+    }
+  }
+  return QVariant();
+}
+
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+VmPrimitiveListNode::loc() const
+{
+  return FileRegion();
+}
+
+// @brief 子供の配列を作る．
+void
+VmPrimitiveListNode::expand() const
+{
+  for (vector<const VlPrimitive*>::const_iterator p = mPrimArray.begin();
+       p != mPrimArray.end(); ++ p) {
+    add_child( new VmPrimitiveNode(*p) );
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmPrimitiveNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] primitive プリミティブ
+VmPrimitiveNode::VmPrimitiveNode(const VlPrimitive* primitive) :
+  mPrimitive(primitive)
+{
+}
+
+// @brief デストラクタ
+VmPrimitiveNode::~VmPrimitiveNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmPrimitiveNode::data(int column,
+		      int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return "vpiPtimitive";
+    }
+    else if ( column == 1 ) {
+      return "";
+    }
+  }
+  return QVariant();
+}
+
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+VmPrimitiveNode::loc() const
+{
+  return file_regin();
+}
+
+// @brief 子供の配列を作る．
+void
+VmPrimitive::expand() const
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス ItemListNode
