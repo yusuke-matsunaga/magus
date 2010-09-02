@@ -224,39 +224,53 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlFunction の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief function type を返す．
   virtual
   tVpiFuncType
   func_type() const;
-  
+
   /// @brief 出力のビット幅を返す．
   virtual
   ymuint32
   bit_size() const;
-  
+
   /// @brief 符号付きの時 true を返す．
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief automatic 宣言されていたら true を返す．
   virtual
   bool
   automatic() const;
-  
+
   /// @brief 範囲のMSBを返す．
-  /// @note このクラスでは NULL を返す．
   virtual
   const VlExpr*
   left_range() const;
-  
+
   /// @brief 範囲のLSBを返す．
-  /// @note このクラスでは NULL を返す．
   virtual
   const VlExpr*
   right_range() const;
-  
+
+  /// @brief 範囲の MSB の値を返す．
+  /// @retval 範囲のMSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  /// @note このクラスでは -1 を返す．
+  virtual
+  int
+  left_range_const() const;
+
+  /// @brief 範囲の LSB の値を返す．
+  /// @retval 範囲のLSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  /// @note このクラスでは -1 を返す．
+  virtual
+  int
+  right_range_const() const;
+
   /// @brief 入出力数を得る．
   virtual
   ymuint32
@@ -267,12 +281,12 @@ public:
   virtual
   const VlIODecl*
   io(ymuint32 pos) const;
-  
+
   /// @brief 本体のステートメントを得る．
   virtual
   const VlStmt*
   stmt() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -291,19 +305,19 @@ public:
   	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl);
-  
+
   /// @brief 出力変数をセットする．
   /// @param[in] ovar 出力変数
   /// @note 関数の場合のみ意味を持つ．
   virtual
   void
   set_ovar(ElbDecl* ovar);
-  
+
   /// @brief 本体のステートメントをセットする．
   virtual
   void
   set_stmt(ElbStmt* stmt);
-  
+
   /// @brief constant function の時に true を返す．
   virtual
   bool
@@ -322,7 +336,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic(const vector<ElbExpr*>& arg_list) const;
-  
+
   /// @brief real 型の値を返す．
   /// @param[in] arg_list 引数のリスト
   /// @note constant function の場合のみ意味を持つ．
@@ -344,45 +358,61 @@ public:
   virtual
   ElbIODecl*
   _io(ymuint32 pos) const;
-  
+
+  /// @brief 範囲のMSBの取得
+  /// @retval 範囲のMSB 範囲を持つとき
+  /// @retval NULL 範囲を持たないとき
+  /// @note このクラスでは NULL を返す．
+  virtual
+  ElbExpr*
+  _left_range() const;
+
+  /// @brief 範囲のLSBの取得
+  /// @retval 範囲のLSB 範囲を持つとき
+  /// @retval NULL 範囲を持たないとき
+  /// @note このクラスでは NULL を返す．
+  virtual
+  ElbExpr*
+  _right_range() const;
+
   /// @brief 本体の ElbStmt を得る．
   virtual
   ElbStmt*
   _stmt() const;
-  
-  
+
+
 private:
-  
+
   /// @brief 関数の値の評価を行う．
   /// @param[in] arg_list 引数のリスト
   /// @note constant function の場合のみ意味を持つ．
   void
   evaluate(const vector<ElbExpr*>& arg_list) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親のスコープ
   const VlNamedObj* mParent;
 
   // パース木の Task 定義
   const PtItem* mPtItem;
-  
+
   // 入出力数
   ymuint32 mIODeclNum;
 
   // 入出力のリスト
   EiIODecl* mIODeclList;
-  
+
   // 出力変数
   ElbDecl* mOvar;
-  
+
   // 本体のステートメント
   ElbStmt* mStmt;
-  
+
 };
 
 
@@ -414,32 +444,52 @@ protected:
 	      ElbExpr* right,
 	      int left_val,
 	      int right_val);
-	      
+
   /// @brief デストラクタ
   virtual
   ~EiFunctionV();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // VlFunction の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
+  /// @brief 範囲の MSB の値を返す．
+  /// @retval 範囲のMSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  left_range_const() const;
+
+  /// @brief 範囲の LSB の値を返す．
+  /// @retval 範囲のLSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  right_range_const() const;
+
   /// @brief 出力のビット幅を返す．
   virtual
   ymuint32
   bit_size() const;
-  
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbFunction の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 範囲のMSBを返す．
   virtual
-  const VlExpr*
-  left_range() const;
-  
+  ElbExpr*
+  _left_range() const;
+
   /// @brief 範囲のLSBを返す．
   virtual
-  const VlExpr*
-  right_range() const;
-  
+  ElbExpr*
+  _right_range() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

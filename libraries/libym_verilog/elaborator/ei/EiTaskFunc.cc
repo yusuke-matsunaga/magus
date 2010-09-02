@@ -513,21 +513,39 @@ EiFunction::automatic() const
 }
 
 // @brief 範囲のMSBを返す．
-// @note このクラスでは NULL を返す．
 const VlExpr*
 EiFunction::left_range() const
 {
-  return NULL;
+  return _left_range();
 }
   
 // @brief 範囲のLSBを返す．
-// @note このクラスでは NULL を返す．
 const VlExpr*
 EiFunction::right_range() const
 {
-  return NULL;
+  return _right_range();
 }
-  
+
+// @brief 範囲の MSB の値を返す．
+// @retval 範囲のMSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+// @note このクラスでは -1 を返す．
+int
+EiFunction::left_range_const() const
+{
+  return -1;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @retval 範囲のLSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+// @note このクラスでは -1 を返す．
+int
+EiFunction::right_range_const() const
+{
+  return -1;
+}
+
 // @brief 入出力数を得る．
 ymuint32
 EiFunction::io_num() const
@@ -588,7 +606,27 @@ EiFunction::_io(ymuint32 pos) const
 {
   return &mIODeclList[pos];
 }
-  
+
+// @brief 範囲のMSBの取得
+// @retval 範囲のMSB 範囲を持つとき
+// @retval NULL 範囲を持たないとき
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiFunction::_left_range() const
+{
+  return NULL;
+}
+
+// @brief 範囲のLSBの取得
+// @retval 範囲のLSB 範囲を持つとき
+// @retval NULL 範囲を持たないとき
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiFunction::_right_range() const
+{
+  return NULL;
+}
+
 // @brief 本体の ElbStmt を得る．
 ElbStmt*
 EiFunction::_stmt() const
@@ -703,7 +741,25 @@ EiFunctionV::EiFunctionV(const VlNamedObj* parent,
 EiFunctionV::~EiFunctionV()
 {
 }
-  
+
+// @brief 範囲の MSB の値を返す．
+// @retval 範囲のMSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiFunctionV::left_range_const() const
+{
+  return mRange.left_range_const();
+}
+
+// @brief 範囲の LSB の値を返す．
+// @retval 範囲のLSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiFunctionV::right_range_const() const
+{
+  return mRange.right_range_const();
+}
+
 // @brief 出力のビット幅を返す．
 ymuint32
 EiFunctionV::bit_size() const
@@ -712,15 +768,15 @@ EiFunctionV::bit_size() const
 }
   
 // @brief 範囲のMSBを返す．
-const VlExpr*
-EiFunctionV::left_range() const
+ElbExpr*
+EiFunctionV::_left_range() const
 {
   return mRange.left_range();
 }
 
 // @brief 範囲のLSBを返す．
-const VlExpr*
-EiFunctionV::right_range() const
+ElbExpr*
+EiFunctionV::_right_range() const
 {
   return mRange.right_range();
 }

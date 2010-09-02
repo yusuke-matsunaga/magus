@@ -25,16 +25,16 @@ class ElbFunction :
   public VlFunction
 {
   friend class CellFunction;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbFunction();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbFunction();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ public:
   	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl) = 0;
-  
+
   /// @brief 出力変数をセットする．
   /// @param[in] ovar 出力変数
   virtual
@@ -64,12 +64,12 @@ public:
   virtual
   void
   set_stmt(ElbStmt* stmt) = 0;
-  
+
   /// @brief constant function の時に true を返す．
   virtual
   bool
   is_constant_function() const = 0;
-  
+
   /// @brief スカラー値を返す．
   /// @param[in] arg_list 引数のリスト
   /// @note constant function の場合のみ意味を持つ．
@@ -83,7 +83,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic(const vector<ElbExpr*>& arg_list) const = 0;
-  
+
   /// @brief real 型の値を返す．
   /// @param[in] arg_list 引数のリスト
   /// @note constant function の場合のみ意味を持つ．
@@ -105,7 +105,21 @@ public:
   virtual
   ElbIODecl*
   _io(ymuint32 pos) const = 0;
-  
+
+  /// @brief 範囲のMSBの取得
+  /// @retval 範囲のMSB 範囲を持つとき
+  /// @retval NULL 範囲を持たないとき
+  virtual
+  ElbExpr*
+  _left_range() const = 0;
+
+  /// @brief 範囲のLSBの取得
+  /// @retval 範囲のLSB 範囲を持つとき
+  /// @retval NULL 範囲を持たないとき
+  virtual
+  ElbExpr*
+  _right_range() const = 0;
+
   /// @brief 本体の ElbStmt を得る．
   virtual
   ElbStmt*
@@ -121,7 +135,7 @@ public:
   const ElbFunction*
   next() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -142,16 +156,16 @@ class ElbTask :
   public VlTask
 {
   friend class CellTask;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbTask();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbTask();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -170,7 +184,7 @@ public:
   	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl) = 0;
-  
+
   /// @brief 本体のステートメントをセットする．
   virtual
   void
@@ -181,7 +195,7 @@ public:
   virtual
   ElbIODecl*
   _io(ymuint32 pos) const = 0;
-  
+
   /// @brief 本体の ElbStmt を得る．
   virtual
   ElbStmt*
@@ -197,7 +211,7 @@ public:
   const ElbTask*
   next() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -205,14 +219,14 @@ private:
 
   // 次の要素を指すポインタ
   ElbTask* mNext;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 inline
 ElbFunction::ElbFunction() :
