@@ -24,6 +24,8 @@
 #include "ElbDecl.h"
 #include "ElbParameter.h"
 #include "ElbGenvar.h"
+#include "ElbModule.h"
+#include "ElbTaskFunc.h"
 #include "ElbRange.h"
 #include "ElbExpr.h"
 
@@ -48,6 +50,310 @@ DeclGen::DeclGen(Elaborator& elab,
 // @brief デストラクタ
 DeclGen::~DeclGen()
 {
+}
+
+// @brief IO宣言要素をインスタンス化する．
+// @param[in] module 親のモジュール
+// @param[in] task 親のタスク
+// @param[in] func 親の function
+// @param[in] pt_head_array IO宣言ヘッダの配列
+// @note module, task, func は1つのみが値を持つ．残りは NULL
+void
+DeclGen::instantiate_iodecl(ElbModule* module,
+			    ElbTask* task,
+			    ElbFunction* func,
+			    PtIOHeadArray pt_head_array)
+{
+  assert_cond( module != NULL || task != NULL || func != NULL,
+	       __FILE__, __LINE__);
+  assert_cond( module == NULL || task == NULL, __FILE__, __LINE__);
+  assert_cond( module == NULL || func == NULL, __FILE__, __LINE__);
+  assert_cond( task == NULL || func == NULL, __FILE__, __LINE__);
+
+  VlNamedObj* namedobj = NULL;
+  if ( module ) {
+    namedobj = module;
+  }
+  else if ( task ) {
+    namedobj = task;
+  }
+  else if ( func ) {
+    namedobj = func;
+  }
+  else {
+    // 冗長
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  ymuint index = 0;
+  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
+    const PtIOHead* pt_head = pt_head_array[i];
+    tVpiAuxType def_aux_type = pt_head->aux_type();
+    bool sign = pt_head->is_signed();
+
+    const PtExpr* pt_left = pt_head->left_range();
+    const PtExpr* pt_right = pt_head->right_range();
+    ElbExpr* left = NULL;
+    ElbExpr* right = NULL;
+    int left_val = 0;
+    int right_val = 0;
+    if ( !instantiate_range(namedobj,
+			    pt_left, pt_right,
+			    left, right,
+			    left_val, right_val) ) {
+      continue;
+    }
+
+    ElbIOHead* head = NULL;
+    if ( module ) {
+      head = factory().new_ModIOHead(module, pt_head);
+    }
+    if ( task ) {
+      head = factory().new_IOHead(task, pt_head);
+    }
+    if ( func ) {
+      head = factory().new_IOHead(func, pt_head);
+    }
+    assert_cond( head != NULL, __FILE__, __LINE__);
+
+    for (ymuint j = 0; j < pt_head->item_num(); ++ j) {
+      const PtIOItem* pt_item = pt_head->item(j);
+
+      // IO定義と変数/ネット定義が一致しているか調べる．
+      ElbObjHandle* handle = find_obj(namedobj, pt_item->name());
+      ElbDecl* decl = NULL;
+      if ( handle ) {
+	// 同名の要素が見つかった．
+	if ( def_aux_type != kVpiAuxNone ) {
+	  // なのに IO 宣言の aux_type もある．
+	  ostringstream buf;
+	  buf << pt_item->name() << " : has an aux-type declaration"
+	      << ", while it also has another declaration in "
+	      << handle->file_region() << ".";
+	  put_msg(__FILE__, __LINE__,
+		  pt_item->file_region(),
+		  kMsgError,
+		  "ELAB",
+		  buf.str());
+	  continue;
+	}
+	decl = handle->decl();
+	if ( decl ) {
+	  tVpiObjType type = decl->type();
+	  if ( (module == NULL || type != kVpiNet) &&
+	       type != kVpiReg &&
+	       type != kVpiIntegerVar &&
+	       type != kVpiTimeVar) {
+	    decl = NULL;
+	  }
+	}
+	if ( !decl ) {
+	  ostringstream buf;
+	  buf << handle->full_name()
+	      << ": Should be a ";
+	  if ( module ) {
+	    buf << "net, ";
+	  }
+	  buf << "reg or integer/time variable.";
+	  put_msg(__FILE__, __LINE__,
+		  pt_item->file_region(),
+		  kMsgError,
+		  "ELAB",
+		  buf.str());
+	  continue;
+	}
+
+	if ( decl->dimension() > 0 ) {
+	  ostringstream buf;
+	  buf << pt_item->name()
+	      << ": Array object shall not be connected to IO port.";
+	  put_msg(__FILE__, __LINE__,
+		  decl->file_region(),
+		  kMsgError,
+		  "ELAB",
+		  buf.str());
+	  continue;
+	}
+
+	// decl と型が一致しているか調べる．
+	// IEEE 1364-2001 12.3.3 Port declarations
+	ElbExpr* left2 = decl->_left_range();
+	ElbExpr* right2 = decl->_right_range();
+	if ( left2 && right2 ) {
+	  if ( left == NULL && right == NULL ) {
+	    // decl は範囲を持っているが IO は持っていない．
+	    // これはエラーにしなくてよいのだろうか？
+	    // たぶんコンパイルオプションで制御すべき
+	    if ( allow_empty_io_range() ) {
+	      left = left2;
+	      right = right2;
+	    }
+	    else {
+	      ostringstream buf;
+	      buf << "Conflictive range declaration of \""
+		  << pt_item->name() << "\".";
+	      put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
+	      continue;
+	    }
+	  }
+	  else {
+	    int left2_val;
+	    bool stat1 = expr_to_int(left2, left2_val);
+	    assert_cond(stat1, __FILE__, __LINE__);
+	    int right2_val;
+	    bool stat2 = expr_to_int(right2, right2_val);
+	    assert_cond(stat2, __FILE__, __LINE__);
+	    if ( left_val != left2_val || right_val != right2_val ) {
+	      ostringstream buf;
+	      buf << "Conflictive range declaration of \""
+		  << pt_item->name() << "\".";
+	      put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
+	      cout << "IO range: [" << left_val << ":" << right_val << "]"
+		   << endl
+		   << "Decl range: [" << left2_val << ":" << right2_val << "]"
+		   << endl;
+	      continue;
+	    }
+	  }
+	}
+	else {
+	  if ( left && right ) {
+	    // decl は範囲を持っていないが IO は持っている．
+	    // エラーとする．
+	    ostringstream buf;
+	    buf << "Conflictive range declaration of \""
+		<< pt_item->name() << "\".";
+	    put_msg(__FILE__, __LINE__,
+		    pt_item->file_region(),
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
+	    continue;
+	  }
+	}
+	// どちらか一方でも符号付きなら両方符号付きにする．
+	// ちょっと ad-hoc な仕様
+	if ( !decl->is_signed() && sign ) {
+	  decl->set_signed();
+	}
+      }
+      else {
+	// 同名の要素が見つからなかったので作る必要がある．
+	tVpiAuxType aux_type = def_aux_type;
+	if ( aux_type == kVpiAuxNone ) {
+	  if ( module ) {
+	    // モジュール IO の場合は `default_net_type を参照する．
+	    tVpiNetType net_type = module->def_net_type();
+	    if ( net_type == kVpiNone ) {
+	      ostringstream buf;
+	      buf << pt_item->name() << " : Implicit declaration is inhibited "
+		  << " because default_nettype = \"none\".";
+	      put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
+	      continue;
+	    }
+	    aux_type = kVpiAuxNet;
+	  }
+	  else {
+	    // task/function の場合，型指定が無い時は reg 型となる．
+	    aux_type = kVpiAuxReg;
+	  }
+	}
+
+	ElbDeclHead* head = NULL;
+	if ( module ) {
+	  head = factory().new_DeclHead(module, pt_head, aux_type,
+					left, right,
+					left_val, right_val);
+	}
+	if ( task ) {
+	  head = factory().new_DeclHead(func, pt_head, aux_type,
+					left, right,
+					left_val, right_val);
+	}
+	if ( func ) {
+	  head = factory().new_DeclHead(func, pt_head, aux_type,
+					left, right,
+					left_val, right_val);
+	}
+	assert_cond( head != NULL, __FILE__, __LINE__);
+
+	const PtExpr* pt_init = pt_item->init_value();
+	ElbExpr* init = NULL;
+	if ( module ) {
+	  if ( pt_init ) {
+	    // 初期値を持つ場合
+	    if ( aux_type == kVpiAuxNet ) {
+	      // net 型の場合(ここに来るのは暗黙宣言のみ)は初期値を持てない．
+	      ostringstream buf;
+	      buf << pt_item->name()
+		  << " : Implicit net declaration cannot have initial value.";
+	      put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
+	      continue;
+	    }
+	    // これは verilog_grammer.yy の list_of_variable_port_identifiers
+	    // に対応するので必ず constant_expression である．
+	    init = instantiate_constant_expr(module, pt_init);
+	    // エラーの場合には init = NULL となるが処理は続ける．
+	  }
+	}
+	else {
+	  // task/function の IO 宣言には初期値はない．
+	  assert_cond( pt_init == NULL, __FILE__, __LINE__);
+	}
+
+	decl = factory().new_Decl(head, pt_item, init);
+	int tag = 0;
+	switch ( aux_type ) {
+	case kVpiAuxNet: tag = vpiNet; break;
+	case kVpiAuxReg: tag = vpiReg; break;
+	case kVpiAuxVar: tag = vpiVariables; break;
+	default:
+	  assert_not_reached(__FILE__, __LINE__);
+	}
+	reg_decl(tag, decl);
+      }
+
+      if ( module ) {
+	module->init_iodecl(index, head, pt_item, decl);
+      }
+      else if ( task ) {
+	task->init_iodecl(index, head, pt_item, decl);
+      }
+      else if ( func ) {
+	func->init_iodecl(index, head, pt_item, decl);
+      }
+      else {
+	// かなりしつこく冗長
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      ++ index;
+
+      ostringstream buf;
+      buf << "IODecl(" << pt_item->name() << ")@"
+	  << namedobj->full_name() << " created.";
+      put_msg(__FILE__, __LINE__,
+	      pt_head->file_region(),
+	      kMsgInfo,
+	      "ELAB",
+	      buf.str());
+    }
+  }
 }
 
 // 宣言要素をインスタンス化する．

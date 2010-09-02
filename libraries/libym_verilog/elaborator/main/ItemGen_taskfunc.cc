@@ -12,16 +12,9 @@
 #include "ItemGen.h"
 #include "ElbEnv.h"
 
-#include "ym_verilog/BitVector.h"
-
-#include "ym_verilog/pt/PtDecl.h"
 #include "ym_verilog/pt/PtItem.h"
-#include "ym_verilog/pt/PtExpr.h"
-#include "ym_verilog/pt/PtMisc.h"
 
 #include "ElbTaskFunc.h"
-#include "ElbDecl.h"
-#include "ElbExpr.h"
 
 #include "ElbStub.h"
 
@@ -156,7 +149,7 @@ ItemGen::phase2_tf(ElbTask* task,
   instantiate_decl(namedobj, pt_item->declhead_array());
 
   // 入出力の生成
-  instantiate_iodecl(task, func, pt_item->iohead_array());
+  instantiate_iodecl(NULL, task, func, pt_item->iohead_array());
 
   if ( func ) {
     // 関数名と同名の変数の生成
@@ -290,7 +283,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   func->set_ovar(decl);
 
   // 入出力の生成
-  instantiate_iodecl(NULL, func, pt_function->iohead_array());
+  instantiate_iodecl(NULL, NULL, func, pt_function->iohead_array());
 
   // 本体のステートメント内部のスコープの生成
   const PtStmt* pt_body = pt_function->body();
@@ -309,225 +302,6 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   }
 
   return func;
-}
-
-// @brief task/function 用のIO宣言要素をインスタンス化する．
-// @brief IO宣言要素を実体化する．
-// @param[in] task 親のタスク
-// @param[in] func 親の function
-// @param[in] pt_head_array IO宣言ヘッダの配列
-void
-ItemGen::instantiate_iodecl(ElbTask* task,
-			    ElbFunction* func,
-			    PtIOHeadArray pt_head_array)
-{
-  assert_cond( task != NULL || func != NULL, __FILE__, __LINE__);
-  assert_cond( task == NULL || func == NULL, __FILE__, __LINE__);
-
-  VlNamedObj* namedobj = task;
-  if ( namedobj == NULL ) {
-    namedobj = func;
-  }
-
-  ymuint index = 0;
-  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
-    const PtIOHead* pt_head = pt_head_array[i];
-    tVpiAuxType def_aux_type = pt_head->aux_type();
-    bool sign = pt_head->is_signed();
-
-    const PtExpr* pt_left = pt_head->left_range();
-    const PtExpr* pt_right = pt_head->right_range();
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
-    int left_val = 0;
-    int right_val = 0;
-    if ( !instantiate_range(namedobj, pt_left, pt_right,
-			    left, right, left_val, right_val) ) {
-      continue;
-    }
-
-    ElbIOHead* head = NULL;
-    if ( task ) {
-      head = factory().new_IOHead(task, pt_head);
-    }
-    else {
-      head = factory().new_IOHead(func, pt_head);
-    }
-
-    for (ymuint j = 0; j < pt_head->item_num(); ++ j) {
-      const PtIOItem* pt_item = pt_head->item(j);
-
-      // IO定義と変数/ネット定義が一致しているか調べる．
-      ElbObjHandle* handle = find_obj(namedobj, pt_item->name());
-      ElbDecl* decl = NULL;
-      if ( handle ) {
-	// 同名の要素が見つかった．
-	if ( def_aux_type != kVpiAuxNone ) {
-	  // なのに IO 宣言の aux_type もある．
-	  ostringstream buf;
-	  buf << pt_item->name() << " : has an aux-type declaration"
-	      << ", while it also has another declaration in "
-	      << handle->file_region() << ".";
-	  put_msg(__FILE__, __LINE__,
-		  pt_item->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
-	  continue;
-	}
-	decl = handle->decl();
-	if ( decl ) {
-	  tVpiObjType type = decl->type();
-	  if ( type != kVpiReg &&
-	       type != kVpiIntegerVar &&
-	       type != kVpiTimeVar) {
-	    decl = NULL;
-	  }
-	}
-	if ( !decl ) {
-	  ostringstream buf;
-	  buf << handle->full_name()
-	      << ": Not a reg or integer/time variable.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_item->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
-	  continue;
-	}
-
-	if ( decl->dimension() > 0 ) {
-	  ostringstream buf;
-	  buf << pt_item->name()
-	      << ": Array object shall not be connected to IO port.";
-	  put_msg(__FILE__, __LINE__,
-		  decl->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
-	  continue;
-	}
-
-	// decl と型が一致しているか調べる．
-	// IEEE 1364-2001 12.3.3 Port declarations
-	ElbExpr* left2 = decl->_left_range();
-	ElbExpr* right2 = decl->_right_range();
-	if ( left2 && right2 ) {
-	  if ( left == NULL && right == NULL ) {
-	    // decl は範囲を持っているが IO は持っていない．
-	    // これはエラーにしなくてよいのだろうか？
-	    // たぶんコンパイルオプションで制御すべき
-	    if ( allow_empty_io_range() ) {
-	      left = left2;
-	      right = right2;
-	    }
-	    else {
-	      ostringstream buf;
-	      buf << "Conflictive range declaration of \""
-		  << pt_item->name() << "\".";
-	      put_msg(__FILE__, __LINE__,
-		      pt_item->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
-	      continue;
-	    }
-	  }
-	  else {
-	    int left2_val;
-	    bool stat1 = expr_to_int(left2, left2_val);
-	    assert_cond(stat1, __FILE__, __LINE__);
-	    int right2_val;
-	    bool stat2 = expr_to_int(right2, right2_val);
-	    assert_cond(stat2, __FILE__, __LINE__);
-	    if ( left_val != left2_val || right_val != right2_val ) {
-	      ostringstream buf;
-	      buf << "Conflictive range declaration of \""
-		  << pt_item->name() << "\".";
-	      put_msg(__FILE__, __LINE__,
-		      pt_item->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
-	      continue;
-	    }
-	  }
-	}
-	else {
-	  if ( left && right ) {
-	    // decl は範囲を持っていないが IO は持っている．
-	    // エラーとする．
-	    ostringstream buf;
-	    buf << "Conflictive range declaration of \""
-		<< pt_item->name() << "\".";
-	    put_msg(__FILE__, __LINE__,
-		    pt_item->file_region(),
-		    kMsgError,
-		    "ELAB",
-		    buf.str());
-	    continue;
-	  }
-	}
-	// どちらか一方でも符号付きなら両方符号付きにする．
-	// ちょっと ad-hoc な仕様
-	if ( !decl->is_signed() && sign ) {
-	  decl->set_signed();
-	}
-      }
-      else {
-	// 同名の要素が見つからなかったので作る必要がある．
-	tVpiAuxType aux_type = def_aux_type;
-	if ( aux_type == kVpiAuxNone ) {
-	  // 型指定が無い場合は reg 型となる．
-	  aux_type = kVpiAuxReg;
-	}
-	
-	// task/function の IO 宣言には初期値はない．
-	const PtExpr* pt_init = pt_item->init_value();
-	assert_cond( pt_init == NULL, __FILE__, __LINE__);
-	
-	ElbDeclHead* head = NULL;
-	if ( task ) {
-	  head = factory().new_DeclHead(func, pt_head, aux_type,
-					left, right,
-					left_val, right_val);
-	}
-	else {
-	  head = factory().new_DeclHead(func, pt_head, aux_type,
-					left, right,
-					left_val, right_val);
-	}
-
-	decl = factory().new_Decl(head, pt_item);
-	int tag = 0;
-	switch ( aux_type ) {
-	case kVpiAuxNet: tag = vpiNet; break;
-	case kVpiAuxReg: tag = vpiReg; break;
-	case kVpiAuxVar: tag = vpiVariables; break;
-	default:
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-	reg_decl(tag, decl);
-      }
-
-      if ( task ) {
-	task->init_iodecl(index, head, pt_item, decl);
-      }
-      else {
-	func->init_iodecl(index, head, pt_item, decl);
-      }
-      ++ index;
-
-      ostringstream buf;
-      buf << "IODecl(" << pt_item->name() << ")@"
-	  << namedobj->full_name() << " created.";
-      put_msg(__FILE__, __LINE__,
-	      pt_head->file_region(),
-	      kMsgInfo,
-	      "ELAB",
-	      buf.str());
-    }
-  }
 }
 
 END_NAMESPACE_YM_VERILOG
