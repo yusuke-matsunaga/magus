@@ -109,7 +109,7 @@ ItemGen::phase1_function(const VlNamedObj* parent,
 	 << pt_function->name() << " )" << endl
 	 << endl;
   }
-  
+
   const PtExpr* pt_left = pt_function->left_range();
   const PtExpr* pt_right = pt_function->right_range();
 
@@ -158,7 +158,7 @@ ItemGen::phase1_function(const VlNamedObj* parent,
   
   func->set_ovar(decl);
 #endif
-  
+
   // 本体のステートメント内部のスコープの生成
   const PtStmt* pt_body = pt_function->body();
   phase1_stmt(func, pt_body);
@@ -191,7 +191,7 @@ ItemGen::phase2_task(ElbTask* task,
 	 << "] )" << endl
 	 << endl;
   }
-  
+
   // 宣言要素の生成
   instantiate_decl(task, pt_item->declhead_array());
 
@@ -220,7 +220,7 @@ ItemGen::phase2_function(ElbFunction* func,
 	 << "] )" << endl
 	 << endl;
   }
-  
+
   // 宣言要素の生成
   instantiate_decl(func, pt_item->declhead_array());
 
@@ -241,7 +241,7 @@ ItemGen::phase2_function(ElbFunction* func,
   
   func->set_ovar(decl);
 #endif
-  
+
   if ( debug ) {
     dout << "phase2_function end" << endl
 	 << endl;
@@ -264,7 +264,7 @@ ItemGen::phase3_task(ElbTask* task,
 	 << "] )" << endl
 	 << endl;
   }
-  
+
   // 本体のステートメントの生成
   ElbTaskEnv env(task);
   const PtStmt* pt_body = pt_item->body();
@@ -272,7 +272,7 @@ ItemGen::phase3_task(ElbTask* task,
   if ( body ) {
     task->set_stmt(body);
   }
-  
+
   if ( debug ) {
     dout << "phase3_task end" << endl
 	 << endl;
@@ -295,7 +295,7 @@ ItemGen::phase3_function(ElbFunction* func,
 	 << "] )" << endl
 	 << endl;
   }
-  
+
   // 本体のステートメントの生成
   ElbFunctionEnv env(func);
   const PtStmt* pt_body = pt_item->body();
@@ -303,7 +303,7 @@ ItemGen::phase3_function(ElbFunction* func,
   if ( body ) {
     func->set_stmt(body);
   }
-  
+
   if ( debug ) {
     dout << "phase3_function end" << endl
 	 << endl;
@@ -327,7 +327,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
 	 << pt_function->name() << " )" << endl
 	 << endl;
   }
-  
+
   const PtExpr* pt_left = pt_function->left_range();
   const PtExpr* pt_right = pt_function->right_range();
   ElbExpr* left = NULL;
@@ -365,7 +365,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
     tag = vpiReg;
   }
   reg_decl(tag, decl);
-  
+
   func->set_ovar(decl);
 
   // 入出力の生成
@@ -390,7 +390,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   return func;
 }
 
-// @brief function 用のIO宣言要素をインスタンス化する．
+// @brief task/function 用のIO宣言要素をインスタンス化する．
 // @brief IO宣言要素を実体化する．
 // @param[in] task 親のタスク
 // @param[in] func 親の function
@@ -408,8 +408,8 @@ ItemGen::instantiate_iodecl(ElbTask* task,
     namedobj = func;
   }
 
-  ymuint32 index = 0;
-  for (ymuint32 i = 0; i < pt_head_array.size(); ++ i) {
+  ymuint index = 0;
+  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
     const PtIOHead* pt_head = pt_head_array[i];
     tVpiAuxType def_aux_type = pt_head->aux_type();
     bool sign = pt_head->is_signed();
@@ -424,7 +424,7 @@ ItemGen::instantiate_iodecl(ElbTask* task,
 			    left, right, left_val, right_val) ) {
       continue;
     }
-    
+
     ElbIOHead* head = NULL;
     if ( task ) {
       head = factory().new_IOHead(task, pt_head);
@@ -433,7 +433,7 @@ ItemGen::instantiate_iodecl(ElbTask* task,
       head = factory().new_IOHead(func, pt_head);
     }
 
-    for (ymuint32 j = 0; j < pt_head->item_num(); ++ j) {
+    for (ymuint j = 0; j < pt_head->item_num(); ++ j) {
       const PtIOItem* pt_item = pt_head->item(j);
 
       // IO定義と変数/ネット定義が一致しているか調べる．
@@ -465,7 +465,8 @@ ItemGen::instantiate_iodecl(ElbTask* task,
 	}
 	if ( !decl ) {
 	  ostringstream buf;
-	  buf << handle->full_name() << ": Not a reg orinteger/time variable.";
+	  buf << handle->full_name()
+	      << ": Not a reg or integer/time variable.";
 	  put_msg(__FILE__, __LINE__,
 		  pt_item->file_region(),
 		  kMsgError,
