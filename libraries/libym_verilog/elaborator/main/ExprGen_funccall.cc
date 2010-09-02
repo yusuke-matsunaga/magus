@@ -24,7 +24,13 @@
 #include "ElbExpr.h"
 #include "ElbTaskFunc.h"
 
-#define DEBUG 0
+BEGIN_NONAMESPACE
+
+const int debug = 0;
+#define dout cout
+
+END_NONAMESPACE
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -148,14 +154,14 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
     ElbDecl* decl = io_decl->_decl();
     if ( decl->value_type() != expr1->value_type() ) {
       error_illegal_argument_type(pt_expr);
-#if DEBUG
-      cout << "decl->value_type() = ";
-      put_value_type(cout, decl->value_type());
-      cout << endl
-	   << "expr1->value_type() = ";
-      put_value_type(cout, expr1->value_type());
-      cout << endl;
-#endif
+      if ( debug ) {
+	dout << "decl->value_type() = ";
+	put_value_type(dout, decl->value_type());
+	dout << endl
+	     << "expr1->value_type() = ";
+	put_value_type(dout, expr1->value_type());
+	dout << endl;
+      }
     }
     arg_list[i] = expr1;
   }

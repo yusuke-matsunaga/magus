@@ -31,6 +31,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 BEGIN_NONAMESPACE
 
 const int debug = 0;
+#define dout cout
 
 END_NONAMESPACE
 
@@ -47,7 +48,7 @@ ItemGen::phase1_task(const VlNamedObj* parent,
 		     const PtItem* pt_task)
 {
   if ( debug ) {
-    cout << endl
+    dout << endl
 	 << "phase1_task( "
 	 << parent->full_name()
 	 << " ["
@@ -86,7 +87,7 @@ ItemGen::phase1_task(const VlNamedObj* parent,
   add_phase3stub(make_stub(this, &ItemGen::phase3_task, task, pt_task));
 
   if ( debug ) {
-    cout << "phase1_task end" << endl
+    dout << "phase1_task end" << endl
 	 << endl;
   }
 }
@@ -99,7 +100,7 @@ ItemGen::phase1_function(const VlNamedObj* parent,
 			 const PtItem* pt_function)
 {
   if ( debug ) {
-    cout << endl
+    dout << endl
 	 << "phase1_function( "
 	 << parent->full_name()
 	 << " ["
@@ -169,7 +170,7 @@ ItemGen::phase1_function(const VlNamedObj* parent,
 			   func, pt_function));
 
   if ( debug ) {
-    cout << "phase1_function end" << endl
+    dout << "phase1_function end" << endl
 	 << endl;
   }
 }
@@ -182,7 +183,7 @@ ItemGen::phase2_task(ElbTask* task,
 		     const PtItem* pt_item)
 {
   if ( debug ) {
-    cout << endl
+    dout << endl
 	 << "phase2_task( "
 	 << task->full_name()
 	 << " ["
@@ -198,7 +199,7 @@ ItemGen::phase2_task(ElbTask* task,
   instantiate_iodecl(task, pt_item->iohead_array());
 
   if ( debug ) {
-    cout << "phase2_task end" << endl
+    dout << "phase2_task end" << endl
 	 << endl;
   }
 }
@@ -211,7 +212,7 @@ ItemGen::phase2_function(ElbFunction* func,
 			 const PtItem* pt_item)
 {
   if ( debug ) {
-    cout << endl
+    dout << endl
 	 << "phase2_function( "
 	 << func->full_name()
 	 << " ["
@@ -242,7 +243,7 @@ ItemGen::phase2_function(ElbFunction* func,
 #endif
   
   if ( debug ) {
-    cout << "phase2_function end" << endl
+    dout << "phase2_function end" << endl
 	 << endl;
   }
 }
@@ -255,7 +256,7 @@ ItemGen::phase3_task(ElbTask* task,
 		     const PtItem* pt_item)
 {
   if ( debug ) {
-    cout << endl
+    dout << endl
 	 << "phase3_task( "
 	 << task->full_name()
 	 << " ["
@@ -273,7 +274,7 @@ ItemGen::phase3_task(ElbTask* task,
   }
   
   if ( debug ) {
-    cout << "phase3_task end" << endl
+    dout << "phase3_task end" << endl
 	 << endl;
   }
 }
@@ -286,7 +287,7 @@ ItemGen::phase3_function(ElbFunction* func,
 			 const PtItem* pt_item)
 {
   if ( debug ) {
-    cout << endl
+    dout << endl
 	 << "phase3_function( "
 	 << func->full_name()
 	 << " ["
@@ -304,7 +305,7 @@ ItemGen::phase3_function(ElbFunction* func,
   }
   
   if ( debug ) {
-    cout << "phase3_function end" << endl
+    dout << "phase3_function end" << endl
 	 << endl;
   }
 }
@@ -317,7 +318,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
 				       const PtItem* pt_function)
 {
   if ( debug ) {
-    cout << endl
+    dout << endl
 	 << "instantiate_constant_function( "
 	 << parent->full_name()
 	 << " ["
@@ -382,7 +383,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   }
 
   if ( debug ) {
-    cout << "instantiate_constant_function end" << endl
+    dout << "instantiate_constant_function end" << endl
 	 << endl;
   }
   
