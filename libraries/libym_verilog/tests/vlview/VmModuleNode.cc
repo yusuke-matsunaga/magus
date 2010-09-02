@@ -30,6 +30,14 @@ VmNode1::add_modulearraylist(const vector<const VlModuleArray*>& ma_list) const
   add_child( new VmModuleArrayListNode(vl_mgr(), ma_list) );
 }
 
+// @brief ModuleInstListNode を追加する．
+// @param[in] module_list モジュールのリスト
+void
+VmNode1::add_moduleinstlist(const vector<const VlModule*>& module_list) const
+{
+  add_child( new VmModuleInstListNode(vl_mgr(), module_list) );
+}
+
 // @brief ModuleListNode を追加する．
 void
 VmNode1::add_modulelist() const
@@ -66,7 +74,7 @@ VmModuleArrayListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiModuleArray";
+      return "vpiModuleArray list";
     }
     else if ( column == 1 ) {
       return "";
@@ -143,7 +151,64 @@ VmModuleArrayNode::expand() const
 {
   ymuint n = mModuleArray->elem_num();
   for (ymuint i = 0; i < n; ++ i) {
-    add_child( new VmModuleNode(vl_mgr(), mModuleArray->elem_by_offset(i)) );
+    const VlModule* module = mModuleArray->elem_by_offset(i);
+    add_child( new VmModuleNode(vl_mgr(), module) );
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmModuleInstListNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] module_list モジュールのリスト
+VmModuleInstListNode::VmModuleInstListNode(const VlMgr& vl_mgr,
+					   const vector<const VlModule*>& module_list) :
+  VmNode1(vl_mgr),
+  mModuleArray(module_list)
+{
+}
+
+// @brief デストラクタ
+VmModuleInstListNode::~VmModuleInstListNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmModuleInstListNode::data(int column,
+			   int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return "vpiModule list";
+    }
+    else if ( column == 1 ) {
+      return "";
+    }
+  }
+  return QVariant();
+}
+
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+VmModuleInstListNode::loc() const
+{
+  return FileRegion();
+}
+
+// @brief 子供の配列を作る．
+void
+VmModuleInstListNode::expand() const
+{
+  for (vector<const VlModule*>::const_iterator p = mModuleArray.begin();
+       p != mModuleArray.end(); ++ p) {
+    const VlModule* module = *p;
+    add_child( new VmModuleNode(vl_mgr(), module) );
   }
 }
 
@@ -173,7 +238,7 @@ VmModuleListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiModule";
+      return "vpiModule list";
     }
     else if ( column == 1 ) {
       return "";
@@ -348,7 +413,7 @@ VmPortListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiPort";
+      return "vpiPort list";
     }
     else if ( column == 1 ) {
       return "";
@@ -373,6 +438,7 @@ VmPortListNode::expand() const
     add_child( new VmPortNode(port) );
   }
 }
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス VlPortNode

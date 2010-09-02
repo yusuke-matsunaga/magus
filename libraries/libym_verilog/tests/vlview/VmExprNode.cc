@@ -71,7 +71,7 @@ VmExprListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return mLabel + " list";
     }
     else if ( column == 1 ) {
       return "";
@@ -136,15 +136,7 @@ VmExprNode::data(int column,
       return mLabel;
     }
     else if ( column == 1 ) {
-      switch ( mExpr->type() ) {
-      case kVpiBitSelect:   return "BitSelect";
-      case kVpiPartSelect:  return "PartSelect";
-      case kVpiOperation:   return "Operation";
-      case kVpiConstant:    return "Constant";
-      case kVpiFuncCall:    return "FuncCall";
-      case kVpiSysFuncCall: return "SysFuncCall";
-      default:              return "Reference";
-      }
+      return QString(mExpr->decompile().c_str());
     }
   }
   return QVariant();
@@ -158,6 +150,23 @@ VmExprNode::loc() const
 }
 
 BEGIN_NONAMESPACE
+
+// 式の型を表す文字列を返す．
+QString
+type2str(tVpiObjType type)
+{
+  switch ( type ) {
+  case kVpiBitSelect:   return "vpiBitSelect";
+  case kVpiPartSelect:  return "vpiPartSelect";
+  case kVpiOperation:   return "vpiOperation";
+  case kVpiConstant:    return "vpiConstant";
+  case kVpiFuncCall:    return "vpiFuncCall";
+  case kVpiSysFuncCall: return "vpiSysFuncCall";
+  default:              return "Reference";
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return "";
+}
 
 // 演算子の型を表す文字列を返す．
 QString
@@ -240,7 +249,7 @@ END_NONAMESPACE
 void
 VmExprNode::expand() const
 {
-  add_str("vpiDecompile", mExpr->decompile());
+  add_str("vpiType", type2str(mExpr->type()));
   switch ( mExpr->type() ) {
   case kVpiBitSelect:
     add_bool("vpiConstantSelect", mExpr->is_constant_select());

@@ -116,7 +116,7 @@ VmParamAssignListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiParamAssign";
+      return "vpiParamAssign list";
     }
     else if ( column == 1 ) {
       return "";
@@ -220,7 +220,7 @@ VmDefParamListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiDefParam";
+      return "vpiDefParam list";
     }
     else if ( column == 1 ) {
       return "";
@@ -326,7 +326,7 @@ VmScopeListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiInternalScope";
+      return "vpiInternalScope list";
     }
     else if ( column == 1 ) {
       return "";
@@ -435,7 +435,7 @@ VmTaskListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiTask";
+      return "vpiTask list";
     }
     else if ( column == 1 ) {
       return "";
@@ -552,7 +552,7 @@ VmFunctionListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiFunction";
+      return "vpiFunction list";
     }
     else if ( column == 1 ) {
       return "";
@@ -691,7 +691,7 @@ VmPrimArrayListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiPrimArray";
+      return "vpiPrimArray list";
     }
     else if ( column == 1 ) {
       return "";
@@ -795,7 +795,7 @@ VmPrimitiveListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiPrimitive";
+      return "vpiPrimitive list";
     }
     else if ( column == 1 ) {
       return "";
@@ -919,7 +919,7 @@ VmPrimTermListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiPtimTerm";
+      return "vpiPtimTerm list";
     }
     else if ( column == 1 ) {
       return "";
@@ -1031,7 +1031,7 @@ VmContAssignListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiContAssign";
+      return "vpiContAssign list";
     }
     else if ( column == 1 ) {
       return "";
@@ -1111,6 +1111,9 @@ VmContAssignNode::expand() const
   add_delay(mContAssign->delay());
 
   add_int("vpiSize", mContAssign->bit_size());
+
+  add_expr("vpiLhs", mContAssign->lhs());
+  add_expr("vpiRhs", mContAssign->rhs());
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -75,7 +75,7 @@ VmProcessListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiProcess";
+      return "vpiProcess list";
     }
     else if ( column == 1 ) {
       return "";
@@ -197,7 +197,7 @@ VmStmtListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return mLabel + " list";
     }
     else if ( column == 1 ) {
       return "";
@@ -448,7 +448,7 @@ VmArgListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiArgument";
+      return "vpiArgument list";
     }
     else if ( column == 1 ) {
       return "";
@@ -511,7 +511,7 @@ VmCaseItemListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiCaseItem";
+      return "vpiCaseItem list";
     }
     else if ( column == 1 ) {
       return "";

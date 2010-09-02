@@ -30,7 +30,9 @@ VmNode::add_strength(const QString& label,
 void
 VmNode::add_delay(const VlDelay* value) const
 {
-  add_child( new VmDelayNode(value) );
+  if ( value != NULL ) {
+    add_child( new VmDelayNode(value) );
+  }
 }
 
 // @brief dir 型のノードを追加する．
@@ -632,7 +634,7 @@ VmStrengthValNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiStrength";
+      return mLabel;
     }
     else if ( column == 1 ) {
       switch ( mStrength ) {

@@ -270,6 +270,11 @@ protected:
   void
   add_modulearraylist(const vector<const VlModuleArray*>& ma_list) const;
 
+  /// @brief ModuleInstListNode を追加する．
+  /// @param[in] module_list モジュールのリスト
+  void
+  add_moduleinstlist(const vector<const VlModule*>& module_list) const;
+
   /// @brief PrimitiveListNode を追加する．
   /// @param[in] primitive_list プリミティブのリスト
   void

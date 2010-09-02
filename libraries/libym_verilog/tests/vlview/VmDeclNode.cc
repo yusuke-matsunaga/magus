@@ -69,7 +69,7 @@ VmIODeclListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return "vpiIODecl";
+      return "vpiIODecl list";
     }
     else if ( column == 1 ) {
       return "";
@@ -77,7 +77,7 @@ VmIODeclListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmIODeclListNode::loc() const
@@ -209,7 +209,7 @@ VmDeclListNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      return mLabel;
+      return mLabel + " list";
     }
     else if ( column == 1 ) {
       return "";

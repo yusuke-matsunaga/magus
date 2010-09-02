@@ -168,7 +168,7 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
   {
     vector<const VlModule*> module_list;
     if ( vl_mgr().find_module_list(scope, module_list) ) {
-      //
+      add_moduleinstlist(module_list);
     }
   }
   {
