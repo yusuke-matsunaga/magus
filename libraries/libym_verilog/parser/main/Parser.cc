@@ -617,7 +617,6 @@ Parser::end_genif()
 void
 Parser::init_block()
 {
-  cout << "init_block()" << endl;
   push_declhead_list();
 
   mCurDeclHeadList = new_declhead_list();
@@ -627,7 +626,6 @@ Parser::init_block()
 void
 Parser::end_block()
 {
-  cout << "end_block()" << endl;
   delete_declhead_list(mCurDeclHeadList);
   
   pop_declhead_list();
