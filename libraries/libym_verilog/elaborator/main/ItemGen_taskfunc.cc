@@ -562,6 +562,7 @@ ItemGen::instantiate_iodecl(ElbTask* task,
       }
 
       task->init_iodecl(index, head, pt_item, decl);
+      ++ index;
 
       ostringstream buf;
       buf << "IODecl(" << pt_item->name() << ")@"
@@ -748,6 +749,7 @@ ItemGen::instantiate_iodecl(ElbFunction* func,
       }
 
       func->init_iodecl(index, head, pt_item, decl);
+      ++ index;
 
       ostringstream buf;
       buf << "IODecl(" << pt_item->name() << ")@"
