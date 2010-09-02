@@ -38,22 +38,22 @@ public:
   virtual
   tVpiDirection
   direction() const = 0;
-  
+
   /// @brief 親のモジュールの取得
   virtual
   ElbModule*
   module() const = 0;
-  
+
   /// @brief 親の task の取得
   virtual
   ElbTask*
   task() const = 0;
-  
+
   /// @brief 親の function の取得
   virtual
   ElbFunction*
   function() const = 0;
-  
+
 };
 
 

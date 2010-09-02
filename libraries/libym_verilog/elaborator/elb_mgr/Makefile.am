@@ -24,6 +24,7 @@ libym_vl_elab_elb_mgr_la_SOURCES = \
 	AttrHash.cc \
 	ElbDecl.cc \
 	ElbExpr.cc \
+	ElbFactory.cc \
 	ElbMgr.cc \
 	ElbParameter.cc \
 	ElbPrimitive.cc \

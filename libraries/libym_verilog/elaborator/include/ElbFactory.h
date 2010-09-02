@@ -28,9 +28,12 @@ class ElbFactory
 {
 public:
 
+  /// @brief コンストラクタ
+  ElbFactory();
+  
   /// @brief デストラクタ
   virtual
-  ~ElbFactory() { }
+  ~ElbFactory();
 
 
 public:
@@ -130,21 +133,40 @@ public:
   /// @brief 宣言要素のヘッダを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
+  /// @param[in] has_delay 遅延値を持つとき true
+  virtual
+  ElbDeclHead*
+  new_DeclHead(const VlNamedObj* parent,
+	       const PtDeclHead* pt_head,
+	       bool has_delay = false);
+
+  /// @brief 宣言要素のヘッダを生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head パース木の宣言ヘッダ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
   /// @param[in] has_delay 遅延値を持つとき true
-  /// @note 範囲なしの時には left と right に NULL を入れる．
   virtual
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtDeclHead* pt_head,
-	       ElbExpr* left = NULL,
-	       ElbExpr* right = NULL,
-	       int left_val = 0,
-	       int right_val = 0,
+	       ElbExpr* left,
+	       ElbExpr* right,
+	       int left_val,
+	       int right_val,
 	       bool has_delay = false) = 0;
+
+  /// @brief 宣言要素のヘッダを生成する．(IODecl 中の宣言用)
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head パース木のIO宣言ヘッダ
+  /// @param[in] aux_type 補助的なデータ型
+  virtual
+  ElbDeclHead*
+  new_DeclHead(const VlNamedObj* parent,
+	       const PtIOHead* pt_head,
+	       tVpiAuxType aux_type);
 
   /// @brief 宣言要素のヘッダを生成する．(IODecl 中の宣言用)
   /// @param[in] parent 親のスコープ
@@ -154,16 +176,23 @@ public:
   /// @param[in] right 範囲の右側の式
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
-  /// @note 範囲なしの時には left と right に NULL を入れる．
   virtual
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtIOHead* pt_head,
 	       tVpiAuxType aux_type,
-	       ElbExpr* left = NULL,
-	       ElbExpr* right = NULL,
-	       int left_val = 0,
-	       int right_val = 0) = 0;
+	       ElbExpr* left,
+	       ElbExpr* right,
+	       int left_val,
+	       int right_val) = 0;
+
+  /// @brief 宣言要素のヘッダを生成する．(function の暗黙宣言用)
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_item パース木の関数定義
+  virtual
+  ElbDeclHead*
+  new_DeclHead(const VlNamedObj* parent,
+	       const PtItem* pt_item);
 
   /// @brief 宣言要素のヘッダを生成する．(function の暗黙宣言用)
   /// @param[in] parent 親のスコープ
@@ -172,15 +201,14 @@ public:
   /// @param[in] right 範囲の右側の式
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
-  /// @note 範囲なしの時には left と right に NULL を入れる．
   virtual
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtItem* pt_item,
-	       ElbExpr* left = NULL,
-	       ElbExpr* right = NULL,
-	       int left_val = 0,
-	       int right_val = 0) = 0;
+	       ElbExpr* left,
+	       ElbExpr* right,
+	       int left_val,
+	       int right_val) = 0;
 
   /// @brief 宣言要素を生成する．
   /// @param[in] head ヘッダ
@@ -220,19 +248,26 @@ public:
   /// @brief parameter 宣言のヘッダを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
+  virtual
+  ElbParamHead*
+  new_ParamHead(const VlNamedObj* parent,
+		const PtDeclHead* pt_head);
+
+  /// @brief parameter 宣言のヘッダを生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head パース木の宣言ヘッダ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
-  /// @note 範囲なしの時には left と right に NULL を入れる．
   virtual
   ElbParamHead*
   new_ParamHead(const VlNamedObj* parent,
 		const PtDeclHead* pt_head,
-		ElbExpr* left = NULL,
-		ElbExpr* right = NULL,
-		int left_val = 0,
-		int right_val = 0) = 0;
+		ElbExpr* left,
+		ElbExpr* right,
+		int left_val,
+		int right_val) = 0;
 
   /// @brief parameter 宣言を生成する．
   /// @param[in] head ヘッダ
@@ -366,19 +401,26 @@ public:
   /// @brief function を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_item パース木の定義
+  virtual
+  ElbFunction*
+  new_Function(const VlNamedObj* parent,
+	       const PtItem* pt_item);
+  
+  /// @brief function を生成する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_item パース木の定義
   /// @param[in] left 範囲の MSB の式
   /// @param[in] right 範囲の LSB の式
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
-  /// @note 範囲なしの時には left と right に NULL を入れる．
   virtual
   ElbFunction*
   new_Function(const VlNamedObj* parent,
 	       const PtItem* pt_item,
-	       ElbExpr* left = NULL,
-	       ElbExpr* right = NULL,
-	       int left_val = 0,
-	       int right_val = 0) = 0;
+	       ElbExpr* left,
+	       ElbExpr* right,
+	       int left_val,
+	       int right_val) = 0;
   
   /// @brief task を生成する．
   /// @param[in] parent 親のスコープ
