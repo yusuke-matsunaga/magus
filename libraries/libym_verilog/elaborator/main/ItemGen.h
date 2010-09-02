@@ -93,20 +93,6 @@ private:
   phase1_task(const VlNamedObj* parent,
 	      const PtItem* pt_task);
 
-  /// @param[in] task の生成を行う．
-  /// @param[in] task タスク本体
-  /// @param[in] pt_item パース木のタスク定義
-  void
-  phase2_task(ElbTask* task,
-	      const PtItem* pt_item);
-
-  /// @param[in] task 内のステートメントの生成を行う．
-  /// @param[in] task task 本体
-  /// @param[in] pt_item パース木の関数定義
-  void
-  phase3_task(ElbTask* task,
-	      const PtItem* pt_item);
-
   /// @brief function の生成を行う．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_function パース木の関数定義
@@ -114,19 +100,25 @@ private:
   phase1_function(const VlNamedObj* parent,
 		  const PtItem* pt_function);
 
-  /// @param[in] function の生成を行う．
+  /// @param[in] task/function 内の宣言要素の生成を行う．
+  /// @param[in] task タスク本体
   /// @param[in] func 関数本体
   /// @param[in] pt_item パース木の関数定義
+  /// @note task と function のどちらかは NULL
   void
-  phase2_function(ElbFunction* func,
-		  const PtItem* pt_item);
+  phase2_tf(ElbTask* task,
+	    ElbFunction* func,
+	    const PtItem* pt_item);
 
-  /// @param[in] function 内のステートメントの生成を行う．
+  /// @param[in] task/function 内のステートメントの生成を行う．
+  /// @param[in] task タスク本体
   /// @param[in] func 関数本体
   /// @param[in] pt_item パース木の関数定義
+  /// @note task と function のどちらかは NULL
   void
-  phase3_function(ElbFunction* func,
-		  const PtItem* pt_item);
+  phase3_tf(ElbTask* task,
+	    ElbFunction* func,
+	    const PtItem* pt_item);
 
   /// @brief task/function 用のIO宣言要素をインスタンス化する．
   /// @brief IO宣言要素を実体化する．

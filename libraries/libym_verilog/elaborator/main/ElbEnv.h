@@ -192,25 +192,6 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbFunctionEnv ElbEnv.h "ElbEnv.h"
-/// @brief 関数内を表す環境
-//////////////////////////////////////////////////////////////////////
-class ElbFunctionEnv :
-  public ElbEnv
-{
-public:
-  
-  /// @brief コンストラクタ
-  /// @param[in] func 親の関数
-  ElbFunctionEnv(const VlNamedObj* func)
-  {
-    set_function(func, false);
-  }
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class ElbConstantFunctionEnv ElbEnv.h "ElbEnv.h"
 /// @brief 定数関数内を表す環境
 //////////////////////////////////////////////////////////////////////
@@ -230,19 +211,29 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbTaskEnv ElbEnv.h "ElbEnv.h"
-/// @brief タスク内を表す環境
+/// @class ElbTfEnv ElbEnv.h "ElbEnv.h"
+/// @brief タスク/関数内を表す環境
 //////////////////////////////////////////////////////////////////////
-class ElbTaskEnv :
+class ElbTfEnv :
   public ElbEnv
 {
 public:
   
   /// @brief コンストラクタ
   /// @param[in] task 親のタスク
-  ElbTaskEnv(const VlNamedObj* task)
+  /// @param[in] func 親の関数
+  /// @note task か func のどちらかは NULL
+  ElbTfEnv(const VlNamedObj* task,
+	   const VlNamedObj* func)
   {
-    set_task(task);
+    if ( task ) {
+      assert_cond( func == NULL, __FILE__, __LINE__);
+      set_task(task);
+    }
+    else {
+      assert_cond( func != NULL, __FILE__, __LINE__);
+      set_function(func);
+    }
   }
   
 };

@@ -83,8 +83,11 @@ ItemGen::phase1_task(const VlNamedObj* parent,
   phase1_stmt(task, pt_body);
 
   // 残りの仕事は phase2, phase3 で行う．
-  add_phase2stub(make_stub(this, &ItemGen::phase2_task, task, pt_task));
-  add_phase3stub(make_stub(this, &ItemGen::phase3_task, task, pt_task));
+  ElbFunction* func = NULL;
+  add_phase2stub(make_stub(this, &ItemGen::phase2_tf,
+			   task, func, pt_task));
+  add_phase3stub(make_stub(this, &ItemGen::phase3_tf,
+			   task, func, pt_task));
 
   if ( debug ) {
     dout << "phase1_task end" << endl
@@ -143,8 +146,7 @@ ItemGen::phase1_function(const VlNamedObj* parent,
 	  kMsgInfo,
 	  "ELAB",
 	  buf.str());
-  
-#if 1
+
   // 関数名と同名の変数の生成
   ElbDeclHead* head = factory().new_DeclHead(func, pt_function,
 					     left, right,
@@ -157,17 +159,17 @@ ItemGen::phase1_function(const VlNamedObj* parent,
   reg_decl(tag, decl);
   
   func->set_ovar(decl);
-#endif
 
   // 本体のステートメント内部のスコープの生成
   const PtStmt* pt_body = pt_function->body();
   phase1_stmt(func, pt_body);
 
   // 残りの仕事は phase2, phase3 で行う．
-  add_phase2stub(make_stub(this, &ItemGen::phase2_function,
-			   func, pt_function));
-  add_phase3stub(make_stub(this, &ItemGen::phase3_function,
-			   func, pt_function));
+  ElbTask* task = NULL;
+  add_phase2stub(make_stub(this, &ItemGen::phase2_tf,
+			   task, func, pt_function));
+  add_phase3stub(make_stub(this, &ItemGen::phase3_tf,
+			   task, func, pt_function));
 
   if ( debug ) {
     dout << "phase1_function end" << endl
@@ -175,137 +177,87 @@ ItemGen::phase1_function(const VlNamedObj* parent,
   }
 }
 
-// @param[in] task の生成を行う．
+// @param[in] task/function 内の宣言要素の生成を行う．
 // @param[in] task タスク本体
-// @param[in] pt_item パース木の関数定義
-void
-ItemGen::phase2_task(ElbTask* task,
-		     const PtItem* pt_item)
-{
-  if ( debug ) {
-    dout << endl
-	 << "phase2_task( "
-	 << task->full_name()
-	 << " ["
-	 << hex << reinterpret_cast<ympuint>(task) << dec
-	 << "] )" << endl
-	 << endl;
-  }
-
-  // 宣言要素の生成
-  instantiate_decl(task, pt_item->declhead_array());
-
-  // 入出力の生成
-  instantiate_iodecl(task, NULL, pt_item->iohead_array());
-
-  if ( debug ) {
-    dout << "phase2_task end" << endl
-	 << endl;
-  }
-}
-
-// @param[in] function の生成を行う．
 // @param[in] func 関数本体
 // @param[in] pt_item パース木の関数定義
 void
-ItemGen::phase2_function(ElbFunction* func,
-			 const PtItem* pt_item)
+ItemGen::phase2_tf(ElbTask* task,
+		   ElbFunction* func,
+		   const PtItem* pt_item)
 {
+  assert_cond( task == NULL || func == NULL, __FILE__, __LINE__);
+  assert_cond( task != NULL || func != NULL, __FILE__, __LINE__);
+
+  VlNamedObj* namedobj = task;
+  if ( namedobj == NULL ) {
+    namedobj = func;
+  }
+
   if ( debug ) {
     dout << endl
-	 << "phase2_function( "
-	 << func->full_name()
+	 << "phase2_tf( "
+	 << namedobj->full_name()
 	 << " ["
-	 << hex << reinterpret_cast<ympuint>(func) << dec
+	 << hex << reinterpret_cast<ympuint>(namedobj) << dec
 	 << "] )" << endl
 	 << endl;
   }
 
   // 宣言要素の生成
-  instantiate_decl(func, pt_item->declhead_array());
+  instantiate_decl(namedobj, pt_item->declhead_array());
 
   // 入出力の生成
-  instantiate_iodecl(NULL, func, pt_item->iohead_array());
-
-#if 0
-  // 関数名と同名の変数の生成
-  ElbDeclHead* head = factory().new_DeclHead(func, pt_item,
-					     left, right,
-					     left_val, right_val);
-  ElbDecl* decl = factory().new_Decl(head, pt_item);
-  int tag = vpiVariables;
-  if ( pt_function->data_type() == kVpiVarNone ) {
-    tag = vpiReg;
-  }
-  reg_decl(tag, decl);
-  
-  func->set_ovar(decl);
-#endif
+  instantiate_iodecl(task, func, pt_item->iohead_array());
 
   if ( debug ) {
-    dout << "phase2_function end" << endl
+    dout << "phase2_tf end" << endl
 	 << endl;
   }
 }
 
-// @param[in] task 内のステートメントの生成を行う．
+// @param[in] task/function 内のステートメントの生成を行う．
 // @param[in] task task 本体
-// @param[in] pt_item パース木の関数定義
-void
-ItemGen::phase3_task(ElbTask* task,
-		     const PtItem* pt_item)
-{
-  if ( debug ) {
-    dout << endl
-	 << "phase3_task( "
-	 << task->full_name()
-	 << " ["
-	 << hex << reinterpret_cast<ympuint>(task) << dec
-	 << "] )" << endl
-	 << endl;
-  }
-
-  // 本体のステートメントの生成
-  ElbTaskEnv env(task);
-  const PtStmt* pt_body = pt_item->body();
-  ElbStmt* body = instantiate_stmt(task, NULL, env, pt_body);
-  if ( body ) {
-    task->set_stmt(body);
-  }
-
-  if ( debug ) {
-    dout << "phase3_task end" << endl
-	 << endl;
-  }
-}
-
-// @param[in] function 内のステートメントの生成を行う．
 // @param[in] func 関数本体
 // @param[in] pt_item パース木の関数定義
 void
-ItemGen::phase3_function(ElbFunction* func,
-			 const PtItem* pt_item)
+ItemGen::phase3_tf(ElbTask* task,
+		   ElbFunction* func,
+		   const PtItem* pt_item)
 {
+  assert_cond( task == NULL || func == NULL, __FILE__, __LINE__);
+  assert_cond( task != NULL || func != NULL, __FILE__, __LINE__);
+
+  VlNamedObj* namedobj = task;
+  if ( namedobj == NULL ) {
+    namedobj = func;
+  }
+
   if ( debug ) {
     dout << endl
-	 << "phase3_function( "
-	 << func->full_name()
+	 << "phase3_tf( "
+	 << namedobj->full_name()
 	 << " ["
-	 << hex << reinterpret_cast<ympuint>(func) << dec
+	 << hex << reinterpret_cast<ympuint>(namedobj) << dec
 	 << "] )" << endl
 	 << endl;
   }
 
   // 本体のステートメントの生成
-  ElbFunctionEnv env(func);
+  ElbTfEnv env(task, func);
   const PtStmt* pt_body = pt_item->body();
-  ElbStmt* body = instantiate_stmt(func, NULL, env, pt_body);
+  ElbStmt* body = instantiate_stmt(namedobj, NULL, env, pt_body);
   if ( body ) {
-    func->set_stmt(body);
+    if ( task ) {
+      task->set_stmt(body);
+    }
+    else {
+      func->set_stmt(body);
+    }
   }
 
   if ( debug ) {
-    dout << "phase3_function end" << endl
+    dout << "phase3_tf end" << endl
 	 << endl;
   }
 }
