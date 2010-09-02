@@ -63,9 +63,9 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  "ELAB",
 	  buf.str());
 
-  ymuint32 io_size = pt_udp->port_num();
+  ymuint io_size = pt_udp->port_num();
 
-  ymuint32 isize = io_size - 1;
+  ymuint isize = io_size - 1;
   tVpiPrimType ptype = pt_udp->prim_type();
   bool is_protected = true; // 何これ?
 
@@ -77,9 +77,9 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
   // ポート名をキーにしたIOテンプレートの辞書を作る．
   IODict iodict;
   const PtIOHead* outhead = NULL;
-  for (ymuint32 i = 0; i < pt_udp->iohead_array().size(); ++ i) {
+  for (ymuint i = 0; i < pt_udp->iohead_array().size(); ++ i) {
     const PtIOHead* iohead = pt_udp->iohead_array()[i];
-    for (ymuint32 j = 0; j < iohead->item_num(); ++ j) {
+    for (ymuint j = 0; j < iohead->item_num(); ++ j) {
       const PtIOItem* elem = iohead->item(j);
       const char* name = elem->name();
       iodict.insert(make_pair(name, make_pair(iohead, elem)));
@@ -91,7 +91,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
   // IOポートを実体化する．
   // ただし port_list に現れる名前の順番にしたがって実体化しなければならない．
-  for (ymuint32 i = 0; i < io_size; ++ i) {
+  for (ymuint i = 0; i < io_size; ++ i) {
     const PtPort* port = pt_udp->port(i);
     const char* name = port->ext_name();
     IODict::const_iterator q = iodict.find(name);
@@ -155,16 +155,16 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
     // 組合わせ回路
 
     // 一行のサイズは入出力数と一致する．
-    ymuint32 row_size = io_size;
+    ymuint row_size = io_size;
 
     // 出力値の位置
-    ymuint32 opos = row_size - 1;
+    ymuint opos = row_size - 1;
   
     // 一行文のデータを保持しておくためのバッファ
     vector<tVpiUdpVal> row_data(row_size);
     
     PtUdpEntryArray table = pt_udp->table_array();
-    for (ymuint32 i = 0; i < table.size(); ++ i) {
+    for (ymuint i = 0; i < table.size(); ++ i) {
       const PtUdpEntry* pt_udp_entry = table[i];
       const FileRegion& tfr = pt_udp_entry->file_region();
       PtUdpValueArray input_array = pt_udp_entry->input_array();
@@ -179,7 +179,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
       }
 
       // 入力
-      for (ymuint32 j = 0; j < isize; ++ j) {
+      for (ymuint j = 0; j < isize; ++ j) {
 	const PtUdpValue* pt_v = input_array[j];
 	tVpiUdpVal symbol = pt_v->symbol();
 
@@ -249,19 +249,19 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
     // 順序回路
 
     // 一行のサイズは入出力 + 現状態
-    ymuint32 row_size = io_size + 1;
+    ymuint row_size = io_size + 1;
 
     // 現状態値の位置
-    ymuint32 cpos = isize;
+    ymuint cpos = isize;
     
     // 出力値の位置
-    ymuint32 opos = io_size;
+    ymuint opos = io_size;
   
     // 一行文のデータを保持しておくためのバッファ
     vector<tVpiUdpVal> row_data(row_size);
     
     PtUdpEntryArray table = pt_udp->table_array();
-    for (ymuint32 i = 0; i < table.size(); ++ i) {
+    for (ymuint i = 0; i < table.size(); ++ i) {
       const PtUdpEntry* pt_udp_entry = table[i];
       const FileRegion& tfr = pt_udp_entry->file_region();
       PtUdpValueArray input_array = pt_udp_entry->input_array();
@@ -277,10 +277,10 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
       }
 
       // 一行中に含まれるエッジタイプのシンボルの数
-      ymuint32 nt = 0;
+      ymuint nt = 0;
 
       // 入力
-      for (ymuint32 j = 0; j < isize; ++ j) {
+      for (ymuint j = 0; j < isize; ++ j) {
 	const PtUdpValue* pt_v = input_array[j];
 	tVpiUdpVal symbol = pt_v->symbol();
 

@@ -44,13 +44,13 @@ AttrDict::add(const PtAttrInst* pt_attr,
   }
   if ( mNum >= mLimit ) {
     // テーブルを拡張する．
-    ymuint32 old_size = mSize;
+    ymuint old_size = mSize;
     Cell** old_table = mTable;
     alloc_table(old_size << 1);
-    for (ymuint32 i = 0; i < old_size; ++ i) {
+    for (ymuint i = 0; i < old_size; ++ i) {
       for (Cell* cell = old_table[i]; cell; ) {
 	Cell* next = cell->mLink;
-	ymuint32 pos = hash_func(cell->mPtAttr);
+	ymuint pos = hash_func(cell->mPtAttr);
 	cell->mLink = mTable[pos];
 	mTable[pos] = cell;
 	cell = next;
@@ -58,7 +58,7 @@ AttrDict::add(const PtAttrInst* pt_attr,
     }
     delete [] old_table;
   }
-  ymuint32 pos = hash_func(pt_attr);
+  ymuint pos = hash_func(pt_attr);
   Cell* cell = reinterpret_cast<Cell*>(mAlloc.get_memory(sizeof(Cell)));
   cell->mPtAttr = pt_attr;
   cell->mAttrList = attr_list;
@@ -72,7 +72,7 @@ AttrDict::add(const PtAttrInst* pt_attr,
 ElbAttrList*
 AttrDict::find(const PtAttrInst* pt_attr) const
 {
-  ymuint32 pos = hash_func(pt_attr);
+  ymuint pos = hash_func(pt_attr);
   for (Cell* cell = mTable[pos]; cell; cell = cell->mLink) {
     if ( cell->mPtAttr == pt_attr ) {
       return cell->mAttrList;
@@ -99,18 +99,18 @@ AttrDict::allocated_size() const
 
 // @brief テーブルの領域を確保する．
 void
-AttrDict::alloc_table(ymuint32 size)
+AttrDict::alloc_table(ymuint size)
 {
   mSize = size;
-  mLimit = static_cast<ymuint32>(mSize * 1.8);
+  mLimit = static_cast<ymuint>(mSize * 1.8);
   mTable = new Cell*[mSize];
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
 }
 
 // @brief ハッシュ値を計算する．
-ymuint32
+ymuint
 AttrDict::hash_func(const PtAttrInst* pt_attr) const
 {
   ympuint tmp = reinterpret_cast<ympuint>(pt_attr);

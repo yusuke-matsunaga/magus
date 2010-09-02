@@ -85,7 +85,7 @@ StmtGen::instantiate_case(const VlNamedObj* parent,
   ElbStmt* stmt = factory().new_CaseStmt(parent, process, pt_stmt, cond);
   
   // case-item の生成
-  for (ymuint32 i = 0; i < pt_stmt->caseitem_num(); ++ i) {
+  for (ymuint i = 0; i < pt_stmt->caseitem_num(); ++ i) {
     const PtCaseItem* pt_item = pt_stmt->caseitem(i);
     ElbStmt* body = NULL;
     if ( pt_item->body() ) {
@@ -96,9 +96,9 @@ StmtGen::instantiate_case(const VlNamedObj* parent,
     }
     
     // ラベルの生成と設定
-    ymuint32 n = pt_item->label_num();
+    ymuint n = pt_item->label_num();
     ElbExpr** label_list = factory().new_ExprList(n);
-    for (ymuint32 j = 0; j < n; ++ j) {
+    for (ymuint j = 0; j < n; ++ j) {
       const PtExpr* pt_expr = pt_item->label(j);
       ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
       if ( !tmp ) {

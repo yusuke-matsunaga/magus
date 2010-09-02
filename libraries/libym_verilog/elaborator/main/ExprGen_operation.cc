@@ -30,7 +30,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 			 const PtExpr* pt_expr)
 {
   tVpiOpType op_type = pt_expr->opr_type();
-  ymuint32 opr_size = pt_expr->operand_num();
+  ymuint opr_size = pt_expr->operand_num();
   
   ElbExpr* opr0 = NULL;
   ElbExpr* opr1 = NULL;
@@ -123,7 +123,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
   case kVpiConcatOp:
     {
       ElbExpr** opr_list = factory().new_ExprList(opr_size);
-      for (ymuint32 i = 0; i < opr_size; ++ i) {
+      for (ymuint i = 0; i < opr_size; ++ i) {
 	const PtExpr* pt_expr1 = pt_expr->operand(i);
 	ElbExpr* expr1 = instantiate_expr(parent, env, pt_expr1);
 	if ( !expr1 ) {
@@ -153,7 +153,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	return NULL;
       }
       ElbExpr** opr_list = factory().new_ExprList(opr_size - 1);
-      for (ymuint32 i = 1; i < opr_size; ++ i) {
+      for (ymuint i = 1; i < opr_size; ++ i) {
 	const PtExpr* pt_expr1 = pt_expr->operand(i);
 	ElbExpr* expr1 = instantiate_expr(parent, env, pt_expr1);
 	if ( !expr1 ) {

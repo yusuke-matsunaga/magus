@@ -114,10 +114,10 @@ ModuleGen::phase1_module_item(ElbModule* module,
 
   // パラメータの割り当てを作る．
   if ( param_con ) {
-    ymuint32 n = param_con->elem_num();
+    ymuint n = param_con->elem_num();
     if ( param_con->named_con() ) {
       // 名前による割り当て
-      for (ymuint32 i = 0; i < n; ++ i) {
+      for (ymuint i = 0; i < n; ++ i) {
 	const PtConnection* pt_con = param_con->pt_con(i);
 	ElbObjHandle* handle = find_obj(module, pt_con->name());
 	if ( handle == NULL || handle->type() != kVpiParameter ) {
@@ -146,9 +146,9 @@ ModuleGen::phase1_module_item(ElbModule* module,
 
       // パラメータポートリストの名前を現れた順番に paramport_list に入れる．
       vector<const char*> paramport_list;
-      for (ymuint32 i = 0; i < paramport_array.size(); ++ i) {
+      for (ymuint i = 0; i < paramport_array.size(); ++ i) {
 	const PtDeclHead* pt_param = paramport_array[i];
-	for (ymuint32 j = 0; j < pt_param->item_num(); ++ j) {
+	for (ymuint j = 0; j < pt_param->item_num(); ++ j) {
 	  const PtDeclItem* pt_item = pt_param->item(j);
 	  paramport_list.push_back(pt_item->name());
 	}
@@ -161,7 +161,7 @@ ModuleGen::phase1_module_item(ElbModule* module,
 		"Too many parameters.");
       }
       else {
-	for (ymuint32 i = 0; i < n; ++ i) {
+	for (ymuint i = 0; i < n; ++ i) {
 	  const PtConnection* pt_con = param_con->pt_con(i);
 	  const char* tmp_name = paramport_list[i];
 	  ElbObjHandle* handle = find_obj(module, tmp_name);
@@ -229,9 +229,9 @@ void
 ModuleGen::instantiate_iodecl(ElbModule* module,
 			      const PtModule* pt_module)
 {
-  ymuint32 index = 0;
+  ymuint index = 0;
   PtIOHeadArray io_array = pt_module->iohead_array();
-  for (ymuint32 i = 0; i < io_array.size(); ++ i) {
+  for (ymuint i = 0; i < io_array.size(); ++ i) {
     const PtIOHead* pt_head = io_array[i];
     tVpiAuxType def_aux_type = pt_head->aux_type();
     bool sign = pt_head->is_signed();
@@ -250,7 +250,7 @@ ModuleGen::instantiate_iodecl(ElbModule* module,
     
     ElbIOHead* head = factory().new_ModIOHead(module, pt_head);
 
-    for (ymuint32 j = 0; j < pt_head->item_num(); ++ j, ++ index) {
+    for (ymuint j = 0; j < pt_head->item_num(); ++ j, ++ index) {
       const PtIOItem* pt_item = pt_head->item(j);
 
       // IO定義と変数/ネット定義が一致しているか調べる．
@@ -452,11 +452,11 @@ void
 ModuleGen::instantiate_port(ElbModule* module,
 			    const PtModule* pt_module)
 {
-  ymuint32 port_num = pt_module->port_num();
-  for (ymuint32 index = 0; index < port_num; ++ index) {
+  ymuint port_num = pt_module->port_num();
+  for (ymuint index = 0; index < port_num; ++ index) {
     const PtPort* pt_port = pt_module->port(index);
     // 内側の接続と向きを作る．
-    ymuint32 n = pt_port->portref_num();
+    ymuint n = pt_port->portref_num();
 
     ElbExpr* low_conn = NULL;
     tVpiDirection dir = kVpiNoDirection;
@@ -471,7 +471,7 @@ ModuleGen::instantiate_port(ElbModule* module,
       // 複数要素の結合の場合
       ElbExpr** expr_list = factory().new_ExprList(n);
       
-      for (ymuint32 i = 0; i < n; ++ i) {
+      for (ymuint i = 0; i < n; ++ i) {
 	const PtPortRef* pt_portref = pt_port->portref(i);
 	ElbExpr* portexpr = instantiate_portref(module, pt_portref);
 	if ( !portexpr ) {

@@ -63,7 +63,7 @@ void
 ItemGen::phase1_item(const VlNamedObj* parent,
 		     PtItemArray pt_item_array)
 {
-  for (ymuint32 i = 0; i < pt_item_array.size(); ++ i) {
+  for (ymuint i = 0; i < pt_item_array.size(); ++ i) {
     const PtItem* pt_item = pt_item_array[i];
     switch ( pt_item->type() ) {
     case kPtItem_DefParam:
@@ -228,7 +228,7 @@ ItemGen::instantiate_cont_assign(const VlNamedObj* parent,
   
   ElbEnv env;
   ElbNetLhsEnv env1(env);
-  for (ymuint32 i = 0; i < pt_header->size(); ++ i) {
+  for (ymuint i = 0; i < pt_header->size(); ++ i) {
     const PtContAssign* pt_elem = pt_header->contassign(i);
     
     // 左辺式の生成
@@ -341,12 +341,12 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
   }
 
   bool found = false;
-  for (ymuint32 i = 0; i < pt_gencase->size(); ++ i) {
+  for (ymuint i = 0; i < pt_gencase->size(); ++ i) {
     const PtGenCaseItem* pt_caseitem = pt_gencase->caseitem(i);
     // default(ラベルリストが空) なら常にマッチする．
-    ymuint32 n = pt_caseitem->label_num();
+    ymuint n = pt_caseitem->label_num();
     bool match = (n == 0);
-    for (ymuint32 i = 0; i < n; ++ i) {
+    for (ymuint i = 0; i < n; ++ i) {
       const PtExpr* pt_expr = pt_caseitem->label(i);
       BitVector label_val;
       if ( !evaluate_expr_bitvector(parent, pt_expr, label_val) ) {

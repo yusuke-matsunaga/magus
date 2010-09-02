@@ -95,7 +95,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
   case kPtCaseStmt:
   case kPtCaseXStmt:
   case kPtCaseZStmt:
-    for (ymuint32 i = 0; i < pt_stmt->caseitem_num(); ++ i) {
+    for (ymuint i = 0; i < pt_stmt->caseitem_num(); ++ i) {
       const PtCaseItem* pt_item = pt_stmt->caseitem(i);
       phase1_stmt(parent, pt_item->body());
     }
@@ -103,7 +103,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
     
   case kPtParBlockStmt:
   case kPtSeqBlockStmt:
-    for (ymuint32 i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
+    for (ymuint i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
       const PtStmt* pt_stmt1 = pt_stmt->stmt_array()[i];
       phase1_stmt(parent, pt_stmt1);
     }
@@ -115,7 +115,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
       ElbScope* block_scope = factory().new_StmtScope(parent, pt_stmt);
       reg_blockscope(block_scope);
       
-      for (ymuint32 i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
+      for (ymuint i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
 	const PtStmt* pt_stmt1 = pt_stmt->stmt_array()[i];
 	phase1_stmt(block_scope, pt_stmt1);
       }
@@ -428,7 +428,7 @@ StmtGen::instantiate_enable(const VlNamedObj* parent,
   
   // 引数を生成する．
   ElbExpr** arg_list = factory().new_ExprList(pt_stmt->arg_num());
-  for (ymuint32 i = 0; i < pt_stmt->arg_num(); ++ i) {
+  for (ymuint i = 0; i < pt_stmt->arg_num(); ++ i) {
     const PtExpr* pt_expr = pt_stmt->arg(i);
     ElbExpr* expr = instantiate_expr(parent, env, pt_expr);
     if ( !expr ) {
@@ -475,7 +475,7 @@ StmtGen::instantiate_sysenable(const VlNamedObj* parent,
   
   // 引数を生成する．
   ElbExpr** arg_list = factory().new_ExprList(pt_stmt->arg_num());
-  for (ymuint32 i = 0; i < pt_stmt->arg_num(); ++ i) {
+  for (ymuint i = 0; i < pt_stmt->arg_num(); ++ i) {
     const PtExpr* pt_expr = pt_stmt->arg(i);
     ElbExpr* arg = NULL;
     // 空の引数があるのでエラーと区別する．
@@ -539,9 +539,9 @@ StmtGen::instantiate_control(const VlNamedObj* parent,
   }
 
   // イベントリストの生成を行う．
-  ymuint32 event_num = pt_control->event_num();
+  ymuint event_num = pt_control->event_num();
   ElbExpr** event_list = factory().new_ExprList(event_num);
-  for (ymuint32 i = 0; i < event_num; ++ i) {
+  for (ymuint i = 0; i < event_num; ++ i) {
     const PtExpr* pt_expr = pt_control->event(i);
     ElbExpr* expr = instantiate_event_expr(parent, env, pt_expr);
     if ( !expr ) {

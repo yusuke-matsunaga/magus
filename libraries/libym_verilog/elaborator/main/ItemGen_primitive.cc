@@ -62,13 +62,13 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 			     prim_head, pt_delay));
   }
   
-  for (ymuint32 i = 0; i < pt_head->size(); ++ i) {
+  for (ymuint i = 0; i < pt_head->size(); ++ i) {
     const PtInst* pt_inst = pt_head->inst(i);
     const FileRegion& fr = pt_inst->file_region();
-    ymuint32 port_num = pt_inst->port_num();
-    ymuint32 output_num;
-    ymuint32 inout_num;
-    ymuint32 input_num;
+    ymuint port_num = pt_inst->port_num();
+    ymuint output_num;
+    ymuint inout_num;
+    ymuint input_num;
     switch ( ElbPrimitive::get_port_size(pt_head->prim_type(), port_num,
 					 output_num, inout_num, input_num) ) {
     case -1:
@@ -155,7 +155,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 			       const ElbUdpDefn* udpdefn)
 {
   PtConnectionArray pa_array = pt_head->paramassign_array();
-  ymuint32 param_size = pa_array.size();
+  ymuint param_size = pa_array.size();
   const PtDelay* pt_delay = pt_head->delay();
   bool has_delay = ( pt_delay || param_size == 1 );
   
@@ -168,7 +168,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 			     prim_head, pt_head));
   }
   
-  for (ymuint32 i = 0; i < pt_head->size(); ++ i) {
+  for (ymuint i = 0; i < pt_head->size(); ++ i) {
     const PtInst* pt_inst = pt_head->inst(i);
     if ( pt_inst->port_num() > 0 &&
 	 pt_inst->port(0)->name() != NULL ) {
@@ -180,7 +180,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
       continue;
     }
     
-    ymuint32 port_num = pt_inst->port_num();
+    ymuint port_num = pt_inst->port_num();
     if ( udpdefn->port_num() != port_num ) {
       put_msg(__FILE__, __LINE__,
 	      pt_inst->file_region(),
@@ -252,7 +252,7 @@ ItemGen::link_udp_delay(ElbPrimHead* prim_head,
 			const PtItem* pt_head)
 {
   const VlNamedObj* parent = prim_head->parent();
-  ymuint32 param_size = pt_head->paramassign_array().size();
+  ymuint param_size = pt_head->paramassign_array().size();
   const PtDelay* pt_delay = pt_head->delay();
   ElbDelay* delay = NULL;
   if ( pt_delay ) {
@@ -275,14 +275,14 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 			 const PtInst* pt_inst)
 {
   const VlNamedObj* parent = prim_array->parent();
-  ymuint32 arraysize = prim_array->elem_num();
+  ymuint arraysize = prim_array->elem_num();
   
   // ポートの情報を得るために先頭の要素を取り出す．
   const VlPrimitive* prim = prim_array->elem_by_offset(0);
   
   ElbEnv env1;
   ElbNetLhsEnv env2(env1);
-  for (ymuint32 index = 0; index < pt_inst->port_num(); ++ index) {
+  for (ymuint index = 0; index < pt_inst->port_num(); ++ index) {
     const PtConnection* pt_con = pt_inst->port(index);
     const PtExpr* pt_expr = pt_con->expr();
     if ( !pt_expr ) {
@@ -318,10 +318,10 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 	      "Real expression cannot connect to UDP port.");
       continue;
     }
-    ymuint32 expr_size = unpack_size(type);
+    ymuint expr_size = unpack_size(type);
     if ( expr_size == 1 ) {
       // サイズが等しければそのまま接続する．
-      for (ymuint32 i = 0; i < arraysize; ++ i) {
+      for (ymuint i = 0; i < arraysize; ++ i) {
 	ElbPrimitive* prim = prim_array->_primitive_by_offset(i);
 	prim->connect(index, tmp);
       }
@@ -329,14 +329,14 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
     else if ( expr_size == 0 ) {
       // サイズがなければ1ビットに直してから接続する．
       tmp->set_reqsize(pack(kVpiValueUS, 1));
-      for (ymuint32 i = 0; i < arraysize; ++ i) {
+      for (ymuint i = 0; i < arraysize; ++ i) {
 	ElbPrimitive* prim = prim_array->_primitive_by_offset(i);
 	prim->connect(index, tmp);
       }
     }
     else if ( expr_size == arraysize ) {
       // tmp を 1 ビットずつに分割して接続する．
-      for (ymuint32 i = 0; i < arraysize; ++ i) {
+      for (ymuint i = 0; i < arraysize; ++ i) {
 	ElbPrimitive* prim = prim_array->_primitive_by_offset(i);
 	ElbExpr* bit = factory().new_BitSelect(pt_expr, tmp, i);
 	prim->connect(index, bit);
@@ -366,7 +366,7 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
   
   ElbEnv env1;
   ElbNetLhsEnv env2(env1);
-  for (ymuint32 index = 0; index < pt_inst->port_num(); ++ index) {
+  for (ymuint index = 0; index < pt_inst->port_num(); ++ index) {
     const PtConnection* pt_con = pt_inst->port(index);
     // UDP instance の場合には ai_list は無視する．
     const PtExpr* pt_expr = pt_con->expr();
@@ -397,7 +397,7 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
 	      "Real expression cannot connect to UDP port.");
       continue;
     }
-    ymuint32 expr_size = unpack_size(type);
+    ymuint expr_size = unpack_size(type);
     if ( expr_size == 1 ) {
       // サイズが等しければそのまま接続する．
       primitive->connect(index, tmp);

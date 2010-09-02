@@ -136,14 +136,14 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
   }
   
   // 引数の生成
-  ymuint32 n = pt_expr->operand_num();
+  ymuint n = pt_expr->operand_num();
   if ( n != child_func->io_num() ) {
     error_n_of_arguments_mismatch(pt_expr);
     return NULL;
   }
   
   ElbExpr** arg_list = factory().new_ExprList(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     const PtExpr* pt_expr1 = pt_expr->operand(i);
     ElbExpr* expr1 = instantiate_expr(parent, env, pt_expr1);
     if ( !expr1 ) {
@@ -196,9 +196,9 @@ ExprGen::instantiate_sysfunccall(const VlNamedObj* parent,
 #warning "TODO: 引数の個数と型のチェック"
   
   // 引数の生成
-  ymuint32 n = pt_expr->operand_num();
+  ymuint n = pt_expr->operand_num();
   ElbExpr** arg_list = factory().new_ExprList(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     const PtExpr* pt_expr1 = pt_expr->operand(i);
     ElbExpr* arg = NULL;
     if ( pt_expr ) {

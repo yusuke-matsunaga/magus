@@ -215,9 +215,9 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
   case kPtOprExpr:
     // 左辺では concatination しか適当でない．
     if ( pt_expr->opr_type() == kVpiConcatOp ) {
-      ymuint32 opr_size = pt_expr->operand_num();
+      ymuint opr_size = pt_expr->operand_num();
       ElbExpr** opr_list = factory().new_ExprList(opr_size);
-      for (ymuint32 i = 0; i < opr_size; ++ i) {
+      for (ymuint i = 0; i < opr_size; ++ i) {
 	const PtExpr* pt_expr1 = pt_expr->operand(i);
 	ElbExpr* expr1 = instantiate_lhs(parent, env, pt_expr1);
 	if ( !expr1 ) {
@@ -334,7 +334,7 @@ ElbDelay*
 ExprGen::instantiate_delay(const VlNamedObj* parent,
 			   const PtDelay* pt_delay)
 {
-  ymuint32 n = 0;
+  ymuint n = 0;
   const PtExpr* expr_array[3];
   for ( ; n < 3; ++ n) {
     const PtExpr* expr = pt_delay->value(n);
@@ -355,7 +355,7 @@ ElbDelay*
 ExprGen::instantiate_delay(const VlNamedObj* parent,
 			   const PtItem* pt_header)
 {
-  ymuint32 n = pt_header->paramassign_array().size();
+  ymuint n = pt_header->paramassign_array().size();
   assert_cond( n == 1, __FILE__, __LINE__);
 
   const PtExpr* expr_array[1];

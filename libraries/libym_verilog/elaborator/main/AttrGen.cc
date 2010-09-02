@@ -50,7 +50,7 @@ AttrGen::instantiate_attribute(PtAttrInstArray pt_attr_array,
 #if 0
   ElbAttrList* attr_list = find_attr_list(pt_attr);
   if ( !attr_list ) {
-    ymuint32 n = 0;
+    ymuint n = 0;
     for (const PtAttrInst* pt_ai = pt_attr;
 	 pt_ai; pt_ai = pt_ai->next()) {
       for (const PtAttrSpec* pt_as = pt_ai->attr_spec_top();
@@ -59,7 +59,7 @@ AttrGen::instantiate_attribute(PtAttrInstArray pt_attr_array,
       }
     }
     attr_list = factory().new_AttrList(n);
-    ymuint32 i = 0;
+    ymuint i = 0;
     for (const PtAttrInst* pt_ai = pt_attr;
 	 pt_ai; pt_ai = pt_ai->next()) {
       for (const PtAttrSpec* pt_as = pt_ai->attr_spec_top();

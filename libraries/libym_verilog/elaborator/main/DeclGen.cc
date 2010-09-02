@@ -57,7 +57,7 @@ void
 DeclGen::instantiate_decl(const VlNamedObj* parent,
 			  PtDeclHeadArray pt_head_array)
 {
-  for (ymuint32 i = 0; i < pt_head_array.size(); ++ i) {
+  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
     const PtDeclHead* pt_head = pt_head_array[i];
     switch ( pt_head->type() ) {
     case kPtDecl_Param:
@@ -106,7 +106,7 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 {
   const VlModule* module = parent->parent_module();
   
-  for (ymuint32 i = 0; i < pt_head_array.size(); ++ i) {
+  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
     const PtDeclHead* pt_head = pt_head_array[i];
     
     const PtExpr* pt_left = pt_head->left_range();
@@ -124,7 +124,7 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 						       left, right,
 						       left_val, right_val);
 
-    for (ymuint32 i = 0; i < pt_head->item_num(); ++ i) {
+    for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
       const PtDeclItem* pt_item = pt_head->item(i);
       const FileRegion& file_region = pt_item->file_region();
       
@@ -194,12 +194,12 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
 			     net_head, pt_delay));
   }
 
-  for (ymuint32 i = 0; i < pt_head->item_num(); ++ i) {
+  for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);
     // init_value() が 0 でなければ初期割り当てを持つということ．
     const PtExpr* pt_init = pt_item->init_value();
 
-    ymuint32 dim_size = pt_item->dimension_list_size();
+    ymuint dim_size = pt_item->dimension_list_size();
     if ( dim_size > 0 ) {
       // 配列
 
@@ -315,10 +315,10 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
 						 left, right,
 						 left_val, right_val);
   
-  for (ymuint32 i = 0; i < pt_head->item_num(); ++ i) {
+  for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);
     const PtExpr* pt_init = pt_item->init_value();
-    ymuint32 dim_size = pt_item->dimension_list_size();
+    ymuint dim_size = pt_item->dimension_list_size();
     if ( dim_size > 0 ) {
       // 配列の場合
 
@@ -386,10 +386,10 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
 
   ElbDeclHead* var_head = factory().new_DeclHead(parent, pt_head);
 
-  for (ymuint32 i = 0; i < pt_head->item_num(); ++ i) {
+  for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);
     const PtExpr* pt_init = pt_item->init_value();
-    ymuint32 dim_size = pt_item->dimension_list_size();
+    ymuint dim_size = pt_item->dimension_list_size();
     if ( dim_size > 0 ) {
       // 配列の場合
 
@@ -455,9 +455,9 @@ DeclGen::instantiate_event_head(const VlNamedObj* parent,
 {
   ElbDeclHead* event_head = factory().new_DeclHead(parent, pt_head);
 
-  for (ymuint32 i = 0; i < pt_head->item_num(); ++ i) {
+  for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);
-    ymuint32 dim_size = pt_item->dimension_list_size();
+    ymuint dim_size = pt_item->dimension_list_size();
     if ( dim_size > 0 ) {
       // 配列
 
@@ -510,7 +510,7 @@ void
 DeclGen::instantiate_genvar_head(const VlNamedObj* parent,
 				 const PtDeclHead* pt_head)
 {
-  for (ymuint32 i = 0; i < pt_head->item_num(); ++ i) {
+  for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);
     ElbGenvar* genvar = factory().new_Genvar(parent, pt_item, 0);
     reg_genvar(genvar);
@@ -534,11 +534,11 @@ DeclGen::instantiate_dimension_list(const VlNamedObj*  parent,
 				    const PtDeclItem* pt_item,
 				    vector<ElbRangeSrc>& range_src)
 {
-  ymuint32 n = pt_item->dimension_list_size();
+  ymuint n = pt_item->dimension_list_size();
   range_src.reserve(n);
   
   bool ok = true;
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     const PtRange* pt_range = pt_item->range(i);
     const PtExpr* pt_left = pt_range->left();
     const PtExpr* pt_right = pt_range->right();

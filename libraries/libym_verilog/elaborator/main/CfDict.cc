@@ -46,13 +46,13 @@ CfDict::add(const VlNamedObj* scope,
   }
   if ( mNum >= mLimit ) {
     // テーブルを拡張する．
-    ymuint32 old_size = mSize;
+    ymuint old_size = mSize;
     Cell** old_table = mTable;
     alloc_table(old_size << 1);
-    for (ymuint32 i = 0; i < old_size; ++ i) {
+    for (ymuint i = 0; i < old_size; ++ i) {
       for (Cell* cell = old_table[i]; cell; ) {
 	Cell* next = cell->mLink;
-	ymuint32 pos = hash_func(cell->mScope, cell->mName);
+	ymuint pos = hash_func(cell->mScope, cell->mName);
 	cell->mLink = mTable[pos];
 	mTable[pos] = cell;
 	cell = next;
@@ -60,7 +60,7 @@ CfDict::add(const VlNamedObj* scope,
     }
     delete [] old_table;
   }
-  ymuint32 pos = hash_func(scope, name);
+  ymuint pos = hash_func(scope, name);
   Cell* cell = reinterpret_cast<Cell*>(mAlloc.get_memory(sizeof(Cell)));
   cell->mScope = scope;
   cell->mName = name;
@@ -77,7 +77,7 @@ ElbFunction*
 CfDict::find(const VlNamedObj* scope,
 	     const char* name) const
 {
-  ymuint32 pos = hash_func(scope, name);
+  ymuint pos = hash_func(scope, name);
   for (Cell* cell = mTable[pos]; cell; cell = cell->mLink) {
     if ( cell->mScope == scope && strcmp(cell->mName, name) == 0 ) {
       return cell->mFunc;
@@ -104,24 +104,24 @@ CfDict::allocated_size() const
 
 // @brief テーブルの領域を確保する．
 void
-CfDict::alloc_table(ymuint32 size)
+CfDict::alloc_table(ymuint size)
 {
   mSize = size;
-  mLimit = static_cast<ymuint32>(mSize * 1.8);
+  mLimit = static_cast<ymuint>(mSize * 1.8);
   mTable = new Cell*[mSize];
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
 }
 
 // @brief ハッシュ値を計算する．
-ymuint32
+ymuint
 CfDict::hash_func(const VlNamedObj* scope,
 		  const char* name) const
 {
-  ymuint32 h = 0;
-  ymuint32 c;
-  for ( ; (c = static_cast<ymuint32>(*name)); ++ name) {
+  ymuint h = 0;
+  ymuint c;
+  for ( ; (c = static_cast<ymuint>(*name)); ++ name) {
     h = h * 37 + c;
   }
   return ((reinterpret_cast<ympuint>(scope) * h) >> 8) % mSize;

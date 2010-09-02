@@ -61,9 +61,9 @@ StmtGen::instantiate_parblock(const VlNamedObj* parent,
 			      const PtStmt* pt_stmt)
 {
   PtStmtArray pt_stmt_array = pt_stmt->stmt_array();
-  ymuint32 stmt_num = pt_stmt_array.size();
+  ymuint stmt_num = pt_stmt_array.size();
   ElbStmt** stmt_list = factory().new_StmtList(stmt_num);
-  for (ymuint32 i = 0; i < stmt_num; ++ i) {
+  for (ymuint i = 0; i < stmt_num; ++ i) {
     const PtStmt* pt_stmt1 = pt_stmt_array[i];
     ElbStmt* stmt1 = instantiate_stmt(parent, process, env, pt_stmt1);
     if ( !stmt1 ) {
@@ -89,9 +89,9 @@ StmtGen::instantiate_seqblock(const VlNamedObj* parent,
 			      const PtStmt* pt_stmt)
 {
   PtStmtArray pt_stmt_array = pt_stmt->stmt_array();
-  ymuint32 stmt_num = pt_stmt_array.size();
+  ymuint stmt_num = pt_stmt_array.size();
   ElbStmt** stmt_list = factory().new_StmtList(stmt_num);
-  for (ymuint32 i = 0; i < stmt_num; ++ i) {
+  for (ymuint i = 0; i < stmt_num; ++ i) {
     const PtStmt* pt_stmt1 = pt_stmt_array[i];
     ElbStmt* stmt1 = instantiate_stmt(parent, process, env, pt_stmt1);
     if ( !stmt1 ) {
@@ -121,9 +121,9 @@ StmtGen::instantiate_namedparblock(const VlNamedObj* parent,
   const VlNamedObj* block = handle->obj();
   
   PtStmtArray pt_stmt_array = pt_stmt->stmt_array();
-  ymuint32 stmt_num = pt_stmt_array.size();
+  ymuint stmt_num = pt_stmt_array.size();
   ElbStmt** stmt_list = factory().new_StmtList(stmt_num);
-  for (ymuint32 i = 0; i < stmt_num; ++ i) {
+  for (ymuint i = 0; i < stmt_num; ++ i) {
     const PtStmt* pt_stmt1 = pt_stmt_array[i];
     ElbStmt* stmt1 = instantiate_stmt(block, process, env,
 				      pt_stmt1);
@@ -155,9 +155,9 @@ StmtGen::instantiate_namedseqblock(const VlNamedObj* parent,
   const VlNamedObj* block = handle->obj();
   
   PtStmtArray pt_stmt_array = pt_stmt->stmt_array();
-  ymuint32 stmt_num = pt_stmt_array.size();
+  ymuint stmt_num = pt_stmt_array.size();
   ElbStmt** stmt_list = factory().new_StmtList(stmt_num);
-  for (ymuint32 i = 0; i < stmt_num; ++ i) {
+  for (ymuint i = 0; i < stmt_num; ++ i) {
     const PtStmt* pt_stmt1 = pt_stmt_array[i];
     ElbStmt* stmt1 = instantiate_stmt(block, process, env, pt_stmt1);
     if ( !stmt1 ) {

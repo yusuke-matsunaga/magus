@@ -645,7 +645,7 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
   const char* name = pt_expr->name();
   
   // 識別子の添字の次元
-  ymuint32 isize = pt_expr->index_num();
+  ymuint isize = pt_expr->index_num();
   
   ElbDecl* decl = NULL;
   ElbDeclArray* decl_array = NULL;
@@ -987,7 +987,7 @@ ExprGen::resolve1(const VlNamedObj* parent,
 		  ElbExpr*& index2)
 {
   // プライマリ式の次元 (ビット指定を含んでいる可能性あり)
-  ymuint32 isize = pt_expr->index_num();
+  ymuint isize = pt_expr->index_num();
 
   // 範囲指定があるとき true となるフラグ
   has_range_select = (pt_expr->left_range() && pt_expr->right_range());
@@ -1081,10 +1081,10 @@ ExprGen::resolve2(const VlNamedObj* parent,
 		  ElbExpr*& index2)
 {
   // 配列の次元
-  ymuint32 dsize = decl->dimension();
+  ymuint dsize = decl->dimension();
   
   // プライマリ式の次元 (ビット指定を含んでいる可能性あり)
-  ymuint32 isize = pt_expr->index_num();
+  ymuint isize = pt_expr->index_num();
 
   // 範囲指定があるとき true となるフラグ
   has_range_select = (pt_expr->left_range() && pt_expr->right_range());
@@ -1109,7 +1109,7 @@ ExprGen::resolve2(const VlNamedObj* parent,
   index2 = NULL;
   
   bool const_mode = pt_expr->is_const_index() || decl->is_consttype();
-  for (ymuint32 i = 0; i < isize; ++ i) {
+  for (ymuint i = 0; i < isize; ++ i) {
     const PtExpr* pt_expr1 = pt_expr->index(i);
     ElbExpr* expr1;
     if ( const_mode ) {
