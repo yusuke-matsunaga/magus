@@ -106,14 +106,6 @@ private:
   void
   phase3_task(ElbTask* task,
 	      const PtItem* pt_item);
-  
-  /// @brief task 用のIO宣言要素をインスタンス化する．
-  /// @brief IO宣言要素を実体化する．
-  /// @param[in] task 親のタスク
-  /// @param[in] pt_head_array IO宣言ヘッダの配列
-  void
-  instantiate_iodecl(ElbTask* task,
-		     PtIOHeadArray pt_head_array);
 
   /// @brief function の生成を行う．
   /// @param[in] parent 親のスコープ
@@ -135,13 +127,16 @@ private:
   void
   phase3_function(ElbFunction* func,
 		  const PtItem* pt_item);
-  
-  /// @brief function 用のIO宣言要素をインスタンス化する．
+
+  /// @brief task/function 用のIO宣言要素をインスタンス化する．
   /// @brief IO宣言要素を実体化する．
+  /// @param[in] task 親のタスク
   /// @param[in] function 親の function
   /// @param[in] pt_head_array IO宣言ヘッダの配列
+  /// @note task と function のどちらかは NULL
   void
-  instantiate_iodecl(ElbFunction* function,
+  instantiate_iodecl(ElbTask* task,
+		     ElbFunction* function,
 		     PtIOHeadArray pt_head_array);
 
   /// @brief module/Udp instance の生成を行う
