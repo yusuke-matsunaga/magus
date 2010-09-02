@@ -37,8 +37,8 @@ VmNode::add_iolist(const vector<const VlIODecl*>& iodecl_list) const
 // @param[in] label ラベル
 // @param[in] decl_list 宣言のリスト
 void
-VmNode::add_decllist(const QString& label,
-		     const vector<const VlDecl*>& decl_list) const
+VmNode1::add_decllist(const QString& label,
+		      const vector<const VlDecl*>& decl_list) const
 {
   add_child( new VmDeclListNode(label, decl_list) );
 }

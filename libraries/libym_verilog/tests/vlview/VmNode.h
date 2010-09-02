@@ -70,48 +70,11 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスが用いる関数
   //////////////////////////////////////////////////////////////////////
-  
-  /// @brief 子供を追加する．
-  void
-  add_child(VmNode* node) const;
-
-  /// @brief UdpListNode を追加する．
-  /// @param[in] vl_mgr VlMgr
-  void
-  add_udplist(const VlMgr& vl_mgr) const;
-
-  /// @brief ModuleListNode を追加する．
-  /// @param[in] vl_mgr VlMgr
-  void
-  add_modulelist(const VlMgr& vl_mgr) const;
 
   /// @brief IODeclListNode を追加する．
   /// @param[in] iodecl_list IO宣言のリスト
   void
   add_iolist(const vector<const VlIODecl*>& iodecl_list) const;
-
-  /// @brief DeclListNode を追加する．
-  /// @param[in] label ラベル
-  /// @param[in] decl_list 宣言のリスト
-  void
-  add_decllist(const QString& label,
-	       const vector<const VlDecl*>& decl_list) const;
-  
-  /// @brief ProcessListNode を追加する．
-  /// @param[in] vl_mgr VlMgr
-  /// @param[in] process_list プロセスのリスト
-  void
-  add_processlist(const VlMgr& vl_mgr,
-		  const vector<const VlProcess*>& process_list) const;
-  
-  /// @brief StmtNodeを追加する．
-  /// @param[in] vl_mgr VlMgr
-  /// @param[in] label ラベル
-  /// @param[in] stmt ステートメント
-  void
-  add_stmt(const VlMgr& vl_mgr,
-	   const QString& label,
-	   const VlStmt* stmt) const;
   
   /// @brief ExprListNode を追加する．
   /// @param[in] label ラベル
@@ -185,6 +148,10 @@ protected:
   void
   add_int(const QString& label,
 	  ymuint value) const;
+  
+  /// @brief 子供を追加する．
+  void
+  add_child(VmNode* node) const;
     
 
 private:
@@ -240,6 +207,83 @@ protected:
   /// @brief VlMgr を取り出す．
   const VlMgr&
   vl_mgr() const;
+  
+  /// @brief UdpListNode を追加する．
+  void
+  add_udplist() const;
+
+  /// @brief ModuleListNode を追加する．
+  void
+  add_modulelist() const;
+
+  /// @brief スコープに属する要素を追加する．
+  /// @param[in] scope スコープ
+  void
+  add_scope_item(const VlNamedObj* scope) const;
+
+  /// @brief DeclListNode を追加する．
+  /// @param[in] label ラベル
+  /// @param[in] decl_list 宣言のリスト
+  void
+  add_decllist(const QString& label,
+	       const vector<const VlDecl*>& decl_list) const;
+
+  /// @brief StmtNodeを追加する．
+  /// @param[in] label ラベル
+  /// @param[in] stmt ステートメント
+  void
+  add_stmt(const QString& label,
+	   const VlStmt* stmt) const;
+
+  /// @brief ParamAssignListNode を追加する．
+  /// @param[in] pa_list parameter代入文のリスト
+  void
+  add_paramassignlist(const vector<const VlParamAssign*>& pa_list) const;
+
+  /// @brief DefParamListNode を追加する．
+  /// @param[in] defparam_list defparam 文のリスト
+  void
+  add_defparamlist(const vector<const VlDefParam*>& defparam_list) const;
+
+  /// @brief ScopeListNode を追加する．
+  /// @param[in] scope_list 内部スコープのリスト
+  void
+  add_scopelist(const vector<const VlNamedObj*>& scope_list) const;
+
+  /// @brief TaskListNode を追加する．
+  /// @param[in] task_list タスクのリスト
+  void
+  add_tasklist(const vector<const VlTask*>& task_list) const;
+  
+  /// @brief FuncListNode を追加する．
+  /// @param[in] function_list 関数のリスト
+  void
+  add_functionlist(const vector<const VlFunction*>& function_list) const;
+
+  /// @brief ContAssignListNode を追加する．
+  /// @param[in] ca_list 継続的代入文のリスト
+  void
+  add_contassignlist(const vector<const VlContAssign*>& ca_list) const;
+
+  /// @brief ModuleArrayListNode を追加する．
+  /// @param[in] ma_list モジュール配列のリスト
+  void
+  add_modulearraylist(const vector<const VlModuleArray*>& ma_list) const;
+
+  /// @brief PrimitiveListNode を追加する．
+  /// @param[in] primitive_list プリミティブのリスト
+  void
+  add_primitivelist(const vector<const VlPrimitive*>& primitive_list) const;
+
+  /// @brief PrimArrayListNode を追加する．
+  /// @param[in] primarray_list プリミティブ配列のリスト
+  void
+  add_primarraylist(const vector<const VlPrimArray*>& primarray_list) const;
+  
+  /// @brief ProcessListNode を追加する．
+  /// @param[in] process_list プロセスのリスト
+  void
+  add_processlist(const vector<const VlProcess*>& process_list) const;
 
   
 private:

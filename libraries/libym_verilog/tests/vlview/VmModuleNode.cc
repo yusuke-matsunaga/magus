@@ -22,12 +22,129 @@ BEGIN_NAMESPACE_YM_VERILOG
 // クラス VmNode の関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief ModuleListNode を追加する．
-// @param[in] vl_mgr VlMgr
+// @brief ModuleArrayListNode を追加する．
+// @param[in] ma_list モジュール配列のリスト
 void
-VmNode::add_modulelist(const VlMgr& vl_mgr) const
+VmNode1::add_modulearraylist(const vector<const VlModuleArray*>& ma_list) const
 {
-  add_child( new VmModuleListNode(vl_mgr) );
+  add_child( new VmModuleArrayListNode(vl_mgr(), ma_list) );
+}
+
+// @brief ModuleListNode を追加する．
+void
+VmNode1::add_modulelist() const
+{
+  add_child( new VmModuleListNode(vl_mgr()) );
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmModuleArrayListNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] ma_list モジュール配列のリスト
+VmModuleArrayListNode::VmModuleArrayListNode(const VlMgr& vl_mgr,
+					     const vector<const VlModuleArray*>& ma_list) :
+  VmNode1(vl_mgr),
+  mModuleArrayArray(ma_list)
+{
+}
+
+// @brief デストラクタ
+VmModuleArrayListNode::~VmModuleArrayListNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmModuleArrayListNode::data(int column,
+		       int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return "vpiModuleArray";
+    }
+    else if ( column == 1 ) {
+      return "";
+    }
+  }
+  return QVariant();
+}
+
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+VmModuleArrayListNode::loc() const
+{
+  return FileRegion();
+}
+
+// @brief 子供の配列を作る．
+void
+VmModuleArrayListNode::expand() const
+{
+  for (vector<const VlModuleArray*>::const_iterator p = mModuleArrayArray.begin();
+       p != mModuleArrayArray.end(); ++ p) {
+    add_child( new VmModuleArrayNode(vl_mgr(), *p) );
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス VmModuleArrayNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] vl_mgr VlMgr
+// @param[in] ma_list モジュール配列のリスト
+VmModuleArrayNode::VmModuleArrayNode(const VlMgr& vl_mgr,
+				     const VlModuleArray* module_array) :
+  VmNode1(vl_mgr),
+  mModuleArray(module_array)
+{
+}
+
+// @brief デストラクタ
+VmModuleArrayNode::~VmModuleArrayNode()
+{
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role 
+QVariant
+VmModuleArrayNode::data(int column,
+			int role) const
+{
+  if ( role == Qt::DisplayRole ) {
+    if ( column == 0 ) {
+      return "vpiModuleArray";
+    }
+    else if ( column == 1 ) {
+      return "";
+    }
+  }
+  return QVariant();
+}
+
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+VmModuleArrayNode::loc() const
+{
+  return FileRegion();
+}
+
+// @brief 子供の配列を作る．
+void
+VmModuleArrayNode::expand() const
+{
+  ymuint n = mModuleArray->elem_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    add_child( new VmModuleNode(vl_mgr(), mModuleArray->elem_by_offset(i)) );
+  }
 }
 
 
@@ -197,13 +314,11 @@ VmModuleNode::expand() const
   }
   add_iolist(io_array);
 
-#if 0
-  put_scope_sub(mgr, module);
-#endif
-  
+  add_scope_item(mModule);
+
   vector<const VlProcess*> process_list;
   if ( vl_mgr().find_process_list(mModule, process_list) ) {
-    add_processlist(vl_mgr(), process_list);
+    add_processlist(process_list);
   }
 }
 

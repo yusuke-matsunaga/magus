@@ -19,7 +19,117 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VmModuleListNode VmRootNode.h
+/// @class VmModuleArrayListNode VmModuleNode.h "VmModuleNode.h"
+/// @brief VmModuleArray のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmModuleArrayListNode :
+  public VmNode1
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] ma_list モジュール配列のリスト
+  VmModuleArrayListNode(const VlMgr& vl_mgr,
+			const vector<const VlModuleArray*>& ma_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmModuleArrayListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // モジュール配列の配列
+  vector<const VlModuleArray*> mModuleArrayArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmModuleArrayNode VmModuleNode.h "VmModuleNode.h"
+/// @brief ModuleArray を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmModuleArrayNode :
+  public VmNode1
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] module_array ModuleArray の構造を表すオブジェクト
+  VmModuleArrayNode(const VlMgr& vl_mgr,
+		    const VlModuleArray* module_array);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmModuleArrayNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対応する ModuleArray
+  const VlModuleArray* mModuleArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmModuleListNode VmModuleNode.h "VmModuleNode.h"
 /// @brief VmModule のリストを表すノード
 //////////////////////////////////////////////////////////////////////
 class VmModuleListNode :

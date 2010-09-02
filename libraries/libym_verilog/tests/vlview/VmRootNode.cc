@@ -61,10 +61,10 @@ void
 VmRootNode::expand() const
 {
   if ( !vl_mgr().udp_list().empty() ) {
-    add_udplist(vl_mgr());
+    add_udplist();
   }
   if ( !vl_mgr().topmodule_list().empty() ) {
-    add_modulelist(vl_mgr());
+    add_modulelist();
   }
 }
 

@@ -22,11 +22,10 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief UdpListNode を追加する．
-// @param[in] vl_mgr VlMgr
 void
-VmNode::add_udplist(const VlMgr& vl_mgr) const
+VmNode1::add_udplist() const
 {
-  add_child( new VmUdpListNode(vl_mgr) );
+  add_child( new VmUdpListNode(vl_mgr()) );
 }
 
 

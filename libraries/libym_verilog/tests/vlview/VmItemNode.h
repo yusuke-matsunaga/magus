@@ -19,6 +19,653 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
+/// @class VmParamAssignListNode VmItemNode.h
+/// @brief パラメータ代入文のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmParamAssignListNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] pa_list パラメータ代入文のリスト
+  VmParamAssignListNode(const vector<const VlParamAssign*>& pa_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmParamAssignListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // パラメータ代入文の配列
+  vector<const VlParamAssign*> mParamAssignArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmParamAssignNode VmItemNode.h
+/// @brief パラメータ代入文を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmParamAssignNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] paramassign パラメータ代入文
+  VmParamAssignNode(const VlParamAssign* paramassign);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmParamAssignNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // パラメータ代入文
+  const VlParamAssign* mParamAssign;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmDefParamListNode VmItemNode.h
+/// @brief defparamのリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmDefParamListNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] defparam_list defparamのリスト
+  VmDefParamListNode(const vector<const VlDefParam*>& defparam_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmDefParamListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // defparamの配列
+  vector<const VlDefParam*> mDefParamArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmDefParamNode VmItemNode.h
+/// @brief defparam文を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmDefParamNode :
+  public VmNode
+{
+public:
+  
+  /// @brief コンストラクタ
+  /// @param[in] defparam defparam文
+  VmDefParamNode(const VlDefParam* defparam);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmDefParamNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // defparam文
+  const VlDefParam* mDefParam;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmScopeListNode VmItemNode.h
+/// @brief スコープのリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmScopeListNode :
+  public VmNode1
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] scope_list スコープのリスト
+  VmScopeListNode(const VlMgr& vl_mgr,
+		  const vector<const VlNamedObj*>& scope_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmScopeListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // スコープの配列
+  vector<const VlNamedObj*> mScopeArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmScopeNode VmItemNode.h
+/// @brief スコープを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmScopeNode :
+  public VmNode1
+{
+public:
+  
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] scope スコープ
+  VmScopeNode(const VlMgr& vl_mgr,
+	      const VlNamedObj* scope);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmScopeNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // スコープ
+  const VlNamedObj* mScope;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmTaskListNode VmItemNode.h
+/// @brief タスクのリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmTaskListNode :
+  public VmNode1
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] task_list タスクのリスト
+  VmTaskListNode(const VlMgr& vl_mgr,
+		 const vector<const VlTask*>& task_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmTaskListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // タスクの配列
+  vector<const VlTask*> mTaskArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmTaskNode VmItemNode.h
+/// @brief タスクを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmTaskNode :
+  public VmNode1
+{
+public:
+  
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] task タスク
+  VmTaskNode(const VlMgr& vl_mgr,
+	     const VlTask* task);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmTaskNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // タスク
+  const VlTask* mTask;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmFunctionListNode VmItemNode.h
+/// @brief 関数のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmFunctionListNode :
+  public VmNode1
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] function_list 関数のリスト
+  VmFunctionListNode(const VlMgr& vl_mgr,
+		     const vector<const VlFunction*>& function_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmFunctionListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // 関数の配列
+  vector<const VlFunction*> mFunctionArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmFunctionNode VmItemNode.h
+/// @brief 関数を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmFunctionNode :
+  public VmNode1
+{
+public:
+  
+  /// @brief コンストラクタ
+  /// @param[in] vl_mgr VlMgr
+  /// @param[in] function 関数
+  VmFunctionNode(const VlMgr& vl_mgr,
+		 const VlFunction* function);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmFunctionNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // 関数
+  const VlFunction* mFunction;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmPrimArrayListNode VmItemNode.h
+/// @brief プリミティブ配列のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmPrimArrayListNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] primarray_list プリミティブ配列のリスト
+  VmPrimArrayListNode(const vector<const VlPrimArray*>& primarray_list);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmPrimArrayListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // プリミティブ配列の配列
+  vector<const VlPrimArray*> mPrimArrayArray;
+  
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmPrimArrayNode VmItemNode.h
+/// @brief プリミティブ配列を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmPrimArrayNode :
+  public VmNode
+{
+public:
+  
+  /// @brief コンストラクタ
+  /// @param[in] primarray プリミティブ配列
+  VmPrimArrayNode(const VlPrimArray* primarray);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmPrimArrayNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role 
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+    
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+  
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+  
+  // プリミティブ配列
+  const VlPrimArray* mPrimArray;
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class VmPrimitiveListNode VmItemNode.h
 /// @brief プリミティブのリストを表すノード
 //////////////////////////////////////////////////////////////////////

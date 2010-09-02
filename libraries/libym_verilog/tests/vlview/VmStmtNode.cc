@@ -27,26 +27,22 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief ProcessListNode を追加する．
-// @param[in] vl_mgr VlMgr
 // @param[in] process_list プロセスのリスト
 void
-VmNode::add_processlist(const VlMgr& vl_mgr,
-			const vector<const VlProcess*>& process_list) const
+VmNode1::add_processlist(const vector<const VlProcess*>& process_list) const
 {
-  add_child( new VmProcessListNode(vl_mgr, process_list) );
+  add_child( new VmProcessListNode(vl_mgr(), process_list) );
 }
 
 // @brief StmtNodeを追加する．
-// @param[in] vl_mgr VlMgr
 // @param[in] label ラベル
 // @param[in] stmt ステートメント
 void
-VmNode::add_stmt(const VlMgr& vl_mgr,
-		 const QString& label,
-		 const VlStmt* stmt) const
+VmNode1::add_stmt(const QString& label,
+		  const VlStmt* stmt) const
 {
   assert_cond( stmt != NULL, __FILE__, __LINE__);
-  add_child( new VmStmtNode(vl_mgr, label, stmt) );
+  add_child( new VmStmtNode(vl_mgr(), label, stmt) );
 }
 
 
@@ -166,7 +162,7 @@ void
 VmProcessNode::expand() const
 {
   add_str("vpiModule", mProcess->parent()->parent_module()->full_name());
-  add_stmt(vl_mgr(), "vpiStmt", mProcess->stmt());
+  add_stmt("vpiStmt", mProcess->stmt());
 }
 
 
@@ -231,7 +227,7 @@ VmStmtListNode::expand() const
 {
   ymuint n = mStmt->child_stmt_num();
   for (ymuint i = 0; i < n; ++ i) {
-    add_stmt(vl_mgr(), "vpiStmt", mStmt->child_stmt(i));
+    add_stmt("vpiStmt", mStmt->child_stmt(i));
   }
 }
 
@@ -322,7 +318,7 @@ VmStmtNode::expand() const
       const VlNamedObj* scope = mStmt->scope();
       assert_cond( scope, __FILE__, __LINE__);
       add_str("vpiFullName", scope->full_name());
-      //put_scope_sub(scope);
+      add_scope_item(scope);
     }
     // わざと次に続く
   case kVpiBegin:
@@ -347,29 +343,29 @@ VmStmtNode::expand() const
   case kVpiRepeat:
   case kVpiWait:
     add_expr("vpiCondition", mStmt->expr());
-    add_stmt(vl_mgr(), "vpiStmt", mStmt->body_stmt());
+    add_stmt("vpiStmt", mStmt->body_stmt());
     break;
 
   case kVpiFor:
-    add_stmt(vl_mgr(), "vpiForInitStmt", mStmt->init_stmt());
+    add_stmt("vpiForInitStmt", mStmt->init_stmt());
     add_expr("vpiCondition", mStmt->expr());
-    add_stmt(vl_mgr(), "vpiForIncStmt", mStmt->inc_stmt());
-    add_stmt(vl_mgr(), "vpiStmt", mStmt->body_stmt());
+    add_stmt("vpiForIncStmt", mStmt->inc_stmt());
+    add_stmt("vpiStmt", mStmt->body_stmt());
     break;
 
   case kVpiForever:
-    add_stmt(vl_mgr(), "vpiStmt", mStmt->body_stmt());
+    add_stmt("vpiStmt", mStmt->body_stmt());
     break;
 
   case kVpiIf:
     add_expr("vpiCondition", mStmt->expr());
-    add_stmt(vl_mgr(), "vpiStmt", mStmt->body_stmt());
+    add_stmt("vpiStmt", mStmt->body_stmt());
     break;
 
   case kVpiIfElse:
     add_expr("vpiCondition", mStmt->expr());
-    add_stmt(vl_mgr(), "vpiStmt", mStmt->body_stmt());
-    add_stmt(vl_mgr(), "vpiElseStmt", mStmt->else_stmt());
+    add_stmt("vpiStmt", mStmt->body_stmt());
+    add_stmt("vpiElseStmt", mStmt->else_stmt());
     break;
 
   case kVpiCase:
@@ -418,7 +414,7 @@ VmStmtNode::expand() const
   case kVpiDelayControl:
   case kVpiEventControl:
     add_child( new VmControlNode(mStmt->control()) );
-    add_stmt(vl_mgr(), "vpiStmt", mStmt->body_stmt());
+    add_stmt("vpiStmt", mStmt->body_stmt());
     break;
 
   default:
@@ -607,7 +603,7 @@ VmCaseItemNode::expand() const
       add_expr("vpiExpr", mCaseItem->expr(i));
     }
   }
-  add_stmt(vl_mgr(), "vpiBody", mCaseItem->body_stmt());
+  add_stmt("vpiBody", mCaseItem->body_stmt());
 }
 
 
