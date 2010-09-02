@@ -500,8 +500,8 @@ Parser::flush_declitem_list(PtrList<PtiDeclHead, PtDeclHead>& head_list)
 void
 Parser::init_tf()
 {
-  mParamHeadListStack.push_back(mCurParamHeadList);
-  mLparamHeadListStack.push_back(mCurLparamHeadList);
+  push_iohead_list();
+  push_paramhead_list();
   push_declhead_list();
   push_item_list();
   
@@ -524,12 +524,8 @@ Parser::init_tf()
 void
 Parser::end_tf()
 {
-  mCurParamHeadList = mParamHeadListStack.back();
-  mParamHeadListStack.pop_back();
-
-  mCurLparamHeadList = mLparamHeadListStack.back();
-  mLparamHeadListStack.pop_back();
-  
+  pop_iohead_list();
+  pop_paramhead_list();
   pop_declhead_list();
   pop_item_list();
 }

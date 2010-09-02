@@ -2446,6 +2446,22 @@ private:
   void
   delete_item_list(PtItemList* list);
 
+  /// @brief 現在の iohead リストをスタックに積む．
+  void
+  push_iohead_list();
+
+  /// @brief スタックの末尾を iohead リストに戻す．
+  void
+  pop_iohead_list();
+  
+  /// @brief 現在の paramhead リストをスタックに積む．
+  void
+  push_paramhead_list();
+
+  // @brief スタックの末尾を paramhead リストに戻す．
+  void
+  pop_paramhead_list();
+  
   /// @brief 現在の declhead リストをスタックに積む．
   void
   push_declhead_list();
@@ -2591,6 +2607,9 @@ public:
   //////////////////////////////////////////////////////////////////////
   // mCurXXXList のスタック
   //////////////////////////////////////////////////////////////////////
+
+  // IO 宣言ヘッダリストのスタック
+  vector<PtrList<PtiIOHead, PtIOHead>*> mIOHeadListStack;
   
   // parameter 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mParamHeadListStack;
@@ -2775,6 +2794,44 @@ void
 Parser::delete_item_list(PtItemList* list)
 {
   delete list;
+}
+
+// @brief 現在の iohead リストをスタックに積む．
+inline
+void
+Parser::push_iohead_list()
+{
+  mIOHeadListStack.push_back(mCurIOHeadList);
+}
+
+// @brief スタックの末尾を iohead リストに戻す．
+inline
+void
+Parser::pop_iohead_list()
+{
+  mCurIOHeadList = mIOHeadListStack.back();
+  mIOHeadListStack.pop_back();
+}
+
+// @brief 現在の paramhead リストをスタックに積む．
+inline
+void
+Parser::push_paramhead_list()
+{
+  mParamHeadListStack.push_back(mCurParamHeadList);
+  mLparamHeadListStack.push_back(mCurLparamHeadList);
+}
+
+// @brief スタックの末尾を paramhead リストに戻す．
+inline
+void
+Parser::pop_paramhead_list()
+{
+  mCurParamHeadList = mParamHeadListStack.back();
+  mParamHeadListStack.pop_back();
+
+  mCurLparamHeadList = mLparamHeadListStack.back();
+  mLparamHeadListStack.pop_back();
 }
 
 // @brief 現在の declhead リストをスタックに積む．
