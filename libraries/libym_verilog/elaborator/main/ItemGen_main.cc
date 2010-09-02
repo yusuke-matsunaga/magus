@@ -86,11 +86,8 @@ ItemGen::phase1_item(const VlNamedObj* parent,
       break;
     
     case kPtItem_Task:
-      phase1_task(parent, pt_item);
-      break;
-
     case kPtItem_Func:
-      phase1_function(parent, pt_item);
+      phase1_tf(parent, pt_item);
       break;
 
     case kPtItem_GateInst:

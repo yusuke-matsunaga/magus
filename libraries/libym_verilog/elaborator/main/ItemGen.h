@@ -86,19 +86,12 @@ private:
   instantiate_process(const VlNamedObj* parent,
 		      const PtItem* pt_item);
   
-  /// @brief task の生成を行う．
+  /// @brief task/function の生成を行う．
   /// @param[in] parent 親のスコープ
-  /// @param[in] pt_task タスク定義
+  /// @param[in] pt_tf タスク/関数定義
   void
-  phase1_task(const VlNamedObj* parent,
-	      const PtItem* pt_task);
-
-  /// @brief function の生成を行う．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_function パース木の関数定義
-  void
-  phase1_function(const VlNamedObj* parent,
-		  const PtItem* pt_function);
+  phase1_tf(const VlNamedObj* parent,
+	      const PtItem* pt_tf);
 
   /// @param[in] task/function 内の宣言要素の生成を行う．
   /// @param[in] task タスク本体
