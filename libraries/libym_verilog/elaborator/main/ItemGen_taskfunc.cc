@@ -549,7 +549,8 @@ ItemGen::instantiate_iodecl(ElbTask* task,
 	assert_cond( pt_init == NULL, __FILE__, __LINE__);
 	
 	ElbDeclHead* head = factory().new_DeclHead(task, pt_head, aux_type,
-						   left, right);
+						   left, right,
+						   left_val, right_val);
 	decl = factory().new_Decl(head, pt_item);
 	int tag = 0;
 	switch ( aux_type ) {
@@ -736,7 +737,8 @@ ItemGen::instantiate_iodecl(ElbFunction* func,
 	assert_cond( pt_init == NULL, __FILE__, __LINE__);
 	
 	ElbDeclHead* head = factory().new_DeclHead(func, pt_head, aux_type,
-						   left, right);
+						   left, right,
+						   left_val, right_val);
 	decl = factory().new_Decl(head, pt_item);
 	int tag = 0;
 	switch ( aux_type ) {
