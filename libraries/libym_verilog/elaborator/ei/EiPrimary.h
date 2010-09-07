@@ -424,10 +424,7 @@ protected:
   
   /// @brief 配列を得る．
   ElbDeclArray*
-  decl_array() const
-  {
-    return mObj;
-  }
+  decl_array() const;
   
   /// @brief インデックス部分を decompile する．
   string
@@ -713,8 +710,21 @@ private:
 
   // 対象の宣言要素
   ElbPrimitive* mObj;
-  
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 配列を得る．
+inline
+ElbDeclArray*
+EiArrayElemPrimary::decl_array() const
+{
+  return mObj;
+}
 
 END_NAMESPACE_YM_VERILOG
 
