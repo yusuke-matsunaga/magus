@@ -12,13 +12,10 @@
 
 
 #include "ym_verilog/vl/VlNamedObj.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class VlExpr;
-class VlPort;
-class VlIODecl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VlModuleArray VlModule.h <ym_verilog/vl/VlModule.h>

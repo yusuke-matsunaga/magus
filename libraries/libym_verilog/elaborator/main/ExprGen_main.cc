@@ -57,7 +57,7 @@ ExprGen::instantiate_expr(const VlNamedObj* parent,
 	  pt_expr->opr_type() == kVpiNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
-  
+
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
     return instantiate_opr(parent, env, pt_expr);
@@ -131,7 +131,7 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
 	}
 	ElbExpr* expr = factory().new_UnaryOp(pt_expr,
 					      pt_expr->opr_type(), opr0);
-  
+
 	// attribute instance の生成
 	//instantiate_attribute(pt_expr->attr_top(), false, expr);
 	
@@ -150,7 +150,7 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
       ElbEventEnv env1(env);
       return instantiate_primary(parent, env1, pt_expr);
     }
-    
+
   case kPtConstExpr:
     // イベント式の根元には定数は使えない．
     error_illegal_constant_in_event_expression(pt_expr);
@@ -191,7 +191,7 @@ ExprGen::instantiate_arg(const VlNamedObj* parent,
 	  pt_expr->opr_type() == kVpiNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
-  
+
   if ( pt_expr->type() == kPtPrimaryExpr ) {
     // システム関数の引数用の特別処理はここだけ．
     ElbSystemTfArgEnv env1(env);
@@ -227,10 +227,10 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
       }
       ElbExpr* expr = factory().new_ConcatOp(pt_expr, opr_size, opr_list);
       expr->set_selfsize();
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_expr->attr_top(), false, expr);
-	
+
       return expr;
     }
     // それ以外の演算子はエラー
@@ -244,15 +244,15 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
   case kPtConstExpr:
     error_illegal_constant_in_lhs(pt_expr);
     return NULL;
-    
+
   case kPtFuncCallExpr:
     error_illegal_funccall_in_lhs(pt_expr);
     return NULL;
-    
+
   case kPtSysFuncCallExpr:
     error_illegal_sysfunccall_in_lhs(pt_expr);
     return NULL;
-    
+
   default:
     break;
   }
@@ -272,21 +272,19 @@ ExprGen::evaluate_expr_int(const VlNamedObj* parent,
 			   const PtExpr* pt_expr,
 			   int& value)
 {
-  ElbExpr* expr = instantiate_constant_expr(parent, pt_expr);
-  if ( !expr ) {
-    return false;
-  }
-  bool stat = expr->eval_int(value);
-  if ( !stat ) {
-    ostringstream buf;
-    buf << expr->decompile() << ": Integer value required.";
+  ElbValue val = evaluate_expr(parent, pt_expr);
+  val.to_int();
+  if ( val.is_error() ) {
     put_msg(__FILE__, __LINE__,
-	    expr->file_region(),
+	    pt_expr->file_region(),
 	    kMsgError,
 	    "ELAB",
-	    buf.str());
+	    "Integer value required.");
+    return false;
   }
-  return stat;
+
+  value = val.int_value();
+  return true;
 }
 
 // @brief PtExpr を評価し bool 値を返す．
@@ -299,12 +297,16 @@ ExprGen::evaluate_expr_bool(const VlNamedObj* parent,
 			    const PtExpr* pt_expr,
 			    bool& value)
 {
-  ElbExpr* expr = instantiate_constant_expr(parent, pt_expr);
-  if ( !expr ) {
-    return false;
+  ElbValue val = evaluate_expr(parent, pt_expr);
+  val.to_logic();
+  assert_cond( !val.is_error(), __FILE__, __LINE__);
+
+  if ( val.scalar_value() == kVpiScalar1 ) {
+    value = true;
   }
-  value = (expr->eval_scalar() == kVpiScalar1);
-  // TODO: expr の開放
+  else {
+    value = false;
+  }
   return true;
 }
 
@@ -318,13 +320,112 @@ ExprGen::evaluate_expr_bitvector(const VlNamedObj* parent,
 				 const PtExpr* pt_expr,
 				 BitVector& value)
 {
-  ElbExpr* expr = instantiate_constant_expr(parent, pt_expr);
-  if ( !expr ) {
+  ElbValue val = evaluate_expr(parent, pt_expr);
+  val.to_bitvector();
+  if ( val.is_error() ) {
+    put_msg(__FILE__, __LINE__,
+	    pt_expr->file_region(),
+	    kMsgError,
+	    "ELAB",
+	    "Bit-vector value required.");
     return false;
   }
-  expr->eval_bitvector(value);
-  // TODO: expr の開放
+
+  value = val.bitvector_value();
   return true;
+}
+
+// @brief 式の値を評価する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+ElbValue
+ExprGen::evaluate_expr(const VlNamedObj* parent,
+		       const PtExpr* pt_expr)
+{
+  // '(' expression ')' の時の対応
+  while ( pt_expr->type() == kPtOprExpr &&
+	  pt_expr->opr_type() == kVpiNullOp ) {
+    pt_expr = pt_expr->operand(0);
+  }
+
+  switch ( pt_expr->type() ) {
+  case kPtOprExpr:
+    return evaluate_opr(parent, pt_expr);
+
+  case kPtConstExpr:
+    return evaluate_const(parent, pt_expr);
+
+  case kPtFuncCallExpr:
+    return evaluate_funccall(parent, pt_expr);
+
+  case kPtSysFuncCallExpr:
+    error_illegal_sysfunccall_in_ce(pt_expr);
+    break;
+
+  case kPtPrimaryExpr:
+    return evaluate_primary(parent, pt_expr);
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  return ElbValue();
+}
+
+// @brief 定数に対して式の値を評価する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+ElbValue
+ExprGen::evaluate_const(const VlNamedObj* parent,
+			const PtExpr* pt_expr)
+{
+  ymuint32 size = pt_expr->const_size();
+  bool is_signed = false;
+  ymuint32 base = 0;
+  switch ( pt_expr->const_type() ) {
+  case kVpiIntConst:
+    if ( pt_expr->const_str() == NULL ) {
+      return ElbValue(static_cast<int>(pt_expr->const_uint()));
+    }
+    break;
+
+  case kVpiRealConst:
+    return ElbValue(pt_expr->const_real());
+
+  case kVpiSignedBinaryConst:
+    is_signed = true;
+  case kVpiBinaryConst:
+    base = 2;
+    break;
+
+  case kVpiSignedOctConst:
+    is_signed = true;
+  case kVpiOctConst:
+    base = 8;
+    break;
+
+  case kVpiSignedDecConst:
+    is_signed = true;
+  case kVpiDecConst:
+    base = 10;
+    break;
+
+  case kVpiSignedHexConst:
+    is_signed = true;
+  case kVpiHexConst:
+    base = 16;
+    break;
+
+  case kVpiStringConst:
+    return ElbValue(BitVector(pt_expr->const_str()));
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+
+  // ここに来たということはビットベクタ型
+  return ElbValue(BitVector(size, is_signed, base, pt_expr->const_str()));
 }
 
 // @brief PtDelay から ElbExpr を生成する．

@@ -12,13 +12,10 @@
 
 
 #include "ym_verilog/vl/VlNamedObj.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class VlDelay;
-class VlExpr;
-class VlRange;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VlDecl VlDecl.h <ym_verilog/vl/VlDecl.h>
@@ -38,13 +35,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の派生クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
   tVpiValueType
   value_type() const = 0;
-  
+
   /// @brief 定数値を持つ型のときに true を返す．
   virtual
   bool
@@ -56,7 +53,7 @@ public:
   virtual
   bool
   is_signed() const = 0;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲指定を持つとき
   /// @retval NULL 範囲指定を持たないとき
@@ -70,14 +67,14 @@ public:
   virtual
   const VlExpr*
   right_range() const = 0;
-  
+
   /// @brief MSB の値を返す．
   /// @retval 範囲のMSBの値 範囲指定を持つとき
   /// @retval -1 範囲指定を持たないとき
   virtual
   int
   left_range_const() const = 0;
-  
+
   /// @brief LSB の値を返す．
   /// @retval 範囲のLSBの値 範囲指定を持つとき
   /// @retval -1 範囲指定を持たないとき
@@ -104,7 +101,7 @@ public:
   virtual
   tVpiVarType
   data_type() const = 0;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -147,7 +144,7 @@ public:
   virtual
   const VlDelay*
   delay() const = 0;
-  
+
   /// @brief 初期値の取得
   /// @retval 初期値
   /// @retval NULL 設定がない場合
@@ -164,7 +161,7 @@ public:
   virtual
   ymuint32
   dimension() const = 0;
-  
+
   /// @brief 範囲の取得
   /// @param[in] pos 位置 (0 <= pos < dimension_list_size())
   virtual

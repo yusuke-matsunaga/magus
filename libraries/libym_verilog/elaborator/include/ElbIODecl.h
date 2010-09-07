@@ -44,14 +44,14 @@ public:
   ElbModule*
   module() const = 0;
 
-  /// @brief 親の task の取得
+  /// @brief 親のタスクの取得
   virtual
-  ElbTask*
+  ElbTaskFunc*
   task() const = 0;
 
-  /// @brief 親の function の取得
+  /// @brief 親の関数の取得
   virtual
-  ElbFunction*
+  ElbTaskFunc*
   function() const = 0;
 
 };
@@ -65,20 +65,17 @@ class ElbIODecl :
   public VlIODecl
 {
 protected:
-  
-  /// @brief コンストラクタ
-  ElbIODecl() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbIODecl() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbIODecl の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 対応する ElbDecl を返す．
   virtual
   ElbDecl*

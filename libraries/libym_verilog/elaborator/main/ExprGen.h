@@ -14,6 +14,7 @@
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ElbProxy.h"
+#include "ElbValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -224,13 +225,14 @@ private:
   instantiate_sysfunccall(const VlNamedObj* parent,
 			  const ElbEnv& env,
 			  const PtExpr* pt_expr);
-  
+
   /// @brief 単体の NamedEvent 用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[in] decl 宣言要素 (NamedEvent であることを期待している)
   /// @return 生成された式を返す．
   /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
+  /// @note decl は NamedEvent であることを期待している．
   ElbExpr*
   instantiate_namedevent_primary1(const VlNamedObj* parent,
 				  const PtExpr* pt_expr,
@@ -239,9 +241,10 @@ private:
   /// @brief 配列要素の NamedEvent 用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 配列型の宣言要素 (NamedEventArray であることを期待している)
+  /// @param[in] decl 配列型の宣言要素
   /// @return 生成された式を返す．
   /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
+  /// @note decl は NamedEventArray であることを期待している．
   ElbExpr*
   instantiate_namedevent_primary2(const VlNamedObj* parent,
 				  const PtExpr* pt_expr,
@@ -281,7 +284,7 @@ private:
   instantiate_normal_primary(const VlNamedObj* parent,
 			     const ElbEnv& env,
 			     const PtExpr* pt_expr);
-  
+
   /// @brief 単体の宣言要素用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] env 生成時の環境
@@ -294,7 +297,7 @@ private:
 			   const ElbEnv& env,
 			   const PtExpr* pt_expr,
 			   ElbDecl* decl);
-  
+
   /// @brief 配列要素用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] env 生成時の環境
@@ -307,7 +310,7 @@ private:
 				const ElbEnv& env,
 				const PtExpr* pt_expr,
 				ElbDeclArray* decl_array);
-  
+
   /// @brief parameter 宣言用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] env 生成時の環境
@@ -354,7 +357,42 @@ private:
   ElbExpr*
   instantiate_genvar(const PtExpr* pt_expr,
 		     int val);
-  
+
+  /// @brief 式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbValue
+  evaluate_expr(const VlNamedObj* parent,
+		const PtExpr* pt_expr);
+
+  /// @brief 演算子に対して式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbValue
+  evaluate_opr(const VlNamedObj* parent,
+	       const PtExpr* pt_expr);
+
+  /// @brief 定数に対して式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbValue
+  evaluate_const(const VlNamedObj* parent,
+		 const PtExpr* pt_expr);
+
+  /// @brief 関数呼び出しに対して式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbValue
+  evaluate_funccall(const VlNamedObj* parent,
+		    const PtExpr* pt_expr);
+
+  /// @brief プライマリに対して式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbValue
+  evaluate_primary(const VlNamedObj* parent,
+		   const PtExpr* pt_expr);
+
   /// @brief 添字の部分を実体化する．(単体のオブジェクト用)
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -372,7 +410,7 @@ private:
 	   bool& has_bit_select,
 	   ElbExpr*& index1,
 	   ElbExpr*& index2);
-  
+
   /// @brief 添字の部分を実体化する．(配列要素のオブジェクト用)
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -443,12 +481,12 @@ private:
   /// @param[in] pt_expr 式を表すパース木
   void
   error_illegal_sysfunccall_in_lhs(const PtExpr* pt_expr);
-  
+
   /// @brief 通常の式中に edge descriptor
   /// @param[in] pt_expr 式を表すパース木
   void
   error_illegal_edge_descriptor(const PtExpr* pt_expr);
-  
+
   /// @brief real 型のオペランドをとれない
   /// @param[in] pt_expr 式を表すパース木
   void
@@ -488,17 +526,17 @@ private:
   /// @param[in] pt_expr 式を表すパース木
   void
   error_illegal_argument_type(const PtExpr* pt_expr);
-  
+
   /// @brief オブジェクトが存在しない
   /// @param[in] pt_expr 式を表すパース木
   void
   error_not_found(const PtExpr* pt_expr);
-  
+
   /// @brief オブジェクトの型が不適切
   /// @param[in] pt_expr 式を表すパース木
   void
   error_illegal_object(const PtExpr* pt_expr);
-  
+
   /// @brief オブジェクトの型が constant function 用として不適切
   /// @param[in] pt_expr 式を表すパース木
   void
@@ -513,12 +551,12 @@ private:
   /// @param[in] pt_expr 式を表すパース木
   void
   error_hname_in_cf(const PtExpr* pt_expr);
-  
+
   /// @brief オブジェクトが parameter でなかった
   /// @param[in] pt_expr 式を表すパース木
   void
   error_not_a_parameter(const PtExpr* pt_expr);
-  
+
   /// @brief オブジェクトが named-event でなかった
   /// @param[in] pt_expr 式を表すパース木
   void
@@ -543,7 +581,7 @@ private:
   /// @param[in] pt_expr 式を表すパース木
   void
   error_array_in_force(const PtExpr* pt_expr);
-  
+
   /// @brief 配列の次元が合わない
   /// @param[in] pt_expr 式を表すパース木
   void
@@ -571,7 +609,7 @@ private:
   error_common(const PtExpr* pt_expr,
 	       const char* label,
 	       const char* msg);
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

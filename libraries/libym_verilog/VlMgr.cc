@@ -270,7 +270,7 @@ VlMgr::find_primarray_list(const VlNamedObj* parent,
 // @retval false 該当する要素がなかった．
 bool
 VlMgr::find_task_list(const VlNamedObj* parent,
-		      vector<const VlTask*>& task_list) const
+		      vector<const VlTaskFunc*>& task_list) const
 {
   return mElbMgr->find_task_list(parent, task_list);
 }
@@ -282,7 +282,7 @@ VlMgr::find_task_list(const VlNamedObj* parent,
 // @retval false 該当する要素がなかった．
 bool
 VlMgr::find_function_list(const VlNamedObj* parent,
-			  vector<const VlFunction*>& func_list) const
+			  vector<const VlTaskFunc*>& func_list) const
 {
   return mElbMgr->find_function_list(parent, func_list);
 }

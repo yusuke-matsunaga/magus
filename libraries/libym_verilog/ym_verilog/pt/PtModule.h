@@ -30,13 +30,13 @@ public:
   /// @brief 仮想デストラクタ
   virtual
   ~PtModule() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtModule の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-    
+
   /// @brief macromodule 情報の取得
   /// @retval true macromodule の場合
   /// @retval false module の場合
@@ -50,45 +50,45 @@ public:
   virtual
   bool
   is_cell() const = 0;
-    
+
   /// @brief protect 情報の取得
   /// @return プロテクトされていたら true を返す．
   virtual
   bool
   is_protected() const = 0;
-  
+
   /// @brief time unit の取得
   /// @return 時間の単位を表す 2 〜 -15 の整数\n
   /// もしくは未定義を表す -16
   virtual
   int
   time_unit() const = 0;
-  
+
   /// @brief time precision の取得
   /// @return 時間の精度を表す 2 〜 -15 の整数\n
   /// もしくは未定義を表す -16
   virtual
   int
   time_precision() const = 0;
-  
+
   /// @brief default net type の取得
   /// @return default net type
   virtual
   tVpiNetType
   nettype() const = 0;
-  
+
   /// @brief unconnected drive の取得
   /// @return unconnected drive
   virtual
   tVpiUnconnDrive
   unconn_drive() const = 0;
-  
+
   /// @brief default delay mode の取得
   /// @return default delay mode
   virtual
   tVpiDefDelayMode
   delay_mode() const = 0;
-  
+
   /// @brief default decay time の取得
   /// @return default decay time
   virtual
@@ -100,31 +100,31 @@ public:
   virtual
   bool
   portfaults() const = 0;
-  
+
   /// @brief suppress_faults 情報の取得
   /// @return true で suppress_faults が効いていることを表す．
   virtual
   bool
   suppress_faults() const = 0;
-  
+
   /// @brief config 情報の取得
   /// @return config 情報
   virtual
   const string&
   config() const = 0;
-  
+
   /// @brief library 情報の取得
   /// @return library 情報
   virtual
   const string&
   library() const = 0;
-  
+
   /// @brief cell 情報の取得
   /// @return cell 情報
   virtual
   const string&
   cell() const = 0;
-  
+
   /// @brief パラメータポート宣言配列の取得
   virtual
   PtDeclHeadArray
@@ -134,18 +134,18 @@ public:
   virtual
   ymuint32
   port_num() const = 0;
-  
+
   /// @brief ポートを取り出す．
   /// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
   virtual
   const PtPort*
   port(ymuint32 pos) const = 0;
-  
+
   /// @brief 入出力宣言ヘッダ配列の取得
   virtual
   PtIOHeadArray
   iohead_array() const = 0;
-  
+
   /// @brief 入出力宣言の要素数の取得
   /// @note 個々のヘッダが持つ要素数の総和を計算する．
   virtual
@@ -156,17 +156,17 @@ public:
   virtual
   PtDeclHeadArray
   paramhead_array() const = 0;
-  
+
   /// @brief localparam 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   localparamhead_array() const = 0;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const = 0;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -184,7 +184,7 @@ public:
   virtual
   void
   clear_topmodule() const = 0;
-  
+
   /// @brief top module のチェック
   /// @return top module の場合に true を返す．
   virtual

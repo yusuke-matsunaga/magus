@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief function を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_item パース木の定義
@@ -35,8 +35,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] right 範囲の LSB の式
 // @param[in] left_val 範囲の MSB の値
 // @param[in] right_val 範囲の LSB の値
-// @note 範囲なしの時には left と right に NULL を入れる．
-ElbFunction*
+ElbTaskFunc*
 EiFactory::new_Function(const VlNamedObj* parent,
 			const PtItem* pt_item,
 			ElbExpr* left,
@@ -48,24 +47,36 @@ EiFactory::new_Function(const VlNamedObj* parent,
   ymuint32 io_num = pt_item->ioitem_num();
   void* q = mAlloc.get_memory(sizeof(EiIODecl) * io_num);
   EiIODecl* io_array = new (q) EiIODecl[io_num];
-  
-  EiFunction* func = NULL;
-  if ( left && right ) {
-    void* p = mAlloc.get_memory(sizeof(EiFunctionV));
-    func = new (p) EiFunctionV(parent, pt_item, io_num, io_array,
-			       left, right, left_val, right_val);
-  }
-  else {
-    void* p = mAlloc.get_memory(sizeof(EiFunction));
-    func = new (p) EiFunction(parent, pt_item, io_num, io_array);
-  }
+
+  void* p = mAlloc.get_memory(sizeof(EiFunctionV));
+  EiFunction* func = new (p) EiFunctionV(parent, pt_item, io_num, io_array,
+					 left, right, left_val, right_val);
+
   return func;
 }
-  
+
+// @brief function を生成する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_item パース木の定義
+ElbTaskFunc*
+EiFactory::new_Function(const VlNamedObj* parent,
+			const PtItem* pt_item)
+{
+  // IO数を数え配列を初期化する．
+  ymuint32 io_num = pt_item->ioitem_num();
+  void* q = mAlloc.get_memory(sizeof(EiIODecl) * io_num);
+  EiIODecl* io_array = new (q) EiIODecl[io_num];
+
+  void* p = mAlloc.get_memory(sizeof(EiFunction));
+  EiFunction* func = new (p) EiFunction(parent, pt_item, io_num, io_array);
+
+  return func;
+}
+
 // @brief task を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_item パース木の定義
-ElbTask*
+ElbTaskFunc*
 EiFactory::new_Task(const VlNamedObj* parent,
 		    const PtItem* pt_item)
 {
@@ -79,7 +90,7 @@ EiFactory::new_Task(const VlNamedObj* parent,
   return task;
 }
 
-#if 0
+
 //////////////////////////////////////////////////////////////////////
 // クラス EiTaskFunc
 //////////////////////////////////////////////////////////////////////
@@ -127,67 +138,6 @@ EiTaskFunc::name() const
   return mPtItem->name();
 }
 
-// @brief function type を返す．
-// @note タスクの場合は意味を持たない．
-tVpiFuncType
-EiTaskFunc::func_type() const
-{
-  switch ( mPtItem->data_type() ) {
-  case kVpiVarNone:
-    return kVpiSizedFunc;
-
-  case kVpiVarInteger:
-    return kVpiIntFunc;
-
-  case kVpiVarReal:
-    return kVpiRealFunc;
-
-  case kVpiVarTime:
-    return kVpiTimeFunc;
-
-  case kVpiVarRealtime:
-    return kVpiRealtimeFunc;
-
-  default:
-    break;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return kVpiIntFunc;
-}
-
-// @brief 出力のビット幅を返す．
-ymuint32
-EiTaskFunc::bit_size() const
-{
-  switch ( mPtItem->data_type() ) {
-  case kVpiVarNone:
-    return 1;
-
-  case kVpiVarInteger:
-    return kVpiSizeInteger;
-
-  case kVpiVarReal:
-  case kVpiVarRealtime:
-    return kVpiSizeReal;
-
-  case kVpiVarTime:
-    return kVpiSizeTime;
-
-  default:
-    break;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 0;
-}
-
-// @brief 符号付きの時 true を返す．
-// @note タスクの場合は意味を持たない．
-bool
-EiTaskFunc::is_signed() const
-{
-  return mPtItem->is_signed();
-}
-
 // @brief automatic 宣言されていたら true を返す．
 bool
 EiTaskFunc::automatic() const
@@ -195,22 +145,6 @@ EiTaskFunc::automatic() const
   return mPtItem->automatic();
 }
 
-// @brief 範囲のMSBを返す．
-// @note このクラスでは NULL を返す．
-const VlExpr*
-EiTaskFunc::left_range() const
-{
-  return NULL;
-}
-  
-// @brief 範囲のLSBを返す．
-// @note このクラスでは NULL を返す．
-const VlExpr*
-EiTaskFunc::right_range() const
-{
-  return NULL;
-}
-  
 // @brief 入出力数を得る．
 ymuint32
 EiTaskFunc::io_num() const
@@ -269,7 +203,7 @@ EiTaskFunc::_stmt() const
 {
   return mStmt;
 }
-#endif
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiTask
@@ -284,11 +218,7 @@ EiTask::EiTask(const VlNamedObj* parent,
 	       const PtItem* pt_item,
 	       ymuint32 io_num,
 	       EiIODecl* io_array) :
-  mParent(parent),
-  mPtItem(pt_item),
-  mIODeclNum(io_num),
-  mIODeclList(io_array),
-  mStmt(NULL)
+  EiTaskFunc(parent, pt_item, io_num, io_array)
 {
 }
 
@@ -304,91 +234,138 @@ EiTask::type() const
   return kVpiTask;
 }
 
-// @brief ファイル位置の取得
-FileRegion
-EiTask::file_region() const
+// @brief function type を返す．
+tVpiFuncType
+EiTask::func_type() const
 {
-  return mPtItem->file_region();
+  return kVpiIntFunc;
 }
 
-// @brief このオブジェクトの属しているスコープを返す．
-const VlNamedObj*
-EiTask::parent() const
-{
-  return mParent;
-}
-  
-// @brief 名前の取得
-const char*
-EiTask::name() const
-{
-  return mPtItem->name();
-}
-
-// @brief automatic 宣言されていたら true を返す．
-bool
-EiTask::automatic() const
-{
-  return mPtItem->automatic();
-}
-  
-// @brief 入出力数を得る．
+// @brief 出力のビット幅を返す．
 ymuint32
-EiTask::io_num() const
+EiTask::bit_size() const
 {
-  return mIODeclNum;
+  return 0;
 }
 
-// @brief 入出力を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
-const VlIODecl*
-EiTask::io(ymuint32 pos) const
+// @brief 符号付きの時 true を返す．
+bool
+EiTask::is_signed() const
 {
-  return &mIODeclList[pos];
-}
-  
-// @brief 本体のステートメントを得る．
-const VlStmt*
-EiTask::stmt() const
-{
-  return mStmt;
+  return false;
 }
 
-// @brief 入出力の初期設定を行う．
-// @param[in] pos 位置番号
-// @param[in] pos 位置番号
-// @param[in] head ヘッダ
-// @param[in] pt_item パース木のIO宣言要素
-// @param[in] decl 対応する宣言要素
+// @brief 範囲のMSBを返す．
+const VlExpr*
+EiTask::left_range() const
+{
+  return NULL;
+}
+
+// @brief 範囲のLSBを返す．
+const VlExpr*
+EiTask::right_range() const
+{
+  return NULL;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @retval 範囲のMSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+// @note このクラスでは -1 を返す．
+int
+EiTask::left_range_const() const
+{
+  return -1;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @retval 範囲のLSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+// @note このクラスでは -1 を返す．
+int
+EiTask::right_range_const() const
+{
+  return -1;
+}
+
+// @brief 出力変数をセットする．
+// @param[in] ovar 出力変数
 void
-EiTask::init_iodecl(ymuint32 pos,
-		    ElbIOHead* head,
-		    const PtIOItem* pt_item,
-		    ElbDecl* decl)
+EiTask::set_ovar(ElbDecl* ovar)
 {
-  mIODeclList[pos].init(head, pt_item, decl);
+  assert_not_reached(__FILE__, __LINE__);
 }
 
-// @brief 本体のステートメントをセットする．
+// @brief constant function の時に true を返す．
+bool
+EiTask::is_constant_function() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief スカラー値を返す．
+// @param[in] arg_list 引数のリスト
+// @note constant function の場合のみ意味を持つ．
+tVpiScalarVal
+EiTask::eval_scalar(const vector<ElbExpr*>& arg_list) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return kVpiScalar0;
+}
+
+// @brief 論理値を返す．
+// @param[in] arg_list 引数のリスト
+// @note constant function の場合のみ意味を持つ．
+tVpiScalarVal
+EiTask::eval_logic(const vector<ElbExpr*>& arg_list) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return kVpiScalar0;
+}
+
+// @brief real 型の値を返す．
+// @param[in] arg_list 引数のリスト
+// @note constant function の場合のみ意味を持つ．
+double
+EiTask::eval_real(const vector<ElbExpr*>& arg_list) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0.0;
+}
+
+// @brief bitvector 型の値を返す．
+// @param[in] arg_list 引数のリスト
+// @note constant function の場合のみ意味を持つ．
 void
-EiTask::set_stmt(ElbStmt* stmt)
+EiTask::eval_bitvector(const vector<ElbExpr*>& arg_list,
+		       BitVector& bitvector,
+		       tVpiValueType req_type) const
 {
-  mStmt = stmt;
+  assert_not_reached(__FILE__, __LINE__);
 }
 
-// @brief 入出力を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
-ElbIODecl*
-EiTask::_io(ymuint32 pos) const
+// @brief 範囲のMSBの取得
+// @retval 範囲のMSB 範囲を持つとき
+// @retval NULL 範囲を持たないとき
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiTask::_left_range() const
 {
-  return &mIODeclList[pos];
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
-  
-// @brief 本体の ElbStmt を得る．
-ElbStmt*
-EiTask::_stmt() const
+
+// @brief 範囲のLSBの取得
+// @retval 範囲のLSB 範囲を持つとき
+// @retval NULL 範囲を持たないとき
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiTask::_right_range() const
 {
-  return mStmt;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 
@@ -405,11 +382,7 @@ EiFunction::EiFunction(const VlNamedObj* parent,
 		       const PtItem* pt_item,
 		       ymuint32 io_num,
 		       EiIODecl* io_array) :
-  mParent(parent),
-  mPtItem(pt_item),
-  mIODeclNum(io_num),
-  mIODeclList(io_array),
-  mStmt(NULL)
+  EiTaskFunc(parent, pt_item, io_num, io_array)
 {
 }
 
@@ -425,32 +398,11 @@ EiFunction::type() const
   return kVpiFunction;
 }
 
-// @brief ファイル位置の取得
-FileRegion
-EiFunction::file_region() const
-{
-  return mPtItem->file_region();
-}
-
-// @brief このオブジェクトの属しているスコープを返す．
-const VlNamedObj*
-EiFunction::parent() const
-{
-  return mParent;
-}
-  
-// @brief 名前の取得
-const char*
-EiFunction::name() const
-{
-  return mPtItem->name();
-}
-
 // @brief function type を返す．
 tVpiFuncType
 EiFunction::func_type() const
 {
-  switch ( mPtItem->data_type() ) {
+  switch ( pt_item()->data_type() ) {
   case kVpiVarNone:
     return kVpiSizedFunc;
 
@@ -477,7 +429,7 @@ EiFunction::func_type() const
 ymuint32
 EiFunction::bit_size() const
 {
-  switch ( mPtItem->data_type() ) {
+  switch ( pt_item()->data_type() ) {
   case kVpiVarNone:
     return 1;
 
@@ -502,14 +454,7 @@ EiFunction::bit_size() const
 bool
 EiFunction::is_signed() const
 {
-  return mPtItem->is_signed();
-}
-
-// @brief automatic 宣言されていたら true を返す．
-bool
-EiFunction::automatic() const
-{
-  return mPtItem->automatic();
+  return pt_item()->is_signed();
 }
 
 // @brief 範囲のMSBを返す．
@@ -546,43 +491,6 @@ EiFunction::right_range_const() const
   return -1;
 }
 
-// @brief 入出力数を得る．
-ymuint32
-EiFunction::io_num() const
-{
-  return mIODeclNum;
-}
-
-// @brief 入出力を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
-const VlIODecl*
-EiFunction::io(ymuint32 pos) const
-{
-  return &mIODeclList[pos];
-}
-  
-// @brief 本体のステートメントを得る．
-const VlStmt*
-EiFunction::stmt() const
-{
-  return mStmt;
-}
-
-// @brief 入出力の初期設定を行う．
-// @param[in] pos 位置番号
-// @param[in] pos 位置番号
-// @param[in] head ヘッダ
-// @param[in] pt_item パース木のIO宣言要素
-// @param[in] decl 対応する宣言要素
-void
-EiFunction::init_iodecl(ymuint32 pos,
-			ElbIOHead* head,
-			const PtIOItem* pt_item,
-			ElbDecl* decl)
-{
-  mIODeclList[pos].init(head, pt_item, decl);
-}
-
 // @brief 出力変数をセットする．
 // @param[in] ovar 出力変数
 // @note 関数の場合のみ意味を持つ．
@@ -590,21 +498,6 @@ void
 EiFunction::set_ovar(ElbDecl* ovar)
 {
   mOvar = ovar;
-}
-
-// @brief 本体のステートメントをセットする．
-void
-EiFunction::set_stmt(ElbStmt* stmt)
-{
-  mStmt = stmt;
-}
-
-// @brief 入出力を得る．
-// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
-ElbIODecl*
-EiFunction::_io(ymuint32 pos) const
-{
-  return &mIODeclList[pos];
 }
 
 // @brief 範囲のMSBの取得
@@ -625,13 +518,6 @@ ElbExpr*
 EiFunction::_right_range() const
 {
   return NULL;
-}
-
-// @brief 本体の ElbStmt を得る．
-ElbStmt*
-EiFunction::_stmt() const
-{
-  return mStmt;
 }
 
 // @brief constant function の時に true を返す．

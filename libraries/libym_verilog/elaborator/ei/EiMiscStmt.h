@@ -228,7 +228,7 @@ private:
   EiTaskCall(const VlNamedObj* parent,
 	     ElbProcess* process,
 	     const PtStmt* pt_stmt,
-	     ElbTask* task,
+	     ElbTaskFunc* task,
 	     ymuint32 arg_num,
 	     ElbExpr** arg_array);
 
@@ -255,7 +255,7 @@ public:
 
   /// @brief task の実体を返す．
   virtual
-  const VlTask*
+  const VlTaskFunc*
   task() const;
 
   /// @brief function 中の実行を行う．
@@ -271,7 +271,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // タスク
-  ElbTask* mTask;
+  ElbTaskFunc* mTask;
 
 };
 

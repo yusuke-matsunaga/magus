@@ -43,8 +43,7 @@ class VlDefParam;
 class VlContAssign;
 
 // in VlTaskFunc.h
-class VlFunction;
-class VlTask;
+class VlTaskFunc;
 
 // in VlPrimitive.h
 class VlPrimitive;
@@ -95,8 +94,7 @@ using nsVerilog::VlIODecl;
 using nsVerilog::VlParamAssign;
 using nsVerilog::VlDefParam;
 using nsVerilog::VlContAssign;
-using nsVerilog::VlFunction;
-using nsVerilog::VlTask;
+using nsVerilog::VlTaskFunc;
 using nsVerilog::VlPrimitive;
 using nsVerilog::VlPrimArray;
 using nsVerilog::VlPrimTerm;

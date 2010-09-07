@@ -88,7 +88,7 @@ private:
   /// @param[in] arg_size 引数の数
   /// @param[in] arg_list 引数のリスト
   EiFuncCall(const PtBase* pt_obj,
-	     const ElbFunction* func,
+	     const ElbTaskFunc* func,
 	     ymuint32 arg_size,
 	     ElbExpr** arg_list);
 
@@ -131,7 +131,7 @@ public:
   /// @brief 対象の関数を返す．
   /// @note kVpiFuncCall の時，意味を持つ．
   virtual
-  const VlFunction*
+  const VlTaskFunc*
   function() const;
 
   /// @brief スカラー値を返す．
@@ -191,7 +191,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 関数
-  const ElbFunction* mFunc;
+  const ElbTaskFunc* mFunc;
 
 };
 

@@ -194,7 +194,7 @@ VlDumperImpl::put_udp_defn(const char* label,
 void
 VlDumperImpl::put_task(const char* label,
 		       const VlMgr& mgr,
-		       const VlTask* task)
+		       const VlTaskFunc* task)
 {
   VlDumpHeader x(this, label, "Task");
 
@@ -216,7 +216,7 @@ VlDumperImpl::put_task(const char* label,
 void
 VlDumperImpl::put_function(const char* label,
 			   const VlMgr& mgr,
-			   const VlFunction* func)
+			   const VlTaskFunc* func)
 {
   VlDumpHeader x(this, label, "Function");
 

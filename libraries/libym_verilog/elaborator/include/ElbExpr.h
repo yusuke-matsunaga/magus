@@ -25,10 +25,10 @@ class ElbExpr :
   public VlExpr
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbExpr() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbExpr() { }
@@ -43,7 +43,7 @@ public:
   virtual
   string
   decompile() const;
-  
+
   /// @brief 式のビット幅を返す．
   virtual
   ymuint32
@@ -70,10 +70,10 @@ public:
   bool
   is_partselect() const;
 
-  /// @brief 可変範囲指定の時に true を返す．
+  /// @brief 範囲指定のモードを返す．
   virtual
-  bool
-  is_varpartselect() const;
+  tVpiRangeMode
+  range_mode() const;
 
   /// @brief 演算子の時に true を返す．
   virtual
@@ -89,13 +89,13 @@ public:
   virtual
   bool
   is_sysfunccall() const;
-  
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note このクラスでは NULL を返す．
   virtual
   const VlDecl*
   decl_obj() const;
-  
+
   /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
   /// @note このクラスでは 0 を返す．
   virtual
@@ -119,7 +119,7 @@ public:
   virtual
   const VlPrimitive*
   primitive_obj() const;
-  
+
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
   /// @note このクラスでは false を返す．
@@ -133,7 +133,7 @@ public:
   virtual
   const VlExpr*
   index() const;
-  
+
   /// @brief インデックス値を返す．
   /// @note 式に対するビット選択の時，意味を持つ．
   /// @note このクラスでは 0 を返す．
@@ -147,7 +147,7 @@ public:
   virtual
   const VlExpr*
   left_range() const;
-  
+
   /// @brief 範囲の MSB の値を返す．
   /// @note 式に対する範囲選択の時，意味を持つ．
   /// @note このクラスでは 0 を返す．
@@ -196,21 +196,21 @@ public:
   virtual
   int
   range_val() const;
-  
+
   /// @brief 親の式を返す．
   /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
   /// @note このクラスでは NULL を返す．
   virtual
   const VlExpr*
   parent_expr() const;
-  
+
   /// @brief 演算子のタイプを返す．
   /// @note 演算子の時，意味を持つ．
   /// @note このクラスでは kVpiNullOp を返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
   /// @brief オペランド数を返す．
   /// @note 演算子の時，意味を持つ．
   /// @note このクラスでは 0 を返す．
@@ -225,7 +225,7 @@ public:
   virtual
   const VlExpr*
   operand(ymuint32 pos) const;
-  
+
   /// @brief 定数の型を返す．
   /// @note 定数の時，意味を持つ．
   /// @note このクラスでは動作は不定
@@ -237,9 +237,9 @@ public:
   /// @note kVpiFuncCall の時，意味を持つ．
   /// @note このクラスでは NULL を返す．
   virtual
-  const VlFunction*
+  const VlTaskFunc*
   function() const;
-  
+
   /// @brief 対象のシステム関数を返す．
   /// @note kVpiSysFuncCall の時，意味を持つ．
   /// @note このクラスでは NULL を返す．
@@ -261,7 +261,7 @@ public:
   virtual
   const VlExpr*
   argument(ymuint32 pos) const;
-  
+
   /// @brief int 型の値を返す．
   /// @param[out] val 結果を格納する変数
   /// @return 整数値に変換できたら true を返す．
@@ -283,7 +283,7 @@ public:
   virtual
   bool
   eval_time(VlTime& val) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -301,7 +301,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   void
   set_selfsize();
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
@@ -315,29 +315,29 @@ public:
   virtual
   ElbExpr*
   _operand(ymuint32 pos) const;
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v) = 0;
-  
+
   /// @brief 実数値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_real(double v) = 0;
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v) = 0;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 便利関数
@@ -361,7 +361,7 @@ public:
   tVpiValueType
   update_size(tVpiValueType type,
 	      tVpiValueType req_type);
-  
+
 };
 
 

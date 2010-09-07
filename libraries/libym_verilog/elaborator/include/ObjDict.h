@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbObjHandle
 {
   friend class ObjDict;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -37,7 +37,7 @@ protected:
   virtual
   ~ElbObjHandle();
 
-  
+
 public:
 
   /// @brief VlNamedObj を返す．
@@ -57,43 +57,37 @@ public:
   /// @brief オブジェクトの階層付き名前を返す．
   string
   full_name();
-  
+
   /// @brief 配列要素を返す．
   /// @note このクラスでは NULL を返す．
   virtual
   const VlNamedObj*
   array_elem(int index);
-  
+
   /// @brief ElbDecl を返す．
   /// @note このクラスでは NULL を返す．
   virtual
   ElbDecl*
   decl();
-  
+
   /// @brief ElbDeclArray を返す．
   /// @note このクラスでは NULL を返す．
   virtual
   ElbDeclArray*
   decl_array();
-  
+
   /// @brief ElbParameter を返す．
   /// @note このクラスでは NULL を返す．
   virtual
   ElbParameter*
   parameter();
-  
-  /// @brief ElbTask を返す．
+
+  /// @brief ElbTaskFunc を返す．
   /// @note このクラスでは NULL を返す．
   virtual
-  ElbTask*
-  task();
-  
-  /// @brief ElbFunction を返す．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  ElbFunction*
-  function();
-  
+  ElbTaskFunc*
+  taskfunc();
+
   /// @brief ElbModuleArray を返す．
   /// @note このクラスでは NULL を返す．
   virtual
@@ -111,7 +105,7 @@ public:
   virtual
   ElbPrimitive*
   primitive();
-  
+
   /// @brief ElbGfRoot を返す．
   /// @note このクラスでは NULL を返す．
   virtual
@@ -123,7 +117,7 @@ public:
   virtual
   ElbGenvar*
   genvar();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -137,9 +131,9 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbTaskHandle
+/// @class ElbTaskFuncHandle
 //////////////////////////////////////////////////////////////////////
-class ElbTaskHandle :
+class ElbTaskFuncHandle :
   public ElbObjHandle
 {
   friend class ObjDict;
@@ -147,25 +141,25 @@ class ElbTaskHandle :
 private:
 
   /// @brief コンストラクタ
-  ElbTaskHandle(ElbTask* obj);
+  ElbTaskFuncHandle(ElbTaskFunc* obj);
 
   /// @brief デストラクタ
   virtual
-  ~ElbTaskHandle();
-  
+  ~ElbTaskFuncHandle();
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
   obj();
-  
-  /// @brief ElbTask を返す．
+
+  /// @brief ElbTaskFunc を返す．
   virtual
-  ElbTask*
-  task();
-  
+  ElbTaskFunc*
+  taskfunc();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -173,49 +167,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のオブジェクト
-  ElbTask* mObj;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class ElbFunctionHandle
-//////////////////////////////////////////////////////////////////////
-class ElbFunctionHandle :
-  public ElbObjHandle
-{
-  friend class ObjDict;
-
-private:
-
-  /// @brief コンストラクタ
-  ElbFunctionHandle(ElbFunction* obj);
-
-  /// @brief デストラクタ
-  virtual
-  ~ElbFunctionHandle();
-  
-
-public:
-  
-  /// @brief VlNamedObj を返す．
-  virtual
-  const VlNamedObj*
-  obj();
-  
-  /// @brief ElbFunction を返す．
-  virtual
-  ElbFunction*
-  function();
-  
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 対象のオブジェクト
-  ElbFunction* mObj;
+  ElbTaskFunc* mObj;
   
 };
 
@@ -236,20 +188,20 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbDeclHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
   obj();
-  
+
   /// @brief ElbDecl を返す．
   virtual
   ElbDecl*
   decl();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -258,7 +210,7 @@ private:
 
   // 対象のオブジェクト
   ElbDecl* mObj;
-  
+
 };
 
 
@@ -278,20 +230,20 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbDeclArrayHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
   obj();
-  
+
   /// @brief ElbDeclArray を返す．
   virtual
   ElbDeclArray*
   decl_array();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -300,7 +252,7 @@ private:
 
   // 対象のオブジェクト
   ElbDeclArray* mObj;
-  
+
 };
 
 
@@ -320,20 +272,20 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbParamHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
   obj();
-  
+
   /// @brief ElbParameter を返す．
   virtual
   ElbParameter*
   parameter();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -342,7 +294,7 @@ private:
 
   // 対象のオブジェクト
   ElbParameter* mObj;
-  
+
 };
 
 
@@ -362,15 +314,15 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbModuleArrayHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
   obj();
-  
+
   /// @brief 配列要素を返す．
   virtual
   const VlNamedObj*
@@ -380,7 +332,7 @@ public:
   virtual
   ElbModuleArray*
   module_array();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -389,7 +341,7 @@ private:
 
   // 対象のオブジェクト
   ElbModuleArray* mObj;
-  
+
 };
 
 
@@ -409,10 +361,10 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbPrimArrayHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
@@ -422,7 +374,7 @@ public:
   virtual
   ElbPrimArray*
   prim_array();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -431,7 +383,7 @@ private:
 
   // 対象のオブジェクト
   ElbPrimArray* mObj;
-  
+
 };
 
 
@@ -451,10 +403,10 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbPrimitiveHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
@@ -464,7 +416,7 @@ public:
   virtual
   ElbPrimitive*
   primitive();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -473,7 +425,7 @@ private:
 
   // 対象のオブジェクト
   ElbPrimitive* mObj;
-  
+
 };
 
 
@@ -493,15 +445,15 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbScopeHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
   obj();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -510,7 +462,7 @@ private:
 
   // 対象のオブジェクト
   const VlNamedObj* mObj;
-  
+
 };
 
 
@@ -530,25 +482,25 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbGfRootHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
   obj();
-  
+
   /// @brief 配列要素を返す．
   virtual
   const VlNamedObj*
   array_elem(int index);
-  
+
   /// @brief ElbGfRoot を返す．
   virtual
   ElbGfRoot*
   gfroot();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -557,7 +509,7 @@ private:
 
   // 対象のオブジェクト
   ElbGfRoot* mObj;
-  
+
 };
 
 
@@ -577,10 +529,10 @@ private:
   /// @brief デストラクタ
   virtual
   ~ElbGenvarHandle();
-  
+
 
 public:
-  
+
   /// @brief VlNamedObj を返す．
   virtual
   const VlNamedObj*
@@ -590,7 +542,7 @@ public:
   virtual
   ElbGenvar*
   genvar();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -599,7 +551,7 @@ private:
 
   // 対象のオブジェクト
   ElbGenvar* mObj;
-  
+
 };
 
 
@@ -623,22 +575,18 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ObjDict の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 内容を空にする．
   void
   clear();
-  
-  /// @brief 要素を追加する．
-  void
-  add(const VlNamedObj* obj);
-  
-  /// @brief 要素を追加する．
-  void
-  add(ElbTask* obj);
 
   /// @brief 要素を追加する．
   void
-  add(ElbFunction* obj);
+  add(const VlNamedObj* obj);
+
+  /// @brief 要素を追加する．
+  void
+  add(ElbTaskFunc* obj);
 
   /// @brief 要素を追加する．
   void
@@ -671,7 +619,7 @@ public:
   /// @brief 要素を追加する．
   void
   add(ElbGenvar* obj);
-  
+
   /// @brief 名前から該当する要素を検索する．
   /// @note なければ NULL を返す．
   ElbObjHandle*
@@ -708,10 +656,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ElbObjHandle の確保用のアロケータ
   UnitAlloc mAlloc;
-  
+
   // ハッシュ表のサイズ
   ymuint32 mSize;
 

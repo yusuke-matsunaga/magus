@@ -58,13 +58,13 @@ public:
   virtual
   const char*
   name() const = 0;
-  
+
   /// @brief オペランドの数の取得
   /// @return 子供の数
   virtual
   ymuint32
   operand_num() const = 0;
-  
+
   /// @brief オペランドの取得
   /// @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
   /// @return pos 番目のオペランド
@@ -84,7 +84,7 @@ public:
   virtual
   ymuint32
   index_num() const = 0;
-  
+
   /// @brief インデックスの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num() )
   virtual
@@ -96,13 +96,13 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const = 0;
-  
+
   /// @brief 範囲の左側の式の取得
   /// @return 範囲の左側の式
   virtual
   const PtExpr*
   left_range() const = 0;
-  
+
   /// @brief 範囲の右側の式の取得
   /// @return 範囲の右側の式
   virtual
@@ -147,7 +147,7 @@ public:
   virtual
   bool
   is_index_expr() const = 0;
-  
+
   /// @brief インデックスの値の取得
   /// @return 階層名の添字として使える式の時にその値を返す．
   virtual

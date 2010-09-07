@@ -148,13 +148,13 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
     }
   }
   {
-    vector<const VlTask*> task_list;
+    vector<const VlTaskFunc*> task_list;
     if ( vl_mgr().find_task_list(scope, task_list) ) {
       add_tasklist(task_list);
     }
   }
   {
-    vector<const VlFunction*> function_list;
+    vector<const VlTaskFunc*> function_list;
     if ( vl_mgr().find_function_list(scope, function_list) ) {
       add_functionlist(function_list);
     }

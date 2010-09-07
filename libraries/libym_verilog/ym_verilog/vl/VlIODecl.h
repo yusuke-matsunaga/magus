@@ -12,16 +12,10 @@
 
 
 #include "ym_verilog/vl/VlObj.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class VlModule;
-class VlUdpDefn;
-class VlTask;
-class VlFunction;
-class VlDecl;
-class VlExpr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VlIODecl VlIODecl.h <ym_verilog/vl/VlIODecl.h>
@@ -58,7 +52,7 @@ public:
   virtual
   bool
   is_signed() const = 0;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -93,16 +87,16 @@ public:
   const VlUdpDefn*
   udp_defn() const = 0;
 
-  /// @brief 親の task の取得
+  /// @brief 親のタスクの取得
   virtual
-  const VlTask*
+  const VlTaskFunc*
   task() const = 0;
 
-  /// @brief 親の function の取得
+  /// @brief 親の関数の取得
   virtual
-  const VlFunction*
+  const VlTaskFunc*
   function() const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

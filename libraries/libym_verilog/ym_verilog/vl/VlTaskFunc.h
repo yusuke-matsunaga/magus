@@ -12,43 +12,63 @@
 
 
 #include "ym_verilog/vl/VlNamedObj.h"
+#include "ym_verilog/vl/VlObj.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-class VlIODecl;
-class VlStmt;
-class VlExpr;
-
 //////////////////////////////////////////////////////////////////////
-/// @class VlFunction VlTaskFunc.h "VlTaskFunc.h"
-/// @brief elaboration 中の function を表すクラス
+/// @class VlTaskFunc VlTaskFunc.h "VlTaskFunc.h"
+/// @brief elaboration 中の task/function を表すクラス
 /// IEEE Std 1364-2001 26.6.18 Task, function declaration
 //////////////////////////////////////////////////////////////////////
-class VlFunction :
+class VlTaskFunc :
   public VlNamedObj
 {
 protected:
 	      
   /// @brief デストラクタ
   virtual
-  ~VlFunction() { }
-  
+  ~VlTaskFunc() { }
+
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // VlFunction の仮想関数
+  // Task/Function に共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
-  /// @brief function type を返す．
-  virtual
-  tVpiFuncType
-  func_type() const = 0;
-  
+
   /// @brief automatic 宣言されていたら true を返す．
   virtual
   bool
   automatic() const = 0;
+
+  /// @brief 入出力数を得る．
+  virtual
+  ymuint32
+  io_num() const = 0;
+
+  /// @brief 入出力の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
+  virtual
+  const VlIODecl*
+  io(ymuint32 pos) const = 0;
+
+  /// @brief 本体のステートメントを得る．
+  virtual
+  const VlStmt*
+  stmt() const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // Function の仮想関数
+  // Task の場合には意味を持たない．
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief function type を返す．
+  virtual
+  tVpiFuncType
+  func_type() const = 0;
 
   /// @brief 符号の取得
   /// @retval true 符号つき
@@ -90,66 +110,6 @@ public:
   ymuint32
   bit_size() const = 0;
 
-  /// @brief 入出力数を得る．
-  virtual
-  ymuint32
-  io_num() const = 0;
-
-  /// @brief 入出力の取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
-  virtual
-  const VlIODecl*
-  io(ymuint32 pos) const = 0;
-  
-  /// @brief 本体のステートメントを得る．
-  virtual
-  const VlStmt*
-  stmt() const = 0;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class VlTask VlTaskFunc.h "VlTaskFunc.h"
-/// @brief elaboration 中の task を表すクラス
-/// IEEE Std 1364-2001 26.6.18 Task, function declaration
-//////////////////////////////////////////////////////////////////////
-class VlTask :
-  public VlNamedObj
-{
-protected:
-	      
-  /// @brief デストラクタ
-  virtual
-  ~VlTask() { }
-  
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlTask の仮想関数
-  //////////////////////////////////////////////////////////////////////
-  
-  /// @brief automatic 宣言されていたら true を返す．
-  virtual
-  bool
-  automatic() const = 0;
-  
-  /// @brief 入出力数を得る．
-  virtual
-  ymuint32
-  io_num() const = 0;
-
-  /// @brief 入出力の取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
-  virtual
-  const VlIODecl*
-  io(ymuint32 pos) const = 0;
-  
-  /// @brief 本体のステートメントを得る．
-  virtual
-  const VlStmt*
-  stmt() const = 0;
-  
 };
 
 END_NAMESPACE_YM_VERILOG

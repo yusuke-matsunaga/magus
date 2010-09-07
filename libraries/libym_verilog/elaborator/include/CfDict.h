@@ -46,12 +46,12 @@ public:
   void
   add(const VlNamedObj* scope,
       const char* name,
-      ElbFunction* func);
+      ElbTaskFunc* func);
       
   /// @brief 名前から該当する要素を検索する．
   /// @param[in] scope 親のスコープ
   /// @param[in] name 名前
-  ElbFunction*
+  ElbTaskFunc*
   find(const VlNamedObj* scope,
        const char* name) const;
   
@@ -93,7 +93,7 @@ private:
     const char* mName;
     
     // 対象の関数
-    ElbFunction* mFunc;
+    ElbTaskFunc* mFunc;
     
     // 次の要素を指すリンク
     Cell* mLink;

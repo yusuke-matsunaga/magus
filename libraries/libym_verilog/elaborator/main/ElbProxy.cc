@@ -93,11 +93,10 @@ ElbProxy::phase1_module_item(ElbModule* module,
 // @note module, task, function は1つのみが値を持つ．残りは NULL．
 void
 ElbProxy::instantiate_iodecl(ElbModule* module,
-			     ElbTask* task,
-			     ElbFunction* function,
+			     ElbTaskFunc* taskfunc,
 			     PtIOHeadArray pt_head_array)
 {
-  mDeclGen->instantiate_iodecl(module, task, function, pt_head_array);
+  mDeclGen->instantiate_iodecl(module, taskfunc, pt_head_array);
 }
 
 // @brief 宣言要素のリストをインスタンス化する．
@@ -135,7 +134,7 @@ ElbProxy::phase1_item(const VlNamedObj* parent,
 // @brief constant function の生成を行う．
 // @param[in] parent 親のスコープ
 // @param[in] pt_function 関数定義
-ElbFunction*
+ElbTaskFunc*
 ElbProxy::instantiate_constant_function(const VlNamedObj* parent,
 					const PtItem* pt_function)
 {

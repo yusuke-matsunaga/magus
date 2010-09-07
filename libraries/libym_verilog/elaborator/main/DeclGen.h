@@ -46,14 +46,12 @@ public:
 
   /// @brief IO宣言要素を実体化する．
   /// @param[in] module 親のモジュール
-  /// @param[in] task 親のタスク
-  /// @param[in] function 親の function
+  /// @param[in] taskfunc 親のタスク/関数
   /// @param[in] pt_head_array IO宣言ヘッダの配列
-  /// @note module, task, function は1つのみが値を持つ．残りは NULL．
+  /// @note module, taskfunc は1つのみが値を持つ．残りは NULL．
   void
   instantiate_iodecl(ElbModule* module,
-		     ElbTask* task,
-		     ElbFunction* function,
+		     ElbTaskFunc* taskfunc,
 		     PtIOHeadArray pt_head_array);
 
   /// @brief 宣言要素のリストをインスタンス化する．

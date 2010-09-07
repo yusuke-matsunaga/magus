@@ -70,7 +70,7 @@ ElbStmt*
 EiFactory::new_TaskCall(const VlNamedObj* parent,
 			ElbProcess* process,
 			const PtStmt* pt_stmt,
-			ElbTask* task,
+			ElbTaskFunc* task,
 			ElbExpr** arg_array)
 {
   ymuint32 n = pt_stmt->arg_num();
@@ -289,7 +289,7 @@ EiTcBase::set_argument(ymuint32 pos,
 EiTaskCall::EiTaskCall(const VlNamedObj* parent,
 		       ElbProcess* process,
 		       const PtStmt* pt_stmt,
-		       ElbTask* task,
+		       ElbTaskFunc* task,
 		       ymuint32 arg_num,
 		       ElbExpr** arg_array) :
   EiTcBase(parent, process, pt_stmt, arg_num, arg_array),
@@ -310,7 +310,7 @@ EiTaskCall::type() const
 }
 
 // @brief task の実体を返す．
-const VlTask*
+const VlTaskFunc*
 EiTaskCall::task() const
 {
   return mTask;

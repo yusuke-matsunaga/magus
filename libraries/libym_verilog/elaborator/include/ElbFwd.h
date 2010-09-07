@@ -49,8 +49,7 @@ class ElbCaHead;
 class ElbContAssign;
 
 // in ElbTaskFunc.h
-class ElbTask;
-class ElbFunction;
+class ElbTaskFunc;
 
 // in ElbPrimitive.h
 class ElbPrimHead;

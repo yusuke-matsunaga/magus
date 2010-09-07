@@ -54,31 +54,23 @@ DeclGen::~DeclGen()
 
 // @brief IO宣言要素をインスタンス化する．
 // @param[in] module 親のモジュール
-// @param[in] task 親のタスク
-// @param[in] func 親の function
+// @param[in] taskfunc 親のタスク/関数
 // @param[in] pt_head_array IO宣言ヘッダの配列
-// @note module, task, func は1つのみが値を持つ．残りは NULL
+// @note module, taskfunc は1つのみが値を持つ．残りは NULL
 void
 DeclGen::instantiate_iodecl(ElbModule* module,
-			    ElbTask* task,
-			    ElbFunction* func,
+			    ElbTaskFunc* taskfunc,
 			    PtIOHeadArray pt_head_array)
 {
-  assert_cond( module != NULL || task != NULL || func != NULL,
-	       __FILE__, __LINE__);
-  assert_cond( module == NULL || task == NULL, __FILE__, __LINE__);
-  assert_cond( module == NULL || func == NULL, __FILE__, __LINE__);
-  assert_cond( task == NULL || func == NULL, __FILE__, __LINE__);
+  assert_cond( module != NULL || taskfunc != NULL, __FILE__, __LINE__);
+  assert_cond( module == NULL || taskfunc == NULL, __FILE__, __LINE__);
 
   VlNamedObj* namedobj = NULL;
   if ( module ) {
     namedobj = module;
   }
-  else if ( task ) {
-    namedobj = task;
-  }
-  else if ( func ) {
-    namedobj = func;
+  else if ( taskfunc ) {
+    namedobj = taskfunc;
   }
   else {
     // 冗長
@@ -108,11 +100,13 @@ DeclGen::instantiate_iodecl(ElbModule* module,
     if ( module ) {
       head = factory().new_ModIOHead(module, pt_head);
     }
-    if ( task ) {
-      head = factory().new_IOHead(task, pt_head);
-    }
-    if ( func ) {
-      head = factory().new_IOHead(func, pt_head);
+    else {
+      if ( taskfunc->type() == kVpiTask ) {
+	head = factory().new_TaskIOHead(taskfunc, pt_head);
+      }
+      else {
+	head = factory().new_FunctionIOHead(taskfunc, pt_head);
+      }
     }
     assert_cond( head != NULL, __FILE__, __LINE__);
 
@@ -277,13 +271,8 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 					left, right,
 					left_val, right_val);
 	}
-	if ( task ) {
-	  head = factory().new_DeclHead(func, pt_head, aux_type,
-					left, right,
-					left_val, right_val);
-	}
-	if ( func ) {
-	  head = factory().new_DeclHead(func, pt_head, aux_type,
+	if ( taskfunc ) {
+	  head = factory().new_DeclHead(taskfunc, pt_head, aux_type,
 					left, right,
 					left_val, right_val);
 	}
@@ -332,11 +321,8 @@ DeclGen::instantiate_iodecl(ElbModule* module,
       if ( module ) {
 	module->init_iodecl(index, head, pt_item, decl);
       }
-      else if ( task ) {
-	task->init_iodecl(index, head, pt_item, decl);
-      }
-      else if ( func ) {
-	func->init_iodecl(index, head, pt_item, decl);
+      else if ( taskfunc ) {
+	taskfunc->init_iodecl(index, head, pt_item, decl);
       }
       else {
 	// かなりしつこく冗長

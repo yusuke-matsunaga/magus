@@ -63,7 +63,7 @@ public:
   /// @note kEnable で意味のある関数
   /// @note このクラスでは NULL を返す．
   virtual
-  const VlTask*
+  const VlTaskFunc*
   task() const;
 
   /// @brief user systf クラスへのポインタを返す．

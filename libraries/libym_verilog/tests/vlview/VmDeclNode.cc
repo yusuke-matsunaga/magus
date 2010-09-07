@@ -166,11 +166,11 @@ VmIODeclNode::expand() const
   if ( udp ) {
     add_str("vpiUdpDefn", udp->def_name());
   }
-  const VlTask* task = mIODecl->task();
+  const VlTaskFunc* task = mIODecl->task();
   if ( task ) {
     add_str("vpiTask", task->full_name());
   }
-  const VlFunction* func = mIODecl->function();
+  const VlTaskFunc* func = mIODecl->function();
   if ( func ) {
     add_str("vpiFunction", func->full_name());
   }

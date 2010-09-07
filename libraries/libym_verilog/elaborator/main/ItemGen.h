@@ -62,7 +62,7 @@ public:
   /// @brief constant function の生成を行う．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_function 関数定義
-  ElbFunction*
+  ElbTaskFunc*
   instantiate_constant_function(const VlNamedObj* parent,
 				const PtItem* pt_function);
   
@@ -94,23 +94,17 @@ private:
 	      const PtItem* pt_tf);
 
   /// @param[in] task/function 内の宣言要素の生成を行う．
-  /// @param[in] task タスク本体
-  /// @param[in] func 関数本体
+  /// @param[in] taskfunc タスク/関数本体
   /// @param[in] pt_item パース木の関数定義
-  /// @note task と function のどちらかは NULL
   void
-  phase2_tf(ElbTask* task,
-	    ElbFunction* func,
+  phase2_tf(ElbTaskFunc* taskfunc,
 	    const PtItem* pt_item);
 
   /// @param[in] task/function 内のステートメントの生成を行う．
-  /// @param[in] task タスク本体
-  /// @param[in] func 関数本体
+  /// @param[in] taskfunc タスク/関数本体
   /// @param[in] pt_item パース木の関数定義
-  /// @note task と function のどちらかは NULL
   void
-  phase3_tf(ElbTask* task,
-	    ElbFunction* func,
+  phase3_tf(ElbTaskFunc* task,
 	    const PtItem* pt_item);
 
   /// @brief module/Udp instance の生成を行う

@@ -27,13 +27,10 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbFactory
 {
 public:
-
-  /// @brief コンストラクタ
-  ElbFactory();
   
   /// @brief デストラクタ
   virtual
-  ~ElbFactory();
+  ~ElbFactory() { }
 
 
 public:
@@ -130,6 +127,22 @@ public:
   new_ModIOHead(ElbModule* module,
 		const PtIOHead* pt_header) = 0;
 
+  /// @brief タスク用の IO ヘッダを生成する．
+  /// @param[in] task 親のタスク
+  /// @param[in] pt_header パース木のIO宣言ヘッダ
+  virtual
+  ElbIOHead*
+  new_TaskIOHead(ElbTaskFunc* task,
+		 const PtIOHead* pt_header) = 0;
+
+  /// @brief 関数用の IO ヘッダを生成する．
+  /// @param[in] func 親の関数
+  /// @param[in] pt_header パース木のIO宣言ヘッダ
+  virtual
+  ElbIOHead*
+  new_FunctionIOHead(ElbTaskFunc* func,
+		     const PtIOHead* pt_header) = 0;
+
   /// @brief 宣言要素のヘッダを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
@@ -138,7 +151,7 @@ public:
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtDeclHead* pt_head,
-	       bool has_delay = false);
+	       bool has_delay = false) = 0;
 
   /// @brief 宣言要素のヘッダを生成する．
   /// @param[in] parent 親のスコープ
@@ -166,7 +179,7 @@ public:
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtIOHead* pt_head,
-	       tVpiAuxType aux_type);
+	       tVpiAuxType aux_type) = 0;
 
   /// @brief 宣言要素のヘッダを生成する．(IODecl 中の宣言用)
   /// @param[in] parent 親のスコープ
@@ -192,7 +205,7 @@ public:
   virtual
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
-	       const PtItem* pt_item);
+	       const PtItem* pt_item) = 0;
 
   /// @brief 宣言要素のヘッダを生成する．(function の暗黙宣言用)
   /// @param[in] parent 親のスコープ
@@ -245,15 +258,15 @@ public:
 		const PtNamedBase* pt_item,
 		const vector<ElbRangeSrc>& range_src) = 0;
 
-  /// @brief parameter 宣言のヘッダを生成する．
+  /// @brief parameter 宣言のヘッダを生成する(範囲指定なし)．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
   virtual
   ElbParamHead*
   new_ParamHead(const VlNamedObj* parent,
-		const PtDeclHead* pt_head);
+		const PtDeclHead* pt_head) = 0;
 
-  /// @brief parameter 宣言のヘッダを生成する．
+  /// @brief parameter 宣言のヘッダを生成する(範囲指定あり)．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
   /// @param[in] left 範囲の左側の式
@@ -402,9 +415,9 @@ public:
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_item パース木の定義
   virtual
-  ElbFunction*
+  ElbTaskFunc*
   new_Function(const VlNamedObj* parent,
-	       const PtItem* pt_item);
+	       const PtItem* pt_item) = 0;
   
   /// @brief function を生成する．
   /// @param[in] parent 親のスコープ
@@ -414,7 +427,7 @@ public:
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
   virtual
-  ElbFunction*
+  ElbTaskFunc*
   new_Function(const VlNamedObj* parent,
 	       const PtItem* pt_item,
 	       ElbExpr* left,
@@ -426,25 +439,9 @@ public:
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_item パース木の定義
   virtual
-  ElbTask*
+  ElbTaskFunc*
   new_Task(const VlNamedObj* parent,
 	   const PtItem* pt_item) = 0;
-  
-  /// @brief task 用の IO ヘッダを生成する．
-  /// @param[in] task_func 親の task/function
-  /// @param[in] pt_header パース木のIO宣言ヘッダ
-  virtual
-  ElbIOHead*
-  new_IOHead(ElbTask* task,
-	     const PtIOHead* pt_header) = 0;
-  
-  /// @brief function 用の IO ヘッダを生成する．
-  /// @param[in] func 親の task/function
-  /// @param[in] pt_header パース木のIO宣言ヘッダ
-  virtual
-  ElbIOHead*
-  new_IOHead(ElbFunction* func,
-	     const PtIOHead* pt_header) = 0;
   
   /// @brief プロセス文を生成する．
   /// @param[in] parent 親のスコープ
@@ -722,7 +719,7 @@ public:
   new_TaskCall(const VlNamedObj* parent,
 	       ElbProcess* process,
 	       const PtStmt* pt_stmt,
-	       ElbTask* task,
+	       ElbTaskFunc* task,
 	       ElbExpr** arg_array) = 0;
 
   /// @brief システムタスクコール文を生成する．
@@ -1050,7 +1047,7 @@ public:
   virtual
   ElbExpr*
   new_FuncCall(const PtBase* pt_obj,
-	       const ElbFunction* func,
+	       const ElbTaskFunc* func,
 	       ymuint32 arg_size,
 	       ElbExpr** arg_list) = 0;
 

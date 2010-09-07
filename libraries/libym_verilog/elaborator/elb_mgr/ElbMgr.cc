@@ -327,7 +327,7 @@ ElbMgr::reg_primitive(ElbPrimitive* obj)
 // @brief タスクを登録する．
 // @param[in] obj 登録するオブジェクト
 void
-ElbMgr::reg_task(ElbTask* obj)
+ElbMgr::reg_task(ElbTaskFunc* obj)
 {
   if ( debug & debug_objdict ) {
     dout << "reg_task( " << obj->name() << " @ "
@@ -343,7 +343,7 @@ ElbMgr::reg_task(ElbTask* obj)
 // @brief 関数を登録する．
 // @param[in] obj 登録するオブジェクト
 void
-ElbMgr::reg_function(ElbFunction* obj)
+ElbMgr::reg_function(ElbTaskFunc* obj)
 {
   if ( debug & debug_objdict ) {
     dout << "reg_function( " << obj->name() << " @ "

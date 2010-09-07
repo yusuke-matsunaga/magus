@@ -42,7 +42,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiPartSelect();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -76,17 +76,22 @@ public:
   bool
   is_partselect() const;
 
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
   const VlDecl*
   decl_obj() const;
-  
+
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
   virtual
   bool
   is_constant_select() const;
-  
+
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
   virtual
@@ -98,7 +103,7 @@ public:
   virtual
   const VlExpr*
   right_range() const;
-  
+
   /// @brief 範囲の MSB の値を返す．
   /// @note 式に対する範囲選択の時，意味を持つ．
   virtual
@@ -132,7 +137,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -144,20 +149,20 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
@@ -165,7 +170,7 @@ public:
   void
   set_bitvector(const BitVector& v);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -173,17 +178,17 @@ private:
 
   // 対象の宣言要素
   ElbDecl* mObj;
-  
+
   // 範囲選択式
   ElbExpr* mIndex1;
 
   ElbExpr* mIndex2;
-  
+
   // 範囲選択式の値
   int mIndex1Val;
 
   int mIndex2Val;
-  
+
 };
 
 
@@ -213,7 +218,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiParamPartSelect();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -247,11 +252,16 @@ public:
   bool
   is_partselect() const;
 
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
   const VlDecl*
   decl_obj() const;
-  
+
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
   virtual
@@ -285,7 +295,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -297,20 +307,20 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
@@ -318,7 +328,7 @@ public:
   void
   set_bitvector(const BitVector& v);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -326,17 +336,17 @@ private:
 
   // 対象の宣言要素
   ElbParameter* mObj;
-  
+
   // 範囲選択式
   ElbExpr* mIndex1;
 
   ElbExpr* mIndex2;
-  
+
   // 範囲選択式の値
   int mIndex1Val;
 
   int mIndex2Val;
-  
+
 };
 
 
@@ -368,7 +378,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiArrayElemPartSelect();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -401,7 +411,12 @@ public:
   virtual
   bool
   is_partselect() const;
-  
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
   virtual
@@ -435,7 +450,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -447,27 +462,27 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -476,20 +491,20 @@ private:
 
   // 対象の宣言要素
   ElbDeclArray* mObj;
-  
+
   // インデックスのリスト
   vector<ElbExpr*> mIndexList;
-  
+
   // 範囲選択式
   ElbExpr* mIndex1;
 
   ElbExpr* mIndex2;
-  
+
   // 範囲選択式の値
   int mIndex1Val;
 
   int mIndex2Val;
-  
+
 };
 
 
@@ -516,7 +531,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiExprPartSelect();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -549,13 +564,18 @@ public:
   virtual
   bool
   is_partselect() const;
-  
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
   /// @brief 親の式を返す．
   /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
   virtual
   const VlExpr*
   parent_expr() const;
-  
+
   /// @brief 範囲の MSB の値を返す．
   /// @note 式に対する範囲選択の時，意味を持つ．
   virtual
@@ -589,7 +609,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -601,14 +621,14 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -616,12 +636,12 @@ private:
 
   // 対象の式
   ElbExpr* mExpr;
-  
+
   // インデックス
   int mIndex1;
 
   int mIndex2;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

@@ -48,7 +48,7 @@ public:
   virtual
   const char*
   stmt_name() const = 0;
-  
+
   /// @brief 階層ブランチの先頭の取得
   /// @return 階層ブランチの先頭
   /// @note kDisable/kEnable/kSysEnable で意味のある関数
@@ -69,7 +69,7 @@ public:
   virtual
   ymuint32
   arg_num() const = 0;
-  
+
   /// @brief 引数の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < arg_num() )
   /// @note kEnable/kSysEnable で意味のある関数
@@ -146,20 +146,20 @@ public:
   virtual
   const PtStmt*
   init_stmt() const = 0;
-  
+
   /// @brief 繰り返し代入文の取得
   /// @return 繰り返し代入文
   /// @note kFor で意味のある関数
   virtual
   const PtStmt*
   next_stmt() const = 0;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   /// @note kNamedParBlock/kNamedSeqBlock で意味のある関数
   virtual
   PtDeclHeadArray
   declhead_array() const = 0;
-  
+
   /// @brief 子供のステートメント配列の取得
   /// @note kParBlock/kSeqBlock で意味のある関数
   virtual

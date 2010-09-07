@@ -123,7 +123,7 @@ private:
   /// @param[in] name 名前
   /// @return parent というスコープ内の name という関数を返す．
   /// @return なければ NULL を返す．
-  const ElbFunction*
+  const ElbTaskFunc*
   find_constant_function(const VlNamedObj* parent,
 			 const char* name) const;
 
@@ -140,7 +140,7 @@ private:
   void
   reg_constant_function(const VlNamedObj* parent,
 			const char* name,
-			ElbFunction* func);
+			ElbTaskFunc* func);
 
   
 private:

@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/verilog.h"
+#include "ym_verilog/vl/VlTaskFunc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -220,19 +221,15 @@ class ElbTfEnv :
 public:
   
   /// @brief コンストラクタ
-  /// @param[in] task 親のタスク
-  /// @param[in] func 親の関数
-  /// @note task か func のどちらかは NULL
-  ElbTfEnv(const VlNamedObj* task,
-	   const VlNamedObj* func)
+  /// @param[in] taskfunc 親のタスク/関数
+  ElbTfEnv(const VlTaskFunc* taskfunc)
   {
-    if ( task ) {
-      assert_cond( func == NULL, __FILE__, __LINE__);
-      set_task(task);
+    if ( taskfunc->type() == kVpiTask ) {
+      set_task(taskfunc);
     }
     else {
-      assert_cond( func != NULL, __FILE__, __LINE__);
-      set_function(func);
+      assert_cond( taskfunc->type() == kVpiFunction, __FILE__, __LINE__);
+      set_function(taskfunc);
     }
   }
   

@@ -46,7 +46,7 @@ class VlTime;
 /// @defgroup VlCommon Verilog 用基本ユーティリティ
 /// @ingroup VlGroup
 /// @{
-  
+
 //////////////////////////////////////////////////////////////////////
 /// @brief 1ビットの値
 //////////////////////////////////////////////////////////////////////
@@ -531,7 +531,7 @@ enum tVpiVarType {
 enum tVpiValueType {
   /// @brief 型無し(エラー値)
   kVpiValueNone      = 0,
-  
+
   /// @brief 符号つき型のビット
   kVpiValueSigned    = 1,
   /// @brief サイズつき型のビット
@@ -540,7 +540,7 @@ enum tVpiValueType {
   kVpiValueBitVector = 4,
   /// @brief 実数型のビット
   kVpiValueRealBit   = 8,
-  
+
   /// @brief 符号無し，サイズ無しのビットベクタ
   kVpiValueUU        = kVpiValueBitVector,
   /// @brief 符号無し，サイズありのビットベクタ
@@ -723,7 +723,7 @@ enum tVpiUdpVal {
 
   kVpiUdpValR  = kVpiUdpVal01,
   kVpiUdpValF  = kVpiUdpVal10,
-  
+
   kVpiUdpValNC = 0
 };
 

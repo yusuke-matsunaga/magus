@@ -182,7 +182,7 @@ public:
   /// @retval false 該当する要素がなかった．
   bool
   find_task_list(const VlNamedObj* parent,
-		 vector<const VlTask*>& task_list) const;
+		 vector<const VlTaskFunc*>& task_list) const;
 
   /// @brief スコープに属する関数のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -191,7 +191,7 @@ public:
   /// @retval false 該当する要素がなかった．
   bool
   find_function_list(const VlNamedObj* parent,
-		     vector<const VlFunction*>& func_list) const;
+		     vector<const VlTaskFunc*>& func_list) const;
 
   /// @brief スコープに属する process のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -308,12 +308,12 @@ public:
   /// @brief タスクを登録する．
   /// @param[in] obj 登録するオブジェクト
   void
-  reg_task(ElbTask* obj);
+  reg_task(ElbTaskFunc* obj);
   
   /// @brief 関数を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
-  reg_function(ElbFunction* obj);
+  reg_function(ElbTaskFunc* obj);
   
   /// @brief continuous assignment を登録する．
   /// @param[in] obj 登録するオブジェクト
@@ -571,7 +571,7 @@ ElbMgr::find_contassign_list(const VlNamedObj* parent,
 inline
 bool
 ElbMgr::find_task_list(const VlNamedObj* parent,
-		       vector<const VlTask*>& task_list) const
+		       vector<const VlTaskFunc*>& task_list) const
 {
   return mTagDict.find_task_list(parent, task_list);
 }
@@ -584,7 +584,7 @@ ElbMgr::find_task_list(const VlNamedObj* parent,
 inline
 bool
 ElbMgr::find_function_list(const VlNamedObj* parent,
-			   vector<const VlFunction*>& func_list) const
+			   vector<const VlTaskFunc*>& func_list) const
 {
   return mTagDict.find_function_list(parent, func_list);
 }

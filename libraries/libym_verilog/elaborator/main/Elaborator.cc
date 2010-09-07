@@ -292,7 +292,7 @@ Elaborator::find_moduledef(const char* name) const
 // @brief constant function を取り出す．
 // @param[in] parent 親のスコープ
 // @param[in] name 名前
-const ElbFunction*
+const ElbTaskFunc*
 Elaborator::find_constant_function(const VlNamedObj* parent,
 				   const char* name) const
 {
@@ -306,7 +306,7 @@ Elaborator::find_constant_function(const VlNamedObj* parent,
 void
 Elaborator::reg_constant_function(const VlNamedObj* parent,
 				  const char* name,
-				  ElbFunction* func)
+				  ElbTaskFunc* func)
 {
   mCfDict.add(parent, name, func);
 }  

@@ -78,7 +78,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtPortRef の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief インデックスの取得
   /// @return インデックスを表す式
   virtual
@@ -93,13 +93,13 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const = 0;
-  
+
   /// @brief 範囲の左側の式の取得
   /// @return 範囲の左側の式
   virtual
   const PtExpr*
   left_range() const = 0;
-  
+
   /// @brief 範囲の右側の式の取得
   /// @return 範囲の右側の式
   virtual

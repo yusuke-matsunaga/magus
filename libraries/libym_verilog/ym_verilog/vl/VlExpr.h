@@ -12,15 +12,10 @@
 
 
 #include "ym_verilog/vl/VlObj.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class VlFunction;
-class VlUserSystf;
-class VlDecl;
-class VlNamedObj;
-class VlPrimitive;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VlExpr VlExpr.h <ym_verilog/vl/VlExpr.h>
@@ -76,10 +71,11 @@ public:
   bool
   is_partselect() const = 0;
 
-  /// @brief 可変範囲指定の時に true を返す．
+  /// @brief 範囲指定のモードを返す．
+  /// @note is_partselect() == true の時のみ意味を持つ．
   virtual
-  bool
-  is_varpartselect() const = 0;
+  tVpiRangeMode
+  range_mode() const = 0;
 
   /// @brief 演算子の時に true を返す．
   virtual
@@ -244,7 +240,7 @@ public:
   /// @note kVpiFuncCall の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
-  const VlFunction*
+  const VlTaskFunc*
   function() const = 0;
   
   /// @brief 対象のシステム関数を返す．

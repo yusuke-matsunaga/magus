@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] arg_list 引数のリスト
 ElbExpr*
 EiFactory::new_FuncCall(const PtBase* pt_obj,
-			const ElbFunction* func,
+			const ElbTaskFunc* func,
 			ymuint32 arg_size,
 			ElbExpr** arg_list)
 {
@@ -106,7 +106,7 @@ EiFcBase::argument(ymuint32 pos) const
 // @param[in] arg_size 引数の数
 // @param[in] arg_list 引数のリスト
 EiFuncCall::EiFuncCall(const PtBase* pt_obj,
-		       const ElbFunction* func,
+		       const ElbTaskFunc* func,
 		       ymuint32 arg_size,
 		       ElbExpr** arg_list) :
   EiFcBase(pt_obj, arg_size, arg_list),
@@ -177,7 +177,7 @@ EiFuncCall::is_funccall() const
 
 // @brief 対象の関数を返す．
 // @note kVpiFuncCall の時，意味を持つ．
-const VlFunction*
+const VlTaskFunc*
 EiFuncCall::function() const
 {
   return mFunc;

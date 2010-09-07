@@ -53,7 +53,7 @@ VmNode1::add_scopelist(const vector<const VlNamedObj*>& scope_list) const
 // @brief TaskListNode を追加する．
 // @param[in] task_list タスクのリスト
 void
-VmNode1::add_tasklist(const vector<const VlTask*>& task_list) const
+VmNode1::add_tasklist(const vector<const VlTaskFunc*>& task_list) const
 {
   add_child( new VmTaskListNode(vl_mgr(), task_list) );
 }
@@ -61,7 +61,7 @@ VmNode1::add_tasklist(const vector<const VlTask*>& task_list) const
 // @brief FuncListNode を追加する．
 // @param[in] function_list 関数のリスト
 void
-VmNode1::add_functionlist(const vector<const VlFunction*>& function_list) const
+VmNode1::add_functionlist(const vector<const VlTaskFunc*>& function_list) const
 {
   add_child( new VmFunctionListNode(vl_mgr(), function_list) );
 }
@@ -415,7 +415,7 @@ VmScopeNode::expand() const
 // @param[in] vl_mgr VlMgr
 // @param[in] task_list タスクのリスト
 VmTaskListNode::VmTaskListNode(const VlMgr& vl_mgr,
-			       const vector<const VlTask*>& task_list) :
+			       const vector<const VlTaskFunc*>& task_list) :
   VmNode1(vl_mgr),
   mTaskArray(task_list)
 {
@@ -455,7 +455,7 @@ VmTaskListNode::loc() const
 void
 VmTaskListNode::expand() const
 {
-  for (vector<const VlTask*>::const_iterator p = mTaskArray.begin();
+  for (vector<const VlTaskFunc*>::const_iterator p = mTaskArray.begin();
        p != mTaskArray.end(); ++ p) {
     add_child( new VmTaskNode(vl_mgr(), *p) );
   }
@@ -470,7 +470,7 @@ VmTaskListNode::expand() const
 // @param[in] vl_mgr VlMgr
 // @param[in] task タスク
 VmTaskNode::VmTaskNode(const VlMgr& vl_mgr,
-		       const VlTask* task) :
+		       const VlTaskFunc* task) :
   VmNode1(vl_mgr),
   mTask(task)
 {
@@ -532,7 +532,7 @@ VmTaskNode::expand() const
 // @param[in] vl_mgr VlMgr
 // @param[in] func_list 関数のリスト
 VmFunctionListNode::VmFunctionListNode(const VlMgr& vl_mgr,
-				       const vector<const VlFunction*>& func_list) :
+				       const vector<const VlTaskFunc*>& func_list) :
   VmNode1(vl_mgr),
   mFunctionArray(func_list)
 {
@@ -572,7 +572,7 @@ VmFunctionListNode::loc() const
 void
 VmFunctionListNode::expand() const
 {
-  for (vector<const VlFunction*>::const_iterator p = mFunctionArray.begin();
+  for (vector<const VlTaskFunc*>::const_iterator p = mFunctionArray.begin();
        p != mFunctionArray.end(); ++ p) {
     add_child( new VmFunctionNode(vl_mgr(), *p) );
   }
@@ -587,7 +587,7 @@ VmFunctionListNode::expand() const
 // @param[in] vl_mgr VlMgr
 // @param[in] func 関数
 VmFunctionNode::VmFunctionNode(const VlMgr& vl_mgr,
-		       const VlFunction* func) :
+		       const VlTaskFunc* func) :
   VmNode1(vl_mgr),
   mFunction(func)
 {

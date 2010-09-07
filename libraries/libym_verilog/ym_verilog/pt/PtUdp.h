@@ -46,13 +46,13 @@ public:
   virtual
   ymuint32
   port_num() const = 0;
-  
+
   /// @brief ポートを取り出す．
   /// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
   virtual
   const PtPort*
   port(ymuint32 pos) const = 0;
-  
+
   /// @brief 入出力宣言ヘッダ配列の取得
   virtual
   PtIOHeadArray
@@ -91,7 +91,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtUdpEntry の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入力値の配列を取り出す．
   virtual
   PtUdpValueArray
@@ -101,7 +101,7 @@ public:
   virtual
   const PtUdpValue*
   current() const = 0;
-  
+
   /// @brief 出力の値を取り出す．
   virtual
   const PtUdpValue*

@@ -415,8 +415,7 @@ StmtGen::instantiate_enable(const VlNamedObj* parent,
 	    buf.str());
     return NULL;
   }
-  ElbTask* task = cell->task();
-  if ( !task ) {
+  if ( cell->type() != kVpiTask ) {
     ostringstream buf;
     buf << expand_full_name(nb_array, name) << " : Not a task.";
     put_msg(__FILE__, __LINE__,
@@ -425,6 +424,8 @@ StmtGen::instantiate_enable(const VlNamedObj* parent,
 	    "ELAB",
 	    buf.str());
   }
+  ElbTaskFunc* task = cell->taskfunc();
+  assert_cond( task != NULL, __FILE__, __LINE__);
   
   // 引数を生成する．
   ElbExpr** arg_list = factory().new_ExprList(pt_stmt->arg_num());

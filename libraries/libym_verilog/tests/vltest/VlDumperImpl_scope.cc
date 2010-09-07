@@ -87,16 +87,16 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
     }
   }
 
-  vector<const VlTask*> task_list;
+  vector<const VlTaskFunc*> task_list;
   if ( mgr.find_task_list(scope, task_list) ) {
-    for (vector<const VlTask*>::const_iterator p = task_list.begin();
+    for (vector<const VlTaskFunc*>::const_iterator p = task_list.begin();
 	 p != task_list.end(); ++ p) {
       put_task("vpiTask", mgr, *p);
     }
   }
-  vector<const VlFunction*> func_list;
+  vector<const VlTaskFunc*> func_list;
   if ( mgr.find_function_list(scope, func_list) ) {
-    for (vector<const VlFunction*>::const_iterator p = func_list.begin();
+    for (vector<const VlTaskFunc*>::const_iterator p = func_list.begin();
 	 p != func_list.end(); ++ p) {
       put_function("vpiFunction", mgr, *p);
     }

@@ -253,12 +253,12 @@ protected:
   /// @brief TaskListNode を追加する．
   /// @param[in] task_list タスクのリスト
   void
-  add_tasklist(const vector<const VlTask*>& task_list) const;
+  add_tasklist(const vector<const VlTaskFunc*>& task_list) const;
   
   /// @brief FuncListNode を追加する．
   /// @param[in] function_list 関数のリスト
   void
-  add_functionlist(const vector<const VlFunction*>& function_list) const;
+  add_functionlist(const vector<const VlTaskFunc*>& function_list) const;
 
   /// @brief ContAssignListNode を追加する．
   /// @param[in] ca_list 継続的代入文のリスト

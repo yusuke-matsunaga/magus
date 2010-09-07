@@ -62,7 +62,7 @@ public:
   /// @brief task の実体を返す．
   /// @note kEnable で意味のある関数
   virtual
-  const VlTask*
+  const VlTaskFunc*
   task() const = 0;
 
   /// @brief user systf クラスへのポインタを返す．

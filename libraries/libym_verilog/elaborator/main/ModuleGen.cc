@@ -214,7 +214,7 @@ ModuleGen::phase2_module_item(ElbModule* module,
   instantiate_decl(module, pt_module->declhead_array());
 
   // IODecl を実体化する．
-  instantiate_iodecl(module, NULL, NULL, pt_module->iohead_array());
+  instantiate_iodecl(module, NULL, pt_module->iohead_array());
   
   // ポートを実体化する
   instantiate_port(module, pt_module);

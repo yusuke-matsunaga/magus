@@ -24,16 +24,16 @@ template <typename T>
 class PtArray
 {
 public:
-  
+
   /// @brief 空のコンストラクタ
   PtArray();
-  
+
   /// @brief コンストラクタ
   /// @param[in] num 要素数
   /// @param[in] array 配列本体
   PtArray(ymuint32 num,
 	  T** array);
-  
+
   /// @brief デストラクタ
   /// @note このクラスではメモリの開放は行わない．
   ~PtArray();
@@ -45,31 +45,31 @@ public:
   /// @return 要素数
   ymuint32
   size() const;
-  
+
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   T*
   operator[](ymuint32 pos) const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 要素数
   ymuint32 mNum;
-  
+
   // ポインタ配列本体
   T** mArray;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // PtArray のインライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 空のコンストラクタ
 template <typename T>
 inline
@@ -78,7 +78,7 @@ PtArray<T>::PtArray() :
   mArray(NULL)
 {
 }
-  
+
 // @brief コンストラクタ
 // @param[in] num 要素数
 // @param[in] array 配列本体
@@ -90,7 +90,7 @@ PtArray<T>::PtArray(ymuint32 num,
   mArray(array)
 {
 }
-  
+
 // @brief デストラクタ
 template <typename T>
 inline
@@ -108,7 +108,7 @@ PtArray<T>::size() const
 {
   return mNum;
 }
-  
+
 // @brief 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 template <typename T>

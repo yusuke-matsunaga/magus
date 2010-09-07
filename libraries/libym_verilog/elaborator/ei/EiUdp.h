@@ -290,18 +290,18 @@ public:
   const VlUdpDefn*
   udp_defn() const;
 
-  /// @brief 親の task の取得
+  /// @brief 親のタスクの取得
   /// @return このクラスは NULL を返す．
   virtual
-  const VlTask*
+  const VlTaskFunc*
   task() const;
 
-  /// @brief 親の function の取得
+  /// @brief 親の関数の取得
   /// @return このクラスは NULL を返す．
   virtual
-  const VlFunction*
+  const VlTaskFunc*
   function() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

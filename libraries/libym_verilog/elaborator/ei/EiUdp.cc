@@ -328,17 +328,17 @@ EiUdpIO::udp_defn() const
   return mUdp;
 }
 
-// @brief 親の task の取得
+// @brief 親のタスク/の取得
 // @return このクラスは NULL を返す．
-const VlTask*
+const VlTaskFunc*
 EiUdpIO::task() const
 {
   return NULL;
 }
 
-// @brief 親の function の取得
+// @brief 親の関数の取得
 // @return このクラスは NULL を返す．
-const VlFunction*
+const VlTaskFunc*
 EiUdpIO::function() const
 {
   return NULL;

@@ -64,11 +64,11 @@ ElbExpr::is_partselect() const
   return false;
 }
 
-// @brief 可変範囲指定の時に true を返す．
-bool
-ElbExpr::is_varpartselect() const
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+ElbExpr::range_mode() const
 {
-  return false;
+  return kVpiNoRange;
 }
 
 // @brief 演算子の時に true を返す．
@@ -240,7 +240,7 @@ ElbExpr::constant_type() const
 // @brief 対象の関数を返す．
 // @note function call の時，意味を持つ．
 // @note このクラスでは NULL を返す．
-const VlFunction*
+const VlTaskFunc*
 ElbExpr::function() const
 {
   return NULL;

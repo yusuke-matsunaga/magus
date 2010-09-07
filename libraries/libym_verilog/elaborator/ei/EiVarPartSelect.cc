@@ -140,11 +140,10 @@ EiVarPartSelect::is_const() const
   return mObj->is_consttype() && is_constant_select();
 }
 
-// @brief 可変範囲指定の時に true を返す．
-bool
-EiVarPartSelect::is_varpartselect() const
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiVarPartSelect::range_mode() const
 {
-  return true;
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -338,11 +337,10 @@ EiParamVarPartSelect::is_const() const
   return is_constant_select();
 }
 
-// @brief 可変範囲指定の時に true を返す．
-bool
-EiParamVarPartSelect::is_varpartselect() const
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiParamVarPartSelect::range_mode() const
 {
-  return true;
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -537,11 +535,10 @@ EiArrayElemVarPartSelect::is_const() const
   return decl_array()->is_consttype() && is_constant_select();
 }
 
-// @brief 可変範囲指定の時に true を返す．
-bool
-EiArrayElemVarPartSelect::is_varpartselect() const
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiArrayElemVarPartSelect::range_mode() const
 {
-  return true;
 }
 
 // @brief 固定選択子の時 true を返す．

@@ -39,7 +39,7 @@ CfDict::~CfDict()
 void
 CfDict::add(const VlNamedObj* scope,
 	    const char* name,
-	    ElbFunction* func)
+	    ElbTaskFunc* func)
 {
   if ( mTable == NULL ) {
     alloc_table(1024);
@@ -73,7 +73,7 @@ CfDict::add(const VlNamedObj* scope,
 // @brief 名前から該当する要素を検索する．
 // @param[in] scope 親のスコープ
 // @param[in] name 名前
-ElbFunction*
+ElbTaskFunc*
 CfDict::find(const VlNamedObj* scope,
 	     const char* name) const
 {

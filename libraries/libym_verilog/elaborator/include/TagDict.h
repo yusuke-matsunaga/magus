@@ -111,21 +111,21 @@ private:
   /// @brief タスクを追加する．
   virtual
   void
-  add_task(ElbTask* obj);
+  add_task(ElbTaskFunc* obj);
 
   /// @brief タスクの先頭を得る．
   virtual
-  const ElbTask*
+  const ElbTaskFunc*
   task();
 
   /// @brief 関数を追加する．
   virtual
   void
-  add_function(ElbFunction* obj);
+  add_function(ElbTaskFunc* obj);
 
   /// @brief 関数の先頭を得る．
   virtual
-  const ElbFunction*
+  const ElbTaskFunc*
   function();
   
   /// @brief continuous assignment を追加する．
@@ -326,7 +326,7 @@ public:
   /// @brief タスクを追加する．
   /// @param[in] task 追加する要素
   void
-  add_task(ElbTask* task);
+  add_task(ElbTaskFunc* task);
 
   /// @brief タスクのリストを取り出す．
   /// @param[in] parent 親のスコープ
@@ -335,12 +335,12 @@ public:
   /// @retval false 該当する要素がなかった．
   bool
   find_task_list(const VlNamedObj* parent,
-		 vector<const VlTask*>& task_list) const;
+		 vector<const VlTaskFunc*>& task_list) const;
   
   /// @brief 関数を追加する．
   /// @param[in] func 追加する要素
   void
-  add_function(ElbFunction* func);
+  add_function(ElbTaskFunc* func);
 
   /// @brief 関数のリストを取り出す．
   /// @param[in] parent 親のスコープ
@@ -349,7 +349,7 @@ public:
   /// @retval false 該当する要素がなかった．
   bool
   find_function_list(const VlNamedObj* parent,
-		     vector<const VlFunction*>& func_list) const;
+		     vector<const VlTaskFunc*>& func_list) const;
 
   /// @brief continuous assignment を追加する．
   /// @param[in] contassign 登録する要素

@@ -353,7 +353,7 @@ public:
   /// @param[in] vl_mgr VlMgr
   /// @param[in] task_list タスクのリスト
   VmTaskListNode(const VlMgr& vl_mgr,
-		 const vector<const VlTask*>& task_list);
+		 const vector<const VlTaskFunc*>& task_list);
 
   /// @brief デストラクタ
   virtual
@@ -390,7 +390,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // タスクの配列
-  vector<const VlTask*> mTaskArray;
+  vector<const VlTaskFunc*> mTaskArray;
   
 };
 
@@ -408,7 +408,7 @@ public:
   /// @param[in] vl_mgr VlMgr
   /// @param[in] task タスク
   VmTaskNode(const VlMgr& vl_mgr,
-	     const VlTask* task);
+	     const VlTaskFunc* task);
 
   /// @brief デストラクタ
   virtual
@@ -445,7 +445,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // タスク
-  const VlTask* mTask;
+  const VlTaskFunc* mTask;
 
 };
 
@@ -463,7 +463,7 @@ public:
   /// @param[in] vl_mgr VlMgr
   /// @param[in] function_list 関数のリスト
   VmFunctionListNode(const VlMgr& vl_mgr,
-		     const vector<const VlFunction*>& function_list);
+		     const vector<const VlTaskFunc*>& function_list);
 
   /// @brief デストラクタ
   virtual
@@ -500,7 +500,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 関数の配列
-  vector<const VlFunction*> mFunctionArray;
+  vector<const VlTaskFunc*> mFunctionArray;
   
 };
 
@@ -518,7 +518,7 @@ public:
   /// @param[in] vl_mgr VlMgr
   /// @param[in] function 関数
   VmFunctionNode(const VlMgr& vl_mgr,
-		 const VlFunction* function);
+		 const VlTaskFunc* function);
 
   /// @brief デストラクタ
   virtual
@@ -555,7 +555,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 関数
-  const VlFunction* mFunction;
+  const VlTaskFunc* mFunction;
 
 };
 

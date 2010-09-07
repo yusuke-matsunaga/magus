@@ -24,6 +24,17 @@ BEGIN_NAMESPACE_YM_VERILOG
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
 
+// @brief parameter 宣言のヘッダを生成する(範囲指定なし)．
+// @param[in] parent 親のスコープ
+ElbParamHead*
+EiFactory::new_ParamHead(const VlNamedObj* parent,
+			 const PtDeclHead* pt_head)
+{
+  void* p = mAlloc.get_memory(sizeof(EiParamHead));
+  EiParamHead* head = new (p) EiParamHead(parent, pt_head);
+  return head;
+}
+
 // @brief parameter 宣言のヘッダを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_head パース木の宣言ヘッダ
@@ -37,17 +48,13 @@ EiFactory::new_ParamHead(const VlNamedObj* parent,
 			 int left_val,
 			 int right_val)
 {
-  EiParamHead* head = NULL;
-  if ( left && right ) {
-    void* p = mAlloc.get_memory(sizeof(EiParamHeadV));
-    head = new (p) EiParamHeadV(parent, pt_head,
-				left, right,
-				left_val, right_val);
-  }
-  else {
-    void* p = mAlloc.get_memory(sizeof(EiParamHead));
-    head = new (p) EiParamHead(parent, pt_head);
-  }
+  assert_cond( left != NULL, __FILE__, __LINE__);
+  assert_cond( right != NULL, __FILE__, __LINE__);
+
+  void* p = mAlloc.get_memory(sizeof(EiParamHeadV));
+  EiParamHead* head = new (p) EiParamHeadV(parent, pt_head,
+					   left, right,
+					   left_val, right_val);
   return head;
 }
 
@@ -62,17 +69,16 @@ EiFactory::new_Parameter(ElbParamHead* head,
 			 bool is_local)
 {
   EiParameter* param = NULL;
-  void* p = NULL;
-  
+
   switch ( head->type() ) {
   case kVpiParameter:
   case kVpiSpecParam:
     if ( is_local ) {
-      p = mAlloc.get_memory(sizeof(EiLocalParam));
+      void* p = mAlloc.get_memory(sizeof(EiLocalParam));
       param = new (p) EiLocalParam(head, pt_item);
     }
     else {
-      p = mAlloc.get_memory(sizeof(EiParameter));
+      void* p = mAlloc.get_memory(sizeof(EiParameter));
       param = new (p) EiParameter(head, pt_item);
     }
     break;
@@ -81,7 +87,7 @@ EiFactory::new_Parameter(ElbParamHead* head,
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
-  
+
   return param;
 }
 
@@ -240,6 +246,30 @@ EiParamHead::bit_offset(int index) const
   return -1;
 }
 
+// @breif 値の型を返す．
+// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+tVpiValueType
+EiParamHead::value_type() const
+{
+  switch ( mPtHead->data_type() ) {
+  case kVpiVarReal:
+  case kVpiVarRealtime:
+    return kVpiValueReal;
+
+  case kVpiVarTime:
+    return kVpiValueTime;
+
+  case kVpiVarInteger:
+    return kVpiValueInteger;
+
+  case kVpiVarNone:
+    // この場合，式の値で決まる．
+    return kVpiValueNone;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return kVpiValueNone;
+}
+
 // @brief データ型の取得
 tVpiVarType
 EiParamHead::data_type() const
@@ -324,6 +354,15 @@ EiParamHeadV::bit_offset(int index) const
   return mRange.offset(index);
 }
 
+// @breif 値の型を返す．
+// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+tVpiValueType
+EiParamHeadV::value_type() const
+{
+  tVpiValueType type = is_signed() ? kVpiValueSS : kVpiValueUS;
+  return pack(type, bit_size());
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiParameter
@@ -379,39 +418,11 @@ EiParameter::name() const
 tVpiValueType
 EiParameter::value_type() const
 {
-#warning "TODO: 意味を確認"
-  switch ( type() ) {
-  case kVpiNet:
-  case kVpiReg:
-    if ( is_signed() ) {
-      return pack(kVpiValueSS, bit_size());
-    }
-    else {
-      return pack(kVpiValueUS, bit_size());
-    }
-    
-  case kVpiIntegerVar:
-    return kVpiValueInteger;
-    
-  case kVpiRealVar:
-    return kVpiValueReal;
-    
-  case kVpiTimeVar:
-    return kVpiValueTime;
-    
-  case kVpiParameter:
-  case kVpiSpecParam:
-  case kVpiConstant:
-    // ここにはこない
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-    
-  default:
-    // 上記以外は形無し
-    break;
+  tVpiValueType vt = mHead->value_type();
+  if ( vt == kVpiValueNone ) {
+    vt = mExpr->value_type();
   }
-  
-  return kVpiValueNone;
+  return vt;
 }
 
 // @brief 符号の取得
@@ -462,7 +473,7 @@ EiParameter::data_type() const
 {
   return mHead->data_type();
 }
-  
+
 // @brief 初期値の取得
 // @retval 初期値
 // @retval NULL 設定がない場合
@@ -471,7 +482,7 @@ EiParameter::init_value() const
 {
   return mExpr;
 }
-  
+
 // @brief localparam のときに true 返す．
 // @note このクラスでは false を返す．
 bool

@@ -78,7 +78,7 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
 			      const ElbEnv& env,
 			      const PtExpr* pt_expr)
 {
-  const ElbFunction* child_func = NULL;
+  const ElbTaskFunc* child_func = NULL;
   if ( env.is_constant() ) {
     // 定数関数を探し出す．
     PtNameBranchArray nb_array = pt_expr->namebranch_array();
@@ -89,7 +89,7 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
 
     // 関数名
     const char* name = pt_expr->name();
-  
+
     // 関数本体を探し出す．
     // constant function はモジュール直下にしかあり得ない
     // <- generated scope 内の関数は constant function ではない．
@@ -100,12 +100,12 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
       error_no_such_function(pt_expr);
       return NULL;
     }
-  
+
     if ( pt_func->is_in_use() ) {
       error_uses_itself(pt_expr);
       return NULL;
     }
-    
+
     child_func = find_constant_function(module, name);
     if ( child_func == NULL ) {
       pt_func->set_in_use();
@@ -131,17 +131,17 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
       error_not_a_function(pt_expr);
       return NULL;
     }
-    child_func = handle->function();
+    child_func = handle->taskfunc();
     assert_cond(child_func, __FILE__, __LINE__);
   }
-  
+
   // 引数の生成
   ymuint n = pt_expr->operand_num();
   if ( n != child_func->io_num() ) {
     error_n_of_arguments_mismatch(pt_expr);
     return NULL;
   }
-  
+
   ElbExpr** arg_list = factory().new_ExprList(n);
   for (ymuint i = 0; i < n; ++ i) {
     const PtExpr* pt_expr1 = pt_expr->operand(i);
@@ -168,7 +168,7 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
 
   // function call の生成
   ElbExpr* expr = factory().new_FuncCall(pt_expr, child_func, n, arg_list);
-  
+
   // attribute instance の生成
   //instantiate_attribute(pt_expr->attr_top(), false, expr);
 
@@ -192,9 +192,9 @@ ExprGen::instantiate_sysfunccall(const VlNamedObj* parent,
     error_no_such_sysfunction(pt_expr);
     return NULL;
   }
-  
+
 #warning "TODO: 引数の個数と型のチェック"
-  
+
   // 引数の生成
   ymuint n = pt_expr->operand_num();
   ElbExpr** arg_list = factory().new_ExprList(n);
@@ -219,6 +219,95 @@ ExprGen::instantiate_sysfunccall(const VlNamedObj* parent,
   ElbExpr* expr = factory().new_SysFuncCall(pt_expr, user_systf, n, arg_list);
 
   return expr;
+}
+
+// @brief PtFuncCall から式の値を評価する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+ElbValue
+ExprGen::evaluate_funccall(const VlNamedObj* parent,
+			   const PtExpr* pt_expr)
+{
+  // 定数関数を探し出す．
+
+  // 階層名は使えない．
+  PtNameBranchArray nb_array = pt_expr->namebranch_array();
+  if ( nb_array.size() > 0 ) {
+    error_hname_in_ce(pt_expr);
+    return ElbValue();
+  }
+
+  // 関数名
+  const char* name = pt_expr->name();
+
+  // 関数本体を探し出す．
+  // constant function はモジュール直下にしかあり得ない
+  // <- generated scope 内の関数は constant function ではない．
+  const VlModule* module = parent->parent_module();
+  const PtModule* pt_module = find_moduledef(module->def_name());
+  const PtItem* pt_func = pt_module->find_function(name);
+  if ( !pt_func ) {
+    error_no_such_function(pt_expr);
+    return ElbValue();
+  }
+
+  if ( pt_func->is_in_use() ) {
+    error_uses_itself(pt_expr);
+    return ElbValue();
+  }
+
+  const ElbTaskFunc* child_func = find_constant_function(module, name);
+  if ( child_func == NULL ) {
+    pt_func->set_in_use();
+    // なかったので作る．
+    child_func = instantiate_constant_function(parent, pt_func);
+    pt_func->clear_in_use();
+  }
+  if ( !child_func ) {
+    error_not_a_constant_function(pt_expr);
+    return ElbValue();
+  }
+
+  // 引数の生成
+  ymuint n = pt_expr->operand_num();
+  if ( n != child_func->io_num() ) {
+    error_n_of_arguments_mismatch(pt_expr);
+    return ElbValue();
+  }
+
+  vector<ElbValue> arg_list(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    const PtExpr* pt_expr1 = pt_expr->operand(i);
+    ElbValue val1 = evaluate_expr(parent, pt_expr1);
+    if ( val1.is_error() ) {
+      // エラーが起った．
+      return ElbValue();
+    }
+    ElbIODecl* io_decl = child_func->_io(i);
+    ElbDecl* decl = io_decl->_decl();
+#warning "TODO: decl の型と val1 の型を比べる"
+#if 0
+    if ( decl->value_type() != expr1->value_type() ) {
+      error_illegal_argument_type(pt_expr);
+      if ( debug ) {
+	dout << "decl->value_type() = ";
+	put_value_type(dout, decl->value_type());
+	dout << endl
+	     << "expr1->value_type() = ";
+	put_value_type(dout, expr1->value_type());
+	dout << endl;
+      }
+    }
+#endif
+    arg_list[i] = val1;
+  }
+
+#if 0
+  // function call の生成
+  ElbExpr* expr = factory().new_FuncCall(pt_expr, child_func, n, arg_list);
+#else
+  return ElbValue();
+#endif
 }
 
 END_NAMESPACE_YM_VERILOG

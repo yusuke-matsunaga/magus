@@ -256,13 +256,13 @@ TagDictCell::primitive()
   
 // @brief タスクを追加する．
 void
-TagDictCell::add_task(ElbTask* obj)
+TagDictCell::add_task(ElbTaskFunc* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief タスクの先頭を得る．
-const ElbTask*
+const ElbTaskFunc*
 TagDictCell::task()
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -271,13 +271,13 @@ TagDictCell::task()
 
 // @brief 関数を追加する．
 void
-TagDictCell::add_function(ElbFunction* obj)
+TagDictCell::add_function(ElbTaskFunc* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief 関数の先頭を得る．
-const ElbFunction*
+const ElbTaskFunc*
 TagDictCell::function()
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -1402,16 +1402,16 @@ class CellTask :
 public:
 
   /// @brief コンストラクタ
-  CellTask(ElbTask* obj);
+  CellTask(ElbTaskFunc* obj);
   
   /// @brief 要素の追加
   virtual
   void
-  add_task(ElbTask* obj);
+  add_task(ElbTaskFunc* obj);
 
   /// @brief 要素の先頭を得る．
   virtual
-  ElbTask*
+  ElbTaskFunc*
   task();
   
   /// @brief 要素数の取得
@@ -1426,10 +1426,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 先頭の要素
-  ElbTask* mTop;
+  ElbTaskFunc* mTop;
 
   // 末尾の要素
-  ElbTask* mTail;
+  ElbTaskFunc* mTail;
 
   // 要素数
   ymuint32 mNum;
@@ -1437,7 +1437,7 @@ private:
 };
 
 // @brief コンストラクタ
-CellTask::CellTask(ElbTask* obj) :
+CellTask::CellTask(ElbTaskFunc* obj) :
   mTop(obj),
   mTail(obj),
   mNum(1)
@@ -1446,7 +1446,7 @@ CellTask::CellTask(ElbTask* obj) :
   
 // @brief 要素の追加
 void
-CellTask::add_task(ElbTask* obj)
+CellTask::add_task(ElbTaskFunc* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
@@ -1454,7 +1454,7 @@ CellTask::add_task(ElbTask* obj)
 }
 
 // @brief 要素の先頭を得る．
-ElbTask*
+ElbTaskFunc*
 CellTask::task()
 {
   return mTop;
@@ -1470,7 +1470,7 @@ CellTask::num()
 // @brief タスクを追加する．
 // @param[in] obj 登録する要素
 void
-TagDict::add_task(ElbTask* obj)
+TagDict::add_task(ElbTaskFunc* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
@@ -1493,14 +1493,14 @@ TagDict::add_task(ElbTask* obj)
 // @retval false 該当する要素がなかった．
 bool
 TagDict::find_task_list(const VlNamedObj* parent,
-			vector<const VlTask*>& obj_list) const
+			vector<const VlTaskFunc*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiTask);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbTask* obj = cell->task();
+    for (const ElbTaskFunc* obj = cell->task();
 	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
@@ -1519,16 +1519,16 @@ class CellFunction :
 public:
 
   /// @brief コンストラクタ
-  CellFunction(ElbFunction* obj);
+  CellFunction(ElbTaskFunc* obj);
   
   /// @brief 要素の追加
   virtual
   void
-  add_function(ElbFunction* obj);
+  add_function(ElbTaskFunc* obj);
 
   /// @brief 要素の先頭を得る．
   virtual
-  ElbFunction*
+  ElbTaskFunc*
   function();
   
   /// @brief 要素数の取得
@@ -1543,10 +1543,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // 先頭の要素
-  ElbFunction* mTop;
+  ElbTaskFunc* mTop;
 
   // 末尾の要素
-  ElbFunction* mTail;
+  ElbTaskFunc* mTail;
 
   // 要素数
   ymuint32 mNum;
@@ -1554,7 +1554,7 @@ private:
 };
 
 // @brief コンストラクタ
-CellFunction::CellFunction(ElbFunction* obj) :
+CellFunction::CellFunction(ElbTaskFunc* obj) :
   mTop(obj),
   mTail(obj),
   mNum(1)
@@ -1563,7 +1563,7 @@ CellFunction::CellFunction(ElbFunction* obj) :
   
 // @brief 要素の追加
 void
-CellFunction::add_function(ElbFunction* obj)
+CellFunction::add_function(ElbTaskFunc* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
@@ -1571,7 +1571,7 @@ CellFunction::add_function(ElbFunction* obj)
 }
 
 // @brief 要素の先頭を得る．
-ElbFunction*
+ElbTaskFunc*
 CellFunction::function()
 {
   return mTop;
@@ -1587,7 +1587,7 @@ CellFunction::num()
 // @brief function を追加する．
 // @param[in] obj 登録する要素
 void
-TagDict::add_function(ElbFunction* obj)
+TagDict::add_function(ElbTaskFunc* obj)
 {
   const VlNamedObj* parent = obj->parent();
   
@@ -1610,14 +1610,14 @@ TagDict::add_function(ElbFunction* obj)
 // @retval false 該当する要素がなかった．
 bool
 TagDict::find_function_list(const VlNamedObj* parent,
-			    vector<const VlFunction*>& obj_list) const
+			    vector<const VlTaskFunc*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiFunction);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbFunction* obj = cell->function();
+    for (const ElbTaskFunc* obj = cell->function();
 	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }

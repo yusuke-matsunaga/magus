@@ -30,7 +30,7 @@ public:
   /// @brief デストラクタ
   virtual
   ~PtIOHead() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ public:
   /// @brief デストラクタ
   virtual
   ~PtIOItem() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ public:
   virtual
   bool
   is_signed() const = 0;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -181,7 +181,7 @@ public:
   virtual
   tVpiVarType
   data_type() const = 0;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -252,12 +252,12 @@ public:
   virtual
   ymuint32
   dimension_list_size() const = 0;
-  
+
   /// @brief 範囲の取得
   virtual
   const PtRange*
   range(ymuint32 pos) const = 0;
-  
+
   /// @brief 初期値の取得
   /// @retval 初期値
   /// @retval NULL 設定がない場合

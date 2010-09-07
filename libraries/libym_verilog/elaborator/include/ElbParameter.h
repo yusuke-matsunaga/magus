@@ -24,10 +24,10 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbParamHead
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbParamHead();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbParamHead();
@@ -54,7 +54,7 @@ public:
   virtual
   bool
   is_signed() const = 0;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -68,12 +68,12 @@ public:
   virtual
   ElbExpr*
   right_range() const = 0;
-  
+
   /// @brief MSB の値を返す．
   virtual
   int
   left_range_const() const = 0;
-  
+
   /// @brief LSB の値を返す．
   virtual
   int
@@ -93,6 +93,12 @@ public:
   int
   bit_offset(int index) const = 0;
 
+  /// @breif 値の型を返す．
+  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+  virtual
+  tVpiValueType
+  value_type() const = 0;
+
   /// @brief データ型の取得
   virtual
   tVpiVarType
@@ -110,28 +116,28 @@ class ElbParameter :
   public VlDecl
 {
   friend class CellParam;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbParameter();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbParameter();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
   tVpiValueType
   value_type() const = 0;
-  
+
   /// @brief 定数値を持つ型のときに true を返す．
   /// @note このクラスは true を返す．
   virtual
@@ -144,7 +150,7 @@ public:
   virtual
   bool
   is_signed() const = 0;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   virtual
@@ -163,7 +169,7 @@ public:
   virtual
   tVpiVarType
   data_type() const = 0;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -218,7 +224,7 @@ public:
   virtual
   ymuint32
   dimension() const;
-  
+
   /// @brief 範囲の取得
   /// @param[in] pos 位置 ( 0 <= pos < dimension() )
   /// @note このクラスでは NULL を返す．
@@ -231,13 +237,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbParameter の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 初期値の設定
   /// @param[in] expr 初期値
   virtual
   void
   set_expr(ElbExpr* expr) = 0;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -273,7 +279,7 @@ public:
   virtual
   bool
   eval_bool() const = 0;
-  
+
   /// @brief real 型の値を返す．
   virtual
   double
@@ -301,13 +307,13 @@ public:
   /// @brief 次の要素を返す．
   const ElbParameter*
   next() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 次の要素を指すポインタ
   ElbParameter* mNext;
 
@@ -317,7 +323,7 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 inline
 ElbParamHead::ElbParamHead()
@@ -329,14 +335,14 @@ inline
 ElbParamHead::~ElbParamHead()
 {
 }
-  
+
 // @brief コンストラクタ
 inline
 ElbParameter::ElbParameter() :
   mNext(NULL)
 {
 }
-  
+
 // @brief デストラクタ
 inline
 ElbParameter::~ElbParameter()

@@ -211,7 +211,7 @@ public:
   /// @retval false 該当する要素がなかった．
   bool
   find_task_list(const VlNamedObj* parent,
-		 vector<const VlTask*>& task_list) const;
+		 vector<const VlTaskFunc*>& task_list) const;
 
   /// @brief スコープに属する関数のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -220,7 +220,7 @@ public:
   /// @retval false 該当する要素がなかった．
   bool
   find_function_list(const VlNamedObj* parent,
-		     vector<const VlFunction*>& func_list) const;
+		     vector<const VlTaskFunc*>& func_list) const;
 
   /// @brief スコープに属する continuous assignment のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ

@@ -174,6 +174,13 @@ EiPartSelect::is_partselect() const
   return true;
 }
 
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiPartSelect::range_mode() const
+{
+  return kVpiConstRange;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 const VlDecl*
 EiPartSelect::decl_obj() const
@@ -371,6 +378,13 @@ EiParamPartSelect::is_partselect() const
   return true;
 }
 
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiParamPartSelect::range_mode() const
+{
+  return kVpiConstRange;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 const VlDecl*
 EiParamPartSelect::decl_obj() const
@@ -537,6 +551,13 @@ EiArrayElemPartSelect::is_partselect() const
   return true;
 }
 
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiArrayElemPartSelect::range_mode() const
+{
+  return kVpiConstRange;
+}
+
 // @brief 範囲の MSB の式を返す．
 // @note 通常の範囲選択の時，意味を持つ．
 const VlExpr*
@@ -697,6 +718,13 @@ bool
 EiExprPartSelect::is_partselect() const
 {
   return true;
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiExprPartSelect::range_mode() const
+{
+  return kVpiConstRange;
 }
 
 // @brief 親の式を返す．

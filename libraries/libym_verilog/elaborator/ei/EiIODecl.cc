@@ -37,27 +37,27 @@ EiFactory::new_ModIOHead(ElbModule* module,
   return head;
 }
 
-// @brief task 用の IO ヘッダを生成する．
-// @param[in] task 親の task
+// @brief タスク用の IO ヘッダを生成する．
+// @param[in] task 親のタスク
 // @param[in] pt_header パース木のIO宣言ヘッダ
 ElbIOHead*
-EiFactory::new_IOHead(ElbTask* task,
-		      const PtIOHead* pt_header)
+EiFactory::new_TaskIOHead(ElbTaskFunc* task,
+			  const PtIOHead* pt_header)
 {
   void* p = mAlloc.get_memory(sizeof(EiTaskIOHead));
   EiIOHead* head = new (p) EiTaskIOHead(task, pt_header);
   return head;
 }
 
-// @brief function 用の IO ヘッダを生成する．
-// @param[in] func 親の function
+// @brief 関数用の IO ヘッダを生成する．
+// @param[in] func 親の関数
 // @param[in] pt_header パース木のIO宣言ヘッダ
 ElbIOHead*
-EiFactory::new_IOHead(ElbFunction* func,
-		      const PtIOHead* pt_header)
+EiFactory::new_FunctionIOHead(ElbTaskFunc* func,
+			      const PtIOHead* pt_header)
 {
-  void* p = mAlloc.get_memory(sizeof(EiFuncIOHead));
-  EiIOHead* head = new (p) EiFuncIOHead(func, pt_header);
+  void* p = mAlloc.get_memory(sizeof(EiFunctionIOHead));
+  EiIOHead* head = new (p) EiFunctionIOHead(func, pt_header);
   return head;
 }
 
@@ -99,15 +99,15 @@ EiIOHead::module() const
   return NULL;
 }
 
-// @brief 親の task の取得
-ElbTask*
+// @brief 親のタスクの取得
+ElbTaskFunc*
 EiIOHead::task() const
 {
   return NULL;
 }
 
-// @brief 親の function の取得
-ElbFunction*
+// @brief 親の関数の取得
+ElbTaskFunc*
 EiIOHead::function() const
 {
   return NULL;
@@ -146,9 +146,9 @@ EiModIOHead::module() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] task 親の task
+// @param[in] task 親のタスク/関数
 // @param[in] pt_header パース木のIO宣言ヘッダ
-EiTaskIOHead::EiTaskIOHead(ElbTask* task,
+EiTaskIOHead::EiTaskIOHead(ElbTaskFunc* task,
 			   const PtIOHead* pt_header) :
   EiIOHead(pt_header),
   mTask(task)
@@ -160,8 +160,8 @@ EiTaskIOHead::~EiTaskIOHead()
 {
 }
 
-// @brief 親の task の取得
-ElbTask*
+// @brief 親のタスクの取得
+ElbTaskFunc*
 EiTaskIOHead::task() const
 {
   return mTask;
@@ -169,27 +169,27 @@ EiTaskIOHead::task() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiFuncIOHead
+// クラス EiFunctionIOHead
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] func 親の function
+// @param[in] func 親の関数
 // @param[in] pt_header パース木のIO宣言ヘッダ
-EiFuncIOHead::EiFuncIOHead(ElbFunction* func,
-			   const PtIOHead* pt_header) :
+EiFunctionIOHead::EiFunctionIOHead(ElbTaskFunc* func,
+				   const PtIOHead* pt_header) :
   EiIOHead(pt_header),
   mFunction(func)
 {
 }
   
 // @brief デストラクタ
-EiFuncIOHead::~EiFuncIOHead()
+EiFunctionIOHead::~EiFunctionIOHead()
 {
 }
 
-// @brief 親の function の取得
-ElbFunction*
-EiFuncIOHead::function() const
+// @brief 親の関数の取得
+ElbTaskFunc*
+EiFunctionIOHead::function() const
 {
   return mFunction;
 }
@@ -307,22 +307,20 @@ EiIODecl::udp_defn() const
   return NULL;
 }
 
-// @brief 親の task の取得
-// @return このクラスは NULL を返す．
-const VlTask*
+// @brief 親のタスクの取得
+const VlTaskFunc*
 EiIODecl::task() const
 {
   return mHead->task();
 }
 
-// @brief 親の function の取得
-// @return このクラスは NULL を返す．
-const VlFunction*
+// @brief 親の関数の取得
+const VlTaskFunc*
 EiIODecl::function() const
 {
   return mHead->function();
 }
-  
+
 // @brief 対応する ElbDecl を返す．
 ElbDecl*
 EiIODecl::_decl() const

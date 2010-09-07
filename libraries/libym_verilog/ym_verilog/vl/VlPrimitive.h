@@ -12,15 +12,10 @@
 
 
 #include "ym_verilog/vl/VlNamedObj.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class VlUdpDefn;
-class VlDelay;
-class VlExpr;
-class VlPrimitive;
-class VlPrimTerm;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VlPrimArray VlPrimitive.h <ym_verilog/vl/VlPrimitive.h>

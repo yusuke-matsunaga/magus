@@ -60,7 +60,7 @@ public:
   virtual
   const PtDelay*
   delay() const = 0;
-  
+
   /// @brief パラメータ割り当てリストの取得
   virtual
   PtConnectionArray
@@ -97,12 +97,12 @@ public:
   virtual
   bool
   automatic() const = 0;
-  
+
   /// @brief IO宣言の要素数の取得
   virtual
   ymuint32
   ioitem_num() const = 0;
-  
+
   /// @brief IO宣言リストの配列の取得
   virtual
   PtIOHeadArray
@@ -112,17 +112,17 @@ public:
   virtual
   PtDeclHeadArray
   paramhead_array() const = 0;
-  
+
   /// @brief localparam 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   localparamhead_array() const = 0;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const = 0;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -186,7 +186,7 @@ public:
   virtual
   tVpiSpecPathType
   specpath_type() const = 0;
-  
+
   /// @brief ターミナルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
@@ -198,33 +198,33 @@ public:
   virtual
   const PtPathDecl*
   path_decl() const = 0;
-  
+
   /// @brief 条件式の取得
   /// @return 条件式
   virtual
   const PtExpr*
   expr() const = 0;
-  
+
   /// @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   then_declhead_array() const = 0;
-  
+
   /// @brief 条件が成り立ったときに生成される item 配列の取得
   virtual
   PtItemArray
   then_item_array() const = 0;
-  
+
   /// @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   else_declhead_array() const = 0;
-  
+
   /// @brief 条件が成り立たなかったときに生成される item 配列の取得
   virtual
   PtItemArray
   else_item_array() const = 0;
-  
+
   /// @brief case item の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
@@ -272,7 +272,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtDefParam の継承クラスが実装する仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 階層ブランチの取得
   virtual
   PtNameBranchArray
@@ -410,7 +410,7 @@ public:
   virtual
   const PtExpr*
   label(ymuint32 pos) const = 0;
-  
+
   /// @brief 宣言のリストの取得
   virtual
   PtDeclHeadArray
@@ -457,20 +457,20 @@ public:
   virtual
   ymuint32
   input_num() const = 0;
-  
+
   /// @brief 入力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
   const PtExpr*
   input(ymuint32 pos) const = 0;
-  
+
   /// @brief 入力の極性の取得
   /// @return 入力の極性\n
   /// 0の場合もありうる．
   virtual
   int
   input_pol() const = 0;
-  
+
   /// @brief パス記述子(?)の取得
   /// @return vpiParallel か vpiFull
   virtual
@@ -488,21 +488,21 @@ public:
   virtual
   const PtExpr*
   output(ymuint32 pos) const = 0;
-  
+
   /// @brief 出力の極性の取得
   /// @return 出力の極性\n
   /// 0の場合もありうる．
   virtual
   int
   output_pol() const = 0;
-  
+
   /// @brief 式の取得
   /// @return 式\n
   /// NULL の場合もありうる．
   virtual
   const PtExpr*
   expr() const = 0;
-  
+
   /// @brief path_delay_value の取得
   /// @return path_delay_value
   virtual

@@ -56,7 +56,7 @@ public:
   virtual
   ymuint32
   event_num() const = 0;
-  
+
   /// @brief イベントリストの要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   /// @note event control/repeat control の場合のみ意味を持つ
@@ -107,7 +107,7 @@ public:
   virtual
   const PtExpr*
   expr() const = 0;
-  
+
 };
 
 
@@ -137,7 +137,7 @@ public:
   virtual
   tVpiStrength
   drive0() const = 0;
-  
+
   /// @brief drive strength1 の取得
   /// @return 1 の強度
   virtual
@@ -260,7 +260,7 @@ public:
   virtual
   ymuint32
   attrspec_num() const = 0;
-    
+
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < attrspec_num() )
   virtual
@@ -301,7 +301,7 @@ public:
   virtual
   const char*
   name() const = 0;
-  
+
   /// @brief 式の取得
   /// @return 式
   virtual

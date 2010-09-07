@@ -30,7 +30,7 @@ ElbStmt::scope() const
 // @brief task の実体を返す．
 // @note kEnable で意味のある関数
 // @note このクラスでは NULL を返す．
-const VlTask*
+const VlTaskFunc*
 ElbStmt::task() const
 {
   return NULL;

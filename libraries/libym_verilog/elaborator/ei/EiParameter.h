@@ -25,15 +25,15 @@ class EiParamHead :
   public ElbParamHead
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
   EiParamHead(const VlNamedObj* parent,
 	      const PtDeclHead* pt_head);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiParamHead();
@@ -59,7 +59,7 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -73,12 +73,12 @@ public:
   virtual
   ElbExpr*
   right_range() const;
-  
+
   /// @brief MSB の値を返す．
   virtual
   int
   left_range_const() const;
-  
+
   /// @brief LSB の値を返す．
   virtual
   int
@@ -97,6 +97,12 @@ public:
   int
   bit_offset(int index) const;
 
+  /// @breif 値の型を返す．
+  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+  virtual
+  tVpiValueType
+  value_type() const;
+
   /// @brief データ型の取得
   virtual
   tVpiVarType
@@ -111,7 +117,7 @@ private:
 
   // 親のスコープ
   const VlNamedObj* mParent;
-  
+
   // パース木の宣言ヘッダ
   const PtDeclHead* mPtHead;
 
@@ -128,7 +134,7 @@ class EiParamHeadV :
   friend class EiFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
@@ -142,17 +148,17 @@ protected:
 		ElbExpr* right,
 		int left_val,
 		int right_val);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiParamHeadV();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -166,12 +172,12 @@ public:
   virtual
   ElbExpr*
   right_range() const;
-  
+
   /// @brief MSB の値を返す．
   virtual
   int
   left_range_const() const;
-  
+
   /// @brief LSB の値を返す．
   virtual
   int
@@ -188,16 +194,22 @@ public:
   virtual
   int
   bit_offset(int index) const;
-  
+
+  /// @breif 値の型を返す．
+  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+  virtual
+  tVpiValueType
+  value_type() const;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 範囲
   EiRangeImpl mRange;
-  
+
 };
 
 
@@ -209,19 +221,19 @@ class EiParameter :
   public ElbParameter
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] head ヘッダ
   /// @param[in] pt_item パース木の宣言要素
   EiParameter(ElbParamHead* head,
 	      const PtNamedBase* pt_item);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiParameter();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -237,7 +249,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -248,18 +260,18 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
@@ -272,12 +284,12 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief MSB の値を返す．
   virtual
   int
   left_range_const() const;
-  
+
   /// @brief LSB の値を返す．
   virtual
   int
@@ -302,32 +314,32 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief 初期値の取得
   /// @retval 初期値
   /// @retval NULL 設定がない場合
   virtual
   const VlExpr*
   init_value() const;
-  
+
   /// @brief localparam のときに true 返す．
   /// @note このクラスでは false を返す．
   virtual
   bool
   is_local_param() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbParameter の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 値の設定
   /// @param[in] expr 値を表す式
   virtual
   void
   set_expr(ElbExpr* expr);
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -363,7 +375,7 @@ public:
   virtual
   bool
   eval_bool() const;
-  
+
   /// @brief real 型の値を返す．
   virtual
   double
@@ -383,7 +395,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -391,13 +403,13 @@ private:
 
   // ヘッダ
   ElbParamHead* mHead;
-  
+
   // パース木の宣言要素
   const PtNamedBase* mPtItem;
-  
+
   // 値
   ElbExpr* mExpr;
-  
+
 };
 
 
@@ -409,31 +421,31 @@ class EiLocalParam :
   public EiParameter
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] head ヘッダ
   /// @param[in] pt_item パース木の宣言要素
   EiLocalParam(ElbParamHead* head,
 	       const PtNamedBase* pt_item);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiLocalParam();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief localparam のときに true 返す．
   /// @note このクラスでは true を返す．
   virtual
   bool
   is_local_param() const;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

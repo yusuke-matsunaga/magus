@@ -131,7 +131,7 @@ protected:
   /// @param[in] name 名前
   /// @return parent というスコープ内の name という関数を返す．
   /// @return なければ NULL を返す．
-  const ElbFunction*
+  const ElbTaskFunc*
   find_constant_function(const VlNamedObj* parent,
 			 const char* name) const;
   
@@ -166,12 +166,12 @@ protected:
   /// @brief タスクを登録する．
   /// @param[in] obj 登録するオブジェクト
   void
-  reg_task(ElbTask* obj);
+  reg_task(ElbTaskFunc* obj);
   
   /// @brief 関数を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
-  reg_function(ElbFunction* obj);
+  reg_function(ElbTaskFunc* obj);
   
   /// @brief 宣言要素を登録する．
   /// @param[in] tag タグ
@@ -249,7 +249,7 @@ protected:
   void
   reg_constant_function(const VlNamedObj* parent,
 			const char* name,
-			ElbFunction* func);
+			ElbTaskFunc* func);
 
   /// @brief 属性リストを登録する．
   /// @param[in] パース木の属性定義
@@ -361,14 +361,12 @@ protected:
 
   /// @brief IO宣言要素を実体化する．
   /// @param[in] module 親のモジュール
-  /// @param[in] task 親のタスク
-  /// @param[in] function 親の function
+  /// @param[in] taskfunc 親のタスク/関数
   /// @param[in] pt_head_array IO宣言ヘッダの配列
   /// @note module, task, function は1つのみが値を持つ．残りは NULL．
   void
   instantiate_iodecl(ElbModule* module,
-		     ElbTask* task,
-		     ElbFunction* function,
+		     ElbTaskFunc* taskfunc,
 		     PtIOHeadArray pt_head_array);
 
   /// @brief 宣言要素のリストをインスタンス化する．
@@ -403,7 +401,7 @@ protected:
   /// @brief constant function の生成を行う．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_function 関数定義
-  ElbFunction*
+  ElbTaskFunc*
   instantiate_constant_function(const VlNamedObj* parent,
 				const PtItem* pt_function);
 
@@ -772,7 +770,7 @@ ElbProxy::reg_blockscope(ElbScope* obj)
 // @param[in] obj 登録するオブジェクト
 inline
 void
-ElbProxy::reg_task(ElbTask* obj)
+ElbProxy::reg_task(ElbTaskFunc* obj)
 {
   mMgr.reg_task(obj);
 }
@@ -781,7 +779,7 @@ ElbProxy::reg_task(ElbTask* obj)
 // @param[in] obj 登録するオブジェクト
 inline
 void
-ElbProxy::reg_function(ElbFunction* obj)
+ElbProxy::reg_function(ElbTaskFunc* obj)
 {
   mMgr.reg_function(obj);
 }
@@ -924,7 +922,7 @@ ElbProxy::find_moduledef(const char* name) const
 // @return parent というスコープ内の name という関数を返す．
 // @return なければ NULL を返す．
 inline
-const ElbFunction*
+const ElbTaskFunc*
 ElbProxy::find_constant_function(const VlNamedObj* parent,
 				 const char* name) const
 {
@@ -939,7 +937,7 @@ inline
 void
 ElbProxy::reg_constant_function(const VlNamedObj* parent,
 				const char* name,
-				ElbFunction* func)
+				ElbTaskFunc* func)
 {
   mElaborator.reg_constant_function(parent, name, func);
 }

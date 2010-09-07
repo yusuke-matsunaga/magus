@@ -92,18 +92,10 @@ ElbObjHandle::parameter()
   return NULL;
 }
 
-// @brief ElbTask を返す．
+// @brief ElbTaskFunc を返す．
 // @note このクラスでは NULL を返す．
-ElbTask*
-ElbObjHandle::task()
-{
-  return NULL;
-}
-
-// @brief ElbFunction を返す．
-// @note このクラスでは NULL を返す．
-ElbFunction*
-ElbObjHandle::function()
+ElbTaskFunc*
+ElbObjHandle::taskfunc()
 {
   return NULL;
 }
@@ -150,60 +142,30 @@ ElbObjHandle::genvar()
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ElbTaskHandle
+// クラス ElbTaskFuncHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ElbTaskHandle::ElbTaskHandle(ElbTask* obj) :
+ElbTaskFuncHandle::ElbTaskFuncHandle(ElbTaskFunc* obj) :
   mObj(obj)
 {
 }
 
 // @brief デストラクタ
-ElbTaskHandle::~ElbTaskHandle()
+ElbTaskFuncHandle::~ElbTaskFuncHandle()
 {
 }
   
 // @brief VlNamedObj を返す．
 const VlNamedObj*
-ElbTaskHandle::obj()
+ElbTaskFuncHandle::obj()
 {
   return mObj;
 }
 
-// @brief ElbTask を返す．
-ElbTask*
-ElbTaskHandle::task()
-{
-  return mObj;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ElbFunctionHandle
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-ElbFunctionHandle::ElbFunctionHandle(ElbFunction* obj) :
-  mObj(obj)
-{
-}
-
-// @brief デストラクタ
-ElbFunctionHandle::~ElbFunctionHandle()
-{
-}
-  
-// @brief VlNamedObj を返す．
-const VlNamedObj*
-ElbFunctionHandle::obj()
-{
-  return mObj;
-}
-
-// @brief ElbFunction を返す．
-ElbFunction*
-ElbFunctionHandle::function()
+// @brief ElbTaskFunc を返す．
+ElbTaskFunc*
+ElbTaskFuncHandle::taskfunc()
 {
   return mObj;
 }
@@ -525,19 +487,10 @@ ObjDict::add(const VlNamedObj* obj)
 
 // @brief 要素を追加する．
 void
-ObjDict::add(ElbTask* obj)
+ObjDict::add(ElbTaskFunc* obj)
 {
-  void* p = mAlloc.get_memory(sizeof(ElbTaskHandle));
-  ElbTaskHandle* handle = new (p) ElbTaskHandle(obj);
-  add_handle(obj->parent(), obj->name(), handle);
-}
-
-// @brief 要素を追加する．
-void
-ObjDict::add(ElbFunction* obj)
-{
-  void* p = mAlloc.get_memory(sizeof(ElbFunctionHandle));
-  ElbFunctionHandle* handle = new (p) ElbFunctionHandle(obj);
+  void* p = mAlloc.get_memory(sizeof(ElbTaskFuncHandle));
+  ElbTaskFuncHandle* handle = new (p) ElbTaskFuncHandle(obj);
   add_handle(obj->parent(), obj->name(), handle);
 }
 

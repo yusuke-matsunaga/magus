@@ -35,52 +35,52 @@ EiFactory::new_Decl(ElbDeclHead* head,
 		    ElbExpr* init)
 {
   EiDecl* decl = NULL;
-  void* p = NULL;
-  
+
   switch ( head->type() ) {
   case kVpiReg:
   case kVpiNet:
     if ( head->bit_size() == 1 ) {
       if ( init ) {
-	p = mAlloc.get_memory(sizeof(EiDeclIS));
+	void* p = mAlloc.get_memory(sizeof(EiDeclIS));
 	decl = new (p) EiDeclIS(head, pt_item, init);
       }
       else {
-	p = mAlloc.get_memory(sizeof(EiDeclS));
+	void* p = mAlloc.get_memory(sizeof(EiDeclS));
 	decl = new (p) EiDeclS(head, pt_item);
       }
       break;
     }
     // わざと次に続く
-    
+
   case kVpiIntegerVar:
   case kVpiTimeVar:
     if ( init ) {
-      p = mAlloc.get_memory(sizeof(EiDeclIV));
+      void* p = mAlloc.get_memory(sizeof(EiDeclIV));
       decl = new (p) EiDeclIV(head, pt_item, init);
     }
     else {
-      p = mAlloc.get_memory(sizeof(EiDeclV));
+      void* p = mAlloc.get_memory(sizeof(EiDeclV));
       decl = new (p) EiDeclV(head, pt_item);
     }
     break;
-    
+
   case kVpiRealVar:
     if ( init ) {
-      p = mAlloc.get_memory(sizeof(EiDeclIR));
+      void* p = mAlloc.get_memory(sizeof(EiDeclIR));
       decl = new (p) EiDeclIR(head, pt_item, init);
     }
     else {
-      p = mAlloc.get_memory(sizeof(EiDeclR));
+      void* p = mAlloc.get_memory(sizeof(EiDeclR));
       decl = new (p) EiDeclR(head, pt_item);
     }
     break;
-    
+
   case kVpiNamedEvent:
     assert_cond(init == NULL, __FILE__, __LINE__);
-    
-    p = mAlloc.get_memory(sizeof(EiDeclN));
-    decl = new (p) EiDeclN(head, pt_item);
+    {
+      void* p = mAlloc.get_memory(sizeof(EiDeclN));
+      decl = new (p) EiDeclN(head, pt_item);
+    }
     break;
     
   case kVpiParameter:
@@ -89,7 +89,7 @@ EiFactory::new_Decl(ElbDeclHead* head,
     assert_not_reached(__FILE__, __LINE__);
     break;
   }
-  
+
   return decl;
 }
 
@@ -157,28 +157,28 @@ EiDecl::value_type() const
     else {
       return pack(kVpiValueUS, bit_size());
     }
-    
+
   case kVpiIntegerVar:
     return kVpiValueInteger;
-    
+
   case kVpiRealVar:
     return kVpiValueReal;
-    
+
   case kVpiTimeVar:
     return kVpiValueTime;
-    
+
   case kVpiParameter:
   case kVpiSpecParam:
   case kVpiConstant:
     // ここにはこない
     assert_not_reached(__FILE__, __LINE__);
     break;
-    
+
   default:
     // 上記以外は形無し
     break;
   }
-  
+
   return kVpiValueNone;
 }
   
@@ -242,7 +242,7 @@ EiDecl::data_type() const
 {
   return mHead->data_type();
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -304,7 +304,7 @@ EiDecl::set_signed()
 {
   mAuxSign = true;
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -341,7 +341,7 @@ EiDeclN::EiDeclN(ElbDeclHead* head,
 EiDeclN::~EiDeclN()
 {
 }
-  
+
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiDeclN::get_scalar() const
@@ -349,7 +349,7 @@ EiDeclN::get_scalar() const
   assert_not_reached(__FILE__, __LINE__);
   return kVpiScalarX;
 }
-    
+
 // @brief スカラー値を設定する．
 void
 EiDeclN::set_scalar(tVpiScalarVal val)
@@ -372,7 +372,7 @@ EiDeclN::get_real() const
   assert_not_reached(__FILE__, __LINE__);
   return 0.0;
 }
-  
+
 // @brief real 型の値を設定する．
 void
 EiDeclN::set_real(double val)
@@ -457,7 +457,7 @@ EiDeclS::EiDeclS(ElbDeclHead* head,
 EiDeclS::~EiDeclS()
 {
 }
-  
+
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiDeclS::get_scalar() const
@@ -588,14 +588,14 @@ EiDeclR::EiDeclR(ElbDeclHead* head,
 EiDeclR::~EiDeclR()
 {
 }
-  
+
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiDeclR::get_scalar() const
 {
   return conv_from_real(mVal);
 }
-    
+
 // @brief スカラー値を設定する．
 void
 EiDeclR::set_scalar(tVpiScalarVal val)
@@ -621,7 +621,7 @@ EiDeclR::get_real() const
 {
   return mVal;
 }
-  
+
 // @brief real 型の値を設定する．
 void
 EiDeclR::set_real(double val)

@@ -12,12 +12,10 @@
 
 
 #include "ym_verilog/vl/VlObj.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class VlNamedObj;
-class VlStmt;
 
 //////////////////////////////////////////////////////////////////////
 /// @class VlProcess VlProcess.h <ym_verilog/vl/VlProcess.h>

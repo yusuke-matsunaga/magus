@@ -68,11 +68,11 @@ VlDumperImpl::put_iodecl(const char* label,
   if ( udp ) {
     put("vpiUdpDefn", udp->def_name() );
   }
-  const VlTask* task = iodecl->task();
+  const VlTaskFunc* task = iodecl->task();
   if ( task ) {
     put("vpiTask", task->full_name() );
   }
-  const VlFunction* func = iodecl->function();
+  const VlTaskFunc* func = iodecl->function();
   if ( func ) {
     put("vpiFunction", func->full_name() );
   }

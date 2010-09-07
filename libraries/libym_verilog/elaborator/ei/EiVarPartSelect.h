@@ -42,7 +42,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiVarPartSelect();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -71,10 +71,10 @@ public:
   bool
   is_const() const;
 
-  /// @brief 可変範囲指定の時に true を返す．
+  /// @brief 範囲指定のモードを返す．
   virtual
-  bool
-  is_varpartselect() const;
+  tVpiRangeMode
+  range_mode() const;
 
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
@@ -136,7 +136,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -148,20 +148,20 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
@@ -169,7 +169,7 @@ public:
   void
   set_bitvector(const BitVector& v);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -177,16 +177,16 @@ private:
 
   // 対象の宣言要素
   ElbDecl* mObj;
-  
+
   // 範囲のベースの式
   ElbExpr* mBase;
 
   // 範囲
   ElbExpr* mRange;
-  
+
   // 範囲の値
   int mRangeVal;
-  
+
 };
 
 
@@ -216,7 +216,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiParamVarPartSelect();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -245,10 +245,10 @@ public:
   bool
   is_const() const;
 
-  /// @brief 可変範囲指定の時に true を返す．
+  /// @brief 範囲指定のモードを返す．
   virtual
-  bool
-  is_varpartselect() const;
+  tVpiRangeMode
+  range_mode() const;
 
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
@@ -310,7 +310,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -322,20 +322,20 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
@@ -343,7 +343,7 @@ public:
   void
   set_bitvector(const BitVector& v);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -351,16 +351,16 @@ private:
 
   // 対象の宣言要素
   ElbParameter* mObj;
-  
+
   // 範囲のベースの式
   ElbExpr* mBase;
 
   // 範囲の式
   ElbExpr* mRange;
-  
+
   // 範囲の値
   int mRangeVal;
-  
+
 };
 
 
@@ -392,7 +392,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiArrayElemVarPartSelect();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -421,10 +421,10 @@ public:
   bool
   is_const() const;
 
-  /// @brief 可変範囲指定の時に true を返す．
+  /// @brief 範囲指定のモードを返す．
   virtual
-  bool
-  is_varpartselect() const;
+  tVpiRangeMode
+  range_mode() const;
 
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
@@ -481,7 +481,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -493,27 +493,27 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -522,19 +522,19 @@ private:
 
   // 対象の宣言要素
   ElbDeclArray* mObj;
-  
+
   // インデックスのリスト
   vector<ElbExpr*> mIndexList;
-  
+
   // 範囲のベースの式
   ElbExpr* mBase;
 
   // 範囲の式
   ElbExpr* mRange;
-  
+
   // 範囲の値
   int mRangeVal;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

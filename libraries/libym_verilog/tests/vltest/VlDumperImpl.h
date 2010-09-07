@@ -202,13 +202,13 @@ public:
   void
   put_task(const char* label,
 	   const VlMgr& mgr,
-	   const VlTask* task);
+	   const VlTaskFunc* task);
 
   /// @brief function の内容を出力する関数
   void
   put_function(const char* label,
 	       const VlMgr& mgr,
-	       const VlFunction* taskfunc);
+	       const VlTaskFunc* taskfunc);
 
 #if 0
   /// @brief frame の内容を出力する関数

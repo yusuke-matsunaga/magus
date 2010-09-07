@@ -29,7 +29,7 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] pt_header パース木のIO宣言ヘッダ
   EiIOHead(const PtIOHead* pt_header);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiIOHead();
@@ -44,34 +44,34 @@ public:
   virtual
   tVpiDirection
   direction() const;
-  
+
   /// @brief 親のモジュールの取得
   /// @note このクラスでは NULL を返す．
   virtual
   ElbModule*
   module() const;
-  
-  /// @brief 親の task の取得
+
+  /// @brief 親のタスクの取得
   /// @note このクラスでは NULL を返す．
   virtual
-  ElbTask*
+  ElbTaskFunc*
   task() const;
-  
-  /// @brief 親の function の取得
+
+  /// @brief 親の関数の取得
   /// @note このクラスでは NULL を返す．
   virtual
-  ElbFunction*
+  ElbTaskFunc*
   function() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パース木の IO 宣言ヘッダ
   const PtIOHead* mPtHead;
-  
+
 };
 
 
@@ -91,7 +91,7 @@ private:
   /// @param[in] pt_header パース木のIO宣言ヘッダ
   EiModIOHead(ElbModule* module,
 	      const PtIOHead* pt_header);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiModIOHead();
@@ -105,7 +105,7 @@ public:
   /// @brief 親のモジュールの取得
   ElbModule*
   module() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class EiTaskIOHead EiIODecl.h "EiIODecl.h"
-/// @brief task 用の IO のヘッダ
+/// @brief タスク用の IO のヘッダ
 //////////////////////////////////////////////////////////////////////
 class EiTaskIOHead :
   public EiIOHead
@@ -130,11 +130,11 @@ class EiTaskIOHead :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] task 親の task
+  /// @param[in] task 親のタスク
   /// @param[in] pt_header パース木のIO宣言ヘッダ
-  EiTaskIOHead(ElbTask* task,
-	       const PtIOHead* pt_header);
-  
+  EiTaskIOHead(ElbTaskFunc* task,
+	     const PtIOHead* pt_header);
+
   /// @brief デストラクタ
   virtual
   ~EiTaskIOHead();
@@ -145,27 +145,27 @@ public:
   // EiIOHead の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 親の task の取得
-  ElbTask*
+  /// @brief 親のタスクの取得
+  ElbTaskFunc*
   task() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親の task
-  ElbTask* mTask;
-  
+  // 親のタスク
+  ElbTaskFunc* mTask;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiFuncIOHead EiIODecl.h "EiIODecl.h"
-/// @brief function 用の IO のヘッダ
+/// @class EiFunctionIOHead EiIODecl.h "EiIODecl.h"
+/// @brief 関数用の IO のヘッダ
 //////////////////////////////////////////////////////////////////////
-class EiFuncIOHead :
+class EiFunctionIOHead :
   public EiIOHead
 {
   friend class EiFactory;
@@ -173,14 +173,14 @@ class EiFuncIOHead :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] func 親の function
+  /// @param[in] func 親の関数
   /// @param[in] pt_header パース木のIO宣言ヘッダ
-  EiFuncIOHead(ElbFunction* func,
-	       const PtIOHead* pt_header);
-  
+  EiFunctionIOHead(ElbTaskFunc* func,
+		   const PtIOHead* pt_header);
+
   /// @brief デストラクタ
   virtual
-  ~EiFuncIOHead();
+  ~EiFunctionIOHead();
 
 
 public:
@@ -188,19 +188,19 @@ public:
   // EiIOHead の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 親の function の取得
-  ElbFunction*
+  /// @brief 親の関数の取得
+  ElbTaskFunc*
   function() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親の function
-  ElbFunction* mFunction;
-  
+  // 親の関数
+  ElbTaskFunc* mFunction;
+
 };
 
 
@@ -212,17 +212,17 @@ class EiIODecl :
   public ElbIODecl
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   EiIODecl();
-  
+
   /// @brief デストラクタ
   virtual
   ~EiIODecl();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlObj の仮想関数
@@ -260,7 +260,7 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -296,22 +296,22 @@ public:
   const VlUdpDefn*
   udp_defn() const;
 
-  /// @brief 親の task の取得
+  /// @brief 親のタスクの取得
   virtual
-  const VlTask*
+  const VlTaskFunc*
   task() const;
 
-  /// @brief 親の function の取得
+  /// @brief 親の関数の取得
   virtual
-  const VlFunction*
+  const VlTaskFunc*
   function() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbIODecl の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 対応する ElbDecl を返す．
   virtual
   ElbDecl*
@@ -332,7 +332,7 @@ public:
   init(ElbIOHead* head,
        const PtIOItem* pt_item,
        ElbDecl* decl);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -347,7 +347,7 @@ private:
 
   // 対応する宣言要素
   ElbDecl* mDecl;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

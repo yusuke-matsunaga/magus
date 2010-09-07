@@ -39,29 +39,38 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			bool delay)
 {
   EiDeclHead* head = NULL;
-  if ( left && right ) {
-    if ( delay ) {
-      void* p = mAlloc.get_memory(sizeof(EiDeclHeadPtVD));
-      head = new (p) EiDeclHeadPtVD(parent, pt_head,
-				    left, right,
-				    left_val, right_val);
-    }
-    else {
-      void* p = mAlloc.get_memory(sizeof(EiDeclHeadPtV));
-      head = new (p) EiDeclHeadPtV(parent, pt_head,
-				   left, right,
-				   left_val, right_val);
-    }
+  if ( delay ) {
+    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPtVD));
+    head = new (p) EiDeclHeadPtVD(parent, pt_head,
+				  left, right,
+				  left_val, right_val);
   }
   else {
-    if ( delay ) {
-      void* p = mAlloc.get_memory(sizeof(EiDeclHeadPtD));
-      head = new (p) EiDeclHeadPtD(parent, pt_head);
-    }
-    else {
-      void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt));
-      head = new (p) EiDeclHeadPt(parent, pt_head);
-    }
+    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPtV));
+    head = new (p) EiDeclHeadPtV(parent, pt_head,
+				 left, right,
+				 left_val, right_val);
+  }
+  return head;
+}
+
+// @brief 宣言要素のヘッダを生成する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_head パース木の宣言ヘッダ
+// @param[in] delay 遅延値を持つとき true
+ElbDeclHead*
+EiFactory::new_DeclHead(const VlNamedObj* parent,
+			const PtDeclHead* pt_head,
+			bool delay)
+{
+  EiDeclHead* head = NULL;
+  if ( delay ) {
+    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPtD));
+    head = new (p) EiDeclHeadPtD(parent, pt_head);
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt));
+    head = new (p) EiDeclHeadPt(parent, pt_head);
   }
   return head;
 }
@@ -83,17 +92,24 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
-  EiDeclHead* head = NULL;
-  if ( left && right ) {
-    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt2V));
-    head = new (p) EiDeclHeadPt2V(parent, pt_head, aux_type,
-				  left, right,
-				  left_val, right_val);
-  }
-  else {
-    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt2));
-    head = new (p) EiDeclHeadPt2(parent, pt_head, aux_type);
-  }
+  void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt2V));
+  EiDeclHead* head = new (p) EiDeclHeadPt2V(parent, pt_head, aux_type,
+					    left, right,
+					    left_val, right_val);
+  return head;
+}
+
+// @brief 宣言要素のヘッダを生成する．(IODecl 中の宣言用)
+// @param[in] parent 親のスコープ
+// @param[in] pt_head パース木のIO宣言ヘッダ
+// @param[in] aux_type 補助的なデータ型
+ElbDeclHead*
+EiFactory::new_DeclHead(const VlNamedObj* parent,
+			const PtIOHead* pt_head,
+			tVpiAuxType aux_type)
+{
+  void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt2));
+  EiDeclHead* head = new (p) EiDeclHeadPt2(parent, pt_head, aux_type);
   return head;
 }
 
@@ -112,17 +128,22 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
-  EiDeclHead* head = NULL;
-  if ( left && right ) {
-    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt3V));
-    head = new (p) EiDeclHeadPt3V(parent, pt_item,
-				  left, right,
-				  left_val, right_val);
-  }
-  else {
-    void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt3));
-    head = new (p) EiDeclHeadPt3(parent, pt_item);
-  }
+  void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt3V));
+  EiDeclHead* head = new (p) EiDeclHeadPt3V(parent, pt_item,
+					    left, right,
+					    left_val, right_val);
+  return head;
+}
+
+// @brief 宣言要素のヘッダを生成する．(function の暗黙宣言用)
+// @param[in] parent 親のスコープ
+// @param[in] pt_item パース木の関数定義
+ElbDeclHead*
+EiFactory::new_DeclHead(const VlNamedObj* parent,
+			const PtItem* pt_item)
+{
+  void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt3));
+  EiDeclHead* head = new (p) EiDeclHeadPt3(parent, pt_item);
   return head;
 }
 
