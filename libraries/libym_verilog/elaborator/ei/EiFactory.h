@@ -991,11 +991,11 @@ public:
   /// @param[in] range_val 範囲の値
   virtual
   ElbExpr*
-  new_VarPartSelect(const PtBase* pt_expr,
-		    ElbDecl* obj,
-		    ElbExpr* base,
-		    ElbExpr* range,
-		    int range_val);
+  new_PlusPartSelect(const PtBase* pt_expr,
+		     ElbDecl* obj,
+		     ElbExpr* base,
+		     ElbExpr* range,
+		     int range_val);
 
   /// @brief 可変部分選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
@@ -1005,11 +1005,39 @@ public:
   /// @param[in] range_val 範囲の値
   virtual
   ElbExpr*
-  new_VarPartSelect(const PtBase* pt_expr,
-		    ElbParameter* obj,
-		    ElbExpr* base,
-		    ElbExpr* range,
-		    int range_val);
+  new_MinusPartSelect(const PtBase* pt_expr,
+		      ElbDecl* obj,
+		      ElbExpr* base,
+		      ElbExpr* range,
+		      int range_val);
+
+  /// @brief 可変部分選択式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  virtual
+  ElbExpr*
+  new_PlusPartSelect(const PtBase* pt_expr,
+		     ElbParameter* obj,
+		     ElbExpr* base,
+		     ElbExpr* range,
+		     int range_val);
+
+  /// @brief 可変部分選択式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  virtual
+  ElbExpr*
+  new_MinusPartSelect(const PtBase* pt_expr,
+		      ElbParameter* obj,
+		      ElbExpr* base,
+		      ElbExpr* range,
+		      int range_val);
 
   /// @brief 配列要素の可変部分選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
@@ -1020,12 +1048,28 @@ public:
   /// @param[in] range_val 範囲の値
   virtual
   ElbExpr*
-  new_VarPartSelect(const PtBase* pt_expr,
-		    ElbDeclArray* obj,
-		    const vector<ElbExpr*>& index_list,
-		    ElbExpr* base,
-		    ElbExpr* range,
-		    int range_val);
+  new_PlusPartSelect(const PtBase* pt_expr,
+		     ElbDeclArray* obj,
+		     const vector<ElbExpr*>& index_list,
+		     ElbExpr* base,
+		     ElbExpr* range,
+		     int range_val);
+
+  /// @brief 配列要素の可変部分選択式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] index_list インデックスのリスト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  virtual
+  ElbExpr*
+  new_MinusPartSelect(const PtBase* pt_expr,
+		      ElbDeclArray* obj,
+		      const vector<ElbExpr*>& index_list,
+		      ElbExpr* base,
+		      ElbExpr* range,
+		      int range_val);
 
   /// @brief 定数式を生成する．
   /// @param[in] pt_expr パース木の定義要素

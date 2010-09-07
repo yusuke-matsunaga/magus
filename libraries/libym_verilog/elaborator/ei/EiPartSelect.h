@@ -71,26 +71,21 @@ public:
   bool
   is_const() const;
 
-  /// @brief 範囲指定の時に true を返す．
-  virtual
-  bool
-  is_partselect() const;
-
   /// @brief 範囲指定のモードを返す．
   virtual
   tVpiRangeMode
   range_mode() const;
-
-  /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-  virtual
-  const VlDecl*
-  decl_obj() const;
 
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
   virtual
   bool
   is_constant_select() const;
+
+  /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+  virtual
+  const VlDecl*
+  decl_obj() const;
 
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
@@ -247,11 +242,6 @@ public:
   bool
   is_const() const;
 
-  /// @brief 範囲指定の時に true を返す．
-  virtual
-  bool
-  is_partselect() const;
-
   /// @brief 範囲指定のモードを返す．
   virtual
   tVpiRangeMode
@@ -261,6 +251,12 @@ public:
   virtual
   const VlDecl*
   decl_obj() const;
+
+  /// @brief 固定選択子の時 true を返す．
+  /// @note ビット選択，部分選択の時，意味を持つ．
+  virtual
+  bool
+  is_constant_select() const;
 
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
@@ -273,6 +269,18 @@ public:
   virtual
   const VlExpr*
   right_range() const;
+
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 式に対する範囲選択の時，意味を持つ．
+  virtual
+  int
+  left_range_val() const;
+
+  /// @brief 範囲の LSB の値を返す．
+  /// @note 式に対する範囲選択の時，意味を持つ．
+  virtual
+  int
+  right_range_val() const;
 
   /// @brief スカラー値を返す．
   virtual
@@ -407,15 +415,16 @@ public:
   bool
   is_const() const;
 
-  /// @brief 範囲指定の時に true を返す．
-  virtual
-  bool
-  is_partselect() const;
-
   /// @brief 範囲指定のモードを返す．
   virtual
   tVpiRangeMode
   range_mode() const;
+
+  /// @brief 固定選択子の時 true を返す．
+  /// @note ビット選択，部分選択の時，意味を持つ．
+  virtual
+  bool
+  is_constant_select() const;
 
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
@@ -428,6 +437,18 @@ public:
   virtual
   const VlExpr*
   right_range() const;
+
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 式に対する範囲選択の時，意味を持つ．
+  virtual
+  int
+  left_range_val() const;
+
+  /// @brief 範囲の LSB の値を返す．
+  /// @note 式に対する範囲選択の時，意味を持つ．
+  virtual
+  int
+  right_range_val() const;
 
   /// @brief スカラー値を返す．
   virtual
@@ -488,12 +509,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 対象の宣言要素
-  ElbDeclArray* mObj;
-
-  // インデックスのリスト
-  vector<ElbExpr*> mIndexList;
 
   // 範囲選択式
   ElbExpr* mIndex1;
@@ -560,15 +575,16 @@ public:
   bool
   is_const() const;
 
-  /// @brief 範囲指定の時に true を返す．
-  virtual
-  bool
-  is_partselect() const;
-
   /// @brief 範囲指定のモードを返す．
   virtual
   tVpiRangeMode
   range_mode() const;
+
+  /// @brief 固定選択子の時 true を返す．
+  /// @note ビット選択，部分選択の時，意味を持つ．
+  virtual
+  bool
+  is_constant_select() const;
 
   /// @brief 親の式を返す．
   /// @note 式に対するビット選択/範囲選択の時，意味を持つ．

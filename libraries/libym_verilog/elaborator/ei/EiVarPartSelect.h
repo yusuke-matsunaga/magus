@@ -17,15 +17,13 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiVarPartSelectPart EiVarPartSelect.h "EiVarPartSelect.h"
+/// @class EiVarPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
 /// @brief 可変パート選択付きのプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiVarPartSelect :
   public EiExprBase1
 {
-  friend class EiFactory;
-
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
@@ -70,11 +68,6 @@ public:
   virtual
   bool
   is_const() const;
-
-  /// @brief 範囲指定のモードを返す．
-  virtual
-  tVpiRangeMode
-  range_mode() const;
 
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   virtual
@@ -191,15 +184,95 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiParamVarPartSelectPart EiVarPartSelect.h "EiVarPartSelect.h"
+/// @class EiPlusPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
+/// @brief 可変パート選択付きのプライマリ式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiPlusPartSelect :
+  public EiVarPartSelect
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  EiPlusPartSelect(const PtBase* pt_expr,
+		   ElbDecl* obj,
+		   ElbExpr* base,
+		   ElbExpr* range,
+		   int range_val);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiPlusPartSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EiMinusPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
+/// @brief 可変パート選択付きのプライマリ式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiMinusPartSelect :
+  public EiVarPartSelect
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  EiMinusPartSelect(const PtBase* pt_expr,
+		    ElbDecl* obj,
+		    ElbExpr* base,
+		    ElbExpr* range,
+		    int range_val);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiMinusPartSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EiParamVarPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
 /// @brief 可変パート選択付きのプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiParamVarPartSelect :
   public EiExprBase1
 {
-  friend class EiFactory;
-
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
@@ -244,11 +317,6 @@ public:
   virtual
   bool
   is_const() const;
-
-  /// @brief 範囲指定のモードを返す．
-  virtual
-  tVpiRangeMode
-  range_mode() const;
 
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
@@ -365,15 +433,95 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiVarArrayElemPrimaryPart EiVarPartSelect.h "EiVarPartSelect.h"
+/// @class EiParamPlusPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
+/// @brief 可変パート選択付きのプライマリ式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiParamPlusPartSelect :
+  public EiParamVarPartSelect
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  EiParamPlusPartSelect(const PtBase* pt_expr,
+			ElbParameter* obj,
+			ElbExpr* base,
+			ElbExpr* range,
+			int range_val);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiParamPlusPartSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EiParamMinusPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
+/// @brief 可変パート選択付きのプライマリ式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiParamMinusPartSelect :
+  public EiParamVarPartSelect
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  EiParamMinusPartSelect(const PtBase* pt_expr,
+			 ElbParameter* obj,
+			 ElbExpr* base,
+			 ElbExpr* range,
+			 int range_val);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiParamMinusPartSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EiArrayElemVarPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
 /// @brief 可変パート選択付きの配列要素のプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiArrayElemVarPartSelect :
   public EiArrayElemPrimary
 {
-  friend class EiFactory;
-
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
@@ -420,11 +568,6 @@ public:
   virtual
   bool
   is_const() const;
-
-  /// @brief 範囲指定のモードを返す．
-  virtual
-  tVpiRangeMode
-  range_mode() const;
 
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
@@ -534,6 +677,92 @@ private:
 
   // 範囲の値
   int mRangeVal;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EiArrayElemPlusPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
+/// @brief 可変パート選択付きの配列要素のプライマリ式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiArrayElemPlusPartSelect :
+  public EiArrayElemVarPartSelect
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] index_list インデックスのリスト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  EiArrayElemPlusPartSelect(const PtBase* pt_expr,
+			    ElbDeclArray* obj,
+			    const vector<ElbExpr*>& index_list,
+			    ElbExpr* base,
+			    ElbExpr* range,
+			    int range_val);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiArrayElemPlusPartSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EiArrayElemMinusPartSelect EiVarPartSelect.h "EiVarPartSelect.h"
+/// @brief 可変パート選択付きの配列要素のプライマリ式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiArrayElemMinusPartSelect :
+  public EiArrayElemVarPartSelect
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] index_list インデックスのリスト
+  /// @param[in] base 範囲のベースアドレスを表す式
+  /// @param[in] range 範囲を表す式
+  /// @param[in] range_val 範囲の値
+  EiArrayElemMinusPartSelect(const PtBase* pt_expr,
+			     ElbDeclArray* obj,
+			     const vector<ElbExpr*>& index_list,
+			     ElbExpr* base,
+			     ElbExpr* range,
+			     int range_val);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiArrayElemMinusPartSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲指定のモードを返す．
+  virtual
+  tVpiRangeMode
+  range_mode() const;
 
 };
 

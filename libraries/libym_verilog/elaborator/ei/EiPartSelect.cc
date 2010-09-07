@@ -167,13 +167,6 @@ EiPartSelect::is_const() const
   return mObj->is_consttype();
 }
 
-// @brief 範囲指定の時に true を返す．
-bool
-EiPartSelect::is_partselect() const
-{
-  return true;
-}
-
 // @brief 範囲指定のモードを返す．
 tVpiRangeMode
 EiPartSelect::range_mode() const
@@ -193,8 +186,7 @@ EiPartSelect::decl_obj() const
 bool
 EiPartSelect::is_constant_select() const
 {
-  // mIndex2 は常に定数のはず
-  return mIndex1->is_const();
+  return true;
 }
 
 // @brief 範囲の MSB の式を返す．
@@ -218,11 +210,7 @@ EiPartSelect::right_range() const
 int
 EiPartSelect::left_range_val() const
 {
-  int ans;
-  if ( !mIndex1->eval_int(ans) ) {
-    return 0;
-  }
-  return ans;
+  return mIndex1Val;
 }
 
 // @brief 範囲の LSB の値を返す．
@@ -230,11 +218,7 @@ EiPartSelect::left_range_val() const
 int
 EiPartSelect::right_range_val() const
 {
-  int ans;
-  if ( !mIndex2->eval_int(ans) ) {
-    return 0;
-  }
-  return ans;
+  return mIndex2Val;
 }
 
 // @brief スカラー値を返す．
@@ -371,18 +355,19 @@ EiParamPartSelect::is_const() const
   return true;
 }
 
-// @brief 範囲指定の時に true を返す．
-bool
-EiParamPartSelect::is_partselect() const
-{
-  return true;
-}
-
 // @brief 範囲指定のモードを返す．
 tVpiRangeMode
 EiParamPartSelect::range_mode() const
 {
   return kVpiConstRange;
+}
+
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
+bool
+EiParamPartSelect::is_constant_select() const
+{
+  return true;
 }
 
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
@@ -406,6 +391,22 @@ const VlExpr*
 EiParamPartSelect::right_range() const
 {
   return mIndex2;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 式に対する範囲選択の時，意味を持つ．
+int
+EiParamPartSelect::left_range_val() const
+{
+  return mIndex1Val;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 式に対する範囲選択の時，意味を持つ．
+int
+EiParamPartSelect::right_range_val() const
+{
+  return mIndex2Val;
 }
 
 // @brief スカラー値を返す．
@@ -544,18 +545,19 @@ EiArrayElemPartSelect::is_const() const
   return decl_array()->is_consttype();
 }
 
-// @brief 範囲指定の時に true を返す．
-bool
-EiArrayElemPartSelect::is_partselect() const
-{
-  return true;
-}
-
 // @brief 範囲指定のモードを返す．
 tVpiRangeMode
 EiArrayElemPartSelect::range_mode() const
 {
   return kVpiConstRange;
+}
+
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
+bool
+EiArrayElemPartSelect::is_constant_select() const
+{
+  return true;
 }
 
 // @brief 範囲の MSB の式を返す．
@@ -572,6 +574,22 @@ const VlExpr*
 EiArrayElemPartSelect::right_range() const
 {
   return mIndex2;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 式に対する範囲選択の時，意味を持つ．
+int
+EiArrayElemPartSelect::left_range_val() const
+{
+  return mIndex1Val;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 式に対する範囲選択の時，意味を持つ．
+int
+EiArrayElemPartSelect::right_range_val() const
+{
+  return mIndex2Val;
 }
 
 // @brief スカラー値を返す．
@@ -607,7 +625,7 @@ EiArrayElemPartSelect::eval_bitvector(BitVector& bitvector,
 				      tVpiValueType req_type) const
 {
   if ( eval_index() ) {
-    mObj->get_partselect(mIndexValList, mIndex1Val, mIndex2Val, bitvector);
+    decl_array()->get_partselect(mIndexValList, mIndex1Val, mIndex2Val, bitvector);
   }
   else {
     bitvector = kVpiScalarX;
@@ -644,7 +662,7 @@ EiArrayElemPartSelect::set_scalar(tVpiScalarVal v)
 {
   assert_cond(mIndex1Val == mIndex2Val, __FILE__, __LINE__);
   if ( eval_index() ) {
-    mObj->set_bitselect(mIndexValList, mIndex1Val, v);
+    decl_array()->set_bitselect(mIndexValList, mIndex1Val, v);
   }
 }
 
@@ -655,9 +673,9 @@ void
 EiArrayElemPartSelect::set_bitvector(const BitVector& v)
 {
   if ( eval_index() ) {
-    mObj->set_partselect(mIndexValList, mIndex1Val, mIndex2Val, v);
+    decl_array()->set_partselect(mIndexValList, mIndex1Val, mIndex2Val, v);
   }
-}  
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -713,18 +731,19 @@ EiExprPartSelect::is_const() const
   return mExpr->is_const();
 }
 
-// @brief 範囲指定の時に true を返す．
-bool
-EiExprPartSelect::is_partselect() const
-{
-  return true;
-}
-
 // @brief 範囲指定のモードを返す．
 tVpiRangeMode
 EiExprPartSelect::range_mode() const
 {
   return kVpiConstRange;
+}
+
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
+bool
+EiExprPartSelect::is_constant_select() const
+{
+  return true;
 }
 
 // @brief 親の式を返す．

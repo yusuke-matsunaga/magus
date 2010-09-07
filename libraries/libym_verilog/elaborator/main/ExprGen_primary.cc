@@ -438,21 +438,18 @@ ExprGen::instantiate_decl_primary(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl,
-					   index1, index2, range_val);
+	return factory().new_PlusPartSelect(pt_expr, decl,
+					    index1, index2, range_val);
       }
 
     case kVpiMinusRange:
       {
-	// 単項マイナス演算子を付加する．
-	ElbExpr* index2_minus = factory().new_UnaryOp(pt_expr, kVpiMinusOp,
-						      index2);
 	int range_val;
-	if ( !expr_to_int(index2_minus, range_val) ) {
+	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl,
-					   index1, index2_minus, range_val);
+	return factory().new_MinusPartSelect(pt_expr, decl,
+					     index1, index2, range_val);
       }
 
     case kVpiNoRange:
@@ -523,21 +520,18 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl_array, index_list,
-					   index1, index2, range_val);
+	return factory().new_PlusPartSelect(pt_expr, decl_array, index_list,
+					    index1, index2, range_val);
       }
       
     case kVpiMinusRange:
       {
-	// 単項マイナス演算子を付加する．
-	ElbExpr* index2_minus = factory().new_UnaryOp(pt_expr, kVpiMinusOp,
-						      index2);
 	int range_val;
-	if ( !expr_to_int(index2_minus, range_val) ) {
+	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl_array, index_list,
-					   index1, index2_minus, range_val);
+	return factory().new_MinusPartSelect(pt_expr, decl_array, index_list,
+					     index1, index2, range_val);
       }
 
     case kVpiNoRange:
@@ -605,21 +599,18 @@ ExprGen::instantiate_param_primary(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, param,
-					   index1, index2, range_val);
+	return factory().new_PlusPartSelect(pt_expr, param,
+					    index1, index2, range_val);
       }
 
     case kVpiMinusRange:
       {
-	// 単項マイナス演算子を付加する．
-	ElbExpr* index2_minus = factory().new_UnaryOp(pt_expr, kVpiMinusOp,
-						      index2);
 	int range_val;
-	if ( !expr_to_int(index2_minus, range_val) ) {
+	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, param,
-					   index1, index2_minus, range_val);
+	return factory().new_MinusPartSelect(pt_expr, param,
+					   index1, index2, range_val);
       }
 
     case kVpiNoRange:
@@ -811,21 +802,18 @@ ExprGen::instantiate_decl_lhs(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl,
-					   index1, index2, range_val);
+	return factory().new_PlusPartSelect(pt_expr, decl,
+					    index1, index2, range_val);
       }
 
     case kVpiMinusRange:
       {
-	// 単項マイナス演算子を付加する．
-	ElbExpr* index2_minus = factory().new_UnaryOp(pt_expr, kVpiMinusOp,
-						      index2);
 	int range_val;
-	if ( !expr_to_int(index2_minus, range_val) ) {
+	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl,
-					   index1, index2_minus, range_val);
+	return factory().new_MinusPartSelect(pt_expr, decl,
+					     index1, index2, range_val);
       }
 
     case kVpiNoRange:
@@ -925,21 +913,18 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl_array, index_list,
-					   index1, index2, range_val);
+	return factory().new_PlusPartSelect(pt_expr, decl_array, index_list,
+					    index1, index2, range_val);
       }
 
     case kVpiMinusRange:
       {
-	// 単項マイナス演算子を付加する．
-	ElbExpr* index2_minus = factory().new_UnaryOp(pt_expr, kVpiMinusOp,
-						      index2);
 	int range_val;
-	if ( !expr_to_int(index2_minus, range_val) ) {
+	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_VarPartSelect(pt_expr, decl_array, index_list,
-					   index1, index2_minus, range_val);
+	return factory().new_MinusPartSelect(pt_expr, decl_array, index_list,
+					     index1, index2, range_val);
       }
 
     case kVpiNoRange:

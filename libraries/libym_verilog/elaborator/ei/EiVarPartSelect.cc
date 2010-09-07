@@ -31,15 +31,15 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
 ElbExpr*
-EiFactory::new_VarPartSelect(const PtBase* pt_expr,
-			     ElbDecl* obj,
-			     ElbExpr* base,
-			     ElbExpr* range,
-			     int range_val)
+EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
+			      ElbDecl* obj,
+			      ElbExpr* base,
+			      ElbExpr* range,
+			      int range_val)
 {
-  void* p = mAlloc.get_memory(sizeof(EiVarPartSelect));
-  EiVarPartSelect* expr = new (p) EiVarPartSelect(pt_expr, obj,
-						  base, range, range_val);
+  void* p = mAlloc.get_memory(sizeof(EiPlusPartSelect));
+  EiVarPartSelect* expr = new (p) EiPlusPartSelect(pt_expr, obj,
+						   base, range, range_val);
 
   return expr;
 }
@@ -51,16 +51,57 @@ EiFactory::new_VarPartSelect(const PtBase* pt_expr,
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
 ElbExpr*
-EiFactory::new_VarPartSelect(const PtBase* pt_expr,
-			     ElbParameter* obj,
-			     ElbExpr* base,
-			     ElbExpr* range,
-			     int range_val)
+EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
+			      ElbDecl* obj,
+			      ElbExpr* base,
+			      ElbExpr* range,
+			      int range_val)
 {
-  void* p = mAlloc.get_memory(sizeof(EiParamVarPartSelect));
-  EiParamVarPartSelect* expr = new (p) EiParamVarPartSelect(pt_expr, obj,
-							    base, range,
-							    range_val);
+  void* p = mAlloc.get_memory(sizeof(EiMinusPartSelect));
+  EiVarPartSelect* expr = new (p) EiMinusPartSelect(pt_expr, obj,
+						    base, range, range_val);
+
+  return expr;
+}
+
+// @brief 可変部分選択式を生成する．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+ElbExpr*
+EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
+			      ElbParameter* obj,
+			      ElbExpr* base,
+			      ElbExpr* range,
+			      int range_val)
+{
+  void* p = mAlloc.get_memory(sizeof(EiParamPlusPartSelect));
+  EiParamVarPartSelect* expr = new (p) EiParamPlusPartSelect(pt_expr, obj,
+							     base, range,
+							     range_val);
+
+  return expr;
+}
+
+// @brief 可変部分選択式を生成する．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+ElbExpr*
+EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
+			      ElbParameter* obj,
+			      ElbExpr* base,
+			      ElbExpr* range,
+			      int range_val)
+{
+  void* p = mAlloc.get_memory(sizeof(EiParamMinusPartSelect));
+  EiParamVarPartSelect* expr = new (p) EiParamMinusPartSelect(pt_expr, obj,
+							     base, range,
+							     range_val);
 
   return expr;
 }
@@ -73,18 +114,42 @@ EiFactory::new_VarPartSelect(const PtBase* pt_expr,
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
 ElbExpr*
-EiFactory::new_VarPartSelect(const PtBase* pt_expr,
-			     ElbDeclArray* obj,
-			     const vector<ElbExpr*>& index_list,
-			     ElbExpr* base,
-			     ElbExpr* range,
-			     int range_val)
+EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
+			      ElbDeclArray* obj,
+			      const vector<ElbExpr*>& index_list,
+			      ElbExpr* base,
+			      ElbExpr* range,
+			      int range_val)
 {
-  void* p = mAlloc.get_memory(sizeof(EiArrayElemVarPartSelect));
-  EiArrayElemVarPartSelect* expr = new (p) EiArrayElemVarPartSelect(pt_expr, obj,
-								    index_list,
-								    base, range,
-								    range_val);
+  void* p = mAlloc.get_memory(sizeof(EiArrayElemPlusPartSelect));
+  EiArrayElemVarPartSelect* expr = new (p) EiArrayElemPlusPartSelect(pt_expr, obj,
+								     index_list,
+								     base, range,
+								     range_val);
+
+  return expr;
+}
+
+// @brief 配列要素の可変部分選択式を生成する．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] index_list インデックスのリスト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+ElbExpr*
+EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
+			       ElbDeclArray* obj,
+			       const vector<ElbExpr*>& index_list,
+			       ElbExpr* base,
+			       ElbExpr* range,
+			       int range_val)
+{
+  void* p = mAlloc.get_memory(sizeof(EiArrayElemMinusPartSelect));
+  EiArrayElemVarPartSelect* expr = new (p) EiArrayElemMinusPartSelect(pt_expr, obj,
+								     index_list,
+								     base, range,
+								     range_val);
 
   return expr;
 }
@@ -129,8 +194,7 @@ EiVarPartSelect::type() const
 tVpiValueType
 EiVarPartSelect::value_type() const
 {
-  int w = (mRangeVal) > 0 ? mRangeVal : - mRangeVal;
-  return pack(kVpiValueUS, w);
+  return pack(kVpiValueUS, mRangeVal);
 }
 
 // @brief 定数の時 true を返す．
@@ -138,12 +202,6 @@ bool
 EiVarPartSelect::is_const() const
 {
   return mObj->is_consttype() && is_constant_select();
-}
-
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiVarPartSelect::range_mode() const
-{
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -246,7 +304,7 @@ EiVarPartSelect::decompile_impl(int ppri) const
 {
   ostringstream buf;
   buf << mObj->name() << "[" << mBase->decompile();
-  if ( mRangeVal > 0 ) {
+  if ( range_mode() == kVpiPlusRange ) {
     buf << "+: " << mRangeVal;
   }
   else {
@@ -288,6 +346,70 @@ EiVarPartSelect::set_bitvector(const BitVector& v)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス EiPlusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiPlusPartSelect::EiPlusPartSelect(const PtBase* pt_expr,
+				   ElbDecl* obj,
+				   ElbExpr* base,
+				   ElbExpr* range,
+				   int range_val) :
+  EiVarPartSelect(pt_expr, obj, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiPlusPartSelect::~EiPlusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiPlusPartSelect::range_mode() const
+{
+  return kVpiPlusRange;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiMinusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiMinusPartSelect::EiMinusPartSelect(const PtBase* pt_expr,
+				     ElbDecl* obj,
+				     ElbExpr* base,
+				     ElbExpr* range,
+				     int range_val) :
+  EiVarPartSelect(pt_expr, obj, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiMinusPartSelect::~EiMinusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiMinusPartSelect::range_mode() const
+{
+  return kVpiMinusRange;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス EiParamVarPartSelect
 //////////////////////////////////////////////////////////////////////
 
@@ -326,8 +448,7 @@ EiParamVarPartSelect::type() const
 tVpiValueType
 EiParamVarPartSelect::value_type() const
 {
-  int w = (mRangeVal > 0) ? mRangeVal : - mRangeVal;
-  return pack(kVpiValueUS, w);
+  return pack(kVpiValueUS, mRangeVal);
 }
 
 // @brief 定数の時 true を返す．
@@ -335,12 +456,6 @@ bool
 EiParamVarPartSelect::is_const() const
 {
   return is_constant_select();
-}
-
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiParamVarPartSelect::range_mode() const
-{
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -445,7 +560,7 @@ EiParamVarPartSelect::decompile_impl(int ppri) const
 {
   ostringstream buf;
   buf << mObj->name() << "[" << mBase->decompile();
-  if ( mRangeVal > 0 ) {
+  if ( range_mode() == kVpiPlusRange ) {
     buf << "+: " << mRangeVal;
   }
   else {
@@ -480,7 +595,71 @@ void
 EiParamVarPartSelect::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
-}  
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiParamPlusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiParamPlusPartSelect::EiParamPlusPartSelect(const PtBase* pt_expr,
+					     ElbParameter* obj,
+					     ElbExpr* base,
+					     ElbExpr* range,
+					     int range_val) :
+  EiParamVarPartSelect(pt_expr, obj, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiParamPlusPartSelect::~EiParamPlusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiParamPlusPartSelect::range_mode() const
+{
+  return kVpiPlusRange;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiParamMinusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiParamMinusPartSelect::EiParamMinusPartSelect(const PtBase* pt_expr,
+					       ElbParameter* obj,
+					       ElbExpr* base,
+					       ElbExpr* range,
+					       int range_val) :
+  EiParamVarPartSelect(pt_expr, obj, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiParamMinusPartSelect::~EiParamMinusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiParamMinusPartSelect::range_mode() const
+{
+  return kVpiMinusRange;
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -523,8 +702,7 @@ EiArrayElemVarPartSelect::type() const
 tVpiValueType
 EiArrayElemVarPartSelect::value_type() const
 {
-  int w = (mRangeVal > 0) ? mRangeVal : - mRangeVal;
-  return pack(kVpiValueUS, w);
+  return pack(kVpiValueUS, mRangeVal);
 }
 
 // @brief 定数の時 true を返す．
@@ -533,12 +711,6 @@ bool
 EiArrayElemVarPartSelect::is_const() const
 {
   return decl_array()->is_consttype() && is_constant_select();
-}
-
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiArrayElemVarPartSelect::range_mode() const
-{
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -619,12 +791,12 @@ EiArrayElemVarPartSelect::eval_real() const
 // @brief bitvector 型の値を返す．
 void
 EiArrayElemVarPartSelect::eval_bitvector(BitVector& bitvector,
-				      tVpiValueType req_type) const
+					 tVpiValueType req_type) const
 {
   if ( eval_index() ) {
     int lsb = range_base_val();
     int msb = lsb + mRangeVal - 1;
-    mObj->get_partselect(mIndexValList, msb, lsb, bitvector);
+    decl_array()->get_partselect(mIndexValList, msb, lsb, bitvector);
   }
   else {
     bitvector = kVpiScalarX;
@@ -667,7 +839,7 @@ EiArrayElemVarPartSelect::set_scalar(tVpiScalarVal v)
 {
   assert_cond(mRangeVal == 1, __FILE__, __LINE__);
   if ( eval_index() ) {
-    mObj->set_bitselect(mIndexValList, range_base_val(), v);
+    decl_array()->set_bitselect(mIndexValList, range_base_val(), v);
   }
 }
 
@@ -680,8 +852,77 @@ EiArrayElemVarPartSelect::set_bitvector(const BitVector& v)
   if ( eval_index() ) {
     int lsb = range_base_val();
     int msb = lsb + mRangeVal - 1;
-    mObj->set_partselect(mIndexValList, msb, lsb, v);
+    decl_array()->set_partselect(mIndexValList, msb, lsb, v);
   }
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiArrayElemPlusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] index_list インデックスのリスト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiArrayElemPlusPartSelect::EiArrayElemPlusPartSelect(const PtBase* pt_expr,
+						     ElbDeclArray* obj,
+						     const vector<ElbExpr*>& index_list,
+						     ElbExpr* base,
+						     ElbExpr* range,
+						     int range_val) :
+  EiArrayElemVarPartSelect(pt_expr, obj, index_list, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiArrayElemPlusPartSelect::~EiArrayElemPlusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiArrayElemPlusPartSelect::range_mode() const
+{
+  return kVpiPlusRange;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiArrayElemMinusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] index_list インデックスのリスト
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiArrayElemMinusPartSelect::EiArrayElemMinusPartSelect(const PtBase* pt_expr,
+						       ElbDeclArray* obj,
+						       const vector<ElbExpr*>& index_list,
+						       ElbExpr* base,
+						       ElbExpr* range,
+						       int range_val) :
+  EiArrayElemVarPartSelect(pt_expr, obj, index_list, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiArrayElemMinusPartSelect::~EiArrayElemMinusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiArrayElemMinusPartSelect::range_mode() const
+{
+  return kVpiMinusRange;
+}
+
 
 END_NAMESPACE_YM_VERILOG
