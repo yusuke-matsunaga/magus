@@ -38,8 +38,8 @@ EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
 			      int range_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiPlusPartSelect));
-  EiVarPartSelect* expr = new (p) EiPlusPartSelect(pt_expr, obj,
-						   base, range, range_val);
+  ElbExpr* expr = new (p) EiPlusPartSelect(pt_expr, obj,
+					   base, range, range_val);
 
   return expr;
 }
@@ -58,8 +58,8 @@ EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
 			      int range_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiMinusPartSelect));
-  EiVarPartSelect* expr = new (p) EiMinusPartSelect(pt_expr, obj,
-						    base, range, range_val);
+  ElbExpr* expr = new (p) EiMinusPartSelect(pt_expr, obj,
+					    base, range, range_val);
 
   return expr;
 }
@@ -78,9 +78,9 @@ EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
 			      int range_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiParamPlusPartSelect));
-  EiParamVarPartSelect* expr = new (p) EiParamPlusPartSelect(pt_expr, obj,
-							     base, range,
-							     range_val);
+  ElbExpr* expr = new (p) EiParamPlusPartSelect(pt_expr, obj,
+						base, range,
+						range_val);
 
   return expr;
 }
@@ -99,9 +99,9 @@ EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
 			      int range_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiParamMinusPartSelect));
-  EiParamVarPartSelect* expr = new (p) EiParamMinusPartSelect(pt_expr, obj,
-							     base, range,
-							     range_val);
+  ElbExpr* expr = new (p) EiParamMinusPartSelect(pt_expr, obj,
+						 base, range,
+						 range_val);
 
   return expr;
 }
@@ -122,10 +122,10 @@ EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
 			      int range_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiArrayElemPlusPartSelect));
-  EiArrayElemVarPartSelect* expr = new (p) EiArrayElemPlusPartSelect(pt_expr, obj,
-								     index_list,
-								     base, range,
-								     range_val);
+  ElbExpr* expr = new (p) EiArrayElemPlusPartSelect(pt_expr, obj,
+						    index_list,
+						    base, range,
+						    range_val);
 
   return expr;
 }
@@ -146,10 +146,10 @@ EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
 			       int range_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiArrayElemMinusPartSelect));
-  EiArrayElemVarPartSelect* expr = new (p) EiArrayElemMinusPartSelect(pt_expr, obj,
-								     index_list,
-								     base, range,
-								     range_val);
+  ElbExpr* expr = new (p) EiArrayElemMinusPartSelect(pt_expr, obj,
+						     index_list,
+						     base, range,
+						     range_val);
 
   return expr;
 }
