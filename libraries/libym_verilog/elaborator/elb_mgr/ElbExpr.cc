@@ -27,7 +27,7 @@ ElbExpr::decompile() const
 {
   return decompile_impl(0);
 }
-  
+
 // @brief 式のビット幅を返す．
 ymuint32
 ElbExpr::bit_size() const
@@ -110,51 +110,6 @@ ElbExpr::index() const
   return NULL;
 }
 
-// @brief 範囲の MSB を返す．
-// @note 部分選択の時，意味を持つ．
-// @note このクラスでは NULL を返す．
-const VlExpr*
-ElbExpr::left_range() const
-{
-  return NULL;
-}
-
-// @brief 範囲の LSB を返す．
-// @note 部分選択の時，意味を持つ．
-// @note このクラスでは NULL を返す．
-const VlExpr*
-ElbExpr::right_range() const
-{
-  return NULL;
-}
-
-// @brief 範囲のベースアドレスの式を返す．
-// @note 可変範囲選択の時，意味を持つ．
-// @note それ以外では NULL を返す．
-const VlExpr*
-ElbExpr::range_base() const
-{
-  return NULL;
-}
-
-// @brief 範囲のビット幅を表す式を返す．
-// @note 可変範囲選択の時，意味を持つ．
-// @note それ以外では NULL を返す．
-const VlExpr*
-ElbExpr::range_expr() const
-{
-  return NULL;
-}
-
-// @brief 親の式を返す．
-// @note 式に対するビット選択/範囲選択の時，意味を持つ．
-// @note このクラスでは NULL を返す．
-const VlExpr*
-ElbExpr::parent_expr() const
-{
-  return NULL;
-}
-  
 // @brief インデックス値を返す．
 // @note 式に対するビット選択の時，意味を持つ．
 // @note このクラスでは 0 を返す．
@@ -162,6 +117,15 @@ int
 ElbExpr::index_val() const
 {
   return 0;
+}
+
+// @brief 範囲の MSB を返す．
+// @note 部分選択の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+const VlExpr*
+ElbExpr::left_range() const
+{
+  return NULL;
 }
 
 // @brief 範囲の MSB の値を返す．
@@ -173,6 +137,15 @@ ElbExpr::left_range_val() const
   return 0;
 }
 
+// @brief 範囲の LSB を返す．
+// @note 部分選択の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+const VlExpr*
+ElbExpr::right_range() const
+{
+  return NULL;
+}
+
 // @brief 範囲の LSB の値を返す．
 // @note 式に対する範囲選択の時，意味を持つ．
 // @note このクラスでは 0 を返す．
@@ -182,22 +155,31 @@ ElbExpr::right_range_val() const
   return 0;
 }
 
-// @brief 範囲のベースアドレスの値を返す．
+// @brief 範囲のビット幅を表す式を返す．
 // @note 可変範囲選択の時，意味を持つ．
-// @note それ以外では 0 を返す．
-int
-ElbExpr::range_base_val() const
+// @note それ以外では NULL を返す．
+const VlExpr*
+ElbExpr::range_width() const
 {
-  return 0;
+  return NULL;
 }
 
 // @brief 範囲のビット幅を返す．
 // @note 可変範囲選択の時，意味を持つ．
 // @note それ以外では 0 を返す．
 int
-ElbExpr::range_val() const
+ElbExpr::range_width_val() const
 {
   return 0;
+}
+
+// @brief 親の式を返す．
+// @note 式に対するビット選択/範囲選択の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+const VlExpr*
+ElbExpr::parent_expr() const
+{
+  return NULL;
 }
 
 // @brief 演算子のタイプを返す．
@@ -208,7 +190,7 @@ ElbExpr::op_type() const
 {
   return kVpiNullOp;
 }
-  
+
 // @brief オペランド数を返す．
 // @note 演算子の時，意味を持つ．
 // @note このクラスでは 0 を返す．
@@ -245,7 +227,7 @@ ElbExpr::function() const
 {
   return NULL;
 }
-  
+
 // @brief 対象のシステム関数を返す．
 // @note system function call の時，意味を持つ．
 // @note このクラスでは NULL を返す．
@@ -254,7 +236,7 @@ ElbExpr::user_systf() const
 {
   return NULL;
 }
- 
+
 // @brief 引数の数を返す．
 // @note kVpiFuncCall/kVpiSysFuncCall の時，意味を持つ．
 // @note このクラスでは 0 を返す．
@@ -282,7 +264,7 @@ ElbExpr::decl_obj() const
 {
   return NULL;
 }
-    
+
 // @brief 配列型宣言要素への参照の場合，配列の次元を返す．
 // @note このクラスでは 0 を返す．
 ymuint32
@@ -308,7 +290,7 @@ ElbExpr::scope_obj() const
 {
   return NULL;
 }
-  
+
 // @brief 対象のオブジェクトを返す．
 // @note 対象が ElbPrimitive の時，意味を持つ．
 // @note このクラスでは NULL を返す．
@@ -373,7 +355,7 @@ ElbExpr::calc_type(tVpiValueType type0,
 
   bool is_sized = false;
   bool is_signed = false;
-  
+
   // 両方が signed の場合にのみ signed
   if ( is_signed_type(type0) && is_signed_type(type1) ) {
     is_signed = true;

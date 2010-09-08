@@ -55,6 +55,13 @@ public:
   bool
   is_const() const;
 
+  /// @brief 固定選択子の時 true を返す．
+  /// @note ビット選択，部分選択の時，意味を持つ．
+  /// @note このクラスでは false を返す．
+  virtual
+  bool
+  is_constant_select() const;
+
   /// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
   virtual
   bool
@@ -103,7 +110,7 @@ public:
   declarray_dimension() const;
 
   /// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+ /// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
   /// @note このクラスでは NULL を返す．
   virtual
   const VlExpr*
@@ -120,12 +127,12 @@ public:
   const VlPrimitive*
   primitive_obj() const;
 
-  /// @brief 固定選択子の時 true を返す．
-  /// @note ビット選択，部分選択の時，意味を持つ．
-  /// @note このクラスでは false を返す．
+  /// @brief 親の式を返す．
+  /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
+  /// @note このクラスでは NULL を返す．
   virtual
-  bool
-  is_constant_select() const;
+  const VlExpr*
+  parent_expr() const;
 
   /// @brief インデックス式を返す．
   /// @note ビット選択の時，意味を持つ．
@@ -169,40 +176,19 @@ public:
   int
   right_range_val() const;
 
-  /// @brief 範囲のベースアドレスの式を返す．
-  /// @note 可変範囲選択の時，意味を持つ．
-  /// @note それ以外では NULL を返す．
-  virtual
-  const VlExpr*
-  range_base() const;
-
-  /// @brief 範囲のベースアドレスの値を返す．
-  /// @note 可変範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
-  virtual
-  int
-  range_base_val() const;
-
   /// @brief 範囲のビット幅を表す式を返す．
   /// @note 可変範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
-  range_expr() const;
+  range_width() const;
 
   /// @brief 範囲のビット幅を返す．
   /// @note 可変範囲選択の時，意味を持つ．
   /// @note それ以外では 0 を返す．
   virtual
   int
-  range_val() const;
-
-  /// @brief 親の式を返す．
-  /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlExpr*
-  parent_expr() const;
+  range_width_val() const;
 
   /// @brief 演算子のタイプを返す．
   /// @note 演算子の時，意味を持つ．

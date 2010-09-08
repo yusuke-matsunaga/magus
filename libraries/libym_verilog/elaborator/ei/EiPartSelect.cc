@@ -37,10 +37,10 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 			  int index1_val,
 			  int index2_val)
 {
-  void* p = mAlloc.get_memory(sizeof(EiPartSelect));
-  EiPartSelect* expr = new (p) EiPartSelect(pt_expr, obj,
-					    index1, index2,
-					    index1_val, index2_val);
+  void* p = mAlloc.get_memory(sizeof(EiDeclPartSelect));
+  ElbExpr* expr = new (p) EiDeclPartSelect(pt_expr, obj,
+					   index1, index2,
+					   index1_val, index2_val);
 
   return expr;
 }
@@ -59,9 +59,9 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 			  int index2_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiParamPartSelect));
-  EiParamPartSelect* expr = new (p) EiParamPartSelect(pt_expr, obj,
-						      index1, index2,
-						      index1_val, index2_val);
+  ElbExpr* expr = new (p) EiParamPartSelect(pt_expr, obj,
+					    index1, index2,
+					    index1_val, index2_val);
 
   return expr;
 }
@@ -82,11 +82,11 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 			  int index2_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiArrayElemPartSelect));
-  EiArrayElemPartSelect* expr = new (p) EiArrayElemPartSelect(pt_expr, obj,
-							      index_list,
-							      index1, index2,
-							      index1_val,
-							      index2_val);
+  ElbExpr* expr = new (p) EiArrayElemPartSelect(pt_expr, obj,
+						index_list,
+						index1, index2,
+						index1_val,
+						index2_val);
 
   return expr;
 }
@@ -102,8 +102,8 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 			  int index2)
 {
   void* p = mAlloc.get_memory(sizeof(EiExprPartSelect));
-  EiExprPartSelect* expr1 = new (p) EiExprPartSelect(pt_expr, expr,
-						     index1, index2);
+  ElbExpr* expr1 = new (p) EiExprPartSelect(pt_expr, expr,
+					    index1, index2);
 
   return expr1;
 }
@@ -115,17 +115,14 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
 // @param[in] index1, inde2 パート選択式
 // @param[in] index1_val, index2_val パート選択式の値
 EiPartSelect::EiPartSelect(const PtBase* pt_expr,
-			   ElbDecl* obj,
 			   ElbExpr* index1,
 			   ElbExpr* index2,
 			   int index1_val,
 			   int index2_val) :
   EiExprBase1(pt_expr),
-  mObj(obj),
   mIndex1(index1),
   mIndex2(index2),
   mIndex1Val(index1_val),
@@ -164,21 +161,7 @@ EiPartSelect::value_type() const
 bool
 EiPartSelect::is_const() const
 {
-  return mObj->is_consttype();
-}
-
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiPartSelect::range_mode() const
-{
-  return kVpiConstRange;
-}
-
-// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-const VlDecl*
-EiPartSelect::decl_obj() const
-{
-  return mObj;
+  return decl_obj()->is_consttype();
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -187,6 +170,20 @@ bool
 EiPartSelect::is_constant_select() const
 {
   return true;
+}
+
+// @brief 範囲指定の時に true を返す．
+bool
+EiPartSelect::is_partselect() const
+{
+  return true;
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiPartSelect::range_mode() const
+{
+  return kVpiConstRange;
 }
 
 // @brief 範囲の MSB の式を返す．
@@ -248,21 +245,12 @@ EiPartSelect::eval_real() const
   return tmp.to_real();
 }
 
-// @brief bitvector 型の値を返す．
-void
-EiPartSelect::eval_bitvector(BitVector& bitvector,
-			     tVpiValueType req_type) const
-{
-  mObj->get_partselect(mIndex1Val, mIndex2Val, bitvector);
-  bitvector.coerce(req_type);
-}
-
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
 EiPartSelect::decompile_impl(int ppri) const
 {
-  string ans = mObj->name();
+  string ans = decl_obj()->name();
   ans += "[" + mIndex1->decompile() + ":"
     + mIndex2->decompile() + "]";
   return ans;
@@ -277,24 +265,69 @@ EiPartSelect::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiDeclPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] index1, inde2 パート選択式
+// @param[in] index1_val, index2_val パート選択式の値
+EiDeclPartSelect::EiDeclPartSelect(const PtBase* pt_expr,
+				   ElbDecl* obj,
+				   ElbExpr* index1,
+				   ElbExpr* index2,
+				   int index1_val,
+				   int index2_val) :
+  EiPartSelect(pt_expr, index1, index2, index1_val, index2_val),
+  mObj(obj)
+{
+}
+
+// @brief デストラクタ
+EiDeclPartSelect::~EiDeclPartSelect()
+{
+}
+
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+const VlDecl*
+EiDeclPartSelect::decl_obj() const
+{
+  return mObj;
+}
+
+// @brief bitvector 型の値を返す．
+void
+EiDeclPartSelect::eval_bitvector(BitVector& bitvector,
+				 tVpiValueType req_type) const
+{
+  mObj->get_partselect(left_range_val(), right_range_val(), bitvector);
+  bitvector.coerce(req_type);
+}
+
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
 void
-EiPartSelect::set_scalar(tVpiScalarVal v)
+EiDeclPartSelect::set_scalar(tVpiScalarVal v)
 {
-  assert_cond(mIndex1Val == mIndex2Val, __FILE__, __LINE__);
-  mObj->set_bitselect(mIndex1Val, v);
+  int msb = left_range_val();
+  assert_cond( msb == right_range_val(), __FILE__, __LINE__);
+  mObj->set_bitselect(msb, v);
 }
 
 // @brief ビットベクタを書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
 void
-EiPartSelect::set_bitvector(const BitVector& v)
+EiDeclPartSelect::set_bitvector(const BitVector& v)
 {
-  mObj->set_partselect(mIndex1Val, mIndex2Val, v);
-}  
+  int msb = left_range_val();
+  int lsb = right_range_val();
+  mObj->set_partselect(lsb, msb, v);
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -312,62 +345,14 @@ EiParamPartSelect::EiParamPartSelect(const PtBase* pt_expr,
 			   ElbExpr* index2,
 			   int index1_val,
 			   int index2_val) :
-  EiExprBase1(pt_expr),
-  mObj(obj),
-  mIndex1(index1),
-  mIndex2(index2),
-  mIndex1Val(index1_val),
-  mIndex2Val(index2_val)
+  EiPartSelect(pt_expr, index1, index2, index1_val, index2_val),
+  mObj(obj)
 {
 }
 
 // @brief デストラクタ
 EiParamPartSelect::~EiParamPartSelect()
 {
-}
-
-// @brief 型の取得
-tVpiObjType
-EiParamPartSelect::type() const
-{
-  return kVpiPartSelect;
-}
-
-// @brief 式のタイプを返す．
-tVpiValueType
-EiParamPartSelect::value_type() const
-{
-  int w = 0;
-  if ( mIndex1Val > mIndex2Val ) {
-    w = mIndex1Val - mIndex2Val + 1;
-  }
-  else {
-    w = mIndex2Val - mIndex1Val + 1;
-  }
-  return pack(kVpiValueUS, w);
-}
-
-// @brief 定数の時 true を返す．
-// @note 参照している要素の型によって決まる．
-bool
-EiParamPartSelect::is_const() const
-{
-  return true;
-}
-
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiParamPartSelect::range_mode() const
-{
-  return kVpiConstRange;
-}
-
-// @brief 固定選択子の時 true を返す．
-// @note ビット選択，部分選択の時，意味を持つ．
-bool
-EiParamPartSelect::is_constant_select() const
-{
-  return true;
 }
 
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
@@ -377,65 +362,6 @@ EiParamPartSelect::decl_obj() const
   return mObj;
 }
 
-// @brief 範囲の MSB の式を返す．
-// @note 通常の範囲選択の時，意味を持つ．
-const VlExpr*
-EiParamPartSelect::left_range() const
-{
-  return mIndex1;
-}
-
-// @brief 範囲の LSB の式を返す．
-// @note 通常の範囲選択の時，意味を持つ．
-const VlExpr*
-EiParamPartSelect::right_range() const
-{
-  return mIndex2;
-}
-
-// @brief 範囲の MSB の値を返す．
-// @note 式に対する範囲選択の時，意味を持つ．
-int
-EiParamPartSelect::left_range_val() const
-{
-  return mIndex1Val;
-}
-
-// @brief 範囲の LSB の値を返す．
-// @note 式に対する範囲選択の時，意味を持つ．
-int
-EiParamPartSelect::right_range_val() const
-{
-  return mIndex2Val;
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiParamPartSelect::eval_scalar() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.bit_select(0);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiParamPartSelect::eval_logic() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiParamPartSelect::eval_real() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.to_real();
-}
-
 // @brief bitvector 型の値を返す．
 void
 EiParamPartSelect::eval_bitvector(BitVector& bitvector,
@@ -443,28 +369,8 @@ EiParamPartSelect::eval_bitvector(BitVector& bitvector,
 {
   BitVector bv;
   mObj->eval_bitvector(bv);
-  bv.part_select(mIndex1Val, mIndex2Val, bitvector);
+  bv.part_select(left_range_val(), right_range_val(), bitvector);
   bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiParamPartSelect::decompile_impl(int ppri) const
-{
-  string ans = mObj->name();
-  ans += "[" + mIndex1->decompile() + ":"
-    + mIndex2->decompile() + "]";
-  return ans;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiParamPartSelect::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
 }
 
 // @brief スカラー値を書き込む．
@@ -483,7 +389,7 @@ void
 EiParamPartSelect::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
-}  
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -545,19 +451,26 @@ EiArrayElemPartSelect::is_const() const
   return decl_array()->is_consttype();
 }
 
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiArrayElemPartSelect::range_mode() const
-{
-  return kVpiConstRange;
-}
-
 // @brief 固定選択子の時 true を返す．
 // @note ビット選択，部分選択の時，意味を持つ．
 bool
 EiArrayElemPartSelect::is_constant_select() const
 {
   return true;
+}
+
+// @brief 範囲指定の時に true を返す．
+bool
+EiArrayElemPartSelect::is_partselect() const
+{
+  return true;
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiArrayElemPartSelect::range_mode() const
+{
+  return kVpiConstRange;
 }
 
 // @brief 範囲の MSB の式を返す．
@@ -731,19 +644,26 @@ EiExprPartSelect::is_const() const
   return mExpr->is_const();
 }
 
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiExprPartSelect::range_mode() const
-{
-  return kVpiConstRange;
-}
-
 // @brief 固定選択子の時 true を返す．
 // @note ビット選択，部分選択の時，意味を持つ．
 bool
 EiExprPartSelect::is_constant_select() const
 {
   return true;
+}
+
+// @brief 範囲指定の時に true を返す．
+bool
+EiExprPartSelect::is_partselect() const
+{
+  return true;
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiExprPartSelect::range_mode() const
+{
+  return kVpiConstRange;
 }
 
 // @brief 親の式を返す．

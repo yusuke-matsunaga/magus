@@ -40,27 +40,34 @@ public:
   virtual
   tVpiValueType
   value_type() const = 0;
-  
+
   /// @brief Verilog-HDL の文字列を得る．
   virtual
   string
   decompile() const = 0;
-  
+
   /// @brief 式のビット幅を返す．
   virtual
   ymuint32
   bit_size() const = 0;
-  
+
   /// @brief 定数式の時 true を返す．
   virtual
   bool
   is_const() const = 0;
 
+  /// @brief 部分/ビット指定が定数の時 true を返す．
+  /// @note kVpiPartSelect/kVpiBitSelect の時，意味を持つ．
+  /// @note それ以外では常に false を返す．
+  virtual
+  bool
+  is_constant_select() const = 0;
+
   /// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
   virtual
   bool
   is_primary() const = 0;
-  
+
   /// @brief ビット指定の時に true を返す．
   virtual
   bool
@@ -91,14 +98,14 @@ public:
   virtual
   bool
   is_sysfunccall() const = 0;
-  
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlDecl*
   decl_obj() const = 0;
-  
+
   /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
   /// @note それ以外では 0 を返す．
   virtual
@@ -111,7 +118,7 @@ public:
   virtual
   const VlExpr*
   declarray_index(ymuint32 pos) const = 0;
-  
+
   /// @brief スコープへの参照の場合，対象のオブジェクトを返す．
   /// @note それ以外では NULL を返す．
   virtual
@@ -122,13 +129,13 @@ public:
   virtual
   const VlPrimitive*
   primitive_obj() const = 0;
-  
-  /// @brief 部分/ビット指定が定数の時 true を返す．
-  /// @note kVpiPartSelect/kVpiBitSelect の時，意味を持つ．
-  /// @note それ以外では常に false を返す．
+
+  /// @brief 親の式を返す．
+  /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
+  /// @note それ以外では NULL を返す．
   virtual
-  bool
-  is_constant_select() const = 0;
+  const VlExpr*
+  parent_expr() const = 0;
 
   /// @brief インデックス式を返す．
   /// @note 通常のビット選択の時，意味を持つ．
@@ -136,13 +143,27 @@ public:
   virtual
   const VlExpr*
   index() const = 0;
-  
+
+  /// @brief インデックス値を返す．
+  /// @note 式に対するビット選択の時，意味を持つ．
+  /// @note それ以外では 0 を返す．
+  virtual
+  int
+  index_val() const = 0;
+
   /// @brief 範囲の MSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
   left_range() const = 0;
+
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 式に対する範囲選択の時，意味を持つ．
+  /// @note それ以外では 0 を返す．
+  virtual
+  int
+  left_range_val() const = 0;
 
   /// @brief 範囲の LSB の式を返す．
   /// @note 通常の範囲選択の時，意味を持つ．
@@ -151,41 +172,6 @@ public:
   const VlExpr*
   right_range() const = 0;
 
-  /// @brief 範囲のベースアドレスの式を返す．
-  /// @note 可変範囲選択の時，意味を持つ．
-  /// @note それ以外では NULL を返す．
-  virtual
-  const VlExpr*
-  range_base() const = 0;
-
-  /// @brief 範囲のビット幅を表す式を返す．
-  /// @note 可変範囲選択の時，意味を持つ．
-  /// @note それ以外では NULL を返す．
-  virtual
-  const VlExpr*
-  range_expr() const = 0;
-  
-  /// @brief 親の式を返す．
-  /// @note 式に対するビット選択/範囲選択の時，意味を持つ．
-  /// @note それ以外では NULL を返す．
-  virtual
-  const VlExpr*
-  parent_expr() const = 0;
-  
-  /// @brief インデックス値を返す．
-  /// @note 式に対するビット選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
-  virtual
-  int
-  index_val() const = 0;
-  
-  /// @brief 範囲の MSB の値を返す．
-  /// @note 式に対する範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
-  virtual
-  int
-  left_range_val() const = 0;
-
   /// @brief 範囲の LSB の値を返す．
   /// @note 式に対する範囲選択の時，意味を持つ．
   /// @note それ以外では 0 を返す．
@@ -193,27 +179,27 @@ public:
   int
   right_range_val() const = 0;
 
-  /// @brief 範囲のベースアドレスの値を返す．
+  /// @brief 範囲のビット幅を表す式を返す．
   /// @note 可変範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note それ以外では NULL を返す．
   virtual
-  int
-  range_base_val() const = 0;
+  const VlExpr*
+  range_width() const = 0;
 
   /// @brief 範囲のビット幅を返す．
   /// @note 可変範囲選択の時，意味を持つ．
   /// @note それ以外では 0 を返す．
   virtual
   int
-  range_val() const = 0;
-  
+  range_width_val() const = 0;
+
   /// @brief 演算子の型を返す．
   /// @note kVpiOperation の時，意味を持つ．
   /// @note それ以外では動作は不定
   virtual
   tVpiOpType
   op_type() const = 0;
-  
+
   /// @brief オペランド数を返す．
   /// @note kVpiOperation の時，意味を持つ．
   /// @note それ以外では 0 を返す．
@@ -228,7 +214,7 @@ public:
   virtual
   const VlExpr*
   operand(ymuint32 pos) const = 0;
-  
+
   /// @brief 定数型を返す．
   /// @note kVpiConstant の時，意味を持つ．
   /// @note それ以外では動作は不定
@@ -242,7 +228,7 @@ public:
   virtual
   const VlTaskFunc*
   function() const = 0;
-  
+
   /// @brief 対象のシステム関数を返す．
   /// @note kVpiSysFuncCall の時，意味を持つ．
   /// @note それ以外では NULL を返す．
@@ -285,7 +271,7 @@ public:
   virtual
   bool
   eval_bool() const = 0;
-  
+
   /// @brief real 型の値を返す．
   virtual
   double
@@ -304,7 +290,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
