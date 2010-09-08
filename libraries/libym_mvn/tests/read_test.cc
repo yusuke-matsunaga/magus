@@ -43,7 +43,7 @@ main(int argc,
 		      "QN",        // 反転出力
 		      "",          // セット
 		      "");         // リセット
-    
+
     for (list<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
       const string& name = *p;
@@ -62,7 +62,7 @@ main(int argc,
       cerr << "error occured" << endl;
       return 2;
     }
-    
+
     dump(cout, mgr);
     dump_verilog(cout, mgr);
 #if 0

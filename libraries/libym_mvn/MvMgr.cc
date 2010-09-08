@@ -348,7 +348,7 @@ MvMgr::connect(MvNode* src_node,
   }
   mNetItvlMgr.erase(tmp);
   ymuint id = tmp;
-  
+
   MvNet* net = new MvNet(src_pin, dst_pin);
   src_pin->mNetList.push_back(net);
   dst_pin->mNet = net;
@@ -408,7 +408,7 @@ MvMgr::sweep()
     const MvInputPin* ipin = node->input(0);
     MvNet* src_net = ipin->net();
     if ( src_net == NULL ) continue;
-    
+
     const MvOutputPin* src_pin = src_net->src_pin();
     MvNode* src_node = src_pin->node();
     ymuint src_pos = src_pin->pos();

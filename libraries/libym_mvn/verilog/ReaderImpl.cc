@@ -30,7 +30,7 @@
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 using namespace nsYm::nsVerilog;
-  
+
 
 BEGIN_NONAMESPACE
 
@@ -82,13 +82,13 @@ bool
 ReaderImpl::gen_network(MvMgr& mgr)
 {
   mVlMgr.elaborate();
-  
+
   mMvMgr = &mgr;
 
   mDeclMap.clear();
   mIODeclMap.clear();
   mDriverList.clear();
-  
+
   MvModule* module0 = NULL;
   list<const VlModule*> tmp_list(mVlMgr.topmodule_list());
   for (list<const VlModule*>::const_iterator p = tmp_list.begin();
@@ -253,7 +253,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	}
       }
     }
-    
+
     Driver prev;
     vector<Driver> tmp2;
     tmp2.reserve(bw);
@@ -376,7 +376,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     default: break;
     }
   }
-  
+
   MvModule* module = mMvMgr->new_module(vl_module->name(), np,
 					ibw_array, obw_array, iobw_array);
 
@@ -385,7 +385,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   if ( !stat ) {
     return NULL;
   }
-  
+
   // 要素を生成する．
   stat = gen_item(module, vl_module);
   if ( !stat ) {
@@ -441,15 +441,15 @@ ReaderImpl::gen_module(const VlModule* vl_module)
 	case 0:
 	  mMvMgr->set_port_ref(module, i, j, node);
 	  break;
-	  
+
 	case 1:
 	  mMvMgr->set_port_ref(module, i, j, node, msb);
 	  break;
-	  
+
 	case 2:
 	  mMvMgr->set_port_ref(module, i, j, node, msb, lsb);
 	  break;
-	  
+
 	default:
 	  assert_not_reached(__FILE__, __LINE__);
 	  break;
@@ -480,7 +480,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       }
     }
   }
-  
+
   return module;
 }
 
@@ -544,7 +544,7 @@ ReaderImpl::gen_decl(MvModule* module,
       }
     }
   }
-  
+
   return true;
 }
 
@@ -596,7 +596,7 @@ ReaderImpl::gen_item(MvModule* module,
       }
     }
   }
-  
+
   // プリミティブ配列インスタンスの生成
   {
     vector<const VlPrimArray*> primarray_list;
@@ -642,7 +642,7 @@ ReaderImpl::gen_item(MvModule* module,
       }
     }
   }
-  
+
   return true;
 }
 
@@ -760,7 +760,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
   if ( !stat ) {
     return;
   }
-  
+
   // 要素を生成する．
   stat = gen_item(parent_module, vl_module);
   if ( !stat ) {
@@ -783,7 +783,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 	connect_lhs(parent_module, lo, node1);
       }
       break;
-      
+
     case kVpiOutput:
       // hi は左辺式
       // lo は右辺式
@@ -796,14 +796,14 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
     case kVpiInout:
       // hi は単純な参照か連結のみ
       break;
-      
+
     case kVpiMixedIO:
       // hi は単純な参照か連結のみ
       //connect_port2(port, hi);
       // TODO: connect_port2 を作る
       assert_not_reached(__FILE__, __LINE__);
       break;
-      
+
     default:
       assert_not_reached(__FILE__, __LINE__);
       break;
@@ -980,7 +980,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       outputs[0] = node;
     }
     break;
-    
+
   case kVpiNandPrim:
     {
       MvNode* node = gen_andtree(parent_module, ni, inputs, 0);
@@ -989,14 +989,14 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       outputs[0] = node1;
     }
     break;
-    
+
   case kVpiOrPrim:
     {
       MvNode* node = gen_ortree(parent_module, ni, inputs, 0);
       outputs[0] = node;
     }
     break;
-    
+
   case kVpiNorPrim:
     {
       MvNode* node = gen_ortree(parent_module, ni, inputs, 0);
@@ -1005,14 +1005,14 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       outputs[0] = node1;
     }
     break;
-    
+
   case kVpiXorPrim:
     {
       MvNode* node = gen_xortree(parent_module, ni, inputs, 0);
       outputs[0] = node;
     }
     break;
-    
+
   case kVpiXnorPrim:
     {
       MvNode* node = gen_xortree(parent_module, ni, inputs, 0);
@@ -1021,7 +1021,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
       outputs[0] = node1;
     }
     break;
-    
+
   case kVpiCombPrim:
     {
       const VlUdpDefn* udp = prim->udp_defn();
@@ -1282,14 +1282,14 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     switch ( expr->op_type() ) {
     case kVpiNullOp:
       return inputs[0];
-	
+
     case kVpiMinusOp:
       {
 	MvNode* node = mMvMgr->new_cmpl(parent_module, expr->bit_size());
 	mMvMgr->connect(inputs[0], 0, node, 0);
 	return node;
       }
-      
+
     case kVpiNotOp:
       {
 	MvNode* node = mMvMgr->new_not(parent_module, 1);
@@ -1306,7 +1306,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 
     case kVpiPlusOp:
       return inputs[0];
-	
+
     case kVpiUnaryAndOp:
       {
 	ymuint bw = inputs[0]->output(0)->bit_width();
@@ -1376,7 +1376,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
       }
-	
+
     case kVpiSubOp:
       {
 	ymuint bw1 = inputs[0]->output(0)->bit_width();
@@ -1420,7 +1420,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
       }
-      
+
     case kVpiPowerOp:
       {
 	ymuint bw1 = inputs[0]->output(0)->bit_width();
@@ -1442,7 +1442,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
       }
-	
+
     case kVpiRShiftOp:
       {
 	ymuint bw1 = inputs[0]->output(0)->bit_width();
@@ -1493,7 +1493,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
       }
-      
+
     case kVpiBitXNorOp:
       {
 	ymuint bw = expr->bit_size();
@@ -1543,7 +1543,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
       }
-	
+
     case kVpiNeqOp:
       {
 	ymuint bw = inputs[0]->output(0)->bit_width();
@@ -1554,7 +1554,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(node, 0, node1, 0);
 	return node1;
       }
-      
+
     case kVpiLtOp:
       {
 	ymuint bw = inputs[0]->output(0)->bit_width();
@@ -1563,7 +1563,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
       }
-      
+
     case kVpiGeOp:
       {
 	ymuint bw = inputs[0]->output(0)->bit_width();
@@ -1574,7 +1574,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(node, 0, node1, 0);
 	return node1;
       }
-	
+
     case kVpiGtOp:
       {
 	ymuint bw = inputs[0]->output(0)->bit_width();
@@ -1583,7 +1583,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 	mMvMgr->connect(inputs[0], 0, node, 1);
 	return node;
       }
-	
+
     case kVpiLeOp:
       {
 	ymuint bw = inputs[0]->output(0)->bit_width();
