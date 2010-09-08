@@ -117,7 +117,7 @@ dump_node(ostream& s,
 	const MvNode* src_node2 = src_pin2->node();
 	s << comma << " .CD(" << node_name(src_node2) << ")";
       }
-      
+
       s << ");" << endl;
     }
     break;
@@ -128,7 +128,7 @@ dump_node(ostream& s,
 	<< " (";
 
       s << " .Q(" << node_name(node) << ")";
-      
+
       const char* comma = ", ";
 
       const MvInputPin* ipin0 = node->input(0);
@@ -474,7 +474,8 @@ dump_node(ostream& s,
       const char* comma = "";
       ymuint ni = node->input_num();
       for (ymuint i = 0; i < ni; ++ i) {
-	const MvInputPin* ipin = node->input(i);
+	ymuint idx = ni - i - 1;
+	const MvInputPin* ipin = node->input(idx);
 	const MvNet* net = ipin->net();
 	const MvOutputPin* opin = net->src_pin();
 	const MvNode* src_node = opin->node();
@@ -522,7 +523,7 @@ dump_node(ostream& s,
       const MvNet* net1 = ipin1->net();
       const MvOutputPin* src_pin1 = net1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
-      
+
       s << "  assign " << node_name(node)
 	<< " = " << node_name(src_node)
 	<< "[" << node_name(src_node1) << "];" << endl;
@@ -545,7 +546,7 @@ dump_node(ostream& s,
       const MvNet* net2 = ipin2->net();
       const MvOutputPin* src_pin2 = net2->src_pin();
       const MvNode* src_node2 = src_pin2->node();
-      
+
       s << "  assign " << node_name(node)
 	<< " = " << node_name(src_node)
 	<< "[" << node_name(src_node1)
@@ -576,6 +577,25 @@ dump_node(ostream& s,
     break;
 
   case MvNode::kConst:
+    {
+      ymuint bw = node->output(0)->bit_width();
+      s << "  assign " << node_name(node)
+	<< " = " << bw << "'b";
+      vector<ymuint32> cv;
+      node->const_value(cv);
+      for (ymuint i = 0; i < bw; ++ i) {
+	ymuint idx = bw - i - 1;
+	ymuint blk = idx + 31 / 32;
+	ymuint sft = idx % 32;
+	if ( (cv[blk] >> sft) & 1 ) {
+	  s << "1";
+	}
+	else {
+	  s << "0";
+	}
+      }
+      s << ";" << endl;
+    }
     break;
 
   default:
@@ -629,7 +649,7 @@ dump_module(ostream& s,
     s << node_name(node) << ";" << endl;
   }
   s << endl;
-    
+
   const list<MvNode*>& node_list = module->node_list();
   for (list<MvNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {

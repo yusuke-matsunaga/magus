@@ -63,7 +63,7 @@ main(int argc,
       return 2;
     }
 
-    dump(cout, mgr);
+    //dump(cout, mgr);
     dump_verilog(cout, mgr);
 #if 0
   }

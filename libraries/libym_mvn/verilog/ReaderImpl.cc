@@ -258,7 +258,8 @@ ReaderImpl::gen_network(MvMgr& mgr)
     vector<Driver> tmp2;
     tmp2.reserve(bw);
     for (ymuint i = 0; i < bw; ++ i) {
-      const Driver& driver = *tmp[i];
+      ymuint idx = bw - i - 1;
+      const Driver& driver = *tmp[idx];
       if ( driver != prev ) {
 	tmp2.push_back(driver);
 	prev = driver;

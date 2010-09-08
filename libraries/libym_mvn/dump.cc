@@ -88,13 +88,25 @@ dump_node(ostream& s,
   case MvNode::kPow:        s << "Pow"; break;
   case MvNode::kIte:        s << "Ite"; break;
   case MvNode::kConcat:     s << "Concat"; break;
-  case MvNode::kConstBitSelect:  s << "ConstBitSelect"; break;
-  case MvNode::kConstPartSelect: s << "ConstPartSelect"; break;
+  case MvNode::kConstBitSelect:
+    s << "ConstBitSelect["
+      << node->bitpos()
+      << "]";
+    break;
+  case MvNode::kConstPartSelect:
+    s << "ConstPartSelect["
+      << node->msb()
+      << ":"
+      << node->lsb()
+      << "]";
+    break;
   case MvNode::kBitSelect:  s << "BitSelect"; break;
   case MvNode::kPartSelect: s << "PartSelect"; break;
   case MvNode::kCombUdp:    s << "Combinational UDP"; break;
-  case MvNode::kSeqUdp:    s << "Sequential UDP"; break;
-  case MvNode::kConst:      s << "Const"; break;
+  case MvNode::kSeqUdp:     s << "Sequential UDP"; break;
+  case MvNode::kConst:
+    s << "Const";
+    break;
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
@@ -167,7 +179,7 @@ dump(ostream& s,
 	s << endl;
       }
     }
-    
+
     ymuint ni = module->input_num();
     for (ymuint j = 0; j < ni; ++ j) {
       dump_node(s, module->input(j));
