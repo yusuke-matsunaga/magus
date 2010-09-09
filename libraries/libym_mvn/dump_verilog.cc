@@ -474,8 +474,7 @@ dump_node(ostream& s,
       const char* comma = "";
       ymuint ni = node->input_num();
       for (ymuint i = 0; i < ni; ++ i) {
-	ymuint idx = ni - i - 1;
-	const MvInputPin* ipin = node->input(idx);
+	const MvInputPin* ipin = node->input(i);
 	const MvNet* net = ipin->net();
 	const MvOutputPin* opin = net->src_pin();
 	const MvNode* src_node = opin->node();
