@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // クラス ElbDeclHead
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 ElbDeclHead::ElbDeclHead()
 {
@@ -85,7 +85,7 @@ ElbDeclHead::data_type() const
 {
   return kVpiVarNone;
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -158,18 +158,18 @@ ElbDeclHead::set_delay(ElbDelay* delay)
 //////////////////////////////////////////////////////////////////////
 // クラス ElbDeclBase
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 ElbDeclBase::ElbDeclBase() :
   mNext(NULL)
 {
 }
-  
+
 // @brief デストラクタ
 ElbDeclBase::~ElbDeclBase()
 {
 }
-  
+
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
 tVpiValueType
@@ -177,7 +177,7 @@ ElbDeclBase::value_type() const
 {
   return kVpiValueNone;
 }
-  
+
 // @brief 定数値を持つ型のときに true を返す．
 bool
 ElbDeclBase::is_consttype() const
@@ -193,7 +193,7 @@ ElbDeclBase::is_signed() const
 {
   return false;
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -212,6 +212,28 @@ ElbDeclBase::right_range() const
   return _right_range();
 }
 
+// @brief ビット要素を返す．
+// @param[in] index インデックス
+// @retval ビット要素 index が範囲内の場合
+// @retval NULL index が範囲外の場合．またはビット展開されていない場合
+// @note このクラスでは NULL を返す．
+const VlDecl*
+ElbDeclBase::elem_by_index(int index) const
+{
+  return NULL;
+}
+
+// @brief ビット要素を返す．
+// @param[in] offset オフセット
+// @retval ビット要素 offset が範囲内の場合
+// @retval NULL offset が範囲外の場合．またはビット展開されていない場合
+// @note このクラスでは NULL を返す．
+const VlDecl*
+ElbDeclBase::elem_by_offset(ymuint offset) const
+{
+  return NULL;
+}
+
 // @brief データ型の取得
 // @retval データ型 パラメータや変数の場合
 // @retval kVpiVarNone 上記以外
@@ -220,7 +242,7 @@ ElbDeclBase::data_type() const
 {
   return kVpiVarNone;
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -275,7 +297,7 @@ ElbDeclBase::delay() const
 {
   return NULL;
 }
-  
+
 // @brief 初期値の取得
 // @retval 初期値
 // @retval NULL 設定がない場合
@@ -301,7 +323,7 @@ ElbDeclBase::dimension() const
 {
   return 0;
 }
-  
+
 // @brief 範囲の取得
 // @param[in] pos 位置 ( 0 <= pos < dimension() )
 // @note このクラスでは NULL を返す．
@@ -315,12 +337,12 @@ ElbDeclBase::range(ymuint32 pos) const
 //////////////////////////////////////////////////////////////////////
 // クラス ElbDecl
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 ElbDecl::ElbDecl()
 {
 }
-  
+
 // @brief デストラクタ
 ElbDecl::~ElbDecl()
 {
@@ -338,12 +360,12 @@ ElbDecl::set_init(ElbExpr* expr)
 //////////////////////////////////////////////////////////////////////
 // クラス ElbDeclArray
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 ElbDeclArray::ElbDeclArray()
 {
 }
-  
+
 // @brief デストラクタ
 ElbDeclArray::~ElbDeclArray()
 {
@@ -353,7 +375,7 @@ ElbDeclArray::~ElbDeclArray()
 //////////////////////////////////////////////////////////////////////
 // クラス ElbGenvar
 //////////////////////////////////////////////////////////////////////
-  
+
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
 tVpiValueType
@@ -361,7 +383,7 @@ ElbGenvar::value_type() const
 {
   return kVpiValueInteger;
 }
-  
+
 // @brief 定数値を持つ型のときに true を返す．
 bool
 ElbGenvar::is_consttype() const
@@ -377,7 +399,7 @@ ElbGenvar::is_signed() const
 {
   return true;
 }
-  
+
 // @brief MSB の値を返す．
 int
 ElbGenvar::left_range_const() const
@@ -429,7 +451,7 @@ void
 ElbGenvar::set_signed()
 {
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき

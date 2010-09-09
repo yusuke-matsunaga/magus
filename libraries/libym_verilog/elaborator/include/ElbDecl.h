@@ -24,10 +24,10 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbDeclHead
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbDeclHead();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbDeclHead();
@@ -55,7 +55,7 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -71,13 +71,13 @@ public:
   virtual
   ElbExpr*
   right_range() const;
-  
+
   /// @brief MSB の値を返す．
   /// @note このクラスでは -1 を返す．
   virtual
   int
   left_range_const() const;
-  
+
   /// @brief LSB の値を返す．
   /// @note このクラスでは -1 を返す．
   virtual
@@ -104,7 +104,7 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -153,7 +153,7 @@ public:
   virtual
   ElbDelay*
   delay() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ public:
   virtual
   void
   set_delay(ElbDelay* delay);
-  
+
 };
 
 
@@ -182,29 +182,29 @@ class ElbDeclBase :
   public VlDecl
 {
   friend class CellDecl;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbDeclBase();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbDeclBase();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   /// @note デフォルト値としてこのクラスでは kVpiValueNone を返す．
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 定数値を持つ型のときに true を返す．
   /// @note デフォルト値としてこのクラスでは false を返す．
   virtual
@@ -218,7 +218,7 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -233,6 +233,24 @@ public:
   const VlExpr*
   right_range() const;
 
+  /// @brief ビット要素を返す．
+  /// @param[in] index インデックス
+  /// @retval ビット要素 index が範囲内の場合
+  /// @retval NULL index が範囲外の場合．またはビット展開されていない場合
+  /// @note このクラスでは NULL を返す．
+  virtual
+  const VlDecl*
+  elem_by_index(int index) const;
+
+  /// @brief ビット要素を返す．
+  /// @param[in] offset オフセット
+  /// @retval ビット要素 offset が範囲内の場合
+  /// @retval NULL offset が範囲外の場合．またはビット展開されていない場合
+  /// @note このクラスでは NULL を返す．
+  virtual
+  const VlDecl*
+  elem_by_offset(ymuint offset) const;
+
   /// @brief データ型の取得
   /// @retval データ型 パラメータや変数の場合
   /// @retval kVpiVarNone 上記以外
@@ -240,7 +258,7 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -289,7 +307,7 @@ public:
   virtual
   const VlDelay*
   delay() const;
-    
+
   /// @brief 初期値の取得
   /// @retval 初期値
   /// @retval NULL 設定がない場合
@@ -297,7 +315,7 @@ public:
   virtual
   const VlExpr*
   init_value() const;
-  
+
   /// @brief localparam のときに true 返す．
   /// @note このクラスでは false を返す．
   virtual
@@ -309,7 +327,7 @@ public:
   virtual
   ymuint32
   dimension() const;
-  
+
   /// @brief 範囲の取得
   /// @param[in] pos 位置 ( 0 <= pos < dimension() )
   /// @note このクラスでは NULL を返す．
@@ -317,12 +335,12 @@ public:
   const VlRange*
   range(ymuint32 pos) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclBase の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -347,7 +365,7 @@ public:
   const ElbDeclBase*
   next() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -372,15 +390,15 @@ class ElbDecl :
   public ElbDeclBase
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbDecl();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbDecl();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbDecl の仮想関数
@@ -390,35 +408,35 @@ public:
   virtual
   void
   set_signed() = 0;
-  
+
   /// @brief 初期値の設定
   /// @param[in] expr 初期値
   /// @note このクラスでは何もしない．
   virtual
   void
   set_init(ElbExpr* expr);
-  
+
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
   get_scalar() const = 0;
-  
+
   /// @brief スカラー値を設定する．
   /// @param[in] val 値
   virtual
   void
   set_scalar(tVpiScalarVal val) = 0;
-  
+
   /// @brief 論理値を返す．
   virtual
   tVpiScalarVal
   get_logic() const = 0;
-  
+
   /// @brief real 型の値を返す．
   virtual
   double
   get_real() const = 0;
-  
+
   /// @brief real 型の値を設定する．
   /// @param[in] val 値
   virtual
@@ -438,7 +456,7 @@ public:
   virtual
   void
   set_bitvector(const BitVector& val) = 0;
-  
+
   /// @brief ビット選択値を返す．
   /// @param[in] index ビット位置
   virtual
@@ -472,7 +490,7 @@ public:
   set_partselect(int left,
 		 int right,
 		 const BitVector& val) = 0;
-  
+
 };
 
 
@@ -489,31 +507,31 @@ class ElbDeclArray :
   public ElbDeclBase
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbDeclArray();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbDeclArray();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclArray の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 要素の型を返す．
   virtual
   tVpiObjType
   elem_type() const = 0;
-  
+
   /// @brief スカラー値を返す．
   /// @param[in] index_array インデックスの配列
   virtual
   tVpiScalarVal
   get_scalar(const vector<int>& index_array) const = 0;
-  
+
   /// @brief スカラー値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -521,13 +539,13 @@ public:
   void
   set_scalar(const vector<int>& index_array,
 	     tVpiScalarVal val) = 0;
-  
+
   /// @brief real 型の値を返す．
   /// @param[in] index_array インデックスの配列
   virtual
   double
   get_real(const vector<int>& index_array) const = 0;
-  
+
   /// @brief real 型の値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -553,7 +571,7 @@ public:
   void
   set_bitvector(const vector<int>& index_array,
 		const BitVector& val) = 0;
-  
+
   /// @brief ビット選択値を返す．
   /// @param[in] index_array インデックスの配列
   /// @param[in] index ビット位置

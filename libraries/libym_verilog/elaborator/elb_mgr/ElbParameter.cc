@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // クラス ElbParameter
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 定数値を持つ型のときに true を返す．
 bool
 ElbParameter::is_consttype() const
 {
   return true;
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -43,6 +43,28 @@ const VlExpr*
 ElbParameter::right_range() const
 {
   return _right_range();
+}
+
+// @brief ビット要素を返す．
+// @param[in] index インデックス
+// @retval ビット要素 index が範囲内の場合
+// @retval NULL index が範囲外の場合．またはビット展開されていない場合
+// @note このクラスでは NULL を返す．
+const VlDecl*
+ElbParameter::elem_by_index(int index) const
+{
+  return NULL;
+}
+
+// @brief ビット要素を返す．
+// @param[in] offset オフセット
+// @retval ビット要素 offset が範囲内の場合
+// @retval NULL offset が範囲外の場合．またはビット展開されていない場合
+// @note このクラスでは NULL を返す．
+const VlDecl*
+ElbParameter::elem_by_offset(ymuint offset) const
+{
+  return NULL;
 }
 
 // @brief net 型の取得
@@ -107,7 +129,7 @@ ElbParameter::dimension() const
 {
   return 0;
 }
-  
+
 // @brief 範囲の取得
 // @param[in] pos 位置 ( 0 <= pos < dimension() )
 // @note このクラスでは NULL を返す．

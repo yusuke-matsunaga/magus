@@ -103,7 +103,7 @@ public:
   virtual
   tVpiVarType
   data_type() const = 0;
-  
+
 };
 
 
@@ -162,6 +162,24 @@ public:
   virtual
   const VlExpr*
   right_range() const;
+
+  /// @brief ビット要素を返す．
+  /// @param[in] index インデックス
+  /// @retval ビット要素 index が範囲内の場合
+  /// @retval NULL index が範囲外の場合．またはビット展開されていない場合
+  /// @note このクラスでは NULL を返す．
+  virtual
+  const VlDecl*
+  elem_by_index(int index) const;
+
+  /// @brief ビット要素を返す．
+  /// @param[in] offset オフセット
+  /// @retval ビット要素 offset が範囲内の場合
+  /// @retval NULL offset が範囲外の場合．またはビット展開されていない場合
+  /// @note このクラスでは NULL を返す．
+  virtual
+  const VlDecl*
+  elem_by_offset(ymuint offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 パラメータや変数の場合
@@ -232,7 +250,7 @@ public:
   const VlRange*
   range(ymuint32 pos) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbParameter の仮想関数

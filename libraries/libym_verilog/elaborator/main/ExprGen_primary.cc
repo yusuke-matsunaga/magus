@@ -37,7 +37,7 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   assert_cond(pt_expr->type() == kPtPrimaryExpr, __FILE__, __LINE__);
   assert_cond(pt_expr->left_range() == NULL, __FILE__, __LINE__);
   assert_cond(pt_expr->right_range() == NULL, __FILE__, __LINE__);
-  
+
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   // 識別子の名前
@@ -70,7 +70,7 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   error_not_a_namedevent(pt_expr);
   return NULL;
 }
-  
+
 // @brief 単体の NamedEvent 用のプライマリ式を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
@@ -95,7 +95,7 @@ ExprGen::instantiate_namedevent_primary1(const VlNamedObj* parent,
     // エラーメッセージは resolve() 内で出力されている．
     return NULL;
   }
-    
+
   return factory().new_Primary(pt_expr, decl);
 }
 
@@ -225,10 +225,10 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
 
   // 識別子の名前
   const char* name = pt_expr->name();
-  
+
   ElbDecl* decl = NULL;
   ElbParameter* param = NULL;
-  
+
   // 名前をキーにして要素を探索する．
   // まず func 内の識別子を探索する．
   ElbObjHandle* handle = find_obj_up(parent, PtNameBranchArray(), name, func);
@@ -523,7 +523,7 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
 	return factory().new_PlusPartSelect(pt_expr, decl_array, index_list,
 					    index1, index2, range_val);
       }
-      
+
     case kVpiMinusRange:
       {
 	int range_val;
@@ -1060,6 +1060,8 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
       assert_not_reached(__FILE__, __LINE__);
       break;
     }
+    // まだできていない．
+    assert_not_reached(__FILE__, __LINE__);
     return ElbValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
   }
 
