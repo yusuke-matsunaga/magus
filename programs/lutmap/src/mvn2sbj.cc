@@ -341,12 +341,12 @@ mvn2sbj(const MvMgr& mvmgr,
 
   ymuint nmax = mvmgr.max_node_id();
   MvNodeMap mvmap(nmax);
-  
+
   const MvModule* module = module_list.front();
 
   vector<bool> mark(nmax, false);
   list<const MvNode*> queue;
-  
+
   // 外部入力を作る．
   ymuint ni = module->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -426,7 +426,7 @@ mvn2sbj(const MvMgr& mvmgr,
     switch ( node->type() ) {
     case MvNode::kOutput:
       break;
-	
+
     case MvNode::kThrough:
       {
 	const MvInputPin* ipin = node->input(0);
@@ -443,7 +443,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	}
       }
       break;
-	
+
     case MvNode::kNot:
       {
 	const MvInputPin* ipin = node->input(0);
@@ -461,19 +461,19 @@ mvn2sbj(const MvMgr& mvmgr,
 	}
       }
       break;
-      
+
     case MvNode::kAnd:
       {
 	const MvInputPin* ipin0 = node->input(0);
 	const MvNet* net0 = ipin0->net();
 	const MvOutputPin* src_pin0 = net0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
-	
+
 	const MvInputPin* ipin1 = node->input(1);
 	const MvNet* net1 = ipin1->net();
 	const MvOutputPin* src_pin1 = net1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
-	
+
 	ymuint bw = node->output(0)->bit_width();
 	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
 	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
@@ -492,19 +492,19 @@ mvn2sbj(const MvMgr& mvmgr,
 	}
       }
       break;
-      
+
     case MvNode::kOr:
       {
 	const MvInputPin* ipin0 = node->input(0);
 	const MvNet* net0 = ipin0->net();
 	const MvOutputPin* src_pin0 = net0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
-	
+
 	const MvInputPin* ipin1 = node->input(1);
 	const MvNet* net1 = ipin1->net();
 	const MvOutputPin* src_pin1 = net1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
-	
+
 	ymuint bw = node->output(0)->bit_width();
 	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
 	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
@@ -523,19 +523,19 @@ mvn2sbj(const MvMgr& mvmgr,
 	}
       }
       break;
-      
+
     case MvNode::kXor:
       {
 	const MvInputPin* ipin0 = node->input(0);
 	const MvNet* net0 = ipin0->net();
 	const MvOutputPin* src_pin0 = net0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
-	
+
 	const MvInputPin* ipin1 = node->input(1);
 	const MvNet* net1 = ipin1->net();
 	const MvOutputPin* src_pin1 = net1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
-	
+
 	ymuint bw = node->output(0)->bit_width();
 	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
 	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
@@ -562,14 +562,14 @@ mvn2sbj(const MvMgr& mvmgr,
 	assert_not_reached(__FILE__, __LINE__);
       }
       break;
-      
+
     case MvNode::kEq:
     case MvNode::kLt:
       {
 	assert_not_reached(__FILE__, __LINE__);
       }
       break;
-      
+
     case MvNode::kAdd:
     case MvNode::kSub:
     case MvNode::kMult:
@@ -580,24 +580,24 @@ mvn2sbj(const MvMgr& mvmgr,
 	assert_not_reached(__FILE__, __LINE__);
       }
       break;
-      
+
     case MvNode::kIte:
       {
 	const MvInputPin* ipin0 = node->input(0);
 	const MvNet* net0 = ipin0->net();
 	const MvOutputPin* src_pin0 = net0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
-	
+
 	const MvInputPin* ipin1 = node->input(1);
 	const MvNet* net1 = ipin1->net();
 	const MvOutputPin* src_pin1 = net1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
-	
+
 	const MvInputPin* ipin2 = node->input(2);
 	const MvNet* net2 = ipin2->net();
 	const MvOutputPin* src_pin2 = net2->src_pin();
 	const MvNode* src_node2 = src_pin2->node();
-	
+
 	ymuint bw = node->output(0)->bit_width();
 	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
 	assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
@@ -605,7 +605,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	bool inv0;
 	bool stat0 = mvmap.get(src_node0, sbjnode0, inv0);
 	assert_cond( stat0, __FILE__, __LINE__);
-	
+
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode1;
 	  bool inv1;
@@ -632,35 +632,34 @@ mvn2sbj(const MvMgr& mvmgr,
       {
 	ymuint bw = node->output(0)->bit_width();
 	ymuint ni = node->input_num();
-	ymuint offset = 0U;
+	ymuint offset = bw;
 	for (ymuint i = 0; i < ni; ++ i) {
 	  const MvInputPin* ipin = node->input(i);
 	  const MvNet* net = ipin->net();
 	  const MvOutputPin* opin = net->src_pin();
 	  const MvNode* src_node = opin->node();
 	  ymuint bw1 = opin->bit_width();
+	  offset -= bw1;
 	  for (ymuint j = 0; j < bw1; ++ j) {
 	    ymuint index = offset + j;
-	    
 	    SbjNode* sbjnode0;
 	    bool inv0;
 	    bool stat0 = mvmap.get(src_node, j, sbjnode0, inv0);
 	    assert_cond( stat0, __FILE__, __LINE__);
 	    mvmap.put(node, index, sbjnode0, inv0);
 	  }
-	  offset += bw1;
 	}
-	assert_cond( bw == offset, __FILE__, __LINE__);
+	assert_cond( offset == 0U, __FILE__, __LINE__);
       }
       break;
-      
+
     case MvNode::kConstBitSelect:
       {
 	const MvInputPin* ipin = node->input(0);
 	const MvNet* net = ipin->net();
 	const MvOutputPin* src_pin = net->src_pin();
 	const MvNode* src_node = src_pin->node();
-	
+
 	SbjNode* sbjnode0;
 	bool inv0;
 	bool stat0 = mvmap.get(src_node, node->bitpos(), sbjnode0, inv0);
@@ -668,14 +667,14 @@ mvn2sbj(const MvMgr& mvmgr,
 	mvmap.put(node, sbjnode0, inv0);
       }
       break;
-      
+
     case MvNode::kConstPartSelect:
       {
 	const MvInputPin* ipin = node->input(0);
 	const MvNet* net = ipin->net();
 	const MvOutputPin* src_pin = net->src_pin();
 	const MvNode* src_node = src_pin->node();
-	
+
 	ymuint bw = node->output(0)->bit_width();
 	ymuint msb = node->msb();
 	ymuint lsb = node->lsb();
@@ -690,31 +689,31 @@ mvn2sbj(const MvMgr& mvmgr,
 	}
       }
       break;
-      
+
     case MvNode::kBitSelect:
       {
 	assert_not_reached(__FILE__, __LINE__);
       }
       break;
-      
+
     case MvNode::kPartSelect:
       {
 	assert_not_reached(__FILE__, __LINE__);
       }
       break;
-      
+
     case MvNode::kCombUdp:
       {
 	assert_not_reached(__FILE__, __LINE__);
       }
       break;
-      
+
     case MvNode::kSeqUdp:
       {
 	assert_not_reached(__FILE__, __LINE__);
       }
       break;
-      
+
     default:
       assert_not_reached(__FILE__, __LINE__);
       break;
@@ -802,7 +801,7 @@ mvn2sbj(const MvMgr& mvmgr,
       }
     }
   }
-  
+
   // 外部出力ノードを作る．
   ymuint no = module->output_num();
   for (ymuint i = 0; i < no; ++ i) {
@@ -823,7 +822,7 @@ mvn2sbj(const MvMgr& mvmgr,
       mvmap.put(node, j, osbjnode, false);
     }
   }
-  
+
   // ポートを生成する．
   ymuint np = module->port_num();
   for (ymuint i = 0; i < np; ++ i) {
