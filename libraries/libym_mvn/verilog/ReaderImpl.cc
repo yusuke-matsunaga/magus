@@ -854,11 +854,11 @@ ReaderImpl::connect_lhs(MvModule* parent_module,
   else if ( expr->is_operation() ) {
     assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
     ymuint n = expr->operand_num();
-    ymuint offset = 0;
+    ymuint offset = expr->bit_size();
     for (ymuint i = 0; i < n; ++ i) {
       const VlExpr* expr1 = expr->operand(i);
+      offset -= expr1->bit_size();
       connect_lhs_sub(parent_module, expr1, node, offset);
-      offset += expr1->bit_size();
     }
   }
   else {
@@ -922,11 +922,11 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
   else if ( expr->is_operation() ) {
     assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
     ymuint n = expr->operand_num();
-    ymuint offset1 = 0;
+    ymuint offset1 = expr->bit_size();
     for (ymuint i = 0; i < n; ++ i) {
       const VlExpr* expr1 = expr->operand(i);
+      offset1 -= expr1->bit_size();
       connect_lhs_sub(parent_module, expr1, node, offset + offset1);
-      offset1 += expr1->bit_size();
     }
   }
   else {
