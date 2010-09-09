@@ -16,7 +16,7 @@
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-  
+
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
@@ -32,10 +32,10 @@ EiFactory::new_ConcatOp(const PtBase* pt_expr,
 {
   void* p = mAlloc.get_memory(sizeof(EiConcatOp));
   EiConcatOp* op = new (p) EiConcatOp(pt_expr, opr_size, opr_list);
-  
+
   return op;
 }
-  
+
 // @brief 反復連結演算子を生成する．
 // @param[in] pt_expr パース木の定義要素
 // @param[in] rep_expr 繰り返し数を表す式
@@ -52,7 +52,7 @@ EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
   void* p = mAlloc.get_memory(sizeof(EiMultiConcatOp));
   EiMultiConcatOp* op = new (p) EiMultiConcatOp(pt_expr, rep_expr, rep_num,
 						opr_size, opr_list);
-  
+
   return op;
 }
 
@@ -72,6 +72,18 @@ EiConcatOp::EiConcatOp(const PtBase* pt_obj,
   mOprNum(opr_size),
   mOprList(opr_array)
 {
+  ymuint32 n = operand_num();
+  mSize = 0;
+  for (ymuint32 i = 0; i < n; ++ i) {
+    ElbExpr* expr = _operand(i);
+    tVpiValueType type1 = expr->value_type();
+    assert_cond(type1 != kVpiValueReal, __FILE__, __LINE__);
+    ymuint32 size1 = unpack_size(type1);
+    mSize += size1;
+
+    // オペランドのサイズは self determined
+    expr->set_selfsize();
+  }
 }
 
 // @brief デストラクタ
@@ -139,7 +151,7 @@ EiConcatOp::eval_bitvector(BitVector& bitvector,
   bitvector = concat(vlist);
   bitvector.coerce(req_type);
 }
-  
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -173,7 +185,7 @@ void
 EiConcatOp::set_bitvector(const BitVector& v)
 {
   #warning "TODO: 要素に合わせて v を切り刻む．"
-}  
+}
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -195,24 +207,6 @@ ElbExpr*
 EiConcatOp::_operand(ymuint32 pos) const
 {
   return mOprList[pos];
-}
-
-// @brief 自分のサイズを計算する．
-void
-EiConcatOp::calc_selfsize()
-{
-  ymuint32 n = operand_num();
-  mSize = 0;
-  for (ymuint32 i = 0; i < n; ++ i) {
-    ElbExpr* expr = _operand(i);
-    tVpiValueType type1 = expr->value_type();
-    assert_cond(type1 != kVpiValueReal, __FILE__, __LINE__);
-    ymuint32 size1 = unpack_size(type1);
-    mSize += size1;
-
-    // オペランドのサイズは self determined
-    expr->set_selfsize();
-  }
 }
 
 
@@ -264,7 +258,7 @@ EiMultiConcatOp::eval_bitvector(BitVector& bitvector,
   bitvector = multi_concat(BitVector(mRepNum), vlist);
   bitvector.coerce(req_type);
 }
-  
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -290,8 +284,8 @@ void
 EiMultiConcatOp::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
-}  
-  
+}
+
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiMultiConcatOp::op_type() const

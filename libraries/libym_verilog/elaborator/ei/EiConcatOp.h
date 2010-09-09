@@ -55,12 +55,12 @@ public:
   virtual
   bool
   is_const() const;
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
   /// @brief オペランド数を返す．
   virtual
   ymuint32
@@ -87,18 +87,18 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数 (private)
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -111,25 +111,25 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief オペランドを返す．
   virtual
   ElbExpr*
   _operand(ymuint32 pos) const;
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -140,31 +140,21 @@ protected:
   ymuint32
   bit_size() const;
 
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 設定用の関数
-  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 自分のサイズを計算する．
-  void
-  calc_selfsize();
-
-  
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // オペランド数
   ymuint32 mOprNum;
-  
+
   // オペランドの配列
   ElbExpr** mOprList;
 
   // 結果のビット幅
   ymuint32 mSize;
-  
+
 };
 
 
@@ -206,7 +196,7 @@ public:
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
@@ -223,25 +213,25 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -253,8 +243,8 @@ public:
   virtual
   ElbExpr*
   _operand(ymuint32 pos) const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -265,7 +255,7 @@ private:
 
   // 繰り返し数
   int mRepNum;
-  
+
 };
 
 
