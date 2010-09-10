@@ -22,6 +22,8 @@ libmagus_lutmap_tcl_la_SOURCES = \
 	LutmapCmd.h \
 	LutmapCmd.cc \
 	Conv2SbjCmd.cc \
+	ReadVerilogCmd.cc \
+	mvn2sbj.cc \
 	DumpSbjCmd.cc \
 	AreaMapCmd.cc \
 	DelayMapCmd.cc \
@@ -31,7 +33,10 @@ libmagus_lutmap_tcl_la_SOURCES = \
 
 libmagus_lutmap_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lutmap/libym_lutmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mvn/libym_mvn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 libmagus_lutmap_tcl_la_LDFLAGS =

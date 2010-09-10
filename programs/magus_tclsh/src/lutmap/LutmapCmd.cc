@@ -53,9 +53,11 @@ lutmap_init(Tcl_Interp* interp,
 	    NetMgr* mgr)
 {
   LutmapData* data = new LutmapData;
-  
+
   TclCmdBinder2<Conv2SbjCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::conv2sbj");
+  TclCmdBinder2<ReadVerilogCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+							   "magus::lutmap::read_verilog");
   TclCmdBinder2<DumpSbjCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
 						       "magus::lutmap::dump_sbjgraph");
   TclCmdBinder2<AreaMapCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
@@ -68,13 +70,14 @@ lutmap_init(Tcl_Interp* interp,
 							 "magus::lutmap::conv2bnet");
   TclCmdBinder2<WriteVqmCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::write_vqm");
-  
-  
+
+
   const char* init =
     "namespace eval tclreadline {\n"
     "namespace eval magus {\n"
     "namespace eval lutmap {\n"
     "proc complete(conv2sbj) { text start end line pos mod } { return \"\" }\n"
+    "proc complete(read_verilog) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_sbjgraph) { text start end line pos mod } { return \"\" }\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
     "proc complete(delay_map) { text start end line pos mod } { return \"\" }\n"

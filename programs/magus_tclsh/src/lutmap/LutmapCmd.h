@@ -102,6 +102,34 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class ReadVerilogCmd LutmapCmd "LutmapCmd.h"
+/// @brief verilog ファイルを読み込むコマンド
+//////////////////////////////////////////////////////////////////////
+class ReadVerilogCmd :
+  public LutmapCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  ReadVerilogCmd(NetMgr* mgr,
+		 LutmapData* data);
+
+  /// @brief デストラクタ
+  virtual
+  ~ReadVerilogCmd();
+
+
+protected:
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class DumpSbjCmd LutmapCmd "LutmapCmd.h"
 /// @brief SbjGraph の内容をダンプするコマンド
 //////////////////////////////////////////////////////////////////////
@@ -254,6 +282,16 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // verilog オプションの解析用オブジェクト
+  TclPopt* mPoptVerilog;
+
 
 };
 

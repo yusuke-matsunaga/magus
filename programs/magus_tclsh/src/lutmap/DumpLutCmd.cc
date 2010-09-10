@@ -10,6 +10,7 @@
 
 
 #include "LutmapCmd.h"
+#include "ym_tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -23,6 +24,8 @@ DumpLutCmd::DumpLutCmd(NetMgr* mgr,
 		       LutmapData* data) :
   LutmapCmd(mgr, data)
 {
+  mPoptVerilog = new TclPopt(this, "verilog",
+			     "verilog mode");
   set_usage_string("?<filename>");
 }
 
@@ -30,7 +33,7 @@ DumpLutCmd::DumpLutCmd(NetMgr* mgr,
 DumpLutCmd::~DumpLutCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 DumpLutCmd::cmd_proc(TclObjVector& objv)
@@ -40,6 +43,7 @@ DumpLutCmd::cmd_proc(TclObjVector& objv)
     print_usage();
     return TCL_ERROR;
   }
+  bool verilog = mPoptVerilog->is_specified();
 
   try {
     ostream* outp = &cout;
@@ -52,7 +56,12 @@ DumpLutCmd::cmd_proc(TclObjVector& objv)
       }
       outp = &ofs;
     }
-    dump(*outp, lutnetwork());
+    if ( verilog ) {
+      dump_verilog(*outp, lutnetwork());
+    }
+    else {
+      dump(*outp, lutnetwork());
+    }
     return TCL_OK;
   }
   catch ( AssertError x ) {
@@ -62,7 +71,7 @@ DumpLutCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 
