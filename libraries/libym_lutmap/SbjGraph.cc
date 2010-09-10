@@ -1,5 +1,5 @@
 
-/// @file libym_lutmap/SbjGraph.cc 
+/// @file libym_lutmap/SbjGraph.cc
 /// @brief SbjGraph の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -28,7 +28,7 @@ SbjNode::SbjNode() :
   mLevel(0)
 {
 }
-      
+
 // デストラクタ
 SbjNode::~SbjNode()
 {
@@ -143,7 +143,7 @@ SbjGraph::copy(const SbjGraph& src,
   ymuint n = src.max_node_id();
   nodemap.clear();
   nodemap.resize(n);
-  
+
   // 外部入力の生成
   const SbjNodeList& input_list = src.input_list();
   for (SbjNodeList::const_iterator p = input_list.begin();
@@ -161,7 +161,7 @@ SbjGraph::copy(const SbjGraph& src,
     SbjNode* dst_node = new_dff();
     nodemap[src_node->id()] = dst_node;
   }
-  
+
   // 論理ノードの生成
   vector<const SbjNode*> node_list;
   src.sort(node_list);
@@ -211,7 +211,7 @@ SbjGraph::copy(const SbjGraph& src,
       set_dff_rst(dst_onode, dst_inode3, src_onode->fanin_rst_inv());
     }
   }
-  
+
   // 外部出力の生成
   const SbjNodeList& output_list = src.output_list();
   for (SbjNodeList::const_iterator p = output_list.begin();
@@ -251,7 +251,7 @@ SbjGraph::clear()
     delete *p;
   }
   mPortArray.clear();
-  
+
   // まず最初に接続を切る．
   for (SbjNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
@@ -456,7 +456,7 @@ SbjGraph::sort(vector<const SbjNode*>& node_list) const
   node_list.reserve(n_lnodes());
 
   vector<bool> mark(max_node_id(), false);
-  
+
   // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
   list<const SbjNode*> tmp_list;
   ppi_list(tmp_list);
@@ -544,7 +544,7 @@ SbjNode*
 SbjGraph::new_input()
 {
   SbjNode* node = new_node(0);
-  
+
   // 入力ノード配列に登録
   ymuint subid = mInputArray.size();
   mInputArray.push_back(node);
@@ -557,7 +557,7 @@ SbjGraph::new_input()
   node->set_input(subid);
 
   node->mLevel = 0;
-  
+
   return node;
 }
 
@@ -567,7 +567,7 @@ SbjGraph::new_output(SbjNode* inode,
 		     bool inv)
 {
   SbjNode* node = new_node(1);
-  
+
   // 出力ノード配列に登録
   ymuint subid = mOutputArray.size();
   mOutputArray.push_back(node);
@@ -597,7 +597,7 @@ SbjGraph::new_logic(ymuint fcode,
   node->set_logic(fcode);
   connect(inode0, node, 0);
   connect(inode1, node, 1);
-  
+
   return node;
 }
 
@@ -801,7 +801,7 @@ SbjGraph::connect(SbjNode* from,
 		  ymuint pos)
 {
   // SbjNode::mFaoutList を変更するのはここだけ
-  
+
   SbjEdge* edge = to->fanin_edge(pos);
   SbjNode* old_from = edge->from();
   if ( old_from ) {
@@ -832,7 +832,7 @@ SbjGraph::level() const
       // node の const を取り去るギミック
       mNodeArray[node->id()]->mLevel = 0;
     }
-    
+
     vector<const SbjNode*> node_list;
     sort(node_list);
     for (vector<const SbjNode*>::const_iterator p = node_list.begin();
@@ -848,7 +848,7 @@ SbjGraph::level() const
       // node の const を取り去るギミック
       mNodeArray[node->id()]->mLevel = l + 1;
     }
-    
+
     ymuint max_l = 0;
     ppo_list(tmp_list);
     for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
@@ -867,256 +867,6 @@ SbjGraph::level() const
     mLevelValid = true;
   }
   return mLevel;
-}
-
-// @brief SbjGraph の内容をダンプする関数
-void
-dump(ostream& s,
-     const SbjGraph& sbjgraph)
-{
-  ymuint np = sbjgraph.port_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    s << "Port#" << i << ":";
-    const SbjPort* port = sbjgraph.port(i);
-    s << " " << port->name() << " = ";
-    ymuint nb = port->bit_width();
-    assert_cond( nb > 0, __FILE__, __LINE__);
-    if ( nb == 1 ) {
-      const SbjNode* node = port->bit(0);
-      s << " " << node->id_str();
-    }
-    else {
-      s << "{";
-      const char* comma = "";
-      for (ymuint i = 0; i < nb; ++ i) {
-	const SbjNode* node = port->bit(i);
-	s << comma << node->id_str();
-	comma = ", ";
-      }
-      s << "}";
-    }
-    s << endl;
-  }
-  s << endl;
-  
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    s << "Input#" << node->subid() << ": " << node->id_str()
-      << " : " << sbjgraph.port(node)->name()
-      << "[" << sbjgraph.port_pos(node) << "]"
-      << endl;
-  }
-
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    const SbjEdge* e = node->fanin_edge(0);
-    s << "Output#" << node->subid() << ": " << node->id_str()
-      << " : " << sbjgraph.port(node)->name()
-      << "[" << sbjgraph.port_pos(node) << "]"
-      << " = ";
-    const SbjNode* inode = e->from();
-    if ( inode ) {
-      // 普通のノードの場合
-      if ( node->output_inv() ) {
-	s << "~";
-      }
-      s << inode->id_str();
-    }
-    else {
-      // 定数ノードの場合
-      if ( node->output_inv() ) {
-	s << "1";
-      }
-      else {
-	s << "0";
-      }
-    }
-    s << endl;
-  }
-
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    s << "DFF(" << node->id_str() << ") :";
-    s << "DATA = ";
-    const SbjNode* inode = node->fanin_data();
-    if ( inode ) {
-      // 普通のノードの場合
-      if ( node->fanin_data_inv() ) {
-	s << "~";
-      }
-      s << inode->id_str();
-    }
-    else {
-      // 定数ノードの場合
-      if ( node->fanin_data_inv() ) {
-	s << "1";
-      }
-      else {
-	s << "0";
-      }
-    }
-
-    const SbjNode* cnode = node->fanin_clock();
-    if ( cnode ) {
-      s << ", CLOCK = ";
-      if ( node->fanin_clock_inv() ) {
-	s << "~";
-      }
-      s << cnode->id_str();
-    }
-
-    const SbjNode* snode = node->fanin_set();
-    if ( snode ) {
-      s << ", SET = ";
-      if ( node->fanin_set_inv() ) {
-	s << "~";
-      }
-      s << snode->id_str();
-    }
-
-    const SbjNode* rnode = node->fanin_rst();
-    if ( rnode ) {
-      s << ", RST = ";
-      if ( node->fanin_rst_inv() ) {
-	s << "~";
-      }
-      s << rnode->id_str();
-    }
-    
-    s << endl;
-  }
-
-  const SbjNodeList& lnode_list = sbjgraph.lnode_list();
-  for (SbjNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    s << "Logic(" << node->id_str() << ") = [";
-    ymuint fcode = node->fcode();
-    s << ((fcode >> 3) & 1) << ((fcode >> 2) & 1)
-      << ((fcode >> 1) & 1) << (fcode & 1) << "] ("
-      << " " << node->fanin(0)->id_str()
-      << ", " << node->fanin(1)->id_str()
-      << ")" << endl;
-    s << endl;
-  }
-}
-
-// @brief SbjGraph の内容を blif 形式で出力する関数
-void
-write_blif(ostream& s,
-	   const SbjGraph& sbjgraph,
-	   const string& module_name)
-{
-  s << ".model " << module_name << endl;
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    s << ".inputs " << node->id_str() << endl;
-  }
-
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    s << ".outputs " << node->id_str() << endl;
-  }
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    const SbjNode* inode = node->fanin(0);
-    if ( inode == 0 ) {
-      s << ".names " << node->id_str() << endl;
-      if ( node->output_inv() ) {
-	s << "1" << endl;
-      }
-      else {
-	s << "0" << endl;
-      }
-    }
-    else {
-      s << ".names " << inode->id_str() << " " << node->id_str() << endl;
-      if ( node->output_inv() ) {
-	s << "0 1" << endl;
-      }
-      else {
-	s << "1 1" << endl;
-      }
-    }
-    s << endl;
-  }
-
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    const SbjNode* inode = node->fanin(0);
-    s << ".latch " << node->id_str() << " "
-      << inode->id_str() << endl;
-  }
-  
-  const SbjNodeList& lnode_list = sbjgraph.lnode_list();
-  for (SbjNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    s << ".names " << node->fanin(0)->id_str()
-      << " " << node->fanin(1)->id_str()
-      << " " << node->id_str() << endl;
-    switch ( node->fcode() ) {
-    case 0x0: // 0000
-    case 0x3: // 0011
-    case 0x5: // 0101
-    case 0xa: // 1010
-    case 0xc: // 1100
-    case 0xf: // 1111
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-    case 0x1: // 0001
-      s << "00 1" << endl;
-      break;
-    case 0x2: // 0010
-      s << "10 1" << endl;
-      break;
-    case 0x4: // 0100
-      s << "01 1" << endl;
-      break;
-    case 0x6: // 0110
-      s << "10 1" << endl
-	<< "01 1" << endl;
-      break;
-    case 0x7: // 0111
-      s << "0- 1" << endl
-	<< "-0 1" << endl;
-      break;
-    case 0x8: // 1000
-      s << "11 1" << endl;
-      break;
-    case 0x9: // 1001
-      s << "00 1" << endl
-	<< "11 1" << endl;
-      break;
-    case 0xb: // 1011
-      s << "1- 1" << endl
-	<< "-0 1" << endl;
-      break;
-    case 0xd: // 1101
-      s << "0- 1" << endl
-	<< "-1 1" << endl;
-      break;
-    case 0xe: // 1110
-      s << "1- 1" << endl
-	<< "-1 1" << endl;
-      break;
-    }
-    s << endl;
-  }
-  s << ".end" << endl;
 }
 
 END_NAMESPACE_YM_LUTMAP

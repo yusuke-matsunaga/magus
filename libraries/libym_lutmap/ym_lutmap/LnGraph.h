@@ -787,7 +787,7 @@ dump(ostream& s,
 /// @param[in] lngraph 対象のネットワーク
 void
 dump_verilog(ostream& s,
-	     const Lngraph& lngraph);
+	     const LnGraph& lngraph);
 
 
 //////////////////////////////////////////////////////////////////////

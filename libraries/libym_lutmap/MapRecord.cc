@@ -74,7 +74,9 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
 			ymuint& depth)
 {
   mapgraph.clear();
-  
+
+  mapgraph.set_name(sbjgraph.name());
+
   // 外部入力の生成
   const SbjNodeList& input_list = sbjgraph.input_list();
   for (SbjNodeList::const_iterator p = input_list.begin();
@@ -85,7 +87,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     node_info.mMapNode[0] = mapnode;
     node_info.mDepth = 0;
   }
-  
+
   // DFFの生成
   const SbjNodeList& dff_list = sbjgraph.dff_list();
   for (SbjNodeList::const_iterator p = dff_list.begin();
@@ -214,7 +216,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     }
     mapgraph.add_port(sbjport->name(), tmp);
   }
-  
+
   lut_num = mapgraph.n_lnodes();
   depth = max_depth;
 }
@@ -228,7 +230,7 @@ make_tv(ymuint ni,
 	vector<int>& tv)
 {
   ymuint np = 1 << ni;
-  
+
   vector<ymulong> vals(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     vals[i] = 0UL;
@@ -303,10 +305,10 @@ MapRecord::back_trace(const SbjNode* node,
     node_info.mMapNode[1] = mapnode1;
     return mapnode1;
   }
-  
+
   // node を根とするカットを取り出す．
   const Cut* cut = node_info.mCut;
-  
+
   // その入力に対応するノードを再帰的に生成する．
   ymuint ni = cut->ni();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -334,15 +336,15 @@ MapRecord::back_trace(const SbjNode* node,
   if ( inv ) {
     expr = ~expr;
   }
-  
+
   // 論理式から真理値表を作る．
   make_tv(ni, expr, tv);
-  
+
   // 新しいノードを作り mNodeMap に登録する．
   mapnode = mapnetwork.new_lut(mTmpFanins, tv);
   node_info.mMapNode[idx] = mapnode;
   node_info.mDepth = idepth + 1;
-  
+
   return mapnode;
 }
 
@@ -407,7 +409,7 @@ MapRecord::back_trace2(const SbjNode* node,
     // インバーターが必要ということ
     return 1;
   }
-  
+
   // node を根とするカットを取り出す．
   const Cut* cut = node_info.mCut;
 

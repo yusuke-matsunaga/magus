@@ -27,6 +27,9 @@ DumpSbjCmd::DumpSbjCmd(NetMgr* mgr,
 {
   mPoptBlif = new TclPopt(this, "blif",
 			  "blif mode");
+  mPoptVerilog = new TclPopt(this, "verilog",
+			     "verilog mode");
+  new_popt_group(mPoptBlif, mPoptVerilog);
   set_usage_string("?<filename>?");
 }
 
@@ -34,12 +37,14 @@ DumpSbjCmd::DumpSbjCmd(NetMgr* mgr,
 DumpSbjCmd::~DumpSbjCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 DumpSbjCmd::cmd_proc(TclObjVector& objv)
 {
   bool blif = mPoptBlif->is_specified();
+  bool verilog = mPoptVerilog->is_specified();
+
   ymuint objc = objv.size();
   if ( objc > 2 ) {
     print_usage();
@@ -58,7 +63,10 @@ DumpSbjCmd::cmd_proc(TclObjVector& objv)
       outp = &ofs;
     }
     if ( blif ) {
-      write_blif(*outp, sbjgraph());
+      dump_blif(*outp, sbjgraph());
+    }
+    else if ( verilog ) {
+      dump_verilog(*outp, sbjgraph());
     }
     else {
       dump(*outp, sbjgraph());
@@ -72,7 +80,7 @@ DumpSbjCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 

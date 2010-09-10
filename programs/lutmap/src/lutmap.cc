@@ -41,7 +41,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc < 2 ) {
     cerr << "USAGE : " << argv[0] << " verilog-file" << endl;
     return 2;
@@ -51,14 +51,14 @@ main(int argc,
   for (ymuint i = 1; i < argc; ++ i) {
     filename_list.push_back(argv[i]);
   }
-  
+
   try {
 #if 0
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     BNetBlifReader reader;
 
     reader.add_msg_handler(msg_handler);
-    
+
     BNetwork network;
 
     if ( !reader.read(filename, network) ) {
@@ -93,7 +93,7 @@ main(int argc,
 		      "QN",        // 反転出力
 		      "",          // セット
 		      "");         // リセット
-    
+
     // verilog ファイルの読み込み
     for (list<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
@@ -117,8 +117,9 @@ main(int argc,
     SbjGraph sbj_network;
     mvn2sbj(mgr, sbj_network);
 
+    dump_verilog(cout, sbj_network);
 #endif
-    
+
     // LUT にマッピング
     LnGraph lut_network;
     ymuint lut_num;
@@ -132,8 +133,8 @@ main(int argc,
 	      depth);
 
     // とりあえず内容を出力する．
-    dump(cout, lut_network);
-    
+    //dump_verilog(cout, lut_network);
+
   }
   catch ( AssertError x) {
     cout << x << endl;

@@ -344,6 +344,8 @@ mvn2sbj(const MvMgr& mvmgr,
 
   const MvModule* module = module_list.front();
 
+  sbjgraph.set_name(module->name());
+
   vector<bool> mark(nmax, false);
   list<const MvNode*> queue;
 

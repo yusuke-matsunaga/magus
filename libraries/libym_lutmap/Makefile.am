@@ -17,10 +17,10 @@ INCLUDES = \
 
 libym_lutmap_la_SOURCES = \
 	SbjGraph.cc \
+	SbjGraph_dump.cc \
 	SbjGraph_mindepth.cc \
 	LnGraph.cc \
-	dump.cc \
-	dump_verilog.cc \
+	LnGraph_dump.cc \
 	EnumCutOp.h \
 	EnumCutOp.cc \
 	EnumCut.h \

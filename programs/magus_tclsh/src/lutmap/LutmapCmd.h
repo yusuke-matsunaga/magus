@@ -69,7 +69,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   LutmapData* mData;
-  
+
 };
 
 
@@ -92,12 +92,12 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 };
 
 
@@ -120,7 +120,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -134,7 +134,10 @@ private:
 
   // blif オプションの解析用オブジェクト
   TclPopt* mPoptBlif;
-  
+
+  // verilog オプションの解析用オブジェクト
+  TclPopt* mPoptVerilog;
+
 };
 
 
@@ -157,7 +160,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -177,7 +180,7 @@ private:
 
   // verbose オプションの解析用オブジェクト
   TclPopt* mPoptVerbose;
-  
+
 };
 
 
@@ -200,7 +203,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -217,13 +220,13 @@ private:
 
   // slack オプションの解析用オブジェクト
   TclPoptInt* mPoptSlack;
-  
+
   // resub オプションの解析用オブジェクト
   TclPopt* mPoptResub;
 
   // verbose オプションの解析用オブジェクト
   TclPopt* mPoptVerbose;
-  
+
 };
 
 
@@ -246,12 +249,12 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 };
 
 
@@ -274,7 +277,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -288,7 +291,7 @@ private:
 
   // npat オプションの解析用オブジェクト
   TclPoptInt* mPoptNpat;
-  
+
 };
 
 
@@ -311,7 +314,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -325,7 +328,7 @@ private:
 
   // npat オプションの解析用オブジェクト
   TclPoptInt* mPoptNpat;
-  
+
 };
 
 
@@ -348,7 +351,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -362,7 +365,7 @@ private:
 
   // dst_network オプションの解析用オブジェクト
   TclPoptStr* mPoptDstNetwork;
-  
+
 };
 
 
@@ -385,12 +388,12 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 };
 
 
@@ -413,12 +416,12 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 };
 
 END_NAMESPACE_MAGUS

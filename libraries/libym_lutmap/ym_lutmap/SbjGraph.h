@@ -36,26 +36,26 @@ class SbjEdge :
   friend class SbjNode;
   friend class SbjGraph;
   friend class SbjEnumCut;
-  
+
 public:
-  
+
   /// @brief 入力側のノードを得る．
   /// @retval 入力側のノード 通常の枝の場合
   /// @retval NULL 定数0に接続している枝の場合
   const SbjNode*
   from() const;
-  
+
   /// @brief 出力側のノードを得る．
   /// @return 出力側のノードを返す．
   const SbjNode*
   to() const;
-  
+
   /// @brief 入力側のノードを得る．
   /// @retval 入力側のノード 通常の枝の場合
   /// @retval NULL 定数0に接続している枝の場合
   SbjNode*
   from();
-  
+
   /// @brief 出力側のノードを得る．
   /// @return 出力側のノードを返す．
   SbjNode*
@@ -64,7 +64,7 @@ public:
   /// @brief 定数枝の時に true を返す．
   bool
   is_const() const;
-  
+
   /// @brief 出力側のノードの何番目の入力かを示す．
   ymuint
   pos() const;
@@ -90,17 +90,17 @@ public:
   /// @brief flow フラグをクリアする．
   void
   clear_flow();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // プライベートメンバ関数
   // これらは friend class からしか呼ぶことができない．
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief コンストラクタ
   SbjEdge();
-  
+
   /// @brief デストラクタ
   ~SbjEdge();
 
@@ -118,19 +118,19 @@ private:
   //////////////////////////////////////////////////////////////////////
   // プライベートメンバ変数
   //////////////////////////////////////////////////////////////////////
-  
+
   // 入力側のノード
   SbjNode* mFrom;
 
   // 出力側のノード
   SbjNode* mTo;
-  
+
   // bit-0: flow フラグ
   // bit-1: tree フラグ
   // bit-2: 入力位置
   ymuint32 mFlags;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 定数
@@ -141,13 +141,13 @@ private:
 
   static
   const int kIposShift = 1;
-  
+
   static
   const ymuint kFlowMask = (1U << kFlowShift);
 
   static
   const ymuint kIposMask = (1U << kIposShift);
-  
+
 };
 
 
@@ -167,7 +167,7 @@ class SbjNode :
   public DlElem
 {
   friend class SbjGraph;
-  
+
 public:
   /// @brief ノードの型
   enum tType {
@@ -190,16 +190,16 @@ private:
 
   /// @brief コンストラクタ
   SbjNode();
-  
+
   /// @brief デストラクタ
   ~SbjNode();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name 構造に関する情報を取り出す関数
   /// @{
-  
+
   /// @brief ID 番号の取得
   /// @return ID 番号を返す．
   /// @note ID 番号はノードの生成時に SbjGraph により自動的に割り振られる．
@@ -215,19 +215,19 @@ public:
   /// @brief タイプを得る．
   tType
   type() const;
-  
+
   /// @brief 入力ノードの時に true を返す．
   bool
   is_input() const;
-  
+
   /// @brief 出力ノードの時に true を返す．
   bool
   is_output() const;
-  
+
   /// @brief 論理ノードの時に true を返す．
   bool
   is_logic() const;
-  
+
   /// @brief DFFノードの時に true を返す．
   bool
   is_dff() const;
@@ -239,7 +239,7 @@ public:
   /// @brief 出力ノードか DFF ノードの時に true を返す．
   bool
   is_ppo() const;
-  
+
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
   ymuint
@@ -249,31 +249,31 @@ public:
   /// @return 反転していたら true を返す．
   bool
   output_inv() const;
-  
+
   /// @brief 機能コードを得る．
   /// @note 論理ノードの場合のみ意味を持つ．
   /// @note 機能コードは2入力の真理値表(4bit)
   ymuint
   fcode() const;
-  
+
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番めのファンインのノード
   /// @note 該当するファンインがなければ NULL を返す．
   const SbjNode*
   fanin(ymuint pos) const;
-  
+
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番目の入力の枝
   /// @note 該当するファンインの枝がなければ NULL を返す．
   const SbjEdge*
   fanin_edge(ymuint pos) const;
-  
+
   /// @brief ファンアウト数を得る．
   ymuint
   n_fanout() const;
-  
+
   /// @brief ファンアウトリストを得る．
   const SbjEdgeList&
   fanout_list() const;
@@ -289,7 +289,7 @@ public:
   /// @brief DFFノードの場合のデータ入力の反転属性を得る．
   bool
   fanin_data_inv() const;
-  
+
   /// @brief DFFノードの場合のクロック入力を得る．
   const SbjNode*
   fanin_clock() const;
@@ -321,7 +321,7 @@ public:
   /// @brief レベルを得る．
   ymuint
   level() const;
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -337,7 +337,7 @@ private:
   /// @note 該当するファンインがなければ NULL を返す．
   SbjNode*
   fanin(ymuint pos);
-  
+
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番目の入力の枝
@@ -364,17 +364,17 @@ private:
   /// @brief タイプを入力に設定する．
   void
   set_input(ymuint subid);
-  
+
   /// @brief タイプを出力に設定する．
   /// @param[in] inv 反転属性
   void
   set_output(ymuint subid,
 	     bool inv);
-  
+
   /// @brief タイプを論理に設定する．
   void
   set_logic(ymuint fcode);
-  
+
   /// @brief タイプをDFFに設定する．
   /// @param[in] inv 反転属性
   void
@@ -395,7 +395,7 @@ private:
   /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
   void
   scan_po();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -425,7 +425,7 @@ private:
   /// @brief target マークを消す．
   void
   clear_tmark();
-  
+
   /// @brief flow 用のマークを返す．
   bool
   fmark() const;
@@ -470,7 +470,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ID 番号
   ymuint32 mId;
 
@@ -480,13 +480,13 @@ private:
   // ファンインの枝(そのもの)の配列
   // 要素数は通常2だが DFF の場合は4
   SbjEdge* mFanins;
-  
+
   // ファンアウトの枝のリスト
   SbjEdgeList mFanoutList;
-  
+
   // 作業用のマーク
   ymuint32 mMark;
-  
+
   // 深さ
   ymuint32 mDepth;
 
@@ -516,7 +516,7 @@ private:
   const int kV1Shift = 6;
   static
   const int kV2Shift = 7;
-  
+
   static
   const ymuint kFoMask = 1U << kFoShift;
   static
@@ -631,8 +631,12 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name ポート関連の情報の取得
+  /// @name 外部インターフェイス情報の取得
   /// @{
+
+  /// @brief モジュール名を得る．
+  string
+  name() const;
 
   /// @brief ポート数を得る．
   ymuint
@@ -659,7 +663,12 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name ポートの生成
+  /// @name 外部インターフェイス情報の設定
+  /// @{
+
+  /// @brief モジュール名を設定する．
+  void
+  set_name(const string& name);
 
   /// @brief ポートを追加する(1ビット版)．
   /// @param[in] name ポート名
@@ -688,14 +697,14 @@ public:
   /// @return ノードIDの最大値 + 1 を返す．
   ymuint
   max_node_id() const;
-  
+
   /// @brief ID 番号によるノードの取得
   /// @param[in] id ID 番号 ( 0 <= id < max_node_id() )
   /// @return ID 番号が id のノードを返す．
   /// @retrun 該当するノードが無い場合には NULL を返す．
   const SbjNode*
   node(ymuint id) const;
-  
+
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint
@@ -740,7 +749,7 @@ public:
   /// @brief 論理ノード数を得る．
   ymuint
   n_lnodes() const;
-  
+
   /// @brief 論理ノードのリストを得る．
   const SbjNodeList&
   lnode_list() const;
@@ -748,7 +757,7 @@ public:
   /// @brief DFFノード数を得る．
   ymuint
   n_dffs() const;
-  
+
   /// @brief DFFノードのリストを得る．
   const SbjNodeList&
   dff_list() const;
@@ -779,7 +788,7 @@ public:
   /// @return 作成したノードを返す．
   SbjNode*
   new_input();
-  
+
   /// @brief 出力ノードを作る．
   /// @param[in] inode 入力のノード
   /// @param[in] inv 極性
@@ -787,7 +796,7 @@ public:
   SbjNode*
   new_output(SbjNode* inode,
 	     bool inv);
-  
+
   /// @brief 論理ノードを作る．
   /// @param[in] fcode 機能コード
   /// @param[in] inode1 1番めの入力ノード
@@ -797,7 +806,7 @@ public:
   new_logic(ymuint fcode,
 	    SbjNode* inode1,
 	    SbjNode* inode2);
-  
+
   /// @brief DFFノードを作る．
   /// @param[in] inode 入力のノード
   /// @param[in] inv 極性
@@ -805,7 +814,7 @@ public:
   SbjNode*
   new_dff(SbjNode* inode = NULL,
 	  bool inv = false);
-  
+
   /// @brief 出力ノードの内容を変更する
   /// @param[in] 変更対象の出力ノード
   /// @param[in] inode 入力のノード
@@ -814,7 +823,7 @@ public:
   change_output(SbjNode* node,
 		SbjNode* inode,
 		bool inv);
-  
+
   /// @brief 論理ノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード
   /// @param[in] fcode 機能コード
@@ -825,7 +834,7 @@ public:
 	       ymuint fcode,
 	       SbjNode* inode1,
 	       SbjNode* inode2);
-  
+
   /// @brief DFFノードの内容を変更する
   /// @param[in] 変更対象のDFFノード
   /// @param[in] inode 入力のノード
@@ -861,7 +870,7 @@ public:
   set_dff_rst(SbjNode* node,
 	      SbjNode* inode,
 	      bool inv);
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -874,7 +883,7 @@ public:
   /// @brief 各ノードの minimum depth を求める．
   void
   get_min_depth(ymuint k) const;
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -887,14 +896,14 @@ public:
   /// @brief 空にする．
   void
   clear();
-  
+
   /// @brief 内容を s に出力する．
   void
   dump(ostream& s) const;
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -905,7 +914,7 @@ private:
   void
   copy(const SbjGraph& src,
        vector<SbjNode*>& nodemap);
-  
+
   // 新しいノードを作成し mNodeList に登録する．
   // 作成されたノードを返す．
   SbjNode*
@@ -926,12 +935,12 @@ private:
   // DFFノードの削除
   void
   delete_dff(SbjNode* node);
-  
+
   // node を削除する．
   void
   delete_node(SbjNode* node,
 	      ymuint ni);
-  
+
   // from を to の pos 番目のファンインとする．
   // to の pos 番目にすでに接続があった場合には自動的に削除される．
   void
@@ -986,7 +995,7 @@ private:
     ymuint32 mPos;
   };
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -997,10 +1006,13 @@ private:
 
   // SbjEdge の配列を確保するためのアロケータ
   FragAlloc mAlloc2;
-  
+
+  // 名前
+  string mName;
+
   // ポートの配列
   vector<SbjPort*> mPortArray;
-  
+
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
   vector<SbjNode*> mNodeArray;
@@ -1014,7 +1026,7 @@ private:
 
   // 入力番号をキーにしたポート情報の配列
   vector<PortInfo> mInputPortArray;
-  
+
   // 入力ノードのリスト
   SbjNodeList mInputList;
 
@@ -1024,16 +1036,16 @@ private:
 
   // 出力番号をキーにしたポート情報の配列
   vector<PortInfo> mOutputPortArray;
-  
+
   // 出力ノードのリスト
   SbjNodeList mOutputList;
-  
+
   // 論理ノードのリスト
   SbjNodeList mLnodeList;
-  
+
   // DFFノードのリスト
   SbjNodeList mDffList;
-  
+
   // 最大レベル
   mutable
   ymuint32 mLevel;
@@ -1041,22 +1053,33 @@ private:
   // mLevel および各 SbjNode::mLevel が正しいとき true となるフラグ
   mutable
   bool mLevelValid;
-  
+
 };
 
 
 /// @relates SbjGraph
 /// @brief SbjGraph の内容をダンプする関数
+/// @param[in] s 出力先のストリーム
+/// @param[in] sbjgraph 対象のネットワーク
 void
 dump(ostream& s,
      const SbjGraph& sbjgraph);
 
 /// @relates SbjGraph
 /// @brief SbjGraph の内容を blif 形式で出力する関数
+/// @param[in] s 出力先のストリーム
+/// @param[in] sbjgraph 対象のネットワーク
 void
-write_blif(ostream& s,
-	   const SbjGraph& sbjgraph,
-	   const string& module_name = "sbjgraph");
+dump_blif(ostream& s,
+	  const SbjGraph& sbjgraph);
+
+/// @relates SbjGraph
+/// @brief SbjGraph の内容を Verilog-HDL 形式で出力する関数
+/// @param[in] s 出力先のストリーム
+/// @param[in] sbjgraph 対象のネットワーク
+void
+dump_verilog(ostream& s,
+	     const SbjGraph& sbjgraph);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1664,6 +1687,22 @@ SbjPort::bit(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 // クラス SbjGraph
 //////////////////////////////////////////////////////////////////////
+
+// @brief モジュール名を得る．
+inline
+string
+SbjGraph::name() const
+{
+  return mName;
+}
+
+// @brief モジュール名を設定する．
+inline
+void
+SbjGraph::set_name(const string& name)
+{
+  mName = name;
+}
 
 // @brief ポート数を得る．
 inline
