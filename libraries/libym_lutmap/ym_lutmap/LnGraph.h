@@ -1,7 +1,7 @@
 #ifndef YM_LUTMAP_LNGRAPH_H
 #define YM_LUTMAP_LNGRAPH_H
 
-/// @file ym_lutmap/LnGraph.h 
+/// @file ym_lutmap/LnGraph.h
 /// @brief LutNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -36,35 +36,35 @@ class LnEdge :
   friend class LnNode;
   friend class LnGraph;
   friend class LnEnumCut;
-  
+
 public:
 
   //////////////////////////////////////////////////////////////////////
   /// @name 関数処理に関する情報にアクセスする関数
   /// @{
-  
+
   /// @brief 入力側のノードを得る．(const 版)
   /// @retval 入力側のノード 通常の枝の場合
   /// @retval NULL 定数0に接続している枝の場合
   const LnNode*
   from() const;
-  
+
   /// @brief 出力側のノードを得る．(const 版)
   /// @return 出力側のノードを返す．
   const LnNode*
   to() const;
-  
+
   /// @brief 入力側のノードを得る．
   /// @retval 入力側のノード 通常の枝の場合
   /// @retval NULL 定数0に接続している枝の場合
   LnNode*
   from();
-  
+
   /// @brief 出力側のノードを得る．
   /// @return 出力側のノードを返す．
   LnNode*
   to();
-  
+
   /// @brief 出力側のノードの何番目の入力かを示す．
   ymuint
   pos() const;
@@ -75,17 +75,17 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // プライベートメンバ関数
   // これらは friend class からしか呼ぶことができない．
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief コンストラクタ
   LnEdge();
-  
+
   /// @brief デストラクタ
   ~LnEdge();
 
@@ -103,16 +103,16 @@ private:
   //////////////////////////////////////////////////////////////////////
   // プライベートメンバ変数
   //////////////////////////////////////////////////////////////////////
-  
+
   // 入力側のノード
   LnNode* mFrom;
 
   // 出力側のノード
   LnNode* mTo;
-  
+
   // 入力位置
   ymuint32 mIpos;
-  
+
 };
 
 
@@ -132,7 +132,7 @@ class LnNode :
   public DlElem
 {
   friend class LnGraph;
-  
+
 public:
   /// @brief ノードの型
   enum tType {
@@ -151,17 +151,17 @@ private:
 
   /// @brief コンストラクタ
   LnNode();
-  
+
   /// @brief デストラクタ
   ~LnNode();
 
-  
+
 public:
 
   //////////////////////////////////////////////////////////////////////
   /// @name 構造に関する情報を取り出す関数
   /// @{
-  
+
   /// @brief ID 番号の取得
   /// @return ID 番号を返す．
   /// @note ID 番号はノードの生成時に LnGraph により自動的に割り振られる．
@@ -177,19 +177,19 @@ public:
   /// @brief タイプを得る．
   tType
   type() const;
-  
+
   /// @brief 入力ノードの時に true を返す．
   bool
   is_input() const;
-  
+
   /// @brief 出力ノードの時に true を返す．
   bool
   is_output() const;
-  
+
   /// @brief LUTノードの時に true を返す．
   bool
   is_lut() const;
-  
+
   /// @brief DFFノードの時に true を返す．
   bool
   is_dff() const;
@@ -201,7 +201,7 @@ public:
   /// @brief 出力ノードか DFF ノードの時に true を返す．
   bool
   is_ppo() const;
-  
+
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
   ymuint
@@ -224,25 +224,25 @@ public:
   /// @note 該当するファンインがなければ NULL を返す．
   LnNode*
   fanin(ymuint pos);
-  
+
   /// @brief ファンインの枝を得る．(const 版)
   /// @param[in] pos 入力番号
   /// @return pos 番目の入力の枝
   /// @note 該当するファンインの枝がなければ NULL を返す．
   const LnEdge*
   fanin_edge(ymuint pos) const;
-  
+
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号
   /// @return pos 番目の入力の枝
   /// @note 該当するファンインの枝がなければ NULL を返す．
   LnEdge*
   fanin_edge(ymuint pos);
-  
+
   /// @brief ファンアウト数を得る．
   ymuint
   n_fanout() const;
-  
+
   /// @brief ファンアウトリストを得る．
   const LnEdgeList&
   fanout_list() const;
@@ -272,19 +272,19 @@ private:
   /// @brief タイプを入力に設定する．
   void
   set_input(ymuint subid = 0);
-  
+
   /// @brief タイプを出力に設定する．
   void
   set_output(ymuint subid = 0);
-  
+
   /// @brief タイプをLUTに設定する．
   void
   set_lut();
-  
+
   /// @brief タイプをDFFに設定する．
   void
   set_dff();
-  
+
   /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
   void
   scan_po();
@@ -294,7 +294,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ID 番号
   ymuint32 mId;
 
@@ -303,20 +303,20 @@ private:
 
   // 入力数
   ymuint32 mNi;
-  
+
   // ファンインの枝(そのもの)の配列
   LnEdge* mFanins;
-  
+
   // ファンアウトの枝のリスト
   LnEdgeList mFanoutList;
-  
+
   // 真理値ベクタ
   vector<int> mTv;
-  
+
   // レベル
   ymuint32 mLevel;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // mFlags 用の定数
@@ -437,7 +437,7 @@ public:
   /// @brief モジュール名を得る．
   string
   name() const;
-  
+
   /// @brief ポート数を得る．
   ymuint
   port_num() const;
@@ -456,7 +456,7 @@ public:
   /// @param[in] node 入出力ノード
   ymuint
   port_pos(const LnNode* node) const;
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -483,7 +483,7 @@ public:
   void
   add_port(const string& name,
 	   const vector<LnNode*>& io_node_vec);
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -498,14 +498,14 @@ public:
   /// @note ノードIDは間が抜けている場合がある．
   ymuint
   max_node_id() const;
-  
+
   /// @brief ID 番号によるノードの取得
   /// @param[in] id ID 番号
   /// @return ID 番号が id のノードを返す．
   /// @retrun 該当するノードが無い場合には NULL を返す．
   const LnNode*
   node(ymuint id) const;
-  
+
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint
@@ -526,7 +526,7 @@ public:
   /// @return 要素数を返す．
   ymuint
   ppi_list(list<LnNode*>& node_list) const;
-  
+
   /// @brief 出力のノード数を得る．
   ymuint
   n_outputs() const;
@@ -550,7 +550,7 @@ public:
   /// @brief LUTノード数を得る．
   ymuint
   n_lnodes() const;
-  
+
   /// @brief LUTノードのリストを得る．
   const LnNodeList&
   lnode_list() const;
@@ -558,7 +558,7 @@ public:
   /// @brief LUTノード数を得る．
   ymuint
   n_luts() const;
-  
+
   /// @brief LUTノードのリストを得る．
   const LnNodeList&
   lut_list() const;
@@ -571,7 +571,7 @@ public:
   /// @brief DFFノード数を得る．
   ymuint
   n_dffs() const;
-  
+
   /// @brief DFFノードのリストを得る．
   const LnNodeList&
   dff_list() const;
@@ -597,13 +597,13 @@ public:
   /// @return 作成したノードを返す．
   LnNode*
   new_input();
-  
+
   /// @brief 出力ノードを作る．
   /// @param[in] inode 入力のノード
   /// @return 作成したノードを返す．
   LnNode*
   new_output(LnNode* inode);
-  
+
   /// @brief LUTノードを作る．
   /// @param[in] inodes 入力ノードのベクタ
   /// @param[in] tv 真理値ベクタ
@@ -612,7 +612,7 @@ public:
   LnNode*
   new_lut(const vector<LnNode*>& inodes,
 	  const vector<int>& tv);
-  
+
   /// @brief DFFノードを作る．
   /// @return 作成したノードを返す．
   LnNode*
@@ -648,7 +648,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -659,7 +659,7 @@ private:
   void
   copy(const LnGraph& src,
        vector<LnNode*>& nodemap);
-  
+
   // 新しいノードを作成し mNodeList に登録する．
   // 作成されたノードを返す．
   LnNode*
@@ -674,23 +674,23 @@ private:
   /// @param[in] node 対象のノード
   void
   delete_output(LnNode* node);
-  
+
   /// @brief LUTノードを削除する．
   /// @param[in] node 対象のノード
   /// @note node のファンアウトは空でなければならない．
   void
   delete_lut(LnNode* node);
-  
+
   /// @brief DFFノードを削除する．
   /// @param[in] node 対象のノード
   /// @note node のファンアウトは空でなければならない．
   void
   delete_dff(LnNode* node);
-  
+
   // node を削除する．
   void
   delete_node(LnNode* node);
-  
+
   // from を to の pos 番目のファンインとする．
   // to の pos 番目にすでに接続があった場合には自動的に削除される．
   void
@@ -711,8 +711,8 @@ private:
     /// @brief ビット位置
     ymuint32 mPos;
   };
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -729,7 +729,7 @@ private:
 
   // ポートの配列
   vector<LnPort*> mPortArray;
-  
+
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
   vector<LnNode*> mNodeArray;
@@ -743,7 +743,7 @@ private:
 
   // 入力番号をキーにしたポート情報の配列
   vector<PortInfo> mInputPortArray;
-  
+
   // 入力ノードのリスト
   LnNodeList mInputList;
 
@@ -756,13 +756,13 @@ private:
 
   // 出力ノードのリスト
   LnNodeList mOutputList;
-  
+
   // LUTノードのリスト
   LnNodeList mLutList;
-  
+
   // DFFノードのリスト
   LnNodeList mDffList;
-  
+
   // 最大レベル
   mutable
   ymuint32 mLevel;
@@ -770,13 +770,24 @@ private:
   // mLevel および各 LnNode::mLevel が正しいとき true となるフラグ
   mutable
   bool mLevelValid;
-  
+
 };
 
-// @brief 内容を s に出力する．
+/// @relates LnGraph
+/// @brief 内容を s に出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] lngraph 対象のネットワーク
 void
 dump(ostream& s,
      const LnGraph& lngraph);
+
+/// @relates LnGraph
+/// @brief 内容をシミュレーション可能な Verilog-HDL 形式で出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] lngraph 対象のネットワーク
+void
+dump_verilog(ostream& s,
+	     const Lngraph& lngraph);
 
 
 //////////////////////////////////////////////////////////////////////
