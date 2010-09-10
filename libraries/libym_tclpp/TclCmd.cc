@@ -98,7 +98,7 @@ TclCmd::bind(Tcl_Interp* interp,
     TclPopt* popt = *p;
     popt->set_interp(interp);
   }
-  
+
   // コマンド名をセットする．
   mCmdName = cmd_name;
   // コマンドを登録する．
@@ -138,14 +138,14 @@ TclCmd::parse_opt(TclObjVector& objv,
 		  bool& help)
 {
   help = false;
-  
+
   // 初期化
   for (list<TclPopt*>::iterator p = mPoptList.begin();
        p != mPoptList.end(); ++ p) {
     TclPopt* popt = *p;
     popt->_init();
   }
-  
+
   // 読み出し位置
   TclObjVector::iterator rpos = objv.begin();
   // コマンド名をスキップ
@@ -225,7 +225,7 @@ TclCmd::parse_opt(TclObjVector& objv,
       return TCL_ERROR;
     }
   }
-  
+
   return TCL_OK;
 }
 
@@ -364,7 +364,18 @@ TclCmd::new_popt_group(TclPopt* popt1,
   if ( popt6 ) {
     pg->add(popt6);
   }
+  mPoptGroupList.push_back(pg);
   return pg;
+}
+
+// @brief Popt グループに要素を追加する．
+// @param[in] group new_popt_group() で作成した TclPoptGroup
+// @param[in] popt 追加する TclPopt
+void
+TclCmd::add_popt(TclPoptGroup* group,
+		 TclPopt* popt)
+{
+  group->add(popt);
 }
 
 // コマンド処理関数

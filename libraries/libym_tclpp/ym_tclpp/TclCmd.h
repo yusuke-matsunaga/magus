@@ -33,7 +33,7 @@ protected:
   /// @brief コンストラクタ
   /// @note この時点では特定のインタプリタとは結び付いていない．
   TclCmd();
-  
+
   /// @brief デストラクタ
   /// コマンドとのバインディングも解除する．
   /// 通常はコマンドの削除に伴ってこのデストラクタが起動されるので，
@@ -44,7 +44,7 @@ protected:
 
 
 public:
-  
+
   /// @brief 特定のインタプリタ上のコマンドと結び付ける．
   /// @param[in] interp インタープリタ
   /// @param[in] cmd_name コマンド名
@@ -58,33 +58,33 @@ public:
   int
   bind(Tcl_Interp* interp,
        const string& cmd_name);
-  
+
   /// @brief コマンド名を得る．
   string
   command_name() const;
-  
+
   /// @brief コマンド情報を取得する．
   /// @param[out] info コマンド情報を格納する変数
   /// @retval TCL_OK 成功した．
   /// @retval TCL_ERROR (あるとは思えないけど) 失敗した．
   int
   command_info(Tcl_CmdInfo* info) const;
-  
+
   /// @brief コマンドトークン(Tcl_CreateCommand()の返り値)を得る．
   Tcl_Command
   cmd_token() const;
-  
+
   /// @brief 最初の引数 (argv[0]) を得る．
   /// @note この値は cmd_proc() 中でしか適正ではない．
   const string&
   arg0() const;
-  
+
   /// @brief TclPopt を登録する．
   /// @param[in] popt 登録するオプション解析用オブジェクト
   /// @note TclPopt オブジェクトはこのコマンドが削除されるときに一緒に削除される．
   void
   bind_popt(TclPopt* popt);
-  
+
   /// @brief Tcl関数に渡す本当のコマンド処理関数
   friend
   int
@@ -92,7 +92,7 @@ public:
 		       Tcl_Interp* interp,
 		       int objc,
 		       Tcl_Obj *const objv[]);
-  
+
   /// @brief コマンド削除関数
   friend
   void
@@ -108,7 +108,7 @@ protected:
 
   /// @brief オプションの解析を行う．
   /// @param[inout] objv 引数の配列
-  /// @param[out] help help/usage オプションがあったら true をセットする． 
+  /// @param[out] help help/usage オプションがあったら true をセットする．
   /// @return エラーが起きたら TCL_ERROR を返す．
   /// @note パーズの結果，objv が書き換わる場合がある．
   /// @note というか書き換えないと2重にパーズされることになる．
@@ -116,34 +116,34 @@ protected:
   int
   parse_opt(TclObjVector& objv,
 	    bool& help);
-  
+
   /// @brief cmd_proc() を呼び出す前に呼ばれる関数
   /// @param [inout] objv 引数の配列
   /// @note デフォルトではなにもしないで TCL_OK を返す．
   virtual
   int
   before_cmd_proc(TclObjVector& objv);
-  
+
   /// @brief コマンドを実行する仮想関数
   /// @param [inout] objv 引数の配列
   /// @note 純粋仮想関数なので継承クラスで実装する必要がある．
   virtual
   int
   cmd_proc(TclObjVector& objv) = 0;
-  
+
   /// @brief cmd_proc() の終了後呼ばれる仮想関数
   /// @note デフォルトでは何もしない．
   virtual
   void
   after_cmd_proc();
-  
+
   /// @brief コマンドの開始を記録する．
   /// @param [inout] objv 引数の配列
   /// @note デフォルトでは何もしない．
   virtual
   void
   rec_cmd_start(const TclObjVector& objv);
-  
+
   /// @brief コマンドの終了を記録する．
   /// @param[in] rcode このコマンドの終了値
   /// @note デフォルトでは何もしない．
@@ -154,16 +154,16 @@ protected:
   /// @brief help/usage で用いる説明文を設定する関数
   void
   set_usage_string(const string& str);
-  
+
   /// @brief help/usage で用いる説明文を返す関数
   string
   usage_string();
-  
+
   /// @brief help オプションがあったときに呼ばれる仮想関数
   virtual
   void
   print_help();
-  
+
   /// @brief usage オプションがあったときに呼ばれる仮想関数
   virtual
   void
@@ -182,9 +182,16 @@ protected:
 		 TclPopt* popt5 = NULL,
 		 TclPopt* popt6 = NULL);
 
+  /// @brief Popt グループに要素を追加する．
+  /// @param[in] group new_popt_group() で作成した TclPoptGroup
+  /// @param[in] popt 追加する TclPopt
+  void
+  add_popt(TclPoptGroup* group,
+	   TclPopt* popt);
+
 
 private:
-  
+
   /// @brief コマンド処理関係の一連の仮想関数を呼んでいる真のコマンド処理関数
   /// @note これを上書きすることも可能だけど普通は必要ないはず
   virtual
@@ -199,10 +206,10 @@ protected:
 
   // コマンド名
   string mCmdName;
-  
+
   // コマンドトークン(Tcl_CreateCommand()の返り値)
   Tcl_Command mCmdToken;
-  
+
   // CmdProc() が呼ばれたときの最初の引数の内容
   // 通常は mCmdName と同じはずだけど，例外があるかどうかは知らない．
   // この値は CmdProc() 中でしか使えない．
@@ -213,19 +220,19 @@ protected:
 
   // help/usage オプションを制御するフラグ
   bool mAutoHelp;
-  
+
   // help/usage で用いる説明文
   string mUsageString;
-  
+
   // オプション解析用オブジェクトのリスト
   list<TclPopt*> mPoptList;
-  
+
   // オプション文字列をキーとして TclPopt を要素とするハッシュ表
   hash_map<string, TclPopt*> mPoptTable;
 
   // TclPoptGroup のリスト
   list<TclPoptGroup*> mPoptGroupList;
-  
+
 };
 
 
@@ -642,7 +649,7 @@ TclCmd::command_name() const
 {
   return mCmdName;
 }
-  
+
 // コマンド情報を取得する．
 inline
 int
@@ -650,7 +657,7 @@ TclCmd::command_info(Tcl_CmdInfo* info) const
 {
   return TclBase::command_info(command_name(), info);
 }
-  
+
 // コマンドトークン(Tcl_CreateCommand()の返り値)を得る．
 inline
 Tcl_Command
@@ -658,7 +665,7 @@ TclCmd::cmd_token() const
 {
   return mCmdToken;
 }
-  
+
 // 最初の引数 (argv[0]) を得る．
 inline
 const string&

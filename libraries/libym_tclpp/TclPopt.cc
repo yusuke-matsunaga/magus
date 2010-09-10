@@ -121,7 +121,7 @@ void
 TclPopt::init()
 {
 }
-  
+
 // @brief オプション文字列がマッチしたときの処理
 // @param[in] opt_str オプション文字列
 // @param[inout] rpos コマンド行引数の次の位置

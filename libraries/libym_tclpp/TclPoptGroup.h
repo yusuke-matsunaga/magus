@@ -56,7 +56,7 @@ private:
 
   // 要素のリスト
   list<TclPopt*> mPoptList;
-  
+
 };
 
 END_NAMESPACE_YM_TCLPP
