@@ -34,7 +34,8 @@ dump(ostream& s,
       s << "{";
       const char* comma = "";
       for (ymuint j = 0; j < nb; ++ j) {
-	const LnNode* node = port->bit(j);
+	ymuint idx = nb - j - 1;
+	const LnNode* node = port->bit(idx);
 	s << comma << node->id_str();
 	comma = ", ";
       }
@@ -261,7 +262,8 @@ dump_verilog(ostream& s,
       s << "{";
       const char* comma = "";
       for (ymuint j = 0; j < nb; ++ j) {
-	const LnNode* node = port->bit(j);
+	ymuint idx = nb - j - 1;
+	const LnNode* node = port->bit(idx);
 	s << comma << node_name(node);
 	comma = ", ";
       }
