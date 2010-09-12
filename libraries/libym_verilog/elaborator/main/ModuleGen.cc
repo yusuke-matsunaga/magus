@@ -45,7 +45,7 @@ ModuleGen::ModuleGen(Elaborator& elab,
   ElbProxy(elab, elb_mgr, elb_factory)
 {
 }
- 
+
 // @brief デストラクタ
 ModuleGen::~ModuleGen()
 {
@@ -60,7 +60,7 @@ ModuleGen::phase1_topmodule(const VlNamedObj* toplevel,
 {
   const FileRegion& file_region = pt_module->file_region();
   const char* name = pt_module->name();
-  
+
   ostringstream buf;
   buf << "instantiating top module \"" << name << "\".";
   put_msg(__FILE__, __LINE__,
@@ -75,7 +75,7 @@ ModuleGen::phase1_topmodule(const VlNamedObj* toplevel,
 					   NULL,
 					   NULL);
   reg_module(module);
-  
+
   // attribute instance の生成
   //instantiate_attribute(pt_module->attr_top(), true, module);
 
@@ -168,7 +168,7 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	  ElbParameter* param = handle->parameter();
 	  assert_cond(param, __FILE__, __LINE__);
 	  assert_cond(param->type() == kVpiParameter, __FILE__, __LINE__);
-	  
+
 	  ElbExpr* expr = param_con->expr(i);
 	  param->set_expr(expr);
 	  ElbParamAssign* pa = factory().new_ParamAssign(module, pt_con,
@@ -179,7 +179,7 @@ ModuleGen::phase1_module_item(ElbModule* module,
       }
     }
   }
-  
+
   // 内側の parameter 宣言の実体化
   // 外側にパラメータポート宣言リストを持っていた場合には
   // 内側の parameter 宣言が localparam に格下げされる．
@@ -189,16 +189,16 @@ ModuleGen::phase1_module_item(ElbModule* module,
   else {
     // パラメータポート宣言リストがない場合には上ですでに実体化している．
   }
-  
+
   // localparam を実体化する．
   instantiate_param(module, pt_module->localparamhead_array(), true);
-  
+
   // それ以外の要素を実体化する．
   phase1_item(module, pt_module->item_array());
-  
+
   // phase2 で行う処理を登録しておく．
   add_phase2stub(module, pt_module);
-  
+
   // ループチェック用のフラグを下ろす．
   pt_module->reset_in_use();
 }
@@ -215,7 +215,7 @@ ModuleGen::phase2_module_item(ElbModule* module,
 
   // IODecl を実体化する．
   instantiate_iodecl(module, NULL, pt_module->iohead_array());
-  
+
   // ポートを実体化する
   instantiate_port(module, pt_module);
 }
@@ -233,7 +233,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 
     ElbExpr* low_conn = NULL;
     tVpiDirection dir = kVpiNoDirection;
-  
+
     if ( n == 1 ) {
       // 単一の要素の場合
       const PtPortRef* pt_portref = pt_port->portref(0);
@@ -243,7 +243,7 @@ ModuleGen::instantiate_port(ElbModule* module,
     else if ( n > 1 ) {
       // 複数要素の結合の場合
       ElbExpr** expr_list = factory().new_ExprList(n);
-      
+
       for (ymuint i = 0; i < n; ++ i) {
 	const PtPortRef* pt_portref = pt_port->portref(i);
 	ElbExpr* portexpr = instantiate_portref(module, pt_portref);
@@ -251,7 +251,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 	  return;
 	}
 	expr_list[i] = portexpr;
-	
+
 	tVpiDirection dir1 = pt_portref->dir();
 	if ( dir == kVpiNoDirection ) {
 	  dir = dir1;
@@ -260,7 +260,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 	  dir = kVpiMixedIO;
 	}
       }
-      
+
       low_conn = factory().new_ConcatOp(pt_port, n, expr_list);
     }
     module->init_port(index, pt_port, low_conn, dir);
@@ -282,7 +282,7 @@ ModuleGen::instantiate_portref(ElbModule* module,
   if ( !decl ) {
     return NULL;
   }
-  
+
   if ( decl->dimension() > 0 ) {
     ostringstream buf;
     buf << decl->full_name()
@@ -294,7 +294,7 @@ ModuleGen::instantiate_portref(ElbModule* module,
 	    buf.str());
     return NULL;
   }
-  
+
   // 添字の部分を実体化する．
   const PtExpr* pt_index = pt_portref->index();
   const PtExpr* pt_left = pt_portref->left_range();

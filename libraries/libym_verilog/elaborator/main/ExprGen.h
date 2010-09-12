@@ -351,11 +351,13 @@ private:
 			    ElbDeclArray* decl_array);
 
   /// @brief genvar に対応した定数を生成する．
+  /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[in] val 値
   /// @note pt_expr に添字が付いていたらエラーとなる．
   ElbExpr*
-  instantiate_genvar(const PtExpr* pt_expr,
+  instantiate_genvar(const VlNamedObj* parent,
+		     const PtExpr* pt_expr,
 		     int val);
 
   /// @brief 式の値を評価する．

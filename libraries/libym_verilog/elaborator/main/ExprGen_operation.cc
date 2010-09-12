@@ -31,7 +31,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 {
   tVpiOpType op_type = pt_expr->opr_type();
   ymuint opr_size = pt_expr->operand_num();
-  
+
   ElbExpr* opr0 = NULL;
   ElbExpr* opr1 = NULL;
   ElbExpr* opr2 = NULL;
@@ -64,7 +64,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
       return NULL;
     }
     return factory().new_UnaryOp(pt_expr, op_type, opr0);
-    
+
   case kVpiBitAndOp:
   case kVpiBitOrOp:
   case kVpiBitXNorOp:
@@ -135,17 +135,17 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	}
 	opr_list[i] = expr1;
       }
-      
+
       expr = factory().new_ConcatOp(pt_expr, opr_size, opr_list);
       expr->set_selfsize();
     }
     break;
-    
+
   case kVpiMultiConcatOp:
     {
       const PtExpr* pt_expr0 = pt_expr->operand(0);
       ElbExpr* rep = instantiate_constant_expr(parent, pt_expr0);
-      if ( !rep ) {
+      if ( rep == NULL ) {
 	return NULL;
       }
       int rep_num;
@@ -175,10 +175,10 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
     assert_not_reached(__FILE__, __LINE__);
     return NULL;
   }
-  
+
   // attribute instance の生成
   //instantiate_attribute(pt_expr->attr_top(), false, expr);
-  
+
   return expr;
 }
 

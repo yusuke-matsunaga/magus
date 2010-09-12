@@ -189,7 +189,7 @@ ExprGen::instantiate_const_primary(const VlNamedObj* parent,
   // そのオブジェクトが genvar の場合
   ElbGenvar* genvar = handle->genvar();
   if ( genvar ) {
-    return instantiate_genvar(pt_expr, genvar->value());
+    return instantiate_genvar(parent, pt_expr, genvar->value());
   }
 
   // それ以外の宣言要素の場合
@@ -248,7 +248,7 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
       // 対象が genvar だった場合
       ElbGenvar* genvar = handle->genvar();
       if ( genvar ) {
-	return instantiate_genvar(pt_expr, genvar->value());
+	return instantiate_genvar(parent, pt_expr, genvar->value());
       }
 
       // それ以外の宣言要素の場合
@@ -298,7 +298,7 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
     // genvar の場合
     ElbGenvar* genvar = handle->genvar();
     if ( genvar ) {
-      return instantiate_genvar(pt_expr, genvar->value());
+      return instantiate_genvar(parent, pt_expr, genvar->value());
     }
   }
   else {
@@ -941,15 +941,44 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
 // @param[in] val 値
 // @note pt_expr に添字が付いていたらエラーとなる．
 ElbExpr*
-ExprGen::instantiate_genvar(const PtExpr* pt_expr,
+ExprGen::instantiate_genvar(const VlNamedObj* parent,
+			    const PtExpr* pt_expr,
 			    int val)
 {
-  if ( pt_expr->index_num() != 0 ) {
-    // genvar は配列型ではない．
+  bool has_range_select = (pt_expr->left_range() && pt_expr->right_range());
+
+  ymuint isize = pt_expr->index_num();
+  if (  isize > 1 || (isize == 1 && has_range_select) ) {
+    // 配列型ではない．
     error_dimension_mismatch(pt_expr);
     return NULL;
   }
+  bool has_bit_select = (isize == 1);
+
+  int index1 = 0;
+  int index2 = 0;
+  if ( has_bit_select ) {
+    if ( !evaluate_expr_int(parent, pt_expr->index(0), index1) ) {
+      return NULL;
+    }
+  }
+  if ( has_range_select ) {
+    bool stat1 = evaluate_expr_int(parent, pt_expr->left_range(), index1);
+    bool stat2 = evaluate_expr_int(parent, pt_expr->right_range(), index2);
+    if ( !stat1 || !stat2 ) {
+      return NULL;
+    }
+  }
+
   // genvar に対応した定数式を生成
+  if ( has_bit_select ) {
+    val >>= index1;
+    val &= 1;
+  }
+  else if ( has_range_select ) {
+    val >>= index2;
+    val &= ((1 << (index1 - index2 + 1)) - 1);
+  }
   return factory().new_GenvarConstant(pt_expr, val);
 }
 
@@ -968,6 +997,31 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     return ElbValue();
   }
 
+  bool has_range_select = (pt_expr->left_range() && pt_expr->right_range());
+
+  ymuint isize = pt_expr->index_num();
+  if (  isize > 1 || (isize == 1 && has_range_select) ) {
+    // 配列型ではない．
+    error_dimension_mismatch(pt_expr);
+    return ElbValue();
+  }
+  bool has_bit_select = (isize == 1);
+
+  int index1 = 0;
+  int index2 = 0;
+  if ( has_bit_select ) {
+    if ( !evaluate_expr_int(parent, pt_expr->index(0), index1) ) {
+      return ElbValue();
+    }
+  }
+  if ( has_range_select ) {
+    bool stat1 = evaluate_expr_int(parent, pt_expr->left_range(), index1);
+    bool stat2 = evaluate_expr_int(parent, pt_expr->right_range(), index2);
+    if ( !stat1 || !stat2 ) {
+      return ElbValue();
+    }
+  }
+
   // 識別子の名前
   const char* name = pt_expr->name();
 
@@ -983,12 +1037,19 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   // そのオブジェクトが genvar の場合
   ElbGenvar* genvar = handle->genvar();
   if ( genvar ) {
-    if ( pt_expr->index_num() != 0 ) {
-      // genvar は配列型ではない．
-      error_dimension_mismatch(pt_expr);
-      return ElbValue();
+    if ( has_bit_select ) {
+      // ビット選択
+      BitVector bv(genvar->value());
+      return ElbValue(bv.bit_select(index1));
     }
-    return ElbValue(genvar->value());
+    else if ( has_range_select ) {
+      // 範囲選択
+      BitVector bv(genvar->value());
+      return ElbValue(bv.part_select(index1, index2));
+    }
+    else {
+      return ElbValue(genvar->value());
+    }
   }
 
   // それ以外の宣言要素の場合
@@ -1000,6 +1061,10 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   }
   ElbValue val;
   if ( param->value_type() == kVpiValueReal ) {
+    if ( has_bit_select || has_range_select ) {
+      error_illegal_real_type(pt_expr);
+      return ElbValue();
+    }
     val = ElbValue(param->eval_real());
   }
   else {
@@ -1008,35 +1073,14 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     val = ElbValue(bv);
   }
 
-  bool has_range_select;
-  bool has_bit_select;
-  ElbExpr* index1;
-  ElbExpr* index2;
-  bool stat = resolve1(parent, pt_expr, param, NULL,
-		       has_range_select, has_bit_select,
-		       index1, index2);
-  if ( !stat ) {
-    // エラーメッセージは resolve() 内で出力されている．
-    return ElbValue();
-  }
-
-  int index1_val;
-  if ( (has_bit_select || has_range_select) &&
-       !expr_to_int(index1, index1_val) ) {
-    return ElbValue();
-  }
-  int index2_val;
-  if ( has_range_select && !expr_to_int(index2, index2_val) ) {
-    return ElbValue();
-  }
-
   if ( has_bit_select ) {
     val.to_bitvector();
     if ( val.is_error() ) {
       error_illegal_real_type(pt_expr);
       return ElbValue();
     }
-    return ElbValue(val.bitvector_value().bit_select(index1_val));
+    int offset = param->bit_offset(index1);
+    return ElbValue(val.bitvector_value().bit_select(offset));
   }
   if ( has_range_select ) {
     val.to_bitvector();
@@ -1048,20 +1092,24 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     int lsb_offset;
     switch ( pt_expr->range_mode() ) {
     case kVpiConstRange:
+      msb_offset = param->bit_offset(index1);
+      lsb_offset = param->bit_offset(index2);
       break;
 
     case kVpiPlusRange:
+#warning "TODO: 仕様を確認"
+      assert_not_reached(__FILE__, __LINE__);
       break;
 
     case kVpiMinusRange:
+#warning "TODO: 仕様を確認"
+      assert_not_reached(__FILE__, __LINE__);
       break;
 
     case kVpiNoRange:
       assert_not_reached(__FILE__, __LINE__);
       break;
     }
-    // まだできていない．
-    assert_not_reached(__FILE__, __LINE__);
     return ElbValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
   }
 
