@@ -47,37 +47,55 @@ main(int argc,
     return 2;
   }
 
+  bool dump1 = false;
+  bool dump2 = false;
+  bool dump3 = false;
+  string dump1_file;
+  string dump2_file;
+  string dump3_file;
+
   list<string> filename_list;
-  for (ymuint i = 1; i < argc; ++ i) {
-    filename_list.push_back(argv[i]);
+  for (int i = 1; i < argc; ++ i) {
+    if ( argv[i][0] == '-' ) {
+      string opt = argv[i] + 1;
+      if ( opt == "dump1" ) {
+	if ( i + 1 >= argc ) {
+	  cerr << "-dump1 <file-name>" << endl;
+	  return 1;
+	}
+	dump1 = true;
+	dump1_file = argv[i + 1];
+	++ i;
+      }
+      else if ( opt == "dump2" ) {
+	if ( i + 1 >= argc ) {
+	  cerr << "-dump2 <file-name>" << endl;
+	  return 1;
+	}
+	dump2 = true;
+	dump2_file = argv[i + 1];
+	++ i;
+      }
+      else if ( opt == "dump3" ) {
+	if ( i + 1 >= argc ) {
+	  cerr << "-dump3 <file-name>" << endl;
+	  return 1;
+	}
+	dump3 = true;
+	dump3_file = argv[i + 1];
+	++ i;
+      }
+      else {
+	cerr << argv[i] << ": illegal option" << endl;
+	return 2;
+      }
+    }
+    else {
+      filename_list.push_back(argv[i]);
+    }
   }
 
   try {
-#if 0
-    MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    BNetBlifReader reader;
-
-    reader.add_msg_handler(msg_handler);
-
-    BNetwork network;
-
-    if ( !reader.read(filename, network) ) {
-      cerr << "Error in reading " << filename << endl;
-      return 4;
-    }
-
-    // 2入力ノードに分解
-    BNetDecomp decomp;
-    decomp(network, 2);
-
-    // SbjGraph に変換
-    SbjGraph sbj_network;
-    BNet2Sbj conv1;
-    bool stat = conv1(network, sbj_network, cerr);
-    if ( !stat ) {
-      return 10;
-    }
-#else
     MvMgr mgr;
     MvVerilogReader reader;
     MsgHandler* mh = new StreamMsgHandler(&cerr);
@@ -103,22 +121,38 @@ main(int argc,
       bool stat = reader.read(name);
       cerr << " end" << endl;
       if ( !stat ) {
-	return 1;
+	return -1;
       }
     }
     // MvNetwork に変換
     bool stat = reader.gen_network(mgr);
     if ( !stat ) {
       cerr << "error occured" << endl;
-      return 2;
+      return -2;
+    }
+    if ( dump1 ) {
+      ofstream ofs;
+      ofs.open(dump1_file.c_str());
+      if ( !ofs.is_open() ) {
+	cerr << dump1_file << ": could not open" << endl;
+	return 3;
+      }
+      dump_verilog(ofs, mgr);
     }
 
     // SbjGraph に変換
     SbjGraph sbj_network;
     mvn2sbj(mgr, sbj_network);
 
-    dump_verilog(cout, sbj_network);
-#endif
+    if ( dump2 ) {
+      ofstream ofs;
+      ofs.open(dump2_file.c_str());
+      if ( !ofs.is_open() ) {
+	cerr << dump2_file << ": could not open" << endl;
+	return 3;
+      }
+      dump_verilog(ofs, sbj_network);
+    }
 
     // LUT にマッピング
     LnGraph lut_network;
@@ -132,8 +166,15 @@ main(int argc,
 	      lut_num,
 	      depth);
 
-    // とりあえず内容を出力する．
-    //dump_verilog(cout, lut_network);
+    if ( dump3 ) {
+      ofstream ofs;
+      ofs.open(dump3_file.c_str());
+      if ( !ofs ) {
+	cerr << dump3_file << ": could not open" << endl;
+	return 3;
+      }
+      dump_verilog(ofs, lut_network);
+    }
 
   }
   catch ( AssertError x) {
