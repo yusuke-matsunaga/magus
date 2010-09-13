@@ -86,76 +86,70 @@ dump_node(ostream& s,
     break;
 
   case MvNode::kDff1:
-    {
-      s << "  GTECH_FD2 U" << node->id()
-	<< " (";
-
-      s << " .Q(" << node_name(node) << ")";
-
-      const char* comma = ", ";
-
+    { // ピン位置と属性は決め打ち
       const MvInputPin* ipin0 = node->input(0);
       const MvNet* net0 = ipin0->net();
-      if ( net0 ) {
-	const MvOutputPin* src_pin0 = net0->src_pin();
-	const MvNode* src_node0 = src_pin0->node();
-	s << comma << " .D(" << node_name(src_node0) << ")";
-      }
-
       const MvInputPin* ipin1 = node->input(1);
       const MvNet* net1 = ipin1->net();
-      if ( net1 ) {
-	const MvOutputPin* src_pin1 = net1->src_pin();
-	const MvNode* src_node1 = src_pin1->node();
-	s << comma << " .CP(" << node_name(src_node1) << ")";
-      }
-
       const MvInputPin* ipin2 = node->input(2);
       const MvNet* net2 = ipin2->net();
-      if ( net2 ) {
-	const MvOutputPin* src_pin2 = net2->src_pin();
-	const MvNode* src_node2 = src_pin2->node();
-	s << comma << " .CD(" << node_name(src_node2) << ")";
-      }
+      assert_cond( net0 != NULL, __FILE__, __LINE__);
+      assert_cond( net1 != NULL, __FILE__, __LINE__);
+      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvNode* src_node0 = src_pin0->node();
+      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvNode* src_node1 = src_pin1->node();
+      const MvOutputPin* src_pin2 = NULL;
+      const MvNode* src_node2 = NULL;
 
-      s << ");" << endl;
+      s << "  always ( posedge " << node_name(src_node1);
+      if ( net2 ) {
+	src_pin2 = net2->src_pin();
+	src_node2 = src_pin2->node();
+	s << " or posedge " << node_name(src_node2);
+      }
+      s << " )" << endl;
+      if ( net2 ) {
+	s << "    if ( " << node_name(src_node2) << " )" << endl
+	  << "      " << node_name(node) << " <= 0;" << endl
+	  << "    else" << endl
+	  << "  ";
+      }
+      s << "    " << node_name(node) << " <= "
+	<< node_name(src_node0) << ";" << endl
+	<< endl;
     }
     break;
 
   case MvNode::kDff2:
-    {
-      s << "  GTECH_FD2 U" << node->id()
-	<< " (";
-
-      s << " .Q(" << node_name(node) << ")";
-
-      const char* comma = ", ";
-
+    { // ピン位置と属性は決め打ち
       const MvInputPin* ipin0 = node->input(0);
       const MvNet* net0 = ipin0->net();
-      if ( net0 ) {
-	const MvOutputPin* src_pin0 = net0->src_pin();
-	const MvNode* src_node0 = src_pin0->node();
-	s << comma << " .D(" << node_name(src_node0) << ")";
-      }
-
       const MvInputPin* ipin1 = node->input(1);
       const MvNet* net1 = ipin1->net();
-      if ( net1 ) {
-	const MvOutputPin* src_pin1 = net1->src_pin();
-	const MvNode* src_node1 = src_pin1->node();
-	s << comma << " .CP(" << node_name(src_node1) << ")";
-      }
-
       const MvInputPin* ipin2 = node->input(2);
       const MvNet* net2 = ipin2->net();
-      if ( net2 ) {
-	const MvOutputPin* src_pin2 = net2->src_pin();
-	const MvNode* src_node2 = src_pin2->node();
-	s << comma << " .CD(" << node_name(src_node2) << ")";
-      }
+      assert_cond( net0 != NULL, __FILE__, __LINE__);
+      assert_cond( net1 != NULL, __FILE__, __LINE__);
+      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvNode* src_node0 = src_pin0->node();
+      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvNode* src_node1 = src_pin1->node();
+      const MvOutputPin* src_pin2 = NULL;
+      const MvNode* src_node2 = NULL;
 
-      s << ");" << endl;
+      s << "  always ( posedge " << node_name(src_node1) << " )" << endl;
+      if ( net2 ) {
+	src_pin2 = net2->src_pin();
+	src_node2 = src_pin2->node();
+	s << "    if ( " << node_name(src_node2) << " )" << endl
+	  << "      " << node_name(node) << " <= 0;" << endl
+	  << "    else" << endl
+	  << "  ";
+      }
+      s << "    " << node_name(node) << " <= "
+	<< node_name(src_node0) << ";" << endl
+	<< endl;
     }
     break;
 
@@ -655,11 +649,17 @@ dump_module(ostream& s,
     MvNode* node = *p;
     assert_cond( node->output_num() == 1, __FILE__, __LINE__);
     ymuint bw = node->output(0)->bit_width();
-    s << "  wire ";
-    if ( bw > 1 ) {
-      s << "[" << bw - 1 << ":" << "0]";
+    if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
+      assert_cond( bw == 1, __FILE__, __LINE__);
+      s << "  reg  " << node_name(node) << ";" << endl;
     }
-    s << " " << node_name(node) << ";" << endl;
+    else {
+      s << "  wire ";
+      if ( bw > 1 ) {
+	s << "[" << bw - 1 << ":" << "0]";
+      }
+      s << " " << node_name(node) << ";" << endl;
+    }
   }
   s << endl;
 
