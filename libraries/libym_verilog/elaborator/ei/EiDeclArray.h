@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIDECLARRAY_H
-#define LIBYM_VERILOG_ELB_IMPL_EIDECLARRAY_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIDECLARRAY_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIDECLARRAY_H
 
-/// @file libym_verilog/elb_impl/EiDeclArray.h
+/// @file libym_verilog/elaborator/ei/EiDeclArray.h
 /// @brief EiDeclArray のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -27,7 +27,7 @@ class EiDeclArray :
   public ElbDeclArray
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -44,7 +44,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiDeclArray();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -71,38 +71,38 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 符号の取得
   /// @retval true 符号つき
   /// @retval false 符号なし
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief MSB の値を返す．
   /// @retval 範囲のMSBの値 範囲指定を持つとき
   /// @retval -1 範囲指定を持たないとき
   virtual
   int
   left_range_const() const;
-  
+
   /// @brief LSB の値を返す．
   /// @retval 範囲のLSBの値 範囲指定を持つとき
   /// @retval -1 範囲指定を持たないとき
@@ -129,7 +129,7 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -177,19 +177,25 @@ public:
   virtual
   ymuint32
   dimension_list_size() const;
-  
+
   /// @brief 範囲の取得
   /// @param[in] pos 位置 (0 <= pos < dimension_list_size())
   virtual
   const VlRange*
   range(ymuint32 pos) const;
 
-  
+  /// @brief 配列要素の時に true を返す．
+  /// @note このクラスでは false を返す．
+  virtual
+  bool
+  is_array_member() const;
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclBase の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -209,7 +215,7 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclArray の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 要素の型を返す．
   virtual
   tVpiObjType
@@ -220,7 +226,7 @@ protected:
   ymuint32
   calc_offset(const vector<int>& index_array) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -228,13 +234,13 @@ private:
 
   // ヘッダ
   ElbDeclHead* mHead;
-  
+
   // パース木の宣言要素
   const PtNamedBase* mPtItem;
-  
+
   // dimension の配列
   EiRangeArray mRangeList;
-  
+
 };
 
 
@@ -246,9 +252,9 @@ class EiDeclArrayN :
   public EiDeclArray
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] head ヘッダ
@@ -259,7 +265,7 @@ private:
 	       const PtNamedBase* pt_item,
 	       ymuint32 dim_size,
 	       EiRange* range_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclArrayN();
@@ -269,13 +275,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclArray の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief スカラー値を返す．
   /// @param[in] index_array インデックスの配列
   virtual
   tVpiScalarVal
   get_scalar(const vector<int>& index_array) const;
-    
+
   /// @brief スカラー値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -289,7 +295,7 @@ public:
   virtual
   double
   get_real(const vector<int>& index_array) const;
-  
+
   /// @brief real 型の値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -315,7 +321,7 @@ public:
   void
   set_bitvector(const vector<int>& index_array,
 		const BitVector& val);
-  
+
   /// @brief ビット選択値を返す．
   /// @param[in] index_array インデックスの配列
   /// @param[in] index ビット位置
@@ -357,7 +363,7 @@ public:
 		 int left,
 		 int right,
 		 const BitVector& val);
-  
+
 };
 
 
@@ -369,9 +375,9 @@ class EiDeclArrayS :
   public EiDeclArray
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] head ヘッダ
@@ -384,7 +390,7 @@ private:
 	       ymuint32 dim_size,
 	       EiRange* range_array,
 	       tVpiScalarVal* varray);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclArrayS();
@@ -394,13 +400,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclArray の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief スカラー値を返す．
   /// @param[in] index_array インデックスの配列
   virtual
   tVpiScalarVal
   get_scalar(const vector<int>& index_array) const;
-    
+
   /// @brief スカラー値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -414,7 +420,7 @@ public:
   virtual
   double
   get_real(const vector<int>& index_array) const;
-  
+
   /// @brief real 型の値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -440,7 +446,7 @@ public:
   void
   set_bitvector(const vector<int>& index_array,
 		const BitVector& val);
-  
+
   /// @brief ビット選択値を返す．
   /// @param[in] index_array インデックスの配列
   /// @param[in] index ビット位置
@@ -482,16 +488,16 @@ public:
 		 int left,
 		 int right,
 		 const BitVector& val);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 値
   tVpiScalarVal* mValArray;
-  
+
 };
 
 
@@ -503,9 +509,9 @@ class EiDeclArrayR :
   public EiDeclArray
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] head ヘッダ
@@ -518,7 +524,7 @@ private:
 	       ymuint32 dim_size,
 	       EiRange* range_array,
 	       double* varray);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclArrayR();
@@ -528,13 +534,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclArray の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief スカラー値を返す．
   /// @param[in] index_array インデックスの配列
   virtual
   tVpiScalarVal
   get_scalar(const vector<int>& index_array) const;
-    
+
   /// @brief スカラー値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -548,7 +554,7 @@ public:
   virtual
   double
   get_real(const vector<int>& index_array) const;
-  
+
   /// @brief real 型の値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -574,7 +580,7 @@ public:
   void
   set_bitvector(const vector<int>& index_array,
 		const BitVector& val);
-  
+
   /// @brief ビット選択値を返す．
   /// @param[in] index_array インデックスの配列
   /// @param[in] index ビット位置
@@ -616,16 +622,16 @@ public:
 		 int left,
 		 int right,
 		 const BitVector& val);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 値
   double* mValArray;
-  
+
 };
 
 
@@ -637,9 +643,9 @@ class EiDeclArrayV :
   public EiDeclArray
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] head ヘッダ
@@ -652,7 +658,7 @@ private:
 	       ymuint32 dim_size,
 	       EiRange* range_array,
 	       BitVector* varray);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclArrayV();
@@ -662,13 +668,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbDeclArray の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief スカラー値を返す．
   /// @param[in] index_array インデックスの配列
   virtual
   tVpiScalarVal
   get_scalar(const vector<int>& index_array) const;
-    
+
   /// @brief スカラー値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -682,7 +688,7 @@ public:
   virtual
   double
   get_real(const vector<int>& index_array) const;
-  
+
   /// @brief real 型の値を設定する．
   /// @param[in] index_array インデックスの配列
   /// @param[in] val 値
@@ -708,7 +714,7 @@ public:
   void
   set_bitvector(const vector<int>& index_array,
 		const BitVector& val);
-  
+
   /// @brief ビット選択値を返す．
   /// @param[in] index_array インデックスの配列
   /// @param[in] index ビット位置
@@ -751,17 +757,17 @@ public:
 		 int right,
 		 const BitVector& val);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 値
   BitVector* mValArray;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIDECLARRAY_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIDECLARRAY_H

@@ -78,7 +78,7 @@ VlDumperImpl::put_iodecl(const char* label,
   }
   put_expr("vpiLeftRange", mgr, iodecl->left_range() );
   put_expr("vpiRightRange", mgr, iodecl->right_range() );
-  
+
 #if 0
   put("vpiExpr", handle.get_handle(vpiExpr), vpiDecompile);
 #else
@@ -148,23 +148,14 @@ VlDumperImpl::put_decl(const char* label,
 
   put("vpiModule", decl->parent_module()->full_name() );
   put("vpiScope", decl->parent()->full_name() );
-  
-#if 0
-  put("vpiArray", handle.get_bool(vpiArray));
-  put("vpiMultiArray", handle.get_bool(vpiMultiArray));
-  if ( handle.get_bool(vpiArray) ) {
-    put("vpiParent", handle.get_handle(vpiParent), vpiFullName);
+
+  put("vpiArray", decl->is_array());
+  put("vpiMultiArray", decl->is_multi_array());
+  if ( decl->is_array_member() ) {
+    put("vpiParent", decl->parent_array()->full_name());
   }
-#else
-#warning "TODO: Decl の array, multi_array, parent"
-#endif
-  
-  if ( decl->type() == kVpiNetArray ||
-       decl->type() == kVpiRegArray ||
-       decl->type() == kVpiIntegerVar ||
-       decl->type() == kVpiRealVar ||
-       decl->type() == kVpiTimeVar ||
-       decl->type() == kVpiNamedEventArray ) {
+
+  if ( decl->is_array() ) {
     ymuint32 n = decl->dimension();
     for (ymuint32 i = 0; i < n; ++ i) {
       put_range("vpiRange", mgr, decl->range(i) );
@@ -185,12 +176,17 @@ VlDumperImpl::put_decl(const char* label,
 #warning "TODO: Reg の expr"
 #endif
   }
-  
-#if 0
-  put("vpiIndex", handle.get_iterate(vpiIndex));
-#else
-#warning "TODO: Decl の index"
-#endif
+
+  if ( decl->is_multi_array_member() ) {
+    vector<const VlExpr*> index_list;
+    decl->index(index_list);
+    for (ymuint i = 0; i < index_list.size(); ++ i) {
+      put("vpiIndex", index_list[i]);
+    }
+  }
+  else if ( decl->is_array_member() ) {
+    put("vpiIndex", decl->index());
+  }
 
   if ( decl->type() == kVpiReg ||
        decl->type() == kVpiIntegerVar ||
@@ -202,10 +198,10 @@ VlDumperImpl::put_decl(const char* label,
 #warning "TODO: Decl の port inst/ports"
 #endif
   }
-  
+
   put_expr("vpiLeftRange", mgr, decl->left_range());
   put_expr("vpiRightRange", mgr, decl->right_range());
-  
+
   if ( decl->type() == kVpiNet ) {
 #if 0
     put("vpiDriver", handle.get_iterate(vpiDriver));
@@ -268,7 +264,7 @@ VlDumperImpl::put_decl(const char* label,
 #endif
   }
 }
-  
+
 // @brief 宣言要素のリストの内容を出力する関数
 void
 VlDumperImpl::put_decl_list(const char* label,
@@ -282,7 +278,7 @@ VlDumperImpl::put_decl_list(const char* label,
     put_decl(label, mgr, *p);
   }
 }
-  
+
 // @brief def param のリストの内容を出力する関数
 void
 VlDumperImpl::put_defparam_list(const char* label,
@@ -290,11 +286,11 @@ VlDumperImpl::put_defparam_list(const char* label,
 				const vector<const VlDefParam*>& defparam_list)
 {
   VlDumpHeader x(this, label, "DefParamList");
-  
+
   for (vector<const VlDefParam*>::const_iterator p = defparam_list.begin();
        p != defparam_list.end(); ++ p) {
     const VlDefParam* defparam = *p;
-    
+
     VlDumpHeader x(this, label, "DefParam");
 
     put("FileRegion", defparam->file_region() );
@@ -303,7 +299,7 @@ VlDumperImpl::put_defparam_list(const char* label,
     put_expr("vpiRhs", mgr, defparam->rhs() );
   }
 }
-  
+
 // @brief param assign のリストの内容を出力する関数
 void
 VlDumperImpl::put_paramassign_list(const char* label,
@@ -315,7 +311,7 @@ VlDumperImpl::put_paramassign_list(const char* label,
   for (vector<const VlParamAssign*>::const_iterator p = pa_list.begin();
        p != pa_list.end(); ++ p) {
     const VlParamAssign* paramassign = *p;
-    
+
     VlDumpHeader x(this, label, "ParamAssign");
 
     put("FileRegion", paramassign->file_region() );
@@ -394,11 +390,11 @@ VlDumperImpl::put_net_array(const char* label,
 {
   VlDecl* net_array = dynamic_cast<const VlDecl*>(obj);
   assert_cond( net_array , __FILE__, __LINE__);
-  
+
   VlDumpHeader x(this, label, "NetArray");
 
   put("FileRegion", net_array->file_region() );
-  
+
   put("vpiFullName", net_array->full_name() );
 #if 0
   put("vpiScalar", handle.get_bool(vpiScalar));
@@ -406,17 +402,17 @@ VlDumperImpl::put_net_array(const char* label,
 #else
 #warning "TODO: NetArray の vector/scalar"
 #endif
-  
+
   put("vpiSize", net_array->bit_size() );
 
   put("vpiModule", net_array->module()->full_name() );
   put("vpiScope",  net_array->scope()->full_name() );
-  
+
   ymuint32 n = net_array->dimension();
   for (ymuint32 i = 0; i < n; ++ i) {
     put("vpiRange", mgr, net_array->range(i) );
   }
-  
+
 #if 0
   put("vpiNet", handle.get_iterate(vpiNet));
 #else
@@ -435,7 +431,7 @@ VlDumperImpl::put_reg(const char* label,
 {
   VlDecl* reg = dynamic_cast<const VlDecl*>(obj);
   assert_cond( reg , __FILE__, __LINE__);
-  
+
   VlDumpHeader x(this, label, "Reg");
 
   put("FileRegion", reg->file_region() );
@@ -452,7 +448,7 @@ VlDumperImpl::put_reg(const char* label,
 
   put("vpiModule", reg->module()->full_name() );
   put("vpiScope", reg->scope()->full_name() );
-  
+
 #if 0
   put("vpiArray", handle.get_bool(vpiArray));
   put("vpiMultiArray", handle.get_bool(vpiMultiArray));
@@ -468,13 +464,13 @@ VlDumperImpl::put_reg(const char* label,
 #else
 #warning "TODO: Reg の expr"
 #endif
-  
+
 #if 0
   put("vpiIndex", handle.get_iterate(vpiIndex));
 #else
 #warning "TODO: Reg の index"
 #endif
-  
+
 #if 0
   put("vpiPortInst", handle.get_iterate(vpiPortInst));
   put("vpiPorts", handle.get_iterate(vpiPorts));
@@ -484,7 +480,7 @@ VlDumperImpl::put_reg(const char* label,
 
   put("vpiLeftRange", mgr, reg->left_range() );
   put("vpiRightRange", mgr, reg->right_range() );
-  
+
 #if 0
   put("vpiDriver", handle.get_iterate(vpiDriver));
   put("vpiLoad", handle.get_iterate(vpiLoad));
@@ -560,7 +556,7 @@ VlDumperImpl::put_reg_array(const char* label,
 {
   VlDecl* reg_array = dynamic_cast<const VlDecl*>(obj);
   assert_cond( reg_array , __FILE__, __LINE__);
-  
+
   VlDumpHeader x(this, label, "RegArray");
 
   put("FileRegion", reg_array->file_region() );
@@ -576,12 +572,12 @@ VlDumperImpl::put_reg_array(const char* label,
 
   put("vpiModule", reg_array->module()->full_name() );
   put("vpiScope", reg_array->scope()->full_name() );
-  
+
   ymuint32 n = net_array->dimension();
   for (ymuint32 i = 0; i < n; ++ i) {
     put("vpiRange", mgr, net_array->range(i) );
   }
-  
+
 #if 0
   put("vpiReg", handle.get_iterate(vpiReg));
 #else
@@ -600,7 +596,7 @@ VlDumperImpl::put_variables(const char* label,
 {
   VlDecl* var = dynamic_cast<const VlDecl*>(obj);
   assert_cond( var , __FILE__, __LINE__);
-  
+
   const char* nm = NULL;
   switch ( var->type() ) {
   case vpiIntegerVar: nm = "integer var"; break;
@@ -624,7 +620,7 @@ VlDumperImpl::put_variables(const char* label,
 
   put("vpiModule", var->module()->full_name() );
   put("vpiScope", var->scope()->full_name() );
-  
+
 #if 0
   if ( handle.get_bool(vpiArray) ) {
     put("vpiLeftRange", handle.get_handle(vpiLeftRange));

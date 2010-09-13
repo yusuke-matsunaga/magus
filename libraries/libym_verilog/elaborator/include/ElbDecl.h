@@ -198,26 +198,11 @@ public:
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @breif 値の型を返す．
-  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-  /// @note デフォルト値としてこのクラスでは kVpiValueNone を返す．
-  virtual
-  tVpiValueType
-  value_type() const;
-
   /// @brief 定数値を持つ型のときに true を返す．
   /// @note デフォルト値としてこのクラスでは false を返す．
   virtual
   bool
   is_consttype() const;
-
-  /// @brief 符号の取得
-  /// @retval true 符号つき
-  /// @retval false 符号なし
-  /// @note このクラスでは false を返す．
-  virtual
-  bool
-  is_signed() const;
 
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
@@ -251,6 +236,7 @@ public:
   const VlDecl*
   elem_by_offset(ymuint offset) const;
 
+#if 0
   /// @brief データ型の取得
   /// @retval データ型 パラメータや変数の場合
   /// @retval kVpiVarNone 上記以外
@@ -307,6 +293,7 @@ public:
   virtual
   const VlDelay*
   delay() const;
+#endif
 
   /// @brief 初期値の取得
   /// @retval 初期値
@@ -322,6 +309,16 @@ public:
   bool
   is_local_param() const;
 
+  /// @brief 配列型オブジェクトの時に true を返す．
+  virtual
+  bool
+  is_array() const;
+
+  /// @brief 多次元の配列型オブジェクトの時に true を返す．
+  virtual
+  bool
+  is_multi_array() const;
+
   /// @brief 配列型オブジェクトの場合の次元数の取得
   /// @note このクラスでは 0 を返す．
   virtual
@@ -334,6 +331,32 @@ public:
   virtual
   const VlRange*
   range(ymuint32 pos) const;
+
+  /// @brief 配列要素の時に true を返す．
+  virtual
+  bool
+  is_array_member() const;
+
+  /// @brief 多次元の配列要素の時に true を返す．
+  virtual
+  bool
+  is_multi_array_member() const;
+
+  /// @brief 配列要素の時に親の配列を返す．
+  virtual
+  VlDecl*
+  parent_array() const;
+
+  /// @brief 1次元配列要素の時にインデックスを返す．
+  virtual
+  const VlExpr*
+  index() const;
+
+  /// @brief 多次元配列要素の時にインデックスのリストを返す．
+  /// @param[out] index_list インデックスのリストを格納する変数
+  virtual
+  void
+  index(vector<const VlExpr*>& index_list) const;
 
 
 public:

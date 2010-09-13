@@ -1,8 +1,8 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIDECL_H
-#define LIBYM_VERILOG_ELB_IMPL_EIDECL_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIDECLELEM_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIDECLELEM_H
 
-/// @file libym_verilog/elb_impl/EiDecl.h
-/// @brief EiDecl のヘッダファイル
+/// @file libym_verilog/elaborator/ei/EiDeclElem.h
+/// @brief EiDeclElem のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: EiDecl.h 2507 2009-10-17 16:24:02Z matsunaga $
@@ -19,10 +19,10 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDecl EiDecl.h "EiDecl.h"
-/// @brief ElbDecl の実装クラス
+/// @class EiDeclElem EiDeclElem.h "EiDeclElem.h"
+/// @brief ElbDeclArray の要素を表すクラス
 //////////////////////////////////////////////////////////////////////
-class EiDecl :
+class EiDeclElem :
   public ElbDecl
 {
   friend class EiFactory;
@@ -30,14 +30,16 @@ class EiDecl :
 protected:
 
   /// @brief コンストラクタ
-  /// @param[in] head ヘッダ
-  /// @param[in] pt_item パース木の宣言要素
-  EiDecl(ElbDeclHead* head,
-	 const PtNamedBase* pt_item);
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] parent_array 親の配列
+  /// @param[in] index_list インデックスのリスト
+  EiDeclElem(const PtBase* pt_expr,
+	     ElbDeclArray* parent_array,
+	     const vector<ElbExpr*>& index_list);
 
   /// @brief デストラクタ
   virtual
-  ~EiDecl();
+  ~EiDeclElem();
 
 
 public:
@@ -167,6 +169,32 @@ public:
   const VlDelay*
   delay() const;
 
+  /// @brief 配列要素の時に true を返す．
+  virtual
+  bool
+  is_array_member() const;
+
+  /// @brief 多次元の配列要素の時に true を返す．
+  virtual
+  bool
+  is_multi_array_member() const;
+
+  /// @brief 配列要素の時に親の配列を返す．
+  virtual
+  VlDecl*
+  parent_array() const;
+
+  /// @brief 1次元配列要素の時にインデックスを返す．
+  virtual
+  const VlExpr*
+  index() const;
+
+  /// @brief 多次元配列要素の時にインデックスのリストを返す．
+  /// @param[out] index_list インデックスのリストを格納する変数
+  virtual
+  void
+  index(vector<const VlExpr*>& index_list) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -174,6 +202,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 符号付きに補正する．
+  /// @note このクラスで呼ばれることはない．
   virtual
   void
   set_signed();
@@ -198,33 +227,38 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ヘッダ
-  ElbDeclHead* mHead;
+  // パース木の定義要素
+  const PtBase* mPtExpr;
 
-  // パース木の宣言要素
-  const PtNamedBase* mPtItem;
+  // 親の配列
+  ElbDeclArray* mArray;
 
-  // 符号付き属性の補正値
-  bool mAuxSign;
+  // インデックスのリスト
+  vector<ElbExpr*> mIndexList;
+
+  // 計算したインデックスの値を保持しておく作業領域
+  mutable
+  vector<ymint32> mIndexValList;
 
 };
 
 
+#if 0
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclN EiDecl.h "EiDecl.h"
-/// @brief 値を持たない EiDecl
+/// @class EiDeclElemN EiDeclElem.h "EiDeclElem.h"
+/// @brief 値を持たない EiDeclElem
 //////////////////////////////////////////////////////////////////////
-class EiDeclN :
-  public EiDecl
+class EiDeclElemN :
+  public EiDeclElem
 {
   friend class EiFactory;
 
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] head ヘッダ
+  /// @param[in] parent_array 親の配列
   /// @param[in] pt_item パース木の宣言要素
-  EiDeclN(ElbDeclHead* head,
+  EiDeclN(ElbDeclArray* parent_array,
 	  const PtNamedBase* pt_item);
 
   /// @brief デストラクタ
@@ -834,7 +868,8 @@ private:
   ElbExpr* mInit;
 
 };
+#endif
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIDECL_H
+#endif //  LIBYM_VERILOG_ELABORATOR_EI_EIDECLELEM_H

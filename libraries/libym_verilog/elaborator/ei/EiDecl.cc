@@ -82,7 +82,7 @@ EiFactory::new_Decl(ElbDeclHead* head,
       decl = new (p) EiDeclN(head, pt_item);
     }
     break;
-    
+
   case kVpiParameter:
   case kVpiSpecParam:
   default:
@@ -135,7 +135,7 @@ EiDecl::parent() const
 {
   return mHead->parent();
 }
-  
+
 // @brief 名前の取得
 const char*
 EiDecl::name() const
@@ -180,14 +180,6 @@ EiDecl::value_type() const
   }
 
   return kVpiValueNone;
-}
-  
-// @brief 定数値を持つ型のときに true を返す．
-// @note このクラスでは false を返す．
-bool
-EiDecl::is_consttype() const
-{
-  return false;
 }
 
 // @brief 符号の取得
@@ -402,7 +394,7 @@ EiDeclN::get_bitselect(int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return kVpiScalarX;
-} 
+}
 
 // @brief ビット値を設定する．
 // @param[in] index ビット位置
@@ -485,7 +477,7 @@ EiDeclS::get_real() const
 {
   return conv_to_real(mVal);
 }
-  
+
 // @brief real 型の値を設定する．
 void
 EiDeclS::set_real(double val)
@@ -522,7 +514,7 @@ EiDeclS::get_bitselect(int index) const
     // 範囲外は X
     return kVpiScalarX;
   }
-} 
+}
 
 // @brief ビット値を設定する．
 // @param[in] index ビット位置
@@ -652,7 +644,7 @@ EiDeclR::get_bitselect(int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return kVpiScalarX;
-} 
+}
 
 // @brief ビット値を設定する．
 // @param[in] index ビット位置
@@ -706,14 +698,14 @@ EiDeclV::EiDeclV(ElbDeclHead* head,
 EiDeclV::~EiDeclV()
 {
 }
-  
+
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiDeclV::get_scalar() const
 {
   return mVal.to_scalar();
 }
-    
+
 // @brief スカラー値を設定する．
 void
 EiDeclV::set_scalar(tVpiScalarVal val)
@@ -734,7 +726,7 @@ EiDeclV::get_real() const
 {
   return mVal.to_real();
 }
-  
+
 // @brief real 型の値を設定する．
 void
 EiDeclV::set_real(double val)
@@ -770,7 +762,7 @@ EiDeclV::get_bitselect(int index) const
   else {
     return kVpiScalarX;
   }
-} 
+}
 
 // @brief ビット値を設定する．
 // @param[in] index ビット位置
@@ -857,7 +849,7 @@ EiDeclIS::init_value() const
 {
   return mInit;
 }
-  
+
 // @brief 初期値の設定
 // @param[in] expr 初期値
 void
@@ -896,7 +888,7 @@ EiDeclIR::init_value() const
 {
   return mInit;
 }
-  
+
 // @brief 初期値の設定
 // @param[in] expr 初期値
 void
@@ -935,7 +927,7 @@ EiDeclIV::init_value() const
 {
   return mInit;
 }
-  
+
 // @brief 初期値の設定
 // @param[in] expr 初期値
 void

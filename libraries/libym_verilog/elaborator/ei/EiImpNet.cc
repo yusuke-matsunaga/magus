@@ -16,7 +16,7 @@
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-  
+
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ EiFactory::new_ImpNet(const VlNamedObj* parent,
 //////////////////////////////////////////////////////////////////////
 // クラス EiImpNet
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] pt_expr パース木のプライマリ式
 EiImpNet::EiImpNet(const VlNamedObj* parent,
@@ -49,7 +49,7 @@ EiImpNet::EiImpNet(const VlNamedObj* parent,
   mNetType(net_type)
 {
 }
-  
+
 // @brief デストラクタ
 EiImpNet::~EiImpNet()
 {
@@ -75,20 +75,30 @@ EiImpNet::parent() const
 {
   return mParent;
 }
-  
+
 // @brief 名前の取得
 const char*
 EiImpNet::name() const
 {
   return mPtExpr->name();
 }
-  
+
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
 tVpiValueType
 EiImpNet::value_type() const
 {
   return pack(kVpiValueUS, 1);
+}
+
+// @brief 符号の取得
+// @retval true 符号つき
+// @retval false 符号なし
+// @note このクラスでは false を返す．
+bool
+EiImpNet::is_signed() const
+{
+  return false;
 }
 
 // @brief MSB の値を返す．
@@ -126,7 +136,16 @@ EiImpNet::bit_offset(int index) const
     return -1;
   }
 }
-  
+
+// @brief データ型の取得
+// @retval データ型 パラメータや変数の場合
+// @retval kVpiVarNone 上記以外
+tVpiVarType
+EiImpNet::data_type() const
+{
+  return kVpiVarNone;
+}
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -134,6 +153,52 @@ tVpiNetType
 EiImpNet::net_type() const
 {
   return mNetType;
+}
+
+// @brief vectored|scalared 属性の取得
+// @retval kVpiVsNone vectored|scalared 指定なし
+// @retval kVpiVectored vectored 指定あり
+// @retval kVpiScalared scalared 指定あり
+tVpiVsType
+EiImpNet::vs_type() const
+{
+  return kVpiVsNone;
+}
+
+// @brief drive0 strength の取得
+// @retval 0 の強度
+// @retval kVpiNoStrength strength の指定なし
+tVpiStrength
+EiImpNet::drive0() const
+{
+  return kVpiNoStrength;
+}
+
+// @brief drive1 strength の取得
+// @retval 1 の強度
+// @retval kVpiNoStrength strength の指定なし
+tVpiStrength
+EiImpNet::drive1() const
+{
+  return kVpiNoStrength;
+}
+
+// @brief charge strength の取得
+// @retval 電荷の強度
+// @retval kVpiNoStrength strength の指定なし
+tVpiStrength
+EiImpNet::charge() const
+{
+  return kVpiNoStrength;
+}
+
+// @brief delay の取得
+// @retval delay
+// @retval NULL delay の指定なし
+const VlDelay*
+EiImpNet::delay() const
+{
+  return NULL;
 }
 
 // @brief dimension list のサイズの取得
@@ -160,7 +225,7 @@ EiImpNet::set_signed()
 {
   // なにもしない．
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -192,7 +257,7 @@ EiImpNet::set_scalar(tVpiScalarVal val)
 {
   mVal = val;
 }
-    
+
 // @brief 論理値を返す．
 tVpiScalarVal
 EiImpNet::get_logic() const
@@ -206,7 +271,7 @@ EiImpNet::get_real() const
 {
   return conv_to_real(mVal);
 }
-  
+
 // @brief real 型の値を設定する．
 void
 EiImpNet::set_real(double val)
@@ -229,7 +294,7 @@ EiImpNet::set_bitvector(const BitVector& val)
 {
   mVal = val.to_scalar();
 }
-  
+
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
 tVpiScalarVal

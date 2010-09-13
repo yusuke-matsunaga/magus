@@ -170,26 +170,9 @@ ElbDeclBase::~ElbDeclBase()
 {
 }
 
-// @breif 値の型を返す．
-// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
-ElbDeclBase::value_type() const
-{
-  return kVpiValueNone;
-}
-
 // @brief 定数値を持つ型のときに true を返す．
 bool
 ElbDeclBase::is_consttype() const
-{
-  return false;
-}
-
-// @brief 符号の取得
-// @retval true 符号つき
-// @retval false 符号なし
-bool
-ElbDeclBase::is_signed() const
 {
   return false;
 }
@@ -234,6 +217,7 @@ ElbDeclBase::elem_by_offset(ymuint offset) const
   return NULL;
 }
 
+#if 0
 // @brief データ型の取得
 // @retval データ型 パラメータや変数の場合
 // @retval kVpiVarNone 上記以外
@@ -297,6 +281,7 @@ ElbDeclBase::delay() const
 {
   return NULL;
 }
+#endif
 
 // @brief 初期値の取得
 // @retval 初期値
@@ -316,6 +301,20 @@ ElbDeclBase::is_local_param() const
   return false;
 }
 
+// @brief 配列型オブジェクトの時に true を返す．
+bool
+ElbDeclBase::is_array() const
+{
+  return false;
+}
+
+// @brief 多次元の配列型オブジェクトの時に true を返す．
+bool
+ElbDeclBase::is_multi_array() const
+{
+  return false;
+}
+
 // @brief 配列型オブジェクトの場合の次元数の取得
 // @note このクラスでは 0 を返す．
 ymuint32
@@ -331,6 +330,42 @@ const VlRange*
 ElbDeclBase::range(ymuint32 pos) const
 {
   return NULL;
+}
+
+// @brief 配列要素の時に true を返す．
+bool
+ElbDeclBase::is_array_member() const
+{
+  return false;
+}
+
+// @brief 多次元の配列要素の時に true を返す．
+bool
+ElbDeclBase::is_multi_array_member() const
+{
+  return false;
+}
+
+// @brief 配列要素の時に親の配列を返す．
+VlDecl*
+ElbDeclBase::parent_array() const
+{
+  return NULL;
+}
+
+// @brief 1次元配列要素の時にインデックスを返す．
+const VlExpr*
+ElbDeclBase::index() const
+{
+  return NULL;
+}
+
+// @brief 多次元配列要素の時にインデックスのリストを返す．
+// @param[out] index_list インデックスのリストを格納する変数
+void
+ElbDeclBase::index(vector<const VlExpr*>& index_list) const
+{
+  index_list.clear();
 }
 
 
@@ -443,6 +478,61 @@ tVpiVarType
 ElbGenvar::data_type() const
 {
   return kVpiVarInteger;
+}
+
+// @brief net 型の取得
+// @retval net 型 net 型の要素の場合
+// @retval kVpiNone net 型の要素でない場合
+tVpiNetType
+ElbGenvar::net_type() const
+{
+  return kVpiNone;
+}
+
+// @brief vectored|scalared 属性の取得
+// @retval kVpiVsNone vectored|scalared 指定なし
+// @retval kVpiVectored vectored 指定あり
+// @retval kVpiScalared scalared 指定あり
+tVpiVsType
+ElbGenvar::vs_type() const
+{
+  return kVpiVsNone;
+}
+
+// @brief drive0 strength の取得
+// @retval 0 の強度
+// @retval kVpiNoStrength strength の指定なし
+tVpiStrength
+ElbGenvar::drive0() const
+{
+  return kVpiNoStrength;
+}
+
+// @brief drive1 strength の取得
+// @retval 1 の強度
+// @retval kVpiNoStrength strength の指定なし
+tVpiStrength
+ElbGenvar::drive1() const
+{
+  return kVpiNoStrength;
+}
+
+// @brief charge strength の取得
+// @retval 電荷の強度
+// @retval kVpiNoStrength strength の指定なし
+tVpiStrength
+ElbGenvar::charge() const
+{
+  return kVpiNoStrength;
+}
+
+// @brief delay の取得
+// @retval delay
+// @retval NULL delay の指定なし
+const VlDelay*
+ElbGenvar::delay() const
+{
+  return NULL;
 }
 
 // @brief 符号付きに補正する．

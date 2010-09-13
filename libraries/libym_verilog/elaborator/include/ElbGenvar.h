@@ -25,26 +25,26 @@ class ElbGenvar :
   public ElbDecl
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbGenvar() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbGenvar() { }
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 定数値を持つ型のときに true を返す．
   virtual
   bool
@@ -56,12 +56,12 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief MSB の値を返す．
   virtual
   int
   left_range_const() const;
-  
+
   /// @brief LSB の値を返す．
   virtual
   int
@@ -87,7 +87,56 @@ public:
   tVpiVarType
   data_type() const;
 
-  
+  /// @brief net 型の取得
+  /// @retval net 型 net 型の要素の場合
+  /// @retval kVpiNone net 型の要素でない場合
+  /// @note デフォルト値としてこのクラスでは kVpiNone を返す．
+  virtual
+  tVpiNetType
+  net_type() const;
+
+  /// @brief vectored|scalared 属性の取得
+  /// @retval kVpiVsNone vectored|scalared 指定なし
+  /// @retval kVpiVectored vectored 指定あり
+  /// @retval kVpiScalared scalared 指定あり
+  /// @note デフォルト値としてこのクラスでは kVpiVsNone を返す．
+  virtual
+  tVpiVsType
+  vs_type() const;
+
+  /// @brief drive0 strength の取得
+  /// @retval 0 の強度
+  /// @retval kVpiNoStrength strength の指定なし
+  /// @note デフォルト値としてこのクラスでは kVpiNoStrength を返す．
+  virtual
+  tVpiStrength
+  drive0() const;
+
+  /// @brief drive1 strength の取得
+  /// @retval 1 の強度
+  /// @retval kVpiNoStrength strength の指定なし
+  /// @note デフォルト値としてこのクラスでは kVpiNoStrength を返す．
+  virtual
+  tVpiStrength
+  drive1() const;
+
+  /// @brief charge strength の取得
+  /// @retval 電荷の強度
+  /// @retval kVpiNoStrength strength の指定なし
+  /// @note デフォルト値としてこのクラスでは kVpiNoStrength を返す．
+  virtual
+  tVpiStrength
+  charge() const;
+
+  /// @brief delay の取得
+  /// @retval delay
+  /// @retval NULL delay の指定なし
+  /// @note デフォルト値としてこのクラスでは NULL を返す．
+  virtual
+  const VlDelay*
+  delay() const;
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbDecl の仮想関数
@@ -98,7 +147,7 @@ public:
   virtual
   void
   set_signed();
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -135,7 +184,7 @@ public:
   virtual
   void
   reset_inuse() = 0;
-  
+
   /// @brief 現在の値を返す．
   virtual
   int
@@ -150,7 +199,7 @@ public:
   virtual
   const PtDeclItem*
   pt_item() const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

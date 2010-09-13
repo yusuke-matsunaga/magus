@@ -43,7 +43,7 @@ EiFactory::new_DeclArray(ElbDeclHead* head,
     range_array[i].set(range_src[i]);
     elem_size *= range_array[i].size();
   }
-  
+
   EiDeclArray* decl = NULL;
   void* p = NULL;
   void* r = NULL;
@@ -59,7 +59,7 @@ EiFactory::new_DeclArray(ElbDeclHead* head,
       break;
     }
     // わざと次に続く．
-    
+
   case kVpiIntegerVar:
   case kVpiTimeVar:
     {
@@ -70,7 +70,7 @@ EiFactory::new_DeclArray(ElbDeclHead* head,
 				  varray);
     }
     break;
-    
+
   case kVpiRealVar:
     {
       r = mAlloc.get_memory(sizeof(double) * elem_size);
@@ -80,7 +80,7 @@ EiFactory::new_DeclArray(ElbDeclHead* head,
 				  varray);
     }
     break;
-    
+
   case kVpiNamedEvent:
     p = mAlloc.get_memory(sizeof(EiDeclArrayN));
     decl = new (p) EiDeclArrayN(head, pt_item, dim_size, range_array);
@@ -139,7 +139,7 @@ EiDeclArray::type() const
   assert_not_reached(__FILE__, __LINE__);
   return kVpiNetArray;
 }
-  
+
 // @brief 要素の型を返す．
 tVpiObjType
 EiDeclArray::elem_type() const
@@ -160,14 +160,14 @@ EiDeclArray::parent() const
 {
   return mHead->parent();
 }
-  
+
 // @brief 名前の取得
 const char*
 EiDeclArray::name() const
 {
   return mPtItem->name();
 }
-  
+
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
 tVpiValueType
@@ -228,7 +228,7 @@ EiDeclArray::data_type() const
 {
   return mHead->data_type();
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -291,7 +291,7 @@ EiDeclArray::dimension_list_size() const
 {
   return mRangeList.size();
 }
-  
+
 // @brief 範囲の取得
 // @param[in] pos 位置 (0 <= pos < dimension_list_size())
 const VlRange*
@@ -299,7 +299,15 @@ EiDeclArray::range(ymuint32 pos) const
 {
   return mRangeList.range(pos);
 }
-  
+
+// @brief 配列要素の時に true を返す．
+// @note このクラスでは false を返す．
+bool
+EiDeclArray::is_array_member() const
+{
+  return false;
+}
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -330,7 +338,7 @@ EiDeclArray::calc_offset(const vector<int>& index_array) const
 //////////////////////////////////////////////////////////////////////
 /// クラス EiDeclArrayN
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] head ヘッダ
@@ -344,12 +352,12 @@ EiDeclArrayN::EiDeclArrayN(ElbDeclHead* head,
   EiDeclArray(head, pt_item, dim_size, range_array)
 {
 }
-  
+
 // @brief デストラクタ
 EiDeclArrayN::~EiDeclArrayN()
 {
 }
-  
+
 // @brief スカラー値を返す．
 // @param[in] index_array インデックスの配列
 tVpiScalarVal
@@ -358,7 +366,7 @@ EiDeclArrayN::get_scalar(const vector<int>& index_array) const
   assert_not_reached(__FILE__, __LINE__);
   return kVpiScalarX;
 }
-    
+
 // @brief スカラー値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値
@@ -377,7 +385,7 @@ EiDeclArrayN::get_real(const vector<int>& index_array) const
   assert_not_reached(__FILE__, __LINE__);
   return 0.0;
 }
-  
+
 // @brief real 型の値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値
@@ -485,7 +493,7 @@ EiDeclArrayS::EiDeclArrayS(ElbDeclHead* head,
 EiDeclArrayS::~EiDeclArrayS()
 {
 }
-  
+
 // @brief スカラー値を返す．
 // @param[in] index_array インデックスの配列
 tVpiScalarVal
@@ -494,7 +502,7 @@ EiDeclArrayS::get_scalar(const vector<int>& index_array) const
   ymuint32 offset = calc_offset(index_array);
   return mValArray[offset];
 }
-    
+
 // @brief スカラー値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値
@@ -514,7 +522,7 @@ EiDeclArrayS::get_real(const vector<int>& index_array) const
   ymuint32 offset = calc_offset(index_array);
   return conv_to_real(mValArray[offset]);
 }
-  
+
 // @brief real 型の値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値
@@ -647,7 +655,7 @@ EiDeclArrayR::EiDeclArrayR(ElbDeclHead* head,
 EiDeclArrayR::~EiDeclArrayR()
 {
 }
-  
+
 // @brief スカラー値を返す．
 // @param[in] index_array インデックスの配列
 tVpiScalarVal
@@ -656,7 +664,7 @@ EiDeclArrayR::get_scalar(const vector<int>& index_array) const
   ymuint32 offset = calc_offset(index_array);
   return conv_from_real(mValArray[offset]);
 }
-    
+
 // @brief スカラー値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値
@@ -676,7 +684,7 @@ EiDeclArrayR::get_real(const vector<int>& index_array) const
   ymuint32 offset = calc_offset(index_array);
   return mValArray[offset];
 }
-  
+
 // @brief real 型の値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値
@@ -787,7 +795,7 @@ EiDeclArrayV::EiDeclArrayV(ElbDeclHead* head,
 EiDeclArrayV::~EiDeclArrayV()
 {
 }
-  
+
 // @brief スカラー値を返す．
 // @param[in] index_array インデックスの配列
 tVpiScalarVal
@@ -796,7 +804,7 @@ EiDeclArrayV::get_scalar(const vector<int>& index_array) const
   ymuint32 offset = calc_offset(index_array);
   return mValArray[offset].to_scalar();
 }
-    
+
 // @brief スカラー値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値
@@ -816,7 +824,7 @@ EiDeclArrayV::get_real(const vector<int>& index_array) const
   ymuint32 offset = calc_offset(index_array);
   return mValArray[offset].to_real();
 }
-  
+
 // @brief real 型の値を設定する．
 // @param[in] index_array インデックスの配列
 // @param[in] val 値

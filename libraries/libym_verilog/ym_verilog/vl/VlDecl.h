@@ -173,16 +173,52 @@ public:
   bool
   is_local_param() const = 0;
 
+  /// @brief 配列型オブジェクトの時に true を返す．
+  virtual
+  bool
+  is_array() const = 0;
+
+  /// @brief 多次元の配列型オブジェクトの時に true を返す．
+  virtual
+  bool
+  is_multi_array() const = 0;
+
   /// @brief 配列型オブジェクトの場合の次元数の取得
   virtual
   ymuint32
   dimension() const = 0;
 
-  /// @brief 範囲の取得
+  /// @brief 範囲の取得(配列型オブジェクト用)
   /// @param[in] pos 位置 (0 <= pos < dimension_list_size())
   virtual
   const VlRange*
   range(ymuint32 pos) const = 0;
+
+  /// @brief 配列要素の時に true を返す．
+  virtual
+  bool
+  is_array_member() const = 0;
+
+  /// @brief 多次元の配列要素の時に true を返す．
+  virtual
+  bool
+  is_multi_array_member() const = 0;
+
+  /// @brief 配列要素の時に親の配列を返す．
+  virtual
+  const VlDecl*
+  parent_array() const = 0;
+
+  /// @brief 1次元配列要素の時にインデックスを返す．
+  virtual
+  const VlExpr*
+  index() const = 0;
+
+  /// @brief 多次元配列要素の時にインデックスのリストを返す．
+  /// @param[out] index_list インデックスのリストを格納する変数
+  virtual
+  void
+  index(vector<const VlExpr*>& index_list) const = 0;
 
 };
 

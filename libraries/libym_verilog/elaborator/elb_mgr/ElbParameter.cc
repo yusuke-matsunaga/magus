@@ -122,6 +122,20 @@ ElbParameter::delay() const
   return NULL;
 }
 
+// @brief 配列型オブジェクトの時に true を返す．
+bool
+ElbParameter::is_array() const
+{
+  return false;
+}
+
+// @brief 多次元の配列型オブジェクトの時に true を返す．
+bool
+ElbParameter::is_multi_array() const
+{
+  return false;
+}
+
 // @brief 配列型オブジェクトの場合の次元数の取得
 // @note このクラスでは 0 を返す．
 ymuint32
@@ -137,6 +151,43 @@ const VlRange*
 ElbParameter::range(ymuint32 pos) const
 {
   return NULL;
+}
+
+// @brief 配列要素の時に true を返す．
+// @note このクラスでは false を返す．
+bool
+ElbParameter::is_array_member() const
+{
+  return false;
+}
+
+// @brief 多次元の配列要素の時に true を返す．
+bool
+ElbParameter::is_multi_array_member() const
+{
+  return false;
+}
+
+// @brief 配列要素の時に親の配列を返す．
+VlDecl*
+ElbParameter::parent_array() const
+{
+  return NULL;
+}
+
+// @brief 1次元配列要素の時にインデックスを返す．
+const VlExpr*
+ElbParameter::index() const
+{
+  return NULL;
+}
+
+// @brief 多次元配列要素の時にインデックスのリストを返す．
+// @param[out] index_list インデックスのリストを格納する変数
+void
+ElbParameter::index(vector<const VlExpr*>& index_list) const
+{
+  index_list.clear();
 }
 
 END_NAMESPACE_YM_VERILOG
