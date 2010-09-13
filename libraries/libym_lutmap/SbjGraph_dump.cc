@@ -271,7 +271,7 @@ BEGIN_NONAMESPACE
 string
 node_name(const SbjNode* node)
 {
-  return "n" + node->id_str();
+  return node->id_str();
 }
 
 END_NONAMESPACE
@@ -314,6 +314,7 @@ dump_verilog(ostream& s,
   const SbjNodeList& input_list = sbjgraph.input_list();
   const SbjNodeList& output_list = sbjgraph.output_list();
   const SbjNodeList& lnode_list = sbjgraph.lnode_list();
+  const SbjNodeList& dff_list = sbjgraph.dff_list();
 
   // input 文
   for (SbjNodeList::const_iterator p = input_list.begin();
@@ -321,6 +322,7 @@ dump_verilog(ostream& s,
     const SbjNode* node = *p;
     s << "  input  " << node_name(node) << ";" << endl;
   }
+  s << endl;
 
   // output 文
   for (SbjNodeList::const_iterator p = output_list.begin();
@@ -328,6 +330,15 @@ dump_verilog(ostream& s,
     const SbjNode* node = *p;
     s << "  output " << node_name(node) << ";" << endl;
   }
+  s << endl;
+
+  // reg 定義
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const SbjNode* node = *p;
+    s << "  reg    " << node_name(node) << ";" << endl;
+  }
+  s << endl;
 
   // wire 定義
   for (SbjNodeList::const_iterator p = lnode_list.begin();
@@ -335,6 +346,7 @@ dump_verilog(ostream& s,
     const SbjNode* node = *p;
     s << "  wire   " << node_name(node) << ";" << endl;
   }
+  s << endl;
 
   // output 用の assign 文
   for (SbjNodeList::const_iterator p = output_list.begin();
@@ -358,17 +370,7 @@ dump_verilog(ostream& s,
     }
     s << ";" << endl;
   }
-
-#if 0
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    const SbjNode* inode = node->fanin(0);
-    s << ".latch " << node->id_str() << " "
-      << inode->id_str() << endl;
-  }
-#endif
+  s << endl;
 
   // 論理ノード用の assign 文
   for (SbjNodeList::const_iterator p = lnode_list.begin();
@@ -438,6 +440,83 @@ dump_verilog(ostream& s,
       << " " << op << " "
       << pol1 << node_name(node->fanin(1))
       << ";" << endl;
+  }
+  s << endl;
+
+  // ff 用の always 文
+  for (SbjNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const SbjNode* node = *p;
+    const SbjNode* dnode = node->fanin_data();
+    bool dinv = node->fanin_data_inv();
+    const SbjNode* cnode = node->fanin_clock();
+    bool cinv = node->fanin_clock_inv();
+    const SbjNode* snode = node->fanin_set();
+    bool sinv = node->fanin_set_inv();
+    const SbjNode* rnode = node->fanin_rst();
+    bool rinv = node->fanin_rst_inv();
+    assert_cond( cnode != NULL, __FILE__, __LINE__);
+    s << "  always @ ( ";
+    if ( cinv ) {
+      s << "negedge";
+    }
+    else {
+      s << "posedge";
+    }
+    s << " " << node_name(cnode);
+    if ( snode ) {
+      s << " or ";
+      if ( sinv ) {
+	s << "negedge";
+      }
+      else {
+	s << "posedge";
+      }
+      s << " " << node_name(snode);
+    }
+    if ( rnode ) {
+      s << " or ";
+      if ( rinv ) {
+	s << "negedge";
+      }
+      else {
+	s << "posedge";
+      }
+      s << " " << node_name(rnode);
+    }
+    s << " )" << endl;
+    if ( snode ) {
+      s << "    if ( ";
+      if ( sinv ) {
+	s << "!";
+      }
+      s << " " << node_name(snode) << " )" << endl;
+      s << "      " << node_name(node)
+	<< " <= 1;" << endl;
+    }
+    if ( rnode ) {
+      s << "    ";
+      if ( snode ) {
+	s << "else ";
+      }
+      s << "if ( ";
+      if ( rinv ) {
+	s << "!";
+      }
+      s << " " << node_name(rnode) << " )" << endl;
+      s << "      " << node_name(node)
+	<< " <= 0;" << endl;
+    }
+    if ( snode || rnode ) {
+      s << "    else" << endl
+	<< "  ";
+    }
+    s << "    " << node_name(node) << " <= ";
+    if ( dinv ) {
+      s << "~";
+    }
+    s << node_name(dnode) << ";" << endl;
+    s << endl;
   }
   s << "endmodule" << endl;
 }

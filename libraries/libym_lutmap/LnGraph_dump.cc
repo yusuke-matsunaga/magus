@@ -227,6 +227,7 @@ dump_verilog(ostream& s,
 {
   const LnNodeList& input_list = lngraph.input_list();
   const LnNodeList& output_list = lngraph.output_list();
+  const LnNodeList& dff_list = lngraph.dff_list();
   const LnNodeList& lut_list = lngraph.lut_list();
 
   hash_set<string> lut_name_set;
@@ -237,11 +238,13 @@ dump_verilog(ostream& s,
   for (LnNodeList::const_iterator p = lut_list.begin();
        p != lut_list.end(); ++ p) {
     const LnNode* node = *p;
-    string name = lut_name(node);
-    lut_names[node->id()] = name;
-    if ( lut_name_set.count(name) == 0 ) {
-      dump_lut(s, node, name);
-      lut_name_set.insert(name);
+    if ( node->ni() > 0 ) {
+      string name = lut_name(node);
+      lut_names[node->id()] = name;
+      if ( lut_name_set.count(name) == 0 ) {
+	dump_lut(s, node, name);
+	lut_name_set.insert(name);
+      }
     }
   }
 
@@ -286,6 +289,13 @@ dump_verilog(ostream& s,
   }
   s << endl;
 
+  for (LnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const LnNode* node = *p;
+    s << "  reg    " << node_name(node) << ";" << endl;
+  }
+  s << endl;
+
   for (LnNodeList::const_iterator p = lut_list.begin();
        p != lut_list.end(); ++ p) {
     const LnNode* node = *p;
@@ -303,40 +313,71 @@ dump_verilog(ostream& s,
       << " = " << node_name(inode) << ";" << endl;
   }
 
-#if 0
-  const LnNodeList& dff_list = lngraph.dff_list();
+  // プリミティブインスタンス記述の生成
+  for (LnNodeList::const_iterator p = lut_list.begin();
+       p != lut_list.end(); ++ p) {
+    const LnNode* node = *p;
+    ymuint ni = node->ni();
+    if ( ni == 0 ) {
+      // 特例
+      s << "  assign " << node_name(node) << " = 1'b";
+      vector<int> tv;
+      node->tv(tv);
+      if ( tv[0] ) {
+	s << "1";
+      }
+      else {
+	s << "0";
+      }
+      s << ";" << endl;
+    }
+    else {
+      s << "  " << lut_names[node->id()] << " U" << node->id()
+	<< " ( " << node_name(node);
+      for (ymuint i = 0; i < ni; ++ i) {
+	const LnNode* inode = node->fanin(i);
+	s << ", " << node_name(inode);
+      }
+      s << " );" << endl;
+    }
+  }
+  s << endl;
+
+  // ff 用の always 文
   for (LnNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const LnNode* node = *p;
     const LnNode* inode = node->fanin(0);
     const LnNode* cnode = node->fanin(1);
-    s << "DFF(" << node->id_str() << "):"
-      << " DATA = " << inode->id_str()
-      << " , CLOCK = " << cnode->id_str();
     const LnNode* snode = node->fanin(2);
-    if ( snode ) {
-      s << ", SET = " << snode->id_str();
-    }
     const LnNode* rnode = node->fanin(3);
+    s << "  always @ ( posedge " << node_name(cnode);
+    if ( snode ) {
+      s << " or posedge " << node_name(snode);
+    }
     if ( rnode ) {
-      s << ", RST = " << rnode->id_str();
+      s << " or posedge " << node_name(rnode);
     }
-    s << endl;
-  }
-#endif
-
-  // プリミティブインスタンス記述の生成
-  for (LnNodeList::const_iterator p = lut_list.begin();
-       p != lut_list.end(); ++ p) {
-    const LnNode* node = *p;
-    s << "  " << lut_names[node->id()] << " U" << node->id()
-      << " ( " << node_name(node);
-    ymuint ni = node->ni();
-    for (ymuint i = 0; i < ni; ++ i) {
-      const LnNode* inode = node->fanin(i);
-      s << ", " << node_name(inode);
+    s << " )" << endl;
+    if ( snode ) {
+      s << "    if ( " << node_name(snode) << " )" << endl
+	<< "      " << node_name(node) << " <= 1;" << endl;
     }
-    s << " );" << endl;
+    if ( rnode ) {
+      s << "    ";
+      if ( snode ) {
+	s << "else ";
+      }
+      s << "if ( " << node_name(rnode) << " )" << endl
+	<< "      " << node_name(node) << " <= 0;" << endl;
+    }
+    if ( snode || rnode ) {
+      s << "    else" << endl
+	<< "  ";
+    }
+    s << "    " << node_name(node) << " <= "
+      << node_name(inode) << ";" << endl
+      << endl;
   }
   s << "endmodule" << endl;
 }
