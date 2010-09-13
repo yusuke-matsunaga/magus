@@ -434,7 +434,6 @@ MvMgr::sweep()
     delete_node(node);
   }
 
-#if 0
   // ビット/部分選択と接続している連結演算の削除を行う．
   node_list.clear();
   for (ymuint i = 0; i < n; ++ i) {
@@ -496,7 +495,6 @@ MvMgr::sweep()
     }
     delete_node(node);
   }
-#endif
 }
 
 // @brief 連結演算からビットを抜き出す．
@@ -509,7 +507,8 @@ MvMgr::select_from_concat(MvNode* src_node,
   assert_cond( src_node->type() == MvNode::kConcat, __FILE__, __LINE__);
   ymuint ni = src_node->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    const MvInputPin* ipin = src_node->input(i);
+    ymuint idx = ni - i - 1;
+    const MvInputPin* ipin = src_node->input(idx);
     ymuint bw = ipin->bit_width();
     if ( bitpos < bw ) {
       MvNode* inode = ipin->net()->src_pin()->node();
