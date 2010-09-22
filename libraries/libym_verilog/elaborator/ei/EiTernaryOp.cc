@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 3項演算子を生成する．
 // @param[in] pt_expr パース木の定義要素
 // @param[in] op_type 演算子のタイプ
@@ -41,7 +41,7 @@ EiFactory::new_TernaryOp(const PtBase* pt_expr,
     p = mAlloc.get_memory(sizeof(EiConditionOp));
     expr = new (p) EiConditionOp(pt_expr, opr0, opr1, opr2);
     break;
-    
+
   case kVpiMinTypMaxOp:
     p = mAlloc.get_memory(sizeof(EiMinTypMaxOp));
     expr = new (p) EiMinTypMaxOp(pt_expr, opr0, opr1, opr2);
@@ -87,9 +87,9 @@ EiTernaryOp::is_const() const
 {
   return operand1()->is_const() &&
     operand2()->is_const() && operand3()->is_const();
-    
+
 }
-  
+
 // @brief オペランド数を返す．
 ymuint32
 EiTernaryOp::operand_num() const
@@ -107,7 +107,7 @@ EiTernaryOp::_operand(ymuint32 pos) const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiConditionOp  
+// クラス EiConditionOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
@@ -150,7 +150,7 @@ EiConditionOp::eval_scalar() const
   switch ( operand1()->eval_logic() ) {
   case kVpiScalar0:
     if ( mType == kVpiValueReal ) {
-      return conv_from_real(operand3()->eval_real());
+      return conv_to_scalar(operand3()->eval_real());
     }
     else {
       return operand3()->eval_scalar();
@@ -158,7 +158,7 @@ EiConditionOp::eval_scalar() const
 
   case kVpiScalar1:
     if ( mType == kVpiValueReal ) {
-      return conv_from_real(operand2()->eval_real());
+      return conv_to_scalar(operand2()->eval_real());
     }
     else {
       return operand2()->eval_scalar();
@@ -191,7 +191,7 @@ EiConditionOp::eval_logic() const
   switch ( operand1()->eval_logic() ) {
   case kVpiScalar0:
     if ( mType == kVpiValueReal ) {
-      return conv_from_real(operand3()->eval_real());
+      return conv_to_scalar(operand3()->eval_real());
     }
     else {
       return operand3()->eval_logic();
@@ -199,7 +199,7 @@ EiConditionOp::eval_logic() const
 
   case kVpiScalar1:
     if ( mType == kVpiValueReal ) {
-      return conv_from_real(operand2()->eval_real());
+      return conv_to_scalar(operand2()->eval_real());
     }
     else {
       return operand2()->eval_logic();
@@ -269,7 +269,7 @@ EiConditionOp::eval_real() const
   // ダミー
   return 0.0;
 }
-  
+
 // @brief bitvector 型の値を返す．
 void
 EiConditionOp::eval_bitvector(BitVector& bitvector,
@@ -303,9 +303,9 @@ EiConditionOp::eval_bitvector(BitVector& bitvector,
       operand2()->eval_bitvector(bitvector, mType);
       operand3()->eval_bitvector(tmp, mType);
       bitvector.merge(tmp);
-    } 
+    }
     break;
-    
+
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
@@ -321,12 +321,12 @@ EiConditionOp::set_reqsize(tVpiValueType type)
   mType = update_size(mType, type);
 
   // 第1オペランドは不変
-  
+
   // 第2, 第3オペランドは type をそのまま伝える．
   operand2()->set_reqsize(mType);
   operand3()->set_reqsize(mType);
 }
-  
+
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiConditionOp::op_type() const
@@ -336,7 +336,7 @@ EiConditionOp::op_type() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiMinTypMaxOp  
+// クラス EiMinTypMaxOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
@@ -386,7 +386,7 @@ EiMinTypMaxOp::eval_real() const
 {
   return operand2()->eval_real();
 }
-  
+
 // @brief bitvector 型の値を返す．
 void
 EiMinTypMaxOp::eval_bitvector(BitVector& bitvector,
@@ -402,13 +402,13 @@ void
 EiMinTypMaxOp::set_reqsize(tVpiValueType type)
 {
   mType = update_size(mType, type);
-  
+
   // 3オペランドには type をそのまま伝える．
   operand1()->set_reqsize(mType);
   operand2()->set_reqsize(mType);
   operand3()->set_reqsize(mType);
 }
-  
+
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiMinTypMaxOp::op_type() const

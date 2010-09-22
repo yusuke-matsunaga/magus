@@ -504,7 +504,7 @@ inline
 void
 ElbValue::real2logic()
 {
-  mScalarValue = conv_from_real(real_value());
+  mScalarValue = conv_to_scalar(real_value());
   mState = kScalar;
 }
 

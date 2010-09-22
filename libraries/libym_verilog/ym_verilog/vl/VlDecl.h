@@ -84,7 +84,7 @@ public:
 
   /// @brief ビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const = 0;
 
   /// @brief オフセット値の取得
@@ -185,14 +185,14 @@ public:
 
   /// @brief 配列型オブジェクトの場合の次元数の取得
   virtual
-  ymuint32
+  ymuint
   dimension() const = 0;
 
   /// @brief 範囲の取得(配列型オブジェクト用)
-  /// @param[in] pos 位置 (0 <= pos < dimension_list_size())
+  /// @param[in] pos 位置 ( 0 <= pos < dimension() )
   virtual
   const VlRange*
-  range(ymuint32 pos) const = 0;
+  range(ymuint pos) const = 0;
 
   /// @brief 配列要素の時に true を返す．
   virtual

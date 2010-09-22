@@ -55,7 +55,7 @@ public:
   virtual
   const VlNamedObj*
   new_Toplevel();
-  
+
   /// @brief generate block を生成する．
   /// @param[in] parent 親のスコープ環境
   /// @param[in] pt_item 対応するパース木の要素
@@ -69,7 +69,7 @@ public:
   ElbGfRoot*
   new_GfRoot(const VlNamedObj* parent,
 	     const PtItem* pt_item);
-  
+
   /// @brief generate for block を生成する．
   /// @param[in] parent 親のスコープ環境
   /// @param[in] pt_item 対応するパース木の要素
@@ -87,7 +87,7 @@ public:
   ElbUdpDefn*
   new_UdpDefn(const PtUdp* pt_udp,
 	      bool is_protected);
-  
+
   /// @brief module を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_module モジュールテンプレート
@@ -99,7 +99,7 @@ public:
 	     const PtModule* pt_module,
 	     const PtItem* pt_head,
 	     const PtInst* pt_inst);
-  
+
   /// @brief module array を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_module モジュールテンプレート
@@ -119,7 +119,7 @@ public:
 		  ElbExpr* right,
 		  int left_val,
 		  int right_val);
-  
+
   /// @brief module IO ヘッダを生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] pt_header パース木のIO宣言ヘッダ
@@ -235,7 +235,7 @@ public:
   new_Decl(ElbDeclHead* head,
 	   const PtNamedBase* pt_item,
 	   ElbExpr* init = NULL);
-  
+
   /// @brief 暗黙のネットを生成する．
   /// @param[in] pt_expr パース木のプライマリ式
   virtual
@@ -249,7 +249,7 @@ public:
   virtual
   ElbRange*
   new_RangeArray(ymuint32 dim_size);
-  
+
   /// @brief 宣言要素の配列を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] head ヘッダ
@@ -260,6 +260,16 @@ public:
   new_DeclArray(ElbDeclHead* head,
 		const PtNamedBase* pt_item,
 		const vector<ElbRangeSrc>& range_src);
+
+  /// @brief 宣言要素を生成する(配列の要素)．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] parent_array 親の配列
+  /// @param[in] index_list インデックスのリスト
+  virtual
+  ElbDecl*
+  new_DeclElem(const PtBase* pt_expr,
+	       ElbDeclArray* parent_array,
+	       const vector<ElbExpr*>& index_list);
 
   /// @brief parameter 宣言のヘッダを生成する(範囲指定なし)．
   /// @param[in] parent 親のスコープ
@@ -294,7 +304,7 @@ public:
   new_Parameter(ElbParamHead* head,
 		const PtNamedBase* pt_item,
 		bool is_local = false);
-  
+
   /// @brief genvar を生成する．
   /// @param[in] parent 親のスコープ環境
   /// @param[in] pt_item 対応するパース木の要素
@@ -315,7 +325,7 @@ public:
   new_CaHead(const VlModule* module,
 	     const PtItem* pt_head,
 	     ElbDelay* delay = NULL);
-  
+
   /// @brief continuous assignment を生成する．
   /// @param[in] head ヘッダ
   /// @param[in] pt_obj 対応するパース木中の定義要素
@@ -327,7 +337,7 @@ public:
 		 const PtBase* pt_obj,
 		 ElbExpr* lhs,
 		 ElbExpr* rhs);
-  
+
   /// @brief net 宣言中の continuous assignment を生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] pt_obj パース木の定義要素
@@ -339,7 +349,7 @@ public:
 		 const PtBase* pt_obj,
 		 ElbExpr* lhs,
 		 ElbExpr* rhs);
-  
+
   /// @brief パラメータ割り当て文を生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] param 対象の parameter
@@ -352,7 +362,7 @@ public:
 		  ElbParameter* param,
 		  ElbExpr* rhs,
 		  bool named_con);
-  
+
   /// @brief defparam 文を生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] pt_header パース木の defparam ヘッダ
@@ -376,7 +386,7 @@ public:
   new_PrimHead(const VlNamedObj* parent,
 	       const PtItem* pt_header,
 	       bool has_delay);
-  
+
   /// @brief UDPプリミティブのヘッダを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_header パース木の定義
@@ -388,7 +398,7 @@ public:
 	      const PtItem* pt_header,
 	      const ElbUdpDefn* udp,
 	      bool has_delay);
-  
+
   /// @brief プリミティブインスタンスを生成する．
   /// @param[in] head ヘッダ
   /// @param[in] pt_inst インスタンス定義
@@ -396,7 +406,7 @@ public:
   ElbPrimitive*
   new_Primitive(ElbPrimHead* head,
 		const PtInst* pt_inst);
-  
+
   /// @brief プリミティブ配列インスタンスを生成する．
   /// @param[in] head ヘッダ
   /// @param[in] pt_inst インスタンス定義
@@ -490,7 +500,7 @@ public:
 		 const PtStmt* pt_stmt,
 		 ElbExpr* lhs,
 		 ElbExpr* rhs);
-  
+
   /// @brief deassign ステートメントを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -516,7 +526,7 @@ public:
 		const PtStmt* pt_stmt,
 		ElbExpr* lhs,
 		ElbExpr* rhs);
-  
+
   /// @brief release ステートメントを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -540,7 +550,7 @@ public:
 	    ElbProcess* process,
 	    const PtStmt* pt_stmt,
 	    ElbStmt** stmt_list);
-  
+
   /// @brief fork ブロックを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -560,7 +570,7 @@ public:
   ElbScope*
   new_StmtScope(const VlNamedObj* parent,
 		const PtStmt* pt_stmt);
-  
+
   /// @brief 名前付き begin ブロックを生成する．
   /// @param[in] block 自分自身に対応するスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -573,7 +583,7 @@ public:
 		 const PtStmt* pt_stmt,
 		 ElbStmt** stmt_list);
 
-  
+
   /// @brief 名前付き fork ブロックを生成する．
   /// @param[in] block 自分自身に対応するスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -674,7 +684,7 @@ public:
 	     ElbExpr* cond,
 	     ElbStmt* stmt,
 	     ElbStmt* else_stmt);
-  
+
   /// @brief case 文を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -798,7 +808,7 @@ public:
   virtual
   ElbExpr**
   new_ExprList(ymuint32 elem_num);
-  
+
   /// @brief 単項演算子を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] op_type 演算子のタイプ
@@ -808,7 +818,7 @@ public:
   new_UnaryOp(const PtBase* pt_expr,
 	      tVpiOpType op_type,
 	      ElbExpr* opr1);
-  
+
   /// @brief 2項演算子を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] op_type 演算子のタイプ
@@ -820,7 +830,7 @@ public:
 	       tVpiOpType op_type,
 	       ElbExpr* opr1,
 	       ElbExpr* opr2);
-  
+
   /// @brief 3項演算子を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] op_type 演算子のタイプ
@@ -834,7 +844,7 @@ public:
 		ElbExpr* opr1,
 		ElbExpr* opr2,
 		ElbExpr* opr3);
-  
+
   /// @brief 連結演算子を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr_size オペランドの要素数
@@ -844,7 +854,7 @@ public:
   new_ConcatOp(const PtBase* pt_expr,
 	       ymuint32 opr_size,
 	       ElbExpr** opr_list);
-  
+
   /// @brief 反復連結演算子を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] rep_expr 繰り返し数を表す式
@@ -876,16 +886,6 @@ public:
   new_Primary(const PtBase* pt_expr,
 	      ElbParameter* obj);
 
-  /// @brief 配列要素のプライマリ式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] index_list インデックスのリスト
-  virtual
-  ElbExpr*
-  new_Primary(const PtBase* pt_expr,
-	      ElbDeclArray* obj,
-	      const vector<ElbExpr*>& index_list);
-
   /// @brief ビット選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
@@ -904,18 +904,6 @@ public:
   ElbExpr*
   new_BitSelect(const PtBase* pt_expr,
 		ElbParameter* obj,
-		ElbExpr* bit_index);
-
-  /// @brief 配列要素のビット選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] index_list インデックスのリスト
-  /// @param[in] bit_index ビット選択式
-  virtual
-  ElbExpr*
-  new_BitSelect(const PtBase* pt_expr,
-		ElbDeclArray* obj,
-		const vector<ElbExpr*>& index_list,
 		ElbExpr* bit_index);
 
   /// @brief ビット選択式を生成する．
@@ -956,22 +944,6 @@ public:
 		 int index1_val,
 		 int index2_val);
 
-  /// @brief 配列要素の部分選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] index_list インデックスのリスト
-  /// @param[in] index1, index2 パート選択式
-  /// @param[in] index1_val, index2_val パート選択式の値
-  virtual
-  ElbExpr*
-  new_PartSelect(const PtBase* pt_expr,
-		 ElbDeclArray* obj,
-		 const vector<ElbExpr*>& index_list,
-		 ElbExpr* index1,
-		 ElbExpr* index2,
-		 int index1_val,
-		 int index2_val);
-  
   /// @brief 部分選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] expr 本体の式
@@ -1039,44 +1011,12 @@ public:
 		      ElbExpr* range,
 		      int range_val);
 
-  /// @brief 配列要素の可変部分選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] index_list インデックスのリスト
-  /// @param[in] base 範囲のベースアドレスを表す式
-  /// @param[in] range 範囲を表す式
-  /// @param[in] range_val 範囲の値
-  virtual
-  ElbExpr*
-  new_PlusPartSelect(const PtBase* pt_expr,
-		     ElbDeclArray* obj,
-		     const vector<ElbExpr*>& index_list,
-		     ElbExpr* base,
-		     ElbExpr* range,
-		     int range_val);
-
-  /// @brief 配列要素の可変部分選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] index_list インデックスのリスト
-  /// @param[in] base 範囲のベースアドレスを表す式
-  /// @param[in] range 範囲を表す式
-  /// @param[in] range_val 範囲の値
-  virtual
-  ElbExpr*
-  new_MinusPartSelect(const PtBase* pt_expr,
-		      ElbDeclArray* obj,
-		      const vector<ElbExpr*>& index_list,
-		      ElbExpr* base,
-		      ElbExpr* range,
-		      int range_val);
-
   /// @brief 定数式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   virtual
   ElbExpr*
   new_Constant(const PtExpr* pt_expr);
-  
+
   /// @brief genvar 起因の定数式を生成する．
   /// @param[in] pt_primary パース木の定義要素
   /// @param[in] val 値
@@ -1108,7 +1048,7 @@ public:
 		  const ElbUserSystf* user_systf,
 		  ymuint32 arg_size,
 		  ElbExpr** arg_list);
-  
+
   /// @brief システム関数/システムタスクの引数を生成する．
   /// @param[in] pt_expr パース木中で参照している要素
   /// @param[in] arg 引数本体
@@ -1116,7 +1056,7 @@ public:
   ElbExpr*
   new_ArgHandle(const PtBase* pt_expr,
 		const VlNamedObj* arg);
-  
+
   /// @brief システム関数/システムタスクの引数を生成する．
   /// @param[in] pt_expr パース木中で参照している要素
   /// @param[in] arg 引数本体
@@ -1134,7 +1074,7 @@ public:
   new_Delay(const PtBase* pt_obj,
 	    ymuint32 elem_num,
 	    ElbExpr** expr_list);
-  
+
   /// @brief attribute instance のリストを生成する．
   /// @param[in] n 要素数
   virtual

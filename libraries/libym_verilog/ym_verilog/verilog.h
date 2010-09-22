@@ -83,12 +83,17 @@ conv_to_real(tVpiScalarVal src);
 /// @brief int から tVpiScalarVal への変換
 /// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
 tVpiScalarVal
-conv_from_int(int src);
+conv_to_scalar(int src);
+
+/// @brief ymuint から tVpiScalarVal への変換
+/// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
+tVpiScalarVal
+conv_to_scalar(ymuint src);
 
 /// @brief 実数値から tVpiScalarVal への変換
 /// @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
 tVpiScalarVal
-conv_from_real(double src);
+conv_to_scalar(double src);
 
 /// @brief tVpiScalarVal の否定
 /// @note kVpiScalarZ は kVpiScalarX と同様に扱われる．
@@ -818,7 +823,7 @@ conv_to_real(tVpiScalarVal src)
 // @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
 inline
 tVpiScalarVal
-conv_from_int(int src)
+conv_to_scalar(int src)
 {
   if ( src == 0 ) {
     return kVpiScalar0;
@@ -828,11 +833,20 @@ conv_from_int(int src)
   }
 }
 
+// @brief ymuint から tVpiScalarVal への変換
+// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
+inline
+tVpiScalarVal
+conv_to_scalar(ymuint src)
+{
+  return conv_to_scalar(static_cast<int>(src));
+}
+
 // @brief 実数値から tVpiScalarVal への変換
 // @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
 inline
 tVpiScalarVal
-conv_from_real(double src)
+conv_to_scalar(double src)
 {
   if ( src == 0.0 ) {
     return kVpiScalar0;

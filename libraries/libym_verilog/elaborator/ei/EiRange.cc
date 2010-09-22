@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @brief 範囲の配列を生成する．
 // @param[in] dim_size 要素数
 ElbRange*
-EiFactory::new_RangeArray(ymuint32 dim_size)
+EiFactory::new_RangeArray(ymuint dim_size)
 {
   void* p = mAlloc.get_memory(sizeof(EiRange) * dim_size);
   EiRange* range_array = new (p) EiRange[dim_size];
@@ -35,7 +35,7 @@ EiFactory::new_RangeArray(ymuint32 dim_size)
 //////////////////////////////////////////////////////////////////////
 // クラス EiRange
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 EiRange::EiRange()
 {
@@ -73,33 +73,33 @@ EiRange::file_region() const
 }
 
 // @brief 要素数(ビット幅)を返す．
-ymuint32
+ymuint
 EiRange::size() const
 {
   return calc_size(mLeftVal, mRightVal);
 }
-  
+
 // @brief MSB を返す．
 VlExpr*
 EiRange::left_range() const
 {
   return mLeftRange;
 }
-  
+
 // @brief LSB を返す．
 VlExpr*
 EiRange::right_range() const
 {
   return mRightRange;
 }
-  
+
 // @brief MSB の値を返す．
 int
 EiRange::left_range_const() const
 {
   return mLeftVal;
 }
-  
+
 // @brief LSB の値を返す．
 int
 EiRange::right_range_const() const
@@ -116,7 +116,7 @@ EiRange::is_in(int index) const
 {
   return is_in(mLeftVal, mRightVal, index);
 }
-  
+
 // @brief LSB からのオフセット値の取得
 // @param[in] index インデックス
 // @retval index の LSB からのオフセット index が範囲内に入っている．
@@ -136,7 +136,7 @@ EiRange::roffset(int index) const
 {
   return roffset(mLeftVal, mRightVal, index);
 }
-  
+
 // @brief offset の逆関数
 // @param[in] offset LSB からのオフセット値
 // @return offset に対応したインデックスを返す．
@@ -171,7 +171,7 @@ EiRangeImpl::EiRangeImpl() :
 EiRangeImpl::~EiRangeImpl()
 {
 }
-  
+
 // @brief 値を設定する．
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
@@ -188,7 +188,7 @@ EiRangeImpl::set(ElbExpr* left,
 }
 
 // @brief サイズを返す．
-ymuint32
+ymuint
 EiRangeImpl::size() const
 {
   return EiRange::calc_size(mLeftVal, mRightVal);
@@ -207,21 +207,21 @@ EiRangeImpl::right_range() const
 {
   return mRightRange;
 }
-  
+
 // MSB の値を返す．確定していないときは -1 を返す．
 int
 EiRangeImpl::left_range_const() const
 {
   return mLeftVal;
 }
-  
+
 // LSB の値を返す．確定していないときは -1 を返す．
 int
 EiRangeImpl::right_range_const() const
 {
   return mRightVal;
 }
-  
+
 // index が範囲内に入っていたら true を返す．
 // 範囲外の時には false を返す．
 bool
@@ -229,7 +229,7 @@ EiRangeImpl::is_in(int index) const
 {
   return EiRange::is_in(mLeftVal, mRightVal, index);
 }
-  
+
 // index のLSBからのオフセットを返す．
 // 範囲外の時は -1 を返す。
 int
@@ -245,14 +245,14 @@ EiRangeImpl::roffset(int index) const
 {
   return EiRange::roffset(mLeftVal, mRightVal, index);
 }
-  
+
 // offset の逆関数
 int
 EiRangeImpl::index(int offset) const
 {
   return EiRange::index(mLeftVal, mRightVal, offset);
 }
-  
+
 // roffset の逆関数
 int
 EiRangeImpl::rindex(int roffset) const
@@ -267,7 +267,7 @@ EiRangeImpl::rindex(int roffset) const
 
 // @brief コンストラクタ
 // @brief dim_size 次元数
-EiRangeArray::EiRangeArray(ymuint32 dim_size,
+EiRangeArray::EiRangeArray(ymuint dim_size,
 			   EiRange* array) :
   mDimSize(dim_size),
   mArray(array)
@@ -278,31 +278,31 @@ EiRangeArray::EiRangeArray(ymuint32 dim_size,
 EiRangeArray::~EiRangeArray()
 {
 }
-  
+
 // @brief 要素数を計算する
 // @return サイズを返す．
-ymuint32
+ymuint
 EiRangeArray::elem_size() const
 {
   // 各次元の要素数をかければよい
-  ymuint32 ans = 1;
-  ymuint32 n = size();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint ans = 1;
+  ymuint n = size();
+  for (ymuint i = 0; i < n; ++ i) {
     ans *= range(i)->size();
   }
   return ans;
 }
-  
+
 // @brief アドレス(オフセット)からインデックスの配列を作る．
 // @param[in] offset オフセット
 // @param[out] index_array
 void
-EiRangeArray::index(ymuint32 offset,
+EiRangeArray::index(ymuint offset,
 		    vector<int>& index_array) const
 {
-  ymuint32 n = size();
+  ymuint n = size();
   index_array.resize(n);
-  for (ymuint32 i = n; i -- > 0; ) {
+  for (ymuint i = n; i -- > 0; ) {
     const EiRange* r = range(i);
     int k = r->size();
     int offset1 = offset % k;
@@ -312,10 +312,10 @@ EiRangeArray::index(ymuint32 offset,
 }
 
 // @brief インデックスからオフセットを得る
-ymuint32
+ymuint
 EiRangeArray::offset(const vector<int>& index_array) const
 {
-  ymuint32 n = size();
+  ymuint n = size();
   if ( index_array.size() != n ) {
 #if 0
     error_header(__FILE__, __LINE__, "RUN", FileRegion())
@@ -327,8 +327,8 @@ EiRangeArray::offset(const vector<int>& index_array) const
     return 0;
   }
 
-  ymuint32 offset = 0;
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint offset = 0;
+  for (ymuint i = 0; i < n; ++ i) {
     const EiRange* r = range(i);
     int k = r->size();
     offset *= k;

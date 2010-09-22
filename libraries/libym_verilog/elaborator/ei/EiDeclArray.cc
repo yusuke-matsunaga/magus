@@ -35,11 +35,11 @@ EiFactory::new_DeclArray(ElbDeclHead* head,
 			 const PtNamedBase* pt_item,
 			 const vector<ElbRangeSrc>& range_src)
 {
-  ymuint32 dim_size = range_src.size();
+  ymuint dim_size = range_src.size();
   void* q = mAlloc.get_memory(sizeof(EiRange) * dim_size);
   EiRange* range_array = new (q) EiRange[dim_size];
-  ymuint32 elem_size = 1;
-  for (ymuint32 i = 0; i < dim_size; ++ i) {
+  ymuint elem_size = 1;
+  for (ymuint i = 0; i < dim_size; ++ i) {
     range_array[i].set(range_src[i]);
     elem_size *= range_array[i].size();
   }
@@ -109,7 +109,7 @@ EiFactory::new_DeclArray(ElbDeclHead* head,
 // @param[in] range_array 範囲の配列
 EiDeclArray::EiDeclArray(ElbDeclHead* head,
 			 const PtNamedBase* pt_item,
-			 ymuint32 dim_size,
+			 ymuint dim_size,
 			 EiRange* range_array) :
   mHead(head),
   mPtItem(pt_item),
@@ -204,7 +204,7 @@ EiDeclArray::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclArray::bit_size() const
 {
   return mHead->bit_size();
@@ -286,7 +286,7 @@ EiDeclArray::delay() const
 
 // @brief dimension list のサイズの取得
 // @return dimension list のサイズ
-ymuint32
+ymuint
 EiDeclArray::dimension_list_size() const
 {
   return mRangeList.size();
@@ -295,7 +295,7 @@ EiDeclArray::dimension_list_size() const
 // @brief 範囲の取得
 // @param[in] pos 位置 (0 <= pos < dimension_list_size())
 const VlRange*
-EiDeclArray::range(ymuint32 pos) const
+EiDeclArray::range(ymuint pos) const
 {
   return mRangeList.range(pos);
 }
@@ -328,7 +328,7 @@ EiDeclArray::_right_range() const
 
 // @brief インデックスからオフセットを計算する．
 // @param[in] index_array インデックスの配列
-ymuint32
+ymuint
 EiDeclArray::calc_offset(const vector<int>& index_array) const
 {
   return mRangeList.offset(index_array);
@@ -347,7 +347,7 @@ EiDeclArray::calc_offset(const vector<int>& index_array) const
 // @param[in] range_array 範囲の配列
 EiDeclArrayN::EiDeclArrayN(ElbDeclHead* head,
 			   const PtNamedBase* pt_item,
-			   ymuint32 dim_size,
+			   ymuint dim_size,
 			   EiRange* range_array) :
   EiDeclArray(head, pt_item, dim_size, range_array)
 {
@@ -359,47 +359,56 @@ EiDeclArrayN::~EiDeclArrayN()
 }
 
 // @brief スカラー値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 tVpiScalarVal
-EiDeclArrayN::get_scalar(const vector<int>& index_array) const
+EiDeclArrayN::get_scalar(ymuint offset) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return kVpiScalarX;
 }
 
 // @brief スカラー値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayN::set_scalar(const vector<int>& index_array,
+EiDeclArrayN::set_scalar(ymuint offset,
 			 tVpiScalarVal val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
+// @brief 論理値を返す．
+// @param[in] offset 要素のオフセット
+tVpiScalarVal
+EiDeclArrayN::get_logic(ymuint offset) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return kVpiScalarX;
+}
+
 // @brief real 型の値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 double
-EiDeclArrayN::get_real(const vector<int>& index_array) const
+EiDeclArrayN::get_real(ymuint offset) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0.0;
 }
 
 // @brief real 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayN::set_real(const vector<int>& index_array,
+EiDeclArrayN::set_real(ymuint offset,
 		       double val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief bitvector 型の値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 void
-EiDeclArrayN::get_bitvector(const vector<int>& index_array,
+EiDeclArrayN::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
 			    tVpiValueType req_type) const
 {
@@ -407,20 +416,20 @@ EiDeclArrayN::get_bitvector(const vector<int>& index_array,
 }
 
 // @brief bitvector 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayN::set_bitvector(const vector<int>& index_array,
+EiDeclArrayN::set_bitvector(ymuint offset,
 			    const BitVector& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief ビット選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 tVpiScalarVal
-EiDeclArrayN::get_bitselect(const vector<int>& index_array,
+EiDeclArrayN::get_bitselect(ymuint offset,
 			    int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -428,11 +437,11 @@ EiDeclArrayN::get_bitselect(const vector<int>& index_array,
 }
 
 // @brief ビット値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 // @param[in] val 値
 void
-EiDeclArrayN::set_bitselect(const vector<int>& index_array,
+EiDeclArrayN::set_bitselect(ymuint offset,
 			    int index,
 			    tVpiScalarVal val)
 {
@@ -440,12 +449,12 @@ EiDeclArrayN::set_bitselect(const vector<int>& index_array,
 }
 
 // @brief 範囲選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayN::get_partselect(const vector<int>& index_array,
+EiDeclArrayN::get_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     BitVector& val) const
@@ -454,12 +463,12 @@ EiDeclArrayN::get_partselect(const vector<int>& index_array,
 }
 
 // @brief 範囲値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayN::set_partselect(const vector<int>& index_array,
+EiDeclArrayN::set_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     const BitVector& val)
@@ -481,7 +490,7 @@ EiDeclArrayN::set_partselect(const vector<int>& index_array,
 // @param[in] varray 値を納める配列
 EiDeclArrayS::EiDeclArrayS(ElbDeclHead* head,
 			   const PtNamedBase* pt_item,
-			   ymuint32 dim_size,
+			   ymuint dim_size,
 			   EiRange* range_array,
 			   tVpiScalarVal* varray) :
   EiDeclArray(head, pt_item, dim_size, range_array),
@@ -495,76 +504,77 @@ EiDeclArrayS::~EiDeclArrayS()
 }
 
 // @brief スカラー値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 tVpiScalarVal
-EiDeclArrayS::get_scalar(const vector<int>& index_array) const
+EiDeclArrayS::get_scalar(ymuint offset) const
 {
-  ymuint32 offset = calc_offset(index_array);
   return mValArray[offset];
 }
 
 // @brief スカラー値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayS::set_scalar(const vector<int>& index_array,
+EiDeclArrayS::set_scalar(ymuint offset,
 			 tVpiScalarVal val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = val;
 }
 
-// @brief real 型の値を返す．
-// @param[in] index_array インデックスの配列
-double
-EiDeclArrayS::get_real(const vector<int>& index_array) const
+// @brief 論理値を返す．
+// @param[in] offset 要素のオフセット
+tVpiScalarVal
+EiDeclArrayS::get_logic(ymuint offset) const
 {
-  ymuint32 offset = calc_offset(index_array);
+  return conv_to_logic(get_scalar(offset));
+}
+
+// @brief real 型の値を返す．
+// @param[in] offset 要素のオフセット
+double
+EiDeclArrayS::get_real(ymuint offset) const
+{
   return conv_to_real(mValArray[offset]);
 }
 
 // @brief real 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayS::set_real(const vector<int>& index_array,
+EiDeclArrayS::set_real(ymuint offset,
 		       double val)
 {
-  ymuint32 offset = calc_offset(index_array);
-  mValArray[offset] = conv_from_real(val);
+  mValArray[offset] = conv_to_scalar(val);
 }
 
 // @brief bitvector 型の値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 void
-EiDeclArrayS::get_bitvector(const vector<int>& index_array,
+EiDeclArrayS::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
 			    tVpiValueType req_type) const
 {
-  ymuint32 offset = calc_offset(index_array);
   bitvector = mValArray[offset];
   bitvector.coerce(req_type);
 }
 
 // @brief bitvector 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayS::set_bitvector(const vector<int>& index_array,
+EiDeclArrayS::set_bitvector(ymuint offset,
 			    const BitVector& val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = val.to_scalar();
 }
 
 // @brief ビット選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 tVpiScalarVal
-EiDeclArrayS::get_bitselect(const vector<int>& index_array,
+EiDeclArrayS::get_bitselect(ymuint offset,
 			    int index) const
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos = bit_offset(index);
   if ( bpos == 0 ) {
     return mValArray[offset];
@@ -576,15 +586,14 @@ EiDeclArrayS::get_bitselect(const vector<int>& index_array,
 }
 
 // @brief ビット値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 // @param[in] val 値
 void
-EiDeclArrayS::set_bitselect(const vector<int>& index_array,
+EiDeclArrayS::set_bitselect(ymuint offset,
 			    int index,
 			    tVpiScalarVal val)
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos = bit_offset(index);
   if ( bpos == 0 ) {
     mValArray[offset] = val;
@@ -592,17 +601,16 @@ EiDeclArrayS::set_bitselect(const vector<int>& index_array,
 }
 
 // @brief 範囲選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayS::get_partselect(const vector<int>& index_array,
+EiDeclArrayS::get_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     BitVector& val) const
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos1 = bit_offset(left);
   int bpos2 = bit_offset(right);
   if ( bpos1 == 0 && bpos2 == 0 ) {
@@ -611,17 +619,16 @@ EiDeclArrayS::get_partselect(const vector<int>& index_array,
 }
 
 // @brief 範囲値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayS::set_partselect(const vector<int>& index_array,
+EiDeclArrayS::set_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     const BitVector& val)
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos1 = bit_offset(left);
   int bpos2 = bit_offset(right);
   if ( bpos1 == 0 && bpos2 == 0 ) {
@@ -643,7 +650,7 @@ EiDeclArrayS::set_partselect(const vector<int>& index_array,
 // @param[in] varray 値を納める配列
 EiDeclArrayR::EiDeclArrayR(ElbDeclHead* head,
 			   const PtNamedBase* pt_item,
-			   ymuint32 dim_size,
+			   ymuint dim_size,
 			   EiRange* range_array,
 			   double* varray) :
   EiDeclArray(head, pt_item, dim_size, range_array),
@@ -657,72 +664,74 @@ EiDeclArrayR::~EiDeclArrayR()
 }
 
 // @brief スカラー値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 tVpiScalarVal
-EiDeclArrayR::get_scalar(const vector<int>& index_array) const
+EiDeclArrayR::get_scalar(ymuint offset) const
 {
-  ymuint32 offset = calc_offset(index_array);
-  return conv_from_real(mValArray[offset]);
+  return conv_to_scalar(mValArray[offset]);
 }
 
 // @brief スカラー値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayR::set_scalar(const vector<int>& index_array,
+EiDeclArrayR::set_scalar(ymuint offset,
 			 tVpiScalarVal val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = conv_to_real(val);
 }
 
-// @brief real 型の値を返す．
-// @param[in] index_array インデックスの配列
-double
-EiDeclArrayR::get_real(const vector<int>& index_array) const
+// @brief 論理値を返す．
+// @param[in] offset 要素のオフセット
+tVpiScalarVal
+EiDeclArrayR::get_logic(ymuint offset) const
 {
-  ymuint32 offset = calc_offset(index_array);
+  return conv_to_scalar(get_real(offset));
+}
+
+// @brief real 型の値を返す．
+// @param[in] offset 要素のオフセット
+double
+EiDeclArrayR::get_real(ymuint offset) const
+{
   return mValArray[offset];
 }
 
 // @brief real 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayR::set_real(const vector<int>& index_array,
+EiDeclArrayR::set_real(ymuint offset,
 		       double val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = val;
 }
 
 // @brief bitvector 型の値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 void
-EiDeclArrayR::get_bitvector(const vector<int>& index_array,
+EiDeclArrayR::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
 			    tVpiValueType req_type) const
 {
-  ymuint32 offset = calc_offset(index_array);
   bitvector = mValArray[offset];
 }
 
 // @brief bitvector 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayR::set_bitvector(const vector<int>& index_array,
+EiDeclArrayR::set_bitvector(ymuint offset,
 			    const BitVector& val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = val.to_real();
 }
 
 // @brief ビット選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 tVpiScalarVal
-EiDeclArrayR::get_bitselect(const vector<int>& index_array,
+EiDeclArrayR::get_bitselect(ymuint offset,
 			    int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -730,11 +739,11 @@ EiDeclArrayR::get_bitselect(const vector<int>& index_array,
 }
 
 // @brief ビット値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 // @param[in] val 値
 void
-EiDeclArrayR::set_bitselect(const vector<int>& index_array,
+EiDeclArrayR::set_bitselect(ymuint offset,
 			    int index,
 			    tVpiScalarVal val)
 {
@@ -742,12 +751,12 @@ EiDeclArrayR::set_bitselect(const vector<int>& index_array,
 }
 
 // @brief 範囲選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayR::get_partselect(const vector<int>& index_array,
+EiDeclArrayR::get_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     BitVector& val) const
@@ -756,12 +765,12 @@ EiDeclArrayR::get_partselect(const vector<int>& index_array,
 }
 
 // @brief 範囲値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayR::set_partselect(const vector<int>& index_array,
+EiDeclArrayR::set_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     const BitVector& val)
@@ -783,7 +792,7 @@ EiDeclArrayR::set_partselect(const vector<int>& index_array,
 // @param[in] varray 値を納める配列
 EiDeclArrayV::EiDeclArrayV(ElbDeclHead* head,
 			   const PtNamedBase* pt_item,
-			   ymuint32 dim_size,
+			   ymuint dim_size,
 			   EiRange* range_array,
 			   BitVector* varray) :
   EiDeclArray(head, pt_item, dim_size, range_array),
@@ -797,76 +806,77 @@ EiDeclArrayV::~EiDeclArrayV()
 }
 
 // @brief スカラー値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 tVpiScalarVal
-EiDeclArrayV::get_scalar(const vector<int>& index_array) const
+EiDeclArrayV::get_scalar(ymuint offset) const
 {
-  ymuint32 offset = calc_offset(index_array);
   return mValArray[offset].to_scalar();
 }
 
 // @brief スカラー値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayV::set_scalar(const vector<int>& index_array,
+EiDeclArrayV::set_scalar(ymuint offset,
 			 tVpiScalarVal val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = val;
 }
 
-// @brief real 型の値を返す．
-// @param[in] index_array インデックスの配列
-double
-EiDeclArrayV::get_real(const vector<int>& index_array) const
+// @brief 論理値を返す．
+// @param[in] offset 要素のオフセット
+tVpiScalarVal
+EiDeclArrayV::get_logic(ymuint offset) const
 {
-  ymuint32 offset = calc_offset(index_array);
+  return mValArray[offset].to_logic();
+}
+
+// @brief real 型の値を返す．
+// @param[in] offset 要素のオフセット
+double
+EiDeclArrayV::get_real(ymuint offset) const
+{
   return mValArray[offset].to_real();
 }
 
 // @brief real 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayV::set_real(const vector<int>& index_array,
+EiDeclArrayV::set_real(ymuint offset,
 		       double val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = val;
 }
 
 // @brief bitvector 型の値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 void
-EiDeclArrayV::get_bitvector(const vector<int>& index_array,
+EiDeclArrayV::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
 			    tVpiValueType req_type) const
 {
-  ymuint32 offset = calc_offset(index_array);
   bitvector = mValArray[offset];
   bitvector.coerce(req_type);
 }
 
 // @brief bitvector 型の値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] val 値
 void
-EiDeclArrayV::set_bitvector(const vector<int>& index_array,
+EiDeclArrayV::set_bitvector(ymuint offset,
 			    const BitVector& val)
 {
-  ymuint32 offset = calc_offset(index_array);
   mValArray[offset] = val;
 }
 
 // @brief ビット選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 tVpiScalarVal
-EiDeclArrayV::get_bitselect(const vector<int>& index_array,
+EiDeclArrayV::get_bitselect(ymuint offset,
 			    int index) const
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos = bit_offset(index);
   if ( bpos >= 0 ) {
     return mValArray[offset].bit_select(bpos);
@@ -877,15 +887,14 @@ EiDeclArrayV::get_bitselect(const vector<int>& index_array,
 }
 
 // @brief ビット値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] index ビット位置
 // @param[in] val 値
 void
-EiDeclArrayV::set_bitselect(const vector<int>& index_array,
+EiDeclArrayV::set_bitselect(ymuint offset,
 			    int index,
 			    tVpiScalarVal val)
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos = bit_offset(index);
   if ( bpos >= 0 ) {
     mValArray[offset].bit_select(bpos, val);
@@ -893,17 +902,16 @@ EiDeclArrayV::set_bitselect(const vector<int>& index_array,
 }
 
 // @brief 範囲選択値を返す．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayV::get_partselect(const vector<int>& index_array,
+EiDeclArrayV::get_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     BitVector& val) const
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos1 = bit_offset(left);
   int bpos2 = bit_offset(right);
   if ( bpos1 >= 0 && bpos2 >= 0 ) {
@@ -922,17 +930,16 @@ EiDeclArrayV::get_partselect(const vector<int>& index_array,
 }
 
 // @brief 範囲値を設定する．
-// @param[in] index_array インデックスの配列
+// @param[in] offset 要素のオフセット
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 // @param[in] val 値
 void
-EiDeclArrayV::set_partselect(const vector<int>& index_array,
+EiDeclArrayV::set_partselect(ymuint offset,
 			     int left,
 			     int right,
 			     const BitVector& val)
 {
-  ymuint32 offset = calc_offset(index_array);
   int bpos1 = bit_offset(left);
   int bpos2 = bit_offset(right);
   if ( bpos1 >= 0 && bpos2 >= 0 ) {

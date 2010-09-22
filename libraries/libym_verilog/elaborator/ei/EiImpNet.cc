@@ -276,7 +276,7 @@ EiImpNet::get_real() const
 void
 EiImpNet::set_real(double val)
 {
-  mVal = conv_from_real(val);
+  mVal = conv_to_scalar(val);
 }
 
 // @brief bitvector 型の値を返す．

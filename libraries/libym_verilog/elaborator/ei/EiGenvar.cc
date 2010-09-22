@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief genvar を生成する．
 // @param[in] parent 親のスコープ環境
 // @param[in] pt_item 対応するパース木の要素
@@ -55,7 +55,7 @@ EiGenvar::EiGenvar(const VlNamedObj* parent,
   mValue(val)
 {
 }
-  
+
 // デストラクタ
 EiGenvar::~EiGenvar()
 {
@@ -95,7 +95,7 @@ EiGenvar::genvar()
 {
   return this;
 }
-  
+
 // @brief bit-select や part-select を持てる時に true を返す．
 bool
 EiGenvar::is_bvtype() const
@@ -121,7 +121,7 @@ EiGenvar::is_consttype() const
 tVpiScalarVal
 EiGenvar::get_scalar() const
 {
-  return conv_from_int(mValue);
+  return conv_to_scalar(mValue);
 }
 
 // @brief スカラー値を設定する．
@@ -130,12 +130,15 @@ EiGenvar::set_scalar(tVpiScalarVal val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
-  
+
 // @brief 論理値を返す．
 tVpiScalarVal
 EiGenvar::get_logic() const
 {
-  return conv_from_int(mValue & 1);
+#warning "TODO: 仕様確認"
+  // int なら 0 かどうか
+  // ビットベクタなら LSB
+  return conv_to_scalar(mValue & 1);
 }
 
 // @brief real 型の値を返す．
@@ -144,7 +147,7 @@ EiGenvar::get_real() const
 {
   return static_cast<double>(mValue);
 }
-  
+
 // @brief real 型の値を設定する．
 void
 EiGenvar::set_real(double val)
@@ -167,14 +170,14 @@ EiGenvar::set_bitvector(const BitVector& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
-  
+
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
 tVpiScalarVal
 EiGenvar::get_bitselect(int index) const
 {
   if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
-    return conv_from_int((mValue >> index) & 1U);
+    return conv_to_scalar((mValue >> index) & 1U);
   }
   else {
     return kVpiScalarX;
@@ -263,7 +266,7 @@ EiGenvar::set_value(int value)
 {
   mValue = value;
 }
-  
+
 // @brief 元となったパース木の定義要素を返す．
 const PtDeclItem*
 EiGenvar::pt_item() const

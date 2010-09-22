@@ -16,7 +16,7 @@
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-  
+
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
@@ -38,39 +38,39 @@ EiFactory::new_Constant(const PtExpr* pt_expr)
       return new (p) EiIntConst(pt_expr, pt_expr->const_uint());
     }
     break;
-    
+
   case kVpiSignedBinaryConst:
     is_signed = true;
   case kVpiBinaryConst:
     base = 2;
     break;
-    
+
   case kVpiSignedOctConst:
     is_signed = true;
   case kVpiOctConst:
     base = 8;
     break;
-    
+
   case kVpiSignedDecConst:
     is_signed = true;
   case kVpiDecConst:
     base = 10;
     break;
-    
+
   case kVpiSignedHexConst:
     is_signed = true;
   case kVpiHexConst:
     base = 16;
     break;
-    
+
   case kVpiRealConst:
     p = mAlloc.get_memory(sizeof(EiRealConst));
     return new (p) EiRealConst(pt_expr, pt_expr->const_real());
-    
+
   case kVpiStringConst:
     p = mAlloc.get_memory(sizeof(EiStringConst));
     return new (p) EiStringConst(pt_expr, pt_expr->const_str());
-    
+
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;
@@ -82,7 +82,7 @@ EiFactory::new_Constant(const PtExpr* pt_expr)
 				  BitVector(size, is_signed, base,
 					    pt_expr->const_str()));
 }
-  
+
 // @brief genvar 起因の定数式を生成する．
 // @param[in] pt_item パース木の定義要素
 // @param[in] val 値
@@ -134,7 +134,7 @@ EiConstant::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }
-  
+
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -209,14 +209,14 @@ EiIntConst::eval_int(int& val) const
 tVpiScalarVal
 EiIntConst::eval_scalar() const
 {
-  return conv_from_int(mValue);
+  return conv_to_scalar(mValue);
 }
 
 // @brief 論理値を返す．
 tVpiScalarVal
 EiIntConst::eval_logic() const
 {
-  return conv_from_int(mValue);
+  return conv_to_scalar(mValue);
 }
 
 // @brief real 型の値を返す．
@@ -235,7 +235,7 @@ EiIntConst::eval_bitvector(BitVector& bitvector,
   bitvector = mValue;
   bitvector.coerce(req_type);
 }
-  
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -395,7 +395,7 @@ EiRealConst::eval_scalar() const
 tVpiScalarVal
 EiRealConst::eval_logic() const
 {
-  return conv_from_real(eval_real());
+  return conv_to_scalar(eval_real());
 }
 
 // @brief real 型の値を返す．
@@ -413,7 +413,7 @@ EiRealConst::eval_bitvector(BitVector& bitvector,
   bitvector = eval_real();
   bitvector.coerce(req_type);
 }
-  
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -489,7 +489,7 @@ EiStringConst::eval_bitvector(BitVector& bitvector,
   bitvector = mValue;
   bitvector.coerce(req_type);
 }
-  
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string

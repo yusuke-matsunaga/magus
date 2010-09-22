@@ -210,7 +210,7 @@ EiDecl::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDecl::bit_size() const
 {
   return mHead->bit_size();
@@ -482,7 +482,7 @@ EiDeclS::get_real() const
 void
 EiDeclS::set_real(double val)
 {
-  mVal = conv_from_real(val);
+  mVal = conv_to_scalar(val);
 }
 
 // @brief bitvector 型の値を返す．
@@ -585,7 +585,7 @@ EiDeclR::~EiDeclR()
 tVpiScalarVal
 EiDeclR::get_scalar() const
 {
-  return conv_from_real(mVal);
+  return conv_to_scalar(mVal);
 }
 
 // @brief スカラー値を設定する．
@@ -599,12 +599,7 @@ EiDeclR::set_scalar(tVpiScalarVal val)
 tVpiScalarVal
 EiDeclR::get_logic() const
 {
-  if ( mVal == 0.0 ) {
-    return kVpiScalar0;
-  }
-  else {
-    return kVpiScalar1;
-  }
+  return conv_to_scalar(get_real());
 }
 
 // @brief real 型の値を返す．

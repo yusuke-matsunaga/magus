@@ -416,18 +416,18 @@ private:
   /// @brief 添字の部分を実体化する．(配列要素のオブジェクト用)
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] obj 対象の配列型オブジェクト
+  /// @param[in] array_obj 対象の配列型オブジェクト
   /// @param[in] func 親の function
-  /// @param[out] index_list インデックス式のリスト
+  /// @param[out] decl_elem 配列要素
   /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
   /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
   /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
   bool
   resolve2(const VlNamedObj* parent,
 	   const PtExpr* pt_expr,
-	   VlDecl* obj,
+	   ElbDeclArray* array_obj,
 	   const VlNamedObj* func,
-	   vector<ElbExpr*>& index_list,
+	   ElbDecl*& decl_elem,
 	   bool& has_range_select,
 	   bool& has_bit_select,
 	   ElbExpr*& index1,

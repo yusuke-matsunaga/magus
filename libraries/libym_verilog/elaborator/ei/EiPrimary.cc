@@ -50,22 +50,6 @@ EiFactory::new_Primary(const PtBase* pt_expr,
   return expr;
 }
 
-// @brief 配列要素のプライマリ式を生成する．
-// @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] index_list インデックスのリスト
-ElbExpr*
-EiFactory::new_Primary(const PtBase* pt_expr,
-		       ElbDeclArray* obj,
-		       const vector<ElbExpr*>& index_list)
-{
-  void* p = mAlloc.get_memory(sizeof(EiArrayElemPrimary));
-  EiArrayElemPrimary* expr = new (p) EiArrayElemPrimary(pt_expr, obj,
-							index_list);
-
-  return expr;
-}
-  
 // @brief システム関数/システムタスクの引数を生成する．
 // @param[in] pt_expr パース木中で参照している要素
 // @param[in] arg 引数本体
@@ -78,7 +62,7 @@ EiFactory::new_ArgHandle(const PtBase* pt_expr,
 
   return expr;
 }
-  
+
 // @brief システム関数/システムタスクの引数を生成する．
 // @param[in] pt_expr パース木中で参照している要素
 // @param[in] arg 引数本体
@@ -194,7 +178,7 @@ EiPrimary::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }
-  
+
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -220,7 +204,7 @@ void
 EiPrimary::set_bitvector(const BitVector& v)
 {
   mObj->set_bitvector(v);
-}  
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -323,7 +307,7 @@ EiParamPrimary::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }
-  
+
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -349,189 +333,6 @@ void
 EiParamPrimary::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
-}  
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiArrayElemPrimary
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] index_list インデックスのリスト
-EiArrayElemPrimary::EiArrayElemPrimary(const PtBase* pt_obj,
-				       ElbDeclArray* obj,
-				       const vector<ElbExpr*>& index_list) :
-  EiExprBase1(pt_obj),
-  mObj(obj),
-  mIndexList(index_list),
-  mIndexValList(index_list.size())
-{
-}
-
-// @brief デストラクタ
-EiArrayElemPrimary::~EiArrayElemPrimary()
-{
-}
-
-// @brief 型の取得
-tVpiObjType
-EiArrayElemPrimary::type() const
-{
-  return mObj->type();
-}
-
-// @brief 式のタイプを返す．
-tVpiValueType
-EiArrayElemPrimary::value_type() const
-{
-  return mObj->value_type();
-}
-
-// @brief 定数の時 true を返す．
-// @note 参照している要素の型によって決まる．
-bool
-EiArrayElemPrimary::is_const() const
-{
-  return mObj->is_consttype();
-}
-
-// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
-bool
-EiArrayElemPrimary::is_primary() const
-{
-  return true;
-}
-
-// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
-const VlDecl*
-EiArrayElemPrimary::decl_obj() const
-{
-  return mObj;
-}
-  
-// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
-ymuint32
-EiArrayElemPrimary::declarray_dimension() const
-{
-  return mIndexList.size();
-}
-
-// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
-const VlExpr*
-EiArrayElemPrimary::declarray_index(ymuint32 pos) const
-{
-  return mIndexList[pos];
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiArrayElemPrimary::eval_scalar() const
-{
-  eval_index();
-  return mObj->get_scalar(mIndexValList);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiArrayElemPrimary::eval_logic() const
-{
-  eval_index();
-  return mObj->get_scalar(mIndexValList);
-}
-
-// @brief real 型の値を返す．
-double
-EiArrayElemPrimary::eval_real() const
-{
-  eval_index();
-  return mObj->get_real(mIndexValList);
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiArrayElemPrimary::eval_bitvector(BitVector& bitvector,
-				   tVpiValueType req_type) const
-{
-  eval_index();
-  mObj->get_bitvector(mIndexValList, bitvector, req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiArrayElemPrimary::decompile_impl(int ppri) const
-{
-  string ans = mObj->name();
-  ans += decompile_index();
-  return ans;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiArrayElemPrimary::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-  
-// @brief インデックス部分を decompile する．
-string
-EiArrayElemPrimary::decompile_index() const
-{
-  ymuint32 n = mIndexList.size();
-  string ans;
-  for (ymuint32 i = 0; i < n; ++ i) {
-    ans += "[" + mIndexList[i]->decompile() + "]";
-  }
-  return ans;
-}
-  
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiArrayElemPrimary::set_scalar(tVpiScalarVal v)
-{
-  eval_index();
-  mObj->set_scalar(mIndexValList, v);
-}
-
-// @brief 実数値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiArrayElemPrimary::set_real(double v)
-{
-  eval_index();
-  mObj->set_real(mIndexValList, v);
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiArrayElemPrimary::set_bitvector(const BitVector& v)
-{
-  eval_index();
-  mObj->set_bitvector(mIndexValList, v);
-}  
-
-// @brief インデックスの値を計算する．
-bool
-EiArrayElemPrimary::eval_index() const
-{
-  ymuint32 n = mIndexList.size();
-  for (ymuint32 i = 0; i < n; ++ i) {
-    if ( !mIndexList[i]->eval_int(mIndexValList[i]) ) {
-      return false;
-    }
-  }
-  return true;
 }
 
 
@@ -611,7 +412,7 @@ EiScopePrimary::decompile_impl(int ppri) const
 {
   return mObj->name();
 }
-  
+
 // @brief 対象のオブジェクトを返す．
 const VlNamedObj*
 EiScopePrimary::scope_obj() const
@@ -627,7 +428,7 @@ EiScopePrimary::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }
-  
+
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -653,7 +454,7 @@ void
 EiScopePrimary::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
-}  
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -732,7 +533,7 @@ EiPrimitivePrimary::decompile_impl(int ppri) const
 {
   return mObj->name();
 }
-  
+
 // @brief 対象のオブジェクトを返す．
 const VlPrimitive*
 EiPrimitivePrimary::primitive_obj() const
@@ -748,7 +549,7 @@ EiPrimitivePrimary::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }
-  
+
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -774,6 +575,6 @@ void
 EiPrimitivePrimary::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
-}  
+}
 
 END_NAMESPACE_YM_VERILOG

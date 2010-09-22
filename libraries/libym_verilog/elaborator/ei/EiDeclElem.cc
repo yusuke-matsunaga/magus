@@ -11,6 +11,9 @@
 
 #include "EiFactory.h"
 #include "EiDeclElem.h"
+#include "ElbExpr.h"
+
+#include "ym_verilog/pt/PtBase.h"
 
 #include "ym_verilog/BitVector.h"
 
@@ -20,6 +23,21 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
+
+// @brief 宣言要素を生成する(配列の要素)．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] parent_array 親の配列
+// @param[in] index_list インデックスのリスト
+ElbDecl*
+EiFactory::new_DeclElem(const PtBase* pt_expr,
+			ElbDeclArray* parent_array,
+			const vector<ElbExpr*>& index_list)
+{
+  void* p = mAlloc.get_memory(sizeof(EiDeclElem));
+  ElbDecl* decl = new (p) EiDeclElem(pt_expr, parent_array, index_list);
+
+  return decl;
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -35,8 +53,7 @@ EiDeclElem::EiDeclElem(const PtBase* pt_expr,
 		       const vector<ElbExpr*>& index_list) :
   mPtExpr(pt_expr),
   mArray(parent_array),
-  mIndexList(index_list),
-  mIndexValList(index_list.size())
+  mIndexList(index_list)
 {
 }
 
@@ -49,13 +66,7 @@ EiDeclElem::~EiDeclElem()
 tVpiObjType
 EiDeclElem::type() const
 {
-  switch( mObj->type() ) {
-  case kVpiNetArray: return kVpiNet;
-  case kVpiRegArray: return kVpiReg;
-  default: assert_not_reached(__FILE__, __LINE__);
-  }
-  // ダミー
-  return kVpiNet;
+  return mArray->elem_type();
 }
 
 // @brief ファイル位置を返す．
@@ -84,13 +95,6 @@ tVpiValueType
 EiDeclElem::value_type() const
 {
   return mArray->value_type();
-}
-
-// @brief 定数値を持つ型のときに true を返す．
-bool
-EiDeclElem::is_consttype() const
-{
-  return false;
 }
 
 // @brief 符号の取得
@@ -187,7 +191,7 @@ EiDeclElem::drive1() const
 // @retval 電荷の強度
 // @retval kVpiNoStrength strength の指定なし
 tVpiStrength
-EiDeclElem::charge() const;
+EiDeclElem::charge() const
 {
   return mArray->charge();
 }
@@ -201,12 +205,161 @@ EiDeclElem::delay() const
   return mArray->delay();
 }
 
+// @brief 配列要素の時に true を返す．
+bool
+EiDeclElem::is_array_member() const
+{
+  return true;
+}
+
+// @brief 多次元の配列要素の時に true を返す．
+bool
+EiDeclElem::is_multi_array_member() const
+{
+  return mIndexList.size() > 1;
+}
+
+// @brief 配列要素の時に親の配列を返す．
+VlDecl*
+EiDeclElem::parent_array() const
+{
+  return mArray;
+}
+
+// @brief 1次元配列要素の時にインデックスを返す．
+const VlExpr*
+EiDeclElem::index() const
+{
+  return mIndexList[0];
+}
+
+// @brief 多次元配列要素の時にインデックスのリストを返す．
+// @param[out] index_list インデックスのリストを格納する変数
+void
+EiDeclElem::index(vector<const VlExpr*>& index_list) const
+{
+  index_list.clear();
+  ymuint n = mIndexList.size();
+  index_list.resize(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    index_list[i] = mIndexList[i];
+  }
+}
+
 // @brief 符号付きに補正する．
 // @note このクラスで呼ばれることはない．
 void
 EiDeclElem::set_signed()
 {
   assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief スカラー値を返す．
+tVpiScalarVal
+EiDeclElem::get_scalar() const
+{
+  ymuint offset = calc_offset();
+  return mArray->get_scalar(offset);
+}
+
+// @brief スカラー値を設定する．
+// @param[in] val 値
+void
+EiDeclElem::set_scalar(tVpiScalarVal val)
+{
+  ymuint offset = calc_offset();
+  mArray->set_scalar(offset, val);
+}
+
+// @brief 論理値を返す．
+tVpiScalarVal
+EiDeclElem::get_logic() const
+{
+  ymuint offset = calc_offset();
+  return mArray->get_logic(offset);
+}
+
+// @brief real 型の値を返す．
+double
+EiDeclElem::get_real() const
+{
+  ymuint offset = calc_offset();
+  return mArray->get_real(offset);
+}
+
+// @brief real 型の値を設定する．
+// @param[in] val 値
+void
+EiDeclElem::set_real(double val)
+{
+  ymuint offset = calc_offset();
+  mArray->set_real(offset, val);
+}
+
+// @brief bitvector 型の値を返す．
+// @param[out] val 値
+// @param[in] req_type 要求される型
+void
+EiDeclElem::get_bitvector(BitVector& val,
+			  tVpiValueType req_type) const
+{
+  ymuint offset = calc_offset();
+  mArray->get_bitvector(offset, val, req_type);
+}
+
+// @brief bitvector 型の値を設定する．
+// @param[in] val 値
+void
+EiDeclElem::set_bitvector(const BitVector& val)
+{
+  ymuint offset = calc_offset();
+  mArray->set_bitvector(offset, val);
+}
+
+// @brief ビット選択値を返す．
+// @param[in] index ビット位置
+tVpiScalarVal
+EiDeclElem::get_bitselect(int index) const
+{
+  ymuint offset = calc_offset();
+  return mArray->get_bitselect(offset, index);
+}
+
+// @brief ビット値を設定する．
+// @param[in] index ビット位置
+// @param[in] val 値
+void
+EiDeclElem::set_bitselect(int index,
+			  tVpiScalarVal val)
+{
+  ymuint offset = calc_offset();
+  mArray->set_bitselect(offset, index, val);
+}
+
+// @brief 範囲選択値を返す．
+// @param[in] left 範囲の MSB
+// @param[in] right 範囲の LSB
+// @param[out] val 値
+void
+EiDeclElem::get_partselect(int left,
+			   int right,
+			   BitVector& val) const
+{
+  ymuint offset = calc_offset();
+  mArray->get_partselect(offset, left, right, val);
+}
+
+// @brief 範囲値を設定する．
+// @param[in] left 範囲の MSB
+// @param[in] right 範囲の LSB
+// @param[in] val 値
+void
+EiDeclElem::set_partselect(int left,
+			   int right,
+			   const BitVector& val)
+{
+  ymuint offset = calc_offset();
+  mArray->set_partselect(offset, left, right, val);
 }
 
 // @brief 範囲のMSBの取得
@@ -227,126 +380,10 @@ EiDeclElem::_right_range() const
   return mArray->_right_range();
 }
 
-// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
-ymuint32
-EiDeclElem::declarray_dimension() const
+// @brief インデックス式を評価してオフセットを計算する．
+ymuint
+EiDeclElem::calc_offset() const
 {
-  return mIndexList.size();
-}
-
-// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
-const VlExpr*
-EiDeclElem::declarray_index(ymuint32 pos) const
-{
-  return mIndexList[pos];
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiDeclElem::eval_scalar() const
-{
-  eval_index();
-  return mObj->get_scalar(mIndexValList);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiDeclElem::eval_logic() const
-{
-  eval_index();
-  return mObj->get_scalar(mIndexValList);
-}
-
-// @brief real 型の値を返す．
-double
-EiDeclElem::eval_real() const
-{
-  eval_index();
-  return mObj->get_real(mIndexValList);
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiDeclElem::eval_bitvector(BitVector& bitvector,
-				   tVpiValueType req_type) const
-{
-  eval_index();
-  mObj->get_bitvector(mIndexValList, bitvector, req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiDeclElem::decompile_impl(int ppri) const
-{
-  string ans = mObj->name();
-  ans += decompile_index();
-  return ans;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiDeclElem::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
-// @brief インデックス部分を decompile する．
-string
-EiDeclElem::decompile_index() const
-{
-  ymuint32 n = mIndexList.size();
-  string ans;
-  for (ymuint32 i = 0; i < n; ++ i) {
-    ans += "[" + mIndexList[i]->decompile() + "]";
-  }
-  return ans;
-}
-
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiDeclElem::set_scalar(tVpiScalarVal v)
-{
-  eval_index();
-  mObj->set_scalar(mIndexValList, v);
-}
-
-// @brief 実数値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiDeclElem::set_real(double v)
-{
-  eval_index();
-  mObj->set_real(mIndexValList, v);
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiDeclElem::set_bitvector(const BitVector& v)
-{
-  eval_index();
-  mObj->set_bitvector(mIndexValList, v);
-}
-
-// @brief インデックスの値を計算する．
-bool
-EiDeclElem::eval_index() const
-{
-  ymuint32 n = mIndexList.size();
-  for (ymuint32 i = 0; i < n; ++ i) {
-    if ( !mIndexList[i]->eval_int(mIndexValList[i]) ) {
-      return false;
-    }
-  }
-  return true;
 }
 
 END_NAMESPACE_YM_VERILOG

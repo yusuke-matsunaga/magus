@@ -111,13 +111,13 @@ ExprGen::instantiate_namedevent_primary2(const VlNamedObj* parent,
 					 ElbDeclArray* decl_array)
 {
   // 添字の部分を実体化する．
-  vector<ElbExpr*> index_list;
+  ElbDecl* decl_elem;
   bool has_bit_select;
   bool has_range_select;
   ElbExpr* index1;
   ElbExpr* index2;
   bool stat = resolve2(parent, pt_expr, decl_array, NULL,
-		       index_list,
+		       decl_elem,
 		       has_range_select, has_bit_select,
 		       index1, index2);
   if ( !stat ) {
@@ -131,7 +131,7 @@ ExprGen::instantiate_namedevent_primary2(const VlNamedObj* parent,
     return NULL;
   }
 
-  return factory().new_Primary(pt_expr, decl_array, index_list);
+  return factory().new_Primary(pt_expr, decl_elem);
 }
 
 // @brief PtPrimary から ElbExpr を生成する．
@@ -473,13 +473,13 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
 				       const PtExpr* pt_expr,
 				       ElbDeclArray* decl_array)
 {
-  vector<ElbExpr*> index_list;
+  ElbDecl* decl_elem;
   bool has_range_select;
   bool has_bit_select;
   ElbExpr* index1;
   ElbExpr* index2;
   bool stat = resolve2(parent, pt_expr, decl_array, NULL,
-		       index_list,
+		       decl_elem,
 		       has_range_select, has_bit_select,
 		       index1, index2);
   if ( !stat ) {
@@ -487,15 +487,14 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
     return NULL;
   }
 
-  tVpiObjType type = decl_array->elem_type();
+  tVpiObjType type = decl_elem->type();
   if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
     error_illegal_object(pt_expr);
     return NULL;
   }
 
   if ( has_bit_select ) {
-    return factory().new_BitSelect(pt_expr, decl_array, index_list,
-				   index1);
+    return factory().new_BitSelect(pt_expr, decl_elem, index1);
   }
   if ( has_range_select ) {
     switch ( pt_expr->range_mode() ) {
@@ -509,7 +508,7 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, index2_val) ) {
 	  return NULL;
 	}
-	return factory().new_PartSelect(pt_expr, decl_array, index_list,
+	return factory().new_PartSelect(pt_expr, decl_elem,
 					index1, index2,
 					index1_val, index2_val);
       }
@@ -520,7 +519,7 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_PlusPartSelect(pt_expr, decl_array, index_list,
+	return factory().new_PlusPartSelect(pt_expr, decl_elem,
 					    index1, index2, range_val);
       }
 
@@ -530,7 +529,7 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_MinusPartSelect(pt_expr, decl_array, index_list,
+	return factory().new_MinusPartSelect(pt_expr, decl_elem,
 					     index1, index2, range_val);
       }
 
@@ -539,7 +538,7 @@ ExprGen::instantiate_declarray_primary(const VlNamedObj* parent,
       break;
     }
   }
-  return factory().new_Primary(pt_expr, decl_array, index_list);
+  return factory().new_Primary(pt_expr, decl_elem);
 }
 
 // @brief parameter 宣言用のプライマリ式を生成する．
@@ -851,13 +850,13 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
   }
 
   // 添字の部分を実体化する．
-  vector<ElbExpr*> index_list;
+  ElbDecl* decl_elem;
   bool has_range_select;
   bool has_bit_select;
   ElbExpr* index1;
   ElbExpr* index2;
   bool stat = resolve2(parent, pt_expr, decl_array, NULL,
-		       index_list,
+		       decl_elem,
 		       has_range_select, has_bit_select,
 		       index1, index2);
   if ( !stat ) {
@@ -865,7 +864,7 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
     return NULL;
   }
 
-  tVpiObjType type = decl_array->elem_type();
+  tVpiObjType type = decl_elem->type();
   // かなり野暮ったいコード
   // でも変に凝るよりシンプルのほうがいいでしょ．
   if ( env.is_net_lhs() ) {
@@ -887,8 +886,7 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
   }
 
   if ( has_bit_select ) {
-    return factory().new_BitSelect(pt_expr, decl_array, index_list,
-				   index1);
+    return factory().new_BitSelect(pt_expr, decl_elem, index1);
   }
   if ( has_range_select ) {
     switch ( pt_expr->range_mode() ) {
@@ -902,7 +900,7 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, index2_val) ) {
 	  return NULL;
 	}
-	return factory().new_PartSelect(pt_expr, decl_array, index_list,
+	return factory().new_PartSelect(pt_expr, decl_elem,
 					index1, index2,
 					index1_val, index2_val);
       }
@@ -913,7 +911,7 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_PlusPartSelect(pt_expr, decl_array, index_list,
+	return factory().new_PlusPartSelect(pt_expr, decl_elem,
 					    index1, index2, range_val);
       }
 
@@ -923,7 +921,7 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
 	if ( !expr_to_int(index2, range_val) ) {
 	  return NULL;
 	}
-	return factory().new_MinusPartSelect(pt_expr, decl_array, index_list,
+	return factory().new_MinusPartSelect(pt_expr, decl_elem,
 					     index1, index2, range_val);
       }
 
@@ -933,7 +931,7 @@ ExprGen::instantiate_declarray_lhs(const VlNamedObj* parent,
     }
   }
 
-  return factory().new_Primary(pt_expr, decl_array, index_list);
+  return factory().new_Primary(pt_expr, decl_elem);
 }
 
 // @brief genvar に対応した定数を生成する．
@@ -1211,25 +1209,25 @@ ExprGen::resolve1(const VlNamedObj* parent,
 // @brief 添字の部分を実体化する．(配列要素のオブジェクト用)
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-// @param[in] obj 対象の配列型オブジェクト
+// @param[in] array_obj 対象の配列型オブジェクト
 // @param[in] func 親の function
-// @param[out] index_list インデックス式のリスト
+// @param[out] decl_elem 配列要素
 // @param[out] has_range_select 範囲指定を持っていたら true を返す．
 // @param[out] has_bit_select ビット指定を持っていたら true を返す．
 // @param[out] index1, index2 範囲指定/ビット指定の式を返す．
 bool
 ExprGen::resolve2(const VlNamedObj* parent,
 		  const PtExpr* pt_expr,
-		  VlDecl* decl,
+		  ElbDeclArray* array_obj,
 		  const VlNamedObj* func,
-		  vector<ElbExpr*>& index_list,
+		  ElbDecl*& decl_elem,
 		  bool& has_range_select,
 		  bool& has_bit_select,
 		  ElbExpr*& index1,
 		  ElbExpr*& index2)
 {
   // 配列の次元
-  ymuint dsize = decl->dimension();
+  ymuint dsize = array_obj->dimension();
 
   // プライマリ式の次元 (ビット指定を含んでいる可能性あり)
   ymuint isize = pt_expr->index_num();
@@ -1250,13 +1248,11 @@ ExprGen::resolve2(const VlNamedObj* parent,
     return false;
   }
 
-  index_list.clear();
-  index_list.reserve(dsize);
-
   index1 = NULL;
   index2 = NULL;
 
-  bool const_mode = pt_expr->is_const_index() || decl->is_consttype();
+  vector<ElbExpr*> index_list(dsize);
+  bool const_mode = pt_expr->is_const_index();
   for (ymuint i = 0; i < isize; ++ i) {
     const PtExpr* pt_expr1 = pt_expr->index(i);
     ElbExpr* expr1;
@@ -1283,13 +1279,13 @@ ExprGen::resolve2(const VlNamedObj* parent,
   }
 
   if ( has_bit_select ) {
-    if ( decl->value_type() == kVpiValueReal ) {
+    if ( array_obj->value_type() == kVpiValueReal ) {
       error_select_for_real(pt_expr);
       return false;
     }
   }
   else if ( has_range_select ) {
-    if ( decl->value_type() == kVpiValueReal ) {
+    if ( array_obj->value_type() == kVpiValueReal ) {
       error_select_for_real(pt_expr);
       return false;
     }
@@ -1314,6 +1310,7 @@ ExprGen::resolve2(const VlNamedObj* parent,
     }
   }
 
+  decl_elem = factory().new_DeclElem(pt_expr, array_obj, index_list);
   return true;
 }
 
