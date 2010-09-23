@@ -11,8 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_verilog/vl/VlDecl.h"
-#include "ElbFwd.h"
+#include "ElbDecl.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -113,7 +112,7 @@ public:
 /// IEEE Std 1364-2001 26.6.12 Parameter, specparam
 //////////////////////////////////////////////////////////////////////
 class ElbParameter :
-  public VlDecl
+  public ElbDecl
 {
   friend class CellParam;
 
@@ -151,18 +150,6 @@ public:
   bool
   is_signed() const = 0;
 
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  virtual
-  const VlExpr*
-  left_range() const;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  virtual
-  const VlExpr*
-  right_range() const;
-
   /// @brief ビット要素を返す．
   /// @param[in] index インデックス
   /// @retval ビット要素 index が範囲内の場合
@@ -191,7 +178,7 @@ public:
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
-  /// @note クラスでは kVpiNone を返す．
+  /// @note このクラスでは kVpiNone を返す．
   virtual
   tVpiNetType
   net_type() const;
@@ -200,7 +187,7 @@ public:
   /// @retval kVpiVsNone vectored|scalared 指定なし
   /// @retval kVpiVectored vectored 指定あり
   /// @retval kVpiScalared scalared 指定あり
-  /// @note クラスでは kVpiVsNone を返す．
+  /// @note このクラスでは kVpiVsNone を返す．
   virtual
   tVpiVsType
   vs_type() const;
@@ -208,7 +195,7 @@ public:
   /// @brief drive0 strength の取得
   /// @retval 0 の強度
   /// @retval kVpiNoStrength strength の指定なし
-  /// @note クラスでは kVpiNoStrength を返す．
+  /// @note このクラスでは kVpiNoStrength を返す．
   virtual
   tVpiStrength
   drive0() const;
@@ -238,11 +225,13 @@ public:
   delay() const;
 
   /// @brief 配列型オブジェクトの時に true を返す．
+  /// @note このクラスでは NULL を返す．
   virtual
   bool
   is_array() const;
 
   /// @brief 多次元の配列型オブジェクトの時に true を返す．
+  /// @note このクラスでは NULL を返す．
   virtual
   bool
   is_multi_array() const;
@@ -267,16 +256,19 @@ public:
   is_array_member() const;
 
   /// @brief 多次元の配列要素の時に true を返す．
+  /// @note このクラスでは false を返す．
   virtual
   bool
   is_multi_array_member() const;
 
   /// @brief 配列要素の時に親の配列を返す．
+  /// @note このクラスでは NULL を返す．
   virtual
   VlDecl*
   parent_array() const;
 
   /// @brief 1次元配列要素の時にインデックスを返す．
+  /// @note このクラスでは NULL を返す．
   virtual
   const VlExpr*
   index() const;
@@ -290,6 +282,59 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // ElbDecl の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 符号付きに補正する．
+  /// @note このクラスでは何もしない．
+  virtual
+  void
+  set_signed();
+
+  /// @brief スカラー値を設定する．
+  /// @param[in] val 値
+  /// @note このクラスでは何もしない．
+  virtual
+  void
+  set_scalar(tVpiScalarVal val);
+
+  /// @brief real 型の値を設定する．
+  /// @param[in] val 値
+  /// @note このクラスでは何もしない．
+  virtual
+  void
+  set_real(double val);
+
+  /// @brief bitvector 型の値を設定する．
+  /// @param[in] val 値
+  /// @note このクラスでは何もしない．
+  virtual
+  void
+  set_bitvector(const BitVector& val);
+
+  /// @brief ビット値を設定する．
+  /// @param[in] index ビット位置
+  /// @param[in] val 値
+  /// @note このクラスでは何もしない．
+  virtual
+  void
+  set_bitselect(int index,
+		tVpiScalarVal val);
+
+  /// @brief 範囲値を設定する．
+  /// @param[in] left 範囲の MSB
+  /// @param[in] right 範囲の LSB
+  /// @param[in] val 値
+  /// @note このクラスでは何もしない．
+  virtual
+  void
+  set_partselect(int left,
+		 int right,
+		 const BitVector& val);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // ElbParameter の仮想関数
   //////////////////////////////////////////////////////////////////////
 
@@ -298,79 +343,6 @@ public:
   virtual
   void
   set_expr(ElbExpr* expr) = 0;
-
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _left_range() const = 0;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _right_range() const = 0;
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const = 0;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const = 0;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const = 0;
-
-  /// @brief 論理値を返す．
-  virtual
-  bool
-  eval_bool() const = 0;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const = 0;
-
-  /// @brief VlTime 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return VlTime 値に変換できたら true を返す．
-  virtual
-  bool
-  eval_time(VlTime& val) const = 0;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const = 0;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbParameter の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 次の要素を返す．
-  const ElbParameter*
-  next() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 次の要素を指すポインタ
-  ElbParameter* mNext;
 
 };
 
@@ -393,8 +365,7 @@ ElbParamHead::~ElbParamHead()
 
 // @brief コンストラクタ
 inline
-ElbParameter::ElbParameter() :
-  mNext(NULL)
+ElbParameter::ElbParameter()
 {
 }
 
@@ -402,14 +373,6 @@ ElbParameter::ElbParameter() :
 inline
 ElbParameter::~ElbParameter()
 {
-}
-
-// @brief 次の要素を返す．
-inline
-const ElbParameter*
-ElbParameter::next() const
-{
-  return mNext;
 }
 
 END_NAMESPACE_YM_VERILOG

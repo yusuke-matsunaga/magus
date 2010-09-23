@@ -75,7 +75,7 @@ ElbMgr::clear()
   mAttrHash.clear();
   mTopLevel = NULL;
 }
-  
+
 // @brief UDP 定義のリストを返す．
 const list<const VlUdpDefn*>&
 ElbMgr::udp_list() const
@@ -97,7 +97,7 @@ ElbMgr::find_udp(const char* name) const
   }
   return p->second;
 }
-  
+
 // @brief UDP を登録する．
 // @param[in] def_name 定義名
 // @param[in] udp 登録する UDP
@@ -221,6 +221,7 @@ ElbMgr::reg_declarray(int tag,
   }
 }
 
+#if 0
 // @brief parameter 宣言を登録する．
 // @param[in] obj 登録するオブジェクト
 void
@@ -236,7 +237,8 @@ ElbMgr::reg_parameter(ElbParameter* obj)
   mObjDict.add(obj);
   mTagDict.add_parameter(obj);
 }
-  
+#endif
+
 // @brief defparam を登録する．
 // @param[in] obj 登録するオブジェクト
 void
@@ -252,7 +254,7 @@ ElbMgr::reg_paramassign(ElbParamAssign* obj)
 {
   mTagDict.add_paramassign(obj);
 }
-  
+
 // @brief モジュール配列を登録する．
 // @param[in] obj 登録するオブジェクト
 void
@@ -268,7 +270,7 @@ ElbMgr::reg_modulearray(ElbModuleArray* obj)
   mObjDict.add(obj);
   mTagDict.add_modulearray(obj);
 }
-  
+
 // @brief モジュールを登録する．
 void
 ElbMgr::reg_module(ElbModule* obj)
@@ -287,7 +289,7 @@ ElbMgr::reg_module(ElbModule* obj)
     mTopmoduleList.push_back(obj);
   }
 }
-      
+
 // @brief プリミティブ配列を登録する．
 // @param[in] obj 登録するオブジェクト
 void
@@ -305,7 +307,7 @@ ElbMgr::reg_primarray(ElbPrimArray* obj)
   }
   mTagDict.add_primarray(obj);
 }
-  
+
 // @brief プリミティブを登録する．
 // @param[in] obj 登録するオブジェクト
 void
@@ -371,7 +373,7 @@ ElbMgr::reg_process(ElbProcess* obj)
 {
   mTagDict.add_process(obj);
 }
-  
+
 // @brief gfroot を登録する．
 // @param[in] obj 登録するオブジェクト
 void
@@ -386,7 +388,7 @@ ElbMgr::reg_gfroot(ElbGfRoot* obj)
   }
   mObjDict.add(obj);
 }
-  
+
 // @brief genvar を登録する．
 // @param[in] obj 登録するオブジェクト
 void
@@ -441,12 +443,12 @@ ElbMgr::find_obj(const VlNamedObj* scope,
     // なければ NULL を返す。
     return NULL;
   }
-  
+
   if ( debug & debug_find_scope ) {
     dout << "--> Found"
 	 << endl << endl;
   }
-  
+
   return handle;
 }
 
@@ -563,7 +565,7 @@ ElbMgr::find_scope_up(const VlNamedObj* base_scope,
   if ( debug & debug_find_scope ) {
     dout << "--> Found: " << cur_scope->full_name() << endl << endl;
   }
-  
+
   return cur_scope;
 }
 

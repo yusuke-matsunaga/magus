@@ -384,6 +384,7 @@ EiDeclElem::_right_range() const
 ymuint
 EiDeclElem::calc_offset() const
 {
+  return mArray->calc_offset(mIndexList);
 }
 
 END_NAMESPACE_YM_VERILOG

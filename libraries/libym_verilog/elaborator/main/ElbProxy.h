@@ -45,7 +45,7 @@ protected:
 
   /// @brief デストラクタ
   ~ElbProxy();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ public:
        ExprGen* expr_gen,
        AttrGen* attr_gen);
 
-  
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // コンパイルオプション
@@ -77,26 +77,26 @@ protected:
   bool
   allow_empty_io_range();
 
-  
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // 検索用の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前から UDP 定義を取出す．
   /// @param[in] name 名前
   /// @return name という名の UDP を返す．
   /// @return なければ NULL を返す．
   const ElbUdpDefn*
   find_udp(const char* name) const;
-  
+
   /// @brief 名前から UserSystf を取出す．
   /// @param[in] name 名前
   /// @return name という名のユーザー定義関数を返す．
   /// @return なければ NULL を返す．
   const ElbUserSystf*
   find_user_systf(const char* name) const;
-  
+
   /// @brief スコープと名前から名前付き要素を取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[in] name 名前
@@ -105,7 +105,7 @@ protected:
   ElbObjHandle*
   find_obj(const VlNamedObj* parent,
 	   const char* name) const;
-  
+
   /// @brief 名前によるオブジェクトの探索
   /// @param[in] base_scope 起点となるスコープ
   /// @param[in] nb_array 階層名の上部 (NULL の場合も有りうる)
@@ -118,14 +118,14 @@ protected:
 	      PtNameBranchArray nb_array,
 	      const char* name,
 	      const VlNamedObj* ulimit);
-  
+
   /// @brief 名前からモジュール定義を取り出す．
   /// @param[in] name 名前
   /// @return name という名のモジュール定義
   /// @return なければ NULL を返す．
   const PtModule*
   find_moduledef(const char* name) const;
-  
+
   /// @brief constant function を取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[in] name 名前
@@ -134,109 +134,104 @@ protected:
   const ElbTaskFunc*
   find_constant_function(const VlNamedObj* parent,
 			 const char* name) const;
-  
+
   /// @brief パース木の属性定義から属性リストを取り出す．
   /// @param[in] pt_attr パース木の属性定義
   ElbAttrList*
   find_attr_list(const PtAttrInst* pt_attr) const;
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
   // 要素を登録する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief UDP を登録する．
   /// @param[in] def_name 定義名
   /// @param[in] udp 登録する UDP
   void
   reg_udp(const char* def_name,
 	  const ElbUdpDefn* udp);
-  
+
   /// @brief generate block を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_genblock(ElbScope* obj);
-  
+
   /// @brief block scope を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_blockscope(ElbScope* obj);
-  
+
   /// @brief タスクを登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_task(ElbTaskFunc* obj);
-  
+
   /// @brief 関数を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_function(ElbTaskFunc* obj);
-  
+
   /// @brief 宣言要素を登録する．
   /// @param[in] tag タグ
   /// @param[in] obj 登録するオブジェクト
   void
   reg_decl(int tag,
 	   ElbDecl* obj);
-  
+
   /// @brief 配列型の宣言要素を登録する．
   /// @param[in] tag タグ
   /// @param[in] obj 登録するオブジェクト
   void
   reg_declarray(int tag,
 		ElbDeclArray* obj);
-  
-  /// @brief parameter 宣言を登録する．
-  /// @param[in] obj 登録するオブジェクト
-  void
-  reg_parameter(ElbParameter* obj);
-  
+
   /// @brief モジュール配列を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_modulearray(ElbModuleArray* obj);
-  
+
   /// @brief ElbModule を登録する．
   /// @param[in] module 登録するモジュール
   void
   reg_module(ElbModule* module);
-    
+
   /// @brief プリミティブ配列を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_primarray(ElbPrimArray* obj);
-  
+
   /// @brief プリミティブを登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_primitive(ElbPrimitive* obj);
-  
+
   /// @brief defparam を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_defparam(ElbDefParam* obj);
-  
+
   /// @brief paramassign を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_paramassign(ElbParamAssign* obj);
-  
+
   /// @brief continuous assignment を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_contassign(ElbContAssign* obj);
-  
+
   /// @brief process を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_process(ElbProcess* obj);
-  
+
   /// @brief genvar を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_genvar(ElbGenvar* obj);
-  
+
   /// @brief gfroot を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
@@ -272,7 +267,7 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // elaboration で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 後で処理する defparam 文を登録する．
   /// @param[in] header アイテムテンプレートのヘッダ (defparam を持つ)
   void
@@ -293,7 +288,7 @@ protected:
   /// @param[in] stub phase3 で行う処理を表すスタブ
   void
   add_phase3stub(ElbStub* stub);
-  
+
   /// @brief 1引数版の ElbStub を作る．
   template<typename T,
 	   typename A>
@@ -301,7 +296,7 @@ protected:
   make_stub(T* obj,
 	    void (T::*memfunc)(A),
 	    A a);
-  
+
   /// @brief 2引数版の ElbStub を作る．
   template<typename T,
 	   typename A,
@@ -311,7 +306,7 @@ protected:
 	    void (T::*memfunc)(A, B),
 	    A a,
 	    B b);
-  
+
   /// @brief 3引数版の ElbStub を作る．
   template<typename T,
 	   typename A,
@@ -323,7 +318,7 @@ protected:
 	    A a,
 	    B b,
 	    C c);
-  
+
   /// @brief 4引数版の ElbStub を作る．
   template<typename T,
 	   typename A,
@@ -502,7 +497,7 @@ protected:
 		  const ElbEnv& env,
 		  const PtExpr* pt_expr,
 		  ElbExpr* lhs);
-  
+
   /// @brief 範囲を表す式を生成
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_left 範囲のMSBを表すパース木
@@ -519,7 +514,7 @@ protected:
 		    ElbExpr*& right,
 		    int& left_val,
 		    int& right_val);
-  
+
   /// @brief PtExpr(primary) から named_event を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -572,7 +567,7 @@ protected:
   evaluate_expr_bitvector(const VlNamedObj* parent,
 			  const PtExpr* pt_expr,
 			  BitVector& value);
-  
+
   /// @brief 式を int 値に変換する．
   /// @return 変換に成功したら true を返す．
   /// @note 変換に失敗したらエラーメッセージを出力する．
@@ -580,12 +575,12 @@ protected:
   expr_to_int(ElbExpr* expr,
 	      int& val);
 
-  
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // attribute instance の生成関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief PtAttrInst から属性リストを生成し，オブジェクトに付加する．
   /// @param[in] pt_attr 属性を表すパース木
   /// @param[in] def 定義側の属性の時 true とするフラグ
@@ -594,7 +589,7 @@ protected:
   instantiate_attribute(PtAttrInstArray pt_attr_array,
 			bool def,
 			const VlObj* obj);
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -615,7 +610,7 @@ protected:
 	  tMsgType type,
 	  const char* label,
 	  const char* msg);
-  
+
   /// @brief メッセージを出力する．
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
@@ -631,29 +626,29 @@ protected:
 	  const char* label,
 	  const string& msg);
 
-  
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // メンバへのアクセス
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ファクトリオブジェクトを得る．
   ElbFactory&
   factory();
-  
+
   /// @brief メッセージマネージャを得る．
   MsgMgr&
   msg_mgr();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 本当の生成器
   Elaborator& mElaborator;
-  
+
   // 生成したオブジェクトを管理するマネージャクラス
   ElbMgr& mMgr;
 
@@ -677,14 +672,14 @@ private:
 
   // attribute instance 生成用のオブジェクト
   AttrGen* mAttrGen;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 名前から UDP 定義を取出す．
 // @param[in] name 名前
 // @return name という名の UDP を返す．
@@ -695,7 +690,7 @@ ElbProxy::find_udp(const char* name) const
 {
   return mMgr.find_udp(name);
 }
-  
+
 // @brief 名前から UserSystf を取出す．
 // @param[in] name 名前
 // @return name という名のユーザー定義関数を返す．
@@ -719,7 +714,7 @@ ElbProxy::find_obj(const VlNamedObj* parent,
 {
   return mMgr.find_obj(parent, name);
 }
-  
+
 // @brief 名前によるオブジェクトの探索
 // @param[in] base_scope 起点となるスコープ
 // @param[in] nb_array 階層名の上部 (NULL の場合も有りうる)
@@ -805,15 +800,6 @@ ElbProxy::reg_declarray(int tag,
 {
   mMgr.reg_declarray(tag, obj);
 }
-  
-// @brief parameter 宣言を登録する．
-// @param[in] obj 登録するオブジェクト
-inline
-void
-ElbProxy::reg_parameter(ElbParameter* obj)
-{
-  mMgr.reg_parameter(obj);
-}
 
 // @brief モジュール配列を登録する．
 // @param[in] obj 登録するオブジェクト
@@ -823,7 +809,7 @@ ElbProxy::reg_modulearray(ElbModuleArray* obj)
 {
   mMgr.reg_modulearray(obj);
 }
-  
+
 // @brief モジュールを登録する．
 // @param[in] module 登録するモジュール
 inline
@@ -841,7 +827,7 @@ ElbProxy::reg_primarray(ElbPrimArray* obj)
 {
   mMgr.reg_primarray(obj);
 }
-  
+
 // @brief プリミティブを登録する．
 // @param[in] obj 登録するオブジェクト
 inline
@@ -850,7 +836,7 @@ ElbProxy::reg_primitive(ElbPrimitive* obj)
 {
   mMgr.reg_primitive(obj);
 }
-  
+
 // @brief defparam を登録する．
 // @param[in] obj 登録するオブジェクト
 inline
@@ -915,7 +901,7 @@ ElbProxy::find_moduledef(const char* name) const
 {
   return mElaborator.find_moduledef(name);
 }
-  
+
 // @brief constant function を取り出す．
 // @param[in] parent 検索対象のスコープ
 // @param[in] name 名前
@@ -941,7 +927,7 @@ ElbProxy::reg_constant_function(const VlNamedObj* parent,
 {
   mElaborator.reg_constant_function(parent, name, func);
 }
-  
+
 // @brief パース木の属性定義から属性リストを取り出す．
 // @param[in] pt_attr パース木の属性定義
 inline
@@ -974,7 +960,7 @@ ElbProxy::reg_attr(const VlObj* obj,
 {
   mMgr.reg_attr(obj, def, attr_list);
 }
-  
+
 // @brief 後で処理する defparam 文を登録する．
 // @param[in] module 親のモジュール
 // @param[in] pt_head アイテムテンプレートのヘッダ (defparam を持つ)
@@ -1039,7 +1025,7 @@ ElbProxy::put_msg(const char* src_file,
 {
   return msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
 }
-  
+
 // @brief メッセージを出力する．
 // @param[in] src_file この関数を読んでいるソースファイル名
 // @param[in] src_line この関数を読んでいるソースの行番号
@@ -1058,7 +1044,7 @@ ElbProxy::put_msg(const char* src_file,
 {
   return msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
 }
-  
+
 // @brief メッセージマネージャを得る．
 inline
 MsgMgr&
@@ -1084,7 +1070,7 @@ ElbProxy::make_stub(T* obj,
   void* p = mElaborator.mAlloc.get_memory(sizeof(ElbStubT1<T, A>));
   return new (p) ElbStubT1<T, A>(obj, memfunc, a);
 }
-  
+
 // @brief 2引数版の ElbStub を作る．
 template<typename T,
 	 typename A,
@@ -1099,7 +1085,7 @@ ElbProxy::make_stub(T* obj,
   void* p = mElaborator.mAlloc.get_memory(sizeof(ElbStubT2<T, A, B>));
   return new (p) ElbStubT2<T, A, B>(obj, memfunc, a, b);
 }
-  
+
 // @brief 3引数版の ElbStub を作る．
 template<typename T,
 	 typename A,
@@ -1116,7 +1102,7 @@ ElbProxy::make_stub(T* obj,
   void* p = mElaborator.mAlloc.get_memory(sizeof(ElbStubT3<T, A, B, C>));
   return new (p) ElbStubT3<T, A, B, C>(obj, memfunc, a, b, c);
 }
-  
+
 // @brief 4引数版の ElbStub を作る．
 template<typename T,
 	 typename A,

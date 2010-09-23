@@ -59,7 +59,7 @@ public:
   phase1_module_item(ElbModule* module,
 		     const PtModule* pt_module,
 		     const ElbParamCon* param_con);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -79,15 +79,6 @@ private:
   void
   phase2_module_item(ElbModule* module,
 		     const PtModule* pt_module);
-
-#if 0
-  /// @brief モジュール用のIO宣言要素をインスタンス化する．
-  /// @param[in] modle モジュール
-  /// @param[in] pt_module パース木のモジュール定義
-  void
-  instantiate_iodecl(ElbModule* module,
-		     const PtModule* pt_module);
-#endif
 
   /// @brief port の生成を行う．
   /// @param[in] module 親のモジュール

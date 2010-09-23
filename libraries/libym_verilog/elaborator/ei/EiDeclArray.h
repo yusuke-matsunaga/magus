@@ -222,9 +222,9 @@ protected:
   elem_type() const;
 
   /// @brief インデックスからオフセットを計算する．
-  /// @param[in] index_array インデックスの配列
+  /// @param[in] index_array インデックス式の配列
   ymuint
-  calc_offset(const vector<int>& index_array) const;
+  calc_offset(const vector<ElbExpr*>& index_array) const;
 
 
 private:

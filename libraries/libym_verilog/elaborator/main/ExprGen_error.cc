@@ -216,7 +216,7 @@ ExprGen::error_illegal_object(const PtExpr* pt_expr)
 		   "ELABXXX",
 		   "Illegal object type.");
 }
-  
+
 // @brief オブジェクトの型が constant function 用として不適切だった
 // @param[in] pt_expr 式を表すパース木
 void
@@ -258,7 +258,7 @@ ExprGen::error_not_a_parameter(const PtExpr* pt_expr)
 		   "ELABXXX",
 		   "Not a parameter.");
 }
-  
+
 // @brief オブジェクトが named-event でなかった
 // @param[in] pt_expr 式を表すパース木
 void
@@ -267,6 +267,15 @@ ExprGen::error_not_a_namedevent(const PtExpr* pt_expr)
   error_with_hname(pt_expr,
 		   "ELABXXX",
 		   "Not a named-event.");
+}
+
+// @brief named-event に対する範囲指定
+void
+ExprGen::error_select_for_namedevent(const PtExpr* pt_expr)
+{
+  error_with_hname(pt_expr,
+		   "ELABXXX",
+		   "Illegal part-select for a named-event.");
 }
 
 // @brief assign/deassign に不適切なビット/範囲指定

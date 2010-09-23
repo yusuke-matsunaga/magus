@@ -385,10 +385,6 @@ public:
   index(ymuint offset,
 	vector<int>& index_array) const;
 
-  /// @brief インデックスからオフセットを得る
-  ymuint
-  offset(const vector<int>& index_array) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////

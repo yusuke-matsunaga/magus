@@ -282,7 +282,7 @@ EiParamBitSelect::eval_scalar() const
   int bpos;
   if ( index()->eval_int(bpos) ) {
     BitVector bv;
-    mObj->eval_bitvector(bv);
+    mObj->get_bitvector(bv);
     return bv.bit_select(bpos);
   }
   // ビット指定が X/Z の時は X を返す．

@@ -311,6 +311,7 @@ EiRangeArray::index(ymuint offset,
   }
 }
 
+#if 0
 // @brief インデックスからオフセットを得る
 ymuint
 EiRangeArray::offset(const vector<int>& index_array) const
@@ -337,5 +338,6 @@ EiRangeArray::offset(const vector<int>& index_array) const
   }
   return offset;
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG

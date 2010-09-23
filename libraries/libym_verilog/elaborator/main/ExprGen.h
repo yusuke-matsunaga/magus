@@ -298,19 +298,6 @@ private:
 			   const PtExpr* pt_expr,
 			   ElbDecl* decl);
 
-  /// @brief 配列要素用のプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl_array 対象の配列
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_declarray_primary(const VlNamedObj* parent,
-				const ElbEnv& env,
-				const PtExpr* pt_expr,
-				ElbDeclArray* decl_array);
-
   /// @brief parameter 宣言用のプライマリ式を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] env 生成時の環境
@@ -324,32 +311,6 @@ private:
 			    const PtExpr* pt_expr,
 			    ElbParameter* param);
 
-  /// @brief 宣言要素の左辺式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 対象の宣言要素
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_decl_lhs(const VlNamedObj* parent,
-		       const ElbEnv& env,
-		       const PtExpr* pt_expr,
-		       ElbDecl* decl);
-
-  /// @brief 配列要素の左辺式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl_array 対象の配列
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_declarray_lhs(const VlNamedObj* parent,
-			    const ElbEnv& env,
-			    const PtExpr* pt_expr,
-			    ElbDeclArray* decl_array);
-
   /// @brief genvar に対応した定数を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -359,6 +320,35 @@ private:
   instantiate_genvar(const VlNamedObj* parent,
 		     const PtExpr* pt_expr,
 		     int val);
+
+  /// @brief 宣言要素のインスタンス化を行う．
+  /// @param[in] handle オブジェクトハンドル
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] func 親の function
+  ElbDecl*
+  instantiate_decl(ElbObjHandle* handle,
+		   const VlNamedObj* parent,
+		   const PtExpr* pt_expr,
+		   const VlNamedObj* func);
+
+  /// @brief 添字の部分を取り出す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] decl 対象のオブジェクト
+  /// @param[in] func 親の function
+  /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
+  /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
+  /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
+  bool
+  instantiate_index(const VlNamedObj* parent,
+		    const PtExpr* pt_expr,
+		    VlDecl* decl,
+		    const VlNamedObj* func,
+		    bool& has_range_select,
+		    bool& has_bit_select,
+		    ElbExpr*& index1,
+		    ElbExpr*& index2);
 
   /// @brief 式の値を評価する．
   /// @param[in] parent 親のスコープ
@@ -394,44 +384,6 @@ private:
   ElbValue
   evaluate_primary(const VlNamedObj* parent,
 		   const PtExpr* pt_expr);
-
-  /// @brief 添字の部分を実体化する．(単体のオブジェクト用)
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] obj 対象のオブジェクト
-  /// @param[in] func 親の function
-  /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
-  /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
-  /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
-  bool
-  resolve1(const VlNamedObj* parent,
-	   const PtExpr* pt_expr,
-	   VlDecl* obj,
-	   const VlNamedObj* func,
-	   bool& has_range_select,
-	   bool& has_bit_select,
-	   ElbExpr*& index1,
-	   ElbExpr*& index2);
-
-  /// @brief 添字の部分を実体化する．(配列要素のオブジェクト用)
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] array_obj 対象の配列型オブジェクト
-  /// @param[in] func 親の function
-  /// @param[out] decl_elem 配列要素
-  /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
-  /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
-  /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
-  bool
-  resolve2(const VlNamedObj* parent,
-	   const PtExpr* pt_expr,
-	   ElbDeclArray* array_obj,
-	   const VlNamedObj* func,
-	   ElbDecl*& decl_elem,
-	   bool& has_range_select,
-	   bool& has_bit_select,
-	   ElbExpr*& index1,
-	   ElbExpr*& index2);
 
 
 private:
@@ -563,6 +515,10 @@ private:
   /// @param[in] pt_expr 式を表すパース木
   void
   error_not_a_namedevent(const PtExpr* pt_expr);
+
+  /// @brief named-event に対する範囲指定
+  void
+  error_select_for_namedevent(const PtExpr* pt_expr);
 
   /// @brief assign/deassign に不適切なビット/範囲指定
   /// @param[in] pt_expr 式を表すパース木

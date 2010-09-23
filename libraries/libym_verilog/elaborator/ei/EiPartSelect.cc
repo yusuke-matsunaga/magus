@@ -343,7 +343,7 @@ EiParamPartSelect::eval_bitvector(BitVector& bitvector,
 			     tVpiValueType req_type) const
 {
   BitVector bv;
-  mObj->eval_bitvector(bv);
+  mObj->get_bitvector(bv);
   bv.part_select(left_range_val(), right_range_val(), bitvector);
   bitvector.coerce(req_type);
 }

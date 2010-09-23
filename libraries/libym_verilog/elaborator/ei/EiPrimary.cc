@@ -266,21 +266,21 @@ EiParamPrimary::decl_obj() const
 tVpiScalarVal
 EiParamPrimary::eval_scalar() const
 {
-  return mObj->eval_scalar();
+  return mObj->get_scalar();
 }
 
 // @brief 論理値を返す．
 tVpiScalarVal
 EiParamPrimary::eval_logic() const
 {
-  return mObj->eval_logic();
+  return mObj->get_logic();
 }
 
 // @brief real 型の値を返す．
 double
 EiParamPrimary::eval_real() const
 {
-  return mObj->eval_real();
+  return mObj->get_real();
 }
 
 // @brief bitvector 型の値を返す．
@@ -288,7 +288,7 @@ void
 EiParamPrimary::eval_bitvector(BitVector& bitvector,
 			       tVpiValueType req_type) const
 {
-  mObj->eval_bitvector(bitvector, req_type);
+  mObj->get_bitvector(bitvector, req_type);
 }
 
 // @brief decompile() の実装関数

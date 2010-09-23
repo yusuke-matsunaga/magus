@@ -55,7 +55,7 @@ VlMgr::clear()
   mElbMgr->clear();
   mAlloc.destroy();
 }
-  
+
 // @brief ファイルを読み込む．
 // @param[in] filename 読み込むファイル名
 // @param[in] searchpath サーチパス
@@ -68,7 +68,7 @@ VlMgr::read_file(const string& filename,
 		 const list<VlLineWatcher*> watcher_list)
 {
   Parser parser(mMsgMgr, *mPtMgr, mAlloc, *mPtiFactory);
-  
+
   return parser.read_file(filename, searchpath, watcher_list);
 }
 
@@ -98,7 +98,7 @@ VlMgr::elaborate()
 
   return elab(*mPtMgr);
 }
-  
+
 // @brief UDP 定義のリストを返す．
 const list<const VlUdpDefn*>&
 VlMgr::udp_list() const
@@ -177,6 +177,7 @@ VlMgr::find_decl_list(const VlNamedObj* parent,
   return mElbMgr->find_decl_list(parent, tag, decl_list);
 }
 
+#if 0
 // @brief スコープに属する parameter 宣言を取り出す．
 // @param[in] parent 検索対象のスコープ
 // @param[out] param_list 結果を格納するリスト
@@ -190,6 +191,7 @@ VlMgr::find_param_list(const VlNamedObj* parent,
 {
   return mElbMgr->find_param_list(parent, param_list);
 }
+#endif
 
 // @brief スコープに属する defparam のリストを取り出す．
 // @param[in] parent 検索対象のスコープ
@@ -310,7 +312,7 @@ VlMgr::find_process_list(const VlNamedObj* parent,
 {
   return mElbMgr->find_process_list(parent, process_list);
 }
-  
+
 // @brief 属性リストを得る．
 // @param[in] obj 対象のオブジェクト
 // @param[in] def 定義側の属性の時 true とするフラグ

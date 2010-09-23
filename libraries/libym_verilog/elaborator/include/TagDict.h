@@ -25,89 +25,79 @@ BEGIN_NAMESPACE_YM_VERILOG
 class TagDictCell
 {
   friend class TagDict;
-  
+
 private:
-  
+
   /// @brief  宣言要素を追加する．
   virtual
   void
   add_decl(ElbDeclBase* obj);
-  
+
   /// @brief  宣言要素の先頭を得る．
   virtual
   const ElbDeclBase*
   decl();
-  
-  /// @brief parameter 宣言を追加する．
-  virtual
-  void
-  add_parameter(ElbParameter* obj);
-  
-  /// @brief parameter 宣言の先頭を得る．
-  virtual
-  const ElbParameter*
-  parameter();
-  
+
   /// @brief  defparam を追加する．
   virtual
   void
   add_defparam(ElbDefParam* obj);
-  
+
   /// @brief  defparam の先頭を得る．
   virtual
   const ElbDefParam*
   defparam();
-  
+
   /// @brief  param assign を追加する．
   virtual
   void
   add_paramassign(ElbParamAssign* obj);
-  
+
   /// @brief  param assign の先頭を得る．
   virtual
   const ElbParamAssign*
   paramassign();
-  
+
   /// @brief module array を追加する．
   virtual
   void
   add_modulearray(ElbModuleArray* obj);
-  
+
   /// @brief module array の先頭を得る．
   virtual
   const ElbModuleArray*
   modulearray();
-  
+
   /// @brief  module を追加する．
   virtual
   void
   add_module(ElbModule* obj);
-  
+
   /// @brief  module の先頭を得る．
   virtual
   const ElbModule*
   module();
-  
+
   /// @brief  primitive array を追加する．
   virtual
   void
   add_primarray(ElbPrimArray* obj);
-  
+
   /// @brief  primitive array の先頭を得る．
   virtual
   const ElbPrimArray*
   primarray();
-  
+
   /// @brief  primitive を追加する．
   virtual
   void
   add_primitive(ElbPrimitive* obj);
-  
+
   /// @brief  primitive の先頭を得る．
   virtual
   const ElbPrimitive*
   primitive();
-  
+
   /// @brief タスクを追加する．
   virtual
   void
@@ -127,43 +117,43 @@ private:
   virtual
   const ElbTaskFunc*
   function();
-  
+
   /// @brief continuous assignment を追加する．
   virtual
   void
   add_contassign(ElbContAssign* obj);
-  
+
   /// @brief  continuous assignment の先頭を得る．
   virtual
   const ElbContAssign*
   contassign();
-  
+
   /// @brief  process を追加する．
   virtual
   void
   add_process(ElbProcess* process);
-  
+
   /// @brief  process の先頭を得る．
   virtual
   const ElbProcess*
   process();
-  
+
   /// @brief generate block を追加する．
   virtual
   void
   add_genblock(ElbScope* obj);
-  
+
   /// @brief generate block の先頭を得る．
   virtual
   const ElbScope*
   genblock();
-  
+
   /// @brief  要素数を得る．
   virtual
   ymuint32
   num() = 0;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -171,13 +161,13 @@ private:
 
   // 親のスコープ
   const VlNamedObj* mParent;
-    
+
   // タグの値
   int mTag;
 
   // ハッシュ上の次の要素を指すポインタ
   TagDictCell* mLink;
-  
+
 };
 
 
@@ -198,7 +188,7 @@ public:
 
 
 public:
-  
+
   /// @brief 内容を空にする
   void
   clear();
@@ -209,7 +199,7 @@ public:
   void
   add_decl(int tag,
 	   ElbDeclBase* decl);
-  
+
   /// @brief タグから該当する宣言要素のリストを返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
@@ -222,22 +212,6 @@ public:
   find_decl_list(const VlNamedObj* parent,
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
-
-  /// @brief parameter 宣言要素を追加する．
-  /// @param[in] param 登録する要素
-  void
-  add_parameter(ElbParameter* param);
-  
-  /// @brief parameter 宣言のリストを返す．
-  /// @param[in] parent 親のスコープ
-  /// @param[out] param_list 結果を格納するリスト
-  /// @retval true 該当する要素が1つ以上あった．
-  /// @retval false 該当する要素がなかった．
-  /// @note scope というスコープ内の parameter 宣言を
-  /// param_list に入れる．
-  bool
-  find_param_list(const VlNamedObj* parent,
-		  vector<const VlDecl*>& param_list) const;
 
   /// @brief defparam を追加する．
   /// @param[in] defparam 登録する要素
@@ -322,7 +296,7 @@ public:
   bool
   find_primitive_list(const VlNamedObj* parent,
 		      vector<const VlPrimitive*>& primitive_list) const;
-  
+
   /// @brief タスクを追加する．
   /// @param[in] task 追加する要素
   void
@@ -336,7 +310,7 @@ public:
   bool
   find_task_list(const VlNamedObj* parent,
 		 vector<const VlTaskFunc*>& task_list) const;
-  
+
   /// @brief 関数を追加する．
   /// @param[in] func 追加する要素
   void
@@ -378,7 +352,7 @@ public:
   bool
   find_process_list(const VlNamedObj* parent,
 		    vector<const VlProcess*>& process_list) const;
-  
+
   /// @brief generate block を追加する．
   /// @param[in] scope 登録する要素
   void
@@ -397,7 +371,7 @@ public:
   size_t
   allocated_size() const;
 
-  
+
 private:
 
   /// @brief Cell を登録する．
@@ -408,7 +382,7 @@ private:
   put_cell(const VlNamedObj* parent,
 	   int tag,
 	   TagDictCell* cell);
-  
+
   /// @brief タグから該当する Cell を探す．
   /// @param[in] parent 親のスコープ
   /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
@@ -420,23 +394,23 @@ private:
   /// @param[in] size 必要なサイズ
   void
   alloc_table(ymuint32 size);
-  
+
   /// @brief ハッシュ値を計算する．
   /// @param[in] parent 親のスコープ
   /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
   ymuint32
   hash_func(const VlNamedObj* parent,
 	    int tag) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // Cell の確保用アロケータ
   AllocBase& mAlloc;
-  
+
   // ハッシュ表のサイズ
   ymuint32 mSize;
 

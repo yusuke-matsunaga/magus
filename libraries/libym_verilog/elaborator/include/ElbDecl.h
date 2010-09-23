@@ -584,6 +584,12 @@ public:
 		 int right,
 		 const BitVector& val) = 0;
 
+  /// @brief インデックスからオフセットを計算する．
+  /// @param[in] index_array インデックス式の配列
+  virtual
+  ymuint
+  calc_offset(const vector<ElbExpr*>& index_array) const = 0;
+
 };
 
 

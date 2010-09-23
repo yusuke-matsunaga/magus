@@ -331,14 +331,8 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ElbParameter の仮想関数
+  // ElbDeclBase の仮想関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 値の設定
-  /// @param[in] expr 値を表す式
-  virtual
-  void
-  set_expr(ElbExpr* expr);
 
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
@@ -354,46 +348,60 @@ public:
   ElbExpr*
   _right_range() const;
 
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbDecl の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
-  eval_scalar() const;
+  get_scalar() const;
 
   /// @brief 論理値を返す．
   virtual
   tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  bool
-  eval_bool() const;
+  get_logic() const;
 
   /// @brief real 型の値を返す．
   virtual
   double
-  eval_real() const;
-
-  /// @brief VlTime 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return VlTime 値に変換できたら true を返す．
-  /// @note eval_bitvector() の結果から変換する．
-  virtual
-  bool
-  eval_time(VlTime& val) const;
+  get_real() const;
 
   /// @brief bitvector 型の値を返す．
   virtual
   void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
+  get_bitvector(BitVector& bitvector,
+		tVpiValueType req_type = kVpiValueNone) const;
+
+  /// @brief ビット選択値を返す．
+  /// @param[in] index ビット位置
+  virtual
+  tVpiScalarVal
+  get_bitselect(int index) const;
+
+  /// @brief 範囲選択値を返す．
+  /// @param[in] left 範囲の MSB
+  /// @param[in] right 範囲の LSB
+  /// @param[out] val 値
+  virtual
+  void
+  get_partselect(int left,
+		 int right,
+		 BitVector& val) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbParameter の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値の設定
+  /// @param[in] expr 値を表す式
+  virtual
+  void
+  set_expr(ElbExpr* expr);
 
 
 private:

@@ -42,7 +42,7 @@ TagDict::~TagDict()
 {
   delete [] mTable;
 }
-  
+
 // @brief 内容を空にする
 void
 TagDict::clear()
@@ -85,7 +85,7 @@ TagDict::put_cell(const VlNamedObj* parent,
   mTable[pos] = cell;
   ++ mNum;
 }
-  
+
 // @brief タグから該当する Cell を探す．
 // @param[in] parent 親のスコープ
 // @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
@@ -149,6 +149,7 @@ TagDictCell::decl()
   return NULL;
 }
 
+#if 0
 // parameter 宣言を追加する．
 void
 TagDictCell::add_parameter(ElbParameter* obj)
@@ -163,7 +164,8 @@ TagDictCell::parameter()
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-    
+#endif
+
 // defparam を追加する．
 void
 TagDictCell::add_defparam(ElbDefParam* obj)
@@ -185,7 +187,7 @@ TagDictCell::add_paramassign(ElbParamAssign* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
-      
+
 // param assign の先頭を得る．
 const ElbParamAssign*
 TagDictCell::paramassign()
@@ -208,7 +210,7 @@ TagDictCell::modulearray()
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-    
+
 // module を追加する．
 void
 TagDictCell::add_module(ElbModule* obj)
@@ -223,7 +225,7 @@ TagDictCell::module()
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-    
+
 // primitive array を追加する．
 void
 TagDictCell::add_primarray(ElbPrimArray* obj)
@@ -238,7 +240,7 @@ TagDictCell::primarray()
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-    
+
 // primitive を追加する．
 void
 TagDictCell::add_primitive(ElbPrimitive* obj)
@@ -253,7 +255,7 @@ TagDictCell::primitive()
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-  
+
 // @brief タスクを追加する．
 void
 TagDictCell::add_task(ElbTaskFunc* obj)
@@ -340,7 +342,7 @@ public:
 
   /// @brief コンストラクタ
   CellScope(ElbScope* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -350,18 +352,18 @@ public:
   virtual
   const ElbScope*
   genblock();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbScope* mTop;
 
@@ -370,7 +372,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -380,7 +382,7 @@ CellScope::CellScope(ElbScope* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellScope::add_genblock(ElbScope* obj)
@@ -410,7 +412,7 @@ void
 TagDict::add_genblock(ElbScope* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiInternalScope);
   if ( cell ) {
@@ -457,7 +459,7 @@ public:
 
   /// @brief コンストラクタ
   CellDecl(ElbDeclBase* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -467,18 +469,18 @@ public:
   virtual
   ElbDeclBase*
   decl();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbDeclBase* mTop;
 
@@ -487,7 +489,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -497,7 +499,7 @@ CellDecl::CellDecl(ElbDeclBase* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellDecl::add_decl(ElbDeclBase* obj)
@@ -529,7 +531,7 @@ TagDict::add_decl(int tag,
 		  ElbDeclBase* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, tag);
   if ( cell ) {
@@ -570,6 +572,7 @@ TagDict::find_decl_list(const VlNamedObj* parent,
 }
 
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // parameter 宣言用のセル
 //////////////////////////////////////////////////////////////////////
@@ -580,7 +583,7 @@ public:
 
   /// @brief コンストラクタ
   CellParam(ElbParameter* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -590,18 +593,18 @@ public:
   virtual
   ElbParameter*
   parameter();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbParameter* mTop;
 
@@ -610,7 +613,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -620,7 +623,7 @@ CellParam::CellParam(ElbParameter* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellParam::add_parameter(ElbParameter* obj)
@@ -650,7 +653,7 @@ void
 TagDict::add_parameter(ElbParameter* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiParameter);
   if ( cell ) {
@@ -688,6 +691,7 @@ TagDict::find_param_list(const VlNamedObj* parent,
   }
   return false;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -700,7 +704,7 @@ public:
 
   /// @brief コンストラクタ
   CellDefParam(ElbDefParam* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -710,18 +714,18 @@ public:
   virtual
   ElbDefParam*
   defparam();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbDefParam* mTop;
 
@@ -730,7 +734,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -740,7 +744,7 @@ CellDefParam::CellDefParam(ElbDefParam* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellDefParam::add_defparam(ElbDefParam* obj)
@@ -770,7 +774,7 @@ void
 TagDict::add_defparam(ElbDefParam* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiDefParam);
   if ( cell ) {
@@ -817,28 +821,28 @@ public:
 
   /// @brief コンストラクタ
   CellParamAssign(ElbParamAssign* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
   add_paramassign(ElbParamAssign* obj);
-      
+
   /// @brief param assign の先頭を得る．
   virtual
   ElbParamAssign*
   paramassign();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbParamAssign* mTop;
 
@@ -847,7 +851,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -857,7 +861,7 @@ CellParamAssign::CellParamAssign(ElbParamAssign* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellParamAssign::add_paramassign(ElbParamAssign* obj)
@@ -887,7 +891,7 @@ void
 TagDict::add_paramassign(ElbParamAssign* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiParamAssign);
   if ( cell ) {
@@ -934,7 +938,7 @@ public:
 
   /// @brief コンストラクタ
   CellModuleArray(ElbModuleArray* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -944,18 +948,18 @@ public:
   virtual
   ElbModuleArray*
   modulearray();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbModuleArray* mTop;
 
@@ -964,7 +968,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -974,7 +978,7 @@ CellModuleArray::CellModuleArray(ElbModuleArray* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellModuleArray::add_modulearray(ElbModuleArray* obj)
@@ -1004,7 +1008,7 @@ void
 TagDict::add_modulearray(ElbModuleArray* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiModuleArray);
   if ( cell ) {
@@ -1051,7 +1055,7 @@ public:
 
   /// @brief コンストラクタ
   CellModule(ElbModule* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -1061,18 +1065,18 @@ public:
   virtual
   ElbModule*
   module();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbModule* mTop;
 
@@ -1081,7 +1085,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -1091,7 +1095,7 @@ CellModule::CellModule(ElbModule* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellModule::add_module(ElbModule* obj)
@@ -1121,7 +1125,7 @@ void
 TagDict::add_module(ElbModule* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiModule);
   if ( cell ) {
@@ -1168,7 +1172,7 @@ public:
 
   /// @brief コンストラクタ
   CellPrimArray(ElbPrimArray* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -1178,18 +1182,18 @@ public:
   virtual
   ElbPrimArray*
   primarray();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbPrimArray* mTop;
 
@@ -1198,7 +1202,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -1208,7 +1212,7 @@ CellPrimArray::CellPrimArray(ElbPrimArray* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellPrimArray::add_primarray(ElbPrimArray* obj)
@@ -1239,7 +1243,7 @@ void
 TagDict::add_primarray(ElbPrimArray* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiPrimitiveArray);
   if ( cell ) {
@@ -1286,7 +1290,7 @@ public:
 
   /// @brief コンストラクタ
   CellPrimitive(ElbPrimitive* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -1296,18 +1300,18 @@ public:
   virtual
   ElbPrimitive*
   primitive();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbPrimitive* mTop;
 
@@ -1316,7 +1320,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -1326,7 +1330,7 @@ CellPrimitive::CellPrimitive(ElbPrimitive* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellPrimitive::add_primitive(ElbPrimitive* obj)
@@ -1356,7 +1360,7 @@ void
 TagDict::add_primitive(ElbPrimitive* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiPrimitive);
   if ( cell ) {
@@ -1403,7 +1407,7 @@ public:
 
   /// @brief コンストラクタ
   CellTask(ElbTaskFunc* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -1413,18 +1417,18 @@ public:
   virtual
   ElbTaskFunc*
   task();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbTaskFunc* mTop;
 
@@ -1433,7 +1437,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -1443,7 +1447,7 @@ CellTask::CellTask(ElbTaskFunc* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellTask::add_task(ElbTaskFunc* obj)
@@ -1459,7 +1463,7 @@ CellTask::task()
 {
   return mTop;
 }
-  
+
 // @brief 要素数の取得
 ymuint32
 CellTask::num()
@@ -1473,7 +1477,7 @@ void
 TagDict::add_task(ElbTaskFunc* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiTask);
   if ( cell ) {
@@ -1520,7 +1524,7 @@ public:
 
   /// @brief コンストラクタ
   CellFunction(ElbTaskFunc* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -1530,18 +1534,18 @@ public:
   virtual
   ElbTaskFunc*
   function();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbTaskFunc* mTop;
 
@@ -1550,7 +1554,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -1560,7 +1564,7 @@ CellFunction::CellFunction(ElbTaskFunc* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellFunction::add_function(ElbTaskFunc* obj)
@@ -1576,7 +1580,7 @@ CellFunction::function()
 {
   return mTop;
 }
-  
+
 // @brief 要素数の取得
 ymuint32
 CellFunction::num()
@@ -1590,7 +1594,7 @@ void
 TagDict::add_function(ElbTaskFunc* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiFunction);
   if ( cell ) {
@@ -1637,7 +1641,7 @@ public:
 
   /// @brief コンストラクタ
   CellContAssign(ElbContAssign* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -1647,18 +1651,18 @@ public:
   virtual
   ElbContAssign*
   contassign();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbContAssign* mTop;
 
@@ -1667,7 +1671,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -1677,7 +1681,7 @@ CellContAssign::CellContAssign(ElbContAssign* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellContAssign::add_contassign(ElbContAssign* obj)
@@ -1693,7 +1697,7 @@ CellContAssign::contassign()
 {
   return mTop;
 }
-  
+
 // @brief 要素数の取得
 ymuint32
 CellContAssign::num()
@@ -1707,7 +1711,7 @@ void
 TagDict::add_contassign(ElbContAssign* obj)
 {
   const VlNamedObj* parent = obj->module();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiContAssign);
   if ( cell ) {
@@ -1754,7 +1758,7 @@ public:
 
   /// @brief コンストラクタ
   CellProcess(ElbProcess* obj);
-  
+
   /// @brief 要素の追加
   virtual
   void
@@ -1764,18 +1768,18 @@ public:
   virtual
   ElbProcess*
   process();
-  
+
   /// @brief 要素数の取得
   virtual
   ymuint32
   num();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 先頭の要素
   ElbProcess* mTop;
 
@@ -1784,7 +1788,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 // @brief コンストラクタ
@@ -1794,7 +1798,7 @@ CellProcess::CellProcess(ElbProcess* obj) :
   mNum(1)
 {
 }
-  
+
 // @brief 要素の追加
 void
 CellProcess::add_process(ElbProcess* obj)
@@ -1824,7 +1828,7 @@ void
 TagDict::add_process(ElbProcess* obj)
 {
   const VlNamedObj* parent = obj->parent();
-  
+
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiProcess);
   if ( cell ) {

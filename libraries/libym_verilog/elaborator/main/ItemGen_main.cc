@@ -50,7 +50,7 @@ ItemGen::ItemGen(Elaborator& elab,
   ElbProxy(elab, elb_mgr, elb_factory)
 {
 }
- 
+
 // @brief デストラクタ
 ItemGen::~ItemGen()
 {
@@ -84,7 +84,7 @@ ItemGen::phase1_item(const VlNamedObj* parent,
       add_phase3stub(make_stub(this, &ItemGen::instantiate_process,
 			       parent, pt_item));
       break;
-    
+
     case kPtItem_Task:
     case kPtItem_Func:
       phase1_tf(parent, pt_item);
@@ -125,7 +125,7 @@ ItemGen::phase1_item(const VlNamedObj* parent,
     case kPtItem_SpecItem:
       // 未対応
       break;
-      
+
     case kPtItem_SpecPath:
       // 未対応
       break;
@@ -148,7 +148,7 @@ ItemGen::defparam_override(const VlModule* module,
 
   PtNameBranchArray nb_array = pt_defparam->namebranch_array();
   const char* name = pt_defparam->name();
-  
+
   ElbObjHandle* handle = find_obj_up(module, nb_array, name, ulimit);
   if ( !handle ) {
     return false;
@@ -156,7 +156,8 @@ ItemGen::defparam_override(const VlModule* module,
   ElbParameter* param = handle->parameter();
   if ( !param || param->type() != kVpiParameter ) {
     ostringstream buf;
-    buf << "\"" << expand_full_name(nb_array, name) << "\" is not a parameter.";
+    buf << "\"" << expand_full_name(nb_array, name)
+	<< "\" is not a parameter.";
     put_msg(__FILE__, __LINE__,
 	    fr,
 	    kMsgError,
@@ -166,7 +167,7 @@ ItemGen::defparam_override(const VlModule* module,
     // もうこれ以降は処理したくないので true を返す．
     return true;
   }
-  
+
   if ( param->is_local_param() ) {
     ostringstream buf;
     buf << "\"" << param->name()
@@ -176,11 +177,11 @@ ItemGen::defparam_override(const VlModule* module,
 	    kMsgError,
 	    "ELAB",
 	    buf.str());
-    
+
     // もうこれ以降は処理したくないので true を返す．
     return true;
   }
-  
+
   ElbExpr* expr = instantiate_constant_expr(module, pt_defparam->expr());
   if ( !expr ) {
     // もうこれ以降は処理したくないので true を返す．
@@ -195,7 +196,7 @@ ItemGen::defparam_override(const VlModule* module,
 	  kMsgInfo,
 	  "ELAB",
 	  buf.str());
-  
+
   param->set_expr(expr);
 
   ElbDefParam* dp = factory().new_DefParam(module,
@@ -222,12 +223,12 @@ ItemGen::instantiate_cont_assign(const VlNamedObj* parent,
 
   const VlModule* module = parent->parent_module();
   ElbCaHead* ca_head = factory().new_CaHead(module, pt_header, delay);
-  
+
   ElbEnv env;
   ElbNetLhsEnv env1(env);
   for (ymuint i = 0; i < pt_header->size(); ++ i) {
     const PtContAssign* pt_elem = pt_header->contassign(i);
-    
+
     // 左辺式の生成
     const PtExpr* pt_lhs = pt_elem->lhs();
     ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
@@ -256,7 +257,7 @@ ItemGen::instantiate_cont_assign(const VlNamedObj* parent,
 	    buf.str());
   }
 }
-  
+
 // @brief process 文の生成を行う．
 // @param[in] parent 親のスコープ
 // @param[in] pt_item パース木の定義
@@ -296,7 +297,7 @@ ItemGen::phase1_genblock(const VlNamedObj* parent,
   if ( name != NULL ) {
     ElbScope* genblock = factory().new_GenBlock(parent, pt_genblock);
     reg_genblock(genblock);
-    
+
     parent = genblock;
   }
   phase1_generate(parent, pt_genblock);
@@ -382,7 +383,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
 
   const char* name0 = pt_genfor->name();
   assert_cond(name0 != NULL, __FILE__, __LINE__);
-  
+
   ElbObjHandle* handle = find_obj(parent, pt_genfor->loop_var());
   if ( !handle ) {
     ostringstream buf;
@@ -416,11 +417,11 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
 	    buf.str());
     return;
   }
-  
+
   // 子供のスコープの検索用オブジェクト
   ElbGfRoot* gfroot = factory().new_GfRoot(parent, pt_genfor);
   reg_gfroot(gfroot);
-  
+
   {
     int val;
     if ( !evaluate_expr_int(parent, pt_genfor->init_expr(), val) ) {
@@ -437,7 +438,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
     genvar->set_value(val);
     genvar->set_inuse();
   }
-  
+
   for ( ; ; ) {
     // 終了条件のチェック
     bool val;
@@ -454,11 +455,11 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
       ElbScope* genblock = factory().new_GfBlock(parent, pt_genfor, gvi);
       gfroot->add(gvi, genblock);
       reg_genblock(genblock);
-      
+
       ElbGenvar* genvar1
 	= factory().new_Genvar(genblock, genvar->pt_item(), gvi);
       reg_genvar(genvar1);
-      
+
       phase1_generate(genblock, pt_genfor);
     }
 

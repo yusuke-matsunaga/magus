@@ -33,14 +33,14 @@ class ElbFactory;
 class VlMgr
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] msg_mgr メッセージマネージャ
   VlMgr(MsgMgr& msg_mgr);
-  
+
   /// @brief デストラクタ
   ~VlMgr();
-  
+
 
 public:
 
@@ -48,12 +48,12 @@ public:
   void
   clear();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // parser 関係のメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ファイルを読み込む．
   /// @param[in] filename 読み込むファイル名
   /// @param[in] searchpath サーチパス
@@ -75,7 +75,7 @@ public:
   const list<const PtUdp*>&
   pt_udp_list() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // elaboration 関係のメンバ関数
@@ -85,11 +85,11 @@ public:
   /// @param[in] エラー数を返す．
   size_t
   elaborate();
-  
+
   /// @brief UDP 定義のリストを返す．
   const list<const VlUdpDefn*>&
   udp_list() const;
-  
+
   /// @brief 名前から UDP 定義を取出す．
   /// @param[in] name 名前
   /// @return name という名の UDP を返す．
@@ -100,14 +100,14 @@ public:
   /// @brief topmodule のリストを返す．
   const list<const VlModule*>&
   topmodule_list() const;
-  
+
   /// @brief 名前から UserSystf を取出す．
   /// @param[in] name 名前
   /// @return name という名のユーザー定義関数を返す．
   /// @return なければ NULL を返す．
   const VlUserSystf*
   find_user_systf(const char* name) const;
-  
+
   /// @brief スコープと名前から名前付き要素を取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[in] name 名前
@@ -138,17 +138,6 @@ public:
   find_decl_list(const VlNamedObj* parent,
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
-
-  /// @brief スコープに属する parameter 宣言を取り出す．
-  /// @param[in] parent 検索対象のスコープ
-  /// @param[out] param_list 結果を格納するリスト
-  /// @retval true 該当する要素が1つ以上あった．
-  /// @retval false 該当する要素がなかった．
-  /// @note scope というスコープ内の paramter 宣言を
-  /// param_list に入れる．
-  bool
-  find_param_list(const VlNamedObj* parent,
-		  vector<const VlDecl*>& param_list) const;
 
   /// @brief スコープに属する defparam のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -239,7 +228,7 @@ public:
   bool
   find_process_list(const VlNamedObj* parent,
 		    vector<const VlProcess*>& process_list) const;
-  
+
   /// @brief 属性リストを得る．
   /// @param[in] obj 対象のオブジェクト
   /// @param[in] def 定義側の属性の時 true とするフラグ
@@ -250,31 +239,31 @@ public:
   /// @brief このオブジェクトが確保したメモリの総量を返す．
   size_t
   allocated_size() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ここで生成するオブジェクト用のアロケータ
   SimpleAlloc mAlloc;
-  
+
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
-  
+
   // Pt オブジェクトを管理するクラス
   PtMgr* mPtMgr;
 
   // Ptオブジェクトの生成を行うファクトリクラス
   PtiFactory* mPtiFactory;
-  
+
   // Elb オブジェクトを管理するクラス
   ElbMgr* mElbMgr;
-  
+
   // Elbオブジェクトの生成を行うファクトリクラス
   ElbFactory* mElbFactory;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

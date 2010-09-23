@@ -43,7 +43,7 @@ public:
   /// @brief デストラクタ
   virtual
   ~ElbMgr();
-  
+
 
 public:
 
@@ -51,16 +51,16 @@ public:
   void
   clear();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 要素を検索する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief UDP 定義のリストを返す．
   const list<const VlUdpDefn*>&
   udp_list() const;
-  
+
   /// @brief 名前から UDP 定義を取出す．
   /// @param[in] name 名前
   /// @return name という名の UDP を返す．
@@ -71,7 +71,7 @@ public:
   /// @brief topmodule のリストを返す．
   const list<const VlModule*>&
   topmodule_list() const;
-  
+
   /// @brief 名前から UserSystf を取出す．
   /// @param[in] name 名前
   /// @return name という名のユーザー定義関数を返す．
@@ -100,17 +100,6 @@ public:
   find_decl_list(const VlNamedObj* parent,
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
-
-  /// @brief スコープに属する parameter 宣言を取り出す．
-  /// @param[in] parent 検索対象のスコープ
-  /// @param[out] param_list 結果を格納するリスト
-  /// @retval true 該当する要素が1つ以上あった．
-  /// @retval false 該当する要素がなかった．
-  /// @note scope というスコープ内の paramter 宣言を
-  /// param_list に入れる．
-  bool
-  find_param_list(const VlNamedObj* parent,
-		  vector<const VlDecl*>& param_list) const;
 
   /// @brief スコープに属する defparam のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -201,7 +190,7 @@ public:
   bool
   find_process_list(const VlNamedObj* parent,
 		    vector<const VlProcess*>& process_list) const;
-  
+
   /// @brief スコープと名前から名前付き要素を取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[in] name 名前
@@ -210,7 +199,7 @@ public:
   ElbObjHandle*
   find_obj(const VlNamedObj* parent,
 	   const char* name) const;
-  
+
   /// @brief スコープと階層名から要素を取り出す．
   /// @param[in] base_scope 起点となるスコープ
   /// @param[in] nb_array 階層名の上部 (NULL の場合も有りうる)
@@ -223,8 +212,8 @@ public:
 	      PtNameBranchArray nb_array,
 	      const char* name,
 	      const VlNamedObj* ulimit);
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 要素を登録する関数
@@ -234,113 +223,108 @@ public:
   /// @param[in] systf 登録するシステムタスク/システム関数
   void
   reg_user_systf(const ElbUserSystf* systf);
-  
+
   /// @brief UDP を登録する．
   /// @param[in] def_name 定義名
   /// @param[in] udp 登録する UDP
   void
   reg_udp(const char* def_name,
 	  const ElbUdpDefn* udp);
-  
+
   /// @brief グローバルスコープを登録する．
   void
   reg_toplevel(const VlNamedObj* toplevel);
-  
+
   /// @brief generate block を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_genblock(ElbScope* obj);
-  
+
   /// @brief block scope を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_blockscope(ElbScope* obj);
-  
+
   /// @brief 宣言要素を登録する．
   /// @param[in] tag タグ
   /// @param[in] obj 登録するオブジェクト
   void
   reg_decl(int tag,
 	   ElbDecl* obj);
-  
+
   /// @brief 宣言要素を登録する．
   /// @param[in] tag タグ
   /// @param[in] obj 登録するオブジェクト
   void
   reg_declarray(int tag,
 		ElbDeclArray* obj);
-  
-  /// @brief parameter 宣言を登録する．
-  /// @param[in] obj 登録するオブジェクト
-  void
-  reg_parameter(ElbParameter* obj);
-  
+
   /// @brief defparam を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_defparam(ElbDefParam* obj);
-  
+
   /// @brief paramassign を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_paramassign(ElbParamAssign* obj);
-  
+
   /// @brief モジュール配列を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_modulearray(ElbModuleArray* obj);
-  
+
   /// @brief モジュールを登録する．
   /// @param[in] module 登録するモジュール
   void
   reg_module(ElbModule* module);
-    
+
   /// @brief プリミティブ配列を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_primarray(ElbPrimArray* obj);
-  
+
   /// @brief プリミティブを登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_primitive(ElbPrimitive* obj);
-  
+
   /// @brief タスクを登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_task(ElbTaskFunc* obj);
-  
+
   /// @brief 関数を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_function(ElbTaskFunc* obj);
-  
+
   /// @brief continuous assignment を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_contassign(ElbContAssign* obj);
-  
+
   /// @brief process を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_process(ElbProcess* obj);
-  
+
   /// @brief gfroot を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_gfroot(ElbGfRoot* obj);
-  
+
   /// @brief genvar を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
   reg_genvar(ElbGenvar* obj);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の検索/登録
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 属性リストを得る．
   /// @param[in] obj 対象のオブジェクト
   /// @param[in] def 定義側の属性の時 true とするフラグ
@@ -362,7 +346,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // その他の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief アロケータを取り出す．
   AllocBase&
   allocator();
@@ -371,7 +355,7 @@ public:
   size_t
   allocated_size() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 検索の下請け関数
@@ -383,43 +367,43 @@ private:
   find_scope_up(const VlNamedObj* base_scope,
 		PtNameBranchArray nb_array,
 		const VlNamedObj* ulimit);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // メモリ確保用のアロケータ
   AllocBase& mAlloc;
-  
+
   // UDP のリスト
   list<const VlUdpDefn*> mUdpList;
-  
+
   // UDP の辞書
   hash_map<string, const ElbUdpDefn*> mUdpHash;
 
   // topmodule のリスト
   list<const VlModule*> mTopmoduleList;
-  
+
   // UserSystf の辞書
   hash_map<string, const ElbUserSystf*> mSystfHash;
-  
+
   // 名前をキーにしたオブジェクトの辞書
   ObjDict mObjDict;
-  
+
   // タグをキーにした各スコープごとのオブジェクトのリストの辞書
   TagDict mTagDict;
-  
+
   // モジュール名をキーにしたモジュールインスタンスの辞書
   ModuleHash mModInstDict;
-  
+
   // 属性リストの辞書
   AttrHash mAttrHash;
-  
+
   // トップレベルスコープ
   const VlNamedObj* mTopLevel;
-  
+
 };
 
 
@@ -455,21 +439,6 @@ ElbMgr::find_decl_list(const VlNamedObj* parent,
 		       vector<const VlDecl*>& decl_list) const
 {
   return mTagDict.find_decl_list(parent, tag, decl_list);
-}
-
-// @brief スコープに属する parameter 宣言を取り出す．
-// @param[in] parent 検索対象のスコープ
-// @param[out] param_list 結果を格納するリスト
-// @retval true 該当する要素が1つ以上あった．
-// @retval false 該当する要素がなかった．
-// @note scope というスコープ内の paramter 宣言を
-// param_list に入れる．
-inline
-bool
-ElbMgr::find_param_list(const VlNamedObj* parent,
-			vector<const VlDecl*>& param_list) const
-{
-  return mTagDict.find_param_list(parent, param_list);
 }
 
 // @brief スコープに属する defparam のリストを取り出す．
@@ -601,7 +570,7 @@ ElbMgr::find_process_list(const VlNamedObj* parent,
 {
   return mTagDict.find_process_list(parent, process_list);
 }
-  
+
 // @brief 属性リストを得る．
 // @param[in] obj 対象のオブジェクト
 // @param[in] def 定義側の属性の時 true とするフラグ

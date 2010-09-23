@@ -71,7 +71,7 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
 {
   {
     vector<const VlDecl*> decl_list;
-    if ( vl_mgr().find_param_list(scope, decl_list) ) {
+    if ( vl_mgr().find_decl_list(scope, vpiParameter, decl_list) ) {
       add_decllist("vpiParameter", decl_list);
     }
   }

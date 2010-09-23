@@ -13,6 +13,8 @@
 #include "EiParameter.h"
 #include "ElbExpr.h"
 
+#include "ym_verilog/BitVector.h"
+
 #include "ym_verilog/pt/PtDecl.h"
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtMisc.h"
@@ -82,7 +84,7 @@ EiFactory::new_Parameter(ElbParamHead* head,
       param = new (p) EiParameter(head, pt_item);
     }
     break;
-    
+
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;
@@ -95,7 +97,7 @@ EiFactory::new_Parameter(ElbParamHead* head,
 //////////////////////////////////////////////////////////////////////
 // クラス EiParamHead
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_head パース木の宣言ヘッダ
@@ -105,7 +107,7 @@ EiParamHead::EiParamHead(const VlNamedObj* parent,
   mPtHead(pt_head)
 {
 }
-  
+
 // @brief デストラクタ
 EiParamHead::~EiParamHead()
 {
@@ -119,7 +121,7 @@ EiParamHead::type() const
   case kPtDecl_Param:
   case kPtDecl_LocalParam:
     return kVpiParameter;
-    
+
   case kPtDecl_SpecParam:
     return kVpiSpecParam;
 
@@ -145,7 +147,7 @@ EiParamHead::is_signed() const
 {
   return mPtHead->is_signed();
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -171,13 +173,13 @@ EiParamHead::left_range_const() const
   switch ( mPtHead->data_type() ) {
   case kVpiVarInteger:
     return kVpiSizeInteger - 1;
-      
+
   case kVpiVarReal:
     return -1;
-      
+
   case kVpiVarTime:
     return kVpiSizeTime - 1;
-      
+
   default:
     break;
   }
@@ -204,13 +206,13 @@ EiParamHead::bit_size() const
   switch ( mPtHead->data_type() ) {
   case kVpiVarInteger:
     return kVpiSizeInteger;
-      
+
   case kVpiVarReal:
     return kVpiSizeReal;
-      
+
   case kVpiVarTime:
     return kVpiSizeTime;
-      
+
   default:
     break;
   }
@@ -228,13 +230,13 @@ EiParamHead::bit_offset(int index) const
   switch ( mPtHead->data_type() ) {
   case kVpiVarReal:
     return -1;
-      
+
   case kVpiVarTime:
     if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
       return index;
     }
     return -1;
-      
+
   case kVpiVarInteger:
   default:
     // int とみなす．
@@ -281,7 +283,7 @@ EiParamHead::data_type() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiParamHeadV
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_head パース木の宣言ヘッダ
@@ -299,12 +301,12 @@ EiParamHeadV::EiParamHeadV(const VlNamedObj* parent,
 {
   mRange.set(left, right, left_val, right_val);
 }
-  
+
 // @brief デストラクタ
 EiParamHeadV::~EiParamHeadV()
 {
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -405,7 +407,7 @@ EiParameter::parent() const
 {
   return mHead->parent();
 }
-  
+
 // @brief 名前の取得
 const char*
 EiParameter::name() const
@@ -498,7 +500,7 @@ EiParameter::set_expr(ElbExpr* expr)
 {
   mExpr = expr;
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -517,6 +519,7 @@ EiParameter::_right_range() const
   return mHead->right_range();
 }
 
+#if 0
 // @brief int 型の値を返す．
 // @param[out] val 結果を格納する変数
 // @return 整数値に変換できたら true を返す．
@@ -525,35 +528,39 @@ EiParameter::eval_int(int& val) const
 {
   return mExpr->eval_int(val);
 }
+#endif
 
 // @brief スカラー値を返す．
 tVpiScalarVal
-EiParameter::eval_scalar() const
+EiParameter::get_scalar() const
 {
   return mExpr->eval_scalar();
 }
 
 // @brief 論理値を返す．
 tVpiScalarVal
-EiParameter::eval_logic() const
+EiParameter::get_logic() const
 {
   return mExpr->eval_logic();
 }
 
+#if 0
 // @brief 論理値を返す．
 bool
 EiParameter::eval_bool() const
 {
   return mExpr->eval_bool();
 }
+#endif
 
 // @brief real 型の値を返す．
 double
-EiParameter::eval_real() const
+EiParameter::get_real() const
 {
   return mExpr->eval_real();
 }
 
+#if 0
 // @brief VlTime 型の値を返す．
 // @param[out] val 結果を格納する変数
 // @return VlTime 値に変換できたら true を返す．
@@ -563,20 +570,48 @@ EiParameter::eval_time(VlTime& val) const
 {
   return mExpr->eval_time(val);
 }
+#endif
 
 // @brief bitvector 型の値を返す．
 void
-EiParameter::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
+EiParameter::get_bitvector(BitVector& bitvector,
+			   tVpiValueType req_type) const
 {
   mExpr->eval_bitvector(bitvector, req_type);
+}
+
+// @brief ビット選択値を返す．
+// @param[in] index ビット位置
+tVpiScalarVal
+EiParameter::get_bitselect(int index) const
+{
+  ymuint offset = bit_offset(index);
+  BitVector bv;
+  get_bitvector(bv);
+  return bv.bit_select(offset);
+}
+
+// @brief 範囲選択値を返す．
+// @param[in] left 範囲の MSB
+// @param[in] right 範囲の LSB
+// @param[out] val 値
+void
+EiParameter::get_partselect(int left,
+			    int right,
+			    BitVector& val) const
+{
+  ymuint offset1 = bit_offset(left);
+  ymuint offset2 = bit_offset(right);
+  BitVector bv;
+  get_bitvector(bv);
+  bv.part_select(offset1, offset2);
 }
 
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiLocalParam
-////////////////////////////////////////////////////////////////////// 
-  
+//////////////////////////////////////////////////////////////////////
+
 // @brief コンストラクタ
 // @param[in] head ヘッダ
 // @param[in] pt_item パース木の宣言要素
@@ -585,12 +620,12 @@ EiLocalParam::EiLocalParam(ElbParamHead* head,
   EiParameter(head, pt_item)
 {
 }
-  
+
 // @brief デストラクタ
 EiLocalParam::~EiLocalParam()
 {
 }
-  
+
 // @brief localparam のときに true 返す．
 // @note このクラスでは true を返す．
 bool

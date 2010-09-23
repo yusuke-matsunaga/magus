@@ -27,24 +27,6 @@ ElbParameter::is_consttype() const
   return true;
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-const VlExpr*
-ElbParameter::left_range() const
-{
-  return _left_range();
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-const VlExpr*
-ElbParameter::right_range() const
-{
-  return _right_range();
-}
-
 // @brief ビット要素を返す．
 // @param[in] index インデックス
 // @retval ビット要素 index が範囲内の場合
@@ -188,6 +170,59 @@ void
 ElbParameter::index(vector<const VlExpr*>& index_list) const
 {
   index_list.clear();
+}
+
+// @brief 符号付きに補正する．
+// @note このクラスでは何もしない．
+void
+ElbParameter::set_signed()
+{
+}
+
+// @brief スカラー値を設定する．
+// @param[in] val 値
+// @note このクラスでは何もしない．
+void
+ElbParameter::set_scalar(tVpiScalarVal val)
+{
+}
+
+// @brief real 型の値を設定する．
+// @param[in] val 値
+// @note このクラスでは何もしない．
+void
+ElbParameter::set_real(double val)
+{
+}
+
+// @brief bitvector 型の値を設定する．
+// @param[in] val 値
+// @note このクラスでは何もしない．
+void
+ElbParameter::set_bitvector(const BitVector& val)
+{
+}
+
+// @brief ビット値を設定する．
+// @param[in] index ビット位置
+// @param[in] val 値
+// @note このクラスでは何もしない．
+void
+ElbParameter::set_bitselect(int index,
+			    tVpiScalarVal val)
+{
+}
+
+// @brief 範囲値を設定する．
+// @param[in] left 範囲の MSB
+// @param[in] right 範囲の LSB
+// @param[in] val 値
+// @note このクラスでは何もしない．
+void
+ElbParameter::set_partselect(int left,
+			     int right,
+			     const BitVector& val)
+{
 }
 
 END_NAMESPACE_YM_VERILOG

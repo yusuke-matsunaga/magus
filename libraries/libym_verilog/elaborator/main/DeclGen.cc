@@ -356,27 +356,27 @@ DeclGen::instantiate_decl(const VlNamedObj* parent,
     case kPtDecl_LocalParam:
       assert_not_reached(__FILE__, __LINE__);
       break;
-    
+
     case kPtDecl_Reg:
       instantiate_reg_head(parent, pt_head);
       break;
-    
+
     case kPtDecl_Var:
       instantiate_var_head(parent, pt_head);
       break;
-    
+
     case kPtDecl_Genvar:
       instantiate_genvar_head(parent, pt_head);
       break;
-    
+
     case kPtDecl_Net:
       instantiate_net_head(parent, pt_head);
       break;
-    
+
     case kPtDecl_Event:
       instantiate_event_head(parent, pt_head);
       break;
-    
+
     case kPtDecl_SpecParam:
       // 未対応
       break;
@@ -397,10 +397,10 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 			   bool is_local)
 {
   const VlModule* module = parent->parent_module();
-  
+
   for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
     const PtDeclHead* pt_head = pt_head_array[i];
-    
+
     const PtExpr* pt_left = pt_head->left_range();
     const PtExpr* pt_right = pt_head->right_range();
     ElbExpr* left = NULL;
@@ -419,7 +419,7 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
     for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
       const PtDeclItem* pt_item = pt_head->item(i);
       const FileRegion& file_region = pt_item->file_region();
-      
+
       // 右辺の式は constant expression のはずなので今つくる．
       const PtExpr* pt_init_expr = pt_item->init_value();
       ElbExpr* init = instantiate_constant_expr(parent, pt_init_expr);
@@ -431,11 +431,11 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 						    pt_item,
 						    is_local);
       assert_cond(param, __FILE__, __LINE__);
-      reg_parameter(param);
-  
+      reg_decl(vpiParameter, param);
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, param);
-    
+
       ostringstream buf;
       buf << "Parameter(" << param->full_name() << ") created.";
       msg_mgr().put_msg(__FILE__, __LINE__,
@@ -443,9 +443,9 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 			kMsgInfo,
 			"ELAB",
 			buf.str());
-    
+
       param->set_expr(init);
-      
+
       // ダブっている感じがするけど同じことを表す parameter assign 文
       // をつくってモジュールに追加する．
       ElbParamAssign* pa = factory().new_ParamAssign(module, pt_item,
@@ -466,7 +466,7 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
   const PtExpr* pt_left = pt_head->left_range();
   const PtExpr* pt_right = pt_head->right_range();
   const PtDelay* pt_delay = pt_head->delay();
-  
+
   bool has_delay = (pt_delay != NULL);
   ElbExpr* left = NULL;
   ElbExpr* right = NULL;
@@ -503,15 +503,15 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
       if ( !instantiate_dimension_list(parent, pt_item, range_src) ) {
 	continue;
       }
-      
+
       ElbDeclArray* net_array = factory().new_DeclArray(net_head,
 							pt_item,
 							range_src);
       reg_declarray(vpiNetArray, net_array);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, net_array);
-      
+
       ostringstream buf;
       buf << "NetArray(" << net_array->full_name() << ") created.";
       msg_mgr().put_msg(__FILE__, __LINE__,
@@ -531,10 +531,10 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
 	add_phase3stub(make_stub(this, &DeclGen::link_net_assign,
 				 net, pt_item));
       }
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, net);
-      
+
       ostringstream buf;
       buf << "Net(" << net->full_name() << ") created.";
       msg_mgr().put_msg(__FILE__, __LINE__,
@@ -568,9 +568,9 @@ DeclGen::link_net_assign(ElbDecl* net,
 			 const PtDeclItem* pt_item)
 {
   // 実際には対応する continuous assign 文を作る．
-  
+
   ElbExpr* lhs = factory().new_Primary(pt_item, net);
-  
+
   const VlNamedObj* parent = net->parent();
   const PtExpr* pt_init = pt_item->init_value();
   ElbExpr* rhs = instantiate_rhs(parent, ElbEnv(), pt_init, lhs);
@@ -606,7 +606,7 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
   ElbDeclHead* reg_head = factory().new_DeclHead(parent, pt_head,
 						 left, right,
 						 left_val, right_val);
-  
+
   for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);
     const PtExpr* pt_init = pt_item->init_value();
@@ -622,15 +622,15 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
       if ( !instantiate_dimension_list(parent, pt_item, range_src) ) {
 	continue;
       }
-      
+
       ElbDeclArray* reg_array = factory().new_DeclArray(reg_head,
 							pt_item,
 							range_src);
       reg_declarray(vpiRegArray, reg_array);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, reg_array);
-      
+
       ostringstream buf;
       buf << "RegArray(" << reg_array->full_name() << ") created.";
       msg_mgr().put_msg(__FILE__, __LINE__,
@@ -649,13 +649,13 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
 	// エラーの時には init = NULL となるがそれでも処理は続ける．
 	// もちろんエラーは記録されている．
       }
-      
+
       ElbDecl* reg = factory().new_Decl(reg_head, pt_item, init);
       reg_decl(vpiReg, reg);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, reg);
-      
+
       ostringstream buf;
       buf << "Reg(" << reg->full_name() << ") created.";
       msg_mgr().put_msg(__FILE__, __LINE__,
@@ -693,12 +693,12 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
       if ( !instantiate_dimension_list(parent, pt_item, range_src) ) {
 	continue;
       }
-      
+
       ElbDeclArray* var_array = factory().new_DeclArray(var_head,
 							pt_item,
 							range_src);
       reg_declarray(vpiVariables, var_array);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, var_array);
 
@@ -720,10 +720,10 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
 	// エラーの時には init = NULL となるがそれでも処理は続ける．
 	// もちろんエラーは記録されている．
       }
-      
+
       ElbDecl* var = factory().new_Decl(var_head, pt_item, init);
       reg_decl(vpiVariables, var);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, var);
 
@@ -758,15 +758,15 @@ DeclGen::instantiate_event_head(const VlNamedObj* parent,
       if ( !instantiate_dimension_list(parent, pt_item, range_src) ) {
 	continue;
       }
-      
+
       ElbDeclArray* ne_array = factory().new_DeclArray(event_head,
 						       pt_item,
 						       range_src);
       reg_declarray(vpiNamedEventArray, ne_array);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, ne_array);
-      
+
       ostringstream buf;
       buf << "NamedEventArray(" << ne_array->full_name() << ") created.";
       msg_mgr().put_msg(__FILE__, __LINE__,
@@ -780,10 +780,10 @@ DeclGen::instantiate_event_head(const VlNamedObj* parent,
       ElbDecl* named_event = factory().new_Decl(event_head,
 						pt_item);
       reg_decl(vpiNamedEvent, named_event);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, named_event);
-      
+
       ostringstream buf;
       buf << "NamedEvent(" << named_event->full_name() << ") created.";
       msg_mgr().put_msg(__FILE__, __LINE__,
@@ -806,7 +806,7 @@ DeclGen::instantiate_genvar_head(const VlNamedObj* parent,
     const PtDeclItem* pt_item = pt_head->item(i);
     ElbGenvar* genvar = factory().new_Genvar(parent, pt_item, 0);
     reg_genvar(genvar);
-    
+
     ostringstream buf;
     buf << "Getnvar(" << genvar->full_name() << ") created.";
     msg_mgr().put_msg(__FILE__, __LINE__,
@@ -828,7 +828,7 @@ DeclGen::instantiate_dimension_list(const VlNamedObj*  parent,
 {
   ymuint n = pt_item->dimension_list_size();
   range_src.reserve(n);
-  
+
   bool ok = true;
   for (ymuint i = 0; i < n; ++ i) {
     const PtRange* pt_range = pt_item->range(i);
@@ -847,7 +847,7 @@ DeclGen::instantiate_dimension_list(const VlNamedObj*  parent,
     range_src.push_back(ElbRangeSrc(pt_range, left, right,
 				    left_val, right_val));
   }
-  
+
   return ok;
 }
 

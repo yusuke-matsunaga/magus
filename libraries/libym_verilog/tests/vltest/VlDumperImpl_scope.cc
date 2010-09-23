@@ -30,7 +30,7 @@ VlDumperImpl::put_scope(const char* label,
 			const VlNamedObj* scope)
 {
   VlDumpHeader x(this, label, "Scope");
-  
+
   put("mFileRegion", scope->file_region() );
   put("vpiFullName", scope->full_name() );
 
@@ -42,7 +42,7 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
 			    const VlNamedObj* scope)
 {
   vector<const VlDecl*> decl_list;
-  if ( mgr.find_param_list(scope, decl_list) ) {
+  if ( mgr.find_decl_list(scope, vpiParameter, decl_list) ) {
     put_decl_list("vpiParameter", mgr, decl_list);
   }
   vector<const VlParamAssign*> paramassign_list;
@@ -77,7 +77,7 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
   if ( mgr.find_decl_list(scope, kVpiNamedEventArray, decl_list) ) {
     put_decl_list("vpiNamedEventArray", mgr, decl_list);
   }
-  
+
   vector<const VlNamedObj*> scope_list;
   if ( mgr.find_genblock_list(scope, scope_list) ) {
     VlDumpHeader x(this, "vpiInternalScope", "ScopeList");
@@ -101,7 +101,7 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
       put_function("vpiFunction", mgr, *p);
     }
   }
-  
+
   vector<const VlContAssign*> contassign_list;
   if ( mgr.find_contassign_list(scope, contassign_list) ) {
     put_contassign_list("vpiContAssign", mgr, contassign_list);
