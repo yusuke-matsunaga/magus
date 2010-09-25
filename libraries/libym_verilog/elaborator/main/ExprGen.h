@@ -298,19 +298,6 @@ private:
 			   const PtExpr* pt_expr,
 			   ElbDecl* decl);
 
-  /// @brief parameter 宣言用のプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] param 対象の parameter 宣言
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_param_primary(const VlNamedObj* parent,
-			    const ElbEnv& env,
-			    const PtExpr* pt_expr,
-			    ElbParameter* param);
-
   /// @brief genvar に対応した定数を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木

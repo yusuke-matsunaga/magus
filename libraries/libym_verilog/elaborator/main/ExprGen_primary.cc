@@ -145,7 +145,7 @@ ExprGen::instantiate_const_primary(const VlNamedObj* parent,
   // そのオブジェクトが parameter の場合
   ElbParameter* param = handle->parameter();
   if ( param ) {
-    return instantiate_param_primary(parent, env, pt_expr, param);
+    return instantiate_decl_primary(parent, env, pt_expr, param);
   }
 
   // それ以外の宣言要素の場合はエラー
@@ -207,12 +207,6 @@ ExprGen::instantiate_cf_primary(const VlNamedObj* parent,
   ElbDecl* decl = instantiate_decl(handle, parent, pt_expr, func);
   if ( decl ) {
     return instantiate_decl_primary(parent, env, pt_expr, decl);
-  }
-
-  // 対象が parameter だった場合
-  ElbParameter* param = handle->parameter();
-  if ( param ) {
-    return instantiate_param_primary(parent, env, pt_expr, param);
   }
 
   // それ以外はエラー
@@ -314,12 +308,6 @@ ExprGen::instantiate_normal_primary(const VlNamedObj* parent,
     return instantiate_decl_primary(parent, env, pt_expr, decl);
   }
 
-  // 対象が parameter だった場合
-  ElbParameter* param = handle->parameter();
-  if ( param ) {
-    return instantiate_param_primary(parent, env, pt_expr, param);
-  }
-
   // ここまで来たら適切な型ではなかったということ．
   error_illegal_object(pt_expr);
   return NULL;
@@ -402,85 +390,6 @@ ExprGen::instantiate_decl_primary(const VlNamedObj* parent,
     }
   }
   return factory().new_Primary(pt_expr, decl);
-}
-
-// @brief parameter 宣言用のプライマリ式を生成する．
-// @param[in] parent 親のスコープ
-// @param[in] env 生成時の環境
-// @param[in] pt_expr 式を表すパース木
-// @param[in] param 対象の parameter 宣言
-// @return 生成された式を返す．
-// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-ElbExpr*
-ExprGen::instantiate_param_primary(const VlNamedObj* parent,
-				   const ElbEnv& env,
-				   const PtExpr* pt_expr,
-				   ElbParameter* param)
-{
-  bool has_range_select;
-  bool has_bit_select;
-  ElbExpr* index1;
-  ElbExpr* index2;
-  bool stat = instantiate_index(parent, pt_expr, param, NULL,
-				has_range_select, has_bit_select,
-				index1, index2);
-  if ( !stat ) {
-    // エラーメッセージは resolve() 内で出力されている．
-    return NULL;
-  }
-
-  tVpiObjType type = param->type();
-  if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
-    error_illegal_object(pt_expr);
-    return NULL;
-  }
-
-  if ( has_bit_select ) {
-    return factory().new_BitSelect(pt_expr, param, index1);
-  }
-  if ( has_range_select ) {
-    switch ( pt_expr->range_mode() ) {
-    case kVpiConstRange:
-      {
-	int index1_val;
-	if ( !expr_to_int(index1, index1_val) ) {
-	  return NULL;
-	}
-	int index2_val;
-	if ( !expr_to_int(index2, index2_val) ) {
-	  return NULL;
-	}
-	return factory().new_PartSelect(pt_expr, param,
-					index1, index2,
-					index1_val, index2_val);
-      }
-
-    case kVpiPlusRange:
-      {
-	int range_val;
-	if ( !expr_to_int(index2, range_val) ) {
-	  return NULL;
-	}
-	return factory().new_PlusPartSelect(pt_expr, param,
-					    index1, index2, range_val);
-      }
-
-    case kVpiMinusRange:
-      {
-	int range_val;
-	if ( !expr_to_int(index2, range_val) ) {
-	  return NULL;
-	}
-	return factory().new_MinusPartSelect(pt_expr, param,
-					   index1, index2, range_val);
-      }
-
-    case kVpiNoRange:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-    }
-  }
-  return factory().new_Primary(pt_expr, param);
 }
 
 // @brief PtPrimary から左辺用の ElbExpr を生成する．
@@ -911,6 +820,12 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
     }
 
     return factory().new_DeclElem(pt_expr, decl_array, index_list);
+  }
+
+  // そのハンドルが parameter ならそのまま返す．
+  ElbParameter* param = handle->parameter();
+  if ( param ) {
+    return param;
   }
 
   // そうでなければ NULL を返す．
