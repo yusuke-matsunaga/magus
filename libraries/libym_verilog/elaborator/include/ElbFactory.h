@@ -876,14 +876,6 @@ public:
   new_Primary(const PtBase* pt_expr,
 	      ElbDecl* obj) = 0;
 
-  /// @brief プライマリ式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  virtual
-  ElbExpr*
-  new_Primary(const PtBase* pt_expr,
-	      ElbParameter* obj) = 0;
-
   /// @brief ビット選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
@@ -892,16 +884,6 @@ public:
   ElbExpr*
   new_BitSelect(const PtBase* pt_expr,
 		ElbDecl* obj,
-		ElbExpr* bit_index) = 0;
-
-  /// @brief ビット選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] bit_index ビット選択式
-  virtual
-  ElbExpr*
-  new_BitSelect(const PtBase* pt_expr,
-		ElbParameter* obj,
 		ElbExpr* bit_index) = 0;
 
   /// @brief ビット選択式を生成する．
@@ -923,20 +905,6 @@ public:
   ElbExpr*
   new_PartSelect(const PtBase* pt_expr,
 		 ElbDecl* obj,
-		 ElbExpr* index1,
-		 ElbExpr* index2,
-		 int index1_val,
-		 int index2_val) = 0;
-
-  /// @brief 部分選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] index1, index2 パート選択式
-  /// @param[in] index1_val, index2_val パート選択式の値
-  virtual
-  ElbExpr*
-  new_PartSelect(const PtBase* pt_expr,
-		 ElbParameter* obj,
 		 ElbExpr* index1,
 		 ElbExpr* index2,
 		 int index1_val,
@@ -977,34 +945,6 @@ public:
   ElbExpr*
   new_MinusPartSelect(const PtBase* pt_expr,
 		      ElbDecl* obj,
-		      ElbExpr* base,
-		      ElbExpr* range,
-		      int range_val) = 0;
-
-  /// @brief 可変部分選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] base 範囲のベースアドレスを表す式
-  /// @param[in] range 範囲を表す式
-  /// @param[in] range_val 範囲の値
-  virtual
-  ElbExpr*
-  new_PlusPartSelect(const PtBase* pt_expr,
-		     ElbParameter* obj,
-		     ElbExpr* base,
-		     ElbExpr* range,
-		     int range_val) = 0;
-
-  /// @brief 可変部分選択式を生成する．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
-  /// @param[in] base 範囲のベースアドレスを表す式
-  /// @param[in] range 範囲を表す式
-  /// @param[in] range_val 範囲の値
-  virtual
-  ElbExpr*
-  new_MinusPartSelect(const PtBase* pt_expr,
-		      ElbParameter* obj,
 		      ElbExpr* base,
 		      ElbExpr* range,
 		      int range_val) = 0;

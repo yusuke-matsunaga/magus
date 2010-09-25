@@ -12,7 +12,6 @@
 #include "EiFactory.h"
 #include "EiPartSelect.h"
 #include "ElbDecl.h"
-#include "ElbParameter.h"
 #include "ElbPrimitive.h"
 
 #include "ym_verilog/BitVector.h"
@@ -41,27 +40,6 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
   ElbExpr* expr = new (p) EiDeclPartSelect(pt_expr, obj,
 					   index1, index2,
 					   index1_val, index2_val);
-
-  return expr;
-}
-
-// @brief 部分選択式を生成する．
-// @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] index1, inde2 パート選択式
-// @param[in] index1_val, index2_val パート選択式の値
-ElbExpr*
-EiFactory::new_PartSelect(const PtBase* pt_expr,
-			  ElbParameter* obj,
-			  ElbExpr* index1,
-			  ElbExpr* index2,
-			  int index1_val,
-			  int index2_val)
-{
-  void* p = mAlloc.get_memory(sizeof(EiParamPartSelect));
-  ElbExpr* expr = new (p) EiParamPartSelect(pt_expr, obj,
-					    index1, index2,
-					    index1_val, index2_val);
 
   return expr;
 }
@@ -302,68 +280,6 @@ EiDeclPartSelect::set_bitvector(const BitVector& v)
   int msb = left_range_val();
   int lsb = right_range_val();
   mObj->set_partselect(lsb, msb, v);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiParamPartSelect
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] index1, inde2 パート選択式
-// @param[in] index1_val, index2_val パート選択式の値
-EiParamPartSelect::EiParamPartSelect(const PtBase* pt_expr,
-			   ElbParameter* obj,
-			   ElbExpr* index1,
-			   ElbExpr* index2,
-			   int index1_val,
-			   int index2_val) :
-  EiPartSelect(pt_expr, index1, index2, index1_val, index2_val),
-  mObj(obj)
-{
-}
-
-// @brief デストラクタ
-EiParamPartSelect::~EiParamPartSelect()
-{
-}
-
-// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-const VlDecl*
-EiParamPartSelect::decl_obj() const
-{
-  return mObj;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiParamPartSelect::eval_bitvector(BitVector& bitvector,
-			     tVpiValueType req_type) const
-{
-  BitVector bv;
-  mObj->get_bitvector(bv);
-  bv.part_select(left_range_val(), right_range_val(), bitvector);
-  bitvector.coerce(req_type);
-}
-
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiParamPartSelect::set_scalar(tVpiScalarVal v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiParamPartSelect::set_bitvector(const BitVector& v)
-{
-  assert_not_reached(__FILE__, __LINE__);
 }
 
 

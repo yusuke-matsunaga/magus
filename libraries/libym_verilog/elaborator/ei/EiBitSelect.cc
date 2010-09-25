@@ -12,8 +12,6 @@
 #include "EiFactory.h"
 #include "EiBitSelect.h"
 #include "ElbDecl.h"
-#include "ElbParameter.h"
-#include "ElbPrimitive.h"
 
 #include "ym_verilog/BitVector.h"
 
@@ -36,21 +34,6 @@ EiFactory::new_BitSelect(const PtBase* pt_expr,
 {
   void* p = mAlloc.get_memory(sizeof(EiDeclBitSelect));
   ElbExpr* expr = new (p) EiDeclBitSelect(pt_expr, obj, bit_index);
-
-  return expr;
-}
-
-// @brief ビット選択式を生成する．
-// @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] bit_index ビット選択式
-ElbExpr*
-EiFactory::new_BitSelect(const PtBase* pt_expr,
-			 ElbParameter* obj,
-			 ElbExpr* bit_index)
-{
-  void* p = mAlloc.get_memory(sizeof(EiParamBitSelect));
-  ElbExpr* expr = new (p) EiParamBitSelect(pt_expr, obj, bit_index);
 
   return expr;
 }
@@ -244,58 +227,6 @@ EiDeclBitSelect::set_scalar(tVpiScalarVal v)
   if ( index()->eval_int(bpos) ) {
     mObj->set_bitselect(bpos, v);
   }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiParamBitSelect
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] bit_index ビット選択式
-EiParamBitSelect::EiParamBitSelect(const PtBase* pt_expr,
-				   ElbParameter* obj,
-				   ElbExpr* bit_index) :
-  EiBitSelect(pt_expr, bit_index),
-  mObj(obj)
-{
-}
-
-// @brief デストラクタ
-EiParamBitSelect::~EiParamBitSelect()
-{
-}
-
-// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-const VlDecl*
-EiParamBitSelect::decl_obj() const
-{
-  return mObj;
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiParamBitSelect::eval_scalar() const
-{
-  int bpos;
-  if ( index()->eval_int(bpos) ) {
-    BitVector bv;
-    mObj->get_bitvector(bv);
-    return bv.bit_select(bpos);
-  }
-  // ビット指定が X/Z の時は X を返す．
-  return kVpiScalarX;
-}
-
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiParamBitSelect::set_scalar(tVpiScalarVal v)
-{
-  assert_not_reached(__FILE__, __LINE__);
 }
 
 
