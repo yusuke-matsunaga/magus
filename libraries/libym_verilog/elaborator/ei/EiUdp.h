@@ -32,7 +32,7 @@ class EiUdpDefn :
   public ElbUdpDefn
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -55,7 +55,7 @@ private:
   virtual
   ~EiUdpDefn();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlObj の仮想関数
@@ -81,12 +81,12 @@ public:
   virtual
   const char*
   def_name() const;
-  
+
   /// @brief primitive type を返す．
   virtual
   tVpiPrimType
   prim_type() const;
-  
+
   /// @brief ポート数を返す．
   virtual
   ymuint32
@@ -97,7 +97,7 @@ public:
   virtual
   const VlIODecl*
   input(ymuint32 pos) const;
-  
+
   /// @brief 出力の宣言要素を返す．
   virtual
   const VlIODecl*
@@ -107,7 +107,7 @@ public:
   virtual
   bool
   is_protected() const;
-  
+
   /// @brief 初期値の式を返す．
   virtual
   const VlExpr*
@@ -194,7 +194,7 @@ private:
 
   // table entry の値の配列
   tVpiUdpVal* mValArray;
-  
+
 };
 
 
@@ -206,7 +206,7 @@ class EiUdpIO :
 {
   friend class EiFactory;
   friend class EiUdpDefn;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -215,7 +215,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiUdpIO();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -232,7 +232,7 @@ public:
   FileRegion
   file_region() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlIODecl に固有の仮想関数
@@ -242,43 +242,57 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief 方向を返す．
   virtual
   tVpiDirection
   direction() const;
-  
+
   /// @brief 符号の属性の取得
   /// @return 符号付きのとき true を返す．
   /// @note このクラスは false を返す．
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief 範囲の MSB の取得
   /// @return このクラスは NULL を返す．
   virtual
   const VlExpr*
   left_range() const;
-  
+
   /// @brief 範囲の LSB の取得
   /// @return このクラスは NULL を返す．
   virtual
   const VlExpr*
   right_range() const;
-    
+
+  /// @brief MSB の値を返す．
+  /// @retval 範囲のMSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  left_range_const() const;
+
+  /// @brief LSB の値を返す．
+  /// @retval 範囲のLSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  right_range_const() const;
+
   /// @brief サイズを返す．
   /// このクラスは 1 を返す．
   virtual
   ymuint32
   bit_size() const;
-  
+
   /// @brief 対応する宣言要素を返す．
   /// @note このクラスでは NULL を返す．
   virtual
   const VlDecl*
   decl() const;
-  
+
   /// @brief 親のモジュールの取得
   /// @return このクラスは NULL を返す．
   virtual
@@ -315,7 +329,7 @@ private:
   set(const PtIOHead* pt_header,
       const PtIOItem* pt_item);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -326,7 +340,7 @@ private:
 
   // パース木のIO宣言ヘッダ
   const PtIOHead* mPtHeader;
-  
+
   // パース木のIO宣言定義
   const PtIOItem* mPtItem;
 
@@ -342,16 +356,16 @@ class EiTableEntry :
 {
   friend class EiFactory;
   friend class EiUdpDefn;
-  
+
 private:
 
   /// @brief コンストラクタ
   EiTableEntry();
-  
+
   /// @brief デストラクタ
   virtual
   ~EiTableEntry();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -373,7 +387,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlTableEntry の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 一行の要素数を返す．
   virtual
   ymuint32
@@ -388,7 +402,7 @@ public:
   virtual
   string
   str() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -399,22 +413,22 @@ public:
   void
   set(const PtUdpEntry* pt_entry,
       const vector<tVpiUdpVal>& vals);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親の UDP
   ElbUdpDefn* mUdp;
-  
+
   // パース木の定義
   const PtUdpEntry* mPtUdpEntry;
-  
+
   // 値の配列 (実体は EiUdpDefn が持っている)
   tVpiUdpVal* mValArray;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

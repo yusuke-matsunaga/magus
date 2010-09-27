@@ -38,7 +38,7 @@ EiFactory::new_UdpDefn(const PtUdp* pt_udp,
   ymuint32 table_size = pt_udp->table_array().size();
   void* r = mAlloc.get_memory(sizeof(EiTableEntry) * table_size);
   EiTableEntry* table = new (r) EiTableEntry[table_size];
-  
+
   ymuint32 row_size = port_num;
   if ( pt_udp->prim_type() == kVpiSeqPrim ) {
     ++ row_size;
@@ -46,7 +46,7 @@ EiFactory::new_UdpDefn(const PtUdp* pt_udp,
   ymuint32 vsize = row_size * table_size;
   void* s = mAlloc.get_memory(sizeof(tVpiUdpVal) * vsize);
   tVpiUdpVal* val_array = new (s) tVpiUdpVal[vsize];
-  
+
   void* p = mAlloc.get_memory(sizeof(EiUdpDefn));
   EiUdpDefn* udp = new (p) EiUdpDefn(pt_udp, is_protected,
 				     port_num, iodecl,
@@ -60,7 +60,7 @@ EiFactory::new_UdpDefn(const PtUdp* pt_udp,
     table[i].mValArray = val_array;
     val_array += row_size;
   }
-  
+
   return udp;
 }
 
@@ -120,14 +120,14 @@ EiUdpDefn::def_name() const
 {
   return mPtUdp->name();
 }
-  
+
 // @brief primitive type を返す．
 tVpiPrimType
 EiUdpDefn::prim_type() const
 {
   return mPtUdp->prim_type();
 }
-  
+
 // @brief ポート数を返す．
 ymuint32
 EiUdpDefn::port_num() const
@@ -142,7 +142,7 @@ EiUdpDefn::input(ymuint32 pos) const
 {
   return &mIODeclList[pos];
 }
-  
+
 // @brief 出力の宣言要素を返す．
 const VlIODecl*
 EiUdpDefn::output() const
@@ -156,7 +156,7 @@ EiUdpDefn::is_protected() const
 {
   return mProtected;
 }
-  
+
 // @brief 初期値の式を返す．
 const VlExpr*
 EiUdpDefn::init_expr() const
@@ -258,7 +258,7 @@ EiUdpIO::name() const
 {
   return mPtItem->name();
 }
-  
+
 // @brief 方向を返す．
 tVpiDirection
 EiUdpIO::direction() const
@@ -271,7 +271,7 @@ EiUdpIO::direction() const
   // ダミー
   return kVpiNoDirection;
 }
-  
+
 // @brief 符号の属性の取得
 // @return 符号付きのとき true を返す．
 // @note このクラスは false を返す．
@@ -280,7 +280,7 @@ EiUdpIO::is_signed() const
 {
   return false;
 }
-  
+
 // @brief 範囲の MSB の取得
 // @return このクラスは NULL を返す．
 const VlExpr*
@@ -288,7 +288,7 @@ EiUdpIO::left_range() const
 {
   return NULL;
 }
-  
+
 // @brief 範囲の LSB の取得
 // @return このクラスは NULL を返す．
 const VlExpr*
@@ -296,7 +296,25 @@ EiUdpIO::right_range() const
 {
   return NULL;
 }
-    
+
+// @brief MSB の値を返す．
+// @retval 範囲のMSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiUdpIO::left_range_const() const
+{
+  return -1;
+}
+
+// @brief LSB の値を返す．
+// @retval 範囲のLSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiUdpIO::right_range_const() const
+{
+  return -1;
+}
+
 // @brief サイズを返す．
 // このクラスは 1 を返す．
 ymuint32
@@ -304,7 +322,7 @@ EiUdpIO::bit_size() const
 {
   return 1;
 }
-  
+
 // @brief 対応する宣言要素を返す．
 // @note このクラスでは NULL を返す．
 const VlDecl*
@@ -312,7 +330,7 @@ EiUdpIO::decl() const
 {
   return NULL;
 }
-  
+
 // @brief 親のモジュールの取得
 // @return このクラスは NULL を返す．
 const VlModule*
@@ -364,7 +382,7 @@ EiUdpIO::set(const PtIOHead* pt_header,
 EiTableEntry::EiTableEntry()
 {
 }
-  
+
 // @brief デストラクタ
 EiTableEntry::~EiTableEntry()
 {
@@ -383,7 +401,7 @@ EiTableEntry::file_region() const
 {
   return mPtUdpEntry->file_region();
 }
-  
+
 // @brief 一行の要素数を返す．
 ymuint32
 EiTableEntry::size() const

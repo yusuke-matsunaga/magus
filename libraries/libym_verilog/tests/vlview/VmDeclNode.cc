@@ -62,7 +62,7 @@ VmIODeclListNode::~VmIODeclListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmIODeclListNode::data(int column,
 		       int role) const
@@ -123,7 +123,7 @@ VmIODeclNode::~VmIODeclNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmIODeclNode::data(int column,
 		   int role) const
@@ -138,7 +138,7 @@ VmIODeclNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmIODeclNode::loc() const
@@ -177,6 +177,8 @@ VmIODeclNode::expand() const
   if ( mIODecl->left_range() ) {
     add_expr("vpiLeftRange", mIODecl->left_range());
     add_expr("vpiRightRange", mIODecl->right_range());
+    add_int("vpiLeftRangeVal", mIODecl->left_range_const());
+    add_int("vpiRightRangeVal", mIODecl->right_range_const());
   }
 }
 
@@ -202,7 +204,7 @@ VmDeclListNode::~VmDeclListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmDeclListNode::data(int column,
 		     int role) const
@@ -217,7 +219,7 @@ VmDeclListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmDeclListNode::loc() const
@@ -264,7 +266,7 @@ VmDeclNode::~VmDeclNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmDeclNode::data(int column,
 		 int role) const
@@ -279,7 +281,7 @@ VmDeclNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmDeclNode::loc() const
@@ -355,6 +357,8 @@ VmDeclNode::expand() const
   if ( mDecl->left_range() ) {
     add_expr("vpiLeftRange", mDecl->left_range());
     add_expr("vpiRightRange", mDecl->right_range());
+    add_int("vpiLeftRangeVal", mDecl->left_range_const());
+    add_int("vpiRightRangeVal", mDecl->right_range_const());
   }
 }
 
@@ -377,7 +381,7 @@ VmRangeNode::~VmRangeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmRangeNode::data(int column,
 		  int role) const
@@ -392,7 +396,7 @@ VmRangeNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmRangeNode::loc() const

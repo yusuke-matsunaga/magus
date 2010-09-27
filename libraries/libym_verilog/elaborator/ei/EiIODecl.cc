@@ -72,7 +72,7 @@ EiIOHead::EiIOHead(const PtIOHead* pt_header) :
   mPtHead(pt_header)
 {
 }
-  
+
 // @brief デストラクタ
 EiIOHead::~EiIOHead()
 {
@@ -127,7 +127,7 @@ EiModIOHead::EiModIOHead(ElbModule* module,
   mModule(module)
 {
 }
-  
+
 // @brief デストラクタ
 EiModIOHead::~EiModIOHead()
 {
@@ -154,7 +154,7 @@ EiTaskIOHead::EiTaskIOHead(ElbTaskFunc* task,
   mTask(task)
 {
 }
-  
+
 // @brief デストラクタ
 EiTaskIOHead::~EiTaskIOHead()
 {
@@ -181,7 +181,7 @@ EiFunctionIOHead::EiFunctionIOHead(ElbTaskFunc* func,
   mFunction(func)
 {
 }
-  
+
 // @brief デストラクタ
 EiFunctionIOHead::~EiFunctionIOHead()
 {
@@ -198,12 +198,12 @@ EiFunctionIOHead::function() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiIODecl
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 EiIODecl::EiIODecl()
 {
 }
-  
+
 // @brief デストラクタ
 EiIODecl::~EiIODecl()
 {
@@ -259,7 +259,7 @@ EiIODecl::is_signed() const
 {
   return mDecl->is_signed();
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -276,6 +276,24 @@ const VlExpr*
 EiIODecl::right_range() const
 {
   return mDecl->right_range();
+}
+
+// @brief MSB の値を返す．
+// @retval 範囲のMSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiIODecl::left_range_const() const
+{
+  return mDecl->left_range_const();
+}
+
+// @brief LSB の値を返す．
+// @retval 範囲のLSBの値 範囲指定を持つとき
+// @retval -1 範囲指定を持たないとき
+int
+EiIODecl::right_range_const() const
+{
+  return mDecl->right_range_const();
 }
 
 // @brief ビット幅を返す．

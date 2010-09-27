@@ -67,6 +67,20 @@ public:
   const VlExpr*
   right_range() const = 0;
 
+  /// @brief MSB の値を返す．
+  /// @retval 範囲のMSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  left_range_const() const = 0;
+
+  /// @brief LSB の値を返す．
+  /// @retval 範囲のLSBの値 範囲指定を持つとき
+  /// @retval -1 範囲指定を持たないとき
+  virtual
+  int
+  right_range_const() const = 0;
+
   /// @brief ビット幅を返す．
   virtual
   ymuint32
