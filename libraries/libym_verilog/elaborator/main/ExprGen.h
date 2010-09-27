@@ -285,19 +285,6 @@ private:
 			     const ElbEnv& env,
 			     const PtExpr* pt_expr);
 
-  /// @brief 単体の宣言要素用のプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 対象の宣言要素
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_decl_primary(const VlNamedObj* parent,
-			   const ElbEnv& env,
-			   const PtExpr* pt_expr,
-			   ElbDecl* decl);
-
   /// @brief genvar に対応した定数を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -313,29 +300,34 @@ private:
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[in] func 親の function
+  /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
+  /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
+  /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
   ElbDecl*
   instantiate_decl(ElbObjHandle* handle,
 		   const VlNamedObj* parent,
 		   const PtExpr* pt_expr,
-		   const VlNamedObj* func);
+		   const VlNamedObj* func,
+		   bool& has_range_select,
+		   bool& has_bit_select,
+		   ElbExpr*& index1,
+		   ElbExpr*& index2);
 
-  /// @brief 添字の部分を取り出す．
-  /// @param[in] parent 親のスコープ
+  /// @brief 単体の宣言要素用のプライマリ式を生成する．
   /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 対象のオブジェクト
-  /// @param[in] func 親の function
-  /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
-  /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
-  /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
-  bool
-  instantiate_index(const VlNamedObj* parent,
-		    const PtExpr* pt_expr,
-		    VlDecl* decl,
-		    const VlNamedObj* func,
-		    bool& has_range_select,
-		    bool& has_bit_select,
-		    ElbExpr*& index1,
-		    ElbExpr*& index2);
+  /// @param[in] decl 対象の宣言要素
+  /// @param[in] has_range_select 範囲指定を持っている時 true を渡す．
+  /// @param[in] has_bit_select ビット指定を持っている時 true を渡す．
+  /// @param[in] index1, index2 範囲指定/ビット指定の式
+  /// @return 生成された式を返す．
+  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
+  ElbExpr*
+  instantiate_decl_primary(const PtExpr* pt_expr,
+			   ElbDecl* decl,
+			   bool has_range_select,
+			   bool has_bit_select,
+			   ElbExpr* index1,
+			   ElbExpr* index2);
 
   /// @brief 式の値を評価する．
   /// @param[in] parent 親のスコープ
