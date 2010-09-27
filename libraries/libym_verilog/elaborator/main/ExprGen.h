@@ -182,17 +182,6 @@ private:
 		      const ElbEnv& env,
 		      const PtExpr* pt_expr);
 
-  /// @brief PtPrimary から左辺用の ElbExpr を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_lhs_primary(const VlNamedObj* parent,
-			  const ElbEnv& env,
-			  const PtExpr* pt_expr);
-
   /// @brief PtOpr から ElbExpr を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] env 生成時の環境
@@ -225,65 +214,6 @@ private:
   instantiate_sysfunccall(const VlNamedObj* parent,
 			  const ElbEnv& env,
 			  const PtExpr* pt_expr);
-
-  /// @brief 単体の NamedEvent 用のプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 宣言要素 (NamedEvent であることを期待している)
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  /// @note decl は NamedEvent であることを期待している．
-  ElbExpr*
-  instantiate_namedevent_primary1(const VlNamedObj* parent,
-				  const PtExpr* pt_expr,
-				  ElbDecl* decl);
-
-  /// @brief 配列要素の NamedEvent 用のプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 配列型の宣言要素
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  /// @note decl は NamedEventArray であることを期待している．
-  ElbExpr*
-  instantiate_namedevent_primary2(const VlNamedObj* parent,
-				  const PtExpr* pt_expr,
-				  ElbDeclArray* decl);
-
-  /// @brief 定数式用のプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_const_primary(const VlNamedObj* parent,
-			    const ElbEnv& env,
-			    const PtExpr* pt_expr);
-
-  /// @brief constant function 内で用いられるプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] func 親の関数
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_cf_primary(const VlNamedObj* parent,
-			 const ElbEnv& env,
-			 const PtExpr* pt_expr,
-			 const VlNamedObj* func);
-
-  /// @brief 通常のプライマリ式を生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] env 生成時の環境
-  /// @param[in] pt_expr 式を表すパース木
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_normal_primary(const VlNamedObj* parent,
-			     const ElbEnv& env,
-			     const PtExpr* pt_expr);
 
   /// @brief genvar に対応した定数を生成する．
   /// @param[in] parent 親のスコープ

@@ -134,7 +134,7 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
 
 	// attribute instance の生成
 	//instantiate_attribute(pt_expr->attr_top(), false, expr);
-	
+
 	return expr;
       }
 
@@ -171,7 +171,7 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
   }
 
   assert_not_reached(__FILE__, __LINE__);
-  
+
   return NULL;
 }
 
@@ -239,7 +239,7 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
 
 
   case kPtPrimaryExpr:
-    return instantiate_lhs_primary(parent, env, pt_expr);
+    return instantiate_primary(parent, env, pt_expr);
 
   case kPtConstExpr:
     error_illegal_constant_in_lhs(pt_expr);
@@ -491,7 +491,7 @@ ExprGen::instantiate_delay_sub(const VlNamedObj* parent,
     }
     expr_list[i] = expr;
   }
-  
+
   ElbDelay* delay = factory().new_Delay(pt_obj, n, expr_list);
 
   return delay;

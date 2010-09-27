@@ -132,17 +132,18 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     // まず関数内の識別子を探索する．
     handle = find_obj_up(parent, nb_array, name, env.function());
     if ( handle == NULL ) {
-      // なかったらモジュール内の定数識別子を探索する．
-      handle = find_obj_up(parent, nb_array, name,
-			   parent->parent_module());
+      if ( !env.is_var_lhs() ) {
+	// 右辺ならモジュール内の定数識別子を探索する．
+	handle = find_obj_up(parent, nb_array, name,
+			     parent->parent_module());
+      }
       if ( handle == NULL ) {
 	// 見つからなかった．
 	error_not_found(pt_expr);
 	return NULL;
       }
-      // handle が持つオブジェクトは genvar か parameter でなければならない．
-      if ( handle->genvar() == NULL &&
-	   handle->parameter() == NULL ) {
+      // この場合は genvar か parameter でなければならない．
+      if ( handle->genvar() == NULL && handle->parameter() == NULL ) {
 	error_not_a_parameter(pt_expr);
 	return NULL;
       }
@@ -212,102 +213,18 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     return NULL;
   }
 
-  // 対象のオブジェクトが genvar の場合
-  ElbGenvar* genvar = handle->genvar();
-  if ( genvar ) {
-    return instantiate_genvar(parent, pt_expr, genvar->value());
+  if ( !env.is_var_lhs() &&
+       !env.is_net_lhs() &&
+       !env.is_pca_lhs() &&
+       !env.is_force_lhs() ) {
+    // 対象のオブジェクトが genvar の場合
+    ElbGenvar* genvar = handle->genvar();
+    if ( genvar ) {
+      return instantiate_genvar(parent, pt_expr, genvar->value());
+    }
   }
 
   // 対象のオブジェクトが宣言要素だった場合
-  bool has_range_select;
-  bool has_bit_select;
-  ElbExpr* index1;
-  ElbExpr* index2;
-  ElbDecl* decl = instantiate_decl(handle, parent, pt_expr, NULL,
-				   has_range_select,
-				   has_bit_select,
-				   index1, index2);
-  if ( decl == NULL ) {
-    return NULL;
-  }
-
-  tVpiObjType type = decl->type();
-  if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
-    error_illegal_object(pt_expr);
-    return NULL;
-  }
-
-  return instantiate_decl_primary(pt_expr, decl,
-				  has_range_select,
-				  has_bit_select,
-				  index1, index2);
-
-}
-
-// @brief PtPrimary から左辺用の ElbExpr を生成する．
-// @param[in] parent 親のスコープ
-// @param[in] env 生成時の環境
-// @param[in] pt_expr 式を表すパース木
-ElbExpr*
-ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
-				 const ElbEnv& env,
-				 const PtExpr* pt_expr)
-{
-  // 識別子の階層
-  PtNameBranchArray nb_array = pt_expr->namebranch_array();
-  // 識別子の名前
-  const char* name = pt_expr->name();
-
-  // 識別子の添字の次元
-  ymuint isize = pt_expr->index_num();
-
-  // 名前に該当するオブジェクトのハンドル
-  ElbObjHandle* handle = NULL;
-
-  if ( env.inside_constant_function() ) {
-    // constant function 中の式の場合
-    if ( nb_array.size() > 0 ) {
-      // 階層つき識別子はだめ
-      error_hname_in_cf(pt_expr);
-      return NULL;
-    }
-
-    // 親の関数
-    const VlNamedObj* func = env.function();
-    assert_cond(func, __FILE__, __LINE__);
-
-    // 名前をキーにして func 内の要素を探索する．
-    handle = find_obj_up(parent, PtNameBranchArray(), name, func);
-    if ( !handle ) {
-      // 暗黙の宣言はない．
-      error_not_found(pt_expr);
-      return NULL;
-    }
-  }
-  else {
-    // 名前をキーにして要素を探索する．
-    handle = find_obj_up(parent, nb_array, name, NULL);
-    if ( !handle  ) {
-      // 見つからなくてもデフォルトネットタイプが kVpiNone でないかぎり
-      // 暗黙の1ビットネット宣言を行う．
-      // ただし識別子に添字がついていたらだめ
-      const VlModule* parent_module = parent->parent_module();
-      tVpiNetType def_nettype = parent_module->def_net_type();
-      if ( !pt_expr->is_simple() ||
-	   nb_array.size() > 0 ||
-	   isize != 0 ||
-	   def_nettype == kVpiNone ) {
-	error_not_found(pt_expr);
-	return NULL;
-      }
-      ElbDecl* decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
-      reg_decl(vpiNet, decl);
-
-      handle = find_obj(parent, name);
-      assert_cond(handle, __FILE__, __LINE__);
-    }
-  }
-
   bool has_range_select;
   bool has_bit_select;
   ElbExpr* index1;
@@ -332,60 +249,16 @@ ExprGen::instantiate_lhs_primary(const VlNamedObj* parent,
   }
 
   tVpiObjType type = decl->type();
-
-  // かなり野暮ったいコード
-  // でも変に凝るよりシンプルのほうがいいでしょ．
-  if ( env.is_net_lhs() ) {
-    // net/net-array 型のみが有効
-    if ( type != kVpiNet ) {
-      error_illegal_object(pt_expr);
-      return NULL;
-    }
-  }
-  else if ( env.is_var_lhs() ) {
-    // reg/reg-array/var 型の宣言要素のみが有効
-    if ( type != kVpiReg &&
-	 type != kVpiIntegerVar &&
-	 type != kVpiRealVar &&
-	 type != kVpiTimeVar ) {
-      error_illegal_object(pt_expr);
-      return NULL;
-    }
-  }
-  else if ( env.is_pca_lhs() ) {
-    // reg/var 型の宣言要素のみが有効
-    if ( type != kVpiReg &&
-	 type != kVpiIntegerVar &&
-	 type != kVpiRealVar &&
-	 type != kVpiTimeVar ) {
-      error_illegal_object(pt_expr);
-      return NULL;
-    }
-    if ( has_range_select || has_bit_select ) {
-      error_select_in_pca(pt_expr);
-      return NULL;
-    }
-  }
-  else if ( env.is_force_lhs() ) {
-    // net/reg/var 型の宣言要素のみが有効
-    if ( type != kVpiNet &&
-	 type != kVpiReg &&
-	 type != kVpiIntegerVar &&
-	 type != kVpiRealVar &&
-	 type != kVpiTimeVar ) {
-      error_illegal_object(pt_expr);
-      return NULL;
-    }
-    if ( has_range_select || has_bit_select ) {
-      error_select_in_force(pt_expr);
-      return NULL;
-    }
+  if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
+    error_illegal_object(pt_expr);
+    return NULL;
   }
 
   return instantiate_decl_primary(pt_expr, decl,
 				  has_range_select,
 				  has_bit_select,
 				  index1, index2);
+
 }
 
 // @brief genvar に対応した定数を生成する．

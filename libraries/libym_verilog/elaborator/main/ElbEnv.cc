@@ -47,7 +47,7 @@ ElbEnv::ElbEnv() :
   mTf(NULL)
 {
 }
-  
+
 // @brief コピーコンストラクタ
 ElbEnv::ElbEnv(const ElbEnv& src) :
   mFlags(src.mFlags),
@@ -68,7 +68,7 @@ ElbEnv::operator=(const ElbEnv& src)
 ElbEnv::~ElbEnv()
 {
 }
-  
+
 // @brief 定数式を要求する．
 void
 ElbEnv::set_constant()
@@ -111,7 +111,7 @@ ElbEnv::set_event()
 {
   mFlags |= MASK_EVENT;
 }
-  
+
 // @brief net 型の左辺式の印をつける．
 void
 ElbEnv::set_net_lhs()
@@ -139,14 +139,14 @@ ElbEnv::set_force_lhs()
 {
   mFlags |= MASK_FORCE;
 }
-  
+
 // @brief 定数式が要求されている時に true を返す．
 bool
 ElbEnv::is_constant() const
 {
   return static_cast<bool>((mFlags >> SFT_CONSTANT) & 1U);
 }
-  
+
 // @brief function 内の生成の時に親の function を返す．
 const VlNamedObj*
 ElbEnv::function() const
@@ -156,7 +156,7 @@ ElbEnv::function() const
   }
   return NULL;
 }
-  
+
 // @brief function 内の生成時に true を返す．
 bool
 ElbEnv::inside_function() const
@@ -170,7 +170,7 @@ ElbEnv::inside_constant_function() const
 {
   return static_cast<bool>((mFlags >> SFT_CF) & 1U);
 }
-  
+
 // @brief task 内の生成の時に親の function を返す．
 const VlNamedObj*
 ElbEnv::task() const
@@ -180,7 +180,7 @@ ElbEnv::task() const
   }
   return NULL;
 }
-  
+
 // @brief task 内の生成時に true を返す．
 bool
 ElbEnv::inside_task() const
@@ -194,14 +194,14 @@ ElbEnv::is_system_tf_arg() const
 {
   return static_cast<bool>((mFlags >> SFT_ARG) & 1U);
 }
-  
+
 // @brief イベント式の時に true を返す．
 bool
 ElbEnv::is_event() const
 {
   return static_cast<bool>((mFlags >> SFT_EVENT) & 1U);
 }
-  
+
 // @brief net 型の左辺式の時に true を返す．
 bool
 ElbEnv::is_net_lhs() const
@@ -229,18 +229,55 @@ ElbEnv::is_force_lhs() const
 {
   return static_cast<bool>((mFlags >> SFT_FORCE) & 1U);
 }
-  
-// @brief 右辺式としてこの環境で valid な型の時 true を返す．
+
+// @brief この環境で valid な型の時 true を返す．
 bool
 ElbEnv::is_valid_primary(tVpiObjType type,
 			 bool part_select) const
 {
+  if ( is_net_lhs() ) {
+    if ( type != kVpiNet ) {
+      return false;
+    }
+  }
+  if ( is_var_lhs() ) {
+    if ( type != kVpiReg &&
+	 type != kVpiIntegerVar &&
+	 type != kVpiRealVar &&
+	 type != kVpiTimeVar ) {
+      return false;
+    }
+  }
+  if ( is_pca_lhs() ) {
+    if ( type != kVpiReg &&
+	 type != kVpiIntegerVar &&
+	 type != kVpiRealVar &&
+	 type != kVpiTimeVar) {
+      return false;
+    }
+    if ( part_select ) {
+      return false;
+    }
+  }
+  if ( is_force_lhs() ) {
+    if ( type != kVpiNet &
+	 type != kVpiReg &
+	 type != kVpiIntegerVar &
+	 type != kVpiRealVar &
+	 type != kVpiTimeVar) {
+      return false;
+    }
+    if ( part_select ) {
+      return false;
+    }
+  }
+
   switch ( type ) {
   case kVpiParameter:
   case kVpiSpecParam:
   case kVpiConstant:
     return true;
-    
+
   case kVpiNet:
   case kVpiReg:
   case kVpiIntegerVar:
@@ -250,7 +287,7 @@ ElbEnv::is_valid_primary(tVpiObjType type,
       return false;
     }
     return true;
-    
+
   case kVpiRealVar:
     if ( is_constant() || part_select ) {
       return false;
@@ -262,7 +299,7 @@ ElbEnv::is_valid_primary(tVpiObjType type,
       return true;
     }
     break;
-    
+
   default:
     if ( is_system_tf_arg() ) {
       return true;
