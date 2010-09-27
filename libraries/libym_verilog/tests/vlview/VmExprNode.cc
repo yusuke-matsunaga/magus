@@ -32,7 +32,7 @@ VmNode::add_exprlist(const QString& label,
 {
   add_child( new VmExprListNode(label, expr_list) );
 }
-  
+
 // @brief ExprNode を追加する．
 // @param[in] expr 式
 void
@@ -64,7 +64,7 @@ VmExprListNode::~VmExprListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmExprListNode::data(int column,
 		     int role) const
@@ -79,7 +79,7 @@ VmExprListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmExprListNode::loc() const
@@ -126,7 +126,7 @@ VmExprNode::~VmExprNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmExprNode::data(int column,
 		 int role) const
@@ -162,6 +162,8 @@ type2str(tVpiObjType type)
   case kVpiConstant:    return "vpiConstant";
   case kVpiFuncCall:    return "vpiFuncCall";
   case kVpiSysFuncCall: return "vpiSysFuncCall";
+  case kVpiNetBit:      return "vpiNetBit";
+  case kVpiRegBit:      return "vpiRegBit";
   default:              return "Reference";
   }
   assert_not_reached(__FILE__, __LINE__);
@@ -220,7 +222,7 @@ op_type_str(tVpiOpType type)
   }
   return "";
 }
-  
+
 // 定数の型を表す文字列を返す．
 QString
 constant_type_str(tVpiConstType type)
@@ -251,38 +253,6 @@ VmExprNode::expand() const
 {
   add_str("vpiType", type2str(mExpr->type()));
   switch ( mExpr->type() ) {
-  case kVpiBitSelect:
-    add_bool("vpiConstantSelect", mExpr->is_constant_select());
-    if ( mExpr->decl_obj() ) {
-      add_str("vpiParent", mExpr->decl_obj()->full_name());
-      for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
-	add_expr("array_index", mExpr->declarray_index(i));
-      }
-      add_expr("vpiIndex", mExpr->index());
-    }
-    else {
-      add_str("vpiParent", mExpr->parent_expr()->decompile());
-      add_int("vpiIndex", mExpr->index_val());
-    }
-    break;
-
-  case kVpiPartSelect:
-    add_bool("vpiConstantSelect", mExpr->is_constant_select());
-    if ( mExpr->decl_obj() ) {
-      add_str("vpiParent", mExpr->decl_obj()->full_name());
-      for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
-	add_expr("array_index", mExpr->declarray_index(i));
-      }
-      add_expr("vpiLeftRange", mExpr->left_range());
-      add_expr("vpiRightRange", mExpr->right_range());
-    }
-    else {
-      add_str("vpiParent", mExpr->parent_expr()->decompile());
-      add_int("vpiLeftRange", mExpr->left_range_val());
-      add_int("vpiRightRange", mExpr->right_range_val());
-    }
-    break;
-    
   case kVpiOperation:
     add_str("vpiOpType", op_type_str(mExpr->op_type()));
     for (ymuint i = 0; i < mExpr->operand_num(); ++ i) {
@@ -300,7 +270,7 @@ VmExprNode::expand() const
       add_expr("vpiArgument", mExpr->argument(i));
     }
     break;
-    
+
   case kVpiSysFuncCall:
     add_str("vpiUserSystf", mExpr->user_systf()->name());
     for (ymuint i = 0; i < mExpr->argument_num(); ++ i) {
@@ -309,17 +279,52 @@ VmExprNode::expand() const
     break;
 
   default:
-    if ( mExpr->decl_obj() ) {
-      add_str("decl obj", mExpr->decl_obj()->full_name());
-      for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
-	add_expr("vpiArrayIndex", mExpr->declarray_index(i));
+    if ( mExpr->is_bitselect() ) {
+      add_bool("vpiConstantSelect", mExpr->is_constant_select());
+      if ( mExpr->decl_obj() ) {
+	add_str("vpiParent", mExpr->decl_obj()->full_name());
+	for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
+	  add_expr("array_index", mExpr->declarray_index(i));
+	}
+	add_expr("vpiIndex", mExpr->index());
+      }
+      else {
+	add_str("vpiParent", mExpr->parent_expr()->decompile());
+	add_int("vpiIndex", mExpr->index_val());
       }
     }
-    else if ( mExpr->scope_obj() ) {
-      add_str("scope obj", mExpr->scope_obj()->full_name());
+    else if ( mExpr->is_partselect() ) {
+      add_bool("vpiConstantSelect", mExpr->is_constant_select());
+      if ( mExpr->decl_obj() ) {
+	add_str("vpiParent", mExpr->decl_obj()->full_name());
+	for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
+	  add_expr("array_index", mExpr->declarray_index(i));
+	}
+	add_expr("vpiLeftRange", mExpr->left_range());
+	add_expr("vpiRightRange", mExpr->right_range());
+      }
+      else {
+	add_str("vpiParent", mExpr->parent_expr()->decompile());
+	add_int("vpiLeftRange", mExpr->left_range_val());
+	add_int("vpiRightRange", mExpr->right_range_val());
+      }
     }
-    else if ( mExpr->primitive_obj() ) {
-      add_str("primitive obj", mExpr->primitive_obj()->full_name());
+    else if ( mExpr->is_primary() ) {
+      if ( mExpr->decl_obj() ) {
+	add_str("decl obj", mExpr->decl_obj()->full_name());
+	for (ymuint i = 0; i < mExpr->declarray_dimension(); ++ i) {
+	  add_expr("vpiArrayIndex", mExpr->declarray_index(i));
+	}
+      }
+      else if ( mExpr->scope_obj() ) {
+	add_str("scope obj", mExpr->scope_obj()->full_name());
+      }
+      else if ( mExpr->primitive_obj() ) {
+	add_str("primitive obj", mExpr->primitive_obj()->full_name());
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
     }
     else {
       assert_not_reached(__FILE__, __LINE__);

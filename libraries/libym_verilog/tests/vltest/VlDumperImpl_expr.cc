@@ -46,55 +46,27 @@ VlDumperImpl::put_expr(const char* label,
 
   const char* nm = NULL;
   switch ( expr->type() ) {
-  case kVpiBitSelect:              nm = "BitSelect"; break;
-  case kVpiPartSelect:             nm = "PartSelect"; break;
   case kVpiOperation:              nm = "Operation"; break;
   case kVpiConstant:               nm = "Constant"; break;
   case kVpiFuncCall:               nm = "FuncCall"; break;
   case kVpiSysFuncCall:            nm = "SysFuncCall"; break;
-  default:                         nm = "Reference"; break;
+  default:
+    if ( expr->is_primary() ) {
+      nm = "Reference";
+    }
+    else if ( expr->is_bitselect() ) {
+      nm = "BitSelect";
+    }
+    else if ( expr->is_partselect() ) {
+      nm = "PartSelect";
+    }
+    break;
   }
-  
+
   VlDumpHeader x(this, label, nm);
   put("FileRegion", expr->file_region());
 
   switch ( expr->type() ) {
-  case kVpiBitSelect:
-    put("vpiConstantSelect", expr->is_constant_select());
-    if ( expr->decl_obj() ) {
-      put("vpiParent", expr->decl_obj()->full_name());
-      if ( expr->declarray_dimension() > 0 ) {
-	for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
-	  put_expr("array_index", mgr, expr->declarray_index(i));
-	}
-      }
-      put_expr("vpiIndex", mgr, expr->index());
-    }
-    else {
-      put_expr("vpiParent", mgr, expr->parent_expr());
-      put("vpiIndex", expr->index_val());
-    }
-    break;
-
-  case kVpiPartSelect:
-    put("vpiConstantSelect", expr->is_constant_select());
-    if ( expr->decl_obj() ) {
-      put("vpiParent", expr->decl_obj()->full_name());
-      if ( expr->declarray_dimension() > 0 ) {
-	for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
-	  put_expr("array_index", mgr, expr->declarray_index(i));
-	}
-      }
-      put_expr("vpiLeftRange", mgr, expr->left_range());
-      put_expr("vpiRightRange", mgr, expr->right_range());
-    }
-    else {
-      put_expr("vpiParent", mgr, expr->parent_expr());
-      put("vpiLeftRange", expr->left_range_val());
-      put("vpiRightRange", expr->right_range_val());
-    }
-    break;
-
   case kVpiOperation:
     put("vpiOpType", expr->op_type());
     for (ymuint32 i = 0; i < expr->operand_num(); ++ i) {
@@ -120,21 +92,60 @@ VlDumperImpl::put_expr(const char* label,
       put_expr("vpiArgument", mgr, expr->argument(i));
     }
     break;
-    
+
   default:
-    if ( expr->decl_obj() ) {
-      put("decl_obj", expr->decl_obj()->full_name());
-      if ( expr->declarray_dimension() > 0 ) {
-	for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
-	  put_expr("array_index", mgr, expr->declarray_index(i));
+    if ( expr->is_bitselect() ) {
+      put("vpiConstantSelect", expr->is_constant_select());
+      if ( expr->decl_obj() ) {
+	put("vpiParent", expr->decl_obj()->full_name());
+	if ( expr->declarray_dimension() > 0 ) {
+	  for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
+	    put_expr("array_index", mgr, expr->declarray_index(i));
+	  }
 	}
+	put_expr("vpiIndex", mgr, expr->index());
+      }
+      else {
+	put_expr("vpiParent", mgr, expr->parent_expr());
+	put("vpiIndex", expr->index_val());
       }
     }
-    else if ( expr->scope_obj() ) {
-      put("scope_obj", expr->scope_obj()->full_name());
+    else if ( expr->is_partselect() ) {
+      put("vpiConstantSelect", expr->is_constant_select());
+      if ( expr->decl_obj() ) {
+	put("vpiParent", expr->decl_obj()->full_name());
+	if ( expr->declarray_dimension() > 0 ) {
+	  for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
+	    put_expr("array_index", mgr, expr->declarray_index(i));
+	  }
+	}
+	put_expr("vpiLeftRange", mgr, expr->left_range());
+	put_expr("vpiRightRange", mgr, expr->right_range());
+      }
+      else {
+	put_expr("vpiParent", mgr, expr->parent_expr());
+	put("vpiLeftRange", expr->left_range_val());
+	put("vpiRightRange", expr->right_range_val());
+      }
     }
-    else if ( expr->primitive_obj() ) {
-      put("primitive_obj", expr->primitive_obj()->full_name());
+    else if ( expr->is_primary() ) {
+      if ( expr->decl_obj() ) {
+	put("decl_obj", expr->decl_obj()->full_name());
+	if ( expr->declarray_dimension() > 0 ) {
+	  for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
+	    put_expr("array_index", mgr, expr->declarray_index(i));
+	  }
+	}
+      }
+      else if ( expr->scope_obj() ) {
+	put("scope_obj", expr->scope_obj()->full_name());
+      }
+      else if ( expr->primitive_obj() ) {
+	put("primitive_obj", expr->primitive_obj()->full_name());
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
     }
     else {
       assert_not_reached(__FILE__, __LINE__);
@@ -171,7 +182,7 @@ VlDumperImpl::put_sys_func_call(const char* label,
   VlDumpHeader x(*this, label, "SystemFuncCall");
 
   put("FileRegion", handle.file_region());
-  
+
   put("vpiName", handle.get_str(vpiName));
   put("vpiUserDefn", handle.get_bool(vpiUserDefn));
   put("vpiFuncType",
@@ -261,9 +272,9 @@ VlDumperImpl::put_delay(const char* label,
     }
     return;
   }
-  
+
   VlDumpHeader x(this, label, "Delay");
-  
+
   put("expr", delay->decompile() );
 }
 
@@ -280,7 +291,7 @@ VlDumperImpl::put_range(const char* label,
     }
     return;
   }
-  
+
   VlDumpHeader x(this, label, "Range");
 
   put("FileRegion", range->file_region() );
