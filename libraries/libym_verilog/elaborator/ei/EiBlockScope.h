@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIBLOCKSCOPE_H
-#define LIBYM_VERILOG_ELB_IMPL_EIBLOCKSCOPE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIBLOCKSCOPE_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIBLOCKSCOPE_H
 
-/// @file libym_verilog/elb_impl/EiBlockScope.h
+/// @file libym_verilog/elaborator/ei/EiBlockScope.h
 /// @brief EiBlockScope のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -25,7 +25,7 @@ class EiBlockScope :
   public ElbScope
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -37,7 +37,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiBlockScope();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ public:
   FileRegion
   file_region() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の仮想関数
@@ -64,7 +64,7 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
@@ -75,10 +75,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親のスコープ
   const VlNamedObj* mParent;
-  
+
   // 対応するパース木の要素
   const PtStmt* mPtStmt;
 
@@ -86,4 +86,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LiBYM_VERILOG_ELABORATOR_EIBLOCKSCOPE_H
+#endif // LiBYM_VERILOG_ELABORATOR_EI_EIBLOCKSCOPE_H

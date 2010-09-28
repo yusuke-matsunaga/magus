@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIGENBLOCK_H
-#define LIBYM_VERILOG_ELB_IMPL_EIGENBLOCK_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIGENBLOCK_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIGENBLOCK_H
 
-/// @file libym_verilog/elb_impl/EiGenBlock.h
+/// @file libym_verilog/elaborator/ei/EiGenBlock.h
 /// @brief EiGenBlock のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -29,7 +29,7 @@ class EiGenBlock :
   public ElbScope
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -41,7 +41,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiGenBlock();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -57,8 +57,8 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の仮想関数
@@ -68,13 +68,13 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -82,10 +82,10 @@ private:
 
   // 親のスコープ
   const VlNamedObj* mParent;
-  
+
   // 対応するパース木の要素
   const PtItem* mPtItem;
-  
+
 };
 
 
@@ -137,12 +137,12 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ public:
   const VlNamedObj*
   elem_by_index(int index);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -168,13 +168,13 @@ private:
 
   // 親のスコープ
   const VlNamedObj* mParent;
-  
+
   // 対応するパース木の要素
   const PtItem* mPtItem;
-  
+
   // 子供のスコープのハッシュ表
   hash_map<int, const VlNamedObj*> mTable;
-  
+
 };
 
 
@@ -186,7 +186,7 @@ class EiGfBlock :
   public EiGenBlock
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -200,29 +200,29 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiGfBlock();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbNamedObj の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 名前
   StrBuff mName;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LiBYM_VERILOG_ELABORATOR_EIGENBLOCK_H
+#endif // LiBYM_VERILOG_ELABORATOR_EI_EIGENBLOCK_H

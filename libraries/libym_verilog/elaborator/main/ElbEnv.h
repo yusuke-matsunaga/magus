@@ -34,7 +34,6 @@ class VlNamedObj;
 /// - reg/variables 型の左辺式
 /// - procedural continuous assignment 文の左辺式
 /// - force 文の左辺式
-/// - イベントトリガー(->)文
 /// の種類がある．
 /// 実際にはそれぞれの環境に対応した派生クラスを用いる．
 //////////////////////////////////////////////////////////////////////
@@ -100,10 +99,6 @@ protected:
   void
   set_force_lhs();
 
-  /// @brief イベントトリガー文の印を付ける．
-  void
-  set_namedevent();
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -157,16 +152,6 @@ public:
   /// @brief force 代入文の左辺式の時に true を返す．
   bool
   is_force_lhs() const;
-
-  /// @brief イベントトリガー文の時に true を返す．
-  bool
-  is_namedevent() const;
-
-  /// @brief 右辺式としてこの環境で valid な型の時 true を返す．
-  /// @param[in] part_select 部分指定ありの時 true を渡すフラグ
-  bool
-  is_valid_primary(tVpiObjType type,
-		   bool part_select) const;
 
 
 private:
@@ -360,26 +345,6 @@ public:
     ElbEnv(env)
   {
     set_force_lhs();
-  }
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class ElbNamedEventEnv ElbEnv.h "ElbEnv.h"
-/// @brief イベントトリガー文を表す環境
-//////////////////////////////////////////////////////////////////////
-class ElbNamedEventEnv :
-  public ElbEnv
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] env 親の環境
-  ElbNamedEventEnv(const ElbEnv& env) :
-    ElbEnv(env)
-  {
-    set_namedevent();
   }
 
 };

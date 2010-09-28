@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EITASKFUNC_H
-#define LIBYM_VERILOG_ELB_IMPL_EITASKFUNC_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EITASKFUNC_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EITASKFUNC_H
 
-/// @file libym_verilog/elb_impl/ElbTaskFuncImpl.h
+/// @file libym_verilog/elaborator/ei/ElbTaskFuncImpl.h
 /// @brief ElbTaskFuncImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -148,7 +148,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親のスコープ
   const VlNamedObj* mParent;
 
@@ -493,7 +493,7 @@ class EiFunctionV :
   public EiFunction
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -564,7 +564,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 範囲
   EiRangeImpl mRange;
 
@@ -585,4 +585,4 @@ EiTaskFunc::pt_item() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EITASKFUNC_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EITASKFUNC_H

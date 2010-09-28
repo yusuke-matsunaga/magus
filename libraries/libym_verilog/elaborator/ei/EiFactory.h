@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIFACTORY_H
-#define LIBYM_VERILOG_ELB_IMPL_EIFACTORY_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIFACTORY_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIFACTORY_H
 
-/// @file libym_verilog/elb_impl/EiFactory.h
+/// @file libym_verilog/elaborator/ei/EiFactory.h
 /// @brief EiFactory のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -248,7 +248,7 @@ public:
   /// @param[in] dim_size 要素数
   virtual
   ElbRange*
-  new_RangeArray(ymuint32 dim_size);
+  new_RangeArray(ymuint dim_size);
 
   /// @brief 宣言要素の配列を生成する．
   /// @param[in] parent 親のスコープ
@@ -467,7 +467,7 @@ public:
   /// @param[in] stmt_num 要素数
   virtual
   ElbStmt**
-  new_StmtList(ymuint32 stmt_num);
+  new_StmtList(ymuint stmt_num);
 
   /// @brief 代入文を生成する．
   /// @param[in] parent 親のスコープ
@@ -707,7 +707,7 @@ public:
   new_EventStmt(const VlNamedObj* parent,
 		ElbProcess* process,
 		const PtStmt* pt_stmt,
-		ElbExpr* named_event);
+		ElbDecl* named_event);
 
   /// @brief NULL ステートメントを生成する．
   /// @param[in] parent 親のスコープ
@@ -788,7 +788,7 @@ public:
   virtual
   ElbControl*
   new_EventControl(const PtControl* pt_control,
-		   ymuint32 event_num,
+		   ymuint event_num,
 		   ElbExpr** event_list);
 
   /// @brief リピートコントロールを生成する．
@@ -800,14 +800,14 @@ public:
   ElbControl*
   new_RepeatControl(const PtControl* pt_control,
 		    ElbExpr* rep,
-		    ymuint32 event_num,
+		    ymuint event_num,
 		    ElbExpr** event_list);
 
   /// @brief 式のポインタ配列を生成する．
   /// @param[in] elem_num 要素数
   virtual
   ElbExpr**
-  new_ExprList(ymuint32 elem_num);
+  new_ExprList(ymuint elem_num);
 
   /// @brief 単項演算子を生成する．
   /// @param[in] pt_expr パース木の定義要素
@@ -852,7 +852,7 @@ public:
   virtual
   ElbExpr*
   new_ConcatOp(const PtBase* pt_expr,
-	       ymuint32 opr_size,
+	       ymuint opr_size,
 	       ElbExpr** opr_list);
 
   /// @brief 反復連結演算子を生成する．
@@ -866,7 +866,7 @@ public:
   new_MultiConcatOp(const PtBase* pt_expr,
 		    ElbExpr* rep_expr,
 		    int rep_num,
-		    ymuint32 opr_size,
+		    ymuint opr_size,
 		    ElbExpr** opr_list);
 
   /// @brief プライマリ式を生成する．
@@ -974,7 +974,7 @@ public:
   ElbExpr*
   new_FuncCall(const PtBase* pt_obj,
 	       const ElbTaskFunc* func,
-	       ymuint32 arg_size,
+	       ymuint arg_size,
 	       ElbExpr** arg_list);
 
   /// @brief システム関数呼び出し式を生成する．
@@ -986,7 +986,7 @@ public:
   ElbExpr*
   new_SysFuncCall(const PtBase* pt_obj,
 		  const ElbUserSystf* user_systf,
-		  ymuint32 arg_size,
+		  ymuint arg_size,
 		  ElbExpr** arg_list);
 
   /// @brief システム関数/システムタスクの引数を生成する．
@@ -1012,14 +1012,14 @@ public:
   virtual
   ElbDelay*
   new_Delay(const PtBase* pt_obj,
-	    ymuint32 elem_num,
+	    ymuint elem_num,
 	    ElbExpr** expr_list);
 
   /// @brief attribute instance のリストを生成する．
   /// @param[in] n 要素数
   virtual
   ElbAttrList*
-  new_AttrList(ymuint32 n);
+  new_AttrList(ymuint n);
 
 
 private:
@@ -1162,4 +1162,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIFACTORY_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIFACTORY_H

@@ -36,7 +36,7 @@ ElbStmt*
 EiFactory::new_EventStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbExpr* named_event)
+			 ElbDecl* named_event)
 {
   void* p = mAlloc.get_memory(sizeof(EiEventStmt));
   ElbStmt* stmt = new (p) EiEventStmt(parent, process, pt_stmt,
@@ -153,7 +153,7 @@ EiFactory::new_CtrlStmt(const VlNamedObj* parent,
 EiEventStmt::EiEventStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbExpr* named_event) :
+			 ElbDecl* named_event) :
   EiStmtBase(parent, process, pt_stmt),
   mEvent(named_event)
 {
@@ -172,12 +172,12 @@ EiEventStmt::type() const
 }
 
 // @brief named event を返す．
-const VlExpr*
+const VlDecl*
 EiEventStmt::named_event() const
 {
   return mEvent;
 }
-  
+
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -201,7 +201,7 @@ EiNullStmt::EiNullStmt(const VlNamedObj* parent,
 		       const PtStmt* pt_stmt) :
   EiStmtBase(parent, process, pt_stmt)
 {
-}   
+}
 
 // @brief デストラクタ
 EiNullStmt::~EiNullStmt()
@@ -214,7 +214,7 @@ EiNullStmt::type() const
 {
   return kVpiNullStmt;
 }
-  
+
 // @brief function 中の実行を行う．
 // @note このクラスでは何もしないで NULL を返す．
 const VlNamedObj*
@@ -249,7 +249,7 @@ EiTcBase::EiTcBase(const VlNamedObj* parent,
 EiTcBase::~EiTcBase()
 {
 }
-    
+
 // @brief 引数の数を返す．
 ymuint32
 EiTcBase::argument_num() const
@@ -460,7 +460,7 @@ EiCtrlStmt::type() const
 {
   return mControl->type();
 }
-  
+
 // @brief コントロールを返す．
 const VlControl*
 EiCtrlStmt::control() const

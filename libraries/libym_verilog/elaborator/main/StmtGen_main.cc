@@ -74,7 +74,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
   case kPtReleaseStmt:
     // 無視
     break;
-    
+
   case kPtDcStmt:
   case kPtEcStmt:
   case kPtWaitStmt:
@@ -91,7 +91,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
       phase1_stmt(parent, pt_stmt->else_body());
     }
     break;
-    
+
   case kPtCaseStmt:
   case kPtCaseXStmt:
   case kPtCaseZStmt:
@@ -100,7 +100,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
       phase1_stmt(parent, pt_item->body());
     }
     break;
-    
+
   case kPtParBlockStmt:
   case kPtSeqBlockStmt:
     for (ymuint i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
@@ -114,7 +114,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
     {
       ElbScope* block_scope = factory().new_StmtScope(parent, pt_stmt);
       reg_blockscope(block_scope);
-      
+
       for (ymuint i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
 	const PtStmt* pt_stmt1 = pt_stmt->stmt_array()[i];
 	phase1_stmt(block_scope, pt_stmt1);
@@ -129,7 +129,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
       }
     }
     break;
-    
+
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
@@ -147,14 +147,14 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
 			  const PtStmt* pt_stmt)
 {
   assert_cond(pt_stmt != NULL, __FILE__, __LINE__);
-  
+
   ElbStmt* stmt = NULL;
   switch ( pt_stmt->type() ) {
   case kPtDisableStmt:
     stmt = instantiate_disable(parent, process,
 			       pt_stmt);
     break;
-    
+
   case kPtEnableStmt:
     if ( env.inside_function() ) {
       goto error;
@@ -162,7 +162,7 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     stmt = instantiate_enable(parent, process, env,
 			      pt_stmt);
     break;
-    
+
   case kPtSysEnableStmt:
     if ( env.inside_constant_function() ) {
       // 無視する．
@@ -175,18 +175,18 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
 				   pt_stmt);
     }
     break;
-    
+
   case kPtAssignStmt:
     stmt = instantiate_assign(parent, process, env,
 			      pt_stmt, true);
     break;
-    
+
   case kPtNbAssignStmt:
     assert_cond(!env.inside_function(), __FILE__, __LINE__);
     stmt = instantiate_assign(parent, process, env,
 			      pt_stmt, false);
     break;
-    
+
   case kPtEventStmt:
     if ( env.inside_function() ) {
       goto error;
@@ -240,7 +240,7 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     stmt = instantiate_ctrlstmt(parent, process, env,
 				pt_stmt);
     break;
-    
+
   case kPtWaitStmt:
     if ( env.inside_function() ) {
       goto error;
@@ -248,22 +248,22 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     stmt = instantiate_wait(parent, process, env,
 			    pt_stmt);
     break;
-    
+
   case kPtForeverStmt:
     stmt = instantiate_forever(parent, process, env,
 			       pt_stmt);
     break;
-    
+
   case kPtRepeatStmt:
     stmt = instantiate_repeat(parent, process, env,
 			      pt_stmt);
     break;
-    
+
   case kPtWhileStmt:
     stmt = instantiate_while(parent, process, env,
 			     pt_stmt);
     break;
-    
+
   case kPtForStmt:
     stmt = instantiate_for(parent, process, env,
 			   pt_stmt);
@@ -273,14 +273,14 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     stmt = instantiate_if(parent, process, env,
 			  pt_stmt);
     break;
-    
+
   case kPtCaseStmt:
   case kPtCaseXStmt:
   case kPtCaseZStmt:
     stmt = instantiate_case(parent, process, env,
 			    pt_stmt);
     break;
-    
+
   case kPtParBlockStmt:
     if ( env.inside_function() ) {
       goto error;
@@ -306,7 +306,7 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     stmt = instantiate_namedseqblock(parent, process, env,
 				     pt_stmt);
     break;
-    
+
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
@@ -314,7 +314,7 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     // attribute instance の生成
     //instantiate_attribute(pt_stmt->attr_top(), false, stmt);
   }
-  
+
   return stmt;
 
  error:
@@ -383,7 +383,7 @@ StmtGen::instantiate_disable(const VlNamedObj* parent,
   const VlNamedObj* scope = handle->obj();
   ElbStmt* stmt = factory().new_DisableStmt(parent, process, pt_stmt,
 					    scope);
-  
+
   return stmt;
 }
 
@@ -426,7 +426,7 @@ StmtGen::instantiate_enable(const VlNamedObj* parent,
   }
   ElbTaskFunc* task = cell->taskfunc();
   assert_cond( task != NULL, __FILE__, __LINE__);
-  
+
   // 引数を生成する．
   ElbExpr** arg_list = factory().new_ExprList(pt_stmt->arg_num());
   for (ymuint i = 0; i < pt_stmt->arg_num(); ++ i) {
@@ -438,7 +438,7 @@ StmtGen::instantiate_enable(const VlNamedObj* parent,
     }
     arg_list[i] = expr;
   }
-  
+
   // task call ステートメントの生成
   ElbStmt* stmt = factory().new_TaskCall(parent, process, pt_stmt,
 					 task, arg_list);
@@ -473,7 +473,7 @@ StmtGen::instantiate_sysenable(const VlNamedObj* parent,
 	    buf.str());
     return NULL;
   }
-  
+
   // 引数を生成する．
   ElbExpr** arg_list = factory().new_ExprList(pt_stmt->arg_num());
   for (ymuint i = 0; i < pt_stmt->arg_num(); ++ i) {
@@ -514,7 +514,7 @@ StmtGen::instantiate_ctrlstmt(const VlNamedObj* parent,
   if ( !body || !control ) {
     return NULL;
   }
-  
+
   // delay / event control ステートメントの生成
   ElbStmt* stmt = factory().new_CtrlStmt(parent, process, pt_stmt,
 					 control, body);
@@ -572,15 +572,15 @@ StmtGen::instantiate_eventstmt(const VlNamedObj* parent,
 			       ElbProcess* process,
 			       const PtStmt* pt_stmt)
 {
-  const PtExpr* pt_prim = pt_stmt->primary();
-  ElbExpr* named_event = instantiate_namedevent(parent, pt_prim);
+  const PtExpr* pt_expr = pt_stmt->primary();
+  ElbDecl* named_event = instantiate_namedevent(parent, pt_expr);
   if ( !named_event ) {
     return NULL;
   }
 
   ElbStmt* stmt = factory().new_EventStmt(parent, process, pt_stmt,
 					  named_event);
-  
+
   return stmt;
 }
 

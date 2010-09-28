@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EICONCATOP_H
-#define LIBYM_VERILOG_ELB_IMPL_EICONCATOP_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EICONCATOP_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EICONCATOP_H
 
-/// @file libym_verilog/elb_impl/EiConcatOp.h
+/// @file libym_verilog/elaborator/ei/EiConcatOp.h
 /// @brief 結合演算子の派生クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -273,4 +273,4 @@ EiConcatOp::bit_size() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EICONCATOP_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EICONCATOP_H

@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIBINARYOP_H
-#define LIBYM_VERILOG_ELB_IMPL_EIBINARYOP_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIBINARYOP_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIBINARYOP_H
 
-/// @file libym_verilog/elb_impl/EiBinaryOp.h
+/// @file libym_verilog/elaborator/ei/EiBinaryOp.h
 /// @brief EiExpr の2項演算子の派生クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -46,7 +46,7 @@ class EiBinaryOp :
   public EiOperation
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -60,7 +60,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiBinaryOp();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ public:
   virtual
   ymuint32
   operand_num() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ public:
   virtual
   ElbExpr*
   _operand(ymuint32 pos) const;
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ protected:
   ElbExpr*
   operand2() { return mOpr[1]; }
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -120,7 +120,7 @@ private:
 
   // オペランド
   ElbExpr* mOpr[2];
-  
+
 };
 
 
@@ -173,7 +173,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -205,7 +205,7 @@ private:
 
   // オペランドの型
   tVpiValueType mOprType;
-  
+
 };
 
 
@@ -242,18 +242,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -290,18 +290,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -338,18 +338,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -386,18 +386,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -434,18 +434,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -482,18 +482,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -530,18 +530,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -578,18 +578,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -642,7 +642,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -655,7 +655,7 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
 };
 
 
@@ -692,18 +692,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -740,18 +740,18 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -803,7 +803,7 @@ public:
   virtual
   double
   eval_real() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -825,7 +825,7 @@ private:
 
   // 式の型
   tVpiValueType mType;
-  
+
 };
 
 
@@ -863,18 +863,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -912,18 +912,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -961,18 +961,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1010,18 +1010,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1068,7 +1068,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1090,7 +1090,7 @@ private:
 
   // 式の型
   tVpiValueType mType;
-  
+
 };
 
 
@@ -1140,18 +1140,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1201,18 +1201,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1262,18 +1262,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1323,18 +1323,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1384,18 +1384,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1453,7 +1453,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1466,13 +1466,13 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
@@ -1486,7 +1486,7 @@ private:
 
   // 式の型
   tVpiValueType mType;
-  
+
 };
 
 
@@ -1538,7 +1538,7 @@ public:
   virtual
   double
   eval_real() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1560,7 +1560,7 @@ private:
 
   // 式の型
   tVpiValueType mType;
-  
+
 };
 
 
@@ -1598,18 +1598,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1647,18 +1647,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1696,18 +1696,18 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 
@@ -1745,20 +1745,20 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
   op_type() const;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIBINARYOP_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIBINARYOP_H

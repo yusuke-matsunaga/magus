@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIVARPARTSELECT_H
-#define LIBYM_VERILOG_ELB_IMPL_EIVARPARTSELECT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIVARPARTSELECT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIVARPARTSELECT_H
 
-/// @file libym_verilog/elb_impl/EiVarPartSelect.h
+/// @file libym_verilog/elaborator/ei/EiVarPartSelect.h
 /// @brief EiVarPartSelect のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -329,4 +329,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIVARPARTSELECT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIVARPARTSELECT_H

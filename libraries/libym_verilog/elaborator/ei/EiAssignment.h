@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIASSIGNMENT_H
-#define LIBYM_VERILOG_ELB_IMPL_EIASSIGNMENT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIASSIGNMENT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIASSIGNMENT_H
 
-/// @file libym_verilog/elb_impl/EiAssignment.h
+/// @file libym_verilog/elaborator/ei/EiAssignment.h
 /// @brief 代入文を表すクラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -49,33 +49,33 @@ protected:
   virtual
   ~EiAssignBase();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 左辺を返す．
   virtual
   const VlExpr*
   lhs() const;
-  
+
   /// @brief 右辺を返す．
   virtual
   const VlExpr*
   rhs() const;
-  
+
 
 protected:
-  
+
   /// @brief 左辺を返す．
   ElbExpr*
   _lhs() const;
-  
+
   /// @brief 右辺を返す．
   ElbExpr*
   _rhs() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ class EiNbAssignment :
   public EiAssignBase
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -120,7 +120,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiNbAssignment();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -132,12 +132,12 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief control を返す．NULL の場合もありうる．
   virtual
   const VlControl*
@@ -169,7 +169,7 @@ class EiAssignment :
   public EiNbAssignment
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -190,12 +190,12 @@ private:
   virtual
   ~EiAssignment();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 代入のブロッキング/ノンブロッキングの区別の取得
   /// @note このクラスでは true を返す．
   virtual
@@ -220,7 +220,7 @@ class EiAssignStmt :
   public EiAssignBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -238,7 +238,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiAssignStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -274,7 +274,7 @@ class EiForceStmt :
   public EiAssignBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -292,7 +292,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiForceStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
@@ -342,12 +342,12 @@ protected:
   virtual
   ~EiDeassignBase();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 左辺を返す．
   virtual
   const VlExpr*
@@ -374,7 +374,7 @@ class EiDeassignStmt :
   public EiDeassignBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -390,7 +390,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiDeassignStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -401,7 +401,7 @@ public:
   virtual
   tVpiObjType
   type() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -426,7 +426,7 @@ class EiReleaseStmt :
   public EiDeassignBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -442,7 +442,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiReleaseStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -454,7 +454,7 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt に固有の仮想関数
@@ -470,4 +470,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIASSIGNMENT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIASSIGNMENT_H

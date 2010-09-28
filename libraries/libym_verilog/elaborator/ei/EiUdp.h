@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIUDP_H
-#define LIBYM_VERILOG_ELB_IMPL_EIUDP_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIUDP_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIUDP_H
 
-/// @file libym_verilog/elb_impl/ElbUdpImpl.h
+/// @file libym_verilog/elaborator/ei/ElbUdpImpl.h
 /// @brief ElbUdpImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -433,4 +433,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIUDP_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIUDP_H

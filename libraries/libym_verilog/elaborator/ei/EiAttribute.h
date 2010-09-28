@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIATTRIBUTE_H
-#define LIBYM_VERILOG_ELB_IMPL_EIATTRIBUTE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIATTRIBUTE_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIATTRIBUTE_H
 
-/// @file libym_verilog/elb_impl/EiAttribute.h
+/// @file libym_verilog/elaborator/ei/EiAttribute.h
 /// @brief EiAttribute のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -26,7 +26,7 @@ class EiAttribute :
 {
   friend class EiFactory;
   friend class EiAttrList;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -35,7 +35,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiAttribute();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief def_attribute なら true を返す．
   virtual
   bool
@@ -73,12 +73,12 @@ public:
   VlExpr*
   expr() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パース木の定義要素
   const PtAttrSpec* mPtAttrSpec;
 
@@ -87,7 +87,7 @@ private:
 
   // 定義側の属性の時 true をなるフラグ
   bool mDef;
-  
+
 };
 
 
@@ -99,7 +99,7 @@ class EiAttrList :
   public ElbAttrList
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -109,7 +109,7 @@ private:
   /// @brief デストラクタ
   ~EiAttrList();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlAttrList の仮想関数
@@ -143,7 +143,7 @@ public:
       const PtAttrSpec* pt_as,
       ElbExpr* expr,
       bool def);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -160,4 +160,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIATTRIBUTE_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIATTRIBUTE_H

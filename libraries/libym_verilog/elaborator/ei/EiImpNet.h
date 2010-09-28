@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIIMPNET_H
-#define LIBYM_VERILOG_ELB_IMPL_EIIMPNET_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIIMPNET_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIIMPNET_H
 
-/// @file libym_verilog/elb_impl/EiImpNet.h
+/// @file libym_verilog/elaborator/ei/EiImpNet.h
 /// @brief EiNet のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -307,4 +307,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIIMPNET_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIIMPNET_H

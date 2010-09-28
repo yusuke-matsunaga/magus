@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIDECL_H
-#define LIBYM_VERILOG_ELB_IMPL_EIDECL_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIDECL_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIDECL_H
 
-/// @file libym_verilog/elb_impl/EiDecl.h
+/// @file libym_verilog/elaborator/ei/EiDecl.h
 /// @brief EiDecl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -837,4 +837,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIDECL_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIDECL_H

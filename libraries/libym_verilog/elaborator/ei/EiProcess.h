@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIPROCESS_H
-#define LIBYM_VERILOG_ELB_IMPL_EIPROCESS_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIPROCESS_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIPROCESS_H
 
-/// @file libym_verilog/elb_impl/EiProcess.h
+/// @file libym_verilog/elaborator/ei/EiProcess.h
 /// @brief EiProcess のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -24,7 +24,7 @@ class EiProcess :
   public ElbProcess
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -36,7 +36,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiProcess();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -63,12 +63,12 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 本体のステートメントの取得
   virtual
   const VlStmt*
   stmt() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ public:
   void
   set_stmt(ElbStmt* stmt);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -94,9 +94,9 @@ private:
 
   // 本体のステートメント
   ElbStmt* mStmt;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIPROCESS_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIPROCESS_H

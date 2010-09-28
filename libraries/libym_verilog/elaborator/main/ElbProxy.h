@@ -518,7 +518,7 @@ protected:
   /// @brief PtExpr(primary) から named_event を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbExpr*
+  ElbDecl*
   instantiate_namedevent(const VlNamedObj* parent,
 			 const PtExpr* pt_expr);
 

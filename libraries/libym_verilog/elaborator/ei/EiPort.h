@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIPORT_H
-#define LIBYM_VERILOG_ELB_IMPL_EIPORT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIPORT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIPORT_H
 
-/// @file libym_verilog/elb_impl/EiPort.h
+/// @file libym_verilog/elaborator/ei/EiPort.h
 /// @brief EiPort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -25,7 +25,7 @@ class EiPort :
   public ElbPort
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -50,28 +50,28 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // VlPort の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入出力の区別を得る．
   virtual
   tVpiDirection
   direction() const;
-  
+
   /// @brief ビット幅を返す．
   virtual
   int
   bit_size() const;
-  
+
   /// @brief 名前による接続を持つとき true を返す．
   virtual
   bool
   is_conn_by_name() const;
-  
+
   /// @brief 明示的に名前がついているとき true を返す．
   virtual
   bool
@@ -86,22 +86,22 @@ public:
   virtual
   const VlModule*
   module() const;
-  
+
   /// @brief ポートリストの何番目のポートかを表すインデックスを返す．
   virtual
   ymuint32
   port_index() const;
-  
+
   /// @brief 上位の接続先を返す．
   virtual
   const VlExpr*
   high_conn() const;
-  
+
   /// @brief 下位の接続先を返す．
   virtual
   const VlExpr*
   low_conn() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ public:
   set_high_conn(ElbExpr* high_conn,
 		bool conn_by_name);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -136,13 +136,13 @@ private:
 
   // 親のモジュール
   ElbModule* mModule;
-  
+
   // パース木のポート定義
   const PtPort* mPtPort;
-  
+
   // ポート番号
   ymuint32 mIndex;
-  
+
   // 上位の接続先
   ElbExpr* mHighConn;
 
@@ -154,9 +154,9 @@ private:
 
   // 名前による結合の時 true となるフラグ
   bool mConnByName;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIPORT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIPORT_H

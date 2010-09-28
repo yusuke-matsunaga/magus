@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIPARAMASSIGN_H
-#define LIBYM_VERILOG_ELB_IMPL_EIPARAMASSIGN_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIPARAMASSIGN_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIPARAMASSIGN_H
 
-/// @file libym_verilog/elb_impl/EiParamAssign.h
+/// @file libym_verilog/elaborator/ei/EiParamAssign.h
 /// @brief EiParamAssign のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -24,9 +24,9 @@ class EiParamAssign :
   public ElbParamAssign
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] param 対象の parameter
@@ -35,11 +35,11 @@ protected:
 		const PtBase* pt_obj,
 		ElbParameter* param,
 		ElbExpr* rhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiParamAssign();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -66,23 +66,23 @@ public:
   virtual
   const VlModule*
   parent() const;
-  
+
   /// @brief 左辺値を返す．
   virtual
   const VlDecl*
   lhs() const;
-  
+
   /// @brief 右辺値を返す．
   virtual
   const VlExpr*
   rhs() const;
-  
+
   /// @brief 名前による接続の場合に true を返す．
   /// @note このクラスでは false を返す．
   virtual
   bool
   is_conn_by_name() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ private:
 
   // 右辺式
   ElbExpr* mRhs;
-  
+
 };
 
 
@@ -112,9 +112,9 @@ class EiParamAssign2 :
   public EiParamAssign
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] pt_obj パース木の接続を表す要素
@@ -124,7 +124,7 @@ private:
 		 const PtBase* pt_obj,
 		 ElbParameter* param,
 		 ElbExpr* rhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiParamAssign2();
@@ -134,13 +134,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbParamAssign の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前による接続の場合に true を返す．
   /// @note このクラスでは true を返す．
   virtual
   bool
   is_conn_by_name() const;
-  
+
 };
 
 
@@ -152,9 +152,9 @@ class EiDefParam :
   public ElbDefParam
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] pt_header パース木の defparam ヘッダ
@@ -170,7 +170,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiDefParam();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -197,17 +197,17 @@ public:
   virtual
   const VlModule*
   parent() const;
-  
+
   /// @brief 左辺値を返す．
   virtual
   const VlDecl*
   lhs() const;
-  
+
   /// @brief 右辺値を返す．
   virtual
   const VlExpr*
   rhs() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -222,15 +222,15 @@ private:
 
   // パース木の defparam 定義
   const PtDefParam* mPtDefParam;
-  
+
   // パラメータ
   ElbParameter* mLhs;
 
   // 右辺式
   ElbExpr* mRhs;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIPARAMASSIGN_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIPARAMASSIGN_H

@@ -16,6 +16,7 @@
 #include "VlDumperImpl.h"
 
 #include <ym_verilog/VlMgr.h>
+#include <ym_verilog/vl/VlDecl.h>
 #include <ym_verilog/vl/VlProcess.h>
 #include <ym_verilog/vl/VlStmt.h>
 #include <ym_verilog/vl/VlControl.h>
@@ -40,7 +41,7 @@ VlDumperImpl::put_process(const char* label,
   default: assert_not_reached(__FILE__, __LINE__);
   }
   VlDumpHeader x(this, label, nm);
-  
+
   put("FileRegion", process->file_region() );
   put("vpiModule", process->parent()->parent_module()->full_name() );
   put_stmt("vpiStmt", mgr, process->stmt() );
@@ -94,7 +95,7 @@ VlDumperImpl::put_stmt(const char* label,
   case kVpiEventControl:    nm = "EventControl"; break;
   default: assert_not_reached( __FILE__, __LINE__);
   }
-  
+
   VlDumpHeader x(this, label, nm);
 
   put("FileRegion", stmt->file_region());
@@ -111,14 +112,14 @@ VlDumperImpl::put_stmt(const char* label,
     }
     put_child_stmt_list("vpiStmt", mgr, stmt);
     break;
-    
+
   case kVpiBegin:
   case kVpiFork:
     put_child_stmt_list("vpiStmt", mgr, stmt);
     break;
-    
+
   case kVpiEventStmt:
-    put_expr("vpiNamedEvent", mgr, stmt->named_event());
+    put("vpiNamedEvent", stmt->named_event()->full_name());
     break;
 
   case kVpiAssignment:
@@ -153,12 +154,12 @@ VlDumperImpl::put_stmt(const char* label,
   case kVpiForever:
     put_stmt("vpiStmt", mgr, stmt->body_stmt() );
     break;
-    
+
   case kVpiIf:
     put_expr("vpiCondition", mgr, stmt->expr() );
     put_stmt("vpiStmt", mgr, stmt->body_stmt() );
     break;
-    
+
   case kVpiIfElse:
     put_expr("vpiCondition", mgr, stmt->expr() );
     put_stmt("vpiStmt", mgr, stmt->body_stmt() );
@@ -201,7 +202,7 @@ VlDumperImpl::put_stmt(const char* label,
     put("vpiTask", stmt->task()->full_name() );
     put_argument_list("vpiArgument", mgr, stmt);
     break;
-    
+
   case kVpiSysTaskCall:
 #if 0
     put("vpiUserDefn", handle.get_bool(vpiUserDefn));
@@ -215,7 +216,7 @@ VlDumperImpl::put_stmt(const char* label,
   case kVpiDisable:
     put("vpiExpr", stmt->scope()->full_name() );
     break;
-    
+
   case kVpiDelayControl:
   case kVpiEventControl:
     put_control("control", mgr, stmt->control() );
@@ -226,7 +227,7 @@ VlDumperImpl::put_stmt(const char* label,
     assert_not_reached(__FILE__, __LINE__);
   }
 }
-  
+
 // @brief statement のリストの内容を出力する関数
 void
 VlDumperImpl::put_stmt_list(const char* label,
@@ -253,7 +254,7 @@ VlDumperImpl::put_control(const char* label,
     }
     return;
   }
-  
+
   if ( control->delay() ) {
     VlDumpHeader x(this, label, "DelayControl");
     put("FileRegion", control->file_region() );

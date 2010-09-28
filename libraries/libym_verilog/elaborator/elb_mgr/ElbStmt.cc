@@ -18,6 +18,17 @@ BEGIN_NAMESPACE_YM_VERILOG
 // クラス ElbStmt
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+ElbStmt::ElbStmt() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+ElbStmt::~ElbStmt()
+{
+}
+
 // @brief 対象のスコープの取得
 // @note kDisable/kParBlock/kSeqBlock で意味のある関数
 // @note このクラスでは NULL を返す．
@@ -53,7 +64,7 @@ ElbStmt::arg_num() const
 {
   return 0;
 }
-  
+
 // @brief 引数の取得
 // @param[in] pos 位置 (0 <= pos < arg_num())
 // @note kEnable/kSysEnable で意味のある関数
@@ -107,7 +118,7 @@ ElbStmt::rhs() const
 {
   return NULL;
 }
-  
+
 // @brief 代入のブロッキング/ノンブロッキングの区別の取得
 // @note このクラスでは false を返す．
 bool
@@ -119,7 +130,7 @@ ElbStmt::is_blocking() const
 // @brief イベントプライマリの取得
 // @note kEvent で意味のある関数
 // @note このクラスでは NULL を返す．
-const VlExpr*
+const VlDecl*
 ElbStmt::named_event() const
 {
   return NULL;
@@ -133,7 +144,7 @@ ElbStmt::else_stmt() const
 {
   return NULL;
 }
-  
+
 // @brief case type の取得
 // @return case type
 // @note kCase/kCaseX/kCaseZ で意味のある関数
@@ -172,7 +183,7 @@ ElbStmt::init_stmt() const
 {
   return NULL;
 }
-  
+
 // @brief 繰り返し代入文の取得
 // @note kFor で意味のある関数
 // @note このクラスでは NULL を返す．
@@ -190,7 +201,7 @@ ElbStmt::child_stmt_num() const
 {
   return 0;
 }
-  
+
 // @brief 子供のステートメントの取得
 // @param[in] pos 位置番号 (0 <= pos < stmt_num())
 // @note kParBlock/kSeqBlock で意味のある関数
@@ -199,7 +210,7 @@ ElbStmt::child_stmt(ymuint32 pos) const
 {
   return _child_stmt(pos);
 }
-  
+
 // @brief caseitem を設定する．
 // @param[in] pos 位置番号
 // @param[in] pt_caseitem パース木の caseitem 定義
@@ -213,7 +224,7 @@ ElbStmt::set_caseitem(ymuint32 pos,
 		      ElbStmt* stmt)
 {
 }
-  
+
 // @brief 子供ののステートメントの取得
 // @note このクラスでは NULL を返す．
 ElbStmt*

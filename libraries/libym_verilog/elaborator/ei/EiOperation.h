@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIOPERATION_H
-#define LIBYM_VERILOG_ELB_IMPL_EIOPERATION_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIOPERATION_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIOPERATION_H
 
-/// @file libym_verilog/elb_impl/EiOperation.h
+/// @file libym_verilog/elaborator/ei/EiOperation.h
 /// @brief EiExpr の演算子の派生クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -28,11 +28,11 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   EiOperation(const PtBase* pt_expr);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiOperation();
-    
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -55,20 +55,20 @@ public:
   bool
   is_operation() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIOPERATION_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIOPERATION_H

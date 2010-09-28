@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIRANGE_H
-#define LIBYM_VERILOG_ELB_IMPL_EIRANGE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIRANGE_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIRANGE_H
 
-/// @file libym_verilog/elb_impl/EiRange.h
+/// @file libym_verilog/elaborator/ei/EiRange.h
 /// @brief EiRange のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -528,4 +528,4 @@ EiRangeArray::range(ymuint pos) const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIRANGE_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIRANGE_H

@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIPRIMITIVE_H
-#define LIBYM_VERILOG_ELB_IMPL_EIPRIMITIVE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIPRIMITIVE_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIPRIMITIVE_H
 
-/// @file libym_verilog/elb_impl/EiPrimitive.h
+/// @file libym_verilog/elaborator/ei/EiPrimitive.h
 /// @brief EiPrimitive のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -43,7 +43,7 @@ protected:
   virtual
   ~EiPrimHead();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbPrimHead の仮想関数
@@ -91,19 +91,19 @@ public:
   virtual
   void
   set_delay(ElbDelay* expr);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親のスコープ
   const VlNamedObj* mParent;
-  
+
   // パース木の定義
   const PtItem* mPtHead;
-  
+
 };
 
 
@@ -128,7 +128,7 @@ private:
   virtual
   ~EiPrimHeadD();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // EiPrimHead の仮想関数
@@ -144,7 +144,7 @@ public:
   void
   set_delay(ElbDelay* expr);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -152,7 +152,7 @@ private:
 
   // 遅延値
   ElbDelay* mDelay;
-  
+
 };
 
 
@@ -164,9 +164,9 @@ class EiPrimHeadU :
   public EiPrimHead
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_header パース木の定義
@@ -174,12 +174,12 @@ protected:
   EiPrimHeadU(const VlNamedObj* parent,
 	      const PtItem* pt_header,
 	      const ElbUdpDefn* udp);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiPrimHeadU();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // EiPrimHead の仮想関数
@@ -199,7 +199,7 @@ public:
   virtual
   const ElbUdpDefn*
   udp_defn() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ private:
 
   // UDP 定義
   const ElbUdpDefn* mUdp;
-  
+
 };
 
 
@@ -235,7 +235,7 @@ private:
   virtual
   ~EiPrimHeadUD();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // EiPrimHead の仮想関数
@@ -249,7 +249,7 @@ public:
   /// @brief 遅延式を設定する．
   void
   set_delay(ElbDelay* expr);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ private:
 
   // 遅延値
   ElbDelay* mDelay;
-  
+
 };
 
 
@@ -279,7 +279,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiPrimitive();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -342,7 +342,7 @@ public:
   virtual
   const VlDelay*
   delay() const;
-  
+
   /// @brief ポート数を得る．
   virtual
   ymuint32
@@ -354,19 +354,19 @@ public:
   const VlPrimTerm*
   prim_term(ymuint32 pos) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbPrimitive の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 接続する．
   /// @param[in] pos ポート番号 (0 から始まる)
   /// @param[in] expr 接続する式
   void
   connect(ymuint32 pos,
 	  ElbExpr* expr);
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -383,17 +383,17 @@ private:
   //////////////////////////////////////////////////////////////////////
   // EiPrimitive の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ヘッダを得る．
   virtual
   ElbPrimHead*
   head() const = 0;
-  
+
   /// @brief パース木のインスタンス定義を得る．
   virtual
   const PtInst*
   pt_inst() const = 0;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -405,7 +405,7 @@ private:
 
   // ポートの配列
   EiPrimTerm* mPortArray;
-  
+
 };
 
 
@@ -417,7 +417,7 @@ class EiPrimitive1 :
   public EiPrimitive
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -426,7 +426,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiPrimitive1();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -447,7 +447,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の派生クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
   virtual
   const char*
@@ -458,17 +458,17 @@ private:
   //////////////////////////////////////////////////////////////////////
   // EiPrimitive の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ヘッダを得る．
   virtual
   ElbPrimHead*
   head() const;
-  
+
   /// @brief パース木のインスタンス定義を得る．
   virtual
   const PtInst*
   pt_inst() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -480,10 +480,10 @@ private:
 
   // インデックス番号
   int mIndex;
-  
+
   // 名前
   const char* mName;
-  
+
 };
 
 
@@ -515,7 +515,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
   virtual
   const char*
@@ -526,17 +526,17 @@ private:
   //////////////////////////////////////////////////////////////////////
   // EiPrimitive の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ヘッダを得る．
   virtual
   ElbPrimHead*
   head() const;
-  
+
   /// @brief パース木のインスタンス定義を得る．
   virtual
   const PtInst*
   pt_inst() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -548,7 +548,7 @@ private:
 
   // パース木のインスタンス定義
   const PtInst* mPtInst;
-  
+
 };
 
 
@@ -560,7 +560,7 @@ class EiPrimArray :
   public ElbPrimArray
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -578,7 +578,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiPrimArray();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -605,7 +605,7 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
@@ -673,7 +673,7 @@ public:
   virtual
   const VlPrimitive*
   elem_by_index(int index) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -687,15 +687,15 @@ public:
   /// @brief 要素のプリミティブを取り出す．
   ElbPrimitive*
   _primitive_by_index(int index) const;
-  
+
   /// @brief ヘッダを得る．
   ElbPrimHead*
   head() const;
-  
+
   /// @brief パース木のインスタンス定義を得る．
   const PtInst*
   pt_inst() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -713,7 +713,7 @@ private:
 
   // 要素の配列
   EiPrimitive1* mArray;
-  
+
 };
 
 
@@ -726,16 +726,16 @@ class EiPrimTerm :
 {
   friend class EiFactory;
   friend class EiPrimitive;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   EiPrimTerm();
-  
+
   /// @brief デストラクタ
   virtual
   ~EiPrimTerm();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -777,7 +777,7 @@ public:
   virtual
   const VlExpr*
   expr() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -789,8 +789,8 @@ public:
   set(ElbPrimitive* primitive,
       ymuint32 index,
       tVpiDirection dir);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -804,9 +804,9 @@ private:
 
   // 接続している式
   ElbExpr* mExpr;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIPRIMITIVE_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIPRIMITIVE_H

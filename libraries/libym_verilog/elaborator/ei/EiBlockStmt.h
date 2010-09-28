@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIBLOCKSTMT_H
-#define LIBYM_VERILOG_ELB_IMPL_EIBLOCKSTMT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIBLOCKSTMT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIBLOCKSTMT_H
 
-/// @file libym_verilog/elb_impl/EiBlockStmtStmt.h
+/// @file libym_verilog/elaborator/ei/EiBlockStmtStmt.h
 /// @brief EiBlockStmtStmt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -28,9 +28,9 @@ class EiBlockStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -46,8 +46,8 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiBlockStmt();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
@@ -57,28 +57,28 @@ public:
   virtual
   ymuint32
   child_stmt_num() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // EiStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 子供のステートメントを返す．
   /// @param[in] pos 位置番号
   virtual
   ElbStmt*
   _child_stmt(ymuint32 pos) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ステートメント数
   ymuint32 mStmtNum;
-  
+
   // ステートメントのリスト
   ElbStmt** mStmtList;
 
@@ -94,7 +94,7 @@ class EiBegin :
   public EiBlockStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -112,7 +112,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiBegin();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief function 中の実行を行う．
   virtual
   const VlNamedObj*
@@ -147,7 +147,7 @@ class EiFork :
   public EiBlockStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -165,7 +165,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiFork();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ public:
   virtual
   const VlNamedObj*
   func_exec(bool constant_function) const;
-  
+
 };
 
 
@@ -201,9 +201,9 @@ class EiNamedBlockStmt :
   public ElbStmt
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] block 自分自身に対応するスコープ
   /// @param[in] process 親のプロセス (or NULL)
@@ -217,7 +217,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiNamedBlockStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ public:
   FileRegion
   file_region() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
@@ -239,7 +239,7 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 対応するスコープを返す．
   virtual
   const VlNamedObj*
@@ -248,13 +248,13 @@ public:
   /// @brief 子供ののステートメントのリストの要素数を返す．
   ymuint32
   child_stmt_num() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // EiStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 子供のステートメントを返す．
   /// @param[in] pos 位置番号
   ElbStmt*
@@ -271,10 +271,10 @@ private:
 
   // 親のプロセス
   ElbProcess* mProcess;
-  
+
   // ステートメント数
   ymuint32 mStmtNum;
-  
+
   // ステートメントのリスト
   ElbStmt** mStmtList;
 
@@ -290,7 +290,7 @@ class EiNamedBegin :
   public EiNamedBlockStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -306,7 +306,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiNamedBegin();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -318,12 +318,12 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief function 中の実行を行う．
   virtual
   const VlNamedObj*
@@ -341,7 +341,7 @@ class EiNamedFork :
   public EiNamedBlockStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -357,7 +357,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiNamedFork();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -369,7 +369,7 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
@@ -385,4 +385,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIBLOCKSTMT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIBLOCKSTMT_H

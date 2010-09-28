@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIPRIMARY_H
-#define LIBYM_VERILOG_ELB_IMPL_EIPRIMARY_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIPRIMARY_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIPRIMARY_H
 
-/// @file libym_verilog/elb_impl/EiPrimary.h
+/// @file libym_verilog/elaborator/ei/EiPrimary.h
 /// @brief EiPrimary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -404,4 +404,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIPRIMARY_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIPRIMARY_H

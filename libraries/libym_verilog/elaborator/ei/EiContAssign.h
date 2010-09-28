@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EICONTASSIGN_H
-#define LIBYM_VERILOG_ELB_IMPL_EICONTASSIGN_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EICONTASSIGN_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EICONTASSIGN_H
 
-/// @file libym_verilog/elb_impl/EiContAssign.h
+/// @file libym_verilog/elaborator/ei/EiContAssign.h
 /// @brief EiContAssign のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -47,35 +47,35 @@ public:
   virtual
   const VlModule*
   module() const;
-  
+
   /// @brief 0の強さを返す．
   virtual
   tVpiStrength
   drive0() const;
-  
+
   /// @brief 1の強さを返す．
   virtual
   tVpiStrength
   drive1() const;
-  
+
   /// @brief 遅延を表す式を返す．
   /// @note このクラスでは NULL を返す．
   virtual
   ElbDelay*
   delay() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親のモジュール
   const VlModule* mModule;
-  
+
   // パース木のヘッダ定義
   const PtItem* mPtHead;
-  
+
 };
 
 
@@ -107,21 +107,21 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbCaHead の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 遅延を表す式を返す．
   virtual
   ElbDelay*
   delay() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 遅延値
   ElbDelay* mDelay;
-  
+
 };
 
 
@@ -161,7 +161,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -177,18 +177,18 @@ public:
   virtual
   const VlExpr*
   lhs() const;
-  
+
   /// @brief 右辺を返す．
   virtual
   const VlExpr*
   rhs() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 対応するパース木の定義要素
   const PtBase* mPtObj;
 
@@ -236,33 +236,33 @@ public:
   virtual
   const VlModule*
   module() const;
-  
+
   /// @brief 0の強さを返す．
   virtual
   tVpiStrength
   drive0() const;
-  
+
   /// @brief 1の強さを返す．
   virtual
   tVpiStrength
   drive1() const;
-  
+
   /// @brief 遅延を表す式を返す．
   virtual
   const VlDelay*
   delay() const;
-  
+
   /// @brief ネット宣言中の assignment の時に true を返す．
   virtual
   bool
   has_net_decl_assign() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ヘッダ
   ElbCaHead* mHead;
 
@@ -293,7 +293,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiContAssign2();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -304,27 +304,27 @@ public:
   virtual
   const VlModule*
   module() const;
-  
+
   /// @brief 0の強さを返す．
   virtual
   tVpiStrength
   drive0() const;
-  
+
   /// @brief 1の強さを返す．
   virtual
   tVpiStrength
   drive1() const;
-  
+
   /// @brief 遅延を表す式を返す．
   virtual
   const VlDelay*
   delay() const;
-  
+
   /// @brief ネット宣言中の assignment の時に true を返す．
   virtual
   bool
   has_net_decl_assign() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -333,9 +333,9 @@ private:
 
   // 親のモジュール
   const VlModule* mModule;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_ELBCONTASSIGN_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_ELBCONTASSIGN_H

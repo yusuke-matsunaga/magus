@@ -11,6 +11,7 @@
 
 #include "VmStmtNode.h"
 #include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlProcess.h"
 #include "ym_verilog/vl/VlStmt.h"
 #include "ym_verilog/vl/VlTaskFunc.h"
@@ -59,7 +60,7 @@ VmProcessListNode::VmProcessListNode(const VlMgr& vl_mgr,
   mProcessArray(process_array)
 {
 }
-  
+
 
 // @brief デストラクタ
 VmProcessListNode::~VmProcessListNode()
@@ -68,7 +69,7 @@ VmProcessListNode::~VmProcessListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmProcessListNode::data(int column,
 			int role) const
@@ -83,7 +84,7 @@ VmProcessListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmProcessListNode::loc() const
@@ -130,7 +131,7 @@ VmProcessNode::~VmProcessNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmProcessNode::data(int column,
 		    int role) const
@@ -149,7 +150,7 @@ VmProcessNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmProcessNode::loc() const
@@ -190,7 +191,7 @@ VmStmtListNode::~VmStmtListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmStmtListNode::data(int column,
 		   int role) const
@@ -205,7 +206,7 @@ VmStmtListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmStmtListNode::loc() const
@@ -256,7 +257,7 @@ VmStmtNode::~VmStmtNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmStmtNode::data(int column,
 		 int role) const
@@ -297,7 +298,7 @@ VmStmtNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmStmtNode::loc() const
@@ -310,7 +311,7 @@ void
 VmStmtNode::expand() const
 {
   add_str("vpiScope", mStmt->parent()->full_name());
-  
+
   switch ( mStmt->type() ) {
   case kVpiNamedBegin:
   case kVpiNamedFork:
@@ -327,7 +328,7 @@ VmStmtNode::expand() const
     break;
 
   case kVpiEventStmt:
-    add_expr("vpiNamedEvent", mStmt->named_event());
+    add_str("vpiNamedEvent", mStmt->named_event()->full_name());
     break;
 
   case kVpiAssignment:
@@ -406,7 +407,7 @@ VmStmtNode::expand() const
     add_str("vpiUserSystf", mStmt->user_systf()->name());
     add_child( new VmArgListNode(mStmt) );
     break;
-    
+
   case kVpiDisable:
     add_str("vpiExpr", mStmt->scope()->full_name());
     break;
@@ -441,7 +442,7 @@ VmArgListNode::~VmArgListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmArgListNode::data(int column,
 		    int role) const
@@ -456,7 +457,7 @@ VmArgListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmArgListNode::loc() const
@@ -504,7 +505,7 @@ VmCaseItemListNode::~VmCaseItemListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmCaseItemListNode::data(int column,
 			 int role) const
@@ -519,7 +520,7 @@ VmCaseItemListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmCaseItemListNode::loc() const
@@ -567,7 +568,7 @@ VmCaseItemNode::~VmCaseItemNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmCaseItemNode::data(int column,
 		     int role) const
@@ -582,7 +583,7 @@ VmCaseItemNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmCaseItemNode::loc() const
@@ -625,7 +626,7 @@ VmControlNode::~VmControlNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmControlNode::data(int column,
 		    int role) const
@@ -648,7 +649,7 @@ VmControlNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmControlNode::loc() const

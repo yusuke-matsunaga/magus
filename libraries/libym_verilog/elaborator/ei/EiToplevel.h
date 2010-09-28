@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EITOPLEVEL_H
-#define LIBYM_VERILOG_ELB_IMPL_EITOPLEVEL_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EITOPLEVEL_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EITOPLEVEL_H
 
-/// @file libym_verilog/elb_impl/EiToplevel.h
+/// @file libym_verilog/elaborator/ei/EiToplevel.h
 /// @brief ElbFrameToplevel のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -24,7 +24,7 @@ class EiToplevel :
   public VlNamedObj
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -33,7 +33,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiToplevel();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ public:
   virtual
   const VlModule*
   parent_module() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
@@ -77,4 +77,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LiBYM_VERILOG_ELABORATOR_EITOPLEVEL_H
+#endif // LiBYM_VERILOG_ELABORATOR_EI_EITOPLEVEL_H

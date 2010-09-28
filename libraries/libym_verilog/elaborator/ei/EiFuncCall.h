@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIFUNCCALL_H
-#define LIBYM_VERILOG_ELB_IMPL_EIFUNCCALL_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIFUNCCALL_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIFUNCCALL_H
 
-/// @file libym_verilog/elb_impl/EiFuncCall.h
+/// @file libym_verilog/elaborator/ei/EiFuncCall.h
 /// @brief EiFuncCall のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -24,9 +24,9 @@ class EiFcBase :
   public EiExprBase1
 {
   friend class EiFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] pt_obj パース木の定義要素
   /// @param[in] arg_size 引数の数
@@ -34,17 +34,17 @@ protected:
   EiFcBase(const PtBase* pt_obj,
 	   ymuint32 arg_size,
 	   ElbExpr** arg_list);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiFcBase();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-    
+
   /// @brief 引数の数を返す．
   virtual
   ymuint32
@@ -61,7 +61,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 引数の数
   ymuint32 mArgNum;
 
@@ -95,7 +95,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiFuncCall();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -143,7 +143,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
   /// @brief real 型の値を返す．
   virtual
   double
@@ -154,7 +154,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -167,19 +167,19 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
   string
   decompile_impl(int ppri) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // eval_XXXX の下請け関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 関数の値を評価する．
   ElbExpr*
   evaluate() const;
@@ -189,7 +189,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 関数
   const ElbTaskFunc* mFunc;
 
@@ -220,7 +220,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiSysFuncCall();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -253,7 +253,7 @@ public:
   virtual
   bool
   is_sysfunccall() const;
-  
+
   /// @brief 対象のシステム関数を返す．
   /// @note kVpiSysFuncCall の時，意味を持つ．
   virtual
@@ -269,7 +269,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-  
+
   /// @brief real 型の値を返す．
   virtual
   double
@@ -281,7 +281,7 @@ public:
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -293,7 +293,7 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
@@ -305,7 +305,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // システム関数
   const ElbUserSystf* mUserSystf;
 
@@ -313,4 +313,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIFUNCCALL_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIFUNCCALL_H

@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EICONTROL_H
-#define LIBYM_VERILOG_ELB_IMPL_EICONTROL_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EICONTROL_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EICONTROL_H
 
-/// @file libym_verilog/elb/EiControl.h
+/// @file libym_verilog/elaborator/ei/EiControl.h
 /// @brief ElbControl の実装クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -33,11 +33,11 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] pt_control パース木の定義要素
   EiControl(const PtControl* pt_control);
-  
+
   /// デストラクタ
   virtual
   ~EiControl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlControl に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 遅延式を返す．
   /// @note このクラスでは NULL を返す．
   virtual
@@ -66,13 +66,13 @@ public:
   virtual
   const VlExpr*
   expr() const;
-  
+
   /// @brief イベント条件式の数を返す．
   /// @note このクラスでは 0 を返す．
   virtual
   ymuint32
   event_num() const;
-  
+
   /// @brief イベント条件式を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   /// @note このクラスでは NULL を返す．
@@ -103,7 +103,7 @@ class EiDelayControl :
   public EiControl
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -111,11 +111,11 @@ private:
   /// @param[in] delay 遅延式
   EiDelayControl(const PtControl* pt_control,
 		 ElbExpr* delay);
-  
+
   /// デストラクタ
   virtual
   ~EiDelayControl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -132,7 +132,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbControl に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// 遅延式を返す．
   virtual
   const VlExpr*
@@ -143,7 +143,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 遅延式
   ElbExpr* mDelay;
 
@@ -161,7 +161,7 @@ class EiEventControl :
   public EiControl
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -171,11 +171,11 @@ protected:
   EiEventControl(const PtControl* pt_control,
 		 ymuint32 event_num,
 		 ElbExpr** event_list);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiEventControl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -192,27 +192,27 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlControl に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief イベント条件式の数を返す．
   virtual
   ymuint32
   event_num() const;
-  
+
   /// @brief イベント条件式を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   virtual
   const VlExpr*
   event(ymuint32 pos) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // イベントリストの要素数
   ymuint32 mEventNum;
-  
+
   // イベントリスト
   ElbExpr** mEventList;
 
@@ -228,7 +228,7 @@ class EiRepeatControl :
   public EiEventControl
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -240,11 +240,11 @@ private:
 		  ElbExpr* rep,
 		  ymuint32 event_num,
 		  ElbExpr** event_list);
-  
+
   /// デストラクタ
   virtual
   ~EiRepeatControl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -261,7 +261,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlControl に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// 繰り返し式を返す．
   virtual
   const VlExpr*
@@ -280,4 +280,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EICONTROL_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EICONTROL_H

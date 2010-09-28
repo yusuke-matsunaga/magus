@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EITERNARYOP_H
-#define LIBYM_VERILOG_ELB_IMPL_EITERNARYOP_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EITERNARYOP_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EITERNARYOP_H
 
-/// @file libym_verilog/elb_impl/EiTernaryOp.h
+/// @file libym_verilog/elaborator/ei/EiTernaryOp.h
 /// @brief EiExpr の3項演算子の派生クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -38,7 +38,7 @@ class EiTernaryOp :
   public EiOperation
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -71,7 +71,7 @@ public:
   virtual
   ymuint32
   operand_num() const;
-    
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ protected:
   ElbExpr*
   operand3() { return mOpr[2]; }
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -122,7 +122,7 @@ private:
 
   // オペランド
   ElbExpr* mOpr[3];
-  
+
 };
 
 
@@ -182,7 +182,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -195,13 +195,13 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
@@ -215,7 +215,7 @@ private:
 
   // 式の型
   tVpiValueType mType;
-  
+
 };
 
 
@@ -275,7 +275,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -288,13 +288,13 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 演算子のタイプを返す．
   virtual
   tVpiOpType
@@ -308,9 +308,9 @@ private:
 
   // 式の型
   tVpiValueType mType;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EITERNARYOP_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EITERNARYOP_H

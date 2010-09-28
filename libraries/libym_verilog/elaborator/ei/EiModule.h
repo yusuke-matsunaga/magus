@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIMODULE_H
-#define LIBYM_VERILOG_ELB_IMPL_EIMODULE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIMODULE_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIMODULE_H
 
-/// @file libym_verilog/elb_impl/EiModule.h
+/// @file libym_verilog/elaborator/ei/EiModule.h
 /// @brief EiModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -31,7 +31,7 @@ class EiModuleHead
 {
   friend class EiModuleArray;
   friend class EiModule2;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -47,7 +47,7 @@ private:
   /// @brief デストラクタ
   ~EiModuleHead();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // EiModuleHead の関数
@@ -56,20 +56,20 @@ public:
   /// @brief このオブジェクトの属しているスコープを返す．
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief ファイル位置の取得
   FileRegion
   file_region() const;
-  
+
   /// @brief インスタンス名を返す．
   const char*
   name() const;
-  
+
   /// @brief definition location を返す．
   /// @return 定義側のファイル位置の情報を返す．
   FileRegion
   def_file_region() const;
-  
+
   /// @brief definition name を返す．
   /// @return 定義名を返す．
   const char*
@@ -78,16 +78,16 @@ public:
   /// @brief ポート数を返す．
   ymuint32
   port_num() const;
-  
+
   /// @brief 入出力宣言数を返す．
   ymuint32
   io_num() const;
-  
+
   /// @brief cell instance のチェック
   /// @return cell instance の場合に true を返す．
   bool
   is_cell_instance() const;
-  
+
   /// @brief protect のチェック
   /// @return protect されていたら true を返す．
   bool
@@ -96,48 +96,48 @@ public:
   /// @brief top module の時 true を返す．
   bool
   is_top_module() const;
-  
+
   /// @brief time unit を返す．
   /// @return 結果は 2 〜 -15 の整数
   /// @return もしくは未定義を表す -16
   int
   time_unit() const;
-  
+
   /// @brief time precision を返す．
   /// @return 結果は 2 〜 -15 の整数
   /// @return もしくは未定義を表す -16
   int
   time_precision() const;
-  
+
   /// @brief default net type を返す．
   tVpiNetType
   def_net_type() const;
-  
+
   /// @brief unconnected drive を返す．
   tVpiUnconnDrive
   unconn_drive() const;
-  
+
   /// @brief default delay mode を返す．
   tVpiDefDelayMode
   def_delay_mode() const;
-  
+
   /// @brief default decay time を返す．
   int
   def_decay_time() const;
-  
+
   /// @brief config 情報を返す．
   string
   config() const;
-  
+
   /// @brief library 情報を返す．
   string
   library() const;
-  
+
   /// @brief cell 情報を返す．
   string
   cell() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -154,7 +154,7 @@ private:
 
   // パース木のモジュールインスタンス定義
   const PtInst* mPtInst;
-  
+
 };
 
 
@@ -166,10 +166,10 @@ class EiModule :
   public ElbModule
 {
 protected:
-  
+
   /// @brief コンストラクタ
   EiModule();
-  
+
   /// @brief デストラクタ
   virtual
   ~EiModule();
@@ -180,7 +180,7 @@ protected:
   void
   init(EiPort* port_array,
        EiIODecl* io_array);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -196,8 +196,8 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の仮想関数
@@ -213,25 +213,25 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlModule の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief definition location を返す．
   /// @return 定義側のファイル位置の情報を返す．
   virtual
   FileRegion
   def_file_region() const;
-  
+
   /// @brief definition name を返す．
   /// @return 定義名を返す．
   virtual
   const char*
   def_name() const;
-  
+
   /// @brief cell instance のチェック
   /// @return cell instance の場合に true を返す．
   virtual
   bool
   is_cell_instance() const;
-  
+
   /// @brief protect のチェック
   /// @return protect されていたら true を返す．
   virtual
@@ -242,51 +242,51 @@ public:
   virtual
   bool
   is_top_module() const;
-  
+
   /// @brief time unit を返す．
   /// @return 結果は 2 〜 -15 の整数
   /// @return もしくは未定義を表す -16
   virtual
   int
   time_unit() const;
-  
+
   /// @brief time precision を返す．
   /// @return 結果は 2 〜 -15 の整数
   /// @return もしくは未定義を表す -16
   virtual
   int
   time_precision() const;
-  
+
   /// @brief default net type を返す．
   virtual
   tVpiNetType
   def_net_type() const;
-  
+
   /// @brief unconnected drive を返す．
   virtual
   tVpiUnconnDrive
   unconn_drive() const;
-  
+
   /// @brief default delay mode を返す．
   virtual
   tVpiDefDelayMode
   def_delay_mode() const;
-  
+
   /// @brief default decay time を返す．
   virtual
   int
   def_decay_time() const;
-  
+
   /// @brief config 情報を返す．
   virtual
   string
   config() const;
-  
+
   /// @brief library 情報を返す．
   virtual
   string
   library() const;
-  
+
   /// @brief cell 情報を返す．
   virtual
   string
@@ -303,7 +303,7 @@ public:
   virtual
   const VlPort*
   port(ymuint32 pos) const;
-  
+
   /// @brief 入出力数を得る．
   virtual
   ymuint32
@@ -320,7 +320,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbModule の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入出力の初期設定を行う．
   /// @param[in] pos 位置番号
   /// @param[in] head ヘッダ
@@ -333,7 +333,7 @@ public:
 	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl);
-  
+
   /// @brief ポートの初期設定を行う．
   /// @param[in] index ポート番号
   /// @param[in] pt_port パース木のポート定義
@@ -355,7 +355,7 @@ public:
   set_port_high_conn(ymuint32 index,
 		     ElbExpr* high_conn,
 		     bool conn_by_name);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -371,19 +371,19 @@ private:
   virtual
   EiModuleHead&
   head() = 0;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ポートの配列
   EiPort* mPortList;
-  
+
   // 入出力の配列
   EiIODecl* mIODeclList;
-  
+
 };
 
 
@@ -395,7 +395,7 @@ class EiModule1 :
   public EiModule
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -404,7 +404,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiModule1();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -422,23 +422,23 @@ private:
        EiModuleArray* module_array,
        int index);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // VlModule の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 配列要素の時 true を返す．
   virtual
   bool
@@ -455,7 +455,7 @@ public:
   virtual
   const VlModuleArray*
   module_array() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -472,7 +472,7 @@ private:
   EiModuleHead&
   head();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -483,10 +483,10 @@ private:
 
   // インデックス
   int mIndex;
-  
+
   // 名前
   StrBuff mName;
-  
+
 };
 
 
@@ -514,24 +514,24 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiModule2();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // VlModule の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 配列要素の時 true を返す．
   virtual
   bool
@@ -549,7 +549,7 @@ public:
   const VlModuleArray*
   module_array() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // EiModule の派生クラスが実装しなければならない仮想関数
@@ -565,15 +565,15 @@ private:
   EiModuleHead&
   head();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ヘッダ情報
   EiModuleHead mHead;
-  
+
 };
 
 
@@ -585,7 +585,7 @@ class EiModuleArray :
   public ElbModuleArray
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -605,7 +605,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiModuleArray();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -621,8 +621,8 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlNamedObj の仮想関数
@@ -632,28 +632,28 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // VlModuleArray の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 範囲の MSB を返す．
   virtual
   const VlExpr*
   left_range() const;
-  
+
   /// @brief 範囲の LSB を返す．
   virtual
   const VlExpr*
   right_range() const;
-  
+
   /// @brief 要素数を返す．
   virtual
   ymuint32
@@ -676,7 +676,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbModuleArray の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 要素を返す．
   ElbModule*
   _module(ymuint32 offset);
@@ -686,32 +686,32 @@ public:
   //////////////////////////////////////////////////////////////////////
   // EiModuleArray の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ヘッダを返す．
   const EiModuleHead&
   head() const;
-  
+
   /// @brief ヘッダを返す．
   EiModuleHead&
   head();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ヘッダ
   EiModuleHead mHead;
-  
+
   // 範囲
   EiRangeImpl mRange;
-  
+
   // 要素の配列
   EiModule1* mArray;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIMODULE_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIMODULE_H

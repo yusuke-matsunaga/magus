@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIPARAMETER_H
-#define LIBYM_VERILOG_ELB_IMPL_EIPARAMETER_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIPARAMETER_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIPARAMETER_H
 
-/// @file libym_verilog/elb_impl/EiParameter.h
+/// @file libym_verilog/elaborator/ei/EiParameter.h
 /// @brief EiParameter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -458,4 +458,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIPARAMETER_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIPARAMETER_H

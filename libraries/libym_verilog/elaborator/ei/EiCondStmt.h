@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EICONDSTMT_H
-#define LIBYM_VERILOG_ELB_IMPL_EICONDSTMT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EICONDSTMT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EICONDSTMT_H
 
-/// @file libym_verilog/elb_impl/EiCondStmt.h
+/// @file libym_verilog/elaborator/ei/EiCondStmt.h
 /// @brief EiCondStmt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -32,7 +32,7 @@ class EiLoopStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -56,17 +56,17 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 条件式を返す．
   virtual
   const VlExpr*
   expr() const;
-  
+
   /// @brief 本体のステートメントを返す．
   virtual
   const VlStmt*
   body_stmt() const;
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ protected:
   ElbStmt*
   _body_stmt() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -100,7 +100,7 @@ class EiWhileStmt :
   public EiLoopStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -118,7 +118,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiWhileStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ class EiRepeatStmt :
   public EiLoopStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -171,7 +171,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiRepeatStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -206,7 +206,7 @@ class EiWaitStmt :
   public EiLoopStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -224,7 +224,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiWaitStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ class EiForStmt :
   public EiLoopStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -282,7 +282,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiForStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -299,17 +299,17 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// 初期化文を返す．
   virtual
   const VlStmt*
   init_stmt() const;
-  
+
   /// 繰り返し文を返す．
   virtual
   const VlStmt*
   inc_stmt() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -345,7 +345,7 @@ class EiForeverStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -361,7 +361,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiForeverStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -373,29 +373,29 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 本体のステートメントを返す．
   virtual
   const VlStmt*
   body_stmt() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief function 中の実行を行う．
   virtual
   const VlNamedObj*
   func_exec(bool constant_function) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -416,7 +416,7 @@ class EiIfStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -434,7 +434,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiIfStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -446,33 +446,33 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 条件式を返す．
   virtual
   const VlExpr*
   expr() const;
-  
+
   /// @brief 本体のステートメントを返す．
   virtual
   const VlStmt*
   body_stmt() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief function 中の実行を行う．
   virtual
   const VlNamedObj*
   func_exec(bool constant_function) const;
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -506,7 +506,7 @@ class EiIfElseStmt :
   public EiIfStmt
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -526,7 +526,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiIfElseStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -543,18 +543,18 @@ public:
   //////////////////////////////////////////////////////////////////////
   // VlStmt に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief else ステートメントを返す．
   virtual
   const VlStmt*
   else_stmt() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief function 中の実行を行う．
   virtual
   const VlNamedObj*
@@ -582,7 +582,7 @@ class EiCaseItem :
 {
   friend class EiFactory;
   friend class EiCaseStmt;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -608,7 +608,7 @@ public:
   FileRegion
   file_region() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlCaseItem に固有の仮想関数
@@ -624,13 +624,13 @@ public:
   virtual
   const VlExpr*
   expr(ymuint32 pos) const;
-  
+
   /// @brief 本体のステートメントを返す．
   virtual
   const VlStmt*
   body_stmt() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -638,10 +638,10 @@ private:
 
   // パース木の caseitem 定義
   const PtCaseItem* mPtCaseItem;
-  
+
   // ラベルのリストの要素数
   ymuint32 mExprNum;
-  
+
   // ラベルのリスト
   ElbExpr** mExprList;
 
@@ -660,7 +660,7 @@ class EiCaseStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -680,7 +680,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiCaseStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -702,7 +702,7 @@ public:
   virtual
   tVpiCaseType
   case_type() const;
-  
+
   /// @brief 条件式を返す．
   virtual
   const VlExpr*
@@ -718,13 +718,13 @@ public:
   virtual
   const VlCaseItem*
   case_item(ymuint32 pos) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief caseitem を設定する．
   /// @param[in] pos 位置番号
   /// @param[in] pt_caseitem パース木の caseitem 定義
@@ -742,7 +742,7 @@ public:
   const VlNamedObj*
   func_exec(bool constant_function) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -750,10 +750,10 @@ private:
 
   // 条件式
   ElbExpr* mCondition;
-  
+
   // case item の要素数
   ymuint32 mCaseItemNum;
-  
+
   // case item のリスト
   EiCaseItem* mCaseItemList;
 
@@ -761,4 +761,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EICONDSTMT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EICONDSTMT_H

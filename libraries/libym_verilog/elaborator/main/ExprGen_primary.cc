@@ -101,22 +101,20 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     // 通常のスコープで探索する．
     handle = find_obj_up(parent, nb_array, name, NULL);
     if ( handle == NULL ) {
-      if ( !env.is_namedevent() ) {
-	// 見つからなくてもデフォルトネットタイプが kVpiNone でないかぎり
-	// 暗黙の1ビットネット宣言を行う．
-	// ただし識別子に添字がついていたらだめ
-	const VlModule* parent_module = parent->parent_module();
-	tVpiNetType def_nettype = parent_module->def_net_type();
-	if ( pt_expr->is_simple() &&
-	     !has_hname &&
-	     isize == 0 &&
-	     def_nettype != kVpiNone ) {
-	  ElbDecl* decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
-	  reg_decl(vpiNet, decl);
+      // 見つからなくてもデフォルトネットタイプが kVpiNone でないかぎり
+      // 暗黙の1ビットネット宣言を行う．
+      // ただし識別子に添字がついていたらだめ
+      const VlModule* parent_module = parent->parent_module();
+      tVpiNetType def_nettype = parent_module->def_net_type();
+      if ( pt_expr->is_simple() &&
+	   !has_hname &&
+	   isize == 0 &&
+	   def_nettype != kVpiNone ) {
+	ElbDecl* decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
+	reg_decl(vpiNet, decl);
 
-	  handle = find_obj(parent, name);
-	  assert_cond(handle, __FILE__, __LINE__);
-	}
+	handle = find_obj(parent, name);
+	assert_cond(handle, __FILE__, __LINE__);
       }
     }
     if ( handle == NULL ) {
@@ -243,6 +241,54 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     }
   }
   return factory().new_Primary(pt_expr, decl);
+}
+
+// @brief PtExpr(primary) から named_event を生成する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+ElbDecl*
+ExprGen::instantiate_namedevent(const VlNamedObj* parent,
+				const PtExpr* pt_expr)
+{
+  assert_cond(pt_expr->type() == kPtPrimaryExpr, __FILE__, __LINE__);
+  assert_cond(pt_expr->left_range() == NULL, __FILE__, __LINE__);
+  assert_cond(pt_expr->right_range() == NULL, __FILE__, __LINE__);
+
+  // 識別子の階層
+  PtNameBranchArray nb_array = pt_expr->namebranch_array();
+
+  // 識別子の名前
+  const char* name = pt_expr->name();
+
+  // 名前に対応したオブジェクトのハンドルを求める．
+  ElbObjHandle* handle = find_obj_up(parent, nb_array, name, NULL);
+  if ( handle == NULL ) {
+    // 見つからなかった．
+    error_not_found(pt_expr);
+    return NULL;
+  }
+
+  // 配列要素などの処理を行う．
+  bool has_range_select;
+  bool has_bit_select;
+  ElbExpr* index1;
+  ElbExpr* index2;
+  ElbDecl* decl = instantiate_decl(handle, parent, pt_expr, NULL,
+				   has_range_select,
+				   has_bit_select,
+				   index1, index2);
+  if ( decl == NULL ) {
+    // エラー
+    // メッセージは instantiate_decl() 内で出力されている．
+    return NULL;
+  }
+  if ( decl->type() != kVpiNamedEvent ) {
+    // 型が違う
+    error_not_a_namedevent(pt_expr);
+    return NULL;
+  }
+
+  return decl;
 }
 
 // @brief genvar に対応した定数を生成する．
@@ -599,17 +645,6 @@ ExprGen::check_decl(const PtExpr* pt_expr,
       return false;
     }
   }
-  if ( env.is_namedevent() ) {
-    if ( decl->type() != kVpiNamedEvent ) {
-      // 型が違う
-      error_not_a_namedevent(pt_expr);
-      return NULL;
-    }
-    if ( has_select ) {
-      // named event は範囲選択できない．
-      error_select_for_namedevent(pt_expr);
-    }
-  }
   if ( env.is_net_lhs() && type != kVpiNet ) {
     // net 型が要求されている．
     return false;
@@ -669,7 +704,7 @@ ExprGen::check_decl(const PtExpr* pt_expr,
     return true;
 
   case kVpiNamedEvent:
-    if ( env.is_event_expr() || env.is_namedevent() ) {
+    if ( env.is_event_expr() ) {
       return true;
     }
     break;

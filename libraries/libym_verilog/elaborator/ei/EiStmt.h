@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EISTMT_H
-#define LIBYM_VERILOG_ELB_IMPL_EISTMT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EISTMT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EISTMT_H
 
-/// @file libym_verilog/elb_impl/EiStmt.h
+/// @file libym_verilog/elaborator/ei/EiStmt.h
 /// @brief EiStmt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -42,7 +42,7 @@ protected:
   /// デストラクタ
   virtual
   ~EiStmtBase();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -69,13 +69,13 @@ public:
   virtual
   ElbProcess*
   process() const;
-  
-  
+
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスから参照可能な関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief パース木の定義要素を得る．
   const PtStmt*
   pt_stmt() const;
@@ -112,4 +112,4 @@ EiStmtBase::pt_stmt() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EISTMT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EISTMT_H

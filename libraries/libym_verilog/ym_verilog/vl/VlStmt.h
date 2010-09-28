@@ -52,134 +52,189 @@ public:
   virtual
   const VlNamedObj*
   parent() const = 0;
-  
+
   /// @brief 対象のスコープの取得
-  /// @note kDisable/kParBlock/kSeqBlock で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiBegin
+  ///  - kVpiDisable
+  ///  - kVpiFork
+  ///  - kVpiNamedBegin
+  ///  - kVpiNamedFork
   virtual
   const VlNamedObj*
   scope() const = 0;
 
   /// @brief task の実体を返す．
-  /// @note kEnable で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiTaskCall
   virtual
   const VlTaskFunc*
   task() const = 0;
 
   /// @brief user systf クラスへのポインタを返す．
-  /// @note kSysEnable で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiSysTaskCall
   virtual
   const VlUserSystf*
   user_systf() const = 0;
 
   /// @brief 引数の数の取得
-  /// @note kEnable/kSysEnable で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiSysTaskCall
+  ///  - kVpiTaskCall
   virtual
-  ymuint32
+  ymuint
   arg_num() const = 0;
-  
+
   /// @brief 引数の取得
   /// @param[in] pos 位置 (0 <= pos < arg_num())
-  /// @note kEnable/kSysEnable で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiSysTaskCall
+  ///  - kVpiTaskCall
   virtual
   const VlExpr*
-  arg(ymuint32 pos) const = 0;
+  arg(ymuint pos) const = 0;
 
   /// @brief control の取得
-  /// @note kDc/kEc/kAssignment で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiAssignment
+  ///  - kVpiDelayControl
+  ///  - kVpiEventControl
   virtual
   const VlControl*
   control() const = 0;
 
   /// @brief 本体のステートメントの取得
-  /// @note kDc/kEc/kWait/kForever/kRepeat/kWhile/kFor/kIf で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiDelayControl
+  ///  - kVpiEventControl
+  ///  - kVpiFor
+  ///  - kVpiForever
+  ///  - kVpiIf
+  ///  - kVpiIfElse
+  ///  - kVpiRepeat
+  ///  - kVpiWait
+  ///  - kVpiWhile
   virtual
   const VlStmt*
   body_stmt() const = 0;
 
   /// @brief 式の取得
-  /// @note kWait/kRepeat/kWhile/kFor/kIf/kCase/kCaseX/kCaseZ で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiCase
+  ///  - kVpiFor
+  ///  - kVpiIf
+  ///  - kVpiIfElse
+  ///  - kVpiRepeat
+  ///  - kVpiWait
+  ///  - kVpiWhile
   virtual
   const VlExpr*
   expr() const = 0;
-  
+
   /// @brief 代入のブロッキング/ノンブロッキングの区別の取得
   /// @retval true ブロッキング代入文を表す．
   /// @retval false ノンブロッキング代入文もしくは他のステートメント
-  /// @note 代入文のときに意味を持つ．
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiAssignment
   virtual
   bool
   is_blocking() const = 0;
-  
+
   /// @brief 左辺式の取得
-  /// @note kAssign/kForce/kPcAssign/kRelease/kDeassign で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiAssignStmt
+  ///  - kVpiAssignment
+  ///  - kVpiDeassign
+  ///  - kVpiForce
+  ///  - kVpiRelease
   virtual
   const VlExpr*
   lhs() const = 0;
 
   /// @brief 右辺式の取得
-  /// @note kAssign/kForce/kPcAssign で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiAssignStmt
+  ///  - kVpiAssignment
+  ///  - kVpiForce
   virtual
   const VlExpr*
   rhs() const = 0;
 
   /// @brief イベントプライマリの取得
-  /// @note kEvent で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiEvent
+  /// @note 返されるオブジェクトの型は kVpiNamedEvent のはず．
   virtual
-  const VlExpr*
+  const VlDecl*
   named_event() const = 0;
 
   /// @brief 条件が成り立たなかったとき実行されるステートメントの取得
-  /// @note kIf で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiIfElse
   virtual
   const VlStmt*
   else_stmt() const = 0;
-  
+
   /// @brief case type の取得
   /// @return case type
-  /// @note kCase/kCaseX/kCaseZ で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiCase
   virtual
   tVpiCaseType
   case_type() const = 0;
-  
+
   /// @brief case item の要素数の取得
   /// @return case item の要素数
-  /// @note kCase/kCaseX/kCaseZ で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiCase
   virtual
-  ymuint32
+  ymuint
   caseitem_num() const = 0;
 
   /// @brief case item の取得
   /// @param[in] pos 位置番号 (0 <= pos < caseitem_num())
-  /// @note kCase/kCaseX/kCaseZ で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiCase
   virtual
   const VlCaseItem*
-  caseitem(ymuint32 pos) const = 0;
+  caseitem(ymuint pos) const = 0;
 
   /// @brief 初期化代入文の取得
-  /// @note kFor で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiFor
   virtual
   const VlStmt*
   init_stmt() const = 0;
-  
+
   /// @brief 繰り返し代入文の取得
-  /// @note kFor で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiFor
   virtual
   const VlStmt*
   inc_stmt() const = 0;
 
   /// @brief 子供のステートメントの数の取得
-  /// @note kParBlock/kSeqBlock で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiBegin
+  ///  - kVpiFork
+  ///  - kVpiNamedBegin
+  ///  - kVpiNamedFork
   virtual
-  ymuint32
+  ymuint
   child_stmt_num() const = 0;
-  
+
   /// @brief 子供のステートメントの取得
   /// @param[in] pos 位置番号 (0 <= pos < stmt_num())
-  /// @note kParBlock/kSeqBlock で意味のある関数
+  /// @note この関数が意味を持つオブジェクトの型
+  ///  - kVpiBegin
+  ///  - kVpiFork
+  ///  - kVpiNamedBegin
+  ///  - kVpiNamedFork
   virtual
   const VlStmt*
-  child_stmt(ymuint32 pos) const = 0;
-  
+  child_stmt(ymuint pos) const = 0;
+
 };
 
 
@@ -204,15 +259,15 @@ public:
 
   /// @brief 条件式のリストの要素数を返す．
   virtual
-  ymuint32
+  ymuint
   expr_num() const = 0;
 
   /// @brief 条件式を返す．
   /// @param[in] pos 位置番号
   virtual
   const VlExpr*
-  expr(ymuint32 pos) const = 0;
-  
+  expr(ymuint pos) const = 0;
+
   /// @brief 本体のステートメントを返す．
   virtual
   const VlStmt*

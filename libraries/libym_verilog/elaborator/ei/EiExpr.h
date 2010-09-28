@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIEXPR_H
-#define LIBYM_VERILOG_ELB_IMPL_EIEXPR_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIEXPR_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIEXPR_H
 
-/// @file libym_verilog/elb_impl/EiExpr.h
+/// @file libym_verilog/elaborator/ei/EiExpr.h
 /// @brief EiExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -25,11 +25,11 @@ class EiExprBase1 :
   public ElbExpr
 {
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   EiExprBase1(const PtBase* pt_obj);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiExprBase1();
@@ -44,7 +44,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -57,21 +57,21 @@ public:
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief 実数値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_real(double v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -80,9 +80,9 @@ private:
 
   // パース木の定義要素
   const PtBase* mPtObj;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIEXPR_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIEXPR_H

@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIDELAY_H
-#define LIBYM_VERILOG_ELB_IMPL_EIDELAY_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIDELAY_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIDELAY_H
 
-/// @file libym_verilog/elb_impl/EiDelay.h
+/// @file libym_verilog/elaborator/ei/EiDelay.h
 /// @brief EiExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -24,9 +24,9 @@ class EiDelay :
   public ElbDelay
 {
   friend class EiFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] pt_obj パース木の定義要素
   /// @param[in] elem_num 要素数
@@ -34,7 +34,7 @@ private:
   EiDelay(const PtBase* pt_obj,
 	  ymuint32 elem_num,
 	  ElbExpr** expr_list);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDelay();
@@ -60,7 +60,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbDelay の派生クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 要素数を返す．
   virtual
   ymuint32
@@ -71,28 +71,28 @@ public:
   virtual
   const VlExpr*
   expr(ymuint32 pos) const;
-  
+
   /// @brief Verilog-HDL の文字列を得る．
   string
   decompile() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パース木の定義要素
   const PtBase* mPtObj;
-  
+
   // 要素数
   ymuint32 mElemNum;
 
   // 要素の配列
   ElbExpr** mElemArray;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIDELAY_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIDELAY_H

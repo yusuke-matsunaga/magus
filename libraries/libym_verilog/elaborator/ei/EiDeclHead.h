@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIDECLHEAD_H
-#define LIBYM_VERILOG_ELB_IMPL_EIDECLHEAD_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIDECLHEAD_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIDECLHEAD_H
 
-/// @file libym_verilog/elb_impl/EiDeclHead.h
+/// @file libym_verilog/elaborator/ei/EiDeclHead.h
 /// @brief EiDeclHead のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -25,11 +25,11 @@ class EiDeclHead :
   public ElbDeclHead
 {
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   EiDeclHead(const VlNamedObj* parent);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclHead();
@@ -53,7 +53,7 @@ private:
 
   // 親のスコープ
   const VlNamedObj* mParent;
-  
+
 };
 
 
@@ -65,7 +65,7 @@ class EiDeclHeadPt :
   public EiDeclHead
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -73,7 +73,7 @@ protected:
   /// @param[in] pt_head パース木の宣言ヘッダ
   EiDeclHeadPt(const VlNamedObj* parent,
 	       const PtDeclHead* pt_head);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclHeadPt();
@@ -115,7 +115,7 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -151,7 +151,7 @@ public:
   virtual
   tVpiStrength
   charge() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ private:
 
   // パース木の宣言ヘッダ
   const PtDeclHead* mPtHead;
-  
+
 };
 
 
@@ -174,7 +174,7 @@ class EiDeclHeadPtD :
   friend class EiFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
@@ -185,7 +185,7 @@ private:
   virtual
   ~EiDeclHeadPtD();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスに共通な仮想関数
@@ -197,7 +197,7 @@ public:
   virtual
   ElbDelay*
   delay() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -209,12 +209,12 @@ public:
   void
   set_delay(ElbDelay* delay);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 遅延式
   ElbDelay* mDelay;
 
@@ -231,7 +231,7 @@ class EiDeclHeadPtV :
   friend class EiFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
@@ -245,17 +245,17 @@ protected:
 		ElbExpr* right,
 		int left_val,
 		int right_val);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclHeadPtV();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -269,12 +269,12 @@ public:
   virtual
   ElbExpr*
   right_range() const;
-  
+
   /// @brief MSB の値を返す．
   virtual
   int
   left_range_const() const;
-  
+
   /// @brief LSB の値を返す．
   virtual
   int
@@ -291,16 +291,16 @@ public:
   virtual
   int
   bit_offset(int index) const;
-  
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 範囲
   EiRangeImpl mRange;
-  
+
 };
 
 
@@ -314,7 +314,7 @@ class EiDeclHeadPtVD :
   friend class EiFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
@@ -333,7 +333,7 @@ private:
   virtual
   ~EiDeclHeadPtVD();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスに共通な仮想関数
@@ -345,7 +345,7 @@ public:
   virtual
   ElbDelay*
   delay() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -356,13 +356,13 @@ public:
   virtual
   void
   set_delay(ElbDelay* delay);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 遅延式
   ElbDelay* mDelay;
 
@@ -387,7 +387,7 @@ protected:
   EiDeclHeadPt2(const VlNamedObj* parent,
 		const PtIOHead* pt_head,
 		tVpiAuxType aux_type);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclHeadPt2();
@@ -430,14 +430,14 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
   virtual
   tVpiNetType
   net_type() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -449,7 +449,7 @@ private:
 
   // 補助的なデータ型
   tVpiAuxType mAuxType;
-  
+
 };
 
 
@@ -463,7 +463,7 @@ class EiDeclHeadPt2V :
   friend class EiFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木のIO宣言ヘッダ
@@ -479,17 +479,17 @@ private:
 		 ElbExpr* right,
 		 int left_val,
 		 int right_val);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclHeadPt2V();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -516,16 +516,16 @@ public:
   virtual
   int
   bit_offset(int index) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 範囲
   EiRangeImpl mRange;
-  
+
 };
 
 
@@ -545,7 +545,7 @@ protected:
   /// @param[in] pt_item パース木の関数定義
   EiDeclHeadPt3(const VlNamedObj* parent,
 		const PtItem* pt_item);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclHeadPt3();
@@ -588,7 +588,7 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -596,7 +596,7 @@ public:
   virtual
   tVpiNetType
   net_type() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -605,7 +605,7 @@ private:
 
   // パース木の関数定義
   const PtItem* mPtItem;
-  
+
 };
 
 
@@ -619,7 +619,7 @@ class EiDeclHeadPt3V :
   friend class EiFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_item パース木の関数定義
@@ -633,17 +633,17 @@ private:
 		 ElbExpr* right,
 		 int left_val,
 		 int right_val);
-  
+
   /// @brief デストラクタ
   virtual
   ~EiDeclHeadPt3V();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -670,18 +670,18 @@ public:
   virtual
   int
   bit_offset(int index) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 範囲
   EiRangeImpl mRange;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIDECLHEAD_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIDECLHEAD_H

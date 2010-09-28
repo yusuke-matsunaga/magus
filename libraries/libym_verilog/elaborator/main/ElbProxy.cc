@@ -152,7 +152,7 @@ ElbProxy::phase1_stmt(const VlNamedObj* parent,
 {
   mStmtGen->phase1_stmt(parent, pt_stmt, cf);
 }
-  
+
 // @brief ステートメントの実体化を行う．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス
@@ -253,7 +253,7 @@ ElbProxy::instantiate_rhs(const VlNamedObj* parent,
   expr->set_reqsize(lhs->value_type());
   return expr;
 }
-  
+
 // @brief 範囲を表す式を生成
 // @param[in] parent 親のスコープ
 // @param[in] pt_left 範囲のMSBを表すパース木
@@ -294,7 +294,7 @@ ElbProxy::instantiate_range(const VlNamedObj* parent,
 // @brief PtExpr(primary) から named_event を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbExpr*
+ElbDecl*
 ElbProxy::instantiate_namedevent(const VlNamedObj* parent,
 				 const PtExpr* pt_expr)
 {
@@ -361,7 +361,7 @@ ElbProxy::evaluate_expr_bitvector(const VlNamedObj* parent,
 {
   return mExprGen->evaluate_expr_bitvector(parent, pt_expr, value);
 }
-  
+
 // @brief 式を int 値に変換する．
 // @return 変換に成功したら true を返す．
 // @note 変換に失敗したらエラーメッセージを出力する．

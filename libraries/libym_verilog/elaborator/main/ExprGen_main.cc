@@ -175,22 +175,6 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
   return NULL;
 }
 
-// @brief PtExpr(primary) から named_event を生成する．
-// @param[in] parent 親のスコープ
-// @param[in] pt_expr 式を表すパース木
-ElbExpr*
-ExprGen::instantiate_namedevent(const VlNamedObj* parent,
-				const PtExpr* pt_expr)
-{
-  assert_cond(pt_expr->type() == kPtPrimaryExpr, __FILE__, __LINE__);
-  assert_cond(pt_expr->left_range() == NULL, __FILE__, __LINE__);
-  assert_cond(pt_expr->right_range() == NULL, __FILE__, __LINE__);
-
-  ElbEnv env;
-  ElbNamedEventEnv env1(env);
-  return instantiate_primary(parent, env1, pt_expr);
-}
-
 // @brief PtExpr からシステム関数の引数を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] env 生成時の環境

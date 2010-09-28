@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIMISCSTMT_H
-#define LIBYM_VERILOG_ELB_IMPL_EIMISCSTMT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIMISCSTMT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIMISCSTMT_H
 
-/// @file libym_verilog/elab/ElbMiscStmt.h
+/// @file libym_verilog/elaborator/ei/ElbMiscStmt.h
 /// @brief ElbStmt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -29,7 +29,7 @@ class EiEventStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -40,12 +40,12 @@ private:
   EiEventStmt(const VlNamedObj* parent,
 	      ElbProcess* process,
 	      const PtStmt* pt_stmt,
-	      ElbExpr* named_event);
+	      ElbDecl* named_event);
 
   /// @brief デストラクタ
   virtual
   ~EiEventStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -62,10 +62,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief named event を返す．
   virtual
-  const VlExpr*
+  const VlDecl*
   named_event() const;
 
   /// @brief function 中の実行を行う．
@@ -81,7 +81,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // イベント
-  ElbExpr* mEvent;
+  ElbDecl* mEvent;
 
 };
 
@@ -94,7 +94,7 @@ class EiNullStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -108,7 +108,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiNullStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -120,12 +120,12 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief function 中の実行を行う．
   /// @note このクラスでは何もしないで NULL を返す．
   virtual
@@ -143,7 +143,7 @@ class EiTcBase :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -162,12 +162,12 @@ protected:
   virtual
   ~EiTcBase();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-    
+
   /// @brief 引数の数を返す．
   virtual
   ymuint32
@@ -178,7 +178,7 @@ public:
   virtual
   const VlExpr*
   argument(ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -192,15 +192,15 @@ private:
   set_argument(ymuint32 pos,
 	       ElbExpr* arg);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 引数の数
   ymuint32 mArgumentNum;
-  
+
   // 引数のリスト
   ElbExpr** mArgumentList;
 
@@ -215,7 +215,7 @@ class EiTaskCall :
   public EiTcBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -235,7 +235,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiTaskCall();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -247,7 +247,7 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
@@ -284,7 +284,7 @@ class EiSysTaskCall :
   public EiTcBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -304,7 +304,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiSysTaskCall();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -316,7 +316,7 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
@@ -354,7 +354,7 @@ class EiDisableStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -370,7 +370,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiDisableStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -382,7 +382,7 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
@@ -402,7 +402,7 @@ public:
   const VlNamedObj*
   func_exec(bool constant_function) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -424,7 +424,7 @@ class EiCtrlStmt :
   public EiStmtBase
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -442,7 +442,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiCtrlStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -454,12 +454,12 @@ public:
   tVpiObjType
   type() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief コントロールを返す．
   virtual
   const VlControl*
@@ -492,4 +492,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIMISCSTMT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIMISCSTMT_H

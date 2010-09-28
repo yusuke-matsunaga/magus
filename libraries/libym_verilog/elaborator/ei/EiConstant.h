@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EICONSTANT_H
-#define LIBYM_VERILOG_ELB_IMPL_EICONSTANT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EICONSTANT_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EICONSTANT_H
 
-/// @file libym_verilog/elb_impl/EiConstant.h
+/// @file libym_verilog/elaborator/ei/EiConstant.h
 /// @brief EiExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -34,7 +34,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~EiConstant();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ public:
   virtual
   bool
   is_const() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -70,28 +70,28 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-  
+
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_scalar(tVpiScalarVal v);
-  
+
   /// @brief 実数値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_real(double v);
-  
+
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
-  
+
 };
 
 
@@ -126,7 +126,7 @@ public:
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 定数の型を返す．
   /// @note 定数の時，意味を持つ．
   virtual
@@ -164,7 +164,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // EiExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
@@ -179,7 +179,7 @@ private:
 
   // 値
   int mValue;
-  
+
 };
 
 
@@ -216,7 +216,7 @@ public:
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 定数の型を返す．
   /// @note 定数の時，意味を持つ．
   virtual
@@ -249,7 +249,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // EiExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
@@ -267,7 +267,7 @@ private:
 
   // 値
   BitVector mValue;
-  
+
 };
 
 
@@ -302,7 +302,7 @@ public:
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 定数の型を返す．
   /// @note 定数の時，意味を持つ．
   virtual
@@ -335,7 +335,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // EiExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
@@ -350,7 +350,7 @@ private:
 
   // 値
   double mValue;
-  
+
 };
 
 
@@ -385,7 +385,7 @@ public:
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 定数の型を返す．
   /// @note 定数の時，意味を持つ．
   virtual
@@ -418,7 +418,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // EiExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief decompile() の実装関数
   /// @param[in] pprim 親の演算子の優先順位
   virtual
@@ -433,9 +433,9 @@ private:
 
   // 値
   BitVector mValue;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EICONSTANT_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EICONSTANT_H

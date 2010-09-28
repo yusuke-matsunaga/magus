@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELB_EIUSERSYSTF_H
-#define LIBYM_VERILOG_ELB_EIUSERSYSTF_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIUSERSYSTF_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIUSERSYSTF_H
 
-/// @file libym_verilog/elb_impl/EiUserSystf.h
+/// @file libym_verilog/elaborator/ei/EiUserSystf.h
 /// @brief EiUserSystf のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -25,10 +25,10 @@ class EiUserSystf :
   public ElbUserSystf
 {
 public:
-  
+
   /// @brief コンストラクタ
   EiUserSystf();
-  
+
   /// @brief デストラクタ
   virtual
   ~EiUserSystf();
@@ -43,7 +43,7 @@ public:
   virtual
   string
   name() const;
-  
+
   /// @brief system task の時 true を返す．
   virtual
   bool
@@ -58,7 +58,7 @@ public:
   virtual
   tVpiFuncType
   function_type() const;
-  
+
   /// @brief compile 時のコールバック関数
   virtual
   ymuint32
@@ -73,7 +73,7 @@ public:
   virtual
   ymuint32
   size() const;
-  
+
 };
 
 
@@ -86,11 +86,11 @@ class EiUserSystf1 :
   public ElbUserSystf
 {
 public:
-  
+
   /// @brief コンストラクタ
-  /// @param[in] 
+  /// @param[in]
   EiUserSystf1();
-  
+
   /// @brief デストラクタ
   virtual
   ~EiUserSystf1();
@@ -105,7 +105,7 @@ public:
   virtual
   string
   name() const;
-  
+
   /// @brief system task の時 true を返す．
   virtual
   bool
@@ -120,7 +120,7 @@ public:
   virtual
   tVpiFuncType
   function_type() const;
-  
+
   /// @brief compile 時のコールバック関数
   virtual
   ymuint32
@@ -135,9 +135,9 @@ public:
   virtual
   ymuint32
   size() const;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_EIUSERSYSTF_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIUSERSYSTF_H
