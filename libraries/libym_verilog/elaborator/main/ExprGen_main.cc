@@ -186,8 +186,6 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   assert_cond(pt_expr->left_range() == NULL, __FILE__, __LINE__);
   assert_cond(pt_expr->right_range() == NULL, __FILE__, __LINE__);
 
-  cout << "instantiate_namedevent" << endl;
-  cout << "  " << pt_expr->name() << endl;
   ElbEnv env;
   ElbNamedEventEnv env1(env);
   return instantiate_primary(parent, env1, pt_expr);

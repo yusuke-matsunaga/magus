@@ -27,61 +27,6 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-#if 0
-// @brief PtExpr(primary) から named_event を生成する．
-// @param[in] parent 親のスコープ
-// @param[in] pt_expr 式を表すパース木
-ElbExpr*
-ExprGen::instantiate_namedevent(const VlNamedObj* parent,
-				const PtExpr* pt_expr)
-{
-  assert_cond(pt_expr->type() == kPtPrimaryExpr, __FILE__, __LINE__);
-  assert_cond(pt_expr->left_range() == NULL, __FILE__, __LINE__);
-  assert_cond(pt_expr->right_range() == NULL, __FILE__, __LINE__);
-
-  // 識別子の階層
-  PtNameBranchArray nb_array = pt_expr->namebranch_array();
-  // 識別子の名前
-  const char* name = pt_expr->name();
-
-  // 名前をキーにして要素を探索する．
-  ElbObjHandle* handle = find_obj_up(parent, nb_array, name, NULL);
-  if ( !handle ) {
-    error_not_found(pt_expr);
-    return NULL;
-  }
-
-  bool has_range_select;
-  bool has_bit_select;
-  ElbExpr* index1;
-  ElbExpr* index2;
-  ElbDecl* decl = instantiate_decl(handle, parent, pt_expr, NULL,
-				   has_range_select,
-				   has_bit_select,
-				   index1, index2);
-  if ( decl == NULL ) {
-    return NULL;
-  }
-  if ( decl->type() != kVpiNamedEvent ) {
-    // ここに来たら型が違うということ．
-    error_not_a_namedevent(pt_expr);
-    return NULL;
-  }
-
-  if ( has_bit_select ) {
-    // named event はビット選択できない．
-    error_dimension_mismatch(pt_expr);
-    return NULL;
-  }
-  if ( has_range_select ) {
-    // named event は範囲選択できない．
-    error_select_for_namedevent(pt_expr);
-  }
-
-  return factory().new_Primary(pt_expr, decl);
-}
-#endif
-
 // @brief PtPrimary から ElbExpr を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] env 生成時の環境
@@ -724,7 +669,7 @@ ExprGen::check_decl(const PtExpr* pt_expr,
     return true;
 
   case kVpiNamedEvent:
-    if ( env.is_event_expr() ) {
+    if ( env.is_event_expr() || env.is_namedevent() ) {
       return true;
     }
     break;
@@ -737,71 +682,5 @@ ExprGen::check_decl(const PtExpr* pt_expr,
   }
   return false;
 }
-
-#if 0
-// @brief 単体の宣言要素用のプライマリ式を生成する．
-// @param[in] pt_expr 式を表すパース木
-// @param[in] decl 対象の宣言要素
-// @param[in] has_range_select 範囲指定を持っている時 true を渡す．
-// @param[in] has_bit_select ビット指定を持っている時 true を渡す．
-// @param[in] index1, index2 範囲指定/ビット指定の式
-// @return 生成された式を返す．
-// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-ElbExpr*
-ExprGen::instantiate_decl_primary(const PtExpr* pt_expr,
-				  ElbDecl* decl,
-				  bool has_range_select,
-				  bool has_bit_select,
-				  ElbExpr* index1,
-				  ElbExpr* index2)
-{
-  if ( has_bit_select ) {
-    return factory().new_BitSelect(pt_expr, decl, index1);
-  }
-  if ( has_range_select ) {
-    switch ( pt_expr->range_mode() ) {
-    case kVpiConstRange:
-      {
-	int index1_val;
-	if ( !expr_to_int(index1, index1_val) ) {
-	  return NULL;
-	}
-	int index2_val;
-	if ( !expr_to_int(index2, index2_val) ) {
-	  return NULL;
-	}
-	return factory().new_PartSelect(pt_expr, decl,
-					index1, index2,
-					index1_val, index2_val);
-      }
-
-    case kVpiPlusRange:
-      {
-	int range_val;
-	if ( !expr_to_int(index2, range_val) ) {
-	  return NULL;
-	}
-	return factory().new_PlusPartSelect(pt_expr, decl,
-					    index1, index2, range_val);
-      }
-
-    case kVpiMinusRange:
-      {
-	int range_val;
-	if ( !expr_to_int(index2, range_val) ) {
-	  return NULL;
-	}
-	return factory().new_MinusPartSelect(pt_expr, decl,
-					     index1, index2, range_val);
-      }
-
-    case kVpiNoRange:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-    }
-  }
-  return factory().new_Primary(pt_expr, decl);
-}
-#endif
 
 END_NAMESPACE_YM_VERILOG
