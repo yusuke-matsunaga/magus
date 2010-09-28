@@ -1,5 +1,5 @@
 
-/// @file libym_verilog/elaborator/EiGenvar.cc
+/// @file libym_verilog/elaborator/ei/EiGenvar.cc
 /// @brief EiGenvar の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -87,20 +87,6 @@ const char*
 EiGenvar::name() const
 {
   return mPtItem->name();
-}
-
-// @brief genvar の取得
-EiGenvar*
-EiGenvar::genvar()
-{
-  return this;
-}
-
-// @brief bit-select や part-select を持てる時に true を返す．
-bool
-EiGenvar::is_bvtype() const
-{
-  return true;
 }
 
 // @breif 値の型を返す．

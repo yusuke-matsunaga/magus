@@ -1,13 +1,13 @@
-#ifndef LIBYM_VERILOG_ELB_IMPL_EIGENVAR_H
-#define LIBYM_VERILOG_ELB_IMPL_EIGENVAR_H
+#ifndef LIBYM_VERILOG_ELABORATOR_EI_EIGENVAR_H
+#define LIBYM_VERILOG_ELABORATOR_EI_EIGENVAR_H
 
-/// @file libym_verilog/elb_impl/EiGenvar.h
+/// @file libym_verilog/elaborator/ei/EiGenvar.h
 /// @brief EiGenvar のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: EiGenvar.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -25,7 +25,7 @@ class EiGenvar :
   public ElbGenvar
 {
   friend class EiFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -39,7 +39,7 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiGenvar();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -66,56 +66,46 @@ public:
   virtual
   const VlNamedObj*
   parent() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
 
-  /// @brief genvar の取得
-  virtual
-  EiGenvar*
-  genvar();
-  
-  /// @brief bit-select や part-select を持てる時に true を返す．
-  virtual
-  bool
-  is_bvtype() const;
-  
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
   tVpiValueType
   value_type() const;
-  
+
   /// @brief 定数値を持つ型のときに true を返す．
   virtual
   bool
   is_consttype() const;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbDecl の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
   get_scalar() const;
-    
+
   /// @brief スカラー値を設定する．
   /// @param[in] val 値
   virtual
   void
   set_scalar(tVpiScalarVal val);
-  
+
   /// @brief 論理値を返す．
   virtual
   tVpiScalarVal
@@ -125,7 +115,7 @@ public:
   virtual
   double
   get_real() const;
-  
+
   /// @brief real 型の値を設定する．
   /// @param[in] val 値
   virtual
@@ -145,7 +135,7 @@ public:
   virtual
   void
   set_bitvector(const BitVector& val);
-  
+
   /// @brief ビット選択値を返す．
   /// @param[in] index ビット位置
   virtual
@@ -197,7 +187,7 @@ public:
   /// @brief 使用を終える．
   void
   reset_inuse();
-  
+
   /// @brief 現在の値を返す．
   int
   value() const;
@@ -205,12 +195,12 @@ public:
   /// @brief 値を設定する．
   void
   set_value(int value);
-  
+
   /// @brief 元となったパース木の定義要素を返す．
   const PtDeclItem*
   pt_item() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -218,10 +208,10 @@ private:
 
   // 親のスコープ
   const VlNamedObj* mParent;
-  
+
   // パース木の定義要素
   const PtDeclItem* mPtItem;
-  
+
   // 使用中の時に true にする flag
   bool mInUse;
 
@@ -232,4 +222,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_IMPL_EIGENVAR_H
+#endif // LIBYM_VERILOG_ELABORATOR_EI_EIGENVAR_H
