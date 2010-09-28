@@ -43,6 +43,8 @@ EiFactory::new_Function(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
+  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+
   // IO数を数え配列を初期化する．
   ymuint32 io_num = pt_item->ioitem_num();
   void* q = mAlloc.get_memory(sizeof(EiIODecl) * io_num);
@@ -84,7 +86,7 @@ EiFactory::new_Task(const VlNamedObj* parent,
   ymuint32 io_num = pt_item->ioitem_num();
   void* q = mAlloc.get_memory(sizeof(EiIODecl) * io_num);
   EiIODecl* io_array = new (q) EiIODecl[io_num];
-  
+
   void* p = mAlloc.get_memory(sizeof(EiTask));
   EiTask* task = new (p) EiTask(parent, pt_item, io_num, io_array);
   return task;
@@ -130,7 +132,7 @@ EiTaskFunc::parent() const
 {
   return mParent;
 }
-  
+
 // @brief 名前の取得
 const char*
 EiTaskFunc::name() const
@@ -159,7 +161,7 @@ EiTaskFunc::io(ymuint32 pos) const
 {
   return &mIODeclList[pos];
 }
-  
+
 // @brief 本体のステートメントを得る．
 const VlStmt*
 EiTaskFunc::stmt() const
@@ -196,7 +198,7 @@ EiTaskFunc::_io(ymuint32 pos) const
 {
   return &mIODeclList[pos];
 }
-  
+
 // @brief 本体の ElbStmt を得る．
 ElbStmt*
 EiTaskFunc::_stmt() const
@@ -463,7 +465,7 @@ EiFunction::left_range() const
 {
   return _left_range();
 }
-  
+
 // @brief 範囲のLSBを返す．
 const VlExpr*
 EiFunction::right_range() const
@@ -546,7 +548,7 @@ EiFunction::eval_logic(const vector<ElbExpr*>& arg_list) const
   evaluate(arg_list);
   return mOvar->get_logic();
 }
-  
+
 // @brief real 型の値を返す．
 // @param[in] arg_list 引数のリスト
 // @note constant function の場合のみ意味を持つ．
@@ -555,7 +557,7 @@ EiFunction::eval_real(const vector<ElbExpr*>& arg_list) const
 {
   evaluate(arg_list);
   return mOvar->get_real();
-} 
+}
 
 // @brief bitvector 型の値を返す．
 // @param[in] arg_list 引数のリスト
@@ -622,7 +624,7 @@ EiFunctionV::EiFunctionV(const VlNamedObj* parent,
 {
   mRange.set(left, right, left_val, right_val);
 }
-	      
+
 // @brief デストラクタ
 EiFunctionV::~EiFunctionV()
 {
@@ -652,7 +654,7 @@ EiFunctionV::bit_size() const
 {
   return mRange.size();
 }
-  
+
 // @brief 範囲のMSBを返す．
 ElbExpr*
 EiFunctionV::_left_range() const

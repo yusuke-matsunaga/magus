@@ -50,14 +50,12 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
 	 << pt_item->name() << " )" << endl
 	 << endl;
   }
-  
+
   ElbTaskFunc* taskfunc = NULL;
-  VlNamedObj* namedobj = NULL;
 
   if ( pt_item->type() == kPtItem_Task ) {
     taskfunc = factory().new_Task(parent, pt_item);
     reg_task(taskfunc);
-    namedobj = taskfunc;
   }
   else {
     assert_cond( pt_item->type() == kPtItem_Func, __FILE__, __LINE__);
@@ -65,36 +63,40 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
     const PtExpr* pt_left = pt_item->left_range();
     const PtExpr* pt_right = pt_item->right_range();
 
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
-    int left_val = 0;
-    int right_val = 0;
-
-    if ( !instantiate_range(parent,
-			    pt_left, pt_right,
-			    left, right,
-			    left_val, right_val) ) {
-      return;
+    if ( pt_left && pt_right ) {
+      ElbExpr* left = NULL;
+      ElbExpr* right = NULL;
+      int left_val = 0;
+      int right_val = 0;
+      if ( !instantiate_range(parent,
+			      pt_left, pt_right,
+			      left, right,
+			      left_val, right_val) ) {
+	return;
+      }
+      taskfunc = factory().new_Function(parent,	pt_item,
+					left, right,
+					left_val, right_val);
     }
-    taskfunc = factory().new_Function(parent,
-				      pt_item,
-				      left, right,
-				      left_val, right_val);
+    else {
+      taskfunc = factory().new_Function(parent,	pt_item);
+    }
+    assert_cond( taskfunc != NULL, __FILE__, __LINE__);
+
     reg_function(taskfunc);
-    namedobj = taskfunc;
   }
 
   // parameter の生成
-  instantiate_param(namedobj, pt_item->paramhead_array(), false);
+  instantiate_param(taskfunc, pt_item->paramhead_array(), false);
 
   // localparam の生成
-  instantiate_param(namedobj, pt_item->localparamhead_array(), true);
-  
+  instantiate_param(taskfunc, pt_item->localparamhead_array(), true);
+
   // attribute instance の生成
-  //instantiate_attribute(pt_item->attr_top(), false, namedobj);
+  //instantiate_attribute(pt_item->attr_top(), false, taskfunc);
 
   ostringstream buf;
-  buf << "instantiating task/func : " << namedobj->full_name() << ".";
+  buf << "instantiating task/func : " << taskfunc->full_name() << ".";
   put_msg(__FILE__, __LINE__,
 	  pt_item->file_region(),
 	  kMsgInfo,
@@ -103,7 +105,7 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
 
   // 本体のステートメント内部のスコープの生成
   const PtStmt* pt_body = pt_item->body();
-  phase1_stmt(namedobj, pt_body);
+  phase1_stmt(taskfunc, pt_body);
 
   // 残りの仕事は phase2, phase3 で行う．
   add_phase2stub(make_stub(this, &ItemGen::phase2_tf, taskfunc, pt_item));
@@ -122,20 +124,18 @@ void
 ItemGen::phase2_tf(ElbTaskFunc* taskfunc,
 		   const PtItem* pt_item)
 {
-  VlNamedObj* namedobj = taskfunc;
-
   if ( debug ) {
     dout << endl
 	 << "phase2_tf( "
-	 << namedobj->full_name()
+	 << taskfunc->full_name()
 	 << " ["
-	 << hex << reinterpret_cast<ympuint>(namedobj) << dec
+	 << hex << reinterpret_cast<ympuint>(taskfunc) << dec
 	 << "] )" << endl
 	 << endl;
   }
 
   // 宣言要素の生成
-  instantiate_decl(namedobj, pt_item->declhead_array());
+  instantiate_decl(taskfunc, pt_item->declhead_array());
 
   // 入出力の生成
   instantiate_iodecl(NULL, taskfunc, pt_item->iohead_array());
@@ -146,9 +146,17 @@ ItemGen::phase2_tf(ElbTaskFunc* taskfunc,
     ElbExpr* right = taskfunc->_right_range();
     int left_val = taskfunc->left_range_const();
     int right_val = taskfunc->right_range_const();
-    ElbDeclHead* head = factory().new_DeclHead(taskfunc, pt_item,
-					       left, right,
-					       left_val, right_val);
+    ElbDeclHead* head = NULL;
+    if ( left && right ) {
+      head = factory().new_DeclHead(taskfunc, pt_item,
+				    left, right,
+				    left_val, right_val);
+    }
+    else {
+      head = factory().new_DeclHead(taskfunc, pt_item);
+    }
+    assert_cond( head, __FILE__, __LINE__);
+
     ElbDecl* decl = factory().new_Decl(head, pt_item);
     int tag = vpiVariables;
     if ( pt_item->data_type() == kVpiVarNone ) {
@@ -172,14 +180,12 @@ void
 ItemGen::phase3_tf(ElbTaskFunc* taskfunc,
 		   const PtItem* pt_item)
 {
-  VlNamedObj* namedobj = taskfunc;
-
   if ( debug ) {
     dout << endl
 	 << "phase3_tf( "
-	 << namedobj->full_name()
+	 << taskfunc->full_name()
 	 << " ["
-	 << hex << reinterpret_cast<ympuint>(namedobj) << dec
+	 << hex << reinterpret_cast<ympuint>(taskfunc) << dec
 	 << "] )" << endl
 	 << endl;
   }
@@ -187,7 +193,7 @@ ItemGen::phase3_tf(ElbTaskFunc* taskfunc,
   // 本体のステートメントの生成
   ElbTfEnv env(taskfunc);
   const PtStmt* pt_body = pt_item->body();
-  ElbStmt* body = instantiate_stmt(namedobj, NULL, env, pt_body);
+  ElbStmt* body = instantiate_stmt(taskfunc, NULL, env, pt_body);
   if ( body ) {
     taskfunc->set_stmt(body);
   }
@@ -220,19 +226,33 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
 
   const PtExpr* pt_left = pt_function->left_range();
   const PtExpr* pt_right = pt_function->right_range();
-  ElbExpr* left = NULL;
-  ElbExpr* right = NULL;
-  int left_val = 0;
-  int right_val = 0;
-  if ( !instantiate_range(parent, pt_left, pt_right,
-			  left, right,
-			  left_val, right_val) ) {
-    return NULL;
+
+  ElbTaskFunc* func = NULL;
+  ElbDeclHead* head = NULL;
+  if ( pt_left && pt_right ) {
+    ElbExpr* left = NULL;
+    ElbExpr* right = NULL;
+    int left_val = 0;
+    int right_val = 0;
+    if ( !instantiate_range(parent, pt_left, pt_right,
+			    left, right,
+			    left_val, right_val) ) {
+      return NULL;
+    }
+    func = factory().new_Function(parent, pt_function,
+				  left, right,
+				  left_val, right_val);
+    head = factory().new_DeclHead(func, pt_function,
+				  left, right,
+				  left_val, right_val);
   }
-  ElbTaskFunc* func = factory().new_Function(parent,
-					     pt_function,
-					     left, right,
-					     left_val, right_val);
+  else {
+    func = factory().new_Function(parent, pt_function);
+    head = factory().new_DeclHead(func, pt_function);
+  }
+  assert_cond( func, __FILE__, __LINE__);
+  assert_cond( head, __FILE__, __LINE__);
+
   // 登録しておく．
   reg_constant_function(parent, pt_function->name(), func);
 
@@ -246,9 +266,6 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   instantiate_decl(func, pt_function->declhead_array());
 
   // 関数名と同名の変数の生成
-  ElbDeclHead* head = factory().new_DeclHead(func, pt_function,
-					     left, right,
-					     left_val, right_val);
   ElbDecl* decl = factory().new_Decl(head, pt_function);
   int tag = vpiVariables;
   if ( pt_function->data_type() == kVpiVarNone ) {

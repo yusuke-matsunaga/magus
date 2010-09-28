@@ -380,6 +380,15 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
   // 添字が定数のとき true となるフラグ
   bool const_mode = pt_expr->is_const_index();
 
+  // 添字には constant/constant function 以外の情報は引き継がない
+  ElbEnv index_env;
+  if ( const_mode ) {
+    index_env = ElbConstantEnv();
+  }
+  else if ( env.inside_constant_function() ) {
+    index_env = ElbConstantFunctionEnv(env.constant_function());
+  }
+
   if ( decl == NULL ) {
     // そのハンドルが宣言要素の配列なら要素を取り出す．
     ElbDeclArray* decl_array = handle->decl_array();
@@ -396,13 +405,7 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
       vector<ElbExpr*> index_list(dsize);
       for (ymuint i = 0; i < dsize; ++ i) {
 	const PtExpr* pt_expr1 = pt_expr->index(i);
-	ElbExpr* expr1;
-	if ( const_mode ) {
-	  expr1 = instantiate_constant_expr(parent, pt_expr1);
-	}
-	else {
-	  expr1 = instantiate_expr(parent, env, pt_expr1);
-	}
+	ElbExpr* expr1 = instantiate_expr(parent, index_env, pt_expr1);
 	if ( !expr1 ) {
 	  return NULL;
 	}
@@ -449,12 +452,7 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
       return NULL;
     }
     const PtExpr* pt_expr1 = pt_expr->index(0);
-    if ( const_mode ) {
-      index1 = instantiate_constant_expr(parent, pt_expr1);
-    }
-    else {
-      index1 = instantiate_expr(parent, env, pt_expr1);
-    }
+    index1 = instantiate_expr(parent, index_env, pt_expr1);
     if ( !index1 ) {
       return NULL;
     }
@@ -464,11 +462,11 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
       error_select_for_real(pt_expr);
       return NULL;
     }
-    if ( const_mode || ( pt_expr->range_mode() == kVpiConstRange ) ) {
+    if ( pt_expr->range_mode() == kVpiConstRange ) {
       index1 = instantiate_constant_expr(parent, pt_expr->left_range());
     }
     else {
-      index1 = instantiate_expr(parent, env, pt_expr->left_range());
+      index1 = instantiate_expr(parent, index_env, pt_expr->left_range());
     }
     if ( !index1 ) {
       return NULL;
@@ -667,46 +665,46 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     BitVector bv;
     param->get_bitvector(bv);
     val = ElbValue(bv);
-  }
 
-  if ( has_bit_select ) {
-    val.to_bitvector();
-    if ( val.is_error() ) {
-      error_illegal_real_type(pt_expr);
-      return ElbValue();
+    if ( has_bit_select ) {
+      val.to_bitvector();
+      if ( val.is_error() ) {
+	error_illegal_real_type(pt_expr);
+	return ElbValue();
+      }
+      int offset = param->bit_offset(index1);
+      return ElbValue(val.bitvector_value().bit_select(offset));
     }
-    int offset = param->bit_offset(index1);
-    return ElbValue(val.bitvector_value().bit_select(offset));
-  }
-  if ( has_range_select ) {
-    val.to_bitvector();
-    if ( val.is_error() ) {
-      error_illegal_real_type(pt_expr);
-      return ElbValue();
-    }
-    int msb_offset;
-    int lsb_offset;
-    switch ( pt_expr->range_mode() ) {
-    case kVpiConstRange:
-      msb_offset = param->bit_offset(index1);
-      lsb_offset = param->bit_offset(index2);
-      break;
+    else if ( has_range_select ) {
+      val.to_bitvector();
+      if ( val.is_error() ) {
+	error_illegal_real_type(pt_expr);
+	return ElbValue();
+      }
+      int msb_offset;
+      int lsb_offset;
+      switch ( pt_expr->range_mode() ) {
+      case kVpiConstRange:
+	msb_offset = param->bit_offset(index1);
+	lsb_offset = param->bit_offset(index2);
+	break;
 
-    case kVpiPlusRange:
+      case kVpiPlusRange:
 #warning "TODO: 仕様を確認"
-      assert_not_reached(__FILE__, __LINE__);
-      break;
+	assert_not_reached(__FILE__, __LINE__);
+	break;
 
-    case kVpiMinusRange:
+      case kVpiMinusRange:
 #warning "TODO: 仕様を確認"
-      assert_not_reached(__FILE__, __LINE__);
-      break;
+	assert_not_reached(__FILE__, __LINE__);
+	break;
 
-    case kVpiNoRange:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
+      case kVpiNoRange:
+	assert_not_reached(__FILE__, __LINE__);
+	break;
+      }
+      return ElbValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
     }
-    return ElbValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
   }
 
   return val;

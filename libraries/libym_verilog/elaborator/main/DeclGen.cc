@@ -85,6 +85,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 
     const PtExpr* pt_left = pt_head->left_range();
     const PtExpr* pt_right = pt_head->right_range();
+
     ElbExpr* left = NULL;
     ElbExpr* right = NULL;
     int left_val = 0;
@@ -93,6 +94,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 			    pt_left, pt_right,
 			    left, right,
 			    left_val, right_val) ) {
+      // エラーが起きたのでスキップする．
       continue;
     }
 
@@ -267,14 +269,24 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 
 	ElbDeclHead* head = NULL;
 	if ( module ) {
-	  head = factory().new_DeclHead(module, pt_head, aux_type,
-					left, right,
-					left_val, right_val);
+	  if ( left && right ) {
+	    head = factory().new_DeclHead(module, pt_head, aux_type,
+					  left, right,
+					  left_val, right_val);
+	  }
+	  else {
+	    head = factory().new_DeclHead(module, pt_head, aux_type);
+	  }
 	}
 	if ( taskfunc ) {
-	  head = factory().new_DeclHead(taskfunc, pt_head, aux_type,
-					left, right,
-					left_val, right_val);
+	  if ( left && right ) {
+	    head = factory().new_DeclHead(taskfunc, pt_head, aux_type,
+					  left, right,
+					  left_val, right_val);
+	  }
+	  else {
+	    head = factory().new_DeclHead(taskfunc, pt_head, aux_type);
+	  }
 	}
 	assert_cond( head != NULL, __FILE__, __LINE__);
 
@@ -400,21 +412,27 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 
   for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
     const PtDeclHead* pt_head = pt_head_array[i];
+    ElbParamHead* param_head = NULL;
 
     const PtExpr* pt_left = pt_head->left_range();
     const PtExpr* pt_right = pt_head->right_range();
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
-    int left_val = 0;
-    int right_val = 0;
-    if ( !instantiate_range(parent, pt_left, pt_right,
-			    left, right,
-			    left_val, right_val) ) {
-      continue;
+    if ( pt_left && pt_right ) {
+      ElbExpr* left = NULL;
+      ElbExpr* right = NULL;
+      int left_val = 0;
+      int right_val = 0;
+      if ( !instantiate_range(parent, pt_left, pt_right,
+			      left, right,
+			      left_val, right_val) ) {
+	continue;
+      }
+      param_head = factory().new_ParamHead(module, pt_head,
+					   left, right,
+					   left_val, right_val);
     }
-    ElbParamHead* param_head = factory().new_ParamHead(module, pt_head,
-						       left, right,
-						       left_val, right_val);
+    else {
+      param_head = factory().new_ParamHead(module, pt_head);
+    }
 
     for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
       const PtDeclItem* pt_item = pt_head->item(i);
@@ -468,19 +486,28 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
   const PtDelay* pt_delay = pt_head->delay();
 
   bool has_delay = (pt_delay != NULL);
-  ElbExpr* left = NULL;
-  ElbExpr* right = NULL;
-  int left_val = 0;
-  int right_val = 0;
-  if ( !instantiate_range(parent, pt_left, pt_right,
-			  left, right,
-			  left_val, right_val) ) {
-    return;
+
+  ElbDeclHead* net_head = NULL;
+  if ( pt_left && pt_right ) {
+    ElbExpr* left = NULL;
+    ElbExpr* right = NULL;
+    int left_val = 0;
+    int right_val = 0;
+    if ( !instantiate_range(parent, pt_left, pt_right,
+			    left, right,
+			    left_val, right_val) ) {
+      return;
+    }
+    net_head = factory().new_DeclHead(parent, pt_head,
+				      left, right,
+				      left_val, right_val,
+				      has_delay);
   }
-  ElbDeclHead* net_head = factory().new_DeclHead(parent, pt_head,
-						 left, right,
-						 left_val, right_val,
-						 has_delay);
+  else {
+    net_head = factory().new_DeclHead(parent, pt_head);
+  }
+  assert_cond( net_head, __FILE__, __LINE__);
+
   if ( pt_delay ) {
     add_phase3stub(make_stub(this, &DeclGen::link_net_delay,
 			     net_head, pt_delay));
@@ -594,18 +621,25 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
   const PtExpr* pt_left = pt_head->left_range();
   const PtExpr* pt_right = pt_head->right_range();
 
-  ElbExpr* left = NULL;
-  ElbExpr* right = NULL;
-  int left_val = 0;
-  int right_val = 0;
-  if ( !instantiate_range(parent, pt_left, pt_right,
-			  left, right,
-			  left_val, right_val) ) {
-    return;
+  ElbDeclHead* reg_head = NULL;
+  if ( pt_left && pt_right ) {
+    ElbExpr* left = NULL;
+    ElbExpr* right = NULL;
+    int left_val = 0;
+    int right_val = 0;
+    if ( !instantiate_range(parent, pt_left, pt_right,
+			    left, right,
+			    left_val, right_val) ) {
+      return;
+    }
+    reg_head = factory().new_DeclHead(parent, pt_head,
+				      left, right,
+				      left_val, right_val);
   }
-  ElbDeclHead* reg_head = factory().new_DeclHead(parent, pt_head,
-						 left, right,
-						 left_val, right_val);
+  else {
+    reg_head = factory().new_DeclHead(parent, pt_head);
+  }
+  assert_cond( reg_head != NULL, __FILE__, __LINE__);
 
   for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);

@@ -38,6 +38,8 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int right_val,
 			bool delay)
 {
+  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+
   EiDeclHead* head = NULL;
   if ( delay ) {
     void* p = mAlloc.get_memory(sizeof(EiDeclHeadPtVD));
@@ -92,6 +94,8 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
+  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+
   void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt2V));
   EiDeclHead* head = new (p) EiDeclHeadPt2V(parent, pt_head, aux_type,
 					    left, right,
@@ -128,6 +132,8 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
+  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+
   void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt3V));
   EiDeclHead* head = new (p) EiDeclHeadPt3V(parent, pt_item,
 					    left, right,
@@ -151,14 +157,14 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 //////////////////////////////////////////////////////////////////////
 // クラス EiDeclHead
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 EiDeclHead::EiDeclHead(const VlNamedObj* parent) :
   mParent(parent)
 {
 }
-  
+
 // @brief デストラクタ
 EiDeclHead::~EiDeclHead()
 {
@@ -185,7 +191,7 @@ EiDeclHeadPt::EiDeclHeadPt(const VlNamedObj* parent,
   mPtHead(pt_header)
 {
 }
-  
+
 // @brief デストラクタ
 EiDeclHeadPt::~EiDeclHeadPt()
 {
@@ -200,10 +206,10 @@ EiDeclHeadPt::type() const
   case kPtDecl_Param:
   case kPtDecl_LocalParam:
     return kVpiParameter;
-    
+
   case kPtDecl_Reg:
     return kVpiReg;
-    
+
   case kPtDecl_Var:
     switch ( mPtHead->data_type() ) {
     case kVpiVarInteger:  return kVpiIntegerVar;
@@ -212,13 +218,13 @@ EiDeclHeadPt::type() const
     default: break;
     }
     break;
-    
+
   case kPtDecl_Net:
     return kVpiNet;
-    
+
   case kPtDecl_Event:
     return kVpiNamedEvent;
-    
+
   case kPtDecl_SpecParam:
     return kVpiSpecParam;
 
@@ -247,29 +253,29 @@ EiDeclHeadPt::bit_size() const
   case kPtDecl_Net:
     // この型は範囲指定を含まないので 1ビットとなる．
     return 1;
-    
+
   case kPtDecl_Param:
   case kPtDecl_LocalParam:
   case kPtDecl_Var:
     switch ( mPtHead->data_type() ) {
     case kVpiVarInteger:
       return kVpiSizeInteger;
-      
+
     case kVpiVarReal:
       return kVpiSizeReal;
-      
+
     case kVpiVarTime:
       return kVpiSizeTime;
-      
+
     default:
       // int とみなす．
       return kVpiSizeInteger;
     }
     break;
-    
+
   case kPtDecl_Event:
     return 0;
-    
+
   case kPtDecl_SpecParam:
     return kVpiSizeInteger;
 
@@ -295,20 +301,20 @@ EiDeclHeadPt::bit_offset(int index) const
       return 0;
     }
     return -1;
-    
+
   case kPtDecl_Param:
   case kPtDecl_LocalParam:
   case kPtDecl_Var:
     switch ( mPtHead->data_type() ) {
     case kVpiVarReal:
       return -1;
-      
+
     case kVpiVarTime:
       if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
 	return index;
       }
       return -1;
-      
+
     case kVpiVarInteger:
     default:
       // int とみなす．
@@ -318,10 +324,10 @@ EiDeclHeadPt::bit_offset(int index) const
       return -1;
     }
     break;
-    
+
   case kPtDecl_Event:
     return -1;
-    
+
   case kPtDecl_SpecParam:
     // int とみなす．
     if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
@@ -344,7 +350,7 @@ EiDeclHeadPt::data_type() const
 {
   return mPtHead->data_type();
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -410,7 +416,7 @@ EiDeclHeadPt::charge() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiDeclHeadPtD
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_header パース木の宣言ヘッダ
@@ -445,7 +451,7 @@ EiDeclHeadPtD::set_delay(ElbDelay* delay)
 //////////////////////////////////////////////////////////////////////
 // クラス EiDeclHeadPtV
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_header パース木の宣言ヘッダ
@@ -463,12 +469,12 @@ EiDeclHeadPtV::EiDeclHeadPtV(const VlNamedObj* parent,
 {
   mRange.set(left, right, left_val, right_val);
 }
-  
+
 // @brief デストラクタ
 EiDeclHeadPtV::~EiDeclHeadPtV()
 {
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -522,7 +528,7 @@ EiDeclHeadPtV::bit_offset(int index) const
 //////////////////////////////////////////////////////////////////////
 // クラス EiDeclHeadPtVD
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_header パース木の宣言ヘッダ
@@ -579,7 +585,7 @@ EiDeclHeadPt2::EiDeclHeadPt2(const VlNamedObj* parent,
   mAuxType(aux_type)
 {
 }
-  
+
 // @brief デストラクタ
 EiDeclHeadPt2::~EiDeclHeadPt2()
 {
@@ -600,7 +606,7 @@ EiDeclHeadPt2::type() const
     default: break;
     }
     break;
-    
+
   default:
     break;
   }
@@ -632,7 +638,7 @@ EiDeclHeadPt2::bit_size() const
     default: break;
     }
     break;
-    
+
   default:
     break;
   }
@@ -654,7 +660,7 @@ EiDeclHeadPt2::bit_offset(int index) const
       return 0;
     }
     return -1;
-    
+
   case kVpiAuxVar:
     switch ( mPtHead->var_type() ) {
     case kVpiVarInteger:
@@ -662,21 +668,21 @@ EiDeclHeadPt2::bit_offset(int index) const
 	return index;
       }
       return -1;
-      
+
     case kVpiVarReal:
       return -1;
-      
+
     case kVpiVarTime:
       if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
 	return index;
       }
       return -1;
-      
+
     default:
       break;
     }
     break;
-    
+
   default:
     break;
   }
@@ -692,7 +698,7 @@ EiDeclHeadPt2::data_type() const
 {
   return mPtHead->var_type();
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -706,7 +712,7 @@ EiDeclHeadPt2::net_type() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiDeclHeadPt2V
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_header パース木のIO宣言ヘッダ
@@ -726,12 +732,12 @@ EiDeclHeadPt2V::EiDeclHeadPt2V(const VlNamedObj* parent,
 {
   mRange.set(left, right, left_val, right_val);
 }
-  
+
 // @brief デストラクタ
 EiDeclHeadPt2V::~EiDeclHeadPt2V()
 {
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -781,7 +787,7 @@ EiDeclHeadPt3::EiDeclHeadPt3(const VlNamedObj* parent,
   mPtItem(pt_item)
 {
 }
-  
+
 // @brief デストラクタ
 EiDeclHeadPt3::~EiDeclHeadPt3()
 {
@@ -821,7 +827,7 @@ EiDeclHeadPt3::bit_size() const
   case kVpiVarInteger:  return kVpiSizeInteger;
   case kVpiVarReal:     return kVpiSizeReal;
   case kVpiVarTime:     return kVpiSizeTime;
-    
+
   default:
     break;
   }
@@ -842,22 +848,22 @@ EiDeclHeadPt3::bit_offset(int index) const
       return 0;
     }
     return -1;
-    
+
   case kVpiVarInteger:
       if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
 	return index;
       }
       return -1;
-    
+
   case kVpiVarReal:
     return -1;
-    
+
   case kVpiVarTime:
       if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
 	return index;
       }
       return -1;
-    
+
   default:
     break;
   }
@@ -873,7 +879,7 @@ EiDeclHeadPt3::data_type() const
 {
   return mPtItem->data_type();
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -887,7 +893,7 @@ EiDeclHeadPt3::net_type() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiDeclHeadPt3V
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_item パース木の関数定義
@@ -905,12 +911,12 @@ EiDeclHeadPt3V::EiDeclHeadPt3V(const VlNamedObj* parent,
 {
   mRange.set(left, right, left_val, right_val);
 }
-  
+
 // @brief デストラクタ
 EiDeclHeadPt3V::~EiDeclHeadPt3V()
 {
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
