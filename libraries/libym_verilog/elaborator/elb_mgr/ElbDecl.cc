@@ -217,72 +217,6 @@ ElbDeclBase::elem_by_offset(ymuint offset) const
   return NULL;
 }
 
-#if 0
-// @brief データ型の取得
-// @retval データ型 パラメータや変数の場合
-// @retval kVpiVarNone 上記以外
-tVpiVarType
-ElbDeclBase::data_type() const
-{
-  return kVpiVarNone;
-}
-
-// @brief net 型の取得
-// @retval net 型 net 型の要素の場合
-// @retval kVpiNone net 型の要素でない場合
-tVpiNetType
-ElbDeclBase::net_type() const
-{
-  return kVpiNone;
-}
-
-// @brief vectored|scalared 属性の取得
-// @retval kVpiVsNone vectored|scalared 指定なし
-// @retval kVpiVectored vectored 指定あり
-// @retval kVpiScalared scalared 指定あり
-tVpiVsType
-ElbDeclBase::vs_type() const
-{
-  return kVpiVsNone;
-}
-
-// @brief drive0 strength の取得
-// @retval 0 の強度
-// @retval kVpiNoStrength strength の指定なし
-tVpiStrength
-ElbDeclBase::drive0() const
-{
-  return kVpiNoStrength;
-}
-
-// @brief drive1 strength の取得
-// @retval 1 の強度
-// @retval kVpiNoStrength strength の指定なし
-tVpiStrength
-ElbDeclBase::drive1() const
-{
-  return kVpiNoStrength;
-}
-
-// @brief charge strength の取得
-// @retval 電荷の強度
-// @retval kVpiNoStrength strength の指定なし
-tVpiStrength
-ElbDeclBase::charge() const
-{
-  return kVpiNoStrength;
-}
-
-// @brief delay の取得
-// @retval delay
-// @retval NULL delay の指定なし
-const VlDelay*
-ElbDeclBase::delay() const
-{
-  return NULL;
-}
-#endif
-
 // @brief 初期値の取得
 // @retval 初期値
 // @retval NULL 設定がない場合
@@ -317,7 +251,7 @@ ElbDeclBase::is_multi_array() const
 
 // @brief 配列型オブジェクトの場合の次元数の取得
 // @note このクラスでは 0 を返す．
-ymuint32
+ymuint
 ElbDeclBase::dimension() const
 {
   return 0;
@@ -327,7 +261,7 @@ ElbDeclBase::dimension() const
 // @param[in] pos 位置 ( 0 <= pos < dimension() )
 // @note このクラスでは NULL を返す．
 const VlRange*
-ElbDeclBase::range(ymuint32 pos) const
+ElbDeclBase::range(ymuint pos) const
 {
   return NULL;
 }
@@ -404,162 +338,6 @@ ElbDeclArray::ElbDeclArray()
 // @brief デストラクタ
 ElbDeclArray::~ElbDeclArray()
 {
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ElbGenvar
-//////////////////////////////////////////////////////////////////////
-
-// @breif 値の型を返す．
-// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
-ElbGenvar::value_type() const
-{
-  return kVpiValueInteger;
-}
-
-// @brief 定数値を持つ型のときに true を返す．
-bool
-ElbGenvar::is_consttype() const
-{
-  return true;
-}
-
-// @brief 符号の取得
-// @retval true 符号つき
-// @retval false 符号なし
-bool
-ElbGenvar::is_signed() const
-{
-  return true;
-}
-
-// @brief MSB の値を返す．
-int
-ElbGenvar::left_range_const() const
-{
-  return kVpiSizeInteger - 1;
-}
-
-// @brief LSB の値を返す．
-int
-ElbGenvar::right_range_const() const
-{
-  return 0;
-}
-
-// @brief ビット幅を返す．
-ymuint32
-ElbGenvar::bit_size() const
-{
-  return kVpiSizeInteger;
-}
-
-// @brief オフセット値の取得
-// @param[in] index インデックス
-// @retval index のオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-ElbGenvar::bit_offset(int index) const
-{
-  if ( 0 <= index && index < kVpiSizeInteger ) {
-    return index;
-  }
-  else {
-    return -1;
-  }
-}
-
-// @brief データ型の取得
-// @retval データ型 パラメータや変数の場合
-// @retval kVpiVarNone 上記以外
-tVpiVarType
-ElbGenvar::data_type() const
-{
-  return kVpiVarInteger;
-}
-
-// @brief net 型の取得
-// @retval net 型 net 型の要素の場合
-// @retval kVpiNone net 型の要素でない場合
-tVpiNetType
-ElbGenvar::net_type() const
-{
-  return kVpiNone;
-}
-
-// @brief vectored|scalared 属性の取得
-// @retval kVpiVsNone vectored|scalared 指定なし
-// @retval kVpiVectored vectored 指定あり
-// @retval kVpiScalared scalared 指定あり
-tVpiVsType
-ElbGenvar::vs_type() const
-{
-  return kVpiVsNone;
-}
-
-// @brief drive0 strength の取得
-// @retval 0 の強度
-// @retval kVpiNoStrength strength の指定なし
-tVpiStrength
-ElbGenvar::drive0() const
-{
-  return kVpiNoStrength;
-}
-
-// @brief drive1 strength の取得
-// @retval 1 の強度
-// @retval kVpiNoStrength strength の指定なし
-tVpiStrength
-ElbGenvar::drive1() const
-{
-  return kVpiNoStrength;
-}
-
-// @brief charge strength の取得
-// @retval 電荷の強度
-// @retval kVpiNoStrength strength の指定なし
-tVpiStrength
-ElbGenvar::charge() const
-{
-  return kVpiNoStrength;
-}
-
-// @brief delay の取得
-// @retval delay
-// @retval NULL delay の指定なし
-const VlDelay*
-ElbGenvar::delay() const
-{
-  return NULL;
-}
-
-// @brief 符号付きに補正する．
-// @note このクラスではなにもしない．
-void
-ElbGenvar::set_signed()
-{
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-ElbGenvar::_left_range() const
-{
-  return NULL;
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-ElbGenvar::_right_range() const
-{
-  return NULL;
 }
 
 END_NAMESPACE_YM_VERILOG

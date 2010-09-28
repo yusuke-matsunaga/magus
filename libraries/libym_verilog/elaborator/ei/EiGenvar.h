@@ -75,104 +75,6 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // VlDecl の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @breif 値の型を返す．
-  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-  virtual
-  tVpiValueType
-  value_type() const;
-
-  /// @brief 定数値を持つ型のときに true を返す．
-  virtual
-  bool
-  is_consttype() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbDecl の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  get_scalar() const;
-
-  /// @brief スカラー値を設定する．
-  /// @param[in] val 値
-  virtual
-  void
-  set_scalar(tVpiScalarVal val);
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  get_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  get_real() const;
-
-  /// @brief real 型の値を設定する．
-  /// @param[in] val 値
-  virtual
-  void
-  set_real(double val);
-
-  /// @brief bitvector 型の値を返す．
-  /// @param[out] val 値
-  /// @param[in] req_type 要求される型
-  virtual
-  void
-  get_bitvector(BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
-
-  /// @brief bitvector 型の値を設定する．
-  /// @param[in] val 値
-  virtual
-  void
-  set_bitvector(const BitVector& val);
-
-  /// @brief ビット選択値を返す．
-  /// @param[in] index ビット位置
-  virtual
-  tVpiScalarVal
-  get_bitselect(int index) const;
-
-  /// @brief ビット値を設定する．
-  /// @param[in] index ビット位置
-  /// @param[in] val 値
-  virtual
-  void
-  set_bitselect(int index,
-		tVpiScalarVal val);
-
-  /// @brief 範囲選択値を返す．
-  /// @param[in] left 範囲の MSB
-  /// @param[in] right 範囲の LSB
-  /// @param[out] val 値
-  virtual
-  void
-  get_partselect(int left,
-		 int right,
-		 BitVector& val) const;
-
-  /// @brief 範囲値を設定する．
-  /// @param[in] left 範囲の MSB
-  /// @param[in] right 範囲の LSB
-  /// @param[in] val 値
-  virtual
-  void
-  set_partselect(int left,
-		 int right,
-		 const BitVector& val);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // EiGenvar に固有の関数
   //////////////////////////////////////////////////////////////////////
 
@@ -199,7 +101,6 @@ public:
   /// @brief 元となったパース木の定義要素を返す．
   const PtDeclItem*
   pt_item() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////

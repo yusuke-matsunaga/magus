@@ -456,8 +456,8 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
       gfroot->add(gvi, genblock);
       reg_genblock(genblock);
 
-      ElbGenvar* genvar1
-	= factory().new_Genvar(genblock, genvar->pt_item(), gvi);
+      const PtDeclItem* pt_item = genvar->pt_item();
+      ElbGenvar* genvar1 = factory().new_Genvar(genblock, pt_item, gvi);
       reg_genvar(genvar1);
 
       phase1_generate(genblock, pt_genfor);
