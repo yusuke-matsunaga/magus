@@ -26,6 +26,7 @@ const int SFT_NET = 6;
 const int SFT_VAR = 7;
 const int SFT_PCA = 8;
 const int SFT_FORCE = 9;
+const int SFT_NAMEDEVENT = 10;
 
 const ymuint32 MASK_CONSTANT = 1U << SFT_CONSTANT;
 const ymuint32 MASK_FUNCTION = 1U << SFT_FUNCTION;
@@ -37,6 +38,7 @@ const ymuint32 MASK_NET      = 1U << SFT_NET;
 const ymuint32 MASK_VAR      = 1U << SFT_VAR;
 const ymuint32 MASK_PCA      = 1U << SFT_PCA;
 const ymuint32 MASK_FORCE    = 1U << SFT_FORCE;
+const ymuint32 MASK_NAMEDEVENT = 1U << SFT_NAMEDEVENT;
 
 END_NONAMESPACE
 
@@ -107,7 +109,7 @@ ElbEnv::set_system_tf_arg()
 
 // @brief イベント式の印をつける．
 void
-ElbEnv::set_event()
+ElbEnv::set_event_expr()
 {
   mFlags |= MASK_EVENT;
 }
@@ -138,6 +140,13 @@ void
 ElbEnv::set_force_lhs()
 {
   mFlags |= MASK_FORCE;
+}
+
+// @brief イベントトリガー文の印を付ける．
+void
+ElbEnv::set_namedevent()
+{
+  mFlags |= MASK_NAMEDEVENT;
 }
 
 // @brief 定数式が要求されている時に true を返す．
@@ -197,7 +206,7 @@ ElbEnv::is_system_tf_arg() const
 
 // @brief イベント式の時に true を返す．
 bool
-ElbEnv::is_event() const
+ElbEnv::is_event_expr() const
 {
   return static_cast<bool>((mFlags >> SFT_EVENT) & 1U);
 }
@@ -228,6 +237,13 @@ bool
 ElbEnv::is_force_lhs() const
 {
   return static_cast<bool>((mFlags >> SFT_FORCE) & 1U);
+}
+
+// @brief イベントトリガー文の時に true を返す．
+bool
+ElbEnv::is_namedevent() const
+{
+  return static_cast<bool>((mFlags >> SFT_NAMEDEVENT) & 1U);
 }
 
 // @brief この環境で valid な型の時 true を返す．
@@ -295,7 +311,7 @@ ElbEnv::is_valid_primary(tVpiObjType type,
     return true;
 
   case kVpiNamedEvent:
-    if ( is_event() ) {
+    if ( is_event_expr() ) {
       return true;
     }
     break;

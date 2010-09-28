@@ -243,21 +243,16 @@ private:
 		   ElbExpr*& index1,
 		   ElbExpr*& index2);
 
-  /// @brief 単体の宣言要素用のプライマリ式を生成する．
+  /// @brief decl の型が適切がチェックする．
   /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] env インスタンス化している環境
   /// @param[in] decl 対象の宣言要素
-  /// @param[in] has_range_select 範囲指定を持っている時 true を渡す．
-  /// @param[in] has_bit_select ビット指定を持っている時 true を渡す．
-  /// @param[in] index1, index2 範囲指定/ビット指定の式
-  /// @return 生成された式を返す．
-  /// @note エラーが起きたらエラーメッセージを出力し，NULL を返す．
-  ElbExpr*
-  instantiate_decl_primary(const PtExpr* pt_expr,
-			   ElbDecl* decl,
-			   bool has_range_select,
-			   bool has_bit_select,
-			   ElbExpr* index1,
-			   ElbExpr* index2);
+  /// @param[in] has_select ビット/範囲指定を持つ時 true を渡す．
+  bool
+  check_decl(const PtExpr* pt_expr,
+	     const ElbEnv& env,
+	     const ElbDecl* decl,
+	     bool has_select);
 
   /// @brief 式の値を評価する．
   /// @param[in] parent 親のスコープ

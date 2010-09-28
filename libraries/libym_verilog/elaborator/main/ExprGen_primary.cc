@@ -27,6 +27,7 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+#if 0
 // @brief PtExpr(primary) から named_event を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
@@ -79,6 +80,7 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
 
   return factory().new_Primary(pt_expr, decl);
 }
+#endif
 
 // @brief PtPrimary から ElbExpr を生成する．
 // @param[in] parent 親のスコープ
@@ -91,7 +93,8 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 {
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
-  if ( nb_array.size() > 0 ) {
+  bool has_hname = (nb_array.size() > 0);
+  if ( has_hname ) {
     if ( env.is_constant() ) {
       // 階層つき識別子はだめ
       error_hname_in_ce(pt_expr);
@@ -153,23 +156,27 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     // 通常のスコープで探索する．
     handle = find_obj_up(parent, nb_array, name, NULL);
     if ( handle == NULL ) {
-      // 見つからなくてもデフォルトネットタイプが kVpiNone でないかぎり
-      // 暗黙の1ビットネット宣言を行う．
-      // ただし識別子に添字がついていたらだめ
-      const VlModule* parent_module = parent->parent_module();
-      tVpiNetType def_nettype = parent_module->def_net_type();
-      if ( !pt_expr->is_simple() ||
-	   nb_array.size() > 0 ||
-	   isize != 0 ||
-	   def_nettype == kVpiNone ) {
-	error_not_found(pt_expr);
-	return NULL;
-      }
-      ElbDecl* decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
-      reg_decl(vpiNet, decl);
+      if ( !env.is_namedevent() ) {
+	// 見つからなくてもデフォルトネットタイプが kVpiNone でないかぎり
+	// 暗黙の1ビットネット宣言を行う．
+	// ただし識別子に添字がついていたらだめ
+	const VlModule* parent_module = parent->parent_module();
+	tVpiNetType def_nettype = parent_module->def_net_type();
+	if ( pt_expr->is_simple() &&
+	     !has_hname &&
+	     isize == 0 &&
+	     def_nettype != kVpiNone ) {
+	  ElbDecl* decl = factory().new_ImpNet(parent, pt_expr, def_nettype);
+	  reg_decl(vpiNet, decl);
 
-      handle = find_obj(parent, name);
-      assert_cond(handle, __FILE__, __LINE__);
+	  handle = find_obj(parent, name);
+	  assert_cond(handle, __FILE__, __LINE__);
+	}
+      }
+    }
+    if ( handle == NULL ) {
+      error_not_found(pt_expr);
+      return NULL;
     }
   }
 
@@ -234,31 +241,63 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 				   has_bit_select,
 				   index1, index2);
   if ( decl == NULL ) {
+    // エラー
+    // メッセージは instantiate_decl() 内で出力されている．
     return NULL;
   }
 
-  if ( decl->is_array_member() ) {
-    if ( env.is_pca_lhs() ) {
-      error_array_in_pca(pt_expr);
-      return NULL;
-    }
-    if ( env.is_force_lhs() ) {
-      error_array_in_force(pt_expr);
-      return NULL;
-    }
-  }
-
-  tVpiObjType type = decl->type();
-  if ( !env.is_valid_primary(type, has_bit_select | has_range_select) ) {
-    error_illegal_object(pt_expr);
+  if ( !check_decl(pt_expr, env, decl, has_range_select | has_bit_select) ) {
+    // エラー
+    // メッセージは instantiate_decl() 内で出力されている．
     return NULL;
   }
 
-  return instantiate_decl_primary(pt_expr, decl,
-				  has_range_select,
-				  has_bit_select,
-				  index1, index2);
+  if ( has_bit_select ) {
+    return factory().new_BitSelect(pt_expr, decl, index1);
+  }
+  if ( has_range_select ) {
+    switch ( pt_expr->range_mode() ) {
+    case kVpiConstRange:
+      {
+	int index1_val;
+	if ( !expr_to_int(index1, index1_val) ) {
+	  return NULL;
+	}
+	int index2_val;
+	if ( !expr_to_int(index2, index2_val) ) {
+	  return NULL;
+	}
+	return factory().new_PartSelect(pt_expr, decl,
+					index1, index2,
+					index1_val, index2_val);
+      }
 
+    case kVpiPlusRange:
+      {
+	int range_val;
+	if ( !expr_to_int(index2, range_val) ) {
+	  return NULL;
+	}
+	return factory().new_PlusPartSelect(pt_expr, decl,
+					    index1, index2, range_val);
+      }
+
+    case kVpiMinusRange:
+      {
+	int range_val;
+	if ( !expr_to_int(index2, range_val) ) {
+	  return NULL;
+	}
+	return factory().new_MinusPartSelect(pt_expr, decl,
+					     index1, index2, range_val);
+      }
+
+    case kVpiNoRange:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+  }
+  return factory().new_Primary(pt_expr, decl);
 }
 
 // @brief genvar に対応した定数を生成する．
@@ -584,6 +623,122 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
   return decl;
 }
 
+// @brief decl の型が適切がチェックする．
+bool
+ExprGen::check_decl(const PtExpr* pt_expr,
+		    const ElbEnv& env,
+		    const ElbDecl* decl,
+		    bool has_select)
+{
+  tVpiObjType type = decl->type();
+
+  if ( env.is_pca_lhs() ) {
+    if ( decl->is_array_member() ) {
+      // PCA の左辺に配列要素
+      error_array_in_pca(pt_expr);
+      return false;
+    }
+    if ( has_select ) {
+      // PCA の左辺に部分指定
+      return false;
+    }
+  }
+  if ( env.is_force_lhs() ) {
+    if ( decl->is_array_member() ) {
+      // force の左辺に配列要素
+      error_array_in_force(pt_expr);
+      return false;
+    }
+    if ( has_select ) {
+      // force の左辺に部分指定
+      return false;
+    }
+  }
+  if ( env.is_namedevent() ) {
+    if ( decl->type() != kVpiNamedEvent ) {
+      // 型が違う
+      error_not_a_namedevent(pt_expr);
+      return NULL;
+    }
+    if ( has_select ) {
+      // named event は範囲選択できない．
+      error_select_for_namedevent(pt_expr);
+    }
+  }
+  if ( env.is_net_lhs() && type != kVpiNet ) {
+    // net 型が要求されている．
+    return false;
+  }
+  if ( env.is_var_lhs() &&
+       ( type != kVpiReg &&
+	 type != kVpiIntegerVar &&
+	 type != kVpiRealVar &&
+	 type != kVpiTimeVar ) ) {
+    // reg 型あるいは変数型が要求されている．
+    return false;
+  }
+  if ( env.is_pca_lhs() ) {
+    if ( type != kVpiReg &&
+	 type != kVpiIntegerVar &&
+	 type != kVpiRealVar &&
+	 type != kVpiTimeVar) {
+      return false;
+    }
+    if ( has_select ) {
+      return false;
+    }
+  }
+  if ( env.is_force_lhs() ) {
+    if ( type != kVpiNet &
+	 type != kVpiReg &
+	 type != kVpiIntegerVar &
+	 type != kVpiRealVar &
+	 type != kVpiTimeVar) {
+      return false;
+    }
+    if ( has_select ) {
+      return false;
+    }
+  }
+
+  switch ( type ) {
+  case kVpiParameter:
+  case kVpiSpecParam:
+  case kVpiConstant:
+    return true;
+
+  case kVpiNet:
+  case kVpiReg:
+  case kVpiIntegerVar:
+  case kVpiTimeVar:
+  case kVpiVarSelect:
+    if ( env.is_constant() ) {
+      return false;
+    }
+    return true;
+
+  case kVpiRealVar:
+    if ( env.is_constant() || has_select ) {
+      return false;
+    }
+    return true;
+
+  case kVpiNamedEvent:
+    if ( env.is_event_expr() ) {
+      return true;
+    }
+    break;
+
+  default:
+    if ( env.is_system_tf_arg() ) {
+      return true;
+    }
+    break;
+  }
+  return false;
+}
+
+#if 0
 // @brief 単体の宣言要素用のプライマリ式を生成する．
 // @param[in] pt_expr 式を表すパース木
 // @param[in] decl 対象の宣言要素
@@ -647,5 +802,6 @@ ExprGen::instantiate_decl_primary(const PtExpr* pt_expr,
   }
   return factory().new_Primary(pt_expr, decl);
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG
