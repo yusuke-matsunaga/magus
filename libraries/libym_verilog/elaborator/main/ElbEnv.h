@@ -25,10 +25,9 @@ class VlNamedObj;
 ///
 /// 具体的には
 /// - 定数式
-/// - function 内の式
-/// - constant function 内の式
-/// - task 内の式
-/// - system function/system task の引数
+/// - 関数内の式
+/// - 定数関数内の式
+/// - システム関数/システムタスクの引数
 /// - イベント式
 /// - net 型の左辺式
 /// - reg/variables 型の左辺式
@@ -68,12 +67,15 @@ protected:
   /// @param[in] function 設定する function
   /// @param[in] cf constant function の時 true にするフラグ
   void
-  set_function(const VlNamedObj* function,
-	       bool cf = false);
+  set_constant_function(const VlNamedObj* function);
+
+  /// @brief 親の function を設定する．
+  void
+  set_function();
 
   /// @brief 親の task を設定する．
   void
-  set_task(const VlNamedObj* task);
+  set_task();
 
   /// @brief system task/system function の引数の印をつける．
   void
@@ -109,25 +111,17 @@ public:
   bool
   is_constant() const;
 
-  /// @brief function 内の生成の時に親の function を返す．
-  const VlNamedObj*
-  function() const;
-
-  /// @brief function 内の生成時に true を返す．
-  bool
-  inside_function() const;
-
   /// @brief constant function 内の生成の時に true を返す．
   bool
   inside_constant_function() const;
 
-  /// @brief task 内の生成の時に親の function を返す．
+  /// @brief constant function 内の生成の時に親の function を返す．
   const VlNamedObj*
-  task() const;
+  constant_function() const;
 
-  /// @brief task 内の生成時に true を返す．
+  /// @brief function 内の生成時に true を返す．
   bool
-  inside_task() const;
+  inside_function() const;
 
   /// @brief system task/system function の引数の時に true を返す．
   bool
@@ -136,6 +130,10 @@ public:
   /// @brief イベント式の時に true を返す．
   bool
   is_event_expr() const;
+
+  /// @brief 左辺式の時に true を返す．
+  bool
+  is_lhs() const;
 
   /// @brief net 型の左辺式の時に true を返す．
   bool
@@ -162,8 +160,8 @@ private:
   // 種々のフラグ
   ymuint32 mFlags;
 
-  // task もしくは function
-  const VlNamedObj* mTf;
+  // constant function
+  const VlNamedObj* mCf;
 
 };
 
@@ -178,10 +176,7 @@ class ElbConstantEnv :
 public:
 
   /// @brief コンストラクタ
-  ElbConstantEnv()
-  {
-    set_constant();
-  }
+  ElbConstantEnv();
 
 };
 
@@ -197,17 +192,14 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] func 親の関数
-  ElbConstantFunctionEnv(const VlNamedObj* func)
-  {
-    set_function(func, true);
-  }
+  ElbConstantFunctionEnv(const VlNamedObj* func);
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
 /// @class ElbTfEnv ElbEnv.h "ElbEnv.h"
-/// @brief タスク/関数内を表す環境
+/// @brief 関数内を表す環境
 //////////////////////////////////////////////////////////////////////
 class ElbTfEnv :
   public ElbEnv
@@ -215,17 +207,8 @@ class ElbTfEnv :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] taskfunc 親のタスク/関数
-  ElbTfEnv(const VlTaskFunc* taskfunc)
-  {
-    if ( taskfunc->type() == kVpiTask ) {
-      set_task(taskfunc);
-    }
-    else {
-      assert_cond( taskfunc->type() == kVpiFunction, __FILE__, __LINE__);
-      set_function(taskfunc);
-    }
-  }
+  /// @param[in] taskfunc タスクか関数のオブジェクト
+  ElbTfEnv(const VlNamedObj* taskfunc);
 
 };
 
@@ -241,11 +224,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] env 親の環境
-  ElbSystemTfArgEnv(const ElbEnv& env) :
-    ElbEnv(env)
-  {
-    set_system_tf_arg();
-  }
+  ElbSystemTfArgEnv(const ElbEnv& env);
 
 };
 
@@ -261,11 +240,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] env 親の環境
-  ElbEventExprEnv(const ElbEnv& env) :
-    ElbEnv(env)
-  {
-    set_event_expr();
-  }
+  ElbEventExprEnv(const ElbEnv& env);
 
 };
 
@@ -281,11 +256,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] env 親の環境
-  ElbNetLhsEnv(const ElbEnv& env) :
-    ElbEnv(env)
-  {
-    set_net_lhs();
-  }
+  ElbNetLhsEnv(const ElbEnv& env);
 
 };
 
@@ -301,11 +272,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] env 親の環境
-  ElbVarLhsEnv(const ElbEnv& env) :
-    ElbEnv(env)
-  {
-    set_var_lhs();
-  }
+  ElbVarLhsEnv(const ElbEnv& env);
 
 };
 
@@ -321,11 +288,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] env 親の環境
-  ElbPcaLhsEnv(const ElbEnv& env) :
-    ElbEnv(env)
-  {
-    set_pca_lhs();
-  }
+  ElbPcaLhsEnv(const ElbEnv& env);
 
 };
 
@@ -341,14 +304,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] env 親の環境
-  ElbForceLhsEnv(const ElbEnv& env) :
-    ElbEnv(env)
-  {
-    set_force_lhs();
-  }
+  ElbForceLhsEnv(const ElbEnv& env);
 
 };
-
 
 END_NAMESPACE_YM_VERILOG
 

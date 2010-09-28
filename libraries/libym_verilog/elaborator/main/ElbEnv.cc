@@ -22,10 +22,11 @@ const int SFT_CF = 2;
 const int SFT_TASK = 3;
 const int SFT_ARG = 4;
 const int SFT_EVENT = 5;
-const int SFT_NET = 6;
-const int SFT_VAR = 7;
-const int SFT_PCA = 8;
-const int SFT_FORCE = 9;
+const int SFT_LHS = 6;
+const int SFT_NET = 7;
+const int SFT_VAR = 8;
+const int SFT_PCA = 9;
+const int SFT_FORCE = 10;
 
 const ymuint32 MASK_CONSTANT = 1U << SFT_CONSTANT;
 const ymuint32 MASK_FUNCTION = 1U << SFT_FUNCTION;
@@ -33,6 +34,7 @@ const ymuint32 MASK_CF       = 1U << SFT_CF;
 const ymuint32 MASK_TASK     = 1U << SFT_TASK;
 const ymuint32 MASK_ARG      = 1U << SFT_ARG;
 const ymuint32 MASK_EVENT    = 1U << SFT_EVENT;
+const ymuint32 MASK_LHS      = 1U << SFT_LHS;
 const ymuint32 MASK_NET      = 1U << SFT_NET;
 const ymuint32 MASK_VAR      = 1U << SFT_VAR;
 const ymuint32 MASK_PCA      = 1U << SFT_PCA;
@@ -44,14 +46,14 @@ END_NONAMESPACE
 // @brief コンストラクタ
 ElbEnv::ElbEnv() :
   mFlags(0U),
-  mTf(NULL)
+  mCf(NULL)
 {
 }
 
 // @brief コピーコンストラクタ
 ElbEnv::ElbEnv(const ElbEnv& src) :
   mFlags(src.mFlags),
-  mTf(src.mTf)
+  mCf(src.mCf)
 {
 }
 
@@ -60,7 +62,7 @@ const ElbEnv&
 ElbEnv::operator=(const ElbEnv& src)
 {
   mFlags = src.mFlags;
-  mTf = src.mTf;
+  mCf = src.mCf;
   return *this;
 }
 
@@ -76,26 +78,21 @@ ElbEnv::set_constant()
   mFlags |= MASK_CONSTANT;
 }
 
-// @brief 親の function を設定する．
-// @param[in] function 設定する function
-// @param[in] cf constant function の時 true にするフラグ
+// @brief function を設定する．
 void
-ElbEnv::set_function(const VlNamedObj* function,
-		     bool cf)
+ElbEnv::set_function()
 {
-  if ( cf ) {
-    mFlags |= MASK_CF;
-  }
   mFlags |= MASK_FUNCTION;
-  mTf = function;
 }
 
-// @brief 親の task を設定する．
+// @brief 親の constant function を設定する．
+// @param[in] function 設定する function
 void
-ElbEnv::set_task(const VlNamedObj* task)
+ElbEnv::set_constant_function(const VlNamedObj* function)
 {
-  mFlags |= MASK_TASK;
-  mTf = task;
+  mFlags |= MASK_CF;
+  mFlags |= MASK_FUNCTION;
+  mCf = function;
 }
 
 // @brief system task/system function の引数の印をつける．
@@ -116,28 +113,28 @@ ElbEnv::set_event_expr()
 void
 ElbEnv::set_net_lhs()
 {
-  mFlags |= MASK_NET;
+  mFlags |= MASK_NET | MASK_LHS;
 }
 
 // @brief reg/var 型の左辺式の印をつける．
 void
 ElbEnv::set_var_lhs()
 {
-  mFlags |= MASK_VAR;
+  mFlags |= MASK_VAR | MASK_LHS;
 }
 
 // @brief pca 代入文の左辺式の印をつける．
 void
 ElbEnv::set_pca_lhs()
 {
-  mFlags |= MASK_PCA;
+  mFlags |= MASK_PCA | MASK_LHS;
 }
 
 // @brief force 代入文の左辺式の印をつける．
 void
 ElbEnv::set_force_lhs()
 {
-  mFlags |= MASK_FORCE;
+  mFlags |= MASK_FORCE | MASK_LHS;
 }
 
 // @brief 定数式が要求されている時に true を返す．
@@ -147,14 +144,11 @@ ElbEnv::is_constant() const
   return static_cast<bool>((mFlags >> SFT_CONSTANT) & 1U);
 }
 
-// @brief function 内の生成の時に親の function を返す．
+// @brief constant function 内の生成の時に親の function を返す．
 const VlNamedObj*
-ElbEnv::function() const
+ElbEnv::constant_function() const
 {
-  if ( inside_function() ) {
-    return mTf;
-  }
-  return NULL;
+  return mCf;
 }
 
 // @brief function 内の生成時に true を返す．
@@ -171,23 +165,6 @@ ElbEnv::inside_constant_function() const
   return static_cast<bool>((mFlags >> SFT_CF) & 1U);
 }
 
-// @brief task 内の生成の時に親の function を返す．
-const VlNamedObj*
-ElbEnv::task() const
-{
-  if ( inside_task() ) {
-    return mTf;
-  }
-  return NULL;
-}
-
-// @brief task 内の生成時に true を返す．
-bool
-ElbEnv::inside_task() const
-{
-  return static_cast<bool>((mFlags >> SFT_TASK) & 1U);
-}
-
 // @brief system task/system function の引数の時に true を返す．
 bool
 ElbEnv::is_system_tf_arg() const
@@ -200,6 +177,13 @@ bool
 ElbEnv::is_event_expr() const
 {
   return static_cast<bool>((mFlags >> SFT_EVENT) & 1U);
+}
+
+// @brief 左辺式の時に true を返す．
+bool
+ElbEnv::is_lhs() const
+{
+  return static_cast<bool>((mFlags >> SFT_LHS) & 1U);
 }
 
 // @brief net 型の左辺式の時に true を返す．
@@ -228,6 +212,121 @@ bool
 ElbEnv::is_force_lhs() const
 {
   return static_cast<bool>((mFlags >> SFT_FORCE) & 1U);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbConstantEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+ElbConstantEnv::ElbConstantEnv()
+{
+  set_constant();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbConstantFunctionEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] func 親の関数
+ElbConstantFunctionEnv::ElbConstantFunctionEnv(const VlNamedObj* func)
+{
+  set_constant_function(func);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbTfEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] taskfunc タスクか関数のオブジェクト
+ElbTfEnv::ElbTfEnv(const VlNamedObj* taskfunc)
+{
+  if ( taskfunc->type() == kVpiFunction ) {
+    set_function();
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbSystemTfArgEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] env 親の環境
+ElbSystemTfArgEnv::ElbSystemTfArgEnv(const ElbEnv& env) :
+  ElbEnv(env)
+{
+  set_system_tf_arg();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbEventExprEnv ElbEnv.h "ElbEnv.h"
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] env 親の環境
+ElbEventExprEnv::ElbEventExprEnv(const ElbEnv& env) :
+  ElbEnv(env)
+{
+  set_event_expr();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbNetLhsEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] env 親の環境
+ElbNetLhsEnv::ElbNetLhsEnv(const ElbEnv& env) :
+  ElbEnv(env)
+{
+  set_net_lhs();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbVarLhsEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] env 親の環境
+ElbVarLhsEnv::ElbVarLhsEnv(const ElbEnv& env) :
+  ElbEnv(env)
+{
+  set_var_lhs();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbPcaLhsEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] env 親の環境
+ElbPcaLhsEnv::ElbPcaLhsEnv(const ElbEnv& env) :
+  ElbEnv(env)
+{
+  set_pca_lhs();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbForceLhsEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] env 親の環境
+ElbForceLhsEnv::ElbForceLhsEnv(const ElbEnv& env) :
+  ElbEnv(env)
+{
+  set_force_lhs();
 }
 
 END_NAMESPACE_YM_VERILOG

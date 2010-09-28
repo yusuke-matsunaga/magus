@@ -61,40 +61,24 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
   ElbObjHandle* handle = NULL;
 
   if ( env.is_constant() ) {
-    // モジュール内の識別子を探索する．
-    handle = find_obj_up(parent, nb_array, name,
-			 parent->parent_module());
+    handle = find_const_handle(parent, pt_expr);
     if ( handle == NULL ) {
-      // 見つからなかった．
-      error_not_found(pt_expr);
-      return NULL;
-    }
-    // handle が持つオブジェクトは genvar か parameter でなければならない．
-    if ( handle->genvar() == NULL &&
-	 handle->parameter() == NULL ) {
-      error_not_a_parameter(pt_expr);
+      // エラーが起こった．
+      // メッセージは find_const_handle() 内で出力されている．
       return NULL;
     }
   }
   else if ( env.inside_constant_function() ) {
     // まず関数内の識別子を探索する．
-    handle = find_obj_up(parent, nb_array, name, env.function());
+    handle = find_obj_up(parent, nb_array, name, env.constant_function());
+    if ( handle == NULL && !env.is_lhs() ) {
+      // 右辺ならモジュール内の定数識別子を探索する．
+      handle = find_const_handle(parent, pt_expr);
+    }
     if ( handle == NULL ) {
-      if ( !env.is_var_lhs() ) {
-	// 右辺ならモジュール内の定数識別子を探索する．
-	handle = find_obj_up(parent, nb_array, name,
-			     parent->parent_module());
-      }
-      if ( handle == NULL ) {
-	// 見つからなかった．
-	error_not_found(pt_expr);
-	return NULL;
-      }
-      // この場合は genvar か parameter でなければならない．
-      if ( handle->genvar() == NULL && handle->parameter() == NULL ) {
-	error_not_a_parameter(pt_expr);
-	return NULL;
-      }
+      // エラーが起こった．
+      // メッセージは find_const_handle() 内で出力されている．
+      return NULL;
     }
   }
   else {
@@ -136,8 +120,11 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
       }
       ElbDecl* decl = handle->decl();
       if ( decl ) {
-	// net-array などもここに含まれる．
 	return factory().new_Primary(pt_expr, decl);
+      }
+      ElbDeclArray* decl_array = handle->decl_array();
+      if ( decl_array ) {
+	return factory().new_ArgHandle(pt_expr, decl_array);
       }
     }
     else if ( isize == 1 ) {
@@ -163,10 +150,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     return NULL;
   }
 
-  if ( !env.is_var_lhs() &&
-       !env.is_net_lhs() &&
-       !env.is_pca_lhs() &&
-       !env.is_force_lhs() ) {
+  if ( !env.is_lhs() ) {
     // 対象のオブジェクトが genvar の場合
     ElbGenvar* genvar = handle->genvar();
     if ( genvar ) {
@@ -179,7 +163,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
   bool has_bit_select;
   ElbExpr* index1;
   ElbExpr* index2;
-  ElbDecl* decl = instantiate_decl(handle, parent, pt_expr, NULL,
+  ElbDecl* decl = instantiate_decl(handle, parent, env, pt_expr,
 				   has_range_select,
 				   has_bit_select,
 				   index1, index2);
@@ -189,7 +173,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     return NULL;
   }
 
-  if ( !check_decl(pt_expr, env, decl, has_range_select | has_bit_select) ) {
+  if ( !check_decl(env, pt_expr, decl, has_range_select | has_bit_select) ) {
     // エラー
     // メッセージは instantiate_decl() 内で出力されている．
     return NULL;
@@ -269,11 +253,12 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   }
 
   // 配列要素などの処理を行う．
+  ElbEnv env0;
   bool has_range_select;
   bool has_bit_select;
   ElbExpr* index1;
   ElbExpr* index2;
-  ElbDecl* decl = instantiate_decl(handle, parent, pt_expr, NULL,
+  ElbDecl* decl = instantiate_decl(handle, parent, env0, pt_expr,
 				   has_range_select,
 				   has_bit_select,
 				   index1, index2);
@@ -289,6 +274,37 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   }
 
   return decl;
+}
+
+// @brief 定数識別子を探す．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+ElbObjHandle*
+ExprGen::find_const_handle(const VlNamedObj* parent,
+			   const PtExpr* pt_expr)
+{
+  // 識別子の階層
+  PtNameBranchArray nb_array = pt_expr->namebranch_array();
+
+  // 識別子の名前
+  const char* name = pt_expr->name();
+
+  // モジュール内の識別子を探索する．
+  ElbObjHandle* handle = find_obj_up(parent, nb_array, name,
+				     parent->parent_module());
+  if ( handle == NULL ) {
+    // 見つからなかった．
+    error_not_found(pt_expr);
+    return NULL;
+  }
+  // handle が持つオブジェクトは genvar か parameter でなければならない．
+  if ( handle->genvar() == NULL &&
+       handle->parameter() == NULL ) {
+    error_not_a_parameter(pt_expr);
+    return NULL;
+  }
+
+  return handle;
 }
 
 // @brief genvar に対応した定数を生成する．
@@ -332,6 +348,234 @@ ExprGen::instantiate_genvar(const VlNamedObj* parent,
 
   // genvar の値に対応した定数式を生成
   return factory().new_GenvarConstant(pt_expr, val);
+}
+
+// @brief 宣言要素のインスタンス化を行う．
+// @param[in] handle オブジェクトハンドル
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+// @param[out] has_range_select 範囲指定を持っていたら true を返す．
+// @param[out] has_bit_select ビット指定を持っていたら true を返す．
+// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
+ElbDecl*
+ExprGen::instantiate_decl(ElbObjHandle* handle,
+			  const VlNamedObj* parent,
+			  const ElbEnv& env,
+			  const PtExpr* pt_expr,
+			  bool& has_range_select,
+			  bool& has_bit_select,
+			  ElbExpr*& index1,
+			  ElbExpr*& index2)
+{
+  // 対象の宣言要素
+  ElbDecl* decl = handle->decl();
+  // 配列の次元
+  ymuint dsize = 0;
+  // プライマリ式の次元 (ビット指定を含んでいる可能性あり)
+  ymuint isize = pt_expr->index_num();
+
+  // 範囲指定があるとき true となるフラグ
+  has_range_select = (pt_expr->left_range() && pt_expr->right_range());
+
+  // 添字が定数のとき true となるフラグ
+  bool const_mode = pt_expr->is_const_index();
+
+  if ( decl == NULL ) {
+    // そのハンドルが宣言要素の配列なら要素を取り出す．
+    ElbDeclArray* decl_array = handle->decl_array();
+    if ( decl_array ) {
+      // 配列の次元
+      dsize = decl_array->dimension();
+      if ( isize != dsize && (isize != dsize + 1 || has_range_select) ) {
+	// 次元が合わない．
+	error_dimension_mismatch(pt_expr);
+	return NULL;
+      }
+
+      // 添字を取り出す．
+      vector<ElbExpr*> index_list(dsize);
+      for (ymuint i = 0; i < dsize; ++ i) {
+	const PtExpr* pt_expr1 = pt_expr->index(i);
+	ElbExpr* expr1;
+	if ( const_mode ) {
+	  expr1 = instantiate_constant_expr(parent, pt_expr1);
+	}
+	else {
+	  expr1 = instantiate_expr(parent, env, pt_expr1);
+	}
+	if ( !expr1 ) {
+	  return NULL;
+	}
+	index_list.push_back(expr1);
+      }
+
+      decl = factory().new_DeclElem(pt_expr, decl_array, index_list);
+    }
+    else {
+      // そのハンドルが parameter ならそのまま返す．
+      ElbParameter* param = handle->parameter();
+      if ( param ) {
+	decl = param;
+      }
+    }
+  }
+  if ( decl == NULL ) {
+    // 適切な型ではなかった．
+    error_illegal_object_cf(pt_expr);
+    return NULL;
+  }
+
+  // ビット指定があるとき true となるフラグ
+  has_bit_select = false;
+
+  if ( isize == dsize + 1 && !has_range_select ) {
+    // 識別子の添字の次元と配列の次元が 1 違いで
+    // 範囲がなければ識別子の最後の添字はビット指定と見なす．
+    has_bit_select = true;
+    -- isize;
+  }
+
+  if ( isize != dsize ) {
+    error_dimension_mismatch(pt_expr);
+    return NULL;
+  }
+
+  index1 = NULL;
+  index2 = NULL;
+
+  if ( has_bit_select ) {
+    if ( decl->value_type() == kVpiValueReal ) {
+      error_select_for_real(pt_expr);
+      return NULL;
+    }
+    const PtExpr* pt_expr1 = pt_expr->index(0);
+    if ( const_mode ) {
+      index1 = instantiate_constant_expr(parent, pt_expr1);
+    }
+    else {
+      index1 = instantiate_expr(parent, env, pt_expr1);
+    }
+    if ( !index1 ) {
+      return NULL;
+    }
+  }
+  else if ( has_range_select ) {
+    if ( decl->value_type() == kVpiValueReal ) {
+      error_select_for_real(pt_expr);
+      return NULL;
+    }
+    if ( const_mode || ( pt_expr->range_mode() == kVpiConstRange ) ) {
+      index1 = instantiate_constant_expr(parent, pt_expr->left_range());
+    }
+    else {
+      index1 = instantiate_expr(parent, env, pt_expr->left_range());
+    }
+    if ( !index1 ) {
+      return NULL;
+    }
+
+    // 範囲の2番目の式は常に定数でなければならない．
+    index2 = instantiate_constant_expr(parent, pt_expr->right_range());
+    if ( !index2 ) {
+      return NULL;
+    }
+  }
+
+  return decl;
+}
+
+// @brief decl の型が適切がチェックする．
+bool
+ExprGen::check_decl(const ElbEnv& env,
+		    const PtExpr* pt_expr,
+		    const ElbDecl* decl,
+		    bool has_select)
+{
+  tVpiObjType type = decl->type();
+
+  if ( env.is_pca_lhs() ) {
+    // procedural continuous assignment 文の左辺式
+    if ( decl->is_array_member() ) {
+      // 配列要素はダメ
+      error_array_in_pca(pt_expr);
+      return false;
+    }
+    if ( has_select ) {
+      // 部分指定はダメ
+      error_select_in_pca(pt_expr);
+      return false;
+    }
+    if ( type != kVpiReg &&
+	 type != kVpiIntegerVar &&
+	 type != kVpiRealVar &&
+	 type != kVpiTimeVar) {
+      // reg/変数以外はダメ
+      error_illegal_object(pt_expr);
+      return false;
+    }
+  }
+  else if ( env.is_force_lhs() ) {
+    // force 文の左辺式
+    if ( decl->is_array_member() ) {
+      // 配列要素はダメ
+      error_array_in_force(pt_expr);
+      return false;
+    }
+    if ( has_select ) {
+      // 部分指定はダメ
+      error_select_in_force(pt_expr);
+      return false;
+    }
+    if ( type != kVpiNet &
+	 type != kVpiReg &
+	 type != kVpiIntegerVar &
+	 type != kVpiRealVar &
+	 type != kVpiTimeVar) {
+      // net/reg/変数以外はダメ
+      error_illegal_object(pt_expr);
+      return false;
+    }
+  }
+  else if ( env.is_net_lhs() &&
+       type != kVpiNet ) {
+    // net 以外はダメ
+    error_illegal_object(pt_expr);
+    return false;
+  }
+  else if ( env.is_var_lhs() &&
+       ( type != kVpiReg &&
+	 type != kVpiIntegerVar &&
+	 type != kVpiRealVar &&
+	 type != kVpiTimeVar ) ) {
+    // reg/変数以外はダメ
+    error_illegal_object(pt_expr);
+    return false;
+  }
+  else {
+    // 右辺系の環境
+    if ( env.is_constant() ) {
+      // 定数式
+      if ( type != kVpiParameter &&
+	   type != kVpiSpecParam ) {
+	// 定数(parameter)でないのでダメ
+	error_illegal_object(pt_expr);
+	return false;
+      }
+    }
+
+    // あとは個別の型ごとにチェックする．
+    if ( type == kVpiRealVar && has_select ) {
+      // real の部分選択は無効
+      error_select_for_real(pt_expr);
+      return false;
+    }
+    if ( type == kVpiNamedEvent && !env.is_event_expr() ) {
+      // イベント式以外では名前つきイベントは使えない．
+      error_illegal_object(pt_expr);
+      return false;
+    }
+  }
+  return true;
 }
 
 // @brief プライマリに対して式の値を評価する．
@@ -466,256 +710,6 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   }
 
   return val;
-}
-
-// @brief 宣言要素のインスタンス化を行う．
-// @param[in] handle オブジェクトハンドル
-// @param[in] parent 親のスコープ
-// @param[in] pt_expr 式を表すパース木
-// @param[in] func 親の function
-// @param[out] has_range_select 範囲指定を持っていたら true を返す．
-// @param[out] has_bit_select ビット指定を持っていたら true を返す．
-// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
-ElbDecl*
-ExprGen::instantiate_decl(ElbObjHandle* handle,
-			  const VlNamedObj* parent,
-			  const PtExpr* pt_expr,
-			  const VlNamedObj* func,
-			  bool& has_range_select,
-			  bool& has_bit_select,
-			  ElbExpr*& index1,
-			  ElbExpr*& index2)
-{
-  // 対象の宣言要素
-  ElbDecl* decl = handle->decl();
-  // 配列の次元
-  ymuint dsize = 0;
-  // プライマリ式の次元 (ビット指定を含んでいる可能性あり)
-  ymuint isize = pt_expr->index_num();
-
-  // 範囲指定があるとき true となるフラグ
-  has_range_select = (pt_expr->left_range() && pt_expr->right_range());
-
-  if ( decl == NULL ) {
-    // そのハンドルが宣言要素の配列なら要素を取り出す．
-    ElbDeclArray* decl_array = handle->decl_array();
-    if ( decl_array ) {
-      // 配列の次元
-      dsize = decl_array->dimension();
-      if ( isize != dsize && (isize != dsize + 1 || has_range_select) ) {
-	// 次元が合わない．
-	error_dimension_mismatch(pt_expr);
-	return NULL;
-      }
-
-      // 添字を取り出す．
-      vector<ElbExpr*> index_list(dsize);
-      bool const_mode = pt_expr->is_const_index();
-      for (ymuint i = 0; i < dsize; ++ i) {
-	const PtExpr* pt_expr1 = pt_expr->index(i);
-	ElbExpr* expr1;
-	if ( const_mode ) {
-	  expr1 = instantiate_constant_expr(parent, pt_expr1);
-	}
-	else if ( func ) {
-	  ElbConstantFunctionEnv env(func);
-	  expr1 = instantiate_expr(parent, env, pt_expr1);
-	}
-	else {
-	  expr1 = instantiate_expr(parent, ElbEnv(), pt_expr1);
-	}
-	if ( !expr1 ) {
-	  return NULL;
-	}
-	index_list.push_back(expr1);
-      }
-
-      decl = factory().new_DeclElem(pt_expr, decl_array, index_list);
-    }
-    else {
-      // そのハンドルが parameter ならそのまま返す．
-      ElbParameter* param = handle->parameter();
-      if ( param ) {
-	decl = param;
-      }
-    }
-  }
-  if ( decl == NULL ) {
-    // 適切な型ではなかった．
-    error_illegal_object_cf(pt_expr);
-    return NULL;
-  }
-
-  // ビット指定があるとき true となるフラグ
-  has_bit_select = false;
-
-  if ( isize == dsize + 1 && !has_range_select ) {
-    // 識別子の添字の次元と配列の次元が 1 違いで
-    // 範囲がなければ識別子の最後の添字はビット指定と見なす．
-    has_bit_select = true;
-    -- isize;
-  }
-
-  if ( isize != dsize ) {
-    error_dimension_mismatch(pt_expr);
-    return NULL;
-  }
-
-  index1 = NULL;
-  index2 = NULL;
-
-  bool const_mode = pt_expr->is_const_index() || decl->is_consttype();
-  if ( has_bit_select ) {
-    if ( decl->value_type() == kVpiValueReal ) {
-      error_select_for_real(pt_expr);
-      return NULL;
-    }
-    const PtExpr* pt_expr1 = pt_expr->index(0);
-    if ( const_mode ) {
-      index1 = instantiate_constant_expr(parent, pt_expr1);
-    }
-    else if ( func ) {
-      ElbConstantFunctionEnv env(func);
-      index1 = instantiate_expr(parent, env, pt_expr1);
-    }
-    else {
-      index1 = instantiate_expr(parent, ElbEnv(), pt_expr1);
-    }
-    if ( !index1 ) {
-      return NULL;
-    }
-  }
-  else if ( has_range_select ) {
-    if ( decl->value_type() == kVpiValueReal ) {
-      error_select_for_real(pt_expr);
-      return NULL;
-    }
-    if ( const_mode || ( pt_expr->range_mode() == kVpiConstRange ) ) {
-      index1 = instantiate_constant_expr(parent, pt_expr->left_range());
-    }
-    else if ( func ) {
-      ElbConstantFunctionEnv env(func);
-      index1 = instantiate_expr(parent, env, pt_expr->left_range());
-    }
-    else {
-      index1 = instantiate_expr(parent, ElbEnv(), pt_expr->left_range());
-    }
-    if ( !index1 ) {
-      return NULL;
-    }
-
-    // 範囲の2番目の式は常に定数でなければならない．
-    index2 = instantiate_constant_expr(parent, pt_expr->right_range());
-    if ( !index2 ) {
-      return NULL;
-    }
-  }
-
-  return decl;
-}
-
-// @brief decl の型が適切がチェックする．
-bool
-ExprGen::check_decl(const PtExpr* pt_expr,
-		    const ElbEnv& env,
-		    const ElbDecl* decl,
-		    bool has_select)
-{
-  tVpiObjType type = decl->type();
-
-  if ( env.is_pca_lhs() ) {
-    if ( decl->is_array_member() ) {
-      // PCA の左辺に配列要素
-      error_array_in_pca(pt_expr);
-      return false;
-    }
-    if ( has_select ) {
-      // PCA の左辺に部分指定
-      return false;
-    }
-  }
-  if ( env.is_force_lhs() ) {
-    if ( decl->is_array_member() ) {
-      // force の左辺に配列要素
-      error_array_in_force(pt_expr);
-      return false;
-    }
-    if ( has_select ) {
-      // force の左辺に部分指定
-      return false;
-    }
-  }
-  if ( env.is_net_lhs() && type != kVpiNet ) {
-    // net 型が要求されている．
-    return false;
-  }
-  if ( env.is_var_lhs() &&
-       ( type != kVpiReg &&
-	 type != kVpiIntegerVar &&
-	 type != kVpiRealVar &&
-	 type != kVpiTimeVar ) ) {
-    // reg 型あるいは変数型が要求されている．
-    return false;
-  }
-  if ( env.is_pca_lhs() ) {
-    if ( type != kVpiReg &&
-	 type != kVpiIntegerVar &&
-	 type != kVpiRealVar &&
-	 type != kVpiTimeVar) {
-      return false;
-    }
-    if ( has_select ) {
-      return false;
-    }
-  }
-  if ( env.is_force_lhs() ) {
-    if ( type != kVpiNet &
-	 type != kVpiReg &
-	 type != kVpiIntegerVar &
-	 type != kVpiRealVar &
-	 type != kVpiTimeVar) {
-      return false;
-    }
-    if ( has_select ) {
-      return false;
-    }
-  }
-
-  switch ( type ) {
-  case kVpiParameter:
-  case kVpiSpecParam:
-  case kVpiConstant:
-    return true;
-
-  case kVpiNet:
-  case kVpiReg:
-  case kVpiIntegerVar:
-  case kVpiTimeVar:
-  case kVpiVarSelect:
-    if ( env.is_constant() ) {
-      return false;
-    }
-    return true;
-
-  case kVpiRealVar:
-    if ( env.is_constant() || has_select ) {
-      return false;
-    }
-    return true;
-
-  case kVpiNamedEvent:
-    if ( env.is_event_expr() ) {
-      return true;
-    }
-    break;
-
-  default:
-    if ( env.is_system_tf_arg() ) {
-      return true;
-    }
-    break;
-  }
-  return false;
 }
 
 END_NAMESPACE_YM_VERILOG

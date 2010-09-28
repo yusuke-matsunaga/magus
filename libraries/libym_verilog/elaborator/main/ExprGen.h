@@ -215,6 +215,13 @@ private:
 			  const ElbEnv& env,
 			  const PtExpr* pt_expr);
 
+  /// @brief 定数識別子を探す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbObjHandle*
+  find_const_handle(const VlNamedObj* parent,
+		    const PtExpr* pt_expr);
+
   /// @brief genvar に対応した定数を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -228,29 +235,29 @@ private:
   /// @brief 宣言要素のインスタンス化を行う．
   /// @param[in] handle オブジェクトハンドル
   /// @param[in] parent 親のスコープ
+  /// @param[in] env インスタンス化している環境
   /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] func 親の function
   /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
   /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
   /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
   ElbDecl*
   instantiate_decl(ElbObjHandle* handle,
 		   const VlNamedObj* parent,
+		   const ElbEnv& env,
 		   const PtExpr* pt_expr,
-		   const VlNamedObj* func,
 		   bool& has_range_select,
 		   bool& has_bit_select,
 		   ElbExpr*& index1,
 		   ElbExpr*& index2);
 
   /// @brief decl の型が適切がチェックする．
-  /// @param[in] pt_expr 式を表すパース木
   /// @param[in] env インスタンス化している環境
+  /// @param[in] pt_expr 式を表すパース木
   /// @param[in] decl 対象の宣言要素
   /// @param[in] has_select ビット/範囲指定を持つ時 true を渡す．
   bool
-  check_decl(const PtExpr* pt_expr,
-	     const ElbEnv& env,
+  check_decl(const ElbEnv& env,
+	     const PtExpr* pt_expr,
 	     const ElbDecl* decl,
 	     bool has_select);
 
