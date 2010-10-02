@@ -285,20 +285,21 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
     }
     ElbIODecl* io_decl = child_func->_io(i);
     ElbDecl* decl = io_decl->_decl();
-#warning "TODO: decl の型と val1 の型を比べる"
-#if 0
-    if ( decl->value_type() != expr1->value_type() ) {
-      error_illegal_argument_type(pt_expr);
-      if ( debug ) {
-	dout << "decl->value_type() = ";
-	put_value_type(dout, decl->value_type());
-	dout << endl
-	     << "expr1->value_type() = ";
-	put_value_type(dout, expr1->value_type());
-	dout << endl;
+    tVpiValueType decl_type = decl->value_type();
+    if ( decl_type == kVpiValueReal ) {
+      val1.to_real();
+      if ( val1.is_error() ) {
+	// 型が異なる．
+	error_illegal_argument_type(pt_expr1);
+	return ElbValue();
       }
     }
-#endif
+    else if ( is_bitvector_type(decl_type) ) {
+      val1.to_bitvector();
+      // 型が異なる．
+      error_illegal_argument_type(pt_expr1);
+      return ElbValue();
+    }
     arg_list[i] = val1;
   }
 
