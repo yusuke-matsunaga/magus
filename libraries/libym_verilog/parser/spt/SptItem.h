@@ -26,7 +26,7 @@ class SptItem :
   public PtItem
 {
 protected:
-  
+
   /// コンストラクタ
   SptItem(const FileRegion& file_region,
 	  tPtItemType type);
@@ -39,7 +39,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtItem の継承クラスが実装する仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -70,7 +70,7 @@ public:
   virtual
   const PtDelay*
   delay() const;
-  
+
   /// @brief パラメータ割り当てリストの取得
   virtual
   PtConnectionArray
@@ -115,12 +115,12 @@ public:
   virtual
   bool
   automatic() const;
-  
+
   /// @brief IO宣言の要素数の取得
   virtual
   ymuint32
   ioitem_num() const;
-  
+
   /// @brief IO宣言リストの配列の取得
   virtual
   PtIOHeadArray
@@ -130,17 +130,17 @@ public:
   virtual
   PtDeclHeadArray
   paramhead_array() const;
-  
+
   /// @brief localparam 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   localparamhead_array() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -214,7 +214,7 @@ public:
   virtual
   tVpiSpecPathType
   specpath_type() const;
-  
+
   /// @brief ターミナルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
@@ -227,34 +227,34 @@ public:
   virtual
   const PtPathDecl*
   path_decl() const;
-  
+
   /// @brief 条件式の取得
   /// @return 条件式
   /// @note このクラスでは NULL を返す．
   virtual
   const PtExpr*
   expr() const;
-  
+
   /// @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   then_declhead_array() const;
-  
+
   /// @brief 条件が成り立ったときに生成される item 配列の取得
   virtual
   PtItemArray
   then_item_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   else_declhead_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される item 配列の取得
   virtual
   PtItemArray
   else_item_array() const;
-  
+
   /// @brief case item の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
@@ -294,7 +294,7 @@ private:
 
   // 型
   tPtItemType mType;
-  
+
 };
 
 
@@ -307,15 +307,15 @@ class SptDefParamH :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptDefParamH(const FileRegion& file_region,
 	       PtDefParamArray dp_array);
-  
+
   /// デストラクタ
   virtual
   ~SptDefParamH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -338,7 +338,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 要素の配列
   PtDefParamArray mArray;
 
@@ -354,18 +354,18 @@ class SptDefParam :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   // value は常に定数式
   SptDefParam(const FileRegion& file_region,
 	      PtNameBranchArray nb_array,
 	      const char* tail_name,
 	      PtExpr* value);
-  
+
   // デストラクタ
   virtual
   ~SptDefParam();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -376,7 +376,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 階層ブランチの取得
   virtual
   PtNameBranchArray
@@ -409,7 +409,7 @@ private:
 
   // 値
   PtExpr* mExpr;
-  
+
 };
 
 
@@ -428,11 +428,11 @@ private:
 		 PtStrength* strength,
 		 PtDelay* delay,
 		 PtContAssignArray ca_array);
-  
+
   // デストラクタ
   virtual
   ~SptContAssignH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -487,16 +487,16 @@ class SptContAssign :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptContAssign(const FileRegion& fr,
 		PtExpr* lhs,
 		PtExpr* rhs);
-  
+
   // デストラクタ
   virtual
   ~SptContAssign();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -545,7 +545,7 @@ class SptProcess :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptProcess(const FileRegion& file_region,
 	     tPtItemType type,
@@ -554,7 +554,7 @@ private:
   // デストラクタ
   virtual
   ~SptProcess();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -587,7 +587,7 @@ class SptTf :
   friend class SptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type 型
@@ -619,13 +619,13 @@ private:
   // デストラクタ
   virtual
   ~SptTf();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtItem の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // 名前を取り出す．
   virtual
   const char*
@@ -635,12 +635,12 @@ public:
   virtual
   bool
   automatic() const;
-  
+
   /// @brief IO宣言の要素数の取得
   virtual
   ymuint32
   ioitem_num() const;
-  
+
   /// @brief IO宣言リストの配列の取得
   virtual
   PtIOHeadArray
@@ -650,17 +650,17 @@ public:
   virtual
   PtDeclHeadArray
   paramhead_array() const;
-  
+
   /// @brief localparam 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   localparamhead_array() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   // 本体を取り出す．
   virtual
   const PtStmt*
@@ -715,7 +715,7 @@ private:
 
   // 符号
   bool mSigned;
-  
+
   // 範囲のMSB
   PtExpr* mLeftRange;
 
@@ -724,10 +724,10 @@ private:
 
   // データ型
   tVpiVarType mDataType;
-  
+
   // IO宣言の要素数
   ymuint32 mIOItemNum;
-  
+
   // IO宣言の配列
   PtIOHeadArray mIOHeadArray;
 
@@ -739,7 +739,7 @@ private:
 
   // その他の宣言の配列
   PtDeclHeadArray mDeclHeadArray;
-  
+
   // 本体
   PtStmt* mBody;
 
@@ -766,7 +766,7 @@ private:
 	   PtStrength* strength,
 	   PtDelay* delay,
 	   PtInstArray elem_array);
-  
+
   // デストラクタ
   virtual
   ~SptGateH();
@@ -833,7 +833,7 @@ class SptMuH :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptMuH(const FileRegion& file_region,
 	 const char* def_name,
@@ -841,7 +841,7 @@ private:
 	 PtStrength* strength,
 	 PtDelay* delay,
 	 PtInstArray elem_array);
-  
+
   // デストラクタ
   virtual
   ~SptMuH();
@@ -866,18 +866,11 @@ public:
   virtual
   const PtDelay*
   delay() const;
-  
-  /// @brief パラメータ割り当てリストの要素数の取得
-  /// @return パラメータ割り当てリストの要素数
-  virtual
-  ymuint32
-  paramassign_num() const;
 
-  /// @brief パラメータ割当の取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < paramassign_num() )
+  /// @brief パラメータ割り当てリストの取得
   virtual
-  const PtConnection*
-  paramassign(ymuint32 pos) const;
+  PtConnectionArray
+  paramassign_array() const;
 
   // 要素数を取り出す．
   virtual
@@ -889,7 +882,7 @@ public:
   virtual
   const PtInst*
   inst(ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -923,18 +916,18 @@ class SptInst :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptInst(const FileRegion& file_region,
 	  const char* name,
 	  PtExpr* left,
 	  PtExpr* right,
 	  PtConnectionArray con_array);
-  
+
   // デストラクタ
   virtual
   ~SptInst();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1003,21 +996,21 @@ private:
 class SptGenBody
 {
 public:
-  
+
   // コンストラクタ
   SptGenBody(PtDeclHeadArray decl_array,
 	     PtItemArray item_array);
-  
+
   // デストラクタ
   ~SptGenBody();
 
 
 public:
-  
+
   /// @brief 宣言ヘッダ配列の取得
   PtDeclHeadArray
   declhead_array() const { return mDeclArray; }
-  
+
   /// @brief item 配列の取得
   PtItemArray
   item_array() const { return mItemArray; }
@@ -1030,7 +1023,7 @@ private:
 
   // 宣言の配列
   PtDeclHeadArray mDeclArray;
-  
+
   // 要素の配列
   PtItemArray mItemArray;
 
@@ -1046,14 +1039,14 @@ class SptGenerate :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptGenerate(const FileRegion& file_region,
 	      tPtItemType type,
 	      const char* name,
 	      PtDeclHeadArray decl_array,
 	      PtItemArray item_array);
-  
+
   // デストラクタ
   virtual
   ~SptGenerate();
@@ -1068,7 +1061,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief 宣言のリストの取得
   virtual
   PtDeclHeadArray
@@ -1103,7 +1096,7 @@ class SptGenIf :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptGenIf(const FileRegion& file_region,
 	   PtExpr* cond,
@@ -1111,7 +1104,7 @@ private:
 	   PtItemArray then_item_array,
 	   PtDeclHeadArray else_decl_array,
 	   PtItemArray else_item_array);
-  
+
   // デストラクタ
   virtual
   ~SptGenIf();
@@ -1126,22 +1119,22 @@ public:
   virtual
   const PtExpr*
   expr() const;
-  
+
   /// @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   then_declhead_array() const;
-  
+
   /// @brief 条件が成り立ったときに生成される item 配列の取得
   virtual
   PtItemArray
   then_item_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   else_declhead_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される item 配列の取得
   virtual
   PtItemArray
@@ -1174,12 +1167,12 @@ class SptGenCase :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptGenCase(const FileRegion& file_region,
 	     PtExpr* expr,
 	     PtGenCaseItemArray item_array);
-  
+
   // デストラクタ
   virtual
   ~SptGenCase();
@@ -1213,7 +1206,7 @@ private:
 
   // 比較式
   PtExpr* mExpr;
-  
+
   // case item の配列
   PtGenCaseItemArray mCaseItemArray;
 
@@ -1229,13 +1222,13 @@ class SptGenCaseItem :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptGenCaseItem(const FileRegion& file_region,
 		 PtExprArray label_array,
 		 PtDeclHeadArray decl_array,
 		 PtItemArray item_array);
-  
+
   // デストラクタ
   virtual
   ~SptGenCaseItem();
@@ -1263,7 +1256,7 @@ public:
   virtual
   const PtExpr*
   label(ymuint32 pos) const;
-  
+
   /// @brief 宣言のリストの取得
   virtual
   PtDeclHeadArray
@@ -1288,7 +1281,7 @@ private:
 
   // 生成される本体
   SptGenBody mBody;
-  
+
 };
 
 
@@ -1301,7 +1294,7 @@ class SptGenFor :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptGenFor(const FileRegion& file_region,
 	    const char* loop_var,
@@ -1311,7 +1304,7 @@ private:
 	    const char* block_name,
 	    PtDeclHeadArray decl_array,
 	    PtItemArray item_array);
-  
+
   // デストラクタ
   virtual
   ~SptGenFor();
@@ -1326,7 +1319,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief 宣言のリストの取得
   virtual
   PtDeclHeadArray
@@ -1393,12 +1386,12 @@ class SptSpecItem :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptSpecItem(const FileRegion& file_region,
 	      tVpiSpecItemType id,
 	      PtExprArray terminal_array);
-  
+
   // デストラクタ
   virtual
   ~SptSpecItem();
@@ -1418,13 +1411,13 @@ public:
   virtual
   ymuint32
   size() const;
-    
+
   /// @brief ターミナルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtExpr*
   terminal(ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1449,17 +1442,17 @@ class SptSpecPath :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptSpecPath(const FileRegion& file_region,
 	      tVpiSpecPathType id,
 	      PtExpr* expr,
 	      PtPathDecl* path_decl);
-  
+
   // デストラクタ
   virtual
   ~SptSpecPath();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1508,7 +1501,7 @@ class SptPathDecl :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptPathDecl(const FileRegion& file_region,
 	      int edge,
@@ -1519,7 +1512,7 @@ private:
 	      int output_pol,
 	      PtExpr* expr,
 	      PtPathDelay* path_delay);
-  
+
   // デストラクタ
   virtual
   ~SptPathDecl();
@@ -1546,19 +1539,19 @@ public:
   virtual
   ymuint32
   input_num() const;
-  
+
   /// @brief 入力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
   const PtExpr*
   input(ymuint32 pos) const;
-  
+
   // 入力の極性を取り出す．
   // 0の場合もありうる．
   virtual
   int
   input_pol() const;
-  
+
   // パス記述子(?)を得る．vpiParallel か vpiFull
   virtual
   int
@@ -1575,19 +1568,19 @@ public:
   virtual
   const PtExpr*
   output(ymuint32 pos) const;
-  
+
   // 出力の極性を取り出す．
   // 0の場合もありうる．
   virtual
   int
   output_pol() const;
-  
+
   // 式を取り出す．
   // NULL の場合もありうる．
   virtual
   const PtExpr*
   expr() const;
-  
+
   // path_delay_value を取り出す．
   virtual
   const PtPathDelay*
@@ -1622,7 +1615,7 @@ class SptPathDelay :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptPathDelay(const FileRegion& file_region,
 	       PtExpr* value1);
@@ -1653,11 +1646,11 @@ private:
 	       PtExpr* value10,
 	       PtExpr* value11,
 	       PtExpr* value12);
-  
+
   // デストラクタ
   virtual
   ~SptPathDelay();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////

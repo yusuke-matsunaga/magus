@@ -29,7 +29,7 @@ CptGateH::CptGateH(const FileRegion& file_region,
   mInstArray(inst_array)
 {
 }
-  
+
 // デストラクタ
 CptGateH::~CptGateH()
 {
@@ -85,7 +85,7 @@ CptGateHS::CptGateHS(const FileRegion& file_region,
   mStrength(strength)
 {
 }
-  
+
 // デストラクタ
 CptGateHS::~CptGateHS()
 {
@@ -112,7 +112,7 @@ CptGateHD::CptGateHD(const FileRegion& file_region,
   mDelay(delay)
 {
 }
-  
+
 // デストラクタ
 CptGateHD::~CptGateHD()
 {
@@ -141,7 +141,7 @@ CptGateHSD::CptGateHSD(const FileRegion& file_region,
   mDelay(delay)
 {
 }
-  
+
 // デストラクタ
 CptGateHSD::~CptGateHSD()
 {
@@ -175,7 +175,7 @@ CptMuH::CptMuH(const FileRegion& file_region,
   mInstArray(inst_array)
 {
 }
-  
+
 // デストラクタ
 CptMuH::~CptMuH()
 {
@@ -231,33 +231,24 @@ CptMuHP::CptMuHP(const FileRegion& file_region,
   mParamAssignArray(con_array)
 {
 }
-  
+
 // デストラクタ
 CptMuHP::~CptMuHP()
 {
 }
-  
-// @brief パラメータ割り当てリストの要素数の取得
-// @return パラメータ割り当てリストの要素数
-ymuint32
-CptMuHP::paramassign_num() const
-{
-  return mParamAssignArray.size();
-}
 
-// @brief パラメータ割当の取得
-// @param[in] pos 位置番号 ( 0 <= pos < paramassign_num() )
-const PtConnection*
-CptMuHP::paramassign(ymuint32 pos) const
+// @brief パラメータ割り当てリストの取得
+PtConnectionArray
+CptMuHP::paramassign_array() const
 {
-  return mParamAssignArray[pos];
+  return mParamAssignArray;
 }
 
 
 //////////////////////////////////////////////////////////////////////
 // strength を持つ MuH
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptMuHS::CptMuHS(const FileRegion& file_region,
 		 const char* def_name,
@@ -267,7 +258,7 @@ CptMuHS::CptMuHS(const FileRegion& file_region,
   mStrength(strength)
 {
 }
-  
+
 // デストラクタ
 CptMuHS::~CptMuHS()
 {
@@ -294,7 +285,7 @@ CptMuHD::CptMuHD(const FileRegion& file_region,
   mDelay(delay)
 {
 }
-  
+
 // デストラクタ
 CptMuHD::~CptMuHD()
 {
@@ -347,7 +338,7 @@ CptMuHSD::delay() const
 //////////////////////////////////////////////////////////////////////
 // module instance/UDP instance のベース実装クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptInst::CptInst(const FileRegion& file_region,
 		 PtConnectionArray con_array) :
@@ -355,7 +346,7 @@ CptInst::CptInst(const FileRegion& file_region,
   mPortArray(con_array)
 {
 }
-  
+
 // デストラクタ
 CptInst::~CptInst()
 {
@@ -418,7 +409,7 @@ CptInst::port(ymuint32 pos) const
 
 // コンストラクタ
 CptInstN::CptInstN(const FileRegion& file_region,
-		       const char* name, 
+		       const char* name,
 		       PtConnectionArray con_array) :
   CptInst(file_region, con_array),
   mName(name)

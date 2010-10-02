@@ -35,26 +35,26 @@
 // YYLTYPE を書き換えたので以下のマクロも書き換えが必要
 #define YYLLOC_DEFAULT(Current, Rhs, N) Current = fr_merge(Rhs, N);
 
-  
+
 BEGIN_NAMESPACE_YM_VERILOG
 
 // yacc/bison が生成したヘッダファイル
 #include "verilog_grammer.h"
-  
 
-// 字句解析関数 
+
+// 字句解析関数
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
       Parser&);
 
-// エラー報告関数 
+// エラー報告関数
 int
 yyerror(YYLTYPE*,
 	Parser&,
 	const char*);
- 
- 
+
+
 // fr_array 全体のファイル領域を求める．
 // 直感的には FileRegion(fr_array[1], fr_array[n])
 // だが(先頭が 0 でなく 1 であることに注意),
@@ -69,7 +69,7 @@ fr_merge(const FileRegion fr_array[],
     // なんでこんなことがあるのか不明
     return FileRegion();
   }
-  
+
   // 真の先頭を求める．
   size_t i;
   for (i = 1; i <= n && !fr_array[i].is_valid(); ++ i) ;
@@ -79,7 +79,7 @@ fr_merge(const FileRegion fr_array[],
   size_t j;
   for (j = n; i >= i && !fr_array[j].is_valid(); -- j) ;
   const FileRegion& last = fr_array[j];
-  
+
   return FileRegion(first, last);
 }
 
@@ -125,7 +125,7 @@ fr_merge(const FileRegion fr_array[],
   PtCaseItem* caseitem;
 
   PtExpr* expr;
-  
+
   PtStrength* strength;
   PtDelay* delay;
   PtControl* control;
@@ -704,7 +704,7 @@ list_of_paramport_decl
 : paramport_head paramport_assignment
 | list_of_paramport_decl ',' { parser.end_paramport(); }
   paramport_head paramport_assignment
-| list_of_paramport_decl ',' { parser.end_paramport(); } paramport_assignment
+| list_of_paramport_decl ',' paramport_assignment
 ;
 
 paramport_head
@@ -1363,7 +1363,7 @@ event_declaration
 ;
 
 event_declhead
-: ai_list EVENT 
+: ai_list EVENT
 {
   parser.new_EventH(@$, $1);
 }
@@ -1383,7 +1383,7 @@ genvar_declaration
 ;
 
 genvar_declhead
-: ai_list GENVAR 
+: ai_list GENVAR
 {
   parser.new_GenvarH(@$, $1);
 }
@@ -1403,7 +1403,7 @@ integer_declaration
 ;
 
 integer_declhead
-: ai_list INTEGER 
+: ai_list INTEGER
 {
   parser.new_VarH(@$, kVpiVarInteger, $1);
 }
@@ -1470,7 +1470,7 @@ net_declaration
 //   |"trireg"                         ["signed"]       [delay3]
 //   |"trireg" ["vectored"|"scalared"] ["signed"] range [delay3]
 net_declhead1
-: ai_list net_type sign                
+: ai_list net_type sign
 {
   // net のデフォルトは1ビット
   parser.new_NetH(@$, $2, $3, $1);
@@ -4194,7 +4194,7 @@ edge_symbol
   $$ = kVpiUdpValQQ;
 }
 ;
-    
+
 
 //////////////////////////////////////////////////////////////////////
 // A.5.4 UDP instantiation
@@ -6848,13 +6848,13 @@ yyerror(YYLTYPE* llocp,
   else {
     s2 = s;
   }
-  
+
   parser.put_msg(__FILE__, __LINE__,
 		 *llocp,
 		 kMsgError,
 		 "PARS",
 		 s2);
-    
+
   return 1;
 }
 

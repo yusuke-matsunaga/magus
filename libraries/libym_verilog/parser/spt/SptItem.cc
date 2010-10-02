@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // item の基底クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param type 種類
@@ -76,7 +76,7 @@ SptItem::delay() const
 {
   return NULL;
 }
-  
+
 // @brief パラメータ割り当てリストの取得
 PtConnectionArray
 SptItem::paramassign_array() const
@@ -135,14 +135,14 @@ SptItem::automatic() const
 {
   return false;
 }
-  
+
 // @brief IO宣言の要素数の取得
 ymuint32
 SptItem::ioitem_num() const
 {
   return 0;
 }
-  
+
 // @brief IO宣言リストの配列の取得
 PtIOHeadArray
 SptItem::iohead_array() const
@@ -156,14 +156,14 @@ SptItem::paramhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief localparam 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptItem::localparamhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptItem::declhead_array() const
@@ -264,7 +264,7 @@ SptItem::specpath_type() const
 {
   return kVpiSpecPathNull; // ダミー
 }
-  
+
 // @brief ターミナルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtExpr*
@@ -281,7 +281,7 @@ SptItem::path_decl() const
 {
   return NULL;
 }
-  
+
 // @brief 条件式の取得
 // @return 条件式
 // このクラスでは NULL を返す．
@@ -290,28 +290,28 @@ SptItem::expr() const
 {
   return NULL;
 }
-  
+
 // @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptItem::then_declhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief 条件が成り立ったときに生成される item 配列の取得
 PtItemArray
 SptItem::then_item_array() const
 {
   return PtItemArray();
 }
-  
+
 // @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptItem::else_declhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 /// @brief 条件が成り立たなかったときに生成される item 配列の取得
 PtItemArray
 SptItem::else_item_array() const
@@ -370,7 +370,7 @@ SptDefParamH::SptDefParamH(const FileRegion& file_region,
   mArray(dp_array)
 {
 }
-  
+
 // デストラクタ
 SptDefParamH::~SptDefParamH()
 {
@@ -396,7 +396,7 @@ SptDefParamH::defparam(ymuint32 pos) const
 //////////////////////////////////////////////////////////////////////
 // defparam 文のベース実装クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param nblist 階層名のリスト
@@ -426,7 +426,7 @@ SptDefParam::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 SptDefParam::namebranch_array() const
@@ -499,7 +499,7 @@ SptContAssignH::size() const
 {
   return mArray.size();
 }
-  
+
 // @brief continuous assign 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtContAssign*
@@ -658,14 +658,14 @@ SptTf::automatic() const
 {
   return mAutomatic;
 }
-  
+
 // @brief IO宣言の要素数の取得
 ymuint32
 SptTf::ioitem_num() const
 {
   return mIOItemNum;
 }
-  
+
 // @brief IO宣言リストの配列の取得
 PtIOHeadArray
 SptTf::iohead_array() const
@@ -679,14 +679,14 @@ SptTf::paramhead_array() const
 {
   return mParamHeadArray;
 }
-  
+
 // @brief localparam 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptTf::localparamhead_array() const
 {
   return mLocalparamHeadArray;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptTf::declhead_array() const
@@ -781,7 +781,7 @@ SptGateH::SptGateH(const FileRegion& file_region,
   mElemArray(elem_array)
 {
 }
-  
+
 // デストラクタ
 SptGateH::~SptGateH()
 {
@@ -853,7 +853,7 @@ SptMuH::SptMuH(const FileRegion& file_region,
   mElemArray(elem_array)
 {
 }
-  
+
 // デストラクタ
 SptMuH::~SptMuH()
 {
@@ -882,21 +882,12 @@ SptMuH::delay() const
 {
   return mDelay;
 }
-  
-// @brief パラメータ割り当てリストの要素数の取得
-// @return パラメータ割り当てリストの要素数
-ymuint32
-SptMuH::paramassign_num() const
-{
-  return mParamArray.size();
-}
 
-// @brief パラメータ割当の取得
-// @param[in] pos 位置番号 ( 0 <= pos < paramassign_num() )
-const PtConnection*
-SptMuH::paramassign(ymuint32 pos) const
+// @brief パラメータ割り当てリストの取得
+PtConnectionArray
+SptMuH::paramassign_array() const
 {
-  return mParamArray[pos];
+  return mParamArray;
 }
 
 // 要素数の取得
@@ -919,7 +910,7 @@ SptMuH::inst(ymuint32 pos) const
 //////////////////////////////////////////////////////////////////////
 // module instance/UDP/gate instance のベース実装クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param name 名前
@@ -938,7 +929,7 @@ SptInst::SptInst(const FileRegion& file_region,
   mPortArray(con_array)
 {
 }
-  
+
 // デストラクタ
 SptInst::~SptInst()
 {
@@ -992,7 +983,7 @@ SptInst::port(ymuint32 pos) const
   return mPortArray[pos];
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // item 関係
 //////////////////////////////////////////////////////////////////////
@@ -1169,7 +1160,7 @@ SptFactory::new_Task(const FileRegion& file_region,
 		       declhead_array,
 		       stmt);
 }
-  
+
 // @brief 1ビット型 function 文の生成
 // @param[in] file_region ファイル位置の情報
 // @param[in] name function 名
@@ -1291,7 +1282,7 @@ SptFactory::new_GateH(const FileRegion& file_region,
 			  NULL, NULL,
 			  elem_array);
 }
-  
+
 // @brief gate instance 文のヘッダの生成 (strength付き)
 // @param[in] file_region ファイル位置の情報
 // @param[in] type primitive の型
@@ -1310,7 +1301,7 @@ SptFactory::new_GateH(const FileRegion& file_region,
 			  strength, NULL,
 			  elem_array);
 }
-  
+
 // @brief gate instance 文のヘッダの生成 (遅延付き)
 // @param[in] file_region ファイル位置の情報
 // @param[in] type primitive の型
@@ -1329,7 +1320,7 @@ SptFactory::new_GateH(const FileRegion& file_region,
 			  NULL, delay,
 			  elem_array);
 }
-  
+
 // @brief gate instance 文のヘッダの生成 (strength, 遅延付き)
 // @param[in] file_region ファイル位置の情報
 // @param[in] type primitive の型

@@ -31,7 +31,7 @@ protected:
   CptGateH(const FileRegion& file_region,
 	   tVpiPrimType prim_type,
 	   PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGateH();
@@ -102,7 +102,7 @@ protected:
 	    tVpiPrimType prim_type,
 	    PtStrength* strength,
 	    PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGateHS();
@@ -145,7 +145,7 @@ protected:
 	    tVpiPrimType prim_type,
 	    PtDelay* delay,
 	    PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGateHD();
@@ -189,7 +189,7 @@ protected:
 	     PtStrength* strength,
 	     PtDelay* delay,
 	     PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGateHSD();
@@ -234,16 +234,16 @@ class CptMuH :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptMuH(const FileRegion& file_region,
 	 const char* def_name,
 	 PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptMuH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -277,7 +277,7 @@ public:
   const PtInst*
   inst(ymuint32 pos) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -291,7 +291,7 @@ private:
 
   // 要素の配列
   PtInstArray mInstArray;
-  
+
 };
 
 
@@ -304,35 +304,28 @@ class CptMuHP :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptMuHP(const FileRegion& file_region,
 	  const char* def_name,
 	  PtConnectionArray con_array,
 	  PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptMuHP();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // PtMuH の仮想関数
+  // PtItem の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
-  /// @brief パラメータ割り当てリストの要素数の取得
-  /// @return パラメータ割り当てリストの要素数
-  virtual
-  ymuint32
-  paramassign_num() const;
 
-  /// @brief パラメータ割当の取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < paramassign_num() )
+  /// @brief パラメータ割り当てリストの取得
   virtual
-  const PtConnection*
-  paramassign(ymuint32 pos) const;
-  
+  PtConnectionArray
+  paramassign_array() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -354,17 +347,17 @@ class CptMuHS :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptMuHS(const FileRegion& file_region,
 	  const char* def_name,
 	  PtStrength* strength,
 	  PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptMuHS();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -384,7 +377,7 @@ private:
 
   // strength
   PtStrength* mStrength;
-  
+
 };
 
 
@@ -397,17 +390,17 @@ class CptMuHD :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptMuHD(const FileRegion& file_region,
 	  const char* def_name,
 	  PtDelay* delay,
 	  PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptMuHD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -418,7 +411,7 @@ public:
   virtual
   const PtDelay*
   delay() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -440,18 +433,18 @@ class CptMuHSD :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptMuHSD(const FileRegion& file_region,
 	   const char* def_name,
 	   PtStrength* strength,
 	   PtDelay* delay,
 	   PtInstArray inst_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptMuHSD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -492,15 +485,15 @@ class CptInst :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptInst(const FileRegion& file_region,
 	  PtConnectionArray con_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptInst();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -572,13 +565,13 @@ protected:
 
   /// @brief コンストラクタ
   CptInstN(const FileRegion& file_region,
-	   const char* name, 
+	   const char* name,
 	   PtConnectionArray con_array);
 
   /// @brief デストラクタ
   virtual
   ~CptInstN();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -598,7 +591,7 @@ private:
 
   // 名前
   const char* mName;
-  
+
 };
 
 
@@ -618,11 +611,11 @@ protected:
 	   PtExpr* left,
 	   PtExpr* right,
 	   PtConnectionArray con_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptInstR();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -650,7 +643,7 @@ private:
 
   // 範囲のLSB
   PtExpr* mRightRange;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
