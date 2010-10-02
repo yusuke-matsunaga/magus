@@ -22,7 +22,6 @@
 #include "ym_verilog/vl/VlModule.h"
 
 #include "ElbDecl.h"
-#include "ElbParameter.h"
 #include "ElbParamAssign.h"
 #include "ElbContAssign.h"
 #include "ElbProcess.h"
@@ -153,7 +152,7 @@ ItemGen::defparam_override(const VlModule* module,
   if ( !handle ) {
     return false;
   }
-  ElbParameter* param = handle->parameter();
+  ElbDecl* param = handle->decl();
   if ( !param || param->type() != kVpiParameter ) {
     ostringstream buf;
     buf << "\"" << expand_full_name(nb_array, name)

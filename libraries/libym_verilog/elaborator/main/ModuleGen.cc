@@ -106,9 +106,11 @@ ModuleGen::phase1_module_item(ElbModule* module,
   // パラメータポートを実体化する．
   PtDeclHeadArray paramport_array = pt_module->paramport_array();
   bool has_paramportdecl = (paramport_array.size() > 0);
-  // もともと外部にパラメータポートリストが無い場合には
-  // 内部の parameter 宣言がパラメータポートリストとなる．
-  paramport_array = pt_module->paramhead_array();
+  if ( !has_paramportdecl ) {
+    // もともと外部にパラメータポートリストが無い場合には
+    // 内部の parameter 宣言がパラメータポートリストとなる．
+    paramport_array = pt_module->paramhead_array();
+  }
   instantiate_param(module, paramport_array, false);
 
   // パラメータの割り当てを作る．
@@ -129,8 +131,9 @@ ModuleGen::phase1_module_item(ElbModule* module,
 		  buf.str());
 	  continue;
 	}
-	ElbParameter* param = handle->parameter();
-	assert_cond(param, __FILE__, __LINE__);
+	ElbDecl* param = handle->decl();
+	assert_cond( param, __FILE__, __LINE__);
+	assert_cond( param->type() == kVpiParameter, __FILE__, __LINE__);
 
 	ElbExpr* expr = param_con->expr(i);
 	param->set_expr(expr);
@@ -164,10 +167,11 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	  const PtConnection* pt_con = param_con->pt_con(i);
 	  const char* tmp_name = paramport_list[i];
 	  ElbObjHandle* handle = find_obj(module, tmp_name);
-	  assert_cond(handle, __FILE__, __LINE__);
-	  ElbParameter* param = handle->parameter();
-	  assert_cond(param, __FILE__, __LINE__);
-	  assert_cond(param->type() == kVpiParameter, __FILE__, __LINE__);
+	  assert_cond( handle, __FILE__, __LINE__);
+
+	  ElbDecl* param = handle->decl();
+	  assert_cond( param, __FILE__, __LINE__);
+	  assert_cond( param->type() == kVpiParameter, __FILE__, __LINE__);
 
 	  ElbExpr* expr = param_con->expr(i);
 	  param->set_expr(expr);

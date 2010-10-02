@@ -19,7 +19,6 @@
 #include "ym_verilog/vl/VlModule.h"
 
 #include "ElbDecl.h"
-#include "ElbParameter.h"
 #include "ElbPrimitive.h"
 #include "ElbExpr.h"
 #include "ElbGenvar.h"
@@ -298,10 +297,12 @@ ExprGen::find_const_handle(const VlNamedObj* parent,
     return NULL;
   }
   // handle が持つオブジェクトは genvar か parameter でなければならない．
-  if ( handle->genvar() == NULL &&
-       handle->parameter() == NULL ) {
-    error_not_a_parameter(pt_expr);
-    return NULL;
+  if ( handle->genvar() == NULL ) {
+    ElbDecl* decl = handle->decl();
+    if ( decl == NULL || decl->type() == kVpiParameter ) {
+      error_not_a_parameter(pt_expr);
+      return NULL;
+    }
   }
 
   return handle;
@@ -413,13 +414,6 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
       }
 
       decl = factory().new_DeclElem(pt_expr, decl_array, index_list);
-    }
-    else {
-      // そのハンドルが parameter ならそのまま返す．
-      ElbParameter* param = handle->parameter();
-      if ( param ) {
-	decl = param;
-      }
     }
   }
   if ( decl == NULL ) {
@@ -648,8 +642,8 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 
   // それ以外の宣言要素の場合
   // しかしこの場合には parameter でなければならない．
-  ElbParameter* param = handle->parameter();
-  if ( !param ) {
+  ElbDecl* param = handle->decl();
+  if ( !param || param->type() != kVpiParameter ) {
     error_not_a_parameter(pt_expr);
     return ElbValue();
   }

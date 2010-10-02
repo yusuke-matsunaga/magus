@@ -332,18 +332,6 @@ public:
 		 int right,
 		 const BitVector& val);
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbParameter の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 初期値の設定
-  /// @param[in] expr 初期値
-  virtual
-  void
-  set_expr(ElbExpr* expr) = 0;
-
 };
 
 

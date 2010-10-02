@@ -14,7 +14,6 @@
 #include "ym_verilog/vl/VlNamedObj.h"
 
 #include "ElbDecl.h"
-#include "ElbParameter.h"
 #include "ElbModule.h"
 #include "ElbTaskFunc.h"
 #include "ElbPrimitive.h"
@@ -44,7 +43,7 @@ tVpiObjType
 ElbObjHandle::type()
 {
   return obj()->type();
-} 
+}
 
 // @brief ファイル位置の取得
 FileRegion
@@ -80,14 +79,6 @@ ElbObjHandle::decl()
 // @note このクラスでは NULL を返す．
 ElbDeclArray*
 ElbObjHandle::decl_array()
-{
-  return NULL;
-}
-
-// @brief ElbParameter を返す．
-// @note このクラスでは NULL を返す．
-ElbParameter*
-ElbObjHandle::parameter()
 {
   return NULL;
 }
@@ -155,7 +146,7 @@ ElbTaskFuncHandle::ElbTaskFuncHandle(ElbTaskFunc* obj) :
 ElbTaskFuncHandle::~ElbTaskFuncHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbTaskFuncHandle::obj()
@@ -185,14 +176,14 @@ ElbDeclHandle::ElbDeclHandle(ElbDecl* obj) :
 ElbDeclHandle::~ElbDeclHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbDeclHandle::obj()
 {
   return mObj;
 }
-  
+
 // @brief ElbDecl を返す．
 ElbDecl*
 ElbDeclHandle::decl()
@@ -215,47 +206,17 @@ ElbDeclArrayHandle::ElbDeclArrayHandle(ElbDeclArray* obj) :
 ElbDeclArrayHandle::~ElbDeclArrayHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbDeclArrayHandle::obj()
 {
   return mObj;
 }
-  
+
 // @brief ElbDeclArray を返す．
 ElbDeclArray*
 ElbDeclArrayHandle::decl_array()
-{
-  return mObj;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ElbParamHandle
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-ElbParamHandle::ElbParamHandle(ElbParameter* obj) :
-  mObj(obj)
-{
-}
-
-// @brief デストラクタ
-ElbParamHandle::~ElbParamHandle()
-{
-}
-  
-// @brief VlNamedObj を返す．
-const VlNamedObj*
-ElbParamHandle::obj()
-{
-  return mObj;
-}
-  
-// @brief ElbParameter を返す．
-ElbParameter*
-ElbParamHandle::parameter()
 {
   return mObj;
 }
@@ -275,14 +236,14 @@ ElbModuleArrayHandle::ElbModuleArrayHandle(ElbModuleArray* obj) :
 ElbModuleArrayHandle::~ElbModuleArrayHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbModuleArrayHandle::obj()
 {
   return mObj;
 }
-  
+
 // @brief 配列要素の VlNamedObj を返す．
 const VlNamedObj*
 ElbModuleArrayHandle::array_elem(int index)
@@ -312,7 +273,7 @@ ElbPrimArrayHandle::ElbPrimArrayHandle(ElbPrimArray* obj) :
 ElbPrimArrayHandle::~ElbPrimArrayHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbPrimArrayHandle::obj()
@@ -342,7 +303,7 @@ ElbPrimitiveHandle::ElbPrimitiveHandle(ElbPrimitive* obj) :
 ElbPrimitiveHandle::~ElbPrimitiveHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbPrimitiveHandle::obj()
@@ -372,7 +333,7 @@ ElbScopeHandle::ElbScopeHandle(const VlNamedObj* obj) :
 ElbScopeHandle::~ElbScopeHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbScopeHandle::obj()
@@ -395,7 +356,7 @@ ElbGfRootHandle::ElbGfRootHandle(ElbGfRoot* obj) :
 ElbGfRootHandle::~ElbGfRootHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbGfRootHandle::obj()
@@ -432,7 +393,7 @@ ElbGenvarHandle::ElbGenvarHandle(ElbGenvar* obj) :
 ElbGenvarHandle::~ElbGenvarHandle()
 {
 }
-  
+
 // @brief VlNamedObj を返す．
 const VlNamedObj*
 ElbGenvarHandle::obj()
@@ -465,7 +426,7 @@ ObjDict::~ObjDict()
 {
   delete [] mTable;
 }
-  
+
 // @brief 内容を空にする．
 void
 ObjDict::clear()
@@ -509,15 +470,6 @@ ObjDict::add(ElbDeclArray* obj)
 {
   void* p = mAlloc.get_memory(sizeof(ElbDeclArrayHandle));
   ElbDeclArrayHandle* handle = new (p) ElbDeclArrayHandle(obj);
-  add_handle(obj->parent(), obj->name(), handle);
-}
-
-// @brief 要素を追加する．
-void
-ObjDict::add(ElbParameter* obj)
-{
-  void* p = mAlloc.get_memory(sizeof(ElbParamHandle));
-  ElbParamHandle* handle = new (p) ElbParamHandle(obj);
   add_handle(obj->parent(), obj->name(), handle);
 }
 

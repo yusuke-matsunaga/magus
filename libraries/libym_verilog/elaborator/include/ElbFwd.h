@@ -38,7 +38,6 @@ class ElbDeclArray;
 
 // in ElbParameter.h
 class ElbParamHead;
-class ElbParameter;
 
 // in ElbParamAssign.h
 class ElbParamAssign;

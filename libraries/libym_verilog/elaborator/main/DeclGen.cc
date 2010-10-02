@@ -445,9 +445,9 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 	continue;
       }
 
-      ElbParameter* param = factory().new_Parameter(param_head,
-						    pt_item,
-						    is_local);
+      ElbDecl* param = factory().new_Parameter(param_head,
+					       pt_item,
+					       is_local);
       assert_cond(param, __FILE__, __LINE__);
       reg_decl(vpiParameter, param);
 

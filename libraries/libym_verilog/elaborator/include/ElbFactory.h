@@ -298,7 +298,7 @@ public:
   /// @param[in] init 初期値
   /// @param[in] is_local localparam の時 true
   virtual
-  ElbParameter*
+  ElbDecl*
   new_Parameter(ElbParamHead* head,
 		const PtNamedBase* pt_item,
 		bool is_local = false) = 0;
@@ -357,7 +357,7 @@ public:
   ElbParamAssign*
   new_ParamAssign(const VlModule* module,
 		  const PtBase* pt_obj,
-		  ElbParameter* param,
+		  ElbDecl* param,
 		  ElbExpr* rhs,
 		  bool named_con) = 0;
 
@@ -372,7 +372,7 @@ public:
   new_DefParam(const VlModule* module,
 	       const PtItem* pt_header,
 	       const PtDefParam* pt_defparam,
-	       ElbParameter* param,
+	       ElbDecl* param,
 	       ElbExpr* rhs) = 0;
 
   /// @brief ゲートプリミティブのヘッダを生成する．

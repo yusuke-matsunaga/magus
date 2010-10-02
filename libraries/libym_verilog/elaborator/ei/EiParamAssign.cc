@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief パラメータ割り当て文を生成する．
 // @param[in] module 親のモジュール
 // @param[in] param 対象の parameter
@@ -32,7 +32,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 ElbParamAssign*
 EiFactory::new_ParamAssign(const VlModule* module,
 			   const PtBase* pt_obj,
-			   ElbParameter* param,
+			   ElbDecl* param,
 			   ElbExpr* rhs,
 			   bool named_con)
 {
@@ -47,7 +47,7 @@ EiFactory::new_ParamAssign(const VlModule* module,
   }
   return pa;
 }
-  
+
 // @brief defparam 文を生成する．
 // @param[in] module 親のモジュール
 // @param[in] pt_header パース木の defparam ヘッダ
@@ -58,13 +58,13 @@ ElbDefParam*
 EiFactory::new_DefParam(const VlModule* module,
 			const PtItem* pt_header,
 			const PtDefParam* pt_defparam,
-			ElbParameter* param,
+			ElbDecl* param,
 			ElbExpr* rhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiDefParam));
   EiDefParam* defparam = new (p) EiDefParam(module, pt_header, pt_defparam,
 					    param, rhs);
-  
+
   return defparam;
 }
 
@@ -72,7 +72,7 @@ EiFactory::new_DefParam(const VlModule* module,
 //////////////////////////////////////////////////////////////////////
 // クラス EiParamAssign
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のモジュール
 // @param[in] pt_obj パース木中の対応する要素
@@ -80,7 +80,7 @@ EiFactory::new_DefParam(const VlModule* module,
 // @param[in] rhs 割り当て式の右辺
 EiParamAssign::EiParamAssign(const VlModule* parent,
 			     const PtBase* pt_obj,
-			     ElbParameter* param,
+			     ElbDecl* param,
 			     ElbExpr* rhs) :
   mModule(parent),
   mPtObj(pt_obj),
@@ -88,7 +88,7 @@ EiParamAssign::EiParamAssign(const VlModule* parent,
   mRhs(rhs)
 {
 }
-  
+
 // @brief デストラクタ
 EiParamAssign::~EiParamAssign()
 {
@@ -121,7 +121,7 @@ EiParamAssign::lhs() const
 {
   return mLhs;
 }
-  
+
 // @brief 右辺値を返す．
 const VlExpr*
 EiParamAssign::rhs() const
@@ -140,7 +140,7 @@ EiParamAssign::is_conn_by_name() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiParamAssign2
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のモジュール
 // @param[in] pt_obj パース木中の対応する要素
@@ -148,12 +148,12 @@ EiParamAssign::is_conn_by_name() const
 // @param[in] rhs 割り当て式の右辺
 EiParamAssign2::EiParamAssign2(const VlModule* parent,
 			       const PtBase* pt_obj,
-			       ElbParameter* param,
+			       ElbDecl* param,
 			       ElbExpr* rhs) :
   EiParamAssign(parent, pt_obj, param, rhs)
 {
 }
-  
+
 // @brief デストラクタ
 EiParamAssign2::~EiParamAssign2()
 {
@@ -170,7 +170,7 @@ EiParamAssign2::is_conn_by_name() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiDefParam
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のモジュール
 // @param[in] pt_header パース木の defparam ヘッダ
@@ -180,7 +180,7 @@ EiParamAssign2::is_conn_by_name() const
 EiDefParam::EiDefParam(const VlModule* parent,
 		       const PtItem* pt_header,
 		       const PtDefParam* pt_defparam,
-		       ElbParameter* param,
+		       ElbDecl* param,
 		       ElbExpr* rhs) :
   mModule(parent),
   mPtHead(pt_header),
@@ -215,14 +215,14 @@ EiDefParam::parent() const
 {
   return mModule;
 }
-  
+
 // @brief 左辺値を返す．
 const VlDecl*
 EiDefParam::lhs() const
 {
   return mLhs;
 }
-  
+
 // @brief 右辺値を返す．
 const VlExpr*
 EiDefParam::rhs() const

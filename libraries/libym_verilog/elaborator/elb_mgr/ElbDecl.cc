@@ -325,6 +325,14 @@ ElbDecl::set_init(ElbExpr* expr)
 {
 }
 
+// @brief parameter の初期値の設定
+// @param[in] expr 初期値
+// @note このクラスのデフォルト実装ではなにもしない．
+void
+ElbDecl::set_expr(ElbExpr* expr)
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス ElbDeclArray

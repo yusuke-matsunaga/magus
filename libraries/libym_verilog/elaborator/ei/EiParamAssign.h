@@ -33,7 +33,7 @@ protected:
   /// @param[in] rhs 割り当て式の右辺
   EiParamAssign(const VlModule* module,
 		const PtBase* pt_obj,
-		ElbParameter* param,
+		ElbDecl* param,
 		ElbExpr* rhs);
 
   /// @brief デストラクタ
@@ -96,7 +96,7 @@ private:
   const PtBase* mPtObj;
 
   // パラメータ
-  ElbParameter* mLhs;
+  ElbDecl* mLhs;
 
   // 右辺式
   ElbExpr* mRhs;
@@ -122,7 +122,7 @@ private:
   /// @param[in] rhs 割り当て式の右辺
   EiParamAssign2(const VlModule* module,
 		 const PtBase* pt_obj,
-		 ElbParameter* param,
+		 ElbDecl* param,
 		 ElbExpr* rhs);
 
   /// @brief デストラクタ
@@ -164,7 +164,7 @@ private:
   EiDefParam(const VlModule* module,
 	     const PtItem* pt_header,
 	     const PtDefParam* pt_defparam,
-	     ElbParameter* param,
+	     ElbDecl* param,
 	     ElbExpr* rhs);
 
   /// @brief デストラクタ
@@ -224,7 +224,7 @@ private:
   const PtDefParam* mPtDefParam;
 
   // パラメータ
-  ElbParameter* mLhs;
+  ElbDecl* mLhs;
 
   // 右辺式
   ElbExpr* mRhs;

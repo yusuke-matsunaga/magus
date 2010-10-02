@@ -65,7 +65,7 @@ EiFactory::new_ParamHead(const VlNamedObj* parent,
 // @param[in] pt_item パース木の宣言要素
 // @param[in] init 初期割り当て式
 // @param[in] is_local localparam の時 true
-ElbParameter*
+ElbDecl*
 EiFactory::new_Parameter(ElbParamHead* head,
 			 const PtNamedBase* pt_item,
 			 bool is_local)
