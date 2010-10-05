@@ -323,32 +323,10 @@ no_fanouts(MvNode* node)
 void
 MvMgr::sweep()
 {
-  vector<MvNode*> node_list;
   ymuint n = max_node_id();
-  node_list.reserve(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    MvNode* node = _node(i);
-    if ( node == NULL ) continue;
-    if ( node->type() != MvNode::kThrough ) continue;
-    node_list.push_back(node);
-  }
-  for (vector<MvNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    MvNode* node = *p;
-
-    const MvInputPin* ipin = node->input(0);
-    const MvOutputPin* src_pin = ipin->src_pin();
-    if ( src_pin == NULL ) continue;
-
-    MvNode* src_node = src_pin->node();
-    ymuint src_pos = src_pin->pos();
-    disconnect(src_node, src_pos, node, 0);
-    reconnect(node, 0, src_node, src_pos);
-    delete_node(node);
-  }
-
   // ビット/部分選択と接続している連結演算の削除を行う．
-  node_list.clear();
+  vector<MvNode*> node_list;
+  node_list.reserve(n);
   for (ymuint i = 0; i < n; ++ i) {
     MvNode* node = _node(i);
     if ( node == NULL ) continue;

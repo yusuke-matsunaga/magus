@@ -14,6 +14,9 @@
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvPin.h"
 
+#include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlRange.h"
+
 
 BEGIN_NAMESPACE_YM_MVN
 
@@ -190,6 +193,40 @@ dump(ostream& s,
       dump_node(s, node);
     }
 
+    s << endl;
+  }
+}
+
+// @brief ノード番号ともとのVerilog名の対応を出力する．
+void
+dump_node_map(ostream& s,
+	      const MvMgr& mgr,
+	      const vector<pair<const VlDecl*, ymuint> >& node_map)
+{
+  ymuint n = mgr.max_node_id();
+  for (ymuint i = 0; i < n; ++ i) {
+    const MvNode* node = mgr.node(i);
+    if ( node == NULL ) continue;
+    if ( node_map.size() <= node->id() ) continue;
+    const pair<const VlDecl*, ymuint>& p = node_map[node->id()];
+    const VlDecl* decl = p.first;
+    if ( decl == NULL ) continue;
+    s << "node" << node->id() << " : ";
+    ymuint offset = p.second;
+    s << decl->full_name();
+    if ( decl->is_array() ) {
+      ymuint d = decl->dimension();
+      vector<int> index_array(d);
+      for (ymuint i = 0; i < d; ++ i) {
+	const VlRange* range = decl->range(i);
+	ymuint n = range->size();
+	index_array[i] = offset % n;
+	offset /= n;
+      }
+      for (ymuint i = 0; i < d; ++ i) {
+	s << "[" << index_array[d - i - 1] << "]";
+      }
+    }
     s << endl;
   }
 }

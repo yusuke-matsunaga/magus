@@ -42,6 +42,8 @@ public:
 
   /// @brief verilog 形式のファイルを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] searchpath サーチパス
+  /// @param[in] watcher_list 行番号ウォッチャーのリスト
   /// @retval true 正常に読み込めた．
   /// @retval false 読込中にエラーが起こった．
   bool
@@ -51,12 +53,12 @@ public:
 
   /// @brief 今まで読み込んだ情報からネットワークを生成する．
   /// @param[in] mgr ネットワーク生成用のマネージャ
-  /// @param[in] searchpath サーチパス
-  /// @param[in] watcher_list 行番号ウォッチャーのリスト
+  /// @param[out] node_map MvNode のID番号をキーにして対応する宣言要素を保持する配列
   /// @retval true 正常に処理を行った．
   /// @retval false 生成中にエラーが起こった．
   bool
-  gen_network(MvMgr& mgr);
+  gen_network(MvMgr& mgr,
+	      vector<pair<const VlDecl*, ymuint> >& node_map);
 
   /// @brief メッセージハンドラを付加する．
   /// @param[in] msg_handler 登録するハンドラ
@@ -229,6 +231,33 @@ private:
 	    ymuint& msb,
 	    ymuint& lsb);
 
+  /// @brief 宣言要素に対応するノードを登録する．
+  /// @param[in] decl 宣言要素
+  /// @param[in] node 登録するノード
+  void
+  reg_node(const VlDecl* decl,
+	   MvNode* node);
+
+  /// @brief 入出力宣言要素に対応するノードを登録する．
+  /// @param[in] decl 宣言要素
+  /// @param[in] node 登録するノード
+  void
+  reg_ionode(const VlDecl* decl,
+	   MvNode* node);
+
+  /// @brief 宣言要素に対応するノードを登録する．
+  /// @param[in] decl 宣言要素(配列型)
+  /// @param[in] offset オフセット
+  /// @param[in] node 登録するノード
+  void
+  reg_node(const VlDecl* decl,
+	   ymuint offset,
+	   MvNode* node);
+
+  /// @brief mNodeMap を拡張する．
+  void
+  expand_nodemap(ymuint id);
+
   /// @brief ドライバーを登録する．
   /// @param[in] node 左辺に対応するノード
   /// @param[in] driver ドライバー
@@ -241,6 +270,12 @@ private:
   /// @note なければ空のリストを作る．
   vector<Driver>&
   driver_list(MvNode* node);
+
+  /// @brief 複数のドライバがある時にエラーメッセージを出力する．
+  void
+  error_drivers(MvNode* node,
+		const Driver& driver1,
+		const Driver& driver2);
 
 
 private:
@@ -296,6 +331,9 @@ private:
 
   // VlIODecl と MvNode の対応付けをとるハッシュ表
   DeclMap mIODeclMap;
+
+  // MvNode の ID番号をキーとして VlDecl の情報を保持する配列．
+  vector<pair<const VlDecl*, ymuint> > mNodeMap;
 
   // VlDecl のドライバーのリスト
   vector<vector<Driver> > mDriverList;

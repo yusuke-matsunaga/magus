@@ -51,9 +51,10 @@ MvVerilogReader::read(const string& filename,
 // @retval true 正常に処理を行った．
 // @retval false 生成中にエラーが起こった．
 bool
-MvVerilogReader::gen_network(MvMgr& mgr)
+MvVerilogReader::gen_network(MvMgr& mgr,
+			     vector<pair<const VlDecl*, ymuint> >& node_map)
 {
-  return mImpl->gen_network(mgr);
+  return mImpl->gen_network(mgr, node_map);
 }
 
 // @brief メッセージハンドラを付加する．

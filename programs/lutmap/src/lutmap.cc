@@ -95,7 +95,9 @@ main(int argc,
     }
   }
 
+#if 0
   try {
+#endif
     MvMgr mgr;
     MvVerilogReader reader;
     MsgHandler* mh = new StreamMsgHandler(&cerr);
@@ -125,7 +127,8 @@ main(int argc,
       }
     }
     // MvNetwork に変換
-    bool stat = reader.gen_network(mgr);
+    vector<pair<const VlDecl*, ymuint> > node_map;
+    bool stat = reader.gen_network(mgr, node_map);
     if ( !stat ) {
       cerr << "error occured" << endl;
       return -2;
@@ -175,11 +178,11 @@ main(int argc,
       }
       dump_verilog(ofs, lut_network);
     }
-
+#if 0
   }
   catch ( AssertError x) {
     cout << x << endl;
   }
-
+#endif
   return 0;
 }

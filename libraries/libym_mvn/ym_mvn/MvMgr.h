@@ -11,6 +11,7 @@
 
 #include "ym_mvn/mvn_nsdef.h"
 #include "ym_utils/ItvlMgr.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -631,6 +632,12 @@ dump(ostream& s,
 void
 dump_verilog(ostream& s,
 	     const MvMgr& mgr);
+
+/// @brief ノード番号ともとのVerilog名の対応を出力する．
+void
+dump_node_map(ostream& s,
+	      const MvMgr& mgr,
+	      const vector<pair<const VlDecl*, ymuint> >& node_map);
 
 END_NAMESPACE_YM_MVN
 

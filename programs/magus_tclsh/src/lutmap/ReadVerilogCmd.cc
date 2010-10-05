@@ -79,7 +79,8 @@ ReadVerilogCmd::cmd_proc(TclObjVector& objv)
 
     // MvNetwork に変換
     MvMgr mgr;
-    bool stat = reader.gen_network(mgr);
+    vector<pair<const VlDecl*, ymuint> > node_map;
+    bool stat = reader.gen_network(mgr, node_map);
     if ( !stat ) {
       TclObj emsg;
       emsg << "Error converting mvn network";

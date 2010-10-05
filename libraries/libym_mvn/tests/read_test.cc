@@ -56,7 +56,8 @@ main(int argc,
       }
     }
     cerr << "Generating MvNetwork" << endl;
-    bool stat = reader.gen_network(mgr);
+    vector<pair<const VlDecl*, ymuint> > node_map;
+    bool stat = reader.gen_network(mgr, node_map);
     cerr << " End" << endl;
     if ( !stat ) {
       cerr << "error occured" << endl;
@@ -65,6 +66,7 @@ main(int argc,
 
     //dump(cout, mgr);
     dump_verilog(cout, mgr);
+    dump_node_map(cout, mgr, node_map);
 #if 0
   }
   catch ( AssertError x) {

@@ -78,7 +78,8 @@ ReaderImpl::read(const string& filename,
 // @retval true 正常に処理を行った．
 // @retval false 生成中にエラーが起こった．
 bool
-ReaderImpl::gen_network(MvMgr& mgr)
+ReaderImpl::gen_network(MvMgr& mgr,
+			vector<pair<const VlDecl*, ymuint> >& node_map)
 {
   mVlMgr.elaborate();
 
@@ -86,6 +87,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
 
   mDeclMap.clear();
   mIODeclMap.clear();
+  mNodeMap.clear();
   mDriverList.clear();
 
   MvModule* module0 = NULL;
@@ -124,22 +126,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
       if ( driver.is_simple() ) {
 	for (ymuint i = 0; i < bw; ++ i) {
 	  if ( tmp[i].rhs_node() != NULL ) {
-	    // TODO: エラーメッセージをちゃんとする．
-	    cerr << "more than one drivers for "
-		 << node->id()
-		 << "@" << i
-		 << endl;
-	    cerr << "previous driver: "
-		 << tmp[i].rhs_node()->id();
-	    if ( tmp[i].has_bitselect() ) {
-	      cerr << "[" << tmp[i].index() << "]";
-	    }
-	    else if ( tmp[i].has_partselect() ) {
-	      cerr << "[" << tmp[i].msb() << ":" << tmp[i].lsb()
-		   << "]";
-	    }
-	    cerr << endl;
-	    abort();
+	    error_drivers(node, tmp[i], driver);
 	  }
 	  tmp[i] = driver;
 	}
@@ -147,22 +134,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
       else if ( driver.has_bitselect() ) {
 	ymuint index = driver.index();
 	if ( tmp[index].rhs_node() != NULL ) {
-	  // TODO: エラーメッセージをちゃんとする．
-	  cerr << "more than one drivers for "
-	       << node->id()
-	       << "@" << index
-	       << endl;
-	  cerr << "previous driver: "
-	       << tmp[index].rhs_node()->id();
-	  if ( tmp[index].has_bitselect() ) {
-	    cerr << "[" << tmp[index].index() << "]";
-	  }
-	  else if ( tmp[index].has_partselect() ) {
-	    cout << "[" << tmp[index].msb() << ":" << tmp[index].lsb()
-		 << "]";
-	  }
-	  cerr << endl;
-	  abort();
+	  error_drivers(node, tmp[index], driver);
 	}
 	tmp[index] = driver;
       }
@@ -171,22 +143,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	ymuint lsb = driver.lsb();
 	for (ymuint i = lsb; i <= msb; ++ i) {
 	  if ( tmp[i].rhs_node() != NULL ) {
-	    // TODO: エラーメッセージをちゃんとする．
-	    cerr << "more than one drivers for "
-		 << node->id()
-		 << "@" << i
-		 << endl;
-	    cerr << "previous driver: "
-		 << tmp[i].rhs_node()->id();
-	    if ( tmp[i].has_bitselect() ) {
-	      cerr << "[" << tmp[i].index() << "]";
-	    }
-	    else if ( tmp[i].has_partselect() ) {
-	      cerr << "[" << tmp[i].msb() << ":" << tmp[i].lsb()
-		   << "]";
-	    }
-	    cerr << endl;
-	    abort();
+	    error_drivers(node, tmp[i], driver);
 	  }
 	  tmp[i] = driver;
 	}
@@ -251,8 +208,38 @@ ReaderImpl::gen_network(MvMgr& mgr)
     }
   }
 
+  // 冗長な through ノードを取り除く
+  {
+    vector<MvNode*> node_list;
+    node_list.reserve(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      MvNode* node = mMvMgr->_node(i);
+      if ( node == NULL ) continue;
+      if ( node->type() != MvNode::kThrough ) continue;
+      node_list.push_back(node);
+    }
+    for (vector<MvNode*>::iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      MvNode* node = *p;
+
+      const MvInputPin* ipin = node->input(0);
+      const MvOutputPin* src_pin = ipin->src_pin();
+      if ( src_pin == NULL ) continue;
+
+      MvNode* src_node = src_pin->node();
+      ymuint src_pos = src_pin->pos();
+      mMvMgr->disconnect(src_node, src_pos, node, 0);
+      mMvMgr->reconnect(node, 0, src_node, src_pos);
+      expand_nodemap(src_node->id());
+      mNodeMap[src_node->id()] = mNodeMap[node->id()];
+      mMvMgr->delete_node(node);
+    }
+  }
+
   // 冗長な through ノードを削除する．
   mMvMgr->sweep();
+
+  node_map = mNodeMap;
 
   return true;
 }
@@ -359,19 +346,19 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     switch ( io->direction() ) {
     case kVpiInput:
       mMvMgr->connect(module->input(i1), 0, node, 0);
-      mIODeclMap.add(decl, module->input(i1));
+      reg_ionode(decl, module->input(i1));
       ++ i1;
       break;
 
     case kVpiOutput:
       mMvMgr->connect(node, 0, module->output(i2), 0);
-      mIODeclMap.add(decl, module->output(i2));
+      reg_ionode(decl, module->output(i2));
       ++ i2;
       break;
 
     case kVpiInout:
       mMvMgr->connect(module->inout(i3), 0, node, 0);
-      mIODeclMap.add(decl, module->input(i3));
+      reg_ionode(decl, module->inout(i3));
       ++ i3;
       break;
 
@@ -458,7 +445,7 @@ ReaderImpl::gen_decl(MvModule* module,
 	// 仮の through ノードに対応させる．
 	ymuint bw = vl_decl->bit_size();
 	MvNode* node = mMvMgr->new_through(module, bw);
-	mDeclMap.add(vl_decl, node);
+	reg_node(vl_decl, node);
       }
     }
   }
@@ -479,7 +466,7 @@ ReaderImpl::gen_decl(MvModule* module,
 	  // 仮の through ノードに対応させる．
 	  ymuint bw = vl_decl->bit_size();
 	  MvNode* node = mMvMgr->new_through(module, bw);
-	  mDeclMap.add(vl_decl, i, node);
+	  reg_node(vl_decl, i, node);
 	}
       }
     }
@@ -978,6 +965,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
 
   case kVpiCombPrim:
     {
+      assert_not_reached(__FILE__, __LINE__);
       const VlUdpDefn* udp = prim->udp_defn();
       ymuint ni = udp->port_num() - 1;
       MvNode* node = mMvMgr->new_combudp(parent_module, ni);
@@ -990,6 +978,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
 
   case kVpiSeqPrim:
     {
+      assert_not_reached(__FILE__, __LINE__);
       const VlUdpDefn* udp = prim->udp_defn();
       ymuint ni = udp->port_num() - 1;
       MvNode* node = mMvMgr->new_sequdp(parent_module, ni);
@@ -1727,6 +1716,53 @@ ReaderImpl::gen_expr4(const VlExpr* expr,
   }
 }
 
+// @brief 宣言要素に対応するノードを登録する．
+// @param[in] decl 宣言要素
+// @param[in] node 登録するノード
+void
+ReaderImpl::reg_node(const VlDecl* decl,
+		     MvNode* node)
+{
+  mDeclMap.add(decl, node);
+  expand_nodemap(node->id());
+  mNodeMap[node->id()] = make_pair(decl, 0);
+}
+
+// @brief 入出力宣言要素に対応するノードを登録する．
+// @param[in] decl 宣言要素
+// @param[in] node 登録するノード
+void
+ReaderImpl::reg_ionode(const VlDecl* decl,
+		       MvNode* node)
+{
+  mIODeclMap.add(decl, node);
+  expand_nodemap(node->id());
+  mNodeMap[node->id()] = make_pair(decl, 0);
+}
+
+// @brief 宣言要素に対応するノードを登録する．
+// @param[in] decl 宣言要素(配列型)
+// @param[in] offset オフセット
+// @param[in] node 登録するノード
+void
+ReaderImpl::reg_node(const VlDecl* decl,
+		     ymuint offset,
+		     MvNode* node)
+{
+  mDeclMap.add(decl, offset, node);
+  expand_nodemap(node->id());
+  mNodeMap[node->id()] = make_pair(decl, offset);
+}
+
+// @brief mNodeMap を拡張する．
+void
+ReaderImpl::expand_nodemap(ymuint id)
+{
+  while ( mNodeMap.size() <= id ) {
+    mNodeMap.push_back(make_pair(static_cast<const VlDecl*>(NULL), 0));
+  }
+}
+
 // @brief ドライバーを登録する．
 // @param[in] node 左辺に対応するノード
 // @param[in] driver ドライバー
@@ -1760,6 +1796,38 @@ ReaderImpl::driver_list(MvNode* node)
     mDriverList.push_back(vector<Driver>());
   }
   return mDriverList[id];
+}
+
+// @brief 複数のドライバがある時にエラーメッセージを出力する．
+void
+ReaderImpl::error_drivers(MvNode* node,
+			  const Driver& driver1,
+			  const Driver& driver2)
+{
+  cerr << "more than one drivers for "
+       << node->id()
+       << endl;
+  cerr << "previous driver: "
+       << driver1.rhs_node()->id();
+  if ( driver1.has_bitselect() ) {
+    cerr << "[" << driver1.index() << "]";
+  }
+  else if ( driver1.has_partselect() ) {
+    cerr << "[" << driver1.msb() << ":" << driver1.lsb()
+	 << "]";
+  }
+  cerr << endl;
+  cerr << "current driver: "
+       << driver2.rhs_node()->id();
+  if ( driver2.has_bitselect() ) {
+    cerr << "[" << driver2.index() << "]";
+  }
+  else if ( driver2.has_partselect() ) {
+    cerr << "[" << driver2.msb() << ":" << driver2.lsb()
+	 << "]";
+  }
+  cerr << endl;
+  abort();
 }
 
 END_NAMESPACE_YM_MVN_VERILOG

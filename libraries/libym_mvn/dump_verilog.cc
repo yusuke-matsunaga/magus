@@ -95,7 +95,7 @@ dump_node(ostream& s,
       assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
       const MvNode* src_node1 = src_pin1->node();
 
-      s << "  always ( posedge " << node_name(src_node1);
+      s << "  always @ ( posedge " << node_name(src_node1);
       const MvOutputPin* src_pin2 = ipin2->src_pin();
       const MvNode* src_node2 = NULL;
       if ( src_pin2 ) {
@@ -127,7 +127,7 @@ dump_node(ostream& s,
       assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
       const MvNode* src_node1 = src_pin1->node();
 
-      s << "  always ( posedge " << node_name(src_node1) << " )" << endl;
+      s << "  always @ ( posedge " << node_name(src_node1) << " )" << endl;
       const MvOutputPin* src_pin2 = ipin2->src_pin();
       const MvNode* src_node2 = NULL;
       if ( src_pin2 ) {
