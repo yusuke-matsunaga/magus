@@ -12,7 +12,6 @@
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNet.h"
 #include "ym_mvn/MvPin.h"
 
 
@@ -76,8 +75,7 @@ dump_node(ostream& s,
   case MvNode::kOutput:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
       s << "  assign " << node_name(node)
 	<< " = " << node_name(src_node)
@@ -88,28 +86,24 @@ dump_node(ostream& s,
   case MvNode::kDff1:
     { // ピン位置と属性は決め打ち
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
       const MvInputPin* ipin2 = node->input(2);
-      const MvNet* net2 = ipin2->net();
-      assert_cond( net0 != NULL, __FILE__, __LINE__);
-      assert_cond( net1 != NULL, __FILE__, __LINE__);
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
+      assert_cond( src_pin0 != NULL, __FILE__, __LINE__);
       const MvNode* src_node0 = src_pin0->node();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
+      assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
       const MvNode* src_node1 = src_pin1->node();
-      const MvOutputPin* src_pin2 = NULL;
-      const MvNode* src_node2 = NULL;
 
       s << "  always ( posedge " << node_name(src_node1);
-      if ( net2 ) {
-	src_pin2 = net2->src_pin();
+      const MvOutputPin* src_pin2 = ipin2->src_pin();
+      const MvNode* src_node2 = NULL;
+      if ( src_pin2 ) {
 	src_node2 = src_pin2->node();
 	s << " or posedge " << node_name(src_node2);
       }
       s << " )" << endl;
-      if ( net2 ) {
+      if ( src_pin2 ) {
 	s << "    if ( " << node_name(src_node2) << " )" << endl
 	  << "      " << node_name(node) << " <= 0;" << endl
 	  << "    else" << endl
@@ -124,23 +118,19 @@ dump_node(ostream& s,
   case MvNode::kDff2:
     { // ピン位置と属性は決め打ち
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
       const MvInputPin* ipin2 = node->input(2);
-      const MvNet* net2 = ipin2->net();
-      assert_cond( net0 != NULL, __FILE__, __LINE__);
-      assert_cond( net1 != NULL, __FILE__, __LINE__);
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
+      assert_cond( src_pin0 != NULL, __FILE__, __LINE__);
       const MvNode* src_node0 = src_pin0->node();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
+      assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
       const MvNode* src_node1 = src_pin1->node();
-      const MvOutputPin* src_pin2 = NULL;
-      const MvNode* src_node2 = NULL;
 
       s << "  always ( posedge " << node_name(src_node1) << " )" << endl;
-      if ( net2 ) {
-	src_pin2 = net2->src_pin();
+      const MvOutputPin* src_pin2 = ipin2->src_pin();
+      const MvNode* src_node2 = NULL;
+      if ( src_pin2 ) {
 	src_node2 = src_pin2->node();
 	s << "    if ( " << node_name(src_node2) << " )" << endl
 	  << "      " << node_name(node) << " <= 0;" << endl
@@ -156,9 +146,8 @@ dump_node(ostream& s,
   case MvNode::kThrough:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      if ( net ) {
-	const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
+      if ( src_pin ) {
 	const MvNode* src_node = src_pin->node();
 	s << "  assign " << node_name(node)
 	  << " = " << node_name(src_node)
@@ -170,8 +159,7 @@ dump_node(ostream& s,
   case MvNode::kNot:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
       s << "  assign " << node_name(node)
 	<< " = ~" << node_name(src_node)
@@ -182,13 +170,11 @@ dump_node(ostream& s,
   case MvNode::kAnd:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -201,13 +187,11 @@ dump_node(ostream& s,
   case MvNode::kOr:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -220,13 +204,11 @@ dump_node(ostream& s,
   case MvNode::kXor:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -239,8 +221,7 @@ dump_node(ostream& s,
   case MvNode::kRand:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
       s << "  assign " << node_name(node)
 	<< " = &" << node_name(src_node)
@@ -251,8 +232,7 @@ dump_node(ostream& s,
   case MvNode::kRor:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
       s << "  assign " << node_name(node)
 	<< " = |" << node_name(src_node)
@@ -263,8 +243,7 @@ dump_node(ostream& s,
   case MvNode::kRxor:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
       s << "  assign " << node_name(node)
 	<< " = ^" << node_name(src_node)
@@ -275,13 +254,11 @@ dump_node(ostream& s,
   case MvNode::kEq:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -294,13 +271,11 @@ dump_node(ostream& s,
   case MvNode::kLt:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -325,13 +300,11 @@ dump_node(ostream& s,
   case MvNode::kAdd:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -344,13 +317,11 @@ dump_node(ostream& s,
   case MvNode::kSub:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -363,13 +334,11 @@ dump_node(ostream& s,
   case MvNode::kMult:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -382,13 +351,11 @@ dump_node(ostream& s,
   case MvNode::kDiv:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -401,13 +368,11 @@ dump_node(ostream& s,
   case MvNode::kMod:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -420,13 +385,11 @@ dump_node(ostream& s,
   case MvNode::kPow:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -439,18 +402,15 @@ dump_node(ostream& s,
   case MvNode::kIte:
     {
       const MvInputPin* ipin0 = node->input(0);
-      const MvNet* net0 = ipin0->net();
-      const MvOutputPin* src_pin0 = net0->src_pin();
+      const MvOutputPin* src_pin0 = ipin0->src_pin();
       const MvNode* src_node0 = src_pin0->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       const MvInputPin* ipin2 = node->input(2);
-      const MvNet* net2 = ipin2->net();
-      const MvOutputPin* src_pin2 = net2->src_pin();
+      const MvOutputPin* src_pin2 = ipin2->src_pin();
       const MvNode* src_node2 = src_pin2->node();
 
       s << "  assign " << node_name(node)
@@ -469,8 +429,7 @@ dump_node(ostream& s,
       ymuint ni = node->input_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	const MvInputPin* ipin = node->input(i);
-	const MvNet* net = ipin->net();
-	const MvOutputPin* opin = net->src_pin();
+	const MvOutputPin* opin = ipin->src_pin();
 	const MvNode* src_node = opin->node();
 	s << comma << node_name(src_node);
 	comma = ", ";
@@ -482,8 +441,7 @@ dump_node(ostream& s,
   case MvNode::kConstBitSelect:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
       s << "  assign " << node_name(node)
 	<< " = " << node_name(src_node)
@@ -494,8 +452,7 @@ dump_node(ostream& s,
   case MvNode::kConstPartSelect:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
       s << "  assign " << node_name(node)
 	<< " = " << node_name(src_node)
@@ -508,13 +465,11 @@ dump_node(ostream& s,
   case MvNode::kBitSelect:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  assign " << node_name(node)
@@ -526,18 +481,15 @@ dump_node(ostream& s,
   case MvNode::kPartSelect:
     {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      const MvOutputPin* src_pin = net->src_pin();
+      const MvOutputPin* src_pin = ipin->src_pin();
       const MvNode* src_node = src_pin->node();
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      const MvOutputPin* src_pin1 = net1->src_pin();
+      const MvOutputPin* src_pin1 = ipin1->src_pin();
       const MvNode* src_node1 = src_pin1->node();
 
       const MvInputPin* ipin2 = node->input(2);
-      const MvNet* net2 = ipin2->net();
-      const MvOutputPin* src_pin2 = net2->src_pin();
+      const MvOutputPin* src_pin2 = ipin2->src_pin();
       const MvNode* src_node2 = src_pin2->node();
 
       s << "  assign " << node_name(node)
@@ -557,8 +509,7 @@ dump_node(ostream& s,
       ymuint ni = node->input_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	const MvInputPin* ipin = node->input(i);
-	const MvNet* net = ipin->net();
-	const MvOutputPin* src_pin = net->src_pin();
+	const MvOutputPin* src_pin = ipin->src_pin();
 	const MvNode* src_node = src_pin->node();
 	s << ", " << node_name(src_node);
       }
@@ -666,8 +617,7 @@ dump_module(ostream& s,
   for (ymuint i = 0; i < no; ++ i) {
     const MvNode* node = module->output(i);
     const MvInputPin* ipin = node->input(0);
-    const MvNet* net = ipin->net();
-    const MvOutputPin* src_pin = net->src_pin();
+    const MvOutputPin* src_pin = ipin->src_pin();
     const MvNode* src_node = src_pin->node();
     s << "  assign " << node_name(node)
       << " = " << node_name(src_node)

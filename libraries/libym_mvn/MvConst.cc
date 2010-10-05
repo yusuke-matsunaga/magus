@@ -23,7 +23,7 @@ MvConst::MvConst(MvModule* module,
   MvNode(module, 0, 1),
   mVal(val)
 {
-  set_bit_width(_output(0), bit_width);
+  set_opin_bit_width(0, bit_width);
 }
 
 // @brief デストラクタ

@@ -12,7 +12,6 @@
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNet.h"
 #include "ym_mvn/MvPin.h"
 
 
@@ -27,9 +26,8 @@ dump_inputpin(ostream& s,
 {
   s << "  InputPin#" << pin->pos()
     << "(" << pin->bit_width() << ")" << endl;
-  MvNet* net = pin->net();
-  if ( net ) {
-    const MvOutputPin* opin = net->src_pin();
+  const MvOutputPin* opin = pin->src_pin();
+  if ( opin ) {
     s << "    <== OutputPin#" << opin->pos()
       << "@node#" << opin->node()->id() << endl;
   }
@@ -42,12 +40,10 @@ dump_outputpin(ostream& s,
 {
   s << "  OutputPin#" << pin->pos()
     << "(" << pin->bit_width() << ")" << endl;
-  const MvNetList& fo_list = pin->net_list();
-  for (MvNetList::const_iterator p = fo_list.begin();
+  const MvInputPinList& fo_list = pin->dst_pin_list();
+  for (MvInputPinList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    const MvNet* net = *p;
-    assert_cond( net->src_pin() == pin, __FILE__, __LINE__);
-    const MvInputPin* ipin = net->dst_pin();
+    const MvInputPin* ipin = *p;
     s << "    ==> InputPin#" << ipin->pos()
       << "@node#" << ipin->node()->id() << endl;
   }

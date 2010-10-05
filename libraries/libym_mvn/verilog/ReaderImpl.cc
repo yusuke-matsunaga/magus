@@ -14,7 +14,6 @@
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNet.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
@@ -115,29 +114,28 @@ ReaderImpl::gen_network(MvMgr& mgr)
   for (ymuint i = 0; i < n; ++ i) {
     MvNode* node = mMvMgr->_node(i);
     if ( node == NULL ) continue;
-    if ( mDriverList.size() <= i ) break;
-    const vector<Driver>& dlist = mDriverList[node->id()];
+    const vector<Driver>& dlist = driver_list(node);
     if ( dlist.empty() ) continue;
     ymuint bw = node->input(0)->bit_width();
-    vector<const Driver*> tmp(bw, NULL);
+    vector<Driver> tmp(bw);
     for (vector<Driver>::const_iterator p = dlist.begin();
 	 p != dlist.end(); ++ p) {
-      const Driver* driver = &*p;
-      if ( driver->is_simple() ) {
+      const Driver& driver = *p;
+      if ( driver.is_simple() ) {
 	for (ymuint i = 0; i < bw; ++ i) {
-	  if ( tmp[i] != NULL ) {
+	  if ( tmp[i].rhs_node() != NULL ) {
 	    // TODO: エラーメッセージをちゃんとする．
 	    cerr << "more than one drivers for "
 		 << node->id()
 		 << "@" << i
 		 << endl;
 	    cerr << "previous driver: "
-		 << tmp[i]->rhs_node()->id();
-	    if ( tmp[i]->has_bitselect() ) {
-	      cerr << "[" << tmp[i]->index() << "]";
+		 << tmp[i].rhs_node()->id();
+	    if ( tmp[i].has_bitselect() ) {
+	      cerr << "[" << tmp[i].index() << "]";
 	    }
-	    else if ( tmp[i]->has_partselect() ) {
-	      cerr << "[" << tmp[i]->msb() << ":" << tmp[i]->lsb()
+	    else if ( tmp[i].has_partselect() ) {
+	      cerr << "[" << tmp[i].msb() << ":" << tmp[i].lsb()
 		   << "]";
 	    }
 	    cerr << endl;
@@ -146,21 +144,21 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	  tmp[i] = driver;
 	}
       }
-      else if ( driver->has_bitselect() ) {
-	ymuint index = driver->index();
-	if ( tmp[index] != NULL ) {
+      else if ( driver.has_bitselect() ) {
+	ymuint index = driver.index();
+	if ( tmp[index].rhs_node() != NULL ) {
 	  // TODO: エラーメッセージをちゃんとする．
 	  cerr << "more than one drivers for "
 	       << node->id()
 	       << "@" << index
 	       << endl;
 	  cerr << "previous driver: "
-	       << tmp[index]->rhs_node()->id();
-	  if ( tmp[index]->has_bitselect() ) {
-	    cerr << "[" << tmp[index]->index() << "]";
+	       << tmp[index].rhs_node()->id();
+	  if ( tmp[index].has_bitselect() ) {
+	    cerr << "[" << tmp[index].index() << "]";
 	  }
-	  else if ( tmp[index]->has_partselect() ) {
-	    cout << "[" << tmp[index]->msb() << ":" << tmp[index]->lsb()
+	  else if ( tmp[index].has_partselect() ) {
+	    cout << "[" << tmp[index].msb() << ":" << tmp[index].lsb()
 		 << "]";
 	  }
 	  cerr << endl;
@@ -169,22 +167,22 @@ ReaderImpl::gen_network(MvMgr& mgr)
 	tmp[index] = driver;
       }
       else {
-	ymuint msb = driver->msb();
-	ymuint lsb = driver->lsb();
+	ymuint msb = driver.msb();
+	ymuint lsb = driver.lsb();
 	for (ymuint i = lsb; i <= msb; ++ i) {
-	  if ( tmp[i] != NULL ) {
+	  if ( tmp[i].rhs_node() != NULL ) {
 	    // TODO: エラーメッセージをちゃんとする．
 	    cerr << "more than one drivers for "
 		 << node->id()
 		 << "@" << i
 		 << endl;
 	    cerr << "previous driver: "
-		 << tmp[i]->rhs_node()->id();
-	    if ( tmp[i]->has_bitselect() ) {
-	      cerr << "[" << tmp[i]->index() << "]";
+		 << tmp[i].rhs_node()->id();
+	    if ( tmp[i].has_bitselect() ) {
+	      cerr << "[" << tmp[i].index() << "]";
 	    }
-	    else if ( tmp[i]->has_partselect() ) {
-	      cerr << "[" << tmp[i]->msb() << ":" << tmp[i]->lsb()
+	    else if ( tmp[i].has_partselect() ) {
+	      cerr << "[" << tmp[i].msb() << ":" << tmp[i].lsb()
 		   << "]";
 	    }
 	    cerr << endl;
@@ -196,60 +194,16 @@ ReaderImpl::gen_network(MvMgr& mgr)
     }
 
     // 明示的なドライバがない場合の処理
-    bool again = false;
     for (ymuint i = 0; i < bw; ++ i) {
-      if ( tmp[i] == NULL ) {
-	again = true;
+      if ( tmp[i].rhs_node() == NULL ) {
 #warning "TODO: warning メッセージを出すようにする．"
 	vector<ymuint32> val(1, 0);
 	MvNode* ud_node = mMvMgr->new_const(module0, 1, val);
 	if ( bw == 1 ) {
-	  reg_driver(node, Driver(ud_node));
+	  tmp[i] = Driver(ud_node);
 	}
 	else {
-	  reg_driver(node, Driver(ud_node, i));
-	}
-      }
-    }
-    if ( again ) {
-      tmp.clear();
-      tmp.resize(bw, NULL);
-      for (vector<Driver>::const_iterator p = dlist.begin();
-	   p != dlist.end(); ++ p) {
-	const Driver* driver = &*p;
-	if ( driver->is_simple() ) {
-	  for (ymuint i = 0; i < bw; ++ i) {
-	    if ( tmp[i] != NULL ) {
-	      // TODO: エラーメッセージをちゃんとする．
-	      cerr << "tmp[" << i << "] != NULL" << endl;
-	      cerr << "more than one drivers" << endl;
-	      abort();
-	    }
-	    tmp[i] = driver;
-	  }
-	}
-	else if ( driver->has_bitselect() ) {
-	  ymuint index = driver->index();
-	  if ( tmp[index] != NULL ) {
-	    // TODO: エラーメッセージをちゃんとする．
-	    cerr << "tmp[" << index << "] != NULL" << endl;
-	    cerr << "more than one drivers" << endl;
-	    abort();
-	  }
-	  tmp[index] = driver;
-	}
-	else {
-	  ymuint msb = driver->msb();
-	  ymuint lsb = driver->lsb();
-	  for (ymuint i = lsb; i <= msb; ++ i) {
-	    if ( tmp[i] != NULL ) {
-	      // TODO: エラーメッセージをちゃんとする．
-	      cerr << "tmp[" << i << "] != NULL" << endl;
-	      cerr << "more than one drivers" << endl;
-	      abort();
-	    }
-	    tmp[i] = driver;
-	  }
+	  tmp[i] = Driver(ud_node, i);
 	}
       }
     }
@@ -259,7 +213,7 @@ ReaderImpl::gen_network(MvMgr& mgr)
     tmp2.reserve(bw);
     for (ymuint i = 0; i < bw; ++ i) {
       ymuint idx = bw - i - 1;
-      const Driver& driver = *tmp[idx];
+      const Driver& driver = tmp[idx];
       if ( driver != prev ) {
 	tmp2.push_back(driver);
 	prev = driver;
@@ -895,7 +849,6 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
     mMvMgr->connect(node, 0, node2, 0);
     mMvMgr->connect(node2, 0, node1, 0);
     assert_cond( node, __FILE__, __LINE__);
-    MvNet* net = node2->input(0)->net();
   }
   else if ( expr->is_bitselect() ) {
     ymuint index;
@@ -1792,11 +1745,21 @@ ReaderImpl::reg_driver(MvNode* node,
     }
     cerr << ")" << endl;
   }
+  driver_list(node).push_back(driver);
+}
+
+// @brief ドライバーリストを取り出す．
+// @param[in] node 対応するノード
+// @note なければ空のリストを作る．
+vector<Driver>&
+ReaderImpl::driver_list(MvNode* node)
+{
+  assert_cond( node != NULL, __FILE__, __LINE__);
   ymuint id = node->id();
   while ( mDriverList.size() <= id ) {
     mDriverList.push_back(vector<Driver>());
   }
-  mDriverList[id].push_back(driver);
+  return mDriverList[id];
 }
 
 END_NAMESPACE_YM_MVN_VERILOG

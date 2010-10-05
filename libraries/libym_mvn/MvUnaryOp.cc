@@ -21,8 +21,8 @@ MvUnaryOp::MvUnaryOp(MvModule* module,
 		     ymuint bit_width2) :
   MvNode(module, 1, 1)
 {
-  set_bit_width(_input(0), bit_width1);
-  set_bit_width(_output(0), bit_width2);
+  set_ipin_bit_width(0, bit_width1);
+  set_opin_bit_width(0, bit_width2);
 }
 
 // @brief デストラクタ

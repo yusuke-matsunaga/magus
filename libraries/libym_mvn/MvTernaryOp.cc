@@ -29,10 +29,10 @@ MvTernaryOp::MvTernaryOp(MvModule* module,
 			 ymuint bit_width4) :
   MvNode(module, 3, 1)
 {
-  set_bit_width(_input(0), bit_width1);
-  set_bit_width(_input(1), bit_width2);
-  set_bit_width(_input(2), bit_width3);
-  set_bit_width(_output(0), bit_width4);
+  set_ipin_bit_width(0, bit_width1);
+  set_ipin_bit_width(1, bit_width2);
+  set_ipin_bit_width(2, bit_width3);
+  set_opin_bit_width(0, bit_width4);
 }
 
 // @brief デストラクタ

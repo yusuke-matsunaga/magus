@@ -13,7 +13,6 @@
 #include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvPin.h"
-#include "ym_mvn/MvNet.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -287,11 +286,11 @@ enqueue(const MvNode* node0,
 	list<const MvNode*>& queue,
 	vector<bool>& mark)
 {
-  const MvNetList& folist = node0->output(0)->net_list();
-  for (MvNetList::const_iterator p = folist.begin();
+  const MvInputPinList& folist = node0->output(0)->dst_pin_list();
+  for (MvInputPinList::const_iterator p = folist.begin();
        p != folist.end(); ++ p) {
-    const MvNet* net = *p;
-    const MvNode* node = net->dst_pin()->node();
+    const MvInputPin* dst_pin = *p;
+    const MvNode* node = dst_pin->node();
     if ( node->type() == MvNode::kDff1 ||
 	 node->type() == MvNode::kDff2 ||
 	 node->type() == MvNode::kConst ) {
@@ -305,13 +304,12 @@ enqueue(const MvNode* node0,
     const MvNode* unmark = NULL;
     for (ymuint i = 0; i < ni; ++ i) {
       const MvInputPin* ipin = node->input(i);
-      const MvNet* net = ipin->net();
-      if ( net == NULL ) {
+      const MvOutputPin* opin = ipin->src_pin();
+      if ( opin == NULL ) {
 	cerr << "node" << node->id() << "->input(" << i
-	     << ") has no net" << endl;
+	     << ") has no source" << endl;
+	abort();
       }
-      assert_cond( net != NULL, __FILE__, __LINE__);
-      const MvOutputPin* opin = net->src_pin();
       const MvNode* inode = opin->node();
       if ( !mark[inode->id()] ) {
 	marked = false;
@@ -432,8 +430,7 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kThrough:
       {
 	const MvInputPin* ipin = node->input(0);
-	const MvNet* net = ipin->net();
-	const MvOutputPin* opin = net->src_pin();
+	const MvOutputPin* opin = ipin->src_pin();
 	const MvNode* src_node = opin->node();
 	ymuint bw = opin->bit_width();
 	for (ymuint i = 0; i < bw; ++ i) {
@@ -449,8 +446,7 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kNot:
       {
 	const MvInputPin* ipin = node->input(0);
-	const MvNet* net = ipin->net();
-	const MvOutputPin* opin = net->src_pin();
+	const MvOutputPin* opin = ipin->src_pin();
 	const MvNode* src_node = opin->node();
 	ymuint bw = opin->bit_width();
 	assert_cond( node->output(0)->bit_width(), __FILE__, __LINE__);
@@ -467,13 +463,11 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kAnd:
       {
 	const MvInputPin* ipin0 = node->input(0);
-	const MvNet* net0 = ipin0->net();
-	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvOutputPin* src_pin0 = ipin0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
 
 	const MvInputPin* ipin1 = node->input(1);
-	const MvNet* net1 = ipin1->net();
-	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvOutputPin* src_pin1 = ipin1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
 
 	ymuint bw = node->output(0)->bit_width();
@@ -498,13 +492,11 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kOr:
       {
 	const MvInputPin* ipin0 = node->input(0);
-	const MvNet* net0 = ipin0->net();
-	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvOutputPin* src_pin0 = ipin0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
 
 	const MvInputPin* ipin1 = node->input(1);
-	const MvNet* net1 = ipin1->net();
-	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvOutputPin* src_pin1 = ipin1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
 
 	ymuint bw = node->output(0)->bit_width();
@@ -529,13 +521,11 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kXor:
       {
 	const MvInputPin* ipin0 = node->input(0);
-	const MvNet* net0 = ipin0->net();
-	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvOutputPin* src_pin0 = ipin0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
 
 	const MvInputPin* ipin1 = node->input(1);
-	const MvNet* net1 = ipin1->net();
-	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvOutputPin* src_pin1 = ipin1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
 
 	ymuint bw = node->output(0)->bit_width();
@@ -586,18 +576,15 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kIte:
       {
 	const MvInputPin* ipin0 = node->input(0);
-	const MvNet* net0 = ipin0->net();
-	const MvOutputPin* src_pin0 = net0->src_pin();
+	const MvOutputPin* src_pin0 = ipin0->src_pin();
 	const MvNode* src_node0 = src_pin0->node();
 
 	const MvInputPin* ipin1 = node->input(1);
-	const MvNet* net1 = ipin1->net();
-	const MvOutputPin* src_pin1 = net1->src_pin();
+	const MvOutputPin* src_pin1 = ipin1->src_pin();
 	const MvNode* src_node1 = src_pin1->node();
 
 	const MvInputPin* ipin2 = node->input(2);
-	const MvNet* net2 = ipin2->net();
-	const MvOutputPin* src_pin2 = net2->src_pin();
+	const MvOutputPin* src_pin2 = ipin2->src_pin();
 	const MvNode* src_node2 = src_pin2->node();
 
 	ymuint bw = node->output(0)->bit_width();
@@ -637,8 +624,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	ymuint offset = bw;
 	for (ymuint i = 0; i < ni; ++ i) {
 	  const MvInputPin* ipin = node->input(i);
-	  const MvNet* net = ipin->net();
-	  const MvOutputPin* opin = net->src_pin();
+	  const MvOutputPin* opin = ipin->src_pin();
 	  const MvNode* src_node = opin->node();
 	  ymuint bw1 = opin->bit_width();
 	  offset -= bw1;
@@ -658,8 +644,7 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kConstBitSelect:
       {
 	const MvInputPin* ipin = node->input(0);
-	const MvNet* net = ipin->net();
-	const MvOutputPin* src_pin = net->src_pin();
+	const MvOutputPin* src_pin = ipin->src_pin();
 	const MvNode* src_node = src_pin->node();
 
 	SbjNode* sbjnode0;
@@ -673,8 +658,7 @@ mvn2sbj(const MvMgr& mvmgr,
     case MvNode::kConstPartSelect:
       {
 	const MvInputPin* ipin = node->input(0);
-	const MvNet* net = ipin->net();
-	const MvOutputPin* src_pin = net->src_pin();
+	const MvOutputPin* src_pin = ipin->src_pin();
 	const MvNode* src_node = src_pin->node();
 
 	ymuint bw = node->output(0)->bit_width();
@@ -729,9 +713,8 @@ mvn2sbj(const MvMgr& mvmgr,
     if ( node == NULL ) continue;
     if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
       const MvInputPin* ipin = node->input(0);
-      const MvNet* net = ipin->net();
-      assert_cond( net != NULL, __FILE__, __LINE__);
-      const MvOutputPin* opin = net->src_pin();
+      const MvOutputPin* opin = ipin->src_pin();
+      assert_cond( opin != NULL, __FILE__, __LINE__);
       const MvNode* src_node = opin->node();
       ymuint bw = ipin->bit_width();
       for (ymuint j = 0; j < bw; ++ j) {
@@ -747,9 +730,8 @@ mvn2sbj(const MvMgr& mvmgr,
       }
 
       const MvInputPin* ipin1 = node->input(1);
-      const MvNet* net1 = ipin1->net();
-      assert_cond( net1 != NULL, __FILE__, __LINE__);
-      const MvOutputPin* opin1 = net1->src_pin();
+      const MvOutputPin* opin1 = ipin1->src_pin();
+      assert_cond( opin1 != NULL, __FILE__, __LINE__);
       assert_cond( opin1->bit_width() == 1, __FILE__, __LINE__);
       const MvNode* src_node1 = opin1->node();
       SbjNode* isbjnode1;
@@ -765,9 +747,8 @@ mvn2sbj(const MvMgr& mvmgr,
       }
 
       const MvInputPin* ipin2 = node->input(2);
-      const MvNet* net2 = ipin2->net();
-      if ( net2 ) {
-	const MvOutputPin* opin2 = net2->src_pin();
+      const MvOutputPin* opin2 = ipin2->src_pin();
+      if ( opin2 ) {
 	assert_cond( opin2->bit_width() == 1, __FILE__, __LINE__);
 	const MvNode* src_node2 = opin2->node();
 	SbjNode* isbjnode2;
@@ -784,9 +765,8 @@ mvn2sbj(const MvMgr& mvmgr,
       }
 
       const MvInputPin* ipin3 = node->input(3);
-      const MvNet* net3 = ipin3->net();
-      if ( net3 ) {
-	const MvOutputPin* opin3 = net3->src_pin();
+      const MvOutputPin* opin3 = ipin3->src_pin();
+      if ( opin3 ) {
 	assert_cond( opin3->bit_width() == 1, __FILE__, __LINE__);
 	const MvNode* src_node3 = opin3->node();
 	SbjNode* isbjnode3;
@@ -809,9 +789,8 @@ mvn2sbj(const MvMgr& mvmgr,
   for (ymuint i = 0; i < no; ++ i) {
     const MvNode* node = module->output(i);
     const MvInputPin* ipin = node->input(0);
-    const MvNet* net = ipin->net();
-    assert_cond( net != NULL, __FILE__, __LINE__);
-    const MvOutputPin* opin = net->src_pin();
+    const MvOutputPin* opin = ipin->src_pin();
+    assert_cond( opin != NULL, __FILE__, __LINE__);
     const MvNode* src_node = opin->node();
 
     ymuint bw = ipin->bit_width();

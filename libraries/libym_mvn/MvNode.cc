@@ -82,14 +82,24 @@ MvNode::const_value(vector<ymuint32>& val) const
 {
 }
 
-// @brief ピンのビット幅を設定する．
-// @param[in] pin 対象のピン
+// @brief 入力ピンのビット幅を設定する．
+// @param[in] pos 対象のピン番号
 // @param[in] bit_width ビット幅
 void
-MvNode::set_bit_width(MvPin* pin,
-		      ymuint bit_width)
+MvNode::set_ipin_bit_width(ymuint pos,
+			   ymuint bit_width)
 {
-  pin->mBitWidth = bit_width;
+  mInputPins[pos].mBitWidth = bit_width;
+}
+
+// @brief 出力ピンのビット幅を設定する．
+// @param[in] pos 対象のピン番号
+// @param[in] bit_width ビット幅
+void
+MvNode::set_opin_bit_width(ymuint pos,
+			   ymuint bit_width)
+{
+  mOutputPins[pos].mBitWidth = bit_width;
 }
 
 END_NAMESPACE_YM_MVN

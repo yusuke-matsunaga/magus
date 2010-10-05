@@ -16,8 +16,6 @@
 #include "MvOutput.h"
 #include "MvInout.h"
 
-#include "ym_mvn/MvNet.h"
-
 
 BEGIN_NAMESPACE_YM_MVN
 
@@ -294,13 +292,13 @@ MvMgr::delete_node(MvNode* node)
     return;
   }
   for (ymuint i = 0; i < node->input_num(); ++ i) {
-    if ( node->input(i)->net() ) {
+    if ( node->input(i)->src_pin() ) {
       cerr << "node" << node->id() << " has fanin" << endl;
       return;
     }
   }
   for (ymuint i = 0; i < node->output_num(); ++ i) {
-    if ( !node->output(i)->net_list().empty() ) {
+    if ( !node->output(i)->dst_pin_list().empty() ) {
       cerr << "node" << node->id() << " has fanout" << endl;
       return;
     }
@@ -309,79 +307,12 @@ MvMgr::delete_node(MvNode* node)
   delete node;
 }
 
-// @brief ピンとピンを接続する．
-// @param[in] src_node 入力元のノード
-// @param[in] src_pin_pos 入力元のピン番号
-// @param[in] dst_node 出力先のノード
-// @param[in] dst_pin 出力先のピン番号
-// @return 接続を表すネットを返す．
-// @note 接続が失敗したら NULLを返す．
-// @note 接続が失敗するのは，
-//  - ピンが異なるモジュールに属していた．
-//  - ピンのビット幅が異なっていた．
-MvNet*
-MvMgr::connect(MvNode* src_node,
-	       ymuint src_pin_pos,
-	       MvNode* dst_node,
-	       ymuint dst_pin_pos)
-{
-  if ( src_node->parent() != dst_node->parent() ) {
-    cerr << "connecting between differnt module" << endl;
-    abort();
-    return NULL;
-  }
-  MvOutputPin* src_pin = src_node->_output(src_pin_pos);
-  MvInputPin* dst_pin = dst_node->_input(dst_pin_pos);
-  if ( src_pin->bit_width() != dst_pin->bit_width() ) {
-    cerr << "src_pin->bit_width() = " << src_pin->bit_width()
-	 << ", dst_pin->bit_width() = " << dst_pin->bit_width() << endl;
-    cerr << "bit_width mismatch" << endl;
-    abort();
-    return NULL;
-  }
-  int tmp = mNetItvlMgr.avail_num();
-  if ( tmp == -1 ) {
-    // IDが枯渇？
-    cerr << "ID exhausted" << endl;
-    abort();
-    return NULL;
-  }
-  mNetItvlMgr.erase(tmp);
-  ymuint id = tmp;
-
-  MvNet* net = new MvNet(src_pin, dst_pin);
-  src_pin->mNetList.push_back(net);
-  dst_pin->mNet = net;
-  net->mId = id;
-  while ( mNetArray.size() <= id ) {
-    mNetArray.push_back(NULL);
-  }
-  mNetArray[id] = net;
-
-  return net;
-}
-
-// @brief 接続を取り除く
-// @param[in] net 接続を表すネット
-void
-MvMgr::disconnect(MvNet* net)
-{
-  MvOutputPin* opin = net->mSrc;
-  opin->mNetList.erase(net);
-  MvInputPin* ipin = net->mDst;
-  ipin->mNet = NULL;
-
-  mNetItvlMgr.add(net->mId);
-  mNetArray[net->mId] = NULL;
-  delete net;
-}
-
 bool
 no_fanouts(MvNode* node)
 {
   ymuint no = node->output_num();
   for (ymuint j = 0; j < no; ++ j) {
-    if ( !node->output(j)->net_list().empty() ) {
+    if ( !node->output(j)->dst_pin_list().empty() ) {
       return false;
     }
   }
@@ -398,39 +329,21 @@ MvMgr::sweep()
   for (ymuint i = 0; i < n; ++ i) {
     MvNode* node = _node(i);
     if ( node == NULL ) continue;
+    if ( node->type() != MvNode::kThrough ) continue;
     node_list.push_back(node);
   }
   for (vector<MvNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     MvNode* node = *p;
-    if ( node->type() != MvNode::kThrough ) continue;
 
     const MvInputPin* ipin = node->input(0);
-    MvNet* src_net = ipin->net();
-    if ( src_net == NULL ) continue;
+    const MvOutputPin* src_pin = ipin->src_pin();
+    if ( src_pin == NULL ) continue;
 
-    const MvOutputPin* src_pin = src_net->src_pin();
     MvNode* src_node = src_pin->node();
     ymuint src_pos = src_pin->pos();
-    disconnect(src_net);
-    const MvOutputPin* opin = node->output(0);
-    const MvNetList& fo_list = opin->net_list();
-    vector<MvNet*> tmp_list;
-    tmp_list.reserve(fo_list.size());
-    for (MvNetList::const_iterator q = fo_list.begin();
-	 q != fo_list.end(); ++ q) {
-      MvNet* net = *q;
-      tmp_list.push_back(net);
-    }
-    for (vector<MvNet*>::iterator q = tmp_list.begin();
-	 q != tmp_list.end(); ++ q) {
-      MvNet* net = *q;
-      MvInputPin* dst_pin = net->mDst;
-      MvNode* dst_node = dst_pin->node();
-      ymuint dst_pos = dst_pin->pos();
-      disconnect(net);
-      connect(src_node, src_pos, dst_node, dst_pos);
-    }
+    disconnect(src_node, src_pos, node, 0);
+    reconnect(node, 0, src_node, src_pos);
     delete_node(node);
   }
 
@@ -445,7 +358,7 @@ MvMgr::sweep()
        p != node_list.end(); ++ p) {
     MvNode* node = *p;
     if ( node->type() == MvNode::kConstBitSelect ) {
-      MvNode* src_node = node->input(0)->net()->src_pin()->node();
+      MvNode* src_node = node->input(0)->src_pin()->node();
       if ( src_node->type() == MvNode::kConcat ) {
 	MvNode* alt_node = select_from_concat(src_node, node->bitpos());
 	// node を alt_node に置き換える．
@@ -459,7 +372,7 @@ MvMgr::sweep()
     }
 #if 0
     else if ( node->type() == MvNode::kConstPartSelect ) {
-      MvNode* src_node = node->input(0)->net()->src_pin()->node();
+      MvNode* src_node = node->input(0)->src_pin()->node();
       if ( src_node->type() == MvNode::kConcat ) {
 	MvNdoe* alt_node = select(src_node, node->mbs(), node->lsb());
 	// node を alt_node に置き換える．
@@ -484,10 +397,10 @@ MvMgr::sweep()
     node_queue.pop_front();
     ymuint ni = node->input_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      MvNet* net = node->input(i)->net();
-      if ( net ) {
-	MvNode* src_node = net->src_pin()->node();
-	disconnect(net);
+      MvOutputPin* src_pin = node->input(i)->src_pin();
+      if ( src_pin ) {
+	MvNode* src_node = src_pin->node();
+	disconnect(src_node, src_pin->pos(), node, i);
 	if ( no_fanouts(src_node) ) {
 	  node_queue.push_back(src_node);
 	}
@@ -511,7 +424,7 @@ MvMgr::select_from_concat(MvNode* src_node,
     const MvInputPin* ipin = src_node->input(idx);
     ymuint bw = ipin->bit_width();
     if ( bitpos < bw ) {
-      MvNode* inode = ipin->net()->src_pin()->node();
+      MvNode* inode = ipin->src_pin()->node();
       if ( inode->type() == MvNode::kConcat ) {
 	return select_from_concat(inode, bitpos);
       }
@@ -553,7 +466,7 @@ MvMgr::select_from_partselect(MvNode* src_node,
   else {
     bitpos = lsb - bitpos;
   }
-  MvNode* inode = ipin->net()->src_pin()->node();
+  MvNode* inode = ipin->src_pin()->node();
   if ( inode->type() == MvNode::kConcat ) {
     return select_from_concat(inode, bitpos);
   }
@@ -611,21 +524,92 @@ MvMgr::replace(MvNode* node,
   ymuint no = node->output_num();
   assert_cond( no == alt_node->output_num(), __FILE__, __LINE__);
   for (ymuint i = 0; i < no; ++ i) {
-    const MvOutputPin* opin = node->output(i);
-    const MvNetList& folist = opin->net_list();
-    vector<MvNet*> net_list;
-    for (MvNetList::const_iterator p = folist.begin();
-	 p != folist.end(); ++ p) {
-      net_list.push_back(*p);
-    }
-    for (vector<MvNet*>::iterator p = net_list.begin();
-	 p != net_list.end(); ++ p) {
-      MvNet* net = *p;
-      MvPin* dst_pin = net->mDst;
-      MvNode* dst_node = dst_pin->node();
-      disconnect(net);
-      connect(alt_node, i, dst_node, dst_pin->pos());
-    }
+    reconnect(node, i, alt_node, i);
+  }
+}
+
+// @brief ピンとピンを接続する．
+// @param[in] src_node 入力元のノード
+// @param[in] src_pin_pos 入力元のピン番号
+// @param[in] dst_node 出力先のノード
+// @param[in] dst_pin 出力先のピン番号
+// @return 接続を表すネットを返す．
+// @note 接続が失敗したら NULLを返す．
+// @note 接続が失敗するのは，
+//  - ピンが異なるモジュールに属していた．
+//  - ピンのビット幅が異なっていた．
+bool
+MvMgr::connect(MvNode* src_node,
+	       ymuint src_pin_pos,
+	       MvNode* dst_node,
+	       ymuint dst_pin_pos)
+{
+  if ( src_node->parent() != dst_node->parent() ) {
+    cerr << "connecting between differnt module" << endl;
+    abort();
+    return false;
+  }
+  MvOutputPin* src_pin = src_node->_output(src_pin_pos);
+  MvInputPin* dst_pin = dst_node->_input(dst_pin_pos);
+  if ( src_pin->bit_width() != dst_pin->bit_width() ) {
+    cerr << "src_pin->bit_width() = " << src_pin->bit_width()
+	 << ", dst_pin->bit_width() = " << dst_pin->bit_width() << endl;
+    cerr << "bit_width mismatch" << endl;
+    abort();
+    return false;;
+  }
+  src_pin->mDstPinList.push_back(dst_pin);
+  dst_pin->mSrcPin = src_pin;
+  return true;
+}
+
+// @brief 接続を取り除く
+// @param[in] src_node 入力元のノード
+// @param[in] src_pin_pos 入力元のピン番号
+// @param[in] dst_node 出力先のノード
+// @param[in] dst_pin 出力先のピン番号
+void
+MvMgr::disconnect(MvNode* src_node,
+		  ymuint src_pin_pos,
+		  MvNode* dst_node,
+		  ymuint dst_pin_pos)
+{
+  MvOutputPin* src_pin = src_node->_output(src_pin_pos);
+  MvInputPin* dst_pin = dst_node->_input(dst_pin_pos);
+  assert_cond( dst_pin->mSrcPin == src_pin, __FILE__, __LINE__);
+  src_pin->mDstPinList.erase(dst_pin);
+  dst_pin->mSrcPin = NULL;
+}
+
+// @brief 接続を切り替える．
+// @param[in] old_node 元のノード
+// @param[in] old_pin_pos 元のピン番号
+// @param[in] new_node 新しいノード
+// @param[in] new_pin 新しいピン番号
+void
+MvMgr::reconnect(MvNode* old_node,
+		 ymuint old_pin_pos,
+		 MvNode* new_node,
+		 ymuint new_pin_pos)
+{
+  MvOutputPin* old_pin = old_node->_output(old_pin_pos);
+  MvOutputPin* new_pin = new_node->_output(new_pin_pos);
+  const MvInputPinList& fo_list = old_pin->dst_pin_list();
+  // リンクトリストをたどっている途中でリンクの変更はできないので
+  // 配列にコピーする．
+  vector<MvInputPin*> tmp_list;
+  tmp_list.reserve(fo_list.size());
+  for (MvInputPinList::const_iterator p = fo_list.begin();
+       p != fo_list.end(); ++ p) {
+    MvInputPin* ipin = *p;
+    tmp_list.push_back(ipin);
+  }
+  for (vector<MvInputPin*>::iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
+    MvInputPin* ipin = *p;
+    old_pin->mDstPinList.erase(ipin);
+    ipin->mSrcPin = new_pin;
+    new_pin->mDstPinList.push_back(ipin);
   }
 }
 
@@ -672,51 +656,15 @@ MvMgr::unreg_node(MvNode* node)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス MvNet
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] src 入力元のピン
-// @param[in] dst 出力先のピン
-MvNet::MvNet(MvOutputPin* src,
-	     MvInputPin* dst) :
-  mId(0),
-  mSrc(src),
-  mDst(dst)
-{
-}
-
-// @brief デストラクタ
-MvNet::~MvNet()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス MvPin
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-MvPin::MvPin() :
-  mNode(NULL),
-  mBitWidth(0),
-  mPos(0)
-{
-}
-
-// @brief デストラクタ
-MvPin::~MvPin()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス MvInputPin
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 MvInputPin::MvInputPin() :
-  mNet(NULL)
+  mNode(NULL),
+  mBitWidth(0),
+  mPos(0),
+  mSrcPin(NULL)
 {
 }
 
@@ -731,7 +679,10 @@ MvInputPin::~MvInputPin()
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MvOutputPin::MvOutputPin()
+MvOutputPin::MvOutputPin() :
+  mNode(NULL),
+  mBitWidth(0),
+  mPos(0)
 {
 }
 

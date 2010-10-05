@@ -44,12 +44,11 @@ class MvModule;
 class MvPort;
 class MvPortRef;
 class MvNode;
-class MvPin;
 class MvInputPin;
 class MvOutputPin;
 class MvNet;
 
-typedef DlList<MvNet> MvNetList;
+typedef DlList<MvInputPin> MvInputPinList;
 
 END_NAMESPACE_YM_MVN
 
@@ -62,9 +61,9 @@ using nsMvn::MvPort;
 using nsMvn::MvPortRef;
 using nsMvn::MvNode;
 using nsMvn::MvInputPin;
+using nsMvn::MvInputPinList;
 using nsMvn::MvOutputPin;
 using nsMvn::MvNet;
-using nsMvn::MvNetList;
 
 END_NAMESPACE_YM
 

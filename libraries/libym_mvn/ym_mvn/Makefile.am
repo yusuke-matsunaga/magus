@@ -10,7 +10,6 @@ noinst_HEADERS = \
 	mvn_nsdef.h \
 	MvMgr.h \
 	MvModule.h \
-	MvNet.h \
 	MvNode.h \
 	MvPin.h \
 	MvPort.h \

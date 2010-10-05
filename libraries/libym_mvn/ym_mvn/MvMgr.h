@@ -37,7 +37,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 情報を取得する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief トップレベルモジュールのリストを得る．
   /// @param[out] module_list モジュールを格納するリスト
   /// @return 要素数を返す．
@@ -63,7 +63,7 @@ public:
   /// @note 該当するモジュールがない場合は NULL を返す．
   MvModule*
   _module(ymuint id);
-  
+
   /// @brief ノードの ID番号の最大値 + 1 を返す．
   ymuint
   max_node_id() const;
@@ -198,7 +198,7 @@ public:
   MvNode*
   new_dff2(MvModule* module,
 	   ymuint bit_width = 1);
-  
+
   /// @brief through ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅
@@ -222,7 +222,7 @@ public:
   MvNode*
   new_and(MvModule* module,
 	  ymuint bit_width = 1);
-  
+
   /// @brief or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅
@@ -230,7 +230,7 @@ public:
   MvNode*
   new_or(MvModule* module,
 	 ymuint bit_width = 1);
-  
+
   /// @brief xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅
@@ -395,7 +395,7 @@ public:
 	  ymuint bit_width1,
 	  ymuint bit_width2,
 	  ymuint bit_width3);
-  
+
   /// @brief power ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width1 入力1のビット幅
@@ -484,7 +484,7 @@ public:
   MvNode*
   new_sequdp(MvModule* module,
 	     ymuint ni);
-  
+
   /// @brief constant ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅
@@ -516,7 +516,7 @@ public:
   select(MvNode* src_node,
 	 ymuint msb,
 	 ymuint lsb);
-  
+
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード
   /// @note 入力ノード, 出力ノードは削除できない
@@ -531,34 +531,52 @@ public:
   void
   replace(MvNode* node,
 	  MvNode* alt_node);
-  
+
   /// @brief ピンとピンを接続する．
   /// @param[in] src_node 入力元のノード
   /// @param[in] src_pin_pos 入力元のピン番号
   /// @param[in] dst_node 出力先のノード
   /// @param[in] dst_pin 出力先のピン番号
-  /// @return 接続を表すネットを返す．
-  /// @note 接続が失敗したら NULLを返す．
+  /// @retval true 接続が成功した．
+  /// @retval false 接続が失敗した．
   /// @note 接続が失敗するのは，
   ///  - ピンが異なるモジュールに属していた．
   ///  - ピンのビット幅が異なっていた．
-  MvNet*
+  bool
   connect(MvNode* src_node,
 	  ymuint src_pin_pos,
 	  MvNode* dst_node,
 	  ymuint dst_pin_pos);
 
   /// @brief 接続を取り除く
-  /// @param[in] net 接続を表すネット
+  /// @param[in] src_node 入力元のノード
+  /// @param[in] src_pin_pos 入力元のピン番号
+  /// @param[in] dst_node 出力先のノード
+  /// @param[in] dst_pin 出力先のピン番号
+  /// @note 現在の実装はあまり効率が良くない．
   void
-  disconnect(MvNet* net);
+  disconnect(MvNode* src_node,
+	     ymuint src_pin_pos,
+	     MvNode* dst_node,
+	     ymuint dst_pin_pos);
+
+  /// @brief 接続を切り替える．
+  /// @param[in] old_node 元のノード
+  /// @param[in] old_pin_pos 元のピン番号
+  /// @param[in] new_node 新しいノード
+  /// @param[in] new_pin 新しいピン番号
+  void
+  reconnect(MvNode* old_node,
+	    ymuint old_pin_pos,
+	    MvNode* new_node,
+	    ymuint new_pin_pos);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ノードを登録する．
   /// @param[in] node 対象のノード
   void
@@ -594,7 +612,7 @@ private:
 
   // ネットの ID番号を管理するためのオブジェクト
   ItvlMgr mNetItvlMgr;
-  
+
 };
 
 

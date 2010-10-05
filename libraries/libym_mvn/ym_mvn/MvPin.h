@@ -15,12 +15,26 @@
 BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
-/// @class MvPin MvPin.h "ym_mvn/MvPin.h"
-/// @brief ノードのピンを表す基底クラス
+/// @class MvInputPin MvPin.h "ym_mvn/MvPin.h"
+/// @brief ノードの入力ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvPin
+class MvInputPin :
+  public DlElem
 {
+  friend class MvMgr;
   friend class MvNode;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  MvInputPin();
+
+  /// @brief デストラクタ
+  ~MvInputPin();
+
 
 public:
 
@@ -37,17 +51,9 @@ public:
   ymuint
   pos() const;
 
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // コンストラクタ / デストラクタ
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  MvPin();
-
-  /// @brief デストラクタ
-  ~MvPin();
+  /// @brief 接続している出力ピンを得る．
+  MvOutputPin*
+  src_pin() const;
 
 
 private:
@@ -57,51 +63,15 @@ private:
 
   // 親のノード
   MvNode* mNode;
-  
+
   // ビット幅
   ymuint32 mBitWidth;
 
   // 位置
   ymuint32 mPos;
 
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class MvInputPin MvPin.h "ym_mvn/MvPin.h"
-/// @brief ノードの入力ピンを表すクラス
-//////////////////////////////////////////////////////////////////////
-class MvInputPin :
-  public MvPin
-{
-  friend class MvMgr;
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // コンストラクタ / デストラクタ
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  MvInputPin();
-
-  /// @brief デストラクタ
-  ~MvInputPin();
-
-
-public:
-
-  /// @brief 接続しているネットを得る．
-  MvNet*
-  net() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 接続しているネット
-  MvNet* mNet;
+  // 接続している出力ピン
+  MvOutputPin* mSrcPin;
 
 };
 
@@ -110,12 +80,12 @@ private:
 /// @class MvOutputPin MvPin.h "ym_mvn/MvPin.h"
 /// @brief ノードの出力ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvOutputPin :
-  public MvPin
+class MvOutputPin
 {
   friend class MvMgr;
+  friend class MvNode;
 
-public:
+private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
   //////////////////////////////////////////////////////////////////////
@@ -129,9 +99,22 @@ public:
 
 public:
 
-  /// @brief 接続しているネットのリストを得る．
-  const MvNetList&
-  net_list() const;
+  /// @breif 属しているノードを得る．
+  MvNode*
+  node() const;
+
+  /// @brief ビット幅を得る．
+  ymuint
+  bit_width() const;
+
+  /// @brief ノードの何番目のピンかを返す．
+  /// @note 入力ピンと出力ピンは区別される．
+  ymuint
+  pos() const;
+
+  /// @brief 接続している入力ピンのリストを得る．
+  const MvInputPinList&
+  dst_pin_list() const;
 
 
 private:
@@ -139,8 +122,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 接続しているネットのリスト
-  MvNetList mNetList;
+  // 親のノード
+  MvNode* mNode;
+
+  // ビット幅
+  ymuint32 mBitWidth;
+
+  // 位置
+  ymuint32 mPos;
+
+  // 接続している入力ピンのリスト
+  MvInputPinList mDstPinList;
 
 };
 
@@ -152,7 +144,7 @@ private:
 // @breif 属しているノードを得る．
 inline
 MvNode*
-MvPin::node() const
+MvInputPin::node() const
 {
   return mNode;
 }
@@ -160,7 +152,7 @@ MvPin::node() const
 // @brief ビット幅を得る．
 inline
 ymuint
-MvPin::bit_width() const
+MvInputPin::bit_width() const
 {
   return mBitWidth;
 }
@@ -169,25 +161,50 @@ MvPin::bit_width() const
 // @note 入力ピンと出力ピンは区別される．
 inline
 ymuint
-MvPin::pos() const
+MvInputPin::pos() const
 {
   return mPos;
 }
 
-// @brief 接続しているネットを得る．
+// @brief 接続している出力ピンを得る．
 inline
-MvNet*
-MvInputPin::net() const
+MvOutputPin*
+MvInputPin::src_pin() const
 {
-  return mNet;
+  return mSrcPin;
 }
 
-// @brief 接続しているネットのリストを得る．
+// @breif 属しているノードを得る．
 inline
-const MvNetList&
-MvOutputPin::net_list() const
+MvNode*
+MvOutputPin::node() const
 {
-  return mNetList;
+  return mNode;
+}
+
+// @brief ビット幅を得る．
+inline
+ymuint
+MvOutputPin::bit_width() const
+{
+  return mBitWidth;
+}
+
+// @brief ノードの何番目のピンかを返す．
+// @note 入力ピンと出力ピンは区別される．
+inline
+ymuint
+MvOutputPin::pos() const
+{
+  return mPos;
+}
+
+// @brief 接続している入力ピンのリストを得る．
+inline
+const MvInputPinList&
+MvOutputPin::dst_pin_list() const
+{
+  return mDstPinList;
 }
 
 END_NAMESPACE_YM_MVN

@@ -39,7 +39,7 @@ public:
   /// @brief 内部のデータをクリアする．
   void
   clear();
-  
+
   /// @brief verilog 形式のファイルを読み込む．
   /// @param[in] filename ファイル名
   /// @retval true 正常に読み込めた．
@@ -57,7 +57,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvMgr& mgr);
-  
+
   /// @brief メッセージハンドラを付加する．
   /// @param[in] msg_handler 登録するハンドラ
   /// @note このハンドラはこのオブジェクトの破壊に伴って破壊される．
@@ -140,7 +140,7 @@ private:
   void
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
-  
+
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 左辺式
@@ -160,7 +160,7 @@ private:
 		  const VlExpr* expr,
 		  MvNode* node,
 		  ymuint offset);
-  
+
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] prim プリミティブ
   /// @param[in] parent_module 親のモジュール
@@ -236,6 +236,12 @@ private:
   reg_driver(MvNode* node,
 	     const Driver& driver);
 
+  /// @brief ドライバーリストを取り出す．
+  /// @param[in] node 対応するノード
+  /// @note なければ空のリストを作る．
+  vector<Driver>&
+  driver_list(MvNode* node);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -252,7 +258,7 @@ private:
 	   const string& qn_pin_name,
 	   const string& set_pin_name,
 	   const string& reset_pin_name);
-    
+
     /// @brief データ入力ピン名
     string mDataPinName;
     /// @brief クロック入力ピン名
@@ -272,7 +278,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // メッセージハンドラの管理者
   MsgMgr mMsgMgr;
 
@@ -290,10 +296,10 @@ private:
 
   // VlIODecl と MvNode の対応付けをとるハッシュ表
   DeclMap mIODeclMap;
-  
+
   // VlDecl のドライバーのリスト
   vector<vector<Driver> > mDriverList;
-  
+
 };
 
 

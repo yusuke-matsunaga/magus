@@ -118,7 +118,7 @@ public:
 
     /// @brief sequential UDP ( n入力, 1出力 )
     kSeqUdp,
-    
+
     /// @brief constant ( 0入力, 1出力 )
     kConst
 
@@ -181,7 +181,7 @@ public:
   virtual
   ymuint
   lsb() const;
-  
+
   /// @brief 定数値を得る．
   /// @param[out] val 値を格納するベクタ
   /// @note type() が kConst の時のみ意味を持つ．
@@ -224,12 +224,19 @@ protected:
   MvOutputPin*
   _output(ymuint pos);
 
-  /// @brief ピンのビット幅を設定する．
-  /// @param[in] pin 対象のピン
+  /// @brief 入力ピンのビット幅を設定する．
+  /// @param[in] pos 対象のピン番号
   /// @param[in] bit_width ビット幅
   void
-  set_bit_width(MvPin* pin,
-		ymuint bit_width);
+  set_ipin_bit_width(ymuint pos,
+		     ymuint bit_width);
+
+  /// @brief 出力ピンのビット幅を設定する．
+  /// @param[in] pos 対象のピン番号
+  /// @param[in] bit_width ビット幅
+  void
+  set_opin_bit_width(ymuint pos,
+		     ymuint bit_width);
 
 
 private:
