@@ -211,7 +211,7 @@ dump_node_map(ostream& s,
     const pair<const VlDecl*, ymuint>& p = node_map[node->id()];
     const VlDecl* decl = p.first;
     if ( decl == NULL ) continue;
-    s << "node" << node->id() << " : ";
+    s << "// node" << node->id() << " : ";
     ymuint offset = p.second;
     s << decl->full_name();
     if ( decl->is_array() ) {

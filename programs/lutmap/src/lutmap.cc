@@ -141,6 +141,7 @@ main(int argc,
 	return 3;
       }
       dump_verilog(ofs, mgr);
+      dump_node_map(ofs, mgr, node_map);
     }
 
     // SbjGraph に変換
