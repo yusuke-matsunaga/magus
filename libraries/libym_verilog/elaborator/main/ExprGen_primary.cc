@@ -82,7 +82,9 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
   }
   else {
     // 通常のスコープで探索する．
-    handle = find_obj_up(parent, nb_array, name, NULL);
+    // たぶんモジュール内でいいはず．
+    handle = find_obj_up(parent, nb_array, name,
+			 parent->parent_module());
     if ( handle == NULL ) {
       // 見つからなくてもデフォルトネットタイプが kVpiNone でないかぎり
       // 暗黙の1ビットネット宣言を行う．
