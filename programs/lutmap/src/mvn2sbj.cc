@@ -13,127 +13,12 @@
 #include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvPin.h"
+#include "MvNodeMap.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
 using namespace nsYm::nsMvn;
-
-class MvNodeMap
-{
-public:
-
-  /// @brief コンストラクタ
-  MvNodeMap(ymuint n);
-
-  /// @brief 登録する．(1ビット版)
-  /// @param[in] mvnode MvNode
-  /// @param[in] sbjnode SbjNode
-  /// @param[in] inv 反転属性
-  void
-  put(const MvNode* mvnode,
-      SbjNode* sbjnode,
-      bool inv);
-
-  /// @brief 登録する．(ベクタ版)
-  /// @param[in] mvnode MvNode
-  /// @param[in] index ビット位置
-  /// @param[in] sbjnode SbjNode
-  /// @param[in] inv 反転属性
-  void
-  put(const MvNode* mvnode,
-      ymuint index,
-      SbjNode* sbjnode,
-      bool inv);
-
-  /// @brief 探す．(1ビット版)
-  bool
-  get(const MvNode* mvnode,
-      SbjNode*& sbjnode,
-      bool& inv) const;
-
-  /// @brief 探す．(ベクタ版)
-  bool
-  get(const MvNode* mvnode,
-      ymuint index,
-      SbjNode*& sbjnode,
-      bool& inv) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  vector<vector<ympuint> > mArray;
-
-};
-
-// @brief コンストラクタ
-MvNodeMap::MvNodeMap(ymuint n) :
-  mArray(n)
-{
-}
-
-// @brief 登録する．(1ビット版)
-// @param[in] mvnode MvNode
-// @param[in] sbjnode SbjNode
-// @param[in] inv 反転属性
-void
-MvNodeMap::put(const MvNode* mvnode,
-	       SbjNode* sbjnode,
-	       bool inv)
-{
-  put(mvnode, 0, sbjnode, inv);
-}
-
-// @brief 登録する．(ベクタ版)
-// @param[in] mvnode MvNode
-// @param[in] index ビット位置
-// @param[in] sbjnode SbjNode
-// @param[in] inv 反転属性
-void
-MvNodeMap::put(const MvNode* mvnode,
-	       ymuint index,
-	       SbjNode* sbjnode,
-	       bool inv)
-{
-  assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
-  vector<ympuint>& array = mArray[mvnode->id()];
-  if ( array.size() != mvnode->output(0)->bit_width() ) {
-    array.resize(mvnode->output(0)->bit_width());
-  }
-  array[index] = reinterpret_cast<ympuint>(sbjnode) | (inv & 1U);
-}
-
-// @brief 探す．(1ビット版)
-bool
-MvNodeMap::get(const MvNode* mvnode,
-	       SbjNode*& sbjnode,
-	       bool& inv) const
-{
-  return get(mvnode, 0, sbjnode, inv);
-}
-
-// @brief 探す．(ベクタ版)
-bool
-MvNodeMap::get(const MvNode* mvnode,
-	       ymuint index,
-	       SbjNode*& sbjnode,
-	       bool& inv) const
-{
-  assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
-  const vector<ympuint>& array = mArray[mvnode->id()];
-  if ( array.empty() ) {
-    return false;
-  }
-  assert_cond( array.size() == mvnode->output(0)->bit_width(),
-	       __FILE__, __LINE__);
-  ympuint tmp = array[index];
-  sbjnode = reinterpret_cast<SbjNode*>(tmp & ~1UL);
-  inv = static_cast<bool>(tmp & 1U);
-  return true;
-}
 
 void
 make_and(SbjGraph& sbjgraph,
@@ -326,7 +211,8 @@ enqueue(const MvNode* node0,
 
 void
 mvn2sbj(const MvMgr& mvmgr,
-	SbjGraph& sbjgraph)
+	SbjGraph& sbjgraph,
+	MvNodeMap& mvnode_map)
 {
   sbjgraph.clear();
 
@@ -338,7 +224,6 @@ mvn2sbj(const MvMgr& mvmgr,
   }
 
   ymuint nmax = mvmgr.max_node_id();
-  MvNodeMap mvmap(nmax);
 
   const MvModule* module = module_list.front();
 
@@ -354,7 +239,7 @@ mvn2sbj(const MvMgr& mvmgr,
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       SbjNode* sbjnode = sbjgraph.new_input();
-      mvmap.put(node, j, sbjnode, false);
+      mvnode_map.put(node, j, sbjnode, false);
     }
     mark[node->id()] = true;
     enqueue(node, queue, mark);
@@ -367,7 +252,7 @@ mvn2sbj(const MvMgr& mvmgr,
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       SbjNode* sbjnode = sbjgraph.new_input();
-      mvmap.put(node, j, sbjnode, false);
+      mvnode_map.put(node, j, sbjnode, false);
     }
     mark[node->id()] = true;
     enqueue(node, queue, mark);
@@ -383,7 +268,7 @@ mvn2sbj(const MvMgr& mvmgr,
       ymuint bw = node->output(0)->bit_width();
       for (ymuint j = 0; j < bw; ++ j) {
 	SbjNode* sbjnode = sbjgraph.new_dff();
-	mvmap.put(node, j, sbjnode, false);
+	mvnode_map.put(node, j, sbjnode, false);
       }
       mark[node->id()] = true;
       enqueue(node, queue, mark);
@@ -398,11 +283,11 @@ mvn2sbj(const MvMgr& mvmgr,
       for (ymuint j = 0; j < bw; ++ j) {
 	if ( pat & 1U ) {
 	  // 1
-	  mvmap.put(node, j, NULL, true);
+	  mvnode_map.put(node, j, NULL, true);
 	}
 	else {
 	  // 0
-	  mvmap.put(node, j, NULL, false);
+	  mvnode_map.put(node, j, NULL, false);
 	}
 	if ( j % 32 == 31 ) {
 	  ++ bpos;
@@ -436,9 +321,9 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode;
 	  bool inv;
-	  bool stat = mvmap.get(src_node, i, sbjnode, inv);
+	  bool stat = mvnode_map.get(src_node, i, sbjnode, inv);
 	  assert_cond( stat , __FILE__, __LINE__);
-	  mvmap.put(node, i, sbjnode, inv);
+	  mvnode_map.put(node, i, sbjnode, inv);
 	}
       }
       break;
@@ -453,9 +338,9 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode;
 	  bool inv;
-	  bool stat = mvmap.get(src_node, i, sbjnode, inv);
+	  bool stat = mvnode_map.get(src_node, i, sbjnode, inv);
 	  assert_cond( stat , __FILE__, __LINE__);
-	  mvmap.put(node, i, sbjnode, !inv);
+	  mvnode_map.put(node, i, sbjnode, !inv);
 	}
       }
       break;
@@ -476,15 +361,15 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode0;
 	  bool inv0;
-	  bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
+	  bool stat0 = mvnode_map.get(src_node0, i, sbjnode0, inv0);
 	  SbjNode* sbjnode1;
 	  bool inv1;
-	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
 	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
 	  SbjNode* sbjnode = NULL;
 	  bool inv = false;
 	  make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	  mvmap.put(node, i, sbjnode, inv);
+	  mvnode_map.put(node, i, sbjnode, inv);
 	}
       }
       break;
@@ -505,15 +390,15 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode0;
 	  bool inv0;
-	  bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
+	  bool stat0 = mvnode_map.get(src_node0, i, sbjnode0, inv0);
 	  SbjNode* sbjnode1;
 	  bool inv1;
-	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
 	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
 	  SbjNode* sbjnode = NULL;
 	  bool inv = false;
 	  make_or(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	  mvmap.put(node, i, sbjnode, inv);
+	  mvnode_map.put(node, i, sbjnode, inv);
 	}
       }
       break;
@@ -534,15 +419,15 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode0;
 	  bool inv0;
-	  bool stat0 = mvmap.get(src_node0, i, sbjnode0, inv0);
+	  bool stat0 = mvnode_map.get(src_node0, i, sbjnode0, inv0);
 	  SbjNode* sbjnode1;
 	  bool inv1;
-	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
 	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
 	  SbjNode* sbjnode = NULL;
 	  bool inv = false;
 	  make_xor(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	  mvmap.put(node, i, sbjnode, inv);
+	  mvnode_map.put(node, i, sbjnode, inv);
 	}
       }
       break;
@@ -592,16 +477,16 @@ mvn2sbj(const MvMgr& mvmgr,
 	assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
 	SbjNode* sbjnode0;
 	bool inv0;
-	bool stat0 = mvmap.get(src_node0, sbjnode0, inv0);
+	bool stat0 = mvnode_map.get(src_node0, sbjnode0, inv0);
 	assert_cond( stat0, __FILE__, __LINE__);
 
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode1;
 	  bool inv1;
-	  bool stat1 = mvmap.get(src_node1, i, sbjnode1, inv1);
+	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
 	  SbjNode* sbjnode2;
 	  bool inv2;
-	  bool stat2 = mvmap.get(src_node2, i, sbjnode2, inv2);
+	  bool stat2 = mvnode_map.get(src_node2, i, sbjnode2, inv2);
 	  assert_cond( stat1 && stat2 , __FILE__, __LINE__);
 	  SbjNode* and1 = NULL;
 	  bool and1_inv = false;
@@ -612,7 +497,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	  SbjNode* or1 = NULL;
 	  bool or1_inv = false;
 	  make_or(sbjgraph, and1, and1_inv, and2, and2_inv, or1, or1_inv);
-	  mvmap.put(node, i, or1, or1_inv);
+	  mvnode_map.put(node, i, or1, or1_inv);
 	}
       }
       break;
@@ -632,9 +517,9 @@ mvn2sbj(const MvMgr& mvmgr,
 	    ymuint index = offset + j;
 	    SbjNode* sbjnode0;
 	    bool inv0;
-	    bool stat0 = mvmap.get(src_node, j, sbjnode0, inv0);
+	    bool stat0 = mvnode_map.get(src_node, j, sbjnode0, inv0);
 	    assert_cond( stat0, __FILE__, __LINE__);
-	    mvmap.put(node, index, sbjnode0, inv0);
+	    mvnode_map.put(node, index, sbjnode0, inv0);
 	  }
 	}
 	assert_cond( offset == 0U, __FILE__, __LINE__);
@@ -649,9 +534,9 @@ mvn2sbj(const MvMgr& mvmgr,
 
 	SbjNode* sbjnode0;
 	bool inv0;
-	bool stat0 = mvmap.get(src_node, node->bitpos(), sbjnode0, inv0);
+	bool stat0 = mvnode_map.get(src_node, node->bitpos(), sbjnode0, inv0);
 	assert_cond( stat0 , __FILE__, __LINE__);
-	mvmap.put(node, sbjnode0, inv0);
+	mvnode_map.put(node, sbjnode0, inv0);
       }
       break;
 
@@ -669,9 +554,9 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint i = 0; i < bw; ++ i) {
 	  SbjNode* sbjnode0;
 	  bool inv0;
-	  bool stat0 = mvmap.get(src_node, i + lsb, sbjnode0, inv0);
+	  bool stat0 = mvnode_map.get(src_node, i + lsb, sbjnode0, inv0);
 	  assert_cond( stat0 , __FILE__, __LINE__);
-	  mvmap.put(node, i, sbjnode0, inv0);
+	  mvnode_map.put(node, i, sbjnode0, inv0);
 	}
       }
       break;
@@ -720,10 +605,10 @@ mvn2sbj(const MvMgr& mvmgr,
       for (ymuint j = 0; j < bw; ++ j) {
 	SbjNode* sbjnode;
 	bool inv;
-	bool stat = mvmap.get(node, j, sbjnode, inv);
+	bool stat = mvnode_map.get(node, j, sbjnode, inv);
 	SbjNode* isbjnode;
 	bool iinv;
-	bool stat1 = mvmap.get(src_node, j, isbjnode, iinv);
+	bool stat1 = mvnode_map.get(src_node, j, isbjnode, iinv);
 	assert_cond( stat && stat1 , __FILE__, __LINE__);
 	assert_cond( inv == false, __FILE__, __LINE__);
 	sbjgraph.set_dff_data(sbjnode, isbjnode, iinv);
@@ -736,12 +621,12 @@ mvn2sbj(const MvMgr& mvmgr,
       const MvNode* src_node1 = opin1->node();
       SbjNode* isbjnode1;
       bool iinv1;
-      bool stat1 = mvmap.get(src_node1, isbjnode1, iinv1);
+      bool stat1 = mvnode_map.get(src_node1, isbjnode1, iinv1);
       assert_cond( stat1 , __FILE__, __LINE__);
       for (ymuint j = 0; j < bw; ++ j) {
 	SbjNode* sbjnode;
 	bool inv;
-	bool stat = mvmap.get(node, j, sbjnode, inv);
+	bool stat = mvnode_map.get(node, j, sbjnode, inv);
 	assert_cond( stat, __FILE__, __LINE__);
 	sbjgraph.set_dff_clock(sbjnode, isbjnode1, iinv1);
       }
@@ -753,12 +638,12 @@ mvn2sbj(const MvMgr& mvmgr,
 	const MvNode* src_node2 = opin2->node();
 	SbjNode* isbjnode2;
 	bool iinv2;
-	bool stat2 = mvmap.get(src_node2, isbjnode2, iinv2);
+	bool stat2 = mvnode_map.get(src_node2, isbjnode2, iinv2);
 	assert_cond( stat2 , __FILE__, __LINE__);
 	for (ymuint j = 0; j < bw; ++ j) {
 	  SbjNode* sbjnode;
 	  bool inv;
-	  bool stat = mvmap.get(node, j, sbjnode, inv);
+	  bool stat = mvnode_map.get(node, j, sbjnode, inv);
 	  assert_cond( stat, __FILE__, __LINE__);
 	  sbjgraph.set_dff_rst(sbjnode, isbjnode2, iinv2);
 	}
@@ -771,12 +656,12 @@ mvn2sbj(const MvMgr& mvmgr,
 	const MvNode* src_node3 = opin3->node();
 	SbjNode* isbjnode3;
 	bool iinv3;
-	bool stat3 = mvmap.get(src_node3, isbjnode3, iinv3);
+	bool stat3 = mvnode_map.get(src_node3, isbjnode3, iinv3);
 	assert_cond( stat3 , __FILE__, __LINE__);
 	for (ymuint j = 0; j < bw; ++ j) {
 	  SbjNode* sbjnode;
 	  bool inv;
-	  bool stat = mvmap.get(node, j, sbjnode, inv);
+	  bool stat = mvnode_map.get(node, j, sbjnode, inv);
 	  assert_cond( stat, __FILE__, __LINE__);
 	  sbjgraph.set_dff_set(sbjnode, isbjnode3, iinv3);
 	}
@@ -797,10 +682,10 @@ mvn2sbj(const MvMgr& mvmgr,
     for (ymuint j = 0; j < bw; ++ j) {
       SbjNode* sbjnode;
       bool inv;
-      bool stat = mvmap.get(src_node, j, sbjnode, inv);
+      bool stat = mvnode_map.get(src_node, j, sbjnode, inv);
       assert_cond( stat, __FILE__, __LINE__);
       SbjNode* osbjnode = sbjgraph.new_output(sbjnode, inv);
-      mvmap.put(node, j, osbjnode, false);
+      mvnode_map.put(node, j, osbjnode, false);
     }
   }
 
@@ -820,7 +705,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint k = 0; k < nb1; ++ k) {
 	  SbjNode* sbjnode;
 	  bool inv;
-	  bool stat = mvmap.get(node, k, sbjnode, inv);
+	  bool stat = mvnode_map.get(node, k, sbjnode, inv);
 	  assert_cond( stat , __FILE__, __LINE__);
 	  assert_cond( inv == false, __FILE__, __LINE__);
 	  tmp.push_back(sbjnode);
@@ -829,7 +714,7 @@ mvn2sbj(const MvMgr& mvmgr,
       else if ( port_ref->has_bitselect() ) {
 	SbjNode* sbjnode;
 	bool inv;
-	bool stat = mvmap.get(node, port_ref->bitpos(), sbjnode, inv);
+	bool stat = mvnode_map.get(node, port_ref->bitpos(), sbjnode, inv);
 	assert_cond( stat , __FILE__, __LINE__);
 	assert_cond( inv == false, __FILE__, __LINE__);
 	tmp.push_back(sbjnode);
@@ -840,7 +725,7 @@ mvn2sbj(const MvMgr& mvmgr,
 	for (ymuint k = lsb; k <= msb; ++ k) {
 	  SbjNode* sbjnode;
 	  bool inv;
-	  bool stat = mvmap.get(node, k, sbjnode, inv);
+	  bool stat = mvnode_map.get(node, k, sbjnode, inv);
 	  assert_cond( stat , __FILE__, __LINE__);
 	  assert_cond( inv == false, __FILE__, __LINE__);
 	  tmp.push_back(sbjnode);

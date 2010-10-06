@@ -24,13 +24,20 @@
 #include "ym_mvn/MvVerilogReader.h"
 #endif
 #include "ym_utils/MsgHandler.h"
+#include "MvNodeMap.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
 void
 mvn2sbj(const MvMgr& mvmgr,
-	SbjGraph& sbjgraph);
+	SbjGraph& sbjgraph,
+	MvNodeMap& mvnode_map);
+
+void
+dump_mvnode_map(ostream& s,
+		const MvMgr& mvmgr,
+		const MvNodeMap& mvnode_map);
 
 END_NAMESPACE_YM_LUTMAP
 
@@ -146,7 +153,8 @@ main(int argc,
 
     // SbjGraph に変換
     SbjGraph sbj_network;
-    mvn2sbj(mgr, sbj_network);
+    nsLutmap::MvNodeMap mvnode_map(mgr.max_node_id());
+    mvn2sbj(mgr, sbj_network, mvnode_map);
 
     if ( dump2 ) {
       ofstream ofs;
@@ -156,6 +164,7 @@ main(int argc,
 	return 3;
       }
       dump_verilog(ofs, sbj_network);
+      dump_mvnode_map(ofs, mgr, mvnode_map);
     }
 
     // LUT にマッピング

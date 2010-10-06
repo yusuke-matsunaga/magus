@@ -20,6 +20,8 @@ bin_PROGRAMS = \
 
 lutmap_SOURCES = \
 	lutmap.cc \
+	MvNodeMap.h \
+	MvNodeMap.cc \
 	mvn2sbj.cc
 
 lutmap_LDADD = \
