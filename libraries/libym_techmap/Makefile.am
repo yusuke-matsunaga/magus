@@ -16,6 +16,7 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_techmap_la_SOURCES = \
+	BNet2Sbj.cc \
 	SbjGraph.cc \
 	SbjGraph_dump.cc
 

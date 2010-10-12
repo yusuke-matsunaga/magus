@@ -35,6 +35,8 @@ class SbjNode;
 typedef DlList<SbjEdge> SbjEdgeList;
 typedef DlList<SbjNode> SbjNodeList;
 
+class BNet2Sbj;
+
 #if 0
 /// @brief 面積最小化 DAG covering のヒューリスティック関数
 /// @param[in] sbjgraph サブジェクトグラフ
@@ -87,6 +89,8 @@ using nsTechmap::SbjNode;
 
 using nsTechmap::SbjEdgeList;
 using nsTechmap::SbjNodeList;
+
+using nsTechmap::BNet2Sbj;
 
 #if 0
 using nsTechmap::area_map;
