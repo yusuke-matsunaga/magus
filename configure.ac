@@ -5,7 +5,7 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([ymtools], [1.2], 
+AC_INIT([ymtools], [1.2],
         [yusuke_matsunaga@ieee.org],
         [ymtools])dnl
 
@@ -34,7 +34,7 @@ AC_ISC_POSIX
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_CHECK_PROG([DOXYGEN],
-	      [doxygen], 
+	      [doxygen],
 	      [doxygen Doxyfile],
 	      [@echo \"You'll need to install 'doxygen'\"])
 AC_SUBST(DOXYGEN)
@@ -80,6 +80,7 @@ ym_libym_tgnet_enable=1
 ym_libym_gds_enable=1
 ym_libym_cec_enable=1
 ym_libym_lutmap_enable=1
+ym_libym_techmap_enable=1
 ym_libym_seal_enable=1
 ym_libym_tclpp_enable=1
 
@@ -171,6 +172,11 @@ YM_BUILD_LIBRARY([libym_cec],
 
 # libym_lutmap
 YM_BUILD_LIBRARY([libym_lutmap],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
+
+# libym_techmap
+YM_BUILD_LIBRARY([libym_techmap],
 		 [ym_libym_utils_enable,
 		  ym_libym_lexp_enable])
 

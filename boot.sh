@@ -7,7 +7,7 @@
 #
 # - configure スクリプトの生成
 # - autogen スクリプトの生成
-# - clean up 
+# - clean up
 # を行うスクリプト
 #
 # [使用方法]
@@ -31,7 +31,7 @@
 #
 # [環境変数]
 #
-# AUTOCONF 
+# AUTOCONF
 #   定義されていたら autoconf プログラムの代わりに用いられる．
 #   例えば /opt/bin/autoconf とか autoconf259 の様な場合に用いる．
 # AUTOCONF_FLAGS
@@ -132,6 +132,7 @@ LIBRARIES=\
  libym_gds \
  libym_cec \
  libym_lutmap \
+ libym_techmap \
  libym_seal \
  libym_tclpp"
 
@@ -192,7 +193,7 @@ case "$1" in
 	clean $2
 	;;
       *) usage;;
-    esac           
+    esac
     ;;
   autogen)
     case $# in
