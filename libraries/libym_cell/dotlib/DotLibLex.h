@@ -30,8 +30,9 @@ const int ERROR = 300;
 class DotLibLex
 {
 public:
-  
+
   /// @brief コンストラクタ
+  /// @param[in] msg_mgr メッセージマネージャ
   DotLibLex(MsgMgr& msg_mgr);
 
   /// @brief デストラクタ
@@ -39,8 +40,9 @@ public:
 
 
 public:
-  
+
   /// @brief ファイルをオープンする．
+  /// @param[in] filename ファイル名
   /// @return ファイルのオープンに失敗したら false を返す．
   bool
   open_file(const string& filename);
@@ -56,7 +58,7 @@ public:
   /// @brief 直前の read_token() に対応する文字列を返す．
   const char*
   cur_string() const;
-  
+
   // 現在のファイル位置
   FileRegion
   cur_file_region();
@@ -73,7 +75,7 @@ public:
   int
   cur_column() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -90,26 +92,26 @@ private:
   // 直前の get() を無かったことにする．
   void
   unget();
-  
+
   // 改行を読み込んだ時の処理
   void
   nl();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
-  
+
   // ファイルを管理するオブジェクト
   FileDescMgr mFileDescMgr;
 
   // 現在オープン中のファイル
   const FileDesc* mCurFileDesc;
-  
+
   // 入力ストリーム
   ifstream mInput;
 
@@ -121,10 +123,10 @@ private:
 
   // 直前の文字が \r の時に true となるフラグ
   bool mCR;
-  
+
   // read_token の結果の文字列を格納する
   StrBuff mCurString;
-  
+
   // 現在の行番号
   int mCurLine;
 
@@ -148,13 +150,15 @@ DotLibLex::cur_string() const
 {
   return mCurString.c_str();
 }
-  
+
 // 現在のファイル位置
 inline
 FileRegion
 DotLibLex::cur_file_region()
 {
-  return FileRegion(mCurFileDesc, mCurLine, mFirstColumn, mCurLine, mCurColumn);
+  return FileRegion(mCurFileDesc,
+		    mCurLine, mFirstColumn,
+		    mCurLine, mCurColumn);
 }
 
 // 現在の行番号を返す．

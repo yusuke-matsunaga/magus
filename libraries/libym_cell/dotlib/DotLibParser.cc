@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CELL
 DotLibParser::DotLibParser() :
   mLex(new DotLibLex(mMsgMgr))
 {
-  
+
 }
 
 // デストラクタ
@@ -27,7 +27,7 @@ DotLibParser::~DotLibParser()
 {
   delete mLex;
 }
-  
+
 // @brief ファイルを読み込む．
 bool
 DotLibParser::read_file(const string& filename)
@@ -40,6 +40,18 @@ DotLibParser::read_file(const string& filename)
   mLex->close_file();
 
   return true;
+}
+
+// @brief 字句解析を行う．
+int
+DotLibParser::yylex(YYSTYPE& lval,
+		    FileRegion& lloc)
+{
+  int token = mLex->read_token();
+  switch ( token ) {
+  case STR:
+    case
+  }
 }
 
 END_NAMESPACE_YM_CELL

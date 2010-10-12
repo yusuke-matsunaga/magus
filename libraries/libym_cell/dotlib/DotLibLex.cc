@@ -14,6 +14,15 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+//#include "dotlib_grammer.h"
+
+#define INT_NUM 301
+#define FLOAT_NUM 302
+#define STR 303
+#define NL 400
+#define ERROR 500
+
+
 // コンストラクタ
 DotLibLex::DotLibLex(MsgMgr& msg_mgr) :
   mMsgMgr(msg_mgr)
@@ -62,12 +71,15 @@ DotLibLex::init()
 
 // トークンを一つとってくる．
 // 仕様
-// - a-zA-Z0-9_.- からなる文字列を識別子として認識する．
-// - "..." の中身を識別子として認識する．
+// - [0-9]* からなる文字列を整数値として認識する．
+// - [0-9]*.[0-9]+(e|E)(+|-)?[0-9]+ を浮動小数点値として認識する．
+// - [a-zA-Z_][a-zA-Z0-9_]* からなる文字列を識別子として認識する．
+// - "..." の中身を文字列として認識する．
 // - 識別子が予約語かどうかはここでは判定しない．
 // - /* 〜 */ で囲まれた部分は読み飛ばす．
 // - // から改行までを読みとばす．(本当の仕様ではない)
-// - 空白，タブ，改行は区切り文字とみなす．
+// - 改行は改行として扱う．
+// - 空白，タブ，バックスラッシュ＋改行は区切り文字とみなす．
 // - それ以外の文字はそのまま返す．
 int
 DotLibLex::read_token()
@@ -75,35 +87,135 @@ DotLibLex::read_token()
   int c;
 
   mCurString.clear();
-  
+
  ST_INIT: // 初期状態
   c = get();
   mFirstColumn = mCurColumn;
-  if ( isalnum(c) || (c == '_') || (c == '.') ) {
+  if ( isdigit(c) ) {
+    mCurString.put_char(c);
+    goto ST_NUM1;
+  }
+  if ( isalpha(c) || (c == '_') ) {
     mCurString.put_char(c);
     goto ST_ID;
   }
-  
+
   switch (c) {
-  case EOF: return EOF;
+  case '.':
+    mCurString.put_char(c);
+    goto ST_DOT;
+
+  case EOF:
+    return EOF;
+
   case ' ':
-  case '\t': goto ST_INIT;
-  case '\n': nl(); goto ST_INIT;
-  case '\"': goto ST_DQ;
-  case '\\': goto ST_BS;
-  case '/': goto ST_COMMENT1;
-  default: break;
+  case '\t':
+    goto ST_INIT; // 最初の空白は読み飛ばす．
+
+  case '\n':
+    nl();
+    return NL;
+
+  case '\"':
+    goto ST_DQ;
+
+  case '\\':
+    c = get();
+    if ( c == '\n' ) {
+      // 無視する．
+      nl();
+      goto ST_INIT;
+    }
+    // それ以外はバックスラッシュがなかったことにする．
+    unget();
+    goto ST_INIT;
+
+  case '/':
+    goto ST_COMMENT1;
+
+  default:
+    break;
   }
   return c;
 
- ST_ID: // 一文字目が[a-zA-Z0-9_.]の時
+ ST_NUM1: // 一文字目が[0-9]の時
   c = get();
-  if ( isalnum(c) || (c == '_') || (c == '.') ) {
+  if ( isdigit(c) ) {
+    mCurString.put_char(c);
+    goto ST_NUM1;
+  }
+  if ( c == '.' ) {
+    mCurString.put_char(c);
+    goto ST_DOT;
+  }
+  unget();
+  return INT_NUM;
+
+ ST_DOT: // [0-9]*'.' を読み込んだ時
+  c = get();
+  if ( isdigit(c) ) {
+    mCurString.put_char(c);
+    goto ST_NUM2;
+  }
+  { // '.' の直後はかならず数字
+    ostringstream buf;
+    buf << "digit number expected after dot";
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
+    return ERROR;
+  }
+
+ ST_NUM2: // [0-9]*'.'[0-9]* を読み込んだ時
+  c = get();
+  if ( isdigit(c) ) {
+    mCurString.put_char(c);
+    goto ST_NUM2;
+  }
+  if ( c == 'e' || c == 'E' ) {
+    mCurString.put_char(c);
+    goto ST_NUM3;
+  }
+  unget();
+  return FLOAT_NUM;
+
+ ST_NUM3: // [0-9]*'.'[0-9]*(e|E)を読み込んだ時
+  c = get();
+  if ( isdigit(c) ) {
+    mCurString.put_char(c);
+    goto ST_NUM4;
+  }
+  if ( c == '+' || c == '-' ) {
+    mCurString.put_char(c);
+    goto ST_NUM4;
+  }
+  { // (e|E) の直後はかならず数字か符号
+    ostringstream buf;
+    buf << "exponent value expected";
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
+    return ERROR;
+  }
+
+ ST_NUM4: // [0-9]*'.'[0-9]*(e|E)(+|-)?[0-9]*を読み込んだ直後
+  c = get();
+  if ( isdigit(c) ) {
+    mCurString.put_char(c);
+    goto ST_NUM4;
+  }
+  unget();
+  return FLOAT_NUM;
+
+ ST_ID: // 一文字目が[a-zA-Z_]の時
+  c = get();
+  if ( isalnum(c) || (c == '_') ) {
     mCurString.put_char(c);
     goto ST_ID;
   }
   unget();
-  
   return STR;
 
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
@@ -131,18 +243,7 @@ DotLibLex::read_token()
   }
   mCurString.put_char(c);
   goto ST_DQ;
-  
- ST_BS: // '\' を読み込んだ直後
-  c = get();
-  if ( c == '\n' ) {
-    // 無視する．
-    nl();
-    goto ST_INIT;
-  }
-  // それ以外はなかったことにする．
-  unget();
-  goto ST_INIT;
-  
+
  ST_COMMENT1: // '/' を読み込んだ直後
   c = get();
   if ( c == '/' ) { // C++ スタイルのコメント
@@ -153,7 +254,7 @@ DotLibLex::read_token()
   }
   unget();
   return '/';
-  
+
  ST_COMMENT2: // 改行まで読み飛ばす．
   c = get();
   if ( c == '\n' ) {
@@ -164,7 +265,7 @@ DotLibLex::read_token()
     return EOF;
   }
   goto ST_COMMENT2;
-  
+
  ST_COMMENT3: // "/*" を読み込んだ直後
   c = get();
   if ( c == EOF ) {
@@ -174,7 +275,7 @@ DotLibLex::read_token()
     goto ST_COMMENT4;
   }
   goto ST_COMMENT3;
-  
+
  ST_COMMENT4: // "/* 〜 *" まで読み込んだ直後
   c = get();
   if ( c == EOF ) {
@@ -190,7 +291,7 @@ DotLibLex::read_token()
     nl();
   }
   goto ST_COMMENT3;
-  
+
  ST_EOF:
   {
     ostringstream buf;
@@ -208,7 +309,7 @@ int
 DotLibLex::get()
 {
   int c = 0;
-  
+
   if ( mUngetChar != 0 ) {
     // 戻された文字があったらそれを返す．
     c = mUngetChar;
@@ -259,7 +360,7 @@ DotLibLex::unget()
   mUngetChar = mLastChar;
   -- mCurColumn;
 }
-  
+
 // 改行を読み込んだ時の処理
 void
 DotLibLex::nl()

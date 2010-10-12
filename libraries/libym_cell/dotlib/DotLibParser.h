@@ -17,6 +17,8 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+union YYSTYPE;
+
 class DotLibLex;
 
 //////////////////////////////////////////////////////////////////////
@@ -25,7 +27,7 @@ class DotLibLex;
 class DotLibParser
 {
 public:
-  
+
   /// @brief コンストラクタ
   DotLibParser();
 
@@ -34,29 +36,34 @@ public:
 
 
 public:
-  
+
   /// @brief ファイルを読み込む．
   bool
   read_file(const string& filename);
 
-  
-private:
+
+public:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  
+  /// @brief 字句解析を行う．
+  int
+  yylex(YYSTYPE& lval,
+	FileRegion& lloc);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // メッセージを管理するオブジェクト
   MsgMgr mMsgMgr;
 
   // 字句解析器
   DotLibLex* mLex;
-  
+
 };
 
 
