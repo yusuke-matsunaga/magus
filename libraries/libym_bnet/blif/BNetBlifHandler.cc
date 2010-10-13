@@ -34,14 +34,19 @@ void
 BNetBlifHandler::set_network(BNetwork* network)
 {
   mNetwork = network;
-  mManip = new BNetManip(network);
 }
 
 // @brief 初期化
 bool
 BNetBlifHandler::init()
 {
+  assert_cond( mManip == NULL, __FILE__, __LINE__);
+
+  mManip = new BNetManip(mNetwork);
   mNetwork->clear();
+
+  mNodeArray.clear();
+
   return true;
 }
 
@@ -102,7 +107,7 @@ BNetBlifHandler::names(const vector<ymuint32>& name_id_array,
   size_t ni = name_id_array.size();
   -- ni;
   BNode* node = get_node(name_id_array[ni]);
-  
+
   LogExpr expr;
   if ( opat == '1' ) {
     if ( ni == 0 ) {
