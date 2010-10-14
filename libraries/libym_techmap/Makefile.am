@@ -17,6 +17,8 @@ INCLUDES = \
 
 libym_techmap_la_SOURCES = \
 	BNet2Sbj.cc \
+	PatGraph.h \
+	PatGraph.cc \
 	SbjGraph.cc \
 	SbjGraph_dump.cc
 
