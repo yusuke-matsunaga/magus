@@ -75,7 +75,7 @@ public:
   enum tType {
     kInput,
     kAnd,
-    kXor,
+    kXor
   };
 
 public:
@@ -96,8 +96,13 @@ public:
   ymuint
   node_num() const;
 
+  /// @brief 入力ノード数を返す．
+  ymuint
+  input_num() const;
+
   /// @brief ノードの種類を返す．
   /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @note 0 <= id < input_num() のノードは入力ノード
   tType
   node_type(ymuint id) const;
 
@@ -165,6 +170,15 @@ private:
   PatEdge* mEdgeArray;
 
 };
+
+
+/// @relates PatGraph
+/// @brief PatGraph の内容を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] patgraph パタングラフ
+void
+dump(ostream& s,
+     const PatGraph& patgraph);
 
 
 //////////////////////////////////////////////////////////////////////

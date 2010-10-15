@@ -142,10 +142,9 @@ dump(ostream& s,
   for (SbjNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const SbjNode* node = *p;
-    ymuint fcode = node->fcode();
-    const char* pol0 = (fcode & 1U) ? "~" : "";
-    const char* pol1 = (fcode & 2U) ? "~" : "";
-    const char* op   = (fcode & 4U) ? "^" : "&";
+    const char* pol0 = node->fanin_inv(0) ? "~" : "";
+    const char* pol1 = node->fanin_inv(1) ? "~" : "";
+    const char* op   = node->is_xor() ? "^" : "&";
     s << "Logic(" << node->id_str() << ") = "
       << pol0 << node->fanin(0)->id_str()
       << " " << op << " "
@@ -214,31 +213,27 @@ dump_blif(ostream& s,
     s << ".names " << node->fanin(0)->id_str()
       << " " << node->fanin(1)->id_str()
       << " " << node->id_str() << endl;
-    switch ( node->fcode() ) {
-    case 0x0:
-      s << "11 1" << endl;
-      break;
-
-    case 0x1:
-      s << "01 1" << endl;
-      break;
-
-    case 0x2:
-      s << "10 1" << endl;
-      break;
-
-    case 0x3:
-      s << "00 1" << endl;
-      break;
-
-    case 0x4:
+    if ( node->is_and() ) {
+      if ( node->fanin_inv(0) ) {
+	if ( node->fanin_inv(1) ) {
+	  s << "00 1" << endl;
+	}
+	else {
+	  s << "01 1" << endl;
+	}
+      }
+      else {
+	if ( node->fanin_inv(1) ) {
+	  s << "10 1" << endl;
+	}
+	else {
+	  s << "11 1" << endl;
+	}
+      }
+    }
+    else {
       s << "10 1" << endl
 	<< "01 1" << endl;
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
     }
     s << endl;
   }
@@ -359,10 +354,9 @@ dump_verilog(ostream& s,
     const SbjNode* node = *p;
     s << "  assign " << node_name(node) << " = ";
 
-    ymuint fcode = node->fcode();
-    const char* pol0 = (fcode & 1U) ? "~" : "";
-    const char* pol1 = (fcode & 2U) ? "~" : "";
-    const char* op   = (fcode & 4U) ? "^" : "&";
+    const char* pol0 = node->fanin_inv(0) ? "~" : "";
+    const char* pol1 = node->fanin_inv(1) ? "~" : "";
+    const char* op   = node->is_xor() ? "^" : "&";
     s << pol0 << node_name(node->fanin(0))
       << " " << op << " "
       << pol1 << node_name(node->fanin(1))

@@ -11,6 +11,7 @@
 
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetBlifReader.h"
+#include "ym_bnet/BNetDecomp.h"
 #include "ym_techmap/BNet2Sbj.h"
 #include "ym_techmap/SbjGraph.h"
 #include "ym_utils/MsgHandler.h"
@@ -81,6 +82,10 @@ main(int argc,
       cerr << "Error in reading " << filename << endl;
       return 4;
     }
+
+    BNetDecomp decomp;
+
+    decomp(network, 2);
 
     BNet2Sbj bnet2sbj;
 

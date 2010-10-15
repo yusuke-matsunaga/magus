@@ -85,4 +85,44 @@ PatGraph::set_edge(ymuint id,
   mEdgeArray[id].mData = data;
 }
 
+
+// @relates PatGraph
+// @brief PatGraph の内容を出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] patgraph パタングラフ
+void
+dump(ostream& s,
+     const PatGraph& patgraph)
+{
+  s << "==== PatGraph dump start ====" << endl;
+
+  // ノードの種類の出力
+  ymuint nn = patgraph.node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    s << "Node#" << i << ": ";
+    switch ( patgraph.node_type(i) ) {
+    case PatGraph::kInput: s << "INPUT"; break;
+    case PatGraph::kAnd:   s << "AND"; break;
+    case PatGraph::kXor:   s << "XOR"; break;
+    default: assert_not_reached(__FILE__, __LINE__);
+    }
+    s << endl;
+  }
+  s << endl;
+
+  // 枝の情報の出力
+  ymuint ne = patgraph.edge_num();
+  for (ymuint i = 0; i < ne; ++ i) {
+    const PatEdge& e = patgraph.edge(i);
+    s << "Edge#" << i << ": " << e.from_id()
+      << " -> " << e.to_id() << "(" << e.fanin_pos() << ")";
+    if ( e.inverted() ) {
+      s << " ***";
+    }
+    s << endl;
+  }
+
+  s << "==== PatGraph dump end ====" << endl;
+}
+
 END_NAMESPACE_YM_TECHMAP

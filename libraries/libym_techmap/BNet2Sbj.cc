@@ -100,6 +100,8 @@ BNet2Sbj::operator()(const BNetwork& network,
 
   sbjgraph.clear();
 
+  sbjgraph.set_name(network.model_name());
+
   // 外部入力を作る．
   // 同時にポートも作る．
   for (BNodeList::const_iterator p = network.inputs_begin();
@@ -227,17 +229,13 @@ BNet2Sbj::operator()(const BNetwork& network,
       else {
 	assert_not_reached(__FILE__, __LINE__);
       }
-      ymuint fcode = 0U;
-      if ( inv0 ) {
-	fcode |= 1U;
-      }
-      if ( inv1 ) {
-	fcode |= 2U;
-      }
+      SbjNode* node = NULL;
       if ( xor_flag ) {
-	fcode |= 4U;
+	node = sbjgraph.new_xor(inode0, inode1);
       }
-      SbjNode* node = sbjgraph.new_logic(fcode, inode0, inode1);
+      else {
+	node = sbjgraph.new_and(inode0, inode1, inv0, inv1);
+      }
       assoc.put(bnode, node, oinv);
     }
     else { // ni > 2

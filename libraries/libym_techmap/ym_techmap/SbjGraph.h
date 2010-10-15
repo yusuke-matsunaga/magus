@@ -140,10 +140,12 @@ public:
     kINPUT  = 0,
     /// @brief 出力ノード
     kOUTPUT = 1,
-    /// @brief 論理ノード
-    kLOGIC  = 2,
     /// @brief DFFノード
-    kDFF    = 3
+    kDFF    = 2,
+    /// @brief ANDノード
+    kAND    = 4,
+    /// @brief XORノード
+    kXOR    = 5
   };
 
 
@@ -193,6 +195,14 @@ public:
   bool
   is_logic() const;
 
+  /// @brief AND ノードの時に true を返す．
+  bool
+  is_and() const;
+
+  /// @brief XOR ノードの時に true を返す．
+  bool
+  is_xor() const;
+
   /// @brief DFFノードの時に true を返す．
   bool
   is_dff() const;
@@ -215,21 +225,17 @@ public:
   bool
   output_inv() const;
 
-  /// @brief 機能コードを得る．
-  /// @note 論理ノードの場合のみ意味を持つ．
-  /// @note 機能コードの各ビットの意味は以下の通り
-  ///  - 0-bit: 入力0の極性(1で反転)
-  ///  - 1-bit: 入力1の極性(1で反転)
-  ///  - 2-bit: AND/XOR フラグ(0 で AND，1 で XOR)
-  ymuint
-  fcode() const;
-
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番めのファンインのノード
   /// @note 該当するファンインがなければ NULL を返す．
   const SbjNode*
   fanin(ymuint pos) const;
+
+  /// @brief ファンインの反転属性を得る．
+  /// @param[in] pos 入力番号 (0 or 1)
+  bool
+  fanin_inv(ymuint pos) const;
 
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号(0 or 1)
@@ -339,12 +345,19 @@ private:
   set_output(ymuint subid,
 	     bool inv);
 
-  /// @brief タイプを論理に設定する．
+  /// @brief タイプをANDに設定する．
+  /// @param[in] inv0, inv1 ファンインの反転属性
   void
-  set_logic(ymuint fcode);
+  set_and(bool inv0,
+	  bool inv1);
+
+  /// @brief タイプをXORに設定する．
+  /// @note 入力に反転属性は付かない．
+  void
+  set_xor();
 
   /// @brief タイプをDFFに設定する．
-  /// @param[in] inv 反転属性
+  /// @param[in] inv データ入力の反転属性
   void
   set_dff(bool inv);
 
@@ -373,7 +386,7 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // タイプ (+ 入力/出力番号/機能コード)
+  // タイプ (+ 入力/出力番号/ファンインの反転属性)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
@@ -665,15 +678,25 @@ public:
   new_output(SbjNode* inode,
 	     bool inv);
 
-  /// @brief 論理ノードを作る．
-  /// @param[in] fcode 機能コード
+  /// @brief ANDノードを作る．
+  /// @param[in] inode1 1番めの入力ノード
+  /// @param[in] inode2 2番めの入力ノード
+  /// @param[in] inv1 1番めの枝の反転属性
+  /// @param[in] inv2 2番めの枝の反転属性
+  /// @return 作成したノードを返す．
+  SbjNode*
+  new_and(SbjNode* inode1,
+	  SbjNode* inode2,
+	  bool inv1,
+	  bool inv2);
+
+  /// @brief XORノードを作る．
   /// @param[in] inode1 1番めの入力ノード
   /// @param[in] inode2 2番めの入力ノード
   /// @return 作成したノードを返す．
   SbjNode*
-  new_logic(ymuint fcode,
-	    SbjNode* inode1,
-	    SbjNode* inode2);
+  new_xor(SbjNode* inode1,
+	  SbjNode* inode2);
 
   /// @brief DFFノードを作る．
   /// @param[in] inode 入力のノード
@@ -692,16 +715,27 @@ public:
 		SbjNode* inode,
 		bool inv);
 
-  /// @brief 論理ノードの内容を再設定する．
+  /// @brief ANDノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード
-  /// @param[in] fcode 機能コード
+  /// @param[in] inode1 1番めの入力ノード
+  /// @param[in] inode2 2番めの入力ノード
+  /// @param[in] inv1 1番めの枝の反転属性
+  /// @param[in] inv2 2番めの枝の反転属性
+  void
+  change_and(SbjNode* node,
+	     SbjNode* inode1,
+	     SbjNode* inode2,
+	     bool inv1,
+	     bool inv2);
+
+  /// @brief XORノードの内容を再設定する．
+  /// @param[in] node 変更対象の論理ノード
   /// @param[in] inode1 1番めの入力ノード
   /// @param[in] inode2 2番めの入力ノード
   void
-  change_logic(SbjNode* node,
-	       ymuint fcode,
-	       SbjNode* inode1,
-	       SbjNode* inode2);
+  change_xor(SbjNode* node,
+	     SbjNode* inode1,
+	     SbjNode* inode2);
 
   /// @brief DFFノードの内容を変更する
   /// @param[in] 変更対象のDFFノード
@@ -1024,12 +1058,23 @@ SbjNode::set_output(ymuint subid,
   mFlags = static_cast<ymuint>(kOUTPUT) | (subid << 4) | (inv << 3);
 }
 
-// タイプを論理に設定する．
+// @brief タイプをANDに設定する．
+// @param[in] inv0, inv1 ファンインの反転属性
 inline
 void
-SbjNode::set_logic(ymuint fcode)
+SbjNode::set_and(bool inv0,
+		 bool inv1)
 {
-  mFlags = static_cast<ymuint>(kLOGIC) | (fcode << 3);
+  mFlags = static_cast<ymuint>(kAND) | (inv0 << 3) | (inv1 << 4);
+}
+
+// @brief タイプをXORに設定する．
+// @note 入力に反転属性は付かない．
+inline
+void
+SbjNode::set_xor()
+{
+  mFlags = static_cast<ymuint>(kXOR);
 }
 
 // @brief タイプをDFFに設定する．
@@ -1072,7 +1117,7 @@ inline
 SbjNode::tType
 SbjNode::type() const
 {
-  return static_cast<tType>(mFlags & 3U);
+  return static_cast<tType>(mFlags & 7U);
 }
 
 // 入力ノードの時に true を返す．
@@ -1096,7 +1141,24 @@ inline
 bool
 SbjNode::is_logic() const
 {
-  return type() == kLOGIC;
+  // kAND と kXOR の符号化に依存したコード
+  return (type() & kAND) == kAND;
+}
+
+// @brief AND ノードの時に true を返す．
+inline
+bool
+SbjNode::is_and() const
+{
+  return type() == kAND;
+}
+
+// @brief XOR ノードの時に true を返す．
+inline
+bool
+SbjNode::is_xor() const
+{
+  return type() == kXOR;
 }
 
 // DFFノードの時に true を返す．
@@ -1139,14 +1201,6 @@ SbjNode::output_inv() const
   return static_cast<bool>((mFlags >> 3) & 1U);
 }
 
-// @brief 機能コードを得る．
-inline
-ymuint
-SbjNode::fcode() const
-{
-  return mFlags >> 3;
-}
-
 // @brief ファンインのノードを得る．
 inline
 const SbjNode*
@@ -1163,6 +1217,15 @@ SbjNode::fanin(ymuint pos)
 {
   // pos の範囲チェックはしていない！！！
   return mFanins[pos].from();
+}
+
+// @brief ファンインの反転属性を得る．
+// @param[in] pos 入力番号 (0 or 1)
+inline
+bool
+SbjNode::fanin_inv(ymuint pos) const
+{
+  return static_cast<bool>((mFlags >> (pos + 3)) & 1U);
 }
 
 // ファンインの枝を得る．
