@@ -81,7 +81,8 @@ public:
 public:
 
   /// @brief コンストラクタ
-  PatGraph();
+  /// @param[in] data 内容を表すエンコードされたデータ
+  PatGraph(const ymuint32* data);
 
   /// @brief デストラクタ
   ~PatGraph();
@@ -99,6 +100,10 @@ public:
   /// @brief 入力ノード数を返す．
   ymuint
   input_num() const;
+
+  /// @brief 根のノード番号を返す．
+  ymuint
+  root_id() const;
 
   /// @brief ノードの種類を返す．
   /// @param[in] id ノード番号 ( 0 <= id < node_num() )
@@ -118,47 +123,17 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 設定用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ノード数を設定し，mNodeTypeArray を確保する．
-  /// @param[in] n ノード数
-  void
-  set_node_num(ymuint n);
-
-  /// @brief ノードの種類を設定する．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
-  /// @param[in] type 設定するノードの種類
-  void
-  set_node_type(ymuint id,
-		tType type);
-
-  /// @brief 枝の数を設定し，mEdgeArray を確保する．
-  /// @param[in] n 枝の数
-  void
-  set_edge_num(ymuint n);
-
-  /// @brief 枝を設定する．
-  /// @param[in] id 枝の番号 ( 0 <= id < edge_num() )
-  /// @param[in] from_id 入力元のノード番号
-  /// @param[in] to_id 出力先のノード番号
-  /// @param[in] fanin_pos ファンインの位置 ( 0  or 1 )
-  /// @param[in] inverted 極性
-  void
-  set_edge(ymuint id,
-	   ymuint from_id,
-	   ymuint to_id,
-	   ymuint fanin_pos,
-	   bool inverted);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // ノード数
   ymuint32 mNodeNum;
+
+  // 入力数
+  ymuint32 mInputNum;
+
+  // 根のノード番号
+  ymuint32 mRootId;
 
   // ノードの種類を納めた配列
   tType* mNodeTypeArray;
@@ -233,6 +208,22 @@ ymuint
 PatGraph::node_num() const
 {
   return mNodeNum;
+}
+
+// @brief 入力ノード数を返す．
+inline
+ymuint
+PatGraph::input_num() const
+{
+  return mInputNum;
+}
+
+// @brief 根のノード番号を返す．
+inline
+ymuint
+PatGraph::root_id() const
+{
+  return mRootId;
 }
 
 // @brief ノードの種類を返す．

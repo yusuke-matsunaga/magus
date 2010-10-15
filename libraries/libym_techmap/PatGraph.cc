@@ -13,12 +13,40 @@
 BEGIN_NAMESPACE_YM_TECHMAP
 
 // @brief コンストラクタ
-PatGraph::PatGraph()
+// @param[in] data 内容を表すエンコードされたデータ
+PatGraph::PatGraph(const ymuint32* data)
 {
-  mNodeNum = 0;
-  mNodeTypeArray = NULL;
-  mEdgeNum = 0;
-  mEdgeArray = NULL;
+  ymuint pos = 0;
+
+  // 最初の1ワードがノード数
+  mNodeNum = data[pos];
+  ++ pos;
+  mNodeTypeArray = new tType[mNodeNum];
+
+  // 次の1ワードが入力数
+  mInputNum = data[pos];
+  ++ pos;
+
+  // 次の1ワードが根の ID
+  mRootId = data[pos];
+  ++ pos;
+
+  // 続く mNodeNum ワードがノードの種類
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    mNodeTypeArray[i] = static_cast<tType>(data[pos]);
+    ++ pos;
+  }
+
+  // 次のワードが枝の数
+  mEdgeNum = data[pos];
+  ++ pos;
+  mEdgeArray = new PatEdge[mEdgeNum];
+
+  // 続く mEdgeNum ワードが枝の情報
+  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+    mEdgeArray[i].mData = data[pos];
+    ++ pos;
+  }
 }
 
 // @brief デストラクタ
@@ -27,64 +55,6 @@ PatGraph::~PatGraph()
   delete [] mNodeTypeArray;
   delete [] mEdgeArray;
 }
-
-// @brief ノード数を設定し，mNodeTypeArray を確保する．
-// @param[in] n ノード数
-void
-PatGraph::set_node_num(ymuint n)
-{
-  assert_cond( mNodeNum == 0, __FILE__, __LINE__);
-  mNodeNum = n;
-  mNodeTypeArray = new tType[n];
-}
-
-// @brief ノードの種類を設定する．
-// @param[in] id ノード番号 ( 0 <= id < node_num() )
-// @param[in] type 設定するノードの種類
-void
-PatGraph::set_node_type(ymuint id,
-			tType type)
-{
-  assert_cond( id < mNodeNum, __FILE__, __LINE__);
-  mNodeTypeArray[id] = type;
-}
-
-// @brief 枝の数を設定し，mEdgeArray を確保する．
-// @param[in] n 枝の数
-void
-PatGraph::set_edge_num(ymuint n)
-{
-  assert_cond( mEdgeNum == 0, __FILE__, __LINE__);
-  mEdgeNum = n;
-  mEdgeArray = new PatEdge[n];
-}
-
-// @brief 枝を設定する．
-// @param[in] id 枝の番号 ( 0 <= id < edge_num() )
-// @param[in] from_id 入力元のノード番号
-// @param[in] to_id 出力先のノード番号
-// @param[in] fanin_pos ファンインの位置 ( 0  or 1 )
-// @param[in] inverted 極性
-void
-PatGraph::set_edge(ymuint id,
-		   ymuint from_id,
-		   ymuint to_id,
-		   ymuint fanin_pos,
-		   bool inverted)
-{
-  assert_cond( id < mEdgeNum, __FILE__, __LINE__);
-  ymuint32 data = 0U;
-  if ( inverted ) {
-    data |= 1U;
-  }
-  if ( fanin_pos == 1 ) {
-    data |= 2U;
-  }
-  data |= (from_id << 2);
-  data |= (to_id << 17);
-  mEdgeArray[id].mData = data;
-}
-
 
 // @relates PatGraph
 // @brief PatGraph の内容を出力する．

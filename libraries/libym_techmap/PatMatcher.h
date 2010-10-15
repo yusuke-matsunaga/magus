@@ -44,7 +44,7 @@ public:
   bool
   operator()(const SbjNode* sbj_root,
 	     const PatGraph& pat_graph,
-	     vector<ymuint> input_map);
+	     vector<ymuint>& input_map);
 
 
 private:
@@ -74,7 +74,7 @@ private:
 
   // サブジェクトノードの ID をキーとしてパタンノードの ID を
   // 入れる配列
-  vector<ymuint> mPatMap;
+  hash_map<ymuint, ymuint> mPatMap;
 
   // パタンノードの ID をキーとして極性を入れる配列
   vector<bool> mInvMap;

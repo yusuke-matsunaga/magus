@@ -6,7 +6,8 @@ SUBDIRS =
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_techmap
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -28,7 +29,8 @@ LIBYM_TECHMAP = $(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la
 LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
-	read_blif
+	read_blif \
+	patgraph_test
 
 read_blif_SOURCES = \
 	read_blif.cc
@@ -36,3 +38,9 @@ read_blif_SOURCES = \
 read_blif_LDADD = \
 	$(LIBYM_TECHMAP) \
 	$(LIBYM_BNET)
+
+patgraph_test_SOURCES = \
+	patgraph_test.cc
+
+patgraph_test_LDADD = \
+	$(LIBYM_TECHMAP)
