@@ -37,13 +37,13 @@ BNetGateDecomp::operator()(BNetwork& network,
 			   ymuint max_fanin)
 {
   BNetDecomp decomp;
-  
+
   bool no_xor = ((type_mask & (kXor | kXnor)) == 0U);
   decomp(network, max_fanin, no_xor);
-  
-  decomp_sub(network, type_mask, max_fanin);
+
+  decomp_sub(network, type_mask);
 }
-  
+
 // @brief 特定の型のみを用いた分解を行う．(ランダム型)
 // @param[in] network 操作対象のネットワーク
 // @param[in] type_mask 使用可能なゲートの種類を表すビットマスク
@@ -57,21 +57,19 @@ BNetGateDecomp::operator()(BNetwork& network,
 			   RandGen& randgen)
 {
   BNetDecomp decomp;
-  
+
   bool no_xor = ((type_mask & (kXor | kXnor)) == 0U);
   decomp(network, max_fanin, randgen, no_xor);
 
-  decomp_sub(network, type_mask, max_fanin);
+  decomp_sub(network, type_mask);
 }
 
 // @brief 特定の型のみを用いた分解を行う．
 // @param[in] network 操作対象のネットワーク
 // @param[in] type_mask 使用可能なゲートの種類を表すビットマスク
-// @param[in] max_fanin ファンインの最大数(0, 1で制限なし)
 void
 BNetGateDecomp::decomp_sub(BNetwork& network,
-			   ymuint32 type_mask,
-			   ymuint max_fanin)
+			   ymuint32 type_mask)
 {
   ymuint n = network.max_node_id();
   mNodeMap.clear();
@@ -81,16 +79,16 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
   for (BNodeList::const_iterator p = network.inputs_begin();
        p != network.inputs_end(); ++ p) {
     BNode* node = *p;
-    mNodeMap[node->id() * 2] = node;
+    node_map(node, false) = node;
   }
   for (BNodeList::const_iterator p = network.latch_nodes_begin();
        p != network.latch_nodes_end(); ++ p) {
     BNode* node = *p;
-    mNodeMap[node->id() * 2] = node;
+    node_map(node, false) = node;
   }
-  
-  mManip = new BNetManip(&network);
-  
+
+  BNetManip manip(&network);
+
   // 論理ノードを type_mask に応じて変換する．
   BNodeVector node_list;
   network.tsort(node_list);
@@ -100,10 +98,10 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
     if ( expr.is_literal() || expr.is_constant() ) {
       continue;
     }
-  
+
     ymuint ni = node->ni();
     assert_cond(expr.child_num() == ni, __FILE__, __LINE__);
-    
+
     ymuint best_cost = ni + 2;
     ymuint32 best_type = 0;
     vector<bool> best_iinv(ni);
@@ -270,7 +268,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       }
     }
     assert_cond(best_cost < ni + 2, __FILE__, __LINE__);
-    
+
     BNodeVector new_fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       BNode* node1 = node->fanin(i);
@@ -279,7 +277,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
 	new_node = node_map(node1, true);
 	if ( new_node == NULL ) {
 	  BNode* node0 = node_map(node1, false);
-	  new_node = mManip->make_inverter(node0);
+	  new_node = manip.make_inverter(node0);
 	}
       }
       else {
@@ -288,7 +286,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       }
       new_fanins[i] = new_node;
     }
-    
+
     LogExprVector lit_array(ni);
     for (ymuint i = 0; i < ni;  ++ i) {
       lit_array[i] = LogExpr::make_posiliteral(i);
@@ -316,22 +314,23 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       assert_cond(__FILE__, __LINE__);
     }
     if ( best_oinv ) {
-      BNode* new_node = mManip->new_logic();
-      bool stat1 = mManip->change_logic(new_node, new_expr, new_fanins);
+      BNode* new_node = manip.new_logic();
+      bool stat1 = manip.change_logic(new_node, new_expr, new_fanins);
       assert_cond(stat1, __FILE__, __LINE__);
       node_map(node, true) = new_node;
-      bool stat2 = mManip->change_to_inverter(node, new_node);
+      bool stat2 = manip.change_to_inverter(node, new_node);
       assert_cond(stat2, __FILE__, __LINE__);
     }
     else {
-      bool stat = mManip->change_logic(node, new_expr, new_fanins);
+      bool stat = manip.change_logic(node, new_expr, new_fanins);
       assert_cond(stat, __FILE__, __LINE__);
     }
     node_map(node, false) = node;
   }
+  mNodeMap.clear();
 
-  delete mManip;
-  mManip = NULL;
+  // 使われなかったノードを取り除く
+  network.sweep();
 }
 
 // expr の子供がすべてリテラルだと仮定して必要となるインバーターの数を数える．
@@ -362,7 +361,7 @@ BNetGateDecomp::count_inv(const LogExpr& expr,
   }
   return c;
 }
-  
+
 // (node:inv) に対応するノードを返す．
 BNode*&
 BNetGateDecomp::node_map(BNode* node,
