@@ -22,10 +22,10 @@ class TmCellRep;
 class TmCellGroup;
 
 //////////////////////////////////////////////////////////////////////
-/// @class TmCellInputPin TmCell.h "TmCell.h"
+/// @class TmCellInput TmCell.h "TmCell.h"
 /// @brief セルの入力ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
-class TmCellInputPin
+class TmCellInput
 {
   friend TmCellMgr;
 
@@ -69,10 +69,10 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TmCellOutputPin TmCell.h "TmCell.h"
+/// @class TmCellOutput TmCell.h "TmCell.h"
 /// @brief セルの出力ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
-class TmCellOutputPin
+class TmCellOutput
 {
   friend TmCellMgr;
 
@@ -175,11 +175,11 @@ public:
 
   /// @brief 入力ピンを返す．
   /// @param[in] pos 入力ピン番号 ( 0 <= pos < input_num() )
-  const TmCellInputPin&
+  const TmCellInput&
   input(ymuint pos) const;
 
   /// @brief 出力ピンを返す．
-  const TmCellOutputPin&
+  const TmCellOutput&
   output() const;
 
 
@@ -201,10 +201,10 @@ private:
   ymuint32 mInputNum;
 
   // 入力ピンの配列
-  TmCellInputPin* mInputArray;
+  TmCellInput* mInputArray;
 
   // 出力ピン
-  TmCellOutputPin;
+  TmCellOutput;
 
 };
 
@@ -352,7 +352,7 @@ TmCellPin::name() const
 // @brief 負荷容量を返す．
 inline
 double
-TmCellInputPin::capacitance() const
+TmCellInput::capacitance() const
 {
   return mCapacitance;
 }
@@ -360,7 +360,7 @@ TmCellInputPin::capacitance() const
 // @brief 立ち上がり時の負荷容量を返す．
 inline
 double
-TmCellInputPin::rise_capacitance() const
+TmCellInput::rise_capacitance() const
 {
   return mRiseCapacitance;
 }
@@ -368,9 +368,65 @@ TmCellInputPin::rise_capacitance() const
 // @brief 立ち下がり時の負荷容量を返す．
 inline
 double
-TmCellInputPin::fall_capacitance() const
+TmCellInput::fall_capacitance() const
 {
   return mFallCapacitance;
+}
+
+// @brief 名前を返す．
+inline
+ShString
+TmCellOutput::name() const
+{
+  return mName;
+}
+
+// @brief 最大ファンアウト容量を返す．
+inline
+double
+TmCellOutput::max_fanout() const
+{
+  return mMaxFanout;
+}
+
+// @brief 最小ファンアウト容量を返す．
+inline
+double
+TmCellOutput::min_fanout() const
+{
+  return mMinFanout;
+}
+
+// @brief 最大負荷容量を返す．
+inline
+double
+TmCellOutput::max_capacitance() const
+{
+  return mMaxCapacitance;
+}
+
+// @brief 最小負荷容量を返す．
+inline
+double
+TmCellOutput::min_capacitance() const
+{
+  return mMinCapacitance;
+}
+
+// @brief 最大遷移時間を返す．
+inline
+double
+TmCellOutput::max_transition() const
+{
+  return mMaxTransition;
+}
+
+// @brief 最小遷移時間を返す．
+inline
+double
+TmCellOutput::min_transition() const
+{
+  return mMinTransition;
 }
 
 // @brief セル名を返す．
@@ -408,7 +464,7 @@ TmCell::input_num() const
 // @brief 入力ピンを返す．
 // @param[in] pos 入力ピン番号 ( 0 <= pos < input_num() )
 inline
-const TmCellInputPin&
+const TmCellInput&
 TmCell::input(ymuint pos) const
 {
   return mInputArray[pos];
@@ -416,7 +472,7 @@ TmCell::input(ymuint pos) const
 
 // @brief 出力ピンを返す．
 inline
-const TmCellOutputPin&
+const TmCellOutput&
 TmCell::output() const
 {
   return mOutput;
