@@ -8,6 +8,8 @@
 
 
 #include "PgNode.h"
+#include "PgGraph.h"
+#include "PgNodeMgr.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
@@ -48,7 +50,7 @@ PgGraph::PgGraph(PgNodeMgr& mgr) :
 // @brief デストラクタ
 PgGraph::~PgGraph()
 {
-  for (vector<PgNode>::iterator p = mNodeList.begin();
+  for (vector<PgNode*>::iterator p = mNodeList.begin();
        p != mNodeList.end(); ++ p) {
     mMgr.delete_node(*p);
   }

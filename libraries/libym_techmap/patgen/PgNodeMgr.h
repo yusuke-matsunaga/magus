@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 
+class PgNode;
+
 //////////////////////////////////////////////////////////////////////
 /// @class PgNodeMgr PgNode.h "PgNode.h"
 /// @brief PgNode を管理するクラス

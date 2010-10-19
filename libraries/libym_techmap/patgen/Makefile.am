@@ -2,30 +2,26 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = \
-	ym_techmap \
-	. \
-	tests
+SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_techmap.la
+noinst_LTLIBRARIES = libym_techmap_patgen.la
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-libym_techmap_la_SOURCES = \
-	BNet2Sbj.cc \
-	PatGraph.h \
-	PatGraph.cc \
-	PatMatcher.h \
-	PatMatcher.cc \
-	SbjGraph.cc \
-	SbjGraph_dump.cc
+libym_techmap_patgen_la_SOURCES = \
+	patgen_nsdef.h \
+	PatGen.h \
+	PatGen.cc \
+	PgNode.h \
+	PgNode.cc \
+	PgNodeMgr.h
 
-libym_techmap_la_LIBADD = \
+libym_techmap_patgen_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_techmap_la_LDFLAGS =
+libym_techmap_patgen_la_LDFLAGS =

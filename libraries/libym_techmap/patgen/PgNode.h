@@ -89,6 +89,54 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class PgHandle PgNode.h "PgNode.h"
+/// @brief PgNode と極性を表すクラス
+//////////////////////////////////////////////////////////////////////
+class PgHandle
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] node ノード
+  /// @param[in] inv 反転属性
+  explicit
+  PgHandle(PgNode* node = NULL,
+	   bool inv = false);
+
+  /// @brief デストラクタ
+  ~PgHandle();
+
+
+public:
+
+  /// @brief ノードを取り出す．
+  PgNode*
+  node() const;
+
+  /// @brief 反転属性を取り出す．
+  bool
+  inv() const;
+
+  /// @brief 値を設定する．
+  /// @param[in] node ノード
+  /// @param[in] inv 反転属性
+  void
+  set(PgNode* node,
+      bool inv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ポインタと反転属性を合わせたもの
+  ympuint mData;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
@@ -149,6 +197,50 @@ bool
 PgNode::fanin_inv(ymuint pos) const
 {
   return static_cast<bool>((mType >> (pos + 2)) & 1U);
+}
+
+// @brief コンストラクタ
+// @param[in] node ノード
+// @param[in] inv 反転属性
+inline
+PgHandle::PgHandle(PgNode* node,
+		   bool inv)
+{
+  set(node, inv);
+}
+
+// @brief デストラクタ
+inline
+PgHandle::~PgHandle()
+{
+}
+
+// @brief ノードを取り出す．
+inline
+PgNode*
+PgHandle::node() const
+{
+  return reinterpret_cast<PgNode*>(mData & ~1UL);
+}
+
+// @brief 反転属性を取り出す．
+inline
+bool
+PgHandle::inv() const
+{
+  return static_cast<bool>(mData & 1UL);
+}
+
+// @brief 値を設定する．
+// @param[in] node ノード
+// @param[in] inv 反転属性
+inline
+void
+PgHandle::set(PgNode* node,
+	      bool inv)
+{
+  // bool に対する & 1UL は不必要だが念のため．
+  mData = reinterpret_cast<ympuint>(node) | (static_cast<ympuint>(inv) & 1UL);
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN
