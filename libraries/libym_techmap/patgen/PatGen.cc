@@ -123,8 +123,7 @@ PatGen::gen_pat(const LogExpr& expr,
 		vector<PgHandle>& pg_list)
 {
   if ( expr.is_literal() ) {
-    //PgNode* node = mgr.new_input();
-    PgNode* node = NULL;
+    PgNode* node = mgr.new_input(expr.varid());
     bool inv = expr.is_negaliteral();
     pg_list.push_back(PgHandle(node, inv));
   }

@@ -36,6 +36,7 @@ public:
 
   /// @brief 入力ノードを作る．
   /// @param[in] id 入力番号
+  /// @note 既にあるときはそれを返す．
   PgNode*
   new_input(ymuint id);
 
@@ -76,6 +77,9 @@ private:
 
   // PgNode のメモリ確保用アロケータ
   UnitAlloc mAlloc;
+
+  // 入力ノードを収める配列
+  vector<PgNode*> mInputList;
 
 };
 
