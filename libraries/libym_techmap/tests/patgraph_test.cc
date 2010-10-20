@@ -17,7 +17,7 @@ void
 dump_word(ostream& s,
 	  ymuint val)
 {
-  s << static_cast<ymuint32>(val);
+  s << static_cast<ymuint32>(val) << endl;
 }
 
 void

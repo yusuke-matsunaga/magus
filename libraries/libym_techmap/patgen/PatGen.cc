@@ -249,8 +249,8 @@ dump_edge(ostream& s,
     if ( node->fanin_inv(fanin_pos) ) {
       v |= 1U;
     }
-    s << v;
   }
+  s << v << endl;
 }
 
 END_NONAMESPACE
@@ -263,7 +263,7 @@ PatGen::dump_graph(ostream& s) const
 {
   ymuint v;
   v = mNodeList.size();
-  s << v;
+  s << v << endl;
   for (ymuint i = 0; i < mNodeList.size(); ++ i) {
     PgNode* node = this->node(i);
     if ( node->is_input() ) {
@@ -275,7 +275,7 @@ PatGen::dump_graph(ostream& s) const
     else if ( node->is_xor() ) {
       v = 3U;
     }
-    s << v;
+    s << v << endl;
   }
   for (ymuint i = 0; i < mNodeList.size(); ++ i) {
     PgNode* node = this->node(i);
@@ -323,9 +323,9 @@ PatGen::dump_edgelist(ostream& s,
   if ( root.inv() ) {
     l |= 1U;
   }
-  s << l;
+  s << l << endl;
   for (ymuint i = 0; i < l; ++ i) {
-    s << val_list[i];
+    s << val_list[i] << endl;
   }
 }
 
