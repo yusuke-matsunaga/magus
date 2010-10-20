@@ -114,6 +114,8 @@ PatGen::operator()(const LogExpr& expr,
 		   vector<PgHandle>& pg_list)
 {
   assert_cond( !expr.is_constant(), __FILE__, __LINE__);
+
+  gen_pat(expr, mgr, pg_list);
 }
 
 // @brief パタングラフを生成する再帰関数
@@ -142,10 +144,17 @@ PatGen::gen_pat(const LogExpr& expr,
 	input[i] = input_pg_list[i][p(i, 0)];
       }
       switch ( n ) {
+      case 2:
+	{
+	  PgHandle handle = make_node(mgr, expr, input[0], input[1]);
+	  pg_list.push_back(handle);
+	}
+	break;
+
       case 3:
 	for (ymuint i = 0; i < n_pat3; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, input, pat3[i], pos);
+	  PgHandle handle = make_graph(mgr, expr, input, pat3[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -153,7 +162,7 @@ PatGen::gen_pat(const LogExpr& expr,
       case 4:
 	for (ymuint i = 0; i < n_pat4; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, input, pat4[i], pos);
+	  PgHandle handle = make_graph(mgr, expr, input, pat4[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -161,7 +170,7 @@ PatGen::gen_pat(const LogExpr& expr,
       case 5:
 	for (ymuint i = 0; i < n_pat5; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, input, pat5[i], pos);
+	  PgHandle handle = make_graph(mgr, expr, input, pat5[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -169,7 +178,7 @@ PatGen::gen_pat(const LogExpr& expr,
       case 6:
 	for (ymuint i = 0; i < n_pat6; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, input, pat6[i], pos);
+	  PgHandle handle = make_graph(mgr, expr, input, pat6[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -185,6 +194,7 @@ PatGen::gen_pat(const LogExpr& expr,
 // @brief テンプレートにしたがって2分木を作る．
 PgHandle
 PatGen::make_graph(PgNodeMgr& mgr,
+		   const LogExpr& expr,
 		   const vector<PgHandle>& input,
 		   int pat[],
 		   ymuint& pos)
@@ -193,20 +203,42 @@ PatGen::make_graph(PgNodeMgr& mgr,
   ++ pos;
   if ( p == -1 ) {
     // 演算ノード
-    PgHandle l_handle = make_graph(mgr, input, pat, pos);
-    PgHandle r_handle = make_graph(mgr, input, pat, pos);
-    PgNode* l_node = l_handle.node();
-    PgNode* r_node = r_handle.node();
-    bool l_inv = l_handle.inv();
-    bool r_inv = r_handle.inv();
-    PgNode* node = mgr.new_and(l_node, r_node, l_inv, r_inv);
-    return PgHandle(node, false);
+    PgHandle l_handle = make_graph(mgr, expr, input, pat, pos);
+    PgHandle r_handle = make_graph(mgr, expr, input, pat, pos);
+    return make_node(mgr, expr, l_handle, r_handle);
   }
   else {
     // 終端ノード
     ymuint id = static_cast<ymuint>(p);
     return input[id];
   }
+}
+
+// @brief 論理式の種類に応じてノードを作る．
+PgHandle
+PatGen::make_node(PgNodeMgr& mgr,
+		  const LogExpr& expr,
+		  PgHandle l_handle,
+		  PgHandle r_handle)
+{
+  PgNode* l_node = l_handle.node();
+  PgNode* r_node = r_handle.node();
+  bool l_inv = l_handle.inv();
+  bool r_inv = r_handle.inv();
+  if ( expr.is_and() ) {
+    PgNode* node = mgr.new_and(l_node, r_node, l_inv, r_inv);
+    return PgHandle(node, false);
+  }
+  if ( expr.is_or() ) {
+    PgNode* node = mgr.new_and(l_node, r_node, !l_inv, !r_inv);
+    return PgHandle(node, true);
+  }
+  if ( expr.is_xor() ) {
+    PgNode* node = mgr.new_xor(l_node, r_node);
+    return PgHandle(node, l_inv ^ r_inv);
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return PgHandle();
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN

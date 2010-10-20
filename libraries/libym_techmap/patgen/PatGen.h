@@ -60,9 +60,17 @@ private:
   /// @brief テンプレートにしたがって2分木を作る．
   PgHandle
   make_graph(PgNodeMgr& mgr,
+	     const LogExpr& expr,
 	     const vector<PgHandle>& input,
 	     int pat[],
 	     ymuint& pos);
+
+  /// @brief 論理式の種類に応じてノードを作る．
+  PgHandle
+  make_node(PgNodeMgr& mgr,
+	    const LogExpr& expr,
+	    PgHandle l_handle,
+	    PgHandle r_handle);
 
 
 private:

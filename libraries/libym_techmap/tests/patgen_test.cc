@@ -15,9 +15,49 @@
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 
 void
-dump_pat(PgHandle h)
+dump_node(ostream& s,
+	  PgNode* node)
 {
+  s << "Node#" << node->id() << ": ";
+  if ( node->is_input() ) {
+    s << "Input#" << node->input_id();
+  }
+  else {
+    PgNode* l_node = node->fanin(0);
+    PgNode* r_node = node->fanin(1);
+    bool l_inv = node->fanin_inv(0);
+    bool r_inv = node->fanin_inv(1);
+    if ( l_inv ) {
+      s << "~";
+    }
+    s << l_node->id() << " ";
+    if ( node->is_and() ) {
+      s << "&";
+    }
+    else {
+      s << "^";
+    }
+    s << " ";
+    if ( r_inv ) {
+      s << "~";
+    }
+    s << r_node->id();
+  }
+  s << endl;
+}
 
+void
+dump_pat(ostream& s,
+	 PgHandle h)
+{
+  PgNode* node = h.node();
+  bool inv = h.inv();
+  s << "Root: ";
+  if ( inv ) {
+    s << "~";
+  }
+  s << node->id() << endl;
+  dump_node(s, node);
 }
 
 void
@@ -31,7 +71,7 @@ test(const LogExpr& expr)
   for (vector<PgHandle>::iterator p = pg_list.begin();
        p != pg_list.end(); ++ p) {
     PgHandle h = *p;
-    dump_pat(h);
+    dump_pat(cout, h);
   }
 }
 

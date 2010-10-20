@@ -26,6 +26,7 @@ libym_techmap_la_SOURCES = \
 	SbjGraph_dump.cc
 
 libym_techmap_la_LIBADD = \
+	patgen/libym_techmap_patgen.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

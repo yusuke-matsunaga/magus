@@ -81,6 +81,9 @@ private:
   // 入力ノードを収める配列
   vector<PgNode*> mInputList;
 
+  // 全ノードを収める配列
+  vector<PgNode*> mNodeList;
+
 };
 
 END_NAMESPACE_YM_TECHMAP_PATGEN

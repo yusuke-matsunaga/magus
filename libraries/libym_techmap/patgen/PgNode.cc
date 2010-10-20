@@ -104,7 +104,10 @@ PgNode*
 PgNodeMgr::new_node()
 {
   void* p = mAlloc.get_memory(sizeof(PgNode));
-  return new (p) PgNode();
+  PgNode* node = new (p) PgNode();
+  node->mId = mNodeList.size();
+  mNodeList.push_back(node);
+  return node;
 }
 
 // @brief ノードを削除する．
