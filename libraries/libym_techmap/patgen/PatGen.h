@@ -20,6 +20,7 @@ BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 //////////////////////////////////////////////////////////////////////
 /// @class PatGen PatGen.h "PatGen.h"
 /// @brief パタングラフを生成するクラス
+/// @note 前処理で使われるのであまり効率を考えなく良い．
 //////////////////////////////////////////////////////////////////////
 class PatGen
 {
@@ -41,8 +42,8 @@ public:
   /// 無効になる．
   /// @note expr は定数を含んではいけない．
   void
-  gen_pat(const LogExpr& expr,
-	  vector<PgHandle>& pg_list);
+  operator()(const LogExpr& expr,
+	     vector<PgHandle>& pg_list);
 
 
 public:
@@ -68,6 +69,33 @@ public:
   /// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
   PgNode*
   node(ymuint pos) const;
+
+  /// @brief グラフ構造全体の内容を表示する．
+  /// @param[in] s 出力先のストリーム
+  void
+  display_graph(ostream& s) const;
+
+  /// @brief エッジリストの内容を表示する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] root 根のハンドル
+  void
+  display_edgelist(ostream& s,
+		   PgHandle root) const;
+
+  /// @brief グラフ構造全体をダンプする．
+  /// @param[in] s 出力先のストリーム
+  /// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
+  void
+  dump_graph(ostream& s) const;
+
+  /// @brief エッジリストをダンプする．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] root 根のハンドル
+  /// @note 内容はエッジ番号のリスト
+  /// @note ただし最初に根の反転属性の情報を含む
+  void
+  dump_edgelist(ostream& s,
+		PgHandle root) const;
 
 
 private:
@@ -101,6 +129,23 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // ハッシュ表用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ハッシュ表を確保する．
+  void
+  alloc_table(ymuint req_size);
+
+  /// @brief PgNode のハッシュ関数
+  static
+  ymuint
+  hash_func(ymuint type,
+	    PgNode* l_node,
+	    PgNode* r_node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -112,6 +157,15 @@ private:
 
   // 全ノードを収める配列
   vector<PgNode*> mNodeList;
+
+  // AND/XOR ノードのハッシュ表
+  PgNode** mHashTable;
+
+  // mHashTable のサイズ
+  ymuint32 mHashSize;
+
+  // ハッシュ表を拡大する目安
+  ymuint32 mNextLimit;
 
 };
 

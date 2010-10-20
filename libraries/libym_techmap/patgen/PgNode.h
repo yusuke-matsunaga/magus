@@ -85,6 +85,9 @@ private:
   // ファンインのノード
   PgNode* mFanin[2];
 
+  // ハッシュ表中のリンク
+  PgNode* mLink;
+
 };
 
 
