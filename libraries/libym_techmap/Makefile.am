@@ -19,9 +19,10 @@ INCLUDES = \
 libym_techmap_la_SOURCES = \
 	BNet2Sbj.cc \
 	PatGraph.h \
-	PatGraph.cc \
 	PatMatcher.h \
 	PatMatcher.cc \
+	PatMgr.h \
+	PatMgr.cc \
 	SbjGraph.cc \
 	SbjGraph_dump.cc
 

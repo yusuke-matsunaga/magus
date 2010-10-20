@@ -7,47 +7,97 @@
 /// All rights reserved.
 
 
+#include "PatMgr.h"
 #include "PatGraph.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
-ymuint32
-encode(ymuint from_id,
-       ymuint to_id,
-       ymuint fanin_pos,
-       bool inv)
+void
+dump_word(ostream& s,
+	  ymuint val)
 {
-  ymuint32 ans = 0U;
-  ans |= (from_id << 2);
-  ans |= (to_id << 17);
-  ans |= ((fanin_pos & 1) << 1);
-  ans |= static_cast<ymuint>(inv);
-  return ans;
+  s << static_cast<ymuint32>(val);
+}
+
+void
+dump_input(ostream& s,
+	   ymuint input_id)
+{
+  dump_word(s, static_cast<ymuint32>(PatMgr::kInput) | (input_id << 2));
+  dump_word(s, 0);
+  dump_word(s, 0);
+}
+
+void
+dump_and(ostream& s,
+	 ymuint l_id,
+	 ymuint r_id,
+	 bool l_inv,
+	 bool r_inv)
+{
+  dump_word(s, static_cast<ymuint32>(PatMgr::kAnd));
+  dump_word(s, (l_id << 1) | static_cast<ymuint32>(l_inv));
+  dump_word(s, (r_id << 1) | static_cast<ymuint32>(r_inv));
+}
+
+void
+dump_xor(ostream& s,
+	 ymuint l_id,
+	 ymuint r_id)
+{
+  dump_word(s, static_cast<ymuint32>(PatMgr::kXor));
+  dump_word(s, (l_id << 1));
+  dump_word(s, (r_id << 1));
 }
 
 void
 test()
 {
-  static ymuint32 data[] = {
-    5, // ノード数
-    3, // 入力数
-    4, // 根の ID
-    static_cast<ymuint32>(PatGraph::kInput),
-    static_cast<ymuint32>(PatGraph::kInput),
-    static_cast<ymuint32>(PatGraph::kInput),
-    static_cast<ymuint32>(PatGraph::kAnd),
-    static_cast<ymuint32>(PatGraph::kXor),
-    4, // 枝数
-    encode(3, 4, 0, false),
-    encode(0, 3, 0, false),
-    encode(1, 3, 1, true),
-    encode(2, 4, 1, false)
-  };
+  const char* filename = "patgraph_test.data";
+  ofstream os;
+  os.open(filename);
+  if ( !os ) {
+    // エラー
+    cerr << "Could not create " << filename << endl;
+    return;
+  }
 
-  PatGraph pat_graph(data);
+  dump_word(os, 5); // ノード数
+  dump_input(os, 0);
+  dump_input(os, 1);
+  dump_input(os, 2);
+  dump_and(os, 0, 1, false, true);
+  dump_xor(os, 3, 2);
 
-  dump(cout, pat_graph);
+  dump_word(os, 3); // 入力数
+  dump_word(os, 0);
+  dump_word(os, 1);
+  dump_word(os, 2);
+
+  dump_word(os, 1); // パタン数
+  dump_word(os, 6);
+  dump_word(os, 4);
+  dump_word(os, 8);
+  dump_word(os, 6);
+  dump_word(os, 7);
+  dump_word(os, 9);
+
+  os.close();
+
+  ifstream is;
+  is.open(filename);
+  if ( !is ) {
+    // エラー
+    cerr << "Could not open " << filename << endl;
+    return;
+  }
+
+  PatMgr pat_mgr;
+
+  pat_mgr.load(is);
+
+  dump(cout, pat_mgr);
 }
 
 END_NAMESPACE_YM_TECHMAP

@@ -15,6 +15,7 @@
 BEGIN_NAMESPACE_YM_TECHMAP
 
 class SbjNode;
+class PatMgr;
 class PatGraph;
 
 //////////////////////////////////////////////////////////////////////
@@ -36,6 +37,7 @@ public:
 
   /// @brief パタンマッチングを行う．
   /// @param[in] sbj_root サブジェクトグラフの根のノード
+  /// @param[in] pat_mgr パタンを管理するクラス
   /// @param[in] pat_graph パタングラフ
   /// @param[out] input_map 入力のマッピング
   /// @retval true マッチした．
@@ -43,6 +45,7 @@ public:
   /// @note input_map の中身は (SbjNode->i() << 1) | pol
   bool
   operator()(const SbjNode* sbj_root,
+	     const PatMgr& pat_mgr,
 	     const PatGraph& pat_graph,
 	     vector<ymuint>& input_map);
 

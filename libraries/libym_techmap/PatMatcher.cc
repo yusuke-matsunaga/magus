@@ -9,6 +9,7 @@
 
 #include "PatMatcher.h"
 #include "ym_techmap/SbjGraph.h"
+#include "PatMgr.h"
 #include "PatGraph.h"
 
 
@@ -26,6 +27,7 @@ PatMatcher::~PatMatcher()
 
 // @brief パタンマッチングを行う．
 // @param[in] sbj_root サブジェクトグラフの根のノード
+// @param[in] pat_mgr パタンを管理するクラス
 // @param[in] pat_graph パタングラフ
 // @param[out] input_map 入力のマッピング
 // @retval true マッチした．
@@ -33,10 +35,11 @@ PatMatcher::~PatMatcher()
 // @note input_map の中身は (SbjNode->i() << 1) | pol
 bool
 PatMatcher::operator()(const SbjNode* sbj_root,
+		       const PatMgr& pat_mgr,
 		       const PatGraph& pat_graph,
 		       vector<ymuint>& input_map)
 {
-  ymuint nn = pat_graph.node_num();
+  ymuint nn = pat_mgr.node_num();
   mSbjMap.clear();
   mSbjMap.resize(nn, NULL);
   mInvMap.clear();
@@ -45,19 +48,19 @@ PatMatcher::operator()(const SbjNode* sbj_root,
 
   // 根のノードを調べる．
   ymuint root_id = pat_graph.root_id();
-  switch ( pat_graph.node_type(root_id) ) {
-  case PatGraph::kInput:
+  switch ( pat_mgr.node_type(root_id) ) {
+  case PatMgr::kInput:
     // これはなんでも OK
     break;
 
-  case PatGraph::kAnd:
+  case PatMgr::kAnd:
     if ( !sbj_root->is_and() ) {
       // 型が違う．
       return false;
     }
     break;
 
-  case PatGraph::kXor:
+  case PatMgr::kXor:
     if ( !sbj_root->is_xor() ) {
       // 型が違う．
       return false;
@@ -73,38 +76,38 @@ PatMatcher::operator()(const SbjNode* sbj_root,
   // 各枝の入力と出力の対応を調べる．
   ymuint ne = pat_graph.edge_num();
   for (ymuint i = 0; i < ne; ++ i) {
-    const PatEdge& e = pat_graph.edge(i);
-    ymuint to_id = e.to_id();
-    ymuint from_id = e.from_id();
-    ymuint f_pos = e.fanin_pos();
+    ymuint edge_id = pat_graph.edge(i);
+    ymuint to_id = pat_mgr.edge_to(edge_id);
+    ymuint from_id = pat_mgr.edge_from(edge_id);
+    ymuint f_pos = pat_mgr.edge_pos(edge_id);
     const SbjNode* to_node = mSbjMap[to_id];
     const SbjNode* from_node = to_node->fanin(f_pos);
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
-    switch ( pat_graph.node_type(from_id) ) {
-    case PatGraph::kInput:
+    switch ( pat_mgr.node_type(from_id) ) {
+    case PatMgr::kInput:
       // どんな型でも OK
       // 極性が違っても OK
-      inv =  e.inverted() ^ iinv;
+      inv =  pat_mgr.edge_inv(edge_id) ^ iinv;
       break;
 
-    case PatGraph::kAnd:
+    case PatMgr::kAnd:
       if ( !from_node->is_and() ) {
 	// 型が違う
 	return false;
       }
-      if ( e.inverted() != iinv ) {
+      if ( pat_mgr.edge_inv(edge_id) != iinv ) {
 	// 極性が違う
 	return false;
       }
       break;
 
-    case PatGraph::kXor:
+    case PatMgr::kXor:
       if ( !from_node->is_xor() ) {
 	// 型が違う
 	return false;
       }
-      if ( e.inverted() != iinv ) {
+      if ( pat_mgr.edge_inv(edge_id) != iinv ) {
 	// 極性が違う
 	return false;
       }
@@ -123,7 +126,8 @@ PatMatcher::operator()(const SbjNode* sbj_root,
   input_map.clear();
   input_map.resize(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    input_map[i] = (mSbjMap[i]->id() << 1) | (mInvMap[i] ? 1 : 0);
+    ymuint node_id = pat_mgr.input_node(i);
+    input_map[i] = (mSbjMap[node_id]->id() << 1) | (mInvMap[node_id] ? 1 : 0);
   }
   return true;
 }
