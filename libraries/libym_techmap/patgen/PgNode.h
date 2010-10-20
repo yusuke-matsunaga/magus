@@ -14,7 +14,7 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 
-class PgNodeMgr;
+class PatGen;
 
 //////////////////////////////////////////////////////////////////////
 /// @class PgNode PgNode.h "PgNode.h"
@@ -22,7 +22,7 @@ class PgNodeMgr;
 //////////////////////////////////////////////////////////////////////
 class PgNode
 {
-  friend class PgNodeMgr;
+  friend class PatGen;
 
 private:
 

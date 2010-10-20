@@ -98,7 +98,9 @@ END_NONAMESPACE
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 
 // @brief コンストラクタ
-PatGen::PatGen()
+PatGen::PatGen() :
+  mAlloc(sizeof(PgNode), 1024)
+
 {
 }
 
@@ -107,25 +109,50 @@ PatGen::~PatGen()
 {
 }
 
-// @brief 論理式から対応するパタングラフを生成する．
-void
-PatGen::operator()(const LogExpr& expr,
-		   PgNodeMgr& mgr,
-		   vector<PgHandle>& pg_list)
+// @brief 入力数を返す．
+// @note ただし使われていない入力もありうる．
+ymuint
+PatGen::input_num() const
 {
-  assert_cond( !expr.is_constant(), __FILE__, __LINE__);
+  return mInputList.size();
+}
 
-  gen_pat(expr, mgr, pg_list);
+// @brief 入力ノードを返す．
+// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
+PgNode*
+PatGen::input_node(ymuint pos) const
+{
+  return mInputList[pos];
+}
+
+// @brief 全ノード数を返す．
+ymuint
+PatGen::node_num() const
+{
+  return mNodeList.size();
+}
+
+// @brief ノードを返す．
+// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
+PgNode*
+PatGen::node(ymuint pos) const
+{
+  return mNodeList[pos];
 }
 
 // @brief パタングラフを生成する再帰関数
+// @param[in] expr 元になる論理式
+// @param[out] pg_list パタングラフのリスト
+// @note pg_list の中身はこの PatGen のインスタンスが破壊されると
+// 無効になる．
+// @note expr は定数を含んではいけない．
 void
 PatGen::gen_pat(const LogExpr& expr,
-		PgNodeMgr& mgr,
 		vector<PgHandle>& pg_list)
 {
+  assert_cond( !expr.is_constant(), __FILE__, __LINE__);
   if ( expr.is_literal() ) {
-    PgNode* node = mgr.new_input(expr.varid());
+    PgNode* node = make_input(expr.varid());
     bool inv = expr.is_negaliteral();
     pg_list.push_back(PgHandle(node, inv));
   }
@@ -134,7 +161,7 @@ PatGen::gen_pat(const LogExpr& expr,
     vector<vector<PgHandle> > input_pg_list(n);
     vector<pair<size_t, size_t> > nk_array(n);
     for (ymuint i = 0; i < n; ++ i) {
-      gen_pat(expr.child(i), mgr, input_pg_list[i]);
+      gen_pat(expr.child(i), input_pg_list[i]);
       nk_array[i] = make_pair(input_pg_list[i].size(), 1);
     }
     MultiCombiGen mcg(nk_array);
@@ -146,7 +173,7 @@ PatGen::gen_pat(const LogExpr& expr,
       switch ( n ) {
       case 2:
 	{
-	  PgHandle handle = make_node(mgr, expr, input[0], input[1]);
+	  PgHandle handle = make_node(expr, input[0], input[1]);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -154,7 +181,7 @@ PatGen::gen_pat(const LogExpr& expr,
       case 3:
 	for (ymuint i = 0; i < n_pat3; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, expr, input, pat3[i], pos);
+	  PgHandle handle = make_bintree(expr, input, pat3[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -162,7 +189,7 @@ PatGen::gen_pat(const LogExpr& expr,
       case 4:
 	for (ymuint i = 0; i < n_pat4; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, expr, input, pat4[i], pos);
+	  PgHandle handle = make_bintree(expr, input, pat4[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -170,7 +197,7 @@ PatGen::gen_pat(const LogExpr& expr,
       case 5:
 	for (ymuint i = 0; i < n_pat5; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, expr, input, pat5[i], pos);
+	  PgHandle handle = make_bintree(expr, input, pat5[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -178,7 +205,7 @@ PatGen::gen_pat(const LogExpr& expr,
       case 6:
 	for (ymuint i = 0; i < n_pat6; ++ i) {
 	  ymuint pos = 0;
-	  PgHandle handle = make_graph(mgr, expr, input, pat6[i], pos);
+	  PgHandle handle = make_bintree(expr, input, pat6[i], pos);
 	  pg_list.push_back(handle);
 	}
 	break;
@@ -191,21 +218,37 @@ PatGen::gen_pat(const LogExpr& expr,
   }
 }
 
+// @brief 入力ノードを作る．
+// @param[in] id 入力番号
+// @note 既にあるときはそれを返す．
+PgNode*
+PatGen::make_input(ymuint id)
+{
+  while ( mInputList.size() <= id ) {
+    mInputList.push_back(NULL);
+  }
+  PgNode* node = mInputList[id];
+  if ( node == NULL ) {
+    node = new_node();
+    node->mType = (id << 2);
+  }
+  return node;
+}
+
 // @brief テンプレートにしたがって2分木を作る．
 PgHandle
-PatGen::make_graph(PgNodeMgr& mgr,
-		   const LogExpr& expr,
-		   const vector<PgHandle>& input,
-		   int pat[],
-		   ymuint& pos)
+PatGen::make_bintree(const LogExpr& expr,
+		     const vector<PgHandle>& input,
+		     int pat[],
+		     ymuint& pos)
 {
   int p = pat[pos];
   ++ pos;
   if ( p == -1 ) {
     // 演算ノード
-    PgHandle l_handle = make_graph(mgr, expr, input, pat, pos);
-    PgHandle r_handle = make_graph(mgr, expr, input, pat, pos);
-    return make_node(mgr, expr, l_handle, r_handle);
+    PgHandle l_handle = make_bintree(expr, input, pat, pos);
+    PgHandle r_handle = make_bintree(expr, input, pat, pos);
+    return make_node(expr, l_handle, r_handle);
   }
   else {
     // 終端ノード
@@ -216,8 +259,7 @@ PatGen::make_graph(PgNodeMgr& mgr,
 
 // @brief 論理式の種類に応じてノードを作る．
 PgHandle
-PatGen::make_node(PgNodeMgr& mgr,
-		  const LogExpr& expr,
+PatGen::make_node(const LogExpr& expr,
 		  PgHandle l_handle,
 		  PgHandle r_handle)
 {
@@ -225,20 +267,44 @@ PatGen::make_node(PgNodeMgr& mgr,
   PgNode* r_node = r_handle.node();
   bool l_inv = l_handle.inv();
   bool r_inv = r_handle.inv();
+  PgNode* node = new_node();
+  node->mFanin[0] = l_node;
+  node->mFanin[1] = r_node;
+  bool oinv = false;
   if ( expr.is_and() ) {
-    PgNode* node = mgr.new_and(l_node, r_node, l_inv, r_inv);
-    return PgHandle(node, false);
+    node->mType = 2U;
   }
-  if ( expr.is_or() ) {
-    PgNode* node = mgr.new_and(l_node, r_node, !l_inv, !r_inv);
-    return PgHandle(node, true);
+  else if ( expr.is_or() ) {
+    node->mType = 2U;
+    l_inv = !l_inv;
+    r_inv = !r_inv;
+    oinv = true;
   }
-  if ( expr.is_xor() ) {
-    PgNode* node = mgr.new_xor(l_node, r_node);
-    return PgHandle(node, l_inv ^ r_inv);
+  else if ( expr.is_xor() ) {
+    node->mType = 3U;
+    oinv = l_inv ^ r_inv;
   }
-  assert_not_reached(__FILE__, __LINE__);
-  return PgHandle();
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  if ( l_inv ) {
+    node->mType |= 4U;
+  }
+  if ( r_inv ) {
+    node->mType |= 8U;
+  }
+  return PgHandle(node, oinv);
+}
+
+// @brief ノードを作る．
+PgNode*
+PatGen::new_node()
+{
+  void* p = mAlloc.get_memory(sizeof(PgNode));
+  PgNode* node = new (p) PgNode();
+  node->mId = mNodeList.size();
+  mNodeList.push_back(node);
+  return node;
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN
