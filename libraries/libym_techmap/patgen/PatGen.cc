@@ -8,6 +8,7 @@
 
 
 #include "PatGen.h"
+#include "PgNode.h"
 #include "../PatMgr.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_utils/Generator.h"
@@ -101,6 +102,28 @@ int pat6[n_pat6][11] = {
 END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+
+//////////////////////////////////////////////////////////////////////
+// クラス PgNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+PgNode::PgNode() :
+  mType(0U)
+{
+  mFanin[0] = NULL;
+  mFanin[1] = NULL;
+}
+
+// @brief デストラクタ
+PgNode::~PgNode()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PatGen
+//////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 PatGen::PatGen() :

@@ -11,11 +11,13 @@
 
 #include "patgen_nsdef.h"
 #include "ym_lexp/lexp_nsdef.h"
-#include "PgNode.h"
 #include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+
+class PgNode;
+class PgHandle;
 
 //////////////////////////////////////////////////////////////////////
 /// @class PatGen PatGen.h "PatGen.h"
