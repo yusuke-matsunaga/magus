@@ -16,7 +16,8 @@ libym_techmap_patgen_la_SOURCES = \
 	patgen_nsdef.h \
 	PatGen.h \
 	PatGen.cc \
-	PgNode.h
+	PgNode.h \
+	pg_dump.cc
 
 libym_techmap_patgen_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \

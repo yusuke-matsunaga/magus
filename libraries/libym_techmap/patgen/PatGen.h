@@ -36,6 +36,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // このクラスのメインの関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 論理式から対応するパタングラフを生成する．
   /// @param[in] expr 元になる論理式
@@ -50,16 +53,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 内容情報を取得する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力数を返す．
-  /// @note ただし使われていない入力もありうる．
-  ymuint
-  input_num() const;
-
-  /// @brief 入力ノードを返す．
-  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
-  PgNode*
-  input_node(ymuint pos) const;
 
   /// @brief 全ノード数を返す．
   ymuint
@@ -78,17 +71,6 @@ public:
   /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
   PgHandle
   pat_root(ymuint id) const;
-
-  /// @brief グラフ構造全体の内容を表示する．
-  /// @param[in] s 出力先のストリーム
-  void
-  display(ostream& s) const;
-
-  /// @brief グラフ構造全体をダンプする．
-  /// @param[in] s 出力先のストリーム
-  /// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
-  void
-  dump(ostream& s) const;
 
 
 private:
@@ -125,22 +107,6 @@ private:
   /// @brief ノードを作る．
   PgNode*
   new_node();
-
-  /// @brief エッジリストの内容を表示する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] root 根のハンドル
-  void
-  display_edgelist(ostream& s,
-		   PgHandle root) const;
-
-  /// @brief エッジリストをダンプする．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] root 根のハンドル
-  /// @note 内容はエッジ番号のリスト
-  /// @note ただし最初に根の反転属性の情報を含む
-  void
-  dump_edgelist(ostream& s,
-		PgHandle root) const;
 
 
 private:
@@ -187,6 +153,28 @@ private:
   vector<PgHandle> mPatList;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// 関連する関数
+//////////////////////////////////////////////////////////////////////
+
+/// @relates PatGen
+/// @brief グラフ構造全体の内容を表示する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] pat_gen 対象のオブジェクト
+void
+pg_display(ostream& s,
+	   const PatGen& pat_gen);
+
+/// @relates PatGen
+/// @brief グラフ構造全体をダンプする．
+/// @param[in] s 出力先のストリーム
+/// @param[in] pat_gen 対象のオブジェクト
+/// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
+void
+pg_dump(ostream& s,
+	const PatGen& pat_gen);
 
 END_NAMESPACE_YM_TECHMAP_PATGEN
 

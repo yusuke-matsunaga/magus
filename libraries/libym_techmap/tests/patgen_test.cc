@@ -41,8 +41,8 @@ test()
   vector<ymuint> pat_list3;
   patgen(expr3, pat_list3);
 
-  cout << "PatGen::dump_graph() " << endl;
-  patgen.display(cout);
+  cout << "pg_display() " << endl;
+  pg_display(cout, patgen);
   cout << endl;
 
   cout << "Patterns for " << expr1 << ":";
@@ -74,29 +74,31 @@ test()
   cout << endl;
 
   const char* filename = "patgraph_test.data";
-  ofstream ofs;
-  ofs.open(filename, ios::binary);
-  if ( !ofs ) {
-    // エラー
-    cerr << "Could not create " << filename << endl;
-    return;
-  }
+  {
+    ofstream ofs;
+    ofs.open(filename, ios::binary);
+    if ( !ofs ) {
+      // エラー
+      cerr << "Could not create " << filename << endl;
+      return;
+    }
 
-  patgen.dump(ofs);
-
-  ofs.close();
-
-  ifstream ifs;
-  ifs.open(filename, ios::binary);
-  if ( !ifs ) {
-    // エラー
-    cerr << "Could not open " << filename << endl;
-    return;
+    pg_dump(ofs, patgen);
   }
 
   PatMgr pat_mgr;
+  {
+    ifstream ifs;
+    ifs.open(filename, ios::binary);
+    if ( !ifs ) {
+      // エラー
+      cerr << "Could not open " << filename << endl;
+      return;
+    }
 
-  pat_mgr.load(ifs);
+
+    pat_mgr.load(ifs);
+  }
 
   dump(cout, pat_mgr);
 }
