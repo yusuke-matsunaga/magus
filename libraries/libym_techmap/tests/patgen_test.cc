@@ -10,6 +10,7 @@
 #include "patgen/patgen_nsdef.h"
 #include "patgen/PatGen.h"
 #include "ym_lexp/LogExpr.h"
+#include "PatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
@@ -25,45 +26,79 @@ test()
   PatGen patgen;
 
   LogExpr expr1 = var0 & var1;
-  vector<PgHandle> pg_list1;
-  patgen(expr1, pg_list1);
+  vector<ymuint> pat_list1;
+  patgen(expr1, pat_list1);
+
+  LogExpr expr11 = var0 ^ var1;
+  vector<ymuint> pat_list11;
+  patgen(expr11, pat_list11);
 
   LogExpr expr2 = var0 & var1 & var2 & var3;
-  vector<PgHandle> pg_list2;
-  patgen(expr2, pg_list2);
+  vector<ymuint> pat_list2;
+  patgen(expr2, pat_list2);
 
   LogExpr expr3 = (var0 & var1) | (var2 & var3);
-  vector<PgHandle> pg_list3;
-  patgen(expr3, pg_list3);
+  vector<ymuint> pat_list3;
+  patgen(expr3, pat_list3);
 
   cout << "PatGen::dump_graph() " << endl;
-  patgen.display_graph(cout);
+  patgen.display(cout);
   cout << endl;
 
-  cout << "Patterns for " << expr1 << endl;
-  for (vector<PgHandle>::iterator p = pg_list1.begin();
-       p != pg_list1.end(); ++ p) {
-    PgHandle h = *p;
-    patgen.display_edgelist(cout, h);
+  cout << "Patterns for " << expr1 << ":";
+  for (vector<ymuint>::iterator p = pat_list1.begin();
+       p != pat_list1.end(); ++ p) {
+    cout << " " << *p;
   }
   cout << endl;
 
-  cout << "Patterns for " << expr2 << endl;
-  for (vector<PgHandle>::iterator p = pg_list2.begin();
-       p != pg_list2.end(); ++ p) {
-    PgHandle h = *p;
-    patgen.display_edgelist(cout, h);
+  cout << "Patterns for " << expr11 << ":";
+  for (vector<ymuint>::iterator p = pat_list11.begin();
+       p != pat_list11.end(); ++ p) {
+    cout << " " << *p;
   }
   cout << endl;
 
-  cout << "Patterns for " << expr3 << endl;
-  for (vector<PgHandle>::iterator p = pg_list3.begin();
-       p != pg_list3.end(); ++ p) {
-    PgHandle h = *p;
-    patgen.display_edgelist(cout, h);
+  cout << "Patterns for " << expr2 << ":";
+  for (vector<ymuint>::iterator p = pat_list2.begin();
+       p != pat_list2.end(); ++ p) {
+    cout << " " << *p;
   }
   cout << endl;
 
+  cout << "Patterns for " << expr3 << ":";
+  for (vector<ymuint>::iterator p = pat_list3.begin();
+       p != pat_list3.end(); ++ p) {
+    cout << " " << *p;
+  }
+  cout << endl;
+
+  const char* filename = "patgraph_test.data";
+  ofstream ofs;
+  ofs.open(filename, ios::binary);
+  if ( !ofs ) {
+    // エラー
+    cerr << "Could not create " << filename << endl;
+    return;
+  }
+
+  patgen.dump(ofs);
+
+  ofs.close();
+
+  ifstream ifs;
+  ifs.open(filename, ios::binary);
+  if ( !ifs ) {
+    // エラー
+    cerr << "Could not open " << filename << endl;
+    return;
+  }
+
+  PatMgr pat_mgr;
+
+  pat_mgr.load(ifs);
+
+  dump(cout, pat_mgr);
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN

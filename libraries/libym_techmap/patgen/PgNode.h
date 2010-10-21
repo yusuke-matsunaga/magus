@@ -70,6 +70,40 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力に設定する．
+  /// @param[in] input_id 入力番号
+  void
+  set_input(ymuint input_id);
+
+  /// @brief ANDに設定する．
+  /// @param[in] inv0, inv1 ファンインの反転属性
+  void
+  set_and(bool inv0,
+	  bool inv1);
+
+  /// @brief XORに設定する．
+  void
+  set_xor();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いる定数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの種類
+  enum tType {
+    kInput = 0,
+    kAnd   = 1,
+    kXor   = 2
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -156,7 +190,7 @@ inline
 bool
 PgNode::is_input() const
 {
-  return ((mType & 3U) == 0U);
+  return ((mType & 3U) == kInput);
 }
 
 // @brief AND の時 true を返す．
@@ -164,7 +198,7 @@ inline
 bool
 PgNode::is_and() const
 {
-  return ((mType & 3U) == 2U);
+  return ((mType & 3U) == kAnd);
 }
 
 // @brief XOR の時 true を返す．
@@ -172,7 +206,7 @@ inline
 bool
 PgNode::is_xor() const
 {
-  return ((mType & 3U) == 3U);
+  return ((mType & 3U) == kXor);
 }
 
 // @brief 入力の時に入力番号を返す．
@@ -201,6 +235,39 @@ bool
 PgNode::fanin_inv(ymuint pos) const
 {
   return static_cast<bool>((mType >> (pos + 2)) & 1U);
+}
+
+// @brief 入力に設定する．
+// @param[in] input_id 入力番号
+inline
+void
+PgNode::set_input(ymuint input_id)
+{
+  mType = (input_id << 2) | kInput;
+}
+
+// @brief ANDに設定する．
+// @param[in] inv0, inv1 ファンインの反転属性
+inline
+void
+PgNode::set_and(bool inv0,
+		bool inv1)
+{
+  mType = kAnd;
+  if ( inv0 ) {
+    mType |= 4U;
+  }
+  if ( inv1 ) {
+    mType |= 8U;
+  }
+}
+
+// @brief XORに設定する．
+inline
+void
+PgNode::set_xor()
+{
+  mType = kXor;
 }
 
 // @brief コンストラクタ

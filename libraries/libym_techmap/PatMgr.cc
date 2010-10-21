@@ -13,6 +13,23 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
+BEGIN_NONAMESPACE
+
+ymuint
+read_word(istream& s)
+{
+  static char buf[4];
+  s.read(buf, 4);
+  ymuint ans =
+    static_cast<ymuint>(buf[0]) |
+    (static_cast<ymuint>(buf[1]) << 8) |
+    (static_cast<ymuint>(buf[2]) << 16) |
+    (static_cast<ymuint>(buf[3]) << 24);
+  return ans;
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス PatGraph
 //////////////////////////////////////////////////////////////////////
@@ -38,11 +55,11 @@ PatGraph::~PatGraph()
 bool
 PatGraph::load(istream& s)
 {
-  s >> mInputNum
-    >> mEdgeNum;
+  mInputNum = read_word(s);
+  mEdgeNum = read_word(s);
   mEdgeList = new ymuint32[mEdgeNum];
   for (ymuint i = 0; i < mEdgeNum; ++ i) {
-    s >> mEdgeList[i];
+    mEdgeList[i] = read_word(s);
   }
   return true;
 }
@@ -67,10 +84,21 @@ PatMgr::PatMgr() :
 // @brief デストラクタ
 PatMgr::~PatMgr()
 {
+  init();
+}
+
+// @brief 内容を初期化する．
+// @note 以前確保されたメモリは開放される．
+void
+PatMgr::init()
+{
   delete [] mNodeTypeArray;
   delete [] mEdgeArray;
   delete [] mInputArray;
   delete [] mPatArray;
+  mNodeNum = 0U;
+  mInputNum = 0U;
+  mPatNum = 0U;
 }
 
 // @brief データを読み込んでセットする．
@@ -80,23 +108,36 @@ PatMgr::~PatMgr()
 bool
 PatMgr::load(istream& s)
 {
-  s >> mNodeNum;
-  cout << "mNodeNum = " << mNodeNum << endl;
+  // 以前の内容を捨てる．
+  init();
+
+  // ノードと枝の情報を読み込む．
+  mNodeNum = read_word(s);
   mNodeTypeArray = new ymuint32[mNodeNum];
   mEdgeArray = new ymuint32[mNodeNum * 2];
+  ymuint max_input = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
-    s >> mNodeTypeArray[i]
-      >> mEdgeArray[i * 2]
-      >> mEdgeArray[i * 2 + 1];
+    mNodeTypeArray[i] = read_word(s);
+    mEdgeArray[i * 2] = read_word(s);
+    mEdgeArray[i * 2 + 1] = read_word(s);
+    if ( node_type(i) == kInput ) {
+      if ( max_input < input_id(i) ) {
+	max_input = input_id(i);
+      }
+    }
   }
 
-  s >> mInputNum;
+  // 入力の情報を作り出す．
+  mInputNum = max_input + 1;
   mInputArray = new ymuint32[mInputNum];
-  for (ymuint i = 0; i < mInputNum; ++ i) {
-    s >> mInputArray[i];
+  for (ymuint i = 0; i < node_num(); ++ i) {
+    if ( node_type(i) == kInput ) {
+      mInputArray[input_id(i)] = i;
+    }
   }
 
-  s >> mPatNum;
+  // パタングラフの情報を読み込む．
+  mPatNum = read_word(s);
   mPatArray = new PatGraph[mPatNum];
   for (ymuint i = 0; i < mPatNum; ++ i) {
     if ( !mPatArray[i].load(s) ) {
@@ -122,12 +163,19 @@ dump(ostream& s,
   for (ymuint i = 0; i < nn; ++ i) {
     s << "Node#" << i << ": ";
     switch ( pat_mgr.node_type(i) ) {
-    case PatMgr::kInput: s << "INPUT"; break;
+    case PatMgr::kInput: s << "INPUT#" << pat_mgr.input_id(i) ; break;
     case PatMgr::kAnd:   s << "AND"; break;
     case PatMgr::kXor:   s << "XOR"; break;
     default: assert_not_reached(__FILE__, __LINE__);
     }
     s << endl;
+  }
+  s << endl;
+
+  // 入力の情報の出力
+  ymuint ni = pat_mgr.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    s << "Input#" << i << ": Node#" << pat_mgr.input_node(i) << endl;
   }
   s << endl;
 
@@ -141,6 +189,7 @@ dump(ostream& s,
     }
     s << endl;
   }
+  s << endl;
 
   // パタングラフの情報の出力
   ymuint np = pat_mgr.pat_num();

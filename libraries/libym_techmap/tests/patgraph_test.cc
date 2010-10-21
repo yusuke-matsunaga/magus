@@ -17,7 +17,13 @@ void
 dump_word(ostream& s,
 	  ymuint val)
 {
-  s << static_cast<ymuint32>(val) << endl;
+  static char buf[4];
+  buf[0] = val & 255U; val >>= 8;
+  buf[1] = val & 255U; val >>= 8;
+  buf[2] = val & 255U; val >>= 8;
+  buf[3] = val & 255U;
+
+  s.write(buf, 4);
 }
 
 void
@@ -56,7 +62,7 @@ test()
 {
   const char* filename = "patgraph_test.data";
   ofstream os;
-  os.open(filename);
+  os.open(filename, ios::binary);
   if ( !os ) {
     // エラー
     cerr << "Could not create " << filename << endl;

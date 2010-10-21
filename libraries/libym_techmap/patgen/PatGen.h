@@ -37,13 +37,11 @@ public:
 
   /// @brief 論理式から対応するパタングラフを生成する．
   /// @param[in] expr 元になる論理式
-  /// @param[out] pg_list パタングラフのリスト
-  /// @note pg_list の中身はこの PatGen のインスタンスが破壊されると
-  /// 無効になる．
+  /// @param[out] pat_list パタン番号のリスト
   /// @note expr は定数を含んではいけない．
   void
   operator()(const LogExpr& expr,
-	     vector<PgHandle>& pg_list);
+	     vector<ymuint>& pat_list);
 
 
 public:
@@ -70,38 +68,38 @@ public:
   PgNode*
   node(ymuint pos) const;
 
+  /// @brief パタン数を返す．
+  ymuint
+  pat_num() const;
+
+  /// @brief パタンの根のハンドルを返す．
+  /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+  PgHandle
+  pat_root(ymuint id) const;
+
   /// @brief グラフ構造全体の内容を表示する．
   /// @param[in] s 出力先のストリーム
   void
-  display_graph(ostream& s) const;
-
-  /// @brief エッジリストの内容を表示する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] root 根のハンドル
-  void
-  display_edgelist(ostream& s,
-		   PgHandle root) const;
+  display(ostream& s) const;
 
   /// @brief グラフ構造全体をダンプする．
   /// @param[in] s 出力先のストリーム
   /// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
   void
-  dump_graph(ostream& s) const;
-
-  /// @brief エッジリストをダンプする．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] root 根のハンドル
-  /// @note 内容はエッジ番号のリスト
-  /// @note ただし最初に根の反転属性の情報を含む
-  void
-  dump_edgelist(ostream& s,
-		PgHandle root) const;
+  dump(ostream& s) const;
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief パタングラフを生成する再帰関数
+  /// @param[in] expr 元になる論理式
+  /// @param[out] pg_list パタングラフ番号のリスト
+  void
+  pg_sub(const LogExpr& expr,
+	 vector<PgHandle>& pg_list);
 
   /// @brief 入力ノードを作る．
   /// @param[in] id 入力番号
@@ -125,6 +123,22 @@ private:
   /// @brief ノードを作る．
   PgNode*
   new_node();
+
+  /// @brief エッジリストの内容を表示する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] root 根のハンドル
+  void
+  display_edgelist(ostream& s,
+		   PgHandle root) const;
+
+  /// @brief エッジリストをダンプする．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] root 根のハンドル
+  /// @note 内容はエッジ番号のリスト
+  /// @note ただし最初に根の反転属性の情報を含む
+  void
+  dump_edgelist(ostream& s,
+		PgHandle root) const;
 
 
 private:
@@ -166,6 +180,9 @@ private:
 
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
+
+  // パタンのリスト
+  vector<PgHandle> mPatList;
 
 };
 

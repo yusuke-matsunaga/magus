@@ -8,6 +8,7 @@
 
 
 #include "PatGen.h"
+#include "../PatMgr.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_utils/Generator.h"
 
@@ -147,199 +148,49 @@ PatGen::node(ymuint pos) const
   return mNodeList[pos];
 }
 
-
-BEGIN_NONAMESPACE
-
-void
-display_edge(ostream& s,
-	     PgNode* node,
-	     ymuint fanin_pos)
+// @brief パタン数を返す．
+ymuint
+PatGen::pat_num() const
 {
-  s << "Edge#" << node->id() * 2 + fanin_pos<< ": ";
-  if ( node->is_input() ) {
-    s << "---";
-  }
-  else {
-    s << "Node#" << node->fanin(fanin_pos)->id()
-      << " -> Node#" << node->id()
-      << "(" << fanin_pos << ")";
-    if ( node->fanin_inv(fanin_pos) ) {
-      s << "[inv]";
-    }
-  }
-  s << endl;
+  return mPatList.size();
 }
 
-END_NONAMESPACE
-
-// @brief グラフ構造全体をダンプする．
-// @param[in] s 出力先のストリーム
-// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
-void
-PatGen::display_graph(ostream& s) const
+// @brief パタンの根のハンドルを返す．
+// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+PgHandle
+PatGen::pat_root(ymuint id) const
 {
-  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
-    PgNode* node = this->node(i);
-    s << "Node#" << node->id() << ": ";
-    if ( node->is_input() ) {
-      s << "Input#" << node->input_id();
-    }
-    else if ( node->is_and() ) {
-      s << "And";
-    }
-    else if ( node->is_xor() ) {
-      s << "Xor";
-    }
-    s << endl;
-  }
-  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
-    PgNode* node = this->node(i);
-    display_edge(s, node, 0);
-    display_edge(s, node, 1);
-  }
+  return mPatList[id];
 }
 
-
-BEGIN_NONAMESPACE
-
+// @brief パタングラフを生成する再帰関数
+// @param[in] expr 元になる論理式
+// @param[out] pat_list パタン番号のリスト
+// @note expr は定数を含んではいけない．
 void
-display_dfs(ostream& s,
-	    PgNode* node,
-	    vector<bool>& vmark)
+PatGen::operator()(const LogExpr& expr,
+		   vector<ymuint>& pat_list)
 {
-  if ( node->is_input() || vmark[node->id()] ) {
-    return;
-  }
-  vmark[node->id()] = true;
-  s << " Edge#" << node->id() * 2;
-  display_dfs(s, node->fanin(0), vmark);
-  s << " Edge#" << node->id() * 2 + 1;
-  display_dfs(s, node->fanin(1), vmark);
-}
+  assert_cond( !expr.is_constant(), __FILE__, __LINE__);
+  vector<PgHandle> pg_list;
+  pg_sub(expr, pg_list);
 
-END_NONAMESPACE
-
-// @brief エッジリストの内容を出力する．
-// @param[in] s 出力先のストリーム
-// @param[in] root 根のハンドル
-void
-PatGen::display_edgelist(ostream& s,
-			 PgHandle root) const
-{
-  ymuint n = mNodeList.size();
-  vector<bool> vmark(n, false);
-  if ( root.inv() ) {
-    s << "[inv]";
-  }
-  display_dfs(s, root.node(), vmark);
-  s << endl;
-}
-
-
-BEGIN_NONAMESPACE
-
-void
-dump_edge(ostream& s,
-	  PgNode* node,
-	  ymuint fanin_pos)
-{
-  ymuint v = 0U;
-  if ( !node->is_input() ) {
-    v = node->fanin(fanin_pos)->id() * 2;
-    if ( node->fanin_inv(fanin_pos) ) {
-      v |= 1U;
-    }
-  }
-  s << v << endl;
-}
-
-END_NONAMESPACE
-
-// @brief グラフ構造全体をダンプする．
-// @param[in] s 出力先のストリーム
-// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
-void
-PatGen::dump_graph(ostream& s) const
-{
-  ymuint v;
-  v = mNodeList.size();
-  s << v << endl;
-  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
-    PgNode* node = this->node(i);
-    if ( node->is_input() ) {
-      v = 0U;
-    }
-    else if ( node->is_and() ) {
-      v = 2U;
-    }
-    else if ( node->is_xor() ) {
-      v = 3U;
-    }
-    s << v << endl;
-  }
-  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
-    PgNode* node = this->node(i);
-    dump_edge(s, node, 0);
-    dump_edge(s, node, 1);
-  }
-}
-
-
-BEGIN_NONAMESPACE
-
-void
-dump_dfs(ostream& s,
-	 PgNode* node,
-	 vector<bool>& vmark,
-	 vector<ymuint>& val_list)
-{
-  if ( node->is_input() || vmark[node->id()] ) {
-    return;
-  }
-  vmark[node->id()] = true;
-  val_list.push_back(node->id() * 2);
-  dump_dfs(s, node->fanin(0), vmark, val_list);
-  val_list.push_back(node->id() * 2 + 1);
-  dump_dfs(s, node->fanin(1), vmark, val_list);
-}
-
-END_NONAMESPACE
-
-// @brief エッジリストをダンプする．
-// @param[in] s 出力先のストリーム
-// @param[in] root 根のハンドル
-// @note 内容はエッジ番号のリスト
-// @note ただし最初の根のノード番号×2 + 反転属性
-void
-PatGen::dump_edgelist(ostream& s,
-		      PgHandle root) const
-{
-  ymuint n = mNodeList.size();
-  vector<bool> vmark(n, false);
-  vector<ymuint> val_list;
-  val_list.reserve(n * 2);
-  dump_dfs(s, root.node(), vmark, val_list);
-  ymuint l = val_list.size() * 2;
-  if ( root.inv() ) {
-    l |= 1U;
-  }
-  s << l << endl;
-  for (ymuint i = 0; i < l; ++ i) {
-    s << val_list[i] << endl;
+  ymuint n = pg_list.size();
+  mPatList.reserve(mPatList.size() + n);
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint id = mPatList.size();
+    pat_list.push_back(id);
+    mPatList.push_back(pg_list[i]);
   }
 }
 
 // @brief パタングラフを生成する再帰関数
 // @param[in] expr 元になる論理式
 // @param[out] pg_list パタングラフのリスト
-// @note pg_list の中身はこの PatGen のインスタンスが破壊されると
-// 無効になる．
-// @note expr は定数を含んではいけない．
 void
-PatGen::operator()(const LogExpr& expr,
-		   vector<PgHandle>& pg_list)
+PatGen::pg_sub(const LogExpr& expr,
+	       vector<PgHandle>& pg_list)
 {
-  assert_cond( !expr.is_constant(), __FILE__, __LINE__);
   if ( expr.is_literal() ) {
     PgNode* node = make_input(expr.varid());
     bool inv = expr.is_negaliteral();
@@ -350,7 +201,7 @@ PatGen::operator()(const LogExpr& expr,
     vector<vector<PgHandle> > input_pg_list(n);
     vector<pair<size_t, size_t> > nk_array(n);
     for (ymuint i = 0; i < n; ++ i) {
-      operator()(expr.child(i), input_pg_list[i]);
+      pg_sub(expr.child(i), input_pg_list[i]);
       nk_array[i] = make_pair(input_pg_list[i].size(), 1);
     }
     MultiCombiGen mcg(nk_array);
@@ -416,7 +267,7 @@ PatGen::make_input(ymuint id)
   while ( mInputList.size() <= id ) {
     PgNode* node = new_node();
     ymuint id1 = mInputList.size();
-    node->mType = (id1 << 2);
+    node->set_input(id1);
     mInputList.push_back(node);
   }
   PgNode* node = mInputList[id];
@@ -461,16 +312,16 @@ PatGen::make_node(const LogExpr& expr,
   bool oinv = false;
   ymuint32 type = 0U;
   if ( expr.is_and() ) {
-    type = 2U;
+    type = PgNode::kAnd;
   }
   else if ( expr.is_or() ) {
-    type = 2U;
+    type = PgNode::kAnd;
     l_inv = !l_inv;
     r_inv = !r_inv;
     oinv = true;
   }
   else if ( expr.is_xor() ) {
-    type = 3U;
+    type = PgNode::kXor;
     oinv = l_inv ^ r_inv;
   }
   else {
@@ -567,6 +418,205 @@ PatGen::hash_func(ymuint type,
   ympuint r = reinterpret_cast<ympuint>(r_node);
 
   return type + l * 5 + r;
+}
+
+
+BEGIN_NONAMESPACE
+
+void
+display_edge(ostream& s,
+	     PgNode* node,
+	     ymuint fanin_pos)
+{
+  s << "Edge#" << node->id() * 2 + fanin_pos<< ": ";
+  if ( node->is_input() ) {
+    s << "---";
+  }
+  else {
+    s << "Node#" << node->fanin(fanin_pos)->id()
+      << " -> Node#" << node->id()
+      << "(" << fanin_pos << ")";
+    if ( node->fanin_inv(fanin_pos) ) {
+      s << "[inv]";
+    }
+  }
+  s << endl;
+}
+
+void
+display_dfs(ostream& s,
+	    PgNode* node,
+	    vector<bool>& vmark)
+{
+  if ( node->is_input() || vmark[node->id()] ) {
+    return;
+  }
+  vmark[node->id()] = true;
+  s << " Edge#" << node->id() * 2;
+  display_dfs(s, node->fanin(0), vmark);
+  s << " Edge#" << node->id() * 2 + 1;
+  display_dfs(s, node->fanin(1), vmark);
+}
+
+END_NONAMESPACE
+
+// @brief グラフ構造全体をダンプする．
+// @param[in] s 出力先のストリーム
+// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
+void
+PatGen::display(ostream& s) const
+{
+  s << "*** NODE SECTION ***" << endl;
+  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
+    PgNode* node = this->node(i);
+    s << "Node#" << node->id() << ": ";
+    if ( node->is_input() ) {
+      s << "Input#" << node->input_id();
+    }
+    else if ( node->is_and() ) {
+      s << "And";
+    }
+    else if ( node->is_xor() ) {
+      s << "Xor";
+    }
+    s << endl;
+  }
+
+  s << " *** EDGE SECTION ***" << endl;
+  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
+    PgNode* node = this->node(i);
+    display_edge(s, node, 0);
+    display_edge(s, node, 1);
+  }
+
+  s << " *** PATTERN SECTION ***" << endl;
+  for (ymuint i = 0; i < mPatList.size(); ++ i) {
+    s << "Pat#" <<i << ": ";
+    display_edgelist(s, mPatList[i]);
+  }
+}
+
+// @brief エッジリストの内容を出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] root 根のハンドル
+void
+PatGen::display_edgelist(ostream& s,
+			 PgHandle root) const
+{
+  ymuint n = mNodeList.size();
+  vector<bool> vmark(n, false);
+  if ( root.inv() ) {
+    s << "[inv]";
+  }
+  display_dfs(s, root.node(), vmark);
+  s << endl;
+}
+
+
+BEGIN_NONAMESPACE
+
+void
+dump_word(ostream& s,
+	  ymuint val)
+{
+  static char buf[4];
+  buf[0] = val & 255U; val >>= 8;
+  buf[1] = val & 255U; val >>= 8;
+  buf[2] = val & 255U; val >>= 8;
+  buf[3] = val & 255U;
+
+  s.write(buf, 4);
+}
+
+void
+dump_edge(ostream& s,
+	  PgNode* node,
+	  ymuint fanin_pos)
+{
+  ymuint v = 0U;
+  if ( !node->is_input() ) {
+    v = node->fanin(fanin_pos)->id() * 2;
+    if ( node->fanin_inv(fanin_pos) ) {
+      v |= 1U;
+    }
+  }
+  dump_word(s, v);
+}
+
+void
+dump_dfs(ostream& s,
+	 PgNode* node,
+	 vector<bool>& vmark,
+	 vector<ymuint>& val_list,
+	 ymuint& max_input)
+{
+  if ( node->is_input() ) {
+    if ( max_input < node->input_id() ) {
+      max_input = node->input_id();
+    }
+    return;
+  }
+  if ( vmark[node->id()] ) {
+    return;
+  }
+  vmark[node->id()] = true;
+  val_list.push_back(node->id() * 2);
+  dump_dfs(s, node->fanin(0), vmark, val_list, max_input);
+  val_list.push_back(node->id() * 2 + 1);
+  dump_dfs(s, node->fanin(1), vmark, val_list, max_input);
+}
+
+END_NONAMESPACE
+
+// @brief グラフ構造全体をダンプする．
+// @param[in] s 出力先のストリーム
+// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
+void
+PatGen::dump(ostream& s) const
+{
+  ymuint nn = mNodeList.size();
+  dump_word(s, nn);
+  for (ymuint i = 0; i < nn; ++ i) {
+    PgNode* node = this->node(i);
+    ymuint v = 0U;
+    if ( node->is_input() ) {
+      v = PatMgr::kInput | (node->input_id() << 2);
+    }
+    else if ( node->is_and() ) {
+      v = PatMgr::kAnd;
+    }
+    else if ( node->is_xor() ) {
+      v = PatMgr::kXor;
+    }
+    dump_word(s, v);
+    dump_edge(s, node, 0);
+    dump_edge(s, node, 1);
+  }
+
+  vector<bool> vmark(nn);
+  vector<ymuint> val_list;
+  val_list.reserve(nn * 2);
+
+  ymuint np = mPatList.size();
+  dump_word(s, np);
+  for (ymuint i = 0; i < np; ++ i) {
+    PgHandle root = mPatList[i];
+    vmark.clear();
+    vmark.resize(nn, false);
+    val_list.clear();
+    ymuint max_input = 0;
+    dump_dfs(s, root.node(), vmark, val_list, max_input);
+    ymuint v = (max_input + 1) << 1;
+    if ( root.inv() ) {
+      v |= 1U;
+    }
+    dump_word(s, v);
+    ymuint ne = val_list.size();
+    dump_word(s, ne);
+    for (ymuint i = 0; i < ne; ++ i) {
+      dump_word(s, val_list[i]);
+    }
+  }
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN
