@@ -10,13 +10,14 @@
 #include "PgFuncMgr.h"
 #include "PgFuncRep.h"
 #include "PgFunc.h"
+#include "PgNode.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_npn/NpnMgr.h"
 
 
 BEGIN_NONAMESPACE
 
-const int debug = 1;
+const int debug = 0;
 
 END_NONAMESPACE
 
@@ -64,6 +65,64 @@ check_input(const LogExpr& expr,
       check_input(expr.child(i), input_map);
     }
   }
+}
+
+// 同形チェックの再帰関数
+bool
+isom_recur(PgNode* node1,
+	   PgNode* node2)
+{
+  if ( node1 == node2 ) {
+    return true;
+  }
+  if ( node1->is_input() ) {
+    // node1 が入力で node2 が入力でなかったら異なる．
+    return node2->is_input();
+  }
+  if ( node2->is_input() ) {
+    // ここに来ているということは node1 が入力でない．
+    return false;
+  }
+  if ( node1->is_and() ) {
+    if ( !node2->is_and() ) {
+      // node1 が AND で node2 が XOR
+      return false;
+    }
+  }
+  else if ( node2->is_and() ) {
+    // ここに来ているということは node1 は XOR
+    return false;
+  }
+  if ( node1->fanin_inv(0) != node2->fanin_inv(0) ||
+       node1->fanin_inv(1) != node2->fanin_inv(1) ) {
+    return false;
+  }
+  if ( !isom_recur(node1->fanin(0), node2->fanin(0)) ) {
+    return false;
+  }
+  if ( !isom_recur(node1->fanin(1), node2->fanin(1)) ) {
+    return false;
+  }
+  return true;
+}
+
+// @brief 2つのパタンが同形かどうか調べる．
+// @param[in] pat1, pat2 パタンの根のハンドル
+// @retval true pat1 と pat2 は同形だった．
+// @retval false pat1 と pat2 は同形ではなかった．
+// @note ここでいう「同形」とは終端番号以外がおなじこと
+bool
+check_isomorphic(PgHandle pat1,
+		 PgHandle pat2)
+{
+  if ( pat1.inv() != pat2.inv() ) {
+    return false;
+  }
+  PgNode* node1 = pat1.node();
+  PgNode* node2 = pat2.node();
+
+  // あとは実際に再帰して調べる．
+  return isom_recur(node1, node2);
 }
 
 END_NONAMESPACE
@@ -171,27 +230,30 @@ PgFuncMgr::reg_expr(const LogExpr& expr)
   if ( pgfunc->mMap.opol() == kPolNega ) {
     cexpr = ~cexpr;
   }
-
-  vector<ymuint> pat_list;
+  vector<PgHandle> pat_list;
   mPatGen(cexpr, pat_list);
+
   // 重複チェック
   // 今は2乗オーダーのバカなアルゴリズムを使っている．
-  for (vector<ymuint>::iterator p = pat_list.begin();
+  for (vector<PgHandle>::iterator p = pat_list.begin();
        p != pat_list.end(); ++ p) {
-    ymuint pat_id1 = *p;
+    PgHandle pat1 = *p;
     bool found = false;
     for (vector<ymuint>::iterator q = pgrep->mPatList.begin();
 	 q != pgrep->mPatList.end(); ++ q) {
       ymuint pat_id2 = *q;
-      if ( mPatGen.check_isomorphic(pat_id1, pat_id2) ) {
+      PgHandle pat2 = mPatGen.pat_root(pat_id2);
+      if ( check_isomorphic(pat1, pat2) ) {
 	found = true;
 	break;
       }
     }
     if ( !found ) {
-      pgrep->mPatList.push_back(pat_id1);
+      ymuint pat_id = mPatGen.reg_pat(pat1);
+      pgrep->mPatList.push_back(pat_id);
     }
   }
+  mPatGen.sweep();
 
   return pgfunc->id();
 }

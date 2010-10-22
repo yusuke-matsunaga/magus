@@ -108,7 +108,8 @@ BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 
 // @brief コンストラクタ
 PgNode::PgNode() :
-  mType(0U)
+  mType(0U),
+  mLocked(false)
 {
   mFanin[0] = NULL;
   mFanin[1] = NULL;
@@ -117,6 +118,20 @@ PgNode::PgNode() :
 // @brief デストラクタ
 PgNode::~PgNode()
 {
+}
+
+// @brief 'lock' する．
+// @note ファンインに再帰する．
+void
+PgNode::set_locked()
+{
+  if ( !mLocked ) {
+    mLocked = true;
+    if ( !is_input() ) {
+      fanin(0)->set_locked();
+      fanin(1)->set_locked();
+    }
+  }
 }
 
 
@@ -169,88 +184,54 @@ PatGen::pat_root(ymuint id) const
   return mPatList[id];
 }
 
-
-BEGIN_NONAMESPACE
-
-// 同形チェックの再帰関数
-bool
-isom_recur(PgNode* node1,
-	   PgNode* node2)
-{
-  if ( node1 == node2 ) {
-    return true;
-  }
-  if ( node1->is_input() ) {
-    return node2->is_input();
-  }
-  if ( node2->is_input() ) {
-    return false;
-  }
-  if ( node1->is_and() ) {
-    if ( !node2->is_and() ) {
-      return false;
-    }
-  }
-  else if ( node2->is_and() ) {
-    return false;
-  }
-  if ( node1->fanin_inv(0) != node2->fanin_inv(0) ||
-       node1->fanin_inv(1) != node2->fanin_inv(1) ) {
-    return false;
-  }
-  if ( !isom_recur(node1->fanin(0), node2->fanin(0)) ) {
-    return false;
-  }
-  if ( !isom_recur(node1->fanin(1), node2->fanin(1)) ) {
-    return false;
-  }
-  return true;
-}
-
-END_NONAMESPACE
-
-// @brief 2つのパタンが同形かどうか調べる．
-// @param[in] pat1, pat2 パタン番号
-// @retval true pat1 と pat2 は同形だった．
-// @retval false pat1 と pat2 は同形ではなかった．
-// @note ここでいう「同形」とは終端番号以外がおなじこと
-bool
-PatGen::check_isomorphic(ymuint pat1,
-			 ymuint pat2) const
-{
-  if ( pat1 == pat2 ) {
-    // 番号が等しければもちろん同形
-    return true;
-  }
-
-  PgHandle h1 = pat_root(pat1);
-  PgHandle h2 = pat_root(pat2);
-  if ( h1.inv() != h2.inv() ) {
-    return false;
-  }
-
-  // あとは実際に再帰して調べる．
-  return isom_recur(h1.node(), h2.node());
-}
-
 // @brief パタングラフを生成する再帰関数
 // @param[in] expr 元になる論理式
-// @param[out] pat_list パタン番号のリスト
+// @param[out] pat_list パタンのリスト
 // @note expr は定数を含んではいけない．
 void
 PatGen::operator()(const LogExpr& expr,
-		   vector<ymuint>& pat_list)
+		   vector<PgHandle>& pat_list)
 {
   assert_cond( !expr.is_constant(), __FILE__, __LINE__);
-  vector<PgHandle> pg_list;
-  pg_sub(expr, pg_list);
+  pg_sub(expr, pat_list);
+}
 
-  ymuint n = pg_list.size();
-  mPatList.reserve(mPatList.size() + n);
-  for (ymuint i = 0; i < n; ++ i) {
-    ymuint id = mPatList.size();
-    pat_list.push_back(id);
-    mPatList.push_back(pg_list[i]);
+// @brief パタンを登録する．
+// @param[in] root 根のハンドル
+// @return パタン番号を返す．
+ymuint
+PatGen::reg_pat(PgHandle root)
+{
+  ymuint id = mPatList.size();
+  mPatList.push_back(root);
+  root.node()->set_locked();
+  return id;
+}
+
+// @brief 使われていないパタンとノードを削除してID番号を詰める．
+void
+PatGen::sweep()
+{
+  // lock されていないノードの削除
+  for ( ; ; ) {
+    PgNode* node = mNodeList.back();
+    if ( node->is_locked() ) {
+      break;
+    }
+    delete_node(node);
+    mNodeList.pop_back();
+  }
+  // 入力ノードの整列
+  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
+    PgNode* node = mNodeList[i];
+    if ( !node->is_input() ) continue;
+    ymuint iid = node->input_id();
+    if ( iid == i ) continue;
+    PgNode* node1 = mNodeList[iid];
+    mNodeList[iid] = node;
+    node->mId = iid;
+    mNodeList[i] = node1;
+    node1->mId = i;
   }
 }
 
@@ -443,6 +424,14 @@ PatGen::new_node()
   node->mId = mNodeList.size();
   mNodeList.push_back(node);
   return node;
+}
+
+// @brief ノードを削除する．
+void
+PatGen::delete_node(PgNode* node)
+{
+  node->~PgNode();
+  mAlloc.put_memory(sizeof(PgNode), static_cast<void*>(node));
 }
 
 // @brief ハッシュ表を確保する．

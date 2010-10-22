@@ -36,12 +36,12 @@ test()
   PgFuncMgr pgf_mgr;
 
   ymuint fid1 = pgf_mgr.reg_expr(expr1);
+  ymuint fid6 = pgf_mgr.reg_expr(expr6);
+  ymuint fid7 = pgf_mgr.reg_expr(expr7);
   ymuint fid2 = pgf_mgr.reg_expr(expr2);
   ymuint fid3 = pgf_mgr.reg_expr(expr3);
   ymuint fid4 = pgf_mgr.reg_expr(expr4);
   ymuint fid5 = pgf_mgr.reg_expr(expr5);
-  ymuint fid6 = pgf_mgr.reg_expr(expr6);
-  ymuint fid7 = pgf_mgr.reg_expr(expr7);
 
   cout << "*** PgFuncMgr ***" << endl;
   cout << "# of functions:     " << pgf_mgr.func_num() << endl

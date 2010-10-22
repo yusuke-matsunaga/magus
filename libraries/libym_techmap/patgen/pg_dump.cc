@@ -21,34 +21,10 @@ display_edge(ostream& s,
 	     PgNode* node,
 	     ymuint fanin_pos)
 {
-  s << "Edge#" << node->id() * 2 + fanin_pos<< ": ";
-  if ( node->is_input() ) {
-    s << "---";
+  if ( node->fanin_inv(fanin_pos) ) {
+    s << "~";
   }
-  else {
-    s << "Node#" << node->fanin(fanin_pos)->id()
-      << " -> Node#" << node->id()
-      << "(" << fanin_pos << ")";
-    if ( node->fanin_inv(fanin_pos) ) {
-      s << "[inv]";
-    }
-  }
-  s << endl;
-}
-
-void
-display_dfs(ostream& s,
-	    PgNode* node,
-	    vector<bool>& vmark)
-{
-  if ( node->is_input() || vmark[node->id()] ) {
-    return;
-  }
-  vmark[node->id()] = true;
-  s << " Edge#" << node->id() * 2;
-  display_dfs(s, node->fanin(0), vmark);
-  s << " Edge#" << node->id() * 2 + 1;
-  display_dfs(s, node->fanin(1), vmark);
+  s << "Node#" << node->fanin(fanin_pos)->id();
 }
 
 END_NONAMESPACE
@@ -60,44 +36,49 @@ void
 pg_display(ostream& s,
 	   const PatGen& pat_gen)
 {
-  ymuint n = pat_gen.node_num();
-
   s << "*** NODE SECTION ***" << endl;
+  ymuint n = pat_gen.node_num();
   for (ymuint i = 0; i < n; ++ i) {
     PgNode* node = pat_gen.node(i);
+    if ( node->is_locked() ) {
+      s << "*";
+    }
+    else {
+      s << " ";
+    }
     s << "Node#" << node->id() << ": ";
     if ( node->is_input() ) {
       s << "Input#" << node->input_id();
     }
-    else if ( node->is_and() ) {
-      s << "And";
-    }
-    else if ( node->is_xor() ) {
-      s << "Xor";
+    else {
+      if ( node->is_and() ) {
+	s << "And";
+      }
+      else if ( node->is_xor() ) {
+	s << "Xor";
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      s << "( ";
+      display_edge(s, node, 0);
+      s << ", ";
+      display_edge(s, node, 1);
+      s << ")";
     }
     s << endl;
   }
-
-  s << " *** EDGE SECTION ***" << endl;
-  for (ymuint i = 0; i < n; ++ i) {
-    PgNode* node = pat_gen.node(i);
-    display_edge(s, node, 0);
-    display_edge(s, node, 1);
-  }
+  s << endl;
 
   s << " *** PATTERN SECTION ***" << endl;
-  vector<bool> vmark;
   ymuint np = pat_gen.pat_num();
   for (ymuint i = 0; i < np; ++ i) {
-    vmark.clear();
-    vmark.resize(n, false);
-    s << "Pat#" <<i << ": ";
     PgHandle root = pat_gen.pat_root(i);
+    s << "Pat#" << i << ": ";
     if ( root.inv() ) {
-      s << "[inv]";
+      s << "~";
     }
-    display_dfs(s, root.node(), vmark);
-    s << endl;
+    s << "Node#" << root.node()->id() << endl;
   }
 }
 

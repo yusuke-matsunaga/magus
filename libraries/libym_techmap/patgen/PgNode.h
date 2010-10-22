@@ -39,6 +39,10 @@ public:
   ymuint
   id() const;
 
+  /// @brief 'lock' 状態を得る．
+  bool
+  is_locked() const;
+
   /// @brief 入力の時 true を返す．
   bool
   is_input() const;
@@ -88,6 +92,11 @@ private:
   void
   set_xor();
 
+  /// @brief 'lock' する．
+  /// @note ファンインに再帰する．
+  void
+  set_locked();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -115,6 +124,9 @@ private:
   // or
   //  + ファンインの極性 ( 1bit x 2)
   ymuint32 mType;
+
+  // lock ビット
+  bool mLocked;
 
   // ファンインのノード
   PgNode* mFanin[2];
@@ -183,6 +195,14 @@ ymuint
 PgNode::id() const
 {
   return mId;
+}
+
+// @brief 'lock' 状態を得る．
+inline
+bool
+PgNode::is_locked() const
+{
+  return mLocked;
 }
 
 // @brief 入力の時 true を返す．

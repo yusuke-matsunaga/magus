@@ -46,16 +46,18 @@ public:
   /// @note expr は定数を含んではいけない．
   void
   operator()(const LogExpr& expr,
-	     vector<ymuint>& pat_list);
+	     vector<PgHandle>& pat_list);
 
-  /// @brief 2つのパタンが同形かどうか調べる．
-  /// @param[in] pat1, pat2 パタン番号
-  /// @retval true pat1 と pat2 は同形だった．
-  /// @retval false pat1 と pat2 は同形ではなかった．
-  /// @note ここでいう「同形」とは終端番号以外がおなじこと
-  bool
-  check_isomorphic(ymuint pat1,
-		   ymuint pat2) const;
+  /// @brief パタンを登録する．
+  /// @param[in] root 根のハンドル
+  /// @return パタン番号を返す．
+  ymuint
+  reg_pat(PgHandle root);
+
+  /// @brief 使われていないパタンとノードを削除してID番号を詰める．
+  /// @note 同時に入力ノードの入力番号とノード番号を一致させる．
+  void
+  sweep();
 
 
 public:
@@ -117,6 +119,10 @@ private:
   PgNode*
   new_node();
 
+  /// @brief ノードを削除する．
+  void
+  delete_node(PgNode* node);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -158,7 +164,7 @@ private:
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
 
-  // パタンのリスト
+  // パタンの根のハンドルのリスト
   vector<PgHandle> mPatList;
 
 };

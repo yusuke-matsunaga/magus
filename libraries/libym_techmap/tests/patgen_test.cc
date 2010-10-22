@@ -9,11 +9,22 @@
 
 #include "patgen/patgen_nsdef.h"
 #include "patgen/PatGen.h"
+#include "patgen/PgNode.h"
 #include "ym_lexp/LogExpr.h"
 #include "PatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+
+void
+display_pat(ostream& s,
+	    PgHandle h)
+{
+  if ( h.inv() ) {
+    s << "~";
+  }
+  s << "Node#" << h.node()->id();
+}
 
 void
 test()
@@ -26,19 +37,19 @@ test()
   PatGen patgen;
 
   LogExpr expr1 = var0 & var1;
-  vector<ymuint> pat_list1;
+  vector<PgHandle> pat_list1;
   patgen(expr1, pat_list1);
 
   LogExpr expr11 = var0 ^ var1;
-  vector<ymuint> pat_list11;
+  vector<PgHandle> pat_list11;
   patgen(expr11, pat_list11);
 
   LogExpr expr2 = var0 & var1 & var2 & var3;
-  vector<ymuint> pat_list2;
+  vector<PgHandle> pat_list2;
   patgen(expr2, pat_list2);
 
   LogExpr expr3 = (var0 & var1) | (var2 & var3);
-  vector<ymuint> pat_list3;
+  vector<PgHandle> pat_list3;
   patgen(expr3, pat_list3);
 
   cout << "pg_display() " << endl;
@@ -46,30 +57,30 @@ test()
   cout << endl;
 
   cout << "Patterns for " << expr1 << ":";
-  for (vector<ymuint>::iterator p = pat_list1.begin();
+  for (vector<PgHandle>::iterator p = pat_list1.begin();
        p != pat_list1.end(); ++ p) {
-    cout << " " << *p;
+    display_pat(cout, *p);
   }
   cout << endl;
 
   cout << "Patterns for " << expr11 << ":";
-  for (vector<ymuint>::iterator p = pat_list11.begin();
+  for (vector<PgHandle>::iterator p = pat_list11.begin();
        p != pat_list11.end(); ++ p) {
-    cout << " " << *p;
+    display_pat(cout, *p);
   }
   cout << endl;
 
   cout << "Patterns for " << expr2 << ":";
-  for (vector<ymuint>::iterator p = pat_list2.begin();
+  for (vector<PgHandle>::iterator p = pat_list2.begin();
        p != pat_list2.end(); ++ p) {
-    cout << " " << *p;
+    display_pat(cout, *p);
   }
   cout << endl;
 
   cout << "Patterns for " << expr3 << ":";
-  for (vector<ymuint>::iterator p = pat_list3.begin();
+  for (vector<PgHandle>::iterator p = pat_list3.begin();
        p != pat_list3.end(); ++ p) {
-    cout << " " << *p;
+    display_pat(cout, *p);
   }
   cout << endl;
 
