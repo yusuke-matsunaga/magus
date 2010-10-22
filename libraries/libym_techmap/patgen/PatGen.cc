@@ -191,7 +191,7 @@ isom_recur(PgNode* node1,
       return false;
     }
   }
-  if ( node2->is_and() ) {
+  else if ( node2->is_and() ) {
     return false;
   }
   if ( node1->fanin_inv(0) != node2->fanin_inv(0) ||

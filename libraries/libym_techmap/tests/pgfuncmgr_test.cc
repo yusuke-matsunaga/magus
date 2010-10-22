@@ -31,6 +31,7 @@ test()
   LogExpr expr4 = var0 & var1 & var2 & var3;
   LogExpr expr5 = (var0 & var1) | (var2 & var3);
   LogExpr expr6 = ~(~var0 | ~var1);
+  LogExpr expr7 = var1 & var0;
 
   PgFuncMgr pgf_mgr;
 
@@ -40,6 +41,7 @@ test()
   ymuint fid4 = pgf_mgr.reg_expr(expr4);
   ymuint fid5 = pgf_mgr.reg_expr(expr5);
   ymuint fid6 = pgf_mgr.reg_expr(expr6);
+  ymuint fid7 = pgf_mgr.reg_expr(expr7);
 
   cout << "*** PgFuncMgr ***" << endl;
   cout << "# of functions:     " << pgf_mgr.func_num() << endl
@@ -83,6 +85,7 @@ test()
   cout << "func id for " << expr4 << " = " << fid4 << endl;
   cout << "func id for " << expr5 << " = " << fid5 << endl;
   cout << "func id for " << expr6 << " = " << fid6 << endl;
+  cout << "func id for " << expr7 << " = " << fid7 << endl;
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN
