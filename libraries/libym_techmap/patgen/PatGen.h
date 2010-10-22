@@ -48,6 +48,15 @@ public:
   operator()(const LogExpr& expr,
 	     vector<ymuint>& pat_list);
 
+  /// @brief 2つのパタンが同形かどうか調べる．
+  /// @param[in] pat1, pat2 パタン番号
+  /// @retval true pat1 と pat2 は同形だった．
+  /// @retval false pat1 と pat2 は同形ではなかった．
+  /// @note ここでいう「同形」とは終端番号以外がおなじこと
+  bool
+  check_isomorphic(ymuint pat1,
+		   ymuint pat2) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

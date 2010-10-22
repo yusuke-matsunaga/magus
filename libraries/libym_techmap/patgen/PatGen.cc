@@ -169,6 +169,70 @@ PatGen::pat_root(ymuint id) const
   return mPatList[id];
 }
 
+
+BEGIN_NONAMESPACE
+
+// 同形チェックの再帰関数
+bool
+isom_recur(PgNode* node1,
+	   PgNode* node2)
+{
+  if ( node1 == node2 ) {
+    return true;
+  }
+  if ( node1->is_input() ) {
+    return node2->is_input();
+  }
+  if ( node2->is_input() ) {
+    return false;
+  }
+  if ( node1->is_and() ) {
+    if ( !node2->is_and() ) {
+      return false;
+    }
+  }
+  if ( node2->is_and() ) {
+    return false;
+  }
+  if ( node1->fanin_inv(0) != node2->fanin_inv(0) ||
+       node1->fanin_inv(1) != node2->fanin_inv(1) ) {
+    return false;
+  }
+  if ( !isom_recur(node1->fanin(0), node2->fanin(0)) ) {
+    return false;
+  }
+  if ( !isom_recur(node1->fanin(1), node2->fanin(1)) ) {
+    return false;
+  }
+  return true;
+}
+
+END_NONAMESPACE
+
+// @brief 2つのパタンが同形かどうか調べる．
+// @param[in] pat1, pat2 パタン番号
+// @retval true pat1 と pat2 は同形だった．
+// @retval false pat1 と pat2 は同形ではなかった．
+// @note ここでいう「同形」とは終端番号以外がおなじこと
+bool
+PatGen::check_isomorphic(ymuint pat1,
+			 ymuint pat2) const
+{
+  if ( pat1 == pat2 ) {
+    // 番号が等しければもちろん同形
+    return true;
+  }
+
+  PgHandle h1 = pat_root(pat1);
+  PgHandle h2 = pat_root(pat2);
+  if ( h1.inv() != h2.inv() ) {
+    return false;
+  }
+
+  // あとは実際に再帰して調べる．
+  return isom_recur(h1.node(), h2.node());
+}
+
 // @brief パタングラフを生成する再帰関数
 // @param[in] expr 元になる論理式
 // @param[out] pat_list パタン番号のリスト
