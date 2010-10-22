@@ -7,6 +7,9 @@
 /// All rights reserved.
 
 
+#include "PgFuncMgr.h"
+#include "PgFuncRep.h"
+#include "PgFunc.h"
 #include "PatGen.h"
 #include "PgNode.h"
 #include "../PatMgr.h"
@@ -34,8 +37,39 @@ END_NONAMESPACE
 // @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
 void
 pg_display(ostream& s,
-	   const PatGen& pat_gen)
+	   const PgFuncMgr& pgf_mgr)
 {
+  s << "*** FUNCTION SECTION ***" << endl;
+  for (ymuint i = 0; i < pgf_mgr.func_num(); ++ i) {
+    const PgFunc* func = pgf_mgr.func(i);
+    assert_cond( func->id() == i, __FILE__, __LINE__);
+    s << "FUNC#" << i << ": REP#" << func->rep()->id()
+	 << ": " << func->map() << endl;
+  }
+  s << endl;
+
+  s << "*** REPRESENTATIVE SECTION ***" << endl;
+  for (ymuint i = 0; i < pgf_mgr.rep_num(); ++ i) {
+    const PgFuncRep* rep = pgf_mgr.rep(i);
+    assert_cond( rep->id() == i , __FILE__, __LINE__);
+    s << "REP#" << i << ": ";
+    rep->rep_func().dump(s, 2);
+    s << endl;
+    s << "  equivalence = ";
+    for (ymuint j = 0; j < rep->func_num(); ++ j) {
+      s << " FUNC#" << rep->func(j)->id();
+    }
+    s << endl;
+    s << "  patterns = ";
+    for (ymuint j = 0; j < rep->pat_num(); ++ j) {
+      s << " PAT#" << rep->pat_id(j);
+    }
+    s << endl;
+  }
+  s << endl;
+
+  const PatGen& pat_gen = pgf_mgr.pat_gen();
+
   s << "*** NODE SECTION ***" << endl;
   ymuint n = pat_gen.node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -70,7 +104,7 @@ pg_display(ostream& s,
   }
   s << endl;
 
-  s << " *** PATTERN SECTION ***" << endl;
+  s << "*** PATTERN SECTION ***" << endl;
   ymuint np = pat_gen.pat_num();
   for (ymuint i = 0; i < np; ++ i) {
     PgHandle root = pat_gen.pat_root(i);
@@ -80,6 +114,7 @@ pg_display(ostream& s,
     }
     s << "Node#" << root.node()->id() << endl;
   }
+  s << "*** END ***" << endl;
 }
 
 
@@ -96,6 +131,50 @@ dump_word(ostream& s,
   buf[3] = val & 255U;
 
   s.write(buf, 4);
+}
+
+void
+dump_func(ostream& s,
+	  const TvFunc& f)
+{
+  ymuint ni = f.ni();
+  dump_word(s, ni);
+  ymuint nip = (1U << ni);
+  ymuint32 v = 0U;
+  ymuint base = 0;
+  for (ymuint p = 0; p < nip; ++ p) {
+    v |= (f.value(p) << (p - base));
+    if ( (p % 32) == 31 ) {
+      dump_word(s, v);
+      base += 32;
+      v = 0U;
+    }
+  }
+  if ( ni <= 4 ) {
+    dump_word(s, v);
+  }
+}
+
+void
+dump_map(ostream& s,
+	 const NpnMap& map)
+{
+  ymuint ni = map.ni();
+  ymuint32 v = (ni << 1);
+  if ( map.opol() == kPolNega ) {
+    v |= 1U;
+  }
+  dump_word(s, v);
+  for (ymuint i = 0; i < ni; ++ i) {
+    tNpnImap imap = map.imap(i);
+    // 手抜きでは imap を ymuint32 にキャストすればよい．
+    ymuint j = npnimap_pos(imap);
+    ymuint32 v = (j << 1);
+    if ( npnimap_pol(imap) ) {
+      v |= 1U;
+    }
+    dump_word(s, v);
+  }
 }
 
 void
@@ -143,8 +222,37 @@ END_NONAMESPACE
 // @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
 void
 pg_dump(ostream& s,
-	const PatGen& pat_gen)
+	const PgFuncMgr& pgf_mgr)
 {
+  ymuint nf = pgf_mgr.func_num();
+  dump_word(s, nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    const PgFunc* func = pgf_mgr.func(i);
+    assert_cond( func->id() == i, __FILE__, __LINE__);
+    dump_word(s, func->rep()->id());
+    dump_map(s, func->map());
+  }
+
+  ymuint nr = pgf_mgr.rep_num();
+  dump_word(s, nr);
+  for (ymuint i = 0; i < nr; ++ i) {
+    const PgFuncRep* rep = pgf_mgr.rep(i);
+    assert_cond( rep->id() == i , __FILE__, __LINE__);
+    dump_func(s, rep->rep_func());
+    ymuint ne = rep->func_num();
+    dump_word(s, ne);
+    for (ymuint j = 0; j < ne; ++ j) {
+      dump_word(s, rep->func(j)->id());
+    }
+    ymuint np = rep->pat_num();
+    dump_word(s, np);
+    for (ymuint j = 0; j < np; ++ j) {
+      dump_word(s, rep->pat_id(j));
+    }
+  }
+
+  const PatGen& pat_gen = pgf_mgr.pat_gen();
+
   ymuint nn = pat_gen.node_num();
   dump_word(s, nn);
   for (ymuint i = 0; i < nn; ++ i) {
