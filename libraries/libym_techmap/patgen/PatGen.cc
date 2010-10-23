@@ -9,6 +9,7 @@
 
 #include "PatGen.h"
 #include "PgNode.h"
+#include "PgHandle.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_utils/Generator.h"
 
@@ -134,6 +135,48 @@ PgNode::set_locked()
   }
 }
 
+// @relates PgNode
+// @brief 同形か調べる．
+// @param[in] node1, node2 根のノード
+bool
+check_isomorphic(const PgNode* node1,
+		 const PgNode* node2)
+{
+  if ( node1 == node2 ) {
+    return true;
+  }
+  if ( node1->is_input() ) {
+    // node1 が入力で node2 が入力でなかったら異なる．
+    return node2->is_input();
+  }
+  if ( node2->is_input() ) {
+    // ここに来ているということは node1 が入力でない．
+    return false;
+  }
+  if ( node1->is_and() ) {
+    if ( !node2->is_and() ) {
+      // node1 が AND で node2 が XOR
+      return false;
+    }
+  }
+  else if ( node2->is_and() ) {
+    // ここに来ているということは node1 は XOR
+    return false;
+  }
+  if ( node1->fanin_inv(0) != node2->fanin_inv(0) ||
+       node1->fanin_inv(1) != node2->fanin_inv(1) ) {
+    // ファンイン極性が異なる．
+    return false;
+  }
+  if ( !check_isomorphic(node1->fanin(0), node2->fanin(0)) ) {
+    return false;
+  }
+  if ( !check_isomorphic(node1->fanin(1), node2->fanin(1)) ) {
+    return false;
+  }
+  return true;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス PatGen
@@ -213,14 +256,22 @@ void
 PatGen::sweep()
 {
   // lock されていないノードの削除
-  for ( ; ; ) {
-    PgNode* node = mNodeList.back();
+  ymuint wpos = 0;
+  for (ymuint i = 0; i < mNodeList.size(); ++ i) {
+    PgNode* node = mNodeList[i];
     if ( node->is_locked() ) {
-      break;
+      if ( wpos != i ) {
+	mNodeList[wpos] = node;
+	node->mId = wpos;
+      }
+      ++ wpos;
     }
-    delete_node(node);
-    mNodeList.pop_back();
+    else {
+      delete_node(node);
+    }
   }
+  mNodeList.erase(mNodeList.begin() + wpos, mNodeList.end());
+
   // 入力ノードの整列
   for (ymuint i = 0; i < mNodeList.size(); ++ i) {
     PgNode* node = mNodeList[i];
@@ -234,6 +285,31 @@ PatGen::sweep()
     node1->mId = i;
   }
 }
+
+
+BEGIN_NONAMESPACE
+
+// pg_list に new_handle を追加する．
+// ただし，同形のパタンがすでにある場合には追加しない．
+void
+add_pg_list(vector<PgHandle>& pg_list,
+	    PgHandle new_handle)
+{
+  for (vector<PgHandle>::iterator p = pg_list.begin();
+       p != pg_list.end(); ++ p) {
+    PgHandle h = *p;
+    // 根に反転属性はないと思ったけど念のため
+    if ( h.inv() != new_handle.inv() ) continue;
+    if ( check_isomorphic(h.node(), new_handle.node()) ) {
+      // 同形のパタンが存在した．
+      return;
+    }
+  }
+  // なかったので追加する．
+  pg_list.push_back(new_handle);
+}
+
+END_NONAMESPACE
 
 // @brief パタングラフを生成する再帰関数
 // @param[in] expr 元になる論理式
@@ -255,55 +331,61 @@ PatGen::pg_sub(const LogExpr& expr,
       pg_sub(expr.child(i), input_pg_list[i]);
       nk_array[i] = make_pair(input_pg_list[i].size(), 1);
     }
+    // ファンインのパタンの組み合わせを列挙するオブジェクト
     MultiCombiGen mcg(nk_array);
+    vector<PgHandle> input(n);
     for (MultiCombiGen::iterator p = mcg.begin(); !p.is_end(); ++ p) {
-      vector<PgHandle> input(n);
-      for (ymuint i = 0; i < n; ++ i) {
-	input[i] = input_pg_list[i][p(i, 0)];
-      }
-      switch ( n ) {
-      case 2:
-	{
-	  PgHandle handle = make_node(expr, input[0], input[1]);
-	  pg_list.push_back(handle);
+      // 入力の順列を列挙するオブジェクト
+      PermGen pg(n, n);
+      for (PermGen::iterator q = pg.begin(); !q.is_end(); ++ q) {
+	for (ymuint i = 0; i < n; ++ i) {
+	  ymuint j = q(i);
+	  input[j] = input_pg_list[i][p(i, 0)];
 	}
-	break;
+	switch ( n ) {
+	case 2:
+	  {
+	    PgHandle handle = make_node(expr, input[0], input[1]);
+	    add_pg_list(pg_list, handle);
+	  }
+	  break;
 
-      case 3:
-	for (ymuint i = 0; i < n_pat3; ++ i) {
-	  ymuint pos = 0;
-	  PgHandle handle = make_bintree(expr, input, pat3[i], pos);
-	  pg_list.push_back(handle);
+	case 3:
+	  for (ymuint i = 0; i < n_pat3; ++ i) {
+	    ymuint pos = 0;
+	    PgHandle handle = make_bintree(expr, input, pat3[i], pos);
+	    add_pg_list(pg_list, handle);
+	  }
+	  break;
+
+	case 4:
+	  for (ymuint i = 0; i < n_pat4; ++ i) {
+	    ymuint pos = 0;
+	    PgHandle handle = make_bintree(expr, input, pat4[i], pos);
+	    add_pg_list(pg_list, handle);
+	  }
+	  break;
+
+	case 5:
+	  for (ymuint i = 0; i < n_pat5; ++ i) {
+	    ymuint pos = 0;
+	    PgHandle handle = make_bintree(expr, input, pat5[i], pos);
+	    add_pg_list(pg_list, handle);
+	  }
+	  break;
+
+	case 6:
+	  for (ymuint i = 0; i < n_pat6; ++ i) {
+	    ymuint pos = 0;
+	    PgHandle handle = make_bintree(expr, input, pat6[i], pos);
+	    add_pg_list(pg_list, handle);
+	  }
+	  break;
+
+	default:
+	  assert_not_reached(__FILE__, __LINE__);
+	  break;
 	}
-	break;
-
-      case 4:
-	for (ymuint i = 0; i < n_pat4; ++ i) {
-	  ymuint pos = 0;
-	  PgHandle handle = make_bintree(expr, input, pat4[i], pos);
-	  pg_list.push_back(handle);
-	}
-	break;
-
-      case 5:
-	for (ymuint i = 0; i < n_pat5; ++ i) {
-	  ymuint pos = 0;
-	  PgHandle handle = make_bintree(expr, input, pat5[i], pos);
-	  pg_list.push_back(handle);
-	}
-	break;
-
-      case 6:
-	for (ymuint i = 0; i < n_pat6; ++ i) {
-	  ymuint pos = 0;
-	  PgHandle handle = make_bintree(expr, input, pat6[i], pos);
-	  pg_list.push_back(handle);
-	}
-	break;
-
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
       }
     }
   }

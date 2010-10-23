@@ -17,41 +17,82 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 
-void
-test()
+LogExpr
+str_to_expr(char* str,
+	    ymuint& pos)
 {
-  LogExpr var0 = LogExpr::make_posiliteral(0);
-  LogExpr var1 = LogExpr::make_posiliteral(1);
-  LogExpr var2 = LogExpr::make_posiliteral(2);
-  LogExpr var3 = LogExpr::make_posiliteral(3);
+  // 最初の空白を読み飛ばす．
+  while ( isspace(str[pos]) ) {
+    ++ pos;
+  }
 
-  LogExpr expr1 = var0 & var1;
-  LogExpr expr2 = var0 | var1;
-  LogExpr expr3 = var0 ^ var1;
-  LogExpr expr4 = var0 & var1 & var2 & var3;
-  LogExpr expr5 = (var0 & var1) | (var2 & var3);
-  LogExpr expr6 = ~(~var0 | ~var1);
-  LogExpr expr7 = var1 & var0;
+  // 次の空白の位置を求める．
+  ymuint end;
+  for (end = pos + 1; str[end] != '\0' && !isspace(str[end]); ++ pos) { }
+
+  LogExpr expr;
+  if ( end == pos + 1 ) {
+    char op = str[pos];
+    ++ pos;
+    if ( op == '~' || op == '!' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      expr = ~expr1;
+    }
+    else if ( op == '&' || op == '*' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      LogExpr expr2 = str_to_expr(str, pos);
+      expr = expr1 & expr2;
+    }
+    else if ( op == '|' || op == '+' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      LogExpr expr2 = str_to_expr(str, pos);
+      expr = expr1 | expr2;
+    }
+    else if ( op == '^' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      LogExpr expr2 = str_to_expr(str, pos);
+      expr = expr1 ^ expr2;
+    }
+    else if ( '0' <= op && op <= '9' ) {
+      int v = static_cast<int>(op) - '0';
+      expr = LogExpr::make_posiliteral(v);
+    }
+  }
+  else {
+    // 数字でなければならない．
+    char oc = str[end];
+    str[end] = '\0';
+    int v = atoi(str);
+    expr = LogExpr::make_posiliteral(v);
+    str[end] = oc;
+  }
+
+  return expr;
+}
+
+void
+test(istream& s)
+{
+  // s の各行が逆ポーランド式の論理式だと思う．
+  vector<LogExpr> expr_list;
+  char buff[4096];
+  while ( s.getline(buff, sizeof(buff), '\n') ) {
+    ymuint pos = 0;
+    LogExpr expr = str_to_expr(buff, pos);
+    expr_list.push_back(expr);
+  }
+
 
   PgFuncMgr pgf_mgr;
 
-  ymuint fid1 = pgf_mgr.reg_expr(expr1);
-  ymuint fid6 = pgf_mgr.reg_expr(expr6);
-  ymuint fid7 = pgf_mgr.reg_expr(expr7);
-  ymuint fid2 = pgf_mgr.reg_expr(expr2);
-  ymuint fid3 = pgf_mgr.reg_expr(expr3);
-  ymuint fid4 = pgf_mgr.reg_expr(expr4);
-  ymuint fid5 = pgf_mgr.reg_expr(expr5);
+  for (vector<LogExpr>::iterator p = expr_list.begin();
+       p != expr_list.end(); ++ p) {
+    LogExpr expr = *p;
+    ymuint fid = pgf_mgr.reg_expr(expr);
+    cout << "Function ID for " << expr << " = " << fid << endl;
+  }
 
   pg_display(cout, pgf_mgr);
-
-  cout << "func id for " << expr1 << " = " << fid1 << endl;
-  cout << "func id for " << expr2 << " = " << fid2 << endl;
-  cout << "func id for " << expr3 << " = " << fid3 << endl;
-  cout << "func id for " << expr4 << " = " << fid4 << endl;
-  cout << "func id for " << expr5 << " = " << fid5 << endl;
-  cout << "func id for " << expr6 << " = " << fid6 << endl;
-  cout << "func id for " << expr7 << " = " << fid7 << endl;
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN
@@ -61,7 +102,20 @@ int
 main(int argc,
      char** argv)
 {
-  nsYm::nsTechmap::nsPatgen::test();
+  using namespace std;
+
+  if ( argc == 2 ) {
+    ifstream ifs;
+    ifs.open(argv[1]);
+    if ( !ifs ) {
+      cerr << "Error opening " << argv[2] << endl;
+      return 1;
+    }
+    nsYm::nsTechmap::nsPatgen::test(ifs);
+  }
+  else {
+    nsYm::nsTechmap::nsPatgen::test(cin);
+  }
 
   return 0;
 }

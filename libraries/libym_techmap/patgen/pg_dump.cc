@@ -12,6 +12,7 @@
 #include "PgFunc.h"
 #include "PatGen.h"
 #include "PgNode.h"
+#include "PgHandle.h"
 #include "../PatMgr.h"
 
 
