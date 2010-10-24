@@ -267,6 +267,21 @@ PatGen::sweep()
       ++ wpos;
     }
     else {
+      if ( node->is_and() || node->is_xor() ) {
+	// ハッシュ表から取り除く
+	ymuint pos = hash_func(node->mType, node->mFanin[0], node->mFanin[1]);
+	ymuint idx = pos % mHashSize;
+	PgNode** p_prev = &mHashTable[idx];
+	for ( ; ; ) {
+	  PgNode* node1 = *p_prev;
+	  assert_cond( node1 != NULL, __FILE__, __LINE__);
+	  if ( node == node1 ) {
+	    *p_prev = node->mLink;
+	    break;
+	  }
+	  p_prev = &(node1->mLink);
+	}
+      }
       delete_node(node);
     }
   }
@@ -456,6 +471,8 @@ PatGen::make_node(const LogExpr& expr,
   else if ( expr.is_xor() ) {
     type = PgNode::kXor;
     oinv = l_inv ^ r_inv;
+    l_inv = false;
+    r_inv = false;
   }
   else {
     assert_not_reached(__FILE__, __LINE__);
