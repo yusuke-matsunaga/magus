@@ -77,10 +77,6 @@ public:
   ymuint
   input_id(ymuint id) const;
 
-  /// @brief 入力数を返す．
-  ymuint
-  input_num() const;
-
   /// @brief 入力のノード番号を返す．
   /// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
   /// @return input_id の入力に対応するノードのノード番号
@@ -137,13 +133,6 @@ private:
   // サイズは mNodeNum * 2
   ymuint32* mEdgeArray;
 
-  // 入力数
-  ymuint32 mInputNum;
-
-  // 入力のノード番号を納めた配列
-  // サイズは mInputNum;
-  ymuint32* mInputArray;
-
   // パタン数
   ymuint32 mPatNum;
 
@@ -194,14 +183,6 @@ PatMgr::input_id(ymuint id) const
   return (mNodeTypeArray[id] >> 2);
 }
 
-// @brief 入力数を返す．
-inline
-ymuint
-PatMgr::input_num() const
-{
-  return mInputNum;
-}
-
 // @brief 入力のノード番号を返す．
 // @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
 // @return input_id の入力に対応するノードのノード番号
@@ -209,7 +190,7 @@ inline
 ymuint
 PatMgr::input_node(ymuint input_id) const
 {
-  return mInputArray[input_id];
+  return input_id;
 }
 
 // @brief 総枝数を返す．

@@ -74,8 +74,6 @@ PatMgr::PatMgr() :
   mNodeNum(0U),
   mNodeTypeArray(NULL),
   mEdgeArray(NULL),
-  mInputNum(0U),
-  mInputArray(NULL),
   mPatNum(0),
   mPatArray(NULL)
 {
@@ -94,10 +92,8 @@ PatMgr::init()
 {
   delete [] mNodeTypeArray;
   delete [] mEdgeArray;
-  delete [] mInputArray;
   delete [] mPatArray;
   mNodeNum = 0U;
-  mInputNum = 0U;
   mPatNum = 0U;
 }
 
@@ -115,24 +111,12 @@ PatMgr::load(istream& s)
   mNodeNum = read_word(s);
   mNodeTypeArray = new ymuint32[mNodeNum];
   mEdgeArray = new ymuint32[mNodeNum * 2];
-  ymuint max_input = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     mNodeTypeArray[i] = read_word(s);
     mEdgeArray[i * 2] = read_word(s);
     mEdgeArray[i * 2 + 1] = read_word(s);
     if ( node_type(i) == kInput ) {
-      if ( max_input < input_id(i) ) {
-	max_input = input_id(i);
-      }
-    }
-  }
-
-  // 入力の情報を作り出す．
-  mInputNum = max_input + 1;
-  mInputArray = new ymuint32[mInputNum];
-  for (ymuint i = 0; i < node_num(); ++ i) {
-    if ( node_type(i) == kInput ) {
-      mInputArray[input_id(i)] = i;
+      assert_cond( input_id(i) == i, __FILE__, __LINE__);
     }
   }
 
@@ -169,13 +153,6 @@ dump(ostream& s,
     default: assert_not_reached(__FILE__, __LINE__);
     }
     s << endl;
-  }
-  s << endl;
-
-  // 入力の情報の出力
-  ymuint ni = pat_mgr.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    s << "Input#" << i << ": Node#" << pat_mgr.input_node(i) << endl;
   }
   s << endl;
 
