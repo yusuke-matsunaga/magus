@@ -28,7 +28,64 @@ read_word(istream& s)
   return ans;
 }
 
+void
+read_map(istream& s,
+	 NpnMap& map)
+{
+  ymuint32 tmp = read_word(s);
+  ymuint ni = (tmp >> 1);
+  map.resize(ni);
+  tPol opol = (tmp & 1U) ? kPolNega : kPolPosi;
+  map.set_opol(opol);
+  for (ymuint i = 0; i < ni; ++ i) {
+    ymuint32 tmp = read_word(s);
+    ymuint pos = (tmp >> 1);
+    tPol ipol = (tmp & 1U) ? kPolNega : kPolPosi;
+    map.set(i, pos, ipol);
+  }
+}
+
 END_NONAMESPACE
+
+//////////////////////////////////////////////////////////////////////
+// クラス RepFunc
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+RepFunc::RepFunc() :
+  mFuncNum(0U),
+  mFuncArray(NULL),
+  mPatNum(0U),
+  mPatArray(NULL)
+{
+}
+
+// @brief デストラクタ
+RepFunc::~RepFunc()
+{
+  delete [] mFuncArray;
+  delete [] mPatArray;
+}
+
+// @brief バイナリ形式のファイルを読み込む．
+// @param[in] s 入力ストリーム
+// @return 読み込みが成功したら true を返す．
+bool
+RepFunc::load(istream& s)
+{
+  mFuncNum = read_word(s);
+  mFuncArray = new ymuint32[mFuncNum];
+  for (ymuint i = 0; i < mFuncNum; ++ i) {
+    mFuncArray[i] = read_word(s);
+  }
+  mPatNum = read_word(s);
+  mPatArray = new ymuint32[mPatNum];
+  for (ymuint i = 0; i < mPatNum; ++ i) {
+    mPatArray[i] = read_word(s);
+  }
+  return true;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス PatGraph
@@ -107,6 +164,22 @@ PatMgr::load(istream& s)
   // 以前の内容を捨てる．
   init();
 
+  // 関数の情報を読み込む．
+  mFuncNum = read_word(s);
+  mNpnMapArray = new NpnMap[mFuncNum];
+  for (ymuint i = 0; i < mFuncNum; ++ i) {
+    read_map(s, mNpnMapArray[i]);
+  }
+
+  // 代表関数の情報を読み込む．
+  mRepNum = read_word(s);
+  mRepArray = new RepFunc[mRepNum];
+  for (ymuint i = 0; i < mRepNum; ++ i) {
+    if ( !mRepArray[i].load(s) ) {
+      return false;
+    }
+  }
+
   // ノードと枝の情報を読み込む．
   mNodeNum = read_word(s);
   mNodeTypeArray = new ymuint32[mNodeNum];
@@ -141,6 +214,33 @@ dump(ostream& s,
      const PatMgr& pat_mgr)
 {
   s << "==== PatMgr dump start ====" << endl;
+
+  // 関数情報の出力
+  ymuint nf = pat_mgr.func_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const NpnMap& map = pat_mgr.npn_map(i);
+    s << "Func#" << i << ": " << map << endl;
+  }
+  s << endl;
+
+  // 代表関数情報の出力
+  ymuint nr = pat_mgr.rep_num();
+  for (ymuint i = 0; i < nr; ++ i) {
+    const RepFunc& rep = pat_mgr.rep(i);
+    s << "Rep#" << i << endl;
+    s << "  equivalence = ";
+    ymuint nf = rep.func_num();
+    for (ymuint j = 0; j < nf; ++ j) {
+      s << " Func#" << rep.func_id(j);
+    }
+    s << endl;
+    ymuint np = rep.pat_num();
+    s << "  patterns = ";
+    for (ymuint j = 0; j < np; ++ j) {
+      s << " Pat#" << rep.pat_id(j);
+    }
+    s << endl;
+  }
 
   // ノードの種類の出力
   ymuint nn = pat_mgr.node_num();

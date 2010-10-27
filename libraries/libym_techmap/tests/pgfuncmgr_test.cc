@@ -82,7 +82,6 @@ test(istream& s)
     expr_list.push_back(expr);
   }
 
-
   PgFuncMgr pgf_mgr;
 
   for (vector<LogExpr>::iterator p = expr_list.begin();
@@ -93,6 +92,7 @@ test(istream& s)
   }
 
   pg_display(cout, pgf_mgr);
+
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN

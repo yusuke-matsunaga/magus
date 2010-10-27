@@ -182,15 +182,6 @@ void
 pg_display(ostream& s,
 	   const PatGen& pat_gen);
 
-/// @relates PatGen
-/// @brief グラフ構造全体をダンプする．
-/// @param[in] s 出力先のストリーム
-/// @param[in] pat_gen 対象のオブジェクト
-/// @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
-void
-pg_dump(ostream& s,
-	const PatGen& pat_gen);
-
 END_NAMESPACE_YM_TECHMAP_PATGEN
 
 #endif // LIBYM_TECHMAP_PATGEN_PATGEN_H

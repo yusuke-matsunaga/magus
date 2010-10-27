@@ -8,83 +8,92 @@
 
 
 #include "patgen/patgen_nsdef.h"
-#include "patgen/PatGen.h"
-#include "patgen/PgNode.h"
+#include "patgen/PgFuncMgr.h"
+//#include "patgen/PgNode.h"
+//#include "patgen/PgHandle.h"
 #include "ym_lexp/LogExpr.h"
 #include "PatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
 
-void
-display_pat(ostream& s,
-	    PgHandle h)
+LogExpr
+str_to_expr(char* str,
+	    ymuint& pos)
 {
-  if ( h.inv() ) {
-    s << "~";
+  // 最初の空白を読み飛ばす．
+  while ( isspace(str[pos]) ) {
+    ++ pos;
   }
-  s << "Node#" << h.node()->id();
+
+  // 次の空白の位置を求める．
+  ymuint end;
+  for (end = pos + 1; str[end] != '\0' && !isspace(str[end]); ++ pos) { }
+
+  LogExpr expr;
+  if ( end == pos + 1 ) {
+    char op = str[pos];
+    ++ pos;
+    if ( op == '~' || op == '!' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      expr = ~expr1;
+    }
+    else if ( op == '&' || op == '*' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      LogExpr expr2 = str_to_expr(str, pos);
+      expr = expr1 & expr2;
+    }
+    else if ( op == '|' || op == '+' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      LogExpr expr2 = str_to_expr(str, pos);
+      expr = expr1 | expr2;
+    }
+    else if ( op == '^' ) {
+      LogExpr expr1 = str_to_expr(str, pos);
+      LogExpr expr2 = str_to_expr(str, pos);
+      expr = expr1 ^ expr2;
+    }
+    else if ( '0' <= op && op <= '9' ) {
+      int v = static_cast<int>(op) - '0';
+      expr = LogExpr::make_posiliteral(v);
+    }
+  }
+  else {
+    // 数字でなければならない．
+    char oc = str[end];
+    str[end] = '\0';
+    int v = atoi(str);
+    expr = LogExpr::make_posiliteral(v);
+    str[end] = oc;
+  }
+
+  return expr;
 }
 
 void
-test()
+test(istream& s)
 {
-  LogExpr var0 = LogExpr::make_posiliteral(0);
-  LogExpr var1 = LogExpr::make_posiliteral(1);
-  LogExpr var2 = LogExpr::make_posiliteral(2);
-  LogExpr var3 = LogExpr::make_posiliteral(3);
-
-  PatGen patgen;
-
-  LogExpr expr1 = var0 & var1;
-  vector<PgHandle> pat_list1;
-  patgen(expr1, pat_list1);
-
-  LogExpr expr11 = var0 ^ var1;
-  vector<PgHandle> pat_list11;
-  patgen(expr11, pat_list11);
-
-  LogExpr expr2 = var0 & var1 & var2 & var3;
-  vector<PgHandle> pat_list2;
-  patgen(expr2, pat_list2);
-
-  LogExpr expr3 = (var0 & var1) | (var2 & var3);
-  vector<PgHandle> pat_list3;
-  patgen(expr3, pat_list3);
-
-  cout << "pg_display() " << endl;
-  pg_display(cout, patgen);
-  cout << endl;
-
-  cout << "Patterns for " << expr1 << ":";
-  for (vector<PgHandle>::iterator p = pat_list1.begin();
-       p != pat_list1.end(); ++ p) {
-    display_pat(cout, *p);
+  // s の各行が逆ポーランド式の論理式だと思う．
+  vector<LogExpr> expr_list;
+  char buff[4096];
+  while ( s.getline(buff, sizeof(buff), '\n') ) {
+    ymuint pos = 0;
+    LogExpr expr = str_to_expr(buff, pos);
+    expr_list.push_back(expr);
   }
-  cout << endl;
 
-  cout << "Patterns for " << expr11 << ":";
-  for (vector<PgHandle>::iterator p = pat_list11.begin();
-       p != pat_list11.end(); ++ p) {
-    display_pat(cout, *p);
+  PgFuncMgr pgf_mgr;
+
+  for (vector<LogExpr>::iterator p = expr_list.begin();
+       p != expr_list.end(); ++ p) {
+    LogExpr expr = *p;
+    ymuint fid = pgf_mgr.reg_expr(expr);
+    cout << "Function ID for " << expr << " = " << fid << endl;
   }
-  cout << endl;
 
-  cout << "Patterns for " << expr2 << ":";
-  for (vector<PgHandle>::iterator p = pat_list2.begin();
-       p != pat_list2.end(); ++ p) {
-    display_pat(cout, *p);
-  }
-  cout << endl;
+  pg_display(cout, pgf_mgr);
 
-  cout << "Patterns for " << expr3 << ":";
-  for (vector<PgHandle>::iterator p = pat_list3.begin();
-       p != pat_list3.end(); ++ p) {
-    display_pat(cout, *p);
-  }
-  cout << endl;
-
-  const char* filename = "patgraph_test.data";
+  const char* filename = "patgen_test.data";
   {
     ofstream ofs;
     ofs.open(filename, ios::binary);
@@ -94,7 +103,7 @@ test()
       return;
     }
 
-    pg_dump(ofs, patgen);
+    pg_dump(ofs, pgf_mgr);
   }
 
   PatMgr pat_mgr;
@@ -121,7 +130,20 @@ int
 main(int argc,
      char** argv)
 {
-  nsYm::nsTechmap::nsPatgen::test();
+  using namespace std;
+
+  if ( argc == 2 ) {
+    ifstream ifs;
+    ifs.open(argv[1]);
+    if ( !ifs ) {
+      cerr << "Error opening " << argv[2] << endl;
+      return 1;
+    }
+    nsYm::nsTechmap::nsPatgen::test(ifs);
+  }
+  else {
+    nsYm::nsTechmap::nsPatgen::test(cin);
+  }
 
   return 0;
 }

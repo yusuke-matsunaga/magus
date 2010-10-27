@@ -230,7 +230,6 @@ pg_dump(ostream& s,
   for (ymuint i = 0; i < nf; ++ i) {
     const PgFunc* func = pgf_mgr.func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
-    dump_word(s, func->rep()->id());
     dump_map(s, func->map());
   }
 
@@ -239,7 +238,6 @@ pg_dump(ostream& s,
   for (ymuint i = 0; i < nr; ++ i) {
     const PgFuncRep* rep = pgf_mgr.rep(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
-    dump_func(s, rep->rep_func());
     ymuint ne = rep->func_num();
     dump_word(s, ne);
     for (ymuint j = 0; j < ne; ++ j) {

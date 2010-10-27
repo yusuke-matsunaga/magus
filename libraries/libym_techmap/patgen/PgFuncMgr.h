@@ -116,6 +116,15 @@ void
 pg_display(ostream& s,
 	   const PgFuncMgr& pgf_mgr);
 
+/// @relates PgFuncMgr
+/// @brief グラフ構造全体をダンプする．
+/// @param[in] s 出力先のストリーム
+/// @param[in] pgf_mgr 対象のオブジェクト
+/// @note ダンプされた情報はそのまま PatMgr で読み込むことができる．
+void
+pg_dump(ostream& s,
+	const PgFuncMgr& pat_gen);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義

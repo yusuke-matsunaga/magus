@@ -10,6 +10,8 @@
 
 
 #include "ym_techmap/techmap_nsdef.h"
+#include "ym_npn/NpnMap.h"
+#include "RepFunc.h"
 #include "PatGraph.h"
 
 
@@ -18,6 +20,15 @@ BEGIN_NAMESPACE_YM_TECHMAP
 //////////////////////////////////////////////////////////////////////
 /// @class PatMgr PatMgr.h "PatMgr.h"
 /// @brief パタングラフを管理するクラス
+///
+/// このクラスが持っている情報は
+/// - パタングラフ
+/// - 各々のパタングラフに対応する論理関数
+/// - その論理関数とNPN同値な関数の集合
+/// で，最後の関数がセルの論理関数と対応づけられる．
+///
+/// 情報の設定は専用形式のバイナリファイルを読み込むことでのみ行える．
+/// バイナリファイルの生成は patgen/PatGen, pg_dump を参照のこと．
 //////////////////////////////////////////////////////////////////////
 class PatMgr
 {
@@ -59,7 +70,31 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 情報取得用の関数
+  // 論理関数グループに関する情報を取得数関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @bireif 論理関数の個数を返す．
+  ymuint
+  func_num() const;
+
+  /// @brief 代表関数に対する変換マップを返す．
+  /// @param[in] id 関数番号　( 0 <= id < func_num() )
+  const NpnMap&
+  npn_map(ymuint id) const;
+
+  /// @brief 代表関数の個数を返す．
+  ymuint
+  rep_num() const;
+
+  /// @brief 代表関数を返す．
+  /// @param[in] id 代表関数番号
+  const RepFunc&
+  rep(ymuint id) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // パタングラフ関係の情報取得用の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 総ノード数を返す．
@@ -122,6 +157,20 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 関数の数
+  ymuint32 mFuncNum;
+
+  // 代表関数に対する変換マップの配列
+  // サイズは mFuncNum
+  NpnMap* mNpnMapArray;
+
+  // 代表関数の数
+  ymuint32 mRepNum;
+
+  // 代表関数の配列
+  // サイズは mRepNum
+  RepFunc* mRepArray;
+
   // ノード数
   ymuint32 mNodeNum;
 
@@ -155,6 +204,40 @@ dump(ostream& s,
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @bireif 論理関数の個数を返す．
+inline
+ymuint
+PatMgr::func_num() const
+{
+  return mFuncNum;
+}
+
+// @brief 代表関数に対する変換マップを返す．
+// @param[in] id 関数番号　( 0 <= id < func_num() )
+inline
+const NpnMap&
+PatMgr::npn_map(ymuint id) const
+{
+  return mNpnMapArray[id];
+}
+
+// @brief 代表関数の個数を返す．
+inline
+ymuint
+PatMgr::rep_num() const
+{
+  return mRepNum;
+}
+
+// @brief 代表関数を返す．
+// @param[in] id 代表関数番号
+inline
+const RepFunc&
+PatMgr::rep(ymuint id) const
+{
+  return mRepArray[id];
+}
 
 // @brief ノード数を返す．
 inline
