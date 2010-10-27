@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_CELL
 class MislibLex
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] msg_mgr メッセージマネージャ
   MislibLex(MsgMgr& msg_mgr);
@@ -50,16 +50,16 @@ public:
   /// @brief 直前の read_token() に対応する文字列を返す．
   const char*
   cur_string() const;
-  
+
   /// @brief cur_string() を double に変換したものを返す．
   double
   cur_num() const;
-  
+
   /// @brief 現在のトークンの位置情報を返す．
   FileRegion
   cur_loc() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -81,10 +81,10 @@ private:
 
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
-  
+
   // 現在のファイル記述子
   const FileDesc* mFileDesc;
-  
+
   // 入力ストリーム
   istream* mInput;
 
@@ -96,18 +96,18 @@ private:
 
   // 直前の文字が \r の時に true となるフラグ
   bool mCR;
-  
+
   // read_token の結果の文字列を格納する
   StrBuff mCurString;
-  
+
   // 現在の行番号
-  int mCurLine;
+  ymuint32 mCurLine;
 
   // 現在のトークンの開始位置
-  int mFirstColumn;
+  ymuint32 mFirstColumn;
 
   // 現在のコラム位置
-  int mCurColumn;
+  ymuint32 mCurColumn;
 
 };
 
@@ -123,7 +123,7 @@ MislibLex::cur_string() const
 {
   return mCurString.c_str();
 }
-  
+
 // @brief cur_string() を double に変換したものを返す．
 inline
 double

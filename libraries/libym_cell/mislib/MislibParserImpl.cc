@@ -48,7 +48,7 @@ MislibParserImpl::read(const string& filename,
 		       CellLibrary& library)
 {
   int yyparse(MislibParserImpl& parser);
-  
+
   ifstream input_stream;
   input_stream.open(filename.c_str());
   if ( !input_stream ) {
@@ -65,51 +65,20 @@ MislibParserImpl::read(const string& filename,
   mLex.init(input_stream, file_desc);
 
   // 初期化
-#if 0
-  for (list<MislibHandler*>::iterator p = mHandlerList.begin();
-       p != mHandlerList.end(); ++ p) {
-    MislibHandler* handler = *p;
-    handler->init();
-  }
-#endif
   mGateHash.clear();
   mError = false;
-  
+
   yyparse(*this);
-  
+
   if ( mError ) {
     // 異常終了
-#if 0
-    for (list<MislibHandler*>::iterator p = mHandlerList.begin();
-	 p != mHandlerList.end(); ++ p) {
-      MislibHandler* handler = *p;
-      handler->error_exit();
-    }
-#endif
     return false;
   }
   else {
     // 正常終了
-#if 0
-    for (list<MislibHandler*>::iterator p = mHandlerList.begin();
-	 p != mHandlerList.end(); ++ p) {
-      MislibHandler* handler = *p;
-      handler->normal_exit();
-    }
-#endif
     return true;
   }
 }
-
-#if 0
-// @brief イベントハンドラの登録
-void
-MislibParserImpl::add_handler(MislibHandler* handler)
-{
-  mHandlerList.push_back(handler);
-  handler->mParser = this;
-}
-#endif
 
 // 文字列ノードを生成する．
 MislibPt*
@@ -245,16 +214,16 @@ MislibParserImpl::new_gate1(const FileRegion& loc,
   assert_cond(pt_expr->is_expr(), __FILE__, __LINE__);
   assert_cond(pt_ipin_list, __FILE__, __LINE__);
   assert_cond(pt_ipin_list->type() == MislibPt::kPinList, __FILE__, __LINE__);
-  
+
   ShString name = pt_name->str();
   FileRegion name_loc = pt_name->loc();
 
   double area = pt_area->num();
   FileRegion area_loc = pt_area->loc();
-  
+
   ShString oname = pt_oname->str();
   FileRegion oname_loc = pt_oname->loc();
-  
+
   // ゲート名の重複チェック
   if ( reg_gate_name(name, name_loc) ) {
     return;
@@ -267,7 +236,7 @@ MislibParserImpl::new_gate1(const FileRegion& loc,
     assert_cond(tmp->type() == MislibPt::kPin, __FILE__, __LINE__);
     assert_cond(tmp->name(), __FILE__, __LINE__);
   }
-  
+
    // 入力ピンの情報を inputs に入れる．
   vector<MislibPtPin*> inputs;
   inputs.reserve(ni);
@@ -277,7 +246,7 @@ MislibParserImpl::new_gate1(const FileRegion& loc,
     assert_cond(pin, __FILE__, __LINE__);
     inputs.push_back(pin);
   }
-    
+
   // 入力ピン名のチェックを行う．
   bool error = false;
   for (size_t i = 0; i < ni; ++ i) {
@@ -309,7 +278,7 @@ MislibParserImpl::new_gate1(const FileRegion& loc,
   if ( error ) {
     return;
   }
-  
+
   // 論理式を作る．
   vector<MislibPt*> names;
   LogExpr expr = make_expr(pt_expr, names);
@@ -355,9 +324,9 @@ MislibParserImpl::new_gate1(const FileRegion& loc,
   }
   // ピン名の順番と論理式のリテラル番号を合わせる．
   expr = expr.remap_var(varmap);
-  
+
   FileRegion expr_loc = pt_expr->loc();
-  
+
   // ハンドラの処理関数を呼び出す．
 #if 0
   for (list<MislibHandler*>::iterator p = mHandlerList.begin();
@@ -391,26 +360,26 @@ MislibParserImpl::new_gate2(const FileRegion& loc,
   assert_cond(pt_ipin, __FILE__, __LINE__);
   assert_cond(pt_ipin->type() == MislibPt::kPin, __FILE__, __LINE__);
   assert_cond(pt_ipin->name() == NULL, __FILE__, __LINE__);
-  
+
   ShString name = pt_name->str();
   FileRegion name_loc = pt_name->loc();
 
   double area = pt_area->num();
   FileRegion area_loc = pt_area->loc();
-  
+
   ShString oname = pt_oname->str();
   FileRegion oname_loc = pt_oname->loc();
-  
+
   // ゲート名の重複チェック
   if ( reg_gate_name(name, name_loc) ) {
     return;
   }
-  
+
   // 論理式を作る．
   vector<MislibPt*> names;
   LogExpr expr = make_expr(pt_expr, names);
   FileRegion expr_loc = pt_expr->loc();
-  
+
 #if 0
   // その際に得られた名前からピンの情報を作る．
   size_t n = names.size();
@@ -451,16 +420,16 @@ MislibParserImpl::new_gate3(const FileRegion& loc,
   assert_cond(pt_oname->type() == MislibPt::kStr, __FILE__, __LINE__);
   assert_cond(pt_expr, __FILE__, __LINE__);
   assert_cond(pt_expr->is_expr(), __FILE__, __LINE__);
-  
+
   ShString name = pt_name->str();
   FileRegion name_loc = pt_name->loc();
 
   double area = pt_area->num();
   FileRegion area_loc = pt_area->loc();
-  
+
   ShString oname = pt_oname->str();
   FileRegion oname_loc = pt_oname->loc();
-  
+
   // ゲート名の重複チェック
   if ( reg_gate_name(name, name_loc) ) {
     return;
@@ -472,7 +441,7 @@ MislibParserImpl::new_gate3(const FileRegion& loc,
   case MislibPt::kConst0:
     expr = LogExpr::make_zero();
     break;
-    
+
   case MislibPt::kConst1:
     expr = LogExpr::make_one();
     break;
@@ -484,7 +453,7 @@ MislibParserImpl::new_gate3(const FileRegion& loc,
     return;
   }
   FileRegion expr_loc = pt_expr->loc();
-  
+
   // ハンドラの処理関数を呼び出す．
 #if 0
   for (list<MislibHandler*>::iterator p = mHandlerList.begin();
@@ -498,7 +467,7 @@ MislibParserImpl::new_gate3(const FileRegion& loc,
   // MislibPt のオブジェクトを開放する．
   mAlloc.destroy();
 }
-  
+
 // @brief ゲート名の登録
 // @return 重複していたら true を返す．
 bool
@@ -532,24 +501,24 @@ MislibParserImpl::pt_to_pin(MislibPt* pt_pin,
     // この時の値は未定
     // 実際には後で設定されるはず．
   }
-	
+
   switch ( pt_pin->phase()->type() ) {
   case MislibPt::kNoninv:
     pin.mPhase = MislibPin::kNoninv;
     break;
-	  
+
   case MislibPt::kInv:
     pin.mPhase = MislibPin::kInv;
     break;
-    
+
   case MislibPt::kUnknown:
     pin.mPhase = MislibPin::kUnknown;
     break;
-	  
+
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-      
+
   pin.mInputLoad = pt_pin->input_load()->num();
   pin.mMaxLoad = pt_pin->max_load()->num();
   pin.mRiseBlockDelay = pt_pin->rise_block_delay()->num();
@@ -578,7 +547,7 @@ MislibParserImpl::make_expr(MislibPt* pt,
   switch ( pt->type() ) {
   case MislibPt::kConst0:
     return LogExpr::make_zero();
-    
+
   case MislibPt::kConst1:
     return LogExpr::make_one();
 
@@ -593,10 +562,10 @@ MislibParserImpl::make_expr(MislibPt* pt,
 
   case MislibPt::kNot:
     return ~make_expr(pt->child1(), names);
-    
+
   case MislibPt::kAnd:
     return make_expr(pt->child1(), names) & make_expr(pt->child2(), names);
-    
+
   case MislibPt::kOr:
     return make_expr(pt->child1(), names) | make_expr(pt->child2(), names);
 
@@ -614,7 +583,7 @@ MislibParserImpl::clear()
 {
   mAlloc.destroy();
 }
-  
+
 // @brief 字句解析を行う．
 // @param[out] lval トークンの値を格納する変数
 // @param[out] lloc トークンの位置を格納する変数
@@ -625,36 +594,36 @@ MislibParserImpl::scan(MislibPt*& lval,
 {
   int tok = mLex.read_token();
   lloc = mLex.cur_loc();
-  
+
   switch ( tok ) {
   case STR:
     lval = new_str(lloc, ShString(mLex.cur_string()).id());
     break;
-    
+
   case NUM:
     lval = new_num(lloc, mLex.cur_num());
     break;
-    
+
   case NONINV:
     lval = new_noninv(lloc);
     break;
-    
+
   case INV:
     lval = new_inv(lloc);
     break;
-    
+
   case UNKNOWN:
     lval = new_unknown(lloc);
     break;
-    
+
   case CONST0:
     lval = new_const0(lloc);
     break;
-    
+
   case CONST1:
     lval = new_const1(lloc);
     break;
-    
+
   }
   return tok;
 }
