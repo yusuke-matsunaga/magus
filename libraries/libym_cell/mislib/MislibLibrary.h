@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_MISLIB_MISLIBCELLLIBRARY_H
-#define LIBYM_CELL_MISLIB_MISLIBCELLLIBRARY_H
+#ifndef LIBYM_CELL_MISLIB_MISLIBLIBRARY_H
+#define LIBYM_CELL_MISLIB_MISLIBLIBRARY_H
 
-/// @file　libym_cell/mislib/MislibCellLibrary.h
-/// @brief MislibCellLibrary のヘッダファイル
+/// @file　libym_cell/mislib/MislibLibrary.h
+/// @brief MislibLibrary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: CellLibrary.h 2507 2009-10-17 16:24:02Z matsunaga $
@@ -19,10 +19,10 @@ BEGIN_NAMESPACE_YM_CELL
 class MislibCell;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MislibCellLibrary MislibCellLibrary.h "MislibCellLibrary.h"
+/// @class MislibLibrary MislibLibrary.h "MislibLibrary.h"
 /// @brief mislib(genlib)用のセルライブラリを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MislibCellLibrary :
+class MislibLibrary :
   public CellLibrary
 {
   friend class MislibParserImpl;
@@ -30,11 +30,11 @@ class MislibCellLibrary :
 public:
 
   /// @brief コンストラクタ
-  MislibCellLibrary();
+  MislibLibrary();
 
   /// @brief デストラクタ
   virtual
-  ~MislibCellLibrary();
+  ~MislibLibrary();
 
 
 public:
@@ -130,10 +130,10 @@ public:
   /// @brief このライブラリの持つセル数の取得
   virtual
   ymuint
-  n_cells() const;
+  cell_numm() const;
 
   /// @brief セルの取得
-  /// @param[in] pos 位置番号( 0 <= pos < n_cells() )
+  /// @param[in] pos 位置番号( 0 <= pos < cell_num() )
   virtual
   const Cell*
   cell(ymuint pos) const;
@@ -149,11 +149,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // セルのリスト
+  // セル数
+  ymuint32 mCellNum;
 
+  // セルのリスト
+  MislibCell* mCellArray;
 
 };
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_MISLIB_MISLIBCELLLIBRARY_H
+#endif // LIBYM_CELL_MISLIB_MISLIBLIBRARY_H

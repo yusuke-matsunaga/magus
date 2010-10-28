@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellTiming
 {
-public:
+protected:
 
   /// @brief コンストラクタ
   CellTiming() { }
@@ -41,10 +41,10 @@ public:
   /// @brief 関連する開始ピン数の取得
   virtual
   ymuint
-  n_ipins() const = 0;
+  ipin_num() const = 0;
 
   /// @brief 関連する開始ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < n_ipins() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < ipin_num() )
   virtual
   const CellPin*
   ipin(ymuint pos) const = 0;
@@ -99,7 +99,7 @@ public:
   /// @brief 立ち上がり遷移遅延の取得
   virtual
   CellResistance
-  rise_resistance() cons = 0t;
+  rise_resistance() const = 0;
 
   /// @brief 立ち下がり遷移遅延の取得
   virtual

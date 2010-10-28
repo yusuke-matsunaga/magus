@@ -25,16 +25,6 @@ libym_cell_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_cell_la_LDFLAGS = 
+libym_cell_la_LDFLAGS =
 
-libym_cell_la_SOURCES = \
-	CellLibrary.cc \
-	Cell.cc \
-	CellPinImpl.h \
-	CellPin.cc \
-	CellLutImpl.h \
-	CellLut.cc \
-	CellTimingImpl.h \
-	CellTiming.cc \
-	CellManip.h \
-	CellManip.cc
+libym_cell_la_SOURCES =

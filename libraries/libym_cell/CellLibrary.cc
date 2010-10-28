@@ -17,6 +17,7 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+#if 0
 // @brief コンストラクタ
 CellLibrary::CellLibrary() :
   mAlloc(4096)
@@ -39,7 +40,7 @@ CellLibrary::cell(const char* name) const
   }
   return p->second;
 }
-  
+
 // @brief ルックアップテーブルのテンプレートの取得
 // @param[in] name テンプレート名
 // @note なければ NULL を返す．
@@ -67,5 +68,6 @@ CellLibrary::bus_type(const char* name) const
   }
   return p->second;
 }
+#endif
 
 END_NAMESPACE_YM_CELL

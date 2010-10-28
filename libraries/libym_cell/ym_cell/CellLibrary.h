@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellLibrary
 {
-public:
+protected:
 
   /// @brief コンストラクタ
   CellLibrary() { }
@@ -126,10 +126,10 @@ public:
   /// @brief このライブラリの持つセル数の取得
   virtual
   ymuint
-  n_cells() const = 0;
+  cell_num() const = 0;
 
   /// @brief セルの取得
-  /// @param[in] pos 位置番号( 0 <= pos < n_cells() )
+  /// @param[in] pos 位置番号( 0 <= pos < cell_num() )
   virtual
   const Cell*
   cell(ymuint pos) const = 0;

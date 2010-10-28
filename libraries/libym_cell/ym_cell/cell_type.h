@@ -57,8 +57,8 @@ enum tCellVoltageUnit {
 enum tCellCurrentUnit {
   kIu1P
 };
-  
-  
+
+
 //////////////////////////////////////////////////////////////////////
 /// @brief 抵抗単位を表す列挙型
 //////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ enum tCellTimingType {
   kTimingCombinational,
   kTimingCombinationalRise,
   kTimingCombinationalFall,
-  
+
   kTimingThreeStateEnable,
   kTimingThreeStateDisable,
   kTimingThreeStateEnableRise,
@@ -148,7 +148,7 @@ enum tCellTimingType {
   kTimingNochangeHighLow,
   kTimingNochangeLowHigh,
   kTimingNochangeLowLow
-  
+
 };
 
 
@@ -160,6 +160,9 @@ enum tCellTimingType {
 class CellArea
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 空のコンストラクタ
   CellArea();
@@ -173,6 +176,20 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を作るクラスメソッド
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 無限大の値を作る．
+  static
+  CellArea
+  infty();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を取得する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を得る．
   double
@@ -180,11 +197,14 @@ public:
 
 
 public:
-  
+  //////////////////////////////////////////////////////////////////////
+  // 代入演算子
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 代入演算子
   const CellArea&
   operator=(const CellArea& src);
-  
+
   /// @brief 加算付き代入演算子
   const CellArea&
   operator+=(const CellArea& src);
@@ -193,7 +213,7 @@ public:
   const CellArea&
   operator-=(const CellArea& src);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -201,7 +221,7 @@ private:
 
   // 値
   double mValue;
-  
+
 };
 
 /// @brief 加算
@@ -222,31 +242,51 @@ operator-(const CellArea& left,
 class CellTime
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 空のコンストラクタ
   CellTime();
 
-  /// @brief double からの変換コンストラクタ
+  /// @brief double からの変換用コンストラクタ
   explicit
   CellTime(double v);
 
   /// @brief デストラクタ
   ~CellTime();
 
-  
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を作るクラスメソッド
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 無限大の値を作る．
+  static
+  CellTime
+  infty();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を取得する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を得る．
   double
   value() const;
-  
+
 
 public:
-  
+  //////////////////////////////////////////////////////////////////////
+  // 代入演算子
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 代入演算子
   const CellTime&
   operator=(const CellTime& src);
-  
+
   /// @brief 加算付き代入演算子
   const CellTime&
   operator+=(const CellTime& src);
@@ -255,7 +295,7 @@ public:
   const CellTime&
   operator-=(const CellTime& src);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -263,7 +303,7 @@ private:
 
   // 値
   double mValue;
-  
+
 };
 
 /// @brief 加算
@@ -284,6 +324,9 @@ operator-(const CellTime& left,
 class CellCapacitance
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 空のコンストラクタ
   CellCapacitance();
@@ -295,20 +338,37 @@ public:
   /// @brief デストラクタ
   ~CellCapacitance();
 
-  
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を作るクラスメソッド
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 無限大の値を作る．
+  static
+  CellCapacitance
+  infty();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を取得する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を得る．
   double
   value() const;
-  
+
 
 public:
-  
+  //////////////////////////////////////////////////////////////////////
+  // 代入演算子
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 代入演算子
   const CellCapacitance&
   operator=(const CellCapacitance& src);
-  
+
   /// @brief 加算付き代入演算子
   const CellCapacitance&
   operator+=(const CellCapacitance& src);
@@ -317,7 +377,7 @@ public:
   const CellCapacitance&
   operator-=(const CellCapacitance& src);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -325,7 +385,7 @@ private:
 
   // 値
   double mValue;
-  
+
 };
 
 /// @brief 加算
@@ -346,6 +406,9 @@ operator-(const CellCapacitance& left,
 class CellResistance
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 空のコンストラクタ
   CellResistance();
@@ -357,20 +420,37 @@ public:
   /// @brief デストラクタ
   ~CellResistance();
 
-  
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を作るクラスメソッド
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 無限大の値を作る．
+  static
+  CellResistance
+  infty();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 値を取得する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を得る．
   double
   value() const;
-  
+
 
 public:
-  
+  //////////////////////////////////////////////////////////////////////
+  // 代入演算子
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 代入演算子
   const CellResistance&
   operator=(const CellResistance& src);
-  
+
   /// @brief 加算付き代入演算子
   const CellResistance&
   operator+=(const CellResistance& src);
@@ -379,7 +459,7 @@ public:
   const CellResistance&
   operator-=(const CellResistance& src);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -387,7 +467,7 @@ private:
 
   // 値
   double mValue;
-  
+
 };
 
 /// @brief 加算
@@ -425,6 +505,14 @@ CellArea::~CellArea()
 {
 }
 
+// @brief 無限大の値を作る．
+inline
+CellArea
+CellArea::infty()
+{
+  return CellArea(DBL_MAX);
+}
+
 // @brief 値を得る．
 inline
 double
@@ -432,7 +520,7 @@ CellArea::value() const
 {
   return mValue;
 }
-  
+
 // @brief 代入演算子
 inline
 const CellArea&
@@ -441,7 +529,7 @@ CellArea::operator=(const CellArea& src)
   mValue = src.mValue;
   return *this;
 }
-  
+
 // @brief 加算付き代入演算子
 inline
 const CellArea&
@@ -498,6 +586,14 @@ CellTime::~CellTime()
 {
 }
 
+// @brief 無限大の値を作る．
+inline
+CellTime
+CellTime::infty()
+{
+  return CellTime(DBL_MAX);
+}
+
 // @brief 値を得る．
 inline
 double
@@ -505,7 +601,7 @@ CellTime::value() const
 {
   return mValue;
 }
-  
+
 // @brief 代入演算子
 inline
 const CellTime&
@@ -514,7 +610,7 @@ CellTime::operator=(const CellTime& src)
   mValue = src.mValue;
   return *this;
 }
-  
+
 // @brief 加算付き代入演算子
 inline
 const CellTime&
@@ -571,6 +667,14 @@ CellCapacitance::~CellCapacitance()
 {
 }
 
+// @brief 無限大の値を作る．
+inline
+CellCapacitance
+CellCapacitance::infty()
+{
+  return CellCapacitance(DBL_MAX);
+}
+
 // @brief 値を得る．
 inline
 double
@@ -578,7 +682,7 @@ CellCapacitance::value() const
 {
   return mValue;
 }
-  
+
 // @brief 代入演算子
 inline
 const CellCapacitance&
@@ -587,7 +691,7 @@ CellCapacitance::operator=(const CellCapacitance& src)
   mValue = src.mValue;
   return *this;
 }
-  
+
 // @brief 加算付き代入演算子
 inline
 const CellCapacitance&
@@ -644,6 +748,14 @@ CellResistance::~CellResistance()
 {
 }
 
+// @brief 無限大の値を作る．
+inline
+CellResistance
+CellResistance::infty()
+{
+  return CellResistance(DBL_MAX);
+}
+
 // @brief 値を得る．
 inline
 double
@@ -651,7 +763,7 @@ CellResistance::value() const
 {
   return mValue;
 }
-  
+
 // @brief 代入演算子
 inline
 const CellResistance&
@@ -660,7 +772,7 @@ CellResistance::operator=(const CellResistance& src)
   mValue = src.mValue;
   return *this;
 }
-  
+
 // @brief 加算付き代入演算子
 inline
 const CellResistance&

@@ -17,6 +17,7 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+#if 0
 
 //////////////////////////////////////////////////////////////////////
 // クラス Cell
@@ -75,7 +76,7 @@ Cell::bundle(const string& name) const
   }
   return NULL;
 }
-  
+
 // @brief タイミング情報の取得
 // @param[in] ipos 開始ピン番号
 // @param[in] opos 終了ピン番号
@@ -104,7 +105,7 @@ Cell::timing(ymuint32 ipos,
   }
   return timing_list.size();
 }
-  
+
 // @brief タイミング情報の取得
 // @param[in] ipos 開始ピン番号
 // @param[in] opos 終了ピン番号
@@ -140,7 +141,7 @@ Cell::timing(ymuint32 ipos,
   }
   return timing_list.size();
 }
-	 
+
 // @brief デバッグ用の内容表示関数
 // @param[in] s 出力先のストリーム
 void
@@ -218,5 +219,6 @@ CellBundle::CellBundle(ShString name,
 CellBundle::~CellBundle()
 {
 }
+#endif
 
 END_NAMESPACE_YM_CELL

@@ -50,10 +50,10 @@ public:
   /// @brief ピン数の取得
   virtual
   ymuint
-  n_pins() const = 0;
+  pin_num() const = 0;
 
   /// @brief ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < n_pins() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
   virtual
   const CellPin*
   pin(ymuint pos) const = 0;
@@ -69,10 +69,10 @@ public:
   /// @brief バス数の取得
   virtual
   ymuint
-  n_buses() const = 0;
+  bus_num() const = 0;
 
   /// @brief バスの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < n_buses() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
   virtual
   const CellBus*
   bus(ymuint pos) const = 0;
@@ -88,10 +88,10 @@ public:
   /// @brief バンドル数の取得
   virtual
   ymuint
-  n_bundles() const = 0;
+  bundle_num() const = 0;
 
   /// @brief バンドルの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < n_bundles() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
   virtual
   const CellBundle*
   bundle(ymuint pos) const = 0;
@@ -119,25 +119,13 @@ public:
   /// @param[in] timing_type タイミング情報の種類
   /// @param[out] timing_list タイミング情報を納めるベクタ
   /// @return 条件に合致するタイミング情報の数を返す．
-  vitual
+  virtual
   ymuint
   timing(ymuint ipos,
 	 ymuint opos,
 	 tCellTimingSense timing_sense,
 	 tCellTimingType timing_type,
 	 vector<const CellTiming*>& timing_list) const = 0;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 使用禁止の関数定義
-  //////////////////////////////////////////////////////////////////////
-
-  // コピーコンストラクタと代入演算子は、使用禁止。実体も定義しない。
-  Cell(const Cell& src);
-
-  const Cell&
-  operator=(const Cell& src);
 
 };
 
