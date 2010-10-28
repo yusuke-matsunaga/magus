@@ -101,32 +101,6 @@ public:
   const CellBundle*
   bundle(const string& name) const = 0;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] opos 終了ピン番号
-  /// @param[out] timing_list タイミング情報を納めるベクタ
-  /// @return 条件に合致するタイミング情報の数を返す．
-  virtual
-  ymuint
-  timing(ymuint ipos,
-	 ymuint opos,
-	 vector<const CellTiming*>& timing_list) const = 0;
-
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] opos 終了ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @param[in] timing_type タイミング情報の種類
-  /// @param[out] timing_list タイミング情報を納めるベクタ
-  /// @return 条件に合致するタイミング情報の数を返す．
-  virtual
-  ymuint
-  timing(ymuint ipos,
-	 ymuint opos,
-	 tCellTimingSense timing_sense,
-	 tCellTimingType timing_type,
-	 vector<const CellTiming*>& timing_list) const = 0;
-
 };
 
 END_NAMESPACE_YM_CELL

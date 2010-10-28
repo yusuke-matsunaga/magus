@@ -16,7 +16,6 @@
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
-#include "ym_lexp/LogExpr.h"
 
 #include "MislibPt.h"
 #include "MislibLex.h"
@@ -37,34 +36,41 @@ public:
 
   /// @brief デストラクタ
   ~MislibParserImpl();
-  
+
 
 public:
-  
+
+  /// @brief 今までに生成したすべてのオブジェクトを解放する．
+  void
+  clear();
+
   /// @brief mislib ファイルを読み込む
   /// @param[in] filename ファイル名
-  /// @param[in] library 対象のセルライブラリ
-  /// @retval true 読み込みが成功した．
-  /// @retval false 読み込みが失敗した．
-  bool
-  read(const string& filename,
-       CellLibrary& library);
-  
+  /// @return パース木を返す．
+  /// @note 読み込みが失敗したら NULL を返す．
+  /// @note パース木は clear() を呼ぶまでは有効
+  const MislibPt*
+  read(const string& filename);
+
   /// @brief メッセージマネージャの取得
   MsgMgr&
   msg_mgr();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // mislib_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief リストノードを生成する．
+  MislibPt*
+  new_list();
+
   /// @brief NOT ノードを生成する．
   MislibPt*
   new_not(const FileRegion& loc,
 	  MislibPt* child1);
-  
+
   /// @brief AND ノードを生成する．
   MislibPt*
   new_and(const FileRegion& loc,
@@ -89,16 +95,7 @@ public:
 	  MislibPt* fall_block_delay,
 	  MislibPt* fall_fanout_delay);
 
-  /// @brief PIN リストノードを生成する．
-  MislibPt*
-  new_pinlist();
-
   /// @brief GATE ノードを生成する．(通常版)
-  /// @note 下記のエラーチェックを行う．
-  ///  - 重複したゲート名
-  ///  - ipin_list 中の入力ピン名が重複している．
-  ///  - ipin_list 中の入力ピン名と出力ピン名が重複している．
-  ///  - ipin_list の要素数と expr の入力数が合わない．
   void
   new_gate1(const FileRegion& loc,
 	    MislibPt* name,
@@ -108,8 +105,6 @@ public:
 	    MislibPt* ipin_list);
 
   /// @brief GATE ノードを生成する．(ワイルドカードの入力ピン)
-  /// @note 下記のエラーチェックを行う．
-  ///  - 重複したゲート名
   void
   new_gate2(const FileRegion& loc,
 	    MislibPt* name,
@@ -118,17 +113,14 @@ public:
 	    MislibPt* expr,
 	    MislibPt* ipin);
 
-  /// @brief GATE ノードを生成する．(入力ピンなし)
-  /// @note 下記のエラーチェックを行う．
-  ///  - 重複したゲート名
-  ///  - expr が定数式でない．
+  /// @brief GATE ノードを生成する．(入力ピンなし:定数ノード)
   void
   new_gate3(const FileRegion& loc,
 	    MislibPt* name,
 	    MislibPt* area,
 	    MislibPt* oname,
 	    MislibPt* expr);
-  
+
   /// @brief 字句解析を行う．
   /// @param[out] lval トークンの値を格納する変数
   /// @param[out] lloc トークンの位置を格納する変数
@@ -136,22 +128,24 @@ public:
   int
   scan(MislibPt*& lval,
        FileRegion& lloc);
-  
-  /// @brief 今までに生成したすべてのオブジェクトを解放する．
+
+  /// @brief エラーメッセージを出力する．
+  /// @note 副作用で mError が true にセットされる．
   void
-  clear();
+  error(const FileRegion& loc,
+	const char* msg);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部でのみ使われるメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 文字列ノードを生成する．
   MislibPt*
   new_str(const FileRegion& loc,
 	  ShString str);
-  
+
   /// @brief 数値ノードを生成する．
   MislibPt*
   new_num(const FileRegion& loc,
@@ -176,42 +170,28 @@ private:
   /// @brief 定数1ノードを生成する．
   MislibPt*
   new_const1(const FileRegion& loc);
-  
-  /// @brief ゲート名の登録
-  /// @return 重複していたら true を返す．
-  bool
-  reg_gate_name(const ShString& name,
-		const FileRegion& name_loc);
-  
-  /// @brief MislibPt を論理式に変換する．
-  /// @param[in] pt 論理式の根のノード
-  /// @param[out] names 論理式中に現れた名前を入れる配列
-  /// @return 論理式を返す．
-  LogExpr
-  make_expr(MislibPt* pt,
-	    vector<MislibPt*>& names);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // MislibPt のメモリ確保用アロケータ
   SimpleAlloc mAlloc;
 
   // 字句解析器
   MislibLex mLex;
-  
+
   // メッセージハンドラの管理者
   MsgMgr mMsgMgr;
-  
-  // ゲート名をキーにしてその定義位置を保持するハッシュ表
-  hash_map<ShString, FileRegion> mGateHash;
-  
+
+  // ゲートのリスト
+  MislibPt* mGateList;
+
   // 読み込み時のエラーの有無を示すフラグ
   bool mError;
-  
+
 };
 
 

@@ -59,7 +59,11 @@ MislibPtNot::dump(ostream& s) const
 {
   s << "<NOT>" << endl;
   dump_loc(s);
+
+  s << "<CHILD1>" << endl;
   child1()->dump(s);
+  s << "</CHILD1>" << endl;
+
   s << "</NOT>" << endl;
 }
 
@@ -118,8 +122,15 @@ MislibPtAnd::dump(ostream& s) const
 {
   s << "<AND>" << endl;
   dump_loc(s);
+
+  s << "<CHILD1>" << endl;
   child1()->dump(s);
+  s << "</CHILD1>" << endl;
+
+  s << "<CHILD2>" << endl;
   child2()->dump(s);
+  s << "</CHILD2>" << endl;
+
   s << "</AND>" << endl;
 }
 
@@ -178,8 +189,15 @@ MislibPtOr::dump(ostream& s) const
 {
   s << "<OR>" << endl;
   dump_loc(s);
+
+  s << "<CHILD1>" << endl;
   child1()->dump(s);
+  s << "</CHILD1>" << endl;
+
+  s << "<CHILD2>" << endl;
   child2()->dump(s);
+  s << "</CHILD2>" << endl;
+
   s << "</OR>" << endl;
 }
 
@@ -279,14 +297,14 @@ MislibPtPin::fall_fanout_delay() const
   return mFallFanoutDelay;
 }
 
-// 次のピンを設定する．
+// 次の要素を設定する．
 void
 MislibPtPin::set_next(MislibPt* pin)
 {
   mNext = pin;
 }
 
-// 次のピンを取り出す．
+// 次の要素を取り出す．
 MislibPt*
 MislibPtPin::next() const
 {
@@ -300,6 +318,7 @@ MislibPtPin::dump(ostream& s) const
 {
   s << "<PIN>" << endl;
   dump_loc(s);
+
   s << "<NAME>" << endl;
   if ( name() ) {
     name()->dump(s);
@@ -308,86 +327,154 @@ MislibPtPin::dump(ostream& s) const
     s << "*" << endl;
   }
   s << "</NAME>" << endl;
+
   s << "<PHASE>" << endl;
   phase()->dump(s);
   s << "</PHASE>" << endl;
+
   s << "<INPUT_LOAD>" << endl;
   input_load()->dump(s);
   s << "</INPUT_LOAD>" << endl;
+
   s << "<MAX_LOAD>" << endl;
   max_load()->dump(s);
   s << "</MAX_LOAD>" << endl;
+
   s << "<RISE_BLOCK_DELAY>" << endl;
   rise_block_delay()->dump(s);
   s << "</RISE_BLOCK_DELAY>" << endl;
+
   s << "<RISE_FANOUT_DELAY>" << endl;
   rise_fanout_delay()->dump(s);
   s << "</RISE_FANOUT_DELAY>" << endl;
+
   s << "<FALL_BLOCK_DELAY>" << endl;
   fall_block_delay()->dump(s);
   s << "</FALL_BLOCK_DELAY>" << endl;
+
   s << "<FALLE_FANOUT_DELAY>" << endl;
   fall_fanout_delay()->dump(s);
   s << "</FALL_FANOUT_DELAY>" << endl;
+
   s << "</PIN>" << endl;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-/// ピンのリストを表すクラス
+// ゲートを表すクラス
 //////////////////////////////////////////////////////////////////////
 
-// コンストラクタ
-MislibPtPinList::MislibPtPinList() :
-  MislibPt(FileRegion())
+// @brief コンストラクタ
+// @param[in] loc 位置情報
+// @param[in] name 名前を表すパース木
+// @param[in] area 面積を表すパース木
+// @param[in] opin_name 出力ピン名を表すパース木
+// @param[in] opin_expr 出力の論理式を表すパース木
+// @param[in] ipin_list 入力ピンのリストを表すパース木
+MislibPtGate::MislibPtGate(const FileRegion& loc,
+			   MislibPt* name,
+			   MislibPt* area,
+			   MislibPt* opin_name,
+			   MislibPt* opin_expr,
+			   MislibPt* ipin_list) :
+  MislibPt(loc),
+  mName(name),
+  mArea(area),
+  mOpinName(opin_name),
+  mOpinExpr(opin_expr),
+  mIpinList(ipin_list)
 {
-  mTop = NULL;
-  mEnd = NULL;
 }
 
-// デストラクタ
-MislibPtPinList::~MislibPtPinList()
+// @brief デストラクタ
+MislibPtGate::~MislibPtGate()
 {
 }
 
-// 種類を取り出す．
+// @brief 種類を取り出す．
 MislibPt::tType
-MislibPtPinList::type() const
+MislibPtGate::type() const
 {
-  return kPinList;
+  return kGate;
 }
 
-// 末尾にピンを追加する．
-void
-MislibPtPinList::push_back(MislibPt* pin)
-{
-  if ( mEnd ) {
-    mEnd->set_next(pin);
-    mEnd = pin;
-  }
-  else {
-    mTop = mEnd = pin;
-  }
-}
-
-// 先頭のピンを取り出す．
+// @brief ピン名/ゲート名を表すオブジェクトを取り出す．
 MislibPt*
-MislibPtPinList::pin() const
+MislibPtGate::name() const
 {
-  return mTop;
+  return mName;
 }
 
-// 内容を出力する．
-// デバッグ用
-void
-MislibPtPinList::dump(ostream& s) const
+// @brief 面積を表すオブジェクトを返す．
+MislibPt*
+MislibPtGate::area() const
 {
-  s << "<PINLIST>" << endl;
+  return mArea;
+}
+
+// @brief 出力ピン名を表すオブジェクトを返す．
+MislibPt*
+MislibPtGate::opin_name() const
+{
+  return mOpinName;
+}
+
+// @brief 出力の論理式を表すオブジェクトを返す．
+MislibPt*
+MislibPtGate::opin_expr() const
+{
+  return mOpinExpr;
+}
+
+// @brief 入力ピンのリストを表すオブジェクトを返す．
+MislibPt*
+MislibPtGate::ipin_list() const
+{
+  return mIpinList;
+}
+
+// 次の要素を設定する．
+void
+MislibPtGate::set_next(MislibPt* pin)
+{
+  mNext = pin;
+}
+
+// 次の要素を取り出す．
+MislibPt*
+MislibPtGate::next() const
+{
+  return mNext;
+}
+
+// @brief 内容を出力する．
+void
+MislibPtGate::dump(ostream& s) const
+{
+  s << "<GATE>" << endl;
   dump_loc(s);
-  for (MislibPt* tmp = pin(); tmp; tmp = tmp->next()) {
-    tmp->dump(s);
-  }
-  s << "</PINLIST>" << endl;
+
+  s << "<NAME>" << endl;
+  name()->dump(s);
+  s << "</NAME>" << endl;
+
+  s << "<AREA>" << endl;
+  area()->dump(s);
+  s << "</AREA>" << endl;
+
+  s << "<OPIN_NAME>" << endl;
+  opin_name()->dump(s);
+  s << "</OPIN_NAME>" << endl;
+
+  s << "<OPIN_EXPR>" << endl;
+  opin_expr()->dump(s);
+  s << "</OPIN_EXPR>" << endl;
+
+  s << "<IPIN_LIST>" << endl;
+  ipin_list()->dump(s);
+  s << "</IPIN_LIST>" << endl;
+
+  s << "</GATE>" << endl;
 }
 
 END_NAMESPACE_YM_CELL

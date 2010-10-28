@@ -46,12 +46,12 @@ public:
   /// @brief 条件の取得
   virtual
   tCellTimingSense
-  timing_sense() const;
+  sense() const;
 
   /// @brief 型の取得
   virtual
   tCellTimingType
-  timing_type() const;
+  type() const;
 
 
 public:
@@ -160,11 +160,35 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を設定する．
+  void
+  set(const CellPin* opin,
+      tCellTimingSense sense,
+      CellTime rise_intrinsic,
+      CellTime fall_intrinsic,
+      CellResistance rise_intrinsic,
+      CellResistance fall_intrinsic);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 出力ピン
   const CellPin* mOpin;
+
+  // timing sense と timing type をパックしたもの
+  tCellTimingSense mSense;
+
+  // 立ち上がり/立ち下がり固有遅延
+  CellTime mIntrinsic[2];
+
+  // 立ち上がり/立ち下がり遷移遅延
+  CellResistance mResistance[2];
 
 };
 
@@ -203,6 +227,16 @@ public:
   virtual
   const CellPin*
   ipin(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力ピンを設定する．
+  void
+  set_ipin(const CellPin* ipin);
 
 
 private:
@@ -250,6 +284,16 @@ public:
   virtual
   const CellPin*
   ipin(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力ピンを設定する．
+  void
+  set_ipin(const vector<const CellPin*>& ipin_array);
 
 
 private:

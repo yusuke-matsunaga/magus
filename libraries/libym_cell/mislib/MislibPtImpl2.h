@@ -17,6 +17,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibPtNot MislibPtImpl2.h "MislibPtImpl2.h"
 /// @brief NOT論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MislibPtNot :
@@ -42,7 +43,7 @@ public:
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -67,11 +68,12 @@ private:
 
   // 子供
   MislibPt* mChild1;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibPtAnd MislibPtImpl2.h "MislibPtImpl2.h"
 /// @brief AND論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MislibPtAnd :
@@ -99,7 +101,7 @@ public:
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -132,11 +134,12 @@ private:
 
   // 2番目の子供
   MislibPt* mChild2;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibPtOr MislibPtImpl2.h "MislibPtImpl2.h"
 /// @brief OR論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MislibPtOr :
@@ -164,7 +167,7 @@ public:
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -197,11 +200,12 @@ private:
 
   // 2番目の子供
   MislibPt* mChild2;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibPtPin MislibPtImpl2.h "MislibPtImpl2.h"
 /// @brief ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
 class MislibPtPin :
@@ -230,7 +234,7 @@ private:
 	      MislibPt* rise_fanout_delay,
 	      MislibPt* fall_block_delay,
 	      MislibPt* fall_fanout_delay);
-  
+
   /// @brief デストラクタ
   virtual
   ~MislibPtPin();
@@ -304,7 +308,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 入力ピン名
   MislibPt* mName;
 
@@ -336,20 +340,32 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @brief ピンのリストを表すクラス
+/// @class MislibPtGate MislibPtImpl2.h "MislibPtImpl2.h"
+/// @brief ゲート(セル)を表すクラス
 //////////////////////////////////////////////////////////////////////
-class MislibPtPinList :
+class MislibPtGate :
   public MislibPt
 {
   friend class MislibParserImpl;
 private:
 
   /// @brief コンストラクタ
-  MislibPtPinList();
+  /// @param[in] loc 位置情報
+  /// @param[in] name 名前を表すパース木
+  /// @param[in] area 面積を表すパース木
+  /// @param[in] opin_name 出力ピン名を表すパース木
+  /// @param[in] opin_expr 出力の論理式を表すパース木
+  /// @param[in] ipin_list 入力ピンのリストを表すパース木
+  MislibPtGate(const FileRegion& loc,
+	       MislibPt* name,
+	       MislibPt* area,
+	       MislibPt* opin_name,
+	       MislibPt* opin_expr,
+	       MislibPt* ipin_list);
 
   /// @brief デストラクタ
   virtual
-  ~MislibPtPinList();
+  ~MislibPtGate();
 
 
 public:
@@ -359,15 +375,40 @@ public:
   tType
   type() const;
 
-  /// @brief 末尾にピンを追加する．
-  virtual
-  void
-  push_back(MislibPt* pin);
-
-  /// @brief 先頭のピンを取り出す．
+  /// @brief ピン名/ゲート名を表すオブジェクトを取り出す．
   virtual
   MislibPt*
-  pin() const;
+  name() const;
+
+  /// @brief 面積を表すオブジェクトを返す．
+  virtual
+  MislibPt*
+  area() const;
+
+  /// @brief 出力ピン名を表すオブジェクトを返す．
+  virtual
+  MislibPt*
+  opin_name() const;
+
+  /// @brief 出力の論理式を表すオブジェクトを返す．
+  virtual
+  MislibPt*
+  opin_expr() const;
+
+  /// @brief 入力ピンのリストを表すオブジェクトを返す．
+  virtual
+  MislibPt*
+  ipin_list() const;
+
+  /// @brief 次の要素を設定する．
+  virtual
+  void
+  set_next(MislibPt* pin);
+
+  /// @brief 次の要素を取り出す．
+  virtual
+  MislibPt*
+  next() const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
@@ -381,11 +422,23 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 先頭のピン
-  MislibPt* mTop;
+  // 名前
+  MislibPt* mName;
 
-  // 末尾のピン
-  MislibPt* mEnd;
+  // 面積
+  MislibPt* mArea;
+
+  // 出力ピン名
+  MislibPt* mOpinName;
+
+  // 出力の論理式
+  MislibPt* mOpinExpr;
+
+  // 入力ピンのリスト
+  MislibPt* mIpinList;
+
+  // 次の要素
+  MislibPt* mNext;
 
 };
 

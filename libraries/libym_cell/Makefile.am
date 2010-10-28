@@ -22,6 +22,7 @@ noinst_LTLIBRARIES = libym_cell.la
 
 libym_cell_la_LIBADD = \
 	dotlib/libym_cell_dotlib.la \
+	mislib/libym_cell_mislib.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

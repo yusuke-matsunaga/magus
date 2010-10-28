@@ -97,9 +97,9 @@ enum tCellDirection {
 /// @brief タイミングの条件を表す列挙型
 //////////////////////////////////////////////////////////////////////
 enum tCellTimingSense {
-  kSensePosiUnate,
-  kSenseNegaUnate,
-  kSenseNonUnate
+  kSensePosiUnate = 1,
+  kSenseNegaUnate = 2,
+  kSenseNonUnate  = 3
 };
 
 
@@ -107,50 +107,49 @@ enum tCellTimingSense {
 /// @brief タイミング情報の型を表す列挙型
 //////////////////////////////////////////////////////////////////////
 enum tCellTimingType {
-  kTimingCombinational,
-  kTimingCombinationalRise,
-  kTimingCombinationalFall,
+  kTimingCombinational          = 0,
+  kTimingCombinationalRise      = 1,
+  kTimingCombinationalFall      = 2,
 
-  kTimingThreeStateEnable,
-  kTimingThreeStateDisable,
-  kTimingThreeStateEnableRise,
-  kTimingThreeStateEnableFall,
-  kTimingThreeStateDisableRise,
-  kTimingThreeStateDisableFall,
+  kTimingThreeStateEnable       = 3,
+  kTimingThreeStateDisable      = 4,
+  kTimingThreeStateEnableRise   = 5,
+  kTimingThreeStateEnableFall   = 6,
+  kTimingThreeStateDisableRise  = 7,
+  kTimingThreeStateDisableFall  = 8,
 
-  kTimingRisingEdge,
-  ktimingFallingEdge,
+  kTimingRisingEdge             = 9,
+  ktimingFallingEdge            = 10,
 
-  kTimingPreset,
-  kTimingClear,
+  kTimingPreset                 = 11,
+  kTimingClear                  = 12,
 
-  kTimingHoldRising,
-  kTimingHaldFalling,
+  kTimingHoldRising             = 13,
+  kTimingHaldFalling            = 14,
 
-  kTimingSetupRising,
-  kTimingSetupFalling,
+  kTimingSetupRising            = 15,
+  kTimingSetupFalling           = 16,
 
-  kTimingRecoveryRising,
-  kTimingRecoveryFalling,
+  kTimingRecoveryRising         = 17,
+  kTimingRecoveryFalling        = 18,
 
-  kTimingSkewRising,
-  kTimingSkewFalling,
+  kTimingSkewRising             = 19,
+  kTimingSkewFalling            = 20,
 
-  kTimingRemovalRising,
-  kTimingRemovalFalling,
+  kTimingRemovalRising          = 21,
+  kTimingRemovalFalling         = 22,
 
-  kTimingNonSeqSetupRising,
-  kTimingNonSeqSetupFalling,
-  kTimingNonSeqHoldRising,
-  kTimingNonSeqHoldFalling,
+  kTimingNonSeqSetupRising      = 23,
+  kTimingNonSeqSetupFalling     = 24,
+  kTimingNonSeqHoldRising       = 25,
+  kTimingNonSeqHoldFalling      = 26,
 
-  kTimingNochangeHighHigh,
-  kTimingNochangeHighLow,
-  kTimingNochangeLowHigh,
-  kTimingNochangeLowLow
+  kTimingNochangeHighHigh       = 27,
+  kTimingNochangeHighLow        = 28,
+  kTimingNochangeLowHigh        = 29,
+  kTimingNochangeLowLow         = 30
 
 };
-
 
 
 //////////////////////////////////////////////////////////////////////

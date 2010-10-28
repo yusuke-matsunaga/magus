@@ -142,6 +142,25 @@ public:
   CellTime
   min_transition() const;
 
+  /// @brief タイミング情報の取得
+  /// @param[in] ipos 入力ピン番号
+  /// @param[out] timing_list タイミング情報を納めるベクタ
+  /// @return 条件に合致するタイミング情報の数を返す．
+  virtual
+  ymuint
+  timing(ymuint ipos,
+	 vector<const CellTiming*>& timing_list) const;
+
+  /// @brief タイミング情報の取得
+  /// @param[in] ipos 開始ピン番号
+  /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @return 条件に合致するタイミング情報を返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellTiming*
+  timing(ymuint ipos,
+	 tCellTimingSense timing_sense) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -239,6 +258,35 @@ public:
   virtual
   CellTime
   min_transition() const;
+
+  /// @brief タイミング情報の取得
+  /// @param[in] ipos 入力ピン番号
+  /// @param[out] timing_list タイミング情報を納めるベクタ
+  /// @return 条件に合致するタイミング情報の数を返す．
+  virtual
+  ymuint
+  timing(ymuint ipos,
+	 vector<const CellTiming*>& timing_list) const;
+
+  /// @brief タイミング情報の取得
+  /// @param[in] ipos 開始ピン番号
+  /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @return 条件に合致するタイミング情報を返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellTiming*
+  timing(ymuint ipos,
+	 tCellTimingSense timing_sense) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // タイミング情報の配列
+  // サイズは入力数
+  const CellTiming** mTimingArray;
 
 };
 

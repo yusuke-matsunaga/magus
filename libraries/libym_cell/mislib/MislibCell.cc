@@ -125,48 +125,4 @@ MislibCell::bundle(const string& name) const
   return NULL;
 }
 
-// @brief タイミング情報の取得
-// @param[in] ipos 開始ピン番号
-// @param[in] opos 終了ピン番号
-// @param[out] timing_list タイミング情報を納めるベクタ
-// @return 条件に合致するタイミング情報の数を返す．
-ymuint
-MislibCell::timing(ymuint ipos,
-		   ymuint opos,
-		   vector<const CellTiming*>& timing_list) const
-{
-  timing_list.clear();
-  if ( opos != 0 || ipos == 0 ) {
-    return 0;
-  }
-  timing_list.push_back(mTimingArray[ipos - 1]);
-  return 1;
-}
-
-// @brief タイミング情報の取得
-// @param[in] ipos 開始ピン番号
-// @param[in] opos 終了ピン番号
-// @param[in] timing_sense タイミング情報の摘要条件
-// @param[in] timing_type タイミング情報の種類
-// @param[out] timing_list タイミング情報を納めるベクタ
-// @return 条件に合致するタイミング情報の数を返す．
-ymuint
-MislibCell::timing(ymuint ipos,
-		   ymuint opos,
-		   tCellTimingSense timing_sense,
-		   tCellTimingType timing_type,
-		   vector<const CellTiming*>& timing_list) const
-{
-  timing_list.clear();
-  if ( opos != 0 || ipos == 0 ) {
-    return 0;
-  }
-  CellTiming* timing = mTimingArray[ipos - 1];
-  if ( timing->timing_sense() == timing_sense &&
-       timing->timing_type() == timing_type ) {
-    timing_list.push_back(timing);
-  }
-  return timing_list.size();
-}
-
 END_NAMESPACE_YM_CELL

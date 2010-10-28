@@ -7,7 +7,8 @@
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -24,20 +25,17 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-#bin_PROGRAMS = \
-#	mislib_test \
-#	dotlib_lex_test
-
 bin_PROGRAMS = \
+	mislibparserimpl_test \
 	dotlib_lex_test
 
-#mislib_test_SOURCES = \
-#	mislib_test.cc
-#
-#mislib_test_LDFLAGS =
-#
-#mislib_test_LDADD = \
-#	$(YMTOOLS_BUILDDIR)/libym_cell/libym_cell.la
+mislibparserimpl_test_SOURCES = \
+	mislibparserimpl_test.cc
+
+mislibparserimpl_test_LDFLAGS =
+
+mislibparserimpl_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
 
 dotlib_lex_test_SOURCES = \
 	dotlib_lex_test.cc

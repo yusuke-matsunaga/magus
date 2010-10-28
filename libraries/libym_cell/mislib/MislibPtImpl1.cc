@@ -29,7 +29,7 @@ MislibPt::MislibPt(const FileRegion& loc) :
 MislibPt::~MislibPt()
 {
 }
-  
+
 // @brief 論理式を表す型のときに true を返す．
 // @note 定数0と定数1は false を返す．
 // @note デフォルトでは false を返す．
@@ -150,17 +150,49 @@ MislibPt::next() const
   return NULL;
 }
 
-// 末尾にピンを追加する．
+// 末尾に要素を追加する．
 // デフォルトでは何もしない．
 void
 MislibPt::push_back(MislibPt* pin)
 {
 }
 
-// 先頭のピンを取り出す．
+// 先頭の要素を取り出す．
 // デフォルトでは NULL を返す．
 MislibPt*
-MislibPt::pin() const
+MislibPt::top() const
+{
+  return NULL;
+}
+
+// @brief 面積を表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::area() const
+{
+  return NULL;
+}
+
+// @brief 出力ピン名を表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::opin_name() const
+{
+  return NULL;
+}
+
+// @brief 出力の論理式を表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::opin_expr() const
+{
+  return NULL;
+}
+
+// @brief 入力ピンのリストを表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::ipin_list() const
 {
   return NULL;
 }
@@ -442,6 +474,66 @@ MislibPtConst1::dump(ostream& s) const
   s << "<CONST1>" << endl;
   dump_loc(s);
   s << "</CONST1>" << endl;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+/// MislibPtのリストを表すクラス
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+MislibPtList::MislibPtList() :
+  MislibPt(FileRegion())
+{
+  mTop = NULL;
+  mEnd = NULL;
+}
+
+// デストラクタ
+MislibPtList::~MislibPtList()
+{
+}
+
+// 種類を取り出す．
+MislibPt::tType
+MislibPtList::type() const
+{
+  return kList;
+}
+
+// 末尾に要素を追加する．
+void
+MislibPtList::push_back(MislibPt* obj)
+{
+  if ( mEnd ) {
+    mEnd->set_next(obj);
+    mEnd = obj;
+  }
+  else {
+    mTop = mEnd = obj;
+  }
+}
+
+// 先頭の要素を取り出す．
+MislibPt*
+MislibPtList::top() const
+{
+  return mTop;
+}
+
+// 内容を出力する．
+// デバッグ用
+void
+MislibPtList::dump(ostream& s) const
+{
+  s << "<PT_LIST>" << endl;
+  dump_loc(s);
+
+  for (MislibPt* tmp = top(); tmp; tmp = tmp->next()) {
+    tmp->dump(s);
+  }
+
+  s << "</PT_LIST>" << endl;
 }
 
 END_NAMESPACE_YM_CELL

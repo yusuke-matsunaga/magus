@@ -25,9 +25,9 @@ BEGIN_NAMESPACE_YM_CELL
 class MislibPt
 {
   friend class MislibParserImpl;
-  
+
 public:
-  
+
   /// @brief ノードの種類
   enum tType {
     /// @brief 文字列
@@ -44,6 +44,8 @@ public:
     kConst0,
     /// @brief 定数1
     kConst1,
+    /// @brief リスト
+    kList,
     /// @brief NOT論理式
     kNot,
     /// @brief AND論理式
@@ -52,11 +54,11 @@ public:
     kOr,
     /// @brief 入力ピン
     kPin,
-    /// @brief ピンリスト
-    kPinList,
+    /// @brief ゲート
+    kGate
   };
 
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -81,20 +83,20 @@ public:
   virtual
   tType
   type() const = 0;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   /// @note 文字列や定数0と定数1も論理式とみなす．
   /// @note デフォルトでは false を返す．
   virtual
   bool
   is_expr() const;
-  
+
   /// @brief 内容を出力する．
   /// デバッグ用
   virtual
   void
   dump(ostream& s) const = 0;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -106,7 +108,7 @@ public:
   virtual
   ShString
   str() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -119,7 +121,7 @@ public:
   double
   num() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 論理式型のときに意味のある関数
@@ -136,7 +138,7 @@ public:
   virtual
   MislibPt*
   child2() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -191,38 +193,71 @@ public:
   MislibPt*
   fall_fanout_delay() const;
 
-  /// @brief 次のピンを設定する．
+  /// @brief 次の要素を設定する．
   /// @note デフォルトでは何もしない．
   virtual
   void
   set_next(MislibPt* pin);
-  
-  /// @brief 次のピンを取り出す．
+
+  /// @brief 次の要素を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
   MislibPt*
   next() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ピンリスト型のときに意味のある関数
+  // リスト型のときに意味のある関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 末尾にピンを追加する．
+  /// @brief 末尾に要素を追加する．
   /// @note デフォルトでは何もしない．
   virtual
   void
   push_back(MislibPt* pin);
 
-  /// @brief 先頭のピンを取り出す．
+  /// @brief 先頭の要素を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
   MislibPt*
-  pin() const;
+  top() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ゲート型のときに意味のある関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 面積を表すオブジェクトを返す．
+  /// @note デフォルトでは NULL を返す．
+  virtual
+  MislibPt*
+  area() const;
+
+  /// @brief 出力ピン名を表すオブジェクトを返す．
+  /// @note デフォルトでは NULL を返す．
+  virtual
+  MislibPt*
+  opin_name() const;
+
+  /// @brief 出力の論理式を表すオブジェクトを返す．
+  /// @note デフォルトでは NULL を返す．
+  virtual
+  MislibPt*
+  opin_expr() const;
+
+  /// @brief 入力ピンのリストを表すオブジェクトを返す．
+  /// @note デフォルトでは NULL を返す．
+  virtual
+  MislibPt*
+  ipin_list() const;
 
 
 protected:
+  //////////////////////////////////////////////////////////////////////
+  // 派生クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 位置を出力する．
   void
@@ -236,7 +271,7 @@ private:
 
   // 位置情報
   FileRegion mLoc;
-  
+
 };
 
 

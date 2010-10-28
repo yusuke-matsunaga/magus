@@ -57,12 +57,12 @@ public:
   /// @brief 条件の取得
   virtual
   tCellTimingSense
-  timing_sense() const = 0;
+  sense() const = 0;
 
   /// @brief 型の取得
   virtual
   tCellTimingType
-  timing_type() const = 0;
+  type() const = 0;
 
 
 public:
