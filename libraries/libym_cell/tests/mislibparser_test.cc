@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "mislib/MislibParserImpl.h"
+#include "mislib/MislibParser.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -19,7 +19,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using nsYm::nsCell::MislibParserImpl;
+  using nsYm::nsCell::MislibParser;
   using nsYm::nsCell::MislibPt;
 
   if ( argc != 2 ) {
@@ -27,7 +27,7 @@ main(int argc,
     return 255;
   }
 
-  MislibParserImpl parser;
+  MislibParser parser;
 
   MsgHandler* mh = new StreamMsgHandler(&cerr);
   mh->set_mask(MsgHandler::kMaskAll);

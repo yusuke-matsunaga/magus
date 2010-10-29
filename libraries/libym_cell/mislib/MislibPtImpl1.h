@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_CELL
 class MislibPtStr :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -76,7 +76,7 @@ private:
 class MislibPtNum :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -125,7 +125,7 @@ private:
 class MislibPtNoninv :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -159,7 +159,7 @@ public:
 class MislibPtInv :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -193,7 +193,7 @@ public:
 class MislibPtUnknown :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -227,7 +227,7 @@ public:
 class MislibPtConst0 :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -266,7 +266,7 @@ public:
 class MislibPtConst1 :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -306,7 +306,7 @@ public:
 class MislibPtList :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ

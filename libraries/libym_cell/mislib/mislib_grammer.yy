@@ -12,7 +12,7 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/FileRegion.h"
-#include "MislibParserImpl.h"
+#include "MislibParser.h"
 #include "MislibPt.h"
 #include "MislibLex.h"
 
@@ -37,12 +37,12 @@ BEGIN_NAMESPACE_YM_CELL
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      MislibParserImpl&);
+      MislibParser&);
 
 // エラー報告関数の宣言
 int
 yyerror(YYLTYPE*,
-	MislibParserImpl&,
+	MislibParser&,
 	const char*);
 
 BEGIN_NONAMESPACE
@@ -69,10 +69,10 @@ END_NONAMESPACE
 %locations
 
 // yyparse の引数
-%parse-param {MislibParserImpl& parser}
+%parse-param {MislibParser& parser}
 
 // yylex の引数
-%lex-param {MislibParserImpl& parser}
+%lex-param {MislibParser& parser}
 
 // トークンの定義
 %token STR
@@ -224,7 +224,7 @@ phase
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      MislibParserImpl& parser)
+      MislibParser& parser)
 {
   return parser.scan(*lvalp, *llocp);
 }
@@ -232,7 +232,7 @@ yylex(YYSTYPE* lvalp,
 // エラー出力関数
 int
 yyerror(YYLTYPE* llocp,
-	MislibParserImpl& parser,
+	MislibParser& parser,
 	const char* msg)
 {
   parser.error(*llocp, msg);

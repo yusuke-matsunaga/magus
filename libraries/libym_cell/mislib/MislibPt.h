@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 
 public:
 

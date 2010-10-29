@@ -1,11 +1,11 @@
-#ifndef LIBYM_CELL_MISLIB_MISLIBPARSERIMPL_H
-#define LIBYM_CELL_MISLIB_MISLIBPARSERIMPL_H
+#ifndef LIBYM_CELL_MISLIB_MISLIBPARSER_H
+#define LIBYM_CELL_MISLIB_MISLIBPARSER_H
 
-/// @file libym_cell/mislib/MislibParserImpl.h
-/// @brief MislibParserImpl のヘッダファイル
+/// @file libym_cell/mislib/MislibParser.h
+/// @brief MislibParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibParserImpl.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: MislibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -24,18 +24,18 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class MislibParserImpl MislibParserImpl.h "MislibParserImpl.h"
+/// @class MislibParser MislibParser.h "MislibParser.h"
 /// @brief Mislib ファイルのパーサーの実装クラス
 //////////////////////////////////////////////////////////////////////
-class MislibParserImpl
+class MislibParser
 {
 public:
 
   /// @brief コンストラクタ
-  MislibParserImpl();
+  MislibParser();
 
   /// @brief デストラクタ
-  ~MislibParserImpl();
+  ~MislibParser();
 
 
 public:
@@ -202,11 +202,11 @@ private:
 // @brief メッセージマネージャの取得
 inline
 MsgMgr&
-MislibParserImpl::msg_mgr()
+MislibParser::msg_mgr()
 {
   return mMsgMgr;
 }
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_MISLIB_MISLIBPARSERIMPL_H
+#endif // LIBYM_CELL_MISLIB_MISLIBPARSER_H
