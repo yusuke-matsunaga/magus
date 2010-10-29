@@ -269,7 +269,7 @@ MislibParser::new_gate3(const FileRegion& loc,
 
   void* p = mAlloc.get_memory(sizeof(MislibPtGate));
   MislibPt* gate = new (p) MislibPtGate(loc, pt_name, pt_area,
-					pt_oname, pt_expr, NULL);
+					pt_oname, pt_expr, new_list());
   mGateList->push_back(gate);
 }
 
