@@ -39,14 +39,6 @@ const int debug_all        = 0xffff;
 
 int debug = DEBUG_FLAG;
 
-size_t
-fact(size_t x)
-{
-  if ( x <= 2 ) {
-    return x;
-  }
-  return x * fact(x - 1);
-}
 END_NONAMESPACE
 
 
@@ -65,21 +57,24 @@ public:
     mConf(conf)
   {
   }
-  
+
 
   // 比較関数
   bool
-  operator()(size_t pos1,
-	     size_t pos2)
+  operator()(ymuint pos1,
+	     ymuint pos2)
   {
     return mConf.w1gt(pos1, pos2);
   }
-  
-  
+
+
 private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
 
   const NpnConf& mConf;
-  
+
 };
 
 
@@ -95,21 +90,24 @@ public:
     mConf(conf)
   {
   }
-  
+
 
   // 比較関数
   bool
-  operator()(size_t pos1,
-	     size_t pos2)
+  operator()(ymuint pos1,
+	     ymuint pos2)
   {
     return mConf.w1eq(pos1, pos2);
   }
-  
-  
+
+
 private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
 
   const NpnConf& mConf;
-  
+
 };
 
 
@@ -122,28 +120,31 @@ public:
 
   // コンストラクタ
   W2Gt(const NpnConf& conf,
-       size_t pos0) :
+       ymuint pos0) :
     mConf(conf),
     mPos0(pos0)
   {
   }
-  
+
 
   // 比較関数
   bool
-  operator()(size_t pos1,
-	     size_t pos2)
+  operator()(ymuint pos1,
+	     ymuint pos2)
   {
     return mConf.w2gt(mPos0, pos1, pos2);
   }
-  
-  
+
+
 private:
-  
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
   const NpnConf& mConf;
-  
-  size_t mPos0;
-  
+
+  ymuint32 mPos0;
+
 };
 
 
@@ -156,28 +157,31 @@ public:
 
   // コンストラクタ
   W2Eq(const NpnConf& conf,
-       size_t pos0) :
+       ymuint pos0) :
     mConf(conf),
     mPos0(pos0)
   {
   }
-  
+
 
   // 比較関数
   bool
-  operator()(size_t pos1,
-	     size_t pos2)
+  operator()(ymuint pos1,
+	     ymuint pos2)
   {
     return mConf.w2eq(mPos0, pos1, pos2);
   }
-  
-  
+
+
 private:
-  
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
   const NpnConf& mConf;
-  
-  size_t mPos0;
-  
+
+  ymuint32 mPos0;
+
 };
 
 
@@ -203,28 +207,28 @@ void
 ww0_refine(vector<NpnConf>& pollist)
 {
   const NpnConf& conf0 = pollist.front();
-  size_t ni = conf0.ni();
-  
+  ymuint ni = conf0.ni();
+
   if ( debug & debug_ww0_refine ) {
     cout << "before ww0_refine()" << endl;
-    for (size_t i = 0; i < pollist.size(); ++ i) {
+    for (ymuint i = 0; i < pollist.size(); ++ i) {
       NpnConf& conf = pollist[i];
       conf.dump(cout);
     }
     cout << endl;
   }
-  
+
   // 重み別 w0 係数を用いて極性の決定を行う．
-  size_t w = 0;
+  ymuint w = 0;
   int max_d0array[kNpnMaxNi + 1];
   for (w = 0; w <= ni && pollist.size() > 1; ++ w) {
     bool first = true;
     int max_d0 = 0;
-    size_t wpos = 0;
-    for (size_t i = 0; i < pollist.size(); ++ i) {
+    ymuint wpos = 0;
+    for (ymuint i = 0; i < pollist.size(); ++ i) {
       const NpnConf& conf = pollist[i];
       int d0 = conf.walsh_w0(w);
-      
+
       int stat = -1;
       if ( first ) {
 	first = false;
@@ -246,10 +250,10 @@ ww0_refine(vector<NpnConf>& pollist)
     }
     max_d0array[w] = max_d0;
   }
-  
+
   if ( debug & debug_ww0_refine ) {
     cout << "after ww0_refine()" << endl;
-    for (size_t i = 0; i < pollist.size(); ++ i) {
+    for (ymuint i = 0; i < pollist.size(); ++ i) {
       NpnConf& conf = pollist[i];
       conf.dump(cout);
     }
@@ -267,31 +271,31 @@ NpnMgr::cannonical(const TvFunc& func,
 {
   NpnRawSig sig;
   NpnConf conf0;
-  
+
   // W0 と W1 が非負になるように極性の調節を行う．
   // W0 と W1 および対称変数の情報を用いて正規化を行う．
   // 以降は対称入力グループ単位で考えればよい．
   // また W0 と W1 シグネチャは最大化されているので考える必要はない．
   sig.normalize(func, conf0);
-  
+
   if ( !conf0.is_resolved() ) {
     if ( debug & debug_step1) {
       cout << "Before step1" << endl;
       conf0.dump(cout);
     }
-  
+
     // W1:cnum:bisym を用いてグループわけを行う．
     conf0.refine(0, W1CnumGt(conf0), W1CnumEq(conf0));
-  
+
     if ( debug & debug_step1) {
       cout << "After step1" << endl;
       conf0.dump(cout);
     }
   }
-  
+
   mMaxList.clear();
   mW2max_count = 0;
-  
+
 #if 1
   if ( conf0.is_resolved() ) {
     mMaxList.push_back(conf0);
@@ -302,7 +306,7 @@ NpnMgr::cannonical(const TvFunc& func,
       // 出力極性が決まっていなければ両方の極性で考える．
       NpnConf conf_p(conf0, 1);
       w2max_recur(conf_p, 0);
-      
+
       NpnConf conf_n(conf0, -1);
       w2max_recur(conf_n, 0);
     }
@@ -313,21 +317,21 @@ NpnMgr::cannonical(const TvFunc& func,
 #else
   // 最初に全ての極性を展開してしまう．
   vector<NpnConf> pollist;
-  size_t ulist[kNpnMaxNi];
-  size_t unum = 0;
-  for (size_t c = 0; c < conf0.nc(); ++ c) {
+  ymuint ulist[kNpnMaxNi];
+  ymuint unum = 0;
+  for (ymuint c = 0; c < conf0.nc(); ++ c) {
     if ( conf0.ic_pol(c) == 0 ) {
       ulist[unum] = c;
       ++ unum;
     }
   }
-  size_t unum_pow = 1UL << unum;
+  ymuint unum_pow = 1UL << unum;
   pollist.reserve(unum_pow);
   if ( conf0.is_opol_fixed() ) {
-    for (size_t p = 0; p < unum_pow; ++ p) {
+    for (ymuint p = 0; p < unum_pow; ++ p) {
       NpnConf conf(conf0);
-      for (size_t i = 0; i < unum; ++ i) {
-	size_t c = ulist[i];
+      for (ymuint i = 0; i < unum; ++ i) {
+	ymuint c = ulist[i];
 	if ( p & (1 << i) ) {
 	  // c のクラスを反転させる．
 	  conf.set_ic_pol(c, 2);
@@ -341,10 +345,10 @@ NpnMgr::cannonical(const TvFunc& func,
   }
   else {
     for (int opol = -1; opol <= 1; opol += 2) {
-      for (size_t p = 0; p < unum_pow; ++ p) {
+      for (ymuint p = 0; p < unum_pow; ++ p) {
 	NpnConf conf(conf0, opol);
-	for (size_t i = 0; i < unum; ++ i) {
-	  size_t c = ulist[i];
+	for (ymuint i = 0; i < unum; ++ i) {
+	  ymuint c = ulist[i];
 	  if ( p & (1 << i) ) {
 	    // c のクラスを反転させる．
 	    conf.set_ic_pol(c, 2);
@@ -359,12 +363,12 @@ NpnMgr::cannonical(const TvFunc& func,
   }
   // それを WW0 を用いて制限する．
   ww0_refine(pollist);
-  for (size_t i = 0; i < pollist.size(); ++ i) {
+  for (ymuint i = 0; i < pollist.size(); ++ i) {
     NpnConf& conf = pollist[i];
     w2max_recur(conf, 0);
   }
 #endif
-  
+
   if ( debug & debug_final ) {
     cout << "Final Result" << endl;
     cout << " w2max_count: " << mW2max_count << endl;
@@ -382,12 +386,12 @@ NpnMgr::cannonical(const TvFunc& func,
     }
     cout << endl;
   }
-  
+
   // conf0 から cmap を作る．
   const NpnConf& max_conf = mMaxList.front();
   max_conf.set_map(cmap);
 }
-  
+
 // @brief 直前の cannonical の呼び出しにおける NpnMap の全候補を返す．
 void
 NpnMgr::all_map(list<NpnMap>& map_list) const
@@ -401,7 +405,7 @@ NpnMgr::all_map(list<NpnMap>& map_list) const
     map_list.push_back(map);
   }
 }
-  
+
 // @brief 直前の cannonical の呼び出しにおける w2max_recur の起動回数を返す．
 ymulong
 NpnMgr::w2max_count() const
@@ -415,38 +419,38 @@ BEGIN_NONAMESPACE
 // @brief 確定した入力との w2 を用いて細分化する．
 void
 w2refine(NpnConf& conf,
-	 size_t g0)
+	 ymuint g0)
 {
   // Walsh の 2次の係数を用いた細分化
 
   // 確定した入力をキューに積む．
-  size_t queue[kNpnMaxNi];
-  size_t rp = 0;
-  size_t wp = 0;
-  for (size_t g = g0; g < conf.ng(); ++ g) {
-    size_t s = conf.begin(g);
-    size_t e = conf.end(g);
+  ymuint queue[kNpnMaxNi];
+  ymuint rp = 0;
+  ymuint wp = 0;
+  for (ymuint g = g0; g < conf.ng(); ++ g) {
+    ymuint s = conf.begin(g);
+    ymuint e = conf.end(g);
     if ( e - s == 1 && conf.ic_pol(s) != 0 ) {
-      size_t pos0 = conf.ic_rep(s);
+      ymuint pos0 = conf.ic_rep(s);
       queue[wp] = pos0;
       ++ wp;
     }
   }
 
   while ( wp > rp ) {
-    size_t pos0 = queue[rp];
+    ymuint pos0 = queue[rp];
     ++ rp;
 
-    size_t c = 0;
-    for (size_t g1 = g0; g1 < conf.ng(); ++ g1) {
-      size_t b = conf.begin(g1);
-      size_t e = conf.end(g1);
+    ymuint c = 0;
+    for (ymuint g1 = g0; g1 < conf.ng(); ++ g1) {
+      ymuint b = conf.begin(g1);
+      ymuint e = conf.end(g1);
       if ( e - b == 1 ) {
 	// 順序が確定している場合
-	
+
 	if ( conf.ic_pol(b) == 0 ) {
 	  // ても極性は確定していない場合
-	  size_t pos1 = conf.ic_rep(b);
+	  ymuint pos1 = conf.ic_rep(b);
 	  int w2_1 = conf.walsh_2(pos0, pos1);
 	  if ( w2_1 < 0 ) {
 	    conf.set_ic_pol(b, 2);
@@ -466,11 +470,11 @@ w2refine(NpnConf& conf,
       }
       else {
 	// 順序が確定していない場合
-	
+
 	// 極性が確定していない場合には2次係数で極性を制限する．
-	for (size_t i = b; i < e; ++ i) {
+	for (ymuint i = b; i < e; ++ i) {
 	  if ( conf.ic_pol(i) == 0 ) {
-	    size_t pos1 = conf.ic_rep(i);
+	    ymuint pos1 = conf.ic_rep(i);
 	    int w2 = conf.walsh_2(pos0, pos1);
 	    if ( w2 > 0 ) {
 	      conf.set_ic_pol(i, 1);
@@ -480,15 +484,15 @@ w2refine(NpnConf& conf,
 	    }
 	  }
 	}
-	
+
 	// 2次係数の降べきの順に並べ替える．
-	size_t d = conf.refine(g1, W2Gt(conf, pos0), W2Eq(conf, pos0));
-	
+	ymuint d = conf.refine(g1, W2Gt(conf, pos0), W2Eq(conf, pos0));
+
 	// 新しく増えたグループで確定したものがあるか調べる．
-	for (size_t j = g1; j < g1 + d; ++ j) {
-	  size_t s = conf.begin(j);
+	for (ymuint j = g1; j < g1 + d; ++ j) {
+	  ymuint s = conf.begin(j);
 	  if ( conf.gnum(j) == 1 && conf.ic_pol(s) != 0 ) {
-	    size_t pos1 = conf.ic_rep(s);
+	    ymuint pos1 = conf.ic_rep(s);
 	    queue[wp] = pos1;
 	    ++ wp;
 	  }
@@ -515,7 +519,7 @@ END_NONAMESPACE
 // @brief シグネチャが最大になるように極性と順序を決める．
 void
 NpnMgr::w2max_recur(NpnConf& conf,
-		    size_t g0)
+		    ymuint g0)
 {
   for ( ; ; ) {
     if ( debug & debug_w2max ) {
@@ -524,21 +528,21 @@ NpnMgr::w2max_recur(NpnConf& conf,
     }
 
     ++ mW2max_count;
-    
+
     if ( !conf.is_resolved() ) {
       w2refine(conf, g0);
     }
-  
+
     if ( conf.is_resolved() ) {
       if ( mMaxList.empty() ) {
 	mMaxList.push_back(conf);
       }
       else {
 	const NpnConf& max_conf = mMaxList.front();
-	size_t ni = max_conf.ni();
+	ymuint ni = max_conf.ni();
 	int diff = 0;
-	for (size_t i = 0; i < ni - 1; ++ i) {
-	  for (size_t j = i + 1; j < ni; ++ j) {
+	for (ymuint i = 0; i < ni - 1; ++ i) {
+	  for (ymuint j = i + 1; j < ni; ++ j) {
 	    int w2_1 = max_conf.walsh_2i(i, j);
 	    int w2_2 = conf.walsh_2i(i, j);
 	    diff = w2_1 - w2_2;
@@ -574,23 +578,23 @@ NpnMgr::w2max_recur(NpnConf& conf,
       }
       return;
     }
-  
+
     // 確定している入力グループをスキップする．
     for ( ; g0 < conf.ng(); ++ g0) {
       if ( conf.gnum(g0) > 1 ) {
 	break;
       }
-      size_t b = conf.begin(g0);
+      ymuint b = conf.begin(g0);
       if ( conf.ic_pol(b) == 0 ) {
 	break;
       }
     }
-    
+
     if ( conf.gnum(g0) > 1 ) {
       // g0 内に複数のクラスがあって順序は未確定
-      size_t b = conf.begin(g0);
-      size_t e = conf.end(g0);
-      for (size_t i = b; i < e; ++ i) {
+      ymuint b = conf.begin(g0);
+      ymuint e = conf.end(g0);
+      for (ymuint i = b; i < e; ++ i) {
 	NpnConf conf_i(conf, g0, i);
 	w2max_recur(conf_i, g0);
       }
@@ -600,7 +604,7 @@ NpnMgr::w2max_recur(NpnConf& conf,
     NpnConf conf_p(conf);
     conf_p.set_ic_pol(g0, 1);
     w2max_recur(conf_p, g0);
-      
+
     conf.set_ic_pol(g0, 2);
     // わざとループする．
   }

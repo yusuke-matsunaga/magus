@@ -29,14 +29,14 @@ NpnMap::NpnMap() :
   mNiPol(0UL)
 {
 }
-  
+
 // 入力数(と出力極性)を指定したコンストラクタ
 // 各入力の変換内容は kImapBad になっている．
-NpnMap::NpnMap(size_t ni,
+NpnMap::NpnMap(ymuint ni,
 	       tPol pol) :
-  mNiPol((ni << 1) | static_cast<size_t>(pol))
+  mNiPol((ni << 1) | static_cast<ymuint>(pol))
 {
-  for (size_t i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < ni; ++ i) {
     mImap[i] = kImapBad;
   }
 }
@@ -45,7 +45,7 @@ NpnMap::NpnMap(size_t ni,
 NpnMap::NpnMap(const NpnMap& src) :
   mNiPol(src.mNiPol)
 {
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     mImap[i] = src.mImap[i];
   }
 }
@@ -55,7 +55,7 @@ const NpnMap&
 NpnMap::operator=(const NpnMap& src)
 {
   mNiPol = src.mNiPol;
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     mImap[i] = src.mImap[i];
   }
   return *this;
@@ -73,27 +73,27 @@ void
 NpnMap::clear()
 {
   mNiPol &= ~(1UL);
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     mImap[i] = kImapBad;
   }
 }
 
 // 入力数を再設定して内容をクリアする．
 void
-NpnMap::resize(size_t new_ni)
+NpnMap::resize(ymuint new_ni)
 {
   mNiPol = new_ni << 1;
-  for (size_t i = 0; i < new_ni; ++ i) {
+  for (ymuint i = 0; i < new_ni; ++ i) {
     mImap[i] = kImapBad;
   }
 }
 
 // 恒等変換を表すように設定する．
 void
-NpnMap::set_identity(size_t new_ni)
+NpnMap::set_identity(ymuint new_ni)
 {
   mNiPol = new_ni << 1;
-  for (size_t i = 0; i < new_ni; ++ i) {
+  for (ymuint i = 0; i < new_ni; ++ i) {
     mImap[i] = npnimap_pack(i, kPolPosi);
   }
 }
@@ -136,7 +136,7 @@ NpnMap::operator==(const NpnMap& src) const
   if ( mNiPol != src.mNiPol ) {
     return false;
   }
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     if ( mImap[i] != src.mImap[i] ) {
       return false;
     }
@@ -154,12 +154,12 @@ inverse(const NpnMap& src)
 	 << endl;
   }
 
-  size_t src_ni = src.ni();
+  ymuint src_ni = src.ni();
   NpnMap dst_map(src_ni, src.opol());
-  for (size_t i = 0; i < src_ni; ++ i) {
+  for (ymuint i = 0; i < src_ni; ++ i) {
     tNpnImap imap = src.mImap[i];
     if ( imap != kImapBad ) {
-      size_t opos = npnimap_pos(imap);
+      ymuint opos = npnimap_pos(imap);
       if ( opos >= src_ni ) {
 	if ( debug_npn_map ) {
 	  cerr << "inverse(src): srcの値域と定義域が一致しません．";
@@ -196,15 +196,15 @@ operator*(const NpnMap& src1,
 	 << endl;
   }
 
-  size_t ni1 = src1.ni();
+  ymuint ni1 = src1.ni();
   NpnMap dst_map(ni1, src1.opol() * src2.opol());
-  for (size_t i1 = 0; i1 < ni1; ++ i1) {
+  for (ymuint i1 = 0; i1 < ni1; ++ i1) {
     tNpnImap imap1 = src1.mImap[i1];
     if ( imap1 == kImapBad ) {
       dst_map.set(i1, kImapBad);
     }
     else {
-      size_t opos1 = npnimap_pos(imap1);
+      ymuint opos1 = npnimap_pos(imap1);
       tPol pol1 = npnimap_pol(imap1);
       tNpnImap imap2 = src2.imap(opos1);
       if ( imap2 == kImapBad ) {
@@ -213,7 +213,7 @@ operator*(const NpnMap& src1,
 	}
       }
       else {
-	size_t opos2 = npnimap_pos(imap2);
+	ymuint opos2 = npnimap_pos(imap2);
 	tPol pol2 = npnimap_pol(imap2);
 	dst_map.set(i1, opos2, pol1 * pol2);
       }
@@ -246,8 +246,8 @@ NpnMap::xform_bdd(const Bdd& f) const
   // 恒等変換ならセットしない．
   VarBddMap subst_array;
   BddMgrRef mgr = f.mgr();
-  size_t ni = mImap.size();
-  for (size_t i = 0; i < ni; ++ i) {
+  ymuint ni = mImap.size();
+  for (ymuint i = 0; i < ni; ++ i) {
     tVarId old_id = i;
     tNpnImap imap = mImap[i];
     tVarId new_id = npnimap_pos(imap);
@@ -281,7 +281,7 @@ operator<<(ostream& s,
     s << '~';
   }
   s << '(';
-  for (size_t i = 0; i < map.ni(); ++ i) {
+  for (ymuint i = 0; i < map.ni(); ++ i) {
     if ( first ) {
       first = false;
     }

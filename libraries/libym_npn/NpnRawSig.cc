@@ -53,24 +53,24 @@ NpnRawSig::normalize(const TvFunc& func,
 		     NpnConf& conf)
 {
   mFunc = func;
-  
+
   mNi = func.ni();
-  
+
   // Walsh の0次と1次の係数を計算する．
   // 2次の係数はオンデマンドで計算する．
   mW0 = func.walsh_01(mW1);
-  for (size_t i = 0; i < mNi; ++ i) {
-    for (size_t j = 0; j < mNi; ++ j) {
+  for (ymuint i = 0; i < mNi; ++ i) {
+    for (ymuint j = 0; j < mNi; ++ j) {
       mW2flag[i * mNi + j] = 0;
     }
   }
-  
+
   if ( debug & debug_normalize ) {
     cout << "Before normalize" << endl;
     cout << func << endl;
     dump_walsh(cout);
   }
-  
+
   // mW0 が非負になるように出力極性の調整を行う．
   mOpol = 1;
   if ( walsh_0() < 0 ) {
@@ -80,18 +80,18 @@ NpnRawSig::normalize(const TvFunc& func,
   else if ( walsh_0() == 0 ) {
     mOpol = 0;
   }
-  
+
   // Walsh の1次係数を計算し，極性の調整を行う．
   // 同時に等価入力クラスをつくる．
   mNc = 0;
   mIndepNum = 0;
-  for (size_t i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mNi; ++ i) {
     mIcNum[i] = 2;
-    mIcLink[i] = static_cast<size_t>(-1);
-    
+    mIcLink[i] = static_cast<ymuint>(-1);
+
     // i の1次係数を求める．
     int w1 = walsh_1(i);
-    
+
     // w1 が非負になるように調整する．
     // w1 が 0 の時には実際のサポートかどうかも調べる．
     int ipol = 1;
@@ -112,11 +112,11 @@ NpnRawSig::normalize(const TvFunc& func,
       }
     }
     mIpols[i] = ipol;
-    
+
     // 等価な入力があるかどうか調べる．
     bool found = false;
-    for (size_t p = 0; p < mNc; ++ p) {
-      size_t pos1 = mIcRep[p];
+    for (ymuint p = 0; p < mNc; ++ p) {
+      ymuint pos1 = mIcRep[p];
       if ( w1 != walsh_1(pos1) ) {
 	continue;
       }
@@ -157,7 +157,7 @@ NpnRawSig::normalize(const TvFunc& func,
       ++ mNc;
     }
   }
-  
+
   if ( mOpol == 0 ) {
     // もしも入力の極性がすべて決まっていれば
     // w2 の最大値と最小値の絶対値の大きい方の出力極性を選ぶ．
@@ -166,12 +166,12 @@ NpnRawSig::normalize(const TvFunc& func,
     int max = min;
     int sum = 0;
     bool valid = true;
-    for (size_t i = 0; i < mNi; ++ i) {
+    for (ymuint i = 0; i < mNi; ++ i) {
       if ( walsh_1(i) == 0 ) {
 	valid = false;
 	break;
       }
-      for (size_t j = 0; j < mNi; ++ j) {
+      for (ymuint j = 0; j < mNi; ++ j) {
 	int w2 = walsh_2(i, j);
 	if ( min > w2 ) {
 	  min = w2;
@@ -186,7 +186,7 @@ NpnRawSig::normalize(const TvFunc& func,
       if ( -min > max ) {
 	mOpol = -1;
 	// w1 を正にするには入力をすべて反転する必要がある．
-	for (size_t i = 0; i < mNi; ++ i) {
+	for (ymuint i = 0; i < mNi; ++ i) {
 	  if ( walsh_1(i) != 0 ) {
 	    mIpols[i] *= -1;
 	  }
@@ -201,7 +201,7 @@ NpnRawSig::normalize(const TvFunc& func,
 	if ( sum < 0 ) {
 	  mOpol = -1;
 	  // w1 を正にするには入力をすべて反転する必要がある．
-	  for (size_t i = 0; i < mNi; ++ i) {
+	  for (ymuint i = 0; i < mNi; ++ i) {
 	    if ( walsh_1(i) != 0 ) {
 	      mIpols[i] *= -1;
 	    }
@@ -215,7 +215,7 @@ NpnRawSig::normalize(const TvFunc& func,
       }
     }
   }
-  
+
   if ( debug & debug_normalize ) {
     cout << "After normalize" << endl;
     dump_walsh(cout);
@@ -223,8 +223,8 @@ NpnRawSig::normalize(const TvFunc& func,
   }
 
   if ( mNc > 0 ) {
-    for (size_t i = 0; i < mNc; ++ i) {
-      size_t pos = mIcRep[i];
+    for (ymuint i = 0; i < mNc; ++ i) {
+      ymuint pos = mIcRep[i];
       int ipol1 = (walsh_1(pos) == 0) ? 0 : 1;
       conf.add_ic_rep(pos, ipol1);
     }
@@ -243,44 +243,44 @@ void
 NpnRawSig::invert_all()
 {
   mW0 *= -1;
-  for (size_t i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mNi; ++ i) {
     mW1[i] *= -1;
   }
   invert_all_w2();
 }
-  
+
 // @brief 一つの入力に関するシグネチャを反転する．
 void
-NpnRawSig::invert_input(size_t pos)
+NpnRawSig::invert_input(ymuint pos)
 {
   mW1[pos] *= -1;
-  for (size_t i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mNi; ++ i) {
     invert_w2(pos, i);
   }
 }
-  
+
 // @brief 2次の係数のみを反転する．
 void
 NpnRawSig::invert_all_w2()
 {
-  for (size_t i = 0; i < mNi; ++ i) {
-    for (size_t j = i + 1; j < mNi; ++ j) {
+  for (ymuint i = 0; i < mNi; ++ i) {
+    for (ymuint j = i + 1; j < mNi; ++ j) {
       invert_w2(i, j);
     }
   }
 }
-  
+
 // @brief w2 の要素を反転する．
 void
-NpnRawSig::invert_w2(size_t pos1,
-		     size_t pos2)
+NpnRawSig::invert_w2(ymuint pos1,
+		     ymuint pos2)
 {
   if ( pos2 > pos1 ) {
     int tmp = pos1;
     pos1 = pos2;
     pos2 = tmp;
   }
-  size_t base = pos1 * ni() + pos2;
+  ymuint base = pos1 * ni() + pos2;
   if ( mW2flag[base] & 1 ) {
     mW2[base] *= -1;
   }
@@ -288,10 +288,10 @@ NpnRawSig::invert_w2(size_t pos1,
     mW2flag[base] ^= 2;
   }
 }
-  
+
 // @brief 重み別 Walsh の 0次係数を得る．
 int
-NpnRawSig::walsh_w0(size_t w,
+NpnRawSig::walsh_w0(ymuint w,
 		    tPol opol,
 		    tPol ipol[]) const
 {
@@ -299,7 +299,7 @@ NpnRawSig::walsh_w0(size_t w,
     opol = ~opol;
   }
   ymuint32 ibits = 0UL;
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     tPol ip = ipol[i];
     if ( mIpols[i] == -1 ) {
       ip = ~ip;
@@ -317,21 +317,21 @@ NpnRawSig::dump_walsh(ostream& s) const
 {
   s << "W0: " << walsh_0() << endl
     << "w1:";
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     s << " " << walsh_1(i);
   }
   s << endl;
   s << "W2:" << endl;
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     s << "   ";
-    for (size_t j = 0; j < ni(); ++ j) {
+    for (ymuint j = 0; j < ni(); ++ j) {
       s << " " << setw(4) << walsh_2(i, j);
     }
     s << endl;
   }
   s << endl;
 }
-  
+
 // @brief 極性情報を出力する．
 void
 NpnRawSig::dump_pols(ostream& s) const
@@ -348,7 +348,7 @@ NpnRawSig::dump_pols(ostream& s) const
   }
   s << endl
     << "ipol:";
-  for (size_t i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < ni(); ++ i) {
     s << " ";
     if ( ipol(i) == -1 ) {
       s << "N";
