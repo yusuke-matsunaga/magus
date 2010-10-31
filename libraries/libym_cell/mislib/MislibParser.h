@@ -40,16 +40,11 @@ public:
 
 public:
 
-  /// @brief 今までに生成したすべてのオブジェクトを解放する．
-  void
-  clear();
-
-  /// @brief mislib ファイルを読み込む
+  /// @brief mislib ファイルを読み込んでライブラリを生成する．
   /// @param[in] filename ファイル名
-  /// @return パース木を返す．
+  /// @return 生成したライブラリを返す．
   /// @note 読み込みが失敗したら NULL を返す．
-  /// @note パース木は clear() を呼ぶまでは有効
-  const MislibPt*
+  const CellLibrary*
   read(const string& filename);
 
   /// @brief メッセージマネージャの取得
@@ -61,6 +56,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // mislib_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 今までに生成したすべてのオブジェクトを解放する．
+  void
+  clear();
 
   /// @brief リストノードを生成する．
   MislibPt*

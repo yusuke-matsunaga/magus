@@ -44,11 +44,20 @@ public:
   name() const = 0;
 
   /// @brief テクノロジの取得
+  /// 返り値は
+  /// - kTechAsic
+  /// - kTechFpga
+  /// のどちらか
   virtual
   tCellTechnology
   technology() const = 0;
 
   /// @brief 遅延モデルの取得
+  /// 返り値は
+  /// - kDelayGeneric
+  /// - kDelayPiecewise
+  /// - kDelayNonlinear
+  /// のいずれか
   virtual
   tCellDelayModel
   delay_model() const = 0;
@@ -75,32 +84,32 @@ public:
 
   /// @brief 時間単位の取得
   virtual
-  tCellTimeUnit
+  string
   time_unit() const = 0;
 
   /// @brief 電圧単位の取得
   virtual
-  tCellVoltageUnit
+  string
   voltage_unit() const = 0;
 
   /// @brief 電流単位の取得
   virtual
-  tCellCurrentUnit
+  string
   current_unit() const = 0;
 
   /// @brief 抵抗単位の取得
   virtual
-  tCellResistanceUnit
+  string
   pulling_resistance_unit() const = 0;
 
   /// @brief 容量単位の取得
   virtual
-  tCellCapacitanceUnit
+  string
   capacitive_load_unit() const = 0;
 
   /// @brief 電力単位の取得
   virtual
-  tCellPowerUnit
+  string
   leakage_power_unit() const = 0;
 
   /// @brief ルックアップテーブルのテンプレートの取得

@@ -13,6 +13,7 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/cell_type.h"
+#include "ym_lexp/lexp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -75,6 +76,11 @@ public:
   // 出力ピンの属性
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 機能を表す論理式を返す．
+  virtual
+  LogExpr
+  function() const = 0;
+
   /// @brief 最大ファンアウト容量を返す．
   virtual
   CellCapacitance
@@ -106,15 +112,6 @@ public:
   min_transition() const = 0;
 
   /// @brief タイミング情報の取得
-  /// @param[in] ipos 入力ピン番号
-  /// @param[out] timing_list タイミング情報を納めるベクタ
-  /// @return 条件に合致するタイミング情報の数を返す．
-  virtual
-  ymuint
-  timing(ymuint ipos,
-	 vector<const CellTiming*>& timing_list) const = 0;
-
-  /// @brief タイミング情報の取得
   /// @param[in] ipos 開始ピン番号
   /// @param[in] timing_sense タイミング情報の摘要条件
   /// @return 条件に合致するタイミング情報を返す．
@@ -122,7 +119,7 @@ public:
   virtual
   const CellTiming*
   timing(ymuint ipos,
-	 tCellTimingSense timing_sense) const = 0;
+	 tCellTimingSense sense) const = 0;
 
 };
 

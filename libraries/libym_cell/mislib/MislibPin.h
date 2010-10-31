@@ -11,6 +11,7 @@
 
 #include "ym_cell/CellPin.h"
 #include "ym_utils/ShString.h"
+#include "ym_lexp/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -22,7 +23,7 @@ BEGIN_NAMESPACE_YM_CELL
 class MislibPin :
   public CellPin
 {
-  friend class MislibParseImpl;
+  friend class MislibLibrary;
 
 protected:
 
@@ -63,7 +64,7 @@ private:
 class MislibInputPin :
   public MislibPin
 {
-  friend class MislibParseImpl;
+  friend class MislibLibrary;
 
 private:
 
@@ -111,6 +112,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 出力ピンの属性
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 機能を表す論理式を返す．
+  virtual
+  LogExpr
+  function() const;
 
   /// @brief 最大ファンアウト容量を返す．
   virtual
@@ -180,7 +186,8 @@ private:
 class MislibOutputPin :
   public MislibPin
 {
-  friend class MislibParseImpl;
+  friend class MislibLibrary;
+  friend class MislibCell;
 
 private:
 
@@ -229,6 +236,11 @@ public:
   // 出力ピンの属性
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 機能を表す論理式を返す．
+  virtual
+  LogExpr
+  function() const;
+
   /// @brief 最大ファンアウト容量を返す．
   virtual
   CellCapacitance
@@ -260,23 +272,14 @@ public:
   min_transition() const;
 
   /// @brief タイミング情報の取得
-  /// @param[in] ipos 入力ピン番号
-  /// @param[out] timing_list タイミング情報を納めるベクタ
-  /// @return 条件に合致するタイミング情報の数を返す．
-  virtual
-  ymuint
-  timing(ymuint ipos,
-	 vector<const CellTiming*>& timing_list) const;
-
-  /// @brief タイミング情報の取得
   /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @param[in] sense タイミング情報の摘要条件 ( kPosiUnate か kNegaUnate )
   /// @return 条件に合致するタイミング情報を返す．
   /// @note なければ NULL を返す．
   virtual
   const CellTiming*
   timing(ymuint ipos,
-	 tCellTimingSense timing_sense) const;
+	 tCellTimingSense sense) const;
 
 
 private:
@@ -284,9 +287,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 機能を表す論理式
+  LogExpr mFunction;
+
   // タイミング情報の配列
-  // サイズは入力数
-  const CellTiming** mTimingArray;
+  // サイズは入力ピン数 x 2
+  CellTiming** mTimingArray;
 
 };
 

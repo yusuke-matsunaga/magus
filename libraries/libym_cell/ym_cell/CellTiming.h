@@ -38,27 +38,6 @@ public:
   // 共通の属性
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 関連する開始ピン数の取得
-  virtual
-  ymuint
-  ipin_num() const = 0;
-
-  /// @brief 関連する開始ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < ipin_num() )
-  virtual
-  const CellPin*
-  ipin(ymuint pos) const = 0;
-
-  /// @brief 関連する終点ピンの取得
-  virtual
-  const CellPin*
-  opin() const = 0;
-
-  /// @brief 条件の取得
-  virtual
-  tCellTimingSense
-  sense() const = 0;
-
   /// @brief 型の取得
   virtual
   tCellTimingType

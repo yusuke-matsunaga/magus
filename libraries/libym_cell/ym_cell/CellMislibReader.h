@@ -37,11 +37,11 @@ public:
 
 public:
 
-  /// @brief mislib 形式のファイルを読み込む
+  /// @brief mislib 形式のファイルを読み込んでライブラリを生成する．
   /// @param[in] filename ファイル名
   /// @return 読み込んで作成したセルライブラリを返す．
   /// @note エラーが起きたら NULL を返す．
-  CellLibrary*
+  const CellLibrary*
   read(const string& filename);
 
   /// @brief メッセージハンドラを付加する．

@@ -77,6 +77,13 @@ MislibInputPin::fall_capacitance() const
   return mCapacitance;
 }
 
+// @brief 機能を表す論理式を返す．
+LogExpr
+MislibInputPin::function() const
+{
+  return LogExpr();
+}
+
 // @brief 最大ファンアウト容量を返す．
 CellCapacitance
 MislibInputPin::max_fanout() const
@@ -186,6 +193,13 @@ MislibOutputPin::fall_capacitance() const
   return CellCapacitance(0.0);
 }
 
+// @brief 機能を表す論理式を返す．
+LogExpr
+MislibOutputPin::function() const
+{
+  return mFunction;
+}
+
 // @brief 最大ファンアウト容量を返す．
 CellCapacitance
 MislibOutputPin::max_fanout() const
@@ -229,30 +243,23 @@ MislibOutputPin::min_transition() const
 }
 
 // @brief タイミング情報の取得
-// @param[in] ipos 入力ピン番号
-// @param[out] timing_list タイミング情報を納めるベクタ
-// @return 条件に合致するタイミング情報の数を返す．
-ymuint
-MislibOutputPin::timing(ymuint ipos,
-			vector<const CellTiming*>& timing_list) const
-{
-  timing_list.clear();
-  timing_list.push_back(mTimingArray[ipos]);
-  return timing_list.size();
-}
-
-// @brief タイミング情報の取得
 // @param[in] ipos 開始ピン番号
-// @param[in] timing_sense タイミング情報の摘要条件
+// @param[in] sense タイミング情報の摘要条件
 // @return 条件に合致するタイミング情報を返す．
 // @note なければ NULL を返す．
 const CellTiming*
 MislibOutputPin::timing(ymuint ipos,
-			tCellTimingSense timing_sense) const
+			tCellTimingSense sense) const
 {
-  const CellTiming* timing = mTimingArray[ipos];
-  if ( timing->sense() == timing_sense ) {
-    return timing;
+  if ( ipos == 0 ) return NULL;
+  if ( sense == kSensePosiUnate ) {
+    return mTimingArray[(ipos - 1) * 2];
+  }
+  else if ( sense == kSenseNegaUnate ) {
+    return mTimingArray[(ipos - 1) * 2 + 1];
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
   }
   return NULL;
 }

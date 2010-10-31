@@ -35,14 +35,10 @@ CellMislibReader::~CellMislibReader()
 // @param[in] filename ファイル名
 // @return 読み込んで作成したセルライブラリを返す．
 // @note エラーが起きたら NULL を返す．
-CellLibrary*
+const CellLibrary*
 CellMislibReader::read(const string& filename)
 {
-  const MislibPt* root = mParser->read(filename);
-  if ( root == NULL ) {
-    return NULL;
-  }
-
+  return mParser->read(filename);
 }
 
 // @brief メッセージハンドラの登録

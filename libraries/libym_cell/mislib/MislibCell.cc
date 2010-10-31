@@ -19,18 +19,13 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MislibCell::MislibCell() :
-  mPinNum(0U),
-  mPinArray(NULL),
-  mTimingArray(NULL)
+MislibCell::MislibCell()
 {
 }
 
 // @brief デストラクタ
 MislibCell::~MislibCell()
 {
-  delete [] mPinArray;
-  delete [] mTimingArray;
 }
 
 // @brief 名前の取得
@@ -51,7 +46,7 @@ MislibCell::area() const
 ymuint
 MislibCell::pin_num() const
 {
-  return mPinNum;
+  return mInputPinNum + 1;
 }
 
 // @brief ピンの取得
@@ -59,7 +54,12 @@ MislibCell::pin_num() const
 const CellPin*
 MislibCell::pin(ymuint pos) const
 {
-  return mPinArray[pos];
+  if ( pos == 0 ) {
+    return &mOutputPin;
+  }
+  else {
+    return &mInputPinArray[pos - 1];
+  }
 }
 
 // @brief 名前からピンの取得
@@ -69,10 +69,14 @@ MislibCell::pin(ymuint pos) const
 const CellPin*
 MislibCell::pin(const string& name) const
 {
+  if ( mOutputPin.name() == name ) {
+    return &mOutputPin;
+  }
+
   // とりあえずナイーブなリニアサーチ
-  for (ymuint i = 0; i < mPinNum; ++ i) {
-    if ( mPinArray[i]->name() == name ) {
-      return mPinArray[i];
+  for (ymuint i = 0; i < mInputPinNum; ++ i) {
+    if ( mInputPinArray[i].name() == name ) {
+      return &mInputPinArray[i];
     }
   }
   return NULL;

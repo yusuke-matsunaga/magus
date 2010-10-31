@@ -11,6 +11,7 @@
 
 #include "ym_cell/Cell.h"
 #include "ym_utils/ShString.h"
+#include "MislibPin.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -24,7 +25,7 @@ class MislibCell :
   public Cell
 {
   // このクラスのみが内容を設定できる．
-  friend class MislibParserImpl;
+  friend class MislibLibrary;
 
 private:
 
@@ -105,32 +106,6 @@ public:
   const CellBundle*
   bundle(const string& name) const;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] opos 終了ピン番号
-  /// @param[out] timing_list タイミング情報を納めるベクタ
-  /// @return 条件に合致するタイミング情報の数を返す．
-  virtual
-  ymuint
-  timing(ymuint ipos,
-	 ymuint opos,
-	 vector<const CellTiming*>& timing_list) const;
-
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] opos 終了ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @param[in] timing_type タイミング情報の種類
-  /// @param[out] timing_list タイミング情報を納めるベクタ
-  /// @return 条件に合致するタイミング情報の数を返す．
-  virtual
-  ymuint
-  timing(ymuint ipos,
-	 ymuint opos,
-	 tCellTimingSense timing_sense,
-	 tCellTimingType timing_type,
-	 vector<const CellTiming*>& timing_list) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -143,16 +118,14 @@ private:
   // 面積
   CellArea mArea;
 
-  // ピン数
-  ymuint32 mPinNum;
+  // 入力ピン数
+  ymuint32 mInputPinNum;
 
-  // ピンの配列
-  CellPin** mPinArray;
+  // 入力ピンの配列
+  MislibInputPin* mInputPinArray;
 
-  // タイミングの配列
-  // サイズは mPinNum - 1
-  // 場合によっては複数のエントリに同じオブジェクトが入る場合もある．
-  CellTiming** mTimingArray;
+  // 出力ピン
+  MislibOutputPin mOutputPin;
 
 };
 

@@ -36,54 +36,6 @@ enum tCellDelayModel {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @brief 時間単位を表す列挙型
-//////////////////////////////////////////////////////////////////////
-enum tCellTimeUnit {
-  kTu1P
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 電圧単位を表す列挙型
-//////////////////////////////////////////////////////////////////////
-enum tCellVoltageUnit {
-  kVu1P
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 電流単位を表す列挙型
-//////////////////////////////////////////////////////////////////////
-enum tCellCurrentUnit {
-  kIu1P
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 抵抗単位を表す列挙型
-//////////////////////////////////////////////////////////////////////
-enum tCellResistanceUnit {
-  kRu1P
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 容量単位を表す列挙型
-//////////////////////////////////////////////////////////////////////
-enum tCellCapacitanceUnit {
-  kCu1P
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 電力単位を表す列挙型
-//////////////////////////////////////////////////////////////////////
-enum tCellPowerUnit {
-  kPu1P
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @brief ピンの方向を表す列挙型
 //////////////////////////////////////////////////////////////////////
 enum tCellDirection {
@@ -233,6 +185,11 @@ CellArea
 operator-(const CellArea& left,
 	  const CellArea& right);
 
+/// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   const CellArea& val);
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellTime cell_type.h <ym_cell/cell_type.h>
@@ -314,6 +271,11 @@ operator+(const CellTime& left,
 CellTime
 operator-(const CellTime& left,
 	  const CellTime& right);
+
+/// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   const CellTime& val);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -397,6 +359,11 @@ CellCapacitance
 operator-(const CellCapacitance& left,
 	  const CellCapacitance& right);
 
+/// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   const CellCapacitance& val);
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellResistance cell_type.h <ym_cell/cell_type.h>
@@ -478,6 +445,11 @@ operator+(const CellResistance& left,
 CellResistance
 operator-(const CellResistance& left,
 	  const CellResistance& right);
+
+/// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   const CellResistance& val);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -565,6 +537,15 @@ operator-(const CellArea& left,
   return CellArea(left).operator-=(right);
 }
 
+// @brief ストリーム出力
+inline
+ostream&
+operator<<(ostream& s,
+	   const CellArea& val)
+{
+  return s << val.value();
+}
+
 // @brief 空のコンストラクタ
 inline
 CellTime::CellTime() :
@@ -644,6 +625,15 @@ operator-(const CellTime& left,
 	  const CellTime& right)
 {
   return CellTime(left).operator-=(right);
+}
+
+// @brief ストリーム出力
+inline
+ostream&
+operator<<(ostream& s,
+	   const CellTime& val)
+{
+  return s << val.value();
 }
 
 // @brief 空のコンストラクタ
@@ -727,6 +717,15 @@ operator-(const CellCapacitance& left,
   return CellCapacitance(left).operator-=(right);
 }
 
+// @brief ストリーム出力
+inline
+ostream&
+operator<<(ostream& s,
+	   const CellCapacitance& val)
+{
+  return s << val.value();
+}
+
 // @brief 空のコンストラクタ
 inline
 CellResistance::CellResistance() :
@@ -806,6 +805,15 @@ operator-(const CellResistance& left,
 	  const CellResistance& right)
 {
   return CellResistance(left).operator-=(right);
+}
+
+// @brief ストリーム出力
+inline
+ostream&
+operator<<(ostream& s,
+	   const CellResistance& val)
+{
+  return s << val.value();
 }
 
 

@@ -26,20 +26,6 @@ MislibTiming::~MislibTiming()
 {
 }
 
-/// @brief 関連する終点ピンの取得
-const CellPin*
-MislibTiming::opin() const
-{
-  return mOpin;
-}
-
-// @brief 条件の取得
-tCellTimingSense
-MislibTiming::sense() const
-{
-  return mSense;
-}
-
 // @brief 型の取得
 tCellTimingType
 MislibTiming::type() const
@@ -157,74 +143,6 @@ const CellLut*
 MislibTiming::cell_fall() const
 {
   return NULL;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス MislibTiming1
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-MislibTiming1::MislibTiming1()
-{
-}
-
-// @brief デストラクタ
-MislibTiming1::~MislibTiming1()
-{
-}
-
-// @brief 関連する開始ピン数の取得
-ymuint
-MislibTiming1::ipin_num() const
-{
-  return 1;
-}
-
-// @brief 関連する開始ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < ipin_num() )
-const CellPin*
-MislibTiming1::ipin(ymuint pos) const
-{
-  if ( pos == 0 ) {
-    return mIpin;
-  }
-  else {
-    return NULL;
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス MislibTiming2
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-MislibTiming2::MislibTiming2() :
-  mIpinNum(0U),
-  mIpinArray(NULL)
-{
-}
-
-// @brief デストラクタ
-MislibTiming2::~MislibTiming2()
-{
-  delete [] mIpinArray;
-}
-
-// @brief 関連する開始ピン数の取得
-ymuint
-MislibTiming2::ipin_num() const
-{
-  return mIpinNum;
-}
-
-// @brief 関連する開始ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < ipin_num() )
-const CellPin*
-MislibTiming2::ipin(ymuint pos) const
-{
-  return mIpinArray[pos];
 }
 
 END_NAMESPACE_YM_CELL
