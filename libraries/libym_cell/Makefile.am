@@ -28,4 +28,5 @@ libym_cell_la_LIBADD = \
 
 libym_cell_la_LDFLAGS =
 
-libym_cell_la_SOURCES =
+libym_cell_la_SOURCES = \
+	dump.cc

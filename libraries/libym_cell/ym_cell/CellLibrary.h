@@ -150,6 +150,20 @@ public:
 
 };
 
+
+/// @relates CellLibrary
+/// @brief 内容をバイナリダンプする．
+void
+dump_library(ostream& s,
+	     const CellLibrary& library);
+
+/// @relates CellLibrary
+/// @brief 内容を出力する．
+void
+display_library(ostream& s,
+		const CellLibrary& library);
+
+
 END_NAMESPACE_YM_CELL
 
 #endif // YM_CELL_CELLLIBRARY_H

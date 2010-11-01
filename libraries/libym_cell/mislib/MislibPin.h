@@ -149,15 +149,6 @@ public:
   min_transition() const;
 
   /// @brief タイミング情報の取得
-  /// @param[in] ipos 入力ピン番号
-  /// @param[out] timing_list タイミング情報を納めるベクタ
-  /// @return 条件に合致するタイミング情報の数を返す．
-  virtual
-  ymuint
-  timing(ymuint ipos,
-	 vector<const CellTiming*>& timing_list) const;
-
-  /// @brief タイミング情報の取得
   /// @param[in] ipos 開始ピン番号
   /// @param[in] timing_sense タイミング情報の摘要条件
   /// @return 条件に合致するタイミング情報を返す．
