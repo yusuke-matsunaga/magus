@@ -18,9 +18,12 @@ BEGIN_NAMESPACE_YM_CELL
 
 BEGIN_NONAMESPACE
 
+/// @brief 32ビットの1語を書き出す．
+/// @param[in] s 出力先のストリーム
+/// @param[in] val 書き出す値
 void
 dump_word(ostream& s,
-	  ymuint val)
+	  ymuint32 val)
 {
   static char buf[4];
   buf[0] = val & 255U; val >>= 8;
@@ -31,6 +34,11 @@ dump_word(ostream& s,
   s.write(buf, 4);
 }
 
+/// @brief 文字列を書き出す．
+/// @param[in] s 出力先のストリーム
+/// @param[in] str 文字列
+/// 形式は最初に文字列長(終端の'\'は含まない)を書き出し，
+/// つづいて文字列(終端の'\'は含まない)を書き出す．
 void
 dump_str(ostream& s,
 	 const string& str)
@@ -40,6 +48,9 @@ dump_str(ostream& s,
   s.write(str.c_str(), l);
 }
 
+/// @brief 倍精度浮動小数点数を書き出す．
+/// @param[in] s 出力先のストリーム
+/// @param[in] val 書き出す値
 void
 dump_real(ostream& s,
 	  double val)
@@ -50,19 +61,37 @@ dump_real(ostream& s,
   s.write(buf, sizeof(double));
 }
 
+/// @brief タイミング情報を書き出す．
+/// @param[in] s 出力先のストリーム
+/// @param[in] timing タイミング情報
 void
 dump_timing(ostream& s,
-	    const CellTiming* timing)
+	    const Cell* cell,
+	    const CellPin* opin,
+	    ymuint rpin_id,
+	    tCellTimingSense sense)
 {
-  dump_real(s, timing->intrinsic_rise().value());
-  dump_real(s, timing->rise_resistance().value());
-  dump_real(s, timing->intrinsic_fall().value());
-  dump_real(s, timing->fall_resistance().value());
+  const CellTiming* timing = opin->timing(rpin_id, sense);
+  if ( timing ) {
+    if ( sense == kSensePosiUnate ) {
+      dump_word(s, 1);
+    }
+    else {
+      dump_word(s, 2);
+    }
+    dump_word(s, rpin_id);
+    dump_real(s, timing->intrinsic_rise().value());
+    dump_real(s, timing->rise_resistance().value());
+    dump_real(s, timing->intrinsic_fall().value());
+    dump_real(s, timing->fall_resistance().value());
+  }
 }
 
 END_NONAMESPACE
 
 /// @brief 内容をバイナリダンプする．
+/// @param[in] s 出力先のストリーム
+/// @param[in] library セルライブラリ
 void
 dump_library(ostream& s,
 	     const CellLibrary& library)
@@ -75,73 +104,55 @@ dump_library(ostream& s,
     dump_str(s, cell->name());
     dump_real(s, cell->area().value());
 
-    ymuint ni = cell->input_num();
-    dump_word(s, ni);
-    for (ymuint j = 0; j < ni; ++ j) {
-      const CellPin* pin = cell->input(j);
+    ymuint np = cell->pin_num();
+    dump_word(s, np);
+    for (ymuint j = 0; j < np; ++ j) {
+      const CellPin* pin = cell->pin(j);
       dump_str(s, pin->name());
-      dump_real(s, pin->capacitance().value());
-      dump_real(s, pin->rise_capacitance().value());
-      dump_real(s, pin->fall_capacitance().value());
-    }
+      switch ( pin->direction() ) {
+      case kDirInput:
+	// Input のつもり
+	dump_word(s, 1);
+	dump_real(s, pin->capacitance().value());
+	dump_real(s, pin->rise_capacitance().value());
+	dump_real(s, pin->fall_capacitance().value());
+	break;
 
-    ymuint no = cell->output_num();
-    dump_word(s, no);
-    for (ymuint j = 0; j < no; ++ j) {
-      const CellPin* pin = cell->output(j);
-      dump_str(s, pin->name());
-      dump_real(s, pin->max_fanout().value());
-      dump_real(s, pin->min_fanout().value());
-      dump_real(s, pin->max_capacitance().value());
-      dump_real(s, pin->min_capacitance().value());
-      dump_real(s, pin->max_transition().value());
-      dump_real(s, pin->min_transition().value());
-      for (ymuint k = 0; k < ni; ++ k) {
-	const CellTiming* p_timing = pin->timing(k, kSensePosiUnate);
-	if ( p_timing ) {
-	  dump_word(s, 1);
-	  dump_word(s, k);
-	  dump_timing(s, p_timing);
+      case kDirOutput:
+	// Output のつもり
+	dump_word(s, 2);
+	dump_real(s, pin->max_fanout().value());
+	dump_real(s, pin->min_fanout().value());
+	dump_real(s, pin->max_capacitance().value());
+	dump_real(s, pin->min_capacitance().value());
+	dump_real(s, pin->max_transition().value());
+	dump_real(s, pin->min_transition().value());
+	for (ymuint k = 0; k < np; ++ k) {
+	  dump_timing(s, cell, pin, k, kSensePosiUnate);
+	  dump_timing(s, cell, pin, k, kSenseNegaUnate);
 	}
-	const CellTiming* n_timing = pin->timing(k, kSenseNegaUnate);
-	if ( p_timing ) {
-	  dump_word(s, 2);
-	  dump_word(s, k);
-	  dump_timing(s, n_timing);
-	}
-      }
-      dump_word(s, 0); // timing 情報が終わった印
-    }
+	dump_word(s, 0); // timing 情報が終わった印
+	break;
 
-    ymuint nio = cell->inout_num();
-    dump_word(s, nio);
-    for (ymuint j = 0; j < nio; ++ j) {
-      const CellPin* pin = cell->inout(j);
-      dump_str(s, pin->name());
-      dump_real(s, pin->capacitance().value());
-      dump_real(s, pin->rise_capacitance().value());
-      dump_real(s, pin->fall_capacitance().value());
-      dump_real(s, pin->max_fanout().value());
-      dump_real(s, pin->min_fanout().value());
-      dump_real(s, pin->max_capacitance().value());
-      dump_real(s, pin->min_capacitance().value());
-      dump_real(s, pin->max_transition().value());
-      dump_real(s, pin->min_transition().value());
-      for (ymuint k = 0; k < ni; ++ k) {
-	const CellTiming* p_timing = pin->timing(k, kSensePosiUnate);
-	if ( p_timing ) {
-	  dump_word(s, 1);
-	  dump_word(s, k);
-	  dump_timing(s, p_timing);
+      case kDirInout:
+	// InOut のつもり
+	dump_word(s, 3);
+	dump_real(s, pin->capacitance().value());
+	dump_real(s, pin->rise_capacitance().value());
+	dump_real(s, pin->fall_capacitance().value());
+	dump_real(s, pin->max_fanout().value());
+	dump_real(s, pin->min_fanout().value());
+	dump_real(s, pin->max_capacitance().value());
+	dump_real(s, pin->min_capacitance().value());
+	dump_real(s, pin->max_transition().value());
+	dump_real(s, pin->min_transition().value());
+	for (ymuint k = 0; k < np; ++ k) {
+	  dump_timing(s, cell, pin, k, kSensePosiUnate);
+	  dump_timing(s, cell, pin, k, kSenseNegaUnate);
 	}
-	const CellTiming* n_timing = pin->timing(k, kSenseNegaUnate);
-	if ( p_timing ) {
-	  dump_word(s, 2);
-	  dump_word(s, k);
-	  dump_timing(s, n_timing);
-	}
+	dump_word(s, 0); // timing 情報が終わった印
+	break;
       }
-      dump_word(s, 0); // timing 情報が終わった印
     }
   }
 }
