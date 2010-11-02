@@ -47,16 +47,52 @@ public:
   CellArea
   area() const = 0;
 
+  /// @brief 入力ピン数の取得
+  virtual
+  ymuint
+  input_num() const = 0;
+
+  /// @brief 入力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @note pos は入力ピン内の番号
+  virtual
+  const CellPin*
+  input(ymuint pos) const = 0;
+
+  /// @brief 出力ピン数の取得
+  virtual
+  ymuint
+  output_num() const = 0;
+
+  /// @brief 出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
+  /// @note pos は出力ピン内の番号
+  virtual
+  const CellPin*
+  output(ymuint pos) const = 0;
+
+  /// @brief 入出力ピン数の取得
+  virtual
+  ymuint
+  inout_num() const = 0;
+
+  /// @brief 入出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
+  /// @note pos は入出力ピン内の番号
+  virtual
+  const CellPin*
+  inout(ymuint pos) const = 0;
+
   /// @brief ピン数の取得
   virtual
   ymuint
   pin_num() const = 0;
 
   /// @brief ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
+  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < pin_num()
   virtual
   const CellPin*
-  pin(ymuint pos) const = 0;
+  pin(ymuint pin_id) const = 0;
 
   /// @brief 名前からピンの取得
   /// @param[in] name ピン名

@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_MISLIB_MISLIBCELL_H
-#define LIBYM_CELL_MISLIB_MISLIBCELL_H
+#ifndef LIBYM_CELL_CI_CIELLL_H
+#define LIBYM_CELL_CI_CICELL_H
 
-/// @file libym_cell/mislib/MislibCell.h
-/// @brief MislibCell のヘッダファイル
+/// @file libym_cell/ci/CiCelll.h
+/// @brief CiCell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -11,35 +11,39 @@
 
 #include "ym_cell/Cell.h"
 #include "ym_utils/ShString.h"
-#include "MislibPin.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
+class CiPin;
+class CiInputPin;
+class CiOutputPin;
+class CiInoutPin;
+class CiBus;
+class CiBundle;
+
 //////////////////////////////////////////////////////////////////////
-/// @class MislibCell MislibCell.h "MislibCell.h"
-/// @brief mislib(genlib) 用の Cell の実装クラス
-/// @note 出力ピンのピン番号は 0 ，入力ピンは 1 〜 pin_num() - 1 とする．
+/// @class CiCell CiCell.h "ci/CiCell.h"
+/// @brief Cell の実装クラス
 //////////////////////////////////////////////////////////////////////
-class MislibCell :
+class CiCell :
   public Cell
 {
-  // このクラスのみが内容を設定できる．
-  friend class MislibLibrary;
+  friend class CiLibrary;
 
 private:
 
   /// @brief コンストラクタ
-  MislibCell();
+  CiCell();
 
   /// @brief デストラクタ
   virtual
-  ~MislibCell();
+  ~CiCell();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // Cell の仮想関数
+  // セル情報の取得
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 名前の取得
@@ -52,16 +56,49 @@ public:
   CellArea
   area() const;
 
+  /// @brief 入力ピン数の取得
+  virtual
+  ymuint
+  input_num() const;
+
+  /// @brief 入力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const CellPin*
+  input(ymuint pos) const;
+
+  /// @brief 出力ピン数の取得
+  virtual
+  ymuint
+  output_num() const;
+
+  /// @brief 出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
+  virtual
+  const CellPin*
+  output(ymuint pos) const;
+
+  /// @brief 入出力ピン数の取得
+  virtual
+  ymuint
+  inout_num() const;
+
+  /// @brief 入出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
+  virtual
+  const CellPin*
+  inout(ymuint pos) const;
+
   /// @brief ピン数の取得
   virtual
   ymuint
   pin_num() const;
 
   /// @brief ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
+  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < pin_num()
   virtual
   const CellPin*
-  pin(ymuint pos) const;
+  pin(ymuint pin_id) const;
 
   /// @brief 名前からピンの取得
   /// @param[in] name ピン名
@@ -119,16 +156,43 @@ private:
   CellArea mArea;
 
   // 入力ピン数
-  ymuint32 mInputPinNum;
+  ymuint32 mInputNum;
 
   // 入力ピンの配列
-  MislibInputPin* mInputPinArray;
+  CiInputPin* mInputArray;
 
-  // 出力ピン
-  MislibOutputPin mOutputPin;
+  // 出力ピン数
+  ymuint32 mOutputNum;
+
+  // 出力ピンの配列
+  CiOutputPin* mOutputArray;
+
+  // 入出力ピン数
+  ymuint32 mInoutNum;
+
+  // 入出力ピンの配列
+  CiInoutPin* mInoutArray;
+
+  // 総ピン数
+  ymuint32 mPinNum;
+
+  // ピンの配列
+  CiPin** mPinArray;
+
+  // バス数
+  ymuint32 mBusNum;
+
+  // バスピンの配列
+  CiBus* mBusArray;
+
+  // バンドル数
+  ymuint32 mBundleNum;
+
+  // バンドルピンの配列
+  CiBundle* mBundleArray;
 
 };
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_MISLIB_MISLIBCELL_H
+#endif // LIBYM_CELL_CI_CICELL_H

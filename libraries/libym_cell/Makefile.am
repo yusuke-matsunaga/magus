@@ -7,6 +7,7 @@
 
 SUBDIRS = \
 	ym_cell \
+	ci \
 	mislib \
 	dotlib \
 	. \
@@ -21,6 +22,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_cell.la
 
 libym_cell_la_LIBADD = \
+	ci/libym_cell_ci.la \
 	dotlib/libym_cell_dotlib.la \
 	mislib/libym_cell_mislib.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \

@@ -74,78 +74,112 @@ dump_library(ostream& s,
     const Cell* cell = library.cell(i);
     dump_str(s, cell->name());
     dump_real(s, cell->area().value());
-    ymuint np = cell->pin_num();
-    dump_word(s, np);
-    for (ymuint j = 0; j < np; ++ j) {
-      const CellPin* pin = cell->pin(j);
-      switch ( pin->direction() ) {
-      case kDirInput:
-	dump_word(s, 1);
-	dump_str(s, pin->name());
-	dump_real(s, pin->capacitance().value());
-	dump_real(s, pin->rise_capacitance().value());
-	dump_real(s, pin->fall_capacitance().value());
-	break;
 
-      case kDirOutput:
-	dump_word(s, 2);
-	dump_str(s, pin->name());
-	dump_real(s, pin->max_fanout().value());
-	dump_real(s, pin->min_fanout().value());
-	dump_real(s, pin->max_capacitance().value());
-	dump_real(s, pin->min_capacitance().value());
-	dump_real(s, pin->max_transition().value());
-	dump_real(s, pin->min_transition().value());
-	for (ymuint k = 0; k < np; ++ k) {
-	  const CellTiming* p_timing = pin->timing(k, kSensePosiUnate);
-	  if ( p_timing ) {
-	    dump_word(s, 1);
-	    dump_word(s, k);
-	    dump_timing(s, p_timing);
-	  }
-	  const CellTiming* n_timing = pin->timing(k, kSenseNegaUnate);
-	  if ( p_timing ) {
-	    dump_word(s, 2);
-	    dump_word(s, k);
-	    dump_timing(s, n_timing);
-	  }
-	}
-	dump_word(s, 0); // timing 情報が終わった印
-	break;
+    ymuint ni = cell->input_num();
+    dump_word(s, ni);
+    for (ymuint j = 0; j < ni; ++ j) {
+      const CellPin* pin = cell->input(j);
+      dump_str(s, pin->name());
+      dump_real(s, pin->capacitance().value());
+      dump_real(s, pin->rise_capacitance().value());
+      dump_real(s, pin->fall_capacitance().value());
+    }
 
-      case kDirInout:
-	dump_word(s, 3);
-	dump_str(s, pin->name());
-	dump_real(s, pin->capacitance().value());
-	dump_real(s, pin->rise_capacitance().value());
-	dump_real(s, pin->fall_capacitance().value());
-	dump_real(s, pin->max_fanout().value());
-	dump_real(s, pin->min_fanout().value());
-	dump_real(s, pin->max_capacitance().value());
-	dump_real(s, pin->min_capacitance().value());
-	dump_real(s, pin->max_transition().value());
-	dump_real(s, pin->min_transition().value());
-	for (ymuint k = 0; k < np; ++ k) {
-	  const CellTiming* p_timing = pin->timing(k, kSensePosiUnate);
-	  if ( p_timing ) {
-	    dump_word(s, 1);
-	    dump_word(s, k);
-	    dump_timing(s, p_timing);
-	  }
-	  const CellTiming* n_timing = pin->timing(k, kSenseNegaUnate);
-	  if ( p_timing ) {
-	    dump_word(s, 2);
-	    dump_word(s, k);
-	    dump_timing(s, n_timing);
-	  }
+    ymuint no = cell->output_num();
+    dump_word(s, no);
+    for (ymuint j = 0; j < no; ++ j) {
+      const CellPin* pin = cell->output(j);
+      dump_str(s, pin->name());
+      dump_real(s, pin->max_fanout().value());
+      dump_real(s, pin->min_fanout().value());
+      dump_real(s, pin->max_capacitance().value());
+      dump_real(s, pin->min_capacitance().value());
+      dump_real(s, pin->max_transition().value());
+      dump_real(s, pin->min_transition().value());
+      for (ymuint k = 0; k < ni; ++ k) {
+	const CellTiming* p_timing = pin->timing(k, kSensePosiUnate);
+	if ( p_timing ) {
+	  dump_word(s, 1);
+	  dump_word(s, k);
+	  dump_timing(s, p_timing);
 	}
-	dump_word(s, 0); // timing 情報が終わった印
-	break;
+	const CellTiming* n_timing = pin->timing(k, kSenseNegaUnate);
+	if ( p_timing ) {
+	  dump_word(s, 2);
+	  dump_word(s, k);
+	  dump_timing(s, n_timing);
+	}
       }
+      dump_word(s, 0); // timing 情報が終わった印
+    }
+
+    ymuint nio = cell->inout_num();
+    dump_word(s, nio);
+    for (ymuint j = 0; j < nio; ++ j) {
+      const CellPin* pin = cell->inout(j);
+      dump_str(s, pin->name());
+      dump_real(s, pin->capacitance().value());
+      dump_real(s, pin->rise_capacitance().value());
+      dump_real(s, pin->fall_capacitance().value());
+      dump_real(s, pin->max_fanout().value());
+      dump_real(s, pin->min_fanout().value());
+      dump_real(s, pin->max_capacitance().value());
+      dump_real(s, pin->min_capacitance().value());
+      dump_real(s, pin->max_transition().value());
+      dump_real(s, pin->min_transition().value());
+      for (ymuint k = 0; k < ni; ++ k) {
+	const CellTiming* p_timing = pin->timing(k, kSensePosiUnate);
+	if ( p_timing ) {
+	  dump_word(s, 1);
+	  dump_word(s, k);
+	  dump_timing(s, p_timing);
+	}
+	const CellTiming* n_timing = pin->timing(k, kSenseNegaUnate);
+	if ( p_timing ) {
+	  dump_word(s, 2);
+	  dump_word(s, k);
+	  dump_timing(s, n_timing);
+	}
+      }
+      dump_word(s, 0); // timing 情報が終わった印
     }
   }
 }
 
+
+BEGIN_NONAMESPACE
+
+// タイミング情報を出力する．
+void
+display_timing(ostream& s,
+	       const Cell* cell,
+	       const CellPin* opin,
+	       ymuint rpin_id,
+	       tCellTimingSense sense)
+{
+  const CellTiming* timing = opin->timing(rpin_id, sense);
+  if ( timing ) {
+    s << "    Timing:" << endl
+      << "      Related Pin     = " << cell->pin(rpin_id)->name() << endl
+      << "      Sense           = ";
+    if ( sense == kSensePosiUnate ) {
+      s << "positive unate";
+    }
+    else if ( sense == kSenseNegaUnate ) {
+      s << "negative unate";
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
+    s << endl
+      << "      Rise Intrinsic  = " << timing->intrinsic_rise() << endl
+      << "      Rise Resistance = " << timing->rise_resistance() << endl
+      << "      Fall Intrinsic  = " << timing->intrinsic_fall() << endl
+      << "      Fall Resistance = " << timing->fall_resistance() << endl;
+  }
+}
+
+END_NONAMESPACE
 
 void
 display_library(ostream& s,
@@ -156,81 +190,56 @@ display_library(ostream& s,
     const Cell* cell = library.cell(i);
     s << "Cell (" << cell->name() << ")" << endl;
     s << "  area = " << cell->area() << endl;
+
     ymuint np = cell->pin_num();
     for (ymuint j = 0; j < np; ++ j) {
       const CellPin* pin = cell->pin(j);
+      s << "  Pin#" << pin->id() << ":" << endl
+	<< "    Name             = " << pin->name() << endl;
+
       switch ( pin->direction() ) {
       case kDirInput:
-	s << "  Input Pin (" << pin->name() << ")" << endl;
-	s << "    Capacitance = " << pin->capacitance() << endl
-	     << "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	     << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
+	s << "    Direction        = INPUT" << endl
+	  << "    Capacitance      = " << pin->capacitance() << endl
+	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
+	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
 	break;
 
       case kDirOutput:
-	s << "  Output Pin(" << pin->name() << ")" << endl;
-	s << "    Function = " << pin->function() << endl
-	     << "    Max Fanout = " << pin->max_fanout() << endl
-	     << "    Min Fanout = " << pin->min_fanout() << endl
-	     << "    Max Capacitance = " << pin->max_capacitance() << endl
-	     << "    Min Capacitance = " << pin->min_capacitance() << endl
-	     << "    Max Transition = " << pin->max_transition() << endl
-	     << "    Min Transition = " << pin->min_transition() << endl;
+	s << "    Direction        = OUTPUT" << endl
+	  << "    Function         = " << pin->function() << endl
+	  << "    Max Fanout       = " << pin->max_fanout() << endl
+	  << "    Min Fanout       = " << pin->min_fanout() << endl
+	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
+	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
+	  << "    Max Transition   = " << pin->max_transition() << endl
+	  << "    Min Transition   = " << pin->min_transition() << endl;
 	for (ymuint k = 0; k < np; ++ k) {
-	  const CellTiming* timing = pin->timing(k, kSensePosiUnate);
-	  if ( timing ) {
-	    s << "    Timing ( PosiUnate )" << endl
-		 << "      Related Pin = " << cell->pin(k)->name() << endl
-		 << "      Rise Intrinsic = " << timing->intrinsic_rise() << endl
-		 << "      Rise Resistance = " << timing->rise_resistance() << endl
-		 << "      Fall Intrinsic = " << timing->intrinsic_fall() << endl
-		 << "      Fall Resistance = " << timing->fall_resistance() << endl;
-	  }
-	  timing = pin->timing(k, kSenseNegaUnate);
-	  if ( timing ) {
-	    s << "    Timing ( NegaUnate )" << endl
-		 << "      Related Pin = " << cell->pin(k)->name() << endl
-		 << "      Rise Intrinsic = " << timing->intrinsic_rise() << endl
-		 << "      Rise Resistance = " << timing->rise_resistance() << endl
-		 << "      Fall Intrinsic = " << timing->intrinsic_fall() << endl
-		 << "      Fall Resistance = " << timing->fall_resistance() << endl;
-	  }
+	  display_timing(s, cell, pin, k, kSensePosiUnate);
+	  display_timing(s, cell, pin, k, kSenseNegaUnate);
 	}
 	break;
 
       case kDirInout:
-	s << "  Inout Pin (" << pin->name() << ")" << endl;
-	s << "    Capacitance = " << pin->capacitance() << endl
+	s << "    Direction        = INOUT" << endl
+	  << "    Function         = " << pin->function() << endl
+	  << "    Capacitance      = " << pin->capacitance() << endl
 	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
-	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
-	s << "    Function = " << pin->function() << endl
-	     << "    Max Fanout = " << pin->max_fanout() << endl
-	     << "    Min Fanout = " << pin->min_fanout() << endl
-	     << "    Max Capacitance = " << pin->max_capacitance() << endl
-	     << "    Min Capacitance = " << pin->min_capacitance() << endl
-	     << "    Max Transition = " << pin->max_transition() << endl
-	     << "    Min Transition = " << pin->min_transition() << endl;
+	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl
+	  << "    Max Fanout       = " << pin->max_fanout() << endl
+	  << "    Min Fanout       = " << pin->min_fanout() << endl
+	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
+	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
+	  << "    Max Transition   = " << pin->max_transition() << endl
+	  << "    Min Transition   = " << pin->min_transition() << endl;
 	for (ymuint k = 0; k < np; ++ k) {
-	  const CellTiming* timing = pin->timing(k, kSensePosiUnate);
-	  if ( timing ) {
-	    s << "    Timing ( PosiUnate )" << endl
-		 << "      Related Pin = " << cell->pin(k)->name() << endl
-		 << "      Rise Intrinsic = " << timing->intrinsic_rise() << endl
-		 << "      Rise Resistance = " << timing->rise_resistance() << endl
-		 << "      Fall Intrinsic = " << timing->intrinsic_fall() << endl
-		 << "      Fall Resistance = " << timing->fall_resistance() << endl;
-	  }
-	  timing = pin->timing(k, kSenseNegaUnate);
-	  if ( timing ) {
-	    s << "    Timing ( NegaUnate )" << endl
-		 << "      Related Pin = " << cell->pin(k)->name() << endl
-		 << "      Rise Intrinsic = " << timing->intrinsic_rise() << endl
-		 << "      Rise Resistance = " << timing->rise_resistance() << endl
-		 << "      Fall Intrinsic = " << timing->intrinsic_fall() << endl
-		 << "      Fall Resistance = " << timing->fall_resistance() << endl;
-	  }
+	  display_timing(s, cell, pin, k, kSensePosiUnate);
+	  display_timing(s, cell, pin, k, kSenseNegaUnate);
 	}
 	break;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__);
       }
     }
     s << endl;

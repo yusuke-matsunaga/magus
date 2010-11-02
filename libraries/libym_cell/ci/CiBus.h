@@ -1,47 +1,42 @@
-#ifndef YM_CELL_CELLBUS_H
-#define YM_CELL_CELLBUS_H
+#ifndef LIBYM_CELL_CI_CIBUS_H
+#define LIBYM_CELL_CI_CIBUS_H
 
-/// @file　ym_cell/CellBus.h
-/// @brief CellBus のヘッダファイル
+/// @file libym_cell/ci/CiBus.h
+/// @brief CiBus のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: CellBus.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_cell/cell_nsdef.h"
-#include "ym_cell/cell_type.h"
+
+#include "ym_cell/CellBus.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellBusType CellBus.h <ym_cell/CellBus.h>
+/// @class CiBusType CiBus.h "ci/CiBus.h"
+/// @brief CellBusType の実装クラス
 //////////////////////////////////////////////////////////////////////
-class CellBusType
+class CiBusType :
+  public CellBusType
 {
-public:
+  friend class CiLibrary;
 
-  /// @brief base_type を表す型
-  enum tBaseType {
-    kArrayType
-  };
-
-  /// @brief data_type を表す型
-  enum tDataType {
-    kBitType
-  };
-
-
-public:
+private:
 
   /// @brief コンストラクタ
-  CellBusType() { }
+  /// @param[in] name 名前
+  /// @param[in] bit_from 開始位置
+  /// @param[in] bit_to 終了位置
+  CiBusType(ShString name,
+	      ymint bit_from,
+	      ymint bit_to);
 
   /// @brief デストラクタ
   virtual
-  ~CellBusType() { }
+  ~CiBusType();
 
 
 public:
@@ -52,56 +47,79 @@ public:
   /// @brief 名前の取得
   virtual
   string
-  name() const = 0;
+  name() const;
 
   /// @brief base_type の取得
   virtual
   tBaseType
-  base_type() const = 0;
+  base_type() const;
 
   /// @brief data_type の取得
   virtual
   tDataType
-  data_type() const = 0;
+  data_type() const;
 
   /// @brief ビット幅の取得
   virtual
   ymuint
-  bit_width() const = 0;
+  bit_width() const;
 
   /// @brief 開始ビットの取得
   virtual
   ymint
-  bit_from() const = 0;
+  bit_from() const;
 
   /// @brief 終了ビットの取得
   virtual
   ymint
-  bit_to() const = 0;
+  bit_to() const;
 
   /// @brief 向きの取得
   /// @note true の時，降順を表す．
   virtual
   bool
-  downto() const = 0;
+  downto() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  ShString mName;
+
+  // ビット幅
+  ymuint32 mBitWidth;
+
+  // 開始ビット
+  ymint32 mBitFrom;
+
+  // 終了ビット
+  ymint32 mBitTo;
+
+  // 向き
+  bool mDownTo;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellBus CellBus.h <ym_cell/CellBus.h>
-/// @brief バスを表すクラス
+/// @class CiBus CiBus.h "ci/CiBus.h"
+/// @brief CellBus の実装クラス
 //////////////////////////////////////////////////////////////////////
-class CellBus
+class CiBus :
+  public CellBus
 {
-public:
+  friend class CiLibrary;
+
+private:
 
   /// @brief コンストラクタ
-  CellBus() { }
+  CiBus();
 
   /// @brief デストラクタ
-  virtual
-  ~CellBus() { }
+  ~CiBus();
 
 
 public:
@@ -112,26 +130,44 @@ public:
   /// @brief 名前の取得
   virtual
   string
-  name() const = 0;
+  name() const;
 
   /// @brief バスの型の取得
   virtual
   const CellBusType*
-  bus_type() const = 0;
+  bus_type() const;
 
   /// @brief ピン数の取得
   virtual
   ymuint
-  pin_num() const = 0;
+  pin_num() const;
 
   /// @brief ピンの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
   virtual
   const CellPin*
-  pin(ymuint pos) const = 0;
+  pin(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  ShString mName;
+
+  // バスの型
+  const CellBusType* mBusType;
+
+  // ピン数
+  ymuint32 mPinNum;
+
+  // ピンの配列
+  CellPin** mPinList;
 
 };
 
 END_NAMESPACE_YM_CELL
 
-#endif // YM_CELL_CELLBUS_H
+#endif // LIBYM_CELL_CI_CIBUS_H

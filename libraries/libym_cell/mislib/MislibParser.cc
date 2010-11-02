@@ -19,7 +19,7 @@
 #include "MislibPtImpl1.h"
 #include "MislibPtImpl2.h"
 
-#include "MislibLibrary.h"
+#include "../ci/CiLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -242,18 +242,17 @@ MislibParser::read(const string& filename)
     return NULL;
   }
 
-  ymuint cell_num = gate_map.size();
-
   // ライブラリの生成
-  MislibLibrary* library = new MislibLibrary;
+  CiLibrary* library = new CiLibrary(filename);
 
   // セル数の設定
+  ymuint cell_num = gate_map.size();
   library->set_cell_num(cell_num);
 
   // セルの内容の設定
-  ymuint pos = 0;
+  ymuint cell_id = 0;
   for (const MislibPt* gate = mGateList->top(); gate;
-       gate = gate->next(), ++ pos) {
+       gate = gate->next(), ++ cell_id) {
     ShString name = gate->name()->str();
     CellArea area(gate->area()->num());
     ShString opin_name = gate->opin_name()->str();
@@ -315,7 +314,9 @@ MislibParser::read(const string& filename)
     }
     LogExpr function = pt_to_expr(opin_expr, ipin_name_map);
     ymuint ni = ipin_name_list.size();
-    library->set_cell(pos, name, area, opin_name, function, ni);
+    library->set_cell(cell_id, name, area, ni, 1, 0, 0, 0);
+    library->set_cell_output(cell_id, ni, 0, opin_name);
+    library->set_opin_function(cell_id, ni, function);
 #if 0
     TvFunc tv_function = expr_to_tvfunc(function, ni);
 #endif
@@ -324,7 +325,7 @@ MislibParser::read(const string& filename)
       ShString name = ipin_name_list[i];
       const MislibPt* pin = ipin_array[i];
       CellCapacitance load(pin->input_load()->num());
-      library->set_cell_ipin(pos, i, name, load);
+      library->set_cell_input(cell_id, i, i, name, load, load, load);
       // タイミング情報の設定
 #if 0
       int unate = tv_function.check_unateness(i);
@@ -337,11 +338,16 @@ MislibParser::read(const string& filename)
       default: assert_not_reached(__FILE__, __LINE__); break;
       }
 #endif
+      vector<ymuint> ipin_list(1, i);
       CellTime r_i(pin->rise_block_delay()->num());
       CellResistance r_r(pin->rise_fanout_delay()->num());
       CellTime f_i(pin->fall_block_delay()->num());
       CellResistance f_r(pin->fall_fanout_delay()->num());
-      library->set_cell_timing(pos, i, sense, r_i, r_r, f_i, f_r);
+      library->set_opin_timing(cell_id, ni, ipin_list,
+			       kTimingCombinational, sense,
+			       r_i, f_i,
+			       CellTime(0.0), CellTime(0.0),
+			       r_r, f_r);
     }
   }
 

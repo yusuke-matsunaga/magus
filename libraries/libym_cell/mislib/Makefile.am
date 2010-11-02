@@ -29,20 +29,12 @@ libym_cell_mislib_la_LDFLAGS =
 libym_cell_mislib_la_SOURCES = \
 	mislib_grammer.yy \
 	CellMislibReader.cc \
-	MislibCell.h \
-	MislibCell.cc \
-	MislibLibrary.h \
-	MislibLibrary.cc \
 	MislibLex.h \
 	MislibLex.cc \
 	MislibParser.h \
 	MislibParser.cc \
-	MislibPin.h \
-	MislibPin.cc \
 	MislibPt.h \
 	MislibPtImpl1.h \
 	MislibPtImpl1.cc \
 	MislibPtImpl2.h \
-	MislibPtImpl2.cc \
-	MislibTiming.h \
-	MislibTiming.cc
+	MislibPtImpl2.cc
