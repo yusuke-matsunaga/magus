@@ -26,7 +26,10 @@ class CiTiming :
 protected:
 
   /// @brief コンストラクタ
-  CiTiming(tCellTimingType timing_type);
+  /// @param[in] id ID番号
+  /// @param[in] type タイミング条件の型
+  CiTiming(ymuint id,
+	   tCellTimingType type);
 
   /// @brief デストラクタ
   ~CiTiming();
@@ -36,6 +39,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 共通の属性
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ID番号を返す．
+  virtual
+  ymuint
+  id() const;
 
   /// @brief 型の取得
   virtual
@@ -152,6 +160,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ID
+  ymuint32 mId;
+
   // 型
   tCellTimingType mType;
 
@@ -168,18 +179,21 @@ class CiTimingGP :
 protected:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
-  CiTimingGP(tCellTimingType timing_type,
+  CiTimingGP(ymuint id,
+	     tCellTimingType timing_type,
 	     CellTime intrinsic_rise,
 	     CellTime intrinsic_fall,
 	     CellTime slope_rise,
 	     CellTime slope_fall);
 
   /// @brief デストラクタ
+  virtual
   ~CiTimingGP();
 
 
@@ -241,6 +255,7 @@ class CiTimingGeneric :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
@@ -248,7 +263,8 @@ private:
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   /// @param[in] rise_resistance 立ち上がり遷移遅延パラメータ
   /// @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
-  CiTimingGeneric(tCellTimingType timing_type,
+  CiTimingGeneric(ymuint id,
+		  tCellTimingType timing_type,
 		  CellTime intrinsic_rise,
 		  CellTime intrinsic_fall,
 		  CellTime slope_rise,
@@ -257,6 +273,7 @@ private:
 		  CellResistance fall_resistance);
 
   /// @brief デストラクタ
+  virtual
   ~CiTimingGeneric();
 
 
@@ -302,12 +319,14 @@ class CiTimingPiecewise :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
-  CiTimingPiecewise(tCellTimingType timing_type,
+  CiTimingPiecewise(ymuint id,
+		    tCellTimingType timing_type,
 		    CellTime intrinsic_rise,
 		    CellTime intrinsic_fall,
 		    CellTime slope_rise,
@@ -316,6 +335,7 @@ private:
 		    CellResistance fall_pin_resistance);
 
   /// @brief デストラクタ
+  virtual
   ~CiTimingPiecewise();
 
 
@@ -371,15 +391,18 @@ class CiTimingNonlinear1 :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
   /// @param[in] cell_rise 立ち上がりセル遅延テーブル
   /// @param[in] cell_fall 立ち下がりセル遅延テーブル
-  CiTimingNonlinear1(tCellTimingType timing_type,
+  CiTimingNonlinear1(ymuint id,
+		     tCellTimingType timing_type,
 		     CellLut* cell_rise,
 		     CellLut* cell_fall);
 
 
   /// @brief デストラクタ
+  virtual
   ~CiTimingNonlinear1();
 
 
@@ -425,12 +448,14 @@ class CiTimingNonlinear2 :
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
   /// @param[in] rise_transition 立ち上がり遷移遅延テーブル
   /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
   /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
-  CiTimingNonlinear2(tCellTimingType timing_type,
+  CiTimingNonlinear2(ymuint id,
+		     tCellTimingType timing_type,
 		     CellLut* rise_transition,
 		     CellLut* fall_transition,
 		     CellLut* rise_propagation,
@@ -438,6 +463,7 @@ private:
 
 
   /// @brief デストラクタ
+  virtual
   ~CiTimingNonlinear2();
 
 

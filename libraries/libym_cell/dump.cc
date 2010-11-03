@@ -66,25 +66,14 @@ dump_real(ostream& s,
 /// @param[in] timing タイミング情報
 void
 dump_timing(ostream& s,
-	    const Cell* cell,
-	    const CellPin* opin,
-	    ymuint rpin_id,
-	    tCellTimingSense sense)
+	    const CellTiming* timing)
 {
-  const CellTiming* timing = opin->timing(rpin_id, sense);
-  if ( timing ) {
-    if ( sense == kSensePosiUnate ) {
-      dump_word(s, 1);
-    }
-    else {
-      dump_word(s, 2);
-    }
-    dump_word(s, rpin_id);
-    dump_real(s, timing->intrinsic_rise().value());
-    dump_real(s, timing->rise_resistance().value());
-    dump_real(s, timing->intrinsic_fall().value());
-    dump_real(s, timing->fall_resistance().value());
-  }
+  dump_real(s, timing->intrinsic_rise().value());
+  dump_real(s, timing->intrinsic_fall().value());
+  dump_real(s, timing->slope_rise().value());
+  dump_real(s, timing->slope_fall().value());
+  dump_real(s, timing->rise_resistance().value());
+  dump_real(s, timing->fall_resistance().value());
 }
 
 END_NONAMESPACE
@@ -96,6 +85,9 @@ void
 dump_library(ostream& s,
 	     const CellLibrary& library)
 {
+  // 名前
+  dump_str(s, library.name());
+
   // セル数
   ymuint nc = library.cell_num();
   dump_word(s, nc);
@@ -106,6 +98,49 @@ dump_library(ostream& s,
 
     ymuint np = cell->pin_num();
     dump_word(s, np);
+
+    ymuint nb = cell->bus_num();
+    dump_word(s, nb);
+
+    ymuint nc = cell->bundle_num();
+    dump_word(s, nc);
+
+    // タイミング情報のID -> 通し番号のマップ
+    hash_map<ymuint, ymuint> timing_map;
+    // タイミング情報のリスト
+    vector<const CellTiming*> timing_list;
+    for (ymuint j = 0; j < np; ++ j) {
+      const CellPin* pin = cell->pin(j);
+      if ( pin->direction() != kDirOutput &&
+	   pin->direction() != kDirInout ) {
+	continue;
+      }
+      for (ymuint k = 0; k < np; ++ k) {
+	const CellTiming* timing_p = pin->timing(k, kSensePosiUnate);
+	if ( timing_p ) {
+	  if ( timing_map.count(timing_p->id()) == 0 ) {
+	    ymuint pos = timing_list.size();
+	    timing_map.insert(make_pair(timing_p->id(), pos));
+	    timing_list.push_back(timing_p);
+	  }
+	}
+	const CellTiming* timing_n = pin->timing(k, kSenseNegaUnate);
+	if ( timing_n ) {
+	  if ( timing_map.count(timing_n->id()) == 0 ) {
+	    ymuint pos = timing_list.size();
+	    timing_map.insert(make_pair(timing_n->id(), pos));
+	    timing_list.push_back(timing_n);
+	  }
+	}
+      }
+    }
+    ymuint nt = timing_list.size();
+    dump_word(s, nt);
+    for (ymuint j = 0; j < nt; ++ j) {
+      const CellTiming* timing = timing_list[j];
+      dump_timing(s, timing);
+    }
+
     for (ymuint j = 0; j < np; ++ j) {
       const CellPin* pin = cell->pin(j);
       dump_str(s, pin->name());
@@ -128,8 +163,22 @@ dump_library(ostream& s,
 	dump_real(s, pin->max_transition().value());
 	dump_real(s, pin->min_transition().value());
 	for (ymuint k = 0; k < np; ++ k) {
-	  dump_timing(s, cell, pin, k, kSensePosiUnate);
-	  dump_timing(s, cell, pin, k, kSenseNegaUnate);
+	  const CellTiming* timing_p = pin->timing(k, kSensePosiUnate);
+	  if ( timing_p ) {
+	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_p->id());
+	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
+	    dump_word(s, 1);
+	    dump_word(s, k);
+	    dump_word(s, p->second);
+	  }
+	  const CellTiming* timing_n = pin->timing(k, kSenseNegaUnate);
+	  if ( timing_n ) {
+	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
+	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
+	    dump_word(s, 2);
+	    dump_word(s, k);
+	    dump_word(s, p->second);
+	  }
 	}
 	dump_word(s, 0); // timing 情報が終わった印
 	break;
@@ -147,8 +196,22 @@ dump_library(ostream& s,
 	dump_real(s, pin->max_transition().value());
 	dump_real(s, pin->min_transition().value());
 	for (ymuint k = 0; k < np; ++ k) {
-	  dump_timing(s, cell, pin, k, kSensePosiUnate);
-	  dump_timing(s, cell, pin, k, kSenseNegaUnate);
+	  const CellTiming* timing_p = pin->timing(k, kSensePosiUnate);
+	  if ( timing_p ) {
+	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_p->id());
+	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
+	    dump_word(s, 1);
+	    dump_word(s, k);
+	    dump_word(s, p->second);
+	  }
+	  const CellTiming* timing_n = pin->timing(k, kSenseNegaUnate);
+	  if ( timing_n ) {
+	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
+	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
+	    dump_word(s, 2);
+	    dump_word(s, k);
+	    dump_word(s, p->second);
+	  }
 	}
 	dump_word(s, 0); // timing 情報が終わった印
 	break;

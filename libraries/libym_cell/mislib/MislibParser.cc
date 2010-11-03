@@ -314,40 +314,49 @@ MislibParser::read(const string& filename)
     }
     LogExpr function = pt_to_expr(opin_expr, ipin_name_map);
     ymuint ni = ipin_name_list.size();
-    library->set_cell(cell_id, name, area, ni, 1, 0, 0, 0);
-    library->set_cell_output(cell_id, ni, 0, opin_name);
-    library->set_opin_function(cell_id, ni, function);
-#if 0
-    TvFunc tv_function = expr_to_tvfunc(function, ni);
-#endif
+    CiCell* cell = library->new_cell(cell_id, name, area, ni +  1, 0, 0);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];
       const MislibPt* pin = ipin_array[i];
       CellCapacitance load(pin->input_load()->num());
-      library->set_cell_input(cell_id, i, i, name, load, load, load);
+      library->new_cell_input(cell, i, name, load, load, load);
+    }
+    // 出力ピンの設定
+    CiOutputPin* opin = library->new_cell_output(cell, ni, opin_name,
+						 CellCapacitance::infty(),
+						 CellCapacitance(0.0),
+						 CellCapacitance::infty(),
+						 CellCapacitance(0.0),
+						 CellTime::infty(),
+						 CellTime(0.0));
+    library->set_opin_function(opin, function);
+#if 0
+    TvFunc tv_function = expr_to_tvfunc(function, ni);
+#endif
+    for (ymuint i = 0; i < ni; ++ i) {
       // タイミング情報の設定
+      const MislibPt* pt_pin = ipin_array[i];
 #if 0
       int unate = tv_function.check_unateness(i);
 #else
       tCellTimingSense sense;
-      switch ( pin->phase()->type() ) {
+      switch ( pt_pin->phase()->type() ) {
       case MislibPt::kNoninv:  sense = kSensePosiUnate; break;
       case MislibPt::kInv:     sense = kSenseNegaUnate; break;
       case MislibPt::kUnknown: sense = kSenseNonUnate; break;
       default: assert_not_reached(__FILE__, __LINE__); break;
       }
 #endif
-      vector<ymuint> ipin_list(1, i);
-      CellTime r_i(pin->rise_block_delay()->num());
-      CellResistance r_r(pin->rise_fanout_delay()->num());
-      CellTime f_i(pin->fall_block_delay()->num());
-      CellResistance f_r(pin->fall_fanout_delay()->num());
-      library->set_opin_timing(cell_id, ni, ipin_list,
-			       kTimingCombinational, sense,
-			       r_i, f_i,
-			       CellTime(0.0), CellTime(0.0),
-			       r_r, f_r);
+      CellTime r_i(pt_pin->rise_block_delay()->num());
+      CellResistance r_r(pt_pin->rise_fanout_delay()->num());
+      CellTime f_i(pt_pin->fall_block_delay()->num());
+      CellResistance f_r(pt_pin->fall_fanout_delay()->num());
+      CellTiming* timing = library->new_timing(i, kTimingCombinational,
+					       r_i, f_i,
+					       CellTime(0.0), CellTime(0.0),
+					       r_r, f_r);
+      library->set_opin_timing(opin, i, sense, timing);
     }
   }
 

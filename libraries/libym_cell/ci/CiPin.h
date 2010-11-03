@@ -30,7 +30,8 @@ class CiPin :
 protected:
 
   /// @brief コンストラクタ
-  CiPin();
+  /// @param[in] name ピン名
+  CiPin(const ShString& name);
 
   /// @brief デストラクタ
   virtual
@@ -173,7 +174,14 @@ class CiInputPin :
 private:
 
   /// @brief コンストラクタ
-  CiInputPin();
+  /// @param[in] name ピン名
+  /// @param[in] capacitance 負荷容量
+  /// @param[in] rise_capacitance 立ち上がり時の負荷容量
+  /// @param[in] fall_capacitance 立ち下がり時の負荷容量
+  CiInputPin(const ShString& name,
+	     CellCapacitance capacitance,
+	     CellCapacitance rise_capacitance,
+	     CellCapacitance fall_capacitance);
 
   /// @brief デストラクタ
   virtual
@@ -241,7 +249,20 @@ class CiOutputPin :
 protected:
 
   /// @brief コンストラクタ
-  CiOutputPin();
+  /// @param[in] name ピン名
+  /// @param[in] max_fanout 最大ファンアウト容量
+  /// @param[in] min_fanout 最小ファンアウト容量
+  /// @param[in] max_capacitance 最大負荷容量
+  /// @param[in] min_capacitance 最小負荷容量
+  /// @param[in] max_transition 最大遷移時間
+  /// @param[in] min_transition 最小遷移時間
+  CiOutputPin(const ShString& name,
+	      CellCapacitance max_fanout,
+	      CellCapacitance min_fanout,
+	      CellCapacitance max_capacitance,
+	      CellCapacitance min_capacitance,
+	      CellTime max_transition,
+	      CellTime min_transition);
 
   /// @brief デストラクタ
   virtual
@@ -349,17 +370,17 @@ private:
   // 最小ファンアウト容量
   CellCapacitance mMinFanout;
 
-  // 最大遷移時間
-  CellTime mMaxTransition;
-
-  // 最小遷移時間
-  CellTime mMinTransition;
-
   // 最大負荷容量
   CellCapacitance mMaxCapacitance;
 
   // 最小負荷容量
   CellCapacitance mMinCapacitance;
+
+  // 最大遷移時間
+  CellTime mMaxTransition;
+
+  // 最小遷移時間
+  CellTime mMinTransition;
 
   // タイミング情報を格納する配列
   // サイズは総ピン数 x 2
@@ -381,7 +402,26 @@ class CiInoutPin :
 private:
 
   /// @brief コンストラクタ
-  CiInoutPin();
+  /// @param[in] name ピン名
+  /// @param[in] capacitance 負荷容量
+  /// @param[in] rise_capacitance 立ち上がり時の負荷容量
+  /// @param[in] fall_capacitance 立ち下がり時の負荷容量
+  /// @param[in] max_fanout 最大ファンアウト容量
+  /// @param[in] min_fanout 最小ファンアウト容量
+  /// @param[in] max_capacitance 最大負荷容量
+  /// @param[in] min_capacitance 最小負荷容量
+  /// @param[in] max_transition 最大遷移時間
+  /// @param[in] min_transition 最小遷移時間
+  CiInoutPin(const ShString& name,
+	     CellCapacitance capacitance,
+	     CellCapacitance rise_capacitance,
+	     CellCapacitance fall_capacitance,
+	     CellCapacitance max_fanout,
+	     CellCapacitance min_fanout,
+	     CellCapacitance max_capacitance,
+	     CellCapacitance min_capacitance,
+	     CellTime max_transition,
+	     CellTime min_transition);
 
   /// @brief デストラクタ
   virtual

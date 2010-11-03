@@ -44,7 +44,34 @@ main(int argc,
     return 1;
   }
 
+#if 0
   display_library(cout, *library);
+#else
+  const char* filename = "celllibrary_test.data";
+  ofstream os;
+  os.open(filename, ios::binary);
+  if ( !os ) {
+    // エラー
+    cerr << "Could not create " << filename << endl;
+    return 1;
+  }
+  dump_library(os, *library);
+
+  os.close();
+
+  ifstream is;
+  is.open(filename);
+  if ( !is ) {
+    // エラー
+    cerr << "Could not open " << filename << endl;
+    return 2;
+  }
+
+  const CellLibrary* library2 = restore_library(is);
+
+  display_library(cout, *library2);
+
+#endif
 
   return 0;
 }

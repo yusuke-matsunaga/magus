@@ -18,7 +18,9 @@
 BEGIN_NAMESPACE_YM_CELL
 
 class CiCell;
+class CiInputPin;
 class CiOutputPin;
+class CiInoutPin;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CiLibrary CiLibrary.h "ci/CiLibrary.h"
@@ -165,100 +167,128 @@ public:
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
   /// @param[in] area 面積
-  /// @param[in] ni 入力数
-  /// @param[in] no 出力数
-  /// @param[in] nio 入出力数
+  /// @param[in] np ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
-  void
-  set_cell(ymuint cell_id,
+  /// @return セルへのポインタを返す．
+  CiCell*
+  new_cell(ymuint cell_id,
 	   ShString name,
 	   CellArea area,
-	   ymuint ni,
-	   ymuint no,
-	   ymuint nio,
+	   ymuint np,
 	   ymuint nb,
 	   ymuint nc);
 
-  /// @brief セルの入力ピンの内容を設定する．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @brief セルの入力ピンを生成する．
+  /// @param[in] cell セル
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
-  /// @param[in] ipin_id 入力ピン番号 ( 0 <= ipin_id < cell->input_num() )
-  /// @param[in] pin_name 入力ピン名
-  /// @param[in] pin_capacitance 入力ピンの負荷容量
-  /// @param[in] pin_rise_capacitance 入力ピンの立ち上がり負荷容量
-  /// @param[in] pin_fall_capacitance 入力ピンの立ち下がり負荷容量
-  void
-  set_cell_input(ymuint cell_id,
+  /// @param[in] name 入力ピン名
+  /// @param[in] capacitance 入力ピンの負荷容量
+  /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
+  /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
+  /// @return 入力ピンへのポインタを返す．
+  CiInputPin*
+  new_cell_input(CiCell* cell,
 		 ymuint pin_id,
-		 ymuint ipin_id,
-		 ShString pin_name,
-		 CellCapacitance pin_capacitance,
-		 CellCapacitance pin_rise_capacitance,
-		 CellCapacitance pin_fall_capacitance);
+		 ShString name,
+		 CellCapacitance capacitance,
+		 CellCapacitance rise_capacitance,
+		 CellCapacitance fall_capacitance);
 
   /// @brief セルの出力ピンの内容を設定する．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] cell セル
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
-  /// @param[in] opin_id 出力力ピン番号 ( 0 <= opin_id < cell->output_num() )
-  /// @param[in] pin_name 出力ピン名
-  void
-  set_cell_output(ymuint cell_id,
+  /// @param[in] name 出力ピン名
+  /// @param[in] max_fanout 最大ファンアウト容量
+  /// @param[in] min_fanout 最小ファンアウト容量
+  /// @param[in] max_capacitance 最大負荷容量
+  /// @param[in] min_capacitance 最小負荷容量
+  /// @param[in] max_transition 最大遷移時間
+  /// @param[in] min_transition 最小遷移時間
+  /// @return 出力ピンへのポインタを返す．
+  CiOutputPin*
+  new_cell_output(CiCell* cell,
 		  ymuint pin_id,
-		  ymuint opin_id,
-		  ShString pin_name);
+		  ShString name,
+		  CellCapacitance max_fanout,
+		  CellCapacitance min_fanout,
+		  CellCapacitance max_capacitance,
+		  CellCapacitance min_capacitance,
+		  CellTime max_transition,
+		  CellTime min_transition);
 
   /// @brief セルの入出力ピンの内容を設定する．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] cell セル
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
-  /// @param[in] iopin_id 入出力力ピン番号 ( 0 <= iopin_id < cell->inout_num() )
-  /// @param[in] pin_name 入出力ピン名
-  /// @param[in] pin_capacitance 入力ピンの負荷容量
-  /// @param[in] pin_rise_capacitance 入力ピンの立ち上がり負荷容量
-  /// @param[in] pin_fall_capacitance 入力ピンの立ち下がり負荷容量
-  void
-  set_cell_inout(ymuint cell_id,
+  /// @param[in] name 入出力ピン名
+  /// @param[in] capacitance 入力ピンの負荷容量
+  /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
+  /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
+  /// @param[in] max_fanout 最大ファンアウト容量
+  /// @param[in] min_fanout 最小ファンアウト容量
+  /// @param[in] max_capacitance 最大負荷容量
+  /// @param[in] min_capacitance 最小負荷容量
+  /// @param[in] max_transition 最大遷移時間
+  /// @param[in] min_transition 最小遷移時間
+  /// @return 入出力ピンへのポインタを返す．
+  CiInoutPin*
+  new_cell_inout(CiCell* cell,
 		 ymuint pin_id,
-		 ymuint iopin_id,
-		 ShString pin_name,
-		 CellCapacitance pin_capacitance,
-		 CellCapacitance pin_rise_capacitance,
-		 CellCapacitance pin_fall_capacitance);
+		 ShString name,
+		 CellCapacitance capacitance,
+		 CellCapacitance rise_capacitance,
+		 CellCapacitance fall_capacitance,
+		 CellCapacitance max_fanout,
+		 CellCapacitance min_fanout,
+		 CellCapacitance max_capacitance,
+		 CellCapacitance min_capacitance,
+		 CellTime max_transition,
+		 CellTime min_transition);
 
-  /// @brief セルの出力ピン(入出力ピン)の機能を設定する．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] pin_id 出力(入出力)ピン番号
-  /// @param[in] function 関数を表す論理式
+  /// @brief タイミング情報を格納する配列を確保する．
+  /// @param[in] pin ピン
+  /// @param[in] np 総ピン数
+  /// @note 配列のサイズは np x 2
   void
-  set_opin_function(ymuint cell_id,
-		    ymuint pin_id,
-		    const LogExpr& function);
+  set_timing_array(CiOutputPin* pin,
+		   ymuint np);
 
-  /// @brief セルのタイミング情報を設定する．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] pin_id 出力(入出力)ピン番号
-  /// @param[in] ipin_list 関連する入力(入出力)ピン番号のリスト
+  /// @brief タイミング情報を作る．
+  /// @param[in] id ID番号
   /// @param[in] type タイミングの型
-  /// @param[in] sense タイミング条件
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   /// @param[in] rise_resistance 立ち上がり負荷依存係数
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
-  /// @note opin_id, ipin_list のピン番号は全てのピンに対する通し番号
+  CellTiming*
+  new_timing(ymuint id,
+	     tCellTimingType type,
+	     CellTime intrinsic_rise,
+	     CellTime intrinsic_fall,
+	     CellTime slope_rise,
+	     CellTime slope_fall,
+	     CellResistance rise_resistance,
+	     CellResistance fall_resistance);
+
+  /// @brief セルのタイミング情報を設定する．
+  /// @param[in] pin 出力(入出力)ピン
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号
+  /// @param[in] sense タイミング条件
+  /// @param[in] timing 設定するタイミング情報
   void
-  set_opin_timing(ymuint cell_id,
-		  ymuint pin_id,
-		  const vector<ymuint>& ipin_list,
-		  tCellTimingType type,
+  set_opin_timing(CiOutputPin* pin,
+		  ymuint ipin_id,
 		  tCellTimingSense sense,
-		  CellTime intrinsic_rise,
-		  CellTime intrinsic_fall,
-		  CellTime slope_rise,
-		  CellTime slope_fall,
-		  CellResistance rise_resistance,
-		  CellResistance fall_resistance);
+		  const CellTiming* timing);
+
+  /// @brief 出力ピンの機能を設定する．
+  /// @param[in] pin 出力(入出力)ピン
+  /// @param[in] function 機能を表す論理式
+  void
+  set_opin_function(CiOutputPin* pin,
+		    const LogExpr& function);
 
 
 private:

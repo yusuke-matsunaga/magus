@@ -163,6 +163,11 @@ void
 display_library(ostream& s,
 		const CellLibrary& library);
 
+/// @relates CellLibrary
+/// @brief バイナリダンプされた内容を読み込む．
+const CellLibrary*
+restore_library(istream& s);
+
 
 END_NAMESPACE_YM_CELL
 
