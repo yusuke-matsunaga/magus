@@ -199,6 +199,7 @@ CiLibrary::new_cell(ymuint cell_id,
 		    ymuint nc)
 {
   CiCell* cell = &mCellArray[cell_id];
+  cell->mId = cell_id;
   cell->mName = name;
   cell->mArea = area;
 

@@ -37,6 +37,12 @@ public:
   // セル情報の取得
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ID番号の取得
+  /// @note ここで返される番号は CellLibrary::cell() の引数に対応する．
+  virtual
+  ymuint
+  id() const = 0;
+
   /// @brief 名前の取得
   virtual
   string

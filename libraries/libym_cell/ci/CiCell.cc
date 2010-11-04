@@ -43,6 +43,14 @@ CiCell::~CiCell()
   // メモリの確保は別のクラスが担当している．
 }
 
+// @brief ID番号の取得
+// @note ここで返される番号は CellLibrary::cell() の引数に対応する．
+ymuint
+CiCell::id() const
+{
+  return mId;
+}
+
 // @brief 名前の取得
 string
 CiCell::name() const
