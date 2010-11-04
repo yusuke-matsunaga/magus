@@ -101,7 +101,7 @@ PgFuncMgr::set_library(const CellLibrary* library)
       }
     }
     if ( opin == NULL ) continue;
-    if ( ni < 2 ) continue;
+    if ( ni < 1 ) continue;
 
     if ( !opin->has_function() ) {
       // 論理式を持たないセルも対象外

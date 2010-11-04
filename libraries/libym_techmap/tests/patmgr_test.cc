@@ -30,21 +30,24 @@ main(int argc,
     return 1;
   }
 
-  PgFuncMgr pgf_mgr;
-  pgf_mgr.set_library(library);
-
-  pg_display(cout, pgf_mgr);
-
   const char* datafile = "patdata.bin";
-  ofstream os;
-  os.open(datafile, ios::binary);
-  if ( !os ) {
-    // エラー
-    cerr << "Could not create " << datafile << endl;
-    return 2;
-  }
+  {
+    PgFuncMgr pgf_mgr;
+    pgf_mgr.set_library(library);
 
-  pg_dump(os, pgf_mgr);
+    pg_display(cout, pgf_mgr);
+
+    ofstream os;
+    os.open(datafile, ios::binary);
+    if ( !os ) {
+      // エラー
+      cerr << "Could not create " << datafile << endl;
+      return 2;
+    }
+
+    pg_dump(os, pgf_mgr);
+    os.close();
+  }
 
   PatMgr pat_mgr;
   {

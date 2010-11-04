@@ -20,8 +20,8 @@ BEGIN_NONAMESPACE
 ymuint
 read_word(istream& s)
 {
-  static char buf[4];
-  s.read(buf, 4);
+  static ymuint8 buf[4];
+  s.read(reinterpret_cast<char*>(buf), 4);
   ymuint ans =
     static_cast<ymuint>(buf[0]) |
     (static_cast<ymuint>(buf[1]) << 8) |
