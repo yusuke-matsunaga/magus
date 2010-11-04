@@ -181,6 +181,14 @@ TvFunc::TvFunc(ymuint ni,
   mVector(new ymulong[mNblk])
 {
   switch ( mNi ) {
+  case 0:
+    mVector[0] = 0x1;
+    break;
+
+  case 1:
+    mVector[1] = 0x3;
+    break;
+
   case 2:
     mVector[0] = 0xF;
     break;
@@ -218,7 +226,17 @@ TvFunc::TvFunc(ymuint ni,
   mNblk(nblock(ni)),
   mVector(new ymulong[mNblk])
 {
+  assert_cond( pos < ni, __FILE__, __LINE__);
   switch ( ni ) {
+  case 1:
+    if ( pol == kPolPosi ) {
+      mVector[0] = 0x2;
+    }
+    else {
+      mVector[0] = 0x1;
+    }
+    break;
+
   case 2:
     switch ( pos ) {
     case 0:
@@ -586,6 +604,14 @@ const TvFunc&
 TvFunc::negate()
 {
   switch ( mNi ) {
+  case 0:
+    mVector[0] ^= 0x1;
+    break;
+
+  case 1:
+    mVector[0] ^= 0x3;
+    break;
+
   case 2:
     mVector[0] ^= 0xF;
     break;
@@ -656,6 +682,27 @@ TvFunc::operator^=(const TvFunc& src1)
 }
 
 BEGIN_NONAMESPACE
+
+// word の中の 1 のビットを数える．
+// 0入力用
+inline
+ymuint
+count_onebits_0(ymulong word)
+{
+  return word & 0x1;
+}
+
+// word の中の 1 のビットを数える．
+// 1入力用
+inline
+ymuint
+count_onebits_1(ymulong word)
+{
+  const ymulong mask1 = 0x3;
+
+  word = (word & mask1) + ((word >> 1) & mask1);
+  return word;
+}
 
 // word の中の 1 のビットを数える．
 // 2入力用
@@ -776,6 +823,8 @@ ymuint
 TvFunc::count_zero() const
 {
   switch ( ni() ) {
+  case 0: return (1 << 0) - count_onebits_0(mVector[0]);
+  case 1: return (1 << 1) - count_onebits_1(mVector[0]);
   case 2: return (1 << 2) - count_onebits_2(mVector[0]);
   case 3: return (1 << 3) - count_onebits_3(mVector[0]);
   case 4: return (1 << 4) - count_onebits_4(mVector[0]);
@@ -802,6 +851,8 @@ ymuint
 TvFunc::count_one() const
 {
   switch ( ni() ) {
+  case 0: return count_onebits_0(mVector[0]);
+  case 1: return count_onebits_1(mVector[0]);
   case 2: return count_onebits_2(mVector[0]);
   case 3: return count_onebits_3(mVector[0]);
   case 4: return count_onebits_4(mVector[0]);
@@ -828,6 +879,8 @@ ymint
 TvFunc::walsh_0() const
 {
   switch ( ni() ) {
+  case 0: return (1 << 0) - count_onebits_0(mVector[0]) * 2;
+  case 1: return (1 << 1) - count_onebits_1(mVector[0]) * 2;
   case 2: return (1 << 2) - count_onebits_2(mVector[0]) * 2;
   case 3: return (1 << 3) - count_onebits_3(mVector[0]) * 2;
   case 4: return (1 << 4) - count_onebits_4(mVector[0]) * 2;
@@ -854,6 +907,8 @@ ymint
 TvFunc::walsh_1(ymuint pos) const
 {
   switch ( ni() ) {
+  case 0: assert_not_reached(__FILE__, __LINE__);
+  case 1: return (1 << 1) - count_onebits_1(mVector[0] ^ c_masks[pos]) * 2;
   case 2: return (1 << 2) - count_onebits_2(mVector[0] ^ c_masks[pos]) * 2;
   case 3: return (1 << 3) - count_onebits_3(mVector[0] ^ c_masks[pos]) * 2;
   case 4: return (1 << 4) - count_onebits_4(mVector[0] ^ c_masks[pos]) * 2;
@@ -906,6 +961,11 @@ TvFunc::walsh_2(ymuint i,
   }
 
   switch ( ni() ) {
+  case 0:
+  case 1:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+
   case 2:
     return (1 << 2) - count_onebits_2(mVector[0] ^ c_masks[i] ^ c_masks[j]) * 2;
 
@@ -1297,6 +1357,29 @@ walsh_01_19b(ymulong* src_vec,
   ymint ans1 = walsh_01_18b(src_vec + (1 << (18 - NIPW)), vec);
   vec[18] += ans0 + ((1 << 18) - ans1);
   return ans0 + ans1;
+}
+
+// 1入力の walsh_01 本体
+inline
+ymint
+walsh_01_1(ymulong* src_vec,
+	   ymint vec[])
+{
+  const ymulong mask1   = 0x3;
+
+  const ymint n = (1 << 1);
+
+  ymulong tmp;
+  {
+    tmp = src_vec[0];
+    ymulong tmp0 = tmp & mask1;
+    ymulong tmp1 = (tmp >> 1) & mask1;
+    tmp = tmp0 + tmp1;
+    tmp0 = tmp0 - tmp1 + 0x1;
+    vec[0] = n - tmp0 * 2;
+  }
+
+  return n - tmp * 2;
 }
 
 // 2入力の walsh_01 本体
@@ -1788,6 +1871,7 @@ ymint
 TvFunc::walsh_01(ymint vec[]) const
 {
   switch ( ni() ) {
+  case  1: return walsh_01_1(mVector, vec);
   case  2: return walsh_01_2(mVector, vec);
   case  3: return walsh_01_3(mVector, vec);
   case  4: return walsh_01_4(mVector, vec);
