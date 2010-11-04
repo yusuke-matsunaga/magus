@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellLibrary
 {
-protected:
+public:
 
   /// @brief コンストラクタ
   CellLibrary() { }

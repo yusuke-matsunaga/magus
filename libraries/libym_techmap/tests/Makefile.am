@@ -31,7 +31,7 @@ LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 bin_PROGRAMS = \
 	read_blif \
 	patgen_test \
-	patgraph_test \
+	patmgr_test \
 	pgfuncmgr_test
 
 read_blif_SOURCES = \
@@ -47,10 +47,10 @@ patgen_test_SOURCES = \
 patgen_test_LDADD = \
 	$(LIBYM_TECHMAP)
 
-patgraph_test_SOURCES = \
-	patgraph_test.cc
+patmgr_test_SOURCES = \
+	patmgr_test.cc
 
-patgraph_test_LDADD = \
+patmgr_test_LDADD = \
 	$(LIBYM_TECHMAP)
 
 pgfuncmgr_test_SOURCES = \

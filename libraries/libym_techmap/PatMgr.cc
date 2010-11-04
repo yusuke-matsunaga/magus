@@ -9,6 +9,8 @@
 
 #include "PatMgr.h"
 #include "PatGraph.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
@@ -46,6 +48,24 @@ read_map(istream& s,
 }
 
 END_NONAMESPACE
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス FuncGroup
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+FuncGroup::FuncGroup() :
+  mCellNum(0),
+  mCellList(NULL)
+{
+}
+
+// @brief デストラクタ
+FuncGroup::~FuncGroup()
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス RepFunc
@@ -147,6 +167,7 @@ PatMgr::~PatMgr()
 void
 PatMgr::init()
 {
+  delete mLibrary;
   delete [] mNodeTypeArray;
   delete [] mEdgeArray;
   delete [] mPatArray;
@@ -164,11 +185,22 @@ PatMgr::load(istream& s)
   // 以前の内容を捨てる．
   init();
 
+  // ライブラリを読み込む．
+  mLibrary = nsYm::nsCell::restore_library(s);
+
   // 関数の情報を読み込む．
   mFuncNum = read_word(s);
-  mNpnMapArray = new NpnMap[mFuncNum];
+  mFuncArray = new FuncGroup[mFuncNum];
   for (ymuint i = 0; i < mFuncNum; ++ i) {
-    read_map(s, mNpnMapArray[i]);
+    FuncGroup& func = mFuncArray[i];
+    read_map(s, func.mNpnMap);
+    ymuint n = read_word(s);
+    func.mCellNum = n;
+    func.mCellList = new const Cell*[n];
+    for (ymuint j = 0; j < n; ++ j) {
+      ymuint id = read_word(s);
+      func.mCellList[j] = mLibrary->cell(id);
+    }
   }
 
   // 代表関数の情報を読み込む．
@@ -218,8 +250,14 @@ dump(ostream& s,
   // 関数情報の出力
   ymuint nf = pat_mgr.func_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    const NpnMap& map = pat_mgr.npn_map(i);
+    const FuncGroup& func = pat_mgr.func_group(i);
+    const NpnMap& map = func.npn_map();
     s << "Func#" << i << ": " << map << endl;
+    ymuint nc = func.cell_num();
+    for (ymuint j = 0; j < nc; ++ j) {
+      const Cell* cell = func.cell(j);
+      s << "  " << cell->name() << endl;
+    }
   }
   s << endl;
 

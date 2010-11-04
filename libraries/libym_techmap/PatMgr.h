@@ -10,7 +10,8 @@
 
 
 #include "ym_techmap/techmap_nsdef.h"
-#include "ym_npn/NpnMap.h"
+#include "ym_cell/cell_nsdef.h"
+#include "FuncGroup.h"
 #include "RepFunc.h"
 #include "PatGraph.h"
 
@@ -73,14 +74,18 @@ public:
   // 論理関数グループに関する情報を取得数関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @bireif 論理関数の個数を返す．
+  /// @brief セルライブラリを返す．
+  const CellLibrary&
+  library() const;
+
+  /// @brief 論理関数の個数を返す．
   ymuint
   func_num() const;
 
-  /// @brief 代表関数に対する変換マップを返す．
+  /// @brief 関数グループを返す．
   /// @param[in] id 関数番号　( 0 <= id < func_num() )
-  const NpnMap&
-  npn_map(ymuint id) const;
+  const FuncGroup&
+  func_group(ymuint id) const;
 
   /// @brief 代表関数の個数を返す．
   ymuint
@@ -157,12 +162,15 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // セルライブラリ
+  const CellLibrary* mLibrary;
+
   // 関数の数
   ymuint32 mFuncNum;
 
-  // 代表関数に対する変換マップの配列
+  // 関数グループの配列
   // サイズは mFuncNum
-  NpnMap* mNpnMapArray;
+  FuncGroup* mFuncArray;
 
   // 代表関数の数
   ymuint32 mRepNum;
@@ -213,13 +221,13 @@ PatMgr::func_num() const
   return mFuncNum;
 }
 
-// @brief 代表関数に対する変換マップを返す．
+// @brief 関数グループを返す．
 // @param[in] id 関数番号　( 0 <= id < func_num() )
 inline
-const NpnMap&
-PatMgr::npn_map(ymuint id) const
+const FuncGroup&
+PatMgr::func_group(ymuint id) const
 {
-  return mNpnMapArray[id];
+  return mFuncArray[id];
 }
 
 // @brief 代表関数の個数を返す．

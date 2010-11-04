@@ -18,16 +18,19 @@ INCLUDES = \
 
 libym_techmap_la_SOURCES = \
 	BNet2Sbj.cc \
+	FuncGroup.h \
 	PatGraph.h \
 	PatMatcher.h \
 	PatMatcher.cc \
 	PatMgr.h \
 	PatMgr.cc \
+	RepFunc.h \
 	SbjGraph.cc \
 	SbjGraph_dump.cc
 
 libym_techmap_la_LIBADD = \
 	patgen/libym_techmap_patgen.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
