@@ -231,6 +231,7 @@ CiLibrary::new_cell_input(CiCell* cell,
   CiInputPin* pin = new (p) CiInputPin(name, capacitance,
 				       rise_capacitance, fall_capacitance);
   cell->mPinArray[pin_id] = pin;
+  pin->mId = pin_id;
 
   return pin;
 }
@@ -262,6 +263,7 @@ CiLibrary::new_cell_output(CiCell* cell,
 					 max_capacitance, min_capacitance,
 					 max_transition, min_transition);
   cell->mPinArray[pin_id] = pin;
+  pin->mId = pin_id;
   set_timing_array(pin, cell->pin_num());
 
   return pin;
@@ -302,6 +304,7 @@ CiLibrary::new_cell_inout(CiCell* cell,
 					max_capacitance, min_capacitance,
 					max_transition, min_transition);
   cell->mPinArray[pin_id] = pin;
+  pin->mId = pin_id;
   set_timing_array(pin, cell->pin_num());
 
   return pin;

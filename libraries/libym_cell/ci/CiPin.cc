@@ -63,6 +63,13 @@ CiPin::fall_capacitance() const
   return CellCapacitance(0.0);
 }
 
+// @brief 論理式を持っているときに true を返す．
+bool
+CiPin::has_function() const
+{
+  return false;
+}
+
 // @brief 機能を表す論理式を返す．
 LogExpr
 CiPin::function() const
@@ -217,6 +224,7 @@ CiOutputPin::CiOutputPin(const ShString& name,
 			 CellTime max_transition,
 			 CellTime min_transition) :
   CiPin(name),
+  mHasFunction(false),
   mMaxFanout(max_fanout),
   mMinFanout(min_fanout),
   mMaxCapacitance(max_capacitance),
@@ -236,6 +244,13 @@ tCellDirection
 CiOutputPin::direction() const
 {
   return kDirOutput;
+}
+
+// @brief 論理式を持っているときに true を返す．
+bool
+CiOutputPin::has_function() const
+{
+  return mHasFunction;
 }
 
 // @brief 機能を表す論理式を返す．
@@ -308,6 +323,7 @@ CiOutputPin::timing(ymuint ipos,
 void
 CiOutputPin::set_function(const LogExpr& function)
 {
+  mHasFunction = true;
   mFunction = function;
 }
 

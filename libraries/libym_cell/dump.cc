@@ -280,9 +280,11 @@ display_library(ostream& s,
 	break;
 
       case kDirOutput:
-	s << "    Direction        = OUTPUT" << endl
-	  << "    Function         = " << pin->function() << endl
-	  << "    Max Fanout       = " << pin->max_fanout() << endl
+	s << "    Direction        = OUTPUT" << endl;
+	if ( pin->has_function() ) {
+	  s << "    Function         = " << pin->function() << endl;
+	}
+	s << "    Max Fanout       = " << pin->max_fanout() << endl
 	  << "    Min Fanout       = " << pin->min_fanout() << endl
 	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
 	  << "    Min Capacitance  = " << pin->min_capacitance() << endl
@@ -295,8 +297,11 @@ display_library(ostream& s,
 	break;
 
       case kDirInout:
-	s << "    Direction        = INOUT" << endl
-	  << "    Function         = " << pin->function() << endl
+	s << "    Direction        = INOUT" << endl;
+	if ( pin->has_function() ) {
+	  s << "    Function         = " << pin->function() << endl;
+	}
+	s << "    Function         = " << pin->function() << endl
 	  << "    Capacitance      = " << pin->capacitance() << endl
 	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
 	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl
