@@ -12,6 +12,9 @@
 #include "PgFunc.h"
 #include "PgNode.h"
 #include "PgHandle.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/Cell.h"
+#include "ym_cell/CellPin.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_npn/NpnMgr.h"
 
@@ -71,10 +74,53 @@ check_input(const LogExpr& expr,
 END_NONAMESPACE
 
 
+// @brief セルライブラリに対応したパタンを作る．
+void
+PgFuncMgr::set_library(const CellLibrary* library)
+{
+  mLibrary = library;
+
+  ymuint nc = library->cell_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    const Cell* cell = library->cell(i);
+    ymuint np = cell->pin_num();
+    const CellPin* opin = NULL;
+    ymuint ni = 0;
+    for (ymuint j = 0; j < np; ++ j) {
+      const CellPin* pin = cell->pin(j);
+      if ( pin->direction() == nsCell::kDirOutput ) {
+	if ( opin != NULL ) {
+	  // 出力ピンが複数あるセルは対象外
+	  opin = NULL;
+	  break;
+	}
+	opin = pin;
+      }
+      else if ( pin->direction() == nsCell::kDirInput ) {
+	++ ni;
+      }
+    }
+    if ( opin == NULL ) continue;
+    if ( ni < 2 ) continue;
+
+    if ( !opin->has_function() ) {
+      // 論理式を持たないセルも対象外
+      continue;
+    }
+
+    LogExpr expr = opin->function();
+    cout << "reg_expr(" << expr << ")" << endl;
+    PgFunc* func = reg_expr(expr);
+    cout << "end" << endl;
+    func->mCellList.push_back(cell);
+  }
+}
+
+
 // @brief 論理式を登録する．
 // @param[in] expr 元になる論理式
 // @return 論理関数番号を返す．
-ymuint
+PgFunc*
 PgFuncMgr::reg_expr(const LogExpr& expr)
 {
   // expr に現れる入力番号を調べる．
@@ -199,7 +245,7 @@ PgFuncMgr::reg_expr(const LogExpr& expr)
   }
   mPatGen.sweep();
 
-  return pgfunc->id();
+  return pgfunc;
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN

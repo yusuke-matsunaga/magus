@@ -11,6 +11,7 @@
 
 #include "patgen_nsdef.h"
 #include "PatGen.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_lexp/lexp_nsdef.h"
 #include "ym_npn/npn_nsdef.h"
 #include "ym_npn/TvFunc.h"
@@ -37,18 +38,23 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 論理式を登録する．
-  /// @param[in] expr 元になる論理式
-  /// @return 論理関数番号を返す．
-  ymuint
-  reg_expr(const LogExpr& expr);
+  /// @brief セルライブラリに対応したパタンを作る．
+  void
+  set_library(const CellLibrary* library);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容情報を取得する関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief セルライブラリを返す．
+  const CellLibrary&
+  library() const;
 
   /// @brief 論理関数の数を返す．
   ymuint
@@ -78,11 +84,20 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 論理式を登録する．
+  /// @param[in] expr 元になる論理式
+  /// @return 論理関数を返す．
+  PgFunc*
+  reg_expr(const LogExpr& expr);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // セルライブラリ
+  const CellLibrary* mLibrary;
 
   // パタングラフを管理するクラス
   PatGen mPatGen;
@@ -129,6 +144,14 @@ pg_dump(ostream& s,
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief セルライブラリを返す．
+inline
+const CellLibrary&
+PgFuncMgr::library() const
+{
+  return *mLibrary;
+}
 
 // @brief 論理関数の数を返す．
 inline

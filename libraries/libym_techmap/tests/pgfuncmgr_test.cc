@@ -73,6 +73,7 @@ str_to_expr(char* str,
 void
 test(istream& s)
 {
+#if 0
   // s の各行が逆ポーランド式の論理式だと思う．
   vector<LogExpr> expr_list;
   char buff[4096];
@@ -90,8 +91,8 @@ test(istream& s)
     ymuint fid = pgf_mgr.reg_expr(expr);
     cout << "Function ID for " << expr << " = " << fid << endl;
   }
-
   pg_display(cout, pgf_mgr);
+#endif
 
 }
 

@@ -148,6 +148,7 @@ PatGraph::load(istream& s)
 
 // @brief コンストラクタ
 PatMgr::PatMgr() :
+  mLibrary(NULL),
   mNodeNum(0U),
   mNodeTypeArray(NULL),
   mEdgeArray(NULL),

@@ -14,6 +14,8 @@
 #include "PgNode.h"
 #include "PgHandle.h"
 #include "../PatMgr.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_cell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
@@ -45,7 +47,13 @@ pg_display(ostream& s,
     const PgFunc* func = pgf_mgr.func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
     s << "FUNC#" << i << ": REP#" << func->rep()->id()
-	 << ": " << func->map() << endl;
+      << ": " << func->map() << endl;
+    const vector<const Cell*>& cell_list = func->cell_list();
+    for (vector<const Cell*>::const_iterator p = cell_list.begin();
+	 p != cell_list.end(); ++ p) {
+      const Cell* cell = *p;
+      s << "  " << cell->name() << endl;
+    }
   }
   s << endl;
 
@@ -225,12 +233,21 @@ void
 pg_dump(ostream& s,
 	const PgFuncMgr& pgf_mgr)
 {
+  nsYm::nsCell::dump_library(s, pgf_mgr.library());
+
   ymuint nf = pgf_mgr.func_num();
   dump_word(s, nf);
   for (ymuint i = 0; i < nf; ++ i) {
     const PgFunc* func = pgf_mgr.func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
     dump_map(s, func->map());
+    const vector<const Cell*>& cell_list = func->cell_list();
+    ymuint nc = cell_list.size();
+    dump_word(s, nc);
+    for (ymuint i = 0; i < nc; ++ i) {
+      const Cell* cell = cell_list[i];
+      dump_word(s, cell->id());
+    }
   }
 
   ymuint nr = pgf_mgr.rep_num();

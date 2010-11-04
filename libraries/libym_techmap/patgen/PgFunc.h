@@ -40,6 +40,10 @@ public:
   ymuint
   id() const;
 
+  /// @brief 属しているセルのリストを返す．
+  const vector<const Cell*>&
+  cell_list() const;
+
   /// @brief 親の代表関数を返す．
   const PgFuncRep*
   rep() const;
@@ -56,6 +60,9 @@ private:
 
   // ID番号
   ymuint32 mId;
+
+  // セルのリスト
+  vector<const Cell*> mCellList;
 
   // 親の代表関数
   PgFuncRep* mRep;
@@ -88,6 +95,14 @@ ymuint
 PgFunc::id() const
 {
   return mId;
+}
+
+// @brief 属しているセルのリストを返す．
+inline
+const vector<const Cell*>&
+PgFunc::cell_list() const
+{
+  return mCellList;
 }
 
 // @brief 親の代表関数を返す．
