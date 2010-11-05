@@ -269,6 +269,49 @@ void
 NpnMgr::cannonical(const TvFunc& func,
 		   NpnMap& cmap)
 {
+  // 特例
+  if ( func.ni() == 0 ) {
+    if ( func.value(0) == 0 ) {
+      // 定数0関数
+      cmap.set_identity(0);
+      return;
+    }
+    else {
+      // 定数1関数
+      cmap.set_identity(0);
+      cmap.set_opol(kPolNega);
+      return;
+    }
+  }
+  if ( func.ni() == 1 ) {
+    if ( func.value(0) == 0 ) {
+      if ( func.value(1) == 0 ) {
+	// 1入力の定数0関数
+	cmap.set_identity(1);
+	return;
+      }
+      else {
+	// 肯定のリテラル関数
+	cmap.set_identity(1);
+	return;
+      }
+    }
+    else {
+      if ( func.value(1) == 0 ) {
+	// 否定のリテラル関数
+	cmap.set_identity(1);
+	cmap.set_opol(kPolNega);
+	return;
+      }
+      else {
+	// 1入力の定数1関数
+	cmap.set_identity(1);
+	cmap.set_opol(kPolNega);
+	return;
+      }
+    }
+  }
+
   NpnRawSig sig;
   NpnConf conf0;
 
