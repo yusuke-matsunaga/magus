@@ -197,6 +197,19 @@ PatGen::~PatGen()
   delete [] mHashTable;
 }
 
+// @brief 初期化する．
+void
+PatGen::init()
+{
+  mAlloc.destroy();
+  mInputList.clear();
+  mNodeList.clear();
+  delete [] mHashTable;
+  mHashTable = NULL;
+  mHashSize = 0;
+  alloc_table(1024);
+}
+
 // @brief 全ノード数を返す．
 ymuint
 PatGen::node_num() const

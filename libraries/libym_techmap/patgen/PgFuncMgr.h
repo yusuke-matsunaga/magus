@@ -90,6 +90,19 @@ private:
   PgFunc*
   reg_expr(const LogExpr& expr);
 
+  /// @brief f に対応する PgFunc を求める．
+  /// @param[in] f 関数
+  /// @note なければ新規に作る．
+  PgFunc*
+  find_func(const TvFunc& f);
+
+  /// @brief f に対応する PgFuncRep を求める．
+  /// @param[in] f 関数
+  /// @note なければ新規に作る．
+  /// @note f は NpnMgr によって正規化されている必要がある．
+  PgFuncRep*
+  find_repfunc(const TvFunc& f);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
