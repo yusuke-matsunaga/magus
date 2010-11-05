@@ -17,6 +17,7 @@ BEGIN_NAMESPACE_YM_TECHMAP
 class SbjNode;
 class PatMgr;
 class PatGraph;
+class Match;
 
 //////////////////////////////////////////////////////////////////////
 /// @class PatMatcher PatMatcher.h "PatMatcher.h"
@@ -27,7 +28,8 @@ class PatMatcher
 public:
 
   /// @brief コンストラクタ
-  PatMatcher();
+  /// @param[in] pat_mgr パタンを管理するクラス
+  PatMatcher(const PatMgr& pat_mgr);
 
   /// @brief デストラクタ
   ~PatMatcher();
@@ -37,17 +39,14 @@ public:
 
   /// @brief パタンマッチングを行う．
   /// @param[in] sbj_root サブジェクトグラフの根のノード
-  /// @param[in] pat_mgr パタンを管理するクラス
   /// @param[in] pat_graph パタングラフ
-  /// @param[out] input_map 入力のマッピング
+  /// @param[out] match マッチング結果
   /// @retval true マッチした．
   /// @retval false マッチしなかった．
-  /// @note input_map の中身は (SbjNode->i() << 1) | pol
   bool
   operator()(const SbjNode* sbj_root,
-	     const PatMgr& pat_mgr,
 	     const PatGraph& pat_graph,
-	     vector<ymuint>& input_map);
+	     Match& match);
 
 
 private:
@@ -72,6 +71,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // パタングラフを管理するクラス
+  const PatMgr& mPatMgr;
+
   // パタンノードの ID をキーとしてサブジェクトノードを入れる配列
   vector<const SbjNode*> mSbjMap;
 
@@ -81,6 +83,9 @@ private:
 
   // パタンノードの ID をキーとして極性を入れる配列
   vector<bool> mInvMap;
+
+  // mSbjMap と mInvMap のクリア用キュー
+  vector<ymuint> mClearQueue;
 
 };
 
