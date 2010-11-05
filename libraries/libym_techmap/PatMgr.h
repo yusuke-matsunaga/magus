@@ -87,6 +87,22 @@ public:
   const FuncGroup&
   func_group(ymuint id) const;
 
+  /// @brief 定数0の関数グループを返す．
+  const FuncGroup&
+  const0_func() const;
+
+  /// @brief 定数1の関数グループを返す．
+  const FuncGroup&
+  const1_func() const;
+
+  /// @brief バッファセルの関数グループを返す．
+  const FuncGroup&
+  buf_func() const;
+
+  /// @brief インバータセルの関数グループを返す．
+  const FuncGroup&
+  inv_func() const;
+
   /// @brief 代表関数の個数を返す．
   ymuint
   rep_num() const;
@@ -228,6 +244,42 @@ const FuncGroup&
 PatMgr::func_group(ymuint id) const
 {
   return mFuncArray[id];
+}
+
+// @brief 定数0の関数グループを返す．
+inline
+const FuncGroup&
+PatMgr::const0_func() const
+{
+  // 決め打ち
+  return mFuncArray[0];
+}
+
+// @brief 定数1の関数グループを返す．
+inline
+const FuncGroup&
+PatMgr::const1_func() const
+{
+  // 決め打ち
+  return mFuncArray[1];
+}
+
+// @brief バッファセルの関数グループを返す．
+inline
+const FuncGroup&
+PatMgr::buf_func() const
+{
+  // 決め打ち
+  return mFuncArray[2];
+}
+
+// @brief インバータセルの関数グループを返す．
+inline
+const FuncGroup&
+PatMgr::inv_func() const
+{
+  // 決め打ち
+  return mFuncArray[3];
 }
 
 // @brief 代表関数の個数を返す．

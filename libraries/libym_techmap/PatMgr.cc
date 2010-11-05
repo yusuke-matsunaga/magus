@@ -249,11 +249,29 @@ dump(ostream& s,
   s << "==== PatMgr dump start ====" << endl;
 
   // 関数情報の出力
+  const FuncGroup& func0 = pat_mgr.const0_func();
+  const FuncGroup& func1 = pat_mgr.const1_func();
+  const FuncGroup& func2 = pat_mgr.buf_func();
+  const FuncGroup& func3 = pat_mgr.inv_func();
   ymuint nf = pat_mgr.func_num();
   for (ymuint i = 0; i < nf; ++ i) {
     const FuncGroup& func = pat_mgr.func_group(i);
-    const NpnMap& map = func.npn_map();
-    s << "Func#" << i << ": " << map << endl;
+    if ( &func == &func0 ) {
+      s << "Const0" << endl;
+    }
+    else if ( &func == &func1 ) {
+      s << "Const1" << endl;
+    }
+    else if ( &func == &func2 ) {
+      s << "Buffer" << endl;
+    }
+    else if ( &func == &func3 ) {
+      s << "Inverter" << endl;
+    }
+    else {
+      const NpnMap& map = func.npn_map();
+      s << "Func#" << i << ": " << map << endl;
+    }
     ymuint nc = func.cell_num();
     for (ymuint j = 0; j < nc; ++ j) {
       const Cell* cell = func.cell(j);
