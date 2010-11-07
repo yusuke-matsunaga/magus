@@ -17,7 +17,6 @@ BEGIN_NAMESPACE_YM_TECHMAP
 class SbjNode;
 class PatMgr;
 class PatGraph;
-class Match;
 
 //////////////////////////////////////////////////////////////////////
 /// @class PatMatcher PatMatcher.h "PatMatcher.h"
@@ -40,13 +39,29 @@ public:
   /// @brief パタンマッチングを行う．
   /// @param[in] sbj_root サブジェクトグラフの根のノード
   /// @param[in] pat_graph パタングラフ
-  /// @param[out] match マッチング結果
   /// @retval true マッチした．
   /// @retval false マッチしなかった．
   bool
   operator()(const SbjNode* sbj_root,
-	     const PatGraph& pat_graph,
-	     Match& match);
+	     const PatGraph& pat_graph);
+
+  /// @brief 直前のマッチングにおける出力の極性を得る．
+  /// @retval true 反転あり
+  /// @retval false 反転なし
+  bool
+  root_inv() const;
+
+  /// @brief 直前のマッチングにおける入力のノードを得る．
+  /// @param[in] pos 入力番号
+  const SbjNode*
+  leaf_node(ymuint pos) const;
+
+  /// @brief 直前のマッチングにおける入力の極性を得る．
+  /// @param[in] pos 入力番号
+  /// @retval true 反転あり
+  /// @retval false 反転なし
+  bool
+  leaf_inv(ymuint pos) const;
 
 
 private:
@@ -87,7 +102,38 @@ private:
   // mSbjMap と mInvMap のクリア用キュー
   vector<ymuint> mClearQueue;
 
+  // 直前のマッチングにおけるパタンの入力ノードを記録する配列
+  vector<const SbjNode*> mLeafNodeArray;
+
+  // 直前のマッチングにおけるパタンの入力の極性を記録する配列
+  vector<bool> mLeafInvArray;
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 直前のマッチングにおける入力のノードを得る．
+// @param[in] pos 入力番号
+inline
+const SbjNode*
+PatMatcher::leaf_node(ymuint pos) const
+{
+  return mLeafNodeArray[pos];
+}
+
+// @brief 直前のマッチングにおける入力の極性を得る．
+// @param[in] pos 入力番号
+// @retval true 反転あり
+// @retval false 反転なし
+inline
+bool
+PatMatcher::leaf_inv(ymuint pos) const
+{
+  return mLeafInvArray[pos];
+}
 
 END_NAMESPACE_YM_TECHMAP
 

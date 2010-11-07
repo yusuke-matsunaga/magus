@@ -35,6 +35,13 @@ class SbjNode;
 typedef DlList<SbjEdge> SbjEdgeList;
 typedef DlList<SbjNode> SbjNodeList;
 
+class CnGraph;
+class CnEdge;
+class CnNode;
+
+typedef DlList<CnEdge> CnEdgeList;
+typedef DlList<CnNode> CnNodeList;
+
 class BNet2Sbj;
 
 #if 0

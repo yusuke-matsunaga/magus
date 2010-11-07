@@ -9,4 +9,5 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	techmap_nsdef.h \
 	BNet2Sbj.h \
+	CnGraph.h \
 	SbjGraph.h

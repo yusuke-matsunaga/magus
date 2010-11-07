@@ -10,6 +10,7 @@
 
 
 #include "ym_techmap/techmap_nsdef.h"
+#include "ym_npn/npn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
@@ -23,10 +24,19 @@ class Match
 public:
 
   /// @brief コンストラクタ
-  Match();
+  /// @param[in] nl 葉の数(入力数)
+  Match(ymuint nl = 0);
+
+  /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
+  Match(const Match& src);
 
   /// @brief デストラクタ
   ~Match();
+
+  /// @brief 代入演算子
+  const Match&
+  operator=(const Match& src);
 
 
 public:
@@ -34,14 +44,9 @@ public:
   // 情報を設定する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 根のノードと入力数を設定する．
-  /// @param[in] root_node 根のノード
-  /// @param[in] root_inv 根の極性
-  /// @param[in] ni 入力数
+  /// @brief 葉の数を再設定する．
   void
-  set_root(const SbjNode* root_node,
-	   bool root_inv,
-	   ymuint ni);
+  resize(ymuint nl);
 
   /// @brief 葉のノードを設定する．
   /// @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
@@ -57,14 +62,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 情報を取得する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 根のノードを得る．
-  const SbjNode*
-  root_node() const;
-
-  /// @brief 根の極性を得る．
-  bool
-  root_inv() const;
 
   /// @brief 葉の数を得る．
   ymuint
@@ -86,16 +83,13 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 根のノード
-  const SbjNode* mRoot;
+  // 葉の数
+  ymuint32 mLeafNum;
 
   // 葉のノードの配列
-  vector<const SbjNode*> mLeafArray;
+  const SbjNode** mLeafArray;
 
   // 根と葉の極性をパックしたもの
-  // 0 〜 (ni - 1) ビットが葉の極性
-  // ni ビットが根の極性
-  // ただし ni は葉の数
   ymuint32 mInvArray;
 
 };
@@ -105,32 +99,16 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-inline
-Match::Match()
-{
-}
-
-// @brief デストラクタ
-inline
-Match::~Match()
-{
-}
-
-// @brief 根のノードと入力数を設定する．
-// @param[in] root_node 根のノード
-// @param[in] root_inv 根の極性
-// @param[in] ni 入力数
+// @brief 葉の数を再設定する．
 inline
 void
-Match::set_root(const SbjNode* root_node,
-		bool root_inv,
-		ymuint ni)
+Match::resize(ymuint nl)
 {
-  mRoot = root_node;
-  mLeafArray.clear();
-  mLeafArray.resize(ni);
-  mInvArray = (static_cast<ymuint>(root_inv) << ni);
+  if ( mLeafNum != nl ) {
+    delete [] mLeafArray;
+    mLeafNum = nl;
+    mLeafArray = new const SbjNode*[nl];
+  }
 }
 
 // @brief 葉のノードを設定する．
@@ -143,24 +121,9 @@ Match::set_leaf(ymuint pos,
 		const SbjNode* leaf_node,
 		bool leaf_inv)
 {
+  assert_cond( pos < leaf_num(), __FILE__, __LINE__);
   mLeafArray[pos] = leaf_node;
   mInvArray |= (static_cast<ymuint>(leaf_inv) << pos);
-}
-
-// @brief 根のノードを得る．
-inline
-const SbjNode*
-Match::root_node() const
-{
-  return mRoot;
-}
-
-// @brief 根の極性を得る．
-inline
-bool
-Match::root_inv() const
-{
-  return static_cast<bool>((mInvArray >> leaf_num()) & 1U);
 }
 
 // @brief 葉の数を得る．
@@ -168,7 +131,7 @@ inline
 ymuint
 Match::leaf_num() const
 {
-  return mLeafArray.size();
+  return mLeafNum;
 }
 
 // @brief 葉のノードを得る．

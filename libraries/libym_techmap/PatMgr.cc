@@ -238,6 +238,26 @@ PatMgr::load(istream& s)
   return true;
 }
 
+// @brief このセルライブラリに含まれるセルの最大の入力数を得る．
+ymuint
+PatMgr::max_input() const
+{
+  ymuint ans = 0;
+  for (ymuint i = 0; i < rep_num(); ++ i) {
+    const RepFunc& rep = this->rep(i);
+    if ( rep.pat_num() == 0 ) {
+      // これは定数かインバーターだから無視しても大丈夫
+      continue;
+    }
+    const PatGraph& pat = this->pat(rep.pat_id(0));
+    ymuint ni = pat.input_num();
+    if ( ans < ni ) {
+      ans = ni;
+    }
+  }
+  return ans;
+}
+
 // @relates PatMgr
 // @brief PatMgr の内容を出力する．
 // @param[in] s 出力先のストリーム

@@ -17,8 +17,15 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_techmap_la_SOURCES = \
+	AreaCover.h \
+	AreaCover.cc \
 	BNet2Sbj.cc \
+	CnGraph.cc \
 	FuncGroup.h \
+	MapRecord.h \
+	MapRecord.cc \
+	Match.h \
+	Match.cc \
 	PatGraph.h \
 	PatMatcher.h \
 	PatMatcher.cc \

@@ -21,7 +21,9 @@ BEGIN_NAMESPACE_YM_TECHMAP
 PatMatcher::PatMatcher(const PatMgr& pat_mgr) :
   mPatMgr(pat_mgr),
   mSbjMap(pat_mgr.node_num(), NULL),
-  mInvMap(pat_mgr.node_num(), false)
+  mInvMap(pat_mgr.node_num(), false),
+  mLeafNodeArray(pat_mgr.max_input()),
+  mLeafInvArray(pat_mgr.max_input())
 {
 }
 
@@ -39,8 +41,7 @@ PatMatcher::~PatMatcher()
 // @note input_map の中身は (SbjNode->i() << 1) | pol
 bool
 PatMatcher::operator()(const SbjNode* sbj_root,
-		       const PatGraph& pat_graph,
-		       Match& match)
+		       const PatGraph& pat_graph)
 {
   // 根のノードを調べる．
   ymuint root_id = pat_graph.root_id();
@@ -122,10 +123,10 @@ PatMatcher::operator()(const SbjNode* sbj_root,
   { // 成功した．
     success= true;
     ymuint ni = pat_graph.input_num();
-    match.set_root(sbj_root, pat_graph.root_inv(), ni);
     for (ymuint i = 0; i < ni; ++ i) {
       ymuint node_id = mPatMgr.input_node(i);
-      match.set_leaf(i, mSbjMap[node_id], mInvMap[node_id]);
+      mLeafNodeArray[i] = mSbjMap[node_id];
+      mLeafInvArray[i] = mInvMap[node_id];
     }
   }
 
