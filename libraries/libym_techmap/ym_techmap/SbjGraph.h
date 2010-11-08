@@ -288,14 +288,6 @@ public:
   bool
   fanin_rst_inv() const;
 
-  /// @brief 深さを得る．
-  ymuint
-  depth() const;
-
-  /// @brief レベルを得る．
-  ymuint
-  level() const;
-
   /// @}
   //////////////////////////////////////////////////////////////////////
 
