@@ -21,6 +21,7 @@ libym_techmap_la_SOURCES = \
 	AreaCover.cc \
 	BNet2Sbj.cc \
 	CnGraph.cc \
+	CnGraph_dump.cc \
 	FuncGroup.h \
 	MapRecord.h \
 	MapRecord.cc \

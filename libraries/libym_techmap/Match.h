@@ -145,6 +145,7 @@ Match::leaf_node(ymuint pos) const
 
 // @brief 葉の極性を得る．
 // @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
+inline
 bool
 Match::leaf_inv(ymuint pos) const
 {

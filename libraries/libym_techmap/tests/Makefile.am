@@ -31,7 +31,8 @@ LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 bin_PROGRAMS = \
 	read_blif \
 	patmgr_test \
-	pgfuncmgr_test
+	pgfuncmgr_test \
+	areacover_test
 
 read_blif_SOURCES = \
 	read_blif.cc
@@ -51,3 +52,10 @@ pgfuncmgr_test_SOURCES = \
 
 pgfuncmgr_test_LDADD = \
 	$(LIBYM_TECHMAP)
+
+areacover_test_SOURCES = \
+	areacover_test.cc
+
+areacover_test_LDADD = \
+	$(LIBYM_TECHMAP) \
+	$(LIBYM_BNET)

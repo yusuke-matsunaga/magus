@@ -21,19 +21,29 @@ BEGIN_NAMESPACE_YM_TECHMAP
 // @param[in] nl 葉の数(入力数)
 Match::Match(ymuint nl) :
   mLeafNum(nl),
-  mLeafArray(new const SbjNode*[nl]),
   mInvArray(0U)
 {
+  if ( nl > 0 ) {
+    mLeafArray = new const SbjNode*[nl];
+  }
+  else {
+    mLeafArray = NULL;
+  }
 }
 
 // @brief コピーコンストラクタ
 Match::Match(const Match& src) :
   mLeafNum(src.leaf_num()),
-  mLeafArray(new const SbjNode*[mLeafNum]),
   mInvArray(src.mInvArray)
 {
-  for (ymuint i = 0; i < mLeafNum; ++ i) {
-    mLeafArray[i] = src.mLeafArray[i];
+  if ( mLeafNum > 0 ) {
+    mLeafArray = new const SbjNode*[mLeafNum];
+    for (ymuint i = 0; i < mLeafNum; ++ i) {
+      mLeafArray[i] = src.mLeafArray[i];
+    }
+  }
+  else {
+    mLeafArray = NULL;
   }
 }
 
@@ -51,7 +61,6 @@ Match::operator=(const Match& src)
 }
 
 // @brief デストラクタ
-inline
 Match::~Match()
 {
   delete [] mLeafArray;

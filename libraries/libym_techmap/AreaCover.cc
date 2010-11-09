@@ -12,6 +12,7 @@
 #include "PatMatcher.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_cell/Cell.h"
+#include "MapRecord.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
@@ -39,8 +40,13 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 		      const PatMgr& patmgr,
 		      CnGraph& mapnetwork)
 {
-  record_cuts(sbjgraph, patmgr);
+  MapRecord maprec;
 
+  // マッピング結果を maprec に記録する．
+  record_cuts(sbjgraph, patmgr, maprec);
+
+  // maprec の情報から mapnetwork を生成する．
+  maprec.gen_mapgraph(sbjgraph, mapnetwork);
 }
 
 // @brief best cut の記録を行う．
@@ -49,12 +55,17 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 AreaCover::record_cuts(const SbjGraph& sbjgraph,
-		       const PatMgr& patmgr)
+		       const PatMgr& patmgr,
+		       MapRecord& maprec)
 {
   ymuint n = sbjgraph.max_node_id();
-  mNodeInfoArray.resize(n * 2);
+  mCostArray.resize(n * 2);
   ymuint max_input = patmgr.max_input();
   mWeight.resize(max_input);
+  mLeafNum.clear();
+  mLeafNum.resize(n, -1);
+
+  maprec.init(sbjgraph);
 
   const FuncGroup& inv_func = patmgr.inv_func();
 
@@ -63,21 +74,21 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   for (SbjNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const SbjNode* node = *p;
-    NodeInfo& p_info = node_info(node, false);
-    p_info.mCost = 0.0;
-    p_info.mCell = NULL;
-    add_inv(node, true, inv_func);
+    double& p_cost = cost(node, false);
+    p_cost = 0.0;
+    double& n_cost = cost(node, true);
+    n_cost = DBL_MAX;
+    add_inv(node, true, inv_func, maprec);
   }
   const SbjNodeList& dff_list = sbjgraph.dff_list();
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const SbjNode* node = *p;
-    NodeInfo& p_info = node_info(node, false);
-    p_info.mCost = 0.0;
-    p_info.mCell = NULL;
-    NodeInfo& n_info = node_info(node, true);
-    n_info.mCost = 0.0;
-    n_info.mCell = NULL;
+    double& p_cost = cost(node, false);
+    p_cost = 0.0;
+    double& n_cost = cost(node, true);
+    n_cost = DBL_MAX;
+    add_inv(node, true, inv_func, maprec);
   }
 
   // 論理ノードのコストを入力側から計算
@@ -89,10 +100,10 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
        p != snode_list.end(); ++ p) {
     const SbjNode* node = *p;
 
-    NodeInfo& p_info = node_info(node, false);
-    NodeInfo& n_info = node_info(node, true);
-    p_info.mCost = DBL_MAX;
-    n_info.mCost = DBL_MAX;
+    double& p_cost = cost(node, false);
+    double& n_cost = cost(node, true);
+    p_cost = DBL_MAX;
+    n_cost = DBL_MAX;
     for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
       const PatGraph& pat = patmgr.pat(pat_id);
       ymuint ni = pat.input_num();
@@ -107,18 +118,26 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	  Match c_match(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {
 	    tNpnImap imap = npn_map.imap(i);
-	    const SbjNode* inode = pat_match.leaf_node(npnimap_pos(imap));
+	    ymuint pos = npnimap_pos(imap);
+	    const SbjNode* inode = pat_match.leaf_node(pos);
 	    bool iinv = (npnimap_pol(imap) == kPolNega);
 	    c_match.set_leaf(i, inode, iinv);
+	    mLeafNum[inode->id()] = i;
 	  }
 	  bool root_inv = pat.root_inv();
 	  if ( npn_map.opol() == kPolNega ) {
 	    root_inv = !root_inv;
 	  }
+	  double& c_cost = root_inv ? n_cost : p_cost;
+
 	  for (ymuint i = 0; i < ni; ++ i) {
 	    mWeight[i] = 0.0;
 	  }
-	  calc_weight(node, c_match, 1.0);
+	  calc_weight(node, 1.0);
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    mLeafNum[c_match.leaf_node(i)->id()] = -1;
+	  }
+
 	  ymuint nc = func.cell_num();
 	  for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
 	    const Cell* cell = func.cell(c_pos);
@@ -126,27 +145,24 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	    for (ymuint i = 0; i < ni; ++ i) {
 	      const SbjNode* leaf_node = c_match.leaf_node(i);
 	      bool leaf_inv = c_match.leaf_inv(i);
-	      NodeInfo& l_info = node_info(leaf_node, leaf_inv);
-	      cur_cost += l_info.mCost * mWeight[i];
+	      cur_cost += cost(leaf_node, leaf_inv) * mWeight[i];
 	    }
-	    NodeInfo& c_info = root_inv ? n_info : p_info;
-	    if ( c_info.mCost >= cur_cost ) {
-	      c_info.mCost = cur_cost;
-	      c_info.mMatch = c_match;
-	      c_info.mCell = cell;
+	    if ( c_cost >= cur_cost ) {
+	      c_cost = cur_cost;
+	      maprec.set_match(node, root_inv, c_match, cell);
 	    }
 	  }
 	}
       }
     }
     bool has_match = false;
-    if ( p_info.mCell != NULL ) {
+    if ( p_cost != DBL_MAX ) {
       has_match = true;
-      add_inv(node, true, inv_func);
+      add_inv(node, true, inv_func, maprec);
     }
-    if ( n_info.mCell != NULL ) {
+    if ( n_cost != DBL_MAX ) {
       has_match = true;
-      add_inv(node, false, inv_func);
+      add_inv(node, false, inv_func, maprec);
     }
     assert_cond( has_match, __FILE__, __LINE__);
   }
@@ -159,48 +175,51 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 void
 AreaCover::add_inv(const SbjNode* node,
 		   bool inv,
-		   const FuncGroup& inv_func)
+		   const FuncGroup& inv_func,
+		   MapRecord& maprec)
 {
-  NodeInfo& node_info = this->node_info(node, inv);
-  NodeInfo& alt_info = this->node_info(node, !inv);
-
-  if ( alt_info.mMatch.leaf_num() == 1 ) {
+  if ( maprec.get_match(node, !inv).leaf_num() == 1 ) {
     // 逆極性の解が自分の解＋インバーターだった
     return;
   }
+
+  double& cur_cost = cost(node, inv);
+  double alt_cost = cost(node, !inv);
   ymuint nc = inv_func.cell_num();
+  const Cell* inv_cell = NULL;
   for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
     const Cell* cell = inv_func.cell(c_pos);
     double cost = cell->area().value();
-    cost += alt_info.mCost;
-    if ( node_info.mCost > cost ) {
-      node_info.mCost = cost;
-      node_info.mMatch.resize(1);
-      node_info.mMatch.set_leaf(0, node, !inv);
-      node_info.mCell = cell;
+    cost += alt_cost;
+    if ( cur_cost > cost ) {
+      cur_cost = cost;
+      inv_cell = cell;
     }
+  }
+  if ( inv_cell ) {
+    maprec.set_inv_match(node, inv, inv_cell);
   }
 }
 
 // @brief node から各入力にいたる経路の重みを計算する．
 void
 AreaCover::calc_weight(const SbjNode* node,
-		       const Match& match,
 		       double cur_weight)
 {
   for ( ; ; ) {
-    for (ymuint i = 0; i < match.leaf_num(); ++ i) {
-      if ( match.leaf_node(i) == node ) {
-	// node は cut の葉だった．
-	if  ( !node->pomark() ) {
-	  mWeight[i] += cur_weight;
-	}
-	return;
+    int c = mLeafNum[node->id()];
+    if ( c != -1 ) {
+      // node はマッチの葉だった．
+      if  ( !node->pomark() ) {
+	mWeight[c] += cur_weight;
       }
+      return;
     }
+    assert_cond( !node->is_input(), __FILE__, __LINE__);
+
     const SbjNode* inode0 = node->fanin(0);
     double cur_weight0 = cur_weight / inode0->n_fanout();
-    calc_weight(inode0, match, cur_weight0);
+    calc_weight(inode0, cur_weight0);
     node = node->fanin(1);
     cur_weight /= node->n_fanout();
   }

@@ -52,18 +52,37 @@ MapRecord::copy(const MapRecord& src)
 // @param[in] node 該当のノード
 // @param[in] inv 極性
 // @param[in] match 対応するマッチ
+// @param[in] cell セル
 void
 MapRecord::set_match(const SbjNode* node,
 		     bool inv,
-		     const Match* match)
+		     const Match& match,
+		     const Cell* cell)
 {
-  node_info(node, inv).mMatch = match;
+  NodeInfo& ni = node_info(node, inv);
+  ni.mMatch = match;
+  ni.mCell = cell;
+}
+
+// @brief インバータのマッチを記録する．
+// @param[in] node 該当のノード
+// @param[in] inv 極性
+// @param[in] cell セル
+void
+MapRecord::set_inv_match(const SbjNode* node,
+			 bool inv,
+			 const Cell* cell)
+{
+  NodeInfo& ni = node_info(node, inv);
+  ni.mMatch.resize(1);
+  ni.mMatch.set_leaf(0, node, !inv);
+  ni.mCell = cell;
 }
 
 // @brief マッチを取り出す．
 // @param[in] node 該当のノード
 // @param[in] inv 極性
-const Match*
+const Match&
 MapRecord::get_match(const SbjNode* node,
 		     bool inv)
 {
@@ -201,27 +220,28 @@ MapRecord::back_trace(const SbjNode* node,
   }
 
   // node を根とするマッチを取り出す．
-  const Match* match = node_info.mMatch;
+  const Match& match = node_info.mMatch;
 
   // その入力に対応するノードを再帰的に生成する．
-  ymuint ni = match->leaf_num();
+  ymuint ni = match.leaf_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = match->leaf_node(i);
-    bool iinv = match->leaf_inv(i);
+    const SbjNode* inode = match.leaf_node(i);
+    bool iinv = match.leaf_inv(i);
     back_trace(inode, iinv, mapnetwork);
   }
 
   mTmpFanins.clear();
   mTmpFanins.resize(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = match->leaf_node(i);
-    bool iinv = match->leaf_inv(i);
+    const SbjNode* inode = match.leaf_node(i);
+    bool iinv = match.leaf_inv(i);
     NodeInfo& inode_info = this->node_info(inode, iinv);
     CnNode* imapnode = inode_info.mMapNode;
     mTmpFanins[i] = imapnode;
   }
 
   // 新しいノードを作り mNodeMap に登録する．
+  assert_cond( node_info.mCell != NULL, __FILE__, __LINE__);
   mapnode = mapnetwork.new_cellnode(mTmpFanins, node_info.mCell);
   node_info.mMapNode = mapnode;
 

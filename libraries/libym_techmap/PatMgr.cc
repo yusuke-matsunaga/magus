@@ -1,6 +1,6 @@
 
-/// @file libym_techmap/PatGraph.cc
-/// @brief PatGraph の実装ファイル
+/// @file libym_techmap/PatMgr.cc
+/// @brief PatMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -94,15 +94,27 @@ bool
 RepFunc::load(istream& s)
 {
   mFuncNum = read_word(s);
-  mFuncArray = new ymuint32[mFuncNum];
-  for (ymuint i = 0; i < mFuncNum; ++ i) {
-    mFuncArray[i] = read_word(s);
+  if ( mFuncNum > 0 ) {
+    mFuncArray = new ymuint32[mFuncNum];
+    for (ymuint i = 0; i < mFuncNum; ++ i) {
+      mFuncArray[i] = read_word(s);
+    }
   }
+  else {
+    mFuncArray = NULL;
+  }
+
   mPatNum = read_word(s);
-  mPatArray = new ymuint32[mPatNum];
-  for (ymuint i = 0; i < mPatNum; ++ i) {
-    mPatArray[i] = read_word(s);
+  if ( mPatNum > 0 ) {
+    mPatArray = new ymuint32[mPatNum];
+    for (ymuint i = 0; i < mPatNum; ++ i) {
+      mPatArray[i] = read_word(s);
+    }
   }
+  else {
+    mPatArray = NULL;
+  }
+
   return true;
 }
 
@@ -134,10 +146,16 @@ PatGraph::load(istream& s)
 {
   mInputNum = read_word(s);
   mEdgeNum = read_word(s);
-  mEdgeList = new ymuint32[mEdgeNum];
-  for (ymuint i = 0; i < mEdgeNum; ++ i) {
-    mEdgeList[i] = read_word(s);
+  if ( mEdgeNum > 0 ) {
+    mEdgeList = new ymuint32[mEdgeNum];
+    for (ymuint i = 0; i < mEdgeNum; ++ i) {
+      mEdgeList[i] = read_word(s);
+    }
   }
+  else {
+    mEdgeList = NULL;
+  }
+
   return true;
 }
 
@@ -197,10 +215,15 @@ PatMgr::load(istream& s)
     read_map(s, func.mNpnMap);
     ymuint n = read_word(s);
     func.mCellNum = n;
-    func.mCellList = new const Cell*[n];
-    for (ymuint j = 0; j < n; ++ j) {
-      ymuint id = read_word(s);
-      func.mCellList[j] = mLibrary->cell(id);
+    if ( n > 0 ) {
+      func.mCellList = new const Cell*[n];
+      for (ymuint j = 0; j < n; ++ j) {
+	ymuint id = read_word(s);
+	func.mCellList[j] = mLibrary->cell(id);
+      }
+    }
+    else {
+      func.mCellList = NULL;
     }
   }
 
@@ -232,6 +255,15 @@ PatMgr::load(istream& s)
   for (ymuint i = 0; i < mPatNum; ++ i) {
     if ( !mPatArray[i].load(s) ) {
       return false;
+    }
+  }
+
+  // 代表関数とパタングラフの対応関係をとる．
+  for (ymuint i = 0; i < mRepNum; ++ i) {
+    RepFunc& rep = mRepArray[i];
+    for (ymuint j = 0; j < rep.mPatNum; ++ j) {
+      PatGraph& pat = mPatArray[rep.mPatArray[j]];
+      pat.mRepId = i;
     }
   }
 
@@ -349,7 +381,8 @@ dump(ostream& s,
   ymuint np = pat_mgr.pat_num();
   for (ymuint i = 0; i < np; ++ i) {
     const PatGraph& pat = pat_mgr.pat(i);
-    s << "Pat#" << i << ": ";
+    s << "Pat#" << i << ": "
+      << "Rep#" << pat.rep_id() << ": ";
     if ( pat.root_inv() ) {
       s << "[inv]";
     }

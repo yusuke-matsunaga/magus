@@ -332,6 +332,62 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class CnPort CnGraph.h "CnGraph.h"
+/// @brief ポートを表すクラス
+//////////////////////////////////////////////////////////////////////
+class CnPort
+{
+  friend class CnGraph;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  /// @param[in] name 名前
+  /// @param[in] io_node_vec 対応する入出力ノードのベクタ
+  CnPort(const string& name,
+	 const vector<CnNode*>& io_node_vec);
+
+  /// @brief デストラクタ
+  ~CnPort();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を得る．
+  string
+  name() const;
+
+  /// @brief ビット数を得る．
+  ymuint
+  bit_width() const;
+
+  /// @brief pos ビット目の内容を得る．
+  /// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
+  const CnNode*
+  bit(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  string mName;
+
+  // 入出力ノードの配列
+  vector<CnNode*> mBody;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class CnGraph CnGraph.h "CnGraph.h"
 /// @brief セルネットワークを表すクラス
 ///
@@ -365,6 +421,65 @@ public:
 
   /// @brief デストラクタ
   ~CnGraph();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name 外部インターフェイス情報の取得
+  /// @{
+
+  /// @brief モジュール名を得る．
+  string
+  name() const;
+
+  /// @brief ポート数を得る．
+  ymuint
+  port_num() const;
+
+  /// @brief ポートを得る．
+  /// @param[in] pos ポート位置 ( 0 <= pos < port_num() )
+  const CnPort*
+  port(ymuint pos) const;
+
+  /// @brief 入出力ノードに関連づけられたポートを得る．
+  /// @param[in] node 入出力ノード
+  const CnPort*
+  port(const CnNode* node) const;
+
+  /// @brief 入出力ノードのポートにおけるビット位置を得る．
+  /// @param[in] node 入出力ノード
+  ymuint
+  port_pos(const CnNode* node) const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name 外部インターフェイス情報の設定
+  /// @{
+
+  /// @brief モジュール名を設定する．
+  void
+  set_name(const string& name);
+
+  /// @brief ポートを追加する(1ビット版)．
+  /// @param[in] name ポート名
+  /// @param[in] io_node 対応する入出力ノード
+  void
+  add_port(const string& name,
+	   CnNode* io_node);
+
+  /// @brief ポートを追加する(ベクタ版)．
+  /// @param[in] name ポート名
+  /// @param[in] io_node_vec 対応する入出力ノードのベクタ
+  void
+  add_port(const string& name,
+	   const vector<CnNode*>& io_node_vec);
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
 
 
 public:
@@ -567,6 +682,21 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入出力ノードに関係するポートの情報
+  struct PortInfo
+  {
+    /// @brief ポート
+    CnPort* mPort;
+    /// @brief ビット位置
+    ymuint32 mPos;
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -579,6 +709,9 @@ private:
   // モジュール名
   string mName;
 
+  // ポートの配列
+  vector<CnPort*> mPortArray;
+
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
   vector<CnNode*> mNodeArray;
@@ -590,12 +723,18 @@ private:
   // 穴はあいていない．
   vector<CnNode*> mInputArray;
 
+  // 入力番号をキーにしたポート情報の配列
+  vector<PortInfo> mInputPortArray;
+
   // 入力ノードのリスト
   CnNodeList mInputList;
 
   // 出力番号をキーにした出力ノードの配列
   // 穴はあいていない．
   vector<CnNode*> mOutputArray;
+
+  // 出力番号をキーにしたポート情報の配列
+  vector<PortInfo> mOutputPortArray;
 
   // 出力ノードのリスト
   CnNodeList mOutputList;
@@ -902,8 +1041,74 @@ CnNode::set_dff()
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス CnPort
+//////////////////////////////////////////////////////////////////////
+
+// @brief 名前を得る．
+inline
+string
+CnPort::name() const
+{
+  return mName;
+}
+
+// @brief ビット数を得る．
+inline
+ymuint
+CnPort::bit_width() const
+{
+  return mBody.size();
+}
+
+// @brief pos ビット目の内容を得る．
+// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
+inline
+const CnNode*
+CnPort::bit(ymuint pos) const
+{
+  return mBody[pos];
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス CnGraph
 //////////////////////////////////////////////////////////////////////
+
+// @brief モジュール名を得る．
+inline
+string
+CnGraph::name() const
+{
+  return mName;
+}
+
+// @brief ポート数を得る．
+inline
+ymuint
+CnGraph::port_num() const
+{
+  return mPortArray.size();
+}
+
+// @brief ポートを得る．
+// @param[in] pos ポート位置 ( 0 <= pos < port_num() )
+inline
+const CnPort*
+CnGraph::port(ymuint pos) const
+{
+  return mPortArray[pos];
+}
+
+// @brief ポートを追加する(1ビット版)．
+// @param[in] name ポート名
+// @param[in] io_node 対応する入出力ノード
+inline
+void
+CnGraph::add_port(const string& name,
+		  CnNode* io_node)
+{
+  add_port(name, vector<CnNode*>(1, io_node));
+}
 
 // ノード番号の最大値 + 1 を返す．
 inline

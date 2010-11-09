@@ -13,13 +13,13 @@
 
 #include "ym_techmap/techmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
+#include "Match.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
 class SbjGraph;
 class SbjNode;
-class Match;
 class CnGraph;
 class CnNode;
 
@@ -55,15 +55,26 @@ public:
   /// @param[in] node 該当のノード
   /// @param[in] inv 極性
   /// @param[in] match 対応するマッチ
+  /// @param[in] cell セル
   void
   set_match(const SbjNode* node,
 	    bool inv,
-	    const Match* match);
+	    const Match& match,
+	    const Cell* cell);
+
+  /// @brief インバータのマッチを記録する．
+  /// @param[in] node 該当のノード
+  /// @param[in] inv 極性
+  /// @param[in] cell セル
+  void
+  set_inv_match(const SbjNode* node,
+		bool inv,
+		const Cell* cell);
 
   /// @brief マッチを取り出す．
   /// @param[in] node 該当のノード
   /// @param[in] inv
-  const Match*
+  const Match&
   get_match(const SbjNode* node,
 	    bool inv);
 
@@ -94,13 +105,12 @@ private:
   {
     NodeInfo()
     {
-      mMatch = NULL;
       mCell = NULL;
       mMapNode = NULL;
     }
 
     // マッチ
-    const Match* mMatch;
+    Match mMatch;
 
     // セル
     const Cell* mCell;

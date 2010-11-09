@@ -57,6 +57,26 @@ CnNode::id_str() const
 }
 
 
+//////////////////////////////////////////////////////////////////////
+// クラス CnPort
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] io_node_vec 対応する入出力ノードのベクタ
+CnPort::CnPort(const string& name,
+	       const vector<CnNode*>& io_node_vec) :
+  mName(name),
+  mBody(io_node_vec)
+{
+}
+
+// @brief デストラクタ
+CnPort::~CnPort()
+{
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 // クラス CnGraph
 ///////////////////////////////////////////////////////////////////////
@@ -168,6 +188,52 @@ CnGraph::copy(const CnGraph& src,
     }
     (void) new_output(dst_inode);
   }
+
+  // ポートの複製
+  ymuint np = src.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const CnPort* src_port = src.port(i);
+    ymuint nb = src_port->bit_width();
+    vector<CnNode*> tmp(nb);
+    for (ymuint j = 0; j < nb; ++ j) {
+      const CnNode* src_node = src_port->bit(j);
+      CnNode* dst_node = nodemap[src_node->id()];
+      tmp[j] = dst_node;
+    }
+    add_port(src_port->name(), tmp);
+  }
+}
+
+// @brief 入出力ノードに関連づけられたポートを得る．
+// @param[in] node 入出力ノード
+const CnPort*
+CnGraph::port(const CnNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputPortArray[node->subid()].mPort;
+  }
+  else if ( node->is_output() ) {
+    return mOutputPortArray[node->subid()].mPort;
+  }
+  else {
+    return NULL;
+  }
+}
+
+// @brief 入出力ノードのポートにおけるビット位置を得る．
+// @param[in] node 入出力ノード
+ymuint
+CnGraph::port_pos(const CnNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputPortArray[node->subid()].mPos;
+  }
+  else if ( node->is_output() ) {
+    return mOutputPortArray[node->subid()].mPos;
+  }
+  else {
+    return NULL;
+  }
 }
 
 // @brief 入力ノードと DFF ノードのリストを得る．
@@ -277,6 +343,41 @@ CnGraph::sort(vector<CnNode*>& node_list) const
     sort_sub(node, mark, node_list);
   }
   assert_cond(node_list.size() == cellnode_num(), __FILE__, __LINE__);
+}
+
+// @brief モジュール名を設定する．
+void
+CnGraph::set_name(const string& name)
+{
+  mName = name;
+}
+
+// @brief ポートを追加する(ベクタ版)．
+// @param[in] name ポート名
+// @param[in] io_node_vec 対応する入出力ノードのベクタ
+void
+CnGraph::add_port(const string& name,
+		  const vector<CnNode*>& io_node_vec)
+{
+  CnPort* port = new CnPort(name, io_node_vec);
+  mPortArray.push_back(port);
+  ymuint n = io_node_vec.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    CnNode* node = io_node_vec[i];
+    if ( node->is_input() ) {
+      PortInfo& port_info = mInputPortArray[node->subid()];
+      port_info.mPort = port;
+      port_info.mPos = i;
+    }
+    else if ( node->is_output() ) {
+      PortInfo& port_info = mOutputPortArray[node->subid()];
+      port_info.mPort = port;
+      port_info.mPos = i;
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
 }
 
 // @brief 入力ノードを作る．

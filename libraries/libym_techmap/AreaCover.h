@@ -19,6 +19,7 @@ BEGIN_NAMESPACE_YM_TECHMAP
 
 class PatMgr;
 class FuncGroup;
+class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
 /// @class AreaCover AreaCover.h "AreaCover.h"
@@ -49,57 +50,40 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる構造体
-  //////////////////////////////////////////////////////////////////////
-
-  struct NodeInfo
-  {
-    // マッチ
-    Match mMatch;
-
-    // コスト
-    double mCost;
-
-    // セル
-    const Cell* mCell;
-
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] pat_mgr パタングラフを管理するオブジェクト
+  /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
   record_cuts(const SbjGraph& sbjgraph,
-	      const PatMgr& patmgr);
+	      const PatMgr& patmgr,
+	      MapRecord& maprec);
 
   /// @brief 逆極性の解にインバーターを付加した解を追加する．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
   /// @param[in] inv_func インバータの関数グループ
+  /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
   add_inv(const SbjNode* node,
 	  bool inv,
-	  const FuncGroup& inv_func);
+	  const FuncGroup& inv_func,
+	  MapRecord& maprec);
 
   /// @brief node から各入力にいたる経路の重みを計算する．
   /// @param[in] node 対象のノード
-  /// @param[in] match マッチング結果
   /// @param[in] cur_weight
   void
   calc_weight(const SbjNode* node,
-	      const Match& match,
 	      double cur_weight);
 
-  /// @brief (node, inv) に対応する NodeInfo を取り出す．
-  NodeInfo&
-  node_info(const SbjNode* node,
-	    bool inv);
+  /// @brief (node, inv) に対応するコストを取り出す．
+  double&
+  cost(const SbjNode* node,
+       bool inv);
 
 
 private:
@@ -107,11 +91,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 各ノードの情報を保持する配列
-  vector<NodeInfo> mNodeInfoArray;
+  // 各ノードのコストを保持する配列
+  vector<double> mCostArray;
 
   // 各入力から根の出力に抜ける経路上の重みを入れる配列
   vector<double> mWeight;
+
+  // calc_weight で用いる作業領域
+  vector<int> mLeafNum;
 
 };
 
@@ -122,11 +109,11 @@ private:
 
 // @brief (node, inv) に対応する NodeInfo を取り出す．
 inline
-AreaCover::NodeInfo&
-AreaCover::node_info(const SbjNode* node,
-		     bool inv)
+double&
+AreaCover::cost(const SbjNode* node,
+		bool inv)
 {
-  return mNodeInfoArray[node->id() * 2 + static_cast<ymuint>(inv)];
+  return mCostArray[node->id() * 2 + static_cast<ymuint>(inv)];
 }
 
 END_NAMESPACE_YM_TECHMAP
