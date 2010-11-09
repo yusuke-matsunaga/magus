@@ -22,12 +22,6 @@ BEGIN_NAMESPACE_YM_CELL
 
 // @brief コンストラクタ
 CiCell::CiCell() :
-  mInputNum(0),
-  mInputArray(NULL),
-  mOutputNum(0),
-  mOutputArray(NULL),
-  mInoutNum(0),
-  mInoutArray(NULL),
   mPinNum(0),
   mPinArray(NULL),
   mBusNum(0),
@@ -63,51 +57,6 @@ CellArea
 CiCell::area() const
 {
   return mArea;
-}
-
-// @brief 入力ピン数の取得
-ymuint
-CiCell::input_num() const
-{
-  return mInputNum;
-}
-
-// @brief 入力ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
-const CellPin*
-CiCell::input(ymuint pos) const
-{
-  return &mInputArray[pos];
-}
-
-// @brief 出力ピン数の取得
-ymuint
-CiCell::output_num() const
-{
-  return mOutputNum;
-}
-
-// @brief 出力ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
-const CellPin*
-CiCell::output(ymuint pos) const
-{
-  return &mOutputArray[pos];
-}
-
-// @brief 入出力ピン数の取得
-ymuint
-CiCell::inout_num() const
-{
-  return mInoutNum;
-}
-
-// @brief 入出力ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
-const CellPin*
-CiCell::inout(ymuint pos) const
-{
-  return &mInoutArray[pos];
 }
 
 // @brief ピン数の取得

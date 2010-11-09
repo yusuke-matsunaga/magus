@@ -62,39 +62,6 @@ public:
   CellArea
   area() const;
 
-  /// @brief 入力ピン数の取得
-  virtual
-  ymuint
-  input_num() const;
-
-  /// @brief 入力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
-  virtual
-  const CellPin*
-  input(ymuint pos) const;
-
-  /// @brief 出力ピン数の取得
-  virtual
-  ymuint
-  output_num() const;
-
-  /// @brief 出力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
-  virtual
-  const CellPin*
-  output(ymuint pos) const;
-
-  /// @brief 入出力ピン数の取得
-  virtual
-  ymuint
-  inout_num() const;
-
-  /// @brief 入出力ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
-  virtual
-  const CellPin*
-  inout(ymuint pos) const;
-
   /// @brief ピン数の取得
   virtual
   ymuint
@@ -163,24 +130,6 @@ private:
 
   // 面積
   CellArea mArea;
-
-  // 入力ピン数
-  ymuint32 mInputNum;
-
-  // 入力ピンの配列
-  CiInputPin* mInputArray;
-
-  // 出力ピン数
-  ymuint32 mOutputNum;
-
-  // 出力ピンの配列
-  CiOutputPin* mOutputArray;
-
-  // 入出力ピン数
-  ymuint32 mInoutNum;
-
-  // 入出力ピンの配列
-  CiInoutPin* mInoutArray;
 
   // 総ピン数
   ymuint32 mPinNum;
