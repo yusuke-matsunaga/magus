@@ -32,6 +32,10 @@ lutmap_init(Tcl_Interp* interp,
 	    NetMgr* mgr);
 
 int
+techmap_init(Tcl_Interp* interp,
+	     NetMgr* mgr);
+
+int
 seal_init(Tcl_Interp* interp,
 	  NetMgr* mgr);
 
@@ -48,7 +52,7 @@ int
 magus_init(Tcl_Interp* interp)
 {
   using namespace nsYm::nsMagus;
-  
+
   //////////////////////////////////////////////////////////////////////
   // magus という namespace を作っておく．
   //////////////////////////////////////////////////////////////////////
@@ -56,13 +60,13 @@ magus_init(Tcl_Interp* interp)
     return TCL_ERROR;
   }
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // NetMgr の生成
   //////////////////////////////////////////////////////////////////////
 
   NetMgr* mgr = new NetMgr;
-  
+
   if ( misc_init(interp) == TCL_ERROR ) {
     return TCL_ERROR;
   }
@@ -70,15 +74,19 @@ magus_init(Tcl_Interp* interp)
   if ( logbase_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
-  
+
   if ( equiv_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
-  
+
   if ( lutmap_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
-  
+
+  if ( techmap_init(interp, mgr) == TCL_ERROR ) {
+    return TCL_ERROR;
+  }
+
   if ( seal_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
@@ -116,13 +124,13 @@ magus_init(Tcl_Interp* interp)
     return TCL_ERROR;
   }
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // パッケージ宣言
   //////////////////////////////////////////////////////////////////////
   if ( Tcl_PkgProvide(interp, "Magus", MAGUS_VERSION) != TCL_OK ) {
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }

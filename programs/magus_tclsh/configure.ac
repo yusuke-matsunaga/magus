@@ -6,7 +6,7 @@
 # Initial block
 # ===================================================================
 AC_INIT([magus], [1.0],
-        [yusuke_matsunaga@ieee.org], 
+        [yusuke_matsunaga@ieee.org],
         [magus])dnl
 
 AC_REVISION($Rev: 2507 $)dnl
@@ -137,6 +137,7 @@ AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/logbase/Makefile])
 AC_CONFIG_FILES([src/equiv/Makefile])
 AC_CONFIG_FILES([src/lutmap/Makefile])
+AC_CONFIG_FILES([src/techmap/Makefile])
 AC_CONFIG_FILES([src/seal/Makefile])
 AC_CONFIG_FILES([src/simplify/Makefile])
 AC_CONFIG_FILES([src/misc/Makefile])
