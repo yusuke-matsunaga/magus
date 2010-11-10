@@ -30,7 +30,6 @@ libym_techmap_la_SOURCES = \
 	PatGraph.h \
 	PatMatcher.h \
 	PatMatcher.cc \
-	PatMgr.h \
 	PatMgr.cc \
 	RepFunc.h \
 	SbjGraph.cc \

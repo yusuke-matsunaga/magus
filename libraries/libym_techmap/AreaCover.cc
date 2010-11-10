@@ -8,8 +8,11 @@
 
 
 #include "AreaCover.h"
-#include "PatMgr.h"
+#include "ym_techmap/PatMgr.h"
 #include "PatMatcher.h"
+#include "PatGraph.h"
+#include "RepFunc.h"
+#include "FuncGroup.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_cell/Cell.h"
 #include "MapRecord.h"
@@ -223,6 +226,26 @@ AreaCover::calc_weight(const SbjNode* node,
     node = node->fanin(1);
     cur_weight /= node->n_fanout();
   }
+}
+
+// @brief 面積最小化 DAG covering のヒューリスティック関数
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] pat_mgr パタンマネージャ
+// @param[in] mode モード
+//  - 0: fanout フロー, resub なし
+//  - 1: weighted フロー, resub なし
+//  - 2: fanout フロー, resub あり
+//  - 3: weighted フロー, resub あり
+// @param[out] mapnetwork マッピング結果
+void
+area_map(const SbjGraph& sbjgraph,
+	 const PatMgr& pat_mgr,
+	 ymuint mode,
+	 CnGraph& mapnetwork)
+{
+  AreaCover area_cover;
+
+  area_cover(sbjgraph, pat_mgr, mapnetwork);
 }
 
 END_NAMESPACE_YM_TECHMAP

@@ -390,6 +390,8 @@ CnGraph::new_input()
   // 入力ノード配列に登録
   ymuint subid = mInputArray.size();
   mInputArray.push_back(node);
+  // ダミーの place-holder を追加する．
+  mInputPortArray.push_back(PortInfo());
 
   // 入力リストに登録
   mInputList.push_back(node);
@@ -410,6 +412,8 @@ CnGraph::new_output(CnNode* inode)
   // 出力ノード配列に登録
   ymuint subid = mOutputArray.size();
   mOutputArray.push_back(node);
+  // ダミーの place-holder を追加する．
+  mOutputPortArray.push_back(PortInfo());
 
   // 出力リストに登録
   mOutputList.push_back(node);

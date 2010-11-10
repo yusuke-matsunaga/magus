@@ -9,7 +9,7 @@
 
 #include "PatMatcher.h"
 #include "ym_techmap/SbjGraph.h"
-#include "PatMgr.h"
+#include "ym_techmap/PatMgr.h"
 #include "PatGraph.h"
 #include "Match.h"
 

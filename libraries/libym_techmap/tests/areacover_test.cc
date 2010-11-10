@@ -13,9 +13,8 @@
 #include "ym_techmap/BNet2Sbj.h"
 #include "ym_techmap/SbjGraph.h"
 #include "ym_techmap/CnGraph.h"
+#include "ym_techmap/PatMgr.h"
 #include "ym_utils/MsgHandler.h"
-#include "AreaCover.h"
-#include "PatMgr.h"
 
 
 BEGIN_NONAMESPACE
@@ -79,10 +78,9 @@ test(string pat_filename,
     }
   }
 
-  AreaCover area_cover;
   CnGraph mapnetwork;
 
-  area_cover(sbjgraph, pat_mgr, mapnetwork);
+  area_map(sbjgraph, pat_mgr, 0, mapnetwork);
 
   dump_verilog(cout, mapnetwork);
 }

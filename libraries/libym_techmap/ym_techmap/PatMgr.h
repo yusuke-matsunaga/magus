@@ -11,12 +11,16 @@
 
 #include "ym_techmap/techmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
-#include "FuncGroup.h"
-#include "RepFunc.h"
-#include "PatGraph.h"
+//#include "FuncGroup.h"
+//#include "RepFunc.h"
+//#include "PatGraph.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
+
+class FuncGroup;
+class RepFunc;
+class PatGraph;
 
 //////////////////////////////////////////////////////////////////////
 /// @class PatMgr PatMgr.h "PatMgr.h"
@@ -55,11 +59,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 情報設定用の関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容を初期化する．
-  /// @note 以前確保されたメモリは開放される．
-  void
-  init();
 
   /// @brief データを読み込んでセットする．
   /// @param[in] s 入力元のストリーム
@@ -179,6 +178,17 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を初期化する．
+  /// @note 以前確保されたメモリは開放される．
+  void
+  init();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -241,22 +251,13 @@ PatMgr::func_num() const
   return mFuncNum;
 }
 
-// @brief 関数グループを返す．
-// @param[in] id 関数番号　( 0 <= id < func_num() )
-inline
-const FuncGroup&
-PatMgr::func_group(ymuint id) const
-{
-  return mFuncArray[id];
-}
-
 // @brief 定数0の関数グループを返す．
 inline
 const FuncGroup&
 PatMgr::const0_func() const
 {
   // 決め打ち
-  return mFuncArray[0];
+  return func_group(0);
 }
 
 // @brief 定数1の関数グループを返す．
@@ -265,7 +266,7 @@ const FuncGroup&
 PatMgr::const1_func() const
 {
   // 決め打ち
-  return mFuncArray[1];
+  return func_group(1);
 }
 
 // @brief バッファセルの関数グループを返す．
@@ -274,7 +275,7 @@ const FuncGroup&
 PatMgr::buf_func() const
 {
   // 決め打ち
-  return mFuncArray[2];
+  return func_group(2);
 }
 
 // @brief インバータセルの関数グループを返す．
@@ -283,7 +284,7 @@ const FuncGroup&
 PatMgr::inv_func() const
 {
   // 決め打ち
-  return mFuncArray[3];
+  return func_group(3);
 }
 
 // @brief 代表関数の個数を返す．
@@ -292,15 +293,6 @@ ymuint
 PatMgr::rep_num() const
 {
   return mRepNum;
-}
-
-// @brief 代表関数を返す．
-// @param[in] id 代表関数番号
-inline
-const RepFunc&
-PatMgr::rep(ymuint id) const
-{
-  return mRepArray[id];
 }
 
 // @brief ノード数を返す．
@@ -390,15 +382,6 @@ ymuint
 PatMgr::pat_num() const
 {
   return mPatNum;
-}
-
-// @brief パタンを返す．
-// @param[in] id パタン番号 ( 0 <= id < pat_num() )
-inline
-const PatGraph&
-PatMgr::pat(ymuint id) const
-{
-  return mPatArray[id];
 }
 
 END_NAMESPACE_YM_TECHMAP

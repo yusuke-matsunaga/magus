@@ -9,7 +9,7 @@
 
 #include "patgen/patgen_nsdef.h"
 #include "patgen/PgFuncMgr.h"
-#include "PatMgr.h"
+#include "ym_techmap/PatMgr.h"
 #include "ym_cell/CellMislibReader.h"
 
 

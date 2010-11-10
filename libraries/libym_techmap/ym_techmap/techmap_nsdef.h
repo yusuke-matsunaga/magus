@@ -28,6 +28,8 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
+class  PatMgr;
+
 class SbjGraph;
 class SbjEdge;
 class SbjNode;
@@ -44,26 +46,23 @@ typedef DlList<CnNode> CnNodeList;
 
 class BNet2Sbj;
 
-#if 0
+
 /// @brief 面積最小化 DAG covering のヒューリスティック関数
 /// @param[in] sbjgraph サブジェクトグラフ
-/// @param[in] limit カットサイズ
+/// @param[in] pat_mgr パタンマネージャ
 /// @param[in] mode モード
 ///  - 0: fanout フロー, resub なし
 ///  - 1: weighted フロー, resub なし
 ///  - 2: fanout フロー, resub あり
 ///  - 3: weighted フロー, resub あり
 /// @param[out] mapnetwork マッピング結果
-/// @param[out] lut_num LUT数
-/// @param[out] depth 段数
 void
 area_map(const SbjGraph& sbjgraph,
-	 ymuint limit,
+	 const PatMgr& pat_mgr,
 	 ymuint mode,
-	 LnGraph& mapnetwork,
-	 ymuint& lut_num,
-	 ymuint& depth);
+	 CnGraph& mapnetwork);
 
+#if 0
 /// @brief 段数最小化 DAG covering のヒューリスティック関数
 /// @param[in] sbjgraph サブジェクトグラフ
 /// @param[in] limit カットサイズ
@@ -90,6 +89,8 @@ END_NAMESPACE_YM_TECHMAP
 
 BEGIN_NAMESPACE_YM
 
+using nsTechmap::PatMgr;
+
 using nsTechmap::SbjGraph;
 using nsTechmap::SbjEdge;
 using nsTechmap::SbjNode;
@@ -99,8 +100,15 @@ using nsTechmap::SbjNodeList;
 
 using nsTechmap::BNet2Sbj;
 
-#if 0
+using nsTechmap::CnGraph;
+using nsTechmap::CnEdge;
+using nsTechmap::CnNode;
+
+using nsTechmap::CnEdgeList;
+using nsTechmap::CnNodeList;
+
 using nsTechmap::area_map;
+#if 0
 using nsTechmap::delay_map;
 #endif
 

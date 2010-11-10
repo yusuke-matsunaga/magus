@@ -12,7 +12,7 @@
 #include "patgen/PgFuncRep.h"
 #include "patgen/PgFunc.h"
 #include "ym_lexp/LogExpr.h"
-#include "PatMgr.h"
+#include "ym_techmap/PatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN

@@ -203,6 +203,21 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       }
     }
   }
+
+  // ポートを生成する．
+  ymuint np = sbjgraph.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const SbjPort* sbjport = sbjgraph.port(i);
+    ymuint nb = sbjport->bit_width();
+    vector<CnNode*> tmp(nb);
+    for (ymuint j = 0; j < nb; ++ j) {
+      const SbjNode* sbjnode = sbjport->bit(j);
+      CnNode* node = node_info(sbjnode, false).mMapNode;
+      assert_cond( node != NULL, __FILE__, __LINE__);
+      tmp[j] = node;
+    }
+    mapgraph.add_port(sbjport->name(), tmp);
+  }
 }
 
 // サブジェクトグラフの node に対応するマップされたノードを

@@ -99,6 +99,7 @@ dump(ostream& s,
       s << comma << inode->id_str();
       comma = ", ";
     }
+    s << ")" << endl;
   }
 }
 

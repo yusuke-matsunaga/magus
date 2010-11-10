@@ -10,4 +10,5 @@ noinst_HEADERS = \
 	techmap_nsdef.h \
 	BNet2Sbj.h \
 	CnGraph.h \
+	PatMgr.h \
 	SbjGraph.h

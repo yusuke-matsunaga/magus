@@ -7,8 +7,10 @@
 /// All rights reserved.
 
 
-#include "PatMgr.h"
+#include "ym_techmap/PatMgr.h"
 #include "PatGraph.h"
+#include "RepFunc.h"
+#include "FuncGroup.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 
@@ -288,6 +290,30 @@ PatMgr::max_input() const
     }
   }
   return ans;
+}
+
+// @brief 関数グループを返す．
+// @param[in] id 関数番号　( 0 <= id < func_num() )
+const FuncGroup&
+PatMgr::func_group(ymuint id) const
+{
+  return mFuncArray[id];
+}
+
+// @brief 代表関数を返す．
+// @param[in] id 代表関数番号
+const RepFunc&
+PatMgr::rep(ymuint id) const
+{
+  return mRepArray[id];
+}
+
+// @brief パタンを返す．
+// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+const PatGraph&
+PatMgr::pat(ymuint id) const
+{
+  return mPatArray[id];
 }
 
 // @relates PatMgr
