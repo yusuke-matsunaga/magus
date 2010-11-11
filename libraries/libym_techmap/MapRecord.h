@@ -23,7 +23,6 @@ class SbjNode;
 class CnGraph;
 class CnNode;
 
-
 //////////////////////////////////////////////////////////////////////
 /// @class MapRecord MapRecord.h "MapRecord.h"
 /// @brief マッピングの解を保持するクラス
@@ -80,9 +79,13 @@ public:
 
   /// @brief マッピング結果を CnGraph にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] const0_cell 定数0のセル
+  /// @param[in] const1_cell 定数1のセル
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
   void
   gen_mapgraph(const SbjGraph& sbjgraph,
+	       const Cell* const0_cell,
+	       const Cell* const1_cell,
 	       CnGraph& mapgraph);
 
 

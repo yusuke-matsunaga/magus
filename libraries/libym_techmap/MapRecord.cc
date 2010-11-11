@@ -90,8 +90,14 @@ MapRecord::get_match(const SbjNode* node,
 }
 
 // @brief マッピング結果を CnGraph にセットする．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] const0_cell 定数0のセル
+// @param[in] const1_cell 定数1のセル
+// @param[out] mapgraph マッピング結果を格納するネットワーク
 void
 MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
+			const Cell* const0_cell,
+			const Cell* const1_cell,
 			CnGraph& mapgraph)
 {
   mapgraph.clear();
@@ -128,17 +134,14 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       mapnode = back_trace(node, inv, mapgraph);
     }
     else {
-#if 0
-      // 定数ノードを作る．
-      vector<int> tv(1);
       if ( inv ) {
-	tv[0] = 1;
+	// 定数1ノードを作る．
+	mapnode = mapgraph.new_cellnode(vector<CnNode*>(0), const1_cell);
       }
       else {
-	tv[0] = 0;
+	// 定数0ノードを作る．
+	mapnode = mapgraph.new_cellnode(vector<CnNode*>(0), const0_cell);
       }
-      mapnode = mapgraph.new_lut(vector<CnNode*>(0), tv);
-#endif
     }
     CnNode* omapnode = mapgraph.new_output(mapnode);
     node_info(onode, false).mMapNode = omapnode;
@@ -148,30 +151,24 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   for (SbjNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const SbjNode* onode = *p;
-
-    {
-      const SbjNode* node = onode->fanin_data();
-      bool inv = onode->fanin_data_inv();
-      CnNode* mapnode = NULL;
-      if ( node ) {
-	mapnode = back_trace(node, inv, mapgraph);
+    const SbjNode* node = onode->fanin_data();
+    bool inv = onode->fanin_data_inv();
+    CnNode* mapnode = NULL;
+    if ( node ) {
+      mapnode = back_trace(node, inv, mapgraph);
+    }
+    else {
+      if ( inv ) {
+	// 定数1ノードを作る．
+	mapnode = mapgraph.new_cellnode(vector<CnNode*>(0), const1_cell);
       }
       else {
-#if 0
-	// 定数ノードを作る．
-	vector<int> tv(1);
-	if ( inv ) {
-	  tv[0] = 1;
-	}
-	else {
-	  tv[0] = 0;
-	}
-	mapnode = mapgraph.new_lut(vector<CnNode*>(0), tv);
-#endif
+	// 定数0ノードを作る．
+	mapnode = mapgraph.new_cellnode(vector<CnNode*>(0), const0_cell);
       }
-      CnNode* omapnode = node_info(onode, false).mMapNode;
-      mapgraph.set_dff_input(omapnode, mapnode);
     }
+    CnNode* omapnode = node_info(onode, false).mMapNode;
+    mapgraph.set_dff_input(omapnode, mapnode);
     {
       const SbjNode* node = onode->fanin_clock();
       bool inv = onode->fanin_clock_inv();

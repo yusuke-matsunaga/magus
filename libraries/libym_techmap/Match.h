@@ -109,6 +109,7 @@ Match::resize(ymuint nl)
     mLeafNum = nl;
     mLeafArray = new const SbjNode*[nl];
   }
+  mInvArray = 0U;
 }
 
 // @brief 葉のノードを設定する．

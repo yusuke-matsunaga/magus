@@ -40,16 +40,18 @@ AreaCover::~AreaCover()
 // @param[out] mapnetwork マッピング結果
 void
 AreaCover::operator()(const SbjGraph& sbjgraph,
-		      const PatMgr& patmgr,
+		      const PatMgr& pat_mgr,
 		      CnGraph& mapnetwork)
 {
   MapRecord maprec;
 
   // マッピング結果を maprec に記録する．
-  record_cuts(sbjgraph, patmgr, maprec);
+  record_cuts(sbjgraph, pat_mgr, maprec);
 
   // maprec の情報から mapnetwork を生成する．
-  maprec.gen_mapgraph(sbjgraph, mapnetwork);
+  const Cell* c0_cell = pat_mgr.const0_func().cell(0);
+  const Cell* c1_cell = pat_mgr.const1_func().cell(0);
+  maprec.gen_mapgraph(sbjgraph, c0_cell, c1_cell, mapnetwork);
 }
 
 // @brief best cut の記録を行う．
@@ -123,7 +125,10 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	    tNpnImap imap = npn_map.imap(i);
 	    ymuint pos = npnimap_pos(imap);
 	    const SbjNode* inode = pat_match.leaf_node(pos);
-	    bool iinv = (npnimap_pol(imap) == kPolNega);
+	    bool iinv = pat_match.leaf_inv(pos);
+	    if ( npnimap_pol(imap) == kPolNega ) {
+	      iinv = !iinv;
+	    }
 	    c_match.set_leaf(i, inode, iinv);
 	    mLeafNum[inode->id()] = i;
 	  }
@@ -221,10 +226,10 @@ AreaCover::calc_weight(const SbjNode* node,
     assert_cond( !node->is_input(), __FILE__, __LINE__);
 
     const SbjNode* inode0 = node->fanin(0);
-    double cur_weight0 = cur_weight / inode0->n_fanout();
+    double cur_weight0 = cur_weight / inode0->fanout_num();
     calc_weight(inode0, cur_weight0);
     node = node->fanin(1);
-    cur_weight /= node->n_fanout();
+    cur_weight /= node->fanout_num();
   }
 }
 

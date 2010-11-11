@@ -35,7 +35,6 @@ class SbjEdge :
 {
   friend class SbjNode;
   friend class SbjGraph;
-  friend class SbjEnumCut;
 
 public:
 
@@ -60,10 +59,6 @@ public:
   /// @return 出力側のノードを返す．
   SbjNode*
   to();
-
-  /// @brief 定数枝の時に true を返す．
-  bool
-  is_const() const;
 
   /// @brief 出力側のノードの何番目の入力かを示す．
   ymuint
@@ -246,7 +241,7 @@ public:
 
   /// @brief ファンアウト数を得る．
   ymuint
-  n_fanout() const;
+  fanout_num() const;
 
   /// @brief ファンアウトリストを得る．
   const SbjEdgeList&
@@ -399,16 +394,8 @@ private:
 
   // mMark の演算で用いる定数
   static
-  const int kFoShift = 0;
-  static
-  const int kUnselShift = 1;
-  static
-  const int kPoShift = 5;
+  const int kPoShift = 0;
 
-  static
-  const ymuint kFoMask = 1U << kFoShift;
-  static
-  const ymuint kUnselMask = 1U << kUnselShift;
   static
   const ymuint kPoMask = 1U << kPoShift;
 
@@ -586,7 +573,7 @@ public:
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint
-  n_inputs() const;
+  input_num() const;
 
   /// @brief 入力 ID 番号による入力ノードの取得
   /// @param[in] id 入力 ID 番号 ( 0 <= id < n_inputs() )
@@ -606,7 +593,7 @@ public:
 
   /// @brief 出力のノード数を得る．
   ymuint
-  n_outputs() const;
+  output_num() const;
 
   /// @brief 出力 ID 番号による出力ノードの取得
   /// @param[in] id 出力 ID 番号 ( 0 <= id < n_outputs() )
@@ -626,7 +613,7 @@ public:
 
   /// @brief 論理ノード数を得る．
   ymuint
-  n_lnodes() const;
+  lnode_num() const;
 
   /// @brief 論理ノードのリストを得る．
   const SbjNodeList&
@@ -634,7 +621,7 @@ public:
 
   /// @brief DFFノード数を得る．
   ymuint
-  n_dffs() const;
+  dff_num() const;
 
   /// @brief DFFノードのリストを得る．
   const SbjNodeList&
@@ -1004,14 +991,6 @@ SbjEdge::set_to(SbjNode* to,
   mIpos = pos;
 }
 
-// 定数枝の時に true を返す．
-inline
-bool
-SbjEdge::is_const() const
-{
-  return mFrom == NULL;
-}
-
 // @brief 出力ノードに接続している時 true を返す．
 inline
 bool
@@ -1182,7 +1161,7 @@ inline
 ymuint
 SbjNode::subid() const
 {
-  return mFlags >> 5;
+  return mFlags >> 4;
 }
 
 // @brief 出力ノードの極性を得る．
@@ -1249,7 +1228,7 @@ SbjNode::fanout_list() const
 // ファンアウト数を得る．
 inline
 ymuint
-SbjNode::n_fanout() const
+SbjNode::fanout_num() const
 {
   return mFanoutList.size();
 }
@@ -1457,7 +1436,7 @@ SbjGraph::node(ymuint id) const
 // 入力ノード数を得る．
 inline
 ymuint
-SbjGraph::n_inputs() const
+SbjGraph::input_num() const
 {
   return mInputArray.size();
 }
@@ -1481,7 +1460,7 @@ SbjGraph::input_list() const
 // 出力のノード数を得る．
 inline
 ymuint
-SbjGraph::n_outputs() const
+SbjGraph::output_num() const
 {
   return mOutputArray.size();
 }
@@ -1505,7 +1484,7 @@ SbjGraph::output_list() const
 // 論理ノード数を得る．
 inline
 ymuint
-SbjGraph::n_lnodes() const
+SbjGraph::lnode_num() const
 {
   return mLnodeList.size();
 }
@@ -1521,7 +1500,7 @@ SbjGraph::lnode_list() const
 // DFFノード数を得る．
 inline
 ymuint
-SbjGraph::n_dffs() const
+SbjGraph::dff_num() const
 {
   return mDffList.size();
 }
