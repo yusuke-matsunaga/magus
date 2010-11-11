@@ -177,8 +177,7 @@ SbjGraph::copy(const SbjGraph& src,
     SbjNode* input1 = nodemap[src_inode1->id()];
     assert_cond(input1, __FILE__, __LINE__);
 
-    SbjNode* dst_node = new_logic(src_node->fcode(),
-				  input0, input1);
+    SbjNode* dst_node = new_logic(src_node->fcode(), input0, input1);
     dst_node->mMark = src_node->mMark;
     nodemap[src_node->id()] = dst_node;
   }
@@ -583,7 +582,11 @@ SbjGraph::new_output(SbjNode* inode,
   return node;
 }
 
-// 論理ノードを作る．
+// @brief 論理ノードを作る．
+// @param[in] fcode 機能コード
+// @param[in] inode1 1番めの入力ノード
+// @param[in] inode2 2番めの入力ノード
+// @return 作成したノードを返す．
 SbjNode*
 SbjGraph::new_logic(ymuint fcode,
 		    SbjNode* inode0,
@@ -599,6 +602,32 @@ SbjGraph::new_logic(ymuint fcode,
   connect(inode1, node, 1);
 
   return node;
+}
+
+// ANDノードを作る．
+SbjNode*
+SbjGraph::new_and(SbjNode* inode0,
+		  SbjNode* inode1,
+		  bool inv0,
+		  bool inv1)
+{
+  ymuint fcode = 0U;
+  if ( inv0 ) {
+    fcode |= 1U;
+  }
+  if ( inv1 ) {
+    fcode |= 2U;
+  }
+  return new_logic(fcode, inode0, inode1);
+}
+
+// XORノードを作る．
+SbjNode*
+SbjGraph::new_xor(SbjNode* inode0,
+		  SbjNode* inode1)
+{
+  ymuint fcode = 4U;
+  return new_logic(fcode, inode0, inode1);
 }
 
 // DFFノードを作る．
@@ -735,6 +764,42 @@ SbjGraph::change_logic(SbjNode* node,
   node->set_logic(fcode);
   connect(inode1, node, 0);
   connect(inode2, node, 1);
+}
+
+// @brief ANDノードの内容を再設定する．
+// @param[in] node 変更対象の論理ノード
+// @param[in] inode1 1番めの入力ノード
+// @param[in] inode2 2番めの入力ノード
+// @param[in] inv1 1番めの枝の反転属性
+// @param[in] inv2 2番めの枝の反転属性
+void
+SbjGraph::change_and(SbjNode* node,
+		     SbjNode* inode1,
+		     SbjNode* inode2,
+		     bool inv1,
+		     bool inv2)
+{
+  ymuint fcode = 0U;
+  if ( inv1 ) {
+    fcode |= 1U;
+  }
+  if ( inv2 ) {
+    fcode |= 2U;
+  }
+  change_logic(node, fcode, inode1, inode2);
+}
+
+// @brief XORノードの内容を再設定する．
+// @param[in] node 変更対象の論理ノード
+// @param[in] inode1 1番めの入力ノード
+// @param[in] inode2 2番めの入力ノード
+void
+SbjGraph::change_xor(SbjNode* node,
+		     SbjNode* inode1,
+		     SbjNode* inode2)
+{
+  ymuint fcode = 4U;
+  change_logic(node, fcode, inode1, inode2);
 }
 
 // @brief DFFノードの内容を変更する

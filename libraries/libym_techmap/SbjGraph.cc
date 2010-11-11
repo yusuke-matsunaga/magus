@@ -173,15 +173,7 @@ SbjGraph::copy(const SbjGraph& src,
     SbjNode* input1 = nodemap[src_inode1->id()];
     assert_cond(input1, __FILE__, __LINE__);
 
-    SbjNode* dst_node = NULL;
-    if ( src_node->is_and() ) {
-      bool inv0 = src_node->fanin_inv(0);
-      bool inv1 = src_node->fanin_inv(1);
-      dst_node = new_and(input0, input1, inv0, inv1);
-    }
-    else {
-      dst_node = new_xor(input0, input1);
-    }
+    SbjNode* dst_node = new_logic(src_node->fcode(), input0, input1);
     dst_node->mMark = src_node->mMark;
     nodemap[src_node->id()] = dst_node;
   }
@@ -584,6 +576,28 @@ SbjGraph::new_output(SbjNode* inode,
   return node;
 }
 
+// @brief 論理ノードを作る．
+// @param[in] fcode 機能コード
+// @param[in] inode1 1番めの入力ノード
+// @param[in] inode2 2番めの入力ノード
+// @return 作成したノードを返す．
+SbjNode*
+SbjGraph::new_logic(ymuint fcode,
+		    SbjNode* inode0,
+		    SbjNode* inode1)
+{
+  SbjNode* node = new_node(2);
+
+  // 論理ノードリストに登録
+  mLnodeList.push_back(node);
+
+  node->set_logic(fcode);
+  connect(inode0, node, 0);
+  connect(inode1, node, 1);
+
+  return node;
+}
+
 // ANDノードを作る．
 SbjNode*
 SbjGraph::new_and(SbjNode* inode0,
@@ -591,16 +605,14 @@ SbjGraph::new_and(SbjNode* inode0,
 		  bool inv0,
 		  bool inv1)
 {
-  SbjNode* node = new_node(2);
-
-  // 論理ノードリストに登録
-  mLnodeList.push_back(node);
-
-  node->set_and(inv0, inv1);
-  connect(inode0, node, 0);
-  connect(inode1, node, 1);
-
-  return node;
+  ymuint fcode = 0U;
+  if ( inv0 ) {
+    fcode |= 1U;
+  }
+  if ( inv1 ) {
+    fcode |= 2U;
+  }
+  return new_logic(fcode, inode0, inode1);
 }
 
 // XORノードを作る．
@@ -608,16 +620,8 @@ SbjNode*
 SbjGraph::new_xor(SbjNode* inode0,
 		  SbjNode* inode1)
 {
-  SbjNode* node = new_node(2);
-
-  // 論理ノードリストに登録
-  mLnodeList.push_back(node);
-
-  node->set_xor();
-  connect(inode0, node, 0);
-  connect(inode1, node, 1);
-
-  return node;
+  ymuint fcode = 4U;
+  return new_logic(fcode, inode0, inode1);
 }
 
 // DFFノードを作る．
@@ -733,6 +737,23 @@ SbjGraph::change_output(SbjNode* node,
   connect(inode, node, 0);
 }
 
+// @brief 論理ノードの内容を再設定する．
+// @param[in] node 変更対象の論理ノード
+// @param[in] fcode 機能コード
+// @param[in] inode1 1番めの入力ノード
+// @param[in] inode2 2番めの入力ノード
+void
+SbjGraph::change_logic(SbjNode* node,
+		       ymuint fcode,
+		       SbjNode* inode1,
+		       SbjNode* inode2)
+{
+  assert_cond( node->is_logic(), __FILE__, __LINE__);
+  node->set_logic(fcode);
+  connect(inode1, node, 0);
+  connect(inode2, node, 1);
+}
+
 // @brief ANDノードの内容を再設定する．
 // @param[in] node 変更対象の論理ノード
 // @param[in] inode1 1番めの入力ノード
@@ -746,10 +767,14 @@ SbjGraph::change_and(SbjNode* node,
 		     bool inv1,
 		     bool inv2)
 {
-  assert_cond( node->is_logic(), __FILE__, __LINE__);
-  node->set_and(inv1, inv2);
-  connect(inode1, node, 0);
-  connect(inode2, node, 1);
+  ymuint fcode = 0U;
+  if ( inv1 ) {
+    fcode |= 1U;
+  }
+  if ( inv2 ) {
+    fcode |= 2U;
+  }
+  change_logic(node, fcode, inode1, inode2);
 }
 
 // @brief XORノードの内容を再設定する．
@@ -761,10 +786,8 @@ SbjGraph::change_xor(SbjNode* node,
 		     SbjNode* inode1,
 		     SbjNode* inode2)
 {
-  assert_cond( node->is_logic(), __FILE__, __LINE__);
-  node->set_xor();
-  connect(inode1, node, 0);
-  connect(inode2, node, 1);
+  ymuint fcode = 4U;
+  change_logic(node, fcode, inode1, inode2);
 }
 
 // @brief DFFノードの内容を変更する

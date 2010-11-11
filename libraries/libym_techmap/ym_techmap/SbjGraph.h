@@ -135,12 +135,10 @@ public:
     kINPUT  = 0,
     /// @brief 出力ノード
     kOUTPUT = 1,
+    /// @brief 論理ノード
+    kLOGIC  = 2,
     /// @brief DFFノード
-    kDFF    = 2,
-    /// @brief ANDノード
-    kAND    = 4,
-    /// @brief XORノード
-    kXOR    = 5
+    kDFF    = 3
   };
 
 
@@ -219,6 +217,19 @@ public:
   /// @return 反転していたら true を返す．
   bool
   output_inv() const;
+
+  /// @brief 機能コードを得る．
+  /// @note 論理ノードの場合のみ意味を持つ．
+  /// @note 機能コードの意味は以下の通り
+  ///  - 000 : a & b
+  ///  - 001 : a' & b
+  ///  - 010 : a & b'
+  ///  - 011 : a' & b'
+  ///  - 100 : a ^ b
+  /// このうち，000 〜 011 が is_and() で true を返す．
+  /// 100 が is_xor() で true を返す．
+  ymuint
+  fcode() const;
 
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号(0 or 1)
@@ -332,16 +343,9 @@ private:
   set_output(ymuint subid,
 	     bool inv);
 
-  /// @brief タイプをANDに設定する．
-  /// @param[in] inv0, inv1 ファンインの反転属性
+  /// @brief タイプを論理に設定する．
   void
-  set_and(bool inv0,
-	  bool inv1);
-
-  /// @brief タイプをXORに設定する．
-  /// @note 入力に反転属性は付かない．
-  void
-  set_xor();
+  set_logic(ymuint fcode);
 
   /// @brief タイプをDFFに設定する．
   /// @param[in] inv データ入力の反転属性
@@ -373,7 +377,7 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // タイプ (+ 入力/出力番号/ファンインの反転属性)
+  // タイプ (+ 入力/出力番号/機能コード)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
@@ -391,6 +395,29 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 定数の定義
   //////////////////////////////////////////////////////////////////////
+
+  // mFlags の演算で用いる定数
+  static
+  const int kTypeShift = 0;
+  static
+  const int kOinvShift = 2;
+  static
+  const int kSubidShift = 3;
+  static
+  const int kFcodeShift = 2;
+  static
+  const int kDDinvShift = 2;
+  static
+  const int kDCinvShift = 3;
+  static
+  const int kDSinvShift = 4;
+  static
+  const int kDRinvShift = 5;
+
+  static
+  const ymuint kTypeMask = 3U;
+  static
+  const ymuint kFcodeMask = 7U;
 
   // mMark の演算で用いる定数
   static
@@ -657,6 +684,16 @@ public:
   new_output(SbjNode* inode,
 	     bool inv);
 
+  /// @brief 論理ノードを作る．
+  /// @param[in] fcode 機能コード
+  /// @param[in] inode1 1番めの入力ノード
+  /// @param[in] inode2 2番めの入力ノード
+  /// @return 作成したノードを返す．
+  SbjNode*
+  new_logic(ymuint fcode,
+	    SbjNode* inode1,
+	    SbjNode* inode2);
+
   /// @brief ANDノードを作る．
   /// @param[in] inode1 1番めの入力ノード
   /// @param[in] inode2 2番めの入力ノード
@@ -693,6 +730,17 @@ public:
   change_output(SbjNode* node,
 		SbjNode* inode,
 		bool inv);
+
+  /// @brief 論理ノードの内容を再設定する．
+  /// @param[in] node 変更対象の論理ノード
+  /// @param[in] fcode 機能コード
+  /// @param[in] inode1 1番めの入力ノード
+  /// @param[in] inode2 2番めの入力ノード
+  void
+  change_logic(SbjNode* node,
+	       ymuint fcode,
+	       SbjNode* inode1,
+	       SbjNode* inode2);
 
   /// @brief ANDノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード
@@ -1017,7 +1065,7 @@ inline
 void
 SbjNode::set_input(ymuint subid)
 {
-  mFlags = static_cast<ymuint>(kINPUT) | (subid << 4);
+  mFlags = static_cast<ymuint>(kINPUT) | (subid << kSubidShift);
 }
 
 // タイプを出力に設定する．
@@ -1026,26 +1074,17 @@ void
 SbjNode::set_output(ymuint subid,
 		    bool inv)
 {
-  mFlags = static_cast<ymuint>(kOUTPUT) | (subid << 4) | (inv << 3);
+  mFlags = static_cast<ymuint>(kOUTPUT) |
+    (subid << kSubidShift) |
+    (inv << kOinvShift);
 }
 
-// @brief タイプをANDに設定する．
-// @param[in] inv0, inv1 ファンインの反転属性
+// タイプを論理に設定する．
 inline
 void
-SbjNode::set_and(bool inv0,
-		 bool inv1)
+SbjNode::set_logic(ymuint fcode)
 {
-  mFlags = static_cast<ymuint>(kAND) | (inv0 << 3) | (inv1 << 4);
-}
-
-// @brief タイプをXORに設定する．
-// @note 入力に反転属性は付かない．
-inline
-void
-SbjNode::set_xor()
-{
-  mFlags = static_cast<ymuint>(kXOR);
+  mFlags = static_cast<ymuint>(kLOGIC) | (fcode << kFcodeShift);
 }
 
 // @brief タイプをDFFに設定する．
@@ -1053,7 +1092,7 @@ inline
 void
 SbjNode::set_dff(bool inv)
 {
-  mFlags = static_cast<ymuint>(kDFF) | (inv << 3);
+  mFlags = static_cast<ymuint>(kDFF) | (inv << kDDinvShift);
 }
 
 // @brief DFFノードのクロック極性を設定する．
@@ -1061,8 +1100,8 @@ inline
 void
 SbjNode::set_dff_clock(bool inv)
 {
-  mFlags &= ~(1UL << 4);
-  mFlags |= (static_cast<ymuint>(inv & 1U) << 4);
+  mFlags &= ~(1UL << kDCinvShift);
+  mFlags |= (static_cast<ymuint>(inv & 1U) << kDCinvShift);
 }
 
 // @brief DFFノードのセット極性を設定する．
@@ -1070,8 +1109,8 @@ inline
 void
 SbjNode::set_dff_set(bool inv)
 {
-  mFlags &= ~(1UL << 5);
-  mFlags |= (static_cast<ymuint>(inv & 1U) << 5);
+  mFlags &= ~(1UL << kDSinvShift);
+  mFlags |= (static_cast<ymuint>(inv & 1U) << kDSinvShift);
 }
 
 // @brief DFFノードのリセット極性を設定する．
@@ -1079,8 +1118,8 @@ inline
 void
 SbjNode::set_dff_rst(bool inv)
 {
-  mFlags &= ~(1UL << 6);
-  mFlags |= (static_cast<ymuint>(inv & 1U) << 6);
+  mFlags &= ~(1UL << kDRinvShift);
+  mFlags |= (static_cast<ymuint>(inv & 1U) << kDRinvShift);
 }
 
 // タイプを得る．
@@ -1088,7 +1127,7 @@ inline
 SbjNode::tType
 SbjNode::type() const
 {
-  return static_cast<tType>(mFlags & 7U);
+  return static_cast<tType>(mFlags & kTypeMask);
 }
 
 // 入力ノードの時に true を返す．
@@ -1112,8 +1151,7 @@ inline
 bool
 SbjNode::is_logic() const
 {
-  // kAND と kXOR の符号化に依存したコード
-  return (type() & kAND) == kAND;
+  return type() == kLOGIC;
 }
 
 // @brief AND ノードの時に true を返す．
@@ -1121,7 +1159,8 @@ inline
 bool
 SbjNode::is_and() const
 {
-  return type() == kAND;
+  // 注意! encoding が変わったら変更すること．
+  return (mFlags & 0x13U) == 0x02U;
 }
 
 // @brief XOR ノードの時に true を返す．
@@ -1129,7 +1168,8 @@ inline
 bool
 SbjNode::is_xor() const
 {
-  return type() == kXOR;
+  // 注意! encoding が変わったら変更すること．
+  return (mFlags & 0x13U) == 0x12U;
 }
 
 // DFFノードの時に true を返す．
@@ -1161,7 +1201,7 @@ inline
 ymuint
 SbjNode::subid() const
 {
-  return mFlags >> 4;
+  return mFlags >> kSubidShift;
 }
 
 // @brief 出力ノードの極性を得る．
@@ -1169,7 +1209,15 @@ inline
 bool
 SbjNode::output_inv() const
 {
-  return static_cast<bool>((mFlags >> 3) & 1U);
+  return static_cast<bool>((mFlags >> kOinvShift) & 1U);
+}
+
+// @brief 機能コードを得る．
+inline
+ymuint
+SbjNode::fcode() const
+{
+  return (mFlags >> kFcodeShift) & kFcodeMask;
 }
 
 // @brief ファンインのノードを得る．
@@ -1196,7 +1244,7 @@ inline
 bool
 SbjNode::fanin_inv(ymuint pos) const
 {
-  return static_cast<bool>((mFlags >> (pos + 3)) & 1U);
+  return static_cast<bool>((mFlags >> (pos + kFcodeShift)) & 1U);
 }
 
 // ファンインの枝を得る．
@@ -1262,7 +1310,7 @@ inline
 bool
 SbjNode::fanin_data_inv() const
 {
-  return static_cast<bool>((mFlags >> 3) & 1U);
+  return static_cast<bool>((mFlags >> kDDinvShift) & 1U);
 }
 
 // @brief DFFノードの場合のクロック入力を得る．
@@ -1286,7 +1334,7 @@ inline
 bool
 SbjNode::fanin_clock_inv() const
 {
-  return static_cast<bool>((mFlags >> 4) & 1U);
+  return static_cast<bool>((mFlags >> kDCinvShift) & 1U);
 }
 
 // @brief DFFノードの場合のセット入力を得る．
@@ -1310,7 +1358,7 @@ inline
 bool
 SbjNode::fanin_set_inv() const
 {
-  return static_cast<bool>((mFlags >> 5) & 1U);
+  return static_cast<bool>((mFlags >> kDSinvShift) & 1U);
 }
 
 // @brief DFFノードの場合のリセット入力を得る．
@@ -1334,7 +1382,7 @@ inline
 bool
 SbjNode::fanin_rst_inv() const
 {
-  return static_cast<bool>((mFlags >> 6) & 1U);
+  return static_cast<bool>((mFlags >> kDRinvShift) & 1U);
 }
 
 
