@@ -16,6 +16,8 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_lutmap_la_SOURCES = \
+	BNet2Sbj.h \
+	BNet2Sbj.cc \
 	SbjGraph.cc \
 	SbjGraph_dump.cc \
 	SbjGraph_mindepth.cc \
