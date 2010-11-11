@@ -35,7 +35,6 @@ class SbjEdge :
 {
   friend class SbjNode;
   friend class SbjGraph;
-  friend class SbjEnumCut;
 
 public:
 
@@ -60,10 +59,6 @@ public:
   /// @return 出力側のノードを返す．
   SbjNode*
   to();
-
-  /// @brief 定数枝の時に true を返す．
-  bool
-  is_const() const;
 
   /// @brief 出力側のノードの何番目の入力かを示す．
   ymuint
@@ -126,8 +121,7 @@ private:
   SbjNode* mTo;
 
   // bit-0: flow フラグ
-  // bit-1: tree フラグ
-  // bit-2: 入力位置
+  // bit-1: 入力位置
   ymuint32 mFlags;
 
 
@@ -137,16 +131,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const int kFlowShift = 0;
+  const int kIposShift = 0;
 
   static
-  const int kIposShift = 1;
-
-  static
-  const ymuint kFlowMask = (1U << kFlowShift);
+  const int kFlowShift = 1;
 
   static
   const ymuint kIposMask = (1U << kIposShift);
+
+  static
+  const ymuint kFlowMask = (1U << kFlowShift);
 
 };
 
@@ -252,7 +246,12 @@ public:
 
   /// @brief 機能コードを得る．
   /// @note 論理ノードの場合のみ意味を持つ．
-  /// @note 機能コードは2入力の真理値表(4bit)
+  /// @note 機能コードの意味は以下の通り
+  ///  - 000 : a & b
+  ///  - 001 : a' & b
+  ///  - 010 : a & b'
+  ///  - 011 : a' & b'
+  ///  - 100 : a ^ b
   ymuint
   fcode() const;
 
@@ -272,7 +271,7 @@ public:
 
   /// @brief ファンアウト数を得る．
   ymuint
-  n_fanout() const;
+  fanout_num() const;
 
   /// @brief ファンアウトリストを得る．
   const SbjEdgeList&
@@ -501,26 +500,18 @@ private:
 
   // mMark の演算で用いる定数
   static
-  const int kFoShift = 0;
+  const int kRangeShift = 0;
   static
-  const int kUnselShift = 1;
+  const int kTargetShift = 1;
   static
-  const int kRangeShift = 2;
+  const int kFlowShift = 2;
   static
-  const int kTargetShift = 3;
+  const int kPoShift = 3;
   static
-  const int kFlowShift = 4;
+  const int kV1Shift = 4;
   static
-  const int kPoShift = 5;
-  static
-  const int kV1Shift = 6;
-  static
-  const int kV2Shift = 7;
+  const int kV2Shift = 5;
 
-  static
-  const ymuint kFoMask = 1U << kFoShift;
-  static
-  const ymuint kUnselMask = 1U << kUnselShift;
   static
   const ymuint kRangeMask = 1U << kRangeShift;
   static
@@ -708,7 +699,7 @@ public:
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint
-  n_inputs() const;
+  input_num() const;
 
   /// @brief 入力 ID 番号による入力ノードの取得
   /// @param[in] id 入力 ID 番号 ( 0 <= id < n_inputs() )
@@ -728,7 +719,7 @@ public:
 
   /// @brief 出力のノード数を得る．
   ymuint
-  n_outputs() const;
+  output_num() const;
 
   /// @brief 出力 ID 番号による出力ノードの取得
   /// @param[in] id 出力 ID 番号 ( 0 <= id < n_outputs() )
@@ -748,7 +739,7 @@ public:
 
   /// @brief 論理ノード数を得る．
   ymuint
-  n_lnodes() const;
+  lnode_num() const;
 
   /// @brief 論理ノードのリストを得る．
   const SbjNodeList&
@@ -756,7 +747,7 @@ public:
 
   /// @brief DFFノード数を得る．
   ymuint
-  n_dffs() const;
+  dff_num() const;
 
   /// @brief DFFノードのリストを得る．
   const SbjNodeList&
@@ -1168,14 +1159,6 @@ SbjEdge::set_to(SbjNode* to,
   }
 }
 
-// 定数枝の時に true を返す．
-inline
-bool
-SbjEdge::is_const() const
-{
-  return mFrom == NULL;
-}
-
 // @brief 出力ノードに接続している時 true を返す．
 inline
 bool
@@ -1342,7 +1325,7 @@ inline
 ymuint
 SbjNode::subid() const
 {
-  return mFlags >> 5;
+  return mFlags >> 4;
 }
 
 // @brief 出力ノードの極性を得る．
@@ -1408,7 +1391,7 @@ SbjNode::fanout_list() const
 // ファンアウト数を得る．
 inline
 ymuint
-SbjNode::n_fanout() const
+SbjNode::fanout_num() const
 {
   return mFanoutList.size();
 }
@@ -1752,7 +1735,7 @@ SbjGraph::node(ymuint id) const
 // 入力ノード数を得る．
 inline
 ymuint
-SbjGraph::n_inputs() const
+SbjGraph::input_num() const
 {
   return mInputArray.size();
 }
@@ -1776,7 +1759,7 @@ SbjGraph::input_list() const
 // 出力のノード数を得る．
 inline
 ymuint
-SbjGraph::n_outputs() const
+SbjGraph::output_num() const
 {
   return mOutputArray.size();
 }
@@ -1800,7 +1783,7 @@ SbjGraph::output_list() const
 // 論理ノード数を得る．
 inline
 ymuint
-SbjGraph::n_lnodes() const
+SbjGraph::lnode_num() const
 {
   return mLnodeList.size();
 }
@@ -1816,7 +1799,7 @@ SbjGraph::lnode_list() const
 // DFFノード数を得る．
 inline
 ymuint
-SbjGraph::n_dffs() const
+SbjGraph::dff_num() const
 {
   return mDffList.size();
 }

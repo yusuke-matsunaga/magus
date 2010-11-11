@@ -25,7 +25,7 @@ public:
 
   // コンストラクタ
   BNodeMap(ymuint n);
-  
+
   // 登録する．
   void
   put(BNode* bnode,
@@ -100,12 +100,16 @@ BNet2Sbj::operator()(const BNetwork& network,
 
   sbjgraph.clear();
 
+  sbjgraph.set_name(network.model_name());
+
   // 外部入力を作る．
+  // 同時にポートも作る．
   for (BNodeList::const_iterator p = network.inputs_begin();
        p != network.inputs_end(); ++p) {
     BNode* bnode = *p;
     SbjNode* node = sbjgraph.new_input();
     assoc.put(bnode, node, false);
+    sbjgraph.add_port(bnode->name(), vector<SbjNode*>(1, node));
   }
 
   // DFFを作る．
@@ -115,7 +119,7 @@ BNet2Sbj::operator()(const BNetwork& network,
     SbjNode* node = sbjgraph.new_dff();
     assoc.put(bnode, node, false);
   }
-  
+
   // 定数0に縮退している外部出力/DFFを求めておく
   vector<bool> zero_outs(n, false);
   for (BNodeList::const_iterator p = network.outputs_begin();
@@ -177,7 +181,7 @@ BNet2Sbj::operator()(const BNetwork& network,
       LogExpr expr = bnode->func();
       assert_cond(expr.child(0).is_literal(), __FILE__, __LINE__);
       assert_cond(expr.child(1).is_literal(), __FILE__, __LINE__);
-      
+
       SbjNode* inode0;
       SbjNode* inode1;
       bool inv0;
@@ -206,6 +210,7 @@ BNet2Sbj::operator()(const BNetwork& network,
 	}
       }
 
+#if 0
       ymuint fcode = 0;
       if ( expr.is_and() ) {
 	if ( inv0 ) {
@@ -256,6 +261,35 @@ BNet2Sbj::operator()(const BNetwork& network,
       }
       SbjNode* node = sbjgraph.new_logic(fcode, inode0, inode1);
       assoc.put(bnode, node, false);
+#else
+      bool oinv = false;
+      ymuint fcode = 0U;
+      if ( expr.is_and() ) {
+	// なにもしない．
+      }
+      else if ( expr.is_or() ) {
+	oinv = true;
+	inv0 = !inv0;
+	inv1 = !inv1;
+      }
+      else if ( expr.is_xor() ) {
+	oinv = inv0 ^ inv1;
+	inv0 = false;
+	inv1 = false;
+	fcode = 4U;
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      if ( inv0 ) {
+	fcode |= 1U;
+      }
+      if ( inv1 ) {
+	fcode |= 2U;
+      }
+      SbjNode* node = sbjgraph.new_logic(fcode, inode0, inode1);
+      assoc.put(bnode, node, oinv);
+#endif
     }
     else { // ni > 2
       err_out << "ERROR: number of fanins exceeds 2" << endl;
@@ -277,8 +311,9 @@ BNet2Sbj::operator()(const BNetwork& network,
     assoc.get(ibnode, inode, inv);
     sbjgraph.set_dff_data(onode, inode, inv);
   }
-  
+
   // 外部出力ノードを作る．
+  // 同時にポートも作る．
   for (BNodeList::const_iterator p = network.outputs_begin();
        p != network.outputs_end(); ++ p) {
     BNode* obnode = *p;
@@ -286,7 +321,8 @@ BNet2Sbj::operator()(const BNetwork& network,
     SbjNode* inode = NULL;
     bool inv;
     assoc.get(ibnode, inode, inv);
-    (void) sbjgraph.new_output(inode, inv);
+    SbjNode* node = sbjgraph.new_output(inode, inv);
+    sbjgraph.add_port(obnode->name(), vector<SbjNode*>(1, node));
   }
 
   return true;

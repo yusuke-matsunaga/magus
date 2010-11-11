@@ -142,14 +142,15 @@ dump(ostream& s,
   for (SbjNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const SbjNode* node = *p;
-    s << "Logic(" << node->id_str() << ") = [";
     ymuint fcode = node->fcode();
-    s << ((fcode >> 3) & 1) << ((fcode >> 2) & 1)
-      << ((fcode >> 1) & 1) << (fcode & 1) << "] ("
-      << " " << node->fanin(0)->id_str()
-      << ", " << node->fanin(1)->id_str()
-      << ")" << endl;
-    s << endl;
+    const char* pol0 = (fcode & 1U) ? "~" : "";
+    const char* pol1 = (fcode & 2U) ? "~" : "";
+    const char* op   = (fcode & 4U) ? "^" : "&";
+    s << "Logic(" << node->id_str() << ") = "
+      << pol0 << node->fanin(0)->id_str()
+      << " " << op << " "
+      << pol1 << node->fanin(1)->id_str()
+      << endl;
   }
 }
 
@@ -214,49 +215,29 @@ dump_blif(ostream& s,
       << " " << node->fanin(1)->id_str()
       << " " << node->id_str() << endl;
     switch ( node->fcode() ) {
-    case 0x0: // 0000
-    case 0x3: // 0011
-    case 0x5: // 0101
-    case 0xa: // 1010
-    case 0xc: // 1100
-    case 0xf: // 1111
-      assert_not_reached(__FILE__, __LINE__);
+    case 0:
+      s << "11 1" << endl;
       break;
-    case 0x1: // 0001
-      s << "00 1" << endl;
-      break;
-    case 0x2: // 0010
-      s << "10 1" << endl;
-      break;
-    case 0x4: // 0100
+
+    case 1:
       s << "01 1" << endl;
       break;
-    case 0x6: // 0110
+
+    case 2:
+      s << "10 1" << endl;
+      break;
+
+    case 3:
+      s << "00 1" << endl;
+      break;
+
+    case 4:
       s << "10 1" << endl
 	<< "01 1" << endl;
       break;
-    case 0x7: // 0111
-      s << "0- 1" << endl
-	<< "-0 1" << endl;
-      break;
-    case 0x8: // 1000
-      s << "11 1" << endl;
-      break;
-    case 0x9: // 1001
-      s << "00 1" << endl
-	<< "11 1" << endl;
-      break;
-    case 0xb: // 1011
-      s << "1- 1" << endl
-	<< "-0 1" << endl;
-      break;
-    case 0xd: // 1101
-      s << "0- 1" << endl
-	<< "-1 1" << endl;
-      break;
-    case 0xe: // 1110
-      s << "1- 1" << endl
-	<< "-1 1" << endl;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
       break;
     }
     s << endl;
@@ -376,67 +357,12 @@ dump_verilog(ostream& s,
   for (SbjNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const SbjNode* node = *p;
-    s << "  assign " << node_name(node) << " = ";
-
-    const char* pol0 = "";
-    const char* pol1 = "";
-    const char* op   = "&";
-    switch ( node->fcode() ) {
-    case 0x0: // 0000
-    case 0x3: // 0011
-    case 0x5: // 0101
-    case 0xa: // 1010
-    case 0xc: // 1100
-    case 0xf: // 1111
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-
-    case 0x1: // 0001
-      pol0 = "~";
-      pol1 = "~";
-      break;
-
-    case 0x2: // 0010
-      pol1 = "~";
-      break;
-
-    case 0x4: // 0100
-      pol0 = "~";
-      break;
-
-    case 0x6: // 0110
-      op   = "^";
-      break;
-
-    case 0x7: // 0111
-      pol0 = "~";
-      pol1 = "~";
-      op   = "|";
-      break;
-
-    case 0x8: // 1000
-      break;
-
-    case 0x9: // 1001
-      pol0 = "~";
-      op   = "^";
-      break;
-
-    case 0xb: // 1011
-      pol1 = "~";
-      op   = "|";
-      break;
-
-    case 0xd: // 1101
-      pol0 = "~";
-      op   = "|";
-      break;
-
-    case 0xe: // 1110
-      op   = "|";
-      break;
-    }
-    s << pol0 << node_name(node->fanin(0))
+    ymuint fcode = node->fcode();
+    const char* pol0 = (fcode & 1U) ? "~" : "";
+    const char* pol1 = (fcode & 2U) ? "~" : "";
+    const char* op   = (fcode & 4U) ? "^" : "&";
+    s << "  assign " << node_name(node) << " = "
+      << pol0 << node_name(node->fanin(0))
       << " " << op << " "
       << pol1 << node_name(node->fanin(1))
       << ";" << endl;

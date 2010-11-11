@@ -453,7 +453,7 @@ void
 SbjGraph::sort(vector<const SbjNode*>& node_list) const
 {
   node_list.clear();
-  node_list.reserve(n_lnodes());
+  node_list.reserve(lnode_num());
 
   vector<bool> mark(max_node_id(), false);
 
@@ -473,7 +473,7 @@ SbjGraph::sort(vector<const SbjNode*>& node_list) const
     ++ rpos;
     sort_sub(node, mark, node_list);
   }
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
 }
 
 
@@ -515,7 +515,7 @@ void
 SbjGraph::rsort(vector<const SbjNode*>& node_list) const
 {
   node_list.clear();
-  node_list.reserve(n_lnodes());
+  node_list.reserve(lnode_num());
 
   vector<bool> mark(max_node_id(), false);
 
@@ -536,7 +536,7 @@ SbjGraph::rsort(vector<const SbjNode*>& node_list) const
     ++ rpos;
     rsort_sub(node, mark, node_list);
   }
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
 }
 
 // 入力ノードを作る．
@@ -643,7 +643,7 @@ void
 SbjGraph::delete_logic(SbjNode* node)
 {
   assert_cond(node->is_logic(), __FILE__, __LINE__);
-  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+  assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
   connect(NULL, node, 0);
   connect(NULL, node, 1);
 

@@ -1,5 +1,5 @@
 
-/// @file libym_lutmap/EnumCut.cc 
+/// @file libym_lutmap/EnumCut.cc
 /// @brief EnumCut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -51,23 +51,23 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   mOp = op;
 
   mOp->all_init(sbjgraph, limit);
-  
+
   mInputs = new const SbjNode*[limit];
 
-  mInodeStack = new ymuint32[sbjgraph.n_lnodes()];
+  mInodeStack = new ymuint32[sbjgraph.lnode_num()];
   mIsPos = &mInodeStack[0];
 
   // 外部入力用の(ダミーの)クラスタを作る．
-  ymuint ni = sbjgraph.n_inputs();
-  ymuint nf = sbjgraph.n_dffs();
-  mNall = ni + nf + sbjgraph.n_lnodes();
+  ymuint ni = sbjgraph.input_num();
+  ymuint nf = sbjgraph.dff_num();
+  mNall = ni + nf + sbjgraph.lnode_num();
   mNcAll = 0;
   mCurPos = 0;
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* node = sbjgraph.input(i);
 
     mNcCur = 0;
-  
+
     mOp->node_init(node, mCurPos);
 
     // 自分自身のみからなるクラスタを登録する．
@@ -77,9 +77,9 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
     // 今の列挙で用いたノードを cut_node_list に格納しておく
     cnode_list(node).push_back(node);
-  
+
     mOp->node_end(node, mCurPos, mNcCur);
-    
+
     ++ mCurPos;
   }
   const SbjNodeList& dff_list = sbjgraph.dff_list();
@@ -88,7 +88,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     const SbjNode* node = *p;
 
     mNcCur = 0;
-  
+
     mOp->node_init(node, mCurPos);
 
     // 自分自身のみからなるクラスタを登録する．
@@ -98,12 +98,12 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
     // 今の列挙で用いたノードを cut_node_list に格納しておく
     cnode_list(node).push_back(node);
-  
+
     mOp->node_end(node, mCurPos, mNcCur);
-    
+
     ++ mCurPos;
   }
-  
+
   // 入力側から内部ノード用のクラスタを作る．
   vector<const SbjNode*> node_list;
   sbjgraph.sort(node_list);
@@ -113,7 +113,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     assert_cond( node->is_logic(), __FILE__, __LINE__);
 
     mMarkedNodesLast = 0;
-    
+
     for (ymuint i = 0; i < 2; ++ i) {
       // ファンインの cut に含まれるノードに c1mark をつける．
       const SbjNode* inode = node->fanin(i);
@@ -144,7 +144,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     // クラスタの列挙を行う．
     // ただし c2mark にぶつかったらそれ以上，入力側にはいかない．
     mNcCur = 0;
-  
+
     mOp->node_init(node, mCurPos);
 
     mInputPos = 0;
@@ -174,10 +174,10 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   }
 
   mOp->all_end(sbjgraph, limit);
-  
+
   delete [] mInputs;
   delete [] mInodeStack;
-  
+
   return mNcAll;
 }
 
@@ -224,7 +224,7 @@ EnumCut::mark_cnode3(const SbjNode* node)
       set_temp1mark(node);
       mMarkedNodes[mMarkedNodesLast] = node;
       ++ mMarkedNodesLast;
-      if ( node->n_fanout() > 1 ) {
+      if ( node->fanout_num() > 1 ) {
 	set_temp2mark(node);
       }
     }
@@ -319,7 +319,7 @@ EnumCut::enum_recur()
 #if defined(DEBUG_ENUM_RECUR)
     cout << "FRONTIER IS EMPTY" << endl;
 #endif
-    
+
     for (ymuint i = 0; i < mInputPos; ++ i) {
       set_cmark(mInputs[i]);
     }
@@ -339,7 +339,7 @@ EnumCut::enum_recur()
 #if defined(DEBUG_ENUM_RECUR)
     cout << "POP[1] " << node->id_str() << endl;
 #endif
-    
+
     // 速度に効くのでコメントアウトしている
     //assert_cond(node->bmark() == 1, __FILE__, __LINE__);
     //assert_cond(node->is_logic(), __FILE__, __LINE__);
@@ -375,7 +375,7 @@ EnumCut::enum_recur()
 	push_node(inode0);
 	inode0_stat = true;
 	set_edge_mark(node, 0);
-	
+
 #if defined(DEBUG_ENUM_RECUR)
 	cout << "PUSH[2] " << inode0->id_str() << endl;
 #endif
