@@ -34,7 +34,6 @@ class SbjEdge :
   public DlElem
 {
   friend class SbjNode;
-  friend class SbjGraph;
 
 public:
 
@@ -67,24 +66,6 @@ public:
   /// @brief 出力ノードに接続している時 true を返す．
   bool
   is_poedge() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // max-flow algorithm 用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief flow が流れている時 true を返す．
-  bool
-  flow() const;
-
-  /// @brief flow フラグをセットする．
-  void
-  set_flow();
-
-  /// @brief flow フラグをクリアする．
-  void
-  clear_flow();
 
 
 private:
@@ -120,27 +101,8 @@ private:
   // 出力側のノード
   SbjNode* mTo;
 
-  // bit-0: flow フラグ
-  // bit-1: 入力位置
-  ymuint32 mFlags;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 定数
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const int kIposShift = 0;
-
-  static
-  const int kFlowShift = 1;
-
-  static
-  const ymuint kIposMask = (1U << kIposShift);
-
-  static
-  const ymuint kFlowMask = (1U << kFlowShift);
+  // 入力位置
+  ymuint32 mIpos;
 
 };
 
@@ -164,6 +126,7 @@ class SbjNode :
   public DlElem
 {
   friend class SbjGraph;
+  friend class SbjMinDepth;
 
 public:
   /// @brief ノードの型
@@ -331,10 +294,6 @@ public:
   bool
   fanin_rst_inv() const;
 
-  /// @brief 深さを得る．
-  ymuint
-  depth() const;
-
   /// @brief レベルを得る．
   ymuint
   level() const;
@@ -416,70 +375,13 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  /// @name mindepth で用いるの関数
-  /// @{
-
-  /// @brief range マークを返す．
-  bool
-  rmark() const;
-
-  /// @brief range マークを付ける．
-  void
-  set_rmark();
-
-  /// @brief target マークを返す．
-  bool
-  tmark() const;
-
-  /// @brief target マークを付ける．
-  void
-  set_tmark();
-
-  /// @brief flow 用のマークを返す．
-  bool
-  fmark() const;
-
-  /// @brief flow 用のマークを付ける．
-  void
-  set_fmark();
-
-  /// @brief range/target/flow マークを消す．
-  void
-  clear_rtfmark();
-
-  /// @brief 入力側の visit フラグを返す．
-  bool
-  vmark1();
-
-  /// @brief 入力側の visit フラグをつける．
-  void
-  set_vmark1();
-
-  /// @brief 出力側の visit フラグを返す．
-  bool
-  vmark2();
-
-  /// @brief 出力側の visit フラグをつける．
-  void
-  set_vmark2();
-
-  /// @brief visit フラグを消す．
-  void
-  clear_vmark();
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // ID 番号
   ymuint32 mId;
 
-  // タイプ (+ 入力／出力番号/機能コード)
+  // タイプ (+ 入力/出力番号/機能コード)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
@@ -491,9 +393,6 @@ private:
 
   // 作業用のマーク
   ymuint32 mMark;
-
-  // 深さ
-  ymuint32 mDepth;
 
   // レベル
   ymuint32 mLevel;
@@ -529,30 +428,10 @@ private:
 
   // mMark の演算で用いる定数
   static
-  const int kRangeShift = 0;
-  static
-  const int kTargetShift = 1;
-  static
-  const int kFlowShift = 2;
-  static
-  const int kPoShift = 3;
-  static
-  const int kV1Shift = 4;
-  static
-  const int kV2Shift = 5;
+  const int kPoShift = 0;
 
   static
-  const ymuint kRangeMask = 1U << kRangeShift;
-  static
-  const ymuint kTargetMask = 1U << kTargetShift;
-  static
-  const ymuint kFlowMask = 1U << kFlowShift;
-  static
-  const ymuint kPoMask = 1U << kPoShift;
-  static
-  const ymuint kV1Mask = 1U << kV1Shift;
-  static
-  const ymuint kV2Mask = 1U << kV2Shift;
+  const ymuint kPoMask = (1U << kPoShift);
 
 };
 
@@ -939,19 +818,6 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name minimum depth 関係の関数
-  /// @{
-
-  /// @brief 各ノードの minimum depth を求める．
-  ymuint
-  get_min_depth(ymuint k) const;
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   /// @name その他の関数
   /// @{
 
@@ -1010,38 +876,6 @@ private:
 	  SbjNode* to,
 	  ymuint pos);
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  /// @name mindepth 関係の関数
-  /// @{
-
-  /// node およびその TFI に rmark を付ける．
-  /// depth が d のノードに tmark を付ける．
-  static
-  void
-  mark_tfi(SbjNode* node,
-	   ymuint d,
-	   vector<SbjNode*>& node_list);
-
-  // node のファンアウトを探索する．
-  static
-  bool
-  dfs_fanout(SbjNode* node);
-
-  static
-  bool
-  dfs(SbjNode* cur_node,
-      int dir);
-
-  // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
-  bool
-  find_k_cut(SbjNode* node,
-	     ymuint k,
-	     ymuint d) const;
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1157,7 +991,7 @@ inline
 SbjEdge::SbjEdge() :
   mFrom(NULL),
   mTo(NULL),
-  mFlags(0U)
+  mIpos(0U)
 {
 }
 
@@ -1204,7 +1038,7 @@ inline
 ymuint
 SbjEdge::pos() const
 {
-  return (mFlags >> kIposShift) & 1U;
+  return mIpos;
 }
 
 // @brief from ノードをセットする．
@@ -1222,12 +1056,7 @@ SbjEdge::set_to(SbjNode* to,
 		ymuint pos)
 {
   mTo = to;
-  if ( pos ) {
-    mFlags |= kIposMask;
-  }
-  else {
-    mFlags &= ~kIposMask;
-  }
+  mIpos = pos;
 }
 
 // @brief 出力ノードに接続している時 true を返す．
@@ -1236,30 +1065,6 @@ bool
 SbjEdge::is_poedge() const
 {
   return to()->is_output();
-}
-
-// @brief flow が流れている時 true を返す．
-inline
-bool
-SbjEdge::flow() const
-{
-  return static_cast<bool>((mFlags >> kFlowShift) & 1U);
-}
-
-// @brief flow フラグをセットする．
-inline
-void
-SbjEdge::set_flow()
-{
-  mFlags |= kFlowMask;
-}
-
-// @brief flow フラグをクリアする．
-inline
-void
-SbjEdge::clear_flow()
-{
-  mFlags &= ~kFlowMask;
 }
 
 
@@ -1598,110 +1403,6 @@ bool
 SbjNode::fanin_rst_inv() const
 {
   return static_cast<bool>((mFlags >> kDRinvShift) & 1U);
-}
-
-// @brief range マークを返す．
-inline
-bool
-SbjNode::rmark() const
-{
-  return static_cast<bool>((mMark >> kRangeShift) & 1U);
-}
-
-// @brief range マークを付ける．
-inline
-void
-SbjNode::set_rmark()
-{
-  mMark |= kRangeMask;
-}
-
-// @brief target マークを返す．
-inline
-bool
-SbjNode::tmark() const
-{
-  return static_cast<bool>((mMark >> kTargetShift) & 1U);
-}
-
-// @brief target マークを付ける．
-inline
-void
-SbjNode::set_tmark()
-{
-  mMark |= kTargetMask;
-}
-
-// @brief flow 用のマークを返す．
-inline
-bool
-SbjNode::fmark() const
-{
-  return static_cast<bool>((mMark >> kFlowShift) & 1U);
-}
-
-// @brief flow 用のマークを付ける．
-inline
-void
-SbjNode::set_fmark()
-{
-  mMark |= kFlowMask;
-}
-
-// @brief range/target/flow マークを消す．
-inline
-void
-SbjNode::clear_rtfmark()
-{
-  mMark &= ~(kRangeMask | kTargetMask | kFlowMask);
-}
-
-// @brief 入力側の visit フラグを返す．
-inline
-bool
-SbjNode::vmark1()
-{
-  return static_cast<bool>((mMark >> kV1Shift) & 1U);
-}
-
-// @brief 入力側の visit フラグをつける．
-inline
-void
-SbjNode::set_vmark1()
-{
-  mMark |= kV1Mask;
-}
-
-// @brief 出力側の visit フラグを返す．
-inline
-bool
-SbjNode::vmark2()
-{
-  return static_cast<bool>((mMark >> kV2Shift) & 1U);
-}
-
-// @brief 出力側の visit フラグをつける．
-inline
-void
-SbjNode::set_vmark2()
-{
-  mMark |= kV2Mask;
-}
-
-// @brief visit フラグを消す．
-inline
-void
-SbjNode::clear_vmark()
-{
-  mMark &= ~(kV1Mask | kV2Mask);
-}
-
-// @brief 深さを得る．
-inline
-ymuint
-SbjNode::depth() const
-{
-  return mDepth;
 }
 
 // @brief レベルを得る．

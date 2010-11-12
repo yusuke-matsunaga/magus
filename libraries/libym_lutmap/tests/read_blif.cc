@@ -80,17 +80,6 @@ main(int argc,
 
     StopWatch timer;
 
-#if 1
-    timer.start();
-    ymuint d1 = sbjgraph.get_min_depth(k);
-    timer.stop();
-
-    cout << "k = " << k << ", depth = " << d1 << endl;
-    USTime t = timer.time();
-    cout << t << endl;
-#endif
-
-#if 1
     nsLutmap::SbjMinDepth mindepth;
 
     timer.reset();
@@ -101,7 +90,7 @@ main(int argc,
     cout << "k = " << k << ", depth = " << d2 << endl;
     USTime t2 = timer.time();
     cout << t2 << endl;
-#endif
+
 #if 0
   }
   catch ( AssertError x) {

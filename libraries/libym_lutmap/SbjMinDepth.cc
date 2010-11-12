@@ -203,12 +203,6 @@ SbjMinDepth::get_min_depth(const SbjGraph& sbjgraph,
       ++ max_depth;
     }
     node->set_depth(max_depth);
-    if ( sbjgraph.node(node->id())->depth() != max_depth ) {
-      cout << "Node#" << node->id()
-	   << ": Sbjnode->depth() = " << sbjgraph.node(node->id())->depth()
-	   << ", SmdNode->depth() = " << max_depth
-	   << endl;
-    }
     if ( ans < max_depth ) {
       ans = max_depth;
     }

@@ -231,6 +231,7 @@ EnumCut::mark_cnode3(const SbjNode* node)
   }
 }
 
+#if 0
 // root_depth よりも小さな depth を持つノードを frontier stack に積む．
 void
 EnumCut::get_frontier(const SbjNode* node,
@@ -273,6 +274,7 @@ EnumCut::clear_frontier(const SbjNode* node)
     }
   }
 }
+#endif
 
 // frontier stack にノードをプッシュする
 inline

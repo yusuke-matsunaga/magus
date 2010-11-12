@@ -1,7 +1,7 @@
 #ifndef LIBYM_LUTMAP_ENUMCUT_H
 #define LIBYM_LUTMAP_ENUMCUT_H
 
-/// @file libym_lutmap/EnumCut.h 
+/// @file libym_lutmap/EnumCut.h
 /// @brief EnumCut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_LUTMAP
 class EnumCut
 {
   class NodeTemp;
-  
+
 public:
 
   /// @brief コンストラクタ
@@ -50,7 +50,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // プライベートメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // cut の列挙を行なうための再帰関数
   bool
   enum_recur();
@@ -67,6 +67,7 @@ private:
   void
   mark_cnode3(const SbjNode* node);
 
+#if 0
   // root_depth よりも小さな depth を持つノードを frontier stack に積む．
   void
   get_frontier(const SbjNode* node,
@@ -75,13 +76,14 @@ private:
   // get_frontier で付けた印を消す．
   void
   clear_frontier(const SbjNode* node);
+#endif
 
   // cmark の付いているノードを cnode_list に入れて
   // cmark を消す．
   void
   set_cut_node_list_recur(const SbjNode* node,
 			  vector<const SbjNode*>& cnode_list);
-  
+
   // frontier stack にノードをプッシュする
   void
   push_node(const SbjNode* node);
@@ -120,16 +122,16 @@ private:
 
   void
   clear_cmark(const SbjNode* node);
-  
+
   bool
   temp1mark(const SbjNode* node);
-  
+
   void
   set_temp1mark(const SbjNode* node);
 
   bool
   temp2mark(const SbjNode* node);
-  
+
   void
   set_temp2mark(const SbjNode* node);
 
@@ -147,14 +149,14 @@ private:
   void
   clear_edge_mark(const SbjNode* node,
 		  ymuint pos);
-  
+
   vector<const SbjNode*>&
   cnode_list(const SbjNode* node);
 
   const vector<const SbjNode*>&
   cnode_list(const SbjNode* node) const;
 
-  
+
 private:
 
   // 各ノードごとの作業領域
@@ -179,39 +181,39 @@ private:
     /// @brief 入力となった．
     void
     set_state2();
-  
+
     /// @brief 初期状態に戻す．
     void
     clear_state();
-  
+
     /// @brief クラスタノードの印を返す．
     bool
     cmark() const;
-  
+
     /// @brief クラスタノードの印をつける．
     void
     set_cmark();
-  
+
     /// @brief クラスタノードの印を消す．
     void
     clear_cmark();
-  
+
     /// @brief temporary 用のマーク1を取り出す．
     bool
     temp1mark() const;
-    
+
     /// @brief temporary 用のマーク1をつける．
     void
     set_temp1mark();
-    
+
     /// @brief temporary 用のマーク2を取り出す．
     bool
     temp2mark() const;
-  
+
     /// @brief temporary 用のマーク2をつける．
     void
     set_temp2mark();
-    
+
     /// @brief temporary 用のマーク1/2を消す．
     void
     clear_tempmark();
@@ -228,7 +230,7 @@ private:
     /// @brief pos 番めの枝のマークを消す．
     void
     clear_edge_mark(ymuint pos);
-    
+
     /// @brief クラスタノードのリストを返す．
     vector<const SbjNode*>&
     cnode_list();
@@ -251,7 +253,7 @@ private:
 
   };
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -271,7 +273,7 @@ private:
 
   // 現在処理中のノードの cut 数
   ymuint32 mNcCur;
-  
+
   // 根のノード
   const SbjNode* mRoot;
 
@@ -283,7 +285,7 @@ private:
 
   // mFrontierStack の先頭を指すポインタ
   const SbjNode** mFsPos;
-  
+
   // 確定した境界ノードを入れるベクタ
   const SbjNode** mInputs;
 
@@ -307,7 +309,7 @@ private:
 
   // カットが列挙されたときに呼ばれるクラス
   EnumCutOp* mOp;
-  
+
 };
 
 
@@ -350,7 +352,7 @@ EnumCut::NodeTemp::set_state2()
   mMarks &= ~3U;
   mMarks |= 2U;
 }
-  
+
 // @brief 初期状態に戻す．
 inline
 void
@@ -358,7 +360,7 @@ EnumCut::NodeTemp::clear_state()
 {
   mMarks &= ~3U;
 }
-  
+
 // @brief クラスタノードの印を返す．
 inline
 bool
@@ -366,7 +368,7 @@ EnumCut::NodeTemp::cmark() const
 {
   return static_cast<bool>((mMarks >> 2) & 1U);
 }
-  
+
 // @brief クラスタノードの印をつける．
 inline
 void
@@ -374,7 +376,7 @@ EnumCut::NodeTemp::set_cmark()
 {
   mMarks |= 4U;
 }
-  
+
 // @brief クラスタノードの印を消す．
 inline
 void
@@ -382,7 +384,7 @@ EnumCut::NodeTemp::clear_cmark()
 {
   mMarks &= ~4U;
 }
-  
+
 // @brief temporary 用のマーク1を取り出す．
 inline
 bool
@@ -398,7 +400,7 @@ EnumCut::NodeTemp::set_temp1mark()
 {
   mMarks |= 8U;
 }
-    
+
 // @brief temporary 用のマーク2を取り出す．
 inline
 bool
@@ -406,7 +408,7 @@ EnumCut::NodeTemp::temp2mark() const
 {
   return static_cast<bool>((mMarks >> 4) & 1U);
 }
-  
+
 // @brief temporary 用のマーク2をつける．
 inline
 void

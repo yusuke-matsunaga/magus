@@ -23,9 +23,7 @@ SbjNode::SbjNode() :
   mId(0),
   mFlags(0U),
   mFanins(NULL),
-  mMark(0),
-  mDepth(0),
-  mLevel(0)
+  mMark(0)
 {
 }
 
