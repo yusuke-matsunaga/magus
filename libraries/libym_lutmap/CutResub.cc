@@ -60,19 +60,19 @@ CutResub::operator()(const SbjGraph& sbjgraph,
   sbjgraph.sort(snode_list);
 
   // 外部入力ノードの対応付けを行う．
-  list<const SbjNode*> tmp_list;
+  vector<const SbjNode*> tmp_list;
   sbjgraph.ppi_list(tmp_list);
-  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     const SbjNode* sbjnode = *p;
     CrNode* node = alloc_node();
     mNodeArray[sbjnode->id()] = node;
     node->set_sbjnode(sbjnode);
   }
-  
+
   // 外部出力からバックトレースを行う．
   sbjgraph.ppo_list(tmp_list);
-  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     const SbjNode* onode = *p;
     const SbjNode* sbjnode = onode->fanin(0);
@@ -113,7 +113,7 @@ CutResub::operator()(const SbjGraph& sbjgraph,
       if ( max_level < level ) {
 	max_level = level;
       }
-      
+
       // 代理カットを求める．
       const CutList& cut_list = cut_holder.cut_list(node);
       for(CutListIterator p = cut_list.begin();
@@ -135,7 +135,7 @@ CutResub::operator()(const SbjGraph& sbjgraph,
 	}
       }
     }
-    
+
     // ゲインの計算を行い，置き換え可能なノードをヒープにつむ．
     mHeap.init(root_list.size());
     for (vector<CrNode*>::const_iterator p = root_list.begin();
@@ -147,7 +147,7 @@ CutResub::operator()(const SbjGraph& sbjgraph,
 	mHeap.put(node);
       }
     }
-    
+
     if ( mHasLevelConstr ) {
       // 要求レベルの計算を行う．
       ymuint poreq = max_level + slack;
@@ -471,7 +471,7 @@ CutResub::update(CrNode* node,
 
     mDeletedCuts.push_back(old_cut);
     put_lq(root);
-    
+
 #ifdef DEBUG_UPDATE
     cout << "subst cut at " << root->sbjnode()->id_str() << endl;
     old_cut->dump(cout);
@@ -601,7 +601,7 @@ CutResub::update(CrNode* node,
       }
     }
   }
-  
+
 #ifdef DEBUG_UPDATE
   cout << "update ends" << endl << endl;
 #endif
@@ -625,7 +625,7 @@ CutResub::subst_cut_fanouts(CrNode* node,
     CrNode* inode = cut_input(new_cut, i);
     inode->set_newmark();
   }
-  
+
   // 古いファンインで新しいファンインに含まれていないものの処理
   for (ymuint i = 0; i < old_ni; ++ i) {
     CrNode* inode = cut_input(old_cut, i);
@@ -684,7 +684,7 @@ CutResub::get_gq()
   CrNode* node = mGQ.getmin();
   node->clear_GQ();
   return node;
-} 
+}
 
 // レベル計算用のキューにつむ．
 void
@@ -703,7 +703,7 @@ CutResub::get_lq()
   CrNode* node = mLQ.getmin();
   node->clear_LQ();
   return node;
-} 
+}
 
 // 要求レベル計算用のキューにつむ．
 void
@@ -722,7 +722,7 @@ CutResub::get_rq()
   CrNode* node = mRQ.getmin();
   node->clear_RQ();
   return node;
-} 
+}
 
 // カットの根に対応するノードを取り出す．
 CrNode*

@@ -21,6 +21,7 @@ libym_lutmap_la_SOURCES = \
 	SbjGraph.cc \
 	SbjGraph_dump.cc \
 	SbjGraph_mindepth.cc \
+	SbjMinDepth.cc \
 	LnGraph.cc \
 	LnGraph_dump.cc \
 	EnumCutOp.h \

@@ -382,9 +382,10 @@ SbjGraph::port_pos(const SbjNode* node) const
 // @param[out] node_list ノードを格納するリスト
 // @return 要素数を返す．
 ymuint
-SbjGraph::ppi_list(list<const SbjNode*>& node_list) const
+SbjGraph::ppi_list(vector<const SbjNode*>& node_list) const
 {
   node_list.clear();
+  node_list.reserve(input_num() + dff_num());
   for (SbjNodeList::const_iterator p = input_list().begin();
        p != input_list().end(); ++ p) {
     node_list.push_back(*p);
@@ -400,9 +401,10 @@ SbjGraph::ppi_list(list<const SbjNode*>& node_list) const
 // @param[out] node_list ノードを格納するリスト
 // @return 要素数を返す．
 ymuint
-SbjGraph::ppo_list(list<const SbjNode*>& node_list) const
+SbjGraph::ppo_list(vector<const SbjNode*>& node_list) const
 {
   node_list.clear();
+  node_list.reserve(output_num() + dff_num());
   for (SbjNodeList::const_iterator p = output_list().begin();
        p != output_list().end(); ++ p) {
     node_list.push_back(*p);
@@ -457,9 +459,9 @@ SbjGraph::sort(vector<const SbjNode*>& node_list) const
   vector<bool> mark(max_node_id(), false);
 
   // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
-  list<const SbjNode*> tmp_list;
+  vector<const SbjNode*> tmp_list;
   ppi_list(tmp_list);
-  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     const SbjNode* node = *p;
     mark[node->id()] = true;
@@ -519,9 +521,9 @@ SbjGraph::rsort(vector<const SbjNode*>& node_list) const
   vector<bool> mark(max_node_id(), false);
 
   // 外部出力とDFFのみをファンアウトにするノードを node_list に追加する．
-  list<const SbjNode*> tmp_list;
+  vector<const SbjNode*> tmp_list;
   ppo_list(tmp_list);
-  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     const SbjNode* node = *p;
     mark[node->id()] = true;
@@ -889,9 +891,9 @@ ymuint
 SbjGraph::level() const
 {
   if ( !mLevelValid ) {
-    list<const SbjNode*> tmp_list;
+    vector<const SbjNode*> tmp_list;
     ppi_list(tmp_list);
-    for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+    for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
 	 p != tmp_list.end(); ++ p) {
       const SbjNode* node = *p;
       // node の const を取り去るギミック
@@ -916,7 +918,7 @@ SbjGraph::level() const
 
     ymuint max_l = 0;
     ppo_list(tmp_list);
-    for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+    for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
 	 p != tmp_list.end(); ++ p) {
       const SbjNode* node = *p;
       const SbjNode* inode = node->fanin(0);

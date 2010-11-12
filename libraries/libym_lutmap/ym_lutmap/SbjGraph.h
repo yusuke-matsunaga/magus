@@ -427,10 +427,6 @@ private:
   void
   set_rmark();
 
-  /// @brief range マークを消す．
-  void
-  clear_rmark();
-
   /// @brief target マークを返す．
   bool
   tmark() const;
@@ -438,10 +434,6 @@ private:
   /// @brief target マークを付ける．
   void
   set_tmark();
-
-  /// @brief target マークを消す．
-  void
-  clear_tmark();
 
   /// @brief flow 用のマークを返す．
   bool
@@ -451,9 +443,9 @@ private:
   void
   set_fmark();
 
-  /// @brief flow 用のマークを消す．
+  /// @brief range/target/flow マークを消す．
   void
-  clear_fmark();
+  clear_rtfmark();
 
   /// @brief 入力側の visit フラグを返す．
   bool
@@ -463,10 +455,6 @@ private:
   void
   set_vmark1();
 
-  /// @brief 入力側の visit フラグを消す．
-  void
-  clear_vmark1();
-
   /// @brief 出力側の visit フラグを返す．
   bool
   vmark2();
@@ -475,9 +463,9 @@ private:
   void
   set_vmark2();
 
-  /// @brief 出力側の visit フラグを消す．
+  /// @brief visit フラグを消す．
   void
-  clear_vmark2();
+  clear_vmark();
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -756,7 +744,7 @@ public:
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppi_list(list<const SbjNode*>& node_list) const;
+  ppi_list(vector<const SbjNode*>& node_list) const;
 
   /// @brief 出力のノード数を得る．
   ymuint
@@ -776,7 +764,7 @@ public:
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppo_list(list<const SbjNode*>& node_list) const;
+  ppo_list(vector<const SbjNode*>& node_list) const;
 
   /// @brief 論理ノード数を得る．
   ymuint
@@ -955,7 +943,7 @@ public:
   /// @{
 
   /// @brief 各ノードの minimum depth を求める．
-  void
+  ymuint
   get_min_depth(ymuint k) const;
 
   /// @}
@@ -1034,7 +1022,7 @@ private:
   void
   mark_tfi(SbjNode* node,
 	   ymuint d,
-	   list<SbjNode*>& node_list);
+	   vector<SbjNode*>& node_list);
 
   // node のファンアウトを探索する．
   static
@@ -1628,14 +1616,6 @@ SbjNode::set_rmark()
   mMark |= kRangeMask;
 }
 
-// @brief range マークを消す．
-inline
-void
-SbjNode::clear_rmark()
-{
-  mMark &= ~kRangeMask;
-}
-
 // @brief target マークを返す．
 inline
 bool
@@ -1650,14 +1630,6 @@ void
 SbjNode::set_tmark()
 {
   mMark |= kTargetMask;
-}
-
-// @brief target マークを消す．
-inline
-void
-SbjNode::clear_tmark()
-{
-  mMark &= ~kTargetMask;
 }
 
 // @brief flow 用のマークを返す．
@@ -1676,12 +1648,12 @@ SbjNode::set_fmark()
   mMark |= kFlowMask;
 }
 
-// @brief flow 用のマークを消す．
+// @brief range/target/flow マークを消す．
 inline
 void
-SbjNode::clear_fmark()
+SbjNode::clear_rtfmark()
 {
-  mMark &= ~kFlowMask;
+  mMark &= ~(kRangeMask | kTargetMask | kFlowMask);
 }
 
 // @brief 入力側の visit フラグを返す．
@@ -1700,14 +1672,6 @@ SbjNode::set_vmark1()
   mMark |= kV1Mask;
 }
 
-// @brief 入力側の visit フラグを消す．
-inline
-void
-SbjNode::clear_vmark1()
-{
-  mMark &= ~kV1Mask;
-}
-
 // @brief 出力側の visit フラグを返す．
 inline
 bool
@@ -1724,12 +1688,12 @@ SbjNode::set_vmark2()
   mMark |= kV2Mask;
 }
 
-// @brief 出力側の visit フラグを消す．
+// @brief visit フラグを消す．
 inline
 void
-SbjNode::clear_vmark2()
+SbjNode::clear_vmark()
 {
-  mMark &= ~kV2Mask;
+  mMark &= ~(kV1Mask | kV2Mask);
 }
 
 // @brief 深さを得る．

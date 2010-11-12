@@ -14,6 +14,7 @@
 #include "ym_bnet/BNetDecomp.h"
 #include "ym_lutmap/BNet2Sbj.h"
 #include "ym_lutmap/SbjGraph.h"
+#include "ym_lutmap/SbjMinDepth.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/StopWatch.h"
 
@@ -27,7 +28,7 @@ usage()
 {
   using namespace std;
 
-  cerr << "USAGE : " << argv0 << " [-blif|-verilog] blif-file" << endl;
+  cerr << "USAGE : " << argv0 << " input-size blif-file" << endl;
 }
 
 END_NONAMESPACE
@@ -41,24 +42,13 @@ main(int argc,
   using namespace nsYm;
 
   argv0 = argv[0];
-
-  int fpos = 1;
-  if ( argc == 3 ) {
-    if ( argv[1][0] != '-' ) {
-      usage();
-      return 1;
-    }
-    else {
-      usage();
-      return 2;
-    }
-  }
-  if ( fpos + 1 != argc ) {
+  if ( argc != 3 ) {
     usage();
     return 3;
   }
 
-  string filename = argv[fpos];
+  ymuint k = atoi(argv[1]);
+  string filename = argv[2];
 
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
@@ -88,12 +78,28 @@ main(int argc,
 
     StopWatch timer;
 
+#if 1
     timer.start();
-    sbjgraph.get_min_depth(12);
+    ymuint d1 = sbjgraph.get_min_depth(k);
     timer.stop();
 
+    cout << "k = " << k << ", depth = " << d1 << endl;
     USTime t = timer.time();
     cout << t << endl;
+#endif
+
+#if 1
+    nsLutmap::SbjMinDepth mindepth;
+
+    timer.reset();
+    timer.start();
+    ymuint d2 = mindepth.get_min_depth(sbjgraph, k);
+    timer.stop();
+
+    cout << "k = " << k << ", depth = " << d2 << endl;
+    USTime t2 = timer.time();
+    cout << t2 << endl;
+#endif
   }
   catch ( AssertError x) {
     cout << x << endl;
