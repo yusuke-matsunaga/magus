@@ -50,7 +50,9 @@ main(int argc,
   ymuint k = atoi(argv[1]);
   string filename = argv[2];
 
+#if 0
   try {
+#endif
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     BNetBlifReader reader;
 
@@ -100,10 +102,12 @@ main(int argc,
     USTime t2 = timer.time();
     cout << t2 << endl;
 #endif
+#if 0
   }
   catch ( AssertError x) {
     cout << x << endl;
   }
+#endif
 
   return 0;
 }
