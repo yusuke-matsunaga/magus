@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
@@ -15,7 +15,7 @@
 #include "ym_mvn/MvPin.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_TECHMAP
 
 using namespace nsYm::nsMvn;
 
@@ -827,4 +827,4 @@ mvn2sbj(const MvMgr& mvmgr,
   }
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_TECHMAP

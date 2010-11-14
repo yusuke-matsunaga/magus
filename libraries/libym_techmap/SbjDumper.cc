@@ -1,6 +1,6 @@
 
-/// @file libym_lutmap/SbjGraph_dump.cc
-/// @brief SbjGraph 用の dump() の実装ファイル
+/// @file libym_techmap/SbjDumper.cc
+/// @brief SbjDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SbjGraph.cc 2274 2009-06-10 07:45:29Z matsunaga $
@@ -9,15 +9,28 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjDumper.h"
+#include "ym_techmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_TECHMAP
 
-// @brief SbjGraph の内容をダンプする関数
+// @brief コンストラクタ
+SbjDumper::SbjDumper()
+{
+}
+
+// @brief デストラクタ
+SbjDumper::~SbjDumper()
+{
+}
+
+/// @brief 独自形式で出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] sbjgraph 対象のサブジェクトグラフ
 void
-dump(ostream& s,
-     const SbjGraph& sbjgraph)
+SbjDumper::dump(ostream& s,
+		const SbjGraph& sbjgraph)
 {
   ymuint np = sbjgraph.port_num();
   for (ymuint i = 0; i < np; ++ i) {
@@ -142,10 +155,9 @@ dump(ostream& s,
   for (SbjNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const SbjNode* node = *p;
-    ymuint fcode = node->fcode();
-    const char* pol0 = (fcode & 1U) ? "~" : "";
-    const char* pol1 = (fcode & 2U) ? "~" : "";
-    const char* op   = (fcode & 4U) ? "^" : "&";
+    const char* pol0 = node->fanin_inv(0) ? "~" : "";
+    const char* pol1 = node->fanin_inv(1) ? "~" : "";
+    const char* op   = node->is_xor() ? "^" : "&";
     s << "Logic(" << node->id_str() << ") = "
       << pol0 << node->fanin(0)->id_str()
       << " " << op << " "
@@ -154,10 +166,12 @@ dump(ostream& s,
   }
 }
 
-// @brief SbjGraph の内容を blif 形式で出力する関数
+// @brief blif 形式で出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] sbjgraph 対象のサブジェクトグラフ
 void
-dump_blif(ostream& s,
-	  const SbjGraph& sbjgraph)
+SbjDumper::dump_blif(ostream& s,
+		     const SbjGraph& sbjgraph)
 {
   s << ".model " << sbjgraph.name() << endl;
   const SbjNodeList& input_list = sbjgraph.input_list();
@@ -214,31 +228,27 @@ dump_blif(ostream& s,
     s << ".names " << node->fanin(0)->id_str()
       << " " << node->fanin(1)->id_str()
       << " " << node->id_str() << endl;
-    switch ( node->fcode() ) {
-    case 0:
-      s << "11 1" << endl;
-      break;
-
-    case 1:
-      s << "01 1" << endl;
-      break;
-
-    case 2:
-      s << "10 1" << endl;
-      break;
-
-    case 3:
-      s << "00 1" << endl;
-      break;
-
-    case 4:
+    if ( node->is_and() ) {
+      if ( node->fanin_inv(0) ) {
+	if ( node->fanin_inv(1) ) {
+	  s << "00 1" << endl;
+	}
+	else {
+	  s << "01 1" << endl;
+	}
+      }
+      else {
+	if ( node->fanin_inv(1) ) {
+	  s << "10 1" << endl;
+	}
+	else {
+	  s << "11 1" << endl;
+	}
+      }
+    }
+    else {
       s << "10 1" << endl
 	<< "01 1" << endl;
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
     }
     s << endl;
   }
@@ -258,10 +268,12 @@ node_name(const SbjNode* node)
 END_NONAMESPACE
 
 
-// @brief SbjGraph の内容を Verilog-HDL 形式で出力する関数
+// @brief Verilog-HDL 形式で出力する関数
+// @param[in] s 出力先のストリーム
+// @param[in] sbjgraph 対象のネットワーク
 void
-dump_verilog(ostream& s,
-	     const SbjGraph& sbjgraph)
+SbjDumper::dump_verilog(ostream& s,
+			const SbjGraph& sbjgraph)
 {
   // module 文
   s << "module " << sbjgraph.name() << "(";
@@ -357,12 +369,12 @@ dump_verilog(ostream& s,
   for (SbjNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const SbjNode* node = *p;
-    ymuint fcode = node->fcode();
-    const char* pol0 = (fcode & 1U) ? "~" : "";
-    const char* pol1 = (fcode & 2U) ? "~" : "";
-    const char* op   = (fcode & 4U) ? "^" : "&";
-    s << "  assign " << node_name(node) << " = "
-      << pol0 << node_name(node->fanin(0))
+    s << "  assign " << node_name(node) << " = ";
+
+    const char* pol0 = node->fanin_inv(0) ? "~" : "";
+    const char* pol1 = node->fanin_inv(1) ? "~" : "";
+    const char* op   = node->is_xor() ? "^" : "&";
+    s << pol0 << node_name(node->fanin(0))
       << " " << op << " "
       << pol1 << node_name(node->fanin(1))
       << ";" << endl;
@@ -447,4 +459,4 @@ dump_verilog(ostream& s,
   s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_TECHMAP

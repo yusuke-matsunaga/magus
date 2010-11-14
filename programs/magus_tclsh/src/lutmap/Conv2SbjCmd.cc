@@ -10,7 +10,7 @@
 
 
 #include "LutmapCmd.h"
-#include "BNet2Sbj.h"
+#include "ym_techmap/BNet2Sbj.h"
 
 
 
@@ -31,7 +31,7 @@ Conv2SbjCmd::Conv2SbjCmd(NetMgr* mgr,
 Conv2SbjCmd::~Conv2SbjCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 Conv2SbjCmd::cmd_proc(TclObjVector& objv)
@@ -57,7 +57,7 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 

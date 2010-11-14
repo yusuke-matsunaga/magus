@@ -1,5 +1,5 @@
 
-/// @file libym_lutmap/tests/bliftest.cc
+/// @file libym_techmap/tests/bliftest.cc
 /// @brief blif ファイルの読み込みのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,9 +12,8 @@
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
-#include "ym_lutmap/BNet2Sbj.h"
-#include "ym_lutmap/SbjGraph.h"
-#include "ym_lutmap/SbjMinDepth.h"
+#include "ym_techmap/BNet2Sbj.h"
+#include "ym_techmap/SbjGraph.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/StopWatch.h"
 
@@ -69,7 +68,7 @@ main(int argc,
 
     decomp(network, 2);
 
-    nsLutmap::BNet2Sbj bnet2sbj;
+    nsTechmap::BNet2Sbj bnet2sbj;
 
     SbjGraph sbjgraph;
 
@@ -79,12 +78,11 @@ main(int argc,
     }
 
     StopWatch timer;
-
-    nsLutmap::SbjMinDepth mindepth;
+    vector<ymuint> depth_array;
 
     timer.reset();
     timer.start();
-    ymuint d2 = mindepth.get_min_depth(sbjgraph, k);
+    ymuint d2 = sbjgraph.get_min_depth(k, depth_array);
     timer.stop();
 
     cout << "k = " << k << ", depth = " << d2 << endl;

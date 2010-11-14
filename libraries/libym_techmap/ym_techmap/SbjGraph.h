@@ -294,6 +294,10 @@ public:
   bool
   fanin_rst_inv() const;
 
+  /// @brief レベルを得る．
+  ymuint
+  level() const;
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -390,6 +394,9 @@ private:
   // 作業用のマーク
   ymuint32 mMark;
 
+  // レベル
+  ymuint32 mLevel;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -424,7 +431,7 @@ private:
   const int kPoShift = 0;
 
   static
-  const ymuint kPoMask = 1U << kPoShift;
+  const ymuint kPoMask = (1U << kPoShift);
 
 };
 
@@ -616,7 +623,7 @@ public:
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppi_list(list<const SbjNode*>& node_list) const;
+  ppi_list(vector<const SbjNode*>& node_list) const;
 
   /// @brief 出力のノード数を得る．
   ymuint
@@ -636,7 +643,7 @@ public:
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppo_list(list<const SbjNode*>& node_list) const;
+  ppo_list(vector<const SbjNode*>& node_list) const;
 
   /// @brief 論理ノード数を得る．
   ymuint
@@ -661,6 +668,19 @@ public:
   /// @brief 逆順で論理ソートされたノードのリストを得る．
   void
   rsort(vector<const SbjNode*>& node_list) const;
+
+  /// @brief 段数を求める．
+  /// @note 副作用として各 SbjNode のレベルが設定される．
+  ymuint
+  level() const;
+
+  /// @brief 各ノードの minimum depth を求める．
+  /// @param[in] k LUT の最大入力数
+  /// @param[out] depth_array 各ノードの深さを収める配列
+  /// @return 出力の最大深さを返す．
+  ymuint
+  get_min_depth(ymuint k,
+		vector<ymuint>& depth_array) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -813,10 +833,6 @@ public:
   void
   clear();
 
-  /// @brief 内容を s に出力する．
-  void
-  dump(ostream& s) const;
-
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -930,32 +946,15 @@ private:
   // DFFノードのリスト
   SbjNodeList mDffList;
 
+  // 最大レベル
+  mutable
+  ymuint32 mLevel;
+
+  // mLevel および各 SbjNode::mLevel が正しいとき true となるフラグ
+  mutable
+  bool mLevelValid;
+
 };
-
-
-/// @relates SbjGraph
-/// @brief SbjGraph の内容をダンプする関数
-/// @param[in] s 出力先のストリーム
-/// @param[in] sbjgraph 対象のネットワーク
-void
-dump(ostream& s,
-     const SbjGraph& sbjgraph);
-
-/// @relates SbjGraph
-/// @brief SbjGraph の内容を blif 形式で出力する関数
-/// @param[in] s 出力先のストリーム
-/// @param[in] sbjgraph 対象のネットワーク
-void
-dump_blif(ostream& s,
-	  const SbjGraph& sbjgraph);
-
-/// @relates SbjGraph
-/// @brief SbjGraph の内容を Verilog-HDL 形式で出力する関数
-/// @param[in] s 出力先のストリーム
-/// @param[in] sbjgraph 対象のネットワーク
-void
-dump_verilog(ostream& s,
-	     const SbjGraph& sbjgraph);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1383,6 +1382,14 @@ bool
 SbjNode::fanin_rst_inv() const
 {
   return static_cast<bool>((mFlags >> kDRinvShift) & 1U);
+}
+
+// @brief レベルを得る．
+inline
+ymuint
+SbjNode::level() const
+{
+  return mLevel;
 }
 
 

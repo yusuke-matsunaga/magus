@@ -10,7 +10,8 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
+#include "ym_techmap/SbjDumper.h"
 #include "ym_lutmap/LnGraph.h"
 #if 0
 #include "ym_lutmap/BNet2Sbj.h"
@@ -163,7 +164,8 @@ main(int argc,
 	cerr << dump2_file << ": could not open" << endl;
 	return 3;
       }
-      dump_verilog(ofs, sbj_network);
+      SbjDumper d;
+      d.dump_verilog(ofs, sbj_network);
       dump_mvnode_map(ofs, mgr, mvnode_map);
     }
 

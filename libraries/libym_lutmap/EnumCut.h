@@ -12,11 +12,11 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/SbjGraph.h"
 #include "EnumCutOp.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class EnumCut EnumCut.h "EnumCut.h"

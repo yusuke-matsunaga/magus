@@ -1,5 +1,5 @@
 
-/// @file libym_lutmap/SbjMinDepth.cc
+/// @file libym_techmap/SbjMinDepth.cc
 /// @brief SbjMinDepth の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/SbjMinDepth.h"
+#include "SbjMinDepth.h"
 #include "SmdNode.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_TECHMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmdNode
@@ -81,27 +81,14 @@ SmdNode::set_fanout(ymuint pos,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SbjMinDepth::SbjMinDepth() :
-  mAlloc(4096)
-{
-}
-
-// @brief デストラクタ
-SbjMinDepth::~SbjMinDepth()
-{
-}
-
-// @brief 各ノードの minimum depth を求める．
 // @param[in] sbjgraph 対象のサブジェクトグラフ
-// @param[in] k LUT の最大入力数
-ymuint
-SbjMinDepth::get_min_depth(const SbjGraph& sbjgraph,
-			   ymuint k)
+SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
+  mAlloc(4096),
+  mSbjGraph(sbjgraph)
 {
   ymuint n = sbjgraph.max_node_id();
 
-  mNodeList.clear();
-  mNodeList.reserve(n);
+  mTfiNodeList.reserve(n);
 
   mNodeNum = n;
   void* p = mAlloc.get_memory(sizeof(SmdNode) * n);
@@ -110,34 +97,26 @@ SbjMinDepth::get_min_depth(const SbjGraph& sbjgraph,
   // sbjgraph の構造を SmdNode にコピーする．
   vector<const SbjNode*> ppi_list;
   sbjgraph.ppi_list(ppi_list);
-  vector<SmdNode*> input_list;
-  input_list.reserve(ppi_list.size());
+  mInputList.reserve(ppi_list.size());
   for (vector<const SbjNode*>::const_iterator p = ppi_list.begin();
        p != ppi_list.end(); ++ p) {
     const SbjNode* sbjnode = *p;
     ymuint id = sbjnode->id();
     SmdNode* node = &mNodeArray[id];
     node->set_id(id, false);
-    node->set_depth(0);
-    node->clear_rtfmark();
-    node->clear_vmark();
-    input_list.push_back(node);
+    mInputList.push_back(node);
   }
   vector<const SbjNode*> sbjnode_list;
   sbjgraph.sort(sbjnode_list);
-  vector<SmdNode*> node_list;
-  node_list.reserve(sbjgraph.lnode_num());
+  mLogicNodeList.reserve(sbjgraph.lnode_num());
   for (vector<const SbjNode*>::const_iterator p = sbjnode_list.begin();
        p != sbjnode_list.end(); ++ p) {
     const SbjNode* sbjnode = *p;
     assert_cond( sbjnode->is_logic(), __FILE__, __LINE__);
     ymuint id = sbjnode->id();
     SmdNode* node = &mNodeArray[id];
-    node_list.push_back(node);
+    mLogicNodeList.push_back(node);
     node->set_id(id, true);
-    node->set_depth(0);
-    node->clear_rtfmark();
-    node->clear_vmark();
     const SbjNode* isbjnode0 = sbjnode->fanin(0);
     SmdNode* inode0 = &mNodeArray[isbjnode0->id()];
     node->set_fanin0(inode0);
@@ -181,12 +160,40 @@ SbjMinDepth::get_min_depth(const SbjGraph& sbjgraph,
       node->set_fanout(pos, edge);
     }
   }
+}
+
+// @brief デストラクタ
+SbjMinDepth::~SbjMinDepth()
+{
+}
+
+// @brief 各ノードの minimum depth を求める．
+// @param[in] sbjgraph 対象のサブジェクトグラフ
+// @param[in] k LUT の最大入力数
+// @param[out] depth_array 各ノードの深さを収める配列
+// @return 出力の最大深さを返す．
+ymuint
+SbjMinDepth::operator()(ymuint k,
+			vector<ymuint>& depth_array)
+{
+  depth_array.clear();
+  depth_array.resize(mNodeNum, 0);
 
   // 入力側から depth を計算してゆく
-  ymuint ans = 0;
-  for (vector<SmdNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
+  for (vector<SmdNode*>::iterator p = mInputList.begin();
+       p != mInputList.end(); ++ p) {
     SmdNode* node = *p;
+    node->clear_rtfmark();
+    node->clear_vmark();
+    node->set_depth(0);
+    depth_array[node->id()] = 0;
+  }
+  ymuint ans = 0;
+  for (vector<SmdNode*>::iterator p = mLogicNodeList.begin();
+       p != mLogicNodeList.end(); ++ p) {
+    SmdNode* node = *p;
+    node->clear_rtfmark();
+    node->clear_vmark();
     // ファンインの depth の最大値を max_depth に入れる．
     SmdNode* inode0 = node->fanin0();
     ymuint max_depth = inode0->depth();
@@ -199,10 +206,11 @@ SbjMinDepth::get_min_depth(const SbjGraph& sbjgraph,
     // max_depth 以下の depth を持つノードのみで構成される k-feasible cut を
     // 見つけることができたら node の depth も max_depth となる．
     // そうでなければ max_depth + 1
-    if ( !find_k_cut(node, input_list, k, max_depth) ) {
+    if ( !find_k_cut(node, k, max_depth) ) {
       ++ max_depth;
     }
     node->set_depth(max_depth);
+    depth_array[node->id()] = max_depth;
     if ( ans < max_depth ) {
       ans = max_depth;
     }
@@ -210,17 +218,9 @@ SbjMinDepth::get_min_depth(const SbjGraph& sbjgraph,
   return ans;
 }
 
-// @brief 各ノードの深さを求める．
-ymuint
-SbjMinDepth::node_depth(const SbjNode* node)
-{
-  return mNodeArray[node->id()].depth();
-}
-
 // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
 bool
 SbjMinDepth::find_k_cut(SmdNode* node,
-			const vector<SmdNode*>& input_list,
 			ymuint k,
 			ymuint d)
 {
@@ -230,6 +230,7 @@ SbjMinDepth::find_k_cut(SmdNode* node,
 
   // node の transitive fanin に rmark を付ける．
   // node および 深さ d のノードに tmark を付ける．
+  mTfiNodeList.clear();
   node->set_tmark();
   mark_tfi(node, d);
 
@@ -237,15 +238,15 @@ SbjMinDepth::find_k_cut(SmdNode* node,
   // k + 1 本以上あれば k-feasible cut は存在しない．
   bool found = true;
   ymuint c = 0;
-  for (vector<SmdNode*>::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
+  for (vector<SmdNode*>::const_iterator p = mInputList.begin();
+       p != mInputList.end(); ++ p) {
     SmdNode* start = *p;
     if ( !start->rmark() ) {
       continue;
     }
     bool stat = dfs_fanout(start);
-    for (vector<SmdNode*>::iterator q = mNodeList.begin();
-	 q != mNodeList.end(); ++ q) {
+    for (vector<SmdNode*>::iterator q = mTfiNodeList.begin();
+	 q != mTfiNodeList.end(); ++ q) {
       SmdNode* node = *q;
       node->clear_vmark();
     }
@@ -257,8 +258,8 @@ SbjMinDepth::find_k_cut(SmdNode* node,
       }
     }
   }
-  for (vector<SmdNode*>::iterator q = mNodeList.begin();
-       q != mNodeList.end(); ++ q) {
+  for (vector<SmdNode*>::iterator q = mTfiNodeList.begin();
+       q != mTfiNodeList.end(); ++ q) {
     SmdNode* node = *q;
     node->clear_rtfmark();
     if ( node->is_logic() ) {
@@ -266,7 +267,6 @@ SbjMinDepth::find_k_cut(SmdNode* node,
       node->fanin1_edge()->clear_flow();
     }
   }
-  mNodeList.clear();
 
   return found;
 }
@@ -278,7 +278,7 @@ SbjMinDepth::mark_tfi(SmdNode* node,
 		      ymuint d)
 {
   if ( !node->check_rmark() ) {
-    mNodeList.push_back(node);
+    mTfiNodeList.push_back(node);
     if ( node->depth() == d ) {
       node->set_tmark();
     }
@@ -385,4 +385,4 @@ SbjMinDepth::dfs(SmdNode* cur_node,
   return false;
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_TECHMAP

@@ -11,6 +11,7 @@
 
 #include "DumpSbjCmd.h"
 #include "ym_tclpp/TclPopt.h"
+#include "ym_techmap/SbjDumper.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -61,14 +62,17 @@ DumpSbjCmd::cmd_proc(TclObjVector& objv)
       }
       outp = &ofs;
     }
+
+    SbjDumper d;
+
     if ( blif ) {
-      dump_blif(*outp, sbjgraph());
+      d.dump_blif(*outp, sbjgraph());
     }
     else if ( verilog ) {
-      dump_verilog(*outp, sbjgraph());
+      d.dump_verilog(*outp, sbjgraph());
     }
     else {
-      dump(*outp, sbjgraph());
+      d.dump(*outp, sbjgraph());
     }
     return TCL_OK;
   }

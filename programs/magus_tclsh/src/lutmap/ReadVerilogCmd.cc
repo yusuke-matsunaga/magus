@@ -10,26 +10,25 @@
 
 
 #include "LutmapCmd.h"
-#include "BNet2Sbj.h"
 #include "ym_mvn/mvn_nsdef.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
 #include "ym_utils/MsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_TECHMAP
 
 void
 mvn2sbj(const MvMgr& mvmgr,
 	SbjGraph& sbjgraph);
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_TECHMAP
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// BNetwork から SbjGraph に変換するコマンド
+// verilog から SbjGraph に変換するコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ

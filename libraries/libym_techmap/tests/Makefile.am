@@ -30,6 +30,7 @@ LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
 	read_blif \
+	mindepth_test \
 	patmgr_test \
 	pgfuncmgr_test \
 	areacover_test
@@ -38,6 +39,13 @@ read_blif_SOURCES = \
 	read_blif.cc
 
 read_blif_LDADD = \
+	$(LIBYM_TECHMAP) \
+	$(LIBYM_BNET)
+
+mindepth_test_SOURCES = \
+	mindepth_test.cc
+
+mindepth_test_LDADD = \
 	$(LIBYM_TECHMAP) \
 	$(LIBYM_BNET)
 

@@ -12,16 +12,12 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/techmap_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
-class SbjGraph;
-class SbjNode;
 class Cut;
-class LnGraph;
-class LnNode;
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapRecord MapRecord.h "MapRecord.h"
@@ -61,7 +57,7 @@ public:
   /// @param[in] node 該当のノード
   const Cut*
   get_cut(const SbjNode* node);
-  
+
   /// @brief マッピング結果を LnGraph にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] dag_cover DAG covering 結果
@@ -130,7 +126,7 @@ private:
 
     // カット
     const Cut* mCut;
-    
+
     // マップ結果
     LnNode* mMapNode[2];
 
@@ -142,12 +138,12 @@ private:
 
     // mCovCount の更新で用いるフラグ
     bool mTmpFlag;
-    
+
     // 段数
     int mDepth;
   };
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -158,7 +154,7 @@ private:
 
   // back_trace 中に用いる作業領域
   vector<LnNode*> mTmpFanins;
-  
+
 };
 
 END_NAMESPACE_YM_LUTMAP

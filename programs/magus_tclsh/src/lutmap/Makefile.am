@@ -15,8 +15,6 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libmagus_lutmap_tcl.la
 
 libmagus_lutmap_tcl_la_SOURCES = \
-	BNet2Sbj.h \
-	BNet2Sbj.cc \
 	Ln2BNet.h \
 	Ln2BNet.cc \
 	LutmapCmd.h \
@@ -33,6 +31,7 @@ libmagus_lutmap_tcl_la_SOURCES = \
 
 libmagus_lutmap_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lutmap/libym_lutmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_mvn/libym_mvn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \

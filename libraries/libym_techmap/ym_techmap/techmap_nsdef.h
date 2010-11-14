@@ -31,11 +31,14 @@ BEGIN_NAMESPACE_YM_TECHMAP
 class  PatMgr;
 
 class SbjGraph;
+class SbjPort;
 class SbjEdge;
 class SbjNode;
+class SbjDumper;
 
 typedef DlList<SbjEdge> SbjEdgeList;
 typedef DlList<SbjNode> SbjNodeList;
+
 
 class CnGraph;
 class CnEdge;
@@ -92,8 +95,10 @@ BEGIN_NAMESPACE_YM
 using nsTechmap::PatMgr;
 
 using nsTechmap::SbjGraph;
+using nsTechmap::SbjPort;
 using nsTechmap::SbjEdge;
 using nsTechmap::SbjNode;
+using nsTechmap::SbjDumper;
 
 using nsTechmap::SbjEdgeList;
 using nsTechmap::SbjNodeList;

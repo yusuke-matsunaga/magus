@@ -11,7 +11,7 @@
 
 #include "CrLevelQ.h"
 #include "CrNode.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

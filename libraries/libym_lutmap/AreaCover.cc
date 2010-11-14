@@ -10,7 +10,7 @@
 
 
 #include "AreaCover.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
 #include "Cut.h"
 #include "MapRecord.h"
 

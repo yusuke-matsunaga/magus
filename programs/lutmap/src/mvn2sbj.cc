@@ -7,7 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/SbjGraph.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"

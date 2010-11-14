@@ -32,8 +32,10 @@ libym_techmap_la_SOURCES = \
 	PatMatcher.cc \
 	PatMgr.cc \
 	RepFunc.h \
+	SbjDumper.cc \
 	SbjGraph.cc \
-	SbjGraph_dump.cc
+	SbjMinDepth.cc \
+	SmdNode.h
 
 libym_techmap_la_LIBADD = \
 	patgen/libym_techmap_patgen.la \

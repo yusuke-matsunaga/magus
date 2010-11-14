@@ -12,6 +12,7 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/techmap_nsdef.h"
 
 #include "ym_utils/Alloc.h"
 #include "CrNode.h"
@@ -21,7 +22,6 @@
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
-class SbjGraph;
 class Cut;
 class CutHolder;
 class MapRecord;
@@ -43,7 +43,7 @@ public:
 
 
 public:
-  
+
   /// @brief カットの置き換えを行って LUT 数の削減を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_holder サブジェクトグラフ上のカット集合
@@ -54,7 +54,7 @@ public:
 	     MapRecord& maprec,
 	     int slack = -1);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部でのみ用いられる関数
@@ -127,7 +127,7 @@ private:
   // カットの根に対応するノードを取り出す．
   CrNode*
   cut_root(const Cut* cut);
-  
+
   // カットの入力に対応するノードを取り出す．
   CrNode*
   cut_input(const Cut* cut,
@@ -149,16 +149,16 @@ private:
 
   // CrNode の領域確保用のオブジェクト
   SimpleAlloc mAlloc;
-  
+
   // 各ノードごとの情報を納める配列
   vector<CrNode*> mNodeArray;
 
   // 削除されたノードを貯めておくリスト
   list<CrNode*> mGarbageList;
-  
+
   // レベル制約がある時 true となるフラグ
   bool mHasLevelConstr;
-  
+
   // ゲインをキーとしたヒープ
   CrHeap mHeap;
 
@@ -170,13 +170,13 @@ private:
 
   // 要求レベル計算用のレベル付きキュー
   CrLevelQ mRQ;
-  
+
   // 削除されるカットを入れておく作業領域
   vector<const Cut*> mDeletedCuts;
 
   // 削除されるノードを入れておく作業領域
   vector<CrNode*> mDeletedNodes;
-  
+
 };
 
 END_NAMESPACE_YM_LUTMAP

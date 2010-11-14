@@ -1,7 +1,7 @@
-#ifndef YM_LUTMAP_SBJMINDEPTH_H
-#define YM_LUTMAP_SBJMINDEPTH_H
+#ifndef YM_TECHMAP_SBJMINDEPTH_H
+#define YM_TECHMAP_SBJMINDEPTH_H
 
-/// @file ym_lutmap/SbjGraph.h
+/// @file ym_techmap/SbjGraph.h
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/SbjGraph.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_TECHMAP
 
 class SmdNode;
 
@@ -29,7 +29,8 @@ class SbjMinDepth
 public:
 
   /// @brief コンストラクタ
-  SbjMinDepth();
+  /// @param[in] sbjgraph 対象のサブジェクトグラフ
+  SbjMinDepth(const SbjGraph& sbjgraph);
 
   /// @brief デストラクタ
   ~SbjMinDepth();
@@ -41,15 +42,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 各ノードの minimum depth を求める．
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
   /// @param[in] k LUT の最大入力数
+  /// @param[out] depth_array 各ノードの深さを収める配列
+  /// @return 出力の最大深さを返す．
   ymuint
-  get_min_depth(const SbjGraph& sbjgraph,
-		ymuint k);
-
-  /// @brief 各ノードの深さを求める．
-  ymuint
-  node_depth(const SbjNode* node);
+  operator()(ymuint k,
+	     vector<ymuint>& depth_array);
 
 
 private:
@@ -60,7 +58,6 @@ private:
   // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
   bool
   find_k_cut(SmdNode* node,
-	     const vector<SmdNode*>& input_list,
 	     ymuint k,
 	     ymuint d);
 
@@ -87,8 +84,17 @@ private:
   // メモリ確保用のオブジェクト
   SimpleAlloc mAlloc;
 
+  // 対象のサブジェクトグラフ
+  const SbjGraph& mSbjGraph;
+
+  // PPI ノードのリスト
+  vector<SmdNode*> mInputList;
+
+  // ソートされた論理ノードのリスト
+  vector<SmdNode*> mLogicNodeList;
+
   // mark_tfi で用いるノードのリスト
-  vector<SmdNode*> mNodeList;
+  vector<SmdNode*> mTfiNodeList;
 
   // ノード数
   ymuint32 mNodeNum;
@@ -103,6 +109,6 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_TECHMAP
 
-#endif // YM_LUTMAP_SBJMINDEPTH_H
+#endif // YM_TECHMAP_SBJMINDEPTH_H

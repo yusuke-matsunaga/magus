@@ -12,12 +12,10 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/techmap_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-class SbjGraph;
-class LnGraph;
 
 //////////////////////////////////////////////////////////////////////
 /// @class AreaMap AreaMap.h "AreaMap.h"
@@ -29,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   AreaMap();
-  
+
   /// @brief デストラクタ
   ~AreaMap();
 

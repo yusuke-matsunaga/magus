@@ -1,7 +1,7 @@
-#ifndef LIBYM_LUTMAP_SMDNODE_H
-#define LIBYM_LUTMAP_SMDNODE_H
+#ifndef LIBYM_TECHMAP_SMDNODE_H
+#define LIBYM_TECHMAP_SMDNODE_H
 
-/// @file libym_lutmap/SmdNode.h
+/// @file libym_techmap/SmdNode.h
 /// @brief SmdNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/techmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_TECHMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmdEdge SmdNode.h "SmdNode.h"
@@ -511,6 +511,6 @@ SmdNode::set_depth(ymuint depth)
   mDepth = depth;
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_TECHMAP
 
-#endif // LIBYM_LUTMAP_SMDNODE_H
+#endif // LIBYM_TECHMAP_SMDNODE_H

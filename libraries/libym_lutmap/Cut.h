@@ -1,7 +1,7 @@
 #ifndef LIBYM_LUTMAP_CUT_H
 #define LIBYM_LUTMAP_CUT_H
 
-/// @file libym_lutmap/Cut.h 
+/// @file libym_lutmap/Cut.h
 /// @brief Cut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,13 +12,11 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-
+#include "ym_techmap/techmap_nsdef.h"
 #include "ym_lexp/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-class SbjNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class Cut Cut.h "Cut.h"
@@ -35,17 +33,17 @@ private:
   /// @brief 空のコンストラクタ
   /// @note 内容は正しくない．
   Cut();
-  
+
   /// @brief デストラクタ
   ~Cut();
 
-  
+
 public:
 
   /// @brief 根のノードを得る．
   const SbjNode*
   root() const;
-  
+
   /// @brief 入力のサイズを得る．
   ymuint
   ni() const;
@@ -63,18 +61,18 @@ public:
   void
   dump(ostream& s) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 根のノード
   const SbjNode* mRoot;
 
   // 次のカットを指すポインタ
   Cut* mLink;
-  
+
   // 入力数
   ymuint32 mNi;
 
@@ -181,7 +179,7 @@ public:
   bool
   empty() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -195,7 +193,7 @@ private:
 
   // 要素数
   ymuint32 mNum;
-  
+
 };
 
 

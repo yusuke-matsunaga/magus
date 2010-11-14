@@ -14,6 +14,7 @@
 #include "ym_bnet/BNetDecomp.h"
 #include "ym_techmap/BNet2Sbj.h"
 #include "ym_techmap/SbjGraph.h"
+#include "ym_techmap/SbjDumper.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -96,14 +97,16 @@ main(int argc,
       return 5;
     }
 
+    SbjDumper dumper;
+
     if ( blif_flag ) {
-      dump_blif(cout, sbjgraph);
+      dumper.dump_blif(cout, sbjgraph);
     }
     else if ( verilog_flag ) {
-      dump_verilog(cout, sbjgraph);
+      dumper.dump_verilog(cout, sbjgraph);
     }
     else {
-      dump(cout, sbjgraph);
+      dumper.dump(cout, sbjgraph);
     }
   }
   catch ( AssertError x) {

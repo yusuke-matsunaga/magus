@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
 #include "EnumCut.h"
 
 //#define DEBUG_ENUM_RECUR

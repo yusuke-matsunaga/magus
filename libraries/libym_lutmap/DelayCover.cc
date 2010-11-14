@@ -10,7 +10,7 @@
 
 
 #include "DelayCover.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"

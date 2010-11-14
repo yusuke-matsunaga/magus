@@ -11,4 +11,5 @@ noinst_HEADERS = \
 	BNet2Sbj.h \
 	CnGraph.h \
 	PatMgr.h \
+	SbjDumper.h \
 	SbjGraph.h

@@ -12,7 +12,7 @@
 
 
 #include "MagBNetCmd.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_techmap/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
 
 

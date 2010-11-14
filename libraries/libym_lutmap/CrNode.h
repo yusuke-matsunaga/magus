@@ -12,11 +12,11 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/techmap_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
-class SbjNode;
 class Cut;
 
 //////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ class Cut;
 class CrNode
 {
   friend class CrHeap;
-  
+
 public:
 
   /// @brief コンストラクタ
@@ -69,7 +69,7 @@ public:
   /// @brief GQ マークを消す．
   void
   clear_GQ();
-  
+
   /// @brief GQ に入っているとき true を返す．
   bool
   in_GQ() const;
@@ -81,7 +81,7 @@ public:
   /// @brief LQ マークを消す．
   void
   clear_LQ();
-  
+
   /// @brief LQ に入っているとき true を返す．
   bool
   in_LQ() const;
@@ -97,7 +97,7 @@ public:
   /// @brief RQ に入っているとき true を返す．
   bool
   in_RQ() const;
-  
+
   /// @brief カットをセットする．
   void
   set_cut(const Cut* cut);
@@ -115,7 +115,7 @@ public:
   /// @brief ファンアウトリストから削除する．
   void
   delete_fanout(CrNode* del_node);
-  
+
   /// @brief ファンアウトリストを得る．
   const vector<CrNode*>&
   fanout_list();
@@ -163,7 +163,7 @@ public:
   /// @brief old マークを消す．
   void
   clear_oldmark();
-  
+
   /// @brief old マークを返す．
   bool
   oldmark();
@@ -180,7 +180,7 @@ public:
   bool
   newmark();
 
-  
+
 public:
 
   // 代役候補のカットのリスト
@@ -188,15 +188,15 @@ public:
 
   ymuint mTmpLevel;
 
-  
+
 private:
 
   // 根のノード
   const SbjNode* mNode;
-  
+
   // このノードを根とする最適カット
   const Cut* mCurCut;
-    
+
   // ファンアウト先のカットの根のノードのリスト
   vector<CrNode*> mFanoutList;
 
@@ -237,7 +237,7 @@ private:
   const int kOldShift = 7;
   static
   const int kNewShift = 8;
-  
+
   static
   const ymuint kInputMask = 1U << kInputShift;
   static
@@ -256,7 +256,7 @@ private:
   const ymuint kOldMask = 1U << kOldShift;
   static
   const ymuint kNewMask = 1U << kNewShift;
-  
+
 };
 
 

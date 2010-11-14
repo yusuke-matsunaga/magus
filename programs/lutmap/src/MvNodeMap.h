@@ -9,7 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/techmap_nsdef.h"
 #include "ym_mvn/MvNode.h"
 
 

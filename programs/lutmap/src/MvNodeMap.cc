@@ -8,6 +8,7 @@
 
 
 #include "MvNodeMap.h"
+#include "ym_techmap/SbjGraph.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
 
