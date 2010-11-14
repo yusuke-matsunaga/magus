@@ -1,7 +1,7 @@
-#ifndef YM_TECHMAP_SBJMINDEPTH_H
-#define YM_TECHMAP_SBJMINDEPTH_H
+#ifndef YM_SBJ_SBJMINDEPTH_H
+#define YM_SBJ_SBJMINDEPTH_H
 
-/// @file ym_techmap/SbjGraph.h
+/// @file ym_sbj/SbjGraph.h
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/sbj_nsdef.h"
+#include "ym_sbj/SbjGraph.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 class SmdNode;
 
@@ -109,6 +109,6 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
-#endif // YM_TECHMAP_SBJMINDEPTH_H
+#endif // YM_SBJ_SBJMINDEPTH_H

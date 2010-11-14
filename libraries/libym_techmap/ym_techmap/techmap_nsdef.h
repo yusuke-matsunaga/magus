@@ -1,7 +1,7 @@
 #ifndef YM_TECHMAP_TECHMAP_NSDEF_H
 #define YM_TECHMAP_TECHMAP_NSDEF_H
 
-/// @file libym_techmap/ym_techmap/techmap_nsdef.h
+/// @file libym_techmap/ym_sbj/sbj_nsdef.h
 /// @brief techmap パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,6 +12,7 @@
 
 
 #include "ymtools.h"
+#include "ym_sbj/sbj_nsdef.h"
 #include "ym_utils/DlList.h"
 
 
@@ -30,24 +31,12 @@ BEGIN_NAMESPACE_YM_TECHMAP
 
 class  PatMgr;
 
-class SbjGraph;
-class SbjPort;
-class SbjEdge;
-class SbjNode;
-class SbjDumper;
-
-typedef DlList<SbjEdge> SbjEdgeList;
-typedef DlList<SbjNode> SbjNodeList;
-
-
 class CnGraph;
 class CnEdge;
 class CnNode;
 
 typedef DlList<CnEdge> CnEdgeList;
 typedef DlList<CnNode> CnNodeList;
-
-class BNet2Sbj;
 
 
 /// @brief 面積最小化 DAG covering のヒューリスティック関数
@@ -93,17 +82,6 @@ END_NAMESPACE_YM_TECHMAP
 BEGIN_NAMESPACE_YM
 
 using nsTechmap::PatMgr;
-
-using nsTechmap::SbjGraph;
-using nsTechmap::SbjPort;
-using nsTechmap::SbjEdge;
-using nsTechmap::SbjNode;
-using nsTechmap::SbjDumper;
-
-using nsTechmap::SbjEdgeList;
-using nsTechmap::SbjNodeList;
-
-using nsTechmap::BNet2Sbj;
 
 using nsTechmap::CnGraph;
 using nsTechmap::CnEdge;

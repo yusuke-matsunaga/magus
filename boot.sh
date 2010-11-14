@@ -127,6 +127,7 @@ LIBRARIES=\
  libym_bnet \
  libym_bdn \
  libym_mvn \
+ libym_sbj \
  libym_aig \
  libym_tgnet \
  libym_gds \

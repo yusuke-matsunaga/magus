@@ -43,6 +43,7 @@ libym_lutmap_la_SOURCES = \
 	DelayCover.cc
 
 libym_lutmap_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

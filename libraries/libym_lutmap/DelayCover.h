@@ -12,7 +12,7 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 #include "ADCost.h"

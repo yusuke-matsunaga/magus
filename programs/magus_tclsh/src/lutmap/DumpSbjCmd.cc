@@ -10,8 +10,8 @@
 
 
 #include "LutmapCmd.h"
-#include "ym_techmap/SbjGraph.h"
-#include "ym_techmap/SbjDumper.h"
+#include "ym_sbj/SbjGraph.h"
+#include "ym_sbj/SbjDumper.h"
 #include "ym_tclpp/TclPopt.h"
 
 

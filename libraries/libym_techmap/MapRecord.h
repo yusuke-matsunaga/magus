@@ -18,11 +18,6 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
-class SbjGraph;
-class SbjNode;
-class CnGraph;
-class CnNode;
-
 //////////////////////////////////////////////////////////////////////
 /// @class MapRecord MapRecord.h "MapRecord.h"
 /// @brief マッピングの解を保持するクラス

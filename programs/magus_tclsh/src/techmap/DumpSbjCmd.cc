@@ -11,7 +11,7 @@
 
 #include "DumpSbjCmd.h"
 #include "ym_tclpp/TclPopt.h"
-#include "ym_techmap/SbjDumper.h"
+#include "ym_sbj/SbjDumper.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

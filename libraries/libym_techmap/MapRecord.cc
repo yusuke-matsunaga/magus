@@ -10,7 +10,7 @@
 
 
 #include "MapRecord.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 #include "ym_techmap/CnGraph.h"
 #include "Match.h"
 

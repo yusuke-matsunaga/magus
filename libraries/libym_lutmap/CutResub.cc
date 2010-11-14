@@ -10,7 +10,7 @@
 
 
 #include "CutResub.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"

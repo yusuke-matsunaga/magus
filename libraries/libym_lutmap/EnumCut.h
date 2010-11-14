@@ -12,7 +12,7 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 #include "EnumCutOp.h"
 
 

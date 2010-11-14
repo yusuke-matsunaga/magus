@@ -9,12 +9,12 @@
 
 #include "AreaCover.h"
 #include "ym_techmap/PatMgr.h"
+#include "ym_techmap/CnGraph.h"
+#include "ym_cell/Cell.h"
 #include "PatMatcher.h"
 #include "PatGraph.h"
 #include "RepFunc.h"
 #include "FuncGroup.h"
-#include "ym_techmap/CnGraph.h"
-#include "ym_cell/Cell.h"
 #include "MapRecord.h"
 
 

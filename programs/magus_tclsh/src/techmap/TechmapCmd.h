@@ -13,7 +13,7 @@
 
 #include "MagBNetCmd.h"
 #include "ym_techmap/PatMgr.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 #include "ym_techmap/CnGraph.h"
 
 

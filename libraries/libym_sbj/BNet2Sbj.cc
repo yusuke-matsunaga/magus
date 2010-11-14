@@ -1,5 +1,5 @@
 
-/// @file libym_techmap/BNet2Sbj.cc
+/// @file libym_sbj/BNet2Sbj.cc
 /// @brief BNet2Sbj の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/BNet2Sbj.h"
+#include "ym_sbj/BNet2Sbj.h"
 #include "ym_bnet/BNetwork.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
 // BNode へのポインタをキーにして SbjNode と極性を保持する連想配列．
@@ -275,4 +275,4 @@ BNet2Sbj::operator()(const BNetwork& network,
   return true;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ

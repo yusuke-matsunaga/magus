@@ -11,7 +11,7 @@
 
 #include "EnumCutOp.h"
 #include "EnumCut.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 
 //#define DEBUG_ENUM_RECUR
 

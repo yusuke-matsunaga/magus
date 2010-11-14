@@ -1,7 +1,7 @@
-#ifndef TECHMAP_BNET2SBJ_H
-#define TECHMAP_BNET2SBJ_H
+#ifndef YM_SBJ_BNET2SBJ_H
+#define YM_SBJ_BNET2SBJ_H
 
-/// @file techmap/BNet2Sbj.h
+/// @file libym_lutmap/BNet2Sbj.h
 /// @brief BNet2Sbj のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,14 +11,14 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 #include "ym_bnet/bnet_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
-/// @class BNet2Sbj BNet2Sbj.h "ym_techmap/BNet2Sbj.h"
+/// @class BNet2Sbj BNet2Sbj.h "ym_lutmap/BNet2Sbj.h"
 /// @brief BNetwork を SbjGraph へ変換するクラス
 //////////////////////////////////////////////////////////////////////
 class BNet2Sbj
@@ -38,6 +38,6 @@ public:
 
 };
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_SBJ
 
-#endif // TECHMAP_BNET2SBJ_H
+#endif // YM_SBJ_BNET2SBJ_H

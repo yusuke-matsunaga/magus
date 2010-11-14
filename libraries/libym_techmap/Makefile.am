@@ -19,7 +19,6 @@ INCLUDES = \
 libym_techmap_la_SOURCES = \
 	AreaCover.h \
 	AreaCover.cc \
-	BNet2Sbj.cc \
 	CnGraph.cc \
 	CnGraph_dump.cc \
 	FuncGroup.h \
@@ -31,14 +30,11 @@ libym_techmap_la_SOURCES = \
 	PatMatcher.h \
 	PatMatcher.cc \
 	PatMgr.cc \
-	RepFunc.h \
-	SbjDumper.cc \
-	SbjGraph.cc \
-	SbjMinDepth.cc \
-	SmdNode.h
+	RepFunc.h
 
 libym_techmap_la_LIBADD = \
 	patgen/libym_techmap_patgen.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

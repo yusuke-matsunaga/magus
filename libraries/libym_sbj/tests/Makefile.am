@@ -6,8 +6,7 @@ SUBDIRS =
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_techmap
+	-I$(YMTOOLS_BUILDDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -25,29 +24,23 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_TECHMAP = $(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la
+LIBYM_SBJ = $(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la
 LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
-	patmgr_test \
-	pgfuncmgr_test \
-	areacover_test
+	read_blif \
+	mindepth_test
 
-patmgr_test_SOURCES = \
-	patmgr_test.cc
+read_blif_SOURCES = \
+	read_blif.cc
 
-patmgr_test_LDADD = \
-	$(LIBYM_TECHMAP)
+read_blif_LDADD = \
+	$(LIBYM_SBJ) \
+	$(LIBYM_BNET)
 
-pgfuncmgr_test_SOURCES = \
-	pgfuncmgr_test.cc
+mindepth_test_SOURCES = \
+	mindepth_test.cc
 
-pgfuncmgr_test_LDADD = \
-	$(LIBYM_TECHMAP)
-
-areacover_test_SOURCES = \
-	areacover_test.cc
-
-areacover_test_LDADD = \
-	$(LIBYM_TECHMAP) \
+mindepth_test_LDADD = \
+	$(LIBYM_SBJ) \
 	$(LIBYM_BNET)

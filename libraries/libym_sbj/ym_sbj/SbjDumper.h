@@ -1,7 +1,7 @@
-#ifndef YM_TECHMAP_SBJDUMPER_H
-#define YM_TECHMAP_SBJDUMPER_H
+#ifndef YM_SBJ_SBJDUMPER_H
+#define YM_SBJ_SBJDUMPER_H
 
-/// @file ym_techmap/SbjDumper.h
+/// @file ym_sbj/SbjDumper.h
 /// @brief SbjDumper のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
 /// @class SbjDumper SbjDumper.h "SbjDumper.h"
@@ -58,6 +58,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
-#endif // YM_TECHMAP_SBJDUMPER_H
+#endif // YM_SBJ_SBJDUMPER_H

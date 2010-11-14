@@ -1,7 +1,7 @@
-#ifndef YM_TECHMAP_SBJGRAPH_H
-#define YM_TECHMAP_SBJGRAPH_H
+#ifndef YM_SBJ_SBJGRAPH_H
+#define YM_SBJ_SBJGRAPH_H
 
-/// @file ym_techmap/SbjGraph.h
+/// @file ym_sbj/SbjGraph.h
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,14 +11,14 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
 /// @class SbjEdge SbjGraph.h "SbjGraph.h"
@@ -1568,6 +1568,6 @@ SbjGraph::dff_list() const
   return mDffList;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
-#endif // YM_TECHMAP_SBJGRAPH_H
+#endif // YM_SBJ_SBJGRAPH_H

@@ -10,9 +10,7 @@
 
 
 #include "ym_techmap/techmap_nsdef.h"
-#include "ym_techmap/SbjGraph.h"
-#include "ym_cell/cell_nsdef.h"
-#include "Match.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP

@@ -1,5 +1,5 @@
 
-/// @file libym_techmap/SbjDumper.cc
+/// @file libym_sbj/SbjDumper.cc
 /// @brief SbjDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/SbjDumper.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjDumper.h"
+#include "ym_sbj/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 // @brief コンストラクタ
 SbjDumper::SbjDumper()
@@ -459,4 +459,4 @@ SbjDumper::dump_verilog(ostream& s,
   s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ

@@ -11,7 +11,6 @@
 
 #include "ym_techmap/techmap_nsdef.h"
 
-
 /// @brief patgen 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_TECHMAP_PATGEN \
 BEGIN_NAMESPACE_YM_TECHMAP \

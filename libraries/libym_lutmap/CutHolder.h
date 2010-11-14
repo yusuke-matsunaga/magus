@@ -13,7 +13,7 @@
 
 #include "EnumCutOp.h"
 #include "Cut.h"
-#include "ym_techmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

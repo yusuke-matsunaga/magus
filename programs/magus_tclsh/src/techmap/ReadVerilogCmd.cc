@@ -10,20 +10,20 @@
 
 
 #include "ReadVerilogCmd.h"
-#include "BNet2Sbj.h"
+#include "ym_sbj/sbj_nsdef.h"
 #include "ym_mvn/mvn_nsdef.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
 #include "ym_utils/MsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 void
 mvn2sbj(const MvMgr& mvmgr,
 	SbjGraph& sbjgraph);
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -89,7 +89,7 @@ ReadVerilogCmd::cmd_proc(TclObjVector& objv)
     }
 
     // SbjGraph に変換
-    mvn2sbj(mgr, sbjgraph());
+    nsSbj::mvn2sbj(mgr, sbjgraph());
 
     return TCL_OK;
   }

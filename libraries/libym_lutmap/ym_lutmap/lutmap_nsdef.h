@@ -12,7 +12,7 @@
 
 
 #include "ymtools.h"
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 #include "ym_utils/DlList.h"
 
 

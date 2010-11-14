@@ -14,7 +14,6 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
-class SbjNode;
 class PatMgr;
 class PatGraph;
 
