@@ -91,6 +91,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_mvn/Makefile])
 AC_CONFIG_FILES([verilog/Makefile])
+AC_CONFIG_FILES([conv/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

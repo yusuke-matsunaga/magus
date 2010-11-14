@@ -11,6 +11,8 @@ noinst_HEADERS = \
 	MvMgr.h \
 	MvModule.h \
 	MvNode.h \
+	MvNodeMap.h \
 	MvPin.h \
 	MvPort.h \
-	MvVerilogReader.h
+	MvVerilogReader.h \
+	Mvn2Sbj.h

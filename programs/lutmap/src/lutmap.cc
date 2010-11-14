@@ -20,27 +20,12 @@
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
 #else
-#include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/Mvn2Sbj.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
+#include "ym_mvn/MvNodeMap.h"
 #endif
 #include "ym_utils/MsgHandler.h"
-#include "MvNodeMap.h"
-
-
-BEGIN_NAMESPACE_YM_LUTMAP
-
-void
-mvn2sbj(const MvMgr& mvmgr,
-	SbjGraph& sbjgraph,
-	MvNodeMap& mvnode_map);
-
-void
-dump_mvnode_map(ostream& s,
-		const MvMgr& mvmgr,
-		const MvNodeMap& mvnode_map);
-
-END_NAMESPACE_YM_LUTMAP
 
 
 int
@@ -154,8 +139,10 @@ main(int argc,
 
     // SbjGraph に変換
     SbjGraph sbj_network;
-    nsLutmap::MvNodeMap mvnode_map(mgr.max_node_id());
-    mvn2sbj(mgr, sbj_network, mvnode_map);
+    MvNodeMap mvnode_map(mgr.max_node_id());
+    Mvn2Sbj conv;
+
+    conv(mgr, sbj_network, mvnode_map);
 
     if ( dump2 ) {
       ofstream ofs;

@@ -11,19 +11,11 @@
 
 #include "ReadVerilogCmd.h"
 #include "ym_sbj/sbj_nsdef.h"
-#include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/Mvn2Sbj.h"
+#include "ym_mvn/MvNodeMap.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
 #include "ym_utils/MsgHandler.h"
-
-
-BEGIN_NAMESPACE_YM_SBJ
-
-void
-mvn2sbj(const MvMgr& mvmgr,
-	SbjGraph& sbjgraph);
-
-END_NAMESPACE_YM_SBJ
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -89,7 +81,9 @@ ReadVerilogCmd::cmd_proc(TclObjVector& objv)
     }
 
     // SbjGraph に変換
-    nsSbj::mvn2sbj(mgr, sbjgraph());
+    Mvn2Sbj conv;
+    MvNodeMap mvnode_map(mgr.max_node_id());
+    conv(mgr, sbjgraph(), mvnode_map);
 
     return TCL_OK;
   }

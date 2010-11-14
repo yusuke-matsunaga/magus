@@ -1,5 +1,5 @@
 
-/// @file lutmap/src/MvNodeMap.cc
+/// @file libym_mvn/conv/MvNodeMap.cc
 /// @brief MvNodeMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,15 +7,14 @@
 /// All rights reserved.
 
 
-#include "MvNodeMap.h"
+#include "ym_mvn/MvNodeMap.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
+#include "ym_mvn/MvNode.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
-
-using namespace nsYm::nsMvn;
+BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 MvNodeMap::MvNodeMap(ymuint n) :
@@ -147,4 +146,4 @@ dump_mvnode_map(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_MVN

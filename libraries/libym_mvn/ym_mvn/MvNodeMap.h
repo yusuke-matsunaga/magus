@@ -1,7 +1,7 @@
-#ifndef LUTMAP_SRC_MVNODEMAP_H
-#define LUTMAP_SRC_MVNODEMAP_H
+#ifndef LIBYM_MVN_CONV_MVNODEMAP_H
+#define LIBYM_MVN_CONV_MVNODEMAP_H
 
-/// @file lutmap/src/MvNodeMap.h
+/// @file libym_mvn/conv/MvNodeMap.h
 /// @brief MvNodeMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,12 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_mvn/mvn_nsdef.h"
 #include "ym_sbj/sbj_nsdef.h"
-#include "ym_mvn/MvNode.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvNodeMap MvNodeMap.h "MvNodeMap.h"
@@ -39,7 +38,7 @@ public:
   /// @param[in] sbjnode SbjNode
   /// @param[in] inv 反転属性
   void
-  put(const nsMvn::MvNode* mvnode,
+  put(const MvNode* mvnode,
       SbjNode* sbjnode,
       bool inv);
 
@@ -49,20 +48,20 @@ public:
   /// @param[in] sbjnode SbjNode
   /// @param[in] inv 反転属性
   void
-  put(const nsMvn::MvNode* mvnode,
+  put(const MvNode* mvnode,
       ymuint index,
       SbjNode* sbjnode,
       bool inv);
 
   /// @brief 探す．(1ビット版)
   bool
-  get(const nsMvn::MvNode* mvnode,
+  get(const MvNode* mvnode,
       SbjNode*& sbjnode,
       bool& inv) const;
 
   /// @brief 探す．(ベクタ版)
   bool
-  get(const nsMvn::MvNode* mvnode,
+  get(const MvNode* mvnode,
       ymuint index,
       SbjNode*& sbjnode,
       bool& inv) const;
@@ -77,6 +76,14 @@ private:
 
 };
 
-END_NAMESPACE_YM_LUTMAP
 
-#endif // LUTMAP_SRC_MVNODEMAP_H
+/// @relates MvNodeMap, MvMgr
+/// @brief MvNodeMap の内容を出力する．
+void
+dump_mvnode_map(ostream& s,
+		const MvMgr& mvmgr,
+		const MvNodeMap& mvnode_map);
+
+END_NAMESPACE_YM_MVN
+
+#endif // LIBYM_MVN_CONV_MVNODEMAP_H

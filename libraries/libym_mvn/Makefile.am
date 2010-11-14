@@ -5,6 +5,7 @@
 SUBDIRS = \
 	ym_mvn \
 	verilog \
+	conv \
 	. \
 	tests
 
@@ -72,5 +73,6 @@ libym_mvn_la_LDFLAGS =
 
 libym_mvn_la_LIBADD = \
 	verilog/libym_mvn_verilog.la \
+	conv/libym_mvn_conv.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

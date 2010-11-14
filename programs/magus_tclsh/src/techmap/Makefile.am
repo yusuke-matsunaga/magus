@@ -28,8 +28,7 @@ libmagus_techmap_tcl_la_SOURCES = \
 	ReadVerilogCmd.h \
 	ReadVerilogCmd.cc \
 	TechmapCmd.h \
-	TechmapCmd.cc \
-	mvn2sbj.cc
+	TechmapCmd.cc
 
 libmagus_techmap_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
