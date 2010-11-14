@@ -6,7 +6,7 @@
 # Initial block
 # ===================================================================
 AC_INIT([lutmap], [1.0],
-        [yusuke_matsunaga@ieee.org], 
+        [yusuke_matsunaga@ieee.org],
         [lutmap])dnl
 
 AC_REVISION($Rev: 2507 $)dnl
@@ -20,8 +20,8 @@ All rights reserved.
 
 AC_CONFIG_SRCDIR([src/lutmap.cc])dnl
 
-AC_CONFIG_AUX_DIR([../../config])dnl
-AC_CONFIG_MACRO_DIR([../../config])dnl
+AC_CONFIG_AUX_DIR([config])dnl
+AC_CONFIG_MACRO_DIR([config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
