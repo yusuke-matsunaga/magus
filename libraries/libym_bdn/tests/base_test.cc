@@ -20,7 +20,7 @@ bool
 base_test()
 {
   BdNetwork network;
-  
+
   // name(), set_name() のテスト
   network.set_name("foo");
   if ( network.name() != "foo" ) {
@@ -34,13 +34,13 @@ base_test()
   }
 
   // new_input() のテスト
-  if ( network.n_inputs() != 0 ) {
-    cout << "ERROR[new_input_test]: n_inputs() != 0" << endl;
+  if ( network.input_num() != 0 ) {
+    cout << "ERROR[new_input_test]: input_num() != 0" << endl;
     return false;
   }
   BdnNode* input0 = network.new_input("input0");
-  if ( network.n_inputs() != 1 ) {
-    cout << "ERROR[new_input_test]: n_inputs() != 1" << endl;
+  if ( network.input_num() != 1 ) {
+    cout << "ERROR[new_input_test]: input_num() != 1" << endl;
     return false;
   }
   if ( input0 == NULL ) {
@@ -53,8 +53,8 @@ base_test()
   }
 
   BdnNode* input1 = network.new_input("input1");
-  if ( network.n_inputs() != 2 ) {
-    cout << "ERROR[new_input_test]: n_inputs() != 2" << endl;
+  if ( network.input_num() != 2 ) {
+    cout << "ERROR[new_input_test]: input_num() != 2" << endl;
     return false;
   }
   if ( input1 == NULL ) {
@@ -72,8 +72,8 @@ base_test()
   BdnNodeHandle and11_h = network.new_logic(0x8,
 					    BdnNodeHandle(input0, false),
 					    BdnNodeHandle(input1, false));
-  if ( network.n_lnodes() != 1 ) {
-    cout << "ERROR[new_logic_test]: n_lnodes() != 1" << endl;
+  if ( network.lnode_num() != 1 ) {
+    cout << "ERROR[new_logic_test]: lnode_num() != 1" << endl;
     return false;
   }
   if ( and11_h.node() == NULL ) {
@@ -97,7 +97,7 @@ base_test()
     cout << "ERROR[new_logic_test]: and11->fanin1() != input1" << endl;
     return false;
   }
-  
+
   BdnNodeHandle and11_h2 = network.new_logic(0x4,
 					     BdnNodeHandle(input0, true),
 					     BdnNodeHandle(input1, false));
@@ -105,7 +105,7 @@ base_test()
     cout << "ERROR[new_logic_test]: and11_h2 != and11_h" << endl;
     return false;
   }
-  
+
   BdnNodeHandle and11_h3 = network.new_logic(0x2,
 					     BdnNodeHandle(input0, false),
 					     BdnNodeHandle(input1, true));
@@ -113,7 +113,7 @@ base_test()
     cout << "ERROR[new_logic_test]: and11_h3 != and11_h" << endl;
     return false;
   }
-  
+
   BdnNodeHandle and11_h4 = network.new_logic(0x1,
 					     BdnNodeHandle(input0, true),
 					     BdnNodeHandle(input1, true));
@@ -121,13 +121,13 @@ base_test()
     cout << "ERROR[new_logic_test]: and11_h4 != and11_h" << endl;
     return false;
   }
-  
+
   // ~0 & 1 を作る．
   BdnNodeHandle and01_h = network.new_logic(0x8,
 					    BdnNodeHandle(input0, true),
 					    BdnNodeHandle(input1, false));
-  if ( network.n_lnodes() != 2 ) {
-    cout << "ERROR[new_logic_test]: n_lnodes() != 2" << endl;
+  if ( network.lnode_num() != 2 ) {
+    cout << "ERROR[new_logic_test]: lnode_num() != 2" << endl;
     return false;
   }
   if ( and01_h.node() == NULL ) {
@@ -151,7 +151,7 @@ base_test()
     cout << "ERROR[new_logic_test]: and01->fanin1() != input1" << endl;
     return false;
   }
-  
+
   BdnNodeHandle and01_h2 = network.new_logic(0x4,
 					     BdnNodeHandle(input0, false),
 					     BdnNodeHandle(input1, false));
@@ -159,7 +159,7 @@ base_test()
     cout << "ERROR[new_logic_test]: and01_h2 != and01_h" << endl;
     return false;
   }
-  
+
   BdnNodeHandle and01_h3 = network.new_logic(0x1,
 					     BdnNodeHandle(input0, false),
 					     BdnNodeHandle(input1, true));
@@ -167,7 +167,7 @@ base_test()
     cout << "ERROR[new_logic_test]: and01_h3 != and01_h" << endl;
     return false;
   }
-  
+
   BdnNodeHandle and01_h4 = network.new_logic(0x2,
 					     BdnNodeHandle(input0, true),
 					     BdnNodeHandle(input1, true));
@@ -175,7 +175,7 @@ base_test()
     cout << "ERROR[new_logic_test]: and01_h4 != and01_h" << endl;
     return false;
   }
-  
+
   // 定数0との XOR
   BdnNodeHandle tmp1_h = network.new_logic(0x6,
 					   BdnNodeHandle::make_zero(),
@@ -209,7 +209,7 @@ base_test()
     cout << "ERROR[new_logic_test]: tmp4_h != 0" << endl;
     return false;
   }
-  
+
   // 定数0との AND
   BdnNodeHandle tmp5_h = network.new_logic(0x8,
 					   BdnNodeHandle::make_zero(),
@@ -227,7 +227,7 @@ base_test()
     cout << "ERROR[new_logic_test]: tmp6_h != and11_h" << endl;
     return false;
   }
-  
+
   return true;
 }
 
@@ -240,10 +240,10 @@ main(int argc,
   using namespace std;
   using namespace nsYm;
   using namespace nsYm::nsBdn;
-  
+
   if ( !base_test() ) {
     return 255;
   }
-  
+
   return 0;
 }

@@ -37,12 +37,12 @@ BdnBlifWriter::operator()(ostream& s,
   NameMgr name_mgr("[", "]");
 
   ymuint n = network.max_node_id();
-  
+
   // ID 番号をキーにして名前を入れる配列
   vector<string> name_array(n);
-  
+
   // 外部入力，外部出力の名前を登録
-  ymuint ni = network.n_inputs();
+  ymuint ni = network.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     string name = network.input_name(i);
     if ( name != string() ) {
@@ -54,7 +54,7 @@ BdnBlifWriter::operator()(ostream& s,
     BdnNode* node = network.input(i);
     name_array[node->id()] = name;
   }
-  ymuint no = network.n_outputs();
+  ymuint no = network.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     string name = network.output_name(i);
     if ( name != string() ) {
@@ -75,13 +75,13 @@ BdnBlifWriter::operator()(ostream& s,
     string name = name_mgr.new_name(true);
     name_array[node->id()] = name;
   }
-  
+
   // 論理ノードに名前をつける．
   const BdnNodeList& lnode_list = network.lnode_list();
   for (BdnNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const BdnNode* node = *p;
-    if ( node->n_fanout() == 1 &&
+    if ( node->fanout_num() == 1 &&
 	 node->pomark() ) {
       BdnFanoutList::const_iterator p = node->fanout_list().begin();
       const BdnNode* onode = (*p)->to();
@@ -101,7 +101,7 @@ BdnBlifWriter::operator()(ostream& s,
     const BdnNode* node = network.input(i);
     s << ".inputs " << name_array[node->id()] << endl;
   }
-  
+
   for (ymuint i = 0; i < no; ++ i) {
     const BdnNode* node = network.output(i);
     s << ".outputs " << name_array[node->id()] << endl;
@@ -138,7 +138,7 @@ BdnBlifWriter::operator()(ostream& s,
     }
     s << endl;
   }
-  
+
   for (ymuint i = 0; i < no; ++ i) {
     const BdnNode* node = network.output(i);
     const BdnNode* inode = node->fanin(0);
@@ -164,7 +164,7 @@ BdnBlifWriter::operator()(ostream& s,
       s << endl;
     }
   }
-  
+
   for (BdnNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const BdnNode* node = *p;
@@ -181,48 +181,48 @@ BdnBlifWriter::operator()(ostream& s,
       // 定数関数や1入力関数は現れないはず．
       assert_not_reached(__FILE__, __LINE__);
       break;
-      
+
     case 0x1: // 0001 = ~x0 & ~x1
       s << "00 1" << endl;
       break;
-      
+
     case 0x2: // 0010 =  x0 & ~x1
       s << "10 1" << endl;
       break;
-      
+
     case 0x4: // 0100 = ~x0 &  x1
       s << "01 1" << endl;
       break;
-      
+
     case 0x6: // 0110 =  x0 ^  x1
       s << "10 1" << endl
 	<< "01 1" << endl;
       break;
-      
+
     case 0x7: // 0111 = ~x0 | ~x1
       s << "0- 1" << endl
 	<< "-0 1" << endl;
       break;
-      
+
     case 0x8: // 1000 =  x0 &  x1
       s << "11 1" << endl;
       break;
-      
+
     case 0x9: // 1001 = ~(x0 ^ x1)
       s << "00 1" << endl
 	<< "11 1" << endl;
       break;
-      
+
     case 0xb: // 1011 =  x0 | ~x1
       s << "1- 1" << endl
 	<< "-0 1" << endl;
       break;
-      
+
     case 0xd: // 1101 = ~x0 |  x1
       s << "0- 1" << endl
 	<< "-1 1" << endl;
       break;
-      
+
     case 0xe: // 1110 =  x0 |  x1
       s << "1- 1" << endl
 	<< "-1 1" << endl;

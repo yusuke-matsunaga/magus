@@ -12,7 +12,7 @@
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
-#include "ym_sbj/BNet2Sbj.h"
+#include "ym_bnet/BNet2Sbj.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_sbj/SbjDumper.h"
 #include "ym_utils/MsgHandler.h"

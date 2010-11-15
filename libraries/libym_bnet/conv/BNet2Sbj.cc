@@ -76,10 +76,6 @@ BNodeMap::get(BNode* bnode,
   return sbjnode != NULL;
 }
 
-END_NAMESPACE_YM_BNET
-
-
-BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス BNet2Sbj
@@ -278,4 +274,4 @@ BNet2Sbj::operator()(const BNetwork& network,
   return true;
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_BNET

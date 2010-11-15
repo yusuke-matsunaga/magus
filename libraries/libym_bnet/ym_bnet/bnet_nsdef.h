@@ -66,6 +66,8 @@ class BNetBlifWriter;
 class BNetEquWriter;
 class BNetVerilogWriter;
 
+class BNet2Sbj;
+
 
 /// @brief 枝のリスト
 /// @ingroup BnetGroup
@@ -105,7 +107,11 @@ using nsBnet::BNetBlifWriter;
 using nsBnet::BNetEquWriter;
 using nsBnet::BNetVerilogWriter;
 
-class BNet2Sbj;
+using nsBnet::BNet2Sbj;
+
+using nsBnet::BNodeEdgeList;
+using nsBnet::BNodeFoList;
+using nsBnet::BNodeVector;
 
 END_NAMESPACE_YM
 

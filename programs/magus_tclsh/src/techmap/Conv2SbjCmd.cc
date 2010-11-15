@@ -10,7 +10,7 @@
 
 
 #include "Conv2SbjCmd.h"
-#include "ym_sbj/BNet2Sbj.h"
+#include "ym_bnet/BNet2Sbj.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
