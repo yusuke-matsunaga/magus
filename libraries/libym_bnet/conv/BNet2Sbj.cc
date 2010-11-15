@@ -1,5 +1,5 @@
 
-/// @file libym_sbj/BNet2Sbj.cc
+/// @file libym_bnet/conv/BNet2Sbj.cc
 /// @brief BNet2Sbj の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_sbj/BNet2Sbj.h"
+#include "ym_bnet/BNet2Sbj.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_sbj/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_YM_SBJ
+BEGIN_NAMESPACE_YM_BNET
 
 //////////////////////////////////////////////////////////////////////
 // BNode へのポインタをキーにして SbjNode と極性を保持する連想配列．
@@ -76,7 +76,10 @@ BNodeMap::get(BNode* bnode,
   return sbjnode != NULL;
 }
 
+END_NAMESPACE_YM_BNET
 
+
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス BNet2Sbj
@@ -275,4 +278,4 @@ BNet2Sbj::operator()(const BNetwork& network,
   return true;
 }
 
-END_NAMESPACE_YM_SBJ
+END_NAMESPACE_YM

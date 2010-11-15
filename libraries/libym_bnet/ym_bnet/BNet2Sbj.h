@@ -1,7 +1,7 @@
-#ifndef YM_SBJ_BNET2SBJ_H
-#define YM_SBJ_BNET2SBJ_H
+#ifndef YM_BNET_BNET2SBJ_H
+#define YM_BNET_BNET2SBJ_H
 
-/// @file libym_lutmap/BNet2Sbj.h
+/// @file ym_bnet/BNet2Sbj.h
 /// @brief BNet2Sbj のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_sbj/sbj_nsdef.h"
 #include "ym_bnet/bnet_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_SBJ
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNet2Sbj BNet2Sbj.h "ym_lutmap/BNet2Sbj.h"
@@ -38,6 +38,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_SBJ
+END_NAMESPACE_YM
 
-#endif // YM_SBJ_BNET2SBJ_H
+#endif // YM_BNET_BNET2SBJ_H

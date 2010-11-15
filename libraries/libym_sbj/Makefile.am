@@ -16,7 +16,6 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_sbj_la_SOURCES = \
-	BNet2Sbj.cc \
 	SbjDumper.cc \
 	SbjGraph.cc \
 	SbjMinDepth.h \

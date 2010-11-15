@@ -105,6 +105,8 @@ using nsBnet::BNetBlifWriter;
 using nsBnet::BNetEquWriter;
 using nsBnet::BNetVerilogWriter;
 
+class BNet2Sbj;
+
 END_NAMESPACE_YM
 
 #endif // YM_BNET_BNET_NSDEF_H

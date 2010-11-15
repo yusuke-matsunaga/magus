@@ -134,6 +134,11 @@ YM_BUILD_LIBRARY([libym_cell],
 YM_BUILD_LIBRARY([libym_verilog],
 		 [ym_libym_utils_enable])
 
+# libym_sbj
+YM_BUILD_LIBRARY([libym_sbj],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
+
 # libym_bnet
 YM_BUILD_LIBRARY([libym_bnet],
 		 [ym_libym_utils_enable,
@@ -147,11 +152,6 @@ YM_BUILD_LIBRARY([libym_bdn],
 # libym_mvn
 YM_BUILD_LIBRARY([libym_mvn],
 		 [ym_libym_utils_enable])
-
-# libym_sbj
-YM_BUILD_LIBRARY([libym_sbj],
-		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
 
 # libym_aig
 YM_BUILD_LIBRARY([libym_aig],

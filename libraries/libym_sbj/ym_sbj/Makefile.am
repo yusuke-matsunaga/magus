@@ -8,6 +8,5 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	sbj_nsdef.h \
-	BNet2Sbj.h \
 	SbjDumper.h \
 	SbjGraph.h

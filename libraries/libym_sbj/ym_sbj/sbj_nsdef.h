@@ -37,8 +37,6 @@ class SbjDumper;
 typedef DlList<SbjEdge> SbjEdgeList;
 typedef DlList<SbjNode> SbjNodeList;
 
-class BNet2Sbj;
-
 END_NAMESPACE_YM_SBJ
 
 BEGIN_NAMESPACE_YM
@@ -51,8 +49,6 @@ using nsSbj::SbjDumper;
 
 using nsSbj::SbjEdgeList;
 using nsSbj::SbjNodeList;
-
-using nsSbj::BNet2Sbj;
 
 END_NAMESPACE_YM
 

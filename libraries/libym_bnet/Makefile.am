@@ -5,6 +5,7 @@
 SUBDIRS = \
 	ym_bnet \
 	$(YM_EXTRA_SUBDIRS) \
+	conv \
 	. \
 	tests
 
@@ -18,10 +19,11 @@ noinst_LTLIBRARIES = libym_bnet.la
 
 libym_bnet_la_LIBADD = \
 	$(YM_EXTRA_LIBADD) \
+	conv/libym_bnet_conv.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_bnet_la_LDFLAGS = 
+libym_bnet_la_LDFLAGS =
 
 libym_bnet_la_SOURCES = \
 	StrBNodeMap.h \
