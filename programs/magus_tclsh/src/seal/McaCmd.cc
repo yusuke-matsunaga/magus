@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
-McaCmd::McaCmd(NetMgr* mgr) :
+McaCmd::McaCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mPoptBdd = new TclPopt(this, "use_bdd",

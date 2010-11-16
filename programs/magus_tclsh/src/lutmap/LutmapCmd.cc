@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LutmapCmd::LutmapCmd(NetMgr* mgr,
+LutmapCmd::LutmapCmd(MagMgr* mgr,
 		     LutmapData* data) :
   MagBNetCmd(mgr),
   mData(data)
@@ -49,25 +49,25 @@ LutmapCmd::lutnetwork()
 
 int
 lutmap_init(Tcl_Interp* interp,
-	    NetMgr* mgr)
+	    MagMgr* mgr)
 {
   LutmapData* data = new LutmapData;
 
-  TclCmdBinder2<Conv2SbjCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<Conv2SbjCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::conv2sbj");
-  TclCmdBinder2<ReadVerilogCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<ReadVerilogCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							   "magus::lutmap::read_verilog");
-  TclCmdBinder2<DumpSbjCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<DumpSbjCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 						       "magus::lutmap::dump_sbjgraph");
-  TclCmdBinder2<AreaMapCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<AreaMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 						       "magus::lutmap::area_map");
-  TclCmdBinder2<DelayMapCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<DelayMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::delay_map");
-  TclCmdBinder2<DumpLutCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<DumpLutCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 						       "magus::lutmap::dump_lutnetwork");
-  TclCmdBinder2<Conv2BNetCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<Conv2BNetCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							 "magus::lutmap::conv2bnet");
-  TclCmdBinder2<WriteVqmCmd, NetMgr*, LutmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<WriteVqmCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::write_vqm");
 
 

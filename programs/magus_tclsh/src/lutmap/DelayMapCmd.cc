@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DelayMapCmd::DelayMapCmd(NetMgr* mgr,
+DelayMapCmd::DelayMapCmd(MagMgr* mgr,
 			 LutmapData* data) :
   LutmapCmd(mgr, data)
 {

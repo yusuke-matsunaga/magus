@@ -14,7 +14,7 @@
 #endif
 
 #include "CellmapCmd.h"
-#include "NetMgr.h"
+#include "MagMgr.h"
 #include "SbjGraph.h"
 #include "CellNetwork.h"
 
@@ -26,7 +26,7 @@ BEGIN_NAMESPACE_MAGUS_CELLMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellmapCmd::CellmapCmd(NetMgr* mgr,
+CellmapCmd::CellmapCmd(MagMgr* mgr,
 		       CellmapData* data) :
   MagCmd(mgr),
   mData(data)
@@ -58,27 +58,27 @@ BEGIN_NAMESPACE_MAGUS
 
 int
 cellmap_init(Tcl_Interp* interp,
-	     NetMgr* mgr)
+	     MagMgr* mgr)
 {
   nsCellmap::CellmapData* data = new nsCellmap::CellmapData;
 
   TclCmdBinder2<nsCellmap::Conv2SbjCmd,
-    NetMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
+    MagMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
 					 "magus::cellmap::conv2sbj");
   TclCmdBinder2<nsCellmap::DumpSbjCmd,
-    NetMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
+    MagMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
 					 "magus::cellmap::dump_sbjgraph");
   TclCmdBinder2<nsCellmap::AreaMapCmd,
-    NetMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
+    MagMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
 					 "magus::cellmap::area_map");
   TclCmdBinder2<nsCellmap::DelayMapCmd,
-    NetMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
+    MagMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
 					 "magus::cellmap::delay_map");
   TclCmdBinder2<nsCellmap::DumpCellCmd,
-    NetMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
+    MagMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
 					 "magus::cellmap::dump_cellnetwork");
   TclCmdBinder2<nsCellmap::Conv2BNetCmd,
-    NetMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
+    MagMgr*, nsCellmap::CellmapData*>::reg(interp, mgr, data,
 					 "magus::cellmap::conv2bnet");
 
   const char* init =

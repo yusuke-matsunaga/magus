@@ -26,7 +26,7 @@ class Conv2SbjCmd :
 public:
 
   /// @brief コンストラクタ
-  Conv2SbjCmd(NetMgr* mgr,
+  Conv2SbjCmd(MagMgr* mgr,
 	      TechmapData* data);
 
   /// @brief デストラクタ

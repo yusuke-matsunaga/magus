@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-TMRCmd::TMRCmd(NetMgr* mgr) :
+TMRCmd::TMRCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }

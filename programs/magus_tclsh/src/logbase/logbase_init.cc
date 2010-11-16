@@ -11,7 +11,7 @@
 
 #include <tcl.h>
 
-#include "NetMgr.h"
+#include "MagMgr.h"
 #include "NtwkBaseCmd.h"
 #include "NtwkInfoCmd.h"
 #include "NtwkIoCmd.h"
@@ -24,63 +24,64 @@ BEGIN_NAMESPACE_MAGUS
 // Magus の初期化関数
 int
 logbase_init(Tcl_Interp* interp,
-	     NetMgr* mgr)
+	     MagMgr* mgr)
 {
   //////////////////////////////////////////////////////////////////////
   // コマンドの登録
   //////////////////////////////////////////////////////////////////////
 
   // ネットワークの生成／削除／複写コマンド
-  TclCmdBinder1<NewNtwk, NetMgr*>::reg(interp, mgr,  "magus::new_network");
-  TclCmdBinder1<DelNtwk, NetMgr*>::reg(interp, mgr,  "magus::delete_network");
-  TclCmdBinder1<CopyNtwk, NetMgr*>::reg(interp, mgr, "magus::::copy_network");
-  TclCmdBinder1<ClrNtwk, NetMgr*>::reg(interp, mgr,  "magus::::clear_network");
+  TclCmdBinder1<NewBNetwork, MagMgr*>::reg(interp, mgr,  "magus::new_bnetwork");
+  TclCmdBinder1<NewBdn, MagMgr*>::reg(interp, mgr,  "magus::new_bdnetwork");
+  TclCmdBinder1<DelNtwk, MagMgr*>::reg(interp, mgr,  "magus::delete_network");
+  TclCmdBinder1<CopyNtwk, MagMgr*>::reg(interp, mgr, "magus::::copy_network");
+  TclCmdBinder1<ClrNtwk, MagMgr*>::reg(interp, mgr,  "magus::::clear_network");
 
   // 操作対象のネットワークを指定するコマンド
-  TclCmdBinder1<PushNtwk, NetMgr*>::reg(interp, mgr, "magus::push_current_network");
-  TclCmdBinder1<PopNtwk, NetMgr*>::reg(interp, mgr,  "magus::pop_current_network");
-  TclCmdBinder1<ChgNtwk, NetMgr*>::reg(interp, mgr, "magus::change_current_network");
-  TclCmdBinder1<CurNtwk, NetMgr*>::reg(interp, mgr,  "magus::current_network");
+  TclCmdBinder1<PushNtwk, MagMgr*>::reg(interp, mgr, "magus::push_current_network");
+  TclCmdBinder1<PopNtwk, MagMgr*>::reg(interp, mgr,  "magus::pop_current_network");
+  TclCmdBinder1<ChgNtwk, MagMgr*>::reg(interp, mgr, "magus::change_current_network");
+  TclCmdBinder1<CurNtwk, MagMgr*>::reg(interp, mgr,  "magus::current_network");
 
   // ネットワーク名の列挙を行うコマンド
-  TclCmdBinder1<ListNtwk, NetMgr*>::reg(interp, mgr, "magus::network_list");
-  TclCmdBinder1<ForNtwk, NetMgr*>::reg(interp, mgr,  "magus::foreach_network");
-  
+  TclCmdBinder1<ListNtwk, MagMgr*>::reg(interp, mgr, "magus::network_list");
+  TclCmdBinder1<ForNtwk, MagMgr*>::reg(interp, mgr,  "magus::foreach_network");
+
 #if 0
   // ネットワークトレースの設定／解除を行うコマンド
-  TclCmdBinder1<SetNetTrace, NetMgr*>::reg(interp, mgr, "magus::network_trace");
+  TclCmdBinder1<SetNetTrace, MagMgr*>::reg(interp, mgr, "magus::network_trace");
 #endif
-  
+
   // ネットワークの諸元を取り出すコマンド
-  TclCmdBinder1<NtwkInfo, NetMgr*>::reg(interp, mgr,   "magus::network_info");
-  TclCmdBinder1<NtwkAllInfo, NetMgr*>::reg(interp, mgr, "magus::network_allinfo");
-  TclCmdBinder1<NtwkPrintStats, NetMgr*>::reg(interp, mgr, "magus::print_stats");
+  TclCmdBinder1<NtwkInfo, MagMgr*>::reg(interp, mgr,   "magus::network_info");
+  TclCmdBinder1<NtwkAllInfo, MagMgr*>::reg(interp, mgr, "magus::network_allinfo");
+  TclCmdBinder1<NtwkPrintStats, MagMgr*>::reg(interp, mgr, "magus::print_stats");
 
   // ネットワークのファイル入出力コマンド
-  TclCmdBinder1<ReadBlif, NetMgr*>::reg(interp, mgr, "magus::read_blif");
-  TclCmdBinder1<ReadIscas89, NetMgr*>::reg(interp, mgr, "magus::read_iscas89");
-  TclCmdBinder1<WriteBlif, NetMgr*>::reg(interp, mgr, "magus::write_blif");
-  TclCmdBinder1<WriteEqu, NetMgr*>::reg(interp, mgr, "magus::write_equ");
-  TclCmdBinder1<WriteVerilog, NetMgr*>::reg(interp, mgr, "magus::write_verilog");
+  TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr, "magus::read_blif");
+  TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr, "magus::read_iscas89");
+  TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr, "magus::write_blif");
+  TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
+  TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr, "magus::write_verilog");
 
   // ネットワーク上での処理コマンド(その2)
-  TclCmdBinder1<ElimCmd, NetMgr*>::reg(interp, mgr,    "magus::eliminate");
-  TclCmdBinder1<SimplifyCmd, NetMgr*>::reg(interp, mgr, "magus::simplify");
-  TclCmdBinder1<SweepCmd, NetMgr*>::reg(interp, mgr,      "magus::sweep");
-  TclCmdBinder1<CleanCmd, NetMgr*>::reg(interp, mgr,      "magus::clean_up");
-  TclCmdBinder1<DecompCmd, NetMgr*>::reg(interp, mgr,     "magus::decomp");
-  TclCmdBinder1<GateDecompCmd, NetMgr*>::reg(interp, mgr, "magus::gate_decomp");
-  TclCmdBinder1<SopDecompCmd, NetMgr*>::reg(interp, mgr,  "magus::sop_decomp");
-  TclCmdBinder1<ConvCombiCmd, NetMgr*>::reg(interp, mgr,  "magus::conv_combi");
-  
-  // ノードに対するコマンド
-  TclCmdBinder1<NodeInfo, NetMgr*>::reg(interp, mgr,   "magus::node_info");
-  TclCmdBinder1<ListNode, NetMgr*>::reg(interp, mgr,   "magus::list_node");
-  TclCmdBinder1<ElimNode, NetMgr*>::reg(interp, mgr,   "magus::eliminate_node");
-  TclCmdBinder1<DelNode, NetMgr*>::reg(interp, mgr,    "magus::delete_node");
-  TclCmdBinder1<SimplifyNode, NetMgr*>::reg(interp, mgr, "magus::simplify_node");
+  TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
+  TclCmdBinder1<SimplifyCmd, MagMgr*>::reg(interp, mgr, "magus::simplify");
+  TclCmdBinder1<SweepCmd, MagMgr*>::reg(interp, mgr,      "magus::sweep");
+  TclCmdBinder1<CleanCmd, MagMgr*>::reg(interp, mgr,      "magus::clean_up");
+  TclCmdBinder1<DecompCmd, MagMgr*>::reg(interp, mgr,     "magus::decomp");
+  TclCmdBinder1<GateDecompCmd, MagMgr*>::reg(interp, mgr, "magus::gate_decomp");
+  TclCmdBinder1<SopDecompCmd, MagMgr*>::reg(interp, mgr,  "magus::sop_decomp");
+  TclCmdBinder1<ConvCombiCmd, MagMgr*>::reg(interp, mgr,  "magus::conv_combi");
 
-  
+  // ノードに対するコマンド
+  TclCmdBinder1<NodeInfo, MagMgr*>::reg(interp, mgr,   "magus::node_info");
+  TclCmdBinder1<ListNode, MagMgr*>::reg(interp, mgr,   "magus::list_node");
+  TclCmdBinder1<ElimNode, MagMgr*>::reg(interp, mgr,   "magus::eliminate_node");
+  TclCmdBinder1<DelNode, MagMgr*>::reg(interp, mgr,    "magus::delete_node");
+  TclCmdBinder1<SimplifyNode, MagMgr*>::reg(interp, mgr, "magus::simplify_node");
+
+
   //////////////////////////////////////////////////////////////////////
   // デフォルト値を入れる変数の初期化
   //////////////////////////////////////////////////////////////////////
@@ -94,7 +95,7 @@ logbase_init(Tcl_Interp* interp,
     "set ::magus::default(elim_limit) 1000\n"
     "set ::magus::default(elim_autolimit) true\n"
     "set ::magus::default(xsim_pat_num) 1000\n";
-  
+
   if ( Tcl_Eval(interp, (char*) script) != TCL_OK ) {
     return TCL_ERROR;
   }

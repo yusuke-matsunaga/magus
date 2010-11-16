@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-AreaMapCmd::AreaMapCmd(NetMgr* mgr,
+AreaMapCmd::AreaMapCmd(MagMgr* mgr,
 		       LutmapData* data) :
   LutmapCmd(mgr, data)
 {

@@ -12,30 +12,66 @@
 
 // ネットワークを操作するサブパッケージ
 
-#include "BaseCmd.h"
+#include "MagCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class NewNtwk NtwkBaseCmd.h "NtwkBaseCmd.h"
-/// @brief 新しいネットワークを作成するコマンド
+/// @class NewBNetwork NtwkBaseCmd.h "NtwkBaseCmd.h"
+/// @brief 新しい BNetwork を作成するコマンド
 //////////////////////////////////////////////////////////////////////
-class NewNtwk :
-  public BaseCmd
+class NewBNetwork :
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  NewNtwk(NetMgr* mgr);
+  NewBNetwork(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~NewNtwk();
+  ~NewBNetwork();
 
 
 protected:
-  
+
+  /// @brief コマンド処理関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // trace オプション解析用オブジェクト
+  TclPoptBool* mPoptTrace;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class NewBdn NtwkBaseCmd.h "NtwkBaseCmd.h"
+/// @brief 新しい BdNetwork を作成するコマンド
+//////////////////////////////////////////////////////////////////////
+class NewBdn :
+  public MagCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  NewBdn(MagMgr* mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~NewBdn();
+
+
+protected:
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -58,12 +94,12 @@ private:
 /// @brief ネットワークを削除するコマンド
 //////////////////////////////////////////////////////////////////////
 class DelNtwk :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  DelNtwk(NetMgr* mgr);
+  DelNtwk(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -71,7 +107,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -85,12 +121,12 @@ protected:
 /// @brief ネットワークの内容をクリアするコマンド
 //////////////////////////////////////////////////////////////////////
 class ClrNtwk :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  ClrNtwk(NetMgr* mgr);
+  ClrNtwk(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -98,7 +134,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -112,12 +148,12 @@ protected:
 /// @brief コピーを行うコマンド
 //////////////////////////////////////////////////////////////////////
 class CopyNtwk :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  CopyNtwk(NetMgr* mgr);
+  CopyNtwk(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -125,70 +161,7 @@ public:
 
 
 protected:
-  
-  /// @brief コマンド処理関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
 
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class PushNtwk NtwkBaseCmd.h "NtwkBaseCmd.h"
-/// @brief カレントネットワークスタックにプッシュするコマンド
-//////////////////////////////////////////////////////////////////////
-class PushNtwk :
-  public BaseCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  PushNtwk(NetMgr* mgr);
-
-  /// @brief デストラクタ
-  virtual
-  ~PushNtwk();
-
-
-protected:
-  
-  /// @brief コマンド処理関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // new オプション解析用のオブジェクト
-  TclPopt* mPoptNew;
-  
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class PopNtwk NtwkBaseCmd.h "NtwkBaseCmd.h"
-/// @brief カレントネットワークのスタックを元に戻す．
-//////////////////////////////////////////////////////////////////////
-class PopNtwk :
-  public BaseCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  PopNtwk(NetMgr* mgr);
-
-  /// @brief デストラクタ
-  virtual
-  ~PopNtwk();
-
-
-protected:
-  
   /// @brief コマンド処理関数
   virtual
   int
@@ -202,12 +175,12 @@ protected:
 /// @brief カレントネットワークを変更するコマンド
 //////////////////////////////////////////////////////////////////////
 class ChgNtwk :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  ChgNtwk(NetMgr* mgr);
+  ChgNtwk(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -215,11 +188,22 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
   cmd_proc(TclObjVector& objv);
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスが用いる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief -new_bnet, -new_bdn オプションの処理を行う．
+  /// @param[in] name ネットワーク名
+  int
+  new_opt(string name);
 
 
 private:
@@ -227,8 +211,65 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // new オプション解析用のオブジェクト
-  TclPopt* mPoptNew;
+  // new_bnet オプション解析用のオブジェクト
+  TclPopt* mPoptNewBNet;
+
+  // new_bdn オプション解析用のオブジェクト
+  TclPopt* mPoptNewBdn;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PushNtwk NtwkBaseCmd.h "NtwkBaseCmd.h"
+/// @brief カレントネットワークスタックにプッシュするコマンド
+//////////////////////////////////////////////////////////////////////
+class PushNtwk :
+  public ChgNtwk
+{
+public:
+
+  /// @brief コンストラクタ
+  PushNtwk(MagMgr* mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~PushNtwk();
+
+
+protected:
+
+  /// @brief コマンド処理関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PopNtwk NtwkBaseCmd.h "NtwkBaseCmd.h"
+/// @brief カレントネットワークのスタックを元に戻す．
+//////////////////////////////////////////////////////////////////////
+class PopNtwk :
+  public MagCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  PopNtwk(MagMgr* mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~PopNtwk();
+
+
+protected:
+
+  /// @brief コマンド処理関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
 
 };
 
@@ -238,12 +279,12 @@ private:
 /// @brief カレントネットワーク名を返すコマンド
 //////////////////////////////////////////////////////////////////////
 class CurNtwk :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  CurNtwk(NetMgr* mgr);
+  CurNtwk(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -251,7 +292,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -265,12 +306,12 @@ protected:
 /// @brief ネットワークのリストを作るコマンド
 //////////////////////////////////////////////////////////////////////
 class ListNtwk :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  ListNtwk(NetMgr* mgr);
+  ListNtwk(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -278,7 +319,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -302,12 +343,12 @@ private:
 /// その都度，カレントネットワークを切替える．
 //////////////////////////////////////////////////////////////////////
 class ForNtwk :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  ForNtwk(NetMgr* mgr);
+  ForNtwk(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -315,7 +356,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int

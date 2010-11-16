@@ -58,7 +58,7 @@ class TechmapCmd :
 public:
 
   /// @brief コンストラクタ
-  TechmapCmd(NetMgr* mgr,
+  TechmapCmd(MagMgr* mgr,
 	     TechmapData* data);
 
   /// @brief デストラクタ

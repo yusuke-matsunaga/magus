@@ -26,7 +26,7 @@ class NtwkInfo :
 public:
 
   /// @brief コンストラクタ
-  NtwkInfo(NetMgr* mgr);
+  NtwkInfo(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -34,7 +34,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -53,7 +53,7 @@ class NtwkAllInfo :
 public:
 
   /// @brief コンストラクタ
-  NtwkAllInfo(NetMgr* mgr);
+  NtwkAllInfo(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -61,7 +61,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -80,7 +80,7 @@ class NtwkPrintStats :
 public:
 
   /// @brief コンストラクタ
-  NtwkPrintStats(NetMgr* mgr);
+  NtwkPrintStats(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -88,7 +88,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int cmd_proc(TclObjVector& objv);

@@ -37,7 +37,7 @@ public:
 
 
 public:
-  
+
   /// @brief メッセージが登録されるたびに呼ばれる仮想関数
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
@@ -85,7 +85,7 @@ class ReadBlif :
 public:
 
   /// @brief コンストラクタ
-  ReadBlif(NetMgr* mgr);
+  ReadBlif(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -93,7 +93,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -110,7 +110,7 @@ private:
 
   // メッセージハンドラ
   TclObjMsgHandler mMsgHandler;
-  
+
 };
 
 
@@ -124,7 +124,7 @@ class ReadIscas89 :
 public:
 
   /// @brief コンストラクタ
-  ReadIscas89(NetMgr* mgr);
+  ReadIscas89(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -132,7 +132,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -149,7 +149,7 @@ private:
 
   // メッセージハンドラ
   TclObjMsgHandler mMsgHandler;
-  
+
 };
 
 
@@ -163,7 +163,7 @@ class WriteBlif :
 public:
 
   /// @brief コンストラクタ
-  WriteBlif(NetMgr* mgr);
+  WriteBlif(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -171,7 +171,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -190,7 +190,7 @@ class WriteEqu :
 public:
 
   /// @brief コンストラクタ
-  WriteEqu(NetMgr* mgr);
+  WriteEqu(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -198,7 +198,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -217,7 +217,7 @@ class WriteVerilog :
 public:
 
   /// @brief コンストラクタ
-  WriteVerilog(NetMgr* mgr);
+  WriteVerilog(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -225,7 +225,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int

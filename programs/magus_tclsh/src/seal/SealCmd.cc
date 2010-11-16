@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SealCmd::SealCmd(NetMgr* mgr) :
+SealCmd::SealCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }

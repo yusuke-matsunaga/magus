@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ReadVerilogCmd::ReadVerilogCmd(NetMgr* mgr,
+ReadVerilogCmd::ReadVerilogCmd(MagMgr* mgr,
 			       TechmapData* data) :
   TechmapCmd(mgr, data)
 {

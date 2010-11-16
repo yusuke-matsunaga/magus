@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-WriteVqmCmd::WriteVqmCmd(NetMgr* mgr,
+WriteVqmCmd::WriteVqmCmd(MagMgr* mgr,
 			 LutmapData* data) :
   LutmapCmd(mgr, data)
 {

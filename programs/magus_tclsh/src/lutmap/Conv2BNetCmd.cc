@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Conv2BNetCmd::Conv2BNetCmd(NetMgr* mgr,
+Conv2BNetCmd::Conv2BNetCmd(MagMgr* mgr,
 			   LutmapData* data) :
   LutmapCmd(mgr, data)
 {
@@ -35,7 +35,7 @@ Conv2BNetCmd::Conv2BNetCmd(NetMgr* mgr,
 Conv2BNetCmd::~Conv2BNetCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 Conv2BNetCmd::cmd_proc(TclObjVector& objv)
@@ -43,7 +43,7 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
   NetHandle* neth = NULL;
 
   if ( mPoptDstNetwork->is_specified() ) {
-    neth = find_or_new_nethandle(mPoptDstNetwork->val());
+    neth = find_or_new_nethandle(mPoptDstNetwork->val(), NetHandle::kMagBNet);
     if ( neth == NULL ) {
       // 見付からなかった
       // エラーメッセージは find_network() の中でセットされている．
@@ -60,7 +60,7 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
     if ( neth == NULL ) {
       neth = cur_nethandle();
     }
-    BNetwork& dst_network = *neth->bnetwork();
+    BNetwork& dst_network = *neth->_bnetwork();
     Ln2BNet conv;
     conv(lutnetwork(), dst_network);
     return TCL_OK;
@@ -72,7 +72,7 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 

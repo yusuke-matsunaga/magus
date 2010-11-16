@@ -10,10 +10,6 @@
 
 
 #include "NetHandle.h"
-#include "ym_bnet/BNetwork.h"
-#if 0
-#include <ym_bdn/BdNetwork.h>
-#endif
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -23,35 +19,44 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] mgr 親のマネージャ
 // @param[in] name 名前
-NetHandle::NetHandle(NetMgr* mgr,
-		     const string& name) :
+NetHandle::NetHandle(const string& name) :
   mName(name),
-  mBNetwork(NULL),
-#if 0
-  mBdNetwork(NULL),
-#endif
   mCount(0)
 {
-  mBNetwork = new BNetwork;
-  mBNetwork->set_model_name(name);
 }
 
 // @brief デストラクタ
 NetHandle::~NetHandle()
 {
-  delete mBNetwork;
-#if 0
-  delete mBdNetwork;
-#endif
 }
-  
-// @brief ネットワークを複製する．
-void
-NetHandle::copy(const NetHandle& src)
+
+// @brief BNetwork を得る．
+const BNetwork*
+NetHandle::bnetwork() const
 {
-  *mBNetwork = *src.mBNetwork;
+  return NULL;
+}
+
+// @brief BNetwork を得る．
+BNetwork*
+NetHandle::_bnetwork()
+{
+  return NULL;
+}
+
+// @brief BdNetwork を得る．
+const BdNetwork*
+NetHandle::bdn() const
+{
+  return NULL;
+}
+
+// @brief BdNetwork を得る．
+BdNetwork*
+NetHandle::_bdn()
+{
+  return NULL;
 }
 
 END_NAMESPACE_MAGUS

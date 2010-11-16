@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-TechmapCmd::TechmapCmd(NetMgr* mgr,
+TechmapCmd::TechmapCmd(MagMgr* mgr,
 		       TechmapData* data) :
   MagBNetCmd(mgr),
   mData(data)
@@ -64,23 +64,23 @@ BEGIN_NAMESPACE_MAGUS
 
 int
 techmap_init(Tcl_Interp* interp,
-	     NetMgr* mgr)
+	     MagMgr* mgr)
 {
   using namespace nsTechmap;
 
   TechmapData* data = new TechmapData;
 
-  TclCmdBinder2<LoadPatCmd, NetMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<LoadPatCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 							"magus::techmap::load_pat");
-  TclCmdBinder2<Conv2SbjCmd, NetMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<Conv2SbjCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 							"magus::techmap::conv2sbj");
-  TclCmdBinder2<ReadVerilogCmd, NetMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<ReadVerilogCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 							   "magus::techmap::read_verilog");
-  TclCmdBinder2<DumpSbjCmd, NetMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<DumpSbjCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 						       "magus::techmap::dump_sbjgraph");
-  TclCmdBinder2<AreaMapCmd, NetMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<AreaMapCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 						       "magus::techmap::area_map");
-  TclCmdBinder2<DumpCnCmd, NetMgr*, TechmapData*>::reg(interp, mgr, data,
+  TclCmdBinder2<DumpCnCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 						       "magus::techmap::dump_cngraph");
 
 

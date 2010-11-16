@@ -26,7 +26,7 @@ class ReadVerilogCmd :
 public:
 
   /// @brief コンストラクタ
-  ReadVerilogCmd(NetMgr* mgr,
+  ReadVerilogCmd(MagMgr* mgr,
 		 TechmapData* data);
 
   /// @brief デストラクタ

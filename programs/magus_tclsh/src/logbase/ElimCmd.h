@@ -26,7 +26,7 @@ class ElimCmd :
 public:
 
   /// @brief コンストラクタ
-  ElimCmd(NetMgr* mgr);
+  ElimCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -54,7 +54,7 @@ private:
 
   // noautolimit オプションの解析用オブジェクト
   TclPopt* mPoptNoAutoLimit;
-  
+
 };
 
 
@@ -68,7 +68,7 @@ class CleanCmd :
 public:
 
   /// @brief コンストラクタ
-  CleanCmd(NetMgr* mgr);
+  CleanCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -99,7 +99,7 @@ private:
 
   // preserve_latch オプションの解析用オブジェクト
   TclPopt* mPoptPL;
-  
+
 };
 
 
@@ -113,7 +113,7 @@ class SweepCmd :
 public:
 
   /// @brief コンストラクタ
-  SweepCmd(NetMgr* mgr);
+  SweepCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -140,13 +140,13 @@ class SimplifyCmd :
 public:
 
   /// @brief コンストラクタ
-  SimplifyCmd(NetMgr* mgr);
+  SimplifyCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
   ~SimplifyCmd();
 
-  
+
 protected:
 
   // コマンド処理関数
@@ -167,13 +167,13 @@ class DecompCmd :
 public:
 
   /// @brief コンストラクタ
-  DecompCmd(NetMgr* mgr);
+  DecompCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
   ~DecompCmd();
 
-  
+
 protected:
 
   // コマンド処理関数
@@ -189,7 +189,7 @@ private:
 
   // xor オプションの解析用オブジェクト
   TclPopt* mPoptXor;
-  
+
   // max_fanin オプションの解析用オブジェクト
   TclPoptInt* mPoptMaxFanin;
 
@@ -201,7 +201,7 @@ private:
 
   // random_seed オプションの解析用オブジェクト
   TclPoptInt* mPoptRandomSeed;
-  
+
 };
 
 
@@ -215,7 +215,7 @@ class GateDecompCmd :
 public:
 
   /// @brief コンストラクタ
-  GateDecompCmd(NetMgr* mgr);
+  GateDecompCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -234,7 +234,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // max_fanin オプションの解析用オブジェクト
   TclPoptInt* mPoptMaxFanin;
 
@@ -260,7 +260,7 @@ class SopDecompCmd :
 public:
 
   /// @brief コンストラクタ
-  SopDecompCmd(NetMgr* mgr);
+  SopDecompCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -287,13 +287,13 @@ class ConvCombiCmd :
 public:
 
   /// @brief コンストラクタ
-  ConvCombiCmd(NetMgr* mgr);
+  ConvCombiCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
   ~ConvCombiCmd();
 
-  
+
 protected:
 
   // コマンド処理関数

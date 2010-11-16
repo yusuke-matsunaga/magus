@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NodeInfo::NodeInfo(NetMgr* mgr) :
+NodeInfo::NodeInfo(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   const char* usage =
@@ -202,7 +202,7 @@ NodeInfo::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ListNode::ListNode(NetMgr* mgr) :
+ListNode::ListNode(MagMgr* mgr) :
   AllNodeCmd(mgr)
 {
 }
@@ -249,7 +249,7 @@ ListNode::after_node_proc()
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ElimNode::ElimNode(NetMgr* mgr) :
+ElimNode::ElimNode(MagMgr* mgr) :
   NodeCmd(mgr)
 {
 }
@@ -277,7 +277,7 @@ ElimNode::node_proc(BNode* node)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DelNode::DelNode(NetMgr* mgr) :
+DelNode::DelNode(MagMgr* mgr) :
   NodeCmd(mgr)
 {
 }
@@ -312,7 +312,7 @@ DelNode::node_proc(BNode* node)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SimplifyNode::SimplifyNode(NetMgr* mgr) :
+SimplifyNode::SimplifyNode(MagMgr* mgr) :
   AllNodeCmd(mgr)
 {
 }

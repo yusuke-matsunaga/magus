@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LoadPatCmd::LoadPatCmd(NetMgr* mgr,
+LoadPatCmd::LoadPatCmd(MagMgr* mgr,
 		       TechmapData* data) :
   TechmapCmd(mgr, data)
 {

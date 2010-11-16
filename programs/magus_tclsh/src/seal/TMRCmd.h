@@ -25,7 +25,7 @@ class TMRCmd :
 public:
 
   /// @brief コンストラクタ
-  TMRCmd(NetMgr* mgr);
+  TMRCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

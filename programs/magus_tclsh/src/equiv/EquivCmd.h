@@ -10,7 +10,7 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "BaseCmd.h"
+#include "MagCmd.h"
 #include "NetHandle.h"
 
 
@@ -21,25 +21,25 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief 検証を行うコマンドの基底クラス
 //////////////////////////////////////////////////////////////////////
 class EquivCmdBase :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  EquivCmdBase(NetMgr* mgr);
+  EquivCmdBase(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
   ~EquivCmdBase();
-  
+
 
 protected:
-  
+
   /// @brief 共通のオプション解析と前処理を行う．
   /// @return エラーが起きたら TCL_ERROR を返す．
   int
   prologue(TclObjVector& objv);
-  
+
   /// @brief ログレベルを返す．
   int
   log_level() const;
@@ -51,21 +51,21 @@ protected:
   /// @brief 使用する SAT-Solver の種類を表す文字列を返す．
   string
   sat_type() const;
-  
+
   /// @brief 使用する SAT-Solver に渡すオプション文字列を返す．
   string
   sat_option() const;
-  
+
   /// @brief SAT-Solver のログ出力用ストリームを返す．
   ostream*
   sat_out() const;
 
   /// @brief 検証対象のネットワーク1を返す．
-  BNetwork*
+  const BNetwork*
   network1() const;
 
   /// @brief 検証対象のネットワーク2を返す．
-  BNetwork*
+  const BNetwork*
   network2() const;
 
   /// @brief 入力の対応関係を返す．
@@ -76,7 +76,7 @@ protected:
   const vector<pair<ymuint32, ymuint32> >&
   output_match() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
@@ -88,14 +88,14 @@ private:
   int
   get_time(const string& str,
 	   int& time);
-  
+
   /// @brief 順番で対応をとり，ID番号のペアのリストを作る．
   void
   assoc_by_order(const BNetwork& network1,
 		 const BNetwork& network2,
 		 vector<pair<ymuint32, ymuint32> >& iassoc,
 		 vector<pair<ymuint32, ymuint32> >& oassoc);
-  
+
   /// @brief 名前で対応をとり, ID番号のペアのリストを作る．
   /// @return エラーが起きたら TCL_ERROR を返す．
   bool
@@ -104,7 +104,7 @@ private:
 		vector<pair<ymuint32, ymuint32> >& iassoc,
 		vector<pair<ymuint32, ymuint32> >& oassoc);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -121,16 +121,16 @@ private:
 
   // time_limit オプション解析用のオブジェクト
   TclPoptObj* mPoptTimeLimit;
-  
+
   // sat オプション解析用のオブジェクト
   TclPoptStr* mPoptSat;
 
   // sat-option オプション解析用のオブジェクト
   TclPoptStr* mPoptSatOption;
-  
+
   // satlog オプション解析用のオブジェクト
   TclPoptStr* mPoptSatlog;
-  
+
   // ログレベル
   int mLogLevel;
 
@@ -142,10 +142,10 @@ private:
 
   // SAT-Solver のオプション
   string mSatOption;
-  
+
   // SAT-Solver のログ出力用ストリーム
   ostream* mSatOut;
-  
+
   // SAT-Solver のログをファイルに出力する時のストリーム
   ofstream mSatLogFile;
 
@@ -157,10 +157,10 @@ private:
 
   // 入力の対応関係
   vector<pair<ymuint32, ymuint32> > mInputMatch;
-  
+
   // 出力の対応関係
   vector<pair<ymuint32, ymuint32> > mOutputMatch;
-  
+
 };
 
 
@@ -174,7 +174,7 @@ class EquivCmd :
 public:
 
   /// @brief コンストラクタ
-  EquivCmd(NetMgr* mgr);
+  EquivCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -188,7 +188,7 @@ protected:
   int
   cmd_proc(TclObjVector& objv);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -196,10 +196,10 @@ private:
 
   // loglevel オプション解析用のオブジェクト
   TclPoptInt* mPoptLoglevel;
-  
+
   // sigsize オプション解析用のオブジェクト
   TclPoptInt* mPoptSigSize;
-  
+
 };
 
 
@@ -230,7 +230,7 @@ EquivCmdBase::sat_type() const
 {
   return mSatType;
 }
-  
+
 // @brief 使用する SAT-Solver に渡すオプション文字列を返す．
 string
 EquivCmdBase::sat_option() const
@@ -248,7 +248,7 @@ EquivCmdBase::sat_out() const
 
 // @brief 検証対象のネットワーク1を返す．
 inline
-BNetwork*
+const BNetwork*
 EquivCmdBase::network1() const
 {
   return mNetwork1->bnetwork();
@@ -256,7 +256,7 @@ EquivCmdBase::network1() const
 
 // @brief 検証対象のネットワーク2を返す．
 inline
-BNetwork*
+const BNetwork*
 EquivCmdBase::network2() const
 {
   return mNetwork2->bnetwork();

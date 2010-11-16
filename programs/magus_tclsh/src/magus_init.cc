@@ -10,7 +10,7 @@
 
 
 #include <tcl.h>
-#include "NetMgr.h"
+#include "MagMgr.h"
 
 //#define USE_TEST_PACKAGE
 
@@ -21,28 +21,28 @@ misc_init(Tcl_Interp* interp);
 
 int
 logbase_init(Tcl_Interp* interp,
-	     NetMgr* mgr);
+	     MagMgr* mgr);
 
 int
 equiv_init(Tcl_Interp* interp,
-	   NetMgr* mgr);
+	   MagMgr* mgr);
 
 int
 lutmap_init(Tcl_Interp* interp,
-	    NetMgr* mgr);
+	    MagMgr* mgr);
 
 int
 techmap_init(Tcl_Interp* interp,
-	     NetMgr* mgr);
+	     MagMgr* mgr);
 
 int
 seal_init(Tcl_Interp* interp,
-	  NetMgr* mgr);
+	  MagMgr* mgr);
 
 #if defined(USE_TEST_PACKAGE)
 int
 test_init(Tcl_Interp* interp,
-	  NetMgr* mgr);
+	  MagMgr* mgr);
 #endif
 
 END_NAMESPACE_MAGUS
@@ -62,10 +62,10 @@ magus_init(Tcl_Interp* interp)
 
 
   //////////////////////////////////////////////////////////////////////
-  // NetMgr の生成
+  // MagMgr の生成
   //////////////////////////////////////////////////////////////////////
 
-  NetMgr* mgr = new NetMgr;
+  MagMgr* mgr = new MagMgr;
 
   if ( misc_init(interp) == TCL_ERROR ) {
     return TCL_ERROR;

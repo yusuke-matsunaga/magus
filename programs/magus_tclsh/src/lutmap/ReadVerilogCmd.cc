@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ReadVerilogCmd::ReadVerilogCmd(NetMgr* mgr,
+ReadVerilogCmd::ReadVerilogCmd(MagMgr* mgr,
 			       LutmapData* data) :
   LutmapCmd(mgr, data)
 {

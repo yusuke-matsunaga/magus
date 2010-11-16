@@ -45,7 +45,7 @@ class CellmapCmd :
 public:
 
   /// @brief コンストラクタ
-  CellmapCmd(NetMgr* mgr,
+  CellmapCmd(MagMgr* mgr,
 	     CellmapData* data);
 
   /// @brief デストラクタ
@@ -84,7 +84,7 @@ class Conv2SbjCmd :
 public:
 
   /// @brief コンストラクタ
-  Conv2SbjCmd(NetMgr* mgr,
+  Conv2SbjCmd(MagMgr* mgr,
 	      CellmapData* data);
 
   /// @brief デストラクタ
@@ -112,7 +112,7 @@ class DumpSbjCmd :
 public:
 
   /// @brief コンストラクタ
-  DumpSbjCmd(NetMgr* mgr,
+  DumpSbjCmd(MagMgr* mgr,
 	     CellmapData* data);
 
   /// @brief デストラクタ
@@ -149,7 +149,7 @@ class AreaMapCmd :
 public:
 
   /// @brief コンストラクタ
-  AreaMapCmd(NetMgr* mgr,
+  AreaMapCmd(MagMgr* mgr,
 	     CellmapData* data);
 
   /// @brief デストラクタ
@@ -192,7 +192,7 @@ class DelayMapCmd :
 public:
 
   /// @brief コンストラクタ
-  DelayMapCmd(NetMgr* mgr,
+  DelayMapCmd(MagMgr* mgr,
 	      CellmapData* data);
 
   /// @brief デストラクタ
@@ -235,7 +235,7 @@ class DumpCellCmd :
 public:
 
   /// @brief コンストラクタ
-  DumpCellCmd(NetMgr* mgr,
+  DumpCellCmd(MagMgr* mgr,
 	      CellmapData* data);
 
   /// @brief デストラクタ
@@ -263,7 +263,7 @@ class Conv2BNetCmd :
 public:
 
   /// @brief コンストラクタ
-  Conv2BNetCmd(NetMgr* mgr,
+  Conv2BNetCmd(MagMgr* mgr,
 	       CellmapData* data);
 
   /// @brief デストラクタ

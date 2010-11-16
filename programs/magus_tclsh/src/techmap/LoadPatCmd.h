@@ -26,7 +26,7 @@ class LoadPatCmd :
 public:
 
   /// @brief コンストラクタ
-  LoadPatCmd(NetMgr* mgr,
+  LoadPatCmd(MagMgr* mgr,
 	     TechmapData* data);
 
   /// @brief デストラクタ

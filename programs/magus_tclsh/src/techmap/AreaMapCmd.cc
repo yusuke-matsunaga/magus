@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-AreaMapCmd::AreaMapCmd(NetMgr* mgr,
+AreaMapCmd::AreaMapCmd(MagMgr* mgr,
 		       TechmapData* data) :
   TechmapCmd(mgr, data)
 {

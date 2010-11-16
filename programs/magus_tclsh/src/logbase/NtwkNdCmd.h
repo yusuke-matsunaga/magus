@@ -28,7 +28,7 @@ class NodeInfo :
 public:
 
   /// @brief コンストラクタ
-  NodeInfo(NetMgr* mgr);
+  NodeInfo(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -36,7 +36,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -55,7 +55,7 @@ class ListNode :
 public:
 
   /// @brief コンストラクタ
-  ListNode(NetMgr* mgr);
+  ListNode(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -68,17 +68,17 @@ protected:
   virtual
   int
   before_node_proc();
-  
+
   /// @brief node の名前を結果のリストに追加する．
   virtual
   int
   node_proc(BNode* node);
-  
+
   /// @brief mResult をインタプリタの結果にセットする．
   virtual
   int
   after_node_proc();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -101,13 +101,13 @@ class ElimNode :
 public:
 
   /// @brief コンストラクタ
-  ElimNode(NetMgr* mgr);
+  ElimNode(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
   ~ElimNode();
 
-  
+
 protected:
 
   /// @brief name という名のノードを eliminate する．
@@ -128,7 +128,7 @@ class DelNode :
 public:
 
   /// @brief コンストラクタ
-  DelNode(NetMgr* mgr);
+  DelNode(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -155,7 +155,7 @@ class SimplifyNode :
 public:
 
   /// @brief コンストラクタ
-  SimplifyNode(NetMgr* mgr);
+  SimplifyNode(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

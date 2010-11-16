@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
-McaCmd2::McaCmd2(NetMgr* mgr) :
+McaCmd2::McaCmd2(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mPoptKiss = new TclPoptStr(this, "kiss",

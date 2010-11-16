@@ -21,8 +21,8 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MagBNetCmd::MagBNetCmd(NetMgr* mgr) :
-  BaseCmd(mgr),
+MagBNetCmd::MagBNetCmd(MagMgr* mgr) :
+  MagCmd(mgr),
   mNetworkSpecified(false)
 {
   mPoptNtwk = new TclPoptObj(this, "network",
@@ -38,13 +38,13 @@ MagBNetCmd::MagBNetCmd(NetMgr* mgr) :
 MagBNetCmd::~MagBNetCmd()
 {
 }
-  
+
 // @brief カレントネットワークの取得
 // @note カレントネットワークが BNetwork でない場合には NULL を返す．
 BNetwork*
 MagBNetCmd::cur_network() const
 {
-  return cur_nethandle()->bnetwork();
+  return cur_nethandle()->_bnetwork();
 }
 
 // コマンド行の引数を解析しネットワークとライブラリをセットする．
@@ -57,14 +57,14 @@ MagBNetCmd::before_cmd_proc(TclObjVector& objv)
 {
   mNetworkSpecified = false;
 
-  BaseCmd::before_cmd_proc(objv);
-  
+  MagCmd::before_cmd_proc(objv);
+
   // ネットワークを指定したときに true とするフラグ
   bool ntwk_flag = false;
-  
+
   // 新規作成の時 true とするフラグ
   bool new_flag = false;
-  
+
   // ネットワーク名
   TclObj name;
   if ( mPoptNtwk->is_specified() ) {
@@ -76,7 +76,7 @@ MagBNetCmd::before_cmd_proc(TclObjVector& objv)
     name = mPoptNewNtwk->val();
     ntwk_flag = true;
   }
-  
+
   if ( ntwk_flag ) {
     // name をネットワーク名と見なしてスタックに入れる．
     // 上書きを考慮して関数を直接呼ばずに Tcl スクリプト
@@ -86,7 +86,7 @@ MagBNetCmd::before_cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
     if ( new_flag ) {
-      if ( script.append_element("-new") != TCL_OK ) {
+      if ( script.append_element("-new_bnet") != TCL_OK ) {
 	return TCL_ERROR;
       }
     }

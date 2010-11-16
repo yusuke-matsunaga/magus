@@ -26,7 +26,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ElimCmd::ElimCmd(NetMgr* mgr) :
+ElimCmd::ElimCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mPoptL = new TclPoptUint(this, "limit",
@@ -75,7 +75,7 @@ ElimCmd::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
   }
-  
+
   if ( mPoptAutoLimit->is_specified() ) {
     autolimit = true;
   }
@@ -98,7 +98,7 @@ ElimCmd::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
   }
-  
+
   size_t objc = objv.size();
   if ( objc != 2 ) {
     print_usage();
@@ -126,7 +126,7 @@ ElimCmd::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CleanCmd::CleanCmd(NetMgr* mgr) :
+CleanCmd::CleanCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mPoptRI = new TclPopt(this, "remove_input",
@@ -166,7 +166,7 @@ CleanCmd::cmd_proc(TclObjVector& objv)
   else if ( mPoptPL->is_specified() ) {
     remove_input = false;
   }
-  
+
   size_t objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
@@ -185,18 +185,18 @@ CleanCmd::cmd_proc(TclObjVector& objv)
     // 使われていないラッチの削除を行う．
     ;
   }
-  
+
   // 正常終了
   return TCL_OK;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // sweep (ファンイン数が1以下のノードの削除) を行うコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SweepCmd::SweepCmd(NetMgr* mgr) :
+SweepCmd::SweepCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }
@@ -223,13 +223,13 @@ SweepCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-    
+
 //////////////////////////////////////////////////////////////////////
 // simplify を行うコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SimplifyCmd::SimplifyCmd(NetMgr* mgr) :
+SimplifyCmd::SimplifyCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }
@@ -255,13 +255,13 @@ SimplifyCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-    
+
 //////////////////////////////////////////////////////////////////////
 // decompose を行うコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DecompCmd::DecompCmd(NetMgr* mgr) :
+DecompCmd::DecompCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mPoptXor = new TclPopt(this, "xor",
@@ -302,7 +302,7 @@ DecompCmd::cmd_proc(TclObjVector& objv)
   if ( !balanced && !random ) {
     balanced = true;
   }
-  
+
   size_t objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
@@ -327,13 +327,13 @@ DecompCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-    
+
 //////////////////////////////////////////////////////////////////////
 // gate_decompose を行うコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GateDecompCmd::GateDecompCmd(NetMgr* mgr) :
+GateDecompCmd::GateDecompCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mPoptMaxFanin = new TclPoptInt(this, "max_fanin",
@@ -395,7 +395,7 @@ GateDecompCmd::cmd_proc(TclObjVector& objv)
     set_result(msg);
     return TCL_ERROR;
   }
-  
+
   int max_fanin = 0;
   if ( mPoptMaxFanin->is_specified() ) {
     max_fanin = mPoptMaxFanin->val();
@@ -411,7 +411,7 @@ GateDecompCmd::cmd_proc(TclObjVector& objv)
   if ( !balanced && !random ) {
     balanced = true;
   }
-  
+
   BNetGateDecomp decomp;
 
   if ( balanced ) {
@@ -436,7 +436,7 @@ GateDecompCmd::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SopDecompCmd::SopDecompCmd(NetMgr* mgr) :
+SopDecompCmd::SopDecompCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }
@@ -470,7 +470,7 @@ SopDecompCmd::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ConvCombiCmd::ConvCombiCmd(NetMgr* mgr) :
+ConvCombiCmd::ConvCombiCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }
@@ -519,7 +519,7 @@ ConvCombiCmd::cmd_proc(TclObjVector& objv)
 
   BNetwork* network = cur_network();
   BNetManip manip(network);
-  
+
   BNodeVector tmp;
   tmp.reserve(network->latch_node_num());
   for (BNodeList::const_iterator p = network->latch_nodes_begin();

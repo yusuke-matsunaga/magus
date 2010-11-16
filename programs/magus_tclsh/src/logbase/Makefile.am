@@ -16,11 +16,15 @@ libmagus_logbase_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
-libmagus_logbase_tcl_la_LDFLAGS = 
+libmagus_logbase_tcl_la_LDFLAGS =
 libmagus_logbase_tcl_la_SOURCES = \
-	NetMgr.cc \
+	MagMgr.cc \
 	NetHandle.cc \
-	BaseCmd.cc \
+	BNetHandle.h \
+	BNetHandle.cc \
+	BdnHandle.h \
+	BdnHandle.cc \
+	MagCmd.cc \
 	MagBNetCmd.cc \
 	MagBdnCmd.cc \
 	NodeCmd.h \

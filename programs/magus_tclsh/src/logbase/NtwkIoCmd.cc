@@ -73,7 +73,7 @@ TclObjMsgHandler::msg_obj() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ReadBlif::ReadBlif(NetMgr* mgr) :
+ReadBlif::ReadBlif(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mReader.add_msg_handler(&mMsgHandler);
@@ -154,7 +154,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ReadIscas89::ReadIscas89(NetMgr* mgr) :
+ReadIscas89::ReadIscas89(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mReader.add_msg_handler(&mMsgHandler);
@@ -189,7 +189,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
     // ファイル名の文字列中に誤りがあった．
     return TCL_ERROR;
   }
-  
+
   // 実際の読み込みを行う．
   try {
     bool result = mReader.read(ex_file_name, *network);
@@ -222,7 +222,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-WriteBlif::WriteBlif(NetMgr* mgr) :
+WriteBlif::WriteBlif(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   set_usage_string("?<filename>?");
@@ -291,7 +291,7 @@ WriteBlif::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-WriteEqu::WriteEqu(NetMgr* mgr) :
+WriteEqu::WriteEqu(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   set_usage_string("?<filename>?");
@@ -352,7 +352,7 @@ WriteEqu::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-WriteVerilog::WriteVerilog(NetMgr* mgr) :
+WriteVerilog::WriteVerilog(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   set_usage_string("?<filename>?");

@@ -1,5 +1,5 @@
-#ifndef MAGUS_BASECMD_H
-#define MAGUS_BASECMD_H
+#ifndef MAGUS_MAGCMD_H
+#define MAGUS_MAGCMD_H
 
 /// @file MagCmd.h
 /// @brief MagCmd のヘッダファイル
@@ -12,19 +12,15 @@
 /// All rights reserved.
 
 
-#include "magus.h"
+#include "magus_nsdef.h"
 #include "ym_tclpp/TclCmd.h"
+#include "NetHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
-// 前方参照のためのクラス宣言
-class NetMgr;
-class NetHandle;
-
-
 //////////////////////////////////////////////////////////////////////
-/// @class BaseCmd MagCmd.h "MagCmd.h"
+/// @class MagCmd MagCmd.h "MagCmd.h"
 /// @ingroup MagusGroup
 /// @brief Magus のコマンドオブジェクトの基底クラス
 ///
@@ -32,17 +28,18 @@ class NetHandle;
 /// するような関数の殻をかぶせること．
 /// あとは変換などの便利関数を入れてある．
 //////////////////////////////////////////////////////////////////////
-class BaseCmd :
+class MagCmd :
   public TclCmd
 {
 public:
 
   /// @brief コンストラクタ
-  BaseCmd(NetMgr* mag);
+  /// @param[in] mgr マネージャ
+  MagCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~BaseCmd();
+  ~MagCmd();
 
 
 protected:
@@ -56,25 +53,47 @@ protected:
   /// @note エラーメッセージはセットされない．
   bool
   check_network_name(const string& name) const;
-  
-  /// @brief 新規ネットワークの作成
-  /// @param[in] name ネットワーク名
-  /// @return 生成されたネットハンドル
+
+  /// @brief 新たな BNetwork を作成して登録する．
+  /// @param[in] name 名前
+  /// @return 作成したネットハンドル
+  /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+  /// @note また，名前が不適切な場合にもエラーとなる．
+  /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
+  /// NULL を返す．
+  NetHandle*
+  new_bnethandle(const string& name) const;
+
+  /// @brief 新たな BdNetwork を作成して登録する．
+  /// @param[in] name 名前
+  /// @return 作成したネットハンドル
+  /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+  /// @note また，名前が不適切な場合にもエラーとなる．
+  /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
+  /// NULL を返す．
+  NetHandle*
+  new_bdnhandle(const string& name) const;
+
+#if 0
+  /// @brief ネットワークの登録
+  /// @param[in] handle ネットワークハンドル
+  /// @return 実行結果
   /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
   /// @note また，名前が不適切な場合にもエラーとなる．
   /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットする．
-  NetHandle*
-  new_nethandle(const string& name) const;
+  bool
+  reg_nethandle(NetHandle* handle) const;
+#endif
 
   /// @brief ネットワークの削除
-  /// @param[in] name ネットワーク名
+  /// @param[in] name 名前
   /// @return 削除が成功したら true を返す．
-  /// @note ネットワーク名が不正なときや使用中のときにはエラーとなる．
+  /// @note 名前が不正なときや使用中のときにはエラーとなる．
   bool
   delete_nethandle(const string& name) const;
-  
+
   /// @brief ネットワークの検索
-  /// @param[in] name ネットワーク名
+  /// @param[in] name 名前
   /// @return name という名のネットワークを返す．
   /// @note "_" の場合にはカレントネットワークをとって来る．
   /// @note 名前が不適切な場合やその名前のネットワークが存在しない場合には
@@ -83,14 +102,17 @@ protected:
   /// して NULL を返す．
   NetHandle*
   find_nethandle(const string& name) const;
-  
+
   /// @brief name という名のネットワークをなんとしてもとって来る．
   /// @param[in] name ネットワーク名
+  /// @param[in] type ネットワークの型
   /// @return name という名のネットワークを返す．
   /// @note 要するに無ければ作る．
   NetHandle*
-  find_or_new_nethandle(const string& name) const;
-  
+  find_or_new_nethandle(const string& name,
+			NetHandle::tType type) const;
+
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -104,13 +126,13 @@ protected:
   /// 記録して false を返す．
   bool
   push_cur_nethandle(const string& name) const;
-  
+
   /// @brief スタックからネットワークを復帰させる．
   /// @return 処理が成功すれば true を返す．
   /// @note スタックが空の場合にはエラーとなる．
   bool
   pop_cur_nethandle() const;
-  
+
   /// @brief 操作対象のネットワークを変更する．
   /// @param[in] name ネットワーク名
   /// @return 変更が成功したら true を返す．
@@ -119,15 +141,15 @@ protected:
   /// @note 常にスタックは変更しない．
   bool
   change_cur_nethandle(const string& name) const;
-  
+
   /// @brief 現在，操作対象となっているネットワークを返す．
   /// @note 常にカレントネットワークは存在するはず．
   /// (と言いつつ中ではちゃんとチェックはしてますよ．)
   NetHandle*
   cur_nethandle() const;
-  
+
   // マネージャを取得する．
-  NetMgr*
+  MagMgr*
   mgr() const;
 
 
@@ -137,10 +159,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ネットワークやセルライブラリ等のデータを管理するオブジェクト
-  NetMgr* mNetMgr;
+  MagMgr* mMagMgr;
 
 };
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_BASECMD_H
+#endif // MAGUS_MAGCMD_H

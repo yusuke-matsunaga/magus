@@ -1,71 +1,113 @@
 
-/// @file magus/logbase/BaseCmd.cc
-/// @brief BaseCmd の実装ファイル
+/// @file magus/logbase/MagCmd.cc
+/// @brief MagCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BaseCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: MagCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BaseCmd.h"
-#include "NetMgr.h"
+#include "MagCmd.h"
+#include "MagMgr.h"
+#include "NetHandle.h"
+#include "BNetHandle.h"
+#include "BdnHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// Magus のコマンドオブジェクトの基底クラス BaseCmd 
+// Magus のコマンドオブジェクトの基底クラス MagCmd
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-BaseCmd::BaseCmd(NetMgr* mag) :
-  mNetMgr(mag)
+MagCmd::MagCmd(MagMgr* mgr) :
+  mMagMgr(mgr)
 {
 }
 
 // @brief デストラクタ
-BaseCmd::~BaseCmd()
+MagCmd::~MagCmd()
 {
-}
-  
-// マネージャを取得する．
-NetMgr*
-BaseCmd::mgr() const
-{
-  return mNetMgr;
 }
 
+// マネージャを取得する．
+MagMgr*
+MagCmd::mgr() const
+{
+  return mMagMgr;
+}
+
+
 //////////////////////////////////////////////////////////////////////
-// ネットワーク操作関係のBaseCmdのメソッド
-// 中身を見れば分かるけどほとんどが NetMgr を呼び出している．
+// ネットワーク操作関係のMagCmdのメソッド
+// 中身を見れば分かるけどほとんどが MagMgr を呼び出している．
 //////////////////////////////////////////////////////////////////////
 
 // name という名のネットワークが登録されているか調べる．
 // 登録されていれば true を返す．
 bool
-BaseCmd::check_network_name(const string& name) const
+MagCmd::check_network_name(const string& name) const
 {
-  NetHandle* neth = mNetMgr->find_nethandle(name, false);
+  NetHandle* neth = mMagMgr->find_nethandle(name, false);
   return (neth != NULL) ? true : false;
 }
 
-// name という名の新たなネットワークエントリを作成して登録する．
-// 同名のネットワークが既に存在していた場合にはエラーとなる．
-// また，名前が不適切な場合にもエラーとなる．
-// エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
+// @brief name という名の新たなネットワークエントリを作成して登録する．
+// @param[in] name 名前
+// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+// @note また，名前が不適切な場合にもエラーとなる．
+// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
 // NULL を返す．
 NetHandle*
-BaseCmd::new_nethandle(const string& name) const
+MagCmd::new_bnethandle(const string& name) const
 {
   ostringstream buf;
-  NetHandle* neth = mNetMgr->new_nethandle(name, &buf);
+  NetHandle* neth = mMagMgr->new_bnethandle(name, &buf);
   if ( neth == NULL ) {
     set_result(buf.str());
   }
   return neth;
 }
+
+// @brief 新たな BdNetwork を作成して登録する．
+// @param[in] name 名前
+// @return 作成したネットハンドル
+// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+// @note また，名前が不適切な場合にもエラーとなる．
+// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
+// NULL を返す．
+NetHandle*
+MagCmd::new_bdnhandle(const string& name) const
+{
+  ostringstream buf;
+  NetHandle* neth = mMagMgr->new_bdnhandle(name, &buf);
+  if ( neth == NULL ) {
+    set_result(buf.str());
+  }
+  return neth;
+}
+
+#if 0
+// @brief ネットワークの登録
+// @param[in] handle ネットワークハンドル
+// @return 実行結果
+// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+// @note また，名前が不適切な場合にもエラーとなる．
+// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットする．
+bool
+MagCmd::reg_nethandle(NetHandle* handle) const
+{
+  ostringstream buf;
+  bool stat = mMagMgr->reg_nethandle(handle, &buf);
+  if ( !stat ) {
+    set_result(buf.str());
+  }
+  return stat;
+}
+#endif
 
 // name という名のネットワークを削除する．
 // ただし，カレントネットワークは削除できない．
@@ -73,10 +115,10 @@ BaseCmd::new_nethandle(const string& name) const
 // エラーの場合にはインタプリタに然るべきメッセージをセットしてfalse
 // を返す．
 bool
-BaseCmd::delete_nethandle(const string& name) const
+MagCmd::delete_nethandle(const string& name) const
 {
   ostringstream buf;
-  bool stat = mNetMgr->delete_nethandle(name, &buf);
+  bool stat = mMagMgr->delete_nethandle(name, &buf);
   if ( !stat ) {
     set_result(buf.str());
   }
@@ -88,10 +130,10 @@ BaseCmd::delete_nethandle(const string& name) const
 // 名前が不適切な場合やその名前のネットワークが存在しない場合にはエラーと
 // なる．
 NetHandle*
-BaseCmd::find_nethandle(const string& name) const
+MagCmd::find_nethandle(const string& name) const
 {
   ostringstream buf;
-  NetHandle* neth = mNetMgr->find_nethandle(name, &buf);
+  NetHandle* neth = mMagMgr->find_nethandle(name, &buf);
   if ( neth == NULL ) {
     set_result(buf.str());
   }
@@ -101,14 +143,23 @@ BaseCmd::find_nethandle(const string& name) const
 // name という名のナットワークをとって来る．
 // 存在しない場合には新たに生成する．
 NetHandle*
-BaseCmd::find_or_new_nethandle(const string& name) const
+MagCmd::find_or_new_nethandle(const string& name,
+			      NetHandle::tType type) const
 {
-  NetHandle* neth = mNetMgr->find_nethandle(name);
+  NetHandle* neth = mMagMgr->find_nethandle(name);
   if ( !neth ) {
-    ostringstream buf;
-    neth = mNetMgr->new_nethandle(name, &buf);
-    if ( !neth ) {
-      set_result(buf.str());
+    switch ( type ) {
+    case NetHandle::kMagBNet:
+      neth = new_bnethandle(name);
+      break;
+
+    case NetHandle::kMagBdn:
+      neth = new_bdnhandle(name);
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
     }
   }
   return neth;
@@ -120,10 +171,10 @@ BaseCmd::find_or_new_nethandle(const string& name) const
 // @note ネットワーク名が適切でない時にはインタプリタにメッセージを
 // 記録して false を返す．
 bool
-BaseCmd::push_cur_nethandle(const string& name) const
+MagCmd::push_cur_nethandle(const string& name) const
 {
   ostringstream buf;
-  bool stat = mNetMgr->push_cur_nethandle(name, &buf);
+  bool stat = mMagMgr->push_cur_nethandle(name, &buf);
   if ( stat ) {
     return true;
   }
@@ -135,10 +186,10 @@ BaseCmd::push_cur_nethandle(const string& name) const
 // @return 処理が成功すれば true を返す．
 // @note スタックが空の場合にはエラーとなる．
 bool
-BaseCmd::pop_cur_nethandle() const
+MagCmd::pop_cur_nethandle() const
 {
   ostringstream buf;
-  bool stat = mNetMgr->pop_cur_nethandle(&buf);
+  bool stat = mMagMgr->pop_cur_nethandle(&buf);
   if ( stat ) {
     return true;
   }
@@ -152,10 +203,10 @@ BaseCmd::pop_cur_nethandle() const
 // 記録して false を返す．
 // この時，カレントネットワークは変更されない．
 bool
-BaseCmd::change_cur_nethandle(const string& name) const
+MagCmd::change_cur_nethandle(const string& name) const
 {
   ostringstream buf;
-  bool stat = mNetMgr->change_cur_nethandle(name, &buf);
+  bool stat = mMagMgr->change_cur_nethandle(name, &buf);
   if ( stat ) {
     return true;
   }
@@ -165,9 +216,9 @@ BaseCmd::change_cur_nethandle(const string& name) const
 
 // カレントネットワークを取り出す．スタックは不変．
 NetHandle*
-BaseCmd::cur_nethandle() const
+MagCmd::cur_nethandle() const
 {
-  NetHandle* neth = mNetMgr->cur_nethandle();
+  NetHandle* neth = mMagMgr->cur_nethandle();
   assert_cond(neth != NULL, __FILE__, __LINE__);
   return neth;
 }
@@ -177,7 +228,7 @@ BaseCmd::cur_nethandle() const
 // 存在していた場合には interp にエラーメッセージをセットして
 // false を返す．
 bool
-BaseCmd::check_node_name(const string& name) const
+MagCmd::check_node_name(const string& name) const
 {
   if ( name == string() ) {
     return true;
@@ -194,10 +245,10 @@ BaseCmd::check_node_name(const string& name) const
 
   return true;
 }
-  
+
 // ノード名からノードを取り出す
 BNode*
-BaseCmd::find_node(TclObj& obj)
+MagCmd::find_node(TclObj& obj)
 {
   string node_str = obj.get_string(NULL);
   BNode* node = cur_network()->find_node(node_str);

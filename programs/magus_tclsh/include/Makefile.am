@@ -7,11 +7,11 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	magus.h \
-	NetHandle.h \
-	NetMgr.h \
-	BaseCmd.h \
+	magus_nsdef.h \
+	MagMgr.h \
+	MagCmd.h \
 	MagBNetCmd.h \
-	MagBdnCmd.h
+	MagBdnCmd.h \
+	NetHandle.h
 
 

@@ -26,7 +26,7 @@ class SealCmd :
 public:
 
   /// @brief コンストラクタ
-  SealCmd(NetMgr* mgr);
+  SealCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

@@ -18,7 +18,7 @@ Copyright (C) 2007-2010 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-AC_CONFIG_SRCDIR([include/magus.h])dnl
+AC_CONFIG_SRCDIR([include/magus_nsdef.h])dnl
 
 AC_CONFIG_AUX_DIR([config])dnl
 AC_CONFIG_MACRO_DIR([config])dnl

@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DupCmd::DupCmd(NetMgr* mgr) :
+DupCmd::DupCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   set_usage_string("node_num[=INT]");

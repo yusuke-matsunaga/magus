@@ -26,7 +26,7 @@ class AreaMapCmd :
 public:
 
   /// @brief コンストラクタ
-  AreaMapCmd(NetMgr* mgr,
+  AreaMapCmd(MagMgr* mgr,
 	     TechmapData* data);
 
   /// @brief デストラクタ

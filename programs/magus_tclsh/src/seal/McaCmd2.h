@@ -29,7 +29,7 @@ class McaCmd2 :
 public:
 
   /// @brief コンストラクタ
-  McaCmd2(NetMgr* mgr);
+  McaCmd2(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

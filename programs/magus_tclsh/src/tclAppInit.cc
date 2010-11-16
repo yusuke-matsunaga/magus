@@ -1,4 +1,4 @@
-/* 
+/*
  * tclAppInit.c --
  *
  *	Provides a default version of the main program and Tcl_AppInit
@@ -14,7 +14,7 @@
  * RCS: @(#) $Id: tclAppInit.cc 2274 2009-06-10 07:45:29Z matsunaga $
  */
 
-#include "magus.h"
+#include "magus_nsdef.h"
 
 #define ERRORCODE_HACK 1
 
@@ -52,7 +52,7 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
  */
 
 #ifndef TCL_LOCAL_APPINIT
-#define TCL_LOCAL_APPINIT Tcl_AppInit    
+#define TCL_LOCAL_APPINIT Tcl_AppInit
 #endif
 extern
 int
@@ -88,21 +88,21 @@ main(int argc,
    * script, prime the library or encoding paths, fiddle with the argv,
    * etc., without needing to rewrite Tcl_Main()
    */
-  
+
 #ifdef TCL_LOCAL_MAIN_HOOK
   extern int TCL_LOCAL_MAIN_HOOK _ANSI_ARGS_((int *argc, char ***argv));
 #endif
-  
+
 #ifdef TCL_XT_TEST
   XtToolkitInitialize();
 #endif
-  
+
 #ifdef TCL_LOCAL_MAIN_HOOK
   TCL_LOCAL_MAIN_HOOK(&argc, &argv);
 #endif
-  
+
   Tcl_Main(argc, argv, TCL_LOCAL_APPINIT);
-  
+
   return 0;			/* Needed only to prevent compiler warning. */
 }
 
@@ -129,7 +129,7 @@ int
 Tcl_AppInit(Tcl_Interp* interp)
 {
   using namespace std;
-  
+
   if (Tcl_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }
@@ -200,21 +200,21 @@ Tcl_AppInit(Tcl_Interp* interp)
   if ( magus_init(interp) == TCL_ERROR ) {
     return TCL_ERROR;
   }
-  
+
   /*
    * Call Tcl_CreateCommand for application-specific commands, if
    * they weren't already created by the init procedures called above.
    */
-  
-  
+
+
   /*
    * Specify a user-specific startup file to invoke if the application
    * is run interactively.  Typically the startup file is "~/.apprc"
    * where "app" is the name of the application.  If this line is deleted
    * then no user-specific startup file will be run under any conditions.
    */
-  
+
   Tcl_SetVar(interp, "tcl_rcFileName", "~/.magusrc", TCL_GLOBAL_ONLY);
-  
+
   return TCL_OK;
 }

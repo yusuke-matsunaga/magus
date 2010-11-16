@@ -39,7 +39,7 @@ public:
 protected:
 
   /// @brief コンストラクタ
-  NodeCmd(NetMgr* mgr);
+  NodeCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -54,25 +54,25 @@ protected:
   // 書き直せば簡単に上書きできる．
   int
   cmd_proc(TclObjVector& objv);
-  
+
   // ノードのタイプと順序を指定するオプション引数をパーズする．
   // エラーが起きたら TCL_ERROR を返す．
   virtual
   int
   parse_args(TclObjVector& objv);
-  
+
   // foreach_node() の直前に呼ばれる関数
   // デフォルトでは何もしない．
   virtual
   int
   before_node_proc();
-  
+
   // foreach_node() の直後に呼ばれる関数
   // デフォルトでは何もしない．
   virtual
   int
   after_node_proc();
-  
+
   // 引数の情報を基に処理すべきノードを配列にセットする．
   // 引数が何も与えられなかったときの振る舞いを変えたいので仮想関数と
   // している．
@@ -81,18 +81,18 @@ protected:
   virtual
   int
   set_nodes(TclObjVector& objv);
-  
+
   // 引数の名前をノード名だと思って配列に納める．
   // 存在しないノード名が与えられたときには TCL_ERROR を返す．
   int
   set_nodes_from_args(TclObjVector& objv);
-  
+
   // ノードのタイプおよび処理順に従ってノードを配列に納める．
   // type が FI/FO の場合には基点となるノードを base に入れる．
   // 今は常に TCL_OK を返す．
   int
   set_all_nodes(TclObjVector& objv);
-    
+
   // マッチングモードを返す．
   tMode
   match_mode() const;
@@ -103,37 +103,37 @@ private:
   // ノード名がパタンにマッチするか調べ，マッチした場合に配列に入れる．
   void
   add_node(BNode* node);
-  
+
   // 外部入力ノードのうち，パタンにマッチするものを配列に入れる．
   void
   set_pi_node();
-  
+
   // 外部出力ノードのうち，パタンにマッチするものを配列にいれる．
   void
   set_po_node();
-  
+
   // ラッチノードのうち，パタンにマッチするものを配列にいれる．
   void
   set_latch_node();
-  
+
   // ロジックノードのうち，パタンにマッチするものを配列にいれる．
   void
   set_logic_node();
-  
+
   // ロジックノードのうち，パタンにマッチするものを配列にいれる．
   // こちらは入力からのトポロジカル順
   void
   set_logic_node_asc();
-  
+
   // ロジックノードのうち，パタンにマッチするものを配列にいれる．
   // こちらは出力からのトポロジカル順
   void
   set_logic_node_dsc();
-  
+
   // ノードのファンインを配列に入れる．
   void
   set_fanin(BNode* node);
-  
+
   // ノードのファンアウトを配列に入れる．
   void
   set_fanout(BNode* node);
@@ -144,18 +144,18 @@ private:
   // 真の時のみ NodeProc() を呼び出す．
   int
   foreach_node(const TclObj& cond = NULL);
-  
+
   // 一つのノードに対する処理
   // 処理結果を返す．
   virtual
   int
   node_proc(BNode* node) = 0;
-  
+
   // mNodeArray をクリアして，size ぶんの領域を確保する．
   void
   init_array(size_t size);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // メンバ変数
@@ -166,7 +166,7 @@ private:
 
   // regexp オプション解析用のオブジェクト
   TclPopt* mPoptRegexp;
-  
+
   // ao オプション解析用のオブジェクト
   TclPopt* mPoptAscOrder;
 
@@ -187,7 +187,7 @@ private:
 
   // ff オプション解析用のオブジェクト
   TclPopt* mPoptFF;
-  
+
   // マッチングモード
   tMode mMatchMode;
 
@@ -223,7 +223,7 @@ class AllNodeCmd :
 protected:
 
   /// @brief コンストラクタ
-  AllNodeCmd(NetMgr* mgr);
+  AllNodeCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

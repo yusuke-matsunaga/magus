@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DumpSbjCmd::DumpSbjCmd(NetMgr* mgr,
+DumpSbjCmd::DumpSbjCmd(MagMgr* mgr,
 		       LutmapData* data) :
   LutmapCmd(mgr, data)
 {

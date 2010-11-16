@@ -14,7 +14,7 @@
 #endif
 
 #include "CellmapCmd.h"
-#include "NetMgr.h"
+#include "MagMgr.h"
 #include "SbjGraph.h"
 #include <ym_tclpp/TclPopt.h>
 
@@ -26,7 +26,7 @@ BEGIN_NAMESPACE_MAGUS_CELLMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DumpSbjCmd::DumpSbjCmd(NetMgr* mgr,
+DumpSbjCmd::DumpSbjCmd(MagMgr* mgr,
 		       CellmapData* data) :
   CellmapCmd(mgr, data)
 {

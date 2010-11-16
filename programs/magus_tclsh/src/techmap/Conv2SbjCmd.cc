@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Conv2SbjCmd::Conv2SbjCmd(NetMgr* mgr,
+Conv2SbjCmd::Conv2SbjCmd(MagMgr* mgr,
 			 TechmapData* data) :
   TechmapCmd(mgr, data)
 {

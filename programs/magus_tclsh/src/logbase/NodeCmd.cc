@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NodeCmd::NodeCmd(NetMgr* mgr) :
+NodeCmd::NodeCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   mPoptGlob = new TclPopt(this, "glob",
@@ -30,13 +30,13 @@ NodeCmd::NodeCmd(NetMgr* mgr) :
   mPoptRegexp = new TclPopt(this, "regexp",
 			    "regex matching");
   new_popt_group(mPoptGlob, mPoptRegexp);
-  
+
   mPoptAscOrder = new TclPopt(this, "ascent",
 			      "ascent order");
   mPoptDscOrder = new TclPopt(this, "decent",
 			      "decent order");
   new_popt_group(mPoptAscOrder, mPoptDscOrder);
-  
+
   mPoptCond = new TclPoptObj(this, "cond",
 			     "specify condition",
 			     "<expression>");
@@ -50,7 +50,7 @@ NodeCmd::NodeCmd(NetMgr* mgr) :
   mPoptFF = new TclPopt(this, "ff",
 			"enumerate FFs");
   new_popt_group(mPoptPI, mPoptPO, mPoptLogic, mPoptFF);
-  
+
   set_usage_string("<node-name>* or <pattern>*");
 }
 
@@ -75,7 +75,7 @@ NodeCmd::parse_args(TclObjVector& objv)
   if ( mPoptRegexp->is_specified() ) {
     mMatchMode = kREGEXP;
   }
-  
+
   if ( mPoptAscOrder->is_specified() ) {
     mNodeOrder = kASC;
   }
@@ -107,7 +107,7 @@ NodeCmd::parse_args(TclObjVector& objv)
 
   return TCL_OK;
 }
-    
+
 // マッチングモードを返す．
 NodeCmd::tMode
 NodeCmd::match_mode() const
@@ -473,7 +473,7 @@ NodeCmd::init_array(size_t size)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-AllNodeCmd::AllNodeCmd(NetMgr* mgr) :
+AllNodeCmd::AllNodeCmd(MagMgr* mgr) :
   NodeCmd(mgr)
 {
 }

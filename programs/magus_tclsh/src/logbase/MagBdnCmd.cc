@@ -20,8 +20,8 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MagBdnCmd::MagBdnCmd(NetMgr* mgr) :
-  BaseCmd(mgr),
+MagBdnCmd::MagBdnCmd(MagMgr* mgr) :
+  MagCmd(mgr),
   mNetworkSpecified(false)
 {
   mPoptNtwk = new TclPoptObj(this, "network",
@@ -48,14 +48,14 @@ MagBdnCmd::before_cmd_proc(TclObjVector& objv)
 {
   mNetworkSpecified = false;
 
-  BaseCmd::before_cmd_proc(objv);
-  
+  MagCmd::before_cmd_proc(objv);
+
   // ネットワークを指定したときに true とするフラグ
   bool ntwk_flag = false;
-  
+
   // 新規作成の時 true とするフラグ
   bool new_flag = false;
-  
+
   // ネットワーク名
   TclObj name;
   if ( mPoptNtwk->is_specified() ) {
@@ -67,7 +67,7 @@ MagBdnCmd::before_cmd_proc(TclObjVector& objv)
     name = mPoptNewNtwk->val();
     ntwk_flag = true;
   }
-  
+
   if ( ntwk_flag ) {
     // name をネットワーク名と見なしてスタックに入れる．
     // 上書きを考慮して関数を直接呼ばずに Tcl スクリプト

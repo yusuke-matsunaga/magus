@@ -26,7 +26,7 @@ class DumpCnCmd :
 public:
 
   /// @brief コンストラクタ
-  DumpCnCmd(NetMgr* mgr,
+  DumpCnCmd(MagMgr* mgr,
 	    TechmapData* data);
 
   /// @brief デストラクタ

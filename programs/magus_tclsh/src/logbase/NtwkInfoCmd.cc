@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NtwkInfo::NtwkInfo(NetMgr* mgr) :
+NtwkInfo::NtwkInfo(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   const char* usage =
@@ -49,7 +49,7 @@ NtwkInfo::cmd_proc(TclObjVector& objv)
   }
 
   BNetwork* network = cur_network();
-  
+
   string attr = objv[1];
   TclObj result;
   if ( attr == "model_name" ) {
@@ -148,7 +148,7 @@ NtwkInfo::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NtwkAllInfo::NtwkAllInfo(NetMgr* mgr) :
+NtwkAllInfo::NtwkAllInfo(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
   set_usage_string("<varname>");
@@ -212,7 +212,7 @@ NtwkAllInfo::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NtwkPrintStats::NtwkPrintStats(NetMgr* mgr) :
+NtwkPrintStats::NtwkPrintStats(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }

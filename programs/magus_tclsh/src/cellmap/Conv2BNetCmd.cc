@@ -112,7 +112,7 @@ lut2bnet(const CnGraph& src_network,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Conv2BNetCmd::Conv2BNetCmd(NetMgr* mgr,
+Conv2BNetCmd::Conv2BNetCmd(MagMgr* mgr,
 			   CellmapData* data) :
   CellmapCmd(mgr, data)
 {

@@ -36,8 +36,8 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-EquivCmdBase::EquivCmdBase(NetMgr* mgr) :
-  BaseCmd(mgr)
+EquivCmdBase::EquivCmdBase(MagMgr* mgr) :
+  MagCmd(mgr)
 {
   mPoptLoglevel = new TclPoptInt(this, "loglevel",
 				 "set log level");
@@ -378,7 +378,7 @@ EquivCmdBase::assoc_by_name(const BNetwork& network1,
 
 
 // @brief コンストラクタ
-EquivCmd::EquivCmd(NetMgr* mgr) :
+EquivCmd::EquivCmd(MagMgr* mgr) :
   EquivCmdBase(mgr)
 {
   
@@ -478,10 +478,10 @@ EquivCmd::cmd_proc(TclObjVector& objv)
 // Equiv の初期化関数
 int
 equiv_init(Tcl_Interp* interp,
-	   NetMgr* mgr)
+	   MagMgr* mgr)
 {
   // 等価検証を行うコマンド
-  TclCmdBinder1<EquivCmd, NetMgr*>::reg(interp, mgr, "magus::equiv");
+  TclCmdBinder1<EquivCmd, MagMgr*>::reg(interp, mgr, "magus::equiv");
 
   //////////////////////////////////////////////////////////////////////
   // デフォルト値を入れる変数の初期化

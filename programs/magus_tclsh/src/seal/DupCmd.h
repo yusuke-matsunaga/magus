@@ -25,7 +25,7 @@ class DupCmd :
 public:
 
   /// @brief コンストラクタ
-  DupCmd(NetMgr* mgr);
+  DupCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

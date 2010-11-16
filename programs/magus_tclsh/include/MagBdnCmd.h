@@ -12,7 +12,7 @@
 /// All rights reserved.
 
 
-#include "BaseCmd.h"
+#include "MagCmd.h"
 #include "ym_bdn/bdn_nsdef.h"
 
 
@@ -24,23 +24,23 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief BdNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
 class MagBdnCmd :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  MagBdnCmd(NetMgr* mgr);
+  MagBdnCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
   ~MagBdnCmd();
 
-  
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief カレントネットワークの取得
   /// @note カレントネットワークが BNetwork でない場合には NULL を返す．
   BdNetwork*
@@ -64,14 +64,14 @@ protected:
   virtual
   int
   before_cmd_proc(TclObjVector& objv);
-  
+
   /// @brief コマンド処理関数の後で実行される関数
   /// before_cmd_proc() で退避されたカレントネットワーク，
   /// カレントライブラリを元に戻す．
   virtual
   void
   after_cmd_proc();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ private:
 
   // new_network オプションを解析するオブジェクト
   TclPoptObj* mPoptNewNtwk;
-  
+
   // コマンドラインでネットワークの指定が行われたかを示すフラグ
   bool mNetworkSpecified;
 

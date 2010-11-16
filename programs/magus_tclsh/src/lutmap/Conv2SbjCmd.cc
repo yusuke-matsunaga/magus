@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Conv2SbjCmd::Conv2SbjCmd(NetMgr* mgr,
+Conv2SbjCmd::Conv2SbjCmd(MagMgr* mgr,
 			 LutmapData* data) :
   LutmapCmd(mgr, data)
 {

@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NodeSubstCmd::NodeSubstCmd(NetMgr* mgr,
+NodeSubstCmd::NodeSubstCmd(MagMgr* mgr,
 			   LutmapData* data) :
   LutmapCmd(mgr, data)
 {
@@ -73,7 +73,7 @@ NodeSubstCmd::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NodeMergeCmd::NodeMergeCmd(NetMgr* mgr,
+NodeMergeCmd::NodeMergeCmd(MagMgr* mgr,
 			   LutmapData* data) :
   LutmapCmd(mgr, data)
 {

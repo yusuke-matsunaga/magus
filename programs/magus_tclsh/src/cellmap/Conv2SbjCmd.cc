@@ -14,7 +14,7 @@
 #endif
 
 #include "CellmapCmd.h"
-#include "NetMgr.h"
+#include "MagMgr.h"
 #include "NetHandle.h"
 #include "SbjGraph.h"
 #include <ym_bnet/BNetwork.h>
@@ -269,7 +269,7 @@ bnet2sbj(const BNetwork& network,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Conv2SbjCmd::Conv2SbjCmd(NetMgr* mgr,
+Conv2SbjCmd::Conv2SbjCmd(MagMgr* mgr,
 			 CellmapData* data) :
   CellmapCmd(mgr, data)
 {

@@ -27,7 +27,7 @@ class LrwCmd :
 public:
 
   /// @brief コンストラクタ
-  LrwCmd(NetMgr* mgr);
+  LrwCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

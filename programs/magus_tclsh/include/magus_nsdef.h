@@ -1,5 +1,5 @@
-#ifndef MAGUS_MAGUS_H
-#define MAGUS_MAGUS_H
+#ifndef MAGUS_MAGUS_NSDEF_H
+#define MAGUS_MAGUS_NSDEF_H
 
 /// @file magus.h
 /// @brief magus用名前空間の定義ファイル
@@ -23,4 +23,13 @@ BEGIN_NAMESPACE(nsMagus)
 END_NAMESPACE(nsMagus) \
 END_NAMESPACE_YM
 
-#endif // MAGUS_MAGUS_H
+
+BEGIN_NAMESPACE_MAGUS
+
+// 前方参照のためのクラス宣言
+class MagMgr;
+class NetHandle;
+
+END_NAMESPACE_MAGUS
+
+#endif // MAGUS_MAGUS_NSDEF_H

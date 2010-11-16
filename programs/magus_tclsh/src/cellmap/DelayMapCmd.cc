@@ -14,7 +14,7 @@
 #endif
 
 #include "CellmapCmd.h"
-#include "NetMgr.h"
+#include "MagMgr.h"
 #include "SbjGraph.h"
 #include "CellNetwork.h"
 #include "CutHolder.h"
@@ -32,7 +32,7 @@ BEGIN_NAMESPACE_MAGUS_CELLMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DelayMapCmd::DelayMapCmd(NetMgr* mgr,
+DelayMapCmd::DelayMapCmd(MagMgr* mgr,
 			 CellmapData* data) :
   CellmapCmd(mgr, data)
 {
