@@ -217,7 +217,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     mapgraph.add_port(sbjport->name(), tmp);
   }
 
-  lut_num = mapgraph.n_lnodes();
+  lut_num = mapgraph.lnode_num();
   depth = max_depth;
 }
 

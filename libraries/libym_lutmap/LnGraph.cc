@@ -26,7 +26,7 @@ LnNode::LnNode() :
   mLevel(0)
 {
 }
-      
+
 // デストラクタ
 LnNode::~LnNode()
 {
@@ -124,11 +124,11 @@ LnGraph::copy(const LnGraph& src,
 	      vector<LnNode*>& nodemap)
 {
   mName = src.mName;
-  
+
   ymuint n = src.max_node_id();
   nodemap.clear();
   nodemap.resize(n);
-  
+
   // 外部入力の生成
   const LnNodeList& input_list = src.input_list();
   for (LnNodeList::const_iterator p = input_list.begin();
@@ -146,14 +146,14 @@ LnGraph::copy(const LnGraph& src,
     LnNode* dst_node = new_dff();
     nodemap[src_node->id()] = dst_node;
   }
-  
+
   // LUTノードの生成
   vector<LnNode*> node_list;
   src.sort(node_list);
   ymuint nl = node_list.size();
   for (ymuint i = 0; i < nl; ++ i) {
     LnNode* src_node = node_list[i];
-    ymuint ni = src_node->ni();
+    ymuint ni = src_node->fanin_num();
     vector<LnNode*> dst_inputs(ni);
     vector<int> tv;
     for (ymuint j = 0; j < ni; ++ j) {
@@ -163,7 +163,7 @@ LnGraph::copy(const LnGraph& src,
       dst_inputs[j] = input;
     }
     src_node->tv(tv);
-    
+
     LnNode* dst_node = new_lut(dst_inputs, tv);
     if ( src_node->pomark() ) {
       dst_node->mFlags |= LnNode::kPoMask;
@@ -180,7 +180,7 @@ LnGraph::copy(const LnGraph& src,
     LnNode* dst_inode = nodemap[src_inode->id()];
     set_dff_input(dst_node, dst_inode);
   }
-  
+
   // 外部出力の生成
   const LnNodeList& output_list = src.output_list();
   for (LnNodeList::const_iterator p = output_list.begin();
@@ -294,7 +294,7 @@ sort_sub(LnNode* node,
     LnNode* onode = e->to();
     if ( mark[onode->id()] || !onode->is_lut() ) continue;
     bool ready = true;
-    ymuint ni = onode->ni();
+    ymuint ni = onode->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       LnNode* inode0 = onode->fanin(i);
       if ( !mark[inode0->id()] ) {
@@ -316,11 +316,11 @@ void
 LnGraph::sort(vector<LnNode*>& node_list) const
 {
   node_list.clear();
-  node_list.reserve(n_lnodes());
-    
+  node_list.reserve(lnode_num());
+
   ymuint n = max_node_id();
   vector<bool> mark(n, false);
-    
+
   // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
   list<LnNode*> tmp_list;
   ppi_list(tmp_list);
@@ -335,19 +335,19 @@ LnGraph::sort(vector<LnNode*>& node_list) const
   for (LnNodeList::const_iterator p = mLutList.begin();
        p != mLutList.end(); ++ p) {
     LnNode* node = *p;
-    if ( node->ni() == 0 && !mark[node->id()] ) {
+    if ( node->fanin_num() == 0 && !mark[node->id()] ) {
       mark[node->id()] = true;
       node_list.push_back(node);
     }
   }
-  
+
   ymuint rpos = 0;
   while ( rpos < node_list.size() ) {
     LnNode* node = node_list[rpos];
     ++ rpos;
     sort_sub(node, mark, node_list);
   }
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
 }
 
 // @brief モジュール名を設定する．
@@ -391,7 +391,7 @@ LnNode*
 LnGraph::new_input()
 {
   LnNode* node = new_node(0);
-  
+
   // 入力ノード配列に登録
   ymuint subid = mInputArray.size();
   mInputArray.push_back(node);
@@ -404,7 +404,7 @@ LnGraph::new_input()
   node->set_input(subid);
 
   node->mLevel = 0;
-  
+
   return node;
 }
 
@@ -415,7 +415,7 @@ LnNode*
 LnGraph::new_output(LnNode* inode)
 {
   LnNode* node = new_node(1);
-  
+
   // 出力ノード配列に登録
   ymuint subid = mOutputArray.size();
   mOutputArray.push_back(node);
@@ -440,7 +440,7 @@ LnGraph::new_lut(const vector<LnNode*>& inodes,
 {
   ymuint ni = inodes.size();
   LnNode* node = new_node(ni);
-  
+
   // LUTノードリストに登録
   mLutList.push_back(node);
 
@@ -455,7 +455,7 @@ LnGraph::new_lut(const vector<LnNode*>& inodes,
   for (ymuint i = 0; i < ni; ++ i) {
     connect(inodes[i], node, i);
   }
-  
+
   return node;
 }
 
@@ -483,7 +483,7 @@ LnGraph::set_dff_input(LnNode* node,
 		       LnNode* inode)
 {
   assert_cond(node->is_dff(), __FILE__, __LINE__);
-  
+
   connect(inode, node, 0);
 }
 
@@ -495,7 +495,7 @@ LnGraph::set_dff_clock(LnNode* node,
 		       LnNode* inode)
 {
   assert_cond(node->is_dff(), __FILE__, __LINE__);
-  
+
   connect(inode, node, 1);
 }
 
@@ -507,7 +507,7 @@ LnGraph::set_dff_set(LnNode* node,
 		     LnNode* inode)
 {
   assert_cond(node->is_dff(), __FILE__, __LINE__);
-  
+
   connect(inode, node, 2);
 }
 
@@ -519,7 +519,7 @@ LnGraph::set_dff_rst(LnNode* node,
 		     LnNode* inode)
 {
   assert_cond(node->is_dff(), __FILE__, __LINE__);
-  
+
   connect(inode, node, 3);
 }
 
@@ -563,7 +563,7 @@ void
 LnGraph::clear()
 {
   mName.clear();
-  
+
   // ポートを削除する．
   for (vector<LnPort*>::iterator p = mPortArray.begin();
        p != mPortArray.end(); ++ p) {
@@ -571,7 +571,7 @@ LnGraph::clear()
     delete port;
   }
   mPortArray.clear();
-  
+
   // まず最初に接続を切る．
   for (LnNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
@@ -581,7 +581,7 @@ LnGraph::clear()
   for (LnNodeList::iterator p = mLutList.begin();
        p != mLutList.end(); ++ p) {
     LnNode* node = *p;
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       connect(NULL, node, i);
     }
@@ -664,8 +664,8 @@ void
 LnGraph::delete_lut(LnNode* node)
 {
   assert_cond(node->is_lut(), __FILE__, __LINE__);
-  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
-  ymuint ni = node->ni();
+  assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
+  ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     connect(NULL, node, i);
   }
@@ -681,7 +681,7 @@ void
 LnGraph::delete_dff(LnNode* node)
 {
   assert_cond(node->is_dff(), __FILE__, __LINE__);
-  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+  assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
   connect(NULL, node, 0);
 
   mDffList.erase(node);
@@ -696,8 +696,8 @@ LnGraph::delete_node(LnNode* node)
   mItvlMgr.add(static_cast<int>(node->mId));
   // 本当は LnEdge のデストラクタを起動する必要があるが中身がないので
   // 省略する．
-  if ( node->ni() ) {
-    mAlloc2.put_memory(sizeof(LnEdge)* node->ni(), node->mFanins);
+  if ( node->fanin_num() ) {
+    mAlloc2.put_memory(sizeof(LnEdge)* node->fanin_num(), node->mFanins);
   }
 }
 
@@ -709,7 +709,7 @@ LnGraph::connect(LnNode* from,
 		 ymuint pos)
 {
   // LnNode::mFaoutList を変更するのはここだけ
-  
+
   LnEdge* edge = to->fanin_edge(pos);
   LnNode* old_from = edge->from();
   if ( old_from ) {
@@ -721,7 +721,7 @@ LnGraph::connect(LnNode* from,
     from->mFanoutList.push_back(edge);
     from->scan_po();
   }
-  
+
   mLevel = 0;
   mLevelValid = false;
 }
@@ -738,14 +738,14 @@ LnGraph::level() const
       LnNode* node = *p;
       node->mLevel = 0;
     }
-    
+
     vector<LnNode*> node_list;
     sort(node_list);
     for (vector<LnNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       LnNode* node = *p;
       ymuint l = 0;
-      ymuint ni = node->ni();
+      ymuint ni = node->fanin_num();
       for (ymuint i = 0; i < ni; ++ i) {
 	LnNode* inode = node->fanin(i);
 	ymuint l1 = inode->mLevel;
@@ -755,7 +755,7 @@ LnGraph::level() const
       }
       node->mLevel = l + 1;
     }
-    
+
     ymuint max_l = 0;
     ppo_list(tmp_list);
     for (list<LnNode*>::const_iterator p = tmp_list.begin();

@@ -30,7 +30,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
   dst_network.clear();
 
   BNetManip manip(&dst_network);
-  
+
   // 外部入力を作る．
   const LnNodeList& input_list = src_network.input_list();
   for (LnNodeList::const_iterator p = input_list.begin();
@@ -48,14 +48,14 @@ Ln2BNet::operator()(const LnGraph& src_network,
     BNode* dst_node = manip.new_latch();
     node_assoc[src_node->id()] = dst_node;
   }
-  
+
   // 内部ノードを作る．
   vector<LnNode*> node_list;
   src_network.sort(node_list);
   for (vector<LnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     LnNode* src_node = *p;
-    ymuint ni = src_node->ni();
+    ymuint ni = src_node->fanin_num();
     vector<int> tv;
     src_node->tv(tv);
     BNode* dst_node = NULL;

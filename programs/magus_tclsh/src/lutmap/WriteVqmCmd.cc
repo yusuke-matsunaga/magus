@@ -60,7 +60,7 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   }
   fout << endl
        << ");" << endl;
-  
+
   fout << " input clk ;" << endl;
   for ( LnNodeList::const_iterator i = pi_list.begin();
 	i != pi_list.end(); ++i ){
@@ -92,11 +92,11 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   }
   fout << " wire w_one ;" << endl;
   fout << " wire w_gnd ;" << endl;
-  
+
   fout << endl << " assign w_one = 1'b1 ;" << endl;
   fout << "assign w_gnd = 1'b0 ;" << endl;
   fout << endl;
-  
+
   for ( LnNodeList::const_iterator i = pi_list.begin();
 	i != pi_list.end(); ++i ){
     const LnNode* pi = *i;
@@ -121,17 +121,17 @@ write_vqm_cycloneiii(const LnGraph& mapgraph,
   lut_in[1] = "datab";
   lut_in[2] = "datac";
   lut_in[3] = "datad";
-  
+
   for ( LnNodeList::const_iterator i = lut_list.begin();
 	i != lut_list.end(); ++i ){
     const LnNode* lut = *i;
     vector<int> bool_table;
     lut->tv( bool_table ); // 真理値表を得る
-    ymuint ni = lut->ni();
+    ymuint ni = lut->fanin_num();
     ymuint table_size = bool_table.size();
-    
+
     fout << endl;
-    
+
     if ( ni == 0 ){
       fout << "assign w_" << lut->id_str() << " = "
 	   << bool_table[0] << endl << endl;
@@ -204,7 +204,7 @@ WriteVqmCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 

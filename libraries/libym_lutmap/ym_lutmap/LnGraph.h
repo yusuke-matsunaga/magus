@@ -209,10 +209,10 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  fanin_num() const;
 
   /// @brief ファンインのノードを得る．
-  /// @param[in] pos 入力番号
+  /// @param[in] pos 入力番号 ( 0 <= pos < fanin_num() )
   /// @return pos 番めのファンインのノード
   /// @note 該当するファンインがなければ NULL を返す．
   const LnNode*
@@ -241,7 +241,7 @@ public:
 
   /// @brief ファンアウト数を得る．
   ymuint
-  n_fanout() const;
+  fanout_num() const;
 
   /// @brief ファンアウトリストを得る．
   const LnEdgeList&
@@ -298,7 +298,7 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // タイプ (+ 入力／出力番号/PoMask)
+  // タイプ (+ 入力/出力番号/PoMask)
   ymuint32 mFlags;
 
   // 入力数
@@ -509,7 +509,7 @@ public:
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint
-  n_inputs() const;
+  input_num() const;
 
   /// @brief 入力 ID 番号による入力ノードの取得
   /// @param[in] id 入力 ID 番号
@@ -529,7 +529,7 @@ public:
 
   /// @brief 出力のノード数を得る．
   ymuint
-  n_outputs() const;
+  output_num() const;
 
   /// @brief 出力 ID 番号による出力ノードの取得
   /// @param[in] id 出力 ID 番号
@@ -549,19 +549,11 @@ public:
 
   /// @brief LUTノード数を得る．
   ymuint
-  n_lnodes() const;
+  lnode_num() const;
 
   /// @brief LUTノードのリストを得る．
   const LnNodeList&
   lnode_list() const;
-
-  /// @brief LUTノード数を得る．
-  ymuint
-  n_luts() const;
-
-  /// @brief LUTノードのリストを得る．
-  const LnNodeList&
-  lut_list() const;
 
   /// @brief ソートされたLUTノードのリストを得る．
   /// @param[out] node_list
@@ -570,7 +562,7 @@ public:
 
   /// @brief DFFノード数を得る．
   ymuint
-  n_dffs() const;
+  dff_num() const;
 
   /// @brief DFFノードのリストを得る．
   const LnNodeList&
@@ -1000,7 +992,7 @@ LnNode::subid() const
 // @brief 入力数を得る．
 inline
 ymuint
-LnNode::ni() const
+LnNode::fanin_num() const
 {
   return mNi;
 }
@@ -1052,7 +1044,7 @@ LnNode::fanout_list() const
 // ファンアウト数を得る．
 inline
 ymuint
-LnNode::n_fanout() const
+LnNode::fanout_num() const
 {
   return mFanoutList.size();
 }
@@ -1164,7 +1156,7 @@ LnGraph::node(ymuint id) const
 // 入力ノード数を得る．
 inline
 ymuint
-LnGraph::n_inputs() const
+LnGraph::input_num() const
 {
   return mInputArray.size();
 }
@@ -1188,7 +1180,7 @@ LnGraph::input_list() const
 // 出力のノード数を得る．
 inline
 ymuint
-LnGraph::n_outputs() const
+LnGraph::output_num() const
 {
   return mOutputArray.size();
 }
@@ -1212,7 +1204,7 @@ LnGraph::output_list() const
 // LUTノード数を得る．
 inline
 ymuint
-LnGraph::n_lnodes() const
+LnGraph::lnode_num() const
 {
   return mLutList.size();
 }
@@ -1225,26 +1217,10 @@ LnGraph::lnode_list() const
   return mLutList;
 }
 
-// @brief LUTノード数を得る．
-inline
-ymuint
-LnGraph::n_luts() const
-{
-  return mLutList.size();
-}
-
-// @brief LUTノードのリストを得る．
-inline
-const LnNodeList&
-LnGraph::lut_list() const
-{
-  return mLutList;
-}
-
 // @brief DFFノード数を得る．
 inline
 ymuint
-LnGraph::n_dffs() const
+LnGraph::dff_num() const
 {
   return mDffList.size();
 }
