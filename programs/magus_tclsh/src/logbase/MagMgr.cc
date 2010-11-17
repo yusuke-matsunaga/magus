@@ -122,39 +122,6 @@ MagMgr::new_bdnhandle(const string& name,
   return neth;
 }
 
-// @brief ネットワークの登録
-// @param[in] handle 登録するネットワークハンドル
-// @param[in] err_out エラー出力
-// @return 実行結果
-// @note 同名のネットワークが既に存在していた場合や名前が不適切な
-// 場合にはエラーとなり，false を返す．
-bool
-MagMgr::reg_nethandle(NetHandle* handle,
-		      ostream* err_out)
-{
-  string name = handle->name();
-
-  // 名前が適切か調べる
-  if ( !check_name(name, err_out) ) {
-    // 名前が不適切だった．
-    return false;
-  }
-
-  // ハッシュを調べる．
-  if ( name == kCurNetwork || _find_nethandle(name) != NULL ) {
-    // 同名のネットワークが存在していた．
-    if ( err_out ) {
-      *err_out << name << " : Already exists.";
-    }
-    return false;
-  }
-
-  // 存在していないので登録する．
-  _reg_nethandle(handle);
-
-  return true;
-}
-
 // @brief ネットワークの検索
 // @param[in] name ネットワーク名
 // @param[in] err_out エラー出力
@@ -342,11 +309,34 @@ MagMgr::new_tmpname()
   return string(buf.str());
 }
 
-// @brief ネットワークを登録する．
+// @brief ネットワークの登録
 // @param[in] handle 登録するネットワークハンドル
-void
-MagMgr::_reg_nethandle(NetHandle* handle)
+// @param[in] err_out エラー出力
+// @return 実行結果
+// @note 同名のネットワークが既に存在していた場合や名前が不適切な
+// 場合にはエラーとなり，false を返す．
+bool
+MagMgr::reg_nethandle(NetHandle* handle,
+		      ostream* err_out)
 {
+  string name = handle->name();
+
+  // 名前が適切か調べる
+  if ( !check_name(name, err_out) ) {
+    // 名前が不適切だった．
+    return false;
+  }
+
+  // ハッシュを調べる．
+  if ( name == kCurNetwork || _find_nethandle(name) != NULL ) {
+    // 同名のネットワークが存在していた．
+    if ( err_out ) {
+      *err_out << name << " : Already exists.";
+    }
+    return false;
+  }
+
+  // 存在していないので登録する．
   void* p = mAlloc.get_memory(sizeof(Cell));
   Cell* cell = new (p) Cell;
   cell->mHandle = handle;
@@ -358,6 +348,8 @@ MagMgr::_reg_nethandle(NetHandle* handle)
   cell->mLink = mNetHandleHash[pos];
   mNetHandleHash[pos] = cell;
   ++ mNetHandleHashNum;
+
+  return true;
 }
 
 // @brief ネットワークを検索する．

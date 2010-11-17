@@ -62,16 +62,6 @@ public:
   new_bdnhandle(const string& name,
 		ostream* err_out = NULL);
 
-  /// @brief ネットワークの登録
-  /// @param[in] handle 登録するネットワークハンドル
-  /// @param[in] err_out エラー出力
-  /// @return 実行結果
-  /// @note 同名のネットワークが既に存在していた場合や名前が不適切な
-  /// 場合にはエラーとなり，false を返す．
-  bool
-  reg_nethandle(NetHandle* handle,
-		ostream* err_out = NULL);
-
   /// @brief ネットワークの検索
   /// @param[in] name 名前
   /// @param[in] err_out エラー出力
@@ -139,10 +129,15 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ネットワークを登録する．
+  /// @brief ネットワークの登録
   /// @param[in] handle 登録するネットワークハンドル
-  void
-  _reg_nethandle(NetHandle* handle);
+  /// @param[in] err_out エラー出力
+  /// @return 実行結果
+  /// @note 同名のネットワークが既に存在していた場合や名前が不適切な
+  /// 場合にはエラーとなり，false を返す．
+  bool
+  reg_nethandle(NetHandle* handle,
+		ostream* err_out = NULL);
 
   /// @brief ネットワークを検索する．
   /// @param[in] name 名前

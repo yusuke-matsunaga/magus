@@ -90,25 +90,6 @@ MagCmd::new_bdnhandle(const string& name) const
   return neth;
 }
 
-#if 0
-// @brief ネットワークの登録
-// @param[in] handle ネットワークハンドル
-// @return 実行結果
-// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
-// @note また，名前が不適切な場合にもエラーとなる．
-// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットする．
-bool
-MagCmd::reg_nethandle(NetHandle* handle) const
-{
-  ostringstream buf;
-  bool stat = mMagMgr->reg_nethandle(handle, &buf);
-  if ( !stat ) {
-    set_result(buf.str());
-  }
-  return stat;
-}
-#endif
-
 // name という名のネットワークを削除する．
 // ただし，カレントネットワークは削除できない．
 // また，名前が不適切な場合や存在しない場合にはエラーとなる．

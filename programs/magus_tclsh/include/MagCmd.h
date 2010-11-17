@@ -74,17 +74,6 @@ protected:
   NetHandle*
   new_bdnhandle(const string& name) const;
 
-#if 0
-  /// @brief ネットワークの登録
-  /// @param[in] handle ネットワークハンドル
-  /// @return 実行結果
-  /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
-  /// @note また，名前が不適切な場合にもエラーとなる．
-  /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットする．
-  bool
-  reg_nethandle(NetHandle* handle) const;
-#endif
-
   /// @brief ネットワークの削除
   /// @param[in] name 名前
   /// @return 削除が成功したら true を返す．
