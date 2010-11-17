@@ -12,6 +12,11 @@
 #include <tcl.h>
 
 #include "MagMgr.h"
+#include "NtwkBaseCmd.h"
+#include "NtwkInfoCmd.h"
+#include "NtwkIoCmd.h"
+#include "ElimCmd.h"
+#include "NtwkNdCmd.h"
 #include "MvnReadVerilog.h"
 
 
@@ -44,8 +49,41 @@ logbase_init(Tcl_Interp* interp,
   TclCmdBinder1<ListNtwk, MagMgr*>::reg(interp, mgr, "magus::network_list");
   TclCmdBinder1<ForNtwk, MagMgr*>::reg(interp, mgr,  "magus::foreach_network");
 
+#if 0
+  // ネットワークトレースの設定／解除を行うコマンド
+  TclCmdBinder1<SetNetTrace, MagMgr*>::reg(interp, mgr, "magus::network_trace");
+#endif
+
+  // ネットワークの諸元を取り出すコマンド
+  TclCmdBinder1<NtwkInfo, MagMgr*>::reg(interp, mgr,   "magus::network_info");
+  TclCmdBinder1<NtwkAllInfo, MagMgr*>::reg(interp, mgr, "magus::network_allinfo");
+  TclCmdBinder1<NtwkPrintStats, MagMgr*>::reg(interp, mgr, "magus::print_stats");
+
   // ネットワークのファイル入出力コマンド
+  TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr, "magus::read_blif");
+  TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr, "magus::read_iscas89");
+  TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr, "magus::write_blif");
+  TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
+  TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr, "magus::write_verilog");
+
   TclCmdBinder1<MvnReadVerilog, MagMgr*>::reg(interp, mgr, "magus::read_verilog");
+
+  // ネットワーク上での処理コマンド(その2)
+  TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
+  TclCmdBinder1<SimplifyCmd, MagMgr*>::reg(interp, mgr, "magus::simplify");
+  TclCmdBinder1<SweepCmd, MagMgr*>::reg(interp, mgr,      "magus::sweep");
+  TclCmdBinder1<CleanCmd, MagMgr*>::reg(interp, mgr,      "magus::clean_up");
+  TclCmdBinder1<DecompCmd, MagMgr*>::reg(interp, mgr,     "magus::decomp");
+  TclCmdBinder1<GateDecompCmd, MagMgr*>::reg(interp, mgr, "magus::gate_decomp");
+  TclCmdBinder1<SopDecompCmd, MagMgr*>::reg(interp, mgr,  "magus::sop_decomp");
+  TclCmdBinder1<ConvCombiCmd, MagMgr*>::reg(interp, mgr,  "magus::conv_combi");
+
+  // ノードに対するコマンド
+  TclCmdBinder1<NodeInfo, MagMgr*>::reg(interp, mgr,   "magus::node_info");
+  TclCmdBinder1<ListNode, MagMgr*>::reg(interp, mgr,   "magus::list_node");
+  TclCmdBinder1<ElimNode, MagMgr*>::reg(interp, mgr,   "magus::eliminate_node");
+  TclCmdBinder1<DelNode, MagMgr*>::reg(interp, mgr,    "magus::delete_node");
+  TclCmdBinder1<SimplifyNode, MagMgr*>::reg(interp, mgr, "magus::simplify_node");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -102,7 +140,26 @@ logbase_init(Tcl_Interp* interp,
     "proc complete(network_list) { t s e l p m } { return \"\" }\n"
     "proc complete(foreach_network) { t s e l p m } { return \"\" }\n"
     "proc complete(network_trace) { t s e l p m } { return \"\" }\n"
+    "proc complete(network_info) { t s e l p m } { return \"\" }\n"
+    "proc complete(network_allinfo) { t s e l p m } { return \"\" }\n"
+    "proc complete(print_stats) { t s e l p m } { return \"\" }\n"
+    "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
+    "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(read_verilog) { t s e l p m } { return \"\" }\n"
+    "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
+    "proc complete(write_equ) { t s e l p m } { return \"\" }\n"
+    "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
+    "proc complete(eliminate) { t s e l p m } { return \"\" }\n"
+    "proc complete(sweep) { t s e l p m } { return \"\" }\n"
+    "proc complete(clean_up) { t s e l p m } { return \"\" }\n"
+    "proc complete(decomp) { t s e l p m } { return \"\" }\n"
+    "proc complete(gate_decomp) { t s e l p m } { return \"\" }\n"
+    "proc complete(sop_decomp) { t s e l p m } { return \"\" }\n"
+    "proc complete(node_info) { t s e l p m } { return \"\" }\n"
+    "proc complete(list_node) { t s e l p m } { return \"\" }\n"
+    "proc complete(eliminate_node) { t s e l p m } { return \"\" }\n"
+    "proc complete(delete_node) { t s e l p m } { return \"\" }\n"
+    "proc complete(equiv) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

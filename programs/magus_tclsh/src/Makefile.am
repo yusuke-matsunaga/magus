@@ -3,7 +3,9 @@
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
 SUBDIRS = \
+	core \
 	logbase \
+	bnet \
 	equiv \
 	lutmap \
 	techmap \
@@ -35,11 +37,13 @@ magus_tclsh_SOURCES = \
 	tclAppInit.cc
 
 magus_tclsh_LDADD = \
-	logbase/libmagus_logbase_tcl.la \
 	equiv/libmagus_equiv_tcl.la \
 	lutmap/libmagus_lutmap_tcl.la \
 	techmap/libmagus_techmap_tcl.la \
 	seal/libmagus_seal_tcl.la \
+	bnet/libmagus_bnet_tcl.la \
+	logbase/libmagus_logbase_tcl.la \
+	core/libmagus_core_tcl.la \
 	misc/libmagus_misc_tcl.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \

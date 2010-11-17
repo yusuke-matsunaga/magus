@@ -18,8 +18,19 @@ libmagus_logbase_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 libmagus_logbase_tcl_la_LDFLAGS =
 libmagus_logbase_tcl_la_SOURCES = \
-	MagBdnCmd.cc \
-	MagMvnCmd.cc \
-	MvnReadVerilog.h \
-	MvnReadVerilog.cc \
-	logbase_init.cc
+	BNetCmd.cc \
+	NewBNetwork.h \
+	NewBNetwork.cc \
+	BNetNodeCmd.h \
+	BNetNodeCmd.cc \
+	BNetBaseCmd.h \
+	BNetBaseCmd.cc \
+	BNetInfoCmd.h \
+	BNetInfoCmd.cc \
+	BNetIoCmd.h \
+	BNetIoCmd.cc \
+	BNetNdCmd.h \
+	BNetNdCmd.cc \
+	BNetElimCmd.h \
+	BNetElimCmd.cc \
+	bnet_init.cc

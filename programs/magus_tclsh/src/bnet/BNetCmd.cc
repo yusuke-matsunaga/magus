@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "NetHandle.h"
 
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MagBNetCmd::MagBNetCmd(MagMgr* mgr) :
+BNetCmd::BNetCmd(MagMgr* mgr) :
   MagCmd(mgr),
   mNetworkSpecified(false)
 {
@@ -35,14 +35,14 @@ MagBNetCmd::MagBNetCmd(MagMgr* mgr) :
 }
 
 // @brief デストラクタ
-MagBNetCmd::~MagBNetCmd()
+BNetCmd::~BNetCmd()
 {
 }
 
 // @brief カレントネットワークの取得
 // @note カレントネットワークが BNetwork でない場合には NULL を返す．
 BNetwork*
-MagBNetCmd::cur_network() const
+BNetCmd::cur_network() const
 {
   return cur_nethandle()->_bnetwork();
 }
@@ -53,7 +53,7 @@ MagBNetCmd::cur_network() const
 // ネットワークおよびライブラリが指定されていた場合には，
 // それぞれ mNetworkSpecified, mLibrarySpecified に true を入れる．
 int
-MagBNetCmd::before_cmd_proc(TclObjVector& objv)
+BNetCmd::before_cmd_proc(TclObjVector& objv)
 {
   mNetworkSpecified = false;
 
@@ -105,7 +105,7 @@ MagBNetCmd::before_cmd_proc(TclObjVector& objv)
 }
 
 void
-MagBNetCmd::after_cmd_proc()
+BNetCmd::after_cmd_proc()
 {
   if ( mNetworkSpecified ) {
     // カレントネットワークをもとに戻す．
