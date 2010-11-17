@@ -1,62 +1,61 @@
 
-/// @file src/logbase/BdnHandle.cc
-/// @brief BdnHandle の実装ファイル
+/// @file src/logbase/MvnHandle.cc
+/// @brief MvnHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BdnHandle.h"
+#include "MvnHandle.h"
+#include "ym_mvn/MvMgr.h"
 #include "ym_bdn/BdNetwork.h"
-#include "ym_bnet/BNetwork.h"
-#include "ym_bnet/BNetDecomp.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// クラス BdnHandle
+// クラス MvnHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 名前
-BdnHandle::BdnHandle(const string& name) :
+MvnHandle::MvnHandle(const string& name) :
   NetHandle(name)
 {
 }
 
 // @brief デストラクタ
-BdnHandle::~BdnHandle()
+MvnHandle::~MvnHandle()
 {
 }
 
 // @brief 型を返す．
 NetHandle::tType
-BdnHandle::type() const
+MvnHandle::type() const
 {
-  return kMagBdn;
+  return kMagMvn;
 }
 
-// @brief BdNetwork を得る．
-const BdNetwork*
-BdnHandle::bdn() const
+// @brief MvMgr を得る．
+const MvMgr*
+MvnHandle::mvn() const
 {
   return &mNetwork;
 }
 
-// @brief BdNetwork を得る．
-BdNetwork*
-BdnHandle::_bdn()
+// @brief MvMgr を得る．
+MvMgr*
+MvnHandle::_mvn()
 {
   return &mNetwork;
 }
 
 // @brief ネットワークをクリアする．
 void
-BdnHandle::clear()
+MvnHandle::clear()
 {
-  mNetwork.clear();
+  #warning "MvnHandle::clear(): no implemented yet"
 }
 
 // @brief ネットワークをコピーする．
@@ -64,25 +63,18 @@ BdnHandle::clear()
 // @param[in] allow_conv true ならタイプが異なる時に変換する．
 // @return コピーが成功したら true を返す．
 bool
-BdnHandle::copy(const NetHandle* src,
-		bool allow_conv)
+MvnHandle::copy(const NetHandle* src,
+		 bool allow_conv)
 {
   switch ( src->type() ) {
   case kMagBNet:
     return false;
-#if 0
-    if ( allow_conv ) {
-      BNetDecomp decomp;
-      decomp(src->bnetwork());
-    }
-#endif
-    break;
 
   case kMagBdn:
-    mNetwork = *(src->bdn());
-    break;
+    return false;
 
   case kMagMvn:
+#warning "MvnHandle::copy(): not implemented yet"
     return false;
 
   default:

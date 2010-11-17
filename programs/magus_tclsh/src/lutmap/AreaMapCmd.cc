@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "LutmapCmd.h"
+#include "AreaMapCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -38,13 +38,13 @@ AreaMapCmd::AreaMapCmd(MagMgr* mgr,
 AreaMapCmd::~AreaMapCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 AreaMapCmd::cmd_proc(TclObjVector& objv)
 {
   bool verbose = mPoptVerbose->is_specified();
-  
+
   ymuint mode = 0;
   if ( mPoptMethod->is_specified() ) {
     string method = mPoptMethod->val();
@@ -70,34 +70,23 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  try {
-    int limit;
-    int code = int_conv(objv[1], limit);
-    if ( code != TCL_OK ) {
-      return code;
-    }
-    
-    ymuint lut_num;
-    ymuint depth;
-    
-    area_map(sbjgraph(), limit, mode, lutnetwork(), lut_num, depth);
-    
-    set_var("::magus::lutmap_stats", "lut_num",
-	    lut_num,
-	    TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
-    set_var("::magus::lutmap_stats", "level",
-	    depth,
-	    TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
-    return TCL_OK;
+  int limit;
+  int code = int_conv(objv[1], limit);
+  if ( code != TCL_OK ) {
+    return code;
   }
-  catch ( AssertError x ) {
-    cerr << x << endl;
-    TclObj emsg;
-    emsg << "Assertion Error";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
-  
+
+  ymuint lut_num;
+  ymuint depth;
+
+  area_map(sbjgraph(), limit, mode, lutnetwork(), lut_num, depth);
+
+  set_var("::magus::lutmap_stats", "lut_num",
+	  lut_num,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var("::magus::lutmap_stats", "level",
+	  depth,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
   return TCL_OK;
 }
 

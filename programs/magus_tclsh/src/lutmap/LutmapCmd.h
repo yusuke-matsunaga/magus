@@ -170,95 +170,6 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AreaMapCmd LutmapCmd "LutmapCmd.h"
-/// @brief area map コマンド
-//////////////////////////////////////////////////////////////////////
-class AreaMapCmd :
-  public LutmapCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  AreaMapCmd(MagMgr* mgr,
-	     LutmapData* data);
-
-  /// @brief デストラクタ
-  virtual
-  ~AreaMapCmd();
-
-
-protected:
-
-  /// @brief コマンドを実行する仮想関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // method オプションの解析用オブジェクト
-  TclPoptStr* mPoptMethod;
-
-  // resub オプションの解析用オブジェクト
-  TclPopt* mPoptResub;
-
-  // verbose オプションの解析用オブジェクト
-  TclPopt* mPoptVerbose;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class DelayMapCmd LutmapCmd "LutmapCmd.h"
-/// @brief delay map コマンド
-//////////////////////////////////////////////////////////////////////
-class DelayMapCmd :
-  public LutmapCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  DelayMapCmd(MagMgr* mgr,
-	      LutmapData* data);
-
-  /// @brief デストラクタ
-  virtual
-  ~DelayMapCmd();
-
-
-protected:
-
-  /// @brief コマンドを実行する仮想関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // method オプションの解析用オブジェクト
-  TclPoptStr* mPoptMethod;
-
-  // slack オプションの解析用オブジェクト
-  TclPoptInt* mPoptSlack;
-
-  // resub オプションの解析用オブジェクト
-  TclPopt* mPoptResub;
-
-  // verbose オプションの解析用オブジェクト
-  TclPopt* mPoptVerbose;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class DumpLutCmd LutmapCmd "LutmapCmd.h"
 /// @brief LutNetwork の内容をダンプするコマンド
 //////////////////////////////////////////////////////////////////////
@@ -291,7 +202,6 @@ private:
 
   // verilog オプションの解析用オブジェクト
   TclPopt* mPoptVerilog;
-
 
 };
 

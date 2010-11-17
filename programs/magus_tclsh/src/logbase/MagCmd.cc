@@ -90,6 +90,24 @@ MagCmd::new_bdnhandle(const string& name) const
   return neth;
 }
 
+// @brief 新たな MvNetwork を作成して登録する．
+// @param[in] name 名前
+// @return 作成したネットハンドル
+// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+// @note また，名前が不適切な場合にもエラーとなる．
+// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
+// NULL を返す．
+NetHandle*
+MagCmd::new_mvnhandle(const string& name) const
+{
+  ostringstream buf;
+  NetHandle* neth = mMagMgr->new_mvnhandle(name, &buf);
+  if ( neth == NULL ) {
+    set_result(buf.str());
+  }
+  return neth;
+}
+
 // name という名のネットワークを削除する．
 // ただし，カレントネットワークは削除できない．
 // また，名前が不適切な場合や存在しない場合にはエラーとなる．

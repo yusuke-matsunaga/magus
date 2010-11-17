@@ -1,26 +1,26 @@
 
-/// @file magus/logbase/MagBdnCmd.cc
-/// @brief MagBdnCmd の実装ファイル
+/// @file magus/logbase/MagMvnCmd.cc
+/// @brief MagMvnCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagBdnCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: MagMvnCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MagBdnCmd.h"
+#include "MagMvnCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// Magus のコマンドオブジェクトの基底クラス MagBdnCmd
+// Magus のコマンドオブジェクトの基底クラス MagMvnCmd
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MagBdnCmd::MagBdnCmd(MagMgr* mgr) :
+MagMvnCmd::MagMvnCmd(MagMgr* mgr) :
   MagCmd(mgr),
   mNetworkSpecified(false)
 {
@@ -34,16 +34,16 @@ MagBdnCmd::MagBdnCmd(MagMgr* mgr) :
 }
 
 // @brief デストラクタ
-MagBdnCmd::~MagBdnCmd()
+MagMvnCmd::~MagMvnCmd()
 {
 }
 
 // @brief カレントネットワークの取得
-// @note カレントネットワークが BNetwork でない場合には NULL を返す．
-BdNetwork*
-MagBdnCmd::cur_network() const
+// @note カレントネットワークが MvNetwork でない場合には NULL を返す．
+MvMgr*
+MagMvnCmd::cur_network() const
 {
-  return cur_nethandle()->_bdn();
+  return cur_nethandle()->_mvn();
 }
 
 // コマンド行の引数を解析しネットワークとライブラリをセットする．
@@ -52,7 +52,7 @@ MagBdnCmd::cur_network() const
 // ネットワークおよびライブラリが指定されていた場合には，
 // それぞれ mNetworkSpecified, mLibrarySpecified に true を入れる．
 int
-MagBdnCmd::before_cmd_proc(TclObjVector& objv)
+MagMvnCmd::before_cmd_proc(TclObjVector& objv)
 {
   mNetworkSpecified = false;
 
@@ -85,7 +85,7 @@ MagBdnCmd::before_cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
     if ( new_flag ) {
-      if ( script.append_element("-new_bdn") != TCL_OK ) {
+      if ( script.append_element("-new_mvn") != TCL_OK ) {
 	return TCL_ERROR;
       }
     }
@@ -104,7 +104,7 @@ MagBdnCmd::before_cmd_proc(TclObjVector& objv)
 }
 
 void
-MagBdnCmd::after_cmd_proc()
+MagMvnCmd::after_cmd_proc()
 {
   if ( mNetworkSpecified ) {
     // カレントネットワークをもとに戻す．

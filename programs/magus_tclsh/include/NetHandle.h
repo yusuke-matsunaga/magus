@@ -13,6 +13,7 @@
 #include "magus_nsdef.h"
 #include "ym_bnet/bnet_nsdef.h"
 #include "ym_bdn/bdn_nsdef.h"
+#include "ym_mvn/mvn_nsdef.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -36,6 +37,8 @@ public:
     kMagBNet,
     /// @brief BdNetwork
     kMagBdn,
+    /// @brief MvNetwork
+    kMagMvn
   };
 
 
@@ -84,6 +87,16 @@ public:
   virtual
   BdNetwork*
   _bdn();
+
+  /// @brief MvNetwork を得る．
+  virtual
+  const MvMgr*
+  mvn() const;
+
+  /// @brief MvNetwork を得る．
+  virtual
+  MvMgr*
+  _mvn();
 
   /// @brief ネットワークをクリアする．
   virtual

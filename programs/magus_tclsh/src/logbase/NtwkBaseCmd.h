@@ -1,4 +1,4 @@
-#ifndef MAGUS_LOGBASE_NTWKBASECMD_H
+#ifndef AGUS_LOGBASE_NTWKBASECMD_H
 #define MAGUS_LOGBASE_NTWKBASECMD_H
 
 /// @file magus/logbase/NtwkBaseCmd.h
@@ -68,6 +68,42 @@ public:
   /// @brief デストラクタ
   virtual
   ~NewBdn();
+
+
+protected:
+
+  /// @brief コマンド処理関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // trace オプション解析用オブジェクト
+  TclPoptBool* mPoptTrace;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class NewMvn NtwkBaseCmd.h "NtwkBaseCmd.h"
+/// @brief 新しい BdNetwork を作成するコマンド
+//////////////////////////////////////////////////////////////////////
+class NewMvn :
+  public MagCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  NewMvn(MagMgr* mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~NewMvn();
 
 
 protected:
@@ -216,6 +252,9 @@ private:
 
   // new_bdn オプション解析用のオブジェクト
   TclPopt* mPoptNewBdn;
+
+  // new_mvn オプション解析用のオブジェクト
+  TclPopt* mPoptNewMvn;
 
 };
 

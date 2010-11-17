@@ -12,6 +12,7 @@ noinst_HEADERS = \
 	MagCmd.h \
 	MagBNetCmd.h \
 	MagBdnCmd.h \
+	MagMvnCmd.h \
 	NetHandle.h
 
 

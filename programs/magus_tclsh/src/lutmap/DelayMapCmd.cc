@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "LutmapCmd.h"
+#include "DelayMapCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
 #include "ym_utils/StopWatch.h"
@@ -42,14 +42,14 @@ DelayMapCmd::DelayMapCmd(MagMgr* mgr,
 DelayMapCmd::~DelayMapCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 DelayMapCmd::cmd_proc(TclObjVector& objv)
 {
   int slack = 0;
   bool verbose = false;
-  
+
   ymuint mode = 0;
   if ( mPoptMethod->is_specified() ) {
     string method = mPoptMethod->val();
@@ -77,7 +77,7 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
   if ( mPoptVerbose->is_specified() ) {
     verbose = true;
   }
-  
+
   ymuint objc = objv.size();
   if ( objc != 2 ) {
     print_usage();
@@ -90,7 +90,7 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
     if ( code != TCL_OK ) {
       return code;
     }
-    
+
     ymuint lut_num;
     ymuint depth;
     delay_map(sbjgraph(), limit, slack, mode, lutnetwork(), lut_num, depth);
@@ -110,7 +110,7 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 

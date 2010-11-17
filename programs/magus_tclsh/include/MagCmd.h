@@ -74,6 +74,16 @@ protected:
   NetHandle*
   new_bdnhandle(const string& name) const;
 
+  /// @brief 新たな MvNetwork を作成して登録する．
+  /// @param[in] name 名前
+  /// @return 作成したネットハンドル
+  /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+  /// @note また，名前が不適切な場合にもエラーとなる．
+  /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
+  /// NULL を返す．
+  NetHandle*
+  new_mvnhandle(const string& name) const;
+
   /// @brief ネットワークの削除
   /// @param[in] name 名前
   /// @return 削除が成功したら true を返す．

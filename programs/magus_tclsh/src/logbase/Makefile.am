@@ -24,9 +24,12 @@ libmagus_logbase_tcl_la_SOURCES = \
 	BNetHandle.cc \
 	BdnHandle.h \
 	BdnHandle.cc \
+	MvnHandle.h \
+	MvnHandle.cc \
 	MagCmd.cc \
 	MagBNetCmd.cc \
 	MagBdnCmd.cc \
+	MagMvnCmd.cc \
 	NodeCmd.h \
 	NodeCmd.cc \
 	NtwkBaseCmd.h \
@@ -39,4 +42,6 @@ libmagus_logbase_tcl_la_SOURCES = \
 	NtwkNdCmd.cc \
 	ElimCmd.h \
 	ElimCmd.cc \
+	MvnReadVerilog.h \
+	MvnReadVerilog.cc \
 	logbase_init.cc

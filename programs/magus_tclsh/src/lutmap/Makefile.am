@@ -20,7 +20,6 @@ libmagus_lutmap_tcl_la_SOURCES = \
 	LutmapCmd.h \
 	LutmapCmd.cc \
 	Conv2SbjCmd.cc \
-	ReadVerilogCmd.cc \
 	DumpSbjCmd.cc \
 	AreaMapCmd.cc \
 	DelayMapCmd.cc \

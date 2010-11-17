@@ -17,6 +17,7 @@
 #include "NtwkIoCmd.h"
 #include "ElimCmd.h"
 #include "NtwkNdCmd.h"
+#include "MvnReadVerilog.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -33,6 +34,7 @@ logbase_init(Tcl_Interp* interp,
   // ネットワークの生成／削除／複写コマンド
   TclCmdBinder1<NewBNetwork, MagMgr*>::reg(interp, mgr,  "magus::new_bnetwork");
   TclCmdBinder1<NewBdn, MagMgr*>::reg(interp, mgr,  "magus::new_bdnetwork");
+  TclCmdBinder1<NewMvn, MagMgr*>::reg(interp, mgr,  "magus::new_mvnetwork");
   TclCmdBinder1<DelNtwk, MagMgr*>::reg(interp, mgr,  "magus::delete_network");
   TclCmdBinder1<CopyNtwk, MagMgr*>::reg(interp, mgr, "magus::::copy_network");
   TclCmdBinder1<ClrNtwk, MagMgr*>::reg(interp, mgr,  "magus::::clear_network");
@@ -63,6 +65,8 @@ logbase_init(Tcl_Interp* interp,
   TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr, "magus::write_blif");
   TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
   TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr, "magus::write_verilog");
+
+  TclCmdBinder1<MvnReadVerilog, MagMgr*>::reg(interp, mgr, "magus::read_verilog");
 
   // ネットワーク上での処理コマンド(その2)
   TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
@@ -101,7 +105,7 @@ logbase_init(Tcl_Interp* interp,
   }
 
   // デフォルトネットワークを作成する．
-  if ( Tcl_Eval(interp, "magus::new_network default_network")
+  if ( Tcl_Eval(interp, "magus::new_bnetwork default_network")
        == TCL_ERROR ) {
     return TCL_ERROR;
   }
@@ -123,7 +127,9 @@ logbase_init(Tcl_Interp* interp,
     "proc complete(stopwatch) { t s e l p m } { return \"\" }\n"
     "proc complete(time) { t s e l p m } { return \"\" }\n"
     "proc complete(random) { t s e l p m } { return \"\" }\n"
-    "proc complete(new_network) { t s e l p m } { return \"\" }\n"
+    "proc complete(new_bnetwork) { t s e l p m } { return \"\" }\n"
+    "proc complete(new_bdnetwork) { t s e l p m } { return \"\" }\n"
+    "proc complete(new_mvnetwork) { t s e l p m } { return \"\" }\n"
     "proc complete(delete_network) { t s e l p m } { return \"\" }\n"
     "proc complete(copy_network) { t s e l p m } { return \"\" }\n"
     "proc complete(clear_network) { t s e l p m } { return \"\" }\n"
@@ -139,6 +145,7 @@ logbase_init(Tcl_Interp* interp,
     "proc complete(print_stats) { t s e l p m } { return \"\" }\n"
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
+    "proc complete(read_verilog) { t s e l p m } { return \"\" }\n"
     "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(write_equ) { t s e l p m } { return \"\" }\n"
     "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"

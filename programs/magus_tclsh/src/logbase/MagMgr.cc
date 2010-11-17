@@ -13,8 +13,7 @@
 #include "NetHandle.h"
 #include "BNetHandle.h"
 #include "BdnHandle.h"
-//#include "ym_bnet/BNetwork.h"
-//#include "ym_bdn/BdNetwork.h"
+#include "MvnHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -114,6 +113,26 @@ MagMgr::new_bdnhandle(const string& name,
 		      ostream* err_out)
 {
   NetHandle* neth = new BdnHandle(name);
+  bool stat = reg_nethandle(neth, err_out);
+  if ( !stat ) {
+    delete neth;
+    neth = NULL;
+  }
+  return neth;
+}
+
+// @brief 新たな MvNetwork を作成して登録する．
+// @param[in] name 名前
+// @param[in] err_out エラー出力
+// @return 作成したネットハンドル
+// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
+// @note また，名前が不適切な場合にもエラーとなる．
+// @note エラーが起きた場合には NULL を返す．
+NetHandle*
+MagMgr::new_mvnhandle(const string& name,
+		      ostream* err_out)
+{
+  NetHandle* neth = new MvnHandle(name);
   bool stat = reg_nethandle(neth, err_out);
   if ( !stat ) {
     delete neth;

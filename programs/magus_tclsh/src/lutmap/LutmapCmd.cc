@@ -10,6 +10,8 @@
 
 
 #include "LutmapCmd.h"
+#include "AreaMapCmd.h"
+#include "DelayMapCmd.h"
 #include "ym_lutmap/LnGraph.h"
 
 
@@ -55,8 +57,7 @@ lutmap_init(Tcl_Interp* interp,
 
   TclCmdBinder2<Conv2SbjCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::conv2sbj");
-  TclCmdBinder2<ReadVerilogCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
-							   "magus::lutmap::read_verilog");
+
   TclCmdBinder2<DumpSbjCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 						       "magus::lutmap::dump_sbjgraph");
   TclCmdBinder2<AreaMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
@@ -76,7 +77,6 @@ lutmap_init(Tcl_Interp* interp,
     "namespace eval magus {\n"
     "namespace eval lutmap {\n"
     "proc complete(conv2sbj) { text start end line pos mod } { return \"\" }\n"
-    "proc complete(read_verilog) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_sbjgraph) { text start end line pos mod } { return \"\" }\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
     "proc complete(delay_map) { text start end line pos mod } { return \"\" }\n"

@@ -74,6 +74,9 @@ BNetHandle::copy(const NetHandle* src,
   case kMagBdn:
     return false;
 
+  case kMagMvn:
+    return false;
+
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;
