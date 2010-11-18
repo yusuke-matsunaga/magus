@@ -88,7 +88,7 @@ PgFuncMgr::set_library(const CellLibrary* library)
 
   // 定数関数，リテラル関数を登録しておく
   // 常に定数0，定数1，肯定リテラル，否定リテラルの関数番号が
-  // 0, 1, 2, 3 になるようにする．
+  // 0, 1, 2, 3, 4 になるようにする．
   {
     TvFunc const0 = TvFunc::const_zero(0);
     PgFunc* func0 = find_func(const0);
@@ -105,6 +105,13 @@ PgFuncMgr::set_library(const CellLibrary* library)
     TvFunc nlit = TvFunc::nega_literal(1, 0);
     PgFunc* func3 = find_func(nlit);
     assert_cond( func3->id() == 3, __FILE__, __LINE__);
+  }
+  // XOR のパタンを登録しておく．
+  {
+    LogExpr lit0 = LogExpr::make_posiliteral(0);
+    LogExpr lit1 = LogExpr::make_posiliteral(1);
+    LogExpr xor_ex = lit0 ^ lit1;
+    reg_expr(xor_ex);
   }
 
   ymuint nc = library->cell_num();
