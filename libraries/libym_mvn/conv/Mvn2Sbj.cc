@@ -57,24 +57,7 @@ make_and(SbjGraph& sbjgraph,
     }
   }
   else {
-    ymuint fcode = 0U;
-    if ( inv0 ) {
-      if ( inv1 ) {
-	fcode = 0x1; // 0001
-      }
-      else {
-	fcode = 0x4; // 0100
-      }
-    }
-    else {
-      if ( inv1 ) {
-	fcode = 0x2; // 0010
-      }
-      else {
-	fcode = 0x8; // 1000
-      }
-    }
-    sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
+    sbjnode = sbjgraph.new_and(sbjnode0, sbjnode1, inv0, inv1);
     inv = false;
   }
 }
@@ -115,25 +98,8 @@ make_or(SbjGraph& sbjgraph,
     }
   }
   else {
-    ymuint fcode = 0U;
-    if ( inv0 ) {
-      if ( inv1 ) {
-	fcode = 0x7; // 0111
-      }
-      else {
-	fcode = 0xd; // 1101
-      }
-    }
-    else {
-      if ( inv1 ) {
-	fcode = 0xb; // 1011
-      }
-      else {
-	fcode = 0xe; // 1110
-      }
-    }
-    sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
-    inv = false;
+    sbjnode = sbjgraph.new_and(sbjnode0, sbjnode1, !inv0, !inv1);
+    inv = true;
   }
 }
 
@@ -155,15 +121,7 @@ make_xor(SbjGraph& sbjgraph,
     sbjnode = sbjnode0;
   }
   else {
-    ymuint fcode = 0U;
-    if ( inv ) {
-      fcode = 0x9; // 1001
-      inv = false;
-    }
-    else {
-      fcode = 0x6; // 0110
-    }
-    sbjnode = sbjgraph.new_logic(fcode, sbjnode0, sbjnode1);
+    sbjnode = sbjgraph.new_xor(sbjnode0, sbjnode1);
   }
 }
 
