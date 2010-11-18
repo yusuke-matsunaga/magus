@@ -20,6 +20,10 @@ int
 misc_init(Tcl_Interp* interp);
 
 int
+core_init(Tcl_Interp* interp,
+	  MagMgr* mgr);
+
+int
 logbase_init(Tcl_Interp* interp,
 	     MagMgr* mgr);
 
@@ -68,6 +72,10 @@ magus_init(Tcl_Interp* interp)
   MagMgr* mgr = new MagMgr;
 
   if ( misc_init(interp) == TCL_ERROR ) {
+    return TCL_ERROR;
+  }
+
+  if ( core_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
 

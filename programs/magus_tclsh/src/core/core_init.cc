@@ -29,8 +29,8 @@ BEGIN_NAMESPACE_MAGUS
 
 // Magus の初期化関数
 int
-logbase_init(Tcl_Interp* interp,
-	     MagMgr* mgr)
+core_init(Tcl_Interp* interp,
+	  MagMgr* mgr)
 {
   //////////////////////////////////////////////////////////////////////
   // コマンドの登録
