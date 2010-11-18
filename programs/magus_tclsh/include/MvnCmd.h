@@ -1,5 +1,5 @@
-#ifndef MAGUS_MAGMVNCMD_H
-#define MAGUS_MAGMVNCMD_H
+#ifndef MAGUS_MVNCMD_H
+#define MAGUS_MVNCMD_H
 
 /// @file MvnCmd.h
 /// @brief MvnCmd のヘッダファイル
@@ -91,4 +91,4 @@ private:
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_MAGMVNCMD_H
+#endif // MAGUS_MVNCMD_H

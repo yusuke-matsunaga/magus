@@ -12,7 +12,6 @@
 #include "TechmapCmd.h"
 #include "LoadPatCmd.h"
 #include "Conv2SbjCmd.h"
-#include "ReadVerilogCmd.h"
 #include "AreaMapCmd.h"
 #include "DumpSbjCmd.h"
 #include "DumpCnCmd.h"
@@ -74,8 +73,6 @@ techmap_init(Tcl_Interp* interp,
 							"magus::techmap::load_pat");
   TclCmdBinder2<Conv2SbjCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 							"magus::techmap::conv2sbj");
-  TclCmdBinder2<ReadVerilogCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
-							   "magus::techmap::read_verilog");
   TclCmdBinder2<DumpSbjCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 						       "magus::techmap::dump_sbjgraph");
   TclCmdBinder2<AreaMapCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
@@ -90,7 +87,6 @@ techmap_init(Tcl_Interp* interp,
     "namespace eval techmap {\n"
     "proc complete(load_pat) { text start end line pos mod } { return \"\" }\n"
     "proc complete(conv2sbj) { text start end line pos mod } { return \"\" }\n"
-    "proc complete(read_verilog) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_sbjgraph) { text start end line pos mod } { return \"\" }\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_cngraph) { text start end line pos mod } { return \"\" }\n"

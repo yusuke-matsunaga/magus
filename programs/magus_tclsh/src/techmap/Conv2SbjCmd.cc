@@ -67,6 +67,7 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
       Mvn2Sbj conv;
 
       conv(mgr, sbjgraph(), mvnode_map);
+      stat = true;
     }
     break;
   }

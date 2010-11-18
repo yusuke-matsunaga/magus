@@ -70,19 +70,7 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  try {
-
-    area_map(sbjgraph(), pat_mgr(), 0, cngraph());
-
-    return TCL_OK;
-  }
-  catch ( AssertError x ) {
-    cerr << x << endl;
-    TclObj emsg;
-    emsg << "Assertion Error";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
+  area_map(sbjgraph(), pat_mgr(), 0, cngraph());
 
   return TCL_OK;
 }

@@ -1,26 +1,26 @@
 
-/// @file magus/logbase/MagMvnCmd.cc
-/// @brief MagMvnCmd の実装ファイル
+/// @file src/mvn/MvnCmd.cc
+/// @brief MvnCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagMvnCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: MvnCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MagMvnCmd.h"
+#include "MvnCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// Magus のコマンドオブジェクトの基底クラス MagMvnCmd
+// Magus のコマンドオブジェクトの基底クラス MvnCmd
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MagMvnCmd::MagMvnCmd(MagMgr* mgr) :
+MvnCmd::MvnCmd(MagMgr* mgr) :
   MagCmd(mgr),
   mNetworkSpecified(false)
 {
@@ -34,14 +34,14 @@ MagMvnCmd::MagMvnCmd(MagMgr* mgr) :
 }
 
 // @brief デストラクタ
-MagMvnCmd::~MagMvnCmd()
+MvnCmd::~MvnCmd()
 {
 }
 
 // @brief カレントネットワークの取得
 // @note カレントネットワークが MvNetwork でない場合には NULL を返す．
 MvMgr*
-MagMvnCmd::cur_network() const
+MvnCmd::cur_network() const
 {
   return cur_nethandle()->_mvn();
 }
@@ -52,7 +52,7 @@ MagMvnCmd::cur_network() const
 // ネットワークおよびライブラリが指定されていた場合には，
 // それぞれ mNetworkSpecified, mLibrarySpecified に true を入れる．
 int
-MagMvnCmd::before_cmd_proc(TclObjVector& objv)
+MvnCmd::before_cmd_proc(TclObjVector& objv)
 {
   mNetworkSpecified = false;
 
@@ -104,7 +104,7 @@ MagMvnCmd::before_cmd_proc(TclObjVector& objv)
 }
 
 void
-MagMvnCmd::after_cmd_proc()
+MvnCmd::after_cmd_proc()
 {
   if ( mNetworkSpecified ) {
     // カレントネットワークをもとに戻す．

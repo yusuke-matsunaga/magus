@@ -25,8 +25,6 @@ libmagus_techmap_tcl_la_SOURCES = \
 	DumpSbjCmd.cc \
 	LoadPatCmd.h \
 	LoadPatCmd.cc \
-	ReadVerilogCmd.h \
-	ReadVerilogCmd.cc \
 	TechmapCmd.h \
 	TechmapCmd.cc
 
@@ -34,7 +32,6 @@ libmagus_techmap_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_mvn/libym_mvn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la

@@ -209,6 +209,7 @@ dump_verilog(ostream& s,
     }
     s << ");" << endl;
   }
+  s << "endmodule" << endl;
 }
 
 END_NAMESPACE_YM_TECHMAP

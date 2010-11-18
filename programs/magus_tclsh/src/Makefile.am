@@ -4,8 +4,8 @@
 
 SUBDIRS = \
 	core \
-	logbase \
 	bnet \
+	mvn \
 	equiv \
 	lutmap \
 	techmap \
@@ -41,8 +41,8 @@ magus_tclsh_LDADD = \
 	lutmap/libmagus_lutmap_tcl.la \
 	techmap/libmagus_techmap_tcl.la \
 	seal/libmagus_seal_tcl.la \
+	mvn/libmagus_mvn_tcl.la \
 	bnet/libmagus_bnet_tcl.la \
-	logbase/libmagus_logbase_tcl.la \
 	core/libmagus_core_tcl.la \
 	misc/libmagus_misc_tcl.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \

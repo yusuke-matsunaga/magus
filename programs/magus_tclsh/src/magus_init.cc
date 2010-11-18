@@ -24,8 +24,12 @@ core_init(Tcl_Interp* interp,
 	  MagMgr* mgr);
 
 int
-logbase_init(Tcl_Interp* interp,
-	     MagMgr* mgr);
+bnet_init(Tcl_Interp* interp,
+	  MagMgr* mgr);
+
+int
+mvn_init(Tcl_Interp* interp,
+	 MagMgr* mgr);
 
 int
 equiv_init(Tcl_Interp* interp,
@@ -79,7 +83,11 @@ magus_init(Tcl_Interp* interp)
     return TCL_ERROR;
   }
 
-  if ( logbase_init(interp, mgr) == TCL_ERROR ) {
+  if ( bnet_init(interp, mgr) == TCL_ERROR ) {
+    return TCL_ERROR;
+  }
+
+  if ( mvn_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
 
