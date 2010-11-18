@@ -1,16 +1,16 @@
 
-/// @file magus/logbase/ElimCmd.cc
-/// @brief ElmCmd の実装ファイル
+/// @file magus/logbase/BNetElimCmd.cc
+/// @brief ElimCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ElimCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: BNetElimCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 // ネットワークの eliminate, sweep, clean-up, decomp を行うコマンド
 
-#include "ElimCmd.h"
+#include "BNetElimCmd.h"
 
 #include "ym_bnet/BNetManip.h"
 #include "ym_bnet/BNetDecomp.h"
@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 ElimCmd::ElimCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mPoptL = new TclPoptUint(this, "limit",
 			   "specify SOP size limit");
@@ -127,7 +127,7 @@ ElimCmd::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 CleanCmd::CleanCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mPoptRI = new TclPopt(this, "remove_input",
 			"remove inputs if possible");
@@ -197,7 +197,7 @@ CleanCmd::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 SweepCmd::SweepCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
 }
 
@@ -230,7 +230,7 @@ SweepCmd::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 SimplifyCmd::SimplifyCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
 }
 
@@ -262,7 +262,7 @@ SimplifyCmd::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 DecompCmd::DecompCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mPoptXor = new TclPopt(this, "xor",
 			 "allow xor decomposition");
@@ -334,7 +334,7 @@ DecompCmd::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 GateDecompCmd::GateDecompCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mPoptMaxFanin = new TclPoptInt(this, "max_fanin",
 				 "specify the maximum number of fanins");
@@ -437,7 +437,7 @@ GateDecompCmd::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 SopDecompCmd::SopDecompCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
 }
 
@@ -471,7 +471,7 @@ SopDecompCmd::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 ConvCombiCmd::ConvCombiCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
 }
 

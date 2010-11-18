@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 // 回路を3重化するコマンド
 //////////////////////////////////////////////////////////////////////
 class TMRCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -33,7 +33,7 @@ public:
 
 
 protected:
-  
+
   // コマンド処理関数
   virtual
   int

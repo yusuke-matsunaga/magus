@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief eliminate を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class ElimCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -63,7 +63,7 @@ private:
 /// @brief clean up (ファンアウト数が0のノードの削除) を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class CleanCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -108,7 +108,7 @@ private:
 /// @brief sweep (ファンイン数が1以下のノードの削除) を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class SweepCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -135,7 +135,7 @@ protected:
 /// @brief simplify を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class SimplifyCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -162,7 +162,7 @@ protected:
 /// @brief decompose を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class DecompCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -210,7 +210,7 @@ private:
 /// @brief gate_decompose を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class GateDecompCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -255,7 +255,7 @@ private:
 /// @brief sop_decompose を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class SopDecompCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -282,7 +282,7 @@ protected:
 /// @brief 組み合わせ回路化する行うコマンド
 //////////////////////////////////////////////////////////////////////
 class ConvCombiCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 

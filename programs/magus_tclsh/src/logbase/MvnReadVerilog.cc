@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 MvnReadVerilog::MvnReadVerilog(MagMgr* mgr) :
-  MagMvnCmd(mgr)
+  MvnCmd(mgr)
 {
 }
 

@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 TMRCmd::TMRCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
 }
 
@@ -36,7 +36,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
 {
   BNetwork& network = *cur_network();
   BNetManip manip(&network);
-  
+
   vector<BNode*> fanins;
   LogExpr l0 = LogExpr::make_posiliteral(0);
   LogExpr l1 = LogExpr::make_posiliteral(1);
@@ -56,7 +56,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
     map1[node->id()] = node;
     map2[node->id()] = node;
   }
-  
+
   BNodeVector node_list;
   network.tsort(node_list);
   for (BNodeVector::iterator p = node_list.begin();

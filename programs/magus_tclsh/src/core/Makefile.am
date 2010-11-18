@@ -28,10 +28,18 @@ libmagus_core_tcl_la_SOURCES = \
 	MvnHandle.h \
 	MvnHandle.cc \
 	MagCmd.cc \
+	NewBNetwork.h \
+	NewBNetwork.cc \
+	NewBdn.h \
+	NewBdn.cc \
+	NewMvn.h \
+	NewMvn.cc \
 	ClrNetwork.h \
 	ClrNetwork.cc \
 	DelNetwork.h \
 	DelNetwork.cc \
+	CopyNetwork.h \
+	CopyNetwork.cc \
 	ChgNetwork.h \
 	ChgNetwork.cc \
 	PushNetwork.h \
@@ -41,4 +49,7 @@ libmagus_core_tcl_la_SOURCES = \
 	CurNetwork.h \
 	CurNetwork.cc \
 	ListNetwork.h \
-	ListNetwork.cc
+	ListNetwork.cc \
+	ForNetwork.h \
+	ForNetwork.cc \
+	core_init.cc

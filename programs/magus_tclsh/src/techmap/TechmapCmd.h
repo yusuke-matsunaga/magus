@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "MagCmd.h"
 #include "ym_techmap/PatMgr.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_techmap/CnGraph.h"
@@ -53,7 +53,7 @@ struct TechmapData
 /// @brief テクノロジマッピングを行うコマンドの基底クラス
 //////////////////////////////////////////////////////////////////////
 class TechmapCmd :
-  public MagBNetCmd
+  public MagCmd
 {
 public:
 

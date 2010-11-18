@@ -10,9 +10,9 @@ noinst_HEADERS = \
 	magus_nsdef.h \
 	MagMgr.h \
 	MagCmd.h \
-	MagBNetCmd.h \
-	MagBdnCmd.h \
-	MagMvnCmd.h \
+	BNetCmd.h \
+	BdnCmd.h \
+	MvnCmd.h \
 	NetHandle.h
 
 

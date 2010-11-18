@@ -12,7 +12,7 @@
 
 // ネットワークを操作するコマンド群
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 // ソフトエラーの解析を実行するコマンド
 //////////////////////////////////////////////////////////////////////
 class SealCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -34,7 +34,7 @@ public:
 
 
 protected:
-  
+
   // コマンド処理関数
   virtual
   int

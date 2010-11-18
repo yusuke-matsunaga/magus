@@ -1,16 +1,15 @@
 
-/// @file magus/logbase/NtwkNdCmd.cc
-/// @brief NtwkNdCmd の実装ファイル
+/// @file magus/logbase/BNetNdCmd.cc
+/// @brief BNetNdCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NtwkNdCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: BNetNdCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-// ノードに対して処理を行うコマンド
 
-#include "NtwkNdCmd.h"
+#include "BNetNdCmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "ym_lexp/LogExprWriter.h"
 #include "ym_bnet/BNetManip.h"
@@ -24,7 +23,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 NodeInfo::NodeInfo(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   const char* usage =
     "<ATTR> node\n"

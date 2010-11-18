@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ListNtwork.h"
-#include "NetHandle.h"
+#include "ListNetwork.h"
+#include "MagMgr.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ListNtwk::ListNtwk(MagMgr* mgr) :
+ListNetwork::ListNetwork(MagMgr* mgr) :
   MagCmd(mgr)
 {
   mPoptAll = new TclPopt(this, "all",
@@ -29,13 +29,13 @@ ListNtwk::ListNtwk(MagMgr* mgr) :
 }
 
 // @brief デストラクタ
-ListNtwk::~ListNtwk()
+ListNetwork::~ListNetwork()
 {
 }
 
 // コマンドを実行する．
 int
-ListNtwk::cmd_proc(TclObjVector& objv)
+ListNetwork::cmd_proc(TclObjVector& objv)
 {
   // @xxx という形のネットワークもリストするかどうか
   bool all = mPoptAll->is_specified();

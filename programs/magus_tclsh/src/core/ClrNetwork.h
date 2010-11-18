@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class ClrNtwk ClrNetwork.h "ClrNetwork.h"
+/// @class ClrNetwork ClrNetwork.h "ClrNetwork.h"
 /// @brief ネットワークの内容をクリアするコマンド
 //////////////////////////////////////////////////////////////////////
-class ClrNtwk :
+class ClrNetwork :
   public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  ClrNtwk(MagMgr* mgr);
+  ClrNetwork(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~ClrNtwk();
+  ~ClrNetwork();
 
 
 protected:

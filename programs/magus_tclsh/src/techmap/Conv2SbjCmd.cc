@@ -11,6 +11,9 @@
 
 #include "Conv2SbjCmd.h"
 #include "ym_bnet/BNet2Sbj.h"
+#include "ym_mvn/Mvn2Sbj.h"
+#include "ym_mvn/MvMgr.h"
+#include "ym_mvn/MvNodeMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -40,24 +43,35 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  try {
-    ostringstream err_out;
-    BNetwork& src_network = *cur_network();
-    BNet2Sbj conv;
-    bool stat = conv(src_network, sbjgraph(), err_out);
-    TclObj emsg = err_out.str();
-    set_result(emsg);
-    return stat ? TCL_OK : TCL_ERROR;
-  }
-  catch ( AssertError x ) {
-    cerr << x << endl;
-    TclObj emsg;
-    emsg << "Assertion Error";
-    set_result(emsg);
-    return TCL_ERROR;
+  bool stat = false;
+  NetHandle* neth = cur_nethandle();
+  switch ( neth->type() ) {
+  case NetHandle::kMagBNet:
+    {
+      ostringstream err_out;
+      const BNetwork& src_network = *neth->bnetwork();
+      BNet2Sbj conv;
+      stat = conv(src_network, sbjgraph(), err_out);
+      TclObj emsg = err_out.str();
+      set_result(emsg);
+    }
+    break;
+
+  case NetHandle::kMagBdn:
+    break;
+
+  case NetHandle::kMagMvn:
+    {
+      const MvMgr& mgr = *neth->mvn();
+      MvNodeMap mvnode_map(mgr.max_node_id());
+      Mvn2Sbj conv;
+
+      conv(mgr, sbjgraph(), mvnode_map);
+    }
+    break;
   }
 
-  return TCL_OK;
+  return stat ? TCL_OK : TCL_ERROR;
 }
 
 END_NAMESPACE_MAGUS_TECHMAP

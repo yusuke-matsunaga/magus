@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "MagCmd.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
 
@@ -39,7 +39,7 @@ struct LutmapData
 /// @brief LUTマッピングを行うコマンドの基底クラス
 //////////////////////////////////////////////////////////////////////
 class LutmapCmd :
-  public MagBNetCmd
+  public MagCmd
 {
 public:
 

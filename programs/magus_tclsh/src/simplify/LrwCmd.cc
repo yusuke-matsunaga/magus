@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS_SIMPLIFY
 
 // @brief コンストラクタ
 LrwCmd::LrwCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
 }
 

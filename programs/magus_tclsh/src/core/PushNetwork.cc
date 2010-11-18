@@ -19,20 +19,20 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PushNtwk::PushNtwk(MagMgr* mgr) :
-  ChgNtwk(mgr)
+PushNetwork::PushNetwork(MagMgr* mgr) :
+  ChgNetwork(mgr)
 {
   set_usage_string("<network-name>");
 }
 
 // @brief デストラクタ
-PushNtwk::~PushNtwk()
+PushNetwork::~PushNetwork()
 {
 }
 
 // コマンドを実行する．
 int
-PushNtwk::cmd_proc(TclObjVector& objv)
+PushNetwork::cmd_proc(TclObjVector& objv)
 {
   size_t objc = objv.size();
   if ( objc != 2 ) {

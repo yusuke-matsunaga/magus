@@ -1,15 +1,15 @@
 
-/// @file magus/logbase/NtwkInfoCmd.cc
-/// @brief NtwkInfoCmd の実装ファイル
+/// @file magus/logbase/BNetInfoCmd.cc
+/// @brief BNetInfoCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NtwkInfoCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: BNetInfoCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "NtwkInfoCmd.h"
+#include "BNetInfoCmd.h"
 #include "ym_bnet/BNetwork.h"
 
 
@@ -20,8 +20,8 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NtwkInfo::NtwkInfo(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+BNetInfo::BNetInfo(MagMgr* mgr) :
+  BNetCmd(mgr)
 {
   const char* usage =
     "<ATTR> ?<value>?\n"
@@ -31,13 +31,13 @@ NtwkInfo::NtwkInfo(MagMgr* mgr) :
 }
 
 // @brief デストラクタ
-NtwkInfo::~NtwkInfo()
+BNetInfo::~BNetInfo()
 {
 }
 
 // コマンドを実行する．
 int
-NtwkInfo::cmd_proc(TclObjVector& objv)
+BNetInfo::cmd_proc(TclObjVector& objv)
 {
   size_t objc = objv.size();
   // このコマンドは属性を表す引数をとる．
@@ -148,20 +148,20 @@ NtwkInfo::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NtwkAllInfo::NtwkAllInfo(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+BNetAllInfo::BNetAllInfo(MagMgr* mgr) :
+  BNetCmd(mgr)
 {
   set_usage_string("<varname>");
 }
 
 // @brief デストラクタ
-NtwkAllInfo::~NtwkAllInfo()
+BNetAllInfo::~BNetAllInfo()
 {
 }
 
 // コマンドを実行する．
 int
-NtwkAllInfo::cmd_proc(TclObjVector& objv)
+BNetAllInfo::cmd_proc(TclObjVector& objv)
 {
   size_t objc = objv.size();
   // このコマンドは連想配列名のみを引数にとる．
@@ -212,19 +212,19 @@ NtwkAllInfo::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NtwkPrintStats::NtwkPrintStats(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+BNetPrintStats::BNetPrintStats(MagMgr* mgr) :
+  BNetCmd(mgr)
 {
 }
 
 // @brief デストラクタ
-NtwkPrintStats::~NtwkPrintStats()
+BNetPrintStats::~BNetPrintStats()
 {
 }
 
 // コマンド処理関数
 int
-NtwkPrintStats::cmd_proc(TclObjVector& objv)
+BNetPrintStats::cmd_proc(TclObjVector& objv)
 {
   BNetwork* network = cur_network();
   TclObj msg;

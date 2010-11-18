@@ -1,8 +1,8 @@
 #ifndef MAGUS_MAGMVNCMD_H
 #define MAGUS_MAGMVNCMD_H
 
-/// @file MagMvnCmd.h
-/// @brief MagMvnCmd のヘッダファイル
+/// @file MvnCmd.h
+/// @brief MvnCmd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -19,21 +19,21 @@
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class MagMvnCmd MagMvnCmd.h "MagMvnCmd.h"
+/// @class MvnCmd MvnCmd.h "MvnCmd.h"
 /// @ingroup MagusGroup
 /// @brief MvNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
-class MagMvnCmd :
+class MvnCmd :
   public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  MagMvnCmd(MagMgr* mgr);
+  MvnCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~MagMvnCmd();
+  ~MvnCmd();
 
 
 protected:

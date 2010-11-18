@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_MAGUS
 // @brief コンストラクタ
 LutmapCmd::LutmapCmd(MagMgr* mgr,
 		     LutmapData* data) :
-  MagBNetCmd(mgr),
+  MagCmd(mgr),
   mData(data)
 {
 }

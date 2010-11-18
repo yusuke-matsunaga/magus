@@ -26,11 +26,11 @@ class CopyNetwork :
 public:
 
   /// @brief コンストラクタ
-  CopyNtwk(MagMgr* mgr);
+  CopyNetwork(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~CopyNtwk();
+  ~CopyNetwork();
 
 
 protected:

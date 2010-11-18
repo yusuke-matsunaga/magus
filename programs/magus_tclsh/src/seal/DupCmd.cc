@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 DupCmd::DupCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   set_usage_string("node_num[=INT]");
 }
@@ -144,10 +144,10 @@ DupCmd::cmd_proc(TclObjVector& objv)
     // たぶんエラー
     return stat;
   }
-  
+
   BNetwork& network = *cur_network();
   BNetManip manip(&network);
-  
+
   // 多重化するノードのリストを作る．
   BNodeVector node_list;
   network.tsort(node_list);
@@ -167,7 +167,7 @@ DupCmd::cmd_proc(TclObjVector& objv)
     }
 #endif
   }
-  
+
   for (vector<BNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BNode* node = *p;
@@ -182,7 +182,7 @@ DupCmd::cmd_proc(TclObjVector& objv)
     BNode* node1 = manip.new_logic();
     bool stat = manip.change_logic(node1, lexp, fanins);
     assert_cond(stat, __FILE__, __LINE__);
-    
+
     // ファンアウトを修正する．
     for (BNodeFoList::const_iterator p = node->fanouts_begin();
 	 p != node->fanouts_end(); ++ p) {

@@ -1,54 +1,44 @@
 
-/// @file src/bnet/NewBNetwork.cc
-/// @brief src/bnet/NewBNetwork の実装ファイル
+/// @file src/core/NewMvn.cc
+/// @brief NewMvn の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NtwkBaseCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: NewMvn.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "NtwkBaseCmd.h"
-//#include "MagMgr.h"
-//#include "NetHandle.h"
-#include "ym_tclpp/TclPopt.h"
+#include "NewMvn.h"
+#include "MagMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// 新しい BNetwork を作成するコマンド
+// 新しいネットワークを作成するコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NewBNetwork::NewBNetwork(MagMgr* mgr) :
+NewMvn::NewMvn(MagMgr* mgr) :
   MagCmd(mgr)
 {
-  mPoptTrace = new TclPoptBool(this, "trace",
-			       "set network trace");
   set_usage_string("?<network-name>?");
 }
 
 // @brief デストラクタ
-NewBNetwork::~NewBNetwork()
+NewMvn::~NewMvn()
 {
 }
 
 // コマンドを実行する．
 int
-NewBNetwork::cmd_proc(TclObjVector& objv)
+NewMvn::cmd_proc(TclObjVector& objv)
 {
-  // trace を付けるかどうか(デフォルトでは付ける)
-  bool trace = true;
   // ネットワーク名
   string name;
 
-  if ( mPoptTrace->is_specified() ) {
-    trace = mPoptTrace->val();
-  }
-
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc > 2 ) {
     // 引数が多すぎる．
     print_usage();
@@ -67,15 +57,11 @@ NewBNetwork::cmd_proc(TclObjVector& objv)
       set_result("No more available name for temporary network.");
       return TCL_ERROR;
     }
-    // 名無しのネットワークにはデフォルトではトレースを付けない．
-    if ( mPoptTrace->count() == 0 ) {
-      trace = false;
-    }
   }
 
-  // 新たなネットワークを生成し，登録する．
-  NetHandle* neth = new_bnethandle(name);
-  if ( neth == NULL ) {
+  // 新たなネットワークを生成する．
+  NetHandle* neth = new_mvnhandle(name);
+  if ( !neth ) {
     // 何らかのエラーが起こった．
     return TCL_ERROR;
   }

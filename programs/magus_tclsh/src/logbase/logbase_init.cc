@@ -26,24 +26,6 @@ logbase_init(Tcl_Interp* interp,
   // コマンドの登録
   //////////////////////////////////////////////////////////////////////
 
-  // ネットワークの生成／削除／複写コマンド
-  TclCmdBinder1<NewBNetwork, MagMgr*>::reg(interp, mgr,  "magus::new_bnetwork");
-  TclCmdBinder1<NewBdn, MagMgr*>::reg(interp, mgr,  "magus::new_bdnetwork");
-  TclCmdBinder1<NewMvn, MagMgr*>::reg(interp, mgr,  "magus::new_mvnetwork");
-  TclCmdBinder1<DelNtwk, MagMgr*>::reg(interp, mgr,  "magus::delete_network");
-  TclCmdBinder1<CopyNtwk, MagMgr*>::reg(interp, mgr, "magus::::copy_network");
-  TclCmdBinder1<ClrNtwk, MagMgr*>::reg(interp, mgr,  "magus::::clear_network");
-
-  // 操作対象のネットワークを指定するコマンド
-  TclCmdBinder1<PushNtwk, MagMgr*>::reg(interp, mgr, "magus::push_current_network");
-  TclCmdBinder1<PopNtwk, MagMgr*>::reg(interp, mgr,  "magus::pop_current_network");
-  TclCmdBinder1<ChgNtwk, MagMgr*>::reg(interp, mgr, "magus::change_current_network");
-  TclCmdBinder1<CurNtwk, MagMgr*>::reg(interp, mgr,  "magus::current_network");
-
-  // ネットワーク名の列挙を行うコマンド
-  TclCmdBinder1<ListNtwk, MagMgr*>::reg(interp, mgr, "magus::network_list");
-  TclCmdBinder1<ForNtwk, MagMgr*>::reg(interp, mgr,  "magus::foreach_network");
-
   // ネットワークのファイル入出力コマンド
   TclCmdBinder1<MvnReadVerilog, MagMgr*>::reg(interp, mgr, "magus::read_verilog");
 
@@ -66,19 +48,6 @@ logbase_init(Tcl_Interp* interp,
     return TCL_ERROR;
   }
 
-  // デフォルトネットワークを作成する．
-  if ( Tcl_Eval(interp, "magus::new_bnetwork default_network")
-       == TCL_ERROR ) {
-    return TCL_ERROR;
-  }
-
-  // それをカレントネットワークにする．
-  if ( Tcl_Eval(interp, "magus::push_current_network default_network")
-      == TCL_ERROR ) {
-    return TCL_ERROR;
-  }
-
-
   //////////////////////////////////////////////////////////////////////
   // tclreadline 用の処理
   // すごい手抜き
@@ -86,22 +55,6 @@ logbase_init(Tcl_Interp* interp,
   const char* completer =
     "namespace eval tclreadline {\n"
     "namespace eval magus {\n"
-    "proc complete(stopwatch) { t s e l p m } { return \"\" }\n"
-    "proc complete(time) { t s e l p m } { return \"\" }\n"
-    "proc complete(random) { t s e l p m } { return \"\" }\n"
-    "proc complete(new_bnetwork) { t s e l p m } { return \"\" }\n"
-    "proc complete(new_bdnetwork) { t s e l p m } { return \"\" }\n"
-    "proc complete(new_mvnetwork) { t s e l p m } { return \"\" }\n"
-    "proc complete(delete_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(copy_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(clear_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(push_current_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(pop_current_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(change_current_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(current_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(network_list) { t s e l p m } { return \"\" }\n"
-    "proc complete(foreach_network) { t s e l p m } { return \"\" }\n"
-    "proc complete(network_trace) { t s e l p m } { return \"\" }\n"
     "proc complete(read_verilog) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";

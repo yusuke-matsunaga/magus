@@ -1,7 +1,7 @@
 #ifndef MAGUS_MAGBNETCMD_H
 #define MAGUS_MAGBNETCMD_H
 
-/// @file MagBNetCmd.h
+/// @file BNetCmd.h
 /// @brief MagCmd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
@@ -19,21 +19,21 @@
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class MagBNetCmd MagBNetCmd.h "MagBNetCmd.h"
+/// @class BNetCmd BNetCmd.h "BNetCmd.h"
 /// @ingroup MagusGroup
 /// @brief BNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
-class MagBNetCmd :
+class BNetCmd :
   public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  MagBNetCmd(MagMgr* mgr);
+  BNetCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~MagBNetCmd();
+  ~BNetCmd();
 
 
 protected:

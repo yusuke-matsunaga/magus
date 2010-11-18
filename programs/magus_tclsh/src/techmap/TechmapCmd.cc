@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 // @brief コンストラクタ
 TechmapCmd::TechmapCmd(MagMgr* mgr,
 		       TechmapData* data) :
-  MagBNetCmd(mgr),
+  MagCmd(mgr),
   mData(data)
 {
 }

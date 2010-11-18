@@ -1,8 +1,8 @@
-#ifndef SRC_CORE_PUSHNETWORK_H
-#define SRC_CORE_PUSHNETWORK_H
+#ifndef SRC_CORE_NEWMVN_H
+#define SRC_CORE_NEWMVN_H
 
-/// @file src/core/PushNetwork.h
-/// @brief PushNetwork のヘッダファイル
+/// @file src/core/NewMvn.h
+/// @brief NewMvn のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: NtwkBaseCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
@@ -11,26 +11,26 @@
 /// All rights reserved.
 
 
-#include "ChgNetwork.h"
+#include "MagCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class PushNetwork PushNetwork.h "PushNetwork.h"
-/// @brief カレントネットワークスタックにプッシュするコマンド
+/// @class NewMvn NewMvn.h "NewMvn.h"
+/// @brief 新しいネットワークを作成するコマンド
 //////////////////////////////////////////////////////////////////////
-class PushNetwork :
-  public ChgNetwork
+class NewMvn :
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  PushNetwork(MagMgr* mgr);
+  NewMvn(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~PushNetwork();
+  ~NewMvn();
 
 
 protected:
@@ -40,8 +40,14 @@ protected:
   int
   cmd_proc(TclObjVector& objv);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
 };
 
 END_NAMESPACE_MAGUS
 
-#endif // SRC_CORE_PUSHNETWORK_H
+#endif // SRC_CORE_NEWMVN_H

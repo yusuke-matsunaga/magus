@@ -1,36 +1,36 @@
-#ifndef MAGUS_LOGBASE_NTWKINFOCMD_H
-#define MAGUS_LOGBASE_NTWKINFOCMD_H
+#ifndef MAGUS_LOGBASE_BNETINFOCMD_H
+#define MAGUS_LOGBASE_BNETINFOCMD_H
 
-/// @file magus/logbase/NtwkInfoCmd.h
+/// @file magus/logbase/BNetInfoCmd.h
 /// @brief ネットワークの情報を取得するコマンドのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NtwkInfoCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: BNetInfoCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class NtwkInfo NtwkInfoCmd.h "NtwkInfoCmd.h"
+/// @class BNetInfo BNetInfoCmd.h "BNetInfoCmd.h"
 /// @brief ネットワークの諸元を取り出すコマンド
 //////////////////////////////////////////////////////////////////////
-class NtwkInfo :
-  public MagBNetCmd
+class BNetInfo :
+  public BNetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  NtwkInfo(MagMgr* mgr);
+  BNetInfo(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~NtwkInfo();
+  ~BNetInfo();
 
 
 protected:
@@ -44,20 +44,20 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class NtwkAllInfo NtwkInfoCmd.h "NtwkInfoCmd.h"
+/// @class BNetAllInfo BNetInfoCmd.h "BNetInfoCmd.h"
 /// @brief ネットワークの諸元を一括して取り出して連想配列に入れるコマンド
 //////////////////////////////////////////////////////////////////////
-class NtwkAllInfo :
-  public MagBNetCmd
+class BNetAllInfo :
+  public BNetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  NtwkAllInfo(MagMgr* mgr);
+  BNetAllInfo(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~NtwkAllInfo();
+  ~BNetAllInfo();
 
 
 protected:
@@ -71,20 +71,20 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class NtwkPrintStats NtwkInfoCmd.h "NtwkInfoCmd.h"
+/// @class BNetPrintStats BNetInfoCmd.h "BNetInfoCmd.h"
 /// @brief ネットワークの緒元を出力するコマンド
 //////////////////////////////////////////////////////////////////////
-class NtwkPrintStats :
-  public MagBNetCmd
+class BNetPrintStats :
+  public BNetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  NtwkPrintStats(MagMgr* mgr);
+  BNetPrintStats(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~NtwkPrintStats();
+  ~BNetPrintStats();
 
 
 protected:
@@ -97,4 +97,4 @@ protected:
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_LOGBASE_NTWKINFOCMD_H
+#endif // MAGUS_LOGBASE_BNETINFOCMD_H

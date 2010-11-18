@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagMvnCmd.h"
+#include "MvnCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief verilog ファイルを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
 class MvnReadVerilog :
-  public MagMvnCmd
+  public MvnCmd
 {
 public:
 

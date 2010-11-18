@@ -1,15 +1,15 @@
 
-/// @file magus/logbase/NtwkIoCmd.cc
-/// @brief NtwkIoCmd の実装ファイル
+/// @file magus/logbase/BNetIoCmd.cc
+/// @brief BNetIoCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NtwkIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "NtwkIoCmd.h"
+#include "BNetIoCmd.h"
 
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetBlifWriter.h"
@@ -74,7 +74,7 @@ TclObjMsgHandler::msg_obj() const
 
 // @brief コンストラクタ
 ReadBlif::ReadBlif(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mReader.add_msg_handler(&mMsgHandler);
   set_usage_string("<filename>");
@@ -155,7 +155,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 ReadIscas89::ReadIscas89(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mReader.add_msg_handler(&mMsgHandler);
   set_usage_string("<filename>");
@@ -223,7 +223,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 WriteBlif::WriteBlif(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   set_usage_string("?<filename>?");
 }
@@ -292,7 +292,7 @@ WriteBlif::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 WriteEqu::WriteEqu(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   set_usage_string("?<filename>?");
 }
@@ -353,7 +353,7 @@ WriteEqu::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 WriteVerilog::WriteVerilog(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   set_usage_string("?<filename>?");
 }

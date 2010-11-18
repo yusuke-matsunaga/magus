@@ -10,21 +10,16 @@ INCLUDES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libmagus_logbase_tcl.la
+noinst_LTLIBRARIES = libmagus_bnet_tcl.la
 
-libmagus_logbase_tcl_la_LIBADD = \
+libmagus_bnet_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
-libmagus_logbase_tcl_la_LDFLAGS =
-libmagus_logbase_tcl_la_SOURCES = \
+libmagus_bnet_tcl_la_LDFLAGS =
+libmagus_bnet_tcl_la_SOURCES = \
 	BNetCmd.cc \
-	NewBNetwork.h \
-	NewBNetwork.cc \
 	BNetNodeCmd.h \
 	BNetNodeCmd.cc \
-	BNetBaseCmd.h \
-	BNetBaseCmd.cc \
 	BNetInfoCmd.h \
 	BNetInfoCmd.cc \
 	BNetIoCmd.h \

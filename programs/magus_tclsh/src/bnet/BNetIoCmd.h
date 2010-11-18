@@ -1,17 +1,17 @@
-#ifndef MAGUS_LOGBASE_NTWKIOCMD_H
-#define MAGUS_LOGBASE_NTWKIOCMD_H
+#ifndef MAGUS_LOGBASE_BNETIOCMD_H
+#define MAGUS_LOGBASE_BNETIOCMD_H
 
-/// @file magus/logbase/NtwkIoCmd.h
+/// @file magus/logbase/BNetIoCmd.h
 /// @brief ネットワーク入出力コマンドのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NtwkIoCmd.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: BNetIoCmd.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetIscas89Reader.h"
@@ -20,7 +20,7 @@
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclObjMsgHandler NtwkIoCmd.h "NtwkIoCmd.h"
+/// @class TclObjMsgHandler BNetIoCmd.h "BNetIoCmd.h"
 /// @brief TclObj に出力するメッセージハンドラ
 //////////////////////////////////////////////////////////////////////
 class TclObjMsgHandler :
@@ -76,11 +76,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ReadBlif NtwkIoCmd.h "NtwkIoCmd.h"
+/// @class ReadBlif BNetIoCmd.h "BNetIoCmd.h"
 /// @brief blif 形式のファイルを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
 class ReadBlif :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -115,11 +115,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ReadIscas89 NtwkIoCmd.h "NtwkIoCmd.h"
+/// @class ReadIscas89 BNetIoCmd.h "BNetIoCmd.h"
 /// @brief iscas89 形式のファイルを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
 class ReadIscas89 :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -154,11 +154,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class WriteBlif NtwkIoCmd.h "NtwkIoCmd.h"
+/// @class WriteBlif BNetIoCmd.h "BNetIoCmd.h"
 /// @brief ファイルに blif 形式で書き出すコマンド
 //////////////////////////////////////////////////////////////////////
 class WriteBlif :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -181,11 +181,11 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class WriteEqu NtwkIoCmd.h "NtwkIoCmd.h"
+/// @class WriteEqu BNetIoCmd.h "BNetIoCmd.h"
 /// @brief ファイルに EQU 形式で書き出すコマンド
 //////////////////////////////////////////////////////////////////////
 class WriteEqu :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -208,11 +208,11 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class WriteVerilog NtwkIoCmd.h "NtwkIoCmd.h"
+/// @class WriteVerilog BNetIoCmd.h "BNetIoCmd.h"
 /// @brief ファイルに Verilog 形式で書き出すコマンド
 //////////////////////////////////////////////////////////////////////
 class WriteVerilog :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
@@ -235,4 +235,4 @@ protected:
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_LOGBASE_NTWKIOCMD_H
+#endif // MAGUS_LOGBASE_BNETIOCMD_H

@@ -1,6 +1,6 @@
 
-/// @file magus/logbase/NodeCmd.cc
-/// @brief NodeCmd の実装ファイル
+/// @file magus/logbase/BNetNodeCmd.cc
+/// @brief BNetNodeCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: NodeCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "NodeCmd.h"
+#include "BNetNodeCmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "ym_bnet/BNetwork.h"
 
@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 NodeCmd::NodeCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mPoptGlob = new TclPopt(this, "glob",
 			  "glob matching");

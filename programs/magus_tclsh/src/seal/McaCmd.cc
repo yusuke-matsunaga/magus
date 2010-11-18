@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 McaCmd::McaCmd(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mPoptBdd = new TclPopt(this, "use_bdd",
 			 "use BDD");
@@ -28,7 +28,7 @@ McaCmd::McaCmd(MagMgr* mgr) :
   mPoptRestore = new TclPoptStr(this, "restore",
 				"restore transition probability",
 				"<probability filename>");
-  
+
   mPoptKiss = new TclPoptStr(this, "kiss",
 			     "specify KISS file",
 			     "<file-name>");
@@ -50,12 +50,12 @@ McaCmd::cmd_proc(TclObjVector& objv)
     print_usage();
     return TCL_ERROR;
   }
-  
+
   BNetwork* bnetwork = cur_network();
   vector<State> init_states;
   bool use_bdd = false;
   bool dump_trans = false;
-  
+
   if ( mPoptBdd->is_specified() ) {
     use_bdd = true;
   }
@@ -108,11 +108,11 @@ McaCmd::cmd_proc(TclObjVector& objv)
     }
     init_states.push_back(s);
   }
-  
+
   nsSeal::MCAnalysis mca;
-  
+
   mca.analyze(*bnetwork, init_states, use_bdd, dump_trans);
-  
+
   return TCL_OK;
 }
 
@@ -122,13 +122,13 @@ McaCmd::read_kiss(ifstream &fi,
 {
   string tmp;
 
-  fi >> tmp >> tmp >> tmp; 
-  
+  fi >> tmp >> tmp >> tmp;
+
   ymuint input_num;
   ymuint output_num;
   ymuint state_num;
   ymuint product_num;
-  
+
   fi >> tmp >> input_num;
   fi >> tmp >> output_num;
   fi >> tmp >> state_num;

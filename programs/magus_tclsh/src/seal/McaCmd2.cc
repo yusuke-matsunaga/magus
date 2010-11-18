@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 McaCmd2::McaCmd2(MagMgr* mgr) :
-  MagBNetCmd(mgr)
+  BNetCmd(mgr)
 {
   mPoptKiss = new TclPoptStr(this, "kiss",
 			     "specify KISS file",
@@ -44,10 +44,10 @@ McaCmd2::cmd_proc(TclObjVector& objv)
     print_usage();
     return TCL_ERROR;
   }
-  
+
   BNetwork* bnetwork = cur_network();
   ymuint ff_num = bnetwork->latch_node_num();
-  
+
   //オプション解析
   bool ffpo_flag = false;
   if ( mPoptFFPO->is_specified() ) {
@@ -72,7 +72,7 @@ McaCmd2::cmd_proc(TclObjVector& objv)
       reset_state += "0";
     }
   }
-    
+
   vector<State> init_states;
   if ( mPoptKiss->is_specified() ) {
     string file_name = mPoptKiss->val();
@@ -95,10 +95,10 @@ McaCmd2::cmd_proc(TclObjVector& objv)
   else {
     init_states.push_back(reset_state);
   }
-  
+
   nsSeal::MCAnalysis mca;
   mca.analyze(*bnetwork, init_states);
-  
+
   return TCL_OK;
 }
 
@@ -108,13 +108,13 @@ McaCmd2::read_kiss(ifstream &fi,
 {
   string tmp;
 
-  fi >> tmp >> tmp >> tmp; 
-  
+  fi >> tmp >> tmp >> tmp;
+
   ymuint input_num;
   ymuint output_num;
   ymuint state_num;
   ymuint product_num;
-  
+
   fi >> tmp >> input_num;
   fi >> tmp >> output_num;
   fi >> tmp >> state_num;

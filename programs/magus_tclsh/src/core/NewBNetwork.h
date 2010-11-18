@@ -1,7 +1,7 @@
-#ifndef SRC_BNET_NEWBNETWORK_H
-#define SRC_BNET_NEWBNETWORK_H
+#ifndef SRC_CORE_NEWBNETWORK_H
+#define SRC_CORE_NEWBNETWORK_H
 
-/// @file src/bnet/NewBNetwork.h
+/// @file src/core/NewBNetwork.h
 /// @brief NewBNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,6 +10,7 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
+
 #include "MagCmd.h"
 
 
@@ -17,7 +18,7 @@ BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 /// @class NewBNetwork NewBNetwork.h "NewBNetwork.h"
-/// @brief 新しい BNetwork を作成するコマンド
+/// @brief 新しいネットワークを作成するコマンド
 //////////////////////////////////////////////////////////////////////
 class NewBNetwork :
   public MagCmd
@@ -45,11 +46,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // trace オプション解析用オブジェクト
-  TclPoptBool* mPoptTrace;
-
 };
 
 END_NAMESPACE_MAGUS
 
-#endif // SRC_BNET_NEWBNETWORK_H
+#endif // SRC_CORE_NEWBNETWORK_H

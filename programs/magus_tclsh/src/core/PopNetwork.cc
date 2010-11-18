@@ -19,19 +19,19 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PopNtwk::PopNtwk(MagMgr* mgr) :
+PopNetwork::PopNetwork(MagMgr* mgr) :
   MagCmd(mgr)
 {
 }
 
 // @brief デストラクタ
-PopNtwk::~PopNtwk()
+PopNetwork::~PopNetwork()
 {
 }
 
 // コマンドを実行する．
 int
-PopNtwk::cmd_proc(TclObjVector& objv)
+PopNetwork::cmd_proc(TclObjVector& objv)
 {
   size_t objc = objv.size();
   if ( objc != 1 && objc != 4 ) {

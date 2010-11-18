@@ -12,7 +12,7 @@
 
 // ノードに対して処理を行うコマンド
 
-#include "NodeCmd.h"
+#include "BNetNodeCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief ノードの諸元を取り出すコマンド
 //////////////////////////////////////////////////////////////////////
 class NodeInfo :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 

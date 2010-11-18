@@ -13,7 +13,7 @@
 // ノードを扱うコマンドオブジェクト
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 // 複数のノードに対して処理を行うコマンドの親クラス
 //////////////////////////////////////////////////////////////////////
 class NodeCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
