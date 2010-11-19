@@ -21,8 +21,8 @@ BEGIN_NAMESPACE_MAGUS_SIMPLIFY
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LrwCmd::LrwCmd(NetMgr* mgr) :
-  MagBNetCmd(mgr)
+LrwCmd::LrwCmd(MagMgr* mgr) :
+  BNetCmd(mgr)
 {
 }
 
@@ -35,7 +35,7 @@ LrwCmd::~LrwCmd()
 int
 LrwCmd::cmd_proc(TclObjVector& objv)
 {
-  BNetwork& network = *cur_nethandle()->bnetwork();
+  BNetwork& network = *cur_nethandle()->_bnetwork();
   BNetManip manip(&network);
 
   return TCL_OK;

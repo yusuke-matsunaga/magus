@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "BaseCmd.h"
+#include "MagCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -20,12 +20,12 @@ BEGIN_NAMESPACE_MAGUS
 // Network を読んで出力するテストコマンド
 //////////////////////////////////////////////////////////////////////
 class TestCmd :
-  public BaseCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  TestCmd(NetMgr* mgr);
+  TestCmd(MagMgr* mgr);
   
 
 protected:

@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "MagCmd.h"
+#include "ym_sbj/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
 
 
@@ -39,12 +39,12 @@ struct LutmapData
 /// @brief LUTマッピングを行うコマンドの基底クラス
 //////////////////////////////////////////////////////////////////////
 class LutmapCmd :
-  public MagBNetCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  LutmapCmd(NetMgr* mgr,
+  LutmapCmd(MagMgr* mgr,
 	    LutmapData* data);
 
   /// @brief デストラクタ
@@ -83,7 +83,7 @@ class Conv2SbjCmd :
 public:
 
   /// @brief コンストラクタ
-  Conv2SbjCmd(NetMgr* mgr,
+  Conv2SbjCmd(MagMgr* mgr,
 	      LutmapData* data);
 
   /// @brief デストラクタ
@@ -111,7 +111,7 @@ class ReadVerilogCmd :
 public:
 
   /// @brief コンストラクタ
-  ReadVerilogCmd(NetMgr* mgr,
+  ReadVerilogCmd(MagMgr* mgr,
 		 LutmapData* data);
 
   /// @brief デストラクタ
@@ -139,7 +139,7 @@ class DumpSbjCmd :
 public:
 
   /// @brief コンストラクタ
-  DumpSbjCmd(NetMgr* mgr,
+  DumpSbjCmd(MagMgr* mgr,
 	     LutmapData* data);
 
   /// @brief デストラクタ
@@ -170,95 +170,6 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AreaMapCmd LutmapCmd "LutmapCmd.h"
-/// @brief area map コマンド
-//////////////////////////////////////////////////////////////////////
-class AreaMapCmd :
-  public LutmapCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  AreaMapCmd(NetMgr* mgr,
-	     LutmapData* data);
-
-  /// @brief デストラクタ
-  virtual
-  ~AreaMapCmd();
-
-
-protected:
-
-  /// @brief コマンドを実行する仮想関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // method オプションの解析用オブジェクト
-  TclPoptStr* mPoptMethod;
-
-  // resub オプションの解析用オブジェクト
-  TclPopt* mPoptResub;
-
-  // verbose オプションの解析用オブジェクト
-  TclPopt* mPoptVerbose;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class DelayMapCmd LutmapCmd "LutmapCmd.h"
-/// @brief delay map コマンド
-//////////////////////////////////////////////////////////////////////
-class DelayMapCmd :
-  public LutmapCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  DelayMapCmd(NetMgr* mgr,
-	      LutmapData* data);
-
-  /// @brief デストラクタ
-  virtual
-  ~DelayMapCmd();
-
-
-protected:
-
-  /// @brief コマンドを実行する仮想関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // method オプションの解析用オブジェクト
-  TclPoptStr* mPoptMethod;
-
-  // slack オプションの解析用オブジェクト
-  TclPoptInt* mPoptSlack;
-
-  // resub オプションの解析用オブジェクト
-  TclPopt* mPoptResub;
-
-  // verbose オプションの解析用オブジェクト
-  TclPopt* mPoptVerbose;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class DumpLutCmd LutmapCmd "LutmapCmd.h"
 /// @brief LutNetwork の内容をダンプするコマンド
 //////////////////////////////////////////////////////////////////////
@@ -268,7 +179,7 @@ class DumpLutCmd :
 public:
 
   /// @brief コンストラクタ
-  DumpLutCmd(NetMgr* mgr,
+  DumpLutCmd(MagMgr* mgr,
 	     LutmapData* data);
 
   /// @brief デストラクタ
@@ -292,7 +203,6 @@ private:
   // verilog オプションの解析用オブジェクト
   TclPopt* mPoptVerilog;
 
-
 };
 
 
@@ -306,7 +216,7 @@ class NodeSubstCmd :
 public:
 
   /// @brief コンストラクタ
-  NodeSubstCmd(NetMgr* mgr,
+  NodeSubstCmd(MagMgr* mgr,
 	       LutmapData* data);
 
   /// @brief デストラクタ
@@ -343,7 +253,7 @@ class NodeMergeCmd :
 public:
 
   /// @brief コンストラクタ
-  NodeMergeCmd(NetMgr* mgr,
+  NodeMergeCmd(MagMgr* mgr,
 	       LutmapData* data);
 
   /// @brief デストラクタ
@@ -380,7 +290,7 @@ class Conv2BNetCmd :
 public:
 
   /// @brief コンストラクタ
-  Conv2BNetCmd(NetMgr* mgr,
+  Conv2BNetCmd(MagMgr* mgr,
 	      LutmapData* data);
 
   /// @brief デストラクタ
@@ -417,7 +327,7 @@ class WriteVqmCmd :
 public:
 
   /// @brief コンストラクタ
-  WriteVqmCmd(NetMgr* mgr,
+  WriteVqmCmd(MagMgr* mgr,
 	      LutmapData* data);
 
   /// @brief デストラクタ
@@ -445,7 +355,7 @@ class GenIlpCmd :
 public:
 
   /// @brief コンストラクタ
-  GenIlpCmd(NetMgr* mgr,
+  GenIlpCmd(MagMgr* mgr,
 	    LutmapData* data);
 
   /// @brief デストラクタ

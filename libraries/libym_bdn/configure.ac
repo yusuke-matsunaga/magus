@@ -5,7 +5,7 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([libym_bdn], [1.0], 
+AC_INIT([libym_bdn], [1.0],
         [yusuke_matsunaga@ieee.org],
         [libym_bdn])dnl
 
@@ -20,8 +20,8 @@ All rights reserved.
 
 AC_CONFIG_SRCDIR([ym_bdn/bdn_nsdef.h])dnl
 
-AC_CONFIG_AUX_DIR([../../config])dnl
-AC_CONFIG_MACRO_DIR([../../config])dnl
+AC_CONFIG_AUX_DIR([config])dnl
+AC_CONFIG_MACRO_DIR([config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl

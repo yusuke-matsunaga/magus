@@ -24,9 +24,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-#LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
+LIBYM_LUTMAP = $(YMTOOLS_BUILDDIR)/libraries/libym_lutmap/libym_lutmap.la
+LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
-#bin_PROGRAMS = \
-#	makenode \
-#	bliftest \
-#	iscas89test
+bin_PROGRAMS =

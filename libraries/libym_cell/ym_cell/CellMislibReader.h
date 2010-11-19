@@ -12,9 +12,12 @@
 
 
 #include "ym_cell/cell_type.h"
+#include "ym_utils/MsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_CELL
+
+class MislibParser;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellMislibReader CellMislibReader.h <ym_cell/CellMislibReader.h>
@@ -31,26 +34,31 @@ public:
   /// @brief デストラクタ
   ~CellMislibReader();
 
-  
+
 public:
 
-  /// @brief mislib 形式のファイルを読み込む
-  /// @param[in] in 入力元のストリーム
+  /// @brief mislib 形式のファイルを読み込んでライブラリを生成する．
   /// @param[in] filename ファイル名
-  /// @param[out] library 読み込んだ内容を設定するネットワーク
-  /// @retval true 正常に読み込めた
-  /// @retval false 読み込み中にエラーが起こった．
-  bool
-  read(istream& in,
-       const string& filename,
-       CellLibrary& library);
+  /// @return 読み込んで作成したセルライブラリを返す．
+  /// @note エラーが起きたら NULL を返す．
+  const CellLibrary*
+  read(const string& filename);
 
   /// @brief メッセージハンドラを付加する．
   void
   add_msg_handler(MsgHandler* msg_handler);
-  
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // mislib のパーサー
+  MislibParser* mParser;
+
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_CELL
 
 #endif // YM_CELL_CELLMISLIBREADER_H

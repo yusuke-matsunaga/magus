@@ -12,6 +12,7 @@
 
 
 #include "ymtools.h"
+#include "ym_sbj/sbj_nsdef.h"
 #include "ym_utils/DlList.h"
 
 
@@ -27,13 +28,6 @@ END_NAMESPACE_YM
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-class SbjGraph;
-class SbjEdge;
-class SbjNode;
-
-typedef DlList<SbjEdge> SbjEdgeList;
-typedef DlList<SbjNode> SbjNodeList;
 
 class LnGraph;
 class LnEdge;
@@ -86,13 +80,6 @@ delay_map(const SbjGraph& sbjgraph,
 END_NAMESPACE_YM_LUTMAP
 
 BEGIN_NAMESPACE_YM
-
-using nsLutmap::SbjGraph;
-using nsLutmap::SbjEdge;
-using nsLutmap::SbjNode;
-
-using nsLutmap::SbjEdgeList;
-using nsLutmap::SbjNodeList;
 
 using nsLutmap::LnGraph;
 using nsLutmap::LnEdge;

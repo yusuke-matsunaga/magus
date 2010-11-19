@@ -10,7 +10,7 @@
 
 
 #include "AreaCover.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 #include "Cut.h"
 #include "MapRecord.h"
 
@@ -47,10 +47,10 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 		      ymuint& depth)
 {
   mMode = mode;
-  
+
   // カットを列挙する．
   mCutHolder.enum_cut(sbjgraph, limit);
-  
+
   // 最良カットを記録する．
   MapRecord maprec;
   record_cuts(sbjgraph, limit, maprec);
@@ -59,7 +59,7 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
     // cut resubstituion
     mCutResub(sbjgraph, mCutHolder, maprec);
   }
-  
+
   // 最終的なネットワークを生成する．
   maprec.gen_mapgraph(sbjgraph, mapnetwork, lut_num, depth);
 }
@@ -79,7 +79,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   mWeight.resize(limit);
 
   maprec.init(sbjgraph);
-  
+
   // 入力のコストを設定
   const SbjNodeList& input_list = sbjgraph.input_list();
   for (SbjNodeList::const_iterator p = input_list.begin();
@@ -102,7 +102,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
     for (CutListIterator p = cut_list.begin();
 	 p != cut_list.end(); ++ p) {
       const Cut* cut = *p;
-      
+
       ymuint ni = cut->ni();
       bool ng = false;
       for (ymuint i = 0; i < ni; ++ i) {
@@ -118,7 +118,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	// ファンアウトモード
 	for (ymuint i = 0; i < ni; ++ i) {
 	  const SbjNode* inode = cut->input(i);
-	  mWeight[i] = 1.0 / inode->n_fanout();
+	  mWeight[i] = 1.0 / inode->fanout_num();
 	}
       }
       else {
@@ -128,7 +128,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	}
 	calc_weight(node, cut, 1.0);
       }
-      
+
       double cur_cost = 1.0;
       for (ymuint i = 0; i < ni; ++ i) {
 	const SbjNode* inode = cut->input(i);
@@ -163,10 +163,10 @@ AreaCover::calc_weight(const SbjNode* node,
       }
     }
     const SbjNode* inode0 = node->fanin(0);
-    double cur_weight0 = cur_weight / inode0->n_fanout();
+    double cur_weight0 = cur_weight / inode0->fanout_num();
     calc_weight(inode0, cut, cur_weight0);
     node = node->fanin(1);
-    cur_weight /= node->n_fanout();
+    cur_weight /= node->fanout_num();
   }
 }
 
@@ -190,7 +190,7 @@ area_map(const SbjGraph& sbjgraph,
 	 ymuint& depth)
 {
   AreaCover area_cover;
-  
+
   area_cover(sbjgraph, limit, mode, mapnetwork, lut_num, depth);
 }
 

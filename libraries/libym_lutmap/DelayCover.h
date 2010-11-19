@@ -12,14 +12,13 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 #include "ADCost.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-class SbjNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DelayCover DelayCover.h "DelayCover.h"
@@ -37,7 +36,7 @@ public:
 
 
 public:
-  
+
   /// @brief 遅延最小化マッピングを行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] limit LUT の入力数
@@ -64,7 +63,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請けの関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] limit LUT の入力数
@@ -74,7 +73,7 @@ private:
 	      ymuint limit,
 	      ymuint slack,
 	      MapRecord& maprec);
-  
+
   // node のカットを記録する．
   void
   record(const SbjNode* node);
@@ -83,7 +82,7 @@ private:
   void
   select(const SbjNode* node,
 	 MapRecord& maprec);
-  
+
   // node から各入力にいたる経路の重みを計算する．
   void
   calc_weight(const SbjNode* node,
@@ -107,16 +106,16 @@ private:
     int mMinDepth;
     int mReqDepth;
   };
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // モード
   ymuint mMode;
-  
+
   // カットを保持するオブジェクト
   CutHolder mCutHolder;
 
@@ -125,16 +124,16 @@ private:
 
   // マッピング用の作業領域
   vector<NodeInfo> mNodeInfo;
-  
+
   // カットの葉の重みを入れる作業領域
   vector<double> mWeight;
-  
+
   // ADCost のメモリ管理用オブジェクト
   ADCostMgr<double> mCostMgr;
-  
+
   // カットの葉の ADCost の反復子を格納する配列
   vector<ADCostIterator<double> > mIcostLists;
-  
+
 };
 
 END_NAMESPACE_YM_LUTMAP

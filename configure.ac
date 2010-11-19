@@ -75,6 +75,7 @@ ym_libym_verilog_enable=1
 ym_libym_bnet_enable=1
 ym_libym_bdn_enable=1
 ym_libym_mvn_enable=1
+ym_libym_sbj_enable=1
 ym_libym_aig_enable=1
 ym_libym_tgnet_enable=1
 ym_libym_gds_enable=1
@@ -143,6 +144,11 @@ YM_BUILD_LIBRARY([libym_bdn],
 		 [ym_libym_utils_enable,
 		  ym_libym_lexp_enable])
 
+# libym_sbj
+YM_BUILD_LIBRARY([libym_sbj],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
+
 # libym_mvn
 YM_BUILD_LIBRARY([libym_mvn],
 		 [ym_libym_utils_enable])
@@ -173,12 +179,14 @@ YM_BUILD_LIBRARY([libym_cec],
 # libym_lutmap
 YM_BUILD_LIBRARY([libym_lutmap],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
+		  ym_libym_lexp_enable,
+		  ym_libym_sbj_enable])
 
 # libym_techmap
 YM_BUILD_LIBRARY([libym_techmap],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
+		  ym_libym_lexp_enable,
+		  ym_libym_sbj_enable])
 
 # libym_seal
 YM_BUILD_LIBRARY([libym_seal],

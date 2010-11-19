@@ -6,7 +6,7 @@
 # Initial block
 # ===================================================================
 AC_INIT([magus], [1.0],
-        [yusuke_matsunaga@ieee.org], 
+        [yusuke_matsunaga@ieee.org],
         [magus])dnl
 
 AC_REVISION($Rev: 2507 $)dnl
@@ -18,10 +18,10 @@ Copyright (C) 2007-2010 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-AC_CONFIG_SRCDIR([include/magus.h])dnl
+AC_CONFIG_SRCDIR([include/magus_nsdef.h])dnl
 
-AC_CONFIG_AUX_DIR([../../config])dnl
-AC_CONFIG_MACRO_DIR([../../config])dnl
+AC_CONFIG_AUX_DIR([config])dnl
+AC_CONFIG_MACRO_DIR([config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
@@ -134,9 +134,12 @@ AC_SUBST(MAGUS_BINDIR)dnl
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([src/logbase/Makefile])
+AC_CONFIG_FILES([src/core/Makefile])
+AC_CONFIG_FILES([src/bnet/Makefile])
+AC_CONFIG_FILES([src/mvn/Makefile])
 AC_CONFIG_FILES([src/equiv/Makefile])
 AC_CONFIG_FILES([src/lutmap/Makefile])
+AC_CONFIG_FILES([src/techmap/Makefile])
 AC_CONFIG_FILES([src/seal/Makefile])
 AC_CONFIG_FILES([src/simplify/Makefile])
 AC_CONFIG_FILES([src/misc/Makefile])

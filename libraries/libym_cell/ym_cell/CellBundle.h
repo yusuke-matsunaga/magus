@@ -12,7 +12,6 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/cell_type.h"
-#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -23,79 +22,38 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellBundle
 {
-  friend class CellManip;
-
-private:
+public:
 
   /// @brief コンストラクタ
-  CellBundle(ShString name,
-	     ymuint32 n_pin);
+  CellBundle() { }
 
   /// @brief デストラクタ
-  ~CellBundle();
-  
-  
+  virtual
+  ~CellBundle() { }
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 名前の取得
-  ShString
-  name() const;
+  virtual
+  string
+  name() const = 0;
 
   /// @brief ピン数の取得
-  ymuint32
-  n_pins() const;
+  virtual
+  ymuint
+  pin_num() const = 0;
 
   /// @brief ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < n_pins() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
+  virtual
   const CellPin*
-  pin(ymuint32 pos) const;
-  
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-  
-  // 名前
-  ShString mName;
-  
-  // ピンのリスト
-  vector<CellPin*> mPinList;
+  pin(ymuint pos) const = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 名前の取得
-inline
-ShString
-CellBundle::name() const
-{
-  return mName;
-}
-
-// @brief ピン数の取得
-inline
-ymuint32
-CellBundle::n_pins() const
-{
-  return mPinList.size();
-}
-
-// @brief ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < n_pins() )
-inline
-const CellPin*
-CellBundle::pin(ymuint32 pos) const
-{
-  return mPinList[pos];
-}
 
 END_NAMESPACE_YM_CELL
 

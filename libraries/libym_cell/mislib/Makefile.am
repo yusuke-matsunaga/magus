@@ -24,14 +24,15 @@ libym_cell_mislib_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_cell_mislib_la_LDFLAGS = 
+libym_cell_mislib_la_LDFLAGS =
 
 libym_cell_mislib_la_SOURCES = \
 	mislib_grammer.yy \
+	CellMislibReader.cc \
 	MislibLex.h \
 	MislibLex.cc \
-	MislibParserImpl.h \
-	MislibParserImpl.cc \
+	MislibParser.h \
+	MislibParser.cc \
 	MislibPt.h \
 	MislibPtImpl1.h \
 	MislibPtImpl1.cc \

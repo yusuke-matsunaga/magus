@@ -10,7 +10,7 @@
 
 
 #include "MapRecord.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
 #include "Cut.h"
 
@@ -217,7 +217,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     mapgraph.add_port(sbjport->name(), tmp);
   }
 
-  lut_num = mapgraph.n_lnodes();
+  lut_num = mapgraph.lnode_num();
   depth = max_depth;
 }
 
@@ -362,9 +362,9 @@ MapRecord::estimate(const SbjGraph& sbjgraph)
   }
 
   // 外部入力の生成
-  list<const SbjNode*> tmp_list;
+  vector<const SbjNode*> tmp_list;
   sbjgraph.ppi_list(tmp_list);
-  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     const SbjNode* node = *p;
     NodeInfo& node_info = mNodeInfo[node->id()];
@@ -374,7 +374,7 @@ MapRecord::estimate(const SbjGraph& sbjgraph)
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   int lut_num = 0;
   sbjgraph.ppo_list(tmp_list);
-  for (list<const SbjNode*>::const_iterator p = tmp_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     const SbjNode* onode = *p;
     const SbjNode* node = onode->fanin(0);

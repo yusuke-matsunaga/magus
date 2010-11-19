@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CalcOdcCmd::CalcOdcCmd(NetMgr* mgr) :
+CalcOdcCmd::CalcOdcCmd(MagMgr* mgr) :
   MagBNetCmd(mgr)
 {
 }

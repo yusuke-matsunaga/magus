@@ -30,7 +30,7 @@ BEGIN_NAMESPACE(nsNpn)
 /// @brief NPN 用の名前空間の終了
 #define END_NAMESPACE_YM_NPN \
 END_NAMESPACE(nsNpn) \
-END_NAMESPACE_YM    
+END_NAMESPACE_YM
 
 /// @namespace nsYm::nsNpn
 /// @brief NPN同値類判定パッケージ関係のクラスが属する名前空間
@@ -58,7 +58,7 @@ class NpnMgr;
 /// 特に根拠はないが，これなら Walsh 係数が 32 ビット整数で収まる．
 /// あと真理値表ベースの手法ではこれくらいが限度
 static
-const size_t kNpnMaxNi = 20;
+const ymuint kNpnMaxNi = 20;
 
 END_NAMESPACE_YM_NPN
 

@@ -14,9 +14,9 @@
 // 実はこのパッケージは Magus には依存していないので汎用である．
 
 
+#include "magus_nsdef.h"
 #include "ym_tclpp/TclCmd.h"
 #include "ym_utils/StopWatch.h"
-#include "magus.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -38,12 +38,12 @@ public:
 
 
 protected:
-  
+
   // コマンドを実行する仮想関数
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

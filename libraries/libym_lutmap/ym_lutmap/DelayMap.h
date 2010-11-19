@@ -12,11 +12,11 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
-class SbjGraph;
 class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public:
 	      ymuint slack,
 	      bool resub,
 	      MapRecord& maprec) = 0;
-  
+
 };
 
 
@@ -64,7 +64,7 @@ public:
 
   /// @brief コンストラクタ
   DagDCoverFactory();
-  
+
   /// @brief デストラクタ
   ~DagDCoverFactory();
 

@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_CELL
 class MislibPtStr :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -34,14 +34,14 @@ private:
   /// @brief デストラクタ
   ~MislibPtStr();
 
-  
+
 public:
 
   /// @brief 種類を取り出す．
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -76,7 +76,7 @@ private:
 class MislibPtNum :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -125,7 +125,7 @@ private:
 class MislibPtNoninv :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -149,7 +149,7 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -159,7 +159,7 @@ public:
 class MislibPtInv :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -183,7 +183,7 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -193,7 +193,7 @@ public:
 class MislibPtUnknown :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -217,7 +217,7 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -227,7 +227,7 @@ public:
 class MislibPtConst0 :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -245,7 +245,7 @@ public:
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -256,7 +256,7 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -266,7 +266,7 @@ public:
 class MislibPtConst1 :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -284,7 +284,7 @@ public:
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -295,7 +295,63 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class MislibPtList MislibPtImpl1.h "MislibPtImpl1.h"
+/// @brief MislibPtのリストを表すクラス
+//////////////////////////////////////////////////////////////////////
+class MislibPtList :
+  public MislibPt
+{
+  friend class MislibParser;
+private:
+
+  /// @brief コンストラクタ
+  MislibPtList();
+
+  /// @brief デストラクタ
+  virtual
+  ~MislibPtList();
+
+
+public:
+
+  /// @brief 種類を取り出す．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 末尾に要素を追加する．
+  virtual
+  void
+  push_back(MislibPt* pin);
+
+  /// @brief 先頭の要素を取り出す．
+  virtual
+  MislibPt*
+  top() const;
+
+  /// @brief 内容を出力する．
+  /// デバッグ用
+  virtual
+  void
+  dump(ostream& s) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 先頭の要素
+  MislibPt* mTop;
+
+  // 末尾の要素
+  MislibPt* mEnd;
+
 };
 
 END_NAMESPACE_YM_CELL

@@ -11,7 +11,7 @@
 
 #include "CrHeap.h"
 #include "CrNode.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -91,7 +91,7 @@ CrHeap::update(CrNode* node,
     move_up(pos);
   }
 }
-  
+
 // 引数の位置にある要素を適当な位置まで沈めてゆく
 void
 CrHeap::move_down(ymuint pos)

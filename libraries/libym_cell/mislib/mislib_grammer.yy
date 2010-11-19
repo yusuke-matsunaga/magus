@@ -12,14 +12,14 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/FileRegion.h"
-#include "MislibParserImpl.h"
+#include "MislibParser.h"
 #include "MislibPt.h"
 #include "MislibLex.h"
-  
+
 
 // より詳細なエラー情報を出力させる．
 #define YYERROR_VERBOSE 1
-  
+
 // 解析結果の型
 #define YYSTYPE MislibPt*
 
@@ -30,21 +30,21 @@
 // YYLTYPE を書き換えたので以下のマクロも書き換えが必要
 #define YYLLOC_DEFAULT(Current, Rhs, N) Current = loc_merge(Rhs, N);
 
-  
+
 BEGIN_NAMESPACE_YM_CELL
 
 // 字句解析関数の宣言
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      MislibParserImpl&);
- 
+      MislibParser&);
+
 // エラー報告関数の宣言
 int
 yyerror(YYLTYPE*,
-	MislibParserImpl&,
+	MislibParser&,
 	const char*);
- 
+
 BEGIN_NONAMESPACE
 
 // loc_array 全体のファイル領域を求める．
@@ -69,10 +69,10 @@ END_NONAMESPACE
 %locations
 
 // yyparse の引数
-%parse-param {MislibParserImpl& parser}
+%parse-param {MislibParser& parser}
 
 // yylex の引数
-%lex-param {MislibParserImpl& parser}
+%lex-param {MislibParser& parser}
 
 // トークンの定義
 %token STR
@@ -131,6 +131,7 @@ gate
 {
   yyclearin;
   yyerrok;
+  $$ = NULL;
 }
 ;
 
@@ -147,7 +148,7 @@ expr
 | NOT expr
 {
   $$ = parser.new_not(@$, $2);
-} 
+}
 | expr STAR expr
 {
   $$ = parser.new_and(@$, $1, $3);
@@ -170,7 +171,7 @@ expr
 pin_list
 : pin
 {
-  $$ = parser.new_pinlist();
+  $$ = parser.new_list();
   $$->push_back($1);
 }
 | pin_list pin
@@ -223,7 +224,7 @@ phase
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      MislibParserImpl& parser)
+      MislibParser& parser)
 {
   return parser.scan(*lvalp, *llocp);
 }
@@ -231,24 +232,10 @@ yylex(YYSTYPE* lvalp,
 // エラー出力関数
 int
 yyerror(YYLTYPE* llocp,
-	MislibParserImpl& parser,
+	MislibParser& parser,
 	const char* msg)
 {
-  string buff;
-  const char* msg2;
-  // 好みの問題だけど "parse error" よりは "syntax error" の方が好き．
-  if ( !strncmp(msg, "parse error", 11) ) {
-    buff ="syntax error";
-    buff += (msg + 11);
-    msg2 = buff.c_str();
-  }
-  else {
-    msg2 = msg;
-  }
-  
-  parser.msg_mgr().put_msg(__FILE__, __LINE__, *llocp,
-			   kMsgError, "MISLIB_PARSER", msg2);
-  
+  parser.error(*llocp, msg);
   return 1;
 }
 

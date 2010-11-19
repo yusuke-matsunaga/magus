@@ -5,7 +5,7 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([libym_mvn], [1.0], 
+AC_INIT([libym_mvn], [1.0],
         [yusuke_matsunaga@ieee.org],
         [libym_mvn])dnl
 
@@ -20,8 +20,8 @@ All rights reserved.
 
 AC_CONFIG_SRCDIR([ym_mvn/mvn_nsdef.h])dnl
 
-AC_CONFIG_AUX_DIR([../../config])dnl
-AC_CONFIG_MACRO_DIR([../../config])dnl
+AC_CONFIG_AUX_DIR([config])dnl
+AC_CONFIG_MACRO_DIR([config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
@@ -91,6 +91,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_mvn/Makefile])
 AC_CONFIG_FILES([verilog/Makefile])
+AC_CONFIG_FILES([conv/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

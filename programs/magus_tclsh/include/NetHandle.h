@@ -10,59 +10,109 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-// ネットワークのオブジェクトを管理するクラス
-
-#include "magus.h"
+#include "magus_nsdef.h"
 #include "ym_bnet/bnet_nsdef.h"
 #include "ym_bdn/bdn_nsdef.h"
+#include "ym_mvn/mvn_nsdef.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
-class NetMgr;
-
 //////////////////////////////////////////////////////////////////////
-/// @class NetHandle NetHandle.h <NetHandle.h>
-/// @brief ネットワークの情報を入れておく構造体
+/// @class NetHandle NetHandle.h "NetHandle.h"
+/// @brief ネットワークを保持するハンドル
 //////////////////////////////////////////////////////////////////////
 class NetHandle
 {
-  friend class NetMgr;
-private:
+  friend class MagMgr;
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 型の定義
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief NetHandle の表す型
+  enum tType {
+    /// @brief BNetwork
+    kMagBNet,
+    /// @brief BdNetwork
+    kMagBdn,
+    /// @brief MvNetwork
+    kMagMvn
+  };
+
+
+protected:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ/デストラクタ
-  // NetMgr のみが生成/破壊を行う．
+  // MagMgr のみが生成/破壊を行う．
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] mgr 親のマネージャ
   /// @param[in] name 名前
-  NetHandle(NetMgr* mgr,
-	    const string& name);
-  
+  NetHandle(const string& name);
+
   /// @brief デストラクタ
+  virtual
   ~NetHandle();
 
 
 public:
-  
+
   /// @brief ネットワーク名を得る．
   const string&
   name() const;
-  
-  /// @brief BNetwork を得る．
-  BNetwork*
-  bnetwork() const;
-  
-  /// @brief BdNetwork を得る．
-  BdNetwork*
-  bdn() const;
-  
-  /// @brief ネットワークを複製する．
-  void
-  copy(const NetHandle& src);
 
-  
+  /// @brief 型を返す．
+  virtual
+  tType
+  type() const = 0;
+
+  /// @brief BNetwork を得る．
+  virtual
+  const BNetwork*
+  bnetwork() const;
+
+  /// @brief BNetwork を得る．
+  virtual
+  BNetwork*
+  _bnetwork();
+
+  /// @brief BdNetwork を得る．
+  virtual
+  const BdNetwork*
+  bdn() const;
+
+  /// @brief BdNetwork を得る．
+  virtual
+  BdNetwork*
+  _bdn();
+
+  /// @brief MvNetwork を得る．
+  virtual
+  const MvMgr*
+  mvn() const;
+
+  /// @brief MvNetwork を得る．
+  virtual
+  MvMgr*
+  _mvn();
+
+  /// @brief ネットワークをクリアする．
+  virtual
+  void
+  clear() = 0;
+
+  /// @brief ネットワークをコピーする．
+  /// @param[in] src コピー元のネットハンドル
+  /// @param[in] allow_conv true ならタイプが異なる時に変換する．
+  /// @return コピーが成功したら true を返す．
+  virtual
+  bool
+  copy(const NetHandle* src,
+       bool allow_conv = false) = 0;
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -71,18 +121,9 @@ private:
   // ネットワーク名
   string mName;
 
-  // BNetwork
-  BNetwork* mBNetwork;
-  
-  // BdNetwork
-  BdNetwork* mBdNetwork;
-  
   // カレントネットワークスタックに積まれた回数
   int mCount;
-  
-  // ハッシュ表の次の要素を指すリンク
-  NetHandle* mLink;
-  
+
 };
 
 
@@ -96,22 +137,6 @@ const string&
 NetHandle::name() const
 {
   return mName;
-}
-  
-// @brief BNetwork を得る．
-inline
-BNetwork*
-NetHandle::bnetwork() const
-{
-  return mBNetwork;
-}
-
-// @brief BdNetwork を得る．
-inline
-BdNetwork*
-NetHandle::bdn() const
-{
-  return mBdNetwork;
 }
 
 END_NAMESPACE_MAGUS

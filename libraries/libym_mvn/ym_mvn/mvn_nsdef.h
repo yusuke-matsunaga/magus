@@ -50,6 +50,9 @@ class MvNet;
 
 typedef DlList<MvInputPin> MvInputPinList;
 
+class Mvn2Sbj;
+class MvNodeMap;
+
 END_NAMESPACE_YM_MVN
 
 BEGIN_NAMESPACE_YM
@@ -64,6 +67,9 @@ using nsMvn::MvInputPin;
 using nsMvn::MvInputPinList;
 using nsMvn::MvOutputPin;
 using nsMvn::MvNet;
+
+using nsMvn::Mvn2Sbj;
+using nsMvn::MvNodeMap;
 
 END_NAMESPACE_YM
 

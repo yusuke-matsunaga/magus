@@ -5,7 +5,7 @@ $Id: BUILDING 958 2007-08-28 05:38:02Z matsunaga $
 //////////////////////////////////////////////////////////////////////
 
 これには少々複雑な手順を必要とします．大まかには次のような4つのステッ
-プを踏みます． 
+プを踏みます．
 
  1. configure スクリプトの生成
  2. autogen スクリプトの生成
@@ -26,22 +26,21 @@ $Id: BUILDING 958 2007-08-28 05:38:02Z matsunaga $
 
 ここでは autoconf, automake, libtool 等を用いて ymtools 直下の configure
 スクリプトを生成します．これは実はだれかが一回行えば良いのでステップ1
-が終わった状態で Subversion レポジトリにインポートしても良いのですが，
-自動で生成されるファイルを Subversion に登録するのは無駄なので普通は登
-録しません． 
+が終わった状態で git レポジトリにインポートしても良いのですが，
+自動で生成されるファイルを git に登録するのは無駄なので普通は登録しません．
 で，ステップ1では autoconf, automake, libtool などを必要とするのですが，
 計算機によってはインストールされていない，または古いバージョンがインス
 トールされている等の問題が起る場合があります．この時はどこか適当な計算
 機上でステップ1を実行してください．
 現時点では以下の環境で正しく処理できることを確認しています．
 
- - FreeBSD 4-STABLE: autoconf2.57 + automake1.7.5 + libtool1.4.3
+ - FreeBSD 8.1-STABLE: autoconf2.68 + automake1.11.1 + libtool2.2.10
  - RedHat Linux 9:   autoconf2.57 + automake1.6.3 + libtool1.4.3
  - Solaris9:         autoconf2.57 + automake1.7.2 + libtool1.5
 
 で，すべての環境において ymtools 直下で
 
-./mk
+./boot.sh
 
 と打ち込めばステップ1は終了です．
 ここでエラーが起きるときには autoconf, automake などのバージョンを確認
@@ -52,27 +51,27 @@ $Id: BUILDING 958 2007-08-28 05:38:02Z matsunaga $
 
 ステップ1で生成されたファイルを消すには
 
-./mk clean
+./boot.sh clean
 
 と打ち込んでください．
 
 ちなみにこれらの auto-tools のバージョンを確かめたいときには
 
-./mk debug
+./boot.sh debug
 
 と打ち込んでください．各々のツールのバージョンが表示されます．それ以外
 の処理は行いません．
 
 
 //////////////////////////////////////////////////////////////////////
-// 2 autogen スクリプトの生成
+// 2.1 autogen スクリプトの生成 (その1)
 //////////////////////////////////////////////////////////////////////
 
 ここではステップ1で生成された configure スクリプトを実行して Makefile
 を生成します．ただし，「ここ」ではそれを実行しないでください．
 ソースファイルのある場所でコンパイルすることも可能ですが，できればコン
 パイルするディレクトリを他に用意することをお勧めします．というのはソー
-スディレクトリはその後 CVS に登録することがあるので「きれいな」状態に
+スディレクトリはその後 git に登録することがあるので「きれいな」状態に
 しておくことが望ましいからです．また，同一のソースから FreeBSD,
 RedHat, Solaris などの異なるプラットフォーム用のバイナリを生成するとき
 にも複数のビルド用ディレクトリを用意したほうが便利です．
@@ -84,7 +83,7 @@ RedHat, Solaris などの異なるプラットフォーム用のバイナリを�
 クリプトを自動生成するようにしました．
 
 cd $SRCDIR
-./mk autogen $BUILDDIR $INSTALLDIR compile-mode
+./.boot.sh autogen $BUILDDIR $INSTALLDIR compile-mode
 
 で $BUILDDIR 直下に autogen というスクリプトが生成されます．
 
@@ -116,6 +115,52 @@ autogen は ./mk autogen で自動生成されるため，手で修正しても�
 ./mk autogen するとその修正が消えてしまうので autogen には手を加え
 ずに autogen.local に修正点を書いておく方が賢明です．
 詳しくは 「A-2 autogen.local の使用例」 を読んでください．
+
+
+//////////////////////////////////////////////////////////////////////
+// 2.2 autogen スクリプトの生成 (その2)
+//////////////////////////////////////////////////////////////////////
+
+$SRCDIR には mkautogen というスクリプトも用意されています．
+これは，opt/debug/prof の3つのモード用のビルドディレクトリを一編に作っ
+てくれるものです．使い方は
+
+cd $SRCDIR
+./mkautogen $PREFIX $ROOTNAME
+
+です．結果として，
+
+$PREFIX/build/$ROOTNAME/opt
+                       /debug
+                       /prof
+$PREFIX/test/$ROOTNAME/opt
+                      /debug
+                      /prof
+
+という6つのディレクトリを作成し，各ビルド用ディレクトリの下に autogen
+スクリプトを作ります．
+また，$PREFIX/build/$ROOTNAME/Makefile というファイルも生成します．
+通常は，
+
+cd $PREFIX/build/$ROOTNAME
+make configure
+make
+(make install) <- ほとんど不要です．
+
+で3つのモードのすべてのオブジェクトを生成します．
+3つのバージョンを同時に作る理由は，時間の計測などを行うには最適化オプ
+ションをつけた方がいいけど，デバッグするにはシンボルが残っていなければ
+いけないとか，コードの最適化用にはプロファイル用のオブジェクトがいると
+かいろいろとオプションが異なるオブジェクトが必要な場合があるので，最初
+から作っておけば手間が省けるだろうというわけです．昔に比べればディスク
+も安いし計算機も速くなったのでこれくらいの無駄は無視できるのではないか
+と思います．もちろん，
+
+cd $PREFIX/build/$ROOTNAME/opt
+./autogen
+make
+
+で最適化モードのオブジェクトのみ作ることも可能です．
 
 
 //////////////////////////////////////////////////////////////////////
@@ -154,21 +199,21 @@ mkdir しておく必要はありません．
 
 
 //////////////////////////////////////////////////////////////////////
-// A-1 mk コマンドリファレンス
+// A-1 boot.sh コマンドリファレンス
 //////////////////////////////////////////////////////////////////////
 
 - configure の生成
- mk
+ boot.sh
 
 - クリーンアップ
- mk clean
+ boot.sh clean
 
 - autogen スクリプトの生成
 
- mk autogen <build-dir> <install-dir> <compile-mode>
+ boot.sh autogen <build-dir> <install-dir> <compile-mode>
 
 - 使用するコマンドのバージョン確認
- mk debug
+ boot.sh debug
 
 
 //////////////////////////////////////////////////////////////////////
@@ -273,6 +318,7 @@ RM                rm コマンドのパス名		rm
 
 *1: FreeBSD の場合バージョンごとに autoconf259 のようなコマンド名にな
  るので自動的に最新版を使用する
+ <== 最近の FreeBSD は最新版が autoconf にリンクされるようになった．
 
 ほとんどの場合 XXXX_FLAGS は指定する必要はないと思いますが，autoconf
 用のマクロが通常と異なる場所に置いてある場合には AUTOHEADER_FLAGS で
@@ -294,134 +340,100 @@ RM                rm コマンドのパス名		rm
 // B-1 サブパッケージの configure/make
 //////////////////////////////////////////////////////////////////////
 
-ymtools のトップディレクトリで mk <subcommand> でいくつかの前処理
+ymtools のトップディレクトリで boot.sh <subcommand> でいくつかの前処理
 をおこないますが，これと同じことが以下のサブディレクトリ上の
- mk <subcommand> コマンドでおこなえます．
+ boot.sh <subcommand> コマンドでおこなえます．
 
 ./ (ymtools のトップディレクトリ)
-ymlibs
-magus
-gdsprint
-led
-cnfdecomp
+libraries/libym_XXXX
+programs/magus_tclsh 論理合成プログラム
+        /atpg        テストパタン生成プログラム
+        /matpg       テストパタン生成プログラム(松永が富士通研時代に作っ
+	             たプログラムのレプリカ:知財的な問題はないはず)
+        /lutmap      LUT型FPGA用テクノロジマッパ
+        /led         この2つは無視してください．
+        /seal
 
-用法は mk と全く同じです．
-実際，mk は
+用法は boot.sh と全く同じです．
+実際，boot.sh は
 
-cd ./; mk
-cd ./ymlibs; mk
-cd ./magus; mk
-cd ./gdsprint; mk
-cd ./led; mk
-cd ./cnfdecomp; mk
+cd ./; boot.sh
+cd ./libraries/libym_utils; boot.sh
+cd ./libraries/libym_lexp; boot.sh
+       .
+       .
+       .
+cd ./programs/magus; boot.sh
+cd ./programs/atpg; boot.sh
+       .
+       .
 
 と同義です．ただし，サブパッケージの configure ではいくつかの細かな設
 定を行うことが可能です(後述)．
 
-magus その他のアプリケーションは ymlibs のいくつかのライブラリに依存し
-ているのでこれらのアプリケーションを作るためには ymlibs を作成する必要
-があります．ただし，これには2通りの方法があって，同一のソースツリーに
-ある ymlibs をコンパイルして使う方法と既にどこかにインストールしてある
-ymlibs を使う方法があります(後述)
+magus その他のアプリケーションは libraries 以下のいくつかのライブラリ
+に依存しているのでこれらのアプリケーションを作るためにはライブラリを作
+成する必要があります．
 
 
 //////////////////////////////////////////////////////////////////////
-// B-2 ymlibs の configure
+// B-2 libraries の configure
 //////////////////////////////////////////////////////////////////////
 
-現在，ymlibs には以下のライブラリが含まれます．
+現在，libraries には以下のライブラリが含まれます．
 
 libym_utils     汎用のユーティリティクラスライブラリ
 libym_tclpp     Tcl インターフェイス
 libym_verilog   Verilog フロントエンド
 libym_sat       SAT パッケージ(未完)
 libym_lexp      論理式を扱うクラスライブラリ
+libym_aig       AIG パッケージ
+libym_sbj       テクノロジマッピング用サブジェクトグラフ
 libym_blif      BLIF ファイルパーサー
 libym_bnet      boolean network を扱うクラスライブラリ
 libym_bdd       BDD を扱うクラスライブラリ
 libym_npn       NPN 同値類判定を行うクラスライブラリ
 libym_gds       GDS-II ファイルパーサー
+libym_bdn       もう一つの boolean network
+libym_cec       組み合わせ回路の等価性検証
+libym_cell      セルライブラリを扱うクラスライブラリ
+libym_iscas89   ISCAS89 形式のファイルを読み込む
+libym_lutmap    LUT型FPGA用テクノロジマッパ
+libym_techmap   セルライブラリ用テクノロジマッパ
+libym_mincov    最小被覆問題ソルバ
+libym_mvn       MvNetwork (RTL用ネットリスト)
+libym_seal      ソフトエラー耐性評価用
+libym_tgnet     simple gate のネットリスト (あまり使い道なし ISCAS89用)
+libym_zstream   zlib を用いた圧縮/解凍を行う入出力ストリーム
 
 ほとんどの場合，libym_utils は必須ですが，それ以外は不要な場合がありま
 す．そこで，これらのライブラリは(libym_utilsも含めて) make するかどう
-かを configure 時に選択できるようになっています．
-具体的には configure のオプションとして
+かを選択できるようになっています．
+具体的には configure.ac 中の
 
---enable-libym_utils もしくは
---enable-libym_utils=yes
+ym_libym_utils_enable=1
 
-とすれば libym_utils ライブラリは make されるようになります．
-逆に作りたくない場合には
+のような行の右辺を 0 に変えればそのライブラリをビルドしなくなります．
 
---disable-libym_utils もしくは
---enable-libym_utils=no
+各ライブラリやプログラムは自分が依存しているライブラリの情報を
+configure.ac 中の YM_BUILD_LIBRARY マクロで判断します．
+たとえば，
 
-とすれば make されません．
-デフォルトでは全てのライブラリが make されるようになっています．
+# libym_bdd
+YM_BUILD_LIBRARY([libym_bdd],
+		 [ym_libym_utils_enable,
+		  ym_libym_lexp_enable])
 
-これを変更するには上述のように configure のオプションをあたえればよい
-のですが，mk(_all) autogen で autogen スクリプトを作って autogen を実
-行する場合，その中で自動的に configure スクリプトが呼び出されてしまい
-ます．そこで，autogen.local にこのオプションを書いておく必要があります．
-具体的には autogen スクリプトの中の optflags というシェル変数が
-configure の引数として渡されますので autogen.local で optflags の値を
-設定すればよいことになります．
-ただし，optflags が既に他の値をもっている場合がありますので，
-
-optflags="$optflags --disable-libym_utils"
-
-のように昔の値の後ろに追加するようにしてください．
-
-ライブラリの中には他のライブラリに依存しているものがあります．依存先の
-ライブラリが disable されていた場合，依存しているライブラリも自動的に
-disable されます．これは configure 時のメッセージに現れるのでチェック
-してください．
-
-libym_utils の中に zlib を利用した圧縮/伸張機能付きストリームバッファ
-のクラスが含まれています．しかし，どうも zlib のバージョンによってはこ
-の部分がうまくコンパイルできないようなので現在は緊急避難的にこのクラス
-の make を個別に on/off できるようにしています．コンパイル時に zlib 関
-係で(正確には gzheaderp が undefined と言われる)エラーが起きたら
---disable-zstream を加えてください．
-
-なお，ymlibs の下で autogen を起動した場合には ymlibs 直下の
-autogen.local が用いられますが，ymtools の下で autogen を起動すると
-ymtools 直下の autogen.local が用いられるので注意が必要です．
-もっとも簡単な方法は ymtools 直下の autogen.local に必要な情報を全て書
-いておいて ymlibs (magus その他のディレクトリも同様) 直下の
-autogen.local には
-
-if test -f ../autogen.local; then
-  . ../autogen.local
-fi
-
-と親のディレクトリの autogen.local を読み込むようにしておくのが安全だ
-と思われます．
+この記述は libym_bdd 以下のディレクトリをビルドするためには
+ym_libym_utils_enable と ym_libym_lexp_enable が 1 である必要がある，
+という意味です．
 
 
 //////////////////////////////////////////////////////////////////////
 // B-3 magus の configure
 //////////////////////////////////////////////////////////////////////
 
-magus の configure に関しては上述の tcl/tk の場所の指定以外に ymlibs
-の指定がおこなえます．
-
-ymtools のソースツリー一式を取ってきて mk, autogen, make する場合
-にはなにも指定する必要はありませんが，他の場所にインストールされている
-ymlibs を用いる場合には magus の configure 時にその場所を指定する必要
-があります(逆にこの場合には magus のソースツリーだけあればよい)．
-方法は，configure のオプションで，
-
---with-ymlibs=<ymConfig.shのあるディレクトリ>
-
-を指定します．通常は ymConfig.sh は　ymlibs のインストール先ディレクト
-リを ${prefix} とすると，${prefix}/lib/ymlibsX.Y/ymConfig.sh にありま
-す(X.Y はバージョン番号)．ですので，${prefix} が /usr/local で，
-バージョンが 1.0 の場合，
-
---with-ymlibs=/usr/local/lib/ymlibs1.0
-
-のように指定します．
+特記事項なし．
 
 
 //////////////////////////////////////////////////////////////////////
@@ -445,7 +457,7 @@ ymtools ディレクトリの下に tclreadline のソースツリーが入っ�
 
 を付けてください．
 
-さらに，magus_shell, magus_wish に静的に tclreadline をリンクしておく
+さらに，magus_tclsh に静的に tclreadline をリンクしておく
 ことも可能です．これを行うには magus の configure 時に
 
 --with-tclreadline=XXX
@@ -456,7 +468,7 @@ tclreadline/libtclreadline.la があって，ソースツリー上に tclreadlin
 がある場合や ${prefix}/lib と ${prefix}/include の下に
 libtclreadline.la と tclreadline.h がある場合等，自動的に tclreadline
 が見付けられた場合には勝手に組み込みます．tclreadline を組み込みたくな
-い場合には 
+い場合には
 
 --without-tclreadline
 

@@ -1,7 +1,7 @@
 #ifndef YM_BDN_BDNETWORK_H
 #define YM_BDN_BDNETWORK_H
 
-/// @file ym_bdn/BdNetwork.h 
+/// @file ym_bdn/BdNetwork.h
 /// @brief BdNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_BDN
 /// @class BdNetwork BdNetwork.h <ym_bdn/BdNetwork.h>
 /// @brief 2入力ノードのネットワークを表すクラス
 ///
-/// 
+///
 /// ノードは，
 ///  - 入力ノード
 ///  - 出力ノード
@@ -65,7 +65,7 @@ public:
   /// @brief デストラクタ
   ~BdNetwork();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name ノードとラッチ関連の情報の取得
@@ -75,48 +75,48 @@ public:
   /// @return ノードIDの最大値 + 1 を返す．
   ymuint
   max_node_id() const;
-  
+
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint
-  n_inputs() const;
-  
+  input_num() const;
+
   /// @brief 外部入力番号から外部入力ノードを得る．
-  /// @param[in] pos 外部入力番号 ( 0 <= pos < n_inputs() )
+  /// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
   BdnNode*
   input(ymuint pos) const;
 
   /// @brief 外部入力の名前を得る．
-  /// @param[in] pos 外部入力番号 ( 0 <= pos < n_inputs() )
+  /// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
   string
   input_name(ymuint pos) const;
-  
+
   /// @brief 出力ノード数を得る．
   ymuint
-  n_outputs() const;
-  
+  output_num() const;
+
   /// @brief 外部出力番号から外部出力ノードを得る．
-  /// @param[in] pos 外部出力番号 ( 0 <= pos < n_outputs() )
+  /// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
   BdnNode*
   output(ymuint pos) const;
-  
+
   /// @brief 外部出力の名前を得る．
-  /// @param[in] pos 外部出力番号 ( 0 <= pos < n_outputs() )
+  /// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
   string
   output_name(ymuint pos) const;
-  
+
   /// @brief ラッチ数を得る．
   ymuint
-  n_latches() const;
-  
+  latch_num() const;
+
   /// @brief ラッチのリストを得る．
   const BdnNodeList&
   latch_list() const;
-  
+
   /// @brief 論理ノード数を得る．
   ymuint
-  n_lnodes() const;
-  
+  lnode_num() const;
+
   /// @brief 論理ノードのリストを得る．
   const BdnNodeList&
   lnode_list() const;
@@ -137,10 +137,10 @@ public:
   /// @note 段数とは入力ノードから出力ノードへ至る経路中の論理ノードの数
   ymuint
   level() const;
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ public:
   /// @return 作成したノードを返す．
   BdnNode*
   new_input(const string& name);
-  
+
   /// @brief 出力ノードを作る．
   /// @param[in] name 名前
   /// @param[in] inode_handle 入力のノード+極性
@@ -160,7 +160,7 @@ public:
   BdnNode*
   new_output(const string& name,
 	     BdnNodeHandle inode_handle);
-  
+
   /// @brief 出力ノードの内容を変更する
   /// @param[in] node 変更対象の出力ノード
   /// @param[in] inode_handle 入力のノード+極性
@@ -189,7 +189,7 @@ public:
   void
   change_reset_value(BdnNode* latch,
 		     int reset_val);
-  
+
   /// @brief 論理ノードを作る．
   /// @param[in] fcode 機能コード
   /// @param[in] inode1_handle 1番めの入力ノード+極性
@@ -201,7 +201,7 @@ public:
   new_logic(ymuint fcode,
 	    BdnNodeHandle inode1_handle,
 	    BdnNodeHandle inode2_handle);
-  
+
   /// @brief 論理ノードの内容を変更する．
   /// @param[in] node 変更対象の論理ノード
   /// @param[in] fcode 機能コード
@@ -214,16 +214,16 @@ public:
 	       ymuint fcode,
 	       BdnNodeHandle inode1_handle,
 	       BdnNodeHandle inode2_handle);
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name その他の関数
   /// @{
-  
+
   /// @brief 名前を得る．
   string
   name() const;
@@ -232,23 +232,23 @@ public:
   /// @param[in] name 新しい名前
   void
   set_name(const string& name);
-  
+
   /// @brief 空にする．
   void
   clear();
-  
+
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
   clean_up();
-  
+
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
   void
   dump(ostream& s) const;
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -259,7 +259,7 @@ private:
   /// @param[in] src コピー元のオブジェクト
   void
   copy(const BdNetwork& src);
-  
+
   /// @brief 論理ノードの内容を設定する．
   /// @param[in] node 設定するノード
   /// @param[in] fcode 機能コード
@@ -275,7 +275,7 @@ private:
 	    ymuint fcode,
 	    BdnNodeHandle inode1_handle,
 	    BdnNodeHandle inode2_handle);
-  
+
   /// @brief ノード間の接続を変更する．
   /// @param[in] from 接続の入力側のノード
   /// @param[in] to 接続の出力側のノード
@@ -285,23 +285,23 @@ private:
   connect(BdnNode* from,
 	  BdnNode* to,
 	  ymuint pos);
-  
+
   /// @brief 新しいノードを作成し mNodeList に登録する．
   /// @return 作成されたノードを返す．
   BdnNode*
   new_node();
-  
+
   /// @note node を削除する．
   /// @param[in] node 削除対象のノード
   void
   delete_node(BdnNode* node);
-  
+
   /// @brief ハッシュ表を確保する．
   /// @param[in] req_size 確保するサイズ
   void
   alloc_table(ymuint req_size);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -312,7 +312,7 @@ private:
 
   // ネットワーク名
   string mName;
-  
+
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
   vector<BdnNode*> mNodeArray;
@@ -326,7 +326,7 @@ private:
 
   // 外部入力ノードの名前の配列
   vector<string> mInputNameArray;
-  
+
   // 外部出力ノードの配列
   // 配列上の位置が外部出力ノードの出力番号となる．
   vector<BdnNode*> mOutputArray;
@@ -336,23 +336,23 @@ private:
 
   // ラッチノードのリスト
   BdnNodeList mLatchList;
-  
+
   // 論理ノードのリスト
   BdnNodeList mLnodeList;
-  
+
   // 論理ノードのハッシュ表
   BdnNode** mHashTable;
 
   // mHashTable のサイズ
   ymuint32 mHashSize;
-  
+
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
-  
+
   // 最大レベル (最下位ビットは valid フラグ)
   mutable
   ymuint32 mLevel;
-  
+
 };
 
 
@@ -363,16 +363,6 @@ private:
 void
 dump(ostream& s,
      const BdNetwork& network);
-
-/// @relates BdNetwork
-/// @brief BdNetwork の内容を blif 形式で出力する関数
-/// @param[in] s 出力先のネットワーク
-/// @param[in] network 対象のネットワーク
-/// @param[in] module_name blif のモジュール名
-void
-write_blif(ostream& s,
-	   const BdNetwork& network,
-	   const string& module_name = "network");
 
 
 //////////////////////////////////////////////////////////////////////
@@ -406,18 +396,18 @@ BdNetwork::max_node_id() const
 {
   return mNodeArray.size();
 }
-  
+
 // @brief 入力ノード数の取得
 // @return 入力ノード数を返す．
 inline
 ymuint
-BdNetwork::n_inputs() const
+BdNetwork::input_num() const
 {
   return mInputArray.size();
 }
-  
+
 // @brief 外部入力番号から外部入力ノードを得る．
-// @param[in] pos 外部入力番号 ( 0 <= pos < n_inputs() )
+// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
 inline
 BdnNode*
 BdNetwork::input(ymuint pos) const
@@ -426,7 +416,7 @@ BdNetwork::input(ymuint pos) const
 }
 
 // @brief 外部入力の名前を得る．
-// @param[in] pos 外部入力番号 ( 0 <= pos < n_inputs() )
+// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
 inline
 string
 BdNetwork::input_name(ymuint pos) const
@@ -437,13 +427,13 @@ BdNetwork::input_name(ymuint pos) const
 // @brief 出力ノード数を得る．
 inline
 ymuint
-BdNetwork::n_outputs() const
+BdNetwork::output_num() const
 {
   return mOutputArray.size();
 }
 
 // @brief 外部出力番号から外部出力ノードを得る．
-// @param[in] pos 外部出力番号 ( 0 <= pos < n_outputs() )
+// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
 inline
 BdnNode*
 BdNetwork::output(ymuint pos) const
@@ -452,7 +442,7 @@ BdNetwork::output(ymuint pos) const
 }
 
 // @brief 外部出力の名前を得る．
-// @param[in] pos 外部出力番号 ( 0 <= pos < n_outputs() )
+// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
 inline
 string
 BdNetwork::output_name(ymuint pos) const
@@ -463,7 +453,7 @@ BdNetwork::output_name(ymuint pos) const
 // @brief ラッチ数を得る．
 inline
 ymuint
-BdNetwork::n_latches() const
+BdNetwork::latch_num() const
 {
   return mLatchList.size();
 }
@@ -479,7 +469,7 @@ BdNetwork::latch_list() const
 // 論理ノード数を得る．
 inline
 ymuint
-BdNetwork::n_lnodes() const
+BdNetwork::lnode_num() const
 {
   return mLnodeList.size();
 }

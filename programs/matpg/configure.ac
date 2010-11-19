@@ -7,7 +7,7 @@
 AC_REVISION($Rev: 2507 $)dnl
 
 AC_INIT([matpg], [1.0],
-        [yusuke_matsunaga@ieee.org], 
+        [yusuke_matsunaga@ieee.org],
         [matpg])dnl
 
 AC_PREREQ(2.57)dnl
@@ -19,8 +19,8 @@ All rights reserved.
 
 AC_CONFIG_SRCDIR([include/matpg_nsdef.h])dnl
 
-AC_CONFIG_AUX_DIR([../../config])dnl
-AC_CONFIG_MACRO_DIR([../../config])dnl
+AC_CONFIG_AUX_DIR([config])dnl
+AC_CONFIG_MACRO_DIR([config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl

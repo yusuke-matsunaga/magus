@@ -12,12 +12,11 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_sbj/sbj_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
-class SbjGraph;
-class SbjNode;
 class EnumCut;
 
 //////////////////////////////////////////////////////////////////////
@@ -28,7 +27,7 @@ class EnumCut;
 class EnumCutOp
 {
   friend class EnumCut;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -40,7 +39,7 @@ protected:
 
 
 public:
-  
+
   /// @brief カットの列挙を行う．
   /// @param[in] sbjgraph 対象のサブジェクトグラフ
   /// @param[in] limit 入力数の制限
@@ -66,7 +65,7 @@ private:
   void
   all_init(const SbjGraph& sbjgraph,
 	   ymuint limit);
-  
+
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
   /// @param[in] node 根のノード
   /// @param[in] cur_pos node の処理順
@@ -111,7 +110,7 @@ private:
   void
   all_end(const SbjGraph& sbjgraph,
 	  ymuint limit);
-  
+
 };
 
 END_NAMESPACE_YM_LUTMAP

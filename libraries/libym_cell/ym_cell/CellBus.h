@@ -12,7 +12,6 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/cell_type.h"
-#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -22,95 +21,70 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellBusType
 {
-  friend class CellManip;
-  
 public:
 
   /// @brief base_type を表す型
   enum tBaseType {
     kArrayType
   };
-  
+
   /// @brief data_type を表す型
   enum tDataType {
     kBitType
   };
-  
 
-private:
+
+public:
 
   /// @brief コンストラクタ
-  CellBusType(ShString name,
-	      tBaseType base_type,
-	      tDataType data_type,
-	      ymint32 bit_from,
-	      ymint32 bit_to);
+  CellBusType() { }
 
   /// @brief デストラクタ
-  ~CellBusType();
+  virtual
+  ~CellBusType() { }
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
-  ShString
-  name() const;
-  
+  virtual
+  string
+  name() const = 0;
+
   /// @brief base_type の取得
+  virtual
   tBaseType
-  base_type() const;
-  
+  base_type() const = 0;
+
   /// @brief data_type の取得
+  virtual
   tDataType
-  data_type() const;
+  data_type() const = 0;
 
   /// @brief ビット幅の取得
-  ymuint32
-  bit_width() const;
+  virtual
+  ymuint
+  bit_width() const = 0;
 
   /// @brief 開始ビットの取得
-  ymint32
-  bit_from() const;
+  virtual
+  ymint
+  bit_from() const = 0;
 
   /// @brief 終了ビットの取得
-  ymint32
-  bit_to() const;
+  virtual
+  ymint
+  bit_to() const = 0;
 
   /// @brief 向きの取得
   /// @note true の時，降順を表す．
+  virtual
   bool
-  downto() const;
-  
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-  
-  // 名前
-  ShString mName;
-  
-  // base_type
-  tBaseType mBaseType;
+  downto() const = 0;
 
-  // data_type
-  tDataType mDataType;
-
-  // ビット幅
-  ymuint32 mBitWidth;
-
-  // 開始ビット
-  ymint32 mBitFrom;
-
-  // 終了ビット
-  ymint32 mBitTo;
-
-  // 向き
-  bool mDownTo;
-  
 };
 
 
@@ -120,153 +94,43 @@ private:
 //////////////////////////////////////////////////////////////////////
 class CellBus
 {
-  friend class CellManip;
-  
-private:
+public:
 
   /// @brief コンストラクタ
-  /// @param[in] name バス名
-  /// @param[in] bus_type バス型
-  CellBus(ShString name,
-	  const CellBusType* bus_type);
+  CellBus() { }
 
   /// @brief デストラクタ
-  ~CellBus();
+  virtual
+  ~CellBus() { }
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 名前の取得
-  ShString
-  name() const;
-  
+  virtual
+  string
+  name() const = 0;
+
   /// @brief バスの型の取得
+  virtual
   const CellBusType*
-  bus_type() const;
+  bus_type() const = 0;
 
   /// @brief ピン数の取得
-  ymuint32
-  n_pins() const;
+  virtual
+  ymuint
+  pin_num() const = 0;
 
   /// @brief ピンの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < n_pins() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
+  virtual
   const CellPin*
-  pin(ymuint32 pos) const;
+  pin(ymuint pos) const = 0;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-  
-  // 名前
-  ShString mName;
-  
-  // バスの型
-  const CellBusType* mBusType;
-  
-  // ピンのリスト
-  vector<CellPin*> mPinList;
-  
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-  
-// @brief 名前の取得
-inline
-ShString
-CellBusType::name() const
-{
-  return mName;
-}
-  
-// @brief base_type の取得
-inline
-CellBusType::tBaseType
-CellBusType::base_type() const
-{
-  return mBaseType;
-}
-
-// @brief data_type の取得
-inline
-CellBusType::tDataType
-CellBusType::data_type() const
-{
-  return mDataType;
-}
-
-// @brief ビット幅の取得
-inline
-ymuint32
-CellBusType::bit_width() const
-{
-  return mBitWidth;
-}
-
-// @brief 開始ビットの取得
-inline
-int
-CellBusType::bit_from() const
-{
-  return mBitFrom;
-}
-
-// @brief 終了ビットの取得
-inline
-int
-CellBusType::bit_to() const
-{
-  return mBitTo;
-}
-
-// @brief 向きの取得
-// @note true の時，降順を表す．
-inline
-bool
-CellBusType::downto() const
-{
-  return mDownTo;
-}
-
-// @brief 名前の取得
-inline
-ShString
-CellBus::name() const
-{
-  return mName;
-}
-  
-// @brief バスの型の取得
-inline
-const CellBusType*
-CellBus::bus_type() const
-{
-  return mBusType;
-}
-
-// @brief ピン数の取得
-inline
-ymuint32
-CellBus::n_pins() const
-{
-  return mPinList.size();
-}
-
-// @brief ピンの取得
-// @param[in] pos 位置番号 ( 0 <= pos < n_pins() )
-inline
-const CellPin*
-CellBus::pin(ymuint32 pos) const
-{
-  return mPinList[pos];
-}
 
 END_NAMESPACE_YM_CELL
 

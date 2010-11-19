@@ -10,7 +10,7 @@
 
 
 #include "DelayCover.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
@@ -50,10 +50,10 @@ DelayCover::operator()(const SbjGraph& sbjgraph,
 		       ymuint& depth)
 {
   mMode = mode;
-  
+
   // カットを列挙する．
   mCutHolder.enum_cut(sbjgraph, limit);
-  
+
   // 最良カットを記録する．
   MapRecord maprec;
   record_cuts(sbjgraph, limit, slack, maprec);
@@ -62,7 +62,7 @@ DelayCover::operator()(const SbjGraph& sbjgraph,
     // cut resubstituion
     mCutResub(sbjgraph, mCutHolder, maprec, slack);
   }
-  
+
   // 最終的なネットワークを生成する．
   maprec.gen_mapgraph(sbjgraph, mapnetwork, lut_num, depth);
 }
@@ -84,7 +84,7 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   ymuint n = sbjgraph.max_node_id();
 
   maprec.init(sbjgraph);
-  
+
   // 作業領域の初期化
   mNodeInfo.clear();
   mNodeInfo.resize(n);
@@ -109,7 +109,7 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
     t.mCostList.insert(NULL, 0, 0.0);
     t.mMinDepth = 0;
   }
-  
+
   // 各ノードごとにカットを記録
   vector<const SbjNode*> snode_list;
   sbjgraph.sort(snode_list);
@@ -184,7 +184,7 @@ DelayCover::record(const SbjNode* node)
       // ファンアウトモード
       for (ymuint i = 0; i < ni; ++ i) {
 	const SbjNode* inode = cut->input(i);
-	mWeight[i] = 1.0 / inode->n_fanout();
+	mWeight[i] = 1.0 / inode->fanout_num();
       }
     }
     else {
@@ -204,7 +204,7 @@ DelayCover::record(const SbjNode* node)
       }
       mIcostLists[i] = u.mCostList.begin();
     }
-    
+
     int cur_depth = max_input_depth + 1;
     if ( min_depth > cur_depth ) {
       min_depth = cur_depth;
@@ -230,10 +230,10 @@ DelayCover::record(const SbjNode* node)
 	break;
       }
       int depth = idepth + 1;
-      
+
       // (depth, area) を登録
       t.mCostList.insert(cut, depth, area);
-      
+
       // 深さが idepth に等しい解を次に進める．
       for (ymuint i = 0; i < ni; ++ i) {
 	ADCost<double>* cost = *mIcostLists[i];
@@ -262,9 +262,9 @@ DelayCover::calc_weight(const SbjNode* node,
       }
     }
     const SbjNode* inode0 = node->fanin(0);
-    calc_weight(inode0, cut, cur_weight / inode0->n_fanout());
+    calc_weight(inode0, cut, cur_weight / inode0->fanout_num());
     node = node->fanin(1);
-    cur_weight /= node->n_fanout();
+    cur_weight /= node->fanout_num();
   }
 }
 

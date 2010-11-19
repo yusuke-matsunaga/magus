@@ -40,7 +40,7 @@ Parser::new_Module1995(const FileRegion& file_region,
   PtDeclHeadArray localparamhead_array = get_localparam_array();
   PtDeclHeadArray declhead_array = get_decl_array();
   PtItemArray item_array = get_item_array();
-  
+
   LexModuleState* state = lex().module_state();
   bool is_cell = state->cell_define();
   bool is_protected = false; // これどうやって決めるの？
@@ -94,7 +94,7 @@ Parser::new_Module1995(const FileRegion& file_region,
     for (ymuint32 j = 0; j < io_head->item_num(); ++ j) {
       const PtIOItem* elem = io_head->item(j);
       const char* elem_name = elem->name();
-      
+
       // まず未定義/多重定義のエラーをチェックする．
       if ( !port_ref_dic.count(elem_name) ) {
 	// port expression に現れない信号線名
@@ -191,7 +191,7 @@ Parser::new_Module2001(const FileRegion& file_region,
   PtDeclHeadArray localparamhead_array = get_localparam_array();
   PtDeclHeadArray declhead_array = get_decl_array();
   PtItemArray item_array = get_item_array();
-  
+
   LexModuleState* state = lex().module_state();
   bool is_cell = state->cell_define();
   bool is_protected = false; // これどうやって決めるの？
@@ -213,10 +213,10 @@ Parser::new_Module2001(const FileRegion& file_region,
   string config;  // ?
   string library; // ?
   string cell;    // ?
-  
+
   // iohead_array からポートの配列を作る．
   PtiPortArray port_array = new_PortArray(iohead_array);
-  
+
   PtModule* module = mFactory.new_Module(file_region,
 					 module_name,
 					 is_macro, is_cell, is_protected,
@@ -248,14 +248,18 @@ Parser::new_PortArray(PtIOHeadArray iohead_array)
   // port_array を確保する．
   void* p = mAlloc.get_memory(sizeof(PtiPort*) * n);
   PtiPort** array = new (p) PtiPort*[n];
- 
+
   // ポートを生成し arary に格納する．
   n = 0;
   for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* head = iohead_array[i];
     for (ymuint32 j = 0; j < head->item_num(); ++ j) {
       const PtIOItem* elem = head->item(j);
-      array[n] = mFactory.new_Port(elem->file_region(), elem->name());
+      const char* name = elem->name();
+      init_portref_list();
+      new_PortRef(elem->file_region(), name);
+      PtiPortRefArray port_expression = get_portref_array();
+      array[n] = mFactory.new_Port(elem->file_region(), port_expression, name);
       ++ n;
     }
   }

@@ -20,8 +20,8 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SealCmd::SealCmd(NetMgr* mgr) :
-  MagBNetCmd(mgr)
+SealCmd::SealCmd(MagMgr* mgr) :
+  BNetCmd(mgr)
 {
 }
 
@@ -36,7 +36,7 @@ SealCmd::cmd_proc(TclObjVector& objv)
 {
   BNetwork& network = *cur_network();
   BNetManip manip(&network);
-  
+
   vector<BNode*> fanins;
   LogExpr l0 = LogExpr::make_posiliteral(0);
   LogExpr l1 = LogExpr::make_posiliteral(1);

@@ -20,8 +20,8 @@ All rights reserved.
 
 AC_CONFIG_SRCDIR([ym_techmap/techmap_nsdef.h])dnl
 
-AC_CONFIG_AUX_DIR([../../config])dnl
-AC_CONFIG_MACRO_DIR([../../config])dnl
+AC_CONFIG_AUX_DIR([config])dnl
+AC_CONFIG_MACRO_DIR([config])dnl
 AC_SUBST(ac_aux_dir)dnl
 
 AM_INIT_AUTOMAKE()dnl
@@ -91,6 +91,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_techmap/Makefile])
+AC_CONFIG_FILES([patgen/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

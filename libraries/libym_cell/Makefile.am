@@ -7,6 +7,7 @@
 
 SUBDIRS = \
 	ym_cell \
+	ci \
 	mislib \
 	dotlib \
 	. \
@@ -21,20 +22,13 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_cell.la
 
 libym_cell_la_LIBADD = \
+	ci/libym_cell_ci.la \
 	dotlib/libym_cell_dotlib.la \
+	mislib/libym_cell_mislib.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_cell_la_LDFLAGS = 
+libym_cell_la_LDFLAGS =
 
 libym_cell_la_SOURCES = \
-	CellLibrary.cc \
-	Cell.cc \
-	CellPinImpl.h \
-	CellPin.cc \
-	CellLutImpl.h \
-	CellLut.cc \
-	CellTimingImpl.h \
-	CellTiming.cc \
-	CellManip.h \
-	CellManip.cc
+	dump.cc

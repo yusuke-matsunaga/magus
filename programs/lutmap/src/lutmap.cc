@@ -10,7 +10,8 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
+#include "ym_sbj/SbjDumper.h"
 #include "ym_lutmap/LnGraph.h"
 #if 0
 #include "ym_lutmap/BNet2Sbj.h"
@@ -19,27 +20,12 @@
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetDecomp.h"
 #else
-#include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/Mvn2Sbj.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
+#include "ym_mvn/MvNodeMap.h"
 #endif
 #include "ym_utils/MsgHandler.h"
-#include "MvNodeMap.h"
-
-
-BEGIN_NAMESPACE_YM_LUTMAP
-
-void
-mvn2sbj(const MvMgr& mvmgr,
-	SbjGraph& sbjgraph,
-	MvNodeMap& mvnode_map);
-
-void
-dump_mvnode_map(ostream& s,
-		const MvMgr& mvmgr,
-		const MvNodeMap& mvnode_map);
-
-END_NAMESPACE_YM_LUTMAP
 
 
 int
@@ -153,8 +139,10 @@ main(int argc,
 
     // SbjGraph に変換
     SbjGraph sbj_network;
-    nsLutmap::MvNodeMap mvnode_map(mgr.max_node_id());
-    mvn2sbj(mgr, sbj_network, mvnode_map);
+    MvNodeMap mvnode_map(mgr.max_node_id());
+    Mvn2Sbj conv;
+
+    conv(mgr, sbj_network, mvnode_map);
 
     if ( dump2 ) {
       ofstream ofs;
@@ -163,7 +151,8 @@ main(int argc,
 	cerr << dump2_file << ": could not open" << endl;
 	return 3;
       }
-      dump_verilog(ofs, sbj_network);
+      SbjDumper d;
+      d.dump_verilog(ofs, sbj_network);
       dump_mvnode_map(ofs, mgr, mvnode_map);
     }
 

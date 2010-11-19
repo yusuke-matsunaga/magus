@@ -20,13 +20,13 @@ BEGIN_NAMESPACE_MAGUS
 
 int
 seal_init(Tcl_Interp* interp,
-	  NetMgr* mgr)
+	  MagMgr* mgr)
 {
-  TclCmdBinder1<SealCmd, NetMgr*>::reg(interp, mgr, "magus::seal");
-  TclCmdBinder1<TMRCmd, NetMgr*>::reg(interp, mgr, "magus::tmr");
-  TclCmdBinder1<DupCmd, NetMgr*>::reg(interp, mgr, "magus::dup_node");
-  TclCmdBinder1<McaCmd, NetMgr*>::reg(interp, mgr, "magus::mc_analysis");
-  TclCmdBinder1<McaCmd2, NetMgr*>::reg(interp, mgr, "magus::mc_analysis2");
+  TclCmdBinder1<SealCmd, MagMgr*>::reg(interp, mgr, "magus::seal");
+  TclCmdBinder1<TMRCmd, MagMgr*>::reg(interp, mgr, "magus::tmr");
+  TclCmdBinder1<DupCmd, MagMgr*>::reg(interp, mgr, "magus::dup_node");
+  TclCmdBinder1<McaCmd, MagMgr*>::reg(interp, mgr, "magus::mc_analysis");
+  TclCmdBinder1<McaCmd2, MagMgr*>::reg(interp, mgr, "magus::mc_analysis2");
 
   const char* init =
     "namespace eval tclreadline {\n"

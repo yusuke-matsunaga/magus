@@ -1,5 +1,5 @@
 
-/// @file libym_bdn/BdNetwork.cc 
+/// @file libym_bdn/BdNetwork.cc
 /// @brief BdNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -26,7 +26,7 @@ BdnNode::BdnNode() :
   mFanins[0].set_to(this, 0);
   mFanins[1].set_to(this, 1);
 }
-      
+
 // デストラクタ
 BdnNode::~BdnNode()
 {
@@ -123,9 +123,9 @@ BdNetwork::copy(const BdNetwork& src)
   vector<BdnNode*> nodemap(n);
 
   const BdnNodeList& src_latch_list = src.latch_list();
-  
+
   // 外部入力ノードの生成
-  ymuint ni = src.n_inputs();
+  ymuint ni = src.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     BdnNode* src_node = src.input(i);
     BdnNode* dst_node = new_input(src.input_name(i));
@@ -138,7 +138,7 @@ BdNetwork::copy(const BdNetwork& src)
     BdnNode* dst_node = new_latch(src_node->reset_val());
     nodemap[src_node->id()] = dst_node;
   }
-    
+
   // 論理ノードの生成
   vector<BdnNode*> node_list;
   src.sort(node_list);
@@ -163,7 +163,7 @@ BdNetwork::copy(const BdNetwork& src)
   }
 
   // 外部出力ノードの生成
-  ymuint no = src.n_outputs();
+  ymuint no = src.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     BdnNode* src_onode = src.output(i);
     BdnNode* src_inode = src_onode->fanin(0);
@@ -175,7 +175,7 @@ BdNetwork::copy(const BdNetwork& src)
     BdnNode* dst_onode = new_output(src.output_name(i), dst_handle);
     nodemap[src_onode->id()] = dst_onode;
   }
-  
+
   // ラッチノードの入力の設定
   for (BdnNodeList::const_iterator p = src_latch_list.begin();
        p != src_latch_list.end(); ++ p) {
@@ -237,14 +237,14 @@ void
 BdNetwork::sort(vector<BdnNode*>& node_list) const
 {
   node_list.clear();
-  node_list.reserve(n_lnodes());
+  node_list.reserve(lnode_num());
 
   // 処理済みの印を表す配列
   ymuint n = max_node_id();
   vector<bool> marks(n, false);
-  
+
   // 外部入力とラッチのみをファンインにするノードを node_list に追加する．
-  ymuint ni = n_inputs();
+  ymuint ni = input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     BdnNode* node = input(i);
     marks[node->id()] = true;
@@ -263,7 +263,7 @@ BdNetwork::sort(vector<BdnNode*>& node_list) const
     sort_sub(node, marks, node_list);
   }
   // うまくいっていれば全ての論理ノードが node_list に入っているはず．
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
 }
 
 
@@ -279,7 +279,7 @@ rsort_sub(BdnNode* node,
   if ( node == NULL ||
        !node->is_logic() ||
        marks[node->id()] ) return;
-  
+
   const BdnFanoutList& fo_list = node->fanout_list();
   for (BdnFanoutList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
@@ -292,7 +292,7 @@ rsort_sub(BdnNode* node,
   marks[node->id()] = true;
   node_list.push_back(node);
 }
-	  
+
 END_NONAMESPACE
 
 // @brief 逆順でソートされたノードのリストを得る．
@@ -300,14 +300,14 @@ void
 BdNetwork::rsort(vector<BdnNode*>& node_list) const
 {
   node_list.clear();
-  node_list.reserve(n_lnodes());
+  node_list.reserve(lnode_num());
 
   // 処理済みの印をあらわす配列
   ymuint n = max_node_id();
   vector<bool> marks(n, false);
 
   // 外部出力とラッチのみをファンアウトにするノードを node_list に追加する．
-  ymuint no = n_outputs();
+  ymuint no = output_num();
   for (ymuint i = 0; i < no; ++ i) {
     BdnNode* node = output(i);
     marks[node->id()] = true;
@@ -321,7 +321,7 @@ BdNetwork::rsort(vector<BdnNode*>& node_list) const
     BdnNode* inode = node->fanin(0);
     rsort_sub(inode, marks, node_list);
   }
-  
+
   // node_list からノードを取り出し，同様の処理を行う．
   for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
     BdnNode* node = node_list[rpos];
@@ -329,7 +329,7 @@ BdNetwork::rsort(vector<BdnNode*>& node_list) const
     rsort_sub(node->fanin1(), marks, node_list);
   }
   // うまくいっていればすべての論理ノードが node_list に入っているはず．
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
 }
 
 // 入力ノードを作る．
@@ -339,17 +339,17 @@ BdNetwork::new_input(const string& name)
   assert_cond(mInputArray.size() == mInputNameArray.size(), __FILE__, __LINE__);
 
   BdnNode* node = new_node();
-  
+
   // 入力ノード配列に登録
   ymuint id = mInputArray.size();
   mInputArray.push_back(node);
 
   // 入力名の配列に名前を登録．
   mInputNameArray.push_back(name);
-  
+
   node->set_input(id);
   node->mLevel = 0;
-  
+
   return node;
 }
 
@@ -359,22 +359,22 @@ BdNetwork::new_output(const string& name,
 		      BdnNodeHandle inode_handle)
 {
   assert_cond(mOutputArray.size() == mOutputNameArray.size(), __FILE__, __LINE__);
-  
+
   BdnNode* node = new_node();
-  
+
   // 出力ノード配列に登録
   ymuint id = mOutputArray.size();
   mOutputArray.push_back(node);
 
   // 出力名の配列に名前を登録
   mOutputNameArray.push_back(name);
-  
+
   node->set_output(id);
-  
+
   change_output(node, inode_handle);
 
   mLevel = 0U;
-  
+
   return node;
 }
 
@@ -533,7 +533,7 @@ BdNetwork::set_logic(BdnNode* node,
 
   BdnNode* inode0 = inode0_handle.node();
   BdnNode* inode1 = inode1_handle.node();
-  
+
   // 境界条件の検査
   if ( inode0 == NULL ) {
     if ( inode1 == NULL ) {
@@ -605,7 +605,7 @@ BdNetwork::set_logic(BdnNode* node,
       }
     }
   }
-  
+
   // 出力極性の正規化
   bool inv = (fcode & 1U) == 1U;
   if ( inv ) {
@@ -628,7 +628,7 @@ BdNetwork::set_logic(BdnNode* node,
       fcode |= 2U;
     }
   }
-  
+
   // 同じ構造を持つノードが既にないか調べる．
   ymuint pos = hash_func(fcode, inode0, inode1);
   ymuint idx = pos % mHashSize;
@@ -648,7 +648,7 @@ BdNetwork::set_logic(BdnNode* node,
     // 論理ノードリストに登録
     mLnodeList.push_back(node);
 
-    if ( n_lnodes() >= mNextLimit ) {
+    if ( lnode_num() >= mNextLimit ) {
       alloc_table(mHashSize * 2);
       // サイズが変わったのでインデックスを再計算する．
       idx = pos % mHashSize;
@@ -674,11 +674,11 @@ BdNetwork::set_logic(BdnNode* node,
   node->set_logic(fcode);
   connect(inode0, node, 0);
   connect(inode1, node, 1);
-  
+
   // ハッシュ表に登録する．
   node->mLink = mHashTable[idx];
   mHashTable[idx] = node;
-  
+
   return BdnNodeHandle(node, inv);
 }
 
@@ -690,7 +690,7 @@ BdNetwork::connect(BdnNode* from,
 		   ymuint pos)
 {
   // BdnNode::mFaoutList を変更するのはここだけ
-  
+
   BdnEdge* edge = &to->mFanins[pos];
   BdnNode* old_from = edge->from();
   if ( old_from ) {
@@ -702,18 +702,18 @@ BdNetwork::connect(BdnNode* from,
     from->mFanoutList.push_back(edge);
     from->scan_po();
   }
-  
+
   // 構造が変わったのでレベルの情報は無効化される．
   mLevel = 0;
 }
-  
+
 // @brief ハッシュ表を確保する．
 void
 BdNetwork::alloc_table(ymuint req_size)
 {
   BdnNode** old_table = mHashTable;
   ymuint old_size = mHashSize;
-  
+
   if ( mHashSize == 0 ) {
     mHashSize = 1024;
   }
@@ -772,10 +772,10 @@ BdNetwork::delete_node(BdnNode* node)
   if ( node->is_logic() ) {
     mLnodeList.erase(node);
   }
-  
+
   // new_node の逆の処理を行なう．
   mItvlMgr.add(static_cast<int>(node->mId));
-  
+
   // mNodeArray 内のエントリはクリアしない．
   // id の再利用と同様に BdnNode も再利用する．
 }
@@ -785,12 +785,12 @@ ymuint
 BdNetwork::level() const
 {
   if ( (mLevel & 1U) == 0U ) {
-    ymuint ni = n_inputs();
+    ymuint ni = input_num();
     for (ymuint i = 0; i < ni; ++ i) {
       BdnNode* node = input(i);
       node->mLevel = 0;
     }
-    
+
     vector<BdnNode*> node_list;
     sort(node_list);
     for (vector<BdnNode*>::const_iterator p = node_list.begin();
@@ -805,9 +805,9 @@ BdNetwork::level() const
       }
       node->mLevel = l + 1;
     }
-    
+
     ymuint max_l = 0;
-    ymuint no = n_outputs();
+    ymuint no = output_num();
     for (ymuint i = 0; i < no; ++ i) {
       BdnNode* node = output(i);
       BdnNode* inode = node->fanin0();
@@ -828,7 +828,7 @@ void
 dump(ostream& s,
      const BdNetwork& network)
 {
-  ymuint ni = network.n_inputs();
+  ymuint ni = network.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* node = network.input(i);
     s << node->id_str();
@@ -862,7 +862,7 @@ dump(ostream& s,
     s << ", reset_value = " << node->reset_val()
       << ")" << endl;
   }
-  
+
   const BdnNodeList& lnode_list = network.lnode_list();
   for (BdnNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
@@ -877,7 +877,7 @@ dump(ostream& s,
       << ")" << endl;
   }
 
-  ymuint no = network.n_outputs();
+  ymuint no = network.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const BdnNode* node = network.output(i);
     s << node->id_str();

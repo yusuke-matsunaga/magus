@@ -27,7 +27,7 @@ class CalcOdcCmd :
 public:
   
   /// @brief コンストラクタ
-  CalcOdcCmd(NetMgr* mgr);
+  CalcOdcCmd(MagMgr* mgr);
   
   /// @brief デストラクタ
   virtual

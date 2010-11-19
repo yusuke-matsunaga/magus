@@ -20,8 +20,8 @@
 BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
-TestCmd::TestCmd(NetMgr* mgr) :
-  BaseCmd(mgr)
+TestCmd::TestCmd(MagMgr* mgr) :
+  MagCmd(mgr)
 {
 } 
 
@@ -68,11 +68,11 @@ TestCmd::cmd_proc(TclObjVector& objv)
 
 int
 test_init(Tcl_Interp* interp,
-	  NetMgr* mgr)
+	  MagMgr* mgr)
 {
   using nsYm::nsTclpp::TclCmdBinder1;
 
-  TclCmdBinder1<TestCmd, NetMgr*>::reg(interp, mgr,
+  TclCmdBinder1<TestCmd, MagMgr*>::reg(interp, mgr,
 				       "magus::rwtest");
   
   const char* init =

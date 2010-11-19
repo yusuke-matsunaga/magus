@@ -1,5 +1,5 @@
 
-/// @file libym_lutmap/Cut.cc 
+/// @file libym_lutmap/Cut.cc
 /// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,7 +10,7 @@
 
 
 #include "Cut.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -51,46 +51,17 @@ calc_expr_for_node(const SbjNode* node,
       LogExpr cexp1 = calc_expr_for_node(node->fanin(1), logmap);
       ymuint fcode = node->fcode();
 
-      // 単純なコード
-      switch ( fcode ) {
-      case 0x0: // 0000
-      case 0x3: // 0011
-      case 0x5: // 0101
-      case 0xa: // 1010
-      case 0xc: // 1100
-      case 0xf: // 1111
-	assert_not_reached(__FILE__, __LINE__);
-	break;
-      case 0x1: // 0001
-	ans = ~cexp0 & ~cexp1;
-	break;
-      case 0x2: // 0010
-	ans = cexp0 & ~cexp1;
-	break;
-      case 0x4: // 0100
-	ans = ~cexp0 & cexp1;
-	break;
-      case 0x6: // 0110
+      if ( fcode & 1U ) {
+	cexp0 = ~cexp0;
+      }
+      if ( fcode & 2U ) {
+	cexp1 = ~cexp1;
+      }
+      if ( fcode & 4U ) {
 	ans = cexp0 ^ cexp1;
-	break;
-      case 0x7: // 0111
-	ans = ~cexp0 | ~cexp1;
-	break;
-      case 0x8: // 1000
+      }
+      else {
 	ans = cexp0 & cexp1;
-	break;
-      case 0x9: // 1001
-	ans = ~cexp0 ^ cexp1;
-	break;
-      case 0xb: // 1011
-	ans = cexp0 | ~cexp1;
-	break;
-      case 0xd: // 1101
-	ans = ~cexp0 | cexp1;
-	break;
-      case 0xe: // 1110
-	ans = cexp0 | cexp1;
-	break;
       }
     }
   }

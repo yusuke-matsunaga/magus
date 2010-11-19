@@ -10,7 +10,10 @@
 
 
 #include "LutmapCmd.h"
-#include "BNet2Sbj.h"
+#include "ym_bnet/BNet2Sbj.h"
+#include "ym_mvn/Mvn2Sbj.h"
+#include "ym_mvn/MvMgr.h"
+#include "ym_mvn/MvNodeMap.h"
 
 
 
@@ -21,7 +24,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Conv2SbjCmd::Conv2SbjCmd(NetMgr* mgr,
+Conv2SbjCmd::Conv2SbjCmd(MagMgr* mgr,
 			 LutmapData* data) :
   LutmapCmd(mgr, data)
 {
@@ -31,7 +34,7 @@ Conv2SbjCmd::Conv2SbjCmd(NetMgr* mgr,
 Conv2SbjCmd::~Conv2SbjCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 Conv2SbjCmd::cmd_proc(TclObjVector& objv)
@@ -41,24 +44,35 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  try {
-    ostringstream err_out;
-    BNetwork& src_network = *cur_network();
-    BNet2Sbj conv;
-    bool stat = conv(src_network, sbjgraph(), err_out);
-    TclObj emsg = err_out.str();
-    set_result(emsg);
-    return stat ? TCL_OK : TCL_ERROR;
+  NetHandle* neth = cur_nethandle();
+  bool stat = false;
+  switch ( neth->type() ) {
+  case NetHandle::kMagBNet:
+    {
+      ostringstream err_out;
+      const BNetwork& src_network = *neth->bnetwork();
+      BNet2Sbj conv;
+      stat = conv(src_network, sbjgraph(), err_out);
+      TclObj emsg = err_out.str();
+      set_result(emsg);
+    }
+    break;
+
+  case NetHandle::kMagBdn:
+    break;
+
+  case NetHandle::kMagMvn:
+    {
+      const MvMgr& mgr = *neth->mvn();
+      MvNodeMap mvnode_map(mgr.max_node_id());
+      Mvn2Sbj conv;
+
+      conv(mgr, sbjgraph(), mvnode_map);
+    }
+    break;
   }
-  catch ( AssertError x ) {
-    cerr << x << endl;
-    TclObj emsg;
-    emsg << "Assertion Error";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
-  
-  return TCL_OK;
+
+  return stat ? TCL_OK : TCL_ERROR;
 }
 
 END_NAMESPACE_MAGUS

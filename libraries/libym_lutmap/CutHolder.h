@@ -13,7 +13,7 @@
 
 #include "EnumCutOp.h"
 #include "Cut.h"
-#include "ym_lutmap/SbjGraph.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -44,7 +44,7 @@ public:
   /// @brief 現在のカットを列挙したときのカットサイズを返す．
   ymuint
   limit() const;
-  
+
   /// @brief 保持しているカットのリストを削除する．
   void
   clear();
@@ -62,7 +62,7 @@ private:
   void
   all_init(const SbjGraph& sbjgraph,
 	   ymuint limit);
-  
+
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
   /// @param[in] node 根のノード
   /// @param[in] cur_pos node の処理順
@@ -119,20 +119,20 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // カットサイズ
   ymuint32 mLimit;
-  
+
   // 各ノードのカットのリスト
   CutList* mCutList;
 
   static
   const ymuint kPageSize = 8192;
-  
+
   char* mCurChunk;
 
   ymuint32 mLast;
-  
+
   vector<char*> mChunk;
 
 };

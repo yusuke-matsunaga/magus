@@ -14,8 +14,8 @@
 // 実はこのパッケージは Magus には依存していないので汎用である．
 
 
+#include "magus_nsdef.h"
 #include "ym_tclpp/TclCmd.h"
-#include "magus.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -31,9 +31,9 @@ public:
   /// @brief コンストラクタ
   RandInitCmd();
 
-  
+
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -53,9 +53,9 @@ public:
   /// @brief コンストラクタ
   RandCmd();
 
-  
+
 protected:
-  
+
   // コマンド処理関数
   virtual
   int

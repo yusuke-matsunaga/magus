@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -24,12 +24,12 @@ typedef string State;
 /// @brief ソフトエラーの解析を実行するコマンド
 //////////////////////////////////////////////////////////////////////
 class McaCmd2 :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  McaCmd2(NetMgr* mgr);
+  McaCmd2(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -37,7 +37,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンド処理関数
   virtual
   int
@@ -51,7 +51,7 @@ private:
   read_kiss(ifstream& fi,
 	    vector<State>& init_states);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -62,13 +62,13 @@ private:
 
   // -state オプションの解析用
   TclPoptStr* mPoptState;
-  
+
   // -comb オプションの解析用
   TclPopt* mPoptComb;
-  
+
   // -ffpo オプションの解析用
   TclPopt* mPoptFFPO;
-  
+
 };
 
 END_NAMESPACE_MAGUS

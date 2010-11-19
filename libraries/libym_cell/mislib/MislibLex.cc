@@ -10,7 +10,6 @@
 
 
 #include "MislibLex.h"
-#include "MislibParserImpl.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -51,7 +50,7 @@ MislibLex::read_token()
   int c;
 
   mCurString.clear();
-  
+
  state1:
   c = get();
   mFirstColumn = mCurColumn;
@@ -211,7 +210,7 @@ int
 MislibLex::get()
 {
   int c = 0;
-  
+
   if ( mUngetChar != 0 ) {
     // 戻された文字があったらそれを返す．
     c = mUngetChar;

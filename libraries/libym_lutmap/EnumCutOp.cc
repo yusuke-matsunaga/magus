@@ -1,5 +1,5 @@
 
-/// @file libym_lutmap/EnumCutOp.cc 
+/// @file libym_lutmap/EnumCutOp.cc
 /// @brief EnumCutOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/SbjGraph.h"
 #include "EnumCutOp.h"
 #include "EnumCut.h"
+#include "ym_sbj/SbjGraph.h"
 
 //#define DEBUG_ENUM_RECUR
 

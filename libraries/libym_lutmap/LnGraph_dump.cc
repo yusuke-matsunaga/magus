@@ -93,13 +93,13 @@ dump(ostream& s,
     s << endl;
   }
 
-  const LnNodeList& lut_list = lngraph.lut_list();
+  const LnNodeList& lut_list = lngraph.lnode_list();
   for (LnNodeList::const_iterator p = lut_list.begin();
        p != lut_list.end(); ++ p) {
     const LnNode* node = *p;
     s << "LUT(" << node->id_str() << ")  = (";
     const char* comma = "";
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       const LnNode* inode = node->fanin(i);
       s << comma << inode->id_str();
@@ -132,7 +132,7 @@ node_name(const LnNode* node)
 string
 lut_name(const LnNode* node)
 {
-  ymuint ni = node->ni();
+  ymuint ni = node->fanin_num();
   vector<int> tv;
   node->tv(tv);
   ymuint nip = 1U << ni;
@@ -171,7 +171,7 @@ dump_lut(ostream& s,
 	 const LnNode* node,
 	 const string& name)
 {
-  ymuint ni = node->ni();
+  ymuint ni = node->fanin_num();
   ymuint nip = 1U << ni;
 
   vector<int> tv;
@@ -228,7 +228,7 @@ dump_verilog(ostream& s,
   const LnNodeList& input_list = lngraph.input_list();
   const LnNodeList& output_list = lngraph.output_list();
   const LnNodeList& dff_list = lngraph.dff_list();
-  const LnNodeList& lut_list = lngraph.lut_list();
+  const LnNodeList& lut_list = lngraph.lnode_list();
 
   hash_set<string> lut_name_set;
   ymuint n = lngraph.max_node_id();
@@ -238,7 +238,7 @@ dump_verilog(ostream& s,
   for (LnNodeList::const_iterator p = lut_list.begin();
        p != lut_list.end(); ++ p) {
     const LnNode* node = *p;
-    if ( node->ni() > 0 ) {
+    if ( node->fanin_num() > 0 ) {
       string name = lut_name(node);
       lut_names[node->id()] = name;
       if ( lut_name_set.count(name) == 0 ) {
@@ -317,7 +317,7 @@ dump_verilog(ostream& s,
   for (LnNodeList::const_iterator p = lut_list.begin();
        p != lut_list.end(); ++ p) {
     const LnNode* node = *p;
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     if ( ni == 0 ) {
       // 特例
       s << "  assign " << node_name(node) << " = 1'b";

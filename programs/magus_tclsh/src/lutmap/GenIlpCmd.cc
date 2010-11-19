@@ -251,7 +251,7 @@ generate_ILP(const SbjGraph& sbjgraph,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GenIlpCmd::GenIlpCmd(NetMgr* mgr,
+GenIlpCmd::GenIlpCmd(MagMgr* mgr,
 		     LutmapData* data) :
   LutmapCmd(mgr, data)
 {

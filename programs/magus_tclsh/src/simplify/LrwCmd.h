@@ -10,9 +10,8 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-// ネットワークを操作するコマンド群
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 #include "simplify.h"
 
 
@@ -22,12 +21,12 @@ BEGIN_NAMESPACE_MAGUS_SIMPLIFY
 // local rewriting を行うコマンド
 //////////////////////////////////////////////////////////////////////
 class LrwCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  LrwCmd(NetMgr* mgr);
+  LrwCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -35,7 +34,7 @@ public:
 
 
 protected:
-  
+
   // コマンド処理関数
   virtual
   int

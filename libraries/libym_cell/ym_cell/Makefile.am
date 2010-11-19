@@ -9,10 +9,11 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	cell_nsdef.h \
 	cell_type.h \
-	CellPin.h \
-	CellBus.h \
-	CellBundle.h \
-	CellTiming.h \
-	CellLut.h \
 	Cell.h \
-	CellLibrary.h
+	CellBundle.h \
+	CellBus.h \
+	CellLibrary.h \
+	CellLut.h \
+	CellMislibReader.h \
+	CellPin.h \
+	CellTiming.h

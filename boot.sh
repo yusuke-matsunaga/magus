@@ -127,6 +127,7 @@ LIBRARIES=\
  libym_bnet \
  libym_bdn \
  libym_mvn \
+ libym_sbj \
  libym_aig \
  libym_tgnet \
  libym_gds \
@@ -152,9 +153,11 @@ case "$1" in
 	clean $BASEDIR
 	clean $BASEDIR/include
 	for lib in $LIBRARIES; do
+	    clean_config $BASEDIR/libraries/$lib
 	    clean $BASEDIR/libraries/$lib
 	done
 	for prog in $PROGRAMS; do
+	    clean_config $BASEDIR/programs/$prog
 	    clean $BASEDIR/programs/$prog
 	done
         boot $BASEDIR
@@ -167,9 +170,8 @@ case "$1" in
 	done
         ;;
       2)
-	clean_config $BASEDIR/config
+	clean_config $2
 	clean $2
-	boot $BASEDIR
         boot $2
         ;;
       *) usage;;
@@ -182,14 +184,16 @@ case "$1" in
 	clean $BASEDIR
 	clean $BASEDIR/include
 	for lib in $LIBRARIES; do
+	    clean_config $BASEDIR/libraries/$lib
 	    clean $BASEDIR/libraries/$lib
 	done
 	for prog in $PROGRAMS; do
+	    clean_config $BASEDIR/programs/$prog
 	    clean $BASEDIR/programs/$prog
 	done
 	;;
       2)
-        clean_config $BASEDIR/config
+        clean_config $2
 	clean $2
 	;;
       *) usage;;

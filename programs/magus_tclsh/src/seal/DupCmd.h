@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagBNetCmd.h"
+#include "BNetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -20,12 +20,12 @@ BEGIN_NAMESPACE_MAGUS
 // 回路を部分的に多重化するコマンド
 //////////////////////////////////////////////////////////////////////
 class DupCmd :
-  public MagBNetCmd
+  public BNetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  DupCmd(NetMgr* mgr);
+  DupCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -33,7 +33,7 @@ public:
 
 
 protected:
-  
+
   // コマンド処理関数
   virtual
   int
