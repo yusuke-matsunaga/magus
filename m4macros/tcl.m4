@@ -23,13 +23,17 @@
 # Checks for tcl/tk environment
 AC_DEFUN([YM_CHECK_TCL],[
 # Checks for Tcl
+ym_tmp_lib_list="lib"
 arch=`uname -p`
 if test "X$arch" = "Xx86_64"; then
-  ym_tmp_lib="lib64"
-else
-  ym_tmp_lib="lib"
+  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
 fi
-ym_tmp_path="$prefix/$ym_tmp_lib $ac_default_prefix/$ym_tmp_lib /usr/$ym_tmp_lib /usr/local/$ym_tmp_lib"
+ym_tmp_path=""
+for ym_tmp_dir in "$prefix $ac_default_prefix /usr /usr/local"; do
+  for ym_tmp_lib in $ym_tmp_lib_list; do
+    ym_tmp_path="$ym_tmp_path $ym_tmp_dir/$ym_tmp_lib"
+  done
+done
 YM_CHECK_TCLLIB(tcl, $ym_tmp_path,
                 [tcl8.5 tcl8.4 tcl8.3 tcl8.2 tcl8.1 tcl8.0 tcl8.0jp tcl],
                 TCL_LIB_SPEC, TCL_MAJOR_VERSION, TCL_MINOR_VERSION)
@@ -83,14 +87,17 @@ AC_SUBST(TCL_MINOR_VERSION)dnl
 AC_DEFUN([YM_CHECK_TK],[
 # Checks for Tcl
 YM_CHECK_TCL
-
+ym_tmp_lib_list="lib"
 arch=`uname -p`
 if test "X$arch" = "Xx86_64"; then
-  ym_tmp_lib="lib64"
-else
-  ym_tmp_lib="lib"
+  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
 fi
-ym_tmp_path="$prefix/$ym_tmp_lib $ac_default_prefix/$ym_tmp_lib /usr/$ym_tmp_lib /usr/local/$ym_tmp_lib"
+ym_tmp_path=""
+for ym_tmp_dir in "$prefix $ac_default_prefix /usr /usr/local"; do
+  for ym_tmp_lib in $ym_tmp_lib_list; do
+    ym_tmp_path="$ym_tmp_path $ym_tmp_dir/$ym_tmp_lib"
+  done
+done
 
 ym_old_cppflags=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $TCL_INCLUDES"
