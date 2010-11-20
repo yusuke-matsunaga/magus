@@ -75,12 +75,12 @@ VlDumperImpl::put_module(const char* label,
   put("vpiTopModule", module->is_top_module() );
   put("vpiCellInstance", module->is_cell_instance() );
   put("vpiProtected", module->is_protected() );
-  
+
   if ( module->time_unit() != -16 ) {
     put("vpiTimeUnit", unit2str(module->time_unit()) );
     put("vpiTimePrecision", unit2str(module->time_precision()) );
   }
-  
+
   put("vpiDefNetType", module->def_net_type() );
   put("vpiUnconnDrive", module->unconn_drive() );
   put("vpiDefDelayMode", module->def_delay_mode() );
@@ -109,16 +109,16 @@ VlDumperImpl::put_module(const char* label,
     }
   }
 #endif
-  
-  for (ymuint32 i = 0; i < module->port_num(); ++ i) {
+
+  for (ymuint i = 0; i < module->port_num(); ++ i) {
     put_port("vpiPort", mgr, module->port(i));
   }
-  for (ymuint32 i = 0; i < module->io_num(); ++ i) {
+  for (ymuint i = 0; i < module->io_num(); ++ i) {
     put_iodecl("vpiIODecl", mgr, module->io(i));
   }
-  
+
   put_scope_sub(mgr, module);
-  
+
   vector<const VlProcess*> process_list;
   if ( mgr.find_process_list(module, process_list) ) {
     put_process_list("vpiProcess", mgr, process_list);
@@ -133,23 +133,23 @@ VlDumperImpl::put_modulearray(const char* label,
 			      const VlModuleArray* module_array)
 {
   VlDumpHeader x(this, label, "ModuleArray");
-  
+
   put("FileRegion", module_array->file_region() );
   put("vpiFullName", module_array->full_name() );
   put("vpiSize", module_array->elem_num() );
   put_expr("vpiLeftRange", mgr, module_array->left_range() );
   put_expr("vpiRightRange", mgr, module_array->right_range() );
-  
+
 #if 0
   vector<VlObj*> obj_list;
   if ( mgr.find_obj(module_array, vpiParamAssign, obj_list) ) {
     put("vpiParamAssign", mgr, obj_list);
   }
 #endif
-  
+
   // 中身は出力しない．
 }
-  
+
 // @brief module array のリストの内容を出力する関数
 void
 VlDumperImpl::put_modulearray_list(const char* label,
@@ -188,10 +188,10 @@ VlDumperImpl::put_port(const char* label,
   put("vpiVector", port->is_vector() );
 #endif
   put("vpiSize", port->bit_size() );
-  
+
   put_expr("vpiHighConn", mgr, port->high_conn() );
   put_expr("vpiLowConn",  mgr, port->low_conn() );
-  
+
 #if 0
   if ( mBitExpandMode ) {
     put("vpiBit", handle.get_iterate(vpiBit));

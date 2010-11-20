@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] expr_list 式の配列
 ElbDelay*
 EiFactory::new_Delay(const PtBase* pt_obj,
-		     ymuint32 elem_num,
+		     ymuint elem_num,
 		     ElbExpr** expr_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiDelay));
@@ -41,20 +41,20 @@ EiFactory::new_Delay(const PtBase* pt_obj,
 //////////////////////////////////////////////////////////////////////
 // クラス EiDelay
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] pt_obj パース木の定義要素
 // @param[in] elem_num 要素数
 // @param[in] expr_list 式の配列
 EiDelay::EiDelay(const PtBase* pt_obj,
-		 ymuint32 elem_num,
+		 ymuint elem_num,
 		 ElbExpr** expr_list) :
   mPtObj(pt_obj),
   mElemNum(elem_num),
   mElemArray(expr_list)
 {
 }
-  
+
 // @brief デストラクタ
 EiDelay::~EiDelay()
 {
@@ -74,9 +74,9 @@ EiDelay::file_region() const
 {
   return mPtObj->file_region();
 }
-  
+
 // @brief 要素数を返す．
-ymuint32
+ymuint
 EiDelay::elem_num() const
 {
   return mElemNum;
@@ -85,18 +85,18 @@ EiDelay::elem_num() const
 // @brief 値を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
 const VlExpr*
-EiDelay::expr(ymuint32 pos) const
+EiDelay::expr(ymuint pos) const
 {
   return mElemArray[pos];
 }
-  
+
 // @brief Verilog-HDL の文字列を得る．
 string
 EiDelay::decompile() const
 {
   string ans = "(";
   string comma = "";
-  for (ymuint32 i = 0; i < elem_num(); ++ i) {
+  for (ymuint i = 0; i < elem_num(); ++ i) {
     ans += comma;
     ans += expr(i)->decompile();
     comma = ", ";

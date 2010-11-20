@@ -80,7 +80,7 @@ AttrDict::find(const PtAttrInst* pt_attr) const
   }
   return NULL;
 }
-  
+
 // @brief 内容をクリアする．
 void
 AttrDict::clear()
@@ -91,7 +91,7 @@ AttrDict::clear()
 }
 
 // @brief このオブジェクトが使用しているメモリ量を返す．
-size_t
+ymuint
 AttrDict::allocated_size() const
 {
   return sizeof(AttrDict) + sizeof(Cell*) * mSize + mAlloc.allocated_size();

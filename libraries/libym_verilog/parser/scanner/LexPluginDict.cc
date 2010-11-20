@@ -19,12 +19,12 @@ BEGIN_NONAMESPACE
 
 // ハッシュ関数
 inline
-ymuint32
+ymuint
 hash_func(const char* str)
 {
-  ymuint32 h = 0;
-  ymuint32 c;
-  for ( ; (c = static_cast<ymuint32>(*str)); ++ str) {
+  ymuint h = 0;
+  ymuint c;
+  for ( ; (c = static_cast<ymuint>(*str)); ++ str) {
     h = h * 37 + c;
   }
   return h;
@@ -45,7 +45,7 @@ LexPluginDict::LexPluginDict() :
 // @brief デストラクタ
 LexPluginDict::~LexPluginDict()
 {
-  for (ymuint32 i = 0; i < mTableSize; ++ i) {
+  for (ymuint i = 0; i < mTableSize; ++ i) {
     for (LexPlugin* p = mHashTable[i]; p; ) {
       LexPlugin* next = p->mLink;
       delete p;
@@ -75,8 +75,8 @@ void
 LexPluginDict::reg_plugin(LexPlugin* plugin)
 {
   const char* name = plugin->name();
-  ymuint32 hash_value = hash_func(name);
-  ymuint32 pos = hash_value % mTableSize;
+  ymuint hash_value = hash_func(name);
+  ymuint pos = hash_value % mTableSize;
   LexPlugin* p;
   for (LexPlugin** prev = &mHashTable[pos]; (p = *prev); ) {
     if ( strcmp(p->name(), name) == 0 ) {
@@ -97,12 +97,12 @@ LexPluginDict::reg_plugin(LexPlugin* plugin)
 
   if ( mNum >= mNextLimit ) {
     LexPlugin** old_table = mHashTable;
-    ymuint32 old_size = mTableSize;
+    ymuint old_size = mTableSize;
     new_table(mTableSize << 1);
-    for (ymuint32 i = 0; i < old_size; ++ i) {
+    for (ymuint i = 0; i < old_size; ++ i) {
       for (LexPlugin* p = old_table[i]; p; ) {
 	LexPlugin* next = p->mLink;
-	ymuint32 pos1 = hash_func(p->name()) % mTableSize;
+	ymuint pos1 = hash_func(p->name()) % mTableSize;
 	p->mLink = mHashTable[pos1];
 	mHashTable[pos1] = p;
 	p = next;
@@ -125,8 +125,8 @@ LexPluginDict::reg_plugin(LexPlugin* plugin)
 bool
 LexPluginDict::unreg_plugin(const char* name)
 {
-  ymuint32 hash_value = hash_func(name);
-  ymuint32 pos = hash_value % mTableSize;
+  ymuint hash_value = hash_func(name);
+  ymuint pos = hash_value % mTableSize;
   LexPlugin** prev = &mHashTable[pos];
   for (LexPlugin* p = *prev; p; ) {
     if ( strcmp(p->name(), name) == 0 ) {
@@ -146,8 +146,8 @@ LexPluginDict::unreg_plugin(const char* name)
 LexPlugin*
 LexPluginDict::find_plugin(const char* name) const
 {
-  ymuint32 hash_value = hash_func(name);
-  ymuint32 pos = hash_value & mHashMask;
+  ymuint hash_value = hash_func(name);
+  ymuint pos = hash_value & mHashMask;
   for (LexPlugin* p = mHashTable[pos]; p; p = p->mLink) {
     if ( strcmp(p->name(), name) == 0 ) {
       return p;
@@ -158,13 +158,13 @@ LexPluginDict::find_plugin(const char* name) const
 
 // @brief ハッシュ表を確保する．
 void
-LexPluginDict::new_table(ymuint32 size)
+LexPluginDict::new_table(ymuint size)
 {
   mTableSize = size;
   mHashMask = mTableSize - 1;
-  mNextLimit = static_cast<ymuint32>(mTableSize * 1.8);
+  mNextLimit = static_cast<ymuint>(mTableSize * 1.8);
   mHashTable = new LexPlugin*[mTableSize];
-  for (ymuint32 i = 0; i < mTableSize; ++ i) {
+  for (ymuint i = 0; i < mTableSize; ++ i) {
     mHashTable[i] = NULL;
   }
 }

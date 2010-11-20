@@ -39,7 +39,7 @@ union YYSTYPE;
 class Parser
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] msg_mgr メッセージマネージャ
   /// @param[in] ptmgr 読んだ結果のパース木を登録するマネージャ
@@ -49,7 +49,7 @@ public:
 	 PtMgr& ptmgr,
 	 AllocBase& alloc,
 	 PtiFactory& ptifactory);
-  
+
   /// @brief デストラクタ
   ~Parser();
 
@@ -70,7 +70,7 @@ public:
 	    const SearchPathList& searchpath,
 	    const list<VlLineWatcher*>& watcher_list);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // UDP 関連の生成関数
@@ -115,7 +115,7 @@ public:
 	       tVpiUdpVal current_symbol,
 	       const FileRegion& output_loc,
 	       tVpiUdpVal output_symbol);
-  
+
   /// @brief UDP のテーブルエントリの要素の値の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] symbol シンボル
@@ -123,8 +123,8 @@ public:
   void
   new_UdpValue(const FileRegion& fr,
 	       tVpiUdpVal symbol);
-  
-  
+
+
 private:
 
   /// @brief new_Udp の下請け関数
@@ -140,7 +140,7 @@ private:
 	  PtiPortArray port_array,
 	  PtIOHeadArray iohead_array);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // モジュール関連の要素の生成関数
@@ -160,7 +160,7 @@ public:
 		 const char* name,
 		 PtrList<PtAttrInst>* ai_list);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ポート関連の要素の生成関数
@@ -169,7 +169,7 @@ public:
   /// @brief 入出力宣言からポートを作る．
   PtiPortArray
   new_PortArray(PtIOHeadArray iohead_array);
-  
+
   /// @brief 空のポートの生成
   void
   new_Port();
@@ -222,7 +222,7 @@ public:
 	      PtExpr* left,
 	      PtExpr* right);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // IO 宣言関係の要素の生成関数
@@ -330,7 +330,7 @@ public:
   new_IOItem(const FileRegion& fr,
 	     const char* name,
 	     PtExpr* init_value);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -371,7 +371,7 @@ public:
   void
   new_LocalParamH(const FileRegion& fr,
 		  PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 範囲指定型 local param 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] sign 符号付きのとき true となるフラグ
@@ -449,7 +449,7 @@ public:
 	   PtExpr* left,
 	   PtExpr* right,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -459,7 +459,7 @@ public:
 	   tVpiNetType type,
 	   bool sign,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成 (strength あり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -471,7 +471,7 @@ public:
 	   bool sign,
 	   PtStrength* strength,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成 (遅延あり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -483,7 +483,7 @@ public:
 	   bool sign,
 	   PtDelay* delay,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成 (strength, 遅延あり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -497,7 +497,7 @@ public:
 	   PtStrength* strength,
 	   PtDelay* delay,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -513,7 +513,7 @@ public:
 	   PtExpr* left,
 	   PtExpr* right,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (strengthあり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -531,7 +531,7 @@ public:
 	   PtExpr* right,
 	   PtStrength* strength,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (遅延あり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -549,7 +549,7 @@ public:
 	   PtExpr* right,
 	   PtDelay* delay,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (strength, 遅延あり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
@@ -602,7 +602,7 @@ public:
   new_Range(const FileRegion& fr,
 	    PtExpr* msb,
 	    PtExpr* lsb);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -702,7 +702,7 @@ public:
 	   bool automatic,
 	   PtStmt* stmt,
 	   PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 1ビット型 function 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name function 名
@@ -716,7 +716,7 @@ public:
 	       bool sign,
 	       PtStmt* stmt,
 	       PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 範囲指定型 function 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name function 名
@@ -734,7 +734,7 @@ public:
 		PtExpr* right,
 		PtStmt* stmt,
 		PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 組み込み型 function 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name function 名
@@ -750,7 +750,7 @@ public:
 		tVpiVarType func_type,
 		PtStmt* stmt,
 		PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief gate instance 文のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
@@ -758,7 +758,7 @@ public:
   new_GateH(const FileRegion& fr,
 	    tVpiPrimType type,
 	    PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief gate instance 文のヘッダの生成 (strength付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
@@ -768,7 +768,7 @@ public:
 	    tVpiPrimType type,
 	    PtStrength* strength,
 	    PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief gate instance 文のヘッダの生成 (遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
@@ -778,7 +778,7 @@ public:
 	    tVpiPrimType type,
 	    PtDelay* delay,
 	    PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief gate instance 文のヘッダの生成 (strength, 遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
@@ -1009,7 +1009,7 @@ public:
   void
   new_Generate(const FileRegion& fr,
 	       PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief generate block 文の生成
   /// @param[in] fr ファイル位置の情報
   void
@@ -1131,7 +1131,7 @@ public:
 	       int output_pol,
 	       PtExpr* expr,
 	       PtPathDelay* path_delay);
-  
+
   /// @brief path delay value の生成 (値が1個)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] value 値
@@ -1210,7 +1210,7 @@ public:
 		PtExpr* value11,
 		PtExpr* value12);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ステートメント関連の要素の生成
@@ -1224,7 +1224,7 @@ public:
   new_Disable(const FileRegion& fr,
 	      const char* name,
 	      PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief disable 文の生成 (階層付き識別子)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] hname 階層名
@@ -1487,7 +1487,7 @@ public:
 	       PtExpr* lhs,
 	       PtExpr* rhs,
 	       PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief deassign 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] lhs 左辺式
@@ -1556,7 +1556,7 @@ public:
 		    const char* name,
 		    PtrList<PtStmt>* stmt_list,
 		    PtrList<PtAttrInst>* ai_list);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1619,7 +1619,7 @@ public:
   new_MultiConcat(const FileRegion& fr,
 		  PtExpr* rep,
 		  PtrList<PtExpr>* expr_list);
-  
+
   /// @brief min/typ/max delay 演算子の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] val0 minimum 値
@@ -1727,7 +1727,7 @@ public:
 	      tVpiRangeMode mode,
 	      PtExpr* left,
 	      PtExpr* right);
-  
+
   /// @brief constant primary の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name 識別子名
@@ -1737,7 +1737,7 @@ public:
   new_CPrimary(const FileRegion& fr,
 	       const char* name,
 	       PtExpr* index);
-  
+
   /// @brief constant primary の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name 識別子名
@@ -1761,7 +1761,7 @@ public:
 	       tVpiRangeMode mode,
 	       PtExpr* left,
 	       PtExpr* right);
-  
+
   /// @brief インデックス付き constant primary の生成 (階層付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] hname 階層名
@@ -1771,7 +1771,7 @@ public:
   new_CPrimary(const FileRegion& fr,
 	       PuHierName* hname,
 	       PtrList<PtExpr>* index_list);
-  
+
   /// @brief function call の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name 関数名
@@ -1810,7 +1810,7 @@ public:
   /// @return 生成された定数
   PtExpr*
   new_IntConst(const FileRegion& fr,
-	       ymuint32 value);
+	       ymuint value);
 
   /// @brief 整数型の定数の生成
   /// @param[in] fr ファイル位置の情報
@@ -1838,7 +1838,7 @@ public:
   /// @return 生成された定数
   PtExpr*
   new_IntConst(const FileRegion& fr,
-	       ymuint32 size,
+	       ymuint size,
 	       tVpiConstType const_type,
 	       const char* value);
 
@@ -1958,7 +1958,7 @@ public:
   new_OrderedCon(const FileRegion& fr,
 		 PtExpr* expr,
 		 PtrList<PtAttrInst>* ai_list);
-  
+
   /// @brief 名前付き結合子の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name 名前
@@ -2033,14 +2033,14 @@ public:
   new_HierName(const char* head_name,
 	       int index,
 	       const char* name);
-  
+
   /// @brief 階層名の追加
   /// @aram[in] hname 階層名の上位部分
   /// @param[in] name 追加する名前
   void
   add_HierName(PuHierName* hname,
 		 const char* name);
-  
+
   /// @brief 階層名の追加
   /// @aram[in] hname 階層名の上位部分
   /// @param[in] index インデックス
@@ -2049,7 +2049,7 @@ public:
   add_HierName(PuHierName* hname,
 	       int index,
 	       const char* name);
-  
+
   /// @brief 階層名の取得
   /// @param[in] hname 階層名
   /// @param[out] 階層の上位部分の配列
@@ -2059,7 +2059,7 @@ public:
   extract_HierName(PuHierName* hname,
 		   PtNameBranchArray& nb_array);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // attribute instance 関係
   //////////////////////////////////////////////////////////////////////
@@ -2081,7 +2081,7 @@ public:
   new_AttrSpec(const FileRegion& fr,
 	       const char* name,
 	       PtExpr* expr);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -2103,7 +2103,7 @@ public:
   /// @brief モジュール定義の終了
   void
   end_module();
-  
+
   /// @brief UDP定義の開始
   /// - port list の初期化
   /// - iohead list の初期化
@@ -2116,7 +2116,7 @@ public:
   /// @brief UDP 定義の終了
   void
   end_udp();
-  
+
   /// @brief task/function 定義の開始
   /// - iohead list の初期化
   /// - paramhead list の初期化
@@ -2129,7 +2129,7 @@ public:
   /// @brief task/function 定義の終了
   void
   end_tf();
-  
+
   /// @brief generate block の開始
   void
   init_generate();
@@ -2137,11 +2137,11 @@ public:
   /// @brief generate block の終了
   void
   end_generate();
-  
+
   /// @brief generate-if の開始
   void
   init_genif();
-  
+
   /// @brief generate-if の else 節の開始
   void
   init_else();
@@ -2149,7 +2149,7 @@ public:
   /// @brief generate-if の終了
   void
   end_genif();
-  
+
   /// @brief block-statment の開始
   void
   init_block();
@@ -2157,7 +2157,7 @@ public:
   /// @brief block-statement の終了
   void
   end_block();
-  
+
   /// @brief ポートリストにポートを追加する．
   void
   add_port(PtiPort* port);
@@ -2165,7 +2165,7 @@ public:
   /// @brief ポートリストを配列に変換する．
   PtiPortArray
   get_port_array();
-  
+
   /// @brief ポート参照リストを初期化する．
   void
   init_portref_list();
@@ -2185,11 +2185,11 @@ public:
   /// @brief parameter port 宣言の終わり
   void
   end_paramport();
-  
+
   /// @brief parameter port リストを配列に変換する．
   PtDeclHeadArray
   get_paramport_array();
-  
+
   /// @brief IO宣言リストにIO宣言ヘッダを追加する．
   void
   add_io_head(PtiIOHead* head);
@@ -2197,35 +2197,35 @@ public:
   /// @brief IO宣言リストにIO宣言要素を追加する．
   void
   add_io_item(PtIOItem* item);
-  
+
   /// @brief IO宣言の終わり
   void
   end_io();
-  
+
   /// @brief IO宣言リストを配列に変換する．
   PtIOHeadArray
   get_io_array();
-  
+
   /// @brief parameter 宣言ヘッダを追加する．
   void
   add_param_head(PtiDeclHead* head);
-  
+
   /// @param parameter 宣言の終わり
   void
   end_param();
-  
+
   /// @brief parameter リストを配列に変換する．
   PtDeclHeadArray
   get_param_array();
-  
+
   /// @brief localparam 宣言ヘッダを追加する．
   void
   add_localparam_head(PtiDeclHead* head);
-  
+
   /// @param localparam 宣言の終わり
   void
   end_localparam();
-  
+
   /// @brief localparam リストを配列に変換する．
   PtDeclHeadArray
   get_localparam_array();
@@ -2237,11 +2237,11 @@ public:
   /// @brief 宣言リストに宣言要素を追加する．
   void
   add_decl_item(PtDeclItem* item);
-  
+
   /// @param 宣言の終わり
   void
   end_decl();
-  
+
   /// @brief 宣言リストを配列に変換する．
   PtDeclHeadArray
   get_decl_array();
@@ -2253,7 +2253,7 @@ public:
   /// @brief generate-if 文の else 節の宣言リストを配列に変換する．
   PtDeclHeadArray
   get_else_decl_array();
-  
+
   /// @brief item リストに要素を追加する．
   void
   add_item(PtItem* item);
@@ -2277,7 +2277,7 @@ public:
   /// @brief UdpEntry のリストを配列に変換する．
   PtUdpEntryArray
   get_udp_entry_array();
-  
+
   /// @brief UdpValue のリストを初期化する．
   void
   init_udp_value_list();
@@ -2289,7 +2289,7 @@ public:
   /// @brief UdpValue のリストを配列に変換する．
   PtUdpValueArray
   get_udp_value_array();
-  
+
   /// @brief defparam リストを初期化する．
   void
   init_defparam();
@@ -2301,7 +2301,7 @@ public:
   /// @brief defparam リストを配列に変換する．
   PtDefParamArray
   get_defparam_array();
-  
+
   /// @brief contassign リストを初期化する．
   void
   init_contassign();
@@ -2313,7 +2313,7 @@ public:
   /// @brief contassign リストを配列に変換する．
   PtContAssignArray
   get_contassign_array();
-  
+
   /// @brief instance リストを初期化する．
   void
   init_inst();
@@ -2325,8 +2325,8 @@ public:
   /// @brief instance リストを配列に変換する．
   PtInstArray
   get_inst_array();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // リスト関係
@@ -2335,21 +2335,21 @@ public:
   template <typename T>
   PtrList<T, T>*
   new_list();
-  
+
   template <typename T>
   PtArray<T>
   to_array(PtrList<T, T>* list);
-  
+
   /// @brief 式のリストから配列を生成する．(multi_concat用)
   /// @param[in] pre_expr list の前に挿入する式
   /// @note 結果として list は削除される．
   PtExprArray
   ExprArray(PtExpr* pre_expr,
 	    PtrList<PtExpr>* list);
-  
+
 
 public:
-  
+
   /// @brief 関数内で使えるステートメントかどうかのチェック
   bool
   check_function_statement(const PtStmt* stmt);
@@ -2357,18 +2357,18 @@ public:
   /// @brief default ラベルが2つ以上含まれていないかどうかのチェック
   bool
   check_default_label(const PtrList<PtCaseItem>* ci_list);
-  
+
   /// @brief 使用されているモジュール名を登録する．
   /// @param[in] name 登録する名前
   void
   reg_defname(const char* name);
-  
+
   /// @brief attribute instance を登録する．
   void
   reg_attrinst(PtBase* ptobj,
 	       PtrList<PtAttrInst>* attr_list);
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // メッセージ出力用の便利関数
@@ -2388,7 +2388,7 @@ public:
 	  tMsgType type,
 	  const char* label,
 	  const char* msg);
-  
+
   /// @brief メッセージを出力する．
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
@@ -2403,7 +2403,7 @@ public:
 	  tMsgType type,
 	  const char* label,
 	  const string& msg);
-  
+
 
 public:
 
@@ -2411,7 +2411,7 @@ public:
   /// @return lex オブジェクトを返す．
   Lex&
   lex();
-  
+
   /// @brief yylex とのインターフェイス
   /// @param[out] lvalp 値を格納する変数
   /// @param[out] llocp 位置情報を格納する変数
@@ -2419,17 +2419,17 @@ public:
   int
   yylex(YYSTYPE& lval,
 	FileRegion& lloc);
-  
+
 
 private:
-  
+
   typedef PtrList<PtiDeclHead, PtDeclHead> PtDeclHeadList;
   typedef PtrList<PtItem, PtItem> PtItemList;
-  
+
   /// @brief 宣言要素リストを最後の宣言ヘッダにセットする．
   void
   flush_declitem_list(PtDeclHeadList& head_list);
-  
+
   /// @brief 新たな declhead リストを生成する．
   PtDeclHeadList*
   new_declhead_list();
@@ -2453,7 +2453,7 @@ private:
   /// @brief スタックの末尾を iohead リストに戻す．
   void
   pop_iohead_list();
-  
+
   /// @brief 現在の paramhead リストをスタックに積む．
   void
   push_paramhead_list();
@@ -2461,11 +2461,11 @@ private:
   // @brief スタックの末尾を paramhead リストに戻す．
   void
   pop_paramhead_list();
-  
+
   /// @brief 現在の declhead リストをスタックに積む．
   void
   push_declhead_list();
-  
+
   /// @brief スタックの末尾を declhead リストに戻す．
   void
   pop_declhead_list();
@@ -2478,21 +2478,21 @@ private:
   void
   pop_item_list();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
-  
+
   // パース木を保持するクラス
   PtMgr& mPtMgr;
 
   // 本体のメモリアロケータ(配列確保用)
   AllocBase& mAlloc;
-  
+
   // パース木の要素の生成を行うクラス
   PtiFactory& mFactory;
 
@@ -2501,10 +2501,10 @@ private:
 
   // PuList<> のメモリ確保用オブジェクト
   FragAlloc mTmpAlloc;
-  
+
   // PtrList 用のアロケータ
   UnitAlloc mCellAlloc;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -2513,62 +2513,62 @@ public:
 
   // ポートリスト
   PtrList<PtiPort> mPortList;
-  
+
   // ポート参照リスト
   PtrList<PtiPortRef> mPortRefList;
-  
+
   // parameter port 宣言ヘッダリスト
   PtDeclHeadList mParamPortHeadList;
-  
+
   // モジュール用 IO宣言ヘッダリスト
   PtrList<PtiIOHead, PtIOHead> mModuleIOHeadList;
-  
+
   // task/function 用 IO宣言ヘッダリスト
   PtrList<PtiIOHead, PtIOHead> mTfIOHeadList;
-  
+
   // モジュール用の parameter 宣言ヘッダリスト
   PtDeclHeadList mModuleParamHeadList;
 
   // task/function 用の parameter 宣言ヘッダリスト
   PtDeclHeadList mTfParamHeadList;
-  
+
   // モジュール用の localparam 宣言ヘッダリスト
   PtDeclHeadList mModuleLparamHeadList;
 
   // task/function 用の localparam 宣言ヘッダリスト
   PtDeclHeadList mTfLparamHeadList;
-  
+
   // モジュール用の宣言ヘッダリスト
   PtDeclHeadList mModuleDeclHeadList;
 
   // task/function 用の宣言ヘッダリスト
   PtDeclHeadList mTfDeclHeadList;
-  
+
   // モジュール用の item リスト
   PtItemList mModuleItemList;
-  
+
   // IO宣言要素リスト
   PtrList<PtIOItem> mIOItemList;
 
   // 宣言要素リスト
   PtrList<PtDeclItem> mDeclItemList;
-  
+
   // UDP エントリのリスト
   PtrList<PtUdpEntry> mUdpEntryList;
 
   // UDP のテーブルの値のリスト
   PtrList<PtUdpValue> mUdpValueList;
-  
+
   // defparam 要素のリスト
   PtrList<PtDefParam> mDefParamList;
-  
+
   // contassign リスト
   PtrList<PtContAssign> mContAssignList;
-  
+
   // instance リスト
   PtrList<PtInst> mInstList;
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 現在，登録対象となっているリストを指すポインタ
@@ -2589,20 +2589,20 @@ public:
 
   // 現在の item リスト
   PtItemList* mCurItemList;
-  
+
   // 現在の then 宣言ヘッダリスト
   PtrList<PtiDeclHead, PtDeclHead>* mCurThenDeclHeadList;
 
   // 現在の then item リスト
   PtItemList* mCurThenItemList;
-  
+
   // 現在の else 宣言ヘッダリスト
   PtrList<PtiDeclHead, PtDeclHead>* mCurElseDeclHeadList;
 
   // 現在の else item リスト
   PtItemList* mCurElseItemList;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // mCurXXXList のスタック
@@ -2610,31 +2610,31 @@ public:
 
   // IO 宣言ヘッダリストのスタック
   vector<PtrList<PtiIOHead, PtIOHead>*> mIOHeadListStack;
-  
+
   // parameter 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mParamHeadListStack;
-  
+
   // localparam 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mLparamHeadListStack;
-  
+
   // 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mDeclHeadListStack;
-  
+
   // item リストのスタック
   vector<PtItemList*> mItemListStack;
-  
+
   // then 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mThenDeclHeadListStack;
-  
+
   // then item リストのスタック
   vector<PtItemList*> mThenItemListStack;
-  
+
   // else 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mElseDeclHeadListStack;
-  
+
   // else item リストのスタック
   vector<PtItemList*> mElseItemListStack;
-  
+
 };
 
 
@@ -2669,7 +2669,7 @@ Parser::put_msg(const char* src_file,
 {
   mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
-  
+
 // @brief メッセージを出力する．
 // @param[in] src_file この関数を読んでいるソースファイル名
 // @param[in] src_line この関数を読んでいるソースの行番号
@@ -2688,7 +2688,7 @@ Parser::put_msg(const char* src_file,
 {
   mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
-  
+
 template <typename T>
 inline
 PtrList<T, T>*
@@ -2763,7 +2763,7 @@ Parser::get_item_array()
 {
   return mCurItemList->to_array(mAlloc);
 }
-  
+
 // @brief 新たな declhead リストを生成する．
 inline
 Parser::PtDeclHeadList*

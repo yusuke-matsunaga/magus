@@ -103,7 +103,7 @@ class EiAttrList :
 private:
 
   /// @brief コンストラクタ
-  EiAttrList(ymuint32 n,
+  EiAttrList(ymuint n,
 	     EiAttribute* array);
 
   /// @brief デストラクタ
@@ -117,14 +117,14 @@ public:
 
   /// @brief 要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief 内容を返す．
   /// @param[in] pos 位置番号 (0 <= pos < size() )
   virtual
   VlAttribute*
-  elem(ymuint32 pos) const;
+  elem(ymuint pos) const;
 
 
 public:
@@ -139,7 +139,7 @@ public:
   /// @param[in] def 定義側の属性のとき true とするフラグ
   virtual
   void
-  set(ymuint32 pos,
+  set(ymuint pos,
       const PtAttrSpec* pt_as,
       ElbExpr* expr,
       bool def);

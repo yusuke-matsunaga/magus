@@ -81,7 +81,7 @@ public:
   /// @brief ビット幅を返す．
   /// @note このクラスでは 1 を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const = 0;
 
   /// @brief LSB からのオフセット値の取得
@@ -239,7 +239,7 @@ public:
   /// @brief 配列型オブジェクトの場合の次元数の取得
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   dimension() const;
 
   /// @brief 範囲の取得
@@ -247,7 +247,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   const VlRange*
-  range(ymuint32 pos) const;
+  range(ymuint pos) const;
 
   /// @brief 配列要素の時に true を返す．
   /// @note このクラスでは false を返す．

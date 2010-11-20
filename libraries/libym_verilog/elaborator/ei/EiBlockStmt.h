@@ -40,7 +40,7 @@ protected:
   EiBlockStmt(const VlNamedObj* parent,
 	      ElbProcess* process,
 	      const PtStmt* pt_stmt,
-	      ymuint32 stmt_num,
+	      ymuint stmt_num,
 	      ElbStmt** array);
 
   /// @brief デストラクタ
@@ -55,7 +55,7 @@ public:
 
   /// @brief 子供のステートメントのリストの要素数を返す．
   virtual
-  ymuint32
+  ymuint
   child_stmt_num() const;
 
 
@@ -68,7 +68,7 @@ public:
   /// @param[in] pos 位置番号
   virtual
   ElbStmt*
-  _child_stmt(ymuint32 pos) const;
+  _child_stmt(ymuint pos) const;
 
 
 private:
@@ -77,7 +77,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ステートメント数
-  ymuint32 mStmtNum;
+  ymuint mStmtNum;
 
   // ステートメントのリスト
   ElbStmt** mStmtList;
@@ -106,7 +106,7 @@ private:
   EiBegin(const VlNamedObj* parent,
 	  ElbProcess* process,
 	  const PtStmt* pt_stmt,
-	  ymuint32 stmt_num,
+	  ymuint stmt_num,
 	  ElbStmt** array);
 
   /// @brief デストラクタ
@@ -159,7 +159,7 @@ private:
   EiFork(const VlNamedObj* parent,
 	 ElbProcess* process,
 	 const PtStmt* pt_stmt,
-	 ymuint32 stmt_num,
+	 ymuint stmt_num,
 	 ElbStmt** array);
 
   /// @brief デストラクタ
@@ -211,7 +211,7 @@ protected:
   /// @param[in] array ステートメントのリスト用配列
   EiNamedBlockStmt(const VlNamedObj* block,
 		   ElbProcess* process,
-		   ymuint32 stmt_num,
+		   ymuint stmt_num,
 		   ElbStmt** array);
 
   /// @brief デストラクタ
@@ -246,7 +246,7 @@ public:
   scope() const;
 
   /// @brief 子供ののステートメントのリストの要素数を返す．
-  ymuint32
+  ymuint
   child_stmt_num() const;
 
 
@@ -258,7 +258,7 @@ public:
   /// @brief 子供のステートメントを返す．
   /// @param[in] pos 位置番号
   ElbStmt*
-  _child_stmt(ymuint32 pos) const;
+  _child_stmt(ymuint pos) const;
 
 
 private:
@@ -300,7 +300,7 @@ private:
   /// @param[in] array ステートメントのリスト用配列
   EiNamedBegin(const VlNamedObj* block,
 	       ElbProcess* process,
-	       ymuint32 stmt_num,
+	       ymuint stmt_num,
 	       ElbStmt** array);
 
   /// @brief デストラクタ
@@ -351,7 +351,7 @@ private:
   /// @param[in] array ステートメントのリスト用配列
   EiNamedFork(const VlNamedObj* block,
 	      ElbProcess* process,
-	      ymuint32 stmt_num,
+	      ymuint stmt_num,
 	      ElbStmt** array);
 
   /// @brief デストラクタ

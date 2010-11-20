@@ -33,12 +33,12 @@ ModuleHash::~ModuleHash()
   // Cell は mAlloc のデストラクタで削除される．
   delete [] mTable;
 }
-  
+
 // @brief 内容を空にする．
 void
 ModuleHash::clear()
 {
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
   mNum = 0;
@@ -50,7 +50,7 @@ ModuleHash::add(const VlModule* obj)
 {
   const VlNamedObj* parent = obj->parent();
   const char* name = obj->def_name();
-  ymuint32 pos = hash_func(parent, name);
+  ymuint pos = hash_func(parent, name);
   for (Cell* cell = mTable[pos]; cell; cell = cell->mLink) {
     if ( cell->mParent == parent && cell->mName == name ) {
       // 同じモジュールが既に登録されていたらモジュール名での検索はできない．
@@ -60,13 +60,13 @@ ModuleHash::add(const VlModule* obj)
   }
   if ( mNum >= mLimit ) {
     // テーブルを拡張する．
-    ymuint32 old_size = mSize;
+    ymuint old_size = mSize;
     Cell** old_table = mTable;
     alloc_table(old_size << 1);
-    for (ymuint32 i = 0; i < old_size; ++ i) {
+    for (ymuint i = 0; i < old_size; ++ i) {
       for (Cell* cell = old_table[i]; cell; ) {
 	Cell* next = cell->mLink;
-	ymuint32 pos = hash_func(cell->mParent, cell->mName);
+	ymuint pos = hash_func(cell->mParent, cell->mName);
 	cell->mLink = mTable[pos];
 	mTable[pos] = cell;
 	cell = next;
@@ -90,7 +90,7 @@ const VlModule*
 ModuleHash::find(const VlNamedObj* parent,
 		 const char* name) const
 {
-  ymuint32 pos = hash_func(parent, name);
+  ymuint pos = hash_func(parent, name);
   for (Cell* cell = mTable[pos]; cell; cell = cell->mLink) {
     if ( cell->mParent == parent && strcmp(cell->mName, name) ) {
       return cell->mModule;
@@ -100,7 +100,7 @@ ModuleHash::find(const VlNamedObj* parent,
 }
 
 // @brief このオブジェクトが使用しているメモリ量を返す．
-size_t
+ymuint
 ModuleHash::allocated_size() const
 {
   return sizeof(Cell*) * mSize;
@@ -108,24 +108,24 @@ ModuleHash::allocated_size() const
 
 // @brief テーブルの領域を確保する．
 void
-ModuleHash::alloc_table(ymuint32 size)
+ModuleHash::alloc_table(ymuint size)
 {
   mSize = size;
-  mLimit = static_cast<ymuint32>(mSize * 1.8);
+  mLimit = static_cast<ymuint>(mSize * 1.8);
   mTable = new Cell*[mSize];
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
 }
 
 // @brief ハッシュ値を計算する．
-ymuint32
+ymuint
 ModuleHash::hash_func(const VlNamedObj* parent,
 		      const char* name) const
 {
-  ymuint32 h = 0;
-  ymuint32 c;
-  for ( ; (c = static_cast<ymuint32>(*name)); ++ name) {
+  ymuint h = 0;
+  ymuint c;
+  for ( ; (c = static_cast<ymuint>(*name)); ++ name) {
     h = h * 37 + c;
   }
   return ((reinterpret_cast<ympuint>(parent) * h) >> 8) % mSize;

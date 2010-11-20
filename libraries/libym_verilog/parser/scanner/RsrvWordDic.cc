@@ -27,7 +27,8 @@ struct STpair {
 };
 
 // 予約語のデータの配列
-static STpair init_data[] = {
+static
+STpair init_data[] = {
   { "always",                   ALWAYS,              true },
   { "and",                      AND,                 true },
   { "assign",                   ASSIGN,              true },
@@ -151,7 +152,7 @@ static STpair init_data[] = {
   { "wor",                      WOR,                 true },
   { "xor",                      XOR,                 true },
   { "xnor",                     XNOR,                true },
-  
+
   { "$setup",                   SETUP,               true },
   { "$hold",                    HOLD,                true },
   { "$setuphold",               SETUPHOLD,           true },
@@ -164,9 +165,9 @@ static STpair init_data[] = {
   { "$period",                  PERIOD,              true },
   { "$width",                   WIDTH,               true },
   { "$nochange",                NOCHANGE,            true },
-  
+
   { "PATHPULSE$",               PATHPULSE,           true },
-  
+
   { "'b",                       BASE_B,              false },
   { "'sb",                      BASE_SB,             false },
   { "'o",                       BASE_O,              false },
@@ -199,7 +200,7 @@ static STpair init_data[] = {
   { "*)",                       STARPR,              false },
   { "+:",                       PLUSCOLON,           false },
   { "-:",                       MINUSCOLON,          false },
-  
+
   { "';'",                      ';',                 false },
   { "':'",                      ':',                 false },
   { "'['",                      '[',                 false },
@@ -226,7 +227,7 @@ static STpair init_data[] = {
   { "'<'",                      '<',                 false },
   { "'>'",                      '>',                 false },
   { "'='",                      '=',                 false },
-  
+
   { "'0'",                      '0',                 false },
   { "'1'",                      '1',                 false },
   { "'X'",                      'x',                 false },
@@ -238,12 +239,12 @@ static STpair init_data[] = {
 };
 
 // 文字列からのハッシュ関数
-ymuint32
+ymuint
 hash_func1(const char* str)
 {
-  ymuint32 h = 0;
-  ymuint32 c;
-  for ( ; (c = static_cast<ymuint32>(*str)); ++ str) {
+  ymuint h = 0;
+  ymuint c;
+  for ( ; (c = static_cast<ymuint>(*str)); ++ str) {
     h = h * 37 + c;
   }
   return h;
@@ -268,21 +269,21 @@ RsrvWordDic::RsrvWordDic()
   mCellArray = new Cell[mSize];
   mTable1 = new Cell*[mSize];
   mTable2 = new Cell*[mSize];
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable1[i] = NULL;
     mTable2[i] = NULL;
   }
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     STpair& p = init_data[i];
     Cell* cell = &mCellArray[i];
     cell->mStr = p.mStr;
     cell->mTok = p.mTok;
     if ( p.mReg ) {
-      ymuint32 pos1 = hash_func1(p.mStr) % mSize;
+      ymuint pos1 = hash_func1(p.mStr) % mSize;
       cell->mLink1 = mTable1[pos1];
       mTable1[pos1] = cell;
     }
-    ymuint32 pos2 = p.mTok % mSize;
+    ymuint pos2 = p.mTok % mSize;
     cell->mLink2 = mTable2[pos2];
     mTable2[pos2] = cell;
   }
@@ -302,7 +303,7 @@ RsrvWordDic::~RsrvWordDic()
 int
 RsrvWordDic::token(const char* str) const
 {
-  ymuint32 pos = hash_func1(str) % mSize;
+  ymuint pos = hash_func1(str) % mSize;
   for (Cell* cell = mTable1[pos]; cell; cell = cell->mLink1) {
     if ( strcmp(str, cell->mStr) == 0 ) {
       return cell->mTok;
@@ -319,7 +320,7 @@ RsrvWordDic::token(const char* str) const
 const char*
 RsrvWordDic::str(int token) const
 {
-  ymuint32 pos = token % mSize;
+  ymuint pos = token % mSize;
   for (Cell* cell = mTable2[pos]; cell; cell = cell->mLink2) {
     if ( token == cell->mTok ) {
       return cell->mStr;

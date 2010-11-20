@@ -38,7 +38,7 @@ public:
   /// @brief 配列型オブジェクトの場合の次元数の取得
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   dimension_list_size() const = 0;
 
   /// @brief 自身が配列型の時の要素の探索

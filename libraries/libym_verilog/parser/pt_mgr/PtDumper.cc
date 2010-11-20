@@ -136,24 +136,24 @@ PtDumper::put(const PtUdp* udp)
 
   put("mName", udp->name());
 
-  for (ymuint32 i = 0; i < udp->port_num(); ++ i) {
+  for (ymuint i = 0; i < udp->port_num(); ++ i) {
     const PtPort* port = udp->port(i);
     put("mPort", port->ext_name());
   }
-  for (ymuint32 i = 0; i < udp->iohead_array().size(); ++ i) {
+  for (ymuint i = 0; i < udp->iohead_array().size(); ++ i) {
     const PtIOHead* io = udp->iohead_array()[i];
     put("mIO", io);
   }
 
   put("mInitial", udp->init_value());
 
-  for (ymuint32 i = 0; i < udp->table_array().size(); ++ i) {
+  for (ymuint i = 0; i < udp->table_array().size(); ++ i) {
     const PtUdpEntry* entry = udp->table_array()[i];
     PtHeader x(*this, "mTable", "UdpEntry");
 
     put("mFileRegion", entry->file_region());
-    
-    for (ymuint32 j = 0; j < entry->input_array().size(); ++ j) {
+
+    for (ymuint j = 0; j < entry->input_array().size(); ++ j) {
       const PtUdpValue* v = entry->input_array()[j];
       put("mInput", v);
     }
@@ -220,7 +220,7 @@ PtDumper::put(const PtModule* m)
 #if 0
   put("mAttrInst", m->attr_top());
 #endif
-  
+
   put("mName", m->name());
 
   put("mCellDefine", m->is_cell());
@@ -239,26 +239,26 @@ PtDumper::put(const PtModule* m)
   put("config", m->config());
   put("library", m->library());
   put("cell", m->cell());
-  
+
   PtDeclHeadArray paramport_array = m->paramport_array();
-  for (ymuint32 i = 0; i < paramport_array.size(); ++ i) {
+  for (ymuint i = 0; i < paramport_array.size(); ++ i) {
     const PtDeclHead* param = paramport_array[i];
     put("mParamPort", param);
   }
 
-  for (ymuint32 i = 0; i < m->port_num(); ++ i) {
+  for (ymuint i = 0; i < m->port_num(); ++ i) {
     const PtPort* port = m->port(i);
     PtHeader x(*this, "mPort", "Port");
-    
+
     put("mFileRegion", port->file_region());
     if ( port->ext_name() != NULL ) {
       put("mExprname", port->ext_name());
     }
-    
-    for (ymuint32 j = 0; j < port->portref_num(); ++ j) {
+
+    for (ymuint j = 0; j < port->portref_num(); ++ j) {
       const PtPortRef* pr = port->portref(j);
       PtHeader x(*this, "mPortRef", "PortRef");
-      
+
       put("mFileRegion", pr->file_region());
       put("mName", pr->name());
       put("mIndex", pr->index());
@@ -269,13 +269,13 @@ PtDumper::put(const PtModule* m)
       }
     }
   }
-  
+
   put_decls(m->iohead_array(),
 	    m->paramhead_array(),
 	    m->localparamhead_array(),
 	    m->declhead_array());
   PtItemArray item_array = m->item_array();
-  for (ymuint32 i = 0; i < item_array.size(); ++ i) {
+  for (ymuint i = 0; i < item_array.size(); ++ i) {
     const PtItem* item = item_array[i];
     put("mItem", item);
   }
@@ -302,7 +302,7 @@ PtDumper::put(const char* label,
 #if 0
   put("mAttrInst", io->attr_top());
 #endif
-  
+
   put("mAuxType", io->aux_type());
   put("mNetType", io->net_type());
   put("mVarType", io->var_type());
@@ -310,7 +310,7 @@ PtDumper::put(const char* label,
   put("mLeftRange", io->left_range());
   put("mRightRange", io->right_range());
 
-  for (ymuint32 i = 0; i < io->item_num(); ++ i) {
+  for (ymuint i = 0; i < io->item_num(); ++ i) {
     const PtIOItem* item = io->item(i);
     PtHeader x(*this, "mElem", "IOElem");
 
@@ -384,7 +384,7 @@ PtDumper::put(const char* label,
 #if 0
   put("mAttrInst", decl->attr_top());
 #endif
-  
+
   put("mSigned", decl->is_signed());
   put("mLeftRange", decl->left_range());
   put("mRightRange", decl->right_range());
@@ -392,13 +392,13 @@ PtDumper::put(const char* label,
   put("mStrength", decl->strength());
   put("mDelay", decl->delay());
 
-  for (ymuint32 i = 0; i < decl->item_num(); ++ i) {
+  for (ymuint i = 0; i < decl->item_num(); ++ i) {
     const PtDeclItem* item = decl->item(i);
     PtHeader x(*this, "mElem", "DeclItem");
 
     put("mFileRegion", item->file_region());
     put("mName", item->name());
-    for (ymuint32 j = 0; j < item->dimension_list_size(); ++ j) {
+    for (ymuint j = 0; j < item->dimension_list_size(); ++ j) {
       const PtRange* range = item->range(j);
       PtHeader x(*this, "mDimension", "Range");
 
@@ -461,7 +461,7 @@ PtDumper::put(const char* label,
 
   switch ( item->type() ) {
   case kPtItem_DefParam:
-    for (ymuint32 i = 0; i < item->size(); ++ i) {
+    for (ymuint i = 0; i < item->size(); ++ i) {
       const PtDefParam* dp = item->defparam(i);
       PtHeader x(*this, "mElem", "DefParam");
 
@@ -475,7 +475,7 @@ PtDumper::put(const char* label,
   case kPtItem_ContAssign:
     put("mStrength", item->strength());
     put("mDelay", item->delay());
-    for (ymuint32 i = 0; i < item->size(); ++ i) {
+    for (ymuint i = 0; i < item->size(); ++ i) {
       const PtContAssign* ca = item->contassign(i);
       PtHeader x(*this, "mElem", "ContAssign");
 
@@ -510,7 +510,7 @@ PtDumper::put(const char* label,
     put("mPrimType", item->prim_type());
     put("mStrength", item->strength());
     put("mDelay", item->delay());
-    for (ymuint32 i = 0; i < item->size(); ++ i) {
+    for (ymuint i = 0; i < item->size(); ++ i) {
       const PtInst* gi = item->inst(i);
       PtHeader x(*this, "mElem", "GateInst");
 
@@ -522,7 +522,7 @@ PtDumper::put(const char* label,
 	put("mLeftRange", gi->left_range());
 	put("mRightrange", gi->right_range());
       }
-      for (ymuint32 j = 0; j < gi->port_num(); ++ j) {
+      for (ymuint j = 0; j < gi->port_num(); ++ j) {
 	const PtConnection* con = gi->port(j);
 	put("mPortCon", con);
       }
@@ -531,13 +531,13 @@ PtDumper::put(const char* label,
 
   case kPtItem_MuInst:
     put("mDefName", item->name());
-    for (ymuint32 i = 0; i < item->paramassign_array().size(); ++ i) {
+    for (ymuint i = 0; i < item->paramassign_array().size(); ++ i) {
       const PtConnection* con = item->paramassign_array()[i];
       put("mParamCon", con);
     }
     put("mStrength", item->strength());
     put("mDelay", item->delay());
-    for (ymuint32 i = 0; i < item->size(); ++ i) {
+    for (ymuint i = 0; i < item->size(); ++ i) {
       const PtInst* mui = item->inst(i);
       PtHeader x(*this, "mElem", "MuInst");
 
@@ -547,7 +547,7 @@ PtDumper::put(const char* label,
 	put("mLeftRange", mui->left_range());
 	put("mRightRange", mui->right_range());
       }
-      for (ymuint32 j = 0; j < mui->port_num(); ++ j) {
+      for (ymuint j = 0; j < mui->port_num(); ++ j) {
 	const PtConnection* con = mui->port(j);
 	put("mPortCon", con);
       }
@@ -555,7 +555,7 @@ PtDumper::put(const char* label,
     break;
 
   case kPtItem_SpecItem:
-    for (ymuint32 i = 0; i < item->size(); ++ i) {
+    for (ymuint i = 0; i < item->size(); ++ i) {
       const PtExpr* expr = item->terminal(i);
       put("mTerminal", expr);
     }
@@ -598,12 +598,12 @@ PtDumper::put(const char* label,
 
   case kPtItem_GenCase:
     put("mExpr", item->expr());
-    for (ymuint32 i = 0; i < item->size(); ++ i) {
+    for (ymuint i = 0; i < item->size(); ++ i) {
       const PtGenCaseItem* gci = item->caseitem(i);
       PtHeader x(*this, "mCaseItem", "GenCaseItem");
 
       put("mFileRegion", gci->file_region());
-      for (ymuint32 j = 0; j < gci->label_num(); ++ j) {
+      for (ymuint j = 0; j < gci->label_num(); ++ j) {
 	const PtExpr* expr = gci->label(j);
 	put("mLabel", expr);
       }
@@ -642,13 +642,13 @@ PtDumper::put(const char* label,
     break;
   }
 
-  ymuint32 i = 0;
+  ymuint i = 0;
   for (const PtExprIter* ei = item->input_top();
        ei; ei = ei->next(), ++ i) {
     PtHeader x4(s, "mInput", i);
     s << ei->expr();
   }
-  
+
   if ( item->input_pol() ) {
     PtHeader x5(s, "InputPol");
     s << static_cast<char>(item->input_pol());
@@ -668,17 +668,17 @@ PtDumper::put(const char* label,
     PtHeader x7(s, "mOutput", i);
     s << ei->expr();
   }
-  
+
   if ( item->output_pol() ) {
     PtHeader x8(s, "mOutputPol");
     s << static_cast<char>(item->output_pol());
   }
-  
+
   if ( item->expr() ) {
     PtHeader x9(s, "mExpr");
     s << item->expr();
   }
-  
+
   {
     PtHeader x10(s, "mPathDelay");
     s << item->path_delay();
@@ -694,7 +694,7 @@ operator<<(PtDumper& s,
 
   s << item->file_region();
 
-  for (ymuint32 i = 0; i < 12; ++ i) {
+  for (ymuint i = 0; i < 12; ++ i) {
     if ( item->value(i) == NULL ) {
       break;
     }
@@ -763,7 +763,7 @@ PtDumper::put(const char* label,
   case kPtSysEnableStmt:
     put(stmt->namebranch_array());
     put("mName", stmt->name());
-    for (ymuint32 i = 0; i < stmt->arg_num(); ++ i) {
+    for (ymuint i = 0; i < stmt->arg_num(); ++ i) {
       const PtExpr* arg = stmt->arg(i);
       if ( arg ) {
 	put("mArg", arg);
@@ -813,12 +813,12 @@ PtDumper::put(const char* label,
   case kPtCaseXStmt:
   case kPtCaseZStmt:
     put("mExpr", stmt->expr());
-    for (ymuint32 i = 0; i < stmt->caseitem_num(); ++ i) {
+    for (ymuint i = 0; i < stmt->caseitem_num(); ++ i) {
       const PtCaseItem* ci = stmt->caseitem(i);
       PtHeader x(*this, "mCaseItem", "CaseItem");
 
       put("mFileRegion", ci->file_region());
-      for (ymuint32 j = 0; j < ci->label_num(); ++ j) {
+      for (ymuint j = 0; j < ci->label_num(); ++ j) {
 	const PtExpr* expr = ci->label(j);
 	put("mLabel", expr);
       }
@@ -843,11 +843,11 @@ PtDumper::put(const char* label,
 
   case kPtParBlockStmt:
   case kPtSeqBlockStmt:
-    for (ymuint32 i = 0; i < stmt->declhead_array().size(); ++ i) {
+    for (ymuint i = 0; i < stmt->declhead_array().size(); ++ i) {
       const PtDeclHead* head = stmt->declhead_array()[i];
       put("mDecl", head);
     }
-    for (ymuint32 i = 0; i < stmt->stmt_array().size(); ++ i) {
+    for (ymuint i = 0; i < stmt->stmt_array().size(); ++ i) {
       const PtStmt* stmt1 = stmt->stmt_array()[i];
       put("mStatement", stmt1);
     }
@@ -879,9 +879,9 @@ PtDumper::put(const char* label,
 #if 0
       put("mAttrInst", expr->attr_top());
 #endif
-      
+
       put("mOprType", expr->opr_type());
-      for (ymuint32 i = 0; i < expr->operand_num(); ++ i) {
+      for (ymuint i = 0; i < expr->operand_num(); ++ i) {
 	put("mOperand",  expr->operand(i));
       }
     }
@@ -906,7 +906,7 @@ PtDumper::put(const char* label,
       put("mConstReal", expr->const_real());
     }
     break;
-    
+
   case kPtFuncCallExpr:
   case kPtSysFuncCallExpr:
     {
@@ -925,7 +925,7 @@ PtDumper::put(const char* label,
 #endif
       put(expr->namebranch_array());
       put("mName", expr->name());
-      for (ymuint32 i = 0; i < expr->operand_num(); ++ i) {
+      for (ymuint i = 0; i < expr->operand_num(); ++ i) {
 	const PtExpr* opr = expr->operand(i);
 	if ( opr ) {
 	  put("mOperand", opr);
@@ -936,7 +936,7 @@ PtDumper::put(const char* label,
       }
     }
     break;
-    
+
   case kPtPrimaryExpr:
     {
       PtHeader x(*this, label, "Primary");
@@ -944,7 +944,7 @@ PtDumper::put(const char* label,
       put("mFileRegion", expr->file_region());
       put(expr->namebranch_array());
       put("mName", expr->name());
-      for (ymuint32 i = 0; i < expr->index_num(); ++ i) {
+      for (ymuint i = 0; i < expr->index_num(); ++ i) {
 	const PtExpr* index = expr->index(i);
 	put("mIndex", index);
       }
@@ -981,19 +981,19 @@ PtDumper::put_decls(PtIOHeadArray iohead_array,
 		    PtDeclHeadArray lparamhead_array,
 		    PtDeclHeadArray declhead_array)
 {
-  for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io = iohead_array[i];
     put("mIODecl", io);
   }
-  for (ymuint32 i = 0; i < paramhead_array.size(); ++ i) {
+  for (ymuint i = 0; i < paramhead_array.size(); ++ i) {
     const PtDeclHead* decl = paramhead_array[i];
     put("mParamDecl", decl);
   }
-  for (ymuint32 i = 0; i < lparamhead_array.size(); ++ i) {
+  for (ymuint i = 0; i < lparamhead_array.size(); ++ i) {
     const PtDeclHead* decl = lparamhead_array[i];
     put("mLocalParamDecl", decl);
   }
-  for (ymuint32 i = 0; i < declhead_array.size(); ++ i) {
+  for (ymuint i = 0; i < declhead_array.size(); ++ i) {
     const PtDeclHead* decl = declhead_array[i];
     put("mDecl", decl);
   }
@@ -1009,20 +1009,20 @@ PtDumper::put_decl_item(const char* label,
 			PtItemArray item_array)
 {
   PtHeader x(*this, label, "GenBlock");
-  
-  for (ymuint32 i = 0; i < decl_array.size(); ++ i) {
+
+  for (ymuint i = 0; i < decl_array.size(); ++ i) {
     put("mDecl", decl_array[i]);
   }
-  for (ymuint32 i = 0; i < item_array.size(); ++ i) {
+  for (ymuint i = 0; i < item_array.size(); ++ i) {
     put("mItem", item_array[i]);
   }
 }
-  
+
 // @brief 階層名の出力
 void
 PtDumper::put(PtNameBranchArray nb_array)
 {
-  for (ymuint32 i = 0; i < nb_array.size(); ++ i) {
+  for (ymuint i = 0; i < nb_array.size(); ++ i) {
     const PtNameBranch* nb = nb_array[i];
     put("mNameBranch", nb);
   }
@@ -1497,7 +1497,7 @@ PtDumper::put(const char* label,
   put("mFileRegion", ctrl->file_region());
   put("mDelay", ctrl->delay());
   put("mRepExpr", ctrl->rep_expr());
-  for (ymuint32 i = 0; i < ctrl->event_num(); ++ i) {
+  for (ymuint i = 0; i < ctrl->event_num(); ++ i) {
     const PtExpr* expr = ctrl->event(i);
     put("mEvent", expr);
   }
@@ -1571,7 +1571,7 @@ PtDumper::put(const char* label,
 #if 0
   put("mAttrInst", con->attr_top());
 #endif
-  
+
   if ( con->name() != NULL ) {
     put("mName", con->name());
   }

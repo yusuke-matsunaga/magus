@@ -29,7 +29,7 @@ class SptUdp :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptUdp(const FileRegion& file_region,
 	 const char* name,
@@ -38,11 +38,11 @@ private:
 	 bool is_seq,
 	 PtExpr* init_value,
 	 PtUdpEntryArray entry_array);
-  
+
   // デストラクタ
   virtual
   ~SptUdp();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -66,14 +66,14 @@ public:
 
   // ポート数を取り出す．
   virtual
-  ymuint32
+  ymuint
   port_num() const;
-  
+
   // ポートを返す．
   virtual
   const PtPort*
-  port(ymuint32 pos) const;
-  
+  port(ymuint pos) const;
+
   /// @brief 入出力宣言ヘッダ配列の取得
   virtual
   PtIOHeadArray
@@ -88,7 +88,7 @@ public:
   virtual
   PtUdpEntryArray
   table_array() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ private:
 
   // プリミティブ名
   const char* mName;
-  
+
   // ポートの配列
   PtiPortArray mPortArray;
 
@@ -128,17 +128,17 @@ class SptUdpEntry :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptUdpEntry(const FileRegion& file_region,
 	      PtUdpValueArray input_array,
 	      PtUdpValue* current,
 	      PtUdpValue* output);
-  
+
   // デストラクタ
   virtual
   ~SptUdpEntry();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 入力値の配列を取り出す．
   virtual
   PtUdpValueArray
@@ -159,7 +159,7 @@ public:
   virtual
   PtUdpValue*
   current() const;
-  
+
   // 出力の値を取り出す．
   virtual
   PtUdpValue*
@@ -173,7 +173,7 @@ private:
 
   // ファイル位置
   FileRegion mFileRegion;
-  
+
   // 入力パタンの配列
   PtUdpValueArray mInputArray;
 
@@ -195,15 +195,15 @@ class SptUdpValue :
   friend class SptFactory;
 
 private:
-  
+
   // コンストラクタ
   SptUdpValue(const FileRegion& file_region,
 	      tVpiUdpVal symbol);
-  
+
   // デストラクタ
   virtual
   ~SptUdpValue();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ public:
   virtual
   tVpiUdpVal
   symbol() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -231,7 +231,7 @@ private:
 
   // シンボル
   tVpiUdpVal mSymbol;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

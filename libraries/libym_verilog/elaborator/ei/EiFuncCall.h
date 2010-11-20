@@ -32,7 +32,7 @@ protected:
   /// @param[in] arg_size 引数の数
   /// @param[in] arg_list 引数のリスト
   EiFcBase(const PtBase* pt_obj,
-	   ymuint32 arg_size,
+	   ymuint arg_size,
 	   ElbExpr** arg_list);
 
   /// @brief デストラクタ
@@ -47,14 +47,14 @@ public:
 
   /// @brief 引数の数を返す．
   virtual
-  ymuint32
+  ymuint
   argument_num() const;
 
   /// @brief 引数の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < argument_num() )
   virtual
   ElbExpr*
-  argument(ymuint32 pos) const;
+  argument(ymuint pos) const;
 
 
 private:
@@ -89,7 +89,7 @@ private:
   /// @param[in] arg_list 引数のリスト
   EiFuncCall(const PtBase* pt_obj,
 	     const ElbTaskFunc* func,
-	     ymuint32 arg_size,
+	     ymuint arg_size,
 	     ElbExpr** arg_list);
 
   /// @brief デストラクタ
@@ -214,7 +214,7 @@ private:
   /// @param[in] arg_list 引数のリスト
   EiSysFuncCall(const PtBase* pt_obj,
 		const ElbUserSystf* user_systf,
-		ymuint32 arg_size,
+		ymuint arg_size,
 		ElbExpr** arg_list);
 
   /// @brief デストラクタ

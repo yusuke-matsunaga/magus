@@ -27,9 +27,9 @@ ElbExpr*
 EiFactory::new_Constant(const PtExpr* pt_expr)
 {
   tVpiConstType const_type = pt_expr->const_type();
-  ymuint32 size = pt_expr->const_size();
+  ymuint size = pt_expr->const_size();
   bool is_signed = false;
-  ymuint32 base = 0;
+  ymuint base = 0;
   void* p;
   switch ( const_type ) {
   case kVpiIntConst:
@@ -273,7 +273,7 @@ EiBitVectorConst::~EiBitVectorConst()
 tVpiValueType
 EiBitVectorConst::value_type() const
 {
-  ymuint32 size = mValue.size();
+  ymuint size = mValue.size();
   if ( static_cast<int>(mConstType) & 8 ) {
     return pack(kVpiValueSS, size);
   }
@@ -448,7 +448,7 @@ EiStringConst::~EiStringConst()
 tVpiValueType
 EiStringConst::value_type() const
 {
-  ymuint32 size = mValue.size();
+  ymuint size = mValue.size();
   return pack(kVpiValueUS, size);
 }
 

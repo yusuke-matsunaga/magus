@@ -61,7 +61,7 @@ expand_full_name(const PtNameBranchArray& nb_array,
 {
   ostringstream buf;
   const char* period = "";
-  for (ymuint32 i = 0; i < nb_array.size(); ++ i) {
+  for (ymuint i = 0; i < nb_array.size(); ++ i) {
     const PtNameBranch* nb = nb_array[i];
     buf << period << nb->name();
     if ( nb->has_index() ) {

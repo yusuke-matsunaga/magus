@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param aux_type 補助的な型
 // @param sign 符号の有無を表すフラグ
 // @param left 範囲の左側の式
-// @param right 範囲の右側の式 
+// @param right 範囲の右側の式
 // net_type と var_type は両方同時に指定されることはない．
 // 少なくとも一つは kVpiNone(net_type) か kVpiVarNone(var_type)
 // になっていなければならない．
@@ -121,7 +121,7 @@ SptIOHead::right_range() const
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 SptIOHead::item_num() const
 {
   return mItemArray.size();
@@ -130,7 +130,7 @@ SptIOHead::item_num() const
 // @brief 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < item_num() )
 const PtIOItem*
-SptIOHead::item(ymuint32 pos) const
+SptIOHead::item(ymuint pos) const
 {
   return mItemArray[pos];
 }
@@ -160,7 +160,7 @@ SptIOItem::SptIOItem(const FileRegion& file_region,
   mInitValue(init_value)
 {
 }
-  
+
 // デストラクタ
 SptIOItem::~SptIOItem()
 {
@@ -260,7 +260,7 @@ SptDeclHead::is_signed() const
 {
   return mSigned;
 }
-  
+
 // 範囲のMSBの取得
 // @retval 範囲のMSB
 // @retval NULL 範囲を持たないとき
@@ -326,7 +326,7 @@ SptDeclHead::delay() const
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 SptDeclHead::item_num() const
 {
   return mItemArray.size();
@@ -335,7 +335,7 @@ SptDeclHead::item_num() const
 // @brief 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < item_num() )
 const PtDeclItem*
-SptDeclHead::item(ymuint32 pos) const
+SptDeclHead::item(ymuint pos) const
 {
   return mItemArray[pos];
 }
@@ -370,7 +370,7 @@ SptDeclItem::SptDeclItem(const FileRegion& file_region,
   mInitValue(init_value)
 {
 }
-  
+
 // デストラクタ
 SptDeclItem::~SptDeclItem()
 {
@@ -394,7 +394,7 @@ SptDeclItem::name() const
 
 // dimension list のサイズの取得
 // @return dimension list のサイズ
-ymuint32
+ymuint
 SptDeclItem::dimension_list_size() const
 {
   return mRangeArray.size();
@@ -403,7 +403,7 @@ SptDeclItem::dimension_list_size() const
 // 範囲の取得
 // @return 先頭の要素
 const PtRange*
-SptDeclItem::range(ymuint32 pos) const
+SptDeclItem::range(ymuint pos) const
 {
   return mRangeArray[pos];
 }
@@ -459,7 +459,7 @@ SptRange::right() const
   return mLsb;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // IO 宣言関係のオブジェクトを生成する関数
 //////////////////////////////////////////////////////////////////////
@@ -625,7 +625,7 @@ SptFactory::new_IOItem(const FileRegion& file_region,
   return new (p) SptIOItem(file_region, name, init_value);
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // その他の宣言関係
 //////////////////////////////////////////////////////////////////////
@@ -841,7 +841,7 @@ SptFactory::new_RegH(const FileRegion& file_region,
 			     kVpiVarNone, kVpiNone, kVpiVsNone,
 			     NULL, NULL);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成
 // @param[in] file_region ファイル位置の情報
 // @param[in] type net の型
@@ -859,7 +859,7 @@ SptFactory::new_NetH(const FileRegion& file_region,
 			     kVpiVarNone, type, kVpiVsNone,
 			     NULL, NULL);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成 (strength あり)
 // @param[in] file_region ファイル位置の情報
 // @param[in] type net の型
@@ -879,7 +879,7 @@ SptFactory::new_NetH(const FileRegion& file_region,
 			     kVpiVarNone, type, kVpiVsNone,
 			     strength, NULL);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成 (遅延あり)
 // @param[in] file_region ファイル位置の情報
 // @param[in] type net の型
@@ -899,7 +899,7 @@ SptFactory::new_NetH(const FileRegion& file_region,
 			     kVpiVarNone, type, kVpiVsNone,
 			     NULL, delay);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成 (strength, 遅延あり)
 // @param[in] file_region ファイル位置の情報
 // @param[in] type net の型
@@ -946,7 +946,7 @@ SptFactory::new_NetH(const FileRegion& file_region,
 			     kVpiVarNone, type, vstype,
 			     NULL, NULL);
 }
-  
+
 // @brief 範囲指定型 net 宣言のヘッダの生成 (strengthあり)
 // @param[in] file_region ファイル位置の情報
 // @param[in] type net の型

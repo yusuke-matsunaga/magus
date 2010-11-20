@@ -112,9 +112,9 @@ CptIOHBase::right_range() const
 {
   return NULL;
 }
-  
+
 // @brief 要素数の取得
-ymuint32
+ymuint
 CptIOHBase::item_num() const
 {
   return mItemArray.size();
@@ -123,7 +123,7 @@ CptIOHBase::item_num() const
 // @brief 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < item_num() )
 const PtIOItem*
-CptIOHBase::item(ymuint32 pos) const
+CptIOHBase::item(ymuint pos) const
 {
   return mItemArray[pos];
 }
@@ -170,7 +170,7 @@ CptIOH::~CptIOH()
 //////////////////////////////////////////////////////////////////////
 // ビットベクタ型のIO宣言のヘッダ
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] file_region ファイル位置の情報
 // @param[in] type IOの種類
@@ -228,7 +228,7 @@ CptIOItem::CptIOItem(const FileRegion& file_region,
   mName(name)
 {
 }
-  
+
 // @brief デストラクタ
 CptIOItem::~CptIOItem()
 {
@@ -262,7 +262,7 @@ CptIOItem::init_value() const
 //////////////////////////////////////////////////////////////////////
 // 初期値をもった IO宣言要素の基底クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] file_region ファイル位置の情報
 // @param[in] name 名前
@@ -275,7 +275,7 @@ CptIOItemI::CptIOItemI(const FileRegion& file_region,
 {
   assert_cond(init_value, __FILE__, __LINE__);
 }
-  
+
 // @brief デストラクタ
 CptIOItemI::~CptIOItemI()
 {
@@ -287,7 +287,7 @@ CptIOItemI::file_region() const
 {
   return FileRegion(CptIOItem::file_region(), mInitValue->file_region());
 }
-  
+
 // @brief 初期値の取得
 const PtExpr*
 CptIOItemI::init_value() const

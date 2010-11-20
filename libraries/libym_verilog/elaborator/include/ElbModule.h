@@ -26,12 +26,12 @@ class ElbModuleArray :
   public VlModuleArray
 {
   friend class CellModuleArray;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbModuleArray();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbModuleArray();
@@ -41,11 +41,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 設定用の関数 (ElbMgr が使う)
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 要素を返す．
   virtual
   ElbModule*
-  _module(ymuint32 offset) = 0;
+  _module(ymuint offset) = 0;
 
 
 public:
@@ -65,7 +65,7 @@ private:
 
   // 次の要素を指すポインタ
   ElbModuleArray* mNext;
-  
+
 };
 
 
@@ -77,12 +77,12 @@ class ElbModule :
   public VlModule
 {
   friend class CellModule;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbModule();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbModule();
@@ -92,7 +92,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ElbModule の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入出力の初期設定を行う．
   /// @param[in] pos 位置番号
   /// @param[in] head ヘッダ
@@ -100,11 +100,11 @@ public:
   /// @param[in] decl 対応する宣言要素
   virtual
   void
-  init_iodecl(ymuint32 pos,
+  init_iodecl(ymuint pos,
 	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl) = 0;
-  
+
   /// @brief ポートの初期設定を行う．
   /// @param[in] index ポート番号
   /// @param[in] pt_port パース木のポート定義
@@ -112,7 +112,7 @@ public:
   /// @param[in] dir 向き
   virtual
   void
-  init_port(ymuint32 index,
+  init_port(ymuint index,
 	    const PtPort* pt_port,
 	    ElbExpr* low_conn,
 	    tVpiDirection dir) = 0;
@@ -123,7 +123,7 @@ public:
   /// @param[in] conn_by_name 名前による割り当て時に true とするフラグ
   virtual
   void
-  set_port_high_conn(ymuint32 index,
+  set_port_high_conn(ymuint index,
 		     ElbExpr* high_conn,
 		     bool conn_by_name) = 0;
 
@@ -145,7 +145,7 @@ private:
 
   // 次の要素を指すポインタ
   ElbModule* mNext;
-  
+
 };
 
 

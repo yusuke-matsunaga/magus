@@ -71,19 +71,19 @@ SptUdp::name() const
 }
 
 // ポート数を取り出す．
-ymuint32
+ymuint
 SptUdp::port_num() const
 {
   return mPortArray.size();
 }
-  
+
 // ポートを取り出す．
 const PtPort*
-SptUdp::port(ymuint32 pos) const
+SptUdp::port(ymuint pos) const
 {
   return mPortArray[pos];
 }
-   
+
 /// @brief 入出力宣言ヘッダ配列の取得
 PtIOHeadArray
 SptUdp::iohead_array() const
@@ -109,7 +109,7 @@ SptUdp::table_array() const
 //////////////////////////////////////////////////////////////////////
 // UDP のテーブルの中身を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 SptUdpEntry::SptUdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
@@ -133,7 +133,7 @@ SptUdpEntry::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // @brief 入力値の配列を取り出す．
 PtUdpValueArray
 SptUdpEntry::input_array() const
@@ -159,7 +159,7 @@ SptUdpEntry::output() const
 //////////////////////////////////////////////////////////////////////
 // UDP のテーブルの値を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 SptUdpValue::SptUdpValue(const FileRegion& file_region,
 			 tVpiUdpVal symbol1) :

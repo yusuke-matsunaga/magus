@@ -31,7 +31,7 @@ class CptModule :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptModule(const FileRegion& file_region,
 	    const char* name,
@@ -57,11 +57,11 @@ private:
 	    PtDeclHeadArray lparamhead_array,
 	    PtDeclHeadArray declhead_array,
 	    PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptModule();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -72,52 +72,52 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 名前の取得
   virtual
   const char*
   name() const;
-  
+
   /// @brief macromodule 情報の取得
   virtual
   bool
   is_macromodule() const;
-  
+
   /// @brief cell 情報の取得
   virtual
   bool
   is_cell() const;
-    
+
   /// @brief protect 情報の取得
   virtual
   bool
   is_protected() const;
-  
+
   /// @brief time unit の取得
   virtual
   int
   time_unit() const;
-  
+
   /// @brief time precision の取得
   virtual
   int
   time_precision() const;
-  
+
   /// @brief default net type の取得
   virtual
   tVpiNetType
   nettype() const;
-  
+
   /// @brief unconnected drive の取得
   virtual
   tVpiUnconnDrive
   unconn_drive() const;
-  
+
   /// @brief default delay mode の取得
   virtual
   tVpiDefDelayMode
   delay_mode() const;
-  
+
   /// @brief default decay time の取得
   virtual
   int
@@ -127,27 +127,27 @@ public:
   virtual
   bool
   portfaults() const;
-  
+
   /// @brief suppress_faults 情報の取得
   virtual
   bool
   suppress_faults() const;
-  
+
   /// @brief config 情報の取得
   virtual
   const string&
   config() const;
-  
+
   /// @brief library 情報の取得
   virtual
   const string&
   library() const;
-  
+
   /// @brief cell 情報の取得
   virtual
   const string&
   cell() const;
-  
+
   /// @brief パラメータポート宣言配列の取得
   virtual
   PtDeclHeadArray
@@ -156,40 +156,40 @@ public:
   /// @brief ポート数の取得
   /// @return ポート数
   virtual
-  ymuint32
+  ymuint
   port_num() const;
-  
+
   /// @brief ポートの取得
   virtual
   const PtPort*
-  port(ymuint32 pos) const;
-  
+  port(ymuint pos) const;
+
   /// @brief 入出力宣言ヘッダ配列の取得
   virtual
   PtIOHeadArray
   iohead_array() const;
-  
+
   /// @brief 入出力宣言の要素数の取得
   /// @note 個々のヘッダが持つ要素数の総和を計算する．
   virtual
-  ymuint32
+  ymuint
   iodecl_num() const;
 
   /// @brief parameter 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   paramhead_array() const;
-  
+
   /// @brief localparam 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   localparamhead_array() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -204,7 +204,7 @@ public:
   virtual
   void
   clear_topmodule() const;
-  
+
   /// @brief top module のチェック
   virtual
   bool
@@ -251,29 +251,30 @@ private:
   const char* mName;
 
   // 様々な情報をパックしたもの
-  mutable int mFlags;
-    
+  mutable
+  ymuint32 mFlags;
+
   // decay time
-  int mDefDecayTime;
-  
+  ymint32 mDefDecayTime;
+
   // config 情報
   string mConfig;
-  
+
   // library 情報
   string mLibrary;
-  
+
   // cell 情報
   string mCell;
 
   // パラメータポート宣言のリスト
   PtDeclHeadArray mParamPortArray;
-  
+
   // ポートの配列
   PtiPortArray mPortArray;
 
   // 入出力宣言リスト
   PtIOHeadArray mIOHeadArray;
-  
+
   // 入出力宣言の要素数
   ymuint32 mIODeclNum;
 
@@ -282,10 +283,10 @@ private:
 
   // localparam 宣言のリスト
   PtDeclHeadArray mLparamHeadArray;
-  
+
   // 宣言リスト
   PtDeclHeadArray mDeclHeadArray;
-  
+
   // 要素のリスト
   PtItemArray mItemArray;
 
@@ -304,21 +305,21 @@ class CptPort :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptPort(const FileRegion& file_region,
 	  const char* ext_name);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptPort();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtPort の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ファイル位置の取得
   /// @return ファイル位置
   virtual
@@ -336,7 +337,7 @@ public:
   /// @return 内部のポート結線リストのサイズ
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   portref_num() const;
 
   /// @brief 内部のポート結線の取得
@@ -344,7 +345,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   const PtPortRef*
-  portref(ymuint32 pos) const;
+  portref(ymuint pos) const;
 
 
 public:
@@ -356,7 +357,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   PtiPortRef*
-  _portref(ymuint32 pos);
+  _portref(ymuint pos);
 
 
 private:
@@ -382,16 +383,16 @@ class CptPort1 :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptPort1(const FileRegion& file_region,
 	   PtiPortRef* portref,
 	   const char* ext_name);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptPort1();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -401,14 +402,14 @@ public:
   /// @brief 内部のポート結線リストのサイズの取得
   /// @return 内部のポート結線リストのサイズ
   virtual
-  ymuint32
+  ymuint
   portref_num() const;
 
   /// @brief 内部のポート結線の取得
   /// @return 先頭の内部のポート結線
   virtual
   const PtPortRef*
-  portref(ymuint32 pos) const;
+  portref(ymuint pos) const;
 
 
 public:
@@ -419,14 +420,14 @@ public:
   /// @brief portref を得る．
   virtual
   PtiPortRef*
-  _portref(ymuint32 pos);
+  _portref(ymuint pos);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 内部向きの接続を表す式
   PtiPortRef* mPortRef;
 
@@ -442,16 +443,16 @@ class CptPort2 :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptPort2(const FileRegion& file_region,
 	   PtiPortRefArray portref_array,
 	   const char* ext_name);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptPort2();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -461,14 +462,14 @@ public:
   /// @brief 内部のポート結線リストのサイズの取得
   /// @return 内部のポート結線リストのサイズ
   virtual
-  ymuint32
+  ymuint
   portref_num() const;
 
   /// @brief 内部のポート結線の取得
   /// @return 先頭の内部のポート結線
   virtual
   const PtPortRef*
-  portref(ymuint32 pos) const;
+  portref(ymuint pos) const;
 
 
 public:
@@ -479,14 +480,14 @@ public:
   /// @brief portref を得る．
   virtual
   PtiPortRef*
-  _portref(ymuint32 pos);
+  _portref(ymuint pos);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ポート参照式の配列
   PtiPortRefArray mPortRefArray;
 
@@ -502,21 +503,21 @@ class CptPortRef :
   friend class CptFactory;
 
 protected:
-  
+
   /// コンストラクタ
   CptPortRef(const FileRegion& file_region,
 	     const char* name);
-  
+
   /// デストラクタ
   virtual
   ~CptPortRef();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtPortRef の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -527,7 +528,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief インデックスの取得
   /// @return インデックスを表す式
   /// @note このクラスでは NULL を返す．
@@ -544,21 +545,21 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const;
-  
+
   /// @brief 範囲の左側の式の取得
   /// @return 範囲の左側の式
   /// @note このクラスでは NULL を返す．
   virtual
   const PtExpr*
   left_range() const;
-  
+
   /// @brief 範囲の右側の式の取得
   /// @return 範囲の右側の式
   /// @note このクラスでは NULL を返す．
   virtual
   const PtExpr*
   right_range() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -581,27 +582,27 @@ class CptPortRefI :
   public CptPortRef
 {
 public:
-  
+
   /// コンストラクタ
   CptPortRefI(const FileRegion& file_region,
 	      const char* name,
 	      PtExpr* index);
-  
+
   /// デストラクタ
   virtual
   ~CptPortRefI();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtPortRef の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// インデックスの取得
   virtual
   const PtExpr*
   index() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -621,18 +622,18 @@ class CptPortRefR :
   public CptPortRef
 {
 public:
-  
+
   /// コンストラクタ
   CptPortRefR(const FileRegion& file_region,
 	      const char* name,
 	      tVpiRangeMode mode,
 	      PtExpr* left,
 	      PtExpr* right);
-  
+
   /// デストラクタ
   virtual
   ~CptPortRefR();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -643,17 +644,17 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const;
-  
+
   /// 範囲の左側の式の取得
   virtual
   const PtExpr*
   left_range() const;
-  
+
   /// 範囲の右側の式の取得
   virtual
   const PtExpr*
   right_range() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -200,7 +200,7 @@ EiParamHead::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiParamHead::bit_size() const
 {
   switch ( mPtHead->data_type() ) {
@@ -340,7 +340,7 @@ EiParamHeadV::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiParamHeadV::bit_size() const
 {
   return mRange.size();
@@ -451,7 +451,7 @@ EiParameter::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiParameter::bit_size() const
 {
   return mHead->bit_size();

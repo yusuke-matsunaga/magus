@@ -62,7 +62,7 @@ public:
   /// @brief オペランドの数の取得
   /// @return 子供の数
   virtual
-  ymuint32
+  ymuint
   operand_num() const = 0;
 
   /// @brief オペランドの取得
@@ -70,7 +70,7 @@ public:
   /// @return pos 番目のオペランド
   virtual
   const PtExpr*
-  operand(ymuint32 pos) const = 0;
+  operand(ymuint pos) const = 0;
 
   /// @brief 定数インデックスのチェック
   /// @retval true インデックスもしくは範囲が定数にならなければならないとき
@@ -82,14 +82,14 @@ public:
   /// @brief インデックスリストのサイズの取得
   /// @return インデックスリストのサイズ
   virtual
-  ymuint32
+  ymuint
   index_num() const = 0;
 
   /// @brief インデックスの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num() )
   virtual
   const PtExpr*
-  index(ymuint32 pos) const = 0;
+  index(ymuint pos) const = 0;
 
   /// @brief 範囲指定モードの取得
   /// @return 範囲指定モード
@@ -119,13 +119,13 @@ public:
   /// @return サイズ\n
   /// サイズ指定の無い場合と整数型の定数でない場合には 0 を返す．
   virtual
-  ymuint32
+  ymuint
   const_size() const = 0;
 
   /// @brief 整数型の値の取得
   /// @return 値
   virtual
-  ymuint32
+  ymuint
   const_uint() const = 0;
 
   /// @brief 整数型および文字列型の定数の文字列表現の取得

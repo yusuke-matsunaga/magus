@@ -85,7 +85,7 @@ CfDict::find(const VlNamedObj* scope,
   }
   return NULL;
 }
-  
+
 // @brief 内容をクリアする．
 void
 CfDict::clear()
@@ -96,7 +96,7 @@ CfDict::clear()
 }
 
 // @brief このオブジェクトが使用しているメモリ量を返す．
-size_t
+ymuint
 CfDict::allocated_size() const
 {
   return sizeof(CfDict) + sizeof(Cell*) * mSize + mAlloc.allocated_size();

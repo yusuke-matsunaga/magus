@@ -25,14 +25,14 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @retval -1 port_size が少なすぎる．
 int
 ElbPrimitive::get_port_size(tVpiPrimType type,
-			    ymuint32 port_size,
-			    ymuint32& output_num,
-			    ymuint32& inout_num,
-			    ymuint32& input_num)
+			    ymuint port_size,
+			    ymuint& output_num,
+			    ymuint& inout_num,
+			    ymuint& input_num)
 {
-  ymuint32 min_size = 0;
-  ymuint32 max_size = port_size;
-  
+  ymuint min_size = 0;
+  ymuint max_size = port_size;
+
   switch ( type ) {
   case kVpiAndPrim:
   case kVpiNandPrim:
@@ -84,7 +84,7 @@ ElbPrimitive::get_port_size(tVpiPrimType type,
     inout_num = 0;
     input_num = 3;
     break;
-    
+
   case kVpiTranPrim:
   case kVpiRtranPrim:
     min_size = 2;

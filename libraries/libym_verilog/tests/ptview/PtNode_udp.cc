@@ -37,7 +37,7 @@ UdpNode::~UdpNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 UdpNode::data(int column,
 	      int role) const
@@ -72,7 +72,7 @@ UdpNode::expand() const
   // table list
   mChildren.clear();
   mChildren.reserve(5);
-  
+
   mChildren.push_back( new PrimTypeNode(mUdp->prim_type()) );
   mChildren.push_back( new UdpPortListNode(mUdp) );
   mChildren.push_back( new IOHeadListNode(mUdp->iohead_array()) );
@@ -101,7 +101,7 @@ UdpPortListNode::~UdpPortListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 UdpPortListNode::data(int column,
 		      int role) const
@@ -116,7 +116,7 @@ UdpPortListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 UdpPortListNode::loc() const
@@ -128,9 +128,9 @@ UdpPortListNode::loc() const
 void
 UdpPortListNode::expand() const
 {
-  ymuint32 n = mUdp->port_num();
+  ymuint n = mUdp->port_num();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new PortNode(mUdp->port(i));
   }
 }
@@ -154,7 +154,7 @@ UdpEntryListNode::~UdpEntryListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 UdpEntryListNode::data(int column,
 		       int role) const
@@ -169,7 +169,7 @@ UdpEntryListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 UdpEntryListNode::loc() const
@@ -182,7 +182,7 @@ void
 UdpEntryListNode::expand() const
 {
   mChildren.resize(mTableArray.size());
-  for (ymuint32 i = 0; i < mTableArray.size(); ++ i) {
+  for (ymuint i = 0; i < mTableArray.size(); ++ i) {
     mChildren[i] = new UdpEntryNode(mTableArray[i]);
   }
 }
@@ -206,7 +206,7 @@ UdpEntryNode::~UdpEntryNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 UdpEntryNode::data(int column,
 		   int role) const
@@ -221,7 +221,7 @@ UdpEntryNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 UdpEntryNode::loc() const
@@ -233,13 +233,13 @@ UdpEntryNode::loc() const
 void
 UdpEntryNode::expand() const
 {
-  ymuint32 n = mTable->input_array().size();
+  ymuint n = mTable->input_array().size();
   if ( mTable->current() ) {
     ++ n;
   }
   ++ n;
   mChildren.reserve(n);
-  for (ymuint32 i = 0; i < mTable->input_array().size(); ++ i) {
+  for (ymuint i = 0; i < mTable->input_array().size(); ++ i) {
     mChildren.push_back( new UdpValNode("Input", mTable->input_array()[i]) );
   }
   if ( mTable->current() ) {
@@ -270,7 +270,7 @@ UdpValNode::~UdpValNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 UdpValNode::data(int column,
 		 int role) const
@@ -285,7 +285,7 @@ UdpValNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 UdpValNode::loc() const

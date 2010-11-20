@@ -56,16 +56,16 @@ CptSpecItem::specitem_type() const
 }
 
 // ターミナルリストの要素数を返す．
-ymuint32
+ymuint
 CptSpecItem::size() const
 {
   return mTerminalArray.size();
 }
-  
+
 // @brief ターミナルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtExpr*
-CptSpecItem::terminal(ymuint32 pos) const
+CptSpecItem::terminal(ymuint pos) const
 {
   return mTerminalArray[pos];
 }
@@ -176,16 +176,16 @@ CptPathDecl::edge() const
 
 // @brief 入力リストの要素数の取得
 // @return 入力リストの要素数
-ymuint32
+ymuint
 CptPathDecl::input_num() const
 {
   return mInputArray.size();
 }
-  
+
 // @brief 入力の取得
 // @param[in] pos 位置番号 ( 0 <= pos < input_num() )
 const PtExpr*
-CptPathDecl::input(ymuint32 pos) const
+CptPathDecl::input(ymuint pos) const
 {
   return mInputArray[pos];
 }
@@ -207,7 +207,7 @@ CptPathDecl::op() const
 
 // @brief 出力リストの要素数の取得
 // @return 出力リストの要素数
-ymuint32
+ymuint
 CptPathDecl::output_num() const
 {
   return mOutputArray.size();
@@ -216,7 +216,7 @@ CptPathDecl::output_num() const
 // @brief 出力の取得
 // @param[in] pos 位置番号 ( 0 <= pos < output_num() )
 const PtExpr*
-CptPathDecl::output(ymuint32 pos) const
+CptPathDecl::output(ymuint pos) const
 {
   return mOutputArray[pos];
 }
@@ -255,7 +255,7 @@ CptPathDelay::CptPathDelay(const FileRegion& file_region,
   mFileRegion(file_region)
 {
   mValues[0] = value;
-  for (ymuint32 i = 1; i < 12; ++ i) {
+  for (ymuint i = 1; i < 12; ++ i) {
     mValues[i] = NULL;
   }
 }
@@ -266,7 +266,7 @@ CptPathDelay::CptPathDelay(const FileRegion& file_region,
 {
   mValues[0] = value1;
   mValues[1] = value2;
-  for (ymuint32 i = 2; i < 12; ++ i) {
+  for (ymuint i = 2; i < 12; ++ i) {
     mValues[i] = NULL;
   }
 }
@@ -279,7 +279,7 @@ CptPathDelay::CptPathDelay(const FileRegion& file_region,
   mValues[0] = value1;
   mValues[1] = value2;
   mValues[2] = value3;
-  for (ymuint32 i = 3; i < 12; ++ i) {
+  for (ymuint i = 3; i < 12; ++ i) {
     mValues[i] = NULL;
   }
 }
@@ -298,7 +298,7 @@ CptPathDelay::CptPathDelay(const FileRegion& file_region,
   mValues[3] = value4;
   mValues[4] = value5;
   mValues[5] = value6;
-  for (ymuint32 i = 6; i < 12; ++ i) {
+  for (ymuint i = 6; i < 12; ++ i) {
     mValues[i] = NULL;
   }
 }
@@ -346,7 +346,7 @@ CptPathDelay::file_region() const
 // 値を取り出す．
 // 0の場合もある．
 const PtExpr*
-CptPathDelay::value(ymuint32 pos) const
+CptPathDelay::value(ymuint pos) const
 {
   return mValues[pos];
 }

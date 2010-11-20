@@ -41,7 +41,7 @@ EiFactory::new_DelayControl(const PtControl* pt_control,
 // @param[in] event_list イベントリストを表す配列
 ElbControl*
 EiFactory::new_EventControl(const PtControl* pt_control,
-			    ymuint32 event_num,
+			    ymuint event_num,
 			    ElbExpr** event_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiEventControl));
@@ -59,7 +59,7 @@ EiFactory::new_EventControl(const PtControl* pt_control,
 ElbControl*
 EiFactory::new_RepeatControl(const PtControl* pt_control,
 			     ElbExpr* rep,
-			     ymuint32 event_num,
+			     ymuint event_num,
 			     ElbExpr** event_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiRepeatControl));
@@ -111,17 +111,17 @@ EiControl::expr() const
 
 // @brief イベント条件式の数を返す．
 // @note このクラスでは 0 を返す．
-ymuint32
+ymuint
 EiControl::event_num() const
 {
   return 0;
 }
-  
+
 // @brief イベント条件式を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < event_num() )
 // @note このクラスでは NULL を返す．
 const VlExpr*
-EiControl::event(ymuint32 pos) const
+EiControl::event(ymuint pos) const
 {
   return NULL;
 }
@@ -140,7 +140,7 @@ EiDelayControl::EiDelayControl(const PtControl* pt_control,
   mDelay(delay)
 {
 }
-  
+
 // デストラクタ
 EiDelayControl::~EiDelayControl()
 {
@@ -152,7 +152,7 @@ EiDelayControl::type() const
 {
   return kVpiDelayControl;
 }
-  
+
 // 遅延式を返す．
 const VlExpr*
 EiDelayControl::delay() const
@@ -170,14 +170,14 @@ EiDelayControl::delay() const
 // @param[in] event_num イベントリストの要素数
 // @param[in] event_list イベントリストを表す配列
 EiEventControl::EiEventControl(const PtControl* pt_control,
-			       ymuint32 event_num,
+			       ymuint event_num,
 			       ElbExpr** event_list) :
   EiControl(pt_control),
   mEventNum(event_num),
   mEventList(event_list)
 {
 }
-  
+
 // @brief デストラクタ
 EiEventControl::~EiEventControl()
 {
@@ -191,16 +191,16 @@ EiEventControl::type() const
 }
 
 // @brief イベント条件式の数を返す．
-ymuint32
+ymuint
 EiEventControl::event_num() const
 {
   return mEventNum;
 }
-  
+
 // @brief イベント条件式を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < event_num() )
 const VlExpr*
-EiEventControl::event(ymuint32 pos) const
+EiEventControl::event(ymuint pos) const
 {
   return mEventList[pos];
 }
@@ -217,13 +217,13 @@ EiEventControl::event(ymuint32 pos) const
 // @param[in] event_list イベントリストを表す配列
 EiRepeatControl::EiRepeatControl(const PtControl* pt_control,
 				 ElbExpr* rep,
-				 ymuint32 event_num,
+				 ymuint event_num,
 				 ElbExpr** event_list) :
   EiEventControl(pt_control, event_num, event_list),
   mExpr(rep)
 {
 }
-  
+
 // デストラクタ
 EiRepeatControl::~EiRepeatControl()
 {

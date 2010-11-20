@@ -91,7 +91,7 @@ EiTernaryOp::is_const() const
 }
 
 // @brief オペランド数を返す．
-ymuint32
+ymuint
 EiTernaryOp::operand_num() const
 {
   return 3;
@@ -100,7 +100,7 @@ EiTernaryOp::operand_num() const
 // @brief オペランドを返す．
 // @param[in] pos 位置番号
 ElbExpr*
-EiTernaryOp::_operand(ymuint32 pos) const
+EiTernaryOp::_operand(ymuint pos) const
 {
   return mOpr[pos];
 }

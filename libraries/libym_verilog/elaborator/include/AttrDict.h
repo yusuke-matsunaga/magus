@@ -47,18 +47,18 @@ public:
   void
   add(const PtAttrInst* pt_attr,
       ElbAttrList* attr_list);
-      
+
   /// @brief 属性リストを取り出す．
   /// @param[in] pt_attr パース木の属性定義
   ElbAttrList*
   find(const PtAttrInst* pt_attr) const;
-  
+
   /// @brief 内容をクリアする．
   void
   clear();
-  
+
   /// @brief このオブジェクトが使用しているメモリ量を返す．
-  size_t
+  ymuint
   allocated_size() const;
 
 
@@ -85,13 +85,13 @@ private:
   {
     // パース木の属性定義
     const PtAttrInst* mPtAttr;
-    
+
     // 対象の属性リスト
     ElbAttrList* mAttrList;
-    
+
     // 次の要素を指すリンク
     Cell* mLink;
-    
+
   };
 
 
@@ -102,7 +102,7 @@ private:
 
   // Cell 用のアロケータ
   UnitAlloc mAlloc;
-  
+
   // ハッシュ表のサイズ
   ymuint32 mSize;
 

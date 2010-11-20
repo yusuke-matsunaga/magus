@@ -29,7 +29,7 @@ ElbExpr::decompile() const
 }
 
 // @brief 式のビット幅を返す．
-ymuint32
+ymuint
 ElbExpr::bit_size() const
 {
   return unpack_size(value_type());
@@ -194,7 +194,7 @@ ElbExpr::op_type() const
 // @brief オペランド数を返す．
 // @note 演算子の時，意味を持つ．
 // @note このクラスでは 0 を返す．
-ymuint32
+ymuint
 ElbExpr::operand_num() const
 {
   return 0;
@@ -204,7 +204,7 @@ ElbExpr::operand_num() const
 // @param[in] pos 位置番号
 // @note 演算子の時，意味を持つ．
 const VlExpr*
-ElbExpr::operand(ymuint32 pos) const
+ElbExpr::operand(ymuint pos) const
 {
   return _operand(pos);
 }
@@ -240,7 +240,7 @@ ElbExpr::user_systf() const
 // @brief 引数の数を返す．
 // @note kVpiFuncCall/kVpiSysFuncCall の時，意味を持つ．
 // @note このクラスでは 0 を返す．
-ymuint32
+ymuint
 ElbExpr::argument_num() const
 {
   return 0;
@@ -251,7 +251,7 @@ ElbExpr::argument_num() const
 // @note kVpiFuncCall/kVpiSysFuncCall の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlExpr*
-ElbExpr::argument(ymuint32 pos) const
+ElbExpr::argument(ymuint pos) const
 {
   return NULL;
 }
@@ -267,7 +267,7 @@ ElbExpr::decl_obj() const
 
 // @brief 配列型宣言要素への参照の場合，配列の次元を返す．
 // @note このクラスでは 0 を返す．
-ymuint32
+ymuint
 ElbExpr::declarray_dimension() const
 {
   return 0;
@@ -277,7 +277,7 @@ ElbExpr::declarray_dimension() const
 // @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
 // @note このクラスでは NULL を返す．
 const VlExpr*
-ElbExpr::declarray_index(ymuint32 pos) const
+ElbExpr::declarray_index(ymuint pos) const
 {
   return NULL;
 }
@@ -338,7 +338,7 @@ ElbExpr::eval_time(VlTime& val) const
 // @note 演算子の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 ElbExpr*
-ElbExpr::_operand(ymuint32 pos) const
+ElbExpr::_operand(ymuint pos) const
 {
   return NULL;
 }
@@ -367,9 +367,9 @@ ElbExpr::calc_type(tVpiValueType type0,
   }
 
   if ( is_sized ) {
-    ymuint32 size0 = unpack_size(type0);
-    ymuint32 size1 = unpack_size(type1);
-    ymuint32 ans_size = ( size0 > size1 ) ? size0 : size1;
+    ymuint size0 = unpack_size(type0);
+    ymuint size1 = unpack_size(type1);
+    ymuint ans_size = ( size0 > size1 ) ? size0 : size1;
     if ( is_signed ) {
       return pack(kVpiValueSS, ans_size);
     }
@@ -399,9 +399,9 @@ ElbExpr::calc_type2(tVpiValueType type0,
 
   // どちらか一方が sized なら結果も sized
   if ( is_sized_type(type0) || is_sized_type(type1) ) {
-    ymuint32 size0 = unpack_size(type0);
-    ymuint32 size1 = unpack_size(type1);
-    ymuint32 ans_size = ( size0 > size1 ) ? size0 : size1;
+    ymuint size0 = unpack_size(type0);
+    ymuint size1 = unpack_size(type1);
+    ymuint ans_size = ( size0 > size1 ) ? size0 : size1;
     return pack(kVpiValueUS, ans_size);
   }
   else {
@@ -422,8 +422,8 @@ ElbExpr::update_size(tVpiValueType type,
     // 自分が real でも伝播しない．
     return type;
   }
-  ymuint32 req_size = unpack_size(req_type);
-  ymuint32 size = unpack_size(type);
+  ymuint req_size = unpack_size(req_type);
+  ymuint size = unpack_size(type);
   if ( req_size <= size ) {
     return type;
   }

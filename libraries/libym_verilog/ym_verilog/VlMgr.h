@@ -83,7 +83,7 @@ public:
 
   /// @brief エラボレーションを行う．
   /// @param[in] エラー数を返す．
-  size_t
+  ymuint
   elaborate();
 
   /// @brief UDP 定義のリストを返す．
@@ -237,7 +237,7 @@ public:
 	    bool def = false) const;
 
   /// @brief このオブジェクトが確保したメモリの総量を返す．
-  size_t
+  ymuint
   allocated_size() const;
 
 

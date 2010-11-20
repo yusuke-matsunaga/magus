@@ -116,7 +116,7 @@ EiImpNet::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiImpNet::bit_size() const
 {
   return 1;
@@ -204,7 +204,7 @@ EiImpNet::delay() const
 // @brief dimension list のサイズの取得
 // @return dimension list のサイズ
 // @note このクラスでは 0 を返す．
-ymuint32
+ymuint
 EiImpNet::dimension_list_size() const
 {
   return 0;
@@ -214,7 +214,7 @@ EiImpNet::dimension_list_size() const
 // @param[in] pos 位置 (0 <= pos < dimension_list_size())
 // @note このクラスでは NULL を返す．
 const VlRange*
-EiImpNet::range(ymuint32 pos) const
+EiImpNet::range(ymuint pos) const
 {
   return NULL;
 }

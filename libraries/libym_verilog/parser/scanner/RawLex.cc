@@ -70,7 +70,7 @@ RawLex::~RawLex()
   clear();
 
   // LexPlugin は LexPluginDict のデストラクタで削除される．
-  
+
   for (list<LexState*>::iterator p = mStates.begin();
        p != mStates.end(); ++ p) {
     delete *p;
@@ -143,7 +143,7 @@ RawLex::get_token()
       case COMMENT1:
       case COMMENT2:
 	continue;
-      
+
       case CD_SYMBOL:
 	{
 	  // 先頭の '`' をスキップする．
@@ -180,11 +180,11 @@ RawLex::get_token()
 	{
 	  // 小さい整数か大きい整数か判断する．
 	  const char* tmp = cur_string();
-	  ymuint32 end = strlen(tmp);
-	  const ymuint32 sft = sizeof(ymuint32) * 8 - 4;
+	  ymuint end = strlen(tmp);
+	  const ymuint sft = sizeof(ymuint32) * 8 - 4;
 	  mCurUint = 0;
 	  bool overflow = false;
-	  for (ymuint32 pos = 0; pos < end; ++ pos) {
+	  for (ymuint pos = 0; pos < end; ++ pos) {
 	    char c = tmp[pos];
 	    ymuint32 v = c - '0';
 	    ymuint32 u = mCurUint >> sft;
@@ -209,7 +209,7 @@ RawLex::get_token()
       default:
 	break;
       }
-      
+
       if ( mDebug ) {
 	ostringstream buf;
 	print_token(buf, id, cur_string());
@@ -232,7 +232,7 @@ RawLex::get_token()
 			"LEX",
 			"Unexpected EOF.");
 	return ERROR;
-	
+
       case CD_SYMBOL:
 	{
 	  // 先頭の '`' をスキップする．
@@ -245,7 +245,7 @@ RawLex::get_token()
 	  }
 	}
 	continue;
-	
+
       default:
 	continue;
       }
@@ -295,12 +295,12 @@ RawLex::get_raw_token()
   InputFile* input_file = mInputMgr->cur_file();
   int id = input_file->read_token(mStringBuff, mCurPos);
   mCurString = mStringBuff.c_str();
-  
+
   switch ( id ) {
   case IDENTIFIER:
     // buff が予約語かどうか判定する．
     id = mDic.token(mCurString);
-    
+
     // UDP のテーブル定義の中はルールが変わるのでモードを用意しておく
     if ( id == TABLE ) {
       mContext = kUdp;
@@ -330,17 +330,17 @@ RawLex::get_raw_token()
   case ERROR:
     mContext = kNormal;
     break;
-    
+
   case EOF:
     if ( mInputMgr->wrap_up() ) {
       goto LOOP;
     }
     break;
-    
+
   default:
     break;
   }
-  
+
   if ( mDebug ) {
     ostringstream buf;
     buf << "get_raw_token(from "
@@ -455,7 +455,7 @@ RawLex::resetall(const FileRegion& file_region)
        p != mStates.end(); ++ p) {
     (*p)->resetall(file_region);
   }
-} 
+}
 
 // @brief マクロ定義の検査
 // @param[in] name 名前
@@ -476,8 +476,8 @@ RawLex::is_macro_defined(const char* name) const
 bool
 RawLex::check_macro(const char* name) const
 {
-  ymuint32 n = mMacroStack.size();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = mMacroStack.size();
+  for (ymuint i = 0; i < n; ++ i) {
     if ( mMacroStack[i].check_name(name) ) {
       return true;
     }

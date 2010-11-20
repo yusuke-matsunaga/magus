@@ -38,7 +38,7 @@ VlDumperImpl::VlDumperImpl(ostream& s) :
   mBitExpandMode(false)
 {
 }
-  
+
 // @brief デストラクタ
 VlDumperImpl::~VlDumperImpl()
 {
@@ -125,7 +125,7 @@ VlDumperImpl::put(const VlMgr& mgr)
     const VlModule* module = tmp_list.front();
     tmp_list.pop_front();
     put_module("MODULE", mgr, module);
-    
+
     vector<const VlModule*> module_list;
     if ( mgr.find_module_list(module, module_list) ) {
       for (vector<const VlModule*>::iterator p = module_list.begin();
@@ -139,8 +139,8 @@ VlDumperImpl::put(const VlMgr& mgr)
       for (vector<const VlModuleArray*>::iterator p = modulearray_list.begin();
 	   p != modulearray_list.end(); ++ p) {
 	const VlModuleArray* module_array = *p;
-	ymuint32 n = module_array->elem_num();
-	for (ymuint32 i = 0; i < n; ++ i) {
+	ymuint n = module_array->elem_num();
+	for (ymuint i = 0; i < n; ++ i) {
 	  const VlModule* module1 = module_array->elem_by_offset(i);
 	  tmp_list.push_back(module1);
 	}
@@ -169,11 +169,11 @@ VlDumperImpl::put(const char* label,
   case kVpiModule:          put_module(label, mgr, obj); break;
   case kVpiModuleArray:     put_module_array(label, mgr, obj); break;
   case kVpiScope:           put_scope(label, mgr, obj); break;
-    
+
   case kVpiGateArray:
   case kVpiSwitchArray:
   case kVpiUdpArray:        put_prim_array(label, mgr, obj); break;
-    
+
   case kVpiNet:             put_decl(label, mgr, obj); break;
   case kVpiNetArray:        put_decl(label, mgr, obj); break;
   case kVpiReg:             put_decl(label, mgr, obj); break;
@@ -188,19 +188,19 @@ VlDumperImpl::put(const char* label,
   case kVpiSpecParam:       put_decl(label, mgr, obj); break;
   case kVpiDefParam:        put_def_param(label, mgr, obj); break;
   case kVpiParamAssign:     put_param_assign(label, mgr, obj); break;
-    
+
   case kVpiRange:           put_range(label, mgr, obj); break;
-    
+
   case kVpiGate:
   case kVpiSwitch:
   case kVpiUdp:             put_primitive(label, mgr, obj); break;
   case kVpiPrimTerm:        put_prim_term(label, mgr, obj); break;
-    
+
   case kVpiUdpDefn:         put_udp_defn(label, mgr, obj); break;
-    
+
   case kVpiTask:            put_task(label, mgr, obj); break;
   case kVpiFunction:        put_function(label, mgr, obj); break;
-    
+
 #if 0
   case kVpiFrame:           put_frame(label, mgr, obj); break;
 #endif
@@ -208,10 +208,10 @@ VlDumperImpl::put(const char* label,
 #if 0
   case kVpiContAssignBit:   put_cont_assign_bit(label, mgr, obj); break;
 #endif
-    
+
   case kVpiInitial:         put_process(label, mgr, obj); break;
   case kVpiAlways:          put_process(label, mgr, obj); break;
-    
+
   case kVpiBegin:           put_stmt(label, mgr, obj); break;
   case kVpiFork:            put_stmt(label, mgr, obj); break;
   case kVpiNamedBegin:      put_stmt(label, mgr, obj); break;
@@ -234,13 +234,13 @@ VlDumperImpl::put(const char* label,
   case kVpiTaskCall:        put_stmt(label, mgr, obj); break;
   case kVpiSysTaskCall:     put_stmt(label, mgr, obj); break;
   case kVpiDisable:         put_stmt(label, mgr, obj); break;
-    
+
 #if 0
   case kVpiDelayControl:    put_control(label, mgr, obj); break;
   case kVpiEventControl:    put_control(label, mgr, obj); break;
   case kVpiRepeatControl:   put_control(label, mgr, obj); break;
 #endif
-    
+
   case kVpiFuncCall:
   case kVpiSysFuncCall:
   case kVpiBitSelect:
@@ -631,7 +631,7 @@ VlDumperImpl::put(const char* label,
 // @param[in] d 整数値
 void
 VlDumperImpl::put(const char* label,
-		  ymuint32 d)
+		  ymuint d)
 {
   VlDumpHeader x(this, label, "int", false);
   mStream << d;

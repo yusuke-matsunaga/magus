@@ -25,10 +25,10 @@ class CptControl :
   public PtControl
 {
 protected:
-  
+
   /// @brief コンストラクタ
   CptControl();
-  
+
   /// @brief デストラクタ
   virtual
   ~CptControl();
@@ -51,15 +51,15 @@ public:
   /// @retval イベントリストのサイズ event control/repeat control の場合
   /// @retval 0 上記以外
   virtual
-  ymuint32
+  ymuint
   event_num() const;
-  
+
   /// @brief イベントリストの要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   /// @note event control/repeat control の場合のみ意味を持つ
   virtual
   const PtExpr*
-  event(ymuint32 pos) const;
+  event(ymuint pos) const;
 
   /// @brief 繰り返し数の取得
   /// @retval 繰り返し数を表す式 repeat control の場合
@@ -81,15 +81,15 @@ class CptDelayControl :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptDelayControl(const FileRegion& file_region,
 		  PtExpr* value);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDelayControl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ public:
   virtual
   tPtCtrlType
   type() const;
-  
+
   /// @brief 遅延式を返す．
   virtual
   const PtExpr*
@@ -136,11 +136,11 @@ class CptEventControl :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptEventControl(const FileRegion& file_region,
 		  PtExprArray event_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptEventControl();
@@ -166,15 +166,15 @@ public:
   /// @retval イベントリストのサイズ event control/repeat control の場合
   /// @retval 0 上記以外
   virtual
-  ymuint32
+  ymuint
   event_num() const;
-  
+
   /// @brief イベントリストの要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   /// @note event control/repeat control の場合のみ意味を持つ
   virtual
   const PtExpr*
-  event(ymuint32 pos) const;
+  event(ymuint pos) const;
 
 
 private:
@@ -200,16 +200,16 @@ class CptRepeatControl :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptRepeatControl(const FileRegion& file_region,
 		   PtExpr* expr,
 		   PtExprArray event_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptRepeatControl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -236,15 +236,15 @@ public:
   /// @retval イベントリストのサイズ event control/repeat control の場合
   /// @retval 0 上記以外
   virtual
-  ymuint32
+  ymuint
   event_num() const;
-  
+
   /// @brief イベントリストの要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   /// @note event control/repeat control の場合のみ意味を持つ
   virtual
   const PtExpr*
-  event(ymuint32 pos) const;
+  event(ymuint pos) const;
 
 
 private:
@@ -271,15 +271,15 @@ class CptConnection :
   public PtConnection
 {
 protected:
-  
+
   /// @brief コンストラクタ
   CptConnection(const FileRegion& file_region,
 		PtExpr* expr);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptConnection();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -328,15 +328,15 @@ class CptOrderedCon :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptOrderedCon(const FileRegion& file_region,
 		PtExpr* expr);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptOrderedCon();
-  
+
 };
 
 
@@ -349,16 +349,16 @@ class CptNamedCon :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptNamedCon(const FileRegion& file_region,
 	      const char* name,
 	      PtExpr* expr);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptNamedCon();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -389,22 +389,22 @@ class CptStrength :
   public PtStrength
 {
   friend class CptFactory;
-  
+
 private:
-  
+
   /// @brief drive strength を表すコンストラクタ
   CptStrength(const FileRegion& file_region,
 	      tVpiStrength value1,
 	      tVpiStrength value2);
-  
+
   /// @brief charge strength を表すコンストラクタ
   CptStrength(const FileRegion& file_region,
 	      tVpiStrength value1);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptStrength();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -459,18 +459,18 @@ private:
   /// @brief 一つの値をとるコンストラクタ
   CptDelay(const FileRegion& file_region,
 	   PtExpr* value1);
-  
+
   /// @brief 二つの値をとるコンストラクタ
   CptDelay(const FileRegion& file_region,
 	   PtExpr* value1,
 	   PtExpr* value2);
-  
+
   /// @brief 三つの値をとるコンストラクタ
   CptDelay(const FileRegion& file_region,
 	   PtExpr* value1,
 	   PtExpr* value2,
 	   PtExpr* value3);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDelay();
@@ -489,7 +489,7 @@ public:
   /// @brief 値を取り出す．
   virtual
   const PtExpr*
-  value(ymuint32 pos) const;
+  value(ymuint pos) const;
 
 
 private:
@@ -555,7 +555,7 @@ private:
 
   // 名前
   const char* mName;
-  
+
 };
 
 
@@ -612,14 +612,14 @@ class CptAttrInst :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptAttrInst(PtAttrSpecArray as_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptAttrInst();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -629,14 +629,14 @@ public:
   /// @brief 要素数の取得
   /// @return 要素数
   virtual
-  ymuint32
+  ymuint
   attrspec_num() const;
-    
+
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < attrspec_num() )
   virtual
   const PtAttrSpec*
-  attrspec(ymuint32 pos) const;
+  attrspec(ymuint pos) const;
 
 
 private:
@@ -664,11 +664,11 @@ private:
   CptAttrSpec(const FileRegion& file_region,
 	      const char* name,
 	      PtExpr* expr);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptAttrSpec();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -684,7 +684,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief 式を取り出す．NULL の場合もある．
   virtual
   const PtExpr*

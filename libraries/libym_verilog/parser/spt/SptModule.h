@@ -28,7 +28,7 @@ class SptModule :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptModule(const FileRegion& file_region,
 	    const char* name,
@@ -54,11 +54,11 @@ private:
 	    PtDeclHeadArray localparamdecl_array,
 	    PtDeclHeadArray decl_array,
 	    PtItemArray item_array);
-  
+
   /// デストラクタ
   virtual
   ~SptModule();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -69,52 +69,52 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// 名前の取得
   virtual
   const char*
   name() const;
-  
+
   /// macromodule 情報の取得
   virtual
   bool
   is_macromodule() const;
-  
+
   /// cell 情報の取得
   virtual
   bool
   is_cell() const;
-    
+
   /// protect 情報の取得
   virtual
   bool
   is_protected() const;
-  
+
   /// time unit の取得
   virtual
   int
   time_unit() const;
-  
+
   /// time precision の取得
   virtual
   int
   time_precision() const;
-  
+
   /// default net type の取得
   virtual
   tVpiNetType
   nettype() const;
-  
+
   /// unconnected drive の取得
   virtual
   tVpiUnconnDrive
   unconn_drive() const;
-  
+
   /// default delay mode の取得
   virtual
   tVpiDefDelayMode
   delay_mode() const;
-  
+
   /// default decay time の取得
   virtual
   int
@@ -124,27 +124,27 @@ public:
   virtual
   bool
   portfaults() const;
-  
+
   /// suppress_faults 情報の取得
   virtual
   bool
   suppress_faults() const;
-  
+
   /// config 情報の取得
   virtual
   const string&
   config() const;
-  
+
   /// library 情報の取得
   virtual
   const string&
   library() const;
-  
+
   /// cell 情報の取得
   virtual
   const string&
   cell() const;
-  
+
   /// @brief パラメータポート宣言配列の取得
   virtual
   PtDeclHeadArray
@@ -153,41 +153,41 @@ public:
   /// @brief ポート数の取得
   /// @return ポート数
   virtual
-  ymuint32
+  ymuint
   port_num() const;
-  
+
   /// @brief ポートの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
   virtual
   const PtPort*
-  port(ymuint32 pos) const;
-  
+  port(ymuint pos) const;
+
   /// @brief 入出力宣言ヘッダ配列の取得
   virtual
   PtIOHeadArray
   iohead_array() const;
-  
+
   /// @brief 入出力宣言の要素数の取得
   /// @note 個々のヘッダが持つ要素数の総和を計算する．
   virtual
-  ymuint32
+  ymuint
   iodecl_num() const;
 
   /// @brief parameter 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   paramhead_array() const;
-  
+
   /// @brief localparam 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   localparamhead_array() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -202,7 +202,7 @@ public:
   virtual
   void
   clear_topmodule() const;
-  
+
   /// top module のチェック
   virtual
   bool
@@ -250,17 +250,17 @@ private:
 
   // 様々な情報をパックしたもの
   mutable
-  int mFlags;
-    
+  ymuint32 mFlags;
+
   // decay time
-  int mDefDecayTime;
-  
+  ymint32 mDefDecayTime;
+
   // config 情報
   string mConfig;
-  
+
   // library 情報
   string mLibrary;
-  
+
   // cell 情報
   string mCell;
 
@@ -272,19 +272,19 @@ private:
 
   // 入出力宣言の配列
   PtIOHeadArray mIOHeadArray;
-  
+
   // 入出力宣言の要素数
   ymuint32 mIODeclNum;
-  
+
   // parameter 宣言の配列
   PtDeclHeadArray mParamHeadArray;
 
   // localparam 宣言の配列
   PtDeclHeadArray mLocalparamHeadArray;
-  
+
   // 宣言リスト
   PtDeclHeadArray mDeclHeadArray;
-  
+
   // 要素のリスト
   PtItemArray mItemArray;
 
@@ -303,22 +303,22 @@ class SptPort :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptPort(const FileRegion& file_region,
 	  PtiPortRefArray portref_array,
 	  const char* ext_name);
-  
+
   /// デストラクタ
   virtual
   ~SptPort();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtPort の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -331,13 +331,13 @@ public:
 
   /// 内部のポート結線リストのサイズの取得
   virtual
-  ymuint32
+  ymuint
   portref_num() const;
 
   /// 内部のポート結線の取得
   virtual
   const PtPortRef*
-  portref(ymuint32 pos) const;
+  portref(ymuint pos) const;
 
 
 public:
@@ -348,7 +348,7 @@ public:
   /// @brief portref を得る．
   virtual
   PtiPortRef*
-  _portref(ymuint32 pos);
+  _portref(ymuint pos);
 
 
 private:
@@ -361,10 +361,10 @@ private:
 
   // 外部向きの名前
   const char* mExtName;
-  
+
   // portref の配列
   PtiPortRefArray mPortRefArray;
-  
+
 };
 
 
@@ -377,7 +377,7 @@ class SptPortRef :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptPortRef(const FileRegion& file_region,
 	     const char* name,
@@ -385,27 +385,27 @@ private:
 	     tVpiRangeMode mode,
 	     PtExpr* left,
 	     PtExpr* right);
-  
+
   // デストラクタ
   virtual
   ~SptPortRef();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtPortRef の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
   file_region() const;
-  
+
   /// 名前の取得
   virtual
   const char*
   name() const;
-  
+
   /// インデックスの取得
   virtual
   const PtExpr*
@@ -415,12 +415,12 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const;
-  
+
   /// 範囲の左側の式の取得
   virtual
   const PtExpr*
   left_range() const;
-  
+
   /// 範囲の右側の式の取得
   virtual
   const PtExpr*

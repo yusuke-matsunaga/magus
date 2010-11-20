@@ -51,7 +51,7 @@ public:
   virtual
   const char*
   stmt_name() const;
-  
+
   /// @brief 階層ブランチの取得
   /// @note kDisable/kEnable/kSysEnable で意味のある関数
   /// @note このクラスでは NULL を返す．
@@ -71,15 +71,15 @@ public:
   /// @return 引数の数
   /// @note kEnable/kSysEnable で意味のある関数
   virtual
-  ymuint32
+  ymuint
   arg_num() const;
-  
+
   /// @brief 引数の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < arg_num() )
   /// @note kEnable/kSysEnable で意味のある関数
   virtual
   const PtExpr*
-  arg(ymuint32 pos) const;
+  arg(ymuint pos) const;
 
   /// @brief コントロールの取得
   /// @return ディレイ/イベントコントロール
@@ -142,7 +142,7 @@ public:
   /// @note kCase/kCaseX/kCaseZ で意味のある関数
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   caseitem_num() const;
 
   /// @brief case item の取得
@@ -150,7 +150,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   const PtCaseItem*
-  caseitem(ymuint32 pos) const;
+  caseitem(ymuint pos) const;
 
   /// @brief 初期化代入文の取得
   /// @return 初期化代入文
@@ -159,7 +159,7 @@ public:
   virtual
   const PtStmt*
   init_stmt() const;
-  
+
   /// @brief 繰り返し代入文の取得
   /// @return 繰り返し代入文
   /// @note kFor で意味のある関数
@@ -167,12 +167,12 @@ public:
   virtual
   const PtStmt*
   next_stmt() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief 子供のステートメント配列の取得
   /// @note kParBlock/kSeqBlock で意味のある関数
   virtual
@@ -208,7 +208,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptDisable();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -268,7 +268,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 階層ブランチの取得
   virtual
   PtNameBranchArray
@@ -298,7 +298,7 @@ protected:
   CptEnableBase(const FileRegion& file_region,
 		const char* name,
 		PtExprArray arg_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptEnableBase();
@@ -318,15 +318,15 @@ public:
   /// @return 引数の数
   /// @note kEnable/kSysEnable で意味のある関数
   virtual
-  ymuint32
+  ymuint
   arg_num() const;
-  
+
   /// @brief 引数の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < arg_num() )
   /// @note kEnable/kSysEnable で意味のある関数
   virtual
   const PtExpr*
-  arg(ymuint32 pos) const;
+  arg(ymuint pos) const;
 
 
 private:
@@ -352,16 +352,16 @@ class CptEnable :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptEnable(const FileRegion& file_region,
 	    const char* name,
 	    PtExprArray arg_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptEnable();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -392,7 +392,7 @@ protected:
 	     PtNameBranchArray nb_array,
 	     const char* tail_name,
 	     PtExprArray arg_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptEnableH();
@@ -402,7 +402,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 階層ブランチの取得
   virtual
   PtNameBranchArray
@@ -429,12 +429,12 @@ class CptSysEnable :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptSysEnable(const FileRegion& file_region,
 	       const char* task_name,
 	       PtExprArray arg_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptSysEnable();
@@ -461,12 +461,12 @@ class CptCtrlStmt :
   public CptStmt
 {
 protected:
-  
+
   /// @brief コンストラクタ
   CptCtrlStmt(const FileRegion& file_region,
 	      PtControl* delay,
 	      PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptCtrlStmt();
@@ -509,18 +509,18 @@ class CptDcStmt :
   public CptCtrlStmt
 {
   friend class CptFactory;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   CptDcStmt(const FileRegion& file_region,
 	    PtControl* delay,
 	    PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDcStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -545,12 +545,12 @@ class CptEcStmt :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptEcStmt(const FileRegion& file_region,
 	    PtControl* event,
 	    PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptEcStmt();
@@ -579,16 +579,16 @@ class CptWait :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptWait(const FileRegion& file_region,
 	  PtExpr* cond,
 	  PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptWait();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -637,7 +637,7 @@ protected:
   /// @brief コンストラクタ
   CptAssignBase(const FileRegion& file_region,
 		PtExpr* lhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptAssignBase();
@@ -685,11 +685,11 @@ protected:
   CptAssign(const FileRegion& file_region,
 	    PtExpr* lhs,
 	    PtExpr* rhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptAssign();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -734,7 +734,7 @@ protected:
 	     PtExpr* lhs,
 	     PtExpr* rhs,
 	     PtControl* control);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptAssignC();
@@ -776,7 +776,7 @@ protected:
   CptNbAssign(const FileRegion& file_region,
 	      PtExpr* lhs,
 	      PtExpr* rhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptNbAssign();
@@ -811,7 +811,7 @@ private:
 	       PtExpr* lhs,
 	       PtExpr* rhs,
 	       PtControl* control);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptNbAssignC();
@@ -845,11 +845,11 @@ protected:
   CptPcAssign(const FileRegion& file_region,
 	      PtExpr* lhs,
 	      PtExpr* rhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptPcAssign();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -892,11 +892,11 @@ protected:
   /// @brief コンストラクタ
   CptDeassign(const FileRegion& file_region,
 	      PtExpr* lhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDeassign();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -919,18 +919,18 @@ class CptForce :
   public CptPcAssign
 {
   friend class CptFactory;
-  
+
 private:
 
   /// @brief コンストラクタ
   CptForce(const FileRegion& file_region,
 	   PtExpr* lhs,
 	   PtExpr* rhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptForce();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -959,11 +959,11 @@ private:
   /// @brief コンストラクタ
   CptRelease(const FileRegion& file_region,
 	     PtExpr* lhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptRelease();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1035,14 +1035,14 @@ class CptNullStmt :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptNullStmt(const FileRegion& file_region);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptNullStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1072,11 +1072,11 @@ protected:
   CptIf(const FileRegion& file_region,
 	PtExpr* expr,
 	PtStmt* then_body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptIf();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1098,7 +1098,7 @@ public:
   virtual
   const PtStmt*
   body() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1129,11 +1129,11 @@ protected:
 	    PtExpr* expr,
 	    PtStmt* then_body,
 	    PtStmt* else_body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptIfElse();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1144,7 +1144,7 @@ public:
   virtual
   const PtStmt*
   else_body() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1171,7 +1171,7 @@ private:
   CptCaseItem(const FileRegion& file_region,
 	      PtExprArray label_array,
 	      PtStmt* body);
-  
+
   /// @brief デストラクタ
   ~CptCaseItem();
 
@@ -1190,14 +1190,14 @@ public:
   /// @retval ラベルの数 通常の case ラベルの場合
   /// @retval 0 default の場合
   virtual
-  ymuint32
+  ymuint
   label_num() const;
-  
+
   /// @brief ラベルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < label_num() )
   virtual
   const PtExpr*
-  label(ymuint32 pos) const;
+  label(ymuint pos) const;
 
   /// @brief 本体のステートメント得る．
   virtual
@@ -1215,7 +1215,7 @@ private:
 
   // ラベルの配列
   PtExprArray mLabelArray;
-  
+
   // ラベルが一致したときに実行されるステートメント
   PtStmt* mBody;
 
@@ -1236,7 +1236,7 @@ protected:
   CptCase(const FileRegion& file_region,
 	  PtExpr* expr,
 	  PtCaseItemArray caseitem_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptCase();
@@ -1260,13 +1260,13 @@ public:
 
   /// @brief case item の要素数を返す．
   virtual
-  ymuint32
+  ymuint
   caseitem_num() const;
 
   /// @brief case item を返す．
   virtual
   const PtCaseItem*
-  caseitem(ymuint32 pos) const;
+  caseitem(ymuint pos) const;
 
 
 private:
@@ -1276,7 +1276,7 @@ private:
 
   // 比較される式
   PtExpr* mExpr;
-  
+
   // case item の配列
   PtCaseItemArray mCaseItemArray;
 
@@ -1297,7 +1297,7 @@ protected:
   CptCaseX(const FileRegion& file_region,
 	   PtExpr* expr,
 	   PtCaseItemArray caseitem_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptCaseX();
@@ -1331,7 +1331,7 @@ protected:
   CptCaseZ(const FileRegion& file_region,
 	   PtExpr* expr,
 	   PtCaseItemArray caseitem_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptCaseZ();
@@ -1362,11 +1362,11 @@ protected:
   /// @brief コンストラクタ
   CptLoopStmt(const FileRegion& file_region,
 	      PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptLoopStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1403,11 +1403,11 @@ private:
   /// @brief コンストラクタ
   CptForever(const FileRegion& file_region,
 	     PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptForever();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1437,11 +1437,11 @@ protected:
   CptRepeat(const FileRegion& file_region,
 	    PtExpr* expr,
 	    PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptRepeat();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1485,11 +1485,11 @@ protected:
   CptWhile(const FileRegion& file_region,
 	   PtExpr* cond,
 	   PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptWhile();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1521,11 +1521,11 @@ protected:
 	 PtExpr* cond,
 	 PtStmt* next,
 	 PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptFor();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1542,7 +1542,7 @@ public:
   virtual
   const PtStmt*
   init_stmt() const;
-  
+
   /// @brief 繰り返し代入式を取出す
   virtual
   const PtStmt*
@@ -1559,7 +1559,7 @@ private:
 
   // 増加処理文
   PtStmt* mNext;
-  
+
 };
 
 
@@ -1574,17 +1574,17 @@ protected:
   /// @brief コンストラクタ
   CptStmtBlock(const FileRegion& file_region,
 	       PtStmtArray stmt_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptStmtBlock();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtStmtBlock の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 子供のステートメント配列の取得
   /// @note kParBlock/kSeqBlock で意味のある関数
   virtual
@@ -1596,7 +1596,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ステートメントの配列
   PtStmtArray mStmtArray;
 
@@ -1618,7 +1618,7 @@ protected:
 		const char* name,
 		PtDeclHeadArray declhead_array,
 		PtStmtArray stmt_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptStmtBlockN();
@@ -1633,7 +1633,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
@@ -1667,11 +1667,11 @@ protected:
   /// @brief コンストラクタ
   CptParBlock(const FileRegion& file_region,
 	      PtStmtArray stmt_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptParBlock();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1702,7 +1702,7 @@ protected:
 	       const char* name,
 	       PtDeclHeadArray declhead_array,
 	       PtStmtArray stmt_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptParBlockN();
@@ -1735,11 +1735,11 @@ protected:
   /// @brief コンストラクタ
   CptSeqBlock(const FileRegion& file_region,
 	      PtStmtArray stmt_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptSeqBlock();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1770,11 +1770,11 @@ protected:
 	       const char* name,
 	       PtDeclHeadArray declhead_array,
 	       PtStmtArray stmt_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptSeqBlockN();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////

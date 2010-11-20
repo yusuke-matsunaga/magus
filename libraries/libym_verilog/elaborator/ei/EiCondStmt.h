@@ -616,14 +616,14 @@ public:
 
   /// @brief 条件式のリストの要素数を返す．
   virtual
-  ymuint32
+  ymuint
   expr_num() const;
 
   /// @brief 条件式を返す．
   /// @param[in] pos 位置番号
   virtual
   const VlExpr*
-  expr(ymuint32 pos) const;
+  expr(ymuint pos) const;
 
   /// @brief 本体のステートメントを返す．
   virtual
@@ -674,7 +674,7 @@ private:
 	     ElbProcess* process,
 	     const PtStmt* pt_stmt,
 	     ElbExpr* expr,
-	     ymuint32 caseitem_num,
+	     ymuint caseitem_num,
 	     EiCaseItem* caseitem_array);
 
   /// @brief デストラクタ
@@ -710,14 +710,14 @@ public:
 
   /// @brief case item のリストの要素数を返す．
   virtual
-  ymuint32
+  ymuint
   case_item_num() const;
 
   /// @brief case item を返す．
   /// @param[in] pos 位置番号
   virtual
   const VlCaseItem*
-  case_item(ymuint32 pos) const;
+  case_item(ymuint pos) const;
 
 
 public:
@@ -732,7 +732,7 @@ public:
   /// @param[in] stmt 本体のステートメント
   virtual
   void
-  set_caseitem(ymuint32 pos,
+  set_caseitem(ymuint pos,
 	       const PtCaseItem* pt_caseitem,
 	       ElbExpr** expr_array,
 	       ElbStmt* stmt);

@@ -92,12 +92,12 @@ Parser::read_file(const string& filename,
   int yyparse(Parser&);
 
   lex().set_searchpath(searchpath);
-  
+
   for (list<VlLineWatcher*>::const_iterator p = watcher_list.begin();
        p != watcher_list.end(); ++ p) {
     lex().reg_watcher(*p);
   }
-  
+
   if ( !lex().open_file(filename) ) {
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -109,7 +109,7 @@ Parser::read_file(const string& filename,
   }
 
   int stat = yyparse(*this);
-    
+
   if ( check_memory_leak ) {
     dout << endl
 	 << "Parser::mAlloc.allocated_size() = "
@@ -121,7 +121,7 @@ Parser::read_file(const string& filename,
   }
   return (stat == 0);
 }
-  
+
 // @brief yylex とのインターフェイス
 // @param[out] lvalp 値を格納する変数
 // @param[out] llocp 位置情報を格納する変数
@@ -131,7 +131,7 @@ Parser::yylex(YYSTYPE& lval,
 	      FileRegion& lloc)
 {
   int id = lex().get_token();
-      
+
   switch ( id ) {
   case IDENTIFIER:
   case SYS_IDENTIFIER:
@@ -140,22 +140,22 @@ Parser::yylex(YYSTYPE& lval,
   case UNUM_BIG:
     lval.strtype = mFactory.new_string(lex().cur_string());
     break;
-	
+
   case UNUM_INT:
     lval.uinttype = lex().cur_uint();
     break;
-    
+
   case RNUMBER:
     lval.dbltype = lex().cur_rnumber();
     break;
-    
+
   default:
     break;
   }
   lloc = lex().cur_token_loc();
   return id;
 }
-  
+
 // @brief 使用されているモジュール名を登録する．
 // @param[in] name 登録する名前
 void
@@ -163,7 +163,7 @@ Parser::reg_defname(const char* name)
 {
   mPtMgr.reg_defname(name);
 }
-  
+
 // @brief attribute instance を登録する．
 void
 Parser::reg_attrinst(PtBase* ptobj,
@@ -204,7 +204,7 @@ Parser::check_function_statement(const PtStmt* stmt)
   case kPtCaseStmt:
   case kPtCaseXStmt:
   case kPtCaseZStmt:
-    for (ymuint32 i = 0; i < stmt->caseitem_num(); ++ i) {
+    for (ymuint i = 0; i < stmt->caseitem_num(); ++ i) {
       const PtCaseItem* item = stmt->caseitem(i);
       if ( !check_function_statement(item->body()) ) {
 	return false;
@@ -230,7 +230,7 @@ Parser::check_function_statement(const PtStmt* stmt)
 
   case kPtSeqBlockStmt:
   case kPtNamedSeqBlockStmt:
-    for (ymuint32 i = 0; i < stmt->stmt_array().size(); ++ i) {
+    for (ymuint i = 0; i < stmt->stmt_array().size(); ++ i) {
       const PtStmt* stmt1 = stmt->stmt_array()[i];
       if ( !check_function_statement(stmt1) ) {
 	return false;
@@ -256,7 +256,7 @@ Parser::check_function_statement(const PtStmt* stmt)
 bool
 Parser::check_default_label(const PtrList<PtCaseItem>* ci_list)
 {
-  ymuint32 n = 0;
+  ymuint n = 0;
   for (PtrList<PtCaseItem>::const_iterator p = ci_list->begin();
        p.is_valid(); ++ p) {
     const PtCaseItem* ci = *p;
@@ -282,11 +282,11 @@ PtExprArray
 Parser::ExprArray(PtExpr* pre_expr,
 		  PtrList<PtExpr>* list)
 {
-  ymuint32 n = list->size();
+  ymuint n = list->size();
   void* p = mAlloc.get_memory(sizeof(PtExpr*) * (n + 1));
   PtExpr** array = new (p) PtExpr*[n + 1];
   array[0] = pre_expr;
-  ymuint32 i = 1;
+  ymuint i = 1;
   for (PtrList<PtExpr>::const_iterator p = list->begin();
        p.is_valid(); ++ p, ++ i) {
     array[i] = *p;
@@ -294,7 +294,7 @@ Parser::ExprArray(PtExpr* pre_expr,
 
   list->~PtrList<PtExpr>();
   mTmpAlloc.put_memory(sizeof(PtrList<PtExpr>), list);
-  
+
   return PtExprArray(n + 1, array);
 }
 
@@ -323,7 +323,7 @@ Parser::new_HierName(const char* head_name,
   void* p = mTmpAlloc.get_memory(sizeof(PuHierName));
   return new (p) PuHierName(mCellAlloc, nb, name);
 }
-  
+
 // @brief 階層名の追加
 // @aram[in] hname 階層名の上位部分
 // @param[in] name 追加する名前
@@ -334,7 +334,7 @@ Parser::add_HierName(PuHierName* hname,
   PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name());
   hname->add(nb, name);
 }
-  
+
 // @brief 階層名の追加
 // @aram[in] hname 階層名の上位部分
 // @param[in] index インデックス
@@ -369,7 +369,7 @@ Parser::extract_HierName(PuHierName* hname,
 
   return ans;
 }
- 
+
 // @brief モジュール定義の開始
 // - port list の初期化
 // - paramport list の初期化
@@ -400,7 +400,7 @@ Parser::init_module()
 
   mCurDeclHeadList->clear();
   mDeclItemList.clear();
-  
+
   mCurItemList->clear();
 }
 
@@ -424,16 +424,16 @@ Parser::init_udp()
   mCurIOHeadList = &mModuleIOHeadList;
   mCurDeclHeadList = &mModuleDeclHeadList;
 
-  
+
   mCurIOHeadList->clear();
   mIOItemList.clear();
-  
+
   mCurDeclHeadList->clear();
   mDeclItemList.clear();
-  
+
   mUdpEntryList.clear();
 }
-  
+
 // @brief UDP 定義の終了
 void
 Parser::end_udp()
@@ -458,7 +458,7 @@ Parser::end_paramport()
 {
   flush_declitem_list(mParamPortHeadList);
 }
-  
+
 // @param parameter 宣言の終わり
 void
 Parser::end_param()
@@ -472,7 +472,7 @@ Parser::end_localparam()
 {
   flush_declitem_list(*mCurLparamHeadList);
 }
-  
+
 // @param 宣言の終わり
 void
 Parser::end_decl()
@@ -504,7 +504,7 @@ Parser::init_tf()
   push_paramhead_list();
   push_declhead_list();
   push_item_list();
-  
+
   mCurIOHeadList = &mTfIOHeadList;
   mCurParamHeadList = &mTfParamHeadList;
   mCurLparamHeadList = &mTfLparamHeadList;
@@ -516,7 +516,7 @@ Parser::init_tf()
   mCurParamHeadList->clear();
   mCurLparamHeadList->clear();
   mCurDeclHeadList->clear();
-  
+
   mDeclItemList.clear();
 }
 
@@ -529,14 +529,14 @@ Parser::end_tf()
   pop_declhead_list();
   pop_item_list();
 }
-  
+
 // @brief generate block の開始
 void
 Parser::init_generate()
 {
   push_declhead_list();
   push_item_list();
-  
+
   new_declhead_list();
   new_item_list();
 }
@@ -551,14 +551,14 @@ Parser::end_generate()
   pop_declhead_list();
   pop_item_list();
 }
-  
+
 // @brief generate-if の then 節の開始
 void
 Parser::init_genif()
 {
   mThenDeclHeadListStack.push_back(mCurThenDeclHeadList);
   mThenItemListStack.push_back(mCurThenItemList);
-  
+
   push_declhead_list();
   push_item_list();
 
@@ -575,10 +575,10 @@ Parser::init_else()
 {
   mElseDeclHeadListStack.push_back(mCurElseDeclHeadList);
   mElseItemListStack.push_back(mCurElseItemList);
-  
+
   mCurElseDeclHeadList = new_declhead_list();
   mCurElseItemList = new_item_list();
-  
+
   // mCurDeclHeadList と mCurItemList は then 節のものが
   // セットされているはずなのでスタックに積む必要が無い．
 
@@ -592,23 +592,23 @@ Parser::end_genif()
 {
   delete_declhead_list(mCurThenDeclHeadList);
   delete_item_list(mCurThenItemList);
-  
+
   mCurThenDeclHeadList = mThenDeclHeadListStack.back();
   mThenDeclHeadListStack.pop_back();
-  
+
   delete_declhead_list(mCurElseDeclHeadList);
   delete_item_list(mCurElseItemList);
-  
+
   pop_declhead_list();
   pop_item_list();
-  
+
   mCurElseDeclHeadList = mElseDeclHeadListStack.back();
   mElseDeclHeadListStack.pop_back();
 
   mCurElseItemList = mElseItemListStack.back();
   mElseItemListStack.pop_back();
 }
-  
+
 // @brief block-statment の開始
 void
 Parser::init_block()
@@ -623,7 +623,7 @@ void
 Parser::end_block()
 {
   delete_declhead_list(mCurDeclHeadList);
-  
+
   pop_declhead_list();
 }
 
@@ -633,7 +633,7 @@ Parser::init_defparam()
 {
   mDefParamList.clear();
 }
-  
+
 // @brief contassign リストを初期化する．
 void
 Parser::init_contassign()

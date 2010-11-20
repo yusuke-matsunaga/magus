@@ -30,7 +30,7 @@ public:
 
   /// @brief コンストラクタ
   LexCondState(RawLex& lex);
-  
+
   /// @brief デストラクタ
   virtual
   ~LexCondState();
@@ -56,12 +56,12 @@ public:
   void
   resetall(const FileRegion& file_region);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 現在の条件
   bool mCurCond;
 

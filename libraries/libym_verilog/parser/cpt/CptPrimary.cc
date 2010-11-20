@@ -80,7 +80,7 @@ CptPrimary::is_simple() const
 //////////////////////////////////////////////////////////////////////
 // インデックスつきの終端記号を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptPrimaryI::CptPrimaryI(const FileRegion& file_region,
 			 const char* name,
@@ -105,16 +105,16 @@ CptPrimaryI::file_region() const
 
 // @brief インデックスリストのサイズの取得
 // @return インデックスリストのサイズ
-ymuint32
+ymuint
 CptPrimaryI::index_num() const
 {
   return mIndexArray.size();
 }
-  
+
 // @brief インデックスの取得
 // @param[in] pos 位置番号 ( 0 <= pos < index_num() )
 const PtExpr*
-CptPrimaryI::index(ymuint32 pos) const
+CptPrimaryI::index(ymuint pos) const
 {
   return mIndexArray[pos];
 }
@@ -143,7 +143,7 @@ CptPrimaryCI::CptPrimaryCI(const FileRegion& file_region,
 CptPrimaryCI::~CptPrimaryCI()
 {
 }
-  
+
 // インデックスもしくは範囲が定数にならなければならないとき true を返す．
 bool
 CptPrimaryCI::is_const_index() const
@@ -230,7 +230,7 @@ CptPrimaryCR::CptPrimaryCR(const FileRegion& file_region,
 CptPrimaryCR::~CptPrimaryCR()
 {
 }
-  
+
 // インデックスもしくは範囲が定数にならなければならないとき true を返す．
 bool
 CptPrimaryCR::is_const_index() const
@@ -297,7 +297,7 @@ CptPrimaryH::CptPrimaryH(const FileRegion& file_region,
   mNbArray(nb_array)
 {
 }
-  
+
 // デストラクタ
 CptPrimaryH::~CptPrimaryH()
 {
@@ -309,7 +309,7 @@ CptPrimaryH::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptPrimaryH::namebranch_array() const
@@ -331,12 +331,12 @@ CptPrimaryHI::CptPrimaryHI(const FileRegion& file_region,
   mNbArray(nb_array)
 {
 }
-  
+
 // デストラクタ
 CptPrimaryHI::~CptPrimaryHI()
 {
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptPrimaryHI::namebranch_array() const
@@ -357,12 +357,12 @@ CptPrimaryHCI::CptPrimaryHCI(const FileRegion& file_region,
   CptPrimaryHI(file_region, nb_array, tail_name, index_array)
 {
 }
-  
+
 // デストラクタ
 CptPrimaryHCI::~CptPrimaryHCI()
 {
 }
-  
+
 // インデックスもしくは範囲が定数にならなければならないとき true を返す．
 bool
 CptPrimaryHCI::is_const_index() const
@@ -386,12 +386,12 @@ CptPrimaryHR::CptPrimaryHR(const FileRegion& file_region,
   mNbArray(nb_array)
 {
 }
-  
+
 // デストラクタ
 CptPrimaryHR::~CptPrimaryHR()
 {
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptPrimaryHR::namebranch_array() const
@@ -421,7 +421,7 @@ CptPrimaryHIR::CptPrimaryHIR(const FileRegion& file_region,
 CptPrimaryHIR::~CptPrimaryHIR()
 {
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptPrimaryHIR::namebranch_array() const

@@ -200,7 +200,7 @@ BEGIN_NAMESPACE_HASH
 template <>
 struct hash<nsYm::nsVerilog::PtModule*>
 {
-  ymuint32
+  ymuint
   operator()(nsYm::nsVerilog::PtModule* module) const
   {
     return reinterpret_cast<ympuint>(module)/sizeof(void*);
@@ -211,7 +211,7 @@ struct hash<nsYm::nsVerilog::PtModule*>
 template <>
 struct hash<const nsYm::nsVerilog::PtModule*>
 {
-  ymuint32
+  ymuint
   operator()(const nsYm::nsVerilog::PtModule* module) const
   {
     return reinterpret_cast<ympuint>(module)/sizeof(void*);

@@ -73,19 +73,19 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief オペランドの数の取得
   /// @return 子供の数
   virtual
-  ymuint32
+  ymuint
   operand_num() const;
-  
+
   /// @brief オペランドの取得
   /// @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
   /// @return pos 番目のオペランド
   virtual
   const PtExpr*
-  operand(ymuint32 pos) const;
+  operand(ymuint pos) const;
 
   /// @brief 定数インデックスのチェック
   /// @retval true インデックスもしくは範囲が定数にならなければならないとき
@@ -98,14 +98,14 @@ public:
   /// @brief インデックスリストのサイズの取得
   /// @return インデックスリストのサイズ
   virtual
-  ymuint32
+  ymuint
   index_num() const;
-  
+
   /// @brief インデックスの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num() )
   virtual
   const PtExpr*
-  index(ymuint32 pos) const;
+  index(ymuint pos) const;
 
   /// @brief 範囲指定モードの取得
   /// @return 範囲指定モード
@@ -113,14 +113,14 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const;
-  
+
   /// @brief 範囲の左側の式の取得
   /// @return 範囲の左側の式
   /// @note このクラスでは NULL を返す．
   virtual
   const PtExpr*
   left_range() const;
-  
+
   /// @brief 範囲の右側の式の取得
   /// @return 範囲の右側の式
   /// @note このクラスでは NULL を返す．
@@ -140,14 +140,14 @@ public:
   /// サイズ指定の無い場合と整数型の定数でない場合には 0 を返す．
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   const_size() const;
 
   /// @brief 整数型の値の取得
   /// @return 値
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   const_uint() const;
 
   /// @brief 整数型および文字列型の定数の文字列表現の取得
@@ -172,7 +172,7 @@ public:
   virtual
   bool
   is_index_expr() const;
-  
+
   /// @brief インデックスの値の取得
   /// @return 階層名の添字として使える式の時にその値を返す．
   /// @note このクラスでは const_uint() をキャストして返す．
@@ -212,7 +212,7 @@ class SptOpr1 :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptOpr1(const FileRegion& file_region,
 	  tVpiOpType op_type,
@@ -234,7 +234,7 @@ public:
   virtual
   bool
   is_index_expr() const;
-  
+
   /// インデックスの値の取得
   virtual
   int
@@ -243,17 +243,17 @@ public:
   /// 演算子の種類の取得
   virtual
   tVpiOpType opr_type() const;
-  
+
   /// @brief オペランドの数の取得
   /// @return 子供の数
   virtual
-  ymuint32
+  ymuint
   operand_num() const;
-  
+
   /// pos 番目のオペランドを取り出す．
   virtual
   const PtExpr*
-  operand(ymuint32 pos) const;
+  operand(ymuint pos) const;
 
 
 private:
@@ -266,7 +266,7 @@ private:
 
   // オペランド数
   ymuint32 mSize;
-  
+
   // オペランドの配列
   PtExpr* mExprList[3];
 
@@ -282,7 +282,7 @@ class SptOpr2 :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptOpr2(const FileRegion& file_region,
 	  tVpiOpType op_type,
@@ -302,7 +302,7 @@ public:
   virtual
   bool
   is_index_expr() const;
-  
+
   /// インデックスの値の取得
   virtual
   int
@@ -311,17 +311,17 @@ public:
   /// 演算子の種類の取得
   virtual
   tVpiOpType opr_type() const;
-  
+
   /// @brief オペランドの数の取得
   /// @return 子供の数
   virtual
-  ymuint32
+  ymuint
   operand_num() const;
-  
+
   /// pos 番目のオペランドを取り出す．
   virtual
   const PtExpr*
-  operand(ymuint32 pos) const;
+  operand(ymuint pos) const;
 
 
 private:
@@ -347,14 +347,14 @@ class SptFuncCall :
   friend class SptFactory;
 
 protected:
-  
+
   /// コンストラクタ
   SptFuncCall(const FileRegion& file_region,
 	      tPtExprType type,
 	      PtNameBranchArray nb_array,
 	      const char* name,
 	      PtExprArray arg_array);
-  
+
   /// デストラクタ
   ~SptFuncCall();
 
@@ -373,17 +373,17 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief オペランドの数の取得
   /// @return 子供の数
-  ymuint32
+  ymuint
   operand_num() const;
-  
+
   /// @brief オペランドの取得
   /// @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
   /// @return pos 番目のオペランド
   const PtExpr*
-  operand(ymuint32 pos) const;
+  operand(ymuint pos) const;
 
 
 private:
@@ -393,7 +393,7 @@ private:
 
   // 階層ブランチの配列
   PtNameBranchArray mNbArray;
-  
+
   // 末尾の名前
   const char* mName;
 
@@ -451,25 +451,25 @@ public:
   /// @brief インデックスリストのサイズの取得
   /// @return インデックスリストのサイズ
   virtual
-  ymuint32
+  ymuint
   index_num() const;
-  
+
   /// @brief インデックスの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num() )
   virtual
   const PtExpr*
-  index(ymuint32 pos) const;
+  index(ymuint pos) const;
 
   /// 範囲指定モードの取得
   virtual
   tVpiRangeMode
   range_mode() const;
-  
+
   /// range の MSB を取出す．
   virtual
   const PtExpr*
   left_range() const;
-  
+
   /// range の LSB を取出す．
   virtual
   const PtExpr*
@@ -518,8 +518,8 @@ private:
   /// コンストラクタ
   SptConstant(const FileRegion& file_region,
 	      tVpiConstType const_type,
-	      ymuint32 size,
-	      ymuint32 uvalue,
+	      ymuint size,
+	      ymuint uvalue,
 	      const char* svalue,
 	      double rvalue);
 
@@ -545,12 +545,12 @@ public:
 
   // 整数型の定数のサイズの取得
   virtual
-  ymuint32
+  ymuint
   const_size() const;
 
   // 整数型の値の取得
   virtual
-  ymuint32
+  ymuint
   const_uint() const;
 
   // 文字列型の値の取得

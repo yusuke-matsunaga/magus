@@ -37,7 +37,7 @@ protected:
   /// @param[in] io_array IO の配列
   EiTaskFunc(const VlNamedObj* parent,
 	     const PtItem* pt_item,
-	     ymuint32 io_num,
+	     ymuint io_num,
 	     EiIODecl* io_array);
 
   /// @brief デストラクタ
@@ -84,14 +84,14 @@ public:
 
   /// @brief 入出力数を得る．
   virtual
-  ymuint32
+  ymuint
   io_num() const;
 
   /// @brief 入出力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
   virtual
   const VlIODecl*
-  io(ymuint32 pos) const;
+  io(ymuint pos) const;
 
   /// @brief 本体のステートメントを得る．
   virtual
@@ -112,7 +112,7 @@ public:
   /// @param[in] decl 対応する宣言要素
   virtual
   void
-  init_iodecl(ymuint32 pos,
+  init_iodecl(ymuint pos,
   	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl);
@@ -126,7 +126,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
   virtual
   ElbIODecl*
-  _io(ymuint32 pos) const;
+  _io(ymuint pos) const;
 
   /// @brief 本体の ElbStmt を得る．
   virtual
@@ -185,7 +185,7 @@ protected:
   /// @param[in] io_array IO の配列
   EiTask(const VlNamedObj* parent,
 	 const PtItem* pt_item,
-	 ymuint32 io_num,
+	 ymuint io_num,
 	 EiIODecl* io_array);
 
   /// @brief デストラクタ
@@ -216,7 +216,7 @@ public:
 
   /// @brief 出力のビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief 符号付きの時 true を返す．
@@ -335,7 +335,7 @@ protected:
   /// @param[in] io_array IO の配列
   EiFunction(const VlNamedObj* parent,
 	     const PtItem* pt_item,
-	     ymuint32 io_num,
+	     ymuint io_num,
 	     EiIODecl* io_array);
 
   /// @brief デストラクタ
@@ -366,7 +366,7 @@ public:
 
   /// @brief 出力のビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief 符号付きの時 true を返す．
@@ -507,7 +507,7 @@ protected:
   /// @param[in] right_val 範囲の LSB の値
   EiFunctionV(const VlNamedObj* parent,
 	      const PtItem* pt_item,
-	      ymuint32 io_num,
+	      ymuint io_num,
 	      EiIODecl* io_array,
 	      ElbExpr* left,
 	      ElbExpr* right,
@@ -540,7 +540,7 @@ public:
 
   /// @brief 出力のビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
 

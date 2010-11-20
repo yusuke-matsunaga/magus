@@ -125,7 +125,7 @@ EiDeclElem::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclElem::bit_size() const
 {
   return mArray->bit_size();

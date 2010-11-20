@@ -76,11 +76,11 @@ public:
   def_name() const;
 
   /// @brief ポート数を返す．
-  ymuint32
+  ymuint
   port_num() const;
 
   /// @brief 入出力宣言数を返す．
-  ymuint32
+  ymuint
   io_num() const;
 
   /// @brief cell instance のチェック
@@ -294,7 +294,7 @@ public:
 
   /// @brief ポート数を返す．
   virtual
-  ymuint32
+  ymuint
   port_num() const;
 
   /// @brief ポートの取得
@@ -302,18 +302,18 @@ public:
   /// @return pos 番目のポートを返す．
   virtual
   const VlPort*
-  port(ymuint32 pos) const;
+  port(ymuint pos) const;
 
   /// @brief 入出力数を得る．
   virtual
-  ymuint32
+  ymuint
   io_num() const;
 
   /// @brief 入出力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
   virtual
   const VlIODecl*
-  io(ymuint32 pos) const;
+  io(ymuint pos) const;
 
 
 public:
@@ -329,7 +329,7 @@ public:
   /// @param[in] 符号付き属性の補正値
   virtual
   void
-  init_iodecl(ymuint32 pos,
+  init_iodecl(ymuint pos,
 	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl);
@@ -341,7 +341,7 @@ public:
   /// @param[in] dir 向き
   virtual
   void
-  init_port(ymuint32 index,
+  init_port(ymuint index,
 	    const PtPort* pt_port,
 	    ElbExpr* low_conn,
 	    tVpiDirection dir);
@@ -352,7 +352,7 @@ public:
   /// @param[in] conn_by_name 名前による割り当て時に true とするフラグ
   virtual
   void
-  set_port_high_conn(ymuint32 index,
+  set_port_high_conn(ymuint index,
 		     ElbExpr* high_conn,
 		     bool conn_by_name);
 
@@ -656,14 +656,14 @@ public:
 
   /// @brief 要素数を返す．
   virtual
-  ymuint32
+  ymuint
   elem_num() const;
 
   /// @brief 要素を返す．
   /// @param[in] offset 位置番号 (0 <= offset < elem_num())
   virtual
   const VlModule*
-  elem_by_offset(ymuint32 offset) const;
+  elem_by_offset(ymuint offset) const;
 
   /// @brief 要素を返す．
   /// @param[in] index インデックス
@@ -679,7 +679,7 @@ public:
 
   /// @brief 要素を返す．
   ElbModule*
-  _module(ymuint32 offset);
+  _module(ymuint offset);
 
 
 public:

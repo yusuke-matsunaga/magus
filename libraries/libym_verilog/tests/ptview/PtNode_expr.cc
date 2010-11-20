@@ -38,7 +38,7 @@ ExprListNode::~ExprListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ExprListNode::data(int column,
 		   int role) const
@@ -53,7 +53,7 @@ ExprListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ExprListNode::loc() const
@@ -65,9 +65,9 @@ ExprListNode::loc() const
 void
 ExprListNode::expand() const
 {
-  ymuint32 n = mExprArray.size();
+  ymuint n = mExprArray.size();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new ExprNode(mLabel, mExprArray[i]);
   }
 }
@@ -94,7 +94,7 @@ ExprNode::~ExprNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ExprNode::data(int column,
 	       int role) const
@@ -119,7 +119,7 @@ ExprNode::data(int column,
 BEGIN_NONAMESPACE
 
 QString
-int2str(ymuint32 val)
+int2str(ymuint val)
 {
   ostringstream buf;
   buf << val;
@@ -147,7 +147,7 @@ ExprNode::loc() const
 void
 ExprNode::expand() const
 {
-  ymuint32 n = 0;
+  ymuint n = 0;
   switch ( mExpr->type() ) {
   case kPtOprExpr:
     n += 1;
@@ -180,11 +180,11 @@ ExprNode::expand() const
   }
 
   mChildren.reserve(n);
-  
+
   switch ( mExpr->type() ) {
   case kPtOprExpr:
     mChildren.push_back( new OpTypeNode( mExpr->opr_type() ) );
-    for (ymuint32 i = 0; i < mExpr->operand_num(); ++ i) {
+    for (ymuint i = 0; i < mExpr->operand_num(); ++ i) {
       mChildren.push_back( new ExprNode("Operand", mExpr->operand(i)) );
     }
     break;
@@ -232,7 +232,7 @@ ExprNode::expand() const
       mChildren.push_back( new NameBranchListNode( mExpr->namebranch_array() ) );
     }
     mChildren.push_back( new StrNode( "Name", mExpr->name() ) );
-    for (ymuint32 i = 0; i < mExpr->operand_num(); ++ i) {
+    for (ymuint i = 0; i < mExpr->operand_num(); ++ i) {
       mChildren.push_back( new ExprNode("Argument", mExpr->operand(i)) );
     }
     break;
@@ -242,7 +242,7 @@ ExprNode::expand() const
       mChildren.push_back( new NameBranchListNode( mExpr->namebranch_array() ) );
     }
     mChildren.push_back( new StrNode( "Name", mExpr->name() ) );
-    for (ymuint32 i = 0; i < mExpr->index_num(); ++ i) {
+    for (ymuint i = 0; i < mExpr->index_num(); ++ i) {
       mChildren.push_back ( new ExprNode("Index", mExpr->index(i)) );
     }
     if ( mExpr->left_range() ) {

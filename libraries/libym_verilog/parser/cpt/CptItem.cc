@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // item の基底クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 CptItem::CptItem()
 {
@@ -58,7 +58,7 @@ CptItem::delay() const
 {
   return NULL;
 }
-  
+
 // @brief パラメータ割り当てリストの取得
 PtConnectionArray
 CptItem::paramassign_array() const
@@ -69,7 +69,7 @@ CptItem::paramassign_array() const
 // @brief 要素数の取得
 // @return 要素数
 // このクラスでは 0 を返す．
-ymuint32
+ymuint
 CptItem::size() const
 {
   return 0;
@@ -78,7 +78,7 @@ CptItem::size() const
 // @brief defparam 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtDefParam*
-CptItem::defparam(ymuint32 pos) const
+CptItem::defparam(ymuint pos) const
 {
   return NULL;
 }
@@ -86,7 +86,7 @@ CptItem::defparam(ymuint32 pos) const
 // @brief continuous assign 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtContAssign*
-CptItem::contassign(ymuint32 pos) const
+CptItem::contassign(ymuint pos) const
 {
   return NULL;
 }
@@ -94,7 +94,7 @@ CptItem::contassign(ymuint32 pos) const
 // @brief module/UDP/gate instance 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtInst*
-CptItem::inst(ymuint32 pos) const
+CptItem::inst(ymuint pos) const
 {
   return NULL;
 }
@@ -117,14 +117,14 @@ CptItem::automatic() const
 {
   return false;
 }
-  
+
 // @brief IO宣言の要素数の取得
-ymuint32
+ymuint
 CptItem::ioitem_num() const
 {
   return 0;
 }
-  
+
 // @brief IO宣言リストの配列の取得
 PtIOHeadArray
 CptItem::iohead_array() const
@@ -138,21 +138,21 @@ CptItem::paramhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief localparam 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptItem::localparamhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptItem::declhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief item 配列の取得
 PtItemArray
 CptItem::item_array() const
@@ -246,11 +246,11 @@ CptItem::specpath_type() const
 {
   return kVpiSpecPathNull; // ダミー
 }
-  
+
 // @brief ターミナルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtExpr*
-CptItem::terminal(ymuint32 pos) const
+CptItem::terminal(ymuint pos) const
 {
   return NULL;
 }
@@ -263,7 +263,7 @@ CptItem::path_decl() const
 {
   return NULL;
 }
-  
+
 // @brief 条件式の取得
 // @return 条件式
 // このクラスでは NULL を返す．
@@ -272,28 +272,28 @@ CptItem::expr() const
 {
   return NULL;
 }
-  
+
 // @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptItem::then_declhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief 条件が成り立ったときに生成される item 配列の取得
 PtItemArray
 CptItem::then_item_array() const
 {
   return PtItemArray();
 }
-  
+
 // @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptItem::else_declhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief 条件が成り立たなかったときに生成される item 配列の取得
 PtItemArray
 CptItem::else_item_array() const
@@ -306,7 +306,7 @@ CptItem::else_item_array() const
 // @return pos 番目の case item
 // このクラスでは NULL を返す．
 const PtGenCaseItem*
-CptItem::caseitem(ymuint32 pos) const
+CptItem::caseitem(ymuint pos) const
 {
   return NULL;
 }
@@ -350,7 +350,7 @@ CptDefParamH::CptDefParamH(const FileRegion& file_region,
   mArray(dp_array)
 {
 }
-  
+
 // デストラクタ
 CptDefParamH::~CptDefParamH()
 {
@@ -371,7 +371,7 @@ CptDefParamH::type() const
 }
 
 // 要素数を返す．
-ymuint32
+ymuint
 CptDefParamH::size() const
 {
   return mArray.size();
@@ -380,7 +380,7 @@ CptDefParamH::size() const
 // @brief defparam 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtDefParam*
-CptDefParamH::defparam(ymuint32 pos) const
+CptDefParamH::defparam(ymuint pos) const
 {
   return mArray[pos];
 }
@@ -389,7 +389,7 @@ CptDefParamH::defparam(ymuint32 pos) const
 //////////////////////////////////////////////////////////////////////
 // defparam 文のベース実装クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptDefParam::CptDefParam(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
@@ -414,7 +414,7 @@ CptDefParam::file_region() const
 {
   return FileRegion(mTopLoc, mExpr->file_region().end_loc());
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptDefParam::namebranch_array() const
@@ -448,7 +448,7 @@ CptContAssignH::CptContAssignH(const FileRegion& file_region,
   mArray(ca_array)
 {
 }
-  
+
 // デストラクタ
 CptContAssignH::~CptContAssignH()
 {
@@ -469,7 +469,7 @@ CptContAssignH::type() const
 }
 
 // 要素数を返す．
-ymuint32
+ymuint
 CptContAssignH::size() const
 {
   return mArray.size();
@@ -478,7 +478,7 @@ CptContAssignH::size() const
 // @brief continuous assign 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtContAssign*
-CptContAssignH::contassign(ymuint32 pos) const
+CptContAssignH::contassign(ymuint pos) const
 {
   return mArray[pos];
 }
@@ -496,7 +496,7 @@ CptContAssignHS::CptContAssignHS(const FileRegion& file_region,
   mStrength(strength)
 {
 }
-  
+
 // デストラクタ
 CptContAssignHS::~CptContAssignHS()
 {
@@ -522,7 +522,7 @@ CptContAssignHD::CptContAssignHD(const FileRegion& file_region,
   mDelay(delay)
 {
 }
-  
+
 // デストラクタ
 CptContAssignHD::~CptContAssignHD()
 {
@@ -550,7 +550,7 @@ CptContAssignHSD::CptContAssignHSD(const FileRegion& file_region,
   mDelay(delay)
 {
 }
-  
+
 // デストラクタ
 CptContAssignHSD::~CptContAssignHSD()
 {
@@ -713,13 +713,13 @@ CptTf::CptTf(const FileRegion& file_region,
   mDeclHeadArray(declhead_array),
   mBody(stmt)
 {
-  ymuint32 n = 0;
-  for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
+  ymuint n = 0;
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     n += iohead_array[i]->item_num();
   }
   mIOItemNum = n;
 }
-  
+
 // デストラクタ
 CptTf::~CptTf()
 {
@@ -745,9 +745,9 @@ CptTf::automatic() const
 {
   return mAutomatic;
 }
-  
+
 // @brief IO宣言の要素数の取得
-ymuint32
+ymuint
 CptTf::ioitem_num() const
 {
   return mIOItemNum;
@@ -766,14 +766,14 @@ CptTf::paramhead_array() const
 {
   return mParamHeadArray;
 }
-  
+
 // @brief localparam 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptTf::localparamhead_array() const
 {
   return mLparamHeadArray;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptTf::declhead_array() const
@@ -850,7 +850,7 @@ CptFunction::CptFunction(const FileRegion& file_region,
 {
   mInUse = false;
 }
-  
+
 // デストラクタ
 CptFunction::~CptFunction()
 {
@@ -943,7 +943,7 @@ CptSizedFunc::right_range() const
 //////////////////////////////////////////////////////////////////////
 /// 組み込み型の function を表すノード
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptTypedFunc::CptTypedFunc(const FileRegion& file_region,
 			   const char* name,
@@ -965,7 +965,7 @@ CptTypedFunc::CptTypedFunc(const FileRegion& file_region,
   mDataType(data_type)
 {
 }
-  
+
 /// デストラクタ
 CptTypedFunc::~CptTypedFunc()
 {
@@ -978,7 +978,7 @@ CptTypedFunc::data_type() const
   return mDataType;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // item 関係
 //////////////////////////////////////////////////////////////////////
@@ -1111,7 +1111,7 @@ CptFactory::new_Task(const FileRegion& file_region,
 			 declhead_array,
 			 stmt);
 }
-  
+
 // function 文を生成する．
 PtItem*
 CptFactory::new_Function(const FileRegion& file_region,

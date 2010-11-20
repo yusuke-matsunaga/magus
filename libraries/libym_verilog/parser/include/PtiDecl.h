@@ -33,8 +33,8 @@ public:
   /// @brief portref を得る．
   virtual
   PtiPortRef*
-  _portref(ymuint32 pos) = 0;
-  
+  _portref(ymuint pos) = 0;
+
 };
 
 
@@ -49,11 +49,11 @@ public:
 
   /// @brief コンストラクタ
   PtiPortRef();
-  
+
   /// @brief デストラクタ
   ~PtiPortRef();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // PtPortRef の仮想関数
@@ -74,7 +74,7 @@ public:
   void
   set_dir(tVpiDirection dir);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -124,7 +124,7 @@ public:
   virtual
   void
   set_elem(PtDeclItemArray elem_array) = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

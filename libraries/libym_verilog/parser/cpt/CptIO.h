@@ -28,7 +28,7 @@ class CptIOHBase :
   public PtiIOHead
 {
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type IOの種類
@@ -100,17 +100,17 @@ public:
   virtual
   const PtExpr*
   right_range() const;
-  
+
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   item_num() const;
-  
+
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < item_num() )
   virtual
   const PtIOItem*
-  item(ymuint32 pos) const;
+  item(ymuint pos) const;
 
 
 private:
@@ -135,10 +135,10 @@ private:
 
   // type と aux_type と符号を格納するメンバ
   ymuint32 mAttr;
-  
+
   // 要素の配列
   PtIOItemArray mItemArray;
-  
+
 };
 
 
@@ -151,7 +151,7 @@ class CptIOH :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type IOの種類
@@ -182,7 +182,7 @@ class CptIOHV :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type IOの種類
@@ -243,7 +243,7 @@ class CptIOItem :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name 名前
@@ -269,7 +269,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief 初期値の取得
   /// @retval 初期値
   /// @retval NULL 初期値を持たないとき
@@ -302,7 +302,7 @@ class CptIOItemI :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name 名前
@@ -324,7 +324,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 初期値の取得
   virtual
   const PtExpr*

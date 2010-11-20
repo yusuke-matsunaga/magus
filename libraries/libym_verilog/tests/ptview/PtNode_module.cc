@@ -37,7 +37,7 @@ ModuleNode::~ModuleNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ModuleNode::data(int column,
 		 int role) const
@@ -104,11 +104,11 @@ ModuleNode::expand() const
   mChildren.push_back( new NetTypeNode("Default Net Type", mModule->nettype()) );
   mChildren.push_back( new UdNode(mModule->unconn_drive()) );
   mChildren.push_back( new DelayModeNode(mModule->delay_mode()) );
-  
+
   mChildren.push_back( new StrNode("Config", mModule->config().c_str()) );
   mChildren.push_back( new StrNode("Library", mModule->library().c_str()) );
   mChildren.push_back( new StrNode("Cell", mModule->cell().c_str()) );
-  
+
   if ( mModule->paramport_array().size() > 0 ) {
     mChildren.push_back( new DeclHeadListNode("Parameter Port",
 					      mModule->paramport_array()) );
@@ -156,7 +156,7 @@ ModulePortListNode::~ModulePortListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ModulePortListNode::data(int column,
 			 int role) const
@@ -171,7 +171,7 @@ ModulePortListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ModulePortListNode::loc() const
@@ -184,7 +184,7 @@ void
 ModulePortListNode::expand() const
 {
   mChildren.resize(mModule->port_num());
-  for (ymuint32 i = 0; i < mModule->port_num(); ++ i) {
+  for (ymuint i = 0; i < mModule->port_num(); ++ i) {
     mChildren[i] = new PortNode(mModule->port(i));
   }
 }

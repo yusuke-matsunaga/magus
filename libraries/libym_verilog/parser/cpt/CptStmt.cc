@@ -72,7 +72,7 @@ CptStmt::stmt_name() const
   }
   return "";
 }
-  
+
 // @brief 階層ブランチの取得
 // @note kDisable/kEnable/kSysEnable で意味のある関数
 // @note このクラスでは NULL を返す．
@@ -95,7 +95,7 @@ CptStmt::name() const
 // @brief 引数の数の取得
 // @return 引数の数
 // @note kEnable/kSysEnable で意味のある関数
-ymuint32
+ymuint
 CptStmt::arg_num() const
 {
   return 0;
@@ -105,7 +105,7 @@ CptStmt::arg_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < arg_num() )
 // @note kEnable/kSysEnable で意味のある関数
 const PtExpr*
-CptStmt::arg(ymuint32 pos) const
+CptStmt::arg(ymuint pos) const
 {
   return NULL;
 }
@@ -184,7 +184,7 @@ CptStmt::else_body() const
 // @return case item の要素数
 // kCase/kCaseX/kCaseZ で意味のある関数
 // このクラスでは 0 を返す．
-ymuint32
+ymuint
 CptStmt::caseitem_num() const
 {
   return 0;
@@ -194,7 +194,7 @@ CptStmt::caseitem_num() const
 // kCase/kCaseX/kCaseZ で意味のある関数
 // このクラスでは NULL を返す．
 const PtCaseItem*
-CptStmt::caseitem(ymuint32 /* pos */) const
+CptStmt::caseitem(ymuint /* pos */) const
 {
   return NULL;
 }
@@ -208,7 +208,7 @@ CptStmt::init_stmt() const
 {
   return NULL;
 }
-  
+
 // @brief 繰り返し代入文の取得
 // @return 繰り返し代入文
 // kFor で意味のある関数
@@ -218,14 +218,14 @@ CptStmt::next_stmt() const
 {
   return NULL;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptStmt::declhead_array() const
 {
   return PtDeclHeadArray();
 }
-  
+
 // @brief 子供のステートメント配列の取得
 // @note kParBlock/kSeqBlock で意味のある関数
 PtStmtArray
@@ -284,7 +284,7 @@ CptDisableH::CptDisableH(const FileRegion& file_region,
 CptDisableH::~CptDisableH()
 {
 }
-  
+
 // @brief 階層ブランチの取得
 // @note kDisable/kEnable/kSysEnable で意味のある関数
 // @note このクラスでは NULL を返す．
@@ -324,17 +324,17 @@ CptEnableBase::name() const
 // @brief 引数の数の取得
 // @return 引数の数
 // @note kEnable/kSysEnable で意味のある関数
-ymuint32
+ymuint
 CptEnableBase::arg_num() const
 {
   return mArgArray.size();
 }
-  
+
 // @brief 引数の取得
 // @param[in] pos 位置番号 ( 0 <= pos < arg_num() )
 // @note kEnable/kSysEnable で意味のある関数
 const PtExpr*
-CptEnableBase::arg(ymuint32 pos) const
+CptEnableBase::arg(ymuint pos) const
 {
   return mArgArray[pos];
 }
@@ -383,7 +383,7 @@ CptEnableH::CptEnableH(const FileRegion& file_region,
 CptEnableH::~CptEnableH()
 {
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptEnableH::namebranch_array() const
@@ -960,7 +960,7 @@ CptCase::expr() const
 }
 
 // case item の要素数を返す．
-ymuint32
+ymuint
 CptCase::caseitem_num() const
 {
   return mCaseItemArray.size();
@@ -968,7 +968,7 @@ CptCase::caseitem_num() const
 
 // case item を返す．
 const PtCaseItem*
-CptCase::caseitem(ymuint32 pos) const
+CptCase::caseitem(ymuint pos) const
 {
   return mCaseItemArray[pos];
 }
@@ -1053,16 +1053,16 @@ CptCaseItem::file_region() const
 
 // ラベルの数を得る．
 // 0 の時は '*' の意味
-ymuint32
+ymuint
 CptCaseItem::label_num() const
 {
   return mLabelArray.size();
 }
-  
+
 // @brief ラベルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < label_num() )
 const PtExpr*
-CptCaseItem::label(ymuint32 pos) const
+CptCaseItem::label(ymuint pos) const
 {
   return mLabelArray[pos];
 }
@@ -1078,7 +1078,7 @@ CptCaseItem::body() const
 //////////////////////////////////////////////////////////////////////
 // LoopStmt のベースクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptLoopStmt::CptLoopStmt(const FileRegion& file_region,
 			 PtStmt* body) :
@@ -1087,7 +1087,7 @@ CptLoopStmt::CptLoopStmt(const FileRegion& file_region,
 {
   assert_cond(body, __FILE__, __LINE__);
 }
-  
+
 // デストラクタ
 CptLoopStmt::~CptLoopStmt()
 {
@@ -1245,7 +1245,7 @@ CptStmtBlock::CptStmtBlock(const FileRegion& file_region,
 CptStmtBlock::~CptStmtBlock()
 {
 }
-  
+
 // @brief 子供のステートメント配列の取得
 PtStmtArray
 CptStmtBlock::stmt_array() const
@@ -1280,7 +1280,7 @@ CptStmtBlockN::name() const
 {
   return mName;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptStmtBlockN::declhead_array() const
@@ -1388,7 +1388,7 @@ CptSeqBlockN::type() const
   return kPtNamedSeqBlockStmt;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // statement 関係
 //////////////////////////////////////////////////////////////////////

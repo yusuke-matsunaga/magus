@@ -43,7 +43,7 @@ Elaborator::Elaborator(MsgMgr& msg_mgr,
   mAlloc(4096)
 {
   mAllowEmptyIORange = true;
-  
+
   mUdpGen = new UdpGen(*this, elb_mgr, elb_factory);
   mModuleGen = new ModuleGen(*this, elb_mgr, elb_factory);
   mDeclGen = new DeclGen(*this, elb_mgr, elb_factory);
@@ -79,7 +79,7 @@ Elaborator::~Elaborator()
 // @param[in] elb_factory Elbオブジェクトを生成するファクトリクラス
 // @param[in] msg_mgr メッセージマネージャ
 // @return エラー数を返す．
-size_t
+ymuint
 Elaborator::operator()(const PtMgr& pt_mgr)
 {
   const list<const PtUdp*>& udp_list = pt_mgr.pt_udp_list();
@@ -91,10 +91,10 @@ Elaborator::operator()(const PtMgr& pt_mgr)
     const PtUdp* pt_udp = *p;
     mUdpGen->instantiate_udp(pt_udp);
   }
-  
+
   // モジュールテンプレートの辞書を作る．
   // と同時に UDP 名とモジュール名の重複チェックを行う．
-  size_t nerr = 0;
+  ymuint nerr = 0;
   for (list<const PtModule*>::const_iterator p = module_list.begin();
        p != module_list.end(); ++ p) {
     const PtModule* module = *p;
@@ -130,7 +130,7 @@ Elaborator::operator()(const PtMgr& pt_mgr)
     // トップレベル階層の生成
     const VlNamedObj* toplevel = mFactory.new_Toplevel();
     mMgr.reg_toplevel(toplevel);
-  
+
     // トップモジュールの生成
     for (list<const PtModule*>::const_iterator p = module_list.begin();
 	 p != module_list.end(); ++ p) {
@@ -156,7 +156,7 @@ Elaborator::operator()(const PtMgr& pt_mgr)
 			kMsgDebug,
 			"ELAB",
 			"\"instantiate_defparam\" starts.");
-    
+
       // 未処理の defparam 文を処理する．
       // 処理された要素は mDefParamList から削除される．
       // 中にはまだ名前空間が構築されていないものもあるので mDefParamList
@@ -183,7 +183,7 @@ Elaborator::operator()(const PtMgr& pt_mgr)
 			kMsgDebug,
 			"ELAB",
 			"Phase 1 starts.");
-    
+
       if ( mPhase1StubList1.empty() ) {
 	// 処理する要素が残っていない．
 	break;
@@ -205,7 +205,7 @@ Elaborator::operator()(const PtMgr& pt_mgr)
 			"ELAB",
 			buf.str());
     }
-  
+
     // Phase 2
     // 配列要素やビット要素の生成を行う．
     msg_mgr().put_msg(__FILE__, __LINE__,
@@ -225,9 +225,9 @@ Elaborator::operator()(const PtMgr& pt_mgr)
 		      "Phase 3 starts.");
 
     mPhase3StubList.eval();
-    
+
   }
-  
+
   mCfDict.clear();
   mModuleDict.clear();
   mDefParamStubList.clear();
@@ -309,6 +309,6 @@ Elaborator::reg_constant_function(const VlNamedObj* parent,
 				  ElbTaskFunc* func)
 {
   mCfDict.add(parent, name, func);
-}  
+}
 
 END_NAMESPACE_YM_VERILOG

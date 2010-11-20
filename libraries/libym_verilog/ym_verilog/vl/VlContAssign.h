@@ -40,22 +40,22 @@ public:
   virtual
   const VlModule*
   module() const = 0;
-  
+
   /// @brief 0の強さを返す．
   virtual
   tVpiStrength
   drive0() const = 0;
-  
+
   /// @brief 1の強さを返す．
   virtual
   tVpiStrength
   drive1() const = 0;
-  
+
   /// @brief 遅延を表す式を返す．
   virtual
   const VlDelay*
   delay() const = 0;
-  
+
   /// @brief ネット宣言中の assignment の時に true を返す．
   virtual
   bool
@@ -63,19 +63,19 @@ public:
 
   /// @brief ビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const = 0;
 
   /// @brief 左辺を返す．
   virtual
   const VlExpr*
   lhs() const = 0;
-  
+
   /// @brief 右辺を返す．
   virtual
   const VlExpr*
   rhs() const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

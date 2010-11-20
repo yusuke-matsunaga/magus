@@ -549,7 +549,6 @@ StmtGen::instantiate_control(const VlNamedObj* parent,
       return NULL;
     }
     event_list[i] = expr;
-    ++ i;
   }
 
   if ( pt_control->type() == kPtEventControl ) {

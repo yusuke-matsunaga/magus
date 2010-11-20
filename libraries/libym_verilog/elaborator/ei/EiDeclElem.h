@@ -106,7 +106,7 @@ public:
 
   /// @brief ビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief オフセット値の取得

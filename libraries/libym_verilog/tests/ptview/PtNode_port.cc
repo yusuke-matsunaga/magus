@@ -35,7 +35,7 @@ PortNode::~PortNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 PortNode::data(int column,
 	       int role) const
@@ -55,7 +55,7 @@ PortNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 PortNode::loc() const
@@ -67,9 +67,9 @@ PortNode::loc() const
 void
 PortNode::expand() const
 {
-  ymuint32 n = mPort->portref_num();
+  ymuint n = mPort->portref_num();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new PortRefNode(mPort->portref(i));
   }
 }
@@ -93,7 +93,7 @@ PortRefNode::~PortRefNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 PortRefNode::data(int column,
 		  int role) const
@@ -108,7 +108,7 @@ PortRefNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 PortRefNode::loc() const

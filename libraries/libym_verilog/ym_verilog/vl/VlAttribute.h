@@ -39,7 +39,7 @@ public:
   virtual
   const char*
   name() const = 0;
-  
+
   /// @brief def_attribute なら true を返す．
   virtual
   bool
@@ -49,7 +49,7 @@ public:
   virtual
   VlExpr*
   expr() const = 0;
-  
+
 };
 
 
@@ -65,7 +65,7 @@ protected:
   virtual
   ~VlAttrList() { }
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlAttrList の仮想関数
@@ -73,15 +73,15 @@ public:
 
   /// @brief 要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const = 0;
 
   /// @brief 内容を返す．
   /// @param[in] pos 位置番号 (0 <= pos < size() )
   virtual
   VlAttribute*
-  elem(ymuint32 pos) const = 0;
-  
+  elem(ymuint pos) const = 0;
+
 };
 
 END_NAMESPACE_YM_VERILOG

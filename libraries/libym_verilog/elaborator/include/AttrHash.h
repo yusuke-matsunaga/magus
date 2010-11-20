@@ -35,11 +35,11 @@ public:
 
 
 public:
-  
+
   /// @brief 内容をクリアする．
   void
   clear();
-  
+
   /// @brief 属性を追加する．
   /// @param[in] obj 対象のオブジェクト
   /// @param[in] def 定義側の属性の時 true とするフラグ
@@ -48,7 +48,7 @@ public:
   add(const VlObj* obj,
       bool def,
       ElbAttrList* attr_list);
-  
+
   /// @brief 属性を取り出す．
   /// @param[in] obj 対象のオブジェクト
   /// @param[in] def 定義側の属性の時 true とするフラグ
@@ -57,9 +57,9 @@ public:
        bool def) const;
 
   /// @brief このオブジェクトが使用しているメモリ量を返す．
-  size_t
+  ymuint
   allocated_size() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -70,13 +70,13 @@ private:
   {
     // 対象のオブジェクト
     const VlObj* mObj;
-    
+
     // 対応する属性リスト
     ElbAttrList* mAttrList[2];
 
     // ハッシュ上の次の要素を指すポインタ
     Cell* mLink;
-    
+
   };
 
 
@@ -86,7 +86,7 @@ private:
   /// @param[in] obj 対象のオブジェクト
   Cell*
   new_cell(const VlObj* obj);
-  
+
   /// @brief オブジェクトから対応する Cell を取り出す．
   /// @param[in] obj 対象のオブジェクト
   Cell*
@@ -94,21 +94,21 @@ private:
 
   /// @brief テーブルの領域を確保する．
   void
-  alloc_table(ymuint32 size);
-  
+  alloc_table(ymuint size);
+
   /// @brief ハッシュ値を計算する．
-  ymuint32
+  ymuint
   hash_func(const VlObj* obj) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // Cell の確保用アロケータ
   AllocBase& mAlloc;
-  
+
   // ハッシュ表のサイズ
   ymuint32 mSize;
 

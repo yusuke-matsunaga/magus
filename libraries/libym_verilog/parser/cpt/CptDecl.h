@@ -36,7 +36,7 @@ protected:
   /// デストラクタ
   virtual
   ~CptDeclHead();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// @brief 範囲のMSBの取得
   /// @retval 範囲のMSB 範囲を持つとき
   /// @retval NULL 範囲を持たないとき
@@ -80,7 +80,7 @@ public:
   virtual
   tVpiVarType
   data_type() const;
-  
+
   /// @brief net 型の取得
   /// @retval net 型 net 型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
@@ -117,14 +117,14 @@ public:
   /// @brief 要素数の取得
   /// @return 要素数
   virtual
-  ymuint32
+  ymuint
   item_num() const;
 
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < item_num() )
   virtual
   const PtDeclItem*
-  item(ymuint32 pos) const;
+  item(ymuint pos) const;
 
 
 private:
@@ -160,13 +160,13 @@ class CptParamH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   CptParamH(const FileRegion& file_region);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptParamH();
@@ -193,13 +193,13 @@ class CptLocalParamH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   CptLocalParamH(const FileRegion& file_region);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptLocalParamH();
@@ -226,7 +226,7 @@ class CptParamHV :
   public CptParamH
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -277,7 +277,7 @@ private:
 
   // 範囲のLSB
   PtExpr* mRightRange;
-  
+
 };
 
 
@@ -288,7 +288,7 @@ class CptParamHSV :
   public CptParamHV
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -315,7 +315,7 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
 };
 
 
@@ -326,7 +326,7 @@ class CptLocalParamHV :
   public CptParamHV
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -363,7 +363,7 @@ class CptLocalParamHSV :
   public CptParamHSV
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -400,7 +400,7 @@ class CptParamHT :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -451,7 +451,7 @@ class CptLocalParamHT :
   public CptParamHT
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -475,7 +475,7 @@ public:
   virtual
   tPtDeclType
   type() const;
-  
+
 };
 
 
@@ -486,7 +486,7 @@ class CptRegH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -496,7 +496,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptRegH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -519,7 +519,7 @@ class CptRegHS :
   public CptRegH
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -529,7 +529,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptRegHS();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -552,7 +552,7 @@ class CptRegHV :
   public CptRegH
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -565,13 +565,13 @@ protected:
 
   /// @brief デストラクタ
   ~CptRegHV();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtDecl の仮想関数
   //////////////////////////////////////////////////////////////////////
-    
+
   /// @brief 符号の有無の取得
   /// @return このクラスでは常に false を返す．
   virtual
@@ -601,7 +601,7 @@ private:
 
   // 範囲のLSB
   PtExpr* mRightRange;
-  
+
 };
 
 
@@ -612,7 +612,7 @@ class CptRegHSV :
   public CptRegHV
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -625,19 +625,19 @@ protected:
 
   /// @brief デストラクタ
   ~CptRegHSV();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtDecl の仮想関数
   //////////////////////////////////////////////////////////////////////
-    
+
   /// @brief 符号の有無の取得
   /// @return このクラスでは常に true を返す．
   virtual
   bool
   is_signed() const;
-  
+
 };
 
 
@@ -648,7 +648,7 @@ class CptVarH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -660,7 +660,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptVarH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -700,18 +700,18 @@ class CptGenvarH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] elem_top 要素のリスト
   CptGenvarH(const FileRegion& file_region);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenvarH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -723,7 +723,7 @@ public:
   virtual
   tPtDeclType
   type() const;
-  
+
 };
 
 
@@ -734,9 +734,9 @@ class CptNetH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -748,7 +748,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -766,7 +766,7 @@ public:
   virtual
   tVpiNetType
   net_type() const;
-    
+
   /// @brief 符号の有無の取得
   virtual
   bool
@@ -791,9 +791,9 @@ class CptNetHS :
   public CptNetH
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -807,7 +807,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetHS();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -839,9 +839,9 @@ class CptNetHD :
   public CptNetH
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -855,7 +855,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetHD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -887,9 +887,9 @@ class CptNetHSD :
   public CptNetH
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -905,7 +905,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetHSD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -946,9 +946,9 @@ class CptNetHV :
   public CptNetH
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -966,7 +966,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetHV();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1015,9 +1015,9 @@ class CptNetHVS :
   public CptNetHV
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -1037,7 +1037,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetHVS();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1069,9 +1069,9 @@ class CptNetHVD :
   public CptNetHV
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -1091,7 +1091,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetHVD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1123,9 +1123,9 @@ class CptNetHVSD :
   public CptNetHV
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] net_type net の型
@@ -1147,7 +1147,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptNetHVSD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1188,13 +1188,13 @@ class CptEventH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   CptEventH(const FileRegion& file_region);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptEventH();
@@ -1221,17 +1221,17 @@ class CptSpecParamH :
   public CptDeclHead
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   CptSpecParamH(const FileRegion& file_region);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptSpecParamH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1254,7 +1254,7 @@ class CptSpecParamHV :
   public CptSpecParamH
 {
   friend class CptFactory;
-  
+
 protected:
 
   /// @brief コンストラクタ
@@ -1309,17 +1309,17 @@ class CptDeclItemBase :
   public PtDeclItem
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] name 名前
   CptDeclItemBase(const char* name);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDeclItemBase();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1335,15 +1335,15 @@ public:
   /// @brief dimension list のサイズを取り出す．
   /// @return ここでは常に 0 を返す．
   virtual
-  ymuint32
+  ymuint
   dimension_list_size() const;
 
   /// 範囲の取得
   /// @note ここでは常に NULL を返す．
   virtual
   const PtRange*
-  range(ymuint32 pos) const;
-  
+  range(ymuint pos) const;
+
   /// @brief 初期値を取り出す．
   /// @return ここでは常に NULL を返す．
   virtual
@@ -1369,19 +1369,19 @@ class CptDeclItem :
   public CptDeclItemBase
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name 名前
   CptDeclItem(const FileRegion& file_region,
 	      const char* name);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDeclItem();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1393,7 +1393,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1413,9 +1413,9 @@ class CptDeclItemR :
   public CptDeclItemBase
 {
   friend class CptFactory;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name 名前
@@ -1423,11 +1423,11 @@ protected:
   CptDeclItemR(const FileRegion& file_region,
 	       const char* name,
 	       PtRangeArray range_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDeclItemR();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1443,14 +1443,14 @@ public:
   /// @brief dimension list のサイズを取り出す．
   /// @return dimension list のサイズ
   virtual
-  ymuint32
+  ymuint
   dimension_list_size() const;
 
   /// 範囲の取得
   virtual
   const PtRange*
-  range(ymuint32 pos) const;
-  
+  range(ymuint pos) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1475,7 +1475,7 @@ class CptDeclItemI :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name 名前
@@ -1483,7 +1483,7 @@ protected:
   CptDeclItemI(const FileRegion& file_region,
 	       const char* name,
 	       PtExpr* init_value);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDeclItemI();
@@ -1499,14 +1499,14 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 初期値を取り出す．
   /// @retval 初期値
   /// @retval NULL 設定がない場合
   virtual
   const PtExpr*
   init_value() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -1536,7 +1536,7 @@ public:
   /// @brief デストラクタ
   virtual
   ~CptRange();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////

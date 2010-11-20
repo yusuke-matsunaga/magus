@@ -73,7 +73,7 @@ EiFactory::new_TaskCall(const VlNamedObj* parent,
 			ElbTaskFunc* task,
 			ElbExpr** arg_array)
 {
-  ymuint32 n = pt_stmt->arg_num();
+  ymuint n = pt_stmt->arg_num();
   void* p = mAlloc.get_memory(sizeof(EiTaskCall));
   EiTaskCall* stmt = new (p) EiTaskCall(parent, process, pt_stmt,
 					task, n, arg_array);
@@ -94,7 +94,7 @@ EiFactory::new_SysTaskCall(const VlNamedObj* parent,
 			   const ElbUserSystf* user_systf,
 			   ElbExpr** arg_array)
 {
-  ymuint32 n = pt_stmt->arg_num();
+  ymuint n = pt_stmt->arg_num();
   void* p = mAlloc.get_memory(sizeof(EiSysTaskCall));
   EiSysTaskCall* stmt = new (p) EiSysTaskCall(parent, process, pt_stmt,
 					      user_systf, n, arg_array);
@@ -237,7 +237,7 @@ EiNullStmt::func_exec(bool constant_function) const
 EiTcBase::EiTcBase(const VlNamedObj* parent,
 		   ElbProcess* process,
 		   const PtStmt* pt_stmt,
-		   ymuint32 arg_num,
+		   ymuint arg_num,
 		   ElbExpr** arg_array) :
   EiStmtBase(parent, process, pt_stmt),
   mArgumentNum(arg_num),
@@ -251,7 +251,7 @@ EiTcBase::~EiTcBase()
 }
 
 // @brief 引数の数を返す．
-ymuint32
+ymuint
 EiTcBase::argument_num() const
 {
   return mArgumentNum;
@@ -259,7 +259,7 @@ EiTcBase::argument_num() const
 
 // @brief 引数の取得
 const VlExpr*
-EiTcBase::argument(ymuint32 pos) const
+EiTcBase::argument(ymuint pos) const
 {
   return mArgumentList[pos];
 }
@@ -268,7 +268,7 @@ EiTcBase::argument(ymuint32 pos) const
 // @param[in] pos 位置番号
 // @param[in] arg 設定する引数
 void
-EiTcBase::set_argument(ymuint32 pos,
+EiTcBase::set_argument(ymuint pos,
 		       ElbExpr* arg)
 {
   mArgumentList[pos] = arg;
@@ -290,7 +290,7 @@ EiTaskCall::EiTaskCall(const VlNamedObj* parent,
 		       ElbProcess* process,
 		       const PtStmt* pt_stmt,
 		       ElbTaskFunc* task,
-		       ymuint32 arg_num,
+		       ymuint arg_num,
 		       ElbExpr** arg_array) :
   EiTcBase(parent, process, pt_stmt, arg_num, arg_array),
   mTask(task)
@@ -341,7 +341,7 @@ EiSysTaskCall::EiSysTaskCall(const VlNamedObj* parent,
 			     ElbProcess* process,
 			     const PtStmt* pt_stmt,
 			     const ElbUserSystf* user_systf,
-			     ymuint32 arg_num,
+			     ymuint arg_num,
 			     ElbExpr** arg_array) :
   EiTcBase(parent, process, pt_stmt, arg_num, arg_array),
   mUserSystf(user_systf)

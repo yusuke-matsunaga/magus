@@ -45,7 +45,7 @@ EiFactory::new_PrimHead(const VlNamedObj* parent,
   }
   return head;
 }
-  
+
 // @brief UDPプリミティブのヘッダを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_header パース木の定義
@@ -68,7 +68,7 @@ EiFactory::new_UdpHead(const VlNamedObj* parent,
   }
   return head;
 }
-  
+
 // @brief プリミティブインスタンスを生成する．
 // @param[in] head ヘッダ
 // @param[in] pt_inst インスタンス定義
@@ -76,16 +76,16 @@ ElbPrimitive*
 EiFactory::new_Primitive(ElbPrimHead* head,
 			 const PtInst* pt_inst)
 {
-  ymuint32 port_num = pt_inst->port_num();
+  ymuint port_num = pt_inst->port_num();
   void* q = mAlloc.get_memory(sizeof(EiPrimTerm) * port_num);
   EiPrimTerm* term_array = new (q) EiPrimTerm[port_num];
-  
+
   void* p = mAlloc.get_memory(sizeof(EiPrimitive2));
   EiPrimitive* prim = new (p) EiPrimitive2(head, pt_inst, term_array);
-  
+
   return prim;
 }
-  
+
 // @brief プリミティブ配列インスタンスを生成する．
 // @param[in] head ヘッダ
 // @param[in] pt_inst インスタンス定義
@@ -103,14 +103,14 @@ EiFactory::new_PrimitiveArray(ElbPrimHead* head,
 {
   EiRangeImpl range;
   range.set(left, right, left_val, right_val);
-  ymuint32 n = range.size();
+  ymuint n = range.size();
   void* q = mAlloc.get_memory(sizeof(EiPrimitive1) * n);
   EiPrimitive1* array = new (q) EiPrimitive1[n];
 
-  ymuint32 nt = n * pt_inst->port_num();
+  ymuint nt = n * pt_inst->port_num();
   void* r = mAlloc.get_memory(sizeof(EiPrimTerm) * nt);
   EiPrimTerm* term_array = new (r) EiPrimTerm[nt];
-  
+
   void* p = mAlloc.get_memory(sizeof(EiPrimArray));
   EiPrimArray* prim_array = new (p) EiPrimArray(head, pt_inst, range,
 						array, term_array);
@@ -270,7 +270,7 @@ EiPrimHeadD::set_delay(ElbDelay* expr)
 //////////////////////////////////////////////////////////////////////
 // クラス EiPrimHeadU
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] pt_header パース木の定義
@@ -282,7 +282,7 @@ EiPrimHeadU::EiPrimHeadU(const VlNamedObj* parent,
   mUdp(udp)
 {
 }
-  
+
 // @brief デストラクタ
 EiPrimHeadU::~EiPrimHeadU()
 {
@@ -365,9 +365,9 @@ EiPrimArray::EiPrimArray(ElbPrimHead* head,
   mRange(range),
   mArray(elem_array)
 {
-  ymuint32 n = mRange.size();
-  ymuint32 port_num = pt_inst->port_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = mRange.size();
+  ymuint port_num = pt_inst->port_num();
+  for (ymuint i = 0; i < n; ++ i) {
     int index = mRange.index(i);
     mArray[i].init(this, index, term_array);
     term_array += port_num;
@@ -404,7 +404,7 @@ EiPrimArray::parent() const
 {
   return mHead->parent();
 }
-  
+
 // @brief 名前の取得
 const char*
 EiPrimArray::name() const
@@ -469,7 +469,7 @@ EiPrimArray::right_range() const
 }
 
 // @brief 要素数を返す．
-ymuint32
+ymuint
 EiPrimArray::elem_num() const
 {
   return mRange.size();
@@ -478,7 +478,7 @@ EiPrimArray::elem_num() const
 // @brief 要素のプリミティブを返す．
 // @param[in] offset 位置番号 ( 0 <= offset < elem_num() )
 const VlPrimitive*
-EiPrimArray::elem_by_offset(ymuint32 offset) const
+EiPrimArray::elem_by_offset(ymuint offset) const
 {
   return &mArray[offset];
 }
@@ -488,13 +488,13 @@ EiPrimArray::elem_by_offset(ymuint32 offset) const
 const VlPrimitive*
 EiPrimArray::elem_by_index(int index) const
 {
-  ymuint32 offset = mRange.offset(index);
+  ymuint offset = mRange.offset(index);
   return &mArray[offset];
 }
 
 // @brief 要素のプリミティブを取り出す．
 ElbPrimitive*
-EiPrimArray::_primitive_by_offset(ymuint32 offset) const
+EiPrimArray::_primitive_by_offset(ymuint offset) const
 {
   return &mArray[offset];
 }
@@ -503,17 +503,17 @@ EiPrimArray::_primitive_by_offset(ymuint32 offset) const
 ElbPrimitive*
 EiPrimArray::_primitive_by_index(int index) const
 {
-  ymuint32 offset = mRange.offset(index);
+  ymuint offset = mRange.offset(index);
   return &mArray[offset];
 }
-  
+
 // @brief ヘッダを得る．
 ElbPrimHead*
 EiPrimArray::head() const
 {
   return mHead;
 }
-  
+
 // @brief パース木のインスタンス定義を得る．
 const PtInst*
 EiPrimArray::pt_inst() const
@@ -607,7 +607,7 @@ EiPrimitive::delay() const
 }
 
 // @brief ポート数を得る．
-ymuint32
+ymuint
 EiPrimitive::port_num() const
 {
   return pt_inst()->port_num();
@@ -616,42 +616,42 @@ EiPrimitive::port_num() const
 // @brief ポート端子を得る．
 // @param[in] pos 位置番号 (0 <= pos < port_num())
 const VlPrimTerm*
-EiPrimitive::prim_term(ymuint32 pos) const
+EiPrimitive::prim_term(ymuint pos) const
 {
   return &mPortArray[pos];
 }
-  
+
 // @brief ポート配列を初期化する．
 // @param[in] term_array 端子の配列
 void
 EiPrimitive::init_port(EiPrimTerm* term_array)
 {
   mPortArray = term_array;
-  
-  ymuint32 output_num;
-  ymuint32 inout_num;
-  ymuint32 input_num;
+
+  ymuint output_num;
+  ymuint inout_num;
+  ymuint input_num;
   int stat = get_port_size(prim_type(), port_num(),
 			   output_num, inout_num, input_num);
   assert_cond(stat == 0, __FILE__, __LINE__);
-  
-  ymuint32 index = 0;
-  for (ymuint32 i = 0; i < output_num; ++ i, ++ index) {
+
+  ymuint index = 0;
+  for (ymuint i = 0; i < output_num; ++ i, ++ index) {
     mPortArray[index].set(this, index, kVpiOutput);
   }
-  for (ymuint32 i = 0; i < inout_num; ++ i, ++ index) {
+  for (ymuint i = 0; i < inout_num; ++ i, ++ index) {
     mPortArray[index].set(this, index, kVpiInout);
   }
-  for (ymuint32 i = 0; i < input_num; ++ i, ++ index) {
+  for (ymuint i = 0; i < input_num; ++ i, ++ index) {
     mPortArray[index].set(this, index, kVpiInput);
   }
 }
-  
+
 // @brief 接続する．
 // @param[in] pos ポート番号 (0 から始まる)
 // @param[in] expr 接続する式
 void
-EiPrimitive::connect(ymuint32 pos,
+EiPrimitive::connect(ymuint pos,
 		     ElbExpr* expr)
 {
   mPortArray[pos].mExpr = expr;
@@ -685,27 +685,27 @@ EiPrimitive1::init(EiPrimArray* prim_array,
   mIndex = index;
 
   init_port(term_array);
-  
+
   // 名前の生成
   ostringstream buf;
   buf << prim_array->name() << "[" << index << "]";
   mName = buf.str().c_str();
 }
-  
+
 // @brief 名前の取得
 const char*
 EiPrimitive1::name() const
 {
   return mName;
 }
-  
+
 // @brief ヘッダを得る．
 ElbPrimHead*
 EiPrimitive1::head() const
 {
   return mPrimArray->head();
 }
-  
+
 // @brief パース木のインスタンス定義を得る．
 const PtInst*
 EiPrimitive1::pt_inst() const
@@ -735,21 +735,21 @@ EiPrimitive2::EiPrimitive2(ElbPrimHead* head,
 EiPrimitive2::~EiPrimitive2()
 {
 }
-  
+
 // @brief 名前の取得
 const char*
 EiPrimitive2::name() const
 {
   return mPtInst->name();
 }
-  
+
 // @brief ヘッダを得る．
 ElbPrimHead*
 EiPrimitive2::head() const
 {
   return mHead;
 }
-  
+
 // @brief パース木のインスタンス定義を得る．
 const PtInst*
 EiPrimitive2::pt_inst() const
@@ -761,12 +761,12 @@ EiPrimitive2::pt_inst() const
 //////////////////////////////////////////////////////////////////////
 // クラス EiPrimTerm
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 EiPrimTerm::EiPrimTerm()
 {
 }
-  
+
 // @brief デストラクタ
 EiPrimTerm::~EiPrimTerm()
 {
@@ -806,7 +806,7 @@ EiPrimTerm::direction() const
 }
 
 // @brief 端子番号を返す．
-ymuint32
+ymuint
 EiPrimTerm::term_index() const
 {
   return (mIndexDir >> 1);
@@ -822,7 +822,7 @@ EiPrimTerm::expr() const
 // @brief 内容を設定する．
 void
 EiPrimTerm::set(ElbPrimitive* primitive,
-		ymuint32 index,
+		ymuint index,
 		tVpiDirection dir)
 {
   mPrimitive = primitive;

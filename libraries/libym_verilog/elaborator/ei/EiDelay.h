@@ -32,7 +32,7 @@ private:
   /// @param[in] elem_num 要素数
   /// @param[in] expr_list 式の配列
   EiDelay(const PtBase* pt_obj,
-	  ymuint32 elem_num,
+	  ymuint elem_num,
 	  ElbExpr** expr_list);
 
   /// @brief デストラクタ
@@ -63,14 +63,14 @@ public:
 
   /// @brief 要素数を返す．
   virtual
-  ymuint32
+  ymuint
   elem_num() const;
 
   /// @brief 値を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < elem_num() )
   virtual
   const VlExpr*
-  expr(ymuint32 pos) const;
+  expr(ymuint pos) const;
 
   /// @brief Verilog-HDL の文字列を得る．
   string

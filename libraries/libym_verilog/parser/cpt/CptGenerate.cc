@@ -58,14 +58,14 @@ CptGenBase::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptGenBase::declhead_array() const
 {
   return mBody.declhead_array();
 }
-  
+
 // @brief item 配列の取得
 PtItemArray
 CptGenBase::item_array() const
@@ -194,28 +194,28 @@ CptGenIf::expr() const
 {
   return mCond;
 }
-  
+
 // @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptGenIf::then_declhead_array() const
 {
   return mThenBody.declhead_array();
 }
-  
+
 // @brief 条件が成り立ったときに生成される item 配列の取得
 PtItemArray
 CptGenIf::then_item_array() const
 {
   return mThenBody.item_array();
 }
-  
+
 // @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptGenIf::else_declhead_array() const
 {
   return mElseBody.declhead_array();
 }
-  
+
 // @brief 条件が成り立たなかったときに生成される item 配列の取得
 PtItemArray
 CptGenIf::else_item_array() const
@@ -254,7 +254,7 @@ CptGenCaseItem::file_region() const
 // @brief ラベルの数の取得
 // @return ラベル数\n
 // 0 の時は default の意味
-ymuint32
+ymuint
 CptGenCaseItem::label_num() const
 {
   return mLabelArray.size();
@@ -263,18 +263,18 @@ CptGenCaseItem::label_num() const
 // @brief ラベルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < label_num() )
 const PtExpr*
-CptGenCaseItem::label(ymuint32 pos) const
+CptGenCaseItem::label(ymuint pos) const
 {
   return mLabelArray[pos];
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptGenCaseItem::declhead_array() const
 {
   return mBody.declhead_array();
 }
-  
+
 // @brief item 配列の取得
 PtItemArray
 CptGenCaseItem::item_array() const
@@ -324,7 +324,7 @@ CptGenCase::expr() const
 }
 
 // case item の要素数を返す．
-ymuint32
+ymuint
 CptGenCase::size() const
 {
   return mCaseItemArray.size();
@@ -332,7 +332,7 @@ CptGenCase::size() const
 
 // case item を返す．
 const PtGenCaseItem*
-CptGenCase::caseitem(ymuint32 pos) const
+CptGenCase::caseitem(ymuint pos) const
 {
   return mCaseItemArray[pos];
 }
@@ -386,14 +386,14 @@ CptGenFor::name() const
 {
   return mName;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptGenFor::declhead_array() const
 {
   return mBody.declhead_array();
 }
-  
+
 // @brief item 配列の取得
 PtItemArray
 CptGenFor::item_array() const

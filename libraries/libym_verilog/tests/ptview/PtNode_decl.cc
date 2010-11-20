@@ -36,7 +36,7 @@ IOHeadListNode::~IOHeadListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 IOHeadListNode::data(int column,
 		     int role) const
@@ -51,7 +51,7 @@ IOHeadListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 IOHeadListNode::loc() const
@@ -63,9 +63,9 @@ IOHeadListNode::loc() const
 void
 IOHeadListNode::expand() const
 {
-   ymuint32 n = mIOHeadArray.size();
+   ymuint n = mIOHeadArray.size();
    mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new IOHeadNode(mIOHeadArray[i]);
   }
 }
@@ -89,7 +89,7 @@ IOHeadNode::~IOHeadNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 IOHeadNode::data(int column,
 		 int role) const
@@ -108,7 +108,7 @@ IOHeadNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 IOHeadNode::loc() const
@@ -152,7 +152,7 @@ IOItemListNode::~IOItemListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 IOItemListNode::data(int column,
 		     int role) const
@@ -167,7 +167,7 @@ IOItemListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 IOItemListNode::loc() const
@@ -179,9 +179,9 @@ IOItemListNode::loc() const
 void
 IOItemListNode::expand() const
 {
-  ymuint32 n = mIOHead->item_num();
+  ymuint n = mIOHead->item_num();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new IOItemNode(mIOHead->item(i));
   }
 }
@@ -205,7 +205,7 @@ IOItemNode::~IOItemNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 IOItemNode::data(int column,
 		 int role) const
@@ -220,7 +220,7 @@ IOItemNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 IOItemNode::loc() const
@@ -256,7 +256,7 @@ DeclHeadListNode::~DeclHeadListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DeclHeadListNode::data(int column,
 		       int role) const
@@ -271,7 +271,7 @@ DeclHeadListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 DeclHeadListNode::loc() const
@@ -283,9 +283,9 @@ DeclHeadListNode::loc() const
 void
 DeclHeadListNode::expand() const
 {
-   ymuint32 n = mDeclHeadArray.size();
+   ymuint n = mDeclHeadArray.size();
    mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new DeclHeadNode(mDeclHeadArray[i]);
   }
 }
@@ -309,7 +309,7 @@ DeclHeadNode::~DeclHeadNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DeclHeadNode::data(int column,
 		   int role) const
@@ -320,38 +320,38 @@ DeclHeadNode::data(int column,
       case kPtDecl_Param:
 	switch ( mDeclHead->data_type() ) {
 	case kVpiVarNone:        return "Parameter";
-	case kVpiVarInteger:     return "Parameter(integer)"; 
+	case kVpiVarInteger:     return "Parameter(integer)";
 	case kVpiVarReal:        return "Parameter(real)";
 	case kVpiVarTime:        return "Parameter(time)";
 	case kVpiVarRealtime:    return "Parameter(realtime)";
 	}
 	break;
-	
+
       case kPtDecl_LocalParam:
 	switch ( mDeclHead->data_type() ) {
 	case kVpiVarNone:        return "Localparam";
-	case kVpiVarInteger:     return "Localparam(integer)"; 
+	case kVpiVarInteger:     return "Localparam(integer)";
 	case kVpiVarReal:        return "Localparam(real)";
 	case kVpiVarTime:        return "Localparam(time)";
 	case kVpiVarRealtime:    return "Localparam(realtime)";
 	}
 	break;
-	
+
       case kPtDecl_Reg:          return "Reg";
       case kPtDecl_Var:
 	switch ( mDeclHead->data_type() ) {
 	case kVpiVarInteger:     return "Integer";
-	case kVpiVarReal:        return "Real";   
+	case kVpiVarReal:        return "Real";
 	case kVpiVarTime:        return "Time";
 	case kVpiVarRealtime:    return "Realtime";
 	case kVpiVarNone:
 	  assert_not_reached(__FILE__, __LINE__);
 	}
 	break;
-	
-      case kPtDecl_Genvar:       return "Genvar";    
-      case kPtDecl_Event:        return "Event";     
-      case kPtDecl_SpecParam:    return "Specparam"; 
+
+      case kPtDecl_Genvar:       return "Genvar";
+      case kPtDecl_Event:        return "Event";
+      case kPtDecl_SpecParam:    return "Specparam";
       case kPtDecl_Net:
 	switch ( mDeclHead->net_type() ) {
 	case kVpiSupply0:        return "Supply0";
@@ -376,7 +376,7 @@ DeclHeadNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 DeclHeadNode::loc() const
@@ -424,7 +424,7 @@ DeclItemListNode::~DeclItemListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DeclItemListNode::data(int column,
 		       int role) const
@@ -439,7 +439,7 @@ DeclItemListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 DeclItemListNode::loc() const
@@ -451,9 +451,9 @@ DeclItemListNode::loc() const
 void
 DeclItemListNode::expand() const
 {
-  ymuint32 n = mDeclHead->item_num();
+  ymuint n = mDeclHead->item_num();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new DeclItemNode(mDeclHead->item(i));
   }
 }
@@ -477,7 +477,7 @@ DeclItemNode::~DeclItemNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DeclItemNode::data(int column,
 		 int role) const
@@ -492,7 +492,7 @@ DeclItemNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 DeclItemNode::loc() const
@@ -531,7 +531,7 @@ RangeListNode::~RangeListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 RangeListNode::data(int column,
 		    int role) const
@@ -546,7 +546,7 @@ RangeListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 RangeListNode::loc() const
@@ -558,9 +558,9 @@ RangeListNode::loc() const
 void
 RangeListNode::expand() const
 {
-  ymuint32 n = mDeclItem->dimension_list_size();
+  ymuint n = mDeclItem->dimension_list_size();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new RangeNode(mDeclItem->range(i));
   }
 }
@@ -584,7 +584,7 @@ RangeNode::~RangeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 RangeNode::data(int column,
 		int role) const
@@ -599,7 +599,7 @@ RangeNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 RangeNode::loc() const

@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // クラス RootNode
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] vl_mgr VlMgr
 RootNode::RootNode(const VlMgr& vl_mgr) :
@@ -35,7 +35,7 @@ RootNode::~RootNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 RootNode::data(int column,
 	       int role) const
@@ -90,7 +90,7 @@ UdpListNode::~UdpListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 UdpListNode::data(int column,
 		  int role) const
@@ -119,7 +119,7 @@ UdpListNode::expand() const
 {
   const list<const PtUdp*>& udp_list = mVlMgr.pt_udp_list();
   mChildren.resize(udp_list.size());
-  ymuint32 i = 0;
+  ymuint i = 0;
   for (list<const PtUdp*>::const_iterator p = udp_list.begin();
        p != udp_list.end(); ++ p, ++ i) {
     const PtUdp* udp = *p;
@@ -146,7 +146,7 @@ ModuleListNode::~ModuleListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ModuleListNode::data(int column,
 		     int role) const
@@ -175,7 +175,7 @@ ModuleListNode::expand() const
 {
   const list<const PtModule*>& module_list = mVlMgr.pt_module_list();
   mChildren.resize(module_list.size());
-  ymuint32 i = 0;
+  ymuint i = 0;
   for (list<const PtModule*>::const_iterator p = module_list.begin();
        p != module_list.end(); ++ p, ++ i) {
     const PtModule* module = *p;
