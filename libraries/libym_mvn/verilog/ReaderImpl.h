@@ -143,6 +143,13 @@ private:
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
 
+  /// @brief プロセス文の生成を行う．
+  /// @param[in] module 親のモジュール
+  /// @param[in] vl_process プロセス文
+  bool
+  gen_process(MvModule* module,
+	      const VlProcess* process);
+
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 左辺式

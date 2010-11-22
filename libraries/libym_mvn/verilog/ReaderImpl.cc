@@ -22,6 +22,9 @@
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlPort.h"
 #include "ym_verilog/vl/VlContAssign.h"
+#include "ym_verilog/vl/VlProcess.h"
+#include "ym_verilog/vl/VlStmt.h"
+#include "ym_verilog/vl/VlControl.h"
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlRange.h"
 
@@ -334,6 +337,21 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     return NULL;
   }
 
+  // プロセスの生成
+  {
+    vector<const VlProcess*> process_list;
+    if ( mVlMgr.find_process_list(vl_module, process_list) ) {
+      for (vector<const VlProcess*>::const_iterator p = process_list.begin();
+	   p != process_list.end(); ++ p) {
+	const VlProcess* process = *p;
+	bool stat1 = gen_process(module, process);
+	if ( !stat1 ) {
+	  return NULL;
+	}
+      }
+    }
+  }
+
   // 入出力ノードの対応表を作る．
   ymuint i1 = 0;
   ymuint i2 = 0;
@@ -456,6 +474,43 @@ ReaderImpl::gen_decl(MvModule* module,
     if ( mVlMgr.find_decl_list(vl_scope, vpiNetArray, netarray_list) ) {
       for (vector<const VlDecl*>::iterator p = netarray_list.begin();
 	   p != netarray_list.end(); ++ p) {
+	const VlDecl* vl_decl = *p;
+	ymuint d = vl_decl->dimension();
+	ymuint array_size = 1;
+	for (ymuint i = 0; i < d; ++ i) {
+	  array_size *= vl_decl->range(i)->size();
+	}
+	for (ymuint i = 0; i < array_size; ++ i) {
+	  // 仮の through ノードに対応させる．
+	  ymuint bw = vl_decl->bit_size();
+	  MvNode* node = mMvMgr->new_through(module, bw);
+	  reg_node(vl_decl, i, node);
+	}
+      }
+    }
+  }
+
+  // reg の生成
+  {
+    vector<const VlDecl*> reg_list;
+    if ( mVlMgr.find_decl_list(vl_scope, vpiReg, reg_list) ) {
+      for (vector<const VlDecl*>::iterator p = reg_list.begin();
+	   p != reg_list.end(); ++ p) {
+	const VlDecl* vl_decl = *p;
+	// 仮の through ノードに対応させる．
+	ymuint bw = vl_decl->bit_size();
+	MvNode* node = mMvMgr->new_through(module, bw);
+	reg_node(vl_decl, node);
+      }
+    }
+  }
+
+  // reg 配列の生成
+  {
+    vector<const VlDecl*> regarray_list;
+    if ( mVlMgr.find_decl_list(vl_scope, vpiNetArray, regarray_list) ) {
+      for (vector<const VlDecl*>::iterator p = regarray_list.begin();
+	   p != regarray_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
 	ymuint d = vl_decl->dimension();
 	ymuint array_size = 1;
@@ -753,6 +808,65 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
   }
 }
 
+// @brief プロセス文の生成を行う．
+// @param[in] module 親のモジュール
+// @param[in] vl_process プロセス文
+bool
+ReaderImpl::gen_process(MvModule* module,
+			const VlProcess* process)
+{
+  if ( process->type() != kVpiAlways ) {
+    // always 文以外(initial文)はダメ
+    cerr << "initial should not be used." << endl;
+    return false;
+  }
+
+  const VlStmt* stmt = process->stmt();
+  if ( stmt->type() != kVpiEventControl ) {
+    // always の直後は '@' でなければダメ
+    cerr << "only '@' is allowed here." << endl;
+    return false;
+  }
+
+  bool has_edge_event = false;
+  bool has_normal_event = false;
+  const VlControl* control = stmt->control();
+  for (ymuint i = 0; i < control->event_num(); ++ i) {
+    const VlExpr* expr = control->event(i);
+    if ( expr->type() == kVpiOperation ) {
+      if ( expr->op_type() == kVpiPosedge ||
+	   expr->op_type() == kVpiNegedge ) {
+	has_edge_event = true;
+      }
+      else {
+	cerr << "only edge descriptor should be used." << endl;
+	return false;
+      }
+    }
+    else if ( expr->decl_obj() != NULL ) {
+      has_normal_event = true;
+    }
+    else {
+      cerr << "illegal type" << endl;
+      return false;
+    }
+  }
+
+  const VlStmt* body = stmt->body_stmt();
+  if ( has_edge_event ) {
+    if ( has_normal_event ) {
+      cerr << "edge-type events and normal events are mutual exclusive." << endl;
+      return false;
+    }
+    // エッジトリガータイプの記憶素子を作る．
+  }
+  else {
+    // 組み合わせ回路かレベルセンシティブタイプの記憶素子を作る．
+
+  }
+
+  return true;
+}
 
 // @brief 左辺式に接続する．
 // @param[in] parent_module 親のモジュール
