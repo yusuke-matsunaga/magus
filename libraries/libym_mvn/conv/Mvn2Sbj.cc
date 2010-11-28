@@ -134,7 +134,7 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       SbjNode* sbjnode = sbjgraph.new_input();
-      mvnode_map.put(node, j, sbjnode, false);
+      mvnode_map.put(node, j, SbjHandle(sbjnode, false));
     }
     mark[node->id()] = true;
     enqueue(node, queue, mark);
@@ -147,7 +147,7 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       SbjNode* sbjnode = sbjgraph.new_input();
-      mvnode_map.put(node, j, sbjnode, false);
+      mvnode_map.put(node, j, SbjHandle(sbjnode, false));
     }
     mark[node->id()] = true;
     enqueue(node, queue, mark);
@@ -163,7 +163,7 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       ymuint bw = node->output(0)->bit_width();
       for (ymuint j = 0; j < bw; ++ j) {
 	SbjNode* sbjnode = sbjgraph.new_dff();
-	mvnode_map.put(node, j, sbjnode, false);
+	mvnode_map.put(node, j, SbjHandle(sbjnode, false));
       }
       mark[node->id()] = true;
       enqueue(node, queue, mark);
@@ -178,11 +178,11 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       for (ymuint j = 0; j < bw; ++ j) {
 	if ( pat & 1U ) {
 	  // 1
-	  mvnode_map.put(node, j, NULL, true);
+	  mvnode_map.put(node, j, SbjHandle::make_one());
 	}
 	else {
 	  // 0
-	  mvnode_map.put(node, j, NULL, false);
+	  mvnode_map.put(node, j, SbjHandle::make_zero());
 	}
 	if ( j % 32 == 31 ) {
 	  ++ bpos;
@@ -274,15 +274,13 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       const MvNode* src_node = opin->node();
       ymuint bw = ipin->bit_width();
       for (ymuint j = 0; j < bw; ++ j) {
-	SbjNode* sbjnode;
-	bool inv;
-	bool stat = mvnode_map.get(node, j, sbjnode, inv);
-	SbjNode* isbjnode;
-	bool iinv;
-	bool stat1 = mvnode_map.get(src_node, j, isbjnode, iinv);
+	SbjNode* sbjhandle;
+	bool stat = mvnode_map.get(node, j, sbjhandle);
+	SbjNode* isbjhandle;
+	bool stat1 = mvnode_map.get(src_node, j, isbjhandle);
 	assert_cond( stat && stat1 , __FILE__, __LINE__);
-	assert_cond( inv == false, __FILE__, __LINE__);
-	sbjgraph.set_dff_data(sbjnode, isbjnode, iinv);
+	assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
+	sbjgraph.set_dff_data(sbjhandle.node(), isbjhandle);
       }
 
       const MvInputPin* ipin1 = node->input(1);

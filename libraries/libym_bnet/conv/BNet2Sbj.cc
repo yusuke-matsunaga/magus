@@ -209,33 +209,22 @@ BNet2Sbj::operator()(const BNetwork& network,
 	}
       }
 
-      bool oinv = false;
-      bool xor_flag = false;
+      SbjHandle ihandle0(inode0, inv0);
+      SbjHandle ihandle1(inode1, inv1);
+      SbjHandle handle;
       if ( expr.is_and() ) {
-	// なにもしない．
+	handle = sbjgraph.new_and(ihandle0, ihandle1);
       }
       else if ( expr.is_or() ) {
-	oinv = true;
-	inv0 = !inv0;
-	inv1 = !inv1;
+	handle = sbjgraph.new_or(ihandle0, ihandle1);
       }
       else if ( expr.is_xor() ) {
-	oinv = inv0 ^ inv1;
-	inv0 = false;
-	inv1 = false;
-	xor_flag = true;
+	handle = sbjgraph.new_xor(ihandle0, ihandle1);
       }
       else {
 	assert_not_reached(__FILE__, __LINE__);
       }
-      SbjNode* node = NULL;
-      if ( xor_flag ) {
-	node = sbjgraph.new_xor(inode0, inode1);
-      }
-      else {
-	node = sbjgraph.new_and(inode0, inode1, inv0, inv1);
-      }
-      assoc.put(bnode, node, oinv);
+      assoc.put(bnode, handle.node(), handle.inv());
     }
     else { // ni > 2
       err_out << "ERROR: number of fanins exceeds 2" << endl;
@@ -267,7 +256,7 @@ BNet2Sbj::operator()(const BNetwork& network,
     SbjNode* inode = NULL;
     bool inv;
     assoc.get(ibnode, inode, inv);
-    SbjNode* node = sbjgraph.new_output(inode, inv);
+    SbjNode* node = sbjgraph.new_output(SbjHandle(inode, inv));
     sbjgraph.add_port(obnode->name(), vector<SbjNode*>(1, node));
   }
 

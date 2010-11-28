@@ -35,36 +35,37 @@ public:
 
   /// @brief 登録する．(1ビット版)
   /// @param[in] mvnode MvNode
-  /// @param[in] sbjnode SbjNode
-  /// @param[in] inv 反転属性
+  /// @param[in] sbjhandle SbjHandle
   void
   put(const MvNode* mvnode,
-      SbjNode* sbjnode,
-      bool inv);
+      SbjHandle sbjhandle);
 
   /// @brief 登録する．(ベクタ版)
   /// @param[in] mvnode MvNode
   /// @param[in] index ビット位置
-  /// @param[in] sbjnode SbjNode
-  /// @param[in] inv 反転属性
+  /// @param[in] sbjhandle SbjHandle
   void
   put(const MvNode* mvnode,
       ymuint index,
-      SbjNode* sbjnode,
-      bool inv);
+      SbjHandle sbjhandle);
 
   /// @brief 探す．(1ビット版)
+  /// @param[in] mvnode MvNode
+  /// @param[out] sbjhandle SbjHandle
+  /// @return 見つかったら true を返す．
   bool
   get(const MvNode* mvnode,
-      SbjNode*& sbjnode,
-      bool& inv) const;
+      SbjHandle& sbjhandle) const;
 
   /// @brief 探す．(ベクタ版)
+  /// @param[in] mvnode MvNode
+  /// @param[in] index ビット位置
+  /// @param[out] sbjhandle SbjHandle
+  /// @return 見つかったら true を返す．
   bool
   get(const MvNode* mvnode,
       ymuint index,
-      SbjNode*& sbjnode,
-      bool& inv) const;
+      SbjHandle& sbjhandle) const;
 
 
 private:
@@ -72,7 +73,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  vector<vector<ympuint> > mArray;
+  vector<vector<SbjHandle> > mArray;
 
 };
 

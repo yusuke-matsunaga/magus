@@ -32,6 +32,7 @@ class SbjGraph;
 class SbjPort;
 class SbjEdge;
 class SbjNode;
+class SbjHandle;
 class SbjDumper;
 
 typedef DlList<SbjEdge> SbjEdgeList;
@@ -45,6 +46,7 @@ using nsSbj::SbjGraph;
 using nsSbj::SbjPort;
 using nsSbj::SbjEdge;
 using nsSbj::SbjNode;
+using nsSbj::SbjHandle;
 using nsSbj::SbjDumper;
 
 using nsSbj::SbjEdgeList;

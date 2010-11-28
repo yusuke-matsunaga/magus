@@ -21,7 +21,7 @@
 BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjEdge SbjGraph.h "SbjGraph.h"
+/// @class SbjEdge SbjGraph.h "ym_sbj/SbjGraph.h"
 /// @brief サブジェクトグラフの枝を表すクラス
 ///
 /// - 入力側のノード
@@ -109,7 +109,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjNode SbjGraph.h "SbjGraph.h"
+/// @class SbjNode SbjGraph.h "ym_sbj/SbjGraph.h"
 /// @brief サブジェクトグラフを構成するプリミティブノードを表すクラス
 ///
 /// ノードの種類は
@@ -437,7 +437,103 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjPort SbjGraph.h "SbjGraph.h"
+/// @class SbjHandle SbjGraph.h "ym_sbj/SbjGraph.h"
+/// @brief ノード＋極性の情報を表すクラス
+//////////////////////////////////////////////////////////////////////
+class SbjHandle
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] node ノード
+  /// @param[in] inv 極性
+  explicit
+  SbjHandle(SbjNode* node = NULL,
+	    bool inv = false);
+
+  /// @brief デストラクタ
+  ~SbjHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 定数を作るクラスメソッド
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 定数0を返す．
+  static
+  SbjHandle
+  make_zero();
+
+  /// @brief 定数1を返す．
+  static
+  SbjHandle
+  make_one();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードを返す．
+  SbjNode*
+  node() const;
+
+  /// @brief 極性を返す．
+  bool
+  inv() const;
+
+  /// @brief 定数0を表しているかどうか調べる．
+  bool
+  is_const0() const;
+
+  /// @brief 定数1を表しているかどうか調べる．
+  bool
+  is_const1() const;
+
+  /// @brief 極性を反転させた結果を返す．
+  SbjHandle
+  operator~() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を設定する．
+  void
+  set(SbjNode* node,
+      bool inv);
+
+  /// @brief 極性を反転させる．
+  void
+  invert();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief データを直接指定したコンストラクタ
+  SbjHandle(ympuint data);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ノードのポインタと極性をパックしたもの
+  ympuint mData;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class SbjPort SbjGraph.h "ym_sbj/SbjGraph.h"
 /// @brief ポートを表すクラス
 ///
 /// ポートは通常，名前を持ち，1つもしくは複数の入出力ノード
@@ -496,7 +592,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjGraph SbjGraph.h "SbjGraph.h"
+/// @class SbjGraph SbjGraph.h "ym_sbj/SbjGraph.h"
 /// @brief サブジェクトグラフを表すクラス
 ///
 /// 入力ノード，出力ノード，論理ノード，DFFノードを分けてリストで持つ
@@ -697,42 +793,58 @@ public:
   new_input();
 
   /// @brief 出力ノードを作る．
-  /// @param[in] inode 入力のノード
-  /// @param[in] inv 極性
+  /// @param[in] ihandle 入力ハンドル
   /// @return 作成したノードを返す．
   SbjNode*
-  new_output(SbjNode* inode,
-	     bool inv);
-
-  /// @brief 論理ノードを作る．
-  /// @param[in] fcode 機能コード
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  /// @return 作成したノードを返す．
-  SbjNode*
-  new_logic(ymuint fcode,
-	    SbjNode* inode1,
-	    SbjNode* inode2);
+  new_output(SbjHandle ihandle);
 
   /// @brief ANDノードを作る．
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  /// @param[in] inv1 1番めの枝の反転属性
-  /// @param[in] inv2 2番めの枝の反転属性
-  /// @return 作成したノードを返す．
-  SbjNode*
-  new_and(SbjNode* inode1,
-	  SbjNode* inode2,
-	  bool inv1,
-	  bool inv2);
+  /// @param[in] ihandle1 1番めの入力ハンドル
+  /// @param[in] ihandle2 2番めの入力ハンドル
+  /// @return 作成したノードのハンドルを返す．
+  /// @note ihandle1/ihandle2 が定数の時も考慮している．
+  SbjHandle
+  new_and(SbjHandle ihandle1,
+	  SbjHandle ihandle2);
+
+  /// @brief ANDノードを作る．
+  /// @param[in] ihandle_list 入力ハンドルのリスト
+  /// @return 作成したノードのハンドルを返す．
+  /// @note 入力が定数の時も考慮している．
+  SbjHandle
+  new_and(const vector<SbjHandle> ihandle_list);
+
+  /// @brief ORノードを作る．
+  /// @param[in] ihandle1 1番めの入力ハンドル
+  /// @param[in] ihandle2 2番めの入力ハンドル
+  /// @return 作成したノードのハンドルを返す．
+  /// @note ihandle1/ihandle2 が定数の時も考慮している．
+  SbjHandle
+  new_or(SbjHandle ihandle1,
+	 SbjHandle ihandle2);
+
+  /// @brief ORノードを作る．
+  /// @param[in] ihandle_list 入力ハンドルのリスト
+  /// @return 作成したノードのハンドルを返す．
+  /// @note 入力が定数の時も考慮している．
+  SbjHandle
+  new_or(const vector<SbjHandle> ihandle_list);
 
   /// @brief XORノードを作る．
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  /// @return 作成したノードを返す．
-  SbjNode*
-  new_xor(SbjNode* inode1,
-	  SbjNode* inode2);
+  /// @param[in] ihandle1 1番めの入力ハンドル
+  /// @param[in] ihandle2 2番めの入力ハンドル
+  /// @return 作成したノードのハンドルを返す．
+  /// @note ihandle1/ihandle2 が定数の時も考慮している．
+  SbjHandle
+  new_xor(SbjHandle ihandle1,
+	  SbjHandle ihandle2);
+
+  /// @brief XORノードを作る．
+  /// @param[in] ihandle_list 入力ハンドルのリスト
+  /// @return 作成したノードのハンドルを返す．
+  /// @note 入力が定数の時も考慮している．
+  SbjHandle
+  new_xor(const vector<SbjHandle> ihandle_list);
 
   /// @brief DFFノードを作る．
   /// @param[in] inode 入力のノード
@@ -744,12 +856,10 @@ public:
 
   /// @brief 出力ノードの内容を変更する
   /// @param[in] 変更対象の出力ノード
-  /// @param[in] inode 入力のノード
-  /// @param[in] inv 極性
+  /// @param[in] ihandle 入力ハンドル
   void
   change_output(SbjNode* node,
-		SbjNode* inode,
-		bool inv);
+		SbjHandle ihandle);
 
   /// @brief 論理ノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード
@@ -846,6 +956,16 @@ private:
   void
   copy(const SbjGraph& src,
        vector<SbjNode*>& nodemap);
+
+  /// @brief 論理ノードを作る．
+  /// @param[in] fcode 機能コード
+  /// @param[in] inode1 1番めの入力ノード
+  /// @param[in] inode2 2番めの入力ノード
+  /// @return 作成したノードを返す．
+  SbjNode*
+  new_logic(ymuint fcode,
+	    SbjNode* inode1,
+	    SbjNode* inode2);
 
   // 新しいノードを作成し mNodeList に登録する．
   // 作成されたノードを返す．
@@ -1390,6 +1510,107 @@ ymuint
 SbjNode::level() const
 {
   return mLevel;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SbjHandle
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] node ノード
+// @param[in] inv 極性
+inline
+SbjHandle::SbjHandle(SbjNode* node,
+		     bool inv)
+{
+  set(node, inv);
+}
+
+// @brief データを直接指定したコンストラクタ
+inline
+SbjHandle::SbjHandle(ympuint data) :
+  mData(data)
+{
+}
+
+// @brief デストラクタ
+inline
+SbjHandle::~SbjHandle()
+{
+}
+
+// @brief 定数0を返す．
+inline
+SbjHandle
+SbjHandle::make_zero()
+{
+  return SbjHandle(0UL);
+}
+
+// @brief 定数1を返す．
+inline
+SbjHandle
+SbjHandle::make_one()
+{
+  return SbjHandle(1UL);
+}
+
+// @brief ノードを返す．
+inline
+SbjNode*
+SbjHandle::node() const
+{
+  return reinterpret_cast<SbjNode*>(mData & ~1UL);
+}
+
+// @brief 極性を返す．
+inline
+bool
+SbjHandle::inv() const
+{
+  return static_cast<bool>(mData & 1UL);
+}
+
+// @brief 定数0を表しているかどうか調べる．
+inline
+bool
+SbjHandle::is_const0() const
+{
+  return mData == 0UL;
+}
+
+// @brief 定数1を表しているかどうか調べる．
+inline
+bool
+SbjHandle::is_const1() const
+{
+  return mData == 1UL;
+}
+
+// @brief 極性を反転させた結果を返す．
+inline
+SbjHandle
+SbjHandle::operator~() const
+{
+  return SbjHandle(mData ^ 1UL);
+}
+
+// @brief 内容を設定する．
+inline
+void
+SbjHandle::set(SbjNode* node,
+	       bool inv)
+{
+  mData = reinterpret_cast<ympuint>(node) | static_cast<ympuint>(inv);
+}
+
+// @brief 極性を反転させる．
+inline
+void
+SbjHandle::invert()
+{
+  mData ^= 1UL;
 }
 
 

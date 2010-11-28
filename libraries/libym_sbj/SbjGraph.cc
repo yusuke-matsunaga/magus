@@ -221,7 +221,7 @@ SbjGraph::copy(const SbjGraph& src,
     if ( src_inode ) {
       dst_inode = nodemap[src_inode->id()];
     }
-    SbjNode* dst_node = new_output(dst_inode, src_onode->output_inv());
+    SbjNode* dst_node = new_output(SbjHandle(dst_inode, src_onode->output_inv()));
     nodemap[src_onode->id()] = dst_node;
   }
 
@@ -567,8 +567,7 @@ SbjGraph::new_input()
 
 // 出力ノードを作る．
 SbjNode*
-SbjGraph::new_output(SbjNode* inode,
-		     bool inv)
+SbjGraph::new_output(SbjHandle ihandle)
 {
   SbjNode* node = new_node(1);
 
@@ -581,6 +580,8 @@ SbjGraph::new_output(SbjNode* inode,
   // 出力リストに登録
   mOutputList.push_back(node);
 
+  SbjNode* inode = ihandle.node();
+  bool inv = ihandle.inv();
   node->set_output(subid, inv);
   connect(inode, node, 0);
 
@@ -609,30 +610,109 @@ SbjGraph::new_logic(ymuint fcode,
   return node;
 }
 
-// ANDノードを作る．
-SbjNode*
-SbjGraph::new_and(SbjNode* inode0,
-		  SbjNode* inode1,
-		  bool inv0,
-		  bool inv1)
+// @brief ANDノードを作る．
+// @param[in] ihandle1 1番めの入力ハンドル
+// @param[in] ihandle2 2番めの入力ハンドル
+// @return 作成したノードのハンドルを返す．
+// @note ihandle1/ihandle2 が定数の時も考慮している．
+SbjHandle
+SbjGraph::new_and(SbjHandle ihandle1,
+		  SbjHandle ihandle2)
 {
+  if ( ihandle1.is_const0() ) {
+    // 入力1が0固定
+    return SbjHandle::make_zero();
+  }
+  if ( ihandle1.is_const1() ) {
+    // 入力1が1固定
+    return ihandle2;
+  }
+  if ( ihandle2.is_const0() ) {
+    // 入力2が0固定
+    return SbjHandle::make_zero();
+  }
+  if ( ihandle2.is_const1() ) {
+    // 入力2が1固定
+    return ihandle1;
+  }
+
   ymuint fcode = 0U;
-  if ( inv0 ) {
+  if ( ihandle1.inv() ) {
     fcode |= 1U;
   }
-  if ( inv1 ) {
+  if ( ihandle2.inv() ) {
     fcode |= 2U;
   }
-  return new_logic(fcode, inode0, inode1);
+  SbjNode* sbjnode = new_logic(fcode, ihandle1.node(), ihandle2.node());
+  return SbjHandle(sbjnode, false);
 }
 
-// XORノードを作る．
-SbjNode*
-SbjGraph::new_xor(SbjNode* inode0,
-		  SbjNode* inode1)
+// @brief ORノードを作る．
+// @param[in] ihandle1 1番めの入力ハンドル
+// @param[in] ihandle2 2番めの入力ハンドル
+// @return 作成したノードのハンドルを返す．
+// @note ihandle1/ihandle2 が定数の時も考慮している．
+SbjHandle
+SbjGraph::new_or(SbjHandle ihandle1,
+		 SbjHandle ihandle2)
 {
-  ymuint fcode = 4U;
-  return new_logic(fcode, inode0, inode1);
+  if ( ihandle1.is_const0() ) {
+    // 入力1が0固定
+    return ihandle2;
+  }
+  if ( ihandle1.is_const1() ) {
+    // 入力1が1固定
+    return SbjHandle::make_one();
+  }
+  if ( ihandle2.is_const0() ) {
+    // 入力2が0固定
+    return ihandle1;
+  }
+  if ( ihandle2.is_const1() ) {
+    // 入力2が1固定
+    return SbjHandle::make_one();
+  }
+
+  ymuint fcode = 0U;
+  if ( !ihandle1.inv() ) {
+    fcode |= 1U;
+  }
+  if ( !ihandle2.inv() ) {
+    fcode |= 2U;
+  }
+  SbjNode* sbjnode = new_logic(fcode, ihandle1.node(), ihandle2.node());
+  return SbjHandle(sbjnode, true);
+}
+
+// @brief XORノードを作る．
+// @param[in] ihandle1 1番めの入力ハンドル
+// @param[in] ihandle2 2番めの入力ハンドル
+// @return 作成したノードのハンドルを返す．
+// @note ihandle1/ihandle2 が定数の時も考慮している．
+SbjHandle
+SbjGraph::new_xor(SbjHandle ihandle1,
+		  SbjHandle ihandle2)
+{
+  if ( ihandle1.is_const0() ) {
+    // 入力1が0固定
+    return ihandle2;
+  }
+  if ( ihandle1.is_const1() ) {
+    // 入力1が1固定
+    return ~ihandle2;
+  }
+  if ( ihandle2.is_const0() ) {
+    // 入力2が0固定
+    return ihandle1;
+  }
+  if ( ihandle2.is_const1() ) {
+    // 入力2が1固定
+    return ~ihandle1;
+  }
+
+  bool inv = ihandle1.inv() ^ ihandle2.inv();
+  SbjNode* node = new_logic(4U, ihandle1.node(), ihandle2.node());
+  return SbjHandle(node, inv);
 }
 
 // DFFノードを作る．
@@ -746,12 +826,11 @@ SbjGraph::delete_node(SbjNode* node,
 // @param[in] inv 極性
 void
 SbjGraph::change_output(SbjNode* node,
-			SbjNode* inode,
-			bool inv)
+			SbjHandle ihandle)
 {
   assert_cond( node->is_output(), __FILE__, __LINE__);
-  node->set_output(node->subid(), inv);
-  connect(inode, node, 0);
+  node->set_output(node->subid(), ihandle.inv());
+  connect(ihandle.node(), node, 0);
 }
 
 // @brief 論理ノードの内容を再設定する．
