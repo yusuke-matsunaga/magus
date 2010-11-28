@@ -16,114 +16,20 @@
 #include "ym_mvn/MvPin.h"
 #include "ym_mvn/MvNodeMap.h"
 
+#include "ThroughConv.h"
+#include "NotConv.h"
+#include "AndConv.h"
+#include "OrConv.h"
+#include "XorConv.h"
+#include "IteConv.h"
+#include "ConcatConv.h"
+#include "ConstBitSelectConv.h"
+#include "ConstPartSelectConv.h"
+
 
 BEGIN_NAMESPACE_YM_MVN
 
 BEGIN_NONAMESPACE
-
-void
-make_and(SbjGraph& sbjgraph,
-	 SbjNode* sbjnode0,
-	 bool inv0,
-	 SbjNode* sbjnode1,
-	 bool inv1,
-	 SbjNode*& sbjnode,
-	 bool& inv)
-{
-  sbjnode = NULL;
-  inv = false;
-  if ( sbjnode0 == NULL ) {
-    if ( inv0 ) {
-      // 入力0が1固定
-      sbjnode = sbjnode1;
-      inv = inv1;
-    }
-    else {
-      // 入力0が0固定
-      sbjnode = NULL;
-      inv = false;
-    }
-  }
-  else if ( sbjnode1 == NULL ) {
-    if ( inv1 ) {
-      // 入力1が1固定
-      sbjnode = sbjnode0;
-      inv = inv0;
-    }
-    else {
-      // 入力1が0固定
-      sbjnode = NULL;
-      inv = false;
-    }
-  }
-  else {
-    sbjnode = sbjgraph.new_and(sbjnode0, sbjnode1, inv0, inv1);
-    inv = false;
-  }
-}
-
-void
-make_or(SbjGraph& sbjgraph,
-	SbjNode* sbjnode0,
-	bool inv0,
-	SbjNode* sbjnode1,
-	bool inv1,
-	SbjNode*& sbjnode,
-	bool& inv)
-{
-  sbjnode = NULL;
-  inv = false;
-  if ( sbjnode0 == NULL ) {
-    if ( inv0 ) {
-      // 入力0が1固定
-      sbjnode = NULL;
-      inv = true;
-    }
-    else {
-      // 入力0が0固定
-      sbjnode = sbjnode1;
-      inv = inv1;
-    }
-  }
-  else if ( sbjnode1 == NULL ) {
-    if ( inv1 ) {
-      // 入力1が1固定
-      sbjnode = NULL;
-      inv = true;
-    }
-    else {
-      // 入力1が0固定
-      sbjnode = sbjnode0;
-      inv = inv0;
-    }
-  }
-  else {
-    sbjnode = sbjgraph.new_and(sbjnode0, sbjnode1, !inv0, !inv1);
-    inv = true;
-  }
-}
-
-void
-make_xor(SbjGraph& sbjgraph,
-	 SbjNode* sbjnode0,
-	 bool inv0,
-	 SbjNode* sbjnode1,
-	 bool inv1,
-	 SbjNode*& sbjnode,
-	 bool& inv)
-{
-  sbjnode = NULL;
-  inv = inv0 ^ inv1;
-  if ( sbjnode0 == NULL ) {
-    sbjnode = sbjnode1;
-  }
-  else if ( sbjnode1 == NULL ) {
-    sbjnode = sbjnode0;
-  }
-  else {
-    sbjnode = sbjgraph.new_xor(sbjnode0, sbjnode1);
-  }
-}
 
 void
 enqueue(const MvNode* node0,
@@ -174,11 +80,24 @@ END_NONAMESPACE
 // @brief コンストラクタ
 Mvn2Sbj::Mvn2Sbj()
 {
+  mConvList.push_back(new ThroughConv);
+  mConvList.push_back(new NotConv);
+  mConvList.push_back(new AndConv);
+  mConvList.push_back(new OrConv);
+  mConvList.push_back(new XorConv);
+  mConvList.push_back(new IteConv);
+  mConvList.push_back(new ConcatConv);
+  mConvList.push_back(new ConstBitSelectConv);
+  mConvList.push_back(new ConstPartSelectConv);
 }
 
 // @brief デストラクタ
 Mvn2Sbj::~Mvn2Sbj()
 {
+  for (list<MvnConv*>::iterator p = mConvList.begin();
+       p != mConvList.end(); ++ p) {
+    delete *p;
+  }
 }
 
 // @brief MvMgr の内容を SbjGraph に変換する．
@@ -284,136 +203,15 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
     queue.pop_front();
 
     // node に対応する SbjNode を作る．
+    for (list<MvnConv*>::iterator p = mConvList.begin();
+	 p != mConvList.end(); ++ p) {
+      MvnConv* conv = *p;
+      if ( conv->conv(node, sbjgraph, mvnode_map) ) {
+	break;
+      }
+    }
     switch ( node->type() ) {
     case MvNode::kOutput:
-      break;
-
-    case MvNode::kThrough:
-      {
-	const MvInputPin* ipin = node->input(0);
-	const MvOutputPin* opin = ipin->src_pin();
-	const MvNode* src_node = opin->node();
-	ymuint bw = opin->bit_width();
-	for (ymuint i = 0; i < bw; ++ i) {
-	  SbjNode* sbjnode;
-	  bool inv;
-	  bool stat = mvnode_map.get(src_node, i, sbjnode, inv);
-	  assert_cond( stat , __FILE__, __LINE__);
-	  mvnode_map.put(node, i, sbjnode, inv);
-	}
-      }
-      break;
-
-    case MvNode::kNot:
-      {
-	const MvInputPin* ipin = node->input(0);
-	const MvOutputPin* opin = ipin->src_pin();
-	const MvNode* src_node = opin->node();
-	ymuint bw = opin->bit_width();
-	assert_cond( node->output(0)->bit_width(), __FILE__, __LINE__);
-	for (ymuint i = 0; i < bw; ++ i) {
-	  SbjNode* sbjnode;
-	  bool inv;
-	  bool stat = mvnode_map.get(src_node, i, sbjnode, inv);
-	  assert_cond( stat , __FILE__, __LINE__);
-	  mvnode_map.put(node, i, sbjnode, !inv);
-	}
-      }
-      break;
-
-    case MvNode::kAnd:
-      {
-	const MvInputPin* ipin0 = node->input(0);
-	const MvOutputPin* src_pin0 = ipin0->src_pin();
-	const MvNode* src_node0 = src_pin0->node();
-
-	const MvInputPin* ipin1 = node->input(1);
-	const MvOutputPin* src_pin1 = ipin1->src_pin();
-	const MvNode* src_node1 = src_pin1->node();
-
-	ymuint bw = node->output(0)->bit_width();
-	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	for (ymuint i = 0; i < bw; ++ i) {
-	  SbjNode* sbjnode0;
-	  bool inv0;
-	  bool stat0 = mvnode_map.get(src_node0, i, sbjnode0, inv0);
-	  SbjNode* sbjnode1;
-	  bool inv1;
-	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
-	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	  SbjNode* sbjnode = NULL;
-	  bool inv = false;
-	  make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	  mvnode_map.put(node, i, sbjnode, inv);
-	}
-      }
-      break;
-
-    case MvNode::kOr:
-      {
-	const MvInputPin* ipin0 = node->input(0);
-	const MvOutputPin* src_pin0 = ipin0->src_pin();
-	const MvNode* src_node0 = src_pin0->node();
-
-	const MvInputPin* ipin1 = node->input(1);
-	const MvOutputPin* src_pin1 = ipin1->src_pin();
-	const MvNode* src_node1 = src_pin1->node();
-
-	ymuint bw = node->output(0)->bit_width();
-	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	for (ymuint i = 0; i < bw; ++ i) {
-	  SbjNode* sbjnode0;
-	  bool inv0;
-	  bool stat0 = mvnode_map.get(src_node0, i, sbjnode0, inv0);
-	  SbjNode* sbjnode1;
-	  bool inv1;
-	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
-	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	  SbjNode* sbjnode = NULL;
-	  bool inv = false;
-	  make_or(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	  mvnode_map.put(node, i, sbjnode, inv);
-	}
-      }
-      break;
-
-    case MvNode::kXor:
-      {
-	const MvInputPin* ipin0 = node->input(0);
-	const MvOutputPin* src_pin0 = ipin0->src_pin();
-	const MvNode* src_node0 = src_pin0->node();
-
-	const MvInputPin* ipin1 = node->input(1);
-	const MvOutputPin* src_pin1 = ipin1->src_pin();
-	const MvNode* src_node1 = src_pin1->node();
-
-	ymuint bw = node->output(0)->bit_width();
-	assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	for (ymuint i = 0; i < bw; ++ i) {
-	  SbjNode* sbjnode0;
-	  bool inv0;
-	  bool stat0 = mvnode_map.get(src_node0, i, sbjnode0, inv0);
-	  SbjNode* sbjnode1;
-	  bool inv1;
-	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
-	  assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-	  SbjNode* sbjnode = NULL;
-	  bool inv = false;
-	  make_xor(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, sbjnode, inv);
-	  mvnode_map.put(node, i, sbjnode, inv);
-	}
-      }
-      break;
-
-    case MvNode::kRand:
-    case MvNode::kRor:
-    case MvNode::kRxor:
-      {
-	assert_not_reached(__FILE__, __LINE__);
-      }
       break;
 
     case MvNode::kEq:
@@ -431,109 +229,6 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
     case MvNode::kPow:
       {
 	assert_not_reached(__FILE__, __LINE__);
-      }
-      break;
-
-    case MvNode::kIte:
-      {
-	const MvInputPin* ipin0 = node->input(0);
-	const MvOutputPin* src_pin0 = ipin0->src_pin();
-	const MvNode* src_node0 = src_pin0->node();
-
-	const MvInputPin* ipin1 = node->input(1);
-	const MvOutputPin* src_pin1 = ipin1->src_pin();
-	const MvNode* src_node1 = src_pin1->node();
-
-	const MvInputPin* ipin2 = node->input(2);
-	const MvOutputPin* src_pin2 = ipin2->src_pin();
-	const MvNode* src_node2 = src_pin2->node();
-
-	ymuint bw = node->output(0)->bit_width();
-	assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-	assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
-	SbjNode* sbjnode0;
-	bool inv0;
-	bool stat0 = mvnode_map.get(src_node0, sbjnode0, inv0);
-	assert_cond( stat0, __FILE__, __LINE__);
-
-	for (ymuint i = 0; i < bw; ++ i) {
-	  SbjNode* sbjnode1;
-	  bool inv1;
-	  bool stat1 = mvnode_map.get(src_node1, i, sbjnode1, inv1);
-	  SbjNode* sbjnode2;
-	  bool inv2;
-	  bool stat2 = mvnode_map.get(src_node2, i, sbjnode2, inv2);
-	  assert_cond( stat1 && stat2 , __FILE__, __LINE__);
-	  SbjNode* and1 = NULL;
-	  bool and1_inv = false;
-	  make_and(sbjgraph, sbjnode0, inv0, sbjnode1, inv1, and1, and1_inv);
-	  SbjNode* and2 = NULL;
-	  bool and2_inv = false;
-	  make_and(sbjgraph, sbjnode0, !inv0, sbjnode2, inv2, and2, and2_inv);
-	  SbjNode* or1 = NULL;
-	  bool or1_inv = false;
-	  make_or(sbjgraph, and1, and1_inv, and2, and2_inv, or1, or1_inv);
-	  mvnode_map.put(node, i, or1, or1_inv);
-	}
-      }
-      break;
-
-    case MvNode::kConcat:
-      {
-	ymuint bw = node->output(0)->bit_width();
-	ymuint ni = node->input_num();
-	ymuint offset = bw;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  const MvInputPin* ipin = node->input(i);
-	  const MvOutputPin* opin = ipin->src_pin();
-	  const MvNode* src_node = opin->node();
-	  ymuint bw1 = opin->bit_width();
-	  offset -= bw1;
-	  for (ymuint j = 0; j < bw1; ++ j) {
-	    ymuint index = offset + j;
-	    SbjNode* sbjnode0;
-	    bool inv0;
-	    bool stat0 = mvnode_map.get(src_node, j, sbjnode0, inv0);
-	    assert_cond( stat0, __FILE__, __LINE__);
-	    mvnode_map.put(node, index, sbjnode0, inv0);
-	  }
-	}
-	assert_cond( offset == 0U, __FILE__, __LINE__);
-      }
-      break;
-
-    case MvNode::kConstBitSelect:
-      {
-	const MvInputPin* ipin = node->input(0);
-	const MvOutputPin* src_pin = ipin->src_pin();
-	const MvNode* src_node = src_pin->node();
-
-	SbjNode* sbjnode0;
-	bool inv0;
-	bool stat0 = mvnode_map.get(src_node, node->bitpos(), sbjnode0, inv0);
-	assert_cond( stat0 , __FILE__, __LINE__);
-	mvnode_map.put(node, sbjnode0, inv0);
-      }
-      break;
-
-    case MvNode::kConstPartSelect:
-      {
-	const MvInputPin* ipin = node->input(0);
-	const MvOutputPin* src_pin = ipin->src_pin();
-	const MvNode* src_node = src_pin->node();
-
-	ymuint bw = node->output(0)->bit_width();
-	ymuint msb = node->msb();
-	ymuint lsb = node->lsb();
-	assert_cond( bw == msb - lsb + 1,
-		     __FILE__, __LINE__);
-	for (ymuint i = 0; i < bw; ++ i) {
-	  SbjNode* sbjnode0;
-	  bool inv0;
-	  bool stat0 = mvnode_map.get(src_node, i + lsb, sbjnode0, inv0);
-	  assert_cond( stat0 , __FILE__, __LINE__);
-	  mvnode_map.put(node, i, sbjnode0, inv0);
-	}
       }
       break;
 

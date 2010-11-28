@@ -14,7 +14,27 @@ noinst_LTLIBRARIES = libym_mvn_conv.la
 
 libym_mvn_conv_la_SOURCES = \
 	MvNodeMap.cc \
-	Mvn2Sbj.cc
+	Mvn2Sbj.cc \
+	ThroughConv.h \
+	ThroughConv.cc \
+	NotConv.h \
+	NotConv.cc \
+	AndConv.h \
+	AndConv.cc \
+	OrConv.h \
+	OrConv.cc \
+	XorConv.h \
+	XorConv.cc \
+	EqConv.h \
+	EqConv.cc \
+	IteConv.h \
+	IteConv.cc \
+	ConcatConv.h \
+	ConcatConv.cc \
+	ConstBitPartSelectConv.h \
+	ConstBitPartSelectConv.cc \
+	ConstPartPartSelectConv.h \
+	ConstPartPartSelectConv.cc
 
 libym_mvn_conv_la_LDFLAGS =
 
