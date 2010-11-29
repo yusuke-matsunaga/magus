@@ -31,6 +31,26 @@ libym_mvn_conv_la_SOURCES = \
 	RorConv.cc \
 	RxorConv.h \
 	RxorConv.cc \
+	AddConv.h \
+	AddConv.cc \
+	SubConv.h \
+	SubConv.cc \
+	MultConv.h \
+	MultConv.cc \
+	DivConv.h \
+	DivConv.cc \
+	ModConv.h \
+	ModConv.cc \
+	PowConv.h \
+	PowConv.cc \
+	SllConv.h \
+	SllConv.cc \
+	SrlConv.h \
+	SrlConv.cc \
+	SlaConv.h \
+	SlaConv.cc \
+	SraConv.h \
+	SraConv.cc \
 	EqConv.h \
 	EqConv.cc \
 	IteConv.h \

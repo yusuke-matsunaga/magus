@@ -24,6 +24,16 @@
 #include "RandConv.h"
 #include "RorConv.h"
 #include "RxorConv.h"
+#include "AddConv.h"
+#include "SubConv.h"
+#include "MultConv.h"
+#include "DivConv.h"
+#include "ModConv.h"
+#include "PowConv.h"
+#include "SllConv.h"
+#include "SrlConv.h"
+#include "SlaConv.h"
+#include "SraConv.h"
 #include "EqConv.h"
 #include "IteConv.h"
 #include "ConcatConv.h"
@@ -93,6 +103,16 @@ Mvn2Sbj::Mvn2Sbj()
   mConvList.push_back(new RandConv);
   mConvList.push_back(new RorConv);
   mConvList.push_back(new RxorConv);
+  mConvList.push_back(new AddConv);
+  mConvList.push_back(new SubConv);
+  mConvList.push_back(new MultConv);
+  mConvList.push_back(new DivConv);
+  mConvList.push_back(new ModConv);
+  mConvList.push_back(new PowConv);
+  mConvList.push_back(new SllConv);
+  mConvList.push_back(new SrlConv);
+  mConvList.push_back(new SlaConv);
+  mConvList.push_back(new SraConv);
   mConvList.push_back(new EqConv);
   mConvList.push_back(new IteConv);
   mConvList.push_back(new ConcatConv);
