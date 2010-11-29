@@ -21,6 +21,9 @@
 #include "AndConv.h"
 #include "OrConv.h"
 #include "XorConv.h"
+#include "RandConv.h"
+#include "RorConv.h"
+#include "RxorConv.h"
 #include "EqConv.h"
 #include "IteConv.h"
 #include "ConcatConv.h"
@@ -44,7 +47,8 @@ enqueue(const MvNode* node0,
     const MvNode* node = dst_pin->node();
     if ( node->type() == MvNode::kDff1 ||
 	 node->type() == MvNode::kDff2 ||
-	 node->type() == MvNode::kConst ) {
+	 node->type() == MvNode::kConst ||
+	 node->type() == MvNode::kOutput ) {
       continue;
     }
     if ( mark[node->id()] ) {
@@ -86,6 +90,9 @@ Mvn2Sbj::Mvn2Sbj()
   mConvList.push_back(new AndConv);
   mConvList.push_back(new OrConv);
   mConvList.push_back(new XorConv);
+  mConvList.push_back(new RandConv);
+  mConvList.push_back(new RorConv);
+  mConvList.push_back(new RxorConv);
   mConvList.push_back(new EqConv);
   mConvList.push_back(new IteConv);
   mConvList.push_back(new ConcatConv);
@@ -205,62 +212,17 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
     queue.pop_front();
 
     // node に対応する SbjNode を作る．
+    bool done = false;
     for (list<MvnConv*>::iterator p = mConvList.begin();
 	 p != mConvList.end(); ++ p) {
       MvnConv& conv = **p;
       if ( conv(node, sbjgraph, mvnode_map) ) {
+	done = true;
 	break;
       }
     }
-    switch ( node->type() ) {
-    case MvNode::kOutput:
-      break;
-
-    case MvNode::kEq:
-    case MvNode::kLt:
-      {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-      break;
-
-    case MvNode::kAdd:
-    case MvNode::kSub:
-    case MvNode::kMult:
-    case MvNode::kDiv:
-    case MvNode::kMod:
-    case MvNode::kPow:
-      {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-      break;
-
-    case MvNode::kBitSelect:
-      {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-      break;
-
-    case MvNode::kPartSelect:
-      {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-      break;
-
-    case MvNode::kCombUdp:
-      {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-      break;
-
-    case MvNode::kSeqUdp:
-      {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-      break;
-
-    default:
+    if ( !done ) {
       assert_not_reached(__FILE__, __LINE__);
-      break;
     }
     enqueue(node, queue, mark);
   }
