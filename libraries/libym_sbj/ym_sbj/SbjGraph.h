@@ -861,30 +861,6 @@ public:
   change_output(SbjNode* node,
 		SbjHandle ihandle);
 
-#if 0
-  /// @brief ANDノードの内容を再設定する．
-  /// @param[in] node 変更対象の論理ノード
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  /// @param[in] inv1 1番めの枝の反転属性
-  /// @param[in] inv2 2番めの枝の反転属性
-  void
-  change_and(SbjNode* node,
-	     SbjNode* inode1,
-	     SbjNode* inode2,
-	     bool inv1,
-	     bool inv2);
-
-  /// @brief XORノードの内容を再設定する．
-  /// @param[in] node 変更対象の論理ノード
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  void
-  change_xor(SbjNode* node,
-	     SbjNode* inode1,
-	     SbjNode* inode2);
-#endif
-
   /// @brief DFFノードの内容を変更する
   /// @param[in] 変更対象のDFFノード
   /// @param[in] ihandle 入力のハンドル
@@ -976,17 +952,6 @@ private:
   _new_xor(const vector<SbjHandle>& ihandle_list,
 	   ymuint start,
 	   ymuint num);
-
-  /// @brief 論理ノードの内容を再設定する．
-  /// @param[in] node 変更対象の論理ノード
-  /// @param[in] fcode 機能コード
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  void
-  change_logic(SbjNode* node,
-	       ymuint fcode,
-	       SbjNode* inode1,
-	       SbjNode* inode2);
 
   // 新しいノードを作成し mNodeList に登録する．
   // 作成されたノードを返す．

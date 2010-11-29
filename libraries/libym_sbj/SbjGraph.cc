@@ -924,61 +924,6 @@ SbjGraph::change_output(SbjNode* node,
   connect(ihandle.node(), node, 0);
 }
 
-// @brief 論理ノードの内容を再設定する．
-// @param[in] node 変更対象の論理ノード
-// @param[in] fcode 機能コード
-// @param[in] inode1 1番めの入力ノード
-// @param[in] inode2 2番めの入力ノード
-void
-SbjGraph::change_logic(SbjNode* node,
-		       ymuint fcode,
-		       SbjNode* inode1,
-		       SbjNode* inode2)
-{
-  assert_cond( node->is_logic(), __FILE__, __LINE__);
-  node->set_logic(fcode);
-  connect(inode1, node, 0);
-  connect(inode2, node, 1);
-}
-
-#if 0
-// @brief ANDノードの内容を再設定する．
-// @param[in] node 変更対象の論理ノード
-// @param[in] inode1 1番めの入力ノード
-// @param[in] inode2 2番めの入力ノード
-// @param[in] inv1 1番めの枝の反転属性
-// @param[in] inv2 2番めの枝の反転属性
-void
-SbjGraph::change_and(SbjNode* node,
-		     SbjNode* inode1,
-		     SbjNode* inode2,
-		     bool inv1,
-		     bool inv2)
-{
-  ymuint fcode = 0U;
-  if ( inv1 ) {
-    fcode |= 1U;
-  }
-  if ( inv2 ) {
-    fcode |= 2U;
-  }
-  change_logic(node, fcode, inode1, inode2);
-}
-
-// @brief XORノードの内容を再設定する．
-// @param[in] node 変更対象の論理ノード
-// @param[in] inode1 1番めの入力ノード
-// @param[in] inode2 2番めの入力ノード
-void
-SbjGraph::change_xor(SbjNode* node,
-		     SbjNode* inode1,
-		     SbjNode* inode2)
-{
-  ymuint fcode = 4U;
-  change_logic(node, fcode, inode1, inode2);
-}
-#endif
-
 // @brief DFFノードの内容を変更する
 // @param[in] 変更対象の出力ノード
 // @param[in] ihandle 入力のハンドル
