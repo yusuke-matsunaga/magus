@@ -25,6 +25,12 @@ libym_mvn_conv_la_SOURCES = \
 	OrConv.cc \
 	XorConv.h \
 	XorConv.cc \
+	RandConv.h \
+	RandConv.cc \
+	RorConv.h \
+	RorConv.cc \
+	RxorConv.h \
+	RxorConv.cc \
 	EqConv.h \
 	EqConv.cc \
 	IteConv.h \
