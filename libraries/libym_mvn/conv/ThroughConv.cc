@@ -32,9 +32,9 @@ ThroughConv::~ThroughConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-ThroughConv::conv(const MvNode* node,
-		  SbjGraph& sbjgraph,
-		  MvNodeMap& nodemap)
+ThroughConv::operator()(const MvNode* node,
+			SbjGraph& sbjgraph,
+			MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kThrough ) {
     const MvInputPin* ipin = node->input(0);

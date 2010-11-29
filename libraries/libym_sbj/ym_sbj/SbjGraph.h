@@ -812,7 +812,7 @@ public:
   /// @return 作成したノードのハンドルを返す．
   /// @note 入力が定数の時も考慮している．
   SbjHandle
-  new_and(const vector<SbjHandle> ihandle_list);
+  new_and(const vector<SbjHandle>& ihandle_list);
 
   /// @brief ORノードを作る．
   /// @param[in] ihandle1 1番めの入力ハンドル
@@ -828,7 +828,7 @@ public:
   /// @return 作成したノードのハンドルを返す．
   /// @note 入力が定数の時も考慮している．
   SbjHandle
-  new_or(const vector<SbjHandle> ihandle_list);
+  new_or(const vector<SbjHandle>& ihandle_list);
 
   /// @brief XORノードを作る．
   /// @param[in] ihandle1 1番めの入力ハンドル
@@ -844,7 +844,7 @@ public:
   /// @return 作成したノードのハンドルを返す．
   /// @note 入力が定数の時も考慮している．
   SbjHandle
-  new_xor(const vector<SbjHandle> ihandle_list);
+  new_xor(const vector<SbjHandle>& ihandle_list);
 
   /// @brief DFFノードを作る．
   /// @param[in] inode 入力のノード
@@ -861,6 +861,7 @@ public:
   change_output(SbjNode* node,
 		SbjHandle ihandle);
 
+#if 0
   /// @brief ANDノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード
   /// @param[in] inode1 1番めの入力ノード
@@ -882,6 +883,7 @@ public:
   change_xor(SbjNode* node,
 	     SbjNode* inode1,
 	     SbjNode* inode2);
+#endif
 
   /// @brief DFFノードの内容を変更する
   /// @param[in] 変更対象のDFFノード
@@ -947,6 +949,33 @@ private:
   new_logic(ymuint fcode,
 	    SbjNode* inode1,
 	    SbjNode* inode2);
+
+  /// @brief new_and の下請け関数
+  /// @param[in] ihandle_list 入力ハンドルのリスト
+  /// @param[in] start 開始位置
+  /// @param[in] num 要素数
+  SbjHandle
+  _new_and(const vector<SbjHandle>& ihandle_list,
+	   ymuint start,
+	   ymuint num);
+
+  /// @brief new_or の下請け関数
+  /// @param[in] ihandle_list 入力ハンドルのリスト
+  /// @param[in] start 開始位置
+  /// @param[in] num 要素数
+  SbjHandle
+  _new_or(const vector<SbjHandle>& ihandle_list,
+	  ymuint start,
+	  ymuint num);
+
+  /// @brief new_xor の下請け関数
+  /// @param[in] ihandle_list 入力ハンドルのリスト
+  /// @param[in] start 開始位置
+  /// @param[in] num 要素数
+  SbjHandle
+  _new_xor(const vector<SbjHandle>& ihandle_list,
+	   ymuint start,
+	   ymuint num);
 
   /// @brief 論理ノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード

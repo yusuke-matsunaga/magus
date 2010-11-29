@@ -41,64 +41,9 @@ public:
   /// @retval false このクラスでは変換処理を行わなかった．
   virtual
   bool
-  conv(const MvNode* node,
-       SbjGraph& sbjgraph,
-       MvNodeMap& nodemap) = 0;
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる便利関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief AND ノードを作る．
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] sbjnode0, sbjnode1 ファンインのノード
-  /// @param[in] inv0, inv1 ファンインの極性
-  /// @param[out] oinv 出力の極性
-  /// @return 生成したノードを返す．
-  /// @note どちらかのファンインが定数の場合でも正しく動く．
-  static
-  SbjNode*
-  make_and(SbjGraph& sbjgraph,
-	   SbjNode* sbjnode0,
-	   SbjNode* sbjnode1,
-	   bool inv0,
-	   bool inv1,
-	   bool& oinv);
-
-  /// @brief OR ノードを作る．
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] sbjnode0, sbjnode1 ファンインのノード
-  /// @param[in] inv0, inv1 ファンインの極性
-  /// @param[out] oinv 出力の極性
-  /// @return 生成したノードを返す．
-  /// @note どちらかのファンインが定数の場合でも正しく動く．
-  static
-  SbjNode*
-  make_or(SbjGraph& sbjgraph,
-	  SbjNode* sbjnode0,
-	  SbjNode* sbjnode1,
-	  bool inv0,
-	  bool inv1,
-	  bool& oinv);
-
-  /// @brief XOR ノードを作る．
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] sbjnode0, sbjnode1 ファンインのノード
-  /// @param[in] inv0, inv1 ファンインの極性
-  /// @param[out] oinv 出力の極性
-  /// @return 生成したノードを返す．
-  /// @note どちらかのファンインが定数の場合でも正しく動く．
-  static
-  SbjNode*
-  make_xor(SbjGraph& sbjgraph,
-	   SbjNode* sbjnode0,
-	   SbjNode* sbjnode1,
-	   bool inv0,
-	   bool inv1,
-	   bool& oinv);
-
+  operator()(const MvNode* node,
+	     SbjGraph& sbjgraph,
+	     MvNodeMap& nodemap) = 0;
 
 };
 

@@ -32,9 +32,9 @@ ConstPartSelectConv::~ConstPartSelectConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-ConstPartSelectConv::conv(const MvNode* node,
-			  SbjGraph& sbjgraph,
-			  MvNodeMap& nodemap)
+ConstPartSelectConv::operator()(const MvNode* node,
+				SbjGraph& sbjgraph,
+				MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kConstPartSelect ) {
     const MvInputPin* ipin = node->input(0);

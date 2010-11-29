@@ -32,9 +32,9 @@ OrConv::~OrConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-OrConv::conv(const MvNode* node,
-	     SbjGraph& sbjgraph,
-	     MvNodeMap& nodemap)
+OrConv::operator()(const MvNode* node,
+		   SbjGraph& sbjgraph,
+		   MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kOr ) {
     const MvInputPin* ipin0 = node->input(0);

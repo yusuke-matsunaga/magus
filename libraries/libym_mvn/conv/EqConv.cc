@@ -32,9 +32,9 @@ EqConv::~EqConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-EqConv::conv(const MvNode* node,
-	     SbjGraph& sbjgraph,
-	     MvNodeMap& nodemap)
+EqConv::operator()(const MvNode* node,
+		   SbjGraph& sbjgraph,
+		   MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kEq ) {
     const MvInputPin* ipin0 = node->input(0);

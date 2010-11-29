@@ -648,6 +648,36 @@ SbjGraph::new_and(SbjHandle ihandle1,
   return SbjHandle(sbjnode, false);
 }
 
+// @brief ANDノードを作る．
+// @param[in] ihandle_list 入力ハンドルのリスト
+// @return 作成したノードのハンドルを返す．
+// @note 入力が定数の時も考慮している．
+SbjHandle
+SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
+{
+  return _new_and(ihandle_list, 0, ihandle_list.size());
+}
+
+// @brief new_and の下請け関数
+// @param[in] ihandle_list 入力ハンドルのリスト
+// @param[in] start 開始位置
+// @param[in] num 要素数
+SbjHandle
+SbjGraph::_new_and(const vector<SbjHandle>& ihandle_list,
+		   ymuint start,
+		   ymuint num)
+{
+  assert_cond( num > 0, __FILE__, __LINE__);
+  if ( num == 1 ) {
+    return ihandle_list[start];
+  }
+
+  ymuint h = num / 2;
+  SbjHandle l = _new_and(ihandle_list, start, h);
+  SbjHandle r = _new_and(ihandle_list, start + h, num - h);
+  return new_and(l, r);
+}
+
 // @brief ORノードを作る．
 // @param[in] ihandle1 1番めの入力ハンドル
 // @param[in] ihandle2 2番めの入力ハンドル
@@ -685,6 +715,36 @@ SbjGraph::new_or(SbjHandle ihandle1,
   return SbjHandle(sbjnode, true);
 }
 
+// @brief ORノードを作る．
+// @param[in] ihandle_list 入力ハンドルのリスト
+// @return 作成したノードのハンドルを返す．
+// @note 入力が定数の時も考慮している．
+SbjHandle
+SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
+{
+  return _new_or(ihandle_list, 0, ihandle_list.size());
+}
+
+// @brief new_or の下請け関数
+// @param[in] ihandle_list 入力ハンドルのリスト
+// @param[in] start 開始位置
+// @param[in] num 要素数
+SbjHandle
+SbjGraph::_new_or(const vector<SbjHandle>& ihandle_list,
+		  ymuint start,
+		  ymuint num)
+{
+  assert_cond( num > 0, __FILE__, __LINE__);
+  if ( num == 1 ) {
+    return ihandle_list[start];
+  }
+
+  ymuint h = num / 2;
+  SbjHandle l = _new_or(ihandle_list, start, h);
+  SbjHandle r = _new_or(ihandle_list, start + h, num - h);
+  return new_or(l, r);
+}
+
 // @brief XORノードを作る．
 // @param[in] ihandle1 1番めの入力ハンドル
 // @param[in] ihandle2 2番めの入力ハンドル
@@ -714,6 +774,36 @@ SbjGraph::new_xor(SbjHandle ihandle1,
   bool inv = ihandle1.inv() ^ ihandle2.inv();
   SbjNode* node = new_logic(4U, ihandle1.node(), ihandle2.node());
   return SbjHandle(node, inv);
+}
+
+// @brief XORノードを作る．
+// @param[in] ihandle_list 入力ハンドルのリスト
+// @return 作成したノードのハンドルを返す．
+// @note 入力が定数の時も考慮している．
+SbjHandle
+SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
+{
+  return _new_xor(ihandle_list, 0, ihandle_list.size());
+}
+
+// @brief new_xor の下請け関数
+// @param[in] ihandle_list 入力ハンドルのリスト
+// @param[in] start 開始位置
+// @param[in] num 要素数
+SbjHandle
+SbjGraph::_new_xor(const vector<SbjHandle>& ihandle_list,
+		   ymuint start,
+		   ymuint num)
+{
+  assert_cond( num > 0, __FILE__, __LINE__);
+  if ( num == 1 ) {
+    return ihandle_list[start];
+  }
+
+  ymuint h = num / 2;
+  SbjHandle l = _new_xor(ihandle_list, start, h);
+  SbjHandle r = _new_xor(ihandle_list, start + h, num - h);
+  return new_xor(l, r);
 }
 
 // DFFノードを作る．
@@ -851,6 +941,7 @@ SbjGraph::change_logic(SbjNode* node,
   connect(inode2, node, 1);
 }
 
+#if 0
 // @brief ANDノードの内容を再設定する．
 // @param[in] node 変更対象の論理ノード
 // @param[in] inode1 1番めの入力ノード
@@ -886,6 +977,7 @@ SbjGraph::change_xor(SbjNode* node,
   ymuint fcode = 4U;
   change_logic(node, fcode, inode1, inode2);
 }
+#endif
 
 // @brief DFFノードの内容を変更する
 // @param[in] 変更対象の出力ノード

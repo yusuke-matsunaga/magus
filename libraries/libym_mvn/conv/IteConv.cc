@@ -32,9 +32,9 @@ IteConv::~IteConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-IteConv::conv(const MvNode* node,
-	      SbjGraph& sbjgraph,
-	      MvNodeMap& nodemap)
+IteConv::operator()(const MvNode* node,
+		    SbjGraph& sbjgraph,
+		    MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kIte ) {
     const MvInputPin* ipin0 = node->input(0);

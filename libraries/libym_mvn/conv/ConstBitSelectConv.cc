@@ -32,9 +32,9 @@ ConstBitSelectConv::~ConstBitSelectConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-ConstBitSelectConv::conv(const MvNode* node,
-			 SbjGraph& sbjgraph,
-			 MvNodeMap& nodemap)
+ConstBitSelectConv::operator()(const MvNode* node,
+			       SbjGraph& sbjgraph,
+			       MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kConstBitSelect ) {
     const MvInputPin* ipin = node->input(0);

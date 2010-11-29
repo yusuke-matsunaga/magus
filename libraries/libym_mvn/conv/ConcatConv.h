@@ -44,9 +44,9 @@ public:
   /// @retval false このクラスでは変換処理を行わなかった．
   virtual
   bool
-  conv(const MvNode* node,
-       SbjGraph& sbjgraph,
-       MvNodeMap& nodemap);
+  operator()(const MvNode* node,
+	     SbjGraph& sbjgraph,
+	     MvNodeMap& nodemap);
 
 };
 

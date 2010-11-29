@@ -32,9 +32,9 @@ NotConv::~NotConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-NotConv::conv(const MvNode* node,
-	      SbjGraph& sbjgraph,
-	      MvNodeMap& nodemap)
+NotConv::operator()(const MvNode* node,
+		    SbjGraph& sbjgraph,
+		    MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kNot ) {
     const MvInputPin* ipin = node->input(0);

@@ -32,9 +32,9 @@ AndConv::~AndConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-AndConv::conv(const MvNode* node,
-	      SbjGraph& sbjgraph,
-	      MvNodeMap& nodemap)
+AndConv::operator()(const MvNode* node,
+		    SbjGraph& sbjgraph,
+		    MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kAnd ) {
     const MvInputPin* ipin0 = node->input(0);

@@ -32,9 +32,9 @@ ConcatConv::~ConcatConv()
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-ConcatConv::conv(const MvNode* node,
-	      SbjGraph& sbjgraph,
-	      MvNodeMap& nodemap)
+ConcatConv::operator()(const MvNode* node,
+		       SbjGraph& sbjgraph,
+		       MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kConcat ) {
     ymuint bw = node->output(0)->bit_width();

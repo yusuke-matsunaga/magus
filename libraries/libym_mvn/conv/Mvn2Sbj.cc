@@ -21,6 +21,7 @@
 #include "AndConv.h"
 #include "OrConv.h"
 #include "XorConv.h"
+#include "EqConv.h"
 #include "IteConv.h"
 #include "ConcatConv.h"
 #include "ConstBitSelectConv.h"
@@ -85,6 +86,7 @@ Mvn2Sbj::Mvn2Sbj()
   mConvList.push_back(new AndConv);
   mConvList.push_back(new OrConv);
   mConvList.push_back(new XorConv);
+  mConvList.push_back(new EqConv);
   mConvList.push_back(new IteConv);
   mConvList.push_back(new ConcatConv);
   mConvList.push_back(new ConstBitSelectConv);
@@ -205,8 +207,8 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
     // node に対応する SbjNode を作る．
     for (list<MvnConv*>::iterator p = mConvList.begin();
 	 p != mConvList.end(); ++ p) {
-      MvnConv* conv = *p;
-      if ( conv->conv(node, sbjgraph, mvnode_map) ) {
+      MvnConv& conv = **p;
+      if ( conv(node, sbjgraph, mvnode_map) ) {
 	break;
       }
     }
