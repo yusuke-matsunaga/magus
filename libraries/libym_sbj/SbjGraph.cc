@@ -655,7 +655,22 @@ SbjGraph::new_and(SbjHandle ihandle1,
 SbjHandle
 SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
 {
-  return _new_and(ihandle_list, 0, ihandle_list.size());
+  ymuint n = ihandle_list.size();
+  vector<SbjHandle> tmp_list;
+  tmp_list.reserve(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    SbjHandle h = ihandle_list[i];
+    if ( h.is_const0() ) {
+      return SbjHandle::make_zero();
+    }
+    else if ( !h.is_const1() ) {
+      tmp_list.push_back(h);
+    }
+  }
+  if ( tmp_list.empty() ) {
+    return SbjHandle::make_one();
+  }
+  return _new_and(tmp_list, 0, tmp_list.size());
 }
 
 // @brief new_and の下請け関数
@@ -722,7 +737,22 @@ SbjGraph::new_or(SbjHandle ihandle1,
 SbjHandle
 SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
 {
-  return _new_or(ihandle_list, 0, ihandle_list.size());
+  ymuint n = ihandle_list.size();
+  vector<SbjHandle> tmp_list;
+  tmp_list.reserve(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    SbjHandle h = ihandle_list[i];
+    if ( h.is_const1() ) {
+      return SbjHandle::make_one();
+    }
+    else if ( !h.is_const0() ) {
+      tmp_list.push_back(h);
+    }
+  }
+  if ( tmp_list.empty() ) {
+    return SbjHandle::make_zero();
+  }
+  return _new_or(tmp_list, 0, tmp_list.size());
 }
 
 // @brief new_or の下請け関数
@@ -783,7 +813,26 @@ SbjGraph::new_xor(SbjHandle ihandle1,
 SbjHandle
 SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
 {
-  return _new_xor(ihandle_list, 0, ihandle_list.size());
+  ymuint n = ihandle_list.size();
+  vector<SbjHandle> tmp_list;
+  tmp_list.reserve(n);
+  bool inv = false;
+  for (ymuint i = 0; i < n; ++ i) {
+    SbjHandle h = ihandle_list[i];
+    if ( h.is_const1() ) {
+      inv = !inv;
+    }
+    else if ( !h.is_const0() ) {
+      tmp_list.push_back(h);
+    }
+  }
+  if ( tmp_list.empty() ) {
+    return SbjHandle::make_zero();
+  }
+  if ( inv ) {
+    tmp_list[0].invert();
+  }
+  return _new_xor(tmp_list, 0, tmp_list.size());
 }
 
 // @brief new_xor の下請け関数
