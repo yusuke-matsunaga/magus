@@ -10,6 +10,7 @@
 #include "IteConv.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvNodeMap.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -51,29 +52,15 @@ IteConv::conv(const MvNode* node,
     ymuint bw = node->output(0)->bit_width();
     assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
     assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
-    SbjNode* sbjnode0;
-    bool inv0;
-    bool stat0 = nodemap.get(src_node0, sbjnode0, inv0);
-    assert_cond( stat0, __FILE__, __LINE__);
+    SbjHandle sbjhandle0 = nodemap.get(src_node0);
 
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjNode* sbjnode1;
-      bool inv1;
-      bool stat1 = nodemap.get(src_node1, i, sbjnode1, inv1);
-      SbjNode* sbjnode2;
-      bool inv2;
-      bool stat2 = nodemap.get(src_node2, i, sbjnode2, inv2);
-      assert_cond( stat1 && stat2 , __FILE__, __LINE__);
-      bool and1_inv = false;
-      SbjNode* and1 = make_and(sbjgraph, sbjnode0, sbjnode1,
-			       inv0, inv1, and1_inv);
-      bool and2_inv = false;
-      SbjNode* and2 = make_and(sbjgraph, sbjnode0, sbjnode2,
-			       !inv0, inv2, and2_inv);
-      bool or1_inv = false;
-      SbjNode* or1 = make_or(sbjgraph, and1, and2,
-			     and1_inv, and2_inv, or1_inv);
-      nodemap.put(node, i, or1, or1_inv);
+      SbjHandle sbjhandle1 = nodemap.get(src_node1, i);
+      SbjHandle sbjhandle2 = nodemap.get(src_node2, i);
+      SbjHandle and1 = sbjgraph.new_and(sbjhandle0, sbjhandle1);
+      SbjHandle and2 = sbjgraph.new_and(~sbjhandle0, sbjhandle2);
+      SbjHandle or1 = sbjgraph.new_or(and1, and2);
+      nodemap.put(node, i, or1);
     }
     return true;
   }

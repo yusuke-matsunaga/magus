@@ -274,13 +274,11 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       const MvNode* src_node = opin->node();
       ymuint bw = ipin->bit_width();
       for (ymuint j = 0; j < bw; ++ j) {
-	SbjNode* sbjhandle;
-	bool stat = mvnode_map.get(node, j, sbjhandle);
-	SbjNode* isbjhandle;
-	bool stat1 = mvnode_map.get(src_node, j, isbjhandle);
-	assert_cond( stat && stat1 , __FILE__, __LINE__);
+	SbjHandle sbjhandle = mvnode_map.get(node, j);
+	SbjHandle isbjhandle = mvnode_map.get(src_node, j);
 	assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
-	sbjgraph.set_dff_data(sbjhandle.node(), isbjhandle);
+	SbjNode* sbjnode = sbjhandle.node();
+	sbjgraph.set_dff_data(sbjnode, isbjhandle);
       }
 
       const MvInputPin* ipin1 = node->input(1);
@@ -288,16 +286,12 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       assert_cond( opin1 != NULL, __FILE__, __LINE__);
       assert_cond( opin1->bit_width() == 1, __FILE__, __LINE__);
       const MvNode* src_node1 = opin1->node();
-      SbjNode* isbjnode1;
-      bool iinv1;
-      bool stat1 = mvnode_map.get(src_node1, isbjnode1, iinv1);
-      assert_cond( stat1 , __FILE__, __LINE__);
+      SbjHandle isbjhandle1 = mvnode_map.get(src_node1);
       for (ymuint j = 0; j < bw; ++ j) {
-	SbjNode* sbjnode;
-	bool inv;
-	bool stat = mvnode_map.get(node, j, sbjnode, inv);
-	assert_cond( stat, __FILE__, __LINE__);
-	sbjgraph.set_dff_clock(sbjnode, isbjnode1, iinv1);
+	SbjHandle sbjhandle = mvnode_map.get(node, j);
+	assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
+	SbjNode* sbjnode = sbjhandle.node();
+	sbjgraph.set_dff_clock(sbjnode, isbjhandle1);
       }
 
       const MvInputPin* ipin2 = node->input(2);
@@ -305,16 +299,12 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       if ( opin2 ) {
 	assert_cond( opin2->bit_width() == 1, __FILE__, __LINE__);
 	const MvNode* src_node2 = opin2->node();
-	SbjNode* isbjnode2;
-	bool iinv2;
-	bool stat2 = mvnode_map.get(src_node2, isbjnode2, iinv2);
-	assert_cond( stat2 , __FILE__, __LINE__);
+	SbjHandle isbjhandle2 = mvnode_map.get(src_node2);
 	for (ymuint j = 0; j < bw; ++ j) {
-	  SbjNode* sbjnode;
-	  bool inv;
-	  bool stat = mvnode_map.get(node, j, sbjnode, inv);
-	  assert_cond( stat, __FILE__, __LINE__);
-	  sbjgraph.set_dff_rst(sbjnode, isbjnode2, iinv2);
+	  SbjHandle sbjhandle = mvnode_map.get(node, j);
+	  assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
+	  SbjNode* sbjnode = sbjhandle.node();
+	  sbjgraph.set_dff_rst(sbjnode, isbjhandle2);
 	}
       }
 
@@ -323,16 +313,12 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       if ( opin3 ) {
 	assert_cond( opin3->bit_width() == 1, __FILE__, __LINE__);
 	const MvNode* src_node3 = opin3->node();
-	SbjNode* isbjnode3;
-	bool iinv3;
-	bool stat3 = mvnode_map.get(src_node3, isbjnode3, iinv3);
-	assert_cond( stat3 , __FILE__, __LINE__);
+	SbjHandle isbjhandle3 = mvnode_map.get(src_node3);
 	for (ymuint j = 0; j < bw; ++ j) {
-	  SbjNode* sbjnode;
-	  bool inv;
-	  bool stat = mvnode_map.get(node, j, sbjnode, inv);
-	  assert_cond( stat, __FILE__, __LINE__);
-	  sbjgraph.set_dff_set(sbjnode, isbjnode3, iinv3);
+	  SbjHandle sbjhandle = mvnode_map.get(node, j);
+	  assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
+	  SbjNode* sbjnode = sbjhandle.node();;
+	  sbjgraph.set_dff_set(sbjnode, isbjhandle3);
 	}
       }
     }
@@ -349,12 +335,9 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
 
     ymuint bw = ipin->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
-      SbjNode* sbjnode;
-      bool inv;
-      bool stat = mvnode_map.get(src_node, j, sbjnode, inv);
-      assert_cond( stat, __FILE__, __LINE__);
-      SbjNode* osbjnode = sbjgraph.new_output(sbjnode, inv);
-      mvnode_map.put(node, j, osbjnode, false);
+      SbjHandle sbjhandle = mvnode_map.get(src_node, j);
+      SbjNode* osbjnode = sbjgraph.new_output(sbjhandle);
+      mvnode_map.put(node, j, SbjHandle(osbjnode, false));
     }
   }
 
@@ -372,31 +355,25 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       const MvNode* node = port_ref->node();
       if ( port_ref->is_simple() ) {
 	for (ymuint k = 0; k < nb1; ++ k) {
-	  SbjNode* sbjnode;
-	  bool inv;
-	  bool stat = mvnode_map.get(node, k, sbjnode, inv);
-	  assert_cond( stat , __FILE__, __LINE__);
-	  assert_cond( inv == false, __FILE__, __LINE__);
+	  SbjHandle sbjhandle = mvnode_map.get(node, k);
+	  assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
+	  SbjNode* sbjnode = sbjhandle.node();
 	  tmp.push_back(sbjnode);
 	}
       }
       else if ( port_ref->has_bitselect() ) {
-	SbjNode* sbjnode;
-	bool inv;
-	bool stat = mvnode_map.get(node, port_ref->bitpos(), sbjnode, inv);
-	assert_cond( stat , __FILE__, __LINE__);
-	assert_cond( inv == false, __FILE__, __LINE__);
+	SbjHandle sbjhandle = mvnode_map.get(node, port_ref->bitpos());
+	assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
+	SbjNode* sbjnode = sbjhandle.node();
 	tmp.push_back(sbjnode);
       }
       else if ( port_ref->has_partselect() ) {
 	ymuint msb = port_ref->msb();
 	ymuint lsb = port_ref->lsb();
 	for (ymuint k = lsb; k <= msb; ++ k) {
-	  SbjNode* sbjnode;
-	  bool inv;
-	  bool stat = mvnode_map.get(node, k, sbjnode, inv);
-	  assert_cond( stat , __FILE__, __LINE__);
-	  assert_cond( inv == false, __FILE__, __LINE__);
+	  SbjHandle sbjhandle = mvnode_map.get(node, k);
+	  assert_cond( sbjhandle.inv() == false, __FILE__, __LINE__);
+	  SbjNode* sbjnode = sbjhandle.node();
 	  tmp.push_back(sbjnode);
 	}
       }

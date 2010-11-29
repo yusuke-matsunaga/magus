@@ -190,24 +190,25 @@ SbjGraph::copy(const SbjGraph& src,
 
     const SbjNode* src_inode0 = src_onode->fanin_data();
     SbjNode* dst_inode0 = nodemap[src_inode0->id()];
-    set_dff_data(dst_onode, dst_inode0, src_onode->fanin_data_inv());
+    set_dff_data(dst_onode, SbjHandle(dst_inode0, src_onode->fanin_data_inv()));
 
     const SbjNode* src_inode1 = src_onode->fanin_clock();
     if ( src_inode1 ) {
       SbjNode* dst_inode1 = nodemap[src_inode1->id()];
-      set_dff_clock(dst_onode, dst_inode1, src_onode->fanin_clock_inv());
+      set_dff_clock(dst_onode,
+		    SbjHandle(dst_inode1, src_onode->fanin_clock_inv()));
     }
 
     const SbjNode* src_inode2 = src_onode->fanin_set();
     if ( src_inode2 ) {
       SbjNode* dst_inode2 = nodemap[src_inode2->id()];
-      set_dff_set(dst_onode, dst_inode2, src_onode->fanin_set_inv());
+      set_dff_set(dst_onode, SbjHandle(dst_inode2, src_onode->fanin_set_inv()));
     }
 
     const SbjNode* src_inode3 = src_onode->fanin_rst();
     if ( src_inode3 ) {
       SbjNode* dst_inode3 = nodemap[src_inode3->id()];
-      set_dff_rst(dst_onode, dst_inode3, src_onode->fanin_rst_inv());
+      set_dff_rst(dst_onode, SbjHandle(dst_inode3, src_onode->fanin_rst_inv()));
     }
   }
 
@@ -888,58 +889,50 @@ SbjGraph::change_xor(SbjNode* node,
 
 // @brief DFFノードの内容を変更する
 // @param[in] 変更対象の出力ノード
-// @param[in] inode 入力のノード
-// @param[in] inv 極性
+// @param[in] ihandle 入力のハンドル
 void
 SbjGraph::set_dff_data(SbjNode* node,
-		       SbjNode* inode,
-		       bool inv)
+		       SbjHandle ihandle)
 {
   assert_cond( node->is_dff(), __FILE__, __LINE__);
-  node->set_dff(inv);
-  connect(inode, node, 0);
+  node->set_dff(ihandle.inv());
+  connect(ihandle.node(), node, 0);
 }
 
 // @brief DFFノードのクロック入力を設定する．
 // @param[in] 変更対象のDFFノード
-// @param[in] inode 入力のノード
-// @param[in] inv 極性
+// @param[in] ihandle 入力のハンドル
 void
 SbjGraph::set_dff_clock(SbjNode* node,
-			SbjNode* inode,
-			bool inv)
+			SbjHandle ihandle)
 {
   assert_cond( node->is_dff(), __FILE__, __LINE__);
-  node->set_dff_clock(inv);
-  connect(inode, node, 1);
+  node->set_dff_clock(ihandle.inv());
+  connect(ihandle.node(), node, 1);
 }
 
 // @brief DFFノードのセット入力を設定する．
 // @param[in] 変更対象のDFFノード
-// @param[in] inode 入力のノード
-// @param[in] inv 極性
+// @param[in] ihandle 入力のハンドル
 void
 SbjGraph::set_dff_set(SbjNode* node,
-		      SbjNode* inode,
-		      bool inv)
+		      SbjHandle ihandle)
 {
   assert_cond( node->is_dff(), __FILE__, __LINE__);
-  node->set_dff_set(inv);
-  connect(inode, node, 2);
+  node->set_dff_set(ihandle.inv());
+  connect(ihandle.node(), node, 2);
 }
 
 // @brief DFFノードのリセット入力を設定する．
 // @param[in] 変更対象のDFFノード
-// @param[in] inode 入力のノード
-// @param[in] inv 極性
+// @param[in] ihandle 入力のハンドル
 void
 SbjGraph::set_dff_rst(SbjNode* node,
-		      SbjNode* inode,
-		      bool inv)
+		      SbjHandle ihandle)
 {
   assert_cond( node->is_dff(), __FILE__, __LINE__);
-  node->set_dff_rst(inv);
-  connect(inode, node, 3);
+  node->set_dff_rst(ihandle.inv());
+  connect(ihandle.node(), node, 3);
 }
 
 // from を to の pos 番目のファンインとする．

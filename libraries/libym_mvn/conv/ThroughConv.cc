@@ -10,6 +10,7 @@
 #include "ThroughConv.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvNodeMap.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -41,11 +42,8 @@ ThroughConv::conv(const MvNode* node,
     const MvNode* src_node = opin->node();
     ymuint bw = opin->bit_width();
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjNode* sbjnode;
-      bool inv;
-      bool stat = nodemap.get(src_node, i, sbjnode, inv);
-      assert_cond( stat , __FILE__, __LINE__);
-      nodemap.put(node, i, sbjnode, inv);
+      SbjHandle sbjhandle = nodemap.get(src_node, i);
+      nodemap.put(node, i, sbjhandle);
     }
     return true;
   }

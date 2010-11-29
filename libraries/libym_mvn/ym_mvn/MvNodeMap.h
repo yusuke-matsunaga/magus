@@ -51,21 +51,17 @@ public:
 
   /// @brief 探す．(1ビット版)
   /// @param[in] mvnode MvNode
-  /// @param[out] sbjhandle SbjHandle
-  /// @return 見つかったら true を返す．
-  bool
-  get(const MvNode* mvnode,
-      SbjHandle& sbjhandle) const;
+  /// @return 対応するハンドルを返す．
+  SbjHandle
+  get(const MvNode* mvnode) const;
 
   /// @brief 探す．(ベクタ版)
   /// @param[in] mvnode MvNode
   /// @param[in] index ビット位置
-  /// @param[out] sbjhandle SbjHandle
-  /// @return 見つかったら true を返す．
-  bool
+  /// @return 対応するハンドルを返す．
+  SbjHandle
   get(const MvNode* mvnode,
-      ymuint index,
-      SbjHandle& sbjhandle) const;
+      ymuint index) const;
 
 
 private:

@@ -10,6 +10,7 @@
 #include "ConstPartSelectConv.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvNodeMap.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -45,11 +46,8 @@ ConstPartSelectConv::conv(const MvNode* node,
     ymuint lsb = node->lsb();
     assert_cond( bw == msb - lsb + 1, __FILE__, __LINE__);
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjNode* sbjnode0;
-      bool inv0;
-      bool stat0 = mvnode_map.get(src_node, i + lsb, sbjnode0, inv0);
-      assert_cond( stat0 , __FILE__, __LINE__);
-      mvnode_map.put(node, i, sbjnode0, inv0);
+      SbjHandle sbjhandle0 = nodemap.get(src_node, i + lsb);
+      nodemap.put(node, i, sbjhandle0);
     }
     return true;
   }

@@ -31,10 +31,10 @@ libym_mvn_conv_la_SOURCES = \
 	IteConv.cc \
 	ConcatConv.h \
 	ConcatConv.cc \
-	ConstBitPartSelectConv.h \
-	ConstBitPartSelectConv.cc \
-	ConstPartPartSelectConv.h \
-	ConstPartPartSelectConv.cc
+	ConstBitSelectConv.h \
+	ConstBitSelectConv.cc \
+	ConstPartSelectConv.h \
+	ConstPartSelectConv.cc
 
 libym_mvn_conv_la_LDFLAGS =
 

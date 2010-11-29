@@ -10,6 +10,7 @@
 #include "ConcatConv.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvNodeMap.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -47,11 +48,8 @@ ConcatConv::conv(const MvNode* node,
       offset -= bw1;
       for (ymuint j = 0; j < bw1; ++ j) {
 	ymuint index = offset + j;
-	SbjNode* sbjnode0;
-	bool inv0;
-	bool stat0 = nodemap.get(src_node, j, sbjnode0, inv0);
-	assert_cond( stat0, __FILE__, __LINE__);
-	nodemap.put(node, index, sbjnode0, inv0);
+	SbjHandle sbjhandle0 = nodemap.get(src_node, j);
+	nodemap.put(node, index, sbjhandle0);
       }
     }
     assert_cond( offset == 0U, __FILE__, __LINE__);

@@ -10,6 +10,7 @@
 #include "EqConv.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvNodeMap.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -46,24 +47,15 @@ EqConv::conv(const MvNode* node,
 
     ymuint bw = src_pin0->bit_width();
     assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-    vector<SbjNode*> input(bw);
-    vector<bool> input_inv(bw);
+    vector<SbjHandle> input_array(bw);
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjNode* sbjnode0;
-      bool inv0;
-      bool stat0 = nodemap.get(src_node0, i, sbjnode0, inv0);
-      SbjNode* sbjnode1;
-      bool inv1;
-      bool stat1 = nodemap.get(src_node1, i, sbjnode1, inv1);
-      assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-      bool inv = false;
-      input[i] = make_xor(sbjgraph, sbjnode0, sbjnode1, inv0, inv1, inv);
-      input_inv[i] = !inv;
+      SbjHandle sbjhandle0 = nodemap.get(src_node0, i);
+      SbjHandle sbjhandle1 = nodemap.get(src_node1, i);
+      input_array[i] = ~sbjgraph.new_xor(sbjhandle0, sbjhandle1);
     }
 
-    bool inv = false;
-    SbjNode* sbjnode = make_and(sbjgraph, input, input_inv, inv);
-    nodemap.put(node, 0, sbjnode, inv);
+    SbjHandle sbjhandle = sbjgraph.new_and(input_array);
+    nodemap.put(node, 0, sbjhandle);
 
     return true;
   }

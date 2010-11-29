@@ -10,6 +10,7 @@
 #include "OrConv.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvNodeMap.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -48,17 +49,10 @@ OrConv::conv(const MvNode* node,
     assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
     assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjNode* sbjnode0;
-      bool inv0;
-      bool stat0 = nodemap.get(src_node0, i, sbjnode0, inv0);
-      SbjNode* sbjnode1;
-      bool inv1;
-      bool stat1 = nodemap.get(src_node1, i, sbjnode1, inv1);
-      assert_cond( stat0 && stat1 , __FILE__, __LINE__);
-      bool inv = false;
-      SbjNode* sbjnode = make_or(sbjgraph, sbjnode0, sbjnode1,
-				 inv0, inv1, inv);
-      nodemap.put(node, i, sbjnode, inv);
+      SbjHandle sbjhandle0 = nodemap.get(src_node0, i);
+      SbjHandle sbjhandle1 = nodemap.get(src_node1, i);
+      SbjHandle sbjhandle = sbjgraph.new_or(sbjhandle0, sbjhandle1);
+      nodemap.put(node, i, sbjhandle);
     }
     return true;
   }

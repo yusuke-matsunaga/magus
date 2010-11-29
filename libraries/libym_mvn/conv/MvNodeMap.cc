@@ -56,34 +56,27 @@ MvNodeMap::put(const MvNode* mvnode,
 
 // @brief 探す．(1ビット版)
 // @param[in] mvnode MvNode
-// @param[out] sbjhandle SbjHandle
-// @return 見つかったら true を返す．
-bool
-MvNodeMap::get(const MvNode* mvnode,
-	       SbjHandle& sbjhandle) const
+SbjHandle
+MvNodeMap::get(const MvNode* mvnode) const
 {
-  return get(mvnode, 0, sbjhandle);
+  return get(mvnode, 0);
 }
 
 // @brief 探す．(ベクタ版)
 // @param[in] mvnode MvNode
 // @param[in] index ビット位置
-// @param[out] sbjhandle SbjHandle
-// @return 見つかったら true を返す．
-bool
+SbjHandle
 MvNodeMap::get(const MvNode* mvnode,
-	       ymuint index,
-	       SbjHandle& sbjhandle) const
+	       ymuint index) const
 {
   assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
   const vector<SbjHandle>& array = mArray[mvnode->id()];
   if ( array.empty() ) {
-    return false;
+    return SbjHandle(NULL, false);
   }
   assert_cond( array.size() == mvnode->output(0)->bit_width(),
 	       __FILE__, __LINE__);
-  sbjhandle = array[index];
-  return true;
+  return array[index];
 }
 
 
@@ -121,18 +114,14 @@ dump_mvnode_map(ostream& s,
     const MvOutputPin* opin = node->output(0);
     ymuint bw = opin->bit_width();
     if ( bw == 1 ) {
-      SbjHandle sbjhandle;
-      bool stat = mvnode_map.get(node, sbjhandle);
-      assert_cond( stat , __FILE__, __LINE__);
+      SbjHandle sbjhandle = mvnode_map.get(node);
       s << "// node" << node->id() << " : ";
       dump_sbjhandle(s, sbjhandle);
       s << endl;
     }
     else {
       for (ymuint i = 0; i < bw; ++ i) {
-	SbjHandle sbjhandle;
-	bool stat = mvnode_map.get(node, i, sbjhandle);
-	assert_cond( stat , __FILE__, __LINE__);
+	SbjHandle sbjhandle = mvnode_map.get(node, i);
 	s << "// node" << node->id() << " [" << i << "] : ";
 	dump_sbjhandle(s, sbjhandle);
 	s << endl;

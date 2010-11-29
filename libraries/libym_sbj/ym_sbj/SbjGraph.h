@@ -861,17 +861,6 @@ public:
   change_output(SbjNode* node,
 		SbjHandle ihandle);
 
-  /// @brief 論理ノードの内容を再設定する．
-  /// @param[in] node 変更対象の論理ノード
-  /// @param[in] fcode 機能コード
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  void
-  change_logic(SbjNode* node,
-	       ymuint fcode,
-	       SbjNode* inode1,
-	       SbjNode* inode2);
-
   /// @brief ANDノードの内容を再設定する．
   /// @param[in] node 変更対象の論理ノード
   /// @param[in] inode1 1番めの入力ノード
@@ -896,39 +885,31 @@ public:
 
   /// @brief DFFノードの内容を変更する
   /// @param[in] 変更対象のDFFノード
-  /// @param[in] inode 入力のノード
-  /// @param[in] inv 極性
+  /// @param[in] ihandle 入力のハンドル
   void
   set_dff_data(SbjNode* node,
-	       SbjNode* inode,
-	       bool inv);
+	       SbjHandle ihandle);
 
   /// @brief DFFノードのクロック入力を設定する．
   /// @param[in] 変更対象のDFFノード
-  /// @param[in] inode 入力のノード
-  /// @param[in] inv 極性
+  /// @param[in] ihandle 入力のハンドル
   void
   set_dff_clock(SbjNode* node,
-		SbjNode* inode,
-		bool inv);
+		SbjHandle ihandle);
 
   /// @brief DFFノードのセット入力を設定する．
   /// @param[in] 変更対象のDFFノード
-  /// @param[in] inode 入力のノード
-  /// @param[in] inv 極性
+  /// @param[in] ihandle 入力のハンドル
   void
   set_dff_set(SbjNode* node,
-	      SbjNode* inode,
-	      bool inv);
+	      SbjHandle ihandle);
 
   /// @brief DFFノードのリセット入力を設定する．
   /// @param[in] 変更対象のDFFノード
-  /// @param[in] inode 入力のノード
-  /// @param[in] inv 極性
+  /// @param[in] ihandle 入力のハンドル
   void
   set_dff_rst(SbjNode* node,
-	      SbjNode* inode,
-	      bool inv);
+	      SbjHandle ihandle);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -966,6 +947,17 @@ private:
   new_logic(ymuint fcode,
 	    SbjNode* inode1,
 	    SbjNode* inode2);
+
+  /// @brief 論理ノードの内容を再設定する．
+  /// @param[in] node 変更対象の論理ノード
+  /// @param[in] fcode 機能コード
+  /// @param[in] inode1 1番めの入力ノード
+  /// @param[in] inode2 2番めの入力ノード
+  void
+  change_logic(SbjNode* node,
+	       ymuint fcode,
+	       SbjNode* inode1,
+	       SbjNode* inode2);
 
   // 新しいノードを作成し mNodeList に登録する．
   // 作成されたノードを返す．

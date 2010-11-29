@@ -10,6 +10,7 @@
 #include "ConstBitSelectConv.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvNodeMap.h"
+#include "ym_sbj/SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -40,11 +41,8 @@ ConstBitSelectConv::conv(const MvNode* node,
     const MvOutputPin* src_pin = ipin->src_pin();
     const MvNode* src_node = src_pin->node();
 
-    SbjNode* sbjnode0;
-    bool inv0;
-    bool stat0 = nodemap.get(src_node, node->bitpos(), sbjnode0, inv0);
-    assert_cond( stat0 , __FILE__, __LINE__);
-    nodemap.put(node, sbjnode0, inv0);
+    SbjHandle sbjhandle0 = nodemap.get(src_node, node->bitpos());
+    nodemap.put(node, sbjhandle0);
     return true;
   }
   return false;
