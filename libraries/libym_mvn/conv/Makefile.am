@@ -53,6 +53,8 @@ libym_mvn_conv_la_SOURCES = \
 	SraConv.cc \
 	EqConv.h \
 	EqConv.cc \
+	LtConv.h \
+	LtConv.cc \
 	IteConv.h \
 	IteConv.cc \
 	ConcatConv.h \

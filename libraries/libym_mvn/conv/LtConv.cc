@@ -47,15 +47,16 @@ LtConv::operator()(const MvNode* node,
 
     ymuint bw = src_pin0->bit_width();
     assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-    vector<SbjHandle> input_array(bw);
+    SbjHandle lt(SbjHandle::make_zero());
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjHandle sbjhandle0 = nodemap.get(src_node0, i);
-      SbjHandle sbjhandle1 = nodemap.get(src_node1, i);
-      input_array[i] = ~sbjgraph.new_xor(sbjhandle0, sbjhandle1);
+      SbjHandle a = nodemap.get(src_node0, i);
+      SbjHandle b = nodemap.get(src_node1, i);
+      SbjHandle p = ~sbjgraph.new_xor(a, b);
+      SbjHandle g = sbjgraph.new_and(~a, b);
+      SbjHandle tmp = sbjgraph.new_and(lt, p);
+      lt = sbjgraph.new_or(g, tmp);
     }
-
-    SbjHandle sbjhandle = sbjgraph.new_and(input_array);
-    nodemap.put(node, 0, sbjhandle);
+    nodemap.put(node, 0, lt);
 
     return true;
   }
