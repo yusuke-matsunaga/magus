@@ -24,6 +24,7 @@
 #include "RandConv.h"
 #include "RorConv.h"
 #include "RxorConv.h"
+#include "CmplConv.h"
 #include "AddConv.h"
 #include "SubConv.h"
 #include "MultConv.h"
@@ -104,6 +105,7 @@ Mvn2Sbj::Mvn2Sbj()
   mConvList.push_back(new RandConv);
   mConvList.push_back(new RorConv);
   mConvList.push_back(new RxorConv);
+  mConvList.push_back(new CmplConv);
   mConvList.push_back(new AddConv);
   mConvList.push_back(new SubConv);
   mConvList.push_back(new MultConv);
