@@ -1531,7 +1531,7 @@ inline
 SbjHandle
 SbjHandle::make_zero()
 {
-  return SbjHandle(0UL);
+  return SbjHandle(static_cast<ympuint>(0UL));
 }
 
 // @brief 定数1を返す．
@@ -1539,7 +1539,7 @@ inline
 SbjHandle
 SbjHandle::make_one()
 {
-  return SbjHandle(1UL);
+  return SbjHandle(static_cast<ympuint>(1UL));
 }
 
 // @brief ノードを返す．
