@@ -16,6 +16,8 @@ libym_mvn_verilog_la_SOURCES = \
 	CfgMgr.h \
 	CfgMgr.cc \
 	CfgNode.h \
+	DeclHash.h \
+	DeclHash.cc \
 	DeclMap.h \
 	DeclMap.cc \
 	DfgBlock.h \
