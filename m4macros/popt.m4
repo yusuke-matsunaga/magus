@@ -19,14 +19,9 @@ AC_DEFUN([YM_CHECK_POPT],[dnl
 AC_MSG_NOTICE([checking if popt is available])
 #
 arch=`uname -p`
-arch=`uname -p`
+ym_tmp_lib_list="lib"
 if test "X$arch" = "Xx86_64"; then
   ym_tmp_lib_list="$ym_tmp_lib_list lib64"
-fi
-if test "X$arch" = "Xx86_64"; then
-  ym_tmp_lib="lib64"
-else
-  ym_tmp_lib="lib"
 fi
 # --with-popt-prefix
 AC_ARG_WITH([popt-prefix],
@@ -77,10 +72,10 @@ fi
 AC_DEFUN([YM_CHECK_POPTLIB],[
   tmp_libdir=$1
   libs_old=$LIBS
-  LIBS="$libs_old -L$popt_libdir"
+  LIBS="$libs_old -L$tmp_libdir"
   AC_CHECK_LIB([popt], [poptGetContext],
                [popt_found=1
-                POPT_LIBS="-L$popt_libdir -lpopt"
+                POPT_LIBS="-L$tmp_libdir -lpopt"
 	      	AC_DEFINE([HAVE_POPT], 1, [Define if you have popt package])
 	        AC_SUBST([POPT_INCLUDES])
 	        AC_SUBST([POPT_LIBS])

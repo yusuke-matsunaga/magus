@@ -67,7 +67,7 @@ check(size_t ni,
 
     test.check_walsh_01(func);
     if ( test.nerr() ) break;
-  
+
     test.check_walsh_012(func);
     if ( test.nerr() ) break;
 
@@ -90,7 +90,7 @@ check(size_t ni,
     }
     else {
       size_t ibits0 = (1 << ni) - 1;
-    
+
       // 全ての 0 のパタン
       test.check_walsh_w0(func, 0);
       // 全ての 1 のパタン
@@ -104,7 +104,7 @@ check(size_t ni,
 	  test.check_walsh_w0(func, ibits ^ ibits0);
 	}
       }
-      
+
       for (size_t i = 0; i < nc; ++ i) {
 	size_t ibits = random_num() & ((1 << ni) - 1);
 	test.check_walsh_w0(func, ibits);
@@ -120,7 +120,7 @@ check(size_t ni,
       }
       else {
 	size_t ibits0 = (1 << ni) - 1;
-    
+
 	// 全ての 0 のパタン
 	test.check_walsh_w1(func, i, 0);
 	// 全ての 1 のパタン
@@ -134,7 +134,7 @@ check(size_t ni,
 	    test.check_walsh_w1(func, i, ibits ^ ibits0);
 	  }
 	}
-      
+
 	for (size_t j = 0; j < nc; ++ j) {
 	  size_t ibits = random_num() & ((1 << ni) - 1);
 	  test.check_walsh_w1(func, i, ibits);
@@ -252,13 +252,13 @@ main(int argc,
 
     { "gen", 'g', POPT_ARG_NONE, NULL, 1,
       "generate all NPN equivalent functions mode", NULL },
-    
+
     { "rgen", 'r', POPT_ARG_NONE, NULL, 2,
       "randomly generate NPN equivalent functions mode", NULL },
 
     { "ni", 'i', POPT_ARG_INT, &ni, 0,
       "number of inputs", NULL },
-    
+
     { "rnum", 'n', POPT_ARG_INT, &rnum, 0,
       "number of functions to be generated", NULL },
 
@@ -267,7 +267,7 @@ main(int argc,
 
     { "bnum", 'b', POPT_ARG_INT, &bnum, 0,
       "number of bit-patterns to be tested", NULL },
-    
+
     POPT_AUTOHELP
 
     { NULL, '\0', 0, NULL, 0, NULL, NULL }
@@ -330,12 +330,6 @@ main(int argc,
     }
     if ( strcmp(argv[base], "--verbose") == 0 ) {
       verbose = true;
-    }
-    else if ( strcmp(argv[base], "--dump") == 0 ) {
-      dump_flag = true;
-    }
-    else if ( strcmp(argv[base], "--signature") == 0 ) {
-      flow_end = 0;
     }
   }
   if ( argc - base <= 1 ) {
