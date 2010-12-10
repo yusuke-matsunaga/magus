@@ -29,7 +29,7 @@ if test "X$arch" = "Xx86_64"; then
   ym_tmp_lib_list="$ym_tmp_lib_list lib64"
 fi
 ym_tmp_path=""
-for ym_tmp_dir in "$prefix $ac_default_prefix /usr /usr/local"; do
+for ym_tmp_dir in $prefix $ac_default_prefix /usr /usr/local; do
   for ym_tmp_lib in $ym_tmp_lib_list; do
     ym_tmp_path="$ym_tmp_path $ym_tmp_dir/$ym_tmp_lib"
   done
@@ -38,7 +38,7 @@ YM_CHECK_TCLLIB(tcl, $ym_tmp_path,
                 [tcl8.5 tcl8.4 tcl8.3 tcl8.2 tcl8.1 tcl8.0 tcl8.0jp tcl],
                 TCL_LIB_SPEC, TCL_MAJOR_VERSION, TCL_MINOR_VERSION)
 if test $ym_tmp_found = no; then
-#  AC_MSG_ERROR([Tcl is not found])
+  AC_MSG_ERROR([Tcl is not found. Use --with-tcl to specify the directory containing TclConfig.sh])
   ym_have_tcl=no
 else
   ym_tmp_path="$ym_tmp_path $ym_tmp_dir"
@@ -51,7 +51,7 @@ else
   ym_tcl_ldadd=$ym_tmp_ldadd
   YM_CHECK_TCLINC(tcl, $TCL_INCLUDE_SPEC, $TCL_PREFIX, $TCL_VERSION)
   if test $ym_tmp_found = no; then
-#  AC_MSG_ERROR([Tcl is not found])
+    AC_MSG_ERROR([tcl.h is not found. Use --with-tcl-include to specify the directory containing tcl.h])
     ym_have_tcl=no
   else
     ym_have_tcl=yes
@@ -252,9 +252,7 @@ AC_DEFUN([YM_CHECK_TCLREADLINE],[
 AC_MSG_CHECKING([for tclreadline])
 arch=`uname -p`
 if test "X$arch" = "Xx86_64"; then
-  ym_tmp_lib="lib64"
-else
-  ym_tmp_lib="lib"
+  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
 fi
 ym_tmp_found=no
 ym_tmp_builtin_tclreadline=no
@@ -278,12 +276,14 @@ fi],[
 #fi
 if test $ym_tmp_found = no; then
   for dir in $prefix /usr /usr/local /opt; do
-    ym_tmp_dir=$dir/$ym_tmp_lib
-    if test -r $ym_tmp_dir/libtclreadline.la; then
-      ym_tmp_found=yes
-      YM_LIBS_LIBTCLREADLINE=$ym_tmp_dir/libtclreadline.la
-      break
-    fi
+    for lib in $ym_tmp_lib_list; do
+      ym_tmp_dir=$dir/$lib
+      if test -r $ym_tmp_dir/libtclreadline.la; then
+        ym_tmp_found=yes
+        YM_LIBS_LIBTCLREADLINE=$ym_tmp_dir/libtclreadline.la
+        break
+      fi
+    done
   done
 fi
 if test $ym_tmp_found = no && test -r  ../tclreadline/libtclreadline.la; then

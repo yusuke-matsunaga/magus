@@ -19,6 +19,10 @@ AC_DEFUN([YM_CHECK_POPT],[dnl
 AC_MSG_NOTICE([checking if popt is available])
 #
 arch=`uname -p`
+arch=`uname -p`
+if test "X$arch" = "Xx86_64"; then
+  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
+fi
 if test "X$arch" = "Xx86_64"; then
   ym_tmp_lib="lib64"
 else
@@ -37,31 +41,52 @@ AC_ARG_WITH([popt-libdir],
 [popt_libdir=""])
 
 popt_found=0
-libs_old=$LIBS
+popt_prefix=""
 for p in $popt_list; do
   popt_include=$p/include
   if test -f $popt_include/popt.h; then
     POPT_INCLUDES="-I$popt_include";
-    if test "x$popt_libdir" = "x"; then
-      popt_libdir=$p/$ym_tmp_lib
-    fi
-    LIBS="$libs_old -L$popt_libdir"
-    AC_CHECK_LIB([popt], [poptGetContext],
-		 [popt_found=1
-                  POPT_LIBS="-L$popt_libdir -lpopt"
-	      	  AC_DEFINE([HAVE_POPT], 1, [Define if you have popt package])
-	          AC_SUBST([POPT_INCLUDES])
-	          AC_SUBST([POPT_LIBS])
-	          break
-		 ], [],
-		 [-lc])
+    popt_found=1
+    popt_prefix=$p
+    break
   fi
 done
-LIBS=$libs_old
+
+if test $popt_found = 1; then
+  popt_found=0
+  if test "x$popt_libdir" = "x"; then
+    for ym_tmp_lib in $ym_tmp_lib_list; do
+      YM_CHECK_POPTLIB($popt_prefix/$ym_tmp_lib)
+    done
+  else
+    YM_CHECK_POPTLIB($popt_libdir)
+  fi
+fi
+
 if test $popt_found = 1; then
    AC_MSG_RESULT([popt is found at $POPT_LIBS])
 else
    AC_MSG_RESULT([popt is not found])
 fi
+])dnl
+
+# ================================================================
+# YM_CHECK_POPTLIB(libpath)
+# ================================================================
+# Checks for popt libraries
+AC_DEFUN([YM_CHECK_POPTLIB],[
+  tmp_libdir=$1
+  libs_old=$LIBS
+  LIBS="$libs_old -L$popt_libdir"
+  AC_CHECK_LIB([popt], [poptGetContext],
+               [popt_found=1
+                POPT_LIBS="-L$popt_libdir -lpopt"
+	      	AC_DEFINE([HAVE_POPT], 1, [Define if you have popt package])
+	        AC_SUBST([POPT_INCLUDES])
+	        AC_SUBST([POPT_LIBS])
+	        break
+	       ], [],
+	       [-lc])
+  LIBS=$libs_old
 ])dnl
 # end of popt.m4
