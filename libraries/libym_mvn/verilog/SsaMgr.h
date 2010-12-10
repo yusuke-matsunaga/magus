@@ -11,12 +11,10 @@
 
 #include "ym_mvn/mvn_nsdef.h"
 #include "ym_verilog/vl/VlFwd.h"
-#include "ym_utils/Alloc.h"
+#include "DeclHash.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
-
-class DfgBlock;
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class SsaMgr SsaMgr.h "SsaMgr.h"
@@ -27,7 +25,8 @@ class SsaMgr
 public:
 
   /// @brief コンストラクタ
-  SsaMgr();
+  /// @param[in] decl_hash VlDecl 用のハッシュ表
+  SsaMgr(DeclHash& decl_hash);
 
   /// @brief デストラクタ
   ~SsaMgr();
@@ -35,56 +34,38 @@ public:
 
 public:
 
-  /// @brief 内容を空にする
+  /// @brief 登録する(単一要素の場合)
+  /// @param[in] decl 宣言要素
+  /// @param[in] node 対応するノード
   void
-  clear();
+  add(const VlDecl* decl,
+      MvNode* node);
 
-  /// @brief 新しい ID を割り当てる．
-  ymuint
-  new_id(const DfgBlock* block,
-	 const VlDecl* decl);
+  /// @brief 登録する(配列の場合)
+  /// @param[in] decl 宣言要素
+  /// @param[in] offset
+  /// @param[in] node 対応するノード
+  void
+  add(const VlDecl* decl,
+      ymuint offset,
+      MvNode* node);
 
-  /// @brief ID 番号を取り出す．
-  ymuint
-  last_id(const DfgBlock* block,
-	  const VlDecl* decl);
+  /// @brief 対応するノードを取り出す．
+  /// @param[in] decl 宣言要素
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型の場合には NULL を返す．
+  MvNode*
+  get(const VlDecl* decl) const;
 
-  /// @brief ID番号をキーにして対応する要素を返す．
-  /// @param[in] id インスタンス番号
-  const VlDecl*
-  decl(ymuint id);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct Cell
-  {
-    /// @brief コンストラクタ
-    /// @param[in] block ブロック
-    /// @param[in] decl 宣言要素
-    Cell(const DfgBlock* block,
-	 const VlDecl* decl) :
-      mBlock(block),
-      mDecl(decl)
-    {
-    }
-
-    // ブロック
-    const DfgBlock* mBlock;
-
-    // 宣言要素
-    const VlDecl* mDecl;
-
-    // インスタンス番号
-    ymuint32 mId;
-
-    // ハッシュ表の中の次の要素を指すリンク
-    Cell* mLink;
-
-  };
+  /// @brief 対応するノードを取り出す(配列型)．
+  /// @param[in] decl 宣言要素
+  /// @param[in] offset オフセット
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型でない場合，
+  /// オフセットが範囲外の場合には NULL を返す．
+  MvNode*
+  get(const VlDecl* decl,
+      ymuint offset) const;
 
 
 private:
@@ -92,52 +73,20 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief テーブルの領域を確保する．
-  /// @param[in] size 必要なサイズ
-  void
-  alloc_table(ymuint size);
-
-  /// @brief セルを探す．
-  /// @param[in] block 親のブロック
-  /// @param[in] decl 宣言要素
-  Cell*
-  find_cell(const DfgBlock* block,
-	    const VlDecl* decl);
-
-  /// @brief ハッシュ値を計算する．
-  /// @param[in] block 親のブロック
-  /// @param[in] decl 宣言要素
-  static
-  ymuint
-  hash_func(const DfgBlock* block,
-	    const VlDecl* decl);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // Cell の確保用アロケータ
-  UnitAlloc mAlloc;
+  // VlDecl 用のハッシュ表
+  DeclHash& mDeclHash;
 
-  // インスタンス番号をキーにして (block, decl) を格納する配列
-  vector<pair<const DfgBlock*, const VlDecl*> > mDeclArray;
-
-  // ハッシュ表のサイズ
-  ymuint32 mSize;
-
-  // ハッシュ表
-  Cell** mTable;
-
-  // ハッシュ表を拡大するしきい値
-  ymuint32 mLimit;
-
-  // 要素数
-  ymuint32 mNum;
+  // VlDecl の ID をキーに MvNode の配列を格納する配列
+  vector<vector<MvNode*> > mNodeArray;
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // LIBYM_MVN_VERILOG_SSAMGR_H

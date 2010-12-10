@@ -90,6 +90,7 @@ ReaderImpl::gen_network(MvMgr& mgr,
 
   mDeclMap.clear();
   mIODeclMap.clear();
+  mProcessList.clear();
   mNodeMap.clear();
   mDriverList.clear();
 
@@ -112,6 +113,13 @@ ReaderImpl::gen_network(MvMgr& mgr,
     else {
       cerr << "more than one top modules" << endl;
     }
+  }
+
+  // プロセス内部の生成
+  for (list<const VlStmt*>::iterator p = mProcessList.begin();
+       p != mProcessList.end(); ++ p) {
+    const VlStmt* stmt = *p;
+    assert_cond( stmt->type() == kVpiEventControl, __FILE__, __LINE__);
   }
 
   // 結線を行う．
@@ -337,21 +345,6 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     return NULL;
   }
 
-  // プロセスの生成
-  {
-    vector<const VlProcess*> process_list;
-    if ( mVlMgr.find_process_list(vl_module, process_list) ) {
-      for (vector<const VlProcess*>::const_iterator p = process_list.begin();
-	   p != process_list.end(); ++ p) {
-	const VlProcess* process = *p;
-	bool stat1 = gen_process(module, process);
-	if ( !stat1 ) {
-	  return NULL;
-	}
-      }
-    }
-  }
-
   // 入出力ノードの対応表を作る．
   ymuint i1 = 0;
   ymuint i2 = 0;
@@ -490,7 +483,7 @@ ReaderImpl::gen_decl(MvModule* module,
     }
   }
 
-  // reg の生成
+  // REG の生成
   {
     vector<const VlDecl*> reg_list;
     if ( mVlMgr.find_decl_list(vl_scope, vpiReg, reg_list) ) {
@@ -501,14 +494,15 @@ ReaderImpl::gen_decl(MvModule* module,
 	ymuint bw = vl_decl->bit_size();
 	MvNode* node = mMvMgr->new_through(module, bw);
 	reg_node(vl_decl, node);
+	(void) mDeclHash.get_id(vl_decl);
       }
     }
   }
 
-  // reg 配列の生成
+  // REG配列の生成
   {
     vector<const VlDecl*> regarray_list;
-    if ( mVlMgr.find_decl_list(vl_scope, vpiNetArray, regarray_list) ) {
+    if ( mVlMgr.find_decl_list(vl_scope, vpiRegArray, regarray_list) ) {
       for (vector<const VlDecl*>::iterator p = regarray_list.begin();
 	   p != regarray_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
@@ -522,6 +516,7 @@ ReaderImpl::gen_decl(MvModule* module,
 	  ymuint bw = vl_decl->bit_size();
 	  MvNode* node = mMvMgr->new_through(module, bw);
 	  reg_node(vl_decl, i, node);
+	  (void) mDeclHash.get_id(vl_decl);
 	}
       }
     }
@@ -621,6 +616,21 @@ ReaderImpl::gen_item(MvModule* module,
 	const VlExpr* rhs = vl_contassign->rhs();
 	MvNode* node = gen_expr1(module, rhs);
 	connect_lhs(module, lhs, node);
+      }
+    }
+  }
+
+  // プロセスの生成
+  {
+    vector<const VlProcess*> process_list;
+    if ( mVlMgr.find_process_list(vl_scope, process_list) ) {
+      for (vector<const VlProcess*>::const_iterator p = process_list.begin();
+	   p != process_list.end(); ++ p) {
+	const VlProcess* process = *p;
+	bool stat1 = gen_process(module, process);
+	if ( !stat1 ) {
+	  return NULL;
+	}
       }
     }
   }
@@ -852,18 +862,12 @@ ReaderImpl::gen_process(MvModule* module,
     }
   }
 
-  const VlStmt* body = stmt->body_stmt();
-  if ( has_edge_event ) {
-    if ( has_normal_event ) {
-      cerr << "edge-type events and normal events are mutual exclusive." << endl;
-      return false;
-    }
-    // エッジトリガータイプの記憶素子を作る．
+  if ( has_edge_event && has_normal_event ) {
+    cerr << "edge-type events and normal events are mutual exclusive." << endl;
+    return false;
   }
-  else {
-    // 組み合わせ回路かレベルセンシティブタイプの記憶素子を作る．
-
-  }
+  // 今はリストに登録しておくだけ．
+  mProcessList.push_back(stmt);
 
   return true;
 }
