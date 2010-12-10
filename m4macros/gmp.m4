@@ -21,7 +21,7 @@ AC_MSG_NOTICE([checking if gmp is available])
 ym_tmp_lib_list="lib"
 arch=`uname -p`
 if test "X$arch" = "Xx86_64"; then
-  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
+  ym_tmp_lib_list="lib64 $ym_tmp_lib_list"
 fi
 # --with-gmp-prefix
 AC_ARG_WITH([gmp-prefix],
