@@ -155,7 +155,7 @@ EiFactory::new_IfStmt(const VlNamedObj* parent,
   }
   return stmt1;
 }
-  
+
 // @brief case 文を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -167,16 +167,16 @@ EiFactory::new_CaseStmt(const VlNamedObj* parent,
 			const PtStmt* pt_stmt,
 			ElbExpr* expr)
 {
-  ymuint32 caseitem_num = pt_stmt->caseitem_num();
-  
+  ymuint caseitem_num = pt_stmt->caseitem_num();
+
   void* q = mAlloc.get_memory(sizeof(EiCaseItem) * caseitem_num);
   EiCaseItem* array = new (q) EiCaseItem[caseitem_num];
-  
+
   void* p = mAlloc.get_memory(sizeof(EiCaseStmt));
   EiCaseStmt* stmt1 = new (p) EiCaseStmt(parent, process, pt_stmt,
 					 expr,
 					 caseitem_num, array);
-  
+
   return stmt1;
 }
 
@@ -206,14 +206,14 @@ EiLoopStmt::EiLoopStmt(const VlNamedObj* parent,
 EiLoopStmt::~EiLoopStmt()
 {
 }
-  
+
 // @brief 条件式を返す．
 const VlExpr*
 EiLoopStmt::expr() const
 {
   return mCondition;
 }
-  
+
 // @brief 本体のステートメントを返す．
 const VlStmt*
 EiLoopStmt::body_stmt() const
@@ -353,7 +353,7 @@ EiWaitStmt::type() const
 {
   return kVpiWait;
 }
-  
+
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -387,7 +387,7 @@ EiForStmt::EiForStmt(const VlNamedObj* parent,
   mInitStmt(init_stmt),
   mIncStmt(inc_stmt)
 {
-} 
+}
 
 // @brief デストラクタ
 EiForStmt::~EiForStmt()
@@ -400,14 +400,14 @@ EiForStmt::type() const
 {
   return kVpiFor;
 }
-  
+
 // 初期化文を返す．
 const VlStmt*
 EiForStmt::init_stmt() const
 {
   return mInitStmt;
 }
-  
+
 // 繰り返し文を返す．
 const VlStmt*
 EiForStmt::inc_stmt() const
@@ -466,14 +466,14 @@ EiForeverStmt::type() const
 {
   return kVpiForever;
 }
-  
+
 // @brief 本体のステートメントを返す．
 const VlStmt*
 EiForeverStmt::body_stmt() const
 {
   return mBodyStmt;
 }
-  
+
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiForeverStmt::func_exec(bool constant_function) const
@@ -520,21 +520,21 @@ EiIfStmt::type() const
 {
   return kVpiIf;
 }
-  
+
 // @brief 条件式を返す．
 const VlExpr*
 EiIfStmt::expr() const
 {
   return mCondition;
 }
-  
+
 // @brief 本体のステートメントを返す．
 const VlStmt*
 EiIfStmt::body_stmt() const
 {
   return mBodyStmt;
 }
-  
+
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiIfStmt::func_exec(bool constant_function) const
@@ -585,14 +585,14 @@ EiIfElseStmt::type() const
 {
   return kVpiIfElse;
 }
-  
+
 // @brief else ステートメントを返す．
 const VlStmt*
 EiIfElseStmt::else_stmt() const
 {
   return mElseStmt;
 }
-  
+
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiIfElseStmt::func_exec(bool constant_function) const
@@ -638,7 +638,7 @@ EiCaseItem::file_region() const
 }
 
 // @brief 条件式のリストの要素数を返す．
-ymuint32
+ymuint
 EiCaseItem::expr_num() const
 {
   return mExprNum;
@@ -647,11 +647,11 @@ EiCaseItem::expr_num() const
 // @brief 条件式を返す．
 // @param[in] pos 位置番号
 const VlExpr*
-EiCaseItem::expr(ymuint32 pos) const
+EiCaseItem::expr(ymuint pos) const
 {
   return mExprList[pos];
 }
-  
+
 // @brief 本体のステートメントを返す．
 const VlStmt*
 EiCaseItem::body_stmt() const
@@ -675,7 +675,7 @@ EiCaseStmt::EiCaseStmt(const VlNamedObj* parent,
 		       ElbProcess* process,
 		       const PtStmt* pt_stmt,
 		       ElbExpr* expr,
-		       ymuint32 caseitem_num,
+		       ymuint caseitem_num,
 		       EiCaseItem* caseitem_array) :
   EiStmtBase(parent, process, pt_stmt),
   mCondition(expr),
@@ -709,7 +709,7 @@ EiCaseStmt::case_type() const
   assert_not_reached(__FILE__, __LINE__);
   return kVpiCaseExact;
 }
-  
+
 // @brief 条件式を返す．
 const VlExpr*
 EiCaseStmt::expr() const
@@ -718,7 +718,7 @@ EiCaseStmt::expr() const
 }
 
 // @brief case item のリストの要素数を返す．
-ymuint32
+ymuint
 EiCaseStmt::case_item_num() const
 {
   return mCaseItemNum;
@@ -727,7 +727,7 @@ EiCaseStmt::case_item_num() const
 // @brief case item を返す．
 // @param[in] pos 位置番号
 const VlCaseItem*
-EiCaseStmt::case_item(ymuint32 pos) const
+EiCaseStmt::case_item(ymuint pos) const
 {
   return &mCaseItemList[pos];
 }
@@ -737,7 +737,7 @@ EiCaseStmt::case_item(ymuint32 pos) const
 // @param[in] expr_array ラベルのリスト用配列
 // @param[in] stmt 本体のステートメント
 void
-EiCaseStmt::set_caseitem(ymuint32 pos,
+EiCaseStmt::set_caseitem(ymuint pos,
 			 const PtCaseItem* pt_caseitem,
 			 ElbExpr** expr_array,
 			 ElbStmt* stmt)
@@ -756,10 +756,10 @@ EiCaseStmt::func_exec(bool constant_function) const
   BitVector val;
   BitVector tmp;
   mCondition->eval_bitvector(val);
-  for (ymuint32 i = 0; i < mCaseItemNum; ++ i) {
+  for (ymuint i = 0; i < mCaseItemNum; ++ i) {
     EiCaseItem& ci = mCaseItemList[i];
     bool found = false;
-    for (ymuint32 j = 0; j < ci.mExprNum; ++ j) {
+    for (ymuint j = 0; j < ci.mExprNum; ++ j) {
       ci.mExprList[j]->eval_bitvector(tmp);
       switch ( pt_stmt()->type() ) {
       case kPtCaseStmt:
@@ -767,19 +767,19 @@ EiCaseStmt::func_exec(bool constant_function) const
 	  found = true;
 	}
 	break;
-	
+
       case kPtCaseXStmt:
 	if ( eq_with_x(val, tmp) ) {
 	  found = true;
 	}
 	break;
-	
+
       case kPtCaseZStmt:
 	if ( eq_with_xz(val, tmp) ) {
 	  found = true;
 	}
 	break;
-	
+
       default:
 	assert_not_reached(__FILE__, __LINE__);
 	break;

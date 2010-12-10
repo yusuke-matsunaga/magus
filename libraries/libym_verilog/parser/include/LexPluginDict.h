@@ -65,7 +65,7 @@ private:
 
   /// @brief ハッシュ表を確保する．
   void
-  new_table(ymuint32 size);
+  new_table(ymuint size);
 
 
 private:
@@ -78,7 +78,7 @@ private:
 
   // ハッシュのためのマスク
   ymuint32 mHashMask;
-  
+
   // ハッシュ表
   LexPlugin** mHashTable;
 

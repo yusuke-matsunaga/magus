@@ -120,7 +120,7 @@ ElbParameter::is_multi_array() const
 
 // @brief 配列型オブジェクトの場合の次元数の取得
 // @note このクラスでは 0 を返す．
-ymuint32
+ymuint
 ElbParameter::dimension() const
 {
   return 0;
@@ -130,7 +130,7 @@ ElbParameter::dimension() const
 // @param[in] pos 位置 ( 0 <= pos < dimension() )
 // @note このクラスでは NULL を返す．
 const VlRange*
-ElbParameter::range(ymuint32 pos) const
+ElbParameter::range(ymuint pos) const
 {
   return NULL;
 }

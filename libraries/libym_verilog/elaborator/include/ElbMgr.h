@@ -352,7 +352,7 @@ public:
   allocator();
 
   /// @brief このオブジェクトが確保したメモリの総量を返す．
-  size_t
+  ymuint
   allocated_size() const;
 
 

@@ -245,7 +245,7 @@ EiDeclHeadPt::is_signed() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclHeadPt::bit_size() const
 {
   switch ( mPtHead->type() ) {
@@ -508,7 +508,7 @@ EiDeclHeadPtV::right_range_const() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclHeadPtV::bit_size() const
 {
   return mRange.size();
@@ -624,7 +624,7 @@ EiDeclHeadPt2::is_signed() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclHeadPt2::bit_size() const
 {
   switch ( mAuxType ) {
@@ -757,7 +757,7 @@ EiDeclHeadPt2V::right_range() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclHeadPt2V::bit_size() const
 {
   return mRange.size();
@@ -819,7 +819,7 @@ EiDeclHeadPt3::is_signed() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclHeadPt3::bit_size() const
 {
   switch ( data_type() ) {
@@ -936,7 +936,7 @@ EiDeclHeadPt3V::right_range() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiDeclHeadPt3V::bit_size() const
 {
   return mRange.size();

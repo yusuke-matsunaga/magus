@@ -50,7 +50,7 @@ public:
   /// @param[in] decl 対応する宣言要素
   virtual
   void
-  init_iodecl(ymuint32 pos,
+  init_iodecl(ymuint pos,
   	      ElbIOHead* head,
 	      const PtIOItem* pt_item,
 	      ElbDecl* decl) = 0;
@@ -64,7 +64,7 @@ public:
   /// @param[in] pos 位置番号 (0 <= pos < io_num())
   virtual
   ElbIODecl*
-  _io(ymuint32 pos) const = 0;
+  _io(ymuint pos) const = 0;
 
   /// @brief 本体の ElbStmt を得る．
   virtual

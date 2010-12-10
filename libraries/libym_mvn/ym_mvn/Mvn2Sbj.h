@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_MVN
 
+class MvnConv;
+
 //////////////////////////////////////////////////////////////////////
 /// @class Mvn2Sbj Mvn2Sbj.h "Mvn2Sbj.h"
 /// @brief Mvn を SbjGraph に変換するクラス
@@ -43,6 +45,15 @@ public:
   operator()(const MvMgr& mvmgr,
 	     SbjGraph& sbjgraph,
 	     MvNodeMap& mvnode_map);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // MvNode の変換関数のリスト
+  list<MvnConv*> mConvList;
 
 };
 

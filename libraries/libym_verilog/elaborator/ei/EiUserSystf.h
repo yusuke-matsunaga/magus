@@ -61,17 +61,17 @@ public:
 
   /// @brief compile 時のコールバック関数
   virtual
-  ymuint32
+  ymuint
   on_compile();
 
   /// @brief 実行時のコールバック関数
   virtual
-  ymuint32
+  ymuint
   on_call();
 
   /// @brief SizedFunc の場合にサイズを返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
 };
@@ -123,17 +123,17 @@ public:
 
   /// @brief compile 時のコールバック関数
   virtual
-  ymuint32
+  ymuint
   on_compile();
 
   /// @brief 実行時のコールバック関数
   virtual
-  ymuint32
+  ymuint
   on_call();
 
   /// @brief SizedFunc の場合にサイズを返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
 };

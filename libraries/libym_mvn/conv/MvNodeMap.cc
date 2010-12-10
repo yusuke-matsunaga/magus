@@ -29,84 +29,74 @@ MvNodeMap::~MvNodeMap()
 
 // @brief 登録する．(1ビット版)
 // @param[in] mvnode MvNode
-// @param[in] sbjnode SbjNode
-// @param[in] inv 反転属性
+// @param[in] sbjhandle SbjHandle
 void
 MvNodeMap::put(const MvNode* mvnode,
-	       SbjNode* sbjnode,
-	       bool inv)
+	       SbjHandle sbjhandle)
 {
-  put(mvnode, 0, sbjnode, inv);
+  put(mvnode, 0, sbjhandle);
 }
 
 // @brief 登録する．(ベクタ版)
 // @param[in] mvnode MvNode
 // @param[in] index ビット位置
-// @param[in] sbjnode SbjNode
-// @param[in] inv 反転属性
+// @param[in] sbjhandle SbjHandle
 void
 MvNodeMap::put(const MvNode* mvnode,
 	       ymuint index,
-	       SbjNode* sbjnode,
-	       bool inv)
+	       SbjHandle sbjhandle)
 {
   assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
-  vector<ympuint>& array = mArray[mvnode->id()];
+  vector<SbjHandle>& array = mArray[mvnode->id()];
   if ( array.size() != mvnode->output(0)->bit_width() ) {
     array.resize(mvnode->output(0)->bit_width());
   }
-  array[index] = reinterpret_cast<ympuint>(sbjnode) | (inv & 1U);
+  array[index] = sbjhandle;
 }
 
 // @brief 探す．(1ビット版)
-bool
-MvNodeMap::get(const MvNode* mvnode,
-	       SbjNode*& sbjnode,
-	       bool& inv) const
+// @param[in] mvnode MvNode
+SbjHandle
+MvNodeMap::get(const MvNode* mvnode) const
 {
-  return get(mvnode, 0, sbjnode, inv);
+  return get(mvnode, 0);
 }
 
 // @brief 探す．(ベクタ版)
-bool
+// @param[in] mvnode MvNode
+// @param[in] index ビット位置
+SbjHandle
 MvNodeMap::get(const MvNode* mvnode,
-	       ymuint index,
-	       SbjNode*& sbjnode,
-	       bool& inv) const
+	       ymuint index) const
 {
   assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
-  const vector<ympuint>& array = mArray[mvnode->id()];
+  const vector<SbjHandle>& array = mArray[mvnode->id()];
   if ( array.empty() ) {
-    return false;
+    return SbjHandle(NULL, false);
   }
   assert_cond( array.size() == mvnode->output(0)->bit_width(),
 	       __FILE__, __LINE__);
-  ympuint tmp = array[index];
-  sbjnode = reinterpret_cast<SbjNode*>(tmp & ~1UL);
-  inv = static_cast<bool>(tmp & 1U);
-  return true;
+  return array[index];
 }
 
 
 BEGIN_NONAMESPACE
+
 void
-dump_sbjnode(ostream& s,
-	     SbjNode* sbjnode,
-	     bool inv)
+dump_sbjhandle(ostream& s,
+	       SbjHandle h)
 {
-  if ( sbjnode ) {
-    if ( inv ) {
-      s << "~";
-    }
-    s << sbjnode->id_str();
+  if ( h.is_const0() ) {
+    s << "0";
+  }
+  else if ( h.is_const1() ) {
+    s << "1";
   }
   else {
-    if ( inv ) {
-      s << "1";
+    if ( h.inv() ) {
+      s << "~";
     }
-    else {
-      s << "0";
-    }
+    s << h.node()->id_str();
   }
 }
 
@@ -124,22 +114,16 @@ dump_mvnode_map(ostream& s,
     const MvOutputPin* opin = node->output(0);
     ymuint bw = opin->bit_width();
     if ( bw == 1 ) {
-      SbjNode* sbjnode;
-      bool inv;
-      bool stat = mvnode_map.get(node, sbjnode, inv);
-      assert_cond( stat , __FILE__, __LINE__);
+      SbjHandle sbjhandle = mvnode_map.get(node);
       s << "// node" << node->id() << " : ";
-      dump_sbjnode(s, sbjnode, inv);
+      dump_sbjhandle(s, sbjhandle);
       s << endl;
     }
     else {
       for (ymuint i = 0; i < bw; ++ i) {
-	SbjNode* sbjnode;
-	bool inv;
-	bool stat = mvnode_map.get(node, i, sbjnode, inv);
-	assert_cond( stat , __FILE__, __LINE__);
+	SbjHandle sbjhandle = mvnode_map.get(node, i);
 	s << "// node" << node->id() << " [" << i << "] : ";
-	dump_sbjnode(s, sbjnode, inv);
+	dump_sbjhandle(s, sbjhandle);
 	s << endl;
       }
     }

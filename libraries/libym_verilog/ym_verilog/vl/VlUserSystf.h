@@ -40,7 +40,7 @@ public:
   virtual
   string
   name() const = 0;
-  
+
   /// @brief system task の時 true を返す．
   virtual
   bool
@@ -55,22 +55,22 @@ public:
   virtual
   tVpiFuncType
   function_type() const = 0;
-  
+
   /// @brief compile 時のコールバック関数
   virtual
-  ymuint32
+  ymuint
   on_compile() = 0;
 
   /// @brief 実行時のコールバック関数
   virtual
-  ymuint32
+  ymuint
   on_call() = 0;
 
   /// @brief SizedFunc の場合にサイズを返す．
   virtual
-  ymuint32
+  ymuint
   size() const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

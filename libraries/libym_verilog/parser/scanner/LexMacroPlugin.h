@@ -61,7 +61,7 @@ public:
   virtual
   bool
   parse();
-  
+
 };
 
 
@@ -93,7 +93,7 @@ public:
   virtual
   bool
   parse();
-  
+
 };
 
 
@@ -106,7 +106,7 @@ class LpMacro :
   public LexPlugin
 {
   friend class LpDefine;
-  
+
 public:
 
   /// @brief コンストラクタ
@@ -115,7 +115,7 @@ public:
   /// @param[in] num_param パラメータ数
   LpMacro(RawLex& lex,
 	  const char* name,
-	  ymuint32 num_param);
+	  ymuint num_param);
 
   /// @brief デストラクタ
   virtual

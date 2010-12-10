@@ -28,7 +28,7 @@ class SptIOHead :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptIOHead(const FileRegion& file_region,
 	    tPtIOType type,
@@ -88,17 +88,17 @@ public:
   virtual
   const PtExpr*
   right_range() const;
-  
+
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   item_num() const;
-  
+
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < item_num() )
   virtual
   const PtIOItem*
-  item(ymuint32 pos) const;
+  item(ymuint pos) const;
 
 
 private:
@@ -120,10 +120,10 @@ private:
 
   // ファイル位置
   FileRegion mFileRegion;
-  
+
   // IO の種類
   tPtIOType mType;
-  
+
   // 補助的な型
   tVpiAuxType mAuxType;
 
@@ -158,7 +158,7 @@ class SptIOItem :
   friend class SptIOHead;
 
 private:
-  
+
   /// コンストラクタ
   SptIOItem(const FileRegion& file_region,
 	    const char* name,
@@ -167,7 +167,7 @@ private:
   /// デストラクタ
   virtual
   ~SptIOItem();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// 初期値の取得
   virtual
   const PtExpr*
@@ -203,7 +203,7 @@ private:
 
   // 初期値
   PtExpr* mInitValue;
-  
+
 };
 
 
@@ -232,7 +232,7 @@ private:
   /// デストラクタ
   virtual
   ~SptDeclHead();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -253,7 +253,7 @@ public:
   virtual
   bool
   is_signed() const;
-  
+
   /// 範囲のMSBの取得
   virtual
   const PtExpr*
@@ -292,14 +292,14 @@ public:
   /// @brief 要素数の取得
   /// @return 要素数
   virtual
-  ymuint32
+  ymuint
   item_num() const;
 
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < item_num() )
   virtual
   const PtDeclItem*
-  item(ymuint32 pos) const;
+  item(ymuint pos) const;
 
 
 private:
@@ -324,7 +324,7 @@ private:
 
   // クラスの型
   tPtDeclType mType;
-  
+
   // 符号の有無
   bool mSigned;
 
@@ -351,7 +351,7 @@ private:
 
   // 要素の配列
   PtDeclItemArray mItemArray;
-  
+
 };
 
 
@@ -365,17 +365,17 @@ class SptDeclItem :
   friend class SptDeclHead;
 
 private:
-  
+
   /// コンストラクタ
   SptDeclItem(const FileRegion& file_region,
 	      const char* name,
 	      PtRangeArray range_array,
 	      PtExpr* init_value);
-  
+
   /// デストラクタ
   virtual
   ~SptDeclItem();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -394,14 +394,14 @@ public:
 
   /// dimension list のサイズの取得
   virtual
-  ymuint32
+  ymuint
   dimension_list_size() const;
 
   /// 範囲の取得
   virtual
   const PtRange*
-  range(ymuint32 pos) const;
-  
+  range(ymuint pos) const;
+
   /// 初期値の取得
   virtual
   const PtExpr*
@@ -418,13 +418,13 @@ private:
 
   // 名前
   const char* mName;
-  
+
   // 範囲の配列
   PtRangeArray mRangeArray;
 
   // 初期値
   PtExpr* mInitValue;
-  
+
 };
 
 
@@ -445,7 +445,7 @@ public:
   /// @brief デストラクタ
   virtual
   ~SptRange();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////

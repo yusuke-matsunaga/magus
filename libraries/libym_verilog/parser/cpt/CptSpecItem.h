@@ -25,12 +25,12 @@ class CptSpecItem :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptSpecItem(const FileRegion& file_region,
 	      tVpiSpecItemType id,
 	      PtExprArray terminal_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptSpecItem();
@@ -59,15 +59,15 @@ public:
 
   /// @brief ターミナルリストの要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
-    
+
   /// @brief ターミナルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtExpr*
-  terminal(ymuint32 pos) const;
-  
+  terminal(ymuint pos) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -95,17 +95,17 @@ class CptSpecPath :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptSpecPath(const FileRegion& file_region,
 	      tVpiSpecPathType id,
 	      PtExpr* expr,
 	      PtPathDecl* path_decl);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptSpecPath();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ class CptPathDecl :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptPathDecl(const FileRegion& file_region,
 	      int edge,
@@ -179,7 +179,7 @@ protected:
 	      int output_pol,
 	      PtExpr* expr,
 	      PtPathDelay* path_delay);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptPathDecl();
@@ -204,21 +204,21 @@ public:
   /// @brief 入力リストの要素数の取得
   /// @return 入力リストの要素数
   virtual
-  ymuint32
+  ymuint
   input_num() const;
-  
+
   /// @brief 入力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
   const PtExpr*
-  input(ymuint32 pos) const;
-  
+  input(ymuint pos) const;
+
   /// @brief 入力の極性を取り出す．
   /// @note 0の場合もありうる．
   virtual
   int
   input_pol() const;
-  
+
   /// @brief パス記述子(?)を得る．vpiParallel か vpiFull
   virtual
   int
@@ -227,27 +227,27 @@ public:
   /// @brief 出力リストの要素数の取得
   /// @return 出力リストの要素数
   virtual
-  ymuint32
+  ymuint
   output_num() const;
 
   /// @brief 出力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
   virtual
   const PtExpr*
-  output(ymuint32 pos) const;
-  
+  output(ymuint pos) const;
+
   /// @brief 出力の極性を取り出す．
   /// @note 0の場合もありうる．
   virtual
   int
   output_pol() const;
-  
+
   /// @brief 式を取り出す．
   /// @note NULL の場合もありうる．
   virtual
   const PtExpr*
   expr() const;
-  
+
   /// @brief path_delay_value を取り出す．
   virtual
   const PtPathDelay*
@@ -283,7 +283,7 @@ class CptPathDelay :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptPathDelay(const FileRegion& file_region,
 	       PtExpr* value1);
@@ -322,11 +322,11 @@ protected:
 	       PtExpr* value10,
 	       PtExpr* value11,
 	       PtExpr* value12);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptPathDelay();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -342,7 +342,7 @@ public:
   /// @note 0の場合もある．
   virtual
   const PtExpr*
-  value(ymuint32 pos) const;
+  value(ymuint pos) const;
 
 
 private:

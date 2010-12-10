@@ -59,7 +59,7 @@ EiFactory::new_ContAssign(ElbCaHead* head,
 {
   void* p = mAlloc.get_memory(sizeof(EiContAssign1));
   EiContAssign* cont_assign = new (p) EiContAssign1(head, pt_obj, lhs, rhs);
-  
+
   return cont_assign;
 }
 
@@ -106,7 +106,7 @@ EiCaHead::module() const
 {
   return mModule;
 }
-  
+
 // @brief 0の強さを返す．
 tVpiStrength
 EiCaHead::drive0() const
@@ -116,7 +116,7 @@ EiCaHead::drive0() const
   }
   return kVpiNoStrength;
 }
-  
+
 // @brief 1の強さを返す．
 tVpiStrength
 EiCaHead::drive1() const
@@ -126,7 +126,7 @@ EiCaHead::drive1() const
   }
   return kVpiNoStrength;
 }
-  
+
 // @brief 遅延を表す式を返す．
 // @note このクラスでは NULL を返す．
 ElbDelay*
@@ -156,7 +156,7 @@ EiCaHeadD::EiCaHeadD(const VlModule* module,
 EiCaHeadD::~EiCaHeadD()
 {
 }
-  
+
 // @brief 遅延を表す式を返す．
 ElbDelay*
 EiCaHeadD::delay() const
@@ -202,7 +202,7 @@ EiContAssign::file_region() const
 }
 
 // @brief ビット幅を返す．
-ymuint32
+ymuint
 EiContAssign::bit_size() const
 {
   return mLhs->bit_size();
@@ -214,7 +214,7 @@ EiContAssign::lhs() const
 {
   return mLhs;
 }
-  
+
 // @brief 右辺を返す．
 const VlExpr*
 EiContAssign::rhs() const
@@ -252,14 +252,14 @@ EiContAssign1::module() const
 {
   return mHead->module();
 }
-  
+
 // @brief 0の強さを返す．
 tVpiStrength
 EiContAssign1::drive0() const
 {
   return mHead->drive0();
 }
-  
+
 // @brief 1の強さを返す．
 tVpiStrength
 EiContAssign1::drive1() const
@@ -311,14 +311,14 @@ EiContAssign2::module() const
 {
   return mModule;
 }
-  
+
 // @brief 0の強さを返す．
 tVpiStrength
 EiContAssign2::drive0() const
 {
   return kVpiNoStrength;
 }
-  
+
 // @brief 1の強さを返す．
 tVpiStrength
 EiContAssign2::drive1() const

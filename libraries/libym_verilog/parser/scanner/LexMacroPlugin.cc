@@ -73,7 +73,7 @@ LpDefine::parse()
   FileRegion macro_loc = cur_token_loc();
 
   // パラメータ名をキーにして位置番号を格納する連想配列
-  hash_map<string, ymuint32> param_dic;
+  hash_map<string, ymuint> param_dic;
 
   // ここは空白が重要なので get_raw_token() を呼ぶ．
   int id = get_raw_token();
@@ -83,7 +83,7 @@ LpDefine::parse()
   else if ( id == '(' ) {
     // パラメータあり
     // パラメータを param_dic に記録
-    ymuint32 pos = 0;
+    ymuint pos = 0;
     if ( !expect(IDENTIFIER) ) {
       put_msg(__FILE__, __LINE__,
 	      cur_token_loc(),
@@ -140,7 +140,7 @@ LpDefine::parse()
 
   // マクロをプラグインとして生成
   const char* macroname = defsymbol.c_str();
-  ymuint32 n = param_dic.size();
+  ymuint n = param_dic.size();
   LpMacro* macro = new LpMacro(lex(), macroname, n);
 
   // マクロ本体を macro に記録
@@ -148,7 +148,7 @@ LpDefine::parse()
     for (int id = get_nospace_token();
 	 id != NL && id != EOF;
 	 id = get_nospace_token()) {
-      hash_map<string, ymuint32>::iterator p;
+      hash_map<string, ymuint>::iterator p;
       if ( id == IDENTIFIER &&
 	   (p = param_dic.find(cur_string())) != param_dic.end() ) {
 	// 置き換え対象のパラメータ
@@ -240,7 +240,7 @@ LpUndef::parse()
   if ( lex().erase_plugin(macroname.c_str()) ) {
     if ( debug() ) {
       ostringstream buf;
-      buf << "forgetting a macro \"" << macroname << "\"."; 
+      buf << "forgetting a macro \"" << macroname << "\".";
       put_msg(__FILE__, __LINE__,
 	      cur_loc,
 	      kMsgDebug,
@@ -275,7 +275,7 @@ LpUndef::parse()
 // @param[in] num_param パラメータ数
 LpMacro::LpMacro(RawLex& lex,
 		 const char* name,
-		 ymuint32 num_param) :
+		 ymuint num_param) :
   LexPlugin(lex, name),
   mNumParam(num_param)
 {
@@ -302,7 +302,7 @@ LpMacro::parse()
 	    buf.str());
     return false;
   }
-  
+
   if ( debug() ) {
     ostringstream buf;
     buf << "macro `" << name() << " found.";
@@ -326,7 +326,7 @@ LpMacro::parse()
 	      "'(' is expected.");
       return false;
     }
-    ymuint32 pos = 0;
+    ymuint pos = 0;
     for (bool go = true; go && pos < mNumParam; ) {
       int id = get_nospace_token();
       switch ( id ) {
@@ -358,7 +358,7 @@ LpMacro::parse()
     }
   }
   lex().push_macro(name(), mTokenList.top(), param_array);
-  
+
   return true;
 }
 

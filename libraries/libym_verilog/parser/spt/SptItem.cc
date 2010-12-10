@@ -87,7 +87,7 @@ SptItem::paramassign_array() const
 // @brief 要素数の取得
 // @return 要素数
 // このクラスでは 0 を返す．
-ymuint32
+ymuint
 SptItem::size() const
 {
   return 0;
@@ -96,7 +96,7 @@ SptItem::size() const
 // @brief defparam 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtDefParam*
-SptItem::defparam(ymuint32 pos) const
+SptItem::defparam(ymuint pos) const
 {
   return NULL;
 }
@@ -104,7 +104,7 @@ SptItem::defparam(ymuint32 pos) const
 // @brief continuous assign 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtContAssign*
-SptItem::contassign(ymuint32) const
+SptItem::contassign(ymuint) const
 {
   return NULL;
 }
@@ -112,7 +112,7 @@ SptItem::contassign(ymuint32) const
 // @brief module/UDP/gate instance 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtInst*
-SptItem::inst(ymuint32 pos) const
+SptItem::inst(ymuint pos) const
 {
   return NULL;
 }
@@ -137,7 +137,7 @@ SptItem::automatic() const
 }
 
 // @brief IO宣言の要素数の取得
-ymuint32
+ymuint
 SptItem::ioitem_num() const
 {
   return 0;
@@ -268,7 +268,7 @@ SptItem::specpath_type() const
 // @brief ターミナルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtExpr*
-SptItem::terminal(ymuint32 pos) const
+SptItem::terminal(ymuint pos) const
 {
   return 0;
 }
@@ -323,7 +323,7 @@ SptItem::else_item_array() const
 // @return 先頭の case item
 // このクラスでは NULL を返す．
 const PtGenCaseItem*
-SptItem::caseitem(ymuint32 /* pos */) const
+SptItem::caseitem(ymuint /* pos */) const
 {
   return NULL;
 }
@@ -378,7 +378,7 @@ SptDefParamH::~SptDefParamH()
 
 // 要素数の取得
 // @return 要素数
-ymuint32
+ymuint
 SptDefParamH::size() const
 {
   return mArray.size();
@@ -387,7 +387,7 @@ SptDefParamH::size() const
 // @brief defparam 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtDefParam*
-SptDefParamH::defparam(ymuint32 pos) const
+SptDefParamH::defparam(ymuint pos) const
 {
   return mArray[pos];
 }
@@ -494,7 +494,7 @@ SptContAssignH::delay() const
 
 // 要素数の取得
 // @return 要素数
-ymuint32
+ymuint
 SptContAssignH::size() const
 {
   return mArray.size();
@@ -503,7 +503,7 @@ SptContAssignH::size() const
 // @brief continuous assign 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtContAssign*
-SptContAssignH::contassign(ymuint32 pos) const
+SptContAssignH::contassign(ymuint pos) const
 {
   return mArray[pos];
 }
@@ -630,8 +630,8 @@ SptTf::SptTf(const FileRegion& file_region,
   mBody(stmt)
 {
   mInUse = false;
-  ymuint32 n = 0;
-  for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
+  ymuint n = 0;
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     n += iohead_array[i]->item_num();
   }
   mIOItemNum = n;
@@ -660,7 +660,7 @@ SptTf::automatic() const
 }
 
 // @brief IO宣言の要素数の取得
-ymuint32
+ymuint
 SptTf::ioitem_num() const
 {
   return mIOItemNum;
@@ -813,7 +813,7 @@ SptGateH::delay() const
 
 // 要素数の取得
 // @return 要素数
-ymuint32
+ymuint
 SptGateH::size() const
 {
   return mElemArray.size();
@@ -822,7 +822,7 @@ SptGateH::size() const
 // @brief module/UDP/gate instance 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtInst*
-SptGateH::inst(ymuint32 pos) const
+SptGateH::inst(ymuint pos) const
 {
   return mElemArray[pos];
 }
@@ -892,7 +892,7 @@ SptMuH::paramassign_array() const
 
 // 要素数の取得
 // @return 要素数
-ymuint32
+ymuint
 SptMuH::size() const
 {
   return mElemArray.size();
@@ -901,7 +901,7 @@ SptMuH::size() const
 // @brief module/UDP/gate instance 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < size() )
 const PtInst*
-SptMuH::inst(ymuint32 pos) const
+SptMuH::inst(ymuint pos) const
 {
   return mElemArray[pos];
 }
@@ -969,7 +969,7 @@ SptInst::right_range() const
 
 // @brief ポート数の取得
 // @return ポート数
-ymuint32
+ymuint
 SptInst::port_num() const
 {
   return mPortArray.size();
@@ -978,7 +978,7 @@ SptInst::port_num() const
 // @brief ポートの取得
 // @param[in] pos 位置番号 ( 0 <= pos < port_num() )
 const PtConnection*
-SptInst::port(ymuint32 pos) const
+SptInst::port(ymuint pos) const
 {
   return mPortArray[pos];
 }

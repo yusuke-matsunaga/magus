@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 単項演算子を生成する．
 // @param[in] pt_expr パース木の定義要素
 // @param[in] op_type 演算子のタイプ
@@ -37,7 +37,7 @@ EiFactory::new_UnaryOp(const PtBase* pt_expr,
     p = mAlloc.get_memory(sizeof(EiPosedgeOp));
     expr = new (p) EiPosedgeOp(pt_expr, opr1);
     break;
-    
+
   case kVpiNegedgeOp:
     p = mAlloc.get_memory(sizeof(EiNegedgeOp));
     expr = new (p) EiNegedgeOp(pt_expr, opr1);
@@ -47,52 +47,52 @@ EiFactory::new_UnaryOp(const PtBase* pt_expr,
     p = mAlloc.get_memory(sizeof(EiBitNegOp));
     expr = new (p) EiBitNegOp(pt_expr, opr1);
     break;
-    
+
   case kVpiPlusOp:
     p = mAlloc.get_memory(sizeof(EiPlusOp));
     expr = new (p) EiPlusOp(pt_expr, opr1);
     break;
-    
+
   case kVpiMinusOp:
     p = mAlloc.get_memory(sizeof(EiMinusOp));
     expr = new (p) EiMinusOp(pt_expr, opr1);
     break;
-    
+
   case kVpiUnaryAndOp:
     p = mAlloc.get_memory(sizeof(EiUnaryAndOp));
     expr = new (p) EiUnaryAndOp(pt_expr, opr1);
     break;
-    
+
   case kVpiUnaryNandOp:
     p = mAlloc.get_memory(sizeof(EiUnaryNandOp));
     expr = new (p) EiUnaryNandOp(pt_expr, opr1);
     break;
-    
+
   case kVpiUnaryOrOp:
     p = mAlloc.get_memory(sizeof(EiUnaryOrOp));
     expr = new (p) EiUnaryOrOp(pt_expr, opr1);
     break;
-    
+
   case kVpiUnaryNorOp:
     p = mAlloc.get_memory(sizeof(EiUnaryNorOp));
     expr = new (p) EiUnaryNorOp(pt_expr, opr1);
     break;
-    
+
   case kVpiUnaryXorOp:
     p = mAlloc.get_memory(sizeof(EiUnaryXorOp));
     expr = new (p) EiUnaryXorOp(pt_expr, opr1);
     break;
-    
+
   case kVpiUnaryXNorOp:
     p = mAlloc.get_memory(sizeof(EiUnaryXnorOp));
     expr = new (p) EiUnaryXnorOp(pt_expr, opr1);
     break;
-    
+
   case kVpiNotOp:
     p = mAlloc.get_memory(sizeof(EiNotOp));
     expr = new (p) EiNotOp(pt_expr, opr1);
     break;
-    
+
   default:
     assert_not_reached(__FILE__, __LINE__);
     break;
@@ -114,7 +114,7 @@ EiUnaryOp::EiUnaryOp(const PtBase* pt_expr,
   mOpr1(opr1)
 {
 }
-  
+
 // @brief デストラクタ
 EiUnaryOp::~EiUnaryOp()
 {
@@ -129,7 +129,7 @@ EiUnaryOp::is_const() const
 }
 
 // @brief オペランド数を返す．
-ymuint32
+ymuint
 EiUnaryOp::operand_num() const
 {
   return 1;
@@ -138,7 +138,7 @@ EiUnaryOp::operand_num() const
 // @brief オペランドを返す．
 // @param[in] pos 位置番号
 ElbExpr*
-EiUnaryOp::_operand(ymuint32 pos) const
+EiUnaryOp::_operand(ymuint pos) const
 {
   return mOpr1;
 }
@@ -827,7 +827,7 @@ EiPosedgeOp::EiPosedgeOp(const PtBase* pt_expr,
 EiPosedgeOp::~EiPosedgeOp()
 {
 }
-  
+
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiPosedgeOp::op_type() const
@@ -853,7 +853,7 @@ EiNegedgeOp::EiNegedgeOp(const PtBase* pt_expr,
 EiNegedgeOp::~EiNegedgeOp()
 {
 }
-  
+
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiNegedgeOp::op_type() const

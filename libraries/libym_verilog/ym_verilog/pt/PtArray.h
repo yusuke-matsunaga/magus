@@ -31,7 +31,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] num 要素数
   /// @param[in] array 配列本体
-  PtArray(ymuint32 num,
+  PtArray(ymuint num,
 	  T** array);
 
   /// @brief デストラクタ
@@ -43,13 +43,13 @@ public:
 
   /// @brief 要素数の取得
   /// @return 要素数
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   T*
-  operator[](ymuint32 pos) const;
+  operator[](ymuint pos) const;
 
 
 private:
@@ -84,7 +84,7 @@ PtArray<T>::PtArray() :
 // @param[in] array 配列本体
 template <typename T>
 inline
-PtArray<T>::PtArray(ymuint32 num,
+PtArray<T>::PtArray(ymuint num,
 		    T** array) :
   mNum(num),
   mArray(array)
@@ -103,7 +103,7 @@ PtArray<T>::~PtArray()
 // @return 要素数
 template <typename T>
 inline
-ymuint32
+ymuint
 PtArray<T>::size() const
 {
   return mNum;
@@ -114,7 +114,7 @@ PtArray<T>::size() const
 template <typename T>
 inline
 T*
-PtArray<T>::operator[](ymuint32 pos) const
+PtArray<T>::operator[](ymuint pos) const
 {
   return mArray[pos];
 }

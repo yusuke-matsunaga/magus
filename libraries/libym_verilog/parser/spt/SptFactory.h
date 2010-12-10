@@ -24,7 +24,7 @@ class SptFactory :
   public PtiFactory
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
   SptFactory(AllocBase& alloc);
@@ -106,7 +106,7 @@ public:
   new_UdpValue(const FileRegion& file_region,
 	       tVpiUdpVal symbol);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // モジュール関係
   //////////////////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ public:
 	     PtDeclHeadArray decl_array,
 	     PtItemArray item_array);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // ポート関係
   //////////////////////////////////////////////////////////////////////
@@ -241,7 +241,7 @@ public:
 	      PtExpr* left,
 	      PtExpr* right);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // IO 宣言関係
   //////////////////////////////////////////////////////////////////////
@@ -359,7 +359,7 @@ public:
 	     const char* name,
 	     PtExpr* init_value);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // その他の宣言関係
   //////////////////////////////////////////////////////////////////////
@@ -399,7 +399,7 @@ public:
   virtual
   PtiDeclHead*
   new_LocalParamH(const FileRegion& file_region);
-  
+
   /// @brief 範囲指定型 local param 宣言のヘッダの生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] sign 符号付きのとき true となるフラグ
@@ -428,7 +428,7 @@ public:
   virtual
   PtiDeclHead*
   new_SpecParamH(const FileRegion& file_region);
-  
+
   /// @brief 範囲指定型 specparam 宣言のヘッダの生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] left 範囲の左側の式
@@ -484,7 +484,7 @@ public:
 	   bool sign,
 	   PtExpr* left,
 	   PtExpr* right);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -495,7 +495,7 @@ public:
   new_NetH(const FileRegion& file_region,
 	   tVpiNetType type,
 	   bool sign);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成 (strength あり)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -508,7 +508,7 @@ public:
 	   tVpiNetType type,
 	   bool sign,
 	   PtStrength* strength);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成 (遅延あり)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -521,7 +521,7 @@ public:
 	   tVpiNetType type,
 	   bool sign,
 	   PtDelay* delay);
-  
+
   /// @brief 1ビット型 net 宣言のヘッダの生成 (strength, 遅延あり)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -536,7 +536,7 @@ public:
 	   bool sign,
 	   PtStrength* strength,
 	   PtDelay* delay);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -553,7 +553,7 @@ public:
 	   bool sign,
 	   PtExpr* left,
 	   PtExpr* right);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (strengthあり)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -572,7 +572,7 @@ public:
 	   PtExpr* left,
 	   PtExpr* right,
 	   PtStrength* strength);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (遅延あり)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -591,7 +591,7 @@ public:
 	   PtExpr* left,
 	   PtExpr* right,
 	   PtDelay* delay);
-  
+
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (strength, 遅延あり)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type net の型
@@ -654,7 +654,7 @@ public:
 	    PtExpr* msb,
 	    PtExpr* lsb);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // item 関係
   //////////////////////////////////////////////////////////////////////
@@ -667,7 +667,7 @@ public:
   PtItem*
   new_DefParamH(const FileRegion& file_region,
 		PtDefParamArray elem_array);
-  
+
   /// @brief defparam 文の要素の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name 名前
@@ -691,7 +691,7 @@ public:
 	       PtNameBranchArray nb_array,
 	       const char* tail_name,
 	       PtExpr* value);
-  
+
   /// @brief continuous assign 文のヘッダの生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] elem_array 要素のリスト
@@ -711,7 +711,7 @@ public:
   new_ContAssignH(const FileRegion& file_region,
 		  PtStrength* strength,
 		  PtContAssignArray elem_array);
-  
+
   /// @brief continuous assign 文のヘッダの生成 (遅延付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] delay 遅延値
@@ -722,7 +722,7 @@ public:
   new_ContAssignH(const FileRegion& file_region,
 		  PtDelay* delay,
 		  PtContAssignArray elem_array);
-  
+
   /// @brief continuous assign 文のヘッダの生成 (strength, 遅延付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] strength 信号強度
@@ -785,7 +785,7 @@ public:
 	   PtDeclHeadArray lparamhead_array,
 	   PtDeclHeadArray decl_array,
 	   PtStmt* stmt);
-  
+
   /// @brief 1ビット型 function 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name function 名
@@ -808,7 +808,7 @@ public:
 	       PtDeclHeadArray lparamhead_array,
 	       PtDeclHeadArray decl_array,
 	       PtStmt* stmt);
-  
+
   /// @brief 範囲指定型 function 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name function 名
@@ -835,7 +835,7 @@ public:
 		PtDeclHeadArray lparamhead_array,
 		PtDeclHeadArray decl_array,
 		PtStmt* stmt);
-  
+
   /// @brief 組み込み型 function 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name function 名
@@ -860,7 +860,7 @@ public:
 		PtDeclHeadArray lparamhead_array,
 		PtDeclHeadArray decl_array,
 		PtStmt* stmt);
-  
+
   /// @brief gate instance 文のヘッダの生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type primitive の型
@@ -871,7 +871,7 @@ public:
   new_GateH(const FileRegion& file_region,
 	    tVpiPrimType type,
 	    PtInstArray elem_array);
-  
+
   /// @brief gate instance 文のヘッダの生成 (strength付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type primitive の型
@@ -884,7 +884,7 @@ public:
 	    tVpiPrimType type,
 	    PtStrength* strength,
 	    PtInstArray elem_array);
-  
+
   /// @brief gate instance 文のヘッダの生成 (遅延付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type primitive の型
@@ -897,7 +897,7 @@ public:
 	    tVpiPrimType type,
 	    PtDelay* delay,
 	    PtInstArray elem_array);
-  
+
   /// @brief gate instance 文のヘッダの生成 (strength, 遅延付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] type primitive の型
@@ -923,7 +923,7 @@ public:
   new_MuH(const FileRegion& file_region,
 	  const char* def_name,
 	  PtInstArray elem_array);
-  
+
   /// @brief module instance/UDP instance 文のヘッダの生成 (strength付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] def_name 定義名
@@ -936,7 +936,7 @@ public:
 	  const char* def_name,
 	  PtStrength* strength,
 	  PtInstArray elem_array);
-  
+
   /// @brief module instance/UDP instance 文のヘッダの生成 (遅延付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] def_name 定義名
@@ -949,7 +949,7 @@ public:
 	  const char* def_name,
 	  PtDelay* delay,
 	  PtInstArray elem_array);
-  
+
   /// @brief module instance/UDP instance 文のヘッダの生成 (strength, 遅延付き)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] def_name 定義名
@@ -964,7 +964,7 @@ public:
 	  PtStrength* strength,
 	  PtDelay* delay,
 	  PtInstArray elem_array);
-  
+
   /// @brief module instance/UDP instance 文のヘッダの生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] def_name 定義名
@@ -977,7 +977,7 @@ public:
 	  const char* def_name,
 	  PtConnectionArray con_array,
 	  PtInstArray elem_array);
-  
+
   /// @brief module instance/UDP instance の要素の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] con_array ポート割り当てリスト
@@ -1023,7 +1023,7 @@ public:
   new_Generate(const FileRegion& file_region,
 	       PtDeclHeadArray declhead_array,
 	       PtItemArray item_array);
-  
+
   /// @brief generate block 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] declhead_array 宣言のリスト
@@ -1034,7 +1034,7 @@ public:
   new_GenBlock(const FileRegion& file_region,
 	       PtDeclHeadArray declhead_array,
 	       PtItemArray item_array);
-  
+
   /// @brief 名前付き generate block 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] name 名前
@@ -1047,7 +1047,7 @@ public:
 	       const char* name,
 	       PtDeclHeadArray declhead_array,
 	       PtItemArray item_array);
-  
+
   /// @brief generate if 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] cond 条件を表す式
@@ -1241,7 +1241,7 @@ public:
 		PtExpr* value11,
 		PtExpr* value12);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // statement 関係
   //////////////////////////////////////////////////////////////////////
@@ -1389,14 +1389,14 @@ public:
   PtStmt*
   new_EventStmt(const FileRegion& file_region,
 		PtExpr* event);
-  
+
   /// @brief null 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @return 生成された null 文
   virtual
   PtStmt*
   new_NullStmt(const FileRegion& file_region);
-  
+
   /// @brief if 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] expr 条件式
@@ -1407,7 +1407,7 @@ public:
   new_If(const FileRegion& file_region,
 	 PtExpr* expr,
 	 PtStmt* then_body);
-  
+
   /// @brief if 文の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] expr 条件式
@@ -1595,7 +1595,7 @@ public:
 		    PtDeclHeadArray declhead_array,
 		    PtStmtArray stmt_array);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // expression 関係
   //////////////////////////////////////////////////////////////////////
@@ -1863,7 +1863,7 @@ public:
   virtual
   PtExpr*
   new_IntConst(const FileRegion& file_region,
-	       ymuint32 value);
+	       ymuint value);
 
   /// @brief 整数型の定数の生成
   /// @param[in] file_region ファイル位置の情報
@@ -1894,7 +1894,7 @@ public:
   virtual
   PtExpr*
   new_IntConst(const FileRegion& file_region,
-	       ymuint32 size,
+	       ymuint size,
 	       tVpiConstType const_type,
 	       const char* value);
 
@@ -1906,7 +1906,7 @@ public:
   PtExpr*
   new_RealConst(const FileRegion& file_region,
 		double value);
-  
+
   /// @brief 文字列型の定数の生成
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] value 文字列
@@ -1916,7 +1916,7 @@ public:
   new_StringConst(const FileRegion& file_region,
 		  const char* value);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // その他
   //////////////////////////////////////////////////////////////////////
@@ -1996,7 +1996,7 @@ public:
   PtStrength*
   new_Strength(const FileRegion& file_region,
 	       tVpiStrength value);
-  
+
   /// @brief 遅延値の生成 (1つの値)
   /// @param[in] file_region ファイル位置の情報
   /// @param[in] value1 値1
@@ -2046,7 +2046,7 @@ public:
   new_NameBranch(const char* name,
 		 int index);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // attribute instance 関係
   //////////////////////////////////////////////////////////////////////
@@ -2070,8 +2070,8 @@ public:
   new_AttrSpec(const FileRegion& file_region,
 	       const char* name,
 	       PtExpr* expr);
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   // その他
   //////////////////////////////////////////////////////////////////////
@@ -2091,7 +2091,7 @@ public:
   virtual
   void
   dump_profile(ostream& s) const;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

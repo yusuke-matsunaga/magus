@@ -89,7 +89,7 @@ public:
 
   /// @brief ポートリストの何番目のポートかを表すインデックスを返す．
   virtual
-  ymuint32
+  ymuint
   port_index() const;
 
   /// @brief 上位の接続先を返す．
@@ -118,7 +118,7 @@ public:
   void
   init(ElbModule* parent,
        const PtPort* pt_port,
-       ymuint32 index,
+       ymuint index,
        ElbExpr* low_conn,
        tVpiDirection dir);
 

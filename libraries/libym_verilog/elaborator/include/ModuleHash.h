@@ -40,16 +40,16 @@ public:
   //////////////////////////////////////////////////////////////////////
   // ModuleHash の関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 内容を空にする．
   void
   clear();
-  
+
   /// @brief 要素を追加する．
   /// @note 同名のモジュールが登録されていたらそのエントリを無効化する．
   void
   add(const VlModule* obj);
-      
+
   /// @brief 名前から該当する要素を検索する．
   /// @param[in] parent 親のスコープ
   /// @param[in] name 名前
@@ -58,7 +58,7 @@ public:
        const char* name) const;
 
   /// @brief このオブジェクトが使用しているメモリ量を返す．
-  size_t
+  ymuint
   allocated_size() const;
 
 
@@ -69,19 +69,19 @@ private:
 
   /// @brief テーブルの領域を確保する．
   void
-  alloc_table(ymuint32 size);
+  alloc_table(ymuint size);
 
   /// @brief ハッシュ値を計算する．
-  ymuint32
+  ymuint
   hash_func(const VlNamedObj* parent,
 	    const char* name) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で使用されるデータ構造
   //////////////////////////////////////////////////////////////////////
-  
+
   struct Cell
   {
     // 親のスコープ
@@ -95,18 +95,18 @@ private:
 
     // 次の要素を指すリンク
     Cell* mLink;
-    
+
   };
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // Cell の確保用アロケータ
   AllocBase& mAlloc;
-  
+
   // ハッシュ表のサイズ
   ymuint32 mSize;
 

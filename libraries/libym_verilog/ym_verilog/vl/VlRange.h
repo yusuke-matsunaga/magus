@@ -39,26 +39,26 @@ public:
 
   /// @brief 要素数(ビット幅)を返す．
   virtual
-  ymuint32
+  ymuint
   size() const = 0;
-  
+
   /// @brief MSB を返す．
   virtual
   const VlExpr*
   left_range() const = 0;
-  
+
   /// @brief LSB を返す．
   virtual
   const VlExpr*
   right_range() const = 0;
-  
+
   /// @brief MSB の値を返す．
   /// @retval MSB の値 値が確定しているとき
   /// @retval -1 値が確定していない
   virtual
   int
   left_range_const() const = 0;
-  
+
   /// @brief LSB の値を返す．
   /// @retval LSB の値 値が確定しているとき
   /// @retval -1 値が確定していない
@@ -73,7 +73,7 @@ public:
   virtual
   bool
   is_in(int index) const = 0;
-  
+
   /// @brief LSB からのオフセット値の取得
   /// @param[in] index インデックス
   /// @retval index の LSB からのオフセット index が範囲内に入っている．
@@ -89,7 +89,7 @@ public:
   virtual
   int
   roffset(int index) const = 0;
-  
+
   /// @brief offset の逆関数
   /// @param[in] offset LSB からのオフセット値
   /// @return offset に対応したインデックスを返す．
@@ -103,7 +103,7 @@ public:
   virtual
   int
   rindex(int roffset) const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

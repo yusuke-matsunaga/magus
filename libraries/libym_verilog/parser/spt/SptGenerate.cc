@@ -60,7 +60,7 @@ SptGenerate::name() const
 {
   return mName;
 }
-  
+
 // @brief 宣言のリストの取得
 PtDeclHeadArray
 SptGenerate::declhead_array() const
@@ -105,28 +105,28 @@ SptGenIf::expr() const
 {
   return mCond;
 }
-  
+
 // @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptGenIf::then_declhead_array() const
 {
   return mThenBody.declhead_array();
 }
-  
+
 // @brief 条件が成り立ったときに生成される item 配列の取得
 PtItemArray
 SptGenIf::then_item_array() const
 {
   return mThenBody.item_array();
 }
-  
+
 // @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptGenIf::else_declhead_array() const
 {
   return mElseBody.declhead_array();
 }
-  
+
 // @brief 条件が成り立たなかったときに生成される item 配列の取得
 PtItemArray
 SptGenIf::else_item_array() const
@@ -165,7 +165,7 @@ SptGenCaseItem::file_region() const
 // @brief ラベルの数の取得
 // @return ラベル数\n
 // 0 の時は default の意味
-ymuint32
+ymuint
 SptGenCaseItem::label_num() const
 {
   return mLabelArray.size();
@@ -174,11 +174,11 @@ SptGenCaseItem::label_num() const
 // @brief ラベルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < label_num() )
 const PtExpr*
-SptGenCaseItem::label(ymuint32 pos) const
+SptGenCaseItem::label(ymuint pos) const
 {
   return mLabelArray[pos];
 }
-  
+
 // @brief 宣言のリストの取得
 PtDeclHeadArray
 SptGenCaseItem::declhead_array() const
@@ -221,7 +221,7 @@ SptGenCase::expr() const
 }
 
 // case item の要素数を返す．
-ymuint32
+ymuint
 SptGenCase::size() const
 {
   return mCaseItemArray.size();
@@ -229,7 +229,7 @@ SptGenCase::size() const
 
 // case item を返す．
 const PtGenCaseItem*
-SptGenCase::caseitem(ymuint32 pos) const
+SptGenCase::caseitem(ymuint pos) const
 {
   return mCaseItemArray[pos];
 }
@@ -269,7 +269,7 @@ SptGenFor::name() const
 {
   return mName;
 }
-  
+
 // @brief 宣言のリストの取得
 PtDeclHeadArray
 SptGenFor::declhead_array() const

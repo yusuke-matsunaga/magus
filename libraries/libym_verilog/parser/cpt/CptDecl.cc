@@ -49,7 +49,7 @@ CptDeclHead::is_signed() const
 {
   return false;
 }
-  
+
 // @brief 範囲のMSBの取得
 // @retval 範囲のMSB 範囲を持つとき
 // @retval NULL 範囲を持たないとき
@@ -79,7 +79,7 @@ CptDeclHead::data_type() const
 {
   return kVpiVarNone;
 }
-  
+
 // @brief net 型の取得
 // @retval net 型 net 型の要素の場合
 // @retval kVpiNone net 型の要素でない場合
@@ -123,7 +123,7 @@ CptDeclHead::delay() const
 
 // @brief 要素数の取得
 // @return 要素数
-ymuint32
+ymuint
 CptDeclHead::item_num() const
 {
   return mItemArray.size();
@@ -132,7 +132,7 @@ CptDeclHead::item_num() const
 // @brief 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < item_num() )
 const PtDeclItem*
-CptDeclHead::item(ymuint32 pos) const
+CptDeclHead::item(ymuint pos) const
 {
   return mItemArray[pos];
 }
@@ -156,7 +156,7 @@ CptParamH::CptParamH(const FileRegion& file_region) :
   CptDeclHead(file_region)
 {
 }
-  
+
 // デストラクタ
 CptParamH::~CptParamH()
 {
@@ -181,7 +181,7 @@ CptLocalParamH::CptLocalParamH(const FileRegion& file_region) :
   CptDeclHead(file_region)
 {
 }
-  
+
 // デストラクタ
 CptLocalParamH::~CptLocalParamH()
 {
@@ -397,7 +397,7 @@ CptLocalParamHT::type() const
 //////////////////////////////////////////////////////////////////////
 // reg 宣言のヘッダを表すクラス
 //////////////////////////////////////////////////////////////////////
-    
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 CptRegH::CptRegH(const FileRegion& file_region) :
@@ -445,7 +445,7 @@ CptRegHS::is_signed() const
 //////////////////////////////////////////////////////////////////////
 // ビットベクタ型の reg 宣言のヘッダを表すクラス
 //////////////////////////////////////////////////////////////////////
-    
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param left 範囲の左側の式
@@ -491,7 +491,7 @@ CptRegHV::right_range() const
 //////////////////////////////////////////////////////////////////////
 // 符号つきビットベクタ型の reg 宣言のヘッダを表すクラス
 //////////////////////////////////////////////////////////////////////
-    
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param left 範囲の左側の式
@@ -562,7 +562,7 @@ CptGenvarH::CptGenvarH(const FileRegion& file_region) :
   CptDeclHead(file_region)
 {
 }
-  
+
 // デストラクタ
 CptGenvarH::~CptGenvarH()
 {
@@ -610,7 +610,7 @@ CptNetH::net_type() const
 {
   return static_cast<tVpiNetType>((mFlags >> 1) & 15);
 }
-    
+
 // 符号の有無の取得
 bool
 CptNetH::is_signed() const
@@ -622,7 +622,7 @@ CptNetH::is_signed() const
 //////////////////////////////////////////////////////////////////////
 // strength つきの net宣言のヘッダを表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param net_type net の型
@@ -652,7 +652,7 @@ CptNetHS::strength() const
 //////////////////////////////////////////////////////////////////////
 // delay つきの net宣言のヘッダを表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param net_type net の型
@@ -682,7 +682,7 @@ CptNetHD::delay() const
 //////////////////////////////////////////////////////////////////////
 // strength と delay つきの net宣言のヘッダを表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param net_type net の型
@@ -720,7 +720,7 @@ CptNetHSD::delay() const
 
 
 //////////////////////////////////////////////////////////////////////
-// ビットベクタ型の net宣言のヘッダを表すクラス 
+// ビットベクタ型の net宣言のヘッダを表すクラス
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
@@ -776,7 +776,7 @@ CptNetHV::right_range() const
 //////////////////////////////////////////////////////////////////////
 // strength つきの CptNetHV
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param net_type net の型
@@ -814,7 +814,7 @@ CptNetHVS::strength() const
 //////////////////////////////////////////////////////////////////////
 // delay つきの CptNetHV
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param net_type net の型
@@ -852,7 +852,7 @@ CptNetHVD::delay() const
 //////////////////////////////////////////////////////////////////////
 // strength と delay つきの CptNetHV
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param net_type net の型
@@ -907,7 +907,7 @@ CptEventH::CptEventH(const FileRegion& file_region) :
   CptDeclHead(file_region)
 {
 }
-  
+
 // デストラクタ
 CptEventH::~CptEventH()
 {
@@ -931,7 +931,7 @@ CptSpecParamH::CptSpecParamH(const FileRegion& file_region) :
   CptDeclHead(file_region)
 {
 }
-  
+
 // デストラクタ
 CptSpecParamH::~CptSpecParamH()
 {
@@ -992,7 +992,7 @@ CptDeclItemBase::CptDeclItemBase(const char* name) :
   mName(name)
 {
 }
-  
+
 // デストラクタ
 CptDeclItemBase::~CptDeclItemBase()
 {
@@ -1007,7 +1007,7 @@ CptDeclItemBase::name() const
 
 // dimension list のサイズの取得
 // @return ここでは常に 0 を返す．
-ymuint32
+ymuint
 CptDeclItemBase::dimension_list_size() const
 {
   return 0;
@@ -1015,7 +1015,7 @@ CptDeclItemBase::dimension_list_size() const
 
 // 範囲の取得
 const PtRange*
-CptDeclItemBase::range(ymuint32 pos) const
+CptDeclItemBase::range(ymuint pos) const
 {
   return NULL;
 }
@@ -1086,7 +1086,7 @@ CptDeclItemR::file_region() const
 }
 
 // dimension list のサイズの取得
-ymuint32
+ymuint
 CptDeclItemR::dimension_list_size() const
 {
   return mRangeArray.size();
@@ -1094,7 +1094,7 @@ CptDeclItemR::dimension_list_size() const
 
 // 範囲の取得
 const PtRange*
-CptDeclItemR::range(ymuint32 pos) const
+CptDeclItemR::range(ymuint pos) const
 {
   return mRangeArray[pos];
 }
@@ -1180,7 +1180,7 @@ CptRange::right() const
   return mLsb;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // その他の宣言関係
 //////////////////////////////////////////////////////////////////////
@@ -1340,7 +1340,7 @@ CptFactory::new_RegH(const FileRegion& file_region,
     return new (p) CptRegHV(file_region, left, right);
   }
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
@@ -1352,7 +1352,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
   return new (p) CptNetH(file_region,
 			 type, sign);
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
@@ -1365,7 +1365,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
 		      type, sign,
 		      strength);
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
@@ -1379,7 +1379,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
 			  type, sign,
 			  delay);
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
@@ -1394,7 +1394,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
 			   type, sign,
 			   strength, delay);
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
@@ -1409,7 +1409,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
   return new (p) CptNetHV(file_region,
 			  type, vstype, sign, left, right);
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
@@ -1426,7 +1426,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
 			   type, vstype, sign, left, right,
 			   strength);
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
@@ -1443,7 +1443,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
 			   type, vstype, sign, left, right,
 			   delay);
 }
-  
+
 // net 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,

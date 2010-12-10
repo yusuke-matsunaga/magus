@@ -33,7 +33,7 @@ SptExpr::SptExpr(const FileRegion& file_region,
 SptExpr::~SptExpr()
 {
 }
-   
+
 // @brief ファイル位置の取得
 // @return ファイル位置
 FileRegion
@@ -76,10 +76,10 @@ SptExpr::name() const
 {
   return NULL;
 }
-  
+
 // @brief オペランドの数の取得
 // @return 子供の数
-ymuint32
+ymuint
 SptExpr::operand_num() const
 {
   return 0;
@@ -89,7 +89,7 @@ SptExpr::operand_num() const
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-SptExpr::operand(ymuint32 pos) const
+SptExpr::operand(ymuint pos) const
 {
   return NULL;
 }
@@ -106,7 +106,7 @@ SptExpr::is_const_index() const
 
 // @brief インデックスリストのサイズの取得
 // @return インデックスリストのサイズ
-ymuint32
+ymuint
 SptExpr::index_num() const
 {
   return 0;
@@ -115,7 +115,7 @@ SptExpr::index_num() const
 // @brief インデックスの取得
 // @param[in] pos 位置番号 ( 0 <= pos < index_num() )
 const PtExpr*
-SptExpr::index(ymuint32 pos) const
+SptExpr::index(ymuint pos) const
 {
   return NULL;
 }
@@ -128,7 +128,7 @@ SptExpr::range_mode() const
 {
   return kVpiNoRange;
 }
-  
+
 // @brief 範囲の左側の式の取得
 // @return 範囲の左側の式
 // このクラスでは NULL を返す．
@@ -137,7 +137,7 @@ SptExpr::left_range() const
 {
   return NULL;
 }
-  
+
 // @brief 範囲の右側の式の取得
 // @return 範囲の右側の式
 // このクラスでは NULL を返す．
@@ -160,7 +160,7 @@ SptExpr::const_type() const
 // @return サイズ\n
 // サイズ指定の無い場合と整数型の定数でない場合には 0 を返す．
 // このクラスでは 0 を返す．
-ymuint32
+ymuint
 SptExpr::const_size() const
 {
   return 0;
@@ -169,7 +169,7 @@ SptExpr::const_size() const
 // @brief 整数型の値の取得
 // @return 値
 // このクラスでは 0 を返す．
-ymuint32
+ymuint
 SptExpr::const_uint() const
 {
   return 0;
@@ -203,7 +203,7 @@ SptExpr::is_index_expr() const
 {
   return false;
 }
-  
+
 // @brief インデックスの値の取得
 // @return 階層名の添字として使える式の時にその値を返す．
 // このクラスでは const_uint() をキャストして返す．
@@ -286,7 +286,7 @@ SptOpr1::is_index_expr() const
     return false;
   }
 }
-  
+
 // @brief インデックスの値の取得
 // @return 階層名の添字として使える式の時にその値を返す．
 int
@@ -303,17 +303,17 @@ SptOpr1::index_value() const
 
 // @brief オペランドの数の取得
 // @return オペランドの数
-ymuint32
+ymuint
 SptOpr1::operand_num() const
 {
   return mSize;
 }
-  
+
 // @brief オペランドを取り出す
 // @param[in] pos 取り出すオペランドの位置（最初の位置は 0）
 // @return pos 番目のオペランド
 const PtExpr*
-SptOpr1::operand(ymuint32 pos) const
+SptOpr1::operand(ymuint pos) const
 {
   return mExprList[pos];
 }
@@ -357,7 +357,7 @@ SptOpr2::is_index_expr() const
 {
   return false;
 }
-  
+
 // @brief インデックスの値の取得
 // @return 階層名の添字として使える式の時にその値を返す．
 int
@@ -368,17 +368,17 @@ SptOpr2::index_value() const
 
 // @brief オペランドの数の取得
 // @return オペランドの数
-ymuint32
+ymuint
 SptOpr2::operand_num() const
 {
   return mExprArray.size();
 }
-  
+
 // @brief オペランドの取得
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-SptOpr2::operand(ymuint32 pos) const
+SptOpr2::operand(ymuint pos) const
 {
   return mExprArray[pos];
 }
@@ -426,20 +426,20 @@ SptFuncCall::name() const
 {
   return mName;
 }
-  
+
 // @brief 引数の数の取得
 // @return 引数の数
-ymuint32
+ymuint
 SptFuncCall::operand_num() const
 {
   return mArgArray.size();
 }
-  
+
 // @brief オペランドの取得
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-SptFuncCall::operand(ymuint32 pos) const
+SptFuncCall::operand(ymuint pos) const
 {
   return mArgArray[pos];
 }
@@ -508,16 +508,16 @@ SptPrimary::is_const_index() const
 
 // @brief インデックスリストのサイズの取得
 // @return インデックスリストのサイズ
-ymuint32
+ymuint
 SptPrimary::index_num() const
 {
   return mIndexArray.size();
 }
-  
+
 // @brief インデックスの取得
 // @param[in] pos 位置番号 ( 0 <= pos < index_num() )
 const PtExpr*
-SptPrimary::index(ymuint32 pos) const
+SptPrimary::index(ymuint pos) const
 {
   return mIndexArray[pos];
 }
@@ -529,7 +529,7 @@ SptPrimary::range_mode() const
 {
   return mMode;
 }
-  
+
 // @brief 範囲の左側の式の取得
 // @return 範囲の左側の式
 const PtExpr*
@@ -537,7 +537,7 @@ SptPrimary::left_range() const
 {
   return mLeftRange;
 }
-  
+
 // @brief 範囲の右側の式の取得
 // @return 範囲の右側の式
 const PtExpr*
@@ -560,8 +560,8 @@ SptPrimary::right_range() const
 // @param[in] rvalue 実数型の時の値
 SptConstant::SptConstant(const FileRegion& file_region,
 			 tVpiConstType const_type,
-			 ymuint32 size,
-			 ymuint32 uvalue,
+			 ymuint size,
+			 ymuint uvalue,
 			 const char* svalue,
 			 double rvalue) :
   SptExpr(file_region, kPtConstExpr),
@@ -580,7 +580,7 @@ SptConstant::~SptConstant()
 
 // @brief 整数型の定数のサイズの取得
 // @return サイズ
-ymuint32
+ymuint
 SptConstant::const_size() const
 {
   return mSize;
@@ -588,7 +588,7 @@ SptConstant::const_size() const
 
 // @brief 整数型の値の取得
 // @return 整数型の値
-ymuint32
+ymuint
 SptConstant::const_uint() const
 {
   return mUintValue;
@@ -628,7 +628,7 @@ SptConstant::const_type() const
   return mConstType;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // expression 関係
 //////////////////////////////////////////////////////////////////////
@@ -1012,7 +1012,7 @@ SptFactory::new_SysFuncCall(const FileRegion& file_region,
 // @return 生成された定数
 PtExpr*
 SptFactory::new_IntConst(const FileRegion& file_region,
-			 ymuint32 value)
+			 ymuint value)
 {
   void* p = alloc().get_memory(sizeof(SptConstant));
   return new (p) SptConstant(file_region, kVpiIntConst,
@@ -1055,7 +1055,7 @@ SptFactory::new_IntConst(const FileRegion& file_region,
 // @return 生成された定数
 PtExpr*
 SptFactory::new_IntConst(const FileRegion& file_region,
-			 ymuint32 size,
+			 ymuint size,
 			 tVpiConstType const_type,
 			 const char* value)
 {

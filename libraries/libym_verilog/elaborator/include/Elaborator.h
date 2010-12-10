@@ -50,7 +50,7 @@ class AttrGen;
 class Elaborator
 {
   friend class ElbProxy;
-  
+
 public:
 
   /// @brief コンストラクタ
@@ -63,14 +63,14 @@ public:
 
   /// @brief デストラクタ
   ~Elaborator();
-  
+
 
 public:
-  
+
   /// @brief エラボレーションを行う．
   /// @param[in] pt_mgr パース木を管理するクラス
   /// @return エラー数を返す．
-  size_t
+  ymuint
   operator()(const PtMgr& pt_mgr);
 
 
@@ -78,11 +78,11 @@ private:
   //////////////////////////////////////////////////////////////////////
   // elaboration で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief メッセージマネージャを取り出す．
   MsgMgr&
   msg_mgr();
-  
+
   /// @brief 後で処理する defparam 文を登録する．
   /// @param[in] header アイテムテンプレートのヘッダ (defparam を持つ)
   /// @param[in] defparam defparam 文のテンプレート
@@ -110,14 +110,14 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 要素を検索する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前からモジュール定義を取り出す．
   /// @param[in] name 名前
   /// @return name という名のモジュール定義
   /// @return なければ NULL を返す．
   const PtModule*
   find_moduledef(const char* name) const;
-  
+
   /// @brief constant function を取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[in] name 名前
@@ -132,7 +132,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 要素を登録する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief constant function を登録する．
   /// @param[in] parent 親のスコープ
   /// @param[in] name 名前
@@ -142,7 +142,7 @@ private:
 			const char* name,
 			ElbTaskFunc* func);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる型定義
@@ -159,18 +159,18 @@ private:
       mPtDefparam(pt_defparam)
     {
     }
-    
+
     /// @brief 対象のモジュール
     const VlModule* mModule;
 
     /// @brief パース木の DefParam ヘッダ
     const PtItem* mPtHeader;
-    
+
     /// @brief パース木の DefParam 文
     const PtDefParam* mPtDefparam;
   };
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -181,13 +181,13 @@ private:
 
   // 生成したオブジェクトを管理するクラス
   ElbMgr& mMgr;
-  
+
   // オブジェクト生成用のファクトリクラス
   ElbFactory& mFactory;
-  
+
   // ElbStub 用のメモリアロケータ
   SimpleAlloc mAlloc;
-  
+
   // UDP 生成用のオブジェクト
   UdpGen* mUdpGen;
 
@@ -205,22 +205,22 @@ private:
 
   // 式生成用のオブジェクト
   ExprGen* mExprGen;
-  
+
   // attribute instance 生成用のオブジェクト
   AttrGen* mAttrGen;
-  
+
   // constant function の辞書
   CfDict mCfDict;
 
   // モジュールテンプレートの辞書
   hash_map<string, const PtModule*> mModuleDict;
-  
+
   // attribute instance の辞書
   AttrDict mAttrDict;
-  
+
   // defparam 文の元のリスト
   list<DefParamStub> mDefParamStubList;
-  
+
   // phase1 で生成するオブジェクトを追加するリスト
   ElbStubList mPhase1StubList1;
 
@@ -232,7 +232,7 @@ private:
 
   // phase3 で link するオブジェクトを入れたリスト
   ElbStubList mPhase3StubList;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -241,7 +241,7 @@ private:
 
   // IOに範囲がなく宣言のみに範囲を持つ場合を許すとき true
   bool mAllowEmptyIORange;
-  
+
 };
 
 

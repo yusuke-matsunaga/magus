@@ -575,7 +575,7 @@ public:
        const char* name) const;
 
   /// @brief このオブジェクトが使用しているメモリ量を返す．
-  size_t
+  ymuint
   allocated_size() const;
 
 
@@ -592,10 +592,10 @@ private:
 
   /// @brief テーブルの領域を確保する．
   void
-  alloc_table(ymuint32 size);
+  alloc_table(ymuint size);
 
   /// @brief ハッシュ値を計算する．
-  ymuint32
+  ymuint
   hash_func(const VlNamedObj* parent,
 	    const char* name) const;
 

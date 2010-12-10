@@ -25,15 +25,15 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbPrimHead
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbPrimHead();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbPrimHead();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbPrimHead の仮想関数
@@ -78,7 +78,7 @@ public:
   virtual
   void
   set_delay(ElbDelay* expr) = 0;
-  
+
 };
 
 
@@ -91,16 +91,16 @@ class ElbPrimArray :
   public VlPrimArray
 {
   friend class CellPrimArray;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbPrimArray();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbPrimArray();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -110,13 +110,13 @@ public:
   /// @brief 要素のプリミティブを取り出す．
   virtual
   ElbPrimitive*
-  _primitive_by_offset(ymuint32 offset) const = 0;
+  _primitive_by_offset(ymuint offset) const = 0;
 
   /// @brief 要素のプリミティブを取り出す．
   virtual
   ElbPrimitive*
   _primitive_by_index(int index) const = 0;
-  
+
   /// @brief ヘッダを得る．
   virtual
   ElbPrimHead*
@@ -140,7 +140,7 @@ private:
 
   // 次の要素を指すポインタ
   ElbPrimArray* mNext;
-  
+
 };
 
 
@@ -154,28 +154,28 @@ class ElbPrimitive :
   friend class CellPrimitive;
 
 protected:
-  
+
   /// @brief コンストラクタ
   ElbPrimitive();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbPrimitive();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbPrimitive の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 接続する．
   /// @param[in] pos ポート番号 (0 から始まる)
   /// @param[in] expr 接続する式
   virtual
   void
-  connect(ymuint32 pos,
+  connect(ymuint pos,
 	  ElbExpr* expr) = 0;
-    
+
   /// @brief ヘッダを得る．
   virtual
   ElbPrimHead*
@@ -196,7 +196,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 便利関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入出力ポート数を計算する．
   /// @param[in] type プリミティブの型
   /// @param[in] port_size 全ポート数
@@ -209,12 +209,12 @@ public:
   static
   int
   get_port_size(tVpiPrimType type,
-		ymuint32 port_size,
-		ymuint32& output_num,
-		ymuint32& inout_num,
-		ymuint32& input_num);
-  
-  
+		ymuint port_size,
+		ymuint& output_num,
+		ymuint& inout_num,
+		ymuint& input_num);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -222,7 +222,7 @@ private:
 
   // 次の要素を指すポインタ
   ElbPrimitive* mNext;
-  
+
 };
 
 
@@ -235,14 +235,14 @@ class ElbPrimTerm :
   public VlPrimTerm
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbPrimTerm() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbPrimTerm() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -253,7 +253,7 @@ public:
   virtual
   void
   set(ElbPrimitive* primitive,
-      ymuint32 index,
+      ymuint index,
       tVpiDirection dir) = 0;
 
 };

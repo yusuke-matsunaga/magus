@@ -86,7 +86,7 @@ public:
 
   /// @brief ビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief LSB からのオフセット値の取得
@@ -184,7 +184,7 @@ public:
   right_range_const() const;
 
   /// @brief ビット幅を返す．
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief LSB からのオフセット値の取得
@@ -297,7 +297,7 @@ public:
 
   /// @brief ビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief オフセット値の取得

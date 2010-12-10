@@ -77,17 +77,17 @@ SptControl::delay() const
 // イベントリストのサイズの取得
 // @retval イベントリストのサイズ event control/repeat control の場合
 // @retval NULL 上記以外
-ymuint32
+ymuint
 SptControl::event_num() const
 {
   return mEventArray.size();
 }
-  
+
 // @brief イベントリストの要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < event_num() )
 // @note event control/repeat control の場合のみ意味を持つ
 const PtExpr*
-SptControl::event(ymuint32 pos) const
+SptControl::event(ymuint pos) const
 {
   return mEventArray[pos];
 }
@@ -129,7 +129,7 @@ SptConnection::SptConnection(const FileRegion& file_region,
 SptConnection::~SptConnection()
 {
 }
-  
+
 // ファイル位置の取得
 // @return ファイル位置
 FileRegion
@@ -253,7 +253,7 @@ SptDelay::SptDelay(const FileRegion& file_region,
   mValue[1] = value2;
   mValue[2] = NULL;
 }
-  
+
 // 三つの値をとるコンストラクタ
 // @param file_region ファイル位置の情報
 // @param value1 遅延値1
@@ -289,7 +289,7 @@ SptDelay::file_region() const
 // @return pos 番目の遅延を表す式
 // 該当する要素がなければ NULL を返す．
 const PtExpr*
-SptDelay::value(ymuint32 pos) const
+SptDelay::value(ymuint pos) const
 {
   if ( pos < 3 ) {
     return mValue[pos];
@@ -369,16 +369,16 @@ SptAttrInst::~SptAttrInst()
 
 // 要素数の取得
 // @return 要素数
-ymuint32
+ymuint
 SptAttrInst::attrspec_num() const
 {
   return mAttrSpecArray.size();
 }
-    
+
 // @brief 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < attrspec_num() )
 const PtAttrSpec*
-SptAttrInst::attrspec(ymuint32 pos) const
+SptAttrInst::attrspec(ymuint pos) const
 {
   return mAttrSpecArray[pos];
 }
@@ -421,7 +421,7 @@ SptAttrSpec::name() const
 {
   return mName;
 }
-  
+
 // 式の取得
 // @return 式
 // NULL の場合もある．
@@ -431,7 +431,7 @@ SptAttrSpec::expr() const
   return mExpr;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // その他
 //////////////////////////////////////////////////////////////////////
@@ -607,7 +607,7 @@ SptFactory::new_NameBranch(const char* name,
   return new (p) SptNameBranch(name, index);
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // attribute instance 関係
 //////////////////////////////////////////////////////////////////////

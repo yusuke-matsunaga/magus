@@ -155,7 +155,7 @@ protected:
   EiTcBase(const VlNamedObj* parent,
 	   ElbProcess* process,
 	   const PtStmt* pt_stmt,
-	   ymuint32 arg_num,
+	   ymuint arg_num,
 	   ElbExpr** arg_array);
 
   /// @brief デストラクタ
@@ -170,14 +170,14 @@ public:
 
   /// @brief 引数の数を返す．
   virtual
-  ymuint32
+  ymuint
   argument_num() const;
 
   /// @brief 引数の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < argument_num() )
   virtual
   const VlExpr*
-  argument(ymuint32 pos) const;
+  argument(ymuint pos) const;
 
 
 private:
@@ -189,7 +189,7 @@ private:
   /// @param[in] pos 位置番号
   /// @param[in] arg 設定する引数
   void
-  set_argument(ymuint32 pos,
+  set_argument(ymuint pos,
 	       ElbExpr* arg);
 
 
@@ -229,7 +229,7 @@ private:
 	     ElbProcess* process,
 	     const PtStmt* pt_stmt,
 	     ElbTaskFunc* task,
-	     ymuint32 arg_num,
+	     ymuint arg_num,
 	     ElbExpr** arg_array);
 
   /// @brief デストラクタ
@@ -298,7 +298,7 @@ private:
 		ElbProcess* process,
 		const PtStmt* pt_stmt,
 		const ElbUserSystf* user_systf,
-		ymuint32 arg_num,
+		ymuint arg_num,
 		ElbExpr** arg_array);
 
   /// @brief デストラクタ

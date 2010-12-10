@@ -150,7 +150,7 @@ private:
 
   /// @brief  要素数を得る．
   virtual
-  ymuint32
+  ymuint
   num() = 0;
 
 
@@ -368,7 +368,7 @@ public:
 		     vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief このオブジェクトが使用しているメモリ量を返す．
-  size_t
+  ymuint
   allocated_size() const;
 
 
@@ -393,12 +393,12 @@ private:
   /// @brief テーブルの領域を確保する．
   /// @param[in] size 必要なサイズ
   void
-  alloc_table(ymuint32 size);
+  alloc_table(ymuint size);
 
   /// @brief ハッシュ値を計算する．
   /// @param[in] parent 親のスコープ
   /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
-  ymuint32
+  ymuint
   hash_func(const VlNamedObj* parent,
 	    int tag) const;
 

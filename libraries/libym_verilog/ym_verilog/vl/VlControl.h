@@ -38,8 +38,8 @@ protected:
   /// @brief デストラクタ
   virtual
   ~VlControl() { }
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlControl の仮想関数
@@ -54,17 +54,17 @@ public:
   virtual
   const VlExpr*
   expr() const = 0;
-  
+
   /// @brief イベント条件式の数を返す．
   virtual
-  ymuint32
+  ymuint
   event_num() const = 0;
-  
+
   /// @brief イベント条件式を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   virtual
   const VlExpr*
-  event(ymuint32 pos) const = 0;
+  event(ymuint pos) const = 0;
 
 };
 

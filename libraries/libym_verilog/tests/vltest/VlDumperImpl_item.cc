@@ -24,7 +24,7 @@
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-  
+
 // @brief primitive array のリストの内容を出力する関数
 void
 VlDumperImpl::put_primarray_list(const char* label,
@@ -36,7 +36,7 @@ VlDumperImpl::put_primarray_list(const char* label,
   for (vector<const VlPrimArray*>::const_iterator p = primarray_list.begin();
        p != primarray_list.end(); ++ p) {
     const VlPrimArray* primarray = *p;
-    
+
     const char* nm = NULL;
     switch ( primarray->type() ) {
     case kVpiGateArray:   nm = "GateArray"; break;
@@ -45,16 +45,16 @@ VlDumperImpl::put_primarray_list(const char* label,
     default: assert_not_reached(__FILE__, __LINE__);
     }
     VlDumpHeader x(this, label, nm);
-  
+
     put("FileRegion", primarray->file_region() );
     put("vpiFullName", primarray->full_name() );
     put("vpiSize", primarray->elem_num() );
     put_expr("vpiLeftRange", mgr, primarray->left_range() );
     put_expr("vpiRightRange", mgr, primarray->right_range() );
     put_delay("vpiDelay", mgr, primarray->delay() );
-  
-    ymuint32 n = primarray->elem_num();
-    for (ymuint32 i = 0; i < n; ++ i) {
+
+    ymuint n = primarray->elem_num();
+    for (ymuint i = 0; i < n; ++ i) {
       const VlPrimitive* primitive = primarray->elem_by_offset(i);
       put_primitive("vpiPrimitive", mgr, primitive);
     }
@@ -76,7 +76,7 @@ VlDumperImpl::put_primitive(const char* label,
   default: assert_not_reached(__FILE__, __LINE__);
   }
   VlDumpHeader x(this, label, nm);
-    
+
   put("FileRegion", prim->file_region() );
   put("vpiFullName", prim->full_name() );
   put("vpiDefName", prim->def_name() );
@@ -91,26 +91,26 @@ VlDumperImpl::put_primitive(const char* label,
 #else
 #warning "TODO: primitive の primitive_array/index"
 #endif
-  
+
   put("vpiModule", prim->parent_module()->full_name() );
   put("vpiScope", prim->parent()->full_name() );
-  
+
   put("vpiStrength0", prim->drive0() );
   put("vpiStrength1", prim->drive1() );
   put("vpiDelay", prim->delay() );
-  
+
   if ( prim->type() == kVpiUdp ) {
     put("vpiUdpDefn", prim->udp_defn()->def_name() );
   }
-  
+
 #if 0
   put("vpiSize", handle.get_int(vpiSize));
 #else
   put("port_num", prim->port_num() );
 #endif
-  
-  ymuint32 n = prim->port_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+
+  ymuint n = prim->port_num();
+  for (ymuint i = 0; i < n; ++ i) {
     put_primterm("vpiPrimTerm", mgr, prim->prim_term(i) );
   }
 }
@@ -161,21 +161,21 @@ VlDumperImpl::put_udp_defn(const char* label,
   put("vpiPrimType", udp->prim_type() );
   put("vpiProtected", udp->is_protected() );
   put("port_num", udp->port_num() );
-  
-  ymuint32 n = udp->port_num() - 1;
-  for (ymuint32 i = 0; i < n; ++ i) {
+
+  ymuint n = udp->port_num() - 1;
+  for (ymuint i = 0; i < n; ++ i) {
     put_iodecl("vpiIODecl", mgr, udp->input(i));
   }
   put_iodecl("vpiIODecl", mgr, udp->output());
-  
+
   if ( udp->init_expr() ) {
     put_expr("vpiInitial", mgr, udp->init_expr() );
   }
 
   {
     VlDumpHeader x(this, "vpiTableEntry", "Iterator");
-    ymuint32 n = udp->table_size();
-    for (ymuint32 i = 0; i < n; ++ i) {
+    ymuint n = udp->table_size();
+    for (ymuint i = 0; i < n; ++ i) {
       const VlTableEntry* entry = udp->table_entry(i);
       put("TableEntry", entry->str());
 #if 0
@@ -201,11 +201,11 @@ VlDumperImpl::put_task(const char* label,
   put("FileRegion", task->file_region() );
   put("vpiFullName", task->full_name() );
 
-  ymuint32 n = task->io_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = task->io_num();
+  for (ymuint i = 0; i < n; ++ i) {
     put_iodecl("vpiIODecl", mgr, task->io(i) );
   }
-  
+
   put_scope_sub(mgr, task);
 
   put_stmt("vpiStmt", mgr, task->stmt() );
@@ -229,8 +229,8 @@ VlDumperImpl::put_function(const char* label,
   put_expr("vpiLeftRange", mgr, func->left_range() );
   put_expr("vpiRightRange", mgr, func->right_range() );
 
-  ymuint32 n = func->io_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = func->io_num();
+  for (ymuint i = 0; i < n; ++ i) {
     put_iodecl("vpiIODecl", mgr, func->io(i) );
   }
 
@@ -268,7 +268,7 @@ VlDumperImpl::put_contassign(const char* label,
 #if 0
   put("vpiScope", ca->scope()->full_name() );
 #endif
-  
+
   put("vpiStrength0", ca->drive0() );
   put("vpiStrength1", ca->drive1() );
   put("vpiDelay", ca->delay() );
@@ -285,7 +285,7 @@ VlDumperImpl::put_contassign(const char* label,
 #warning "TODO: ContAssign のビット展開"
 #endif
 }
-  
+
 // @brief continuous assignment のリストの内容を出力する関数
 void
 VlDumperImpl::put_contassign_list(const char* label,

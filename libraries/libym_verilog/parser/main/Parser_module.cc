@@ -66,10 +66,10 @@ Parser::new_Module1995(const FileRegion& file_region,
   // port_array をスキャンして中で用いられている名前を port_ref_dic
   // に登録する．
   hash_set<string> port_ref_dic;
-  for (ymuint32 i = 0; i < port_array.size(); ++ i) {
+  for (ymuint i = 0; i < port_array.size(); ++ i) {
     PtiPort* port = port_array[i];
-    ymuint32 n = port->portref_num();
-    for (ymuint32 j = 0; j < n; ++ j) {
+    ymuint n = port->portref_num();
+    for (ymuint j = 0; j < n; ++ j) {
       PtiPortRef* portref = port->_portref(j);
       const char* name = portref->name();
       port_ref_dic.insert(name);
@@ -80,7 +80,7 @@ Parser::new_Module1995(const FileRegion& file_region,
   // ポート宣言が型を持つ場合にはモジュール内部の宣言要素を生成する．
   // 持たない場合にはデフォルトタイプのネットを生成する．
   hash_map<string, tVpiDirection> iodecl_dirs;
-  for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io_head = iohead_array[i];
     // 名前をキーにして方向を記録しておく
     tVpiDirection dir = kVpiNoDirection;
@@ -91,7 +91,7 @@ Parser::new_Module1995(const FileRegion& file_region,
     default:
       assert_not_reached(__FILE__, __LINE__);
     }
-    for (ymuint32 j = 0; j < io_head->item_num(); ++ j) {
+    for (ymuint j = 0; j < io_head->item_num(); ++ j) {
       const PtIOItem* elem = io_head->item(j);
       const char* elem_name = elem->name();
 
@@ -127,14 +127,14 @@ Parser::new_Module1995(const FileRegion& file_region,
   // 調べる．
   // 同時に名無しのポートがあるかどうかしらべる．
   bool named_port = true;
-  for (ymuint32 i = 0; i < port_array.size(); ++ i) {
+  for (ymuint i = 0; i < port_array.size(); ++ i) {
     PtiPort* port = port_array[i];
     if ( port->ext_name() == NULL ) {
       // 1つでも名前を持たないポートがあったら名前での結合はできない．
       named_port = false;
     }
-    ymuint32 n = port->portref_num();
-    for (ymuint32 j = 0; j < n; ++ j) {
+    ymuint n = port->portref_num();
+    for (ymuint j = 0; j < n; ++ j) {
       PtiPortRef* portref = port->_portref(j);
       const char* name = portref->name();
       hash_map<string, tVpiDirection>::iterator p = iodecl_dirs.find(name);
@@ -241,8 +241,8 @@ Parser::new_Module2001(const FileRegion& file_region,
 PtiPortArray
 Parser::new_PortArray(PtIOHeadArray iohead_array)
 {
-  ymuint32 n = 0;
-  for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
+  ymuint n = 0;
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     n += iohead_array[i]->item_num();
   }
   // port_array を確保する．
@@ -251,9 +251,9 @@ Parser::new_PortArray(PtIOHeadArray iohead_array)
 
   // ポートを生成し arary に格納する．
   n = 0;
-  for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* head = iohead_array[i];
-    for (ymuint32 j = 0; j < head->item_num(); ++ j) {
+    for (ymuint j = 0; j < head->item_num(); ++ j) {
       const PtIOItem* elem = head->item(j);
       const char* name = elem->name();
       init_portref_list();

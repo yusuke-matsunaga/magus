@@ -43,7 +43,7 @@ EiFactory::dump_prof(ostream& s)
 // @brief ステートメントの配列を生成する．
 // @param[in] stmt_num 要素数
 ElbStmt**
-EiFactory::new_StmtList(ymuint32 stmt_num)
+EiFactory::new_StmtList(ymuint stmt_num)
 {
   void* q = mAlloc.get_memory(sizeof(ElbStmt*) * stmt_num);
   ElbStmt** array = new (q) ElbStmt*[stmt_num];
@@ -54,7 +54,7 @@ EiFactory::new_StmtList(ymuint32 stmt_num)
 // @brief 式の配列を生成する．
 // @param[in] elem_num 要素数
 ElbExpr**
-EiFactory::new_ExprList(ymuint32 elem_num)
+EiFactory::new_ExprList(ymuint elem_num)
 {
   void* p = mAlloc.get_memory(sizeof(ElbExpr*) * elem_num);
   ElbExpr** expr_array = new (p) ElbExpr*[elem_num];

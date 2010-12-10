@@ -379,9 +379,9 @@ ElbValue
 ExprGen::evaluate_const(const VlNamedObj* parent,
 			const PtExpr* pt_expr)
 {
-  ymuint32 size = pt_expr->const_size();
+  ymuint size = pt_expr->const_size();
   bool is_signed = false;
-  ymuint32 base = 0;
+  ymuint base = 0;
   switch ( pt_expr->const_type() ) {
   case kVpiIntConst:
     if ( pt_expr->const_str() == NULL ) {

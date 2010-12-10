@@ -32,7 +32,7 @@ protected:
   /// @param[in] opr_size オペランド数
   /// @param[in] opr_array オペランドを格納する配列
   EiConcatOp(const PtBase* pt_obj,
-	     ymuint32 opr_size,
+	     ymuint opr_size,
 	     ElbExpr** opr_array);
 
   /// @brief デストラクタ
@@ -63,7 +63,7 @@ public:
 
   /// @brief オペランド数を返す．
   virtual
-  ymuint32
+  ymuint
   operand_num() const;
 
   /// @brief スカラー値を返す．
@@ -128,7 +128,7 @@ public:
   /// @brief オペランドを返す．
   virtual
   ElbExpr*
-  _operand(ymuint32 pos) const;
+  _operand(ymuint pos) const;
 
 
 protected:
@@ -137,7 +137,7 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ビット幅を返す．
-  ymuint32
+  ymuint
   bit_size() const;
 
 
@@ -179,7 +179,7 @@ private:
   EiMultiConcatOp(const PtBase* pt_obj,
 		  ElbExpr* rep_expr,
 		  int rep_num,
-		  ymuint32 opr_size,
+		  ymuint opr_size,
 		  ElbExpr** opr_array);
 
   /// @brief デストラクタ
@@ -204,7 +204,7 @@ public:
 
   /// @brief オペランド数を返す．
   virtual
-  ymuint32
+  ymuint
   operand_num() const;
 
   /// @brief bitvector 型の値を返す．
@@ -242,7 +242,7 @@ public:
   /// @param[in] pos 位置番号
   virtual
   ElbExpr*
-  _operand(ymuint32 pos) const;
+  _operand(ymuint pos) const;
 
 
 private:
@@ -265,7 +265,7 @@ private:
 
 // @brief ビット幅を返す．
 inline
-ymuint32
+ymuint
 EiConcatOp::bit_size() const
 {
   return mSize;

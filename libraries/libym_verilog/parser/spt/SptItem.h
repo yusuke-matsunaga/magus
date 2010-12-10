@@ -80,26 +80,26 @@ public:
   /// @return 要素数
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief defparam 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtDefParam*
-  defparam(ymuint32 pos) const;
+  defparam(ymuint pos) const;
 
   /// @brief continuous assign 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtContAssign*
-  contassign(ymuint32 pos) const;
+  contassign(ymuint pos) const;
 
   /// @brief module/UDP/gate instance 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtInst*
-  inst(ymuint32 pos) const;
+  inst(ymuint pos) const;
 
   /// @brief 名前の取得
   /// @return 名前
@@ -118,7 +118,7 @@ public:
 
   /// @brief IO宣言の要素数の取得
   virtual
-  ymuint32
+  ymuint
   ioitem_num() const;
 
   /// @brief IO宣言リストの配列の取得
@@ -219,7 +219,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtExpr*
-  terminal(ymuint32 pos) const;
+  terminal(ymuint pos) const;
 
   /// @brief パス記述の取得
   /// @return パス記述
@@ -259,7 +259,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtGenCaseItem*
-  caseitem(ymuint32 pos) const;
+  caseitem(ymuint pos) const;
 
   /// @brief 繰り返し制御用の変数名の取得
   /// @return 繰り返し制御用の変数名
@@ -324,14 +324,14 @@ public:
 
   // 要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief defparam 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtDefParam*
-  defparam(ymuint32 pos) const;
+  defparam(ymuint pos) const;
 
 
 private:
@@ -451,14 +451,14 @@ public:
 
   // 要素数を得る．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief continuous assign 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtContAssign*
-  contassign(ymuint32 pos) const;
+  contassign(ymuint pos) const;
 
 
 private:
@@ -638,7 +638,7 @@ public:
 
   /// @brief IO宣言の要素数の取得
   virtual
-  ymuint32
+  ymuint
   ioitem_num() const;
 
   /// @brief IO宣言リストの配列の取得
@@ -794,14 +794,14 @@ public:
 
   // 要素数を取り出す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief module/UDP/gate instance 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtInst*
-  inst(ymuint32 pos) const;
+  inst(ymuint pos) const;
 
 
 private:
@@ -874,14 +874,14 @@ public:
 
   // 要素数を取り出す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief module/UDP/gate instance 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtInst*
-  inst(ymuint32 pos) const;
+  inst(ymuint pos) const;
 
 
 private:
@@ -957,14 +957,14 @@ public:
   /// @brief ポート数の取得
   /// @return ポート数
   virtual
-  ymuint32
+  ymuint
   port_num() const;
 
   /// @brief ポートの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
   virtual
   const PtConnection*
-  port(ymuint32 pos) const;
+  port(ymuint pos) const;
 
 
 private:
@@ -1190,13 +1190,13 @@ public:
 
   // case item の要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   // case item を返す．
   virtual
   const PtGenCaseItem*
-  caseitem(ymuint32 pos) const;
+  caseitem(ymuint pos) const;
 
 
 private:
@@ -1248,14 +1248,14 @@ public:
   /// @return ラベル数\n
   /// 0 の時は default の意味
   virtual
-  ymuint32
+  ymuint
   label_num() const;
 
   /// @brief ラベルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < label_num() )
   virtual
   const PtExpr*
-  label(ymuint32 pos) const;
+  label(ymuint pos) const;
 
   /// @brief 宣言のリストの取得
   virtual
@@ -1409,14 +1409,14 @@ public:
 
   // ターミナルリストの要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief ターミナルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
   const PtExpr*
-  terminal(ymuint32 pos) const;
+  terminal(ymuint pos) const;
 
 
 private:
@@ -1537,14 +1537,14 @@ public:
   /// @brief 入力リストの要素数の取得
   /// @return 入力リストの要素数
   virtual
-  ymuint32
+  ymuint
   input_num() const;
 
   /// @brief 入力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   virtual
   const PtExpr*
-  input(ymuint32 pos) const;
+  input(ymuint pos) const;
 
   // 入力の極性を取り出す．
   // 0の場合もありうる．
@@ -1560,14 +1560,14 @@ public:
   /// @brief 出力リストの要素数の取得
   /// @return 出力リストの要素数
   virtual
-  ymuint32
+  ymuint
   output_num() const;
 
   /// @brief 出力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
   virtual
   const PtExpr*
-  output(ymuint32 pos) const;
+  output(ymuint pos) const;
 
   // 出力の極性を取り出す．
   // 0の場合もありうる．
@@ -1666,7 +1666,7 @@ public:
   // 0の場合もある．
   virtual
   const PtExpr*
-  value(ymuint32 pos) const;
+  value(ymuint pos) const;
 
 
 private:

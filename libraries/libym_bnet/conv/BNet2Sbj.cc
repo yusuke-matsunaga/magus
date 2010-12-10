@@ -29,14 +29,11 @@ public:
   // 登録する．
   void
   put(BNode* bnode,
-      SbjNode* sbjnode,
-      bool inv);
+      SbjHandle sbjhandle);
 
   // 探す．
-  bool
-  get(BNode* bnode,
-      SbjNode*& sbjnode,
-      bool& inv) const;
+  SbjHandle
+  get(BNode* bnode) const;
 
 
 private:
@@ -45,35 +42,29 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ただの配列
-  vector<ympuint> mArray;
+  vector<SbjHandle> mArray;
 
 };
 
 // コンストラクタ
 BNodeMap::BNodeMap(ymuint n) :
-  mArray(n, 0UL)
+  mArray(n, SbjHandle::make_zero())
 {
 }
 
 // 登録する．
 void
 BNodeMap::put(BNode* bnode,
-	      SbjNode* sbjnode,
-	      bool inv)
+	      SbjHandle sbjhandle)
 {
-  mArray[bnode->id()] = reinterpret_cast<ympuint>(sbjnode) | (inv & 1);
+  mArray[bnode->id()] = sbjhandle;
 }
 
 // 探す．
-bool
-BNodeMap::get(BNode* bnode,
-	      SbjNode*& sbjnode,
-	      bool& inv) const
+SbjHandle
+BNodeMap::get(BNode* bnode) const
 {
-  ympuint tmp = mArray[bnode->id()];
-  sbjnode = reinterpret_cast<SbjNode*>(tmp & ~1UL);
-  inv = static_cast<bool>(tmp & 1);
-  return sbjnode != NULL;
+  return mArray[bnode->id()];
 }
 
 
@@ -107,7 +98,7 @@ BNet2Sbj::operator()(const BNetwork& network,
        p != network.inputs_end(); ++p) {
     BNode* bnode = *p;
     SbjNode* node = sbjgraph.new_input();
-    assoc.put(bnode, node, false);
+    assoc.put(bnode, SbjHandle(node, false));
     sbjgraph.add_port(bnode->name(), vector<SbjNode*>(1, node));
   }
 
@@ -116,7 +107,7 @@ BNet2Sbj::operator()(const BNetwork& network,
        p != network.latch_nodes_end(); ++ p) {
     BNode* bnode = *p;
     SbjNode* node = sbjgraph.new_dff();
-    assoc.put(bnode, node, false);
+    assoc.put(bnode, SbjHandle(node, false));
   }
 
   // 定数0に縮退している外部出力/DFFを求めておく
@@ -157,18 +148,15 @@ BNet2Sbj::operator()(const BNetwork& network,
 	return false;
       }
       bool inv = bnode->is_one();
-      assoc.put(bnode, NULL, inv);
+      assoc.put(bnode, SbjHandle(NULL, inv));
     }
     else if ( ni == 1 ) {
-      SbjNode* inode;
-      bool inv;
-      bool stat = assoc.get(bnode->fanin(0), inode, inv);
-      assert_cond(stat, __FILE__, __LINE__);
+      SbjHandle ihandle = assoc.get(bnode->fanin(0));
       if ( bnode->is_buffer() ) {
-	assoc.put(bnode, inode, inv);
+	assoc.put(bnode, ihandle);
       }
       else if ( bnode->is_inverter() ) {
-	assoc.put(bnode, inode, !inv);
+	assoc.put(bnode, ~ihandle);
       }
       else {
 	err_out << "ERROR: " << bnode->name()
@@ -181,61 +169,41 @@ BNet2Sbj::operator()(const BNetwork& network,
       assert_cond(expr.child(0).is_literal(), __FILE__, __LINE__);
       assert_cond(expr.child(1).is_literal(), __FILE__, __LINE__);
 
-      SbjNode* inode0;
-      SbjNode* inode1;
-      bool inv0;
-      bool inv1;
-
-      bool stat0 = assoc.get(bnode->fanin(0), inode0, inv0);
-      assert_cond(stat0, __FILE__, __LINE__);
-      bool stat1 = assoc.get(bnode->fanin(1), inode1, inv1);
-      assert_cond(stat1, __FILE__, __LINE__);
+      SbjHandle ihandle0 = assoc.get(bnode->fanin(0));
+      SbjHandle ihandle1 = assoc.get(bnode->fanin(1));
 
       if ( expr.child(0).is_negaliteral() ) {
 	if ( expr.child(0).varid() == 0 ) {
-	  inv0 = !inv0;
+	  ihandle0.invert();
 	}
 	else {
-	  inv1 = !inv1;
+	  ihandle1.invert();
 	}
       }
 
       if ( expr.child(1).is_negaliteral() ) {
 	if ( expr.child(1).varid() == 0 ) {
-	  inv0 = !inv0;
+	  ihandle0.invert();
 	}
 	else {
-	  inv1 = !inv1;
+	  ihandle1.invert();
 	}
       }
 
-      bool oinv = false;
-      bool xor_flag = false;
+      SbjHandle handle;
       if ( expr.is_and() ) {
-	// なにもしない．
+	handle = sbjgraph.new_and(ihandle0, ihandle1);
       }
       else if ( expr.is_or() ) {
-	oinv = true;
-	inv0 = !inv0;
-	inv1 = !inv1;
+	handle = sbjgraph.new_or(ihandle0, ihandle1);
       }
       else if ( expr.is_xor() ) {
-	oinv = inv0 ^ inv1;
-	inv0 = false;
-	inv1 = false;
-	xor_flag = true;
+	handle = sbjgraph.new_xor(ihandle0, ihandle1);
       }
       else {
 	assert_not_reached(__FILE__, __LINE__);
       }
-      SbjNode* node = NULL;
-      if ( xor_flag ) {
-	node = sbjgraph.new_xor(inode0, inode1);
-      }
-      else {
-	node = sbjgraph.new_and(inode0, inode1, inv0, inv1);
-      }
-      assoc.put(bnode, node, oinv);
+      assoc.put(bnode, handle);
     }
     else { // ni > 2
       err_out << "ERROR: number of fanins exceeds 2" << endl;
@@ -248,14 +216,12 @@ BNet2Sbj::operator()(const BNetwork& network,
   for (BNodeList::const_iterator p = network.latch_nodes_begin();
        p != network.latch_nodes_end(); ++ p) {
     BNode* obnode = *p;
-    bool inv;
-    SbjNode* onode = NULL;
-    assoc.get(obnode, onode, inv);
-    assert_cond(inv == false, __FILE__, __LINE__);
+    SbjHandle ohandle = assoc.get(obnode);
+    assert_cond( ohandle.inv() == false, __FILE__, __LINE__);
+    SbjNode* onode = ohandle.node();
     BNode* ibnode = obnode->fanin(0);
-    SbjNode* inode = NULL;
-    assoc.get(ibnode, inode, inv);
-    sbjgraph.set_dff_data(onode, inode, inv);
+    SbjHandle ihandle = assoc.get(ibnode);
+    sbjgraph.set_dff_data(onode, ihandle);
   }
 
   // 外部出力ノードを作る．
@@ -264,10 +230,8 @@ BNet2Sbj::operator()(const BNetwork& network,
        p != network.outputs_end(); ++ p) {
     BNode* obnode = *p;
     BNode* ibnode = obnode->fanin(0);
-    SbjNode* inode = NULL;
-    bool inv;
-    assoc.get(ibnode, inode, inv);
-    SbjNode* node = sbjgraph.new_output(inode, inv);
+    SbjHandle ihandle = assoc.get(ibnode);
+    SbjNode* node = sbjgraph.new_output(ihandle);
     sbjgraph.add_port(obnode->name(), vector<SbjNode*>(1, node));
   }
 

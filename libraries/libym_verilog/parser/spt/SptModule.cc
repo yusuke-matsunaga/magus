@@ -85,27 +85,27 @@ SptModule::SptModule(const FileRegion& file_region,
   mItemArray(item_array)
 {
   mFlags =
-    is_cell
-    | (is_protected << 1)
-    | ((time_precision + 16) << 2)
-    | ((time_unit + 16) << 7)
-    | (static_cast<int>(net_type) << 12)
-    | (static_cast<int>(unconn) << 16)
-    | (static_cast<int>(delay) << 18)
-    | (macro << 21)
-    | (explicit_name << 22)
-    | (1 << 23) // top_module
-    | (portfaults << 25)
-    | (suppress_faults << 26)
+    static_cast<ymuint32>(is_cell)
+    | (static_cast<ymuint32>(is_protected) << 1)
+    | (static_cast<ymuint32>(time_precision + 16) << 2)
+    | (static_cast<ymuint32>(time_unit + 16) << 7)
+    | (static_cast<ymuint32>(net_type) << 12)
+    | (static_cast<ymuint32>(unconn) << 16)
+    | (static_cast<ymuint32>(delay) << 18)
+    | (static_cast<ymuint32>(macro) << 21)
+    | (static_cast<ymuint32>(explicit_name) << 22)
+    | (1U << 23) // top_module
+    | (static_cast<ymuint32>(portfaults) << 25)
+    | (static_cast<ymuint32>(suppress_faults) << 26)
     ;
-  
-  ymuint32 n = 0;
-  for (ymuint32 i = 0; i < mIOHeadArray.size(); ++ i) {
+
+  ymuint n = 0;
+  for (ymuint i = 0; i < mIOHeadArray.size(); ++ i) {
     n += mIOHeadArray[i]->item_num();
   }
   mIODeclNum = n;
-  
-  for (ymuint32 i = 0; i < mItemArray.size(); ++ i) {
+
+  for (ymuint i = 0; i < mItemArray.size(); ++ i) {
     const PtItem* item = mItemArray[i];
     if ( item->type() == kPtItem_Func ) {
       mFuncDic.insert(make_pair(item->name(), item));
@@ -133,7 +133,7 @@ SptModule::name() const
 {
   return mName;
 }
-  
+
 // @brief パラメータポート宣言配列の取得
 PtDeclHeadArray
 SptModule::paramport_array() const
@@ -143,7 +143,7 @@ SptModule::paramport_array() const
 
 // @brief ポート数の取得
 // @return ポート数
-ymuint32
+ymuint
 SptModule::port_num() const
 {
   return mPortArray.size();
@@ -151,11 +151,11 @@ SptModule::port_num() const
 
 // ポートの取得
 const PtPort*
-SptModule::port(ymuint32 pos) const
+SptModule::port(ymuint pos) const
 {
   return mPortArray[pos];
 }
-  
+
 // @brief 入出力宣言ヘッダ配列の取得
 PtIOHeadArray
 SptModule::iohead_array() const
@@ -164,7 +164,7 @@ SptModule::iohead_array() const
 }
 
 // @brief 入出力宣言の要素数の取得
-ymuint32
+ymuint
 SptModule::iodecl_num() const
 {
   return mIODeclNum;
@@ -176,28 +176,28 @@ SptModule::paramhead_array() const
 {
   return mParamHeadArray;
 }
-  
+
 // @brief localparam 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptModule::localparamhead_array() const
 {
   return mLocalparamHeadArray;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptModule::declhead_array() const
 {
   return mDeclHeadArray;
 }
-  
+
 // @brief item 配列の取得
 PtItemArray
 SptModule::item_array() const
 {
   return mItemArray;
 }
-  
+
 // macromodule 情報の取得
 // @retval true macromodule の場合
 // @retval false module の場合
@@ -324,7 +324,7 @@ bool
 SptModule::suppress_faults() const
 {
   return static_cast<bool>((mFlags >> 26) & 1);
-} 
+}
 
 // config 情報の取得
 // @return config 情報
@@ -341,7 +341,7 @@ SptModule::library() const
 {
   return mLibrary;
 }
-  
+
 // cell 情報の取得
 // @return cell 情報
 const string&
@@ -423,7 +423,7 @@ SptPort::ext_name() const
 
 // 内部のポート結線リストのサイズの取得
 // @return 内部のポート結線リストのサイズ
-ymuint32
+ymuint
 SptPort::portref_num() const
 {
   return mPortRefArray.size();
@@ -432,14 +432,14 @@ SptPort::portref_num() const
 // 内部のポート結線の取得
 // @return 先頭のポート結線
 const PtPortRef*
-SptPort::portref(ymuint32 pos) const
+SptPort::portref(ymuint pos) const
 {
   return mPortRefArray[pos];
 }
 
 // @brief portref を得る．
 PtiPortRef*
-SptPort::_portref(ymuint32 pos)
+SptPort::_portref(ymuint pos)
 {
   return mPortRefArray[pos];
 }
@@ -448,7 +448,7 @@ SptPort::_portref(ymuint32 pos)
 //////////////////////////////////////////////////////////////////////
 // port reference を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 // @param file_region ファイル位置の情報
 // @param name 名前
@@ -483,7 +483,7 @@ SptPortRef::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // 名前の取得
 // @return 名前
 const char*
@@ -508,8 +508,8 @@ tVpiRangeMode
 SptPortRef::range_mode() const
 {
   return mMode;
-}   
-  
+}
+
 // 範囲の左側の式の取得
 // @return 範囲の左側の式
 const PtExpr*
@@ -526,7 +526,7 @@ SptPortRef::right_range() const
   return mRightRange;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // モジュール関係のオブジェクトを生成する関数
 //////////////////////////////////////////////////////////////////////
@@ -637,7 +637,7 @@ SptFactory::new_Port(const FileRegion& file_region,
 		     PtiPortRef* portref,
 		     const char* ext_name)
 {
-  ymuint32 portref_num = 1;
+  ymuint portref_num = 1;
   void* q = alloc().get_memory(sizeof(PtiPortRef*) * portref_num);
   PtiPortRef** portref_array = new (q) PtiPortRef*[portref_num];
   portref_array[0] = portref;

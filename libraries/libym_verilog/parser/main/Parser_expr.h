@@ -100,7 +100,7 @@ Parser::new_MultiConcat(const FileRegion& fr,
 {
   return mFactory.new_MultiConcat(fr, ExprArray(rep, expr_list));
 }
-  
+
 // @brief min/typ/max delay 演算子の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] val0 minimum 値
@@ -252,7 +252,7 @@ Parser::new_Primary(const FileRegion& fr,
   return mFactory.new_Primary(fr, nb_array, tail_name, to_array(index_list),
 			      mode, left, right);
 }
-  
+
 // @brief constant primary の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] name 識別子名
@@ -266,7 +266,7 @@ Parser::new_CPrimary(const FileRegion& fr,
 {
   return mFactory.new_CPrimary(fr, name, index);
 }
-  
+
 // @brief constant primary の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] name 識別子名
@@ -298,7 +298,7 @@ Parser::new_CPrimary(const FileRegion& fr,
 {
   return mFactory.new_CPrimary(fr, name, mode, left, right);
 }
-  
+
 // @brief インデックス付き constant primary の生成 (階層付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] hname 階層名
@@ -314,7 +314,7 @@ Parser::new_CPrimary(const FileRegion& fr,
   const char* tail_name = extract_HierName(hname, nb_array);
   return mFactory.new_CPrimary(fr, nb_array, tail_name, to_array(index_list));
 }
-  
+
 // @brief function call の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] name 関数名
@@ -372,7 +372,7 @@ Parser::new_SysFuncCall(const FileRegion& fr,
 inline
 PtExpr*
 Parser::new_IntConst(const FileRegion& fr,
-		     ymuint32 value)
+		     ymuint value)
 {
   return mFactory.new_IntConst(fr, value);
 }
@@ -412,7 +412,7 @@ Parser::new_IntConst(const FileRegion& fr,
 inline
 PtExpr*
 Parser::new_IntConst(const FileRegion& fr,
-		     ymuint32 size,
+		     ymuint size,
 		     tVpiConstType const_type,
 		     const char* value)
 {

@@ -45,9 +45,9 @@ private:
   /// @param[in] val_array テーブル中の値を納める配列
   EiUdpDefn(const PtUdp* pt_udp,
 	    bool is_protected,
-	    ymuint32 io_num,
+	    ymuint io_num,
 	    EiUdpIO* io_array,
-	    ymuint32 table_num,
+	    ymuint table_num,
 	    EiTableEntry* table,
 	    tVpiUdpVal* val_array);
 
@@ -89,14 +89,14 @@ public:
 
   /// @brief ポート数を返す．
   virtual
-  ymuint32
+  ymuint
   port_num() const;
 
   /// @brief 入力の宣言要素を返す．
   /// @param[in] pos 入力番号 ( 0 <= pos < port_num() - 1 )
   virtual
   const VlIODecl*
-  input(ymuint32 pos) const;
+  input(ymuint pos) const;
 
   /// @brief 出力の宣言要素を返す．
   virtual
@@ -121,14 +121,14 @@ public:
 
   /// @brief table entry の行数を返す．
   virtual
-  ymuint32
+  ymuint
   table_size() const;
 
   /// @brief table entry を返す．
   /// @param[in] pos 行番号
   virtual
   const VlTableEntry*
-  table_entry(ymuint32 pos) const;
+  table_entry(ymuint pos) const;
 
 
 public:
@@ -142,7 +142,7 @@ public:
   /// @param[in] name 名前
   /// @param[in] dir 向き
   void
-  set_io(ymuint32 pos,
+  set_io(ymuint pos,
 	 const PtIOHead* pt_header,
 	 const PtIOItem* pt_item);
 
@@ -158,7 +158,7 @@ public:
   /// @param[in] pt_udp_entry パース木の一行分の定義
   /// @param[in] vals シンボル値の配列
   void
-  set_tableentry(ymuint32 pos,
+  set_tableentry(ymuint pos,
 		 const PtUdpEntry* pt_udp_entry,
 		 const vector<tVpiUdpVal>& vals);
 
@@ -284,7 +284,7 @@ public:
   /// @brief サイズを返す．
   /// このクラスは 1 を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief 対応する宣言要素を返す．
@@ -390,13 +390,13 @@ public:
 
   /// @brief 一行の要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief pos 番目の位置の値を返す．
   virtual
   tVpiUdpVal
-  val(ymuint32 pos) const;
+  val(ymuint pos) const;
 
   /// @brief 一行文の内容を表す文字列をつくる．
   virtual

@@ -73,7 +73,7 @@ public:
 
   /// @brief オペランド数を返す．
   virtual
-  ymuint32
+  ymuint
   operand_num() const;
 
 
@@ -86,7 +86,7 @@ public:
   /// @param[in] pos 位置番号
   virtual
   ElbExpr*
-  _operand(ymuint32 pos) const;
+  _operand(ymuint pos) const;
 
 
 protected:

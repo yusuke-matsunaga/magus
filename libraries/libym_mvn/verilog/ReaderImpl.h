@@ -13,6 +13,7 @@
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/MsgHandler.h"
+#include "DeclHash.h"
 #include "DeclMap.h"
 #include "Driver.h"
 
@@ -142,6 +143,13 @@ private:
   void
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
+
+  /// @brief プロセス文の生成を行う．
+  /// @param[in] module 親のモジュール
+  /// @param[in] vl_process プロセス文
+  bool
+  gen_process(MvModule* module,
+	      const VlProcess* process);
 
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール
@@ -331,6 +339,12 @@ private:
 
   // VlIODecl と MvNode の対応付けをとるハッシュ表
   DeclMap mIODeclMap;
+
+  // REG 型オブジェクトに ID 番号を割り当てるためのハッシュ表
+  DeclHash mDeclHash;
+
+  // always 文の本体を登録しておくリスト
+  list<const VlStmt*> mProcessList;
 
   // MvNode の ID番号をキーとして VlDecl の情報を保持する配列．
   vector<pair<const VlDecl*, ymuint> > mNodeMap;

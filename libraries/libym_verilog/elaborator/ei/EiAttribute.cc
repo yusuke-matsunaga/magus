@@ -21,11 +21,11 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief attribute instance のリストを生成する．
 // @param[in] n 要素数
 ElbAttrList*
-EiFactory::new_AttrList(ymuint32 n)
+EiFactory::new_AttrList(ymuint n)
 {
   void* q = mAlloc.get_memory(sizeof(EiAttribute) * n);
   EiAttribute* array = new (q) EiAttribute[n];
@@ -71,7 +71,7 @@ EiAttribute::name() const
 {
   return mPtAttrSpec->name();
 }
-  
+
 // @brief def_attribute なら true を返す．
 bool
 EiAttribute::def_attribute() const
@@ -92,7 +92,7 @@ EiAttribute::expr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-EiAttrList::EiAttrList(ymuint32 n,
+EiAttrList::EiAttrList(ymuint n,
 		       EiAttribute* array) :
   mSize(n),
   mArray(array)
@@ -105,7 +105,7 @@ EiAttrList::~EiAttrList()
 }
 
 // @brief 要素数を返す．
-ymuint32
+ymuint
 EiAttrList::size() const
 {
   return mSize;
@@ -114,7 +114,7 @@ EiAttrList::size() const
 // @brief 内容を返す．
 // @param[in] pos 位置番号 (0 <= pos < size() )
 VlAttribute*
-EiAttrList::elem(ymuint32 pos) const
+EiAttrList::elem(ymuint pos) const
 {
   return &mArray[pos];
 }
@@ -125,7 +125,7 @@ EiAttrList::elem(ymuint32 pos) const
 // @param[in] expr 値を表す式
 // @param[in] def 定義側の属性のとき true とするフラグ
 void
-EiAttrList::set(ymuint32 pos,
+EiAttrList::set(ymuint pos,
 		const PtAttrSpec* pt_as,
 		ElbExpr* expr,
 		bool def)

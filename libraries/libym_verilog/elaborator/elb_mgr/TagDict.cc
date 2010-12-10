@@ -47,7 +47,7 @@ TagDict::~TagDict()
 void
 TagDict::clear()
 {
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
   mNum = 0;
@@ -64,13 +64,13 @@ TagDict::put_cell(const VlNamedObj* parent,
 {
   if ( mNum >= mLimit ) {
     // テーブルを拡張する．
-    ymuint32 old_size = mSize;
+    ymuint old_size = mSize;
     TagDictCell** old_table = mTable;
     alloc_table(old_size << 1);
-    for (ymuint32 i = 0; i < old_size; ++ i) {
+    for (ymuint i = 0; i < old_size; ++ i) {
       for (TagDictCell* cell = old_table[i]; cell; ) {
 	TagDictCell* next = cell->mLink;
-	ymuint32 pos = hash_func(cell->mParent, cell->mTag);
+	ymuint pos = hash_func(cell->mParent, cell->mTag);
 	cell->mLink = mTable[pos];
 	mTable[pos] = cell;
 	cell = next;
@@ -78,7 +78,7 @@ TagDict::put_cell(const VlNamedObj* parent,
     }
     delete [] old_table;
   }
-  ymuint32 pos = hash_func(parent, tag);
+  ymuint pos = hash_func(parent, tag);
   cell->mParent = parent;
   cell->mTag = tag;
   cell->mLink = mTable[pos];
@@ -93,7 +93,7 @@ TagDictCell*
 TagDict::find_cell(const VlNamedObj* parent,
 		   int tag) const
 {
-  ymuint32 pos = hash_func(parent, tag);
+  ymuint pos = hash_func(parent, tag);
   for (TagDictCell* cell = mTable[pos]; cell; cell = cell->mLink) {
     if ( cell->mParent == parent && cell->mTag == tag ) {
       return cell;
@@ -103,7 +103,7 @@ TagDict::find_cell(const VlNamedObj* parent,
 }
 
 // @brief このオブジェクトが使用しているメモリ量を返す．
-size_t
+ymuint
 TagDict::allocated_size() const
 {
   return sizeof(TagDictCell*) * mSize;
@@ -111,18 +111,18 @@ TagDict::allocated_size() const
 
 // @brief テーブルの領域を確保する．
 void
-TagDict::alloc_table(ymuint32 size)
+TagDict::alloc_table(ymuint size)
 {
   mSize = size;
-  mLimit = static_cast<ymuint32>(mSize * 1.8);
+  mLimit = static_cast<ymuint>(mSize * 1.8);
   mTable = new TagDictCell*[mSize];
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
 }
 
 // @brief ハッシュ値を計算する．
-ymuint32
+ymuint
 TagDict::hash_func(const VlNamedObj* parent,
 		   int tag) const
 {
@@ -355,7 +355,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -400,7 +400,7 @@ CellScope::genblock()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellScope::num()
 {
   return mNum;
@@ -472,7 +472,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -517,7 +517,7 @@ CellDecl::decl()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellDecl::num()
 {
   return mNum;
@@ -596,7 +596,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -641,7 +641,7 @@ CellParam::parameter()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellParam::num()
 {
   return mNum;
@@ -717,7 +717,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -762,7 +762,7 @@ CellDefParam::defparam()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellDefParam::num()
 {
   return mNum;
@@ -834,7 +834,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -879,7 +879,7 @@ CellParamAssign::paramassign()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellParamAssign::num()
 {
   return mNum;
@@ -951,7 +951,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -996,7 +996,7 @@ CellModuleArray::modulearray()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellModuleArray::num()
 {
   return mNum;
@@ -1068,7 +1068,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -1113,7 +1113,7 @@ CellModule::module()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellModule::num()
 {
   return mNum;
@@ -1185,7 +1185,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -1230,7 +1230,7 @@ CellPrimArray::primarray()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellPrimArray::num()
 {
   return mNum;
@@ -1303,7 +1303,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -1348,7 +1348,7 @@ CellPrimitive::primitive()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellPrimitive::num()
 {
   return mNum;
@@ -1420,7 +1420,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -1465,7 +1465,7 @@ CellTask::task()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellTask::num()
 {
   return mNum;
@@ -1537,7 +1537,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -1582,7 +1582,7 @@ CellFunction::function()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellFunction::num()
 {
   return mNum;
@@ -1654,7 +1654,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -1699,7 +1699,7 @@ CellContAssign::contassign()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellContAssign::num()
 {
   return mNum;
@@ -1771,7 +1771,7 @@ public:
 
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   num();
 
 
@@ -1816,7 +1816,7 @@ CellProcess::process()
 }
 
 // @brief 要素数の取得
-ymuint32
+ymuint
 CellProcess::num()
 {
   return mNum;

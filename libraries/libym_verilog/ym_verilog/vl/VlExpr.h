@@ -48,7 +48,7 @@ public:
 
   /// @brief 式のビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const = 0;
 
   /// @brief 定数式の時 true を返す．
@@ -109,7 +109,7 @@ public:
   /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
   /// @note それ以外では 0 を返す．
   virtual
-  ymuint32
+  ymuint
   declarray_dimension() const = 0;
 
   /// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
@@ -117,7 +117,7 @@ public:
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
-  declarray_index(ymuint32 pos) const = 0;
+  declarray_index(ymuint pos) const = 0;
 
   /// @brief スコープへの参照の場合，対象のオブジェクトを返す．
   /// @note それ以外では NULL を返す．
@@ -204,7 +204,7 @@ public:
   /// @note kVpiOperation の時，意味を持つ．
   /// @note それ以外では 0 を返す．
   virtual
-  ymuint32
+  ymuint
   operand_num() const = 0;
 
   /// @brief オペランドを返す．
@@ -213,7 +213,7 @@ public:
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
-  operand(ymuint32 pos) const = 0;
+  operand(ymuint pos) const = 0;
 
   /// @brief 定数型を返す．
   /// @note kVpiConstant の時，意味を持つ．
@@ -239,7 +239,7 @@ public:
   /// @brief 引数の数を返す．
   /// @note kVpiFuncCall/kVpiSysFuncCall の時，意味を持つ．
   virtual
-  ymuint32
+  ymuint
   argument_num() const = 0;
 
   /// @brief 引数を返す．
@@ -248,7 +248,7 @@ public:
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
-  argument(ymuint32 pos) const = 0;
+  argument(ymuint pos) const = 0;
 
   /// @brief int 型の値を返す．
   /// @param[out] val 結果を格納する変数

@@ -26,7 +26,7 @@ class VlTaskFunc :
   public VlNamedObj
 {
 protected:
-	      
+
   /// @brief デストラクタ
   virtual
   ~VlTaskFunc() { }
@@ -44,14 +44,14 @@ public:
 
   /// @brief 入出力数を得る．
   virtual
-  ymuint32
+  ymuint
   io_num() const = 0;
 
   /// @brief 入出力の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < io_num() )
   virtual
   const VlIODecl*
-  io(ymuint32 pos) const = 0;
+  io(ymuint pos) const = 0;
 
   /// @brief 本体のステートメントを得る．
   virtual
@@ -107,7 +107,7 @@ public:
 
   /// @brief 出力のビット幅を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const = 0;
 
 };

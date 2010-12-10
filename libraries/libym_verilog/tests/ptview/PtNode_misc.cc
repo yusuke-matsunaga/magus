@@ -34,7 +34,7 @@ ControlNode::~ControlNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ControlNode::data(int column,
 		  int role) const
@@ -53,7 +53,7 @@ ControlNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ControlNode::loc() const
@@ -70,23 +70,23 @@ ControlNode::expand() const
     mChildren.reserve(1);
     mChildren.push_back( new ExprNode("Delay", mControl->delay()) );
     break;
-    
+
   case kPtEventControl:
     {
-      ymuint32 n = mControl->event_num();
+      ymuint n = mControl->event_num();
       mChildren.reserve(n);
-      for (ymuint32 i = 0; i < n; ++ i) {
+      for (ymuint i = 0; i < n; ++ i) {
 	mChildren.push_back( new ExprNode("Event", mControl->event(i)) );
       }
     }
     break;
-    
+
   case kPtRepeatControl:
     {
-      ymuint32 n = mControl->event_num();
+      ymuint n = mControl->event_num();
       mChildren.reserve(n + 1);
       mChildren.push_back( new ExprNode("Repeat", mControl->rep_expr()) );
-      for (ymuint32 i = 0; i < n; ++ i) {
+      for (ymuint i = 0; i < n; ++ i) {
 	mChildren.push_back( new ExprNode("Event", mControl->event(i)) );
       }
     }
@@ -113,7 +113,7 @@ ConnectionListNode::~ConnectionListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ConnectionListNode::data(int column,
 			 int role) const
@@ -128,7 +128,7 @@ ConnectionListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ConnectionListNode::loc() const
@@ -140,9 +140,9 @@ ConnectionListNode::loc() const
 void
 ConnectionListNode::expand() const
 {
-  ymuint32 n = mConArray.size();
+  ymuint n = mConArray.size();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new ConnectionNode(mConArray[i]);
   }
 }
@@ -166,7 +166,7 @@ ConnectionNode::~ConnectionNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ConnectionNode::data(int column,
 		     int role) const
@@ -186,7 +186,7 @@ ConnectionNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ConnectionNode::loc() const
@@ -223,7 +223,7 @@ StrengthNode::~StrengthNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 StrengthNode::data(int column,
 		   int role) const
@@ -238,7 +238,7 @@ StrengthNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 StrengthNode::loc() const
@@ -284,7 +284,7 @@ DelayNode::~DelayNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DelayNode::data(int column,
 		int role) const
@@ -299,7 +299,7 @@ DelayNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 DelayNode::loc() const
@@ -311,14 +311,14 @@ DelayNode::loc() const
 void
 DelayNode::expand() const
 {
-  ymuint32 n = 0;
-  for (ymuint32 i = 0; i < 3; ++ i) {
+  ymuint n = 0;
+  for (ymuint i = 0; i < 3; ++ i) {
     if ( mDelay->value(i) ) {
       ++ n;
     }
   }
   mChildren.reserve(n);
-  for (ymuint32 i = 0; i < 3; ++ i) {
+  for (ymuint i = 0; i < 3; ++ i) {
     if ( mDelay->value(i) ) {
       QString label("Delay");
       label += static_cast<char>('0' + i);
@@ -346,7 +346,7 @@ NameBranchListNode::~NameBranchListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 NameBranchListNode::data(int column,
 			 int role) const
@@ -361,7 +361,7 @@ NameBranchListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 NameBranchListNode::loc() const
@@ -373,9 +373,9 @@ NameBranchListNode::loc() const
 void
 NameBranchListNode::expand() const
 {
-  ymuint32 n = mNameBranchArray.size();
+  ymuint n = mNameBranchArray.size();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new NameBranchNode(mNameBranchArray[i]);
   }
 }
@@ -399,7 +399,7 @@ NameBranchNode::~NameBranchNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 NameBranchNode::data(int column,
 		     int role) const
@@ -418,7 +418,7 @@ NameBranchNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 NameBranchNode::loc() const
@@ -454,7 +454,7 @@ StrNode::~StrNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 StrNode::data(int column,
 	      int role) const
@@ -495,7 +495,7 @@ AuxTypeNode::~AuxTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 AuxTypeNode::data(int column,
 		   int role) const
@@ -559,7 +559,7 @@ NetTypeNode::~NetTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 NetTypeNode::data(int column,
 		  int role) const
@@ -607,7 +607,7 @@ VarTypeNode::~VarTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VarTypeNode::data(int column,
 		  int role) const
@@ -648,7 +648,7 @@ DirNode::~DirNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DirNode::data(int column,
 	      int role) const
@@ -689,7 +689,7 @@ UdNode::~UdNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 UdNode::data(int column,
 	     int role) const
@@ -728,7 +728,7 @@ DelayModeNode::~DelayModeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DelayModeNode::data(int column,
 		    int role) const
@@ -770,7 +770,7 @@ PrimTypeNode::~PrimTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 PrimTypeNode::data(int column,
 		   int role) const
@@ -834,7 +834,7 @@ OpTypeNode::~OpTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 OpTypeNode::data(int column,
 		 int role) const
@@ -913,7 +913,7 @@ ConstTypeNode::~ConstTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ConstTypeNode::data(int column,
 		    int role) const
@@ -960,7 +960,7 @@ RangeModeNode::~RangeModeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 RangeModeNode::data(int column,
 		    int role) const
@@ -1003,7 +1003,7 @@ StrengthValNode::~StrengthValNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 StrengthValNode::data(int column,
 		      int role) const
@@ -1048,7 +1048,7 @@ VsNode::~VsNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VsNode::data(int column,
 	     int role) const
@@ -1090,7 +1090,7 @@ BoolNode::~BoolNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 BoolNode::data(int column,
 	       int role) const

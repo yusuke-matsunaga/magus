@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief begin ブロックを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -34,14 +34,14 @@ EiFactory::new_Begin(const VlNamedObj* parent,
 		     const PtStmt* pt_stmt,
 		     ElbStmt** stmt_list)
 {
-  ymuint32 stmt_num = pt_stmt->stmt_array().size();
+  ymuint stmt_num = pt_stmt->stmt_array().size();
   void* p = mAlloc.get_memory(sizeof(EiBegin));
   EiBegin* stmt = new (p) EiBegin(parent, process, pt_stmt,
 				  stmt_num, stmt_list);
 
   return stmt;
 }
-  
+
 // @brief fork ブロックを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -53,14 +53,14 @@ EiFactory::new_Fork(const VlNamedObj* parent,
 		    const PtStmt* pt_stmt,
 		    ElbStmt** stmt_list)
 {
-  ymuint32 stmt_num = pt_stmt->stmt_array().size();
+  ymuint stmt_num = pt_stmt->stmt_array().size();
   void* p = mAlloc.get_memory(sizeof(EiFork));
   EiFork* stmt = new (p) EiFork(parent, process, pt_stmt,
 				 stmt_num, stmt_list);
 
   return stmt;
 }
-  
+
 // @brief 名前付き begin ブロックを生成する．
 // @param[in] block 自分自身に対応するスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -72,7 +72,7 @@ EiFactory::new_NamedBegin(const VlNamedObj* block,
 			  const PtStmt* pt_stmt,
 			  ElbStmt** stmt_list)
 {
-  ymuint32 stmt_num = pt_stmt->stmt_array().size();
+  ymuint stmt_num = pt_stmt->stmt_array().size();
   void* p = mAlloc.get_memory(sizeof(EiNamedBegin));
   EiNamedBegin* stmt = new (p) EiNamedBegin(block, process,
 					    stmt_num, stmt_list);
@@ -91,7 +91,7 @@ EiFactory::new_NamedFork(const VlNamedObj* block,
 			 const PtStmt* pt_stmt,
 			 ElbStmt** stmt_list)
 {
-  ymuint32 stmt_num = pt_stmt->stmt_array().size();
+  ymuint stmt_num = pt_stmt->stmt_array().size();
   void* p = mAlloc.get_memory(sizeof(EiNamedFork));
   EiNamedFork* stmt = new (p) EiNamedFork(block, process,
 					  stmt_num, stmt_list);
@@ -103,7 +103,7 @@ EiFactory::new_NamedFork(const VlNamedObj* block,
 //////////////////////////////////////////////////////////////////////
 // クラス EiBlockStmt
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -113,7 +113,7 @@ EiFactory::new_NamedFork(const VlNamedObj* block,
 EiBlockStmt::EiBlockStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ymuint32 stmt_num,
+			 ymuint stmt_num,
 			 ElbStmt** array) :
   EiStmtBase(parent, process, pt_stmt),
   mStmtNum(stmt_num),
@@ -127,7 +127,7 @@ EiBlockStmt::~EiBlockStmt()
 }
 
 // @brief 中身のステートメントのリストの要素数を返す．
-ymuint32
+ymuint
 EiBlockStmt::child_stmt_num() const
 {
   return mStmtNum;
@@ -136,7 +136,7 @@ EiBlockStmt::child_stmt_num() const
 // @brief 中身のステートメントを返す．
 // @param[in] pos 位置番号
 ElbStmt*
-EiBlockStmt::_child_stmt(ymuint32 pos) const
+EiBlockStmt::_child_stmt(ymuint pos) const
 {
   return mStmtList[pos];
 }
@@ -155,7 +155,7 @@ EiBlockStmt::_child_stmt(ymuint32 pos) const
 EiBegin::EiBegin(const VlNamedObj* parent,
 		 ElbProcess* process,
 		 const PtStmt* pt_stmt,
-		 ymuint32 stmt_num,
+		 ymuint stmt_num,
 		 ElbStmt** array) :
   EiBlockStmt(parent, process, pt_stmt, stmt_num, array)
 {
@@ -172,12 +172,12 @@ EiBegin::type() const
 {
   return kVpiBegin;
 }
-  
+
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiBegin::func_exec(bool constant_function) const
 {
-  for (ymuint32 i = 0; i < child_stmt_num(); ++ i) {
+  for (ymuint i = 0; i < child_stmt_num(); ++ i) {
     ElbStmt* stmt1 = _child_stmt(i);
     const VlNamedObj* scope = stmt1->func_exec(constant_function);
     if ( scope ) {
@@ -201,7 +201,7 @@ EiBegin::func_exec(bool constant_function) const
 EiFork::EiFork(const VlNamedObj* parent,
 	       ElbProcess* process,
 	       const PtStmt* pt_stmt,
-	       ymuint32 stmt_num,
+	       ymuint stmt_num,
 	       ElbStmt** array) :
   EiBlockStmt(parent, process, pt_stmt, stmt_num, array)
 {
@@ -232,7 +232,7 @@ EiFork::func_exec(bool constant_function) const
 //////////////////////////////////////////////////////////////////////
 // クラス EiNamedBlockStmt
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] block 自分自身に対応するスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -240,7 +240,7 @@ EiFork::func_exec(bool constant_function) const
 // @param[in] array ステートメントのリスト用配列
 EiNamedBlockStmt::EiNamedBlockStmt(const VlNamedObj* block,
 				   ElbProcess* process,
-				   ymuint32 stmt_num,
+				   ymuint stmt_num,
 				   ElbStmt** array) :
   mBlockScope(block),
   mProcess(process),
@@ -267,7 +267,7 @@ EiNamedBlockStmt::parent() const
 {
   return mBlockScope->parent();
 }
-  
+
 // @brief 対応するスコープを返す．
 const VlNamedObj*
 EiNamedBlockStmt::scope() const
@@ -276,7 +276,7 @@ EiNamedBlockStmt::scope() const
 }
 
 // @brief 中身のステートメントのリストの要素数を返す．
-ymuint32
+ymuint
 EiNamedBlockStmt::child_stmt_num() const
 {
   return mStmtNum;
@@ -285,7 +285,7 @@ EiNamedBlockStmt::child_stmt_num() const
 // @brief 中身のステートメントを返す．
 // @param[in] pos 位置番号
 ElbStmt*
-EiNamedBlockStmt::_child_stmt(ymuint32 pos) const
+EiNamedBlockStmt::_child_stmt(ymuint pos) const
 {
   return mStmtList[pos];
 }
@@ -302,7 +302,7 @@ EiNamedBlockStmt::_child_stmt(ymuint32 pos) const
 // @param[in] array ステートメントのリスト用配列
 EiNamedBegin::EiNamedBegin(const VlNamedObj* block,
 			   ElbProcess* process,
-			   ymuint32 stmt_num,
+			   ymuint stmt_num,
 			   ElbStmt** array) :
   EiNamedBlockStmt(block, process, stmt_num, array)
 {
@@ -319,12 +319,12 @@ EiNamedBegin::type() const
 {
   return kVpiNamedBegin;
 }
-  
+
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiNamedBegin::func_exec(bool constant_function) const
 {
-  for (ymuint32 i = 0; i < child_stmt_num(); ++ i) {
+  for (ymuint i = 0; i < child_stmt_num(); ++ i) {
     ElbStmt* stmt1 = _child_stmt(i);
     const VlNamedObj* scope1 = stmt1->func_exec(constant_function);
     if ( scope1 ) {
@@ -351,7 +351,7 @@ EiNamedBegin::func_exec(bool constant_function) const
 // @param[in] array ステートメントのリスト用配列
 EiNamedFork::EiNamedFork(const VlNamedObj* block,
 			 ElbProcess* process,
-			 ymuint32 stmt_num,
+			 ymuint stmt_num,
 			 ElbStmt** array) :
   EiNamedBlockStmt(block, process, stmt_num, array)
 {
@@ -368,7 +368,7 @@ EiNamedFork::type() const
 {
   return kVpiNamedFork;
 }
-  
+
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*

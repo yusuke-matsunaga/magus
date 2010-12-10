@@ -42,7 +42,7 @@ EiPort::~EiPort()
 void
 EiPort::init(ElbModule* module,
 	     const PtPort* pt_port,
-	     ymuint32 index,
+	     ymuint index,
 	     ElbExpr* low_conn,
 	     tVpiDirection dir)
 {
@@ -77,28 +77,28 @@ EiPort::file_region() const
 {
   return mPtPort->file_region();
 }
-  
+
 // @brief 入出力の区別を得る．
 tVpiDirection
 EiPort::direction() const
 {
   return mDirection;
 }
-  
+
 // @brief ビット幅を返す．
 int
 EiPort::bit_size() const
 {
   return mLowConn->bit_size();
 }
-  
+
 // @brief 名前による接続を持つとき true を返す．
 bool
 EiPort::is_conn_by_name() const
 {
   return mConnByName;
 }
-  
+
 // @brief 明示的に名前がついているとき true を返す．
 bool
 EiPort::is_explicit_name() const
@@ -119,21 +119,21 @@ EiPort::module() const
 {
   return mModule;
 }
-  
+
 // @brief ポートリストの何番目のポートかを表すインデックスを返す．
-ymuint32
+ymuint
 EiPort::port_index() const
 {
   return mIndex;
 }
-  
+
 // @brief 上位の接続先を返す．
 const VlExpr*
 EiPort::high_conn() const
 {
   return mHighConn;
 }
-  
+
 // @brief 下位の接続先を返す．
 const VlExpr*
 EiPort::low_conn() const

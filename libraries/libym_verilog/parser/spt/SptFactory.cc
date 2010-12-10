@@ -33,7 +33,7 @@ SptFactory::~SptFactory()
 const char*
 SptFactory::new_string(const char* str)
 {
-  ymuint32 len = strlen(str) + 1;
+  ymuint len = strlen(str) + 1;
   char* dst = static_cast<char*>(alloc().get_memory(len));
   strcpy(dst, str);
   return dst;

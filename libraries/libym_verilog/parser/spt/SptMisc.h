@@ -28,13 +28,13 @@ class SptControl :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptControl(const FileRegion& file_region,
 	     tPtCtrlType type,
 	     PtExpr* expr,
 	     PtExprArray event_array);
-  
+
   /// デストラクタ
   virtual
   ~SptControl();
@@ -64,15 +64,15 @@ public:
   /// @retval イベントリストのサイズ event control/repeat control の場合
   /// @retval 0 上記以外
   virtual
-  ymuint32
+  ymuint
   event_num() const;
-  
+
   /// @brief イベントリストの要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   /// @note event control/repeat control の場合のみ意味を持つ
   virtual
   const PtExpr*
-  event(ymuint32 pos) const;
+  event(ymuint pos) const;
 
   /// 繰り返し数の取得
   virtual
@@ -109,22 +109,22 @@ class SptConnection :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptConnection(const FileRegion& file_region,
 		PtExpr* expr,
 		const char* name = NULL);
-  
+
   /// デストラクタ
   virtual
   ~SptConnection();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtConnection の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -167,26 +167,26 @@ class SptStrength :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ (0/1 の強度用)
   SptStrength(const FileRegion& file_region,
 	      tVpiStrength drive0,
 	      tVpiStrength drive1);
-  
+
   /// コンストラクタ (電荷の強度用)
   SptStrength(const FileRegion& file_region,
 	      tVpiStrength charge);
-  
+
   /// デストラクタ
   virtual
   ~SptStrength();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtStrength の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -235,18 +235,18 @@ private:
   /// 一つの値をとるコンストラクタ
   SptDelay(const FileRegion& file_region,
 	   PtExpr* value1);
-  
+
   /// 二つの値をとるコンストラクタ
   SptDelay(const FileRegion& file_region,
 	   PtExpr* value1,
 	   PtExpr* value2);
-  
+
   /// 三つの値をとるコンストラクタ
   SptDelay(const FileRegion& file_region,
 	   PtExpr* value1,
 	   PtExpr* value2,
 	   PtExpr* value3);
-  
+
   /// デストラクタ
   virtual
   ~SptDelay();
@@ -256,7 +256,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtDelay の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -265,7 +265,7 @@ public:
   /// 値の取得
   virtual
   const PtExpr*
-  value(ymuint32 pos) const;
+  value(ymuint pos) const;
 
 
 private:
@@ -348,14 +348,14 @@ class SptAttrInst :
   friend class SptFactory;
 
 private:
-  
+
   /// コンストラクタ
   SptAttrInst(PtAttrSpecArray as_array);
-  
+
   /// デストラクタ
   virtual
   ~SptAttrInst();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -365,14 +365,14 @@ public:
   /// @brief 要素数の取得
   /// @return 要素数
   virtual
-  ymuint32
+  ymuint
   attrspec_num() const;
-    
+
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < attrspec_num() )
   virtual
   const PtAttrSpec*
-  attrspec(ymuint32 pos) const;
+  attrspec(ymuint pos) const;
 
 
 private:
@@ -382,7 +382,7 @@ private:
 
   // attr spec の配列
   PtAttrSpecArray mAttrSpecArray;
-  
+
 };
 
 
@@ -400,17 +400,17 @@ private:
   SptAttrSpec(const FileRegion& file_region,
 	      const char* name,
 	      PtExpr* expr);
-  
+
   /// デストラクタ
   virtual
   ~SptAttrSpec();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtAttrSpec の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -420,7 +420,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// 式の取得
   virtual
   const PtExpr*

@@ -31,7 +31,7 @@ class CptUdp :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptUdp(const FileRegion& file_region,
 	 const char* name,
@@ -40,11 +40,11 @@ private:
 	 bool is_seq,
 	 PtExpr* init_value,
 	 PtUdpEntryArray entry_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptUdp();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -68,14 +68,14 @@ public:
 
   /// @brief ポート数を取り出す．
   virtual
-  ymuint32
+  ymuint
   port_num() const;
-  
+
   /// @brief ポートを取り出す．
   virtual
   const PtPort*
-  port(ymuint32 pos) const;
-  
+  port(ymuint pos) const;
+
   /// @brief 入出力宣言ヘッダ配列の取得
   virtual
   PtIOHeadArray
@@ -102,7 +102,7 @@ private:
 
   // プリミティブ名
   const char* mName;
-  
+
   // ポートの配列
   PtiPortArray mPortArray;
 
@@ -130,16 +130,16 @@ class CptUdpEntry :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptUdpEntry(const FileRegion& file_region,
 	      PtUdpValueArray input_array,
 	      PtUdpValue* output);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptUdpEntry();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 入力値の配列を取り出す．
   virtual
   PtUdpValueArray
@@ -161,12 +161,12 @@ public:
   virtual
   const PtUdpValue*
   current() const;
-  
+
   /// @brief 出力の値を取り出す．
   virtual
   PtUdpValue*
   output() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ private:
 
   // ファイル位置
   FileRegion mFileRegion;
-  
+
   // 入力パタンの配列
   PtUdpValueArray mInputArray;
 
@@ -194,17 +194,17 @@ class CptUdpEntryS :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptUdpEntryS(const FileRegion& file_region,
 	       PtUdpValueArray input_array,
 	       PtUdpValue* current,
 	       PtUdpValue* output);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptUdpEntryS();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ public:
   virtual
   PtUdpValue*
   current() const;
-    
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -237,15 +237,15 @@ class CptUdpValue :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptUdpValue(const FileRegion& file_region,
 	      tVpiUdpVal symbol);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptUdpValue();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -261,7 +261,7 @@ public:
   virtual
   tVpiUdpVal
   symbol() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

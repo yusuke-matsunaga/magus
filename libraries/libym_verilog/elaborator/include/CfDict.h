@@ -47,20 +47,20 @@ public:
   add(const VlNamedObj* scope,
       const char* name,
       ElbTaskFunc* func);
-      
+
   /// @brief 名前から該当する要素を検索する．
   /// @param[in] scope 親のスコープ
   /// @param[in] name 名前
   ElbTaskFunc*
   find(const VlNamedObj* scope,
        const char* name) const;
-  
+
   /// @brief 内容をクリアする．
   void
   clear();
-  
+
   /// @brief このオブジェクトが使用しているメモリ量を返す．
-  size_t
+  ymuint
   allocated_size() const;
 
 
@@ -71,10 +71,10 @@ private:
 
   /// @brief テーブルの領域を確保する．
   void
-  alloc_table(ymuint32 size);
+  alloc_table(ymuint size);
 
   /// @brief ハッシュ値を計算する．
-  ymuint32
+  ymuint
   hash_func(const VlNamedObj* scope,
 	    const char* name) const;
 
@@ -88,16 +88,16 @@ private:
   {
     // 親のスコープ
     const VlNamedObj* mScope;
-    
+
     // 名前
     const char* mName;
-    
+
     // 対象の関数
     ElbTaskFunc* mFunc;
-    
+
     // 次の要素を指すリンク
     Cell* mLink;
-    
+
   };
 
 
@@ -108,7 +108,7 @@ private:
 
   // Cell 用のアロケータ
   UnitAlloc mAlloc;
-  
+
   // ハッシュ表のサイズ
   ymuint32 mSize;
 

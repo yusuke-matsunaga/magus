@@ -513,9 +513,9 @@ ElbMgr::find_scope_up(const VlNamedObj* base_scope,
 	 << base_scope->full_name() << endl;
   }
 
-  ymuint32 n = nb_array.size();
+  ymuint n = nb_array.size();
   const VlNamedObj* cur_scope = base_scope;
-  for (ymuint32 i = 0; i < n; ) {
+  for (ymuint i = 0; i < n; ) {
     PtNameBranch* name_branch = nb_array[i];
     const char* top_name = name_branch->name();
     const VlNamedObj* top_scope = NULL;
@@ -570,7 +570,7 @@ ElbMgr::find_scope_up(const VlNamedObj* base_scope,
 }
 
 // @brief このオブジェクトが確保したメモリの総量を返す．
-size_t
+ymuint
 ElbMgr::allocated_size() const
 {
   return mTagDict.allocated_size()

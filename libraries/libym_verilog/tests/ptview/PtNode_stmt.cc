@@ -40,7 +40,7 @@ StmtListNode::~StmtListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 StmtListNode::data(int column,
 		   int role) const
@@ -55,7 +55,7 @@ StmtListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 StmtListNode::loc() const
@@ -67,9 +67,9 @@ StmtListNode::loc() const
 void
 StmtListNode::expand() const
 {
-  ymuint32 n = mStmtArray.size();
+  ymuint n = mStmtArray.size();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new StmtNode("Stmt", mStmtArray[i]);
   }
 }
@@ -96,7 +96,7 @@ StmtNode::~StmtNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 StmtNode::data(int column,
 	       int role) const
@@ -138,7 +138,7 @@ StmtNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 StmtNode::loc() const
@@ -150,7 +150,7 @@ StmtNode::loc() const
 void
 StmtNode::expand() const
 {
-  ymuint32 n = 0;
+  ymuint n = 0;
   switch ( mStmt->type() ) {
   case kPtDisableStmt:
     n = 1;
@@ -242,14 +242,14 @@ StmtNode::expand() const
     mChildren.resize(1);
     mChildren[0] = new StmtNode("Body", mStmt->body());
     break;
-    
+
   case kPtRepeatStmt:
   case kPtWhileStmt:
     mChildren.resize(2);
     mChildren[0] = new ExprNode("Condition", mStmt->expr());
     mChildren[1] = new StmtNode("Body", mStmt->body());
     break;
-    
+
   case kPtForStmt:
     mChildren.resize(4);
     mChildren[0] = new StmtNode("Initial Stmt", mStmt->init_stmt());
@@ -257,7 +257,7 @@ StmtNode::expand() const
     mChildren[2] = new StmtNode("Increent Stmt", mStmt->next_stmt());
     mChildren[3] = new StmtNode("Body", mStmt->body());
     break;
-    
+
   case kPtNamedParBlockStmt:
   case kPtNamedSeqBlockStmt:
     n = 1;
@@ -320,7 +320,7 @@ ArgListNode::~ArgListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ArgListNode::data(int column,
 		  int role) const
@@ -335,7 +335,7 @@ ArgListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ArgListNode::loc() const
@@ -347,9 +347,9 @@ ArgListNode::loc() const
 void
 ArgListNode::expand() const
 {
-  ymuint32 n = mStmt->arg_num();
+  ymuint n = mStmt->arg_num();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new ExprNode("Argument", mStmt->arg(i));
   }
 }
@@ -373,7 +373,7 @@ CaseItemListNode::~CaseItemListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 CaseItemListNode::data(int column,
 		       int role) const
@@ -388,7 +388,7 @@ CaseItemListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 CaseItemListNode::loc() const
@@ -400,9 +400,9 @@ CaseItemListNode::loc() const
 void
 CaseItemListNode::expand() const
 {
-  ymuint32 n = mStmt->caseitem_num();
+  ymuint n = mStmt->caseitem_num();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new CaseItemNode(mStmt->caseitem(i));
   }
 }
@@ -426,7 +426,7 @@ CaseItemNode::~CaseItemNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 CaseItemNode::data(int column,
 		   int role) const
@@ -441,7 +441,7 @@ CaseItemNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 CaseItemNode::loc() const
@@ -453,13 +453,13 @@ CaseItemNode::loc() const
 void
 CaseItemNode::expand() const
 {
-  ymuint32 n = mCaseItem->label_num();
-  ymuint32 m = n + 1;
+  ymuint n = mCaseItem->label_num();
+  ymuint m = n + 1;
   if ( n == 0 ) {
     m = 2;
   }
   mChildren.reserve(m);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren.push_back( new ExprNode("Label", mCaseItem->label(i)) );
   }
   if ( n == 0 ) {

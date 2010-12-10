@@ -91,7 +91,7 @@ VlMgr::pt_udp_list() const
 // @brief エラボレーションを行う．
 // @param[in] msg_mgr メッセージマネージャ
 // @param[in] エラー数を返す．
-size_t
+ymuint
 VlMgr::elaborate()
 {
   Elaborator elab(mMsgMgr, *mElbMgr, *mElbFactory);
@@ -324,7 +324,7 @@ VlMgr::find_attr(const VlObj* obj,
 }
 
 // @brief このオブジェクトが確保したメモリの総量を返す．
-size_t
+ymuint
 VlMgr::allocated_size() const
 {
   return mAlloc.allocated_size();

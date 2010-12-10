@@ -46,14 +46,14 @@ public:
 
   /// @brief 内部のポート結線リストのサイズの取得
   virtual
-  ymuint32
+  ymuint
   portref_num() const = 0;
 
   /// @brief 内部のポート結線リストの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
   const PtPortRef*
-  portref(ymuint32 pos) const = 0;
+  portref(ymuint pos) const = 0;
 
 };
 

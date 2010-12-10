@@ -34,7 +34,7 @@ struct PtrListCell
 
   // リンクポインタ
   PtrListCell* mLink;
-  
+
 };
 
 
@@ -69,12 +69,12 @@ public:
   /// @brief 次の要素を指す．
   const PtrListIterator&
   operator++();
-  
+
   /// @brief 正しい内容をさしているときに true を返す．
   bool
   is_valid() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -82,7 +82,7 @@ private:
 
   // セル
   PtrListCell<T>* mCell;
-  
+
 };
 
 
@@ -99,14 +99,14 @@ public:
 
   typedef PtrListIterator<T1> const_iterator;
   typedef PtrListCell<T1> Cell;
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] alloc アロケータ
   /// @note 空のリストを作る
   PtrList(UnitAlloc& alloc);
-  
+
   /// @brief デストラクタ
   ~PtrList();
 
@@ -116,7 +116,7 @@ public:
   /// @brief リストのクリア
   void
   clear();
-  
+
   /// @brief 要素の追加
   /// @param[in] elem 追加する要素
   void
@@ -124,17 +124,17 @@ public:
 
   /// @brief 要素数の取得
   /// @return 要素数
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief 空の時に true を返す．
   bool
   empty() const;
-  
+
   /// @brief 先頭の反復子を返す．
   PtrListIterator<T1>
   begin() const;
-  
+
   /// @brief 先頭の要素を返す．
   T1*
   front() const;
@@ -143,7 +143,7 @@ public:
   T1*
   back() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   /// 特別な関数
@@ -155,7 +155,7 @@ public:
   PtArray<T2>
   to_array(AllocBase& alloc);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -163,10 +163,10 @@ private:
 
   // メモリ確保用のアロケータ
   UnitAlloc& mAlloc;
-  
+
   // 先頭の要素
   Cell* mTop;
-  
+
   // 末尾の要素
   Cell* mEnd;
 
@@ -236,7 +236,7 @@ PtrListIterator<T>::operator++()
   }
   return *this;
 }
-  
+
 // @brief 正しい内容をさしているときに true を返す．
 template <typename T>
 inline
@@ -290,7 +290,7 @@ PtrList<T1, T2>::clear()
   mEnd = NULL;
   mNum = 0;
 }
-  
+
 // @brief 要素の追加
 // @param[in] elem 追加する要素
 template <typename T1,
@@ -318,7 +318,7 @@ PtrList<T1, T2>::push_back(T1* elem)
 template <typename T1,
 	  typename T2>
 inline
-ymuint32
+ymuint
 PtrList<T1, T2>::size() const
 {
   return mNum;
@@ -383,10 +383,10 @@ inline
 PtArray<T2>
 PtrList<T1, T2>::to_array(AllocBase& alloc)
 {
-  ymuint32 n = mNum;
+  ymuint n = mNum;
   void* p = alloc.get_memory(sizeof(T2*) * n);
   T2** array = new (p) T2*[n];
-  ymuint32 i = 0;
+  ymuint i = 0;
   for (Cell* cell = mTop; cell; cell = cell->mLink, ++ i) {
     array[i] = cell->mPtr;
   }

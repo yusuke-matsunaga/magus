@@ -142,17 +142,17 @@ SptStmt::name() const
 // @brief 引数の数の取得
 // @return 引数の数
 // @note kEnable/kSysEnable で意味のある関数
-ymuint32
+ymuint
 SptStmt::arg_num() const
 {
   return mArgArray.size();
 }
-  
+
 // @brief 引数の取得
 // @param[in] pos 位置番号 ( 0 <= pos < arg_num() )
 // @note kEnable/kSysEnable で意味のある関数
 const PtExpr*
-SptStmt::arg(ymuint32 pos) const
+SptStmt::arg(ymuint pos) const
 {
   return mArgArray[pos];
 }
@@ -223,7 +223,7 @@ SptStmt::else_body() const
 // case item の要素数の取得
 // @return case item の要素数
 // kCase/kCaseX/kCaseZ で意味のある関数
-ymuint32
+ymuint
 SptStmt::caseitem_num() const
 {
   return mCaseItemArray.size();
@@ -232,7 +232,7 @@ SptStmt::caseitem_num() const
 // case item の取得
 // kCase/kCaseX/kCaseZ で意味のある関数
 const PtCaseItem*
-SptStmt::caseitem(ymuint32 pos) const
+SptStmt::caseitem(ymuint pos) const
 {
   return mCaseItemArray[pos];
 }
@@ -245,7 +245,7 @@ SptStmt::init_stmt() const
 {
   return mBody2;
 }
-  
+
 // 繰り返し代入文の取得
 // @return 繰り返し代入文
 // kFor で意味のある関数
@@ -254,7 +254,7 @@ SptStmt::next_stmt() const
 {
   return mBody3;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 // @note kNamedParBlock/kNamedSeqBlock で意味のある関数
 PtDeclHeadArray
@@ -262,7 +262,7 @@ SptStmt::declhead_array() const
 {
   return mDeclArray;
 }
-  
+
 // @brief 子供のステートメント配列の取得
 // @note kParBlock/kSeqBlock で意味のある関数
 PtStmtArray
@@ -302,7 +302,7 @@ SptCaseItem::file_region() const
 // @brief ラベルの数の取得
 // @retval ラベルの数 通常の case ラベルの場合
 // @retval 0 default の場合
-ymuint32
+ymuint
 SptCaseItem::label_num() const
 {
   return mLabelArray.size();
@@ -311,7 +311,7 @@ SptCaseItem::label_num() const
 // @brief ラベルの取得
 // @param[in] pos 位置番号 ( 0 <= pos < label_num() )
 const PtExpr*
-SptCaseItem::label(ymuint32 pos) const
+SptCaseItem::label(ymuint pos) const
 {
   return mLabelArray[pos];
 }
@@ -323,7 +323,7 @@ SptCaseItem::body() const
   return mBody;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // statement 関係
 //////////////////////////////////////////////////////////////////////

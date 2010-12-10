@@ -564,7 +564,7 @@ enum tVpiValueType {
 /// @param[in] size サイズ
 tVpiValueType
 pack(tVpiValueType type,
-     ymuint32 size);
+     ymuint size);
 
 /// @brief 2つの型をマージする．
 /// @param[in] vtype1, vtype2 型
@@ -579,7 +579,7 @@ unpack_type(tVpiValueType packed_type);
 
 /// @brief サイズを取り出す．
 /// @param[in] packed_type 型とサイズをパックしたもの．
-ymuint32
+ymuint
 unpack_size(tVpiValueType type);
 
 /// @brief 符号つきの型かどうかのチェック
@@ -939,9 +939,9 @@ neq(tVpiScalarVal src1,
 inline
 tVpiValueType
 pack(tVpiValueType type,
-     ymuint32 size)
+     ymuint size)
 {
-  ymuint32 tmp = type | (size << 4);
+  ymuint tmp = type | (size << 4);
   return static_cast<tVpiValueType>(tmp);
 }
 
@@ -951,8 +951,8 @@ tVpiValueType
 merge(tVpiValueType vtype1,
       tVpiValueType vtype2)
 {
-  ymuint32 tmp
-    = static_cast<ymuint32>(vtype1) | static_cast<ymuint32>(vtype2);
+  ymuint tmp
+    = static_cast<ymuint>(vtype1) | static_cast<ymuint>(vtype2);
   return static_cast<tVpiValueType>(tmp);
 }
 
@@ -961,16 +961,16 @@ inline
 tVpiValueType
 unpack_type(tVpiValueType packed_type)
 {
-  ymuint32 tmp = static_cast<ymuint32>(packed_type) & 0xF;
+  ymuint tmp = static_cast<ymuint>(packed_type) & 0xF;
   return static_cast<tVpiValueType>(tmp);
 }
 
 // @brief サイズを取り出す．
 inline
-ymuint32
+ymuint
 unpack_size(tVpiValueType type)
 {
-  return (static_cast<ymuint32>(type) >> 4);
+  return (static_cast<ymuint>(type) >> 4);
 }
 
 // @brief 符号つきの型かどうかのチェック
@@ -979,7 +979,7 @@ inline
 bool
 is_signed_type(tVpiValueType type)
 {
-  return (static_cast<ymuint32>(type) & kVpiValueSigned) == kVpiValueSigned;
+  return (static_cast<ymuint>(type) & kVpiValueSigned) == kVpiValueSigned;
 }
 
 // @brief サイズつきの型かどうかのチェック
@@ -988,7 +988,7 @@ inline
 bool
 is_sized_type(tVpiValueType type)
 {
-  return (static_cast<ymuint32>(type) & kVpiValueSized) == kVpiValueSized;
+  return (static_cast<ymuint>(type) & kVpiValueSized) == kVpiValueSized;
 }
 
 // @brief ビットベクタ型かどうかのチェック

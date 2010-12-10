@@ -72,21 +72,21 @@ public:
 
   /// @brief 要素数を返す．
   virtual
-  ymuint32
+  ymuint
   elem_num() const = 0;
 
   /// @brief 要素のプリミティブを返す．
   /// @param[in] offset 位置番号 ( 0 <= offset < elem_num() )
   virtual
   const VlPrimitive*
-  elem_by_offset(ymuint32 offset) const = 0;
+  elem_by_offset(ymuint offset) const = 0;
 
   /// @brief 要素を返す．
   /// @param[in] index インデックス
   virtual
   const VlPrimitive*
   elem_by_index(int index) const = 0;
-  
+
 };
 
 
@@ -131,18 +131,18 @@ public:
   virtual
   const VlDelay*
   delay() const = 0;
-  
+
   /// @brief ポート数を得る．
   virtual
-  ymuint32
+  ymuint
   port_num() const = 0;
 
   /// @brief ポート端子を得る．
   /// @param[in] pos 位置番号 (0 <= pos < port_num())
   virtual
   const VlPrimTerm*
-  prim_term(ymuint32 pos) const = 0;
-  
+  prim_term(ymuint pos) const = 0;
+
 };
 
 
@@ -178,7 +178,7 @@ public:
 
   /// @brief 端子番号を返す．
   virtual
-  ymuint32
+  ymuint
   term_index() const = 0;
 
   /// @brief 接続しているネットを表す式を返す．

@@ -6,7 +6,6 @@ SUBDIRS =
 
 INCLUDES = \
 	$(TCL_INCLUDES) \
-	$(TK_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include

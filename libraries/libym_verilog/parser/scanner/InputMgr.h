@@ -35,13 +35,13 @@ class RawLex;
 class InputMgr
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] lex 親の Lex
   /// @param[in] fd_mgr ファイル記述子を管理するクラス
   InputMgr(RawLex* lex,
 	   FileDescMgr& fd_mgr);
-  
+
   /// @brief デストラクタ
   ~InputMgr();
 
@@ -94,18 +94,18 @@ public:
   ///           - 2 新しいファイルはインクルードもとのファイル
   void
   set_file_loc(const char* filename,
-	       ymuint32 line,
-	       ymuint32 level);
-  
+	       ymuint line,
+	       ymuint level);
+
   /// @brief 現在のファイルを返す．
   InputFile*
   cur_file();
-  
+
   /// @brief 現在の InputFile が EOF を返したときの処理
   /// @return 処理を続けられる時 true を返す．
   bool
   wrap_up();
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -114,7 +114,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 新しい FileDesc を作る
   /// @param[in] filename ファイル名
   /// @return 生成された FileDesc
@@ -128,25 +128,25 @@ private:
   const FileDesc*
   new_file_desc(const char* filename,
 		const FileLoc& parent_file_loc);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親の Lex
   RawLex* mLex;
-  
+
   // ファイル記述子を管理するクラス
   FileDescMgr& mFdMgr;
-  
+
   // サーチパス
   SearchPathList mSearchPathList;
 
   // 現在のファイル情報
   InputFile* mCurFile;
-  
+
   // ファイル情報のスタック
   vector<InputFile*> mFileStack;
 
@@ -156,7 +156,7 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 現在のファイルを返す．
 inline
 InputFile*

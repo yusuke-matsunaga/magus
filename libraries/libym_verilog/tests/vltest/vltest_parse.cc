@@ -33,7 +33,7 @@ parse_mode(const list<string>& filename_list,
   MsgMgr msgmgr;
   MsgHandler* tmh = new StreamMsgHandler(&cerr);
   msgmgr.reg_handler(tmh);
-  
+
   SearchPathList splist;
   if ( spath ) {
     splist.set(spath);
@@ -44,9 +44,9 @@ parse_mode(const list<string>& filename_list,
   if ( watch_line ) {
     watcher_list.push_back(&watcher);
   }
-  
-  ymuint32 c = loop + 1;
-  for (ymuint32 i = 0; i < c; ++ i) {
+
+  ymuint c = loop + 1;
+  for (ymuint i = 0; i < c; ++ i) {
     try {
       StopWatch timer;
       timer.start();
@@ -76,7 +76,7 @@ parse_mode(const list<string>& filename_list,
 	dp.enable_file_loc_mode();
 	dp.put(udp_list, module_list);
       }
-      
+
       switch ( msgmgr.error_num() ) {
       case 0:
 	cerr << "No errors" << endl;
@@ -84,7 +84,7 @@ parse_mode(const list<string>& filename_list,
       case 1:
 	cerr << "Total 1 error" << endl;
 	break;
-	
+
       default:
 	cerr << "Total " << msgmgr.error_num() << " errors" << endl;
 	break;

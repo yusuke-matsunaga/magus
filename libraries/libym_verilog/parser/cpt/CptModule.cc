@@ -61,27 +61,27 @@ CptModule::CptModule(const FileRegion& file_region,
   mItemArray(item_array)
 {
   mFlags =
-    is_cell
-    | (is_protected << 1)
-    | ((time_precision + 16) << 2)
-    | ((time_unit + 16) << 7)
-    | (net_type << 12)
-    | (unconn << 16)
-    | (delay << 18)
-    | (macro << 21)
-    | (explicit_name << 22)
-    | (1 << 23) // top_module
-    | (portfaults << 25)
-    | (suppress_faults << 26)
+    static_cast<ymuint32>(is_cell)
+    | (static_cast<ymuint32>(is_protected) << 1)
+    | (static_cast<ymuint32>(time_precision + 16) << 2)
+    | (static_cast<ymuint32>(time_unit + 16) << 7)
+    | (static_cast<ymuint32>(net_type) << 12)
+    | (static_cast<ymuint32>(unconn) << 16)
+    | (static_cast<ymuint32>(delay) << 18)
+    | (static_cast<ymuint32>(macro) << 21)
+    | (static_cast<ymuint32>(explicit_name) << 22)
+    | (1U << 23) // top_module
+    | (static_cast<ymuint32>(portfaults) << 25)
+    | (static_cast<ymuint32>(suppress_faults) << 26)
     ;
-  
-  ymuint32 n = 0;
-  for (ymuint32 i = 0; i < mIOHeadArray.size(); ++ i) {
+
+  ymuint n = 0;
+  for (ymuint i = 0; i < mIOHeadArray.size(); ++ i) {
     n += mIOHeadArray[i]->item_num();
   }
   mIODeclNum = n;
 
-  for (ymuint32 i = 0; i < mItemArray.size(); ++ i) {
+  for (ymuint i = 0; i < mItemArray.size(); ++ i) {
     const PtItem* item = mItemArray[i];
     if ( item->type() == kPtItem_Func ) {
       mFuncDic.insert(make_pair(item->name(), item));
@@ -107,7 +107,7 @@ CptModule::name() const
 {
   return mName;
 }
-  
+
 // @brief パラメータポート宣言配列の取得
 PtDeclHeadArray
 CptModule::paramport_array() const
@@ -117,7 +117,7 @@ CptModule::paramport_array() const
 
 // @brief ポート数の取得
 // @return ポート数
-ymuint32
+ymuint
 CptModule::port_num() const
 {
   return mPortArray.size();
@@ -125,21 +125,21 @@ CptModule::port_num() const
 
 // ポートを返す．
 const PtPort*
-CptModule::port(ymuint32 pos) const
+CptModule::port(ymuint pos) const
 {
   return mPortArray[pos];
 }
-  
+
 // @brief 入出力宣言ヘッダ配列の取得
 PtIOHeadArray
 CptModule::iohead_array() const
 {
   return mIOHeadArray;
 }
-  
+
 // @brief 入出力宣言の要素数の取得
 // @note 個々のヘッダが持つ要素数の総和を計算する．
-ymuint32
+ymuint
 CptModule::iodecl_num() const
 {
   return mIODeclNum;
@@ -151,28 +151,28 @@ CptModule::paramhead_array() const
 {
   return mParamHeadArray;
 }
-  
+
 // @brief localparam 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptModule::localparamhead_array() const
 {
   return mLparamHeadArray;
 }
-  
+
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 CptModule::declhead_array() const
 {
   return mDeclHeadArray;
 }
-  
+
 // @brief item 配列の取得
 PtItemArray
 CptModule::item_array() const
 {
   return mItemArray;
 }
-  
+
 // macromodule の時 true を返す．
 bool
 CptModule::is_macromodule() const
@@ -187,14 +187,14 @@ CptModule::is_cell() const
 {
   return static_cast<bool>(mFlags & 1);
 }
-    
+
 // protect されていたら true を返す．
 bool
 CptModule::is_protected() const
 {
   return static_cast<bool>((mFlags >> 1) & 1);
 }
-  
+
 // time unit を返す．
 // 結果は 2 〜 -15 の整数
 // もしくは未定義を表す -16
@@ -219,14 +219,14 @@ CptModule::nettype() const
 {
   return static_cast<tVpiNetType>((mFlags >> 12) & 0xf);
 }
-  
+
 // unconnected drive を返す．
 tVpiUnconnDrive
 CptModule::unconn_drive() const
 {
   return static_cast<tVpiUnconnDrive>((mFlags >> 16) & 0x3);
 }
-  
+
 // default delay mode を返す．
 tVpiDefDelayMode
 CptModule::delay_mode() const
@@ -306,8 +306,8 @@ bool
 CptModule::suppress_faults() const
 {
   return static_cast<bool>((mFlags >> 26) & 1);
-} 
-  
+}
+
 // config 情報を返す．
 const string&
 CptModule::config() const
@@ -321,7 +321,7 @@ CptModule::library() const
 {
   return mLibrary;
 }
-  
+
 // cell 情報を返す．
 const string&
 CptModule::cell() const
@@ -366,7 +366,7 @@ CptPort::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // 外向の名前(本当のポート名)を取出す
 // 無い場合は NULL を返す
 const char*
@@ -376,7 +376,7 @@ CptPort::ext_name() const
 }
 
 // 内部のポート結線リストのサイズを取り出す．
-ymuint32
+ymuint
 CptPort::portref_num() const
 {
   return 0;
@@ -384,14 +384,14 @@ CptPort::portref_num() const
 
 // 内部のポート結線の先頭を取り出す．
 const PtPortRef*
-CptPort::portref(ymuint32 pos) const
+CptPort::portref(ymuint pos) const
 {
   return NULL;
 }
 
 // @brief portref を得る．
 PtiPortRef*
-CptPort::_portref(ymuint32 pos)
+CptPort::_portref(ymuint pos)
 {
   return NULL;
 }
@@ -416,7 +416,7 @@ CptPort1::~CptPort1()
 }
 
 // 内部のポート結線リストのサイズを取り出す．
-ymuint32
+ymuint
 CptPort1::portref_num() const
 {
   return 1;
@@ -424,14 +424,14 @@ CptPort1::portref_num() const
 
 // 内部のポート結線の先頭を取り出す．
 const PtPortRef*
-CptPort1::portref(ymuint32 /* pos */) const
+CptPort1::portref(ymuint /* pos */) const
 {
   return mPortRef;
 }
 
 // @brief portref を得る．
 PtiPortRef*
-CptPort1::_portref(ymuint32 /* pos */)
+CptPort1::_portref(ymuint /* pos */)
 {
   return mPortRef;
 }
@@ -456,7 +456,7 @@ CptPort2::~CptPort2()
 }
 
 // 内部のポート結線リストのサイズを取り出す．
-ymuint32
+ymuint
 CptPort2::portref_num() const
 {
   return mPortRefArray.size();
@@ -464,14 +464,14 @@ CptPort2::portref_num() const
 
 // 内部のポート結線を取り出す．
 const PtPortRef*
-CptPort2::portref(ymuint32 pos) const
+CptPort2::portref(ymuint pos) const
 {
   return mPortRefArray[pos];
 }
 
 // @brief portref を得る．
 PtiPortRef*
-CptPort2::_portref(ymuint32 pos)
+CptPort2::_portref(ymuint pos)
 {
   return mPortRefArray[pos];
 }
@@ -480,7 +480,7 @@ CptPort2::_portref(ymuint32 pos)
 //////////////////////////////////////////////////////////////////////
 // port reference のベース実装クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptPortRef::CptPortRef(const FileRegion& file_region,
 		       const char* name) :
@@ -488,7 +488,7 @@ CptPortRef::CptPortRef(const FileRegion& file_region,
   mName(name)
 {
 }
-  
+
 // デストラクタ
 CptPortRef::~CptPortRef()
 {
@@ -500,14 +500,14 @@ CptPortRef::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // 名前を取り出す．
 const char*
 CptPortRef::name() const
 {
   return mName;
 }
-  
+
 // @brief インデックスの取得
 // @return インデックスを表す式
 // このクラスでは NULL を返す．
@@ -528,7 +528,7 @@ CptPortRef::range_mode() const
 {
   return kVpiNoRange;
 }
-  
+
 // @brief 範囲の左側の式の取得
 // @return 範囲の左側の式
 // このクラスでは NULL を返す．
@@ -551,7 +551,7 @@ CptPortRef::right_range() const
 //////////////////////////////////////////////////////////////////////
 // インデックスつきの port reference を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptPortRefI::CptPortRefI(const FileRegion& file_region,
 			 const char* name,
@@ -560,12 +560,12 @@ CptPortRefI::CptPortRefI(const FileRegion& file_region,
   mIndex(index)
 {
 }
-  
+
 // デストラクタ
 CptPortRefI::~CptPortRefI()
 {
 }
-  
+
 // インデックスを返す．
 const PtExpr*
 CptPortRefI::index() const
@@ -577,7 +577,7 @@ CptPortRefI::index() const
 //////////////////////////////////////////////////////////////////////
 // 範囲指定つきの port reference を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptPortRefR::CptPortRefR(const FileRegion& file_region,
 			 const char* name,
@@ -590,7 +590,7 @@ CptPortRefR::CptPortRefR(const FileRegion& file_region,
   mRightRange(right)
 {
 }
-  
+
 // デストラクタ
 CptPortRefR::~CptPortRefR()
 {
@@ -601,15 +601,15 @@ tVpiRangeMode
 CptPortRefR::range_mode() const
 {
   return mMode;
-}   
-  
+}
+
 // range の MSB を取り出す．
 const PtExpr*
 CptPortRefR::left_range() const
 {
   return mLeftRange;
 }
-  
+
 // range の LSB を取り出す．
 const PtExpr*
 CptPortRefR::right_range() const
@@ -617,7 +617,7 @@ CptPortRefR::right_range() const
   return mRightRange;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // モジュール関係
 //////////////////////////////////////////////////////////////////////
@@ -698,7 +698,7 @@ CptFactory::new_Module(const FileRegion& file_region,
 			   item_array);
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // ポート関係
 //////////////////////////////////////////////////////////////////////

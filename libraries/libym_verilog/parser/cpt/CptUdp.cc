@@ -71,19 +71,19 @@ CptUdp::name() const
 }
 
 // ポート数を取り出す．
-ymuint32
+ymuint
 CptUdp::port_num() const
 {
   return mPortArray.size();
 }
-  
+
 // 先頭のポートを取り出す．
 const PtPort*
-CptUdp::port(ymuint32 pos) const
+CptUdp::port(ymuint pos) const
 {
   return mPortArray[pos];
 }
-  
+
 // @brief 入出力宣言ヘッダ配列の取得
 PtIOHeadArray
 CptUdp::iohead_array() const
@@ -109,7 +109,7 @@ CptUdp::table_array() const
 //////////////////////////////////////////////////////////////////////
 // UDP のテーブルの中身を表すクラス(組合せ回路用)
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptUdpEntry::CptUdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
@@ -131,7 +131,7 @@ CptUdpEntry::file_region() const
 {
   return mFileRegion;
 }
-  
+
 // @brief 入力値の配列を取り出す．
 PtUdpValueArray
 CptUdpEntry::input_array() const
@@ -158,7 +158,7 @@ CptUdpEntry::output() const
 //////////////////////////////////////////////////////////////////////
 // UDP のテーブルの中身を表すクラス(順序回路用)
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptUdpEntryS::CptUdpEntryS(const FileRegion& file_region,
 			   PtUdpValueArray input_array,
@@ -185,7 +185,7 @@ CptUdpEntryS::current() const
 //////////////////////////////////////////////////////////////////////
 // UDP のテーブルの値を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptUdpValue::CptUdpValue(const FileRegion& file_region,
 			 tVpiUdpVal symbol) :

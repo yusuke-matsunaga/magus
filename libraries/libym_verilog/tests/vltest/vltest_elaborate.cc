@@ -55,13 +55,13 @@ elaborate_mode(const list<string>& filename_list,
     watcher_list.push_back(&watcher);
   }
 
-  ymuint32 c = loop + 1;
-  for (ymuint32 i = 0; i < c; ++ i) {
-    
+  ymuint c = loop + 1;
+  for (ymuint i = 0; i < c; ++ i) {
+
 #if 0
     try {
 #endif
-      
+
       StopWatch timer;
       timer.start();
       VlMgr vlmgr(msgmgr);
@@ -89,7 +89,7 @@ elaborate_mode(const list<string>& filename_list,
 	timer.start();
 
 	vlmgr.elaborate();
-	
+
 	timer.stop();
 	USTime time = timer.time();
 	if ( verbose ) {
@@ -100,7 +100,7 @@ elaborate_mode(const list<string>& filename_list,
 	       << "M bytes" << endl;
 	  sleep(20);
 	}
-      
+
 	if ( msgmgr.error_num() == 0 && dump_vpi ) {
 	  VlDumper dumper(cout);
 	  dumper(vlmgr);
@@ -113,12 +113,12 @@ elaborate_mode(const list<string>& filename_list,
       case 1:
 	cerr << "Total 1 error" << endl;
 	break;
-	
+
       default:
 	cerr << "Total " << msgmgr.error_num() << " errors" << endl;
 	break;
       }
-      
+
 #if 0
     }
     catch ( AssertError x ) {

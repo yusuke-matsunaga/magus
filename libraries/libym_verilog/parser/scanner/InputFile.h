@@ -36,9 +36,9 @@ BEGIN_NAMESPACE_YM_VERILOG
 class InputFile
 {
   friend class InputMgr;
-  
+
 private:
-  
+
   /// @brief コンストラクタ
   /// @param[in] lex 親の Lex
   /// @param[in] fd UNIX のファイル記述子
@@ -68,7 +68,7 @@ public:
   /// @param[out] buff 結果の文字列を格納するバッファ
   int
   _read_token(StrBuff& buff);
-  
+
   /// @brief 2進数モードの読み込みを行う．
   /// @param[in] c 最初の文字
   /// @param[out] buff 結果を格納するバッファ
@@ -76,7 +76,7 @@ public:
   int
   read_bin_str(int c,
 	       StrBuff& buff);
-  
+
   /// @brief 8進数モードの読み込みを行う．
   /// @param[in] c 最初の文字
   /// @param[out] buff 結果を格納するバッファ
@@ -84,7 +84,7 @@ public:
   int
   read_oct_str(int c,
 	       StrBuff& buff);
-  
+
   /// @brief 10進数モードの読み込みを行う．
   /// @param[in] c 最初の文字
   /// @param[out] buff 結果を格納するバッファ
@@ -92,7 +92,7 @@ public:
   int
   read_dec_str(int c,
 	       StrBuff& buff);
-  
+
   /// @brief 16進数モードの読み込みを行う．
   /// @param[in] c 最初の文字
   /// @param[out] buff 結果を格納するバッファ
@@ -105,7 +105,7 @@ public:
   /// @param[out] buff 結果を格納する文字列バッファ
   void
   get_str(StrBuff& buff);
-  
+
   /// @brief 二重引用符用の読み込み
   /// @param[out] buff 結果を格納する文字列バッファ
   /// @return トークン番号を返す．
@@ -114,7 +114,7 @@ public:
   ///  - ERROR
   int
   read_dq_str(StrBuff& buff);
-  
+
   /// @brief escaped identifier 用の読み込み
   /// @param[out] buff 結果を格納する文字列バッファ
   /// @return トークン番号を返す．
@@ -124,7 +124,7 @@ public:
   ///  - ERROR
   int
   read_esc_str(StrBuff& buff);
-  
+
   /// @brief 数字を読み込む．
   /// @param[out] buff 結果を格納する文字列バッファ
   /// @return トークン番号を返す．
@@ -134,11 +134,11 @@ public:
   ///  - ERROR
   int
   read_num(StrBuff& buff);
-  
+
   /// @brief 空白文字を読み飛ばす
   void
   read_space();
-  
+
   /// @brief '/' を読み込んだ後の処理
   /// @param[out] buff コメントを格納する文字列バッファ
   /// @return トークン番号を返す．
@@ -168,7 +168,7 @@ public:
   /// @return 読み込んだ文字を返す．
   int
   get();
-  
+
   /// @brief ファイル記述子を返す．
   const FileDesc*
   file_desc() const;
@@ -178,41 +178,41 @@ public:
   filename() const;
 
   /// @brief 現在の行番号を返す．
-  ymuint32
+  ymuint
   cur_line() const;
 
   /// @brief 現在のカラム番号を返す．
-  ymuint32
+  ymuint
   cur_column() const;
 
   /// @brief 直前の行番号を返す．
-  ymuint32
+  ymuint
   last_line() const;
 
   /// @brief 直前のカラム番号を返す．
-  ymuint32
+  ymuint
   last_column() const;
 
   /// @brief 現在のファイル位置の取得
   /// @return 現在のファイル位置
   FileRegion
   cur_file_region() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 改行コードを読み込んだ時の処理
   void
   nl();
-  
+
   /// @brief バッファに充填する．
   /// @brief 読み込まれた文字数を返す．
   int
   fill_buff();
-  
+
   /// @brief メッセージを出力する．
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
@@ -227,7 +227,7 @@ private:
 	  tMsgType type,
 	  const char* label,
 	  const char* msg);
-  
+
   /// @brief メッセージを出力する．
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
@@ -242,19 +242,19 @@ private:
 	  tMsgType type,
 	  const char* label,
 	  const string& msg);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親の Lex
   RawLex* mLex;
-  
+
   // UNIX のファイル記述子
   int mFd;
-  
+
   // ファイル記述子
   const FileDesc* mFileDesc;
 
@@ -266,19 +266,19 @@ private:
 
   // ファイルバッファ
   char mBuff[4096];
-  
+
   // 現在の行番号
   ymuint32 mCurLine;
 
   // 現在のコラム番号
   ymuint32 mCurColumn;
-  
+
   // 直前の行番号
   ymuint32 mLastLine;
 
   // 直前のコラム番号
   ymuint32 mLastColumn;
-  
+
   // 最後の文字が '\n' の時 true となるフラグ
   bool mNL;
 
@@ -296,18 +296,18 @@ int
 InputFile::read_token(StrBuff& buff,
 		      FileRegion& token_loc)
 {
-  ymuint32 first_line = cur_line();
-  ymuint32 first_column = cur_column();
+  ymuint first_line = cur_line();
+  ymuint first_column = cur_column();
 
   int id = _read_token(buff);
-  
+
   token_loc = FileRegion(file_desc(),
 			 first_line, first_column,
 			 last_line(),last_column());
 
   return id;
 }
-  
+
 // @brief ファイル記述子を返す．
 inline
 const FileDesc*
@@ -337,7 +337,7 @@ InputFile::get()
 
 // @brief 現在の行番号を返す．
 inline
-ymuint32
+ymuint
 InputFile::cur_line() const
 {
   return mCurLine;
@@ -345,7 +345,7 @@ InputFile::cur_line() const
 
 // @brief 現在のカラム番号を返す．
 inline
-ymuint32
+ymuint
 InputFile::cur_column() const
 {
   return mCurColumn;
@@ -353,7 +353,7 @@ InputFile::cur_column() const
 
 // @brief 直前の行番号を返す．
 inline
-ymuint32
+ymuint
 InputFile::last_line() const
 {
   return mLastLine;
@@ -361,7 +361,7 @@ InputFile::last_line() const
 
 // @brief 直前のカラム番号を返す．
 inline
-ymuint32
+ymuint
 InputFile::last_column() const
 {
   return mLastColumn;
@@ -387,7 +387,7 @@ InputFile::_accept()
   ++ mCurColumn;
   ++ mReadPos;
 }
-  
+
 // @brief 改行コードを読み込んだ時の処理
 inline
 void
@@ -417,7 +417,7 @@ InputFile::fill_buff()
   }
   return mEndPos;
 }
-  
+
 // @brief メッセージを出力する．
 // @param[in] src_file この関数を読んでいるソースファイル名
 // @param[in] src_line この関数を読んでいるソースの行番号
@@ -438,7 +438,7 @@ InputFile::put_msg(const char* src_file,
 			  file_loc, type,
 			  label, msg);
 }
-  
+
 // @brief メッセージを出力する．
 // @param[in] src_file この関数を読んでいるソースファイル名
 // @param[in] src_line この関数を読んでいるソースの行番号

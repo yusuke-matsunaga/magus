@@ -51,13 +51,13 @@ private:
   /// デストラクタ
   virtual
   ~SptStmt();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // PtStmt の派生クラスのための仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// ファイル位置の取得
   virtual
   FileRegion
@@ -73,7 +73,7 @@ public:
   virtual
   const char*
   stmt_name() const;
-  
+
   /// 階層ブランチの取得
   virtual
   PtNameBranchArray
@@ -88,15 +88,15 @@ public:
   /// @return 引数の数
   /// @note kEnable/kSysEnable で意味のある関数
   virtual
-  ymuint32
+  ymuint
   arg_num() const;
-  
+
   /// @brief 引数の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < arg_num() )
   /// @note kEnable/kSysEnable で意味のある関数
   virtual
   const PtExpr*
-  arg(ymuint32 pos) const;
+  arg(ymuint pos) const;
 
   /// コントロールの取得
   virtual
@@ -135,30 +135,30 @@ public:
 
   /// case item の要素数の取得
   virtual
-  ymuint32
+  ymuint
   caseitem_num() const;
 
   /// case item の取得
   virtual
   const PtCaseItem*
-  caseitem(ymuint32 pos) const;
+  caseitem(ymuint pos) const;
 
   /// 初期化代入文の取得
   virtual
   const PtStmt*
   init_stmt() const;
-  
+
   /// 繰り返し代入文の取得
   virtual
   const PtStmt*
   next_stmt() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   /// @note kNamedParBlock/kNamedSeqBlock で意味のある関数
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief 子供のステートメント配列の取得
   /// @note kParBlock/kSeqBlock で意味のある関数
   virtual
@@ -200,13 +200,13 @@ private:
 
   // 式2
   PtExpr* mExpr2;
-  
+
   // case item の配列
   PtCaseItemArray mCaseItemArray;
 
   // 宣言の配列
   PtDeclHeadArray mDeclArray;
-  
+
   // ステートメントの配列
   PtStmtArray mStmtArray;
 
@@ -228,12 +228,12 @@ private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ/デストラクタ
   //////////////////////////////////////////////////////////////////////
-  
+
   /// コンストラクタ
   SptCaseItem(const FileRegion& file_region,
 	      PtExprArray label_array,
 	      PtStmt* body);
-  
+
   /// デストラクタ
   ~SptCaseItem();
 
@@ -252,20 +252,20 @@ public:
   /// @retval ラベルの数 通常の case ラベルの場合
   /// @retval 0 default の場合
   virtual
-  ymuint32
+  ymuint
   label_num() const;
-  
+
   /// @brief ラベルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < label_num() )
   virtual
   const PtExpr*
-  label(ymuint32 pos) const;
+  label(ymuint pos) const;
 
   /// 本体のステートメントの取得
   virtual
   PtStmt*
   body() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -277,7 +277,7 @@ private:
 
   // ラベルのリスト
   PtExprArray mLabelArray;
-  
+
   // ラベルが一致したときに実行されるステートメント
   PtStmt* mBody;
 

@@ -25,10 +25,10 @@ class ElbUdpDefn :
   public VlUdpDefn
 {
 public:
-  
+
   /// @brief コンストラクタ
   ElbUdpDefn() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbUdpDefn() { }
@@ -46,7 +46,7 @@ public:
   /// @param[in] dir 向き
   virtual
   void
-  set_io(ymuint32 pos,
+  set_io(ymuint pos,
 	 const PtIOHead* pt_header,
 	 const PtIOItem* pt_item) = 0;
 
@@ -64,7 +64,7 @@ public:
   /// @param[in] vals シンボル値の配列
   virtual
   void
-  set_tableentry(ymuint32 pos,
+  set_tableentry(ymuint pos,
 		 const PtUdpEntry* pt_udp_entry,
 		 const vector<tVpiUdpVal>& vals) = 0;
 
@@ -79,13 +79,13 @@ class ElbTableEntry :
   public VlTableEntry
 {
 public:
-  
+
   /// @brief コンストラクタ
   ElbTableEntry() { }
-  
+
   /// @brief デストラクタ
   ~ElbTableEntry() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////

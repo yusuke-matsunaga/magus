@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr_list オペランドのリスト
 ElbExpr*
 EiFactory::new_ConcatOp(const PtBase* pt_expr,
-			ymuint32 opr_size,
+			ymuint opr_size,
 			ElbExpr** opr_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiConcatOp));
@@ -46,7 +46,7 @@ ElbExpr*
 EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
 			     ElbExpr* rep_expr,
 			     int rep_num,
-			     ymuint32 opr_size,
+			     ymuint opr_size,
 			     ElbExpr** opr_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiMultiConcatOp));
@@ -66,19 +66,19 @@ EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
 // @param[in] opr_size オペランド数
 // @param[in] opr_array オペランドを格納する配列
 EiConcatOp::EiConcatOp(const PtBase* pt_obj,
-		       ymuint32 opr_size,
+		       ymuint opr_size,
 		       ElbExpr** opr_array) :
   EiOperation(pt_obj),
   mOprNum(opr_size),
   mOprList(opr_array)
 {
-  ymuint32 n = operand_num();
+  ymuint n = operand_num();
   mSize = 0;
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     ElbExpr* expr = _operand(i);
     tVpiValueType type1 = expr->value_type();
     assert_cond(type1 != kVpiValueReal, __FILE__, __LINE__);
-    ymuint32 size1 = unpack_size(type1);
+    ymuint size1 = unpack_size(type1);
     mSize += size1;
 
     // オペランドのサイズは self determined
@@ -103,7 +103,7 @@ EiConcatOp::value_type() const
 bool
 EiConcatOp::is_const() const
 {
-  for (ymuint32 i = 0; i < mOprNum; ++ i) {
+  for (ymuint i = 0; i < mOprNum; ++ i) {
     if ( !mOprList[i]->is_const() ) {
       return false;
     }
@@ -142,9 +142,9 @@ void
 EiConcatOp::eval_bitvector(BitVector& bitvector,
 			   tVpiValueType req_type) const
 {
-  ymuint32 n = operand_num();
+  ymuint n = operand_num();
   vector<BitVector> vlist(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     const VlExpr* expr = operand(i);
     expr->eval_bitvector(vlist[i]);
   }
@@ -159,8 +159,8 @@ EiConcatOp::decompile_impl(int ppri) const
 {
   string ans("{");
   const char* delim = "";
-  ymuint32 n = operand_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = operand_num();
+  for (ymuint i = 0; i < n; ++ i) {
     const VlExpr* expr = operand(i);
     ans += delim + expr->decompile();
     delim = ",";
@@ -195,7 +195,7 @@ EiConcatOp::op_type() const
 }
 
 // @brief オペランド数を返す．
-ymuint32
+ymuint
 EiConcatOp::operand_num() const
 {
   return mOprNum;
@@ -204,7 +204,7 @@ EiConcatOp::operand_num() const
 // @brief オペランドを返す．
 // @param[in] pos 位置番号
 ElbExpr*
-EiConcatOp::_operand(ymuint32 pos) const
+EiConcatOp::_operand(ymuint pos) const
 {
   return mOprList[pos];
 }
@@ -223,7 +223,7 @@ EiConcatOp::_operand(ymuint32 pos) const
 EiMultiConcatOp::EiMultiConcatOp(const PtBase* pt_obj,
 				 ElbExpr* rep_expr,
 				 int rep_num,
-				 ymuint32 opr_size,
+				 ymuint opr_size,
 				 ElbExpr** opr_array) :
   EiConcatOp(pt_obj, opr_size, opr_array),
   mRepExpr(rep_expr),
@@ -249,9 +249,9 @@ void
 EiMultiConcatOp::eval_bitvector(BitVector& bitvector,
 				tVpiValueType req_type) const
 {
-  ymuint32 n = EiConcatOp::operand_num();
+  ymuint n = EiConcatOp::operand_num();
   vector<BitVector> vlist(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     const VlExpr* expr = EiConcatOp::operand(i);
     expr->eval_bitvector(vlist[i]);
   }
@@ -267,8 +267,8 @@ EiMultiConcatOp::decompile_impl(int ppri) const
   string ans("{");
   ans += mRepExpr->decompile() + "{";
   const char* comma = "";
-  ymuint32 n = EiConcatOp::operand_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = EiConcatOp::operand_num();
+  for (ymuint i = 0; i < n; ++ i) {
     const VlExpr* expr = EiConcatOp::operand(i);
     ans += comma + expr->decompile();
     comma = ",";
@@ -294,7 +294,7 @@ EiMultiConcatOp::op_type() const
 }
 
 // @brief オペランド数を返す．
-ymuint32
+ymuint
 EiMultiConcatOp::operand_num() const
 {
   return EiConcatOp::operand_num() + 1;
@@ -303,7 +303,7 @@ EiMultiConcatOp::operand_num() const
 // @brief オペランドを返す．
 // @param[in] pos 位置番号
 ElbExpr*
-EiMultiConcatOp::_operand(ymuint32 pos) const
+EiMultiConcatOp::_operand(ymuint pos) const
 {
   if ( pos == 0 ) {
     return mRepExpr;

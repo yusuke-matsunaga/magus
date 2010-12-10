@@ -49,7 +49,7 @@ class RawLex
   friend class LexPlugin;
 
 public:
-  
+
   /// @brief 解析用のコンテキスト
   enum tContext {
     /// @brief 通常
@@ -65,10 +65,10 @@ public:
     /// @brief 16進定数
     kHex
   };
-  
-  
+
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] msg_mgr メッセージマネージャ
   /// @param[in] fd_mgr ファイル記述子を管理するクラス
@@ -94,7 +94,7 @@ public:
   /// @param[in] searchpath セットするサーチパス
   void
   set_searchpath(const SearchPathList& searchpath = SearchPathList());
-  
+
   /// @brief ファイルをオープンする．
   /// @param[in] filename ファイル名
   /// @retval true オープンに成功した．
@@ -115,7 +115,7 @@ public:
   /// @return 読み込んだトークンの id を返す．
   int
   get_token();
-  
+
   /// @brief 生のトークンの読み出し
   /// @return 読み出されたトークンの id を返す．
   int
@@ -130,10 +130,10 @@ public:
   /// @return 最後に読んだ文字列
   const char*
   cur_string() const;
-  
+
   /// @brief 最後に読んだ文字列を unsigned integer に変換する．
   /// @return 最後に読んだ文字列を unsigned integer に変換したもの
-  ymuint32
+  ymuint
   cur_uint() const;
 
   /// @brief 最後に読んだ文字列を real number に変換する．
@@ -201,7 +201,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
 
-public:  
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name デバッグモードの制御
   /// @{
@@ -223,11 +223,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name その他
   /// @{
-  
+
   /// @brief メッセージマネージャの取得
   MsgMgr&
   msg_mgr();
-  
+
   /// @brief `resetall の処理
   void
   resetall(const FileRegion& file_region);
@@ -243,7 +243,7 @@ public:
   /// @return マクロ展開が自己ループしていたら true を返す．
   bool
   check_macro(const char* name) const;
-  
+
   /// @brief マクロの追加
   void
   push_macro(const char* name,
@@ -255,24 +255,24 @@ public:
   /// @retval false 条件が成り立っていない
   bool
   cond() const;
-  
+
   /// @brief condition の書き換え
   /// @param[in] flag 設定する値
   void
   set_cond(bool flag);
-  
+
   /// @brief condition の反転
   void
   flip_cond();
-  
+
   /// @brief 改行文字を読み込んだときに呼ばれる関数
   void
   check_line();
-  
+
   /// @brief コンテキストを返す．
   tContext
   context();
-  
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -281,13 +281,13 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
-  
+
   // 入力ファイルを管理するオブジェクト
   InputMgr* mInputMgr;
-  
+
   // 予約語辞書の参照
   const RsrvWordDic& mDic;
 
@@ -296,7 +296,7 @@ private:
 
   // 現在のトークンの位置
   FileRegion mCurPos;
-  
+
   // 現在のトークンの文字列
   const char* mCurString;
 
@@ -308,7 +308,7 @@ private:
 
   // マクロのスタック
   vector<MacroSource> mMacroStack;
-  
+
   // 行番号ウオッチャーを管理するクラス
   T1BindMgr<int> mWatcherMgr;
 
@@ -317,16 +317,16 @@ private:
 
   // 内部状態用のリスト
   list<LexState*> mStates;
-  
+
   // コンテキスト
   tContext mContext;
-  
+
   // read_token の結果の文字列を格納するバッファ
   StrBuff mStringBuff;
-  
+
   // デバッグ時に true にするフラグ
   bool mDebug;
-  
+
 };
 
 
@@ -355,7 +355,7 @@ RawLex::cur_string() const
 // @brief 最後に読んだ文字列を unsigned integer に変換する．
 // @return 最後に読んだ文字列を unsigned integer に変換したもの
 inline
-ymuint32
+ymuint
 RawLex::cur_uint() const
 {
   return mCurUint;
@@ -369,7 +369,7 @@ RawLex::cur_rnumber() const
 {
   return strtod(mCurString, static_cast<char**>(NULL));
 }
-  
+
 // @brief メッセージマネージャの取得
 inline
 MsgMgr&
@@ -377,7 +377,7 @@ RawLex::msg_mgr()
 {
   return mMsgMgr;
 }
-  
+
 // @brief コンテキストを返す．
 inline
 RawLex::tContext

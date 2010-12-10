@@ -44,14 +44,14 @@ public:
 
   /// @brief ポート数を取り出す．
   virtual
-  ymuint32
+  ymuint
   port_num() const = 0;
 
   /// @brief ポートを取り出す．
   /// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
   virtual
   const PtPort*
-  port(ymuint32 pos) const = 0;
+  port(ymuint pos) const = 0;
 
   /// @brief 入出力宣言ヘッダ配列の取得
   virtual
@@ -67,7 +67,7 @@ public:
   virtual
   PtUdpEntryArray
   table_array() const = 0;
-  
+
 };
 
 

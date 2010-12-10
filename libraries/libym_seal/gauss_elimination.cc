@@ -22,7 +22,7 @@ gaussian_elimination(const Matrix& src_matrix,
 		     vector<double>& solution)
 {
   ymuint32 nv = src_matrix.row_size();
-  
+
   if ( nv + 1 != src_matrix.col_size() ) {
     // 1列は右辺の定数だとして変数と数と方程式の数は等しくなければならない．
     cout << "nr + 1 != nc" << endl;
@@ -106,7 +106,7 @@ gaussian_elimination(const Matrix& src_matrix,
     cout << "work.elem(row_idx[nv - 1], nv - 1) == 0.0" << endl;
     return false;
   }
-  
+
   // 後方代入
   solution.clear();
   solution.resize(nv);
@@ -118,7 +118,7 @@ gaussian_elimination(const Matrix& src_matrix,
     }
     solution[i] = v / works.elem(r, i);
   }
-  
+
 #if 1
 #if 0
   display(cout, src_matrix);
@@ -152,7 +152,7 @@ gaussian_elimination(const Matrix& src_matrix,
   }
   assert_cond(!error, __FILE__, __LINE__);
 #endif
-  
+
   return true;
 }
 
@@ -199,16 +199,16 @@ gaussian_elimination(const SMatrix& src_matrix,
     }
     max_elem[r] = max;
   }
-  
+
   // 変数を一つずつ選んでゆく
   vector<pair<ymuint, SmCell*> > cur_rows;
   cur_rows.reserve(nv);
   for (ymuint c = 0; c < nv; ++ c) {
-#if 1
+#if 0
     cout << c << " / " << nv;
     cout.flush();
 #endif
-    
+
     // c 番めの係数が最大の行を選ぶ．
     double max = 0.0;
     ymuint max_r = 0;
@@ -235,7 +235,7 @@ gaussian_elimination(const SMatrix& src_matrix,
       return false;
     }
 
-#if 1
+#if 0
     cout << " : --> " << max_r
 	 << " / " << cur_rows.size();
     cout.flush();
@@ -260,7 +260,7 @@ gaussian_elimination(const SMatrix& src_matrix,
 	max_elem[r] = v;
       }
     }
-#if 1
+#if 0
     cout << " end (# of cells(K): "
 	 << works.cell_num() / 1024
 	 << ", used mem: "
@@ -278,7 +278,7 @@ gaussian_elimination(const SMatrix& src_matrix,
     return false;
   }
 #endif
-  
+
   // 後方代入
   solution.clear();
   solution.resize(nv);
@@ -298,7 +298,7 @@ gaussian_elimination(const SMatrix& src_matrix,
     }
     solution[c] = v / k;
   }
-  
+
 #if 1
   // 解の検証
   bool error = false;
@@ -331,7 +331,7 @@ gaussian_elimination(const SMatrix& src_matrix,
   watch.stop();
   USTime time = watch.time();
   cout << "end" << "  " << time << endl;
-  
+
   return true;
 }
 

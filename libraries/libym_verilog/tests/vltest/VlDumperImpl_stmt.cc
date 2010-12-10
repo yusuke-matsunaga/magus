@@ -169,11 +169,11 @@ VlDumperImpl::put_stmt(const char* label,
   case kVpiCase:
     put("vpiCaseType", stmt->case_type() );
     put_expr("vpiCondition", mgr, stmt->expr() );
-    for (ymuint32 i = 0; i < stmt->caseitem_num(); ++ i) {
+    for (ymuint i = 0; i < stmt->caseitem_num(); ++ i) {
       VlDumpHeader x(this, "vpiCaseItem", "CaseItem");
       const VlCaseItem* ci = stmt->caseitem(i);
       put("FileRegion", ci->file_region() );
-      for (ymuint32 j = 0; j < ci->expr_num(); ++ j) {
+      for (ymuint j = 0; j < ci->expr_num(); ++ j) {
 	put_expr("vpiExpr", mgr, ci->expr(j) );
       }
       put_stmt("vpiStmt", mgr, ci->body_stmt() );
@@ -264,14 +264,14 @@ VlDumperImpl::put_control(const char* label,
     VlDumpHeader x(this, label, "RepeatControl");
     put("FileRegion", control->file_region() );
     put_expr("vpiExpr", mgr, control->expr() );
-    for (ymuint32 i = 0; i < control->event_num(); ++ i) {
+    for (ymuint i = 0; i < control->event_num(); ++ i) {
       put_expr("vpiCondition", mgr, control->event(i) );
     }
   }
   else {
     VlDumpHeader x(this, label, "EventControl");
     put("FileRegion", control->file_region() );
-    for (ymuint32 i = 0; i < control->event_num(); ++ i) {
+    for (ymuint i = 0; i < control->event_num(); ++ i) {
       put_expr("vpiCondition", mgr, control->event(i) );
     }
   }
@@ -283,8 +283,8 @@ VlDumperImpl::put_child_stmt_list(const char* label,
 				  const VlMgr& mgr,
 				  const VlStmt* stmt)
 {
-  ymuint32 n = stmt->child_stmt_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = stmt->child_stmt_num();
+  for (ymuint i = 0; i < n; ++ i) {
     put_stmt(label, mgr, stmt->child_stmt(i) );
   }
 }
@@ -295,8 +295,8 @@ VlDumperImpl::put_argument_list(const char* label,
 				const VlMgr& mgr,
 				const VlStmt* stmt)
 {
-  ymuint32 n = stmt->arg_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  ymuint n = stmt->arg_num();
+  for (ymuint i = 0; i < n; ++ i) {
     put_expr(label, mgr, stmt->arg(i) );
   }
 }

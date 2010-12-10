@@ -81,17 +81,17 @@ public:
   virtual
   const PtExpr*
   right_range() const = 0;
-  
+
   /// @brief 要素数の取得
   virtual
-  ymuint32
+  ymuint
   item_num() const = 0;
-  
+
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < item_num() )
   virtual
   const PtIOItem*
-  item(ymuint32 pos) const = 0;
+  item(ymuint pos) const = 0;
 
 };
 
@@ -116,7 +116,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtIOItem の継承クラスが実装する仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 初期値の取得
   /// @retval 初期値
   /// @retval NULL 初期値を持たないとき
@@ -214,14 +214,14 @@ public:
   /// @brief 要素数の取得
   /// @return 要素数
   virtual
-  ymuint32
+  ymuint
   item_num() const = 0;
 
   /// @brief 要素の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < item_num() )
   virtual
   const PtDeclItem*
-  item(ymuint32 pos) const = 0;
+  item(ymuint pos) const = 0;
 
 };
 
@@ -250,13 +250,13 @@ public:
   /// @brief dimension list のサイズの取得
   /// @return dimension list のサイズ
   virtual
-  ymuint32
+  ymuint
   dimension_list_size() const = 0;
 
   /// @brief 範囲の取得
   virtual
   const PtRange*
-  range(ymuint32 pos) const = 0;
+  range(ymuint pos) const = 0;
 
   /// @brief 初期値の取得
   /// @retval 初期値
@@ -298,7 +298,7 @@ public:
   virtual
   const PtExpr*
   right() const = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

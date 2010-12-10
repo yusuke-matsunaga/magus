@@ -69,7 +69,7 @@ VlDumperImpl::put_expr(const char* label,
   switch ( expr->type() ) {
   case kVpiOperation:
     put("vpiOpType", expr->op_type());
-    for (ymuint32 i = 0; i < expr->operand_num(); ++ i) {
+    for (ymuint i = 0; i < expr->operand_num(); ++ i) {
       put_expr("vpiOperand", mgr, expr->operand(i));
     }
     break;
@@ -81,14 +81,14 @@ VlDumperImpl::put_expr(const char* label,
 
   case kVpiFuncCall:
     put("vpiFunction", expr->function()->full_name());
-    for (ymuint32 i = 0; i < expr->argument_num(); ++ i) {
+    for (ymuint i = 0; i < expr->argument_num(); ++ i) {
       put_expr("vpiArgument", mgr, expr->argument(i));
     }
     break;
 
   case kVpiSysFuncCall:
     put("vpiUserSysTf", expr->user_systf()->name());
-    for (ymuint32 i = 0; i < expr->argument_num(); ++ i) {
+    for (ymuint i = 0; i < expr->argument_num(); ++ i) {
       put_expr("vpiArgument", mgr, expr->argument(i));
     }
     break;
@@ -99,7 +99,7 @@ VlDumperImpl::put_expr(const char* label,
       if ( expr->decl_obj() ) {
 	put("vpiParent", expr->decl_obj()->full_name());
 	if ( expr->declarray_dimension() > 0 ) {
-	  for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
+	  for (ymuint i = 0; i < expr->declarray_dimension(); ++ i) {
 	    put_expr("array_index", mgr, expr->declarray_index(i));
 	  }
 	}
@@ -115,7 +115,7 @@ VlDumperImpl::put_expr(const char* label,
       if ( expr->decl_obj() ) {
 	put("vpiParent", expr->decl_obj()->full_name());
 	if ( expr->declarray_dimension() > 0 ) {
-	  for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
+	  for (ymuint i = 0; i < expr->declarray_dimension(); ++ i) {
 	    put_expr("array_index", mgr, expr->declarray_index(i));
 	  }
 	}
@@ -132,7 +132,7 @@ VlDumperImpl::put_expr(const char* label,
       if ( expr->decl_obj() ) {
 	put("decl_obj", expr->decl_obj()->full_name());
 	if ( expr->declarray_dimension() > 0 ) {
-	  for (ymuint32 i = 0; i < expr->declarray_dimension(); ++ i) {
+	  for (ymuint i = 0; i < expr->declarray_dimension(); ++ i) {
 	    put_expr("array_index", mgr, expr->declarray_index(i));
 	  }
 	}

@@ -32,21 +32,21 @@ public:
   /// @brief コンストラクタ
   /// @param[in] s 出力ストリーム
   VlDumperImpl(ostream& s);
-  
+
   /// @brief デストラクタ
   ~VlDumperImpl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を出力する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief VlMgr の持っている内容を出力する
   /// @param[in] vlmgr VlMgr
   void
   put(const VlMgr& vlmgr);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -88,13 +88,13 @@ public:
   /// @brief bit 展開モードの時 true を返す．
   bool
   bitexpand_mode() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief module の内容を出力する関数
   /// @param[in] label ラベル
   /// @param[in] mgr VlMgr
@@ -111,13 +111,13 @@ public:
   put_modulearray(const char* label,
 		  const VlMgr& mgr,
 		  const VlModuleArray* modulearray);
-  
+
   /// @brief module array のリストの内容を出力する関数
   void
   put_modulearray_list(const char* label,
 		       const VlMgr& mgr,
 		       const vector<const VlModuleArray*>& module_array_list);
-  
+
   /// @brief scope の内容を出力する関数
   /// @param[in] mgr VlMgr
   void
@@ -128,7 +128,7 @@ public:
   void
   put_scope_sub(const VlMgr& mgr,
 		const VlNamedObj* scope);
-  
+
   /// @brief io decl の内容を出力する関数
   /// @param[in] mgr VlMgr
   void
@@ -149,25 +149,25 @@ public:
   put_decl(const char* label,
 	   const VlMgr& mgr,
 	   const VlDecl* decl);
-  
+
   /// @brief 宣言要素のリストの内容を出力する関数
   void
   put_decl_list(const char* label,
 		const VlMgr& mgr,
 		const vector<const VlDecl*>& decl_list);
-  
+
   /// @brief def param のリストの内容を出力する関数
   void
   put_defparam_list(const char* label,
 		    const VlMgr& mgr,
 		    const vector<const VlDefParam*>& defparam_list);
-  
+
   /// @brief param assign のリストの内容を出力する関数
   void
   put_paramassign_list(const char* label,
 		       const VlMgr& mgr,
 		       const vector<const VlParamAssign*>& paramassign_list);
-  
+
   /// @brief primitive array のリストの内容を出力する関数
   void
   put_primarray_list(const char* label,
@@ -216,13 +216,13 @@ public:
   put_frame(const char* label,
 	    const VlHandle& handle);
 #endif
-  
+
   /// @brief continuous assignment の内容を出力する関数
   void
   put_contassign(const char* label,
 		 const VlMgr& mgr,
 		 const VlContAssign* contassign);
-  
+
   /// @brief continuous assignment のリストの内容を出力する関数
   void
   put_contassign_list(const char* label,
@@ -252,25 +252,25 @@ public:
   put_stmt_list(const char* label,
 		const VlMgr& mgr,
 		const vector<const VlStmt*>& stmt_list);
-  
+
   /// @brief delay/event/repeat control の内容を出力する関数
   void
   put_control(const char* label,
 	      const VlMgr& mgr,
 	      const VlControl* obj);
-  
+
   /// @brief ブロック内の stmt リストを出力する関数
   void
   put_child_stmt_list(const char* label,
 		      const VlMgr& mgr,
 		      const VlStmt* stmt);
-  
+
   /// @brief 引数のリストを出力する関数
   void
   put_argument_list(const char* label,
 		    const VlMgr& mgr,
 		    const VlStmt* stmt);
-  
+
   /// @brief 式の内容を出力する関数
   void
   put_expr(const char* label,
@@ -282,13 +282,13 @@ public:
   put_delay(const char* label,
 	    const VlMgr& mgr,
 	    const VlDelay* delay);
-  
+
   /// @brief range の内容を出力する関数
   void
   put_range(const char* label,
 	    const VlMgr& mgr,
 	    const VlRange* obj);
-  
+
 
   //////////////////////////////////////////////////////////////////////
   // その他の型
@@ -392,7 +392,7 @@ public:
   /// @param[in] d 整数値
   void
   put(const char* label,
-      ymuint32 d);
+      ymuint d);
 
   /// @brief 文字列の出力
   /// @param[in] label ラベル
@@ -442,7 +442,7 @@ private:
 
   // マーカ出力後に改行していないことを示すフラグ
   list<bool> mDoCR;
-  
+
   // インデント量
   int mIndent;
 

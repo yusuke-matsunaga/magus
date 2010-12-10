@@ -44,17 +44,17 @@ CptControl::delay() const
 // @brief イベントリストのサイズの取得
 // @retval イベントリストのサイズ event control/repeat control の場合
 // @retval 0 上記以外
-ymuint32
+ymuint
 CptControl::event_num() const
 {
   return 0;
 }
-  
+
 // @brief イベントリストの要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < event_num() )
 // @note event control/repeat control の場合のみ意味を持つ
 const PtExpr*
-CptControl::event(ymuint32 pos) const
+CptControl::event(ymuint pos) const
 {
   return NULL;
 }
@@ -144,7 +144,7 @@ CptEventControl::type() const
 // @brief イベントリストのサイズの取得
 // @retval イベントリストのサイズ event control/repeat control の場合
 // @retval 0 上記以外
-ymuint32
+ymuint
 CptEventControl::event_num() const
 {
   return mEventArray.size();
@@ -154,7 +154,7 @@ CptEventControl::event_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < event_num() )
 // @note event control/repeat control の場合のみ意味を持つ
 const PtExpr*
-CptEventControl::event(ymuint32 pos) const
+CptEventControl::event(ymuint pos) const
 {
   return mEventArray[pos];
 }
@@ -204,7 +204,7 @@ CptRepeatControl::rep_expr() const
 // @brief イベントリストのサイズの取得
 // @retval イベントリストのサイズ event control/repeat control の場合
 // @retval 0 上記以外
-ymuint32
+ymuint
 CptRepeatControl::event_num() const
 {
   return mEventArray.size();
@@ -214,7 +214,7 @@ CptRepeatControl::event_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < event_num() )
 // @note event control/repeat control の場合のみ意味を持つ
 const PtExpr*
-CptRepeatControl::event(ymuint32 pos) const
+CptRepeatControl::event(ymuint pos) const
 {
   return mEventArray[pos];
 }
@@ -236,7 +236,7 @@ CptConnection::CptConnection(const FileRegion& file_region,
 CptConnection::~CptConnection()
 {
 }
-  
+
 // ファイル位置を取出す．
 FileRegion
 CptConnection::file_region() const
@@ -378,7 +378,7 @@ CptDelay::CptDelay(const FileRegion& file_region,
   mValue[1] = NULL;
   mValue[2] = NULL;
 }
-  
+
 // 二つの値をとるコンストラクタ
 CptDelay::CptDelay(const FileRegion& file_region,
 		   PtExpr* value1,
@@ -389,7 +389,7 @@ CptDelay::CptDelay(const FileRegion& file_region,
   mValue[1] = value2;
   mValue[2] = NULL;
 }
-  
+
 // 三つの値をとるコンストラクタ
 CptDelay::CptDelay(const FileRegion& file_region,
 		   PtExpr* value1,
@@ -416,7 +416,7 @@ CptDelay::file_region() const
 
 // 値を取り出す．
 const PtExpr*
-CptDelay::value(ymuint32 pos) const
+CptDelay::value(ymuint pos) const
 {
   if ( pos < 3 ) {
     return mValue[pos];
@@ -516,16 +516,16 @@ CptAttrInst::~CptAttrInst()
 
 // @brief 要素数の取得
 // @return 要素数
-ymuint32
+ymuint
 CptAttrInst::attrspec_num() const
 {
   return mAttrSpecArray.size();
 }
-    
+
 // @brief 要素の取得
 // @param[in] pos 位置番号 ( 0 <= pos < attrspec_num() )
 const PtAttrSpec*
-CptAttrInst::attrspec(ymuint32 pos) const
+CptAttrInst::attrspec(ymuint pos) const
 {
   return mAttrSpecArray[pos];
 }
@@ -544,7 +544,7 @@ CptAttrSpec::CptAttrSpec(const FileRegion& file_region,
   mExpr(expr)
 {
 }
-  
+
 // デストラクタ
 CptAttrSpec::~CptAttrSpec()
 {
@@ -563,7 +563,7 @@ CptAttrSpec::name() const
 {
   return mName;
 }
-  
+
 // 式を取り出す．NULL の場合もある．
 const PtExpr*
 CptAttrSpec::expr() const
@@ -571,7 +571,7 @@ CptAttrSpec::expr() const
   return mExpr;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // その他
 //////////////////////////////////////////////////////////////////////
@@ -714,7 +714,7 @@ CptFactory::new_NameBranch(const char* name,
   return new (p) CptNameBranchI(name, index);
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // attribute instance 関係
 //////////////////////////////////////////////////////////////////////

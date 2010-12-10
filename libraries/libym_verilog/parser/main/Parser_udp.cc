@@ -39,9 +39,9 @@ Parser::new_Udp1995(const FileRegion& file_region,
 
   const PtIOItem* out_item = NULL;
   bool is_seq = false;
-  
+
   bool sane = true;
-  
+
   // Verilog1995 の形式の時には YACC の文法では規定できないので，
   // 1. port_list に現れる名前が portdecl_list 中に存在すること．
   // 2. その最初の名前は output であること．
@@ -50,7 +50,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
   // まず portdecl_list の各要素を名前をキーにした連想配列に格納する．
   // ついでに output の数を数える．
   hash_map<string, const PtIOItem*> iomap;
-  for (ymuint32 i = 0; i < iohead_array.size(); ++ i) {
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io = iohead_array[i];
     if ( io->type() == kPtIO_Output ) {
       if ( out_item ) {
@@ -63,17 +63,17 @@ Parser::new_Udp1995(const FileRegion& file_region,
 	sane = false;
 	break;
       }
-      
+
       // これは YACC の文法が正しくかけていれば成り立つはず．
       assert_cond(io->item_num() == 1, __FILE__, __LINE__);
 
       out_item = io->item(0);
- 
+
       if ( io->aux_type() == kVpiAuxReg ) {
 	is_seq = true;
       }
     }
-    for (ymuint32 j = 0; j < io->item_num(); ++ j) {
+    for (ymuint j = 0; j < io->item_num(); ++ j) {
       const PtIOItem* elem = io->item(j);
       if ( iomap.count(elem->name()) > 0 ) {
 	// 二重登録
@@ -93,7 +93,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
 
   // port_list に現れる名前が iolist 中にあるか調べる．
   PtiPortArray port_array = get_port_array();
-  for (ymuint32 i = 0; i < port_array.size(); ++ i) {
+  for (ymuint i = 0; i < port_array.size(); ++ i) {
     const PtiPort* port = port_array[i];
     const char* port_name = port->ext_name();
     hash_map<string, const PtIOItem*>::iterator q = iomap.find(port_name);
@@ -125,7 +125,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
     }
     iomap.erase(q);
   }
-    
+
   if ( !iomap.empty() ) {
     // iolist 中のみに現れる要素がある．
     for (hash_map<string, const PtIOItem*>::const_iterator q
@@ -177,7 +177,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
       }
     }
   }
-  
+
   if ( sane ) {
     new_Udp(file_region,
 	    udp_name,
@@ -203,7 +203,7 @@ Parser::new_Udp2001(const FileRegion& file_region,
 		    PtrList<PtAttrInst>* ai_list)
 {
   PtIOHeadArray iohead_array = get_io_array();
-  
+
   bool is_seq = false;
 
   // YACC の文法が正しく書かれていれば最初のヘッダが出力で
@@ -213,7 +213,7 @@ Parser::new_Udp2001(const FileRegion& file_region,
   assert_cond(out_head->type() == kPtIO_Output, __FILE__, __LINE__);
   assert_cond(out_head->item_num() == 1, __FILE__, __LINE__);
   const PtIOItem* out_item = out_head->item(0);
-  
+
   if ( out_head->aux_type() == kVpiAuxReg ) {
     is_seq = true;
   }
@@ -221,7 +221,7 @@ Parser::new_Udp2001(const FileRegion& file_region,
 
   // iohead_array から port_array を生成する．
   PtiPortArray port_array = new_PortArray(iohead_array);
-  
+
   new_Udp(file_region,
 	  udp_name,
 	  init_name,
@@ -252,7 +252,7 @@ Parser::new_Udp(const FileRegion& file_region,
   if ( is_seq ) {
     // 初期値の設定がある．
     if ( init_name ) {
-      
+
       // init_name が正しいかチェックする．
       if ( strcmp(init_name, out_item->name()) != 0 ) {
 	// output 文の名前と異なる．
@@ -267,7 +267,7 @@ Parser::new_Udp(const FileRegion& file_region,
 		buf.str());
 	return;
       }
-      
+
       if ( out_item->init_value() ) {
 	// output 文にも初期値割り当てがある．
 	// これは warning にする．
@@ -280,7 +280,7 @@ Parser::new_Udp(const FileRegion& file_region,
 		" output declarations's initial value is ignored.");
       }
     }
-  
+
     // このあと elaboration で注意が必要なのは init_value.
     // 場合によってはこれが NULLで outhead->top()->init_value()
     // が空でない場合がある．
@@ -307,7 +307,7 @@ Parser::new_Udp(const FileRegion& file_region,
 			      iohead_array,
 			      get_udp_entry_array());
   }
-  
+
   mPtMgr.reg_udp(udp);
   reg_attrinst(udp, ai_list);
 }
@@ -359,7 +359,7 @@ Parser::get_udp_entry_array()
 {
   return mUdpEntryList.to_array(mAlloc);
 }
-  
+
 // @brief UDP のテーブルエントリの要素の値の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] symbol シンボル

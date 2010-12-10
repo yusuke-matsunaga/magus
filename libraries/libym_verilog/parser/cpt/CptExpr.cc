@@ -37,7 +37,7 @@ CptExpr::opr_type() const
 {
   return kVpiNullOp;
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptExpr::namebranch_array() const
@@ -56,17 +56,17 @@ CptExpr::name() const
 
 // @brief オペランドの数の取得
 // @return 子供の数
-ymuint32
+ymuint
 CptExpr::operand_num() const
 {
   return 0;
 }
-  
+
 // @brief オペランドの取得
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-CptExpr::operand(ymuint32 pos) const
+CptExpr::operand(ymuint pos) const
 {
   return NULL;
 }
@@ -83,16 +83,16 @@ CptExpr::is_const_index() const
 
 // @brief インデックスリストのサイズの取得
 // @return インデックスリストのサイズ
-ymuint32
+ymuint
 CptExpr::index_num() const
 {
   return 0;
 }
-  
+
 // @brief インデックスの取得
 // @param[in] pos 位置番号 ( 0 <= pos < index_num() )
 const PtExpr*
-CptExpr::index(ymuint32 pos) const
+CptExpr::index(ymuint pos) const
 {
   return NULL;
 }
@@ -105,7 +105,7 @@ CptExpr::range_mode() const
 {
   return kVpiNoRange;
 }
-  
+
 // @brief 範囲の左側の式の取得
 // @return 範囲の左側の式
 // このクラスでは NULL を返す．
@@ -114,7 +114,7 @@ CptExpr::left_range() const
 {
   return NULL;
 }
-  
+
 // @brief 範囲の右側の式の取得
 // @return 範囲の右側の式
 // このクラスでは NULL を返す．
@@ -137,7 +137,7 @@ CptExpr::const_type() const
 // @return サイズ\n
 // サイズ指定の無い場合と整数型の定数でない場合には 0 を返す．
 // このクラスでは 0 を返す．
-ymuint32
+ymuint
 CptExpr::const_size() const
 {
   return 0;
@@ -146,7 +146,7 @@ CptExpr::const_size() const
 // @brief 整数型の値の取得
 // @return 値
 // このクラスでは 0 を返す．
-ymuint32
+ymuint
 CptExpr::const_uint() const
 {
   return 0;
@@ -180,7 +180,7 @@ CptExpr::is_index_expr() const
 {
   return false;
 }
-  
+
 // @brief インデックスの値の取得
 // @return 階層名の添字として使える式の時にその値を返す．
 // このクラスでは const_uint() をキャストして返す．
@@ -204,7 +204,7 @@ CptExpr::is_simple() const
 //////////////////////////////////////////////////////////////////////
 // 演算子のベース実装クラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptOpr::CptOpr(tVpiOpType op_type) :
   mOpType(op_type)
@@ -270,7 +270,7 @@ CptOpr1::is_index_expr() const
     return false;
   }
 }
-  
+
 // 階層名の添字として使える式の時にその値を返す．
 int
 CptOpr1::index_value() const
@@ -283,10 +283,10 @@ CptOpr1::index_value() const
   }
   return 0;
 }
-  
+
 // @brief オペランドの数の取得
 // @return 子供の数
-ymuint32
+ymuint
 CptOpr1::operand_num() const
 {
   return 1;
@@ -296,7 +296,7 @@ CptOpr1::operand_num() const
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-CptOpr1::operand(ymuint32 pos) const
+CptOpr1::operand(ymuint pos) const
 {
   if ( pos == 0 ) {
     return mOpr;
@@ -310,7 +310,7 @@ CptOpr1::operand(ymuint32 pos) const
 //////////////////////////////////////////////////////////////////////
 // 二項演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptOpr2::CptOpr2(tVpiOpType op_type,
 		 PtExpr* opr1,
@@ -337,7 +337,7 @@ CptOpr2::file_region() const
 
 // @brief オペランドの数の取得
 // @return 子供の数
-ymuint32
+ymuint
 CptOpr2::operand_num() const
 {
   return 2;
@@ -347,7 +347,7 @@ CptOpr2::operand_num() const
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-CptOpr2::operand(ymuint32 pos) const
+CptOpr2::operand(ymuint pos) const
 {
   if ( pos < 2 ) {
     return mOpr[pos];
@@ -361,7 +361,7 @@ CptOpr2::operand(ymuint32 pos) const
 //////////////////////////////////////////////////////////////////////
 // 三項演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 CptOpr3::CptOpr3(tVpiOpType op_type,
 		 PtExpr* opr1,
@@ -391,7 +391,7 @@ CptOpr3::file_region() const
 
 // @brief オペランドの数の取得
 // @return 子供の数
-ymuint32
+ymuint
 CptOpr3::operand_num() const
 {
   return 3;
@@ -401,7 +401,7 @@ CptOpr3::operand_num() const
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-CptOpr3::operand(ymuint32 pos) const
+CptOpr3::operand(ymuint pos) const
 {
   if ( pos < 3 ) {
     return mOpr[pos];
@@ -449,10 +449,10 @@ CptConcat::opr_type() const
 {
   return kVpiConcatOp;
 }
-  
+
 // @brief オペランドの数の取得
 // @return 子供の数
-ymuint32
+ymuint
 CptConcat::operand_num() const
 {
   return mExprArray.size();
@@ -462,7 +462,7 @@ CptConcat::operand_num() const
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-CptConcat::operand(ymuint32 pos) const
+CptConcat::operand(ymuint pos) const
 {
   return mExprArray[pos];
 }
@@ -536,18 +536,18 @@ CptMinTypMax::opr_type() const
 }
 
 // 子供の数の取得
-ymuint32
+ymuint
 CptMinTypMax::operand_num() const
 {
   return 3;
 }
-  
+
 // 値(式)を取出す．
 // idx = 0 : Min
 //     = 1 : Typ
 //     = 2 : Max
 const PtExpr*
-CptMinTypMax::operand(ymuint32 idx) const
+CptMinTypMax::operand(ymuint idx) const
 {
   if ( idx < 3 ) {
     return mValue[idx];
@@ -593,7 +593,7 @@ CptFuncCallBase::name() const
 
 // @brief オペランドの数の取得
 // @return 子供の数
-ymuint32
+ymuint
 CptFuncCallBase::operand_num() const
 {
   return mArgArray.size();
@@ -603,7 +603,7 @@ CptFuncCallBase::operand_num() const
 // @param[in] pos 取り出すオペランンドの位置(最初の位置は 0)
 // @return pos 番目のオペランド
 const PtExpr*
-CptFuncCallBase::operand(ymuint32 pos) const
+CptFuncCallBase::operand(ymuint pos) const
 {
   return mArgArray[pos];
 }
@@ -652,7 +652,7 @@ CptFuncCallH::CptFuncCallH(const FileRegion& file_region,
 CptFuncCallH::~CptFuncCallH()
 {
 }
-  
+
 // @brief 階層ブランチの取得
 PtNameBranchArray
 CptFuncCallH::namebranch_array() const
@@ -722,7 +722,7 @@ CptConstant::type() const
 
 // コンストラクタ
 CptIntConstant1::CptIntConstant1(const FileRegion& file_region,
-				 ymuint32 value) :
+				 ymuint value) :
   CptConstant(file_region),
   mValue(value)
 {
@@ -748,7 +748,7 @@ CptIntConstant1::is_index_expr() const
 }
 
 // 整数型の値の取得
-ymuint32
+ymuint
 CptIntConstant1::const_uint() const
 {
   return mValue;
@@ -795,7 +795,7 @@ CptIntConstant2::const_str() const
 
 // コンストラクタ
 CptIntConstant3::CptIntConstant3(const FileRegion& file_region,
-				 ymuint32 size,
+				 ymuint size,
 				 tVpiConstType const_type,
 				 const char* value) :
   CptConstant(file_region),
@@ -818,7 +818,7 @@ CptIntConstant3::const_type() const
 }
 
 // 整数型の定数のサイズの取得
-ymuint32
+ymuint
 CptIntConstant3::const_size() const
 {
   return mSize;
@@ -895,7 +895,7 @@ CptStringConstant::const_str() const
   return mValue;
 }
 
-  
+
 //////////////////////////////////////////////////////////////////////
 // expression 関係
 //////////////////////////////////////////////////////////////////////
@@ -1006,7 +1006,7 @@ CptFactory::new_SysFuncCall(const FileRegion& file_region,
 // 定数を生成する．
 PtExpr*
 CptFactory::new_IntConst(const FileRegion& file_region,
-			 ymuint32 value)
+			 ymuint value)
 {
   ++ mNumIntConstant1;
   void* p = alloc().get_memory(sizeof(CptIntConstant1));
@@ -1037,7 +1037,7 @@ CptFactory::new_IntConst(const FileRegion& file_region,
 // 定数を生成する．
 PtExpr*
 CptFactory::new_IntConst(const FileRegion& file_region,
-			 ymuint32 size,
+			 ymuint size,
 			 tVpiConstType const_type,
 			 const char* value)
 {

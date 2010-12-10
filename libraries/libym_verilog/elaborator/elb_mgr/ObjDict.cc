@@ -431,7 +431,7 @@ ObjDict::~ObjDict()
 void
 ObjDict::clear()
 {
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
   mNum = 0;
@@ -526,14 +526,14 @@ ObjDict::add_handle(const VlNamedObj* parent,
 {
   if ( mNum >= mLimit ) {
     // テーブルを拡張する．
-    ymuint32 old_size = mSize;
+    ymuint old_size = mSize;
     ElbObjHandle** old_table = mTable;
     alloc_table(old_size << 1);
-    for (ymuint32 i = 0; i < old_size; ++ i) {
+    for (ymuint i = 0; i < old_size; ++ i) {
       for (ElbObjHandle* handle = old_table[i]; handle; ) {
 	ElbObjHandle* next = handle->mLink;
 	const VlNamedObj* obj = handle->obj();
-	ymuint32 pos = hash_func(obj->parent(), obj->name());
+	ymuint pos = hash_func(obj->parent(), obj->name());
 	handle->mLink = mTable[pos];
 	mTable[pos] = handle;
 	handle = next;
@@ -541,7 +541,7 @@ ObjDict::add_handle(const VlNamedObj* parent,
     }
     delete [] old_table;
   }
-  ymuint32 pos = hash_func(parent, name);
+  ymuint pos = hash_func(parent, name);
   handle->mLink = mTable[pos];
   mTable[pos] = handle;
   ++ mNum;
@@ -552,7 +552,7 @@ ElbObjHandle*
 ObjDict::find(const VlNamedObj* parent,
 	      const char* name) const
 {
-  ymuint32 pos = hash_func(parent, name);
+  ymuint pos = hash_func(parent, name);
   for (ElbObjHandle* handle = mTable[pos]; handle; handle = handle->mLink) {
     const VlNamedObj* obj = handle->obj();
     if ( obj->parent() == parent && strcmp(obj->name(), name) == 0 ) {
@@ -563,7 +563,7 @@ ObjDict::find(const VlNamedObj* parent,
 }
 
 // @brief このオブジェクトが使用しているメモリ量を返す．
-size_t
+ymuint
 ObjDict::allocated_size() const
 {
   return sizeof(ElbObjHandle*) * mSize + mAlloc.allocated_size();
@@ -571,24 +571,24 @@ ObjDict::allocated_size() const
 
 // @brief テーブルの領域を確保する．
 void
-ObjDict::alloc_table(ymuint32 size)
+ObjDict::alloc_table(ymuint size)
 {
   mSize = size;
-  mLimit = static_cast<ymuint32>(mSize * 1.8);
+  mLimit = static_cast<ymuint>(mSize * 1.8);
   mTable = new ElbObjHandle*[mSize];
-  for (ymuint32 i = 0; i < mSize; ++ i) {
+  for (ymuint i = 0; i < mSize; ++ i) {
     mTable[i] = NULL;
   }
 }
 
 // @brief ハッシュ値を計算する．
-ymuint32
+ymuint
 ObjDict::hash_func(const VlNamedObj* parent,
 		   const char* name) const
 {
-  ymuint32 h = 0;
-  ymuint32 c;
-  for ( ; (c = static_cast<ymuint32>(*name)); ++ name) {
+  ymuint h = 0;
+  ymuint c;
+  for ( ; (c = static_cast<ymuint>(*name)); ++ name) {
     h = h * 37 + c;
   }
   return ((reinterpret_cast<ympuint>(parent) * h) >> 8) % mSize;

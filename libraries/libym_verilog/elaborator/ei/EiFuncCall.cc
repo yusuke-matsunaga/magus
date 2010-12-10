@@ -29,7 +29,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 ElbExpr*
 EiFactory::new_FuncCall(const PtBase* pt_obj,
 			const ElbTaskFunc* func,
-			ymuint32 arg_size,
+			ymuint arg_size,
 			ElbExpr** arg_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiFuncCall));
@@ -47,7 +47,7 @@ EiFactory::new_FuncCall(const PtBase* pt_obj,
 ElbExpr*
 EiFactory::new_SysFuncCall(const PtBase* pt_obj,
 			   const ElbUserSystf* user_systf,
-			   ymuint32 arg_size,
+			   ymuint arg_size,
 			   ElbExpr** arg_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiSysFuncCall));
@@ -67,21 +67,21 @@ EiFactory::new_SysFuncCall(const PtBase* pt_obj,
 // @param[in] arg_size 引数の数
 // @param[in] arg_list 引数のリスト
 EiFcBase::EiFcBase(const PtBase* pt_obj,
-		   ymuint32 arg_size,
+		   ymuint arg_size,
 		   ElbExpr** arg_list) :
   EiExprBase1(pt_obj),
   mArgNum(arg_size),
   mArgList(arg_list)
 {
 }
-  
+
 // @brief デストラクタ
 EiFcBase::~EiFcBase()
 {
 }
-    
+
 // @brief 引数の数を返す．
-ymuint32
+ymuint
 EiFcBase::argument_num() const
 {
   return mArgNum;
@@ -90,7 +90,7 @@ EiFcBase::argument_num() const
 // @brief 引数の取得
 // @param[in] pos 位置番号 ( 0 <= pos < argument_num() )
 ElbExpr*
-EiFcBase::argument(ymuint32 pos) const
+EiFcBase::argument(ymuint pos) const
 {
   return mArgList[pos];
 }
@@ -107,7 +107,7 @@ EiFcBase::argument(ymuint32 pos) const
 // @param[in] arg_list 引数のリスト
 EiFuncCall::EiFuncCall(const PtBase* pt_obj,
 		       const ElbTaskFunc* func,
-		       ymuint32 arg_size,
+		       ymuint arg_size,
 		       ElbExpr** arg_list) :
   EiFcBase(pt_obj, arg_size, arg_list),
   mFunc(func)
@@ -157,8 +157,8 @@ bool
 EiFuncCall::is_const() const
 {
   if ( mFunc->is_constant_function() ) {
-    ymuint32 n = argument_num();
-    for (ymuint32 i = 0; i < n; ++ i) {
+    ymuint n = argument_num();
+    for (ymuint i = 0; i < n; ++ i) {
       if ( !argument(i)->is_const() ) {
 	return false;
       }
@@ -187,9 +187,9 @@ EiFuncCall::function() const
 tVpiScalarVal
 EiFuncCall::eval_scalar() const
 {
-  ymuint32 n = argument_num();
+  ymuint n = argument_num();
   vector<ElbExpr*> arg_list(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     arg_list[i] = argument(i);
   }
   return mFunc->eval_scalar(arg_list);
@@ -199,21 +199,21 @@ EiFuncCall::eval_scalar() const
 tVpiScalarVal
 EiFuncCall::eval_logic() const
 {
-  ymuint32 n = argument_num();
+  ymuint n = argument_num();
   vector<ElbExpr*> arg_list(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     arg_list[i] = argument(i);
   }
   return mFunc->eval_logic(arg_list);
 }
-  
+
 // @brief real 型の値を返す．
 double
 EiFuncCall::eval_real() const
 {
-  ymuint32 n = argument_num();
+  ymuint n = argument_num();
   vector<ElbExpr*> arg_list(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     arg_list[i] = argument(i);
   }
   return mFunc->eval_real(arg_list);
@@ -224,14 +224,14 @@ void
 EiFuncCall::eval_bitvector(BitVector& bitvector,
 			   tVpiValueType req_type) const
 {
-  ymuint32 n = argument_num();
+  ymuint n = argument_num();
   vector<ElbExpr*> arg_list(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     arg_list[i] = argument(i);
   }
   mFunc->eval_bitvector(arg_list, bitvector, req_type);
 }
-  
+
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -239,9 +239,9 @@ EiFuncCall::decompile_impl(int ppri) const
 {
   string ans = mFunc->name();
   ans += "(";
-  ymuint32 n = argument_num();
+  ymuint n = argument_num();
   const char* comma = "";
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     ans += comma + argument(i)->decompile();
     comma = ", ";
   }
@@ -270,7 +270,7 @@ EiFuncCall::set_reqsize(tVpiValueType type)
 // @param[in] arg_list 引数のリスト
 EiSysFuncCall::EiSysFuncCall(const PtBase* pt_obj,
 			     const ElbUserSystf* user_systf,
-			     ymuint32 arg_size,
+			     ymuint arg_size,
 			     ElbExpr** arg_list) :
   EiFcBase(pt_obj, arg_size, arg_list),
   mUserSystf(user_systf)
@@ -360,7 +360,7 @@ EiSysFuncCall::eval_logic() const
 # warning "TODO: 未完"
   return kVpiScalarX;
 }
-  
+
 // @brief real 型の値を返す．
 double
 EiSysFuncCall::eval_real() const
@@ -383,9 +383,9 @@ EiSysFuncCall::decompile_impl(int ppri) const
 {
   string ans = mUserSystf->name();
   ans += "(";
-  ymuint32 n = argument_num();
+  ymuint n = argument_num();
   const char* comma = "";
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     ans += comma + argument(i)->decompile();
     comma = ", ";
   }

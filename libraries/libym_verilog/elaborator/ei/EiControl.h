@@ -70,7 +70,7 @@ public:
   /// @brief イベント条件式の数を返す．
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   event_num() const;
 
   /// @brief イベント条件式を返す．
@@ -78,7 +78,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   const VlExpr*
-  event(ymuint32 pos) const;
+  event(ymuint pos) const;
 
 
 private:
@@ -169,7 +169,7 @@ protected:
   /// @param[in] event_num イベントリストの要素数
   /// @param[in] event_list イベントリストを表す配列
   EiEventControl(const PtControl* pt_control,
-		 ymuint32 event_num,
+		 ymuint event_num,
 		 ElbExpr** event_list);
 
   /// @brief デストラクタ
@@ -195,14 +195,14 @@ public:
 
   /// @brief イベント条件式の数を返す．
   virtual
-  ymuint32
+  ymuint
   event_num() const;
 
   /// @brief イベント条件式を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < event_num() )
   virtual
   const VlExpr*
-  event(ymuint32 pos) const;
+  event(ymuint pos) const;
 
 
 private:
@@ -238,7 +238,7 @@ private:
   /// @param[in] event_list イベントリストを表す配列
   EiRepeatControl(const PtControl* pt_control,
 		  ElbExpr* rep,
-		  ymuint32 event_num,
+		  ymuint event_num,
 		  ElbExpr** event_list);
 
   /// デストラクタ

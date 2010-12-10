@@ -23,21 +23,21 @@ BEGIN_NAMESPACE_YM_VERILOG
 class CptGenBody
 {
 public:
-  
+
   /// @brief コンストラクタ
   CptGenBody(PtDeclHeadArray declhead_array,
 	     PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   ~CptGenBody();
 
 
 public:
-  
+
   /// @brief 宣言ヘッダ配列の取得
   PtDeclHeadArray
   declhead_array() const { return mDeclHeadArray; }
-  
+
   /// @brief item 配列の取得
   PtItemArray
   item_array() const { return mItemArray; }
@@ -50,7 +50,7 @@ private:
 
   // 宣言の配列
   PtDeclHeadArray mDeclHeadArray;
-  
+
   // 要素の配列
   PtItemArray mItemArray;
 
@@ -66,12 +66,12 @@ class CptGenBase :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenBase(const FileRegion& file_region,
 	     PtDeclHeadArray declhead_array,
 	     PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenBase();
@@ -86,12 +86,12 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -121,12 +121,12 @@ class CptGenerate :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenerate(const FileRegion& file_region,
 	      PtDeclHeadArray declhead_array,
 	      PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenerate();
@@ -155,16 +155,16 @@ class CptGenBlock :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenBlock(const FileRegion& file_region,
 	      PtDeclHeadArray declhead_array,
 	      PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenBlock();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -189,13 +189,13 @@ class CptGenBlockN :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenBlockN(const FileRegion& file_region,
 	       const char* name,
 	       PtDeclHeadArray declhead_array,
 	       PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenBlockN();
@@ -210,7 +210,7 @@ public:
   virtual
   const char*
   name() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -232,7 +232,7 @@ class CptGenIf :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenIf(const FileRegion& file_region,
 	   PtExpr* cond,
@@ -240,11 +240,11 @@ protected:
 	   PtItemArray then_item_array,
 	   PtDeclHeadArray else_declhead_array,
 	   PtItemArray else_item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenIf();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -266,22 +266,22 @@ public:
   virtual
   const PtExpr*
   expr() const;
-  
+
   /// @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   then_declhead_array() const;
-  
+
   /// @brief 条件が成り立ったときに生成される item 配列の取得
   virtual
   PtItemArray
   then_item_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   else_declhead_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される item 配列の取得
   virtual
   PtItemArray
@@ -317,16 +317,16 @@ class CptGenCase :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenCase(const FileRegion& file_region,
 	     PtExpr* expr,
 	     PtGenCaseItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenCase();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -357,13 +357,13 @@ public:
 
   /// @brief case item の要素数を返す．
   virtual
-  ymuint32
+  ymuint
   size() const;
 
   /// @brief case item を返す．
   virtual
   const PtGenCaseItem*
-  caseitem(ymuint32 pos) const;
+  caseitem(ymuint pos) const;
 
 
 private:
@@ -376,7 +376,7 @@ private:
 
   // 比較式
   PtExpr* mExpr;
-  
+
   // case item の配列
   PtGenCaseItemArray mCaseItemArray;
 
@@ -392,13 +392,13 @@ class CptGenCaseItem :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenCaseItem(const FileRegion& file_region,
 		 PtExprArray label_array,
 		 PtDeclHeadArray declhead_array,
 		 PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenCaseItem();
@@ -418,20 +418,20 @@ public:
   /// @return ラベル数\n
   /// 0 の時は default の意味
   virtual
-  ymuint32
+  ymuint
   label_num() const;
 
   /// @brief ラベルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < label_num() )
   virtual
   const PtExpr*
-  label(ymuint32 pos) const;
-  
+  label(ymuint pos) const;
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -451,7 +451,7 @@ private:
 
   // 生成される本体
   CptGenBody mBody;
-  
+
 };
 
 
@@ -464,7 +464,7 @@ class CptGenFor :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptGenFor(const FileRegion& file_region,
 	    const char* loop_var,
@@ -474,11 +474,11 @@ protected:
 	    const char* block_name,
 	    PtDeclHeadArray declhead_array,
 	    PtItemArray item_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptGenFor();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -500,12 +500,12 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray

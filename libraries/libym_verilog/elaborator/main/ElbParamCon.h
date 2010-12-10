@@ -33,7 +33,7 @@ public:
   /// @param[in] num 要素数
   /// @param[in] named_con 名前による割り当ての時 true となるフラグ
   ElbParamCon(const FileRegion& file_region,
-	      ymuint32 num,
+	      ymuint num,
 	      bool named_con);
 
   /// @brief 仮想デストラクタ
@@ -45,7 +45,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部からアクセスするための関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ファイル位置を返す．
   const FileRegion&
   file_region() const;
@@ -53,32 +53,32 @@ public:
   /// @brief 名前による割り当ての時 true を返す．
   bool
   named_con() const;
-  
+
   /// @brief 要素数を返す．
-  ymuint32
+  ymuint
   elem_num() const;
 
   /// @brief pos 番目の要素に対応するパース木の要素を返す．
   /// @param[in] pos 位置
   const PtConnection*
-  pt_con(ymuint32 pos) const;
-  
+  pt_con(ymuint pos) const;
+
   /// @brief pos 番目の要素の名前を返す．
   /// @param[in] pos 位置
   const char*
-  name(ymuint32 pos) const;
+  name(ymuint pos) const;
 
   /// @brief pos 番目の要素の値を返す．
   /// @param[in] pos 位置
   ElbExpr*
-  expr(ymuint32 pos) const;
-  
+  expr(ymuint pos) const;
+
   /// @brief 名前と値を設定する．
   void
-  set(ymuint32 pos,
+  set(ymuint pos,
       const PtConnection* pt_con,
       ElbExpr* expr);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -86,30 +86,30 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   struct Unit {
-    
+
     // パース木の要素
     const PtConnection* mPtCon;
 
     // 値
     ElbExpr* mExpr;
-    
+
   };
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ファイル位置
   FileRegion mFileRegion;
 
   // 名前による割り当ての時 true となるフラグ
   bool mNamedCon;
-  
+
   // 要素のベクタ
   vector<Unit> mList;
-  
+
 };
 
 
@@ -123,7 +123,7 @@ private:
 /// @param[in] named_con 名前による割り当ての時 true となるフラグ
 inline
 ElbParamCon::ElbParamCon(const FileRegion& file_region,
-			 ymuint32 num,
+			 ymuint num,
 			 bool named_con) :
   mFileRegion(file_region),
   mNamedCon(named_con),
@@ -152,10 +152,10 @@ ElbParamCon::named_con() const
 {
   return mNamedCon;
 }
-  
+
 // @brief 要素数を返す．
 inline
-ymuint32
+ymuint
 ElbParamCon::elem_num() const
 {
   return mList.size();
@@ -165,7 +165,7 @@ ElbParamCon::elem_num() const
 // @param[in] pos 位置
 inline
 const PtConnection*
-ElbParamCon::pt_con(ymuint32 pos) const
+ElbParamCon::pt_con(ymuint pos) const
 {
   return mList[pos].mPtCon;
 }
@@ -173,7 +173,7 @@ ElbParamCon::pt_con(ymuint32 pos) const
 // @brief 名前を返す．
 inline
 const char*
-ElbParamCon::name(ymuint32 pos) const
+ElbParamCon::name(ymuint pos) const
 {
   return mList[pos].mPtCon->name();
 }
@@ -181,15 +181,15 @@ ElbParamCon::name(ymuint32 pos) const
 // @brief 値を返す．
 inline
 ElbExpr*
-ElbParamCon::expr(ymuint32 pos) const
+ElbParamCon::expr(ymuint pos) const
 {
   return mList[pos].mExpr;
 }
-  
+
 // @brief 名前と値を設定する．
 inline
 void
-ElbParamCon::set(ymuint32 pos,
+ElbParamCon::set(ymuint pos,
 		 const PtConnection* pt_con,
   		 ElbExpr* expr)
 {

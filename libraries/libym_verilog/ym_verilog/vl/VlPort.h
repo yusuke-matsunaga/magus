@@ -30,28 +30,28 @@ protected:
   /// @brief デストラクタ
   virtual
   ~VlPort() { }
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // VlPort に固有の仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入出力の区別を得る．
   virtual
   tVpiDirection
   direction() const = 0;
-  
+
   /// @brief ビット幅を返す．
   virtual
   int
   bit_size() const = 0;
-  
+
   /// @brief 名前による接続を持つとき true を返す．
   virtual
   bool
   is_conn_by_name() const = 0;
-  
+
   /// @brief 明示的に名前がついているとき true を返す．
   virtual
   bool
@@ -66,17 +66,17 @@ public:
   virtual
   const VlModule*
   module() const = 0;
-  
+
   /// @brief ポートリストの何番目のポートかを表すインデックスを返す．
   virtual
-  ymuint32
+  ymuint
   port_index() const = 0;
-  
+
   /// @brief 上位の接続先を返す．
   virtual
   const VlExpr*
   high_conn() const = 0;
-  
+
   /// @brief 下位の接続先を返す．
   virtual
   const VlExpr*

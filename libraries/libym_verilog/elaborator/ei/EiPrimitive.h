@@ -345,14 +345,14 @@ public:
 
   /// @brief ポート数を得る．
   virtual
-  ymuint32
+  ymuint
   port_num() const;
 
   /// @brief ポート端子を得る．
   /// @param[in] pos 位置番号 (0 <= pos < port_num())
   virtual
   const VlPrimTerm*
-  prim_term(ymuint32 pos) const;
+  prim_term(ymuint pos) const;
 
 
 public:
@@ -364,7 +364,7 @@ public:
   /// @param[in] pos ポート番号 (0 から始まる)
   /// @param[in] expr 接続する式
   void
-  connect(ymuint32 pos,
+  connect(ymuint pos,
 	  ElbExpr* expr);
 
 
@@ -659,14 +659,14 @@ public:
 
   /// @brief 要素数を返す．
   virtual
-  ymuint32
+  ymuint
   elem_num() const;
 
   /// @brief 要素のプリミティブを返す．
   /// @param[in] offset 位置番号 ( 0 <= offset < elem_num() )
   virtual
   const VlPrimitive*
-  elem_by_offset(ymuint32 offset) const;
+  elem_by_offset(ymuint offset) const;
 
   /// @brief 要素を返す．
   /// @param[in] index インデックス
@@ -682,7 +682,7 @@ public:
 
   /// @brief 要素のプリミティブを取り出す．
   ElbPrimitive*
-  _primitive_by_offset(ymuint32 offset) const;
+  _primitive_by_offset(ymuint offset) const;
 
   /// @brief 要素のプリミティブを取り出す．
   ElbPrimitive*
@@ -770,7 +770,7 @@ public:
 
   /// @brief 端子番号を返す．
   virtual
-  ymuint32
+  ymuint
   term_index() const;
 
   /// @brief 接続しているネットを表す式を返す．
@@ -787,7 +787,7 @@ public:
   /// @brief 内容を設定する．
   void
   set(ElbPrimitive* primitive,
-      ymuint32 index,
+      ymuint index,
       tVpiDirection dir);
 
 

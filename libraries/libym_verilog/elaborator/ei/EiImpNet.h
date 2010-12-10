@@ -103,7 +103,7 @@ public:
   /// @brief ビット幅を返す．
   /// @note このクラスは 1 を返す．
   virtual
-  ymuint32
+  ymuint
   bit_size() const;
 
   /// @brief オフセット値の取得
@@ -175,7 +175,7 @@ public:
   /// @return dimension list のサイズ
   /// @note このクラスでは 0 を返す．
   virtual
-  ymuint32
+  ymuint
   dimension_list_size() const;
 
   /// @brief 範囲の取得
@@ -183,7 +183,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   const VlRange*
-  range(ymuint32 pos) const;
+  range(ymuint pos) const;
 
 
 public:

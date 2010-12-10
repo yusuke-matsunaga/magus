@@ -40,7 +40,7 @@ ItemListNode::~ItemListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ItemListNode::data(int column,
 		   int role) const
@@ -55,7 +55,7 @@ ItemListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ItemListNode::loc() const
@@ -67,9 +67,9 @@ ItemListNode::loc() const
 void
 ItemListNode::expand() const
 {
-   ymuint32 n = mItemArray.size();
+   ymuint n = mItemArray.size();
    mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new ItemNode(mItemArray[i]);
   }
 }
@@ -94,7 +94,7 @@ ItemNode::~ItemNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ItemNode::data(int column,
 	       int role) const
@@ -139,14 +139,14 @@ ItemNode::data(int column,
       case kPtItem_Func:
       case kPtItem_GenFor:
 	return mItem->name();
-	
+
       case kPtItem_Generate:
       case kPtItem_GenBlock:
 	if ( mItem->name() ) {
 	  return mItem->name();
 	}
 	break;
-	
+
       default:
 	break;
       }
@@ -154,7 +154,7 @@ ItemNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ItemNode::loc() const
@@ -169,14 +169,14 @@ ItemNode::expand() const
   switch ( mItem->type() ) {
   case kPtItem_DefParam:
     mChildren.resize(mItem->size());
-    for (ymuint32 i = 0; i < mItem->size(); ++ i) {
+    for (ymuint i = 0; i < mItem->size(); ++ i) {
       mChildren[i] = new DefParamNode(mItem->defparam(i));
     }
     break;
-    
+
   case kPtItem_ContAssign:
     {
-      ymuint32 n = mItem->size();
+      ymuint n = mItem->size();
       if ( mItem->strength() ) {
 	++ n;
       }
@@ -184,22 +184,22 @@ ItemNode::expand() const
 	++ n;
       }
       mChildren.resize(n);
-      for (ymuint32 i = 0; i < mItem->size(); ++ i) {
+      for (ymuint i = 0; i < mItem->size(); ++ i) {
 	mChildren[i] = new ContAssignNode(mItem->contassign(i));
       }
     }
     break;
-    
+
   case kPtItem_Initial:
   case kPtItem_Always:
     mChildren.resize(1);
     mChildren[0] = new StmtNode("Body", mItem->body());
     break;
-    
+
   case kPtItem_Task:
   case kPtItem_Func:
     {
-      ymuint32 n = 2;
+      ymuint n = 2;
       if ( mItem->left_range() ) {
 	assert_cond(mItem->right_range(), __FILE__, __LINE__);
 	n += 3;
@@ -243,10 +243,10 @@ ItemNode::expand() const
       mChildren.push_back( new StmtNode("Body", mItem->body()) );
     }
     break;
-    
+
   case kPtItem_GateInst:
     {
-      ymuint32 n = 1;
+      ymuint n = 1;
       if ( mItem->strength() ) {
 	++ n;
       }
@@ -264,10 +264,10 @@ ItemNode::expand() const
       mChildren.push_back( new InstListNode(mItem) );
     }
     break;
-    
+
   case kPtItem_MuInst:
     {
-      ymuint32 n = 1;
+      ymuint n = 1;
       if ( mItem->paramassign_array().size() > 0 ) {
 	++ n;
       }
@@ -291,30 +291,30 @@ ItemNode::expand() const
       mChildren.push_back( new InstListNode(mItem) );
     }
     break;
-    
+
   case kPtItem_SpecItem:
     switch ( mItem->specitem_type() ) {
     case kVpiPulsestyleOnEvent:
       break;
-      
+
     case kVpiPulsestyleOnDetect:
       break;
-      
+
     case kVpiShowcancelled:
       break;
-      
+
     case kVpiNoshowcancelled:
       break;
     }
     break;
-    
+
   case kPtItem_SpecPath:
     break;
-    
+
   case kPtItem_Generate:
   case kPtItem_GenBlock:
     {
-      ymuint32 n = 0;
+      ymuint n = 0;
       if ( mItem->declhead_array().size() > 0 ) {
 	++ n;
       }
@@ -332,10 +332,10 @@ ItemNode::expand() const
       }
     }
     break;
-    
+
   case kPtItem_GenIf:
     {
-      ymuint32 n = 1;
+      ymuint n = 1;
       if ( mItem->then_declhead_array().size() > 0 ) {
 	++ n;
       }
@@ -368,16 +368,16 @@ ItemNode::expand() const
       }
     }
     break;
-    
+
   case kPtItem_GenCase:
     mChildren.resize(2);
     mChildren[0] = new ExprNode("Condition", mItem->expr());
     mChildren[1] = new GenCaseItemListNode(mItem);
     break;
-    
+
   case kPtItem_GenFor:
     {
-      ymuint32 n = 4;
+      ymuint n = 4;
       if ( mItem->declhead_array().size() > 0 ) {
 	++ n;
       }
@@ -421,7 +421,7 @@ DefParamNode::~DefParamNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 DefParamNode::data(int column,
 		   int role) const
@@ -436,7 +436,7 @@ DefParamNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 DefParamNode::loc() const
@@ -448,7 +448,7 @@ DefParamNode::loc() const
 void
 DefParamNode::expand() const
 {
-  ymuint32 n = 2;
+  ymuint n = 2;
   if ( mDefParam->namebranch_array().size() > 0 ) {
     ++ n;
   }
@@ -479,7 +479,7 @@ ContAssignNode::~ContAssignNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 ContAssignNode::data(int column,
 		     int role) const
@@ -494,7 +494,7 @@ ContAssignNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 ContAssignNode::loc() const
@@ -530,7 +530,7 @@ InstListNode::~InstListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 InstListNode::data(int column,
 		   int role) const
@@ -545,7 +545,7 @@ InstListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 InstListNode::loc() const
@@ -557,9 +557,9 @@ InstListNode::loc() const
 void
 InstListNode::expand() const
 {
-   ymuint32 n = mItem->size();
+   ymuint n = mItem->size();
    mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new InstNode(mItem->inst(i));
   }
 }
@@ -583,7 +583,7 @@ InstNode::~InstNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 InstNode::data(int column,
 	       int role) const
@@ -603,7 +603,7 @@ InstNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 InstNode::loc() const
@@ -615,7 +615,7 @@ InstNode::loc() const
 void
 InstNode::expand() const
 {
-  ymuint32 n = 1;
+  ymuint n = 1;
   if ( mInst->left_range() ) {
     assert_cond(mInst->right_range(), __FILE__, __LINE__);
     n += 2;
@@ -647,7 +647,7 @@ InstPortListNode::~InstPortListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 InstPortListNode::data(int column,
 		       int role) const
@@ -662,7 +662,7 @@ InstPortListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 InstPortListNode::loc() const
@@ -674,9 +674,9 @@ InstPortListNode::loc() const
 void
 InstPortListNode::expand() const
 {
-  ymuint32 n = mInst->port_num();
+  ymuint n = mInst->port_num();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new ConnectionNode(mInst->port(i));
   }
 }
@@ -687,7 +687,7 @@ InstPortListNode::expand() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] item 親の generate case 
+// @param[in] item 親の generate case
 GenCaseItemListNode::GenCaseItemListNode(const PtItem* item) :
   mItem(item)
 {
@@ -700,7 +700,7 @@ GenCaseItemListNode::~GenCaseItemListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 GenCaseItemListNode::data(int column,
 			  int role) const
@@ -715,7 +715,7 @@ GenCaseItemListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 GenCaseItemListNode::loc() const
@@ -727,9 +727,9 @@ GenCaseItemListNode::loc() const
 void
 GenCaseItemListNode::expand() const
 {
-  ymuint32 n = mItem->size();
+  ymuint n = mItem->size();
   mChildren.resize(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren[i] = new GenCaseItemNode(mItem->caseitem(i));
   }
 }
@@ -753,7 +753,7 @@ GenCaseItemNode::~GenCaseItemNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 GenCaseItemNode::data(int column,
 		      int role) const
@@ -768,7 +768,7 @@ GenCaseItemNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 GenCaseItemNode::loc() const
@@ -780,7 +780,7 @@ GenCaseItemNode::loc() const
 void
 GenCaseItemNode::expand() const
 {
-  ymuint32 n = mItem->label_num();
+  ymuint n = mItem->label_num();
   if ( n == 0 ) {
     n = 1;
   }
@@ -792,7 +792,7 @@ GenCaseItemNode::expand() const
   }
   mChildren.reserve(n);
   n = mItem->label_num();
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mChildren.push_back( new ExprNode("Label", mItem->label(i)) );
   }
   if ( n == 0 ) {

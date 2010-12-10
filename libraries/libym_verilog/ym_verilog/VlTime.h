@@ -28,7 +28,7 @@ public:
   /// @brief 空のコンストラクタ
   /// @note 値は不定
   VlTime();
-  
+
   /// @brief 2つの値を指定するコンストラクタ
   /// @param[in] l 下位32ビットの値
   /// @param[in] h 上位32ビットの値
@@ -196,7 +196,7 @@ VlTime::VlTime() :
   mHigh(0)
 {
 }
-  
+
 // @brief 2つの値を指定するコンストラクタ
 // @param[in] l 下位32ビットの値
 // @param[in] h 上位32ビットの値
@@ -229,7 +229,7 @@ VlTime::VlTime(const VlTime& src) :
   mLow(src.mLow),
   mHigh(src.mHigh)
 {
-} 
+}
 
 // @brief 代入演算子
 inline
@@ -356,7 +356,7 @@ VlTime::operator+=(const VlTime& op2)
 {
   // 桁あげを考慮しなければならないのでちょっとめんどくさい
   mLow += op2.mLow;
-  ymuint32 carry = 0;
+  ymuint carry = 0;
   if ( mLow < op2.mLow ) {
     // 桁あげが起った．
     carry = 1;

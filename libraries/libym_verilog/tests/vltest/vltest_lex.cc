@@ -34,16 +34,16 @@ lex_mode(const list<string>& filename_list,
 	 int loop,
 	 bool dump_token)
 {
-  ymuint32 c = loop + 1;
-  for (ymuint32 i = 0; i < c; ++ i) {
+  ymuint c = loop + 1;
+  for (ymuint i = 0; i < c; ++ i) {
     MsgMgr msg_mgr;
     MsgHandler* handler = new StreamMsgHandler(&cerr);
     msg_mgr.reg_handler(handler);
-    
+
     FileDescMgr fd_mgr;
-  
+
     Lex lex(msg_mgr, fd_mgr);
-  
+
     if ( spath ) {
       SearchPathList splist(spath);
       lex.set_searchpath(splist);
@@ -55,7 +55,7 @@ lex_mode(const list<string>& filename_list,
 
     StopWatch timer;
     timer.start();
-  
+
     int nt_id = 0;
     int nt_sid = 0;
     int nt_un = 0;
@@ -82,7 +82,7 @@ lex_mode(const list<string>& filename_list,
 	  print_token(cout, id, lex.cur_string());
 	  cout << endl;
 	}
-      
+
 	switch ( id ) {
 	case IDENTIFIER:
 	  ++ nt_id;
@@ -115,7 +115,7 @@ lex_mode(const list<string>& filename_list,
 
     timer.stop();
     USTime time = timer.time();
-    
+
     if ( verbose ) {
       cout << "Total " << setw(10) << nt_id << " IDENTIFIER tokens" << endl
 	   << "      " << setw(10) << nt_sid << " SYS_IDENTIFIER tokens" << endl
