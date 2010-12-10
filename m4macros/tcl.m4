@@ -26,7 +26,7 @@ AC_DEFUN([YM_CHECK_TCL],[
 ym_tmp_lib_list="lib"
 arch=`uname -p`
 if test "X$arch" = "Xx86_64"; then
-  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
+  ym_tmp_lib_list="lib64 $ym_tmp_lib_list"
 fi
 ym_tmp_path=""
 for ym_tmp_dir in $prefix $ac_default_prefix /usr /usr/local; do

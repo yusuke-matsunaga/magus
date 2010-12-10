@@ -21,7 +21,7 @@ AC_MSG_NOTICE([checking if popt is available])
 arch=`uname -p`
 ym_tmp_lib_list="lib"
 if test "X$arch" = "Xx86_64"; then
-  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
+  ym_tmp_lib_list="lib64 $ym_tmp_lib_list"
 fi
 # --with-popt-prefix
 AC_ARG_WITH([popt-prefix],
