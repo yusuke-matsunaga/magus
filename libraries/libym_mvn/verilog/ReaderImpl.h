@@ -16,6 +16,7 @@
 #include "DeclHash.h"
 #include "DeclMap.h"
 #include "Driver.h"
+#include "Env.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
@@ -144,12 +145,19 @@ private:
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
 
-  /// @brief プロセス文の生成を行う．
-  /// @param[in] module 親のモジュール
+  /// @brief プロセス文を登録する．
   /// @param[in] vl_process プロセス文
   bool
+  reg_process(const VlProcess* process);
+
+  /// @brief プロセス文の中身を生成する．
+  /// @param[in] module 親のモジュール
+  /// @param[in] stmt 本体のステートメント
+  /// @param[in] env 環境
+  bool
   gen_process(MvModule* module,
-	      const VlProcess* process);
+	      const VlStmt* stmt,
+	      Env& env);
 
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール
@@ -214,30 +222,38 @@ private:
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式
+  /// @param[in] env 環境
   MvNode*
-  gen_expr1(MvModule* parent_module,
-	    const VlExpr* expr);
+  gen_expr(MvModule* parent_module,
+	   const VlExpr* expr,
+	   const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
+  /// @param[in] env 環境
   MvNode*
-  gen_expr2(const VlExpr* expr);
+  gen_primary(const VlExpr* expr,
+	      const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
   /// @param[in] bitpos ビット位置
+  /// @param[in] env 環境
   MvNode*
-  gen_expr3(const VlExpr* expr,
-	    ymuint& bitpos);
+  gen_primary(const VlExpr* expr,
+	      ymuint& bitpos,
+	      const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
   /// @param[in] msb MSBのビット位置
   /// @param[in] lsb LSBのビット位置
+  /// @param[in] env 環境
   MvNode*
-  gen_expr4(const VlExpr* expr,
-	    ymuint& msb,
-	    ymuint& lsb);
+  gen_primary(const VlExpr* expr,
+	      ymuint& msb,
+	      ymuint& lsb,
+	      const Env& env);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素
@@ -334,14 +350,14 @@ private:
   // MvNetwork を扱うマネージャ
   MvMgr* mMvMgr;
 
-  // VlDecl と MvNode の対応付けをとるハッシュ表
-  DeclMap mDeclMap;
-
   // VlIODecl と MvNode の対応付けをとるハッシュ表
   DeclMap mIODeclMap;
 
   // REG 型オブジェクトに ID 番号を割り当てるためのハッシュ表
   DeclHash mDeclHash;
+
+  // トップレベルの環境
+  Env mGlobalEnv;
 
   // always 文の本体を登録しておくリスト
   list<const VlStmt*> mProcessList;

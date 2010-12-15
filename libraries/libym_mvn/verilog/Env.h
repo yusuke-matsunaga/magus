@@ -1,8 +1,8 @@
-#ifndef LIBYM_MVN_VERILOG_SSAMGR_H
-#define LIBYM_MVN_VERILOG_SSAMGR_H
+#ifndef LIBYM_MVN_VERILOG_ENV_H
+#define LIBYM_MVN_VERILOG_ENV_H
 
-/// @file libym_mvn/verilog/SsaMgr.h
-/// @brief SsaMgr のヘッダファイル
+/// @file libym_mvn/verilog/Env.h
+/// @brief Env のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -17,22 +17,29 @@
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SsaMgr SsaMgr.h "SsaMgr.h"
-/// @brief SSA のためのインスタンス番号生成を行うクラス
+/// @class Env Env.h "Env.h"
+/// @brief const VlDecl と MvNode の対応をとる連想配列
 //////////////////////////////////////////////////////////////////////
-class SsaMgr
+class Env
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] decl_hash VlDecl 用のハッシュ表
-  SsaMgr(DeclHash& decl_hash);
+  Env(DeclHash& decl_hash);
+
+  /// @brief コピーコンストラクタ
+  Env(const Env& src);
 
   /// @brief デストラクタ
-  ~SsaMgr();
+  ~Env();
 
 
 public:
+
+  /// @brief 内容をクリアする．
+  void
+  clear();
 
   /// @brief 登録する(単一要素の場合)
   /// @param[in] decl 宣言要素
@@ -89,4 +96,4 @@ private:
 
 END_NAMESPACE_YM_MVN_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_SSAMGR_H
+#endif // LIBYM_MVN_VERILOG_ENV_H

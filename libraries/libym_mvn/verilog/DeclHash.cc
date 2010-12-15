@@ -57,6 +57,13 @@ DeclHash::get_id(const VlDecl* decl)
   }
 }
 
+// @brief ID番号の最大値 + 1を返す．
+ymuint
+DeclHash::max_id() const
+{
+  return mNum;
+}
+
 // @brief Cell を登録する．
 void
 DeclHash::put_cell(const VlDecl* decl,

@@ -10,6 +10,7 @@
 #include "ReaderImpl.h"
 #include "DeclMap.h"
 #include "Driver.h"
+#include "Env.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
@@ -44,7 +45,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 ReaderImpl::ReaderImpl() :
-  mVlMgr(mMsgMgr)
+  mVlMgr(mMsgMgr),
+  mGlobalEnv(mDeclHash)
 {
   mMvMgr = NULL;
 }
@@ -88,8 +90,9 @@ ReaderImpl::gen_network(MvMgr& mgr,
 
   mMvMgr = &mgr;
 
-  mDeclMap.clear();
   mIODeclMap.clear();
+  mDeclHash.clear();
+  mGlobalEnv.clear();
   mProcessList.clear();
   mNodeMap.clear();
   mDriverList.clear();
@@ -120,6 +123,8 @@ ReaderImpl::gen_network(MvMgr& mgr,
        p != mProcessList.end(); ++ p) {
     const VlStmt* stmt = *p;
     assert_cond( stmt->type() == kVpiEventControl, __FILE__, __LINE__);
+    Env top_env(mGlobalEnv);
+    gen_process(module0, stmt->body_stmt(), top_env);
   }
 
   // 結線を行う．
@@ -352,7 +357,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   for (ymuint i = 0; i < nio_all; ++ i) {
     const VlIODecl* io = vl_module->io(i);
     const VlDecl* decl = io->decl();
-    MvNode* node = mDeclMap.get(decl);
+    MvNode* node = mGlobalEnv.get(decl);
     assert_cond( node != NULL, __FILE__, __LINE__);
     switch ( io->direction() ) {
     case kVpiInput:
@@ -614,7 +619,7 @@ ReaderImpl::gen_item(MvModule* module,
 	const VlContAssign* vl_contassign = *p;
 	const VlExpr* lhs = vl_contassign->lhs();
 	const VlExpr* rhs = vl_contassign->rhs();
-	MvNode* node = gen_expr1(module, rhs);
+	MvNode* node = gen_expr(module, rhs, mGlobalEnv);
 	connect_lhs(module, lhs, node);
       }
     }
@@ -627,7 +632,7 @@ ReaderImpl::gen_item(MvModule* module,
       for (vector<const VlProcess*>::const_iterator p = process_list.begin();
 	   p != process_list.end(); ++ p) {
 	const VlProcess* process = *p;
-	bool stat1 = gen_process(module, process);
+	bool stat1 = reg_process(process);
 	if ( !stat1 ) {
 	  return NULL;
 	}
@@ -713,22 +718,22 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
       string port_name = vl_port->name();
       const VlExpr* expr = vl_port->high_conn();
       if ( port_name == ff_info.mDataPinName ) {
-	MvNode* node1 = gen_expr1(parent_module, expr);
+	MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
 	mMvMgr->connect(node1, 0, node, 0);
       }
       else if ( port_name == ff_info.mClockPinName ) {
-	MvNode* node1 = gen_expr1(parent_module, expr);
+	MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
 	mMvMgr->connect(node1, 0, node, 1);
       }
       else if ( port_name == ff_info.mResetPinName ) {
 	if ( expr != NULL ) {
-	  MvNode* node1 = gen_expr1(parent_module, expr);
+	  MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
 	  mMvMgr->connect(node1, 0, node, 2);
 	}
       }
       else if ( port_name == ff_info.mSetPinName ) {
 	if ( expr != NULL ) {
-	  MvNode* node1 = gen_expr1(parent_module, expr);
+	  MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
 	  mMvMgr->connect(node1, 0, node, 3);
 	}
       }
@@ -786,7 +791,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
       // hi は右辺式
       // lo は左辺式
       {
-	MvNode* node1 = gen_expr1(parent_module, hi);
+	MvNode* node1 = gen_expr(parent_module, hi, mGlobalEnv);
 	connect_lhs(parent_module, lo, node1);
       }
       break;
@@ -795,7 +800,7 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
       // hi は左辺式
       // lo は右辺式
       {
-	MvNode* node1 = gen_expr1(parent_module, lo);
+	MvNode* node1 = gen_expr(parent_module, lo, mGlobalEnv);
 	connect_lhs(parent_module, hi, node1);
       }
       break;
@@ -818,12 +823,10 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
   }
 }
 
-// @brief プロセス文の生成を行う．
-// @param[in] module 親のモジュール
+// @brief プロセス文を登録する．
 // @param[in] vl_process プロセス文
 bool
-ReaderImpl::gen_process(MvModule* module,
-			const VlProcess* process)
+ReaderImpl::reg_process(const VlProcess* process)
 {
   if ( process->type() != kVpiAlways ) {
     // always 文以外(initial文)はダメ
@@ -872,6 +875,48 @@ ReaderImpl::gen_process(MvModule* module,
   return true;
 }
 
+// @brief ステートメントの中身を生成する．
+// @param[in] module 親のモジュール
+// @param[in] stmt 本体のステートメント
+// @param[in] env 環境
+bool
+ReaderImpl::gen_stmt(MvModule* module,
+		     const VlStmt* stmt,
+		     Env& env)
+{
+  switch ( stmt->type() ) {
+  case kVpiAssignment:
+    {
+      const VlExpr* rhs = stmt->rhs();
+      MvNode* node = gen_expr(module, rhs, env);
+      const VlExpr* lhs = stmt->lhs();
+
+    }
+    break;
+
+  case kVpiBegin:
+  case kVpiNamedBegin:
+    {
+    }
+    break;
+
+  case kVpiIf:
+    break;
+
+  case kVpiIfElse:
+    break;
+
+  case kVpiCase:
+    break;
+
+  default:
+#warning "エラーメッセージをまともにする．"
+    cerr << "can not synthesized" << endl;
+    return false;
+  }
+  return true;
+}
+
 // @brief 左辺式に接続する．
 // @param[in] parent_module 親のモジュール
 // @param[in] expr 左辺式
@@ -891,21 +936,21 @@ ReaderImpl::connect_lhs(MvModule* parent_module,
     }
     assert_cond( node->output(0)->bit_width() == expr->bit_size(),
 		 __FILE__, __LINE__);
-    MvNode* node1 = gen_expr2(expr);
+    MvNode* node1 = gen_primary(expr, mGlobalEnv);
     reg_driver(node1, Driver(node));
   }
   else if ( expr->is_bitselect() ) {
     assert_cond( node->output(0)->bit_width() == 1, __FILE__, __LINE__);
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     ymuint offset;
-    MvNode* node1 = gen_expr3(expr, offset);
+    MvNode* node1 = gen_primary(expr, offset, mGlobalEnv);
     reg_driver(node1, Driver(node, offset));
   }
   else if ( expr->is_partselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     ymuint msb;
     ymuint lsb;
-    MvNode* node1 = gen_expr4(expr, msb, lsb);
+    MvNode* node1 = gen_primary(expr, msb, lsb, mGlobalEnv);
     assert_cond( node->output(0)->bit_width() == msb - lsb + 1,
 		 __FILE__, __LINE__);
     reg_driver(node1, Driver(node, msb, lsb));
@@ -937,7 +982,7 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
 {
   ymuint bw = node->output(0)->bit_width();
   if ( expr->is_primary() ) {
-    MvNode* node1 = gen_expr2(expr);
+    MvNode* node1 = gen_primary(expr, mGlobalEnv);
     ymuint bw1 = node1->input(0)->bit_width();
     MvNode* node2 = NULL;
     if ( bw1 == 1 ) {
@@ -957,7 +1002,7 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
   }
   else if ( expr->is_bitselect() ) {
     ymuint index;
-    MvNode* node1 = gen_expr3(expr, index);
+    MvNode* node1 = gen_primary(expr, index, mGlobalEnv);
     MvNode* node2 = mMvMgr->new_constbitselect(parent_module,
 					       offset,
 					       bw);
@@ -968,7 +1013,7 @@ ReaderImpl::connect_lhs_sub(MvModule* parent_module,
   else if ( expr->is_partselect() ) {
     ymuint msb;
     ymuint lsb;
-    MvNode* node1 = gen_expr4(expr, msb, lsb);
+    MvNode* node1 = gen_primary(expr, msb, lsb, mGlobalEnv);
     ymuint bw1 = msb - lsb + 1;
     MvNode* node2 = mMvMgr->new_constpartselect(parent_module,
 						offset + bw1 - 1,
@@ -1123,7 +1168,7 @@ ReaderImpl::gen_priminst(const VlPrimitive* prim,
     const VlPrimTerm* term = prim->prim_term(pos);
     ++ pos;
     const VlExpr* expr = term->expr();
-    MvNode* node = gen_expr1(parent_module, expr);
+    MvNode* node = gen_expr(parent_module, expr, mGlobalEnv);
     const pair<MvNode*, ymuint>& p = inputs[i];
     mMvMgr->connect(node, 0, p.first, p.second);
   }
@@ -1255,9 +1300,11 @@ ReaderImpl::gen_xortree(MvModule* parent_module,
 // @brief 式に対応したノードの木を作る．
 // @param[in] parent_module 親のモジュール
 // @param[in] expr 式
+// @param[in] env 環境
 MvNode*
-ReaderImpl::gen_expr1(MvModule* parent_module,
-		      const VlExpr* expr)
+ReaderImpl::gen_expr(MvModule* parent_module,
+		     const VlExpr* expr,
+		     const Env& env)
 {
   if ( expr->is_const() ) {
     assert_cond( is_bitvector_type(expr->value_type()), __FILE__, __LINE__);
@@ -1285,12 +1332,12 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     return mMvMgr->new_const(parent_module, bit_size, tmp);
   }
   if ( expr->is_primary() ) {
-    return gen_expr2(expr);
+    return gen_primary(expr, env);
   }
   if ( expr->is_bitselect() ) {
     if ( expr->is_constant_select() ) {
       ymuint bitpos;
-      MvNode* node = gen_expr3(expr, bitpos);
+      MvNode* node = gen_primary(expr, bitpos, env);
       const MvOutputPin* pin = node->output(0);
       MvNode* node1 = mMvMgr->new_constbitselect(parent_module,
 						 bitpos,
@@ -1301,8 +1348,8 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     }
     else {
 #warning "TODO: [msb:lsb] のオフセット変換をしていない"
-      MvNode* node = gen_expr2(expr);
-      MvNode* node1 = gen_expr1(parent_module, expr->index());
+      MvNode* node = gen_primary(expr, env);
+      MvNode* node1 = gen_expr(parent_module, expr->index(), env);
       const MvOutputPin* pin0 = node->output(0);
       const MvOutputPin* pin1 = node1->output(0);
       MvNode* node2 = mMvMgr->new_bitselect(parent_module,
@@ -1317,7 +1364,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     if ( expr->is_constant_select() ) {
       ymuint msb;
       ymuint lsb;
-      MvNode* node = gen_expr4(expr, msb, lsb);
+      MvNode* node = gen_primary(expr, msb, lsb, env);
       const MvOutputPin* pin = node->output(0);
       MvNode* node1 = mMvMgr->new_constpartselect(parent_module,
 						  msb, lsb,
@@ -1337,7 +1384,7 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
     ymuint n = expr->operand_num();
     vector<MvNode*> inputs(n);
     for (ymuint i = 0; i < n; ++ i) {
-      inputs[i] = gen_expr1(parent_module, expr->operand(i));
+      inputs[i] = gen_expr(parent_module, expr->operand(i), env);
     }
 
     switch ( expr->op_type() ) {
@@ -1716,8 +1763,10 @@ ReaderImpl::gen_expr1(MvModule* parent_module,
 
 // @brief 宣言要素への参照に対応するノードを作る．
 // @param[in] expr 式
+// @param[in] env 環境
 MvNode*
-ReaderImpl::gen_expr2(const VlExpr* expr)
+ReaderImpl::gen_primary(const VlExpr* expr,
+			const Env& env)
 {
   const VlDecl* decl = expr->decl_obj();
   assert_cond( decl != NULL, __FILE__, __LINE__);
@@ -1735,17 +1784,17 @@ ReaderImpl::gen_expr2(const VlExpr* expr)
       offset += index_val * mlt;
       mlt *= decl->range(i)->size();
     }
-    MvNode* node = mDeclMap.get(decl, offset);
+    MvNode* node = env.get(decl, offset);
     if ( node == NULL ) {
-      cerr << decl->name() << " is not found in mDeclMap" << endl;
+      cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
   }
   else {
-    MvNode* node = mDeclMap.get(decl);
+    MvNode* node = env.get(decl);
     if ( node == NULL ) {
-      cerr << decl->name() << " is not found in mDeclMap" << endl;
+      cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
@@ -1754,9 +1803,11 @@ ReaderImpl::gen_expr2(const VlExpr* expr)
 
 // @brief 宣言要素への参照に対応するノードを作る．
 // @param[in] expr 式
+// @param[in] env 環境
 MvNode*
-ReaderImpl::gen_expr3(const VlExpr* expr,
-		      ymuint& bitpos)
+ReaderImpl::gen_primary(const VlExpr* expr,
+			ymuint& bitpos,
+			const Env& env)
 {
   const VlDecl* decl = expr->decl_obj();
   assert_cond( decl != NULL, __FILE__, __LINE__);
@@ -1775,17 +1826,17 @@ ReaderImpl::gen_expr3(const VlExpr* expr,
       offset += index_val * mlt;
       mlt *= decl->range(i)->size();
     }
-    MvNode* node = mDeclMap.get(decl, offset);
+    MvNode* node = env.get(decl, offset);
     if ( node == NULL ) {
-      cerr << decl->name() << " is not found in mDeclMap" << endl;
+      cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
   }
   else {
-    MvNode* node = mDeclMap.get(decl);
+    MvNode* node = env.get(decl);
     if ( node == NULL ) {
-      cerr << decl->name() << " is not found in mDeclMap" << endl;
+      cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
@@ -1794,10 +1845,12 @@ ReaderImpl::gen_expr3(const VlExpr* expr,
 
 // @brief 宣言要素への参照に対応するノードを作る．
 // @param[in] expr 式
+// @param[in] env 環境
 MvNode*
-ReaderImpl::gen_expr4(const VlExpr* expr,
-		      ymuint& msb,
-		      ymuint& lsb)
+ReaderImpl::gen_primary(const VlExpr* expr,
+			ymuint& msb,
+			ymuint& lsb,
+			const Env& env)
 {
   const VlDecl* decl = expr->decl_obj();
   assert_cond( decl != NULL, __FILE__, __LINE__);
@@ -1817,17 +1870,17 @@ ReaderImpl::gen_expr4(const VlExpr* expr,
       offset += index_val * mlt;
       mlt *= decl->range(i)->size();
     }
-    MvNode* node = mDeclMap.get(decl, offset);
+    MvNode* node = env.get(decl, offset);
     if ( node == NULL ) {
-      cerr << decl->name() << " is not found in mDeclMap" << endl;
+      cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
   }
   else {
-    MvNode* node = mDeclMap.get(decl);
+    MvNode* node = env.get(decl);
     if ( node == NULL ) {
-      cerr << decl->name() << " is not found in mDeclMap" << endl;
+      cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
@@ -1841,7 +1894,7 @@ void
 ReaderImpl::reg_node(const VlDecl* decl,
 		     MvNode* node)
 {
-  mDeclMap.add(decl, node);
+  mGlobalEnv.add(decl, node);
   expand_nodemap(node->id());
   mNodeMap[node->id()] = make_pair(decl, 0);
 }
@@ -1867,7 +1920,7 @@ ReaderImpl::reg_node(const VlDecl* decl,
 		     ymuint offset,
 		     MvNode* node)
 {
-  mDeclMap.add(decl, offset, node);
+  mGlobalEnv.add(decl, offset, node);
   expand_nodemap(node->id());
   mNodeMap[node->id()] = make_pair(decl, offset);
 }
