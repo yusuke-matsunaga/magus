@@ -150,14 +150,14 @@ private:
   bool
   reg_process(const VlProcess* process);
 
-  /// @brief プロセス文の中身を生成する．
+  /// @brief ステートメントの中身を生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] stmt 本体のステートメント
   /// @param[in] env 環境
   bool
-  gen_process(MvModule* module,
-	      const VlStmt* stmt,
-	      Env& env);
+  gen_stmt(MvModule* module,
+	   const VlStmt* stmt,
+	   Env& env);
 
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール

@@ -124,7 +124,7 @@ ReaderImpl::gen_network(MvMgr& mgr,
     const VlStmt* stmt = *p;
     assert_cond( stmt->type() == kVpiEventControl, __FILE__, __LINE__);
     Env top_env(mGlobalEnv);
-    gen_process(module0, stmt->body_stmt(), top_env);
+    gen_stmt(module0, stmt->body_stmt(), top_env);
   }
 
   // 結線を行う．
