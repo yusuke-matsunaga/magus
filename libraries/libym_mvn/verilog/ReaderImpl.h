@@ -161,23 +161,16 @@ private:
 
   /// @brief 左辺式に接続する．
   /// @param[in] parent_module 親のモジュール
+  /// @param[in] dst_node 左辺に対応するノード
   /// @param[in] expr 左辺式
+  /// @param[in] offset オフセット
   /// @param[in] node 右辺に対応するノード
   void
   connect_lhs(MvModule* parent_module,
+	      MvNode* dst_node,
 	      const VlExpr* expr,
+	      ymuint offset,
 	      MvNode* node);
-
-  /// @brief 左辺式に接続する．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] expr 左辺式
-  /// @param[in] node 右辺に対応するノード
-  /// @param[in] offset node に対するオフセット
-  void
-  connect_lhs_sub(MvModule* parent_module,
-		  const VlExpr* expr,
-		  MvNode* node,
-		  ymuint offset);
 
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] prim プリミティブ
@@ -235,25 +228,16 @@ private:
   gen_primary(const VlExpr* expr,
 	      const Env& env);
 
-  /// @brief 宣言要素への参照に対応するノードを作る．
-  /// @param[in] expr 式
-  /// @param[in] bitpos ビット位置
-  /// @param[in] env 環境
-  MvNode*
-  gen_primary(const VlExpr* expr,
-	      ymuint& bitpos,
-	      const Env& env);
-
-  /// @brief 宣言要素への参照に対応するノードを作る．
-  /// @param[in] expr 式
-  /// @param[in] msb MSBのビット位置
-  /// @param[in] lsb LSBのビット位置
-  /// @param[in] env 環境
-  MvNode*
-  gen_primary(const VlExpr* expr,
-	      ymuint& msb,
-	      ymuint& lsb,
-	      const Env& env);
+  /// @brief 環境をマージする．
+  /// @param[in] env 対象の環境
+  /// @param[in] cond 条件を表すノード
+  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
+  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
+  void
+  merge_env(Env& env,
+	    MvNode* cond,
+	    const Env& then_env,
+	    const Env& else_env);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素
