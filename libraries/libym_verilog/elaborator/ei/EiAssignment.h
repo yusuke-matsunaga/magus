@@ -18,11 +18,10 @@
 
 
 #include "EiStmt.h"
+#include "ElbFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class ElbExpr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class EiAssignBase EiAssignment.h "EiAssignment.h"
@@ -42,7 +41,7 @@ protected:
   EiAssignBase(const VlNamedObj* parent,
 	       ElbProcess* process,
 	       const PtStmt* pt_stmt,
-	       ElbExpr* lhs,
+	       ElbLhs* lhs,
 	       ElbExpr* rhs);
 
   /// @brief デストラクタ
@@ -59,6 +58,20 @@ public:
   virtual
   const VlExpr*
   lhs() const;
+
+  /// @brief 左辺式の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  virtual
+  ymuint
+  lhs_elem_num() const;
+
+  /// @brief 左辺式の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  virtual
+  const VlExpr*
+  lhs_elem(ymuint pos) const;
 
   /// @brief 右辺を返す．
   virtual
@@ -83,7 +96,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 左辺
-  ElbExpr* mLhs;
+  ElbLhs* mLhs;
 
   // 右辺
   ElbExpr* mRhs;
@@ -113,7 +126,7 @@ protected:
   EiNbAssignment(const VlNamedObj* parent,
 		 ElbProcess* process,
 		 const PtStmt* pt_stmt,
-		 ElbExpr* lhs,
+		 ElbLhs* lhs,
 		 ElbExpr* rhs,
 		 ElbControl* control);
 
@@ -182,7 +195,7 @@ private:
   EiAssignment(const VlNamedObj* parent,
 	       ElbProcess* process,
 	       const PtStmt* pt_stmt,
-	       ElbExpr* lhs,
+	       ElbLhs* lhs,
 	       ElbExpr* rhs,
 	       ElbControl* control);
 
@@ -232,7 +245,7 @@ private:
   EiAssignStmt(const VlNamedObj* parent,
 	       ElbProcess* process,
 	       const PtStmt* pt_stmt,
-	       ElbExpr* lhs,
+	       ElbLhs* lhs,
 	       ElbExpr* rhs);
 
   /// @brief デストラクタ
@@ -286,7 +299,7 @@ private:
   EiForceStmt(const VlNamedObj* parent,
 	      ElbProcess* process,
 	      const PtStmt* pt_stmt,
-	      ElbExpr* lhs,
+	      ElbLhs* lhs,
 	      ElbExpr* rhs);
 
   /// @brief デストラクタ
@@ -336,7 +349,7 @@ protected:
   EiDeassignBase(const VlNamedObj* parent,
 		 ElbProcess* process,
 		 const PtStmt* pt_stmt,
-		 ElbExpr* lhs);
+		 ElbLhs* lhs);
 
   /// @brief デストラクタ
   virtual
@@ -353,6 +366,20 @@ public:
   const VlExpr*
   lhs() const;
 
+  /// @brief 左辺式の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  virtual
+  ymuint
+  lhs_elem_num() const;
+
+  /// @brief 左辺式の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  virtual
+  const VlExpr*
+  lhs_elem(ymuint pos) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -360,7 +387,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 左辺
-  ElbExpr* mLhs;
+  ElbLhs* mLhs;
 
 };
 
@@ -385,7 +412,7 @@ private:
   EiDeassignStmt(const VlNamedObj* parent,
 		 ElbProcess* process,
 		 const PtStmt* pt_stmt,
-		 ElbExpr* lhs);
+		 ElbLhs* lhs);
 
   /// @brief デストラクタ
   virtual
@@ -437,7 +464,7 @@ private:
   EiReleaseStmt(const VlNamedObj* parent,
 		ElbProcess* process,
 		const PtStmt* pt_stmt,
-		ElbExpr* lhs);
+		ElbLhs* lhs);
 
   /// @brief デストラクタ
   virtual

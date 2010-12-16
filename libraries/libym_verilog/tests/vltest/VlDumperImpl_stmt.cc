@@ -125,6 +125,15 @@ VlDumperImpl::put_stmt(const char* label,
   case kVpiAssignment:
     put("vpiBlocking", stmt->is_blocking() );
     put_expr("vpiLhs", mgr, stmt->lhs() );
+    {
+      ymuint n = stmt->lhs_elem_num();
+      if ( n > 1 ) {
+	VlDumpHeader x1(this, "vpiLhs", "LhsElemArray");
+	for (ymuint i = 0; i < n; ++ i) {
+	  put_expr("vpiExpr", mgr, stmt->lhs_elem(i));
+	}
+      }
+    }
     put_expr("vpiRhs", mgr, stmt->rhs() );
     put_control("control", mgr, stmt->control() );
     break;
@@ -182,20 +191,56 @@ VlDumperImpl::put_stmt(const char* label,
 
   case kVpiAssignStmt:
     put_expr("vpiLhs", mgr, stmt->lhs() );
+    {
+      ymuint n = stmt->lhs_elem_num();
+      if ( n > 1 ) {
+	VlDumpHeader x1(this, "vpiLhs", "LhsElemArray");
+	for (ymuint i = 0; i < n; ++ i) {
+	  put_expr("vpiExpr", mgr, stmt->lhs_elem(i));
+	}
+      }
+    }
     put_expr("vpiRhs", mgr, stmt->rhs() );
     break;
 
   case kVpiForce:
     put_expr("vpiLhs", mgr, stmt->lhs() );
+    {
+      ymuint n = stmt->lhs_elem_num();
+      if ( n > 1 ) {
+	VlDumpHeader x1(this, "vpiLhs", "LhsElemArray");
+	for (ymuint i = 0; i < n; ++ i) {
+	  put_expr("vpiExpr", mgr, stmt->lhs_elem(i));
+	}
+      }
+    }
     put_expr("vpiRhs", mgr, stmt->rhs() );
     break;
 
   case kVpiDeassign:
     put_expr("vpiLhs", mgr, stmt->lhs() );
+    {
+      ymuint n = stmt->lhs_elem_num();
+      if ( n > 1 ) {
+	VlDumpHeader x1(this, "vpiLhs", "LhsElemArray");
+	for (ymuint i = 0; i < n; ++ i) {
+	  put_expr("vpiExpr", mgr, stmt->lhs_elem(i));
+	}
+      }
+    }
     break;
 
   case kVpiRelease:
     put_expr("vpiLhs", mgr, stmt->lhs() );
+    {
+      ymuint n = stmt->lhs_elem_num();
+      if ( n > 1 ) {
+	VlDumpHeader x1(this, "vpiLhs", "LhsElemArray");
+	for (ymuint i = 0; i < n; ++ i) {
+	  put_expr("vpiExpr", mgr, stmt->lhs_elem(i));
+	}
+      }
+    }
     break;
 
   case kVpiTaskCall:

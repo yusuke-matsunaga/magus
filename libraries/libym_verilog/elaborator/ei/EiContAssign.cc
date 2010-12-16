@@ -12,6 +12,7 @@
 #include "EiFactory.h"
 #include "EiContAssign.h"
 #include "ElbExpr.h"
+#include "ElbLhs.h"
 #include "ElbDelay.h"
 
 #include "ym_verilog/pt/PtItem.h"
@@ -54,7 +55,7 @@ EiFactory::new_CaHead(const VlModule* module,
 ElbContAssign*
 EiFactory::new_ContAssign(ElbCaHead* head,
 			  const PtBase* pt_obj,
-			  ElbExpr* lhs,
+			  ElbLhs* lhs,
 			  ElbExpr* rhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiContAssign1));
@@ -71,7 +72,7 @@ EiFactory::new_ContAssign(ElbCaHead* head,
 ElbContAssign*
 EiFactory::new_ContAssign(const VlModule* module,
 			  const PtBase* pt_obj,
-			  ElbExpr* lhs,
+			  ElbLhs* lhs,
 			  ElbExpr* rhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiContAssign2));
@@ -174,7 +175,7 @@ EiCaHeadD::delay() const
 // @param[in] lhs 左辺式
 // @param[in] rhs 右辺式
 EiContAssign::EiContAssign(const PtBase* pt_obj,
-			   ElbExpr* lhs,
+			   ElbLhs* lhs,
 			   ElbExpr* rhs) :
   mPtObj(pt_obj),
   mLhs(lhs),
@@ -205,14 +206,32 @@ EiContAssign::file_region() const
 ymuint
 EiContAssign::bit_size() const
 {
-  return mLhs->bit_size();
+  return lhs()->bit_size();
 }
 
 // @brief 左辺を返す．
 const VlExpr*
 EiContAssign::lhs() const
 {
-  return mLhs;
+  return mLhs->_expr();
+}
+
+// @brief 左辺式の要素数の取得
+// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+ymuint
+EiContAssign::lhs_elem_num() const
+{
+  return mLhs->elem_num();
+}
+
+// @brief 左辺式の要素の取得
+// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+const VlExpr*
+EiContAssign::lhs_elem(ymuint pos) const
+{
+  return mLhs->elem(pos);
 }
 
 // @brief 右辺を返す．
@@ -234,7 +253,7 @@ EiContAssign::rhs() const
 // @param[in] rhs 右辺式
 EiContAssign1::EiContAssign1(ElbCaHead* head,
 			     const PtBase* pt_obj,
-			     ElbExpr* lhs,
+			     ElbLhs* lhs,
 			     ElbExpr* rhs) :
   EiContAssign(pt_obj, lhs, rhs),
   mHead(head)
@@ -293,7 +312,7 @@ EiContAssign1::has_net_decl_assign() const
 // @param[in] rhs 右辺式
 EiContAssign2::EiContAssign2(const VlModule* module,
 			     const PtBase* pt_obj,
-			     ElbExpr* lhs,
+			     ElbLhs* lhs,
 			     ElbExpr* rhs) :
   EiContAssign(pt_obj, lhs, rhs),
   mModule(module)

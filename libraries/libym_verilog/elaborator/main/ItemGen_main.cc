@@ -29,6 +29,7 @@
 #include "ElbGfRoot.h"
 #include "ElbGenvar.h"
 #include "ElbExpr.h"
+#include "ElbLhs.h"
 
 #include "ElbStub.h"
 
@@ -230,7 +231,7 @@ ItemGen::instantiate_cont_assign(const VlNamedObj* parent,
 
     // 左辺式の生成
     const PtExpr* pt_lhs = pt_elem->lhs();
-    ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
+    ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
     if ( !lhs ) {
       return;
     }
@@ -248,7 +249,7 @@ ItemGen::instantiate_cont_assign(const VlNamedObj* parent,
 
     ostringstream buf;
     buf << "instantiating continuous assign: "
-	<< lhs->decompile() << " = " << rhs->decompile() << ".";
+	<< lhs->_expr()->decompile() << " = " << rhs->decompile() << ".";
     put_msg(__FILE__, __LINE__,
 	    pt_elem->file_region(),
 	    kMsgInfo,

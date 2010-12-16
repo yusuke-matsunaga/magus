@@ -77,6 +77,8 @@ libym_vl_elab_ei_la_SOURCES = \
 	EiDelay.cc \
 	EiRange.h \
 	EiRange.cc \
+	EiLhs.h \
+	EiLhs.cc \
 	EiExpr.h \
 	EiExpr.cc \
 	EiOperation.h \

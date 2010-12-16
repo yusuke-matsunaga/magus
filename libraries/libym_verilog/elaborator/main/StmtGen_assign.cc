@@ -37,9 +37,9 @@ StmtGen::instantiate_assign(const VlNamedObj* parent,
   const PtExpr* pt_lhs = pt_stmt->lhs();
   const PtExpr* pt_rhs = pt_stmt->rhs();
   const PtControl* pt_control = pt_stmt->control();
-  
+
   ElbVarLhsEnv env1(env);
-  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -47,7 +47,7 @@ StmtGen::instantiate_assign(const VlNamedObj* parent,
   if ( !rhs ) {
     return NULL;
   }
-  
+
   ElbControl* control = NULL;
   if ( pt_control ) {
     if ( env.inside_function() ) {
@@ -87,7 +87,7 @@ StmtGen::instantiate_pca(const VlNamedObj* parent,
   const PtExpr* pt_lhs = pt_stmt->lhs();
   const PtExpr* pt_rhs = pt_stmt->rhs();
   ElbPcaLhsEnv env1(env);
-  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -115,7 +115,7 @@ StmtGen::instantiate_deassign(const VlNamedObj* parent,
 {
   const PtExpr* pt_lhs = pt_stmt->lhs();
   ElbPcaLhsEnv env1(env);
-  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -140,7 +140,7 @@ StmtGen::instantiate_force(const VlNamedObj* parent,
   const PtExpr* pt_lhs = pt_stmt->lhs();
   const PtExpr* pt_rhs = pt_stmt->rhs();
   ElbForceLhsEnv env1(env);
-  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -148,7 +148,7 @@ StmtGen::instantiate_force(const VlNamedObj* parent,
   if ( !rhs ) {
     return NULL;
   }
-  
+
   ElbStmt* stmt = factory().new_ForceStmt(parent, process, pt_stmt,
 					  lhs, rhs);
 
@@ -168,7 +168,7 @@ StmtGen::instantiate_release(const VlNamedObj* parent,
 {
   const PtExpr* pt_lhs = pt_stmt->lhs();
   ElbForceLhsEnv env1(env);
-  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }

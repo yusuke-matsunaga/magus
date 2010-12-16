@@ -94,7 +94,7 @@ public:
   /// @param[in] pt_expr 式を表すパース木
   /// @return 生成された ElbExpr のポインタを返す．
   /// @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
-  ElbExpr*
+  ElbLhs*
   instantiate_lhs(const VlNamedObj* parent,
 		  const ElbEnv& env,
 		  const PtExpr* pt_expr);
@@ -170,6 +170,19 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief PtExpr から左辺式を生成する
+  /// @param[in] parent 親のスコープ
+  /// @param[in] env 生成時の環境
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] elem_array 生成した左辺式の要素を格納するベクタ
+  /// @return 生成した式を返す．
+  /// @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
+  ElbExpr*
+  instantiate_lhs_sub(const VlNamedObj* parent,
+		      const ElbEnv& env,
+		      const PtExpr* pt_expr,
+		      vector<ElbExpr*>& elem_array);
 
   /// @brief PtPrimary から ElbExpr を生成する．
   /// @param[in] parent 親のスコープ

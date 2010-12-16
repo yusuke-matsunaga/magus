@@ -206,11 +206,39 @@ ExprGen::instantiate_arg(const VlNamedObj* parent,
 // @param[in] pt_expr 式を表すパース木
 // @return 生成された ElbExpr のポインタを返す．
 // @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
-ElbExpr*
+ElbLhs*
 ExprGen::instantiate_lhs(const VlNamedObj* parent,
 			 const ElbEnv& env,
 			 const PtExpr* pt_expr)
 {
+  vector<ElbExpr*> elem_array;
+  ElbExpr* expr = instantiate_lhs_sub(parent, env, pt_expr, elem_array);
+  if ( !expr ) {
+    return NULL;
+  }
+  ymuint n = elem_array.size();
+  if ( n == 1 ) {
+    return factory().new_Lhs(expr);
+  }
+  else {
+    return factory().new_Lhs(expr, elem_array);
+  }
+}
+
+// @brief PtExpr から左辺式を生成する
+// @param[in] parent 親のスコープ
+// @param[in] env 生成時の環境
+// @param[in] pt_expr 式を表すパース木
+// @param[out] elem_array 生成した左辺式の要素を格納するベクタ
+// @return 生成した式を返す．
+// @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
+ElbExpr*
+ExprGen::instantiate_lhs_sub(const VlNamedObj* parent,
+			     const ElbEnv& env,
+			     const PtExpr* pt_expr,
+			     vector<ElbExpr*>& elem_array)
+{
+  elem_array.clear();
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
     // 左辺では concatination しか適当でない．
@@ -218,12 +246,15 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
       ymuint opr_size = pt_expr->operand_num();
       ElbExpr** opr_list = factory().new_ExprList(opr_size);
       for (ymuint i = 0; i < opr_size; ++ i) {
-	const PtExpr* pt_expr1 = pt_expr->operand(i);
-	ElbExpr* expr1 = instantiate_lhs(parent, env, pt_expr1);
+	ymuint pos = opr_size - i - 1;
+	const PtExpr* pt_expr1 = pt_expr->operand(pos);
+	vector<ElbExpr*> tmp_array;
+	ElbExpr* expr1 = instantiate_lhs_sub(parent, env, pt_expr1, tmp_array);
 	if ( !expr1 ) {
 	  return NULL;
 	}
-	opr_list[i] = expr1;
+	opr_list[pos] = expr1;
+	elem_array.insert(elem_array.end(), tmp_array.begin(), tmp_array.end());
       }
       ElbExpr* expr = factory().new_ConcatOp(pt_expr, opr_size, opr_list);
       expr->set_selfsize();
@@ -239,7 +270,11 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
 
 
   case kPtPrimaryExpr:
-    return instantiate_primary(parent, env, pt_expr);
+    {
+      ElbExpr* expr = instantiate_primary(parent, env, pt_expr);
+      elem_array.push_back(expr);
+      return expr;
+    }
 
   case kPtConstExpr:
     error_illegal_constant_in_lhs(pt_expr);

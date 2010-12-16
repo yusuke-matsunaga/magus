@@ -13,6 +13,7 @@
 #include "EiAssignment.h"
 #include "ElbControl.h"
 #include "ElbExpr.h"
+#include "ElbLhs.h"
 
 #include "ym_verilog/BitVector.h"
 
@@ -22,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 代入文を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -35,7 +36,7 @@ ElbStmt*
 EiFactory::new_Assignment(const VlNamedObj* parent,
 			  ElbProcess* process,
 			  const PtStmt* pt_stmt,
-			  ElbExpr* lhs,
+			  ElbLhs* lhs,
 			  ElbExpr* rhs,
 			  bool block,
 			  ElbControl* control)
@@ -64,7 +65,7 @@ ElbStmt*
 EiFactory::new_AssignStmt(const VlNamedObj* parent,
 			  ElbProcess* process,
 			  const PtStmt* pt_stmt,
-			  ElbExpr* lhs,
+			  ElbLhs* lhs,
 			  ElbExpr* rhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiAssignStmt));
@@ -73,7 +74,7 @@ EiFactory::new_AssignStmt(const VlNamedObj* parent,
 
   return stmt;
 }
-  
+
 // @brief deassign ステートメントを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -83,7 +84,7 @@ ElbStmt*
 EiFactory::new_DeassignStmt(const VlNamedObj* parent,
 			    ElbProcess* process,
 			    const PtStmt* pt_stmt,
-			    ElbExpr* lhs)
+			    ElbLhs* lhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiAssignStmt));
   ElbStmt* stmt = new (p) EiDeassignStmt(parent, process, pt_stmt,
@@ -102,7 +103,7 @@ ElbStmt*
 EiFactory::new_ForceStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbExpr* lhs,
+			 ElbLhs* lhs,
 			 ElbExpr* rhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiForceStmt));
@@ -111,7 +112,7 @@ EiFactory::new_ForceStmt(const VlNamedObj* parent,
 
   return stmt;
 }
-  
+
 // @brief release ステートメントを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -121,7 +122,7 @@ ElbStmt*
 EiFactory::new_ReleaseStmt(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbExpr* lhs)
+			   ElbLhs* lhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiReleaseStmt));
   ElbStmt* stmt = new (p) EiReleaseStmt(parent, process, pt_stmt,
@@ -144,7 +145,7 @@ EiFactory::new_ReleaseStmt(const VlNamedObj* parent,
 EiAssignBase::EiAssignBase(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbExpr* lhs,
+			   ElbLhs* lhs,
 			   ElbExpr* rhs) :
   EiStmtBase(parent, process, pt_stmt),
   mLhs(lhs),
@@ -156,28 +157,46 @@ EiAssignBase::EiAssignBase(const VlNamedObj* parent,
 EiAssignBase::~EiAssignBase()
 {
 }
-  
+
 // @brief 左辺を返す．
 const VlExpr*
 EiAssignBase::lhs() const
 {
-  return mLhs;
+  return mLhs->_expr();
 }
-  
+
+// @brief 左辺式の要素数の取得
+// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+ymuint
+EiAssignBase::lhs_elem_num() const
+{
+  return mLhs->elem_num();
+}
+
+// @brief 左辺式の要素の取得
+// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+const VlExpr*
+EiAssignBase::lhs_elem(ymuint pos) const
+{
+  return mLhs->elem(pos);
+}
+
 // @brief 右辺を返す．
 const VlExpr*
 EiAssignBase::rhs() const
 {
   return mRhs;
 }
-  
+
 // @brief 左辺を返す．
 ElbExpr*
 EiAssignBase::_lhs() const
 {
-  return mLhs;
+  return mLhs->_expr();
 }
-  
+
 // @brief 右辺を返す．
 ElbExpr*
 EiAssignBase::_rhs() const
@@ -200,7 +219,7 @@ EiAssignBase::_rhs() const
 EiNbAssignment::EiNbAssignment(const VlNamedObj* parent,
 			       ElbProcess* process,
 			       const PtStmt* pt_stmt,
-			       ElbExpr* lhs,
+			       ElbLhs* lhs,
 			       ElbExpr* rhs,
 			       ElbControl* control) :
   EiAssignBase(parent, process, pt_stmt, lhs, rhs),
@@ -219,7 +238,7 @@ EiNbAssignment::type() const
 {
   return kVpiAssignment;
 }
-  
+
 // @brief control を返す．NULL の場合もありうる．
 const VlControl*
 EiNbAssignment::control() const
@@ -250,7 +269,7 @@ EiNbAssignment::func_exec(bool constant_function) const
 EiAssignment::EiAssignment(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbExpr* lhs,
+			   ElbLhs* lhs,
 			   ElbExpr* rhs,
 			   ElbControl* control) :
   EiNbAssignment(parent, process, pt_stmt, lhs, rhs, control)
@@ -305,7 +324,7 @@ EiAssignment::func_exec(bool constant_function) const
 EiAssignStmt::EiAssignStmt(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbExpr* lhs,
+			   ElbLhs* lhs,
 			   ElbExpr* rhs) :
   EiAssignBase(parent, process, pt_stmt, lhs, rhs)
 {
@@ -346,7 +365,7 @@ EiAssignStmt::func_exec(bool constant_function) const
 EiForceStmt::EiForceStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbExpr* lhs,
+			 ElbLhs* lhs,
 			 ElbExpr* rhs) :
   EiAssignBase(parent, process, pt_stmt, lhs, rhs)
 {
@@ -356,14 +375,14 @@ EiForceStmt::EiForceStmt(const VlNamedObj* parent,
 EiForceStmt::~EiForceStmt()
 {
 }
-  
+
 // @brief このクラスの型を返す．
 tVpiObjType
 EiForceStmt::type() const
 {
   return kVpiForce;
 }
-  
+
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -386,7 +405,7 @@ EiForceStmt::func_exec(bool constant_function) const
 EiDeassignBase::EiDeassignBase(const VlNamedObj* parent,
 			       ElbProcess* process,
 			       const PtStmt* pt_stmt,
-			       ElbExpr* lhs) :
+			       ElbLhs* lhs) :
   EiStmtBase(parent, process, pt_stmt),
   mLhs(lhs)
 {
@@ -396,12 +415,30 @@ EiDeassignBase::EiDeassignBase(const VlNamedObj* parent,
 EiDeassignBase::~EiDeassignBase()
 {
 }
-  
+
 // @brief 左辺を返す．
 const VlExpr*
 EiDeassignBase::lhs() const
 {
-  return mLhs;
+  return mLhs->_expr();
+}
+
+// @brief 左辺式の要素数の取得
+// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+ymuint
+EiDeassignBase::lhs_elem_num() const
+{
+  return mLhs->elem_num();
+}
+
+// @brief 左辺式の要素の取得
+// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+const VlExpr*
+EiDeassignBase::lhs_elem(ymuint pos) const
+{
+  return mLhs->elem(pos);
 }
 
 
@@ -417,7 +454,7 @@ EiDeassignBase::lhs() const
 EiDeassignStmt::EiDeassignStmt(const VlNamedObj* parent,
 			       ElbProcess* process,
 			       const PtStmt* pt_stmt,
-			       ElbExpr* lhs) :
+			       ElbLhs* lhs) :
   EiDeassignBase(parent, process, pt_stmt, lhs)
 {
 }
@@ -426,7 +463,7 @@ EiDeassignStmt::EiDeassignStmt(const VlNamedObj* parent,
 EiDeassignStmt::~EiDeassignStmt()
 {
 }
-  
+
 // @brief このクラスの型を返す．
 tVpiObjType
 EiDeassignStmt::type() const
@@ -456,7 +493,7 @@ EiDeassignStmt::func_exec(bool constant_function) const
 EiReleaseStmt::EiReleaseStmt(const VlNamedObj* parent,
 			     ElbProcess* process,
 			     const PtStmt* pt_stmt,
-			     ElbExpr* lhs) :
+			     ElbLhs* lhs) :
   EiDeassignBase(parent, process, pt_stmt, lhs)
 {
 }
@@ -465,7 +502,7 @@ EiReleaseStmt::EiReleaseStmt(const VlNamedObj* parent,
 EiReleaseStmt::~EiReleaseStmt()
 {
 }
-  
+
 // @brief このクラスの型を返す．
 tVpiObjType
 EiReleaseStmt::type() const

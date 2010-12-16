@@ -21,6 +21,7 @@
 #include "ElbUdp.h"
 #include "ElbPrimitive.h"
 #include "ElbExpr.h"
+#include "ElbLhs.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -61,7 +62,7 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
     add_phase3stub(make_stub(this, &ItemGen::link_gate_delay,
 			     prim_head, pt_delay));
   }
-  
+
   for (ymuint i = 0; i < pt_head->size(); ++ i) {
     const PtInst* pt_inst = pt_head->inst(i);
     const FileRegion& fr = pt_inst->file_region();
@@ -107,7 +108,7 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 							      left, right,
 							      left_val, right_val);
       reg_primarray(prim_array);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, prim_array);
 
@@ -118,7 +119,7 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 	      kMsgInfo,
 	      "ELAB",
 	      buf.str());
-      
+
       add_phase3stub(make_stub(this, &ItemGen::link_prim_array,
 			       prim_array, pt_inst));
     }
@@ -127,7 +128,7 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
       ElbPrimitive* prim = factory().new_Primitive(prim_head,
 						   pt_inst);
       reg_primitive(prim);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, prim);
 
@@ -158,7 +159,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
   ymuint param_size = pa_array.size();
   const PtDelay* pt_delay = pt_head->delay();
   bool has_delay = ( pt_delay || param_size == 1 );
-  
+
   ElbPrimHead* prim_head = factory().new_UdpHead(parent,
 						 pt_head,
 						 udpdefn,
@@ -167,7 +168,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
     add_phase3stub(make_stub(this, &ItemGen::link_udp_delay,
 			     prim_head, pt_head));
   }
-  
+
   for (ymuint i = 0; i < pt_head->size(); ++ i) {
     const PtInst* pt_inst = pt_head->inst(i);
     if ( pt_inst->port_num() > 0 &&
@@ -179,7 +180,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 	      "UDP instance cannot have named port list.");
       continue;
     }
-    
+
     ymuint port_num = pt_inst->port_num();
     if ( udpdefn->port_num() != port_num ) {
       put_msg(__FILE__, __LINE__,
@@ -203,13 +204,13 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 			      left_val, right_val) ) {
 	return;
       }
-      
+
       ElbPrimArray* prim_array = factory().new_PrimitiveArray(prim_head,
 							      pt_inst,
 							      left, right,
 							      left_val, right_val);
       reg_primarray(prim_array);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, prim_array);
 
@@ -221,10 +222,10 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
       ElbPrimitive* primitive = factory().new_Primitive(prim_head,
 							pt_inst);
       reg_primitive(primitive);
-  
+
       // attribute instance の生成
       //instantiate_attribute(pt_head->attr_top(), false, primitive);
-      
+
       add_phase3stub(make_stub(this, &ItemGen::link_primitive,
 			       primitive, pt_inst));
     }
@@ -276,10 +277,10 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 {
   const VlNamedObj* parent = prim_array->parent();
   ymuint arraysize = prim_array->elem_num();
-  
+
   // ポートの情報を得るために先頭の要素を取り出す．
   const VlPrimitive* prim = prim_array->elem_by_offset(0);
-  
+
   ElbEnv env1;
   ElbNetLhsEnv env2(env1);
   for (ymuint index = 0; index < pt_inst->port_num(); ++ index) {
@@ -294,7 +295,7 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 	      "Empty expression in UDP/primitive instance port.");
       continue;
     }
-    
+
     const VlPrimTerm* term = prim->prim_term(index);
     ElbExpr* tmp = NULL;
     if ( term->direction() == kVpiInput ) {
@@ -303,7 +304,12 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
     }
     else {
       // それ以外は左辺式
-      tmp = instantiate_lhs(parent, env2, pt_expr);
+#warning "lhs を捨てている．"
+      ElbLhs* lhs = instantiate_lhs(parent, env2, pt_expr);
+      if ( !lhs ) {
+	continue;
+      }
+      tmp = lhs->_expr();
     }
     if ( !tmp ) {
       continue;
@@ -363,7 +369,7 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
 			const PtInst* pt_inst)
 {
   const VlNamedObj* parent = primitive->parent();
-  
+
   ElbEnv env1;
   ElbNetLhsEnv env2(env1);
   for (ymuint index = 0; index < pt_inst->port_num(); ++ index) {
@@ -382,7 +388,12 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
     }
     else {
       // それ以外は左辺式
-      tmp = instantiate_lhs(parent, env2, pt_expr);
+#warning "lhs を捨てている．"
+      ElbLhs* lhs = instantiate_lhs(parent, env2, pt_expr);
+      if ( !lhs ) {
+	continue;
+      }
+      tmp = lhs->_expr();
     }
     if ( !tmp ) {
       continue;

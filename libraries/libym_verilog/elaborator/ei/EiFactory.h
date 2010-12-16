@@ -335,7 +335,7 @@ public:
   ElbContAssign*
   new_ContAssign(ElbCaHead* head,
 		 const PtBase* pt_obj,
-		 ElbExpr* lhs,
+		 ElbLhs* lhs,
 		 ElbExpr* rhs);
 
   /// @brief net 宣言中の continuous assignment を生成する．
@@ -347,7 +347,7 @@ public:
   ElbContAssign*
   new_ContAssign(const VlModule* module,
 		 const PtBase* pt_obj,
-		 ElbExpr* lhs,
+		 ElbLhs* lhs,
 		 ElbExpr* rhs);
 
   /// @brief パラメータ割り当て文を生成する．
@@ -482,7 +482,7 @@ public:
   new_Assignment(const VlNamedObj* parent,
 		 ElbProcess* process,
 		 const PtStmt* pt_stmt,
-		 ElbExpr* lhs,
+		 ElbLhs* lhs,
 		 ElbExpr* rhs,
 		 bool block,
 		 ElbControl* control = NULL);
@@ -498,7 +498,7 @@ public:
   new_AssignStmt(const VlNamedObj* parent,
 		 ElbProcess* process,
 		 const PtStmt* pt_stmt,
-		 ElbExpr* lhs,
+		 ElbLhs* lhs,
 		 ElbExpr* rhs);
 
   /// @brief deassign ステートメントを生成する．
@@ -511,7 +511,7 @@ public:
   new_DeassignStmt(const VlNamedObj* parent,
 		   ElbProcess* process,
 		   const PtStmt* pt_stmt,
-		   ElbExpr* lhs);
+		   ElbLhs* lhs);
 
   /// @brief force ステートメントを生成する．
   /// @param[in] parent 親のスコープ
@@ -524,7 +524,7 @@ public:
   new_ForceStmt(const VlNamedObj* parent,
 		ElbProcess* process,
 		const PtStmt* pt_stmt,
-		ElbExpr* lhs,
+		ElbLhs* lhs,
 		ElbExpr* rhs);
 
   /// @brief release ステートメントを生成する．
@@ -537,7 +537,7 @@ public:
   new_ReleaseStmt(const VlNamedObj* parent,
 		  ElbProcess* process,
 		  const PtStmt* pt_stmt,
-		  ElbExpr* lhs);
+		  ElbLhs* lhs);
 
   /// @brief begin ブロックを生成する．
   /// @param[in] parent 親のスコープ
@@ -1004,6 +1004,20 @@ public:
   ElbExpr*
   new_ArgHandle(const PtBase* pt_expr,
 		ElbPrimitive* arg);
+
+  /// @brief 単純な左辺式を生成する．
+  /// @param[in] expr 対応する式
+  virtual
+  ElbLhs*
+  new_Lhs(ElbExpr* expr);
+
+  /// @brief 連結演算子の左辺式を生成する．
+  /// @param[in] expr 対応する式
+  /// @param[in] elem_array 要素のベクタ
+  virtual
+  ElbLhs*
+  new_Lhs(ElbExpr* expr,
+	  const vector<ElbExpr*>& elem_array);
 
   /// @brief 遅延値を生成する．
   /// @param[in] pt_obj パース木の定義要素

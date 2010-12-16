@@ -72,6 +72,9 @@ class ElbControl;
 // in ElbExpr.h
 class ElbExpr;
 
+// in ElbLhs.h
+class ElbLhs;
+
 // in ElbDelay.h
 class ElbDelay;
 
