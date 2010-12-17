@@ -41,6 +41,10 @@ public:
   void
   clear();
 
+  /// @brief ID番号の最大値+1を返す．
+  ymuint
+  max_id() const;
+
   /// @brief 登録する(単一要素の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] node 対応するノード
@@ -73,6 +77,15 @@ public:
   MvNode*
   get(const VlDecl* decl,
       ymuint offset) const;
+
+  /// @brief ID番号に対応するノードを登録する．
+  void
+  add_by_id(ymuint id,
+	    MvNode* node);
+
+  /// @brief ID番号に対応するノードを取り出す．
+  MvNode*
+  get_from_id(ymuint id) const;
 
 
 private:

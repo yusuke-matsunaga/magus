@@ -145,10 +145,11 @@ private:
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
 
-  /// @brief プロセス文を登録する．
+  /// @brief プロセス文を生成する．
   /// @param[in] vl_process プロセス文
   bool
-  reg_process(const VlProcess* process);
+  gen_process(MvModule* parent_module,
+	      const VlProcess* process);
 
   /// @brief ステートメントの中身を生成する．
   /// @param[in] module 親のモジュール
@@ -159,25 +160,19 @@ private:
 	   const VlStmt* stmt,
 	   Env& env);
 
-  /// @brief 左辺式に接続する．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] dst_node 左辺に対応するノード
-  /// @param[in] expr 左辺式
-  /// @param[in] offset オフセット
-  /// @param[in] node 右辺に対応するノード
-  void
-  connect_lhs(MvModule* parent_module,
-	      MvNode* dst_node,
-	      const VlExpr* expr,
-	      ymuint offset,
-	      MvNode* node);
-
   /// @brief プリミティブインスタンスの生成を行う．
-  /// @param[in] prim プリミティブ
   /// @param[in] parent_module 親のモジュール
+  /// @param[in] prim プリミティブ
   void
-  gen_priminst(const VlPrimitive* prim,
-	       MvModule* parent_module);
+  gen_priminst(MvModule* parent_module,
+	       const VlPrimitive* prim);
+
+  /// @brief 継続的代入文の生成を行う．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] cont_assign 継続的代入文
+  void
+  gen_cont_assign(MvModule* parent_module,
+		  const VlContAssign* cont_assign);
 
   /// @brief AND のバランス木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -228,13 +223,38 @@ private:
   gen_primary(const VlExpr* expr,
 	      const Env& env);
 
+  /// @brief 右辺式に対応するノードを返す．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] node 右辺式のノード
+  /// @param[in] offset オフセット
+  /// @param[in] bit_width ビット幅
+  /// @note node から [offset: offset + bit_width - 1] の選択するノードを返す．
+  /// @note 全範囲を選択する場合には node を返す．
+  /// @note 範囲が合わなかったら NULL を返す．
+  MvNode*
+  gen_rhs(MvModule* parent_module,
+	  MvNode* node,
+	  ymuint offset,
+	  ymuint bit_width);
+
+  /// @brief 左辺式に接続する．
+  /// @param[in] dst_node 左辺に対応するノード
+  /// @param[in] expr 左辺式
+  /// @param[in] src_node 右辺に対応するノード
+  void
+  connect_lhs(MvNode* dst_node,
+	      const VlExpr* expr,
+	      MvNode* src_node);
+
   /// @brief 環境をマージする．
+  /// @param[in] parent_module 親のモジュール
   /// @param[in] env 対象の環境
   /// @param[in] cond 条件を表すノード
   /// @param[in] then_env 条件が成り立ったときに通るパスの環境
   /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
   void
-  merge_env(Env& env,
+  merge_env(MvModule* parent_module,
+	    Env& env,
 	    MvNode* cond,
 	    const Env& then_env,
 	    const Env& else_env);
@@ -342,9 +362,6 @@ private:
 
   // トップレベルの環境
   Env mGlobalEnv;
-
-  // always 文の本体を登録しておくリスト
-  list<const VlStmt*> mProcessList;
 
   // MvNode の ID番号をキーとして VlDecl の情報を保持する配列．
   vector<pair<const VlDecl*, ymuint> > mNodeMap;

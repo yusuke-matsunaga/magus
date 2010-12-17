@@ -42,6 +42,13 @@ Env::clear()
   mNodeArray.resize(mDeclHash.max_id());
 }
 
+// @brief ID番号の最大値+1を返す．
+ymuint
+Env::max_id() const
+{
+  return mDeclHash.max_id();
+}
+
 // @brief 登録する(単一要素の場合)
 // @param[in] decl 宣言要素
 // @param[in] node 対応するノード
@@ -119,6 +126,21 @@ Env::get(const VlDecl* decl,
     return NULL;
   }
   return tmp[offset];
+}
+
+// @brief ID番号に対応するノードを登録する．
+void
+Env::add_by_id(ymuint id,
+	       MvNode* node)
+{
+  mNodeArray[id][0] = node;
+}
+
+// @brief ID番号に対応するノードを取り出す．
+MvNode*
+Env::get_from_id(ymuint id) const
+{
+  return mNodeArray[id][0];
 }
 
 END_NAMESPACE_YM_MVN_VERILOG
