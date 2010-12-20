@@ -13,6 +13,7 @@
 
 #include "MagMgr.h"
 #include "MvnReadVerilog.h"
+#include "MvnWriteVerilog.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -29,6 +30,8 @@ mvn_init(Tcl_Interp* interp,
   // ネットワークのファイル入出力コマンド
   TclCmdBinder1<MvnReadVerilog, MagMgr*>::reg(interp, mgr,
 					      "magus::mvn::read_verilog");
+  TclCmdBinder1<MvnWriteVerilog, MagMgr*>::reg(interp, mgr,
+					       "magus::mvn::write_verilog");
 
   //////////////////////////////////////////////////////////////////////
   // tclreadline 用の処理
@@ -39,6 +42,7 @@ mvn_init(Tcl_Interp* interp,
     "namespace eval magus {\n"
     "namespace eval mvn {\n"
     "proc complete(read_verilog) { t s e l p m } { return \"\" }\n"
+    "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n"
     "}\n";
