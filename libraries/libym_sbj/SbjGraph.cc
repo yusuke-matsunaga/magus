@@ -143,6 +143,9 @@ SbjGraph::copy(const SbjGraph& src,
   nodemap.clear();
   nodemap.resize(n);
 
+  // 名前のコピー
+  mName = src.mName;
+
   // 外部入力の生成
   const SbjNodeList& input_list = src.input_list();
   for (SbjNodeList::const_iterator p = input_list.begin();
