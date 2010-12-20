@@ -143,11 +143,7 @@ dump(ostream& s,
     const MvModule* module = mgr.module(i);
     if ( module == NULL ) continue;
 
-    s << "Module#" << module->id() << "(";
-    if ( module->name() ) {
-      s << module->name();
-    }
-    s << ")" << endl;
+    s << "Module#" << module->id() << "(" << module->name() << ")" << endl;
     const MvNode* pnode = module->parent();
     if ( pnode ) {
       s << "  parent node: Module#" << pnode->parent()->id()
@@ -160,11 +156,7 @@ dump(ostream& s,
     ymuint np = module->port_num();
     for (ymuint j = 0; j < np; ++ j) {
       const MvPort* port = module->port(j);
-      s << "  Port#" << j << "(";
-      if ( port->name() ) {
-	s << port->name();
-      }
-      s << ")" << endl;
+      s << "  Port#" << j << "(" << port->name() << ")" << endl;
       ymuint n = port->port_ref_num();
       for (ymuint k = 0; k < n; ++ k) {
 	const MvPortRef* port_ref = port->port_ref(k);
