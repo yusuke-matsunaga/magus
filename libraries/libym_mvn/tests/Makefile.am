@@ -28,7 +28,8 @@ LIBYM_MVN = ../libym_mvn.la
 
 noinst_PROGRAMS = \
 	makenode_test \
-	read_test
+	read_test \
+	conv2sbj_test
 
 makenode_test_SOURCES = \
 	makenode_test.cc
@@ -40,4 +41,10 @@ read_test_SOURCES = \
 	read_test.cc
 
 read_test_LDADD = \
+	$(LIBYM_MVN)
+
+conv2sbj_test_SOURCES = \
+	conv2sbj_test.cc
+
+conv2sbj_test_LDADD = \
 	$(LIBYM_MVN)
