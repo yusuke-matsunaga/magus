@@ -89,7 +89,7 @@ ReadBlif::~ReadBlif()
 int
 ReadBlif::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名を引数としてとる．
   if ( objc != 2 ) {
@@ -170,7 +170,7 @@ ReadIscas89::~ReadIscas89()
 int
 ReadIscas89::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名を引数としてとる．
   if ( objc != 2 ) {
@@ -223,7 +223,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 WriteBlif::WriteBlif(MagMgr* mgr) :
-  BNetCmd(mgr)
+  BNetCmd(mgr, false)
 {
   set_usage_string("?<filename>?");
 }
@@ -237,12 +237,12 @@ WriteBlif::~WriteBlif()
 int
 WriteBlif::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名のみを引数に取る．
   // 引数がなければ標準出力に出す．
   bool map = false;
-  size_t base = 1;
+  ymuint base = 1;
   if ( objc > 1 && string(objv[1]) == "-n" ) {
     map = true;
     base = 2;
@@ -306,7 +306,7 @@ WriteEqu::~WriteEqu()
 int
 WriteEqu::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // 引き数の数をチェックする．
   if( objc > 2 ){

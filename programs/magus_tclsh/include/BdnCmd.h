@@ -29,7 +29,10 @@ class BdnCmd :
 public:
 
   /// @brief コンストラクタ
-  BdnCmd(MagMgr* mgr);
+  /// @param[in] mgr Magus の管理オブジェクト
+  /// @param[in] new_bdn_enable -new_bnet オプションを使用するとき true
+  BdnCmd(MagMgr* mgr,
+	 bool new_bdn_enable = true);
 
   /// @brief デストラクタ
   virtual
@@ -54,20 +57,11 @@ protected:
 
   /// @brief コマンド行の引数をパーズする関数．
   /// @param[in] objv 引数の配列
-  /// objv で与えられるコマンド行引数のうちで，
-  /// -network <network名> | -nwk <network名>
-  /// の形のオプションがあればカレントネットワークのスタックに積む．
-  /// その場合には mNetworkSpecified のフラグに true がセットされる．
-  /// objv からはこれらのオプション文字列が削除される．
-  /// エラーが起きた時にはメッセージをインタプリタにセットして TCL_ERROR
-  /// を返す．
   virtual
   int
   before_cmd_proc(TclObjVector& objv);
 
   /// @brief コマンド処理関数の後で実行される関数
-  /// before_cmd_proc() で退避されたカレントネットワーク，
-  /// カレントライブラリを元に戻す．
   virtual
   void
   after_cmd_proc();

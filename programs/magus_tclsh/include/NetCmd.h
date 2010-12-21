@@ -28,7 +28,14 @@ class NetCmd :
 public:
 
   /// @brief コンストラクタ
-  NetCmd(MagMgr* mgr);
+  /// @param[in] mgr Magus の管理オブジェクト
+  /// @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
+  /// @param[in] new_bdn_enable -new_bdn オプションを使用するとき true
+  /// @param[in] new_mvn_enable -new_mvn オプションを使用するとき true
+  NetCmd(MagMgr* mgr,
+	 bool new_bnet_enable = true,
+	 bool new_bdn_enable = true,
+	 bool new_mvn_enable = true);
 
   /// @brief デストラクタ
   virtual

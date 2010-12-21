@@ -29,7 +29,10 @@ class BNetCmd :
 public:
 
   /// @brief コンストラクタ
-  BNetCmd(MagMgr* mgr);
+  /// @param[in] mgr Magus の管理オブジェクト
+  /// @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
+  BNetCmd(MagMgr* mgr,
+	  bool new_bnet_enable = true);
 
   /// @brief デストラクタ
   virtual

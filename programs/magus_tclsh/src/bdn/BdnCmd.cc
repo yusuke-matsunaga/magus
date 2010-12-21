@@ -20,8 +20,10 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-BdnCmd::BdnCmd(MagMgr* mgr) :
-  NetCmd(mgr)
+// @param[in] new_bdn_enable -new_bnet オプションを使用するとき true
+BdnCmd::BdnCmd(MagMgr* mgr,
+	       bool new_bdn_enable) :
+  NetCmd(mgr, false, new_bdn_enable, false)
 {
 }
 
@@ -46,28 +48,13 @@ BdnCmd::cur_network() const
 int
 BdnCmd::before_cmd_proc(TclObjVector& objv)
 {
-  if ( popt_new_bnet()->is_specified() ) {
-    TclObj emsg;
-    emsg << "-" << popt_new_bnet()->opt_str()
-	 << " : Illegal option";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
-  if ( popt_new_mvn()->is_specified() ) {
-    TclObj emsg;
-    emsg << "-" << popt_new_mvn()->opt_str()
-	 << " : Illegal option";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
-
-  NetCmd::before_cmd_proc(objv);
-
-  if ( cur_nethandle()->type() != NetHandle::kMagBdn ) {
-    TclObj emsg;
-    emsg << "Network type mismatch. BdNetwork type assumed.";
-    set_result(emsg);
-    return TCL_ERROR;
+  if ( NetCmd::before_cmd_proc(objv) == TCL_OK ) {
+    if ( cur_nethandle()->type() != NetHandle::kMagBdn ) {
+      TclObj emsg;
+      emsg << "Network type mismatch. BdNetwork type assumed.";
+      set_result(emsg);
+      return TCL_ERROR;
+    }
   }
 
   return TCL_OK;

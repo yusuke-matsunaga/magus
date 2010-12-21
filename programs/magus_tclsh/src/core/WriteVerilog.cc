@@ -13,6 +13,7 @@
 
 #include "ym_bnet/BNetVerilogWriter.h"
 #include "ym_mvn/MvMgr.h"
+#include "ym_tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -23,7 +24,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 WriteVerilog::WriteVerilog(MagMgr* mgr) :
-  NetCmd(mgr)
+  NetCmd(mgr, false, false, false)
 {
   set_usage_string("?<filename>?");
 }

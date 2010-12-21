@@ -20,8 +20,9 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MvnCmd::MvnCmd(MagMgr* mgr) :
-  NetCmd(mgr)
+MvnCmd::MvnCmd(MagMgr* mgr,
+	       bool new_mvn_enable) :
+  NetCmd(mgr, false, false, new_mvn_enable)
 {
 }
 
@@ -46,28 +47,13 @@ MvnCmd::cur_network() const
 int
 MvnCmd::before_cmd_proc(TclObjVector& objv)
 {
-  if ( popt_new_bnet()->is_specified() ) {
-    TclObj emsg;
-    emsg << "-" << popt_new_bnet()->opt_str()
-	 << " : Illegal option";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
-  if ( popt_new_bdn()->is_specified() ) {
-    TclObj emsg;
-    emsg << "-" << popt_new_bdn()->opt_str()
-	 << " : Illegal option";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
-
-  NetCmd::before_cmd_proc(objv);
-
-  if ( cur_nethandle()->type() != NetHandle::kMagMvn ) {
-    TclObj emsg;
-    emsg << "Network type mismatch. MvNetwork type assumed.";
-    set_result(emsg);
-    return TCL_ERROR;
+  if ( NetCmd::before_cmd_proc(objv) == TCL_OK ) {
+    if ( cur_nethandle()->type() != NetHandle::kMagMvn ) {
+      TclObj emsg;
+      emsg << "Network type mismatch. MvNetwork type assumed.";
+      set_result(emsg);
+      return TCL_ERROR;
+    }
   }
 
   return TCL_OK;

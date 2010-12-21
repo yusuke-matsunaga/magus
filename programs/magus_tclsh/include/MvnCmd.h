@@ -29,7 +29,10 @@ class MvnCmd :
 public:
 
   /// @brief コンストラクタ
-  MvnCmd(MagMgr* mgr);
+  /// @param[in] mgr Magus の管理オブジェクト
+  /// @param[in] new_mvn_enable -new_mvn オプションを使用するとき true
+  MvnCmd(MagMgr* mgr,
+	 bool new_mvn_enable = true);
 
   /// @brief デストラクタ
   virtual
