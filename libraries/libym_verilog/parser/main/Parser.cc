@@ -500,23 +500,17 @@ Parser::flush_declitem_list(PtrList<PtiDeclHead, PtDeclHead>& head_list)
 void
 Parser::init_tf()
 {
-  push_iohead_list();
-  push_paramhead_list();
-  push_declhead_list();
-  push_item_list();
-
-  mCurIOHeadList = &mTfIOHeadList;
-  mCurParamHeadList = &mTfParamHeadList;
-  mCurLparamHeadList = &mTfLparamHeadList;
-  mCurDeclHeadList = &mTfDeclHeadList;
+  push_iohead_list(&mTfIOHeadList);
+  push_paramhead_list(&mTfParamHeadList, &mTfLparamHeadList);
+  push_declhead_list(&mTfDeclHeadList);
 
   mCurIOHeadList->clear();
   mIOItemList.clear();
 
   mCurParamHeadList->clear();
   mCurLparamHeadList->clear();
-  mCurDeclHeadList->clear();
 
+  mCurDeclHeadList->clear();
   mDeclItemList.clear();
 }
 
@@ -526,30 +520,23 @@ Parser::end_tf()
 {
   pop_iohead_list();
   pop_paramhead_list();
-  pop_declhead_list();
-  pop_item_list();
+  pop_declhead_list(false);
 }
 
 // @brief generate block の開始
 void
 Parser::init_generate()
 {
-  push_declhead_list();
-  push_item_list();
-
-  mCurDeclHeadList = new_declhead_list();
-  mCurItemList = new_item_list();
+  push_declhead_list(new_declhead_list());
+  push_item_list(new_item_list());
 }
 
 // @brief generate block の終了
 void
 Parser::end_generate()
 {
-  delete_declhead_list(mCurDeclHeadList);
-  delete_item_list(mCurItemList);
-
-  pop_declhead_list();
-  pop_item_list();
+  pop_declhead_list(true);
+  pop_item_list(true);
 }
 
 // @brief generate-if の then 節の開始
@@ -559,14 +546,11 @@ Parser::init_genif()
   mThenDeclHeadListStack.push_back(mCurThenDeclHeadList);
   mThenItemListStack.push_back(mCurThenItemList);
 
-  push_declhead_list();
-  push_item_list();
-
   mCurThenDeclHeadList = new_declhead_list();
   mCurThenItemList = new_item_list();
 
-  mCurThenDeclHeadList = mCurThenDeclHeadList;
-  mCurItemList = mCurThenItemList;
+  push_declhead_list(mCurThenDeclHeadList);
+  push_item_list(mCurThenItemList);
 }
 
 // @brief generate-if の else 節の開始
@@ -599,8 +583,8 @@ Parser::end_genif()
   delete_declhead_list(mCurElseDeclHeadList);
   delete_item_list(mCurElseItemList);
 
-  pop_declhead_list();
-  pop_item_list();
+  pop_declhead_list(false);
+  pop_item_list(false);
 
   mCurElseDeclHeadList = mElseDeclHeadListStack.back();
   mElseDeclHeadListStack.pop_back();
@@ -613,18 +597,14 @@ Parser::end_genif()
 void
 Parser::init_block()
 {
-  push_declhead_list();
-
-  mCurDeclHeadList = new_declhead_list();
+  push_declhead_list(new_declhead_list());
 }
 
 // @brief block-statement の終了
 void
 Parser::end_block()
 {
-  delete_declhead_list(mCurDeclHeadList);
-
-  pop_declhead_list();
+  pop_declhead_list(true);
 }
 
 // @brief defparam リストを初期化する．

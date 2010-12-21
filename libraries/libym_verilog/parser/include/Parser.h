@@ -2422,9 +2422,19 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ型の定義
+  //////////////////////////////////////////////////////////////////////
 
+  typedef PtrList<PtiIOHead, PtIOHead> PtIOHeadList;
   typedef PtrList<PtiDeclHead, PtDeclHead> PtDeclHeadList;
   typedef PtrList<PtItem, PtItem> PtItemList;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 宣言要素リストを最後の宣言ヘッダにセットする．
   void
@@ -2447,36 +2457,44 @@ private:
   delete_item_list(PtItemList* list);
 
   /// @brief 現在の iohead リストをスタックに積む．
+  /// @param[in] new_iohead 新しく設定する iohead
   void
-  push_iohead_list();
+  push_iohead_list(PtIOHeadList* new_iohead);
 
   /// @brief スタックの末尾を iohead リストに戻す．
   void
   pop_iohead_list();
 
   /// @brief 現在の paramhead リストをスタックに積む．
+  /// @param[in] new_paramhead 新しく設定する paramhead
+  /// @param[in] new_lparamhead 新しく設定する lparamhead
   void
-  push_paramhead_list();
+  push_paramhead_list(PtDeclHeadList* new_paramhead,
+		      PtDeclHeadList* new_lparamhead);
 
   // @brief スタックの末尾を paramhead リストに戻す．
   void
   pop_paramhead_list();
 
   /// @brief 現在の declhead リストをスタックに積む．
+  /// @param[in] new_declhead 新しく設定する declhead
   void
-  push_declhead_list();
+  push_declhead_list(PtDeclHeadList* new_declhead);
 
   /// @brief スタックの末尾を declhead リストに戻す．
+  /// @param[in] delete_top true なら昔の declhead を削除する．
   void
-  pop_declhead_list();
+  pop_declhead_list(bool delete_top);
 
   /// @brief 現在の item リストをスタックに積む．
+  /// @param[in] new_item 新しく設定する item リスト
   void
-  push_item_list();
+  push_item_list(PtItemList* new_item);
 
   /// @brief スタックの末尾を item リストに戻す．
+  /// @param[in] delete_top true なら昔の declhead を削除する．
   void
-  pop_item_list();
+  pop_item_list(bool delete_top);
 
 
 private:
@@ -2521,10 +2539,10 @@ public:
   PtDeclHeadList mParamPortHeadList;
 
   // モジュール用 IO宣言ヘッダリスト
-  PtrList<PtiIOHead, PtIOHead> mModuleIOHeadList;
+  PtIOHeadList mModuleIOHeadList;
 
   // task/function 用 IO宣言ヘッダリスト
-  PtrList<PtiIOHead, PtIOHead> mTfIOHeadList;
+  PtIOHeadList mTfIOHeadList;
 
   // モジュール用の parameter 宣言ヘッダリスト
   PtDeclHeadList mModuleParamHeadList;
@@ -2576,7 +2594,7 @@ public:
 
   // 現在の IO宣言ヘッダリスト
   // 実際には mModuleIOHeadList か mTfIOHeadList を指す．
-  PtrList<PtiIOHead, PtIOHead>* mCurIOHeadList;
+  PtIOHeadList* mCurIOHeadList;
 
   // 現在の parameter 宣言ヘッダリスト
   PtDeclHeadList* mCurParamHeadList;
@@ -2591,13 +2609,13 @@ public:
   PtItemList* mCurItemList;
 
   // 現在の then 宣言ヘッダリスト
-  PtrList<PtiDeclHead, PtDeclHead>* mCurThenDeclHeadList;
+  PtDeclHeadList* mCurThenDeclHeadList;
 
   // 現在の then item リスト
   PtItemList* mCurThenItemList;
 
   // 現在の else 宣言ヘッダリスト
-  PtrList<PtiDeclHead, PtDeclHead>* mCurElseDeclHeadList;
+  PtDeclHeadList* mCurElseDeclHeadList;
 
   // 現在の else item リスト
   PtItemList* mCurElseItemList;
@@ -2609,7 +2627,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   // IO 宣言ヘッダリストのスタック
-  vector<PtrList<PtiIOHead, PtIOHead>*> mIOHeadListStack;
+  vector<PtIOHeadList*> mIOHeadListStack;
 
   // parameter 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mParamHeadListStack;
@@ -2797,11 +2815,13 @@ Parser::delete_item_list(PtItemList* list)
 }
 
 // @brief 現在の iohead リストをスタックに積む．
+// @param[in] new_iohead 新しく設定する iohead
 inline
 void
-Parser::push_iohead_list()
+Parser::push_iohead_list(PtIOHeadList* new_iohead)
 {
   mIOHeadListStack.push_back(mCurIOHeadList);
+  mCurIOHeadList = new_iohead;
 }
 
 // @brief スタックの末尾を iohead リストに戻す．
@@ -2814,12 +2834,18 @@ Parser::pop_iohead_list()
 }
 
 // @brief 現在の paramhead リストをスタックに積む．
+// @param[in] new_paramhead 新しく設定する paramhead
+// @param[in] new_lparamhead 新しく設定する lparamhead
 inline
 void
-Parser::push_paramhead_list()
+Parser::push_paramhead_list(PtDeclHeadList* new_paramhead,
+			    PtDeclHeadList* new_lparamhead)
 {
   mParamHeadListStack.push_back(mCurParamHeadList);
   mLparamHeadListStack.push_back(mCurLparamHeadList);
+
+  mCurParamHeadList = new_paramhead;
+  mCurLparamHeadList = new_lparamhead;
 }
 
 // @brief スタックの末尾を paramhead リストに戻す．
@@ -2835,35 +2861,47 @@ Parser::pop_paramhead_list()
 }
 
 // @brief 現在の declhead リストをスタックに積む．
+// @param[in] new_declhead 新しく設定する declhead
 inline
 void
-Parser::push_declhead_list()
+Parser::push_declhead_list(PtDeclHeadList* new_declhead)
 {
   mDeclHeadListStack.push_back(mCurDeclHeadList);
+  mCurDeclHeadList = new_declhead;
 }
 
 // @brief スタックの末尾を declhead リストに戻す．
+// @param[in] delete_top true なら昔の declhead を削除する．
 inline
 void
-Parser::pop_declhead_list()
+Parser::pop_declhead_list(bool delete_top)
 {
+  if ( delete_top ) {
+    delete mCurDeclHeadList;
+  }
   mCurDeclHeadList = mDeclHeadListStack.back();
   mDeclHeadListStack.pop_back();
 }
 
 // @brief 現在の item リストをスタックに積む．
+// @param[in] new_item 新しく設定する item リスト
 inline
 void
-Parser::push_item_list()
+Parser::push_item_list(PtItemList* new_item)
 {
   mItemListStack.push_back(mCurItemList);
+  mCurItemList = new_item;
 }
 
 // @brief スタックの末尾を item リストに戻す．
+// @param[in] delete_top true なら昔の item を削除する．
 inline
 void
-Parser::pop_item_list()
+Parser::pop_item_list(bool delete_top)
 {
+  if ( delete_top ) {
+    delete mCurItemList;
+  }
   mCurItemList = mItemListStack.back();
   mItemListStack.pop_back();
 }
