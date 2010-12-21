@@ -39,7 +39,6 @@ bnet_init(Tcl_Interp* interp,
   TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr, "magus::read_iscas89");
   TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr, "magus::write_blif");
   TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
-  TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr, "magus::write_verilog");
 
   // ネットワーク上での処理コマンド(その2)
   TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
@@ -92,7 +91,6 @@ bnet_init(Tcl_Interp* interp,
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(write_equ) { t s e l p m } { return \"\" }\n"
-    "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
     "proc complete(eliminate) { t s e l p m } { return \"\" }\n"
     "proc complete(sweep) { t s e l p m } { return \"\" }\n"
     "proc complete(clean_up) { t s e l p m } { return \"\" }\n"

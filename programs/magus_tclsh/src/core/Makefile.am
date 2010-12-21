@@ -52,4 +52,6 @@ libmagus_core_tcl_la_SOURCES = \
 	ListNetwork.cc \
 	ForNetwork.h \
 	ForNetwork.cc \
+	WriteVerilog.h \
+	WriteVerilog.cc \
 	core_init.cc

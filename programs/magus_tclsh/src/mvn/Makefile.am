@@ -20,6 +20,4 @@ libmagus_mvn_tcl_la_SOURCES = \
 	MvnCmd.cc \
 	MvnReadVerilog.h \
 	MvnReadVerilog.cc \
-	MvnWriteVerilog.h \
-	MvnWriteVerilog.cc \
 	mvn_init.cc
