@@ -1,8 +1,8 @@
-#ifndef MAGUS_MVNCMD_H
-#define MAGUS_MVNCMD_H
+#ifndef MAGUS_NETCMD_H
+#define MAGUS_NETCMD_H
 
-/// @file MvnCmd.h
-/// @brief MvnCmd のヘッダファイル
+/// @file NetCmd.h
+/// @brief NetCmd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,28 +12,27 @@
 /// All rights reserved.
 
 
-#include "NetCmd.h"
-#include "ym_mvn/mvn_nsdef.h"
+#include "MagCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class MvnCmd MvnCmd.h "MvnCmd.h"
+/// @class NetCmd NetCmd.h "NetCmd.h"
 /// @ingroup MagusGroup
-/// @brief MvNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
+/// @brief -network オプションを取る Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
-class MvnCmd :
-  public NetCmd
+class NetCmd :
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  MvnCmd(MagMgr* mgr);
+  NetCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~MvnCmd();
+  ~NetCmd();
 
 
 protected:
@@ -41,10 +40,17 @@ protected:
   // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief カレントネットワークの取得
-  /// @note カレントネットワークが MvNetwork でない場合には NULL を返す．
-  MvMgr*
-  cur_network() const;
+  /// @brief new_bnet オプション用の解析オブジェクトを得る．
+  TclPoptObj*
+  popt_new_bnet();
+
+  /// @brief new_bdn オプション用の解析オブジェクトを得る．
+  TclPoptObj*
+  popt_new_bdn();
+
+  /// @brief new_mvn オプション用の解析オブジェクトを得る．
+  TclPoptObj*
+  popt_new_mvn();
 
 
 protected:
@@ -72,8 +78,29 @@ protected:
   void
   after_cmd_proc();
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // メンバ変数
+  //////////////////////////////////////////////////////////////////////
+
+  // network オプションを解析するオブジェクト
+  TclPoptObj* mPoptNtwk;
+
+  // new_bnet オプションを解析するオブジェクト
+  TclPoptObj* mPoptNewBNet;
+
+  // new_bdn オプションを解析するオブジェクト
+  TclPoptObj* mPoptNewBdn;
+
+  // new_mvn オプションを解析するオブジェクト
+  TclPoptObj* mPoptNewMvn;
+
+  // コマンドラインでネットワークの指定が行われたかを示すフラグ
+  bool mNetworkSpecified;
+
 };
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_MVNCMD_H
+#endif // MAGUS_MAGNETCMD_H

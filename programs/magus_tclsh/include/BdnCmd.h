@@ -1,8 +1,8 @@
-#ifndef MAGUS_MAGBDNCMD_H
-#define MAGUS_MAGBDNCMD_H
+#ifndef MAGUS_BDNCMD_H
+#define MAGUS_BDNCMD_H
 
-/// @file MagBdnCmd.h
-/// @brief MagBdnCmd のヘッダファイル
+/// @file BdnCmd.h
+/// @brief BdnCmd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,28 +12,28 @@
 /// All rights reserved.
 
 
-#include "MagCmd.h"
+#include "NetCmd.h"
 #include "ym_bdn/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class MagBdnCmd MagBdnCmd.h "MagBdnCmd.h"
+/// @class BdnCmd BdnCmd.h "BdnCmd.h"
 /// @ingroup MagusGroup
 /// @brief BdNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
-class MagBdnCmd :
-  public MagCmd
+class BdnCmd :
+  public NetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  MagBdnCmd(MagMgr* mgr);
+  BdnCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
-  ~MagBdnCmd();
+  ~BdnCmd();
 
 
 protected:
@@ -71,21 +71,6 @@ protected:
   virtual
   void
   after_cmd_proc();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // メンバ変数
-  //////////////////////////////////////////////////////////////////////
-
-  // network オプションを解析するオブジェクト
-  TclPoptObj* mPoptNtwk;
-
-  // new_network オプションを解析するオブジェクト
-  TclPoptObj* mPoptNewNtwk;
-
-  // コマンドラインでネットワークの指定が行われたかを示すフラグ
-  bool mNetworkSpecified;
 
 };
 

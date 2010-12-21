@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 WriteVerilog::WriteVerilog(MagMgr* mgr) :
-  MagCmd(mgr)
+  NetCmd(mgr)
 {
   set_usage_string("?<filename>?");
 }

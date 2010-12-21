@@ -46,7 +46,7 @@ protected:
   // 継承クラスが用いる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief -new_bnet, -new_bdn オプションの処理を行う．
+  /// @brief -new_bnet, -new_bdn -new_mvn オプションの処理を行う．
   /// @param[in] name ネットワーク名
   int
   new_opt(string name);

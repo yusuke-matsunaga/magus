@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "MagCmd.h"
+#include "NetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief ファイルに Verilog 形式で書き出すコマンド
 //////////////////////////////////////////////////////////////////////
 class WriteVerilog :
-  public MagCmd
+  public NetCmd
 {
 public:
 

@@ -28,6 +28,7 @@ libmagus_core_tcl_la_SOURCES = \
 	MvnHandle.h \
 	MvnHandle.cc \
 	MagCmd.cc \
+	NetCmd.cc \
 	NewBNetwork.h \
 	NewBNetwork.cc \
 	NewBdn.h \
