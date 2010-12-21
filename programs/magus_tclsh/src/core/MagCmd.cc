@@ -156,6 +156,10 @@ MagCmd::find_or_new_nethandle(const string& name,
       neth = new_bdnhandle(name);
       break;
 
+    case NetHandle::kMagMvn:
+      neth = new_mvnhandle(name);
+      break;
+
     default:
       assert_not_reached(__FILE__, __LINE__);
       break;
