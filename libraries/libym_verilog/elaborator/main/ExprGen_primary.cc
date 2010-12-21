@@ -301,7 +301,7 @@ ExprGen::find_const_handle(const VlNamedObj* parent,
   // handle が持つオブジェクトは genvar か parameter でなければならない．
   if ( handle->genvar() == NULL ) {
     ElbDecl* decl = handle->decl();
-    if ( decl == NULL || decl->type() == kVpiParameter ) {
+    if ( decl == NULL || decl->type() != kVpiParameter ) {
       error_not_a_parameter(pt_expr);
       return NULL;
     }
