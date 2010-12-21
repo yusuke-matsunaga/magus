@@ -537,8 +537,8 @@ Parser::init_generate()
   push_declhead_list();
   push_item_list();
 
-  new_declhead_list();
-  new_item_list();
+  mCurDeclHeadList = new_declhead_list();
+  mCurItemList = new_item_list();
 }
 
 // @brief generate block の終了
