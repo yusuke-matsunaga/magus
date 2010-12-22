@@ -10,6 +10,7 @@
 
 
 #include "Parser.h"
+#include "Parser_item.h"
 
 #include "PtiFactory.h"
 #include "PuHierName.h"
@@ -17,6 +18,7 @@
 #include "PtMgr.h"
 
 #include "ym_verilog/pt/PtStmt.h"
+#include "ym_verilog/pt/PtItem.h"
 
 
 const int debug = 0;
@@ -370,6 +372,183 @@ Parser::extract_HierName(PuHierName* hname,
   return ans;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// generate 文の生成
+//////////////////////////////////////////////////////////////////////
+
+// @brief generate 文の生成
+// @param[in] fr ファイル位置の情報
+void
+Parser::new_Generate(const FileRegion& fr,
+		     PtrList<PtAttrInst>* ai_list)
+{
+  PtItem* item = mFactory.new_Generate(fr, get_decl_array(), get_item_array());
+  reg_attrinst(item, ai_list);
+  end_generate();
+  add_item(item);
+}
+
+// @brief generate block 文の生成
+// @param[in] fr ファイル位置の情報
+void
+Parser::new_GenBlock(const FileRegion& fr)
+{
+  PtItem* item = mFactory.new_GenBlock(fr, get_decl_array(), get_item_array());
+  end_generate();
+  add_item(item);
+}
+
+// @brief 名前付き generate block 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] name 名前
+void
+Parser::new_GenBlock(const FileRegion& fr,
+		     const char* name)
+{
+  PtItem* item = mFactory.new_GenBlock(fr, name,
+				       get_decl_array(), get_item_array());
+  end_generate();
+  add_item(item);
+}
+
+// @brief generate if 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] cond 条件を表す式
+void
+Parser::new_GenIf(const FileRegion& fr,
+		  PtExpr* cond)
+{
+  PtItem* item = mFactory.new_GenIf(fr, cond,
+				    get_then_decl_array(),
+				    get_then_item_array(),
+				    PtDeclHeadArray(),
+				    PtItemArray());
+  end_genif();
+  add_item(item);
+}
+
+// @brief generate if 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] cond 条件を表す式
+void
+Parser::new_GenIfElse(const FileRegion& fr,
+		      PtExpr* cond)
+{
+  PtItem* item = mFactory.new_GenIf(fr, cond,
+				    get_then_decl_array(),
+				    get_then_item_array(),
+				    get_else_decl_array(),
+				    get_else_item_array());
+  end_genif();
+  add_item(item);
+}
+
+// @brief generate-if 文の then 節の宣言リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_then_decl_array()
+{
+  flush_declitem_list(*mCurDeclHeadList);
+  return mCurThenDeclHeadList->to_array(mAlloc);
+}
+
+// @brief generate-if 文の else 節の宣言リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_else_decl_array()
+{
+  flush_declitem_list(*mCurDeclHeadList);
+  return mCurElseDeclHeadList->to_array(mAlloc);
+}
+
+// @brief generate-if 文の then 節の item リストを配列に変換する．
+inline
+PtItemArray
+Parser::get_then_item_array()
+{
+  return mCurThenItemList->to_array(mAlloc);
+}
+
+// @brief generate-if 文の else 節の item リストを配列に変換する．
+inline
+PtItemArray
+Parser::get_else_item_array()
+{
+  return mCurElseItemList->to_array(mAlloc);
+}
+
+// @brief generate case 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] expr 選択式
+// @param[in] item_list generate case item のリスト
+void
+Parser::new_GenCase(const FileRegion& fr,
+		    PtExpr* expr,
+		    PtrList<PtGenCaseItem>* item_list)
+{
+  add_item( mFactory.new_GenCase(fr, expr, to_array(item_list)) );
+}
+
+// @brief generate case の要素の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] label_list 比較式のリスト
+// @return 生成された generate case item
+PtGenCaseItem*
+Parser::new_GenCaseItem(const FileRegion& fr,
+			PtrList<PtExpr>* label_list)
+{
+  PtGenCaseItem* item = mFactory.new_GenCaseItem(fr,
+						 to_array(label_list),
+						 get_decl_array(),
+						 get_item_array());
+  end_generate();
+  return item;
+}
+
+// @brief generate for 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] loop_var ループ変数
+// @param[in] init_expr 初期化式
+// @param[in] cond ループ条件式
+// @param[in] inc_var 増加式の左辺の変数
+// @param[in] inc_expr 増加式
+// @param[in] block_name ブロック名
+// @param[in] decl_array 宣言のリスト
+// @param[in] item_array 要素のリスト
+void
+Parser::new_GenFor(const FileRegion& fr,
+		   const char* loop_var,
+		   PtExpr* init_expr,
+		   PtExpr* cond,
+		   const char* inc_var,
+		   PtExpr* inc_expr,
+		   const char* block_name)
+{
+  if ( strcmp(loop_var, inc_var) != 0 ) {
+    end_generate();
+    ostringstream buf;
+    buf << "Lhs of the increment statement ("
+	<< inc_var
+	<< ") does not match with Lhs of the initial statement ("
+	<< loop_var
+	<< ")";
+    put_msg(__FILE__, __LINE__,
+	    fr,
+	    kMsgError,
+	    "PARSER",
+	    buf.str());
+  }
+
+  PtItem* item = mFactory.new_GenFor(fr, loop_var,
+				     init_expr, cond, inc_expr,
+				     block_name,
+				     get_decl_array(),
+				     get_item_array());
+  add_item(item);
+  end_generate();
+}
+
 // @brief モジュール定義の開始
 // - port list の初期化
 // - paramport list の初期化
@@ -527,8 +706,8 @@ Parser::end_tf()
 void
 Parser::init_generate()
 {
-  push_declhead_list(new_declhead_list());
-  push_item_list(new_item_list());
+  push_declhead_list(NULL);
+  push_item_list(NULL);
 }
 
 // @brief generate block の終了
@@ -543,48 +722,45 @@ Parser::end_generate()
 void
 Parser::init_genif()
 {
+  push_declhead_list(NULL);
+  push_item_list(NULL);
+
   mThenDeclHeadListStack.push_back(mCurThenDeclHeadList);
   mThenItemListStack.push_back(mCurThenItemList);
 
-  mCurThenDeclHeadList = new_declhead_list();
-  mCurThenItemList = new_item_list();
-
-  push_declhead_list(mCurThenDeclHeadList);
-  push_item_list(mCurThenItemList);
+  mCurThenDeclHeadList = mCurDeclHeadList;
+  mCurThenItemList = mCurItemList;
 }
 
 // @brief generate-if の else 節の開始
 void
 Parser::init_else()
 {
+  pop_declhead_list(true);
+  pop_item_list(true);
+
+  push_declhead_list(NULL);
+  push_item_list(NULL);
+
   mElseDeclHeadListStack.push_back(mCurElseDeclHeadList);
   mElseItemListStack.push_back(mCurElseItemList);
 
-  mCurElseDeclHeadList = new_declhead_list();
-  mCurElseItemList = new_item_list();
-
-  // mCurDeclHeadList と mCurItemList は then 節のものが
-  // セットされているはずなのでスタックに積む必要が無い．
-
-  mCurDeclHeadList = mCurElseDeclHeadList;
-  mCurItemList = mCurElseItemList;
+  mCurElseDeclHeadList = mCurDeclHeadList;
+  mCurElseItemList = mCurItemList;
 }
 
 // @brief generate-if の終了
 void
 Parser::end_genif()
 {
-  delete_declhead_list(mCurThenDeclHeadList);
-  delete_item_list(mCurThenItemList);
+  pop_declhead_list(true);
+  pop_item_list(true);
 
   mCurThenDeclHeadList = mThenDeclHeadListStack.back();
   mThenDeclHeadListStack.pop_back();
 
-  delete_declhead_list(mCurElseDeclHeadList);
-  delete_item_list(mCurElseItemList);
-
-  pop_declhead_list(false);
-  pop_item_list(false);
+  mCurThenItemList = mThenItemListStack.back();
+  mThenItemListStack.pop_back();
 
   mCurElseDeclHeadList = mElseDeclHeadListStack.back();
   mElseDeclHeadListStack.pop_back();
@@ -597,7 +773,7 @@ Parser::end_genif()
 void
 Parser::init_block()
 {
-  push_declhead_list(new_declhead_list());
+  push_declhead_list(NULL);
 }
 
 // @brief block-statement の終了

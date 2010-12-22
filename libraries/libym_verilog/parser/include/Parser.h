@@ -2440,22 +2440,6 @@ private:
   void
   flush_declitem_list(PtDeclHeadList& head_list);
 
-  /// @brief 新たな declhead リストを生成する．
-  PtDeclHeadList*
-  new_declhead_list();
-
-  /// @brief declhead リストを削除する．
-  void
-  delete_declhead_list(PtDeclHeadList* list);
-
-  /// @brief 新たな item リストを生成する．
-  PtItemList*
-  new_item_list();
-
-  /// @brief item リストを削除する．
-  void
-  delete_item_list(PtItemList* list);
-
   /// @brief 現在の iohead リストをスタックに積む．
   /// @param[in] new_iohead 新しく設定する iohead
   void
@@ -2478,6 +2462,7 @@ private:
 
   /// @brief 現在の declhead リストをスタックに積む．
   /// @param[in] new_declhead 新しく設定する declhead
+  /// @note new_declhead が NULL の場合，新たに生成する．
   void
   push_declhead_list(PtDeclHeadList* new_declhead);
 
@@ -2782,38 +2767,6 @@ Parser::get_item_array()
   return mCurItemList->to_array(mAlloc);
 }
 
-// @brief 新たな declhead リストを生成する．
-inline
-Parser::PtDeclHeadList*
-Parser::new_declhead_list()
-{
-  return new PtDeclHeadList(mCellAlloc);
-}
-
-// @brief declhead リストを削除する．
-inline
-void
-Parser::delete_declhead_list(PtDeclHeadList* list)
-{
-  delete list;
-}
-
-// @brief 新たな item リストを生成する．
-inline
-Parser::PtItemList*
-Parser::new_item_list()
-{
-  return new PtItemList(mCellAlloc);
-}
-
-// @brief item リストを削除する．
-inline
-void
-Parser::delete_item_list(PtItemList* list)
-{
-  delete list;
-}
-
 // @brief 現在の iohead リストをスタックに積む．
 // @param[in] new_iohead 新しく設定する iohead
 inline
@@ -2867,6 +2820,9 @@ void
 Parser::push_declhead_list(PtDeclHeadList* new_declhead)
 {
   mDeclHeadListStack.push_back(mCurDeclHeadList);
+  if ( new_declhead == NULL ) {
+    new_declhead = new PtDeclHeadList(mCellAlloc);
+  }
   mCurDeclHeadList = new_declhead;
 }
 
@@ -2890,6 +2846,9 @@ void
 Parser::push_item_list(PtItemList* new_item)
 {
   mItemListStack.push_back(mCurItemList);
+  if ( new_item == NULL ) {
+    new_item = new PtItemList(mCellAlloc);
+  }
   mCurItemList = new_item;
 }
 

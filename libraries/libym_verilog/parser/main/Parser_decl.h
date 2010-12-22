@@ -305,7 +305,7 @@ Parser::new_LocalParamH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_localparam_head(head);
 }
-  
+
 // @brief 範囲指定型 local param 宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] sign 符号付きのとき true となるフラグ
@@ -451,7 +451,7 @@ Parser::new_RegH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
@@ -467,7 +467,7 @@ Parser::new_NetH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成 (strength あり)
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
@@ -485,7 +485,7 @@ Parser::new_NetH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成 (遅延あり)
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
@@ -503,7 +503,7 @@ Parser::new_NetH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 1ビット型 net 宣言のヘッダの生成 (strength, 遅延あり)
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
@@ -523,7 +523,7 @@ Parser::new_NetH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 範囲指定型 net 宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
@@ -545,7 +545,7 @@ Parser::new_NetH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 範囲指定型 net 宣言のヘッダの生成 (strengthあり)
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
@@ -570,7 +570,7 @@ Parser::new_NetH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 範囲指定型 net 宣言のヘッダの生成 (遅延あり)
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
@@ -595,7 +595,7 @@ Parser::new_NetH(const FileRegion& fr,
   reg_attrinst(head, ai_list);
   add_decl_head(head);
 }
-  
+
 // @brief 範囲指定型 net 宣言のヘッダの生成 (strength, 遅延あり)
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
