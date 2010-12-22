@@ -1,7 +1,4 @@
-#ifndef LIBYM_VERILOG_PARSER_MAIN_PARSER_DECL_H
-#define LIBYM_VERILOG_PARSER_MAIN_PARSER_DECL_H
-
-/// @file libym_verilog/parser/main/Parser_decl.h
+/// @file libym_verilog/parser/main/Parser_decl.cc
 /// @brief Parser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -28,7 +25,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] type IO の種類
 // @param[in] sign 符号付きのとき true となるフラグ
 // @return 生成された IO宣言ヘッダ
-inline
 void
 Parser::new_IOHead(const FileRegion& fr,
 		   tPtIOType type,
@@ -45,7 +41,6 @@ Parser::new_IOHead(const FileRegion& fr,
 // @param[in] type IO の種類
 // @param[in] sign 符号付きのとき true となるフラグ
 // @return 生成された IO宣言ヘッダ
-inline
 void
 Parser::new_RegIOHead(const FileRegion& fr,
 		      tPtIOType type,
@@ -63,7 +58,6 @@ Parser::new_RegIOHead(const FileRegion& fr,
 // @param[in] net_type 補助的なネット型
 // @param[in] sign 符号付きのとき true となるフラグ
 // @return 生成された IO宣言ヘッダ
-inline
 void
 Parser::new_NetIOHead(const FileRegion& fr,
 		      tPtIOType type,
@@ -81,7 +75,6 @@ Parser::new_NetIOHead(const FileRegion& fr,
 // @param[in] type IO の種類
 // @param[in] var_type 補助的な変数型
 // @return 生成された IO宣言ヘッダ
-inline
 void
 Parser::new_VarIOHead(const FileRegion& fr,
 		      tPtIOType type,
@@ -100,7 +93,6 @@ Parser::new_VarIOHead(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された IO宣言ヘッダ
-inline
 void
 Parser::new_IOHead(const FileRegion& fr,
 		   tPtIOType type,
@@ -121,7 +113,6 @@ Parser::new_IOHead(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された IO宣言ヘッダ
-inline
 void
 Parser::new_RegIOHead(const FileRegion& fr,
 		      tPtIOType type,
@@ -143,7 +134,6 @@ Parser::new_RegIOHead(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された IO宣言ヘッダ
-inline
 void
 Parser::new_NetIOHead(const FileRegion& fr,
 		      tPtIOType type,
@@ -175,7 +165,6 @@ Parser::add_io_head(PtiIOHead* head)
 // @brief IO 宣言の要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] name 要素名
-inline
 void
 Parser::new_IOItem(const FileRegion& fr,
 		   const char* name)
@@ -187,7 +176,6 @@ Parser::new_IOItem(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 要素名
 // @param[in] init_value 初期値を表す式
-inline
 void
 Parser::new_IOItem(const FileRegion& fr,
 		   const char* name,
@@ -197,7 +185,6 @@ Parser::new_IOItem(const FileRegion& fr,
 }
 
 // @brief IO宣言リストにIO宣言要素を追加する．
-inline
 void
 Parser::add_io_item(PtIOItem* item)
 {
@@ -211,7 +198,6 @@ Parser::add_io_item(PtIOItem* item)
 
 // @brief パラメータ宣言のヘッダの生成 (型指定なし)
 // @param[in] fr ファイル位置の情報
-inline
 void
 Parser::new_ParamH(const FileRegion& fr,
 		   PtrList<PtAttrInst>* ai_list,
@@ -232,7 +218,6 @@ Parser::new_ParamH(const FileRegion& fr,
 // @param[in] sign 符号付きのとき true となるフラグ
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
-inline
 void
 Parser::new_ParamH(const FileRegion& fr,
 		   bool sign,
@@ -254,7 +239,6 @@ Parser::new_ParamH(const FileRegion& fr,
 // @brief 組み込み型パラメータ宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] var_type データ型
-inline
 void
 Parser::new_ParamH(const FileRegion& fr,
 		   tVpiVarType var_type,
@@ -296,7 +280,6 @@ Parser::add_param_head(PtiDeclHead* head)
 
 // @brief local param 宣言のヘッダの生成 (型指定なし)
 // @param[in] fr ファイル位置の情報
-inline
 void
 Parser::new_LocalParamH(const FileRegion& fr,
 			PtrList<PtAttrInst>* ai_list)
@@ -311,7 +294,6 @@ Parser::new_LocalParamH(const FileRegion& fr,
 // @param[in] sign 符号付きのとき true となるフラグ
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
-inline
 void
 Parser::new_LocalParamH(const FileRegion& fr,
 			bool sign,
@@ -327,7 +309,6 @@ Parser::new_LocalParamH(const FileRegion& fr,
 // @brief 組み込み型パラメータ宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] var_type データ型
-inline
 void
 Parser::new_LocalParamH(const FileRegion& fr,
 			tVpiVarType var_type,
@@ -355,7 +336,6 @@ Parser::add_localparam_head(PtiDeclHead* head)
 // @brief specparam 宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @return 生成された specparam
-inline
 void
 Parser::new_SpecParamH(const FileRegion& fr,
 		       PtrList<PtAttrInst>* ai_list)
@@ -369,7 +349,6 @@ Parser::new_SpecParamH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
-inline
 void
 Parser::new_SpecParamH(const FileRegion& fr,
 		       PtExpr* left,
@@ -384,7 +363,6 @@ Parser::new_SpecParamH(const FileRegion& fr,
 // @brief イベント宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @return 生成されたイベント
-inline
 void
 Parser::new_EventH(const FileRegion& fr,
 		   PtrList<PtAttrInst>* ai_list)
@@ -396,7 +374,6 @@ Parser::new_EventH(const FileRegion& fr,
 
 // @brief genvar 宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
-inline
 void
 Parser::new_GenvarH(const FileRegion& fr,
 		    PtrList<PtAttrInst>* ai_list)
@@ -409,7 +386,6 @@ Parser::new_GenvarH(const FileRegion& fr,
 // @brief 変数宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] var_type データ型
-inline
 void
 Parser::new_VarH(const FileRegion& fr,
 		 tVpiVarType var_type,
@@ -423,7 +399,6 @@ Parser::new_VarH(const FileRegion& fr,
 // @brief 1ビット型 reg 宣言のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] sign 符号付きの時 true となるフラグ
-inline
 void
 Parser::new_RegH(const FileRegion& fr,
 		 bool sign,
@@ -439,7 +414,6 @@ Parser::new_RegH(const FileRegion& fr,
 // @param[in] sign 符号付きの時 true となるフラグ
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
-inline
 void
 Parser::new_RegH(const FileRegion& fr,
 		 bool sign,
@@ -456,7 +430,6 @@ Parser::new_RegH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] type net の型
 // @param[in] sign 符号の有無を表すフラグ
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -473,7 +446,6 @@ Parser::new_NetH(const FileRegion& fr,
 // @param[in] type net の型
 // @param[in] sign 符号の有無を表すフラグ
 // @param[in] strength 信号強度
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -491,7 +463,6 @@ Parser::new_NetH(const FileRegion& fr,
 // @param[in] type net の型
 // @param[in] sign 符号の有無を表すフラグ
 // @param[in] delay 遅延
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -510,7 +481,6 @@ Parser::new_NetH(const FileRegion& fr,
 // @param[in] sign 符号の有無を表すフラグ
 // @param[in] strength 信号強度
 // @param[in] delay 遅延
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -531,7 +501,6 @@ Parser::new_NetH(const FileRegion& fr,
 // @param[in] sign 符号の有無を表すフラグ
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -554,7 +523,6 @@ Parser::new_NetH(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] strength 信号強度
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -579,7 +547,6 @@ Parser::new_NetH(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] delay 遅延
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -605,7 +572,6 @@ Parser::new_NetH(const FileRegion& fr,
 // @param[in] right 範囲の右側の式
 // @param[in] strength 信号強度
 // @param[in] delay 遅延
-inline
 void
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
@@ -641,7 +607,6 @@ Parser::add_decl_head(PtiDeclHead* head)
 // @brief 宣言要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
-inline
 void
 Parser::new_DeclItem(const FileRegion& fr,
 		     const char* name)
@@ -653,7 +618,6 @@ Parser::new_DeclItem(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] init_value 初期値を表す式
-inline
 void
 Parser::new_DeclItem(const FileRegion& fr,
 		     const char* name,
@@ -666,7 +630,6 @@ Parser::new_DeclItem(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] range_array 配列の各次元の範囲のリスト
-inline
 void
 Parser::new_DeclItem(const FileRegion& fr,
 		     const char* name,
@@ -691,7 +654,6 @@ Parser::add_decl_item(PtDeclItem* item)
 // @brief 範囲の生成
 // @param[in] msb MSB を表す式
 // @param[in] lsb LSB を表す式
-inline
 PtRange*
 Parser::new_Range(const FileRegion& fr,
 		  PtExpr* msb,
@@ -701,5 +663,3 @@ Parser::new_Range(const FileRegion& fr,
 }
 
 END_NAMESPACE_YM_VERILOG
-
-#endif // LIBYM_VERILOG_PARSER_MAIN_PARSER_DECL_H

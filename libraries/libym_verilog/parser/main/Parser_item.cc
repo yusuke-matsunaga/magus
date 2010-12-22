@@ -1,7 +1,4 @@
-#ifndef LIBYM_VERILOG_PARSER_MAIN_PARSER_ITEM_H
-#define LIBYM_VERILOG_PARSER_MAIN_PARSER_ITEM_H
-
-/// @file libym_verilog/parser/main/Parser_item.h
+/// @file libym_verilog/parser/main/Parser_item.cc
 /// @brief Parser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -27,7 +24,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief defparam 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
-inline
 void
 Parser::new_DefParamH(const FileRegion& fr,
 		      PtrList<PtAttrInst>* ai_list)
@@ -41,7 +37,6 @@ Parser::new_DefParamH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] value 値を表す式
-inline
 void
 Parser::new_DefParam(const FileRegion& fr,
 		     const char* name,
@@ -54,7 +49,6 @@ Parser::new_DefParam(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] hname 階層名
 // @param[in] value 値を表す式
-inline
 void
 Parser::new_DefParam(const FileRegion& fr,
 		     PuHierName* hname,
@@ -88,7 +82,6 @@ Parser::get_defparam_array()
 
 // @brief continuous assign 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
-inline
 void
 Parser::new_ContAssignH(const FileRegion& fr,
 			PtrList<PtAttrInst>* ai_list)
@@ -101,7 +94,6 @@ Parser::new_ContAssignH(const FileRegion& fr,
 // @brief continuous assign 文のヘッダの生成 (strengthつき)
 // @param[in] fr ファイル位置の情報
 // @param[in] strength 信号強度
-inline
 void
 Parser::new_ContAssignH(const FileRegion& fr,
 			PtStrength* strength,
@@ -116,7 +108,6 @@ Parser::new_ContAssignH(const FileRegion& fr,
 // @brief continuous assign 文のヘッダの生成 (遅延付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] delay 遅延値
-inline
 void
 Parser::new_ContAssignH(const FileRegion& fr,
 			PtDelay* delay,
@@ -133,7 +124,6 @@ Parser::new_ContAssignH(const FileRegion& fr,
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
-inline
 void
 Parser::new_ContAssignH(const FileRegion& fr,
 			PtStrength* strength,
@@ -150,7 +140,6 @@ Parser::new_ContAssignH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] lhs 左辺式
 // @param[in] rhs 右辺式
-inline
 void
 Parser::new_ContAssign(const FileRegion& fr,
 		       PtExpr* lhs,
@@ -183,7 +172,6 @@ Parser::get_contassign_array()
 // @brief initial 文の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] body 本体のステートメント
-inline
 void
 Parser::new_Initial(const FileRegion& fr,
 		    PtStmt* body,
@@ -197,7 +185,6 @@ Parser::new_Initial(const FileRegion& fr,
 // @brief always 文の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] body 本体のステートメント
-inline
 void
 Parser::new_Always(const FileRegion& fr,
 		   PtStmt* body,
@@ -218,7 +205,6 @@ Parser::new_Always(const FileRegion& fr,
 // @param[in] name task 名
 // @param[in] automatic automatic task の時に true となるフラグ
 // @param[in] stmt 本体のステートメント
-inline
 void
 Parser::new_Task(const FileRegion& fr,
 		 const char* name,
@@ -232,9 +218,9 @@ Parser::new_Task(const FileRegion& fr,
 				   get_localparam_array(),
 				   get_decl_array(),
 				   stmt);
+  end_tf();
   reg_attrinst(item, ai_list);
   add_item(item);
-  end_tf();
 }
 
 // @brief 1ビット型 function 文の生成
@@ -243,7 +229,6 @@ Parser::new_Task(const FileRegion& fr,
 // @param[in] automatic automatic task の時に true となるフラグ
 // @param[in] sign signed 属性がついていたら true となるフラグ
 // @param[in] stmt 本体のステートメント
-inline
 void
 Parser::new_Function(const FileRegion& fr,
 		     const char* name,
@@ -261,10 +246,13 @@ Parser::new_Function(const FileRegion& fr,
 					 get_localparam_array(),
 					 get_decl_array(),
 					 stmt);
+    end_tf();
     reg_attrinst(item, ai_list);
     add_item(item);
   }
-  end_tf();
+  else {
+    end_tf();
+  }
 }
 
 // @brief 範囲指定型 function 文の生成
@@ -275,7 +263,6 @@ Parser::new_Function(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] stmt 本体のステートメント
-inline
 void
 Parser::new_SizedFunc(const FileRegion& fr,
 		      const char* name,
@@ -296,9 +283,12 @@ Parser::new_SizedFunc(const FileRegion& fr,
 					  get_decl_array(),
 					  stmt);
     reg_attrinst(item, ai_list);
+    end_tf();
     add_item(item);
   }
-  end_tf();
+  else {
+    end_tf();
+  }
 }
 
 // @brief 組み込み型 function 文の生成
@@ -308,7 +298,6 @@ Parser::new_SizedFunc(const FileRegion& fr,
 // @param[in] sign signed 属性がついていたら true となるフラグ
 // @param[in] func_type 関数の戻値の型
 // @param[in] stmt 本体のステートメント
-inline
 void
 Parser::new_TypedFunc(const FileRegion& fr,
 		      const char* name,
@@ -327,10 +316,13 @@ Parser::new_TypedFunc(const FileRegion& fr,
 					  get_localparam_array(),
 					  get_decl_array(),
 					  stmt);
+    end_tf();
     reg_attrinst(item, ai_list);
     add_item(item);
   }
-  end_tf();
+  else {
+    end_tf();
+  }
 }
 
 
@@ -341,7 +333,6 @@ Parser::new_TypedFunc(const FileRegion& fr,
 // @brief gate instance 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
-inline
 void
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
@@ -356,7 +347,6 @@ Parser::new_GateH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
 // @param[in] strength 信号強度
-inline
 void
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
@@ -374,7 +364,6 @@ Parser::new_GateH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
 // @param[in] delay 遅延値
-inline
 void
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
@@ -393,7 +382,6 @@ Parser::new_GateH(const FileRegion& fr,
 // @param[in] type primitive の型
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
-inline
 void
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
@@ -411,7 +399,6 @@ Parser::new_GateH(const FileRegion& fr,
 // @brief module instance/UDP instance 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
-inline
 void
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
@@ -428,7 +415,6 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] strength 信号強度
-inline
 void
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
@@ -447,7 +433,6 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] delay 遅延値
-inline
 void
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
@@ -467,7 +452,6 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] def_name 定義名
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
-inline
 void
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
@@ -487,7 +471,6 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] con_array ポート割り当てリスト
-inline
 void
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
@@ -505,7 +488,6 @@ Parser::new_MuH(const FileRegion& fr,
 // @brief module instance/UDP/gate instance の要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] con_list ポート割り当ての配列
-inline
 void
 Parser::new_Inst(const FileRegion& fr,
 		 PtrList<PtConnection>* con_list)
@@ -516,7 +498,6 @@ Parser::new_Inst(const FileRegion& fr,
 // @brief module instance/UDP/gate instance の要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] expr1 ポート割り当て
-inline
 void
 Parser::new_Inst(const FileRegion& fr,
 		 PtExpr* expr1)
@@ -527,7 +508,6 @@ Parser::new_Inst(const FileRegion& fr,
 // @brief module instance/UDP/gate instance の要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] expr1, expr2 ポート割り当て
-inline
 void
 Parser::new_Inst(const FileRegion& fr,
 		 PtExpr* expr1,
@@ -539,7 +519,6 @@ Parser::new_Inst(const FileRegion& fr,
 // @brief module instance/UDP/gate instance の要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] expr1, expr2, expr3 ポート割り当て
-inline
 void
 Parser::new_Inst(const FileRegion& fr,
 		 PtExpr* expr1,
@@ -552,7 +531,6 @@ Parser::new_Inst(const FileRegion& fr,
 // @brief module instance/UDP/gate instance の要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] expr1, expr2, expr3, expr4 ポート割り当て
-inline
 void
 Parser::new_Inst(const FileRegion& fr,
 		 PtExpr* expr1,
@@ -567,7 +545,6 @@ Parser::new_Inst(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] con_list ポート割り当ての配列
-inline
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
@@ -580,7 +557,6 @@ Parser::new_InstN(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] expr1 ポート割り当て
-inline
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
@@ -593,7 +569,6 @@ Parser::new_InstN(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] expr1, expr2 ポート割り当て
-inline
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
@@ -607,7 +582,6 @@ Parser::new_InstN(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] expr1, expr2, expr3 ポート割り当て
-inline
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
@@ -622,7 +596,6 @@ Parser::new_InstN(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
 // @param[in] expr1, expr2, expr3, expr4 ポート割り当て
-inline
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
@@ -640,7 +613,6 @@ Parser::new_InstN(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] con_list ポート割り当ての配列
-inline
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
@@ -657,7 +629,6 @@ Parser::new_InstV(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] expr1 ポート割り当て
-inline
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
@@ -674,7 +645,6 @@ Parser::new_InstV(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] expr1, expr2 ポート割り当て
-inline
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
@@ -692,7 +662,6 @@ Parser::new_InstV(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] expr1, expr2, expr3 ポート割り当て
-inline
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
@@ -711,7 +680,6 @@ Parser::new_InstV(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] expr1, expr2, expr3, expr4 ポート割り当て
-inline
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
@@ -722,7 +690,8 @@ Parser::new_InstV(const FileRegion& fr,
 		  PtExpr* expr3,
 		  PtExpr* expr4)
 {
-  add_inst( mFactory.new_InstV(fr, name, left, right, expr1, expr2, expr3, expr4) );
+  add_inst( mFactory.new_InstV(fr, name, left, right,
+			       expr1, expr2, expr3, expr4) );
 }
 
 // @brief instance リストに要素を追加する．
@@ -746,6 +715,180 @@ Parser::get_inst_array()
 // generate 文の生成
 //////////////////////////////////////////////////////////////////////
 
+// @brief generate 文の生成
+// @param[in] fr ファイル位置の情報
+void
+Parser::new_Generate(const FileRegion& fr,
+		     PtrList<PtAttrInst>* ai_list)
+{
+  PtItem* item = mFactory.new_Generate(fr,
+				       get_decl_array(), get_item_array());
+  reg_attrinst(item, ai_list);
+  end_generate();
+  add_item(item);
+}
+
+// @brief generate block 文の生成
+// @param[in] fr ファイル位置の情報
+void
+Parser::new_GenBlock(const FileRegion& fr)
+{
+  PtItem* item = mFactory.new_GenBlock(fr,
+				       get_decl_array(), get_item_array());
+  end_generate();
+  add_item(item);
+}
+
+// @brief 名前付き generate block 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] name 名前
+void
+Parser::new_GenBlock(const FileRegion& fr,
+		     const char* name)
+{
+  PtItem* item = mFactory.new_GenBlock(fr, name,
+				       get_decl_array(), get_item_array());
+  end_generate();
+  add_item(item);
+}
+
+// @brief generate if 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] cond 条件を表す式
+void
+Parser::new_GenIf(const FileRegion& fr,
+		  PtExpr* cond)
+{
+  PtItem* item = mFactory.new_GenIf(fr, cond,
+				    get_then_decl_array(),
+				    get_then_item_array(),
+				    PtDeclHeadArray(),
+				    PtItemArray());
+  end_genif();
+  add_item(item);
+}
+
+// @brief generate if 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] cond 条件を表す式
+void
+Parser::new_GenIfElse(const FileRegion& fr,
+		      PtExpr* cond)
+{
+  PtItem* item = mFactory.new_GenIf(fr, cond,
+				    get_then_decl_array(),
+				    get_then_item_array(),
+				    get_else_decl_array(),
+				    get_else_item_array());
+  end_genif();
+  add_item(item);
+}
+
+// @brief generate-if 文の then 節の宣言リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_then_decl_array()
+{
+  flush_declitem_list(*mCurDeclHeadList);
+  return mCurThenDeclHeadList->to_array(mAlloc);
+}
+
+// @brief generate-if 文の else 節の宣言リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_else_decl_array()
+{
+  flush_declitem_list(*mCurDeclHeadList);
+  return mCurElseDeclHeadList->to_array(mAlloc);
+}
+
+// @brief generate-if 文の then 節の item リストを配列に変換する．
+inline
+PtItemArray
+Parser::get_then_item_array()
+{
+  return mCurThenItemList->to_array(mAlloc);
+}
+
+// @brief generate-if 文の else 節の item リストを配列に変換する．
+inline
+PtItemArray
+Parser::get_else_item_array()
+{
+  return mCurElseItemList->to_array(mAlloc);
+}
+
+// @brief generate case 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] expr 選択式
+// @param[in] item_list generate case item のリスト
+void
+Parser::new_GenCase(const FileRegion& fr,
+		    PtExpr* expr,
+		    PtrList<PtGenCaseItem>* item_list)
+{
+  add_item( mFactory.new_GenCase(fr, expr, to_array(item_list)) );
+}
+
+// @brief generate case の要素の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] label_list 比較式のリスト
+// @return 生成された generate case item
+PtGenCaseItem*
+Parser::new_GenCaseItem(const FileRegion& fr,
+			PtrList<PtExpr>* label_list)
+{
+  PtGenCaseItem* item = mFactory.new_GenCaseItem(fr,
+						 to_array(label_list),
+						 get_decl_array(),
+						 get_item_array());
+  end_generate();
+  return item;
+}
+
+// @brief generate for 文の生成
+// @param[in] fr ファイル位置の情報
+// @param[in] loop_var ループ変数
+// @param[in] init_expr 初期化式
+// @param[in] cond ループ条件式
+// @param[in] inc_var 増加式の左辺の変数
+// @param[in] inc_expr 増加式
+// @param[in] block_name ブロック名
+// @param[in] decl_array 宣言のリスト
+// @param[in] item_array 要素のリスト
+void
+Parser::new_GenFor(const FileRegion& fr,
+		   const char* loop_var,
+		   PtExpr* init_expr,
+		   PtExpr* cond,
+		   const char* inc_var,
+		   PtExpr* inc_expr,
+		   const char* block_name)
+{
+  if ( strcmp(loop_var, inc_var) != 0 ) {
+    end_generate();
+    ostringstream buf;
+    buf << "Lhs of the increment statement ("
+	<< inc_var
+	<< ") does not match with Lhs of the initial statement ("
+	<< loop_var
+	<< ")";
+    put_msg(__FILE__, __LINE__,
+	    fr,
+	    kMsgError,
+	    "PARSER",
+	    buf.str());
+  }
+
+  PtItem* item = mFactory.new_GenFor(fr, loop_var,
+				     init_expr, cond, inc_expr,
+				     block_name,
+				     get_decl_array(),
+				     get_item_array());
+  add_item(item);
+  end_generate();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // spec item の生成
@@ -755,7 +898,6 @@ Parser::get_inst_array()
 // @param[in] fr ファイル位置の情報
 // @param[in] id specify block item の種類
 // @param[in] terminal_list 端子のリスト
-inline
 void
 Parser::new_SpecItem(const FileRegion& fr,
 		     tVpiSpecItemType id,
@@ -769,7 +911,6 @@ Parser::new_SpecItem(const FileRegion& fr,
 // @param[in] id spec path の種類
 // @param[in] expr 条件式
 // @param[in] path_decl パス記述
-inline
 void
 Parser::new_SpecPath(const FileRegion& fr,
 		     tVpiSpecPathType id,
@@ -789,7 +930,6 @@ Parser::new_SpecPath(const FileRegion& fr,
 // @param[in] output_pol
 // @param[in] expr
 // @param[in] path_delay
-inline
 PtPathDecl*
 Parser::new_PathDecl(const FileRegion& fr,
 		     int edge,
@@ -818,7 +958,6 @@ Parser::new_PathDecl(const FileRegion& fr,
 // @param[in] output_pol
 // @param[in] expr
 // @param[in] path_delay
-inline
 PtPathDecl*
 Parser::new_PathDecl(const FileRegion& fr,
 		     int edge,
@@ -841,7 +980,6 @@ Parser::new_PathDecl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 値
 // @return 生成された path delay value
-inline
 PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
 		      PtExpr* value)
@@ -854,7 +992,6 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value1 値1
 // @param[in] value2 値2
 // @return 生成された path delay value
-inline
 PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
 		      PtExpr* value1,
@@ -869,7 +1006,6 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value2 値2
 // @param[in] value3 値3
 // @return 生成された path delay value
-inline
 PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
 		      PtExpr* value1,
@@ -888,7 +1024,6 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value5 値5
 // @param[in] value6 値6
 // @return 生成された path delay value
-inline
 PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
 		      PtExpr* value1,
@@ -918,7 +1053,6 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value11 値11
 // @param[in] value12 値12
 // @return 生成された path delay value
-inline
 PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
 		      PtExpr* value1,
@@ -950,5 +1084,3 @@ Parser::add_item(PtItem* item)
 }
 
 END_NAMESPACE_YM_VERILOG
-
-#endif // LIBYM_VERILOG_PARSER_MAIN_PARSER_ITEM_H

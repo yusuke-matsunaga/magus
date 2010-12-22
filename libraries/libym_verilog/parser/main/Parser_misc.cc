@@ -1,7 +1,4 @@
-#ifndef LIBYM_VERILOG_PARSER_MAIN_PARSER_MISC_H
-#define LIBYM_VERILOG_PARSER_MAIN_PARSER_MISC_H
-
-/// @file libym_verilog/parser/main/Parser_misc.h
+/// @file libym_verilog/parser/main/Parser_misc.cc
 /// @brief Parser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -25,7 +22,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] fr ファイル位置の情報
 // @param[in] value 遅延を表す式
 // @return 生成されたディレイコントロール
-inline
 PtControl*
 Parser::new_DelayControl(const FileRegion& fr,
 			 PtExpr* value)
@@ -36,7 +32,6 @@ Parser::new_DelayControl(const FileRegion& fr,
 // @brief イベントコントロールの生成
 // @param[in] fr ファイル位置の情報
 // @return 生成されたイベントコントロール
-inline
 PtControl*
 Parser::new_EventControl(const FileRegion& fr)
 {
@@ -47,7 +42,6 @@ Parser::new_EventControl(const FileRegion& fr)
 // @param[in] fr ファイル位置の情報
 // @param[in] event_name イベントを表す名前
 // @return 生成されたイベントコントロール
-inline
 PtControl*
 Parser::new_EventControl(const FileRegion& fr,
 			 const char* event_name,
@@ -61,7 +55,6 @@ Parser::new_EventControl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] event_name イベントを表す階層名
 // @return 生成されたイベントコントロール
-inline
 PtControl*
 Parser::new_EventControl(const FileRegion& fr,
 			 PuHierName* event_name,
@@ -75,7 +68,6 @@ Parser::new_EventControl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] event_list イベントのリスト
 // @return 生成されたイベントコントロール
-inline
 PtControl*
 Parser::new_EventControl(const FileRegion& fr,
 			 PtrList<PtExpr>* event_list)
@@ -87,7 +79,6 @@ Parser::new_EventControl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] expr 繰り返し数を表す式
 // @return 生成されたリピートコントロール
-inline
 PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
 			  PtExpr* expr)
@@ -100,7 +91,6 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @param[in] rep 繰り返し数を表す式
 // @param[in] event_name 繰り返しの単位となるイベント名
 // @return 生成されたリピートコントロール
-inline
 PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
 			  PtExpr* rep,
@@ -116,7 +106,6 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @param[in] rep 繰り返し数を表す式
 // @param[in] event 繰り返しの単位となるイベント階層名
 // @return 生成されたリピートコントロール
-inline
 PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
 			  PtExpr* rep,
@@ -132,7 +121,6 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @param[in] rep 繰り返し数を表す式
 // @param[in] event_list 繰り返しの単位となるイベントのリスト
 // @return 生成されたリピートコントロール
-inline
 PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
 			  PtExpr* rep,
@@ -144,18 +132,16 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @brief 順序つき結合子の生成
 // @param[in] expr 結合する式
 // @return 生成された結合子
-inline
 PtConnection*
 Parser::new_OrderedCon(PtExpr* expr)
 {
   return mFactory.new_OrderedCon(expr);
 }
-  
+
 // @brief 順序つき結合子の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] expr 結合する式
 // @return 生成された結合子
-inline
 PtConnection*
 Parser::new_OrderedCon(const FileRegion& fr,
 		       PtExpr* expr,
@@ -171,7 +157,6 @@ Parser::new_OrderedCon(const FileRegion& fr,
 // @param[in] name 名前
 // @param[in] expr 結合する式
 // @return 生成された結合子
-inline
 PtConnection*
 Parser::new_NamedCon(const FileRegion& fr,
 		     const char* name,
@@ -188,7 +173,6 @@ Parser::new_NamedCon(const FileRegion& fr,
 // @param[in] value0 '0' の強度
 // @param[in] value1 '1' の強度
 // @return 生成された strength
-inline
 PtStrength*
 Parser::new_Strength(const FileRegion& fr,
 		     tVpiStrength value0,
@@ -201,7 +185,6 @@ Parser::new_Strength(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 強度
 // @return 生成された strength
-inline
 PtStrength*
 Parser::new_Strength(const FileRegion& fr,
 		     tVpiStrength value)
@@ -213,7 +196,6 @@ Parser::new_Strength(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value1 値1
 // @return 生成された遅延値
-inline
 PtDelay*
 Parser::new_Delay(const FileRegion& fr,
 		  PtExpr* value1)
@@ -226,7 +208,6 @@ Parser::new_Delay(const FileRegion& fr,
 // @param[in] value1 値1
 // @param[in] value2 値2
 // @return 生成された遅延値
-inline
 PtDelay*
 Parser::new_Delay(const FileRegion& fr,
 		  PtExpr* value1,
@@ -241,7 +222,6 @@ Parser::new_Delay(const FileRegion& fr,
 // @param[in] value2 値2
 // @param[in] value3 値3
 // @return 生成された遅延値
-inline
 PtDelay*
 Parser::new_Delay(const FileRegion& fr,
 		  PtExpr* value1,
@@ -255,7 +235,6 @@ Parser::new_Delay(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] as_array attribute spec のリスト
 // @return 生成された attribute instance
-inline
 PtAttrInst*
 Parser::new_AttrInst(const FileRegion& fr,
 		     PtrList<PtAttrSpec>* as_list)
@@ -268,7 +247,6 @@ Parser::new_AttrInst(const FileRegion& fr,
 // @param[in] name 名前
 // @param[in] expr 値
 // @return 生成された attribute spec
-inline
 PtAttrSpec*
 Parser::new_AttrSpec(const FileRegion& fr,
 		     const char* name,
@@ -278,5 +256,3 @@ Parser::new_AttrSpec(const FileRegion& fr,
 }
 
 END_NAMESPACE_YM_VERILOG
-
-#endif // LIBYM_VERILOG_PARSER_MAIN_PARSER_MISC_H

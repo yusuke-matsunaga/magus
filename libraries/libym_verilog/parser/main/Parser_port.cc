@@ -1,7 +1,4 @@
-#ifndef LIBYM_VERILOG_PARSER_MAIN_PARSER_PORT_H
-#define LIBYM_VERILOG_PARSER_MAIN_PARSER_PORT_H
-
-/// @file libym_verilog/parser/main/Parser_port.h
+/// @file libym_verilog/parser/main/Parser_port.cc
 /// @brief Parser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -15,7 +12,6 @@
 #include "PtiDecl.h"
 
 
-
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
@@ -23,7 +19,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief 空のポートの生成
-inline
 void
 Parser::new_Port()
 {
@@ -33,7 +28,6 @@ Parser::new_Port()
 // @brief ポートの生成 (内側の式のみ指定するタイプ)
 // @param[in] file_region ファイル位置
 // @param[in] name 外側の名前
-inline
 void
 Parser::new_Port1(const FileRegion& file_region)
 {
@@ -53,7 +47,6 @@ Parser::new_Port1(const FileRegion& file_region)
 // @brief ポートの生成 (外側の名前のみ指定するタイプ)
 // @param[in] file_region ファイル位置
 // @param[in] name 外側の名前
-inline
 void
 Parser::new_Port2(const FileRegion& file_region,
 		  const char* name)
@@ -64,7 +57,6 @@ Parser::new_Port2(const FileRegion& file_region,
 // @brief ポートの生成 (外側の名前と内側の式を指定するタイプ)
 // @param[in] file_region ファイル位置
 // @param[in] name 外側の名前
-inline
 void
 Parser::new_Port3(const FileRegion& file_region,
 		  const char* name)
@@ -81,13 +73,6 @@ Parser::add_port(PtiPort* port)
   mPortList.push_back(port);
 }
 
-// @brief ポートリストを配列に変換する．
-inline
-PtiPortArray
-Parser::get_port_array()
-{
-  return mPortList.to_array(mAlloc);
-}
 
 //////////////////////////////////////////////////////////////////////
 // PtiPortRef の生成
@@ -96,7 +81,6 @@ Parser::get_port_array()
 // @brief ポート参照式の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] name ポートに接続している内部の識別子名
-inline
 void
 Parser::new_PortRef(const FileRegion& fr,
 		    const char* name)
@@ -108,7 +92,6 @@ Parser::new_PortRef(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name ポートに接続している内部の識別子名
 // @param[in] index ビット指定用の式
-inline
 void
 Parser::new_PortRef(const FileRegion& fr,
 		    const char* name,
@@ -123,7 +106,6 @@ Parser::new_PortRef(const FileRegion& fr,
 // @param[in] range_mode 範囲指定のモード
 // @param[in] left 範囲指定の左側の式
 // @param[in] right 範囲指摘の右側の式
-inline
 void
 Parser::new_PortRef(const FileRegion& fr,
 		    const char* name,
@@ -142,22 +124,4 @@ Parser::add_portref(PtiPortRef* portref)
   mPortRefList.push_back(portref);
 }
 
-// @brief ポート参照リストを初期化する．
-inline
-void
-Parser::init_portref_list()
-{
-  mPortRefList.clear();
-}
-
-// @brief ポート参照リストを配列に変換する
-inline
-PtiPortRefArray
-Parser::get_portref_array()
-{
-  return mPortRefList.to_array(mAlloc);
-}
-
 END_NAMESPACE_YM_VERILOG
-
-#endif // LIBYM_VERILOG_PARSER_MAIN_PARSER_PORT_H

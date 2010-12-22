@@ -25,7 +25,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 class VlLineWatcher;
 class PtMgr;
-class PtiFactory;
 class Lex;
 class PuHierName;
 
@@ -2654,44 +2653,6 @@ Parser::lex()
   return *mLex;
 }
 
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-Parser::put_msg(const char* src_file,
-		int src_line,
-		const FileRegion& file_loc,
-		tMsgType type,
-		const char* label,
-		const char* msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-Parser::put_msg(const char* src_file,
-		int src_line,
-		const FileRegion& file_loc,
-		tMsgType type,
-		const char* label,
-		const string& msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
 template <typename T>
 inline
 PtrList<T, T>*
@@ -2717,6 +2678,22 @@ Parser::to_array(PtrList<T, T>* list)
   else {
     return PtArray<T>();
   }
+}
+
+// @brief ポートリストを配列に変換する．
+inline
+PtiPortArray
+Parser::get_port_array()
+{
+  return mPortList.to_array(mAlloc);
+}
+
+// @brief ポート参照リストを配列に変換する
+inline
+PtiPortRefArray
+Parser::get_portref_array()
+{
+  return mPortRefList.to_array(mAlloc);
 }
 
 // @brief parameter port リストを配列に変換する．

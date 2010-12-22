@@ -1,7 +1,4 @@
-#ifndef LIBYM_VERILOG_PARSER_MAIN_PARSER_EXPR_H
-#define LIBYM_VERILOG_PARSER_MAIN_PARSER_EXPR_H
-
-/// @file libym_verilog/parser/main/Parser_expr.h
+/// @file libym_verilog/parser/main/Parser_expr.cc
 /// @brief Parser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,6 +11,7 @@
 #include "Parser.h"
 
 #include "PtiFactory.h"
+#include "ym_verilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -23,7 +21,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] type 演算の種類
 // @param[in] opr オペランド
 // @return 生成された演算子
-inline
 PtExpr*
 Parser::new_Opr(const FileRegion& fr,
 		tVpiOpType type,
@@ -41,7 +38,6 @@ Parser::new_Opr(const FileRegion& fr,
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @return 生成された演算子
-inline
 PtExpr*
 Parser::new_Opr(const FileRegion& fr,
 		tVpiOpType type,
@@ -61,7 +57,6 @@ Parser::new_Opr(const FileRegion& fr,
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
 // @return 生成された演算子
-inline
 PtExpr*
 Parser::new_Opr(const FileRegion& fr,
 		tVpiOpType type,
@@ -79,7 +74,6 @@ Parser::new_Opr(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] expr_list オペランドのリスト
 // @return 生成された concatination 演算子
-inline
 PtExpr*
 Parser::new_Concat(const FileRegion& fr,
 		   PtrList<PtExpr>* expr_list)
@@ -92,7 +86,6 @@ Parser::new_Concat(const FileRegion& fr,
 // @param[in] rep 繰り返し数
 // @param[in] expr_list 結合するオペランドのリスト
 // @return 生成された multi-concatination 演算子
-inline
 PtExpr*
 Parser::new_MultiConcat(const FileRegion& fr,
 			PtExpr* rep,
@@ -107,7 +100,6 @@ Parser::new_MultiConcat(const FileRegion& fr,
 // @param[in] val1 typical 値
 // @param[in] val2 maximum 値
 // @return 生成された min/typ/max 演算子
-inline
 PtExpr*
 Parser::new_MinTypMax(const FileRegion& fr,
 		      PtExpr* val0,
@@ -121,7 +113,6 @@ Parser::new_MinTypMax(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] name 識別子名
 // @return 生成された primary
-inline
 PtExpr*
 Parser::new_Primary(const FileRegion& fr,
 		    const char* name)
@@ -134,7 +125,6 @@ Parser::new_Primary(const FileRegion& fr,
 // @param[in] name 識別子名
 // @param[in] index_list インデックスのリスト
 // @return 生成された primary
-inline
 PtExpr*
 Parser::new_Primary(const FileRegion& fr,
 		    const char* name,
@@ -184,7 +174,6 @@ Parser::new_Primary(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] hname 階層名
 // @return 生成された primary
-inline
 PtExpr*
 Parser::new_Primary(const FileRegion& fr,
 		    PuHierName* hname)
@@ -199,7 +188,6 @@ Parser::new_Primary(const FileRegion& fr,
 // @param[in] hname 階層名
 // @param[in] index_list インデックスのリスト
 // @return 生成された primary
-inline
 PtExpr*
 Parser::new_Primary(const FileRegion& fr,
 		    PuHierName* hname,
@@ -217,7 +205,6 @@ Parser::new_Primary(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された primary
-inline
 PtExpr*
 Parser::new_Primary(const FileRegion& fr,
 		    PuHierName* hname,
@@ -238,7 +225,6 @@ Parser::new_Primary(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された primary
-inline
 PtExpr*
 Parser::new_Primary(const FileRegion& fr,
 		    PuHierName* hname,
@@ -258,7 +244,6 @@ Parser::new_Primary(const FileRegion& fr,
 // @param[in] name 識別子名
 // @param[in] index インデックス
 // @return 生成された const primary
-inline
 PtExpr*
 Parser::new_CPrimary(const FileRegion& fr,
 		     const char* name,
@@ -272,7 +257,6 @@ Parser::new_CPrimary(const FileRegion& fr,
 // @param[in] name 識別子名
 // @param[in] index_list インデックスのリスト
 // @return 生成された const primary
-inline
 PtExpr*
 Parser::new_CPrimary(const FileRegion& fr,
 		     const char* name,
@@ -288,7 +272,6 @@ Parser::new_CPrimary(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された constant primary
-inline
 PtExpr*
 Parser::new_CPrimary(const FileRegion& fr,
 		     const char* name,
@@ -304,7 +287,6 @@ Parser::new_CPrimary(const FileRegion& fr,
 // @param[in] hname 階層名
 // @param[in] index_list インデックスのリスト
 // @return 生成された constant primary
-inline
 PtExpr*
 Parser::new_CPrimary(const FileRegion& fr,
 		     PuHierName* hname,
@@ -320,7 +302,6 @@ Parser::new_CPrimary(const FileRegion& fr,
 // @param[in] name 関数名
 // @param[in] arg_list 引数のリスト
 // @return 生成された function call
-inline
 PtExpr*
 Parser::new_FuncCall(const FileRegion& fr,
 		     const char* name,
@@ -337,7 +318,6 @@ Parser::new_FuncCall(const FileRegion& fr,
 // @param[in] hname 階層名
 // @param[in] arg_list 引数のリスト
 // @return 生成された function call
-inline
 PtExpr*
 Parser::new_FuncCall(const FileRegion& fr,
 		     PuHierName* hname,
@@ -346,7 +326,8 @@ Parser::new_FuncCall(const FileRegion& fr,
 {
   PtNameBranchArray nb_array;
   const char* tail_name = extract_HierName(hname, nb_array);
-  PtExpr* expr = mFactory.new_FuncCall(fr, nb_array, tail_name, to_array(arg_list));
+  PtExpr* expr = mFactory.new_FuncCall(fr, nb_array, tail_name,
+				       to_array(arg_list));
   reg_attrinst(expr, ai_list);
   return expr;
 }
@@ -356,7 +337,6 @@ Parser::new_FuncCall(const FileRegion& fr,
 // @param[in] name 関数名
 // @param[in] arg_array 引数のリスト
 // @return 生成された function call
-inline
 PtExpr*
 Parser::new_SysFuncCall(const FileRegion& fr,
 			const char* name,
@@ -369,7 +349,6 @@ Parser::new_SysFuncCall(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 定数を表す整数値
 // @return 生成された定数
-inline
 PtExpr*
 Parser::new_IntConst(const FileRegion& fr,
 		     ymuint value)
@@ -381,7 +360,6 @@ Parser::new_IntConst(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-inline
 PtExpr*
 Parser::new_IntConst(const FileRegion& fr,
 		     const char* value)
@@ -394,7 +372,6 @@ Parser::new_IntConst(const FileRegion& fr,
 // @param[in] const_type 定数の種類
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-inline
 PtExpr*
 Parser::new_IntConst(const FileRegion& fr,
 		     tVpiConstType const_type,
@@ -409,7 +386,6 @@ Parser::new_IntConst(const FileRegion& fr,
 // @param[in] const_type 定数の種類
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-inline
 PtExpr*
 Parser::new_IntConst(const FileRegion& fr,
 		     ymuint size,
@@ -423,7 +399,6 @@ Parser::new_IntConst(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-inline
 PtExpr*
 Parser::new_RealConst(const FileRegion& fr,
 		      double value)
@@ -435,7 +410,6 @@ Parser::new_RealConst(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 文字列
 // @return 生成された定数
-inline
 PtExpr*
 Parser::new_StringConst(const FileRegion& fr,
 			const char* value)
@@ -444,5 +418,3 @@ Parser::new_StringConst(const FileRegion& fr,
 }
 
 END_NAMESPACE_YM_VERILOG
-
-#endif // LIBYM_VERILOG_PARSER_MAIN_PARSER_EXPR_H
