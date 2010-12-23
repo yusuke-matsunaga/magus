@@ -133,13 +133,13 @@ void
 dump_word(ostream& s,
 	  ymuint val)
 {
-  static char buf[4];
+  static ymuint8 buf[4];
   buf[0] = val & 255U; val >>= 8;
   buf[1] = val & 255U; val >>= 8;
   buf[2] = val & 255U; val >>= 8;
   buf[3] = val & 255U;
 
-  s.write(buf, 4);
+  s.write(reinterpret_cast<char*>(buf), 4);
 }
 
 void
