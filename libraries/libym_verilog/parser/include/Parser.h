@@ -610,9 +610,8 @@ public:
 
   /// @brief defparam 文のヘッダの生成
   /// @param[in] fr ファイル位置の情報
-  void
-  new_DefParamH(const FileRegion& fr,
-		PtrList<PtAttrInst>* ai_list);
+  PtItem*
+  new_DefParamH(const FileRegion& fr);
 
   /// @brief defparam 文の要素の生成
   /// @param[in] fr ファイル位置の情報
@@ -634,36 +633,32 @@ public:
 
   /// @brief continuous assign 文のヘッダの生成
   /// @param[in] fr ファイル位置の情報
-  void
-  new_ContAssignH(const FileRegion& fr,
-		  PtrList<PtAttrInst>* ai_list);
+  PtItem*
+  new_ContAssignH(const FileRegion& fr);
 
   /// @brief continuous assign 文のヘッダの生成 (strengthつき)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] strength 信号強度
-  void
+  PtItem*
   new_ContAssignH(const FileRegion& fr,
-		  PtStrength* strength,
-		  PtrList<PtAttrInst>* ai_list);
+		  PtStrength* strength);
 
   /// @brief continuous assign 文のヘッダの生成 (遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] delay 遅延値
-  void
+  PtItem*
   new_ContAssignH(const FileRegion& fr,
-		  PtDelay* delay,
-		  PtrList<PtAttrInst>* ai_list);
+		  PtDelay* delay);
 
   /// @brief continuous assign 文のヘッダの生成 (strength, 遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] strength 信号強度
   /// @param[in] delay 遅延値
   /// @param[in] elem_array 要素のリスト
-  void
+  PtItem*
   new_ContAssignH(const FileRegion& fr,
 		  PtStrength* strength,
-		  PtDelay* delay,
-		  PtrList<PtAttrInst>* ai_list);
+		  PtDelay* delay);
 
   /// @brief continuous assign 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -677,30 +672,27 @@ public:
   /// @brief initial 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] body 本体のステートメント
-  void
+  PtItem*
   new_Initial(const FileRegion& fr,
-	      PtStmt* body,
-	      PtrList<PtAttrInst>* ai_list);
+	      PtStmt* body);
 
   /// @brief always 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] body 本体のステートメント
-  void
+  PtItem*
   new_Always(const FileRegion& fr,
-	     PtStmt* body,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtStmt* body);
 
   /// @brief task 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] name task 名
   /// @param[in] automatic automatic task の時に true となるフラグ
   /// @param[in] stmt 本体のステートメント
-  void
+  PtItem*
   new_Task(const FileRegion& fr,
 	   const char* name,
 	   bool automatic,
-	   PtStmt* stmt,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtStmt* stmt);
 
   /// @brief 1ビット型 function 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -708,13 +700,12 @@ public:
   /// @param[in] automatic automatic task の時に true となるフラグ
   /// @param[in] sign signed 属性がついていたら true となるフラグ
   /// @param[in] stmt 本体のステートメント
-  void
+  PtItem*
   new_Function(const FileRegion& fr,
 	       const char* name,
 	       bool automatic,
 	       bool sign,
-	       PtStmt* stmt,
-	       PtrList<PtAttrInst>* ai_list);
+	       PtStmt* stmt);
 
   /// @brief 範囲指定型 function 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -724,15 +715,14 @@ public:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   /// @param[in] stmt 本体のステートメント
-  void
+  PtItem*
   new_SizedFunc(const FileRegion& fr,
 		const char* name,
 		bool automatic,
 		bool sign,
 		PtExpr* left,
 		PtExpr* right,
-		PtStmt* stmt,
-		PtrList<PtAttrInst>* ai_list);
+		PtStmt* stmt);
 
   /// @brief 組み込み型 function 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -741,104 +731,94 @@ public:
   /// @param[in] sign signed 属性がついていたら true となるフラグ
   /// @param[in] func_type 関数の戻値の型
   /// @param[in] stmt 本体のステートメント
-  void
+  PtItem*
   new_TypedFunc(const FileRegion& fr,
 		const char* name,
 		bool automatic,
 		bool sign,
 		tVpiVarType func_type,
-		PtStmt* stmt,
-		PtrList<PtAttrInst>* ai_list);
+		PtStmt* stmt);
 
   /// @brief gate instance 文のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
-  void
+  PtItem*
   new_GateH(const FileRegion& fr,
-	    tVpiPrimType type,
-	    PtrList<PtAttrInst>* ai_list);
+	    tVpiPrimType type);
 
   /// @brief gate instance 文のヘッダの生成 (strength付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
   /// @param[in] strength 信号強度
-  void
+  PtItem*
   new_GateH(const FileRegion& fr,
 	    tVpiPrimType type,
-	    PtStrength* strength,
-	    PtrList<PtAttrInst>* ai_list);
+	    PtStrength* strength);
 
   /// @brief gate instance 文のヘッダの生成 (遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
   /// @param[in] delay 遅延値
-  void
+  PtItem*
   new_GateH(const FileRegion& fr,
 	    tVpiPrimType type,
-	    PtDelay* delay,
-	    PtrList<PtAttrInst>* ai_list);
+	    PtDelay* delay);
 
   /// @brief gate instance 文のヘッダの生成 (strength, 遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type primitive の型
   /// @param[in] strength 信号強度
   /// @param[in] delay 遅延値
-  void
+  PtItem*
   new_GateH(const FileRegion& fr,
 	    tVpiPrimType type,
 	    PtStrength* strength,
-	    PtDelay* delay,
-	    PtrList<PtAttrInst>* ai_list);
+	    PtDelay* delay);
 
   /// @brief module instance/UDP instance 文のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] def_name 定義名
-  void
+  PtItem*
   new_MuH(const FileRegion& fr,
-	  const char* def_name,
-	  PtrList<PtAttrInst>* ai_list);
+	  const char* def_name);
 
   /// @brief module instance/UDP instance 文のヘッダの生成 (strength付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] def_name 定義名
   /// @param[in] strength 信号強度
-  void
+  PtItem*
   new_MuH(const FileRegion& fr,
 	  const char* def_name,
-	  PtStrength* strength,
-	  PtrList<PtAttrInst>* ai_list);
+	  PtStrength* strength);
 
   /// @brief module instance/UDP instance 文のヘッダの生成 (遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] def_name 定義名
   /// @param[in] delay 遅延値
-  void
+  PtItem*
   new_MuH(const FileRegion& fr,
 	  const char* def_name,
-	  PtDelay* delay,
-	  PtrList<PtAttrInst>* ai_list);
+	  PtDelay* delay);
 
   /// @brief module instance/UDP instance 文のヘッダの生成 (strength, 遅延付き)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] def_name 定義名
   /// @param[in] strength 信号強度
   /// @param[in] delay 遅延値
-  void
+  PtItem*
   new_MuH(const FileRegion& fr,
 	  const char* def_name,
 	  PtStrength* strength,
-	  PtDelay* delay,
-	  PtrList<PtAttrInst>* ai_list);
+	  PtDelay* delay);
 
   /// @brief module instance/UDP instance 文のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] def_name 定義名
   /// @param[in] con_list ポート割り当てリスト
-  void
+  PtItem*
   new_MuH(const FileRegion& fr,
 	  const char* def_name,
-	  PtrList<PtConnection>* con_list,
-	  PtrList<PtAttrInst>* ai_list);
+	  PtrList<PtConnection>* con_list);
 
   /// @brief module instance/UDP/gate instance の要素の生成
   /// @param[in] fr ファイル位置の情報
@@ -1005,9 +985,8 @@ public:
 
   /// @brief generate 文の生成
   /// @param[in] fr ファイル位置の情報
-  void
-  new_Generate(const FileRegion& fr,
-	       PtrList<PtAttrInst>* ai_list);
+  PtItem*
+  new_Generate(const FileRegion& fr);
 
   /// @brief generate block 文の生成
   /// @param[in] fr ファイル位置の情報

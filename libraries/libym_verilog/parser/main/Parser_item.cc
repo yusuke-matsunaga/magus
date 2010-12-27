@@ -24,12 +24,10 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief defparam 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
-void
-Parser::new_DefParamH(const FileRegion& fr,
-		      PtrList<PtAttrInst>* ai_list)
+PtItem*
+Parser::new_DefParamH(const FileRegion& fr)
 {
-  PtItem* head = mFactory.new_DefParamH(fr, get_defparam_array());
-  add_item(head, ai_list);
+  return mFactory.new_DefParamH(fr, get_defparam_array());
 }
 
 // @brief defparam 文の要素の生成
@@ -81,38 +79,30 @@ Parser::get_defparam_array()
 
 // @brief continuous assign 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
-void
-Parser::new_ContAssignH(const FileRegion& fr,
-			PtrList<PtAttrInst>* ai_list)
+PtItem*
+Parser::new_ContAssignH(const FileRegion& fr)
 {
-  PtItem* head = mFactory.new_ContAssignH(fr, get_contassign_array());
-  add_item(head, ai_list);
+  return mFactory.new_ContAssignH(fr, get_contassign_array());
 }
 
 // @brief continuous assign 文のヘッダの生成 (strengthつき)
 // @param[in] fr ファイル位置の情報
 // @param[in] strength 信号強度
-void
+PtItem*
 Parser::new_ContAssignH(const FileRegion& fr,
-			PtStrength* strength,
-			PtrList<PtAttrInst>* ai_list)
+			PtStrength* strength)
 {
-  PtItem* head = mFactory.new_ContAssignH(fr, strength,
-					  get_contassign_array());
-  add_item(head, ai_list);
+  return mFactory.new_ContAssignH(fr, strength, get_contassign_array());
 }
 
 // @brief continuous assign 文のヘッダの生成 (遅延付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] delay 遅延値
-void
+PtItem*
 Parser::new_ContAssignH(const FileRegion& fr,
-			PtDelay* delay,
-			PtrList<PtAttrInst>* ai_list)
+			PtDelay* delay)
 {
-  PtItem* head = mFactory.new_ContAssignH(fr, delay,
-					  get_contassign_array());
-  add_item(head, ai_list);
+  return mFactory.new_ContAssignH(fr, delay, get_contassign_array());
 }
 
 // @brief continuous assign 文のヘッダの生成 (strength, 遅延付き)
@@ -120,15 +110,12 @@ Parser::new_ContAssignH(const FileRegion& fr,
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
-void
+PtItem*
 Parser::new_ContAssignH(const FileRegion& fr,
 			PtStrength* strength,
-			PtDelay* delay,
-			PtrList<PtAttrInst>* ai_list)
+			PtDelay* delay)
 {
-  PtItem* head = mFactory.new_ContAssignH(fr, strength, delay,
-					  get_contassign_array());
-  add_item(head, ai_list);
+  return mFactory.new_ContAssignH(fr, strength, delay, get_contassign_array());
 }
 
 // @brief continuous assign 文の生成
@@ -167,25 +154,21 @@ Parser::get_contassign_array()
 // @brief initial 文の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] body 本体のステートメント
-void
+PtItem*
 Parser::new_Initial(const FileRegion& fr,
-		    PtStmt* body,
-		    PtrList<PtAttrInst>* ai_list)
+		    PtStmt* body)
 {
-  PtItem* item = mFactory.new_Initial(fr, body);
-  add_item(item, ai_list);
+  return mFactory.new_Initial(fr, body);
 }
 
 // @brief always 文の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] body 本体のステートメント
-void
+PtItem*
 Parser::new_Always(const FileRegion& fr,
-		   PtStmt* body,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtStmt* body)
 {
-  PtItem* item = mFactory.new_Always(fr, body);
-  add_item(item, ai_list);
+  return mFactory.new_Always(fr, body);
 }
 
 
@@ -198,20 +181,18 @@ Parser::new_Always(const FileRegion& fr,
 // @param[in] name task 名
 // @param[in] automatic automatic task の時に true となるフラグ
 // @param[in] stmt 本体のステートメント
-void
+PtItem*
 Parser::new_Task(const FileRegion& fr,
 		 const char* name,
 		 bool automatic,
-		 PtStmt* stmt,
-		 PtrList<PtAttrInst>* ai_list)
+		 PtStmt* stmt)
 {
-  PtItem* item = mFactory.new_Task(fr, name, automatic,
-				   get_tf_io_array(),
-				   get_tf_param_array(),
-				   get_tf_localparam_array(),
-				   get_tf_decl_array(),
-				   stmt);
-  add_item(item, ai_list);
+  return mFactory.new_Task(fr, name, automatic,
+			   get_tf_io_array(),
+			   get_tf_param_array(),
+			   get_tf_localparam_array(),
+			   get_tf_decl_array(),
+			   stmt);
 }
 
 // @brief 1ビット型 function 文の生成
@@ -220,25 +201,20 @@ Parser::new_Task(const FileRegion& fr,
 // @param[in] automatic automatic task の時に true となるフラグ
 // @param[in] sign signed 属性がついていたら true となるフラグ
 // @param[in] stmt 本体のステートメント
-void
+PtItem*
 Parser::new_Function(const FileRegion& fr,
 		     const char* name,
 		     bool automatic,
 		     bool sign,
-		     PtStmt* stmt,
-		     PtrList<PtAttrInst>* ai_list)
+		     PtStmt* stmt)
 {
-  // 関数内で使用できないステートメントが含まれていないかチェック
-  if ( check_function_statement(stmt) ) {
-    PtItem* item = mFactory.new_Function(fr, name, automatic,
-					 sign,
-					 get_tf_io_array(),
-					 get_tf_param_array(),
-					 get_tf_localparam_array(),
-					 get_tf_decl_array(),
-					 stmt);
-    add_item(item, ai_list);
-  }
+  return mFactory.new_Function(fr, name, automatic,
+			       sign,
+			       get_tf_io_array(),
+			       get_tf_param_array(),
+			       get_tf_localparam_array(),
+			       get_tf_decl_array(),
+			       stmt);
 }
 
 // @brief 範囲指定型 function 文の生成
@@ -249,27 +225,22 @@ Parser::new_Function(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] stmt 本体のステートメント
-void
+PtItem*
 Parser::new_SizedFunc(const FileRegion& fr,
 		      const char* name,
 		      bool automatic,
 		      bool sign,
 		      PtExpr* left,
 		      PtExpr* right,
-		      PtStmt* stmt,
-		      PtrList<PtAttrInst>* ai_list)
+		      PtStmt* stmt)
 {
-  // 関数内で使用できないステートメントが含まれていないかチェック
-  if ( check_function_statement(stmt) ) {
-    PtItem* item = mFactory.new_SizedFunc(fr, name, automatic,
-					  sign, left, right,
-					  get_tf_io_array(),
-					  get_tf_param_array(),
-					  get_tf_localparam_array(),
-					  get_tf_decl_array(),
-					  stmt);
-    add_item(item, ai_list);
-  }
+  return mFactory.new_SizedFunc(fr, name, automatic,
+				sign, left, right,
+				get_tf_io_array(),
+				get_tf_param_array(),
+				get_tf_localparam_array(),
+				get_tf_decl_array(),
+				stmt);
 }
 
 // @brief 組み込み型 function 文の生成
@@ -279,26 +250,21 @@ Parser::new_SizedFunc(const FileRegion& fr,
 // @param[in] sign signed 属性がついていたら true となるフラグ
 // @param[in] func_type 関数の戻値の型
 // @param[in] stmt 本体のステートメント
-void
+PtItem*
 Parser::new_TypedFunc(const FileRegion& fr,
 		      const char* name,
 		      bool automatic,
 		      bool sign,
 		      tVpiVarType func_type,
-		      PtStmt* stmt,
-		      PtrList<PtAttrInst>* ai_list)
+		      PtStmt* stmt)
 {
-  // 関数内で使用できないステートメントが含まれていないかチェック
-  if ( check_function_statement(stmt) ) {
-    PtItem* item = mFactory.new_TypedFunc(fr, name, automatic,
-					  sign, func_type,
-					  get_tf_io_array(),
-					  get_tf_param_array(),
-					  get_tf_localparam_array(),
-					  get_tf_decl_array(),
-					  stmt);
-    add_item(item, ai_list);
-  }
+  return mFactory.new_TypedFunc(fr, name, automatic,
+				sign, func_type,
+				get_tf_io_array(),
+				get_tf_param_array(),
+				get_tf_localparam_array(),
+				get_tf_decl_array(),
+				stmt);
 }
 
 
@@ -308,12 +274,10 @@ Parser::new_TypedFunc(const FileRegion& fr,
 
 // @brief generate 文の生成
 // @param[in] fr ファイル位置の情報
-void
-Parser::new_Generate(const FileRegion& fr,
-		     PtrList<PtAttrInst>* ai_list)
+PtItem*
+Parser::new_Generate(const FileRegion& fr)
 {
-  PtItem* item = mFactory.new_Generate(fr, mCurDeclArray, mCurItemArray);
-  add_item(item, ai_list);
+  return mFactory.new_Generate(fr, mCurDeclArray, mCurItemArray);
 }
 
 // @brief generate block 文の生成

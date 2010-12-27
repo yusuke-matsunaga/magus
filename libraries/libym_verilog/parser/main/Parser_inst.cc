@@ -25,45 +25,35 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @brief gate instance 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
-void
+PtItem*
 Parser::new_GateH(const FileRegion& fr,
-		  tVpiPrimType type,
-		  PtrList<PtAttrInst>* ai_list)
+		  tVpiPrimType type)
 {
-  PtItem* item = mFactory.new_GateH(fr, type, get_inst_array());
-  add_item(item, ai_list);
+  return mFactory.new_GateH(fr, type, get_inst_array());
 }
 
 // @brief gate instance 文のヘッダの生成 (strength付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
 // @param[in] strength 信号強度
-void
+PtItem*
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
-		  PtStrength* strength,
-		  PtrList<PtAttrInst>* ai_list)
+		  PtStrength* strength)
 {
-  PtItem* item = mFactory.new_GateH(fr, type,
-				    strength,
-				    get_inst_array());
-  add_item(item, ai_list);
+  return mFactory.new_GateH(fr, type, strength, get_inst_array());
 }
 
 // @brief gate instance 文のヘッダの生成 (遅延付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
 // @param[in] delay 遅延値
-void
+PtItem*
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
-		  PtDelay* delay,
-		  PtrList<PtAttrInst>* ai_list)
+		  PtDelay* delay)
 {
-  PtItem* item = mFactory.new_GateH(fr, type,
-				    delay,
-				    get_inst_array());
-  add_item(item, ai_list);
+  return mFactory.new_GateH(fr, type, delay, get_inst_array());
 }
 
 // @brief gate instance 文のヘッダの生成 (strength, 遅延付き)
@@ -71,65 +61,50 @@ Parser::new_GateH(const FileRegion& fr,
 // @param[in] type primitive の型
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
-void
+PtItem*
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
 		  PtStrength* strength,
-		  PtDelay* delay,
-		  PtrList<PtAttrInst>* ai_list)
+		  PtDelay* delay)
 {
-  PtItem* item = mFactory.new_GateH(fr, type,
-				    strength, delay,
-				    get_inst_array());
-  add_item(item, ai_list);
+  return mFactory.new_GateH(fr, type, strength, delay, get_inst_array());
 }
 
 // @brief module instance/UDP instance 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
-void
+PtItem*
 Parser::new_MuH(const FileRegion& fr,
-		const char* def_name,
-		PtrList<PtAttrInst>* ai_list)
+		const char* def_name)
 {
-  PtItem* item = mFactory.new_MuH(fr, def_name,
-				  get_inst_array());
   reg_defname(def_name);
-  add_item(item, ai_list);
+  return mFactory.new_MuH(fr, def_name, get_inst_array());
 }
 
 // @brief module instance/UDP instance 文のヘッダの生成 (strength付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] strength 信号強度
-void
+PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
-		PtStrength* strength,
-		PtrList<PtAttrInst>* ai_list)
+		PtStrength* strength)
 {
-  PtItem* item = mFactory.new_MuH(fr, def_name,
-				  strength,
-				  get_inst_array());
   reg_defname(def_name);
-  add_item(item, ai_list);
+  return mFactory.new_MuH(fr, def_name, strength, get_inst_array());
 }
 
 // @brief module instance/UDP instance 文のヘッダの生成 (遅延付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] delay 遅延値
-void
+PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
-		PtDelay* delay,
-		PtrList<PtAttrInst>* ai_list)
+		PtDelay* delay)
 {
-  PtItem* item = mFactory.new_MuH(fr, def_name,
-				  delay,
-				  get_inst_array());
   reg_defname(def_name);
-  add_item(item, ai_list);
+  return mFactory.new_MuH(fr, def_name, delay, get_inst_array());
 }
 
 // @brief module instance/UDP instance 文のヘッダの生成 (strength, 遅延付き)
@@ -137,47 +112,28 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] def_name 定義名
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
-void
+PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
 		PtStrength* strength,
-		PtDelay* delay,
-		PtrList<PtAttrInst>* ai_list)
+		PtDelay* delay)
 {
-  PtItem* item = mFactory.new_MuH(fr, def_name,
-				  strength, delay,
-				  get_inst_array());
   reg_defname(def_name);
-  add_item(item, ai_list);
+  return mFactory.new_MuH(fr, def_name, strength, delay, get_inst_array());
 }
 
 // @brief module instance/UDP instance 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] con_array ポート割り当てリスト
-void
+PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
-		PtrList<PtConnection>* con_list,
-		PtrList<PtAttrInst>* ai_list)
+		PtrList<PtConnection>* con_list)
 {
-  PtItem* item = mFactory.new_MuH(fr, def_name,
-				  to_array(con_list),
-				  get_inst_array());
   reg_defname(def_name);
-  add_item(item, ai_list);
+  return mFactory.new_MuH(fr, def_name, to_array(con_list), get_inst_array());
 }
-
-// @brief item リストに要素を追加する．
-inline
-void
-Parser::add_item(PtItem* item,
-		 PtrList<PtAttrInst>* attr_list)
-{
-  reg_attrinst(item, attr_list);
-  mCurItemList->push_back(item);
-}
-
 
 // @brief module instance/UDP/gate instance の要素の生成
 // @param[in] fr ファイル位置の情報

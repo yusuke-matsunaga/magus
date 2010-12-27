@@ -114,6 +114,8 @@ fr_merge(const FileRegion fr_array[],
 
   PuHierName* hiername;
 
+  PtItem* item;
+
   PtGenCaseItem* gencaseitem;
   PtPathDecl* pathdecl;
   PtPathDelay* pathdelay;
@@ -393,6 +395,12 @@ fr_merge(const FileRegion fr_array[],
 %type <inttype> opt_auto
 
 %type <strtype> mu_head
+
+%type <item> pure_item
+%type <item> task_declaration function_declaration
+%type <item> parameter_override continuous_assign
+%type <item> gate_instantiation module_instantiation
+%type <item> initial_construct always_construct
 
 %type <stmtlist> nzlist_of_stmt
 
@@ -1023,14 +1031,45 @@ module_or_generate_decl
 ;
 
 module_or_generate_item
+: ai_list pure_item
+{
+  parser.add_item($2, $1);
+}
+;
+
+pure_item
 : task_declaration
+{
+  $$ = $1;
+}
 | function_declaration
+{
+  $$ = $1;
+}
 | parameter_override
+{
+  $$ = $1;
+}
 | continuous_assign
+{
+  $$ = $1;
+}
 | gate_instantiation
+{
+  $$ = $1;
+}
 | module_instantiation
+{
+  $$ = $1;
+}
 | initial_construct
+{
+  $$ = $1;
+}
 | always_construct
+{
+  $$ = $1;
+}
 ;
 
 // [SPEC] parameter_override ::= "defparam" list_of_param_assignments ';'
@@ -1038,12 +1077,13 @@ module_or_generate_item
 // 階層付きの名前を使ってこそ意味があるのでこれは仕様の明らかな誤り
 // そのため defparam_assignment という非終端節点を用意している．
 parameter_override
-: ai_list defparam_head nzlist_of_defparam_assignment ';'
+: defparam_head nzlist_of_defparam_assignment ';'
 {
-  parser.new_DefParamH(@$, $1);
+  $$ = parser.new_DefParamH(@$);
 }
-| ai_list defparam_head error ';'
+| defparam_head error ';'
 {
+  $$ = NULL;
   yyerrok;
 }
 ;
@@ -2216,51 +2256,88 @@ nzlist_of_dimensions
 // function_statement は statement で代用する．
 // 読み込んだあとでチェックする．
 function_declaration
-: ai_list function_head opt_auto sign IDENTIFIER ';'
+: function_head opt_auto sign IDENTIFIER ';'
   nzlist_of_fitem_decl
   statement
   function_tail
 {
-  parser.new_Function(@$, $5, $3, $4, $8, $1);
+  // 関数内で使用できないステートメントが含まれていないかチェック
+  if ( parser.check_function_statement($7) ) {
+    $$ = parser.new_Function(@$, $4, $2, $3, $7);
+  }
+  else {
+    $$ = NULL;
+  }
 }
-| ai_list function_head opt_auto sign '[' expression ':' expression ']' IDENTIFIER ';'
+| function_head opt_auto sign '[' expression ':' expression ']' IDENTIFIER ';'
   nzlist_of_fitem_decl
   statement
   function_tail
 {
-  parser.new_SizedFunc(@$, $10, $3, $4, $6, $8, $13, $1);
+  // 関数内で使用できないステートメントが含まれていないかチェック
+  if ( parser.check_function_statement($12) ) {
+    $$ = parser.new_SizedFunc(@$, $9, $2, $3, $5, $7, $12);
+  }
+  else {
+    $$ = NULL;
+  }
 }
-| ai_list function_head opt_auto sign data_type IDENTIFIER ';'
+| function_head opt_auto sign data_type IDENTIFIER ';'
   nzlist_of_fitem_decl
   statement
   function_tail
 {
-  parser.new_TypedFunc(@$, $6, $3, $4, $5, $9, $1);
+  // 関数内で使用できないステートメントが含まれていないかチェック
+  if ( parser.check_function_statement($8) ) {
+    $$ = parser.new_TypedFunc(@$, $5, $2, $3, $4, $8);
+  }
+  else {
+    $$ = NULL;
+  }
 }
-| ai_list function_head opt_auto sign IDENTIFIER function_port_block ';'
+| function_head opt_auto sign IDENTIFIER function_port_block ';'
   list_of_bitem_decl
   statement
   function_tail
 {
-  parser.new_Function(@$, $5, $3, $4, $9, $1);
+  // 関数内で使用できないステートメントが含まれていないかチェック
+  if ( parser.check_function_statement($8) ) {
+    $$ = parser.new_Function(@$, $4, $2, $3, $8);
+  }
+  else {
+    $$ = NULL;
+  }
 }
-| ai_list function_head opt_auto sign '[' expression ':' expression ']'
+| function_head opt_auto sign '[' expression ':' expression ']'
   IDENTIFIER function_port_block ';'
   list_of_bitem_decl
   statement
   function_tail
 {
-  parser.new_SizedFunc(@$, $10, $3, $4, $6, $8, $14, $1);
+  // 関数内で使用できないステートメントが含まれていないかチェック
+  if ( parser.check_function_statement($13) ) {
+    $$ = parser.new_SizedFunc(@$, $9, $2, $3, $5, $7, $13);
+  }
+  else {
+    $$ = NULL;
+  }
 }
-| ai_list function_head opt_auto sign data_type IDENTIFIER function_port_block ';'
+| function_head opt_auto sign data_type IDENTIFIER function_port_block ';'
   list_of_bitem_decl
   statement
   function_tail
 {
-  parser.new_TypedFunc(@$, $6, $3, $4, $5, $10, $1);
+  // 関数内で使用できないステートメントが含まれていないかチェック
+  if ( parser.check_function_statement($9) ) {
+    $$ = parser.new_TypedFunc(@$, $5, $2, $3, $4, $9);
+  }
+  else {
+    $$ = NULL;
+  }
 }
-| ai_list function_head error function_tail
+| function_head error function_tail
 {
+  $$ = NULL;
   yyerrok;
 }
 ;
@@ -2364,22 +2441,23 @@ data_type
 // この statement は statement_or_null でよいそうだ．
 // Verilog-XL もそうなっている．
 task_declaration
-: ai_list task_head opt_auto IDENTIFIER ';'
+: task_head opt_auto IDENTIFIER ';'
   list_of_titem_decl
   statement_or_null
   task_tail
 {
-  parser.new_Task(@$, $4, $3, $7, $1);
+  $$ = parser.new_Task(@$, $3, $2, $6);
 }
-| ai_list task_head opt_auto IDENTIFIER task_port_block ';'
+| task_head opt_auto IDENTIFIER task_port_block ';'
   list_of_bitem_decl
   statement_or_null
   task_tail
 {
-  parser.new_Task(@$, $4, $3, $8, $1);
+  $$ = parser.new_Task(@$, $3, $2, $7);
 }
-| ai_list task_head error task_tail
+| task_head error task_tail
 {
+  $$ = NULL;
   yyerrok;
 }
 ;
@@ -2693,97 +2771,97 @@ identifier_with_range
 //            |"pullup" [pullup_strength] pull_gate_instance
 //                 {',' pull_gate_instance } ';'
 gate_instantiation
-: ai_list cmos_switchtype                        nzlist_of_cmos_switch_inst ';'
+: cmos_switchtype                        nzlist_of_cmos_switch_inst ';'
 {
-  parser.new_GateH(@$, $2, $1);
+  $$ = parser.new_GateH(@$, $1);
 }
-| ai_list cmos_switchtype                 delay3 nzlist_of_cmos_switch_inst ';'
+| cmos_switchtype                 delay3 nzlist_of_cmos_switch_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list enable_gatetype                        nzlist_of_enable_gate_inst ';'
+| enable_gatetype                        nzlist_of_enable_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $1);
+  $$ = parser.new_GateH(@$, $1);
 }
-| ai_list enable_gatetype                 delay3 nzlist_of_enable_gate_inst ';'
+| enable_gatetype                 delay3 nzlist_of_enable_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list enable_gatetype  drive_strength        nzlist_of_enable_gate_inst ';'
+| enable_gatetype  drive_strength        nzlist_of_enable_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list enable_gatetype  drive_strength delay3 nzlist_of_enable_gate_inst ';'
+| enable_gatetype  drive_strength delay3 nzlist_of_enable_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $4, $1);
+  $$ = parser.new_GateH(@$, $1, $2, $3);
 }
-| ai_list mos_switchtype                         nzlist_of_mos_switch_inst ';'
+| mos_switchtype                         nzlist_of_mos_switch_inst ';'
 {
-  parser.new_GateH(@$, $2, $1);
+  $$ = parser.new_GateH(@$, $1);
 }
-| ai_list mos_switchtype                  delay3 nzlist_of_mos_switch_inst ';'
+| mos_switchtype                  delay3 nzlist_of_mos_switch_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list n_input_gatetype                       nzlist_of_n_input_gate_inst ';'
+| n_input_gatetype                       nzlist_of_n_input_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $1);
+  $$ = parser.new_GateH(@$, $1);
 }
-| ai_list n_input_gatetype                delay2 nzlist_of_n_input_gate_inst ';'
+| n_input_gatetype                delay2 nzlist_of_n_input_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list n_input_gatetype drive_strength        nzlist_of_n_input_gate_inst ';'
+| n_input_gatetype drive_strength        nzlist_of_n_input_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list n_input_gatetype drive_strength delay2 nzlist_of_n_input_gate_inst ';'
+| n_input_gatetype drive_strength delay2 nzlist_of_n_input_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $4, $1);
+  $$ = parser.new_GateH(@$, $1, $2, $3);
 }
-| ai_list n_output_gatetype                       nzlist_of_n_output_gate_inst ';'
+| n_output_gatetype                       nzlist_of_n_output_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $1);
+  $$ = parser.new_GateH(@$, $1);
 }
-| ai_list n_output_gatetype                delay2 nzlist_of_n_output_gate_inst ';'
+| n_output_gatetype                delay2 nzlist_of_n_output_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list n_output_gatetype drive_strength        nzlist_of_n_output_gate_inst ';'
+| n_output_gatetype drive_strength        nzlist_of_n_output_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list n_output_gatetype drive_strength delay2 nzlist_of_n_output_gate_inst ';'
+| n_output_gatetype drive_strength delay2 nzlist_of_n_output_gate_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $4, $1);
+  $$ = parser.new_GateH(@$, $1, $2, $3);
 }
-| ai_list pass_en_switchtype                      nzlist_of_pass_en_switch_inst ';'
+| pass_en_switchtype                      nzlist_of_pass_en_switch_inst ';'
 {
-  parser.new_GateH(@$, $2, $1);
+  $$ = parser.new_GateH(@$, $1);
 }
-| ai_list pass_en_switchtype               delay3 nzlist_of_pass_en_switch_inst ';'
+| pass_en_switchtype               delay3 nzlist_of_pass_en_switch_inst ';'
 {
-  parser.new_GateH(@$, $2, $3, $1);
+  $$ = parser.new_GateH(@$, $1, $2);
 }
-| ai_list pass_switchtype                         nzlist_of_pass_switch_inst ';'
+| pass_switchtype                         nzlist_of_pass_switch_inst ';'
 {
-  parser.new_GateH(@$, $2, $1);
+  $$ = parser.new_GateH(@$, $1);
 }
-| ai_list PULLDOWN                                nzlist_of_pull_inst ';'
+| PULLDOWN                                nzlist_of_pull_inst ';'
 {
-  parser.new_GateH(@$, kVpiPulldownPrim, $1);
+  $$ = parser.new_GateH(@$, kVpiPulldownPrim);
 }
-| ai_list PULLDOWN pulldown_strength              nzlist_of_pull_inst ';'
+| PULLDOWN pulldown_strength              nzlist_of_pull_inst ';'
 {
-  parser.new_GateH(@$, kVpiPulldownPrim, $3, $1);
+  $$ = parser.new_GateH(@$, kVpiPulldownPrim, $2);
 }
-| ai_list PULLUP                                  nzlist_of_pull_inst ';'
+| PULLUP                                  nzlist_of_pull_inst ';'
 {
-  parser.new_GateH(@$, kVpiPullupPrim, $1);
+  $$ = parser.new_GateH(@$, kVpiPullupPrim);
 }
-| ai_list PULLUP pullup_strength                  nzlist_of_pull_inst ';'
+| PULLUP pullup_strength                  nzlist_of_pull_inst ';'
 {
-  parser.new_GateH(@$, kVpiPullupPrim, $3, $1);
+  $$ = parser.new_GateH(@$, kVpiPullupPrim, $2);
 }
 ;
 
@@ -2855,7 +2933,7 @@ nzlist_of_pull_inst
 cmos_switch_instance
 : '(' net_lvalue ',' expression ',' expression ',' expression ')'
 {
-  parser.new_Inst(@$, $2, $4, $6, $6);
+  parser.new_Inst(@$, $2, $4, $6, $8);
 }
 | IDENTIFIER
   '(' net_lvalue ',' expression ',' expression ',' expression ')'
@@ -3276,47 +3354,48 @@ pass_switchtype
 // なので parameter_value_assignment と重なる．
 // とりあえず delay2 と ordered_parameter_assignment は区別できない．
 module_instantiation
-: ai_list mu_head                                          nzlist_of_mu_inst ';'
+: mu_head                                          nzlist_of_mu_inst ';'
 {
-  parser.new_MuH(@$, $2, $1);
+  $$ = parser.new_MuH(@$, $1);
 }
-| ai_list mu_head '#' '(' list_of_ordered_param_assign ')' nzlist_of_mu_inst ';'
+| mu_head '#' '(' list_of_ordered_param_assign ')' nzlist_of_mu_inst ';'
 {
-  parser.new_MuH(@$, $2, $5, $1);
+  $$ = parser.new_MuH(@$, $1, $4);
 }
-| ai_list mu_head '#' '(' list_of_named_param_assign ')'   nzlist_of_mu_inst ';'
+| mu_head '#' '(' list_of_named_param_assign ')'   nzlist_of_mu_inst ';'
 {
-  parser.new_MuH(@$, $2, $5, $1);
+  $$ = parser.new_MuH(@$, $1, $4);
 }
-| ai_list mu_head '#' unumber                              nzlist_of_mu_inst ';'
+| mu_head '#' unumber                              nzlist_of_mu_inst ';'
              // これは delay2 の特殊形
 {
-  PtDelay* delay = parser.new_Delay(FileRegion(@3, @4), $4);
-  parser.new_MuH(@$, $2, delay, $1);
+  PtDelay* delay = parser.new_Delay(FileRegion(@2, @3), $3);
+  $$ = parser.new_MuH(@$, $1, delay);
 }
-| ai_list mu_head '#' rnumber                              nzlist_of_mu_inst ';'
+| mu_head '#' rnumber                              nzlist_of_mu_inst ';'
              // これは delay2 の特殊形
 {
-  PtDelay* delay = parser.new_Delay(FileRegion(@3, @4), $4);
-  parser.new_MuH(@$, $2, delay, $1);
+  PtDelay* delay = parser.new_Delay(FileRegion(@2, @3), $3);
+  $$ = parser.new_MuH(@$, $1, delay);
 }
-| ai_list mu_head '#' IDENTIFIER                           nzlist_of_mu_inst ';'
+| mu_head '#' IDENTIFIER                           nzlist_of_mu_inst ';'
              // これは delay2 の特殊形
 {
-  PtExpr* prim = parser.new_Primary(@4, $4);
-  PtDelay* delay = parser.new_Delay(FileRegion(@3, @4), prim);
-  parser.new_MuH(@$, $2, delay, $1);
+  PtExpr* prim = parser.new_Primary(@3, $3);
+  PtDelay* delay = parser.new_Delay(FileRegion(@2, @3), prim);
+  $$ = parser.new_MuH(@$, $1, delay);
 }
-| ai_list mu_head drive_strength                           nzlist_of_mu_inst ';'
+| mu_head drive_strength                           nzlist_of_mu_inst ';'
 {
-  parser.new_MuH(@$, $2, $3, $1);
+  $$ = parser.new_MuH(@$, $1, $2);
 }
-| ai_list mu_head drive_strength delay2                    nzlist_of_mu_inst ';'
+| mu_head drive_strength delay2                    nzlist_of_mu_inst ';'
 {
-  parser.new_MuH(@$, $2, $3, $4, $1);
+  $$ = parser.new_MuH(@$, $1, $2, $3);
 }
-| ai_list mu_head error ';'
+| mu_head error ';'
 {
+  $$ = NULL;
   yyerrok;
 }
 ;
@@ -3516,7 +3595,8 @@ named_port_connection
 generated_instantiation
 : ai_list generate_head list_of_generate_items generate_tail
 {
-  parser.new_Generate(@$, $1);
+  PtItem* item = parser.new_Generate(@$);
+  parser.add_item(item, $1);
 }
 | ai_list generate_head error generate_tail
 {
@@ -4165,24 +4245,25 @@ edge_symbol
 // [SPEC] continuous_assign ::=
 //             "assign" [drive_stregth] [delay3] list_of_net_assignments ';'
 continuous_assign
-: ai_list assign_head                       list_of_net_assignments ';'
+: assign_head                       list_of_net_assignments ';'
 {
-  parser.new_ContAssignH(@$, $1);
+  $$ = parser.new_ContAssignH(@$);
 }
-| ai_list assign_head                delay3 list_of_net_assignments ';'
+| assign_head                delay3 list_of_net_assignments ';'
 {
-  parser.new_ContAssignH(@$, $3, $1);
+  $$ = parser.new_ContAssignH(@$, $2);
 }
-| ai_list assign_head drive_strength        list_of_net_assignments ';'
+| assign_head drive_strength        list_of_net_assignments ';'
 {
-  parser.new_ContAssignH(@$, $3, $1);
+  $$ = parser.new_ContAssignH(@$, $2);
 }
-| ai_list assign_head drive_strength delay3 list_of_net_assignments ';'
+| assign_head drive_strength delay3 list_of_net_assignments ';'
 {
-  parser.new_ContAssignH(@$, $3, $4, $1);
+  $$ = parser.new_ContAssignH(@$, $2, $3);
 }
-| ai_list assign_head error ';'
+| assign_head error ';'
 {
+  $$ = NULL;
   yyerrok;
 }
 ;
@@ -4215,17 +4296,17 @@ net_assignment
 
 // [SPEC] initial_construct ::= "initial" statement
 initial_construct
-: ai_list INITIAL statement
+: INITIAL statement
 {
-  parser.new_Initial(@$, $3, $1);
+  $$ = parser.new_Initial(@$, $2);
 }
 ;
 
 // [SPEC] always_construct ::= "always" statement
 always_construct
-: ai_list ALWAYS statement
+: ALWAYS statement
 {
-  parser.new_Always(@$, $3, $1);
+  $$ = parser.new_Always(@$, $2);
 }
 ;
 

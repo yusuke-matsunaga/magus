@@ -16,6 +16,7 @@
 #include "Lex.h"
 #include "PtMgr.h"
 
+#include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtStmt.h"
 
 
@@ -368,6 +369,17 @@ Parser::extract_HierName(PuHierName* hname,
   }
 
   return ans;
+}
+
+// @brief item リストに要素を追加する．
+void
+Parser::add_item(PtItem* item,
+		 PtrList<PtAttrInst>* attr_list)
+{
+  if ( item ) {
+    reg_attrinst(item, attr_list);
+    mCurItemList->push_back(item);
+  }
 }
 
 // @brief メッセージを出力する．
