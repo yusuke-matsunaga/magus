@@ -122,6 +122,16 @@ ElbProxy::instantiate_param(const VlNamedObj* parent,
   mDeclGen->instantiate_param(parent, pt_head_array, is_local);
 }
 
+// @brief genvar をインスタンス化する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_head_array 宣言ヘッダの配列
+void
+ElbProxy::instantiate_genvar(const VlNamedObj* parent,
+			     PtDeclHeadArray pt_head_array)
+{
+  mDeclGen->instantiate_genvar(parent, pt_head_array);
+}
+
 // @brief スコープに関係する要素を実体化する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_item_array 要素定義の配列

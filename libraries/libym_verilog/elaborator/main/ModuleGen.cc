@@ -197,6 +197,9 @@ ModuleGen::phase1_module_item(ElbModule* module,
   // localparam を実体化する．
   instantiate_param(module, pt_module->localparamhead_array(), true);
 
+  // genvar を実体化する．
+  instantiate_genvar(module, pt_module->declhead_array());
+
   // それ以外の要素を実体化する．
   phase1_item(module, pt_module->item_array());
 

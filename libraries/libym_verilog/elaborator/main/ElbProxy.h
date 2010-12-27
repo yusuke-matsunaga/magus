@@ -380,6 +380,13 @@ protected:
 		    PtDeclHeadArray pt_head_array,
 		    bool is_local);
 
+  /// @brief genvar をインスタンス化する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head_array 宣言ヘッダの配列
+  void
+  instantiate_genvar(const VlNamedObj* parent,
+		     PtDeclHeadArray pt_head_array);
+
 
 protected:
   //////////////////////////////////////////////////////////////////////

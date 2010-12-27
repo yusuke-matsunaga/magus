@@ -378,7 +378,7 @@ DeclGen::instantiate_decl(const VlNamedObj* parent,
       break;
 
     case kPtDecl_Genvar:
-      instantiate_genvar_head(parent, pt_head);
+      // すでに処理済みのはず．
       break;
 
     case kPtDecl_Net:
@@ -470,6 +470,21 @@ DeclGen::instantiate_param(const VlNamedObj* parent,
 						     param, init,
 						     true);
       reg_paramassign(pa);
+    }
+  }
+}
+
+// genvar をインスタンス化する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_head_array 宣言ヘッダの配列
+void
+DeclGen::instantiate_genvar(const VlNamedObj* parent,
+			    PtDeclHeadArray pt_head_array)
+{
+  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
+    const PtDeclHead* pt_head = pt_head_array[i];
+    if ( pt_head->type() == kPtDecl_Genvar ) {
+      instantiate_genvar_head(parent, pt_head);
     }
   }
 }
