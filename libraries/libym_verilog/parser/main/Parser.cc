@@ -614,6 +614,9 @@ Parser::init_generate()
 void
 Parser::end_generate()
 {
+  mGenDeclArray = get_decl_array();
+  mGenItemArray = get_item_array();
+
   pop_declhead_list(true);
   pop_item_list(true);
 }
@@ -624,51 +627,40 @@ Parser::init_genif()
 {
   push_declhead_list(NULL);
   push_item_list(NULL);
-
-  mThenDeclHeadListStack.push_back(mCurThenDeclHeadList);
-  mThenItemListStack.push_back(mCurThenItemList);
-
-  mCurThenDeclHeadList = mCurDeclHeadList;
-  mCurThenItemList = mCurItemList;
-}
-
-// @brief generate-if の else 節の開始
-void
-Parser::init_else()
-{
-  push_declhead_list(NULL);
-  push_item_list(NULL);
-
-  mElseDeclHeadListStack.push_back(mCurElseDeclHeadList);
-  mElseItemListStack.push_back(mCurElseItemList);
-
-  mCurElseDeclHeadList = mCurDeclHeadList;
-  mCurElseItemList = mCurItemList;
 }
 
 // @brief generate-if の終了
 void
 Parser::end_genif()
 {
-  // else 節の分
+  flush_declitem_list(*mCurDeclHeadList);
+
+  mGenThenDeclArray = get_decl_array();
+  mGenThenItemArray = get_item_array();
+
   pop_declhead_list(true);
   pop_item_list(true);
+}
 
-  // then 節の分
+// @brief generate-if の else 節の開始
+void
+Parser::init_genelse()
+{
+  push_declhead_list(NULL);
+  push_item_list(NULL);
+}
+
+// @brief generate-if-else の終了
+void
+Parser::end_genelse()
+{
+  flush_declitem_list(*mCurDeclHeadList);
+
+  mGenElseDeclArray = get_decl_array();
+  mGenElseItemArray = get_item_array();
+
   pop_declhead_list(true);
   pop_item_list(true);
-
-  mCurThenDeclHeadList = mThenDeclHeadListStack.back();
-  mThenDeclHeadListStack.pop_back();
-
-  mCurThenItemList = mThenItemListStack.back();
-  mThenItemListStack.pop_back();
-
-  mCurElseDeclHeadList = mElseDeclHeadListStack.back();
-  mElseDeclHeadListStack.pop_back();
-
-  mCurElseItemList = mElseItemListStack.back();
-  mElseItemListStack.pop_back();
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -434,6 +434,7 @@ fr_merge(const FileRegion fr_array[],
 
 %type <gcilist> list_of_gencaseitem
 %type <gencaseitem> genvar_case_item
+%type <exprlist> genvar_case_head
 
 %type <strength> drive_strength charge_strength
 %type <strength> pulldown_strength pullup_strength
@@ -3607,14 +3608,13 @@ named_port_connection
 // [SPEC] generated_instantiation ::=
 //             "generate" { generate_item } "endgenerate"
 generated_instantiation
-: ai_list generate_head list_of_generate_items ENDGENERATE
+: ai_list generate_head list_of_generate_items generate_tail
 {
   parser.new_Generate(@$, $1);
 }
-| ai_list generate_head error ENDGENERATE
+| ai_list generate_head error generate_tail
 {
   // generate 中のエラーは endgenerate まで読み飛ばす
-  parser.end_generate();
   yyerrok;
 }
 ;
@@ -3623,6 +3623,13 @@ generate_head
 : GENERATE
 {
   parser.init_generate();
+}
+;
+
+generate_tail
+: ENDGENERATE
+{
+  parser.end_generate();
 }
 ;
 
@@ -3667,16 +3674,18 @@ generate_item_or_null
 generate_item
 : gen_if '(' expression ')' generate_item_or_null %prec LOWER_THAN_ELSE
 {
+  parser.end_genif();
   parser.new_GenIf(@$, $3);
 }
 | gen_if '(' expression ')' generate_item_or_null
   gen_else generate_item_or_null
 {
+  parser.end_genelse();
   parser.new_GenIfElse(@$, $3);
 }
 | gen_if error gen_else { yyerrok; } generate_item_or_null
 {
-  parser.end_genif();
+  parser.end_genelse();
 }
 | CASE '(' expression ')' list_of_gencaseitem ENDCASE
 {
@@ -3691,33 +3700,30 @@ generate_item
           IDENTIFIER '=' expression ')'
   gen_begin ':' IDENTIFIER
   list_of_generate_items
-  END
+  gen_end
 {
   parser.new_GenFor(@$, $3, $5, $7, $9, $11, $15);
 }
 | FOR '(' IDENTIFIER '=' expression ';' expression ';'
           IDENTIFIER '=' expression ')'
-  gen_begin error
-  END
+  gen_begin error gen_end
 {
-  parser.end_generate();
   yyerrok;
 }
 | FOR error END
 {
   yyerrok;
 }
-| gen_begin list_of_generate_items END
+| gen_begin list_of_generate_items gen_end
 {
   parser.new_GenBlock(@$);
 }
-| gen_begin ':' IDENTIFIER list_of_generate_items END
+| gen_begin ':' IDENTIFIER list_of_generate_items gen_end
 {
   parser.new_GenBlock(@$, $3);
 }
-| gen_begin error END
+| gen_begin error gen_end
 {
-  parser.end_generate();
   yyerrok;
 }
 | module_or_generate_item
@@ -3733,7 +3739,8 @@ gen_if
 gen_else
 : ELSE
 {
-  parser.init_else();
+  parser.end_genif();
+  parser.init_genelse();
 }
 ;
 
@@ -3741,6 +3748,13 @@ gen_begin
 : BEGIN
 {
   parser.init_generate();
+}
+;
+
+gen_end
+: END
+{
+  parser.end_generate();
 }
 ;
 
@@ -3764,17 +3778,28 @@ list_of_gencaseitem
 //                 generate_item_or_null
 //            |"default" [':'] generate_item_or_null
 genvar_case_item
-: nzlist_of_expressions ':' { parser.init_generate(); } generate_item_or_null
+: genvar_case_head generate_item_or_null
 {
+  parser.end_generate();
   $$ = parser.new_GenCaseItem(@$, $1);
 }
-| DEFAULT                   { parser.init_generate(); } generate_item_or_null
+;
+
+genvar_case_head
+: nzlist_of_expressions ':'
 {
-  $$ = parser.new_GenCaseItem(@$, NULL);
+  parser.init_generate();
+  $$ = $1;
 }
-| DEFAULT               ':' { parser.init_generate(); } generate_item_or_null
+| DEFAULT
 {
-  $$ = parser.new_GenCaseItem(@$, NULL);
+  parser.init_generate();
+  $$ = NULL;
+}
+| DEFAULT               ':'
+{
+  parser.init_generate();
+  $$ = NULL;
 }
 ;
 

@@ -2141,13 +2141,17 @@ public:
   void
   init_genif();
 
-  /// @brief generate-if の else 節の開始
-  void
-  init_else();
-
   /// @brief generate-if の終了
   void
   end_genif();
+
+  /// @brief generate-if の else 節の開始
+  void
+  init_genelse();
+
+  /// @grief generate-if の else 節の終了
+  void
+  end_genelse();
 
   /// @brief block-statment の開始
   void
@@ -2205,6 +2209,10 @@ public:
   PtIOHeadArray
   get_io_array();
 
+  /// @brief task/function 用の IO宣言リストを配列に変換する．
+  PtIOHeadArray
+  get_tf_io_array();
+
   /// @brief parameter 宣言ヘッダを追加する．
   void
   add_param_head(PtiDeclHead* head);
@@ -2217,6 +2225,10 @@ public:
   PtDeclHeadArray
   get_param_array();
 
+  /// @brief task/function 用の parameter リストを配列に変換する．
+  PtDeclHeadArray
+  get_tf_param_array();
+
   /// @brief localparam 宣言ヘッダを追加する．
   void
   add_localparam_head(PtiDeclHead* head);
@@ -2228,6 +2240,10 @@ public:
   /// @brief localparam リストを配列に変換する．
   PtDeclHeadArray
   get_localparam_array();
+
+  /// @brief task/function 用の localparam リストを配列に変換する．
+  PtDeclHeadArray
+  get_tf_localparam_array();
 
   /// @brief 宣言リストに宣言ヘッダを追加する．
   void
@@ -2245,6 +2261,11 @@ public:
   PtDeclHeadArray
   get_decl_array();
 
+  /// @brief task/function 用の宣言リストを配列に変換する．
+  PtDeclHeadArray
+  get_tf_decl_array();
+
+#if 0
   /// @brief generate-if 文の then 節の宣言リストを配列に変換する．
   PtDeclHeadArray
   get_then_decl_array();
@@ -2252,6 +2273,7 @@ public:
   /// @brief generate-if 文の else 節の宣言リストを配列に変換する．
   PtDeclHeadArray
   get_else_decl_array();
+#endif
 
   /// @brief item リストに要素を追加する．
   void
@@ -2261,6 +2283,11 @@ public:
   PtItemArray
   get_item_array();
 
+  /// @brief task/function 用の item リストを配列に変換する．
+  PtItemArray
+  get_tf_item_array();
+
+#if 0
   /// @brief generate-if 文の then 節の item リストを配列に変換する．
   PtItemArray
   get_then_item_array();
@@ -2268,6 +2295,7 @@ public:
   /// @brief generate-if 文の else 節の item リストを配列に変換する．
   PtItemArray
   get_else_item_array();
+#endif
 
   /// @brief UdpEntry を追加する．
   void
@@ -2592,17 +2620,23 @@ public:
   // 現在の item リスト
   PtItemList* mCurItemList;
 
-  // 現在の then 宣言ヘッダリスト
-  PtDeclHeadList* mCurThenDeclHeadList;
+  // generate 文の宣言ヘッダリスト
+  PtDeclHeadArray mGenDeclArray;
 
-  // 現在の then item リスト
-  PtItemList* mCurThenItemList;
+  // generate 文の item リスト
+  PtItemArray mGenItemArray;
 
-  // 現在の else 宣言ヘッダリスト
-  PtDeclHeadList* mCurElseDeclHeadList;
+  // generate-if の then 節の宣言ヘッダリスト
+  PtDeclHeadArray mGenThenDeclArray;
 
-  // 現在の else item リスト
-  PtItemList* mCurElseItemList;
+  // generate-if の then 節の item リスト
+  PtItemArray mGenThenItemArray;
+
+  // generate-if の else 節の宣言ヘッダリスト
+  PtDeclHeadArray mGenElseDeclArray;
+
+  // generate-if の else 節の item リスト
+  PtItemArray mGenElseItemArray;
 
 
 public:
@@ -2624,18 +2658,6 @@ public:
 
   // item リストのスタック
   vector<PtItemList*> mItemListStack;
-
-  // then 宣言ヘッダリストのスタック
-  vector<PtDeclHeadList*> mThenDeclHeadListStack;
-
-  // then item リストのスタック
-  vector<PtItemList*> mThenItemListStack;
-
-  // else 宣言ヘッダリストのスタック
-  vector<PtDeclHeadList*> mElseDeclHeadListStack;
-
-  // else item リストのスタック
-  vector<PtItemList*> mElseItemListStack;
 
 };
 
@@ -2712,12 +2734,28 @@ Parser::get_io_array()
   return mCurIOHeadList->to_array(mAlloc);
 }
 
+// @brief task/function 用の IO宣言リストを配列に変換する．
+inline
+PtIOHeadArray
+Parser::get_tf_io_array()
+{
+  return mTfIOHeadList.to_array(mAlloc);
+}
+
 // @brief parameter リストを配列に変換する．
 inline
 PtDeclHeadArray
 Parser::get_param_array()
 {
   return mCurParamHeadList->to_array(mAlloc);
+}
+
+// @brief task/function 用の parameter リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_tf_param_array()
+{
+  return mTfParamHeadList.to_array(mAlloc);
 }
 
 // @brief localparam リストを配列に変換する．
@@ -2728,12 +2766,28 @@ Parser::get_localparam_array()
   return mCurLparamHeadList->to_array(mAlloc);
 }
 
+// @brief task/function 用の localparam リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_tf_localparam_array()
+{
+  return mTfLparamHeadList.to_array(mAlloc);
+}
+
 // @brief 宣言リストを配列に変換する．
 inline
 PtDeclHeadArray
 Parser::get_decl_array()
 {
   return mCurDeclHeadList->to_array(mAlloc);
+}
+
+// @brief task/function 用の宣言リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_tf_decl_array()
+{
+  return mTfDeclHeadList.to_array(mAlloc);
 }
 
 // @brief item リストを配列に変換する．

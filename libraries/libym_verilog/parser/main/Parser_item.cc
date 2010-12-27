@@ -213,10 +213,10 @@ Parser::new_Task(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtItem* item = mFactory.new_Task(fr, name, automatic,
-				   get_io_array(),
-				   get_param_array(),
-				   get_localparam_array(),
-				   get_decl_array(),
+				   get_tf_io_array(),
+				   get_tf_param_array(),
+				   get_tf_localparam_array(),
+				   get_tf_decl_array(),
 				   stmt);
   reg_attrinst(item, ai_list);
   add_item(item);
@@ -240,10 +240,10 @@ Parser::new_Function(const FileRegion& fr,
   if ( check_function_statement(stmt) ) {
     PtItem* item = mFactory.new_Function(fr, name, automatic,
 					 sign,
-					 get_io_array(),
-					 get_param_array(),
-					 get_localparam_array(),
-					 get_decl_array(),
+					 get_tf_io_array(),
+					 get_tf_param_array(),
+					 get_tf_localparam_array(),
+					 get_tf_decl_array(),
 					 stmt);
     reg_attrinst(item, ai_list);
     add_item(item);
@@ -272,10 +272,10 @@ Parser::new_SizedFunc(const FileRegion& fr,
   if ( check_function_statement(stmt) ) {
     PtItem* item = mFactory.new_SizedFunc(fr, name, automatic,
 					  sign, left, right,
-					  get_io_array(),
-					  get_param_array(),
-					  get_localparam_array(),
-					  get_decl_array(),
+					  get_tf_io_array(),
+					  get_tf_param_array(),
+					  get_tf_localparam_array(),
+					  get_tf_decl_array(),
 					  stmt);
     reg_attrinst(item, ai_list);
     add_item(item);
@@ -302,10 +302,10 @@ Parser::new_TypedFunc(const FileRegion& fr,
   if ( check_function_statement(stmt) ) {
     PtItem* item = mFactory.new_TypedFunc(fr, name, automatic,
 					  sign, func_type,
-					  get_io_array(),
-					  get_param_array(),
-					  get_localparam_array(),
-					  get_decl_array(),
+					  get_tf_io_array(),
+					  get_tf_param_array(),
+					  get_tf_localparam_array(),
+					  get_tf_decl_array(),
 					  stmt);
     reg_attrinst(item, ai_list);
     add_item(item);
@@ -708,10 +708,8 @@ void
 Parser::new_Generate(const FileRegion& fr,
 		     PtrList<PtAttrInst>* ai_list)
 {
-  PtItem* item = mFactory.new_Generate(fr,
-				       get_decl_array(), get_item_array());
+  PtItem* item = mFactory.new_Generate(fr, mGenDeclArray, mGenItemArray);
   reg_attrinst(item, ai_list);
-  end_generate();
   add_item(item);
 }
 
@@ -720,9 +718,7 @@ Parser::new_Generate(const FileRegion& fr,
 void
 Parser::new_GenBlock(const FileRegion& fr)
 {
-  PtItem* item = mFactory.new_GenBlock(fr,
-				       get_decl_array(), get_item_array());
-  end_generate();
+  PtItem* item = mFactory.new_GenBlock(fr, mGenDeclArray, mGenItemArray);
   add_item(item);
 }
 
@@ -733,9 +729,7 @@ void
 Parser::new_GenBlock(const FileRegion& fr,
 		     const char* name)
 {
-  PtItem* item = mFactory.new_GenBlock(fr, name,
-				       get_decl_array(), get_item_array());
-  end_generate();
+  PtItem* item = mFactory.new_GenBlock(fr, name, mGenDeclArray, mGenItemArray);
   add_item(item);
 }
 
@@ -747,11 +741,10 @@ Parser::new_GenIf(const FileRegion& fr,
 		  PtExpr* cond)
 {
   PtItem* item = mFactory.new_GenIf(fr, cond,
-				    get_then_decl_array(),
-				    get_then_item_array(),
+				    mGenThenDeclArray,
+				    mGenThenItemArray,
 				    PtDeclHeadArray(),
 				    PtItemArray());
-  end_genif();
   add_item(item);
 }
 
@@ -763,46 +756,11 @@ Parser::new_GenIfElse(const FileRegion& fr,
 		      PtExpr* cond)
 {
   PtItem* item = mFactory.new_GenIf(fr, cond,
-				    get_then_decl_array(),
-				    get_then_item_array(),
-				    get_else_decl_array(),
-				    get_else_item_array());
-  end_genif();
+				    mGenThenDeclArray,
+				    mGenThenItemArray,
+				    mGenElseDeclArray,
+				    mGenElseItemArray);
   add_item(item);
-}
-
-// @brief generate-if 文の then 節の宣言リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_then_decl_array()
-{
-  flush_declitem_list(*mCurDeclHeadList);
-  return mCurThenDeclHeadList->to_array(mAlloc);
-}
-
-// @brief generate-if 文の else 節の宣言リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_else_decl_array()
-{
-  flush_declitem_list(*mCurDeclHeadList);
-  return mCurElseDeclHeadList->to_array(mAlloc);
-}
-
-// @brief generate-if 文の then 節の item リストを配列に変換する．
-inline
-PtItemArray
-Parser::get_then_item_array()
-{
-  return mCurThenItemList->to_array(mAlloc);
-}
-
-// @brief generate-if 文の else 節の item リストを配列に変換する．
-inline
-PtItemArray
-Parser::get_else_item_array()
-{
-  return mCurElseItemList->to_array(mAlloc);
 }
 
 // @brief generate case 文の生成
@@ -814,7 +772,8 @@ Parser::new_GenCase(const FileRegion& fr,
 		    PtExpr* expr,
 		    PtrList<PtGenCaseItem>* item_list)
 {
-  add_item( mFactory.new_GenCase(fr, expr, to_array(item_list)) );
+  PtItem* item = mFactory.new_GenCase(fr, expr, to_array(item_list));
+  add_item(item);
 }
 
 // @brief generate case の要素の生成
@@ -827,9 +786,8 @@ Parser::new_GenCaseItem(const FileRegion& fr,
 {
   PtGenCaseItem* item = mFactory.new_GenCaseItem(fr,
 						 to_array(label_list),
-						 get_decl_array(),
-						 get_item_array());
-  end_generate();
+						 mGenDeclArray,
+						 mGenItemArray);
   return item;
 }
 
@@ -852,8 +810,14 @@ Parser::new_GenFor(const FileRegion& fr,
 		   PtExpr* inc_expr,
 		   const char* block_name)
 {
-  if ( strcmp(loop_var, inc_var) != 0 ) {
-    end_generate();
+  if ( strcmp(loop_var, inc_var) == 0 ) {
+    PtItem* item = mFactory.new_GenFor(fr, loop_var,
+				       init_expr, cond, inc_expr,
+				       block_name,
+				       mGenDeclArray, mGenItemArray);
+    add_item(item);
+  }
+  else {
     ostringstream buf;
     buf << "Lhs of the increment statement ("
 	<< inc_var
@@ -866,14 +830,6 @@ Parser::new_GenFor(const FileRegion& fr,
 	    "PARSER",
 	    buf.str());
   }
-
-  PtItem* item = mFactory.new_GenFor(fr, loop_var,
-				     init_expr, cond, inc_expr,
-				     block_name,
-				     get_decl_array(),
-				     get_item_array());
-  end_generate();
-  add_item(item);
 }
 
 
