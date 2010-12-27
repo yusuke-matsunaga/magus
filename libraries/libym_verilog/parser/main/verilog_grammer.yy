@@ -2284,28 +2284,28 @@ function_declaration
 : ai_list function_head opt_auto sign IDENTIFIER ';'
   nzlist_of_fitem_decl
   statement
-  ENDFUNCTION
+  function_tail
 {
   parser.new_Function(@$, $5, $3, $4, $8, $1);
 }
 | ai_list function_head opt_auto sign '[' expression ':' expression ']' IDENTIFIER ';'
   nzlist_of_fitem_decl
   statement
-  ENDFUNCTION
+  function_tail
 {
   parser.new_SizedFunc(@$, $10, $3, $4, $6, $8, $13, $1);
 }
 | ai_list function_head opt_auto sign data_type IDENTIFIER ';'
   nzlist_of_fitem_decl
   statement
-  ENDFUNCTION
+  function_tail
 {
   parser.new_TypedFunc(@$, $6, $3, $4, $5, $9, $1);
 }
 | ai_list function_head opt_auto sign IDENTIFIER function_port_block ';'
   list_of_bitem_decl
   statement
-  ENDFUNCTION
+  function_tail
 {
   parser.new_Function(@$, $5, $3, $4, $9, $1);
 }
@@ -2313,20 +2313,19 @@ function_declaration
   IDENTIFIER function_port_block ';'
   list_of_bitem_decl
   statement
-  ENDFUNCTION
+  function_tail
 {
   parser.new_SizedFunc(@$, $10, $3, $4, $6, $8, $14, $1);
 }
 | ai_list function_head opt_auto sign data_type IDENTIFIER function_port_block ';'
   list_of_bitem_decl
   statement
-  ENDFUNCTION
+  function_tail
 {
   parser.new_TypedFunc(@$, $6, $3, $4, $5, $10, $1);
 }
-| ai_list function_head error ENDFUNCTION
+| ai_list function_head error function_tail
 {
-  parser.end_tf();
   yyerrok;
 }
 ;
@@ -2335,6 +2334,13 @@ function_head
 : FUNCTION
 {
   parser.init_tf();
+}
+;
+
+function_tail
+: ENDFUNCTION
+{
+  parser.end_tf();
 }
 ;
 
@@ -2426,20 +2432,19 @@ task_declaration
 : ai_list task_head opt_auto IDENTIFIER ';'
   list_of_titem_decl
   statement_or_null
-  ENDTASK
+  task_tail
 {
   parser.new_Task(@$, $4, $3, $7, $1);
 }
 | ai_list task_head opt_auto IDENTIFIER task_port_block ';'
   list_of_bitem_decl
   statement_or_null
-  ENDTASK
+  task_tail
 {
   parser.new_Task(@$, $4, $3, $8, $1);
 }
-| ai_list task_head error ENDTASK
+| ai_list task_head error task_tail
 {
-  parser.end_tf();
   yyerrok;
 }
 ;
@@ -2448,6 +2453,13 @@ task_head
 : TASK
 {
   parser.init_tf();
+}
+;
+
+task_tail
+: ENDTASK
+{
+  parser.end_tf();
 }
 ;
 

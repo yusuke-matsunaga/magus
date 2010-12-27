@@ -218,7 +218,6 @@ Parser::new_Task(const FileRegion& fr,
 				   get_localparam_array(),
 				   get_decl_array(),
 				   stmt);
-  end_tf();
   reg_attrinst(item, ai_list);
   add_item(item);
 }
@@ -246,12 +245,8 @@ Parser::new_Function(const FileRegion& fr,
 					 get_localparam_array(),
 					 get_decl_array(),
 					 stmt);
-    end_tf();
     reg_attrinst(item, ai_list);
     add_item(item);
-  }
-  else {
-    end_tf();
   }
 }
 
@@ -283,11 +278,7 @@ Parser::new_SizedFunc(const FileRegion& fr,
 					  get_decl_array(),
 					  stmt);
     reg_attrinst(item, ai_list);
-    end_tf();
     add_item(item);
-  }
-  else {
-    end_tf();
   }
 }
 
@@ -316,12 +307,8 @@ Parser::new_TypedFunc(const FileRegion& fr,
 					  get_localparam_array(),
 					  get_decl_array(),
 					  stmt);
-    end_tf();
     reg_attrinst(item, ai_list);
     add_item(item);
-  }
-  else {
-    end_tf();
   }
 }
 
