@@ -23,11 +23,9 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @return 生成された disable 文
 PtStmt*
 Parser::new_Disable(const FileRegion& fr,
-		    const char* name,
-		    PtrList<PtAttrInst>* ai_list)
+		    const char* name)
 {
   PtStmt* stmt = mFactory.new_Disable(fr, name);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -38,13 +36,11 @@ Parser::new_Disable(const FileRegion& fr,
 // @return 生成された disable 文
 PtStmt*
 Parser::new_Disable(const FileRegion& fr,
-		    PuHierName* hname,
-		    PtrList<PtAttrInst>* ai_list)
+		    PuHierName* hname)
 {
   PtNameBranchArray nb_array;
   const char* tail_name = extract_HierName(hname, nb_array);
   PtStmt* stmt = mFactory.new_Disable(fr, nb_array, tail_name);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -56,11 +52,9 @@ Parser::new_Disable(const FileRegion& fr,
 PtStmt*
 Parser::new_Enable(const FileRegion& fr,
 		   const char* name,
-		   PtrList<PtExpr>* arg_list,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtrList<PtExpr>* arg_list)
 {
   PtStmt* stmt = mFactory.new_Enable(fr, name, to_array(arg_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -73,13 +67,11 @@ Parser::new_Enable(const FileRegion& fr,
 PtStmt*
 Parser::new_Enable(const FileRegion& fr,
 		   PuHierName* hname,
-		   PtrList<PtExpr>* arg_list,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtrList<PtExpr>* arg_list)
 {
   PtNameBranchArray nb_array;
   const char* tail_name = extract_HierName(hname, nb_array);
   PtStmt* stmt = mFactory.new_Enable(fr, nb_array, tail_name, to_array(arg_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -90,11 +82,9 @@ Parser::new_Enable(const FileRegion& fr,
 PtStmt*
 Parser::new_SysEnable(const FileRegion& fr,
 		      const char* name,
-		      PtrList<PtExpr>* arg_list,
-		      PtrList<PtAttrInst>* ai_list)
+		      PtrList<PtExpr>* arg_list)
 {
   PtStmt* stmt = mFactory.new_SysEnable(fr, name, to_array(arg_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -106,11 +96,9 @@ Parser::new_SysEnable(const FileRegion& fr,
 PtStmt*
 Parser::new_DcStmt(const FileRegion& fr,
 		   PtControl* delay,
-		   PtStmt* body,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtStmt* body)
 {
   PtStmt* stmt = mFactory.new_DcStmt(fr, delay, body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -122,11 +110,9 @@ Parser::new_DcStmt(const FileRegion& fr,
 PtStmt*
 Parser::new_EcStmt(const FileRegion& fr,
 		   PtControl* event,
-		   PtStmt* body,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtStmt* body)
 {
   PtStmt* stmt = mFactory.new_EcStmt(fr, event, body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -138,11 +124,9 @@ Parser::new_EcStmt(const FileRegion& fr,
 PtStmt*
 Parser::new_Wait(const FileRegion& fr,
 		 PtExpr* cond,
-		 PtStmt* body,
-		 PtrList<PtAttrInst>* ai_list)
+		 PtStmt* body)
 {
   PtStmt* stmt = mFactory.new_Wait(fr, cond, body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -154,11 +138,9 @@ Parser::new_Wait(const FileRegion& fr,
 PtStmt*
 Parser::new_Assign(const FileRegion& fr,
 		   PtExpr* lhs,
-		   PtExpr* rhs,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtExpr* rhs)
 {
   PtStmt* stmt = mFactory.new_Assign(fr, lhs, rhs);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -172,11 +154,9 @@ PtStmt*
 Parser::new_Assign(const FileRegion& fr,
 		   PtExpr* lhs,
 		   PtExpr* rhs,
-		   PtControl* control,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtControl* control)
 {
   PtStmt* stmt = mFactory.new_Assign(fr, lhs, rhs, control);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -188,11 +168,9 @@ Parser::new_Assign(const FileRegion& fr,
 PtStmt*
 Parser::new_NbAssign(const FileRegion& fr,
 		     PtExpr* lhs,
-		     PtExpr* rhs,
-		     PtrList<PtAttrInst>* ai_list)
+		     PtExpr* rhs)
 {
   PtStmt* stmt = mFactory.new_NbAssign(fr, lhs, rhs);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -206,11 +184,9 @@ PtStmt*
 Parser::new_NbAssign(const FileRegion& fr,
 		     PtExpr* lhs,
 		     PtExpr* rhs,
-		     PtControl* control,
-		     PtrList<PtAttrInst>* ai_list)
+		     PtControl* control)
 {
   PtStmt* stmt = mFactory.new_NbAssign(fr, lhs, rhs, control);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -220,11 +196,9 @@ Parser::new_NbAssign(const FileRegion& fr,
 // @return 生成された event 文
 PtStmt*
 Parser::new_EventStmt(const FileRegion& fr,
-		      PtExpr* event,
-		      PtrList<PtAttrInst>* ai_list)
+		      PtExpr* event)
 {
   PtStmt* stmt = mFactory.new_EventStmt(fr, event);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -232,11 +206,9 @@ Parser::new_EventStmt(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @return 生成された null 文
 PtStmt*
-Parser::new_NullStmt(const FileRegion& fr,
-		     PtrList<PtAttrInst>* ai_list)
+Parser::new_NullStmt(const FileRegion& fr)
 {
   PtStmt* stmt = mFactory.new_NullStmt(fr);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -248,11 +220,9 @@ Parser::new_NullStmt(const FileRegion& fr,
 PtStmt*
 Parser::new_If(const FileRegion& fr,
 	       PtExpr* expr,
-	       PtStmt* then_body,
-	       PtrList<PtAttrInst>* ai_list)
+	       PtStmt* then_body)
 {
   PtStmt* stmt = mFactory.new_If(fr, expr, then_body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -266,11 +236,9 @@ PtStmt*
 Parser::new_If(const FileRegion& fr,
 	       PtExpr* expr,
 	       PtStmt* then_body,
-	       PtStmt* else_body,
-	       PtrList<PtAttrInst>* ai_list)
+	       PtStmt* else_body)
 {
   PtStmt* stmt = mFactory.new_If(fr, expr, then_body, else_body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -282,11 +250,9 @@ Parser::new_If(const FileRegion& fr,
 PtStmt*
 Parser::new_Case(const FileRegion& fr,
 		 PtExpr* expr,
-		 PtrList<PtCaseItem>* caseitem_list,
-		 PtrList<PtAttrInst>* ai_list)
+		 PtrList<PtCaseItem>* caseitem_list)
 {
   PtStmt* stmt = mFactory.new_Case(fr, expr, to_array(caseitem_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -298,11 +264,9 @@ Parser::new_Case(const FileRegion& fr,
 PtStmt*
 Parser::new_CaseX(const FileRegion& fr,
 		  PtExpr* expr,
-		  PtrList<PtCaseItem>* caseitem_list,
-		  PtrList<PtAttrInst>* ai_list)
+		  PtrList<PtCaseItem>* caseitem_list)
 {
   PtStmt* stmt = mFactory.new_CaseX(fr, expr, to_array(caseitem_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -314,11 +278,9 @@ Parser::new_CaseX(const FileRegion& fr,
 PtStmt*
 Parser::new_CaseZ(const FileRegion& fr,
 		  PtExpr* expr,
-		  PtrList<PtCaseItem>* caseitem_list,
-		  PtrList<PtAttrInst>* ai_list)
+		  PtrList<PtCaseItem>* caseitem_list)
 {
   PtStmt* stmt = mFactory.new_CaseZ(fr, expr, to_array(caseitem_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -341,11 +303,9 @@ Parser::new_CaseItem(const FileRegion& fr,
 // @return 生成された forever 文
 PtStmt*
 Parser::new_Forever(const FileRegion& fr,
-		    PtStmt* body,
-		    PtrList<PtAttrInst>* ai_list)
+		    PtStmt* body)
 {
   PtStmt* stmt = mFactory.new_Forever(fr, body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -357,11 +317,9 @@ Parser::new_Forever(const FileRegion& fr,
 PtStmt*
 Parser::new_Repeat(const FileRegion& fr,
 		   PtExpr* expr,
-		   PtStmt* body,
-		   PtrList<PtAttrInst>* ai_list)
+		   PtStmt* body)
 {
   PtStmt* stmt = mFactory.new_Repeat(fr, expr, body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -373,11 +331,9 @@ Parser::new_Repeat(const FileRegion& fr,
 PtStmt*
 Parser::new_While(const FileRegion& fr,
 		  PtExpr* cond,
-		  PtStmt* body,
-		  PtrList<PtAttrInst>* ai_list)
+		  PtStmt* body)
 {
   PtStmt* stmt = mFactory.new_While(fr, cond, body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -393,11 +349,9 @@ Parser::new_For(const FileRegion& fr,
 		PtStmt* init,
 		PtExpr* cond,
 		PtStmt* next,
-		PtStmt* body,
-		PtrList<PtAttrInst>* ai_list)
+		PtStmt* body)
 {
   PtStmt* stmt = mFactory.new_For(fr, init, cond, next, body);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -409,11 +363,9 @@ Parser::new_For(const FileRegion& fr,
 PtStmt*
 Parser::new_PcAssign(const FileRegion& fr,
 		     PtExpr* lhs,
-		     PtExpr* rhs,
-		     PtrList<PtAttrInst>* ai_list)
+		     PtExpr* rhs)
 {
   PtStmt* stmt = mFactory.new_PcAssign(fr, lhs, rhs);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -423,11 +375,9 @@ Parser::new_PcAssign(const FileRegion& fr,
 // @return 生成された deassign 文
 PtStmt*
 Parser::new_Deassign(const FileRegion& fr,
-		     PtExpr* lhs,
-		     PtrList<PtAttrInst>* ai_list)
+		     PtExpr* lhs)
 {
   PtStmt* stmt = mFactory.new_Deassign(fr, lhs);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -439,11 +389,9 @@ Parser::new_Deassign(const FileRegion& fr,
 PtStmt*
 Parser::new_Force(const FileRegion& fr,
 		  PtExpr* lhs,
-		  PtExpr* rhs,
-		  PtrList<PtAttrInst>* ai_list)
+		  PtExpr* rhs)
 {
   PtStmt* stmt = mFactory.new_Force(fr, lhs, rhs);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -453,11 +401,9 @@ Parser::new_Force(const FileRegion& fr,
 // @return 生成された release 文
 PtStmt*
 Parser::new_Release(const FileRegion& fr,
-		    PtExpr* lhs,
-		    PtrList<PtAttrInst>* ai_list)
+		    PtExpr* lhs)
 {
   PtStmt* stmt = mFactory.new_Release(fr, lhs);
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -467,11 +413,9 @@ Parser::new_Release(const FileRegion& fr,
 // @return 生成された parallel block
 PtStmt*
 Parser::new_ParBlock(const FileRegion& fr,
-		     PtrList<PtStmt>* stmt_list,
-		     PtrList<PtAttrInst>* ai_list)
+		     PtrList<PtStmt>* stmt_list)
 {
   PtStmt* stmt = mFactory.new_ParBlock(fr, to_array(stmt_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -483,14 +427,11 @@ Parser::new_ParBlock(const FileRegion& fr,
 PtStmt*
 Parser::new_NamedParBlock(const FileRegion& fr,
 			  const char* name,
-			  PtrList<PtStmt>* stmt_list,
-			  PtrList<PtAttrInst>* ai_list)
+			  PtrList<PtStmt>* stmt_list)
 {
   PtStmt* stmt = mFactory.new_NamedParBlock(fr, name,
 					    mCurDeclArray,
 					    to_array(stmt_list));
-  reg_attrinst(stmt, ai_list);
-
   return stmt;
 }
 
@@ -500,11 +441,9 @@ Parser::new_NamedParBlock(const FileRegion& fr,
 // @return 生成された sequential block
 PtStmt*
 Parser::new_SeqBlock(const FileRegion& fr,
-		     PtrList<PtStmt>* stmt_list,
-		     PtrList<PtAttrInst>* ai_list)
+		     PtrList<PtStmt>* stmt_list)
 {
   PtStmt* stmt = mFactory.new_SeqBlock(fr, to_array(stmt_list));
-  reg_attrinst(stmt, ai_list);
   return stmt;
 }
 
@@ -516,14 +455,11 @@ Parser::new_SeqBlock(const FileRegion& fr,
 PtStmt*
 Parser::new_NamedSeqBlock(const FileRegion& fr,
 			  const char* name,
-			  PtrList<PtStmt>* stmt_list,
-			  PtrList<PtAttrInst>* ai_list)
+			  PtrList<PtStmt>* stmt_list)
 {
   PtStmt* stmt = mFactory.new_NamedSeqBlock(fr, name,
 					    mCurDeclArray,
 					    to_array(stmt_list));
-  reg_attrinst(stmt, ai_list);
-
   return stmt;
 }
 

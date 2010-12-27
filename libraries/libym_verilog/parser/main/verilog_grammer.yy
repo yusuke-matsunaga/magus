@@ -12,6 +12,8 @@
 
 #include "ym_utils/FileRegion.h"
 #include "ym_verilog/pt/PtP.h"
+#include "ym_verilog/pt/PtItem.h"
+#include "ym_verilog/pt/PtStmt.h"
 #include "ym_verilog/pt/PtExpr.h"
 
 #include "Parser.h"
@@ -398,7 +400,7 @@ fr_merge(const FileRegion fr_array[],
 %type <stmt> procedural_continuous_assignments
 %type <stmt> variable_assignment
 %type <stmt> par_block seq_block
-%type <stmt> statement statement_or_null
+%type <stmt> statement statement_or_null pure_statement
 %type <stmt> disable_statement event_trigger
 %type <stmt> procedural_timing_control_statement
 %type <stmt> wait_statement conditional_statement case_statement
@@ -468,6 +470,7 @@ fr_merge(const FileRegion fr_array[],
 %type <expr> event_primary
 %type <cilist> list_of_case_items
 %type <caseitem> case_item
+%type <exprlist> case_item_label
 %type <pathdecl> path_declaration simple_path_declaration
                  edge_sensitive_path_declaration
 %type <expr> specify_terminal
@@ -1087,13 +1090,9 @@ defparam_assignment
 //            |"localparam" "realtime"         list_of_param_assignments ';'
 //            |"localparam" "time"             list_of_param_assignments ';'
 local_parameter_declaration
-: localparam_declhead list_of_localparam_assignments ';'
+: localparam_declhead list_of_localparam_assignments localparam_end
+| localparam_declhead error localparam_end
 {
-  parser.end_localparam();
-}
-| localparam_declhead error ';'
-{
-  parser.end_localparam();
   yyerrok;
 }
 ;
@@ -1113,6 +1112,13 @@ localparam_declhead
 }
 ;
 
+localparam_end
+: ';'
+{
+  parser.end_localparam();
+}
+;
+
 // [SPEC] parameter_declaration ::=
 //             "parameter" ["signed"] [range] list_of_param_assignments ';'
 //            |"parameter" "integer"          list_of_param_assignments ';'
@@ -1120,13 +1126,9 @@ localparam_declhead
 //            |"parameter" "realtime"         list_of_param_assignments ';'
 //            |"parameter" "time"             list_of_param_assignments ';'
 parameter_declaration
-: parameter_declhead list_of_param_assignments ';'
+: parameter_declhead list_of_param_assignments parameter_end
+| parameter_declhead error parameter_end
 {
-  parser.end_param();
-}
-| parameter_declhead error ';'
-{
-  parser.end_param();
   yyerrok;
 }
 ;
@@ -1146,18 +1148,18 @@ parameter_declhead
 }
 ;
 
+parameter_end
+: ';'
+{
+  parser.end_param();
+}
+;
+
 // [SPEC] specparam_declaration ::= specparam ["range"]
 //             list_of_specparam_assignments ';'
 specparam_declaration
-: specparam_declhead list_of_specparam_assignments ';'
-{
-  parser.end_decl();
-}
-| specparam_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: specparam_declhead list_of_specparam_assignments decl_end
+| specparam_declhead error decl_error_end
 ;
 
 specparam_declhead
@@ -1171,6 +1173,22 @@ specparam_declhead
 }
 ;
 
+decl_end
+: ';'
+{
+  parser.end_decl();
+}
+;
+
+decl_error_end
+: ';'
+{
+  parser.end_decl();
+  yyerrok;
+}
+;
+
+
 //////////////////////////////////////////////////////////////////////
 // A.2.1.2 Port declarations
 //////////////////////////////////////////////////////////////////////
@@ -1179,15 +1197,8 @@ specparam_declhead
 //            "inout" [nettype] ["signed"] [range] list_of_port_identifiers ';'
 // 末尾のセミコロンは IEEE1364-2001 の仕様書にはない．
 inout_declaration
-: inout_declhead list_of_port_identifiers ';'
-{
-  parser.end_io();
-}
-| inout_declhead error ';'
-{
-  parser.end_io();
-  yyerrok;
-}
+: inout_declhead list_of_port_identifiers iodecl_end
+| inout_declhead error iodecl_error_end
 ;
 
 inout_declhead
@@ -1209,19 +1220,27 @@ inout_declhead
 }
 ;
 
-// [SPEC] input_declaration ::=
-//            "input" [nettype]["signed"][range] list_of_port_identifiers ';'
-// 末尾のセミコロンは IEEE1364-2001 の仕様書にはない．
-input_declaration
-: input_declhead list_of_port_identifiers ';'
+iodecl_end
+: ';'
 {
   parser.end_io();
 }
-| input_declhead error ';'
+;
+
+iodecl_error_end
+: ';'
 {
   parser.end_io();
   yyerrok;
 }
+;
+
+// [SPEC] input_declaration ::=
+//            "input" [nettype]["signed"][range] list_of_port_identifiers ';'
+// 末尾のセミコロンは IEEE1364-2001 の仕様書にはない．
+input_declaration
+: input_declhead list_of_port_identifiers iodecl_end
+| input_declhead error iodecl_error_end
 ;
 
 input_declhead
@@ -1265,24 +1284,10 @@ input_declhead
 // わかる．そのため，list_of_port_identifiers のみをとる形式と両方をとる形式
 // にわける．
 output_declaration
-: output_declhead1 list_of_port_identifiers ';'
-{
-  parser.end_io();
-}
-| output_declhead2 list_of_variable_port_identifiers ';'
-{
-  parser.end_io();
-}
-| output_declhead1 error ';'
-{
-  parser.end_io();
-  yyerrok;
-}
-| output_declhead2 error ';'
-{
-  parser.end_io();
-  yyerrok;
-}
+: output_declhead1 list_of_port_identifiers iodecl_end
+| output_declhead2 list_of_variable_port_identifiers iodecl_end
+| output_declhead1 error iodecl_error_end
+| output_declhead2 error iodecl_error_end
 ;
 
 // [SPEC*] output_declhead1 ::=
@@ -1341,21 +1346,15 @@ output_declhead2
 }
 ;
 
+
 //////////////////////////////////////////////////////////////////////
 // A.2.1.3 Type declarations
 //////////////////////////////////////////////////////////////////////
 
 // [SPEC] event_declaration ::= "event" list_of_event_identifiers ';'
 event_declaration
-: event_declhead list_of_event_identifiers ';'
-{
-  parser.end_decl();
-}
-| event_declhead  error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: event_declhead list_of_event_identifiers decl_end
+| event_declhead  error decl_error_end
 ;
 
 event_declhead
@@ -1367,15 +1366,8 @@ event_declhead
 
 // [SPEC] genvar_declaration ::= "genvar" list_of_genvar_identifiers ';'
 genvar_declaration
-: genvar_declhead list_of_genvar_identifiers ';'
-{
-  parser.end_decl();
-}
-| genvar_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: genvar_declhead list_of_genvar_identifiers decl_end
+| genvar_declhead error decl_error_end
 ;
 
 genvar_declhead
@@ -1387,15 +1379,8 @@ genvar_declhead
 
 // [SPEC] integer_declaration ::= "integer" list_of_variable_identifiers ';'
 integer_declaration
-: integer_declhead list_of_variable_identifiers ';'
-{
-  parser.end_decl();
-}
-| integer_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: integer_declhead list_of_variable_identifiers decl_end
+| integer_declhead error decl_error_end
 ;
 
 integer_declhead
@@ -1431,33 +1416,12 @@ integer_declhead
 // がありうるパタンを net_declaration2 とし，list_of_net_decl_assignments
 // のみがありうるパタンを net_declaration3 とする．
 net_declaration
-: net_declhead1 list_of_net_decls ';'
-{
-  parser.end_decl();
-}
-| net_declhead2 list_of_net_identifiers ';'
-{
-  parser.end_decl();
-}
-| net_declhead3 list_of_net_decl_assignments ';'
-{
-  parser.end_decl();
-}
-| net_declhead1 error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
-| net_declhead2 error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
-| net_declhead3 error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: net_declhead1 list_of_net_decls decl_end
+| net_declhead2 list_of_net_identifiers decl_end
+| net_declhead3 list_of_net_decl_assignments decl_end
+| net_declhead1 error decl_error_end
+| net_declhead2 error decl_error_end
+| net_declhead3 error decl_error_end
 ;
 
 // [SPEC*] net_declaration1_head ::=
@@ -1621,15 +1585,8 @@ net_declhead3
 
 // [SPEC] real_declaration ::= "real" list_of_real_identifiers ';'
 real_declaration
-: real_declhead list_of_real_identifiers ';'
-{
-  parser.end_decl();
-}
-| real_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: real_declhead list_of_real_identifiers decl_end
+| real_declhead error decl_error_end
 ;
 
 real_declhead
@@ -1641,15 +1598,8 @@ real_declhead
 
 // [SPEC] realtime_declaration ::= "realtime" list_of_real_identifiers ';'
 realtime_declaration
-: realtime_declhead list_of_real_identifiers ';'
-{
-  parser.end_decl();
-}
-| realtime_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: realtime_declhead list_of_real_identifiers decl_end
+| realtime_declhead error decl_error_end
 ;
 
 realtime_declhead
@@ -1662,15 +1612,8 @@ realtime_declhead
 // [SPEC] reg_declaration ::= "reg" ["signed"] [range]
 //             list_of_variable_identifiers ';'
 reg_declaration
-: reg_declhead list_of_variable_identifiers ';'
-{
-  parser.end_decl();
-}
-| reg_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: reg_declhead list_of_variable_identifiers decl_end
+| reg_declhead error decl_error_end
 ;
 
 reg_declhead
@@ -1686,15 +1629,8 @@ reg_declhead
 
 // [SPEC] time_declaration ::= "time" list_of_variable_identifiers ';'
 time_declaration
-: time_declhead list_of_variable_identifiers ';'
-{
-  parser.end_decl();
-}
-| time_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: time_declhead list_of_variable_identifiers decl_end
+| time_declhead error decl_error_end
 ;
 
 time_declhead
@@ -2529,15 +2465,8 @@ tf_ioitem_end
 //            |"input" [task_port_type]           list_of_port_identifiers
 // 実際には tf_input_declhead という非終端節点で処理する．
 tf_input_declaration
-: tf_input_declhead list_of_port_identifiers ';'
-{
-  parser.end_io();
-}
-| tf_input_declhead error ';'
-{
-  parser.end_io();
-  yyerrok;
-}
+: tf_input_declhead list_of_port_identifiers iodecl_end
+| tf_input_declhead error iodecl_error_end
 ;
 
 // [SPEC*] tf_input_declhead ::=
@@ -2573,15 +2502,8 @@ tf_input_declhead
 //            |"output" [task_port_type]           list_of_port_identifiers
 // 実際には tf_output_declhead という非終端節点で処理する．
 tf_output_declaration
-: tf_output_declhead list_of_port_identifiers ';'
-{
-  parser.end_io();
-}
-| tf_output_declhead error ';'
-{
-  parser.end_io();
-  yyerrok;
-}
+: tf_output_declhead list_of_port_identifiers iodecl_end
+| tf_output_declhead error iodecl_error_end
 ;
 
 // [SPEC*] tf_output_declhead ::=
@@ -2617,15 +2539,8 @@ tf_output_declhead
 //            |inout [task_port_type]           list_of_port_identifiers
 // 実際には tf_inout_declhead という非終端節点で処理する．
 tf_inout_declaration
-: tf_inout_declhead list_of_port_identifiers ';'
-{
-  parser.end_io();
-}
-| tf_inout_declhead error ';'
-{
-  parser.end_io();
-  yyerrok;
-}
+: tf_inout_declhead list_of_port_identifiers iodecl_end
+| tf_inout_declhead error iodecl_error_end
 ;
 
 // [SPEC*] tf_inout_declhead ::=
@@ -2708,15 +2623,8 @@ block_item_declaration
 // [SPEC] block_reg_declaration ::= "reg" ["signed"] [range]
 //                 list_of_block_variable_identifiers ';'
 block_reg_declaration
-: block_reg_declhead list_of_block_variable_identifiers ';'
-{
-  parser.end_decl();
-}
-| block_reg_declhead error ';'
-{
-  parser.end_decl();
-  yyerrok;
-}
+: block_reg_declhead list_of_block_variable_identifiers decl_end
+| block_reg_declhead error decl_error_end
 ;
 
 block_reg_declhead
@@ -3823,7 +3731,7 @@ udp_declaration
   TABLE
   list_of_udp_entries
   ENDTABLE
-  ENDPRIMITIVE
+  udp_tail
 {
   parser.new_Udp1995(@$, $3, NULL, FileRegion(), NULL, $1);
 }
@@ -3833,7 +3741,7 @@ udp_declaration
   TABLE
   list_of_udp_entries
   ENDTABLE
-  ENDPRIMITIVE
+  udp_tail
 {
   parser.new_Udp1995(@$, $3, $10, @10, $12, $1);
 }
@@ -3842,7 +3750,7 @@ udp_declaration
   TABLE
   list_of_udp_entries
   ENDTABLE
-  ENDPRIMITIVE
+  udp_tail
 {
   parser.new_Udp2001(@$, $3, NULL, FileRegion(), NULL, $1);
 }
@@ -3852,13 +3760,12 @@ udp_declaration
   TABLE
   list_of_udp_entries
   ENDTABLE
-  ENDPRIMITIVE
+  udp_tail
 {
   parser.new_Udp2001(@$, $3, $10, @10, $12, $1);
 }
-| ai_list udp_head error ENDPRIMITIVE
+| ai_list udp_head error udp_tail
 {
-  parser.end_udp();
   yyerrok;
 }
 ;
@@ -3868,6 +3775,13 @@ udp_head
 : PRIMITIVE
 {
   parser.init_udp();
+}
+;
+
+udp_tail
+: ENDPRIMITIVE
+{
+  parser.end_udp();
 }
 ;
 
@@ -3939,14 +3853,10 @@ nzlist_of_uport_decl
 // 最後の port_identifier [ '=' constant_expression ] は
 // variable_port_identifier として処理する．
 udp_output_declaration
-: udp_output_declhead1 port_identifier_item ';'
-{
-  parser.end_io();
-}
-| udp_output_declhead2 variable_port_identifier_item ';'
-{
-  parser.end_io();
-}
+: udp_output_declhead1 port_identifier_item iodecl_end
+| udp_output_declhead2 variable_port_identifier_item iodecl_end
+| udp_output_declhead1 error iodecl_error_end
+| udp_output_declhead2 error iodecl_error_end
 ;
 
 udp_output_declhead1
@@ -3969,10 +3879,8 @@ udp_output_declhead2
 //             { attribute_instance } "input" list_of_port_identifiers
 // [SPEC] list_of_port_identifiers ::= port_identifier {',' port_identifier}
 udp_input_declaration
-: udp_input_declhead list_of_port_identifiers ';'
-{
-  parser.end_io();
-}
+: udp_input_declhead list_of_port_identifiers iodecl_end
+| udp_input_declhead error iodecl_error_end
 ;
 
 // [SPEC*] udp_input_declhead ::= { attribute_instance } "input"
@@ -3992,6 +3900,10 @@ udp_reg_declaration
   parser.new_RegH(@$, false, $1);
   parser.new_DeclItem(@3, $3);
   parser.end_decl();
+}
+| ai_list REG error ';'
+{
+  yyerrok;
 }
 ;
 
@@ -4322,21 +4234,21 @@ always_construct
 // delay_control/event_control/repeat_control を区別する．
 // 末尾のセミコロンはこちらで処理する．
 blocking_assignment
-: ai_list variable_lvalue '='               expression ';'
+: variable_lvalue '='               expression ';'
 {
-  $$ = parser.new_Assign(@$, $2, $4, $1);
+  $$ = parser.new_Assign(@$, $1, $3);
 }
-| ai_list variable_lvalue '=' delay_control expression ';'
+| variable_lvalue '=' delay_control expression ';'
 {
-  $$ = parser.new_Assign(@$, $2, $5, $4, $1);
+  $$ = parser.new_Assign(@$, $1, $4, $3);
 }
-| ai_list variable_lvalue '=' event_control expression ';'
+| variable_lvalue '=' event_control expression ';'
 {
-  $$ = parser.new_Assign(@$, $2, $5, $4, $1);
+  $$ = parser.new_Assign(@$, $1, $4, $3);
 }
-| ai_list variable_lvalue '=' repeat_control expression ';'
+| variable_lvalue '=' repeat_control expression ';'
 {
-  $$ = parser.new_Assign(@$, $2, $5, $4, $1);
+  $$ = parser.new_Assign(@$, $1, $4, $3);
 }
 ;
 
@@ -4344,21 +4256,21 @@ blocking_assignment
 //             variable_lvalue "<=" [ delay_or_event_control ] expression
 // 末尾のセミコロンはこちらで処理する．
 nonblocking_assignment
-: ai_list variable_lvalue LTEQ               expression ';'
+: variable_lvalue LTEQ               expression ';'
 {
-  $$ = parser.new_NbAssign(@$, $2, $4, $1);
+  $$ = parser.new_NbAssign(@$, $1, $3);
 }
-| ai_list variable_lvalue LTEQ delay_control expression ';'
+| variable_lvalue LTEQ delay_control expression ';'
 {
-  $$ = parser.new_NbAssign(@$, $2, $5, $4, $1);
+  $$ = parser.new_NbAssign(@$, $1, $4, $3);
 }
-| ai_list variable_lvalue LTEQ event_control expression ';'
+| variable_lvalue LTEQ event_control expression ';'
 {
-  $$ = parser.new_NbAssign(@$, $2, $5, $4, $1);
+  $$ = parser.new_NbAssign(@$, $1, $4, $3);
 }
-| ai_list variable_lvalue LTEQ repeat_control expression ';'
+| variable_lvalue LTEQ repeat_control expression ';'
 {
-  $$ = parser.new_NbAssign(@$, $2, $5, $4, $1);
+  $$ = parser.new_NbAssign(@$, $1, $4, $3);
 }
 ;
 
@@ -4373,21 +4285,21 @@ nonblocking_assignment
 // どうでもいいけど何でこの名前が複数形なのか不思議
 // 末尾のセミコロンはこちらで処理する．
 procedural_continuous_assignments
-: ai_list ASSIGN variable_lvalue '=' expression ';'
+: ASSIGN variable_lvalue '=' expression ';'
 {
-  $$ = parser.new_PcAssign(@$, $3, $5, $1);
+  $$ = parser.new_PcAssign(@$, $2, $4);
 }
-| ai_list DEASSIGN variable_lvalue ';'
+| DEASSIGN variable_lvalue ';'
 {
-  $$ = parser.new_Deassign(@$, $3, $1);
+  $$ = parser.new_Deassign(@$, $2);
 }
-| ai_list FORCE variable_lvalue '=' expression ';'
+| FORCE variable_lvalue '=' expression ';'
 {
-  $$ = parser.new_Force(@$, $3, $5, $1);
+  $$ = parser.new_Force(@$, $2, $4);
 }
-| ai_list RELEASE variable_lvalue ';'
+| RELEASE variable_lvalue ';'
 {
-  $$ = parser.new_Release(@$, $3, $1);
+  $$ = parser.new_Release(@$, $2);
 }
 ;
 
@@ -4412,41 +4324,36 @@ procedural_continuous_assignments
 //             "join"
 
 par_block
-: ai_list FORK
-  JOIN
+: FORK JOIN // わざと fork/join を使わない．
 {
-  $$ = parser.new_ParBlock(@$, NULL, $1);
+  $$ = parser.new_ParBlock(@$, NULL);
 }
-| ai_list FORK
-    nzlist_of_stmt
-  JOIN
+| FORK nzlist_of_stmt JOIN // わざと fork/join を使わない．
 {
-  $$ = parser.new_ParBlock(@$, $3, $1);
+  $$ = parser.new_ParBlock(@$, $2);
 }
-| ai_list fork ':' IDENTIFIER
+| named_fork IDENTIFIER
     list_of_bitem_decl
   join
 {
-  $$ = parser.new_NamedParBlock(@$, $4, NULL, $1);
+  $$ = parser.new_NamedParBlock(@$, $2, NULL);
 }
-| ai_list fork ':' IDENTIFIER
+| named_fork IDENTIFIER
     list_of_bitem_decl
     nzlist_of_stmt
   join
 {
-  $$ = parser.new_NamedParBlock(@$, $4, $6, $1);
+  $$ = parser.new_NamedParBlock(@$, $2, $4);
 }
-| ai_list FORK
-    error
-  JOIN
+| named_fork error join
 {
-  $$ = NULL;
+  $$ = parser.new_NullStmt(@$);
   yyerrok;
 }
 ;
 
-fork
-: FORK
+named_fork
+: FORK ':'
 {
   parser.init_block();
 }
@@ -4465,41 +4372,36 @@ join
 //             "end"
 
 seq_block
-: ai_list BEGIN
-  END
+: BEGIN END
 {
-  $$ = parser.new_SeqBlock(@$, NULL, $1);
+  $$ = parser.new_SeqBlock(@$, NULL);
 }
-| ai_list BEGIN
-    nzlist_of_stmt
-  END
+| BEGIN nzlist_of_stmt END
 {
-  $$ = parser.new_SeqBlock(@$, $3, $1);
+  $$ = parser.new_SeqBlock(@$, $2);
 }
-| ai_list begin ':' IDENTIFIER
+| named_begin IDENTIFIER
     list_of_bitem_decl
   end
 {
-  $$ = parser.new_NamedSeqBlock(@$, $4, NULL, $1);
+  $$ = parser.new_NamedSeqBlock(@$, $2, NULL);
 }
-| ai_list begin ':' IDENTIFIER
+| named_begin IDENTIFIER
     list_of_bitem_decl
     nzlist_of_stmt
   end
 {
-  $$ = parser.new_NamedSeqBlock(@$, $4, $6, $1);
+  $$ = parser.new_NamedSeqBlock(@$, $2, $4);
 }
-| ai_list BEGIN
-    error
-  END
+| named_begin error end
 {
-  $$ = NULL;
+  $$ = parser.new_NullStmt(@$);
   yyerrok;
 }
 ;
 
-begin
-: BEGIN
+named_begin
+: BEGIN ':'
 {
   parser.init_block();
 }
@@ -4560,7 +4462,7 @@ variable_assignment
 // procedural_continuous_assignments の末尾のセミコロンは
 // blocking_assignment/nonblocking_assignment/
 // procedural_continuous_assignments 側で処理する．
-statement
+pure_statement
 : blocking_assignment
 {
   $$ = $1;
@@ -4620,8 +4522,16 @@ statement
 | error ';'
 {
   // ダミー
-  $$ = parser.new_NullStmt(@$, NULL);
+  $$ = parser.new_NullStmt(@$);
   yyerrok;
+}
+;
+
+statement
+: ai_list pure_statement
+{
+  $$ = $2;
+  parser.reg_attrinst($$, $1);
 }
 ;
 
@@ -4635,7 +4545,8 @@ statement_or_null
 }
 | ai_list ';'
 {
-  $$ = parser.new_NullStmt(@$, $1);
+  $$ = parser.new_NullStmt(@$);
+  parser.reg_attrinst($$, $1);
 }
 ;
 
@@ -4711,13 +4622,13 @@ repeat_control
 // [SPEC] hierarchical_block_identifier ::= hierarchical_identifier
 // こういう意味的な区別を構文規則に持ち込むなっちゅうの
 disable_statement
-: ai_list DISABLE hierarchical_identifier ';'
+: DISABLE hierarchical_identifier ';'
 {
-  $$ = parser.new_Disable(@$, $3, $1);
+  $$ = parser.new_Disable(@$, $2);
 }
-| ai_list DISABLE IDENTIFIER ';'
+| DISABLE IDENTIFIER ';'
 {
-  $$ = parser.new_Disable(@$, $3, $1);
+  $$ = parser.new_Disable(@$, $2);
 }
 ;
 
@@ -4762,25 +4673,25 @@ any_event
 // あれ？ イベントって次元をもった配列として定義できるので
 // [SPEC*] hierarchical_identifier {'[' expression ']} じゃないの？
 event_trigger
-: ai_list MINUSGT hierarchical_identifier ';'
+: MINUSGT hierarchical_identifier ';'
 {
-  PtExpr* primary = parser.new_Primary(@3, $3);
-  $$ = parser.new_EventStmt(@$, primary, $1);
+  PtExpr* primary = parser.new_Primary(@2, $2);
+  $$ = parser.new_EventStmt(@$, primary);
 }
-| ai_list MINUSGT IDENTIFIER ';'
+| MINUSGT IDENTIFIER ';'
 {
-  PtExpr* primary = parser.new_Primary(@3, $3);
-  $$ = parser.new_EventStmt(@$, primary, $1);
+  PtExpr* primary = parser.new_Primary(@2, $2);
+  $$ = parser.new_EventStmt(@$, primary);
 }
-| ai_list MINUSGT hierarchical_identifier nzlist_of_index ';'
+| MINUSGT hierarchical_identifier nzlist_of_index ';'
 {
-  PtExpr* primary = parser.new_Primary(FileRegion(@3, @4), $3, $4);
-  $$ = parser.new_EventStmt(@$, primary, $1);
+  PtExpr* primary = parser.new_Primary(FileRegion(@2, @3), $2, $3);
+  $$ = parser.new_EventStmt(@$, primary);
 }
-| ai_list MINUSGT IDENTIFIER nzlist_of_index ';'
+| MINUSGT IDENTIFIER nzlist_of_index ';'
 {
-  PtExpr* primary = parser.new_Primary(FileRegion(@3, @4), $3, $4);
-  $$ = parser.new_EventStmt(@$, primary, $1);
+  PtExpr* primary = parser.new_Primary(FileRegion(@2, @3), $2, $3);
+  $$ = parser.new_EventStmt(@$, primary);
 }
 ;
 
@@ -4842,22 +4753,22 @@ event_primary
 // repeat '(' expression ')' event_control statement となるので
 // 最後の形式はもともと含まれているので不要である．
 procedural_timing_control_statement
-: ai_list delay_control statement_or_null
+: delay_control statement_or_null
 {
-  $$ = parser.new_DcStmt(@$, $2, $3, $1);
+  $$ = parser.new_DcStmt(@$, $1, $2);
 }
-| ai_list event_control statement_or_null
+| event_control statement_or_null
 {
-  $$ = parser.new_EcStmt(@$, $2, $3, $1);
+  $$ = parser.new_EcStmt(@$, $1, $2);
 }
 ;
 
 // [SPEC] wait_statement ::=
 //             "wait" '(' expression ')' statement_or_null
 wait_statement
-: ai_list WAIT '(' expression ')' statement_or_null
+: WAIT '(' expression ')' statement_or_null
 {
-  $$ = parser.new_Wait(@$, $4, $6, $1);
+  $$ = parser.new_Wait(@$, $3, $5);
 }
 ;
 
@@ -4876,13 +4787,13 @@ wait_statement
 //                 [ "else" statement_or_null ]
 // if も statement なので else if の記述は不要なのにね
 conditional_statement
-: ai_list IF '(' expression ')' statement_or_null %prec LOWER_THAN_ELSE
+: IF '(' expression ')' statement_or_null %prec LOWER_THAN_ELSE
 {
-  $$ = parser.new_If(@$, $4, $6, $1);
+  $$ = parser.new_If(@$, $3, $5);
 }
-| ai_list IF '(' expression ')' statement_or_null ELSE statement_or_null
+| IF '(' expression ')' statement_or_null ELSE statement_or_null
 {
-  $$ = parser.new_If(@$, $4, $6, $8, $1);
+  $$ = parser.new_If(@$, $3, $5, $7);
 }
 ;
 
@@ -4909,34 +4820,34 @@ conditional_statement
 //            |"casex" '(' expression ')'
 //                 case_item { case_item } "endcase"
 case_statement
-: ai_list CASE '(' expression ')'
+: CASE '(' expression ')'
   list_of_case_items
   ENDCASE
 {
-  if ( parser.check_default_label($6) ) {
-    $$ = parser.new_Case(@$, $4, $6, $1);
+  if ( parser.check_default_label($5) ) {
+    $$ = parser.new_Case(@$, $3, $5);
   }
   else {
     YYERROR;
   }
 }
-| ai_list CASEX '(' expression ')'
+| CASEX '(' expression ')'
   list_of_case_items
   ENDCASE
 {
-  if ( parser.check_default_label($6) ) {
-    $$ = parser.new_CaseX(@$, $4, $6, $1);
+  if ( parser.check_default_label($5) ) {
+    $$ = parser.new_CaseX(@$, $3, $5);
   }
   else {
     YYERROR;
   }
 }
-| ai_list CASEZ '(' expression ')'
+| CASEZ '(' expression ')'
   list_of_case_items
   ENDCASE
 {
-  if ( parser.check_default_label($6) ) {
-    $$ = parser.new_CaseZ(@$, $4, $6, $1);
+  if ( parser.check_default_label($5) ) {
+    $$ = parser.new_CaseZ(@$, $3, $5);
   }
   else {
     YYERROR;
@@ -4962,17 +4873,24 @@ list_of_case_items
 //             expresison {',' expression} ':' statement_or_null
 //            |"default" [':'] statement_or_null
 case_item
-: nzlist_of_expressions ':' statement_or_null
+: case_item_label statement_or_null
 {
-  $$ = parser.new_CaseItem(@$, $1, $3);
+  $$ = parser.new_CaseItem(@$, $1, $2);
 }
-| DEFAULT                   statement_or_null
+;
+
+case_item_label
+: nzlist_of_expressions ':'
 {
-  $$ = parser.new_CaseItem(@$, NULL, $2);
+  $$ = $1;
 }
-| DEFAULT               ':' statement_or_null
+| DEFAULT
 {
-  $$ = parser.new_CaseItem(@$, NULL, $3);
+  $$ = NULL;
+}
+| DEFAULT               ':'
+{
+  $$ = NULL;
 }
 ;
 
@@ -5006,22 +4924,22 @@ case_item
 //            |"for '(' variable_assignment ';' expresson ';'
 //                 variable_assignment ')' statement
 loop_statement
-: ai_list FOREVER statement
+: FOREVER statement
 {
-  $$ = parser.new_Forever(@$, $3, $1);
+  $$ = parser.new_Forever(@$, $2);
 }
-| ai_list REPEAT '(' expression ')' statement
+| REPEAT '(' expression ')' statement
 {
-  $$ = parser.new_Repeat(@$, $4, $6, $1);
+  $$ = parser.new_Repeat(@$, $3, $5);
 }
-| ai_list WHILE '(' expression ')' statement
+| WHILE '(' expression ')' statement
 {
-  $$ = parser.new_While(@$, $4, $6, $1);
+  $$ = parser.new_While(@$, $3, $5);
 }
-| ai_list FOR '(' variable_assignment ';' expression ';'
-                  variable_assignment ')' statement
+| FOR '(' variable_assignment ';' expression ';'
+          variable_assignment ')' statement
 {
-  $$ = parser.new_For(@$, $4, $6, $8, $10, $1);
+  $$ = parser.new_For(@$, $3, $5, $7, $9);
 }
 ;
 
@@ -5036,13 +4954,13 @@ loop_statement
 // nzlist_of_arguments というのを作る．
 // リスト自体は空でないがが要素は空がありうる．
 system_task_enable
-: ai_list SYS_IDENTIFIER ';'
+: SYS_IDENTIFIER ';'
 {
-  $$ = parser.new_SysEnable(@$, $2, NULL, $1);
+  $$ = parser.new_SysEnable(@$, $1, NULL);
 }
-| ai_list SYS_IDENTIFIER '(' nzlist_of_arguments ')' ';'
+| SYS_IDENTIFIER '(' nzlist_of_arguments ')' ';'
 {
-  $$ = parser.new_SysEnable(@$, $2, $4, $1);
+  $$ = parser.new_SysEnable(@$, $1, $3);
 }
 ;
 
@@ -5050,21 +4968,21 @@ system_task_enable
 //             hierarchical_task_identifier
 //                 ['(' expression {',' expresison} ')'] ';'
 task_enable
-: ai_list hierarchical_identifier ';'
+: hierarchical_identifier ';'
 {
-  $$ = parser.new_Enable(@$, $2, NULL, $1);
+  $$ = parser.new_Enable(@$, $1, NULL);
 }
-| ai_list IDENTIFIER ';'
+| IDENTIFIER ';'
 {
-  $$ = parser.new_Enable(@$, $2, NULL, $1);
+  $$ = parser.new_Enable(@$, $1, NULL);
 }
-| ai_list hierarchical_identifier '(' nzlist_of_expressions ')' ';'
+| hierarchical_identifier '(' nzlist_of_expressions ')' ';'
 {
-  $$ = parser.new_Enable(@$, $2, $4, $1);
+  $$ = parser.new_Enable(@$, $1, $3);
 }
-| ai_list IDENTIFIER '(' nzlist_of_expressions ')' ';'
+| IDENTIFIER '(' nzlist_of_expressions ')' ';'
 {
-  $$ = parser.new_Enable(@$, $2, $4, $1);
+  $$ = parser.new_Enable(@$, $1, $3);
 }
 ;
 

@@ -1221,8 +1221,7 @@ public:
   /// @return 生成された disable 文
   PtStmt*
   new_Disable(const FileRegion& fr,
-	      const char* name,
-	      PtrList<PtAttrInst>* ai_list);
+	      const char* name);
 
   /// @brief disable 文の生成 (階層付き識別子)
   /// @param[in] fr ファイル位置の情報
@@ -1230,8 +1229,7 @@ public:
   /// @return 生成された disable 文
   PtStmt*
   new_Disable(const FileRegion& fr,
-	      PuHierName* hname,
-	      PtrList<PtAttrInst>* ai_list);
+	      PuHierName* hname);
 
   /// @brief enable 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1241,8 +1239,7 @@ public:
   PtStmt*
   new_Enable(const FileRegion& fr,
 	     const char* name,
-	     PtrList<PtExpr>* arg_list,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtrList<PtExpr>* arg_list);
 
   /// @brief enable 文の生成 (階層付き識別子)
   /// @param[in] fr ファイル位置の情報
@@ -1253,8 +1250,7 @@ public:
   PtStmt*
   new_Enable(const FileRegion& fr,
 	     PuHierName* hname,
-	     PtrList<PtExpr>* arg_list,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtrList<PtExpr>* arg_list);
 
   /// @brief system task enable 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1263,8 +1259,7 @@ public:
   PtStmt*
   new_SysEnable(const FileRegion& fr,
 		const char* name,
-		PtrList<PtExpr>* arg_list,
-		PtrList<PtAttrInst>* ai_list);
+		PtrList<PtExpr>* arg_list);
 
   /// @brief delay control 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1274,8 +1269,7 @@ public:
   PtStmt*
   new_DcStmt(const FileRegion& fr,
 	     PtControl* delay,
-	     PtStmt* body,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtStmt* body);
 
   /// @brief event control 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1285,8 +1279,7 @@ public:
   PtStmt*
   new_EcStmt(const FileRegion& fr,
 	     PtControl* event,
-	     PtStmt* body,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtStmt* body);
 
   /// @brief wait 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1296,8 +1289,7 @@ public:
   PtStmt*
   new_Wait(const FileRegion& fr,
 	   PtExpr* cond,
-	   PtStmt* body,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtStmt* body);
 
   /// @brief assign 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1307,8 +1299,7 @@ public:
   PtStmt*
   new_Assign(const FileRegion& fr,
 	     PtExpr* lhs,
-	     PtExpr* rhs,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtExpr* rhs);
 
   /// @brief control 付き assign 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1320,8 +1311,7 @@ public:
   new_Assign(const FileRegion& fr,
 	     PtExpr* lhs,
 	     PtExpr* rhs,
-	     PtControl* control,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtControl* control);
 
   /// @brief nonblocking assign 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1331,8 +1321,7 @@ public:
   PtStmt*
   new_NbAssign(const FileRegion& fr,
 	       PtExpr* lhs,
-	       PtExpr* rhs,
-	       PtrList<PtAttrInst>* ai_list);
+	       PtExpr* rhs);
 
   /// @brief control 付き nonblocking assign 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1344,8 +1333,7 @@ public:
   new_NbAssign(const FileRegion& fr,
 	       PtExpr* lhs,
 	       PtExpr* rhs,
-	       PtControl* control,
-	       PtrList<PtAttrInst>* ai_list);
+	       PtControl* control);
 
   /// @brief event 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1353,15 +1341,13 @@ public:
   /// @return 生成された event 文
   PtStmt*
   new_EventStmt(const FileRegion& fr,
-		PtExpr* event,
-		PtrList<PtAttrInst>* ai_list);
+		PtExpr* event);
 
   /// @brief null 文の生成
   /// @param[in] fr ファイル位置の情報
   /// @return 生成された null 文
   PtStmt*
-  new_NullStmt(const FileRegion& fr,
-	       PtrList<PtAttrInst>* ai_list);
+  new_NullStmt(const FileRegion& fr);
 
   /// @brief if 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1371,8 +1357,7 @@ public:
   PtStmt*
   new_If(const FileRegion& fr,
 	 PtExpr* expr,
-	 PtStmt* then_body,
-	 PtrList<PtAttrInst>* ai_list);
+	 PtStmt* then_body);
 
   /// @brief if 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1384,8 +1369,7 @@ public:
   new_If(const FileRegion& fr,
 	 PtExpr* expr,
 	 PtStmt* then_body,
-	 PtStmt* else_body,
-	 PtrList<PtAttrInst>* ai_list);
+	 PtStmt* else_body);
 
   /// @brief case 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1395,8 +1379,7 @@ public:
   PtStmt*
   new_Case(const FileRegion& fr,
 	   PtExpr* expr,
-	   PtrList<PtCaseItem>* caseitem_list,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtrList<PtCaseItem>* caseitem_list);
 
   /// @brief casex 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1406,8 +1389,7 @@ public:
   PtStmt*
   new_CaseX(const FileRegion& fr,
 	    PtExpr* expr,
-	    PtrList<PtCaseItem>* caseitem_list,
-	    PtrList<PtAttrInst>* ai_list);
+	    PtrList<PtCaseItem>* caseitem_list);
 
   /// @brief casez 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1417,8 +1399,7 @@ public:
   PtStmt*
   new_CaseZ(const FileRegion& fr,
 	    PtExpr* expr,
-	    PtrList<PtCaseItem>* caseitem_list,
-	    PtrList<PtAttrInst>* ai_list);
+	    PtrList<PtCaseItem>* caseitem_list);
 
   /// @brief case item の生成
   /// @param[in] fr ファイル位置の情報
@@ -1436,8 +1417,7 @@ public:
   /// @return 生成された forever 文
   PtStmt*
   new_Forever(const FileRegion& fr,
-	      PtStmt* body,
-	      PtrList<PtAttrInst>* ai_list);
+	      PtStmt* body);
 
   /// @brief repeat 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1447,8 +1427,7 @@ public:
   PtStmt*
   new_Repeat(const FileRegion& fr,
 	     PtExpr* expr,
-	     PtStmt* body,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtStmt* body);
 
   /// @brief while 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1458,8 +1437,7 @@ public:
   PtStmt*
   new_While(const FileRegion& fr,
 	    PtExpr* cond,
-	    PtStmt* body,
-	    PtrList<PtAttrInst>* ai_list);
+	    PtStmt* body);
 
   /// @brief for 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1473,8 +1451,7 @@ public:
 	  PtStmt* init,
 	  PtExpr* cond,
 	  PtStmt* next,
-	  PtStmt* body,
-	  PtrList<PtAttrInst>* ai_list);
+	  PtStmt* body);
 
   /// @brief procedural assign 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1484,8 +1461,7 @@ public:
   PtStmt*
   new_PcAssign(const FileRegion& fr,
 	       PtExpr* lhs,
-	       PtExpr* rhs,
-	       PtrList<PtAttrInst>* ai_list);
+	       PtExpr* rhs);
 
   /// @brief deassign 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1493,8 +1469,7 @@ public:
   /// @return 生成された deassign 文
   PtStmt*
   new_Deassign(const FileRegion& fr,
-	       PtExpr* lhs,
-	       PtrList<PtAttrInst>* ai_list);
+	       PtExpr* lhs);
 
   /// @brief force 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1504,8 +1479,7 @@ public:
   PtStmt*
   new_Force(const FileRegion& fr,
 	    PtExpr* lhs,
-	    PtExpr* rhs,
-	    PtrList<PtAttrInst>* ai_list);
+	    PtExpr* rhs);
 
   /// @brief release 文の生成
   /// @param[in] fr ファイル位置の情報
@@ -1513,8 +1487,7 @@ public:
   /// @return 生成された release 文
   PtStmt*
   new_Release(const FileRegion& fr,
-	      PtExpr* lhs,
-	      PtrList<PtAttrInst>* ai_list);
+	      PtExpr* lhs);
 
   /// @brief parallel block の生成
   /// @param[in] fr ファイル位置の情報
@@ -1522,8 +1495,7 @@ public:
   /// @return 生成された parallel block
   PtStmt*
   new_ParBlock(const FileRegion& fr,
-	       PtrList<PtStmt>* stmt_list,
-	       PtrList<PtAttrInst>* ai_list);
+	       PtrList<PtStmt>* stmt_list);
 
   /// @brief 名前付き parallel block の生成
   /// @param[in] fr ファイル位置の情報
@@ -1533,8 +1505,7 @@ public:
   PtStmt*
   new_NamedParBlock(const FileRegion& fr,
 		    const char* name,
-		    PtrList<PtStmt>* stmt_list,
-		    PtrList<PtAttrInst>* ai_list);
+		    PtrList<PtStmt>* stmt_list);
 
   /// @brief sequential block の生成
   /// @param[in] fr ファイル位置の情報
@@ -1542,8 +1513,7 @@ public:
   /// @return 生成された sequential block
   PtStmt*
   new_SeqBlock(const FileRegion& fr,
-	       PtrList<PtStmt>* stmt_list,
-	       PtrList<PtAttrInst>* ai_list);
+	       PtrList<PtStmt>* stmt_list);
 
   /// @brief 名前付き sequential block の生成
   /// @param[in] fr ファイル位置の情報
@@ -1553,8 +1523,7 @@ public:
   PtStmt*
   new_NamedSeqBlock(const FileRegion& fr,
 		    const char* name,
-		    PtrList<PtStmt>* stmt_list,
-		    PtrList<PtAttrInst>* ai_list);
+		    PtrList<PtStmt>* stmt_list);
 
 
 public:
