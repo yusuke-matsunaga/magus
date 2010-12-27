@@ -872,8 +872,8 @@ Parser::new_GenFor(const FileRegion& fr,
 				     block_name,
 				     get_decl_array(),
 				     get_item_array());
-  add_item(item);
   end_generate();
+  add_item(item);
 }
 
 
