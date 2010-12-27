@@ -15,8 +15,6 @@
 #include "ym_verilog/pt/PtExpr.h"
 
 #include "Parser.h"
-  //#include "Parser_port.h"
-  //#include "Parser_decl.h"
 
 #include "PuHierName.h"
 #include "PtrList.h"
