@@ -75,6 +75,40 @@ Parser::add_port(PtiPort* port)
 
 
 //////////////////////////////////////////////////////////////////////
+// PtiPortArray の生成
+//////////////////////////////////////////////////////////////////////
+
+// @brief 入出力宣言からポートを作る．
+PtiPortArray
+Parser::new_PortArray(PtIOHeadArray iohead_array)
+{
+  ymuint n = 0;
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
+    n += iohead_array[i]->item_num();
+  }
+  // port_array を確保する．
+  void* p = mAlloc.get_memory(sizeof(PtiPort*) * n);
+  PtiPort** array = new (p) PtiPort*[n];
+
+  // ポートを生成し arary に格納する．
+  n = 0;
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
+    const PtIOHead* head = iohead_array[i];
+    for (ymuint j = 0; j < head->item_num(); ++ j) {
+      const PtIOItem* elem = head->item(j);
+      const char* name = elem->name();
+      init_portref_list();
+      new_PortRef(elem->file_region(), name);
+      PtiPortRefArray port_expression = get_portref_array();
+      array[n] = mFactory.new_Port(elem->file_region(), port_expression, name);
+      ++ n;
+    }
+  }
+  return PtiPortArray(n, array);
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // PtiPortRef の生成
 //////////////////////////////////////////////////////////////////////
 
@@ -122,6 +156,14 @@ void
 Parser::add_portref(PtiPortRef* portref)
 {
   mPortRefList.push_back(portref);
+}
+
+// @brief ポート参照リストを配列に変換する
+inline
+PtiPortRefArray
+Parser::get_portref_array()
+{
+  return mPortRefList.to_array(mAlloc);
 }
 
 END_NAMESPACE_YM_VERILOG

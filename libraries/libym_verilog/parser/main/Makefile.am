@@ -28,11 +28,11 @@ libym_vl_parser_main_la_SOURCES = \
 	Parser.cc \
 	Parser_decl.cc \
 	Parser_expr.cc \
+	Parser_inst.cc \
 	Parser_item.cc \
 	Parser_misc.cc \
 	Parser_port.cc \
 	Parser_stmt.cc \
-	Parser_udp.cc \
 	Parser_module.cc \
 	PuHierName.h
 

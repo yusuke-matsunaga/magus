@@ -285,9 +285,6 @@ Parser::new_Case(const FileRegion& fr,
 		 PtrList<PtCaseItem>* caseitem_list,
 		 PtrList<PtAttrInst>* ai_list)
 {
-  if ( !check_default_label(caseitem_list) ) {
-    return NULL;
-  }
   PtStmt* stmt = mFactory.new_Case(fr, expr, to_array(caseitem_list));
   reg_attrinst(stmt, ai_list);
   return stmt;
@@ -304,9 +301,6 @@ Parser::new_CaseX(const FileRegion& fr,
 		  PtrList<PtCaseItem>* caseitem_list,
 		  PtrList<PtAttrInst>* ai_list)
 {
-  if ( !check_default_label(caseitem_list) ) {
-    return NULL;
-  }
   PtStmt* stmt = mFactory.new_CaseX(fr, expr, to_array(caseitem_list));
   reg_attrinst(stmt, ai_list);
   return stmt;
@@ -323,9 +317,6 @@ Parser::new_CaseZ(const FileRegion& fr,
 		  PtrList<PtCaseItem>* caseitem_list,
 		  PtrList<PtAttrInst>* ai_list)
 {
-  if ( !check_default_label(caseitem_list) ) {
-    return NULL;
-  }
   PtStmt* stmt = mFactory.new_CaseZ(fr, expr, to_array(caseitem_list));
   reg_attrinst(stmt, ai_list);
   return stmt;
@@ -496,7 +487,7 @@ Parser::new_NamedParBlock(const FileRegion& fr,
 			  PtrList<PtAttrInst>* ai_list)
 {
   PtStmt* stmt = mFactory.new_NamedParBlock(fr, name,
-					    get_decl_array(),
+					    mCurDeclArray,
 					    to_array(stmt_list));
   reg_attrinst(stmt, ai_list);
 
@@ -529,7 +520,7 @@ Parser::new_NamedSeqBlock(const FileRegion& fr,
 			  PtrList<PtAttrInst>* ai_list)
 {
   PtStmt* stmt = mFactory.new_NamedSeqBlock(fr, name,
-					    get_decl_array(),
+					    mCurDeclArray,
 					    to_array(stmt_list));
   reg_attrinst(stmt, ai_list);
 

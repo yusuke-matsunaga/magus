@@ -4621,7 +4621,8 @@ statement
 }
 | error ';'
 {
-  $$ = NULL;
+  // ダミー
+  $$ = parser.new_NullStmt(@$, NULL);
   yyerrok;
 }
 ;
@@ -4914,24 +4915,34 @@ case_statement
   list_of_case_items
   ENDCASE
 {
-  $$ = parser.new_Case(@$, $4, $6, $1);
+  if ( parser.check_default_label($6) ) {
+    $$ = parser.new_Case(@$, $4, $6, $1);
+  }
+  else {
+    YYERROR;
+  }
 }
 | ai_list CASEX '(' expression ')'
   list_of_case_items
   ENDCASE
 {
-  $$ = parser.new_CaseX(@$, $4, $6, $1);
+  if ( parser.check_default_label($6) ) {
+    $$ = parser.new_CaseX(@$, $4, $6, $1);
+  }
+  else {
+    YYERROR;
+  }
 }
 | ai_list CASEZ '(' expression ')'
   list_of_case_items
   ENDCASE
 {
-  $$ = parser.new_CaseZ(@$, $4, $6, $1);
-}
-| error ENDCASE
-{
-  $$ = NULL;
-  yyerrok;
+  if ( parser.check_default_label($6) ) {
+    $$ = parser.new_CaseZ(@$, $4, $6, $1);
+  }
+  else {
+    YYERROR;
+  }
 }
 ;
 

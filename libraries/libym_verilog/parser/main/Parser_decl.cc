@@ -32,8 +32,7 @@ Parser::new_IOHead(const FileRegion& fr,
 		   PtrList<PtAttrInst>* ai_list)
 {
   PtiIOHead* head = mFactory.new_IOHead(fr, type, sign);
-  reg_attrinst(head, ai_list);
-  add_io_head(head);
+  add_io_head(head, ai_list);
 }
 
 // @brief IO 宣言のヘッダの生成 (reg 型)
@@ -48,8 +47,7 @@ Parser::new_RegIOHead(const FileRegion& fr,
 		      PtrList<PtAttrInst>* ai_list)
 {
   PtiIOHead* head = mFactory.new_RegIOHead(fr, type, sign);
-  reg_attrinst(head, ai_list);
-  add_io_head(head);
+  add_io_head(head, ai_list);
 }
 
 // @brief IO 宣言のヘッダの生成 (ネット型)
@@ -66,8 +64,7 @@ Parser::new_NetIOHead(const FileRegion& fr,
 		      PtrList<PtAttrInst>* ai_list)
 {
   PtiIOHead* head = mFactory.new_NetIOHead(fr, type, net_type, sign);
-  reg_attrinst(head, ai_list);
-  add_io_head(head);
+  add_io_head(head, ai_list);
 }
 
 // @brief IO 宣言のヘッダの生成 (変数型)
@@ -82,8 +79,7 @@ Parser::new_VarIOHead(const FileRegion& fr,
 		      PtrList<PtAttrInst>* ai_list)
 {
   PtiIOHead* head = mFactory.new_VarIOHead(fr, type, var_type);
-  reg_attrinst(head, ai_list);
-  add_io_head(head);
+  add_io_head(head, ai_list);
 }
 
 // @brief 範囲付きの IO 宣言のヘッダの生成
@@ -102,8 +98,7 @@ Parser::new_IOHead(const FileRegion& fr,
 		   PtrList<PtAttrInst>* ai_list)
 {
   PtiIOHead* head = mFactory.new_IOHead(fr, type, sign, left, right);
-  reg_attrinst(head, ai_list);
-  add_io_head(head);
+  add_io_head(head, ai_list);
 }
 
 // @brief 範囲付きの IO 宣言のヘッダの生成 (reg 型)
@@ -122,8 +117,7 @@ Parser::new_RegIOHead(const FileRegion& fr,
 		      PtrList<PtAttrInst>* ai_list)
 {
   PtiIOHead* head = mFactory.new_RegIOHead(fr, type, sign, left, right);
-  reg_attrinst(head, ai_list);
-  add_io_head(head);
+  add_io_head(head, ai_list);
 }
 
 // @brief 範囲付きの IO 宣言のヘッダの生成 (ネット型)
@@ -144,15 +138,16 @@ Parser::new_NetIOHead(const FileRegion& fr,
 		      PtrList<PtAttrInst>* ai_list)
 {
   PtiIOHead* head = mFactory.new_NetIOHead(fr, type, net_type, sign, left, right);
-  reg_attrinst(head, ai_list);
-  add_io_head(head);
+  add_io_head(head, ai_list);
 }
 
 // @brief IO宣言リストにIO宣言ヘッダを追加する．
 inline
 void
-Parser::add_io_head(PtiIOHead* head)
+Parser::add_io_head(PtiIOHead* head,
+		    PtrList<PtAttrInst>* attr_list)
 {
+  reg_attrinst(head, attr_list);
   mCurIOHeadList->push_back(head);
   mIOItemList.clear();
 }
@@ -204,13 +199,7 @@ Parser::new_ParamH(const FileRegion& fr,
 		   bool paramport)
 {
   PtiDeclHead* head = mFactory.new_ParamH(fr);
-  reg_attrinst(head, ai_list);
-  if ( paramport ) {
-    add_paramport_head(head);
-  }
-  else {
-    add_param_head(head);
-  }
+  add_paramport_head(head, ai_list, paramport);
 }
 
 // @brief 範囲指定型パラメータ宣言のヘッダの生成
@@ -227,13 +216,7 @@ Parser::new_ParamH(const FileRegion& fr,
 		   bool paramport)
 {
   PtiDeclHead* head = mFactory.new_ParamH(fr, sign, left, right);
-  reg_attrinst(head, ai_list);
-  if ( paramport ) {
-    add_paramport_head(head);
-  }
-  else {
-    add_param_head(head);
-  }
+  add_paramport_head(head, ai_list, paramport);
 }
 
 // @brief 組み込み型パラメータ宣言のヘッダの生成
@@ -246,30 +229,23 @@ Parser::new_ParamH(const FileRegion& fr,
 		   bool paramport)
 {
   PtiDeclHead* head = mFactory.new_ParamH(fr, var_type);
-  reg_attrinst(head, ai_list);
-  if ( paramport ) {
-    add_paramport_head(head);
-  }
-  else {
-    add_param_head(head);
-  }
+  add_paramport_head(head, ai_list, paramport);
 }
 
 // @brief parameter port 宣言ヘッダを追加する．
 inline
 void
-Parser::add_paramport_head(PtiDeclHead* head)
+Parser::add_paramport_head(PtiDeclHead* head,
+			   PtrList<PtAttrInst>* attr_list,
+			   bool paramport)
 {
-  mParamPortHeadList.push_back(head);
-  mDeclItemList.clear();
-}
-
-// @brief parameter 宣言ヘッダを追加する．
-inline
-void
-Parser::add_param_head(PtiDeclHead* head)
-{
-  mCurParamHeadList->push_back(head);
+  reg_attrinst(head, attr_list);
+  if ( paramport ) {
+    mParamPortHeadList.push_back(head);
+  }
+  else {
+    mCurParamHeadList->push_back(head);
+  }
   mDeclItemList.clear();
 }
 
@@ -285,8 +261,7 @@ Parser::new_LocalParamH(const FileRegion& fr,
 			PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_LocalParamH(fr);
-  reg_attrinst(head, ai_list);
-  add_localparam_head(head);
+  add_localparam_head(head, ai_list);
 }
 
 // @brief 範囲指定型 local param 宣言のヘッダの生成
@@ -302,8 +277,7 @@ Parser::new_LocalParamH(const FileRegion& fr,
 			PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_LocalParamH(fr, sign, left, right);
-  reg_attrinst(head, ai_list);
-  add_localparam_head(head);
+  add_localparam_head(head, ai_list);
 }
 
 // @brief 組み込み型パラメータ宣言のヘッダの生成
@@ -315,15 +289,16 @@ Parser::new_LocalParamH(const FileRegion& fr,
 			PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_LocalParamH(fr, var_type);
-  reg_attrinst(head, ai_list);
-  add_localparam_head(head);
+  add_localparam_head(head, ai_list);
 }
 
 // @brief localparam 宣言ヘッダを追加する．
 inline
 void
-Parser::add_localparam_head(PtiDeclHead* head)
+Parser::add_localparam_head(PtiDeclHead* head,
+			    PtrList<PtAttrInst>* attr_list)
 {
+  reg_attrinst(head, attr_list);
   mCurLparamHeadList->push_back(head);
   mDeclItemList.clear();
 }
@@ -341,8 +316,7 @@ Parser::new_SpecParamH(const FileRegion& fr,
 		       PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_SpecParamH(fr);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 範囲指定型 specparam 宣言のヘッダの生成
@@ -356,8 +330,7 @@ Parser::new_SpecParamH(const FileRegion& fr,
 		       PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_SpecParamH(fr, left, right);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief イベント宣言のヘッダの生成
@@ -368,8 +341,7 @@ Parser::new_EventH(const FileRegion& fr,
 		   PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_EventH(fr);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief genvar 宣言のヘッダの生成
@@ -379,8 +351,7 @@ Parser::new_GenvarH(const FileRegion& fr,
 		    PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_GenvarH(fr);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 変数宣言のヘッダの生成
@@ -392,8 +363,7 @@ Parser::new_VarH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_VarH(fr, var_type);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 1ビット型 reg 宣言のヘッダの生成
@@ -405,8 +375,7 @@ Parser::new_RegH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_RegH(fr, sign);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 範囲指定型 reg 宣言のヘッダの生成
@@ -422,8 +391,7 @@ Parser::new_RegH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_RegH(fr, sign, left, right);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 1ビット型 net 宣言のヘッダの生成
@@ -437,8 +405,7 @@ Parser::new_NetH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, sign);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 1ビット型 net 宣言のヘッダの生成 (strength あり)
@@ -454,8 +421,7 @@ Parser::new_NetH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, sign, strength);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 1ビット型 net 宣言のヘッダの生成 (遅延あり)
@@ -471,8 +437,7 @@ Parser::new_NetH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, sign, delay);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 1ビット型 net 宣言のヘッダの生成 (strength, 遅延あり)
@@ -490,8 +455,7 @@ Parser::new_NetH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, sign, strength, delay);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 範囲指定型 net 宣言のヘッダの生成
@@ -511,8 +475,7 @@ Parser::new_NetH(const FileRegion& fr,
 		 PtrList<PtAttrInst>* ai_list)
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, vstype, sign, left, right);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 範囲指定型 net 宣言のヘッダの生成 (strengthあり)
@@ -535,8 +498,7 @@ Parser::new_NetH(const FileRegion& fr,
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, vstype, sign, left, right,
 					strength);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 範囲指定型 net 宣言のヘッダの生成 (遅延あり)
@@ -559,8 +521,7 @@ Parser::new_NetH(const FileRegion& fr,
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, vstype, sign, left, right,
 					delay);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 範囲指定型 net 宣言のヘッダの生成 (strength, 遅延あり)
@@ -585,15 +546,16 @@ Parser::new_NetH(const FileRegion& fr,
 {
   PtiDeclHead* head = mFactory.new_NetH(fr, type, vstype, sign, left, right,
 					strength, delay);
-  reg_attrinst(head, ai_list);
-  add_decl_head(head);
+  add_decl_head(head, ai_list);
 }
 
 // @brief 宣言リストに宣言ヘッダを追加する．
 inline
 void
-Parser::add_decl_head(PtiDeclHead* head)
+Parser::add_decl_head(PtiDeclHead* head,
+		      PtrList<PtAttrInst>* attr_list)
 {
+  reg_attrinst(head, attr_list);
   mCurDeclHeadList->push_back(head);
   mDeclItemList.clear();
 }

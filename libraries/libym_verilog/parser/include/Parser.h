@@ -2183,7 +2183,9 @@ public:
 
   /// @brief parameter port 宣言ヘッダを追加する．
   void
-  add_paramport_head(PtiDeclHead* head);
+  add_paramport_head(PtiDeclHead* head,
+		     PtrList<PtAttrInst>* attr_list,
+		     bool paramport);
 
   /// @brief parameter port 宣言の終わり
   void
@@ -2195,7 +2197,8 @@ public:
 
   /// @brief IO宣言リストにIO宣言ヘッダを追加する．
   void
-  add_io_head(PtiIOHead* head);
+  add_io_head(PtiIOHead* head,
+	      PtrList<PtAttrInst>* attr_list);
 
   /// @brief IO宣言リストにIO宣言要素を追加する．
   void
@@ -2205,25 +2208,21 @@ public:
   void
   end_io();
 
-  /// @brief IO宣言リストを配列に変換する．
+  /// @brief module用の IO宣言リストを配列に変換する．
   PtIOHeadArray
-  get_io_array();
+  get_module_io_array();
 
   /// @brief task/function 用の IO宣言リストを配列に変換する．
   PtIOHeadArray
   get_tf_io_array();
 
-  /// @brief parameter 宣言ヘッダを追加する．
-  void
-  add_param_head(PtiDeclHead* head);
-
   /// @param parameter 宣言の終わり
   void
   end_param();
 
-  /// @brief parameter リストを配列に変換する．
+  /// @brief module 用の parameter リストを配列に変換する．
   PtDeclHeadArray
-  get_param_array();
+  get_module_param_array();
 
   /// @brief task/function 用の parameter リストを配列に変換する．
   PtDeclHeadArray
@@ -2231,15 +2230,16 @@ public:
 
   /// @brief localparam 宣言ヘッダを追加する．
   void
-  add_localparam_head(PtiDeclHead* head);
+  add_localparam_head(PtiDeclHead* head,
+		      PtrList<PtAttrInst>* attr_list);
 
   /// @param localparam 宣言の終わり
   void
   end_localparam();
 
-  /// @brief localparam リストを配列に変換する．
+  /// @brief module 用の localparam リストを配列に変換する．
   PtDeclHeadArray
-  get_localparam_array();
+  get_module_localparam_array();
 
   /// @brief task/function 用の localparam リストを配列に変換する．
   PtDeclHeadArray
@@ -2247,7 +2247,8 @@ public:
 
   /// @brief 宣言リストに宣言ヘッダを追加する．
   void
-  add_decl_head(PtiDeclHead* head);
+  add_decl_head(PtiDeclHead* head,
+		PtrList<PtAttrInst>* attr_list);
 
   /// @brief 宣言リストに宣言要素を追加する．
   void
@@ -2261,41 +2262,30 @@ public:
   PtDeclHeadArray
   get_decl_array();
 
+  /// @brief module 用の宣言リストを配列に変換する．
+  PtDeclHeadArray
+  get_module_decl_array();
+
   /// @brief task/function 用の宣言リストを配列に変換する．
   PtDeclHeadArray
   get_tf_decl_array();
 
-#if 0
-  /// @brief generate-if 文の then 節の宣言リストを配列に変換する．
-  PtDeclHeadArray
-  get_then_decl_array();
-
-  /// @brief generate-if 文の else 節の宣言リストを配列に変換する．
-  PtDeclHeadArray
-  get_else_decl_array();
-#endif
-
   /// @brief item リストに要素を追加する．
   void
-  add_item(PtItem* item);
+  add_item(PtItem* item,
+	   PtrList<PtAttrInst>* attr_list);
 
   /// @brief item リストを配列に変換する．
   PtItemArray
   get_item_array();
 
+  /// @brief module 用の item リストを配列に変換する．
+  PtItemArray
+  get_module_item_array();
+
   /// @brief task/function 用の item リストを配列に変換する．
   PtItemArray
   get_tf_item_array();
-
-#if 0
-  /// @brief generate-if 文の then 節の item リストを配列に変換する．
-  PtItemArray
-  get_then_item_array();
-
-  /// @brief generate-if 文の else 節の item リストを配列に変換する．
-  PtItemArray
-  get_else_item_array();
-#endif
 
   /// @brief UdpEntry を追加する．
   void
@@ -2467,26 +2457,6 @@ private:
   void
   flush_declitem_list(PtDeclHeadList& head_list);
 
-  /// @brief 現在の iohead リストをスタックに積む．
-  /// @param[in] new_iohead 新しく設定する iohead
-  void
-  push_iohead_list(PtIOHeadList* new_iohead);
-
-  /// @brief スタックの末尾を iohead リストに戻す．
-  void
-  pop_iohead_list();
-
-  /// @brief 現在の paramhead リストをスタックに積む．
-  /// @param[in] new_paramhead 新しく設定する paramhead
-  /// @param[in] new_lparamhead 新しく設定する lparamhead
-  void
-  push_paramhead_list(PtDeclHeadList* new_paramhead,
-		      PtDeclHeadList* new_lparamhead);
-
-  // @brief スタックの末尾を paramhead リストに戻す．
-  void
-  pop_paramhead_list();
-
   /// @brief 現在の declhead リストをスタックに積む．
   /// @param[in] new_declhead 新しく設定する declhead
   /// @note new_declhead が NULL の場合，新たに生成する．
@@ -2620,11 +2590,11 @@ public:
   // 現在の item リスト
   PtItemList* mCurItemList;
 
-  // generate 文の宣言ヘッダリスト
-  PtDeclHeadArray mGenDeclArray;
+  // 現在の宣言ヘッダの配列
+  PtDeclHeadArray mCurDeclArray;
 
-  // generate 文の item リスト
-  PtItemArray mGenItemArray;
+  // 現在の item の配列
+  PtItemArray mCurItemArray;
 
   // generate-if の then 節の宣言ヘッダリスト
   PtDeclHeadArray mGenThenDeclArray;
@@ -2643,15 +2613,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // mCurXXXList のスタック
   //////////////////////////////////////////////////////////////////////
-
-  // IO 宣言ヘッダリストのスタック
-  vector<PtIOHeadList*> mIOHeadListStack;
-
-  // parameter 宣言ヘッダリストのスタック
-  vector<PtDeclHeadList*> mParamHeadListStack;
-
-  // localparam 宣言ヘッダリストのスタック
-  vector<PtDeclHeadList*> mLparamHeadListStack;
 
   // 宣言ヘッダリストのスタック
   vector<PtDeclHeadList*> mDeclHeadListStack;
@@ -2700,200 +2661,6 @@ Parser::to_array(PtrList<T, T>* list)
   else {
     return PtArray<T>();
   }
-}
-
-// @brief ポートリストを配列に変換する．
-inline
-PtiPortArray
-Parser::get_port_array()
-{
-  return mPortList.to_array(mAlloc);
-}
-
-// @brief ポート参照リストを配列に変換する
-inline
-PtiPortRefArray
-Parser::get_portref_array()
-{
-  return mPortRefList.to_array(mAlloc);
-}
-
-// @brief parameter port リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_paramport_array()
-{
-  return mParamPortHeadList.to_array(mAlloc);
-}
-
-// @brief IO宣言リストを配列に変換する．
-inline
-PtIOHeadArray
-Parser::get_io_array()
-{
-  return mCurIOHeadList->to_array(mAlloc);
-}
-
-// @brief task/function 用の IO宣言リストを配列に変換する．
-inline
-PtIOHeadArray
-Parser::get_tf_io_array()
-{
-  return mTfIOHeadList.to_array(mAlloc);
-}
-
-// @brief parameter リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_param_array()
-{
-  return mCurParamHeadList->to_array(mAlloc);
-}
-
-// @brief task/function 用の parameter リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_tf_param_array()
-{
-  return mTfParamHeadList.to_array(mAlloc);
-}
-
-// @brief localparam リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_localparam_array()
-{
-  return mCurLparamHeadList->to_array(mAlloc);
-}
-
-// @brief task/function 用の localparam リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_tf_localparam_array()
-{
-  return mTfLparamHeadList.to_array(mAlloc);
-}
-
-// @brief 宣言リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_decl_array()
-{
-  return mCurDeclHeadList->to_array(mAlloc);
-}
-
-// @brief task/function 用の宣言リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_tf_decl_array()
-{
-  return mTfDeclHeadList.to_array(mAlloc);
-}
-
-// @brief item リストを配列に変換する．
-inline
-PtItemArray
-Parser::get_item_array()
-{
-  return mCurItemList->to_array(mAlloc);
-}
-
-// @brief 現在の iohead リストをスタックに積む．
-// @param[in] new_iohead 新しく設定する iohead
-inline
-void
-Parser::push_iohead_list(PtIOHeadList* new_iohead)
-{
-  mIOHeadListStack.push_back(mCurIOHeadList);
-  mCurIOHeadList = new_iohead;
-}
-
-// @brief スタックの末尾を iohead リストに戻す．
-inline
-void
-Parser::pop_iohead_list()
-{
-  mCurIOHeadList = mIOHeadListStack.back();
-  mIOHeadListStack.pop_back();
-}
-
-// @brief 現在の paramhead リストをスタックに積む．
-// @param[in] new_paramhead 新しく設定する paramhead
-// @param[in] new_lparamhead 新しく設定する lparamhead
-inline
-void
-Parser::push_paramhead_list(PtDeclHeadList* new_paramhead,
-			    PtDeclHeadList* new_lparamhead)
-{
-  mParamHeadListStack.push_back(mCurParamHeadList);
-  mLparamHeadListStack.push_back(mCurLparamHeadList);
-
-  mCurParamHeadList = new_paramhead;
-  mCurLparamHeadList = new_lparamhead;
-}
-
-// @brief スタックの末尾を paramhead リストに戻す．
-inline
-void
-Parser::pop_paramhead_list()
-{
-  mCurParamHeadList = mParamHeadListStack.back();
-  mParamHeadListStack.pop_back();
-
-  mCurLparamHeadList = mLparamHeadListStack.back();
-  mLparamHeadListStack.pop_back();
-}
-
-// @brief 現在の declhead リストをスタックに積む．
-// @param[in] new_declhead 新しく設定する declhead
-inline
-void
-Parser::push_declhead_list(PtDeclHeadList* new_declhead)
-{
-  mDeclHeadListStack.push_back(mCurDeclHeadList);
-  if ( new_declhead == NULL ) {
-    new_declhead = new PtDeclHeadList(mCellAlloc);
-  }
-  mCurDeclHeadList = new_declhead;
-}
-
-// @brief スタックの末尾を declhead リストに戻す．
-// @param[in] delete_top true なら昔の declhead を削除する．
-inline
-void
-Parser::pop_declhead_list(bool delete_top)
-{
-  if ( delete_top ) {
-    delete mCurDeclHeadList;
-  }
-  mCurDeclHeadList = mDeclHeadListStack.back();
-  mDeclHeadListStack.pop_back();
-}
-
-// @brief 現在の item リストをスタックに積む．
-// @param[in] new_item 新しく設定する item リスト
-inline
-void
-Parser::push_item_list(PtItemList* new_item)
-{
-  mItemListStack.push_back(mCurItemList);
-  if ( new_item == NULL ) {
-    new_item = new PtItemList(mCellAlloc);
-  }
-  mCurItemList = new_item;
-}
-
-// @brief スタックの末尾を item リストに戻す．
-// @param[in] delete_top true なら昔の item を削除する．
-inline
-void
-Parser::pop_item_list(bool delete_top)
-{
-  if ( delete_top ) {
-    delete mCurItemList;
-  }
-  mCurItemList = mItemListStack.back();
-  mItemListStack.pop_back();
 }
 
 END_NAMESPACE_YM_VERILOG

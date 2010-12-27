@@ -17,7 +17,6 @@
 #include "PtMgr.h"
 
 #include "ym_verilog/pt/PtStmt.h"
-//#include "ym_verilog/pt/PtItem.h"
 
 
 const int debug = 0;
@@ -432,7 +431,6 @@ Parser::init_module()
   mIOItemList.clear();
 
   mCurParamHeadList->clear();
-
   mCurLparamHeadList->clear();
 
   mCurDeclHeadList->clear();
@@ -445,7 +443,6 @@ Parser::init_module()
 void
 Parser::end_module()
 {
-  // 今のところやる事はない．
 }
 
 // @brief UDP定義の開始
@@ -461,7 +458,6 @@ Parser::init_udp()
   mCurIOHeadList = &mModuleIOHeadList;
   mCurDeclHeadList = &mModuleDeclHeadList;
 
-
   mCurIOHeadList->clear();
   mIOItemList.clear();
 
@@ -475,7 +471,6 @@ Parser::init_udp()
 void
 Parser::end_udp()
 {
-  // 今のところやる事はない．
 }
 
 // @brief ポート参照リストを初期化する．
@@ -546,6 +541,8 @@ Parser::init_block()
 void
 Parser::end_block()
 {
+  mCurDeclArray = get_decl_array();
+
   pop_declhead_list(true);
 }
 
@@ -579,8 +576,11 @@ Parser::init_inst()
 void
 Parser::init_tf()
 {
-  push_iohead_list(&mTfIOHeadList);
-  push_paramhead_list(&mTfParamHeadList, &mTfLparamHeadList);
+  mCurIOHeadList = &mTfIOHeadList;
+
+  mCurParamHeadList = &mTfParamHeadList;
+  mCurLparamHeadList = &mTfLparamHeadList;
+
   push_declhead_list(&mTfDeclHeadList);
 
   mCurIOHeadList->clear();
@@ -597,8 +597,13 @@ Parser::init_tf()
 void
 Parser::end_tf()
 {
-  pop_iohead_list();
-  pop_paramhead_list();
+  mCurIOHeadList = &mModuleIOHeadList;
+
+  mCurParamHeadList = &mModuleParamHeadList;
+  mCurLparamHeadList = &mModuleLparamHeadList;
+
+  mCurDeclArray = get_decl_array();
+
   pop_declhead_list(false);
 }
 
@@ -614,8 +619,8 @@ Parser::init_generate()
 void
 Parser::end_generate()
 {
-  mGenDeclArray = get_decl_array();
-  mGenItemArray = get_item_array();
+  mCurDeclArray = get_decl_array();
+  mCurItemArray = get_item_array();
 
   pop_declhead_list(true);
   pop_item_list(true);
@@ -661,6 +666,74 @@ Parser::end_genelse()
 
   pop_declhead_list(true);
   pop_item_list(true);
+}
+
+// @brief 現在の declhead リストをスタックに積む．
+// @param[in] new_declhead 新しく設定する declhead
+inline
+void
+Parser::push_declhead_list(PtDeclHeadList* new_declhead)
+{
+  mDeclHeadListStack.push_back(mCurDeclHeadList);
+  if ( new_declhead == NULL ) {
+    new_declhead = new PtDeclHeadList(mCellAlloc);
+  }
+  mCurDeclHeadList = new_declhead;
+}
+
+// @brief スタックの末尾を declhead リストに戻す．
+// @param[in] delete_top true なら昔の declhead を削除する．
+inline
+void
+Parser::pop_declhead_list(bool delete_top)
+{
+  if ( delete_top ) {
+    delete mCurDeclHeadList;
+  }
+  mCurDeclHeadList = mDeclHeadListStack.back();
+  mDeclHeadListStack.pop_back();
+}
+
+// @brief 現在の item リストをスタックに積む．
+// @param[in] new_item 新しく設定する item リスト
+inline
+void
+Parser::push_item_list(PtItemList* new_item)
+{
+  mItemListStack.push_back(mCurItemList);
+  if ( new_item == NULL ) {
+    new_item = new PtItemList(mCellAlloc);
+  }
+  mCurItemList = new_item;
+}
+
+// @brief スタックの末尾を item リストに戻す．
+// @param[in] delete_top true なら昔の item を削除する．
+inline
+void
+Parser::pop_item_list(bool delete_top)
+{
+  if ( delete_top ) {
+    delete mCurItemList;
+  }
+  mCurItemList = mItemListStack.back();
+  mItemListStack.pop_back();
+}
+
+// @brief 宣言リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_decl_array()
+{
+  return mCurDeclHeadList->to_array(mAlloc);
+}
+
+// @brief item リストを配列に変換する．
+inline
+PtItemArray
+Parser::get_item_array()
+{
+  return mCurItemList->to_array(mAlloc);
 }
 
 END_NAMESPACE_YM_VERILOG
