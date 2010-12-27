@@ -281,6 +281,10 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   ElbValue val1;
   ElbValue val2;
 
+  bool int_type = false;
+  bool real_type = false;
+  bool bv_type = false;
+
   // 一回目はオペランドの評価のみを行う．
   switch ( op_type ) {
   case kVpiPosedgeOp:
@@ -299,7 +303,7 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiUnaryXNorOp:
     // この演算はビットベクタ型に変換できなければならない．
     assert_cond(opr_size == 1, __FILE__, __LINE__);
-    val0 = evaluate_opr(parent, pt_expr->operand(0));
+    val0 = evaluate_expr(parent, pt_expr->operand(0));
     if ( val0.is_error() ) {
       return ElbValue();
     }
@@ -315,7 +319,7 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiMinusOp:
     // この演算はどの型でもOK
     assert_cond(opr_size == 1, __FILE__, __LINE__);
-    val0 = evaluate_opr(parent, pt_expr->operand(0));
+    val0 = evaluate_expr(parent, pt_expr->operand(0));
     if ( val0.is_error() ) {
       return ElbValue();
     }
@@ -336,8 +340,8 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiArithRShiftOp:
     // この演算はビットベクタ型に変換できなければならない．
     assert_cond(opr_size == 2, __FILE__, __LINE__);
-    val0 = evaluate_opr(parent, pt_expr->operand(0));
-    val1 = evaluate_opr(parent, pt_expr->operand(1));
+    val0 = evaluate_expr(parent, pt_expr->operand(0));
+    val1 = evaluate_expr(parent, pt_expr->operand(1));
     if ( val0.is_error() || val1.is_error() ) {
       return ElbValue();
     }
@@ -370,10 +374,31 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiLtOp:
     // この演算はどの型でもOK
     assert_cond(opr_size == 2, __FILE__, __LINE__);
-    val0 = evaluate_opr(parent, pt_expr->operand(0));
-    val1 = evaluate_opr(parent, pt_expr->operand(1));
+    val0 = evaluate_expr(parent, pt_expr->operand(0));
+    val1 = evaluate_expr(parent, pt_expr->operand(1));
     if ( val0.is_error() || val1.is_error() ) {
       return ElbValue();
+    }
+    if ( val0.is_real() ) {
+      val1.to_real();
+      real_type = true;
+    }
+    else if ( val1.is_real() ) {
+      val0.to_real();
+      real_type = true;
+    }
+    else if ( val0.is_int() ) {
+      if ( val1.is_int() ) {
+	int_type = true;
+      }
+      else {
+	val0.to_bitvector();
+	bv_type = true;
+      }
+    }
+    else if ( val1.is_int() ) {
+      val1.to_bitvector();
+      bv_type = true;
     }
     break;
 
@@ -387,9 +412,9 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiConditionOp:
   case kVpiMinTypMaxOp:
     assert_cond(opr_size == 3, __FILE__, __LINE__);
-    val0 = evaluate_opr(parent, pt_expr->operand(0));
-    val1 = evaluate_opr(parent, pt_expr->operand(1));
-    val2 = evaluate_opr(parent, pt_expr->operand(2));
+    val0 = evaluate_expr(parent, pt_expr->operand(0));
+    val1 = evaluate_expr(parent, pt_expr->operand(1));
+    val2 = evaluate_expr(parent, pt_expr->operand(2));
     if ( val0.is_error() || val1.is_error() || val2.is_error() ) {
       return ElbValue();
     }
@@ -475,22 +500,91 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
     return ElbValue(arshift(val0.bitvector_value(), val1.bitvector_value()));
 
   case kVpiAddOp:
-    return ElbValue(val0.bitvector_value() + val1.bitvector_value());
+    if ( int_type ) {
+      return ElbValue(val0.int_value() + val1.int_value());
+    }
+    else if ( real_type ) {
+      return ElbValue(val0.real_value() + val1.real_value());
+    }
+    else if ( bv_type ) {
+      return ElbValue(val0.bitvector_value() + val1.bitvector_value());
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
 
   case kVpiSubOp:
-    return ElbValue(val0.bitvector_value() - val1.bitvector_value());
+    if ( int_type ) {
+      return ElbValue(val0.int_value() - val1.int_value());
+    }
+    else if ( real_type ) {
+      return ElbValue(val0.real_value() - val1.real_value());
+    }
+    else if ( bv_type ) {
+      return ElbValue(val0.bitvector_value() - val1.bitvector_value());
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
 
   case kVpiMultOp:
-    return ElbValue(val0.bitvector_value() * val1.bitvector_value());
+    if ( int_type ) {
+      return ElbValue(val0.int_value() * val1.int_value());
+    }
+    else if ( real_type ) {
+      return ElbValue(val0.real_value() * val1.real_value());
+    }
+    else if ( bv_type ) {
+      return ElbValue(val0.bitvector_value() * val1.bitvector_value());
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
 
   case kVpiDivOp:
-    return ElbValue(val0.bitvector_value() / val1.bitvector_value());
+    if ( int_type ) {
+      return ElbValue(val0.int_value() / val1.int_value());
+    }
+    else if ( real_type ) {
+      return ElbValue(val0.real_value() / val1.real_value());
+    }
+    else if ( bv_type ) {
+      return ElbValue(val0.bitvector_value() / val1.bitvector_value());
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
 
   case kVpiModOp:
-    return ElbValue(val0.bitvector_value() % val1.bitvector_value());
+    if ( int_type ) {
+      return ElbValue(val0.int_value() % val1.int_value());
+    }
+    else if ( real_type ) {
+#warning "TODO: エラーメッセージをしっかりする．"
+      return ElbValue();
+    }
+    else if ( bv_type ) {
+      return ElbValue(val0.bitvector_value() % val1.bitvector_value());
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
 
   case kVpiPowerOp:
-    return ElbValue(power(val0.bitvector_value(), val1.bitvector_value()));
+    if ( int_type ) {
+      double a = static_cast<double>(val0.int_value());
+      double b = static_cast<double>(val1.int_value());
+      return ElbValue(pow(a, b));
+    }
+    else if ( real_type ) {
+      return ElbValue(pow(val0.real_value(), val1.real_value()));
+    }
+    else if ( bv_type ) {
+      return ElbValue(power(val0.bitvector_value(), val1.bitvector_value()));
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
 
   case kVpiLogAndOp:
     if ( val0.scalar_value() == kVpiScalar1 &&
