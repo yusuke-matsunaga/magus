@@ -565,7 +565,6 @@ Parser::add_decl_head(PtiDeclHead* head,
 // PtDeclItem の生成
 //////////////////////////////////////////////////////////////////////
 
-
 // @brief 宣言要素の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] name 名前
