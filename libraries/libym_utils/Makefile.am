@@ -17,26 +17,27 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_utils_la_SOURCES = \
-	ItvlCell.h \
-	StrPool.h \
-	FragAlloc.cc \
-	SimpleAlloc.cc \
-	UnitAlloc.cc \
+	BinIO.cc \
 	Binder.cc \
 	DlList.cc \
 	File.cc \
 	FileLoc.cc \
-	MsgHandler.cc \
+	FragAlloc.cc \
 	Generator.cc \
+	ItvlCell.h \
 	ItvlCell.cc \
 	ItvlMgr.cc \
 	MFSet.cc \
+	MsgHandler.cc \
 	NameMgr.cc \
-	RefCount.cc \
-	StopWatch.cc \
-	StrBuff.cc \
-	StrPool.cc \
 	RandGen.cc \
+	RefCount.cc \
+	SimpleAlloc.cc \
+	StrBuff.cc \
+	StrPool.h \
+	StrPool.cc \
+	StopWatch.cc \
+	UnitAlloc.cc \
 	random.cc
 
 libym_utils_la_LIBADD =

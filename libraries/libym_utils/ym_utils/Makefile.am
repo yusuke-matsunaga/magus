@@ -9,6 +9,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	Alloc.h \
 	Binder.h \
+	BinIO.h \
 	DlList.h \
 	File.h \
 	FileDescMgr.h \
