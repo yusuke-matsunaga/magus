@@ -13,36 +13,24 @@
 #include "FuncGroup.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
 BEGIN_NONAMESPACE
 
-ymuint
-read_word(istream& s)
-{
-  static ymuint8 buf[4];
-  s.read(reinterpret_cast<char*>(buf), 4);
-  ymuint ans =
-    static_cast<ymuint>(buf[0]) |
-    (static_cast<ymuint>(buf[1]) << 8) |
-    (static_cast<ymuint>(buf[2]) << 16) |
-    (static_cast<ymuint>(buf[3]) << 24);
-  return ans;
-}
-
 void
 read_map(istream& s,
 	 NpnMap& map)
 {
-  ymuint32 tmp = read_word(s);
+  ymuint32 tmp = BinIO::read_32(s);
   ymuint ni = (tmp >> 1);
   map.resize(ni);
   tPol opol = (tmp & 1U) ? kPolNega : kPolPosi;
   map.set_opol(opol);
   for (ymuint i = 0; i < ni; ++ i) {
-    ymuint32 tmp = read_word(s);
+    ymuint32 tmp = BinIO::read_32(s);
     ymuint pos = (tmp >> 1);
     tPol ipol = (tmp & 1U) ? kPolNega : kPolPosi;
     map.set(i, pos, ipol);
@@ -95,22 +83,22 @@ RepFunc::~RepFunc()
 bool
 RepFunc::load(istream& s)
 {
-  mFuncNum = read_word(s);
+  mFuncNum = BinIO::read_32(s);
   if ( mFuncNum > 0 ) {
     mFuncArray = new ymuint32[mFuncNum];
     for (ymuint i = 0; i < mFuncNum; ++ i) {
-      mFuncArray[i] = read_word(s);
+      mFuncArray[i] = BinIO::read_32(s);
     }
   }
   else {
     mFuncArray = NULL;
   }
 
-  mPatNum = read_word(s);
+  mPatNum = BinIO::read_32(s);
   if ( mPatNum > 0 ) {
     mPatArray = new ymuint32[mPatNum];
     for (ymuint i = 0; i < mPatNum; ++ i) {
-      mPatArray[i] = read_word(s);
+      mPatArray[i] = BinIO::read_32(s);
     }
   }
   else {
@@ -146,12 +134,12 @@ PatGraph::~PatGraph()
 bool
 PatGraph::load(istream& s)
 {
-  mInputNum = read_word(s);
-  mEdgeNum = read_word(s);
+  mInputNum = BinIO::read_32(s);
+  mEdgeNum = BinIO::read_32(s);
   if ( mEdgeNum > 0 ) {
     mEdgeList = new ymuint32[mEdgeNum];
     for (ymuint i = 0; i < mEdgeNum; ++ i) {
-      mEdgeList[i] = read_word(s);
+      mEdgeList[i] = BinIO::read_32(s);
     }
   }
   else {
@@ -210,17 +198,17 @@ PatMgr::load(istream& s)
   mLibrary = nsYm::nsCell::restore_library(s);
 
   // 関数の情報を読み込む．
-  mFuncNum = read_word(s);
+  mFuncNum = BinIO::read_32(s);
   mFuncArray = new FuncGroup[mFuncNum];
   for (ymuint i = 0; i < mFuncNum; ++ i) {
     FuncGroup& func = mFuncArray[i];
     read_map(s, func.mNpnMap);
-    ymuint n = read_word(s);
+    ymuint n = BinIO::read_32(s);
     func.mCellNum = n;
     if ( n > 0 ) {
       func.mCellList = new const Cell*[n];
       for (ymuint j = 0; j < n; ++ j) {
-	ymuint id = read_word(s);
+	ymuint id = BinIO::read_32(s);
 	func.mCellList[j] = mLibrary->cell(id);
       }
     }
@@ -230,7 +218,7 @@ PatMgr::load(istream& s)
   }
 
   // 代表関数の情報を読み込む．
-  mRepNum = read_word(s);
+  mRepNum = BinIO::read_32(s);
   mRepArray = new RepFunc[mRepNum];
   for (ymuint i = 0; i < mRepNum; ++ i) {
     if ( !mRepArray[i].load(s) ) {
@@ -239,20 +227,20 @@ PatMgr::load(istream& s)
   }
 
   // ノードと枝の情報を読み込む．
-  mNodeNum = read_word(s);
+  mNodeNum = BinIO::read_32(s);
   mNodeTypeArray = new ymuint32[mNodeNum];
   mEdgeArray = new ymuint32[mNodeNum * 2];
   for (ymuint i = 0; i < mNodeNum; ++ i) {
-    mNodeTypeArray[i] = read_word(s);
-    mEdgeArray[i * 2] = read_word(s);
-    mEdgeArray[i * 2 + 1] = read_word(s);
+    mNodeTypeArray[i] = BinIO::read_32(s);
+    mEdgeArray[i * 2] = BinIO::read_32(s);
+    mEdgeArray[i * 2 + 1] = BinIO::read_32(s);
     if ( node_type(i) == kInput ) {
       assert_cond( input_id(i) == i, __FILE__, __LINE__);
     }
   }
 
   // パタングラフの情報を読み込む．
-  mPatNum = read_word(s);
+  mPatNum = BinIO::read_32(s);
   mPatArray = new PatGraph[mPatNum];
   for (ymuint i = 0; i < mPatNum; ++ i) {
     if ( !mPatArray[i].load(s) ) {

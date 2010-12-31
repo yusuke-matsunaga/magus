@@ -71,6 +71,47 @@ BinIO::write_64(ostream& s,
   s.write(reinterpret_cast<char*>(mBuf), 8);
 }
 
+// @brief 単精度浮動小数点数の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinIO::write_float(ostream& s,
+		   float val)
+{
+  // かなり強引
+  *(reinterpret_cast<float*>(mBuf)) = val;
+  s.write(reinterpret_cast<char*>(mBuf), sizeof(float));
+}
+
+// @brief 倍精度浮動小数点数の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinIO::write_double(ostream& s,
+		    double val)
+{
+  // かなり強引
+  *(reinterpret_cast<double*>(mBuf)) = val;
+  s.write(reinterpret_cast<char*>(mBuf), sizeof(double));
+}
+
+// @brief 文字列の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+void
+BinIO::write_str(ostream& s,
+		 const char* val)
+{
+  if ( val ) {
+    ymuint l = strlen(val);
+    write_32(s, l);
+    s.write(val, l);
+  }
+  else {
+    write_32(s, 0);
+  }
+}
+
 // @brief 1バイトの読み出し
 // @param[in] s 入力元のストリーム
 ymuint8
@@ -122,6 +163,45 @@ BinIO::read_64(istream& s)
     (static_cast<ymuint64>(mBuf[6]) << 48) |
     (static_cast<ymuint64>(mBuf[7]) << 56);
   return val;
+}
+
+// @brief 単精度不動週数点数の読み出し
+// @param[in] s 入力元のストリーム
+float
+BinIO::read_float(istream& s)
+{
+  // かなり強引
+  s.read(reinterpret_cast<char*>(mBuf), sizeof(float));
+  return *(reinterpret_cast<float*>(mBuf));
+}
+
+// @brief 倍精度不動週数点数の読み出し
+// @param[in] s 入力元のストリーム
+double
+BinIO::read_double(istream& s)
+{
+  // かなり強引
+  s.read(reinterpret_cast<char*>(mBuf), sizeof(double));
+  return *(reinterpret_cast<double*>(mBuf));
+}
+
+// @brief 文字列の読み出し
+// @param[in] s 入力元のストリーム
+string
+BinIO::read_str(istream& s)
+{
+  ymuint32 l = read_32(s);
+  if ( l > 0 ) {
+    char* buf = new char[l + 1];
+    s.read(buf, l);
+    buf[l] = '\0';
+    string ans(buf);
+    delete [] buf;
+    return ans;
+  }
+  else {
+    return string();
+  }
 }
 
 END_NAMESPACE_YM

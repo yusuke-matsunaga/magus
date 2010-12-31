@@ -58,6 +58,38 @@ public:
   write_64(ostream& s,
 	   ymuint64 val);
 
+  /// @brief 単精度浮動小数点数の書き込み
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] val 値
+  static
+  void
+  write_float(ostream& s,
+	      float val);
+
+  /// @brief 倍精度浮動小数点数の書き込み
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] val 値
+  static
+  void
+  write_double(ostream& s,
+	       double val);
+
+  /// @brief 文字列の書き込み
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] val 値
+  static
+  void
+  write_str(ostream& s,
+	    const char* val);
+
+  /// @brief 文字列の書き込み
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] val 値
+  static
+  void
+  write_str(ostream& s,
+	    const string& val);
+
   /// @brief 1バイトの読み出し
   /// @param[in] s 入力元のストリーム
   static
@@ -82,6 +114,24 @@ public:
   ymuint64
   read_64(istream& s);
 
+  /// @brief 単精度不動週数点数の読み出し
+  /// @param[in] s 入力元のストリーム
+  static
+  float
+  read_float(istream& s);
+
+  /// @brief 倍精度不動週数点数の読み出し
+  /// @param[in] s 入力元のストリーム
+  static
+  double
+  read_double(istream& s);
+
+  /// @brief 文字列の読み出し
+  /// @param[in] s 入力元のストリーム
+  static
+  string
+  read_str(istream& s);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -93,6 +143,22 @@ private:
   ymuint8 mBuf[8];
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 文字列の書き込み
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+inline
+void
+BinIO::write_str(ostream& s,
+		 const string& val)
+{
+  write_str(s, val.c_str());
+}
 
 END_NAMESPACE_YM
 
