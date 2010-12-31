@@ -12,8 +12,6 @@
 
 #include "PtiFactory.h"
 #include "ym_verilog/pt/PtItem.h"
-#include "ym_verilog/pt/PtStmt.h"
-#include "ym_verilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -133,6 +131,13 @@ Parser::new_MuH(const FileRegion& fr,
 {
   reg_defname(def_name);
   return mFactory.new_MuH(fr, def_name, to_array(con_list), get_inst_array());
+}
+
+// @brief instance リストを初期化する．
+void
+Parser::init_inst()
+{
+  mInstList.clear();
 }
 
 // @brief module instance/UDP/gate instance の要素の生成
