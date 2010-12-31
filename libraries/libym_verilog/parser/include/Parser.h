@@ -231,43 +231,39 @@ public:
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type IO の種類
   /// @param[in] sign 符号付きのとき true となるフラグ
-  void
+  PtiIOHead*
   new_IOHead(const FileRegion& fr,
 	     tPtIOType type,
-	     bool sign,
-	     PtrList<PtAttrInst>* ai_list);
+	     bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (reg 型)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type IO の種類
   /// @param[in] sign 符号付きのとき true となるフラグ
-  void
+  PtiIOHead*
   new_RegIOHead(const FileRegion& fr,
 		tPtIOType type,
-		bool sign,
-		PtrList<PtAttrInst>* ai_list);
+		bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (ネット型)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type IO の種類
   /// @param[in] net_type 補助的なネット型
   /// @param[in] sign 符号付きのとき true となるフラグ
-  void
+  PtiIOHead*
   new_NetIOHead(const FileRegion& fr,
 		tPtIOType type,
 		tVpiNetType net_type,
-		bool sign,
-		PtrList<PtAttrInst>* ai_list);
+		bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (変数型)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type IO の種類
   /// @param[in] var_type 補助的な変数型
-  void
+  PtiIOHead*
   new_VarIOHead(const FileRegion& fr,
 		tPtIOType type,
-		tVpiVarType var_type,
-		PtrList<PtAttrInst>* ai_list);
+		tVpiVarType var_type);
 
   /// @brief 範囲付きの IO 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
@@ -275,13 +271,12 @@ public:
   /// @param[in] sign 符号付きのとき true となるフラグ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiIOHead*
   new_IOHead(const FileRegion& fr,
 	     tPtIOType type,
 	     bool sign,
 	     PtExpr* left,
-	     PtExpr* right,
-	     PtrList<PtAttrInst>* ai_list);
+	     PtExpr* right);
 
   /// @brief 範囲付きの IO 宣言のヘッダの生成 (reg 型)
   /// @param[in] fr ファイル位置の情報
@@ -289,13 +284,12 @@ public:
   /// @param[in] sign 符号付きのとき true となるフラグ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiIOHead*
   new_RegIOHead(const FileRegion& fr,
 		tPtIOType type,
 		bool sign,
 		PtExpr* left,
-		PtExpr* right,
-		PtrList<PtAttrInst>* ai_list);
+		PtExpr* right);
 
   /// @brief 範囲付きの IO 宣言のヘッダの生成 (ネット型)
   /// @param[in] fr ファイル位置の情報
@@ -304,14 +298,13 @@ public:
   /// @param[in] sign 符号付きのとき true となるフラグ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiIOHead*
   new_NetIOHead(const FileRegion& fr,
 		tPtIOType type,
 		tVpiNetType net_type,
 		bool sign,
 		PtExpr* left,
-		PtExpr* right,
-		PtrList<PtAttrInst>* ai_list);
+		PtExpr* right);
 
   /// @brief IO 宣言の要素の生成
   /// @param[in] fr ファイル位置の情報
@@ -338,150 +331,131 @@ public:
 
   /// @brief パラメータ宣言のヘッダの生成 (型指定なし)
   /// @param[in] fr ファイル位置の情報
-  void
-  new_ParamH(const FileRegion& fr,
-	     PtrList<PtAttrInst>* ai_list,
-	     bool paramport = false);
+  PtiDeclHead*
+  new_ParamH(const FileRegion& fr);
 
   /// @brief 範囲指定型パラメータ宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] sign 符号付きのとき true となるフラグ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiDeclHead*
   new_ParamH(const FileRegion& fr,
 	     bool sign,
 	     PtExpr* left,
-	     PtExpr* right,
-	     PtrList<PtAttrInst>* ai_list,
-	     bool paramport = false);
+	     PtExpr* right);
 
   /// @brief 組み込み型パラメータ宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] var_type データ型
-  void
+  PtiDeclHead*
   new_ParamH(const FileRegion& fr,
-	     tVpiVarType var_type,
-	     PtrList<PtAttrInst>* ai_list,
-	     bool paramport = false);
+	     tVpiVarType var_type);
 
   /// @brief local param 宣言のヘッダの生成 (型指定なし)
   /// @param[in] fr ファイル位置の情報
-  void
-  new_LocalParamH(const FileRegion& fr,
-		  PtrList<PtAttrInst>* ai_list);
+  PtiDeclHead*
+  new_LocalParamH(const FileRegion& fr);
 
   /// @brief 範囲指定型 local param 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] sign 符号付きのとき true となるフラグ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiDeclHead*
   new_LocalParamH(const FileRegion& fr,
 		  bool sign,
 		  PtExpr* left,
-		  PtExpr* right,
-		  PtrList<PtAttrInst>* ai_list);
+		  PtExpr* right);
 
   /// @brief 組み込み型パラメータ宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] var_type データ型
-  void
+  PtiDeclHead*
   new_LocalParamH(const FileRegion& fr,
-		  tVpiVarType var_type,
-		  PtrList<PtAttrInst>* ai_list);
+		  tVpiVarType var_type);
 
   /// @brief specparam 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @return 生成された specparam
-  void
-  new_SpecParamH(const FileRegion& fr,
-		 PtrList<PtAttrInst>* ai_list);
+  PtiDeclHead*
+  new_SpecParamH(const FileRegion& fr);
 
   /// @brief 範囲指定型 specparam 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiDeclHead*
   new_SpecParamH(const FileRegion& fr,
 		 PtExpr* left,
-		 PtExpr* right,
-		 PtrList<PtAttrInst>* ai_list);
+		 PtExpr* right);
 
   /// @brief イベント宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @return 生成されたイベント
-  void
-  new_EventH(const FileRegion& fr,
-	     PtrList<PtAttrInst>* ai_list);
+  PtiDeclHead*
+  new_EventH(const FileRegion& fr);
 
   /// @brief genvar 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
-  void
-  new_GenvarH(const FileRegion& fr,
-	      PtrList<PtAttrInst>* ai_list);
+  PtiDeclHead*
+  new_GenvarH(const FileRegion& fr);
 
   /// @brief 変数宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] var_type データ型
-  void
+  PtiDeclHead*
   new_VarH(const FileRegion& fr,
-	   tVpiVarType var_type,
-	   PtrList<PtAttrInst>* ai_list);
+	   tVpiVarType var_type);
 
   /// @brief 1ビット型 reg 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] sign 符号付きの時 true となるフラグ
-  void
+  PtiDeclHead*
   new_RegH(const FileRegion& fr,
-	   bool sign,
-	   PtrList<PtAttrInst>* ai_list);
+	   bool sign);
 
   /// @brief 範囲指定型 reg 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] sign 符号付きの時 true となるフラグ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiDeclHead*
   new_RegH(const FileRegion& fr,
 	   bool sign,
 	   PtExpr* left,
-	   PtExpr* right,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtExpr* right);
 
   /// @brief 1ビット型 net 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
   /// @param[in] sign 符号の有無を表すフラグ
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
-	   bool sign,
-	   PtrList<PtAttrInst>* ai_list);
+	   bool sign);
 
   /// @brief 1ビット型 net 宣言のヘッダの生成 (strength あり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
   /// @param[in] sign 符号の有無を表すフラグ
   /// @param[in] strength 信号強度
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
 	   bool sign,
-	   PtStrength* strength,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtStrength* strength);
 
   /// @brief 1ビット型 net 宣言のヘッダの生成 (遅延あり)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] type net の型
   /// @param[in] sign 符号の有無を表すフラグ
   /// @param[in] delay 遅延
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
 	   bool sign,
-	   PtDelay* delay,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtDelay* delay);
 
   /// @brief 1ビット型 net 宣言のヘッダの生成 (strength, 遅延あり)
   /// @param[in] fr ファイル位置の情報
@@ -489,13 +463,12 @@ public:
   /// @param[in] sign 符号の有無を表すフラグ
   /// @param[in] strength 信号強度
   /// @param[in] delay 遅延
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
 	   bool sign,
 	   PtStrength* strength,
-	   PtDelay* delay,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtDelay* delay);
 
   /// @brief 範囲指定型 net 宣言のヘッダの生成
   /// @param[in] fr ファイル位置の情報
@@ -504,14 +477,13 @@ public:
   /// @param[in] sign 符号の有無を表すフラグ
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
 	   tVpiVsType vstype,
 	   bool sign,
 	   PtExpr* left,
-	   PtExpr* right,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtExpr* right);
 
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (strengthあり)
   /// @param[in] fr ファイル位置の情報
@@ -521,15 +493,14 @@ public:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   /// @param[in] strength 信号強度
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
 	   tVpiVsType vstype,
 	   bool sign,
 	   PtExpr* left,
 	   PtExpr* right,
-	   PtStrength* strength,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtStrength* strength);
 
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (遅延あり)
   /// @param[in] fr ファイル位置の情報
@@ -539,15 +510,14 @@ public:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   /// @param[in] delay 遅延
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
 	   tVpiVsType vstype,
 	   bool sign,
 	   PtExpr* left,
 	   PtExpr* right,
-	   PtDelay* delay,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtDelay* delay);
 
   /// @brief 範囲指定型 net 宣言のヘッダの生成 (strength, 遅延あり)
   /// @param[in] fr ファイル位置の情報
@@ -558,7 +528,7 @@ public:
   /// @param[in] right 範囲の右側の式
   /// @param[in] strength 信号強度
   /// @param[in] delay 遅延
-  void
+  PtiDeclHead*
   new_NetH(const FileRegion& fr,
 	   tVpiNetType type,
 	   tVpiVsType vstype,
@@ -566,8 +536,7 @@ public:
 	   PtExpr* left,
 	   PtExpr* right,
 	   PtStrength* strength,
-	   PtDelay* delay,
-	   PtrList<PtAttrInst>* ai_list);
+	   PtDelay* delay);
 
   /// @brief 宣言要素の生成
   /// @param[in] fr ファイル位置の情報
@@ -2132,16 +2101,29 @@ public:
   /// @brief parameter port 宣言ヘッダを追加する．
   void
   add_paramport_head(PtiDeclHead* head,
-		     PtrList<PtAttrInst>* attr_list,
-		     bool paramport);
+		     PtrList<PtAttrInst>* attr_list);
 
   /// @brief parameter port 宣言の終わり
   void
-  end_paramport();
+  flush_paramport();
+
+  /// @brief parameter 宣言ヘッダを追加する．
+  void
+  add_param_head(PtiDeclHead* head,
+		 PtrList<PtAttrInst>* attr_list);
 
   /// @brief parameter port リストを配列に変換する．
   PtDeclHeadArray
   get_paramport_array();
+
+  /// @brief IOポート宣言リストにIO宣言ヘッダを追加する．
+  void
+  add_ioport_head(PtiIOHead* head,
+	      PtrList<PtAttrInst>* attr_list);
+
+  /// @brief IO宣言の終わり
+  void
+  flush_io();
 
   /// @brief IO宣言リストにIO宣言ヘッダを追加する．
   void
@@ -2151,10 +2133,6 @@ public:
   /// @brief IO宣言リストにIO宣言要素を追加する．
   void
   add_io_item(PtIOItem* item);
-
-  /// @brief IO宣言の終わり
-  void
-  end_io();
 
   /// @brief module用の IO宣言リストを配列に変換する．
   PtIOHeadArray
@@ -2201,10 +2179,6 @@ public:
   /// @brief 宣言リストに宣言要素を追加する．
   void
   add_decl_item(PtDeclItem* item);
-
-  /// @param 宣言の終わり
-  void
-  end_decl();
 
   /// @brief 宣言リストを配列に変換する．
   PtDeclHeadArray
@@ -2400,10 +2374,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 宣言要素リストを最後の宣言ヘッダにセットする．
-  void
-  flush_declitem_list(PtDeclHeadList& head_list);
 
   /// @brief 現在の declhead リストをスタックに積む．
   /// @param[in] new_declhead 新しく設定する declhead

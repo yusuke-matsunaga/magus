@@ -176,7 +176,6 @@ Parser::new_Module1995(const FileRegion& file_region,
 					 item_array);
   mPtMgr.reg_module(module);
   reg_attrinst(module, ai_list);
-  end_module();
 }
 
 // Verilog2001 タイプのモジュールを生成する．
@@ -235,7 +234,6 @@ Parser::new_Module2001(const FileRegion& file_region,
 					 item_array);
   mPtMgr.reg_module(module);
   reg_attrinst(module, ai_list);
-  end_module();
 }
 
 // @brief ポートリストを配列に変換する．

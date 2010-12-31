@@ -492,56 +492,6 @@ Parser::init_portref_list()
   mPortRefList.clear();
 }
 
-// @brief IO宣言の終わり
-void
-Parser::end_io()
-{
-  if ( !mIOItemList.empty() ) {
-    assert_cond( !mCurIOHeadList->empty(), __FILE__, __LINE__);
-    PtiIOHead* last = mCurIOHeadList->back();
-    last->set_elem(mIOItemList.to_array(mAlloc));
-  }
-}
-
-// @brief parameter port 宣言の終わり
-void
-Parser::end_paramport()
-{
-  flush_declitem_list(mParamPortHeadList);
-}
-
-// @param parameter 宣言の終わり
-void
-Parser::end_param()
-{
-  flush_declitem_list(*mCurParamHeadList);
-}
-
-// @param localparam 宣言の終わり
-void
-Parser::end_localparam()
-{
-  flush_declitem_list(*mCurLparamHeadList);
-}
-
-// @param 宣言の終わり
-void
-Parser::end_decl()
-{
-  flush_declitem_list(*mCurDeclHeadList);
-}
-
-// @brief 宣言要素リストを最後の宣言ヘッダにセットする．
-void
-Parser::flush_declitem_list(PtrList<PtiDeclHead, PtDeclHead>& head_list)
-{
-  if ( !mDeclItemList.empty() ) {
-    assert_cond( !head_list.empty(), __FILE__, __LINE__);
-    PtiDeclHead* last = head_list.back();
-    last->set_elem(mDeclItemList.to_array(mAlloc));
-  }
-}
-
 // @brief block-statment の開始
 void
 Parser::init_block()
@@ -650,8 +600,6 @@ Parser::init_genif()
 void
 Parser::end_genif()
 {
-  flush_declitem_list(*mCurDeclHeadList);
-
   mGenThenDeclArray = get_decl_array();
   mGenThenItemArray = get_item_array();
 
@@ -671,8 +619,6 @@ Parser::init_genelse()
 void
 Parser::end_genelse()
 {
-  flush_declitem_list(*mCurDeclHeadList);
-
   mGenElseDeclArray = get_decl_array();
   mGenElseItemArray = get_item_array();
 
