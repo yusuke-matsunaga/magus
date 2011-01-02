@@ -945,7 +945,7 @@ module_item
 }
 | ai_list parameter_declaration
 {
-  parser.add_param_head($2, $1);
+  parser.add_decl_head($2, $1);
 }
 | ai_list specify_block
 {
@@ -972,7 +972,7 @@ module_item2
 }
 | ai_list parameter_declaration
 {
-  parser.add_param_head($2, $1);
+  parser.add_decl_head($2, $1);
 }
 | ai_list specify_block
 {

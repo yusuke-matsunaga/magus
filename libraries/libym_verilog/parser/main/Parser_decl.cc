@@ -130,7 +130,7 @@ Parser::new_NetIOHead(const FileRegion& fr,
 // @brief IOポート宣言リストにIO宣言ヘッダを追加する．
 void
 Parser::add_ioport_head(PtiIOHead* head,
-		    PtrList<PtAttrInst>* attr_list)
+			PtrList<PtAttrInst>* attr_list)
 {
   if ( head ) {
     reg_attrinst(head, attr_list);
@@ -258,21 +258,6 @@ Parser::flush_paramport()
   }
 }
 
-// @brief parameter 宣言ヘッダを追加する．
-void
-Parser::add_param_head(PtiDeclHead* head,
-		       PtrList<PtAttrInst>* attr_list)
-{
-  if ( head ) {
-    reg_attrinst(head, attr_list);
-    mCurParamHeadList->push_back(head);
-    if ( !mDeclItemList.empty() ) {
-      head->set_elem(mDeclItemList.to_array(mAlloc));
-    }
-  }
-  mDeclItemList.clear();
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // PtDeclHead ( localparam ) の生成
@@ -308,21 +293,6 @@ Parser::new_LocalParamH(const FileRegion& fr,
 			tVpiVarType var_type)
 {
   return mFactory.new_LocalParamH(fr, var_type);
-}
-
-// @brief localparam 宣言ヘッダを追加する．
-void
-Parser::add_localparam_head(PtiDeclHead* head,
-			    PtrList<PtAttrInst>* attr_list)
-{
-  if ( head ) {
-    reg_attrinst(head, attr_list);
-    mCurLparamHeadList->push_back(head);
-    if ( !mDeclItemList.empty() ) {
-      head->set_elem(mDeclItemList.to_array(mAlloc));
-    }
-  }
-  mDeclItemList.clear();
 }
 
 

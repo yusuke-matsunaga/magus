@@ -2107,11 +2107,6 @@ public:
   void
   flush_paramport();
 
-  /// @brief parameter 宣言ヘッダを追加する．
-  void
-  add_param_head(PtiDeclHead* head,
-		 PtrList<PtAttrInst>* attr_list);
-
   /// @brief parameter port リストを配列に変換する．
   PtDeclHeadArray
   get_paramport_array();
@@ -2142,10 +2137,6 @@ public:
   PtIOHeadArray
   get_tf_io_array();
 
-  /// @param parameter 宣言の終わり
-  void
-  end_param();
-
   /// @brief module 用の parameter リストを配列に変換する．
   PtDeclHeadArray
   get_module_param_array();
@@ -2153,15 +2144,6 @@ public:
   /// @brief task/function 用の parameter リストを配列に変換する．
   PtDeclHeadArray
   get_tf_param_array();
-
-  /// @brief localparam 宣言ヘッダを追加する．
-  void
-  add_localparam_head(PtiDeclHead* head,
-		      PtrList<PtAttrInst>* attr_list);
-
-  /// @param localparam 宣言の終わり
-  void
-  end_localparam();
 
   /// @brief module 用の localparam リストを配列に変換する．
   PtDeclHeadArray
@@ -2444,18 +2426,6 @@ public:
   // task/function 用 IO宣言ヘッダリスト
   PtIOHeadList mTfIOHeadList;
 
-  // モジュール用の parameter 宣言ヘッダリスト
-  PtDeclHeadList mModuleParamHeadList;
-
-  // task/function 用の parameter 宣言ヘッダリスト
-  PtDeclHeadList mTfParamHeadList;
-
-  // モジュール用の localparam 宣言ヘッダリスト
-  PtDeclHeadList mModuleLparamHeadList;
-
-  // task/function 用の localparam 宣言ヘッダリスト
-  PtDeclHeadList mTfLparamHeadList;
-
   // モジュール用の宣言ヘッダリスト
   PtDeclHeadList mModuleDeclHeadList;
 
@@ -2495,12 +2465,6 @@ public:
   // 現在の IO宣言ヘッダリスト
   // 実際には mModuleIOHeadList か mTfIOHeadList を指す．
   PtIOHeadList* mCurIOHeadList;
-
-  // 現在の parameter 宣言ヘッダリスト
-  PtDeclHeadList* mCurParamHeadList;
-
-  // 現在の localparam 宣言ヘッダリスト
-  PtDeclHeadList* mCurLparamHeadList;
 
   // 現在の宣言ヘッダリスト
   PtDeclHeadList* mCurDeclHeadList;

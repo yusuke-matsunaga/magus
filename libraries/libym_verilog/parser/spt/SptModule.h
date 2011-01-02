@@ -50,8 +50,6 @@ private:
 	    PtDeclHeadArray paramport_array,
 	    PtiPortArray port_array,
 	    PtIOHeadArray iodecl_array,
-	    PtDeclHeadArray paramdecl_array,
-	    PtDeclHeadArray localparamdecl_array,
 	    PtDeclHeadArray decl_array,
 	    PtItemArray item_array);
 
@@ -173,16 +171,6 @@ public:
   ymuint
   iodecl_num() const;
 
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const;
-
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const;
-
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
@@ -275,12 +263,6 @@ private:
 
   // 入出力宣言の要素数
   ymuint32 mIODeclNum;
-
-  // parameter 宣言の配列
-  PtDeclHeadArray mParamHeadArray;
-
-  // localparam 宣言の配列
-  PtDeclHeadArray mLocalparamHeadArray;
 
   // 宣言リスト
   PtDeclHeadArray mDeclHeadArray;

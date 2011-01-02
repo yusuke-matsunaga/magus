@@ -110,8 +110,6 @@ public:
 	     PtDeclHeadArray paramport_array,
 	     PtiPortArray port_array,
 	     PtIOHeadArray iohead_array,
-	     PtDeclHeadArray paramhead_array,
-	     PtDeclHeadArray localparamhead_array,
 	     PtDeclHeadArray declhead_array,
 	     PtItemArray item_array);
 
@@ -560,8 +558,6 @@ public:
 	   const char* name,
 	   bool automatic,
 	   PtIOHeadArray iohead_array,
-	   PtDeclHeadArray paramhead_array,
-	   PtDeclHeadArray lparamhead_array,
 	   PtDeclHeadArray declhead_array,
 	   PtStmt* stmt);
 
@@ -573,8 +569,6 @@ public:
 	       bool automatic,
 	       bool sign,
 	       PtIOHeadArray iohead_array,
-	       PtDeclHeadArray paraead_array,
-	       PtDeclHeadArray lparamhead_array,
 	       PtDeclHeadArray declhead_array,
 	       PtStmt* stmt);
 
@@ -588,8 +582,6 @@ public:
 		PtExpr* left,
 		PtExpr* right,
 		PtIOHeadArray iohead_array,
-		PtDeclHeadArray paraead_array,
-		PtDeclHeadArray lparamhead_array,
 		PtDeclHeadArray declhead_array,
 		PtStmt* stmt);
 
@@ -602,8 +594,6 @@ public:
 		bool sign,
 		tVpiVarType func_type,
 		PtIOHeadArray iohead_array,
-		PtDeclHeadArray paraead_array,
-		PtDeclHeadArray lparamhead_array,
 		PtDeclHeadArray declhead_array,
 		PtStmt* stmt);
 

@@ -137,8 +137,6 @@ public:
   /// @param[in] paramdecl_port_array パラメータポートのリスト
   /// @param[in] port_array ポートのリスト
   /// @param[in] iodecl_array 入出力のリスト
-  /// @param[in] paramdecl_array parameter のリスト
-  /// @param[in] localparamdecl_array local_param のリスト
   /// @param[in] decl_array 宣言のリスト
   /// @param[in] item_array 要素のリスト
   /// @return 生成されたモジュール
@@ -165,8 +163,6 @@ public:
 	     PtDeclHeadArray paramport_array,
 	     PtiPortArray port_array,
 	     PtIOHeadArray iodecl_array,
-	     PtDeclHeadArray paramdecl_array,
-	     PtDeclHeadArray localparamdecl_array,
 	     PtDeclHeadArray decl_array,
 	     PtItemArray item_array);
 
@@ -770,8 +766,6 @@ public:
   /// @param[in] name task 名
   /// @param[in] automatic automatic task の時に true となるフラグ
   /// @param[in] iohead_array ポート宣言のリスト
-  /// @param[in] paramhead_array parameter 宣言のリスト
-  /// @param[in] lparamhead_array local parmeter 宣言のリスト
   /// @param[in] decl_array 宣言のリスト (IO宣言を含む)
   /// @param[in] stmt 本体のステートメント
   /// @return 生成された task 文
@@ -781,8 +775,6 @@ public:
 	   const char* name,
 	   bool automatic,
 	   PtIOHeadArray iohead_array,
-	   PtDeclHeadArray paramhead_array,
-	   PtDeclHeadArray lparamhead_array,
 	   PtDeclHeadArray decl_array,
 	   PtStmt* stmt);
 
@@ -792,8 +784,6 @@ public:
   /// @param[in] automatic automatic task の時に true となるフラグ
   /// @param[in] sign 符号つきの時に true となるフラグ
   /// @param[in] iohead_array ポート宣言のリスト
-  /// @param[in] paramhead_array parameter 宣言のリスト
-  /// @param[in] lparamhead_array local parmeter 宣言のリスト
   /// @param[in] decl_array 宣言のリスト (IO宣言を含む)
   /// @param[in] stmt 本体のステートメント
   /// @return 生成された func 文
@@ -804,8 +794,6 @@ public:
 	       bool automatic,
 	       bool sign,
 	       PtIOHeadArray iohead_array,
-	       PtDeclHeadArray paramhead_array,
-	       PtDeclHeadArray lparamhead_array,
 	       PtDeclHeadArray decl_array,
 	       PtStmt* stmt);
 
@@ -817,8 +805,6 @@ public:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   /// @param[in] iohead_array ポート宣言のリスト
-  /// @param[in] paramhead_array parameter 宣言のリスト
-  /// @param[in] lparamhead_array local parmeter 宣言のリスト
   /// @param[in] decl_array 宣言のリスト (IO宣言を含む)
   /// @param[in] stmt 本体のステートメント
   /// @return 生成された func 文
@@ -831,8 +817,6 @@ public:
 		PtExpr* left,
 		PtExpr* right,
 		PtIOHeadArray iohead_array,
-		PtDeclHeadArray paramhead_array,
-		PtDeclHeadArray lparamhead_array,
 		PtDeclHeadArray decl_array,
 		PtStmt* stmt);
 
@@ -856,8 +840,6 @@ public:
 		bool sign,
 		tVpiVarType func_type,
 		PtIOHeadArray iohead_array,
-		PtDeclHeadArray paramhead_array,
-		PtDeclHeadArray lparamhead_array,
 		PtDeclHeadArray decl_array,
 		PtStmt* stmt);
 

@@ -87,10 +87,7 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
   }
 
   // parameter の生成
-  instantiate_param(taskfunc, pt_item->paramhead_array(), false);
-
-  // localparam の生成
-  instantiate_param(taskfunc, pt_item->localparamhead_array(), true);
+  phase1_decl(taskfunc, pt_item->declhead_array(), false);
 
   // attribute instance の生成
   //instantiate_attribute(pt_item->attr_top(), false, taskfunc);
@@ -257,10 +254,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   reg_constant_function(parent, pt_function->name(), func);
 
   // parameter の生成
-  instantiate_param(func, pt_function->paramhead_array(), false);
-
-  // localparam の生成
-  instantiate_param(func, pt_function->localparamhead_array(), true);
+  phase1_decl(func, pt_function->declhead_array(), false);
 
   // 宣言要素の生成
   instantiate_decl(func, pt_function->declhead_array());

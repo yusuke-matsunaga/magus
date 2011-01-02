@@ -354,6 +354,15 @@ protected:
   // 宣言要素のインスタンス化関係の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief parameter と genvar を実体化する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head_array 宣言ヘッダの配列
+  /// @param[in] force_to_local true なら parameter を localparam にする．
+  void
+  phase1_decl(const VlNamedObj* parent,
+	      PtDeclHeadArray pt_head_array,
+	      bool force_to_local);
+
   /// @brief IO宣言要素を実体化する．
   /// @param[in] module 親のモジュール
   /// @param[in] taskfunc 親のタスク/関数
@@ -370,22 +379,6 @@ protected:
   void
   instantiate_decl(const VlNamedObj* parent,
 		   PtDeclHeadArray pt_head_array);
-
-  /// @brief パラメータ用の instantiate 関数
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_head_array 宣言ヘッダの配列
-  /// @param[in] is_local local_param の時 true
-  void
-  instantiate_param(const VlNamedObj* parent,
-		    PtDeclHeadArray pt_head_array,
-		    bool is_local);
-
-  /// @brief genvar をインスタンス化する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_head_array 宣言ヘッダの配列
-  void
-  instantiate_genvar(const VlNamedObj* parent,
-		     PtDeclHeadArray pt_head_array);
 
 
 protected:

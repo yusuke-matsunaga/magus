@@ -52,6 +52,36 @@ DeclGen::~DeclGen()
 {
 }
 
+// @brief parameter と genvar を実体化する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_head_array 宣言ヘッダの配列
+// @param[in] force_to_local true なら parameter を localparam にする．
+void
+DeclGen::phase1_decl(const VlNamedObj* parent,
+		     PtDeclHeadArray pt_head_array,
+		     bool force_to_local)
+{
+  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
+    const PtDeclHead* pt_head = pt_head_array[i];
+    switch ( pt_head->type() ) {
+    case kPtDecl_Param:
+      instantiate_param_head(parent, pt_head, force_to_local);
+      break;
+
+    case kPtDecl_LocalParam:
+      instantiate_param_head(parent, pt_head, true);
+      break;
+
+    case kPtDecl_Genvar:
+      instantiate_genvar_head(parent, pt_head);
+      break;
+
+    default:
+      break;
+    }
+  }
+}
+
 // @brief IO宣言要素をインスタンス化する．
 // @param[in] module 親のモジュール
 // @param[in] taskfunc 親のタスク/関数
@@ -366,7 +396,7 @@ DeclGen::instantiate_decl(const VlNamedObj* parent,
     switch ( pt_head->type() ) {
     case kPtDecl_Param:
     case kPtDecl_LocalParam:
-      assert_not_reached(__FILE__, __LINE__);
+      // すでに処理済みのはず．
       break;
 
     case kPtDecl_Reg:
@@ -402,90 +432,72 @@ DeclGen::instantiate_decl(const VlNamedObj* parent,
 // @brief パラメータ用の instantiate 関数
 // @param[in] parent 親のスコープ
 // @param[in] pt_head_array 宣言ヘッダの配列
-// @param[in] is_local local_param の時 true
+// @param[in] is_local local_param にする時 true
 void
-DeclGen::instantiate_param(const VlNamedObj* parent,
-			   PtDeclHeadArray pt_head_array,
-			   bool is_local)
+DeclGen::instantiate_param_head(const VlNamedObj* parent,
+				const PtDeclHead* pt_head,
+				bool is_local)
 {
   const VlModule* module = parent->parent_module();
 
-  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
-    const PtDeclHead* pt_head = pt_head_array[i];
-    ElbParamHead* param_head = NULL;
+  ElbParamHead* param_head = NULL;
 
-    const PtExpr* pt_left = pt_head->left_range();
-    const PtExpr* pt_right = pt_head->right_range();
-    if ( pt_left && pt_right ) {
-      ElbExpr* left = NULL;
-      ElbExpr* right = NULL;
-      int left_val = 0;
-      int right_val = 0;
-      if ( !instantiate_range(parent, pt_left, pt_right,
-			      left, right,
-			      left_val, right_val) ) {
-	continue;
-      }
-      param_head = factory().new_ParamHead(module, pt_head,
-					   left, right,
-					   left_val, right_val);
+  const PtExpr* pt_left = pt_head->left_range();
+  const PtExpr* pt_right = pt_head->right_range();
+  if ( pt_left && pt_right ) {
+    ElbExpr* left = NULL;
+    ElbExpr* right = NULL;
+    int left_val = 0;
+    int right_val = 0;
+    if ( !instantiate_range(parent, pt_left, pt_right,
+			    left, right,
+			    left_val, right_val) ) {
+      return;
     }
-    else {
-      param_head = factory().new_ParamHead(module, pt_head);
-    }
-
-    for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
-      const PtDeclItem* pt_item = pt_head->item(i);
-      const FileRegion& file_region = pt_item->file_region();
-
-      // 右辺の式は constant expression のはずなので今つくる．
-      const PtExpr* pt_init_expr = pt_item->init_value();
-      ElbExpr* init = instantiate_constant_expr(parent, pt_init_expr);
-      if ( !init ) {
-	continue;
-      }
-
-      ElbDecl* param = factory().new_Parameter(param_head,
-					       pt_item,
-					       is_local);
-      assert_cond(param, __FILE__, __LINE__);
-      reg_decl(vpiParameter, param);
-
-      // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, param);
-
-      ostringstream buf;
-      buf << "Parameter(" << param->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			file_region,
-			kMsgInfo,
-			"ELAB",
-			buf.str());
-
-      param->set_expr(init);
-
-      // ダブっている感じがするけど同じことを表す parameter assign 文
-      // をつくってモジュールに追加する．
-      ElbParamAssign* pa = factory().new_ParamAssign(module, pt_item,
-						     param, init,
-						     true);
-      reg_paramassign(pa);
-    }
+    param_head = factory().new_ParamHead(module, pt_head,
+					 left, right,
+					 left_val, right_val);
   }
-}
+  else {
+    param_head = factory().new_ParamHead(module, pt_head);
+  }
 
-// genvar をインスタンス化する．
-// @param[in] parent 親のスコープ
-// @param[in] pt_head_array 宣言ヘッダの配列
-void
-DeclGen::instantiate_genvar(const VlNamedObj* parent,
-			    PtDeclHeadArray pt_head_array)
-{
-  for (ymuint i = 0; i < pt_head_array.size(); ++ i) {
-    const PtDeclHead* pt_head = pt_head_array[i];
-    if ( pt_head->type() == kPtDecl_Genvar ) {
-      instantiate_genvar_head(parent, pt_head);
+  for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
+    const PtDeclItem* pt_item = pt_head->item(i);
+    const FileRegion& file_region = pt_item->file_region();
+
+    // 右辺の式は constant expression のはずなので今つくる．
+    const PtExpr* pt_init_expr = pt_item->init_value();
+    ElbExpr* init = instantiate_constant_expr(parent, pt_init_expr);
+    if ( !init ) {
+      continue;
     }
+
+    ElbDecl* param = factory().new_Parameter(param_head,
+					     pt_item,
+					     is_local);
+    assert_cond(param, __FILE__, __LINE__);
+    reg_decl(vpiParameter, param);
+
+    // attribute instance の生成
+    //instantiate_attribute(pt_head->attr_top(), false, param);
+
+    ostringstream buf;
+    buf << "Parameter(" << param->full_name() << ") created.";
+    msg_mgr().put_msg(__FILE__, __LINE__,
+		      file_region,
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
+
+    param->set_expr(init);
+
+    // ダブっている感じがするけど同じことを表す parameter assign 文
+    // をつくってモジュールに追加する．
+    ElbParamAssign* pa = factory().new_ParamAssign(module, pt_item,
+						   param, init,
+						   true);
+    reg_paramassign(pa);
   }
 }
 

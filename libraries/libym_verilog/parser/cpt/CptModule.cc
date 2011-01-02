@@ -42,8 +42,6 @@ CptModule::CptModule(const FileRegion& file_region,
 		     PtDeclHeadArray paramport_array,
 		     PtiPortArray port_array,
 		     PtIOHeadArray iohead_array,
-		     PtDeclHeadArray paramhead_array,
-		     PtDeclHeadArray lparamhead_array,
 		     PtDeclHeadArray declhead_array,
 		     PtItemArray item_array) :
   mFileRegion(file_region),
@@ -55,8 +53,6 @@ CptModule::CptModule(const FileRegion& file_region,
   mParamPortArray(paramport_array),
   mPortArray(port_array),
   mIOHeadArray(iohead_array),
-  mParamHeadArray(paramhead_array),
-  mLparamHeadArray(lparamhead_array),
   mDeclHeadArray(declhead_array),
   mItemArray(item_array)
 {
@@ -143,20 +139,6 @@ ymuint
 CptModule::iodecl_num() const
 {
   return mIODeclNum;
-}
-
-// @brief parameter 宣言ヘッダ配列の取得
-PtDeclHeadArray
-CptModule::paramhead_array() const
-{
-  return mParamHeadArray;
-}
-
-// @brief localparam 宣言ヘッダ配列の取得
-PtDeclHeadArray
-CptModule::localparamhead_array() const
-{
-  return mLparamHeadArray;
 }
 
 // @brief 宣言ヘッダ配列の取得
@@ -647,8 +629,6 @@ CptPortRefR::right_range() const
 // @param param_port_array パラメータポートのリスト
 // @param port_array ポートのリスト
 // @param iohead_array 入出力のリスト
-// @param paramhead_array parameter のリスト
-// @param lparamhead_array localparameter のリスト
 // @param declhead_array 宣言のリスト
 // @param item_array 要素のリスト
 // @return 生成されたモジュール
@@ -674,8 +654,6 @@ CptFactory::new_Module(const FileRegion& file_region,
 		       PtDeclHeadArray paramport_array,
 		       PtiPortArray port_array,
 		       PtIOHeadArray iohead_array,
-		       PtDeclHeadArray paramhead_array,
-		       PtDeclHeadArray lparamhead_array,
 		       PtDeclHeadArray declhead_array,
 		       PtItemArray item_array)
 {
@@ -692,8 +670,6 @@ CptFactory::new_Module(const FileRegion& file_region,
 			   paramport_array,
 			   port_array,
 			   iohead_array,
-			   paramhead_array,
-			   lparamhead_array,
 			   declhead_array,
 			   item_array);
 }

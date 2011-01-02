@@ -126,16 +126,6 @@ public:
   PtIOHeadArray
   iohead_array() const;
 
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const;
-
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const;
-
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
@@ -281,7 +271,6 @@ public:
   virtual
   const PtExpr*
   next_expr() const;
-
 
 
 private:
@@ -598,8 +587,6 @@ private:
   /// @param[in] right 範囲の右側の式
   /// @param[in] data_type 関数の戻値の型
   /// @param[in] iohead_array IO宣言のリスト
-  /// @param[in] paramhead_array parameter 宣言のリスト
-  /// @param[in] lparamhead_array localparam 宣言のリスト
   /// @param[in] declhead_array 宣言のリスト
   /// @param[in] stmt 本体のステートメント
   SptTf(const FileRegion& file_region,
@@ -611,8 +598,6 @@ private:
 	PtExpr* right,
 	tVpiVarType var_type,
 	PtIOHeadArray iohead_array,
-	PtDeclHeadArray paramhead_array,
-	PtDeclHeadArray localparamhead_array,
 	PtDeclHeadArray declhead_array,
 	PtStmt* stmt);
 
@@ -645,16 +630,6 @@ public:
   virtual
   PtIOHeadArray
   iohead_array() const;
-
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const;
-
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const;
 
   /// @brief 宣言ヘッダ配列の取得
   virtual
@@ -730,12 +705,6 @@ private:
 
   // IO宣言の配列
   PtIOHeadArray mIOHeadArray;
-
-  // paramter 宣言の配列
-  PtDeclHeadArray mParamHeadArray;
-
-  // localparam 宣言の配列
-  PtDeclHeadArray mLocalparamHeadArray;
 
   // その他の宣言の配列
   PtDeclHeadArray mDeclHeadArray;

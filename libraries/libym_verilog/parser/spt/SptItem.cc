@@ -150,20 +150,6 @@ SptItem::iohead_array() const
   return PtIOHeadArray();
 }
 
-// @brief parameter 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptItem::paramhead_array() const
-{
-  return PtDeclHeadArray();
-}
-
-// @brief localparam 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptItem::localparamhead_array() const
-{
-  return PtDeclHeadArray();
-}
-
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptItem::declhead_array() const
@@ -612,8 +598,6 @@ SptTf::SptTf(const FileRegion& file_region,
 	     PtExpr* right,
 	     tVpiVarType data_type,
 	     PtIOHeadArray iohead_array,
-	     PtDeclHeadArray paramhead_array,
-	     PtDeclHeadArray localparamhead_array,
 	     PtDeclHeadArray declhead_array,
 	     PtStmt* stmt) :
   SptItem(file_region, type),
@@ -624,8 +608,6 @@ SptTf::SptTf(const FileRegion& file_region,
   mRightRange(right),
   mDataType(data_type),
   mIOHeadArray(iohead_array),
-  mParamHeadArray(paramhead_array),
-  mLocalparamHeadArray(localparamhead_array),
   mDeclHeadArray(declhead_array),
   mBody(stmt)
 {
@@ -671,20 +653,6 @@ PtIOHeadArray
 SptTf::iohead_array() const
 {
   return mIOHeadArray;
-}
-
-// @brief parameter 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptTf::paramhead_array() const
-{
-  return mParamHeadArray;
-}
-
-// @brief localparam 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptTf::localparamhead_array() const
-{
-  return mLocalparamHeadArray;
 }
 
 // @brief 宣言ヘッダ配列の取得
@@ -1143,8 +1111,6 @@ SptFactory::new_Task(const FileRegion& file_region,
 		     const char* name,
 		     bool automatic,
 		     PtIOHeadArray iohead_array,
-		     PtDeclHeadArray paramhead_array,
-		     PtDeclHeadArray localparamhead_array,
 		     PtDeclHeadArray declhead_array,
 		     PtStmt* stmt)
 {
@@ -1155,8 +1121,6 @@ SptFactory::new_Task(const FileRegion& file_region,
 		       false, NULL, NULL,
 		       kVpiVarNone,
 		       iohead_array,
-		       paramhead_array,
-		       localparamhead_array,
 		       declhead_array,
 		       stmt);
 }
@@ -1178,8 +1142,6 @@ SptFactory::new_Function(const FileRegion& file_region,
 			 bool automatic,
 			 bool sign,
 			 PtIOHeadArray iohead_array,
-			 PtDeclHeadArray paramhead_array,
-			 PtDeclHeadArray lparamhead_array,
 			 PtDeclHeadArray declhead_array,
 			 PtStmt* stmt)
 {
@@ -1190,7 +1152,7 @@ SptFactory::new_Function(const FileRegion& file_region,
 		       sign, NULL, NULL,
 		       kVpiVarNone,
 		       iohead_array,
-		       paramhead_array, lparamhead_array, declhead_array,
+		       declhead_array,
 		       stmt);
 }
 
@@ -1215,8 +1177,6 @@ SptFactory::new_SizedFunc(const FileRegion& file_region,
 			  PtExpr* left,
 			  PtExpr* right,
 			  PtIOHeadArray iohead_array,
-			  PtDeclHeadArray paramhead_array,
-			  PtDeclHeadArray lparamhead_array,
 			  PtDeclHeadArray declhead_array,
 			  PtStmt* stmt)
 {
@@ -1227,7 +1187,7 @@ SptFactory::new_SizedFunc(const FileRegion& file_region,
 		       sign, left, right,
 		       kVpiVarNone,
 		       iohead_array,
-		       paramhead_array, lparamhead_array, declhead_array,
+		       declhead_array,
 		       stmt);
 }
 
@@ -1250,8 +1210,6 @@ SptFactory::new_TypedFunc(const FileRegion& file_region,
 			  bool sign,
 			  tVpiVarType func_type,
 			  PtIOHeadArray iohead_array,
-			  PtDeclHeadArray paramhead_array,
-			  PtDeclHeadArray lparamhead_array,
 			  PtDeclHeadArray declhead_array,
 			  PtStmt* stmt)
 {
@@ -1262,7 +1220,7 @@ SptFactory::new_TypedFunc(const FileRegion& file_region,
 		       sign, NULL, NULL,
 		       func_type,
 		       iohead_array,
-		       paramhead_array, lparamhead_array, declhead_array,
+		       declhead_array,
 		       stmt);
 }
 

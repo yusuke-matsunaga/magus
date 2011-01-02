@@ -200,16 +200,10 @@ Parser::init_tf()
 {
   mCurIOHeadList = &mTfIOHeadList;
 
-  mCurParamHeadList = &mTfParamHeadList;
-  mCurLparamHeadList = &mTfLparamHeadList;
-
   push_declhead_list(&mTfDeclHeadList);
 
   mCurIOHeadList->clear();
   mIOItemList.clear();
-
-  mCurParamHeadList->clear();
-  mCurLparamHeadList->clear();
 
   mCurDeclHeadList->clear();
   mDeclItemList.clear();
@@ -220,9 +214,6 @@ void
 Parser::end_tf()
 {
   mCurIOHeadList = &mModuleIOHeadList;
-
-  mCurParamHeadList = &mModuleParamHeadList;
-  mCurLparamHeadList = &mModuleLparamHeadList;
 
   mCurDeclArray = get_decl_array();
 
@@ -242,8 +233,6 @@ Parser::new_Task(const FileRegion& fr,
 {
   return mFactory.new_Task(fr, name, automatic,
 			   get_tf_io_array(),
-			   get_tf_param_array(),
-			   get_tf_localparam_array(),
 			   get_tf_decl_array(),
 			   stmt);
 }
@@ -264,8 +253,6 @@ Parser::new_Function(const FileRegion& fr,
   return mFactory.new_Function(fr, name, automatic,
 			       sign,
 			       get_tf_io_array(),
-			       get_tf_param_array(),
-			       get_tf_localparam_array(),
 			       get_tf_decl_array(),
 			       stmt);
 }
@@ -290,8 +277,6 @@ Parser::new_SizedFunc(const FileRegion& fr,
   return mFactory.new_SizedFunc(fr, name, automatic,
 				sign, left, right,
 				get_tf_io_array(),
-				get_tf_param_array(),
-				get_tf_localparam_array(),
 				get_tf_decl_array(),
 				stmt);
 }
@@ -314,8 +299,6 @@ Parser::new_TypedFunc(const FileRegion& fr,
   return mFactory.new_TypedFunc(fr, name, automatic,
 				sign, func_type,
 				get_tf_io_array(),
-				get_tf_param_array(),
-				get_tf_localparam_array(),
 				get_tf_decl_array(),
 				stmt);
 }
@@ -514,22 +497,6 @@ PtIOHeadArray
 Parser::get_tf_io_array()
 {
   return mTfIOHeadList.to_array(mAlloc);
-}
-
-// @brief task/function 用の parameter リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_tf_param_array()
-{
-  return mTfParamHeadList.to_array(mAlloc);
-}
-
-// @brief task/function 用の localparam リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_tf_localparam_array()
-{
-  return mTfLparamHeadList.to_array(mAlloc);
 }
 
 // @brief task/function 用の宣言リストを配列に変換する．

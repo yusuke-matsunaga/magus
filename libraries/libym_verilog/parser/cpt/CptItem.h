@@ -26,7 +26,7 @@ class CptItem :
   public PtItem
 {
 protected:
-  
+
   /// @brief コンストラクタ
   CptItem();
 
@@ -60,7 +60,7 @@ public:
   virtual
   const PtDelay*
   delay() const;
-  
+
   /// @brief パラメータ割り当てリストの取得
   virtual
   PtConnectionArray
@@ -104,32 +104,22 @@ public:
   virtual
   const char*
   name() const;
-  
+
   /// @brief IO宣言の要素数の取得
   virtual
   ymuint32
   ioitem_num() const;
-  
+
   /// @brief IO宣言リストの配列の取得
   virtual
   PtIOHeadArray
   iohead_array() const;
 
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const;
-  
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const;
-  
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief item 配列の取得
   virtual
   PtItemArray
@@ -203,7 +193,7 @@ public:
   virtual
   tVpiSpecPathType
   specpath_type() const;
-  
+
   /// @brief ターミナルの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < size() )
   virtual
@@ -216,29 +206,29 @@ public:
   virtual
   const PtPathDecl*
   path_decl() const;
-  
+
   /// @brief 条件式の取得
   /// @return 条件式
   /// @note このクラスでは NULL を返す．
   virtual
   const PtExpr*
   expr() const;
-  
+
   /// @brief 条件が成り立ったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   then_declhead_array() const;
-  
+
   /// @brief 条件が成り立ったときに生成される item 配列の取得
   virtual
   PtItemArray
   then_item_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   else_declhead_array() const;
-  
+
   /// @brief 条件が成り立たなかったときに生成される item 配列の取得
   virtual
   PtItemArray
@@ -283,15 +273,15 @@ class CptDefParamH :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptDefParamH(const FileRegion& file_region,
 	       PtDefParamArray dp_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDefParamH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -328,7 +318,7 @@ private:
 
   // ファイル位置
   FileRegion mFileRegion;
-  
+
   // 要素の配列
   PtDefParamArray mArray;
 
@@ -344,18 +334,18 @@ class CptDefParam :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   /// @note value は常に定数式
   CptDefParam(const FileRegion& file_region,
 	      PtNameBranchArray nb_array,
 	      const char* tail_name,
 	      PtExpr* value);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptDefParam();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -367,7 +357,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 階層ブランチの取得
   PtNameBranchArray
   namebranch_array() const;
@@ -401,7 +391,7 @@ private:
 
   // 値
   PtExpr* mExpr;
-  
+
 };
 
 
@@ -418,11 +408,11 @@ protected:
   /// @brief コンストラクタ
   CptContAssignH(const FileRegion& file_region,
 		 PtContAssignArray ca_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptContAssignH();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -480,11 +470,11 @@ protected:
   CptContAssignHS(const FileRegion& file_region,
 		  PtStrength* str,
 		  PtContAssignArray ca_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptContAssignHS();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -522,11 +512,11 @@ protected:
   CptContAssignHD(const FileRegion& file_region,
 		  PtDelay* delay,
 		  PtContAssignArray ca_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptContAssignHD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -565,11 +555,11 @@ protected:
 		   PtStrength* str,
 		   PtDelay* delay,
 		   PtContAssignArray ca_array);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptContAssignHSD();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -610,15 +600,15 @@ class CptContAssign :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptContAssign(PtExpr* lhs,
 		PtExpr* rhs);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptContAssign();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -664,7 +654,7 @@ class CptProcess :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptProcess(const FileRegion& file_region,
 	     PtStmt* body);
@@ -672,7 +662,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptProcess();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -713,7 +703,7 @@ class CptInitial :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptInitial(const FileRegion& file_region,
 	     PtStmt* body);
@@ -721,7 +711,7 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CptInitial();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -746,15 +736,15 @@ class CptAlways :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptAlways(const FileRegion& file_region,
 	    PtStmt* body);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptAlways();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -766,7 +756,7 @@ public:
   virtual
   tPtItemType
   type() const;
-  
+
 };
 
 
@@ -777,21 +767,19 @@ class CptTf :
   public CptItem
 {
 protected:
-  
+
   /// @brief コンストラクタ
   CptTf(const FileRegion& file_region,
 	const char* name,
 	bool automatic,
 	PtIOHeadArray iohead_array,
-	PtDeclHeadArray paramhead_array,
-	PtDeclHeadArray lparamhead_array,
 	PtDeclHeadArray declhead_array,
 	PtStmt* stmt);
 
   /// @brief デストラクタ
   virtual
   ~CptTf();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -802,7 +790,7 @@ public:
   virtual
   FileRegion
   file_region() const;
-  
+
   /// @brief 名前を取り出す．
   virtual
   const char*
@@ -812,32 +800,22 @@ public:
   virtual
   bool
   automatic() const;
-  
+
   /// @brief IO宣言の要素数の取得
   virtual
   ymuint32
   ioitem_num() const;
-  
+
   /// @brief IO宣言リストの配列の取得
   virtual
   PtIOHeadArray
   iohead_array() const;
 
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const;
-  
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const;
-  
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
   declhead_array() const;
-  
+
   /// @brief 本体を取り出す．
   virtual
   const PtStmt*
@@ -857,22 +835,16 @@ private:
 
   // automatic 属性
   bool mAutomatic;
-  
+
   // IO宣言の要素数
   ymuint32 mIOItemNum;
-  
+
   // IO宣言の配列
   PtIOHeadArray mIOHeadArray;
 
-  // parameter の宣言の配列
-  PtDeclHeadArray mParamHeadArray;
-
-  // localparam の宣言の配列
-  PtDeclHeadArray mLparamHeadArray;
-
   // その他の宣言の配列
   PtDeclHeadArray mDeclHeadArray;
-  
+
   // 本体
   PtStmt* mBody;
 
@@ -888,21 +860,19 @@ class CptTask :
   friend class CptFactory;
 
 private:
-  
+
   /// @brief コンストラクタ
   CptTask(const FileRegion& file_region,
 	  const char* name,
 	  bool automatic,
 	  PtIOHeadArray iohead_array,
-	  PtDeclHeadArray paramhead_array,
-	  PtDeclHeadArray lparamhead_array,
 	  PtDeclHeadArray declhead_array,
 	  PtStmt* stmt);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptTask();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -927,22 +897,20 @@ class CptFunction :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptFunction(const FileRegion& file_region,
 	      const char* name,
 	      bool automatic,
 	      bool sign,
 	      PtIOHeadArray iohead_array,
-	      PtDeclHeadArray paramhead_array,
-	      PtDeclHeadArray lparamhead_array,
 	      PtDeclHeadArray declhead_array,
 	      PtStmt* stmt);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptFunction();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1014,15 +982,13 @@ protected:
 	       PtExpr* left,
 	       PtExpr* right,
 	       PtIOHeadArray iohead_array,
-	       PtDeclHeadArray paramhead_array,
-	       PtDeclHeadArray lparamhead_array,
 	       PtDeclHeadArray declhead_array,
 	       PtStmt* stmt);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptSizedFunc();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1063,7 +1029,7 @@ class CptTypedFunc :
   friend class CptFactory;
 
 protected:
-  
+
   /// @brief コンストラクタ
   CptTypedFunc(const FileRegion& file_region,
 	       const char* name,
@@ -1071,11 +1037,9 @@ protected:
 	       bool sign,
 	       tVpiVarType dat_type,
 	       PtIOHeadArray iohead_array,
-	       PtDeclHeadArray paramhead_array,
-	       PtDeclHeadArray lparamhead_array,
 	       PtDeclHeadArray declhead_array,
 	       PtStmt* stmt);
-  
+
   /// @brief デストラクタ
   virtual
   ~CptTypedFunc();

@@ -271,8 +271,6 @@ PtDumper::put(const PtModule* m)
   }
 
   put_decls(m->iohead_array(),
-	    m->paramhead_array(),
-	    m->localparamhead_array(),
 	    m->declhead_array());
   PtItemArray item_array = m->item_array();
   for (ymuint i = 0; i < item_array.size(); ++ i) {
@@ -500,8 +498,6 @@ PtDumper::put(const char* label,
     }
     put("mName", item->name());
     put_decls(item->iohead_array(),
-	      item->paramhead_array(),
-	      item->localparamhead_array(),
 	      item->declhead_array());
     put("mBody", item->body());
     break;
@@ -977,21 +973,11 @@ PtDumper::put_parent_file(const FileLoc& file_loc)
 /// @brief 宣言を出力する．
 void
 PtDumper::put_decls(PtIOHeadArray iohead_array,
-		    PtDeclHeadArray paramhead_array,
-		    PtDeclHeadArray lparamhead_array,
 		    PtDeclHeadArray declhead_array)
 {
   for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io = iohead_array[i];
     put("mIODecl", io);
-  }
-  for (ymuint i = 0; i < paramhead_array.size(); ++ i) {
-    const PtDeclHead* decl = paramhead_array[i];
-    put("mParamDecl", decl);
-  }
-  for (ymuint i = 0; i < lparamhead_array.size(); ++ i) {
-    const PtDeclHead* decl = lparamhead_array[i];
-    put("mLocalParamDecl", decl);
   }
   for (ymuint i = 0; i < declhead_array.size(); ++ i) {
     const PtDeclHead* decl = declhead_array[i];

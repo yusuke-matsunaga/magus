@@ -42,8 +42,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param paramport_array パラメータポート宣言のリスト
 // @param port_array ポートのリスト
 // @param iohead_array IO宣言のリスト
-// @param paramhead_array parameter 宣言のリスト
-// @param localparamhead_array local_param 宣言のリスト
 // @param declhead_array 宣言のリスト
 // @param item_array 要素のリスト
 SptModule::SptModule(const FileRegion& file_region,
@@ -66,8 +64,6 @@ SptModule::SptModule(const FileRegion& file_region,
 		     PtDeclHeadArray paramport_array,
 		     PtiPortArray port_array,
 		     PtIOHeadArray iohead_array,
-		     PtDeclHeadArray paramdecl_array,
-		     PtDeclHeadArray localparamdecl_array,
 		     PtDeclHeadArray decl_array,
 		     PtItemArray item_array) :
   mFileRegion(file_region),
@@ -79,8 +75,6 @@ SptModule::SptModule(const FileRegion& file_region,
   mParamPortArray(paramport_array),
   mPortArray(port_array),
   mIOHeadArray(iohead_array),
-  mParamHeadArray(paramdecl_array),
-  mLocalparamHeadArray(localparamdecl_array),
   mDeclHeadArray(decl_array),
   mItemArray(item_array)
 {
@@ -168,20 +162,6 @@ ymuint
 SptModule::iodecl_num() const
 {
   return mIODeclNum;
-}
-
-// @brief parameter 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptModule::paramhead_array() const
-{
-  return mParamHeadArray;
-}
-
-// @brief localparam 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptModule::localparamhead_array() const
-{
-  return mLocalparamHeadArray;
 }
 
 // @brief 宣言ヘッダ配列の取得
@@ -557,8 +537,6 @@ SptPortRef::right_range() const
 // @param[in] parampoar_array パラメータポートのリスト
 // @param[in] port_array ポートのリスト
 // @param[in] iohead_array 入出力のリスト
-// @param[in] paramhead_array parameter のリスト
-// @param[in] localparamhead_array localparam のリスト
 // @param[in] declhead_array 宣言のリスト
 // @param[in] item_array 要素のリスト
 // @return 生成されたモジュール
@@ -584,8 +562,6 @@ SptFactory::new_Module(const FileRegion& file_region,
 		       PtDeclHeadArray paramport_array,
 		       PtiPortArray port_array,
 		       PtIOHeadArray iohead_array,
-		       PtDeclHeadArray paramhead_array,
-		       PtDeclHeadArray localparamhead_array,
 		       PtDeclHeadArray declhead_array,
 		       PtItemArray item_array)
 {
@@ -601,8 +577,6 @@ SptFactory::new_Module(const FileRegion& file_region,
 					paramport_array,
 					port_array,
 					iohead_array,
-					paramhead_array,
-					localparamhead_array,
 					declhead_array,
 					item_array);
   return module;

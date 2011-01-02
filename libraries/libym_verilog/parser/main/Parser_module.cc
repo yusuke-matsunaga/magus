@@ -42,16 +42,11 @@ Parser::init_module()
   mParamPortHeadList.clear();
 
   mCurIOHeadList = &mModuleIOHeadList;
-  mCurParamHeadList = &mModuleParamHeadList;
-  mCurLparamHeadList = &mModuleLparamHeadList;
   mCurDeclHeadList = &mModuleDeclHeadList;
   mCurItemList = &mModuleItemList;
 
   mCurIOHeadList->clear();
   mIOItemList.clear();
-
-  mCurParamHeadList->clear();
-  mCurLparamHeadList->clear();
 
   mCurDeclHeadList->clear();
   mDeclItemList.clear();
@@ -82,8 +77,6 @@ Parser::new_Module1995(const FileRegion& file_region,
   PtiPortArray port_array = get_port_array();
   PtDeclHeadArray paramport_array = get_paramport_array();
   PtIOHeadArray iohead_array = get_module_io_array();
-  PtDeclHeadArray paramhead_array = get_module_param_array();
-  PtDeclHeadArray localparamhead_array = get_module_localparam_array();
   PtDeclHeadArray declhead_array = get_module_decl_array();
   PtItemArray item_array = get_module_item_array();
 
@@ -215,8 +208,6 @@ Parser::new_Module1995(const FileRegion& file_region,
 					 paramport_array,
 					 port_array,
 					 iohead_array,
-					 paramhead_array,
-					 localparamhead_array,
 					 declhead_array,
 					 item_array);
   mPtMgr.reg_module(module);
@@ -232,8 +223,6 @@ Parser::new_Module2001(const FileRegion& file_region,
 {
   PtDeclHeadArray paramport_array = get_paramport_array();
   PtIOHeadArray iohead_array = get_module_io_array();
-  PtDeclHeadArray paramhead_array = get_module_param_array();
-  PtDeclHeadArray localparamhead_array = get_module_localparam_array();
   PtDeclHeadArray declhead_array = get_module_decl_array();
   PtItemArray item_array = get_module_item_array();
 
@@ -273,8 +262,6 @@ Parser::new_Module2001(const FileRegion& file_region,
 					 paramport_array,
 					 port_array,
 					 iohead_array,
-					 paramhead_array,
-					 localparamhead_array,
 					 declhead_array,
 					 item_array);
   mPtMgr.reg_module(module);
@@ -303,22 +290,6 @@ PtDeclHeadArray
 Parser::get_paramport_array()
 {
   return mParamPortHeadList.to_array(mAlloc);
-}
-
-// @brief module 用の parameter リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_module_param_array()
-{
-  return mModuleParamHeadList.to_array(mAlloc);
-}
-
-// @brief module 用の localparam リストを配列に変換する．
-inline
-PtDeclHeadArray
-Parser::get_module_localparam_array()
-{
-  return mModuleLparamHeadList.to_array(mAlloc);
 }
 
 // @brief module 用の宣言リストを配列に変換する．

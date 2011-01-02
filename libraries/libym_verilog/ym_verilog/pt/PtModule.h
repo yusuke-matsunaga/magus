@@ -152,16 +152,6 @@ public:
   ymuint
   iodecl_num() const = 0;
 
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const = 0;
-
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const = 0;
-
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray

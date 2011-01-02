@@ -106,12 +106,9 @@ ModuleGen::phase1_module_item(ElbModule* module,
   // パラメータポートを実体化する．
   PtDeclHeadArray paramport_array = pt_module->paramport_array();
   bool has_paramportdecl = (paramport_array.size() > 0);
-  if ( !has_paramportdecl ) {
-    // もともと外部にパラメータポートリストが無い場合には
-    // 内部の parameter 宣言がパラメータポートリストとなる．
-    paramport_array = pt_module->paramhead_array();
+  if ( has_paramportdecl ) {
+    phase1_decl(module, paramport_array, false);
   }
-  instantiate_param(module, paramport_array, false);
 
   // パラメータの割り当てを作る．
   if ( param_con ) {
@@ -184,21 +181,8 @@ ModuleGen::phase1_module_item(ElbModule* module,
     }
   }
 
-  // 内側の parameter 宣言の実体化
-  // 外側にパラメータポート宣言リストを持っていた場合には
-  // 内側の parameter 宣言が localparam に格下げされる．
-  if ( has_paramportdecl ) {
-    instantiate_param(module, pt_module->paramhead_array(), true);
-  }
-  else {
-    // パラメータポート宣言リストがない場合には上ですでに実体化している．
-  }
-
-  // localparam を実体化する．
-  instantiate_param(module, pt_module->localparamhead_array(), true);
-
-  // genvar を実体化する．
-  instantiate_genvar(module, pt_module->declhead_array());
+  // parameter と genvar を実体化する．
+  phase1_decl(module, pt_module->declhead_array(), has_paramportdecl);
 
   // それ以外の要素を実体化する．
   phase1_item(module, pt_module->item_array());
