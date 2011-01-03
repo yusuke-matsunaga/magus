@@ -13,14 +13,6 @@
 
 #include "Parser.h"
 
-//#include "PtiFactory.h"
-//#include "PuHierName.h"
-//#include "Lex.h"
-//#include "PtMgr.h"
-
-//#include "ym_verilog/pt/PtItem.h"
-//#include "ym_verilog/pt/PtStmt.h"
-
 
 BEGIN_NAMESPACE_YM_VERILOG
 
