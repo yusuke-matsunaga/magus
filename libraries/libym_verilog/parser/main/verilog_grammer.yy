@@ -3786,7 +3786,10 @@ generate_item
 {
   yyerrok;
 }
-| module_or_generate_item
+| ai_list module_or_generate_item
+{
+  parser.add_item($2, $1);
+}
 ;
 
 gen_if
