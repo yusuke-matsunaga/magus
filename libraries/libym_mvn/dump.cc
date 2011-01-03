@@ -63,8 +63,8 @@ dump_node(ostream& s,
   case MvNode::kInput:      s << "Input"; break;
   case MvNode::kInout:      s << "Inout"; break;
   case MvNode::kOutput:     s << "Output"; break;
-  case MvNode::kDff1:       s << "DFF1"; break;
-  case MvNode::kDff2:       s << "DFF2"; break;
+  case MvNode::kDff:        s << "DFF"; break;
+  case MvNode::kLatch:      s << "Latch"; break;
   case MvNode::kThrough:    s << "Through"; break;
   case MvNode::kNot:        s << "Not"; break;
   case MvNode::kAnd:        s << "And"; break;

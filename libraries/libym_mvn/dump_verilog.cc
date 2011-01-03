@@ -83,7 +83,7 @@ dump_node(ostream& s,
     }
     break;
 
-  case MvNode::kDff1:
+  case MvNode::kDff:
     { // ピン位置と属性は決め打ち
       const MvInputPin* ipin0 = node->input(0);
       const MvInputPin* ipin1 = node->input(1);
@@ -115,7 +115,7 @@ dump_node(ostream& s,
     }
     break;
 
-  case MvNode::kDff2:
+  case MvNode::kLatch:
     { // ピン位置と属性は決め打ち
       const MvInputPin* ipin0 = node->input(0);
       const MvInputPin* ipin1 = node->input(1);
@@ -600,7 +600,7 @@ dump_module(ostream& s,
     MvNode* node = *p;
     assert_cond( node->output_num() == 1, __FILE__, __LINE__);
     ymuint bw = node->output(0)->bit_width();
-    if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
+    if ( node->type() == MvNode::kDff || node->type() == MvNode::kLatch ) {
       assert_cond( bw == 1, __FILE__, __LINE__);
       s << "  reg  " << node_name(node) << ";" << endl;
     }

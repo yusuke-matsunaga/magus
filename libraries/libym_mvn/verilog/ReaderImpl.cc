@@ -693,69 +693,6 @@ void
 ReaderImpl::gen_moduleinst(const VlModule* vl_module,
 			   MvModule* parent_module)
 {
-  hash_map<string, FFInfo>::const_iterator p
-    = mFFInfoDict.find(vl_module->def_name());
-  if ( p != mFFInfoDict.end() ) {
-    // 特例．FFセルに置き換える．
-    const FFInfo& ff_info = p->second;
-    MvNode* node = mMvMgr->new_dff1(parent_module, 1);
-    ymuint np = vl_module->port_num();
-    for (ymuint i = 0; i < np; ++ i) {
-      const VlPort* vl_port = vl_module->port(i);
-      string port_name = vl_port->name();
-      const VlExpr* expr = vl_port->high_conn();
-      if ( port_name == ff_info.mDataPinName ) {
-	MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
-	mMvMgr->connect(node1, 0, node, 0);
-      }
-      else if ( port_name == ff_info.mClockPinName ) {
-	MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
-	mMvMgr->connect(node1, 0, node, 1);
-      }
-      else if ( port_name == ff_info.mResetPinName ) {
-	if ( expr != NULL ) {
-	  MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
-	  mMvMgr->connect(node1, 0, node, 2);
-	}
-      }
-      else if ( port_name == ff_info.mSetPinName ) {
-	if ( expr != NULL ) {
-	  MvNode* node1 = gen_expr(parent_module, expr, mGlobalEnv);
-	  mMvMgr->connect(node1, 0, node, 3);
-	}
-      }
-      else if ( port_name == ff_info.mQPinName ) {
-	if ( expr != NULL ) {
-	  MvNode* dst_node = gen_primary(expr, mGlobalEnv);
-	  connect_lhs(dst_node, expr, node);
-	}
-      }
-      else if ( port_name == ff_info.mQnPinName ) {
-	if ( expr != NULL ) {
-	  MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(node, 0, node1, 0);
-	  MvNode* dst_node = gen_primary(expr, mGlobalEnv);
-	  connect_lhs(dst_node, expr, node1);
-	}
-      }
-      else {
-	ostringstream buf;
-	buf << port_name
-	    << " : No such pin in "
-	    << vl_module->def_name()
-	    << ".";
-	mMsgMgr.put_msg(__FILE__, __LINE__,
-			vl_port->file_region(),
-			kMsgError,
-			"MVNXXX",
-			buf.str());
-      }
-    }
-    return;
-  }
-
-  // 通常の処理
-
   // 宣言要素を生成する．
   bool stat = gen_decl(parent_module, vl_module);
   if ( !stat ) {

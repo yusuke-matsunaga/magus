@@ -21,7 +21,9 @@ BEGIN_NAMESPACE_YM_MVN
 class MvDff :
   public MvNode
 {
-protected:
+  friend class MvMgr;
+
+private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
   //////////////////////////////////////////////////////////////////////
@@ -29,23 +31,14 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] bit_width ビット幅
+  /// @param[in] np 非同期セット入力ピン数
   MvDff(MvModule* module,
-	ymuint bit_width);
+	ymuint bit_width,
+	ymuint np);
 
   /// @brief デストラクタ
   ~MvDff();
 
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class MvDff1 MvDff.h "MvDff.h"
-/// @brief 非同期セット / リセットタイプの D-FF を表すクラス
-//////////////////////////////////////////////////////////////////////
-class MvDff1 :
-  public MvDff
-{
-  friend class MvMgr;
 
 public:
 
@@ -53,6 +46,18 @@ public:
   virtual
   tType
   type() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class MvLatch MvDff.h "MvDff.h"
+/// @brief ラッチを表すクラス
+//////////////////////////////////////////////////////////////////////
+class MvLatch :
+  public MvNode
+{
+  friend class MvMgr;
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -62,23 +67,11 @@ private:
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] bit_width ビット幅
-  MvDff1(MvModule* module,
-	 ymuint bit_width);
+  MvLatch(MvModule* module,
+	  ymuint bit_width);
 
   /// @brief デストラクタ
-  ~MvDff1();
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class MvDff2 MvDff.h "MvDff.h"
-/// @brief 同期セット / リセットタイプの D-FF を表すクラス
-//////////////////////////////////////////////////////////////////////
-class MvDff2 :
-  public MvDff
-{
-  friend class MvMgr;
+  ~MvLatch();
 
 public:
 
@@ -86,20 +79,6 @@ public:
   virtual
   tType
   type() const;
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // コンストラクタ / デストラクタ
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  /// @param[in] module 親のモジュール
-  /// @param[in] bit_width ビット幅
-  MvDff2(MvModule* module,
-	 ymuint bit_width);
-
-  /// @brief デストラクタ
-  ~MvDff2();
 
 };
 

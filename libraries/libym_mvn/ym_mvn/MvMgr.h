@@ -192,13 +192,14 @@ public:
 
   /// @brief 非同期セット/リセットタイプの FF ノードを生成する．
   MvNode*
-  new_dff1(MvModule* module,
-	   ymuint bit_width = 1);
+  new_dff(MvModule* module,
+	  ymuint np,
+	  ymuint bit_width = 1);
 
-  /// @brief 同期セット/リセットタイプの FF ノードを生成する．
+  /// @brief ラッチノードを生成する．
   MvNode*
-  new_dff2(MvModule* module,
-	   ymuint bit_width = 1);
+  new_latch(MvModule* module,
+	    ymuint bit_width = 1);
 
   /// @brief through ノードを生成する．
   /// @param[in] module ノードが属するモジュール

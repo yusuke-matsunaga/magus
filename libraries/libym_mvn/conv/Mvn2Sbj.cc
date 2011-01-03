@@ -57,8 +57,8 @@ enqueue(const MvNode* node0,
        p != folist.end(); ++ p) {
     const MvInputPin* dst_pin = *p;
     const MvNode* node = dst_pin->node();
-    if ( node->type() == MvNode::kDff1 ||
-	 node->type() == MvNode::kDff2 ||
+    if ( node->type() == MvNode::kDff ||
+	 node->type() == MvNode::kLatch ||
 	 node->type() == MvNode::kConst ||
 	 node->type() == MvNode::kOutput ) {
       continue;
@@ -191,7 +191,7 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
   for (list<MvNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const MvNode* node = *p;
-    if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
+    if ( node->type() == MvNode::kDff ) {
       // DFF
       ymuint bw = node->output(0)->bit_width();
       for (ymuint j = 0; j < bw; ++ j) {
@@ -200,6 +200,9 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
       }
       mark[node->id()] = true;
       enqueue(node, queue, mark);
+    }
+    else if ( node->type() == MvNode::kLatch ) {
+      // LATCH
     }
     else if ( node->type() == MvNode::kConst ) {
       // 定数
@@ -255,7 +258,7 @@ Mvn2Sbj::operator()(const MvMgr& mvmgr,
   for (ymuint i = 0; i < nmax; ++ i) {
     const MvNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
-    if ( node->type() == MvNode::kDff1 || node->type() == MvNode::kDff2 ) {
+    if ( node->type() == MvNode::kDff ) {
       const MvInputPin* ipin = node->input(0);
       const MvOutputPin* opin = ipin->src_pin();
       assert_cond( opin != NULL, __FILE__, __LINE__);
