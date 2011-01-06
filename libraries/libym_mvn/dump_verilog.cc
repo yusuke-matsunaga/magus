@@ -85,9 +85,9 @@ dump_node(ostream& s,
 
   case MvNode::kDff:
     { // ピン位置と属性は決め打ち
+      ymuint ni = node->input_num();
       const MvInputPin* ipin0 = node->input(0);
       const MvInputPin* ipin1 = node->input(1);
-      const MvInputPin* ipin2 = node->input(2);
       const MvOutputPin* src_pin0 = ipin0->src_pin();
       assert_cond( src_pin0 != NULL, __FILE__, __LINE__);
       const MvNode* src_node0 = src_pin0->node();
@@ -96,17 +96,25 @@ dump_node(ostream& s,
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  always @ ( posedge " << node_name(src_node1);
-      const MvOutputPin* src_pin2 = ipin2->src_pin();
-      const MvNode* src_node2 = NULL;
-      if ( src_pin2 ) {
-	src_node2 = src_pin2->node();
-	s << " or posedge " << node_name(src_node2);
+      for (ymuint i = 2; i < ni; ++ i) {
+	const MvInputPin* ipin2 = node->input(i);
+	const MvOutputPin* src_pin2 = ipin2->src_pin();
+	const MvNode* src_node2 = src_pin2->node();
+	const char* polstr = node->control_pol(i - 2) ? "posedge" : "negedge";
+	s << " or " << polstr << " " << node_name(src_node2);
       }
       s << " )" << endl;
-      if ( src_pin2 ) {
-	s << "    if ( " << node_name(src_node2) << " )" << endl
-	  << "      " << node_name(node) << " <= 0;" << endl
-	  << "    else" << endl
+      const char* elif = "if";
+      for (ymuint i = 2; i < ni; ++ i) {
+	const MvInputPin* ipin2 = node->input(i);
+	const MvOutputPin* src_pin2 = ipin2->src_pin();
+	const MvNode* src_node2 = src_pin2->node();
+	s << "    " << elif << " ( " << node_name(src_node2) << " )" << endl
+	  << "      " << node_name(node) << " <= ";
+	elif = "else if";
+      }
+      if ( ni > 2 ) {
+	s << "    else" << endl
 	  << "  ";
       }
       s << "    " << node_name(node) << " <= "
@@ -119,7 +127,6 @@ dump_node(ostream& s,
     { // ピン位置と属性は決め打ち
       const MvInputPin* ipin0 = node->input(0);
       const MvInputPin* ipin1 = node->input(1);
-      const MvInputPin* ipin2 = node->input(2);
       const MvOutputPin* src_pin0 = ipin0->src_pin();
       assert_cond( src_pin0 != NULL, __FILE__, __LINE__);
       const MvNode* src_node0 = src_pin0->node();
@@ -127,17 +134,9 @@ dump_node(ostream& s,
       assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
       const MvNode* src_node1 = src_pin1->node();
 
-      s << "  always @ ( posedge " << node_name(src_node1) << " )" << endl;
-      const MvOutputPin* src_pin2 = ipin2->src_pin();
-      const MvNode* src_node2 = NULL;
-      if ( src_pin2 ) {
-	src_node2 = src_pin2->node();
-	s << "    if ( " << node_name(src_node2) << " )" << endl
-	  << "      " << node_name(node) << " <= 0;" << endl
-	  << "    else" << endl
-	  << "  ";
-      }
-      s << "    " << node_name(node) << " <= "
+      s << "  always @ ( * )" << endl
+	<< "    if ( " << node_name(src_node1) << " )" << endl
+	<< "      " << node_name(node) << " <= "
 	<< node_name(src_node0) << ";" << endl
 	<< endl;
     }

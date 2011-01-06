@@ -64,27 +64,4 @@ MvVerilogReader::add_msg_handler(MsgHandler* msg_handler)
   mImpl->add_msg_handler(msg_handler);
 }
 
-// @brief フリップフロップのセル名，ピン名を設定する．
-// @param[in] cell_name セル名
-// @param[in] data_pin_name データ入力ピン名
-// @param[in] clock_pin_name クロック入力ピン名
-// @param[in] q_pin_name ノーマル出力ピン名
-// @param[in] qn_pin_name 反転出力ピン名
-// @param[in] set_pin_name セットピン名
-// @param[in] reset_pin_name リセットピン名
-// @note 存在しない場合には空文字列を渡す．
-void
-MvVerilogReader::set_ffname(const string& cell_name,
-			    const string& data_pin_name,
-			    const string& clock_pin_name,
-			    const string& q_pin_name,
-			    const string& qn_pin_name,
-			    const string& set_pin_name,
-			    const string& reset_pin_name)
-{
-  mImpl->set_ffname(cell_name, data_pin_name, clock_pin_name,
-		    q_pin_name, qn_pin_name,
-		    set_pin_name, reset_pin_name);
-}
-
 END_NAMESPACE_YM_MVN

@@ -190,13 +190,20 @@ public:
   void
   sweep();
 
-  /// @brief 非同期セット/リセットタイプの FF ノードを生成する．
+  /// @brief フリップフロップノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] np 非同期セットの制御信号数
+  /// @param[in] control_array 非同期セットの極性と値を入れた配列
+  /// @param[in] bit_width ビット幅
   MvNode*
   new_dff(MvModule* module,
 	  ymuint np,
+	  const vector<ymuint32>& control_array,
 	  ymuint bit_width = 1);
 
   /// @brief ラッチノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   MvNode*
   new_latch(MvModule* module,
 	    ymuint bit_width = 1);

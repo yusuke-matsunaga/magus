@@ -43,14 +43,6 @@ MvnReadVerilog::cmd_proc(TclObjVector& objv)
   mh->delete_mask(kMsgDebug);
   reader.add_msg_handler(mh);
 
-  reader.set_ffname("KTECH_DFF", // セル名
-		    "D",         // データ入力
-		    "CK",        // クロック
-		    "Q",         // ノーマル出力
-		    "QN",        // 反転出力
-		    "",          // セット
-		    "");         // リセット
-
   // Verilog ファイルの読み込み
   for (ymuint i = 1; i < objv.size(); ++ i) {
     TclObj obj = objv[i];
