@@ -142,6 +142,21 @@ private:
 	   const VlStmt* stmt,
 	   Env& env);
 
+  /// @brief always latch のチェック
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] src_node ソースノード
+  /// @param[in] dst_node 代入先のノード
+  /// @param[out] cond latch の場合の条件ノード
+  /// @retval 0 組み合わせ回路
+  /// @retval 1 ラッチ
+  /// @retval 2 条件なしのループあり(エラー)
+  /// @retval 3 条件中に dst_node が含まれる
+  ymuint
+  loop_check(MvModule* parent_module,
+	     MvNode* src_node,
+	     MvNode* dst_node,
+	     MvNode*& cond);
+
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] prim プリミティブ

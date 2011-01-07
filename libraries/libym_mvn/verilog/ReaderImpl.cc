@@ -787,8 +787,29 @@ ReaderImpl::gen_process(MvModule* parent_module,
   for (ymuint i = 0; i < n; ++ i) {
     MvNode* node0 = mGlobalEnv.get_from_id(i);
     MvNode* node1 = top_env.get_from_id(i);
-    if ( node0 != node1 ) {
+    if ( node0 == node1 ) {
+      continue;
+    }
+    MvNode* cond = NULL;
+    switch ( loop_check(parent_module, node1, node0, cond) ) {
+    case 0: // 依存関係なし
       mMvMgr->connect(node1, 0, node0, 0);
+      break;
+
+    case 1: // 条件付きの依存関係あり
+      assert_cond( cond != ULL, __FILE__, __LINE__);
+      {
+	ymuint bw = node0->output_pin(0)->bit_width();
+	MvNode* latch = mMvMgr->new_latch(parent_module, bw);
+	mMvMgr->connect(node1, 0, latch, 0);
+	mMvMgr->connect(cond, 0, latch, 1);
+	mMvMgr->connect(latch, 0, node0, 0);
+      }
+      break;
+
+    case 2: // 常に依存
+      cerr << "combinational loop found" << endl;
+      return false;
     }
   }
 
@@ -954,6 +975,129 @@ ReaderImpl::gen_stmt(MvModule* module,
     return false;
   }
   return true;
+}
+
+// @brief always latch のチェック
+// @param[in] parent_module 親のモジュール
+// @param[in] src_node ソースノード
+// @param[in] dst_node 代入先のノード
+// @param[out] cond latch の場合の条件ノード
+// @retval 0 組み合わせ回路
+// @retval 1 ラッチ
+// @retval 2 条件なしのループあり(エラー)
+// @retval 3 条件中に dst_node が含まれる
+ymuint
+ReaderImpl::loop_check(MvModule* parent_module,
+		       MvNode* src_node,
+		       MvNode* dst_node,
+		       MvNode*& cond)
+{
+  if ( src_node == dst_node ) {
+    return 2;
+  }
+  if ( src_node->type() == MvNode::kIte ) {
+    MvNode* cond_node = src_node->input_pin(0)->src_pin()->node();
+    if ( containment_check(cond_node, dst_node) ) {
+      // 条件式中に dst_node が含まれていたらエラー
+      return 3;
+    }
+    MvNode* node1 = src_node->input_pin(1)->src_pin()->node();
+    MvNode* cond1 = NULL;
+    ymuint stat1 = loop_check(parent_module, node1, dst_node, cond1);
+    MvNode* node2 = src_node->input_pin(2)->src_pin()->node();
+    MvNode* cond2 = NULL;
+    ymuint stat2 = loop_check(parent_module, node2, dst_node, cond2);
+    if ( stat1 == 3 || stat2 == 3 ) {
+      return 3;
+    }
+
+    // case はブロックでないので途中で定義できない
+    MvNode* cond_node_bar = NULL;
+    switch ( stat1 ) {
+    case 0:
+      switch ( stat2 ) {
+      case 0:
+	return 0;
+
+      case 1:
+	// ラッチの書き込み条件は cond_node | cond2
+	cond = mMvMgr->new_or(parent_module, 2, 1);
+	mMvMgr->connect(cond_node, 0, cond, 0);
+	mMvMgr->connect(cond2, 0, cond, 1);
+	return 1;
+
+      case 2:
+	// ラッチの書き込み条件は cond_node
+	cond = cond_node;
+	return 1;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+
+    case 1:
+      switch ( stat2 ) {
+      case 0:
+	// ラッチの書き込み条件は !cond_node | cond1
+	cond_node_bar = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(cond_node, 0, cond_node_bar, 0);
+	cond = mMvMgr->new_or(parent_module, 2, 1);
+	mMvMgr->connect(cond_node_bar, 0, cond, 0);
+	mMvMgr->connect(cond1, 0, cond, 1);
+	return 1;
+
+       case 1:
+	// ラッチの書き込み条件は cond_node & cond1 | !cond_node & cond2
+	// つまり，ITE(cond_node, cond1, cond2)
+	cond = mMvMgr->new_ite(parent_module, 1);
+	mMvMgr->connect(cond_node, 0, cond, 0);
+	mMvMgr->connect(cond1, 0, cond, 1);
+	mMvMgr->connect(cond2, 0, cond, 2);
+	return 1;
+
+      case 2:
+	// ラッチの書き込み条件は cond_node & cond1
+	cond = mMvMgr->new_and(parent_module, 2, 1);
+	mMvMgr->connect(cond_node, 0, cond, 0);
+	mMvMgr->connect(cond1, 0, cond, 1);
+	return 1;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+
+    case 2:
+      switch ( stat2 ) {
+      case 0:
+	// ラッチの書き込み条件は !cond_node
+	cond = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(cond_node, 0, cond, 0);
+	return 1;
+
+      case 1:
+	// ラッチの書き込み条件は !cond_node & cond2
+	cond_node_bar = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(cond_node, 0, cond_node_bar, 0);
+	cond = mMvMgr->new_and(parent_module, 2, 1);
+	mMvMgr->connect(cond_node_bar, 0, cond, 0);
+	mMvMgr->connect(cond2, 0, cond, 1);
+	return 1;
+
+      case 2:
+	return 2;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
+
 }
 
 // @brief プリミティブインスタンスの生成を行う．
