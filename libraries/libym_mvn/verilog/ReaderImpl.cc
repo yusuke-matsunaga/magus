@@ -999,14 +999,20 @@ ReaderImpl::gen_priminst(MvModule* parent_module,
 
   case kVpiAndPrim:
     {
-      MvNode* node = gen_andtree(parent_module, ni, inputs, 0);
+      MvNode* node = mMvMgr->new_and(parent_module, ni, 1);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
       outputs[0] = node;
     }
     break;
 
   case kVpiNandPrim:
     {
-      MvNode* node = gen_andtree(parent_module, ni, inputs, 0);
+      MvNode* node = mMvMgr->new_and(parent_module, ni, 1);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
       MvNode* node1 = mMvMgr->new_not(parent_module, 1);
       mMvMgr->connect(node, 0, node1, 0);
       outputs[0] = node1;
@@ -1015,14 +1021,20 @@ ReaderImpl::gen_priminst(MvModule* parent_module,
 
   case kVpiOrPrim:
     {
-      MvNode* node = gen_ortree(parent_module, ni, inputs, 0);
+      MvNode* node = mMvMgr->new_or(parent_module, ni, 1);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
       outputs[0] = node;
     }
     break;
 
   case kVpiNorPrim:
     {
-      MvNode* node = gen_ortree(parent_module, ni, inputs, 0);
+      MvNode* node = mMvMgr->new_or(parent_module, ni, 1);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
       MvNode* node1 = mMvMgr->new_not(parent_module, 1);
       mMvMgr->connect(node, 0, node1, 0);
       outputs[0] = node1;
@@ -1031,14 +1043,20 @@ ReaderImpl::gen_priminst(MvModule* parent_module,
 
   case kVpiXorPrim:
     {
-      MvNode* node = gen_xortree(parent_module, ni, inputs, 0);
+      MvNode* node = mMvMgr->new_xor(parent_module, ni, 1);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
       outputs[0] = node;
     }
     break;
 
   case kVpiXnorPrim:
     {
-      MvNode* node = gen_xortree(parent_module, ni, inputs, 0);
+      MvNode* node = mMvMgr->new_xor(parent_module, ni, 1);
+      for (ymuint i = 0; i < ni; ++ i) {
+	inputs[i] = make_pair(node, i);
+      }
       MvNode* node1 = mMvMgr->new_not(parent_module, 1);
       mMvMgr->connect(node, 0, node1, 0);
       outputs[0] = node1;
@@ -1212,129 +1230,6 @@ ReaderImpl::gen_rhs(MvModule* parent_module,
     mMvMgr->connect(node, 0, src_node, 0);
   }
   return src_node;
-}
-
-// @brief AND のバランス木を作る．
-// @param[in] parent_module 親のモジュール
-// @param[in] ni 入力数
-// @param[in] inputs 入力ピンを格納する配列
-// @param[in] offset inputs のオフセット
-MvNode*
-ReaderImpl::gen_andtree(MvModule* parent_module,
-			ymuint ni,
-			vector<pair<MvNode*, ymuint> >& inputs,
-			ymuint offset)
-{
-  assert_cond( ni > 1, __FILE__, __LINE__);
-
-  if ( ni == 2 ) {
-    MvNode* node = mMvMgr->new_and(parent_module, 1);
-    inputs[offset + 0] = make_pair(node, 0);
-    inputs[offset + 1] = make_pair(node, 1);
-    return node;
-  }
-
-  if ( ni == 3 ) {
-    MvNode* node0 = gen_andtree(parent_module, 2, inputs, offset);
-    MvNode* node = mMvMgr->new_and(parent_module, 1);
-    mMvMgr->connect(node0, 0, node, 0);
-    inputs[offset + 2] = make_pair(node, 1);
-    return node;
-  }
-
-  ymuint nr = ni / 2;
-  ymuint nl = ni - nr;
-
-  MvNode* node0 = gen_andtree(parent_module, nl, inputs, offset);
-  MvNode* node1 = gen_andtree(parent_module, nr, inputs, offset + nl);
-
-  MvNode* node = mMvMgr->new_and(parent_module, 1);
-  mMvMgr->connect(node0, 0, node, 0);
-  mMvMgr->connect(node1, 0, node, 1);
-
-  return node;
-}
-
-// @brief OR のバランス木を作る．
-// @param[in] parent_module 親のモジュール
-// @param[in] ni 入力数
-// @param[in] inputs 入力ピンを格納する配列
-// @param[in] offset inputs のオフセット
-MvNode*
-ReaderImpl::gen_ortree(MvModule* parent_module,
-		       ymuint ni,
-		       vector<pair<MvNode*, ymuint> >& inputs,
-		       ymuint offset)
-{
-  assert_cond( ni > 1, __FILE__, __LINE__);
-
-  if ( ni == 2 ) {
-    MvNode* node = mMvMgr->new_or(parent_module, 1);
-    inputs[offset + 0] = make_pair(node, 0);
-    inputs[offset + 1] = make_pair(node, 1);
-    return node;
-  }
-
-  if ( ni == 3 ) {
-    MvNode* node0 = gen_ortree(parent_module, 2, inputs, offset);
-    MvNode* node = mMvMgr->new_or(parent_module, 1);
-    mMvMgr->connect(node0, 0, node, 0);
-    inputs[offset + 2] = make_pair(node, 1);
-    return node;
-  }
-
-  ymuint nr = ni / 2;
-  ymuint nl = ni - nr;
-
-  MvNode* node0 = gen_ortree(parent_module, nl, inputs, offset);
-  MvNode* node1 = gen_ortree(parent_module, nr, inputs, offset + nl);
-
-  MvNode* node = mMvMgr->new_or(parent_module, 1);
-  mMvMgr->connect(node0, 0, node, 0);
-  mMvMgr->connect(node1, 0, node, 1);
-
-  return node;
-}
-
-// @brief XOR のバランス木を作る．
-// @param[in] parent_module 親のモジュール
-// @param[in] ni 入力数
-// @param[in] inputs 入力ピンを格納する配列
-// @param[in] offset inputs のオフセット
-MvNode*
-ReaderImpl::gen_xortree(MvModule* parent_module,
-			ymuint ni,
-			vector<pair<MvNode*, ymuint> >& inputs,
-			ymuint offset)
-{
-  assert_cond( ni > 1, __FILE__, __LINE__);
-
-  if ( ni == 2 ) {
-    MvNode* node = mMvMgr->new_xor(parent_module, 1);
-    inputs[offset + 0] = make_pair(node, 0);
-    inputs[offset + 1] = make_pair(node, 1);
-    return node;
-  }
-
-  if ( ni == 3 ) {
-    MvNode* node0 = gen_xortree(parent_module, 2, inputs, offset);
-    MvNode* node = mMvMgr->new_xor(parent_module, 1);
-    mMvMgr->connect(node0, 0, node, 0);
-    inputs[offset + 2] = make_pair(node, 1);
-    return node;
-  }
-
-  ymuint nr = ni / 2;
-  ymuint nl = ni - nr;
-
-  MvNode* node0 = gen_xortree(parent_module, nl, inputs, offset);
-  MvNode* node1 = gen_xortree(parent_module, nr, inputs, offset + nl);
-
-  MvNode* node = mMvMgr->new_xor(parent_module, 1);
-  mMvMgr->connect(node0, 0, node, 0);
-  mMvMgr->connect(node1, 0, node, 1);
-
-  return node;
 }
 
 // @brief 式に対応したノードの木を作る．
@@ -1578,7 +1473,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
     case kVpiBitAndOp:
       {
 	ymuint bw = expr->bit_size();
-	MvNode* node = mMvMgr->new_and(parent_module, bw);
+	MvNode* node = mMvMgr->new_and(parent_module, 2, bw);
 	mMvMgr->connect(inputs[0], 0, node, 0);
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
@@ -1587,7 +1482,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
     case kVpiBitOrOp:
       {
 	ymuint bw = expr->bit_size();
-	MvNode* node = mMvMgr->new_or(parent_module, bw);
+	MvNode* node = mMvMgr->new_or(parent_module, 2, bw);
 	mMvMgr->connect(inputs[0], 0, node, 0);
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
@@ -1596,7 +1491,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
     case kVpiBitXNorOp:
       {
 	ymuint bw = expr->bit_size();
-	MvNode* node = mMvMgr->new_xor(parent_module, bw);
+	MvNode* node = mMvMgr->new_xor(parent_module, 2, bw);
 	mMvMgr->connect(inputs[0], 0, node, 0);
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	MvNode* node1 = mMvMgr->new_not(parent_module, bw);
@@ -1607,7 +1502,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
     case kVpiBitXorOp:
       {
 	ymuint bw = expr->bit_size();
-	MvNode* node = mMvMgr->new_xor(parent_module, bw);
+	MvNode* node = mMvMgr->new_xor(parent_module, 2, bw);
 	mMvMgr->connect(inputs[0], 0, node, 0);
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
@@ -1615,7 +1510,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
 
     case kVpiLogAndOp:
       {
-	MvNode* node = mMvMgr->new_and(parent_module, 1);
+	MvNode* node = mMvMgr->new_and(parent_module, 2, 1);
 	mMvMgr->connect(inputs[0], 0, node, 0);
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;
@@ -1623,7 +1518,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
 
     case kVpiLogOrOp:
       {
-	MvNode* node = mMvMgr->new_or(parent_module, 1);
+	MvNode* node = mMvMgr->new_or(parent_module, 2, 1);
 	mMvMgr->connect(inputs[0], 0, node, 0);
 	mMvMgr->connect(inputs[1], 0, node, 1);
 	return node;

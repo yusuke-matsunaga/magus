@@ -156,39 +156,6 @@ private:
   gen_cont_assign(MvModule* parent_module,
 		  const VlContAssign* cont_assign);
 
-  /// @brief AND のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_andtree(MvModule* parent_module,
-	      ymuint ni,
-	      vector<pair<MvNode*, ymuint> >& inputs,
-	      ymuint offset);
-
-  /// @brief OR のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_ortree(MvModule* parent_module,
-	     ymuint ni,
-	     vector<pair<MvNode*, ymuint> >& inputs,
-	     ymuint offset);
-
-  /// @brief XOR のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_xortree(MvModule* parent_module,
-	      ymuint ni,
-	      vector<pair<MvNode*, ymuint> >& inputs,
-	      ymuint offset);
-
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式

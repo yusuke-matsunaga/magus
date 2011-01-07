@@ -50,11 +50,11 @@ public:
 
     /// @brief logical not ( 1入力, 1出力 )
     kNot,
-    /// @brief logical and ( 2入力, 1出力 )
+    /// @brief logical and ( n入力, 1出力 )
     kAnd,
-    /// @brief logical or ( 2入力, 1出力 )
+    /// @brief logical or ( n入力, 1出力 )
     kOr,
-    /// @brief logical xor ( 2入力, 1出力 )
+    /// @brief logical xor ( n入力, 1出力 )
     kXor,
 
     /// @brief reduction and ( 1入力, 1出力 )

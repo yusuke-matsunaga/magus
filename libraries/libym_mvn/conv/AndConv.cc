@@ -37,22 +37,28 @@ AndConv::operator()(const MvNode* node,
 		    MvNodeMap& nodemap)
 {
   if ( node->type() == MvNode::kAnd ) {
-    const MvInputPin* ipin0 = node->input(0);
-    const MvOutputPin* src_pin0 = ipin0->src_pin();
-    const MvNode* src_node0 = src_pin0->node();
-
-    const MvInputPin* ipin1 = node->input(1);
-    const MvOutputPin* src_pin1 = ipin1->src_pin();
-    const MvNode* src_node1 = src_pin1->node();
+    ymuint ni = node->input_num();
+    assert_cond( ni >= 2, __FILE__, __LINE__);
+    ymuint no = node->output_num();
+    assert_cond( no == 1, __FILE__, __LINE__);
 
     ymuint bw = node->output(0)->bit_width();
-    assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-    assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
-    for (ymuint i = 0; i < bw; ++ i) {
-      SbjHandle sbjhandle0 = nodemap.get(src_node0, i);
-      SbjHandle sbjhandle1 = nodemap.get(src_node1, i);
-      SbjHandle sbjhandle = sbjgraph.new_and(sbjhandle0, sbjhandle1);
-      nodemap.put(node, i, sbjhandle);
+    vector<vector<SbjHandle> > input_list_array(bw);
+    for (ymuint b = 0; b < bw; ++ b) {
+      input_list_array[b].resize(ni);
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      const MvInputPin* ipin = node->input(i);
+      const MvOutputPin* src_pin = ipin->src_pin();
+      const MvNode* src_node = src_pin->node();
+      assert_cond( src_pin->bit_width() == bw, __FILE__, __LINE__);
+      for (ymuint b = 0; b < bw; ++ b) {
+	input_list_array[b][i] = nodemap.get(src_node, b);
+      }
+    }
+    for (ymuint b = 0; b < bw; ++ b) {
+      SbjHandle sbjhandle = sbjgraph.new_and(input_list_array[b]);
+      nodemap.put(node, b, sbjhandle);
     }
     return true;
   }
