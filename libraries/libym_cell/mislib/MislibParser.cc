@@ -87,60 +87,6 @@ dfs(const MislibPt* node,
   }
 }
 
-// MislibPt を論理式に変換する．
-// param[in] node パース木の根のノード
-// param[in] name_map 端子名をキーにして端子番号を返す連想配列
-LogExpr
-pt_to_expr(const MislibPt* node,
-	   const hash_map<ShString, ymuint>& name_map)
-{
-  switch ( node->type() ) {
-  case MislibPt::kConst0:
-    return LogExpr::make_zero();
-
-  case MislibPt::kConst1:
-    return LogExpr::make_one();
-
-  case MislibPt::kStr:
-    {
-      ShString name = node->str();
-      hash_map<ShString, ymuint>::const_iterator p = name_map.find(name);
-      assert_cond( p != name_map.end(), __FILE__, __LINE__);
-      return LogExpr::make_posiliteral(p->second);
-    }
-
-  case MislibPt::kNot:
-    return ~pt_to_expr(node->child1(), name_map);
-
-  case MislibPt::kAnd:
-    {
-      LogExpr expr1 = pt_to_expr(node->child1(), name_map);
-      LogExpr expr2 = pt_to_expr(node->child2(), name_map);
-      return expr1 & expr2;
-    }
-
-  case MislibPt::kOr:
-    {
-      LogExpr expr1 = pt_to_expr(node->child1(), name_map);
-      LogExpr expr2 = pt_to_expr(node->child2(), name_map);
-      return expr1 | expr2;
-    }
-
-  case MislibPt::kXor:
-    {
-      LogExpr expr1 = pt_to_expr(node->child1(), name_map);
-      LogExpr expr2 = pt_to_expr(node->child2(), name_map);
-      return expr1 ^ expr2;
-    }
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-
-  // ダミー
-  return LogExpr::make_zero();
-}
-
 #if 0
 // @brief LogExpr を TvFunc に変換する．
 // @param[in] expr 対象の論理式
@@ -320,7 +266,7 @@ MislibParser::read(const string& filename)
     else {
       assert_not_reached(__FILE__, __LINE__);
     }
-    LogExpr function = pt_to_expr(opin_expr, ipin_name_map);
+
     ymuint ni = ipin_name_list.size();
     CiCell* cell = library->new_cell(cell_id, name, area, ni +  1, 0, 0);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -338,6 +284,7 @@ MislibParser::read(const string& filename)
 						 CellCapacitance(0.0),
 						 CellTime::infty(),
 						 CellTime(0.0));
+    LogExpr function = opin_expr->to_expr(ipin_name_map);
     library->set_opin_function(opin, function);
 #if 0
     TvFunc tv_function = expr_to_tvfunc(function, ni);

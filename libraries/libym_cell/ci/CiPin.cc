@@ -136,6 +136,7 @@ CiPin::timing(ymuint ipos,
 void
 CiPin::set_function(const LogExpr& function)
 {
+  assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
@@ -147,6 +148,7 @@ CiPin::set_timing(ymuint pin_id,
 		  tCellTimingSense sense,
 		  const CellTiming* timing)
 {
+  assert_not_reached(__FILE__, __LINE__);
 }
 
 

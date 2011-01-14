@@ -57,7 +57,7 @@ MislibPt::num() const
 
 // 1番目の子供を取り出す．
 // デフォルトでは NULL を返す．
-MislibPt*
+const MislibPt*
 MislibPt::child1() const
 {
   return NULL;
@@ -65,10 +65,20 @@ MislibPt::child1() const
 
 // 2番目の子供を取り出す．
 // デフォルトでは NULL を返す．
-MislibPt*
+const MislibPt*
 MislibPt::child2() const
 {
   return NULL;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPt::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  // デフォルトではエラーとなる．
+  assert_not_reached(__FILE__, __LINE__);
+  return LogExpr();
 }
 
 // ピン名を表すオブジェクトを取り出す．
@@ -241,6 +251,16 @@ ShString
 MislibPtStr::str() const
 {
   return mStr;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtStr::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  hash_map<ShString, ymuint>::const_iterator p = name_map.find(str());
+  assert_cond( p != name_map.end(), __FILE__, __LINE__);
+  return LogExpr::make_posiliteral(p->second);
 }
 
 // 内容を出力する．
@@ -426,6 +446,14 @@ MislibPtConst0::is_expr() const
   return true;
 }
 
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtConst0::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  return LogExpr::make_zero();
+}
+
 // 内容を出力する．
 // デバッグ用
 void
@@ -464,6 +492,14 @@ bool
 MislibPtConst1::is_expr() const
 {
   return true;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtConst1::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  return LogExpr::make_one();
 }
 
 // 内容を出力する．
