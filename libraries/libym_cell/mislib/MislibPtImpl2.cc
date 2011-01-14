@@ -203,6 +203,73 @@ MislibPtOr::dump(ostream& s) const
 
 
 //////////////////////////////////////////////////////////////////////
+// XOR論理式を表すクラス
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+MislibPtXor::MislibPtXor(const FileRegion& loc,
+			 MislibPt* child1,
+			 MislibPt* child2) :
+  MislibPt(loc),
+  mChild1(child1),
+  mChild2(child2)
+{
+}
+
+// デストラクタ
+MislibPtXor::~MislibPtXor()
+{
+}
+
+// 種類を取り出す．
+MislibPt::tType
+MislibPtXor::type() const
+{
+  return kXor;
+}
+
+// @brief 論理式を表す型のときに true を返す．
+bool
+MislibPtXor::is_expr() const
+{
+  return true;
+}
+
+// 1番目の子供を取り出す．
+MislibPt*
+MislibPtXor::child1() const
+{
+  return mChild1;
+}
+
+// 2番目の子供を取り出す．
+MislibPt*
+MislibPtXor::child2() const
+{
+  return mChild2;
+}
+
+// 内容を出力する．
+// デバッグ用
+void
+MislibPtXor::dump(ostream& s) const
+{
+  s << "<XOR>" << endl;
+  dump_loc(s);
+
+  s << "<CHILD1>" << endl;
+  child1()->dump(s);
+  s << "</CHILD1>" << endl;
+
+  s << "<CHILD2>" << endl;
+  child2()->dump(s);
+  s << "</CHILD2>" << endl;
+
+  s << "</XOR>" << endl;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
 

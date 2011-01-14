@@ -205,6 +205,72 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibPtXor MislibPtImpl2.h "MislibPtImpl2.h"
+/// @brief XOR論理式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class MislibPtXor :
+  public MislibPt
+{
+  friend class MislibParser;
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] loc 位置情報
+  /// @param[in] child1 1番目の子供
+  /// @param[in] child2 2番目の子供
+  MislibPtXor(const FileRegion& loc,
+	      MislibPt* child1,
+	      MislibPt* child2);
+
+  /// @brief デストラクタ
+  virtual
+  ~MislibPtXor();
+
+
+public:
+
+  /// @brief 種類を取り出す．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 論理式を表す型のときに true を返す．
+  virtual
+  bool
+  is_expr() const;
+
+  /// @brief 1番目の子供を取り出す．
+  virtual
+  MislibPt*
+  child1() const;
+
+  /// @brief 2番目の子供を取り出す．
+  virtual
+  MislibPt*
+  child2() const;
+
+  /// @brief 内容を出力する．
+  /// デバッグ用
+  virtual
+  void
+  dump(ostream& s) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 1番目の子供
+  MislibPt* mChild1;
+
+  // 2番目の子供
+  MislibPt* mChild2;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class MislibPtPin MislibPtImpl2.h "MislibPtImpl2.h"
 /// @brief ピンを表すクラス
 //////////////////////////////////////////////////////////////////////

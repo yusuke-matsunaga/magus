@@ -95,7 +95,7 @@ END_NONAMESPACE
 %token ERROR
 
 // 論理式の演算子は優先度に注意
-%left PLUS
+%left PLUS HAT
 %left STAR
 %nonassoc NOT
 
@@ -156,6 +156,10 @@ expr
 | expr PLUS expr
 {
   $$ = parser.new_or(@$, $1, $3);
+}
+| expr HAT expr
+{
+  $$ = parser.new_xor(@$, $1, $3);
 }
 | CONST0
 {

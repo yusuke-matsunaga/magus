@@ -77,6 +77,7 @@ dfs(const MislibPt* node,
 
   case MislibPt::kAnd:
   case MislibPt::kOr:
+  case MislibPt::kXor:
     dfs(node->child1(), name_list, name_map);
     dfs(node->child2(), name_list, name_map);
     break;
@@ -123,6 +124,13 @@ pt_to_expr(const MislibPt* node,
       LogExpr expr1 = pt_to_expr(node->child1(), name_map);
       LogExpr expr2 = pt_to_expr(node->child2(), name_map);
       return expr1 | expr2;
+    }
+
+  case MislibPt::kXor:
+    {
+      LogExpr expr1 = pt_to_expr(node->child1(), name_map);
+      LogExpr expr2 = pt_to_expr(node->child2(), name_map);
+      return expr1 ^ expr2;
     }
 
   default:
@@ -448,6 +456,16 @@ MislibParser::new_or(const FileRegion& loc,
 {
   void* p = mAlloc.get_memory(sizeof(MislibPtOr));
   return new (p) MislibPtOr(loc, child1, child2);
+}
+
+// XOR ノードを生成する．
+MislibPt*
+MislibParser::new_xor(const FileRegion& loc,
+		      MislibPt* child1,
+		      MislibPt* child2)
+{
+  void* p = mAlloc.get_memory(sizeof(MislibPtXor));
+  return new (p) MislibPtXor(loc, child1, child2);
 }
 
 // PIN ノードを生成する．

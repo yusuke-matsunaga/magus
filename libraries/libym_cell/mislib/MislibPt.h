@@ -52,6 +52,8 @@ public:
     kAnd,
     /// @brief OR論理式
     kOr,
+    /// @brief XOR論理式
+    kXor,
     /// @brief 入力ピン
     kPin,
     /// @brief ゲート
