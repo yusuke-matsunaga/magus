@@ -226,26 +226,32 @@ public:
 
   /// @brief and ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
   new_and(MvModule* module,
+	  ymuint input_num,
 	  ymuint bit_width = 1);
 
   /// @brief or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
   new_or(MvModule* module,
+	 ymuint input_num,
 	 ymuint bit_width = 1);
 
   /// @brief xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
   new_xor(MvModule* module,
+	  ymuint input_num,
 	  ymuint bit_width = 1);
 
   /// @brief reduction and ノードを生成する．
@@ -254,7 +260,7 @@ public:
   /// @return 生成したノードを返す．
   MvNode*
   new_rand(MvModule* module,
-	   ymuint bit_width = 1);
+	   ymuint bit_width);
 
   /// @brief reduction or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -262,7 +268,7 @@ public:
   /// @return 生成したノードを返す．
   MvNode*
   new_ror(MvModule* module,
-	  ymuint bit_width = 1);
+	  ymuint bit_width);
 
   /// @brief reduction xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -270,7 +276,7 @@ public:
   /// @return 生成したノードを返す．
   MvNode*
   new_rxor(MvModule* module,
-	   ymuint bit_width = 1);
+	   ymuint bit_width);
 
   /// @brief equal ノードを生成する．
   /// @param[in] module ノードが属するモジュール

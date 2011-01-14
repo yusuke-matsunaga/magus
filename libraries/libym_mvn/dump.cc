@@ -130,26 +130,28 @@ dump_node(ostream& s,
     const MvOutputPin* pin = node->output(i);
     dump_outputpin(s, pin);
   }
-  s << endl;
-  for (ymuint i = 0; i < ni - 2; ++ i) {
-    s << "  Control#" << i << "(InputPin#" << i + 2 << ")" << endl
-      << "    ";
-    if ( node->control_pol(i) ) {
-      s << "posedge";
+  if ( node->type() == MvNode::kDff ) {
+    for (ymuint i = 0; i < ni - 2; ++ i) {
+      s << "  Control#" << i << "(InputPin#" << i + 2 << ")" << endl
+	<< "    ";
+      if ( node->control_pol(i) ) {
+	s << "posedge";
+      }
+      else {
+	s << "negedge";
+      }
+      s << ": ";
+      vector<ymuint32> val;
+      node->control_value(i, val);
+      ymuint n = val.size();
+      s << hex;
+      for (ymuint i = 0; i < n; ++ i) {
+	s << " " << val[n - i - 1];
+      }
+      s << dec << endl;
     }
-    else {
-      s << "negedge";
-    }
-    s << ": ";
-    vector<ymuint32> val;
-    node->control_value(i, val);
-    ymuint n = val.size();
-    s << hex;
-    for (ymuint i = 0; i < n; ++ i) {
-      s << " " << val[n - i - 1];
-    }
-    s << dec << endl;
   }
+  s << endl;
 }
 
 END_NONAMESPACE

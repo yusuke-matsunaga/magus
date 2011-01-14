@@ -142,6 +142,21 @@ private:
 	   const VlStmt* stmt,
 	   Env& env);
 
+  /// @brief always latch のチェック
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] src_node ソースノード
+  /// @param[in] dst_node 代入先のノード
+  /// @param[out] cond latch の場合の条件ノード
+  /// @retval 0 組み合わせ回路
+  /// @retval 1 ラッチ
+  /// @retval 2 条件なしのループあり(エラー)
+  /// @retval 3 条件中に dst_node が含まれる
+  ymuint
+  loop_check(MvModule* parent_module,
+	     MvNode* src_node,
+	     MvNode* dst_node,
+	     MvNode*& cond);
+
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] prim プリミティブ
@@ -155,39 +170,6 @@ private:
   void
   gen_cont_assign(MvModule* parent_module,
 		  const VlContAssign* cont_assign);
-
-  /// @brief AND のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_andtree(MvModule* parent_module,
-	      ymuint ni,
-	      vector<pair<MvNode*, ymuint> >& inputs,
-	      ymuint offset);
-
-  /// @brief OR のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_ortree(MvModule* parent_module,
-	     ymuint ni,
-	     vector<pair<MvNode*, ymuint> >& inputs,
-	     ymuint offset);
-
-  /// @brief XOR のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_xortree(MvModule* parent_module,
-	      ymuint ni,
-	      vector<pair<MvNode*, ymuint> >& inputs,
-	      ymuint offset);
 
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
