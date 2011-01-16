@@ -780,7 +780,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
     return false;
   }
 
-  Env top_env(mGlobalEnv);
+  TmpEnv top_env(mGlobalEnv);
   gen_stmt(parent_module, stmt->body_stmt(), top_env);
 
   ymuint n = mGlobalEnv.max_id();
@@ -791,15 +791,15 @@ ReaderImpl::gen_process(MvModule* parent_module,
       continue;
     }
     MvNode* cond = NULL;
-    switch ( loop_check(parent_module, node1, node0, cond) ) {
+    switch ( latch_check(parent_module, node1, node0, cond) ) {
     case 0: // 依存関係なし
       mMvMgr->connect(node1, 0, node0, 0);
       break;
 
     case 1: // 条件付きの依存関係あり
-      assert_cond( cond != ULL, __FILE__, __LINE__);
+      assert_cond( cond != NULL, __FILE__, __LINE__);
       {
-	ymuint bw = node0->output_pin(0)->bit_width();
+	ymuint bw = node0->output(0)->bit_width();
 	MvNode* latch = mMvMgr->new_latch(parent_module, bw);
 	mMvMgr->connect(node1, 0, latch, 0);
 	mMvMgr->connect(cond, 0, latch, 1);
@@ -823,7 +823,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
 bool
 ReaderImpl::gen_stmt(MvModule* module,
 		     const VlStmt* stmt,
-		     Env& env)
+		     TmpEnv& env)
 {
   switch ( stmt->type() ) {
   case kVpiAssignment:
@@ -941,7 +941,7 @@ ReaderImpl::gen_stmt(MvModule* module,
     {
       const VlExpr* cond = stmt->expr();
       MvNode* cond_node = gen_expr(module, cond, env);
-      Env then_env(env);
+      TmpEnv then_env(env);
       gen_stmt(module, stmt->body_stmt(), then_env);
       merge_env(module, env, cond_node, then_env, env);
     }
@@ -951,9 +951,9 @@ ReaderImpl::gen_stmt(MvModule* module,
     {
       const VlExpr* cond = stmt->expr();
       MvNode* cond_node = gen_expr(module, cond, env);
-      Env then_env(env);
+      TmpEnv then_env(env);
       gen_stmt(module, stmt->body_stmt(), then_env);
-      Env else_env(env);
+      TmpEnv else_env(env);
       gen_stmt(module, stmt->else_stmt(), else_env);
       merge_env(module, env, cond_node, then_env, else_env);
     }
@@ -977,6 +977,7 @@ ReaderImpl::gen_stmt(MvModule* module,
   return true;
 }
 
+#if 0
 // @brief always latch のチェック
 // @param[in] parent_module 親のモジュール
 // @param[in] src_node ソースノード
@@ -987,24 +988,18 @@ ReaderImpl::gen_stmt(MvModule* module,
 // @retval 2 条件なしのループあり(エラー)
 // @retval 3 条件中に dst_node が含まれる
 ymuint
-ReaderImpl::loop_check(MvModule* parent_module,
-		       MvNode* src_node,
-		       MvNode* dst_node,
-		       MvNode*& cond)
+ReaderImpl::latch_check(MvModule* parent_module,
+			MvNode* src_node,
+			MvNode* dst_node,
+			MvNode*& cond)
 {
-  if ( src_node == dst_node ) {
-    return 2;
-  }
   if ( src_node->type() == MvNode::kIte ) {
-    MvNode* cond_node = src_node->input_pin(0)->src_pin()->node();
-    if ( containment_check(cond_node, dst_node) ) {
-      // 条件式中に dst_node が含まれていたらエラー
-      return 3;
-    }
-    MvNode* node1 = src_node->input_pin(1)->src_pin()->node();
+    if ( src_node->input(1)->src_pin() == NULL ) {
+
+    MvNode* node1 = src_node->input(1)->src_pin()->node();
     MvNode* cond1 = NULL;
     ymuint stat1 = loop_check(parent_module, node1, dst_node, cond1);
-    MvNode* node2 = src_node->input_pin(2)->src_pin()->node();
+    MvNode* node2 = src_node->input(2)->src_pin()->node();
     MvNode* cond2 = NULL;
     ymuint stat2 = loop_check(parent_module, node2, dst_node, cond2);
     if ( stat1 == 3 || stat2 == 3 ) {
@@ -1099,6 +1094,7 @@ ReaderImpl::loop_check(MvModule* parent_module,
   }
 
 }
+#endif
 
 // @brief プリミティブインスタンスの生成を行う．
 // @param[in] parent_module 親のモジュール
@@ -1292,6 +1288,7 @@ ReaderImpl::merge_env(MvModule* parent_module,
 {
   ymuint n = env.max_id();
   for (ymuint i = 0; i < n; ++ i) {
+    // TODO: node0, node1, node2 が NULL の場合がある．
     MvNode* node0 = env.get_from_id(i);
     MvNode* node1 = then_env.get_from_id(i);
     MvNode* node2 = else_env.get_from_id(i);

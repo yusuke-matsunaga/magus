@@ -143,4 +143,67 @@ Env::get_from_id(ymuint id) const
   return mNodeArray[id][0];
 }
 
+// @brief DeclHash を得る．
+DeclHash&
+Env::decl_hash() const
+{
+  return mDeclHash;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス TmpEnv
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] global_env プロセスの外側の Env
+TmpEnv::TmpEnv(const Env& global_env) :
+  Env(global_env.decl_hash()),
+  mGlobalEnv(global_env)
+{
+}
+
+// @brief コピーコンストラクタ
+TmpEnv::TmpEnv(const TmpEnv& tmp_env) :
+  Env(tmp_env),
+  mGlobalEnv(tmp_env.mGlobalEnv)
+{
+}
+
+// @brief デストラクタ
+TmpEnv::~TmpEnv()
+{
+}
+
+// @brief 対応するノードを取り出す．
+// @param[in] decl 宣言要素
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型の場合には NULL を返す．
+MvNode*
+TmpEnv::get(const VlDecl* decl) const
+{
+  MvNode* ans = Env::get(decl);
+  if ( ans == NULL ) {
+    ans = mGlobalEnv.get(decl);
+  }
+  return ans;
+}
+
+// @brief 対応するノードを取り出す(配列型)．
+// @param[in] decl 宣言要素
+// @param[in] offset オフセット
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型でない場合，
+// オフセットが範囲外の場合には NULL を返す．
+MvNode*
+TmpEnv::get(const VlDecl* decl,
+	    ymuint offset) const
+{
+  MvNode* ans = Env::get(decl, offset);
+  if ( ans == NULL ) {
+    ans = mGlobalEnv.get(decl, offset);
+  }
+  return ans;
+}
+
 END_NAMESPACE_YM_MVN_VERILOG

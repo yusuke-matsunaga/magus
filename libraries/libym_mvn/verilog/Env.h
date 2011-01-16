@@ -25,13 +25,15 @@ class Env
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] decl_hash VlDecl 用のハッシュ表
+  /// @param[in] decl_hash 宣言要素のハッシュ表
   Env(DeclHash& decl_hash);
 
   /// @brief コピーコンストラクタ
+  /// @param[in] src もとのオブジェクト
   Env(const Env& src);
 
   /// @brief デストラクタ
+  virtual
   ~Env();
 
 
@@ -65,6 +67,7 @@ public:
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
+  virtual
   MvNode*
   get(const VlDecl* decl) const;
 
@@ -74,6 +77,7 @@ public:
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
+  virtual
   MvNode*
   get(const VlDecl* decl,
       ymuint offset) const;
@@ -87,11 +91,9 @@ public:
   MvNode*
   get_from_id(ymuint id) const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  /// @brief DeclHash を得る．
+  DeclHash&
+  decl_hash() const;
 
 
 private:
@@ -106,6 +108,60 @@ private:
   vector<vector<MvNode*> > mNodeArray;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class TmpEnv Env.h "Env.h"
+/// @brief プロセス内部の Env
+//////////////////////////////////////////////////////////////////////
+class TmpEnv :
+  public Env
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] global_env プロセスの外側の Env
+  TmpEnv(const Env& global_env);
+
+  /// @brief コピーコンストラクタ
+  TmpEnv(const TmpEnv& tmp_env);
+
+  /// @brief デストラクタ
+  virtual
+  ~TmpEnv();
+
+public:
+
+  /// @brief 対応するノードを取り出す．
+  /// @param[in] decl 宣言要素
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型の場合には NULL を返す．
+  virtual
+  MvNode*
+  get(const VlDecl* decl) const;
+
+  /// @brief 対応するノードを取り出す(配列型)．
+  /// @param[in] decl 宣言要素
+  /// @param[in] offset オフセット
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型でない場合，
+  /// オフセットが範囲外の場合には NULL を返す．
+  virtual
+  MvNode*
+  get(const VlDecl* decl,
+      ymuint offset) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 外側の Env
+  const Env& mGlobalEnv;
+
+};
+
 
 END_NAMESPACE_YM_MVN_VERILOG
 
