@@ -44,6 +44,15 @@ public:
   ymuint
   get_id(const VlDecl* decl);
 
+  /// @brief ID番号を得る．
+  /// @param[in] decl 配列型宣言要素
+  /// @param[in] offset オフセット
+  /// @return ID番号
+  /// @note 登録されていなかった場合には新しい番号を割り当てる．
+  ymuint
+  get_id(const VlDecl* decl,
+	 ymuint offset);
+
   /// @brief ID番号の最大値 + 1を返す．
   ymuint
   max_id() const;
@@ -111,6 +120,9 @@ private:
 
   // 要素数
   ymuint32 mNum;
+
+  // 次に割り当て可能な ID 番号
+  ymuint32 mNextId;
 
 };
 

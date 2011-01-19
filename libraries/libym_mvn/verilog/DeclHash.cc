@@ -17,7 +17,8 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 // @brief コンストラクタ
 DeclHash::DeclHash() :
   mAlloc(sizeof(Cell), 1024),
-  mNum(0)
+  mNum(0),
+  mNextId(0)
 {
   alloc_table(1024);
 }
@@ -36,6 +37,7 @@ DeclHash::clear()
     mTable[i] = NULL;
   }
   mNum = 0;
+  mNextId = 0;
   mAlloc.destroy();
 }
 
@@ -51,17 +53,41 @@ DeclHash::get_id(const VlDecl* decl)
     return cell->mId;
   }
   else {
-    ymuint id = mNum;
+    ymuint id = mNextId;
+    ++ mNextId;
     put_cell(decl, id);
     return id;
   }
+}
+
+// @brief ID番号を得る．
+// @param[in] decl 配列型宣言要素
+// @param[in] offset オフセット
+// @return ID番号
+// @note 登録されていなかった場合には新しい番号を割り当てる．
+ymuint
+DeclHash::get_id(const VlDecl* decl,
+		 ymuint offset)
+{
+  assert_cond( decl->dimension == 0, __FILE__, __LINE__);
+  Cell* cell = find_cell(decl);
+  ymuint base = 0;
+  if ( cell ) {
+    base = cell->mId;
+  }
+  else {
+    base = mNextId;
+    ++ mNextId;
+    put_cell(decl, base);
+  }
+  return base + offset;
 }
 
 // @brief ID番号の最大値 + 1を返す．
 ymuint
 DeclHash::max_id() const
 {
-  return mNum;
+  return mNextId;
 }
 
 // @brief Cell を登録する．
@@ -69,6 +95,7 @@ void
 DeclHash::put_cell(const VlDecl* decl,
 		   ymuint id)
 {
+  ymuint
   if ( mNum >= mLimit ) {
     // テーブルを拡大する．
     ymuint old_size = mSize;
