@@ -145,17 +145,14 @@ private:
   /// @brief always latch のチェック
   /// @param[in] parent_module 親のモジュール
   /// @param[in] src_node ソースノード
-  /// @param[in] dst_node 代入先のノード
-  /// @param[out] cond latch の場合の条件ノード
-  /// @retval 0 組み合わせ回路
-  /// @retval 1 ラッチ
-  /// @retval 2 条件なしのループあり(エラー)
-  /// @retval 3 条件中に dst_node が含まれる
+  /// @param[out] cond_node 条件を表すノード
+  /// @retval 0 latch 条件はない．
+  /// @retval 1 常に latch
+  /// @retval 2 部分的な latch 条件あり
   ymuint
   latch_check(MvModule* parent_module,
 	      MvNode* src_node,
-	      MvNode* dst_node,
-	      MvNode*& cond);
+	      MvNode*& cond_node);
 
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] parent_module 親のモジュール

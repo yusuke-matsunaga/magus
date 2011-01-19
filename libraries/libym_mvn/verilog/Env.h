@@ -17,6 +17,29 @@
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
+/// @class AssignInfo Env.h "Env.h"
+/// @brief 代入情報を表すクラス
+/// 具体的には代入の右辺と代入条件を表すノードの組
+//////////////////////////////////////////////////////////////////////
+struct AssignInfo
+{
+  /// @brief コンストラクタ
+  /// @param[in] rhs 代入の右辺
+  /// @param[in] cond 代入条件
+  explicit
+  AssignInfo(MvNode* rhs = NULL,
+	     MvNode* cond = NULL);
+
+  /// @brief 代入の右辺式を表すノード
+  MvNode* mRhs;
+
+  /// @brief 代入条件を表すノード
+  /// ただし常に代入する時は NULL
+  MvNode* mCond;
+
+};
+
+//////////////////////////////////////////////////////////////////////
 /// @class Env Env.h "Env.h"
 /// @brief const VlDecl と MvNode の対応をとる連想配列
 //////////////////////////////////////////////////////////////////////
@@ -63,12 +86,20 @@ public:
       ymuint offset,
       MvNode* node);
 
+  /// @brief マージする．
+  void
+  merge(const Env& then_env,
+	const Env& else_env,
+	MvMgr* mgr,
+	MvModule* parent_module,
+	MvNode* cond);
+
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
   virtual
-  MvNode*
+  AssignInfo
   get(const VlDecl* decl) const;
 
   /// @brief 対応するノードを取り出す(配列型)．
@@ -78,7 +109,7 @@ public:
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
   virtual
-  MvNode*
+  AssignInfo
   get(const VlDecl* decl,
       ymuint offset) const;
 
@@ -105,7 +136,7 @@ private:
   DeclHash& mDeclHash;
 
   // VlDecl の ID をキーに MvNode の配列を格納する配列
-  vector<vector<MvNode*> > mNodeArray;
+  vector<vector<AssignInfo> > mNodeArray;
 
 };
 
@@ -137,7 +168,7 @@ public:
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
   virtual
-  MvNode*
+  AssignInfo
   get(const VlDecl* decl) const;
 
   /// @brief 対応するノードを取り出す(配列型)．
@@ -147,7 +178,7 @@ public:
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
   virtual
-  MvNode*
+  AssignInfo
   get(const VlDecl* decl,
       ymuint offset) const;
 
@@ -161,7 +192,6 @@ private:
   const Env& mGlobalEnv;
 
 };
-
 
 END_NAMESPACE_YM_MVN_VERILOG
 
