@@ -572,7 +572,7 @@ StmtGen::instantiate_eventstmt(const VlNamedObj* parent,
 			       const PtStmt* pt_stmt)
 {
   const PtExpr* pt_expr = pt_stmt->primary();
-  ElbDecl* named_event = instantiate_namedevent(parent, pt_expr);
+  ElbExpr* named_event = instantiate_namedevent(parent, pt_expr);
   if ( !named_event ) {
     return NULL;
   }

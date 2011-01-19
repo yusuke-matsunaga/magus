@@ -22,14 +22,14 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // クラス EiExprBase1
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 EiExprBase1::EiExprBase1(const PtBase* pt_obj) :
   mPtObj(pt_obj)
 {
 }
-  
+
 // @brief デストラクタ
 EiExprBase1::~EiExprBase1()
 {
@@ -41,7 +41,8 @@ EiExprBase1::file_region() const
 {
   return mPtObj->file_region();
 }
-  
+
+#if 0
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -67,7 +68,8 @@ void
 EiExprBase1::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
-}  
+}
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -80,7 +82,7 @@ EiOperation::EiOperation(const PtBase* pt_expr) :
   EiExprBase1(pt_expr)
 {
 }
-  
+
 // @brief デストラクタ
 EiOperation::~EiOperation()
 {
@@ -152,7 +154,7 @@ EiOperation::decompile_impl(int ppri) const
     ">>>",            // vpiArithRShiftOp
     "**"              // vpiPowerOp
   };
-  
+
   // 優先順位のテーブル
   static int pri_table[] = {
     0,                // dummy
@@ -200,7 +202,7 @@ EiOperation::decompile_impl(int ppri) const
     9,                // vpiArithRShiftOp
     12                // vpiPowerOp
   };
-  
+
   string ans;
 
   tVpiOpType optype = op_type();
@@ -211,13 +213,13 @@ EiOperation::decompile_impl(int ppri) const
     need_par = true;
     ans += "(";
   }
-  
+
   switch ( optype ) {
-    
+
     // 空
   case kVpiNullOp:
     break;
-    
+
     // 単項演算子
   case kVpiMinusOp:
   case kVpiNotOp:
@@ -233,7 +235,7 @@ EiOperation::decompile_impl(int ppri) const
   case kVpiNegedgeOp:
     ans += sym_table[optype] + _operand(0)->decompile_impl(pri);
     break;
-    
+
     // 二項演算子
   case kVpiAddOp:
   case kVpiArithLShiftOp:
@@ -262,7 +264,7 @@ EiOperation::decompile_impl(int ppri) const
     ans += _operand(0)->decompile_impl(pri) + sym_table[optype] +
       _operand(1)->decompile_impl(pri);
     break;
-    
+
     // 三項演算子
   case kVpiConditionOp:
     ans += _operand(0)->decompile_impl(pri) + "?" +

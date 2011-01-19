@@ -134,6 +134,7 @@ EiBitSelect::index_val() const
   return 0;
 }
 
+#if 0
 // @brief 論理値を返す．
 tVpiScalarVal
 EiBitSelect::eval_logic() const
@@ -156,6 +157,7 @@ EiBitSelect::eval_bitvector(BitVector& bitvector,
   bitvector = eval_scalar();
   bitvector.coerce(req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -205,6 +207,7 @@ EiDeclBitSelect::decl_obj() const
   return mObj;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiDeclBitSelect::eval_scalar() const
@@ -228,6 +231,7 @@ EiDeclBitSelect::set_scalar(tVpiScalarVal v)
     mObj->set_bitselect(bpos, v);
   }
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -297,6 +301,7 @@ EiExprBitSelect::index_val() const
   return mIndex;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiExprBitSelect::eval_scalar() const
@@ -328,6 +333,7 @@ EiExprBitSelect::eval_bitvector(BitVector& bitvector,
   bitvector = eval_scalar();
   bitvector.coerce(req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位

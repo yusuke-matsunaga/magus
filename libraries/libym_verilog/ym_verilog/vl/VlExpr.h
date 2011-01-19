@@ -250,6 +250,7 @@ public:
   const VlExpr*
   argument(ymuint pos) const = 0;
 
+#if 0
   /// @brief int 型の値を返す．
   /// @param[out] val 結果を格納する変数
   /// @return 整数値に変換できたら true を返す．
@@ -290,6 +291,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const = 0;
+#endif
 
 };
 

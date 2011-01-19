@@ -135,6 +135,7 @@ EiConstant::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
+#if 0
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -161,6 +162,7 @@ EiConstant::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -197,6 +199,7 @@ EiIntConst::constant_type() const
   return kVpiIntConst;
 }
 
+#if 0
 // @brief int 型の値を返す．
 bool
 EiIntConst::eval_int(int& val) const
@@ -235,6 +238,7 @@ EiIntConst::eval_bitvector(BitVector& bitvector,
   bitvector = mValue;
   bitvector.coerce(req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -290,6 +294,7 @@ EiBitVectorConst::constant_type() const
   return mConstType;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiBitVectorConst::eval_scalar() const
@@ -319,6 +324,7 @@ EiBitVectorConst::eval_bitvector(BitVector& bitvector,
   bitvector = mValue;
   bitvector.coerce(req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -383,6 +389,7 @@ EiRealConst::constant_type() const
   return kVpiRealConst;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiRealConst::eval_scalar() const
@@ -413,6 +420,7 @@ EiRealConst::eval_bitvector(BitVector& bitvector,
   bitvector = eval_real();
   bitvector.coerce(req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -460,6 +468,7 @@ EiStringConst::constant_type() const
   return kVpiStringConst;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiStringConst::eval_scalar() const
@@ -489,6 +498,7 @@ EiStringConst::eval_bitvector(BitVector& bitvector,
   bitvector = mValue;
   bitvector.coerce(req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位

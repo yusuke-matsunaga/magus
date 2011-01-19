@@ -143,6 +143,7 @@ EiConditionOp::value_type() const
   return mType;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiConditionOp::eval_scalar() const
@@ -311,6 +312,7 @@ EiConditionOp::eval_bitvector(BitVector& bitvector,
   }
   bitvector.coerce(req_type);
 }
+#endif
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
@@ -366,6 +368,7 @@ EiMinTypMaxOp::value_type() const
   return mType;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiMinTypMaxOp::eval_scalar() const
@@ -394,6 +397,7 @@ EiMinTypMaxOp::eval_bitvector(BitVector& bitvector,
 {
   operand2()->eval_bitvector(bitvector, req_type);
 }
+#endif
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型

@@ -183,6 +183,7 @@ EiFuncCall::function() const
   return mFunc;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiFuncCall::eval_scalar() const
@@ -231,6 +232,7 @@ EiFuncCall::eval_bitvector(BitVector& bitvector,
   }
   mFunc->eval_bitvector(arg_list, bitvector, req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -345,6 +347,7 @@ EiSysFuncCall::user_systf() const
   return mUserSystf;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiSysFuncCall::eval_scalar() const
@@ -376,6 +379,7 @@ EiSysFuncCall::eval_bitvector(BitVector& bitvector,
 {
 # warning "TODO: 未完"
 }
+#endif
 
 // @brief decompile した文字列を返す．
 string

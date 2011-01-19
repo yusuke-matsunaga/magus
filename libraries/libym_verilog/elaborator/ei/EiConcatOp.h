@@ -66,6 +66,7 @@ public:
   ymuint
   operand_num() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -86,6 +87,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
+#endif
 
 
 private:
@@ -207,11 +209,13 @@ public:
   ymuint
   operand_num() const;
 
+#if 0
   /// @brief bitvector 型の値を返す．
   virtual
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
+#endif
 
 
 public:
@@ -225,12 +229,14 @@ public:
   string
   decompile_impl(int ppri) const;
 
+#if 0
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
+#endif
 
 
 public:

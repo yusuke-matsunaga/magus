@@ -84,6 +84,7 @@ public:
   int
   index_val() const;
 
+#if 0
   /// @brief 論理値を返す．
   virtual
   tVpiScalarVal
@@ -99,7 +100,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -165,12 +166,14 @@ public:
   const VlDecl*
   decl_obj() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
   eval_scalar() const;
+#endif
 
-
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbExpr の仮想関数
@@ -182,7 +185,7 @@ public:
   virtual
   void
   set_scalar(tVpiScalarVal v);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -263,6 +266,7 @@ public:
   int
   index_val() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -283,7 +287,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////

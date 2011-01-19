@@ -707,7 +707,7 @@ public:
   new_EventStmt(const VlNamedObj* parent,
 		ElbProcess* process,
 		const PtStmt* pt_stmt,
-		ElbDecl* named_event);
+		ElbExpr* named_event);
 
   /// @brief NULL ステートメントを生成する．
   /// @param[in] parent 親のスコープ

@@ -194,6 +194,166 @@ EiPrimary::set_bitvector(const BitVector& v)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス EiArrayElemPrimary
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] dim 配列の次元
+// @param[in] index_list インデックスのリスト
+EiArrayElemPrimary::EiArrayElemPrimary(const PtBase* pt_obj,
+				       ElbDeclArray* obj,
+				       ymuint dim,
+				       ElbExpr* index_list) :
+  EiExprBase1(pt_obj),
+  mObj(obj),
+  mDim(dim),
+  mIndexList(index_list)
+{
+}
+
+// @brief デストラクタ
+EiArrayElemPrimary::~EiArrayElemPrimary()
+{
+}
+
+// @brief 型の取得
+tVpiObjType
+EiArrayElemPrimary::type() const
+{
+  return mObj->type();
+}
+
+// @brief 式のタイプを返す．
+tVpiValueType
+EiArrayElemPrimary::value_type() const
+{
+  return mObj->value_type();
+}
+
+// @brief 定数の時 true を返す．
+// @note 参照している要素の型によって決まる．
+bool
+EiArrayElemPrimary::is_const() const
+{
+  return mObj->is_consttype();
+}
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiArrayElemPrimary::is_primary() const
+{
+  return true;
+}
+
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDecl*
+EiArrayElemPrimary::decl_obj() const
+{
+  return mObj;
+}
+
+// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
+// @note それ以外では 0 を返す．
+ymuint
+EiArrayElemPrimary::declarray_dimension() const
+{
+  return mDim;
+}
+
+// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+// @note それ以外では NULL を返す．
+const VlExpr*
+EiArrayElemPrimary::declarray_index(ymuint pos) const
+{
+  return &mIndexList[pos];
+}
+
+// @brief スカラー値を返す．
+tVpiScalarVal
+EiArrayElemPrimary::eval_scalar() const
+{
+  ymuint offset = calc_offset();
+  return mObj->get_scalar(offset);
+}
+
+// @brief 論理値を返す．
+tVpiScalarVal
+EiArrayElemPrimary::eval_logic() const
+{
+  ymuint offset = calc_offset();
+  return mObj->get_scalar(offset);
+}
+
+// @brief real 型の値を返す．
+double
+EiArrayElemPrimary::eval_real() const
+{
+  ymuint offset = calc_offset();
+  return mObj->get_real(offset);
+}
+
+// @brief bitvector 型の値を返す．
+void
+EiArrayElemPrimary::eval_bitvector(BitVector& bitvector,
+				   tVpiValueType req_type) const
+{
+  ymuint offset = calc_offset();
+  mObj->get_bitvector(offset, bitvector, req_type);
+}
+
+// @brief decompile() の実装関数
+// @param[in] pprim 親の演算子の優先順位
+string
+EiArrayElemPrimary::decompile_impl(int ppri) const
+{
+  return mObj->name();
+}
+
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiArrayElemPrimary::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+// @brief スカラー値を書き込む．
+// @param[in] v 書き込む値
+// @note 左辺式の時のみ意味を持つ．
+void
+EiArrayElemPrimary::set_scalar(tVpiScalarVal v)
+{
+  ymuint offset = calc_offset();
+  mObj->set_scalar(offset, v);
+}
+
+// @brief 実数値を書き込む．
+// @param[in] v 書き込む値
+// @note 左辺式の時のみ意味を持つ．
+void
+EiArrayElemPrimary::set_real(double v)
+{
+  ymuint offset = calc_offset();
+  mObj->set_real(offset, v);
+}
+
+// @brief ビットベクタを書き込む．
+// @param[in] v 書き込む値
+// @note 左辺式の時のみ意味を持つ．
+void
+EiArrayElemPrimary::set_bitvector(const BitVector& v)
+{
+  ymuint offset = calc_offset();
+  mObj->set_bitvector(offset, v);
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス EiScopePrimary
 //////////////////////////////////////////////////////////////////////
 

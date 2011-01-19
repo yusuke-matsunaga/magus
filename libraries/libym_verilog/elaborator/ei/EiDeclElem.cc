@@ -20,6 +20,7 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
@@ -386,5 +387,6 @@ EiDeclElem::calc_offset() const
 {
   return mArray->calc_offset(mIndexList);
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG

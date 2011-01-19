@@ -248,6 +248,7 @@ public:
   const VlExpr*
   argument(ymuint pos) const;
 
+#if 0
   /// @brief int 型の値を返す．
   /// @param[out] val 結果を格納する変数
   /// @return 整数値に変換できたら true を返す．
@@ -269,6 +270,7 @@ public:
   virtual
   bool
   eval_time(VlTime& val) const;
+#endif
 
 
 public:
@@ -302,6 +304,7 @@ public:
   ElbExpr*
   _operand(ymuint pos) const;
 
+#if 0
   /// @brief スカラー値を書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
@@ -322,6 +325,7 @@ public:
   virtual
   void
   set_bitvector(const BitVector& v) = 0;
+#endif
 
 
 public:

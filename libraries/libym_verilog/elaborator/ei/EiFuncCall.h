@@ -134,6 +134,7 @@ public:
   const VlTaskFunc*
   function() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -154,6 +155,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
+#endif
 
 
 public:
@@ -175,6 +177,7 @@ public:
   decompile_impl(int ppri) const;
 
 
+#if 0
 private:
   //////////////////////////////////////////////////////////////////////
   // eval_XXXX の下請け関数
@@ -183,7 +186,7 @@ private:
   /// @brief 関数の値を評価する．
   ElbExpr*
   evaluate() const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -260,6 +263,7 @@ public:
   const VlUserSystf*
   user_systf() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -280,6 +284,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
+#endif
 
 
 public:

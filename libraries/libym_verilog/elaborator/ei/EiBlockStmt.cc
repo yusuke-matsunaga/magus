@@ -56,7 +56,7 @@ EiFactory::new_Fork(const VlNamedObj* parent,
   ymuint stmt_num = pt_stmt->stmt_array().size();
   void* p = mAlloc.get_memory(sizeof(EiFork));
   EiFork* stmt = new (p) EiFork(parent, process, pt_stmt,
-				 stmt_num, stmt_list);
+				stmt_num, stmt_list);
 
   return stmt;
 }
@@ -173,6 +173,7 @@ EiBegin::type() const
   return kVpiBegin;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiBegin::func_exec(bool constant_function) const
@@ -186,7 +187,7 @@ EiBegin::func_exec(bool constant_function) const
   }
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiFork
@@ -219,6 +220,7 @@ EiFork::type() const
   return kVpiFork;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えないのでエラーとなる．
 const VlNamedObj*
@@ -227,7 +229,7 @@ EiFork::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiNamedBlockStmt
@@ -320,6 +322,7 @@ EiNamedBegin::type() const
   return kVpiNamedBegin;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiNamedBegin::func_exec(bool constant_function) const
@@ -338,7 +341,7 @@ EiNamedBegin::func_exec(bool constant_function) const
   }
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiNamedFork
@@ -369,6 +372,7 @@ EiNamedFork::type() const
   return kVpiNamedFork;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -377,5 +381,6 @@ EiNamedFork::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG

@@ -15,14 +15,15 @@
 
 #include "VlDumperImpl.h"
 
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlDecl.h>
-#include <ym_verilog/vl/VlProcess.h>
-#include <ym_verilog/vl/VlStmt.h>
-#include <ym_verilog/vl/VlControl.h>
-#include <ym_verilog/vl/VlModule.h>
-#include <ym_verilog/vl/VlTaskFunc.h>
-#include <ym_verilog/vl/VlUserSystf.h>
+#include "ym_verilog/VlMgr.h"
+#include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlProcess.h"
+#include "ym_verilog/vl/VlStmt.h"
+#include "ym_verilog/vl/VlControl.h"
+#include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlTaskFunc.h"
+#include "ym_verilog/vl/VlUserSystf.h"
+#include "ym_verilog/vl/VlExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -119,7 +120,7 @@ VlDumperImpl::put_stmt(const char* label,
     break;
 
   case kVpiEventStmt:
-    put("vpiNamedEvent", stmt->named_event()->full_name());
+    put("vpiNamedEvent", stmt->named_event()->decompile());
     break;
 
   case kVpiAssignment:

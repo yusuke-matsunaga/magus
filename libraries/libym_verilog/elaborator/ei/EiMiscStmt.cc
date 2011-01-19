@@ -36,7 +36,7 @@ ElbStmt*
 EiFactory::new_EventStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbDecl* named_event)
+			 ElbExpr* named_event)
 {
   void* p = mAlloc.get_memory(sizeof(EiEventStmt));
   ElbStmt* stmt = new (p) EiEventStmt(parent, process, pt_stmt,
@@ -153,7 +153,7 @@ EiFactory::new_CtrlStmt(const VlNamedObj* parent,
 EiEventStmt::EiEventStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbDecl* named_event) :
+			 ElbExpr* named_event) :
   EiStmtBase(parent, process, pt_stmt),
   mEvent(named_event)
 {
@@ -172,12 +172,13 @@ EiEventStmt::type() const
 }
 
 // @brief named event を返す．
-const VlDecl*
+const VlExpr*
 EiEventStmt::named_event() const
 {
   return mEvent;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -186,7 +187,7 @@ EiEventStmt::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiNullStmt
@@ -215,6 +216,7 @@ EiNullStmt::type() const
   return kVpiNullStmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスでは何もしないで NULL を返す．
 const VlNamedObj*
@@ -222,7 +224,7 @@ EiNullStmt::func_exec(bool constant_function) const
 {
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiTcBase
@@ -316,6 +318,7 @@ EiTaskCall::task() const
   return mTask;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -324,7 +327,7 @@ EiTaskCall::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス SysTaskCall
@@ -367,6 +370,7 @@ EiSysTaskCall::user_systf() const
   return mUserSystf;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note system task は function 中では無視される．
 const VlNamedObj*
@@ -377,7 +381,7 @@ EiSysTaskCall::func_exec(bool constant_function) const
   }
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiDisableStmt
@@ -420,13 +424,14 @@ EiDisableStmt::scope() const
   return mExpr;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiDisableStmt::func_exec(bool constant_function) const
 {
   return mExpr;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiCtrlStmt
@@ -475,6 +480,7 @@ EiCtrlStmt::body_stmt() const
   return mBodyStmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -483,5 +489,6 @@ EiCtrlStmt::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG

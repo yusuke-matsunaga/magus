@@ -231,7 +231,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 // @brief PtExpr(primary) から named_event を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbDecl*
+ElbExpr*
 ExprGen::instantiate_namedevent(const VlNamedObj* parent,
 				const PtExpr* pt_expr)
 {
@@ -274,7 +274,7 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
     return NULL;
   }
 
-  return decl;
+  return factory().new_Primary(pt_expr, decl);
 }
 
 // @brief 定数識別子を探す．

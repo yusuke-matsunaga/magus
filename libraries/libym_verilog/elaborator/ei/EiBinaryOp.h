@@ -158,6 +158,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -173,7 +174,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -233,6 +234,7 @@ private:
   ~EiEqOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -242,6 +244,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
+#endif
 
 
 public:
@@ -281,6 +284,7 @@ private:
   ~EiNeqOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -290,6 +294,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
+#endif
 
 
 public:
@@ -329,6 +334,7 @@ private:
   ~EiCaseEqOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -338,6 +344,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
+#endif
 
 
 public:
@@ -377,6 +384,7 @@ private:
   ~EiCaseNeqOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -386,6 +394,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
+#endif
 
 
 public:
@@ -425,6 +434,7 @@ private:
   ~EiGtOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -434,6 +444,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
+#endif
 
 
 public:
@@ -473,6 +484,7 @@ private:
   ~EiGeOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -482,6 +494,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
+#endif
 
 
 public:
@@ -521,6 +534,7 @@ private:
   ~EiLtOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -530,6 +544,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
+#endif
 
 
 public:
@@ -569,6 +584,7 @@ private:
   ~EiLeOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -578,7 +594,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -627,6 +643,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -642,6 +659,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
+#endif
 
 
 public:
@@ -683,6 +701,7 @@ private:
   ~EiLogAndOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -692,7 +711,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -731,6 +750,7 @@ private:
   ~EiLogOrOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -740,7 +760,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -789,6 +809,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -803,7 +824,7 @@ public:
   virtual
   double
   eval_real() const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -853,6 +874,7 @@ private:
   ~EiBitAndOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -863,7 +885,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -902,6 +924,7 @@ private:
   ~EiBitOrOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -912,7 +935,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -951,6 +974,7 @@ private:
   ~EiBitXorOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -961,7 +985,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1000,6 +1024,7 @@ private:
   ~EiBitXnorOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1010,7 +1035,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1059,6 +1084,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -1068,7 +1094,7 @@ public:
   virtual
   tVpiScalarVal
   eval_logic() const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1118,6 +1144,7 @@ private:
   ~EiAddOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1140,7 +1167,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1179,6 +1206,7 @@ private:
   ~EiSubOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1201,7 +1229,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1240,6 +1268,7 @@ private:
   ~EiMultOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1262,7 +1291,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1301,6 +1330,7 @@ private:
   ~EiDivOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1323,7 +1353,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1362,6 +1392,7 @@ private:
   ~EiModOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1384,7 +1415,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1433,6 +1464,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -1453,7 +1485,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1524,6 +1556,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -1538,7 +1571,7 @@ public:
   virtual
   double
   eval_real() const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1588,6 +1621,7 @@ private:
   ~EiLShiftOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1598,7 +1632,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1637,6 +1671,7 @@ private:
   ~EiRShiftOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1647,7 +1682,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1686,6 +1721,7 @@ private:
   ~EiArithLShiftOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1696,7 +1732,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1735,6 +1771,7 @@ private:
   ~EiArithRShiftOp();
 
 
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
@@ -1745,7 +1782,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////

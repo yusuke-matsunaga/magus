@@ -259,6 +259,7 @@ EiWhileStmt::type() const
   return kVpiWhile;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiWhileStmt::func_exec(bool constant_function) const
@@ -271,7 +272,7 @@ EiWhileStmt::func_exec(bool constant_function) const
   }
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiRepeatStmt
@@ -304,6 +305,7 @@ EiRepeatStmt::type() const
   return kVpiRepeat;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiRepeatStmt::func_exec(bool constant_function) const
@@ -321,7 +323,7 @@ EiRepeatStmt::func_exec(bool constant_function) const
   }
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiWaitStmt
@@ -354,6 +356,7 @@ EiWaitStmt::type() const
   return kVpiWait;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -362,7 +365,7 @@ EiWaitStmt::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiForStmt
@@ -415,6 +418,7 @@ EiForStmt::inc_stmt() const
   return mIncStmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiForStmt::func_exec(bool constant_function) const
@@ -435,7 +439,7 @@ EiForStmt::func_exec(bool constant_function) const
   }
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiForeverStmt
@@ -474,6 +478,7 @@ EiForeverStmt::body_stmt() const
   return mBodyStmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiForeverStmt::func_exec(bool constant_function) const
@@ -486,7 +491,7 @@ EiForeverStmt::func_exec(bool constant_function) const
   }
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス IfStmt
@@ -535,6 +540,7 @@ EiIfStmt::body_stmt() const
   return mBodyStmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiIfStmt::func_exec(bool constant_function) const
@@ -544,6 +550,7 @@ EiIfStmt::func_exec(bool constant_function) const
   }
   return NULL;
 }
+#endif
 
 ElbStmt*
 EiIfStmt::_body_stmt() const
@@ -593,6 +600,7 @@ EiIfElseStmt::else_stmt() const
   return mElseStmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiIfElseStmt::func_exec(bool constant_function) const
@@ -604,7 +612,7 @@ EiIfElseStmt::func_exec(bool constant_function) const
     return mElseStmt->func_exec(constant_function);
   }
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiCaseItem
@@ -749,6 +757,7 @@ EiCaseStmt::set_caseitem(ymuint pos,
   ci.mBodyStmt = stmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiCaseStmt::func_exec(bool constant_function) const
@@ -797,5 +806,6 @@ EiCaseStmt::func_exec(bool constant_function) const
   }
   return NULL;
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG

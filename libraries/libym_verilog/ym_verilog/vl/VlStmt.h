@@ -180,7 +180,7 @@ public:
   ///  - kVpiEvent
   /// @note 返されるオブジェクトの型は kVpiNamedEvent のはず．
   virtual
-  const VlDecl*
+  const VlExpr*
   named_event() const = 0;
 
   /// @brief 条件が成り立たなかったとき実行されるステートメントの取得

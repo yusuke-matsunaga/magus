@@ -300,6 +300,7 @@ ElbExpr::primitive_obj() const
   return NULL;
 }
 
+#if 0
 // @brief int 型の値を返す．
 bool
 ElbExpr::eval_int(int& val) const
@@ -332,6 +333,7 @@ ElbExpr::eval_time(VlTime& val) const
   }
   return false;
 }
+#endif
 
 // @brief オペランドを返す．
 // @param[in] pos 位置番号

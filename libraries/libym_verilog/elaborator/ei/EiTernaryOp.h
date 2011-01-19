@@ -162,6 +162,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -182,7 +183,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -255,6 +256,7 @@ public:
   tVpiValueType
   value_type() const;
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -275,7 +277,7 @@ public:
   void
   eval_bitvector(BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////

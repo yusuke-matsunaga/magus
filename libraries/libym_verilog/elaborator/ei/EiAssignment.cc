@@ -246,6 +246,7 @@ EiNbAssignment::control() const
   return mControl;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiNbAssignment::func_exec(bool constant_function) const
@@ -253,7 +254,7 @@ EiNbAssignment::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiAssignment
@@ -289,6 +290,7 @@ EiAssignment::is_blocking() const
   return true;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 const VlNamedObj*
 EiAssignment::func_exec(bool constant_function) const
@@ -309,6 +311,7 @@ EiAssignment::func_exec(bool constant_function) const
   }
   return NULL;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -342,6 +345,7 @@ EiAssignStmt::type() const
   return kVpiAssignStmt;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -350,7 +354,7 @@ EiAssignStmt::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiForceStmt
@@ -383,6 +387,7 @@ EiForceStmt::type() const
   return kVpiForce;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -391,7 +396,7 @@ EiForceStmt::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiDeassignBase
@@ -471,6 +476,7 @@ EiDeassignStmt::type() const
   return kVpiDeassign;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -479,7 +485,7 @@ EiDeassignStmt::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiReleaseStmt
@@ -510,6 +516,7 @@ EiReleaseStmt::type() const
   return kVpiRelease;
 }
 
+#if 0
 // @brief function 中の実行を行う．
 // @note このクラスは function 中では使えない．
 const VlNamedObj*
@@ -518,5 +525,6 @@ EiReleaseStmt::func_exec(bool constant_function) const
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG

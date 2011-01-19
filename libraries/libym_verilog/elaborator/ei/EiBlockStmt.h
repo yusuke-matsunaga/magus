@@ -130,10 +130,12 @@ public:
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief function 中の実行を行う．
   virtual
   const VlNamedObj*
   func_exec(bool constant_function) const;
+#endif
 
 };
 
@@ -183,12 +185,13 @@ public:
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief function 中の実行を行う．
   /// @note このクラスは function 中では使えないのでエラーとなる．
   virtual
   const VlNamedObj*
   func_exec(bool constant_function) const;
-
+#endif
 };
 
 
@@ -324,11 +327,12 @@ public:
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief function 中の実行を行う．
   virtual
   const VlNamedObj*
   func_exec(bool constant_function) const;
-
+#endif
 };
 
 
@@ -375,12 +379,13 @@ public:
   // VlStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief function 中の実行を行う．
   /// @note このクラスは function 中では使えない．
   virtual
   const VlNamedObj*
   func_exec(bool constant_function) const;
-
+#endif
 };
 
 END_NAMESPACE_YM_VERILOG

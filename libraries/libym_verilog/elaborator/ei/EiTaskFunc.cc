@@ -577,6 +577,7 @@ EiFunction::eval_bitvector(const vector<ElbExpr*>& arg_list,
 void
 EiFunction::evaluate(const vector<ElbExpr*>& arg_list) const
 {
+#if 0
   assert_cond(arg_list.size() == io_num(), __FILE__, __LINE__);
   ymuint n = arg_list.size();
   for (ymuint i = 0; i < n; ++ i) {
@@ -596,6 +597,7 @@ EiFunction::evaluate(const vector<ElbExpr*>& arg_list) const
     }
   }
   _stmt()->func_exec(true);
+#endif
 }
 
 
