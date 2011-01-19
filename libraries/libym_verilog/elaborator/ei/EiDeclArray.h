@@ -173,22 +173,47 @@ public:
   const VlDelay*
   delay() const;
 
+  /// @brief 配列型オブジェクトの時に true を返す．
+  virtual
+  bool
+  is_array() const;
+
+  /// @brief 多次元の配列型オブジェクトの時に true を返す．
+  virtual
+  bool
+  is_multi_array() const;
+
   /// @brief 配列型オブジェクトの場合の次元数の取得
   virtual
   ymuint
-  dimension_list_size() const;
+  dimension() const;
 
   /// @brief 範囲の取得
-  /// @param[in] pos 位置 (0 <= pos < dimension_list_size())
+  /// @param[in] pos 位置 ( 0 <= pos < dimension() )
   virtual
   const VlRange*
   range(ymuint pos) const;
 
-  /// @brief 配列要素の時に true を返す．
-  /// @note このクラスでは false を返す．
+  /// @brief 配列の要素数の取得
   virtual
-  bool
-  is_array_member() const;
+  ymuint
+  array_size() const;
+
+  /// @brief 1次元配列の場合にインデックスからオフセットを計算する．
+  /// @param[in] index インデックス
+  /// @return index に対するオフセット値を返す．
+  /// @note index が範囲外の場合には -1 を返す．
+  virtual
+  int
+  array_offset(int index) const;
+
+  /// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
+  /// @param[in] index_list インデックスのリスト
+  /// @return index_list に対するオフセット値を返す．
+  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+  virtual
+  int
+  array_offset(const vector<int>& index_list) const;
 
 
 public:

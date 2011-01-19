@@ -218,24 +218,6 @@ public:
   const VlExpr*
   right_range() const;
 
-  /// @brief ビット要素を返す．
-  /// @param[in] index インデックス
-  /// @retval ビット要素 index が範囲内の場合
-  /// @retval NULL index が範囲外の場合．またはビット展開されていない場合
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlDecl*
-  elem_by_index(int index) const;
-
-  /// @brief ビット要素を返す．
-  /// @param[in] offset オフセット
-  /// @retval ビット要素 offset が範囲内の場合
-  /// @retval NULL offset が範囲外の場合．またはビット展開されていない場合
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlDecl*
-  elem_by_offset(ymuint offset) const;
-
   /// @brief 初期値の取得
   /// @retval 初期値
   /// @retval NULL 設定がない場合
@@ -273,31 +255,26 @@ public:
   const VlRange*
   range(ymuint pos) const;
 
-  /// @brief 配列要素の時に true を返す．
+  /// @brief 配列の要素数の取得
   virtual
-  bool
-  is_array_member() const;
+  ymuint
+  array_size() const;
 
-  /// @brief 多次元の配列要素の時に true を返す．
+  /// @brief 1次元配列の場合にインデックスからオフセットを計算する．
+  /// @param[in] index インデックス
+  /// @return index に対するオフセット値を返す．
+  /// @note index が範囲外の場合には -1 を返す．
   virtual
-  bool
-  is_multi_array_member() const;
+  int
+  array_offset(int index) const;
 
-  /// @brief 配列要素の時に親の配列を返す．
+  /// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
+  /// @param[in] index_list インデックスのリスト
+  /// @return index_list に対するオフセット値を返す．
+  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
   virtual
-  VlDecl*
-  parent_array() const;
-
-  /// @brief 1次元配列要素の時にインデックスを返す．
-  virtual
-  const VlExpr*
-  index() const;
-
-  /// @brief 多次元配列要素の時にインデックスのリストを返す．
-  /// @param[out] index_list インデックスのリストを格納する変数
-  virtual
-  void
-  index(vector<const VlExpr*>& index_list) const;
+  int
+  array_offset(const vector<int>& index_list) const;
 
 
 public:

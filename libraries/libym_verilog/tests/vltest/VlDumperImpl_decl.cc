@@ -151,9 +151,6 @@ VlDumperImpl::put_decl(const char* label,
 
   put("vpiArray", decl->is_array());
   put("vpiMultiArray", decl->is_multi_array());
-  if ( decl->is_array_member() ) {
-    put("vpiParent", decl->parent_array()->full_name());
-  }
 
   if ( decl->is_array() ) {
     ymuint n = decl->dimension();
@@ -175,17 +172,6 @@ VlDumperImpl::put_decl(const char* label,
 #else
 #warning "TODO: Reg の expr"
 #endif
-  }
-
-  if ( decl->is_multi_array_member() ) {
-    vector<const VlExpr*> index_list;
-    decl->index(index_list);
-    for (ymuint i = 0; i < index_list.size(); ++ i) {
-      put("vpiIndex", index_list[i]);
-    }
-  }
-  else if ( decl->is_array_member() ) {
-    put("vpiIndex", decl->index());
   }
 
   if ( decl->type() == kVpiReg ||

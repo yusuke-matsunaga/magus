@@ -284,28 +284,59 @@ EiDeclArray::delay() const
   return mHead->delay();
 }
 
-// @brief dimension list のサイズの取得
-// @return dimension list のサイズ
+// @brief 配列型オブジェクトの時に true を返す．
+bool
+EiDeclArray::is_array() const
+{
+  return true;
+}
+
+// @brief 多次元の配列型オブジェクトの時に true を返す．
+bool
+EiDeclArray::is_multi_array() const
+{
+  return dimension() > 1;
+}
+
+// @brief 配列型オブジェクトの場合の次元数の取得
 ymuint
-EiDeclArray::dimension_list_size() const
+EiDeclArray::dimension() const
 {
   return mRangeList.size();
 }
 
 // @brief 範囲の取得
-// @param[in] pos 位置 (0 <= pos < dimension_list_size())
+// @param[in] pos 位置 ( 0 <= pos < dimension() )
 const VlRange*
 EiDeclArray::range(ymuint pos) const
 {
   return mRangeList.range(pos);
 }
 
-// @brief 配列要素の時に true を返す．
-// @note このクラスでは false を返す．
-bool
-EiDeclArray::is_array_member() const
+// @brief 配列の要素数の取得
+ymuint
+EiDeclArray::array_size() const
 {
-  return false;
+  return mRangeList.elem_size();
+}
+
+// @brief 1次元配列の場合にインデックスからオフセットを計算する．
+// @param[in] index インデックス
+// @return index に対するオフセット値を返す．
+// @note index が範囲外の場合には -1 を返す．
+int
+EiDeclArray::array_offset(int index) const
+{
+}
+
+// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
+// @param[in] index_list インデックスのリスト
+// @return index_list に対するオフセット値を返す．
+// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+int
+EiDeclArray::array_offset(const vector<int>& index_list) const
+{
+  return mRangeList.offset(index_list);
 }
 
 // @brief 範囲のMSBの取得

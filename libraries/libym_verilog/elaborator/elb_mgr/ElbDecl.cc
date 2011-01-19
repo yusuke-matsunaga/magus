@@ -195,28 +195,6 @@ ElbDeclBase::right_range() const
   return _right_range();
 }
 
-// @brief ビット要素を返す．
-// @param[in] index インデックス
-// @retval ビット要素 index が範囲内の場合
-// @retval NULL index が範囲外の場合．またはビット展開されていない場合
-// @note このクラスでは NULL を返す．
-const VlDecl*
-ElbDeclBase::elem_by_index(int index) const
-{
-  return NULL;
-}
-
-// @brief ビット要素を返す．
-// @param[in] offset オフセット
-// @retval ビット要素 offset が範囲内の場合
-// @retval NULL offset が範囲外の場合．またはビット展開されていない場合
-// @note このクラスでは NULL を返す．
-const VlDecl*
-ElbDeclBase::elem_by_offset(ymuint offset) const
-{
-  return NULL;
-}
-
 // @brief 初期値の取得
 // @retval 初期値
 // @retval NULL 設定がない場合
@@ -266,40 +244,31 @@ ElbDeclBase::range(ymuint pos) const
   return NULL;
 }
 
-// @brief 配列要素の時に true を返す．
-bool
-ElbDeclBase::is_array_member() const
+// @brief 配列の要素数の取得
+ymuint
+ElbDeclBase::array_size() const
 {
-  return false;
+  return 0;
 }
 
-// @brief 多次元の配列要素の時に true を返す．
-bool
-ElbDeclBase::is_multi_array_member() const
+// @brief 1次元配列の場合にインデックスからオフセットを計算する．
+// @param[in] index インデックス
+// @return index に対するオフセット値を返す．
+// @note index が範囲外の場合には -1 を返す．
+int
+ElbDeclBase::array_offset(int index) const
 {
-  return false;
+  return -1;
 }
 
-// @brief 配列要素の時に親の配列を返す．
-VlDecl*
-ElbDeclBase::parent_array() const
+// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
+// @param[in] index_list インデックスのリスト
+// @return index_list に対するオフセット値を返す．
+// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+int
+ElbDeclBase::array_offset(const vector<int>& index_list) const
 {
-  return NULL;
-}
-
-// @brief 1次元配列要素の時にインデックスを返す．
-const VlExpr*
-ElbDeclBase::index() const
-{
-  return NULL;
-}
-
-// @brief 多次元配列要素の時にインデックスのリストを返す．
-// @param[out] index_list インデックスのリストを格納する変数
-void
-ElbDeclBase::index(vector<const VlExpr*>& index_list) const
-{
-  index_list.clear();
+  return -1;
 }
 
 

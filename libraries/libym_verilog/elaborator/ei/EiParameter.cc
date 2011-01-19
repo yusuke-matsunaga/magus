@@ -519,17 +519,6 @@ EiParameter::_right_range() const
   return mHead->right_range();
 }
 
-#if 0
-// @brief int 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return 整数値に変換できたら true を返す．
-bool
-EiParameter::eval_int(int& val) const
-{
-  return mExpr->eval_int(val);
-}
-#endif
-
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiParameter::get_scalar() const
@@ -544,33 +533,12 @@ EiParameter::get_logic() const
   return mExpr->eval_logic();
 }
 
-#if 0
-// @brief 論理値を返す．
-bool
-EiParameter::eval_bool() const
-{
-  return mExpr->eval_bool();
-}
-#endif
-
 // @brief real 型の値を返す．
 double
 EiParameter::get_real() const
 {
   return mExpr->eval_real();
 }
-
-#if 0
-// @brief VlTime 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return VlTime 値に変換できたら true を返す．
-// @note eval_bitvector() の結果から変換する．
-bool
-EiParameter::eval_time(VlTime& val) const
-{
-  return mExpr->eval_time(val);
-}
-#endif
 
 // @brief bitvector 型の値を返す．
 void

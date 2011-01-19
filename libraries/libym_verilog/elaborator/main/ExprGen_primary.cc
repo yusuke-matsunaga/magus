@@ -489,7 +489,7 @@ ExprGen::check_decl(const ElbEnv& env,
 
   if ( env.is_pca_lhs() ) {
     // procedural continuous assignment 文の左辺式
-    if ( decl->is_array_member() ) {
+    if ( decl->is_array() ) {
       // 配列要素はダメ
       error_array_in_pca(pt_expr);
       return false;
@@ -510,7 +510,7 @@ ExprGen::check_decl(const ElbEnv& env,
   }
   else if ( env.is_force_lhs() ) {
     // force 文の左辺式
-    if ( decl->is_array_member() ) {
+    if ( decl->is_array() ) {
       // 配列要素はダメ
       error_array_in_force(pt_expr);
       return false;

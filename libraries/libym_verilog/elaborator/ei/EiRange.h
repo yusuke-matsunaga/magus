@@ -368,22 +368,29 @@ public:
   ymuint
   size() const;
 
-  /// @brief pos 番めの範囲を返す．
-  /// @param[in] pos 位置番号
-  EiRange*
-  range(ymuint pos) const;
-
   /// @brief 要素数を計算する
   /// @return サイズを返す．
   ymuint
   elem_size() const;
 
-  /// @brief アドレス(オフセット)からインデックスの配列を作る．
+  /// @brief pos 番めの範囲を返す．
+  /// @param[in] pos 位置番号
+  EiRange*
+  range(ymuint pos) const;
+
+  /// @brief アドレス(オフセット)からインデックスのリストを作る．
   /// @param[in] offset オフセット
-  /// @param[out] index_array
+  /// @param[out] index_list インデックスのリスト
   void
   index(ymuint offset,
-	vector<int>& index_array) const;
+	vector<int>& index_list) const;
+
+  /// @brief インデックスのリストからオフセットを得る．
+  /// @param[in] index_list インデックスのリスト
+  /// @return index_list の値に対応したオフセット値
+  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+  int
+  offset(const vector<int>& index_list) const;
 
 
 private:
@@ -396,6 +403,9 @@ private:
 
   // 範囲の配列
   EiRange* mArray;
+
+  // 要素数
+  ymuint32 mElemSize;
 
 };
 
@@ -514,6 +524,15 @@ ymuint
 EiRangeArray::size() const
 {
   return mDimSize;
+}
+
+// @brief 要素数を計算する
+// @return サイズを返す．
+inline
+ymuint
+EiRangeArray::elem_size() const
+{
+  return mElemSize;
 }
 
 // @brief pos 番めの範囲を返す．

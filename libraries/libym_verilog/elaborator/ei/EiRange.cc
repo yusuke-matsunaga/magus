@@ -272,6 +272,11 @@ EiRangeArray::EiRangeArray(ymuint dim_size,
   mDimSize(dim_size),
   mArray(array)
 {
+  // 要素数を計算する．
+  mElemSize = 1;
+  for (ymuint i = 0; i < dim_size; ++ i) {
+    mElemSize *= array[i].size();
+  }
 }
 
 // デストラクタ
@@ -279,65 +284,45 @@ EiRangeArray::~EiRangeArray()
 {
 }
 
-// @brief 要素数を計算する
-// @return サイズを返す．
-ymuint
-EiRangeArray::elem_size() const
-{
-  // 各次元の要素数をかければよい
-  ymuint ans = 1;
-  ymuint n = size();
-  for (ymuint i = 0; i < n; ++ i) {
-    ans *= range(i)->size();
-  }
-  return ans;
-}
-
 // @brief アドレス(オフセット)からインデックスの配列を作る．
 // @param[in] offset オフセット
-// @param[out] index_array
+// @param[out] index_list
 void
 EiRangeArray::index(ymuint offset,
-		    vector<int>& index_array) const
+		    vector<int>& index_list) const
 {
   ymuint n = size();
-  index_array.resize(n);
+  index_list.resize(n);
   for (ymuint i = n; i -- > 0; ) {
     const EiRange* r = range(i);
     int k = r->size();
     int offset1 = offset % k;
     offset /= k;
-    index_array[i] = r->rindex(offset1);
+    index_list[i] = r->rindex(offset1);
   }
 }
 
-#if 0
-// @brief インデックスからオフセットを得る
-ymuint
-EiRangeArray::offset(const vector<int>& index_array) const
+// @brief インデックスのリストからオフセットを得る．
+// @param[in] index_list インデックスのリスト
+// @return index_list の値に対応したオフセット値
+// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+int
+EiRangeArray::offset(const vector<int>& index_list) const
 {
   ymuint n = size();
-  if ( index_array.size() != n ) {
-#if 0
-    error_header(__FILE__, __LINE__, "RUN", FileRegion())
-      << "dimension mismatch between range array and index array"
-      << eom;
-#else
-#warning "TODO: どう処理するのがよいのか考える．"
-#endif
-    return 0;
+  if ( index_list.size() != n ) {
+    return -1;
   }
 
-  ymuint offset = 0;
+  int offset = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const EiRange* r = range(i);
     int k = r->size();
     offset *= k;
-    int offset1 = r->roffset(index_array[i]);
+    int offset1 = r->roffset(index_list[i]);
     offset += offset1;
   }
   return offset;
 }
-#endif
 
 END_NAMESPACE_YM_VERILOG
