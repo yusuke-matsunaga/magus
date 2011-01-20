@@ -112,17 +112,14 @@ DeclGen::instantiate_iodecl(ElbModule* module,
     const PtIOHead* pt_head = pt_head_array[i];
     tVpiAuxType def_aux_type = pt_head->aux_type();
     bool sign = pt_head->is_signed();
-
     const PtExpr* pt_left = pt_head->left_range();
     const PtExpr* pt_right = pt_head->right_range();
+    bool has_range = (pt_left != NULL) && (pt_right != NULL);
 
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
     if ( !instantiate_range(namedobj,
 			    pt_left, pt_right,
-			    left, right,
 			    left_val, right_val) ) {
       // エラーが起きたのでスキップする．
       continue;
@@ -203,16 +200,16 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 
 	// decl と型が一致しているか調べる．
 	// IEEE 1364-2001 12.3.3 Port declarations
-	ElbExpr* left2 = decl->_left_range();
-	ElbExpr* right2 = decl->_right_range();
-	if ( left2 && right2 ) {
-	  if ( left == NULL && right == NULL ) {
+	if ( decl->has_range() ) {
+	  int left_val2 = decl->left_range_val();
+	  int right_val2 = decl->right_range_val();
+	  if ( !has_range ) {
 	    // decl は範囲を持っているが IO は持っていない．
 	    // これはエラーにしなくてよいのだろうか？
 	    // たぶんコンパイルオプションで制御すべき
 	    if ( allow_empty_io_range() ) {
-	      left = left2;
-	      right = right2;
+	      left_val = left_val2;
+	      right_val = right_val2;
 	    }
 	    else {
 	      ostringstream buf;
@@ -227,13 +224,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	    }
 	  }
 	  else {
-	    int left2_val;
-	    bool stat1 = expr_to_int(left2, left2_val);
-	    assert_cond(stat1, __FILE__, __LINE__);
-	    int right2_val;
-	    bool stat2 = expr_to_int(right2, right2_val);
-	    assert_cond(stat2, __FILE__, __LINE__);
-	    if ( left_val != left2_val || right_val != right2_val ) {
+	    if ( left_val != left_val2 || right_val != right_val2 ) {
 	      ostringstream buf;
 	      buf << "Conflictive range declaration of \""
 		  << pt_item->name() << "\".";
@@ -244,14 +235,14 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 		      buf.str());
 	      cout << "IO range: [" << left_val << ":" << right_val << "]"
 		   << endl
-		   << "Decl range: [" << left2_val << ":" << right2_val << "]"
+		   << "Decl range: [" << left_val2 << ":" << right_val2 << "]"
 		   << endl;
 	      continue;
 	    }
 	  }
 	}
 	else {
-	  if ( left && right ) {
+	  if ( has_range ) {
 	    // decl は範囲を持っていないが IO は持っている．
 	    // エラーとする．
 	    ostringstream buf;
@@ -299,9 +290,9 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 
 	ElbDeclHead* head = NULL;
 	if ( module ) {
-	  if ( left && right ) {
+	  if ( has_range ) {
 	    head = factory().new_DeclHead(module, pt_head, aux_type,
-					  left, right,
+					  pt_left, pt_right,
 					  left_val, right_val);
 	  }
 	  else {
@@ -309,9 +300,9 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	  }
 	}
 	if ( taskfunc ) {
-	  if ( left && right ) {
+	  if ( has_range ) {
 	    head = factory().new_DeclHead(taskfunc, pt_head, aux_type,
-					  left, right,
+					  pt_left, pt_right,
 					  left_val, right_val);
 	  }
 	  else {
@@ -445,17 +436,14 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
   const PtExpr* pt_left = pt_head->left_range();
   const PtExpr* pt_right = pt_head->right_range();
   if ( pt_left && pt_right ) {
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
     if ( !instantiate_range(parent, pt_left, pt_right,
-			    left, right,
 			    left_val, right_val) ) {
       return;
     }
     param_head = factory().new_ParamHead(module, pt_head,
-					 left, right,
+					 pt_left, pt_right,
 					 left_val, right_val);
   }
   else {
@@ -516,17 +504,14 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
 
   ElbDeclHead* net_head = NULL;
   if ( pt_left && pt_right ) {
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
     if ( !instantiate_range(parent, pt_left, pt_right,
-			    left, right,
 			    left_val, right_val) ) {
       return;
     }
     net_head = factory().new_DeclHead(parent, pt_head,
-				      left, right,
+				      pt_left, pt_right,
 				      left_val, right_val,
 				      has_delay);
   }
@@ -651,17 +636,14 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
 
   ElbDeclHead* reg_head = NULL;
   if ( pt_left && pt_right ) {
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
     if ( !instantiate_range(parent, pt_left, pt_right,
-			    left, right,
 			    left_val, right_val) ) {
       return;
     }
     reg_head = factory().new_DeclHead(parent, pt_head,
-				      left, right,
+				      pt_left, pt_right,
 				      left_val, right_val);
   }
   else {
@@ -896,17 +878,15 @@ DeclGen::instantiate_dimension_list(const VlNamedObj*  parent,
     const PtRange* pt_range = pt_item->range(i);
     const PtExpr* pt_left = pt_range->left();
     const PtExpr* pt_right = pt_range->right();
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
     if ( !instantiate_range(parent, pt_left, pt_right,
-			    left, right,
 			    left_val, right_val) ) {
       ok = false;
       break;
     }
-    range_src.push_back(ElbRangeSrc(pt_range, left, right,
+    range_src.push_back(ElbRangeSrc(pt_range,
+				    pt_left, pt_right,
 				    left_val, right_val));
   }
 

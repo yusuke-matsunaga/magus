@@ -311,7 +311,7 @@ ItemGen::phase1_genif(const VlNamedObj* parent,
 		      const PtItem* pt_genif)
 {
   bool cond;
-  if ( !evaluate_expr_bool(parent, pt_genif->expr(), cond) ) {
+  if ( !evaluate_bool(parent, pt_genif->expr(), cond) ) {
     return;
   }
   if ( cond ) {
@@ -334,7 +334,7 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
 			const PtItem* pt_gencase)
 {
   BitVector val;
-  if ( !evaluate_expr_bitvector(parent, pt_gencase->expr(), val) ) {
+  if ( !evaluate_bitvector(parent, pt_gencase->expr(), val) ) {
     return;
   }
 
@@ -347,7 +347,7 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
     for (ymuint i = 0; i < n; ++ i) {
       const PtExpr* pt_expr = pt_caseitem->label(i);
       BitVector label_val;
-      if ( !evaluate_expr_bitvector(parent, pt_expr, label_val) ) {
+      if ( !evaluate_bitvector(parent, pt_expr, label_val) ) {
 	continue;
       }
       if ( label_val == val ) {
@@ -424,7 +424,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
 
   {
     int val;
-    if ( !evaluate_expr_int(parent, pt_genfor->init_expr(), val) ) {
+    if ( !evaluate_int(parent, pt_genfor->init_expr(), val) ) {
       return;
     }
     if ( val < 0 ) {
@@ -442,7 +442,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
   for ( ; ; ) {
     // 終了条件のチェック
     bool val;
-    if ( !evaluate_expr_bool(parent, pt_genfor->expr(), val) ) {
+    if ( !evaluate_bool(parent, pt_genfor->expr(), val) ) {
       break;
     }
     if ( !val ) {
@@ -466,7 +466,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
     // genvar の増加分の処理．
     {
       int val;
-      if ( !evaluate_expr_int(parent, pt_genfor->next_expr(), val) ) {
+      if ( !evaluate_int(parent, pt_genfor->next_expr(), val) ) {
 	break;
       }
       if ( val < 0 ) {

@@ -11,7 +11,6 @@ CLEANFILES =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	VlArrayObj.h \
 	VlAttribute.h \
 	VlContAssign.h \
 	VlControl.h \

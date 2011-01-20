@@ -28,29 +28,29 @@ public:
 
   /// @brief コンストラクタ
   ElbRangeSrc(const PtRange* pt_range,
-	      ElbExpr* left,
-	      ElbExpr* right,
+	      const PtExpr* left,
+	      const PtExpr* right,
 	      int left_val,
 	      int right_val);
 
   /// @brief デストラクタ
   ~ElbRangeSrc();
-  
+
 
 public:
 
   /// @brief パース木の範囲定義を返す．
   const PtRange*
   pt_range() const;
-  
+
   /// @brief 範囲の MSB の式を返す．
-  ElbExpr*
+  const PtExpr*
   left_range() const;
 
   /// @brief 範囲の LSB の式を返す．
-  ElbExpr*
+  const PtExpr*
   right_range() const;
-  
+
   /// @brief 範囲の MSB の値を返す．
   int
   left_range_val() const;
@@ -58,8 +58,8 @@ public:
   /// @brief 範囲の LSB の値を返す．
   int
   right_range_val() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -69,17 +69,17 @@ private:
   const PtRange* mPtRange;
 
   // 範囲の MSB の式
-  ElbExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲の LSB の式
-  ElbExpr* mRightRange;
-  
+  const PtExpr* mRightRange;
+
   // 範囲の MSB
   int mLeftVal;
 
   // 範囲の LSB
   int mRightVal;
-  
+
 };
 
 
@@ -92,14 +92,14 @@ class ElbRange :
   public VlRange
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbRange() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbRange() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ public:
   virtual
   void
   set(const ElbRangeSrc& src) = 0;
-  
+
 };
 
 
@@ -122,8 +122,8 @@ public:
 // @brief コンストラクタ
 inline
 ElbRangeSrc::ElbRangeSrc(const PtRange* pt_range,
-			 ElbExpr* left,
-			 ElbExpr* right,
+			 const PtExpr* left,
+			 const PtExpr* right,
 			 int left_val,
 			 int right_val) :
   mPtRange(pt_range),
@@ -147,10 +147,10 @@ ElbRangeSrc::pt_range() const
 {
   return mPtRange;
 }
-  
+
 // @brief 範囲の MSB の式を返す．
 inline
-ElbExpr*
+const PtExpr*
 ElbRangeSrc::left_range() const
 {
   return mLeftRange;
@@ -158,12 +158,12 @@ ElbRangeSrc::left_range() const
 
 // @brief 範囲の LSB の式を返す．
 inline
-ElbExpr*
+const PtExpr*
 ElbRangeSrc::right_range() const
 {
   return mRightRange;
 }
-  
+
 // @brief 範囲の MSB の値を返す．
 inline
 int

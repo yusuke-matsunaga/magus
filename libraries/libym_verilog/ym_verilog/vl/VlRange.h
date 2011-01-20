@@ -42,29 +42,29 @@ public:
   ymuint
   size() const = 0;
 
-  /// @brief MSB を返す．
-  virtual
-  const VlExpr*
-  left_range() const = 0;
-
-  /// @brief LSB を返す．
-  virtual
-  const VlExpr*
-  right_range() const = 0;
-
   /// @brief MSB の値を返す．
   /// @retval MSB の値 値が確定しているとき
   /// @retval -1 値が確定していない
   virtual
   int
-  left_range_const() const = 0;
+  left_range_val() const = 0;
 
   /// @brief LSB の値を返す．
   /// @retval LSB の値 値が確定しているとき
   /// @retval -1 値が確定していない
   virtual
   int
-  right_range_const() const = 0;
+  right_range_val() const = 0;
+
+  /// @brief MSB を表す文字列を返す．
+  virtual
+  string
+  left_range_string() const = 0;
+
+  /// @brief LSB を表す文字列を返す．
+  virtual
+  string
+  right_range_string() const = 0;
 
   /// @brief 範囲のチェック
   /// @param[in] index インデックス

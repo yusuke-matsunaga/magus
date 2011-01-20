@@ -64,18 +64,15 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
     const PtExpr* pt_right = pt_item->right_range();
 
     if ( pt_left && pt_right ) {
-      ElbExpr* left = NULL;
-      ElbExpr* right = NULL;
       int left_val = 0;
       int right_val = 0;
       if ( !instantiate_range(parent,
 			      pt_left, pt_right,
-			      left, right,
 			      left_val, right_val) ) {
 	return;
       }
       taskfunc = factory().new_Function(parent,	pt_item,
-					left, right,
+					pt_left, pt_right,
 					left_val, right_val);
     }
     else {
@@ -139,14 +136,12 @@ ItemGen::phase2_tf(ElbTaskFunc* taskfunc,
 
   if ( taskfunc->type() == kVpiFunction ) {
     // 関数名と同名の変数の生成
-    ElbExpr* left = taskfunc->_left_range();
-    ElbExpr* right = taskfunc->_right_range();
-    int left_val = taskfunc->left_range_const();
-    int right_val = taskfunc->right_range_const();
+    int left_val = taskfunc->left_range_val();
+    int right_val = taskfunc->right_range_val();
     ElbDeclHead* head = NULL;
-    if ( left && right ) {
+    if ( taskfunc->has_range() ) {
       head = factory().new_DeclHead(taskfunc, pt_item,
-				    left, right,
+				    pt_item->left_range(), pt_item->right_range(),
 				    left_val, right_val);
     }
     else {
@@ -227,20 +222,17 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   ElbTaskFunc* func = NULL;
   ElbDeclHead* head = NULL;
   if ( pt_left && pt_right ) {
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
     if ( !instantiate_range(parent, pt_left, pt_right,
-			    left, right,
 			    left_val, right_val) ) {
       return NULL;
     }
     func = factory().new_Function(parent, pt_function,
-				  left, right,
+				  pt_left, pt_right,
 				  left_val, right_val);
     head = factory().new_DeclHead(func, pt_function,
-				  left, right,
+				  pt_left, pt_right,
 				  left_val, right_val);
   }
   else {

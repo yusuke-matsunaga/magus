@@ -19,6 +19,7 @@ noinst_HEADERS = \
 	Parser.h \
 	PtDumper.h \
 	PtMgr.h \
+	PtiExpr.h \
 	PtiFwd.h \
 	PtiFactory.h \
 	PtiDecl.h \

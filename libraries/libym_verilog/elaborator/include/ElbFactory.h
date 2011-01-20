@@ -114,8 +114,8 @@ public:
 		  const PtModule* pt_module,
 		  const PtItem* pt_head,
 		  const PtInst* pt_inst,
-		  ElbExpr* left,
-		  ElbExpr* right,
+		  const PtExpr* left,
+		  const PtExpr* right,
 		  int left_val,
 		  int right_val) = 0;
 
@@ -165,8 +165,8 @@ public:
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtDeclHead* pt_head,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val,
 	       bool has_delay = false) = 0;
@@ -194,8 +194,8 @@ public:
   new_DeclHead(const VlNamedObj* parent,
 	       const PtIOHead* pt_head,
 	       tVpiAuxType aux_type,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val) = 0;
 
@@ -218,8 +218,8 @@ public:
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtItem* pt_item,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val) = 0;
 
@@ -287,8 +287,8 @@ public:
   ElbParamHead*
   new_ParamHead(const VlNamedObj* parent,
 		const PtDeclHead* pt_head,
-		ElbExpr* left,
-		ElbExpr* right,
+		const PtExpr* left,
+		const PtExpr* right,
 		int left_val,
 		int right_val) = 0;
 
@@ -416,8 +416,8 @@ public:
   ElbPrimArray*
   new_PrimitiveArray(ElbPrimHead* head,
 		     const PtInst* pt_inst,
-		     ElbExpr* left,
-		     ElbExpr* right,
+		     const PtExpr* left,
+		     const PtExpr* right,
 		     int left_val,
 		     int right_val) = 0;
 
@@ -440,8 +440,8 @@ public:
   ElbTaskFunc*
   new_Function(const VlNamedObj* parent,
 	       const PtItem* pt_item,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val) = 0;
 
@@ -888,6 +888,18 @@ public:
 
   /// @brief ビット選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] bit_index ビット選択式
+  /// @param[in] bit_index_val ビット選択式の値
+  virtual
+  ElbExpr*
+  new_BitSelect(const PtBase* pt_expr,
+		ElbDecl* obj,
+		const PtExpr* bit_index,
+		int bit_index_val) = 0;
+
+  /// @brief ビット選択式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] expr 本体の式
   /// @param[in] bit_index ビット選択式
   virtual
@@ -905,8 +917,8 @@ public:
   ElbExpr*
   new_PartSelect(const PtBase* pt_expr,
 		 ElbDecl* obj,
-		 ElbExpr* index1,
-		 ElbExpr* index2,
+		 const PtExpr* index1,
+		 const PtExpr* index2,
 		 int index1_val,
 		 int index2_val) = 0;
 

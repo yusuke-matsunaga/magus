@@ -303,9 +303,9 @@ ExprGen::instantiate_lhs_sub(const VlNamedObj* parent,
 // @note 定数でなければエラーメッセージを出力し false を返す．
 // @brief PtExpr から expression を生成し int 値を返す．
 bool
-ExprGen::evaluate_expr_int(const VlNamedObj* parent,
-			   const PtExpr* pt_expr,
-			   int& value)
+ExprGen::evaluate_int(const VlNamedObj* parent,
+		      const PtExpr* pt_expr,
+		      int& value)
 {
   ElbValue val = evaluate_expr(parent, pt_expr);
   val.to_int();
@@ -322,15 +322,33 @@ ExprGen::evaluate_expr_int(const VlNamedObj* parent,
   return true;
 }
 
+// @brief PtExpr を評価しスカラー値を返す．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+// @param[out] value 評価値を格納する変数
+// @note 定数でなければエラーメッセージを出力し false を返す．
+bool
+ExprGen::evaluate_scalar(const VlNamedObj* parent,
+			 const PtExpr* pt_expr,
+			 tVpiScalarVal& value)
+{
+  ElbValue val = evaluate_expr(parent, pt_expr);
+  val.to_scalar();
+  assert_cond( !val.is_error(), __FILE__, __LINE__);
+
+  value = val.scalar_value();
+  return true;
+}
+
 // @brief PtExpr を評価し bool 値を返す．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ExprGen::evaluate_expr_bool(const VlNamedObj* parent,
-			    const PtExpr* pt_expr,
-			    bool& value)
+ExprGen::evaluate_bool(const VlNamedObj* parent,
+		       const PtExpr* pt_expr,
+		       bool& value)
 {
   ElbValue val = evaluate_expr(parent, pt_expr);
   val.to_logic();
@@ -351,9 +369,9 @@ ExprGen::evaluate_expr_bool(const VlNamedObj* parent,
 // @param[out] value 評価値を格納する変数
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ExprGen::evaluate_expr_bitvector(const VlNamedObj* parent,
-				 const PtExpr* pt_expr,
-				 BitVector& value)
+ExprGen::evaluate_bitvector(const VlNamedObj* parent,
+			    const PtExpr* pt_expr,
+			    BitVector& value)
 {
   ElbValue val = evaluate_expr(parent, pt_expr);
   val.to_bitvector();

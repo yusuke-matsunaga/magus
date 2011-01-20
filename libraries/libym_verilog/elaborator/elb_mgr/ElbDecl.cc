@@ -30,52 +30,6 @@ ElbDeclHead::~ElbDeclHead()
 {
 }
 
-// @brief 符号の取得
-// @retval true 符号つき
-// @retval false 符号なし
-// @note このクラスでは false を返す．
-bool
-ElbDeclHead::is_signed() const
-{
-  return false;
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-ElbDeclHead::left_range() const
-{
-  return NULL;
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-ElbDeclHead::right_range() const
-{
-  return NULL;
-}
-
-// @brief MSB の値を返す．
-// @note このクラスでは -1 を返す．
-int
-ElbDeclHead::left_range_const() const
-{
-  return -1;
-}
-
-// @brief LSB の値を返す．
-// @note このクラスでは -1 を返す．
-int
-ElbDeclHead::right_range_const() const
-{
-  return -1;
-}
-
 // @brief データ型の取得
 // @retval データ型 kParam, kLocalParam, kVar の場合
 // @retval kVpiVarNone 上記以外

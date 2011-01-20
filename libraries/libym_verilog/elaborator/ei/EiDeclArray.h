@@ -101,14 +101,14 @@ public:
   /// @retval -1 範囲指定を持たないとき
   virtual
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief LSB の値を返す．
   /// @retval 範囲のLSBの値 範囲指定を持つとき
   /// @retval -1 範囲指定を持たないとき
   virtual
   int
-  right_range_const() const;
+  right_range_val() const;
 
   /// @brief ビット幅を返す．
   virtual

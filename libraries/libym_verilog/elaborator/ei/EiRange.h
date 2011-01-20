@@ -63,25 +63,29 @@ public:
   ymuint
   size() const;
 
-  /// @brief MSB を返す．
-  virtual
-  VlExpr*
-  left_range() const;
-
-  /// @brief LSB を返す．
-  virtual
-  VlExpr*
-  right_range() const;
-
   /// @brief MSB の値を返す．
+  /// @retval MSB の値 値が確定しているとき
+  /// @retval -1 値が確定していない
   virtual
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief LSB の値を返す．
+  /// @retval LSB の値 値が確定しているとき
+  /// @retval -1 値が確定していない
   virtual
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief MSB を表す文字列を返す．
+  virtual
+  string
+  left_range_string() const;
+
+  /// @brief LSB を表す文字列を返す．
+  virtual
+  string
+  right_range_string() const;
 
   /// @brief 範囲のチェック
   /// @param[in] index インデックス
@@ -272,21 +276,21 @@ public:
   ymuint
   size() const;
 
-  /// @brief MSB を返す．
-  ElbExpr*
-  left_range() const;
-
-  /// @brief LSB を返す．
-  ElbExpr*
-  right_range() const;
-
   /// @brief MSB の値を返す．
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief LSB の値を返す．
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief MSB を表す文字列を返す．
+  string
+  left_range_string() const;
+
+  /// @brief LSB を表す文字列を返す．
+  string
+  right_range_string() const;
 
   /// @brief 範囲のチェック
   /// @param[in] index インデックス
@@ -327,11 +331,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 範囲の MSB
-  ElbExpr* mLeftRange;
+  // 範囲の MSB を表す式
+  const PtExpr* mLeftRange;
 
-  // 範囲の LSB
-  ElbExpr* mRightRange;
+  // 範囲の LSB を表す式
+  const PtExpr* mRightRange;
 
   // MSB の値
   int mLeftVal;

@@ -40,7 +40,7 @@ public:
   const char*
   def_name() const = 0;
 
-  /// @brief UPD 定義を返す．
+  /// @brief UDP 定義を返す．
   virtual
   const VlUdpDefn*
   udp_defn() const = 0;
@@ -60,15 +60,25 @@ public:
   const VlDelay*
   delay() const = 0;
 
-  /// @brief 範囲の MSB を返す．
+  /// @brief 範囲の MSB の値を返す．
   virtual
-  const VlExpr*
-  left_range() const = 0;
+  int
+  left_range_val() const = 0;
 
-  /// @brief 範囲の LSB を返す．
+  /// @brief 範囲の LSB の値を返す．
   virtual
-  const VlExpr*
-  right_range() const = 0;
+  int
+  right_range_val() const = 0;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  virtual
+  string
+  left_range_string() const = 0;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  virtual
+  string
+  right_range_string() const = 0;
 
   /// @brief 要素数を返す．
   virtual
@@ -112,7 +122,8 @@ public:
   const char*
   def_name() const = 0;
 
-  /// @brief UPD 定義を返す．
+  /// @brief UDP 定義を返す．
+  /// @note prim_type() が kVpiSeqPrim と kVpiConbPrim の場合のみ意味を持つ．
   virtual
   const VlUdpDefn*
   udp_defn() const = 0;
@@ -138,7 +149,7 @@ public:
   port_num() const = 0;
 
   /// @brief ポート端子を得る．
-  /// @param[in] pos 位置番号 (0 <= pos < port_num())
+  /// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
   virtual
   const VlPrimTerm*
   prim_term(ymuint pos) const = 0;

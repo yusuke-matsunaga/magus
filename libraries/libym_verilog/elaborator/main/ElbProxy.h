@@ -502,16 +502,12 @@ protected:
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_left 範囲のMSBを表すパース木
   /// @param[in] pt_right 範囲のLSBを表すパース木
-  /// @param[out] left 範囲の MSB の式
-  /// @param[out] right 範囲の LSB の式
   /// @param[out] left_val 範囲の MSB の値
   /// @param[out] right_val 範囲の LSB の値
   bool
   instantiate_range(const VlNamedObj* parent,
 		    const PtExpr* pt_left,
 		    const PtExpr* pt_right,
-		    ElbExpr*& left,
-		    ElbExpr*& right,
 		    int& left_val,
 		    int& right_val);
 
@@ -544,9 +540,19 @@ protected:
   /// @param[out] value 評価値を格納する変数
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_int(const VlNamedObj* parent,
-		    const PtExpr* pt_expr,
-		    int& value);
+  evaluate_int(const VlNamedObj* parent,
+	       const PtExpr* pt_expr,
+	       int& value);
+
+  /// @brief PtExpr を評価しスカラー値を返す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] value 評価値を格納する変数
+  /// @note 定数でなければエラーメッセージを出力し false を返す．
+  bool
+  evaluate_scalar(const VlNamedObj* parent,
+		  const PtExpr* pt_expr,
+		  tVpiScalarVal& value);
 
   /// @brief PtExpr を評価し bool 値を返す．
   /// @param[in] parent 親のスコープ
@@ -554,9 +560,9 @@ protected:
   /// @param[out] value 評価値を格納する変数
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bool(const VlNamedObj* parent,
-		     const PtExpr* pt_expr,
-		     bool& value);
+  evaluate_bool(const VlNamedObj* parent,
+		const PtExpr* pt_expr,
+		bool& value);
 
   /// @brief PtExpr を評価しビットベクタ値を返す．
   /// @param[in] parent 親のスコープ
@@ -564,9 +570,9 @@ protected:
   /// @param[out] value 評価値を格納する変数
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bitvector(const VlNamedObj* parent,
-			  const PtExpr* pt_expr,
-			  BitVector& value);
+  evaluate_bitvector(const VlNamedObj* parent,
+		     const PtExpr* pt_expr,
+		     BitVector& value);
 
   /// @brief 式を int 値に変換する．
   /// @return 変換に成功したら true を返す．

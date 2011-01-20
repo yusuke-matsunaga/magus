@@ -291,24 +291,22 @@ ModuleGen::instantiate_portref(ElbModule* module,
   const PtExpr* pt_left = pt_portref->left_range();
   const PtExpr* pt_right = pt_portref->right_range();
   if ( pt_index ) {
-    ElbExpr* index1 = instantiate_constant_expr(module, pt_index);
-    if ( !index1 ) {
+    int index_val;
+    bool stat = evaluate_int(module, pt_index, index_val);
+    if ( !stat ) {
       return NULL;
     }
-    return factory().new_BitSelect(pt_portref, decl, index1);
+    return factory().new_BitSelect(pt_portref, decl, pt_index, index_val);
   }
   else if ( pt_left && pt_right ) {
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
     if ( !instantiate_range(module, pt_left, pt_right,
-			    left, right,
 			    left_val, right_val) ) {
       return NULL;
     }
     return factory().new_PartSelect(pt_portref, decl,
-				    left, right,
+				    pt_left, pt_right,
 				    left_val, right_val);
   }
   else {

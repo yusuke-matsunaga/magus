@@ -131,7 +131,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     else if ( isize == 1 ) {
       const PtExpr* pt_expr1 = pt_expr->index(0);
       int index;
-      bool stat = evaluate_expr_int(parent, pt_expr1, index);
+      bool stat = evaluate_int(parent, pt_expr1, index);
       if ( !stat ) {
 	return NULL;
       }
@@ -331,7 +331,7 @@ ExprGen::instantiate_genvar(const VlNamedObj* parent,
 
   if ( has_bit_select ) {
     int index1 = 0;
-    if ( !evaluate_expr_int(parent, pt_expr->index(0), index1) ) {
+    if ( !evaluate_int(parent, pt_expr->index(0), index1) ) {
       return NULL;
     }
     val >>= index1;
@@ -340,8 +340,8 @@ ExprGen::instantiate_genvar(const VlNamedObj* parent,
   else if ( has_range_select ) {
     int index1 = 0;
     int index2 = 0;
-    bool stat1 = evaluate_expr_int(parent, pt_expr->left_range(), index1);
-    bool stat2 = evaluate_expr_int(parent, pt_expr->right_range(), index2);
+    bool stat1 = evaluate_int(parent, pt_expr->left_range(), index1);
+    bool stat2 = evaluate_int(parent, pt_expr->right_range(), index2);
     if ( !stat1 || !stat2 ) {
       return NULL;
     }
@@ -600,13 +600,13 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   int index1 = 0;
   int index2 = 0;
   if ( has_bit_select ) {
-    if ( !evaluate_expr_int(parent, pt_expr->index(0), index1) ) {
+    if ( !evaluate_int(parent, pt_expr->index(0), index1) ) {
       return ElbValue();
     }
   }
   if ( has_range_select ) {
-    bool stat1 = evaluate_expr_int(parent, pt_expr->left_range(), index1);
-    bool stat2 = evaluate_expr_int(parent, pt_expr->right_range(), index2);
+    bool stat1 = evaluate_int(parent, pt_expr->left_range(), index1);
+    bool stat2 = evaluate_int(parent, pt_expr->right_range(), index2);
     if ( !stat1 || !stat2 ) {
       return ElbValue();
     }

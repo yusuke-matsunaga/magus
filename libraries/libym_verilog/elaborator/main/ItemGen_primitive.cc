@@ -93,19 +93,16 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
     const PtExpr* pt_right = pt_inst->right_range();
     if ( pt_left && pt_right ) {
       // 配列の場合
-      ElbExpr* left = NULL;
-      ElbExpr* right = NULL;
       int left_val = 0;
       int right_val = 0;
       if ( !instantiate_range(parent, pt_left, pt_right,
-			      left, right,
 			      left_val, right_val) ) {
 	return;
       }
 
       ElbPrimArray* prim_array = factory().new_PrimitiveArray(prim_head,
 							      pt_inst,
-							      left, right,
+							      pt_left, pt_right,
 							      left_val, right_val);
       reg_primarray(prim_array);
 
@@ -195,19 +192,16 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
     const PtExpr* pt_right = pt_inst->right_range();
     if ( pt_left && pt_right ) {
       // 配列
-      ElbExpr* left = NULL;
-      ElbExpr* right = NULL;
       int left_val = 0;
       int right_val = 0;
       if ( !instantiate_range(parent, pt_left, pt_right,
-			      left, right,
 			      left_val, right_val) ) {
 	return;
       }
 
       ElbPrimArray* prim_array = factory().new_PrimitiveArray(prim_head,
 							      pt_inst,
-							      left, right,
+							      pt_left, pt_right,
 							      left_val, right_val);
       reg_primarray(prim_array);
 

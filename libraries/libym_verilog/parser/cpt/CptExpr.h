@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_verilog/pt/PtExpr.h"
+#include "PtiExpr.h"
 #include "ym_verilog/pt/PtArray.h"
 
 #include "ym_utils/FileRegion.h"
@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class CptExpr :
-  public PtExpr
+  public PtiExpr
 {
 protected:
 

@@ -63,7 +63,7 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
   const PtModule* pt_module = find_moduledef(defname);
   if ( pt_module ) {
     // モジュール定義が見つかった．
-  
+
     if ( pt_module->is_in_use() ) {
       // 依存関係が循環している．
       ostringstream buf;
@@ -98,16 +98,16 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
       }
       else {
 	// 単一の要素
-	ElbModule* module1 = factory().new_Module(parent, 
+	ElbModule* module1 = factory().new_Module(parent,
 						  pt_module,
 						  pt_head,
 						  pt_inst);
 	reg_module(module1);
-  
+
 	// attribute instance の生成
 	//instantiate_attribute(pt_module->attr_top(), true, module1);
 	//instantiate_attribute(pt_head->attr_top(), false, module1);
-	
+
 	ostringstream buf;
 	buf << "\"" << module1->full_name() << "\" has been created.";
 	put_msg(__FILE__, __LINE__,
@@ -115,7 +115,7 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 		kMsgInfo,
 		"ELAB",
 		buf.str());
-	
+
 	// パラメータ割り当て式の生成
 	PtConnectionArray pa_array = pt_head->paramassign_array();
 	ymuint n = pa_array.size();
@@ -129,7 +129,7 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 	  ElbExpr* expr = instantiate_constant_expr(parent, pt_con->expr());
 	  param_con.set(i, pt_con, expr);
 	}
-	
+
 	phase1_module_item(module1, pt_module, &param_con);
 	add_phase3stub(make_stub(this, &ItemGen::link_module,
 				 module1, pt_module, pt_inst));
@@ -162,13 +162,13 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 	      "UDP instance cannot have ordered parameter list.");
       return;
     }
-    
+
     // 今すぐには処理できないのでキューに積む．
     add_phase2stub(make_stub(this, &ItemGen::instantiate_udpheader,
 			     parent, pt_head, udpdefn));
     return;
   }
-  
+
   // どちらもなければエラー
   ostringstream buf;
   buf << defname << " : No such module or UDP.";
@@ -197,21 +197,18 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   const PtExpr* pt_left = pt_inst->left_range();
   const PtExpr* pt_right = pt_inst->right_range();
 
-  ElbExpr* left = NULL;
-  ElbExpr* right = NULL;
   int left_val = 0;
   int right_val = 0;
   if ( !instantiate_range(parent, pt_left, pt_right,
-			  left, right,
 			  left_val, right_val) ) {
     return;
   }
-  
+
   ElbModuleArray* module_array = factory().new_ModuleArray(parent,
 							   pt_module,
 							   pt_head,
 							   pt_inst,
-							   left, right,
+							   pt_left, pt_right,
 							   left_val, right_val);
   reg_modulearray(module_array);
 
@@ -244,11 +241,11 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   ymuint n = module_array->elem_num();
   for (ymuint i = 0; i < n; ++ i) {
     ElbModule* module1 = module_array->_module(i);
-  
+
     // attribute instance の生成
     //instantiate_attribute(pt_module->attr_top(), true, module1);
     //instantiate_attribute(pt_head->attr_top(), false, module1);
-    
+
     ostringstream buf;
     buf << "\"" << module1->full_name() << "\" has been created.";
     put_msg(__FILE__, __LINE__,
@@ -355,7 +352,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     if ( !tmp ) {
       continue;
     }
-    
+
     const VlPort* port = module0->port(index);
     if ( port == NULL ) {
       // このポートはダミー
@@ -411,7 +408,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 	      "ELAB",
 	      buf.str());
     }
-    
+
     // attribute の設定を行う．
 #if 0
     for (ymuint i = 0; i < module_size; ++ i) {
@@ -435,7 +432,7 @@ ItemGen::link_module(ElbModule* module,
 		     const PtInst* pt_inst)
 {
   const VlNamedObj* parent = module->parent();
-  
+
   const FileRegion& fr = pt_inst->file_region();
 
   ymuint port_num = module->port_num();
@@ -482,7 +479,7 @@ ItemGen::link_module(ElbModule* module,
       }
     }
   }
-  
+
   ElbEnv env;
   for (ymuint i = 0; i < n; ++ i) {
     const PtConnection* pt_con = pt_inst->port(i);
@@ -512,7 +509,7 @@ ItemGen::link_module(ElbModule* module,
     else {
       assert_cond(pt_con->name() == NULL, __FILE__, __LINE__);
     }
-    
+
     ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
     if ( !tmp ) {
       continue;

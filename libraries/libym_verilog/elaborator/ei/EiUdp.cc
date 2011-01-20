@@ -16,6 +16,7 @@
 #include "ym_verilog/pt/PtUdp.h"
 #include "ym_verilog/pt/PtDecl.h"
 #include "ym_verilog/pt/PtArray.h"
+#include "ym_verilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -157,19 +158,19 @@ EiUdpDefn::is_protected() const
   return mProtected;
 }
 
-// @brief 初期値の式を返す．
-const VlExpr*
-EiUdpDefn::init_expr() const
-{
-  return mInitExpr;
-}
-
 // @brief 初期値を返す．
 // @return 0/1/X を返す．
 tVpiScalarVal
 EiUdpDefn::init_val() const
 {
   return mInitVal;
+}
+
+// @brief 初期値を表す文字列を返す．
+string
+EiUdpDefn::init_val_string() const
+{
+  return mInitExpr->decompile();
 }
 
 // @brief table entry の行数を返す．
@@ -204,7 +205,7 @@ EiUdpDefn::set_io(ymuint pos,
 // @param[in] init_expr 初期値を表す式
 // @param[in] init_val 初期値
 void
-EiUdpDefn::set_initial(ElbExpr* init_expr,
+EiUdpDefn::set_initial(const PtExpr* init_expr,
 		       tVpiScalarVal init_val)
 {
   mInitExpr = init_expr;
@@ -281,38 +282,43 @@ EiUdpIO::is_signed() const
   return false;
 }
 
-// @brief 範囲の MSB の取得
-// @return このクラスは NULL を返す．
-const VlExpr*
-EiUdpIO::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiUdpIO::has_range() const
 {
-  return NULL;
-}
-
-// @brief 範囲の LSB の取得
-// @return このクラスは NULL を返す．
-const VlExpr*
-EiUdpIO::right_range() const
-{
-  return NULL;
+  return false;
 }
 
 // @brief MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @note 範囲を持たないときの値は不定
 int
-EiUdpIO::left_range_const() const
+EiUdpIO::left_range_val() const
 {
-  return -1;
+  return 0;
 }
 
 // @brief LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @note 範囲を持たないときの値は不定
 int
-EiUdpIO::right_range_const() const
+EiUdpIO::right_range_val() const
 {
-  return -1;
+  return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiUdpIO::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiUdpIO::right_range_string() const
+{
+  return string();
 }
 
 // @brief サイズを返す．

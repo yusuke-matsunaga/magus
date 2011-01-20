@@ -112,9 +112,19 @@ public:
   /// @param[out] value 評価値を格納する変数
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_int(const VlNamedObj* parent,
-		    const PtExpr* pt_expr,
-		    int& value);
+  evaluate_int(const VlNamedObj* parent,
+	       const PtExpr* pt_expr,
+	       int& value);
+
+  /// @brief PtExpr を評価しスカラー値を返す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] value 評価値を格納する変数
+  /// @note 定数でなければエラーメッセージを出力し false を返す．
+  bool
+  evaluate_scalar(const VlNamedObj* parent,
+		  const PtExpr* pt_expr,
+		  tVpiScalarVal& value);
 
   /// @brief PtExpr を評価し bool 値を返す．
   /// @param[in] parent 親のスコープ
@@ -122,9 +132,9 @@ public:
   /// @param[out] value 評価値を格納する変数
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bool(const VlNamedObj* parent,
-		     const PtExpr* pt_expr,
-		     bool& value);
+  evaluate_bool(const VlNamedObj* parent,
+		const PtExpr* pt_expr,
+		bool& value);
 
   /// @brief PtExpr を評価しビットベクタ値を返す．
   /// @param[in] parent 親のスコープ
@@ -132,9 +142,9 @@ public:
   /// @param[out] value 評価値を格納する変数
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bitvector(const VlNamedObj* parent,
-			  const PtExpr* pt_expr,
-			  BitVector& value);
+  evaluate_bitvector(const VlNamedObj* parent,
+		     const PtExpr* pt_expr,
+		     BitVector& value);
 
   /// @brief PtDelay から ElbExpr を生成する．
   /// @param[in] parent 親のスコープ

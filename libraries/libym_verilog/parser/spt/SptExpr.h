@@ -13,7 +13,7 @@
 
 #include "ym_utils/FileRegion.h"
 
-#include "ym_verilog/pt/PtExpr.h"
+#include "PtiExpr.h"
 #include "ym_verilog/pt/PtArray.h"
 
 
@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class SptExpr :
-  public PtExpr
+  public PtiExpr
 {
   friend class SptFactory;
 

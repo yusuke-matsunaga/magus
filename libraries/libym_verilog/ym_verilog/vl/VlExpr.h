@@ -79,6 +79,10 @@ public:
   is_partselect() const = 0;
 
   /// @brief 範囲指定のモードを返す．
+  /// @retval kVpiNoRange 範囲指定なし
+  /// @retval kVpiConstRange 固定範囲
+  /// @retval kVpiPlusRange +: の可動範囲
+  /// @retval kVpiMinusRange -: の可動範囲
   /// @note is_partselect() == true の時のみ意味を持つ．
   virtual
   tVpiRangeMode
@@ -121,11 +125,13 @@ public:
 
   /// @brief スコープへの参照の場合，対象のオブジェクトを返す．
   /// @note それ以外では NULL を返す．
+  /// @note スコープへの参照が式で用いられるのはシステム関数/タスクの引数だけ
   virtual
   const VlNamedObj*
   scope_obj() const = 0;
 
   /// @brief primitive への参照の場合，対象のオブジェクトを返す．
+  /// @note primitiveへの参照が式で用いられるのはシステム関数/タスクの引数だけ
   virtual
   const VlPrimitive*
   primitive_obj() const = 0;

@@ -10,6 +10,7 @@
 
 
 #include "PtiDecl.h"
+#include "PtiExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 
 
@@ -44,6 +45,344 @@ PtiPortRef::dir() const
 {
   return mDir;
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PtiExpr
+//////////////////////////////////////////////////////////////////////
+
+
+BEGIN_NONAMESPACE
+
+string
+decompile_impl(const PtExpr* expr,
+	       int ppri);
+
+// @brief 演算子の場合の decompile() 処理
+string
+decompile_opr(const PtExpr* expr,
+	      int ppri)
+{
+  // 各演算子を表す文字列のテーブル
+  static const char* sym_table[] = {
+    "",               // dummy
+    "-",              // vpiMinusOp
+    "+",              // vpiPlusOp
+    "!",              // vpiNotOp
+    "~",              // vpiBitNeg
+    "&",              // vpiUnaryAndOp
+    "~&",             // vpiUnaryNandOp
+    "|",              // vpiUnaryOrOp
+    "~|",             // vpiUnaryNorOp
+    "^",              // vpiUnaryXorOp
+    "~^",             // vpiUnaryXNorOp
+    "-",              // vpiSubOp
+    "/",              // vpiDivOp
+    "%",              // vpiModOp
+    "==",             // vpiEqOp
+    "!=",             // vpiNeqOp
+    "===",            // vpiCaseEqOp
+    "!==",            // vpiCaseNeqOp
+    ">",              // vpiGtOp
+    ">=",             // vpiGeOp
+    "<",              // vpiLtOp
+    "<=",             // vpiLeOp
+    "<<",             // vpiLShiftOp
+    ">>",             // vpiRShiftOp
+    "+",              // vpiAddOp
+    "*",              // vpiMultOp
+    "&&",             // vpiLogAndOp
+    "||",             // vpiLogOrOp
+    "&",              // vpiBitAndOp
+    "|",              // vpiBitOrOp
+    "^",              // vpiBitXorOp
+    "~^",             // vpiBitXNorOp
+    "?:",             // vpiConditionOp(dummy)
+    "{}",             // vpiConcatOp(dummy)
+    "{{}}",           // vpiMultiConcatOp(dummy)
+    "or",             // vpiEventOrOp(dummy)
+    ";",              // vpiNullOp(dummy)
+    ",",              // vpiListOp(dummy)
+    ":",              // vpiMinTypMaxOp(dummy)
+    "posedge ",       // vpiPosedgeOp
+    "negedge ",       // vpiNegedgeOp
+    "<<<",            // vpiArithLShiftOp
+    ">>>",            // vpiArithRShiftOp
+    "**"              // vpiPowerOp
+  };
+
+  // 優先順位のテーブル
+  static int pri_table[] = {
+    0,                // dummy
+    13,               // vpiMinusOp
+    13,               // vpiPlusOp
+    13,               // vpiNotOp
+    13,               // vpiBitNegOp
+    13,               // vpiUnaryAndOp
+    13,               // vpiUnaryNandOp
+    13,               // vpiUnaryOrOp
+    13,               // vpiUnaryNorOp
+    13,               // vpiUnaryXorOp
+    13,               // vpiUnaryXNorOp
+    10,               // vpiSubOp
+    11,               // vpiDivOp
+    11,               // vpiModOp
+    7,                // vpiEqOp
+    7,                // vpiNeqOp
+    7,                // vpiCaseEqOp
+    7,                // vpiCaseNeqOp
+    8,                // vpiGtOp
+    8,                // vpiGeOp
+    8,                // vpiLtOp
+    8,                // vpiLeOp
+    9,                // vpiLShiftOp
+    9,                // vpiRShiftOp
+    10,               // vpiAddOp
+    11,               // vpiMultOp
+    3,                // vpiLogAndOp
+    2,                // vpiLogOrOp
+    6,                // vpiBitAndOp
+    4,                // vpiBitOrOp
+    5,                // vpiBitXorOp
+    5,                // vpiBitXNorOp
+    1,                // vpiConditionOp
+    0,                // vpiConcatOp
+    0,                // vpiMultiConcatOp
+    0,                // vpiEventOrOp
+    0,                // vpiNullOp
+    0,                // vpiListOp
+    0,                // vpiMinTypMaxOp
+    0,                // vpiPosedgeOp
+    0,                // vpiNegedgeOp
+    9,                // vpiArithLShiftOp
+    9,                // vpiArithRShiftOp
+    12                // vpiPowerOp
+  };
+
+  string ans;
+
+  tVpiOpType optype = expr->opr_type();
+  // parent_optype の優先順位が自分の優先順位よりも高ければ括弧が必要
+  bool need_par = false;
+  int pri = pri_table[optype];
+  if ( ppri > pri ) {
+    need_par = true;
+    ans += "(";
+  }
+
+  switch ( optype ) {
+    // 空
+  case kVpiNullOp:
+    break;
+
+    // 単項演算子
+  case kVpiMinusOp:
+  case kVpiNotOp:
+  case kVpiBitNegOp:
+  case kVpiPlusOp:
+  case kVpiUnaryAndOp:
+  case kVpiUnaryNandOp:
+  case kVpiUnaryNorOp:
+  case kVpiUnaryOrOp:
+  case kVpiUnaryXNorOp:
+  case kVpiUnaryXorOp:
+  case kVpiPosedgeOp:
+  case kVpiNegedgeOp:
+    ans += sym_table[optype] + decompile_impl(expr->operand(0), pri);
+    break;
+
+    // 二項演算子
+  case kVpiAddOp:
+  case kVpiArithLShiftOp:
+  case kVpiArithRShiftOp:
+  case kVpiBitAndOp:
+  case kVpiBitOrOp:
+  case kVpiBitXNorOp:
+  case kVpiBitXorOp:
+  case kVpiCaseEqOp:
+  case kVpiCaseNeqOp:
+  case kVpiDivOp:
+  case kVpiEqOp:
+  case kVpiGeOp:
+  case kVpiGtOp:
+  case kVpiLShiftOp:
+  case kVpiLeOp:
+  case kVpiLogAndOp:
+  case kVpiLogOrOp:
+  case kVpiLtOp:
+  case kVpiModOp:
+  case kVpiMultOp:
+  case kVpiNeqOp:
+  case kVpiPowerOp:
+  case kVpiRShiftOp:
+  case kVpiSubOp:
+    ans += decompile_impl(expr->operand(0), pri) + sym_table[optype] +
+      decompile_impl(expr->operand(1), pri);
+    break;
+
+    // 三項演算子
+  case kVpiConditionOp:
+    ans += decompile_impl(expr->operand(0), pri) + "?" +
+      decompile_impl(expr->operand(1), pri) + ":" +
+      decompile_impl(expr->operand(2), pri);
+    break;
+
+  case kVpiMinTypMaxOp:
+    ans += decompile_impl(expr->operand(0), pri) + ":" +
+      decompile_impl(expr->operand(1), pri) + ":" +
+      decompile_impl(expr->operand(2), pri);
+    break;
+
+  case kVpiConcatOp:
+    {
+      ans += "{";
+      const char* delim = "";
+      ymuint n = expr->operand_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	ans += delim + expr->operand(i)->decompile();
+	delim = ",";
+      }
+      ans += "}";
+    }
+    break;
+
+  case kVpiMultiConcatOp:
+    {
+      ans = "{";
+      ans += expr->operand(0)->decompile() + "{";
+      const char* delim = "";
+      ymuint n = expr->operand_num();
+      for (ymuint i = 1; i < n; ++ i) {
+	ans += delim + expr->operand(i)->decompile();
+	delim = ",";
+      }
+      ans += "}}";
+    }
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  if ( need_par ) {
+    ans += ")";
+  }
+  return ans;
+}
+
+// @brief decompile() の下請け関数
+// @param[in] ppri 直前の演算子の優先順位
+string
+decompile_impl(const PtExpr* expr,
+	       int ppri)
+{
+  switch ( expr->type() ) {
+  case kPtOprExpr:
+    return decompile_opr(expr, ppri);
+    break;
+
+  case kPtConstExpr:
+    {
+      ostringstream buf;
+      if ( expr->const_size() > 0 ) {
+	buf << expr->const_size() << "'";
+      }
+
+      switch ( expr->const_type() ) {
+      case kVpiRealConst:
+	buf << expr->const_real();
+	return buf.str();
+
+      case kVpiStringConst:
+	return expr->const_str();
+
+      case kVpiIntConst:
+	if ( expr->const_str() == NULL ) {
+	  buf << expr->const_uint();
+	  return buf.str();
+	}
+	break;
+
+      case kVpiSignedBinaryConst:
+	buf << "s";
+      case kVpiBinaryConst:
+	buf << "b";
+	break;
+
+      case kVpiSignedOctConst:
+	buf << "s";
+      case kVpiOctConst:
+	buf << "b";
+	break;
+
+      case kVpiSignedDecConst:
+	buf << "s";
+      case kVpiDecConst:
+	buf << "d";
+	break;
+
+      case kVpiSignedHexConst:
+	buf << "s";
+      case kVpiHexConst:
+	buf << "h";
+	break;
+      }
+      buf << expr->const_str();
+      return buf.str();
+    }
+
+  case kPtFuncCallExpr:
+  case kPtSysFuncCallExpr:
+    {
+      string ans(expr->name());
+      ans += "(";
+      ymuint n = expr->operand_num();
+      const char* comma = "";
+      for (ymuint i = 0; i < n; ++ i) {
+	ans += comma + expr->operand(i)->decompile();
+	comma = ", ";
+      }
+      ans += ")";
+      return ans;
+    }
+
+  case kPtPrimaryExpr:
+    {
+      string ans(expand_full_name(expr->namebranch_array(), expr->name()));
+      ymuint n = expr->index_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	ans += "[" + expr->index(i)->decompile() + "]";
+      }
+      if ( expr->range_mode() != kVpiNoRange ) {
+	const char* delim = NULL;
+	switch ( expr->range_mode() ) {
+	case kVpiConstRange: delim = ":"; break;
+	case kVpiPlusRange:  delim = "+:"; break;
+	case kVpiMinusRange: delim = "-:"; break;
+	case kVpiNoRange: assert_not_reached(__FILE__, __LINE__);
+	}
+	ans += "[" + expr->left_range()->decompile() + delim +
+	  expr->right_range()->decompile() + "]";
+      }
+      return ans;
+    }
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  return string();
+}
+
+END_NONAMESPACE
+
+
+// @brief 式を表す文字列表現の取得
+string
+PtiExpr::decompile() const
+{
+  return decompile_impl(this, 0);
+}
+
 
 
 //////////////////////////////////////////////////////////////////////

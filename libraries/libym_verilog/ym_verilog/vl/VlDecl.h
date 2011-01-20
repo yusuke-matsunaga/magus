@@ -54,33 +54,34 @@ public:
   bool
   is_signed() const = 0;
 
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲指定を持つとき
-  /// @retval NULL 範囲指定を持たないとき
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  const VlExpr*
-  left_range() const = 0;
+  bool
+  has_range() const = 0;
 
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲指定を持つとき
-  /// @retval NULL 範囲指定を持たないとき
-  virtual
-  const VlExpr*
-  right_range() const = 0;
-
-  /// @brief MSB の値を返す．
-  /// @retval 範囲のMSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  left_range_const() const = 0;
+  left_range_val() const = 0;
 
-  /// @brief LSB の値を返す．
-  /// @retval 範囲のLSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @brief 範囲の LSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const = 0;
+  right_range_val() const = 0;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const = 0;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const = 0;
 
   /// @brief ビット幅を返す．
   virtual
@@ -96,14 +97,17 @@ public:
   bit_offset(int index) const = 0;
 
   /// @brief データ型の取得
-  /// @retval データ型 パラメータや変数の場合
+  /// @retval kVpiVarInteger 整数型
+  /// @retval kVpiVarReal 実数型
+  /// @retval kVpiVarTime time型
+  /// @retval kVpiVarRealTime realtime型
   /// @retval kVpiVarNone 上記以外
   virtual
   tVpiVarType
   data_type() const = 0;
 
   /// @brief net 型の取得
-  /// @retval net 型 net 型の要素の場合
+  /// @retval net型 net型の要素の場合
   /// @retval kVpiNone net 型の要素でない場合
   virtual
   tVpiNetType

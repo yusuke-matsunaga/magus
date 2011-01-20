@@ -51,38 +51,38 @@ public:
   /// @brief 符号の取得
   /// @retval true 符号つき
   /// @retval false 符号なし
-  /// @note このクラスでは false を返す．
   virtual
   bool
-  is_signed() const;
+  is_signed() const = 0;
 
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  /// @note このクラスでは NULL を返す．
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  ElbExpr*
-  left_range() const;
+  bool
+  has_range() const = 0;
 
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  /// @note このクラスでは NULL を返す．
-  virtual
-  ElbExpr*
-  right_range() const;
-
-  /// @brief MSB の値を返す．
-  /// @note このクラスでは -1 を返す．
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  left_range_const() const;
+  left_range_val() const = 0;
 
-  /// @brief LSB の値を返す．
-  /// @note このクラスでは -1 を返す．
+  /// @brief 範囲の LSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const;
+  right_range_val() const = 0;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const = 0;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const = 0;
 
   /// @brief ビット幅を返す．
   virtual
@@ -275,26 +275,6 @@ public:
   virtual
   int
   array_offset(const vector<int>& index_list) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbDeclBase の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _left_range() const = 0;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _right_range() const = 0;
 
 
 public:

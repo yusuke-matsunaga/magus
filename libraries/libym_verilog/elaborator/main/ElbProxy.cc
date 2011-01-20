@@ -259,33 +259,21 @@ ElbProxy::instantiate_rhs(const VlNamedObj* parent,
 // @param[in] parent 親のスコープ
 // @param[in] pt_left 範囲のMSBを表すパース木
 // @param[in] pt_right 範囲のLSBを表すパース木
-// @param[in] left 範囲の MSB の式
-// @param[in] right 範囲の LSB の式
 // @param[in] left_val 範囲の MSB の値
 // @param[in] right_val 範囲の LSB の値
 bool
 ElbProxy::instantiate_range(const VlNamedObj* parent,
 			    const PtExpr* pt_left,
 			    const PtExpr* pt_right,
-			    ElbExpr*& left,
-			    ElbExpr*& right,
 			    int& left_val,
 			    int& right_val)
 {
-  left = NULL;
-  right = NULL;
   left_val = 0;
   right_val = 0;
   if ( pt_left && pt_right ) {
-    left = instantiate_constant_expr(parent, pt_left);
-    right = instantiate_constant_expr(parent, pt_right);
-    if ( !left || !right ) {
-      return false;
-    }
-    if ( !expr_to_int(left, left_val) ) {
-      return false;
-    }
-    if ( !expr_to_int(right, right_val) ) {
+    bool stat1 = evaluate_int(parent, pt_left, left_val);
+    bool stat2 = evaluate_int(parent, pt_right, right_val);
+    if ( !stat1 || !stat2 ) {
       return false;
     }
   }
@@ -324,18 +312,30 @@ ElbProxy::instantiate_delay(const VlNamedObj* parent,
   return mExprGen->instantiate_delay(parent, pt_head);
 }
 
-#if 0
 // @brief PtExpr を評価し int 値を返す．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ElbProxy::evaluate_expr_int(const VlNamedObj* parent,
-			    const PtExpr* pt_expr,
-			    int& value)
+ElbProxy::evaluate_int(const VlNamedObj* parent,
+		       const PtExpr* pt_expr,
+		       int& value)
 {
-  return mExprGen->evaluate_expr_int(parent, pt_expr, value);
+  return mExprGen->evaluate_int(parent, pt_expr, value);
+}
+
+// @brief PtExpr を評価しスカラー値を返す．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+// @param[out] value 評価値を格納する変数
+// @note 定数でなければエラーメッセージを出力し false を返す．
+bool
+ElbProxy::evaluate_scalar(const VlNamedObj* parent,
+			  const PtExpr* pt_expr,
+			  tVpiScalarVal& value)
+{
+  return mExprGen->evaluate_scalar(parent, pt_expr, value);
 }
 
 // @brief PtExpr を評価し bool 値を返す．
@@ -344,11 +344,11 @@ ElbProxy::evaluate_expr_int(const VlNamedObj* parent,
 // @param[out] value 評価値を格納する変数
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ElbProxy::evaluate_expr_bool(const VlNamedObj* parent,
-			     const PtExpr* pt_expr,
-			     bool& value)
+ElbProxy::evaluate_bool(const VlNamedObj* parent,
+			const PtExpr* pt_expr,
+			bool& value)
 {
-  return mExprGen->evaluate_expr_bool(parent, pt_expr, value);
+  return mExprGen->evaluate_bool(parent, pt_expr, value);
 }
 
 // @brief PtExpr を評価しビットベクタ値を返す．
@@ -357,13 +357,14 @@ ElbProxy::evaluate_expr_bool(const VlNamedObj* parent,
 // @param[out] value 評価値を格納する変数
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ElbProxy::evaluate_expr_bitvector(const VlNamedObj* parent,
-				  const PtExpr* pt_expr,
-				  BitVector& value)
+ElbProxy::evaluate_bitvector(const VlNamedObj* parent,
+			     const PtExpr* pt_expr,
+			     BitVector& value)
 {
-  return mExprGen->evaluate_expr_bitvector(parent, pt_expr, value);
+  return mExprGen->evaluate_bitvector(parent, pt_expr, value);
 }
 
+#if 0
 // @brief 式を int 値に変換する．
 // @return 変換に成功したら true を返す．
 // @note 変換に失敗したらエラーメッセージを出力する．

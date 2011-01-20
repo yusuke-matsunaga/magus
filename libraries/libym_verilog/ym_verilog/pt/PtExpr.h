@@ -161,6 +161,11 @@ public:
   bool
   is_simple() const = 0;
 
+  /// @brief 式を表す文字列表現の取得
+  virtual
+  string
+  decompile() const = 0;
+
 };
 
 
