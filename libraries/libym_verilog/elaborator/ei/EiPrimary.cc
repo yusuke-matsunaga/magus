@@ -36,6 +36,27 @@ EiFactory::new_Primary(const PtBase* pt_expr,
   return expr;
 }
 
+// @brief プライマリ式を生成する(配列要素版)．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] index_list インデックスのリスト
+ElbExpr*
+EiFactory::new_Primary(const PtBase* pt_expr,
+		       ElbDeclArray* obj,
+		       const vector<ElbExpr*>& index_list)
+{
+  ymuint n = index_list.size();
+  void* q = mAlloc.get_memory(sizeof(ElbExpr*) * n);
+  ElbExpr** index_array = new (q) ElbExpr*[n];
+  for (ymuint i = 0; i < n; ++ i) {
+    index_array[i] = index_list[i];
+  }
+  void* p = mAlloc.get_memory(sizeof(EiArrayElemPrimary));
+  ElbExpr* expr = new (p) EiArrayElemPrimary(pt_expr, obj, n, index_array);
+
+  return expr;
+}
+
 // @brief システム関数/システムタスクの引数を生成する．
 // @param[in] pt_expr パース木中で参照している要素
 // @param[in] arg 引数本体
@@ -119,6 +140,7 @@ EiPrimary::decl_obj() const
   return mObj;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiPrimary::eval_scalar() const
@@ -147,6 +169,7 @@ EiPrimary::eval_bitvector(BitVector& bitvector,
 {
   mObj->get_bitvector(bitvector, req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -165,6 +188,7 @@ EiPrimary::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
+#if 0
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -191,6 +215,7 @@ EiPrimary::set_bitvector(const BitVector& v)
 {
   mObj->set_bitvector(v);
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -205,7 +230,7 @@ EiPrimary::set_bitvector(const BitVector& v)
 EiArrayElemPrimary::EiArrayElemPrimary(const PtBase* pt_obj,
 				       ElbDeclArray* obj,
 				       ymuint dim,
-				       ElbExpr* index_list) :
+				       ElbExpr** index_list) :
   EiExprBase1(pt_obj),
   mObj(obj),
   mDim(dim),
@@ -237,7 +262,8 @@ EiArrayElemPrimary::value_type() const
 bool
 EiArrayElemPrimary::is_const() const
 {
-  return mObj->is_consttype();
+  // 配列要素は定数ではない．
+  return false;
 }
 
 // @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
@@ -249,8 +275,8 @@ EiArrayElemPrimary::is_primary() const
 
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
-const VlDecl*
-EiArrayElemPrimary::decl_obj() const
+const VlDeclArray*
+EiArrayElemPrimary::declarray_obj() const
 {
   return mObj;
 }
@@ -269,9 +295,10 @@ EiArrayElemPrimary::declarray_dimension() const
 const VlExpr*
 EiArrayElemPrimary::declarray_index(ymuint pos) const
 {
-  return &mIndexList[pos];
+  return mIndexList[pos];
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiArrayElemPrimary::eval_scalar() const
@@ -304,6 +331,7 @@ EiArrayElemPrimary::eval_bitvector(BitVector& bitvector,
   ymuint offset = calc_offset();
   mObj->get_bitvector(offset, bitvector, req_type);
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -322,6 +350,7 @@ EiArrayElemPrimary::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
+#if 0
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -351,6 +380,7 @@ EiArrayElemPrimary::set_bitvector(const BitVector& v)
   ymuint offset = calc_offset();
   mObj->set_bitvector(offset, v);
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -394,6 +424,7 @@ EiScopePrimary::is_const() const
   return false;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiScopePrimary::eval_scalar() const
@@ -421,6 +452,7 @@ EiScopePrimary::eval_bitvector(BitVector& bitvector,
 			       tVpiValueType req_type) const
 {
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -446,6 +478,7 @@ EiScopePrimary::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
+#if 0
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -472,6 +505,7 @@ EiScopePrimary::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -515,6 +549,7 @@ EiPrimitivePrimary::is_const() const
   return false;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
 EiPrimitivePrimary::eval_scalar() const
@@ -542,6 +577,7 @@ EiPrimitivePrimary::eval_bitvector(BitVector& bitvector,
 				   tVpiValueType req_type) const
 {
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -567,6 +603,7 @@ EiPrimitivePrimary::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
+#if 0
 // @brief スカラー値を書き込む．
 // @param[in] v 書き込む値
 // @note 左辺式の時のみ意味を持つ．
@@ -593,5 +630,6 @@ EiPrimitivePrimary::set_bitvector(const BitVector& v)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
+#endif
 
 END_NAMESPACE_YM_VERILOG

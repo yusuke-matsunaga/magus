@@ -32,8 +32,8 @@ BEGIN_NAMESPACE_YM_VERILOG
 ElbDeclHead*
 EiFactory::new_DeclHead(const VlNamedObj* parent,
 			const PtDeclHead* pt_head,
-			ElbExpr* left,
-			ElbExpr* right,
+			const PtExpr* left,
+			const PtExpr* right,
 			int left_val,
 			int right_val,
 			bool delay)
@@ -89,8 +89,8 @@ ElbDeclHead*
 EiFactory::new_DeclHead(const VlNamedObj* parent,
 			const PtIOHead* pt_head,
 			tVpiAuxType aux_type,
-			ElbExpr* left,
-			ElbExpr* right,
+			const PtExpr* left,
+			const PtExpr* right,
 			int left_val,
 			int right_val)
 {
@@ -127,8 +127,8 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 ElbDeclHead*
 EiFactory::new_DeclHead(const VlNamedObj* parent,
 			const PtItem* pt_item,
-			ElbExpr* left,
-			ElbExpr* right,
+			const PtExpr* left,
+			const PtExpr* right,
 			int left_val,
 			int right_val)
 {
@@ -500,8 +500,8 @@ EiDeclHeadPtD::set_delay(ElbDelay* delay)
 // @param[in] right_val 範囲の右側の値
 EiDeclHeadPtV::EiDeclHeadPtV(const VlNamedObj* parent,
 			     const PtDeclHead* pt_header,
-			     ElbExpr* left,
-			     ElbExpr* right,
+			     const PtExpr* left,
+			     const PtExpr* right,
 			     int left_val,
 			     int right_val) :
   EiDeclHeadPt(parent, pt_header)
@@ -584,8 +584,8 @@ EiDeclHeadPtV::bit_offset(int index) const
 // @param[in] right_val 範囲の右側の値
 EiDeclHeadPtVD::EiDeclHeadPtVD(const VlNamedObj* parent,
 			       const PtDeclHead* pt_header,
-			       ElbExpr* left,
-			       ElbExpr* right,
+			       const PtExpr* left,
+			       const PtExpr* right,
 			       int left_val,
 			       int right_val) :
   EiDeclHeadPtV(parent, pt_header, left, right, left_val, right_val),
@@ -809,8 +809,8 @@ EiDeclHeadPt2::net_type() const
 EiDeclHeadPt2V::EiDeclHeadPt2V(const VlNamedObj* parent,
 			       const PtIOHead* pt_header,
 			       tVpiAuxType aux_type,
-			       ElbExpr* left,
-			       ElbExpr* right,
+			       const PtExpr* left,
+			       const PtExpr* right,
 			       int left_val,
 			       int right_val) :
   EiDeclHeadPt2(parent, pt_header, aux_type)
@@ -1048,8 +1048,8 @@ EiDeclHeadPt3::net_type() const
 // @param[in] right_val 範囲の右側の値
 EiDeclHeadPt3V::EiDeclHeadPt3V(const VlNamedObj* parent,
 			       const PtItem* pt_item,
-			       ElbExpr* left,
-			       ElbExpr* right,
+			       const PtExpr* left,
+			       const PtExpr* right,
 			       int left_val,
 			       int right_val) :
   EiDeclHeadPt3(parent, pt_item)

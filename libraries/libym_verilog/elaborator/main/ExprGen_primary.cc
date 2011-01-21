@@ -123,9 +123,9 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
       if ( decl ) {
 	return factory().new_Primary(pt_expr, decl);
       }
-      ElbDeclArray* decl_array = handle->decl_array();
-      if ( decl_array ) {
-	return factory().new_ArgHandle(pt_expr, decl_array);
+      ElbDeclArray* declarray = handle->declarray();
+      if ( declarray ) {
+	return factory().new_ArgHandle(pt_expr, declarray);
       }
     }
     else if ( isize == 1 ) {
@@ -159,65 +159,91 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     }
   }
 
+  // 添字には constant/constant function 以外の情報は引き継がない
+  ElbEnv index_env;
+  if ( pt_expr->is_const_index() ) {
+    index_env = ElbConstantEnv();
+  }
+  else if ( env.inside_constant_function() ) {
+    index_env = ElbConstantFunctionEnv(env.constant_function());
+  }
+
   // 対象のオブジェクトが宣言要素だった場合
+  tVpiObjType decl_type;
+  bool is_array;
   bool has_range_select;
   bool has_bit_select;
-  ElbExpr* index1;
-  ElbExpr* index2;
-  ElbDecl* decl = instantiate_decl(handle, parent, env, pt_expr,
-				   has_range_select,
-				   has_bit_select,
-				   index1, index2);
-  if ( decl == NULL ) {
+  ElbExpr* primary = instantiate_primary_sub(handle, parent,
+					     index_env, pt_expr,
+					     decl_type,
+					     is_array,
+					     has_range_select,
+					     has_bit_select);
+  if ( primary == NULL ) {
     // エラー
     // メッセージは instantiate_decl() 内で出力されている．
     return NULL;
   }
 
-  if ( !check_decl(env, pt_expr, decl, has_range_select | has_bit_select) ) {
+  if ( !check_decl(env, pt_expr, decl_type, is_array,
+		   has_range_select | has_bit_select) ) {
     // エラー
     // メッセージは instantiate_decl() 内で出力されている．
     return NULL;
   }
 
   if ( has_bit_select ) {
-    return factory().new_BitSelect(pt_expr, decl, index1);
+    const PtExpr* pt_expr1 = pt_expr->index(isize - 1);
+    ElbExpr* index = instantiate_expr(parent, index_env, pt_expr1);
+    if ( !index ) {
+      return NULL;
+    }
+    return factory().new_BitSelect(pt_expr, primary, index);
   }
   if ( has_range_select ) {
     switch ( pt_expr->range_mode() ) {
     case kVpiConstRange:
       {
+	const PtExpr* pt_left = pt_expr->left_range();
+	const PtExpr* pt_right = pt_expr->right_range();
 	int index1_val;
-	if ( !expr_to_int(index1, index1_val) ) {
-	  return NULL;
-	}
 	int index2_val;
-	if ( !expr_to_int(index2, index2_val) ) {
+	bool stat1 = evaluate_int(parent, pt_left, index1_val);
+	bool stat2 = evaluate_int(parent, pt_right, index2_val);
+	if ( !stat1 || !stat2 ) {
 	  return NULL;
 	}
-	return factory().new_PartSelect(pt_expr, decl,
-					index1, index2,
+	return factory().new_PartSelect(pt_expr, primary,
+					pt_left, pt_right,
 					index1_val, index2_val);
       }
 
     case kVpiPlusRange:
       {
+	const PtExpr* pt_base = pt_expr->left_range();
+	const PtExpr* pt_range = pt_expr->right_range();
+	ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
 	int range_val;
-	if ( !expr_to_int(index2, range_val) ) {
+	bool stat = evaluate_int(parent, pt_range, range_val);
+	if ( base == NULL || !stat ) {
 	  return NULL;
 	}
-	return factory().new_PlusPartSelect(pt_expr, decl,
-					    index1, index2, range_val);
+	return factory().new_PlusPartSelect(pt_expr, primary,
+					    base, pt_range, range_val);
       }
 
     case kVpiMinusRange:
       {
+	const PtExpr* pt_base = pt_expr->left_range();
+	const PtExpr* pt_range = pt_expr->right_range();
+	ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
 	int range_val;
-	if ( !expr_to_int(index2, range_val) ) {
+	bool stat = evaluate_int(parent, pt_range, range_val);
+	if ( base == NULL || !stat ) {
 	  return NULL;
 	}
-	return factory().new_MinusPartSelect(pt_expr, decl,
-					     index1, index2, range_val);
+	return factory().new_MinusPartSelect(pt_expr, primary,
+					     base, pt_range, range_val);
       }
 
     case kVpiNoRange:
@@ -225,7 +251,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
       break;
     }
   }
-  return factory().new_Primary(pt_expr, decl);
+  return primary;
 }
 
 // @brief PtExpr(primary) から named_event を生成する．
@@ -255,26 +281,35 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
 
   // 配列要素などの処理を行う．
   ElbEnv env0;
+  if ( pt_expr->is_const_index() ) {
+    env0 = ElbConstantEnv();
+  }
+  tVpiObjType decl_type;
+  bool is_array;
   bool has_range_select;
   bool has_bit_select;
-  ElbExpr* index1;
-  ElbExpr* index2;
-  ElbDecl* decl = instantiate_decl(handle, parent, env0, pt_expr,
-				   has_range_select,
-				   has_bit_select,
-				   index1, index2);
-  if ( decl == NULL ) {
+  ElbExpr* primary = instantiate_primary_sub(handle, parent, env0, pt_expr,
+					     decl_type,
+					     is_array,
+					     has_range_select,
+					     has_bit_select);
+  if ( primary == NULL ) {
     // エラー
     // メッセージは instantiate_decl() 内で出力されている．
     return NULL;
   }
-  if ( decl->type() != kVpiNamedEvent ) {
+  if ( decl_type != kVpiNamedEvent ) {
     // 型が違う
     error_not_a_namedevent(pt_expr);
     return NULL;
   }
+  if ( has_range_select || has_bit_select ) {
+    // 部分選択，ビット選択は使えない．
+    error_select_for_namedevent(pt_expr);
+    return NULL;
+  }
 
-  return factory().new_Primary(pt_expr, decl);
+  return primary;
 }
 
 // @brief 定数識別子を探す．
@@ -357,21 +392,20 @@ ExprGen::instantiate_genvar(const VlNamedObj* parent,
 // @param[in] handle オブジェクトハンドル
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
+// @param[out] decl_type 対象の宣言要素の型
+// @param[out] is_array 対象が配列の時 true を返す．
 // @param[out] has_range_select 範囲指定を持っていたら true を返す．
 // @param[out] has_bit_select ビット指定を持っていたら true を返す．
-// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
-ElbDecl*
-ExprGen::instantiate_decl(ElbObjHandle* handle,
-			  const VlNamedObj* parent,
-			  const ElbEnv& env,
-			  const PtExpr* pt_expr,
-			  bool& has_range_select,
-			  bool& has_bit_select,
-			  ElbExpr*& index1,
-			  ElbExpr*& index2)
+ElbExpr*
+ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
+				 const VlNamedObj* parent,
+				 const ElbEnv& env,
+				 const PtExpr* pt_expr,
+				 tVpiObjType& decl_type,
+				 bool& is_array,
+				 bool& has_range_select,
+				 bool& has_bit_select)
 {
-  // 対象の宣言要素
-  ElbDecl* decl = handle->decl();
   // 配列の次元
   ymuint dsize = 0;
   // プライマリ式の次元 (ビット指定を含んでいる可能性あり)
@@ -380,45 +414,45 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
   // 範囲指定があるとき true となるフラグ
   has_range_select = (pt_expr->left_range() && pt_expr->right_range());
 
-  // 添字が定数のとき true となるフラグ
-  bool const_mode = pt_expr->is_const_index();
+  // 答え
+  ElbExpr* primary = NULL;
 
-  // 添字には constant/constant function 以外の情報は引き継がない
-  ElbEnv index_env;
-  if ( const_mode ) {
-    index_env = ElbConstantEnv();
+  ElbDecl* decl = handle->decl();
+  ElbDeclArray* declarray = handle->declarray();
+  tVpiValueType value_type;
+  if ( decl != NULL ) {
+    primary = factory().new_Primary(pt_expr, decl);
+    decl_type = decl->type();
+    is_array = false;
+    value_type = decl->value_type();
   }
-  else if ( env.inside_constant_function() ) {
-    index_env = ElbConstantFunctionEnv(env.constant_function());
-  }
+  else if ( declarray != NULL ) {
+    // 配列の次元
+    dsize = declarray->dimension();
+    if ( isize != dsize && (isize != dsize + 1 || has_range_select) ) {
+      // 次元が合わない．
+      error_dimension_mismatch(pt_expr);
+      return NULL;
+    }
 
-  if ( decl == NULL ) {
-    // そのハンドルが宣言要素の配列なら要素を取り出す．
-    ElbDeclArray* decl_array = handle->decl_array();
-    if ( decl_array ) {
-      // 配列の次元
-      dsize = decl_array->dimension();
-      if ( isize != dsize && (isize != dsize + 1 || has_range_select) ) {
-	// 次元が合わない．
-	error_dimension_mismatch(pt_expr);
+    // 添字を取り出す．
+    vector<ElbExpr*> index_list;
+    index_list.reserve(dsize);
+    for (ymuint i = 0; i < dsize; ++ i) {
+      const PtExpr* pt_expr1 = pt_expr->index(i);
+      ElbExpr* expr1 = instantiate_expr(parent, env, pt_expr1);
+      if ( !expr1 ) {
 	return NULL;
       }
-
-      // 添字を取り出す．
-      vector<ElbExpr*> index_list(dsize);
-      for (ymuint i = 0; i < dsize; ++ i) {
-	const PtExpr* pt_expr1 = pt_expr->index(i);
-	ElbExpr* expr1 = instantiate_expr(parent, index_env, pt_expr1);
-	if ( !expr1 ) {
-	  return NULL;
-	}
-	index_list.push_back(expr1);
-      }
-
-      decl = factory().new_DeclElem(pt_expr, decl_array, index_list);
+      index_list.push_back(expr1);
     }
+
+    primary = factory().new_Primary(pt_expr, declarray, index_list);
+    decl_type = declarray->type();
+    is_array = false;
+    value_type = declarray->value_type();
   }
-  if ( decl == NULL ) {
+  if ( primary == NULL ) {
     // 適切な型ではなかった．
     error_illegal_object_cf(pt_expr);
     return NULL;
@@ -435,61 +469,32 @@ ExprGen::instantiate_decl(ElbObjHandle* handle,
   }
 
   if ( isize != dsize ) {
+    // 次元が会わない．
     error_dimension_mismatch(pt_expr);
     return NULL;
   }
 
-  index1 = NULL;
-  index2 = NULL;
-
-  if ( has_bit_select ) {
-    if ( decl->value_type() == kVpiValueReal ) {
+  if ( has_range_select || has_bit_select ) {
+    if ( value_type == kVpiValueReal ) {
       error_select_for_real(pt_expr);
-      return NULL;
-    }
-    const PtExpr* pt_expr1 = pt_expr->index(0);
-    index1 = instantiate_expr(parent, index_env, pt_expr1);
-    if ( !index1 ) {
-      return NULL;
-    }
-  }
-  else if ( has_range_select ) {
-    if ( decl->value_type() == kVpiValueReal ) {
-      error_select_for_real(pt_expr);
-      return NULL;
-    }
-    if ( pt_expr->range_mode() == kVpiConstRange ) {
-      index1 = instantiate_constant_expr(parent, pt_expr->left_range());
-    }
-    else {
-      index1 = instantiate_expr(parent, index_env, pt_expr->left_range());
-    }
-    if ( !index1 ) {
-      return NULL;
-    }
-
-    // 範囲の2番目の式は常に定数でなければならない．
-    index2 = instantiate_constant_expr(parent, pt_expr->right_range());
-    if ( !index2 ) {
       return NULL;
     }
   }
 
-  return decl;
+  return primary;
 }
 
 // @brief decl の型が適切がチェックする．
 bool
 ExprGen::check_decl(const ElbEnv& env,
 		    const PtExpr* pt_expr,
-		    const ElbDecl* decl,
+		    tVpiObjType decl_type,
+		    bool is_array,
 		    bool has_select)
 {
-  tVpiObjType type = decl->type();
-
   if ( env.is_pca_lhs() ) {
     // procedural continuous assignment 文の左辺式
-    if ( decl->is_array() ) {
+    if ( is_array ) {
       // 配列要素はダメ
       error_array_in_pca(pt_expr);
       return false;
@@ -499,10 +504,10 @@ ExprGen::check_decl(const ElbEnv& env,
       error_select_in_pca(pt_expr);
       return false;
     }
-    if ( type != kVpiReg &&
-	 type != kVpiIntegerVar &&
-	 type != kVpiRealVar &&
-	 type != kVpiTimeVar) {
+    if ( decl_type != kVpiReg &&
+	 decl_type != kVpiIntegerVar &&
+	 decl_type != kVpiRealVar &&
+	 decl_type != kVpiTimeVar) {
       // reg/変数以外はダメ
       error_illegal_object(pt_expr);
       return false;
@@ -510,7 +515,7 @@ ExprGen::check_decl(const ElbEnv& env,
   }
   else if ( env.is_force_lhs() ) {
     // force 文の左辺式
-    if ( decl->is_array() ) {
+    if ( is_array ) {
       // 配列要素はダメ
       error_array_in_force(pt_expr);
       return false;
@@ -520,27 +525,27 @@ ExprGen::check_decl(const ElbEnv& env,
       error_select_in_force(pt_expr);
       return false;
     }
-    if ( type != kVpiNet &
-	 type != kVpiReg &
-	 type != kVpiIntegerVar &
-	 type != kVpiRealVar &
-	 type != kVpiTimeVar) {
+    if ( decl_type != kVpiNet &
+	 decl_type != kVpiReg &
+	 decl_type != kVpiIntegerVar &
+	 decl_type != kVpiRealVar &
+	 decl_type != kVpiTimeVar) {
       // net/reg/変数以外はダメ
       error_illegal_object(pt_expr);
       return false;
     }
   }
   else if ( env.is_net_lhs() &&
-       type != kVpiNet ) {
+       decl_type != kVpiNet ) {
     // net 以外はダメ
     error_illegal_object(pt_expr);
     return false;
   }
   else if ( env.is_var_lhs() &&
-       ( type != kVpiReg &&
-	 type != kVpiIntegerVar &&
-	 type != kVpiRealVar &&
-	 type != kVpiTimeVar ) ) {
+       ( decl_type != kVpiReg &&
+	 decl_type != kVpiIntegerVar &&
+	 decl_type != kVpiRealVar &&
+	 decl_type != kVpiTimeVar ) ) {
     // reg/変数以外はダメ
     error_illegal_object(pt_expr);
     return false;
@@ -549,8 +554,8 @@ ExprGen::check_decl(const ElbEnv& env,
     // 右辺系の環境
     if ( env.is_constant() ) {
       // 定数式
-      if ( type != kVpiParameter &&
-	   type != kVpiSpecParam ) {
+      if ( decl_type != kVpiParameter &&
+	   decl_type != kVpiSpecParam ) {
 	// 定数(parameter)でないのでダメ
 	error_illegal_object(pt_expr);
 	return false;
@@ -558,12 +563,12 @@ ExprGen::check_decl(const ElbEnv& env,
     }
 
     // あとは個別の型ごとにチェックする．
-    if ( type == kVpiRealVar && has_select ) {
+    if ( decl_type == kVpiRealVar && has_select ) {
       // real の部分選択は無効
       error_select_for_real(pt_expr);
       return false;
     }
-    if ( type == kVpiNamedEvent && !env.is_event_expr() ) {
+    if ( decl_type == kVpiNamedEvent && !env.is_event_expr() ) {
       // イベント式以外では名前つきイベントは使えない．
       error_illegal_object(pt_expr);
       return false;

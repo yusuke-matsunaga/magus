@@ -260,28 +260,31 @@ private:
   /// @param[in] parent 親のスコープ
   /// @param[in] env インスタンス化している環境
   /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] decl_type 対象の宣言要素の型
+  /// @param[out] is_array 対象が配列の時 true を返す．
   /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
   /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
-  /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
-  ElbDecl*
-  instantiate_decl(ElbObjHandle* handle,
-		   const VlNamedObj* parent,
-		   const ElbEnv& env,
-		   const PtExpr* pt_expr,
-		   bool& has_range_select,
-		   bool& has_bit_select,
-		   ElbExpr*& index1,
-		   ElbExpr*& index2);
+  ElbExpr*
+  instantiate_primary_sub(ElbObjHandle* handle,
+			  const VlNamedObj* parent,
+			  const ElbEnv& env,
+			  const PtExpr* pt_expr,
+			  tVpiObjType& decl_type,
+			  bool& is_array,
+			  bool& has_range_select,
+			  bool& has_bit_select);
 
   /// @brief decl の型が適切がチェックする．
   /// @param[in] env インスタンス化している環境
   /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 対象の宣言要素
+  /// @param[in] decl_type 対象の宣言要素の型
+  /// @param[in] is_array 対象が配列の時 true を渡す．
   /// @param[in] has_select ビット/範囲指定を持つ時 true を渡す．
   bool
   check_decl(const ElbEnv& env,
 	     const PtExpr* pt_expr,
-	     const ElbDecl* decl,
+	     tVpiObjType decl_type,
+	     bool is_array,
 	     bool has_select);
 
   /// @brief 式の値を評価する．

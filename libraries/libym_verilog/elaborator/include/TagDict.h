@@ -31,12 +31,22 @@ private:
   /// @brief  宣言要素を追加する．
   virtual
   void
-  add_decl(ElbDeclBase* obj);
+  add_decl(ElbDecl* obj);
 
   /// @brief  宣言要素の先頭を得る．
   virtual
-  const ElbDeclBase*
+  const ElbDecl*
   decl();
+
+  /// @brief  宣言要素を追加する．
+  virtual
+  void
+  add_declarray(ElbDeclArray* obj);
+
+  /// @brief  宣言要素の先頭を得る．
+  virtual
+  const ElbDeclArray*
+  declarray();
 
   /// @brief  defparam を追加する．
   virtual
@@ -198,7 +208,7 @@ public:
   /// @param[in] decl 登録する要素
   void
   add_decl(int tag,
-	   ElbDeclBase* decl);
+	   ElbDecl* decl);
 
   /// @brief タグから該当する宣言要素のリストを返す．
   /// @param[in] parent 親のスコープ
@@ -212,6 +222,26 @@ public:
   find_decl_list(const VlNamedObj* parent,
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
+
+  /// @brief 宣言要素を追加する．
+  /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+  /// @param[in] decl 登録する要素
+  void
+  add_declarray(int tag,
+		ElbDeclArray* decl);
+
+  /// @brief タグから該当する宣言要素のリストを返す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+  /// @param[out] declarray_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  /// @note scope というスコープ内の tag というタグを持つ要素を
+  /// decl_list に入れる．
+  bool
+  find_declarray_list(const VlNamedObj* parent,
+		      int tag,
+		      vector<const VlDeclArray*>& declarray_list) const;
 
   /// @brief defparam を追加する．
   /// @param[in] defparam 登録する要素

@@ -74,7 +74,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   ElbDeclArray*
-  decl_array();
+  declarray();
 
   /// @brief ElbTaskFunc を返す．
   /// @note このクラスでは NULL を返す．
@@ -236,7 +236,7 @@ public:
   /// @brief ElbDeclArray を返す．
   virtual
   ElbDeclArray*
-  decl_array();
+  declarray();
 
 
 private:

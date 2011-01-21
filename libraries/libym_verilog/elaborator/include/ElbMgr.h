@@ -101,6 +101,19 @@ public:
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
 
+  /// @brief スコープとタグから宣言要素の配列を取り出す．
+  /// @param[in] parent 検索対象のスコープ
+  /// @param[in] tag タグ
+  /// @param[out] declarray_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  /// @note scope というスコープ内の tag というタグを持つ宣言要素を
+  /// decl_list に入れる．
+  bool
+  find_declarray_list(const VlNamedObj* parent,
+		      int tag,
+		      vector<const VlDeclArray*>& declarray_list) const;
+
   /// @brief スコープに属する defparam のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[out] defparam_list 結果を格納するリスト
@@ -439,6 +452,23 @@ ElbMgr::find_decl_list(const VlNamedObj* parent,
 		       vector<const VlDecl*>& decl_list) const
 {
   return mTagDict.find_decl_list(parent, tag, decl_list);
+}
+
+// @brief スコープとタグから宣言要素の配列を取り出す．
+// @param[in] parent 検索対象のスコープ
+// @param[in] tag タグ
+// @param[out] declarray_list 結果を格納するリスト
+// @retval true 該当する要素が1つ以上あった．
+// @retval false 該当する要素がなかった．
+// @note scope というスコープ内の tag というタグを持つ宣言要素を
+// decl_list に入れる．
+inline
+bool
+ElbMgr::find_declarray_list(const VlNamedObj* parent,
+			    int tag,
+			    vector<const VlDeclArray*>& declarray_list) const
+{
+  return mTagDict.find_declarray_list(parent, tag, declarray_list);
 }
 
 // @brief スコープに属する defparam のリストを取り出す．

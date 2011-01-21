@@ -266,17 +266,20 @@ ModuleGen::instantiate_portref(ElbModule* module,
   const char* name = pt_portref->name();
   ElbObjHandle* handle = find_obj(module, name);
   if ( !handle ) {
-    return NULL;
-  }
-
-  ElbDecl* decl = handle->decl();
-  if ( !decl ) {
-    return NULL;
-  }
-
-  if ( decl->dimension() > 0 ) {
     ostringstream buf;
-    buf << decl->full_name()
+    buf << name
+	<< ": Not found.";
+    put_msg(__FILE__, __LINE__,
+	    pt_portref->file_region(),
+	    kMsgError,
+	    "ELAB",
+	    buf.str());
+    return NULL;
+  }
+
+  if ( handle->declarray() ) {
+    ostringstream buf;
+    buf << handle->declarray()->full_name()
 	<< ": Array shall not be connected to a module port.";
     put_msg(__FILE__, __LINE__,
 	    pt_portref->file_region(),
@@ -285,6 +288,19 @@ ModuleGen::instantiate_portref(ElbModule* module,
 	    buf.str());
     return NULL;
   }
+  ElbDecl* decl = handle->decl();
+  if ( decl == NULL ) {
+    ostringstream buf;
+    buf << name
+	<< ": Illegal type for port connection.";
+    put_msg(__FILE__, __LINE__,
+	    pt_portref->file_region(),
+	    kMsgError,
+	    "ELAB",
+	    buf.str());
+    return NULL;
+  }
+  ElbExpr* primary = factory().new_Primary(pt_portref, decl);
 
   // 添字の部分を実体化する．
   const PtExpr* pt_index = pt_portref->index();
@@ -296,7 +312,7 @@ ModuleGen::instantiate_portref(ElbModule* module,
     if ( !stat ) {
       return NULL;
     }
-    return factory().new_BitSelect(pt_portref, decl, pt_index, index_val);
+    return factory().new_BitSelect(pt_portref, primary, pt_index, index_val);
   }
   else if ( pt_left && pt_right ) {
     int left_val = 0;
@@ -305,12 +321,12 @@ ModuleGen::instantiate_portref(ElbModule* module,
 			    left_val, right_val) ) {
       return NULL;
     }
-    return factory().new_PartSelect(pt_portref, decl,
+    return factory().new_PartSelect(pt_portref, primary,
 				    pt_left, pt_right,
 				    left_val, right_val);
   }
   else {
-    return factory().new_Primary(pt_portref, decl);
+    return primary;
   }
 }
 

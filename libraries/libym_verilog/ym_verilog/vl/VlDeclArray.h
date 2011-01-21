@@ -1,13 +1,13 @@
-#ifndef YM_VERILOG_VL_VLDECL_H
-#define YM_VERILOG_VL_VLDECL_H
+#ifndef YM_VERILOG_VL_VLDECLARRAY_H
+#define YM_VERILOG_VL_VLDECLARRAY_H
 
-/// @file ym_verilog/vl/VlDecl.h
-/// @brief VlDecl のヘッダファイル
+/// @file ym_verilog/vl/VlDeclArray.h
+/// @brief VlDeclArray のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: VlDecl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,22 +18,22 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlDecl VlDecl.h "ym_verilog/vl/VlDecl.h"
+/// @class VlDeclArray VlDeclArray.h "ym_verilog/vl/VlDeclArray.h"
 /// @brief エラボレーション中の名前付きオブジェクトを表す基底クラス
 //////////////////////////////////////////////////////////////////////
-class VlDecl :
+class VlDeclArray :
   public VlNamedObj
 {
 protected:
 
   /// @brief デストラクタ
   virtual
-  ~VlDecl() { }
+  ~VlDeclArray() { }
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // VlDecl の派生クラスに共通な仮想関数
+  // VlDeclArray の派生クラスに共通な仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @breif 値の型を返す．
@@ -41,11 +41,6 @@ public:
   virtual
   tVpiValueType
   value_type() const = 0;
-
-  /// @brief 定数値を持つ型のときに true を返す．
-  virtual
-  bool
-  is_consttype() const = 0;
 
   /// @brief 符号の取得
   /// @retval true 符号つき
@@ -149,20 +144,45 @@ public:
   const VlDelay*
   delay() const = 0;
 
-  /// @brief 初期値の取得
-  /// @retval 初期値
-  /// @retval NULL 設定がない場合
-  virtual
-  const VlExpr*
-  init_value() const = 0;
-
-  /// @brief localparam のときに true 返す．
+  /// @brief 多次元の配列型オブジェクトの時に true を返す．
   virtual
   bool
-  is_local_param() const = 0;
+  is_multi_array() const = 0;
+
+  /// @brief 次元数の取得
+  virtual
+  ymuint
+  dimension() const = 0;
+
+  /// @brief 範囲の取得
+  /// @param[in] pos 位置 ( 0 <= pos < dimension() )
+  virtual
+  const VlRange*
+  range(ymuint pos) const = 0;
+
+  /// @brief 配列の要素数の取得
+  virtual
+  ymuint
+  array_size() const = 0;
+
+  /// @brief 1次元配列の場合にインデックスからオフセットを計算する．
+  /// @param[in] index インデックス
+  /// @return index に対するオフセット値を返す．
+  /// @note index が範囲外の場合には -1 を返す．
+  virtual
+  int
+  array_offset(int index) const = 0;
+
+  /// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
+  /// @param[in] index_list インデックスのリスト
+  /// @return index_list に対するオフセット値を返す．
+  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+  virtual
+  int
+  array_offset(const vector<int>& index_list) const = 0;
 
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // YM_VERILOG_VL_VLDECL_H
+#endif // YM_VERILOG_VL_VLDECLARRAY_H

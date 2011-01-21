@@ -150,11 +150,24 @@ public:
 	   const VlMgr& mgr,
 	   const VlDecl* decl);
 
+  /// @brief 宣言要素の内容を出力する関数
+  /// @param[in] mgr VlMgr
+  void
+  put_declarray(const char* label,
+		const VlMgr& mgr,
+		const VlDeclArray* declarray);
+
   /// @brief 宣言要素のリストの内容を出力する関数
   void
   put_decl_list(const char* label,
 		const VlMgr& mgr,
 		const vector<const VlDecl*>& decl_list);
+
+  /// @brief 宣言要素のリストの内容を出力する関数
+  void
+  put_declarray_list(const char* label,
+		     const VlMgr& mgr,
+		     const vector<const VlDeclArray*>& decl_list);
 
   /// @brief def param のリストの内容を出力する関数
   void

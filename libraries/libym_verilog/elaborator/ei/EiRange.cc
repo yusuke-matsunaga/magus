@@ -11,7 +11,8 @@
 
 #include "EiFactory.h"
 #include "EiRange.h"
-#include "ElbExpr.h"
+
+#include "ym_verilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -79,32 +80,36 @@ EiRange::size() const
   return calc_size(mLeftVal, mRightVal);
 }
 
-// @brief MSB を返す．
-VlExpr*
-EiRange::left_range() const
-{
-  return mLeftRange;
-}
-
-// @brief LSB を返す．
-VlExpr*
-EiRange::right_range() const
-{
-  return mRightRange;
-}
-
 // @brief MSB の値を返す．
+// @retval MSB の値 値が確定しているとき
+// @retval -1 値が確定していない
 int
-EiRange::left_range_const() const
+EiRange::left_range_val() const
 {
   return mLeftVal;
 }
 
 // @brief LSB の値を返す．
+// @retval LSB の値 値が確定しているとき
+// @retval -1 値が確定していない
 int
-EiRange::right_range_const() const
+EiRange::right_range_val() const
 {
   return mRightVal;
+}
+
+// @brief MSB を表す文字列を返す．
+string
+EiRange::left_range_string() const
+{
+  return mLeftRange->decompile();
+}
+
+// @brief LSB を表す文字列を返す．
+string
+EiRange::right_range_string() const
+{
+  return mRightRange->decompile();
 }
 
 // @brief 範囲のチェック
@@ -176,8 +181,8 @@ EiRangeImpl::~EiRangeImpl()
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 void
-EiRangeImpl::set(ElbExpr* left,
-		 ElbExpr* right,
+EiRangeImpl::set(const PtExpr* left,
+		 const PtExpr* right,
 		 int left_val,
 		 int right_val)
 {
@@ -194,32 +199,32 @@ EiRangeImpl::size() const
   return EiRange::calc_size(mLeftVal, mRightVal);
 }
 
-// MSB を返す．
-ElbExpr*
-EiRangeImpl::left_range() const
-{
-  return mLeftRange;
-}
-
-// LSB を返す．
-ElbExpr*
-EiRangeImpl::right_range() const
-{
-  return mRightRange;
-}
-
-// MSB の値を返す．確定していないときは -1 を返す．
+// @brief MSB の値を返す．
 int
-EiRangeImpl::left_range_const() const
+EiRangeImpl::left_range_val() const
 {
   return mLeftVal;
 }
 
-// LSB の値を返す．確定していないときは -1 を返す．
+// @brief LSB の値を返す．
 int
-EiRangeImpl::right_range_const() const
+EiRangeImpl::right_range_val() const
 {
   return mRightVal;
+}
+
+// @brief MSB を表す文字列を返す．
+string
+EiRangeImpl::left_range_string() const
+{
+  return mLeftRange->decompile();
+}
+
+// @brief LSB を表す文字列を返す．
+string
+EiRangeImpl::right_range_string() const
+{
+  return mRightRange->decompile();
 }
 
 // index が範囲内に入っていたら true を返す．

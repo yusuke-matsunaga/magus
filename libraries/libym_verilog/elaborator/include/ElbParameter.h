@@ -54,29 +54,34 @@ public:
   bool
   is_signed() const = 0;
 
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  ElbExpr*
-  left_range() const = 0;
+  bool
+  has_range() const = 0;
 
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  right_range() const = 0;
-
-  /// @brief MSB の値を返す．
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  left_range_const() const = 0;
+  left_range_val() const = 0;
 
-  /// @brief LSB の値を返す．
+  /// @brief 範囲の LSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const = 0;
+  right_range_val() const = 0;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const = 0;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const = 0;
 
   /// @brief ビット幅を返す．
   /// @note このクラスでは 1 を返す．
@@ -223,61 +228,6 @@ public:
   virtual
   const VlDelay*
   delay() const;
-
-  /// @brief 配列型オブジェクトの時に true を返す．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  bool
-  is_array() const;
-
-  /// @brief 多次元の配列型オブジェクトの時に true を返す．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  bool
-  is_multi_array() const;
-
-  /// @brief 配列型オブジェクトの場合の次元数の取得
-  /// @note このクラスでは 0 を返す．
-  virtual
-  ymuint
-  dimension() const;
-
-  /// @brief 範囲の取得
-  /// @param[in] pos 位置 ( 0 <= pos < dimension() )
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlRange*
-  range(ymuint pos) const;
-
-  /// @brief 配列要素の時に true を返す．
-  /// @note このクラスでは false を返す．
-  virtual
-  bool
-  is_array_member() const;
-
-  /// @brief 多次元の配列要素の時に true を返す．
-  /// @note このクラスでは false を返す．
-  virtual
-  bool
-  is_multi_array_member() const;
-
-  /// @brief 配列要素の時に親の配列を返す．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  VlDecl*
-  parent_array() const;
-
-  /// @brief 1次元配列要素の時にインデックスを返す．
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlExpr*
-  index() const;
-
-  /// @brief 多次元配列要素の時にインデックスのリストを返す．
-  /// @param[out] index_list インデックスのリストを格納する変数
-  virtual
-  void
-  index(vector<const VlExpr*>& index_list) const;
 
 
 public:

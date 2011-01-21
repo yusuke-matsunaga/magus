@@ -78,7 +78,7 @@ ElbObjHandle::decl()
 // @brief ElbDeclArray を返す．
 // @note このクラスでは NULL を返す．
 ElbDeclArray*
-ElbObjHandle::decl_array()
+ElbObjHandle::declarray()
 {
   return NULL;
 }
@@ -216,7 +216,7 @@ ElbDeclArrayHandle::obj()
 
 // @brief ElbDeclArray を返す．
 ElbDeclArray*
-ElbDeclArrayHandle::decl_array()
+ElbDeclArrayHandle::declarray()
 {
   return mObj;
 }

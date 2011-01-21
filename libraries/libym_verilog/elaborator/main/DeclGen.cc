@@ -171,30 +171,30 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	  }
 	}
 	if ( !decl ) {
-	  ostringstream buf;
-	  buf << handle->full_name()
-	      << ": Should be a ";
-	  if ( module ) {
-	    buf << "net, ";
+	  if ( handle->declarray() ) {
+	    ostringstream buf;
+	    buf << pt_item->name()
+		<< ": Array object shall not be connected to IO port.";
+	    put_msg(__FILE__, __LINE__,
+		    decl->file_region(),
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
 	  }
-	  buf << "reg or integer/time variable.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_item->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
-	  continue;
-	}
-
-	if ( decl->dimension() > 0 ) {
-	  ostringstream buf;
-	  buf << pt_item->name()
-	      << ": Array object shall not be connected to IO port.";
-	  put_msg(__FILE__, __LINE__,
-		  decl->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  else {
+	    ostringstream buf;
+	    buf << handle->full_name()
+		<< ": Should be a ";
+	    if ( module ) {
+	      buf << "net, ";
+	    }
+	    buf << "reg or integer/time variable.";
+	    put_msg(__FILE__, __LINE__,
+		    pt_item->file_region(),
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
+	  }
 	  continue;
 	}
 

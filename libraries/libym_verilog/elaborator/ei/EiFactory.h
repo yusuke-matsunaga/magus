@@ -115,8 +115,8 @@ public:
 		  const PtModule* pt_module,
 		  const PtItem* pt_head,
 		  const PtInst* pt_inst,
-		  ElbExpr* left,
-		  ElbExpr* right,
+		  const PtExpr* left,
+		  const PtExpr* right,
 		  int left_val,
 		  int right_val);
 
@@ -156,8 +156,8 @@ public:
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtDeclHead* pt_head,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val,
 	       bool has_delay = false);
@@ -186,8 +186,8 @@ public:
   new_DeclHead(const VlNamedObj* parent,
 	       const PtIOHead* pt_head,
 	       tVpiAuxType aux_type,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val);
 
@@ -212,8 +212,8 @@ public:
   ElbDeclHead*
   new_DeclHead(const VlNamedObj* parent,
 	       const PtItem* pt_item,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val);
 
@@ -261,16 +261,6 @@ public:
 		const PtNamedBase* pt_item,
 		const vector<ElbRangeSrc>& range_src);
 
-  /// @brief 宣言要素を生成する(配列の要素)．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] parent_array 親の配列
-  /// @param[in] index_list インデックスのリスト
-  virtual
-  ElbDecl*
-  new_DeclElem(const PtBase* pt_expr,
-	       ElbDeclArray* parent_array,
-	       const vector<ElbExpr*>& index_list);
-
   /// @brief parameter 宣言のヘッダを生成する(範囲指定なし)．
   /// @param[in] parent 親のスコープ
   virtual
@@ -289,8 +279,8 @@ public:
   ElbParamHead*
   new_ParamHead(const VlNamedObj* parent,
 		const PtDeclHead* pt_head,
-		ElbExpr* left,
-		ElbExpr* right,
+		const PtExpr* left,
+		const PtExpr* right,
 		int left_val,
 		int right_val);
 
@@ -418,8 +408,8 @@ public:
   ElbPrimArray*
   new_PrimitiveArray(ElbPrimHead* head,
 		     const PtInst* pt_inst,
-		     ElbExpr* left,
-		     ElbExpr* right,
+		     const PtExpr* left,
+		     const PtExpr* right,
 		     int left_val,
 		     int right_val);
 
@@ -434,8 +424,8 @@ public:
   ElbTaskFunc*
   new_Function(const VlNamedObj* parent,
 	       const PtItem* pt_item,
-	       ElbExpr* left,
-	       ElbExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       int left_val,
 	       int right_val);
 
@@ -878,48 +868,70 @@ public:
   new_Primary(const PtBase* pt_expr,
 	      ElbDecl* obj);
 
-  /// @brief ビット選択式を生成する．
+  /// @brief プライマリ式を生成する(配列要素版)．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
+  /// @param[in] index_list インデックスのリスト
+  virtual
+  ElbExpr*
+  new_Primary(const PtBase* pt_expr,
+	      ElbDeclArray* obj,
+	      const vector<ElbExpr*>& index_list);
+
+  /// @brief 固定ビット選択式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] expr 本体のオブジェクト
   /// @param[in] bit_index ビット選択式
+  /// @param[in] bit_index_val ビット選択式の値
   virtual
   ElbExpr*
   new_BitSelect(const PtBase* pt_expr,
-		ElbDecl* obj,
-		ElbExpr* bit_index);
+		ElbExpr* expr,
+		const PtExpr* bit_index,
+		int bit_index_val);
 
-  /// @brief ビット選択式を生成する．
+  /// @brief 固定ビット選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] expr 本体の式
+  /// @param[in] bit_index_val ビット選択式の値
+  virtual
+  ElbExpr*
+  new_BitSelect(const PtBase* pt_expr,
+		ElbExpr* expr,
+		int bit_index_val);
+
+  /// @brief 可変ビット選択式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] expr 本体のオブジェクト
   /// @param[in] bit_index ビット選択式
   virtual
   ElbExpr*
   new_BitSelect(const PtBase* pt_expr,
 		ElbExpr* expr,
-		int bit_index);
+		ElbExpr* bit_index);
 
-  /// @brief 部分選択式を生成する．
+  /// @brief 固定部分選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] parent_expr 本体の式
   /// @param[in] index1, index2 パート選択式
   /// @param[in] index1_val, index2_val パート選択式の値
   virtual
   ElbExpr*
   new_PartSelect(const PtBase* pt_expr,
-		 ElbDecl* obj,
-		 ElbExpr* index1,
-		 ElbExpr* index2,
+		 ElbExpr* parent_expr,
+		 const PtExpr* index1,
+		 const PtExpr* index2,
 		 int index1_val,
 		 int index2_val);
 
-  /// @brief 部分選択式を生成する．
+  /// @brief 固定部分選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] expr 本体の式
+  /// @param[in] parent_expr 本体の式
   /// @param[in] index1, inde2 パート選択式
   virtual
   ElbExpr*
   new_PartSelect(const PtBase* pt_expr,
-		 ElbExpr* expr,
+		 ElbExpr* parent_expr,
 		 int index1,
 		 int index2);
 
@@ -932,9 +944,9 @@ public:
   virtual
   ElbExpr*
   new_PlusPartSelect(const PtBase* pt_expr,
-		     ElbDecl* obj,
+		     ElbExpr* obj,
 		     ElbExpr* base,
-		     ElbExpr* range,
+		     const PtExpr* range_expr,
 		     int range_val);
 
   /// @brief 可変部分選択式を生成する．
@@ -946,9 +958,9 @@ public:
   virtual
   ElbExpr*
   new_MinusPartSelect(const PtBase* pt_expr,
-		      ElbDecl* obj,
+		      ElbExpr* obj,
 		      ElbExpr* base,
-		      ElbExpr* range,
+		      const PtExpr* range_expr,
 		      int range_val);
 
   /// @brief 定数式を生成する．

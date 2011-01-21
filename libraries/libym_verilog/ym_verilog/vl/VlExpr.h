@@ -78,16 +78,6 @@ public:
   bool
   is_partselect() const = 0;
 
-  /// @brief 範囲指定のモードを返す．
-  /// @retval kVpiNoRange 範囲指定なし
-  /// @retval kVpiConstRange 固定範囲
-  /// @retval kVpiPlusRange +: の可動範囲
-  /// @retval kVpiMinusRange -: の可動範囲
-  /// @note is_partselect() == true の時のみ意味を持つ．
-  virtual
-  tVpiRangeMode
-  range_mode() const = 0;
-
   /// @brief 演算子の時に true を返す．
   virtual
   bool
@@ -104,11 +94,16 @@ public:
   is_sysfunccall() const = 0;
 
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-  /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlDecl*
   decl_obj() const = 0;
+
+  /// @brief 宣言要素の配列への参照の場合，対象のオブジェクトを返す．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlDeclArray*
+  declarray_obj() const = 0;
 
   /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
   /// @note それ以外では 0 を返す．
@@ -144,60 +139,68 @@ public:
   parent_expr() const = 0;
 
   /// @brief インデックス式を返す．
-  /// @note 通常のビット選択の時，意味を持つ．
+  /// @note ビット選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
   index() const = 0;
 
   /// @brief インデックス値を返す．
-  /// @note 式に対するビット選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note 固定ビット選択の時，意味を持つ．
+  /// @note それ以外では値は不定
   virtual
   int
   index_val() const = 0;
 
+  /// @brief 範囲指定のモードを返す．
+  /// @retval kVpiNoRange 範囲指定なし
+  /// @retval kVpiConstRange 固定範囲
+  /// @retval kVpiPlusRange +: の可動範囲
+  /// @retval kVpiMinusRange -: の可動範囲
+  /// @note is_partselect() == true の時のみ意味を持つ．
+  virtual
+  tVpiRangeMode
+  range_mode() const = 0;
+
   /// @brief 範囲の MSB の式を返す．
-  /// @note 通常の範囲選択の時，意味を持つ．
+  /// @note 範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
   left_range() const = 0;
 
   /// @brief 範囲の MSB の値を返す．
-  /// @note 式に対する範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note それ以外では値は不定
   virtual
   int
   left_range_val() const = 0;
 
   /// @brief 範囲の LSB の式を返す．
-  /// @note 通常の範囲選択の時，意味を持つ．
+  /// @note 範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
   right_range() const = 0;
 
   /// @brief 範囲の LSB の値を返す．
-  /// @note 式に対する範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note それ以外では値は不定
   virtual
   int
   right_range_val() const = 0;
 
-  /// @brief 範囲のビット幅を表す式を返す．
+  /// @brief 範囲のベースを表す式を返す．
   /// @note 可変範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
-  range_width() const = 0;
+  base() const = 0;
 
   /// @brief 範囲のビット幅を返す．
   /// @note 可変範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note それ以外では値は不定
   virtual
   int
-  range_width_val() const = 0;
+  range_width() const = 0;
 
   /// @brief 演算子の型を返す．
   /// @note kVpiOperation の時，意味を持つ．

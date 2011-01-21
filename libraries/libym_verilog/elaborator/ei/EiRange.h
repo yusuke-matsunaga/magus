@@ -12,7 +12,6 @@
 
 
 #include "ElbRange.h"
-#include "ElbExpr.h"
 #include "ym_verilog/pt/PtDecl.h"
 
 
@@ -219,10 +218,10 @@ private:
   const PtRange* mPtRange;
 
   // 範囲の MSB
-  ElbExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲の LSB
-  ElbExpr* mRightRange;
+  const PtExpr* mRightRange;
 
   // MSB の値
   int mLeftVal;
@@ -261,8 +260,8 @@ public:
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
   void
-  set(ElbExpr* left,
-      ElbExpr* right,
+  set(const PtExpr* left,
+      const PtExpr* right,
       int left_val,
       int right_val);
 

@@ -110,123 +110,6 @@ ElbDeclHead::set_delay(ElbDelay* delay)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ElbDeclBase
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-ElbDeclBase::ElbDeclBase() :
-  mNext(NULL)
-{
-}
-
-// @brief デストラクタ
-ElbDeclBase::~ElbDeclBase()
-{
-}
-
-// @brief 定数値を持つ型のときに true を返す．
-bool
-ElbDeclBase::is_consttype() const
-{
-  return false;
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-const VlExpr*
-ElbDeclBase::left_range() const
-{
-  return _left_range();
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-const VlExpr*
-ElbDeclBase::right_range() const
-{
-  return _right_range();
-}
-
-// @brief 初期値の取得
-// @retval 初期値
-// @retval NULL 設定がない場合
-// @note このクラスでは NULL を返す．
-const VlExpr*
-ElbDeclBase::init_value() const
-{
-  return NULL;
-}
-
-// @brief localparam のときに true 返す．
-// @note このクラスでは false を返す．
-bool
-ElbDeclBase::is_local_param() const
-{
-  return false;
-}
-
-// @brief 配列型オブジェクトの時に true を返す．
-bool
-ElbDeclBase::is_array() const
-{
-  return false;
-}
-
-// @brief 多次元の配列型オブジェクトの時に true を返す．
-bool
-ElbDeclBase::is_multi_array() const
-{
-  return false;
-}
-
-// @brief 配列型オブジェクトの場合の次元数の取得
-// @note このクラスでは 0 を返す．
-ymuint
-ElbDeclBase::dimension() const
-{
-  return 0;
-}
-
-// @brief 範囲の取得
-// @param[in] pos 位置 ( 0 <= pos < dimension() )
-// @note このクラスでは NULL を返す．
-const VlRange*
-ElbDeclBase::range(ymuint pos) const
-{
-  return NULL;
-}
-
-// @brief 配列の要素数の取得
-ymuint
-ElbDeclBase::array_size() const
-{
-  return 0;
-}
-
-// @brief 1次元配列の場合にインデックスからオフセットを計算する．
-// @param[in] index インデックス
-// @return index に対するオフセット値を返す．
-// @note index が範囲外の場合には -1 を返す．
-int
-ElbDeclBase::array_offset(int index) const
-{
-  return -1;
-}
-
-// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
-// @param[in] index_list インデックスのリスト
-// @return index_list に対するオフセット値を返す．
-// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
-int
-ElbDeclBase::array_offset(const vector<int>& index_list) const
-{
-  return -1;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス ElbDecl
 //////////////////////////////////////////////////////////////////////
 
@@ -238,6 +121,22 @@ ElbDecl::ElbDecl()
 // @brief デストラクタ
 ElbDecl::~ElbDecl()
 {
+}
+
+// @brief 定数値を持つ型のときに true を返す．
+// @note このクラスは false を返す．
+bool
+ElbDecl::is_consttype() const
+{
+  return false;
+}
+
+// @brief localparam のときに true 返す．
+// @note このクラスでは false を返す．
+bool
+ElbDecl::is_local_param() const
+{
+  return false;
 }
 
 // @brief 初期値の設定

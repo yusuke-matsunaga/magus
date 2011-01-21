@@ -32,7 +32,6 @@ class ElbIODecl;
 
 // in ElbDecl.h
 class ElbDeclHead;
-class ElbDeclBase;
 class ElbDecl;
 class ElbDeclArray;
 

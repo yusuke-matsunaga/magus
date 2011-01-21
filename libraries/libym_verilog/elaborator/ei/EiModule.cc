@@ -70,8 +70,8 @@ EiFactory::new_ModuleArray(const VlNamedObj* parent,
 			   const PtModule* pt_module,
 			   const PtItem* pt_head,
 			   const PtInst* pt_inst,
-			   ElbExpr* left,
-			   ElbExpr* right,
+			   const PtExpr* left,
+			   const PtExpr* right,
 			   int left_val,
 			   int right_val)
 {

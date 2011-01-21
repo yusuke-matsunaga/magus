@@ -311,6 +311,15 @@ EiDecl::delay() const
   return mHead->delay();
 }
 
+// @brief 初期値の取得
+// @retval 初期値
+// @retval NULL 設定がない場合
+const VlExpr*
+EiDecl::init_value() const
+{
+  return NULL;
+}
+
 // @brief 符号付きに補正する．
 void
 EiDecl::set_signed()

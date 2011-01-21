@@ -42,14 +42,16 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
 			    const VlNamedObj* scope)
 {
   vector<const VlDecl*> decl_list;
+  vector<const VlDeclArray*> declarray_list;
+  vector<const VlParamAssign*> paramassign_list;
+  vector<const VlDefParam*> defparam_list;
+
   if ( mgr.find_decl_list(scope, vpiParameter, decl_list) ) {
     put_decl_list("vpiParameter", mgr, decl_list);
   }
-  vector<const VlParamAssign*> paramassign_list;
   if ( mgr.find_paramassign_list(scope, paramassign_list) ) {
     put_paramassign_list("vpiParamAssign", mgr, paramassign_list);
   }
-  vector<const VlDefParam*> defparam_list;
   if ( mgr.find_defparam_list(scope, defparam_list) ) {
     put_defparam_list("vpiDefParam", mgr, defparam_list);
   }
@@ -59,14 +61,14 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
   if ( mgr.find_decl_list(scope, vpiNet, decl_list) ) {
     put_decl_list("vpiNet", mgr, decl_list);
   }
-  if ( mgr.find_decl_list(scope, vpiNetArray, decl_list) ) {
-    put_decl_list("vpiNetArray", mgr, decl_list);
+  if ( mgr.find_declarray_list(scope, vpiNetArray, declarray_list) ) {
+    put_declarray_list("vpiNetArray", mgr, declarray_list);
   }
   if ( mgr.find_decl_list(scope, vpiReg, decl_list) ) {
     put_decl_list("vpiReg", mgr, decl_list);
   }
-  if ( mgr.find_decl_list(scope, vpiRegArray, decl_list) ) {
-    put_decl_list("vpiRegArray", mgr, decl_list);
+  if ( mgr.find_declarray_list(scope, vpiRegArray, declarray_list) ) {
+    put_declarray_list("vpiRegArray", mgr, declarray_list);
   }
   if ( mgr.find_decl_list(scope, vpiVariables, decl_list) ) {
     put_decl_list("vpiVariables", mgr, decl_list);
@@ -74,8 +76,8 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
   if ( mgr.find_decl_list(scope, kVpiNamedEvent, decl_list) ) {
     put_decl_list("vpiNamedEvent", mgr, decl_list);
   }
-  if ( mgr.find_decl_list(scope, kVpiNamedEventArray, decl_list) ) {
-    put_decl_list("vpiNamedEventArray", mgr, decl_list);
+  if ( mgr.find_declarray_list(scope, kVpiNamedEventArray, declarray_list) ) {
+    put_declarray_list("vpiNamedEventArray", mgr, declarray_list);
   }
 
   vector<const VlNamedObj*> scope_list;

@@ -170,7 +170,7 @@ private:
   EiArrayElemPrimary(const PtBase* pt_expr,
 		     ElbDeclArray* obj,
 		     ymuint dim,
-		     ElbExpr* index_list);
+		     ElbExpr** index_list);
 
   /// @brief デストラクタ
   virtual
@@ -212,8 +212,8 @@ public:
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
   virtual
-  const VlDecl*
-  decl_obj() const;
+  const VlDeclArray*
+  declarray_obj() const;
 
   /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
   /// @note それ以外では 0 を返す．

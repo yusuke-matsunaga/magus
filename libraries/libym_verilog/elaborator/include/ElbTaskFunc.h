@@ -120,20 +120,6 @@ public:
 		 BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const = 0;
 
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _left_range() const = 0;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _right_range() const = 0;
-
 
 public:
   //////////////////////////////////////////////////////////////////////

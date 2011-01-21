@@ -136,35 +136,33 @@ TagDict::hash_func(const VlNamedObj* parent,
 
 // 宣言要素を追加する．
 void
-TagDictCell::add_decl(ElbDeclBase* obj)
+TagDictCell::add_decl(ElbDecl* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // 宣言要素の先頭を得る．
-const ElbDeclBase*
+const ElbDecl*
 TagDictCell::decl()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
-#if 0
-// parameter 宣言を追加する．
+// 宣言要素配列を追加する．
 void
-TagDictCell::add_parameter(ElbParameter* obj)
+TagDictCell::add_declarray(ElbDeclArray* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
-// parameter 宣言の先頭を得る．
-const ElbParameter*
-TagDictCell::parameter()
+// 宣言要素配列の先頭を得る．
+const ElbDeclArray*
+TagDictCell::declarray()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-#endif
 
 // defparam を追加する．
 void
@@ -458,16 +456,16 @@ class CellDecl :
 public:
 
   /// @brief コンストラクタ
-  CellDecl(ElbDeclBase* obj);
+  CellDecl(ElbDecl* obj);
 
   /// @brief 要素の追加
   virtual
   void
-  add_decl(ElbDeclBase* obj);
+  add_decl(ElbDecl* obj);
 
   /// @brief 宣言要素の先頭を得る．
   virtual
-  ElbDeclBase*
+  ElbDecl*
   decl();
 
   /// @brief 要素数の取得
@@ -482,10 +480,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 先頭の要素
-  ElbDeclBase* mTop;
+  ElbDecl* mTop;
 
   // 末尾の要素
-  ElbDeclBase* mTail;
+  ElbDecl* mTail;
 
   // 要素数
   ymuint32 mNum;
@@ -493,7 +491,7 @@ private:
 };
 
 // @brief コンストラクタ
-CellDecl::CellDecl(ElbDeclBase* obj) :
+CellDecl::CellDecl(ElbDecl* obj) :
   mTop(obj),
   mTail(obj),
   mNum(1)
@@ -502,7 +500,7 @@ CellDecl::CellDecl(ElbDeclBase* obj) :
 
 // @brief 要素の追加
 void
-CellDecl::add_decl(ElbDeclBase* obj)
+CellDecl::add_decl(ElbDecl* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
@@ -510,7 +508,7 @@ CellDecl::add_decl(ElbDeclBase* obj)
 }
 
 // @brief 宣言要素の先頭を得る．
-ElbDeclBase*
+ElbDecl*
 CellDecl::decl()
 {
   return mTop;
@@ -528,7 +526,7 @@ CellDecl::num()
 // @param[in] obj 登録する要素
 void
 TagDict::add_decl(int tag,
-		  ElbDeclBase* obj)
+		  ElbDecl* obj)
 {
   const VlNamedObj* parent = obj->parent();
 
@@ -562,7 +560,7 @@ TagDict::find_decl_list(const VlNamedObj* parent,
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbDeclBase* obj = cell->decl();
+    for (const ElbDecl* obj = cell->decl();
 	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
@@ -572,27 +570,26 @@ TagDict::find_decl_list(const VlNamedObj* parent,
 }
 
 
-#if 0
 //////////////////////////////////////////////////////////////////////
-// parameter 宣言用のセル
+// 宣言要素用のセル
 //////////////////////////////////////////////////////////////////////
-class CellParam :
+class CellDeclArray :
   public TagDictCell
 {
 public:
 
   /// @brief コンストラクタ
-  CellParam(ElbParameter* obj);
+  CellDeclArray(ElbDeclArray* obj);
 
   /// @brief 要素の追加
   virtual
   void
-  add_parameter(ElbParameter* obj);
+  add_declarray(ElbDeclArray* obj);
 
-  /// @brief parameter 宣言の先頭を得る．
+  /// @brief 宣言要素の先頭を得る．
   virtual
-  ElbParameter*
-  parameter();
+  ElbDeclArray*
+  declarray();
 
   /// @brief 要素数の取得
   virtual
@@ -606,10 +603,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 先頭の要素
-  ElbParameter* mTop;
+  ElbDeclArray* mTop;
 
   // 末尾の要素
-  ElbParameter* mTail;
+  ElbDeclArray* mTail;
 
   // 要素数
   ymuint32 mNum;
@@ -617,7 +614,7 @@ private:
 };
 
 // @brief コンストラクタ
-CellParam::CellParam(ElbParameter* obj) :
+CellDeclArray::CellDeclArray(ElbDeclArray* obj) :
   mTop(obj),
   mTail(obj),
   mNum(1)
@@ -626,43 +623,45 @@ CellParam::CellParam(ElbParameter* obj) :
 
 // @brief 要素の追加
 void
-CellParam::add_parameter(ElbParameter* obj)
+CellDeclArray::add_declarray(ElbDeclArray* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
   ++ mNum;
 }
 
-// @brief parameter 宣言の先頭を得る．
-ElbParameter*
-CellParam::parameter()
+// @brief 宣言要素の先頭を得る．
+ElbDeclArray*
+CellDeclArray::declarray()
 {
   return mTop;
 }
 
 // @brief 要素数の取得
 ymuint
-CellParam::num()
+CellDeclArray::num()
 {
   return mNum;
 }
 
-// @brief parameter 宣言を追加する．
+// @brief 宣言要素を追加する．
+// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
 // @param[in] obj 登録する要素
 void
-TagDict::add_parameter(ElbParameter* obj)
+TagDict::add_declarray(int tag,
+		       ElbDeclArray* obj)
 {
   const VlNamedObj* parent = obj->parent();
 
   // 該当の Cell が存在するか調べる．
-  TagDictCell* cell = find_cell(parent, vpiParameter);
+  TagDictCell* cell = find_cell(parent, tag);
   if ( cell ) {
-    cell->add_parameter(obj);
+    cell->add_declarray(obj);
   }
   else {
-    void* p = mAlloc.get_memory(sizeof(CellParam));
-    TagDictCell* cell = new (p) CellParam(obj);
-    put_cell(parent, vpiParameter, cell);
+    void* p = mAlloc.get_memory(sizeof(CellDeclArray));
+    TagDictCell* cell = new (p) CellDeclArray(obj);
+    put_cell(parent, tag, cell);
   }
 }
 
@@ -673,17 +672,18 @@ TagDict::add_parameter(ElbParameter* obj)
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 // @note scope というスコープ内の tag というタグを持つ要素を
-// decl_list に入れる．
+// obj_list に入れる．
 bool
-TagDict::find_param_list(const VlNamedObj* parent,
-			 vector<const VlDecl*>& obj_list) const
+TagDict::find_declarray_list(const VlNamedObj* parent,
+			     int tag,
+			     vector<const VlDeclArray*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
-  TagDictCell* cell = find_cell(parent, vpiParameter);
+  TagDictCell* cell = find_cell(parent, tag);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbParameter* obj = cell->parameter();
+    for (const ElbDeclArray* obj = cell->declarray();
 	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
@@ -691,7 +691,6 @@ TagDict::find_param_list(const VlNamedObj* parent,
   }
   return false;
 }
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

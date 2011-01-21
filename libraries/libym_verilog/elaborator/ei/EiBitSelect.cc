@@ -14,6 +14,7 @@
 #include "ElbDecl.h"
 
 #include "ym_verilog/BitVector.h"
+#include "ym_verilog/pt/PtExpr.h"
 
 
 
@@ -23,34 +24,52 @@ BEGIN_NAMESPACE_YM_VERILOG
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief ビット選択式を生成する．
+// @brief 固定ビット選択式を生成する．
 // @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] bit_index ビット選択式
+// @param[in] base_expr 本体のオブジェクト
+// @param[in] index_expr ビット選択式
+// @param[in] index_val ビット選択式の値
 ElbExpr*
 EiFactory::new_BitSelect(const PtBase* pt_expr,
-			 ElbDecl* obj,
-			 ElbExpr* bit_index)
+			 ElbExpr* base_expr,
+			 const PtExpr* index_expr,
+			 int index_val)
 {
-  void* p = mAlloc.get_memory(sizeof(EiDeclBitSelect));
-  ElbExpr* expr = new (p) EiDeclBitSelect(pt_expr, obj, bit_index);
+  void* p = mAlloc.get_memory(sizeof(EiConstBitSelect));
+  ElbExpr* expr = new (p) EiConstBitSelect(pt_expr, base_expr,
+					   index_expr, index_val);
 
   return expr;
 }
 
-// @brief ビット選択式を生成する．
+// @brief 固定ビット選択式を生成する．
 // @param[in] pt_expr パース木の定義要素
-// @param[in] expr 本体の式
-// @param[in] bit_index ビット位置
+// @param[in] base_expr 本体の式
+// @param[in] bit_index_val ビット選択式の値
 ElbExpr*
 EiFactory::new_BitSelect(const PtBase* pt_expr,
-			 ElbExpr* expr,
-			 int bit_index)
+			 ElbExpr* base_expr,
+			 int index_val)
 {
-  void* p = mAlloc.get_memory(sizeof(EiExprBitSelect));
-  EiExprBitSelect* expr1 = new (p) EiExprBitSelect(pt_expr, expr, bit_index);
+  void* p = mAlloc.get_memory(sizeof(EiConstBitSelect));
+  ElbExpr* expr = new (p) EiConstBitSelect(pt_expr, base_expr, NULL, index_val);
 
-  return expr1;
+  return expr;
+}
+
+// @brief 可変ビット選択式を生成する．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] base_expr 本体のオブジェクト
+// @param[in] bit_index ビット選択式
+ElbExpr*
+EiFactory::new_BitSelect(const PtBase* pt_expr,
+			 ElbExpr* base_expr,
+			 ElbExpr* index_expr)
+{
+  void* p = mAlloc.get_memory(sizeof(EiBitSelect));
+  ElbExpr* expr = new (p) EiBitSelect(pt_expr, base_expr, index_expr);
+
+  return expr;
 }
 
 
@@ -60,11 +79,14 @@ EiFactory::new_BitSelect(const PtBase* pt_expr,
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-// @param[in] bit_index ビット選択式
+// @param[in] base_expr 対象の式
+// @param[in] index_expr ビット選択式
 EiBitSelect::EiBitSelect(const PtBase* pt_expr,
-			 ElbExpr* bit_index) :
+			 ElbExpr* base_expr,
+			 ElbExpr* index_expr) :
   EiExprBase1(pt_expr),
-  mIndex(bit_index)
+  mBaseExpr(base_expr),
+  mIndexExpr(index_expr)
 {
 }
 
@@ -77,7 +99,7 @@ EiBitSelect::~EiBitSelect()
 tVpiObjType
 EiBitSelect::type() const
 {
-  switch ( decl_obj()->type() ) {
+  switch ( parent_expr()->type() ) {
   case kVpiNet: return kVpiNetBit;
   case kVpiReg: return kVpiRegBit;
   default: break;
@@ -97,7 +119,7 @@ EiBitSelect::value_type() const
 bool
 EiBitSelect::is_const() const
 {
-  return decl_obj()->is_consttype() && mIndex->is_const();
+  return parent_expr()->is_const() && is_constant_select();
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -105,7 +127,7 @@ EiBitSelect::is_const() const
 bool
 EiBitSelect::is_constant_select() const
 {
-  return mIndex->is_const();
+  return mIndexExpr->is_const();
 }
 
 // @brief ビット指定の時に true を返す．
@@ -119,7 +141,7 @@ EiBitSelect::is_bitselect() const
 const VlExpr*
 EiBitSelect::index() const
 {
-  return mIndex;
+  return mIndexExpr;
 }
 
 // @brief インデックス値を返す．
@@ -127,84 +149,14 @@ EiBitSelect::index() const
 int
 EiBitSelect::index_val() const
 {
-  int ans;
-  if ( mIndex->eval_int(ans) ) {
-    return ans;
-  }
   return 0;
 }
 
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiBitSelect::eval_logic() const
+// @brief 親の式を返す．
+const VlExpr*
+EiBitSelect::parent_expr() const
 {
-  return eval_scalar();
-}
-
-// @brief real 型の値を返す．
-double
-EiBitSelect::eval_real() const
-{
-  return conv_to_real(eval_scalar());
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiBitSelect::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
-{
-  bitvector = eval_scalar();
-  bitvector.coerce(req_type);
-}
-#endif
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiBitSelect::decompile_impl(int ppri) const
-{
-  string ans = decl_obj()->name();
-  ans += "[" + mIndex->decompile() + "]";
-  return ans;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiBitSelect::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiDeclBitSelect
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] bit_index ビット選択式
-EiDeclBitSelect::EiDeclBitSelect(const PtBase* pt_expr,
-				 ElbDecl* obj,
-				 ElbExpr* bit_index) :
-  EiBitSelect(pt_expr, bit_index),
-  mObj(obj)
-{
-}
-
-// @brief デストラクタ
-EiDeclBitSelect::~EiDeclBitSelect()
-{
-}
-
-// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-const VlDecl*
-EiDeclBitSelect::decl_obj() const
-{
-  return mObj;
+  return mBaseExpr;
 }
 
 #if 0
@@ -233,39 +185,66 @@ EiDeclBitSelect::set_scalar(tVpiScalarVal v)
 }
 #endif
 
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiBitSelect::set_reqsize(tVpiValueType type)
+{
+}
+
+// @brief decompile() の実装関数
+// @param[in] pprim 親の演算子の優先順位
+string
+EiBitSelect::decompile_impl(int ppri) const
+{
+  string ans = parent_expr()->decompile();
+  ans += "[" + mIndexExpr->decompile() + "]";
+
+  return ans;
+}
+
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiExprBitSelect
+// クラス EiConstBitSelect
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-// @param[in] expr 本体の式
-// @param[in] bit_index ビット位置
-EiExprBitSelect::EiExprBitSelect(const PtBase* pt_expr,
-				 ElbExpr* expr,
-				 int bit_index) :
+// @param[in] base_expr 対象の式
+// @param[in] index_expr ビット選択式
+// @param[in] index_val ビット選択式の値
+EiConstBitSelect::EiConstBitSelect(const PtBase* pt_expr,
+				   ElbExpr* base_expr,
+				   const PtExpr* index_expr,
+				   int index_val) :
   EiExprBase1(pt_expr),
-  mExpr(expr),
-  mIndex(bit_index)
+  mBaseExpr(base_expr),
+  mIndexExpr(index_expr),
+  mIndexVal(index_val)
 {
 }
 
 // @brief デストラクタ
-EiExprBitSelect::~EiExprBitSelect()
+EiConstBitSelect::~EiConstBitSelect()
 {
 }
 
 // @brief 型の取得
 tVpiObjType
-EiExprBitSelect::type() const
+EiConstBitSelect::type() const
 {
+  switch ( parent_expr()->type() ) {
+  case kVpiNet: return kVpiNetBit;
+  case kVpiReg: return kVpiRegBit;
+  default: break;
+  }
   return kVpiBitSelect;
 }
 
 // @brief 式のタイプを返す．
 tVpiValueType
-EiExprBitSelect::value_type() const
+EiConstBitSelect::value_type() const
 {
   return pack(kVpiValueUS, 1);
 }
@@ -273,62 +252,67 @@ EiExprBitSelect::value_type() const
 // @brief 定数の時 true を返す．
 // @note 参照している要素の型によって決まる．
 bool
-EiExprBitSelect::is_const() const
+EiConstBitSelect::is_const() const
 {
-  return mExpr->is_const();
+  return parent_expr()->is_const();
 }
 
-// @brief ビット指定の時に true を返す．
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
 bool
-EiExprBitSelect::is_bitselect() const
+EiConstBitSelect::is_constant_select() const
 {
   return true;
 }
 
-// @brief 親の式を返す．
-// @note 正確には式に対するビット選択/部分選択の時のみ意味を持つ．
-const VlExpr*
-EiExprBitSelect::parent_expr() const
+// @brief ビット指定の時に true を返す．
+bool
+EiConstBitSelect::is_bitselect() const
 {
-  return mExpr;
+  return true;
+}
+
+// @brief インデックス式を返す．
+const VlExpr*
+EiConstBitSelect::index() const
+{
+  return NULL;
 }
 
 // @brief インデックス値を返す．
 // @note 式に対するビット選択の時，意味を持つ．
 int
-EiExprBitSelect::index_val() const
+EiConstBitSelect::index_val() const
 {
-  return mIndex;
+  return mIndexVal;
+}
+
+// @brief 親の式を返す．
+const VlExpr*
+EiConstBitSelect::parent_expr() const
+{
+  return mBaseExpr;
 }
 
 #if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiExprBitSelect::eval_scalar() const
-{
-  BitVector tmp;
-  mExpr->eval_bitvector(tmp);
-  return tmp.bit_select(mIndex);
-}
-
 // @brief 論理値を返す．
 tVpiScalarVal
-EiExprBitSelect::eval_logic() const
+EiConstBitSelect::eval_logic() const
 {
   return eval_scalar();
 }
 
 // @brief real 型の値を返す．
 double
-EiExprBitSelect::eval_real() const
+EiConstBitSelect::eval_real() const
 {
   return conv_to_real(eval_scalar());
 }
 
 // @brief bitvector 型の値を返す．
 void
-EiExprBitSelect::eval_bitvector(BitVector& bitvector,
-				tVpiValueType req_type) const
+EiConstBitSelect::eval_bitvector(BitVector& bitvector,
+			    tVpiValueType req_type) const
 {
   bitvector = eval_scalar();
   bitvector.coerce(req_type);
@@ -338,18 +322,27 @@ EiExprBitSelect::eval_bitvector(BitVector& bitvector,
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
-EiExprBitSelect::decompile_impl(int ppri) const
+EiConstBitSelect::decompile_impl(int ppri) const
 {
-  ostringstream buf;
-  buf << "(" << mExpr->decompile() << ")" << "[" << mIndex << "]";
-  return buf.str();
+  string ans = parent_expr()->decompile() + "[";
+  if ( mIndexExpr ) {
+    ans += mIndexExpr->decompile();
+  }
+  else {
+    ostringstream buf;
+    buf << mIndexVal;
+    ans += buf.str();
+  }
+  ans += "]";
+
+  return ans;
 }
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiExprBitSelect::set_reqsize(tVpiValueType type)
+EiConstBitSelect::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }

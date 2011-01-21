@@ -217,27 +217,9 @@ ElbMgr::reg_declarray(int tag,
   }
   mObjDict.add(obj);
   if ( tag ) {
-    mTagDict.add_decl(tag, obj);
+    mTagDict.add_declarray(tag, obj);
   }
 }
-
-#if 0
-// @brief parameter 宣言を登録する．
-// @param[in] obj 登録するオブジェクト
-void
-ElbMgr::reg_parameter(ElbParameter* obj)
-{
-  if ( debug & debug_objdict ) {
-    dout << "reg_parameter( " << obj->name() << " @ "
-	 << obj->parent()->full_name()
-	 << " ["
-	 << hex << reinterpret_cast<ympuint>(obj->parent()) << dec
-	 << "] )" << endl << endl;
-  }
-  mObjDict.add(obj);
-  mTagDict.add_parameter(obj);
-}
-#endif
 
 // @brief defparam を登録する．
 // @param[in] obj 登録するオブジェクト

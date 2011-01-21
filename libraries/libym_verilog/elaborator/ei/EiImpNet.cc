@@ -101,18 +101,43 @@ EiImpNet::is_signed() const
   return false;
 }
 
-// @brief MSB の値を返す．
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiImpNet::has_range() const
+{
+  return false;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiImpNet::left_range_const() const
+EiImpNet::left_range_val() const
 {
   return 0;
 }
 
-// @brief LSB の値を返す．
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiImpNet::right_range_const() const
+EiImpNet::right_range_val() const
 {
   return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiImpNet::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiImpNet::right_range_string() const
+{
+  return string();
 }
 
 // @brief ビット幅を返す．
@@ -201,20 +226,11 @@ EiImpNet::delay() const
   return NULL;
 }
 
-// @brief dimension list のサイズの取得
-// @return dimension list のサイズ
-// @note このクラスでは 0 を返す．
-ymuint
-EiImpNet::dimension_list_size() const
-{
-  return 0;
-}
-
-// @brief 範囲の取得
-// @param[in] pos 位置 (0 <= pos < dimension_list_size())
-// @note このクラスでは NULL を返す．
-const VlRange*
-EiImpNet::range(ymuint pos) const
+// @brief 初期値の取得
+// @retval 初期値
+// @retval NULL 設定がない場合
+const VlExpr*
+EiImpNet::init_value() const
 {
   return NULL;
 }
@@ -224,24 +240,6 @@ void
 EiImpNet::set_signed()
 {
   // なにもしない．
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiImpNet::_left_range() const
-{
-  return NULL;
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiImpNet::_right_range() const
-{
-  return NULL;
 }
 
 // @brief スカラー値を返す．

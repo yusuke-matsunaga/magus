@@ -90,15 +90,34 @@ public:
   bool
   is_signed() const;
 
-  /// @brief MSB の値を返す．
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  int
-  left_range_const() const;
+  bool
+  has_range() const;
 
-  /// @brief LSB の値を返す．
+  /// @brief 範囲の MSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const;
+  left_range_val() const;
+
+  /// @brief 範囲の LSB の値を返す．
+  /// @note 範囲を持たないときの値は不定
+  virtual
+  int
+  right_range_val() const;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const;
 
   /// @brief ビット幅を返す．
   /// @note このクラスは 1 を返す．
@@ -171,19 +190,12 @@ public:
   const VlDelay*
   delay() const;
 
-  /// @brief dimension list のサイズの取得
-  /// @return dimension list のサイズ
-  /// @note このクラスでは 0 を返す．
+  /// @brief 初期値の取得
+  /// @retval 初期値
+  /// @retval NULL 設定がない場合
   virtual
-  ymuint
-  dimension_list_size() const;
-
-  /// @brief 範囲の取得
-  /// @param[in] pos 位置 (0 <= pos < dimension_list_size())
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlRange*
-  range(ymuint pos) const;
+  const VlExpr*
+  init_value() const;
 
 
 public:
@@ -195,20 +207,6 @@ public:
   virtual
   void
   set_signed();
-
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _left_range() const;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  ElbExpr*
-  _right_range() const;
 
   /// @brief スカラー値を返す．
   virtual

@@ -185,22 +185,43 @@ EiDeclArray::is_signed() const
   return mHead->is_signed();
 }
 
-// @brief MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-int
-EiDeclArray::left_range_const() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclArray::has_range() const
 {
-  return mHead->left_range_const();
+  return mHead->has_range();
 }
 
-// @brief LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiDeclArray::right_range_const() const
+EiDeclArray::left_range_val() const
 {
-  return mHead->right_range_const();
+  return mHead->left_range_val();
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclArray::right_range_val() const
+{
+  return mHead->right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclArray::left_range_string() const
+{
+  return mHead->left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclArray::right_range_string() const
+{
+  return mHead->right_range_string();
 }
 
 // @brief ビット幅を返す．
@@ -339,24 +360,7 @@ EiDeclArray::array_offset(const vector<int>& index_list) const
   return mRangeList.offset(index_list);
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclArray::_left_range() const
-{
-  return mHead->left_range();
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclArray::_right_range() const
-{
-  return mHead->right_range();
-}
-
+#if 0
 // @brief インデックスからオフセットを計算する．
 // @param[in] index_array インデックス式の配列
 ymuint
@@ -377,6 +381,7 @@ EiDeclArray::calc_offset(const vector<ElbExpr*>& index_array) const
   }
   return offset;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////

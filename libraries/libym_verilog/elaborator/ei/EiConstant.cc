@@ -428,7 +428,7 @@ string
 EiRealConst::decompile_impl(int ppri) const
 {
   ostringstream buf;
-  buf << eval_real();
+  buf << mValue;
   return buf.str();
 }
 

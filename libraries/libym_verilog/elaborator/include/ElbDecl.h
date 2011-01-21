@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlDeclArray.h"
 #include "ElbFwd.h"
 
 
@@ -170,135 +171,6 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbDeclBase ElbDecl.h "ElbDecl.h"
-/// @brief 名前付きの宣言要素の基底クラス
-/// IEEE Std 1364-2001 26.6.6 Nets and net arrays
-/// IEEE Std 1364-2001 26.6.7 Regs and reg arrays
-/// IEEE Std 1364-2001 26.6.8 Variables
-/// IEEE Std 1364-2001 26.6.11 Named event
-/// IEEE Std 1364-2001 26.6.12 Parameter, specparam
-//////////////////////////////////////////////////////////////////////
-class ElbDeclBase :
-  public VlDecl
-{
-  friend class CellDecl;
-
-protected:
-
-  /// @brief コンストラクタ
-  ElbDeclBase();
-
-  /// @brief デストラクタ
-  virtual
-  ~ElbDeclBase();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlDecl の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 定数値を持つ型のときに true を返す．
-  /// @note デフォルト値としてこのクラスでは false を返す．
-  virtual
-  bool
-  is_consttype() const;
-
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  const VlExpr*
-  left_range() const;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  const VlExpr*
-  right_range() const;
-
-  /// @brief 初期値の取得
-  /// @retval 初期値
-  /// @retval NULL 設定がない場合
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlExpr*
-  init_value() const;
-
-  /// @brief localparam のときに true 返す．
-  /// @note このクラスでは false を返す．
-  virtual
-  bool
-  is_local_param() const;
-
-  /// @brief 配列型オブジェクトの時に true を返す．
-  virtual
-  bool
-  is_array() const;
-
-  /// @brief 多次元の配列型オブジェクトの時に true を返す．
-  virtual
-  bool
-  is_multi_array() const;
-
-  /// @brief 配列型オブジェクトの場合の次元数の取得
-  /// @note このクラスでは 0 を返す．
-  virtual
-  ymuint
-  dimension() const;
-
-  /// @brief 範囲の取得
-  /// @param[in] pos 位置 ( 0 <= pos < dimension() )
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const VlRange*
-  range(ymuint pos) const;
-
-  /// @brief 配列の要素数の取得
-  virtual
-  ymuint
-  array_size() const;
-
-  /// @brief 1次元配列の場合にインデックスからオフセットを計算する．
-  /// @param[in] index インデックス
-  /// @return index に対するオフセット値を返す．
-  /// @note index が範囲外の場合には -1 を返す．
-  virtual
-  int
-  array_offset(int index) const;
-
-  /// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
-  /// @param[in] index_list インデックスのリスト
-  /// @return index_list に対するオフセット値を返す．
-  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
-  virtual
-  int
-  array_offset(const vector<int>& index_list) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbDeclBase の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 次の要素を返す．
-  const ElbDeclBase*
-  next() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 次の要素を指すポインタ
-  ElbDeclBase* mNext;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class ElbDecl ElbDecl.h "ElbDecl.h"
 /// @brief 名前付きの宣言要素を表すクラス
 /// IEEE Std 1364-2001 26.6.6 Nets and net arrays
@@ -308,8 +180,10 @@ private:
 /// IEEE Std 1364-2001 26.6.12 Parameter, specparam
 //////////////////////////////////////////////////////////////////////
 class ElbDecl :
-  public ElbDeclBase
+  public VlDecl
 {
+  friend class CellDecl;
+
 protected:
 
   /// @brief コンストラクタ
@@ -318,6 +192,24 @@ protected:
   /// @brief デストラクタ
   virtual
   ~ElbDecl();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlDecl の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 定数値を持つ型のときに true を返す．
+  /// @note このクラスは false を返す．
+  virtual
+  bool
+  is_consttype() const;
+
+  /// @brief localparam のときに true 返す．
+  /// @note このクラスは false を返す．
+  virtual
+  bool
+  is_local_param() const;
 
 
 public:
@@ -425,6 +317,19 @@ public:
   void
   set_expr(ElbExpr* expr);
 
+  /// @brief 次の要素を返す．
+  const ElbDecl*
+  next() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 次の要素を指すポインタ
+  ElbDecl* mNext;
+
 };
 
 
@@ -438,8 +343,10 @@ public:
 /// IEEE Std 1364-2001 26.6.12 Parameter, specparam
 //////////////////////////////////////////////////////////////////////
 class ElbDeclArray :
-  public ElbDeclBase
+  public VlDeclArray
 {
+  friend class CellDeclArray;
+
 protected:
 
   /// @brief コンストラクタ
@@ -562,6 +469,25 @@ public:
   calc_offset(const vector<ElbExpr*>& index_array) const = 0;
 #endif
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbDeclArray の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 次の要素を返す．
+  const ElbDeclArray*
+  next() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 次の要素を指すポインタ
+  ElbDeclArray* mNext;
+
 };
 
 
@@ -571,8 +497,16 @@ public:
 
 // @brief 次の要素を返す．
 inline
-const ElbDeclBase*
-ElbDeclBase::next() const
+const ElbDecl*
+ElbDecl::next() const
+{
+  return mNext;
+}
+
+// @brief 次の要素を返す．
+inline
+const ElbDeclArray*
+ElbDeclArray::next() const
 {
   return mNext;
 }

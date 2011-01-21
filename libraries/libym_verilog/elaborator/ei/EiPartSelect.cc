@@ -11,9 +11,8 @@
 
 #include "EiFactory.h"
 #include "EiPartSelect.h"
-#include "ElbDecl.h"
-#include "ElbPrimitive.h"
 
+#include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/BitVector.h"
 
 
@@ -23,42 +22,83 @@ BEGIN_NAMESPACE_YM_VERILOG
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
 
-// @brief 部分選択式を生成する．
+// @brief 固定部分選択式を生成する．
 // @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] index1, inde2 パート選択式
+// @param[in] parent_expr 本体の式
+// @param[in] index1, index2 パート選択式
 // @param[in] index1_val, index2_val パート選択式の値
 ElbExpr*
 EiFactory::new_PartSelect(const PtBase* pt_expr,
-			  ElbDecl* obj,
-			  ElbExpr* index1,
-			  ElbExpr* index2,
+			  ElbExpr* parent_expr,
+			  const PtExpr* index1,
+			  const PtExpr* index2,
 			  int index1_val,
 			  int index2_val)
 {
-  void* p = mAlloc.get_memory(sizeof(EiDeclPartSelect));
-  ElbExpr* expr = new (p) EiDeclPartSelect(pt_expr, obj,
-					   index1, index2,
-					   index1_val, index2_val);
+  void* p = mAlloc.get_memory(sizeof(EiConstPartSelect));
+  ElbExpr* expr = new (p) EiConstPartSelect(pt_expr, parent_expr,
+					    index1, index2,
+					    index1_val, index2_val);
 
   return expr;
 }
 
-// @brief 部分選択式を生成する．
+// @brief 固定部分選択式を生成する．
 // @param[in] pt_expr パース木の定義要素
-// @param[in] expr 本体の式
+// @param[in] parent_expr 本体の式
 // @param[in] index1, inde2 パート選択式
 ElbExpr*
 EiFactory::new_PartSelect(const PtBase* pt_expr,
-			  ElbExpr* expr,
+			  ElbExpr* parent_expr,
 			  int index1,
 			  int index2)
 {
-  void* p = mAlloc.get_memory(sizeof(EiExprPartSelect));
-  ElbExpr* expr1 = new (p) EiExprPartSelect(pt_expr, expr,
+  void* p = mAlloc.get_memory(sizeof(EiConstPartSelect));
+  ElbExpr* expr = new (p) EiConstPartSelect(pt_expr, parent_expr,
+					    NULL, NULL,
 					    index1, index2);
 
-  return expr1;
+  return expr;
+}
+
+// @brief 可変部分選択式を生成する．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] parent_expr 本体の式
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+ElbExpr*
+EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
+			      ElbExpr* parent_expr,
+			      ElbExpr* base,
+			      const PtExpr* range,
+			      int range_val)
+{
+  void* p = mAlloc.get_memory(sizeof(EiPlusPartSelect));
+  ElbExpr* expr = new (p) EiPlusPartSelect(pt_expr, parent_expr,
+					   base, range, range_val);
+
+  return expr;
+}
+
+// @brief 可変部分選択式を生成する．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] parent_expr 本体の式
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+ElbExpr*
+EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
+			       ElbExpr* parent_expr,
+			       ElbExpr* base,
+			       const PtExpr* range,
+			       int range_val)
+{
+  void* p = mAlloc.get_memory(sizeof(EiMinusPartSelect));
+  ElbExpr* expr = new (p) EiMinusPartSelect(pt_expr, parent_expr,
+					    base, range, range_val);
+
+  return expr;
 }
 
 
@@ -68,18 +108,11 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-// @param[in] index1, inde2 パート選択式
-// @param[in] index1_val, index2_val パート選択式の値
+// @param[in] parent_expr 対象の式
 EiPartSelect::EiPartSelect(const PtBase* pt_expr,
-			   ElbExpr* index1,
-			   ElbExpr* index2,
-			   int index1_val,
-			   int index2_val) :
+			   ElbExpr* parent_expr) :
   EiExprBase1(pt_expr),
-  mIndex1(index1),
-  mIndex2(index2),
-  mIndex1Val(index1_val),
-  mIndex2Val(index2_val)
+  mParentExpr(parent_expr)
 {
 }
 
@@ -95,34 +128,12 @@ EiPartSelect::type() const
   return kVpiPartSelect;
 }
 
-// @brief 式のタイプを返す．
-tVpiValueType
-EiPartSelect::value_type() const
-{
-  int w = 0;
-  if ( mIndex1Val > mIndex2Val ) {
-    w = mIndex1Val - mIndex2Val + 1;
-  }
-  else {
-    w = mIndex2Val - mIndex1Val + 1;
-  }
-  return pack(kVpiValueUS, w);
-}
-
 // @brief 定数の時 true を返す．
 // @note 参照している要素の型によって決まる．
 bool
 EiPartSelect::is_const() const
 {
-  return decl_obj()->is_consttype();
-}
-
-// @brief 固定選択子の時 true を返す．
-// @note ビット選択，部分選択の時，意味を持つ．
-bool
-EiPartSelect::is_constant_select() const
-{
-  return true;
+  return parent_expr()->is_const() && is_constant_select();
 }
 
 // @brief 範囲指定の時に true を返す．
@@ -132,9 +143,68 @@ EiPartSelect::is_partselect() const
   return true;
 }
 
+// @brief 親の式を返す．
+// @note 式に対するビット選択/範囲選択の時，意味を持つ．
+const VlExpr*
+EiPartSelect::parent_expr() const
+{
+  return mParentExpr;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiConstPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] parent_expr 対象の式
+// @param[in] index1, index2 パート選択式
+// @param[in] index1_val, index2_val パート選択式の値
+EiConstPartSelect::EiConstPartSelect(const PtBase* pt_expr,
+				     ElbExpr* parent_expr,
+				     const PtExpr* index1,
+				     const PtExpr* index2,
+				     int index1_val,
+				     int index2_val) :
+  EiPartSelect(pt_expr, parent_expr),
+  mLeftRange(index1),
+  mRightRange(index2),
+  mLeftVal(index1_val),
+  mRightVal(index2_val)
+{
+}
+
+// @brief デストラクタ
+EiConstPartSelect::~EiConstPartSelect()
+{
+}
+
+// @brief 式のタイプを返す．
+tVpiValueType
+EiConstPartSelect::value_type() const
+{
+  int w = 0;
+  if ( mLeftVal > mRightVal ) {
+    w = mLeftVal - mRightVal + 1;
+  }
+  else {
+    w = mRightVal - mLeftVal + 1;
+  }
+  return pack(kVpiValueUS, w);
+}
+
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
+bool
+EiConstPartSelect::is_constant_select() const
+{
+  return true;
+}
+
 // @brief 範囲指定のモードを返す．
 tVpiRangeMode
-EiPartSelect::range_mode() const
+EiConstPartSelect::range_mode() const
 {
   return kVpiConstRange;
 }
@@ -142,38 +212,39 @@ EiPartSelect::range_mode() const
 // @brief 範囲の MSB の式を返す．
 // @note 通常の範囲選択の時，意味を持つ．
 const VlExpr*
-EiPartSelect::left_range() const
+EiConstPartSelect::left_range() const
 {
-  return mIndex1;
+  return NULL;
 }
 
 // @brief 範囲の LSB の式を返す．
 // @note 通常の範囲選択の時，意味を持つ．
 const VlExpr*
-EiPartSelect::right_range() const
+EiConstPartSelect::right_range() const
 {
-  return mIndex2;
+  return NULL;
 }
 
 // @brief 範囲の MSB の値を返す．
 // @note 式に対する範囲選択の時，意味を持つ．
 int
-EiPartSelect::left_range_val() const
+EiConstPartSelect::left_range_val() const
 {
-  return mIndex1Val;
+  return mLeftVal;
 }
 
 // @brief 範囲の LSB の値を返す．
 // @note 式に対する範囲選択の時，意味を持つ．
 int
-EiPartSelect::right_range_val() const
+EiConstPartSelect::right_range_val() const
 {
-  return mIndex2Val;
+  return mRightVal;
 }
 
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
-EiPartSelect::eval_scalar() const
+EiConstPartSelect::eval_scalar() const
 {
   BitVector tmp;
   eval_bitvector(tmp);
@@ -182,7 +253,7 @@ EiPartSelect::eval_scalar() const
 
 // @brief 論理値を返す．
 tVpiScalarVal
-EiPartSelect::eval_logic() const
+EiConstPartSelect::eval_logic() const
 {
   BitVector tmp;
   eval_bitvector(tmp);
@@ -191,21 +262,36 @@ EiPartSelect::eval_logic() const
 
 // @brief real 型の値を返す．
 double
-EiPartSelect::eval_real() const
+EiConstPartSelect::eval_real() const
 {
   BitVector tmp;
   eval_bitvector(tmp);
   return tmp.to_real();
 }
+#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
-EiPartSelect::decompile_impl(int ppri) const
+EiConstPartSelect::decompile_impl(int ppri) const
 {
-  string ans = decl_obj()->name();
-  ans += "[" + mIndex1->decompile() + ":"
-    + mIndex2->decompile() + "]";
+  string ans = parent_expr()->decompile();
+  string left_str;
+  string right_str;
+  if ( mLeftRange && mRightRange ) {
+    left_str = mLeftRange->decompile();
+    right_str = mRightRange->decompile();
+  }
+  else {
+    ostringstream buf;
+    buf << mLeftVal;
+    left_str = buf.str();
+    buf.clear();
+    buf << mRightVal;
+    right_str = buf.str();
+  }
+  ans += "[" + left_str + ":" + right_str + "]";
+
   return ans;
 }
 
@@ -213,178 +299,76 @@ EiPartSelect::decompile_impl(int ppri) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiPartSelect::set_reqsize(tVpiValueType type)
+EiConstPartSelect::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiDeclPartSelect
+// クラス EiVarPartSelect
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-// @param[in] obj 本体のオブジェクト
-// @param[in] index1, inde2 パート選択式
-// @param[in] index1_val, index2_val パート選択式の値
-EiDeclPartSelect::EiDeclPartSelect(const PtBase* pt_expr,
-				   ElbDecl* obj,
-				   ElbExpr* index1,
-				   ElbExpr* index2,
-				   int index1_val,
-				   int index2_val) :
-  EiPartSelect(pt_expr, index1, index2, index1_val, index2_val),
-  mObj(obj)
+// @param[in] parent_expr 本体の式
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiVarPartSelect::EiVarPartSelect(const PtBase* pt_expr,
+				 ElbExpr* parent_expr,
+				 ElbExpr* base,
+				 const PtExpr* range,
+				 int range_val) :
+  EiPartSelect(pt_expr, parent_expr),
+  mBaseExpr(base),
+  mRangeExpr(range),
+  mRangeVal(range_val)
 {
 }
 
 // @brief デストラクタ
-EiDeclPartSelect::~EiDeclPartSelect()
+EiVarPartSelect::~EiVarPartSelect()
 {
-}
-
-// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-const VlDecl*
-EiDeclPartSelect::decl_obj() const
-{
-  return mObj;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiDeclPartSelect::eval_bitvector(BitVector& bitvector,
-				 tVpiValueType req_type) const
-{
-  mObj->get_partselect(left_range_val(), right_range_val(), bitvector);
-  bitvector.coerce(req_type);
-}
-
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiDeclPartSelect::set_scalar(tVpiScalarVal v)
-{
-  int msb = left_range_val();
-  assert_cond( msb == right_range_val(), __FILE__, __LINE__);
-  mObj->set_bitselect(msb, v);
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiDeclPartSelect::set_bitvector(const BitVector& v)
-{
-  int msb = left_range_val();
-  int lsb = right_range_val();
-  mObj->set_partselect(lsb, msb, v);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiExprPartSelect
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] expr 本体の式
-// @param[in] index1, index2 パート選択式
-EiExprPartSelect::EiExprPartSelect(const PtBase* pt_expr,
-				   ElbExpr* expr,
-				   int index1,
-				   int index2) :
-  EiExprBase1(pt_expr),
-  mExpr(expr),
-  mIndex1(index1),
-  mIndex2(index2)
-{
-}
-
-// @brief デストラクタ
-EiExprPartSelect::~EiExprPartSelect()
-{
-}
-
-// @brief 型の取得
-tVpiObjType
-EiExprPartSelect::type() const
-{
-  return kVpiPartSelect;
 }
 
 // @brief 式のタイプを返す．
 tVpiValueType
-EiExprPartSelect::value_type() const
+EiVarPartSelect::value_type() const
 {
-  int w = 0;
-  if ( mIndex1 > mIndex2 ) {
-    w = mIndex1 - mIndex2 + 1;
-  }
-  else {
-    w = mIndex2 - mIndex1 + 1;
-  }
-  return pack(kVpiValueUS, w);
-}
-
-// @brief 定数の時 true を返す．
-// @note 参照している要素の型によって決まる．
-bool
-EiExprPartSelect::is_const() const
-{
-  return mExpr->is_const();
+  return pack(kVpiValueUS, mRangeVal);
 }
 
 // @brief 固定選択子の時 true を返す．
 // @note ビット選択，部分選択の時，意味を持つ．
 bool
-EiExprPartSelect::is_constant_select() const
+EiVarPartSelect::is_constant_select() const
 {
-  return true;
+  return mBaseExpr->is_const();
 }
 
-// @brief 範囲指定の時に true を返す．
-bool
-EiExprPartSelect::is_partselect() const
-{
-  return true;
-}
-
-// @brief 範囲指定のモードを返す．
-tVpiRangeMode
-EiExprPartSelect::range_mode() const
-{
-  return kVpiConstRange;
-}
-
-// @brief 親の式を返す．
-// @note 式に対するビット選択/範囲選択の時，意味を持つ．
+// @brief 範囲のベースを表す式を返す．
+// @note 可変範囲選択の時，意味を持つ．
+// @note それ以外では NULL を返す．
 const VlExpr*
-EiExprPartSelect::parent_expr() const
+EiVarPartSelect::base() const
 {
-  return mExpr;
+  return mBaseExpr;
 }
 
-// @brief 範囲の MSB の値を返す．
-// @note 式に対する範囲選択の時，意味を持つ．
+// @brief 範囲のビット幅を返す．
+// @note 可変範囲選択の時，意味を持つ．
+// @note それ以外では 0 を返す．
 int
-EiExprPartSelect::left_range_val() const
+EiVarPartSelect::range_width() const
 {
-  return mIndex1;
+  return mRangeVal;
 }
 
-// @brief 範囲の LSB の値を返す．
-// @note 式に対する範囲選択の時，意味を持つ．
-int
-EiExprPartSelect::right_range_val() const
-{
-  return mIndex2;
-}
-
+#if 0
 // @brief スカラー値を返す．
 tVpiScalarVal
-EiExprPartSelect::eval_scalar() const
+EiVarPartSelect::eval_scalar() const
 {
   BitVector tmp;
   eval_bitvector(tmp);
@@ -393,7 +377,7 @@ EiExprPartSelect::eval_scalar() const
 
 // @brief 論理値を返す．
 tVpiScalarVal
-EiExprPartSelect::eval_logic() const
+EiVarPartSelect::eval_logic() const
 {
   BitVector tmp;
   eval_bitvector(tmp);
@@ -402,42 +386,107 @@ EiExprPartSelect::eval_logic() const
 
 // @brief real 型の値を返す．
 double
-EiExprPartSelect::eval_real() const
+EiVarPartSelect::eval_real() const
 {
   BitVector tmp;
   eval_bitvector(tmp);
   return tmp.to_real();
 }
-
-// @brief bitvector 型の値を返す．
-void
-EiExprPartSelect::eval_bitvector(BitVector& bitvector,
-				 tVpiValueType req_type) const
-{
-  BitVector tmp;
-  mExpr->eval_bitvector(tmp);
-  tmp.part_select(mIndex1, mIndex2, bitvector);
-  bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiExprPartSelect::decompile_impl(int ppri) const
-{
-  ostringstream buf;
-  buf << "(" << mExpr->decompile() << ")"
-      << "[" << mIndex1 << ":" << mIndex2 << "]";
-  return buf.str();
-}
+#endif
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiExprPartSelect::set_reqsize(tVpiValueType type)
+EiVarPartSelect::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiPlusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] parent_expr 本体の式
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiPlusPartSelect::EiPlusPartSelect(const PtBase* pt_expr,
+				   ElbExpr* parent_expr,
+				   ElbExpr* base,
+				   const PtExpr* range,
+				   int range_val) :
+  EiVarPartSelect(pt_expr, parent_expr, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiPlusPartSelect::~EiPlusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiPlusPartSelect::range_mode() const
+{
+  return kVpiPlusRange;
+}
+
+// @brief decompile() の実装関数
+// @param[in] ppri 親の演算子の優先順位
+string
+EiPlusPartSelect::decompile_impl(int ppri) const
+{
+  ostringstream buf;
+  buf << parent_expr()->decompile() << "[" << base()->decompile()
+      << "+:" << range_width() << "]";
+  return buf.str();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiMinusPartSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] parent_expr 本体の式
+// @param[in] base 範囲のベースアドレスを表す式
+// @param[in] range 範囲を表す式
+// @param[in] range_val 範囲の値
+EiMinusPartSelect::EiMinusPartSelect(const PtBase* pt_expr,
+				     ElbExpr* parent_expr,
+				     ElbExpr* base,
+				     const PtExpr* range,
+				     int range_val) :
+  EiVarPartSelect(pt_expr, parent_expr, base, range, range_val)
+{
+}
+
+// @brief デストラクタ
+EiMinusPartSelect::~EiMinusPartSelect()
+{
+}
+
+// @brief 範囲指定のモードを返す．
+tVpiRangeMode
+EiMinusPartSelect::range_mode() const
+{
+  return kVpiMinusRange;
+}
+
+// @brief decompile() の実装関数
+// @param[in] ppri 親の演算子の優先順位
+string
+EiMinusPartSelect::decompile_impl(int ppri) const
+{
+  ostringstream buf;
+  buf << parent_expr()->decompile() << "[" << base()->decompile()
+      << "-:" << range_width() << "]";
+  return buf.str();
 }
 
 END_NAMESPACE_YM_VERILOG

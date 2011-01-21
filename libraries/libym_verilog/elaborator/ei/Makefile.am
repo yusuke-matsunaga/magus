@@ -96,8 +96,6 @@ libym_vl_elab_ei_la_SOURCES = \
 	EiBitSelect.cc \
 	EiPartSelect.h \
 	EiPartSelect.cc \
-	EiVarPartSelect.h \
-	EiVarPartSelect.cc \
 	EiFuncCall.h \
 	EiFuncCall.cc \
 	EiConstant.h \

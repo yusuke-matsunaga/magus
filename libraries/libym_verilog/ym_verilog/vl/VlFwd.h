@@ -25,6 +25,9 @@ class VlNamedObj;
 // in VlDecl.h
 class VlDecl;
 
+// in VlDeclArray.h
+class VlDeclArray;
+
 // in VlModule.h
 class VlModule;
 class VlModuleArray;

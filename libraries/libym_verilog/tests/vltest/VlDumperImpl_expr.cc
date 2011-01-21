@@ -298,8 +298,8 @@ VlDumperImpl::put_range(const char* label,
 
   put("vpiSize", range->size() );
 
-  put_expr("vpiLeftRange", mgr, range->left_range() );
-  put_expr("vpiRightRange", mgr, range->right_range() );
+  put("vpiLeftRange", range->left_range_val() );
+  put("vpiRightRange", range->right_range_val() );
 }
 
 END_NAMESPACE_YM_VERILOG

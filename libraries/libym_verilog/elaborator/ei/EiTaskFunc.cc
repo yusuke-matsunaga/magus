@@ -38,8 +38,8 @@ BEGIN_NAMESPACE_YM_VERILOG
 ElbTaskFunc*
 EiFactory::new_Function(const VlNamedObj* parent,
 			const PtItem* pt_item,
-			ElbExpr* left,
-			ElbExpr* right,
+			const PtExpr* left,
+			const PtExpr* right,
 			int left_val,
 			int right_val)
 {
@@ -243,13 +243,6 @@ EiTask::func_type() const
   return kVpiIntFunc;
 }
 
-// @brief 出力のビット幅を返す．
-ymuint
-EiTask::bit_size() const
-{
-  return 0;
-}
-
 // @brief 符号付きの時 true を返す．
 bool
 EiTask::is_signed() const
@@ -257,38 +250,50 @@ EiTask::is_signed() const
   return false;
 }
 
-// @brief 範囲のMSBを返す．
-const VlExpr*
-EiTask::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiTask::has_range() const
 {
-  return NULL;
-}
-
-// @brief 範囲のLSBを返す．
-const VlExpr*
-EiTask::right_range() const
-{
-  return NULL;
+  return false;
 }
 
 // @brief 範囲の MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-// @note このクラスでは -1 を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiTask::left_range_const() const
+EiTask::left_range_val() const
 {
-  return -1;
+  return 0;
 }
 
 // @brief 範囲の LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-// @note このクラスでは -1 を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiTask::right_range_const() const
+EiTask::right_range_val() const
 {
-  return -1;
+  return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiTask::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiTask::right_range_string() const
+{
+  return string();
+}
+
+// @brief 出力のビット幅を返す．
+ymuint
+EiTask::bit_size() const
+{
+  return 0;
 }
 
 // @brief 出力変数をセットする．
@@ -348,28 +353,6 @@ EiTask::eval_bitvector(const vector<ElbExpr*>& arg_list,
   assert_not_reached(__FILE__, __LINE__);
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-EiTask::_left_range() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-EiTask::_right_range() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiFunction
@@ -427,6 +410,52 @@ EiFunction::func_type() const
   return kVpiIntFunc;
 }
 
+// @brief 符号付きの時 true を返す．
+bool
+EiFunction::is_signed() const
+{
+  return pt_item()->is_signed();
+}
+
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiFunction::has_range() const
+{
+  return false;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiFunction::left_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiFunction::right_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiFunction::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiFunction::right_range_string() const
+{
+  return string();
+}
+
 // @brief 出力のビット幅を返す．
 ymuint
 EiFunction::bit_size() const
@@ -452,47 +481,6 @@ EiFunction::bit_size() const
   return 0;
 }
 
-// @brief 符号付きの時 true を返す．
-bool
-EiFunction::is_signed() const
-{
-  return pt_item()->is_signed();
-}
-
-// @brief 範囲のMSBを返す．
-const VlExpr*
-EiFunction::left_range() const
-{
-  return _left_range();
-}
-
-// @brief 範囲のLSBを返す．
-const VlExpr*
-EiFunction::right_range() const
-{
-  return _right_range();
-}
-
-// @brief 範囲の MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-// @note このクラスでは -1 を返す．
-int
-EiFunction::left_range_const() const
-{
-  return -1;
-}
-
-// @brief 範囲の LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-// @note このクラスでは -1 を返す．
-int
-EiFunction::right_range_const() const
-{
-  return -1;
-}
-
 // @brief 出力変数をセットする．
 // @param[in] ovar 出力変数
 // @note 関数の場合のみ意味を持つ．
@@ -500,26 +488,6 @@ void
 EiFunction::set_ovar(ElbDecl* ovar)
 {
   mOvar = ovar;
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-EiFunction::_left_range() const
-{
-  return NULL;
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-// @note このクラスでは NULL を返す．
-ElbExpr*
-EiFunction::_right_range() const
-{
-  return NULL;
 }
 
 // @brief constant function の時に true を返す．
@@ -618,8 +586,8 @@ EiFunctionV::EiFunctionV(const VlNamedObj* parent,
 			 const PtItem* pt_item,
 			 ymuint io_num,
 			 EiIODecl* io_array,
-			 ElbExpr* left,
-			 ElbExpr* right,
+			 const PtExpr* left,
+			 const PtExpr* right,
 			 int left_val,
 			 int right_val) :
   EiFunction(parent, pt_item, io_num, io_array)
@@ -632,22 +600,43 @@ EiFunctionV::~EiFunctionV()
 {
 }
 
-// @brief 範囲の MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-int
-EiFunctionV::left_range_const() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiFunctionV::has_range() const
 {
-  return mRange.left_range_const();
+  return true;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiFunctionV::left_range_val() const
+{
+  return mRange.left_range_val();
 }
 
 // @brief 範囲の LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @note 範囲を持たないときの値は不定
 int
-EiFunctionV::right_range_const() const
+EiFunctionV::right_range_val() const
 {
-  return mRange.right_range_const();
+  return mRange.right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiFunctionV::left_range_string() const
+{
+  return mRange.left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiFunctionV::right_range_string() const
+{
+  return mRange.right_range_string();
 }
 
 // @brief 出力のビット幅を返す．
@@ -655,20 +644,6 @@ ymuint
 EiFunctionV::bit_size() const
 {
   return mRange.size();
-}
-
-// @brief 範囲のMSBを返す．
-ElbExpr*
-EiFunctionV::_left_range() const
-{
-  return mRange.left_range();
-}
-
-// @brief 範囲のLSBを返す．
-ElbExpr*
-EiFunctionV::_right_range() const
-{
-  return mRange.right_range();
 }
 
 END_NAMESPACE_YM_VERILOG

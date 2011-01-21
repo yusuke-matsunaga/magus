@@ -258,16 +258,6 @@ public:
 		const PtNamedBase* pt_item,
 		const vector<ElbRangeSrc>& range_src) = 0;
 
-  /// @brief 宣言要素を生成する(配列の要素)．
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] parent_array 親の配列
-  /// @param[in] index_list インデックスのリスト
-  virtual
-  ElbDecl*
-  new_DeclElem(const PtBase* pt_expr,
-	       ElbDeclArray* parent_array,
-	       const vector<ElbExpr*>& index_list) = 0;
-
   /// @brief parameter 宣言のヘッダを生成する(範囲指定なし)．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_head パース木の宣言ヘッダ
@@ -876,39 +866,49 @@ public:
   new_Primary(const PtBase* pt_expr,
 	      ElbDecl* obj) = 0;
 
-  /// @brief ビット選択式を生成する．
+  /// @brief プライマリ式を生成する(配列要素版)．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
-  /// @param[in] bit_index ビット選択式
+  /// @param[in] index_list インデックスのリスト
   virtual
   ElbExpr*
-  new_BitSelect(const PtBase* pt_expr,
-		ElbDecl* obj,
-		ElbExpr* bit_index) = 0;
+  new_Primary(const PtBase* pt_expr,
+	      ElbDeclArray* obj,
+	      const vector<ElbExpr*>& index_list) = 0;
 
-  /// @brief ビット選択式を生成する．
+  /// @brief 固定ビット選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] expr 本体のオブジェクト
   /// @param[in] bit_index ビット選択式
   /// @param[in] bit_index_val ビット選択式の値
   virtual
   ElbExpr*
   new_BitSelect(const PtBase* pt_expr,
-		ElbDecl* obj,
+		ElbExpr* expr,
 		const PtExpr* bit_index,
 		int bit_index_val) = 0;
 
-  /// @brief ビット選択式を生成する．
+  /// @brief 固定ビット選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] expr 本体の式
+  /// @param[in] bit_index_val ビット選択式の値
+  virtual
+  ElbExpr*
+  new_BitSelect(const PtBase* pt_expr,
+		ElbExpr* expr,
+		int bit_index_val) = 0;
+
+  /// @brief 可変ビット選択式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] expr 本体のオブジェクト
   /// @param[in] bit_index ビット選択式
   virtual
   ElbExpr*
   new_BitSelect(const PtBase* pt_expr,
 		ElbExpr* expr,
-		int bit_index) = 0;
+		ElbExpr* bit_index) = 0;
 
-  /// @brief 部分選択式を生成する．
+  /// @brief 固定部分選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
   /// @param[in] index1, index2 パート選択式
@@ -916,13 +916,13 @@ public:
   virtual
   ElbExpr*
   new_PartSelect(const PtBase* pt_expr,
-		 ElbDecl* obj,
+		 ElbExpr* obj,
 		 const PtExpr* index1,
 		 const PtExpr* index2,
 		 int index1_val,
 		 int index2_val) = 0;
 
-  /// @brief 部分選択式を生成する．
+  /// @brief 固定部分選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] expr 本体の式
   /// @param[in] index1, inde2 パート選択式
@@ -942,9 +942,9 @@ public:
   virtual
   ElbExpr*
   new_PlusPartSelect(const PtBase* pt_expr,
-		     ElbDecl* obj,
+		     ElbExpr* obj,
 		     ElbExpr* base,
-		     ElbExpr* range,
+		     const PtExpr* range_expr,
 		     int range_val) = 0;
 
   /// @brief 可変部分選択式を生成する．
@@ -956,9 +956,9 @@ public:
   virtual
   ElbExpr*
   new_MinusPartSelect(const PtBase* pt_expr,
-		      ElbDecl* obj,
+		      ElbExpr* obj,
 		      ElbExpr* base,
-		      ElbExpr* range,
+		      const PtExpr* range_expr,
 		      int range_val) = 0;
 
   /// @brief 定数式を生成する．

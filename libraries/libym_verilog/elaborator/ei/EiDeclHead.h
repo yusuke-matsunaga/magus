@@ -270,8 +270,8 @@ protected:
   /// @param[in] right_val 範囲の右側の値
   EiDeclHeadPtV(const VlNamedObj* parent,
 		const PtDeclHead* pt_head,
-		ElbExpr* left,
-		ElbExpr* right,
+		const PtExpr* left,
+		const PtExpr* right,
 		int left_val,
 		int right_val);
 
@@ -358,8 +358,8 @@ private:
   /// @param[in] right_val 範囲の右側の値
   EiDeclHeadPtVD(const VlNamedObj* parent,
 		 const PtDeclHead* pt_head,
-		 ElbExpr* left,
-		 ElbExpr* right,
+		 const PtExpr* left,
+		 const PtExpr* right,
 		 int left_val,
 		 int right_val);
 
@@ -538,8 +538,8 @@ private:
   EiDeclHeadPt2V(const VlNamedObj* parent,
 		 const PtIOHead* pt_head,
 		 tVpiAuxType aux_type,
-		 ElbExpr* left,
-		 ElbExpr* right,
+		 const PtExpr* left,
+		 const PtExpr* right,
 		 int left_val,
 		 int right_val);
 
@@ -736,8 +736,8 @@ private:
   /// @param[in] right_val 範囲の LSB の値
   EiDeclHeadPt3V(const VlNamedObj* parent,
 		 const PtItem* pt_item,
-		 ElbExpr* left,
-		 ElbExpr* right,
+		 const PtExpr* left,
+		 const PtExpr* right,
 		 int left_val,
 		 int right_val);
 
