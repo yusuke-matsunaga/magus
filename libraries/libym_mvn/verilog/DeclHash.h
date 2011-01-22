@@ -50,7 +50,7 @@ public:
   /// @return ID番号
   /// @note 登録されていなかった場合には新しい番号を割り当てる．
   ymuint
-  get_id(const VlDecl* decl,
+  get_id(const VlDeclArray* decl,
 	 ymuint offset);
 
   /// @brief ID番号の最大値 + 1を返す．

@@ -21,6 +21,7 @@
 #include "ym_verilog/vl/VlUdp.h"
 #include "ym_verilog/vl/VlIODecl.h"
 #include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlDeclArray.h"
 #include "ym_verilog/vl/VlPort.h"
 #include "ym_verilog/vl/VlContAssign.h"
 #include "ym_verilog/vl/VlProcess.h"
@@ -328,8 +329,10 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   for (ymuint i = 0; i < nio_all; ++ i) {
     const VlIODecl* io = vl_module->io(i);
     const VlDecl* decl = io->decl();
-    MvNode* node = mGlobalEnv.get(decl);
+    AssignInfo ai = mGlobalEnv.get(decl);
+    MvNode* node = ai.mRhs;
     assert_cond( node != NULL, __FILE__, __LINE__);
+    assert_cond( ai.mCond == NULL, __FILE__, __LINE__);
     switch ( io->direction() ) {
     case kVpiInput:
       mMvMgr->connect(module->input(i1), 0, node, 0);
@@ -439,16 +442,13 @@ ReaderImpl::gen_decl(MvModule* module,
 
   // ネット配列の生成
   {
-    vector<const VlDecl*> netarray_list;
-    if ( mVlMgr.find_decl_list(vl_scope, vpiNetArray, netarray_list) ) {
-      for (vector<const VlDecl*>::iterator p = netarray_list.begin();
+    vector<const VlDeclArray*> netarray_list;
+    if ( mVlMgr.find_declarray_list(vl_scope, vpiNetArray, netarray_list) ) {
+      for (vector<const VlDeclArray*>::iterator p = netarray_list.begin();
 	   p != netarray_list.end(); ++ p) {
-	const VlDecl* vl_decl = *p;
+	const VlDeclArray* vl_decl = *p;
 	ymuint d = vl_decl->dimension();
-	ymuint array_size = 1;
-	for (ymuint i = 0; i < d; ++ i) {
-	  array_size *= vl_decl->range(i)->size();
-	}
+	ymuint array_size = vl_decl->array_size();
 	for (ymuint i = 0; i < array_size; ++ i) {
 	  // 仮の through ノードに対応させる．
 	  ymuint bw = vl_decl->bit_size();
@@ -477,16 +477,13 @@ ReaderImpl::gen_decl(MvModule* module,
 
   // REG配列の生成
   {
-    vector<const VlDecl*> regarray_list;
-    if ( mVlMgr.find_decl_list(vl_scope, vpiRegArray, regarray_list) ) {
-      for (vector<const VlDecl*>::iterator p = regarray_list.begin();
+    vector<const VlDeclArray*> regarray_list;
+    if ( mVlMgr.find_declarray_list(vl_scope, vpiRegArray, regarray_list) ) {
+      for (vector<const VlDeclArray*>::iterator p = regarray_list.begin();
 	   p != regarray_list.end(); ++ p) {
-	const VlDecl* vl_decl = *p;
+	const VlDeclArray* vl_decl = *p;
 	ymuint d = vl_decl->dimension();
-	ymuint array_size = 1;
-	for (ymuint i = 0; i < d; ++ i) {
-	  array_size *= vl_decl->range(i)->size();
-	}
+	ymuint array_size = vl_decl->array_size();
 	for (ymuint i = 0; i < array_size; ++ i) {
 	  // 仮の through ノードに対応させる．
 	  ymuint bw = vl_decl->bit_size();

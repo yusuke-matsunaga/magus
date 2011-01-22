@@ -69,7 +69,6 @@ ymuint
 DeclHash::get_id(const VlDecl* decl,
 		 ymuint offset)
 {
-  assert_cond( decl->dimension == 0, __FILE__, __LINE__);
   Cell* cell = find_cell(decl);
   ymuint base = 0;
   if ( cell ) {
@@ -95,7 +94,6 @@ void
 DeclHash::put_cell(const VlDecl* decl,
 		   ymuint id)
 {
-  ymuint
   if ( mNum >= mLimit ) {
     // テーブルを拡大する．
     ymuint old_size = mSize;
