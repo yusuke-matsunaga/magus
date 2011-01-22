@@ -40,6 +40,7 @@ noinst_HEADERS = \
 	ElbTaskFunc.h \
 	ElbUdp.h \
 	ElbUserSystf.h \
+	ElbValue.h \
 	ModuleHash.h \
 	ObjDict.h \
 	TagDict.h

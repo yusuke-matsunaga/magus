@@ -48,6 +48,16 @@ private:
   const ElbDeclArray*
   declarray();
 
+  /// @brief  パラメータを追加する．
+  virtual
+  void
+  add_parameter(ElbParameter* obj);
+
+  /// @brief  パラメータの先頭を得る．
+  virtual
+  const ElbParameter*
+  parameter();
+
   /// @brief  defparam を追加する．
   virtual
   void
@@ -242,6 +252,13 @@ public:
   find_declarray_list(const VlNamedObj* parent,
 		      int tag,
 		      vector<const VlDeclArray*>& declarray_list) const;
+
+  /// @brief パラメータを追加する．
+  /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+  /// @param[in] decl 登録する要素
+  void
+  add_parameter(int tag,
+		ElbParameter* decl);
 
   /// @brief defparam を追加する．
   /// @param[in] defparam 登録する要素

@@ -104,57 +104,13 @@ ElbParameter::delay() const
   return NULL;
 }
 
-// @brief 符号付きに補正する．
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_signed()
+// @brief 初期値の取得
+// @retval 初期値
+// @retval NULL 設定がない場合
+const VlExpr*
+ElbParameter::init_value() const
 {
-}
-
-// @brief スカラー値を設定する．
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_scalar(tVpiScalarVal val)
-{
-}
-
-// @brief real 型の値を設定する．
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_real(double val)
-{
-}
-
-// @brief bitvector 型の値を設定する．
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_bitvector(const BitVector& val)
-{
-}
-
-// @brief ビット値を設定する．
-// @param[in] index ビット位置
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_bitselect(int index,
-			    tVpiScalarVal val)
-{
-}
-
-// @brief 範囲値を設定する．
-// @param[in] left 範囲の MSB
-// @param[in] right 範囲の LSB
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_partselect(int left,
-			     int right,
-			     const BitVector& val)
-{
+  return NULL;
 }
 
 END_NAMESPACE_YM_VERILOG

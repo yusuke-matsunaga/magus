@@ -90,6 +90,7 @@ public:
   bool
   is_constant_function() const = 0;
 
+#if 0
   /// @brief スカラー値を返す．
   /// @param[in] arg_list 引数のリスト
   /// @note constant function の場合のみ意味を持つ．
@@ -119,6 +120,7 @@ public:
   eval_bitvector(const vector<ElbExpr*>& arg_list,
 		 BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const = 0;
+#endif
 
 
 public:

@@ -106,6 +106,13 @@ public:
   instantiate_namedevent(const VlNamedObj* parent,
 			 const PtExpr* pt_expr);
 
+  /// @brief 式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbValue
+  evaluate_expr(const VlNamedObj* parent,
+		const PtExpr* pt_expr);
+
   /// @brief PtExpr を評価し int 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -286,13 +293,6 @@ private:
 	     tVpiObjType decl_type,
 	     bool is_array,
 	     bool has_select);
-
-  /// @brief 式の値を評価する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_expr 式を表すパース木
-  ElbValue
-  evaluate_expr(const VlNamedObj* parent,
-		const PtExpr* pt_expr);
 
   /// @brief 演算子に対して式の値を評価する．
   /// @param[in] parent 親のスコープ

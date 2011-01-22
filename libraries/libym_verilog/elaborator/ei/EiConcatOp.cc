@@ -12,6 +12,7 @@
 #include "EiFactory.h"
 #include "EiConcatOp.h"
 
+#include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/BitVector.h"
 
 
@@ -44,7 +45,7 @@ EiFactory::new_ConcatOp(const PtBase* pt_expr,
 // @param[in] opr_list オペランドのリスト
 ElbExpr*
 EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
-			     ElbExpr* rep_expr,
+			     const PtExpr* rep_expr,
 			     int rep_num,
 			     ymuint opr_size,
 			     ElbExpr** opr_list)
@@ -225,7 +226,7 @@ EiConcatOp::_operand(ymuint pos) const
 // @param[in] opr_size オペランド数
 // @param[in] opr_array オペランドを格納する配列
 EiMultiConcatOp::EiMultiConcatOp(const PtBase* pt_obj,
-				 ElbExpr* rep_expr,
+				 const PtExpr* rep_expr,
 				 int rep_num,
 				 ymuint opr_size,
 				 ElbExpr** opr_array) :
@@ -233,7 +234,6 @@ EiMultiConcatOp::EiMultiConcatOp(const PtBase* pt_obj,
   mRepExpr(rep_expr),
   mRepNum(rep_num)
 {
-  mRepExpr->set_selfsize();
 }
 
 // @brief デストラクタ
@@ -314,7 +314,8 @@ ElbExpr*
 EiMultiConcatOp::_operand(ymuint pos) const
 {
   if ( pos == 0 ) {
-    return mRepExpr;
+#warning "TODO: なんとかする．"
+    return NULL;
   }
   return EiConcatOp::_operand(pos - 1);
 }

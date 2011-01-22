@@ -19,6 +19,7 @@
 #include "ym_verilog/vl/VlModule.h"
 
 #include "ElbDecl.h"
+#include "ElbParameter.h"
 #include "ElbPrimitive.h"
 #include "ElbExpr.h"
 #include "ElbGenvar.h"
@@ -649,24 +650,19 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 
   // それ以外の宣言要素の場合
   // しかしこの場合には parameter でなければならない．
-  ElbDecl* param = handle->decl();
-  if ( !param || param->type() != kVpiParameter ) {
+  ElbParameter* param = handle->parameter();
+  if ( !param ) {
     error_not_a_parameter(pt_expr);
     return ElbValue();
   }
-  ElbValue val;
+  ElbValue val = param->get_value();;
   if ( param->value_type() == kVpiValueReal ) {
     if ( has_bit_select || has_range_select ) {
       error_illegal_real_type(pt_expr);
       return ElbValue();
     }
-    val = ElbValue(param->get_real());
   }
   else {
-    BitVector bv;
-    param->get_bitvector(bv);
-    val = ElbValue(bv);
-
     if ( has_bit_select ) {
       val.to_bitvector();
       if ( val.is_error() ) {

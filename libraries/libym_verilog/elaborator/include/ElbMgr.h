@@ -272,6 +272,13 @@ public:
   reg_declarray(int tag,
 		ElbDeclArray* obj);
 
+  /// @brief パラメータを登録する．
+  /// @param[in] tag タグ
+  /// @param[in] obj 登録するオブジェクト
+  void
+  reg_parameter(int ga,
+		ElbParameter* obj);
+
   /// @brief defparam を登録する．
   /// @param[in] obj 登録するオブジェクト
   void

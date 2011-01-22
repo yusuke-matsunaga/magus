@@ -187,6 +187,13 @@ protected:
   reg_declarray(int tag,
 		ElbDeclArray* obj);
 
+  /// @brief パラメータを登録する．
+  /// @param[in] tag タグ
+  /// @param[in] obj 登録するオブジェクト
+  void
+  reg_parameter(int tag,
+		ElbParameter* obj);
+
   /// @brief モジュール配列を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
@@ -534,6 +541,13 @@ protected:
   instantiate_delay(const VlNamedObj* parent,
 		    const PtItem* pt_head);
 
+  /// @brief 式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  ElbValue
+  evaluate_expr(const VlNamedObj* parent,
+		const PtExpr* pt_expr);
+
   /// @brief PtExpr を評価し int 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -573,13 +587,6 @@ protected:
   evaluate_bitvector(const VlNamedObj* parent,
 		     const PtExpr* pt_expr,
 		     BitVector& value);
-
-  /// @brief 式を int 値に変換する．
-  /// @return 変換に成功したら true を返す．
-  /// @note 変換に失敗したらエラーメッセージを出力する．
-  bool
-  expr_to_int(ElbExpr* expr,
-	      int& val);
 
 
 protected:
@@ -805,6 +812,17 @@ ElbProxy::reg_declarray(int tag,
 			ElbDeclArray* obj)
 {
   mMgr.reg_declarray(tag, obj);
+}
+
+// @brief パラメータを登録する．
+// @param[in] tag タグ
+// @param[in] obj 登録するオブジェクト
+inline
+void
+ElbProxy::reg_parameter(int tag,
+			ElbParameter* obj)
+{
+  mMgr.reg_parameter(tag, obj);
 }
 
 // @brief モジュール配列を登録する．

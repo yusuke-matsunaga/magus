@@ -65,7 +65,7 @@ EiFactory::new_ParamHead(const VlNamedObj* parent,
 // @param[in] pt_item パース木の宣言要素
 // @param[in] init 初期割り当て式
 // @param[in] is_local localparam の時 true
-ElbDecl*
+ElbParameter*
 EiFactory::new_Parameter(ElbParamHead* head,
 			 const PtNamedBase* pt_item,
 			 bool is_local)
@@ -431,7 +431,36 @@ EiParameter::value_type() const
 {
   tVpiValueType vt = mHead->value_type();
   if ( vt == kVpiValueNone ) {
-    vt = mExpr->value_type();
+    if ( mValue.is_int() ) {
+      return kVpiValueInteger;
+    }
+    if ( mValue.is_scalar() ) {
+      return pack(kVpiValueUS, 1);
+    }
+    if ( mValue.is_bitvector() ) {
+      const BitVector& bv = mValue.bitvector_value();
+      ymuint size = bv.size();
+      if ( bv.is_signed() ) {
+	if ( bv.is_sized() ) {
+	  return pack(kVpiValueSS, size);
+	}
+	else {
+	  return pack(kVpiValueSU, size);
+	}
+      }
+      else {
+	if ( bv.is_sized() ) {
+	  return pack(kVpiValueUS, size);
+	}
+	else {
+	  return pack(kVpiValueUU, size);
+	}
+      }
+    }
+    if ( mValue.is_real() ) {
+      return kVpiValueReal;
+    }
+    return kVpiValueNone;
   }
   return vt;
 }
@@ -510,15 +539,6 @@ EiParameter::data_type() const
   return mHead->data_type();
 }
 
-// @brief 初期値の取得
-// @retval 初期値
-// @retval NULL 設定がない場合
-const VlExpr*
-EiParameter::init_value() const
-{
-  return mExpr;
-}
-
 // @brief localparam のときに true 返す．
 // @note このクラスでは false を返す．
 bool
@@ -527,71 +547,23 @@ EiParameter::is_local_param() const
   return false;
 }
 
-// @brief 初期値の設定
-// @param[in] expr 初期値
+// @brief 値の取得
+ElbValue
+EiParameter::get_value() const
+{
+  return mValue;
+}
+
+// @brief 値の設定
+// @param[in] expr 値を表す式
+// @param[in] value 値
 void
-EiParameter::set_expr(ElbExpr* expr)
+EiParameter::set_expr(const PtExpr* expr,
+		      const ElbValue& value)
 {
   mExpr = expr;
+  mValue = value;
 }
-
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiParameter::get_scalar() const
-{
-  return mExpr->eval_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiParameter::get_logic() const
-{
-  return mExpr->eval_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiParameter::get_real() const
-{
-  return mExpr->eval_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiParameter::get_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  mExpr->eval_bitvector(bitvector, req_type);
-}
-
-// @brief ビット選択値を返す．
-// @param[in] index ビット位置
-tVpiScalarVal
-EiParameter::get_bitselect(int index) const
-{
-  ymuint offset = bit_offset(index);
-  BitVector bv;
-  get_bitvector(bv);
-  return bv.bit_select(offset);
-}
-
-// @brief 範囲選択値を返す．
-// @param[in] left 範囲の MSB
-// @param[in] right 範囲の LSB
-// @param[out] val 値
-void
-EiParameter::get_partselect(int left,
-			    int right,
-			    BitVector& val) const
-{
-  ymuint offset1 = bit_offset(left);
-  ymuint offset2 = bit_offset(right);
-  BitVector bv;
-  get_bitvector(bv);
-  bv.part_select(offset1, offset2);
-}
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

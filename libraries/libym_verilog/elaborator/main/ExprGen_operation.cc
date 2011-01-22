@@ -144,12 +144,9 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
   case kVpiMultiConcatOp:
     {
       const PtExpr* pt_expr0 = pt_expr->operand(0);
-      ElbExpr* rep = instantiate_constant_expr(parent, pt_expr0);
-      if ( rep == NULL ) {
-	return NULL;
-      }
       int rep_num;
-      if ( !expr_to_int(rep, rep_num) ) {
+      bool stat = evaluate_int(parent, pt_expr0, rep_num);
+      if ( !stat ) {
 	return NULL;
       }
       ElbExpr** opr_list = factory().new_ExprList(opr_size - 1);
@@ -165,7 +162,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	}
 	opr_list[i - 1] = expr1;
       }
-      expr = factory().new_MultiConcatOp(pt_expr, rep, rep_num,
+      expr = factory().new_MultiConcatOp(pt_expr, pt_expr0, rep_num,
 					 opr_size - 1, opr_list);
       expr->set_selfsize();
     }

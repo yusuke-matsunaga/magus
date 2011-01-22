@@ -114,7 +114,6 @@ public:
   data_type() const;
 
 
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -344,13 +343,6 @@ public:
   tVpiVarType
   data_type() const;
 
-  /// @brief 初期値の取得
-  /// @retval 初期値
-  /// @retval NULL 設定がない場合
-  virtual
-  const VlExpr*
-  init_value() const;
-
   /// @brief localparam のときに true 返す．
   /// @note このクラスでは false を返す．
   virtual
@@ -360,51 +352,21 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ElbDecl の仮想関数
+  // ElbParameter の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スカラー値を返す．
+  /// @brief 値の取得
   virtual
-  tVpiScalarVal
-  get_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  get_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  get_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  get_bitvector(BitVector& bitvector,
-		tVpiValueType req_type = kVpiValueNone) const;
-
-  /// @brief ビット選択値を返す．
-  /// @param[in] index ビット位置
-  virtual
-  tVpiScalarVal
-  get_bitselect(int index) const;
-
-  /// @brief 範囲選択値を返す．
-  /// @param[in] left 範囲の MSB
-  /// @param[in] right 範囲の LSB
-  /// @param[out] val 値
-  virtual
-  void
-  get_partselect(int left,
-		 int right,
-		 BitVector& val) const;
+  ElbValue
+  get_value() const;
 
   /// @brief 値の設定
   /// @param[in] expr 値を表す式
+  /// @param[in] value 値
   virtual
   void
-  set_expr(ElbExpr* expr);
+  set_expr(const PtExpr* expr,
+	   const ElbValue& value);
 
 
 private:
@@ -418,8 +380,11 @@ private:
   // パース木の宣言要素
   const PtNamedBase* mPtItem;
 
+  // 式
+  const PtExpr* mExpr;
+
   // 値
-  ElbExpr* mExpr;
+  ElbValue mValue;
 
 };
 

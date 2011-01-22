@@ -114,13 +114,14 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
+#if 0
   /// @brief ビットベクタを書き込む．
   /// @param[in] v 書き込む値
   /// @note 左辺式の時のみ意味を持つ．
   virtual
   void
   set_bitvector(const BitVector& v);
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -179,7 +180,7 @@ private:
   /// @param[in] opr_array オペランドを格納する配列
   /// @note は opr_size は繰り返し数のオペランドは含まない．
   EiMultiConcatOp(const PtBase* pt_obj,
-		  ElbExpr* rep_expr,
+		  const PtExpr* rep_expr,
 		  int rep_num,
 		  ymuint opr_size,
 		  ElbExpr** opr_array);
@@ -257,7 +258,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 繰り返し数を表す式
-  ElbExpr* mRepExpr;
+  const PtExpr* mRepExpr;
 
   // 繰り返し数
   int mRepNum;

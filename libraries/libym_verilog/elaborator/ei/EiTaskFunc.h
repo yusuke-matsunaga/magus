@@ -271,6 +271,7 @@ public:
   bool
   is_constant_function() const;
 
+#if 0
   /// @brief スカラー値を返す．
   /// @param[in] arg_list 引数のリスト
   /// @note constant function の場合のみ意味を持つ．
@@ -300,6 +301,7 @@ public:
   eval_bitvector(const vector<ElbExpr*>& arg_list,
 		 BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
+#endif
 
 };
 
@@ -408,6 +410,7 @@ public:
   bool
   is_constant_function() const;
 
+#if 0
   /// @brief スカラー値を返す．
   /// @param[in] arg_list 引数のリスト
   /// @note constant function の場合のみ意味を持つ．
@@ -438,7 +441,6 @@ public:
 		 BitVector& bitvector,
 		 tVpiValueType req_type = kVpiValueNone) const;
 
-
 private:
 
   /// @brief 関数の値の評価を行う．
@@ -446,6 +448,7 @@ private:
   /// @note constant function の場合のみ意味を持つ．
   void
   evaluate(const vector<ElbExpr*>& arg_list) const;
+#endif
 
 
 private:

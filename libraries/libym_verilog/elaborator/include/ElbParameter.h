@@ -12,6 +12,9 @@
 
 
 #include "ElbDecl.h"
+#include "ElbValue.h"
+
+#include "ym_verilog/pt/PtP.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -117,7 +120,7 @@ public:
 /// IEEE Std 1364-2001 26.6.12 Parameter, specparam
 //////////////////////////////////////////////////////////////////////
 class ElbParameter :
-  public ElbDecl
+  public VlDecl
 {
   friend class CellParam;
 
@@ -136,24 +139,11 @@ public:
   // VlDecl の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @breif 値の型を返す．
-  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-  virtual
-  tVpiValueType
-  value_type() const = 0;
-
   /// @brief 定数値を持つ型のときに true を返す．
   /// @note このクラスは true を返す．
   virtual
   bool
   is_consttype() const;
-
-  /// @brief 符号の取得
-  /// @retval true 符号つき
-  /// @retval false 符号なし
-  virtual
-  bool
-  is_signed() const = 0;
 
   /// @brief ビット要素を返す．
   /// @param[in] index インデックス
@@ -229,58 +219,44 @@ public:
   const VlDelay*
   delay() const;
 
+  /// @brief 初期値の取得
+  /// @retval 初期値
+  /// @retval NULL 設定がない場合
+  virtual
+  const VlExpr*
+  init_value() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ElbDecl の仮想関数
+  // ElbParameter の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 符号付きに補正する．
-  /// @note このクラスでは何もしない．
+  /// @brief 値の取得
   virtual
-  void
-  set_signed();
+  ElbValue
+  get_value() const = 0;
 
-  /// @brief スカラー値を設定する．
+  /// @brief parameter の値の設定
+  /// @param[in] expr 値を表す式
   /// @param[in] val 値
-  /// @note このクラスでは何もしない．
   virtual
   void
-  set_scalar(tVpiScalarVal val);
+  set_expr(const PtExpr* expr,
+	   const ElbValue& val) = 0;
 
-  /// @brief real 型の値を設定する．
-  /// @param[in] val 値
-  /// @note このクラスでは何もしない．
-  virtual
-  void
-  set_real(double val);
+  /// @brief 次の要素を返す．
+  const ElbParameter*
+  next() const;
 
-  /// @brief bitvector 型の値を設定する．
-  /// @param[in] val 値
-  /// @note このクラスでは何もしない．
-  virtual
-  void
-  set_bitvector(const BitVector& val);
 
-  /// @brief ビット値を設定する．
-  /// @param[in] index ビット位置
-  /// @param[in] val 値
-  /// @note このクラスでは何もしない．
-  virtual
-  void
-  set_bitselect(int index,
-		tVpiScalarVal val);
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 範囲値を設定する．
-  /// @param[in] left 範囲の MSB
-  /// @param[in] right 範囲の LSB
-  /// @param[in] val 値
-  /// @note このクラスでは何もしない．
-  virtual
-  void
-  set_partselect(int left,
-		 int right,
-		 const BitVector& val);
+  // 次の要素を指すポインタ
+  ElbParameter* mNext;
 
 };
 
@@ -311,6 +287,14 @@ ElbParameter::ElbParameter()
 inline
 ElbParameter::~ElbParameter()
 {
+}
+
+// @brief 次の要素を返す．
+inline
+const ElbParameter*
+ElbParameter::next() const
+{
+  return mNext;
 }
 
 END_NAMESPACE_YM_VERILOG

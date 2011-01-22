@@ -12,6 +12,7 @@
 
 
 #include "ElbParamAssign.h"
+#include "ElbValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -30,11 +31,13 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] param 対象の parameter
-  /// @param[in] rhs 割り当て式の右辺
+  /// @param[in] rhs_expr 割り当て式の右辺
+  /// @param[in] rhs_value 右辺の値
   EiParamAssign(const VlModule* module,
 		const PtBase* pt_obj,
-		ElbDecl* param,
-		ElbExpr* rhs);
+		ElbParameter* param,
+		const PtExpr* rhs_expr,
+		const ElbValue& rhs_value);
 
   /// @brief デストラクタ
   virtual
@@ -67,15 +70,17 @@ public:
   const VlModule*
   parent() const;
 
-  /// @brief 左辺値を返す．
+  /// @brief 左辺のパラメータを返す．
   virtual
   const VlDecl*
   lhs() const;
 
+#if 0
   /// @brief 右辺値を返す．
   virtual
-  const VlExpr*
-  rhs() const;
+  const PtExpr*
+  rhsExpr() const;
+#endif
 
   /// @brief 名前による接続の場合に true を返す．
   /// @note このクラスでは false を返す．
@@ -96,10 +101,13 @@ private:
   const PtBase* mPtObj;
 
   // パラメータ
-  ElbDecl* mLhs;
+  ElbParameter* mLhs;
 
   // 右辺式
-  ElbExpr* mRhs;
+  const PtExpr* mRhsExpr;
+
+  // 右辺の値
+  ElbValue mRhsValue;
 
 };
 
@@ -119,11 +127,13 @@ private:
   /// @param[in] module 親のモジュール
   /// @param[in] pt_obj パース木の接続を表す要素
   /// @param[in] param 対象の parameter
-  /// @param[in] rhs 割り当て式の右辺
+  /// @param[in] rhs_expr 割り当て式の右辺
+  /// @param[in] rhs_value 右辺の値
   EiParamAssign2(const VlModule* module,
 		 const PtBase* pt_obj,
-		 ElbDecl* param,
-		 ElbExpr* rhs);
+		 ElbParameter* param,
+		 const PtExpr* rhs_expr,
+		 const ElbValue& rhs_value);
 
   /// @brief デストラクタ
   virtual
@@ -160,12 +170,14 @@ private:
   /// @param[in] pt_header パース木の defparam ヘッダ
   /// @param[in] pt_item パース木の defparam 定義
   /// @param[in] param 対象の parameter
-  /// @param[in] rhs 割り当て式の右辺
+  /// @param[in] rhs_expr 割り当て式の右辺
+  /// @param[in] rhs_value 右辺の値
   EiDefParam(const VlModule* module,
 	     const PtItem* pt_header,
 	     const PtDefParam* pt_defparam,
-	     ElbDecl* param,
-	     ElbExpr* rhs);
+	     ElbParameter* param,
+	     const PtExpr* rhs_expr,
+	     const ElbValue& rhs_value);
 
   /// @brief デストラクタ
   virtual
@@ -203,10 +215,12 @@ public:
   const VlDecl*
   lhs() const;
 
+#if 0
   /// @brief 右辺値を返す．
   virtual
   const VlExpr*
   rhs() const;
+#endif
 
 
 private:
@@ -224,10 +238,13 @@ private:
   const PtDefParam* mPtDefParam;
 
   // パラメータ
-  ElbDecl* mLhs;
+  ElbParameter* mLhs;
 
   // 右辺式
-  ElbExpr* mRhs;
+  const PtExpr* mRhsExpr;
+
+  // 右辺の値
+  ElbValue mRhsValue;
 
 };
 

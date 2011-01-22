@@ -126,8 +126,9 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 	ElbParamCon param_con(pt_head->file_region(), n, named_con);
 	for (ymuint i = 0; i < n; ++ i) {
 	  const PtConnection* pt_con = pa_array[i];
-	  ElbExpr* expr = instantiate_constant_expr(parent, pt_con->expr());
-	  param_con.set(i, pt_con, expr);
+	  const PtExpr* expr = pt_con->expr();
+	  ElbValue value = evaluate_expr(parent, expr);
+	  param_con.set(i, pt_con, expr, value);
 	}
 
 	phase1_module_item(module1, pt_module, &param_con);
@@ -234,8 +235,9 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   ElbParamCon param_con(pt_head->file_region(), param_num, named_con);
   for (ymuint i = 0; i < param_num; ++ i) {
     const PtConnection* pt_con = pa_array[i];
-    ElbExpr* expr = instantiate_constant_expr(parent, pt_con->expr());
-    param_con.set(i, pt_con, expr);
+    const PtExpr* expr = pt_con->expr();
+    ElbValue value = evaluate_expr(parent, expr);
+    param_con.set(i, pt_con, expr, value);
   }
 
   ymuint n = module_array->elem_num();

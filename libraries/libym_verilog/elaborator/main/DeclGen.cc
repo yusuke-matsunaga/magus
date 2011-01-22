@@ -454,18 +454,11 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
     const PtDeclItem* pt_item = pt_head->item(i);
     const FileRegion& file_region = pt_item->file_region();
 
-    // 右辺の式は constant expression のはずなので今つくる．
-    const PtExpr* pt_init_expr = pt_item->init_value();
-    ElbExpr* init = instantiate_constant_expr(parent, pt_init_expr);
-    if ( !init ) {
-      continue;
-    }
-
-    ElbDecl* param = factory().new_Parameter(param_head,
-					     pt_item,
-					     is_local);
+    ElbParameter* param = factory().new_Parameter(param_head,
+						  pt_item,
+						  is_local);
     assert_cond(param, __FILE__, __LINE__);
-    reg_decl(vpiParameter, param);
+    reg_parameter(kVpiParameter, param);
 
     // attribute instance の生成
     //instantiate_attribute(pt_head->attr_top(), false, param);
@@ -478,12 +471,16 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
 		      "ELAB",
 		      buf.str());
 
-    param->set_expr(init);
+    // 右辺の式は constant expression のはずなので今つくる．
+    const PtExpr* pt_init_expr = pt_item->init_value();
+    ElbValue value = evaluate_expr(parent, pt_init_expr);
+
+    param->set_expr(pt_init_expr, value);
 
     // ダブっている感じがするけど同じことを表す parameter assign 文
     // をつくってモジュールに追加する．
     ElbParamAssign* pa = factory().new_ParamAssign(module, pt_item,
-						   param, init,
+						   param, pt_init_expr, value,
 						   true);
     reg_paramassign(pa);
   }

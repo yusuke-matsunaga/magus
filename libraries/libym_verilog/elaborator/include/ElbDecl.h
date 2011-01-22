@@ -229,6 +229,7 @@ public:
   void
   set_init(ElbExpr* expr);
 
+#if 0
   /// @brief スカラー値を返す．
   virtual
   tVpiScalarVal
@@ -303,6 +304,7 @@ public:
   set_partselect(int left,
 		 int right,
 		 const BitVector& val) = 0;
+#endif
 
 
 public:
@@ -310,12 +312,14 @@ public:
   // ElbDecl の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief parameter の初期値の設定
   /// @param[in] expr 初期値
   /// @note このクラスのデフォルト実装ではなにもしない．
   virtual
   void
   set_expr(ElbExpr* expr);
+#endif
 
   /// @brief 次の要素を返す．
   const ElbDecl*

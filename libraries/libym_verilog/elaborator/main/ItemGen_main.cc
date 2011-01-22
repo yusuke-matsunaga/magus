@@ -21,7 +21,7 @@
 
 #include "ym_verilog/vl/VlModule.h"
 
-#include "ElbDecl.h"
+#include "ElbParameter.h"
 #include "ElbParamAssign.h"
 #include "ElbContAssign.h"
 #include "ElbProcess.h"
@@ -153,8 +153,8 @@ ItemGen::defparam_override(const VlModule* module,
   if ( !handle ) {
     return false;
   }
-  ElbDecl* param = handle->decl();
-  if ( !param || param->type() != kVpiParameter ) {
+  ElbParameter* param = handle->parameter();
+  if ( !param ) {
     ostringstream buf;
     buf << "\"" << expand_full_name(nb_array, name)
 	<< "\" is not a parameter.";
@@ -182,27 +182,24 @@ ItemGen::defparam_override(const VlModule* module,
     return true;
   }
 
-  ElbExpr* expr = instantiate_constant_expr(module, pt_defparam->expr());
-  if ( !expr ) {
-    // もうこれ以降は処理したくないので true を返す．
-    return true;;
-  }
+  const PtExpr* rhs_expr = pt_defparam->expr();
+  ElbValue rhs_value = evaluate_expr(module, rhs_expr);
 
   ostringstream buf;
   buf << "instantiating defparam: " << param->full_name()
-      << " = " << expr->decompile() << ".";
+      << " = " << rhs_expr->decompile() << ".";
   put_msg(__FILE__, __LINE__,
 	  fr,
 	  kMsgInfo,
 	  "ELAB",
 	  buf.str());
 
-  param->set_expr(expr);
+  param->set_expr(rhs_expr, rhs_value);
 
   ElbDefParam* dp = factory().new_DefParam(module,
 					   pt_header,
 					   pt_defparam,
-					   param, expr);
+					   param, rhs_expr, rhs_value);
   reg_defparam(dp);
 
   return true;

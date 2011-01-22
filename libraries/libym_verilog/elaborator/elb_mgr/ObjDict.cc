@@ -14,6 +14,7 @@
 #include "ym_verilog/vl/VlNamedObj.h"
 
 #include "ElbDecl.h"
+#include "ElbParameter.h"
 #include "ElbModule.h"
 #include "ElbTaskFunc.h"
 #include "ElbPrimitive.h"
@@ -79,6 +80,14 @@ ElbObjHandle::decl()
 // @note このクラスでは NULL を返す．
 ElbDeclArray*
 ElbObjHandle::declarray()
+{
+  return NULL;
+}
+
+// @brief ElbParameter を返す．
+// @note このクラスでは NULL を返す．
+ElbParameter*
+ElbObjHandle::parameter()
 {
   return NULL;
 }
@@ -217,6 +226,36 @@ ElbDeclArrayHandle::obj()
 // @brief ElbDeclArray を返す．
 ElbDeclArray*
 ElbDeclArrayHandle::declarray()
+{
+  return mObj;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ElbParamHandle
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+ElbParamHandle::ElbParamHandle(ElbParameter* obj) :
+  mObj(obj)
+{
+}
+
+// @brief デストラクタ
+ElbParamHandle::~ElbParamHandle()
+{
+}
+
+// @brief VlNamedObj を返す．
+const VlNamedObj*
+ElbParamHandle::obj()
+{
+  return mObj;
+}
+
+// @brief ElbParameter を返す．
+ElbParameter*
+ElbParamHandle::parameter()
 {
   return mObj;
 }
@@ -470,6 +509,15 @@ ObjDict::add(ElbDeclArray* obj)
 {
   void* p = mAlloc.get_memory(sizeof(ElbDeclArrayHandle));
   ElbDeclArrayHandle* handle = new (p) ElbDeclArrayHandle(obj);
+  add_handle(obj->parent(), obj->name(), handle);
+}
+
+// @brief 要素を追加する．
+void
+ObjDict::add(ElbParameter* obj)
+{
+  void* p = mAlloc.get_memory(sizeof(ElbParamHandle));
+  ElbParamHandle* handle = new (p) ElbParamHandle(obj);
   add_handle(obj->parent(), obj->name(), handle);
 }
 

@@ -312,6 +312,7 @@ EiTask::is_constant_function() const
   return false;
 }
 
+#if 0
 // @brief スカラー値を返す．
 // @param[in] arg_list 引数のリスト
 // @note constant function の場合のみ意味を持つ．
@@ -352,6 +353,7 @@ EiTask::eval_bitvector(const vector<ElbExpr*>& arg_list,
 {
   assert_not_reached(__FILE__, __LINE__);
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -497,6 +499,7 @@ EiFunction::is_constant_function() const
   return false;
 }
 
+#if 0
 // @brief スカラー値を返す．
 // @param[in] arg_list 引数のリスト
 // @note constant function の場合のみ意味を持つ．
@@ -567,6 +570,7 @@ EiFunction::evaluate(const vector<ElbExpr*>& arg_list) const
   _stmt()->func_exec(true);
 #endif
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////

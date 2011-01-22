@@ -29,7 +29,6 @@ libym_vl_elab_main_la_SOURCES = \
 	ElbProxy.h \
 	ElbProxy.cc \
 	ElbParamCon.h \
-	ElbValue.h \
 	UdpGen.h \
 	UdpGen.cc \
 	ModuleGen.h \

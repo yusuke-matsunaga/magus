@@ -312,6 +312,16 @@ ElbProxy::instantiate_delay(const VlNamedObj* parent,
   return mExprGen->instantiate_delay(parent, pt_head);
 }
 
+// @brief 式の値を評価する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+ElbValue
+ElbProxy::evaluate_expr(const VlNamedObj* parent,
+			const PtExpr* pt_expr)
+{
+  return mExprGen->evaluate_expr(parent, pt_expr);
+}
+
 // @brief PtExpr を評価し int 値を返す．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
@@ -363,28 +373,6 @@ ElbProxy::evaluate_bitvector(const VlNamedObj* parent,
 {
   return mExprGen->evaluate_bitvector(parent, pt_expr, value);
 }
-
-#if 0
-// @brief 式を int 値に変換する．
-// @return 変換に成功したら true を返す．
-// @note 変換に失敗したらエラーメッセージを出力する．
-bool
-ElbProxy::expr_to_int(ElbExpr* expr,
-		      int& val)
-{
-  bool stat = expr->eval_int(val);
-  if ( !stat ) {
-    ostringstream buf;
-    buf << expr->decompile() << ": Integer value required.";
-    msg_mgr().put_msg(__FILE__, __LINE__,
-		      expr->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
-  }
-  return stat;
-}
-#endif
 
 // @brief PtAttrInst から属性リストを生成し，オブジェクトに付加する．
 // @param[in] pt_attr_array 属性を表すパース木

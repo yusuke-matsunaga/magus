@@ -288,7 +288,7 @@ public:
   /// @param[in] init 初期値
   /// @param[in] is_local localparam の時 true
   virtual
-  ElbDecl*
+  ElbParameter*
   new_Parameter(ElbParamHead* head,
 		const PtNamedBase* pt_item,
 		bool is_local = false) = 0;
@@ -342,13 +342,15 @@ public:
   /// @param[in] module 親のモジュール
   /// @param[in] param 対象の parameter
   /// @param[in] rhs 割り当て式の右辺
+  /// @param[in] rhs_value 右辺の値
   /// @param[in] named_con 名前による割り当ての時 true
   virtual
   ElbParamAssign*
   new_ParamAssign(const VlModule* module,
 		  const PtBase* pt_obj,
-		  ElbDecl* param,
-		  ElbExpr* rhs,
+		  ElbParameter* param,
+		  const PtExpr* rhs,
+		  const ElbValue& rhs_value,
 		  bool named_con) = 0;
 
   /// @brief defparam 文を生成する．
@@ -357,13 +359,15 @@ public:
   /// @param[in] pt_item パース木の defparam 定義
   /// @param[in] param 対象の parameter
   /// @param[in] rhs 割り当て式の右辺
+  /// @param[in] rhs_value 右辺の値
   virtual
   ElbDefParam*
   new_DefParam(const VlModule* module,
 	       const PtItem* pt_header,
 	       const PtDefParam* pt_defparam,
-	       ElbDecl* param,
-	       ElbExpr* rhs) = 0;
+	       ElbParameter* param,
+	       const PtExpr* rhs,
+	       const ElbValue& rhs_value) = 0;
 
   /// @brief ゲートプリミティブのヘッダを生成する．
   /// @param[in] parent 親のスコープ
@@ -853,7 +857,7 @@ public:
   virtual
   ElbExpr*
   new_MultiConcatOp(const PtBase* pt_expr,
-		    ElbExpr* rep_expr,
+		    const PtExpr* rep_expr,
 		    int rep_num,
 		    ymuint opr_size,
 		    ElbExpr** opr_list) = 0;

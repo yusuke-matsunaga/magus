@@ -164,6 +164,21 @@ TagDictCell::declarray()
   return NULL;
 }
 
+// @brief  パラメータを追加する．
+void
+TagDictCell::add_parameter(ElbParameter* obj)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief  パラメータの先頭を得る．
+const ElbParameter*
+TagDictCell::parameter()
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
 // defparam を追加する．
 void
 TagDictCell::add_defparam(ElbDefParam* obj)
@@ -560,9 +575,20 @@ TagDict::find_decl_list(const VlNamedObj* parent,
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbDecl* obj = cell->decl();
-	 obj; obj = obj->next()) {
-      obj_list.push_back(obj);
+    if ( cell->decl() ) {
+      for (const ElbDecl* obj = cell->decl();
+	   obj; obj = obj->next()) {
+	obj_list.push_back(obj);
+      }
+    }
+    else if ( cell->parameter() ) {
+      for (const ElbParameter* obj = cell->parameter();
+	   obj; obj = obj->next()) {
+	obj_list.push_back(obj);
+      }
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
     }
     return true;
   }
@@ -692,6 +718,101 @@ TagDict::find_declarray_list(const VlNamedObj* parent,
   return false;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// パラメータ用ののセル
+//////////////////////////////////////////////////////////////////////
+class CellParam :
+  public TagDictCell
+{
+public:
+
+  /// @brief コンストラクタ
+  CellParam(ElbParameter* obj);
+
+  /// @brief 要素の追加
+  virtual
+  void
+  add_parameter(ElbParameter* obj);
+
+  /// @brief 宣言要素の先頭を得る．
+  virtual
+  ElbParameter*
+  parameter();
+
+  /// @brief 要素数の取得
+  virtual
+  ymuint
+  num();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 先頭の要素
+  ElbParameter* mTop;
+
+  // 末尾の要素
+  ElbParameter* mTail;
+
+  // 要素数
+  ymuint32 mNum;
+
+};
+
+// @brief コンストラクタ
+CellParam::CellParam(ElbParameter* obj) :
+  mTop(obj),
+  mTail(obj),
+  mNum(1)
+{
+}
+
+// @brief 要素の追加
+void
+CellParam::add_parameter(ElbParameter* obj)
+{
+  mTail->mNext = obj;
+  mTail = obj;
+  ++ mNum;
+}
+
+// @brief 宣言要素の先頭を得る．
+ElbParameter*
+CellParam::parameter()
+{
+  return mTop;
+}
+
+// @brief 要素数の取得
+ymuint
+CellParam::num()
+{
+  return mNum;
+}
+
+// @brief 宣言要素を追加する．
+// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+// @param[in] obj 登録する要素
+void
+TagDict::add_parameter(int tag,
+		       ElbParameter* obj)
+{
+  const VlNamedObj* parent = obj->parent();
+
+  // 該当の Cell が存在するか調べる．
+  TagDictCell* cell = find_cell(parent, tag);
+  if ( cell ) {
+    cell->add_parameter(obj);
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(CellParam));
+    TagDictCell* cell = new (p) CellParam(obj);
+    put_cell(parent, tag, cell);
+  }
+}
 
 //////////////////////////////////////////////////////////////////////
 // defparam 用のセル

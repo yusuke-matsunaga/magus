@@ -128,14 +128,14 @@ ModuleGen::phase1_module_item(ElbModule* module,
 		  buf.str());
 	  continue;
 	}
-	ElbDecl* param = handle->decl();
+	ElbParameter* param = handle->parameter();
 	assert_cond( param, __FILE__, __LINE__);
-	assert_cond( param->type() == kVpiParameter, __FILE__, __LINE__);
 
-	ElbExpr* expr = param_con->expr(i);
-	param->set_expr(expr);
+	const PtExpr* expr = param_con->expr(i);
+	ElbValue value = param_con->value(i);
+	param->set_expr(expr, value);
 	ElbParamAssign* pa = factory().new_ParamAssign(module, pt_con,
-						       param, expr,
+						       param, expr, value,
 						       true);
 	reg_paramassign(pa);
       }
@@ -166,14 +166,14 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	  ElbObjHandle* handle = find_obj(module, tmp_name);
 	  assert_cond( handle, __FILE__, __LINE__);
 
-	  ElbDecl* param = handle->decl();
+	  ElbParameter* param = handle->parameter();
 	  assert_cond( param, __FILE__, __LINE__);
-	  assert_cond( param->type() == kVpiParameter, __FILE__, __LINE__);
 
-	  ElbExpr* expr = param_con->expr(i);
-	  param->set_expr(expr);
+	  const PtExpr* expr = param_con->expr(i);
+	  ElbValue value = param_con->value(i);
+	  param->set_expr(expr, value);
 	  ElbParamAssign* pa = factory().new_ParamAssign(module, pt_con,
-							 param, expr,
+							 param, expr, value,
 							 false);
 	  reg_paramassign(pa);
 	}

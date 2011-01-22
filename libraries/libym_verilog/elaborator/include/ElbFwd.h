@@ -37,6 +37,7 @@ class ElbDeclArray;
 
 // in ElbParameter.h
 class ElbParamHead;
+class ElbParameter;
 
 // in ElbParamAssign.h
 class ElbParamAssign;
@@ -98,6 +99,9 @@ class ElbGenvar;
 class ElbAttribute;
 class ElbAttrList;
 class ElbAttrIter;
+
+// in ElbValue.h
+class ElbValue;
 
 END_NAMESPACE_YM_VERILOG
 

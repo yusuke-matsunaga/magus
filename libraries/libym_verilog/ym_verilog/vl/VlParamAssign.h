@@ -41,22 +41,24 @@ public:
   virtual
   const VlModule*
   parent() const = 0;
-  
+
   /// @brief 左辺値を返す．
   virtual
   const VlDecl*
   lhs() const = 0;
-  
+
+#if 0
   /// @brief 右辺値を返す．
   virtual
   const VlExpr*
   rhs() const = 0;
-  
+#endif
+
   /// @brief 名前による接続の場合に true を返す．
   virtual
   bool
   is_conn_by_name() const = 0;
-  
+
 };
 
 
@@ -84,17 +86,19 @@ public:
   virtual
   const VlModule*
   parent() const = 0;
-  
+
   /// @brief 左辺値を返す．
   virtual
   const VlDecl*
   lhs() const = 0;
-  
+
+#if 0
   /// @brief 右辺値を返す．
   virtual
   const VlExpr*
   rhs() const = 0;
-  
+#endif
+
 };
 
 

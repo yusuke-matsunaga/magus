@@ -15,10 +15,10 @@
 #include "ym_utils/FileRegion.h"
 #include "ym_verilog/pt/PtMisc.h"
 
+#include "ElbValue.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class ElbExpr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ElbParamCon ElbParamCon.h "ElbParamCon.h"
@@ -68,16 +68,22 @@ public:
   const char*
   name(ymuint pos) const;
 
+  /// @brief pos 番目の要素の式を返す．
+  /// @param[in] pos 位置
+  const PtExpr*
+  expr(ymuint pos) const;
+
   /// @brief pos 番目の要素の値を返す．
   /// @param[in] pos 位置
-  ElbExpr*
-  expr(ymuint pos) const;
+  ElbValue
+  value(ymuint pos) const;
 
   /// @brief 名前と値を設定する．
   void
   set(ymuint pos,
       const PtConnection* pt_con,
-      ElbExpr* expr);
+      const PtExpr* expr,
+      const ElbValue& value);
 
 
 private:
@@ -90,8 +96,11 @@ private:
     // パース木の要素
     const PtConnection* mPtCon;
 
+    // 式
+    const PtExpr* mExpr;
+
     // 値
-    ElbExpr* mExpr;
+    ElbValue mValue;
 
   };
 
@@ -178,12 +187,20 @@ ElbParamCon::name(ymuint pos) const
   return mList[pos].mPtCon->name();
 }
 
-// @brief 値を返す．
+// @brief 式を返す．
 inline
-ElbExpr*
+const PtExpr*
 ElbParamCon::expr(ymuint pos) const
 {
   return mList[pos].mExpr;
+}
+
+// @brief 値を返す．
+inline
+ElbValue
+ElbParamCon::value(ymuint pos) const
+{
+  return mList[pos].mValue;
 }
 
 // @brief 名前と値を設定する．
@@ -191,11 +208,13 @@ inline
 void
 ElbParamCon::set(ymuint pos,
 		 const PtConnection* pt_con,
-  		 ElbExpr* expr)
+		 const PtExpr* expr,
+		 const ElbValue& value)
 {
   Unit& unit = mList[pos];
   unit.mPtCon = pt_con;
   unit.mExpr = expr;
+  unit.mValue = value;
 }
 
 END_NAMESPACE_YM_VERILOG
