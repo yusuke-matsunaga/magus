@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/vl/VlContAssign.h"
+#include "ElbFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -23,10 +24,10 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbCaHead
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbCaHead();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbCaHead();
@@ -41,22 +42,22 @@ public:
   virtual
   const VlModule*
   module() const = 0;
-  
+
   /// @brief 0の強さを返す．
   virtual
   tVpiStrength
   drive0() const = 0;
-  
+
   /// @brief 1の強さを返す．
   virtual
   tVpiStrength
   drive1() const = 0;
-  
+
   /// @brief 遅延を表す式を返す．
   virtual
   ElbDelay*
   delay() const = 0;
-  
+
 };
 
 
@@ -69,12 +70,12 @@ class ElbContAssign :
   public VlContAssign
 {
   friend class CellContAssign;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbContAssign();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbContAssign();
@@ -89,7 +90,7 @@ public:
   const ElbContAssign*
   next() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -97,38 +98,13 @@ private:
 
   // 次の要素を指すポインタ
   ElbContAssign* mNext;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-ElbCaHead::ElbCaHead()
-{
-}
-
-// @brief デストラクタ
-inline
-ElbCaHead::~ElbCaHead()
-{
-}
-
-// @brief コンストラクタ
-inline
-ElbContAssign::ElbContAssign() :
-  mNext(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-ElbContAssign::~ElbContAssign()
-{
-}
 
 // @brief 次の要素を得る．
 inline

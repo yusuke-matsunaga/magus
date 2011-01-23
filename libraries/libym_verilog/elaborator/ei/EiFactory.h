@@ -872,6 +872,14 @@ public:
   new_Primary(const PtBase* pt_expr,
 	      ElbDecl* obj);
 
+  /// @brief プライマリ式を生成する．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  virtual
+  ElbExpr*
+  new_Primary(const PtBase* pt_expr,
+	      ElbParameter* obj);
+
   /// @brief プライマリ式を生成する(配列要素版)．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト

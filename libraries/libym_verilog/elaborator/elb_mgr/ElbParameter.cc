@@ -10,15 +10,40 @@
 
 
 #include "ElbParameter.h"
-#include "ElbParamAssign.h"
-#include "ElbExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
+// クラス ElbParamHead
+//////////////////////////////////////////////////////////////////////
+
+
+// @brief コンストラクタ
+ElbParamHead::ElbParamHead()
+{
+}
+
+// @brief デストラクタ
+ElbParamHead::~ElbParamHead()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス ElbParameter
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+ElbParameter::ElbParameter() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+ElbParameter::~ElbParameter()
+{
+}
 
 // @brief 定数値を持つ型のときに true を返す．
 bool

@@ -418,10 +418,17 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
   // 答え
   ElbExpr* primary = NULL;
 
+  ElbParameter* param = handle->parameter();
   ElbDecl* decl = handle->decl();
   ElbDeclArray* declarray = handle->declarray();
   tVpiValueType value_type;
-  if ( decl != NULL ) {
+  if ( param != NULL ) {
+    primary = factory().new_Primary(pt_expr, param);
+    decl_type = param->type();
+    is_array = false;
+    value_type = param->value_type();
+  }
+  else if ( decl != NULL ) {
     primary = factory().new_Primary(pt_expr, decl);
     decl_type = decl->type();
     is_array = false;
@@ -455,7 +462,7 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
   }
   if ( primary == NULL ) {
     // 適切な型ではなかった．
-    error_illegal_object_cf(pt_expr);
+    error_illegal_object(pt_expr);
     return NULL;
   }
 

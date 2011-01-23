@@ -114,7 +114,8 @@ ElbDeclHead::set_delay(ElbDelay* delay)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ElbDecl::ElbDecl()
+ElbDecl::ElbDecl() :
+  mNext(NULL)
 {
 }
 
@@ -153,7 +154,8 @@ ElbDecl::set_init(ElbExpr* expr)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ElbDeclArray::ElbDeclArray()
+ElbDeclArray::ElbDeclArray() :
+  mNext(NULL)
 {
 }
 

@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/vl/VlProcess.h"
+#include "ElbFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -27,14 +28,14 @@ class ElbProcess :
   friend class CellProcess;
 
 protected:
-  
+
   /// @brief コンストラクタ
   ElbProcess();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbProcess();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -57,7 +58,7 @@ public:
   const ElbProcess*
   next() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -65,25 +66,12 @@ private:
 
   // 次の要素を指すポインタ
   ElbProcess* mNext;
-  
+
 };
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-ElbProcess::ElbProcess() :
-  mNext(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-ElbProcess::~ElbProcess()
-{
-}
 
 // @brief 次の要素を得る．
 inline

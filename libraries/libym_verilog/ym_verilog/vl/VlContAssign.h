@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/vl/VlObj.h"
+#include "ym_verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

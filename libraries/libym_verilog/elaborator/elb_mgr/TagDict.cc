@@ -575,20 +575,17 @@ TagDict::find_decl_list(const VlNamedObj* parent,
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    if ( cell->decl() ) {
-      for (const ElbDecl* obj = cell->decl();
-	   obj; obj = obj->next()) {
-	obj_list.push_back(obj);
-      }
-    }
-    else if ( cell->parameter() ) {
+    if ( tag == kVpiParameter || tag == kVpiSpecParam ) {
       for (const ElbParameter* obj = cell->parameter();
 	   obj; obj = obj->next()) {
 	obj_list.push_back(obj);
       }
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      for (const ElbDecl* obj = cell->decl();
+	   obj; obj = obj->next()) {
+	obj_list.push_back(obj);
+      }
     }
     return true;
   }
@@ -813,6 +810,7 @@ TagDict::add_parameter(int tag,
     put_cell(parent, tag, cell);
   }
 }
+
 
 //////////////////////////////////////////////////////////////////////
 // defparam 用のセル

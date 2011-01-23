@@ -265,30 +265,6 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-inline
-ElbParamHead::ElbParamHead()
-{
-}
-
-// @brief デストラクタ
-inline
-ElbParamHead::~ElbParamHead()
-{
-}
-
-// @brief コンストラクタ
-inline
-ElbParameter::ElbParameter()
-{
-}
-
-// @brief デストラクタ
-inline
-ElbParameter::~ElbParameter()
-{
-}
-
 // @brief 次の要素を返す．
 inline
 const ElbParameter*

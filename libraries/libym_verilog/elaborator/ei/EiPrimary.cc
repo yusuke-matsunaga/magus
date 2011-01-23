@@ -12,6 +12,7 @@
 #include "EiFactory.h"
 #include "EiPrimary.h"
 #include "ElbDecl.h"
+#include "ElbParameter.h"
 #include "ElbPrimitive.h"
 
 #include "ym_verilog/BitVector.h"
@@ -32,6 +33,19 @@ EiFactory::new_Primary(const PtBase* pt_expr,
 {
   void* p = mAlloc.get_memory(sizeof(EiPrimary));
   EiPrimary* expr = new (p) EiPrimary(pt_expr, obj);
+
+  return expr;
+}
+
+// @brief プライマリ式を生成する．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+ElbExpr*
+EiFactory::new_Primary(const PtBase* pt_expr,
+		       ElbParameter* obj)
+{
+  void* p = mAlloc.get_memory(sizeof(EiParamPrimary));
+  EiParamPrimary* expr = new (p) EiParamPrimary(pt_expr, obj);
 
   return expr;
 }
@@ -212,6 +226,140 @@ EiPrimary::set_real(double v)
 // @note 左辺式の時のみ意味を持つ．
 void
 EiPrimary::set_bitvector(const BitVector& v)
+{
+  mObj->set_bitvector(v);
+}
+#endif
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiParamPrimary
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+EiParamPrimary::EiParamPrimary(const PtBase* pt_obj,
+			       ElbParameter* obj) :
+  EiExprBase1(pt_obj),
+  mObj(obj)
+{
+}
+
+// @brief デストラクタ
+EiParamPrimary::~EiParamPrimary()
+{
+}
+
+// @brief 型の取得
+tVpiObjType
+EiParamPrimary::type() const
+{
+  return mObj->type();
+}
+
+// @brief 式のタイプを返す．
+tVpiValueType
+EiParamPrimary::value_type() const
+{
+  return mObj->value_type();
+}
+
+// @brief 定数の時 true を返す．
+// @note 参照している要素の型によって決まる．
+bool
+EiParamPrimary::is_const() const
+{
+  return mObj->is_consttype();
+}
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiParamPrimary::is_primary() const
+{
+  return true;
+}
+
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDecl*
+EiParamPrimary::decl_obj() const
+{
+  return mObj;
+}
+
+#if 0
+// @brief スカラー値を返す．
+tVpiScalarVal
+EiParamPrimary::eval_scalar() const
+{
+  return mObj->get_scalar();
+}
+
+// @brief 論理値を返す．
+tVpiScalarVal
+EiParamPrimary::eval_logic() const
+{
+  return mObj->get_scalar();
+}
+
+// @brief real 型の値を返す．
+double
+EiParamPrimary::eval_real() const
+{
+  return mObj->get_real();
+}
+
+// @brief bitvector 型の値を返す．
+void
+EiParamPrimary::eval_bitvector(BitVector& bitvector,
+			       tVpiValueType req_type) const
+{
+  mObj->get_bitvector(bitvector, req_type);
+}
+#endif
+
+// @brief decompile() の実装関数
+// @param[in] pprim 親の演算子の優先順位
+string
+EiParamPrimary::decompile_impl(int ppri) const
+{
+  return mObj->name();
+}
+
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiParamPrimary::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+#if 0
+// @brief スカラー値を書き込む．
+// @param[in] v 書き込む値
+// @note 左辺式の時のみ意味を持つ．
+void
+EiParamPrimary::set_scalar(tVpiScalarVal v)
+{
+  mObj->set_scalar(v);
+}
+
+// @brief 実数値を書き込む．
+// @param[in] v 書き込む値
+// @note 左辺式の時のみ意味を持つ．
+void
+EiParamPrimary::set_real(double v)
+{
+  mObj->set_real(v);
+}
+
+// @brief ビットベクタを書き込む．
+// @param[in] v 書き込む値
+// @note 左辺式の時のみ意味を持つ．
+void
+EiParamPrimary::set_bitvector(const BitVector& v)
 {
   mObj->set_bitvector(v);
 }
