@@ -27,6 +27,7 @@ noinst_HEADERS = \
 	ElbGenvar.h \
 	ElbGfRoot.h \
 	ElbIODecl.h \
+	ElbLhs.h \
 	ElbModule.h \
 	ElbParamAssign.h \
 	ElbParameter.h \
