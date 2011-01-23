@@ -76,28 +76,6 @@ public:
   const VlDecl*
   decl_obj() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -117,28 +95,6 @@ public:
   string
   decompile_impl(int ppri) const;
 
-#if 0
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_scalar(tVpiScalarVal v);
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -210,28 +166,6 @@ public:
   const VlDecl*
   decl_obj() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -251,28 +185,6 @@ public:
   string
   decompile_impl(int ppri) const;
 
-#if 0
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_scalar(tVpiScalarVal v);
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -362,28 +274,6 @@ public:
   const VlExpr*
   declarray_index(ymuint pos) const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -403,39 +293,6 @@ public:
   string
   decompile_impl(int ppri) const;
 
-#if 0
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_scalar(tVpiScalarVal v);
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
-
-#if 0
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief オフセットを計算する．
-  ymuint
-  calc_offset() const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -503,28 +360,6 @@ public:
   bool
   is_const() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -549,28 +384,6 @@ public:
   const VlNamedObj*
   scope_obj() const;
 
-#if 0
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_scalar(tVpiScalarVal v);
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -637,28 +450,6 @@ public:
   const VlPrimitive*
   primitive_obj() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -678,28 +469,6 @@ public:
   string
   decompile_impl(int ppri) const;
 
-#if 0
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_scalar(tVpiScalarVal v);
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////

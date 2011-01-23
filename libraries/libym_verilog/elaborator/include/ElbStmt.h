@@ -288,13 +288,6 @@ public:
 	       ElbExpr** expr_array,
 	       ElbStmt* stmt);
 
-#if 0
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const = 0;
-#endif
-
   /// @brief 子供ののステートメントの取得
   /// @note このクラスでは NULL を返す．
   virtual

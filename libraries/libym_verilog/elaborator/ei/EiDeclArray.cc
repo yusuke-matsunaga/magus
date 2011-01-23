@@ -360,29 +360,6 @@ EiDeclArray::array_offset(const vector<int>& index_list) const
   return mRangeList.offset(index_list);
 }
 
-#if 0
-// @brief インデックスからオフセットを計算する．
-// @param[in] index_array インデックス式の配列
-ymuint
-EiDeclArray::calc_offset(const vector<ElbExpr*>& index_array) const
-{
-  ymuint n = mRangeList.size();
-  assert_cond( index_array.size() == n, __FILE__, __LINE__);
-  ymuint offset = 0;
-  for (ymuint i = 0; i < n; ++ i) {
-    const EiRange* r = mRangeList.range(i);
-    int k = r->size();
-    offset *= k;
-    int index;
-    bool stat = index_array[i]->eval_int(index);
-    assert_cond( stat, __FILE__, __LINE__);
-    int offset1 = r->roffset(index);
-    offset += offset1;
-  }
-  return offset;
-}
-#endif
-
 
 //////////////////////////////////////////////////////////////////////
 /// クラス EiDeclArrayN

@@ -39,8 +39,6 @@ libym_vl_elab_ei_la_SOURCES = \
 	EiDeclHead.cc \
 	EiDeclArray.h \
 	EiDeclArray.cc \
-	EiDeclElem.h \
-	EiDeclElem.cc \
 	EiParameter.h \
 	EiParameter.cc \
 	EiImpNet.h \

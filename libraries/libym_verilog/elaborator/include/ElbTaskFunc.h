@@ -90,38 +90,6 @@ public:
   bool
   is_constant_function() const = 0;
 
-#if 0
-  /// @brief スカラー値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_scalar(const vector<ElbExpr*>& arg_list) const = 0;
-
-  /// @brief 論理値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_logic(const vector<ElbExpr*>& arg_list) const = 0;
-
-  /// @brief real 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  double
-  eval_real(const vector<ElbExpr*>& arg_list) const = 0;
-
-  /// @brief bitvector 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  void
-  eval_bitvector(const vector<ElbExpr*>& arg_list,
-		 BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const = 0;
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////

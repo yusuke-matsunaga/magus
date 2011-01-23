@@ -66,29 +66,6 @@ public:
   ymuint
   operand_num() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -114,14 +91,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-#if 0
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -210,14 +179,6 @@ public:
   ymuint
   operand_num() const;
 
-#if 0
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -229,15 +190,6 @@ public:
   virtual
   string
   decompile_impl(int ppri) const;
-
-#if 0
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
 
 
 public:

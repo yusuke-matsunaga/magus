@@ -312,49 +312,6 @@ EiTask::is_constant_function() const
   return false;
 }
 
-#if 0
-// @brief スカラー値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-tVpiScalarVal
-EiTask::eval_scalar(const vector<ElbExpr*>& arg_list) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalar0;
-}
-
-// @brief 論理値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-tVpiScalarVal
-EiTask::eval_logic(const vector<ElbExpr*>& arg_list) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalar0;
-}
-
-// @brief real 型の値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-double
-EiTask::eval_real(const vector<ElbExpr*>& arg_list) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return 0.0;
-}
-
-// @brief bitvector 型の値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-void
-EiTask::eval_bitvector(const vector<ElbExpr*>& arg_list,
-		       BitVector& bitvector,
-		       tVpiValueType req_type) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-#endif
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiFunction
@@ -498,79 +455,6 @@ EiFunction::is_constant_function() const
 {
   return false;
 }
-
-#if 0
-// @brief スカラー値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-tVpiScalarVal
-EiFunction::eval_scalar(const vector<ElbExpr*>& arg_list) const
-{
-  evaluate(arg_list);
-  return mOvar->get_scalar();
-}
-
-// @brief 論理値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-tVpiScalarVal
-EiFunction::eval_logic(const vector<ElbExpr*>& arg_list) const
-{
-  evaluate(arg_list);
-  return mOvar->get_logic();
-}
-
-// @brief real 型の値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-double
-EiFunction::eval_real(const vector<ElbExpr*>& arg_list) const
-{
-  evaluate(arg_list);
-  return mOvar->get_real();
-}
-
-// @brief bitvector 型の値を返す．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-void
-EiFunction::eval_bitvector(const vector<ElbExpr*>& arg_list,
-			   BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  evaluate(arg_list);
-  mOvar->get_bitvector(bitvector, req_type);
-}
-
-// @brief 関数の値の評価を行う．
-// @param[in] arg_list 引数のリスト
-// @note constant function の場合のみ意味を持つ．
-void
-EiFunction::evaluate(const vector<ElbExpr*>& arg_list) const
-{
-#if 0
-  assert_cond(arg_list.size() == io_num(), __FILE__, __LINE__);
-  ymuint n = arg_list.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    ElbExpr* expr = arg_list[i];
-    ElbIODecl* io_decl = _io(i);
-    ElbDecl* decl = io_decl->_decl();
-    if ( decl->bit_size() == 1 ) {
-      decl->set_scalar(expr->eval_scalar());
-    }
-    else if ( decl->value_type() == kVpiValueReal ) {
-      decl->set_real(expr->eval_real());
-    }
-    else {
-      BitVector tmp;
-      expr->eval_bitvector(tmp, decl->value_type());
-      decl->set_bitvector(tmp);
-    }
-  }
-  _stmt()->func_exec(true);
-#endif
-}
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

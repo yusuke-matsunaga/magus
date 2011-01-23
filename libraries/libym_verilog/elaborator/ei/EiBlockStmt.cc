@@ -173,21 +173,6 @@ EiBegin::type() const
   return kVpiBegin;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiBegin::func_exec(bool constant_function) const
-{
-  for (ymuint i = 0; i < child_stmt_num(); ++ i) {
-    ElbStmt* stmt1 = _child_stmt(i);
-    const VlNamedObj* scope = stmt1->func_exec(constant_function);
-    if ( scope ) {
-      return scope;
-    }
-  }
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiFork
@@ -220,16 +205,6 @@ EiFork::type() const
   return kVpiFork;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えないのでエラーとなる．
-const VlNamedObj*
-EiFork::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiNamedBlockStmt
@@ -322,26 +297,6 @@ EiNamedBegin::type() const
   return kVpiNamedBegin;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiNamedBegin::func_exec(bool constant_function) const
-{
-  for (ymuint i = 0; i < child_stmt_num(); ++ i) {
-    ElbStmt* stmt1 = _child_stmt(i);
-    const VlNamedObj* scope1 = stmt1->func_exec(constant_function);
-    if ( scope1 ) {
-      if ( scope1 == scope() ) {
-	return NULL;
-      }
-      else {
-	return scope1;
-      }
-    }
-  }
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiNamedFork
@@ -371,16 +326,5 @@ EiNamedFork::type() const
 {
   return kVpiNamedFork;
 }
-
-#if 0
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiNamedFork::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-#endif
 
 END_NAMESPACE_YM_VERILOG

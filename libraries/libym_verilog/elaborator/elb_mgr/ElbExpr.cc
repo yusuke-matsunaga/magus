@@ -28,41 +28,6 @@ ElbExpr::decompile() const
   return decompile_impl(0);
 }
 
-#if 0
-// @brief int 型の値を返す．
-bool
-ElbExpr::eval_int(int& val) const
-{
-  BitVector bv;
-  eval_bitvector(bv);
-  if ( bv.is_int() ) {
-    val = bv.to_int();
-    return true;
-  }
-  return false;
-}
-
-// @brief 論理値を返す．
-bool
-ElbExpr::eval_bool() const
-{
-  return ( eval_logic() == kVpiScalar1 );
-}
-
-// @brief VlTime 型の値を返す．
-bool
-ElbExpr::eval_time(VlTime& val) const
-{
-  BitVector bv;
-  eval_bitvector(bv);
-  if ( bv.is_time() ) {
-    val = bv.to_time();
-    return true;
-  }
-  return false;
-}
-#endif
-
 // @brief オペランドを返す．
 // @param[in] pos 位置番号
 // @note 演算子の時，意味を持つ．

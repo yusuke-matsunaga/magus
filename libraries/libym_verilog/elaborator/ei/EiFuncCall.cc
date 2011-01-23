@@ -183,57 +183,6 @@ EiFuncCall::function() const
   return mFunc;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiFuncCall::eval_scalar() const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  return mFunc->eval_scalar(arg_list);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiFuncCall::eval_logic() const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  return mFunc->eval_logic(arg_list);
-}
-
-// @brief real 型の値を返す．
-double
-EiFuncCall::eval_real() const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  return mFunc->eval_real(arg_list);
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiFuncCall::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  mFunc->eval_bitvector(arg_list, bitvector, req_type);
-}
-#endif
-
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -346,40 +295,6 @@ EiSysFuncCall::user_systf() const
 {
   return mUserSystf;
 }
-
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiSysFuncCall::eval_scalar() const
-{
-# warning "TODO: 未完"
-  return kVpiScalarX;
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiSysFuncCall::eval_logic() const
-{
-# warning "TODO: 未完"
-  return kVpiScalarX;
-}
-
-// @brief real 型の値を返す．
-double
-EiSysFuncCall::eval_real() const
-{
-# warning "TODO: 未完"
-  return 0.0;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiSysFuncCall::eval_bitvector(BitVector& bitvector,
-			      tVpiValueType req_type) const
-{
-# warning "TODO: 未完"
-}
-#endif
 
 // @brief decompile した文字列を返す．
 string

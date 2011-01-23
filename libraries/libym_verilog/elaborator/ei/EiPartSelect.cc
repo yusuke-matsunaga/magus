@@ -241,35 +241,6 @@ EiConstPartSelect::right_range_val() const
   return mRightVal;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiConstPartSelect::eval_scalar() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.bit_select(0);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiConstPartSelect::eval_logic() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiConstPartSelect::eval_real() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.to_real();
-}
-#endif
-
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -365,34 +336,6 @@ EiVarPartSelect::range_width() const
   return mRangeVal;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiVarPartSelect::eval_scalar() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.bit_select(0);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiVarPartSelect::eval_logic() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiVarPartSelect::eval_real() const
-{
-  BitVector tmp;
-  eval_bitvector(tmp);
-  return tmp.to_real();
-}
-#endif
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型

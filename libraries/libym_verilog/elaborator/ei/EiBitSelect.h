@@ -93,23 +93,6 @@ public:
   const VlExpr*
   parent_expr() const;
 
-#if 0
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -223,23 +206,6 @@ public:
   const VlExpr*
   parent_expr() const;
 
-#if 0
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////

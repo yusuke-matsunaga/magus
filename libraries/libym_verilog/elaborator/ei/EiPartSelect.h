@@ -153,22 +153,6 @@ public:
   int
   right_range_val() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -265,22 +249,6 @@ public:
   int
   range_width() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////

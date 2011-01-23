@@ -71,28 +71,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-#if 0
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_scalar(tVpiScalarVal v);
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
-#endif
 };
 
 
@@ -134,33 +112,6 @@ public:
   tVpiConstType
   constant_type() const;
 
-#if 0
-  /// @brief int 型の値を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -224,29 +175,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 
 public:
@@ -313,29 +241,6 @@ public:
   tVpiConstType
   constant_type() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -397,29 +302,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 
 public:

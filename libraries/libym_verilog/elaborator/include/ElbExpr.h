@@ -44,30 +44,6 @@ public:
   string
   decompile() const;
 
-#if 0
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  /// @note eval_bitvector() の結果から変換する．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief 論理値を返す．
-  /// @note eval_scalar() の結果から変換する．
-  virtual
-  bool
-  eval_bool() const;
-
-  /// @brief VlTime 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return VlTime 値に変換できたら true を返す．
-  /// @note eval_bitvector() の結果から変換する．
-  virtual
-  bool
-  eval_time(VlTime& val) const;
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -99,29 +75,6 @@ public:
   virtual
   ElbExpr*
   _operand(ymuint pos) const;
-
-#if 0
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_scalar(tVpiScalarVal v) = 0;
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v) = 0;
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v) = 0;
-#endif
 
 
 public:

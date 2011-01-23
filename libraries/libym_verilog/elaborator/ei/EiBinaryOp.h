@@ -158,23 +158,6 @@ public:
   tVpiValueType
   value_type() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -234,19 +217,6 @@ private:
   ~EiEqOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -282,19 +252,6 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiNeqOp();
-
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
 
 
 public:
@@ -334,19 +291,6 @@ private:
   ~EiCaseEqOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -382,19 +326,6 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiCaseNeqOp();
-
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
 
 
 public:
@@ -434,19 +365,6 @@ private:
   ~EiGtOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -482,19 +400,6 @@ private:
   /// @brief デストラクタ
   virtual
   ~EiGeOp();
-
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
 
 
 public:
@@ -534,19 +439,6 @@ private:
   ~EiLtOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -583,18 +475,6 @@ private:
   virtual
   ~EiLeOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -643,24 +523,6 @@ public:
   tVpiValueType
   value_type() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -701,18 +563,6 @@ private:
   ~EiLogAndOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -749,18 +599,6 @@ private:
   virtual
   ~EiLogOrOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -809,22 +647,6 @@ public:
   tVpiValueType
   value_type() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -874,19 +696,6 @@ private:
   ~EiBitAndOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -923,19 +732,6 @@ private:
   virtual
   ~EiBitOrOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -974,19 +770,6 @@ private:
   ~EiBitXorOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -1023,19 +806,6 @@ private:
   virtual
   ~EiBitXnorOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1084,17 +854,6 @@ public:
   tVpiValueType
   value_type() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1144,31 +903,6 @@ private:
   ~EiAddOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -1205,31 +939,6 @@ private:
   virtual
   ~EiSubOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1268,31 +977,6 @@ private:
   ~EiMultOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -1330,31 +1014,6 @@ private:
   ~EiDivOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -1391,31 +1050,6 @@ private:
   virtual
   ~EiModOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1464,28 +1098,6 @@ public:
   tVpiValueType
   value_type() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1556,22 +1168,6 @@ public:
   tVpiValueType
   value_type() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1621,19 +1217,6 @@ private:
   ~EiLShiftOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -1670,19 +1253,6 @@ private:
   virtual
   ~EiRShiftOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -1721,19 +1291,6 @@ private:
   ~EiArithLShiftOp();
 
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 public:
   //////////////////////////////////////////////////////////////////////
   // EiOperation の仮想関数
@@ -1770,19 +1327,6 @@ private:
   virtual
   ~EiArithRShiftOp();
 
-
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 public:
   //////////////////////////////////////////////////////////////////////

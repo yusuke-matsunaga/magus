@@ -135,35 +135,6 @@ EiConstant::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
-#if 0
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConstant::set_scalar(tVpiScalarVal v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 実数値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConstant::set_real(double v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConstant::set_bitvector(const BitVector& v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-#endif
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiIntConst
@@ -198,47 +169,6 @@ EiIntConst::constant_type() const
 {
   return kVpiIntConst;
 }
-
-#if 0
-// @brief int 型の値を返す．
-bool
-EiIntConst::eval_int(int& val) const
-{
-  val = mValue;
-  return true;
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiIntConst::eval_scalar() const
-{
-  return conv_to_scalar(mValue);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiIntConst::eval_logic() const
-{
-  return conv_to_scalar(mValue);
-}
-
-// @brief real 型の値を返す．
-double
-EiIntConst::eval_real() const
-{
-  return static_cast<double>(mValue);
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiIntConst::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  BitVector tmp(mValue);
-  bitvector = mValue;
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -293,38 +223,6 @@ EiBitVectorConst::constant_type() const
 {
   return mConstType;
 }
-
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiBitVectorConst::eval_scalar() const
-{
-  return mValue.to_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiBitVectorConst::eval_logic() const
-{
-  return mValue.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiBitVectorConst::eval_real() const
-{
-  return mValue.to_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiBitVectorConst::eval_bitvector(BitVector& bitvector,
-				 tVpiValueType req_type) const
-{
-  bitvector = mValue;
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
@@ -389,39 +287,6 @@ EiRealConst::constant_type() const
   return kVpiRealConst;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiRealConst::eval_scalar() const
-{
-#warning "TODO: 仕様を確認"
-  return kVpiScalarX;
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiRealConst::eval_logic() const
-{
-  return conv_to_scalar(eval_real());
-}
-
-// @brief real 型の値を返す．
-double
-EiRealConst::eval_real() const
-{
-  return mValue;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiRealConst::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
-{
-  bitvector = eval_real();
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -467,38 +332,6 @@ EiStringConst::constant_type() const
 {
   return kVpiStringConst;
 }
-
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiStringConst::eval_scalar() const
-{
-  return mValue.to_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiStringConst::eval_logic() const
-{
-  return mValue.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiStringConst::eval_real() const
-{
-  return mValue.to_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiStringConst::eval_bitvector(BitVector& bitvector,
-			      tVpiValueType req_type) const
-{
-  bitvector = mValue;
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位

@@ -159,32 +159,6 @@ EiBitSelect::parent_expr() const
   return mBaseExpr;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiDeclBitSelect::eval_scalar() const
-{
-  int bpos = index_val();
-  if ( index()->eval_int(bpos) ) {
-    return mObj->get_bitselect(bpos);
-  }
-  // ビット指定が X/Z の時は X を返す．
-  return kVpiScalarX;
-}
-
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiDeclBitSelect::set_scalar(tVpiScalarVal v)
-{
-  int bpos;
-  if ( index()->eval_int(bpos) ) {
-    mObj->set_bitselect(bpos, v);
-  }
-}
-#endif
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -293,31 +267,6 @@ EiConstBitSelect::parent_expr() const
 {
   return mBaseExpr;
 }
-
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiConstBitSelect::eval_logic() const
-{
-  return eval_scalar();
-}
-
-// @brief real 型の値を返す．
-double
-EiConstBitSelect::eval_real() const
-{
-  return conv_to_real(eval_scalar());
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiConstBitSelect::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
-{
-  bitvector = eval_scalar();
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位

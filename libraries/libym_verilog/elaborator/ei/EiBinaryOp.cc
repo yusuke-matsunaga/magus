@@ -245,31 +245,6 @@ EiCompareOp::value_type() const
   return pack(kVpiValueUS, 1);
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiCompareOp::eval_scalar() const
-{
-  return eval_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiCompareOp::eval_real() const
-{
-  return conv_to_real(eval_logic());
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiCompareOp::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
-{
-  bitvector = eval_logic();
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -300,29 +275,6 @@ EiEqOp::~EiEqOp()
 {
 }
 
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiEqOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() == operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    return eq(bv0, bv1);
-  }
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiEqOp::op_type() const
@@ -350,29 +302,6 @@ EiNeqOp::EiNeqOp(const PtBase* pt_obj,
 EiNeqOp::~EiNeqOp()
 {
 }
-
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiNeqOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() != operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    return ne(bv0, bv1);
-  }
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -402,34 +331,6 @@ EiCaseEqOp::~EiCaseEqOp()
 {
 }
 
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiCaseEqOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() == operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    if ( eq_with_xz(bv0, bv1) ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiCaseEqOp::op_type() const
@@ -457,34 +358,6 @@ EiCaseNeqOp::EiCaseNeqOp(const PtBase* pt_obj,
 EiCaseNeqOp::~EiCaseNeqOp()
 {
 }
-
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiCaseNeqOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() != operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    if ( eq_with_xz(bv0, bv1) ) {
-      return kVpiScalar0;
-    }
-    else {
-      return kVpiScalar1;
-    }
-  }
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -514,29 +387,6 @@ EiGtOp::~EiGtOp()
 {
 }
 
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiGtOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() > operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    return gt(bv0, bv1);
-  }
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiGtOp::op_type() const
@@ -564,29 +414,6 @@ EiGeOp::EiGeOp(const PtBase* pt_obj,
 EiGeOp::~EiGeOp()
 {
 }
-
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiGeOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() >= operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    return ge(bv0, bv1);
-  }
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -616,29 +443,6 @@ EiLtOp::~EiLtOp()
 {
 }
 
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiLtOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() < operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    return lt(bv0, bv1);
-  }
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiLtOp::op_type() const
@@ -666,29 +470,6 @@ EiLeOp::EiLeOp(const PtBase* pt_obj,
 EiLeOp::~EiLeOp()
 {
 }
-
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiLeOp::eval_logic() const
-{
-  if ( opr_type() == kVpiValueReal ) {
-    if ( operand1()->eval_real() <= operand2()->eval_real() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    BitVector bv0;
-    BitVector bv1;
-    operand1()->eval_bitvector(bv0, opr_type());
-    operand2()->eval_bitvector(bv1, opr_type());
-    return le(bv0, bv1);
-  }
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -733,31 +514,6 @@ EiBinaryLogOp::value_type() const
   return pack(kVpiValueUS, 1);
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiBinaryLogOp::eval_scalar() const
-{
-  return eval_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiBinaryLogOp::eval_real() const
-{
-  return conv_to_real(eval_logic());
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiBinaryLogOp::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
-{
-  bitvector = eval_logic();
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -788,17 +544,6 @@ EiLogAndOp::~EiLogAndOp()
 {
 }
 
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiLogAndOp::eval_logic() const
-{
-  tVpiScalarVal v1 = operand1()->eval_logic();
-  tVpiScalarVal v2 = operand2()->eval_logic();
-  return v1 && v2;
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiLogAndOp::op_type() const
@@ -826,17 +571,6 @@ EiLogOrOp::EiLogOrOp(const PtBase* pt_obj,
 EiLogOrOp::~EiLogOrOp()
 {
 }
-
-#if 0
-// @brief 論理値を返す．
-tVpiScalarVal
-EiLogOrOp::eval_logic() const
-{
-  tVpiScalarVal v1 = operand1()->eval_logic();
-  tVpiScalarVal v2 = operand2()->eval_logic();
-  return v1 || v2;
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -880,35 +614,6 @@ EiBinaryBitOp::value_type() const
   return mType;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiBinaryBitOp::eval_scalar() const
-{
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiBinaryBitOp::eval_logic() const
-{
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiBinaryBitOp::eval_real() const
-{
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_real();
-}
-#endif
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -941,20 +646,6 @@ EiBitAndOp::~EiBitAndOp()
 {
 }
 
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiBitAndOp::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector &= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiBitAndOp::op_type() const
@@ -982,20 +673,6 @@ EiBitOrOp::EiBitOrOp(const PtBase* pt_obj,
 EiBitOrOp::~EiBitOrOp()
 {
 }
-
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiBitOrOp::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector |= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -1025,20 +702,6 @@ EiBitXorOp::~EiBitXorOp()
 {
 }
 
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiBitXorOp::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector ^= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiBitXorOp::op_type() const
@@ -1066,21 +729,6 @@ EiBitXnorOp::EiBitXnorOp(const PtBase* pt_obj,
 EiBitXnorOp::~EiBitXnorOp()
 {
 }
-
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiBitXnorOp::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector ^= bv1;
-  bitvector.negate();
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -1122,36 +770,6 @@ EiBinaryArithOp::value_type() const
   return mType;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiBinaryArithOp::eval_scalar() const
-{
-  if ( value_type() == kVpiValueReal ) {
-    return conv_to_scalar(eval_real());
-  }
-  else {
-    BitVector bv;
-    eval_bitvector(bv, value_type());
-    return bv.to_scalar();
-  }
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiBinaryArithOp::eval_logic() const
-{
-  if ( value_type() == kVpiValueReal ) {
-    return conv_to_scalar(eval_real());
-  }
-  else {
-    BitVector bv;
-    eval_bitvector(bv, value_type());
-    return bv.to_logic();
-  }
-}
-#endif
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -1184,46 +802,6 @@ EiAddOp::~EiAddOp()
 {
 }
 
-#if 0
-// @brief int 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return 整数値に変換できたら true を返す．
-bool
-EiAddOp::eval_int(int& val) const
-{
-  int v0;
-  bool stat1 = operand1()->eval_int(v0);
-  int v1;
-  bool stat2 = operand2()->eval_int(v1);
-  if ( stat1 && stat2 ) {
-    val = v0 + v1;
-    return true;
-  }
-  return false;
-}
-
-// @brief real 型の値を返す．
-double
-EiAddOp::eval_real() const
-{
-  double v0 = operand1()->eval_real();
-  double v1 = operand2()->eval_real();
-  return v0 + v1;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiAddOp::eval_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector += bv1;
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiAddOp::op_type() const
@@ -1251,46 +829,6 @@ EiSubOp::EiSubOp(const PtBase* pt_obj,
 EiSubOp::~EiSubOp()
 {
 }
-
-#if 0
-// @brief int 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return 整数値に変換できたら true を返す．
-bool
-EiSubOp::eval_int(int& val) const
-{
-  int v0;
-  bool stat1 = operand1()->eval_int(v0);
-  int v1;
-  bool stat2 = operand2()->eval_int(v1);
-  if ( stat1 && stat2 ) {
-    val = v0 - v1;
-    return true;
-  }
-  return false;
-}
-
-// @brief real 型の値を返す．
-double
-EiSubOp::eval_real() const
-{
-  double v0 = operand1()->eval_real();
-  double v1 = operand2()->eval_real();
-  return v0 - v1;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiSubOp::eval_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector -= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -1320,46 +858,6 @@ EiMultOp::~EiMultOp()
 {
 }
 
-#if 0
-// @brief int 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return 整数値に変換できたら true を返す．
-bool
-EiMultOp::eval_int(int& val) const
-{
-  int v0;
-  bool stat1 = operand1()->eval_int(v0);
-  int v1;
-  bool stat2 = operand2()->eval_int(v1);
-  if ( stat1 && stat2 ) {
-    val = v0 * v1;
-    return true;
-  }
-  return false;
-}
-
-// @brief real 型の値を返す．
-double
-EiMultOp::eval_real() const
-{
-  double v0 = operand1()->eval_real();
-  double v1 = operand2()->eval_real();
-  return v0 * v1;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiMultOp::eval_bitvector(BitVector& bitvector,
-			 tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector *= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiMultOp::op_type() const
@@ -1388,46 +886,6 @@ EiDivOp::~EiDivOp()
 {
 }
 
-#if 0
-// @brief int 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return 整数値に変換できたら true を返す．
-bool
-EiDivOp::eval_int(int& val) const
-{
-  int v0;
-  bool stat1 = operand1()->eval_int(v0);
-  int v1;
-  bool stat2 = operand2()->eval_int(v1);
-  if ( stat1 && stat2 ) {
-    val = v0 / v1;
-    return true;
-  }
-  return false;
-}
-
-// @brief real 型の値を返す．
-double
-EiDivOp::eval_real() const
-{
-  double v0 = operand1()->eval_real();
-  double v1 = operand2()->eval_real();
-  return v0 / v1;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiDivOp::eval_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector /= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiDivOp::op_type() const
@@ -1455,47 +913,6 @@ EiModOp::EiModOp(const PtBase* pt_obj,
 EiModOp::~EiModOp()
 {
 }
-
-#if 0
-// @brief int 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return 整数値に変換できたら true を返す．
-bool
-EiModOp::eval_int(int& val) const
-{
-  int v0;
-  bool stat1 = operand1()->eval_int(v0);
-  int v1;
-  bool stat2 = operand2()->eval_int(v1);
-  if ( stat1 && stat2 ) {
-    val = v0 % v1;
-    return true;
-  }
-  return false;
-}
-
-// @brief real 型の値を返す．
-double
-EiModOp::eval_real() const
-{
-  // ビットベクタで計算してからあとで double に直すだけ
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiModOp::eval_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector %= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -1539,52 +956,6 @@ EiPowerOp::value_type() const
 {
   return mType;
 }
-
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiPowerOp::eval_scalar() const
-{
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiPowerOp::eval_logic() const
-{
-  if ( value_type() == kVpiValueReal ) {
-    return conv_to_scalar(eval_real());
-  }
-  else {
-    BitVector bv;
-    eval_bitvector(bv, value_type());
-    return bv.to_logic();
-  }
-}
-
-// @brief real 型の値を返す．
-double
-EiPowerOp::eval_real() const
-{
-  double v0 = operand1()->eval_real();
-  double v1 = operand2()->eval_real();
-  return pow(v0, v1);
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiPowerOp::eval_bitvector(BitVector& bitvector,
-			  tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector.power(bv1);
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
@@ -1644,35 +1015,6 @@ EiShiftOp::value_type() const
   return mType;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiShiftOp::eval_scalar() const
-{
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiShiftOp::eval_logic() const
-{
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiShiftOp::eval_real() const
-{
-  BitVector bv;
-  eval_bitvector(bv, value_type());
-  return bv.to_real();
-}
-#endif
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -1708,20 +1050,6 @@ EiLShiftOp::~EiLShiftOp()
 {
 }
 
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiLShiftOp::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector <<= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiLShiftOp::op_type() const
@@ -1749,20 +1077,6 @@ EiRShiftOp::EiRShiftOp(const PtBase* pt_obj,
 EiRShiftOp::~EiRShiftOp()
 {
 }
-
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiRShiftOp::eval_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector >>= bv1;
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -1792,20 +1106,6 @@ EiArithLShiftOp::~EiArithLShiftOp()
 {
 }
 
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiArithLShiftOp::eval_bitvector(BitVector& bitvector,
-				tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector.alshift(bv1);
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief 演算子のタイプを返す．
 tVpiOpType
 EiArithLShiftOp::op_type() const
@@ -1833,20 +1133,6 @@ EiArithRShiftOp::EiArithRShiftOp(const PtBase* pt_obj,
 EiArithRShiftOp::~EiArithRShiftOp()
 {
 }
-
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiArithRShiftOp::eval_bitvector(BitVector& bitvector,
-				tVpiValueType req_type) const
-{
-  BitVector bv1;
-  operand1()->eval_bitvector(bitvector, value_type());
-  operand2()->eval_bitvector(bv1, value_type());
-  bitvector.arshift(bv1);
-  bitvector.coerce(req_type);
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType

@@ -303,7 +303,7 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
     arg_list[i] = val1;
   }
 
-#if 0
+#if 0 // evaluate_funccall 未完
   // function call の生成
   ElbExpr* expr = factory().new_FuncCall(pt_expr, child_func, n, arg_list);
 #else

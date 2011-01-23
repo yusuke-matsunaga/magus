@@ -134,29 +134,6 @@ public:
   const VlTaskFunc*
   function() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -176,17 +153,6 @@ public:
   string
   decompile_impl(int ppri) const;
 
-
-#if 0
-private:
-  //////////////////////////////////////////////////////////////////////
-  // eval_XXXX の下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 関数の値を評価する．
-  ElbExpr*
-  evaluate() const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -262,29 +228,6 @@ public:
   virtual
   const VlUserSystf*
   user_systf() const;
-
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
 
 
 public:

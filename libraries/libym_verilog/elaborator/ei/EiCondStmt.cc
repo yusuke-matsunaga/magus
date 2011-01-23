@@ -259,20 +259,6 @@ EiWhileStmt::type() const
   return kVpiWhile;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiWhileStmt::func_exec(bool constant_function) const
-{
-  while ( expr()->eval_logic() == kVpiScalar1 ) {
-    const VlNamedObj* scope = _body_stmt()->func_exec(constant_function);
-    if ( scope ) {
-      return scope;
-    }
-  }
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiRepeatStmt
@@ -305,25 +291,6 @@ EiRepeatStmt::type() const
   return kVpiRepeat;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiRepeatStmt::func_exec(bool constant_function) const
-{
-  int n;
-  if ( !expr()->eval_int(n) ) {
-    // 整数値でなかったら 0 と見なす．
-    n = 0;
-  }
-  for (int i = 0; i < n; ++ i) {
-    const VlNamedObj* scope = _body_stmt()->func_exec(constant_function);
-    if ( scope ) {
-      return scope;
-    }
-  }
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiWaitStmt
@@ -356,16 +323,6 @@ EiWaitStmt::type() const
   return kVpiWait;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiWaitStmt::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiForStmt
@@ -418,28 +375,6 @@ EiForStmt::inc_stmt() const
   return mIncStmt;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiForStmt::func_exec(bool constant_function) const
-{
-  const VlNamedObj* scope = mInitStmt->func_exec(constant_function);
-  if ( scope ) {
-    return scope;
-  }
-  while ( expr()->eval_logic() == kVpiScalar1 ) {
-    scope = _body_stmt()->func_exec(constant_function);
-    if ( scope ) {
-      return scope;
-    }
-    scope = mIncStmt->func_exec(constant_function);
-    if ( scope ) {
-      return scope;
-    }
-  }
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiForeverStmt
@@ -478,20 +413,6 @@ EiForeverStmt::body_stmt() const
   return mBodyStmt;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiForeverStmt::func_exec(bool constant_function) const
-{
-  while ( 1 ) {
-    const VlNamedObj* scope = mBodyStmt->func_exec(constant_function);
-    if ( scope ) {
-      return scope;
-    }
-  }
-  return NULL;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス IfStmt
@@ -540,17 +461,6 @@ EiIfStmt::body_stmt() const
   return mBodyStmt;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiIfStmt::func_exec(bool constant_function) const
-{
-  if ( expr()->eval_scalar() == kVpiScalar1 ) {
-    return mBodyStmt->func_exec(constant_function);
-  }
-  return NULL;
-}
-#endif
 
 ElbStmt*
 EiIfStmt::_body_stmt() const
@@ -600,19 +510,6 @@ EiIfElseStmt::else_stmt() const
   return mElseStmt;
 }
 
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiIfElseStmt::func_exec(bool constant_function) const
-{
-  if ( expr()->eval_scalar() == kVpiScalar1 ) {
-    return _body_stmt()->func_exec(constant_function);
-  }
-  else {
-    return mElseStmt->func_exec(constant_function);
-  }
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiCaseItem
@@ -756,56 +653,5 @@ EiCaseStmt::set_caseitem(ymuint pos,
   ci.mExprList = expr_array;
   ci.mBodyStmt = stmt;
 }
-
-#if 0
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiCaseStmt::func_exec(bool constant_function) const
-{
-  BitVector val;
-  BitVector tmp;
-  mCondition->eval_bitvector(val);
-  for (ymuint i = 0; i < mCaseItemNum; ++ i) {
-    EiCaseItem& ci = mCaseItemList[i];
-    bool found = false;
-    for (ymuint j = 0; j < ci.mExprNum; ++ j) {
-      ci.mExprList[j]->eval_bitvector(tmp);
-      switch ( pt_stmt()->type() ) {
-      case kPtCaseStmt:
-	if ( eq(val, tmp) ) {
-	  found = true;
-	}
-	break;
-
-      case kPtCaseXStmt:
-	if ( eq_with_x(val, tmp) ) {
-	  found = true;
-	}
-	break;
-
-      case kPtCaseZStmt:
-	if ( eq_with_xz(val, tmp) ) {
-	  found = true;
-	}
-	break;
-
-      default:
-	assert_not_reached(__FILE__, __LINE__);
-	break;
-      }
-      if ( found ) {
-	break;
-      }
-    }
-    if ( found || ci.mExprNum == 0 ) {
-      const VlNamedObj* scope = ci.mBodyStmt->func_exec(constant_function);
-      if ( scope ) {
-	return scope;
-      }
-    }
-  }
-  return NULL;
-}
-#endif
 
 END_NAMESPACE_YM_VERILOG

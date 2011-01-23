@@ -322,35 +322,6 @@ EiExprBase1::argument(ymuint pos) const
   return NULL;
 }
 
-#if 0
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiExprBase1::set_scalar(tVpiScalarVal v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 実数値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiExprBase1::set_real(double v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiExprBase1::set_bitvector(const BitVector& v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-#endif
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiOperation

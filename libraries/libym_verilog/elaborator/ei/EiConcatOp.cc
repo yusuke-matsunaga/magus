@@ -112,49 +112,6 @@ EiConcatOp::is_const() const
   return true;
 }
 
-#if 0
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiConcatOp::eval_scalar() const
-{
-  // 最後の要素の LSB を返す．
-  return operand(operand_num() - 1)->eval_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiConcatOp::eval_logic() const
-{
-  BitVector bv;
-  eval_bitvector(bv);
-  return bv.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiConcatOp::eval_real() const
-{
-  BitVector bv;
-  eval_bitvector(bv);
-  return bv.to_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiConcatOp::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  ymuint n = operand_num();
-  vector<BitVector> vlist(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = operand(i);
-    expr->eval_bitvector(vlist[i]);
-  }
-  bitvector = concat(vlist);
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -180,17 +137,6 @@ EiConcatOp::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }
-
-#if 0
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConcatOp::set_bitvector(const BitVector& v)
-{
-  #warning "TODO: 要素に合わせて v を切り刻む．"
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType
@@ -248,23 +194,6 @@ EiMultiConcatOp::value_type() const
   return pack(kVpiValueUS, bit_size() * mRepNum);
 }
 
-#if 0
-// @brief bitvector 型の値を返す．
-void
-EiMultiConcatOp::eval_bitvector(BitVector& bitvector,
-				tVpiValueType req_type) const
-{
-  ymuint n = EiConcatOp::operand_num();
-  vector<BitVector> vlist(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = EiConcatOp::operand(i);
-    expr->eval_bitvector(vlist[i]);
-  }
-  bitvector = multi_concat(BitVector(mRepNum), vlist);
-  bitvector.coerce(req_type);
-}
-#endif
-
 // @brief decompile() の実装関数
 // @param[in] pprim 親の演算子の優先順位
 string
@@ -282,17 +211,6 @@ EiMultiConcatOp::decompile_impl(int ppri) const
   ans += "}}";
   return ans;
 }
-
-#if 0
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiMultiConcatOp::set_bitvector(const BitVector& v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-#endif
 
 // @brief 演算子のタイプを返す．
 tVpiOpType

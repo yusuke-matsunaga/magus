@@ -113,41 +113,6 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
     const FileRegion& ifr = pt_init_value->file_region();
 
-#if 0
-    // 式の生成
-    ElbExpr* init_expr = instantiate_constant_expr(NULL, pt_init_value);
-    if ( !init_expr ) {
-      put_msg(__FILE__, __LINE__,
-	      ifr,
-	      kMsgError,
-	      "ELAB",
-	      "Constant value is required.");
-      return;
-    }
-
-    // その値は 1ビットの 0 か 1 か X でなければならない．
-    tVpiValueType type = init_expr->value_type();
-    if ( type == kVpiValueReal ) {
-      put_msg(__FILE__, __LINE__,
-	      ifr,
-	      kMsgError,
-	      "ELAB",
-	      "Only 1-bit constants are allowed here.");
-      return;
-    }
-    if ( is_sized_type(type) && unpack_size(type) != 1 ) {
-      put_msg(__FILE__, __LINE__,
-	      ifr,
-	      kMsgError,
-	      "ELAB",
-	      "Only 1-bit constants are allowed here.");
-      return;
-    }
-    tVpiScalarVal val = init_expr->eval_scalar();
-
-    // 初期値を設定する．
-    udp->set_initial(init_expr, val);
-#else
     tVpiScalarVal val;
     if ( !evaluate_scalar(NULL, pt_init_value, val) ) {
       put_msg(__FILE__, __LINE__,
@@ -159,7 +124,6 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
     }
     // 初期値を設定する．
     udp->set_initial(pt_init_value, val);
-#endif
   }
 
   // テーブルの中身を作る．

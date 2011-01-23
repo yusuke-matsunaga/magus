@@ -229,97 +229,11 @@ public:
   void
   set_init(ElbExpr* expr);
 
-#if 0
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  get_scalar() const = 0;
-
-  /// @brief スカラー値を設定する．
-  /// @param[in] val 値
-  virtual
-  void
-  set_scalar(tVpiScalarVal val) = 0;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  get_logic() const = 0;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  get_real() const = 0;
-
-  /// @brief real 型の値を設定する．
-  /// @param[in] val 値
-  virtual
-  void
-  set_real(double val) = 0;
-
-  /// @brief bitvector 型の値を返す．
-  /// @param[out] val 値
-  /// @param[in] req_type 要求される型
-  virtual
-  void
-  get_bitvector(BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const = 0;
-
-  /// @brief bitvector 型の値を設定する．
-  /// @param[in] val 値
-  virtual
-  void
-  set_bitvector(const BitVector& val) = 0;
-
-  /// @brief ビット選択値を返す．
-  /// @param[in] index ビット位置
-  virtual
-  tVpiScalarVal
-  get_bitselect(int index) const = 0;
-
-  /// @brief ビット値を設定する．
-  /// @param[in] index ビット位置
-  /// @param[in] val 値
-  virtual
-  void
-  set_bitselect(int index,
-		tVpiScalarVal val) = 0;
-
-  /// @brief 範囲選択値を返す．
-  /// @param[in] left 範囲の MSB
-  /// @param[in] right 範囲の LSB
-  /// @param[out] val 値
-  virtual
-  void
-  get_partselect(int left,
-		 int right,
-		 BitVector& val) const = 0;
-
-  /// @brief 範囲値を設定する．
-  /// @param[in] left 範囲の MSB
-  /// @param[in] right 範囲の LSB
-  /// @param[in] val 値
-  virtual
-  void
-  set_partselect(int left,
-		 int right,
-		 const BitVector& val) = 0;
-#endif
-
 
 public:
   //////////////////////////////////////////////////////////////////////
   // ElbDecl の仮想関数
   //////////////////////////////////////////////////////////////////////
-
-#if 0
-  /// @brief parameter の初期値の設定
-  /// @param[in] expr 初期値
-  /// @note このクラスのデフォルト実装ではなにもしない．
-  virtual
-  void
-  set_expr(ElbExpr* expr);
-#endif
 
   /// @brief 次の要素を返す．
   const ElbDecl*
@@ -464,14 +378,6 @@ public:
 		 int left,
 		 int right,
 		 const BitVector& val) = 0;
-
-#if 0
-  /// @brief インデックスからオフセットを計算する．
-  /// @param[in] index_array インデックス式の配列
-  virtual
-  ymuint
-  calc_offset(const vector<ElbExpr*>& index_array) const = 0;
-#endif
 
 
 public:

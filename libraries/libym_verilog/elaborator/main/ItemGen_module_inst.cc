@@ -412,7 +412,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     }
 
     // attribute の設定を行う．
-#if 0
+#if 0 // attribute instance の設定
     for (ymuint i = 0; i < module_size; ++ i) {
       ElbModule* module1 = module_array->_module(i);
       const VlPort* port = module1->port(index);

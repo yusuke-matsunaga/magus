@@ -271,38 +271,6 @@ public:
   bool
   is_constant_function() const;
 
-#if 0
-  /// @brief スカラー値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_scalar(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief 論理値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_logic(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief real 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  double
-  eval_real(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief bitvector 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  void
-  eval_bitvector(const vector<ElbExpr*>& arg_list,
-		 BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-#endif
-
 };
 
 
@@ -409,46 +377,6 @@ public:
   virtual
   bool
   is_constant_function() const;
-
-#if 0
-  /// @brief スカラー値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_scalar(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief 論理値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_logic(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief real 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  double
-  eval_real(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief bitvector 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  void
-  eval_bitvector(const vector<ElbExpr*>& arg_list,
-		 BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-private:
-
-  /// @brief 関数の値の評価を行う．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  void
-  evaluate(const vector<ElbExpr*>& arg_list) const;
-#endif
 
 
 private:

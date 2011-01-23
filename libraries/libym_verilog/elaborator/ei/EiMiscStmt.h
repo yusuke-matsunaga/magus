@@ -68,13 +68,6 @@ public:
   const VlExpr*
   named_event() const;
 
-#if 0
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -121,19 +114,6 @@ public:
   tVpiObjType
   type() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-#if 0
-  /// @brief function 中の実行を行う．
-  /// @note このクラスでは何もしないで NULL を返す．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-#endif
 };
 
 
@@ -260,13 +240,6 @@ public:
   const VlTaskFunc*
   task() const;
 
-#if 0
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -330,13 +303,6 @@ public:
   const VlUserSystf*
   user_systf() const;
 
-#if 0
-  /// @brief function 中の実行を行う．
-  /// @note system task は function 中では無視される．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -401,12 +367,6 @@ public:
   const VlNamedObj*
   scope() const;
 
-#if 0
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -475,13 +435,6 @@ public:
   const VlStmt*
   body_stmt() const;
 
-#if 0
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
