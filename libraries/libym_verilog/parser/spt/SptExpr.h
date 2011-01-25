@@ -58,7 +58,7 @@ public:
   /// @note このクラスでは kVpiNullOp を返す．
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief 階層ブランチの取得
   /// system function call の場合は常に NULL
@@ -242,7 +242,8 @@ public:
 
   /// 演算子の種類の取得
   virtual
-  tVpiOpType opr_type() const;
+  tVpiOpType
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数
@@ -262,7 +263,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の種類
-  tVpiOpType mOprType;
+  tVpiOpType mOpType;
 
   // オペランド数
   ymuint32 mSize;
@@ -310,7 +311,8 @@ public:
 
   /// 演算子の種類の取得
   virtual
-  tVpiOpType opr_type() const;
+  tVpiOpType
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数
@@ -330,7 +332,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の種類
-  tVpiOpType mOprType;
+  tVpiOpType mOpType;
 
   // オペランドのリスト
   PtExprArray mExprArray;

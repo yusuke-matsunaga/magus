@@ -23,13 +23,13 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief 定数を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiConstant :
-  public EiExprBase1
+  public EiExprBase
 {
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
-  EiConstant(const PtBase* pt_expr);
+  EiConstant(const PtExpr* pt_expr);
 
   /// @brief デストラクタ
   virtual
@@ -88,7 +88,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] value 値
-  EiIntConst(const PtBase* pt_expr,
+  EiIntConst(const PtExpr* pt_expr,
 	     int value);
 
   /// @brief デストラクタ
@@ -111,18 +111,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:
@@ -151,7 +139,7 @@ private:
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] const_type 定数型
   /// @param[in] value 値
-  EiBitVectorConst(const PtBase* pt_expr,
+  EiBitVectorConst(const PtExpr* pt_expr,
 		   tVpiConstType const_type,
 		   const BitVector& value);
 
@@ -175,18 +163,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:
@@ -217,7 +193,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] value 値
-  EiRealConst(const PtBase* pt_expr,
+  EiRealConst(const PtExpr* pt_expr,
 	      double value);
 
   /// @brief デストラクタ
@@ -240,18 +216,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:
@@ -279,7 +243,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] value 値
-  EiStringConst(const PtBase* pt_expr,
+  EiStringConst(const PtExpr* pt_expr,
 		const string& value);
 
   /// @brief デストラクタ
@@ -302,18 +266,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:

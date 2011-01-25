@@ -54,7 +54,7 @@ ExprGen::instantiate_expr(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->opr_type() == kVpiNullOp ) {
+	  pt_expr->op_type() == kVpiNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 
@@ -114,13 +114,13 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->opr_type() == kVpiNullOp ) {
+	  pt_expr->op_type() == kVpiNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
-    switch ( pt_expr->opr_type() ) {
+    switch ( pt_expr->op_type() ) {
     case kVpiPosedgeOp:
     case kVpiNegedgeOp:
       { // これのみがイベント式の特徴
@@ -130,7 +130,7 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
 	  return NULL;
 	}
 	ElbExpr* expr = factory().new_UnaryOp(pt_expr,
-					      pt_expr->opr_type(), opr0);
+					      pt_expr->op_type(), opr0);
 
 	// attribute instance の生成
 	//instantiate_attribute(pt_expr->attr_top(), false, expr);
@@ -188,7 +188,7 @@ ExprGen::instantiate_arg(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->opr_type() == kVpiNullOp ) {
+	  pt_expr->op_type() == kVpiNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 
@@ -242,7 +242,7 @@ ExprGen::instantiate_lhs_sub(const VlNamedObj* parent,
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
     // 左辺では concatination しか適当でない．
-    if ( pt_expr->opr_type() == kVpiConcatOp ) {
+    if ( pt_expr->op_type() == kVpiConcatOp ) {
       ymuint opr_size = pt_expr->operand_num();
       ElbExpr** opr_list = factory().new_ExprList(opr_size);
       for (ymuint i = 0; i < opr_size; ++ i) {
@@ -397,7 +397,7 @@ ExprGen::evaluate_expr(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->opr_type() == kVpiNullOp ) {
+	  pt_expr->op_type() == kVpiNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 

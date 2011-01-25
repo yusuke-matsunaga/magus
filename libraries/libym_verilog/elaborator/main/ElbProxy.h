@@ -505,19 +505,6 @@ protected:
 		  const PtExpr* pt_expr,
 		  ElbLhs* lhs);
 
-  /// @brief 範囲を表す式を生成
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_left 範囲のMSBを表すパース木
-  /// @param[in] pt_right 範囲のLSBを表すパース木
-  /// @param[out] left_val 範囲の MSB の値
-  /// @param[out] right_val 範囲の LSB の値
-  bool
-  instantiate_range(const VlNamedObj* parent,
-		    const PtExpr* pt_left,
-		    const PtExpr* pt_right,
-		    int& left_val,
-		    int& right_val);
-
   /// @brief PtExpr(primary) から named_event を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
@@ -587,6 +574,19 @@ protected:
   evaluate_bitvector(const VlNamedObj* parent,
 		     const PtExpr* pt_expr,
 		     BitVector& value);
+
+  /// @brief 範囲を表す式を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_left 範囲のMSBを表すパース木
+  /// @param[in] pt_right 範囲のLSBを表すパース木
+  /// @param[out] left_val 範囲の MSB の値
+  /// @param[out] right_val 範囲の LSB の値
+  bool
+  evaluate_range(const VlNamedObj* parent,
+		 const PtExpr* pt_left,
+		 const PtExpr* pt_right,
+		 int& left_val,
+		 int& right_val);
 
 
 protected:

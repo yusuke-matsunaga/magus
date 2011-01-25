@@ -27,22 +27,11 @@ class ElbExpr :
 protected:
 
   /// @brief コンストラクタ
-  ElbExpr() { }
+  ElbExpr();
 
   /// @brief デストラクタ
   virtual
-  ~ElbExpr() { }
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief Verilog-HDL の文字列を得る．
-  virtual
-  string
-  decompile() const;
+  ~ElbExpr();
 
 
 public:
@@ -61,12 +50,6 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   void
   set_selfsize();
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const = 0;
 
   /// @brief オペランドを返す．
   /// @param[in] pos 位置番号

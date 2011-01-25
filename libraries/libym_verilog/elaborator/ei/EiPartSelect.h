@@ -21,14 +21,14 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief パート選択式を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class EiPartSelect :
-  public EiExprBase1
+  public EiExprBase
 {
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] parent_expr 対象の式
-  EiPartSelect(const PtBase* pt_expr,
+  EiPartSelect(const PtExpr* pt_expr,
 	       ElbExpr* parent_expr);
 
   /// @brief デストラクタ
@@ -96,7 +96,7 @@ private:
   /// @param[in] parent_expr 対象の式
   /// @param[in] index1, index2 パート選択式
   /// @param[in] index1_val, index2_val パート選択式の値
-  EiConstPartSelect(const PtBase* pt_expr,
+  EiConstPartSelect(const PtExpr* pt_expr,
 		    ElbExpr* parent_expr,
 		    const PtExpr* index1,
 		    const PtExpr* index2,
@@ -166,12 +166,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -208,7 +202,7 @@ protected:
   /// @param[in] base 範囲のベースアドレスを表す式
   /// @param[in] range 範囲を表す式
   /// @param[in] range_val 範囲の値
-  EiVarPartSelect(const PtBase* pt_expr,
+  EiVarPartSelect(const PtExpr* pt_expr,
 		  ElbExpr* parent_expr,
 		  ElbExpr* base,
 		  const PtExpr* range,
@@ -298,7 +292,7 @@ private:
   /// @param[in] base 範囲のベースアドレスを表す式
   /// @param[in] range 範囲を表す式
   /// @param[in] range_val 範囲の値
-  EiPlusPartSelect(const PtBase* pt_expr,
+  EiPlusPartSelect(const PtExpr* pt_expr,
 		   ElbExpr* parent_expr,
 		   ElbExpr* base,
 		   const PtExpr* range,
@@ -318,18 +312,6 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 };
 
@@ -351,7 +333,7 @@ private:
   /// @param[in] base 範囲のベースアドレスを表す式
   /// @param[in] range 範囲を表す式
   /// @param[in] range_val 範囲の値
-  EiMinusPartSelect(const PtBase* pt_expr,
+  EiMinusPartSelect(const PtExpr* pt_expr,
 		    ElbExpr* parent_expr,
 		    ElbExpr* base,
 		    const PtExpr* range,
@@ -371,18 +353,6 @@ public:
   virtual
   tVpiRangeMode
   range_mode() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 };
 

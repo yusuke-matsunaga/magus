@@ -2092,11 +2092,7 @@ public:
 
   /// @brief ポート参照リストに要素を追加する．
   void
-  add_portref(PtiPortRef* portref);
-
-  /// @brief ポート参照リストを配列に変換する
-  PtiPortRefArray
-  get_portref_array();
+  add_portref(PtExpr* portref);
 
   /// @brief parameter port 宣言ヘッダを追加する．
   void
@@ -2415,7 +2411,7 @@ public:
   PtrList<PtiPort> mPortList;
 
   // ポート参照リスト
-  PtrList<PtiPortRef> mPortRefList;
+  PtrList<PtExpr> mPortRefList;
 
   // parameter port 宣言ヘッダリスト
   PtDeclHeadList mParamPortHeadList;

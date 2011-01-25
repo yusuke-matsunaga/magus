@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr_num オペランド数
 // @param[in] opr_list オペランドのリスト
 ElbExpr*
-EiFactory::new_ConcatOp(const PtBase* pt_expr,
+EiFactory::new_ConcatOp(const PtExpr* pt_expr,
 			ymuint opr_size,
 			ElbExpr** opr_list)
 {
@@ -44,7 +44,7 @@ EiFactory::new_ConcatOp(const PtBase* pt_expr,
 // @param[in] opr_num オペランド数
 // @param[in] opr_list オペランドのリスト
 ElbExpr*
-EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
+EiFactory::new_MultiConcatOp(const PtExpr* pt_expr,
 			     const PtExpr* rep_expr,
 			     int rep_num,
 			     ymuint opr_size,
@@ -63,13 +63,13 @@ EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr_size オペランド数
 // @param[in] opr_array オペランドを格納する配列
-EiConcatOp::EiConcatOp(const PtBase* pt_obj,
+EiConcatOp::EiConcatOp(const PtExpr* pt_expr,
 		       ymuint opr_size,
 		       ElbExpr** opr_array) :
-  EiOperation(pt_obj),
+  EiOperation(pt_expr),
   mOprNum(opr_size),
   mOprList(opr_array)
 {
@@ -112,23 +112,6 @@ EiConcatOp::is_const() const
   return true;
 }
 
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiConcatOp::decompile_impl(int ppri) const
-{
-  string ans("{");
-  const char* delim = "";
-  ymuint n = operand_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = operand(i);
-    ans += delim + expr->decompile();
-    delim = ",";
-  }
-  ans += "}";
-  return ans;
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -136,13 +119,6 @@ void
 EiConcatOp::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiConcatOp::op_type() const
-{
-  return kVpiConcatOp;
 }
 
 // @brief オペランド数を返す．
@@ -166,17 +142,17 @@ EiConcatOp::_operand(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] rep_expr 繰り返し数を表す式
 // @param[in] rep_num 繰り返し数
 // @param[in] opr_size オペランド数
 // @param[in] opr_array オペランドを格納する配列
-EiMultiConcatOp::EiMultiConcatOp(const PtBase* pt_obj,
+EiMultiConcatOp::EiMultiConcatOp(const PtExpr* pt_expr,
 				 const PtExpr* rep_expr,
 				 int rep_num,
 				 ymuint opr_size,
 				 ElbExpr** opr_array) :
-  EiConcatOp(pt_obj, opr_size, opr_array),
+  EiConcatOp(pt_expr, opr_size, opr_array),
   mRepExpr(rep_expr),
   mRepNum(rep_num)
 {
@@ -192,31 +168,6 @@ tVpiValueType
 EiMultiConcatOp::value_type() const
 {
   return pack(kVpiValueUS, bit_size() * mRepNum);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiMultiConcatOp::decompile_impl(int ppri) const
-{
-  string ans("{");
-  ans += mRepExpr->decompile() + "{";
-  const char* comma = "";
-  ymuint n = EiConcatOp::operand_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = EiConcatOp::operand(i);
-    ans += comma + expr->decompile();
-    comma = ",";
-  }
-  ans += "}}";
-  return ans;
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiMultiConcatOp::op_type() const
-{
-  return kVpiMultiConcatOp;
 }
 
 // @brief オペランド数を返す．

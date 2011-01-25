@@ -95,8 +95,8 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
       // 配列の場合
       int left_val = 0;
       int right_val = 0;
-      if ( !instantiate_range(parent, pt_left, pt_right,
-			      left_val, right_val) ) {
+      if ( !evaluate_range(parent, pt_left, pt_right,
+			   left_val, right_val) ) {
 	return;
       }
 
@@ -194,8 +194,8 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
       // 配列
       int left_val = 0;
       int right_val = 0;
-      if ( !instantiate_range(parent, pt_left, pt_right,
-			      left_val, right_val) ) {
+      if ( !evaluate_range(parent, pt_left, pt_right,
+			   left_val, right_val) ) {
 	return;
       }
 

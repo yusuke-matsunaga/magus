@@ -21,13 +21,13 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief 演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiOperation :
-  public EiExprBase1
+  public EiExprBase
 {
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
-  EiOperation(const PtBase* pt_expr);
+  EiOperation(const PtExpr* pt_expr);
 
   /// @brief デストラクタ
   virtual
@@ -55,17 +55,10 @@ public:
   bool
   is_operation() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
+  /// @brief 演算子のタイプを返す．
   virtual
-  string
-  decompile_impl(int ppri) const;
+  tVpiOpType
+  op_type() const;
 
 };
 

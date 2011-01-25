@@ -21,17 +21,17 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief function call/system-function call に共通な基底クラス
 //////////////////////////////////////////////////////////////////////
 class EiFcBase :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
 protected:
 
   /// @brief コンストラクタ
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] arg_size 引数の数
   /// @param[in] arg_list 引数のリスト
-  EiFcBase(const PtBase* pt_obj,
+  EiFcBase(const PtExpr* pt_expr,
 	   ymuint arg_size,
 	   ElbExpr** arg_list);
 
@@ -83,11 +83,11 @@ class EiFuncCall :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] func 関数
   /// @param[in] arg_size 引数の数
   /// @param[in] arg_list 引数のリスト
-  EiFuncCall(const PtBase* pt_obj,
+  EiFuncCall(const PtExpr* pt_expr,
 	     const ElbTaskFunc* func,
 	     ymuint arg_size,
 	     ElbExpr** arg_list);
@@ -147,12 +147,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -177,11 +171,11 @@ class EiSysFuncCall :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] user_systf システム関数
   /// @param[in] arg_size 引数の数
   /// @param[in] arg_list 引数のリスト
-  EiSysFuncCall(const PtBase* pt_obj,
+  EiSysFuncCall(const PtExpr* pt_expr,
 		const ElbUserSystf* user_systf,
 		ymuint arg_size,
 		ElbExpr** arg_list);
@@ -241,12 +235,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:

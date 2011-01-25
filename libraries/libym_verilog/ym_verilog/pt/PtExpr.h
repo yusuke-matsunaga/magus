@@ -47,7 +47,7 @@ public:
   /// @return 演算子の種類
   virtual
   tVpiOpType
-  opr_type() const = 0;
+  op_type() const = 0;
 
   /// @brief 階層ブランチの取得
   virtual

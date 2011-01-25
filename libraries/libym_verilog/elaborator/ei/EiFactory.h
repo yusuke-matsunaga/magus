@@ -809,7 +809,7 @@ public:
   /// @param[in] opr1 オペランド
   virtual
   ElbExpr*
-  new_UnaryOp(const PtBase* pt_expr,
+  new_UnaryOp(const PtExpr* pt_expr,
 	      tVpiOpType op_type,
 	      ElbExpr* opr1);
 
@@ -820,7 +820,7 @@ public:
   /// @param[in] opr2 オペランド
   virtual
   ElbExpr*
-  new_BinaryOp(const PtBase* pt_expr,
+  new_BinaryOp(const PtExpr* pt_expr,
 	       tVpiOpType op_type,
 	       ElbExpr* opr1,
 	       ElbExpr* opr2);
@@ -833,7 +833,7 @@ public:
   /// @param[in] opr3 オペランド
   virtual
   ElbExpr*
-  new_TernaryOp(const PtBase* pt_expr,
+  new_TernaryOp(const PtExpr* pt_expr,
 		tVpiOpType op_type,
 		ElbExpr* opr1,
 		ElbExpr* opr2,
@@ -845,7 +845,7 @@ public:
   /// @param[in] opr_list オペランドのリスト
   virtual
   ElbExpr*
-  new_ConcatOp(const PtBase* pt_expr,
+  new_ConcatOp(const PtExpr* pt_expr,
 	       ymuint opr_size,
 	       ElbExpr** opr_list);
 
@@ -857,7 +857,7 @@ public:
   /// @param[in] opr_list オペランドのリスト
   virtual
   ElbExpr*
-  new_MultiConcatOp(const PtBase* pt_expr,
+  new_MultiConcatOp(const PtExpr* pt_expr,
 		    const PtExpr* rep_expr,
 		    int rep_num,
 		    ymuint opr_size,
@@ -869,7 +869,7 @@ public:
   /// @param[in] index_list インデックスのリスト
   virtual
   ElbExpr*
-  new_Primary(const PtBase* pt_expr,
+  new_Primary(const PtExpr* pt_expr,
 	      ElbDecl* obj);
 
   /// @brief プライマリ式を生成する．
@@ -877,7 +877,7 @@ public:
   /// @param[in] obj 本体のオブジェクト
   virtual
   ElbExpr*
-  new_Primary(const PtBase* pt_expr,
+  new_Primary(const PtExpr* pt_expr,
 	      ElbParameter* obj);
 
   /// @brief プライマリ式を生成する(配列要素版)．
@@ -886,7 +886,7 @@ public:
   /// @param[in] index_list インデックスのリスト
   virtual
   ElbExpr*
-  new_Primary(const PtBase* pt_expr,
+  new_Primary(const PtExpr* pt_expr,
 	      ElbDeclArray* obj,
 	      const vector<ElbExpr*>& index_list);
 
@@ -897,7 +897,7 @@ public:
   /// @param[in] bit_index_val ビット選択式の値
   virtual
   ElbExpr*
-  new_BitSelect(const PtBase* pt_expr,
+  new_BitSelect(const PtExpr* pt_expr,
 		ElbExpr* expr,
 		const PtExpr* bit_index,
 		int bit_index_val);
@@ -908,7 +908,7 @@ public:
   /// @param[in] bit_index_val ビット選択式の値
   virtual
   ElbExpr*
-  new_BitSelect(const PtBase* pt_expr,
+  new_BitSelect(const PtExpr* pt_expr,
 		ElbExpr* expr,
 		int bit_index_val);
 
@@ -918,7 +918,7 @@ public:
   /// @param[in] bit_index ビット選択式
   virtual
   ElbExpr*
-  new_BitSelect(const PtBase* pt_expr,
+  new_BitSelect(const PtExpr* pt_expr,
 		ElbExpr* expr,
 		ElbExpr* bit_index);
 
@@ -929,7 +929,7 @@ public:
   /// @param[in] index1_val, index2_val パート選択式の値
   virtual
   ElbExpr*
-  new_PartSelect(const PtBase* pt_expr,
+  new_PartSelect(const PtExpr* pt_expr,
 		 ElbExpr* parent_expr,
 		 const PtExpr* index1,
 		 const PtExpr* index2,
@@ -942,7 +942,7 @@ public:
   /// @param[in] index1, inde2 パート選択式
   virtual
   ElbExpr*
-  new_PartSelect(const PtBase* pt_expr,
+  new_PartSelect(const PtExpr* pt_expr,
 		 ElbExpr* parent_expr,
 		 int index1,
 		 int index2);
@@ -955,7 +955,7 @@ public:
   /// @param[in] range_val 範囲の値
   virtual
   ElbExpr*
-  new_PlusPartSelect(const PtBase* pt_expr,
+  new_PlusPartSelect(const PtExpr* pt_expr,
 		     ElbExpr* obj,
 		     ElbExpr* base,
 		     const PtExpr* range_expr,
@@ -969,7 +969,7 @@ public:
   /// @param[in] range_val 範囲の値
   virtual
   ElbExpr*
-  new_MinusPartSelect(const PtBase* pt_expr,
+  new_MinusPartSelect(const PtExpr* pt_expr,
 		      ElbExpr* obj,
 		      ElbExpr* base,
 		      const PtExpr* range_expr,
@@ -990,25 +990,25 @@ public:
 		     int val);
 
   /// @brief 関数呼び出し式を生成する．
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] func 関数
   /// @param[in] arg_size 引数の数
   /// @param[in] arg_list 引数のリスト
   virtual
   ElbExpr*
-  new_FuncCall(const PtBase* pt_obj,
+  new_FuncCall(const PtExpr* pt_expr,
 	       const ElbTaskFunc* func,
 	       ymuint arg_size,
 	       ElbExpr** arg_list);
 
   /// @brief システム関数呼び出し式を生成する．
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] user_systf システム関数
   /// @param[in] arg_size 引数の数
   /// @param[in] arg_list 引数のリスト
   virtual
   ElbExpr*
-  new_SysFuncCall(const PtBase* pt_obj,
+  new_SysFuncCall(const PtExpr* pt_obj,
 		  const ElbUserSystf* user_systf,
 		  ymuint arg_size,
 		  ElbExpr** arg_list);
@@ -1018,7 +1018,7 @@ public:
   /// @param[in] arg 引数本体
   virtual
   ElbExpr*
-  new_ArgHandle(const PtBase* pt_expr,
+  new_ArgHandle(const PtExpr* pt_expr,
 		const VlNamedObj* arg);
 
   /// @brief システム関数/システムタスクの引数を生成する．
@@ -1026,7 +1026,7 @@ public:
   /// @param[in] arg 引数本体
   virtual
   ElbExpr*
-  new_ArgHandle(const PtBase* pt_expr,
+  new_ArgHandle(const PtExpr* pt_expr,
 		ElbPrimitive* arg);
 
   /// @brief 単純な左辺式を生成する．

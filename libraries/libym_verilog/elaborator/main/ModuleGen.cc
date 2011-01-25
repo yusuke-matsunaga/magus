@@ -228,7 +228,7 @@ ModuleGen::instantiate_port(ElbModule* module,
     if ( n == 1 ) {
       // 単一の要素の場合
       const PtPortRef* pt_portref = pt_port->portref(0);
-      dir = pt_portref->dir();
+      dir = pt_port->portref_dir(0);
       low_conn = instantiate_portref(module, pt_portref);
     }
     else if ( n > 1 ) {
@@ -243,7 +243,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 	}
 	expr_list[i] = portexpr;
 
-	tVpiDirection dir1 = pt_portref->dir();
+	tVpiDirection dir1 = pt_port->portref_dir(i);
 	if ( dir == kVpiNoDirection ) {
 	  dir = dir1;
 	}
@@ -252,7 +252,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 	}
       }
 
-      low_conn = factory().new_ConcatOp(pt_port, n, expr_list);
+      low_conn = factory().new_PortConcatOp(pt_port, n, expr_list);
     }
     module->init_port(index, pt_port, low_conn, dir);
   }
@@ -300,7 +300,6 @@ ModuleGen::instantiate_portref(ElbModule* module,
 	    buf.str());
     return NULL;
   }
-  ElbExpr* primary = factory().new_Primary(pt_portref, decl);
 
   // 添字の部分を実体化する．
   const PtExpr* pt_index = pt_portref->index();
@@ -312,21 +311,20 @@ ModuleGen::instantiate_portref(ElbModule* module,
     if ( !stat ) {
       return NULL;
     }
-    return factory().new_BitSelect(pt_portref, primary, pt_index, index_val);
+    return factory().new_PortExpr(pt_portref, decl, pt_index, index_val);
   }
   else if ( pt_left && pt_right ) {
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(module, pt_left, pt_right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(module, pt_left, pt_right, left_val, right_val) ) {
       return NULL;
     }
-    return factory().new_PartSelect(pt_portref, primary,
-				    pt_left, pt_right,
-				    left_val, right_val);
+    return factory().new_PortExpr(pt_portref, decl,
+				  pt_left, pt_right,
+				  left_val, right_val);
   }
   else {
-    return primary;
+    return factory().new_PortExpr(pt_portref, decl);
   }
 }
 

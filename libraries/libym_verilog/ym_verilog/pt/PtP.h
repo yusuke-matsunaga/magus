@@ -131,8 +131,9 @@ class PtUdpValue;
 
 // in PtModule.h
 class PtModule;
+
+// in PtPort.h
 class PtPort;
-class PtPortRef;
 
 // in PtDecl.h
 class PtIOHead;
@@ -171,7 +172,6 @@ template <typename T>
 class PtArray;
 
 typedef PtArray<PtPort> PtPortArray;
-typedef PtArray<PtPortRef> PtPortRefArray;
 typedef PtArray<PtUdpEntry> PtUdpEntryArray;
 typedef PtArray<PtUdpValue> PtUdpValueArray;
 typedef PtArray<PtIOHead> PtIOHeadArray;

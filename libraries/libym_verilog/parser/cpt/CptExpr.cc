@@ -33,7 +33,7 @@ CptExpr::~CptExpr()
 // @return 演算子の種類
 // このクラスでは kVpiNullOp を返す．
 tVpiOpType
-CptExpr::opr_type() const
+CptExpr::op_type() const
 {
   return kVpiNullOp;
 }
@@ -225,7 +225,7 @@ CptOpr::type() const
 
 // 演算子のトークン番号を得る．
 tVpiOpType
-CptOpr::opr_type() const
+CptOpr::op_type() const
 {
   return mOpType;
 }
@@ -263,7 +263,7 @@ bool
 CptOpr1::is_index_expr() const
 {
   // 算術演算はOKだけどめんどくさいので単項のマイナスのみOKとする．
-  if ( opr_type() == 0 || opr_type() == vpiMinusOp ) {
+  if ( op_type() == 0 || op_type() == vpiMinusOp ) {
     return operand(0)->is_index_expr();
   }
   else {
@@ -275,10 +275,10 @@ CptOpr1::is_index_expr() const
 int
 CptOpr1::index_value() const
 {
-  if ( opr_type() == 0 ) {
+  if ( op_type() == 0 ) {
     return operand(0)->index_value();
   }
-  if ( opr_type() == vpiMinusOp ) {
+  if ( op_type() == vpiMinusOp ) {
     return - operand(0)->index_value();
   }
   return 0;
@@ -445,7 +445,7 @@ CptConcat::type() const
 
 ///演算子の種類の取得
 tVpiOpType
-CptConcat::opr_type() const
+CptConcat::op_type() const
 {
   return kVpiConcatOp;
 }
@@ -486,7 +486,7 @@ CptMultiConcat::~CptMultiConcat()
 
 // 演算子の種類の取得
 tVpiOpType
-CptMultiConcat::opr_type() const
+CptMultiConcat::op_type() const
 {
   return kVpiMultiConcatOp;
 }
@@ -530,7 +530,7 @@ CptMinTypMax::type() const
 
 // 演算子の種類の取得
 tVpiOpType
-CptMinTypMax::opr_type() const
+CptMinTypMax::op_type() const
 {
   return kVpiMinTypMaxOp;
 }

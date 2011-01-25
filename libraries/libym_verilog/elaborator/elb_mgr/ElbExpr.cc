@@ -21,11 +21,14 @@ BEGIN_NAMESPACE_YM_VERILOG
 // クラス ElbExpr
 //////////////////////////////////////////////////////////////////////
 
-// @brief Verilog-HDL の文字列を得る．
-string
-ElbExpr::decompile() const
+// @brief コンストラクタ
+ElbExpr::ElbExpr()
 {
-  return decompile_impl(0);
+}
+
+// @brief デストラクタ
+ElbExpr::~ElbExpr()
+{
 }
 
 // @brief オペランドを返す．

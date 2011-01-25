@@ -255,31 +255,6 @@ ElbProxy::instantiate_rhs(const VlNamedObj* parent,
   return expr;
 }
 
-// @brief 範囲を表す式を生成
-// @param[in] parent 親のスコープ
-// @param[in] pt_left 範囲のMSBを表すパース木
-// @param[in] pt_right 範囲のLSBを表すパース木
-// @param[in] left_val 範囲の MSB の値
-// @param[in] right_val 範囲の LSB の値
-bool
-ElbProxy::instantiate_range(const VlNamedObj* parent,
-			    const PtExpr* pt_left,
-			    const PtExpr* pt_right,
-			    int& left_val,
-			    int& right_val)
-{
-  left_val = 0;
-  right_val = 0;
-  if ( pt_left && pt_right ) {
-    bool stat1 = evaluate_int(parent, pt_left, left_val);
-    bool stat2 = evaluate_int(parent, pt_right, right_val);
-    if ( !stat1 || !stat2 ) {
-      return false;
-    }
-  }
-  return true;
-}
-
 // @brief PtExpr(primary) から named_event を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
@@ -372,6 +347,31 @@ ElbProxy::evaluate_bitvector(const VlNamedObj* parent,
 			     BitVector& value)
 {
   return mExprGen->evaluate_bitvector(parent, pt_expr, value);
+}
+
+// @brief 範囲を表す式を評価する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_left 範囲のMSBを表すパース木
+// @param[in] pt_right 範囲のLSBを表すパース木
+// @param[in] left_val 範囲の MSB の値
+// @param[in] right_val 範囲の LSB の値
+bool
+ElbProxy::evaluate_range(const VlNamedObj* parent,
+			 const PtExpr* pt_left,
+			 const PtExpr* pt_right,
+			 int& left_val,
+			 int& right_val)
+{
+  left_val = 0;
+  right_val = 0;
+  if ( pt_left && pt_right ) {
+    bool stat1 = evaluate_int(parent, pt_left, left_val);
+    bool stat2 = evaluate_int(parent, pt_right, right_val);
+    if ( !stat1 || !stat2 ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // @brief PtAttrInst から属性リストを生成し，オブジェクトに付加する．

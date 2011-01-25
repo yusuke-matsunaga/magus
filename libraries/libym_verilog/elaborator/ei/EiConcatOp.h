@@ -31,7 +31,7 @@ protected:
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr_size オペランド数
   /// @param[in] opr_array オペランドを格納する配列
-  EiConcatOp(const PtBase* pt_obj,
+  EiConcatOp(const PtExpr* pt_expr,
 	     ymuint opr_size,
 	     ElbExpr** opr_array);
 
@@ -56,27 +56,10 @@ public:
   bool
   is_const() const;
 
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
   /// @brief オペランド数を返す．
   virtual
   ymuint
   operand_num() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数 (private)
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 public:
@@ -148,7 +131,7 @@ private:
   /// @param[in] opr_size オペランド数
   /// @param[in] opr_array オペランドを格納する配列
   /// @note は opr_size は繰り返し数のオペランドは含まない．
-  EiMultiConcatOp(const PtBase* pt_obj,
+  EiMultiConcatOp(const PtExpr* pt_expr,
 		  const PtExpr* rep_expr,
 		  int rep_num,
 		  ymuint opr_size,
@@ -169,27 +152,10 @@ public:
   tVpiValueType
   value_type() const;
 
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
   /// @brief オペランド数を返す．
   virtual
   ymuint
   operand_num() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 public:

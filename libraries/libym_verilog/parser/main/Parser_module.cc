@@ -60,13 +60,6 @@ Parser::end_module()
 {
 }
 
-// @brief ポート参照リストを初期化する．
-void
-Parser::init_portref_list()
-{
-  mPortRefList.clear();
-}
-
 // Verilog1995 タイプのモジュールを生成する．
 void
 Parser::new_Module1995(const FileRegion& file_region,
@@ -102,16 +95,16 @@ Parser::new_Module1995(const FileRegion& file_region,
   string library; // ?
   string cell;    // ?
 
-  // port_array をスキャンして中で用いられている名前を port_ref_dic
+  // port_array をスキャンして中で用いられている名前を portref_dic
   // に登録する．
-  hash_set<string> port_ref_dic;
+  hash_set<string> portref_dic;
   for (ymuint i = 0; i < port_array.size(); ++ i) {
     PtiPort* port = port_array[i];
-    ymuint n = port->portref_num();
+    ymuint n = port->portref_size();
     for (ymuint j = 0; j < n; ++ j) {
-      PtiPortRef* portref = port->_portref(j);
+      const PtExpr* portref = port->portref_elem(j);
       const char* name = portref->name();
-      port_ref_dic.insert(name);
+      portref_dic.insert(name);
     }
   }
 
@@ -135,7 +128,7 @@ Parser::new_Module1995(const FileRegion& file_region,
       const char* elem_name = elem->name();
 
       // まず未定義/多重定義のエラーをチェックする．
-      if ( !port_ref_dic.count(elem_name) ) {
+      if ( !portref_dic.count(elem_name) ) {
 	// port expression に現れない信号線名
 	// 未定義エラー
 	ostringstream buf;
@@ -172,9 +165,9 @@ Parser::new_Module1995(const FileRegion& file_region,
       // 1つでも名前を持たないポートがあったら名前での結合はできない．
       named_port = false;
     }
-    ymuint n = port->portref_num();
+    ymuint n = port->portref_size();
     for (ymuint j = 0; j < n; ++ j) {
-      PtiPortRef* portref = port->_portref(j);
+      const PtExpr* portref = port->portref_elem(j);
       const char* name = portref->name();
       hash_map<string, tVpiDirection>::iterator p = iodecl_dirs.find(name);
       if ( p == iodecl_dirs.end() ) {
@@ -189,7 +182,7 @@ Parser::new_Module1995(const FileRegion& file_region,
       }
       else {
 	tVpiDirection dir = p->second;
-	portref->set_dir(dir);
+	port->_set_portref_dir(j, dir);
       }
     }
   }

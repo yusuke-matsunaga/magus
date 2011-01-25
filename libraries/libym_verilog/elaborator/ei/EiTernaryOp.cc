@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr1 オペランド
 // @param[in] opr2 オペランド
 ElbExpr*
-EiFactory::new_TernaryOp(const PtBase* pt_expr,
+EiFactory::new_TernaryOp(const PtExpr* pt_expr,
 			 tVpiOpType op_type,
 			 ElbExpr* opr0,
 			 ElbExpr* opr1,
@@ -60,15 +60,15 @@ EiFactory::new_TernaryOp(const PtBase* pt_expr,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
-EiTernaryOp::EiTernaryOp(const PtBase* pt_obj,
+EiTernaryOp::EiTernaryOp(const PtExpr* pt_expr,
 			 ElbExpr* opr1,
 			 ElbExpr* opr2,
 			 ElbExpr* opr3) :
-  EiOperation(pt_obj)
+  EiOperation(pt_expr)
 {
   mOpr[0] = opr1;
   mOpr[1] = opr2;
@@ -111,15 +111,15 @@ EiTernaryOp::_operand(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
-EiConditionOp::EiConditionOp(const PtBase* pt_obj,
+EiConditionOp::EiConditionOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1,
 			     ElbExpr* opr2,
 			     ElbExpr* opr3) :
-  EiTernaryOp(pt_obj, opr1, opr2, opr3)
+  EiTernaryOp(pt_expr, opr1, opr2, opr3)
 {
   // 三項演算子の場合は第1オペランドが self determined で
   // 結果は第2オペランドと第3オペランドから決まる．
@@ -158,28 +158,21 @@ EiConditionOp::set_reqsize(tVpiValueType type)
   operand3()->set_reqsize(mType);
 }
 
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiConditionOp::op_type() const
-{
-  return kVpiConditionOp;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiMinTypMaxOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
-EiMinTypMaxOp::EiMinTypMaxOp(const PtBase* pt_obj,
+EiMinTypMaxOp::EiMinTypMaxOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1,
 			     ElbExpr* opr2,
 			     ElbExpr* opr3) :
-  EiTernaryOp(pt_obj, opr1, opr2, opr3)
+  EiTernaryOp(pt_expr, opr1, opr2, opr3)
 {
   // とりあえず真ん中の式を使う．
   mType = opr2->value_type();
@@ -209,13 +202,6 @@ EiMinTypMaxOp::set_reqsize(tVpiValueType type)
   operand1()->set_reqsize(mType);
   operand2()->set_reqsize(mType);
   operand3()->set_reqsize(mType);
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiMinTypMaxOp::op_type() const
-{
-  return kVpiMinTypMaxOp;
 }
 
 END_NAMESPACE_YM_VERILOG

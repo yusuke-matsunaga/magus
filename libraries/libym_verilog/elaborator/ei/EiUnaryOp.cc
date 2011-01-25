@@ -26,7 +26,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] op_type 演算子のタイプ
 // @param[in] opr1 オペランド
 ElbExpr*
-EiFactory::new_UnaryOp(const PtBase* pt_expr,
+EiFactory::new_UnaryOp(const PtExpr* pt_expr,
 		       tVpiOpType op_type,
 		       ElbExpr* opr1)
 {
@@ -34,13 +34,9 @@ EiFactory::new_UnaryOp(const PtBase* pt_expr,
   void* p;
   switch ( op_type ) {
   case kVpiPosedgeOp:
-    p = mAlloc.get_memory(sizeof(EiPosedgeOp));
-    expr = new (p) EiPosedgeOp(pt_expr, opr1);
-    break;
-
   case kVpiNegedgeOp:
-    p = mAlloc.get_memory(sizeof(EiNegedgeOp));
-    expr = new (p) EiNegedgeOp(pt_expr, opr1);
+    p = mAlloc.get_memory(sizeof(EiEventEdgeOp));
+    expr = new (p) EiEventEdgeOp(pt_expr, opr1);
     break;
 
   case kVpiBitNegOp:
@@ -49,43 +45,19 @@ EiFactory::new_UnaryOp(const PtBase* pt_expr,
     break;
 
   case kVpiPlusOp:
-    p = mAlloc.get_memory(sizeof(EiPlusOp));
-    expr = new (p) EiPlusOp(pt_expr, opr1);
-    break;
-
   case kVpiMinusOp:
-    p = mAlloc.get_memory(sizeof(EiMinusOp));
-    expr = new (p) EiMinusOp(pt_expr, opr1);
+    p = mAlloc.get_memory(sizeof(EiUnaryArithOp));
+    expr = new (p) EiUnaryArithOp(pt_expr, opr1);
     break;
 
   case kVpiUnaryAndOp:
-    p = mAlloc.get_memory(sizeof(EiUnaryAndOp));
-    expr = new (p) EiUnaryAndOp(pt_expr, opr1);
-    break;
-
   case kVpiUnaryNandOp:
-    p = mAlloc.get_memory(sizeof(EiUnaryNandOp));
-    expr = new (p) EiUnaryNandOp(pt_expr, opr1);
-    break;
-
   case kVpiUnaryOrOp:
-    p = mAlloc.get_memory(sizeof(EiUnaryOrOp));
-    expr = new (p) EiUnaryOrOp(pt_expr, opr1);
-    break;
-
   case kVpiUnaryNorOp:
-    p = mAlloc.get_memory(sizeof(EiUnaryNorOp));
-    expr = new (p) EiUnaryNorOp(pt_expr, opr1);
-    break;
-
   case kVpiUnaryXorOp:
-    p = mAlloc.get_memory(sizeof(EiUnaryXorOp));
-    expr = new (p) EiUnaryXorOp(pt_expr, opr1);
-    break;
-
   case kVpiUnaryXNorOp:
-    p = mAlloc.get_memory(sizeof(EiUnaryXnorOp));
-    expr = new (p) EiUnaryXnorOp(pt_expr, opr1);
+    p = mAlloc.get_memory(sizeof(EiReductionOp));
+    expr = new (p) EiReductionOp(pt_expr, opr1);
     break;
 
   case kVpiNotOp:
@@ -108,7 +80,7 @@ EiFactory::new_UnaryOp(const PtBase* pt_expr,
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド
-EiUnaryOp::EiUnaryOp(const PtBase* pt_expr,
+EiUnaryOp::EiUnaryOp(const PtExpr* pt_expr,
 		     ElbExpr* opr1) :
   EiOperation(pt_expr),
   mOpr1(opr1)
@@ -151,7 +123,7 @@ EiUnaryOp::_operand(ymuint pos) const
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド
-EiNotOp::EiNotOp(const PtBase* pt_expr,
+EiNotOp::EiNotOp(const PtExpr* pt_expr,
 		 ElbExpr* opr1) :
   EiUnaryOp(pt_expr, opr1)
 {
@@ -181,13 +153,6 @@ EiNotOp::set_reqsize(tVpiValueType type)
   // この演算子は型が固定なので何もしない．
 }
 
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiNotOp::op_type() const
-{
-  return kVpiNotOp;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiBitNeg
@@ -196,7 +161,7 @@ EiNotOp::op_type() const
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド
-EiBitNegOp::EiBitNegOp(const PtBase* pt_expr,
+EiBitNegOp::EiBitNegOp(const PtExpr* pt_expr,
 		       ElbExpr* opr1) :
   EiUnaryOp(pt_expr, opr1)
 {
@@ -228,13 +193,6 @@ EiBitNegOp::set_reqsize(tVpiValueType type)
   operand1()->set_reqsize(mType);
 }
 
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiBitNegOp::op_type() const
-{
-  return kVpiBitNegOp;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiReductionOp
@@ -243,7 +201,7 @@ EiBitNegOp::op_type() const
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド
-EiReductionOp::EiReductionOp(const PtBase* pt_expr,
+EiReductionOp::EiReductionOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1) :
   EiUnaryOp(pt_expr, opr1)
 {
@@ -278,169 +236,13 @@ EiReductionOp::set_reqsize(tVpiValueType type)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiUnaryAndOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiUnaryAndOp::EiUnaryAndOp(const PtBase* pt_expr,
-			   ElbExpr* opr1) :
-  EiReductionOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiUnaryAndOp::~EiUnaryAndOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiUnaryAndOp::op_type() const
-{
-  return kVpiUnaryAndOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiUnaryNandOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiUnaryNandOp::EiUnaryNandOp(const PtBase* pt_expr,
-			     ElbExpr* opr1) :
-  EiReductionOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiUnaryNandOp::~EiUnaryNandOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiUnaryNandOp::op_type() const
-{
-  return kVpiUnaryNandOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiUnaryOrOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiUnaryOrOp::EiUnaryOrOp(const PtBase* pt_expr,
-			 ElbExpr* opr1) :
-  EiReductionOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiUnaryOrOp::~EiUnaryOrOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiUnaryOrOp::op_type() const
-{
-  return kVpiUnaryOrOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiUnaryNorOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiUnaryNorOp::EiUnaryNorOp(const PtBase* pt_expr,
-			   ElbExpr* opr1) :
-  EiReductionOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiUnaryNorOp::~EiUnaryNorOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiUnaryNorOp::op_type() const
-{
-  return kVpiUnaryNorOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiUnaryXorOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiUnaryXorOp::EiUnaryXorOp(const PtBase* pt_expr,
-			   ElbExpr* opr1) :
-  EiReductionOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiUnaryXorOp::~EiUnaryXorOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiUnaryXorOp::op_type() const
-{
-  return kVpiUnaryXorOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiUnaryXnorOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiUnaryXnorOp::EiUnaryXnorOp(const PtBase* pt_expr,
-			     ElbExpr* opr1) :
-  EiReductionOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiUnaryXnorOp::~EiUnaryXnorOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiUnaryXnorOp::op_type() const
-{
-  return kVpiUnaryXNorOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス EiUnaryArithOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド
-EiUnaryArithOp::EiUnaryArithOp(const PtBase* pt_expr,
+EiUnaryArithOp::EiUnaryArithOp(const PtExpr* pt_expr,
 			       ElbExpr* opr1) :
   EiUnaryOp(pt_expr, opr1)
 {
@@ -471,65 +273,13 @@ EiUnaryArithOp::set_reqsize(tVpiValueType type)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiPlusOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiPlusOp::EiPlusOp(const PtBase* pt_expr,
-		   ElbExpr* opr1) :
-  EiUnaryArithOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiPlusOp::~EiPlusOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiPlusOp::op_type() const
-{
-  return kVpiPlusOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiMinusOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiMinusOp::EiMinusOp(const PtBase* pt_expr,
-		     ElbExpr* opr1) :
-  EiUnaryArithOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiMinusOp::~EiMinusOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiMinusOp::op_type() const
-{
-  return kVpiMinusOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス EiEventEdgeOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド
-EiEventEdgeOp::EiEventEdgeOp(const PtBase* pt_expr,
+EiEventEdgeOp::EiEventEdgeOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1) :
   EiUnaryOp(pt_expr, opr1)
 {
@@ -554,58 +304,6 @@ void
 EiEventEdgeOp::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiPosedgeOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiPosedgeOp::EiPosedgeOp(const PtBase* pt_expr,
-			 ElbExpr* opr1) :
-  EiEventEdgeOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiPosedgeOp::~EiPosedgeOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiPosedgeOp::op_type() const
-{
-  return kVpiPosedgeOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiNegedgeOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-// @param[in] opr1 オペランド
-EiNegedgeOp::EiNegedgeOp(const PtBase* pt_expr,
-			 ElbExpr* opr1) :
-  EiEventEdgeOp(pt_expr, opr1)
-{
-}
-
-// @brief デストラクタ
-EiNegedgeOp::~EiNegedgeOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiNegedgeOp::op_type() const
-{
-  return kVpiNegedgeOp;
 }
 
 END_NAMESPACE_YM_VERILOG

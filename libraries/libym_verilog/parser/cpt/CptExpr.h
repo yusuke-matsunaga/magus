@@ -45,7 +45,7 @@ public:
   /// @note このクラスでは kVpiNullOp を返す．
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief 階層ブランチの取得
   /// @note このクラスでは NULL を返す．
@@ -207,7 +207,7 @@ public:
   // 演算子のトークン番号を得る．
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
 
 private:
@@ -436,7 +436,7 @@ public:
   ///演算子の種類の取得
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数
@@ -492,7 +492,7 @@ public:
   ///演算子の種類の取得
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
 };
 
@@ -535,7 +535,7 @@ public:
   ///演算子の種類の取得
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数

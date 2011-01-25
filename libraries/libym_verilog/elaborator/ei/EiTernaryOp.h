@@ -42,11 +42,11 @@ class EiTernaryOp :
 protected:
 
   /// @brief コンストラクタ
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド1
   /// @param[in] opr2 オペランド2
   /// @param[in] opr3 オペランド3
-  EiTernaryOp(const PtBase* pt_obj,
+  EiTernaryOp(const PtExpr* pt_expr,
 	      ElbExpr* opr1,
 	      ElbExpr* opr2,
 	      ElbExpr* opr3);
@@ -138,11 +138,11 @@ class EiConditionOp :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド1
   /// @param[in] opr2 オペランド2
   /// @param[in] opr3 オペランド3
-  EiConditionOp(const PtBase* pt_obj,
+  EiConditionOp(const PtExpr* pt_expr,
 		ElbExpr* opr1,
 		ElbExpr* opr2,
 		ElbExpr* opr3);
@@ -176,17 +176,6 @@ public:
   set_reqsize(tVpiValueType type);
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -210,11 +199,11 @@ class EiMinTypMaxOp :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] pt_obj パース木の定義要素
+  /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド1
   /// @param[in] opr2 オペランド2
   /// @param[in] opr3 オペランド3
-  EiMinTypMaxOp(const PtBase* pt_obj,
+  EiMinTypMaxOp(const PtExpr* pt_expr,
 		ElbExpr* opr1,
 		ElbExpr* opr2,
 		ElbExpr* opr3);
@@ -246,17 +235,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
 
 
 private:

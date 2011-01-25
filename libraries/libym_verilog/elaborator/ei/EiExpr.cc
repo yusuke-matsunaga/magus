@@ -14,37 +14,35 @@
 
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/VlTime.h"
-#include "ym_verilog/pt/PtBase.h"
+#include "ym_verilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiExprBase1
+// クラス EiExpr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_expr パース木の定義要素
-EiExprBase1::EiExprBase1(const PtBase* pt_obj) :
-  mPtObj(pt_obj)
+EiExpr::EiExpr()
 {
 }
 
 // @brief デストラクタ
-EiExprBase1::~EiExprBase1()
+EiExpr::~EiExpr()
 {
 }
 
 // @brief ファイル位置を返す．
 FileRegion
-EiExprBase1::file_region() const
+EiExpr::file_region() const
 {
-  return mPtObj->file_region();
+  return pt_obj()->file_region();
 }
 
 // @brief 式のビット幅を返す．
 ymuint
-EiExprBase1::bit_size() const
+EiExpr::bit_size() const
 {
   return unpack_size(value_type());
 }
@@ -52,7 +50,7 @@ EiExprBase1::bit_size() const
 // @brief 定数の時 true を返す．
 // @note このクラスは false を返す．
 bool
-EiExprBase1::is_const() const
+EiExpr::is_const() const
 {
   return false;
 }
@@ -61,49 +59,49 @@ EiExprBase1::is_const() const
 // @note ビット選択，部分選択の時，意味を持つ．
 // @note このクラスでは false を返す．
 bool
-EiExprBase1::is_constant_select() const
+EiExpr::is_constant_select() const
 {
   return false;
 }
 
 // @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
 bool
-EiExprBase1::is_primary() const
+EiExpr::is_primary() const
 {
   return false;
 }
 
 // @brief ビット指定の時に true を返す．
 bool
-EiExprBase1::is_bitselect() const
+EiExpr::is_bitselect() const
 {
   return false;
 }
 
 // @brief 範囲指定の時に true を返す．
 bool
-EiExprBase1::is_partselect() const
+EiExpr::is_partselect() const
 {
   return false;
 }
 
 // @brief 演算子の時に true を返す．
 bool
-EiExprBase1::is_operation() const
+EiExpr::is_operation() const
 {
   return false;
 }
 
 // @brief 関数呼び出しの時に true を返す．
 bool
-EiExprBase1::is_funccall() const
+EiExpr::is_funccall() const
 {
   return false;
 }
 
 // @brief システム関数よびあどい時に true を返す．
 bool
-EiExprBase1::is_sysfunccall() const
+EiExpr::is_sysfunccall() const
 {
   return false;
 }
@@ -112,7 +110,7 @@ EiExprBase1::is_sysfunccall() const
 // @note プライマリ，ビット選択，部分選択の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlDecl*
-EiExprBase1::decl_obj() const
+EiExpr::decl_obj() const
 {
   return NULL;
 }
@@ -120,7 +118,7 @@ EiExprBase1::decl_obj() const
 // @brief 宣言要素の配列への参照の場合，対象のオブジェクトを返す．
 // @note それ以外では NULL を返す．
 const VlDeclArray*
-EiExprBase1::declarray_obj() const
+EiExpr::declarray_obj() const
 {
   return NULL;
 }
@@ -128,7 +126,7 @@ EiExprBase1::declarray_obj() const
 // @brief 配列型宣言要素への参照の場合，配列の次元を返す．
 // @note このクラスでは 0 を返す．
 ymuint
-EiExprBase1::declarray_dimension() const
+EiExpr::declarray_dimension() const
 {
   return 0;
 }
@@ -137,7 +135,7 @@ EiExprBase1::declarray_dimension() const
 // @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
 // @note このクラスでは NULL を返す．
 const VlExpr*
-EiExprBase1::declarray_index(ymuint pos) const
+EiExpr::declarray_index(ymuint pos) const
 {
   return NULL;
 }
@@ -146,7 +144,7 @@ EiExprBase1::declarray_index(ymuint pos) const
 // @note 対象がスコープの時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlNamedObj*
-EiExprBase1::scope_obj() const
+EiExpr::scope_obj() const
 {
   return NULL;
 }
@@ -155,7 +153,7 @@ EiExprBase1::scope_obj() const
 // @note 対象が ElbPrimitive の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlPrimitive*
-EiExprBase1::primitive_obj() const
+EiExpr::primitive_obj() const
 {
   return NULL;
 }
@@ -164,7 +162,7 @@ EiExprBase1::primitive_obj() const
 // @note ビット選択の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlExpr*
-EiExprBase1::index() const
+EiExpr::index() const
 {
   return NULL;
 }
@@ -173,14 +171,14 @@ EiExprBase1::index() const
 // @note 式に対するビット選択の時，意味を持つ．
 // @note このクラスでは 0 を返す．
 int
-EiExprBase1::index_val() const
+EiExpr::index_val() const
 {
   return 0;
 }
 
 // @brief 範囲指定のモードを返す．
 tVpiRangeMode
-EiExprBase1::range_mode() const
+EiExpr::range_mode() const
 {
   return kVpiNoRange;
 }
@@ -189,7 +187,7 @@ EiExprBase1::range_mode() const
 // @note 部分選択の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlExpr*
-EiExprBase1::left_range() const
+EiExpr::left_range() const
 {
   return NULL;
 }
@@ -198,7 +196,7 @@ EiExprBase1::left_range() const
 // @note 式に対する範囲選択の時，意味を持つ．
 // @note このクラスでは 0 を返す．
 int
-EiExprBase1::left_range_val() const
+EiExpr::left_range_val() const
 {
   return 0;
 }
@@ -207,7 +205,7 @@ EiExprBase1::left_range_val() const
 // @note 部分選択の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlExpr*
-EiExprBase1::right_range() const
+EiExpr::right_range() const
 {
   return NULL;
 }
@@ -216,7 +214,7 @@ EiExprBase1::right_range() const
 // @note 式に対する範囲選択の時，意味を持つ．
 // @note このクラスでは 0 を返す．
 int
-EiExprBase1::right_range_val() const
+EiExpr::right_range_val() const
 {
   return 0;
 }
@@ -225,7 +223,7 @@ EiExprBase1::right_range_val() const
 // @note 可変範囲選択の時，意味を持つ．
 // @note それ以外では NULL を返す．
 const VlExpr*
-EiExprBase1::base() const
+EiExpr::base() const
 {
   return NULL;
 }
@@ -234,7 +232,7 @@ EiExprBase1::base() const
 // @note 可変範囲選択の時，意味を持つ．
 // @note それ以外では 0 を返す．
 int
-EiExprBase1::range_width() const
+EiExpr::range_width() const
 {
   return 0;
 }
@@ -243,7 +241,7 @@ EiExprBase1::range_width() const
 // @note 式に対するビット選択/範囲選択の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlExpr*
-EiExprBase1::parent_expr() const
+EiExpr::parent_expr() const
 {
   return NULL;
 }
@@ -252,7 +250,7 @@ EiExprBase1::parent_expr() const
 // @note 演算子の時，意味を持つ．
 // @note このクラスでは kVpiNullOp を返す．
 tVpiOpType
-EiExprBase1::op_type() const
+EiExpr::op_type() const
 {
   return kVpiNullOp;
 }
@@ -261,7 +259,7 @@ EiExprBase1::op_type() const
 // @note 演算子の時，意味を持つ．
 // @note このクラスでは 0 を返す．
 ymuint
-EiExprBase1::operand_num() const
+EiExpr::operand_num() const
 {
   return 0;
 }
@@ -270,7 +268,7 @@ EiExprBase1::operand_num() const
 // @param[in] pos 位置番号
 // @note 演算子の時，意味を持つ．
 const VlExpr*
-EiExprBase1::operand(ymuint pos) const
+EiExpr::operand(ymuint pos) const
 {
   return _operand(pos);
 }
@@ -279,7 +277,7 @@ EiExprBase1::operand(ymuint pos) const
 // @note 定数の時，意味を持つ．
 // @note このクラスでは動作は不定
 tVpiConstType
-EiExprBase1::constant_type() const
+EiExpr::constant_type() const
 {
   // とは言っても何か返さなければならない．
   return kVpiDecConst;
@@ -289,7 +287,7 @@ EiExprBase1::constant_type() const
 // @note function call の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlTaskFunc*
-EiExprBase1::function() const
+EiExpr::function() const
 {
   return NULL;
 }
@@ -298,7 +296,7 @@ EiExprBase1::function() const
 // @note system function call の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlUserSystf*
-EiExprBase1::user_systf() const
+EiExpr::user_systf() const
 {
   return NULL;
 }
@@ -307,7 +305,7 @@ EiExprBase1::user_systf() const
 // @note kVpiFuncCall/kVpiSysFuncCall の時，意味を持つ．
 // @note このクラスでは 0 を返す．
 ymuint
-EiExprBase1::argument_num() const
+EiExpr::argument_num() const
 {
   return 0;
 }
@@ -317,9 +315,40 @@ EiExprBase1::argument_num() const
 // @note kVpiFuncCall/kVpiSysFuncCall の時，意味を持つ．
 // @note このクラスでは NULL を返す．
 const VlExpr*
-EiExprBase1::argument(ymuint pos) const
+EiExpr::argument(ymuint pos) const
 {
   return NULL;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiExprBase
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+EiExprBase::EiExprBase(const PtExpr* pt_expr) :
+  mPtExpr(pt_expr)
+{
+}
+
+// @brief デストラクタ
+EiExprBase::~EiExprBase()
+{
+}
+
+// @brief Verilog-HDL の文字列を得る．
+string
+EiExprBase::decompile() const
+{
+  return pt_expr()->decompile();
+}
+
+/// @brief パース木の定義要素を返す．
+const PtBase*
+EiExprBase::pt_obj() const
+{
+  return pt_expr();
 }
 
 
@@ -329,8 +358,8 @@ EiExprBase1::argument(ymuint pos) const
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-EiOperation::EiOperation(const PtBase* pt_expr) :
-  EiExprBase1(pt_expr)
+EiOperation::EiOperation(const PtExpr* pt_expr) :
+  EiExprBase(pt_expr)
 {
 }
 
@@ -353,189 +382,11 @@ EiOperation::is_operation() const
   return true;
 }
 
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiOperation::decompile_impl(int ppri) const
+// @brief 演算子のタイプを返す．
+tVpiOpType
+EiOperation::op_type() const
 {
-  // 各演算子を表す文字列のテーブル
-  static const char* sym_table[] = {
-    "",               // dummy
-    "-",              // vpiMinusOp
-    "+",              // vpiPlusOp
-    "!",              // vpiNotOp
-    "~",              // vpiBitNeg
-    "&",              // vpiUnaryAndOp
-    "~&",             // vpiUnaryNandOp
-    "|",              // vpiUnaryOrOp
-    "~|",             // vpiUnaryNorOp
-    "^",              // vpiUnaryXorOp
-    "~^",             // vpiUnaryXNorOp
-    "-",              // vpiSubOp
-    "/",              // vpiDivOp
-    "%",              // vpiModOp
-    "==",             // vpiEqOp
-    "!=",             // vpiNeqOp
-    "===",            // vpiCaseEqOp
-    "!==",            // vpiCaseNeqOp
-    ">",              // vpiGtOp
-    ">=",             // vpiGeOp
-    "<",              // vpiLtOp
-    "<=",             // vpiLeOp
-    "<<",             // vpiLShiftOp
-    ">>",             // vpiRShiftOp
-    "+",              // vpiAddOp
-    "*",              // vpiMultOp
-    "&&",             // vpiLogAndOp
-    "||",             // vpiLogOrOp
-    "&",              // vpiBitAndOp
-    "|",              // vpiBitOrOp
-    "^",              // vpiBitXorOp
-    "~^",             // vpiBitXNorOp
-    "?:",             // vpiConditionOp(dummy)
-    "{}",             // vpiConcatOp(dummy)
-    "{{}}",           // vpiMultiConcatOp(dummy)
-    "or",             // vpiEventOrOp(dummy)
-    ";",              // vpiNullOp(dummy)
-    ",",              // vpiListOp(dummy)
-    ":",              // vpiMinTypMaxOp(dummy)
-    "posedge ",       // vpiPosedgeOp
-    "negedge ",       // vpiNegedgeOp
-    "<<<",            // vpiArithLShiftOp
-    ">>>",            // vpiArithRShiftOp
-    "**"              // vpiPowerOp
-  };
-
-  // 優先順位のテーブル
-  static int pri_table[] = {
-    0,                // dummy
-    13,               // vpiMinusOp
-    13,               // vpiPlusOp
-    13,               // vpiNotOp
-    13,               // vpiBitNegOp
-    13,               // vpiUnaryAndOp
-    13,               // vpiUnaryNandOp
-    13,               // vpiUnaryOrOp
-    13,               // vpiUnaryNorOp
-    13,               // vpiUnaryXorOp
-    13,               // vpiUnaryXNorOp
-    10,               // vpiSubOp
-    11,               // vpiDivOp
-    11,               // vpiModOp
-    7,                // vpiEqOp
-    7,                // vpiNeqOp
-    7,                // vpiCaseEqOp
-    7,                // vpiCaseNeqOp
-    8,                // vpiGtOp
-    8,                // vpiGeOp
-    8,                // vpiLtOp
-    8,                // vpiLeOp
-    9,                // vpiLShiftOp
-    9,                // vpiRShiftOp
-    10,               // vpiAddOp
-    11,               // vpiMultOp
-    3,                // vpiLogAndOp
-    2,                // vpiLogOrOp
-    6,                // vpiBitAndOp
-    4,                // vpiBitOrOp
-    5,                // vpiBitXorOp
-    5,                // vpiBitXNorOp
-    1,                // vpiConditionOp
-    0,                // vpiConcatOp
-    0,                // vpiMultiConcatOp
-    0,                // vpiEventOrOp
-    0,                // vpiNullOp
-    0,                // vpiListOp
-    0,                // vpiMinTypMaxOp
-    0,                // vpiPosedgeOp
-    0,                // vpiNegedgeOp
-    9,                // vpiArithLShiftOp
-    9,                // vpiArithRShiftOp
-    12                // vpiPowerOp
-  };
-
-  string ans;
-
-  tVpiOpType optype = op_type();
-  // parent_optype の優先順位が自分の優先順位よりも高ければ括弧が必要
-  bool need_par = false;
-  int pri = pri_table[optype];
-  if ( ppri > pri ) {
-    need_par = true;
-    ans += "(";
-  }
-
-  switch ( optype ) {
-
-    // 空
-  case kVpiNullOp:
-    break;
-
-    // 単項演算子
-  case kVpiMinusOp:
-  case kVpiNotOp:
-  case kVpiBitNegOp:
-  case kVpiPlusOp:
-  case kVpiUnaryAndOp:
-  case kVpiUnaryNandOp:
-  case kVpiUnaryNorOp:
-  case kVpiUnaryOrOp:
-  case kVpiUnaryXNorOp:
-  case kVpiUnaryXorOp:
-  case kVpiPosedgeOp:
-  case kVpiNegedgeOp:
-    ans += sym_table[optype] + _operand(0)->decompile_impl(pri);
-    break;
-
-    // 二項演算子
-  case kVpiAddOp:
-  case kVpiArithLShiftOp:
-  case kVpiArithRShiftOp:
-  case kVpiBitAndOp:
-  case kVpiBitOrOp:
-  case kVpiBitXNorOp:
-  case kVpiBitXorOp:
-  case kVpiCaseEqOp:
-  case kVpiCaseNeqOp:
-  case kVpiDivOp:
-  case kVpiEqOp:
-  case kVpiGeOp:
-  case kVpiGtOp:
-  case kVpiLShiftOp:
-  case kVpiLeOp:
-  case kVpiLogAndOp:
-  case kVpiLogOrOp:
-  case kVpiLtOp:
-  case kVpiModOp:
-  case kVpiMultOp:
-  case kVpiNeqOp:
-  case kVpiPowerOp:
-  case kVpiRShiftOp:
-  case kVpiSubOp:
-    ans += _operand(0)->decompile_impl(pri) + sym_table[optype] +
-      _operand(1)->decompile_impl(pri);
-    break;
-
-    // 三項演算子
-  case kVpiConditionOp:
-    ans += _operand(0)->decompile_impl(pri) + "?" +
-      _operand(1)->decompile_impl(pri) + ":" +
-      _operand(2)->decompile_impl(pri);
-    break;
-
-  case kVpiMinTypMaxOp:
-    ans += _operand(0)->decompile_impl(pri) + ":" +
-      _operand(1)->decompile_impl(pri) + ":" +
-      _operand(2)->decompile_impl(pri);
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  if ( need_par ) {
-    ans += ")";
-  }
-  return ans;
+  return pt_expr()->op_type();
 }
 
 END_NAMESPACE_YM_VERILOG

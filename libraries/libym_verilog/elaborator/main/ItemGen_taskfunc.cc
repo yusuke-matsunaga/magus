@@ -66,9 +66,9 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
     if ( pt_left && pt_right ) {
       int left_val = 0;
       int right_val = 0;
-      if ( !instantiate_range(parent,
-			      pt_left, pt_right,
-			      left_val, right_val) ) {
+      if ( !evaluate_range(parent,
+			   pt_left, pt_right,
+			   left_val, right_val) ) {
 	return;
       }
       taskfunc = factory().new_Function(parent,	pt_item,
@@ -224,8 +224,8 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   if ( pt_left && pt_right ) {
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(parent, pt_left, pt_right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(parent, pt_left, pt_right,
+			 left_val, right_val) ) {
       return NULL;
     }
     func = factory().new_Function(parent, pt_function,

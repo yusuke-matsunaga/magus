@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] index1, index2 パート選択式
 // @param[in] index1_val, index2_val パート選択式の値
 ElbExpr*
-EiFactory::new_PartSelect(const PtBase* pt_expr,
+EiFactory::new_PartSelect(const PtExpr* pt_expr,
 			  ElbExpr* parent_expr,
 			  const PtExpr* index1,
 			  const PtExpr* index2,
@@ -48,7 +48,7 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 // @param[in] parent_expr 本体の式
 // @param[in] index1, inde2 パート選択式
 ElbExpr*
-EiFactory::new_PartSelect(const PtBase* pt_expr,
+EiFactory::new_PartSelect(const PtExpr* pt_expr,
 			  ElbExpr* parent_expr,
 			  int index1,
 			  int index2)
@@ -68,7 +68,7 @@ EiFactory::new_PartSelect(const PtBase* pt_expr,
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
 ElbExpr*
-EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
+EiFactory::new_PlusPartSelect(const PtExpr* pt_expr,
 			      ElbExpr* parent_expr,
 			      ElbExpr* base,
 			      const PtExpr* range,
@@ -88,7 +88,7 @@ EiFactory::new_PlusPartSelect(const PtBase* pt_expr,
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
 ElbExpr*
-EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
+EiFactory::new_MinusPartSelect(const PtExpr* pt_expr,
 			       ElbExpr* parent_expr,
 			       ElbExpr* base,
 			       const PtExpr* range,
@@ -109,9 +109,9 @@ EiFactory::new_MinusPartSelect(const PtBase* pt_expr,
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] parent_expr 対象の式
-EiPartSelect::EiPartSelect(const PtBase* pt_expr,
+EiPartSelect::EiPartSelect(const PtExpr* pt_expr,
 			   ElbExpr* parent_expr) :
-  EiExprBase1(pt_expr),
+  EiExprBase(pt_expr),
   mParentExpr(parent_expr)
 {
 }
@@ -161,7 +161,7 @@ EiPartSelect::parent_expr() const
 // @param[in] parent_expr 対象の式
 // @param[in] index1, index2 パート選択式
 // @param[in] index1_val, index2_val パート選択式の値
-EiConstPartSelect::EiConstPartSelect(const PtBase* pt_expr,
+EiConstPartSelect::EiConstPartSelect(const PtExpr* pt_expr,
 				     ElbExpr* parent_expr,
 				     const PtExpr* index1,
 				     const PtExpr* index2,
@@ -241,31 +241,6 @@ EiConstPartSelect::right_range_val() const
   return mRightVal;
 }
 
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiConstPartSelect::decompile_impl(int ppri) const
-{
-  string ans = parent_expr()->decompile();
-  string left_str;
-  string right_str;
-  if ( mLeftRange && mRightRange ) {
-    left_str = mLeftRange->decompile();
-    right_str = mRightRange->decompile();
-  }
-  else {
-    ostringstream buf;
-    buf << mLeftVal;
-    left_str = buf.str();
-    buf.clear();
-    buf << mRightVal;
-    right_str = buf.str();
-  }
-  ans += "[" + left_str + ":" + right_str + "]";
-
-  return ans;
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -286,7 +261,7 @@ EiConstPartSelect::set_reqsize(tVpiValueType type)
 // @param[in] base 範囲のベースアドレスを表す式
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
-EiVarPartSelect::EiVarPartSelect(const PtBase* pt_expr,
+EiVarPartSelect::EiVarPartSelect(const PtExpr* pt_expr,
 				 ElbExpr* parent_expr,
 				 ElbExpr* base,
 				 const PtExpr* range,
@@ -357,7 +332,7 @@ EiVarPartSelect::set_reqsize(tVpiValueType type)
 // @param[in] base 範囲のベースアドレスを表す式
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
-EiPlusPartSelect::EiPlusPartSelect(const PtBase* pt_expr,
+EiPlusPartSelect::EiPlusPartSelect(const PtExpr* pt_expr,
 				   ElbExpr* parent_expr,
 				   ElbExpr* base,
 				   const PtExpr* range,
@@ -378,17 +353,6 @@ EiPlusPartSelect::range_mode() const
   return kVpiPlusRange;
 }
 
-// @brief decompile() の実装関数
-// @param[in] ppri 親の演算子の優先順位
-string
-EiPlusPartSelect::decompile_impl(int ppri) const
-{
-  ostringstream buf;
-  buf << parent_expr()->decompile() << "[" << base()->decompile()
-      << "+:" << range_width() << "]";
-  return buf.str();
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiMinusPartSelect
@@ -400,7 +364,7 @@ EiPlusPartSelect::decompile_impl(int ppri) const
 // @param[in] base 範囲のベースアドレスを表す式
 // @param[in] range 範囲を表す式
 // @param[in] range_val 範囲の値
-EiMinusPartSelect::EiMinusPartSelect(const PtBase* pt_expr,
+EiMinusPartSelect::EiMinusPartSelect(const PtExpr* pt_expr,
 				     ElbExpr* parent_expr,
 				     ElbExpr* base,
 				     const PtExpr* range,
@@ -419,17 +383,6 @@ tVpiRangeMode
 EiMinusPartSelect::range_mode() const
 {
   return kVpiMinusRange;
-}
-
-// @brief decompile() の実装関数
-// @param[in] ppri 親の演算子の優先順位
-string
-EiMinusPartSelect::decompile_impl(int ppri) const
-{
-  ostringstream buf;
-  buf << parent_expr()->decompile() << "[" << base()->decompile()
-      << "-:" << range_width() << "]";
-  return buf.str();
 }
 
 END_NAMESPACE_YM_VERILOG

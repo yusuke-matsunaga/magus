@@ -371,10 +371,12 @@ SptModule::explicit_name() const
 // @param portref_array ポートの参照式の配列
 // @param ext_name 外向きの名前
 SptPort::SptPort(const FileRegion& file_region,
-		 PtiPortRefArray portref_array,
+		 const PtExpr* portref,
+		 PtExprArray portref_array,
 		 const char* ext_name) :
   mFileRegion(file_region),
   mExtName(ext_name),
+  mPortRef(portref),
   mPortRefArray(portref_array)
 {
 }
@@ -404,24 +406,34 @@ SptPort::ext_name() const
 // 内部のポート結線リストのサイズの取得
 // @return 内部のポート結線リストのサイズ
 ymuint
-SptPort::portref_num() const
+SptPort::portref_size() const
 {
   return mPortRefArray.size();
 }
 
 // 内部のポート結線の取得
 // @return 先頭のポート結線
-const PtPortRef*
-SptPort::portref(ymuint pos) const
+const PtExpr*
+SptPort::portref_elem(ymuint pos) const
 {
   return mPortRefArray[pos];
 }
 
-// @brief portref を得る．
-PtiPortRef*
-SptPort::_portref(ymuint pos)
+// @brief 内部のポート結線の報告の取得
+tVpiDirection
+SPtPort::portref_dir(ymuint pos) const
 {
-  return mPortRefArray[pos];
+  return mDirArray[pos];
+}
+
+// @brief portref の方向を設定する．
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+// @param[in] dir 方向
+void
+SptPort::_set_portref_dir(ymuint pos,
+			  tVpiDirection dir)
+{
+  mDirArray[pos] = dir;
 }
 
 

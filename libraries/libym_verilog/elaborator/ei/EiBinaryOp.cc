@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr0 オペランド
 // @param[in] opr1 オペランド
 ElbExpr*
-EiFactory::new_BinaryOp(const PtBase* pt_expr,
+EiFactory::new_BinaryOp(const PtExpr* pt_expr,
 			tVpiOpType op_type,
 			ElbExpr* opr0,
 			ElbExpr* opr1)
@@ -36,48 +36,20 @@ EiFactory::new_BinaryOp(const PtBase* pt_expr,
   void* p;
   switch( op_type ) {
   case kVpiBitAndOp:
-    p = mAlloc.get_memory(sizeof(EiBitAndOp));
-    expr = new (p) EiBitAndOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiBitOrOp:
-    p = mAlloc.get_memory(sizeof(EiBitOrOp));
-    expr = new (p) EiBitOrOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiBitXNorOp:
-    p = mAlloc.get_memory(sizeof(EiBitXnorOp));
-    expr = new (p) EiBitXnorOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiBitXorOp:
-    p = mAlloc.get_memory(sizeof(EiBitXorOp));
-    expr = new (p) EiBitXorOp(pt_expr, opr0, opr1);
+    p = mAlloc.get_memory(sizeof(EiBinaryBitOp));
+    expr = new (p) EiBinaryBitOp(pt_expr, opr0, opr1);
     break;
 
   case kVpiAddOp:
-    p = mAlloc.get_memory(sizeof(EiAddOp));
-    expr = new (p) EiAddOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiSubOp:
-    p = mAlloc.get_memory(sizeof(EiSubOp));
-    expr = new (p) EiSubOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiMultOp:
-    p = mAlloc.get_memory(sizeof(EiMultOp));
-    expr = new (p) EiMultOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiDivOp:
-    p = mAlloc.get_memory(sizeof(EiDivOp));
-    expr = new (p) EiDivOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiModOp:
-    p = mAlloc.get_memory(sizeof(EiModOp));
-    expr = new (p) EiModOp(pt_expr, opr0, opr1);
+    p = mAlloc.get_memory(sizeof(EiBinaryArithOp));
+    expr = new (p) EiBinaryArithOp(pt_expr, opr0, opr1);
     break;
 
   case kVpiPowerOp:
@@ -86,73 +58,29 @@ EiFactory::new_BinaryOp(const PtBase* pt_expr,
     break;
 
   case kVpiLShiftOp:
-    p = mAlloc.get_memory(sizeof(EiLShiftOp));
-    expr = new (p) EiLShiftOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiRShiftOp:
-    p = mAlloc.get_memory(sizeof(EiRShiftOp));
-    expr = new (p) EiRShiftOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiArithLShiftOp:
-    p = mAlloc.get_memory(sizeof(EiArithLShiftOp));
-    expr = new (p) EiArithLShiftOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiArithRShiftOp:
-    p = mAlloc.get_memory(sizeof(EiArithRShiftOp));
-    expr = new (p) EiArithRShiftOp(pt_expr, opr0, opr1);
+    p = mAlloc.get_memory(sizeof(EiShiftOp));
+    expr = new (p) EiShiftOp(pt_expr, opr0, opr1);
     break;
 
   case kVpiLogAndOp:
-    p = mAlloc.get_memory(sizeof(EiLogAndOp));
-    expr = new (p) EiLogAndOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiLogOrOp:
-    p = mAlloc.get_memory(sizeof(EiLogOrOp));
-    expr = new (p) EiLogOrOp(pt_expr, opr0, opr1);
+    p = mAlloc.get_memory(sizeof(EiBinaryLogOp));
+    expr = new (p) EiBinaryLogOp(pt_expr, opr0, opr1);
     break;
 
   case kVpiCaseEqOp:
-    p = mAlloc.get_memory(sizeof(EiCaseEqOp));
-    expr = new (p) EiCaseEqOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiCaseNeqOp:
-    p = mAlloc.get_memory(sizeof(EiCaseNeqOp));
-    expr = new (p) EiCaseNeqOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiEqOp:
-    p = mAlloc.get_memory(sizeof(EiEqOp));
-    expr = new (p) EiEqOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiNeqOp:
-    p = mAlloc.get_memory(sizeof(EiNeqOp));
-    expr = new (p) EiNeqOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiGeOp:
-    p = mAlloc.get_memory(sizeof(EiGeOp));
-    expr = new (p) EiGeOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiGtOp:
-    p = mAlloc.get_memory(sizeof(EiGtOp));
-    expr = new (p) EiGtOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiLeOp:
-    p = mAlloc.get_memory(sizeof(EiLeOp));
-    expr = new (p) EiLeOp(pt_expr, opr0, opr1);
-    break;
-
   case kVpiLtOp:
-    p = mAlloc.get_memory(sizeof(EiLtOp));
-    expr = new (p) EiLtOp(pt_expr, opr0, opr1);
+    p = mAlloc.get_memory(sizeof(EiCompareOp));
+    expr = new (p) EiCompareOp(pt_expr, opr0, opr1);
     break;
 
   default:
@@ -168,13 +96,13 @@ EiFactory::new_BinaryOp(const PtBase* pt_expr,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
-EiBinaryOp::EiBinaryOp(const PtBase* pt_obj,
+EiBinaryOp::EiBinaryOp(const PtExpr* pt_expr,
 		       ElbExpr* opr1,
 		       ElbExpr* opr2) :
-  EiOperation(pt_obj)
+  EiOperation(pt_expr)
 {
   mOpr[0] = opr1;
   mOpr[1] = opr2;
@@ -214,13 +142,13 @@ EiBinaryOp::_operand(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
-EiCompareOp::EiCompareOp(const PtBase* pt_obj,
+EiCompareOp::EiCompareOp(const PtExpr* pt_expr,
 			 ElbExpr* opr1,
 			 ElbExpr* opr2) :
-  EiBinaryOp(pt_obj, opr1, opr2)
+  EiBinaryOp(pt_expr, opr1, opr2)
 {
   // 比較演算は大きい方の型を用いる．
   tVpiValueType type1 = operand1()->value_type();
@@ -256,241 +184,17 @@ EiCompareOp::set_reqsize(tVpiValueType type)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiEqOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiEqOp::EiEqOp(const PtBase* pt_obj,
-	       ElbExpr* opr1,
-	       ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiEqOp::~EiEqOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiEqOp::op_type() const
-{
-  return kVpiEqOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiNeqOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiNeqOp::EiNeqOp(const PtBase* pt_obj,
-		 ElbExpr* opr1,
-		 ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiNeqOp::~EiNeqOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiNeqOp::op_type() const
-{
-  return kVpiNeqOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiCaseEqOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiCaseEqOp::EiCaseEqOp(const PtBase* pt_obj,
-		       ElbExpr* opr1,
-		       ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiCaseEqOp::~EiCaseEqOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiCaseEqOp::op_type() const
-{
-  return kVpiCaseEqOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiCaseNeqOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiCaseNeqOp::EiCaseNeqOp(const PtBase* pt_obj,
-			 ElbExpr* opr1,
-			 ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiCaseNeqOp::~EiCaseNeqOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiCaseNeqOp::op_type() const
-{
-  return kVpiCaseNeqOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiGtOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiGtOp::EiGtOp(const PtBase* pt_obj,
-	       ElbExpr* opr1,
-	       ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiGtOp::~EiGtOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiGtOp::op_type() const
-{
-  return kVpiGtOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiGeOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiGeOp::EiGeOp(const PtBase* pt_obj,
-	       ElbExpr* opr1,
-	       ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiGeOp::~EiGeOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiGeOp::op_type() const
-{
-  return kVpiGeOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiLtOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiLtOp::EiLtOp(const PtBase* pt_obj,
-	       ElbExpr* opr1,
-	       ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiLtOp::~EiLtOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiLtOp::op_type() const
-{
-  return kVpiLtOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiLeOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiLeOp::EiLeOp(const PtBase* pt_obj,
-	       ElbExpr* opr1,
-	       ElbExpr* opr2) :
-  EiCompareOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiLeOp::~EiLeOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiLeOp::op_type() const
-{
-  return kVpiLeOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス EiBinaryLogOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
-EiBinaryLogOp::EiBinaryLogOp(const PtBase* pt_obj,
+EiBinaryLogOp::EiBinaryLogOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1,
 			     ElbExpr* opr2) :
-  EiBinaryOp(pt_obj, opr1, opr2)
+  EiBinaryOp(pt_expr, opr1, opr2)
 {
   // 論理演算の場合はオペランドも1ビットスカラーのはずだが
   // 仕様書には max(L(i), L(j)) なんて書いてある．
@@ -525,73 +229,17 @@ EiBinaryLogOp::set_reqsize(tVpiValueType type)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiLogAndOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiLogAndOp::EiLogAndOp(const PtBase* pt_obj,
-		       ElbExpr* opr1,
-		       ElbExpr* opr2) :
-  EiBinaryLogOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiLogAndOp::~EiLogAndOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiLogAndOp::op_type() const
-{
-  return kVpiLogAndOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiLogOrOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiLogOrOp::EiLogOrOp(const PtBase* pt_obj,
-		     ElbExpr* opr1,
-		     ElbExpr* opr2) :
-  EiBinaryLogOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiLogOrOp::~EiLogOrOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiLogOrOp::op_type() const
-{
-  return kVpiLogOrOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス EiBinaryBitOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
-EiBinaryBitOp::EiBinaryBitOp(const PtBase* pt_obj,
+EiBinaryBitOp::EiBinaryBitOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1,
 			     ElbExpr* opr2) :
-  EiBinaryOp(pt_obj, opr1, opr2)
+  EiBinaryOp(pt_expr, opr1, opr2)
 {
   // オペランドのサイズの大きい方で決まる．
   tVpiValueType type1 = operand1()->value_type();
@@ -627,129 +275,17 @@ EiBinaryBitOp::set_reqsize(tVpiValueType type)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiBitAndOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiBitAndOp::EiBitAndOp(const PtBase* pt_obj,
-		       ElbExpr* opr1,
-		       ElbExpr* opr2) :
-  EiBinaryBitOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiBitAndOp::~EiBitAndOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiBitAndOp::op_type() const
-{
-  return kVpiBitAndOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiBitOrOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiBitOrOp::EiBitOrOp(const PtBase* pt_obj,
-		     ElbExpr* opr1,
-		     ElbExpr* opr2) :
-  EiBinaryBitOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiBitOrOp::~EiBitOrOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiBitOrOp::op_type() const
-{
-  return kVpiBitOrOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiBitXorOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiBitXorOp::EiBitXorOp(const PtBase* pt_obj,
-		       ElbExpr* opr1,
-		       ElbExpr* opr2) :
-  EiBinaryBitOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiBitXorOp::~EiBitXorOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiBitXorOp::op_type() const
-{
-  return kVpiBitXorOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiBitXnorOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiBitXnorOp::EiBitXnorOp(const PtBase* pt_obj,
-		       ElbExpr* opr1,
-		       ElbExpr* opr2) :
-  EiBinaryBitOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiBitXnorOp::~EiBitXnorOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiBitXnorOp::op_type() const
-{
-  return kVpiBitXNorOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス EiBinaryArithOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
-EiBinaryArithOp::EiBinaryArithOp(const PtBase* pt_obj,
+EiBinaryArithOp::EiBinaryArithOp(const PtExpr* pt_expr,
 				 ElbExpr* opr1,
 				 ElbExpr* opr2) :
-  EiBinaryOp(pt_obj, opr1, opr2)
+  EiBinaryOp(pt_expr, opr1, opr2)
 {
   // オペランドのサイズの大きい方で決まる．
   tVpiValueType type1 = operand1()->value_type();
@@ -783,157 +319,17 @@ EiBinaryArithOp::set_reqsize(tVpiValueType type)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EiAddOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiAddOp::EiAddOp(const PtBase* pt_obj,
-		 ElbExpr* opr1,
-		 ElbExpr* opr2) :
-  EiBinaryArithOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiAddOp::~EiAddOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiAddOp::op_type() const
-{
-  return kVpiAddOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiSubOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiSubOp::EiSubOp(const PtBase* pt_obj,
-		 ElbExpr* opr1,
-		 ElbExpr* opr2) :
-  EiBinaryArithOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiSubOp::~EiSubOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiSubOp::op_type() const
-{
-  return kVpiSubOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiMultOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiMultOp::EiMultOp(const PtBase* pt_obj,
-		   ElbExpr* opr1,
-		   ElbExpr* opr2) :
-  EiBinaryArithOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiMultOp::~EiMultOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiMultOp::op_type() const
-{
-  return kVpiMultOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiDivOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiDivOp::EiDivOp(const PtBase* pt_obj,
-		 ElbExpr* opr1,
-		 ElbExpr* opr2) :
-  EiBinaryArithOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiDivOp::~EiDivOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiDivOp::op_type() const
-{
-  return kVpiDivOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiModOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiModOp::EiModOp(const PtBase* pt_obj,
-		 ElbExpr* opr1,
-		 ElbExpr* opr2) :
-  EiBinaryArithOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiModOp::~EiModOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiModOp::op_type() const
-{
-  return kVpiModOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス EiPowerOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
-EiPowerOp::EiPowerOp(const PtBase* pt_obj,
+EiPowerOp::EiPowerOp(const PtExpr* pt_expr,
 		     ElbExpr* opr1,
 		     ElbExpr* opr2) :
-  EiBinaryOp(pt_obj, opr1, opr2)
+  EiBinaryOp(pt_expr, opr1, opr2)
 {
   // 巾乗演算の場合, どちらかのオペランドが real, integer, signed
   // なら結果は real, どちらも unsigned の時のみ unsigned となる．
@@ -971,26 +367,19 @@ EiPowerOp::set_reqsize(tVpiValueType type)
   // 第2オペランドは不変
 }
 
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiPowerOp::op_type() const
-{
-  return kVpiPowerOp;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiShiftOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
-EiShiftOp::EiShiftOp(const PtBase* pt_obj,
+EiShiftOp::EiShiftOp(const PtExpr* pt_expr,
 		     ElbExpr* opr1,
 		     ElbExpr* opr2) :
-  EiBinaryOp(pt_obj, opr1, opr2)
+  EiBinaryOp(pt_expr, opr1, opr2)
 {
   // シフト演算子は第1オペランドの型とサイズをそのまま引き継ぐ
   mType = opr1->value_type();
@@ -1027,118 +416,6 @@ EiShiftOp::set_reqsize(tVpiValueType type)
   operand1()->set_reqsize(mType);
 
   // 第2オペランドは不変
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiLShiftOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiLShiftOp::EiLShiftOp(const PtBase* pt_obj,
-		       ElbExpr* opr1,
-		       ElbExpr* opr2) :
-  EiShiftOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiLShiftOp::~EiLShiftOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiLShiftOp::op_type() const
-{
-  return kVpiLShiftOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiRShiftOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiRShiftOp::EiRShiftOp(const PtBase* pt_obj,
-		       ElbExpr* opr1,
-		       ElbExpr* opr2) :
-  EiShiftOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiRShiftOp::~EiRShiftOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiRShiftOp::op_type() const
-{
-  return kVpiRShiftOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiArithLShiftOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiArithLShiftOp::EiArithLShiftOp(const PtBase* pt_obj,
-				 ElbExpr* opr1,
-				 ElbExpr* opr2) :
-  EiShiftOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiArithLShiftOp::~EiArithLShiftOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiArithLShiftOp::op_type() const
-{
-  return kVpiArithLShiftOp;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス EiArithRShiftOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
-// @param[in] opr1 オペランド1
-// @param[in] opr2 オペランド2
-EiArithRShiftOp::EiArithRShiftOp(const PtBase* pt_obj,
-				 ElbExpr* opr1,
-				 ElbExpr* opr2) :
-  EiShiftOp(pt_obj, opr1, opr2)
-{
-}
-
-// @brief デストラクタ
-EiArithRShiftOp::~EiArithRShiftOp()
-{
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiArithRShiftOp::op_type() const
-{
-  return kVpiArithRShiftOp;
 }
 
 END_NAMESPACE_YM_VERILOG

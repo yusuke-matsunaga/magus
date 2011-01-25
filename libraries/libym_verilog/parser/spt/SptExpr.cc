@@ -54,7 +54,7 @@ SptExpr::type() const
 // @return 演算子の種類
 // このクラスでは kVpiNullOp を返す．
 tVpiOpType
-SptExpr::opr_type() const
+SptExpr::op_type() const
 {
   return kVpiNullOp;
 }
@@ -243,7 +243,7 @@ SptOpr1::SptOpr1(const FileRegion& file_region,
 		 PtExpr* opr2,
 		 PtExpr* opr3) :
   SptExpr(file_region, kPtOprExpr),
-  mOprType(op_type)
+  mOpType(op_type)
 {
   mExprList[0] = opr1;
   if ( (mExprList[1] = opr2) ) {
@@ -267,9 +267,9 @@ SptOpr1::~SptOpr1()
 // @brief 演算子の種類の取得
 // @return 演算子の種類
 tVpiOpType
-SptOpr1::opr_type() const
+SptOpr1::op_type() const
 {
-  return mOprType;
+  return mOpType;
 }
 
 // @brief インデックスとして使える式のチェック
@@ -279,7 +279,7 @@ bool
 SptOpr1::is_index_expr() const
 {
   // 算術演算なら本当はOKだけどめんどくさいので単項のマイナスのみOKとする．
-  if ( mOprType == kVpiMinusOp || mOprType == kVpiNullOp ) {
+  if ( mOpType == kVpiMinusOp || mOpType == kVpiNullOp ) {
     return operand(0)->is_index_expr();
   }
   else {
@@ -292,10 +292,10 @@ SptOpr1::is_index_expr() const
 int
 SptOpr1::index_value() const
 {
-  if ( mOprType == kVpiNullOp ) {
+  if ( mOpType == kVpiNullOp ) {
     return operand(0)->index_value();
   }
-  if ( mOprType == kVpiMinusOp ) {
+  if ( mOpType == kVpiMinusOp ) {
     return - operand(0)->index_value();
   }
   return 0;
@@ -331,7 +331,7 @@ SptOpr2::SptOpr2(const FileRegion& file_region,
 		 tVpiOpType op_type,
 		 PtExprArray opr_array) :
   SptExpr(file_region, kPtOprExpr),
-  mOprType(op_type),
+  mOpType(op_type),
   mExprArray(opr_array)
 {
 }
@@ -344,9 +344,9 @@ SptOpr2::~SptOpr2()
 // @brief 演算子の種類の取得
 // @return 演算子の種類
 tVpiOpType
-SptOpr2::opr_type() const
+SptOpr2::op_type() const
 {
-  return mOprType;
+  return mOpType;
 }
 
 // @brief インデックスとして使える式のチェック

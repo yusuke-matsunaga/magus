@@ -30,7 +30,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] index_expr ビット選択式
 // @param[in] index_val ビット選択式の値
 ElbExpr*
-EiFactory::new_BitSelect(const PtBase* pt_expr,
+EiFactory::new_BitSelect(const PtExpr* pt_expr,
 			 ElbExpr* base_expr,
 			 const PtExpr* index_expr,
 			 int index_val)
@@ -47,7 +47,7 @@ EiFactory::new_BitSelect(const PtBase* pt_expr,
 // @param[in] base_expr 本体の式
 // @param[in] bit_index_val ビット選択式の値
 ElbExpr*
-EiFactory::new_BitSelect(const PtBase* pt_expr,
+EiFactory::new_BitSelect(const PtExpr* pt_expr,
 			 ElbExpr* base_expr,
 			 int index_val)
 {
@@ -62,7 +62,7 @@ EiFactory::new_BitSelect(const PtBase* pt_expr,
 // @param[in] base_expr 本体のオブジェクト
 // @param[in] bit_index ビット選択式
 ElbExpr*
-EiFactory::new_BitSelect(const PtBase* pt_expr,
+EiFactory::new_BitSelect(const PtExpr* pt_expr,
 			 ElbExpr* base_expr,
 			 ElbExpr* index_expr)
 {
@@ -81,10 +81,10 @@ EiFactory::new_BitSelect(const PtBase* pt_expr,
 // @param[in] pt_expr パース木の定義要素
 // @param[in] base_expr 対象の式
 // @param[in] index_expr ビット選択式
-EiBitSelect::EiBitSelect(const PtBase* pt_expr,
+EiBitSelect::EiBitSelect(const PtExpr* pt_expr,
 			 ElbExpr* base_expr,
 			 ElbExpr* index_expr) :
-  EiExprBase1(pt_expr),
+  EiExprBase(pt_expr),
   mBaseExpr(base_expr),
   mIndexExpr(index_expr)
 {
@@ -167,17 +167,6 @@ EiBitSelect::set_reqsize(tVpiValueType type)
 {
 }
 
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiBitSelect::decompile_impl(int ppri) const
-{
-  string ans = parent_expr()->decompile();
-  ans += "[" + mIndexExpr->decompile() + "]";
-
-  return ans;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiConstBitSelect
@@ -188,11 +177,11 @@ EiBitSelect::decompile_impl(int ppri) const
 // @param[in] base_expr 対象の式
 // @param[in] index_expr ビット選択式
 // @param[in] index_val ビット選択式の値
-EiConstBitSelect::EiConstBitSelect(const PtBase* pt_expr,
+EiConstBitSelect::EiConstBitSelect(const PtExpr* pt_expr,
 				   ElbExpr* base_expr,
 				   const PtExpr* index_expr,
 				   int index_val) :
-  EiExprBase1(pt_expr),
+  EiExprBase(pt_expr),
   mBaseExpr(base_expr),
   mIndexExpr(index_expr),
   mIndexVal(index_val)
@@ -266,25 +255,6 @@ const VlExpr*
 EiConstBitSelect::parent_expr() const
 {
   return mBaseExpr;
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiConstBitSelect::decompile_impl(int ppri) const
-{
-  string ans = parent_expr()->decompile() + "[";
-  if ( mIndexExpr ) {
-    ans += mIndexExpr->decompile();
-  }
-  else {
-    ostringstream buf;
-    buf << mIndexVal;
-    ans += buf.str();
-  }
-  ans += "]";
-
-  return ans;
 }
 
 // @brief 要求される式の型を計算してセットする．

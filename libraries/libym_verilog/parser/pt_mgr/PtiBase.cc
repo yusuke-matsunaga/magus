@@ -17,37 +17,6 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-// @class PtiPortRef PtiModule.h "PtiModule.h"
-// @brief port reference を表すクラス
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-PtiPortRef::PtiPortRef() :
-  mDir(kVpiNoDirection)
-{
-}
-
-// @brief デストラクタ
-PtiPortRef::~PtiPortRef()
-{
-}
-
-// @brief 方向をセットする．
-void
-PtiPortRef::set_dir(tVpiDirection dir)
-{
-  mDir = dir;
-}
-
-// @brief 方向を得る．
-tVpiDirection
-PtiPortRef::dir() const
-{
-  return mDir;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス PtiExpr
 //////////////////////////////////////////////////////////////////////
 
@@ -161,7 +130,7 @@ decompile_opr(const PtExpr* expr,
 
   string ans;
 
-  tVpiOpType optype = expr->opr_type();
+  tVpiOpType optype = expr->op_type();
   // parent_optype の優先順位が自分の優先順位よりも高ければ括弧が必要
   bool need_par = false;
   int pri = pri_table[optype];

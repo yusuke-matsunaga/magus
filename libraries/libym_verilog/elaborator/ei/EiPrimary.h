@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief プライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiPrimary :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
@@ -30,7 +30,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
-  EiPrimary(const PtBase* pt_expr,
+  EiPrimary(const PtExpr* pt_expr,
 	    ElbDecl* obj);
 
   /// @brief デストラクタ
@@ -89,12 +89,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -106,12 +100,13 @@ private:
 
 };
 
+
 //////////////////////////////////////////////////////////////////////
 /// @class EiParamPrimary EiPrimary.h "EiPrimary.h"
 /// @brief パラメータ用のプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiParamPrimary :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
@@ -120,7 +115,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
-  EiParamPrimary(const PtBase* pt_expr,
+  EiParamPrimary(const PtExpr* pt_expr,
 		 ElbParameter* obj);
 
   /// @brief デストラクタ
@@ -179,12 +174,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -202,7 +191,7 @@ private:
 /// @brief 配列要素のプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiArrayElemPrimary :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
@@ -213,7 +202,7 @@ private:
   /// @param[in] obj 本体のオブジェクト
   /// @param[in] dim 配列の次元
   /// @param[in] index_list インデックスのリスト
-  EiArrayElemPrimary(const PtBase* pt_expr,
+  EiArrayElemPrimary(const PtExpr* pt_expr,
 		     ElbDeclArray* obj,
 		     ymuint dim,
 		     ElbExpr** index_list);
@@ -287,12 +276,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -316,7 +299,7 @@ private:
 /// @brief VlNamedObj のプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiScopePrimary :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
@@ -325,7 +308,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
-  EiScopePrimary(const PtBase* pt_expr,
+  EiScopePrimary(const PtExpr* pt_expr,
 		 const VlNamedObj* obj);
 
   /// @brief デストラクタ
@@ -360,6 +343,11 @@ public:
   bool
   is_const() const;
 
+  /// @brief 対象のオブジェクトを返す．
+  virtual
+  const VlNamedObj*
+  scope_obj() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -372,17 +360,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
-  /// @brief 対象のオブジェクトを返す．
-  virtual
-  const VlNamedObj*
-  scope_obj() const;
 
 
 private:
@@ -401,7 +378,7 @@ private:
 /// @brief VlPrimitive のプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiPrimitivePrimary :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
@@ -410,7 +387,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
-  EiPrimitivePrimary(const PtBase* pt_expr,
+  EiPrimitivePrimary(const PtExpr* pt_expr,
 		     ElbPrimitive* obj);
 
   /// @brief デストラクタ
@@ -462,12 +439,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:

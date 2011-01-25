@@ -118,9 +118,9 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(namedobj,
-			    pt_left, pt_right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(namedobj,
+			 pt_left, pt_right,
+			 left_val, right_val) ) {
       // エラーが起きたのでスキップする．
       continue;
     }
@@ -438,8 +438,8 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
   if ( pt_left && pt_right ) {
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(parent, pt_left, pt_right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(parent, pt_left, pt_right,
+			 left_val, right_val) ) {
       return;
     }
     param_head = factory().new_ParamHead(module, pt_head,
@@ -503,8 +503,8 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
   if ( pt_left && pt_right ) {
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(parent, pt_left, pt_right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(parent, pt_left, pt_right,
+			 left_val, right_val) ) {
       return;
     }
     net_head = factory().new_DeclHead(parent, pt_head,
@@ -605,7 +605,11 @@ DeclGen::link_net_assign(ElbDecl* net,
 {
   // 実際には対応する continuous assign 文を作る．
 
+#if 0
   ElbExpr* lhs_expr = factory().new_Primary(pt_item, net);
+#else
+  ElbExpr* lhs_expr = factory().new_Primary(NULL, net);
+#endif
   ElbLhs* lhs = factory().new_Lhs(lhs_expr);
 
   const VlNamedObj* parent = net->parent();
@@ -635,8 +639,8 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
   if ( pt_left && pt_right ) {
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(parent, pt_left, pt_right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(parent, pt_left, pt_right,
+			 left_val, right_val) ) {
       return;
     }
     reg_head = factory().new_DeclHead(parent, pt_head,
@@ -877,8 +881,8 @@ DeclGen::instantiate_dimension_list(const VlNamedObj*  parent,
     const PtExpr* pt_right = pt_range->right();
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(parent, pt_left, pt_right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(parent, pt_left, pt_right,
+			 left_val, right_val) ) {
       ok = false;
       break;
     }

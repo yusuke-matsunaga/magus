@@ -29,7 +29,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 			 const ElbEnv& env,
 			 const PtExpr* pt_expr)
 {
-  tVpiOpType op_type = pt_expr->opr_type();
+  tVpiOpType op_type = pt_expr->op_type();
   ymuint opr_size = pt_expr->operand_num();
 
   ElbExpr* opr0 = NULL;
@@ -271,7 +271,7 @@ ElbValue
 ExprGen::evaluate_opr(const VlNamedObj* parent,
 		      const PtExpr* pt_expr)
 {
-  tVpiOpType op_type = pt_expr->opr_type();
+  tVpiOpType op_type = pt_expr->op_type();
   ymuint opr_size = pt_expr->operand_num();
 
   ElbValue val0;

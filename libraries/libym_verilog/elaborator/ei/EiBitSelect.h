@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "EiPrimary.h"
+#include "EiExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief 可変ビット選択式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiBitSelect :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
@@ -31,7 +31,7 @@ private:
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] base_expr 対象の式
   /// @param[in] index_expr ビット選択式
-  EiBitSelect(const PtBase* pt_expr,
+  EiBitSelect(const PtExpr* pt_expr,
 	      ElbExpr* base_expr,
 	      ElbExpr* index_expr);
 
@@ -106,12 +106,6 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -132,7 +126,7 @@ private:
 /// @brief 固定ビット選択式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiConstBitSelect :
-  public EiExprBase1
+  public EiExprBase
 {
   friend class EiFactory;
 
@@ -143,7 +137,7 @@ private:
   /// @param[in] base_expr 対象の式
   /// @param[in] index_expr ビット選択式
   /// @param[in] index_val ビット選択式の値
-  EiConstBitSelect(const PtBase* pt_expr,
+  EiConstBitSelect(const PtExpr* pt_expr,
 		   ElbExpr* base_expr,
 		   const PtExpr* index_expr,
 		   int index_val);
@@ -218,12 +212,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:

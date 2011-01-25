@@ -200,8 +200,8 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
 
   int left_val = 0;
   int right_val = 0;
-  if ( !instantiate_range(parent, pt_left, pt_right,
-			  left_val, right_val) ) {
+  if ( !evaluate_range(parent, pt_left, pt_right,
+		       left_val, right_val) ) {
     return;
   }
 

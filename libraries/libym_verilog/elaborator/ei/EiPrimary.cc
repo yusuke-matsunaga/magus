@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] pt_expr パース木の定義要素
 // @param[in] obj 本体のオブジェクト
 ElbExpr*
-EiFactory::new_Primary(const PtBase* pt_expr,
+EiFactory::new_Primary(const PtExpr* pt_expr,
 		       ElbDecl* obj)
 {
   void* p = mAlloc.get_memory(sizeof(EiPrimary));
@@ -41,7 +41,7 @@ EiFactory::new_Primary(const PtBase* pt_expr,
 // @param[in] pt_expr パース木の定義要素
 // @param[in] obj 本体のオブジェクト
 ElbExpr*
-EiFactory::new_Primary(const PtBase* pt_expr,
+EiFactory::new_Primary(const PtExpr* pt_expr,
 		       ElbParameter* obj)
 {
   void* p = mAlloc.get_memory(sizeof(EiParamPrimary));
@@ -55,7 +55,7 @@ EiFactory::new_Primary(const PtBase* pt_expr,
 // @param[in] obj 本体のオブジェクト
 // @param[in] index_list インデックスのリスト
 ElbExpr*
-EiFactory::new_Primary(const PtBase* pt_expr,
+EiFactory::new_Primary(const PtExpr* pt_expr,
 		       ElbDeclArray* obj,
 		       const vector<ElbExpr*>& index_list)
 {
@@ -75,7 +75,7 @@ EiFactory::new_Primary(const PtBase* pt_expr,
 // @param[in] pt_expr パース木中で参照している要素
 // @param[in] arg 引数本体
 ElbExpr*
-EiFactory::new_ArgHandle(const PtBase* pt_expr,
+EiFactory::new_ArgHandle(const PtExpr* pt_expr,
 			 const VlNamedObj* arg)
 {
   void* p = mAlloc.get_memory(sizeof(EiScopePrimary));
@@ -88,7 +88,7 @@ EiFactory::new_ArgHandle(const PtBase* pt_expr,
 // @param[in] pt_expr パース木中で参照している要素
 // @param[in] arg 引数本体
 ElbExpr*
-EiFactory::new_ArgHandle(const PtBase* pt_expr,
+EiFactory::new_ArgHandle(const PtExpr* pt_expr,
 			 ElbPrimitive* arg)
 {
   void* p = mAlloc.get_memory(sizeof(EiPrimitivePrimary));
@@ -105,9 +105,9 @@ EiFactory::new_ArgHandle(const PtBase* pt_expr,
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] obj 本体のオブジェクト
-EiPrimary::EiPrimary(const PtBase* pt_obj,
+EiPrimary::EiPrimary(const PtExpr* pt_expr,
 		     ElbDecl* obj) :
-  EiExprBase1(pt_obj),
+  EiExprBase(pt_expr),
   mObj(obj)
 {
 }
@@ -136,7 +136,7 @@ EiPrimary::value_type() const
 bool
 EiPrimary::is_const() const
 {
-  return mObj->is_consttype();
+  return false;
 }
 
 // @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
@@ -152,14 +152,6 @@ const VlDecl*
 EiPrimary::decl_obj() const
 {
   return mObj;
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiPrimary::decompile_impl(int ppri) const
-{
-  return mObj->name();
 }
 
 // @brief 要求される式の型を計算してセットする．
@@ -179,9 +171,9 @@ EiPrimary::set_reqsize(tVpiValueType type)
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] obj 本体のオブジェクト
-EiParamPrimary::EiParamPrimary(const PtBase* pt_obj,
+EiParamPrimary::EiParamPrimary(const PtExpr* pt_expr,
 			       ElbParameter* obj) :
-  EiExprBase1(pt_obj),
+  EiExprBase(pt_expr),
   mObj(obj)
 {
 }
@@ -210,7 +202,7 @@ EiParamPrimary::value_type() const
 bool
 EiParamPrimary::is_const() const
 {
-  return mObj->is_consttype();
+  return true;
 }
 
 // @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
@@ -226,14 +218,6 @@ const VlDecl*
 EiParamPrimary::decl_obj() const
 {
   return mObj;
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiParamPrimary::decompile_impl(int ppri) const
-{
-  return mObj->name();
 }
 
 // @brief 要求される式の型を計算してセットする．
@@ -255,11 +239,11 @@ EiParamPrimary::set_reqsize(tVpiValueType type)
 // @param[in] obj 本体のオブジェクト
 // @param[in] dim 配列の次元
 // @param[in] index_list インデックスのリスト
-EiArrayElemPrimary::EiArrayElemPrimary(const PtBase* pt_obj,
+EiArrayElemPrimary::EiArrayElemPrimary(const PtExpr* pt_expr,
 				       ElbDeclArray* obj,
 				       ymuint dim,
 				       ElbExpr** index_list) :
-  EiExprBase1(pt_obj),
+  EiExprBase(pt_expr),
   mObj(obj),
   mDim(dim),
   mIndexList(index_list)
@@ -326,14 +310,6 @@ EiArrayElemPrimary::declarray_index(ymuint pos) const
   return mIndexList[pos];
 }
 
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiArrayElemPrimary::decompile_impl(int ppri) const
-{
-  return mObj->name();
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -351,9 +327,9 @@ EiArrayElemPrimary::set_reqsize(tVpiValueType type)
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] obj 本体のオブジェクト
-EiScopePrimary::EiScopePrimary(const PtBase* pt_obj,
+EiScopePrimary::EiScopePrimary(const PtExpr* pt_expr,
 			       const VlNamedObj* obj) :
-  EiExprBase1(pt_obj),
+  EiExprBase(pt_expr),
   mObj(obj)
 {
 }
@@ -385,14 +361,6 @@ EiScopePrimary::is_const() const
   return false;
 }
 
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiScopePrimary::decompile_impl(int ppri) const
-{
-  return mObj->name();
-}
-
 // @brief 対象のオブジェクトを返す．
 const VlNamedObj*
 EiScopePrimary::scope_obj() const
@@ -417,9 +385,9 @@ EiScopePrimary::set_reqsize(tVpiValueType type)
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] obj 本体のオブジェクト
-EiPrimitivePrimary::EiPrimitivePrimary(const PtBase* pt_obj,
+EiPrimitivePrimary::EiPrimitivePrimary(const PtExpr* pt_expr,
 				       ElbPrimitive* obj) :
-  EiExprBase1(pt_obj),
+  EiExprBase(pt_expr),
   mObj(obj)
 {
 }
@@ -449,14 +417,6 @@ bool
 EiPrimitivePrimary::is_const() const
 {
   return false;
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiPrimitivePrimary::decompile_impl(int ppri) const
-{
-  return mObj->name();
 }
 
 // @brief 対象のオブジェクトを返す．

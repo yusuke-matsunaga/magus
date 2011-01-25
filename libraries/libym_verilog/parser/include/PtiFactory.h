@@ -182,7 +182,7 @@ public:
   new_Port(const FileRegion& fr,
 	   const char* ext_name = NULL) = 0;
 
-  /// @brief ポートの生成 (ポート参照式が一つのポート)
+  /// @brief ポートの生成 (ポート参照式があるポート)
   /// @param[in] fr ファイル位置の情報
   /// @param[in] portref ポートに接続している式 (ポート参照式)
   /// @param[in] ext_name ポート名 (空文字列の場合もある)
@@ -190,54 +190,8 @@ public:
   virtual
   PtiPort*
   new_Port(const FileRegion& fr,
-	   PtiPortRef* portref,
+	   PtExpr* port_ref,
 	   const char* ext_name) = 0;
-
-  /// @brief ポートの生成 (ポート参照式のリストを持つポート)
-  /// @param[in] fr ファイル位置の情報
-  /// @param[in] portref_array ポートに接続している式 (ポート参照式) のリスト
-  /// @param[in] ext_name ポート名 (空文字列の場合もある)
-  /// @return 生成されたポート
-  virtual
-  PtiPort*
-  new_Port(const FileRegion& fr,
-	   PtiPortRefArray portref_array,
-	   const char* ext_name) = 0;
-
-  /// @brief ポート参照式の生成
-  /// @param[in] fr ファイル位置の情報
-  /// @param[in] name ポートに接続している内部の識別子名
-  /// @return 生成されたポート参照式
-  virtual
-  PtiPortRef*
-  new_PortRef(const FileRegion& fr,
-	      const char* name) = 0;
-
-  /// @brief ビット指定つきポート参照式の生成
-  /// @param[in] fr ファイル位置の情報
-  /// @param[in] name ポートに接続している内部の識別子名
-  /// @param[in] index ビット指定用の式
-  /// @return 生成されたポート参照式
-  virtual
-  PtiPortRef*
-  new_PortRef(const FileRegion& fr,
-	      const char* name,
-	      PtExpr* index) = 0;
-
-  /// @brief 範囲指定付きポート参照式の生成
-  /// @param[in] fr ファイル位置の情報
-  /// @param[in] name ポートに接続している内部の識別子名
-  /// @param[in] range_mode 範囲指定のモード
-  /// @param[in] left 範囲指定の左側の式
-  /// @param[in] right 範囲指摘の右側の式
-  /// @return 生成されたポート参照式
-  virtual
-  PtiPortRef*
-  new_PortRef(const FileRegion& fr,
-	      const char* name,
-	      tVpiRangeMode range_mode,
-	      PtExpr* left,
-	      PtExpr* right) = 0;
 
 
   //////////////////////////////////////////////////////////////////////
