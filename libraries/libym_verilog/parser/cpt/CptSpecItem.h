@@ -99,8 +99,8 @@ protected:
   /// @brief コンストラクタ
   CptSpecPath(const FileRegion& file_region,
 	      tVpiSpecPathType id,
-	      PtExpr* expr,
-	      PtPathDecl* path_decl);
+	      const PtExpr* expr,
+	      const PtPathDecl* path_decl);
 
   /// @brief デストラクタ
   virtual
@@ -151,10 +151,10 @@ private:
   tVpiSpecPathType mId;
 
   // モジュールパスの式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
   // パス記述
-  PtPathDecl* mPathDecl;
+  const PtPathDecl* mPathDecl;
 
 };
 
@@ -177,8 +177,8 @@ protected:
 	      int op,
 	      PtExprArray output_array,
 	      int output_pol,
-	      PtExpr* expr,
-	      PtPathDelay* path_delay);
+	      const PtExpr* expr,
+	      const PtPathDelay* path_delay);
 
   /// @brief デストラクタ
   virtual
@@ -268,8 +268,8 @@ private:
   int mOp;
   PtExprArray mOutputArray;
   int mOutputPol;
-  PtExpr* mExpr;
-  PtPathDelay* mPathDelay;
+  const PtExpr* mExpr;
+  const PtPathDelay* mPathDelay;
 
 };
 
@@ -286,42 +286,42 @@ protected:
 
   /// @brief コンストラクタ
   CptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1);
+	       const PtExpr* value1);
 
   /// @brief コンストラクタ
   CptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2);
+	       const PtExpr* value1,
+	       const PtExpr* value2);
 
   /// @brief コンストラクタ
   CptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2,
-	       PtExpr* value3);
+	       const PtExpr* value1,
+	       const PtExpr* value2,
+	       const PtExpr* value3);
 
   /// @brief コンストラクタ
   CptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2,
-	       PtExpr* value3,
-	       PtExpr* value4,
-	       PtExpr* value5,
-	       PtExpr* value6);
+	       const PtExpr* value1,
+	       const PtExpr* value2,
+	       const PtExpr* value3,
+	       const PtExpr* value4,
+	       const PtExpr* value5,
+	       const PtExpr* value6);
 
   /// @brief コンストラクタ
   CptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2,
-	       PtExpr* value3,
-	       PtExpr* value4,
-	       PtExpr* value5,
-	       PtExpr* value6,
-	       PtExpr* value7,
-	       PtExpr* value8,
-	       PtExpr* value9,
-	       PtExpr* value10,
-	       PtExpr* value11,
-	       PtExpr* value12);
+	       const PtExpr* value1,
+	       const PtExpr* value2,
+	       const PtExpr* value3,
+	       const PtExpr* value4,
+	       const PtExpr* value5,
+	       const PtExpr* value6,
+	       const PtExpr* value7,
+	       const PtExpr* value8,
+	       const PtExpr* value9,
+	       const PtExpr* value10,
+	       const PtExpr* value11,
+	       const PtExpr* value12);
 
   /// @brief デストラクタ
   virtual
@@ -354,7 +354,7 @@ private:
   FileRegion mFileRegion;
 
   // ディレイ値
-  PtExpr* mValues[12];
+  const PtExpr* mValues[12];
 
 };
 

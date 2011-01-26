@@ -357,25 +357,46 @@ CptPort::ext_name() const
   return mExtName;
 }
 
-// 内部のポート結線リストのサイズを取り出す．
+// @brief 内側のポート結線を表す式の取得
+const PtExpr*
+CptPort::portref() const
+{
+  return NULL;
+}
+
+// @brief 内部のポート結線リストのサイズの取得
 ymuint
-CptPort::portref_num() const
+CptPort::portref_size() const
 {
   return 0;
 }
 
-// 内部のポート結線の先頭を取り出す．
-const PtPortRef*
-CptPort::portref(ymuint pos) const
+// @brief 内部のポート結線リストの取得
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+const PtExpr*
+CptPort::portref_elem(ymuint pos) const
 {
+  assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
-// @brief portref を得る．
-PtiPortRef*
-CptPort::_portref(ymuint pos)
+//@brief 内部ポート結線の方向の取得
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+tVpiDirection
+CptPort::portref_dir(ymuint pos) const
 {
-  return NULL;
+  assert_not_reached(__FILE__, __LINE__);
+  return kVpiNoDirection;
+}
+
+// @brief portref の方向を設定する．
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+// @param[in] dir 方向
+void
+CptPort::_set_portref_dir(ymuint pos,
+			  tVpiDirection dir)
+{
+  assert_not_reached(__FILE__, __LINE__);
 }
 
 
@@ -385,7 +406,7 @@ CptPort::_portref(ymuint pos)
 
 // コンストラクタ
 CptPort1::CptPort1(const FileRegion& file_region,
-		   PtiPortRef* portref,
+		   const PtExpr* portref,
 		   const char* ext_name) :
   CptPort(file_region, ext_name),
   mPortRef(portref)
@@ -397,25 +418,46 @@ CptPort1::~CptPort1()
 {
 }
 
-// 内部のポート結線リストのサイズを取り出す．
+// @brief 内側のポート結線を表す式の取得
+const PtExpr*
+CptPort1::portref() const
+{
+  return mPortRef;
+}
+
+// @brief 内部のポート結線リストのサイズの取得
 ymuint
-CptPort1::portref_num() const
+CptPort1::portref_size() const
 {
   return 1;
 }
 
-// 内部のポート結線の先頭を取り出す．
-const PtPortRef*
-CptPort1::portref(ymuint /* pos */) const
+// @brief 内部のポート結線リストの取得
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+const PtExpr*
+CptPort1::portref_elem(ymuint pos) const
 {
+  assert_cond( pos == 0, __FILE__, __LINE__);
   return mPortRef;
 }
 
-// @brief portref を得る．
-PtiPortRef*
-CptPort1::_portref(ymuint /* pos */)
+// @brief 内部ポート結線の方向の取得
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+tVpiDirection
+CptPort1::portref_dir(ymuint pos) const
 {
-  return mPortRef;
+  return mDir;
+}
+
+// @brief portref の方向を設定する．
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+// @param[in] dir 方向
+void
+CptPort1::_set_portref_dir(ymuint pos,
+			   tVpiDirection dir)
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  mDir = dir;
 }
 
 
@@ -425,10 +467,13 @@ CptPort1::_portref(ymuint /* pos */)
 
 // コンストラクタ
 CptPort2::CptPort2(const FileRegion& file_region,
-		   PtiPortRefArray portref_array,
+		   const PtExpr* portref,
+		   PtExprArray portref_array,
+		   tVpiDirection* dir_array,
 		   const char* ext_name) :
-  CptPort(file_region, ext_name),
-  mPortRefArray(portref_array)
+  CptPort1(file_region, portref, ext_name),
+  mPortRefArray(portref_array),
+  mDirArray(dir_array)
 {
 }
 
@@ -437,166 +482,37 @@ CptPort2::~CptPort2()
 {
 }
 
-// 内部のポート結線リストのサイズを取り出す．
+// @brief 内部のポート結線リストのサイズの取得
 ymuint
-CptPort2::portref_num() const
+CptPort2::portref_size() const
 {
   return mPortRefArray.size();
 }
 
-// 内部のポート結線を取り出す．
-const PtPortRef*
-CptPort2::portref(ymuint pos) const
+// @brief 内部のポート結線リストの取得
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+const PtExpr*
+CptPort2::portref_elem(ymuint pos) const
 {
   return mPortRefArray[pos];
 }
 
-// @brief portref を得る．
-PtiPortRef*
-CptPort2::_portref(ymuint pos)
+// @brief 内部ポート結線の方向の取得
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+tVpiDirection
+CptPort2::portref_dir(ymuint pos) const
 {
-  return mPortRefArray[pos];
+  return mDirArray[pos];
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// port reference のベース実装クラス
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-CptPortRef::CptPortRef(const FileRegion& file_region,
-		       const char* name) :
-  mFileRegion(file_region),
-  mName(name)
+// @brief portref の方向を設定する．
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+// @param[in] dir 方向
+void
+CptPort2::_set_portref_dir(ymuint pos,
+			   tVpiDirection dir)
 {
-}
-
-// デストラクタ
-CptPortRef::~CptPortRef()
-{
-}
-
-// ファイル位置を返す．
-FileRegion
-CptPortRef::file_region() const
-{
-  return mFileRegion;
-}
-
-// 名前を取り出す．
-const char*
-CptPortRef::name() const
-{
-  return mName;
-}
-
-// @brief インデックスの取得
-// @return インデックスを表す式
-// このクラスでは NULL を返す．
-const PtExpr*
-CptPortRef::index() const
-{
-  return NULL;
-}
-
-// @brief 範囲指定モードの取得
-// @retval kVpiNoRange 範囲指定なし
-// @retval kVpiConstRange [ a : b ] のタイプ
-// @retval kVpiPlusRange  [ a :+ b ] のタイプ
-// @retval kVpiMinusRange [ a :- b ] のタイプ
-// このクラスでは kVpiNoRange を返す．
-tVpiRangeMode
-CptPortRef::range_mode() const
-{
-  return kVpiNoRange;
-}
-
-// @brief 範囲の左側の式の取得
-// @return 範囲の左側の式
-// このクラスでは NULL を返す．
-const PtExpr*
-CptPortRef::left_range() const
-{
-  return NULL;
-}
-
-// @brief 範囲の右側の式の取得
-// @return 範囲の右側の式
-// このクラスでは NULL を返す．
-const PtExpr*
-CptPortRef::right_range() const
-{
-  return NULL;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// インデックスつきの port reference を表すクラス
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-CptPortRefI::CptPortRefI(const FileRegion& file_region,
-			 const char* name,
-			 PtExpr* index) :
-  CptPortRef(file_region, name),
-  mIndex(index)
-{
-}
-
-// デストラクタ
-CptPortRefI::~CptPortRefI()
-{
-}
-
-// インデックスを返す．
-const PtExpr*
-CptPortRefI::index() const
-{
-  return mIndex;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// 範囲指定つきの port reference を表すクラス
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-CptPortRefR::CptPortRefR(const FileRegion& file_region,
-			 const char* name,
-			 tVpiRangeMode mode,
-			 PtExpr* left,
-			 PtExpr* right) :
-  CptPortRef(file_region, name),
-  mMode(mode),
-  mLeftRange(left),
-  mRightRange(right)
-{
-}
-
-// デストラクタ
-CptPortRefR::~CptPortRefR()
-{
-}
-
-// range のモードを取り出す．
-tVpiRangeMode
-CptPortRefR::range_mode() const
-{
-  return mMode;
-}
-
-// range の MSB を取り出す．
-const PtExpr*
-CptPortRefR::left_range() const
-{
-  return mLeftRange;
-}
-
-// range の LSB を取り出す．
-const PtExpr*
-CptPortRefR::right_range() const
-{
-  return mRightRange;
+  mDirArray[pos] = dir;
 }
 
 
@@ -633,7 +549,7 @@ CptPortRefR::right_range() const
 // @param item_array 要素のリスト
 // @return 生成されたモジュール
 // paramport_array の内容と paramhead_array の内容は重複しない．
-PtModule*
+const PtModule*
 CptFactory::new_Module(const FileRegion& file_region,
 		       const char* name,
 		       bool macro,
@@ -699,7 +615,7 @@ CptFactory::new_Port(const FileRegion& file_region,
 // @return 生成されたポート
 PtiPort*
 CptFactory::new_Port(const FileRegion& file_region,
-		     PtiPortRef* portref,
+		     const PtExpr* portref,
 		     const char* ext_name)
 {
   ++ mNumPort;
@@ -709,64 +625,22 @@ CptFactory::new_Port(const FileRegion& file_region,
 
 // ポートの生成
 // @param file_region ファイル位置の情報
+// @param[in] portref ポートに接続している式 (ポート参照式)
 // @param portref_list ポートに接続している式 (ポート参照式) のリスト
 // @param ext_name ポート名 (空文字列の場合もある)
 // @return 生成されたポート
 PtiPort*
 CptFactory::new_Port(const FileRegion& file_region,
-		     PtiPortRefArray portref_array,
+		     const PtExpr* portref,
+		     PtExprArray portref_array,
 		     const char* ext_name)
 {
   ++ mNumPort;
+  ymuint n = portref_array.size();
+  tVpiDirection* dir_array = alloc_array<tVpiDirection>(n);
   void* p = alloc().get_memory(sizeof(CptPort2));
-  return new (p) CptPort2(file_region, portref_array, ext_name);
-}
-
-// ポート参照式の生成
-// @param file_region ファイル位置の情報
-// @param name ポートに接続している内部の識別子名
-// @return 生成されたポート参照式
-PtiPortRef*
-CptFactory::new_PortRef(const FileRegion& file_region,
-			const char* name)
-{
-  ++ mNumPortRef;
-  void* p = alloc().get_memory(sizeof(CptPortRef));
-  return new (p) CptPortRef(file_region, name);
-}
-
-// ビット指定つきポート参照式の生成
-// @param file_region ファイル位置の情報
-// @param name ポートに接続している内部の識別子名
-// @param index ビット指定用の式
-// @return 生成されたポート参照式
-PtiPortRef*
-CptFactory::new_PortRef(const FileRegion& file_region,
-			const char* name,
-			PtExpr* index)
-{
-  ++ mNumPortRefI;
-  void* p = alloc().get_memory(sizeof(CptPortRefI));
-  return new (p) CptPortRefI(file_region, name, index);
-}
-
-// 範囲指定付きポート参照式の生成
-// @param file_region ファイル位置の情報
-// @param name ポートに接続している内部の識別子名
-// @param range_mode 範囲指定のモード
-// @param left 範囲指定の左側の式
-// @param right 範囲指摘の右側の式
-// @return 生成されたポート参照式
-PtiPortRef*
-CptFactory::new_PortRef(const FileRegion& file_region,
-			const char* name,
-			tVpiRangeMode range_mode,
-			PtExpr* left,
-			PtExpr* right)
-{
-  ++ mNumPortRefR;
-  void* p = alloc().get_memory(sizeof(CptPortRefR));
-  return new (p) CptPortRefR(file_region, name, range_mode, left, right);
+  return new (p) CptPort2(file_region, portref,
+			  portref_array, dir_array, ext_name);
 }
 
 END_NAMESPACE_YM_VERILOG

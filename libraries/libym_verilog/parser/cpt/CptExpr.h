@@ -234,7 +234,7 @@ protected:
   // コンストラクタ
   CptOpr1(const FileRegion& file_region,
 	  tVpiOpType op_type,
-	  PtExpr* opr);
+	  const PtExpr* opr);
 
   // デストラクタ
   virtual
@@ -284,7 +284,7 @@ private:
   FileRegion mFileRegion;
 
   // オペランド
-  PtExpr* mOpr;
+  const PtExpr* mOpr;
 
 };
 
@@ -301,8 +301,8 @@ protected:
 
   // コンストラクタ
   CptOpr2(tVpiOpType op_type,
-	  PtExpr* opr1,
-	  PtExpr* opr2);
+	  const PtExpr* opr1,
+	  const PtExpr* opr2);
 
   // デストラクタ
   virtual
@@ -339,7 +339,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // オペランド
-  PtExpr* mOpr[2];
+  const PtExpr* mOpr[2];
 
 };
 
@@ -356,9 +356,9 @@ protected:
 
   // コンストラクタ
   CptOpr3(tVpiOpType op_type,
-	  PtExpr* opr1,
-	  PtExpr* opr2,
-	  PtExpr* opr3);
+	  const PtExpr* opr1,
+	  const PtExpr* opr2,
+	  const PtExpr* opr3);
 
   // デストラクタ
   virtual
@@ -395,7 +395,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // オペランド
-  PtExpr* mOpr[3];
+  const PtExpr* mOpr[3];
 
 };
 
@@ -508,9 +508,9 @@ class CptMinTypMax :
 private:
 
   // コンストラクタ
-  CptMinTypMax(PtExpr* val0,
-	       PtExpr* val1,
-	       PtExpr* val2);
+  CptMinTypMax(const PtExpr* val0,
+	       const PtExpr* val1,
+	       const PtExpr* val2);
 
   // デストラクタ
   virtual
@@ -557,7 +557,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  PtExpr* mValue[3];
+  const PtExpr* mValue[3];
 
 };
 
@@ -971,8 +971,8 @@ protected:
   CptPrimaryR(const FileRegion& file_region,
 	      const char* name,
 	      tVpiRangeMode mode,
-	      PtExpr* left,
-	      PtExpr* right);
+	      const PtExpr* left,
+	      const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1022,10 +1022,10 @@ private:
   tVpiRangeMode mMode;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -1044,8 +1044,8 @@ protected:
   CptPrimaryCR(const FileRegion& file_region,
 	       const char* name,
 	       tVpiRangeMode mode,
-	       PtExpr* left,
-	       PtExpr* right);
+	       const PtExpr* left,
+	       const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1080,8 +1080,8 @@ protected:
 	       const char* name,
 	       PtExprArray index_array,
 	       tVpiRangeMode mode,
-	       PtExpr* left,
-	       PtExpr* right);
+	       const PtExpr* left,
+	       const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1118,10 +1118,10 @@ private:
   tVpiRangeMode mMode;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -1268,8 +1268,8 @@ protected:
 	       PtNameBranchArray nb_array,
 	       const char* tail_name,
 	       tVpiRangeMode mode,
-	       PtExpr* left,
-	       PtExpr* right);
+	       const PtExpr* left,
+	       const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1313,8 +1313,8 @@ protected:
 		const char* tail_name,
 		PtExprArray index_array,
 		tVpiRangeMode mode,
-		PtExpr* left,
-		PtExpr* right);
+		const PtExpr* left,
+		const PtExpr* right);
 
   // デストラクタ
   virtual

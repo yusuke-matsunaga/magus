@@ -32,7 +32,7 @@ private:
   /// コンストラクタ
   SptControl(const FileRegion& file_region,
 	     tPtCtrlType type,
-	     PtExpr* expr,
+	     const PtExpr* expr,
 	     PtExprArray event_array);
 
   /// デストラクタ
@@ -92,7 +92,7 @@ private:
   tPtCtrlType mType;
 
   // 遅延を表す式/繰り返し回数を表す式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
   // イベントの配列
   PtExprArray mEventArray;
@@ -112,7 +112,7 @@ private:
 
   /// コンストラクタ
   SptConnection(const FileRegion& file_region,
-		PtExpr* expr,
+		const PtExpr* expr,
 		const char* name = NULL);
 
   /// デストラクタ
@@ -153,7 +153,7 @@ private:
   const char* mName;
 
   // 接続を表す式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
 };
 
@@ -234,18 +234,18 @@ private:
 
   /// 一つの値をとるコンストラクタ
   SptDelay(const FileRegion& file_region,
-	   PtExpr* value1);
+	   const PtExpr* value1);
 
   /// 二つの値をとるコンストラクタ
   SptDelay(const FileRegion& file_region,
-	   PtExpr* value1,
-	   PtExpr* value2);
+	   const PtExpr* value1,
+	   const PtExpr* value2);
 
   /// 三つの値をとるコンストラクタ
   SptDelay(const FileRegion& file_region,
-	   PtExpr* value1,
-	   PtExpr* value2,
-	   PtExpr* value3);
+	   const PtExpr* value1,
+	   const PtExpr* value2,
+	   const PtExpr* value3);
 
   /// デストラクタ
   virtual
@@ -277,7 +277,7 @@ private:
   FileRegion mFileRegion;
 
   // 値のリスト
-  PtExpr* mValue[3];
+  const PtExpr* mValue[3];
 
 };
 
@@ -399,7 +399,7 @@ private:
   /// コンストラクタ
   SptAttrSpec(const FileRegion& file_region,
 	      const char* name,
-	      PtExpr* expr);
+	      const PtExpr* expr);
 
   /// デストラクタ
   virtual
@@ -439,7 +439,7 @@ private:
   const char* mName;
 
   // 式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
 };
 

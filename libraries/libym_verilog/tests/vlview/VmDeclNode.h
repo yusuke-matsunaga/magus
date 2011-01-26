@@ -40,12 +40,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -59,15 +59,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // IO宣言の配列
   vector<const VlIODecl*> mIOArray;
-  
+
 };
 
 
@@ -93,12 +93,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -112,15 +112,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // IO宣言要素
   const VlIODecl* mIODecl;
-  
+
 };
 
 
@@ -148,12 +148,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -167,7 +167,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -175,10 +175,10 @@ private:
 
   // ラベル
   QString mLabel;
-  
+
   // 宣言の配列
   vector<const VlDecl*> mDeclArray;
-  
+
 };
 
 
@@ -206,12 +206,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -225,7 +225,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -233,10 +233,126 @@ private:
 
   // ラベル
   QString mLabel;
-  
+
   // 宣言要素
   const VlDecl* mDecl;
-  
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmDeclArrayListNode VmDeclNode.h
+/// @brief Decl宣言要素のリストを表すノード
+//////////////////////////////////////////////////////////////////////
+class VmDeclArrayListNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] label ラベル
+  /// @param[in] decl_array 宣言要素の配列
+  VmDeclArrayListNode(const QString& label,
+		      const vector<const VlDeclArray*>& decl_array);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmDeclArrayListNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ラベル
+  QString mLabel;
+
+  // 宣言の配列
+  vector<const VlDeclArray*> mDeclArray;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class VmDeclArrayNode VmDeclNode.h
+/// @brief 宣言要素を表すノード
+//////////////////////////////////////////////////////////////////////
+class VmDeclArrayNode :
+  public VmNode
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] label ラベル
+  /// @param[in] declitem 宣言要素
+  VmDeclArrayNode(const QString& label,
+		  const VlDeclArray* declitem);
+
+  /// @brief デストラクタ
+  virtual
+  ~VmDeclArrayNode();
+
+
+public:
+
+  /// @brief データを返す．
+  /// @param[in] column コラム番号
+  /// @param[in] role
+  virtual
+  QVariant
+  data(int column,
+       int role) const;
+
+  /// @brief 対象のファイル上での位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+
+  /// @brief 子供の配列を作る．
+  virtual
+  void
+  expand() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ラベル
+  QString mLabel;
+
+  // 宣言要素
+  const VlDeclArray* mDecl;
+
 };
 
 
@@ -261,12 +377,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -280,15 +396,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親の宣言要素
   const VlDecl* mDecl;
-  
+
 };
 
 
@@ -313,12 +429,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -332,15 +448,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 範囲
   const VlRange* mRange;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

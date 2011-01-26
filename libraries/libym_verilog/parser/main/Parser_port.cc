@@ -34,19 +34,20 @@ Parser::new_Port1(const FileRegion& file_region)
 {
   // 明示的に外の名前がついていなくても内側の名前が1つで
   // 範囲指定が無いときには内側の名前を外側の名前とする．
-  const char* name = NULL;
-  PtExpr* portref = NULL;
   if ( mPortRefList.size() == 1 ) {
-    portref = mPortRefList.front();
+    const PtExpr* portref = mPortRefList.front();
+    const char* name = NULL;
     if ( portref->index_num() == 0 && portref->left_range() == NULL ) {
       name = portref->name();
     }
     mPortRefList.clear();
+    add_port( mFactory.new_Port(file_region, portref, name) );
   }
   else {
-    portref = new_Concat(file_region, &mPortRefList);
+    PtExprArray portref_array = to_array(&mPortRefList);
+    const PtExpr* portref = mFactory.new_Concat(file_region, portref_array);
+    add_port( mFactory.new_Port(file_region, portref, portref_array, NULL) );
   }
-  add_port( mFactory.new_Port(file_region, portref, name) );
 }
 
 // @brief ポートの生成 (外側の名前のみ指定するタイプ)
@@ -66,15 +67,15 @@ void
 Parser::new_Port3(const FileRegion& file_region,
 		  const char* name)
 {
-  PtExpr* portref = NULL;
   if ( mPortRefList.size() == 1 ) {
-    portref = mPortRefList.front();
+    add_port( mFactory.new_Port(file_region, mPortRefList.front(), name) );
     mPortRefList.clear();
   }
   else {
-    portref = new_Concat(file_region, &mPortRefList);
+    PtExprArray portref_array = to_array(&mPortRefList);
+    const PtExpr* portref = mFactory.new_Concat(file_region, portref_array);
+    add_port( mFactory.new_Port(file_region, portref, portref_array, name) );
   }
-  add_port( mFactory.new_Port(file_region, portref, name) );
 }
 
 // @brief ポートリストにポートを追加する．
@@ -109,7 +110,7 @@ Parser::new_PortArray(PtIOHeadArray iohead_array)
     for (ymuint j = 0; j < head->item_num(); ++ j) {
       const PtIOItem* elem = head->item(j);
       const char* name = elem->name();
-      PtExpr* portref = mFactory.new_Primary(elem->file_region(), name);
+      const PtExpr* portref = mFactory.new_Primary(elem->file_region(), name);
       array[n] = mFactory.new_Port(elem->file_region(), portref, name);
       ++ n;
     }
@@ -139,9 +140,9 @@ Parser::new_PortRef(const FileRegion& fr,
 void
 Parser::new_PortRef(const FileRegion& fr,
 		    const char* name,
-		    PtExpr* index)
+		    const PtExpr* index)
 {
-  PtrList<PtExpr> index_list(mCellAlloc);
+  PtrList<const PtExpr> index_list(mCellAlloc);
   index_list.push_back(index);
   PtExprArray index_array = to_array(&index_list);
   add_portref( mFactory.new_Primary(fr, name, index_array) );
@@ -157,8 +158,8 @@ void
 Parser::new_PortRef(const FileRegion& fr,
 		    const char* name,
 		    tVpiRangeMode range_mode,
-		    PtExpr* left,
-		    PtExpr* right)
+		    const PtExpr* left,
+		    const PtExpr* right)
 {
   add_portref( mFactory.new_Primary(fr, name, range_mode, left, right) );
 }
@@ -173,7 +174,7 @@ Parser::init_portref_list()
 // @brief ポート参照リストに要素を追加する．
 inline
 void
-Parser::add_portref(PtExpr* portref)
+Parser::add_portref(const PtExpr* portref)
 {
   mPortRefList.push_back(portref);
 }

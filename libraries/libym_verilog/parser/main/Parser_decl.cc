@@ -85,8 +85,8 @@ PtiIOHead*
 Parser::new_IOHead(const FileRegion& fr,
 		   tPtIOType type,
 		   bool sign,
-		   PtExpr* left,
-		   PtExpr* right)
+		   const PtExpr* left,
+		   const PtExpr* right)
 {
   return mFactory.new_IOHead(fr, type, sign, left, right);
 }
@@ -102,8 +102,8 @@ PtiIOHead*
 Parser::new_RegIOHead(const FileRegion& fr,
 		      tPtIOType type,
 		      bool sign,
-		      PtExpr* left,
-		      PtExpr* right)
+		      const PtExpr* left,
+		      const PtExpr* right)
 {
   return mFactory.new_RegIOHead(fr, type, sign, left, right);
 }
@@ -121,8 +121,8 @@ Parser::new_NetIOHead(const FileRegion& fr,
 		      tPtIOType type,
 		      tVpiNetType net_type,
 		      bool sign,
-		      PtExpr* left,
-		      PtExpr* right)
+		      const PtExpr* left,
+		      const PtExpr* right)
 {
   return mFactory.new_NetIOHead(fr, type, net_type, sign, left, right);
 }
@@ -130,7 +130,7 @@ Parser::new_NetIOHead(const FileRegion& fr,
 // @brief IOポート宣言リストにIO宣言ヘッダを追加する．
 void
 Parser::add_ioport_head(PtiIOHead* head,
-			PtrList<PtAttrInst>* attr_list)
+			PtrList<const PtAttrInst>* attr_list)
 {
   if ( head ) {
     reg_attrinst(head, attr_list);
@@ -153,7 +153,7 @@ Parser::flush_io()
 // @brief IO宣言リストにIO宣言ヘッダを追加する．
 void
 Parser::add_io_head(PtiIOHead* head,
-		    PtrList<PtAttrInst>* attr_list)
+		    PtrList<const PtAttrInst>* attr_list)
 {
   reg_attrinst(head, attr_list);
   mCurIOHeadList->push_back(head);
@@ -185,7 +185,7 @@ Parser::new_IOItem(const FileRegion& fr,
 void
 Parser::new_IOItem(const FileRegion& fr,
 		   const char* name,
-		   PtExpr* init_value)
+		   const PtExpr* init_value)
 {
   add_io_item( mFactory.new_IOItem(fr, name, init_value) );
 }
@@ -193,7 +193,7 @@ Parser::new_IOItem(const FileRegion& fr,
 // @brief IO宣言リストにIO宣言要素を追加する．
 inline
 void
-Parser::add_io_item(PtIOItem* item)
+Parser::add_io_item(const PtIOItem* item)
 {
   mIOItemList.push_back(item);
 }
@@ -219,8 +219,8 @@ Parser::new_ParamH(const FileRegion& fr)
 PtiDeclHead*
 Parser::new_ParamH(const FileRegion& fr,
 		   bool sign,
-		   PtExpr* left,
-		   PtExpr* right)
+		   const PtExpr* left,
+		   const PtExpr* right)
 {
   return mFactory.new_ParamH(fr, sign, left, right);
 }
@@ -238,7 +238,7 @@ Parser::new_ParamH(const FileRegion& fr,
 // @brief parameter port 宣言ヘッダを追加する．
 void
 Parser::add_paramport_head(PtiDeclHead* head,
-			   PtrList<PtAttrInst>* attr_list)
+			   PtrList<const PtAttrInst>* attr_list)
 {
   if ( head ) {
     reg_attrinst(head, attr_list);
@@ -279,8 +279,8 @@ Parser::new_LocalParamH(const FileRegion& fr)
 PtiDeclHead*
 Parser::new_LocalParamH(const FileRegion& fr,
 			bool sign,
-			PtExpr* left,
-			PtExpr* right)
+			const PtExpr* left,
+			const PtExpr* right)
 {
   return mFactory.new_LocalParamH(fr, sign, left, right);
 }
@@ -315,8 +315,8 @@ Parser::new_SpecParamH(const FileRegion& fr)
 // @param[in] right 範囲の右側の式
 PtiDeclHead*
 Parser::new_SpecParamH(const FileRegion& fr,
-		       PtExpr* left,
-		       PtExpr* right)
+		       const PtExpr* left,
+		       const PtExpr* right)
 {
   return mFactory.new_SpecParamH(fr, left, right);
 }
@@ -366,8 +366,8 @@ Parser::new_RegH(const FileRegion& fr,
 PtiDeclHead*
 Parser::new_RegH(const FileRegion& fr,
 		 bool sign,
-		 PtExpr* left,
-		 PtExpr* right)
+		 const PtExpr* left,
+		 const PtExpr* right)
 {
   return mFactory.new_RegH(fr, sign, left, right);
 }
@@ -393,7 +393,7 @@ PtiDeclHead*
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
 		 bool sign,
-		 PtStrength* strength)
+		 const PtStrength* strength)
 {
   return mFactory.new_NetH(fr, type, sign, strength);
 }
@@ -407,7 +407,7 @@ PtiDeclHead*
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
 		 bool sign,
-		 PtDelay* delay)
+		 const PtDelay* delay)
 {
   return mFactory.new_NetH(fr, type, sign, delay);
 }
@@ -422,8 +422,8 @@ PtiDeclHead*
 Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
 		 bool sign,
-		 PtStrength* strength,
-		 PtDelay* delay)
+		 const PtStrength* strength,
+		 const PtDelay* delay)
 {
   return mFactory.new_NetH(fr, type, sign, strength, delay);
 }
@@ -440,8 +440,8 @@ Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
 		 tVpiVsType vstype,
 		 bool sign,
-		 PtExpr* left,
-		 PtExpr* right)
+		 const PtExpr* left,
+		 const PtExpr* right)
 {
   return mFactory.new_NetH(fr, type, vstype, sign, left, right);
 }
@@ -459,9 +459,9 @@ Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
 		 tVpiVsType vstype,
 		 bool sign,
-		 PtExpr* left,
-		 PtExpr* right,
-		 PtStrength* strength)
+		 const PtExpr* left,
+		 const PtExpr* right,
+		 const PtStrength* strength)
 {
   return mFactory.new_NetH(fr, type, vstype, sign, left, right,	strength);
 }
@@ -479,9 +479,9 @@ Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
 		 tVpiVsType vstype,
 		 bool sign,
-		 PtExpr* left,
-		 PtExpr* right,
-		 PtDelay* delay)
+		 const PtExpr* left,
+		 const PtExpr* right,
+		 const PtDelay* delay)
 {
   return mFactory.new_NetH(fr, type, vstype, sign, left, right,	delay);
 }
@@ -500,10 +500,10 @@ Parser::new_NetH(const FileRegion& fr,
 		 tVpiNetType type,
 		 tVpiVsType vstype,
 		 bool sign,
-		 PtExpr* left,
-		 PtExpr* right,
-		 PtStrength* strength,
-		 PtDelay* delay)
+		 const PtExpr* left,
+		 const PtExpr* right,
+		 const PtStrength* strength,
+		 const PtDelay* delay)
 {
   return mFactory.new_NetH(fr, type, vstype, sign, left, right,	strength, delay);
 }
@@ -511,7 +511,7 @@ Parser::new_NetH(const FileRegion& fr,
 // @brief 宣言リストに宣言ヘッダを追加する．
 void
 Parser::add_decl_head(PtiDeclHead* head,
-		      PtrList<PtAttrInst>* attr_list)
+		      PtrList<const PtAttrInst>* attr_list)
 {
   if ( head ) {
     reg_attrinst(head, attr_list);
@@ -545,7 +545,7 @@ Parser::new_DeclItem(const FileRegion& fr,
 void
 Parser::new_DeclItem(const FileRegion& fr,
 		     const char* name,
-		     PtExpr* init_value)
+		     const PtExpr* init_value)
 {
   add_decl_item( mFactory.new_DeclItem(fr, name, init_value) );
 }
@@ -557,7 +557,7 @@ Parser::new_DeclItem(const FileRegion& fr,
 void
 Parser::new_DeclItem(const FileRegion& fr,
 		     const char* name,
-		     PtrList<PtRange>* range_list)
+		     PtrList<const PtRange>* range_list)
 {
   add_decl_item( mFactory.new_DeclItem(fr, name, to_array(range_list)) );
 }
@@ -565,7 +565,7 @@ Parser::new_DeclItem(const FileRegion& fr,
 // @brief 宣言リストに宣言要素を追加する．
 inline
 void
-Parser::add_decl_item(PtDeclItem* item)
+Parser::add_decl_item(const PtDeclItem* item)
 {
   mDeclItemList.push_back(item);
 }
@@ -578,10 +578,10 @@ Parser::add_decl_item(PtDeclItem* item)
 // @brief 範囲の生成
 // @param[in] msb MSB を表す式
 // @param[in] lsb LSB を表す式
-PtRange*
+const PtRange*
 Parser::new_Range(const FileRegion& fr,
-		  PtExpr* msb,
-		  PtExpr* lsb)
+		  const PtExpr* msb,
+		  const PtExpr* lsb)
 {
   return mFactory.new_Range(fr, msb, lsb);
 }

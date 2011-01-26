@@ -100,9 +100,9 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
     }
   }
   {
-    vector<const VlDecl*> decl_list;
-    if ( vl_mgr().find_decl_list(scope, vpiNetArray, decl_list) ) {
-      add_decllist("vpiNetArray", decl_list);
+    vector<const VlDeclArray*> declarray_list;
+    if ( vl_mgr().find_declarray_list(scope, vpiNetArray, declarray_list) ) {
+      add_declarraylist("vpiNetArray", declarray_list);
     }
   }
   {
@@ -112,9 +112,9 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
     }
   }
   {
-    vector<const VlDecl*> decl_list;
-    if ( vl_mgr().find_decl_list(scope, vpiRegArray, decl_list) ) {
-      add_decllist("vpiRegArray", decl_list);
+    vector<const VlDeclArray*> declarray_list;
+    if ( vl_mgr().find_declarray_list(scope, vpiRegArray, declarray_list) ) {
+      add_declarraylist("vpiRegArray", declarray_list);
     }
   }
   {
@@ -124,9 +124,9 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
     }
   }
   {
-    vector<const VlDecl*> decl_list;
-    if ( vl_mgr().find_decl_list(scope, vpiVariables, decl_list) ) {
-      add_decllist("vpiVariables", decl_list);
+    vector<const VlDeclArray*> declarray_list;
+    if ( vl_mgr().find_declarray_list(scope, vpiVariables, declarray_list) ) {
+      add_declarraylist("vpiVariables", declarray_list);
     }
   }
   {
@@ -136,9 +136,10 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
     }
   }
   {
-    vector<const VlDecl*> decl_list;
-    if ( vl_mgr().find_decl_list(scope, vpiNamedEventArray, decl_list) ) {
-      add_decllist("vpiNamedEventArray", decl_list);
+    vector<const VlDeclArray*> declarray_list;
+    if ( vl_mgr().find_declarray_list(scope, vpiNamedEventArray,
+				      declarray_list) ) {
+      add_declarraylist("vpiNamedEventArray", declarray_list);
     }
   }
   {

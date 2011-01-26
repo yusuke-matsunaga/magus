@@ -36,7 +36,7 @@ private:
 	 PtiPortArray port_array,
 	 PtIOHeadArray iohead_array,
 	 bool is_seq,
-	 PtExpr* init_value,
+	 const PtExpr* init_value,
 	 PtUdpEntryArray entry_array);
 
   // デストラクタ
@@ -132,8 +132,8 @@ private:
   // コンストラクタ
   SptUdpEntry(const FileRegion& file_region,
 	      PtUdpValueArray input_array,
-	      PtUdpValue* current,
-	      PtUdpValue* output);
+	      const PtUdpValue* current,
+	      const PtUdpValue* output);
 
   // デストラクタ
   virtual
@@ -157,12 +157,12 @@ public:
 
   // 現状態の値を取り出す．
   virtual
-  PtUdpValue*
+  const PtUdpValue*
   current() const;
 
   // 出力の値を取り出す．
   virtual
-  PtUdpValue*
+  const PtUdpValue*
   output() const;
 
 
@@ -178,10 +178,10 @@ private:
   PtUdpValueArray mInputArray;
 
   // 現状態のパタン
-  PtUdpValue* mCurrent;
+  const PtUdpValue* mCurrent;
 
   // 出力のパタン
-  PtUdpValue* mOutput;
+  const PtUdpValue* mOutput;
 
 };
 

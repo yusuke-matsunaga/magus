@@ -380,7 +380,7 @@ CptDefParamH::defparam(ymuint pos) const
 CptDefParam::CptDefParam(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
 			 const char* tail_name,
-			 PtExpr* value) :
+			 const PtExpr* value) :
   mTopLoc(file_region.start_loc()),
   mNbArray(nb_array),
   mName(tail_name),
@@ -476,7 +476,7 @@ CptContAssignH::contassign(ymuint pos) const
 
 // コンストラクタ
 CptContAssignHS::CptContAssignHS(const FileRegion& file_region,
-				 PtStrength* strength,
+				 const PtStrength* strength,
 				 PtContAssignArray ca_array) :
   CptContAssignH(file_region, ca_array),
   mStrength(strength)
@@ -502,7 +502,7 @@ CptContAssignHS::strength() const
 
 // コンストラクタ
 CptContAssignHD::CptContAssignHD(const FileRegion& file_region,
-				 PtDelay* delay,
+				 const PtDelay* delay,
 				 PtContAssignArray ca_array) :
   CptContAssignH(file_region, ca_array),
   mDelay(delay)
@@ -528,8 +528,8 @@ CptContAssignHD::delay() const
 
 // コンストラクタ
 CptContAssignHSD::CptContAssignHSD(const FileRegion& file_region,
-				   PtStrength* strength,
-				   PtDelay* delay,
+				   const PtStrength* strength,
+				   const PtDelay* delay,
 				   PtContAssignArray ca_array) :
   CptContAssignH(file_region, ca_array),
   mStrength(strength),
@@ -562,8 +562,8 @@ CptContAssignHSD::delay() const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CptContAssign::CptContAssign(PtExpr* lhs,
-			     PtExpr* rhs) :
+CptContAssign::CptContAssign(const PtExpr* lhs,
+			     const PtExpr* rhs) :
   mLhs(lhs),
   mRhs(rhs)
 {
@@ -602,7 +602,7 @@ CptContAssign::rhs() const
 
 // コンストラクタ
 CptProcess::CptProcess(const FileRegion& file_region,
-		       PtStmt* body) :
+		       const PtStmt* body) :
   mTopLoc(file_region.start_loc()),
   mBody(body)
 {
@@ -635,7 +635,7 @@ CptProcess::body() const
 
 // コンストラクタ
 CptInitial::CptInitial(const FileRegion& file_region,
-		       PtStmt* body) :
+		       const PtStmt* body) :
   CptProcess(file_region, body)
 {
 }
@@ -659,7 +659,7 @@ CptInitial::type() const
 
 // コンストラクタ
 CptAlways::CptAlways(const FileRegion& file_region,
-		     PtStmt* body) :
+		     const PtStmt* body) :
   CptProcess(file_region, body)
 {
 }
@@ -687,7 +687,7 @@ CptTf::CptTf(const FileRegion& file_region,
 	     bool automatic,
 	     PtIOHeadArray iohead_array,
 	     PtDeclHeadArray declhead_array,
-	     PtStmt* stmt) :
+	     const PtStmt* stmt) :
   mFileRegion(file_region),
   mName(name),
   mAutomatic(automatic),
@@ -767,7 +767,7 @@ CptTask::CptTask(const FileRegion& file_region,
 		 bool automatic,
 		 PtIOHeadArray iohead_array,
 		 PtDeclHeadArray declhead_array,
-		 PtStmt* stmt) :
+		 const PtStmt* stmt) :
   CptTf(file_region,
 	name, automatic,
 	iohead_array,
@@ -800,7 +800,7 @@ CptFunction::CptFunction(const FileRegion& file_region,
 			 bool sign,
 			 PtIOHeadArray iohead_array,
 			 PtDeclHeadArray declhead_array,
-			 PtStmt* stmt) :
+			 const PtStmt* stmt) :
   CptTf(file_region,
 	name, automatic,
 	iohead_array,
@@ -861,11 +861,11 @@ CptSizedFunc::CptSizedFunc(const FileRegion& file_region,
 			   const char* name,
 			   bool automatic,
 			   bool sign,
-			   PtExpr* left,
-			   PtExpr* right,
+			   const PtExpr* left,
+			   const PtExpr* right,
 			   PtIOHeadArray iohead_array,
 			   PtDeclHeadArray declhead_array,
-			   PtStmt* stmt) :
+			   const PtStmt* stmt) :
   CptFunction(file_region,
 	      name, automatic, sign,
 	      iohead_array,
@@ -908,7 +908,7 @@ CptTypedFunc::CptTypedFunc(const FileRegion& file_region,
 			   tVpiVarType data_type,
 			   PtIOHeadArray iohead_array,
 			   PtDeclHeadArray declhead_array,
-			   PtStmt* stmt) :
+			   const PtStmt* stmt) :
   CptFunction(file_region,
 	      name, automatic, sign,
 	      iohead_array,
@@ -936,7 +936,7 @@ CptTypedFunc::data_type() const
 //////////////////////////////////////////////////////////////////////
 
 // defparam 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_DefParamH(const FileRegion& file_region,
 			  PtDefParamArray elem_array)
 {
@@ -946,21 +946,21 @@ CptFactory::new_DefParamH(const FileRegion& file_region,
 }
 
 // defparam 文の要素を生成する．
-PtDefParam*
+const PtDefParam*
 CptFactory::new_DefParam(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* value)
+			 const PtExpr* value)
 {
   ++ mNumDefParam;
   void* p = alloc().get_memory(sizeof(CptDefParam));
   return new (p) CptDefParam(file_region, PtNameBranchArray(), name, value);
 }
 
-PtDefParam*
+const PtDefParam*
 CptFactory::new_DefParam(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
 			 const char* tail_name,
-			 PtExpr* value)
+			 const PtExpr* value)
 {
   ++ mNumDefParam;
   void* p = alloc().get_memory(sizeof(CptDefParam));
@@ -968,7 +968,7 @@ CptFactory::new_DefParam(const FileRegion& file_region,
 }
 
 // continuous assign 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_ContAssignH(const FileRegion& file_region,
 			    PtContAssignArray elem_array)
 {
@@ -978,9 +978,9 @@ CptFactory::new_ContAssignH(const FileRegion& file_region,
 }
 
 // continuous assign 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_ContAssignH(const FileRegion& file_region,
-			    PtStrength* strength,
+			    const PtStrength* strength,
 			    PtContAssignArray elem_array)
 {
   ++ mNumContAssignHS;
@@ -989,9 +989,9 @@ CptFactory::new_ContAssignH(const FileRegion& file_region,
 }
 
 // continuous assign 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_ContAssignH(const FileRegion& file_region,
-			    PtDelay* delay,
+			    const PtDelay* delay,
 			    PtContAssignArray elem_array)
 {
   ++ mNumContAssignHD;
@@ -1000,10 +1000,10 @@ CptFactory::new_ContAssignH(const FileRegion& file_region,
 }
 
 // continuous assign 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_ContAssignH(const FileRegion& file_region,
-			    PtStrength* strength,
-			    PtDelay* delay,
+			    const PtStrength* strength,
+			    const PtDelay* delay,
 			    PtContAssignArray elem_array)
 {
   ++ mNumContAssignHSD;
@@ -1012,10 +1012,10 @@ CptFactory::new_ContAssignH(const FileRegion& file_region,
 }
 
 // continuous assign 文の要素を生成する．
-PtContAssign*
+const PtContAssign*
 CptFactory::new_ContAssign(const FileRegion& file_region,
-			   PtExpr* lhs,
-			   PtExpr* rhs)
+			   const PtExpr* lhs,
+			   const PtExpr* rhs)
 {
   ++ mNumContAssign;
   // 実は file_region は不要
@@ -1024,9 +1024,9 @@ CptFactory::new_ContAssign(const FileRegion& file_region,
 }
 
 // initial 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_Initial(const FileRegion& file_region,
-			PtStmt* body)
+			const PtStmt* body)
 {
   ++ mNumInitial;
   void* p = alloc().get_memory(sizeof(CptInitial));
@@ -1034,9 +1034,9 @@ CptFactory::new_Initial(const FileRegion& file_region,
 }
 
 // always 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_Always(const FileRegion& file_region,
-		       PtStmt* body)
+		       const PtStmt* body)
 {
   ++ mNumAlways;
   void* p = alloc().get_memory(sizeof(CptAlways));
@@ -1044,13 +1044,13 @@ CptFactory::new_Always(const FileRegion& file_region,
 }
 
 // task 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_Task(const FileRegion& file_region,
 		     const char* name,
 		     bool automatic,
 		     PtIOHeadArray iohead_array,
 		     PtDeclHeadArray declhead_array,
-		     PtStmt* stmt)
+		     const PtStmt* stmt)
 {
   ++ mNumTask;
   void* p = alloc().get_memory(sizeof(CptTask));
@@ -1061,14 +1061,14 @@ CptFactory::new_Task(const FileRegion& file_region,
 }
 
 // function 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_Function(const FileRegion& file_region,
 			 const char* name,
 			 bool automatic,
 			 bool sign,
 			 PtIOHeadArray iohead_array,
 			 PtDeclHeadArray declhead_array,
-			 PtStmt* stmt)
+			 const PtStmt* stmt)
 {
   ++ mNumFunction;
   void* p = alloc().get_memory(sizeof(CptFunction));
@@ -1079,16 +1079,16 @@ CptFactory::new_Function(const FileRegion& file_region,
 }
 
 // ビットベクタ型 function の生成
-PtItem*
+const PtItem*
 CptFactory::new_SizedFunc(const FileRegion& file_region,
 			  const char* name,
 			  bool automatic,
 			  bool sign,
-			  PtExpr* left,
-			  PtExpr* right,
+			  const PtExpr* left,
+			  const PtExpr* right,
 			  PtIOHeadArray iohead_array,
 			  PtDeclHeadArray declhead_array,
-			  PtStmt* stmt)
+			  const PtStmt* stmt)
 {
   ++ mNumSizedFunc;
   void* p = alloc().get_memory(sizeof(CptSizedFunc));
@@ -1101,7 +1101,7 @@ CptFactory::new_SizedFunc(const FileRegion& file_region,
 }
 
 // 組み込み型 function の生成
-PtItem*
+const PtItem*
 CptFactory::new_TypedFunc(const FileRegion& file_region,
 			  const char* name,
 			  bool automatic,
@@ -1109,7 +1109,7 @@ CptFactory::new_TypedFunc(const FileRegion& file_region,
 			  tVpiVarType func_type,
 			  PtIOHeadArray iohead_array,
 			  PtDeclHeadArray declhead_array,
-			  PtStmt* stmt)
+			  const PtStmt* stmt)
 {
   ++ mNumTypedFunc;
   void* p = alloc().get_memory(sizeof(CptTypedFunc));

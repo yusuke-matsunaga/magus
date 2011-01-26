@@ -340,7 +340,7 @@ protected:
   CptDefParam(const FileRegion& file_region,
 	      PtNameBranchArray nb_array,
 	      const char* tail_name,
-	      PtExpr* value);
+	      const PtExpr* value);
 
   /// @brief デストラクタ
   virtual
@@ -390,7 +390,7 @@ private:
   const char* mName;
 
   // 値
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
 };
 
@@ -468,7 +468,7 @@ protected:
 
   /// @brief コンストラクタ
   CptContAssignHS(const FileRegion& file_region,
-		  PtStrength* str,
+		  const PtStrength* str,
 		  PtContAssignArray ca_array);
 
   /// @brief デストラクタ
@@ -493,7 +493,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
 };
 
@@ -510,7 +510,7 @@ protected:
 
   /// @brief コンストラクタ
   CptContAssignHD(const FileRegion& file_region,
-		  PtDelay* delay,
+		  const PtDelay* delay,
 		  PtContAssignArray ca_array);
 
   /// @brief デストラクタ
@@ -535,7 +535,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -552,8 +552,8 @@ protected:
 
   /// @brief コンストラクタ
   CptContAssignHSD(const FileRegion& file_region,
-		   PtStrength* str,
-		   PtDelay* delay,
+		   const PtStrength* str,
+		   const PtDelay* delay,
 		   PtContAssignArray ca_array);
 
   /// @brief デストラクタ
@@ -583,10 +583,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -602,8 +602,8 @@ class CptContAssign :
 protected:
 
   /// @brief コンストラクタ
-  CptContAssign(PtExpr* lhs,
-		PtExpr* rhs);
+  CptContAssign(const PtExpr* lhs,
+		const PtExpr* rhs);
 
   /// @brief デストラクタ
   virtual
@@ -637,10 +637,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 左辺式
-  PtExpr* mLhs;
+  const PtExpr* mLhs;
 
   // 右辺式
-  PtExpr* mRhs;
+  const PtExpr* mRhs;
 
 };
 
@@ -657,7 +657,7 @@ protected:
 
   /// @brief コンストラクタ
   CptProcess(const FileRegion& file_region,
-	     PtStmt* body);
+	     const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -689,7 +689,7 @@ private:
   FileLoc mTopLoc;
 
   // 本体
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 
@@ -706,7 +706,7 @@ protected:
 
   /// @brief コンストラクタ
   CptInitial(const FileRegion& file_region,
-	     PtStmt* body);
+	     const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -739,7 +739,7 @@ protected:
 
   /// @brief コンストラクタ
   CptAlways(const FileRegion& file_region,
-	    PtStmt* body);
+	    const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -774,7 +774,7 @@ protected:
 	bool automatic,
 	PtIOHeadArray iohead_array,
 	PtDeclHeadArray declhead_array,
-	PtStmt* stmt);
+	const PtStmt* stmt);
 
   /// @brief デストラクタ
   virtual
@@ -846,7 +846,7 @@ private:
   PtDeclHeadArray mDeclHeadArray;
 
   // 本体
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 
@@ -867,7 +867,7 @@ private:
 	  bool automatic,
 	  PtIOHeadArray iohead_array,
 	  PtDeclHeadArray declhead_array,
-	  PtStmt* stmt);
+	  const PtStmt* stmt);
 
   /// @brief デストラクタ
   virtual
@@ -905,7 +905,7 @@ protected:
 	      bool sign,
 	      PtIOHeadArray iohead_array,
 	      PtDeclHeadArray declhead_array,
-	      PtStmt* stmt);
+	      const PtStmt* stmt);
 
   /// @brief デストラクタ
   virtual
@@ -979,11 +979,11 @@ protected:
 	       const char* name,
 	       bool automatic,
 	       bool sign,
-	       PtExpr* left,
-	       PtExpr* right,
+	       const PtExpr* left,
+	       const PtExpr* right,
 	       PtIOHeadArray iohead_array,
 	       PtDeclHeadArray declhead_array,
-	       PtStmt* stmt);
+	       const PtStmt* stmt);
 
   /// @brief デストラクタ
   virtual
@@ -1012,10 +1012,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -1038,7 +1038,7 @@ protected:
 	       tVpiVarType dat_type,
 	       PtIOHeadArray iohead_array,
 	       PtDeclHeadArray declhead_array,
-	       PtStmt* stmt);
+	       const PtStmt* stmt);
 
   /// @brief デストラクタ
   virtual

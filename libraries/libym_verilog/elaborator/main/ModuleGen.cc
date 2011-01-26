@@ -19,6 +19,7 @@
 #include "ym_verilog/pt/PtPort.h"
 #include "ym_verilog/pt/PtDecl.h"
 #include "ym_verilog/pt/PtItem.h"
+#include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 #include "ym_verilog/pt/PtArray.h"
 
@@ -220,14 +221,14 @@ ModuleGen::instantiate_port(ElbModule* module,
   for (ymuint index = 0; index < port_num; ++ index) {
     const PtPort* pt_port = pt_module->port(index);
     // 内側の接続と向きを作る．
-    ymuint n = pt_port->portref_num();
+    ymuint n = pt_port->portref_size();
 
     ElbExpr* low_conn = NULL;
     tVpiDirection dir = kVpiNoDirection;
 
+    const PtExpr* pt_portref = pt_port->portref();
     if ( n == 1 ) {
       // 単一の要素の場合
-      const PtPortRef* pt_portref = pt_port->portref(0);
       dir = pt_port->portref_dir(0);
       low_conn = instantiate_portref(module, pt_portref);
     }
@@ -236,8 +237,8 @@ ModuleGen::instantiate_port(ElbModule* module,
       ElbExpr** expr_list = factory().new_ExprList(n);
 
       for (ymuint i = 0; i < n; ++ i) {
-	const PtPortRef* pt_portref = pt_port->portref(i);
-	ElbExpr* portexpr = instantiate_portref(module, pt_portref);
+	const PtExpr* pt_portexpr = pt_port->portref_elem(i);
+	ElbExpr* portexpr = instantiate_portref(module, pt_portexpr);
 	if ( !portexpr ) {
 	  return;
 	}
@@ -252,7 +253,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 	}
       }
 
-      low_conn = factory().new_PortConcatOp(pt_port, n, expr_list);
+      low_conn = factory().new_ConcatOp(pt_portref, n, expr_list);
     }
     module->init_port(index, pt_port, low_conn, dir);
   }
@@ -261,7 +262,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 // PtPortRef から expression を生成する．
 ElbExpr*
 ModuleGen::instantiate_portref(ElbModule* module,
-			       const PtPortRef* pt_portref)
+			       const PtExpr* pt_portref)
 {
   const char* name = pt_portref->name();
   ElbObjHandle* handle = find_obj(module, name);
@@ -301,8 +302,13 @@ ModuleGen::instantiate_portref(ElbModule* module,
     return NULL;
   }
 
+  ElbExpr* primary = factory().new_Primary(pt_portref, decl);
+
   // 添字の部分を実体化する．
-  const PtExpr* pt_index = pt_portref->index();
+  const PtExpr* pt_index = NULL;
+  if ( pt_portref->index_num() == 0 ) {
+    pt_index = pt_portref->index(0);
+  }
   const PtExpr* pt_left = pt_portref->left_range();
   const PtExpr* pt_right = pt_portref->right_range();
   if ( pt_index ) {
@@ -311,21 +317,19 @@ ModuleGen::instantiate_portref(ElbModule* module,
     if ( !stat ) {
       return NULL;
     }
-    return factory().new_PortExpr(pt_portref, decl, pt_index, index_val);
+    return factory().new_BitSelect(pt_portref, primary, pt_index, index_val);
   }
-  else if ( pt_left && pt_right ) {
+  if ( pt_left && pt_right ) {
     int left_val = 0;
     int right_val = 0;
     if ( !evaluate_range(module, pt_left, pt_right, left_val, right_val) ) {
       return NULL;
     }
-    return factory().new_PortExpr(pt_portref, decl,
-				  pt_left, pt_right,
-				  left_val, right_val);
+    return factory().new_PartSelect(pt_portref, primary,
+				    pt_left, pt_right,
+				    left_val, right_val);
   }
-  else {
-    return factory().new_PortExpr(pt_portref, decl);
-  }
+  return primary;
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -60,7 +60,7 @@ public:
   const PtExpr*
   portref_elem(ymuint pos) const = 0;
 
-  ///@brief 内部ポート結線の方向の取得
+  /// @brief 内部ポート結線の方向の取得
   /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
   tVpiDirection

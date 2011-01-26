@@ -65,7 +65,7 @@ void
 Parser::new_Module1995(const FileRegion& file_region,
 		       bool is_macro,
 		       const char* module_name,
-		       PtrList<PtAttrInst>* ai_list)
+		       PtrList<const PtAttrInst>* ai_list)
 {
   PtiPortArray port_array = get_port_array();
   PtDeclHeadArray paramport_array = get_paramport_array();
@@ -187,22 +187,22 @@ Parser::new_Module1995(const FileRegion& file_region,
     }
   }
 
-  PtModule* module = mFactory.new_Module(file_region,
-					 module_name,
-					 is_macro,
-					 is_cell,
-					 is_protected,
-					 time_u, time_p,
-					 nettype, unconn,
-					 delay, decay,
-					 named_port,
-					 portfaults, suppress_faults,
-					 config, library, cell,
-					 paramport_array,
-					 port_array,
-					 iohead_array,
-					 declhead_array,
-					 item_array);
+  const PtModule* module = mFactory.new_Module(file_region,
+					       module_name,
+					       is_macro,
+					       is_cell,
+					       is_protected,
+					       time_u, time_p,
+					       nettype, unconn,
+					       delay, decay,
+					       named_port,
+					       portfaults, suppress_faults,
+					       config, library, cell,
+					       paramport_array,
+					       port_array,
+					       iohead_array,
+					       declhead_array,
+					       item_array);
   mPtMgr.reg_module(module);
   reg_attrinst(module, ai_list);
 }
@@ -212,7 +212,7 @@ void
 Parser::new_Module2001(const FileRegion& file_region,
 		       bool is_macro,
 		       const char* module_name,
-		       PtrList<PtAttrInst>* ai_list)
+		       PtrList<const PtAttrInst>* ai_list)
 {
   PtDeclHeadArray paramport_array = get_paramport_array();
   PtIOHeadArray iohead_array = get_module_io_array();
@@ -244,19 +244,19 @@ Parser::new_Module2001(const FileRegion& file_region,
   // iohead_array からポートの配列を作る．
   PtiPortArray port_array = new_PortArray(iohead_array);
 
-  PtModule* module = mFactory.new_Module(file_region,
-					 module_name,
-					 is_macro, is_cell, is_protected,
-					 time_u, time_p, nettype,
-					 unconn, delay, decay,
-					 true,
-					 portfaults, suppress_faults,
-					 config, library, cell,
-					 paramport_array,
-					 port_array,
-					 iohead_array,
-					 declhead_array,
-					 item_array);
+  const PtModule* module = mFactory.new_Module(file_region,
+					       module_name,
+					       is_macro, is_cell, is_protected,
+					       time_u, time_p, nettype,
+					       unconn, delay, decay,
+					       true,
+					       portfaults, suppress_faults,
+					       config, library, cell,
+					       paramport_array,
+					       port_array,
+					       iohead_array,
+					       declhead_array,
+					       item_array);
   mPtMgr.reg_module(module);
   reg_attrinst(module, ai_list);
 }

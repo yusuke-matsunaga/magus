@@ -205,8 +205,8 @@ CptLocalParamH::type() const
 // @param left 範囲の左側の式
 // @param right 範囲の右側の式
 CptParamHV::CptParamHV(const FileRegion& file_region,
-		       PtExpr* left,
-		       PtExpr* right) :
+		       const PtExpr* left,
+		       const PtExpr* right) :
   CptParamH(file_region),
   mLeftRange(left),
   mRightRange(right)
@@ -254,8 +254,8 @@ CptParamHV::right_range() const
 // @param left 範囲の左側の式
 // @param right 範囲の右側の式
 CptParamHSV::CptParamHSV(const FileRegion& file_region,
-			 PtExpr* left,
-			 PtExpr* right) :
+			 const PtExpr* left,
+			 const PtExpr* right) :
   CptParamHV(file_region, left, right)
 {
 }
@@ -285,8 +285,8 @@ CptParamHSV::is_signed() const
 // @param left 範囲の左側の式
 // @param right 範囲の右側の式
 CptLocalParamHV::CptLocalParamHV(const FileRegion& file_region,
-				 PtExpr* left,
-				 PtExpr* right) :
+				 const PtExpr* left,
+				 const PtExpr* right) :
   CptParamHV(file_region, left, right)
 {
 }
@@ -313,8 +313,8 @@ CptLocalParamHV::type() const
 // @param left 範囲の左側の式
 // @param right 範囲の右側の式
 CptLocalParamHSV::CptLocalParamHSV(const FileRegion& file_region,
-				   PtExpr* left,
-				   PtExpr* right) :
+				   const PtExpr* left,
+				   const PtExpr* right) :
   CptParamHSV(file_region, left, right)
 {
 }
@@ -451,8 +451,8 @@ CptRegHS::is_signed() const
 // @param left 範囲の左側の式
 // @param right 範囲の右側の式
 CptRegHV::CptRegHV(const FileRegion& file_region,
-		   PtExpr* left,
-		   PtExpr* right) :
+		   const PtExpr* left,
+		   const PtExpr* right) :
   CptRegH(file_region),
   mLeftRange(left),
   mRightRange(right)
@@ -497,8 +497,8 @@ CptRegHV::right_range() const
 // @param left 範囲の左側の式
 // @param right 範囲の右側の式
 CptRegHSV::CptRegHSV(const FileRegion& file_region,
-		     PtExpr* left,
-		     PtExpr* right) :
+		     const PtExpr* left,
+		     const PtExpr* right) :
   CptRegHV(file_region, left, right)
 {
 }
@@ -630,7 +630,7 @@ CptNetH::is_signed() const
 CptNetHS::CptNetHS(const FileRegion& file_region,
 		   tVpiNetType net_type,
 		   bool sign,
-		   PtStrength* strength) :
+		   const PtStrength* strength) :
   CptNetH(file_region, net_type, sign),
   mStrength(strength)
 {
@@ -660,7 +660,7 @@ CptNetHS::strength() const
 CptNetHD::CptNetHD(const FileRegion& file_region,
 		   tVpiNetType net_type,
 		   bool sign,
-		   PtDelay* delay) :
+		   const PtDelay* delay) :
   CptNetH(file_region, net_type, sign),
   mDelay(delay)
 {
@@ -691,8 +691,8 @@ CptNetHD::delay() const
 CptNetHSD::CptNetHSD(const FileRegion& file_region,
 		     tVpiNetType net_type,
 		     bool sign,
-		     PtStrength* strength,
-		     PtDelay* delay) :
+		     const PtStrength* strength,
+		     const PtDelay* delay) :
   CptNetH(file_region, net_type, sign),
   mStrength(strength),
   mDelay(delay)
@@ -734,8 +734,8 @@ CptNetHV::CptNetHV(const FileRegion& file_region,
 		   tVpiNetType net_type,
 		   tVpiVsType vstype,
 		   bool sign,
-		   PtExpr* left,
-		   PtExpr* right) :
+		   const PtExpr* left,
+		   const PtExpr* right) :
   CptNetH(file_region, net_type, sign),
   mLeftRange(left),
   mRightRange(right)
@@ -789,9 +789,9 @@ CptNetHVS::CptNetHVS(const FileRegion& file_region,
 		     tVpiNetType net_type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtStrength* strength) :
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtStrength* strength) :
   CptNetHV(file_region, net_type,
 	   vstype, sign, left, right),
   mStrength(strength)
@@ -827,9 +827,9 @@ CptNetHVD::CptNetHVD(const FileRegion& file_region,
 		     tVpiNetType net_type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtDelay* delay) :
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtDelay* delay) :
   CptNetHV(file_region, net_type,
 	   vstype, sign, left, right),
   mDelay(delay)
@@ -866,10 +866,10 @@ CptNetHVSD::CptNetHVSD(const FileRegion& file_region,
 		       tVpiNetType net_type,
 		       tVpiVsType vstype,
 		       bool sign,
-		       PtExpr* left,
-		       PtExpr* right,
-		       PtStrength* strength,
-		       PtDelay* delay) :
+		       const PtExpr* left,
+		       const PtExpr* right,
+		       const PtStrength* strength,
+		       const PtDelay* delay) :
   CptNetHV(file_region, net_type,
 	   vstype, sign, left, right),
   mStrength(strength),
@@ -954,8 +954,8 @@ CptSpecParamH::type() const
 // @param left 範囲の左側の式
 // @param right 範囲の右側の式
 CptSpecParamHV::CptSpecParamHV(const FileRegion& file_region,
-			       PtExpr* left,
-			       PtExpr* right) :
+			       const PtExpr* left,
+			       const PtExpr* right) :
   CptSpecParamH(file_region),
   mLeftRange(left),
   mRightRange(right)
@@ -1110,7 +1110,7 @@ CptDeclItemR::range(ymuint pos) const
 // @param init_value 初期値
 CptDeclItemI::CptDeclItemI(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* init_value) :
+			 const PtExpr* init_value) :
   CptDeclItem(file_region, name),
   mInitValue(init_value)
 {
@@ -1146,8 +1146,8 @@ CptDeclItemI::init_value() const
 
 // @brief コンストラクタ
 CptRange::CptRange(const FileRegion& fr,
-		   PtExpr* msb,
-		   PtExpr* lsb) :
+		   const PtExpr* msb,
+		   const PtExpr* lsb) :
   mFileRegion(fr),
   mMsb(msb),
   mLsb(lsb)
@@ -1198,8 +1198,8 @@ CptFactory::new_ParamH(const FileRegion& file_region)
 PtiDeclHead*
 CptFactory::new_ParamH(const FileRegion& file_region,
 		       bool sign,
-		       PtExpr* left,
-		       PtExpr* right)
+		       const PtExpr* left,
+		       const PtExpr* right)
 {
   ++ mNumParamHV;
   if ( sign ) {
@@ -1235,8 +1235,8 @@ CptFactory::new_LocalParamH(const FileRegion& file_region)
 PtiDeclHead*
 CptFactory::new_LocalParamH(const FileRegion& file_region,
 			    bool sign,
-			    PtExpr* left,
-			    PtExpr* right)
+			    const PtExpr* left,
+			    const PtExpr* right)
 {
   ++ mNumLocalParamHV;
   if ( sign ) {
@@ -1271,8 +1271,8 @@ CptFactory::new_SpecParamH(const FileRegion& file_region)
 // specparam 宣言のヘッダを生成する．
 PtiDeclHead*
 CptFactory::new_SpecParamH(const FileRegion& file_region,
-			   PtExpr* left,
-			   PtExpr* right)
+			   const PtExpr* left,
+			   const PtExpr* right)
 {
   ++ mNumSpecParamHV;
   void* p = alloc().get_memory(sizeof(CptSpecParamHV));
@@ -1327,8 +1327,8 @@ CptFactory::new_RegH(const FileRegion& file_region,
 PtiDeclHead*
 CptFactory::new_RegH(const FileRegion& file_region,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right)
+		     const PtExpr* left,
+		     const PtExpr* right)
 {
   ++ mNumRegHV;
   if ( sign ) {
@@ -1358,7 +1358,7 @@ PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     bool sign,
-		     PtStrength* strength)
+		     const PtStrength* strength)
 {
   ++ mNumNetHS;
   return new CptNetHS(file_region,
@@ -1371,7 +1371,7 @@ PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     bool sign,
-		     PtDelay* delay)
+		     const PtDelay* delay)
 {
   ++ mNumNetHD;
   void* p = alloc().get_memory(sizeof(CptNetHD));
@@ -1385,8 +1385,8 @@ PtiDeclHead*
 CptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     bool sign,
-		     PtStrength* strength,
-		     PtDelay* delay)
+		     const PtStrength* strength,
+		     const PtDelay* delay)
 {
   ++mNumNetHSD;
   void* p = alloc().get_memory(sizeof(CptNetHSD));
@@ -1401,8 +1401,8 @@ CptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right)
+		     const PtExpr* left,
+		     const PtExpr* right)
 {
   ++ mNumNetHV;
   void* p = alloc().get_memory(sizeof(CptNetHV));
@@ -1416,9 +1416,9 @@ CptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtStrength* strength)
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtStrength* strength)
 {
   ++ mNumNetHVS;
   void* p = alloc().get_memory(sizeof(CptNetHVS));
@@ -1433,9 +1433,9 @@ CptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtDelay* delay)
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtDelay* delay)
 {
   ++ mNumNetHVD;
   void* p = alloc().get_memory(sizeof(CptNetHVD));
@@ -1450,10 +1450,10 @@ CptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtStrength* strength,
-		     PtDelay* delay)
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtStrength* strength,
+		     const PtDelay* delay)
 {
   ++ mNumNetHVSD;
   void* p = alloc().get_memory(sizeof(CptNetHVSD));
@@ -1463,7 +1463,7 @@ CptFactory::new_NetH(const FileRegion& file_region,
 }
 
 // 宣言要素を生成する．
-PtDeclItem*
+const PtDeclItem*
 CptFactory::new_DeclItem(const FileRegion& file_region,
 			 const char* name)
 {
@@ -1472,17 +1472,17 @@ CptFactory::new_DeclItem(const FileRegion& file_region,
   return new (p) CptDeclItem(file_region, name);
 }
 
-PtDeclItem*
+const PtDeclItem*
 CptFactory::new_DeclItem(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* init_value)
+			 const PtExpr* init_value)
 {
   ++ mNumDeclItemI;
   void* p = alloc().get_memory(sizeof(CptDeclItemI));
   return new (p) CptDeclItemI(file_region, name, init_value);
 }
 
-PtDeclItem*
+const PtDeclItem*
 CptFactory::new_DeclItem(const FileRegion& file_region,
 			 const char* name,
 			 PtRangeArray range_array)
@@ -1492,10 +1492,10 @@ CptFactory::new_DeclItem(const FileRegion& file_region,
   return new (p) CptDeclItemR(file_region, name, range_array);
 }
 
-PtRange*
+const PtRange*
 CptFactory::new_Range(const FileRegion& fr,
-		      PtExpr* msb,
-		      PtExpr* lsb)
+		      const PtExpr* msb,
+		      const PtExpr* lsb)
 {
   void* p = alloc().get_memory(sizeof(CptRange));
   return new (p) CptRange(fr, msb, lsb);

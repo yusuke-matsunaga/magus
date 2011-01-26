@@ -164,8 +164,8 @@ Parser::reg_defname(const char* name)
 
 // @brief attribute instance を登録する．
 void
-Parser::reg_attrinst(PtBase* ptobj,
-		     PtrList<PtAttrInst>* attr_list)
+Parser::reg_attrinst(const PtBase* ptobj,
+		     PtrList<const PtAttrInst>* attr_list)
 {
   if ( attr_list ) {
     // 未実装
@@ -252,10 +252,10 @@ Parser::check_function_statement(const PtStmt* stmt)
 
 // default ラベルが2つ以上含まれていないかどうかのチェック
 bool
-Parser::check_default_label(const PtrList<PtCaseItem>* ci_list)
+Parser::check_default_label(const PtrList<const PtCaseItem>* ci_list)
 {
   ymuint n = 0;
-  for (PtrList<PtCaseItem>::const_iterator p = ci_list->begin();
+  for (PtrList<const PtCaseItem>::const_iterator p = ci_list->begin();
        p.is_valid(); ++ p) {
     const PtCaseItem* ci = *p;
     if ( ci->label_num() == 0 ) {
@@ -277,21 +277,21 @@ Parser::check_default_label(const PtrList<PtCaseItem>* ci_list)
 // @param[in] pre_expr list の前に挿入する式
 // @note 結果として list は削除される．
 PtExprArray
-Parser::ExprArray(PtExpr* pre_expr,
-		  PtrList<PtExpr>* list)
+Parser::ExprArray(const PtExpr* pre_expr,
+		  PtrList<const PtExpr>* list)
 {
   ymuint n = list->size();
-  void* p = mAlloc.get_memory(sizeof(PtExpr*) * (n + 1));
-  PtExpr** array = new (p) PtExpr*[n + 1];
+  void* p = mAlloc.get_memory(sizeof(const PtExpr*) * (n + 1));
+  const PtExpr** array = new (p) const PtExpr*[n + 1];
   array[0] = pre_expr;
   ymuint i = 1;
-  for (PtrList<PtExpr>::const_iterator p = list->begin();
+  for (PtrList<const PtExpr>::const_iterator p = list->begin();
        p.is_valid(); ++ p, ++ i) {
     array[i] = *p;
   }
 
-  list->~PtrList<PtExpr>();
-  mTmpAlloc.put_memory(sizeof(PtrList<PtExpr>), list);
+  list->~PtrList<const PtExpr>();
+  mTmpAlloc.put_memory(sizeof(PtrList<const PtExpr>), list);
 
   return PtExprArray(n + 1, array);
 }
@@ -303,7 +303,7 @@ PuHierName*
 Parser::new_HierName(const char* head_name,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(head_name);
+  const PtNameBranch* nb = mFactory.new_NameBranch(head_name);
   void* p = mTmpAlloc.get_memory(sizeof(PuHierName));
   return new (p) PuHierName(mCellAlloc, nb, name);
 }
@@ -317,7 +317,7 @@ Parser::new_HierName(const char* head_name,
 		     int index,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(head_name, index);
+  const PtNameBranch* nb = mFactory.new_NameBranch(head_name, index);
   void* p = mTmpAlloc.get_memory(sizeof(PuHierName));
   return new (p) PuHierName(mCellAlloc, nb, name);
 }
@@ -329,7 +329,7 @@ void
 Parser::add_HierName(PuHierName* hname,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name());
+  const PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name());
   hname->add(nb, name);
 }
 
@@ -342,7 +342,7 @@ Parser::add_HierName(PuHierName* hname,
 		     int index,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name(), index);
+  const PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name(), index);
   hname->add(nb, name);
 }
 
@@ -370,8 +370,8 @@ Parser::extract_HierName(PuHierName* hname,
 
 // @brief item リストに要素を追加する．
 void
-Parser::add_item(PtItem* item,
-		 PtrList<PtAttrInst>* attr_list)
+Parser::add_item(const PtItem* item,
+		 PtrList<const PtAttrInst>* attr_list)
 {
   if ( item ) {
     reg_attrinst(item, attr_list);

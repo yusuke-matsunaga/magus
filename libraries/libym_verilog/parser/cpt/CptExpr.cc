@@ -238,7 +238,7 @@ CptOpr::op_type() const
 // コンストラクタ
 CptOpr1::CptOpr1(const FileRegion& file_region,
 		 tVpiOpType op_type,
-		 PtExpr* opr) :
+		 const PtExpr* opr) :
   CptOpr(op_type),
   mFileRegion(file_region),
   mOpr(opr)
@@ -313,8 +313,8 @@ CptOpr1::operand(ymuint pos) const
 
 // コンストラクタ
 CptOpr2::CptOpr2(tVpiOpType op_type,
-		 PtExpr* opr1,
-		 PtExpr* opr2) :
+		 const PtExpr* opr1,
+		 const PtExpr* opr2) :
   CptOpr(op_type)
 {
   mOpr[0] = opr1;
@@ -364,9 +364,9 @@ CptOpr2::operand(ymuint pos) const
 
 // コンストラクタ
 CptOpr3::CptOpr3(tVpiOpType op_type,
-		 PtExpr* opr1,
-		 PtExpr* opr2,
-		 PtExpr* opr3) :
+		 const PtExpr* opr1,
+		 const PtExpr* opr2,
+		 const PtExpr* opr3) :
   CptOpr(op_type)
 {
   mOpr[0] = opr1;
@@ -497,9 +497,9 @@ CptMultiConcat::op_type() const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CptMinTypMax::CptMinTypMax(PtExpr* val0,
-			   PtExpr* val1,
-			   PtExpr* val2)
+CptMinTypMax::CptMinTypMax(const PtExpr* val0,
+			   const PtExpr* val1,
+			   const PtExpr* val2)
 {
   mValue[0] = val0;
   mValue[1] = val1;
@@ -901,21 +901,21 @@ CptStringConstant::const_str() const
 //////////////////////////////////////////////////////////////////////
 
 // 演算子を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_Opr(const FileRegion& file_region,
 		    tVpiOpType type,
-		    PtExpr* opr)
+		    const PtExpr* opr)
 {
   ++ mNumOpr1;
   void* p = alloc().get_memory(sizeof(CptOpr1));
   return new (p) CptOpr1(file_region, type, opr);
 }
 
-PtExpr*
+const PtExpr*
 CptFactory::new_Opr(const FileRegion& file_region,
 		    tVpiOpType type,
-		    PtExpr* opr1,
-		    PtExpr* opr2)
+		    const PtExpr* opr1,
+		    const PtExpr* opr2)
 {
   // 実は file_region は不要
   ++ mNumOpr2;
@@ -923,12 +923,12 @@ CptFactory::new_Opr(const FileRegion& file_region,
   return new (p) CptOpr2(type, opr1, opr2);
 }
 
-PtExpr*
+const PtExpr*
 CptFactory::new_Opr(const FileRegion& file_region,
 		    tVpiOpType type,
-		    PtExpr* opr1,
-		    PtExpr* opr2,
-		    PtExpr* opr3)
+		    const PtExpr* opr1,
+		    const PtExpr* opr2,
+		    const PtExpr* opr3)
 {
   // 実は file_region は不要
   ++ mNumOpr3;
@@ -937,7 +937,7 @@ CptFactory::new_Opr(const FileRegion& file_region,
 }
 
 // concatination を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_Concat(const FileRegion& file_region,
 		       PtExprArray expr_array)
 {
@@ -947,7 +947,7 @@ CptFactory::new_Concat(const FileRegion& file_region,
 }
 
 // multiple concatenation を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_MultiConcat(const FileRegion& file_region,
 			    PtExprArray expr_array)
 {
@@ -957,11 +957,11 @@ CptFactory::new_MultiConcat(const FileRegion& file_region,
 }
 
 // multiple concatenation を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_MinTypMax(const FileRegion& file_region,
-			  PtExpr* val0,
-			  PtExpr* val1,
-			  PtExpr* val2)
+			  const PtExpr* val0,
+			  const PtExpr* val1,
+			  const PtExpr* val2)
 {
   // 実は file_region は不要
   ++ mNumMinTypMax3;
@@ -970,7 +970,7 @@ CptFactory::new_MinTypMax(const FileRegion& file_region,
 }
 
 // function call を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_FuncCall(const FileRegion& file_region,
 			 const char* name,
 			 PtExprArray arg_array)
@@ -981,7 +981,7 @@ CptFactory::new_FuncCall(const FileRegion& file_region,
 }
 
 // function call を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_FuncCall(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
 			 const char* tail_name,
@@ -993,7 +993,7 @@ CptFactory::new_FuncCall(const FileRegion& file_region,
 }
 
 // system function call を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_SysFuncCall(const FileRegion& file_region,
 			    const char* name,
 			    PtExprArray arg_array)
@@ -1004,7 +1004,7 @@ CptFactory::new_SysFuncCall(const FileRegion& file_region,
 }
 
 // 定数を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_IntConst(const FileRegion& file_region,
 			 ymuint value)
 {
@@ -1014,7 +1014,7 @@ CptFactory::new_IntConst(const FileRegion& file_region,
 }
 
 // 定数を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_IntConst(const FileRegion& file_region,
 			 const char* value)
 {
@@ -1024,7 +1024,7 @@ CptFactory::new_IntConst(const FileRegion& file_region,
 }
 
 // 定数を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_IntConst(const FileRegion& file_region,
 			 tVpiConstType const_type,
 			 const char* value)
@@ -1035,7 +1035,7 @@ CptFactory::new_IntConst(const FileRegion& file_region,
 }
 
 // 定数を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_IntConst(const FileRegion& file_region,
 			 ymuint size,
 			 tVpiConstType const_type,
@@ -1047,7 +1047,7 @@ CptFactory::new_IntConst(const FileRegion& file_region,
 }
 
 // 定数を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_RealConst(const FileRegion& file_region,
 			  double value)
 {
@@ -1057,7 +1057,7 @@ CptFactory::new_RealConst(const FileRegion& file_region,
 }
 
 // 定数を生成する．
-PtExpr*
+const PtExpr*
 CptFactory::new_StringConst(const FileRegion& file_region,
 			    const char* value)
 {

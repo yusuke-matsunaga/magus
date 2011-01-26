@@ -84,7 +84,7 @@ private:
 
   /// @brief コンストラクタ
   CptDelayControl(const FileRegion& file_region,
-		  PtExpr* value);
+		  const PtExpr* value);
 
   /// @brief デストラクタ
   virtual
@@ -122,7 +122,7 @@ private:
   FileLoc mTopLoc;
 
   // 遅延を表す式
-  PtExpr* mDelay;
+  const PtExpr* mDelay;
 
 };
 
@@ -203,7 +203,7 @@ private:
 
   /// @brief コンストラクタ
   CptRepeatControl(const FileRegion& file_region,
-		   PtExpr* expr,
+		   const PtExpr* expr,
 		   PtExprArray event_array);
 
   /// @brief デストラクタ
@@ -256,7 +256,7 @@ private:
   FileRegion mFileRegion;
 
   // 繰り返し数を表す式
-  PtExpr* mRepExpr;
+  const PtExpr* mRepExpr;
 
   // イベントのリスト
   PtExprArray mEventArray;
@@ -274,7 +274,7 @@ protected:
 
   /// @brief コンストラクタ
   CptConnection(const FileRegion& file_region,
-		PtExpr* expr);
+		const PtExpr* expr);
 
   /// @brief デストラクタ
   virtual
@@ -314,7 +314,7 @@ private:
   FileRegion mFileRegion;
 
   // 接続を表す式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
 };
 
@@ -331,7 +331,7 @@ protected:
 
   /// @brief コンストラクタ
   CptOrderedCon(const FileRegion& file_region,
-		PtExpr* expr);
+		const PtExpr* expr);
 
   /// @brief デストラクタ
   virtual
@@ -353,7 +353,7 @@ protected:
   /// @brief コンストラクタ
   CptNamedCon(const FileRegion& file_region,
 	      const char* name,
-	      PtExpr* expr);
+	      const PtExpr* expr);
 
   /// @brief デストラクタ
   virtual
@@ -458,18 +458,18 @@ private:
 
   /// @brief 一つの値をとるコンストラクタ
   CptDelay(const FileRegion& file_region,
-	   PtExpr* value1);
+	   const PtExpr* value1);
 
   /// @brief 二つの値をとるコンストラクタ
   CptDelay(const FileRegion& file_region,
-	   PtExpr* value1,
-	   PtExpr* value2);
+	   const PtExpr* value1,
+	   const PtExpr* value2);
 
   /// @brief 三つの値をとるコンストラクタ
   CptDelay(const FileRegion& file_region,
-	   PtExpr* value1,
-	   PtExpr* value2,
-	   PtExpr* value3);
+	   const PtExpr* value1,
+	   const PtExpr* value2,
+	   const PtExpr* value3);
 
   /// @brief デストラクタ
   virtual
@@ -501,7 +501,7 @@ private:
   FileRegion mFileRegion;
 
   // 値のリスト
-  PtExpr* mValue[3];
+  const PtExpr* mValue[3];
 
 };
 
@@ -663,7 +663,7 @@ private:
   /// @brief コンストラクタ
   CptAttrSpec(const FileRegion& file_region,
 	      const char* name,
-	      PtExpr* expr);
+	      const PtExpr* expr);
 
   /// @brief デストラクタ
   virtual
@@ -703,7 +703,7 @@ private:
   const char* mName;
 
   // 式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
 };
 

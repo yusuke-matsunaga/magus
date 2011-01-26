@@ -518,7 +518,7 @@ ElbMgr::find_scope_up(const VlNamedObj* base_scope,
   ymuint n = nb_array.size();
   const VlNamedObj* cur_scope = base_scope;
   for (ymuint i = 0; i < n; ) {
-    PtNameBranch* name_branch = nb_array[i];
+    const PtNameBranch* name_branch = nb_array[i];
     const char* top_name = name_branch->name();
     const VlNamedObj* top_scope = NULL;
     // まず普通に探す．

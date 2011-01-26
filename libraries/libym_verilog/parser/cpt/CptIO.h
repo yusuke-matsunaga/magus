@@ -196,8 +196,8 @@ protected:
 	  tVpiAuxType aux_type,
 	  tVpiNetType net_type,
 	  bool sign,
-	  PtExpr* left,
-	  PtExpr* right);
+	  const PtExpr* left,
+	  const PtExpr* right);
 
   /// @brief デストラクタ
   virtual
@@ -226,10 +226,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -309,7 +309,7 @@ protected:
   /// @param[in] init_value 初期値
   CptIOItemI(const FileRegion& file_region,
 	     const char* name,
-	     PtExpr* init_value);
+	     const PtExpr* init_value);
 
   /// @brief デストラクタ
   virtual
@@ -337,7 +337,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 初期値
-  PtExpr* mInitValue;
+  const PtExpr* mInitValue;
 
 };
 

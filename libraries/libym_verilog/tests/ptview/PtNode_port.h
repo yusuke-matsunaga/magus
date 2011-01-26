@@ -40,12 +40,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -59,7 +59,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -67,60 +67,7 @@ private:
 
   // 対応するポート
   const PtPort* mPort;
-  
-};
 
-
-//////////////////////////////////////////////////////////////////////
-/// @class PortRefNode PtNodeImpl.h
-/// @brief ポート参照式を表すノード
-//////////////////////////////////////////////////////////////////////
-class PortRefNode :
-  public PtNode
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] portref ポート参照式を表すパース木
-  PortRefNode(const PtPortRef* portref);
-
-  /// @brief デストラクタ
-  virtual
-  ~PortRefNode();
-
-
-public:
-
-  /// @brief データを返す．
-  /// @param[in] column コラム番号
-  /// @param[in] role 
-  virtual
-  QVariant
-  data(int column,
-       int role) const;
-    
-  /// @brief 対象のファイル上での位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-
-private:
-
-  /// @brief 子供の配列を作る．
-  virtual
-  void
-  expand() const;
-
-  
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 対応するポート参照式
-  const PtPortRef* mPortRef;
-  
 };
 
 END_NAMESPACE_YM_VERILOG

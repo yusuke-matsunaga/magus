@@ -157,7 +157,7 @@ CptGenBlockN::name() const
 
 // コンストラクタ
 CptGenIf::CptGenIf(const FileRegion& file_region,
-		   PtExpr* cond,
+		   const PtExpr* cond,
 		   PtDeclHeadArray then_declhead_array,
 		   PtItemArray then_item_array,
 		   PtDeclHeadArray else_declhead_array,
@@ -289,7 +289,7 @@ CptGenCaseItem::item_array() const
 
 // コンストラクタ
 CptGenCase::CptGenCase(const FileRegion& file_region,
-		       PtExpr* expr,
+		       const PtExpr* expr,
 		       PtGenCaseItemArray item_array) :
   mFileRegion(file_region),
   mExpr(expr),
@@ -345,9 +345,9 @@ CptGenCase::caseitem(ymuint pos) const
 // コンストラクタ
 CptGenFor::CptGenFor(const FileRegion& file_region,
 		     const char* loop_var,
-		     PtExpr* init_expr,
-		     PtExpr* cond,
-		     PtExpr* next_expr,
+		     const PtExpr* init_expr,
+		     const PtExpr* cond,
+		     const PtExpr* next_expr,
 		     const char* block_name,
 		     PtDeclHeadArray declhead_array,
 		     PtItemArray item_array) :
@@ -435,7 +435,7 @@ CptGenFor::next_expr() const
 //////////////////////////////////////////////////////////////////////
 
 // generate 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_Generate(const FileRegion& file_region,
 			 PtDeclHeadArray declhead_array,
 			 PtItemArray item_array)
@@ -446,7 +446,7 @@ CptFactory::new_Generate(const FileRegion& file_region,
 }
 
 // generate block 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GenBlock(const FileRegion& file_region,
 			 PtDeclHeadArray declhead_array,
 			 PtItemArray item_array)
@@ -457,7 +457,7 @@ CptFactory::new_GenBlock(const FileRegion& file_region,
 }
 
 // generate block 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GenBlock(const FileRegion& file_region,
 			 const char* name,
 			 PtDeclHeadArray declhead_array,
@@ -469,9 +469,9 @@ CptFactory::new_GenBlock(const FileRegion& file_region,
 }
 
 // generate if 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GenIf(const FileRegion& file_region,
-		      PtExpr* cond,
+		      const PtExpr* cond,
 		      PtDeclHeadArray then_declhead_array,
 		      PtItemArray then_item_array,
 		      PtDeclHeadArray else_declhead_array,
@@ -485,9 +485,9 @@ CptFactory::new_GenIf(const FileRegion& file_region,
 }
 
 // generate case 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GenCase(const FileRegion& file_region,
-			PtExpr* expr,
+			const PtExpr* expr,
 			PtGenCaseItemArray item_array)
 {
   ++ mNumGenCase;
@@ -496,7 +496,7 @@ CptFactory::new_GenCase(const FileRegion& file_region,
 }
 
 // generate case の要素を生成する．
-PtGenCaseItem*
+const PtGenCaseItem*
 CptFactory::new_GenCaseItem(const FileRegion& file_region,
 			    PtExprArray label_array,
 			    PtDeclHeadArray declhead_array,
@@ -509,12 +509,12 @@ CptFactory::new_GenCaseItem(const FileRegion& file_region,
 }
 
 // generate for 文を生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GenFor(const FileRegion& file_region,
 		       const char* loop_var,
-		       PtExpr* init_expr,
-		       PtExpr* cond,
-		       PtExpr* next_expr,
+		       const PtExpr* init_expr,
+		       const PtExpr* cond,
+		       const PtExpr* next_expr,
 		       const char* block_name,
 		       PtDeclHeadArray declhead_array,
 		       PtItemArray item_array)

@@ -42,7 +42,7 @@ Parser::end_generate()
 
 // @brief generate 文の生成
 // @param[in] fr ファイル位置の情報
-PtItem*
+const PtItem*
 Parser::new_Generate(const FileRegion& fr)
 {
   return mFactory.new_Generate(fr, mCurDeclArray, mCurItemArray);
@@ -53,7 +53,7 @@ Parser::new_Generate(const FileRegion& fr)
 void
 Parser::new_GenBlock(const FileRegion& fr)
 {
-  PtItem* item = mFactory.new_GenBlock(fr, mCurDeclArray, mCurItemArray);
+  const PtItem* item = mFactory.new_GenBlock(fr, mCurDeclArray, mCurItemArray);
   mCurItemList->push_back(item);
 }
 
@@ -64,7 +64,8 @@ void
 Parser::new_GenBlock(const FileRegion& fr,
 		     const char* name)
 {
-  PtItem* item = mFactory.new_GenBlock(fr, name, mCurDeclArray, mCurItemArray);
+  const PtItem* item = mFactory.new_GenBlock(fr, name,
+					     mCurDeclArray, mCurItemArray);
   mCurItemList->push_back(item);
 }
 
@@ -111,13 +112,13 @@ Parser::end_genelse()
 // @param[in] cond 条件を表す式
 void
 Parser::new_GenIf(const FileRegion& fr,
-		  PtExpr* cond)
+		  const PtExpr* cond)
 {
-  PtItem* item = mFactory.new_GenIf(fr, cond,
-				    mGenThenDeclArray,
-				    mGenThenItemArray,
-				    PtDeclHeadArray(),
-				    PtItemArray());
+  const PtItem* item = mFactory.new_GenIf(fr, cond,
+					  mGenThenDeclArray,
+					  mGenThenItemArray,
+					  PtDeclHeadArray(),
+					  PtItemArray());
   mCurItemList->push_back(item);
 }
 
@@ -126,13 +127,13 @@ Parser::new_GenIf(const FileRegion& fr,
 // @param[in] cond 条件を表す式
 void
 Parser::new_GenIfElse(const FileRegion& fr,
-		      PtExpr* cond)
+		      const PtExpr* cond)
 {
-  PtItem* item = mFactory.new_GenIf(fr, cond,
-				    mGenThenDeclArray,
-				    mGenThenItemArray,
-				    mGenElseDeclArray,
-				    mGenElseItemArray);
+  const PtItem* item = mFactory.new_GenIf(fr, cond,
+					  mGenThenDeclArray,
+					  mGenThenItemArray,
+					  mGenElseDeclArray,
+					  mGenElseItemArray);
   mCurItemList->push_back(item);
 }
 
@@ -142,10 +143,10 @@ Parser::new_GenIfElse(const FileRegion& fr,
 // @param[in] item_list generate case item のリスト
 void
 Parser::new_GenCase(const FileRegion& fr,
-		    PtExpr* expr,
-		    PtrList<PtGenCaseItem>* item_list)
+		    const PtExpr* expr,
+		    PtrList<const PtGenCaseItem>* item_list)
 {
-  PtItem* item = mFactory.new_GenCase(fr, expr, to_array(item_list));
+  const PtItem* item = mFactory.new_GenCase(fr, expr, to_array(item_list));
   mCurItemList->push_back(item);
 }
 
@@ -153,14 +154,14 @@ Parser::new_GenCase(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] label_list 比較式のリスト
 // @return 生成された generate case item
-PtGenCaseItem*
+const PtGenCaseItem*
 Parser::new_GenCaseItem(const FileRegion& fr,
-			PtrList<PtExpr>* label_list)
+			PtrList<const PtExpr>* label_list)
 {
-  PtGenCaseItem* item = mFactory.new_GenCaseItem(fr,
-						 to_array(label_list),
-						 mCurDeclArray,
-						 mCurItemArray);
+  const PtGenCaseItem* item = mFactory.new_GenCaseItem(fr,
+						       to_array(label_list),
+						       mCurDeclArray,
+						       mCurItemArray);
   return item;
 }
 
@@ -177,18 +178,18 @@ Parser::new_GenCaseItem(const FileRegion& fr,
 void
 Parser::new_GenFor(const FileRegion& fr,
 		   const char* loop_var,
-		   PtExpr* init_expr,
-		   PtExpr* cond,
+		   const PtExpr* init_expr,
+		   const PtExpr* cond,
 		   const char* inc_var,
-		   PtExpr* inc_expr,
+		   const PtExpr* inc_expr,
 		   const char* block_name)
 {
   if ( strcmp(loop_var, inc_var) == 0 ) {
-    PtItem* item = mFactory.new_GenFor(fr, loop_var,
-				       init_expr, cond, inc_expr,
-				       block_name,
-				       mCurDeclArray,
-				       mCurItemArray);
+    const PtItem* item = mFactory.new_GenFor(fr, loop_var,
+					     init_expr, cond, inc_expr,
+					     block_name,
+					     mCurDeclArray,
+					     mCurItemArray);
     mCurItemList->push_back(item);
   }
   else {

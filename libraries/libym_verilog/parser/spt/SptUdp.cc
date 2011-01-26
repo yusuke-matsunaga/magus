@@ -27,7 +27,7 @@ SptUdp::SptUdp(const FileRegion& file_region,
 	       PtiPortArray port_array,
 	       PtIOHeadArray iohead_array,
 	       bool is_seq,
-	       PtExpr* init_value,
+	       const PtExpr* init_value,
 	       PtUdpEntryArray entry_array) :
   mFileRegion(file_region),
   mName(name),
@@ -113,8 +113,8 @@ SptUdp::table_array() const
 // コンストラクタ
 SptUdpEntry::SptUdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
-			 PtUdpValue* current,
-			 PtUdpValue* output) :
+			 const PtUdpValue* current,
+			 const PtUdpValue* output) :
   mFileRegion(file_region),
   mInputArray(input_array),
   mCurrent(current),
@@ -142,14 +142,14 @@ SptUdpEntry::input_array() const
 }
 
 // 現状態の値を取り出す．
-PtUdpValue*
+const PtUdpValue*
 SptUdpEntry::current() const
 {
   return mCurrent;
 }
 
 // 出力の値を取り出す．
-PtUdpValue*
+const PtUdpValue*
 SptUdpEntry::output() const
 {
   return mOutput;
@@ -200,7 +200,7 @@ SptUdpValue::symbol() const
 // @param[in] iohead_array IOリスト
 // @param[in] entry_top テーブルエントリのリスト
 // @return 生成された UDP
-PtUdp*
+const PtUdp*
 SptFactory::new_CmbUdp(const FileRegion& file_region,
 		       const char* name,
 		       PtiPortArray port_array,
@@ -208,13 +208,12 @@ SptFactory::new_CmbUdp(const FileRegion& file_region,
 		       PtUdpEntryArray entry_array)
 {
   void* p = alloc().get_memory(sizeof(SptUdp));
-  SptUdp* udp = new (p) SptUdp(file_region,
-			       name,
-			       port_array,
-			       iohead_array,
-			       false, NULL,
-			       entry_array);
-  return udp;
+  return new (p) SptUdp(file_region,
+			name,
+			port_array,
+			iohead_array,
+			false, NULL,
+			entry_array);
 }
 
 // @brief sequential UDP の生成
@@ -226,22 +225,21 @@ SptFactory::new_CmbUdp(const FileRegion& file_region,
 // @param[in] init_value 初期値を表す式
 // @param[in] entry_top テーブルエントリのリスト
 // @return 生成された UDP
-PtUdp*
+const PtUdp*
 SptFactory::new_SeqUdp(const FileRegion& file_region,
 		       const char* name,
 		       PtiPortArray port_array,
 		       PtIOHeadArray iohead_array,
-		       PtExpr* init_value,
+		       const PtExpr* init_value,
 		       PtUdpEntryArray entry_array)
 {
   void* p = alloc().get_memory(sizeof(SptUdp));
-  SptUdp* udp = new (p) SptUdp(file_region,
-			       name,
-			       port_array,
-			       iohead_array,
-			       true, init_value,
-			       entry_array);
-  return udp;
+  return new (p) SptUdp(file_region,
+			name,
+			port_array,
+			iohead_array,
+			true, init_value,
+			entry_array);
 }
 
 // @brief combinational UDP 用のテーブルエントリの生成
@@ -249,10 +247,10 @@ SptFactory::new_SeqUdp(const FileRegion& file_region,
 // @param[in] input_array 入力値のリスト
 // @param[in] output 出力値のリスト
 // @return 生成されたテーブルエントリ
-PtUdpEntry*
+const PtUdpEntry*
 SptFactory::new_UdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
-			 PtUdpValue* output)
+			 const PtUdpValue* output)
 {
   void* p = alloc().get_memory(sizeof(SptUdpEntry));
   return new (p) SptUdpEntry(file_region,
@@ -267,11 +265,11 @@ SptFactory::new_UdpEntry(const FileRegion& file_region,
 // @param[in] current 現状態値
 // @param[in] output 出力値のリスト
 // @return 生成されたテーブルエントリ
-PtUdpEntry*
+const PtUdpEntry*
 SptFactory::new_UdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
-			 PtUdpValue* current,
-			 PtUdpValue* output)
+			 const PtUdpValue* current,
+			 const PtUdpValue* output)
 {
   void* p = alloc().get_memory(sizeof(SptUdpEntry));
   return new (p) SptUdpEntry(file_region,
@@ -284,7 +282,7 @@ SptFactory::new_UdpEntry(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] symbol シンボル
 // @return 生成された値
-PtUdpValue*
+const PtUdpValue*
 SptFactory::new_UdpValue(const FileRegion& file_region,
 			 tVpiUdpVal symbol)
 {

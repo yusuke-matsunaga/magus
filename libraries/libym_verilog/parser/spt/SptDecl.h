@@ -36,8 +36,8 @@ private:
 	    tVpiNetType net_type,
 	    tVpiVarType var_type,
 	    bool sign,
-	    PtExpr* left,
-	    PtExpr* right);
+	    const PtExpr* left,
+	    const PtExpr* right);
 
   /// デストラクタ
   virtual
@@ -137,10 +137,10 @@ private:
   bool mSigned;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
   // 要素の配列
   PtIOItemArray mItemArray;
@@ -162,7 +162,7 @@ private:
   /// コンストラクタ
   SptIOItem(const FileRegion& file_region,
 	    const char* name,
-	    PtExpr* init_value);
+	    const PtExpr* init_value);
 
   /// デストラクタ
   virtual
@@ -202,7 +202,7 @@ private:
   const char* mName;
 
   // 初期値
-  PtExpr* mInitValue;
+  const PtExpr* mInitValue;
 
 };
 
@@ -221,13 +221,13 @@ private:
   SptDeclHead(const FileRegion& file_region,
 	      tPtDeclType type,
 	      bool sign,
-	      PtExpr* left,
-	      PtExpr* right,
+	      const PtExpr* left,
+	      const PtExpr* right,
 	      tVpiVarType var_type,
 	      tVpiNetType net_type,
 	      tVpiVsType vs_type,
-	      PtStrength* strength,
-	      PtDelay* delay);
+	      const PtStrength* strength,
+	      const PtDelay* delay);
 
   /// デストラクタ
   virtual
@@ -329,10 +329,10 @@ private:
   bool mSigned;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
   // データ型
   tVpiVarType mVarType;
@@ -344,10 +344,10 @@ private:
   tVpiVsType mVsType;
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
   // 要素の配列
   PtDeclItemArray mItemArray;
@@ -370,7 +370,7 @@ private:
   SptDeclItem(const FileRegion& file_region,
 	      const char* name,
 	      PtRangeArray range_array,
-	      PtExpr* init_value);
+	      const PtExpr* init_value);
 
   /// デストラクタ
   virtual
@@ -423,7 +423,7 @@ private:
   PtRangeArray mRangeArray;
 
   // 初期値
-  PtExpr* mInitValue;
+  const PtExpr* mInitValue;
 
 };
 
@@ -439,8 +439,8 @@ public:
 
   /// @brief コンストラクタ
   SptRange(const FileRegion& file_region,
-	   PtExpr* msb,
-	   PtExpr* lsb);
+	   const PtExpr* msb,
+	   const PtExpr* lsb);
 
   /// @brief デストラクタ
   virtual
@@ -477,10 +477,10 @@ private:
   FileRegion mFileRegion;
 
   // MSB
-  PtExpr* mMsb;
+  const PtExpr* mMsb;
 
   // LSB
-  PtExpr* mLsb;
+  const PtExpr* mLsb;
 
 };
 

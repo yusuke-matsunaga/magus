@@ -216,9 +216,9 @@ private:
   /// コンストラクタ
   SptOpr1(const FileRegion& file_region,
 	  tVpiOpType op_type,
-	  PtExpr* opr1,
-	  PtExpr* opr2 = NULL,
-	  PtExpr* opr3 = NULL);
+	  const PtExpr* opr1,
+	  const PtExpr* opr2 = NULL,
+	  const PtExpr* opr3 = NULL);
 
   /// デストラクタ
   virtual
@@ -269,7 +269,7 @@ private:
   ymuint32 mSize;
 
   // オペランドの配列
-  PtExpr* mExprList[3];
+  const PtExpr* mExprList[3];
 
 };
 
@@ -422,8 +422,8 @@ private:
 	     bool const_index,
 	     PtExprArray index_array = PtExprArray(),
 	     tVpiRangeMode mode = kVpiNoRange,
-	     PtExpr* left = NULL,
-	     PtExpr* right = NULL);
+	     const PtExpr* left = NULL,
+	     const PtExpr* right = NULL);
 
   /// デストラクタ
   virtual
@@ -499,10 +499,10 @@ private:
   tVpiRangeMode mMode;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 

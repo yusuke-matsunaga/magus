@@ -31,7 +31,6 @@ class PtiIOHead;
 class PtiDeclHead;
 
 typedef PtArray<PtiPort> PtiPortArray;
-typedef PtArray<PtiPortRef> PtiPortRefArray;
 
 END_NAMESPACE_YM_VERILOG
 

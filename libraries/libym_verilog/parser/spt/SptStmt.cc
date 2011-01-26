@@ -36,12 +36,12 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param arg_array 引数のリスト
 SptStmt::SptStmt(const FileRegion& file_region,
 		 tPtStmtType type,
-		 PtStmt* body1,
-		 PtStmt* body2,
-		 PtStmt* body3,
-		 PtExpr* expr1,
-		 PtExpr* expr2,
-		 PtControl* control,
+		 const PtStmt* body1,
+		 const PtStmt* body2,
+		 const PtStmt* body3,
+		 const PtExpr* expr1,
+		 const PtExpr* expr2,
+		 const PtControl* control,
 		 const char* name,
 		 PtNameBranchArray nb_array,
 		 PtCaseItemArray caseitem_array,
@@ -279,7 +279,7 @@ SptStmt::stmt_array() const
 // コンストラクタ
 SptCaseItem::SptCaseItem(const FileRegion& file_region,
 			 PtExprArray label_array,
-			 PtStmt* body) :
+			 const PtStmt* body) :
   mFileRegion(file_region),
   mLabelArray(label_array),
   mBody(body)
@@ -317,7 +317,7 @@ SptCaseItem::label(ymuint pos) const
 }
 
 // 本体のステートメント得る．
-PtStmt*
+const PtStmt*
 SptCaseItem::body() const
 {
   return mBody;
@@ -332,7 +332,7 @@ SptCaseItem::body() const
 // @param[in] file_region ファイル位置の情報
 // @param[in] name 停止するスコープ名
 // @return 生成された disable 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Disable(const FileRegion& file_region,
 			const char* name)
 {
@@ -350,7 +350,7 @@ SptFactory::new_Disable(const FileRegion& file_region,
 // @param[in] nb_top 階層名のリスト
 // @param[in] name 末尾の名前
 // @return 生成された disable 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Disable(const FileRegion& file_region,
 			PtNameBranchArray nb_array,
 			const char* name)
@@ -370,7 +370,7 @@ SptFactory::new_Disable(const FileRegion& file_region,
 // @param[in] name 起動するタスク名
 // @param[in] arg_array 引数のリスト
 // @return 生成された enable 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Enable(const FileRegion& file_region,
 		       const char* name,
 		       PtExprArray arg_array)
@@ -395,7 +395,7 @@ SptFactory::new_Enable(const FileRegion& file_region,
 // @param[in] name 末尾の名前
 // @param[in] arg_array 引数のリスト
 // @return 生成された enable 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Enable(const FileRegion& file_region,
 		       PtNameBranchArray nb_array,
 		       const char* name,
@@ -420,7 +420,7 @@ SptFactory::new_Enable(const FileRegion& file_region,
 // @param[in] name 起動するシステムタスク名
 // @param[in] arg_array 引数のリスト
 // @return 生成された system task enable 文
-PtStmt*
+const PtStmt*
 SptFactory::new_SysEnable(const FileRegion& file_region,
 			  const char* name,
 			  PtExprArray arg_array)
@@ -444,10 +444,10 @@ SptFactory::new_SysEnable(const FileRegion& file_region,
 // @param[in] delay delay control (delay control 文とは別物)
 // @param[in] body 本体のステートメント
 // @return 生成された delay control 文
-PtStmt*
+const PtStmt*
 SptFactory::new_DcStmt(const FileRegion& file_region,
-		       PtControl* delay,
-		       PtStmt* body)
+		       const PtControl* delay,
+		       const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -462,10 +462,10 @@ SptFactory::new_DcStmt(const FileRegion& file_region,
 // @param[in] event delay control (event control 文とは別物)
 // @param[in] body 本体のステートメント
 // @return 生成された event control 文
-PtStmt*
+const PtStmt*
 SptFactory::new_EcStmt(const FileRegion& file_region,
-		       PtControl* event,
-		       PtStmt* body)
+		       const PtControl* event,
+		       const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -480,10 +480,10 @@ SptFactory::new_EcStmt(const FileRegion& file_region,
 // @param[in] cond 条件式
 // @param[in] body 本体のステートメント
 // @return 生成された wait 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Wait(const FileRegion& file_region,
-		     PtExpr* cond,
-		     PtStmt* body)
+		     const PtExpr* cond,
+		     const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -498,10 +498,10 @@ SptFactory::new_Wait(const FileRegion& file_region,
 // @param[in] lhs 左辺式
 // @param[in] rhs 右辺式
 // @return 生成された assign 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Assign(const FileRegion& file_region,
-		       PtExpr* lhs,
-		       PtExpr* rhs)
+		       const PtExpr* lhs,
+		       const PtExpr* rhs)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -516,11 +516,11 @@ SptFactory::new_Assign(const FileRegion& file_region,
 // @param[in] rhs 右辺式
 // @param[in] control 制御式
 // @return 生成された assign 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Assign(const FileRegion& file_region,
-		       PtExpr* lhs,
-		       PtExpr* rhs,
-		       PtControl* control)
+		       const PtExpr* lhs,
+		       const PtExpr* rhs,
+		       const PtControl* control)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -535,10 +535,10 @@ SptFactory::new_Assign(const FileRegion& file_region,
 // @param[in] lhs 左辺式
 // @param[in] rhs 右辺式
 // @return 生成された nonblocking assign 文
-PtStmt*
+const PtStmt*
 SptFactory::new_NbAssign(const FileRegion& file_region,
-			 PtExpr* lhs,
-			 PtExpr* rhs)
+			 const PtExpr* lhs,
+			 const PtExpr* rhs)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -553,11 +553,11 @@ SptFactory::new_NbAssign(const FileRegion& file_region,
 // @param[in] rhs 右辺式
 // @param[in] control 制御式
 // @return 生成された nonblocking assign 文
-PtStmt*
+const PtStmt*
 SptFactory::new_NbAssign(const FileRegion& file_region,
-			 PtExpr* lhs,
-			 PtExpr* rhs,
-			 PtControl* control)
+			 const PtExpr* lhs,
+			 const PtExpr* rhs,
+			 const PtControl* control)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -571,9 +571,9 @@ SptFactory::new_NbAssign(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] event イベント名
 // @return 生成された event 文
-PtStmt*
+const PtStmt*
 SptFactory::new_EventStmt(const FileRegion& file_region,
-			  PtExpr* event)
+			  const PtExpr* event)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -585,7 +585,7 @@ SptFactory::new_EventStmt(const FileRegion& file_region,
 // @brief null 文の生成
 // @param[in] file_region ファイル位置の情報
 // @return 生成された null 文
-PtStmt*
+const PtStmt*
 SptFactory::new_NullStmt(const FileRegion& file_region)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
@@ -598,10 +598,10 @@ SptFactory::new_NullStmt(const FileRegion& file_region)
 // @param[in] expr 条件式
 // @param[in] then_body 成り立ったときに実行されるステートメント
 // @return 生成された if 文
-PtStmt*
+const PtStmt*
 SptFactory::new_If(const FileRegion& file_region,
-		   PtExpr* expr,
-		   PtStmt* then_body)
+		   const PtExpr* expr,
+		   const PtStmt* then_body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -616,11 +616,11 @@ SptFactory::new_If(const FileRegion& file_region,
 // @param[in] then_body 成り立ったときに実行されるステートメント
 // @param[in] else_body 成り立たなかったときに実行されるステートメント
 // @return 生成された if 文
-PtStmt*
+const PtStmt*
 SptFactory::new_If(const FileRegion& file_region,
-		   PtExpr* expr,
-		   PtStmt* then_body,
-		   PtStmt* else_body)
+		   const PtExpr* expr,
+		   const PtStmt* then_body,
+		   const PtStmt* else_body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -634,9 +634,9 @@ SptFactory::new_If(const FileRegion& file_region,
 // @param[in] expr 条件式
 // @param[in] caseitem_list case item のリスト
 // @return 生成された case 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Case(const FileRegion& file_region,
-		     PtExpr* expr,
+		     const PtExpr* expr,
 		     PtCaseItemArray caseitem_array)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
@@ -655,9 +655,9 @@ SptFactory::new_Case(const FileRegion& file_region,
 // @param[in] expr 条件式
 // @param[in] caseitem_list case item のリスト
 // @return 生成された casex 文
-PtStmt*
+const PtStmt*
 SptFactory::new_CaseX(const FileRegion& file_region,
-		      PtExpr* expr,
+		      const PtExpr* expr,
 		      PtCaseItemArray caseitem_array)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
@@ -676,9 +676,9 @@ SptFactory::new_CaseX(const FileRegion& file_region,
 // @param[in] expr 条件式
 // @param[in] caseitem_list case item のリスト
 // @return 生成された casez 文
-PtStmt*
+const PtStmt*
 SptFactory::new_CaseZ(const FileRegion& file_region,
-		      PtExpr* expr,
+		      const PtExpr* expr,
 		      PtCaseItemArray caseitem_array)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
@@ -697,10 +697,10 @@ SptFactory::new_CaseZ(const FileRegion& file_region,
 // @param[in] label ラベルのリスト
 // @param[in] body 本体のステートメント
 // @return 生成された case item
-PtCaseItem*
+const PtCaseItem*
 SptFactory::new_CaseItem(const FileRegion& file_region,
 			 PtExprArray label_array,
-			 PtStmt* body)
+			 const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptCaseItem));
   return new (p) SptCaseItem(file_region, label_array, body);
@@ -710,9 +710,9 @@ SptFactory::new_CaseItem(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] body 本体のステートメント
 // @return 生成された forever 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Forever(const FileRegion& file_region,
-			PtStmt* body)
+			const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -725,10 +725,10 @@ SptFactory::new_Forever(const FileRegion& file_region,
 // @param[in] expr 繰り返し数を表す式
 // @param[in] body 本体のステートメント
 // @return 生成された repeat 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Repeat(const FileRegion& file_region,
-		       PtExpr* expr,
-		       PtStmt* body)
+		       const PtExpr* expr,
+		       const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -742,10 +742,10 @@ SptFactory::new_Repeat(const FileRegion& file_region,
 // @param[in] cond 繰り返し条件式
 // @param[in] body 本体のステートメント
 // @return 生成された while 文
-PtStmt*
+const PtStmt*
 SptFactory::new_While(const FileRegion& file_region,
-		      PtExpr* cond,
-		      PtStmt* body)
+		      const PtExpr* cond,
+		      const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -761,12 +761,12 @@ SptFactory::new_While(const FileRegion& file_region,
 // @param[in] next 増加文
 // @param[in] body 本体のステートメント
 // @return 生成された for 文
-PtStmt*
+const PtStmt*
 SptFactory::new_For(const FileRegion& file_region,
-		    PtStmt* init,
-		    PtExpr* cond,
-		    PtStmt* next,
-		    PtStmt* body)
+		    const PtStmt* init,
+		    const PtExpr* cond,
+		    const PtStmt* next,
+		    const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -780,10 +780,10 @@ SptFactory::new_For(const FileRegion& file_region,
 // @param[in] lhs 左辺式
 // @param[in] rhs 右辺式
 // @return 生成された procedural assign 文
-PtStmt*
+const PtStmt*
 SptFactory::new_PcAssign(const FileRegion& file_region,
-			 PtExpr* lhs,
-			 PtExpr* rhs)
+			 const PtExpr* lhs,
+			 const PtExpr* rhs)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -796,9 +796,9 @@ SptFactory::new_PcAssign(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] lhs 左辺式
 // @return 生成された deassign 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Deassign(const FileRegion& file_region,
-			 PtExpr* lhs)
+			 const PtExpr* lhs)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -812,10 +812,10 @@ SptFactory::new_Deassign(const FileRegion& file_region,
 // @param[in] lhs 左辺式
 // @param[in] rhs 右辺式
 // @return 生成された force 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Force(const FileRegion& file_region,
-		      PtExpr* lhs,
-		      PtExpr* rhs)
+		      const PtExpr* lhs,
+		      const PtExpr* rhs)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -828,9 +828,9 @@ SptFactory::new_Force(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] lhs 左辺式
 // @return 生成された release 文
-PtStmt*
+const PtStmt*
 SptFactory::new_Release(const FileRegion& file_region,
-			PtExpr* lhs)
+			const PtExpr* lhs)
 {
   void* p = alloc().get_memory(sizeof(SptStmt));
   return new (p) SptStmt(file_region,
@@ -843,7 +843,7 @@ SptFactory::new_Release(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] stmt_top 本体のステートメントのリスト
 // @return 生成された parallel block
-PtStmt*
+const PtStmt*
 SptFactory::new_ParBlock(const FileRegion& file_region,
 			 PtStmtArray stmt_array)
 {
@@ -866,7 +866,7 @@ SptFactory::new_ParBlock(const FileRegion& file_region,
 // @param[in] decl_top 宣言のリスト
 // @param[in] stmt_top 本体のステートメントのリスト
 // @return 生成された parallel block
-PtStmt*
+const PtStmt*
 SptFactory::new_NamedParBlock(const FileRegion& file_region,
 			      const char* name,
 			      PtDeclHeadArray decl_array,
@@ -889,7 +889,7 @@ SptFactory::new_NamedParBlock(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] stmt_top 本体のステートメントのリスト
 // @return 生成された sequential block
-PtStmt*
+const PtStmt*
 SptFactory::new_SeqBlock(const FileRegion& file_region,
 			 PtStmtArray stmt_array)
 {
@@ -912,7 +912,7 @@ SptFactory::new_SeqBlock(const FileRegion& file_region,
 // @param[in] decl_top 宣言のリスト
 // @param[in] stmt_top 本体のステートメントのリスト
 // @return 生成された sequential block
-PtStmt*
+const PtStmt*
 SptFactory::new_NamedSeqBlock(const FileRegion& file_region,
 			      const char* name,
 			      PtDeclHeadArray decl_array,

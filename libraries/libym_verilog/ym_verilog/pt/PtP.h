@@ -171,26 +171,26 @@ class PtAttrSpec;
 template <typename T>
 class PtArray;
 
-typedef PtArray<PtPort> PtPortArray;
-typedef PtArray<PtUdpEntry> PtUdpEntryArray;
-typedef PtArray<PtUdpValue> PtUdpValueArray;
-typedef PtArray<PtIOHead> PtIOHeadArray;
-typedef PtArray<PtIOItem> PtIOItemArray;
-typedef PtArray<PtDeclHead> PtDeclHeadArray;
-typedef PtArray<PtDeclItem> PtDeclItemArray;
-typedef PtArray<PtItem> PtItemArray;
-typedef PtArray<PtInst> PtInstArray;
-typedef PtArray<PtDefParam> PtDefParamArray;
-typedef PtArray<PtContAssign> PtContAssignArray;
-typedef PtArray<PtGenCaseItem> PtGenCaseItemArray;
-typedef PtArray<PtStmt> PtStmtArray;
-typedef PtArray<PtCaseItem> PtCaseItemArray;
-typedef PtArray<PtExpr> PtExprArray;
-typedef PtArray<PtConnection> PtConnectionArray;
-typedef PtArray<PtRange> PtRangeArray;
-typedef PtArray<PtNameBranch> PtNameBranchArray;
-typedef PtArray<PtAttrInst> PtAttrInstArray;
-typedef PtArray<PtAttrSpec> PtAttrSpecArray;
+typedef PtArray<const PtPort> PtPortArray;
+typedef PtArray<const PtUdpEntry> PtUdpEntryArray;
+typedef PtArray<const PtUdpValue> PtUdpValueArray;
+typedef PtArray<const PtIOHead> PtIOHeadArray;
+typedef PtArray<const PtIOItem> PtIOItemArray;
+typedef PtArray<const PtDeclHead> PtDeclHeadArray;
+typedef PtArray<const PtDeclItem> PtDeclItemArray;
+typedef PtArray<const PtItem> PtItemArray;
+typedef PtArray<const PtInst> PtInstArray;
+typedef PtArray<const PtDefParam> PtDefParamArray;
+typedef PtArray<const PtContAssign> PtContAssignArray;
+typedef PtArray<const PtGenCaseItem> PtGenCaseItemArray;
+typedef PtArray<const PtStmt> PtStmtArray;
+typedef PtArray<const PtCaseItem> PtCaseItemArray;
+typedef PtArray<const PtExpr> PtExprArray;
+typedef PtArray<const PtConnection> PtConnectionArray;
+typedef PtArray<const PtRange> PtRangeArray;
+typedef PtArray<const PtNameBranch> PtNameBranchArray;
+typedef PtArray<const PtAttrInst> PtAttrInstArray;
+typedef PtArray<const PtAttrSpec> PtAttrSpecArray;
 
 END_NAMESPACE_YM_VERILOG
 

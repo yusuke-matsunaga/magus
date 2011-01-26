@@ -315,19 +315,27 @@ public:
   const char*
   ext_name() const;
 
+  /// @brief 内側のポート結線を表す式の取得
+  virtual
+  const PtExpr*
+  portref() const;
+
   /// @brief 内部のポート結線リストのサイズの取得
-  /// @return 内部のポート結線リストのサイズ
-  /// @note このクラスでは 0 を返す．
   virtual
   ymuint
-  portref_num() const;
+  portref_size() const;
 
-  /// @brief 内部のポート結線の取得
-  /// @return 先頭の内部のポート結線
-  /// @note このクラスでは NULL を返す．
+  /// @brief 内部のポート結線リストの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
-  const PtPortRef*
-  portref(ymuint pos) const;
+  const PtExpr*
+  portref_elem(ymuint pos) const;
+
+  /// @brief 内部ポート結線の方向の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+  virtual
+  tVpiDirection
+  portref_dir(ymuint pos) const;
 
 
 public:
@@ -335,11 +343,13 @@ public:
   // 設定用の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief portref を得る．
-  /// @note このクラスでは NULL を返す．
+  /// @brief portref の方向を設定する．
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+  /// @param[in] dir 方向
   virtual
-  PtiPortRef*
-  _portref(ymuint pos);
+  void
+  _set_portref_dir(ymuint pos,
+		   tVpiDirection dir);
 
 
 private:
@@ -364,11 +374,11 @@ class CptPort1 :
 {
   friend class CptFactory;
 
-private:
+protected:
 
   /// @brief コンストラクタ
   CptPort1(const FileRegion& file_region,
-	   PtiPortRef* portref,
+	   const PtExpr* portref,
 	   const char* ext_name);
 
   /// @brief デストラクタ
@@ -381,17 +391,27 @@ public:
   // PtPort の継承クラスが実装しなければならない仮想関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 内側のポート結線を表す式の取得
+  virtual
+  const PtExpr*
+  portref() const;
+
   /// @brief 内部のポート結線リストのサイズの取得
-  /// @return 内部のポート結線リストのサイズ
   virtual
   ymuint
-  portref_num() const;
+  portref_size() const;
 
-  /// @brief 内部のポート結線の取得
-  /// @return 先頭の内部のポート結線
+  /// @brief 内部のポート結線リストの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
-  const PtPortRef*
-  portref(ymuint pos) const;
+  const PtExpr*
+  portref_elem(ymuint pos) const;
+
+  ///@brief 内部ポート結線の方向の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+  virtual
+  tVpiDirection
+  portref_dir(ymuint pos) const;
 
 
 public:
@@ -399,10 +419,13 @@ public:
   // 設定用の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief portref を得る．
+  /// @brief portref の方向を設定する．
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+  /// @param[in] dir 方向
   virtual
-  PtiPortRef*
-  _portref(ymuint pos);
+  void
+  _set_portref_dir(ymuint pos,
+		   tVpiDirection dir);
 
 
 private:
@@ -411,7 +434,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 内部向きの接続を表す式
-  PtiPortRef* mPortRef;
+  const PtExpr* mPortRef;
+
+  // 方向
+  tVpiDirection mDir;
 
 };
 
@@ -420,7 +446,7 @@ private:
 /// @brief port を表すクラス (portref リスト付き)
 //////////////////////////////////////////////////////////////////////
 class CptPort2 :
-  public CptPort
+  public CptPort1
 {
   friend class CptFactory;
 
@@ -428,7 +454,9 @@ private:
 
   /// @brief コンストラクタ
   CptPort2(const FileRegion& file_region,
-	   PtiPortRefArray portref_array,
+	   const PtExpr* portref,
+	   PtExprArray portref_array,
+	   tVpiDirection* dir_array,
 	   const char* ext_name);
 
   /// @brief デストラクタ
@@ -442,16 +470,21 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 内部のポート結線リストのサイズの取得
-  /// @return 内部のポート結線リストのサイズ
   virtual
   ymuint
-  portref_num() const;
+  portref_size() const;
 
-  /// @brief 内部のポート結線の取得
-  /// @return 先頭の内部のポート結線
+  /// @brief 内部のポート結線リストの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
-  const PtPortRef*
-  portref(ymuint pos) const;
+  const PtExpr*
+  portref_elem(ymuint pos) const;
+
+  ///@brief 内部ポート結線の方向の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+  virtual
+  tVpiDirection
+  portref_dir(ymuint pos) const;
 
 
 public:
@@ -459,198 +492,28 @@ public:
   // 設定用の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief portref を得る．
+  /// @brief portref の方向を設定する．
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+  /// @param[in] dir 方向
   virtual
-  PtiPortRef*
-  _portref(ymuint pos);
+  void
+  _set_portref_dir(ymuint pos,
+		   tVpiDirection dir);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ポート参照式
+  const PtExpr* mPortRef;
 
   // ポート参照式の配列
-  PtiPortRefArray mPortRefArray;
+  PtExprArray mPortRefArray;
 
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// port reference のベース実装クラス
-//////////////////////////////////////////////////////////////////////
-class CptPortRef :
-  public PtiPortRef
-{
-  friend class CptFactory;
-
-protected:
-
-  /// コンストラクタ
-  CptPortRef(const FileRegion& file_region,
-	     const char* name);
-
-  /// デストラクタ
-  virtual
-  ~CptPortRef();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // PtPortRef の継承クラスが実装しなければならない仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// ファイル位置の取得
-  virtual
-  FileRegion
-  file_region() const;
-
-  /// @brief 名前の取得
-  /// @return 名前
-  virtual
-  const char*
-  name() const;
-
-  /// @brief インデックスの取得
-  /// @return インデックスを表す式
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const PtExpr*
-  index() const;
-
-  /// @brief 範囲指定モードの取得
-  /// @retval kVpiNoRange 範囲指定なし
-  /// @retval kVpiConstRange [ a : b ] のタイプ
-  /// @retval kVpiPlusRange  [ a :+ b ] のタイプ
-  /// @retval kVpiMinusRange [ a :- b ] のタイプ
-  /// @note このクラスでは kVpiNoRange を返す．
-  virtual
-  tVpiRangeMode
-  range_mode() const;
-
-  /// @brief 範囲の左側の式の取得
-  /// @return 範囲の左側の式
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const PtExpr*
-  left_range() const;
-
-  /// @brief 範囲の右側の式の取得
-  /// @return 範囲の右側の式
-  /// @note このクラスでは NULL を返す．
-  virtual
-  const PtExpr*
-  right_range() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ファイル位置
-  FileRegion mFileRegion;
-
-  // 名前
-  const char* mName;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// インデックスつきの port reference を表すクラス
-//////////////////////////////////////////////////////////////////////
-class CptPortRefI :
-  public CptPortRef
-{
-public:
-
-  /// コンストラクタ
-  CptPortRefI(const FileRegion& file_region,
-	      const char* name,
-	      PtExpr* index);
-
-  /// デストラクタ
-  virtual
-  ~CptPortRefI();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // PtPortRef の継承クラスが実装しなければならない仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// インデックスの取得
-  virtual
-  const PtExpr*
-  index() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // インデックス
-  PtExpr* mIndex;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// 範囲指定つきの port reference を表すクラス
-//////////////////////////////////////////////////////////////////////
-class CptPortRefR :
-  public CptPortRef
-{
-public:
-
-  /// コンストラクタ
-  CptPortRefR(const FileRegion& file_region,
-	      const char* name,
-	      tVpiRangeMode mode,
-	      PtExpr* left,
-	      PtExpr* right);
-
-  /// デストラクタ
-  virtual
-  ~CptPortRefR();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // PtPortRef の継承クラスが実装しなければならない仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// 範囲指定モードの取得
-  virtual
-  tVpiRangeMode
-  range_mode() const;
-
-  /// 範囲の左側の式の取得
-  virtual
-  const PtExpr*
-  left_range() const;
-
-  /// 範囲の右側の式の取得
-  virtual
-  const PtExpr*
-  right_range() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 範囲指定モード
-  tVpiRangeMode mMode;
-
-  // 範囲のMSB
-  PtExpr* mLeftRange;
-
-  // 範囲のLSB
-  PtExpr* mRightRange;
+  // 方向の配列
+  tVpiDirection* mDirArray;
 
 };
 

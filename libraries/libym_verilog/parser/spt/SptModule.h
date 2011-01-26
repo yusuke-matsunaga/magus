@@ -289,7 +289,7 @@ private:
   /// @brief コンストラクタ
   SptPort(const FileRegion& file_region,
 	  const PtExpr* portref,
-	  PtPortRefArray portref_array,
+	  PtExprArray portref_array,
 	  const char* ext_name);
 
   /// @brief デストラクタ
@@ -362,7 +362,7 @@ private:
   const PtExpr* mPortRef;
 
   // portref の配列
-  PtiPortRefArray mPortRefArray;
+  PtExprArray mPortRefArray;
 
   // portref の方向の配列
   tVpiDirection* mDirArray;

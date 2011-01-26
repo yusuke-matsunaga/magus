@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief defparam 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
-PtItem*
+const PtItem*
 Parser::new_DefParamH(const FileRegion& fr)
 {
   return mFactory.new_DefParamH(fr, get_defparam_array());
@@ -43,7 +43,7 @@ Parser::init_defparam()
 void
 Parser::new_DefParam(const FileRegion& fr,
 		     const char* name,
-		     PtExpr* value)
+		     const PtExpr* value)
 {
   add_defparam( mFactory.new_DefParam(fr, name, value) );
 }
@@ -55,7 +55,7 @@ Parser::new_DefParam(const FileRegion& fr,
 void
 Parser::new_DefParam(const FileRegion& fr,
 		     PuHierName* hname,
-		     PtExpr* value)
+		     const PtExpr* value)
 {
   PtNameBranchArray nb_array;
   const char* tail_name = extract_HierName(hname, nb_array);
@@ -65,7 +65,7 @@ Parser::new_DefParam(const FileRegion& fr,
 // @brief defparam リストに要素を追加する．
 inline
 void
-Parser::add_defparam(PtDefParam* defparam)
+Parser::add_defparam(const PtDefParam* defparam)
 {
   mDefParamList.push_back(defparam);
 }
@@ -85,7 +85,7 @@ Parser::get_defparam_array()
 
 // @brief continuous assign 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
-PtItem*
+const PtItem*
 Parser::new_ContAssignH(const FileRegion& fr)
 {
   return mFactory.new_ContAssignH(fr, get_contassign_array());
@@ -94,9 +94,9 @@ Parser::new_ContAssignH(const FileRegion& fr)
 // @brief continuous assign 文のヘッダの生成 (strengthつき)
 // @param[in] fr ファイル位置の情報
 // @param[in] strength 信号強度
-PtItem*
+const PtItem*
 Parser::new_ContAssignH(const FileRegion& fr,
-			PtStrength* strength)
+			const PtStrength* strength)
 {
   return mFactory.new_ContAssignH(fr, strength, get_contassign_array());
 }
@@ -104,9 +104,9 @@ Parser::new_ContAssignH(const FileRegion& fr,
 // @brief continuous assign 文のヘッダの生成 (遅延付き)
 // @param[in] fr ファイル位置の情報
 // @param[in] delay 遅延値
-PtItem*
+const PtItem*
 Parser::new_ContAssignH(const FileRegion& fr,
-			PtDelay* delay)
+			const PtDelay* delay)
 {
   return mFactory.new_ContAssignH(fr, delay, get_contassign_array());
 }
@@ -116,10 +116,10 @@ Parser::new_ContAssignH(const FileRegion& fr,
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
-PtItem*
+const PtItem*
 Parser::new_ContAssignH(const FileRegion& fr,
-			PtStrength* strength,
-			PtDelay* delay)
+			const PtStrength* strength,
+			const PtDelay* delay)
 {
   return mFactory.new_ContAssignH(fr, strength, delay, get_contassign_array());
 }
@@ -137,8 +137,8 @@ Parser::init_contassign()
 // @param[in] rhs 右辺式
 void
 Parser::new_ContAssign(const FileRegion& fr,
-		       PtExpr* lhs,
-		       PtExpr* rhs)
+		       const PtExpr* lhs,
+		       const PtExpr* rhs)
 {
   add_contassign( mFactory.new_ContAssign(fr, lhs, rhs) );
 }
@@ -146,7 +146,7 @@ Parser::new_ContAssign(const FileRegion& fr,
 // @brief contassign リストに要素を追加する．
 inline
 void
-Parser::add_contassign(PtContAssign* contassign)
+Parser::add_contassign(const PtContAssign* contassign)
 {
   mContAssignList.push_back(contassign);
 }
@@ -167,9 +167,9 @@ Parser::get_contassign_array()
 // @brief initial 文の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] body 本体のステートメント
-PtItem*
+const PtItem*
 Parser::new_Initial(const FileRegion& fr,
-		    PtStmt* body)
+		    const PtStmt* body)
 {
   return mFactory.new_Initial(fr, body);
 }
@@ -177,9 +177,9 @@ Parser::new_Initial(const FileRegion& fr,
 // @brief always 文の生成
 // @param[in] fr ファイル位置の情報
 // @param[in] body 本体のステートメント
-PtItem*
+const PtItem*
 Parser::new_Always(const FileRegion& fr,
-		   PtStmt* body)
+		   const PtStmt* body)
 {
   return mFactory.new_Always(fr, body);
 }
@@ -225,11 +225,11 @@ Parser::end_tf()
 // @param[in] name task 名
 // @param[in] automatic automatic task の時に true となるフラグ
 // @param[in] stmt 本体のステートメント
-PtItem*
+const PtItem*
 Parser::new_Task(const FileRegion& fr,
 		 const char* name,
 		 bool automatic,
-		 PtStmt* stmt)
+		 const PtStmt* stmt)
 {
   return mFactory.new_Task(fr, name, automatic,
 			   get_tf_io_array(),
@@ -243,12 +243,12 @@ Parser::new_Task(const FileRegion& fr,
 // @param[in] automatic automatic task の時に true となるフラグ
 // @param[in] sign signed 属性がついていたら true となるフラグ
 // @param[in] stmt 本体のステートメント
-PtItem*
+const PtItem*
 Parser::new_Function(const FileRegion& fr,
 		     const char* name,
 		     bool automatic,
 		     bool sign,
-		     PtStmt* stmt)
+		     const PtStmt* stmt)
 {
   return mFactory.new_Function(fr, name, automatic,
 			       sign,
@@ -265,14 +265,14 @@ Parser::new_Function(const FileRegion& fr,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @param[in] stmt 本体のステートメント
-PtItem*
+const PtItem*
 Parser::new_SizedFunc(const FileRegion& fr,
 		      const char* name,
 		      bool automatic,
 		      bool sign,
-		      PtExpr* left,
-		      PtExpr* right,
-		      PtStmt* stmt)
+		      const PtExpr* left,
+		      const PtExpr* right,
+		      const PtStmt* stmt)
 {
   return mFactory.new_SizedFunc(fr, name, automatic,
 				sign, left, right,
@@ -288,13 +288,13 @@ Parser::new_SizedFunc(const FileRegion& fr,
 // @param[in] sign signed 属性がついていたら true となるフラグ
 // @param[in] func_type 関数の戻値の型
 // @param[in] stmt 本体のステートメント
-PtItem*
+const PtItem*
 Parser::new_TypedFunc(const FileRegion& fr,
 		      const char* name,
 		      bool automatic,
 		      bool sign,
 		      tVpiVarType func_type,
-		      PtStmt* stmt)
+		      const PtStmt* stmt)
 {
   return mFactory.new_TypedFunc(fr, name, automatic,
 				sign, func_type,
@@ -315,9 +315,9 @@ Parser::new_TypedFunc(const FileRegion& fr,
 void
 Parser::new_SpecItem(const FileRegion& fr,
 		     tVpiSpecItemType id,
-		     PtrList<PtExpr>* terminal_list)
+		     PtrList<const PtExpr>* terminal_list)
 {
-  PtItem* item = mFactory.new_SpecItem(fr, id, to_array(terminal_list));
+  const PtItem* item = mFactory.new_SpecItem(fr, id, to_array(terminal_list));
   mCurItemList->push_back(item);
 }
 
@@ -329,10 +329,10 @@ Parser::new_SpecItem(const FileRegion& fr,
 void
 Parser::new_SpecPath(const FileRegion& fr,
 		     tVpiSpecPathType id,
-		     PtExpr* expr,
-		     PtPathDecl* path_decl)
+		     const PtExpr* expr,
+		     const PtPathDecl* path_decl)
 {
-  PtItem* item = mFactory.new_SpecPath(fr, id, expr, path_decl);
+  const PtItem* item = mFactory.new_SpecPath(fr, id, expr, path_decl);
   mCurItemList->push_back(item);
 }
 
@@ -346,16 +346,16 @@ Parser::new_SpecPath(const FileRegion& fr,
 // @param[in] output_pol
 // @param[in] expr
 // @param[in] path_delay
-PtPathDecl*
+const PtPathDecl*
 Parser::new_PathDecl(const FileRegion& fr,
 		     int edge,
-		     PtrList<PtExpr>* input_list,
+		     PtrList<const PtExpr>* input_list,
 		     int input_pol,
 		     int op,
-		     PtrList<PtExpr>* output_list,
+		     PtrList<const PtExpr>* output_list,
 		     int output_pol,
-		     PtExpr* expr,
-		     PtPathDelay* path_delay)
+		     const PtExpr* expr,
+		     const PtPathDelay* path_delay)
 {
   return mFactory.new_PathDecl(fr, edge,
 			       to_array(input_list), input_pol,
@@ -374,16 +374,16 @@ Parser::new_PathDecl(const FileRegion& fr,
 // @param[in] output_pol
 // @param[in] expr
 // @param[in] path_delay
-PtPathDecl*
+const PtPathDecl*
 Parser::new_PathDecl(const FileRegion& fr,
 		     int edge,
-		     PtrList<PtExpr>* input_list,
+		     PtrList<const PtExpr>* input_list,
 		     int input_pol,
 		     int op,
-		     PtExpr* output,
+		     const PtExpr* output,
 		     int output_pol,
-		     PtExpr* expr,
-		     PtPathDelay* path_delay)
+		     const PtExpr* expr,
+		     const PtPathDelay* path_delay)
 {
   return mFactory.new_PathDecl(fr, edge,
 			       to_array(input_list), input_pol,
@@ -396,9 +396,9 @@ Parser::new_PathDecl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 値
 // @return 生成された path delay value
-PtPathDelay*
+const PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
-		      PtExpr* value)
+		      const PtExpr* value)
 {
   return mFactory.new_PathDelay(fr, value);
 }
@@ -408,10 +408,10 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value1 値1
 // @param[in] value2 値2
 // @return 生成された path delay value
-PtPathDelay*
+const PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
-		      PtExpr* value1,
-		      PtExpr* value2)
+		      const PtExpr* value1,
+		      const PtExpr* value2)
 {
   return mFactory.new_PathDelay(fr, value1, value2);
 }
@@ -422,11 +422,11 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value2 値2
 // @param[in] value3 値3
 // @return 生成された path delay value
-PtPathDelay*
+const PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
-		      PtExpr* value1,
-		      PtExpr* value2,
-		      PtExpr* value3)
+		      const PtExpr* value1,
+		      const PtExpr* value2,
+		      const PtExpr* value3)
 {
   return mFactory.new_PathDelay(fr, value1, value2, value3);
 }
@@ -440,14 +440,14 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value5 値5
 // @param[in] value6 値6
 // @return 生成された path delay value
-PtPathDelay*
+const PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
-		      PtExpr* value1,
-		      PtExpr* value2,
-		      PtExpr* value3,
-		      PtExpr* value4,
-		      PtExpr* value5,
-		      PtExpr* value6)
+		      const PtExpr* value1,
+		      const PtExpr* value2,
+		      const PtExpr* value3,
+		      const PtExpr* value4,
+		      const PtExpr* value5,
+		      const PtExpr* value6)
 {
   return mFactory.new_PathDelay(fr,
 				value1, value2, value3,
@@ -469,20 +469,20 @@ Parser::new_PathDelay(const FileRegion& fr,
 // @param[in] value11 値11
 // @param[in] value12 値12
 // @return 生成された path delay value
-PtPathDelay*
+const PtPathDelay*
 Parser::new_PathDelay(const FileRegion& fr,
-		      PtExpr* value1,
-		      PtExpr* value2,
-		      PtExpr* value3,
-		      PtExpr* value4,
-		      PtExpr* value5,
-		      PtExpr* value6,
-		      PtExpr* value7,
-		      PtExpr* value8,
-		      PtExpr* value9,
-		      PtExpr* value10,
-		      PtExpr* value11,
-		      PtExpr* value12)
+		      const PtExpr* value1,
+		      const PtExpr* value2,
+		      const PtExpr* value3,
+		      const PtExpr* value4,
+		      const PtExpr* value5,
+		      const PtExpr* value6,
+		      const PtExpr* value7,
+		      const PtExpr* value8,
+		      const PtExpr* value9,
+		      const PtExpr* value10,
+		      const PtExpr* value11,
+		      const PtExpr* value12)
 {
   return mFactory.new_PathDelay(fr,
 				value1, value2, value3,

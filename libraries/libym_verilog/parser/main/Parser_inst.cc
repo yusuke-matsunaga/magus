@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @brief gate instance 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
-PtItem*
+const PtItem*
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type)
 {
@@ -34,10 +34,10 @@ Parser::new_GateH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
 // @param[in] strength 信号強度
-PtItem*
+const PtItem*
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
-		  PtStrength* strength)
+		  const PtStrength* strength)
 {
   return mFactory.new_GateH(fr, type, strength, get_inst_array());
 }
@@ -46,10 +46,10 @@ Parser::new_GateH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] type primitive の型
 // @param[in] delay 遅延値
-PtItem*
+const PtItem*
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
-		  PtDelay* delay)
+		  const PtDelay* delay)
 {
   return mFactory.new_GateH(fr, type, delay, get_inst_array());
 }
@@ -59,11 +59,11 @@ Parser::new_GateH(const FileRegion& fr,
 // @param[in] type primitive の型
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
-PtItem*
+const PtItem*
 Parser::new_GateH(const FileRegion& fr,
 		  tVpiPrimType type,
-		  PtStrength* strength,
-		  PtDelay* delay)
+		  const PtStrength* strength,
+		  const PtDelay* delay)
 {
   return mFactory.new_GateH(fr, type, strength, delay, get_inst_array());
 }
@@ -71,7 +71,7 @@ Parser::new_GateH(const FileRegion& fr,
 // @brief module instance/UDP instance 文のヘッダの生成
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
-PtItem*
+const PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name)
 {
@@ -83,10 +83,10 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] strength 信号強度
-PtItem*
+const PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
-		PtStrength* strength)
+		const PtStrength* strength)
 {
   reg_defname(def_name);
   return mFactory.new_MuH(fr, def_name, strength, get_inst_array());
@@ -96,10 +96,10 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] delay 遅延値
-PtItem*
+const PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
-		PtDelay* delay)
+		const PtDelay* delay)
 {
   reg_defname(def_name);
   return mFactory.new_MuH(fr, def_name, delay, get_inst_array());
@@ -110,11 +110,11 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] def_name 定義名
 // @param[in] strength 信号強度
 // @param[in] delay 遅延値
-PtItem*
+const PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
-		PtStrength* strength,
-		PtDelay* delay)
+		const PtStrength* strength,
+		const PtDelay* delay)
 {
   reg_defname(def_name);
   return mFactory.new_MuH(fr, def_name, strength, delay, get_inst_array());
@@ -124,10 +124,10 @@ Parser::new_MuH(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] def_name 定義名
 // @param[in] con_array ポート割り当てリスト
-PtItem*
+const PtItem*
 Parser::new_MuH(const FileRegion& fr,
 		const char* def_name,
-		PtrList<PtConnection>* con_list)
+		PtrList<const PtConnection>* con_list)
 {
   reg_defname(def_name);
   return mFactory.new_MuH(fr, def_name, to_array(con_list), get_inst_array());
@@ -145,7 +145,7 @@ Parser::init_inst()
 // @param[in] con_list ポート割り当ての配列
 void
 Parser::new_Inst(const FileRegion& fr,
-		 PtrList<PtConnection>* con_list)
+		 PtrList<const PtConnection>* con_list)
 {
   add_inst( mFactory.new_Inst(fr, to_array(con_list)) );
 }
@@ -155,7 +155,7 @@ Parser::new_Inst(const FileRegion& fr,
 // @param[in] expr1 ポート割り当て
 void
 Parser::new_Inst(const FileRegion& fr,
-		 PtExpr* expr1)
+		 const PtExpr* expr1)
 {
   add_inst( mFactory.new_Inst(fr, expr1) );
 }
@@ -165,8 +165,8 @@ Parser::new_Inst(const FileRegion& fr,
 // @param[in] expr1, expr2 ポート割り当て
 void
 Parser::new_Inst(const FileRegion& fr,
-		 PtExpr* expr1,
-		 PtExpr* expr2)
+		 const PtExpr* expr1,
+		 const PtExpr* expr2)
 {
   add_inst( mFactory.new_Inst(fr, expr1, expr2) );
 }
@@ -176,9 +176,9 @@ Parser::new_Inst(const FileRegion& fr,
 // @param[in] expr1, expr2, expr3 ポート割り当て
 void
 Parser::new_Inst(const FileRegion& fr,
-		 PtExpr* expr1,
-		 PtExpr* expr2,
-		 PtExpr* expr3)
+		 const PtExpr* expr1,
+		 const PtExpr* expr2,
+		 const PtExpr* expr3)
 {
   add_inst( mFactory.new_Inst(fr, expr1, expr2, expr3) );
 }
@@ -188,10 +188,10 @@ Parser::new_Inst(const FileRegion& fr,
 // @param[in] expr1, expr2, expr3, expr4 ポート割り当て
 void
 Parser::new_Inst(const FileRegion& fr,
-		 PtExpr* expr1,
-		 PtExpr* expr2,
-		 PtExpr* expr3,
-		 PtExpr* expr4)
+		 const PtExpr* expr1,
+		 const PtExpr* expr2,
+		 const PtExpr* expr3,
+		 const PtExpr* expr4)
 {
   add_inst( mFactory.new_Inst(fr, expr1, expr2, expr3, expr4) );
 }
@@ -203,7 +203,7 @@ Parser::new_Inst(const FileRegion& fr,
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
-		  PtrList<PtConnection>* con_list)
+		  PtrList<const PtConnection>* con_list)
 {
   add_inst( mFactory.new_InstN(fr, name, to_array(con_list)) );
 }
@@ -215,7 +215,7 @@ Parser::new_InstN(const FileRegion& fr,
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* expr1)
+		  const PtExpr* expr1)
 {
   add_inst( mFactory.new_InstN(fr, name, expr1) );
 }
@@ -227,8 +227,8 @@ Parser::new_InstN(const FileRegion& fr,
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* expr1,
-		  PtExpr* expr2)
+		  const PtExpr* expr1,
+		  const PtExpr* expr2)
 {
   add_inst( mFactory.new_InstN(fr, name, expr1, expr2) );
 }
@@ -240,9 +240,9 @@ Parser::new_InstN(const FileRegion& fr,
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* expr1,
-		  PtExpr* expr2,
-		  PtExpr* expr3)
+		  const PtExpr* expr1,
+		  const PtExpr* expr2,
+		  const PtExpr* expr3)
 {
   add_inst( mFactory.new_InstN(fr, name, expr1, expr2, expr3) );
 }
@@ -254,10 +254,10 @@ Parser::new_InstN(const FileRegion& fr,
 void
 Parser::new_InstN(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* expr1,
-		  PtExpr* expr2,
-		  PtExpr* expr3,
-		  PtExpr* expr4)
+		  const PtExpr* expr1,
+		  const PtExpr* expr2,
+		  const PtExpr* expr3,
+		  const PtExpr* expr4)
 {
   add_inst( mFactory.new_InstN(fr, name, expr1, expr2, expr3, expr4) );
 }
@@ -271,9 +271,9 @@ Parser::new_InstN(const FileRegion& fr,
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* left,
-		  PtExpr* right,
-		  PtrList<PtConnection>* con_list)
+		  const PtExpr* left,
+		  const PtExpr* right,
+		  PtrList<const PtConnection>* con_list)
 {
   add_inst( mFactory.new_InstV(fr, name, left, right, to_array(con_list)) );
 }
@@ -287,9 +287,9 @@ Parser::new_InstV(const FileRegion& fr,
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* left,
-		  PtExpr* right,
-		  PtExpr* expr1)
+		  const PtExpr* left,
+		  const PtExpr* right,
+		  const PtExpr* expr1)
 {
   add_inst( mFactory.new_InstV(fr, name, left, right, expr1) );
 }
@@ -303,10 +303,10 @@ Parser::new_InstV(const FileRegion& fr,
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* left,
-		  PtExpr* right,
-		  PtExpr* expr1,
-		  PtExpr* expr2)
+		  const PtExpr* left,
+		  const PtExpr* right,
+		  const PtExpr* expr1,
+		  const PtExpr* expr2)
 {
   add_inst( mFactory.new_InstV(fr, name, left, right, expr1, expr2) );
 }
@@ -320,11 +320,11 @@ Parser::new_InstV(const FileRegion& fr,
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* left,
-		  PtExpr* right,
-		  PtExpr* expr1,
-		  PtExpr* expr2,
-		  PtExpr* expr3)
+		  const PtExpr* left,
+		  const PtExpr* right,
+		  const PtExpr* expr1,
+		  const PtExpr* expr2,
+		  const PtExpr* expr3)
 {
   add_inst( mFactory.new_InstV(fr, name, left, right, expr1, expr2, expr3) );
 }
@@ -338,12 +338,12 @@ Parser::new_InstV(const FileRegion& fr,
 void
 Parser::new_InstV(const FileRegion& fr,
 		  const char* name,
-		  PtExpr* left,
-		  PtExpr* right,
-		  PtExpr* expr1,
-		  PtExpr* expr2,
-		  PtExpr* expr3,
-		  PtExpr* expr4)
+		  const PtExpr* left,
+		  const PtExpr* right,
+		  const PtExpr* expr1,
+		  const PtExpr* expr2,
+		  const PtExpr* expr3,
+		  const PtExpr* expr4)
 {
   add_inst( mFactory.new_InstV(fr, name, left, right,
 			       expr1, expr2, expr3, expr4) );
@@ -352,7 +352,7 @@ Parser::new_InstV(const FileRegion& fr,
 // @brief instance リストに要素を追加する．
 inline
 void
-Parser::add_inst(PtInst* inst)
+Parser::add_inst(const PtInst* inst)
 {
   mInstList.push_back(inst);
 }

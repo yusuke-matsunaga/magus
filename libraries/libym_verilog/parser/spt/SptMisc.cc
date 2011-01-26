@@ -30,7 +30,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param event_array イベントリスト
 SptControl::SptControl(const FileRegion& file_region,
 		       tPtCtrlType type,
-		       PtExpr* expr,
+		       const PtExpr* expr,
 		       PtExprArray event_array) :
   mFileRegion(file_region),
   mType(type),
@@ -117,7 +117,7 @@ SptControl::rep_expr() const
 // @param name 名前 (空の場合もある)
 // @param expr 式
 SptConnection::SptConnection(const FileRegion& file_region,
-			     PtExpr* expr,
+			     const PtExpr* expr,
 			     const char* name) :
   mFileRegion(file_region),
   mName(name),
@@ -232,7 +232,7 @@ SptStrength::charge() const
 // @param file_region ファイル位置の情報
 // @param value1 遅延値
 SptDelay::SptDelay(const FileRegion& file_region,
-		   PtExpr* value1) :
+		   const PtExpr* value1) :
   mFileRegion(file_region)
 {
   mValue[0] = value1;
@@ -245,8 +245,8 @@ SptDelay::SptDelay(const FileRegion& file_region,
 // @param value1 遅延値1
 // @param value2 遅延値2
 SptDelay::SptDelay(const FileRegion& file_region,
-		   PtExpr* value1,
-		   PtExpr* value2) :
+		   const PtExpr* value1,
+		   const PtExpr* value2) :
   mFileRegion(file_region)
 {
   mValue[0] = value1;
@@ -260,9 +260,9 @@ SptDelay::SptDelay(const FileRegion& file_region,
 // @param value2 遅延値2
 // @param value3 遅延値3
 SptDelay::SptDelay(const FileRegion& file_region,
-		   PtExpr* value1,
-		   PtExpr* value2,
-		   PtExpr* value3) :
+		   const PtExpr* value1,
+		   const PtExpr* value2,
+		   const PtExpr* value3) :
   mFileRegion(file_region)
 {
   mValue[0] = value1;
@@ -394,7 +394,7 @@ SptAttrInst::attrspec(ymuint pos) const
 // @param expr 式(NULLの場合もある)
 SptAttrSpec::SptAttrSpec(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* expr) :
+			 const PtExpr* expr) :
   mFileRegion(file_region),
   mName(name),
   mExpr(expr)
@@ -440,9 +440,9 @@ SptAttrSpec::expr() const
 // @param[in] file_region ファイル位置の情報
 // @param[in] value 遅延を表す式
 // @return 生成されたディレイコントロール
-PtControl*
+const PtControl*
 SptFactory::new_DelayControl(const FileRegion& file_region,
-			     PtExpr* value)
+			     const PtExpr* value)
 {
   void* p = alloc().get_memory(sizeof(SptControl));
   return new (p) SptControl(file_region, kPtDelayControl,
@@ -453,7 +453,7 @@ SptFactory::new_DelayControl(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] event_array イベントのリスト
 // @return 生成されたイベントコントロール
-PtControl*
+const PtControl*
 SptFactory::new_EventControl(const FileRegion& file_region,
 			     PtExprArray event_array)
 {
@@ -467,9 +467,9 @@ SptFactory::new_EventControl(const FileRegion& file_region,
 // @param[in] expr 繰り返し数を表す式
 // @param[in] event_array 繰り返しの単位となるイベントのリスト
 // @return 生成されたリピートコントロール
-PtControl*
+const PtControl*
 SptFactory::new_RepeatControl(const FileRegion& file_region,
-			      PtExpr* expr,
+			      const PtExpr* expr,
 			      PtExprArray event_array)
 {
   void* p = alloc().get_memory(sizeof(SptControl));
@@ -481,9 +481,9 @@ SptFactory::new_RepeatControl(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] expr 結合する式
 // @return 生成された結合子
-PtConnection*
+const PtConnection*
 SptFactory::new_OrderedCon(const FileRegion& file_region,
-			   PtExpr* expr)
+			   const PtExpr* expr)
 {
   void* p = alloc().get_memory(sizeof(SptConnection));
   return new (p) SptConnection(file_region, expr, NULL);
@@ -492,8 +492,8 @@ SptFactory::new_OrderedCon(const FileRegion& file_region,
 // @brief 順序つき結合子の生成
 // @param[in] expr 結合する式
 // @return 生成された結合子
-PtConnection*
-SptFactory::new_OrderedCon(PtExpr* expr)
+const PtConnection*
+SptFactory::new_OrderedCon(const PtExpr* expr)
 {
   FileRegion file_region;
   if ( expr ) {
@@ -508,10 +508,10 @@ SptFactory::new_OrderedCon(PtExpr* expr)
 // @param[in] name 名前
 // @param[in] expr 結合する式
 // @return 生成された結合子
-PtConnection*
+const PtConnection*
 SptFactory::new_NamedCon(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* expr)
+			 const PtExpr* expr)
 {
   void* p = alloc().get_memory(sizeof(SptConnection));
   return new (p) SptConnection(file_region, expr, name);
@@ -522,7 +522,7 @@ SptFactory::new_NamedCon(const FileRegion& file_region,
 // @param[in] value0 '0' の強度
 // @param[in] value1 '1' の強度
 // @return 生成された strength
-PtStrength*
+const PtStrength*
 SptFactory::new_Strength(const FileRegion& file_region,
 			 tVpiStrength value0,
 			 tVpiStrength value1)
@@ -535,7 +535,7 @@ SptFactory::new_Strength(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] value 強度
 // @return 生成された strength
-PtStrength*
+const PtStrength*
 SptFactory::new_Strength(const FileRegion& file_region,
 			 tVpiStrength value)
 {
@@ -547,9 +547,9 @@ SptFactory::new_Strength(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] value1 値1
 // @return 生成された遅延値
-PtDelay*
+const PtDelay*
 SptFactory::new_Delay(const FileRegion& file_region,
-		      PtExpr* value1)
+		      const PtExpr* value1)
 {
   void* p = alloc().get_memory(sizeof(SptDelay));
   return new (p) SptDelay(file_region, value1);
@@ -560,10 +560,10 @@ SptFactory::new_Delay(const FileRegion& file_region,
 // @param[in] value1 値1
 // @param[in] value2 値2
 // @return 生成された遅延値
-PtDelay*
+const PtDelay*
 SptFactory::new_Delay(const FileRegion& file_region,
-		      PtExpr* value1,
-		      PtExpr* value2)
+		      const PtExpr* value1,
+		      const PtExpr* value2)
 {
   void* p = alloc().get_memory(sizeof(SptDelay));
   return new (p) SptDelay(file_region, value1, value2);
@@ -575,11 +575,11 @@ SptFactory::new_Delay(const FileRegion& file_region,
 // @param[in] value2 値2
 // @param[in] value3 値3
 // @return 生成された遅延値
-PtDelay*
+const PtDelay*
 SptFactory::new_Delay(const FileRegion& file_region,
-		      PtExpr* value1,
-		      PtExpr* value2,
-		      PtExpr* value3)
+		      const PtExpr* value1,
+		      const PtExpr* value2,
+		      const PtExpr* value3)
 {
   void* p = alloc().get_memory(sizeof(SptDelay));
   return new (p) SptDelay(file_region, value1, value2, value3);
@@ -588,7 +588,7 @@ SptFactory::new_Delay(const FileRegion& file_region,
 // @brief 階層名の生成
 // @param[in] name 名前
 // @return 生成された階層名
-PtNameBranch*
+const PtNameBranch*
 SptFactory::new_NameBranch(const char* name)
 {
   void* p = alloc().get_memory(sizeof(SptNameBranch));
@@ -599,7 +599,7 @@ SptFactory::new_NameBranch(const char* name)
 // @param[in] name 名前
 // @param[in] index インデックス
 // @return 生成された階層名
-PtNameBranch*
+const PtNameBranch*
 SptFactory::new_NameBranch(const char* name,
 			   int index)
 {
@@ -616,7 +616,7 @@ SptFactory::new_NameBranch(const char* name,
 // @param[in] file_region ファイル位置の情報
 // @param[in] as_array attribute spec のリスト
 // @return 生成された attribute instance
-PtAttrInst*
+const PtAttrInst*
 SptFactory::new_AttrInst(const FileRegion& file_region,
 			 PtAttrSpecArray as_array)
 {
@@ -630,10 +630,10 @@ SptFactory::new_AttrInst(const FileRegion& file_region,
 // @param[in] name 名前
 // @param[in] expr 値
 // @return 生成された attribute spec
-PtAttrSpec*
+const PtAttrSpec*
 SptFactory::new_AttrSpec(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* expr)
+			 const PtExpr* expr)
 {
   void* p = alloc().get_memory(sizeof(SptAttrSpec));
   return new (p) SptAttrSpec(file_region, name, expr);

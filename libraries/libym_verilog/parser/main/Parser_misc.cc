@@ -22,9 +22,9 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] fr ファイル位置の情報
 // @param[in] value 遅延を表す式
 // @return 生成されたディレイコントロール
-PtControl*
+const PtControl*
 Parser::new_DelayControl(const FileRegion& fr,
-			 PtExpr* value)
+			 const PtExpr* value)
 {
   return mFactory.new_DelayControl(fr, value);
 }
@@ -32,7 +32,7 @@ Parser::new_DelayControl(const FileRegion& fr,
 // @brief イベントコントロールの生成
 // @param[in] fr ファイル位置の情報
 // @return 生成されたイベントコントロール
-PtControl*
+const PtControl*
 Parser::new_EventControl(const FileRegion& fr)
 {
   return mFactory.new_EventControl(fr);
@@ -42,12 +42,12 @@ Parser::new_EventControl(const FileRegion& fr)
 // @param[in] fr ファイル位置の情報
 // @param[in] event_name イベントを表す名前
 // @return 生成されたイベントコントロール
-PtControl*
+const PtControl*
 Parser::new_EventControl(const FileRegion& fr,
 			 const char* event_name,
 			 const FileRegion& name_loc)
 {
-  PtExpr* expr = new_Primary(name_loc, event_name);
+  const PtExpr* expr = new_Primary(name_loc, event_name);
   return mFactory.new_EventControl(fr, expr);
 }
 
@@ -55,12 +55,12 @@ Parser::new_EventControl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] event_name イベントを表す階層名
 // @return 生成されたイベントコントロール
-PtControl*
+const PtControl*
 Parser::new_EventControl(const FileRegion& fr,
 			 PuHierName* event_name,
 			 const FileRegion& name_loc)
 {
-  PtExpr* expr = new_Primary(name_loc, event_name);
+  const PtExpr* expr = new_Primary(name_loc, event_name);
   return mFactory.new_EventControl(fr, expr);
 }
 
@@ -68,9 +68,9 @@ Parser::new_EventControl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] event_list イベントのリスト
 // @return 生成されたイベントコントロール
-PtControl*
+const PtControl*
 Parser::new_EventControl(const FileRegion& fr,
-			 PtrList<PtExpr>* event_list)
+			 PtrList<const PtExpr>* event_list)
 {
   return mFactory.new_EventControl(fr, to_array(event_list));
 }
@@ -79,9 +79,9 @@ Parser::new_EventControl(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] expr 繰り返し数を表す式
 // @return 生成されたリピートコントロール
-PtControl*
+const PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
-			  PtExpr* expr)
+			  const PtExpr* expr)
 {
   return mFactory.new_RepeatControl(fr, expr);
 }
@@ -91,13 +91,13 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @param[in] rep 繰り返し数を表す式
 // @param[in] event_name 繰り返しの単位となるイベント名
 // @return 生成されたリピートコントロール
-PtControl*
+const PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
-			  PtExpr* rep,
+			  const PtExpr* rep,
 			  const char* event_name,
 			  const FileRegion& name_loc)
 {
-  PtExpr* expr = new_Primary(name_loc, event_name);
+  const PtExpr* expr = new_Primary(name_loc, event_name);
   return mFactory.new_RepeatControl(fr, rep, expr);
 }
 
@@ -106,13 +106,13 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @param[in] rep 繰り返し数を表す式
 // @param[in] event 繰り返しの単位となるイベント階層名
 // @return 生成されたリピートコントロール
-PtControl*
+const PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
-			  PtExpr* rep,
+			  const PtExpr* rep,
 			  PuHierName* event_name,
 			  const FileRegion& name_loc)
 {
-  PtExpr* expr = new_Primary(name_loc, event_name);
+  const PtExpr* expr = new_Primary(name_loc, event_name);
   return mFactory.new_RepeatControl(fr, rep, expr);
 }
 
@@ -121,10 +121,10 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @param[in] rep 繰り返し数を表す式
 // @param[in] event_list 繰り返しの単位となるイベントのリスト
 // @return 生成されたリピートコントロール
-PtControl*
+const PtControl*
 Parser::new_RepeatControl(const FileRegion& fr,
-			  PtExpr* rep,
-			  PtrList<PtExpr>* event_list)
+			  const PtExpr* rep,
+			  PtrList<const PtExpr>* event_list)
 {
   return mFactory.new_RepeatControl(fr, rep, to_array(event_list));
 }
@@ -132,8 +132,8 @@ Parser::new_RepeatControl(const FileRegion& fr,
 // @brief 順序つき結合子の生成
 // @param[in] expr 結合する式
 // @return 生成された結合子
-PtConnection*
-Parser::new_OrderedCon(PtExpr* expr)
+const PtConnection*
+Parser::new_OrderedCon(const PtExpr* expr)
 {
   return mFactory.new_OrderedCon(expr);
 }
@@ -142,12 +142,12 @@ Parser::new_OrderedCon(PtExpr* expr)
 // @param[in] fr ファイル位置の情報
 // @param[in] expr 結合する式
 // @return 生成された結合子
-PtConnection*
+const PtConnection*
 Parser::new_OrderedCon(const FileRegion& fr,
-		       PtExpr* expr,
-		       PtrList<PtAttrInst>* ai_list)
+		       const PtExpr* expr,
+		       PtrList<const PtAttrInst>* ai_list)
 {
-  PtConnection* con = mFactory.new_OrderedCon(fr, expr);
+  const PtConnection* con = mFactory.new_OrderedCon(fr, expr);
   reg_attrinst(con, ai_list);
   return con;
 }
@@ -157,13 +157,13 @@ Parser::new_OrderedCon(const FileRegion& fr,
 // @param[in] name 名前
 // @param[in] expr 結合する式
 // @return 生成された結合子
-PtConnection*
+const PtConnection*
 Parser::new_NamedCon(const FileRegion& fr,
 		     const char* name,
-		     PtExpr* expr,
-		     PtrList<PtAttrInst>* ai_list)
+		     const PtExpr* expr,
+		     PtrList<const PtAttrInst>* ai_list)
 {
-  PtConnection* con = mFactory.new_NamedCon(fr, name, expr);
+  const PtConnection* con = mFactory.new_NamedCon(fr, name, expr);
   reg_attrinst(con, ai_list);
   return con;
 }
@@ -173,7 +173,7 @@ Parser::new_NamedCon(const FileRegion& fr,
 // @param[in] value0 '0' の強度
 // @param[in] value1 '1' の強度
 // @return 生成された strength
-PtStrength*
+const PtStrength*
 Parser::new_Strength(const FileRegion& fr,
 		     tVpiStrength value0,
 		     tVpiStrength value1)
@@ -185,7 +185,7 @@ Parser::new_Strength(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value 強度
 // @return 生成された strength
-PtStrength*
+const PtStrength*
 Parser::new_Strength(const FileRegion& fr,
 		     tVpiStrength value)
 {
@@ -196,9 +196,9 @@ Parser::new_Strength(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] value1 値1
 // @return 生成された遅延値
-PtDelay*
+const PtDelay*
 Parser::new_Delay(const FileRegion& fr,
-		  PtExpr* value1)
+		  const PtExpr* value1)
 {
   return mFactory.new_Delay(fr, value1);
 }
@@ -208,10 +208,10 @@ Parser::new_Delay(const FileRegion& fr,
 // @param[in] value1 値1
 // @param[in] value2 値2
 // @return 生成された遅延値
-PtDelay*
+const PtDelay*
 Parser::new_Delay(const FileRegion& fr,
-		  PtExpr* value1,
-		  PtExpr* value2)
+		  const PtExpr* value1,
+		  const PtExpr* value2)
 {
   return mFactory.new_Delay(fr, value1, value2);
 }
@@ -222,11 +222,11 @@ Parser::new_Delay(const FileRegion& fr,
 // @param[in] value2 値2
 // @param[in] value3 値3
 // @return 生成された遅延値
-PtDelay*
+const PtDelay*
 Parser::new_Delay(const FileRegion& fr,
-		  PtExpr* value1,
-		  PtExpr* value2,
-		  PtExpr* value3)
+		  const PtExpr* value1,
+		  const PtExpr* value2,
+		  const PtExpr* value3)
 {
   return mFactory.new_Delay(fr, value1, value2, value3);
 }
@@ -235,9 +235,9 @@ Parser::new_Delay(const FileRegion& fr,
 // @param[in] fr ファイル位置の情報
 // @param[in] as_array attribute spec のリスト
 // @return 生成された attribute instance
-PtAttrInst*
+const PtAttrInst*
 Parser::new_AttrInst(const FileRegion& fr,
-		     PtrList<PtAttrSpec>* as_list)
+		     PtrList<const PtAttrSpec>* as_list)
 {
   return mFactory.new_AttrInst(fr, to_array(as_list));
 }
@@ -247,10 +247,10 @@ Parser::new_AttrInst(const FileRegion& fr,
 // @param[in] name 名前
 // @param[in] expr 値
 // @return 生成された attribute spec
-PtAttrSpec*
+const PtAttrSpec*
 Parser::new_AttrSpec(const FileRegion& fr,
 		     const char* name,
-		     PtExpr* expr)
+		     const PtExpr* expr)
 {
   return mFactory.new_AttrSpec(fr, name, expr);
 }

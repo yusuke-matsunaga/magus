@@ -79,7 +79,7 @@ CptGateH::inst(ymuint pos) const
 // コンストラクタ
 CptGateHS::CptGateHS(const FileRegion& file_region,
 		     tVpiPrimType prim_type,
-		     PtStrength* strength,
+		     const PtStrength* strength,
 		     PtInstArray inst_array) :
   CptGateH(file_region, prim_type, inst_array),
   mStrength(strength)
@@ -106,7 +106,7 @@ CptGateHS::strength() const
 // コンストラクタ
 CptGateHD::CptGateHD(const FileRegion& file_region,
 		     tVpiPrimType prim_type,
-		     PtDelay* delay,
+		     const PtDelay* delay,
 		     PtInstArray inst_array) :
   CptGateH(file_region, prim_type, inst_array),
   mDelay(delay)
@@ -133,8 +133,8 @@ CptGateHD::delay() const
 // コンストラクタ
 CptGateHSD::CptGateHSD(const FileRegion& file_region,
 		       tVpiPrimType prim_type,
-		       PtStrength* strength,
-		       PtDelay* delay,
+		       const PtStrength* strength,
+		       const PtDelay* delay,
 		       PtInstArray inst_array) :
   CptGateH(file_region, prim_type, inst_array),
   mStrength(strength),
@@ -252,7 +252,7 @@ CptMuHP::paramassign_array() const
 // コンストラクタ
 CptMuHS::CptMuHS(const FileRegion& file_region,
 		 const char* def_name,
-		 PtStrength* strength,
+		 const PtStrength* strength,
 		 PtInstArray inst_array) :
   CptMuH(file_region, def_name, inst_array),
   mStrength(strength)
@@ -279,7 +279,7 @@ CptMuHS::strength() const
 // コンストラクタ
 CptMuHD::CptMuHD(const FileRegion& file_region,
 		 const char* def_name,
-		 PtDelay* delay,
+		 const PtDelay* delay,
 		 PtInstArray inst_array) :
   CptMuH(file_region, def_name, inst_array),
   mDelay(delay)
@@ -306,8 +306,8 @@ CptMuHD::delay() const
 // コンストラクタ
 CptMuHSD::CptMuHSD(const FileRegion& file_region,
 		   const char* def_name,
-		   PtStrength* strength,
-		   PtDelay* delay,
+		   const PtStrength* strength,
+		   const PtDelay* delay,
 		   PtInstArray inst_array) :
   CptMuH(file_region, def_name, inst_array),
   mStrength(strength),
@@ -436,8 +436,8 @@ CptInstN::name() const
 // コンストラクタ
 CptInstR::CptInstR(const FileRegion& file_region,
 		       const char* name,
-		       PtExpr* left,
-		       PtExpr* right,
+		       const PtExpr* left,
+		       const PtExpr* right,
 		       PtConnectionArray con_array) :
   CptInstN(file_region, name, con_array),
   mLeftRange(left),
@@ -470,7 +470,7 @@ CptInstR::right_range() const
 //////////////////////////////////////////////////////////////////////
 
 // gate instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
 		      PtInstArray inst_array)
@@ -481,10 +481,10 @@ CptFactory::new_GateH(const FileRegion& file_region,
 }
 
 // gate instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
-		      PtStrength* strength,
+		      const PtStrength* strength,
 		      PtInstArray inst_array)
 {
   ++ mNumGateHS;
@@ -493,10 +493,10 @@ CptFactory::new_GateH(const FileRegion& file_region,
 }
 
 // gate instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
-		      PtDelay* delay,
+		      const PtDelay* delay,
 		      PtInstArray inst_array)
 {
   ++ mNumGateHD;
@@ -505,11 +505,11 @@ CptFactory::new_GateH(const FileRegion& file_region,
 }
 
 // gate instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
-		      PtStrength* strength,
-		      PtDelay* delay,
+		      const PtStrength* strength,
+		      const PtDelay* delay,
 		      PtInstArray inst_array)
 {
   ++ mNumGateHSD;
@@ -519,7 +519,7 @@ CptFactory::new_GateH(const FileRegion& file_region,
 }
 
 // module instance/UDP instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
 		    PtInstArray inst_array)
@@ -531,10 +531,10 @@ CptFactory::new_MuH(const FileRegion& file_region,
 }
 
 // module instance/UDP instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
-		    PtStrength* strength,
+		    const PtStrength* strength,
 		    PtInstArray inst_array)
 {
   ++ mNumMuHS;
@@ -544,10 +544,10 @@ CptFactory::new_MuH(const FileRegion& file_region,
 }
 
 // module instance/UDP instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
-		    PtDelay* delay,
+		    const PtDelay* delay,
 		    PtInstArray inst_array)
 {
   ++ mNumMuHD;
@@ -557,11 +557,11 @@ CptFactory::new_MuH(const FileRegion& file_region,
 }
 
 // module instance/UDP instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
-		    PtStrength* strength,
-		    PtDelay* delay,
+		    const PtStrength* strength,
+		    const PtDelay* delay,
 		    PtInstArray inst_array)
 {
   ++ mNumMuHSD;
@@ -571,7 +571,7 @@ CptFactory::new_MuH(const FileRegion& file_region,
 }
 
 // module instance/UDP instance 文のヘッダを生成する．
-PtItem*
+const PtItem*
 CptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
 		    PtConnectionArray con_array,
@@ -584,7 +584,7 @@ CptFactory::new_MuH(const FileRegion& file_region,
 }
 
 // module instance/UDP instance の要素を生成する．
-PtInst*
+const PtInst*
 CptFactory::new_Inst(const FileRegion& file_region,
 		     PtConnectionArray con_array)
 {
@@ -594,7 +594,7 @@ CptFactory::new_Inst(const FileRegion& file_region,
 }
 
 // module instance/UDP instance の要素を生成する．
-PtInst*
+const PtInst*
 CptFactory::new_InstN(const FileRegion& file_region,
 		      const char* name,
 		      PtConnectionArray con_array)
@@ -605,11 +605,11 @@ CptFactory::new_InstN(const FileRegion& file_region,
 }
 
 // module instance/UDP instance の要素を生成する．
-PtInst*
+const PtInst*
 CptFactory::new_InstV(const FileRegion& file_region,
 		      const char* name,
-		      PtExpr* left,
-		      PtExpr* right,
+		      const PtExpr* left,
+		      const PtExpr* right,
 		      PtConnectionArray con_array)
 {
   ++ mNumInstR;
