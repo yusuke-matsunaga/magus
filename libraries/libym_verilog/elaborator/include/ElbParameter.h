@@ -12,7 +12,6 @@
 
 
 #include "ElbDecl.h"
-#include "ElbValue.h"
 
 #include "ym_verilog/pt/PtP.h"
 

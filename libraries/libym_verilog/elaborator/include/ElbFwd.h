@@ -100,9 +100,6 @@ class ElbAttribute;
 class ElbAttrList;
 class ElbAttrIter;
 
-// in ElbValue.h
-class ElbValue;
-
 END_NAMESPACE_YM_VERILOG
 
 #endif // YM_VERILOG_ELB_ELBFWD_H
