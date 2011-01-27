@@ -14,8 +14,7 @@
 #include "ym_verilog/verilog.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_verilog/pt/PtMisc.h"
-
-#include "ElbValue.h"
+#include "ym_verilog/VlValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -75,7 +74,7 @@ public:
 
   /// @brief pos 番目の要素の値を返す．
   /// @param[in] pos 位置
-  ElbValue
+  VlValue
   value(ymuint pos) const;
 
   /// @brief 名前と値を設定する．
@@ -83,7 +82,7 @@ public:
   set(ymuint pos,
       const PtConnection* pt_con,
       const PtExpr* expr,
-      const ElbValue& value);
+      VlValue value);
 
 
 private:
@@ -100,7 +99,7 @@ private:
     const PtExpr* mExpr;
 
     // 値
-    ElbValue mValue;
+    VlValue mValue;
 
   };
 
@@ -197,7 +196,7 @@ ElbParamCon::expr(ymuint pos) const
 
 // @brief 値を返す．
 inline
-ElbValue
+VlValue
 ElbParamCon::value(ymuint pos) const
 {
   return mList[pos].mValue;
@@ -209,7 +208,7 @@ void
 ElbParamCon::set(ymuint pos,
 		 const PtConnection* pt_con,
 		 const PtExpr* expr,
-		 const ElbValue& value)
+		 VlValue value)
 {
   Unit& unit = mList[pos];
   unit.mPtCon = pt_con;

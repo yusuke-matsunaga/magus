@@ -234,7 +234,7 @@ public:
 
   /// @brief 値の取得
   virtual
-  ElbValue
+  VlValue
   get_value() const = 0;
 
   /// @brief parameter の値の設定
@@ -243,7 +243,7 @@ public:
   virtual
   void
   set_expr(const PtExpr* expr,
-	   const ElbValue& val) = 0;
+	   const VlValue& val) = 0;
 
   /// @brief 次の要素を返す．
   const ElbParameter*

@@ -22,7 +22,6 @@
 #include "ym_verilog/vl/VlModule.h"
 
 #include "ElbParameter.h"
-#include "ElbParamAssign.h"
 #include "ElbContAssign.h"
 #include "ElbProcess.h"
 #include "ElbScope.h"
@@ -183,7 +182,7 @@ ItemGen::defparam_override(const VlModule* module,
   }
 
   const PtExpr* rhs_expr = pt_defparam->expr();
-  ElbValue rhs_value = evaluate_expr(module, rhs_expr);
+  VlValue rhs_value = evaluate_expr(module, rhs_expr);
 
   ostringstream buf;
   buf << "instantiating defparam: " << param->full_name()

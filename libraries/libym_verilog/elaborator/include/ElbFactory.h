@@ -341,17 +341,28 @@ public:
   /// @brief パラメータ割り当て文を生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] param 対象の parameter
-  /// @param[in] rhs 割り当て式の右辺
+  /// @param[in] rhs_expr 割り当て式の右辺
   /// @param[in] rhs_value 右辺の値
-  /// @param[in] named_con 名前による割り当ての時 true
   virtual
   ElbParamAssign*
   new_ParamAssign(const VlModule* module,
 		  const PtBase* pt_obj,
 		  ElbParameter* param,
-		  const PtExpr* rhs,
-		  const ElbValue& rhs_value,
-		  bool named_con) = 0;
+		  const PtExpr* rhs_expr,
+		  const VlValue& rhs_value) = 0;
+
+  /// @brief 名前によるパラメータ割り当て文を生成する．
+  /// @param[in] module 親のモジュール
+  /// @param[in] param 対象の parameter
+  /// @param[in] rhs_expr 割り当て式の右辺
+  /// @param[in] rhs_value 右辺の値
+  virtual
+  ElbParamAssign*
+  new_NamedParamAssign(const VlModule* module,
+		       const PtBase* pt_obj,
+		       ElbParameter* param,
+		       const PtExpr* rhs_expr,
+		       const VlValue& rhs_value) = 0;
 
   /// @brief defparam 文を生成する．
   /// @param[in] module 親のモジュール
@@ -367,7 +378,7 @@ public:
 	       const PtDefParam* pt_defparam,
 	       ElbParameter* param,
 	       const PtExpr* rhs,
-	       const ElbValue& rhs_value) = 0;
+	       const VlValue& rhs_value) = 0;
 
   /// @brief ゲートプリミティブのヘッダを生成する．
   /// @param[in] parent 親のスコープ

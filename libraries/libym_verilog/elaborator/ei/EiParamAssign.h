@@ -12,7 +12,7 @@
 
 
 #include "ElbParamAssign.h"
-#include "ElbValue.h"
+#include "ym_verilog/VlValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -37,7 +37,7 @@ protected:
 		const PtBase* pt_obj,
 		ElbParameter* param,
 		const PtExpr* rhs_expr,
-		const ElbValue& rhs_value);
+		const VlValue& rhs_value);
 
   /// @brief デストラクタ
   virtual
@@ -75,12 +75,15 @@ public:
   const VlDecl*
   lhs() const;
 
-#if 0
   /// @brief 右辺値を返す．
   virtual
-  const PtExpr*
-  rhsExpr() const;
-#endif
+  VlValue
+  rhs_value() const;
+
+  /// @brief 右辺の式を表す文字列を返す．
+  virtual
+  string
+  rhs_string() const;
 
   /// @brief 名前による接続の場合に true を返す．
   /// @note このクラスでは false を返す．
@@ -107,7 +110,7 @@ private:
   const PtExpr* mRhsExpr;
 
   // 右辺の値
-  ElbValue mRhsValue;
+  VlValue mRhsValue;
 
 };
 
@@ -133,7 +136,7 @@ private:
 		 const PtBase* pt_obj,
 		 ElbParameter* param,
 		 const PtExpr* rhs_expr,
-		 const ElbValue& rhs_value);
+		 const VlValue& rhs_value);
 
   /// @brief デストラクタ
   virtual
@@ -177,7 +180,7 @@ private:
 	     const PtDefParam* pt_defparam,
 	     ElbParameter* param,
 	     const PtExpr* rhs_expr,
-	     const ElbValue& rhs_value);
+	     const VlValue& rhs_value);
 
   /// @brief デストラクタ
   virtual
@@ -215,12 +218,15 @@ public:
   const VlDecl*
   lhs() const;
 
-#if 0
   /// @brief 右辺値を返す．
   virtual
-  const VlExpr*
-  rhs() const;
-#endif
+  VlValue
+  rhs_value() const;
+
+  /// @brief 右辺の式を表す文字列を返す．
+  virtual
+  string
+  rhs_string() const;
 
 
 private:
@@ -244,7 +250,7 @@ private:
   const PtExpr* mRhsExpr;
 
   // 右辺の値
-  ElbValue mRhsValue;
+  VlValue mRhsValue;
 
 };
 

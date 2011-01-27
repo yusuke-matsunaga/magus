@@ -12,6 +12,7 @@
 #include "ExprGen.h"
 #include "ElbEnv.h"
 
+#include "ym_verilog/BitVector.h"
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 
@@ -179,117 +180,32 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
   return expr;
 }
 
-BEGIN_NONAMESPACE
-
-// val0 と val1 が === で等価とみなされる時 true を返す．
-bool
-caseeq(ElbValue& val0,
-       ElbValue& val1)
-{
-  if ( val0.is_real() ) {
-    val1.to_real();
-    return ( val0.real_value() == val1.real_value() );
-  }
-  else if ( val1.is_real() ) {
-    val0.to_real();
-    return ( val0.real_value() == val1.real_value() );
-  }
-  else {
-    val0.to_bitvector();
-    val1.to_bitvector();
-    return eq_with_x(val0.bitvector_value(), val1.bitvector_value());
-  }
-}
-
-// val0 == val1 の比較結果を返す．
-tVpiScalarVal
-eq(ElbValue& val0,
-   ElbValue& val1)
-{
-  if ( val0.is_real() ) {
-    val1.to_real();
-    if ( val0.real_value() == val1.real_value() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else if ( val1.is_real() ) {
-    val0.to_real();
-    if ( val0.real_value() == val1.real_value() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    val0.to_bitvector();
-    val1.to_bitvector();
-    return eq(val0.bitvector_value(), val1.bitvector_value());
-  }
-}
-
-// val0 >= val1 の比較を行う．
-tVpiScalarVal
-ge(ElbValue& val0,
-   ElbValue& val1)
-{
-  if ( val0.is_real() ) {
-    val1.to_real();
-    if ( val0.real_value() >= val1.real_value() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else if ( val1.is_real() ) {
-    val0.to_real();
-    if ( val0.real_value() >= val1.real_value() ) {
-      return kVpiScalar1;
-    }
-    else {
-      return kVpiScalar0;
-    }
-  }
-  else {
-    val0.to_bitvector();
-    val1.to_bitvector();
-    return ge(val0.bitvector_value(), val1.bitvector_value());
-  }
-}
-
-END_NONAMESPACE
-
-
 // @brief 演算子に対して int 型の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbValue
+VlValue
 ExprGen::evaluate_opr(const VlNamedObj* parent,
 		      const PtExpr* pt_expr)
 {
   tVpiOpType op_type = pt_expr->op_type();
-  ymuint opr_size = pt_expr->operand_num();
+  ymuint op_size = pt_expr->operand_num();
+  vector<VlValue> val(3);
 
-  ElbValue val0;
-  ElbValue val1;
-  ElbValue val2;
+  // オペランドの値の評価を行う．
+  for (ymuint i = 0; i < op_size; ++ i) {
+    val[i] = evaluate_expr(parent, pt_expr->operand(i));
+    if ( val[i].is_error() ) {
+      return VlValue();
+    }
+  }
 
-  bool int_type = false;
-  bool real_type = false;
-  bool bv_type = false;
-
-  // 一回目はオペランドの評価のみを行う．
+  // 結果の型のチェックを行う．
   switch ( op_type ) {
   case kVpiPosedgeOp:
   case kVpiNegedgeOp:
     // この演算は使えない．
-    assert_cond(opr_size == 1, __FILE__, __LINE__);
     error_illegal_edge_descriptor(pt_expr);
-    return ElbValue();
+    return VlValue();
 
   case kVpiBitNegOp:
   case kVpiUnaryAndOp:
@@ -298,35 +214,6 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiUnaryNorOp:
   case kVpiUnaryXorOp:
   case kVpiUnaryXNorOp:
-    // この演算はビットベクタ型に変換できなければならない．
-    assert_cond(opr_size == 1, __FILE__, __LINE__);
-    val0 = evaluate_expr(parent, pt_expr->operand(0));
-    if ( val0.is_error() ) {
-      return ElbValue();
-    }
-    if ( val0.is_real() ) {
-      error_illegal_real_type(pt_expr->operand(0));
-      return ElbValue();
-    }
-    // ビットベクタ型に変換しておく
-    val0.to_bitvector();
-    break;
-
-  case kVpiPlusOp:
-  case kVpiMinusOp:
-    // この演算はどの型でもOK
-    assert_cond(opr_size == 1, __FILE__, __LINE__);
-    val0 = evaluate_expr(parent, pt_expr->operand(0));
-    if ( val0.is_error() ) {
-      return ElbValue();
-    }
-    break;
-
-  case kVpiNotOp:
-    // この演算は論理値に変換しておく．
-    val0.to_logic();
-    break;
-
   case kVpiBitAndOp:
   case kVpiBitOrOp:
   case kVpiBitXNorOp:
@@ -335,31 +222,24 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiRShiftOp:
   case kVpiArithLShiftOp:
   case kVpiArithRShiftOp:
+  case kVpiModOp:
+  case kVpiConcatOp:
+  case kVpiMultiConcatOp:
     // この演算はビットベクタ型に変換できなければならない．
-    assert_cond(opr_size == 2, __FILE__, __LINE__);
-    val0 = evaluate_expr(parent, pt_expr->operand(0));
-    val1 = evaluate_expr(parent, pt_expr->operand(1));
-    if ( val0.is_error() || val1.is_error() ) {
-      return ElbValue();
+    for (ymuint i = 0; i < op_size; ++ i) {
+      if ( !val[i].is_bitvector_conv() ) {
+	error_illegal_real_type(pt_expr->operand(i));
+	return VlValue();
+      }
     }
-    if ( val0.is_real() ) {
-      error_illegal_real_type(pt_expr->operand(0));
-      return ElbValue();
-    }
-    if ( val1.is_real() ) {
-      error_illegal_real_type(pt_expr->operand(1));
-      return ElbValue();
-    }
-    // ビットベクタ型に変換しておく．
-    val0.to_bitvector();
-    val1.to_bitvector();
     break;
 
+  case kVpiPlusOp:
+  case kVpiMinusOp:
   case kVpiAddOp:
   case kVpiSubOp:
   case kVpiMultOp:
   case kVpiDivOp:
-  case kVpiModOp:
   case kVpiPowerOp:
   case kVpiCaseEqOp:
   case kVpiCaseNeqOp:
@@ -369,280 +249,124 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   case kVpiGtOp:
   case kVpiLeOp:
   case kVpiLtOp:
-    // この演算はどの型でもOK
-    assert_cond(opr_size == 2, __FILE__, __LINE__);
-    val0 = evaluate_expr(parent, pt_expr->operand(0));
-    val1 = evaluate_expr(parent, pt_expr->operand(1));
-    if ( val0.is_error() || val1.is_error() ) {
-      return ElbValue();
-    }
-    if ( val0.is_real() ) {
-      val1.to_real();
-      real_type = true;
-    }
-    else if ( val1.is_real() ) {
-      val0.to_real();
-      real_type = true;
-    }
-    else if ( val0.is_int() ) {
-      if ( val1.is_int() ) {
-	int_type = true;
-      }
-      else {
-	val0.to_bitvector();
-	bv_type = true;
-      }
-    }
-    else if ( val1.is_int() ) {
-      val1.to_bitvector();
-      bv_type = true;
-    }
-    break;
-
   case kVpiLogAndOp:
   case kVpiLogOrOp:
-    // 論理値型に変換しておく．
-    val0.to_logic();
-    val1.to_logic();
-    break;
-
   case kVpiConditionOp:
   case kVpiMinTypMaxOp:
-    assert_cond(opr_size == 3, __FILE__, __LINE__);
-    val0 = evaluate_expr(parent, pt_expr->operand(0));
-    val1 = evaluate_expr(parent, pt_expr->operand(1));
-    val2 = evaluate_expr(parent, pt_expr->operand(2));
-    if ( val0.is_error() || val1.is_error() || val2.is_error() ) {
-      return ElbValue();
-    }
-    break;
-
-  case kVpiConcatOp:
-  case kVpiMultiConcatOp:
+    // この演算はどの型でもOK
     break;
 
   default:
     assert_not_reached(__FILE__, __LINE__);
-    return ElbValue();
+    return VlValue();
   }
 
   // 二回目は値の評価を行う．
   switch ( op_type ) {
-  case kVpiBitNegOp:
-    return ElbValue(~val0.bitvector_value());
-
   case kVpiUnaryAndOp:
-    return ElbValue(val0.bitvector_value().reduction_and());
+    return reduction_and(val[0]);
 
   case kVpiUnaryNandOp:
-    return ElbValue(val0.bitvector_value().reduction_nand());
+    return reduction_nand(val[0]);
 
   case kVpiUnaryOrOp:
-    return ElbValue(val0.bitvector_value().reduction_or());
+    return reduction_or(val[0]);
 
   case kVpiUnaryNorOp:
-    return ElbValue(val0.bitvector_value().reduction_nor());
+    return reduction_nor(val[0]);
 
   case kVpiUnaryXorOp:
-    return ElbValue(val0.bitvector_value().reduction_xor());
+    return reduction_xor(val[0]);
 
   case kVpiUnaryXNorOp:
-    return ElbValue(val0.bitvector_value().reduction_xnor());
+    return reduction_xor(val[0]);
 
   case kVpiPlusOp:
-    return val0;
+    return val[0];
 
   case kVpiMinusOp:
-    if ( val0.is_int() ) {
-      return ElbValue(- val0.int_value());
-    }
-    if ( val0.is_bitvector() ) {
-      return ElbValue(- val0.bitvector_value());
-    }
-    if ( val0.is_real() ) {
-      return ElbValue(- val0.real_value());
-    }
+    return - val[0];
 
-  case kVpiNotOp:
-    if ( val0.scalar_value() == kVpiScalar0 ) {
-      return ElbValue(kVpiScalar1);
-    }
-    else {
-      return ElbValue(kVpiScalar0);
-    }
-    break;
+  case kVpiBitNegOp:
+    return bit_negate(val[0]);
 
   case kVpiBitAndOp:
-    return ElbValue(val0.bitvector_value() & val1.bitvector_value());
+    return bit_and(val[0], val[1]);
 
   case kVpiBitOrOp:
-    return ElbValue(val0.bitvector_value() | val1.bitvector_value());
+    return bit_or(val[0], val[1]);
 
   case kVpiBitXNorOp:
-    return ElbValue(~(val0.bitvector_value() ^ val1.bitvector_value()));
+    return bit_xnor(val[0], val[1]);
 
   case kVpiBitXorOp:
-    return ElbValue(val0.bitvector_value() ^ val1.bitvector_value());
+    return bit_xor(val[0], val[1]);
 
   case kVpiLShiftOp:
-    return ElbValue(val0.bitvector_value() << val1.bitvector_value());
+    return val[0] << val[1];
 
   case kVpiRShiftOp:
-    return ElbValue(val0.bitvector_value() >> val1.bitvector_value());
+    return val[0] >> val[1];
 
   case kVpiArithLShiftOp:
-    return ElbValue(alshift(val0.bitvector_value(), val1.bitvector_value()));
+    return alshift(val[0], val[1]);
 
   case kVpiArithRShiftOp:
-    return ElbValue(arshift(val0.bitvector_value(), val1.bitvector_value()));
+    return arshift(val[0], val[1]);
 
   case kVpiAddOp:
-    if ( int_type ) {
-      return ElbValue(val0.int_value() + val1.int_value());
-    }
-    else if ( real_type ) {
-      return ElbValue(val0.real_value() + val1.real_value());
-    }
-    else if ( bv_type ) {
-      return ElbValue(val0.bitvector_value() + val1.bitvector_value());
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
+    return val[0] + val[1];
 
   case kVpiSubOp:
-    if ( int_type ) {
-      return ElbValue(val0.int_value() - val1.int_value());
-    }
-    else if ( real_type ) {
-      return ElbValue(val0.real_value() - val1.real_value());
-    }
-    else if ( bv_type ) {
-      return ElbValue(val0.bitvector_value() - val1.bitvector_value());
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
+    return val[0] - val[1];
 
   case kVpiMultOp:
-    if ( int_type ) {
-      return ElbValue(val0.int_value() * val1.int_value());
-    }
-    else if ( real_type ) {
-      return ElbValue(val0.real_value() * val1.real_value());
-    }
-    else if ( bv_type ) {
-      return ElbValue(val0.bitvector_value() * val1.bitvector_value());
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
+    return val[0] * val[1];
 
   case kVpiDivOp:
-    if ( int_type ) {
-      return ElbValue(val0.int_value() / val1.int_value());
-    }
-    else if ( real_type ) {
-      return ElbValue(val0.real_value() / val1.real_value());
-    }
-    else if ( bv_type ) {
-      return ElbValue(val0.bitvector_value() / val1.bitvector_value());
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
+    return val[0] / val[1];
 
   case kVpiModOp:
-    if ( int_type ) {
-      return ElbValue(val0.int_value() % val1.int_value());
-    }
-    else if ( real_type ) {
-#warning "TODO: エラーメッセージをしっかりする．"
-      return ElbValue();
-    }
-    else if ( bv_type ) {
-      return ElbValue(val0.bitvector_value() % val1.bitvector_value());
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
+    return val[0] % val[1];
 
   case kVpiPowerOp:
-    if ( int_type ) {
-      double a = static_cast<double>(val0.int_value());
-      double b = static_cast<double>(val1.int_value());
-      return ElbValue(pow(a, b));
-    }
-    else if ( real_type ) {
-      return ElbValue(pow(val0.real_value(), val1.real_value()));
-    }
-    else if ( bv_type ) {
-      return ElbValue(power(val0.bitvector_value(), val1.bitvector_value()));
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
-    }
+    return power(val[0], val[1]);
+
+  case kVpiNotOp:
+    return log_not(val[0]);
 
   case kVpiLogAndOp:
-    if ( val0.scalar_value() == kVpiScalar1 &&
-	 val1.scalar_value() == kVpiScalar1 ) {
-      return ElbValue(kVpiScalar1);
-    }
-    else {
-      return ElbValue(kVpiScalar0);
-    }
+    return log_and(val[0], val[1]);
 
   case kVpiLogOrOp:
-    if ( val0.scalar_value() == kVpiScalar1 ||
-	 val1.scalar_value() == kVpiScalar1 ) {
-      return ElbValue(kVpiScalar1);
-    }
-    else {
-      return ElbValue(kVpiScalar0);
-    }
+    return log_or(val[0], val[1]);
 
   case kVpiCaseEqOp:
-    if ( caseeq(val0, val1) ) {
-      return ElbValue(kVpiScalar1);
-    }
-    else {
-      return ElbValue(kVpiScalar0);
-    }
+    return eq_with_x(val[0], val[1]);
 
   case kVpiCaseNeqOp:
-    if ( caseeq(val0, val1) ) {
-      return ElbValue(kVpiScalar0);
-    }
-    else {
-      return ElbValue(kVpiScalar1);
-    }
+    return log_not(eq_with_x(val[0], val[1]));
 
   case kVpiEqOp:
-    return ElbValue(eq(val0, val1));
+    return eq(val[0], val[1]);
 
   case kVpiNeqOp:
-    return ElbValue(!eq(val0, val1));
+    return log_not(eq(val[0], val[1]));
 
   case kVpiGeOp:
-    return ElbValue(ge(val0, val1));
+    return ge(val[0], val[1]);
 
   case kVpiGtOp:
-    return ElbValue(!ge(val1, val0));
+    return log_not(ge(val[1], val[0]));
 
   case kVpiLeOp:
-    return ElbValue(ge(val1, val0));
+    return ge(val[1], val[0]);
 
   case kVpiLtOp:
-    return ElbValue(!ge(val0, val1));
+    return log_not(ge(val[0], val[1]));
 
   case kVpiConditionOp:
-    val0.to_logic();
-    if ( val0.scalar_value() == kVpiScalar1 ) {
-      return ElbValue(val1);
-    }
-    else {
-      return ElbValue(val0);
-    }
+    return ite(val[0], val[1], val[2]);
 
   case kVpiMinTypMaxOp:
     // 本当はエラー
@@ -650,49 +374,10 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
     break;
 
   case kVpiConcatOp:
-    {
-      vector<BitVector> opr_list(opr_size);
-      for (ymuint i = 0; i < opr_size; ++ i) {
-	const PtExpr* pt_expr1 = pt_expr->operand(i);
-	ElbValue val = evaluate_expr(parent, pt_expr1);
-	if ( val.is_error() ) {
-	  return ElbValue();
-	}
-	if ( val.is_real() ) {
-	  error_illegal_real_type(pt_expr1);
-	  return ElbValue();
-	}
-	val.to_bitvector();
-	opr_list[i] = val.bitvector_value();
-      }
-      return ElbValue(concat(opr_list));
-    }
+    return concat(val);
 
   case kVpiMultiConcatOp:
-    {
-      const PtExpr* pt_expr0 = pt_expr->operand(0);
-      ElbValue val0 = evaluate_expr(parent, pt_expr0);
-      if ( val0.is_error() ) {
-	return ElbValue();
-      }
-      val0.to_bitvector();
-
-      vector<BitVector> opr_list(opr_size - 1);
-      for (ymuint i = 1; i < opr_size; ++ i) {
-	const PtExpr* pt_expr1 = pt_expr->operand(i);
-	ElbValue val = evaluate_expr(parent, pt_expr1);
-	if ( val.is_error() ) {
-	  return ElbValue();
-	}
-	if ( val.is_real() ) {
-	  error_illegal_real_type(pt_expr1);
-	  return ElbValue();
-	}
-	val.to_bitvector();
-	opr_list[i - 1] = val.bitvector_value();
-      }
-      return ElbValue(multi_concat(val0.bitvector_value(), opr_list));
-    }
+    return multi_concat(val);
 
   default:
     assert_not_reached(__FILE__, __LINE__);
@@ -700,7 +385,7 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
   }
 
   // ダミー
-  return ElbValue();
+  return VlValue();
 }
 
 END_NAMESPACE_YM_VERILOG

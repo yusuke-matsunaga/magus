@@ -290,7 +290,7 @@ ElbProxy::instantiate_delay(const VlNamedObj* parent,
 // @brief 式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbValue
+VlValue
 ElbProxy::evaluate_expr(const VlNamedObj* parent,
 			const PtExpr* pt_expr)
 {

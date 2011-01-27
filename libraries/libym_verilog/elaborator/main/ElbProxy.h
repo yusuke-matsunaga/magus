@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/verilog.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/pt/PtArray.h"
 #include "ym_utils/MsgHandler.h"
@@ -531,7 +532,7 @@ protected:
   /// @brief 式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  VlValue
   evaluate_expr(const VlNamedObj* parent,
 		const PtExpr* pt_expr);
 

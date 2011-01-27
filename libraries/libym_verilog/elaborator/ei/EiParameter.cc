@@ -429,6 +429,7 @@ EiParameter::name() const
 tVpiValueType
 EiParameter::value_type() const
 {
+#if 0 // 自身に型の指定がない parameter の value_type() は値の型を用いるべき？
   tVpiValueType vt = mHead->value_type();
   if ( vt == kVpiValueNone ) {
     if ( mValue.is_int() ) {
@@ -463,6 +464,9 @@ EiParameter::value_type() const
     return kVpiValueNone;
   }
   return vt;
+#else
+  return mHead->value_type();
+#endif
 }
 
 // @brief 符号の取得
@@ -548,7 +552,7 @@ EiParameter::is_local_param() const
 }
 
 // @brief 値の取得
-ElbValue
+VlValue
 EiParameter::get_value() const
 {
   return mValue;
@@ -559,7 +563,7 @@ EiParameter::get_value() const
 // @param[in] value 値
 void
 EiParameter::set_expr(const PtExpr* expr,
-		      const ElbValue& value)
+		      const VlValue& value)
 {
   mExpr = expr;
   mValue = value;

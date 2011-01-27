@@ -16,7 +16,10 @@ noinst_LTLIBRARIES = libym_vl_common.la
 
 libym_vl_common_la_SOURCES = \
 	BitVector.cc \
+	VlValueRep.h \
+	VlValue.cc \
 	udpval.cc
+
 
 libym_vl_common_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

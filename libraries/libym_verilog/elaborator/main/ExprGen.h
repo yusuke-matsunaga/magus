@@ -12,9 +12,9 @@
 
 
 #include "ym_verilog/verilog.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ElbProxy.h"
-#include "ElbValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -109,7 +109,7 @@ public:
   /// @brief 式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  VlValue
   evaluate_expr(const VlNamedObj* parent,
 		const PtExpr* pt_expr);
 
@@ -297,28 +297,28 @@ private:
   /// @brief 演算子に対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  VlValue
   evaluate_opr(const VlNamedObj* parent,
 	       const PtExpr* pt_expr);
 
   /// @brief 定数に対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  VlValue
   evaluate_const(const VlNamedObj* parent,
 		 const PtExpr* pt_expr);
 
   /// @brief 関数呼び出しに対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  VlValue
   evaluate_funccall(const VlNamedObj* parent,
 		    const PtExpr* pt_expr);
 
   /// @brief プライマリに対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  VlValue
   evaluate_primary(const VlNamedObj* parent,
 		   const PtExpr* pt_expr);
 

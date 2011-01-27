@@ -585,7 +585,7 @@ ExprGen::check_decl(const ElbEnv& env,
 // @brief プライマリに対して式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbValue
+VlValue
 ExprGen::evaluate_primary(const VlNamedObj* parent,
 			  const PtExpr* pt_expr)
 {
@@ -594,7 +594,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   if ( nb_array.size() > 0 ) {
     // 階層つき識別子はだめ
     error_hname_in_ce(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
 
   bool has_range_select = (pt_expr->left_range() && pt_expr->right_range());
@@ -603,7 +603,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   if (  isize > 1 || (isize == 1 && has_range_select) ) {
     // 配列型ではない．
     error_dimension_mismatch(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
   bool has_bit_select = (isize == 1);
 
@@ -611,14 +611,14 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   int index2 = 0;
   if ( has_bit_select ) {
     if ( !evaluate_int(parent, pt_expr->index(0), index1) ) {
-      return ElbValue();
+      return VlValue();
     }
   }
   if ( has_range_select ) {
     bool stat1 = evaluate_int(parent, pt_expr->left_range(), index1);
     bool stat2 = evaluate_int(parent, pt_expr->right_range(), index2);
     if ( !stat1 || !stat2 ) {
-      return ElbValue();
+      return VlValue();
     }
   }
 
@@ -631,7 +631,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   if ( !handle ) {
     // 見つからなかった．
     error_not_found(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
 
   // そのオブジェクトが genvar の場合
@@ -640,15 +640,15 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     if ( has_bit_select ) {
       // ビット選択
       BitVector bv(genvar->value());
-      return ElbValue(bv.bit_select(index1));
+      return VlValue(bv.bit_select(index1));
     }
     else if ( has_range_select ) {
       // 範囲選択
       BitVector bv(genvar->value());
-      return ElbValue(bv.part_select(index1, index2));
+      return VlValue(bv.part_select(index1, index2));
     }
     else {
-      return ElbValue(genvar->value());
+      return VlValue(genvar->value());
     }
   }
 
@@ -657,30 +657,28 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   ElbParameter* param = handle->parameter();
   if ( !param ) {
     error_not_a_parameter(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
-  ElbValue val = param->get_value();;
+  VlValue val = param->get_value();;
   if ( param->value_type() == kVpiValueReal ) {
     if ( has_bit_select || has_range_select ) {
       error_illegal_real_type(pt_expr);
-      return ElbValue();
+      return VlValue();
     }
   }
   else {
     if ( has_bit_select ) {
-      val.to_bitvector();
-      if ( val.is_error() ) {
+      if ( !val.is_bitvector_conv() ) {
 	error_illegal_real_type(pt_expr);
-	return ElbValue();
+	return VlValue();
       }
       int offset = param->bit_offset(index1);
-      return ElbValue(val.bitvector_value().bit_select(offset));
+      return VlValue(val.bitvector_value().bit_select(offset));
     }
     else if ( has_range_select ) {
-      val.to_bitvector();
-      if ( val.is_error() ) {
+      if ( !val.is_bitvector_conv() ) {
 	error_illegal_real_type(pt_expr);
-	return ElbValue();
+	return VlValue();
       }
       int msb_offset;
       int lsb_offset;
@@ -704,7 +702,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	assert_not_reached(__FILE__, __LINE__);
 	break;
       }
-      return ElbValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
+      return VlValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
     }
   }
 

@@ -48,7 +48,7 @@ public:
   /// - 基数は10
   explicit
   BitVector(ymuint32 val = 0);
-  
+
   /// @brief int からのキャスト用コンストラクタ
   /// @param[in] val 値
   /// @note 結果の型は
@@ -57,7 +57,7 @@ public:
   /// - 基数は10
   explicit
   BitVector(int val);
-  
+
   /// @brief bool からの変換コンストラクタ
   /// @param[in] value ブール値
   /// @note 結果の型は
@@ -74,8 +74,8 @@ public:
   /// - 符号なし
   /// - 基数は10
   explicit
-  BitVector(const VlTime& time);
-  
+  BitVector(VlTime time);
+
   /// @brief スカラ値からのキャスト用コンストラクタ
   /// @param[in] value 値 (kVpiScalar{0, 1, X, Z}
   /// @param[in] size サイズ (ビット幅)
@@ -87,7 +87,7 @@ public:
   explicit
   BitVector(tVpiScalarVal value,
 	    ymuint32 size = 1);
-  
+
   /// @brief C文字列からの変換用コンストラクタ
   /// @param[in] str 文字列 (C文字列)
   /// @note 結果の型は
@@ -96,7 +96,7 @@ public:
   /// - 基数は2
   explicit
   BitVector(const char* str);
-  
+
   /// @brief string 文字列からの変換用コンストラクタ
   /// @param[in] str 文字列 (string)
   /// @note 結果の型は
@@ -105,7 +105,7 @@ public:
   /// - 基数は2
   explicit
   BitVector(const string& str);
-  
+
   /// @brief 浮動小数点数をビットベクタにする
   /// @param[in] val 浮動小数点数
   /// @warning 整数で表せない範囲の場合には値は不定
@@ -137,7 +137,7 @@ public:
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   BitVector(const BitVector& src);
-  
+
   /// @brief ビット長の変換を行うコピーコンストラクタもどき
   /// @param[in] src 返還元ののビットベクタ
   /// @param[in] size 指定サイズ
@@ -148,7 +148,7 @@ public:
   /// - src のビット長が size よりも長ければ切り捨てる．
   BitVector(const BitVector& src,
 	    ymuint32 size);
-  
+
   /// @brief ビット長の変換と属性の変更を行うコピーコンストラクタもどき
   /// @param[in] src 変換元のオブジェクト
   /// @param[in] size 指定サイズ
@@ -160,7 +160,7 @@ public:
 	    bool is_sized,
 	    bool is_signed,
 	    ymuint32 base);
-  
+
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   /// @return 自分自身
@@ -175,7 +175,7 @@ public:
   /// - 基数は10
   const BitVector&
   operator=(ymuint32 val);
-  
+
   /// @brief int からの代入演算子
   /// @param[in] val 値
   /// @note 結果の型は
@@ -184,7 +184,7 @@ public:
   /// - 基数は10
   const BitVector&
   operator=(int val);
-  
+
   /// @brief bool からの代入演算子
   /// @param[in] value ブール値
   /// @note 結果の型は
@@ -201,8 +201,8 @@ public:
   /// - 符号なし
   /// - 基数は10
   const BitVector&
-  operator=(const VlTime& time);
-  
+  operator=(VlTime time);
+
   /// @brief スカラ値からの代入演算子
   /// @param[in] value 値 (kVpiScalar{0, 1, X, Z}
   /// @note 結果の型は
@@ -211,7 +211,7 @@ public:
   /// - 基数は2
   const BitVector&
   operator=(tVpiScalarVal value);
-  
+
   /// @brief C文字列からの代入演算子
   /// @param[in] str 文字列 (C文字列)
   /// @note 結果の型は
@@ -220,7 +220,7 @@ public:
   /// - 基数は2
   const BitVector&
   operator=(const char* str);
-  
+
   /// @brief string 文字列からの代入演算子
   /// @param[in] str 文字列 (string)
   /// @note 結果の型は
@@ -229,14 +229,14 @@ public:
   /// - 基数は2
   const BitVector&
   operator=(const string& str);
-  
+
   /// @brief 浮動小数点数からの代入演算子
   /// @param[in] val 浮動小数点数
   /// @warning 整数で表せない範囲の場合には値は不定
   /// @todo 整数を経由しない方法に書き換えること
   const BitVector&
   operator=(double val);
-  
+
   /// @brief ビット長の変換と属性の変更を行う代入演算子もどき
   /// @param[in] src 変換元のオブジェクト
   /// @param[in] size 指定サイズ
@@ -260,7 +260,8 @@ public:
 
   /// @brief 型変換を行う．
   /// @param[in] type 要求される型(サイズも含む)
-  void
+  /// @return 自分自身への参照を返す．
+  const BitVector&
   coerce(tVpiValueType type);
 
   /// @}
@@ -304,7 +305,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
- 
+
   //////////////////////////////////////////////////////////////////////
   // 以下の演算は IEEE1364-2001 section 4.1 準拠
   //////////////////////////////////////////////////////////////////////
@@ -321,47 +322,47 @@ public:
   ///   ただし，どちらも unsized なら結果も unsized
   /// - 基数: なし(10)
   /// @{
-  
+
   /// @brief 2の補数を計算し自分自身に代入する．
   /// @return 自分自身を返す．
   const BitVector&
   complement();
-  
+
   /// @brief 加算つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
   /// @note 自分自身に src を足したものを代入する
   const BitVector&
   operator+=(const BitVector& src);
-  
+
   /// @brief 減算つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
   /// @note 自分自身から src を引いたものを代入する
   const BitVector&
   operator-=(const BitVector& src);
-  
+
   /// @brief 乗算つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
   /// @note 自分自身に src を掛けたものを代入する
   const BitVector&
   operator*=(const BitVector& src);
-  
+
   /// @brief 除算つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
   /// @note 自分自身を src で割ったものを代入する
   const BitVector&
   operator/=(const BitVector& src);
-  
+
   /// @brief 剰余算つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
   /// @note 自分自身を src で割った余りを代入する
   const BitVector&
   operator%=(const BitVector& src);
-  
+
   /// 巾乗つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
@@ -371,7 +372,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name Bit-wise logical member operators (IEEE1364-2001 4.1.10)
@@ -401,14 +402,14 @@ public:
   /// @note 自分自身と src との AND を代入する
   const BitVector&
   operator&=(const BitVector& src);
-  
+
   /// @brief Or つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
   /// @note 自分自身と src との OR を代入する
   const BitVector&
   operator|=(const BitVector& src);
-  
+
   /// @brief XOR つき代入
   /// @param[in] src オペランド
   /// @return 自分自身を返す．
@@ -418,7 +419,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name Reduction operators (IEEE1364-2001 4.1.11)
@@ -433,31 +434,31 @@ public:
   /// @note すべてのビットの AND を計算する
   tVpiScalarVal
   reduction_and() const;
-  
+
   /// @brief リダクションOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの OR を計算する
   tVpiScalarVal
   reduction_or() const;
-  
+
   /// @brief リダクションXOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの XOR を計算する
   tVpiScalarVal
   reduction_xor() const;
-  
+
   /// @brief リダクションNAND
   /// @return 演算結果を返す．
   /// @note すべてのビットの NAND を計算する
   tVpiScalarVal
   reduction_nand() const;
-  
+
   /// @brief リダクションNOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの NOR を計算する
   tVpiScalarVal
   reduction_nor() const;
-  
+
   /// @brief リダクションXNOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの XNOR を計算する
@@ -466,7 +467,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name Shift member operators (IEEE1364-2001 4.1.12)
@@ -482,49 +483,49 @@ public:
   /// @note 自分自身を src だけ論理左シフトしたものを代入する．
   const BitVector&
   operator<<=(const BitVector& src);
-  
+
   /// @brief 論理左シフトつき代入
   /// @param[in] src シフト量 (ymuint32)
   /// @return 自分自身を返す．
   /// @note 自分自身を src だけ論理左シフトしたものを代入する．
   const BitVector&
   operator<<=(ymuint32 src);
-  
+
   /// @brief 論理右シフトつき代入
   /// @param[in] src シフト量 (BitVector)
   /// @return 自分自身を返す．
   /// @note 自分自身を src だけ論理右シフトしたものを代入する．
   const BitVector&
   operator>>=(const BitVector& src);
-  
+
   /// @brief 論理右シフトつき代入
   /// @param[in] src シフト量 (ymuint32)
   /// @return 自分自身を返す．
   /// @note 自分自身を src だけ論理右シフトしたものを代入する．
   const BitVector&
   operator>>=(ymuint32 src);
-  
+
   /// @brief 算術左シフトつき代入
   /// @param[in] src シフト量 (BitVector)
   /// @return 自分自身を返す．
   /// @note 自分自身を src だけ算術左シフトしたものを代入する．
   const BitVector&
   alshift(const BitVector& src);
-  
+
   /// @brief 算術左シフトつき代入
   /// @param[in] src シフト量 (ymuint32)
   /// @return 自分自身を返す．
   /// @note 自分自身を src だけ算術左シフトしたものを代入する．
   const BitVector&
   alshift(ymuint32 src);
-  
+
   /// @brief 算術右シフトつき代入
   /// @param[in] src シフト量 (BitVector)
   /// @return 自分自身を返す．
   /// @note 自分自身を src だけ算術右シフトしたものを代入する．
   const BitVector&
   arshift(const BitVector& src);
-  
+
   /// @brief 算術右シフトつき代入
   /// @param[in] src シフト量 (ymuint32)
   /// @return 自分自身を返す．
@@ -534,7 +535,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name Vector bit-select and part-select addressing (IEEE1364-2001 4.2.1)
@@ -553,7 +554,7 @@ public:
   BitVector
   part_select(int msb,
 	      int lsb) const;
-  
+
   /// @brief part-select 書き込み
   /// @param[in] msb 選択範囲の MSB
   /// @param[in] lsb 選択範囲の LSB
@@ -564,13 +565,13 @@ public:
   part_select(int msb,
 	      int lsb,
 	      const BitVector& val);
-  
+
   /// @brief bit-select 演算子
   /// @param[in] bpos 選択するビット位置
   /// @return bpos で指定された位置の値
   tVpiScalarVal
   bit_select(int bpos) const;
-  
+
   /// @brief bit-select 書き込み
   /// @param[in] bpos 選択するビット位置
   /// @param[in] val 書き込む値
@@ -582,42 +583,46 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name その他のメンバ関数
   /// @{
-  
+
+  /// @brief 型を返す．
+  tVpiValueType
+  type() const;
+
   /// @brief srcの値をビットごとにマージする．
   /// @param[in] src オペランド
   /// @return 自分自身
   /// @note 異なっているビットは X となる．
   const BitVector&
   merge(const BitVector& src);
-  
+
   /// @brief サイズを返す．
   ymuint32
   size() const;
-  
+
   /// @brief 実際のサイズはともかくサイズの指定があるかどうかを返す．
   bool
   is_sized() const;
-  
+
   /// @brief 符号付きの場合に true を返す
   bool
   is_signed() const;
-  
+
   /// @brief 表示用の基数を得る．
   ymuint32
   base() const;
-  
+
   /// @brief pos ビット目の値を得る．
   /// @param[in] pos 取得するビット位置
   /// @return pos ビット目の値を返す．
   /// @return pos が範囲を越えていたら kVpiScalarX を返す．
   tVpiScalarVal
   value(int pos) const;
-  
+
   /// @brief pos ビット目の値をセットする．
   /// @param[in] pos 値を設定するビット位置
   /// @param[in] val 設定する値
@@ -625,65 +630,65 @@ public:
   void
   set_value(int pos,
 	    tVpiScalarVal val);
-  
+
   /// @brief 符号付きかつ負数の時に true を返す
   bool
   is_negative() const;
-  
+
   /// @brief x 値を含んでいたら true を返す
   bool
   has_x() const;
-  
+
   /// @brief z 値を含んでいたら true を返す
   bool
   has_z() const;
-  
+
   /// @brief x/z 値を含んでいたら true を返す
   bool
   has_xz() const;
-  
+
   /// @brief z を x に変える．
   /// @note ほとんどの演算で z は x と区別されていない
   void
   z_to_x();
-  
+
   /// @brief x/z を 0 に変える．
   /// @note Verilog-HDL で4値を2値に強引に変換するときのやり方
   void
   xz_to_0();
-  
+
   /// @brief 32 ビットの符合なし数に変換可能なら true を返す．
   /// @note 具体的には size() が 32以下で x や z を含んでいないこと
   bool
   is_uint32() const;
-  
+
   /// @brief is_uint32 の条件を満たしているときに ymuint32 に変換する．
   /// @note 上の条件を満たしていないときの値は不定
   /// (というか実際にどういう値を返すのかはソースコードを見ればわかる)
   ymuint32
   to_uint32() const;
-  
+
   /// @brief int の数値に変換可能なら true を返す．
   /// @note 実際には is_uint32() と同一
   bool
   is_int() const;
-  
+
   /// @brief is_int の条件を満たしているときに int に変換する．
   /// @note 上の条件を満たしていないときの値は不定
   /// (というか実際にどういう値を返すのかはソースコードを見ればわかる)
   int
   to_int() const;
-  
+
   /// @brief 値を double 型に変換する．
   /// @note X/Z は0と見なす．
   double
   to_real() const;
-  
+
   /// @brief 値をバイトベクターと見なして文字列に変換する．
   /// @note 長さが8の倍数でない場合にはパディングする．
   string
   to_string() const;
-  
+
   /// @brief 1ビットのスカラー値に変換する．
   /// @note 実際には LSB を返すだけ．
   tVpiScalarVal
@@ -700,7 +705,7 @@ public:
   /// @note to_logic() と同様で，かつ X/Z を false と見なす．
   bool
   to_bool() const;
-  
+
   /// @brief time 型に変換可能なら true を返す．
   /// @note 具体的には size() が 64 以下で X/Z を含んでいないこと
   bool
@@ -719,25 +724,25 @@ public:
   /// opt_base を基数と見なす．
   string
   verilog_string(ymuint32 opt_base = 0) const;
-  
+
   /// @brief 内容を10進数で表した文字列を返す．
   string
   dec_str() const;
-  
+
   /// @brief 内容を2進数で表した文字列を返す．
   /// @param[in] skip_zeros 0スキップフラグ
   /// @return 内容を2進数で表した文字列を返す．
   /// @note skip_zeros が true なら上位は0は出力しない．
   string
   bin_str(bool skip_zeros = true) const;
-  
+
   /// @brief 内容を8進数で表した文字列を返す．
   /// @param[in] skip_zeros 0スキップフラグ
   /// @return 内容を8進数で表した文字列を返す．
   /// @note skip_zeros が true なら上位は0は出力しない．
   string
   oct_str(bool skip_zeros = true) const;
-  
+
   /// @brief 内容を16進数で表した文字列を返す．
   /// @param[in] skip_zeros 0スキップフラグ
   /// @return 内容を16進数で表した文字列を返す．
@@ -781,17 +786,17 @@ public:
 
 
 private:
-  
+
   // mVal0, mVal1 のリサイズをする．
   void
   resize(ymuint32 size);
-  
+
   // 属性(サイズの有無, 符号の有無, 基数)をセットする．
   void
   set_type(bool has_size,
 	   bool has_sign,
 	   ymuint32 base);
-  
+
   // 値をセットする．(1ワードバージョン)
   void
   set(ymuint32 val0,
@@ -800,7 +805,7 @@ private:
       bool is_sized,
       bool is_signed,
       int base);
-  
+
   // 値をセットする．(ベクタバージョン)
   void
   set(const ymuint32* val0,
@@ -810,7 +815,7 @@ private:
       bool is_sized,
       bool is_signed,
       int base);
-  
+
   // 値をセットする．(ベクタバージョン)
   void
   set(const vector<ymuint32>& val0,
@@ -852,7 +857,7 @@ private:
 		     bool is_signed,
 		     const string& str,
 		     ymuint32 pos);
-  
+
   // 文字列からの変換用コンストラクタの共通ルーティン
   void
   set_from_string(ymuint32 strsize,
@@ -888,7 +893,7 @@ private:
   static
   ymuint32
   mask(ymuint32 size);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -906,8 +911,8 @@ private:
   // mVal0:Val1 の組み合わせで値を表す．
   ymuint32* mVal0;
   ymuint32* mVal1;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 定数
@@ -1116,7 +1121,7 @@ operator>=(const BitVector& src1,
 tVpiScalarVal
 eq(const BitVector& src1,
    const BitVector& src2);
-  
+
 /// @relates BitVector
 /// @brief x が 0 および 1 と等価と見なせるとした場合の等価比較演算子
 /// @param[in] src1, src2 オペランド
@@ -1124,7 +1129,7 @@ eq(const BitVector& src1,
 bool
 eq_with_x(const BitVector& src1,
 	  const BitVector& src2);
-  
+
 /// @relates BitVector
 /// @brief x および z が 0 および 1 と等価と見なせるとした場合の等価比較演算子
 /// @param[in] src1, src2 オペランド
@@ -1717,6 +1722,29 @@ arshift(const BitVector& src1,
 	ymuint32 src2)
 {
   return BitVector(src1).arshift(src2);
+}
+
+// @brief 型を返す．
+inline
+tVpiValueType
+BitVector::type() const
+{
+  if ( is_signed() ) {
+    if ( is_sized() ) {
+      return pack(kVpiValueSS, size());
+    }
+    else {
+      return pack(kVpiValueSU, size());
+    }
+  }
+  else {
+    if ( is_sized() ) {
+      return pack(kVpiValueUS, size());
+    }
+    else {
+      return pack(kVpiValueUU, size());
+    }
+  }
 }
 
 // サイズを返す．

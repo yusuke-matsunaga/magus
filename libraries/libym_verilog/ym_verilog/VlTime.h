@@ -49,12 +49,12 @@ public:
   VlTime(const VlTime& src);
 
   /// @brief 代入演算子
-  const VlTime&
-  operator=(const VlTime& src);
+  VlTime
+  operator=(VlTime src);
 
   /// @brief 加算つき代入演算子
-  const VlTime&
-  operator+=(const VlTime& src);
+  VlTime
+  operator+=(VlTime src);
 
   /// @brief デストラクタ
   ~VlTime();
@@ -85,6 +85,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 値を取り出す関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 64ビットの値を取り出す．
+  ymuint64
+  value() const;
 
   /// @brief 下位32ビットの値を取り出す．
   PLI_UINT32
@@ -125,11 +129,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 下位32ビットの値
-  PLI_UINT32 mLow;
-
-  // 上位32ビットの値
-  PLI_UINT32 mHigh;
+  // 64ビットの値
+  ymuint64 mValue;
 
 };
 
@@ -142,43 +143,43 @@ private:
 /// @param[in] op1, op2 オペランド
 /// @return op1 + op2
 VlTime
-operator+(const VlTime& op1,
-	  const VlTime& op2);
+operator+(VlTime op1,
+	  VlTime op2);
 
 /// @brief 等価比較
 /// @param[in] op1, op2 オペランド
 /// @return op1 と op2 が等しいとき true を返す．
 bool
-operator==(const VlTime& op1,
-	   const VlTime& op2);
+operator==(VlTime op1,
+	   VlTime op2);
 
 /// @brief 小なり
 /// @param[in] op1, op2 オペランド
 /// @return op1 < op2 のとき true を返す．
 bool
-operator<(const VlTime& op1,
-	  const VlTime& op2);
+operator<(VlTime op1,
+	  VlTime op2);
 
 /// @brief 小なりまたは等しい
 /// @param[in] op1, op2 オペランド
 /// @return op1 <= op2 のとき true を返す．
 bool
-operator<=(const VlTime& op1,
-	   const VlTime& op2);
+operator<=(VlTime op1,
+	   VlTime op2);
 
 /// @brief 大なり
 /// @param[in] op1, op2 オペランド
 /// @return op1 > op2 のとき true を返す．
 bool
-operator>(const VlTime& op1,
-	  const VlTime& op2);
+operator>(VlTime op1,
+	  VlTime op2);
 
 /// @brief 大なりまたは等しい
 /// @param[in] op1, op2 オペランド
 /// @return op1 >= op2 のとき true を返す．
 bool
-operator>=(const VlTime& op1,
-	   const VlTime& op2);
+operator>=(VlTime op1,
+	   VlTime op2);
 
 /// @}
 //////////////////////////////////////////////////////////////////////
@@ -192,8 +193,7 @@ operator>=(const VlTime& op1,
 // @note 値は不定
 inline
 VlTime::VlTime() :
-  mLow(0),
-  mHigh(0)
+  mValue(0UL)
 {
 }
 
@@ -202,17 +202,16 @@ VlTime::VlTime() :
 // @param[in] h 上位32ビットの値
 inline
 VlTime::VlTime(PLI_UINT32 l,
-	       PLI_UINT32 h) :
-  mLow(l),
-  mHigh(h)
+	       PLI_UINT32 h)
 {
+  ymuint64 tmp = h;
+  mValue = (tmp << 32) | l;
 }
 
 // @brief unsigned int からの変換コンストラクタ
 inline
 VlTime::VlTime(unsigned int val) :
-  mLow(val),
-  mHigh(0)
+  mValue(val)
 {
 }
 
@@ -226,18 +225,16 @@ VlTime::VlTime(double val)
 // @brief コピーコンストラクタ
 inline
 VlTime::VlTime(const VlTime& src) :
-  mLow(src.mLow),
-  mHigh(src.mHigh)
+  mValue(src.mValue)
 {
 }
 
 // @brief 代入演算子
 inline
-const VlTime&
-VlTime::operator=(const VlTime& src)
+VlTime
+VlTime::operator=(VlTime src)
 {
-  mLow = src.mLow;
-  mHigh = src.mHigh;
+  mValue = src.mValue;
   return *this;
 }
 
@@ -255,8 +252,8 @@ void
 VlTime::set(PLI_UINT32 l,
 	    PLI_UINT32 h)
 {
-  mLow = l;
-  mHigh = h;
+  ymuint64 tmp = h;
+  mValue = (tmp << 32) | l;
 }
 
 // @brief unsigned int の値を設定する．
@@ -264,8 +261,7 @@ inline
 void
 VlTime::set(unsigned int val)
 {
-  mLow = val;
-  mHigh = 0;
+  mValue = val;
 }
 
 // @brief double の値を設定する．
@@ -274,11 +270,11 @@ void
 VlTime::set(double val)
 {
   if ( val < 0.0 ) {
-    mLow = 0;
-    mHigh = 0;
+    mValue = 0UL;
     return;
   }
 
+#if 0
   double hd = rint(val / 4294967296.0);
   if ( hd >= 4294967296.0 ) {
     // オーバーフロー
@@ -290,6 +286,18 @@ VlTime::set(double val)
   mHigh = static_cast<PLI_UINT32>(hd);
   val -= hd;
   mLow = static_cast<PLI_UINT32>(rint(val));
+#else
+  double val1 = rint(val);
+  mValue = static_cast<ymuint64>(val1);
+#endif
+}
+
+// @brief 64ビットの値を取り出す．
+inline
+ymuint64
+VlTime::value() const
+{
+  return mValue;
 }
 
 // @brief 下位32ビットの値を取り出す．
@@ -297,7 +305,7 @@ inline
 PLI_UINT32
 VlTime::low() const
 {
-  return mLow;
+  return mValue & 0xFFFFFFFFUL;
 }
 
 // @brief 上位32ビットの値を取り出す．
@@ -305,7 +313,7 @@ inline
 PLI_UINT32
 VlTime::high() const
 {
-  return mHigh;
+  return (mValue >> 32);
 }
 
 // @brief unsigned int への変換
@@ -314,7 +322,7 @@ inline
 unsigned int
 VlTime::to_uint() const
 {
-  return mLow;
+  return static_cast<ymuint32>(mValue);
 }
 
 // @brief 論理値への変換
@@ -324,7 +332,7 @@ inline
 tVpiScalarVal
 VlTime::to_logic() const
 {
-  if ( mHigh != 0 || mLow != 0 ) {
+  if ( mValue != 0UL ) {
     return kVpiScalar1;
   }
   else {
@@ -337,8 +345,7 @@ inline
 double
 VlTime::to_real() const
 {
-  return static_cast<double>(mHigh) * 4294967296.0 +
-    static_cast<double>(mLow);
+  return static_cast<double>(mValue);
 }
 
 // ハッシュ関数
@@ -346,30 +353,23 @@ inline
 ymuint32
 VlTime::hash() const
 {
-  return (mHigh + 1) * (mLow + 3);
+  return (mValue * mValue) >> 24;
 }
 
 // 加算付き代入
 inline
-const VlTime&
-VlTime::operator+=(const VlTime& op2)
+VlTime
+VlTime::operator+=(VlTime op2)
 {
-  // 桁あげを考慮しなければならないのでちょっとめんどくさい
-  mLow += op2.mLow;
-  ymuint carry = 0;
-  if ( mLow < op2.mLow ) {
-    // 桁あげが起った．
-    carry = 1;
-  }
-  mHigh += op2.mHigh + carry;
+  mValue += op2.mValue;
   return *this;
 }
 
 // 加算
 inline
 VlTime
-operator+(const VlTime& op1,
-	  const VlTime& op2)
+operator+(VlTime op1,
+	  VlTime op2)
 {
   return VlTime(op1).operator+=(op2);
 }
@@ -377,11 +377,10 @@ operator+(const VlTime& op1,
 // 等価比較
 inline
 bool
-operator==(const VlTime& op1,
-	   const VlTime& op2)
+operator==(VlTime op1,
+	   VlTime op2)
 {
-  if ( op1.high() == op2.high() &&
-       op1.low() == op2.low() ) {
+  if ( op1.value() == op2.value() ) {
     return true;
   }
   else {
@@ -392,23 +391,22 @@ operator==(const VlTime& op1,
 // 小なり
 inline
 bool
-operator<(const VlTime& op1,
-	  const VlTime& op2)
+operator<(VlTime op1,
+	  VlTime op2)
 {
-  if ( op1.high() < op2.high() ) {
+  if ( op1.value() < op2.value() ) {
     return true;
   }
-  if ( op1.high() > op2.high() ) {
+  else {
     return false;
   }
-  return op1.low() < op2.low();
 }
 
 // 小なりまたは等しい
 inline
 bool
-operator<=(const VlTime& op1,
-	   const VlTime& op2)
+operator<=(VlTime op1,
+	   VlTime op2)
 {
   return !(op2 < op1);
 }
@@ -416,8 +414,8 @@ operator<=(const VlTime& op1,
 // 大なり
 inline
 bool
-operator>(const VlTime& op1,
-	  const VlTime& op2)
+operator>(VlTime op1,
+	  VlTime op2)
 {
   return op2 < op1;
 }
@@ -425,8 +423,8 @@ operator>(const VlTime& op1,
 // 大なりまたは等しい
 inline
 bool
-operator>=(const VlTime& op1,
-	   const VlTime& op2)
+operator>=(VlTime op1,
+	   VlTime op2)
 {
   return !(op1 < op2);
 }
@@ -440,7 +438,7 @@ template <>
 struct hash<nsYm::nsVerilog::VlTime>
 {
   ymuint32
-  operator()(const nsYm::nsVerilog::VlTime& time) const
+  operator()(nsYm::nsVerilog::VlTime time) const
   {
     return time.hash();
   }

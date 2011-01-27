@@ -328,7 +328,7 @@ VmStmtNode::expand() const
     break;
 
   case kVpiEventStmt:
-    add_str("vpiNamedEvent", mStmt->named_event()->full_name());
+    add_str("vpiNamedEvent", mStmt->named_event()->decompile());
     break;
 
   case kVpiAssignment:

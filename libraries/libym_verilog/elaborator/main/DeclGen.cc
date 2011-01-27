@@ -473,15 +473,15 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
 
     // 右辺の式は constant expression のはずなので今つくる．
     const PtExpr* pt_init_expr = pt_item->init_value();
-    ElbValue value = evaluate_expr(parent, pt_init_expr);
+    VlValue value = evaluate_expr(parent, pt_init_expr);
 
     param->set_expr(pt_init_expr, value);
 
     // ダブっている感じがするけど同じことを表す parameter assign 文
     // をつくってモジュールに追加する．
-    ElbParamAssign* pa = factory().new_ParamAssign(module, pt_item,
-						   param, pt_init_expr, value,
-						   true);
+    ElbParamAssign* pa = factory().new_NamedParamAssign(module, pt_item,
+							param, pt_init_expr,
+							value);
     reg_paramassign(pa);
   }
 }

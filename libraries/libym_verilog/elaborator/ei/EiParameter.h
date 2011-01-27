@@ -14,6 +14,8 @@
 #include "ElbParameter.h"
 #include "EiRange.h"
 
+#include "ym_verilog/VlValue.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -357,7 +359,7 @@ public:
 
   /// @brief 値の取得
   virtual
-  ElbValue
+  VlValue
   get_value() const;
 
   /// @brief 値の設定
@@ -366,7 +368,7 @@ public:
   virtual
   void
   set_expr(const PtExpr* expr,
-	   const ElbValue& value);
+	   const VlValue& value);
 
 
 private:
@@ -384,7 +386,7 @@ private:
   const PtExpr* mExpr;
 
   // 値
-  ElbValue mValue;
+  VlValue mValue;
 
 };
 

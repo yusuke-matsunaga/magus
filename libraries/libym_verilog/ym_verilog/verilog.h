@@ -38,10 +38,12 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-class BitVector;
 class VlLineWatcher;
 class VlMgr;
+class BitVector;
 class VlTime;
+class VlValue;
+
 
 /// @defgroup VlCommon Verilog 用基本ユーティリティ
 /// @ingroup VlGroup
@@ -1014,10 +1016,11 @@ END_NAMESPACE_YM_VERILOG
 
 BEGIN_NAMESPACE_YM
 
-using nsVerilog::BitVector;
 using nsVerilog::VlLineWatcher;
 using nsVerilog::VlMgr;
 using nsVerilog::VlTime;
+using nsVerilog::BitVector;
+using nsVerilog::VlValue;
 
 END_NAMESPACE_YM
 

@@ -224,7 +224,7 @@ ExprGen::instantiate_sysfunccall(const VlNamedObj* parent,
 // @brief PtFuncCall から式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbValue
+VlValue
 ExprGen::evaluate_funccall(const VlNamedObj* parent,
 			   const PtExpr* pt_expr)
 {
@@ -234,7 +234,7 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   if ( nb_array.size() > 0 ) {
     error_hname_in_ce(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
 
   // 関数名
@@ -248,12 +248,12 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
   const PtItem* pt_func = pt_module->find_function(name);
   if ( !pt_func ) {
     error_no_such_function(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
 
   if ( pt_func->is_in_use() ) {
     error_uses_itself(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
 
   const ElbTaskFunc* child_func = find_constant_function(module, name);
@@ -265,40 +265,40 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
   }
   if ( !child_func ) {
     error_not_a_constant_function(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
 
   // 引数の生成
   ymuint n = pt_expr->operand_num();
   if ( n != child_func->io_num() ) {
     error_n_of_arguments_mismatch(pt_expr);
-    return ElbValue();
+    return VlValue();
   }
 
-  vector<ElbValue> arg_list(n);
+  vector<VlValue> arg_list(n);
   for (ymuint i = 0; i < n; ++ i) {
     const PtExpr* pt_expr1 = pt_expr->operand(i);
-    ElbValue val1 = evaluate_expr(parent, pt_expr1);
+    VlValue val1 = evaluate_expr(parent, pt_expr1);
     if ( val1.is_error() ) {
       // エラーが起った．
-      return ElbValue();
+      return VlValue();
     }
     ElbIODecl* io_decl = child_func->_io(i);
     ElbDecl* decl = io_decl->_decl();
     tVpiValueType decl_type = decl->value_type();
     if ( decl_type == kVpiValueReal ) {
-      val1.to_real();
-      if ( val1.is_error() ) {
+      if ( !val1.is_real_conv() ) {
 	// 型が異なる．
 	error_illegal_argument_type(pt_expr1);
-	return ElbValue();
+	return VlValue();
       }
     }
     else if ( is_bitvector_type(decl_type) ) {
-      val1.to_bitvector();
-      // 型が異なる．
-      error_illegal_argument_type(pt_expr1);
-      return ElbValue();
+      if ( !val1.is_bitvector_conv() ) {
+	// 型が異なる．
+	error_illegal_argument_type(pt_expr1);
+	return VlValue();
+      }
     }
     arg_list[i] = val1;
   }
@@ -307,7 +307,7 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
   // function call の生成
   ElbExpr* expr = factory().new_FuncCall(pt_expr, child_func, n, arg_list);
 #else
-  return ElbValue();
+  return VlValue();
 #endif
 }
 

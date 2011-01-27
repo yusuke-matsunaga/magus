@@ -127,7 +127,7 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 	for (ymuint i = 0; i < n; ++ i) {
 	  const PtConnection* pt_con = pa_array[i];
 	  const PtExpr* expr = pt_con->expr();
-	  ElbValue value = evaluate_expr(parent, expr);
+	  VlValue value = evaluate_expr(parent, expr);
 	  param_con.set(i, pt_con, expr, value);
 	}
 
@@ -236,7 +236,7 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   for (ymuint i = 0; i < param_num; ++ i) {
     const PtConnection* pt_con = pa_array[i];
     const PtExpr* expr = pt_con->expr();
-    ElbValue value = evaluate_expr(parent, expr);
+    VlValue value = evaluate_expr(parent, expr);
     param_con.set(i, pt_con, expr, value);
   }
 

@@ -12,6 +12,7 @@
 #include "ExprGen.h"
 #include "ElbEnv.h"
 
+#include "ym_verilog/BitVector.h"
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
@@ -307,9 +308,8 @@ ExprGen::evaluate_int(const VlNamedObj* parent,
 		      const PtExpr* pt_expr,
 		      int& value)
 {
-  ElbValue val = evaluate_expr(parent, pt_expr);
-  val.to_int();
-  if ( val.is_error() ) {
+  VlValue val = evaluate_expr(parent, pt_expr);
+  if ( !val.is_int_conv() ) {
     put_msg(__FILE__, __LINE__,
 	    pt_expr->file_region(),
 	    kMsgError,
@@ -332,10 +332,7 @@ ExprGen::evaluate_scalar(const VlNamedObj* parent,
 			 const PtExpr* pt_expr,
 			 tVpiScalarVal& value)
 {
-  ElbValue val = evaluate_expr(parent, pt_expr);
-  val.to_scalar();
-  assert_cond( !val.is_error(), __FILE__, __LINE__);
-
+  VlValue val = evaluate_expr(parent, pt_expr);
   value = val.scalar_value();
   return true;
 }
@@ -350,10 +347,7 @@ ExprGen::evaluate_bool(const VlNamedObj* parent,
 		       const PtExpr* pt_expr,
 		       bool& value)
 {
-  ElbValue val = evaluate_expr(parent, pt_expr);
-  val.to_logic();
-  assert_cond( !val.is_error(), __FILE__, __LINE__);
-
+  VlValue val = evaluate_expr(parent, pt_expr);
   if ( val.scalar_value() == kVpiScalar1 ) {
     value = true;
   }
@@ -373,9 +367,8 @@ ExprGen::evaluate_bitvector(const VlNamedObj* parent,
 			    const PtExpr* pt_expr,
 			    BitVector& value)
 {
-  ElbValue val = evaluate_expr(parent, pt_expr);
-  val.to_bitvector();
-  if ( val.is_error() ) {
+  VlValue val = evaluate_expr(parent, pt_expr);
+  if ( !val.is_bitvector_conv() ) {
     put_msg(__FILE__, __LINE__,
 	    pt_expr->file_region(),
 	    kMsgError,
@@ -391,7 +384,7 @@ ExprGen::evaluate_bitvector(const VlNamedObj* parent,
 // @brief 式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbValue
+VlValue
 ExprGen::evaluate_expr(const VlNamedObj* parent,
 		       const PtExpr* pt_expr)
 {
@@ -422,13 +415,13 @@ ExprGen::evaluate_expr(const VlNamedObj* parent,
     assert_not_reached(__FILE__, __LINE__);
   }
 
-  return ElbValue();
+  return VlValue();
 }
 
 // @brief 定数に対して式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbValue
+VlValue
 ExprGen::evaluate_const(const VlNamedObj* parent,
 			const PtExpr* pt_expr)
 {
@@ -438,12 +431,12 @@ ExprGen::evaluate_const(const VlNamedObj* parent,
   switch ( pt_expr->const_type() ) {
   case kVpiIntConst:
     if ( pt_expr->const_str() == NULL ) {
-      return ElbValue(static_cast<int>(pt_expr->const_uint()));
+      return VlValue(static_cast<int>(pt_expr->const_uint()));
     }
     break;
 
   case kVpiRealConst:
-    return ElbValue(pt_expr->const_real());
+    return VlValue(pt_expr->const_real());
 
   case kVpiSignedBinaryConst:
     is_signed = true;
@@ -470,7 +463,7 @@ ExprGen::evaluate_const(const VlNamedObj* parent,
     break;
 
   case kVpiStringConst:
-    return ElbValue(BitVector(pt_expr->const_str()));
+    return VlValue(BitVector(pt_expr->const_str()));
 
   default:
     assert_not_reached(__FILE__, __LINE__);
@@ -478,7 +471,7 @@ ExprGen::evaluate_const(const VlNamedObj* parent,
   }
 
   // ここに来たということはビットベクタ型
-  return ElbValue(BitVector(size, is_signed, base, pt_expr->const_str()));
+  return VlValue(BitVector(size, is_signed, base, pt_expr->const_str()));
 }
 
 // @brief PtDelay から ElbExpr を生成する．

@@ -15,6 +15,7 @@
 #include "ElbExpr.h"
 
 #include "ym_verilog/pt/PtItem.h"
+#include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 
 
@@ -35,19 +36,27 @@ EiFactory::new_ParamAssign(const VlModule* module,
 			   const PtBase* pt_obj,
 			   ElbParameter* param,
 			   const PtExpr* rhs_expr,
-			   const ElbValue& rhs_value,
-			   bool named_con)
+			   const VlValue& rhs_value)
 {
-  EiParamAssign* pa = NULL;
-  if ( named_con ) {
-    void* p = mAlloc.get_memory(sizeof(EiParamAssign));
-    pa = new (p) EiParamAssign(module, pt_obj, param, rhs_expr, rhs_value);
-  }
-  else {
-    void* p = mAlloc.get_memory(sizeof(EiParamAssign2));
-    pa = new (p) EiParamAssign2(module, pt_obj, param, rhs_expr, rhs_value);
-  }
-  return pa;
+  void* p = mAlloc.get_memory(sizeof(EiParamAssign2));
+  return new (p) EiParamAssign(module, pt_obj, param, rhs_expr, rhs_value);
+}
+
+// @brief 名前によるパラメータ割り当て文を生成する．
+// @param[in] module 親のモジュール
+// @param[in] param 対象の parameter
+// @param[in] rhs_expr 割り当て式の右辺
+// @param[in] rhs_value 右辺の値
+// @param[in] named_con 名前による割り当ての時 true
+ElbParamAssign*
+EiFactory::new_NamedParamAssign(const VlModule* module,
+				const PtBase* pt_obj,
+				ElbParameter* param,
+				const PtExpr* rhs_expr,
+				const VlValue& rhs_value)
+{
+  void* p = mAlloc.get_memory(sizeof(EiParamAssign));
+  return new (p) EiParamAssign2(module, pt_obj, param, rhs_expr, rhs_value);
 }
 
 // @brief defparam 文を生成する．
@@ -63,13 +72,11 @@ EiFactory::new_DefParam(const VlModule* module,
 			const PtDefParam* pt_defparam,
 			ElbParameter* param,
 			const PtExpr* rhs_expr,
-			const ElbValue& rhs_value)
+			const VlValue& rhs_value)
 {
   void* p = mAlloc.get_memory(sizeof(EiDefParam));
-  EiDefParam* defparam = new (p) EiDefParam(module, pt_header, pt_defparam,
-					    param, rhs_expr, rhs_value);
-
-  return defparam;
+  return new (p) EiDefParam(module, pt_header, pt_defparam,
+			    param, rhs_expr, rhs_value);
 }
 
 
@@ -87,7 +94,7 @@ EiParamAssign::EiParamAssign(const VlModule* parent,
 			     const PtBase* pt_obj,
 			     ElbParameter* param,
 			     const PtExpr* rhs_expr,
-			     const ElbValue& rhs_value) :
+			     const VlValue& rhs_value) :
   mModule(parent),
   mPtObj(pt_obj),
   mLhs(param),
@@ -129,14 +136,19 @@ EiParamAssign::lhs() const
   return mLhs;
 }
 
-#if 0
 // @brief 右辺値を返す．
-const VlExpr*
-EiParamAssign::rhs() const
+VlValue
+EiParamAssign::rhs_value() const
 {
-  return mRhs;
+  return mRhsValue;
 }
-#endif
+
+// @brief 右辺の式を表す文字列を返す．
+string
+EiParamAssign::rhs_string() const
+{
+  return mRhsExpr->decompile();
+}
 
 // @brief 名前による接続の場合に true を返す．
 bool
@@ -160,7 +172,7 @@ EiParamAssign2::EiParamAssign2(const VlModule* parent,
 			       const PtBase* pt_obj,
 			       ElbParameter* param,
 			       const PtExpr* rhs_expr,
-			       const ElbValue& rhs_value) :
+			       const VlValue& rhs_value) :
   EiParamAssign(parent, pt_obj, param, rhs_expr, rhs_value)
 {
 }
@@ -194,7 +206,7 @@ EiDefParam::EiDefParam(const VlModule* parent,
 		       const PtDefParam* pt_defparam,
 		       ElbParameter* param,
 		       const PtExpr* rhs_expr,
-		       const ElbValue& rhs_value) :
+		       const VlValue& rhs_value) :
   mModule(parent),
   mPtHead(pt_header),
   mPtDefParam(pt_defparam),
@@ -237,13 +249,18 @@ EiDefParam::lhs() const
   return mLhs;
 }
 
-#if 0
 // @brief 右辺値を返す．
-const VlExpr*
-EiDefParam::rhs() const
+VlValue
+EiDefParam::rhs_value() const
 {
-  return mRhs;
+  return mRhsValue;
 }
-#endif
+
+// @brief 右辺の式を表す文字列を返す．
+string
+EiDefParam::rhs_string() const
+{
+  return mRhsExpr->decompile();
+}
 
 END_NAMESPACE_YM_VERILOG

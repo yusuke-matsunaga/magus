@@ -133,11 +133,11 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	assert_cond( param, __FILE__, __LINE__);
 
 	const PtExpr* expr = param_con->expr(i);
-	ElbValue value = param_con->value(i);
+	VlValue value = param_con->value(i);
 	param->set_expr(expr, value);
-	ElbParamAssign* pa = factory().new_ParamAssign(module, pt_con,
-						       param, expr, value,
-						       true);
+	ElbParamAssign* pa = factory().new_NamedParamAssign(module, pt_con,
+							    param, expr,
+							    value);
 	reg_paramassign(pa);
       }
     }
@@ -171,11 +171,10 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	  assert_cond( param, __FILE__, __LINE__);
 
 	  const PtExpr* expr = param_con->expr(i);
-	  ElbValue value = param_con->value(i);
+	  VlValue value = param_con->value(i);
 	  param->set_expr(expr, value);
 	  ElbParamAssign* pa = factory().new_ParamAssign(module, pt_con,
-							 param, expr, value,
-							 false);
+							 param, expr, value);
 	  reg_paramassign(pa);
 	}
       }

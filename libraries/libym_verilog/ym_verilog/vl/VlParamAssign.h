@@ -47,12 +47,15 @@ public:
   const VlDecl*
   lhs() const = 0;
 
-#if 0
   /// @brief 右辺値を返す．
   virtual
-  const VlExpr*
-  rhs() const = 0;
-#endif
+  VlValue
+  rhs_value() const = 0;
+
+  /// @brief 右辺の式を表す文字列を返す．
+  virtual
+  string
+  rhs_string() const = 0;
 
   /// @brief 名前による接続の場合に true を返す．
   virtual
@@ -92,12 +95,15 @@ public:
   const VlDecl*
   lhs() const = 0;
 
-#if 0
   /// @brief 右辺値を返す．
   virtual
-  const VlExpr*
-  rhs() const = 0;
-#endif
+  VlValue
+  rhs_value() const = 0;
+
+  /// @brief 右辺の式を表す文字列を返す．
+  virtual
+  string
+  rhs_string() const = 0;
 
 };
 

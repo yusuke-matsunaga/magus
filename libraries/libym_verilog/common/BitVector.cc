@@ -78,7 +78,7 @@ mult32(ymuint32 a,
   ymuint32 c2h = c2 >> 16;
   c2 &= 0xffff;
   ymuint32 c3 = c2h + tmp_hhh;
-  
+
   ymuint32 cl = (c1 << 16) + c0;
   ymuint32 ch = (c3 << 16) + c2;
 
@@ -198,7 +198,7 @@ BitVector::BitVector(int val) :
 {
   set(~val, val, kVpiSizeInteger, false, true, 10);
 }
-  
+
 // @brief int からの代入演算子
 // @param[in] val 値
 // @note 結果の型は
@@ -225,7 +225,7 @@ BitVector::BitVector(bool value) :
     set(1, 0, 1, true, false, 2);
   }
 }
-  
+
 // @brief bool からの代入演算子
 // @param[in] value ブール値
 // @note 結果の型は
@@ -245,7 +245,7 @@ BitVector::operator=(bool value)
 }
 
 // @brief time 型からの変換コンストラクタ
-BitVector::BitVector(const VlTime& time) :
+BitVector::BitVector(VlTime time) :
   mSize(0),
   mVal0(NULL),
   mVal1(NULL)
@@ -266,7 +266,7 @@ BitVector::BitVector(const VlTime& time) :
 // - 符号なし
 // - 基数は10
 const BitVector&
-BitVector::operator=(const VlTime& time)
+BitVector::operator=(VlTime time)
 {
   // サイズあり, 符号無し, 基数10
   resize(kVpiSizeTime);
@@ -322,7 +322,7 @@ BitVector::BitVector(const char* str) :
 {
   operator=(str);
 }
-  
+
 // @brief C文字列からの代入演算子
 // @param[in] str 文字列 (C文字列)
 // @note 結果の型は
@@ -631,7 +631,7 @@ BitVector::BitVector(const BitVector& src,
 {
   set(src.mVal0, src.mVal1, src.size(), size, is_sized, is_signed, base);
 }
-  
+
 // @brief スカラ値からの代入演算子
 // @param[in] value 値 (kVpiScalar{0, 1, X, Z}
 // @note 結果の型は
@@ -751,28 +751,30 @@ BitVector::set_from_verilog_string(const string& str)
   case 16: set_from_hexstring(size, is_sized, is_signed, str, 0); break;
   default: cerr << "illegal base : " << base << endl;
   }
-  
+
   return true;
 }
 
 // @brief 型変換を行う．
 // @param[in] type 要求される型(サイズも含む)
-void
+// @return 自分自身への参照を返す．
+const BitVector&
 BitVector::coerce(tVpiValueType type)
 {
-  if ( type == kVpiValueNone ) {
-    return;
-  }
-  bool is_signed = is_signed_type(type);
-  bool is_sized = is_sized_type(type);
-  ymuint32 req_size = unpack_size(type);
+  if ( type != kVpiValueNone ) {
+    bool is_signed = is_signed_type(type);
+    bool is_sized = is_sized_type(type);
+    ymuint32 req_size = unpack_size(type);
 
-  if ( size() == req_size ) {
-    set_type(is_sized, is_signed, base());
+    if ( size() == req_size ) {
+      set_type(is_sized, is_signed, base());
+    }
+    else {
+      set(mVal0, mVal1, size(), req_size, is_sized, is_signed, base());
+    }
   }
-  else {
-    set(mVal0, mVal1, size(), req_size, is_sized, is_signed, base());
-  }
+
+  return *this;
 }
 
 // 0 を表すオブジェクトを生成する
@@ -1589,7 +1591,7 @@ BitVector::eq_base(const BitVector& src1,
     // 通常の等価比較
     return src1.mVal0 == src2.mVal0;
   }
-  
+
   if ( mode == 2 ) {
     // x を 0 または 1 と見なす等価比較
     ymuint32 n = block(src1.size());
@@ -2229,7 +2231,7 @@ BitVector::arshift(const BitVector& src)
   if ( src.has_xz() ) {
     return *this = BitVector::x(size());
   }
-  
+
   if ( !src.is_uint32() ) {
     cerr << "error in operator<<: right operand too big" << endl;
     return *this = BitVector::x(size());
@@ -2448,7 +2450,7 @@ BitVector::part_select(int msb,
     // 狂ってる．
     return;
   }
-  
+
   ymuint32 l = msb - lsb + 1;
   ymuint32 src_blk = block(l);
   ymuint32 src_mask = mask(l);
@@ -2562,7 +2564,7 @@ BitVector::merge(const BitVector& src)
   }
 
   set_type(ans_sized, ans_signed, ans_base);
-  
+
   ymuint32 n = block(size());
   for (ymuint32 i = 0; i < n; ++ i) {
     ymuint32 val1_0 = mVal0[i];
@@ -2591,7 +2593,7 @@ BitVector::value(int pos) const
   if ( pos < 0 || pos >= static_cast<int>(size()) ) {
     return kVpiScalarX;
   }
-  
+
   ymuint32 blk = pos / kBlockSize;
   ymuint32 sft = pos - blk * kBlockSize;
   ymuint32 msk = 1 << sft;
@@ -2622,7 +2624,7 @@ BitVector::set_value(int pos,
   if ( pos < 0 || pos >= static_cast<int>(size()) ) {
     return;
   }
-  
+
   ymuint32 blk = pos / kBlockSize;
   ymuint32 sft = pos - blk * kBlockSize;
   ymuint32 msk = 1 << sft;
@@ -2830,7 +2832,7 @@ BitVector::verilog_string(ymuint32 opt_base) const
 
   // サイズなしの場合には上位の0は無視する．
   bool skip_zeros = !is_sized();
-  
+
   ymuint32 l = size();
   if ( l == 1 ) {
     switch ( value(0) ) {
@@ -3058,7 +3060,7 @@ BitVector::set(ymuint32 val0,
 	       int base)
 {
   assert_cond(size <= kBlockSize, __FILE__, __LINE__);
-  
+
   resize(size);
   set_type(has_size, has_sign, base);
   ymuint32 m = mask(size);
