@@ -348,7 +348,7 @@ ExprGen::evaluate_bool(const VlNamedObj* parent,
 		       bool& value)
 {
   VlValue val = evaluate_expr(parent, pt_expr);
-  if ( val.scalar_value() == kVpiScalar1 ) {
+  if ( val.logic_value() == kVpiScalar1 ) {
     value = true;
   }
   else {
