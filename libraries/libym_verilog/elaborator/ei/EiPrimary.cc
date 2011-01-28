@@ -15,7 +15,7 @@
 #include "ElbParameter.h"
 #include "ElbPrimitive.h"
 
-#include "ym_verilog/BitVector.h"
+#include "ym_verilog/pt/PtDecl.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -32,9 +32,18 @@ EiFactory::new_Primary(const PtExpr* pt_expr,
 		       ElbDecl* obj)
 {
   void* p = mAlloc.get_memory(sizeof(EiPrimary));
-  EiPrimary* expr = new (p) EiPrimary(pt_expr, obj);
+  return new (p) EiPrimary(pt_expr, obj);
+}
 
-  return expr;
+// @brief プライマリ式を生成する．
+// @param[in] pt_item パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+ElbExpr*
+EiFactory::new_Primary(const PtDeclItem* pt_item,
+		       ElbDecl* obj)
+{
+  void* p = mAlloc.get_memory(sizeof(EiDeclPrimary));
+  return new (p) EiDeclPrimary(pt_item, obj);
 }
 
 // @brief プライマリ式を生成する．
@@ -45,9 +54,7 @@ EiFactory::new_Primary(const PtExpr* pt_expr,
 		       ElbParameter* obj)
 {
   void* p = mAlloc.get_memory(sizeof(EiParamPrimary));
-  EiParamPrimary* expr = new (p) EiParamPrimary(pt_expr, obj);
-
-  return expr;
+  return new (p) EiParamPrimary(pt_expr, obj);
 }
 
 // @brief プライマリ式を生成する(配列要素版)．
@@ -66,9 +73,7 @@ EiFactory::new_Primary(const PtExpr* pt_expr,
     index_array[i] = index_list[i];
   }
   void* p = mAlloc.get_memory(sizeof(EiArrayElemPrimary));
-  ElbExpr* expr = new (p) EiArrayElemPrimary(pt_expr, obj, n, index_array);
-
-  return expr;
+  return new (p) EiArrayElemPrimary(pt_expr, obj, n, index_array);
 }
 
 // @brief システム関数/システムタスクの引数を生成する．
@@ -79,9 +84,7 @@ EiFactory::new_ArgHandle(const PtExpr* pt_expr,
 			 const VlNamedObj* arg)
 {
   void* p = mAlloc.get_memory(sizeof(EiScopePrimary));
-  EiScopePrimary* expr = new (p) EiScopePrimary(pt_expr, arg);
-
-  return expr;
+  return new (p) EiScopePrimary(pt_expr, arg);
 }
 
 // @brief システム関数/システムタスクの引数を生成する．
@@ -92,9 +95,7 @@ EiFactory::new_ArgHandle(const PtExpr* pt_expr,
 			 ElbPrimitive* arg)
 {
   void* p = mAlloc.get_memory(sizeof(EiPrimitivePrimary));
-  EiPrimitivePrimary* expr = new (p) EiPrimitivePrimary(pt_expr, arg);
-
-  return expr;
+  return new (p) EiPrimitivePrimary(pt_expr, arg);
 }
 
 
@@ -161,6 +162,86 @@ void
 EiPrimary::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiDeclPrimary
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_item パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+EiDeclPrimary::EiDeclPrimary(const PtDeclItem* pt_item,
+			     ElbDecl* obj) :
+  mPtObj(pt_item),
+  mObj(obj)
+{
+}
+
+// @brief デストラクタ
+EiDeclPrimary::~EiDeclPrimary()
+{
+}
+
+// @brief 型の取得
+tVpiObjType
+EiDeclPrimary::type() const
+{
+  return mObj->type();
+}
+
+// @brief 式のタイプを返す．
+tVpiValueType
+EiDeclPrimary::value_type() const
+{
+  return mObj->value_type();
+}
+
+// @brief 定数の時 true を返す．
+// @note 参照している要素の型によって決まる．
+bool
+EiDeclPrimary::is_const() const
+{
+  return false;
+}
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiDeclPrimary::is_primary() const
+{
+  return true;
+}
+
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDecl*
+EiDeclPrimary::decl_obj() const
+{
+  return mObj;
+}
+
+// @brief Verilog-HDL の文字列を得る．
+string
+EiDeclPrimary::decompile() const
+{
+  return mPtObj->name();
+}
+
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiDeclPrimary::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+// @brief パース木の定義要素を返す．
+const PtBase*
+EiDeclPrimary::pt_obj() const
+{
+  return mPtObj;
 }
 
 

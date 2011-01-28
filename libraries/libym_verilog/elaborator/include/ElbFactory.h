@@ -881,6 +881,15 @@ public:
   new_Primary(const PtExpr* pt_expr,
 	      ElbDecl* obj) = 0;
 
+  /// @brief プライマリ式を生成する(net decl の初期値用)．
+  /// @param[in] pt_item パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] index_list インデックスのリスト
+  virtual
+  ElbExpr*
+  new_Primary(const PtDeclItem* pt_item,
+	      ElbDecl* obj) = 0;
+
   /// @brief プライマリ式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] obj 本体のオブジェクト
