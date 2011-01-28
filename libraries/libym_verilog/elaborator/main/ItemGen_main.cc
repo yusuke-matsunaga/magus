@@ -182,7 +182,7 @@ ItemGen::defparam_override(const VlModule* module,
   }
 
   const PtExpr* rhs_expr = pt_defparam->expr();
-  VlValue rhs_value = evaluate_expr(module, rhs_expr);
+  VlValue rhs_value = evaluate_expr(module, rhs_expr, true);
 
   ostringstream buf;
   buf << "instantiating defparam: " << param->full_name()
@@ -307,7 +307,7 @@ ItemGen::phase1_genif(const VlNamedObj* parent,
 		      const PtItem* pt_genif)
 {
   bool cond;
-  if ( !evaluate_bool(parent, pt_genif->expr(), cond) ) {
+  if ( !evaluate_bool(parent, pt_genif->expr(), cond, true) ) {
     return;
   }
   if ( cond ) {
@@ -330,7 +330,7 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
 			const PtItem* pt_gencase)
 {
   BitVector val;
-  if ( !evaluate_bitvector(parent, pt_gencase->expr(), val) ) {
+  if ( !evaluate_bitvector(parent, pt_gencase->expr(), val, true) ) {
     return;
   }
 
@@ -343,7 +343,7 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
     for (ymuint i = 0; i < n; ++ i) {
       const PtExpr* pt_expr = pt_caseitem->label(i);
       BitVector label_val;
-      if ( !evaluate_bitvector(parent, pt_expr, label_val) ) {
+      if ( !evaluate_bitvector(parent, pt_expr, label_val, true) ) {
 	continue;
       }
       if ( label_val == val ) {
@@ -420,7 +420,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
 
   {
     int val;
-    if ( !evaluate_int(parent, pt_genfor->init_expr(), val) ) {
+    if ( !evaluate_int(parent, pt_genfor->init_expr(), val, true) ) {
       return;
     }
     if ( val < 0 ) {
@@ -438,7 +438,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
   for ( ; ; ) {
     // 終了条件のチェック
     bool val;
-    if ( !evaluate_bool(parent, pt_genfor->expr(), val) ) {
+    if ( !evaluate_bool(parent, pt_genfor->expr(), val, true) ) {
       break;
     }
     if ( !val ) {
@@ -462,7 +462,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
     // genvar の増加分の処理．
     {
       int val;
-      if ( !evaluate_int(parent, pt_genfor->next_expr(), val) ) {
+      if ( !evaluate_int(parent, pt_genfor->next_expr(), val, true) ) {
 	break;
       }
       if ( val < 0 ) {

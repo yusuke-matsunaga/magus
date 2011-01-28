@@ -224,16 +224,20 @@ ExprGen::instantiate_sysfunccall(const VlNamedObj* parent,
 // @brief PtFuncCall から式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
+// @param[in] put_error エラーを出力する時，true にする．
 VlValue
 ExprGen::evaluate_funccall(const VlNamedObj* parent,
-			   const PtExpr* pt_expr)
+			   const PtExpr* pt_expr,
+			   bool put_error)
 {
   // 定数関数を探し出す．
 
   // 階層名は使えない．
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   if ( nb_array.size() > 0 ) {
-    error_hname_in_ce(pt_expr);
+    if ( put_error ) {
+      error_hname_in_ce(pt_expr);
+    }
     return VlValue();
   }
 
@@ -247,12 +251,16 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
   const PtModule* pt_module = find_moduledef(module->def_name());
   const PtItem* pt_func = pt_module->find_function(name);
   if ( !pt_func ) {
-    error_no_such_function(pt_expr);
+    if ( put_error ) {
+      error_no_such_function(pt_expr);
+    }
     return VlValue();
   }
 
   if ( pt_func->is_in_use() ) {
-    error_uses_itself(pt_expr);
+    if ( put_error ) {
+      error_uses_itself(pt_expr);
+    }
     return VlValue();
   }
 
@@ -264,21 +272,25 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
     pt_func->clear_in_use();
   }
   if ( !child_func ) {
-    error_not_a_constant_function(pt_expr);
+    if ( put_error ) {
+      error_not_a_constant_function(pt_expr);
+    }
     return VlValue();
   }
 
   // 引数の生成
   ymuint n = pt_expr->operand_num();
   if ( n != child_func->io_num() ) {
-    error_n_of_arguments_mismatch(pt_expr);
+    if ( put_error ) {
+      error_n_of_arguments_mismatch(pt_expr);
+    }
     return VlValue();
   }
 
   vector<VlValue> arg_list(n);
   for (ymuint i = 0; i < n; ++ i) {
     const PtExpr* pt_expr1 = pt_expr->operand(i);
-    VlValue val1 = evaluate_expr(parent, pt_expr1);
+    VlValue val1 = evaluate_expr(parent, pt_expr1, put_error);
     if ( val1.is_error() ) {
       // エラーが起った．
       return VlValue();
@@ -289,14 +301,18 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
     if ( decl_type == kVpiValueReal ) {
       if ( !val1.is_real_conv() ) {
 	// 型が異なる．
-	error_illegal_argument_type(pt_expr1);
+	if ( put_error ) {
+	  error_illegal_argument_type(pt_expr1);
+	}
 	return VlValue();
       }
     }
     else if ( is_bitvector_type(decl_type) ) {
       if ( !val1.is_bitvector_conv() ) {
 	// 型が異なる．
-	error_illegal_argument_type(pt_expr1);
+	if ( put_error ) {
+	  error_illegal_argument_type(pt_expr1);
+	}
 	return VlValue();
       }
     }

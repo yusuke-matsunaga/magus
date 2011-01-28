@@ -473,7 +473,7 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
 
     // 右辺の式は constant expression のはずなので今つくる．
     const PtExpr* pt_init_expr = pt_item->init_value();
-    VlValue value = evaluate_expr(parent, pt_init_expr);
+    VlValue value = evaluate_expr(parent, pt_init_expr, true);
 
     param->set_expr(pt_init_expr, value);
 

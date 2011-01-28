@@ -66,7 +66,7 @@ private:
   struct Cell
   {
     // 宣言要素
-    const VlDecl* mDecl;
+    const VlObj* mDecl;
 
     // ID番号
     ymuint32 mId;
@@ -84,12 +84,12 @@ private:
 
   /// @brief Cell を登録する．
   void
-  put_cell(const VlDecl* decl,
+  put_cell(const VlObj* decl,
 	   ymuint id);
 
   /// @brief Cell を探す．
   Cell*
-  find_cell(const VlDecl* decl) const;
+  find_cell(const VlObj* decl) const;
 
   /// @brief テーブルの領域を確保する．
   /// @param[in] size 必要なサイズ
@@ -98,7 +98,7 @@ private:
 
   /// @brief ハッシュ値を計算する．
   ymuint
-  hash_func(const VlDecl* decl) const;
+  hash_func(const VlObj* decl) const;
 
 
 private:

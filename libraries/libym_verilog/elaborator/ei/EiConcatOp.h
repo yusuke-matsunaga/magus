@@ -157,6 +157,12 @@ public:
   ymuint
   operand_num() const;
 
+  /// @brief 繰り返し数を返す．
+  /// @note multiple concatenation の時のみ意味を持つ．
+  virtual
+  ymuint
+  rep_num() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

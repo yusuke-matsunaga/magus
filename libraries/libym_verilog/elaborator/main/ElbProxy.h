@@ -532,49 +532,59 @@ protected:
   /// @brief 式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] put_error エラーを出力する時，true にする．
   VlValue
   evaluate_expr(const VlNamedObj* parent,
-		const PtExpr* pt_expr);
+		const PtExpr* pt_expr,
+		bool put_error);
 
   /// @brief PtExpr を評価し int 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
   evaluate_int(const VlNamedObj* parent,
 	       const PtExpr* pt_expr,
-	       int& value);
+	       int& value,
+	       bool put_error);
 
   /// @brief PtExpr を評価しスカラー値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
   evaluate_scalar(const VlNamedObj* parent,
 		  const PtExpr* pt_expr,
-		  tVpiScalarVal& value);
+		  tVpiScalarVal& value,
+		  bool put_error);
 
   /// @brief PtExpr を評価し bool 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
   evaluate_bool(const VlNamedObj* parent,
 		const PtExpr* pt_expr,
-		bool& value);
+		bool& value,
+		bool put_error);
 
   /// @brief PtExpr を評価しビットベクタ値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
   evaluate_bitvector(const VlNamedObj* parent,
 		     const PtExpr* pt_expr,
-		     BitVector& value);
+		     BitVector& value,
+		     bool put_error);
 
   /// @brief 範囲を表す式を評価する．
   /// @param[in] parent 親のスコープ

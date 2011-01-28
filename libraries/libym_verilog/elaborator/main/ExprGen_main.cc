@@ -301,20 +301,24 @@ ExprGen::instantiate_lhs_sub(const VlNamedObj* parent,
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
 // @note 定数でなければエラーメッセージを出力し false を返す．
 // @brief PtExpr から expression を生成し int 値を返す．
 bool
 ExprGen::evaluate_int(const VlNamedObj* parent,
 		      const PtExpr* pt_expr,
-		      int& value)
+		      int& value,
+		      bool put_error)
 {
-  VlValue val = evaluate_expr(parent, pt_expr);
+  VlValue val = evaluate_expr(parent, pt_expr, put_error);
   if ( !val.is_int_conv() ) {
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    "Integer value required.");
+    if ( put_error ) {
+      put_msg(__FILE__, __LINE__,
+	      pt_expr->file_region(),
+	      kMsgError,
+	      "ELAB",
+	      "Integer value required.");
+    }
     return false;
   }
 
@@ -326,13 +330,15 @@ ExprGen::evaluate_int(const VlNamedObj* parent,
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
 ExprGen::evaluate_scalar(const VlNamedObj* parent,
 			 const PtExpr* pt_expr,
-			 tVpiScalarVal& value)
+			 tVpiScalarVal& value,
+			 bool put_error)
 {
-  VlValue val = evaluate_expr(parent, pt_expr);
+  VlValue val = evaluate_expr(parent, pt_expr, put_error);
   value = val.scalar_value();
   return true;
 }
@@ -341,13 +347,15 @@ ExprGen::evaluate_scalar(const VlNamedObj* parent,
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
 ExprGen::evaluate_bool(const VlNamedObj* parent,
 		       const PtExpr* pt_expr,
-		       bool& value)
+		       bool& value,
+		       bool put_error)
 {
-  VlValue val = evaluate_expr(parent, pt_expr);
+  VlValue val = evaluate_expr(parent, pt_expr, put_error);
   if ( val.logic_value() == kVpiScalar1 ) {
     value = true;
   }
@@ -361,19 +369,23 @@ ExprGen::evaluate_bool(const VlNamedObj* parent,
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
 ExprGen::evaluate_bitvector(const VlNamedObj* parent,
 			    const PtExpr* pt_expr,
-			    BitVector& value)
+			    BitVector& value,
+			    bool put_error)
 {
-  VlValue val = evaluate_expr(parent, pt_expr);
+  VlValue val = evaluate_expr(parent, pt_expr, put_error);
   if ( !val.is_bitvector_conv() ) {
-    put_msg(__FILE__, __LINE__,
-	    pt_expr->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    "Bit-vector value required.");
+    if ( put_error ) {
+      put_msg(__FILE__, __LINE__,
+	      pt_expr->file_region(),
+	      kMsgError,
+	      "ELAB",
+	      "Bit-vector value required.");
+    }
     return false;
   }
 
@@ -384,9 +396,11 @@ ExprGen::evaluate_bitvector(const VlNamedObj* parent,
 // @brief 式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
+// @param[in] put_error エラーを出力する時，true にする．
 VlValue
 ExprGen::evaluate_expr(const VlNamedObj* parent,
-		       const PtExpr* pt_expr)
+		       const PtExpr* pt_expr,
+		       bool put_error)
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
@@ -396,20 +410,22 @@ ExprGen::evaluate_expr(const VlNamedObj* parent,
 
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
-    return evaluate_opr(parent, pt_expr);
+    return evaluate_opr(parent, pt_expr, put_error);
 
   case kPtConstExpr:
     return evaluate_const(parent, pt_expr);
 
   case kPtFuncCallExpr:
-    return evaluate_funccall(parent, pt_expr);
+    return evaluate_funccall(parent, pt_expr, put_error);
 
   case kPtSysFuncCallExpr:
-    error_illegal_sysfunccall_in_ce(pt_expr);
+    if ( put_error ) {
+      error_illegal_sysfunccall_in_ce(pt_expr);
+    }
     break;
 
   case kPtPrimaryExpr:
-    return evaluate_primary(parent, pt_expr);
+    return evaluate_primary(parent, pt_expr, put_error);
 
   default:
     assert_not_reached(__FILE__, __LINE__);

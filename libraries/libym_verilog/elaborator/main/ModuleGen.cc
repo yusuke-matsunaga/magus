@@ -312,7 +312,7 @@ ModuleGen::instantiate_portref(ElbModule* module,
   const PtExpr* pt_right = pt_portref->right_range();
   if ( pt_index ) {
     int index_val;
-    bool stat = evaluate_int(module, pt_index, index_val);
+    bool stat = evaluate_int(module, pt_index, index_val, true);
     if ( !stat ) {
       return NULL;
     }

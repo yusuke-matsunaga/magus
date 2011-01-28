@@ -73,18 +73,22 @@ public:
   /// @brief 登録する(単一要素の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] node 対応するノード
+  /// @param[in] cond 条件
   void
   add(const VlDecl* decl,
-      MvNode* node);
+      MvNode* node,
+      MvNode* cond = NULL);
 
   /// @brief 登録する(配列の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] offset
   /// @param[in] node 対応するノード
+  /// @param[in] cond 条件
   void
-  add(const VlDecl* decl,
+  add(const VlDeclArray* decl,
       ymuint offset,
-      MvNode* node);
+      MvNode* node,
+      MvNode* cond = NULL);
 
   /// @brief マージする．
   void
@@ -110,7 +114,7 @@ public:
   /// オフセットが範囲外の場合には NULL を返す．
   virtual
   AssignInfo
-  get(const VlDecl* decl,
+  get(const VlDeclArray* decl,
       ymuint offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
@@ -136,7 +140,7 @@ private:
   DeclHash& mDeclHash;
 
   // VlDecl の ID をキーに MvNode の配列を格納する配列
-  vector<vector<AssignInfo> > mNodeArray;
+  vector<AssignInfo> mNodeArray;
 
 };
 
@@ -161,6 +165,7 @@ public:
   virtual
   ~TmpEnv();
 
+
 public:
 
   /// @brief 対応するノードを取り出す．
@@ -179,7 +184,7 @@ public:
   /// オフセットが範囲外の場合には NULL を返す．
   virtual
   AssignInfo
-  get(const VlDecl* decl,
+  get(const VlDeclArray* decl,
       ymuint offset) const;
 
 

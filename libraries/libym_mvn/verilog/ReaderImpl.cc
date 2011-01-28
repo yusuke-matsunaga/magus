@@ -84,7 +84,7 @@ ReaderImpl::read(const string& filename,
 // @retval false 生成中にエラーが起こった．
 bool
 ReaderImpl::gen_network(MvMgr& mgr,
-			vector<pair<const VlDecl*, ymuint> >& node_map)
+			vector<pair<const VlDeclArray*, ymuint> >& node_map)
 {
   if ( mMsgMgr.error_num() > 0 ) {
     return false;
@@ -101,7 +101,8 @@ ReaderImpl::gen_network(MvMgr& mgr,
   mIODeclMap.clear();
   mDeclHash.clear();
   mGlobalEnv.clear();
-  mNodeMap.clear();
+  mNodeMap1.clear();
+  mNodeMap2.clear();
   mDriverList.clear();
 
   MvModule* module0 = NULL;
@@ -245,7 +246,8 @@ ReaderImpl::gen_network(MvMgr& mgr,
       mMvMgr->disconnect(src_node, src_pos, node, 0);
       mMvMgr->reconnect(node, 0, src_node, src_pos);
       expand_nodemap(src_node->id());
-      mNodeMap[src_node->id()] = mNodeMap[node->id()];
+      mNodeMap1[src_node->id()] = mNodeMap1[node->id()];
+      mNodeMap2[src_node->id()] = mNodeMap2[node->id()];
       mMvMgr->delete_node(node);
     }
   }
@@ -253,7 +255,7 @@ ReaderImpl::gen_network(MvMgr& mgr,
   // 冗長な through ノードを削除する．
   mMvMgr->sweep();
 
-  node_map = mNodeMap;
+  node_map = mNodeMap2;
 
   return true;
 }
@@ -447,7 +449,6 @@ ReaderImpl::gen_decl(MvModule* module,
       for (vector<const VlDeclArray*>::iterator p = netarray_list.begin();
 	   p != netarray_list.end(); ++ p) {
 	const VlDeclArray* vl_decl = *p;
-	ymuint d = vl_decl->dimension();
 	ymuint array_size = vl_decl->array_size();
 	for (ymuint i = 0; i < array_size; ++ i) {
 	  // 仮の through ノードに対応させる．
@@ -482,14 +483,13 @@ ReaderImpl::gen_decl(MvModule* module,
       for (vector<const VlDeclArray*>::iterator p = regarray_list.begin();
 	   p != regarray_list.end(); ++ p) {
 	const VlDeclArray* vl_decl = *p;
-	ymuint d = vl_decl->dimension();
 	ymuint array_size = vl_decl->array_size();
+	(void) mDeclHash.get_id(vl_decl, 0);
 	for (ymuint i = 0; i < array_size; ++ i) {
 	  // 仮の through ノードに対応させる．
 	  ymuint bw = vl_decl->bit_size();
 	  MvNode* node = mMvMgr->new_through(module, bw);
 	  reg_node(vl_decl, i, node);
-	  (void) mDeclHash.get_id(vl_decl);
 	}
       }
     }
@@ -832,16 +832,26 @@ ReaderImpl::gen_stmt(MvModule* module,
       for (ymuint i = 0; i < n; ++ i) {
 	const VlExpr* lhs = stmt->lhs_elem(i);
 	const VlDecl* lhs_decl = lhs->decl_obj();
-	assert_cond( lhs_decl, __FILE__, __LINE__);
-	assert_cond( lhs->declarray_dimension() == lhs_decl->dimension(),
-		     __FILE__, __LINE__ );
-	if ( lhs_decl->dimension() > 0 ) {
+	const VlDeclArray* lhs_declarray = lhs->declarray_obj();
+	ymuint bw;
+	AssignInfo old_dst;
+	ymuint lhs_offset = 0;
+	if ( lhs_decl ) {
+	  bw = lhs_decl->bit_size();
+	  old_dst = env.get(lhs_decl);
+	}
+	else if ( lhs_declarray ) {
+	  assert_cond( lhs->declarray_dimension() == lhs_declarray->dimension(),
+		       __FILE__, __LINE__ );
+	  bw = lhs_declarray->bit_size();
+	  // lhs_offset は lhs->declarray_index() から計算される．
+	  old_dst = env.get(lhs_declarray, lhs_offset);
 #warning "TODO: 配列の時の処理"
+	}
+	else {
 	  assert_not_reached(__FILE__, __LINE__);
 	}
-	ymuint bw = lhs_decl->bit_size();
 	MvNode* src_node = gen_rhs(module, node, offset, bw);
-	MvNode* old_dst = env.get(lhs_decl);
 	MvNode* dst_node = NULL;
 	if ( lhs->is_primary() ) {
 	  dst_node = mMvMgr->new_through(module, bw);
@@ -866,7 +876,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 							   bw - 1,
 							   index + 1,
 							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	    mMvMgr->connect(old_dst.mRhs, 0, tmp_node, 0);
 	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
 	    ++ pos;
 	  }
@@ -877,7 +887,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 							   index - 1,
 							   0,
 							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	    mMvMgr->connect(old_dst.mRhs, 0, tmp_node, 0);
 	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
 	  }
 	}
@@ -901,7 +911,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 							   bw - 1,
 							   msb + 1,
 							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	    mMvMgr->connect(old_dst.mRhs, 0, tmp_node, 0);
 	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
 	    ++ pos;
 	  }
@@ -912,12 +922,17 @@ ReaderImpl::gen_stmt(MvModule* module,
 							   lsb - 1,
 							   0,
 							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	    mMvMgr->connect(old_dst.mRhs, 0, tmp_node, 0);
 	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
 	  }
 	}
 	assert_cond( dst_node, __FILE__, __LINE__);
-	env.add(lhs_decl, dst_node);
+	if ( lhs_decl ) {
+	  env.add(lhs_decl, dst_node);
+	}
+	else {
+	  env.add(lhs_declarray, lhs_offset, dst_node);
+	}
 	offset += lhs->bit_size();
       }
     }
@@ -1373,7 +1388,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
   if ( expr->is_const() ) {
     assert_cond( is_bitvector_type(expr->value_type()), __FILE__, __LINE__);
     BitVector bv;
-    expr->eval_bitvector(bv);
+    //expr->eval_bitvector(bv);
     ymuint bit_size = bv.size();
     ymuint n = (bit_size + 31) / 32;
     vector<ymuint32> tmp(n);
@@ -1748,20 +1763,20 @@ ReaderImpl::gen_expr(MvModule* parent_module,
 
     case kVpiMultiConcatOp:
       {
-	ymint r;
-	bool stat = expr->operand(0)->eval_int(r);
-	assert_cond( stat , __FILE__, __LINE__);
+	ymint r = expr->rep_num();
 	ymuint n = expr->operand_num() - 1;
 	vector<ymuint> bw_array(n * r);
-	for (ymuint i = 0; i < n; ++ i) {
-	  for (ymint j = 0; j < r; ++ j) {
-	    bw_array[j * r + i] = inputs[i + 1]->output(0)->bit_width();
+	for (ymint j = 0; j < r; ++ j) {
+	  ymuint base = j * r;
+	  for (ymuint i = 0; i < n; ++ i) {
+	    bw_array[base + i] = inputs[i + 1]->output(0)->bit_width();
 	  }
 	}
 	MvNode* node = mMvMgr->new_concat(parent_module, bw_array);
-	for (ymuint i = 0; i < n; ++ i) {
-	  for (ymint j = 0; j < r; ++ j) {
-	    mMvMgr->connect(inputs[i + 1], 0, node, j * r + i);
+	for (ymint j = 0; j < r; ++ j) {
+	  ymuint base = j * r;
+	  for (ymuint i = 0; i < n; ++ i) {
+	    mMvMgr->connect(inputs[i + 1], 0, node, base + i);
 	  }
 	}
 	return node;
@@ -1834,36 +1849,59 @@ ReaderImpl::gen_primary(const VlExpr* expr,
 			const Env& env)
 {
   const VlDecl* decl = expr->decl_obj();
-  assert_cond( decl != NULL, __FILE__, __LINE__);
-  ymuint dim = expr->declarray_dimension();
-  assert_cond( decl->dimension() == dim, __FILE__, __LINE__);
-  if ( dim > 1 ) {
-    // 配列型
-    ymuint offset = 0;
-    ymuint mlt = 1;
-    for (ymuint i = 0; i < dim; ++ i) {
-      const VlExpr* index = expr->declarray_index(i);
-      int index_val;
-      bool stat = index->eval_int(index_val);
-      assert_cond( stat, __FILE__, __LINE__);
-      offset += index_val * mlt;
-      mlt *= decl->range(i)->size();
-    }
-    MvNode* node = env.get(decl, offset);
+  const VlDeclArray* declarray = expr->declarray_obj();
+  if ( decl ) {
+    assert_cond(expr->declarray_dimension() == 0, __FILE__, __LINE__);
+    AssignInfo info = env.get(decl);
+    MvNode* node = info.mRhs;
     if ( node == NULL ) {
       cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
   }
-  else {
-    MvNode* node = env.get(decl);
-    if ( node == NULL ) {
-      cerr << decl->name() << " is not found in mGlobalEnv" << endl;
+  else if ( declarray ) {
+    if ( expr->is_constant_select() ) {
+      // インデックス固定の配列要素
+      ymuint offset = expr->declarray_offset();
+      AssignInfo info = env.get(declarray, offset);
+      MvNode* node = info.mRhs;
+      if ( node == NULL ) {
+	cerr << decl->name() << " is not found in mGlobalEnv" << endl;
+      }
+      assert_cond( node != NULL, __FILE__, __LINE__);
+      return node;
     }
-    assert_cond( node != NULL, __FILE__, __LINE__);
-    return node;
+    else {
+      // インデックス可変の配列要素
+#if 0
+      ymuint dim = expr->declarray_dimension();
+      assert_cond( declarray->dimension() == dim, __FILE__, __LINE__);
+      ymuint offset = 0;
+      ymuint mlt = 1;
+      for (ymuint i = 0; i < dim; ++ i) {
+	const VlExpr* index = expr->declarray_index(i);
+	int index_val;
+	bool stat = index->eval_int(index_val);
+	assert_cond( stat, __FILE__, __LINE__);
+	offset += index_val * mlt;
+	mlt *= declarray->range(i)->size();
+      }
+      AssignInfo info = env.get(declarray, offset);
+      MvNode* node = info.mRhs;
+      if ( node == NULL ) {
+	cerr << decl->name() << " is not found in mGlobalEnv" << endl;
+      }
+      assert_cond( node != NULL, __FILE__, __LINE__);
+      return node;
+#else
+      assert_not_reached(__FILE__, __LINE__);
+      return NULL;
+#endif
+    }
   }
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 // @brief 宣言要素に対応するノードを登録する．
@@ -1875,7 +1913,7 @@ ReaderImpl::reg_node(const VlDecl* decl,
 {
   mGlobalEnv.add(decl, node);
   expand_nodemap(node->id());
-  mNodeMap[node->id()] = make_pair(decl, 0);
+  mNodeMap1[node->id()] = decl;
 }
 
 // @brief 入出力宣言要素に対応するノードを登録する．
@@ -1887,7 +1925,7 @@ ReaderImpl::reg_ionode(const VlDecl* decl,
 {
   mIODeclMap.add(decl, node);
   expand_nodemap(node->id());
-  mNodeMap[node->id()] = make_pair(decl, 0);
+  mNodeMap1[node->id()] = decl;
 }
 
 // @brief 宣言要素に対応するノードを登録する．
@@ -1895,21 +1933,22 @@ ReaderImpl::reg_ionode(const VlDecl* decl,
 // @param[in] offset オフセット
 // @param[in] node 登録するノード
 void
-ReaderImpl::reg_node(const VlDecl* decl,
+ReaderImpl::reg_node(const VlDeclArray* decl,
 		     ymuint offset,
 		     MvNode* node)
 {
   mGlobalEnv.add(decl, offset, node);
   expand_nodemap(node->id());
-  mNodeMap[node->id()] = make_pair(decl, offset);
+  mNodeMap2[node->id()] = make_pair(decl, offset);
 }
 
 // @brief mNodeMap を拡張する．
 void
 ReaderImpl::expand_nodemap(ymuint id)
 {
-  while ( mNodeMap.size() <= id ) {
-    mNodeMap.push_back(make_pair(static_cast<const VlDecl*>(NULL), 0));
+  while ( mNodeMap1.size() <= id ) {
+    mNodeMap1.push_back(NULL);
+    mNodeMap2.push_back(make_pair(static_cast<const VlDeclArray*>(NULL), 0));
   }
 }
 

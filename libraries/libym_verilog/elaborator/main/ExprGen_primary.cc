@@ -17,6 +17,8 @@
 #include "ym_verilog/pt/PtMisc.h"
 
 #include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlDeclArray.h"
+#include "ym_verilog/vl/VlRange.h"
 
 #include "ElbDecl.h"
 #include "ElbParameter.h"
@@ -132,7 +134,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     else if ( isize == 1 ) {
       const PtExpr* pt_expr1 = pt_expr->index(0);
       int index;
-      bool stat = evaluate_int(parent, pt_expr1, index);
+      bool stat = evaluate_int(parent, pt_expr1, index, true);
       if ( !stat ) {
 	return NULL;
       }
@@ -209,8 +211,8 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	const PtExpr* pt_right = pt_expr->right_range();
 	int index1_val;
 	int index2_val;
-	bool stat1 = evaluate_int(parent, pt_left, index1_val);
-	bool stat2 = evaluate_int(parent, pt_right, index2_val);
+	bool stat1 = evaluate_int(parent, pt_left, index1_val, true);
+	bool stat2 = evaluate_int(parent, pt_right, index2_val, true);
 	if ( !stat1 || !stat2 ) {
 	  return NULL;
 	}
@@ -225,7 +227,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	const PtExpr* pt_range = pt_expr->right_range();
 	ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
 	int range_val;
-	bool stat = evaluate_int(parent, pt_range, range_val);
+	bool stat = evaluate_int(parent, pt_range, range_val, true);
 	if ( base == NULL || !stat ) {
 	  return NULL;
 	}
@@ -239,7 +241,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	const PtExpr* pt_range = pt_expr->right_range();
 	ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
 	int range_val;
-	bool stat = evaluate_int(parent, pt_range, range_val);
+	bool stat = evaluate_int(parent, pt_range, range_val, true);
 	if ( base == NULL || !stat ) {
 	  return NULL;
 	}
@@ -364,7 +366,7 @@ ExprGen::instantiate_genvar(const VlNamedObj* parent,
 
   if ( has_bit_select ) {
     int index1 = 0;
-    if ( !evaluate_int(parent, pt_expr->index(0), index1) ) {
+    if ( !evaluate_int(parent, pt_expr->index(0), index1, true) ) {
       return NULL;
     }
     val >>= index1;
@@ -373,8 +375,8 @@ ExprGen::instantiate_genvar(const VlNamedObj* parent,
   else if ( has_range_select ) {
     int index1 = 0;
     int index2 = 0;
-    bool stat1 = evaluate_int(parent, pt_expr->left_range(), index1);
-    bool stat2 = evaluate_int(parent, pt_expr->right_range(), index2);
+    bool stat1 = evaluate_int(parent, pt_expr->left_range(), index1, true);
+    bool stat2 = evaluate_int(parent, pt_expr->right_range(), index2, true);
     if ( !stat1 || !stat2 ) {
       return NULL;
     }
@@ -440,22 +442,44 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
       return NULL;
     }
 
-    // 添字を取り出す．
-    vector<ElbExpr*> index_list;
-    index_list.reserve(dsize);
-    for (ymuint i = 0; i < dsize; ++ i) {
-      const PtExpr* pt_expr1 = pt_expr->index(i);
-      ElbExpr* expr1 = instantiate_expr(parent, env, pt_expr1);
-      if ( !expr1 ) {
-	return NULL;
-      }
-      index_list.push_back(expr1);
-    }
-
-    primary = factory().new_Primary(pt_expr, declarray, index_list);
     decl_type = declarray->type();
     is_array = false;
     value_type = declarray->value_type();
+
+    // 添字が定数ならオフセットを計算する．
+    ymuint offset = 0;
+    ymuint mlt = 1;
+    bool const_index = true;
+    for (ymuint i = 0; i < dsize; ++ i) {
+      ymuint j = dsize - i - 1;
+      const PtExpr* pt_expr1 = pt_expr->index(j);
+      int index_val;
+      bool stat = evaluate_int(parent, pt_expr1, index_val, false);
+      if ( !stat ) {
+	const_index = false;
+	break;
+      }
+      offset += index_val * mlt;
+      mlt *= declarray->range(j)->size();
+    }
+    if ( const_index ) {
+      primary = factory().new_Primary(pt_expr, declarray, offset);
+    }
+    else {
+      // 添字の式を生成する．
+      vector<ElbExpr*> index_list;
+      index_list.reserve(dsize);
+      for (ymuint i = 0; i < dsize; ++ i) {
+	const PtExpr* pt_expr1 = pt_expr->index(i);
+	ElbExpr* expr1 = instantiate_expr(parent, env, pt_expr1);
+	if ( !expr1 ) {
+	  return NULL;
+	}
+	index_list.push_back(expr1);
+      }
+
+      primary = factory().new_Primary(pt_expr, declarray, index_list);
+    }
   }
   if ( primary == NULL ) {
     // 適切な型ではなかった．
@@ -585,15 +609,19 @@ ExprGen::check_decl(const ElbEnv& env,
 // @brief プライマリに対して式の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
+// @param[in] put_error エラーを出力する時，true にする．
 VlValue
 ExprGen::evaluate_primary(const VlNamedObj* parent,
-			  const PtExpr* pt_expr)
+			  const PtExpr* pt_expr,
+			  bool put_error)
 {
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
   if ( nb_array.size() > 0 ) {
     // 階層つき識別子はだめ
-    error_hname_in_ce(pt_expr);
+    if ( put_error ) {
+      error_hname_in_ce(pt_expr);
+    }
     return VlValue();
   }
 
@@ -602,7 +630,9 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   ymuint isize = pt_expr->index_num();
   if (  isize > 1 || (isize == 1 && has_range_select) ) {
     // 配列型ではない．
-    error_dimension_mismatch(pt_expr);
+    if ( put_error ) {
+      error_dimension_mismatch(pt_expr);
+    }
     return VlValue();
   }
   bool has_bit_select = (isize == 1);
@@ -610,13 +640,15 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   int index1 = 0;
   int index2 = 0;
   if ( has_bit_select ) {
-    if ( !evaluate_int(parent, pt_expr->index(0), index1) ) {
+    if ( !evaluate_int(parent, pt_expr->index(0), index1, put_error) ) {
       return VlValue();
     }
   }
   if ( has_range_select ) {
-    bool stat1 = evaluate_int(parent, pt_expr->left_range(), index1);
-    bool stat2 = evaluate_int(parent, pt_expr->right_range(), index2);
+    const PtExpr* pt_left = pt_expr->left_range();
+    bool stat1 = evaluate_int(parent, pt_left, index1, put_error);
+    const PtExpr* pt_right = pt_expr->right_range();
+    bool stat2 = evaluate_int(parent, pt_right, index2, put_error);
     if ( !stat1 || !stat2 ) {
       return VlValue();
     }
@@ -630,7 +662,9 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 				     parent->parent_module());
   if ( !handle ) {
     // 見つからなかった．
-    error_not_found(pt_expr);
+    if ( put_error ) {
+      error_not_found(pt_expr);
+    }
     return VlValue();
   }
 
@@ -656,20 +690,26 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   // しかしこの場合には parameter でなければならない．
   ElbParameter* param = handle->parameter();
   if ( !param ) {
-    error_not_a_parameter(pt_expr);
+    if ( put_error ) {
+      error_not_a_parameter(pt_expr);
+    }
     return VlValue();
   }
   VlValue val = param->get_value();;
   if ( param->value_type() == kVpiValueReal ) {
     if ( has_bit_select || has_range_select ) {
-      error_illegal_real_type(pt_expr);
+      if ( put_error ) {
+	error_illegal_real_type(pt_expr);
+      }
       return VlValue();
     }
   }
   else {
     if ( has_bit_select ) {
       if ( !val.is_bitvector_conv() ) {
-	error_illegal_real_type(pt_expr);
+	if ( put_error ) {
+	  error_illegal_real_type(pt_expr);
+	}
 	return VlValue();
       }
       int offset = param->bit_offset(index1);
@@ -677,7 +717,9 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     }
     else if ( has_range_select ) {
       if ( !val.is_bitvector_conv() ) {
-	error_illegal_real_type(pt_expr);
+	if ( put_error ) {
+	  error_illegal_real_type(pt_expr);
+	}
 	return VlValue();
       }
       int msb_offset;

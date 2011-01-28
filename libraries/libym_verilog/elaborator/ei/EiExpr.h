@@ -123,6 +123,12 @@ public:
   const VlExpr*
   declarray_index(ymuint pos) const;
 
+  /// @brief 配列型宣言要素への参照のオフセットを返す．
+  /// @note 固定インデックスの場合のみ意味を持つ．
+  virtual
+  ymuint
+  declarray_offset() const;
+
   /// @brief スコープへの参照の場合，対象のオブジェクトを返す．
   /// @note このクラスでは NULL を返す．
   virtual
@@ -223,6 +229,12 @@ public:
   virtual
   const VlExpr*
   operand(ymuint pos) const;
+
+  /// @brief 繰り返し数を返す．
+  /// @note multiple concatenation の時のみ意味を持つ．
+  virtual
+  ymuint
+  rep_num() const;
 
   /// @brief 定数の型を返す．
   /// @note 定数の時，意味を持つ．

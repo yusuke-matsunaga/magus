@@ -140,6 +140,14 @@ EiExpr::declarray_index(ymuint pos) const
   return NULL;
 }
 
+// @brief 配列型宣言要素への参照のオフセットを返す．
+// @note 固定インデックスの場合のみ意味を持つ．
+ymuint
+EiExpr::declarray_offset() const
+{
+  return 0;
+}
+
 // @brief 対象のオブジェクトを返す．
 // @note 対象がスコープの時，意味を持つ．
 // @note このクラスでは NULL を返す．
@@ -271,6 +279,14 @@ const VlExpr*
 EiExpr::operand(ymuint pos) const
 {
   return _operand(pos);
+}
+
+// @brief 繰り返し数を返す．
+// @note multiple concatenation の時のみ意味を持つ．
+ymuint
+EiExpr::rep_num() const
+{
+  return 0;
 }
 
 // @brief 定数の型を返す．

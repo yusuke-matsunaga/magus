@@ -399,6 +399,122 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class EiArrayElemPrimary EiPrimary.h "EiPrimary.h"
+/// @brief 固定インデックスの配列要素のプライマリ式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiConstArrayElemPrimary :
+  public EiExprBase
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] offset オフセット
+  EiConstArrayElemPrimary(const PtExpr* pt_expr,
+			  ElbDeclArray* obj,
+			  ymuint offset);
+
+  /// @brief デストラクタ
+  virtual
+  ~EiConstArrayElemPrimary();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlObj の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型の取得
+  virtual
+  tVpiObjType
+  type() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // VlExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 式のタイプを返す．
+  virtual
+  tVpiValueType
+  value_type() const;
+
+  /// @brief 定数の時 true を返す．
+  /// @note 参照している要素の型によって決まる．
+  virtual
+  bool
+  is_const() const;
+
+  /// @brief 部分/ビット指定が定数の時 true を返す．
+  /// @note kVpiPartSelect/kVpiBitSelect の時，意味を持つ．
+  /// @note それ以外では常に false を返す．
+  virtual
+  bool
+  is_constant_select() const;
+
+  /// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+  virtual
+  bool
+  is_primary() const;
+
+  /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+  /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+  virtual
+  const VlDeclArray*
+  declarray_obj() const;
+
+  /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
+  /// @note それ以外では 0 を返す．
+  virtual
+  ymuint
+  declarray_dimension() const;
+
+  /// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlExpr*
+  declarray_index(ymuint pos) const;
+
+  /// @brief 配列型宣言要素への参照のオフセットを返す．
+  /// @note 固定インデックスの場合のみ意味を持つ．
+  virtual
+  ymuint
+  declarray_offset() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ElbExpr の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 要求される式の型を計算してセットする．
+  /// @param[in] type 要求される式の型
+  /// @note 必要であればオペランドに対して再帰的に処理を行なう．
+  virtual
+  void
+  set_reqsize(tVpiValueType type);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対象の宣言要素
+  ElbDeclArray* mObj;
+
+  // オフセット
+  ymuint32 mOffset;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class EiScopePrimary EiPrimary.h "EiPrimary.h"
 /// @brief VlNamedObj のプライマリ式を表すクラス
 //////////////////////////////////////////////////////////////////////

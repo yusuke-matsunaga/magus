@@ -76,6 +76,19 @@ EiFactory::new_Primary(const PtExpr* pt_expr,
   return new (p) EiArrayElemPrimary(pt_expr, obj, n, index_array);
 }
 
+// @brief プライマリ式を生成する(固定インデックスの配列要素版)．
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] offset オフセット
+ElbExpr*
+EiFactory::new_Primary(const PtExpr* pt_expr,
+		       ElbDeclArray* obj,
+		       ymuint offset)
+{
+  void* p = mAlloc.get_memory(sizeof(EiConstArrayElemPrimary));
+  return new (p) EiConstArrayElemPrimary(pt_expr, obj, offset);
+}
+
 // @brief システム関数/システムタスクの引数を生成する．
 // @param[in] pt_expr パース木中で参照している要素
 // @param[in] arg 引数本体
@@ -396,6 +409,110 @@ EiArrayElemPrimary::declarray_index(ymuint pos) const
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
 EiArrayElemPrimary::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiConstArrayElemPrimary
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] obj 本体のオブジェクト
+// @param[in] offset オフセット
+EiConstArrayElemPrimary::EiConstArrayElemPrimary(const PtExpr* pt_expr,
+						 ElbDeclArray* obj,
+						 ymuint offset) :
+  EiExprBase(pt_expr),
+  mObj(obj),
+  mOffset(offset)
+{
+}
+
+// @brief デストラクタ
+EiConstArrayElemPrimary::~EiConstArrayElemPrimary()
+{
+}
+
+// @brief 型の取得
+tVpiObjType
+EiConstArrayElemPrimary::type() const
+{
+  return mObj->type();
+}
+
+// @brief 式のタイプを返す．
+tVpiValueType
+EiConstArrayElemPrimary::value_type() const
+{
+  return mObj->value_type();
+}
+
+// @brief 定数の時 true を返す．
+// @note 参照している要素の型によって決まる．
+bool
+EiConstArrayElemPrimary::is_const() const
+{
+  // 配列要素は定数ではない．
+  return false;
+}
+
+// @brief 部分/ビット指定が定数の時 true を返す．
+// @note kVpiPartSelect/kVpiBitSelect の時，意味を持つ．
+// @note それ以外では常に false を返す．
+bool
+EiConstArrayElemPrimary::is_constant_select() const
+{
+  return true;
+}
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiConstArrayElemPrimary::is_primary() const
+{
+  return true;
+}
+
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDeclArray*
+EiConstArrayElemPrimary::declarray_obj() const
+{
+  return mObj;
+}
+
+// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
+// @note それ以外では 0 を返す．
+ymuint
+EiConstArrayElemPrimary::declarray_dimension() const
+{
+  return 0;
+}
+
+// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+// @note それ以外では NULL を返す．
+const VlExpr*
+EiConstArrayElemPrimary::declarray_index(ymuint pos) const
+{
+  return NULL;
+}
+
+// @brief 配列型宣言要素への参照のオフセットを返す．
+// @note 固定インデックスの場合のみ意味を持つ．
+ymuint
+EiConstArrayElemPrimary::declarray_offset() const
+{
+  return mOffset;
+}
+
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiConstArrayElemPrimary::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
 }

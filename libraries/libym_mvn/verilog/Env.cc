@@ -52,59 +52,53 @@ Env::max_id() const
 // @brief 登録する(単一要素の場合)
 // @param[in] decl 宣言要素
 // @param[in] node 対応するノード
+// @param[in] cond 条件
 void
 Env::add(const VlDecl* decl,
-	 MvNode* node)
+	 MvNode* node,
+	 MvNode* cond)
 {
   ymuint id = mDeclHash.get_id(decl);
   while ( mNodeArray.size() <= id ) {
-    mNodeArray.push_back(vector<MvNode*>(1));
+    mNodeArray.push_back(AssignInfo());
   }
-  vector<MvNode*>& tmp = mNodeArray[id];
-  if ( tmp.size() != 1 ) {
-    tmp.resize(1);
-  }
-  tmp[0] = node;
+  AssignInfo& info = mNodeArray[id];
+  info.mRhs = node;
+  info.mCond = cond;
 }
 
 // @brief 登録する(配列の場合)
 // @param[in] decl 宣言要素
 // @param[in] offset
 // @param[in] node 対応するノード
+// @param[in] cond 条件
 void
-Env::add(const VlDecl* decl,
+Env::add(const VlDeclArray* decl,
 	 ymuint offset,
-	 MvNode* node)
+	 MvNode* node,
+	 MvNode* cond)
 {
-  ymuint id = mDeclHash.get_id(decl);
+  ymuint id = mDeclHash.get_id(decl, offset);
   while ( mNodeArray.size() <= id ) {
-    mNodeArray.push_back(vector<MvNode*>(1));
+    mNodeArray.push_back(AssignInfo());
   }
-  vector<MvNode*>& tmp = mNodeArray[id];
-  ymuint n = 1;
-  ymuint nd = decl->dimension();
-  for (ymuint i = 0; i < nd; ++ i) {
-    const VlRange* range = decl->range(i);
-    n *= range->size();
-  }
-  if ( tmp.size() == n ) {
-    tmp.resize(n);
-  }
-  tmp[offset] = node;
+  AssignInfo& info = mNodeArray[id];
+  info.mRhs = node;
+  info.mCond = cond;
 }
 
 // @brief 対応するノードを取り出す．
 // @param[in] decl 宣言要素
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
-MvNode*
+AssignInfo
 Env::get(const VlDecl* decl) const
 {
   ymuint id = mDeclHash.get_id(decl);
   if ( mNodeArray.size() <= id ) {
-    return NULL;
+    return AssignInfo(NULL, NULL);
   }
-  return mNodeArray[id][0];
+  return mNodeArray[id];
 }
 
 // @brief 対応するノードを取り出す(配列型)．
@@ -113,19 +107,15 @@ Env::get(const VlDecl* decl) const
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
-MvNode*
-Env::get(const VlDecl* decl,
+AssignInfo
+Env::get(const VlDeclArray* decl,
 	 ymuint offset) const
 {
-  ymuint id = mDeclHash.get_id(decl);
+  ymuint id = mDeclHash.get_id(decl, offset);
   if ( mNodeArray.size() <= id ) {
-    return NULL;
+    return AssignInfo(NULL, NULL);
   }
-  const vector<MvNode*>& tmp = mNodeArray[id];
-  if ( tmp.size() <= offset ) {
-    return NULL;
-  }
-  return tmp[offset];
+  return mNodeArray[id];
 }
 
 // @brief ID番号に対応するノードを登録する．
@@ -179,12 +169,12 @@ TmpEnv::~TmpEnv()
 // @param[in] decl 宣言要素
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
-MvNode*
+AssignInfo
 TmpEnv::get(const VlDecl* decl) const
 {
-  MvNode* ans = Env::get(decl);
-  if ( ans == NULL ) {
-    ans = mGlobalEnv.get(decl);
+  AssignInfo ans = Env::get(decl);
+  if ( ans.mRhs == NULL ) {
+    return mGlobalEnv.get(decl);
   }
   return ans;
 }
@@ -195,13 +185,13 @@ TmpEnv::get(const VlDecl* decl) const
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
-MvNode*
-TmpEnv::get(const VlDecl* decl,
+AssignInfo
+TmpEnv::get(const VlDeclArray* decl,
 	    ymuint offset) const
 {
-  MvNode* ans = Env::get(decl, offset);
-  if ( ans == NULL ) {
-    ans = mGlobalEnv.get(decl, offset);
+  AssignInfo ans = Env::get(decl, offset);
+  if ( ans.mRhs == NULL ) {
+    return mGlobalEnv.get(decl, offset);
   }
   return ans;
 }

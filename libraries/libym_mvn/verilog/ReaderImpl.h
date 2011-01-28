@@ -60,7 +60,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvMgr& mgr,
-	      vector<pair<const VlDecl*, ymuint> >& node_map);
+	      vector<pair<const VlDeclArray*, ymuint> >& node_map);
 
   /// @brief メッセージハンドラを付加する．
   /// @param[in] msg_handler 登録するハンドラ
@@ -232,14 +232,14 @@ private:
   /// @param[in] node 登録するノード
   void
   reg_ionode(const VlDecl* decl,
-	   MvNode* node);
+	     MvNode* node);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素(配列型)
   /// @param[in] offset オフセット
   /// @param[in] node 登録するノード
   void
-  reg_node(const VlDecl* decl,
+  reg_node(const VlDeclArray* decl,
 	   ymuint offset,
 	   MvNode* node);
 
@@ -290,8 +290,11 @@ private:
   // トップレベルの環境
   Env mGlobalEnv;
 
-  // MvNode の ID番号をキーとして VlDecl の情報を保持する配列．
-  vector<pair<const VlDecl*, ymuint> > mNodeMap;
+  // MvNode の ID番号をキーとして VlDecl の情報を保持する配列
+  vector<const VlDecl*> mNodeMap1;
+
+  // MvNode の ID番号をキーとして VlDeclArray の情報を保持する配列．
+  vector<pair<const VlDeclArray*, ymuint> > mNodeMap2;
 
   // VlDecl のドライバーのリスト
   vector<vector<Driver> > mDriverList;

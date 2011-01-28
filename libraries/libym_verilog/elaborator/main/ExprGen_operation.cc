@@ -146,7 +146,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
     {
       const PtExpr* pt_expr0 = pt_expr->operand(0);
       int rep_num;
-      bool stat = evaluate_int(parent, pt_expr0, rep_num);
+      bool stat = evaluate_int(parent, pt_expr0, rep_num, true);
       if ( !stat ) {
 	return NULL;
       }
@@ -183,9 +183,11 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 // @brief 演算子に対して int 型の値を評価する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
+// @param[in] put_error エラーを出力する時，true にする．
 VlValue
 ExprGen::evaluate_opr(const VlNamedObj* parent,
-		      const PtExpr* pt_expr)
+		      const PtExpr* pt_expr,
+		      bool put_error)
 {
   tVpiOpType op_type = pt_expr->op_type();
   ymuint op_size = pt_expr->operand_num();
@@ -193,7 +195,7 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
 
   // オペランドの値の評価を行う．
   for (ymuint i = 0; i < op_size; ++ i) {
-    val[i] = evaluate_expr(parent, pt_expr->operand(i));
+    val[i] = evaluate_expr(parent, pt_expr->operand(i), put_error);
     if ( val[i].is_error() ) {
       return VlValue();
     }
@@ -228,7 +230,9 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
     // この演算はビットベクタ型に変換できなければならない．
     for (ymuint i = 0; i < op_size; ++ i) {
       if ( !val[i].is_bitvector_conv() ) {
-	error_illegal_real_type(pt_expr->operand(i));
+	if ( put_error ) {
+	  error_illegal_real_type(pt_expr->operand(i));
+	}
 	return VlValue();
       }
     }

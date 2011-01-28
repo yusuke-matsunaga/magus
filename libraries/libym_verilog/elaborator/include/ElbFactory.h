@@ -908,6 +908,16 @@ public:
 	      ElbDeclArray* obj,
 	      const vector<ElbExpr*>& index_list) = 0;
 
+  /// @brief プライマリ式を生成する(固定インデックスの配列要素版)．
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] obj 本体のオブジェクト
+  /// @param[in] offset オフセット
+  virtual
+  ElbExpr*
+  new_Primary(const PtExpr* pt_expr,
+	      ElbDeclArray* obj,
+	      ymuint offset) = 0;
+
   /// @brief 固定ビット選択式を生成する．
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] expr 本体のオブジェクト

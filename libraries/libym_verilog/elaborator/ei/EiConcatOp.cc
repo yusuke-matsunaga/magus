@@ -177,6 +177,14 @@ EiMultiConcatOp::operand_num() const
   return EiConcatOp::operand_num() + 1;
 }
 
+// @brief 繰り返し数を返す．
+// @note multiple concatenation の時のみ意味を持つ．
+ymuint
+EiMultiConcatOp::rep_num() const
+{
+  return mRepNum;
+}
+
 // @brief オペランドを返す．
 // @param[in] pos 位置番号
 ElbExpr*

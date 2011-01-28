@@ -64,7 +64,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvMgr& mgr,
-	      vector<pair<const VlDecl*, ymuint> >& node_map);
+	      vector<pair<const VlDeclArray*, ymuint> >& node_map);
 
   /// @brief メッセージハンドラを付加する．
   /// @param[in] msg_handler 登録するハンドラ
