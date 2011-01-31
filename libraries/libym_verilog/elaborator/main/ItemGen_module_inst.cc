@@ -363,6 +363,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       continue;
     }
 
+#if 0
     if ( port->direction() == kVpiInput ) {
       // 入力ポートには任意の式を接続できる．
       // 式の生成を行う．
@@ -375,6 +376,9 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       // それ以外の場合には左辺式のみが接続できる．
       ElbLhs* tmp_lhs = instantiate_lhs(parent, env, pt_expr);
     }
+#else
+    ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
+#endif
 
     ymuint port_size = port->bit_size();
     tVpiValueType type = tmp->value_type();
@@ -548,6 +552,7 @@ ItemGen::link_module(ElbModule* module,
 
     ymuint port_size = port->bit_size();
 
+#if 0
     if ( port->direction() == kVpiInput ) {
       // 入力ポートには任意の式を接続できる．
       ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
@@ -608,6 +613,49 @@ ItemGen::link_module(ElbModule* module,
       // 左辺はサイズの補正をしても意味がないのでそのまま接続する．
       module->set_port_high_conn(index, tmp_lhs, conn_by_name);
     }
+#else
+    ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
+    if ( !tmp ) {
+      continue;
+    }
+
+    tVpiValueType type = tmp->value_type();
+    if ( type == kVpiValueReal ) {
+      put_msg(__FILE__, __LINE__,
+	      tmp->file_region(),
+	      kMsgError,
+	      "ELAB",
+	      "Real expression cannot connect to module port.");
+      continue;
+    }
+    ymuint expr_size = unpack_size(type);
+
+    // 単独のインスタンスの場合 expr のサイズは補正される．
+    // ... でいいんだよね．
+    if ( port_size != expr_size ) {
+      if ( expr_size != 0 ) {
+	ostringstream buf;
+	buf << module->full_name() << " : "
+	    << (index + 1) << num_suffix(index + 1)
+	    << " port : port size does not match with the expression. "
+	    << "expression size is coereced.";
+	put_msg(__FILE__, __LINE__,
+		pt_expr->file_region(),
+		kMsgWarning,
+		"ELAB",
+		buf.str());
+	ostringstream buf2;
+	buf2 << "port_size: " << port_size << ", expr_size: " << expr_size;
+	put_msg(__FILE__, __LINE__,
+		pt_expr->file_region(),
+		kMsgDebug,
+		"ELAB",
+		buf2.str());
+      }
+      tmp->set_reqsize(pack(kVpiValueUS, port_size));
+    }
+    module->set_port_high_conn(index, tmp, conn_by_name);
+#endif
 
     // attribute instance の生成
     //instantiate_attribute(pt_con->attr_top(), false, port);
