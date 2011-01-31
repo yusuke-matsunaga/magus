@@ -763,6 +763,14 @@ void
 dump_verilog(ostream& s,
 	     const CnGraph& cngraph);
 
+/// @relates CnGraph
+/// @brief 内容をシミュレーション可能な SPICE 形式で出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] cngraph 対象のネットワーク
+void
+dump_spice(ostream& s,
+	   const CnGraph& cngraph);
+
 
 //////////////////////////////////////////////////////////////////////
 // inline 関数の定義

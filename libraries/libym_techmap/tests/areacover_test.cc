@@ -82,7 +82,11 @@ test(string pat_filename,
 
   area_map(sbjgraph, pat_mgr, 0, mapnetwork);
 
+#if 0
   dump_verilog(cout, mapnetwork);
+#else
+  dump_spice(cout, mapnetwork);
+#endif
 }
 
 END_NAMESPACE_YM_TECHMAP

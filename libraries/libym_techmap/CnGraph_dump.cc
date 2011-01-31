@@ -212,4 +212,56 @@ dump_verilog(ostream& s,
   s << "endmodule" << endl;
 }
 
+// 内容を SPICE 形式で s に出力する．
+void
+dump_spice(ostream& s,
+	   const CnGraph& network)
+{
+  const CnNodeList& input_list = network.input_list();
+  const CnNodeList& output_list = network.output_list();
+  const CnNodeList& cellnode_list = network.cellnode_list();
+
+  s << "IN " << input_list.size();
+  for (CnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
+    const CnNode* node = *p;
+    s << "  " << node_name(node);
+  }
+  s << endl;
+
+  s << "OUT " << output_list.size();
+  for (CnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const CnNode* node = *p;
+    const CnEdge* e = node->fanin_edge(0);
+    const CnNode* inode = e->from();
+    assert_cond( inode != NULL, __FILE__, __LINE__);
+    s << "  " << node_name(inode);
+  }
+  s << endl;
+
+  for (CnNodeList::const_iterator p = cellnode_list.begin();
+       p != cellnode_list.end(); ++ p) {
+    const CnNode* node = *p;
+    const Cell* cell = node->cell();
+    assert_cond( cell != NULL, __FILE__, __LINE__);
+    ymuint np = cell->pin_num();
+    s << "X" << node->id();
+    ymuint ipos = 0;
+    for (ymuint i = 0; i < np; ++ i) {
+      const CellPin* pin = cell->pin(i);
+      const CnNode* node1 = NULL;
+      if ( pin->direction() == nsCell::kDirInput ) {
+	node1 = node->fanin(ipos);
+	++ ipos;
+      }
+      else if ( pin->direction() == nsCell::kDirOutput ) {
+	node1 = node;
+      }
+      s << " " << node_name(node1);
+    }
+    s << " VDD VSS " << cell->name() << endl;
+  }
+}
+
 END_NAMESPACE_YM_TECHMAP
