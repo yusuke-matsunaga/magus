@@ -5,7 +5,7 @@
 ///
 /// $Id: ItemGen_module_inst.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -320,6 +320,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     }
   }
 
+  // ポートに接続する式を生成する．
   ElbEnv env;
   for (ymuint i = 0; i < n; ++ i) {
     const PtConnection* pt_con = pt_inst->port(i);
@@ -328,8 +329,10 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       continue;
     }
 
-    ymuint index = i;
+    // この式が対応するインデックス
+    ymuint index;
     if ( conn_by_name ) {
+      // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
       assert_cond(port_name != NULL, __FILE__, __LINE__);
       hash_map<string, int>::iterator p = port_index.find(port_name);
@@ -347,18 +350,30 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       assert_cond(index < port_num, __FILE__, __LINE__);
     }
     else {
+      // 順序に割り当ての場合は単純に i
+      index = i;
+      // 前にも書いたように YACC の文法で規定されているのでこれは常に真
       assert_cond(pt_con->name() == NULL, __FILE__, __LINE__);
     }
 
-    ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
-    if ( !tmp ) {
-      continue;
-    }
-
+    // 割り当てるポートを取り出す．
     const VlPort* port = module0->port(index);
     if ( port == NULL ) {
       // このポートはダミー
       continue;
+    }
+
+    if ( port->direction() == kVpiInput ) {
+      // 入力ポートには任意の式を接続できる．
+      // 式の生成を行う．
+      ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
+      if ( !tmp ) {
+	continue;
+      }
+    }
+    else {
+      // それ以外の場合には左辺式のみが接続できる．
+      ElbLhs* tmp_lhs = instantiate_lhs(parent, env, pt_expr);
     }
 
     ymuint port_size = port->bit_size();
@@ -390,13 +405,20 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       }
     }
     else if ( port_size * module_size == expr_size ) {
+      assert_cond( module_size > 1, __FILE__, __LINE__);
       // tmp を 分割する．
       for (ymuint i = 0; i < module_size; ++ i) {
 	ElbModule* module1 = module_array->_module(i);
-	int lsb = i;
-	int msb = lsb + port_size - 1;
-	ElbExpr* part = factory().new_PartSelect(pt_expr, tmp, msb, lsb);
-	module1->set_port_high_conn(index, part, conn_by_name);
+	if ( port_size == 1 ) {
+	  ElbExpr* part = factory().new_BitSelect(pt_expr, tmp, i);
+	  module1->set_port_high_conn(index, part, conn_by_name);
+	}
+	else {
+	  int lsb = i;
+	  int msb = lsb + port_size - 1;
+	  ElbExpr* part = factory().new_PartSelect(pt_expr, tmp, msb, lsb);
+	  module1->set_port_high_conn(index, part, conn_by_name);
+	}
       }
     }
     else {
@@ -482,6 +504,7 @@ ItemGen::link_module(ElbModule* module,
     }
   }
 
+  // ポートに接続する式を生成する．
   ElbEnv env;
   for (ymuint i = 0; i < n; ++ i) {
     const PtConnection* pt_con = pt_inst->port(i);
@@ -490,8 +513,10 @@ ItemGen::link_module(ElbModule* module,
       continue;
     }
 
-    ymuint index = i;
+    // この式に対応するポート番号を求める．
+    ymuint index ;
     if ( conn_by_name ) {
+      // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
       assert_cond(port_name != NULL, __FILE__, __LINE__);
       hash_map<string, int>::iterator p = port_index.find(port_name);
@@ -509,12 +534,10 @@ ItemGen::link_module(ElbModule* module,
       assert_cond(index < port_num, __FILE__, __LINE__);
     }
     else {
+      // 順序による割り当ての場合は単純に i
+      index = i;
+      // 前にも書いたように YACC の文法から下の仮定は常になりたつはず．
       assert_cond(pt_con->name() == NULL, __FILE__, __LINE__);
-    }
-
-    ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
-    if ( !tmp ) {
-      continue;
     }
 
     const VlPort* port = module->port(index);
@@ -524,34 +547,67 @@ ItemGen::link_module(ElbModule* module,
     }
 
     ymuint port_size = port->bit_size();
-    tVpiValueType type = tmp->value_type();
-    ymuint expr_size = unpack_size(type);
 
-    // 単独のインスタンスの場合 expr のサイズは補正される．
-    // ... でいいんだよね．
-    if ( port_size != expr_size ) {
-      if ( expr_size != 0 ) {
-	ostringstream buf;
-	buf << module->full_name() << " : "
-	    << (index + 1) << num_suffix(index + 1)
-	    << " port : port size does not match with the expression. "
-	    << "expression size is coereced.";
-	put_msg(__FILE__, __LINE__,
-		pt_expr->file_region(),
-		kMsgWarning,
-		"ELAB",
-		buf.str());
-	ostringstream buf2;
-	buf2 << "port_size: " << port_size << ", expr_size: " << expr_size;
-	put_msg(__FILE__, __LINE__,
-		pt_expr->file_region(),
-		kMsgDebug,
-		"ELAB",
-		buf2.str());
+    if ( port->direction() == kVpiInput ) {
+      // 入力ポートには任意の式を接続できる．
+      ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
+      if ( !tmp ) {
+	continue;
       }
-      tmp->set_reqsize(pack(kVpiValueUS, port_size));
+
+      tVpiValueType type = tmp->value_type();
+      if ( type == kVpiValueReal ) {
+	put_msg(__FILE__, __LINE__,
+		tmp->file_region(),
+		kMsgError,
+		"ELAB",
+		"Real expression cannot connect to module port.");
+	continue;
+      }
+      ymuint expr_size = unpack_size(type);
+
+      // 単独のインスタンスの場合 expr のサイズは補正される．
+      // ... でいいんだよね．
+      if ( port_size != expr_size ) {
+	if ( expr_size != 0 ) {
+	  ostringstream buf;
+	  buf << module->full_name() << " : "
+	      << (index + 1) << num_suffix(index + 1)
+	      << " port : port size does not match with the expression. "
+	      << "expression size is coereced.";
+	  put_msg(__FILE__, __LINE__,
+		  pt_expr->file_region(),
+		  kMsgWarning,
+		  "ELAB",
+		  buf.str());
+	  ostringstream buf2;
+	  buf2 << "port_size: " << port_size << ", expr_size: " << expr_size;
+	  put_msg(__FILE__, __LINE__,
+		  pt_expr->file_region(),
+		  kMsgDebug,
+		  "ELAB",
+		  buf2.str());
+	}
+	tmp->set_reqsize(pack(kVpiValueUS, port_size));
+      }
+      module->set_port_high_conn(index, tmp, conn_by_name);
     }
-    module->set_port_high_conn(index, tmp, conn_by_name);
+    else {
+      // それ以外のポートに接続できるのは左辺式だけ．
+      ElbLhs* tmp_lhs = instantiate_lhs(parent, env, pt_expr);
+      ElbExpr* tmp = tmp_lhs._expr();
+      tVpiValueType type = tmp->value_type();
+      if ( type == kVpiValueReal ) {
+	put_msg(__FILE__, __LINE__,
+		tmp->file_region(),
+		kMsgError,
+		"ELAB",
+		"Real expression cannot connect to module port.");
+	continue;
+      }
+      // 左辺はサイズの補正をしても意味がないのでそのまま接続する．
+      module->set_port_high_conn(index, tmp_lhs, conn_by_name);
+    }
 
     // attribute instance の生成
     //instantiate_attribute(pt_con->attr_top(), false, port);
