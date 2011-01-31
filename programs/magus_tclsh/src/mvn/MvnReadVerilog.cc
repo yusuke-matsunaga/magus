@@ -12,6 +12,7 @@
 #include "MvnReadVerilog.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
+#include "ym_mvn/MvVlMap.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -66,7 +67,7 @@ MvnReadVerilog::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  vector<pair<const VlDecl*, ymuint> > node_map;
+  MvVlMap node_map;
   bool stat = reader.gen_network(*neth->_mvn(), node_map);
   if ( !stat ) {
     TclObj emsg;

@@ -52,51 +52,43 @@ Env::max_id() const
 // @brief 登録する(単一要素の場合)
 // @param[in] decl 宣言要素
 // @param[in] node 対応するノード
-// @param[in] cond 条件
 void
 Env::add(const VlDecl* decl,
-	 MvNode* node,
-	 MvNode* cond)
+	 MvNode* node)
 {
   ymuint id = mDeclHash.get_id(decl);
   while ( mNodeArray.size() <= id ) {
-    mNodeArray.push_back(AssignInfo());
+    mNodeArray.push_back(NULL);
   }
-  AssignInfo& info = mNodeArray[id];
-  info.mRhs = node;
-  info.mCond = cond;
+  mNodeArray[id] = node;
 }
 
 // @brief 登録する(配列の場合)
 // @param[in] decl 宣言要素
 // @param[in] offset
 // @param[in] node 対応するノード
-// @param[in] cond 条件
 void
 Env::add(const VlDeclArray* decl,
 	 ymuint offset,
-	 MvNode* node,
-	 MvNode* cond)
+	 MvNode* node)
 {
   ymuint id = mDeclHash.get_id(decl, offset);
   while ( mNodeArray.size() <= id ) {
-    mNodeArray.push_back(AssignInfo());
+    mNodeArray.push_back(NULL);
   }
-  AssignInfo& info = mNodeArray[id];
-  info.mRhs = node;
-  info.mCond = cond;
+  mNodeArray[id] = node;
 }
 
 // @brief 対応するノードを取り出す．
 // @param[in] decl 宣言要素
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
-AssignInfo
+MvNode*
 Env::get(const VlDecl* decl) const
 {
   ymuint id = mDeclHash.get_id(decl);
   if ( mNodeArray.size() <= id ) {
-    return AssignInfo(NULL, NULL);
+    return NULL;
   }
   return mNodeArray[id];
 }
@@ -107,13 +99,13 @@ Env::get(const VlDecl* decl) const
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
-AssignInfo
+MvNode*
 Env::get(const VlDeclArray* decl,
 	 ymuint offset) const
 {
   ymuint id = mDeclHash.get_id(decl, offset);
   if ( mNodeArray.size() <= id ) {
-    return AssignInfo(NULL, NULL);
+    return NULL;
   }
   return mNodeArray[id];
 }
@@ -123,14 +115,14 @@ void
 Env::add_by_id(ymuint id,
 	       MvNode* node)
 {
-  mNodeArray[id][0] = node;
+  mNodeArray[id] = node;
 }
 
 // @brief ID番号に対応するノードを取り出す．
 MvNode*
 Env::get_from_id(ymuint id) const
 {
-  return mNodeArray[id][0];
+  return mNodeArray[id];
 }
 
 // @brief DeclHash を得る．
@@ -169,11 +161,11 @@ TmpEnv::~TmpEnv()
 // @param[in] decl 宣言要素
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
-AssignInfo
+MvNode*
 TmpEnv::get(const VlDecl* decl) const
 {
-  AssignInfo ans = Env::get(decl);
-  if ( ans.mRhs == NULL ) {
+  MvNode* ans = Env::get(decl);
+  if ( ans == NULL ) {
     return mGlobalEnv.get(decl);
   }
   return ans;
@@ -185,12 +177,12 @@ TmpEnv::get(const VlDecl* decl) const
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
-AssignInfo
+MvNode*
 TmpEnv::get(const VlDeclArray* decl,
 	    ymuint offset) const
 {
-  AssignInfo ans = Env::get(decl, offset);
-  if ( ans.mRhs == NULL ) {
+  MvNode* ans = Env::get(decl, offset);
+  if ( ans == NULL ) {
     return mGlobalEnv.get(decl, offset);
   }
   return ans;

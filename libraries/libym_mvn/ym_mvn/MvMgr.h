@@ -651,7 +651,7 @@ dump_verilog(ostream& s,
 void
 dump_node_map(ostream& s,
 	      const MvMgr& mgr,
-	      const vector<pair<const VlDecl*, ymuint> >& node_map);
+	      const MvVlMap& node_map);
 
 END_NAMESPACE_YM_MVN
 

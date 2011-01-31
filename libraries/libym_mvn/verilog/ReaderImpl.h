@@ -10,6 +10,7 @@
 
 
 #include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/MvVlMap.h"
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/MsgHandler.h"
@@ -60,7 +61,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvMgr& mgr,
-	      vector<pair<const VlDeclArray*, ymuint> >& node_map);
+	      MvVlMap& node_map);
 
   /// @brief メッセージハンドラを付加する．
   /// @param[in] msg_handler 登録するハンドラ
@@ -215,10 +216,10 @@ private:
   /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
   void
   merge_env(MvModule* parent_module,
-	    Env& env,
+	    TmpEnv& env,
 	    MvNode* cond,
-	    const Env& then_env,
-	    const Env& else_env);
+	    const TmpEnv& then_env,
+	    const TmpEnv& else_env);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素
@@ -242,10 +243,6 @@ private:
   reg_node(const VlDeclArray* decl,
 	   ymuint offset,
 	   MvNode* node);
-
-  /// @brief mNodeMap を拡張する．
-  void
-  expand_nodemap(ymuint id);
 
   /// @brief ドライバーを登録する．
   /// @param[in] node 左辺に対応するノード
@@ -290,11 +287,8 @@ private:
   // トップレベルの環境
   Env mGlobalEnv;
 
-  // MvNode の ID番号をキーとして VlDecl の情報を保持する配列
-  vector<const VlDecl*> mNodeMap1;
-
-  // MvNode の ID番号をキーとして VlDeclArray の情報を保持する配列．
-  vector<pair<const VlDeclArray*, ymuint> > mNodeMap2;
+  // MvNode の ID番号をキーとして VlDecl/VlDeclArray の情報を保持する配列
+  MvVlMap mNodeMap;
 
   // VlDecl のドライバーのリスト
   vector<vector<Driver> > mDriverList;

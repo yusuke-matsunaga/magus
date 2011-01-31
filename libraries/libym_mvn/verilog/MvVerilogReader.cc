@@ -52,7 +52,7 @@ MvVerilogReader::read(const string& filename,
 // @retval false 生成中にエラーが起こった．
 bool
 MvVerilogReader::gen_network(MvMgr& mgr,
-			     vector<pair<const VlDeclArray*, ymuint> >& node_map)
+			     MvVlMap& node_map)
 {
   return mImpl->gen_network(mgr, node_map);
 }

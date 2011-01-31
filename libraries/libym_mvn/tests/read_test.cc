@@ -11,6 +11,7 @@
 
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
+#include "ym_mvn/MvVlMap.h"
 
 
 int
@@ -48,7 +49,7 @@ main(int argc,
       }
     }
     cerr << "Generating MvNetwork" << endl;
-    vector<pair<const VlDecl*, ymuint> > node_map;
+    MvVlMap node_map;
     bool stat = reader.gen_network(mgr, node_map);
     cerr << " End" << endl;
     if ( !stat ) {

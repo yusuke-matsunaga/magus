@@ -39,6 +39,7 @@ struct AssignInfo
 
 };
 
+
 //////////////////////////////////////////////////////////////////////
 /// @class Env Env.h "Env.h"
 /// @brief const VlDecl と MvNode の対応をとる連想配列
@@ -73,37 +74,25 @@ public:
   /// @brief 登録する(単一要素の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] node 対応するノード
-  /// @param[in] cond 条件
   void
   add(const VlDecl* decl,
-      MvNode* node,
-      MvNode* cond = NULL);
+      MvNode* node);
 
   /// @brief 登録する(配列の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] offset
   /// @param[in] node 対応するノード
-  /// @param[in] cond 条件
   void
   add(const VlDeclArray* decl,
       ymuint offset,
-      MvNode* node,
-      MvNode* cond = NULL);
-
-  /// @brief マージする．
-  void
-  merge(const Env& then_env,
-	const Env& else_env,
-	MvMgr* mgr,
-	MvModule* parent_module,
-	MvNode* cond);
+      MvNode* node);
 
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
   virtual
-  AssignInfo
+  MvNode*
   get(const VlDecl* decl) const;
 
   /// @brief 対応するノードを取り出す(配列型)．
@@ -113,7 +102,7 @@ public:
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
   virtual
-  AssignInfo
+  MvNode*
   get(const VlDeclArray* decl,
       ymuint offset) const;
 
@@ -140,7 +129,7 @@ private:
   DeclHash& mDeclHash;
 
   // VlDecl の ID をキーに MvNode の配列を格納する配列
-  vector<AssignInfo> mNodeArray;
+  vector<MvNode*> mNodeArray;
 
 };
 
@@ -168,12 +157,34 @@ public:
 
 public:
 
+#if 0
+  /// @brief 登録する(単一要素の場合)
+  /// @param[in] decl 宣言要素
+  /// @param[in] node 対応するノード
+  /// @param[in] cond 条件
+  void
+  add(const VlDecl* decl,
+      MvNode* node,
+      MvNode* cond);
+
+  /// @brief 登録する(配列の場合)
+  /// @param[in] decl 宣言要素
+  /// @param[in] offset
+  /// @param[in] node 対応するノード
+  /// @param[in] cond 条件
+  void
+  add(const VlDeclArray* decl,
+      ymuint offset,
+      MvNode* node,
+      MvNode* cond);
+#endif
+
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
   virtual
-  AssignInfo
+  MvNode*
   get(const VlDecl* decl) const;
 
   /// @brief 対応するノードを取り出す(配列型)．
@@ -183,9 +194,28 @@ public:
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
   virtual
+  MvNode*
+  get(const VlDeclArray* decl,
+      ymuint offset) const;
+
+#if 0
+  /// @brief 対応するノードを取り出す．
+  /// @param[in] decl 宣言要素
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型の場合には NULL を返す．
+  AssignInfo
+  get(const VlDecl* decl) const;
+
+  /// @brief 対応するノードを取り出す(配列型)．
+  /// @param[in] decl 宣言要素
+  /// @param[in] offset オフセット
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型でない場合，
+  /// オフセットが範囲外の場合には NULL を返す．
   AssignInfo
   get(const VlDeclArray* decl,
       ymuint offset) const;
+#endif
 
 
 private:
