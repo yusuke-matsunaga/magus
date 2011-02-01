@@ -493,7 +493,7 @@ EiModule::init_iodecl(ymuint pos,
 void
 EiModule::init_port(ymuint index,
 		    const PtPort* pt_port,
-		    ElbExpr* low_conn,
+		    ElbLhs* low_conn,
 		    tVpiDirection dir)
 {
   mPortList[index].init(this, pt_port, index, low_conn, dir);
@@ -505,7 +505,7 @@ EiModule::init_port(ymuint index,
 // @param[in] conn_by_name 名前による割り当て時に true とするフラグ
 void
 EiModule::set_port_high_conn(ymuint index,
-			     ElbExpr* high_conn,
+			     ElbLhs* high_conn,
 			     bool conn_by_name)
 {
   mPortList[index].set_high_conn(high_conn, conn_by_name);

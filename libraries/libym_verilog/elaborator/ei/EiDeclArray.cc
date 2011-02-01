@@ -348,6 +348,10 @@ EiDeclArray::array_size() const
 int
 EiDeclArray::array_offset(int index) const
 {
+  if ( mRangeList.size() == 1 ) {
+    return mRangeList.range(0)->offset(index);
+  }
+  return -1;
 }
 
 // @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．

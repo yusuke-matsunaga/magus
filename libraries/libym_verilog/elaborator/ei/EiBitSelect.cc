@@ -67,7 +67,7 @@ EiFactory::new_BitSelect(const PtExpr* pt_expr,
 			 ElbExpr* index_expr)
 {
   void* p = mAlloc.get_memory(sizeof(EiBitSelect));
-  ElbExpr* expr = new (p) EiBitSelect(pt_expr, base_expr, index_expr);
+  ElbExpr* expr = new (p) EiVarBitSelect(pt_expr, base_expr, index_expr);
 
   return expr;
 }
@@ -80,13 +80,10 @@ EiFactory::new_BitSelect(const PtExpr* pt_expr,
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] base_expr 対象の式
-// @param[in] index_expr ビット選択式
 EiBitSelect::EiBitSelect(const PtExpr* pt_expr,
-			 ElbExpr* base_expr,
-			 ElbExpr* index_expr) :
+			 ElbExpr* base_expr) :
   EiExprBase(pt_expr),
-  mBaseExpr(base_expr),
-  mIndexExpr(index_expr)
+  mBaseExpr(base_expr)
 {
 }
 
@@ -122,14 +119,6 @@ EiBitSelect::is_const() const
   return parent_expr()->is_const() && is_constant_select();
 }
 
-// @brief 固定選択子の時 true を返す．
-// @note ビット選択，部分選択の時，意味を持つ．
-bool
-EiBitSelect::is_constant_select() const
-{
-  return mIndexExpr->is_const();
-}
-
 // @brief ビット指定の時に true を返す．
 bool
 EiBitSelect::is_bitselect() const
@@ -137,19 +126,37 @@ EiBitSelect::is_bitselect() const
   return true;
 }
 
-// @brief インデックス式を返す．
-const VlExpr*
-EiBitSelect::index() const
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDecl*
+EiBitSelect::decl_obj() const
 {
-  return mIndexExpr;
+  return parent_expr()->decl_obj();
 }
 
-// @brief インデックス値を返す．
-// @note 式に対するビット選択の時，意味を持つ．
-int
-EiBitSelect::index_val() const
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDeclArray*
+EiBitSelect::declarray_obj() const
 {
-  return 0;
+  return parent_expr()->declarray_obj();
+}
+
+// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
+// @note それ以外では 0 を返す．
+ymuint
+EiBitSelect::declarray_dimension() const
+{
+  return parent_expr()->declarray_dimension();
+}
+
+// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+// @note それ以外では NULL を返す．
+const VlExpr*
+EiBitSelect::declarray_index(ymuint pos) const
+{
+  return parent_expr()->declarray_index(pos);
 }
 
 // @brief 親の式を返す．
@@ -181,8 +188,7 @@ EiConstBitSelect::EiConstBitSelect(const PtExpr* pt_expr,
 				   ElbExpr* base_expr,
 				   const PtExpr* index_expr,
 				   int index_val) :
-  EiExprBase(pt_expr),
-  mBaseExpr(base_expr),
+  EiBitSelect(pt_expr, base_expr),
   mIndexExpr(index_expr),
   mIndexVal(index_val)
 {
@@ -193,44 +199,10 @@ EiConstBitSelect::~EiConstBitSelect()
 {
 }
 
-// @brief 型の取得
-tVpiObjType
-EiConstBitSelect::type() const
-{
-  switch ( parent_expr()->type() ) {
-  case kVpiNet: return kVpiNetBit;
-  case kVpiReg: return kVpiRegBit;
-  default: break;
-  }
-  return kVpiBitSelect;
-}
-
-// @brief 式のタイプを返す．
-tVpiValueType
-EiConstBitSelect::value_type() const
-{
-  return pack(kVpiValueUS, 1);
-}
-
-// @brief 定数の時 true を返す．
-// @note 参照している要素の型によって決まる．
-bool
-EiConstBitSelect::is_const() const
-{
-  return parent_expr()->is_const();
-}
-
 // @brief 固定選択子の時 true を返す．
 // @note ビット選択，部分選択の時，意味を持つ．
 bool
 EiConstBitSelect::is_constant_select() const
-{
-  return true;
-}
-
-// @brief ビット指定の時に true を返す．
-bool
-EiConstBitSelect::is_bitselect() const
 {
   return true;
 }
@@ -250,20 +222,49 @@ EiConstBitSelect::index_val() const
   return mIndexVal;
 }
 
-// @brief 親の式を返す．
-const VlExpr*
-EiConstBitSelect::parent_expr() const
+
+//////////////////////////////////////////////////////////////////////
+// クラス EiVarBitSelect
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+// @param[in] base_expr 対象の式
+// @param[in] index_expr ビット選択式
+EiVarBitSelect::EiVarBitSelect(const PtExpr* pt_expr,
+			       ElbExpr* base_expr,
+			       ElbExpr* index_expr) :
+  EiBitSelect(pt_expr, base_expr),
+  mIndexExpr(index_expr)
 {
-  return mBaseExpr;
 }
 
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiConstBitSelect::set_reqsize(tVpiValueType type)
+// @brief デストラクタ
+EiVarBitSelect::~EiVarBitSelect()
 {
-  // なにもしない．
+}
+
+// @brief 固定選択子の時 true を返す．
+// @note ビット選択，部分選択の時，意味を持つ．
+bool
+EiVarBitSelect::is_constant_select() const
+{
+  return mIndexExpr->is_const();
+}
+
+// @brief インデックス式を返す．
+const VlExpr*
+EiVarBitSelect::index() const
+{
+  return mIndexExpr;
+}
+
+// @brief インデックス値を返す．
+// @note 式に対するビット選択の時，意味を持つ．
+int
+EiVarBitSelect::index_val() const
+{
+  return 0;
 }
 
 END_NAMESPACE_YM_VERILOG

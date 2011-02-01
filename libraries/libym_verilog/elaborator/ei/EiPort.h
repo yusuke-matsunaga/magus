@@ -97,10 +97,38 @@ public:
   const VlExpr*
   high_conn() const;
 
+  /// @brief high_conn が左辺式の時の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  virtual
+  ymuint
+  high_conn_elem_num() const;
+
+  /// @brief high_conn が左辺式の時の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  virtual
+  const VlExpr*
+  high_conn_elem(ymuint pos) const;
+
   /// @brief 下位の接続先を返す．
   virtual
   const VlExpr*
   low_conn() const;
+
+  /// @brief low_conn が左辺式の時の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  virtual
+  ymuint
+  low_conn_elem_num() const;
+
+  /// @brief low_conn が左辺式の時の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  virtual
+  const VlExpr*
+  low_conn_elem(ymuint pos) const;
 
 
 public:
@@ -119,13 +147,13 @@ public:
   init(ElbModule* parent,
        const PtPort* pt_port,
        ymuint index,
-       ElbExpr* low_conn,
+       ElbLhs* low_conn,
        tVpiDirection dir);
 
   /// @brief high_conn を接続する．
   virtual
   void
-  set_high_conn(ElbExpr* high_conn,
+  set_high_conn(ElbLhs* high_conn,
 		bool conn_by_name);
 
 
@@ -144,10 +172,10 @@ private:
   ymuint32 mIndex;
 
   // 上位の接続先
-  ElbExpr* mHighConn;
+  ElbLhs* mHighConn;
 
   // 下位の接続先
-  ElbExpr* mLowConn;
+  ElbLhs* mLowConn;
 
   // 向き
   tVpiDirection mDirection;

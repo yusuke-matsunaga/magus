@@ -222,18 +222,20 @@ ModuleGen::instantiate_port(ElbModule* module,
     // 内側の接続と向きを作る．
     ymuint n = pt_port->portref_size();
 
-    ElbExpr* low_conn = NULL;
+    ElbLhs* low_conn = NULL;
     tVpiDirection dir = kVpiNoDirection;
 
     const PtExpr* pt_portref = pt_port->portref();
     if ( n == 1 ) {
       // 単一の要素の場合
       dir = pt_port->portref_dir(0);
-      low_conn = instantiate_portref(module, pt_portref);
+      ElbExpr* expr1 = instantiate_portref(module, pt_portref);
+      low_conn = factory().new_Lhs(expr1);
     }
     else if ( n > 1 ) {
       // 複数要素の結合の場合
       ElbExpr** expr_list = factory().new_ExprList(n);
+      vector<ElbExpr*> elem_array(n);
 
       for (ymuint i = 0; i < n; ++ i) {
 	const PtExpr* pt_portexpr = pt_port->portref_elem(i);
@@ -242,6 +244,7 @@ ModuleGen::instantiate_port(ElbModule* module,
 	  return;
 	}
 	expr_list[i] = portexpr;
+	elem_array[n - i - 1] = portexpr;
 
 	tVpiDirection dir1 = pt_port->portref_dir(i);
 	if ( dir == kVpiNoDirection ) {
@@ -252,7 +255,8 @@ ModuleGen::instantiate_port(ElbModule* module,
 	}
       }
 
-      low_conn = factory().new_ConcatOp(pt_portref, n, expr_list);
+      ElbExpr* expr1 = factory().new_ConcatOp(pt_portref, n, expr_list);
+      low_conn = factory().new_Lhs(expr1, elem_array);
     }
     module->init_port(index, pt_port, low_conn, dir);
   }

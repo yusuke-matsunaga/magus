@@ -18,22 +18,19 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class EiBitSelect EiBitSelect.h "EiBitSelect.h"
-/// @brief 可変ビット選択式を表すクラス
+/// @brief ビット選択式を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class EiBitSelect :
   public EiExprBase
 {
-  friend class EiFactory;
-
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] base_expr 対象の式
   /// @param[in] index_expr ビット選択式
   EiBitSelect(const PtExpr* pt_expr,
-	      ElbExpr* base_expr,
-	      ElbExpr* index_expr);
+	      ElbExpr* base_expr);
 
   /// @brief デストラクタ
   virtual
@@ -72,21 +69,30 @@ public:
   bool
   is_bitselect() const;
 
-  /// @brief 固定選択子の時 true を返す．
-  /// @note ビット選択，部分選択の時，意味を持つ．
+  /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+  /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
   virtual
-  bool
-  is_constant_select() const;
+  const VlDecl*
+  decl_obj() const;
 
-  /// @brief インデックス式を返す．
+  /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+  /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+  virtual
+  const VlDeclArray*
+  declarray_obj() const;
+
+  /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
+  /// @note それ以外では 0 を返す．
+  virtual
+  ymuint
+  declarray_dimension() const;
+
+  /// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+  /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
-  index() const;
-
-  /// @brief インデックス値を返す．
-  virtual
-  int
-  index_val() const;
+  declarray_index(ymuint pos) const;
 
   /// @brief 親の式を返す．
   virtual
@@ -115,9 +121,6 @@ private:
   // 対象の式
   ElbExpr* mBaseExpr;
 
-  // インデックス式
-  ElbExpr* mIndexExpr;
-
 };
 
 
@@ -126,7 +129,7 @@ private:
 /// @brief 固定ビット選択式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiConstBitSelect :
-  public EiExprBase
+  public EiBitSelect
 {
   friend class EiFactory;
 
@@ -149,35 +152,8 @@ private:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // VlObj の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型の取得
-  virtual
-  tVpiObjType
-  type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // VlExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 式のタイプを返す．
-  virtual
-  tVpiValueType
-  value_type() const;
-
-  /// @brief 定数の時 true を返す．
-  /// @note 参照している要素の型によって決まる．
-  virtual
-  bool
-  is_const() const;
-
-  /// @brief ビット指定の時に true を返す．
-  virtual
-  bool
-  is_bitselect() const;
 
   /// @brief 固定選択子の時 true を返す．
   /// @note ビット選択，部分選択の時，意味を持つ．
@@ -195,23 +171,65 @@ public:
   int
   index_val() const;
 
-  /// @brief 親の式を返す．
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // インデックス式
+  const PtExpr* mIndexExpr;
+
+  // インデックス値
+  int mIndexVal;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EiVarBitSelect EiBitSelect.h "EiBitSelect.h"
+/// @brief 可変ビット選択式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class EiVarBitSelect :
+  public EiBitSelect
+{
+  friend class EiFactory;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] base_expr 対象の式
+  /// @param[in] index_expr ビット選択式
+  EiVarBitSelect(const PtExpr* pt_expr,
+		 ElbExpr* base_expr,
+		 ElbExpr* index_expr);
+
+  /// @brief デストラクタ
   virtual
-  const VlExpr*
-  parent_expr() const;
+  ~EiVarBitSelect();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数
+  // VlExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 要求される式の型を計算してセットする．
-  /// @param[in] type 要求される式の型
-  /// @note 必要であればオペランドに対して再帰的に処理を行なう．
+  /// @brief 固定選択子の時 true を返す．
+  /// @note ビット選択，部分選択の時，意味を持つ．
   virtual
-  void
-  set_reqsize(tVpiValueType type);
+  bool
+  is_constant_select() const;
+
+  /// @brief インデックス式を返す．
+  virtual
+  const VlExpr*
+  index() const;
+
+  /// @brief インデックス値を返す．
+  virtual
+  int
+  index_val() const;
 
 
 private:
@@ -219,14 +237,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 対象の式
-  ElbExpr* mBaseExpr;
-
   // インデックス式
-  const PtExpr* mIndexExpr;
-
-  // インデックス値
-  int mIndexVal;
+  ElbExpr* mIndexExpr;
 
 };
 

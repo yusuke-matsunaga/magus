@@ -143,6 +143,39 @@ EiPartSelect::is_partselect() const
   return true;
 }
 
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDecl*
+EiPartSelect::decl_obj() const
+{
+  return parent_expr()->decl_obj();
+}
+
+// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+const VlDeclArray*
+EiPartSelect::declarray_obj() const
+{
+  return parent_expr()->declarray_obj();
+}
+
+// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
+// @note それ以外では 0 を返す．
+ymuint
+EiPartSelect::declarray_dimension() const
+{
+  return parent_expr()->declarray_dimension();
+}
+
+// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+// @note それ以外では NULL を返す．
+const VlExpr*
+EiPartSelect::declarray_index(ymuint pos) const
+{
+  return parent_expr()->declarray_index(pos);
+}
+
 // @brief 親の式を返す．
 // @note 式に対するビット選択/範囲選択の時，意味を持つ．
 const VlExpr*

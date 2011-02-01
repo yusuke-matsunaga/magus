@@ -63,6 +63,31 @@ public:
   bool
   is_partselect() const;
 
+  /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+  /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+  virtual
+  const VlDecl*
+  decl_obj() const;
+
+  /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
+  /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
+  virtual
+  const VlDeclArray*
+  declarray_obj() const;
+
+  /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
+  /// @note それ以外では 0 を返す．
+  virtual
+  ymuint
+  declarray_dimension() const;
+
+  /// @brief 配列型宣言要素への参照の場合，配列のインデックスを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < declarray_dimension() )
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlExpr*
+  declarray_index(ymuint pos) const;
+
   /// @brief 親の式を返す．
   virtual
   const VlExpr*
