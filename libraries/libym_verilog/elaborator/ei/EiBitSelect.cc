@@ -36,10 +36,8 @@ EiFactory::new_BitSelect(const PtExpr* pt_expr,
 			 int index_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiConstBitSelect));
-  ElbExpr* expr = new (p) EiConstBitSelect(pt_expr, base_expr,
-					   index_expr, index_val);
-
-  return expr;
+  return new (p) EiConstBitSelect(pt_expr, base_expr,
+				  index_expr, index_val);
 }
 
 // @brief 固定ビット選択式を生成する．
@@ -52,9 +50,7 @@ EiFactory::new_BitSelect(const PtExpr* pt_expr,
 			 int index_val)
 {
   void* p = mAlloc.get_memory(sizeof(EiConstBitSelect));
-  ElbExpr* expr = new (p) EiConstBitSelect(pt_expr, base_expr, NULL, index_val);
-
-  return expr;
+  return new (p) EiConstBitSelect(pt_expr, base_expr, NULL, index_val);
 }
 
 // @brief 可変ビット選択式を生成する．
@@ -66,10 +62,8 @@ EiFactory::new_BitSelect(const PtExpr* pt_expr,
 			 ElbExpr* base_expr,
 			 ElbExpr* index_expr)
 {
-  void* p = mAlloc.get_memory(sizeof(EiBitSelect));
-  ElbExpr* expr = new (p) EiVarBitSelect(pt_expr, base_expr, index_expr);
-
-  return expr;
+  void* p = mAlloc.get_memory(sizeof(EiVarBitSelect));
+  return new (p) EiVarBitSelect(pt_expr, base_expr, index_expr);
 }
 
 
