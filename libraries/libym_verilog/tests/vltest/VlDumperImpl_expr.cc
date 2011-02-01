@@ -103,12 +103,17 @@ VlDumperImpl::put_expr(const char* label,
 	    put_expr("array_index", mgr, expr->declarray_index(i));
 	  }
 	}
-	put_expr("vpiIndex", mgr, expr->index());
       }
       else {
 	put_expr("vpiParent", mgr, expr->parent_expr());
+      }
+      if ( expr->is_constant_select() ) {
 	put("vpiIndex", expr->index_val());
       }
+      else {
+	put_expr("vpiIndex", mgr, expr->index());
+      }
+
     }
     else if ( expr->is_partselect() ) {
       put("vpiConstantSelect", expr->is_constant_select());
@@ -119,13 +124,17 @@ VlDumperImpl::put_expr(const char* label,
 	    put_expr("array_index", mgr, expr->declarray_index(i));
 	  }
 	}
-	put_expr("vpiLeftRange", mgr, expr->left_range());
-	put_expr("vpiRightRange", mgr, expr->right_range());
       }
       else {
 	put_expr("vpiParent", mgr, expr->parent_expr());
+      }
+      if ( expr->is_constant_select() ) {
 	put("vpiLeftRange", expr->left_range_val());
 	put("vpiRightRange", expr->right_range_val());
+      }
+      else {
+	put_expr("vpiLeftRange", mgr, expr->left_range());
+	put_expr("vpiRightRange", mgr, expr->right_range());
       }
     }
     else if ( expr->is_primary() ) {

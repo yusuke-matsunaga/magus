@@ -197,14 +197,12 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 
   if ( has_bit_select ) {
     const PtExpr* pt_expr1 = pt_expr->index(isize - 1);
-#if 0
     int index_val;
     bool stat1 = evaluate_int(parent, pt_expr1, index_val, false);
     if ( stat1 ) {
       // 固定インデックスだった．
       return factory().new_BitSelect(pt_expr, primary, pt_expr1, index_val);
     }
-#endif
     ElbExpr* index = instantiate_expr(parent, index_env, pt_expr1);
     if ( !index ) {
       return NULL;
