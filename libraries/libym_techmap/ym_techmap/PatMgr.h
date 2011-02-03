@@ -64,6 +64,14 @@ public:
   bool
   load(istream& s);
 
+  /// @brief セルライブラリの内容(+パタングラフ)をバイナリファイルに書き出す．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] library ダンプ対象のライブラリ
+  static
+  void
+  dump_library(ostream& s,
+	       const CellLibrary& library);
+
 
 public:
   //////////////////////////////////////////////////////////////////////

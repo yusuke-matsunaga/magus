@@ -31,6 +31,7 @@ main(int argc,
   }
 
   const char* datafile = "patdata.bin";
+#if 0
   {
     PgFuncMgr pgf_mgr;
     pgf_mgr.set_library(library);
@@ -48,6 +49,19 @@ main(int argc,
     pg_dump(os, pgf_mgr);
     os.close();
   }
+#else
+
+  ofstream os;
+  os.open(datafile, ios::binary);
+  if ( !os ) {
+    // エラー
+    cerr << "Could not create " << datafile << endl;
+    return 2;
+  }
+  PatMgr::dump_library(os, *library);
+  os.close();
+
+#endif
 
   PatMgr pat_mgr;
   {
