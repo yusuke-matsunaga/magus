@@ -26,6 +26,9 @@ DumpCnCmd::DumpCnCmd(MagMgr* mgr,
 {
   mPoptVerilog = new TclPopt(this, "verilog",
 			     "verilog mode");
+  mPoptSpice = new TclPopt(this, "spice",
+			   "spice mode");
+  new_popt_group(mPoptVerilog, mPoptSpice);
   set_usage_string("?<filename>");
 }
 
@@ -44,6 +47,7 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
   bool verilog = mPoptVerilog->is_specified();
+  bool spice = mPoptSpice->is_specified();
 
   try {
     ostream* outp = &cout;
@@ -58,6 +62,9 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
     }
     if ( verilog ) {
       dump_verilog(*outp, cngraph());
+    }
+    else if ( spice ) {
+      dump_spice(*outp, cngraph());
     }
     else {
       dump(*outp, cngraph());
