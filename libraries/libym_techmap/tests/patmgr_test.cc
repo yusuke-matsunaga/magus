@@ -8,7 +8,6 @@
 
 
 #include "patgen/patgen_nsdef.h"
-#include "patgen/PgFuncMgr.h"
 #include "ym_techmap/PatMgr.h"
 #include "ym_cell/CellMislibReader.h"
 
@@ -19,9 +18,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using namespace nsYm::nsCell;
   using namespace nsYm::nsTechmap;
-  using namespace nsYm::nsTechmap::nsPatgen;
 
   const char* filename = argv[1];
   CellMislibReader reader;
@@ -31,25 +28,6 @@ main(int argc,
   }
 
   const char* datafile = "patdata.bin";
-#if 0
-  {
-    PgFuncMgr pgf_mgr;
-    pgf_mgr.set_library(library);
-
-    pg_display(cout, pgf_mgr);
-
-    ofstream os;
-    os.open(datafile, ios::binary);
-    if ( !os ) {
-      // エラー
-      cerr << "Could not create " << datafile << endl;
-      return 2;
-    }
-
-    pg_dump(os, pgf_mgr);
-    os.close();
-  }
-#else
 
   ofstream os;
   os.open(datafile, ios::binary);
@@ -61,7 +39,6 @@ main(int argc,
   PatMgr::dump_library(os, *library);
   os.close();
 
-#endif
 
   PatMgr pat_mgr;
   {
