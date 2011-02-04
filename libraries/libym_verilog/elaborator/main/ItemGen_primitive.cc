@@ -100,10 +100,11 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 	return;
       }
 
-      ElbPrimArray* prim_array = factory().new_PrimitiveArray(prim_head,
-							      pt_inst,
-							      pt_left, pt_right,
-							      left_val, right_val);
+      ElbPrimArray* prim_array
+	= factory().new_PrimitiveArray(prim_head,
+				       pt_inst,
+				       pt_left, pt_right,
+				       left_val, right_val);
       reg_primarray(prim_array);
 
       // attribute instance の生成
@@ -199,10 +200,11 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 	return;
       }
 
-      ElbPrimArray* prim_array = factory().new_PrimitiveArray(prim_head,
-							      pt_inst,
-							      pt_left, pt_right,
-							      left_val, right_val);
+      ElbPrimArray* prim_array
+	= factory().new_PrimitiveArray(prim_head,
+				       pt_inst,
+				       pt_left, pt_right,
+				       left_val, right_val);
       reg_primarray(prim_array);
 
       // attribute instance の生成
@@ -213,8 +215,9 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
     }
     else {
       // 単一の要素
-      ElbPrimitive* primitive = factory().new_Primitive(prim_head,
-							pt_inst);
+      ElbPrimitive* primitive
+	= factory().new_Primitive(prim_head,
+				  pt_inst);
       reg_primitive(primitive);
 
       // attribute instance の生成
