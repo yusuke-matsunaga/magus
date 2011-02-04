@@ -92,6 +92,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 			    ElbTaskFunc* taskfunc,
 			    PtIOHeadArray pt_head_array)
 {
+  // module と taskfunc は排他的
   assert_cond( module != NULL || taskfunc != NULL, __FILE__, __LINE__);
   assert_cond( module == NULL || taskfunc == NULL, __FILE__, __LINE__);
 
@@ -116,15 +117,19 @@ DeclGen::instantiate_iodecl(ElbModule* module,
     const PtExpr* pt_right = pt_head->right_range();
     bool has_range = (pt_left != NULL) && (pt_right != NULL);
 
+    // 範囲指定を持っている場合には範囲を計算する．
     int left_val = 0;
     int right_val = 0;
     if ( !evaluate_range(namedobj,
 			 pt_left, pt_right,
 			 left_val, right_val) ) {
       // エラーが起きたのでスキップする．
+      // エラーメッセージは evaluate_range() 内で出力されている．
       continue;
     }
 
+    // ヘッダ情報の生成
+    // ちなみに IOHead は範囲の情報を持たない．
     ElbIOHead* head = NULL;
     if ( module ) {
       head = factory().new_ModIOHead(module, pt_head);
@@ -162,16 +167,23 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	}
 	decl = handle->decl();
 	if ( decl ) {
+	  // 対象が宣言要素だった場合．
 	  tVpiObjType type = decl->type();
 	  if ( (module == NULL || type != kVpiNet) &&
 	       type != kVpiReg &&
 	       type != kVpiIntegerVar &&
 	       type != kVpiTimeVar) {
+	    // ちょっと論理式が分かりにくいが，上の式を否定すると，
+	    // - module かつネットは OK
+	    // - reg/integer/time は OK
+	    // ということになる．
+	    // それ以外は NULL にしておく．
 	    decl = NULL;
 	  }
 	}
 	if ( !decl ) {
 	  if ( handle->declarray() ) {
+	    // 対象が配列だった場合．
 	    ostringstream buf;
 	    buf << pt_item->name()
 		<< ": Array object shall not be connected to IO port.";
@@ -182,6 +194,8 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 		    buf.str());
 	  }
 	  else {
+	    // 不適切な型だった場合．
+	    // 上の decl = NULL にした時もここに来る．
 	    ostringstream buf;
 	    buf << handle->full_name()
 		<< ": Should be a ";
@@ -197,6 +211,8 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	  }
 	  continue;
 	}
+
+	// ここに来たら decl != NULL
 
 	// decl と型が一致しているか調べる．
 	// IEEE 1364-2001 12.3.3 Port declarations
@@ -223,28 +239,8 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	      continue;
 	    }
 	  }
-	  else {
-	    if ( left_val != left_val2 || right_val != right_val2 ) {
-	      ostringstream buf;
-	      buf << "Conflictive range declaration of \""
-		  << pt_item->name() << "\".";
-	      put_msg(__FILE__, __LINE__,
-		      pt_item->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
-	      cout << "IO range: [" << left_val << ":" << right_val << "]"
-		   << endl
-		   << "Decl range: [" << left_val2 << ":" << right_val2 << "]"
-		   << endl;
-	      continue;
-	    }
-	  }
-	}
-	else {
-	  if ( has_range ) {
-	    // decl は範囲を持っていないが IO は持っている．
-	    // エラーとする．
+	  else if ( left_val != left_val2 || right_val != right_val2 ) {
+	    // 範囲が異なっていた．
 	    ostringstream buf;
 	    buf << "Conflictive range declaration of \""
 		<< pt_item->name() << "\".";
@@ -253,8 +249,25 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 		    kMsgError,
 		    "ELAB",
 		    buf.str());
+	    cout << "IO range: [" << left_val << ":" << right_val << "]"
+		 << endl
+		 << "Decl range: [" << left_val2 << ":" << right_val2 << "]"
+		 << endl;
 	    continue;
 	  }
+	}
+	else if ( has_range ) {
+	  // decl は範囲を持っていないが IO は持っている．
+	  // エラーとする．
+	  ostringstream buf;
+	  buf << "Conflictive range declaration of \""
+	      << pt_item->name() << "\".";
+	  put_msg(__FILE__, __LINE__,
+		  pt_item->file_region(),
+		  kMsgError,
+		  "ELAB",
+		  buf.str());
+	  continue;
 	}
 	// どちらか一方でも符号付きなら両方符号付きにする．
 	// ちょっと ad-hoc な仕様
@@ -288,6 +301,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	  }
 	}
 
+	// ヘッダを生成する．
 	ElbDeclHead* head = NULL;
 	if ( module ) {
 	  if ( has_range ) {
@@ -311,6 +325,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	}
 	assert_cond( head != NULL, __FILE__, __LINE__);
 
+	// 初期値を生成する．
 	const PtExpr* pt_init = pt_item->init_value();
 	ElbExpr* init = NULL;
 	if ( module ) {
@@ -848,7 +863,7 @@ DeclGen::instantiate_genvar_head(const VlNamedObj* parent,
     reg_genvar(genvar);
 
     ostringstream buf;
-    buf << "Getnvar(" << genvar->full_name() << ") created.";
+    buf << "Genvar(" << genvar->full_name() << ") created.";
     msg_mgr().put_msg(__FILE__, __LINE__,
 		      pt_item->file_region(),
 		      kMsgInfo,
