@@ -13,15 +13,17 @@
 
 #include "Parser.h"
 #include "PtMgr.h"
-#include "parser/cpt/CptFactory.h"
 
 #include "Elaborator.h"
-#include "elaborator/ei/EiFactory.h"
 
 #include "ElbMgr.h"
 #include "ElbUdp.h"
 #include "ElbUserSystf.h"
 #include "ElbAttribute.h"
+
+#include "CptFactory.h"
+#include "EiFactory.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 

@@ -10,20 +10,13 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/include
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_verilog.la
 
-libym_verilog_la_SOURCES = \
-	VlMgr.cc
+libym_verilog_la_SOURCES =
 
 libym_verilog_la_LIBADD = \
 	common/libym_vl_common.la \
