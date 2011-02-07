@@ -113,6 +113,49 @@ EiFactory::new_ArgHandle(const PtExpr* pt_expr,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス EiPrimaryBase
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] pt_expr パース木の定義要素
+EiPrimaryBase::EiPrimaryBase(const PtExpr* pt_expr) :
+  EiExprBase(pt_expr)
+{
+}
+
+// @brief デストラクタ
+EiPrimaryBase::~EiPrimaryBase()
+{
+}
+
+// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
+bool
+EiPrimaryBase::is_primary() const
+{
+  return true;
+}
+
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiPrimaryBase::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置番号
+// @note 演算子の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiPrimaryBase::_operand(ymuint pos) const
+{
+  return NULL;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス EiPrimary
 //////////////////////////////////////////////////////////////////////
 
@@ -121,7 +164,7 @@ EiFactory::new_ArgHandle(const PtExpr* pt_expr,
 // @param[in] obj 本体のオブジェクト
 EiPrimary::EiPrimary(const PtExpr* pt_expr,
 		     ElbDecl* obj) :
-  EiExprBase(pt_expr),
+  EiPrimaryBase(pt_expr),
   mObj(obj)
 {
 }
@@ -153,13 +196,6 @@ EiPrimary::is_const() const
   return false;
 }
 
-// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
-bool
-EiPrimary::is_primary() const
-{
-  return true;
-}
-
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*
@@ -187,15 +223,6 @@ EiPrimary::lhs_elem(ymuint pos) const
 {
   assert_cond( pos == 0, __FILE__, __LINE__);
   return this;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiPrimary::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
 }
 
 
@@ -292,6 +319,16 @@ EiDeclPrimary::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
+// @brief オペランドを返す．
+// @param[in] pos 位置番号
+// @note 演算子の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiDeclPrimary::_operand(ymuint pos) const
+{
+  return NULL;
+}
+
 // @brief パース木の定義要素を返す．
 const PtBase*
 EiDeclPrimary::pt_obj() const
@@ -309,7 +346,7 @@ EiDeclPrimary::pt_obj() const
 // @param[in] obj 本体のオブジェクト
 EiParamPrimary::EiParamPrimary(const PtExpr* pt_expr,
 			       ElbParameter* obj) :
-  EiExprBase(pt_expr),
+  EiPrimaryBase(pt_expr),
   mObj(obj)
 {
 }
@@ -341,28 +378,12 @@ EiParamPrimary::is_const() const
   return true;
 }
 
-// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
-bool
-EiParamPrimary::is_primary() const
-{
-  return true;
-}
-
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*
 EiParamPrimary::decl_obj() const
 {
   return mObj;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiParamPrimary::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
 }
 
 
@@ -379,7 +400,7 @@ EiArrayElemPrimary::EiArrayElemPrimary(const PtExpr* pt_expr,
 				       ElbDeclArray* obj,
 				       ymuint dim,
 				       ElbExpr** index_list) :
-  EiExprBase(pt_expr),
+  EiPrimaryBase(pt_expr),
   mObj(obj),
   mDim(dim),
   mIndexList(index_list)
@@ -412,13 +433,6 @@ EiArrayElemPrimary::is_const() const
 {
   // 配列要素は定数ではない．
   return false;
-}
-
-// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
-bool
-EiArrayElemPrimary::is_primary() const
-{
-  return true;
 }
 
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
@@ -467,15 +481,6 @@ EiArrayElemPrimary::lhs_elem(ymuint pos) const
   return this;
 }
 
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiArrayElemPrimary::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiConstArrayElemPrimary
@@ -488,7 +493,7 @@ EiArrayElemPrimary::set_reqsize(tVpiValueType type)
 EiConstArrayElemPrimary::EiConstArrayElemPrimary(const PtExpr* pt_expr,
 						 ElbDeclArray* obj,
 						 ymuint offset) :
-  EiExprBase(pt_expr),
+  EiPrimaryBase(pt_expr),
   mObj(obj),
   mOffset(offset)
 {
@@ -527,13 +532,6 @@ EiConstArrayElemPrimary::is_const() const
 // @note それ以外では常に false を返す．
 bool
 EiConstArrayElemPrimary::is_constant_select() const
-{
-  return true;
-}
-
-// @brief プライマリ(net/reg/variables/parameter)の時に true を返す．
-bool
-EiConstArrayElemPrimary::is_primary() const
 {
   return true;
 }
@@ -592,15 +590,6 @@ EiConstArrayElemPrimary::lhs_elem(ymuint pos) const
   return this;
 }
 
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiConstArrayElemPrimary::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiScopePrimary
@@ -611,7 +600,7 @@ EiConstArrayElemPrimary::set_reqsize(tVpiValueType type)
 // @param[in] obj 本体のオブジェクト
 EiScopePrimary::EiScopePrimary(const PtExpr* pt_expr,
 			       const VlNamedObj* obj) :
-  EiExprBase(pt_expr),
+  EiPrimaryBase(pt_expr),
   mObj(obj)
 {
 }
@@ -650,15 +639,6 @@ EiScopePrimary::scope_obj() const
   return mObj;
 }
 
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiScopePrimary::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiPrimitivePrimary
@@ -669,7 +649,7 @@ EiScopePrimary::set_reqsize(tVpiValueType type)
 // @param[in] obj 本体のオブジェクト
 EiPrimitivePrimary::EiPrimitivePrimary(const PtExpr* pt_expr,
 				       ElbPrimitive* obj) :
-  EiExprBase(pt_expr),
+  EiPrimaryBase(pt_expr),
   mObj(obj)
 {
 }
@@ -706,15 +686,6 @@ const VlPrimitive*
 EiPrimitivePrimary::primitive_obj() const
 {
   return mObj;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiPrimitivePrimary::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
 }
 
 END_NAMESPACE_YM_VERILOG

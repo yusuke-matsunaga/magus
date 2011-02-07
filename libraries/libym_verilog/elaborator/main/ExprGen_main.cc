@@ -212,18 +212,64 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
 			 const ElbEnv& env,
 			 const PtExpr* pt_expr)
 {
-  vector<ElbExpr*> elem_array;
-  ElbExpr* expr = instantiate_lhs_sub(parent, env, pt_expr, elem_array);
-  if ( !expr ) {
+  switch ( pt_expr->type() ) {
+  case kPtOprExpr:
+    // 左辺では concatination しか適当でない．
+    if ( pt_expr->op_type() == kVpiConcatOp ) {
+      vector<ElbExpr*> elem_array;
+      ymuint opr_size = pt_expr->operand_num();
+      ElbExpr** opr_list = factory().new_ExprList(opr_size);
+      for (ymuint i = 0; i < opr_size; ++ i) {
+	ymuint pos = opr_size - i - 1;
+	const PtExpr* pt_expr1 = pt_expr->operand(pos);
+	vector<ElbExpr*> tmp_array;
+	ElbExpr* expr1 = instantiate_lhs_sub(parent, env, pt_expr1, tmp_array);
+	if ( !expr1 ) {
+	  return NULL;
+	}
+	opr_list[pos] = expr1;
+	elem_array.insert(elem_array.end(), tmp_array.begin(), tmp_array.end());
+      }
+      ymuint n = elem_array.size();
+      ElbExpr** lhs_elem_array = factory().new_ExprList(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	lhs_elem_array[i] = elem_array[i];
+      }
+      ElbExpr* expr = factory().new_Lhs(pt_expr, opr_size, opr_list,
+					n, lhs_elem_array);
+      expr->set_selfsize();
+
+      // attribute instance の生成
+      //instantiate_attribute(pt_expr->attr_top(), false, expr);
+
+      return expr;
+    }
+    // それ以外の演算子はエラー
+    error_illegal_operator_in_lhs(pt_expr);
     return NULL;
+
+
+  case kPtPrimaryExpr:
+    return instantiate_primary(parent, env, pt_expr);
+
+  case kPtConstExpr:
+    error_illegal_constant_in_lhs(pt_expr);
+    return NULL;
+
+  case kPtFuncCallExpr:
+    error_illegal_funccall_in_lhs(pt_expr);
+    return NULL;
+
+  case kPtSysFuncCallExpr:
+    error_illegal_sysfunccall_in_lhs(pt_expr);
+    return NULL;
+
+  default:
+    break;
   }
-  ymuint n = elem_array.size();
-  if ( n == 1 ) {
-    return expr;
-  }
-  else {
-    return factory().new_Lhs(expr, elem_array);
-  }
+
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 // @brief PtExpr から左辺式を生成する

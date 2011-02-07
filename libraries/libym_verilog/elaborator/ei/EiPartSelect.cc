@@ -205,6 +205,25 @@ EiPartSelect::lhs_elem(ymuint pos) const
   return this;
 }
 
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiPartSelect::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置番号
+// @note 演算子の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiPartSelect::_operand(ymuint pos) const
+{
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiConstPartSelect
@@ -295,15 +314,6 @@ EiConstPartSelect::right_range_val() const
   return mRightVal;
 }
 
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiConstPartSelect::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiVarPartSelect
@@ -363,16 +373,6 @@ int
 EiVarPartSelect::range_width() const
 {
   return mRangeVal;
-}
-
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiVarPartSelect::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
 }
 
 

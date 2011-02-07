@@ -163,6 +163,22 @@ VlDumperImpl::put_expr(const char* label,
   }
 }
 
+// @brief 左辺式の内容を出力する関数
+void
+VlDumperImpl::put_lhs(const char* label,
+		      const VlMgr& mgr,
+		      const VlExpr* expr)
+{
+  put_expr(label, mgr, expr);
+  ymuint n = expr->lhs_elem_num();
+  if ( n > 1 ) {
+    VlDumpHeader x1(this, "vpiLhs", "LhsElemArray");
+    for (ymuint i = 0; i < n; ++ i) {
+      put_expr("vpiExpr", mgr, expr->lhs_elem(i));
+    }
+  }
+}
+
 #if 0
 // func call の内容を式として出力する関数
 // IEEE 1364-2001 p. 650

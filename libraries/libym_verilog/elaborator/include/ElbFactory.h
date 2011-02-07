@@ -1058,12 +1058,18 @@ public:
 		ElbPrimitive* arg) = 0;
 
   /// @brief 連結演算子の左辺式を生成する．
-  /// @param[in] expr 対応する式
-  /// @param[in] elem_array 要素のベクタ
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] opr_size オペランド数
+  /// @param[in] opr_array オペランドを格納する配列
+  /// @param[in] lhs_elem_num 左辺の要素数
+  /// @param[in] lhs_elem_array 左辺の要素の配列
   virtual
   ElbExpr*
-  new_Lhs(ElbExpr* expr,
-	  const vector<ElbExpr*>& elem_array) = 0;
+  new_Lhs(const PtExpr* pt_expr,
+	  ymuint opr_size,
+	  ElbExpr** opr_array,
+	  ymuint lhs_elem_num,
+	  ElbExpr** lhs_elem_array) = 0;
 
   /// @brief 遅延値を生成する．
   /// @param[in] pt_obj パース木の定義要素

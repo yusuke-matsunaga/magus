@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ElbLhs.h"
+#include "EiConcatOp.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -21,27 +21,32 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief 連結演算子の左辺式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiLhs :
-  public EiExpr
+  public EiConcatOp
 {
   friend class EiFactory;
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] expr 対応する式
-  /// @param[in] elem_num 要素数
-  /// @param[in] elem_array 要素の配列
-  EiLhsConcat(ElbExpr* expr,
-	      ymuint elem_num,
-	      ElbExpr** elem_array);
+  /// @param[in] pt_expr パース木の定義要素
+  /// @param[in] opr_size オペランド数
+  /// @param[in] opr_array オペランドを格納する配列
+  /// @param[in] lhs_elem_num 左辺の要素数
+  /// @param[in] lhs_elem_array 左辺の要素の配列
+  /// @note opr_array と lhs_elem_array は別物
+  EiLhs(const PtExpr* pt_expr,
+	ymuint opr_size,
+	ElbExpr** opr_array,
+	ymuint lhs_elem_num,
+	ElbExpr** lhs_elem_array);
 
   /// @brief デストラクタ
   virtual
-  ~EiLhsConcat();
+  ~EiLhs();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ElbLhs の関数
+  // VlExpr の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 左辺式の要素数の取得
@@ -49,14 +54,14 @@ public:
   /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
   virtual
   ymuint
-  elem_num() const;
+  lhs_elem_num() const;
 
   /// @brief 左辺式の要素の取得
   /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
   /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
   virtual
-  ElbExpr*
-  elem(ymuint pos) const;
+  const VlExpr*
+  lhs_elem(ymuint pos) const;
 
 
 private:

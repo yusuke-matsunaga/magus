@@ -95,6 +95,25 @@ EiFcBase::argument(ymuint pos) const
   return mArgList[pos];
 }
 
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiFcBase::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置番号
+// @note 演算子の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiFcBase::_operand(ymuint pos) const
+{
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiFuncCall
@@ -183,15 +202,6 @@ EiFuncCall::function() const
   return mFunc;
 }
 
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiFuncCall::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiSysFuncCall
@@ -277,15 +287,6 @@ const VlUserSystf*
 EiSysFuncCall::user_systf() const
 {
   return mUserSystf;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiSysFuncCall::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -271,14 +271,7 @@ VlDumperImpl::put_contassign(const char* label,
   put("vpiStrength1", ca->drive1() );
   put("vpiDelay", ca->delay() );
 
-  put_expr("vpiLhs", mgr, ca->lhs() );
-  ymuint n = ca->lhs_elem_num();
-  if ( n > 1 ) {
-    VlDumpHeader x1(this, "vpiLhs", "LhsElemArray");
-    for (ymuint i = 0; i < n; ++ i) {
-      put_expr("vpiExpr", mgr, ca->lhs_elem(i));
-    }
-  }
+  put_lhs("vpiLhs", mgr, ca->lhs() );
 
   put_expr("vpiRhs", mgr, ca->rhs() );
 

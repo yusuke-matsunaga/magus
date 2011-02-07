@@ -822,10 +822,10 @@ ReaderImpl::gen_stmt(MvModule* module,
     {
       const VlExpr* rhs = stmt->rhs();
       MvNode* node = gen_expr(module, rhs, env);
-      ymuint n = stmt->lhs_elem_num();
+      ymuint n = stmt->lhs()->lhs_elem_num();
       ymuint offset = 0;
       for (ymuint i = 0; i < n; ++ i) {
-	const VlExpr* lhs = stmt->lhs_elem(i);
+	const VlExpr* lhs = stmt->lhs()->lhs_elem(i);
 	const VlDecl* lhs_decl = lhs->decl_obj();
 	const VlDeclArray* lhs_declarray = lhs->declarray_obj();
 	ymuint bw;
@@ -1257,14 +1257,15 @@ ReaderImpl::gen_cont_assign(MvModule* parent_module,
 {
   const VlExpr* rhs = cont_assign->rhs();
   MvNode* node = gen_expr(parent_module, rhs, mGlobalEnv);
-  ymuint n = cont_assign->lhs_elem_num();
+  const VlExpr* lhs = cont_assign->lhs();
+  ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
   for (ymuint i = 0; i < n; i ++ ) {
-    const VlExpr* lhs = cont_assign->lhs_elem(i);
-    MvNode* dst_node = gen_primary(lhs, mGlobalEnv);
-    ymuint dst_bw = lhs->bit_size();
+    const VlExpr* lhs_elem = lhs->lhs_elem(i);
+    MvNode* dst_node = gen_primary(lhs_elem, mGlobalEnv);
+    ymuint dst_bw = lhs_elem->bit_size();
     MvNode* src_node = gen_rhs(parent_module, node, offset, dst_bw);
-    connect_lhs(dst_node, lhs, src_node);
+    connect_lhs(dst_node, lhs_elem, src_node);
     offset += dst_bw;
   }
 }

@@ -290,6 +290,12 @@ public:
 	   const VlMgr& mgr,
 	   const VlExpr* expr);
 
+  /// @brief 左辺式の内容を出力する関数
+  void
+  put_lhs(const char* label,
+	  const VlMgr& mgr,
+	  const VlExpr* expr);
+
   /// @brief 遅延値を出力する関数
   void
   put_delay(const char* label,
