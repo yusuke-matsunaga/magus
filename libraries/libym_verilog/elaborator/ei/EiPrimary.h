@@ -76,6 +76,22 @@ public:
   const VlDecl*
   decl_obj() const;
 
+  /// @brief 左辺式の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  /// @note このクラスでは 1 を返す．
+  virtual
+  ymuint
+  lhs_elem_num() const;
+
+  /// @brief 左辺式の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  /// @note このクラスでは pos = 0 の時，自分自身を返す．
+  virtual
+  const VlExpr*
+  lhs_elem(ymuint pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -165,6 +181,22 @@ public:
   virtual
   string
   decompile() const;
+
+  /// @brief 左辺式の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  /// @note このクラスでは 1 を返す．
+  virtual
+  ymuint
+  lhs_elem_num() const;
+
+  /// @brief 左辺式の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  /// @note このクラスでは pos = 0 の時に自分自身 を返す．
+  virtual
+  const VlExpr*
+  lhs_elem(ymuint pos) const;
 
 
 public:
@@ -367,6 +399,22 @@ public:
   const VlExpr*
   declarray_index(ymuint pos) const;
 
+  /// @brief 左辺式の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  /// @note このクラスでは 1 を返す．
+  virtual
+  ymuint
+  lhs_elem_num() const;
+
+  /// @brief 左辺式の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  /// @note このクラスでは pos = 0 の時に自分自身 を返す．
+  virtual
+  const VlExpr*
+  lhs_elem(ymuint pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -485,6 +533,22 @@ public:
   virtual
   ymuint
   declarray_offset() const;
+
+  /// @brief 左辺式の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+  /// @note このクラスでは 1 を返す．
+  virtual
+  ymuint
+  lhs_elem_num() const;
+
+  /// @brief 左辺式の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+  /// @note このクラスでは pos = 0 の時に自分自身 を返す．
+  virtual
+  const VlExpr*
+  lhs_elem(ymuint pos) const;
 
 
 public:

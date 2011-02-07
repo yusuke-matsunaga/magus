@@ -19,7 +19,6 @@
 #include "AttrGen.h"
 
 #include "ElbExpr.h"
-#include "ElbLhs.h"
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtArray.h"
 #include "PtDumper.h"
@@ -228,7 +227,7 @@ ElbProxy::instantiate_arg(const VlNamedObj* parent,
 // @param[in] pt_expr 式を表すパース木
 // @return 生成された ElbExpr のポインタを返す．
 // @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
-ElbLhs*
+ElbExpr*
 ElbProxy::instantiate_lhs(const VlNamedObj* parent,
 			  const ElbEnv& env,
 			  const PtExpr* pt_expr)
@@ -247,11 +246,11 @@ ElbExpr*
 ElbProxy::instantiate_rhs(const VlNamedObj* parent,
 			  const ElbEnv& env,
 			  const PtExpr* pt_expr,
-			  ElbLhs* lhs)
+			  ElbExpr* lhs)
 {
   ElbExpr* expr = mExprGen->instantiate_expr(parent, env, pt_expr);
   // lhs の型を expr に設定する．
-  expr->set_reqsize(lhs->_expr()->value_type());
+  expr->set_reqsize(lhs->value_type());
   return expr;
 }
 

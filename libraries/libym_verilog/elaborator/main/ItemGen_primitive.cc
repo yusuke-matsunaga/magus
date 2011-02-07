@@ -21,7 +21,6 @@
 #include "ElbUdp.h"
 #include "ElbPrimitive.h"
 #include "ElbExpr.h"
-#include "ElbLhs.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -301,12 +300,7 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
     }
     else {
       // それ以外は左辺式
-#warning "lhs を捨てている．"
-      ElbLhs* lhs = instantiate_lhs(parent, env2, pt_expr);
-      if ( !lhs ) {
-	continue;
-      }
-      tmp = lhs->_expr();
+      tmp = instantiate_lhs(parent, env2, pt_expr);
     }
     if ( !tmp ) {
       continue;
@@ -385,12 +379,7 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
     }
     else {
       // それ以外は左辺式
-#warning "lhs を捨てている．"
-      ElbLhs* lhs = instantiate_lhs(parent, env2, pt_expr);
-      if ( !lhs ) {
-	continue;
-      }
-      tmp = lhs->_expr();
+      tmp = instantiate_lhs(parent, env2, pt_expr);
     }
     if ( !tmp ) {
       continue;

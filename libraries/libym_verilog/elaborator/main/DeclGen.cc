@@ -619,8 +619,7 @@ DeclGen::link_net_assign(ElbDecl* net,
 			 const PtDeclItem* pt_item)
 {
   // 実際には対応する continuous assign 文を作る．
-  ElbExpr* lhs_expr = factory().new_Primary(pt_item, net);
-  ElbLhs* lhs = factory().new_Lhs(lhs_expr);
+  ElbExpr* lhs = factory().new_Primary(pt_item, net);
 
   const VlNamedObj* parent = net->parent();
   const PtExpr* pt_init = pt_item->init_value();

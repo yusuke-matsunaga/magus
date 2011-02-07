@@ -222,15 +222,14 @@ ModuleGen::instantiate_port(ElbModule* module,
     // 内側の接続と向きを作る．
     ymuint n = pt_port->portref_size();
 
-    ElbLhs* low_conn = NULL;
+    ElbExpr* low_conn = NULL;
     tVpiDirection dir = kVpiNoDirection;
 
     const PtExpr* pt_portref = pt_port->portref();
     if ( n == 1 ) {
       // 単一の要素の場合
       dir = pt_port->portref_dir(0);
-      ElbExpr* expr1 = instantiate_portref(module, pt_portref);
-      low_conn = factory().new_Lhs(expr1);
+      low_conn = instantiate_portref(module, pt_portref);
     }
     else if ( n > 1 ) {
       // 複数要素の結合の場合

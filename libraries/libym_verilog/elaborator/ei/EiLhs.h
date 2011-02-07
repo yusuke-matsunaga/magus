@@ -17,53 +17,11 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiLhsSimple EiLhs.h "EiLhs.h"
-/// @brief 単純な左辺式を表すクラス
-//////////////////////////////////////////////////////////////////////
-class EiLhsSimple :
-  public ElbLhs
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] expr 対応する式
-  EiLhsSimple(ElbExpr* expr);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiLhsSimple();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbLhs の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 左辺式の要素数の取得
-  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
-  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
-  virtual
-  ymuint
-  elem_num() const;
-
-  /// @brief 左辺式の要素の取得
-  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
-  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
-  virtual
-  ElbExpr*
-  elem(ymuint pos) const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiLhsConcat EiLhs.h "EiLhs.h"
+/// @class EiLhs EiLhs.h "EiLhs.h"
 /// @brief 連結演算子の左辺式を表すクラス
 //////////////////////////////////////////////////////////////////////
-class EiLhsConcat :
-  public ElbLhs
+class EiLhs :
+  public EiExpr
 {
   friend class EiFactory;
 private:

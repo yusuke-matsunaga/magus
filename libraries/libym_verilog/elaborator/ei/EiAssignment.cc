@@ -13,7 +13,6 @@
 #include "EiAssignment.h"
 #include "ElbControl.h"
 #include "ElbExpr.h"
-#include "ElbLhs.h"
 
 #include "ym_verilog/BitVector.h"
 
@@ -36,7 +35,7 @@ ElbStmt*
 EiFactory::new_Assignment(const VlNamedObj* parent,
 			  ElbProcess* process,
 			  const PtStmt* pt_stmt,
-			  ElbLhs* lhs,
+			  ElbExpr* lhs,
 			  ElbExpr* rhs,
 			  bool block,
 			  ElbControl* control)
@@ -65,7 +64,7 @@ ElbStmt*
 EiFactory::new_AssignStmt(const VlNamedObj* parent,
 			  ElbProcess* process,
 			  const PtStmt* pt_stmt,
-			  ElbLhs* lhs,
+			  ElbExpr* lhs,
 			  ElbExpr* rhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiAssignStmt));
@@ -84,7 +83,7 @@ ElbStmt*
 EiFactory::new_DeassignStmt(const VlNamedObj* parent,
 			    ElbProcess* process,
 			    const PtStmt* pt_stmt,
-			    ElbLhs* lhs)
+			    ElbExpr* lhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiAssignStmt));
   ElbStmt* stmt = new (p) EiDeassignStmt(parent, process, pt_stmt,
@@ -103,7 +102,7 @@ ElbStmt*
 EiFactory::new_ForceStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbLhs* lhs,
+			 ElbExpr* lhs,
 			 ElbExpr* rhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiForceStmt));
@@ -122,7 +121,7 @@ ElbStmt*
 EiFactory::new_ReleaseStmt(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbLhs* lhs)
+			   ElbExpr* lhs)
 {
   void* p = mAlloc.get_memory(sizeof(EiReleaseStmt));
   ElbStmt* stmt = new (p) EiReleaseStmt(parent, process, pt_stmt,
@@ -145,7 +144,7 @@ EiFactory::new_ReleaseStmt(const VlNamedObj* parent,
 EiAssignBase::EiAssignBase(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbLhs* lhs,
+			   ElbExpr* lhs,
 			   ElbExpr* rhs) :
   EiStmtBase(parent, process, pt_stmt),
   mLhs(lhs),
@@ -162,25 +161,7 @@ EiAssignBase::~EiAssignBase()
 const VlExpr*
 EiAssignBase::lhs() const
 {
-  return mLhs->_expr();
-}
-
-// @brief 左辺式の要素数の取得
-// @note 通常は1だが，連結演算子の場合はその子供の数となる．
-// @note ただし，連結演算の入れ子はすべて平坦化して考える．
-ymuint
-EiAssignBase::lhs_elem_num() const
-{
-  return mLhs->elem_num();
-}
-
-// @brief 左辺式の要素の取得
-// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
-// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
-const VlExpr*
-EiAssignBase::lhs_elem(ymuint pos) const
-{
-  return mLhs->elem(pos);
+  return mLhs;
 }
 
 // @brief 右辺を返す．
@@ -194,7 +175,7 @@ EiAssignBase::rhs() const
 ElbExpr*
 EiAssignBase::_lhs() const
 {
-  return mLhs->_expr();
+  return mLhs;
 }
 
 // @brief 右辺を返す．
@@ -219,7 +200,7 @@ EiAssignBase::_rhs() const
 EiNbAssignment::EiNbAssignment(const VlNamedObj* parent,
 			       ElbProcess* process,
 			       const PtStmt* pt_stmt,
-			       ElbLhs* lhs,
+			       ElbExpr* lhs,
 			       ElbExpr* rhs,
 			       ElbControl* control) :
   EiAssignBase(parent, process, pt_stmt, lhs, rhs),
@@ -261,7 +242,7 @@ EiNbAssignment::control() const
 EiAssignment::EiAssignment(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbLhs* lhs,
+			   ElbExpr* lhs,
 			   ElbExpr* rhs,
 			   ElbControl* control) :
   EiNbAssignment(parent, process, pt_stmt, lhs, rhs, control)
@@ -295,7 +276,7 @@ EiAssignment::is_blocking() const
 EiAssignStmt::EiAssignStmt(const VlNamedObj* parent,
 			   ElbProcess* process,
 			   const PtStmt* pt_stmt,
-			   ElbLhs* lhs,
+			   ElbExpr* lhs,
 			   ElbExpr* rhs) :
   EiAssignBase(parent, process, pt_stmt, lhs, rhs)
 {
@@ -327,7 +308,7 @@ EiAssignStmt::type() const
 EiForceStmt::EiForceStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbLhs* lhs,
+			 ElbExpr* lhs,
 			 ElbExpr* rhs) :
   EiAssignBase(parent, process, pt_stmt, lhs, rhs)
 {
@@ -358,7 +339,7 @@ EiForceStmt::type() const
 EiDeassignBase::EiDeassignBase(const VlNamedObj* parent,
 			       ElbProcess* process,
 			       const PtStmt* pt_stmt,
-			       ElbLhs* lhs) :
+			       ElbExpr* lhs) :
   EiStmtBase(parent, process, pt_stmt),
   mLhs(lhs)
 {
@@ -373,25 +354,7 @@ EiDeassignBase::~EiDeassignBase()
 const VlExpr*
 EiDeassignBase::lhs() const
 {
-  return mLhs->_expr();
-}
-
-// @brief 左辺式の要素数の取得
-// @note 通常は1だが，連結演算子の場合はその子供の数となる．
-// @note ただし，連結演算の入れ子はすべて平坦化して考える．
-ymuint
-EiDeassignBase::lhs_elem_num() const
-{
-  return mLhs->elem_num();
-}
-
-// @brief 左辺式の要素の取得
-// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
-// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
-const VlExpr*
-EiDeassignBase::lhs_elem(ymuint pos) const
-{
-  return mLhs->elem(pos);
+  return mLhs;
 }
 
 
@@ -407,7 +370,7 @@ EiDeassignBase::lhs_elem(ymuint pos) const
 EiDeassignStmt::EiDeassignStmt(const VlNamedObj* parent,
 			       ElbProcess* process,
 			       const PtStmt* pt_stmt,
-			       ElbLhs* lhs) :
+			       ElbExpr* lhs) :
   EiDeassignBase(parent, process, pt_stmt, lhs)
 {
 }
@@ -437,7 +400,7 @@ EiDeassignStmt::type() const
 EiReleaseStmt::EiReleaseStmt(const VlNamedObj* parent,
 			     ElbProcess* process,
 			     const PtStmt* pt_stmt,
-			     ElbLhs* lhs) :
+			     ElbExpr* lhs) :
   EiDeassignBase(parent, process, pt_stmt, lhs)
 {
 }

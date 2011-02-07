@@ -39,7 +39,7 @@ StmtGen::instantiate_assign(const VlNamedObj* parent,
   const PtControl* pt_control = pt_stmt->control();
 
   ElbVarLhsEnv env1(env);
-  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -87,7 +87,7 @@ StmtGen::instantiate_pca(const VlNamedObj* parent,
   const PtExpr* pt_lhs = pt_stmt->lhs();
   const PtExpr* pt_rhs = pt_stmt->rhs();
   ElbPcaLhsEnv env1(env);
-  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -115,7 +115,7 @@ StmtGen::instantiate_deassign(const VlNamedObj* parent,
 {
   const PtExpr* pt_lhs = pt_stmt->lhs();
   ElbPcaLhsEnv env1(env);
-  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -140,7 +140,7 @@ StmtGen::instantiate_force(const VlNamedObj* parent,
   const PtExpr* pt_lhs = pt_stmt->lhs();
   const PtExpr* pt_rhs = pt_stmt->rhs();
   ElbForceLhsEnv env1(env);
-  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }
@@ -168,7 +168,7 @@ StmtGen::instantiate_release(const VlNamedObj* parent,
 {
   const PtExpr* pt_lhs = pt_stmt->lhs();
   ElbForceLhsEnv env1(env);
-  ElbLhs* lhs = instantiate_lhs(parent, env1, pt_lhs);
+  ElbExpr* lhs = instantiate_lhs(parent, env1, pt_lhs);
   if ( !lhs ) {
     return NULL;
   }

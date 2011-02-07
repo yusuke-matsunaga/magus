@@ -12,7 +12,6 @@
 #include "EiPort.h"
 #include "ElbModule.h"
 #include "ElbExpr.h"
-#include "ElbLhs.h"
 
 #include "ym_verilog/pt/PtPort.h"
 
@@ -44,7 +43,7 @@ void
 EiPort::init(ElbModule* module,
 	     const PtPort* pt_port,
 	     ymuint index,
-	     ElbLhs* low_conn,
+	     ElbExpr* low_conn,
 	     tVpiDirection dir)
 {
   mModule = module;
@@ -58,7 +57,7 @@ EiPort::init(ElbModule* module,
 
 // @brief high_conn を接続する．
 void
-EiPort::set_high_conn(ElbLhs* high_conn,
+EiPort::set_high_conn(ElbExpr* high_conn,
 		      bool conn_by_name)
 {
   mHighConn = high_conn;
@@ -90,7 +89,7 @@ EiPort::direction() const
 int
 EiPort::bit_size() const
 {
-  return mLowConn->_expr()->bit_size();
+  return mLowConn->bit_size();
 }
 
 // @brief 名前による接続を持つとき true を返す．
@@ -132,68 +131,14 @@ EiPort::port_index() const
 const VlExpr*
 EiPort::high_conn() const
 {
-  if ( mHighConn != NULL ) {
-    return mHighConn->_expr();
-  }
-  return NULL;
-}
-
-// @brief high_conn が左辺式の時の要素数の取得
-// @note 通常は1だが，連結演算子の場合はその子供の数となる．
-// @note ただし，連結演算の入れ子はすべて平坦化して考える．
-ymuint
-EiPort::high_conn_elem_num() const
-{
-  if ( mHighConn != NULL ) {
-    return mHighConn->elem_num();
-  }
-  return 0;
-}
-
-// @brief high_conn が左辺式の時の要素の取得
-// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
-// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
-const VlExpr*
-EiPort::high_conn_elem(ymuint pos) const
-{
-  if ( mHighConn != NULL ) {
-    return mHighConn->elem(pos);
-  }
-  return NULL;
+  return mHighConn;
 }
 
 // @brief 下位の接続先を返す．
 const VlExpr*
 EiPort::low_conn() const
 {
-  if ( mLowConn != NULL ) {
-    return mLowConn->_expr();
-  }
-  return NULL;
-}
-
-// @brief low_conn が左辺式の時の要素数の取得
-// @note 通常は1だが，連結演算子の場合はその子供の数となる．
-// @note ただし，連結演算の入れ子はすべて平坦化して考える．
-ymuint
-EiPort::low_conn_elem_num() const
-{
-  if ( mLowConn != NULL ) {
-    return mLowConn->elem_num();
-  }
-  return 0;
-}
-
-// @brief low_conn が左辺式の時の要素の取得
-// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
-// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
-const VlExpr*
-EiPort::low_conn_elem(ymuint pos) const
-{
-  if ( mLowConn != NULL ) {
-    return mLowConn->elem(pos);
-  }
-  return NULL;
+  return mLowConn;
 }
 
 END_NAMESPACE_YM_VERILOG

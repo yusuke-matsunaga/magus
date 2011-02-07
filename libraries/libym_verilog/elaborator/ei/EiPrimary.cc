@@ -168,6 +168,27 @@ EiPrimary::decl_obj() const
   return mObj;
 }
 
+// @brief 左辺式の要素数の取得
+// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+// @note このクラスでは 1 を返す．
+ymuint
+EiPrimary::lhs_elem_num() const
+{
+  return 1;
+}
+
+// @brief 左辺式の要素の取得
+// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+// @note このクラスでは pos = 0 の時，自分自身を返す．
+const VlExpr*
+EiPrimary::lhs_elem(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return this;
+}
+
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -239,6 +260,27 @@ string
 EiDeclPrimary::decompile() const
 {
   return mPtObj->name();
+}
+
+// @brief 左辺式の要素数の取得
+// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+// @note このクラスでは 1 を返す．
+ymuint
+EiDeclPrimary::lhs_elem_num() const
+{
+  return 1;
+}
+
+// @brief 左辺式の要素の取得
+// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+// @note このクラスでは pos = 0 の時，自分自身を返す．
+const VlExpr*
+EiDeclPrimary::lhs_elem(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return this;
 }
 
 // @brief 要求される式の型を計算してセットする．
@@ -404,6 +446,27 @@ EiArrayElemPrimary::declarray_index(ymuint pos) const
   return mIndexList[pos];
 }
 
+// @brief 左辺式の要素数の取得
+// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+// @note このクラスでは 1 を返す．
+ymuint
+EiArrayElemPrimary::lhs_elem_num() const
+{
+  return 1;
+}
+
+// @brief 左辺式の要素の取得
+// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+// @note このクラスでは pos = 0 の時，自分自身を返す．
+const VlExpr*
+EiArrayElemPrimary::lhs_elem(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return this;
+}
+
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -506,6 +569,27 @@ ymuint
 EiConstArrayElemPrimary::declarray_offset() const
 {
   return mOffset;
+}
+
+// @brief 左辺式の要素数の取得
+// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+// @note ただし，連結演算の入れ子はすべて平坦化して考える．
+// @note このクラスでは 1 を返す．
+ymuint
+EiConstArrayElemPrimary::lhs_elem_num() const
+{
+  return 1;
+}
+
+// @brief 左辺式の要素の取得
+// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
+// @note このクラスでは pos = 0 の時，自分自身を返す．
+const VlExpr*
+EiConstArrayElemPrimary::lhs_elem(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return this;
 }
 
 // @brief 要求される式の型を計算してセットする．

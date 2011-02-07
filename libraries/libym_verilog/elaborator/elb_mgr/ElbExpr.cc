@@ -31,16 +31,6 @@ ElbExpr::~ElbExpr()
 {
 }
 
-// @brief オペランドを返す．
-// @param[in] pos 位置番号
-// @note 演算子の時，意味を持つ．
-// @note このクラスでは NULL を返す．
-ElbExpr*
-ElbExpr::_operand(ymuint pos) const
-{
-  return NULL;
-}
-
 // 二項演算のタイプとサイズを決める．
 tVpiValueType
 ElbExpr::calc_type(tVpiValueType type0,

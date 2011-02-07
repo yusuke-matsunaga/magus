@@ -207,7 +207,7 @@ ExprGen::instantiate_arg(const VlNamedObj* parent,
 // @param[in] pt_expr 式を表すパース木
 // @return 生成された ElbExpr のポインタを返す．
 // @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
-ElbLhs*
+ElbExpr*
 ExprGen::instantiate_lhs(const VlNamedObj* parent,
 			 const ElbEnv& env,
 			 const PtExpr* pt_expr)
@@ -219,7 +219,7 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
   }
   ymuint n = elem_array.size();
   if ( n == 1 ) {
-    return factory().new_Lhs(expr);
+    return expr;
   }
   else {
     return factory().new_Lhs(expr, elem_array);

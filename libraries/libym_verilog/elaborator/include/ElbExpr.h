@@ -57,7 +57,7 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   ElbExpr*
-  _operand(ymuint pos) const;
+  _operand(ymuint pos) const = 0;
 
 
 public:

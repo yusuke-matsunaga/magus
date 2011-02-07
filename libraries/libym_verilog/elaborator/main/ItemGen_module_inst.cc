@@ -25,7 +25,6 @@
 
 #include "ElbModule.h"
 #include "ElbExpr.h"
-#include "ElbLhs.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -391,10 +390,9 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       // 配列型インスタンスの場合 expr_size に制限がある．
       if ( port_size == expr_size ) {
 	// サイズが等しい場合はそのまま接続する．
-	ElbLhs* tmp_lhs = factory().new_Lhs(tmp);
 	for (ymuint i = 0; i < module_size; ++ i) {
 	  ElbModule* module1 = module_array->_module(i);
-	  module1->set_port_high_conn(index, tmp_lhs, conn_by_name);
+	  module1->set_port_high_conn(index, tmp, conn_by_name);
 	}
       }
       else if ( port_size * module_size == expr_size ) {
@@ -411,8 +409,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 	    int msb = lsb + port_size - 1;
 	    tmp1 = factory().new_PartSelect(pt_expr, tmp, msb, lsb);
 	  }
-	  ElbLhs* tmp_lhs = factory().new_Lhs(tmp1);
-	  module1->set_port_high_conn(index,tmp_lhs, conn_by_name);
+	  module1->set_port_high_conn(index, tmp1, conn_by_name);
 	}
       }
       else {
@@ -429,8 +426,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     }
     else {
       // それ以外の場合には左辺式のみが接続できる．
-      ElbLhs* tmp_lhs = instantiate_lhs(parent, env, pt_expr);
-      ElbExpr* tmp = tmp_lhs->_expr();
+      ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
       tVpiValueType type = tmp->value_type();
       if ( type == kVpiValueReal ) {
 	put_msg(__FILE__, __LINE__,
@@ -447,7 +443,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 	// 普通に考えていいアイデアとは思えない．
 	for (ymuint i = 0; i < module_size; ++ i) {
 	  ElbModule* module1 = module_array->_module(i);
-	  module1->set_port_high_conn(index, tmp_lhs, conn_by_name);
+	  module1->set_port_high_conn(index, tmp, conn_by_name);
 	}
       }
       else if ( expr_size == port_size * module_size ) {
@@ -625,13 +621,11 @@ ItemGen::link_module(ElbModule* module,
 	}
 	tmp->set_reqsize(pack(kVpiValueUS, port_size));
       }
-      ElbLhs* tmp_lhs = factory().new_Lhs(tmp);
-      module->set_port_high_conn(index, tmp_lhs, conn_by_name);
+      module->set_port_high_conn(index, tmp, conn_by_name);
     }
     else {
       // それ以外のポートに接続できるのは左辺式だけ．
-      ElbLhs* tmp_lhs = instantiate_lhs(parent, env, pt_expr);
-      ElbExpr* tmp = tmp_lhs->_expr();
+      ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
       tVpiValueType type = tmp->value_type();
       if ( type == kVpiValueReal ) {
 	put_msg(__FILE__, __LINE__,
@@ -642,7 +636,7 @@ ItemGen::link_module(ElbModule* module,
 	continue;
       }
       // 左辺はサイズの補正をしても意味がないのでそのまま接続する．
-      module->set_port_high_conn(index, tmp_lhs, conn_by_name);
+      module->set_port_high_conn(index, tmp, conn_by_name);
     }
 
     // attribute instance の生成

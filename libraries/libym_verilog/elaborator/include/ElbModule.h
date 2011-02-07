@@ -114,7 +114,7 @@ public:
   void
   init_port(ymuint index,
 	    const PtPort* pt_port,
-	    ElbLhs* low_conn,
+	    ElbExpr* low_conn,
 	    tVpiDirection dir) = 0;
 
   /// @brief ポートの high_conn を接続する．
@@ -124,7 +124,7 @@ public:
   virtual
   void
   set_port_high_conn(ymuint index,
-		     ElbLhs* high_conn,
+		     ElbExpr* high_conn,
 		     bool conn_by_name) = 0;
 
 
