@@ -164,10 +164,12 @@ private:
 
   /// @brief 継続的代入文の生成を行う．
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] cont_assign 継続的代入文
+  /// @param[in] lhs 左辺式
+  /// @param[in] rhs 右辺式
   void
   gen_cont_assign(MvModule* parent_module,
-		  const VlContAssign* cont_assign);
+		  const VlExpr* lhs,
+		  const VlExpr* rhs);
 
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール

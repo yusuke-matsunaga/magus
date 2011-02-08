@@ -580,7 +580,7 @@ ReaderImpl::gen_item(MvModule* module,
       for (vector<const VlContAssign*>::iterator p = contassign_list.begin();
 	   p != contassign_list.end(); ++ p) {
 	const VlContAssign* cont_assign = *p;
-	gen_cont_assign(module, cont_assign);
+	gen_cont_assign(module, cont_assign->lhs(), cont_assign->rhs());
       }
     }
   }
@@ -689,21 +689,13 @@ ReaderImpl::gen_moduleinst(const VlModule* vl_module,
     case kVpiInput:
       // hi は右辺式
       // lo は左辺式
-      {
-	MvNode* node1 = gen_expr(parent_module, hi, mGlobalEnv);
-	MvNode* dst_node = gen_primary(lo, mGlobalEnv);
-	connect_lhs(dst_node, lo, node1);
-      }
+      gen_cont_assign(parent_module, lo, hi);
       break;
 
     case kVpiOutput:
       // hi は左辺式
       // lo は右辺式
-      {
-	MvNode* node1 = gen_expr(parent_module, lo, mGlobalEnv);
-	MvNode* dst_node = gen_primary(hi, mGlobalEnv);
-	connect_lhs(dst_node, hi, node1);
-      }
+      gen_cont_assign(parent_module, hi, lo);
       break;
 
     case kVpiInout:
@@ -979,6 +971,8 @@ ReaderImpl::gen_stmt(MvModule* module,
       MvNode* cond_node = gen_expr(module, cond, env);
 
     }
+#else
+#warning "TODO: case 文"
 #endif
     break;
 
@@ -1250,14 +1244,14 @@ ReaderImpl::gen_priminst(MvModule* parent_module,
 
 // @brief 継続的代入文の生成を行う．
 // @param[in] parent_module 親のモジュール
-// @param[in] cont_assign 継続的代入文
+// @param[in] lhs 左辺式
+// @param[in] rhs 右辺式
 void
 ReaderImpl::gen_cont_assign(MvModule* parent_module,
-			    const VlContAssign* cont_assign)
+			    const VlExpr* lhs,
+			    const VlExpr* rhs)
 {
-  const VlExpr* rhs = cont_assign->rhs();
   MvNode* node = gen_expr(parent_module, rhs, mGlobalEnv);
-  const VlExpr* lhs = cont_assign->lhs();
   ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
   for (ymuint i = 0; i < n; i ++ ) {
