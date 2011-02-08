@@ -821,14 +821,17 @@ ReaderImpl::gen_stmt(MvModule* module,
 	const VlExpr* lhs1 = lhs->lhs_elem(i);
 	const VlDecl* lhs_decl = lhs1->decl_obj();
 	const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
+	const VlDeclBase* lhs_declbase = NULL;
 	ymuint bw;
 	MvNode* old_dst = NULL;
 	ymuint lhs_offset = 0;
 	if ( lhs_decl ) {
+	  lhs_declbase = lhs_decl;
 	  bw = lhs_decl->bit_size();
 	  old_dst = env.get(lhs_decl);
 	}
 	else if ( lhs_declarray ) {
+	  lhs_declbase = lhs_declarray;
 	  bw = lhs_declarray->bit_size();
 	  if ( lhs1->is_constant_select() ) {
 	    lhs_offset = lhs1->declarray_offset();
@@ -854,13 +857,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 	}
 	else if ( lhs1->is_bitselect() ) {
 	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-	  ymuint index;
-	  if ( lhs_decl ) {
-	    index = lhs_decl->bit_offset(lhs1->index_val());
-	  }
-	  else {
-	    index = lhs_declarray->bit_offset(lhs1->index_val());
-	  }
+	  ymuint index = lhs_declbase->bit_offset(lhs1->index_val());
 	  vector<ymuint> bw_array;
 	  bw_array.reserve(3);
 	  if ( index < bw - 1 ) {
@@ -894,16 +891,8 @@ ReaderImpl::gen_stmt(MvModule* module,
 	}
 	else if ( lhs1->is_partselect() ) {
 	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-	  ymuint msb;
-	  ymuint lsb;
-	  if ( lhs_decl ) {
-	    msb = lhs_decl->bit_offset(lhs1->left_range_val());
-	    lsb = lhs_decl->bit_offset(lhs1->right_range_val());
-	  }
-	  else {
-	    msb = lhs_declarray->bit_offset(lhs1->left_range_val());
-	    lsb = lhs_declarray->bit_offset(lhs1->right_range_val());
-	  }
+	  ymuint msb = lhs_declbase->bit_offset(lhs1->left_range_val());
+	  ymuint lsb = lhs_declbase->bit_offset(lhs1->right_range_val());
 	  vector<ymuint> bw_array;
 	  bw_array.reserve(3);
 	  if ( msb < bw - 1 ) {
