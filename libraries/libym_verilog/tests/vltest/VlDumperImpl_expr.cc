@@ -22,6 +22,7 @@
 #include <ym_verilog/vl/VlTaskFunc.h>
 #include <ym_verilog/vl/VlUserSystf.h>
 #include <ym_verilog/vl/VlDecl.h>
+#include <ym_verilog/vl/VlDeclArray.h>
 #include <ym_verilog/vl/VlPrimitive.h>
 
 
@@ -95,18 +96,7 @@ VlDumperImpl::put_expr(const char* label,
 
   default:
     if ( expr->is_bitselect() ) {
-      put("vpiConstantSelect", expr->is_constant_select());
-      if ( expr->decl_obj() ) {
-	put("vpiParent", expr->decl_obj()->full_name());
-	if ( expr->declarray_dimension() > 0 ) {
-	  for (ymuint i = 0; i < expr->declarray_dimension(); ++ i) {
-	    put_expr("array_index", mgr, expr->declarray_index(i));
-	  }
-	}
-      }
-      else {
-	put_expr("vpiParent", mgr, expr->parent_expr());
-      }
+      put_primary(mgr, expr);
       if ( expr->is_constant_select() ) {
 	put("vpiIndex", expr->index_val());
       }
@@ -116,45 +106,26 @@ VlDumperImpl::put_expr(const char* label,
 
     }
     else if ( expr->is_partselect() ) {
-      put("vpiConstantSelect", expr->is_constant_select());
-      if ( expr->decl_obj() ) {
-	put("vpiParent", expr->decl_obj()->full_name());
-	if ( expr->declarray_dimension() > 0 ) {
-	  for (ymuint i = 0; i < expr->declarray_dimension(); ++ i) {
-	    put_expr("array_index", mgr, expr->declarray_index(i));
-	  }
-	}
+      put_primary(mgr, expr);
+      const char* rm_str = NULL;
+      switch ( expr->range_mode() ) {
+      case kVpiConstRange: rm_str = "constant_range"; break;
+      case kVpiPlusRange:  rm_str = "plus_range"; break;
+      case kVpiMinusRange:  rm_str = "minus_range"; break;
+      default: assert_not_reached(__FILE__, __LINE__);
       }
-      else {
-	put_expr("vpiParent", mgr, expr->parent_expr());
-      }
+      put("range_mode", rm_str);
       if ( expr->is_constant_select() ) {
 	put("vpiLeftRange", expr->left_range_val());
 	put("vpiRightRange", expr->right_range_val());
       }
       else {
-	put_expr("vpiLeftRange", mgr, expr->left_range());
-	put_expr("vpiRightRange", mgr, expr->right_range());
+	put_expr("base", mgr, expr->base());
+	put("range", expr->range_width());
       }
     }
     else if ( expr->is_primary() ) {
-      if ( expr->decl_obj() ) {
-	put("decl_obj", expr->decl_obj()->full_name());
-	if ( expr->declarray_dimension() > 0 ) {
-	  for (ymuint i = 0; i < expr->declarray_dimension(); ++ i) {
-	    put_expr("array_index", mgr, expr->declarray_index(i));
-	  }
-	}
-      }
-      else if ( expr->scope_obj() ) {
-	put("scope_obj", expr->scope_obj()->full_name());
-      }
-      else if ( expr->primitive_obj() ) {
-	put("primitive_obj", expr->primitive_obj()->full_name());
-      }
-      else {
-	assert_not_reached(__FILE__, __LINE__);
-      }
+      put_primary(mgr, expr);
     }
     else {
       assert_not_reached(__FILE__, __LINE__);
@@ -179,111 +150,38 @@ VlDumperImpl::put_lhs(const char* label,
   }
 }
 
-#if 0
-// func call の内容を式として出力する関数
-// IEEE 1364-2001 p. 650
+// @brief プライマリ式を出力する関数
 void
-VlDumperImpl::put_func_call(const char* label,
-			    const VpiHandle& handle)
+VlDumperImpl::put_primary(const VlMgr& mgr,
+			  const VlExpr* expr)
 {
-  VlDumpHeader x(*this, label, "FuncCall");
-
-  put("FileRegion", handle.file_region());
-
-  put("vpiName", handle.get_str(vpiName));
-  put_str("vpiFunction", handle.get_handle(vpiFunction), vpiFullName);
-  put("vpiFuncType",
-      static_cast<tVpiFuncType>(handle.get_int(vpiFuncType)));
-
-  put("vpiArgument", handle.get_iterate(vpiArgument));
+  if ( expr->decl_obj() ) {
+    put("decl_obj", expr->decl_obj()->full_name());
+  }
+  else if ( expr->declarray_obj() ) {
+    put("declarray_obj", expr->declarray_obj()->full_name());
+    if ( expr->is_constant_select() ) {
+      put("offset", expr->declarray_offset());
+    }
+    else {
+      for (ymuint i = 0; i < expr->declarray_dimension(); ++ i) {
+	put_expr("array_index", mgr, expr->declarray_index(i));
+      }
+    }
+  }
+  else if ( expr->scope_obj() ) {
+    put("scope_obj", expr->scope_obj()->full_name());
+  }
+  else if ( expr->primitive_obj() ) {
+    put("primitive_obj", expr->primitive_obj()->full_name());
+  }
+  else if( expr->parent_expr() ) {
+    put_expr("parent", mgr, expr->parent_expr());
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
 }
-
-// system func call の内容を式として出力する関数
-// IEEE 1364-2001 p.650
-void
-VlDumperImpl::put_sys_func_call(const char* label,
-				const VpiHandle& handle)
-{
-  VlDumpHeader x(*this, label, "SystemFuncCall");
-
-  put("FileRegion", handle.file_region());
-
-  put("vpiName", handle.get_str(vpiName));
-  put("vpiUserDefn", handle.get_bool(vpiUserDefn));
-  put("vpiFuncType",
-      static_cast<tVpiFuncType>(handle.get_int(vpiFuncType)));
-  put("vpiUserSystf", handle.get_handle(vpiUserSystf));
-
-  put("vpiArgument", handle.get_iterate(vpiArgument));
-}
-
-// bit select の内容を式として出力する関数
-// IEEE 1364-2001 p.654
-void
-VlDumperImpl::put_bit_select(const char* label,
-			  const VpiHandle& handle)
-{
-  VlDumpHeader x(*this, label, "bit select");
-
-  put("FileRegion", handle.file_region());
-
-  put("vpiConstantSelect", handle.get_bool(vpiConstantSelect));
-  put_str("vpiParent", handle.get_handle(vpiParent), vpiFullName);
-
-  put("vpiIndex", handle.get_handle(vpiIndex));
-
-  put("vpiUse", handle.get_iterate(vpiUse));
-}
-
-// part select の内容を式として出力する関数
-// IEEE 1364-2001 p.655
-void
-VlDumperImpl::put_part_select(const char* label,
-			   const VpiHandle& handle)
-{
-  VlDumpHeader x(*this, label, "PartSelect");
-
-  put("FileRegion", handle.file_region());
-
-  put("vpiConstantSelect", handle.get_bool(vpiConstantSelect));
-  put_str("vpiParent", handle.get_handle(vpiParent), vpiFullName);
-
-  put("vpiSize", handle.get_int(vpiSize));
-  put("vpiLeftRange", handle.get_handle(vpiLeftRange));
-  put("vpiRightRange", handle.get_handle(vpiRightRange));
-}
-
-// operation の内容を式として出力する関数
-// IEEE 1364-2001 p.655
-void
-VlDumperImpl::put_operation(const char* label,
-			 const VpiHandle& handle)
-{
-  VlDumpHeader x(*this, label, "Operation");
-
-  put("FileRegion", handle.file_region());
-
-  put("vpiSize", handle.get_int(vpiSize));
-  put("vpiOpType", static_cast<tVpiOpType>(handle.get_int(vpiOpType)));
-  put("vpiOperand", handle.get_iterate(vpiOperand));
-}
-
-// constant の内容を式として出力する関数
-// IEEE 1364-2001 p.655
-void
-VlDumperImpl::put_constant(const char* label,
-			const VpiHandle& handle)
-{
-  VlDumpHeader x(*this, label, "Constant");
-
-  put("FileRegion", handle.file_region());
-
-  put("vpiSize", handle.get_int(vpiSize));
-  put("vpiConstType",
-      static_cast<tVpiConstType>(handle.get_int(vpiConstType)));
-  put("vpiDecompile", handle.get_str(vpiDecompile));
-}
-#endif
 
 // @brief 遅延値を出力する関数
 void

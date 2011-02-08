@@ -5,7 +5,7 @@
 ///
 /// $Id: ExprGen_primary.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -231,28 +231,60 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
       {
 	const PtExpr* pt_base = pt_expr->left_range();
 	const PtExpr* pt_range = pt_expr->right_range();
-	ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
 	int range_val;
-	bool stat = evaluate_int(parent, pt_range, range_val, true);
-	if ( base == NULL || !stat ) {
+	bool stat1 = evaluate_int(parent, pt_range, range_val, true);
+	if ( !stat1 ) {
+	  // range は常に固定でなければならない．
 	  return NULL;
 	}
-	return factory().new_PlusPartSelect(pt_expr, primary,
-					    base, pt_range, range_val);
+	int base_val;
+	bool stat2 = evaluate_int(parent, pt_base, base_val, false);
+	if ( stat2 ) {
+	  // 固定インデックスだった．
+	  int index1_val = base_val + range_val - 1;
+	  int index2_val = base_val;
+	  return factory().new_PartSelect(pt_expr, primary,
+					  pt_base, pt_range,
+					  index1_val, index2_val);
+	}
+	else {
+	  ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
+	  if ( !base ) {
+	    return NULL;
+	  }
+	  return factory().new_PlusPartSelect(pt_expr, primary,
+					      base, pt_range, range_val);
+	}
       }
 
     case kVpiMinusRange:
       {
 	const PtExpr* pt_base = pt_expr->left_range();
 	const PtExpr* pt_range = pt_expr->right_range();
-	ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
 	int range_val;
-	bool stat = evaluate_int(parent, pt_range, range_val, true);
-	if ( base == NULL || !stat ) {
+	bool stat1 = evaluate_int(parent, pt_range, range_val, true);
+	if ( !stat1 ) {
+	  // range は常に固定でなければならない．
 	  return NULL;
 	}
-	return factory().new_MinusPartSelect(pt_expr, primary,
-					     base, pt_range, range_val);
+	int base_val;
+	bool stat2 = evaluate_int(parent, pt_base, base_val, false);
+	if ( stat2 ) {
+	  // 固定インデックスだった．
+	  int index1_val = base_val;
+	  int index2_val = base_val - range_val + 1;
+	  return factory().new_PartSelect(pt_expr, primary,
+					  pt_base, pt_range,
+					  index1_val, index2_val);
+	}
+	else {
+	  ElbExpr* base = instantiate_expr(parent, index_env, pt_base);
+	  if ( !base ) {
+	    return NULL;
+	  }
+	  return factory().new_MinusPartSelect(pt_expr, primary,
+					       base, pt_range, range_val);
+	}
       }
 
     case kVpiNoRange:

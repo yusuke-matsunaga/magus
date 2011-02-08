@@ -296,6 +296,11 @@ public:
 	  const VlMgr& mgr,
 	  const VlExpr* expr);
 
+  /// @brief プライマリ式を出力する関数
+  void
+  put_primary(const VlMgr& mgr,
+	      const VlExpr* expr);
+
   /// @brief 遅延値を出力する関数
   void
   put_delay(const char* label,
