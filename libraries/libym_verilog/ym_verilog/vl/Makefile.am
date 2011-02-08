@@ -15,6 +15,8 @@ noinst_HEADERS = \
 	VlContAssign.h \
 	VlControl.h \
 	VlDecl.h \
+	VlDeclArray.h \
+	VlDeclBase.h \
 	VlDelay.h \
 	VlExpr.h \
 	VlFwd.h \

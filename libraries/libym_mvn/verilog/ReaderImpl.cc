@@ -813,13 +813,14 @@ ReaderImpl::gen_stmt(MvModule* module,
   case kVpiAssignment:
     {
       const VlExpr* rhs = stmt->rhs();
+      const VlExpr* lhs = stmt->lhs();
       MvNode* node = gen_expr(module, rhs, env);
-      ymuint n = stmt->lhs()->lhs_elem_num();
+      ymuint n = lhs->lhs_elem_num();
       ymuint offset = 0;
       for (ymuint i = 0; i < n; ++ i) {
-	const VlExpr* lhs = stmt->lhs()->lhs_elem(i);
-	const VlDecl* lhs_decl = lhs->decl_obj();
-	const VlDeclArray* lhs_declarray = lhs->declarray_obj();
+	const VlExpr* lhs1 = lhs->lhs_elem(i);
+	const VlDecl* lhs_decl = lhs1->decl_obj();
+	const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
 	ymuint bw;
 	MvNode* old_dst = NULL;
 	ymuint lhs_offset = 0;
@@ -829,15 +830,16 @@ ReaderImpl::gen_stmt(MvModule* module,
 	}
 	else if ( lhs_declarray ) {
 	  bw = lhs_declarray->bit_size();
-	  if ( lhs->is_constant_select() ) {
-	    lhs_offset = lhs->declarray_offset();
+	  if ( lhs1->is_constant_select() ) {
+	    lhs_offset = lhs1->declarray_offset();
 	    old_dst = env.get(lhs_declarray, lhs_offset);
 	  }
 	  else {
-	    assert_cond( lhs->declarray_dimension() == lhs_declarray->dimension(),
+	    assert_cond( lhs1->declarray_dimension()
+			 == lhs_declarray->dimension(),
 			 __FILE__, __LINE__ );
 	    // lhs_offset は lhs->declarray_index() から計算される．
-#warning "TODO: 配列の時の処理"
+#warning "TODO: 配列の可変インデックス時の処理"
 	  }
 	}
 	else {
@@ -846,13 +848,19 @@ ReaderImpl::gen_stmt(MvModule* module,
 
 	MvNode* src_node = gen_rhs(module, node, offset, bw);
 	MvNode* dst_node = NULL;
-	if ( lhs->is_primary() ) {
+	if ( lhs1->is_primary() ) {
 	  dst_node = mMvMgr->new_through(module, bw);
 	  mMvMgr->connect(src_node, 0, dst_node, 0);
 	}
-	else if ( lhs->is_bitselect() ) {
-	  assert_cond( lhs->is_constant_select(), __FILE__, __LINE__);
-	  ymuint index = lhs_decl->bit_offset(lhs->index_val());
+	else if ( lhs1->is_bitselect() ) {
+	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
+	  ymuint index;
+	  if ( lhs_decl ) {
+	    index = lhs_decl->bit_offset(lhs1->index_val());
+	  }
+	  else {
+	    index = lhs_declarray->bit_offset(lhs1->index_val());
+	  }
 	  vector<ymuint> bw_array;
 	  bw_array.reserve(3);
 	  if ( index < bw - 1 ) {
@@ -884,10 +892,18 @@ ReaderImpl::gen_stmt(MvModule* module,
 	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
 	  }
 	}
-	else if ( lhs->is_partselect() ) {
-	  assert_cond( lhs->is_constant_select(), __FILE__, __LINE__);
-	  ymuint msb = lhs_decl->bit_offset(lhs->left_range_val());
-	  ymuint lsb = lhs_decl->bit_offset(lhs->right_range_val());
+	else if ( lhs1->is_partselect() ) {
+	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
+	  ymuint msb;
+	  ymuint lsb;
+	  if ( lhs_decl ) {
+	    msb = lhs_decl->bit_offset(lhs1->left_range_val());
+	    lsb = lhs_decl->bit_offset(lhs1->right_range_val());
+	  }
+	  else {
+	    msb = lhs_declarray->bit_offset(lhs1->left_range_val());
+	    lsb = lhs_declarray->bit_offset(lhs1->right_range_val());
+	  }
 	  vector<ymuint> bw_array;
 	  bw_array.reserve(3);
 	  if ( msb < bw - 1 ) {
@@ -926,7 +942,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 	else {
 	  env.add(lhs_declarray, lhs_offset, dst_node);
 	}
-	offset += lhs->bit_size();
+	offset += lhs1->bit_size();
       }
     }
     break;
