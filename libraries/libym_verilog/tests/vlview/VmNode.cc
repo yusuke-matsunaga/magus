@@ -144,7 +144,7 @@ VmNode1::add_scope_item(const VlNamedObj* scope) const
   }
   {
     vector<const VlNamedObj*> scope_list;
-    if ( vl_mgr().find_genblock_list(scope, scope_list) ) {
+    if ( vl_mgr().find_internalscope_list(scope, scope_list) ) {
       add_scopelist(scope_list);
     }
   }
