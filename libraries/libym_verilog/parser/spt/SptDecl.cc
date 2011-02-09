@@ -799,9 +799,18 @@ SptFactory::new_VarH(const FileRegion& file_region,
 		     tVpiVarType var_type)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
+  bool sign = false;
+  switch ( var_type ) {
+  case kVpiVarInteger:
+  case kVpiVarReal:
+  case kVpiVarRealtime:
+    sign = true;
+  default:
+    break;
+  }
   return new (p) SptDeclHead(file_region,
 			     kPtDecl_Var,
-			     false, NULL, NULL,
+			     sign, NULL, NULL,
 			     var_type, kVpiNone, kVpiVsNone,
 			     NULL, NULL);
 }

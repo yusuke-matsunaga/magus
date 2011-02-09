@@ -358,6 +358,22 @@ CptParamHT::type() const
   return kPtDecl_Param;
 }
 
+// @brief 符号の取得
+// @retval true 符号つき
+// @retval false 符号なし
+bool
+CptParamHT::is_signed() const
+{
+  switch ( data_type() ) {
+  case kVpiVarInteger:
+  case kVpiVarReal:
+  case kVpiVarRealtime:
+    return true;
+  default:
+    return false;
+  }
+}
+
 // データ型の取得
 // @retval データ型 kParam, kLocalParam, kVar の場合
 // @retval kVpiVarNone 上記以外
@@ -540,6 +556,22 @@ tPtDeclType
 CptVarH::type() const
 {
   return kPtDecl_Var;
+}
+
+// @brief 符号の取得
+// @retval true 符号つき
+// @retval false 符号なし
+bool
+CptVarH::is_signed() const
+{
+  switch ( data_type() ) {
+  case kVpiVarInteger:
+  case kVpiVarReal:
+  case kVpiVarRealtime:
+    return true;
+  default:
+    return false;
+  }
 }
 
 // データ型の取得

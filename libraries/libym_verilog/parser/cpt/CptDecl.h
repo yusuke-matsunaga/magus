@@ -425,6 +425,13 @@ public:
   tPtDeclType
   type() const;
 
+  /// @brief 符号の取得
+  /// @retval true 符号つき
+  /// @retval false 符号なし
+  virtual
+  bool
+  is_signed() const;
+
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
   /// @retval kVpiVarNone 上記以外
@@ -672,6 +679,13 @@ public:
   virtual
   tPtDeclType
   type() const;
+
+  /// @brief 符号の取得
+  /// @retval true 符号つき
+  /// @retval false 符号なし
+  virtual
+  bool
+  is_signed() const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
