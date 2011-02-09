@@ -93,6 +93,12 @@ public:
   bool
   is_sysfunccall() const = 0;
 
+  /// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlDeclBase*
+  decl_base() const = 0;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
   /// @note それ以外では NULL を返す．
   virtual

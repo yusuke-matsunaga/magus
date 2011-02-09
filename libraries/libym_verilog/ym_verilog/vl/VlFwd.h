@@ -22,6 +22,9 @@ class VlObj;
 // in VlNamedObj.h
 class VlNamedObj;
 
+// in VlDeclBase.h
+class VlDeclBase;
+
 // in VlDecl.h
 class VlDecl;
 

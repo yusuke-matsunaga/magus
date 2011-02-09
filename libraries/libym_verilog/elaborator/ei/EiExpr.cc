@@ -106,6 +106,14 @@ EiExpr::is_sysfunccall() const
   return false;
 }
 
+// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+// @note それ以外では NULL を返す．
+const VlDeclBase*
+EiExpr::decl_base() const
+{
+  return NULL;
+}
+
 // @brief 対象のオブジェクトを返す．
 // @note プライマリ，ビット選択，部分選択の時，意味を持つ．
 // @note このクラスでは NULL を返す．

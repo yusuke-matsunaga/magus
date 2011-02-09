@@ -196,6 +196,14 @@ EiPrimary::is_const() const
   return false;
 }
 
+// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+// @note それ以外では NULL を返す．
+const VlDeclBase*
+EiPrimary::decl_base() const
+{
+  return mObj;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*
@@ -272,6 +280,14 @@ bool
 EiDeclPrimary::is_primary() const
 {
   return true;
+}
+
+// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+// @note それ以外では NULL を返す．
+const VlDeclBase*
+EiDeclPrimary::decl_base() const
+{
+  return mObj;;
 }
 
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
@@ -378,6 +394,14 @@ EiParamPrimary::is_const() const
   return true;
 }
 
+// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+// @note それ以外では NULL を返す．
+const VlDeclBase*
+EiParamPrimary::decl_base() const
+{
+  return mObj;
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*
@@ -433,6 +457,14 @@ EiArrayElemPrimary::is_const() const
 {
   // 配列要素は定数ではない．
   return false;
+}
+
+// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+// @note それ以外では NULL を返す．
+const VlDeclBase*
+EiArrayElemPrimary::decl_base() const
+{
+  return mObj;
 }
 
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
