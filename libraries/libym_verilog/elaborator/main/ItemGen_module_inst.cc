@@ -104,9 +104,13 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 						  pt_inst);
 	reg_module(module1);
 
+#if 0
 	// attribute instance の生成
-	//instantiate_attribute(pt_module->attr_top(), true, module1);
-	//instantiate_attribute(pt_head->attr_top(), false, module1);
+	instantiate_attribute(pt_module->attr_top(), true, module1);
+	instantiate_attribute(pt_head->attr_top(), false, module1);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
 	ostringstream buf;
 	buf << "\"" << module1->full_name() << "\" has been created.";
@@ -244,9 +248,13 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   for (ymuint i = 0; i < n; ++ i) {
     ElbModule* module1 = module_array->_module(i);
 
+#if 0
     // attribute instance の生成
-    //instantiate_attribute(pt_module->attr_top(), true, module1);
-    //instantiate_attribute(pt_head->attr_top(), false, module1);
+    instantiate_attribute(pt_module->attr_top(), true, module1);
+    instantiate_attribute(pt_head->attr_top(), false, module1);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
     ostringstream buf;
     buf << "\"" << module1->full_name() << "\" has been created.";
@@ -448,7 +456,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       }
       else if ( expr_size == port_size * module_size ) {
 	// 式を分割する．
-#warning "TODO"
+#warning "TODO:2011-02-09-03"
       }
       else {
 	// サイズが合わない．
@@ -464,8 +472,8 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       }
     }
 
-    // attribute の設定を行う．
-#if 0 // attribute instance の設定
+#if 0
+    // attribute instance の設定
     for (ymuint i = 0; i < module_size; ++ i) {
       ElbModule* module1 = module_array->_module(i);
       const VlPort* port = module1->port(index);
@@ -473,6 +481,8 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       // attribute instance の生成
       instantiate_attribute(pt_con->attr_top(), false, port);
     }
+#else
+#warning "TODO:2011-02-09-01"
 #endif
   }
 }
@@ -639,8 +649,12 @@ ItemGen::link_module(ElbModule* module,
       module->set_port_high_conn(index, tmp, conn_by_name);
     }
 
+#if 0
     // attribute instance の生成
-    //instantiate_attribute(pt_con->attr_top(), false, port);
+    instantiate_attribute(pt_con->attr_top(), false, port);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
   }
 }
 

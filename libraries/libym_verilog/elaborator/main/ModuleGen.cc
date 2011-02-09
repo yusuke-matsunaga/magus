@@ -77,8 +77,12 @@ ModuleGen::phase1_topmodule(const VlNamedObj* toplevel,
 					   NULL);
   reg_module(module);
 
+#if 0
   // attribute instance の生成
-  //instantiate_attribute(pt_module->attr_top(), true, module);
+  instantiate_attribute(pt_module->attr_top(), true, module);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
   ostringstream buf2;
   buf2 << "module \"" << module->full_name() << "\" has been created.";

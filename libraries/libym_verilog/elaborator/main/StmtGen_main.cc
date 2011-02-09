@@ -311,8 +311,12 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     assert_not_reached(__FILE__, __LINE__);
   }
   if ( stmt ) {
+#if 0
     // attribute instance の生成
-    //instantiate_attribute(pt_stmt->attr_top(), false, stmt);
+    instantiate_attribute(pt_stmt->attr_top(), false, stmt);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
   }
 
   return stmt;

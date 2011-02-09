@@ -1,3 +1,29 @@
+2011-02-09  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
+
+	* ExprGen_funccall.cc : システム関数呼び出しの引数の個数と型のチェッ
+	ク
+	TODO:2011-02-09-04
+
+	* ExprGen_funccall.cc : evaluate_funccall() 未完
+	TODO:2011-02-09-05
+
+2011-02-09  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
+
+	* ItemGen_module_inst.cc : 配列型モジュールインスタンスの接続をイ
+	ンスタンスごとに分割する場合の処理
+	TODO:2011-02-09-03
+
+2011-02-09  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
+
+	* mine/bitvector_e.v : 範囲外の指定がエラーにならない．
+	それともこれは実行時/合成時にエラーにするの？
+	TODO:2011-02-09-02
+
+2011-02-09  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
+
+	* ModuleGen.cc など : attribute instance の生成および関連付け
+	TODO:2011-02-09-01
+
 2007-12-11  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
 
 	* default_nettype none で input のみ宣言するとエラーになる(これは想定内)
@@ -6,8 +32,3 @@
 	mine/defnet_e.v
 
 	* 日時不明で対応済
-
-2011-02-09  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
-
-	* ModuleGen.cc など : attribute instance の生成および関連付け
-

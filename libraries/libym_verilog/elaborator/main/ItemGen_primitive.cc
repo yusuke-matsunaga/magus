@@ -106,8 +106,12 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 				       left_val, right_val);
       reg_primarray(prim_array);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, prim_array);
+      instantiate_attribute(pt_head->attr_top(), false, prim_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "instantiating primitive array: " << prim_array->full_name();
@@ -126,8 +130,12 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 						   pt_inst);
       reg_primitive(prim);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, prim);
+      instantiate_attribute(pt_head->attr_top(), false, prim);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "instantiating primitive: " << prim->full_name();
@@ -206,8 +214,12 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 				       left_val, right_val);
       reg_primarray(prim_array);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, prim_array);
+      instantiate_attribute(pt_head->attr_top(), false, prim_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       add_phase3stub(make_stub(this, &ItemGen::link_prim_array,
 			       prim_array, pt_inst));
@@ -219,8 +231,12 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 				  pt_inst);
       reg_primitive(primitive);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, primitive);
+      instantiate_attribute(pt_head->attr_top(), false, primitive);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       add_phase3stub(make_stub(this, &ItemGen::link_primitive,
 			       primitive, pt_inst));

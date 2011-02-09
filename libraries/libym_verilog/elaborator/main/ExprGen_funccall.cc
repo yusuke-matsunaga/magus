@@ -169,8 +169,12 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
   // function call の生成
   ElbExpr* expr = factory().new_FuncCall(pt_expr, child_func, n, arg_list);
 
+#if 0
   // attribute instance の生成
-  //instantiate_attribute(pt_expr->attr_top(), false, expr);
+  instantiate_attribute(pt_expr->attr_top(), false, expr);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
   return expr;
 }
@@ -193,7 +197,7 @@ ExprGen::instantiate_sysfunccall(const VlNamedObj* parent,
     return NULL;
   }
 
-#warning "TODO: 引数の個数と型のチェック"
+#warning "TODO: 2011-02-09-04 引数の個数と型のチェック"
 
   // 引数の生成
   ymuint n = pt_expr->operand_num();
@@ -230,6 +234,7 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
 			   const PtExpr* pt_expr,
 			   bool put_error)
 {
+#if 0 // evaluate_funccall 未完
   // 定数関数を探し出す．
 
   // 階層名は使えない．
@@ -319,10 +324,10 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
     arg_list[i] = val1;
   }
 
-#if 0 // evaluate_funccall 未完
   // function call の生成
   ElbExpr* expr = factory().new_FuncCall(pt_expr, child_func, n, arg_list);
 #else
+#warning "TODO:2011-02-09-05"
   return VlValue();
 #endif
 }

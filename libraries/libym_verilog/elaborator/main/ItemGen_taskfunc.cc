@@ -86,8 +86,12 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
   // parameter の生成
   phase1_decl(taskfunc, pt_item->declhead_array(), false);
 
+#if 0
   // attribute instance の生成
-  //instantiate_attribute(pt_item->attr_top(), false, taskfunc);
+  instantiate_attribute(pt_item->attr_top(), false, taskfunc);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
   ostringstream buf;
   buf << "instantiating task/func : " << taskfunc->full_name() << ".";

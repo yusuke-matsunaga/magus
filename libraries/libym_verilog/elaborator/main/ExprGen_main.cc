@@ -133,8 +133,12 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
 	ElbExpr* expr = factory().new_UnaryOp(pt_expr,
 					      pt_expr->op_type(), opr0);
 
+#if 0
 	// attribute instance の生成
-	//instantiate_attribute(pt_expr->attr_top(), false, expr);
+	instantiate_attribute(pt_expr->attr_top(), false, expr);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
 	return expr;
       }
@@ -239,8 +243,12 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
 					n, lhs_elem_array);
       expr->set_selfsize();
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_expr->attr_top(), false, expr);
+      instantiate_attribute(pt_expr->attr_top(), false, expr);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       return expr;
     }
@@ -306,8 +314,12 @@ ExprGen::instantiate_lhs_sub(const VlNamedObj* parent,
       ElbExpr* expr = factory().new_ConcatOp(pt_expr, opr_size, opr_list);
       expr->set_selfsize();
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_expr->attr_top(), false, expr);
+      instantiate_attribute(pt_expr->attr_top(), false, expr);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       return expr;
     }

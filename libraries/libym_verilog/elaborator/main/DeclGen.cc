@@ -475,8 +475,12 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
     assert_cond(param, __FILE__, __LINE__);
     reg_parameter(kVpiParameter, param);
 
+#if 0
     // attribute instance の生成
-    //instantiate_attribute(pt_head->attr_top(), false, param);
+    instantiate_attribute(pt_head->attr_top(), false, param);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
     ostringstream buf;
     buf << "Parameter(" << param->full_name() << ") created.";
@@ -560,8 +564,12 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
 							range_src);
       reg_declarray(vpiNetArray, net_array);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, net_array);
+      instantiate_attribute(pt_head->attr_top(), false, net_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "NetArray(" << net_array->full_name() << ") created.";
@@ -583,8 +591,12 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
 				 net, pt_item));
       }
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, net);
+      instantiate_attribute(pt_head->attr_top(), false, net);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "Net(" << net->full_name() << ") created.";
@@ -682,8 +694,12 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
 							range_src);
       reg_declarray(vpiRegArray, reg_array);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, reg_array);
+      instantiate_attribute(pt_head->attr_top(), false, reg_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "RegArray(" << reg_array->full_name() << ") created.";
@@ -707,8 +723,12 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
       ElbDecl* reg = factory().new_Decl(reg_head, pt_item, init);
       reg_decl(vpiReg, reg);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, reg);
+      instantiate_attribute(pt_head->attr_top(), false, reg);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "Reg(" << reg->full_name() << ") created.";
@@ -753,8 +773,12 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
 							range_src);
       reg_declarray(vpiVariables, var_array);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, var_array);
+      instantiate_attribute(pt_head->attr_top(), false, var_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "VarArray(" << var_array->full_name() << ") created.";
@@ -778,8 +802,12 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
       ElbDecl* var = factory().new_Decl(var_head, pt_item, init);
       reg_decl(vpiVariables, var);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, var);
+      instantiate_attribute(pt_head->attr_top(), false, var);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "Var(" << var->full_name() << ") created.";
@@ -818,8 +846,12 @@ DeclGen::instantiate_event_head(const VlNamedObj* parent,
 						       range_src);
       reg_declarray(vpiNamedEventArray, ne_array);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, ne_array);
+      instantiate_attribute(pt_head->attr_top(), false, ne_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "NamedEventArray(" << ne_array->full_name() << ") created.";
@@ -835,8 +867,12 @@ DeclGen::instantiate_event_head(const VlNamedObj* parent,
 						pt_item);
       reg_decl(vpiNamedEvent, named_event);
 
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, named_event);
+      instantiate_attribute(pt_head->attr_top(), false, named_event);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "NamedEvent(" << named_event->full_name() << ") created.";

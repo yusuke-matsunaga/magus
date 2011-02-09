@@ -174,8 +174,12 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
     return NULL;
   }
 
+#if 0
   // attribute instance の生成
-  //instantiate_attribute(pt_expr->attr_top(), false, expr);
+  instantiate_attribute(pt_expr->attr_top(), false, expr);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
   return expr;
 }
