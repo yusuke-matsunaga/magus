@@ -217,6 +217,10 @@ ElbMgr::reg_declarray(int tag,
   }
   mObjDict.add(obj);
   if ( tag ) {
+    if ( tag == vpiVariables ) {
+      // ちょっと汚い補正
+      tag += 100;
+    }
     mTagDict.add_declarray(tag, obj);
   }
 }

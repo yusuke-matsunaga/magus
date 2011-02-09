@@ -475,6 +475,10 @@ ElbMgr::find_declarray_list(const VlNamedObj* parent,
 			    int tag,
 			    vector<const VlDeclArray*>& declarray_list) const
 {
+  if ( tag == vpiVariables ) {
+    // ちょっと汚い補正
+    tag += 100;
+  }
   return mTagDict.find_declarray_list(parent, tag, declarray_list);
 }
 
