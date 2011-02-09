@@ -821,17 +821,15 @@ ReaderImpl::gen_stmt(MvModule* module,
 	const VlExpr* lhs1 = lhs->lhs_elem(i);
 	const VlDecl* lhs_decl = lhs1->decl_obj();
 	const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
-	const VlDeclBase* lhs_declbase = NULL;
+	const VlDeclBase* lhs_declbase = lhs1->decl_base();
 	ymuint bw;
 	MvNode* old_dst = NULL;
 	ymuint lhs_offset = 0;
 	if ( lhs_decl ) {
-	  lhs_declbase = lhs_decl;
 	  bw = lhs_decl->bit_size();
 	  old_dst = env.get(lhs_decl);
 	}
 	else if ( lhs_declarray ) {
-	  lhs_declbase = lhs_declarray;
 	  bw = lhs_declarray->bit_size();
 	  if ( lhs1->is_constant_select() ) {
 	    lhs_offset = lhs1->declarray_offset();
@@ -1337,13 +1335,13 @@ ReaderImpl::connect_lhs(MvNode* dst_node,
   }
   else if ( expr->is_bitselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-    const VlDecl* decl = expr->decl_obj();
+    const VlDeclBase* decl = expr->decl_base();
     ymuint index = decl->bit_offset(expr->index_val());
     reg_driver(dst_node, Driver(src_node, index));
   }
   else if ( expr->is_partselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-    const VlDecl* decl = expr->decl_obj();
+    const VlDeclBase* decl = expr->decl_base();
     ymuint msb = decl->bit_offset(expr->left_range_val());
     ymuint lsb = decl->bit_offset(expr->right_range_val());
     assert_cond( src_node->output(0)->bit_width() == msb - lsb + 1,
@@ -1810,7 +1808,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
   }
   if ( expr->is_bitselect() ) {
     if ( expr->is_constant_select() ) {
-      const VlDecl* decl = expr->decl_obj();
+      const VlDeclBase* decl = expr->decl_base();
       ymuint bitpos = decl->bit_offset(expr->index_val());
       const MvOutputPin* pin = node->output(0);
       MvNode* node1 = mMvMgr->new_constbitselect(parent_module,
@@ -1835,7 +1833,7 @@ ReaderImpl::gen_expr(MvModule* parent_module,
   }
   if ( expr->is_partselect() ) {
     if ( expr->is_constant_select() ) {
-      const VlDecl* decl = expr->decl_obj();
+      const VlDeclBase* decl = expr->decl_base();
       ymuint msb = decl->bit_offset(expr->left_range_val());
       ymuint lsb = decl->bit_offset(expr->right_range_val());
       const MvOutputPin* pin = node->output(0);
