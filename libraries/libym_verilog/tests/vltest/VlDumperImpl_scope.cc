@@ -84,7 +84,7 @@ VlDumperImpl::put_scope_sub(const VlMgr& mgr,
   }
 
   vector<const VlNamedObj*> scope_list;
-  if ( mgr.find_genblock_list(scope, scope_list) ) {
+  if ( mgr.find_internalscope_list(scope, scope_list) ) {
     VlDumpHeader x(this, "vpiInternalScope", "ScopeList");
     for (vector<const VlNamedObj*>::iterator p = scope_list.begin();
 	 p != scope_list.end(); ++ p) {

@@ -105,15 +105,7 @@ VlDumperImpl::put_stmt(const char* label,
   switch ( stmt->type() ) {
   case kVpiNamedBegin:
   case kVpiNamedFork:
-    {
-      const VlNamedObj* scope = stmt->scope();
-      assert_cond( scope , __FILE__, __LINE__);
-      put("vpiFullName", scope->full_name() );
-      put_scope_sub(mgr, scope);
-    }
-    put_child_stmt_list("vpiStmt", mgr, stmt);
-    break;
-
+    // スコープとしての内容は別に出力されている．
   case kVpiBegin:
   case kVpiFork:
     put_child_stmt_list("vpiStmt", mgr, stmt);

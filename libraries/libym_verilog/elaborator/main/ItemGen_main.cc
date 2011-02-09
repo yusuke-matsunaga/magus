@@ -291,7 +291,7 @@ ItemGen::phase1_genblock(const VlNamedObj* parent,
   const char* name = pt_genblock->name();
   if ( name != NULL ) {
     ElbScope* genblock = factory().new_GenBlock(parent, pt_genblock);
-    reg_genblock(genblock);
+    reg_internalscope(genblock);
 
     parent = genblock;
   }
@@ -449,7 +449,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
       int gvi = genvar->value();
       ElbScope* genblock = factory().new_GfBlock(parent, pt_genfor, gvi);
       gfroot->add(gvi, genblock);
-      reg_genblock(genblock);
+      reg_internalscope(genblock);
 
       const PtDeclItem* pt_item = genvar->pt_item();
       ElbGenvar* genvar1 = factory().new_Genvar(genblock, pt_item, gvi);

@@ -117,6 +117,7 @@ public:
   find_obj(const VlNamedObj* parent,
 	   const char* name) const;
 
+#if 0
   /// @brief スコープに属する generate block のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[out] scope_list 結果を格納するリスト
@@ -125,6 +126,16 @@ public:
   bool
   find_genblock_list(const VlNamedObj* parent,
 		     vector<const VlNamedObj*>& scope_list) const;
+#endif
+
+  /// @brief スコープに属する internal scope のリストを取り出す．
+  /// @param[in] parent 検索対象のスコープ
+  /// @param[out] scope_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  bool
+  find_internalscope_list(const VlNamedObj* parent,
+			  vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief スコープとタグから宣言要素を取り出す．
   /// @param[in] parent 検索対象のスコープ

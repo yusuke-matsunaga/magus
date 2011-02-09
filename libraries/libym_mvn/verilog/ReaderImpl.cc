@@ -493,7 +493,7 @@ ReaderImpl::gen_decl(MvModule* module,
   // 内部スコープ要素の生成
   {
     vector<const VlNamedObj*> scope_list;
-    if ( mVlMgr.find_genblock_list(vl_scope, scope_list) ) {
+    if ( mVlMgr.find_internalscope_list(vl_scope, scope_list) ) {
       for (vector<const VlNamedObj*>::iterator p = scope_list.begin();
 	   p != scope_list.end(); ++ p) {
 	const VlNamedObj* vl_scope1 = *p;
@@ -603,7 +603,7 @@ ReaderImpl::gen_item(MvModule* module,
   // 内部スコープ要素の生成
   {
     vector<const VlNamedObj*> scope_list;
-    if ( mVlMgr.find_genblock_list(vl_scope, scope_list) ) {
+    if ( mVlMgr.find_internalscope_list(vl_scope, scope_list) ) {
       for (vector<const VlNamedObj*>::iterator p = scope_list.begin();
 	   p != scope_list.end(); ++ p) {
 	const VlNamedObj* vl_scope1 = *p;

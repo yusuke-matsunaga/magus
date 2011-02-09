@@ -10,6 +10,7 @@
 
 
 #include "TagDict.h"
+#include "TagDictCell.h"
 #include "ym_verilog/vl/VlObj.h"
 #include "ElbScope.h"
 #include "ElbModule.h"
@@ -329,16 +330,16 @@ TagDictCell::process()
   return NULL;
 }
 
-// generate block を追加する．
+// internal scope を追加する．
 void
-TagDictCell::add_genblock(ElbScope* obj)
+TagDictCell::add_internalscope(ElbScope* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
-// generate block の先頭を得る．
+// internal scope の先頭を得る．
 const ElbScope*
-TagDictCell::genblock()
+TagDictCell::internalscope()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -346,7 +347,7 @@ TagDictCell::genblock()
 
 
 //////////////////////////////////////////////////////////////////////
-// generate block 用のセル
+// internal scope 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellScope :
   public TagDictCell
@@ -359,12 +360,12 @@ public:
   /// @brief 要素の追加
   virtual
   void
-  add_genblock(ElbScope* obj);
+  add_internalscope(ElbScope* obj);
 
-  /// @brief generate block の先頭を得る．
+  /// @brief 要素の先頭を得る．
   virtual
   const ElbScope*
-  genblock();
+  internalscope();
 
   /// @brief 要素数の取得
   virtual
@@ -398,16 +399,16 @@ CellScope::CellScope(ElbScope* obj) :
 
 // @brief 要素の追加
 void
-CellScope::add_genblock(ElbScope* obj)
+CellScope::add_internalscope(ElbScope* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
   ++ mNum;
 }
 
-// @brief generate block の先頭を得る．
+// @brief 要素の先頭を得る．
 const ElbScope*
-CellScope::genblock()
+CellScope::internalscope()
 {
   return mTop;
 }
@@ -419,17 +420,17 @@ CellScope::num()
   return mNum;
 }
 
-// @brief generate block を追加する．
+// @brief internal scope を追加する．
 // @param[in] obj 登録する要素
 void
-TagDict::add_genblock(ElbScope* obj)
+TagDict::add_internalscope(ElbScope* obj)
 {
   const VlNamedObj* parent = obj->parent();
 
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiInternalScope);
   if ( cell ) {
-    cell->add_genblock(obj);
+    cell->add_internalscope(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellScope));
@@ -438,21 +439,21 @@ TagDict::add_genblock(ElbScope* obj)
   }
 }
 
-// @brief generate block のリストを取り出す．
+// @brief internal scope のリストを取り出す．
 // @param[in] parent 親のスコープ
 // @param[out] obj_list 結果を格納するリスト
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagDict::find_genblock_list(const VlNamedObj* parent,
-			    vector<const VlNamedObj*>& obj_list) const
+TagDict::find_internalscope_list(const VlNamedObj* parent,
+				 vector<const VlNamedObj*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiInternalScope);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbScope* obj = cell->genblock();
+    for (const ElbScope* obj = cell->internalscope();
 	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
