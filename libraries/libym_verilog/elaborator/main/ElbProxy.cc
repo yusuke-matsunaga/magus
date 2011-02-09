@@ -249,8 +249,10 @@ ElbProxy::instantiate_rhs(const VlNamedObj* parent,
 			  ElbExpr* lhs)
 {
   ElbExpr* expr = mExprGen->instantiate_expr(parent, env, pt_expr);
-  // lhs の型を expr に設定する．
-  expr->set_reqsize(lhs->value_type());
+  if ( expr ) {
+    // lhs の型を expr に設定する．
+    expr->set_reqsize(lhs->value_type());
+  }
   return expr;
 }
 
