@@ -402,6 +402,7 @@ fr_merge(const FileRegion fr_array[],
 
 %type <declhead> paramport_head
 %type <declhead> module_or_generate_decl
+%type <declhead> bitem_decl_body
 %type <declhead> event_declaration event_declhead
 %type <declhead> genvar_declaration genvar_declhead
 %type <declhead> integer_declaration integer_declhead
@@ -409,7 +410,7 @@ fr_merge(const FileRegion fr_array[],
 %type <declhead> realtime_declaration realtime_declhead
 %type <declhead> time_declaration time_declhead
 %type <declhead> net_declaration net_declhead1 net_declhead2 net_declhead3
-%type <declhead> reg_declaration reg_declhead
+%type <declhead> reg_declaration block_reg_declaration reg_declhead
 %type <declhead> parameter_declaration parameter_declhead
 %type <declhead> specparam_declaration specparam_declhead
 %type <declhead> udp_reg_declaration
@@ -2774,13 +2775,41 @@ task_port_type
 // 使っているところで処理する．
 // 具体的には nzlist_of_fitem_decl, list_of_bitem_decl, list_of_titem_decl
 block_item_declaration
+: ai_list bitem_decl_body
+{
+  parser.add_decl_head($2, $1);
+}
+;
+
+bitem_decl_body
 : block_reg_declaration
+{
+  $$ = $1;
+}
 | event_declaration
+{
+  $$ = $1;
+}
 | integer_declaration
+{
+  $$ = $1;
+}
 | parameter_declaration
+{
+  $$ = $1;
+}
 | real_declaration
+{
+  $$ = $1;
+}
 | realtime_declaration
+{
+  $$ = $1;
+}
 | time_declaration
+{
+  $$ = $1;
+}
 ;
 
 // [SPEC] block_reg_declaration ::= "reg" ["signed"] [range]
@@ -2788,7 +2817,14 @@ block_item_declaration
 // reg_declaration との違いは初期値を持てないこと．
 block_reg_declaration
 : reg_declhead list_of_block_variable_identifiers ';'
+{
+  $$ = $1;
+}
 | reg_declhead error ';'
+{
+  $$ = NULL;
+  yyerrok;
+}
 ;
 
 // [SPEC] list_of_block_variable_identifiers ::=
