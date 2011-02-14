@@ -188,6 +188,9 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     return NULL;
   }
 
+  const VlDeclBase* decl_base = primary->decl_base();
+  assert_cond( decl_base != NULL, __FILE__, __LINE__);
+
   if ( !check_decl(env, pt_expr, decl_type, is_array,
 		   has_range_select | has_bit_select) ) {
     // エラー
@@ -196,6 +199,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
   }
 
   if ( has_bit_select ) {
+    // ビット指定付きの場合
     const PtExpr* pt_expr1 = pt_expr->index(isize - 1);
     int index_val;
     bool stat1 = evaluate_int(parent, pt_expr1, index_val, false);
@@ -210,6 +214,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     return factory().new_BitSelect(pt_expr, primary, index);
   }
   if ( has_range_select ) {
+    // 範囲指定付きの場合
     switch ( pt_expr->range_mode() ) {
     case kVpiConstRange:
       {
@@ -220,6 +225,12 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	bool stat1 = evaluate_int(parent, pt_left, index1_val, true);
 	bool stat2 = evaluate_int(parent, pt_right, index2_val, true);
 	if ( !stat1 || !stat2 ) {
+	  return NULL;
+	}
+	bool big = (index1_val >= index2_val);
+	if ( big ^ decl_base->is_big_endian() ) {
+	  // 範囲の順番が逆
+	  error_range_order(pt_expr);
 	  return NULL;
 	}
 	return factory().new_PartSelect(pt_expr, primary,
@@ -241,8 +252,16 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	bool stat2 = evaluate_int(parent, pt_base, base_val, false);
 	if ( stat2 ) {
 	  // 固定インデックスだった．
-	  int index1_val = base_val + range_val - 1;
-	  int index2_val = base_val;
+	  int index1_val;
+	  int index2_val;
+	  if ( decl_base->is_big_endian() ) {
+	    index1_val = base_val + range_val - 1;
+	    index2_val = base_val;
+	  }
+	  else {
+	    index1_val = base_val;
+	    index2_val = base_val + range_val - 1;
+	  }
 	  return factory().new_PartSelect(pt_expr, primary,
 					  pt_base, pt_range,
 					  index1_val, index2_val);
@@ -271,8 +290,16 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	bool stat2 = evaluate_int(parent, pt_base, base_val, false);
 	if ( stat2 ) {
 	  // 固定インデックスだった．
-	  int index1_val = base_val;
-	  int index2_val = base_val - range_val + 1;
+	  int index1_val;
+	  int index2_val;
+	  if ( decl_base->is_big_endian() ) {
+	    index1_val = base_val;
+	    index2_val = base_val - range_val + 1;
+	  }
+	  else {
+	    index1_val = base_val - range_val + 1;
+	    index2_val = base_val;
+	  }
 	  return factory().new_PartSelect(pt_expr, primary,
 					  pt_base, pt_range,
 					  index1_val, index2_val);

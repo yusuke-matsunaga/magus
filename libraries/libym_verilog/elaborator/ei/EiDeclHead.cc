@@ -283,6 +283,20 @@ EiDeclHeadPt::right_range_string() const
   return string();
 }
 
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt::is_little_endian() const
+{
+  return true;
+}
+
 // @brief ビット幅を返す．
 ymuint
 EiDeclHeadPt::bit_size() const
@@ -553,6 +567,20 @@ EiDeclHeadPtV::right_range_string() const
   return mRange.right_range_string();
 }
 
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPtV::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPtV::is_little_endian() const
+{
+  return mRange.is_little_endian();
+}
+
 // @brief ビット幅を返す．
 ymuint
 EiDeclHeadPtV::bit_size() const
@@ -706,6 +734,20 @@ string
 EiDeclHeadPt2::right_range_string() const
 {
   return string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt2::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt2::is_little_endian() const
+{
+  return true;
 }
 
 // @brief ビット幅を返す．
@@ -862,6 +904,20 @@ EiDeclHeadPt2V::right_range_string() const
   return mRange.right_range_string();
 }
 
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt2V::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt2V::is_little_endian() const
+{
+  return mRange.is_little_endian();
+}
+
 // @brief ビット幅を返す．
 ymuint
 EiDeclHeadPt2V::bit_size() const
@@ -961,6 +1017,20 @@ string
 EiDeclHeadPt3::right_range_string() const
 {
   return string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt3::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt3::is_little_endian() const
+{
+  return true;
 }
 
 // @brief ビット幅を返す．
@@ -1099,6 +1169,20 @@ string
 EiDeclHeadPt3V::right_range_string() const
 {
   return mRange.right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt3V::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt3V::is_little_endian() const
+{
+  return mRange.is_little_endian();
 }
 
 // @brief ビット幅を返す．

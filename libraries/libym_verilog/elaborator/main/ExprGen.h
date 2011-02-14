@@ -469,6 +469,10 @@ private:
   void
   error_not_a_namedevent(const PtExpr* pt_expr);
 
+  /// @brief 要素の範囲の順番と範囲指定の順番が異なる．
+  void
+  error_range_order(const PtExpr* pt_expr);
+
   /// @brief named-event に対する範囲指定
   void
   error_select_for_namedevent(const PtExpr* pt_expr);

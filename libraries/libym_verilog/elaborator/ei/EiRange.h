@@ -291,6 +291,14 @@ public:
   string
   right_range_string() const;
 
+  /// @brief left_range >= right_range の時に true を返す．
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  bool
+  is_little_endian() const;
+
   /// @brief 範囲のチェック
   /// @param[in] index インデックス
   /// @retval true index が範囲内に入っている．
@@ -519,6 +527,22 @@ EiRange::rindex(int left,
   else {
     return roffset + left;
   }
+}
+
+// @brief left_range >= right_range の時に true を返す．
+inline
+bool
+EiRangeImpl::is_big_endian() const
+{
+  return mLeftVal >= mRightVal;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+inline
+bool
+EiRangeImpl::is_little_endian() const
+{
+  return mRightVal >= mLeftVal;
 }
 
 // @brief 次元数を得る．

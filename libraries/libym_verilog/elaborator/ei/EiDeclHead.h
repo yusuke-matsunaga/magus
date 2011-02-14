@@ -125,6 +125,16 @@ public:
   string
   right_range_string() const;
 
+  /// @brief left_range >= right_range の時に true を返す．
+  virtual
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  virtual
+  bool
+  is_little_endian() const;
+
   /// @brief ビット幅を返す．
   virtual
   ymuint32
@@ -314,7 +324,18 @@ public:
   string
   right_range_string() const;
 
+  /// @brief left_range >= right_range の時に true を返す．
+  virtual
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  virtual
+  bool
+  is_little_endian() const;
+
   /// @brief ビット幅を返す．
+  virtual
   ymuint32
   bit_size() const;
 
@@ -474,6 +495,16 @@ public:
   string
   right_range_string() const;
 
+  /// @brief left_range >= right_range の時に true を返す．
+  virtual
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  virtual
+  bool
+  is_little_endian() const;
+
   /// @brief ビット幅を返す．
   virtual
   ymuint32
@@ -582,6 +613,16 @@ public:
   string
   right_range_string() const;
 
+  /// @brief left_range >= right_range の時に true を返す．
+  virtual
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  virtual
+  bool
+  is_little_endian() const;
+
   /// @brief ビット幅を返す．
   virtual
   ymuint32
@@ -675,6 +716,16 @@ public:
   virtual
   string
   right_range_string() const;
+
+  /// @brief left_range >= right_range の時に true を返す．
+  virtual
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  virtual
+  bool
+  is_little_endian() const;
 
   /// @brief ビット幅を返す．
   virtual
@@ -779,6 +830,16 @@ public:
   virtual
   string
   right_range_string() const;
+
+  /// @brief left_range >= right_range の時に true を返す．
+  virtual
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  virtual
+  bool
+  is_little_endian() const;
 
   /// @brief ビット幅を返す．
   virtual

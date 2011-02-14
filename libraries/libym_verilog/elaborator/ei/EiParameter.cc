@@ -201,6 +201,20 @@ EiParamHead::right_range_string() const
   return string();
 }
 
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiParamHead::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiParamHead::is_little_endian() const
+{
+  return true;
+}
+
 // @brief ビット幅を返す．
 ymuint
 EiParamHead::bit_size() const
@@ -346,6 +360,20 @@ string
 EiParamHeadV::right_range_string() const
 {
   return mRange.right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiParamHeadV::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiParamHeadV::is_little_endian() const
+{
+  return mRange.is_little_endian();
 }
 
 // @brief ビット幅を返す．
@@ -515,6 +543,20 @@ string
 EiParameter::right_range_string() const
 {
   return mHead->right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiParameter::is_big_endian() const
+{
+  return mHead->is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiParameter::is_little_endian() const
+{
+  return mHead->is_little_endian();
 }
 
 // @brief ビット幅を返す．

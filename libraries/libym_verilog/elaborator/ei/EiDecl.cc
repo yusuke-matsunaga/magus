@@ -230,6 +230,20 @@ EiDecl::right_range_string() const
   return mHead->right_range_string();
 }
 
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDecl::is_big_endian() const
+{
+  return mHead->is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDecl::is_little_endian() const
+{
+  return mHead->is_little_endian();
+}
+
 // @brief ビット幅を返す．
 ymuint
 EiDecl::bit_size() const
