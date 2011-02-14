@@ -318,6 +318,13 @@ public:
   // その他の型
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief VlValue の情報を出力する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  put(const char* label,
+      const VlValue& value);
+
   /// @brief FileLoc の情報を出力する．
   /// @param[in] label ラベル
   /// @param[in] file_loc ファイルの位置情報
@@ -417,6 +424,34 @@ public:
   void
   put(const char* label,
       ymuint d);
+
+  /// @brief スカラー値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val スカラー値
+  void
+  put(const char* label,
+      tVpiScalarVal val);
+
+  /// @brief time値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val time値
+  void
+  put(const char* label,
+      VlTime val);
+
+  /// @brief 実数値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val 値
+  void
+  put(const char* label,
+      double val);
+
+  /// @brief ビットベクタ値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val 値
+  void
+  put(const char* label,
+      const BitVector& val);
 
   /// @brief 文字列の出力
   /// @param[in] label ラベル

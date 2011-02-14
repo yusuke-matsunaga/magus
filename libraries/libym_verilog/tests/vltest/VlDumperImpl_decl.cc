@@ -15,14 +15,15 @@
 
 #include "VlDumperImpl.h"
 
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlIODecl.h>
-#include <ym_verilog/vl/VlDecl.h>
-#include <ym_verilog/vl/VlDeclArray.h>
-#include <ym_verilog/vl/VlParamAssign.h>
-#include <ym_verilog/vl/VlModule.h>
-#include <ym_verilog/vl/VlUdp.h>
-#include <ym_verilog/vl/VlTaskFunc.h>
+#include "ym_verilog/VlMgr.h"
+#include "ym_verilog/VlValue.h"
+#include "ym_verilog/vl/VlIODecl.h"
+#include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlDeclArray.h"
+#include "ym_verilog/vl/VlParamAssign.h"
+#include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlUdp.h"
+#include "ym_verilog/vl/VlTaskFunc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -428,6 +429,8 @@ VlDumperImpl::put_defparam_list(const char* label,
     put("FileRegion", defparam->file_region() );
     put("vpiModule", defparam->parent()->full_name() );
     put("vpiLhs", defparam->lhs()->full_name() );
+    //put("vpiRhs", defparam->rhs_string());
+    put("vpiRhs", defparam->rhs_value());
 #if 0 // defparam/param_assign の RHS
     put_expr("vpiRhs", mgr, defparam->rhs() );
 #endif
@@ -452,6 +455,8 @@ VlDumperImpl::put_paramassign_list(const char* label,
     put("vpiModule", paramassign->parent()->full_name() );
     put("vpiConnByName", paramassign->is_conn_by_name() );
     put("vpiLhs", paramassign->lhs()->full_name() );
+    //put("vpiRhs", paramassign->rhs_string());
+    put("vpiRhs", paramassign->rhs_value());
 #if 0 // defparam/param_assign の RHS
     put_expr("vpiRhs", mgr, paramassign->rhs() );
 #endif
