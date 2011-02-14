@@ -741,6 +741,12 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     else if ( has_range_select ) {
       // 範囲選択
       BitVector bv(genvar->value());
+      if ( index1 < index2 ) {
+	if ( put_error ) {
+	  error_range_order(pt_expr);
+	}
+	return VlValue();
+      }
       return VlValue(bv.part_select(index1, index2));
     }
     else {
@@ -768,6 +774,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
   }
   else {
     if ( has_bit_select ) {
+      // ビット選択
       if ( !val.is_bitvector_conv() ) {
 	if ( put_error ) {
 	  error_illegal_real_type(pt_expr);
@@ -784,21 +791,39 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	}
 	return VlValue();
       }
-      int msb_offset;
-      int lsb_offset;
       switch ( pt_expr->range_mode() ) {
       case kVpiConstRange:
-	msb_offset = param->bit_offset(index1);
-	lsb_offset = param->bit_offset(index2);
+	{
+	  bool big = (index1 >= index2);
+	  if ( big ^ param->is_big_endian() ) {
+	    if ( put_error ) {
+	      error_range_order(pt_expr);
+	    }
+	    return VlValue();
+	  }
+	}
 	break;
 
       case kVpiPlusRange:
-#warning "TODO: 仕様を確認"
-	assert_not_reached(__FILE__, __LINE__);
+	if ( param->is_big_endian() ) {
+	  int range = index2;
+	  index2 = index1;
+	  index1 = index1 + range - 1;
+	}
+	else {
+	  index2 = index1 + index2 - 1;
+	}
 	break;
 
       case kVpiMinusRange:
-#warning "TODO: 仕様を確認"
+	if ( param->is_big_endian() ) {
+	  index2 = index1 - index2 + 1;
+	}
+	else {
+	  int range = index2;
+	  index2 = index1;
+	  index1 = index1 - range + 1;
+	}
 	assert_not_reached(__FILE__, __LINE__);
 	break;
 
@@ -806,6 +831,8 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	assert_not_reached(__FILE__, __LINE__);
 	break;
       }
+      int msb_offset = param->bit_offset(index1);
+      int lsb_offset = param->bit_offset(index2);
       return VlValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
     }
   }
