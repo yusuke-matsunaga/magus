@@ -1336,12 +1336,14 @@ ReaderImpl::connect_lhs(MvNode* dst_node,
   else if ( expr->is_bitselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     const VlDeclBase* decl = expr->decl_base();
+    assert_cond( decl != NULL, __FILE__, __LINE__);
     ymuint index = decl->bit_offset(expr->index_val());
     reg_driver(dst_node, Driver(src_node, index));
   }
   else if ( expr->is_partselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     const VlDeclBase* decl = expr->decl_base();
+    assert_cond( decl != NULL, __FILE__, __LINE__);
     ymuint msb = decl->bit_offset(expr->left_range_val());
     ymuint lsb = decl->bit_offset(expr->right_range_val());
     assert_cond( src_node->output(0)->bit_width() == msb - lsb + 1,
