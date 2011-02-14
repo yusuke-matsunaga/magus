@@ -42,6 +42,29 @@ MvVlMap::MvVlMap(const MvVlMap& src) :
   }
 }
 
+// @brief 代入演算子
+const MvVlMap&
+MvVlMap::operator=(const MvVlMap& src)
+{
+  if ( &src != this) {
+    clear();
+    ymuint n = src.mArray.size();
+    mArray.resize(n, NULL);
+    for (ymuint i = 0; i < n; ++ i) {
+      const MapRec* src_rec = src.mArray[i];
+      if ( src_rec ) {
+	if ( src_rec->is_single_elem() ) {
+	  reg_node(i, src_rec->get_single_elem());
+	}
+	else {
+	  reg_node(i, src_rec->get_array_elem(), src_rec->get_array_offset());
+	}
+      }
+    }
+  }
+  return *this;
+}
+
 // @brief デストラクタ
 MvVlMap::~MvVlMap()
 {
@@ -63,11 +86,9 @@ void
 MvVlMap::reg_node(ymuint id,
 		  const VlDecl* decl)
 {
-  if ( mArray.size() <= id ) {
-    mArray.resize(id + 1, NULL);
-  }
   void* p = mAlloc.get_memory(sizeof(SingleMapRec));
-  mArray[id] = new (p) SingleMapRec(decl);
+  MapRec* rec = new (p) SingleMapRec(decl);
+  put(id, rec);
 }
 
 // @brief 配列の宣言要素を登録する．
@@ -79,11 +100,9 @@ MvVlMap::reg_node(ymuint id,
 		  const VlDeclArray* declarray,
 		  ymuint offset)
 {
-  if ( mArray.size() <= id ) {
-    mArray.resize(id + 1, NULL);
-  }
   void* p = mAlloc.get_memory(sizeof(ArrayMapRec));
-  mArray[id] = new (p) ArrayMapRec(declarray, offset);
+  MapRec* rec = new (p) ArrayMapRec(declarray, offset);
+  put(id, rec);
 }
 
 // @brief src_id の内容を dst_id にコピーする．
@@ -91,7 +110,7 @@ void
 MvVlMap::copy(ymuint src_id,
 	      ymuint dst_id)
 {
-  mArray[dst_id] = mArray[src_id];
+  put(dst_id, get(src_id));
 }
 
 // @brief id に対応する宣言要素が単一要素の時に true を返す．
@@ -99,10 +118,11 @@ MvVlMap::copy(ymuint src_id,
 bool
 MvVlMap::is_single_elem(ymuint id) const
 {
-  if ( mArray.size() <= id ) {
+  MapRec* rec = get(id);
+  if ( rec == NULL ) {
     return false;
   }
-  return mArray[id]->is_single_elem();
+  return rec->is_single_elem();
 }
 
 // @brief id に対応する宣言要素が配列要素の時に true を返す．
@@ -110,10 +130,11 @@ MvVlMap::is_single_elem(ymuint id) const
 bool
 MvVlMap::is_array_elem(ymuint id) const
 {
-  if ( mArray.size() <= id ) {
+  MapRec* rec = get(id);
+  if ( rec == NULL ) {
     return false;
   }
-  return mArray[id]->is_array_elem();
+  return rec->is_array_elem();
 }
 
 // @brief id に対応する宣言要素を返す．(単一要素版)
@@ -122,10 +143,11 @@ MvVlMap::is_array_elem(ymuint id) const
 const VlDecl*
 MvVlMap::get_single_elem(ymuint id) const
 {
-  if ( mArray.size() <= id ) {
+  MapRec* rec = get(id);
+  if ( rec == NULL ) {
     return NULL;
   }
-  return mArray[id]->get_single_elem();
+  return rec->get_single_elem();
 }
 
 // @brief id に対応する宣言要素を返す．(配列要素版)
@@ -134,10 +156,11 @@ MvVlMap::get_single_elem(ymuint id) const
 const VlDeclArray*
 MvVlMap::get_array_elem(ymuint id) const
 {
-  if ( mArray.size() <= id ) {
+  MapRec* rec = get(id);
+  if ( rec == NULL ) {
     return NULL;
   }
-  return mArray[id]->get_array_elem();
+  return rec->get_array_elem();
 }
 
 // @brief id に対応する宣言要素のオフセットを返す．(配列要素版)
@@ -146,10 +169,36 @@ MvVlMap::get_array_elem(ymuint id) const
 ymuint
 MvVlMap::get_array_offset(ymuint id) const
 {
-  if ( mArray.size() <= id ) {
+  MapRec* rec = get(id);
+  if ( rec == NULL ) {
     return 0;
   }
-  return mArray[id]->get_array_offset();
+  return rec->get_array_offset();
+}
+
+// @brief 要素を設定する．
+// @param[in] id ID番号
+// @param[in] elem 設定する要素
+void
+MvVlMap::put(ymuint id,
+	     MapRec* elem)
+{
+  if ( mArray.size() <= id ) {
+    mArray.resize(id + 1, NULL);
+  }
+  mArray[id] = elem;
+}
+
+// @brief 要素を取り出す．
+// @param[in] id ID番号
+// @note id が範囲外の時は NULL が返される．
+MapRec*
+MvVlMap::get(ymuint id) const
+{
+  if ( mArray.size() <= id ) {
+    return NULL;
+  }
+  return mArray[id];
 }
 
 

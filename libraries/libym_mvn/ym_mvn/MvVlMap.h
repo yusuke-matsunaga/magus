@@ -32,6 +32,10 @@ public:
   /// @brief コピーコンストラクタ
   MvVlMap(const MvVlMap& src);
 
+  /// @brief 代入演算子
+  const MvVlMap&
+  operator=(const MvVlMap& src);
+
   /// @brief デストラクタ
   ~MvVlMap();
 
@@ -99,6 +103,25 @@ public:
   /// @note is_array_elem(id) == false の時は 0 が返される．
   ymuint
   get_array_offset(ymuint id) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 要素を設定する．
+  /// @param[in] id ID番号
+  /// @param[in] elem 設定する要素
+  void
+  put(ymuint id,
+      MapRec* elem);
+
+  /// @brief 要素を取り出す．
+  /// @param[in] id ID番号
+  /// @note id が範囲外の時は NULL が返される．
+  MapRec*
+  get(ymuint id) const;
 
 
 private:
