@@ -120,6 +120,14 @@ EiBitSelect::is_bitselect() const
   return true;
 }
 
+// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+// @note それ以外では NULL を返す．
+const VlDeclBase*
+EiBitSelect::decl_base() const
+{
+  return parent_expr()->decl_base();
+}
+
 // @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
 // @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
 const VlDecl*
