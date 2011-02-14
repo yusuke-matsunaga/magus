@@ -763,7 +763,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     }
     return VlValue();
   }
-  VlValue val = param->get_value();;
+  VlValue val = param->get_value();
   if ( param->value_type() == kVpiValueReal ) {
     if ( has_bit_select || has_range_select ) {
       if ( put_error ) {
