@@ -280,7 +280,10 @@ BitVector::operator=(VlTime time)
 
 // スカラ値からのキャスト用コンストラクタ
 BitVector::BitVector(tVpiScalarVal value,
-		     ymuint32 size)
+		     ymuint32 size) :
+  mSize(0),
+  mVal0(NULL),
+  mVal1(NULL)
 {
   resize(size);
   set_type(true, false, 2);
