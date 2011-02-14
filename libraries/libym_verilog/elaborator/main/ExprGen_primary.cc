@@ -172,13 +172,11 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
   }
 
   // 対象のオブジェクトが宣言要素だった場合
-  tVpiObjType decl_type;
   bool is_array;
   bool has_range_select;
   bool has_bit_select;
   ElbExpr* primary = instantiate_primary_sub(handle, parent,
 					     index_env, pt_expr,
-					     decl_type,
 					     is_array,
 					     has_range_select,
 					     has_bit_select);
@@ -190,6 +188,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 
   const VlDeclBase* decl_base = primary->decl_base();
   assert_cond( decl_base != NULL, __FILE__, __LINE__);
+  tVpiObjType decl_type = decl_base->type();
 
   if ( !check_decl(env, pt_expr, decl_type, is_array,
 		   has_range_select | has_bit_select) ) {
@@ -352,12 +351,11 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   if ( pt_expr->is_const_index() ) {
     env0 = ElbConstantEnv();
   }
-  tVpiObjType decl_type;
+
   bool is_array;
   bool has_range_select;
   bool has_bit_select;
   ElbExpr* primary = instantiate_primary_sub(handle, parent, env0, pt_expr,
-					     decl_type,
 					     is_array,
 					     has_range_select,
 					     has_bit_select);
@@ -366,6 +364,10 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
     // メッセージは instantiate_decl() 内で出力されている．
     return NULL;
   }
+
+  const VlDeclBase* decl_base = primary->decl_base();
+  assert_cond( decl_base != NULL, __FILE__, __LINE__);
+  tVpiObjType decl_type = decl_base->type();
   if ( decl_type != kVpiNamedEvent ) {
     // 型が違う
     error_not_a_namedevent(pt_expr);
@@ -457,7 +459,6 @@ ExprGen::instantiate_genvar(const VlNamedObj* parent,
 // @param[in] handle オブジェクトハンドル
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-// @param[out] decl_type 対象の宣言要素の型
 // @param[out] is_array 対象が配列の時 true を返す．
 // @param[out] has_range_select 範囲指定を持っていたら true を返す．
 // @param[out] has_bit_select ビット指定を持っていたら true を返す．
@@ -466,7 +467,6 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
 				 const VlNamedObj* parent,
 				 const ElbEnv& env,
 				 const PtExpr* pt_expr,
-				 tVpiObjType& decl_type,
 				 bool& is_array,
 				 bool& has_range_select,
 				 bool& has_bit_select)
@@ -488,13 +488,11 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
   tVpiValueType value_type;
   if ( param != NULL ) {
     primary = factory().new_Primary(pt_expr, param);
-    decl_type = param->type();
     is_array = false;
     value_type = param->value_type();
   }
   else if ( decl != NULL ) {
     primary = factory().new_Primary(pt_expr, decl);
-    decl_type = decl->type();
     is_array = false;
     value_type = decl->value_type();
   }
@@ -507,8 +505,7 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
       return NULL;
     }
 
-    decl_type = declarray->type();
-    is_array = false;
+    is_array = true;
     value_type = declarray->value_type();
 
     // 添字が定数ならオフセットを計算する．
