@@ -814,7 +814,6 @@ dump_module(ostream& s,
     assert_cond( node->output_num() == 1, __FILE__, __LINE__);
     ymuint bw = node->output(0)->bit_width();
     if ( node->type() == MvNode::kDff || node->type() == MvNode::kLatch ) {
-      assert_cond( bw == 1, __FILE__, __LINE__);
       s << "  reg  " << node_name(node) << ";" << endl;
     }
     else {
