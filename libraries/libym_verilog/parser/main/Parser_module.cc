@@ -244,6 +244,8 @@ Parser::new_Module2001(const FileRegion& file_region,
   // iohead_array からポートの配列を作る．
   PtiPortArray port_array = new_PortArray(iohead_array);
 
+#warning "TODO:2011-02-15-01"
+
   const PtModule* module = mFactory.new_Module(file_region,
 					       module_name,
 					       is_macro, is_cell, is_protected,

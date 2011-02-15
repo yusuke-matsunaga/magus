@@ -1,3 +1,9 @@
+2011-02-15  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
+
+	* parser/main/Parser_module.cc (new_Module2001):
+	IO の二重定義のチェックをしていない．
+	TODO:2011-02-15-01
+
 2011-02-14  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
 
 	* elaborator/ei/EiParameter.cc (set_expr):
