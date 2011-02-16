@@ -141,7 +141,7 @@ private:
   bool
   gen_stmt(MvModule* module,
 	   const VlStmt* stmt,
-	   TmpEnv& env);
+	   ProcEnv& env);
 
   /// @brief always latch のチェック
   /// @param[in] parent_module 親のモジュール
@@ -218,10 +218,10 @@ private:
   /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
   void
   merge_env(MvModule* parent_module,
-	    TmpEnv& env,
+	    ProcEnv& env,
 	    MvNode* cond,
-	    const TmpEnv& then_env,
-	    const TmpEnv& else_env);
+	    const ProcEnv& then_env,
+	    const ProcEnv& else_env);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素

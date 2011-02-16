@@ -764,36 +764,29 @@ ReaderImpl::gen_process(MvModule* parent_module,
     return false;
   }
 
-  TmpEnv top_env(mGlobalEnv);
+  ProcEnv top_env(mGlobalEnv);
   gen_stmt(parent_module, stmt->body_stmt(), top_env);
 
   ymuint n = mGlobalEnv.max_id();
   for (ymuint i = 0; i < n; ++ i) {
-    MvNode* node1 = top_env.get_from_id(i);
-    if ( node1 == NULL ) {
+    AssignInfo info1 = top_env.get_from_id(i);
+    MvNode* rhs = info1.mRhs;
+    MvNode* cond = info1.mCond;
+    if ( rhs == NULL ) {
       continue;
     }
     MvNode* node0 = mGlobalEnv.get_from_id(i);
-    MvNode* cond = NULL;
-    switch ( latch_check(parent_module, node1, cond) ) {
-    case 0: // latch 条件なし
-      mMvMgr->connect(node1, 0, node0, 0);
-      break;
-
-    case 1: // 常に latch
-      // これはあるわけない．
-      assert_not_reached(__FILE__, __LINE__);
-
-    case 2: // latch 条件あり
-      assert_cond( cond != NULL, __FILE__, __LINE__);
-      {
-	ymuint bw = node0->output(0)->bit_width();
-	MvNode* latch = mMvMgr->new_latch(parent_module, bw);
-	mMvMgr->connect(node1, 0, latch, 0);
-	mMvMgr->connect(cond, 0, latch, 1);
-	mMvMgr->connect(latch, 0, node0, 0);
-      }
-      break;
+    if ( cond == NULL ) {
+      // 単純な組み合わせ論理
+      mMvMgr->connect(rhs, 0, node0, 0);
+    }
+    else {
+      // latch を挿入
+      ymuint bw = node0->output(0)->bit_width();
+      MvNode* latch = mMvMgr->new_latch(parent_module, bw);
+      mMvMgr->connect(rhs, 0, latch, 0);
+      mMvMgr->connect(cond, 0, latch, 1);
+      mMvMgr->connect(latch, 0, node0, 0);
     }
   }
 
@@ -807,7 +800,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
 bool
 ReaderImpl::gen_stmt(MvModule* module,
 		     const VlStmt* stmt,
-		     TmpEnv& env)
+		     ProcEnv& env)
 {
   switch ( stmt->type() ) {
   case kVpiAssignment:
@@ -823,7 +816,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 	const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
 	const VlDeclBase* lhs_declbase = lhs1->decl_base();
 	ymuint bw = lhs_declbase->bit_size();
-	MvNode* old_dst = NULL;
+	AssignInfo old_dst;
 	ymuint lhs_offset = 0;
 	if ( lhs_decl ) {
 	  old_dst = env.get(lhs_decl);
@@ -949,7 +942,7 @@ ReaderImpl::gen_stmt(MvModule* module,
     {
       const VlExpr* cond = stmt->expr();
       MvNode* cond_node = gen_expr(module, cond, env);
-      TmpEnv then_env(env);
+      ProcEnv then_env(env);
       gen_stmt(module, stmt->body_stmt(), then_env);
       merge_env(module, env, cond_node, then_env, env);
     }
@@ -959,9 +952,9 @@ ReaderImpl::gen_stmt(MvModule* module,
     {
       const VlExpr* cond = stmt->expr();
       MvNode* cond_node = gen_expr(module, cond, env);
-      TmpEnv then_env(env);
+      ProcEnv then_env(env);
       gen_stmt(module, stmt->body_stmt(), then_env);
-      TmpEnv else_env(env);
+      ProcEnv else_env(env);
       gen_stmt(module, stmt->else_stmt(), else_env);
       merge_env(module, env, cond_node, then_env, else_env);
     }
@@ -995,52 +988,102 @@ ReaderImpl::gen_stmt(MvModule* module,
 // @param[in] else_env 条件が成り立たなかったときに通るパスの環境
 void
 ReaderImpl::merge_env(MvModule* parent_module,
-		      TmpEnv& env,
+		      ProcEnv& env,
 		      MvNode* cond,
-		      const TmpEnv& then_env,
-		      const TmpEnv& else_env)
+		      const ProcEnv& then_env,
+		      const ProcEnv& else_env)
 {
   ymuint n = env.max_id();
   for (ymuint i = 0; i < n; ++ i) {
-    // TODO: node0, node1, node2 が NULL の場合がある．
-    MvNode* node0 = env.get_from_id(i);
-    MvNode* node1 = then_env.get_from_id(i);
-    MvNode* node2 = else_env.get_from_id(i);
+    AssignInfo info0 = env.get_from_id(i);
+    MvNode* node0 = info0.mRhs;
+    MvNode* cond0 = info0.mCond;
+    AssignInfo info1 = then_env.get_from_id(i);
+    MvNode* node1 = info1.mRhs;
+    MvNode* cond1 = info1.mCond;
+    AssignInfo info2 = else_env.get_from_id(i);
+    MvNode* node2 = info2.mRhs;
+    MvNode* cond2 = info2.mCond;
+
+    MvNode* new_node = NULL;
+    MvNode* new_cond = NULL;
     if ( node1 == node2 ) {
       // 両方の結果が等しければ ITE を挿入しない．
-      if ( node1 == node0 ) {
-	// さらにもとのノードと同じならなにもしない．
-	continue;
-      }
-      env.add_by_id(i, node1);
+      new_node = node1;
+    }
+    else if ( node1 == NULL ) {
+      // node1 が NULL
+      assert_cond( node2 != NULL, __FILE__, __LINE__);
+      new_node = node2;
+    }
+    else if ( node2 == NULL ) {
+      // node2 が NULL
+      assert_cond( node1 != NULL, __FILE__, __LINE__);
+      new_node = node1;
     }
     else {
-      ymuint bw;
-      if ( node0 ) {
-	bw = node0->output(0)->bit_width();
-      }
-      else if ( node1 ) {
-	bw = node1->output(0)->bit_width();
-      }
-      else if ( node2 ) {
-	bw = node2->output(0)->bit_width();
+      ymuint bw = node1->output(0)->bit_width();
+      new_node = mMvMgr->new_ite(parent_module, bw);
+      mMvMgr->connect(cond, 0, new_node, 0);
+      mMvMgr->connect(node1, 0, new_node, 1);
+      mMvMgr->connect(node2, 0, new_node, 2);
+    }
+    if ( cond1 == cond2 ) {
+      // 両方の条件が等しければ ITE を挿入しない
+      new_cond = cond1;
+    }
+    else if ( cond1 == NULL ) {
+      assert_cond( cond2 != NULL, __FILE__, __LINE__);
+      if ( node1 == NULL ) {
+	// cond の時には代入はない．
+	// 代入条件は ~cond & cond2
+	MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(cond, 0, cond_bar, 0);
+	new_cond = mMvMgr->new_and(parent_module, 1);
+	mMvMgr->connect(cond_bar, 0, new_cond, 0);
+	mMvMgr->connect(cond2, 0, new_cond, 1);
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	// cond の時には常に代入する．
+	// 代入条件は cond | cond2
+	new_cond = mMvMgr->new_or(parent_module, 1);
+	mMvMgr->connect(cond, 0, new_cond, 0);
+	mMvMgr->connect(cond2, 0, new_cond, 1);
       }
-      MvNode* node = mMvMgr->new_ite(parent_module, bw);
-      mMvMgr->connect(cond, 0, node, 0);
-      if ( node1 ) {
-	mMvMgr->connect(node1, 0, node, 1);
-      }
-      if ( node2 ) {
-	mMvMgr->connect(node2, 0, node, 2);
-      }
-      env.add_by_id(i, node);
     }
+    else if ( cond2 == NULL ) {
+      assert_cond( cond1 != NULL, __FILE__, __LINE__);
+      if ( node2 == NULL ) {
+	// ~cond の時には代入はない．
+	// 代入条件は cond & cond1
+	new_cond = mMvMgr->new_and(parent_module, 1);
+	mMvMgr->connect(cond, 0, new_cond, 0);
+	mMvMgr->connect(cond1, 0, new_cond, 1);
+      }
+      else {
+	// ~cond の時には常に代入
+	// 代入条件は ~cond | cond1
+	MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
+	mMvMgr->connect(cond, 0, cond_bar, 0);
+	new_cond = mMvMgr->new_or(parent_module, 1);
+	mMvMgr->connect(cond_bar, 0, new_cond, 0);
+	mMvMgr->connect(cond1, 0, new_cond, 1);
+      }
+    }
+    else {
+      new_cond = mMvMgr->new_ite(parent_module, 1);
+      mMvMgr->connect(cond, 0, new_cond, 0);
+      mMvMgr->connect(cond1, 0, new_cond, 1);
+      mMvMgr->connect(cond2, 0, new_cond, 2);
+    }
+    if ( new_node == NULL && new_cond == NULL ) {
+      continue;
+    }
+    env.add_by_id(i, new_node, new_cond);
   }
 }
 
+#if 0
 // @brief always latch のチェック
 // @param[in] parent_module 親のモジュール
 // @param[in] src_node ソースノード
@@ -1162,6 +1205,7 @@ ReaderImpl::latch_check(MvModule* parent_module,
   }
   return 0;
 }
+#endif
 
 // @brief プリミティブインスタンスの生成を行う．
 // @param[in] parent_module 親のモジュール

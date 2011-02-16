@@ -16,7 +16,6 @@
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
-#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class AssignInfo Env.h "Env.h"
 /// @brief 代入情報を表すクラス
@@ -39,7 +38,6 @@ struct AssignInfo
   MvNode* mCond;
 
 };
-#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -93,7 +91,6 @@ public:
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
-  virtual
   MvNode*
   get(const VlDecl* decl) const;
 
@@ -103,7 +100,6 @@ public:
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
-  virtual
   MvNode*
   get(const VlDeclArray* decl,
       ymuint offset) const;
@@ -137,33 +133,38 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TmpEnv Env.h "Env.h"
+/// @class ProcEnv Env.h "Env.h"
 /// @brief プロセス内部の Env
 //////////////////////////////////////////////////////////////////////
-class TmpEnv :
-  public Env
+class ProcEnv
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] global_env プロセスの外側の Env
-  TmpEnv(const Env& global_env);
+  ProcEnv(const Env& global_env);
 
   /// @brief コピーコンストラクタ
-  TmpEnv(const TmpEnv& tmp_env);
+  ProcEnv(const ProcEnv& tmp_env);
 
   /// @brief デストラクタ
-  virtual
-  ~TmpEnv();
+  ~ProcEnv();
 
 
 public:
 
-#if 0
+  /// @brief 内容をクリアする．
+  void
+  clear();
+
+  /// @brief ID番号の最大値+1を返す．
+  ymuint
+  max_id() const;
+
   /// @brief 登録する(単一要素の場合)
   /// @param[in] decl 宣言要素
-  /// @param[in] node 対応するノード
-  /// @param[in] cond 条件
+  /// @param[in] node 代入式の右辺
+  /// @param[in] cond 代入条件
   void
   add(const VlDecl* decl,
       MvNode* node,
@@ -172,35 +173,14 @@ public:
   /// @brief 登録する(配列の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] offset
-  /// @param[in] node 対応するノード
-  /// @param[in] cond 条件
+  /// @param[in] node 代入式の右辺
+  /// @param[in] cond 代入条件
   void
   add(const VlDeclArray* decl,
       ymuint offset,
       MvNode* node,
       MvNode* cond);
-#endif
 
-  /// @brief 対応するノードを取り出す．
-  /// @param[in] decl 宣言要素
-  /// @return 対応するノードを返す．
-  /// @note 登録されていない場合と配列型の場合には NULL を返す．
-  virtual
-  MvNode*
-  get(const VlDecl* decl) const;
-
-  /// @brief 対応するノードを取り出す(配列型)．
-  /// @param[in] decl 宣言要素
-  /// @param[in] offset オフセット
-  /// @return 対応するノードを返す．
-  /// @note 登録されていない場合と配列型でない場合，
-  /// オフセットが範囲外の場合には NULL を返す．
-  virtual
-  MvNode*
-  get(const VlDeclArray* decl,
-      ymuint offset) const;
-
-#if 0
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
@@ -217,7 +197,20 @@ public:
   AssignInfo
   get(const VlDeclArray* decl,
       ymuint offset) const;
-#endif
+
+  /// @brief ID番号に対応するノードを登録する．
+  void
+  add_by_id(ymuint id,
+	    MvNode* node,
+	    MvNode* cond);
+
+  /// @brief ID番号に対応するノードを取り出す．
+  AssignInfo
+  get_from_id(ymuint id) const;
+
+  /// @brief DeclHash を得る．
+  DeclHash&
+  decl_hash() const;
 
 
 private:
@@ -227,6 +220,12 @@ private:
 
   // 外側の Env
   const Env& mGlobalEnv;
+
+  // VlDecl 用のハッシュ表
+  DeclHash& mDeclHash;
+
+  // VlDecl の ID をキーに AssignInfo の配列を格納する配列
+  vector<AssignInfo> mNodeArray;
 
 };
 
