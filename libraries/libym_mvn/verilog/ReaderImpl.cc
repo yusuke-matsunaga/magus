@@ -728,6 +728,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
     return false;
   }
 
+#if 0
   const VlStmt* stmt = process->stmt();
   if ( stmt->type() != kVpiEventControl ) {
     // always の直後は '@' でなければダメ
@@ -789,7 +790,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
       mMvMgr->connect(latch, 0, node0, 0);
     }
   }
-
+#endif
   return true;
 }
 
@@ -802,6 +803,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 		     const VlStmt* stmt,
 		     ProcEnv& env)
 {
+#if 0
   switch ( stmt->type() ) {
   case kVpiAssignment:
     {
@@ -977,6 +979,7 @@ ReaderImpl::gen_stmt(MvModule* module,
     cerr << "can not synthesized" << endl;
     return false;
   }
+#endif
   return true;
 }
 

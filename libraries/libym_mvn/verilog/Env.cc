@@ -135,7 +135,7 @@ Env::decl_hash() const
 // @param[in] global_env プロセスの外側の Env
 ProcEnv::ProcEnv(const Env& global_env) :
   mGlobalEnv(global_env),
-  mDeclHash(global_env.mDeclHash),
+  mDeclHash(global_env.decl_hash()),
   mNodeArray(global_env.max_id())
 {
 }
@@ -225,7 +225,7 @@ ProcEnv::get(const VlDeclArray* decl,
   ymuint id = mDeclHash.get_id(decl, offset);
   AssignInfo ans = get_from_id(id);
   if ( ans.mRhs == NULL ) {
-    MvNode* node = mGlobalEnv.get(decl);
+    MvNode* node = mGlobalEnv.get(decl, offset);
     return AssignInfo(node);
   }
   return ans;

@@ -28,7 +28,9 @@ struct AssignInfo
   /// @param[in] cond 代入条件
   explicit
   AssignInfo(MvNode* rhs = NULL,
-	     MvNode* cond = NULL);
+	     MvNode* cond = NULL) :
+    mRhs(rhs),
+    mCond(cond) { }
 
   /// @brief 代入の右辺式を表すノード
   MvNode* mRhs;
