@@ -55,7 +55,7 @@ public:
   /// @param[in] init_val 初期値
   virtual
   void
-  set_initial(ElbExpr* init_expr,
+  set_initial(const PtExpr* init_expr,
 	      tVpiScalarVal init_val) = 0;
 
   /// @brief table entry の内容を設定する．

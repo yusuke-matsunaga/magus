@@ -32,6 +32,7 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 noinst_PROGRAMS = \
+	binio_test
 	file_test \
 	namemgr_test \
 	combigen_test \
@@ -47,8 +48,13 @@ noinst_PROGRAMS = \
 
 YMUTILS = ../libym_utils.la
 
+binio_test_SOURCES = \
+	binio_test.cc
+binio_test_LDADD = \
+	$(YMUTILS)
+
 file_test_SOURCES = \
-	file_test.cc 
+	file_test.cc
 file_test_LDADD = \
 	$(YMUTILS)
 

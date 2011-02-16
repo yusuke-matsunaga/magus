@@ -22,11 +22,15 @@ noinst_LTLIBRARIES = \
 ############################################################
 libym_vl_elab_elb_mgr_la_SOURCES = \
 	AttrHash.cc \
+	ElbContAssign.cc \
 	ElbDecl.cc \
 	ElbExpr.cc \
 	ElbMgr.cc \
+	ElbParamAssign.cc \
 	ElbParameter.cc \
 	ElbPrimitive.cc \
+	ElbProcess.cc \
+	ElbScope.cc \
 	ElbStmt.cc \
 	ElbUserSystf.cc \
 	ModuleHash.cc \

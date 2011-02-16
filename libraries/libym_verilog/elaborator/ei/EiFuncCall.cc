@@ -22,36 +22,36 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief 関数呼び出し式を生成する．
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] func 関数
 // @param[in] arg_size 引数の数
 // @param[in] arg_list 引数のリスト
 ElbExpr*
-EiFactory::new_FuncCall(const PtBase* pt_obj,
+EiFactory::new_FuncCall(const PtExpr* pt_expr,
 			const ElbTaskFunc* func,
 			ymuint arg_size,
 			ElbExpr** arg_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiFuncCall));
-  EiFuncCall* expr = new (p) EiFuncCall(pt_obj, func,
+  EiFuncCall* expr = new (p) EiFuncCall(pt_expr, func,
 					arg_size, arg_list);
 
   return expr;
 }
 
 // @brief システム関数呼び出し式を生成する．
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] user_systf システム関数
 // @param[in] arg_size 引数の数
 // @param[in] arg_list 引数のリスト
 ElbExpr*
-EiFactory::new_SysFuncCall(const PtBase* pt_obj,
+EiFactory::new_SysFuncCall(const PtExpr* pt_expr,
 			   const ElbUserSystf* user_systf,
 			   ymuint arg_size,
 			   ElbExpr** arg_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiSysFuncCall));
-  EiSysFuncCall* expr = new (p) EiSysFuncCall(pt_obj, user_systf,
+  EiSysFuncCall* expr = new (p) EiSysFuncCall(pt_expr, user_systf,
 					      arg_size, arg_list);
 
   return expr;
@@ -63,13 +63,13 @@ EiFactory::new_SysFuncCall(const PtBase* pt_obj,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] arg_size 引数の数
 // @param[in] arg_list 引数のリスト
-EiFcBase::EiFcBase(const PtBase* pt_obj,
+EiFcBase::EiFcBase(const PtExpr* pt_expr,
 		   ymuint arg_size,
 		   ElbExpr** arg_list) :
-  EiExprBase1(pt_obj),
+  EiExprBase(pt_expr),
   mArgNum(arg_size),
   mArgList(arg_list)
 {
@@ -95,21 +95,40 @@ EiFcBase::argument(ymuint pos) const
   return mArgList[pos];
 }
 
+// @brief 要求される式の型を計算してセットする．
+// @param[in] type 要求される式の型
+// @note 必要であればオペランドに対して再帰的に処理を行なう．
+void
+EiFcBase::set_reqsize(tVpiValueType type)
+{
+  // なにもしない．
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置番号
+// @note 演算子の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiFcBase::_operand(ymuint pos) const
+{
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiFuncCall
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] func 関数
 // @param[in] arg_size 引数の数
 // @param[in] arg_list 引数のリスト
-EiFuncCall::EiFuncCall(const PtBase* pt_obj,
+EiFuncCall::EiFuncCall(const PtExpr* pt_expr,
 		       const ElbTaskFunc* func,
 		       ymuint arg_size,
 		       ElbExpr** arg_list) :
-  EiFcBase(pt_obj, arg_size, arg_list),
+  EiFcBase(pt_expr, arg_size, arg_list),
   mFunc(func)
 {
 }
@@ -183,96 +202,21 @@ EiFuncCall::function() const
   return mFunc;
 }
 
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiFuncCall::eval_scalar() const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  return mFunc->eval_scalar(arg_list);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiFuncCall::eval_logic() const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  return mFunc->eval_logic(arg_list);
-}
-
-// @brief real 型の値を返す．
-double
-EiFuncCall::eval_real() const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  return mFunc->eval_real(arg_list);
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiFuncCall::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  ymuint n = argument_num();
-  vector<ElbExpr*> arg_list(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    arg_list[i] = argument(i);
-  }
-  mFunc->eval_bitvector(arg_list, bitvector, req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiFuncCall::decompile_impl(int ppri) const
-{
-  string ans = mFunc->name();
-  ans += "(";
-  ymuint n = argument_num();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    ans += comma + argument(i)->decompile();
-    comma = ", ";
-  }
-  ans += ")";
-  return ans;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiFuncCall::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiSysFuncCall
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] user_systf システム関数
 // @param[in] arg_size 引数の数
 // @param[in] arg_list 引数のリスト
-EiSysFuncCall::EiSysFuncCall(const PtBase* pt_obj,
+EiSysFuncCall::EiSysFuncCall(const PtExpr* pt_expr,
 			     const ElbUserSystf* user_systf,
 			     ymuint arg_size,
 			     ElbExpr** arg_list) :
-  EiFcBase(pt_obj, arg_size, arg_list),
+  EiFcBase(pt_expr, arg_size, arg_list),
   mUserSystf(user_systf)
 {
 }
@@ -343,63 +287,6 @@ const VlUserSystf*
 EiSysFuncCall::user_systf() const
 {
   return mUserSystf;
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiSysFuncCall::eval_scalar() const
-{
-# warning "TODO: 未完"
-  return kVpiScalarX;
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiSysFuncCall::eval_logic() const
-{
-# warning "TODO: 未完"
-  return kVpiScalarX;
-}
-
-// @brief real 型の値を返す．
-double
-EiSysFuncCall::eval_real() const
-{
-# warning "TODO: 未完"
-  return 0.0;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiSysFuncCall::eval_bitvector(BitVector& bitvector,
-			      tVpiValueType req_type) const
-{
-# warning "TODO: 未完"
-}
-
-// @brief decompile した文字列を返す．
-string
-EiSysFuncCall::decompile_impl(int ppri) const
-{
-  string ans = mUserSystf->name();
-  ans += "(";
-  ymuint n = argument_num();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    ans += comma + argument(i)->decompile();
-    comma = ", ";
-  }
-  ans += ")";
-  return ans;
-}
-
-// @brief 要求される式の型を計算してセットする．
-// @param[in] type 要求される式の型
-// @note 必要であればオペランドに対して再帰的に処理を行なう．
-void
-EiSysFuncCall::set_reqsize(tVpiValueType type)
-{
-  // なにもしない．
 }
 
 END_NAMESPACE_YM_VERILOG

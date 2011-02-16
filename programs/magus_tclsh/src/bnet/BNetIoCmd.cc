@@ -89,7 +89,7 @@ ReadBlif::~ReadBlif()
 int
 ReadBlif::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名を引数としてとる．
   if ( objc != 2 ) {
@@ -170,7 +170,7 @@ ReadIscas89::~ReadIscas89()
 int
 ReadIscas89::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名を引数としてとる．
   if ( objc != 2 ) {
@@ -223,7 +223,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 WriteBlif::WriteBlif(MagMgr* mgr) :
-  BNetCmd(mgr)
+  BNetCmd(mgr, false)
 {
   set_usage_string("?<filename>?");
 }
@@ -237,12 +237,12 @@ WriteBlif::~WriteBlif()
 int
 WriteBlif::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // このコマンドはファイル名のみを引数に取る．
   // 引数がなければ標準出力に出す．
   bool map = false;
-  size_t base = 1;
+  ymuint base = 1;
   if ( objc > 1 && string(objv[1]) == "-n" ) {
     map = true;
     base = 2;
@@ -306,7 +306,7 @@ WriteEqu::~WriteEqu()
 int
 WriteEqu::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
 
   // 引き数の数をチェックする．
   if( objc > 2 ){
@@ -339,68 +339,6 @@ WriteEqu::cmd_proc(TclObjVector& objv)
     TclObj msg;
     msg << "Error occured in writing " << objv[1];
     set_result(msg);
-    return TCL_ERROR;
-  }
-
-  // 正常終了
-  return TCL_OK;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// ファイルに Verilog 形式で書き出すコマンド
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-WriteVerilog::WriteVerilog(MagMgr* mgr) :
-  BNetCmd(mgr)
-{
-  set_usage_string("?<filename>?");
-}
-
-// @brief デストラクタ
-WriteVerilog::~WriteVerilog()
-{
-}
-
-// コマンドを実行する．
-int
-WriteVerilog::cmd_proc(TclObjVector& objv)
-{
-  size_t objc = objv.size();
-
-  // このコマンドはファイル名のみを引数に取る．
-  // 引数がなければ標準出力に出す．
-  if ( objc > 2 ) {
-    print_usage();
-    return TCL_ERROR;
-  }
-
-  // 出力先のファイルを開く
-  ostream* osp = &cout;
-  ofstream ofs;
-  if ( objc == 2 ) {
-    string file_name = objv[1];
-    if ( !open_ofile(ofs, file_name) ) {
-      // ファイルが開けなかった．
-      return TCL_ERROR;
-    }
-    osp = &ofs;
-  }
-
-  bool result = false;  // 念のため FALSE を入れておく．
-
-  // 実際の書き出しを行う．
-  BNetVerilogWriter writer;
-  writer.dump(*osp, *(cur_network()));
-  // この関数はfailしない．
-  result = true;
-
-  // 結果がエラーでないか調べる．今はエラーとはならない．
-  if ( !result ) {
-    TclObj emsg;
-    emsg << "Error occurred in writing " << objv[1];
-    set_result(emsg);
     return TCL_ERROR;
   }
 

@@ -92,7 +92,7 @@ private:
   /// @param[in] pt_portref パース木の portref 定義
   ElbExpr*
   instantiate_portref(ElbModule* module,
-		      const PtPortRef* pt_portref);
+		      const PtExpr* pt_portref);
 
 };
 

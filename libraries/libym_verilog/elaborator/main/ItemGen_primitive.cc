@@ -61,7 +61,7 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
     add_phase3stub(make_stub(this, &ItemGen::link_gate_delay,
 			     prim_head, pt_delay));
   }
-  
+
   for (ymuint i = 0; i < pt_head->size(); ++ i) {
     const PtInst* pt_inst = pt_head->inst(i);
     const FileRegion& fr = pt_inst->file_region();
@@ -92,24 +92,26 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
     const PtExpr* pt_right = pt_inst->right_range();
     if ( pt_left && pt_right ) {
       // 配列の場合
-      ElbExpr* left = NULL;
-      ElbExpr* right = NULL;
       int left_val = 0;
       int right_val = 0;
-      if ( !instantiate_range(parent, pt_left, pt_right,
-			      left, right,
-			      left_val, right_val) ) {
+      if ( !evaluate_range(parent, pt_left, pt_right,
+			   left_val, right_val) ) {
 	return;
       }
 
-      ElbPrimArray* prim_array = factory().new_PrimitiveArray(prim_head,
-							      pt_inst,
-							      left, right,
-							      left_val, right_val);
+      ElbPrimArray* prim_array
+	= factory().new_PrimitiveArray(prim_head,
+				       pt_inst,
+				       pt_left, pt_right,
+				       left_val, right_val);
       reg_primarray(prim_array);
-  
+
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, prim_array);
+      instantiate_attribute(pt_head->attr_top(), false, prim_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "instantiating primitive array: " << prim_array->full_name();
@@ -118,7 +120,7 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 	      kMsgInfo,
 	      "ELAB",
 	      buf.str());
-      
+
       add_phase3stub(make_stub(this, &ItemGen::link_prim_array,
 			       prim_array, pt_inst));
     }
@@ -127,9 +129,13 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
       ElbPrimitive* prim = factory().new_Primitive(prim_head,
 						   pt_inst);
       reg_primitive(prim);
-  
+
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, prim);
+      instantiate_attribute(pt_head->attr_top(), false, prim);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       ostringstream buf;
       buf << "instantiating primitive: " << prim->full_name();
@@ -158,7 +164,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
   ymuint param_size = pa_array.size();
   const PtDelay* pt_delay = pt_head->delay();
   bool has_delay = ( pt_delay || param_size == 1 );
-  
+
   ElbPrimHead* prim_head = factory().new_UdpHead(parent,
 						 pt_head,
 						 udpdefn,
@@ -167,7 +173,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
     add_phase3stub(make_stub(this, &ItemGen::link_udp_delay,
 			     prim_head, pt_head));
   }
-  
+
   for (ymuint i = 0; i < pt_head->size(); ++ i) {
     const PtInst* pt_inst = pt_head->inst(i);
     if ( pt_inst->port_num() > 0 &&
@@ -179,7 +185,7 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
 	      "UDP instance cannot have named port list.");
       continue;
     }
-    
+
     ymuint port_num = pt_inst->port_num();
     if ( udpdefn->port_num() != port_num ) {
       put_msg(__FILE__, __LINE__,
@@ -194,37 +200,44 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
     const PtExpr* pt_right = pt_inst->right_range();
     if ( pt_left && pt_right ) {
       // 配列
-      ElbExpr* left = NULL;
-      ElbExpr* right = NULL;
       int left_val = 0;
       int right_val = 0;
-      if ( !instantiate_range(parent, pt_left, pt_right,
-			      left, right,
-			      left_val, right_val) ) {
+      if ( !evaluate_range(parent, pt_left, pt_right,
+			   left_val, right_val) ) {
 	return;
       }
-      
-      ElbPrimArray* prim_array = factory().new_PrimitiveArray(prim_head,
-							      pt_inst,
-							      left, right,
-							      left_val, right_val);
+
+      ElbPrimArray* prim_array
+	= factory().new_PrimitiveArray(prim_head,
+				       pt_inst,
+				       pt_left, pt_right,
+				       left_val, right_val);
       reg_primarray(prim_array);
-  
+
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, prim_array);
+      instantiate_attribute(pt_head->attr_top(), false, prim_array);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
       add_phase3stub(make_stub(this, &ItemGen::link_prim_array,
 			       prim_array, pt_inst));
     }
     else {
       // 単一の要素
-      ElbPrimitive* primitive = factory().new_Primitive(prim_head,
-							pt_inst);
+      ElbPrimitive* primitive
+	= factory().new_Primitive(prim_head,
+				  pt_inst);
       reg_primitive(primitive);
-  
+
+#if 0
       // attribute instance の生成
-      //instantiate_attribute(pt_head->attr_top(), false, primitive);
-      
+      instantiate_attribute(pt_head->attr_top(), false, primitive);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
+
       add_phase3stub(make_stub(this, &ItemGen::link_primitive,
 			       primitive, pt_inst));
     }
@@ -276,10 +289,10 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 {
   const VlNamedObj* parent = prim_array->parent();
   ymuint arraysize = prim_array->elem_num();
-  
+
   // ポートの情報を得るために先頭の要素を取り出す．
   const VlPrimitive* prim = prim_array->elem_by_offset(0);
-  
+
   ElbEnv env1;
   ElbNetLhsEnv env2(env1);
   for (ymuint index = 0; index < pt_inst->port_num(); ++ index) {
@@ -294,7 +307,7 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 	      "Empty expression in UDP/primitive instance port.");
       continue;
     }
-    
+
     const VlPrimTerm* term = prim->prim_term(index);
     ElbExpr* tmp = NULL;
     if ( term->direction() == kVpiInput ) {
@@ -363,7 +376,7 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
 			const PtInst* pt_inst)
 {
   const VlNamedObj* parent = primitive->parent();
-  
+
   ElbEnv env1;
   ElbNetLhsEnv env2(env1);
   for (ymuint index = 0; index < pt_inst->port_num(); ++ index) {

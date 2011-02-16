@@ -47,7 +47,7 @@ VmUdpListNode::~VmUdpListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmUdpListNode::data(int column,
 		    int role) const
@@ -101,7 +101,7 @@ VmUdpNode::~VmUdpNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmUdpNode::data(int column,
 		int role) const
@@ -137,8 +137,8 @@ VmUdpNode::expand() const
   }
   ioarray[n - 1] = mUdp->output();
   add_iolist(ioarray);
-  if ( mUdp->init_expr() ) {
-    add_expr("vpiInitial", mUdp->init_expr());
+  if ( mUdp->init_val_string() != string() ) {
+    add_str("vpiInitial", mUdp->init_val_string());
   }
   add_child( new VmUdpEntryListNode(mUdp) );
 }
@@ -162,7 +162,7 @@ VmUdpEntryListNode::~VmUdpEntryListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmUdpEntryListNode::data(int column,
 			 int role) const
@@ -177,7 +177,7 @@ VmUdpEntryListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmUdpEntryListNode::loc() const
@@ -214,7 +214,7 @@ VmUdpEntryNode::~VmUdpEntryNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmUdpEntryNode::data(int column,
 		     int role) const
@@ -229,7 +229,7 @@ VmUdpEntryNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmUdpEntryNode::loc() const

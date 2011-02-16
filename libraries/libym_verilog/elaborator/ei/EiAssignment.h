@@ -18,11 +18,10 @@
 
 
 #include "EiStmt.h"
+#include "ElbFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
-
-class ElbExpr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class EiAssignBase EiAssignment.h "EiAssignment.h"
@@ -143,11 +142,6 @@ public:
   const VlControl*
   control() const;
 
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -202,11 +196,6 @@ public:
   bool
   is_blocking() const;
 
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 };
 
 
@@ -250,18 +239,6 @@ public:
   tVpiObjType
   type() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 };
 
 
@@ -303,18 +280,6 @@ public:
   virtual
   tVpiObjType
   type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 };
 
@@ -402,18 +367,6 @@ public:
   tVpiObjType
   type() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt に固有の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 };
 
 
@@ -453,18 +406,6 @@ public:
   virtual
   tVpiObjType
   type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt に固有の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 };
 

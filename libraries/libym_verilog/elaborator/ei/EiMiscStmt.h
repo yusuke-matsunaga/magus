@@ -40,7 +40,7 @@ private:
   EiEventStmt(const VlNamedObj* parent,
 	      ElbProcess* process,
 	      const PtStmt* pt_stmt,
-	      ElbDecl* named_event);
+	      ElbExpr* named_event);
 
   /// @brief デストラクタ
   virtual
@@ -65,14 +65,8 @@ public:
 
   /// @brief named event を返す．
   virtual
-  const VlDecl*
+  const VlExpr*
   named_event() const;
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 private:
@@ -80,8 +74,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // イベント
-  ElbDecl* mEvent;
+  // イベントを表す式
+  ElbExpr* mEvent;
 
 };
 
@@ -119,18 +113,6 @@ public:
   virtual
   tVpiObjType
   type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスでは何もしないで NULL を返す．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 };
 
@@ -258,12 +240,6 @@ public:
   const VlTaskFunc*
   task() const;
 
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -326,12 +302,6 @@ public:
   virtual
   const VlUserSystf*
   user_systf() const;
-
-  /// @brief function 中の実行を行う．
-  /// @note system task は function 中では無視される．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 private:
@@ -396,11 +366,6 @@ public:
   virtual
   const VlNamedObj*
   scope() const;
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 private:
@@ -469,12 +434,6 @@ public:
   virtual
   const VlStmt*
   body_stmt() const;
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 private:

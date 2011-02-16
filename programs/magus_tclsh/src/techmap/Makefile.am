@@ -21,6 +21,8 @@ libmagus_techmap_tcl_la_SOURCES = \
 	Conv2SbjCmd.cc \
 	DumpCnCmd.h \
 	DumpCnCmd.cc \
+	DumpPatCmd.h \
+	DumpPatCmd.cc \
 	DumpSbjCmd.h \
 	DumpSbjCmd.cc \
 	LoadPatCmd.h \

@@ -214,41 +214,44 @@ public:
   tVpiFuncType
   func_type() const;
 
-  /// @brief 出力のビット幅を返す．
-  virtual
-  ymuint
-  bit_size() const;
-
   /// @brief 符号付きの時 true を返す．
   virtual
   bool
   is_signed() const;
 
-  /// @brief 範囲のMSBを返す．
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  const VlExpr*
-  left_range() const;
-
-  /// @brief 範囲のLSBを返す．
-  virtual
-  const VlExpr*
-  right_range() const;
+  bool
+  has_range() const;
 
   /// @brief 範囲の MSB の値を返す．
-  /// @retval 範囲のMSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
-  /// @note このクラスでは -1 を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief 範囲の LSB の値を返す．
-  /// @retval 範囲のLSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
-  /// @note このクラスでは -1 を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const;
+
+  /// @brief 出力のビット幅を返す．
+  virtual
+  ymuint
+  bit_size() const;
 
 
 public:
@@ -267,52 +270,6 @@ public:
   virtual
   bool
   is_constant_function() const;
-
-  /// @brief スカラー値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_scalar(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief 論理値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_logic(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief real 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  double
-  eval_real(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief bitvector 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  void
-  eval_bitvector(const vector<ElbExpr*>& arg_list,
-		 BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  /// @note このクラスでは NULL を返す．
-  virtual
-  ElbExpr*
-  _left_range() const;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  /// @note このクラスでは NULL を返す．
-  virtual
-  ElbExpr*
-  _right_range() const;
 
 };
 
@@ -364,41 +321,44 @@ public:
   tVpiFuncType
   func_type() const;
 
-  /// @brief 出力のビット幅を返す．
-  virtual
-  ymuint
-  bit_size() const;
-
   /// @brief 符号付きの時 true を返す．
   virtual
   bool
   is_signed() const;
 
-  /// @brief 範囲のMSBを返す．
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  const VlExpr*
-  left_range() const;
-
-  /// @brief 範囲のLSBを返す．
-  virtual
-  const VlExpr*
-  right_range() const;
+  bool
+  has_range() const;
 
   /// @brief 範囲の MSB の値を返す．
-  /// @retval 範囲のMSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
-  /// @note このクラスでは -1 を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief 範囲の LSB の値を返す．
-  /// @retval 範囲のLSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
-  /// @note このクラスでは -1 を返す．
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const;
+
+  /// @brief 出力のビット幅を返す．
+  virtual
+  ymuint
+  bit_size() const;
 
 
 public:
@@ -417,61 +377,6 @@ public:
   virtual
   bool
   is_constant_function() const;
-
-  /// @brief スカラー値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_scalar(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief 論理値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  tVpiScalarVal
-  eval_logic(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief real 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  double
-  eval_real(const vector<ElbExpr*>& arg_list) const;
-
-  /// @brief bitvector 型の値を返す．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  virtual
-  void
-  eval_bitvector(const vector<ElbExpr*>& arg_list,
-		 BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  /// @note このクラスでは NULL を返す．
-  virtual
-  ElbExpr*
-  _left_range() const;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  /// @note このクラスでは NULL を返す．
-  virtual
-  ElbExpr*
-  _right_range() const;
-
-
-private:
-
-  /// @brief 関数の値の評価を行う．
-  /// @param[in] arg_list 引数のリスト
-  /// @note constant function の場合のみ意味を持つ．
-  void
-  evaluate(const vector<ElbExpr*>& arg_list) const;
 
 
 private:
@@ -509,8 +414,8 @@ protected:
 	      const PtItem* pt_item,
 	      ymuint io_num,
 	      EiIODecl* io_array,
-	      ElbExpr* left,
-	      ElbExpr* right,
+	      const PtExpr* left,
+	      const PtExpr* right,
 	      int left_val,
 	      int right_val);
 
@@ -524,40 +429,39 @@ public:
   // VlFunction の仮想関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 範囲指定を持つとき true を返す．
+  virtual
+  bool
+  has_range() const;
+
   /// @brief 範囲の MSB の値を返す．
-  /// @retval 範囲のMSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief 範囲の LSB の値を返す．
-  /// @retval 範囲のLSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const;
 
   /// @brief 出力のビット幅を返す．
   virtual
   ymuint
   bit_size() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbFunction の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 範囲のMSBを返す．
-  virtual
-  ElbExpr*
-  _left_range() const;
-
-  /// @brief 範囲のLSBを返す．
-  virtual
-  ElbExpr*
-  _right_range() const;
 
 
 private:

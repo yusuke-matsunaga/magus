@@ -35,8 +35,8 @@ SptIOHead::SptIOHead(const FileRegion& file_region,
 		     tVpiNetType net_type,
 		     tVpiVarType var_type,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right) :
+		     const PtExpr* left,
+		     const PtExpr* right) :
   mFileRegion(file_region),
   mType(type),
   mAuxType(aux_type),
@@ -154,7 +154,7 @@ SptIOHead::set_elem(PtIOItemArray elem_array)
 // @param init_value 初期値
 SptIOItem::SptIOItem(const FileRegion& file_region,
 		     const char* name,
-		     PtExpr* init_value) :
+		     const PtExpr* init_value) :
   mFileRegion(file_region),
   mName(name),
   mInitValue(init_value)
@@ -209,15 +209,15 @@ SptIOItem::init_value() const
 // net_type/vs_type/strength/delay が意味を持つのは type == kNet の
 // 時のみ
 SptDeclHead::SptDeclHead(const FileRegion& file_region,
-		   tPtDeclType type,
-		   bool sign,
-		   PtExpr* left,
-		   PtExpr* right,
-		   tVpiVarType var_type,
-		   tVpiNetType net_type,
-		   tVpiVsType vs_type,
-		   PtStrength* strength,
-		   PtDelay* delay) :
+			 tPtDeclType type,
+			 bool sign,
+			 const PtExpr* left,
+			 const PtExpr* right,
+			 tVpiVarType var_type,
+			 tVpiNetType net_type,
+			 tVpiVsType vs_type,
+			 const PtStrength* strength,
+			 const PtDelay* delay) :
   mFileRegion(file_region),
   mType(type),
   mSigned(sign),
@@ -363,7 +363,7 @@ SptDeclHead::set_elem(PtDeclItemArray elem_array)
 SptDeclItem::SptDeclItem(const FileRegion& file_region,
 			 const char* name,
 			 PtRangeArray range_array,
-			 PtExpr* init_value) :
+			 const PtExpr* init_value) :
   mFileRegion(file_region),
   mName(name),
   mRangeArray(range_array),
@@ -425,8 +425,8 @@ SptDeclItem::init_value() const
 
 // @brief コンストラクタ
 SptRange::SptRange(const FileRegion& file_region,
-		   PtExpr* msb,
-		   PtExpr* lsb) :
+		   const PtExpr* msb,
+		   const PtExpr* lsb) :
   mFileRegion(file_region),
   mMsb(msb),
   mLsb(lsb)
@@ -545,8 +545,8 @@ PtiIOHead*
 SptFactory::new_IOHead(const FileRegion& file_region,
 		       tPtIOType type,
 		       bool sign,
-		       PtExpr* left,
-		       PtExpr* right)
+		       const PtExpr* left,
+		       const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptIOHead));
   return new (p) SptIOHead(file_region,
@@ -566,8 +566,8 @@ PtiIOHead*
 SptFactory::new_RegIOHead(const FileRegion& file_region,
 			  tPtIOType type,
 			  bool sign,
-			  PtExpr* left,
-			  PtExpr* right)
+			  const PtExpr* left,
+			  const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptIOHead));
   return new (p) SptIOHead(file_region,
@@ -589,8 +589,8 @@ SptFactory::new_NetIOHead(const FileRegion& file_region,
 			  tPtIOType type,
 			  tVpiNetType net_type,
 			  bool sign,
-			  PtExpr* left,
-			  PtExpr* right)
+			  const PtExpr* left,
+			  const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptIOHead));
   return new (p) SptIOHead(file_region,
@@ -603,7 +603,7 @@ SptFactory::new_NetIOHead(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] name 要素名
 // @return 生成された要素
-PtIOItem*
+const PtIOItem*
 SptFactory::new_IOItem(const FileRegion& file_region,
 		       const char* name)
 {
@@ -616,10 +616,10 @@ SptFactory::new_IOItem(const FileRegion& file_region,
 // @param[in] name 要素名
 // @param[in] init_value 初期値を表す式
 // @return 生成された要素
-PtIOItem*
+const PtIOItem*
 SptFactory::new_IOItem(const FileRegion& file_region,
 		       const char* name,
-		       PtExpr* init_value)
+		       const PtExpr* init_value)
 {
   void* p = alloc().get_memory(sizeof(SptIOItem));
   return new (p) SptIOItem(file_region, name, init_value);
@@ -653,8 +653,8 @@ SptFactory::new_ParamH(const FileRegion& file_region)
 PtiDeclHead*
 SptFactory::new_ParamH(const FileRegion& file_region,
 		       bool sign,
-		       PtExpr* left,
-		       PtExpr* right)
+		       const PtExpr* left,
+		       const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -703,8 +703,8 @@ SptFactory::new_LocalParamH(const FileRegion& file_region)
 PtiDeclHead*
 SptFactory::new_LocalParamH(const FileRegion& file_region,
 			    bool sign,
-			    PtExpr* left,
-			    PtExpr* right)
+			    const PtExpr* left,
+			    const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -751,8 +751,8 @@ SptFactory::new_SpecParamH(const FileRegion& file_region)
 // @return 生成された specparam
 PtiDeclHead*
 SptFactory::new_SpecParamH(const FileRegion& file_region,
-			   PtExpr* left,
-			   PtExpr* right)
+			   const PtExpr* left,
+			   const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -799,9 +799,18 @@ SptFactory::new_VarH(const FileRegion& file_region,
 		     tVpiVarType var_type)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
+  bool sign = false;
+  switch ( var_type ) {
+  case kVpiVarInteger:
+  case kVpiVarReal:
+  case kVpiVarRealtime:
+    sign = true;
+  default:
+    break;
+  }
   return new (p) SptDeclHead(file_region,
 			     kPtDecl_Var,
-			     false, NULL, NULL,
+			     sign, NULL, NULL,
 			     var_type, kVpiNone, kVpiVsNone,
 			     NULL, NULL);
 }
@@ -831,8 +840,8 @@ SptFactory::new_RegH(const FileRegion& file_region,
 PtiDeclHead*
 SptFactory::new_RegH(const FileRegion& file_region,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right)
+		     const PtExpr* left,
+		     const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -870,7 +879,7 @@ PtiDeclHead*
 SptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     bool sign,
-		     PtStrength* strength)
+		     const PtStrength* strength)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -890,7 +899,7 @@ PtiDeclHead*
 SptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     bool sign,
-		     PtDelay* delay)
+		     const PtDelay* delay)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -911,8 +920,8 @@ PtiDeclHead*
 SptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     bool sign,
-		     PtStrength* strength,
-		     PtDelay* delay)
+		     const PtStrength* strength,
+		     const PtDelay* delay)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -936,8 +945,8 @@ SptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right)
+		     const PtExpr* left,
+		     const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -961,9 +970,9 @@ SptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtStrength* strength)
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtStrength* strength)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -987,9 +996,9 @@ SptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtDelay* delay)
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtDelay* delay)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -1014,10 +1023,10 @@ SptFactory::new_NetH(const FileRegion& file_region,
 		     tVpiNetType type,
 		     tVpiVsType vstype,
 		     bool sign,
-		     PtExpr* left,
-		     PtExpr* right,
-		     PtStrength* strength,
-		     PtDelay* delay)
+		     const PtExpr* left,
+		     const PtExpr* right,
+		     const PtStrength* strength,
+		     const PtDelay* delay)
 {
   void* p = alloc().get_memory(sizeof(SptDeclHead));
   return new (p) SptDeclHead(file_region,
@@ -1031,7 +1040,7 @@ SptFactory::new_NetH(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] name 名前
 // @return 生成された要素
-PtDeclItem*
+const PtDeclItem*
 SptFactory::new_DeclItem(const FileRegion& file_region,
 			 const char* name)
 {
@@ -1044,10 +1053,10 @@ SptFactory::new_DeclItem(const FileRegion& file_region,
 // @param[in] name 名前
 // @param[in] init_value 初期値を表す式
 // @return 生成された要素
-PtDeclItem*
+const PtDeclItem*
 SptFactory::new_DeclItem(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* init_value)
+			 const PtExpr* init_value)
 {
   void* p = alloc().get_memory(sizeof(SptDeclItem));
   return new (p) SptDeclItem(file_region, name, PtRangeArray(), init_value);
@@ -1058,7 +1067,7 @@ SptFactory::new_DeclItem(const FileRegion& file_region,
 // @param[in] name 名前
 // @param[in] range_array 配列の各次元の範囲のリスト
 // @return 生成された要素
-PtDeclItem*
+const PtDeclItem*
 SptFactory::new_DeclItem(const FileRegion& file_region,
 			 const char* name,
 			 PtRangeArray range_array)
@@ -1071,10 +1080,10 @@ SptFactory::new_DeclItem(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] msb MSB を表す式
 // @param[in] lsb LSB を表す式
-PtRange*
+const PtRange*
 SptFactory::new_Range(const FileRegion& file_region,
-		      PtExpr* msb,
-		      PtExpr* lsb)
+		      const PtExpr* msb,
+		      const PtExpr* lsb)
 {
   void* p = alloc().get_memory(sizeof(SptRange));
   return new (p) SptRange(file_region, msb, lsb);

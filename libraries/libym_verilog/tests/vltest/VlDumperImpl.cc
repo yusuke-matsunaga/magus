@@ -15,11 +15,11 @@
 
 #include "VlDumperImpl.h"
 
-#include <ym_utils/FileRegion.h>
-
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlModule.h>
-#include <ym_verilog/vl/VlUdp.h>
+#include "ym_utils/FileRegion.h"
+#include "ym_verilog/VlMgr.h"
+#include "ym_verilog/VlValue.h"
+#include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlUdp.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -263,6 +263,45 @@ VlDumperImpl::put(const char* label,
 //////////////////////////////////////////////////////////////////////
 // その他のデータ型の出力
 //////////////////////////////////////////////////////////////////////
+
+// @brief VlValue の情報を出力する．
+// @param[in] label ラベル
+// @param[in] value 値
+void
+VlDumperImpl::put(const char* label,
+		  const VlValue& value)
+{
+  VlDumpHeader x(this, label, "VlValue");
+  switch ( value.type() ) {
+  case VlValue::kIntType:
+    put("int_value()", value.int_value());
+    break;
+
+  case VlValue::kUintType:
+    put("uint_value()", value.uint_value());
+    break;
+
+  case VlValue::kScalarType:
+    put("scalar_value()", value.scalar_value());
+    break;
+
+  case VlValue::kRealType:
+    put("real_value()", value.real_value());
+    break;
+
+  case VlValue::kTimeType:
+    put("time_value()", value.time_value());
+    break;
+
+  case VlValue::kBitVectorType:
+    put("bitvector_value()", value.bitvector_value());
+    break;
+
+  case VlValue::kErrorType:
+    mStream << "ErrorType";
+    break;
+  }
+}
 
 // @brief FileLoc の情報を出力する．
 // @param[in] label ラベル
@@ -635,6 +674,57 @@ VlDumperImpl::put(const char* label,
 {
   VlDumpHeader x(this, label, "int", false);
   mStream << d;
+}
+
+// @brief スカラー値の出力
+// @param[in] label ラベル
+// @param[in] val スカラー値
+void
+VlDumperImpl::put(const char* label,
+		  tVpiScalarVal val)
+{
+  VlDumpHeader x(this, label, "scalar", false);
+  switch ( val ) {
+  case kVpiScalarZ: mStream << "Z"; break;
+  case kVpiScalar0: mStream << "0"; break;
+  case kVpiScalar1: mStream << "1"; break;
+  case kVpiScalarX: mStream << "X"; break;
+  }
+}
+
+// @brief time値の出力
+// @param[in] label ラベル
+// @param[in] val time値
+void
+VlDumperImpl::put(const char* label,
+		  VlTime val)
+{
+  VlDumpHeader x(this, label, "time", false);
+  put("high", val.high());
+  put("low", val.low());
+
+}
+
+// @brief 実数値の出力
+// @param[in] label ラベル
+// @param[in] val 値
+void
+VlDumperImpl::put(const char* label,
+		  double val)
+{
+  VlDumpHeader x(this, label, "real", false);
+  mStream << val;
+}
+
+// @brief ビットベクタ値の出力
+// @param[in] label ラベル
+// @param[in] val 値
+void
+VlDumperImpl::put(const char* label,
+		  const BitVector& val)
+{
+  VlDumpHeader x(this, label, "bitvector", false);
+  mStream << val.verilog_string();
 }
 
 // @brief 文字列の出力

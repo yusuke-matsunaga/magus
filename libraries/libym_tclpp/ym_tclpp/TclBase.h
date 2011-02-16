@@ -35,18 +35,18 @@ public:
   /// @brief コンストラクタ
   /// @note 最初は特定のインタープリタには結び付いていない．
   TclBase();
-  
+
   /// @brief デストラクタ
   virtual
   ~TclBase();
-  
+
   /// @brief インタープリタの取得
   /// @return インタープリタを返す．
   /// NULL の場合もあり得る．
   Tcl_Interp*
   interp() const;
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   /// @name Tcl スクリプトの評価関数
   /// @{
@@ -59,7 +59,7 @@ public:
   /// @retval TCL_ERROR エラーが起きた
   int
   eval(const TclObj& script) const;
-  
+
   /// @brief  グローバルレベルでのスクリプトの評価
   ///
   /// 結果またはエラーメッセージをインタープリタにセットする．
@@ -68,7 +68,7 @@ public:
   /// @retval TCL_ERROR エラーが起きた
   int
   global_eval(const TclObj& script) const;
-  
+
   /// @brief ファイルの評価
   ///
   /// 結果またはエラーメッセージをインタープリタにセットする．
@@ -93,7 +93,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name コマンド操作関数
@@ -107,14 +107,14 @@ public:
   /// 直接 Tcl_CreateCommand() を呼んでははいけない．
   /// @sa TclCmd
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief コマンドの削除
   /// @param[in] cmd_name 削除するコマンド名
   /// @retval TCL_OK 成功した
   /// @retval TCL_ERROR エラーが起きた
   int
   delete_command(const string& cmd_name) const;
-  
+
   /// @brief token を使ったコマンドの削除
   /// @param[in] token 削除するコマンドのトークン
   /// @retval TCL_OK 成功した
@@ -122,7 +122,7 @@ public:
   /// @sa TclCmd
   int
   delete_command(Tcl_Command token) const;
-  
+
   /// @brief コマンドに関する情報の取得
   /// @param[in] cmd_name コメント名
   /// @param[out] info 得られたコマンド情報
@@ -132,7 +132,7 @@ public:
   int
   command_info(const string& cmd_name,
 	       Tcl_CmdInfo* info) const;
-  
+
   /// @brief コマンドに関する情報のセット
   /// @param[in] cmd_name コメント名
   /// @param[in] info セットするコマンド情報
@@ -145,7 +145,7 @@ public:
   int
   set_command_info(const string& cmd_name,
 		   Tcl_CmdInfo* info) const;
-  
+
   /// @brief コマンド名の取得
   /// @param[in] token コマンドのトークン
   /// @return コマンド名
@@ -156,7 +156,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 結果にアクセスするための関数
   /// @{
@@ -165,11 +165,11 @@ public:
   /// @param[in] obj 結果にセットするオブジェクト
   void
   set_result(const TclObj& obj) const;
-  
+
   /// @brief 結果のクリア
   void
   reset_result() const;
-  
+
   /// @brief 結果の取得
   /// @return 結果を表すオブジェクト
   TclObj
@@ -177,7 +177,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name オブジェクトの型変換
@@ -192,7 +192,7 @@ public:
   int
   int_conv(const TclObj& obj,
 	   ymint& ans) const;
-  
+
   /// @brief オブジェクトから unsigned int への変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] ans 変換結果を格納する変数
@@ -202,7 +202,7 @@ public:
   int
   uint_conv(const TclObj& obj,
 	    ymuint& ans) const;
-  
+
   /// @brief オブジェクトから long への変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] ans 変換結果を格納する変数
@@ -212,7 +212,7 @@ public:
   int
   long_conv(const TclObj& obj,
 	    ymlong& ans) const;
-  
+
   /// @brief オブジェクトから unsigned long への変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] ans 変換結果を格納する変数
@@ -222,7 +222,7 @@ public:
   int
   ulong_conv(const TclObj& obj,
 	     ymulong& ans) const;
-  
+
   /// @brief オブジェクトから double への変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] ans 変換結果を格納する変数
@@ -232,7 +232,7 @@ public:
   int
   double_conv(const TclObj& obj,
 	      double& ans) const;
-  
+
   /// @brief オブジェクトからブール値への変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] ans 変換結果を格納する変数
@@ -242,7 +242,7 @@ public:
   int
   bool_conv(const TclObj& obj,
 	    bool& ans) const;
-  
+
   /// @brief オブジェクトからリストへの変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] objv 変換結果を格納するベクタ
@@ -251,7 +251,7 @@ public:
   int
   list_conv(const TclObj& obj,
 	    TclObjVector& objv) const;
-  
+
   /// @brief オブジェクトからリストへの変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] objv 変換結果を格納するリスト
@@ -260,7 +260,7 @@ public:
   int
   list_conv(const TclObj& obj,
 	    TclObjList& objv) const;
-  
+
   /// @brief オブジェクトからリストへの変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[out] length 変換結果のリストの要素数を格納する変数
@@ -270,7 +270,7 @@ public:
   int
   list_length(const TclObj& obj,
 	      size_t& length) const;
-  
+
   /// @brief オブジェクトからリストへの変換
   /// @param[in] obj 変換元のオブジェクト
   /// @param[in] index 取り出す要素の位置 (最初の位置は 0)
@@ -285,7 +285,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 式の評価
   /// @{
@@ -325,7 +325,7 @@ public:
   int
   expr_bool(const TclObj& obj,
 	    bool& ans) const;
-  
+
   /// @brief オブジェクトの評価
   ///
   /// 結果を TclObj の形で評価する．
@@ -348,7 +348,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name エラー情報の設定
@@ -366,14 +366,14 @@ public:
   /// obj を Tcl 変数 errorCode にセットする．
   void
   set_errorcode(const TclObj& obj) const;
-  
+
   /// @brief バックグラウンドエラーの報告
   void
   background_error() const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name Tcl変数の操作
@@ -411,7 +411,7 @@ public:
 	  const TclObj& idx,
 	  const TclObj& value,
 	  int flags) const;
-  
+
   /// @brief 変数の値の取得
   /// @param[in] name 対象の変数名
   /// @param[in] flags 種々のフラグ
@@ -488,7 +488,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name Tcl変数の値の取得と型変換を組み合わせた関数
@@ -585,7 +585,7 @@ public:
 		const TclObj& idx,
 		int flags,
 		long& ans) const;
-  
+
   /// @brief Tcl変数から unsigned long への変換
   /// @param[in] name Tcl変数名
   /// @param[in] flags 種々のフラグ
@@ -599,7 +599,7 @@ public:
   ulong_from_var(const TclObj& name,
 		 int flags,
 		 unsigned long& ans) const;
-  
+
   /// @brief 配列型 Tcl変数から unsigned long への変換
   /// @param[in] base Tcl変数名
   /// @param[in] idx インデックス
@@ -615,7 +615,7 @@ public:
 		 const TclObj& idx,
 		 int flags,
 		 unsigned long& ans) const;
-  
+
   /// @brief Tcl変数から double への変換
   /// @param[in] name Tcl変数名
   /// @param[in] flags 種々のフラグ
@@ -629,7 +629,7 @@ public:
   double_from_var(const TclObj& name,
 		  int flags,
 		  double& ans) const;
-  
+
   /// @brief 配列型 Tcl変数から double への変換
   /// @param[in] base Tcl変数名
   /// @param[in] idx インデックス
@@ -645,7 +645,7 @@ public:
 		  const TclObj& idx,
 		  int flags,
 		  double& ans) const;
-  
+
   /// @brief Tcl変数から bool への変換
   /// @param[in] name Tcl変数名
   /// @param[in] flags 種々のフラグ
@@ -659,7 +659,7 @@ public:
   bool_from_var(const TclObj& name,
 		int flags,
 		bool& ans) const;
-  
+
   /// @brief 配列型 Tcl変数から bool への変換
   /// @param[in] base Tcl変数名
   /// @param[in] idx インデックス
@@ -675,7 +675,7 @@ public:
 		const TclObj& idx,
 		int flags,
 		bool& ans) const;
-  
+
   /// @brief Tcl変数からリストへの変換
   /// @param[in] name Tcl変数名
   /// @param[in] flags 種々のフラグ
@@ -689,7 +689,7 @@ public:
   list_from_var(const TclObj& name,
 		int flags,
 		TclObjVector& objv) const;
-  
+
   /// @brief Tcl変数からリストへの変換
   /// @param[in] name Tcl変数名
   /// @param[in] flags 種々のフラグ
@@ -703,7 +703,7 @@ public:
   list_from_var(const TclObj& name,
 		int flags,
 		TclObjList& objv) const;
-  
+
   /// @brief 配列型 Tcl変数からリストへの変換
   /// @param[in] base Tcl変数名
   /// @param[in] idx インデックス
@@ -719,7 +719,7 @@ public:
 		const TclObj& idx,
 		int flags,
 		TclObjVector& objv) const;
-  
+
   /// @brief 配列型 Tcl変数からリストへの変換
   /// @param[in] base Tcl変数名
   /// @param[in] idx インデックス
@@ -738,7 +738,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name 変数トレース情報の取得
@@ -766,7 +766,7 @@ public:
   vartrace_info(const string& name,
 		int flags,
 		TclVarTrace* prev_obj) const;
-  
+
   /// @brief 変数トレース情報の取得
   /// @param[in] base Tcl変数名
   /// @param[in] idx インデックス
@@ -788,7 +788,7 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////
   /// @name ユーティリティ関数
@@ -805,7 +805,7 @@ public:
   bool
   tilde_subst(const string& name,
 	      string& subst_name) const;
-  
+
   /// @brief エラー出力関数
   /// @return エラーメッセージ文字列
   ///
@@ -826,7 +826,8 @@ public:
   /// 失敗した場合にはメッセージをインタプリタにセットする．
   bool
   open_ifile(ifstream& ifs,
-	     const string& name) const;
+	     const string& name,
+	     ios::openmode openmode = ios::in) const;
 
   /// @brief 出力ファイルのオープン
   /// @param[out] ofs 開いたファイルの出力ストリームをセットする変数
@@ -838,7 +839,8 @@ public:
   /// 失敗した場合にはメッセージをインタプリタにセットする．
   bool
   open_ofile(ofstream& ofs,
-	     const string& name) const;
+	     const string& name,
+	     ios::openmode openmode = ios::out) const;
 
   /// @brief glob 形式のマッチング関数
   /// @param[in] str マッチング対象の文字列
@@ -873,7 +875,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   /// @brief Tcl インタープリタを設定する．
   /// @param[in] interp Tcl インタープリタ
   void

@@ -14,7 +14,10 @@
 #include "ym_mvn/MvNode.h"
 #include "ym_mvn/MvPin.h"
 
+#include "ym_mvn/MvVlMap.h"
+
 #include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlDeclArray.h"
 #include "ym_verilog/vl/VlRange.h"
 
 
@@ -63,8 +66,8 @@ dump_node(ostream& s,
   case MvNode::kInput:      s << "Input"; break;
   case MvNode::kInout:      s << "Inout"; break;
   case MvNode::kOutput:     s << "Output"; break;
-  case MvNode::kDff1:       s << "DFF1"; break;
-  case MvNode::kDff2:       s << "DFF2"; break;
+  case MvNode::kDff:        s << "DFF"; break;
+  case MvNode::kLatch:      s << "Latch"; break;
   case MvNode::kThrough:    s << "Through"; break;
   case MvNode::kNot:        s << "Not"; break;
   case MvNode::kAnd:        s << "And"; break;
@@ -104,7 +107,17 @@ dump_node(ostream& s,
   case MvNode::kCombUdp:    s << "Combinational UDP"; break;
   case MvNode::kSeqUdp:     s << "Sequential UDP"; break;
   case MvNode::kConst:
-    s << "Const";
+    {
+      s << "Const(";
+      vector<ymuint32> val;
+      node->const_value(val);
+      ymuint n = val.size();
+      s << hex;
+      for (ymuint i = 0; i < n; ++ i) {
+	s << " " << val[n - i - 1];
+      }
+      s << dec << ")";
+    }
     break;
   default:
     assert_not_reached(__FILE__, __LINE__);
@@ -119,6 +132,27 @@ dump_node(ostream& s,
   for (ymuint i = 0; i < no; ++ i) {
     const MvOutputPin* pin = node->output(i);
     dump_outputpin(s, pin);
+  }
+  if ( node->type() == MvNode::kDff ) {
+    for (ymuint i = 0; i < ni - 2; ++ i) {
+      s << "  Control#" << i << "(InputPin#" << i + 2 << ")" << endl
+	<< "    ";
+      if ( node->control_pol(i) ) {
+	s << "posedge";
+      }
+      else {
+	s << "negedge";
+      }
+      s << ": ";
+      vector<ymuint32> val;
+      node->control_value(i, val);
+      ymuint n = val.size();
+      s << hex;
+      for (ymuint i = 0; i < n; ++ i) {
+	s << " " << val[n - i - 1];
+      }
+      s << dec << endl;
+    }
   }
   s << endl;
 }
@@ -143,11 +177,7 @@ dump(ostream& s,
     const MvModule* module = mgr.module(i);
     if ( module == NULL ) continue;
 
-    s << "Module#" << module->id() << "(";
-    if ( module->name() ) {
-      s << module->name();
-    }
-    s << ")" << endl;
+    s << "Module#" << module->id() << "(" << module->name() << ")" << endl;
     const MvNode* pnode = module->parent();
     if ( pnode ) {
       s << "  parent node: Module#" << pnode->parent()->id()
@@ -160,11 +190,7 @@ dump(ostream& s,
     ymuint np = module->port_num();
     for (ymuint j = 0; j < np; ++ j) {
       const MvPort* port = module->port(j);
-      s << "  Port#" << j << "(";
-      if ( port->name() ) {
-	s << port->name();
-      }
-      s << ")" << endl;
+      s << "  Port#" << j << "(" << port->name() << ")" << endl;
       ymuint n = port->port_ref_num();
       for (ymuint k = 0; k < n; ++ k) {
 	const MvPortRef* port_ref = port->port_ref(k);
@@ -201,28 +227,32 @@ dump(ostream& s,
 void
 dump_node_map(ostream& s,
 	      const MvMgr& mgr,
-	      const vector<pair<const VlDecl*, ymuint> >& node_map)
+	      const MvVlMap& node_map)
 {
   ymuint n = mgr.max_node_id();
   for (ymuint i = 0; i < n; ++ i) {
     const MvNode* node = mgr.node(i);
     if ( node == NULL ) continue;
-    if ( node_map.size() <= node->id() ) continue;
-    const pair<const VlDecl*, ymuint>& p = node_map[node->id()];
-    const VlDecl* decl = p.first;
-    if ( decl == NULL ) continue;
+
     s << "// node" << node->id() << " : ";
-    ymuint offset = p.second;
-    s << decl->full_name();
-    if ( decl->is_array() ) {
-      ymuint d = decl->dimension();
+    if ( node_map.is_single_elem(i) ) {
+      const VlDecl* decl = node_map.get_single_elem(i);
+      assert_cond( decl != NULL, __FILE__, __LINE__);
+      s << decl->full_name();
+    }
+    else if ( node_map.is_array_elem(i) ) {
+      const VlDeclArray* declarray = node_map.get_array_elem(i);
+      assert_cond( declarray != NULL, __FILE__, __LINE__);
+      ymuint offset = node_map.get_array_offset(i);
+      ymuint d = declarray->dimension();
       vector<int> index_array(d);
       for (ymuint i = 0; i < d; ++ i) {
-	const VlRange* range = decl->range(i);
+	const VlRange* range = declarray->range(i);
 	ymuint n = range->size();
 	index_array[i] = offset % n;
 	offset /= n;
       }
+      s << declarray->full_name();
       for (ymuint i = 0; i < d; ++ i) {
 	s << "[" << index_array[d - i - 1] << "]";
       }

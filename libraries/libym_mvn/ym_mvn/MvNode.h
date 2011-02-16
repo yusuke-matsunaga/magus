@@ -36,26 +36,25 @@ public:
     /// @brief 入出力 ( 1入力, 1出力 )
     kInout,
 
-    /// @brief フリップフロップ1
-    /// (クロック，データ入力，非同期リセット，非同期セット，データ出力)
-    /// リセット，セットは使用しない場合もある．
-    kDff1,
+    /// @brief フリップフロップ
+    /// (クロック，データ入力，非同期セット)
+    /// 非同期セットは複数ある場合もある．
+    kDff,
 
-    /// @brief フリップフロップ2
-    /// (クロック，データ入力，同期リセット，同期セット，データ出力)
-    /// リセット，セットは使用しない場合もある．
-    kDff2,
+    /// @brief ラッチ
+    /// (データ入力，ラッチイネーブル，データ出力)
+    kLatch,
 
     /// @brief through ( 1入力, 1出力 )
     kThrough,
 
     /// @brief logical not ( 1入力, 1出力 )
     kNot,
-    /// @brief logical and ( 2入力, 1出力 )
+    /// @brief logical and ( n入力, 1出力 )
     kAnd,
-    /// @brief logical or ( 2入力, 1出力 )
+    /// @brief logical or ( n入力, 1出力 )
     kOr,
-    /// @brief logical xor ( 2入力, 1出力 )
+    /// @brief logical xor ( n入力, 1出力 )
     kXor,
 
     /// @brief reduction and ( 1入力, 1出力 )
@@ -160,6 +159,26 @@ public:
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
   const MvOutputPin*
   output(ymuint pos) const;
+
+  /// @brief 非同期セット信号の極性を得る．
+  /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+  /// @retval 1 正極性(posedge)
+  /// @retval 0 負極性(negedge)
+  /// @note type() が kDff の時のみ意味を持つ．
+  /// @note デフォルトの実装では 0 を返す．
+  virtual
+  ymuint
+  control_pol(ymuint pos) const;
+
+  /// @brief 非同期セット信号のセット値を得る．
+  /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+  /// @param[out] val 値を格納するベクタ
+  /// @note type() が kDff の時のみ意味を持つ．
+  /// @note デフォルトの実装ではなにもしない．
+  virtual
+  void
+  control_value(ymuint pos,
+		vector<ymuint32>& val) const;
 
   /// @brief ビット位置を得る．
   /// @note type() が kConstBitSelect の時のみ意味を持つ．

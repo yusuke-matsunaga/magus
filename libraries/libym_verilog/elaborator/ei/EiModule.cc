@@ -70,8 +70,8 @@ EiFactory::new_ModuleArray(const VlNamedObj* parent,
 			   const PtModule* pt_module,
 			   const PtItem* pt_head,
 			   const PtInst* pt_inst,
-			   ElbExpr* left,
-			   ElbExpr* right,
+			   const PtExpr* left,
+			   const PtExpr* right,
 			   int left_val,
 			   int right_val)
 {
@@ -717,18 +717,32 @@ EiModuleArray::name() const
   return mHead.name();
 }
 
-// @brief 範囲の MSB を返す．
-const VlExpr*
-EiModuleArray::left_range() const
+// @brief 範囲の MSB の値を返す．
+int
+EiModuleArray::left_range_val() const
 {
-  return mRange.left_range();
+  return mRange.left_range_val();
 }
 
-// @brief 範囲の LSB を返す．
-const VlExpr*
-EiModuleArray::right_range() const
+// @brief 範囲の LSB の値を返す．
+int
+EiModuleArray::right_range_val() const
 {
-  return mRange.right_range();
+  return mRange.right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+string
+EiModuleArray::left_range_string() const
+{
+  return mRange.left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+string
+EiModuleArray::right_range_string() const
+{
+  return mRange.right_range_string();
 }
 
 // @brief 要素数を返す．

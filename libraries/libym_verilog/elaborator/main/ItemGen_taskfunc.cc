@@ -64,18 +64,15 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
     const PtExpr* pt_right = pt_item->right_range();
 
     if ( pt_left && pt_right ) {
-      ElbExpr* left = NULL;
-      ElbExpr* right = NULL;
       int left_val = 0;
       int right_val = 0;
-      if ( !instantiate_range(parent,
-			      pt_left, pt_right,
-			      left, right,
-			      left_val, right_val) ) {
+      if ( !evaluate_range(parent,
+			   pt_left, pt_right,
+			   left_val, right_val) ) {
 	return;
       }
       taskfunc = factory().new_Function(parent,	pt_item,
-					left, right,
+					pt_left, pt_right,
 					left_val, right_val);
     }
     else {
@@ -87,13 +84,14 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
   }
 
   // parameter の生成
-  instantiate_param(taskfunc, pt_item->paramhead_array(), false);
+  phase1_decl(taskfunc, pt_item->declhead_array(), false);
 
-  // localparam の生成
-  instantiate_param(taskfunc, pt_item->localparamhead_array(), true);
-
+#if 0
   // attribute instance の生成
-  //instantiate_attribute(pt_item->attr_top(), false, taskfunc);
+  instantiate_attribute(pt_item->attr_top(), false, taskfunc);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
 
   ostringstream buf;
   buf << "instantiating task/func : " << taskfunc->full_name() << ".";
@@ -142,14 +140,12 @@ ItemGen::phase2_tf(ElbTaskFunc* taskfunc,
 
   if ( taskfunc->type() == kVpiFunction ) {
     // 関数名と同名の変数の生成
-    ElbExpr* left = taskfunc->_left_range();
-    ElbExpr* right = taskfunc->_right_range();
-    int left_val = taskfunc->left_range_const();
-    int right_val = taskfunc->right_range_const();
+    int left_val = taskfunc->left_range_val();
+    int right_val = taskfunc->right_range_val();
     ElbDeclHead* head = NULL;
-    if ( left && right ) {
+    if ( taskfunc->has_range() ) {
       head = factory().new_DeclHead(taskfunc, pt_item,
-				    left, right,
+				    pt_item->left_range(), pt_item->right_range(),
 				    left_val, right_val);
     }
     else {
@@ -230,20 +226,17 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   ElbTaskFunc* func = NULL;
   ElbDeclHead* head = NULL;
   if ( pt_left && pt_right ) {
-    ElbExpr* left = NULL;
-    ElbExpr* right = NULL;
     int left_val = 0;
     int right_val = 0;
-    if ( !instantiate_range(parent, pt_left, pt_right,
-			    left, right,
-			    left_val, right_val) ) {
+    if ( !evaluate_range(parent, pt_left, pt_right,
+			 left_val, right_val) ) {
       return NULL;
     }
     func = factory().new_Function(parent, pt_function,
-				  left, right,
+				  pt_left, pt_right,
 				  left_val, right_val);
     head = factory().new_DeclHead(func, pt_function,
-				  left, right,
+				  pt_left, pt_right,
 				  left_val, right_val);
   }
   else {
@@ -257,10 +250,7 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
   reg_constant_function(parent, pt_function->name(), func);
 
   // parameter の生成
-  instantiate_param(func, pt_function->paramhead_array(), false);
-
-  // localparam の生成
-  instantiate_param(func, pt_function->localparamhead_array(), true);
+  phase1_decl(func, pt_function->declhead_array(), false);
 
   // 宣言要素の生成
   instantiate_decl(func, pt_function->declhead_array());

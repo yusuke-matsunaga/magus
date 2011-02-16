@@ -55,6 +55,8 @@ class CellTiming;
 class CellLutTemplate;
 class CellLut;
 
+class CellMislibReader;
+
 END_NAMESPACE_YM_CELL
 
 BEGIN_NAMESPACE_YM
@@ -68,6 +70,8 @@ using nsCell::CellBundle;
 using nsCell::CellTiming;
 using nsCell::CellLutTemplate;
 using nsCell::CellLut;
+
+using nsCell::CellMislibReader;
 
 END_NAMESPACE_YM
 

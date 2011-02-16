@@ -145,13 +145,13 @@ ElbMgr::reg_user_systf(const ElbUserSystf* systf)
   mSystfHash.insert(make_pair(systf->_name(), systf));
 }
 
-// @brief generate block を登録する．
+// @brief internal scope を登録する．
 // @param[in] obj 登録するオブジェクト
 void
-ElbMgr::reg_genblock(ElbScope* obj)
+ElbMgr::reg_internalscope(ElbScope* obj)
 {
   if ( debug & debug_objdict ) {
-    dout << "reg_genblock( " << obj->name() << " @ "
+    dout << "reg_internalscope( " << obj->name() << " @ "
 	 << obj->parent()->full_name()
 	 << " ["
 	 << hex << reinterpret_cast<ympuint>(obj->parent()) << dec
@@ -159,26 +159,7 @@ ElbMgr::reg_genblock(ElbScope* obj)
 	 << endl;
   }
   mObjDict.add(obj);
-  mTagDict.add_genblock(obj);
-}
-
-// @brief block scope を登録する．
-// @param[in] obj 登録するオブジェクト
-void
-ElbMgr::reg_blockscope(ElbScope* obj)
-{
-  if ( debug & debug_objdict ) {
-    dout << "reg_blockscope( " << obj->name() << " @ "
-	 << obj->parent()->full_name()
-	 << " ["
-	 << hex << reinterpret_cast<ympuint>(obj->parent()) << dec
-	 << "] )" << endl
-	 << endl;
-  }
-  mObjDict.add(obj);
-#if 0 // TagDict::add_blockscope() は作ってない．
-  mTagDict.add_blockscope(obj);
-#endif
+  mTagDict.add_internalscope(obj);
 }
 
 // @brief 宣言要素を登録する．
@@ -217,27 +198,33 @@ ElbMgr::reg_declarray(int tag,
   }
   mObjDict.add(obj);
   if ( tag ) {
-    mTagDict.add_decl(tag, obj);
+    if ( tag == vpiVariables ) {
+      // ちょっと汚い補正
+      tag += 100;
+    }
+    mTagDict.add_declarray(tag, obj);
   }
 }
 
-#if 0
-// @brief parameter 宣言を登録する．
+// @brief パラメータを登録する．
+// @param[in] tag タグ
 // @param[in] obj 登録するオブジェクト
 void
-ElbMgr::reg_parameter(ElbParameter* obj)
+ElbMgr::reg_parameter(int tag,
+		      ElbParameter* obj)
 {
   if ( debug & debug_objdict ) {
-    dout << "reg_parameter( " << obj->name() << " @ "
+    dout << "reg_decl( " << obj->name() << " @ "
 	 << obj->parent()->full_name()
 	 << " ["
 	 << hex << reinterpret_cast<ympuint>(obj->parent()) << dec
 	 << "] )" << endl << endl;
   }
   mObjDict.add(obj);
-  mTagDict.add_parameter(obj);
+  if ( tag ) {
+    mTagDict.add_parameter(tag, obj);
+  }
 }
-#endif
 
 // @brief defparam を登録する．
 // @param[in] obj 登録するオブジェクト
@@ -516,7 +503,7 @@ ElbMgr::find_scope_up(const VlNamedObj* base_scope,
   ymuint n = nb_array.size();
   const VlNamedObj* cur_scope = base_scope;
   for (ymuint i = 0; i < n; ) {
-    PtNameBranch* name_branch = nb_array[i];
+    const PtNameBranch* name_branch = nb_array[i];
     const char* top_name = name_branch->name();
     const VlNamedObj* top_scope = NULL;
     // まず普通に探す．

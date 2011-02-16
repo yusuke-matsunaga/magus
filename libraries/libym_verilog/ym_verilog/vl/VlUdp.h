@@ -68,16 +68,16 @@ public:
   bool
   is_protected() const = 0;
 
-  /// @brief 初期値の式を返す．
-  virtual
-  const VlExpr*
-  init_expr() const = 0;
-
   /// @brief 初期値を返す．
   /// @return 0/1/X を返す．
   virtual
   tVpiScalarVal
   init_val() const = 0;
+
+  /// @brief 初期値を表す文字列を返す．
+  virtual
+  string
+  init_val_string() const = 0;
 
   /// @brief table entry の行数を返す．
   virtual

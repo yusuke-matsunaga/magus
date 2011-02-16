@@ -1,7 +1,7 @@
-#ifndef YM_VERILOG_VL_VLMGR_H
-#define YM_VERILOG_VL_VLMGR_H
+#ifndef YM_VERILOG_VLMGR_H
+#define YM_VERILOG_VLMGR_H
 
-/// @file ym_verilog/vl/VlMgr.h
+/// @file ym_verilog/VlMgr.h
 /// @brief VlMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -27,7 +27,7 @@ class ElbMgr;
 class ElbFactory;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlMgr VlMgr.h <ym_verilog/vl/VlMgr.h>
+/// @class VlMgr VlMgr.h "ym_verilog/VlMgr.h"
 /// @brief Verilog-HDL の elaboration 結果を保持するクラス
 //////////////////////////////////////////////////////////////////////
 class VlMgr
@@ -117,6 +117,7 @@ public:
   find_obj(const VlNamedObj* parent,
 	   const char* name) const;
 
+#if 0
   /// @brief スコープに属する generate block のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[out] scope_list 結果を格納するリスト
@@ -125,6 +126,16 @@ public:
   bool
   find_genblock_list(const VlNamedObj* parent,
 		     vector<const VlNamedObj*>& scope_list) const;
+#endif
+
+  /// @brief スコープに属する internal scope のリストを取り出す．
+  /// @param[in] parent 検索対象のスコープ
+  /// @param[out] scope_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  bool
+  find_internalscope_list(const VlNamedObj* parent,
+			  vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief スコープとタグから宣言要素を取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -138,6 +149,19 @@ public:
   find_decl_list(const VlNamedObj* parent,
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
+
+  /// @brief スコープとタグから宣言要素の配列を取り出す．
+  /// @param[in] parent 検索対象のスコープ
+  /// @param[in] tag タグ
+  /// @param[out] declarray_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  /// @note scope というスコープ内の tag というタグを持つ宣言要素を
+  /// decl_list に入れる．
+  bool
+  find_declarray_list(const VlNamedObj* parent,
+		      int tag,
+		      vector<const VlDeclArray*>& declarray_list) const;
 
   /// @brief スコープに属する defparam のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -268,4 +292,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_VLMGR_H
+#endif // YM_VERILOG_VLMGR_H

@@ -124,17 +124,6 @@ public:
   tVpiObjType
   type() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 };
 
 
@@ -176,18 +165,6 @@ public:
   virtual
   tVpiObjType
   type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えないのでエラーとなる．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 };
 
@@ -318,17 +295,6 @@ public:
   tVpiObjType
   type() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 };
 
 
@@ -368,18 +334,6 @@ public:
   virtual
   tVpiObjType
   type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 };
 

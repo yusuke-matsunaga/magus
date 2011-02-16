@@ -12,9 +12,9 @@
 
 
 #include "ym_verilog/verilog.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ElbProxy.h"
-#include "ElbValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -102,39 +102,66 @@ public:
   /// @brief PtExpr(primary) から named_event を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbDecl*
+  ElbExpr*
   instantiate_namedevent(const VlNamedObj* parent,
 			 const PtExpr* pt_expr);
+
+  /// @brief 式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] put_error エラーを出力する時，true にする．
+  VlValue
+  evaluate_expr(const VlNamedObj* parent,
+		const PtExpr* pt_expr,
+		bool put_error);
 
   /// @brief PtExpr を評価し int 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_int(const VlNamedObj* parent,
-		    const PtExpr* pt_expr,
-		    int& value);
+  evaluate_int(const VlNamedObj* parent,
+	       const PtExpr* pt_expr,
+	       int& value,
+	       bool put_error);
+
+  /// @brief PtExpr を評価しスカラー値を返す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
+  /// @note 定数でなければエラーメッセージを出力し false を返す．
+  bool
+  evaluate_scalar(const VlNamedObj* parent,
+		  const PtExpr* pt_expr,
+		  tVpiScalarVal& value,
+		  bool put_error);
 
   /// @brief PtExpr を評価し bool 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bool(const VlNamedObj* parent,
-		     const PtExpr* pt_expr,
-		     bool& value);
+  evaluate_bool(const VlNamedObj* parent,
+		const PtExpr* pt_expr,
+		bool& value,
+		bool put_error);
 
   /// @brief PtExpr を評価しビットベクタ値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bitvector(const VlNamedObj* parent,
-			  const PtExpr* pt_expr,
-			  BitVector& value);
+  evaluate_bitvector(const VlNamedObj* parent,
+		     const PtExpr* pt_expr,
+		     BitVector& value,
+		     bool put_error);
 
   /// @brief PtDelay から ElbExpr を生成する．
   /// @param[in] parent 親のスコープ
@@ -170,6 +197,19 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief PtExpr から左辺式を生成する
+  /// @param[in] parent 親のスコープ
+  /// @param[in] env 生成時の環境
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] elem_array 生成した左辺式の要素を格納するベクタ
+  /// @return 生成した式を返す．
+  /// @note 不適切な式ならばエラーメッセージを出力し NULL を返す．
+  ElbExpr*
+  instantiate_lhs_sub(const VlNamedObj* parent,
+		      const ElbEnv& env,
+		      const PtExpr* pt_expr,
+		      vector<ElbExpr*>& elem_array);
 
   /// @brief PtPrimary から ElbExpr を生成する．
   /// @param[in] parent 親のスコープ
@@ -237,64 +277,64 @@ private:
   /// @param[in] parent 親のスコープ
   /// @param[in] env インスタンス化している環境
   /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] is_array 対象が配列の時 true を返す．
   /// @param[out] has_range_select 範囲指定を持っていたら true を返す．
   /// @param[out] has_bit_select ビット指定を持っていたら true を返す．
-  /// @param[out] index1, index2 範囲指定/ビット指定の式を返す．
-  ElbDecl*
-  instantiate_decl(ElbObjHandle* handle,
-		   const VlNamedObj* parent,
-		   const ElbEnv& env,
-		   const PtExpr* pt_expr,
-		   bool& has_range_select,
-		   bool& has_bit_select,
-		   ElbExpr*& index1,
-		   ElbExpr*& index2);
+  ElbExpr*
+  instantiate_primary_sub(ElbObjHandle* handle,
+			  const VlNamedObj* parent,
+			  const ElbEnv& env,
+			  const PtExpr* pt_expr,
+			  bool& is_array,
+			  bool& has_range_select,
+			  bool& has_bit_select);
 
   /// @brief decl の型が適切がチェックする．
   /// @param[in] env インスタンス化している環境
   /// @param[in] pt_expr 式を表すパース木
-  /// @param[in] decl 対象の宣言要素
+  /// @param[in] decl_type 対象の宣言要素の型
+  /// @param[in] is_array 対象が配列の時 true を渡す．
   /// @param[in] has_select ビット/範囲指定を持つ時 true を渡す．
   bool
   check_decl(const ElbEnv& env,
 	     const PtExpr* pt_expr,
-	     const ElbDecl* decl,
+	     tVpiObjType decl_type,
+	     bool is_array,
 	     bool has_select);
-
-  /// @brief 式の値を評価する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_expr 式を表すパース木
-  ElbValue
-  evaluate_expr(const VlNamedObj* parent,
-		const PtExpr* pt_expr);
 
   /// @brief 演算子に対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  /// @param[in] put_error エラーを出力する時，true にする．
+  VlValue
   evaluate_opr(const VlNamedObj* parent,
-	       const PtExpr* pt_expr);
+	       const PtExpr* pt_expr,
+	       bool put_error);
 
   /// @brief 定数に対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  VlValue
   evaluate_const(const VlNamedObj* parent,
 		 const PtExpr* pt_expr);
 
   /// @brief 関数呼び出しに対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  /// @param[in] put_error エラーを出力する時，true にする．
+  VlValue
   evaluate_funccall(const VlNamedObj* parent,
-		    const PtExpr* pt_expr);
+		    const PtExpr* pt_expr,
+		    bool put_error);
 
   /// @brief プライマリに対して式の値を評価する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbValue
+  /// @param[in] put_error エラーを出力する時，true にする．
+  VlValue
   evaluate_primary(const VlNamedObj* parent,
-		   const PtExpr* pt_expr);
+		   const PtExpr* pt_expr,
+		   bool put_error);
 
 
 private:
@@ -426,6 +466,10 @@ private:
   /// @param[in] pt_expr 式を表すパース木
   void
   error_not_a_namedevent(const PtExpr* pt_expr);
+
+  /// @brief 要素の範囲の順番と範囲指定の順番が異なる．
+  void
+  error_range_order(const PtExpr* pt_expr);
 
   /// @brief named-event に対する範囲指定
   void

@@ -32,7 +32,7 @@ class MvPortRef
 {
   friend class MvPort;
   friend class MvMgr;
-  
+
 public:
 
   /// @brief ノードを返す．
@@ -43,11 +43,11 @@ public:
   /// @brief 単純な形式の場合 true を返す．
   bool
   is_simple() const;
-  
+
   /// @brief ビット指定ありの場合 true を返す．
   bool
   has_bitselect() const;
-  
+
   /// @brief 範囲指定ありの場合 true を返す．
   /// @note ビット指定は含まない．
   bool
@@ -61,7 +61,7 @@ public:
   /// @note has_bitselect() == true の時のみ意味を持つ．
   ymuint
   bitpos() const;
-  
+
   /// @brief 範囲指定の MSB を返す．
   /// @note has_partselect() == true の時のみ意味を持つ．
   ymuint
@@ -72,7 +72,7 @@ public:
   ymuint
   lsb() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
@@ -143,12 +143,12 @@ private:
 class MvPort
 {
   friend class MvMgr;
-  
+
 public:
 
   /// @brief 名前を得る．
-  /// @note 空(NULL)の場合もある．
-  const char*
+  /// @note 空("")の場合もある．
+  string
   name() const;
 
   /// @brief ビット幅を得る．
@@ -179,14 +179,14 @@ private:
   /// @brief デストラクタ
   ~MvPort();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 名前
-  const char* mName;
+  string mName;
 
   // portref の数
   ymuint32 mPortRefNum;
@@ -233,7 +233,7 @@ bool
 MvPortRef::has_partselect() const
 {
   return static_cast<bool>(mLsb & 1U);
-} 
+}
 
 // @brief ビット指定位置を返す．
 // @note has_bitselect() == true の時のみ意味を持つ．
@@ -317,7 +317,7 @@ MvPortRef::set(MvNode* node,
 // @brief 名前を得る．
 // @note 空(NULL)の場合もある．
 inline
-const char*
+string
 MvPort::name() const
 {
   return mName;

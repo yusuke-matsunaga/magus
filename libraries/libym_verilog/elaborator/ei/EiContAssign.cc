@@ -205,7 +205,7 @@ EiContAssign::file_region() const
 ymuint
 EiContAssign::bit_size() const
 {
-  return mLhs->bit_size();
+  return lhs()->bit_size();
 }
 
 // @brief 左辺を返す．

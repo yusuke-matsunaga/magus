@@ -235,7 +235,7 @@ protected:
 
   /// @brief コンストラクタ
   CptGenIf(const FileRegion& file_region,
-	   PtExpr* cond,
+	   const PtExpr* cond,
 	   PtDeclHeadArray then_declhead_array,
 	   PtItemArray then_item_array,
 	   PtDeclHeadArray else_declhead_array,
@@ -297,7 +297,7 @@ private:
   FileRegion mFileRegion;
 
   // 条件式
-  PtExpr* mCond;
+  const PtExpr* mCond;
 
   // 成り立ったとき生成される本体
   CptGenBody mThenBody;
@@ -320,7 +320,7 @@ protected:
 
   /// @brief コンストラクタ
   CptGenCase(const FileRegion& file_region,
-	     PtExpr* expr,
+	     const PtExpr* expr,
 	     PtGenCaseItemArray item_array);
 
   /// @brief デストラクタ
@@ -375,7 +375,7 @@ private:
   FileRegion mFileRegion;
 
   // 比較式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
   // case item の配列
   PtGenCaseItemArray mCaseItemArray;
@@ -468,9 +468,9 @@ protected:
   /// @brief コンストラクタ
   CptGenFor(const FileRegion& file_region,
 	    const char* loop_var,
-	    PtExpr* init_expr,
-	    PtExpr* cond,
-	    PtExpr* next_expr,
+	    const PtExpr* init_expr,
+	    const PtExpr* cond,
+	    const PtExpr* next_expr,
 	    const char* block_name,
 	    PtDeclHeadArray declhead_array,
 	    PtItemArray item_array);
@@ -547,13 +547,13 @@ private:
   const char* mLoopVar;
 
   // 初期化文の右辺
-  PtExpr* mInitExpr;
+  const PtExpr* mInitExpr;
 
   // 繰り返し条件
-  PtExpr* mCond;
+  const PtExpr* mCond;
 
   // 増加文の右辺
-  PtExpr* mNextExpr;
+  const PtExpr* mNextExpr;
 
   // 生成される本体
   CptGenBody mBody;

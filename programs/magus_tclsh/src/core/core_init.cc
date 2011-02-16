@@ -23,6 +23,7 @@
 #include "CurNetwork.h"
 #include "ListNetwork.h"
 #include "ForNetwork.h"
+#include "WriteVerilog.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -53,6 +54,9 @@ core_init(Tcl_Interp* interp,
   // ネットワーク名の列挙を行うコマンド
   TclCmdBinder1<ListNetwork, MagMgr*>::reg(interp, mgr, "magus::network_list");
   TclCmdBinder1<ForNetwork, MagMgr*>::reg(interp, mgr,  "magus::foreach_network");
+
+  // ネットワークのファイル出力を行うコマンド
+  TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr,  "magus::write_verilog");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -105,6 +109,7 @@ core_init(Tcl_Interp* interp,
     "proc complete(current_network) { t s e l p m } { return \"\" }\n"
     "proc complete(network_list) { t s e l p m } { return \"\" }\n"
     "proc complete(foreach_network) { t s e l p m } { return \"\" }\n"
+    "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

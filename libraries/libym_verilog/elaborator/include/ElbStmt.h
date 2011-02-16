@@ -177,7 +177,7 @@ public:
   /// @note 返されるオブジェクトの型は kVpiNamedEvent のはず．
   /// @note このクラスでは NULL を返す．
   virtual
-  const VlDecl*
+  const VlExpr*
   named_event() const;
 
   /// @brief 条件が成り立たなかったとき実行されるステートメントの取得
@@ -271,11 +271,6 @@ public:
 	       const PtCaseItem* pt_caseitem,
 	       ElbExpr** expr_array,
 	       ElbStmt* stmt);
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const = 0;
 
   /// @brief 子供ののステートメントの取得
   /// @note このクラスでは NULL を返す．

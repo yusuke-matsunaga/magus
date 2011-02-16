@@ -85,6 +85,18 @@ ElbProxy::phase1_module_item(ElbModule* module,
   return mModuleGen->phase1_module_item(module, pt_module, param_con);
 }
 
+// @brief parameter と genvar を実体化する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_head_array 宣言ヘッダの配列
+// @param[in] force_to_local true なら parameter を localparam にする．
+void
+ElbProxy::phase1_decl(const VlNamedObj* parent,
+		      PtDeclHeadArray pt_head_array,
+		      bool force_to_local)
+{
+  mDeclGen->phase1_decl(parent, pt_head_array, force_to_local);
+}
+
 // @brief IO宣言要素を実体化する．
 // @param[in] module 親のモジュール
 // @param[in] task 親のタスク
@@ -107,18 +119,6 @@ ElbProxy::instantiate_decl(const VlNamedObj* parent,
 			   PtDeclHeadArray pt_head_array)
 {
   mDeclGen->instantiate_decl(parent, pt_head_array);
-}
-
-// @brief パラメータ用の instantiate 関数
-// @param[in] parent 親のスコープ
-// @param[in] pt_head_array 宣言ヘッダの配列
-// @param[in] is_local local_param の時 true
-void
-ElbProxy::instantiate_param(const VlNamedObj* parent,
-			    PtDeclHeadArray pt_head_array,
-			    bool is_local)
-{
-  mDeclGen->instantiate_param(parent, pt_head_array, is_local);
 }
 
 // @brief スコープに関係する要素を実体化する．
@@ -249,52 +249,17 @@ ElbProxy::instantiate_rhs(const VlNamedObj* parent,
 			  ElbExpr* lhs)
 {
   ElbExpr* expr = mExprGen->instantiate_expr(parent, env, pt_expr);
-  // lhs の型を expr に設定する．
-  expr->set_reqsize(lhs->value_type());
-  return expr;
-}
-
-// @brief 範囲を表す式を生成
-// @param[in] parent 親のスコープ
-// @param[in] pt_left 範囲のMSBを表すパース木
-// @param[in] pt_right 範囲のLSBを表すパース木
-// @param[in] left 範囲の MSB の式
-// @param[in] right 範囲の LSB の式
-// @param[in] left_val 範囲の MSB の値
-// @param[in] right_val 範囲の LSB の値
-bool
-ElbProxy::instantiate_range(const VlNamedObj* parent,
-			    const PtExpr* pt_left,
-			    const PtExpr* pt_right,
-			    ElbExpr*& left,
-			    ElbExpr*& right,
-			    int& left_val,
-			    int& right_val)
-{
-  left = NULL;
-  right = NULL;
-  left_val = 0;
-  right_val = 0;
-  if ( pt_left && pt_right ) {
-    left = instantiate_constant_expr(parent, pt_left);
-    right = instantiate_constant_expr(parent, pt_right);
-    if ( !left || !right ) {
-      return false;
-    }
-    if ( !expr_to_int(left, left_val) ) {
-      return false;
-    }
-    if ( !expr_to_int(right, right_val) ) {
-      return false;
-    }
+  if ( expr ) {
+    // lhs の型を expr に設定する．
+    expr->set_reqsize(lhs->value_type());
   }
-  return true;
+  return expr;
 }
 
 // @brief PtExpr(primary) から named_event を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
-ElbDecl*
+ElbExpr*
 ElbProxy::instantiate_namedevent(const VlNamedObj* parent,
 				 const PtExpr* pt_expr)
 {
@@ -323,63 +288,101 @@ ElbProxy::instantiate_delay(const VlNamedObj* parent,
   return mExprGen->instantiate_delay(parent, pt_head);
 }
 
+// @brief 式の値を評価する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+// @param[in] put_error エラーを出力する時，true にする．
+VlValue
+ElbProxy::evaluate_expr(const VlNamedObj* parent,
+			const PtExpr* pt_expr,
+			bool put_error)
+{
+  return mExprGen->evaluate_expr(parent, pt_expr, put_error);
+}
+
 // @brief PtExpr を評価し int 値を返す．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ElbProxy::evaluate_expr_int(const VlNamedObj* parent,
-			    const PtExpr* pt_expr,
-			    int& value)
+ElbProxy::evaluate_int(const VlNamedObj* parent,
+		       const PtExpr* pt_expr,
+		       int& value,
+		       bool put_error)
 {
-  return mExprGen->evaluate_expr_int(parent, pt_expr, value);
+  return mExprGen->evaluate_int(parent, pt_expr, value, put_error);
+}
+
+// @brief PtExpr を評価しスカラー値を返す．
+// @param[in] parent 親のスコープ
+// @param[in] pt_expr 式を表すパース木
+// @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
+// @note 定数でなければエラーメッセージを出力し false を返す．
+bool
+ElbProxy::evaluate_scalar(const VlNamedObj* parent,
+			  const PtExpr* pt_expr,
+			  tVpiScalarVal& value,
+			  bool put_error)
+{
+  return mExprGen->evaluate_scalar(parent, pt_expr, value, put_error);
 }
 
 // @brief PtExpr を評価し bool 値を返す．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ElbProxy::evaluate_expr_bool(const VlNamedObj* parent,
-			     const PtExpr* pt_expr,
-			     bool& value)
+ElbProxy::evaluate_bool(const VlNamedObj* parent,
+			const PtExpr* pt_expr,
+			bool& value,
+			bool put_error)
 {
-  return mExprGen->evaluate_expr_bool(parent, pt_expr, value);
+  return mExprGen->evaluate_bool(parent, pt_expr, value, put_error);
 }
 
 // @brief PtExpr を評価しビットベクタ値を返す．
 // @param[in] parent 親のスコープ
 // @param[in] pt_expr 式を表すパース木
 // @param[out] value 評価値を格納する変数
+// @param[in] put_error エラーを出力する時，true にする．
 // @note 定数でなければエラーメッセージを出力し false を返す．
 bool
-ElbProxy::evaluate_expr_bitvector(const VlNamedObj* parent,
-				  const PtExpr* pt_expr,
-				  BitVector& value)
+ElbProxy::evaluate_bitvector(const VlNamedObj* parent,
+			     const PtExpr* pt_expr,
+			     BitVector& value,
+			     bool put_error)
 {
-  return mExprGen->evaluate_expr_bitvector(parent, pt_expr, value);
+  return mExprGen->evaluate_bitvector(parent, pt_expr, value, put_error);
 }
 
-// @brief 式を int 値に変換する．
-// @return 変換に成功したら true を返す．
-// @note 変換に失敗したらエラーメッセージを出力する．
+// @brief 範囲を表す式を評価する．
+// @param[in] parent 親のスコープ
+// @param[in] pt_left 範囲のMSBを表すパース木
+// @param[in] pt_right 範囲のLSBを表すパース木
+// @param[in] left_val 範囲の MSB の値
+// @param[in] right_val 範囲の LSB の値
 bool
-ElbProxy::expr_to_int(ElbExpr* expr,
-		      int& val)
+ElbProxy::evaluate_range(const VlNamedObj* parent,
+			 const PtExpr* pt_left,
+			 const PtExpr* pt_right,
+			 int& left_val,
+			 int& right_val)
 {
-  bool stat = expr->eval_int(val);
-  if ( !stat ) {
-    ostringstream buf;
-    buf << expr->decompile() << ": Integer value required.";
-    msg_mgr().put_msg(__FILE__, __LINE__,
-		      expr->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
+  left_val = 0;
+  right_val = 0;
+  if ( pt_left && pt_right ) {
+    bool stat1 = evaluate_int(parent, pt_left, left_val, true);
+    bool stat2 = evaluate_int(parent, pt_right, right_val, true);
+    if ( !stat1 || !stat2 ) {
+      return false;
+    }
   }
-  return stat;
+  return true;
 }
 
 // @brief PtAttrInst から属性リストを生成し，オブジェクトに付加する．

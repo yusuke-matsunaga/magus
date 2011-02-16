@@ -15,6 +15,7 @@
 #include "AreaMapCmd.h"
 #include "DumpSbjCmd.h"
 #include "DumpCnCmd.h"
+#include "DumpPatCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -71,6 +72,8 @@ techmap_init(Tcl_Interp* interp,
 
   TclCmdBinder2<LoadPatCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 							"magus::techmap::load_pat");
+  TclCmdBinder2<DumpPatCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
+																	   "magus::techmap::dump_pat");
   TclCmdBinder2<Conv2SbjCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
 							"magus::techmap::conv2sbj");
   TclCmdBinder2<DumpSbjCmd, MagMgr*, TechmapData*>::reg(interp, mgr, data,
@@ -86,6 +89,7 @@ techmap_init(Tcl_Interp* interp,
     "namespace eval magus {\n"
     "namespace eval techmap {\n"
     "proc complete(load_pat) { text start end line pos mod } { return \"\" }\n"
+    "proc complete(dump_pat) { text start end line pos mod } { return \"\" }\n"
     "proc complete(conv2sbj) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_sbjgraph) { text start end line pos mod } { return \"\" }\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"

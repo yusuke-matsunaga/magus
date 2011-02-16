@@ -11,6 +11,7 @@
 
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
+#include "ym_mvn/MvVlMap.h"
 
 
 int
@@ -36,14 +37,6 @@ main(int argc,
     mh->delete_mask(kMsgDebug);
     reader.add_msg_handler(mh);
 
-    reader.set_ffname("KTECH_DFF", // セル名
-		      "D",         // データ入力
-		      "CK",        // クロック
-		      "Q",         // ノーマル出力
-		      "QN",        // 反転出力
-		      "",          // セット
-		      "");         // リセット
-
     for (list<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
       const string& name = *p;
@@ -56,7 +49,7 @@ main(int argc,
       }
     }
     cerr << "Generating MvNetwork" << endl;
-    vector<pair<const VlDecl*, ymuint> > node_map;
+    MvVlMap node_map;
     bool stat = reader.gen_network(mgr, node_map);
     cerr << " End" << endl;
     if ( !stat ) {

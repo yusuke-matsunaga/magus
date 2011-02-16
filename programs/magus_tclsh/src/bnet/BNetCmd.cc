@@ -11,7 +11,6 @@
 
 #include "BNetCmd.h"
 #include "ym_tclpp/TclPopt.h"
-#include "NetHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -21,17 +20,12 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-BNetCmd::BNetCmd(MagMgr* mgr) :
-  MagCmd(mgr),
-  mNetworkSpecified(false)
+// @param[in] mgr Magus の管理オブジェクト
+// @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
+BNetCmd::BNetCmd(MagMgr* mgr,
+		 bool new_bnet_enable) :
+  NetCmd(mgr, new_bnet_enable, false, false)
 {
-  mPoptNtwk = new TclPoptObj(this, "network",
-			     "specify target network",
-			     "<network-name>");
-  mPoptNewNtwk = new TclPoptObj(this, "new_network",
-				"specify target new network",
-				"<network-name>");
-  new_popt_group(mPoptNtwk, mPoptNewNtwk);
 }
 
 // @brief デストラクタ
@@ -55,50 +49,13 @@ BNetCmd::cur_network() const
 int
 BNetCmd::before_cmd_proc(TclObjVector& objv)
 {
-  mNetworkSpecified = false;
-
-  MagCmd::before_cmd_proc(objv);
-
-  // ネットワークを指定したときに true とするフラグ
-  bool ntwk_flag = false;
-
-  // 新規作成の時 true とするフラグ
-  bool new_flag = false;
-
-  // ネットワーク名
-  TclObj name;
-  if ( mPoptNtwk->is_specified() ) {
-    name = mPoptNtwk->val();
-    ntwk_flag = true;
-  }
-  else if ( mPoptNewNtwk->is_specified() ) {
-    new_flag = true;
-    name = mPoptNewNtwk->val();
-    ntwk_flag = true;
-  }
-
-  if ( ntwk_flag ) {
-    // name をネットワーク名と見なしてスタックに入れる．
-    // 上書きを考慮して関数を直接呼ばずに Tcl スクリプト
-    // を評価させる．
-    TclObj script;
-    if ( script.append_element("::magus::push_current_network") != TCL_OK ) {
+  if ( NetCmd::before_cmd_proc(objv) == TCL_OK ) {
+    if ( cur_nethandle()->type() != NetHandle::kMagBNet ) {
+      TclObj emsg;
+      emsg << "Network type mismatch. BNetwork type assumed.";
+      set_result(emsg);
       return TCL_ERROR;
     }
-    if ( new_flag ) {
-      if ( script.append_element("-new_bnet") != TCL_OK ) {
-	return TCL_ERROR;
-      }
-    }
-    // name は {--new <name>}の場合があるので単一の要素とは限らない．
-    if ( script.append_list(name) != TCL_OK ) {
-      return TCL_ERROR;
-    }
-    if ( eval(script) != TCL_OK ) {
-      // (たぶん)ネットワークが存在しなかった．
-      return TCL_ERROR;
-    }
-    mNetworkSpecified = true;
   }
 
   return TCL_OK;
@@ -107,14 +64,7 @@ BNetCmd::before_cmd_proc(TclObjVector& objv)
 void
 BNetCmd::after_cmd_proc()
 {
-  if ( mNetworkSpecified ) {
-    // カレントネットワークをもとに戻す．
-    // 上書きを考慮して関数を直接呼ばずに Tcl スクリプト
-    // を評価させる．
-    int stat = eval("::magus::pop_current_network");
-    assert_cond( stat == TCL_OK, __FILE__, __LINE__);
-    mNetworkSpecified = false;
-  }
+  NetCmd::after_cmd_proc();
 }
 
 END_NAMESPACE_MAGUS

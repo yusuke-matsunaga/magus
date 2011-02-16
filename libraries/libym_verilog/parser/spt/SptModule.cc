@@ -42,8 +42,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param paramport_array パラメータポート宣言のリスト
 // @param port_array ポートのリスト
 // @param iohead_array IO宣言のリスト
-// @param paramhead_array parameter 宣言のリスト
-// @param localparamhead_array local_param 宣言のリスト
 // @param declhead_array 宣言のリスト
 // @param item_array 要素のリスト
 SptModule::SptModule(const FileRegion& file_region,
@@ -66,8 +64,6 @@ SptModule::SptModule(const FileRegion& file_region,
 		     PtDeclHeadArray paramport_array,
 		     PtiPortArray port_array,
 		     PtIOHeadArray iohead_array,
-		     PtDeclHeadArray paramdecl_array,
-		     PtDeclHeadArray localparamdecl_array,
 		     PtDeclHeadArray decl_array,
 		     PtItemArray item_array) :
   mFileRegion(file_region),
@@ -79,8 +75,6 @@ SptModule::SptModule(const FileRegion& file_region,
   mParamPortArray(paramport_array),
   mPortArray(port_array),
   mIOHeadArray(iohead_array),
-  mParamHeadArray(paramdecl_array),
-  mLocalparamHeadArray(localparamdecl_array),
   mDeclHeadArray(decl_array),
   mItemArray(item_array)
 {
@@ -168,20 +162,6 @@ ymuint
 SptModule::iodecl_num() const
 {
   return mIODeclNum;
-}
-
-// @brief parameter 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptModule::paramhead_array() const
-{
-  return mParamHeadArray;
-}
-
-// @brief localparam 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptModule::localparamhead_array() const
-{
-  return mLocalparamHeadArray;
 }
 
 // @brief 宣言ヘッダ配列の取得
@@ -391,10 +371,12 @@ SptModule::explicit_name() const
 // @param portref_array ポートの参照式の配列
 // @param ext_name 外向きの名前
 SptPort::SptPort(const FileRegion& file_region,
-		 PtiPortRefArray portref_array,
+		 const PtExpr* portref,
+		 PtExprArray portref_array,
 		 const char* ext_name) :
   mFileRegion(file_region),
   mExtName(ext_name),
+  mPortRef(portref),
   mPortRefArray(portref_array)
 {
 }
@@ -424,106 +406,34 @@ SptPort::ext_name() const
 // 内部のポート結線リストのサイズの取得
 // @return 内部のポート結線リストのサイズ
 ymuint
-SptPort::portref_num() const
+SptPort::portref_size() const
 {
   return mPortRefArray.size();
 }
 
 // 内部のポート結線の取得
 // @return 先頭のポート結線
-const PtPortRef*
-SptPort::portref(ymuint pos) const
+const PtExpr*
+SptPort::portref_elem(ymuint pos) const
 {
   return mPortRefArray[pos];
 }
 
-// @brief portref を得る．
-PtiPortRef*
-SptPort::_portref(ymuint pos)
+// @brief 内部のポート結線の報告の取得
+tVpiDirection
+SptPort::portref_dir(ymuint pos) const
 {
-  return mPortRefArray[pos];
+  return mDirArray[pos];
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// port reference を表すクラス
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-// @param file_region ファイル位置の情報
-// @param name 名前
-// @param index ビット指定インデックス
-// @param mode 範囲指定モード
-// @param left 範囲の左側の式
-// @param right 範囲の右側の式
-SptPortRef::SptPortRef(const FileRegion& file_region,
-		       const char* name,
-		       PtExpr* index,
-		       tVpiRangeMode mode,
-		       PtExpr* left,
-		       PtExpr* right) :
-  mFileRegion(file_region),
-  mName(name),
-  mIndex(index),
-  mMode(mode),
-  mLeftRange(left),
-  mRightRange(right)
+// @brief portref の方向を設定する．
+// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
+// @param[in] dir 方向
+void
+SptPort::_set_portref_dir(ymuint pos,
+			  tVpiDirection dir)
 {
-}
-
-// デストラクタ
-SptPortRef::~SptPortRef()
-{
-}
-
-// ファイル位置の取得
-// @return ファイル位置
-FileRegion
-SptPortRef::file_region() const
-{
-  return mFileRegion;
-}
-
-// 名前の取得
-// @return 名前
-const char*
-SptPortRef::name() const
-{
-  return mName;
-}
-
-// インデックスの取得
-// @return インデックスを表す式
-const PtExpr*
-SptPortRef::index() const
-{
-  return mIndex;
-}
-
-// 範囲指定モードの取得
-// @retval kVpiConstRange [ a : b ] のタイプ
-// @retval kVpiPlusRange  [ a :+ b ] のタイプ
-// @retval kVpiMinusRange [ a :- b ] のタイプ
-tVpiRangeMode
-SptPortRef::range_mode() const
-{
-  return mMode;
-}
-
-// 範囲の左側の式の取得
-// @return 範囲の左側の式
-const PtExpr*
-SptPortRef::left_range() const
-{
-  return mLeftRange;
-}
-
-// 範囲の右側の式の取得
-// @return 範囲の右側の式
-const PtExpr*
-SptPortRef::right_range() const
-{
-  return mRightRange;
+  mDirArray[pos] = dir;
 }
 
 
@@ -557,13 +467,11 @@ SptPortRef::right_range() const
 // @param[in] parampoar_array パラメータポートのリスト
 // @param[in] port_array ポートのリスト
 // @param[in] iohead_array 入出力のリスト
-// @param[in] paramhead_array parameter のリスト
-// @param[in] localparamhead_array localparam のリスト
 // @param[in] declhead_array 宣言のリスト
 // @param[in] item_array 要素のリスト
 // @return 生成されたモジュール
 // @note paramport_array の内容と paramhead_array の内容は重複しない．
-PtModule*
+const PtModule*
 SptFactory::new_Module(const FileRegion& file_region,
 		       const char* name,
 		       bool macro,
@@ -584,28 +492,23 @@ SptFactory::new_Module(const FileRegion& file_region,
 		       PtDeclHeadArray paramport_array,
 		       PtiPortArray port_array,
 		       PtIOHeadArray iohead_array,
-		       PtDeclHeadArray paramhead_array,
-		       PtDeclHeadArray localparamhead_array,
 		       PtDeclHeadArray declhead_array,
 		       PtItemArray item_array)
 {
   void* p = alloc().get_memory(sizeof(SptModule));
-  SptModule* module = new (p) SptModule(file_region, name,
-					macro, is_cell, is_protected,
-					time_unit, time_precision,
-					net_type, unconn,
-					delay, decay,
-					explicit_name,
-					portfaults, suppress_faults,
-					config, library, cell,
-					paramport_array,
-					port_array,
-					iohead_array,
-					paramhead_array,
-					localparamhead_array,
-					declhead_array,
-					item_array);
-  return module;
+  return new (p) SptModule(file_region, name,
+			   macro, is_cell, is_protected,
+			   time_unit, time_precision,
+			   net_type, unconn,
+			   delay, decay,
+			   explicit_name,
+			   portfaults, suppress_faults,
+			   config, library, cell,
+			   paramport_array,
+			   port_array,
+			   iohead_array,
+			   declhead_array,
+			   item_array);
 }
 
 
@@ -623,7 +526,8 @@ SptFactory::new_Port(const FileRegion& file_region,
 {
   void* p = alloc().get_memory(sizeof(SptPort));
   return new (p) SptPort(file_region,
-			 PtiPortRefArray(),
+			 NULL,
+			 PtExprArray(),
 			 ext_name);
 }
 
@@ -634,77 +538,36 @@ SptFactory::new_Port(const FileRegion& file_region,
 // @return 生成されたポート
 PtiPort*
 SptFactory::new_Port(const FileRegion& file_region,
-		     PtiPortRef* portref,
+		     const PtExpr* portref,
 		     const char* ext_name)
 {
   ymuint portref_num = 1;
-  void* q = alloc().get_memory(sizeof(PtiPortRef*) * portref_num);
-  PtiPortRef** portref_array = new (q) PtiPortRef*[portref_num];
+  const PtExpr** portref_array = alloc_array<const PtExpr*>(portref_num);
   portref_array[0] = portref;
   void* p = alloc().get_memory(sizeof(SptPort));
   return new (p) SptPort(file_region,
-			 PtiPortRefArray(portref_num, portref_array),
+			 portref,
+			 PtExprArray(portref_num, portref_array),
 			 ext_name);
 }
 
 // @brief ポートの生成
 // @param[in] file_region ファイル位置の情報
+// @param portref ポートに接続している式 (ポート参照式)
 // @param portref_array ポートに接続している式 (ポート参照式) のリスト
 // @param[in] ext_name ポート名 (空文字列の場合もある)
 // @return 生成されたポート
 PtiPort*
 SptFactory::new_Port(const FileRegion& file_region,
-		     PtiPortRefArray portref_array,
+		     const PtExpr* portref,
+		     PtExprArray portref_array,
 		     const char* ext_name)
 {
   void* p = alloc().get_memory(sizeof(SptPort));
   return new (p) SptPort(file_region,
+			 portref,
 			 portref_array,
 			 ext_name);
-}
-
-// @brief ポート参照式の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] name ポートに接続している内部の識別子名
-// @return 生成されたポート参照式
-PtiPortRef*
-SptFactory::new_PortRef(const FileRegion& file_region,
-			const char* name)
-{
-  void* p = alloc().get_memory(sizeof(SptPortRef));
-  return new (p) SptPortRef(file_region, name, NULL, kVpiNoRange, NULL, NULL);
-}
-
-// @brief ビット指定つきポート参照式の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] name ポートに接続している内部の識別子名
-// @param[in] index ビット指定用の式
-// @return 生成されたポート参照式
-PtiPortRef*
-SptFactory::new_PortRef(const FileRegion& file_region,
-			const char* name,
-			PtExpr* index)
-{
-  void* p = alloc().get_memory(sizeof(SptPortRef));
-  return new (p) SptPortRef(file_region, name, index, kVpiNoRange, NULL, NULL);
-}
-
-// @brief 範囲指定付きポート参照式の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] name ポートに接続している内部の識別子名
-// @param[in] range_mode 範囲指定のモード
-// @param[in] left 範囲指定の左側の式
-// @param[in] right 範囲指摘の右側の式
-// @return 生成されたポート参照式
-PtiPortRef*
-SptFactory::new_PortRef(const FileRegion& file_region,
-			const char* name,
-			tVpiRangeMode range_mode,
-			PtExpr* left,
-			PtExpr* right)
-{
-  void* p = alloc().get_memory(sizeof(SptPortRef));
-  return new (p) SptPortRef(file_region, name, NULL, range_mode, left, right);
 }
 
 END_NAMESPACE_YM_VERILOG

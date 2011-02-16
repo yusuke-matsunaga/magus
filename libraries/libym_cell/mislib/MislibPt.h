@@ -14,6 +14,7 @@
 #include "ym_cell/cell_nsdef.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/FileRegion.h"
+#include "ym_lexp/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -52,6 +53,8 @@ public:
     kAnd,
     /// @brief OR論理式
     kOr,
+    /// @brief XOR論理式
+    kXor,
     /// @brief 入力ピン
     kPin,
     /// @brief ゲート
@@ -130,14 +133,20 @@ public:
   /// @brief 1番目の子供を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibPt*
   child1() const;
 
   /// @brief 2番目の子供を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibPt*
   child2() const;
+
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+  virtual
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
 
 public:

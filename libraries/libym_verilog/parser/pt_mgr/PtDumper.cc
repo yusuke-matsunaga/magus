@@ -255,13 +255,19 @@ PtDumper::put(const PtModule* m)
       put("mExprname", port->ext_name());
     }
 
-    for (ymuint j = 0; j < port->portref_num(); ++ j) {
-      const PtPortRef* pr = port->portref(j);
+    for (ymuint j = 0; j < port->portref_size(); ++ j) {
+      const PtExpr* pr = port->portref_elem(j);
       PtHeader x(*this, "mPortRef", "PortRef");
 
       put("mFileRegion", pr->file_region());
+      put("mDir", port->portref_dir(j));
       put("mName", pr->name());
-      put("mIndex", pr->index());
+      if ( pr->index_num() == 1 ) {
+	put("mIndex", pr->index(0));
+      }
+      else {
+	assert_cond( pr->index_num() == 0, __FILE__, __LINE__);
+      }
       if ( pr->range_mode() != kVpiNoRange ) {
 	put("mRangeMode", pr->range_mode());
 	put("mLeftRange", pr->left_range());
@@ -271,8 +277,6 @@ PtDumper::put(const PtModule* m)
   }
 
   put_decls(m->iohead_array(),
-	    m->paramhead_array(),
-	    m->localparamhead_array(),
 	    m->declhead_array());
   PtItemArray item_array = m->item_array();
   for (ymuint i = 0; i < item_array.size(); ++ i) {
@@ -500,8 +504,6 @@ PtDumper::put(const char* label,
     }
     put("mName", item->name());
     put_decls(item->iohead_array(),
-	      item->paramhead_array(),
-	      item->localparamhead_array(),
 	      item->declhead_array());
     put("mBody", item->body());
     break;
@@ -868,7 +870,7 @@ PtDumper::put(const char* label,
 
   switch ( expr->type() ) {
   case kPtOprExpr:
-    if ( expr->opr_type() == kVpiNullOp ) {
+    if ( expr->op_type() == kVpiNullOp ) {
       // '(' expression ')' なので無視
       return put(label, expr->operand(0));
     }
@@ -880,7 +882,7 @@ PtDumper::put(const char* label,
       put("mAttrInst", expr->attr_top());
 #endif
 
-      put("mOprType", expr->opr_type());
+      put("mOprType", expr->op_type());
       for (ymuint i = 0; i < expr->operand_num(); ++ i) {
 	put("mOperand",  expr->operand(i));
       }
@@ -977,21 +979,11 @@ PtDumper::put_parent_file(const FileLoc& file_loc)
 /// @brief 宣言を出力する．
 void
 PtDumper::put_decls(PtIOHeadArray iohead_array,
-		    PtDeclHeadArray paramhead_array,
-		    PtDeclHeadArray lparamhead_array,
 		    PtDeclHeadArray declhead_array)
 {
   for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io = iohead_array[i];
     put("mIODecl", io);
-  }
-  for (ymuint i = 0; i < paramhead_array.size(); ++ i) {
-    const PtDeclHead* decl = paramhead_array[i];
-    put("mParamDecl", decl);
-  }
-  for (ymuint i = 0; i < lparamhead_array.size(); ++ i) {
-    const PtDeclHead* decl = lparamhead_array[i];
-    put("mLocalParamDecl", decl);
   }
   for (ymuint i = 0; i < declhead_array.size(); ++ i) {
     const PtDeclHead* decl = declhead_array[i];

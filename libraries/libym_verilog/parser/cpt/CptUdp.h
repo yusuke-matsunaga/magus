@@ -38,7 +38,7 @@ private:
 	 PtiPortArray port_array,
 	 PtIOHeadArray iohead_array,
 	 bool is_seq,
-	 PtExpr* init_value,
+	 const PtExpr* init_value,
 	 PtUdpEntryArray entry_array);
 
   /// @brief デストラクタ
@@ -113,7 +113,7 @@ private:
   bool mSeq;
 
   // 初期値
-  PtExpr* mInitValue;
+  const PtExpr* mInitValue;
 
   // テーブル要素の配列
   PtUdpEntryArray mTableArray;
@@ -134,7 +134,7 @@ protected:
   /// @brief コンストラクタ
   CptUdpEntry(const FileRegion& file_region,
 	      PtUdpValueArray input_array,
-	      PtUdpValue* output);
+	      const PtUdpValue* output);
 
   /// @brief デストラクタ
   virtual
@@ -164,7 +164,7 @@ public:
 
   /// @brief 出力の値を取り出す．
   virtual
-  PtUdpValue*
+  const PtUdpValue*
   output() const;
 
 
@@ -180,7 +180,7 @@ private:
   PtUdpValueArray mInputArray;
 
   // 出力のパタン
-  PtUdpValue* mOutput;
+  const PtUdpValue* mOutput;
 
 };
 
@@ -198,8 +198,8 @@ private:
   /// @brief コンストラクタ
   CptUdpEntryS(const FileRegion& file_region,
 	       PtUdpValueArray input_array,
-	       PtUdpValue* current,
-	       PtUdpValue* output);
+	       const PtUdpValue* current,
+	       const PtUdpValue* output);
 
   /// @brief デストラクタ
   virtual
@@ -213,7 +213,7 @@ public:
 
   /// @brief 現状態の値を取り出す．
   virtual
-  PtUdpValue*
+  const PtUdpValue*
   current() const;
 
 
@@ -223,7 +223,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 現状態のパタン
-  PtUdpValue* mCurrent;
+  const PtUdpValue* mCurrent;
 
 };
 

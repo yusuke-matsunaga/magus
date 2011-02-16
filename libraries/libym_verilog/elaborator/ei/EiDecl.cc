@@ -191,22 +191,57 @@ EiDecl::is_signed() const
   return mHead->is_signed() || mAuxSign;
 }
 
-// @brief MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-int
-EiDecl::left_range_const() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDecl::has_range() const
 {
-  return mHead->left_range_const();
+  return mHead->has_range();
 }
 
-// @brief LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiDecl::right_range_const() const
+EiDecl::left_range_val() const
 {
-  return mHead->right_range_const();
+  return mHead->left_range_val();
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDecl::right_range_val() const
+{
+  return mHead->right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDecl::left_range_string() const
+{
+  return mHead->left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDecl::right_range_string() const
+{
+  return mHead->right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDecl::is_big_endian() const
+{
+  return mHead->is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDecl::is_little_endian() const
+{
+  return mHead->is_little_endian();
 }
 
 // @brief ビット幅を返す．
@@ -290,29 +325,20 @@ EiDecl::delay() const
   return mHead->delay();
 }
 
+// @brief 初期値の取得
+// @retval 初期値
+// @retval NULL 設定がない場合
+const VlExpr*
+EiDecl::init_value() const
+{
+  return NULL;
+}
+
 // @brief 符号付きに補正する．
 void
 EiDecl::set_signed()
 {
   mAuxSign = true;
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDecl::_left_range() const
-{
-  return mHead->left_range();
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDecl::_right_range() const
-{
-  return mHead->right_range();
 }
 
 

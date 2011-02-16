@@ -263,50 +263,12 @@ public:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-inline
-ElbPrimHead::ElbPrimHead()
-{
-}
-
-// @brief デストラクタ
-inline
-ElbPrimHead::~ElbPrimHead()
-{
-}
-
-// @brief コンストラクタ
-inline
-ElbPrimArray::ElbPrimArray() :
-  mNext(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-ElbPrimArray::~ElbPrimArray()
-{
-}
-
 // @brief 次の要素を得る．
 inline
 const ElbPrimArray*
 ElbPrimArray::next() const
 {
   return mNext;
-}
-
-// @brief コンストラクタ
-inline
-ElbPrimitive::ElbPrimitive() :
-  mNext(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-ElbPrimitive::~ElbPrimitive()
-{
 }
 
 // @brief 次の要素を得る．

@@ -31,9 +31,9 @@ public:
   /// @brief ID番号を得る．
   ymuint
   id() const;
-  
+
   /// @brief 名前を得る．
-  const char*
+  string
   name() const;
 
   /// @brief 親のノードを得る．
@@ -92,8 +92,8 @@ public:
   /// @brief 内部ノードのリストの末尾の反復子を得る．
   list<MvNode*>::const_iterator
   nodes_end() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
@@ -113,7 +113,7 @@ private:
 
   /// @brief デストラクタ
   ~MvModule();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -124,14 +124,14 @@ private:
   ymuint mId;
 
   // 名前
-  const char* mName;
+  string mName;
 
   // 親のノード
   MvNode* mParent;
 
   // ポートの配列
   vector<MvPort*> mPortArray;
-  
+
   // 入力ノードの配列
   vector<MvNode*> mInputArray;
 
@@ -158,10 +158,10 @@ MvModule::id() const
 {
   return mId;
 }
-  
+
 // @brief 名前を得る．
 inline
-const char*
+string
 MvModule::name() const
 {
   return mName;

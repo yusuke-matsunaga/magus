@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/verilog.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/pt/PtArray.h"
 #include "ym_utils/MsgHandler.h"
@@ -153,6 +154,7 @@ protected:
   reg_udp(const char* def_name,
 	  const ElbUdpDefn* udp);
 
+#if 0
   /// @brief generate block を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
@@ -162,6 +164,12 @@ protected:
   /// @param[in] obj 登録するオブジェクト
   void
   reg_blockscope(ElbScope* obj);
+#endif
+
+  /// @brief internal scope を登録する．
+  /// @param[in] obj 登録するオブジェクト
+  void
+  reg_internalscope(ElbScope* obj);
 
   /// @brief タスクを登録する．
   /// @param[in] obj 登録するオブジェクト
@@ -186,6 +194,13 @@ protected:
   void
   reg_declarray(int tag,
 		ElbDeclArray* obj);
+
+  /// @brief パラメータを登録する．
+  /// @param[in] tag タグ
+  /// @param[in] obj 登録するオブジェクト
+  void
+  reg_parameter(int tag,
+		ElbParameter* obj);
 
   /// @brief モジュール配列を登録する．
   /// @param[in] obj 登録するオブジェクト
@@ -354,6 +369,15 @@ protected:
   // 宣言要素のインスタンス化関係の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief parameter と genvar を実体化する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head_array 宣言ヘッダの配列
+  /// @param[in] force_to_local true なら parameter を localparam にする．
+  void
+  phase1_decl(const VlNamedObj* parent,
+	      PtDeclHeadArray pt_head_array,
+	      bool force_to_local);
+
   /// @brief IO宣言要素を実体化する．
   /// @param[in] module 親のモジュール
   /// @param[in] taskfunc 親のタスク/関数
@@ -370,15 +394,6 @@ protected:
   void
   instantiate_decl(const VlNamedObj* parent,
 		   PtDeclHeadArray pt_head_array);
-
-  /// @brief パラメータ用の instantiate 関数
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_head_array 宣言ヘッダの配列
-  /// @param[in] is_local local_param の時 true
-  void
-  instantiate_param(const VlNamedObj* parent,
-		    PtDeclHeadArray pt_head_array,
-		    bool is_local);
 
 
 protected:
@@ -498,27 +513,10 @@ protected:
 		  const PtExpr* pt_expr,
 		  ElbExpr* lhs);
 
-  /// @brief 範囲を表す式を生成
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_left 範囲のMSBを表すパース木
-  /// @param[in] pt_right 範囲のLSBを表すパース木
-  /// @param[out] left 範囲の MSB の式
-  /// @param[out] right 範囲の LSB の式
-  /// @param[out] left_val 範囲の MSB の値
-  /// @param[out] right_val 範囲の LSB の値
-  bool
-  instantiate_range(const VlNamedObj* parent,
-		    const PtExpr* pt_left,
-		    const PtExpr* pt_right,
-		    ElbExpr*& left,
-		    ElbExpr*& right,
-		    int& left_val,
-		    int& right_val);
-
   /// @brief PtExpr(primary) から named_event を生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
-  ElbDecl*
+  ElbExpr*
   instantiate_namedevent(const VlNamedObj* parent,
 			 const PtExpr* pt_expr);
 
@@ -538,42 +536,75 @@ protected:
   instantiate_delay(const VlNamedObj* parent,
 		    const PtItem* pt_head);
 
+  /// @brief 式の値を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[in] put_error エラーを出力する時，true にする．
+  VlValue
+  evaluate_expr(const VlNamedObj* parent,
+		const PtExpr* pt_expr,
+		bool put_error);
+
   /// @brief PtExpr を評価し int 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_int(const VlNamedObj* parent,
-		    const PtExpr* pt_expr,
-		    int& value);
+  evaluate_int(const VlNamedObj* parent,
+	       const PtExpr* pt_expr,
+	       int& value,
+	       bool put_error);
+
+  /// @brief PtExpr を評価しスカラー値を返す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_expr 式を表すパース木
+  /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
+  /// @note 定数でなければエラーメッセージを出力し false を返す．
+  bool
+  evaluate_scalar(const VlNamedObj* parent,
+		  const PtExpr* pt_expr,
+		  tVpiScalarVal& value,
+		  bool put_error);
 
   /// @brief PtExpr を評価し bool 値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bool(const VlNamedObj* parent,
-		     const PtExpr* pt_expr,
-		     bool& value);
+  evaluate_bool(const VlNamedObj* parent,
+		const PtExpr* pt_expr,
+		bool& value,
+		bool put_error);
 
   /// @brief PtExpr を評価しビットベクタ値を返す．
   /// @param[in] parent 親のスコープ
   /// @param[in] pt_expr 式を表すパース木
   /// @param[out] value 評価値を格納する変数
+  /// @param[in] put_error エラーを出力する時，true にする．
   /// @note 定数でなければエラーメッセージを出力し false を返す．
   bool
-  evaluate_expr_bitvector(const VlNamedObj* parent,
-			  const PtExpr* pt_expr,
-			  BitVector& value);
+  evaluate_bitvector(const VlNamedObj* parent,
+		     const PtExpr* pt_expr,
+		     BitVector& value,
+		     bool put_error);
 
-  /// @brief 式を int 値に変換する．
-  /// @return 変換に成功したら true を返す．
-  /// @note 変換に失敗したらエラーメッセージを出力する．
+  /// @brief 範囲を表す式を評価する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_left 範囲のMSBを表すパース木
+  /// @param[in] pt_right 範囲のLSBを表すパース木
+  /// @param[out] left_val 範囲の MSB の値
+  /// @param[out] right_val 範囲の LSB の値
   bool
-  expr_to_int(ElbExpr* expr,
-	      int& val);
+  evaluate_range(const VlNamedObj* parent,
+		 const PtExpr* pt_left,
+		 const PtExpr* pt_right,
+		 int& left_val,
+		 int& right_val);
 
 
 protected:
@@ -743,6 +774,7 @@ ElbProxy::reg_udp(const char* def_name,
   mMgr.reg_udp(def_name, udp);
 }
 
+#if 0
 // @brief generate block を登録する．
 // @param[in] obj 登録するオブジェクト
 inline
@@ -759,6 +791,16 @@ void
 ElbProxy::reg_blockscope(ElbScope* obj)
 {
   mMgr.reg_blockscope(obj);
+}
+#endif
+
+// @brief internal scope を登録する．
+// @param[in] obj 登録するオブジェクト
+inline
+void
+ElbProxy::reg_internalscope(ElbScope* obj)
+{
+  mMgr.reg_internalscope(obj);
 }
 
 // @brief タスクを登録する．
@@ -799,6 +841,17 @@ ElbProxy::reg_declarray(int tag,
 			ElbDeclArray* obj)
 {
   mMgr.reg_declarray(tag, obj);
+}
+
+// @brief パラメータを登録する．
+// @param[in] tag タグ
+// @param[in] obj 登録するオブジェクト
+inline
+void
+ElbProxy::reg_parameter(int tag,
+			ElbParameter* obj)
+{
+  mMgr.reg_parameter(tag, obj);
 }
 
 // @brief モジュール配列を登録する．

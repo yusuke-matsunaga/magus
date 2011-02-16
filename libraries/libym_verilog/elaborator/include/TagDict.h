@@ -18,158 +18,7 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-//////////////////////////////////////////////////////////////////////
-/// @class TagDictCell TagDictCell.h "TagDictCell.h"
-/// @brief TagDict 用のセル
-//////////////////////////////////////////////////////////////////////
-class TagDictCell
-{
-  friend class TagDict;
-
-private:
-
-  /// @brief  宣言要素を追加する．
-  virtual
-  void
-  add_decl(ElbDeclBase* obj);
-
-  /// @brief  宣言要素の先頭を得る．
-  virtual
-  const ElbDeclBase*
-  decl();
-
-  /// @brief  defparam を追加する．
-  virtual
-  void
-  add_defparam(ElbDefParam* obj);
-
-  /// @brief  defparam の先頭を得る．
-  virtual
-  const ElbDefParam*
-  defparam();
-
-  /// @brief  param assign を追加する．
-  virtual
-  void
-  add_paramassign(ElbParamAssign* obj);
-
-  /// @brief  param assign の先頭を得る．
-  virtual
-  const ElbParamAssign*
-  paramassign();
-
-  /// @brief module array を追加する．
-  virtual
-  void
-  add_modulearray(ElbModuleArray* obj);
-
-  /// @brief module array の先頭を得る．
-  virtual
-  const ElbModuleArray*
-  modulearray();
-
-  /// @brief  module を追加する．
-  virtual
-  void
-  add_module(ElbModule* obj);
-
-  /// @brief  module の先頭を得る．
-  virtual
-  const ElbModule*
-  module();
-
-  /// @brief  primitive array を追加する．
-  virtual
-  void
-  add_primarray(ElbPrimArray* obj);
-
-  /// @brief  primitive array の先頭を得る．
-  virtual
-  const ElbPrimArray*
-  primarray();
-
-  /// @brief  primitive を追加する．
-  virtual
-  void
-  add_primitive(ElbPrimitive* obj);
-
-  /// @brief  primitive の先頭を得る．
-  virtual
-  const ElbPrimitive*
-  primitive();
-
-  /// @brief タスクを追加する．
-  virtual
-  void
-  add_task(ElbTaskFunc* obj);
-
-  /// @brief タスクの先頭を得る．
-  virtual
-  const ElbTaskFunc*
-  task();
-
-  /// @brief 関数を追加する．
-  virtual
-  void
-  add_function(ElbTaskFunc* obj);
-
-  /// @brief 関数の先頭を得る．
-  virtual
-  const ElbTaskFunc*
-  function();
-
-  /// @brief continuous assignment を追加する．
-  virtual
-  void
-  add_contassign(ElbContAssign* obj);
-
-  /// @brief  continuous assignment の先頭を得る．
-  virtual
-  const ElbContAssign*
-  contassign();
-
-  /// @brief  process を追加する．
-  virtual
-  void
-  add_process(ElbProcess* process);
-
-  /// @brief  process の先頭を得る．
-  virtual
-  const ElbProcess*
-  process();
-
-  /// @brief generate block を追加する．
-  virtual
-  void
-  add_genblock(ElbScope* obj);
-
-  /// @brief generate block の先頭を得る．
-  virtual
-  const ElbScope*
-  genblock();
-
-  /// @brief  要素数を得る．
-  virtual
-  ymuint
-  num() = 0;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 親のスコープ
-  const VlNamedObj* mParent;
-
-  // タグの値
-  int mTag;
-
-  // ハッシュ上の次の要素を指すポインタ
-  TagDictCell* mLink;
-
-};
-
+class TagDictCell;
 
 //////////////////////////////////////////////////////////////////////
 /// @class TagDict TagDict.h "TagDict.h"
@@ -198,7 +47,7 @@ public:
   /// @param[in] decl 登録する要素
   void
   add_decl(int tag,
-	   ElbDeclBase* decl);
+	   ElbDecl* decl);
 
   /// @brief タグから該当する宣言要素のリストを返す．
   /// @param[in] parent 親のスコープ
@@ -212,6 +61,33 @@ public:
   find_decl_list(const VlNamedObj* parent,
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
+
+  /// @brief 宣言要素を追加する．
+  /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+  /// @param[in] decl 登録する要素
+  void
+  add_declarray(int tag,
+		ElbDeclArray* decl);
+
+  /// @brief タグから該当する宣言要素のリストを返す．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+  /// @param[out] declarray_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  /// @note scope というスコープ内の tag というタグを持つ要素を
+  /// decl_list に入れる．
+  bool
+  find_declarray_list(const VlNamedObj* parent,
+		      int tag,
+		      vector<const VlDeclArray*>& declarray_list) const;
+
+  /// @brief パラメータを追加する．
+  /// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+  /// @param[in] decl 登録する要素
+  void
+  add_parameter(int tag,
+		ElbParameter* decl);
 
   /// @brief defparam を追加する．
   /// @param[in] defparam 登録する要素
@@ -353,19 +229,19 @@ public:
   find_process_list(const VlNamedObj* parent,
 		    vector<const VlProcess*>& process_list) const;
 
-  /// @brief generate block を追加する．
+  /// @brief internal scope を追加する．
   /// @param[in] scope 登録する要素
   void
-  add_genblock(ElbScope* scope);
+  add_internalscope(ElbScope* scope);
 
-  /// @brief generate block のリストを取り出す．
+  /// @brief internal scope のリストを取り出す．
   /// @param[in] parent 親のスコープ
   /// @param[out] scope_list 結果を格納するリスト
   /// @retval true 該当する要素が1つ以上あった．
   /// @retval false 該当する要素がなかった．
   bool
-  find_genblock_list(const VlNamedObj* parent,
-		     vector<const VlNamedObj*>& scope_list) const;
+  find_internalscope_list(const VlNamedObj* parent,
+			  vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief このオブジェクトが使用しているメモリ量を返す．
   ymuint

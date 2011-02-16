@@ -47,7 +47,7 @@ public:
   /// @return 演算子の種類
   virtual
   tVpiOpType
-  opr_type() const = 0;
+  op_type() const = 0;
 
   /// @brief 階層ブランチの取得
   virtual
@@ -160,6 +160,11 @@ public:
   virtual
   bool
   is_simple() const = 0;
+
+  /// @brief 式を表す文字列表現の取得
+  virtual
+  string
+  decompile() const = 0;
 
 };
 

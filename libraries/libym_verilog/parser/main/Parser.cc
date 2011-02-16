@@ -10,12 +10,14 @@
 
 
 #include "Parser.h"
+#include "Parser_int.h"
 
 #include "PtiFactory.h"
 #include "PuHierName.h"
 #include "Lex.h"
 #include "PtMgr.h"
 
+#include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtStmt.h"
 
 
@@ -55,10 +57,6 @@ Parser::Parser(MsgMgr& msg_mgr,
   mParamPortHeadList(mCellAlloc),
   mModuleIOHeadList(mCellAlloc),
   mTfIOHeadList(mCellAlloc),
-  mModuleParamHeadList(mCellAlloc),
-  mTfParamHeadList(mCellAlloc),
-  mModuleLparamHeadList(mCellAlloc),
-  mTfLparamHeadList(mCellAlloc),
   mModuleDeclHeadList(mCellAlloc),
   mTfDeclHeadList(mCellAlloc),
   mModuleItemList(mCellAlloc),
@@ -166,8 +164,8 @@ Parser::reg_defname(const char* name)
 
 // @brief attribute instance を登録する．
 void
-Parser::reg_attrinst(PtBase* ptobj,
-		     PtrList<PtAttrInst>* attr_list)
+Parser::reg_attrinst(const PtBase* ptobj,
+		     PtrList<const PtAttrInst>* attr_list)
 {
   if ( attr_list ) {
     // 未実装
@@ -254,10 +252,10 @@ Parser::check_function_statement(const PtStmt* stmt)
 
 // default ラベルが2つ以上含まれていないかどうかのチェック
 bool
-Parser::check_default_label(const PtrList<PtCaseItem>* ci_list)
+Parser::check_default_label(const PtrList<const PtCaseItem>* ci_list)
 {
   ymuint n = 0;
-  for (PtrList<PtCaseItem>::const_iterator p = ci_list->begin();
+  for (PtrList<const PtCaseItem>::const_iterator p = ci_list->begin();
        p.is_valid(); ++ p) {
     const PtCaseItem* ci = *p;
     if ( ci->label_num() == 0 ) {
@@ -279,21 +277,21 @@ Parser::check_default_label(const PtrList<PtCaseItem>* ci_list)
 // @param[in] pre_expr list の前に挿入する式
 // @note 結果として list は削除される．
 PtExprArray
-Parser::ExprArray(PtExpr* pre_expr,
-		  PtrList<PtExpr>* list)
+Parser::ExprArray(const PtExpr* pre_expr,
+		  PtrList<const PtExpr>* list)
 {
   ymuint n = list->size();
-  void* p = mAlloc.get_memory(sizeof(PtExpr*) * (n + 1));
-  PtExpr** array = new (p) PtExpr*[n + 1];
+  void* p = mAlloc.get_memory(sizeof(const PtExpr*) * (n + 1));
+  const PtExpr** array = new (p) const PtExpr*[n + 1];
   array[0] = pre_expr;
   ymuint i = 1;
-  for (PtrList<PtExpr>::const_iterator p = list->begin();
+  for (PtrList<const PtExpr>::const_iterator p = list->begin();
        p.is_valid(); ++ p, ++ i) {
     array[i] = *p;
   }
 
-  list->~PtrList<PtExpr>();
-  mTmpAlloc.put_memory(sizeof(PtrList<PtExpr>), list);
+  list->~PtrList<const PtExpr>();
+  mTmpAlloc.put_memory(sizeof(PtrList<const PtExpr>), list);
 
   return PtExprArray(n + 1, array);
 }
@@ -305,7 +303,7 @@ PuHierName*
 Parser::new_HierName(const char* head_name,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(head_name);
+  const PtNameBranch* nb = mFactory.new_NameBranch(head_name);
   void* p = mTmpAlloc.get_memory(sizeof(PuHierName));
   return new (p) PuHierName(mCellAlloc, nb, name);
 }
@@ -319,7 +317,7 @@ Parser::new_HierName(const char* head_name,
 		     int index,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(head_name, index);
+  const PtNameBranch* nb = mFactory.new_NameBranch(head_name, index);
   void* p = mTmpAlloc.get_memory(sizeof(PuHierName));
   return new (p) PuHierName(mCellAlloc, nb, name);
 }
@@ -331,7 +329,7 @@ void
 Parser::add_HierName(PuHierName* hname,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name());
+  const PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name());
   hname->add(nb, name);
 }
 
@@ -344,7 +342,7 @@ Parser::add_HierName(PuHierName* hname,
 		     int index,
 		     const char* name)
 {
-  PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name(), index);
+  const PtNameBranch* nb = mFactory.new_NameBranch(hname->tail_name(), index);
   hname->add(nb, name);
 }
 
@@ -370,282 +368,67 @@ Parser::extract_HierName(PuHierName* hname,
   return ans;
 }
 
-// @brief モジュール定義の開始
-// - port list の初期化
-// - paramport list の初期化
-// - iohead list の初期化
-// - paramhead list の初期化
-// - localparamhead list の初期化
-// - declhead list の初期化
-// - item list の初期化
-// を行う．
+// @brief item リストに要素を追加する．
 void
-Parser::init_module()
+Parser::add_item(const PtItem* item,
+		 PtrList<const PtAttrInst>* attr_list)
 {
-  mPortList.clear();
-  mParamPortHeadList.clear();
-
-  mCurIOHeadList = &mModuleIOHeadList;
-  mCurParamHeadList = &mModuleParamHeadList;
-  mCurLparamHeadList = &mModuleLparamHeadList;
-  mCurDeclHeadList = &mModuleDeclHeadList;
-  mCurItemList = &mModuleItemList;
-
-  mCurIOHeadList->clear();
-  mIOItemList.clear();
-
-  mCurParamHeadList->clear();
-
-  mCurLparamHeadList->clear();
-
-  mCurDeclHeadList->clear();
-  mDeclItemList.clear();
-
-  mCurItemList->clear();
-}
-
-// @brief モジュール定義の終了
-void
-Parser::end_module()
-{
-  // 今のところやる事はない．
-}
-
-// @brief UDP定義の開始
-// - port list の初期化
-// - iohead list の初期化
-// - declhead list の初期化
-// - UDP entry list の初期化
-// を行う．
-void
-Parser::init_udp()
-{
-  mPortList.clear();
-  mCurIOHeadList = &mModuleIOHeadList;
-  mCurDeclHeadList = &mModuleDeclHeadList;
-
-
-  mCurIOHeadList->clear();
-  mIOItemList.clear();
-
-  mCurDeclHeadList->clear();
-  mDeclItemList.clear();
-
-  mUdpEntryList.clear();
-}
-
-// @brief UDP 定義の終了
-void
-Parser::end_udp()
-{
-  // 今のところやる事はない．
-}
-
-// @brief IO宣言の終わり
-void
-Parser::end_io()
-{
-  if ( !mIOItemList.empty() ) {
-    assert_cond( !mCurIOHeadList->empty(), __FILE__, __LINE__);
-    PtiIOHead* last = mCurIOHeadList->back();
-    last->set_elem(mIOItemList.to_array(mAlloc));
+  if ( item ) {
+    reg_attrinst(item, attr_list);
+    mCurItemList->push_back(item);
   }
 }
 
-// @brief parameter port 宣言の終わり
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] file_loc ファイル位置
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
 void
-Parser::end_paramport()
+Parser::put_msg(const char* src_file,
+		int src_line,
+		const FileRegion& file_loc,
+		tMsgType type,
+		const char* label,
+		const char* msg)
 {
-  flush_declitem_list(mParamPortHeadList);
+  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
-// @param parameter 宣言の終わり
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] file_loc ファイル位置
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
 void
-Parser::end_param()
+Parser::put_msg(const char* src_file,
+		int src_line,
+		const FileRegion& file_loc,
+		tMsgType type,
+		const char* label,
+		const string& msg)
 {
-  flush_declitem_list(*mCurParamHeadList);
-}
-
-// @param localparam 宣言の終わり
-void
-Parser::end_localparam()
-{
-  flush_declitem_list(*mCurLparamHeadList);
-}
-
-// @param 宣言の終わり
-void
-Parser::end_decl()
-{
-  flush_declitem_list(*mCurDeclHeadList);
-}
-
-// @brief 宣言要素リストを最後の宣言ヘッダにセットする．
-void
-Parser::flush_declitem_list(PtrList<PtiDeclHead, PtDeclHead>& head_list)
-{
-  if ( !mDeclItemList.empty() ) {
-    assert_cond( !head_list.empty(), __FILE__, __LINE__);
-    PtiDeclHead* last = head_list.back();
-    last->set_elem(mDeclItemList.to_array(mAlloc));
-  }
-}
-
-// @brief task/function 定義の開始
-// - iohead list の初期化
-// - paramhead list の初期化
-// - localparamhead list の初期化
-// - declhead list の初期化
-// を行う．
-void
-Parser::init_tf()
-{
-  push_iohead_list();
-  push_paramhead_list();
-  push_declhead_list();
-  push_item_list();
-
-  mCurIOHeadList = &mTfIOHeadList;
-  mCurParamHeadList = &mTfParamHeadList;
-  mCurLparamHeadList = &mTfLparamHeadList;
-  mCurDeclHeadList = &mTfDeclHeadList;
-
-  mCurIOHeadList->clear();
-  mIOItemList.clear();
-
-  mCurParamHeadList->clear();
-  mCurLparamHeadList->clear();
-  mCurDeclHeadList->clear();
-
-  mDeclItemList.clear();
-}
-
-// @brief task/function 定義の終了
-void
-Parser::end_tf()
-{
-  pop_iohead_list();
-  pop_paramhead_list();
-  pop_declhead_list();
-  pop_item_list();
-}
-
-// @brief generate block の開始
-void
-Parser::init_generate()
-{
-  push_declhead_list();
-  push_item_list();
-
-  new_declhead_list();
-  new_item_list();
-}
-
-// @brief generate block の終了
-void
-Parser::end_generate()
-{
-  delete_declhead_list(mCurDeclHeadList);
-  delete_item_list(mCurItemList);
-
-  pop_declhead_list();
-  pop_item_list();
-}
-
-// @brief generate-if の then 節の開始
-void
-Parser::init_genif()
-{
-  mThenDeclHeadListStack.push_back(mCurThenDeclHeadList);
-  mThenItemListStack.push_back(mCurThenItemList);
-
-  push_declhead_list();
-  push_item_list();
-
-  mCurThenDeclHeadList = new_declhead_list();
-  mCurThenItemList = new_item_list();
-
-  mCurThenDeclHeadList = mCurThenDeclHeadList;
-  mCurItemList = mCurThenItemList;
-}
-
-// @brief generate-if の else 節の開始
-void
-Parser::init_else()
-{
-  mElseDeclHeadListStack.push_back(mCurElseDeclHeadList);
-  mElseItemListStack.push_back(mCurElseItemList);
-
-  mCurElseDeclHeadList = new_declhead_list();
-  mCurElseItemList = new_item_list();
-
-  // mCurDeclHeadList と mCurItemList は then 節のものが
-  // セットされているはずなのでスタックに積む必要が無い．
-
-  mCurDeclHeadList = mCurElseDeclHeadList;
-  mCurItemList = mCurElseItemList;
-}
-
-// @brief generate-if の終了
-void
-Parser::end_genif()
-{
-  delete_declhead_list(mCurThenDeclHeadList);
-  delete_item_list(mCurThenItemList);
-
-  mCurThenDeclHeadList = mThenDeclHeadListStack.back();
-  mThenDeclHeadListStack.pop_back();
-
-  delete_declhead_list(mCurElseDeclHeadList);
-  delete_item_list(mCurElseItemList);
-
-  pop_declhead_list();
-  pop_item_list();
-
-  mCurElseDeclHeadList = mElseDeclHeadListStack.back();
-  mElseDeclHeadListStack.pop_back();
-
-  mCurElseItemList = mElseItemListStack.back();
-  mElseItemListStack.pop_back();
+  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 // @brief block-statment の開始
 void
 Parser::init_block()
 {
-  push_declhead_list();
-
-  mCurDeclHeadList = new_declhead_list();
+  push_declhead_list(NULL);
 }
 
 // @brief block-statement の終了
 void
 Parser::end_block()
 {
-  delete_declhead_list(mCurDeclHeadList);
+  mCurDeclArray = get_decl_array();
 
-  pop_declhead_list();
-}
-
-// @brief defparam リストを初期化する．
-void
-Parser::init_defparam()
-{
-  mDefParamList.clear();
-}
-
-// @brief contassign リストを初期化する．
-void
-Parser::init_contassign()
-{
-  mContAssignList.clear();
-}
-
-// @brief instance リストを初期化する．
-void
-Parser::init_inst()
-{
-  mInstList.clear();
+  pop_declhead_list(true);
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -12,7 +12,7 @@
 /// All rights reserved.
 
 
-#include "MagCmd.h"
+#include "NetCmd.h"
 #include "ym_bnet/bnet_nsdef.h"
 
 
@@ -24,12 +24,15 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief BNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
 class BNetCmd :
-  public MagCmd
+  public NetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  BNetCmd(MagMgr* mgr);
+  /// @param[in] mgr Magus の管理オブジェクト
+  /// @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
+  BNetCmd(MagMgr* mgr,
+	  bool new_bnet_enable = true);
 
   /// @brief デストラクタ
   virtual
@@ -71,21 +74,6 @@ protected:
   virtual
   void
   after_cmd_proc();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // メンバ変数
-  //////////////////////////////////////////////////////////////////////
-
-  // network オプションを解析するオブジェクト
-  TclPoptObj* mPoptNtwk;
-
-  // new_network オプションを解析するオブジェクト
-  TclPoptObj* mPoptNewNtwk;
-
-  // コマンドラインでネットワークの指定が行われたかを示すフラグ
-  bool mNetworkSpecified;
 
 };
 

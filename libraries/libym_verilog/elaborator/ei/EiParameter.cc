@@ -45,8 +45,8 @@ EiFactory::new_ParamHead(const VlNamedObj* parent,
 ElbParamHead*
 EiFactory::new_ParamHead(const VlNamedObj* parent,
 			 const PtDeclHead* pt_head,
-			 ElbExpr* left,
-			 ElbExpr* right,
+			 const PtExpr* left,
+			 const PtExpr* right,
 			 int left_val,
 			 int right_val)
 {
@@ -65,7 +65,7 @@ EiFactory::new_ParamHead(const VlNamedObj* parent,
 // @param[in] pt_item パース木の宣言要素
 // @param[in] init 初期割り当て式
 // @param[in] is_local localparam の時 true
-ElbDecl*
+ElbParameter*
 EiFactory::new_Parameter(ElbParamHead* head,
 			 const PtNamedBase* pt_item,
 			 bool is_local)
@@ -148,34 +148,24 @@ EiParamHead::is_signed() const
   return mPtHead->is_signed();
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiParamHead::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiParamHead::has_range() const
 {
-  return NULL;
+  return false;
 }
 
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiParamHead::right_range() const
-{
-  return NULL;
-}
-
-// @brief MSB の値を返す．
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiParamHead::left_range_const() const
+EiParamHead::left_range_val() const
 {
   switch ( mPtHead->data_type() ) {
   case kVpiVarInteger:
     return kVpiSizeInteger - 1;
 
   case kVpiVarReal:
-    return -1;
+    return 0;
 
   case kVpiVarTime:
     return kVpiSizeTime - 1;
@@ -187,16 +177,42 @@ EiParamHead::left_range_const() const
   return kVpiSizeInteger - 1;
 }
 
-// @brief LSB の値を返す．
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiParamHead::right_range_const() const
+EiParamHead::right_range_val() const
 {
-  if ( mPtHead->data_type() == kVpiVarReal ) {
-    return -1;
-  }
-  else {
-    return 0;
-  }
+  return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiParamHead::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiParamHead::right_range_string() const
+{
+  return string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiParamHead::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiParamHead::is_little_endian() const
+{
+  return true;
 }
 
 // @brief ビット幅を返す．
@@ -293,8 +309,8 @@ EiParamHead::data_type() const
 // @param[in] right_val 範囲の右側の値
 EiParamHeadV::EiParamHeadV(const VlNamedObj* parent,
 			   const PtDeclHead* pt_head,
-			   ElbExpr* left,
-			   ElbExpr* right,
+			   const PtExpr* left,
+			   const PtExpr* right,
 			   int left_val,
 			   int right_val) :
   EiParamHead(parent, pt_head)
@@ -307,36 +323,57 @@ EiParamHeadV::~EiParamHeadV()
 {
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiParamHeadV::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiParamHeadV::has_range() const
 {
-  return mRange.left_range();
+  return true;
 }
 
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiParamHeadV::right_range() const
-{
-  return mRange.right_range();
-}
-
-// @brief MSB の値を返す．
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiParamHeadV::left_range_const() const
+EiParamHeadV::left_range_val() const
 {
-  return mRange.left_range_const();
+  return mRange.left_range_val();
 }
 
-// @brief LSB の値を返す．
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiParamHeadV::right_range_const() const
+EiParamHeadV::right_range_val() const
 {
-  return mRange.right_range_const();
+  return mRange.right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiParamHeadV::left_range_string() const
+{
+  return mRange.left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiParamHeadV::right_range_string() const
+{
+  return mRange.right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiParamHeadV::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiParamHeadV::is_little_endian() const
+{
+  return mRange.is_little_endian();
 }
 
 // @brief ビット幅を返す．
@@ -420,11 +457,44 @@ EiParameter::name() const
 tVpiValueType
 EiParameter::value_type() const
 {
+#if 0 // 自身に型の指定がない parameter の value_type() は値の型を用いるべき？
   tVpiValueType vt = mHead->value_type();
   if ( vt == kVpiValueNone ) {
-    vt = mExpr->value_type();
+    if ( mValue.is_int() ) {
+      return kVpiValueInteger;
+    }
+    if ( mValue.is_scalar() ) {
+      return pack(kVpiValueUS, 1);
+    }
+    if ( mValue.is_bitvector() ) {
+      const BitVector& bv = mValue.bitvector_value();
+      ymuint size = bv.size();
+      if ( bv.is_signed() ) {
+	if ( bv.is_sized() ) {
+	  return pack(kVpiValueSS, size);
+	}
+	else {
+	  return pack(kVpiValueSU, size);
+	}
+      }
+      else {
+	if ( bv.is_sized() ) {
+	  return pack(kVpiValueUS, size);
+	}
+	else {
+	  return pack(kVpiValueUU, size);
+	}
+      }
+    }
+    if ( mValue.is_real() ) {
+      return kVpiValueReal;
+    }
+    return kVpiValueNone;
   }
   return vt;
+#else
+  return mHead->value_type();
+#endif
 }
 
 // @brief 符号の取得
@@ -436,18 +506,57 @@ EiParameter::is_signed() const
   return mHead->is_signed();
 }
 
-// @brief MSB の値を返す．
-int
-EiParameter::left_range_const() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiParameter::has_range() const
 {
-  return mHead->left_range_const();
+  return mHead->has_range();
 }
 
-// @brief LSB の値を返す．
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiParameter::right_range_const() const
+EiParameter::left_range_val() const
 {
-  return mHead->right_range_const();
+  return mHead->left_range_val();
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiParameter::right_range_val() const
+{
+  return mHead->right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiParameter::left_range_string() const
+{
+  return mHead->left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiParameter::right_range_string() const
+{
+  return mHead->right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiParameter::is_big_endian() const
+{
+  return mHead->is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiParameter::is_little_endian() const
+{
+  return mHead->is_little_endian();
 }
 
 // @brief ビット幅を返す．
@@ -476,15 +585,6 @@ EiParameter::data_type() const
   return mHead->data_type();
 }
 
-// @brief 初期値の取得
-// @retval 初期値
-// @retval NULL 設定がない場合
-const VlExpr*
-EiParameter::init_value() const
-{
-  return mExpr;
-}
-
 // @brief localparam のときに true 返す．
 // @note このクラスでは false を返す．
 bool
@@ -493,118 +593,23 @@ EiParameter::is_local_param() const
   return false;
 }
 
-// @brief 初期値の設定
-// @param[in] expr 初期値
+// @brief 値の取得
+VlValue
+EiParameter::get_value() const
+{
+  return mValue;
+}
+
+// @brief 値の設定
+// @param[in] expr 値を表す式
+// @param[in] value 値
 void
-EiParameter::set_expr(ElbExpr* expr)
+EiParameter::set_expr(const PtExpr* expr,
+		      const VlValue& value)
 {
   mExpr = expr;
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiParameter::_left_range() const
-{
-  return mHead->left_range();
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiParameter::_right_range() const
-{
-  return mHead->right_range();
-}
-
-#if 0
-// @brief int 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return 整数値に変換できたら true を返す．
-bool
-EiParameter::eval_int(int& val) const
-{
-  return mExpr->eval_int(val);
-}
-#endif
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiParameter::get_scalar() const
-{
-  return mExpr->eval_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiParameter::get_logic() const
-{
-  return mExpr->eval_logic();
-}
-
-#if 0
-// @brief 論理値を返す．
-bool
-EiParameter::eval_bool() const
-{
-  return mExpr->eval_bool();
-}
-#endif
-
-// @brief real 型の値を返す．
-double
-EiParameter::get_real() const
-{
-  return mExpr->eval_real();
-}
-
-#if 0
-// @brief VlTime 型の値を返す．
-// @param[out] val 結果を格納する変数
-// @return VlTime 値に変換できたら true を返す．
-// @note eval_bitvector() の結果から変換する．
-bool
-EiParameter::eval_time(VlTime& val) const
-{
-  return mExpr->eval_time(val);
-}
-#endif
-
-// @brief bitvector 型の値を返す．
-void
-EiParameter::get_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  mExpr->eval_bitvector(bitvector, req_type);
-}
-
-// @brief ビット選択値を返す．
-// @param[in] index ビット位置
-tVpiScalarVal
-EiParameter::get_bitselect(int index) const
-{
-  ymuint offset = bit_offset(index);
-  BitVector bv;
-  get_bitvector(bv);
-  return bv.bit_select(offset);
-}
-
-// @brief 範囲選択値を返す．
-// @param[in] left 範囲の MSB
-// @param[in] right 範囲の LSB
-// @param[out] val 値
-void
-EiParameter::get_partselect(int left,
-			    int right,
-			    BitVector& val) const
-{
-  ymuint offset1 = bit_offset(left);
-  ymuint offset2 = bit_offset(right);
-  BitVector bv;
-  get_bitvector(bv);
-  bv.part_select(offset1, offset2);
+  mValue = value;
+#warning "TODO:2011-02-14-01"
 }
 
 

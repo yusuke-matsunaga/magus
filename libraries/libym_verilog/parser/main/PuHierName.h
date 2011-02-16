@@ -32,7 +32,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class PuHierName
 {
   friend class Parser;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -40,7 +40,7 @@ private:
   /// @param[in] nb 階層ブランチ
   /// @param[in] name 名前
   PuHierName(UnitAlloc& alloc,
-	     PtNameBranch* nb,
+	     const PtNameBranch* nb,
 	     const char* name);
 
   /// @brief デストラクタ
@@ -53,12 +53,12 @@ public:
   /// @param[in] nb 追加する階層ブランチ
   /// @param[in] tail_name 追加する最下層の名前
   void
-  add(PtNameBranch* nb,
+  add(const PtNameBranch* nb,
       const char* tail_name);
 
 
 public:
-  
+
   /// @brief 最下層の名前を取り出す．
   /// @return 最下層の名前
   const char*
@@ -71,7 +71,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 階層ブランチのリスト
-  PtrList<PtNameBranch> mNbList;
+  PtrList<const PtNameBranch> mNbList;
 
   // 最下層の名前
   const char* mTailName;
@@ -89,7 +89,7 @@ private:
 // @param[in] name 名前
 inline
 PuHierName::PuHierName(UnitAlloc& alloc,
-		       PtNameBranch* nb,
+		       const PtNameBranch* nb,
 		       const char* name) :
   mNbList(alloc),
   mTailName(name)
@@ -107,7 +107,7 @@ PuHierName::~PuHierName()
 // 追加する．
 inline
 void
-PuHierName::add(PtNameBranch* nb,
+PuHierName::add(const PtNameBranch* nb,
 		const char* tail_name)
 {
   mNbList.push_back(nb);

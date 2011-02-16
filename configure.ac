@@ -207,7 +207,6 @@ YM_FINISH_LIBRARIES_SUBDIRS
 ym_magus_tclsh_enable=1
 ym_atpg_enable=1
 ym_matpg_enable=1
-ym_lutmap_enable=1
 
 YM_INIT_PROGRAMS_SUBDIRS
 
@@ -227,13 +226,6 @@ YM_BUILD_PROGRAM([matpg],
 		  ym_libym_lexp_enable,
 		  ym_libym_tgnet_enable,
 		  ym_libym_tclpp_enable])
-
-# lutmap
-YM_BUILD_PROGRAM([lutmap],
-		 [ym_libym_utils_enable,
-		  ym_libym_verilog_enable,
-		  ym_libym_mvn_enable,
-		  ym_libym_lutmap_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS
 

@@ -12,6 +12,7 @@
 #include "MvnReadVerilog.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvVerilogReader.h"
+#include "ym_mvn/MvVlMap.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -43,14 +44,6 @@ MvnReadVerilog::cmd_proc(TclObjVector& objv)
   mh->delete_mask(kMsgDebug);
   reader.add_msg_handler(mh);
 
-  reader.set_ffname("KTECH_DFF", // セル名
-		    "D",         // データ入力
-		    "CK",        // クロック
-		    "Q",         // ノーマル出力
-		    "QN",        // 反転出力
-		    "",          // セット
-		    "");         // リセット
-
   // Verilog ファイルの読み込み
   for (ymuint i = 1; i < objv.size(); ++ i) {
     TclObj obj = objv[i];
@@ -74,7 +67,7 @@ MvnReadVerilog::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  vector<pair<const VlDecl*, ymuint> > node_map;
+  MvVlMap node_map;
   bool stat = reader.gen_network(*neth->_mvn(), node_map);
   if ( !stat ) {
     TclObj emsg;

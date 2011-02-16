@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_verilog/pt/PtExpr.h"
+#include "PtiExpr.h"
 #include "ym_verilog/pt/PtArray.h"
 
 #include "ym_utils/FileRegion.h"
@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class CptExpr :
-  public PtExpr
+  public PtiExpr
 {
 protected:
 
@@ -45,7 +45,7 @@ public:
   /// @note このクラスでは kVpiNullOp を返す．
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief 階層ブランチの取得
   /// @note このクラスでは NULL を返す．
@@ -207,7 +207,7 @@ public:
   // 演算子のトークン番号を得る．
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
 
 private:
@@ -234,7 +234,7 @@ protected:
   // コンストラクタ
   CptOpr1(const FileRegion& file_region,
 	  tVpiOpType op_type,
-	  PtExpr* opr);
+	  const PtExpr* opr);
 
   // デストラクタ
   virtual
@@ -284,7 +284,7 @@ private:
   FileRegion mFileRegion;
 
   // オペランド
-  PtExpr* mOpr;
+  const PtExpr* mOpr;
 
 };
 
@@ -301,8 +301,8 @@ protected:
 
   // コンストラクタ
   CptOpr2(tVpiOpType op_type,
-	  PtExpr* opr1,
-	  PtExpr* opr2);
+	  const PtExpr* opr1,
+	  const PtExpr* opr2);
 
   // デストラクタ
   virtual
@@ -339,7 +339,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // オペランド
-  PtExpr* mOpr[2];
+  const PtExpr* mOpr[2];
 
 };
 
@@ -356,9 +356,9 @@ protected:
 
   // コンストラクタ
   CptOpr3(tVpiOpType op_type,
-	  PtExpr* opr1,
-	  PtExpr* opr2,
-	  PtExpr* opr3);
+	  const PtExpr* opr1,
+	  const PtExpr* opr2,
+	  const PtExpr* opr3);
 
   // デストラクタ
   virtual
@@ -395,7 +395,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // オペランド
-  PtExpr* mOpr[3];
+  const PtExpr* mOpr[3];
 
 };
 
@@ -436,7 +436,7 @@ public:
   ///演算子の種類の取得
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数
@@ -492,7 +492,7 @@ public:
   ///演算子の種類の取得
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
 };
 
@@ -508,9 +508,9 @@ class CptMinTypMax :
 private:
 
   // コンストラクタ
-  CptMinTypMax(PtExpr* val0,
-	       PtExpr* val1,
-	       PtExpr* val2);
+  CptMinTypMax(const PtExpr* val0,
+	       const PtExpr* val1,
+	       const PtExpr* val2);
 
   // デストラクタ
   virtual
@@ -535,7 +535,7 @@ public:
   ///演算子の種類の取得
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数
@@ -557,7 +557,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  PtExpr* mValue[3];
+  const PtExpr* mValue[3];
 
 };
 
@@ -971,8 +971,8 @@ protected:
   CptPrimaryR(const FileRegion& file_region,
 	      const char* name,
 	      tVpiRangeMode mode,
-	      PtExpr* left,
-	      PtExpr* right);
+	      const PtExpr* left,
+	      const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1022,10 +1022,10 @@ private:
   tVpiRangeMode mMode;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -1044,8 +1044,8 @@ protected:
   CptPrimaryCR(const FileRegion& file_region,
 	       const char* name,
 	       tVpiRangeMode mode,
-	       PtExpr* left,
-	       PtExpr* right);
+	       const PtExpr* left,
+	       const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1080,8 +1080,8 @@ protected:
 	       const char* name,
 	       PtExprArray index_array,
 	       tVpiRangeMode mode,
-	       PtExpr* left,
-	       PtExpr* right);
+	       const PtExpr* left,
+	       const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1118,10 +1118,10 @@ private:
   tVpiRangeMode mMode;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -1268,8 +1268,8 @@ protected:
 	       PtNameBranchArray nb_array,
 	       const char* tail_name,
 	       tVpiRangeMode mode,
-	       PtExpr* left,
-	       PtExpr* right);
+	       const PtExpr* left,
+	       const PtExpr* right);
 
   // デストラクタ
   virtual
@@ -1313,8 +1313,8 @@ protected:
 		const char* tail_name,
 		PtExprArray index_array,
 		tVpiRangeMode mode,
-		PtExpr* left,
-		PtExpr* right);
+		const PtExpr* left,
+		const PtExpr* right);
 
   // デストラクタ
   virtual

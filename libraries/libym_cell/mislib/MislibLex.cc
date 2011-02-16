@@ -74,7 +74,10 @@ MislibLex::read_token()
   case ')': return RP;
   case '!': return NOT;
   case '*': return STAR;
+  case '&': return STAR;
   case '+': return PLUS;
+  case '|': return PLUS;
+  case '^': return HAT;
   case '#': goto state6;
   case '\"': goto state7;
   }

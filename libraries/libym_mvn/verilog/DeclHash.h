@@ -44,6 +44,15 @@ public:
   ymuint
   get_id(const VlDecl* decl);
 
+  /// @brief ID番号を得る．
+  /// @param[in] decl 配列型宣言要素
+  /// @param[in] offset オフセット
+  /// @return ID番号
+  /// @note 登録されていなかった場合には新しい番号を割り当てる．
+  ymuint
+  get_id(const VlDeclArray* decl,
+	 ymuint offset);
+
   /// @brief ID番号の最大値 + 1を返す．
   ymuint
   max_id() const;
@@ -57,7 +66,7 @@ private:
   struct Cell
   {
     // 宣言要素
-    const VlDecl* mDecl;
+    const VlObj* mDecl;
 
     // ID番号
     ymuint32 mId;
@@ -75,12 +84,12 @@ private:
 
   /// @brief Cell を登録する．
   void
-  put_cell(const VlDecl* decl,
+  put_cell(const VlObj* decl,
 	   ymuint id);
 
   /// @brief Cell を探す．
   Cell*
-  find_cell(const VlDecl* decl) const;
+  find_cell(const VlObj* decl) const;
 
   /// @brief テーブルの領域を確保する．
   /// @param[in] size 必要なサイズ
@@ -89,7 +98,7 @@ private:
 
   /// @brief ハッシュ値を計算する．
   ymuint
-  hash_func(const VlDecl* decl) const;
+  hash_func(const VlObj* decl) const;
 
 
 private:
@@ -111,6 +120,9 @@ private:
 
   // 要素数
   ymuint32 mNum;
+
+  // 次に割り当て可能な ID 番号
+  ymuint32 mNextId;
 
 };
 

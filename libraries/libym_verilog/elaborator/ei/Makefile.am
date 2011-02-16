@@ -39,8 +39,6 @@ libym_vl_elab_ei_la_SOURCES = \
 	EiDeclHead.cc \
 	EiDeclArray.h \
 	EiDeclArray.cc \
-	EiDeclElem.h \
-	EiDeclElem.cc \
 	EiParameter.h \
 	EiParameter.cc \
 	EiImpNet.h \
@@ -77,6 +75,8 @@ libym_vl_elab_ei_la_SOURCES = \
 	EiDelay.cc \
 	EiRange.h \
 	EiRange.cc \
+	EiLhs.h \
+	EiLhs.cc \
 	EiExpr.h \
 	EiExpr.cc \
 	EiOperation.h \
@@ -94,8 +94,6 @@ libym_vl_elab_ei_la_SOURCES = \
 	EiBitSelect.cc \
 	EiPartSelect.h \
 	EiPartSelect.cc \
-	EiVarPartSelect.h \
-	EiVarPartSelect.cc \
 	EiFuncCall.h \
 	EiFuncCall.cc \
 	EiConstant.h \

@@ -10,6 +10,7 @@
 #include "DeclHash.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlDeclArray.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
@@ -17,7 +18,8 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 // @brief コンストラクタ
 DeclHash::DeclHash() :
   mAlloc(sizeof(Cell), 1024),
-  mNum(0)
+  mNum(0),
+  mNextId(0)
 {
   alloc_table(1024);
 }
@@ -36,6 +38,7 @@ DeclHash::clear()
     mTable[i] = NULL;
   }
   mNum = 0;
+  mNextId = 0;
   mAlloc.destroy();
 }
 
@@ -51,15 +54,45 @@ DeclHash::get_id(const VlDecl* decl)
     return cell->mId;
   }
   else {
-    ymuint id = mNum;
+    ymuint id = mNextId;
+    ++ mNextId;
     put_cell(decl, id);
     return id;
   }
 }
 
+// @brief ID番号を得る．
+// @param[in] decl 配列型宣言要素
+// @param[in] offset オフセット
+// @return ID番号
+// @note 登録されていなかった場合には新しい番号を割り当てる．
+ymuint
+DeclHash::get_id(const VlDeclArray* decl,
+		 ymuint offset)
+{
+  Cell* cell = find_cell(decl);
+  ymuint base = 0;
+  if ( cell ) {
+    base = cell->mId;
+  }
+  else {
+    base = mNextId;
+    mNextId += decl->array_size();
+    put_cell(decl, base);
+  }
+  return base + offset;
+}
+
+// @brief ID番号の最大値 + 1を返す．
+ymuint
+DeclHash::max_id() const
+{
+  return mNextId;
+}
+
 // @brief Cell を登録する．
 void
-DeclHash::put_cell(const VlDecl* decl,
+DeclHash::put_cell(const VlObj* decl,
 		   ymuint id)
 {
   if ( mNum >= mLimit ) {
@@ -90,7 +123,7 @@ DeclHash::put_cell(const VlDecl* decl,
 
 // @brief Cell を探す．
 DeclHash::Cell*
-DeclHash::find_cell(const VlDecl* decl) const
+DeclHash::find_cell(const VlObj* decl) const
 {
   ymuint pos = hash_func(decl);
   for (Cell* cell = mTable[pos]; cell; cell = cell->mLink) {
@@ -116,7 +149,7 @@ DeclHash::alloc_table(ymuint size)
 
 // @brief ハッシュ値を計算する．
 ymuint
-DeclHash::hash_func(const VlDecl* decl) const
+DeclHash::hash_func(const VlObj* decl) const
 {
   ympuint tmp = reinterpret_cast<ympuint>(decl);
   return ((tmp * tmp) >> 10) % mSize;

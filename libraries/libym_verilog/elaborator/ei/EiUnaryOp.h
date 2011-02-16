@@ -52,7 +52,7 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド
-  EiUnaryOp(const PtBase* pt_expr,
+  EiUnaryOp(const PtExpr* pt_expr,
 	    ElbExpr* opr1);
 
   /// @brief デストラクタ
@@ -128,7 +128,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド
-  EiNotOp(const PtBase* pt_expr,
+  EiNotOp(const PtExpr* pt_expr,
 	  ElbExpr* opr1);
 
   /// @brief デストラクタ
@@ -146,27 +146,6 @@ public:
   tVpiValueType
   value_type() const;
 
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -179,17 +158,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
 
 };
 
@@ -208,7 +176,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド
-  EiBitNegOp(const PtBase* pt_expr,
+  EiBitNegOp(const PtExpr* pt_expr,
 	     ElbExpr* opr1);
 
   /// @brief デストラクタ
@@ -226,27 +194,6 @@ public:
   tVpiValueType
   value_type() const;
 
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -259,17 +206,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
 
 
 private:
@@ -297,7 +233,7 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド
-  EiReductionOp(const PtBase* pt_expr,
+  EiReductionOp(const PtExpr* pt_expr,
 		ElbExpr* opr1);
 
   /// @brief デストラクタ
@@ -314,22 +250,6 @@ public:
   virtual
   tVpiValueType
   value_type() const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
 
 
 public:
@@ -348,282 +268,6 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiUnaryAndOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief リダクション AND 演算子
-//////////////////////////////////////////////////////////////////////
-class EiUnaryAndOp :
-  public EiReductionOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiUnaryAndOp(const PtBase* pt_expr,
-	       ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiUnaryAndOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiUnaryNandOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief リダクション NAND 演算子
-//////////////////////////////////////////////////////////////////////
-class EiUnaryNandOp :
-  public EiReductionOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiUnaryNandOp(const PtBase* pt_expr,
-		ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiUnaryNandOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiUnaryOrOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief リダクション OR 演算子
-//////////////////////////////////////////////////////////////////////
-class EiUnaryOrOp :
-  public EiReductionOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiUnaryOrOp(const PtBase* pt_expr,
-		ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiUnaryOrOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiUnaryNorOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief リダクション NOR 演算子
-//////////////////////////////////////////////////////////////////////
-class EiUnaryNorOp :
-  public EiReductionOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiUnaryNorOp(const PtBase* pt_expr,
-	       ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiUnaryNorOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiUnaryXorOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief リダクション XOR 演算子
-//////////////////////////////////////////////////////////////////////
-class EiUnaryXorOp :
-  public EiReductionOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiUnaryXorOp(const PtBase* pt_expr,
-	       ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiUnaryXorOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiUnaryXnorOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief リダクション XNOR 演算子
-//////////////////////////////////////////////////////////////////////
-class EiUnaryXnorOp :
-  public EiReductionOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiUnaryXnorOp(const PtBase* pt_expr,
-		ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiUnaryXnorOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class EiUnaryArithOp EiUnaryOp.h "EiUnaryOp.h"
 //////////////////////////////////////////////////////////////////////
 class EiUnaryArithOp :
@@ -636,7 +280,7 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド
-  EiUnaryArithOp(const PtBase* pt_expr,
+  EiUnaryArithOp(const PtExpr* pt_expr,
 		 ElbExpr* opr1);
 
   /// @brief デストラクタ
@@ -671,144 +315,6 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiPlusOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief 単項プラス演算子
-//////////////////////////////////////////////////////////////////////
-class EiPlusOp :
-  public EiUnaryArithOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiPlusOp(const PtBase* pt_expr,
-	   ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiPlusOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiMinusOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief 単項マイナス演算子
-//////////////////////////////////////////////////////////////////////
-class EiMinusOp :
-  public EiUnaryArithOp
-{
-  friend class EiFactory;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiMinusOp(const PtBase* pt_expr,
-	    ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiMinusOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // VlExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class EiEventEdgeOp EiUnaryOp.h "EiUnaryOp.h"
 /// @brief posdedge / negaedge 演算子の基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -822,7 +328,7 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr1 オペランド
-  EiEventEdgeOp(const PtBase* pt_expr,
+  EiEventEdgeOp(const PtExpr* pt_expr,
 		ElbExpr* opr1);
 
   /// @brief デストラクタ
@@ -840,27 +346,6 @@ public:
   tVpiValueType
   value_type() const;
 
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -873,76 +358,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiPosedgeOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief posedge 演算子
-//////////////////////////////////////////////////////////////////////
-class EiPosedgeOp :
-  public EiEventEdgeOp
-{
-  friend class EiFactory;
-
-protected:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiPosedgeOp(const PtBase* pt_expr,
-	      ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiPosedgeOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class EiNegedgeOp EiUnaryOp.h "EiUnaryOp.h"
-/// @brief negedge 演算子
-//////////////////////////////////////////////////////////////////////
-class EiNegedgeOp :
-  public EiEventEdgeOp
-{
-  friend class EiFactory;
-
-protected:
-
-  /// @brief コンストラクタ
-  /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] opr1 オペランド
-  EiNegedgeOp(const PtBase* pt_expr,
-	      ElbExpr* opr1);
-
-  /// @brief デストラクタ
-  virtual
-  ~EiNegedgeOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiOperation の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
 
 };
 

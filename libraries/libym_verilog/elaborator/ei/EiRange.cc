@@ -11,7 +11,8 @@
 
 #include "EiFactory.h"
 #include "EiRange.h"
-#include "ElbExpr.h"
+
+#include "ym_verilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -79,32 +80,36 @@ EiRange::size() const
   return calc_size(mLeftVal, mRightVal);
 }
 
-// @brief MSB を返す．
-VlExpr*
-EiRange::left_range() const
-{
-  return mLeftRange;
-}
-
-// @brief LSB を返す．
-VlExpr*
-EiRange::right_range() const
-{
-  return mRightRange;
-}
-
 // @brief MSB の値を返す．
+// @retval MSB の値 値が確定しているとき
+// @retval -1 値が確定していない
 int
-EiRange::left_range_const() const
+EiRange::left_range_val() const
 {
   return mLeftVal;
 }
 
 // @brief LSB の値を返す．
+// @retval LSB の値 値が確定しているとき
+// @retval -1 値が確定していない
 int
-EiRange::right_range_const() const
+EiRange::right_range_val() const
 {
   return mRightVal;
+}
+
+// @brief MSB を表す文字列を返す．
+string
+EiRange::left_range_string() const
+{
+  return mLeftRange->decompile();
+}
+
+// @brief LSB を表す文字列を返す．
+string
+EiRange::right_range_string() const
+{
+  return mRightRange->decompile();
 }
 
 // @brief 範囲のチェック
@@ -176,8 +181,8 @@ EiRangeImpl::~EiRangeImpl()
 // @param[in] left 範囲の MSB
 // @param[in] right 範囲の LSB
 void
-EiRangeImpl::set(ElbExpr* left,
-		 ElbExpr* right,
+EiRangeImpl::set(const PtExpr* left,
+		 const PtExpr* right,
 		 int left_val,
 		 int right_val)
 {
@@ -194,32 +199,32 @@ EiRangeImpl::size() const
   return EiRange::calc_size(mLeftVal, mRightVal);
 }
 
-// MSB を返す．
-ElbExpr*
-EiRangeImpl::left_range() const
-{
-  return mLeftRange;
-}
-
-// LSB を返す．
-ElbExpr*
-EiRangeImpl::right_range() const
-{
-  return mRightRange;
-}
-
-// MSB の値を返す．確定していないときは -1 を返す．
+// @brief MSB の値を返す．
 int
-EiRangeImpl::left_range_const() const
+EiRangeImpl::left_range_val() const
 {
   return mLeftVal;
 }
 
-// LSB の値を返す．確定していないときは -1 を返す．
+// @brief LSB の値を返す．
 int
-EiRangeImpl::right_range_const() const
+EiRangeImpl::right_range_val() const
 {
   return mRightVal;
+}
+
+// @brief MSB を表す文字列を返す．
+string
+EiRangeImpl::left_range_string() const
+{
+  return mLeftRange->decompile();
+}
+
+// @brief LSB を表す文字列を返す．
+string
+EiRangeImpl::right_range_string() const
+{
+  return mRightRange->decompile();
 }
 
 // index が範囲内に入っていたら true を返す．
@@ -272,6 +277,11 @@ EiRangeArray::EiRangeArray(ymuint dim_size,
   mDimSize(dim_size),
   mArray(array)
 {
+  // 要素数を計算する．
+  mElemSize = 1;
+  for (ymuint i = 0; i < dim_size; ++ i) {
+    mElemSize *= array[i].size();
+  }
 }
 
 // デストラクタ
@@ -279,65 +289,45 @@ EiRangeArray::~EiRangeArray()
 {
 }
 
-// @brief 要素数を計算する
-// @return サイズを返す．
-ymuint
-EiRangeArray::elem_size() const
-{
-  // 各次元の要素数をかければよい
-  ymuint ans = 1;
-  ymuint n = size();
-  for (ymuint i = 0; i < n; ++ i) {
-    ans *= range(i)->size();
-  }
-  return ans;
-}
-
 // @brief アドレス(オフセット)からインデックスの配列を作る．
 // @param[in] offset オフセット
-// @param[out] index_array
+// @param[out] index_list
 void
 EiRangeArray::index(ymuint offset,
-		    vector<int>& index_array) const
+		    vector<int>& index_list) const
 {
   ymuint n = size();
-  index_array.resize(n);
+  index_list.resize(n);
   for (ymuint i = n; i -- > 0; ) {
     const EiRange* r = range(i);
     int k = r->size();
     int offset1 = offset % k;
     offset /= k;
-    index_array[i] = r->rindex(offset1);
+    index_list[i] = r->rindex(offset1);
   }
 }
 
-#if 0
-// @brief インデックスからオフセットを得る
-ymuint
-EiRangeArray::offset(const vector<int>& index_array) const
+// @brief インデックスのリストからオフセットを得る．
+// @param[in] index_list インデックスのリスト
+// @return index_list の値に対応したオフセット値
+// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+int
+EiRangeArray::offset(const vector<int>& index_list) const
 {
   ymuint n = size();
-  if ( index_array.size() != n ) {
-#if 0
-    error_header(__FILE__, __LINE__, "RUN", FileRegion())
-      << "dimension mismatch between range array and index array"
-      << eom;
-#else
-#warning "TODO: どう処理するのがよいのか考える．"
-#endif
-    return 0;
+  if ( index_list.size() != n ) {
+    return -1;
   }
 
-  ymuint offset = 0;
+  int offset = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const EiRange* r = range(i);
     int k = r->size();
     offset *= k;
-    int offset1 = r->roffset(index_array[i]);
+    int offset1 = r->roffset(index_list[i]);
     offset += offset1;
   }
   return offset;
 }
-#endif
 
 END_NAMESPACE_YM_VERILOG

@@ -130,7 +130,7 @@ ElbStmt::is_blocking() const
 // @brief イベントプライマリの取得
 // @note kEvent で意味のある関数
 // @note このクラスでは NULL を返す．
-const VlDecl*
+const VlExpr*
 ElbStmt::named_event() const
 {
   return NULL;

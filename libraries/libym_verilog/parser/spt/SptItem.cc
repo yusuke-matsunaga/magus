@@ -150,20 +150,6 @@ SptItem::iohead_array() const
   return PtIOHeadArray();
 }
 
-// @brief parameter 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptItem::paramhead_array() const
-{
-  return PtDeclHeadArray();
-}
-
-// @brief localparam 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptItem::localparamhead_array() const
-{
-  return PtDeclHeadArray();
-}
-
 // @brief 宣言ヘッダ配列の取得
 PtDeclHeadArray
 SptItem::declhead_array() const
@@ -405,7 +391,7 @@ SptDefParamH::defparam(ymuint pos) const
 SptDefParam::SptDefParam(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
 			 const char* tail_name,
-			 PtExpr* value) :
+			 const PtExpr* value) :
   mFileRegion(file_region),
   mNbArray(nb_array),
   mName(tail_name),
@@ -461,8 +447,8 @@ SptDefParam::expr() const
 // @param delay 遅延
 // @param ca_list continuous assignment のリスト
 SptContAssignH::SptContAssignH(const FileRegion& file_region,
-			       PtStrength* strength,
-			       PtDelay* delay,
+			       const PtStrength* strength,
+			       const PtDelay* delay,
 			       PtContAssignArray ca_array) :
   SptItem(file_region, kPtItem_ContAssign),
   mStrength(strength),
@@ -518,8 +504,8 @@ SptContAssignH::contassign(ymuint pos) const
 // @param lhs 左辺式
 // @param rhs 右辺式
 SptContAssign::SptContAssign(const FileRegion& file_region,
-			     PtExpr* lhs,
-			     PtExpr* rhs) :
+			     const PtExpr* lhs,
+			     const PtExpr* rhs) :
   mFileRegion(file_region),
   mLhs(lhs),
   mRhs(rhs)
@@ -566,7 +552,7 @@ SptContAssign::rhs() const
 // @param body 本体のステートメント
 SptProcess::SptProcess(const FileRegion& file_region,
 		       tPtItemType type,
-		       PtStmt* body) :
+		       const PtStmt* body) :
   SptItem(file_region, type),
   mBody(body)
 {
@@ -608,14 +594,12 @@ SptTf::SptTf(const FileRegion& file_region,
 	     const char* name,
 	     bool automatic,
 	     bool sign,
-	     PtExpr* left,
-	     PtExpr* right,
+	     const PtExpr* left,
+	     const PtExpr* right,
 	     tVpiVarType data_type,
 	     PtIOHeadArray iohead_array,
-	     PtDeclHeadArray paramhead_array,
-	     PtDeclHeadArray localparamhead_array,
 	     PtDeclHeadArray declhead_array,
-	     PtStmt* stmt) :
+	     const PtStmt* stmt) :
   SptItem(file_region, type),
   mName(name),
   mAutomatic(automatic),
@@ -624,8 +608,6 @@ SptTf::SptTf(const FileRegion& file_region,
   mRightRange(right),
   mDataType(data_type),
   mIOHeadArray(iohead_array),
-  mParamHeadArray(paramhead_array),
-  mLocalparamHeadArray(localparamhead_array),
   mDeclHeadArray(declhead_array),
   mBody(stmt)
 {
@@ -671,20 +653,6 @@ PtIOHeadArray
 SptTf::iohead_array() const
 {
   return mIOHeadArray;
-}
-
-// @brief parameter 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptTf::paramhead_array() const
-{
-  return mParamHeadArray;
-}
-
-// @brief localparam 宣言ヘッダ配列の取得
-PtDeclHeadArray
-SptTf::localparamhead_array() const
-{
-  return mLocalparamHeadArray;
 }
 
 // @brief 宣言ヘッダ配列の取得
@@ -771,8 +739,8 @@ SptTf::is_in_use() const
 // @param elem_list 要素のリスト
 SptGateH::SptGateH(const FileRegion& file_region,
 		   tVpiPrimType prim_type,
-		   PtStrength* strength,
-		   PtDelay* delay,
+		   const PtStrength* strength,
+		   const PtDelay* delay,
 		   PtInstArray elem_array) :
   SptItem(file_region, kPtItem_GateInst),
   mPrimType(prim_type),
@@ -842,8 +810,8 @@ SptGateH::inst(ymuint pos) const
 SptMuH::SptMuH(const FileRegion& file_region,
 	       const char* def_name,
 	       PtConnectionArray con_array,
-	       PtStrength* strength,
-	       PtDelay* delay,
+	       const PtStrength* strength,
+	       const PtDelay* delay,
 	       PtInstArray elem_array) :
   SptItem(file_region, kPtItem_MuInst),
   mName(def_name),
@@ -919,8 +887,8 @@ SptMuH::inst(ymuint pos) const
 // @param con_array ポート割り当てリスト
 SptInst::SptInst(const FileRegion& file_region,
 		 const char* name,
-		 PtExpr* left,
-		 PtExpr* right,
+		 const PtExpr* left,
+		 const PtExpr* right,
 		 PtConnectionArray con_array) :
   mFileRegion(file_region),
   mName(name),
@@ -985,14 +953,14 @@ SptInst::port(ymuint pos) const
 
 
 //////////////////////////////////////////////////////////////////////
-// item 関係
+// item 関係の生成
 //////////////////////////////////////////////////////////////////////
 
 // @brief defparam 文のヘッダの生成
 // @param[in] file_region ファイル位置の情報
 // @param[in] elem_array 要素のリスト
 // @return 生成された defparam ヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_DefParamH(const FileRegion& file_region,
 			  PtDefParamArray elem_array)
 {
@@ -1005,10 +973,10 @@ SptFactory::new_DefParamH(const FileRegion& file_region,
 // @param[in] name 名前
 // @param[in] value 値を表す式
 // @return 生成された要素
-PtDefParam*
+const PtDefParam*
 SptFactory::new_DefParam(const FileRegion& file_region,
 			 const char* name,
-			 PtExpr* value)
+			 const PtExpr* value)
 {
   void* p = alloc().get_memory(sizeof(SptDefParam));
   return new (p) SptDefParam(file_region, PtNameBranchArray(), name, value);
@@ -1020,11 +988,11 @@ SptFactory::new_DefParam(const FileRegion& file_region,
 // @param[in] tail_name 名前
 // @param[in] value 値を表す式
 // @return 生成された要素
-PtDefParam*
+const PtDefParam*
 SptFactory::new_DefParam(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
 			 const char* tail_name,
-			 PtExpr* value)
+			 const PtExpr* value)
 {
   void* p = alloc().get_memory(sizeof(SptDefParam));
   return new (p) SptDefParam(file_region, nb_array, tail_name, value);
@@ -1034,7 +1002,7 @@ SptFactory::new_DefParam(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] elem_array 要素のリスト
 // @return 生成された continuous assign 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_ContAssignH(const FileRegion& file_region,
 			    PtContAssignArray elem_array)
 {
@@ -1047,9 +1015,9 @@ SptFactory::new_ContAssignH(const FileRegion& file_region,
 // @param[in] strength 信号強度
 // @param[in] elem_array 要素のリスト
 // @return 生成された continuous assign 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_ContAssignH(const FileRegion& file_region,
-			    PtStrength* strength,
+			    const PtStrength* strength,
 			    PtContAssignArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptContAssignH));
@@ -1061,9 +1029,9 @@ SptFactory::new_ContAssignH(const FileRegion& file_region,
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
 // @return 生成された continuous assign 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_ContAssignH(const FileRegion& file_region,
-			    PtDelay* delay,
+			    const PtDelay* delay,
 			    PtContAssignArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptContAssignH));
@@ -1076,10 +1044,10 @@ SptFactory::new_ContAssignH(const FileRegion& file_region,
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
 // @return 生成された continuous assign 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_ContAssignH(const FileRegion& file_region,
-			    PtStrength* strength,
-			    PtDelay* delay,
+			    const PtStrength* strength,
+			    const PtDelay* delay,
 			    PtContAssignArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptContAssignH));
@@ -1091,10 +1059,10 @@ SptFactory::new_ContAssignH(const FileRegion& file_region,
 // @param[in] lhs 左辺式
 // @param[in] rhs 右辺式
 // @return 生成された continuous assign 文
-PtContAssign*
+const PtContAssign*
 SptFactory::new_ContAssign(const FileRegion& file_region,
-			   PtExpr* lhs,
-			   PtExpr* rhs)
+			   const PtExpr* lhs,
+			   const PtExpr* rhs)
 {
   void* p = alloc().get_memory(sizeof(SptContAssign));
   return new (p) SptContAssign(file_region, lhs, rhs);
@@ -1104,9 +1072,9 @@ SptFactory::new_ContAssign(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] body 本体のステートメント
 // @return 生成された initial 文
-PtItem*
+const PtItem*
 SptFactory::new_Initial(const FileRegion& file_region,
-			PtStmt* body)
+			const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptProcess));
   return new (p) SptProcess(file_region,
@@ -1118,9 +1086,9 @@ SptFactory::new_Initial(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] body 本体のステートメント
 // @return 生成された always 文
-PtItem*
+const PtItem*
 SptFactory::new_Always(const FileRegion& file_region,
-		       PtStmt* body)
+		       const PtStmt* body)
 {
   void* p = alloc().get_memory(sizeof(SptProcess));
   return new (p) SptProcess(file_region,
@@ -1138,15 +1106,13 @@ SptFactory::new_Always(const FileRegion& file_region,
 // @param[in] declhead_array 宣言のリスト (IO宣言を含む)
 // @param[in] stmt 本体のステートメント
 // @return 生成された task 文
-PtItem*
+const PtItem*
 SptFactory::new_Task(const FileRegion& file_region,
 		     const char* name,
 		     bool automatic,
 		     PtIOHeadArray iohead_array,
-		     PtDeclHeadArray paramhead_array,
-		     PtDeclHeadArray localparamhead_array,
 		     PtDeclHeadArray declhead_array,
-		     PtStmt* stmt)
+		     const PtStmt* stmt)
 {
   void* p = alloc().get_memory(sizeof(SptTf));
   return new (p) SptTf(file_region,
@@ -1155,8 +1121,6 @@ SptFactory::new_Task(const FileRegion& file_region,
 		       false, NULL, NULL,
 		       kVpiVarNone,
 		       iohead_array,
-		       paramhead_array,
-		       localparamhead_array,
 		       declhead_array,
 		       stmt);
 }
@@ -1172,16 +1136,14 @@ SptFactory::new_Task(const FileRegion& file_region,
 // @param[in] declhead_array 宣言のリスト (IO宣言を含む)
 // @param[in] stmt 本体のステートメント
 // @return 生成された func 文
-PtItem*
+const PtItem*
 SptFactory::new_Function(const FileRegion& file_region,
 			 const char* name,
 			 bool automatic,
 			 bool sign,
 			 PtIOHeadArray iohead_array,
-			 PtDeclHeadArray paramhead_array,
-			 PtDeclHeadArray lparamhead_array,
 			 PtDeclHeadArray declhead_array,
-			 PtStmt* stmt)
+			 const PtStmt* stmt)
 {
   void* p = alloc().get_memory(sizeof(SptTf));
   return new (p) SptTf(file_region,
@@ -1190,7 +1152,7 @@ SptFactory::new_Function(const FileRegion& file_region,
 		       sign, NULL, NULL,
 		       kVpiVarNone,
 		       iohead_array,
-		       paramhead_array, lparamhead_array, declhead_array,
+		       declhead_array,
 		       stmt);
 }
 
@@ -1207,18 +1169,16 @@ SptFactory::new_Function(const FileRegion& file_region,
 // @param[in] declhead_array 宣言のリスト (IO宣言を含む)
 // @param[in] stmt 本体のステートメント
 // @return 生成された func 文
-PtItem*
+const PtItem*
 SptFactory::new_SizedFunc(const FileRegion& file_region,
 			  const char* name,
 			  bool automatic,
 			  bool sign,
-			  PtExpr* left,
-			  PtExpr* right,
+			  const PtExpr* left,
+			  const PtExpr* right,
 			  PtIOHeadArray iohead_array,
-			  PtDeclHeadArray paramhead_array,
-			  PtDeclHeadArray lparamhead_array,
 			  PtDeclHeadArray declhead_array,
-			  PtStmt* stmt)
+			  const PtStmt* stmt)
 {
   void* p = alloc().get_memory(sizeof(SptTf));
   return new (p) SptTf(file_region,
@@ -1227,7 +1187,7 @@ SptFactory::new_SizedFunc(const FileRegion& file_region,
 		       sign, left, right,
 		       kVpiVarNone,
 		       iohead_array,
-		       paramhead_array, lparamhead_array, declhead_array,
+		       declhead_array,
 		       stmt);
 }
 
@@ -1243,17 +1203,15 @@ SptFactory::new_SizedFunc(const FileRegion& file_region,
 // @param[in] declhead_array 宣言のリスト (IO宣言を含む)
 // @param[in] stmt 本体のステートメント
 // @return 生成された func 文
-PtItem*
+const PtItem*
 SptFactory::new_TypedFunc(const FileRegion& file_region,
 			  const char* name,
 			  bool automatic,
 			  bool sign,
 			  tVpiVarType func_type,
 			  PtIOHeadArray iohead_array,
-			  PtDeclHeadArray paramhead_array,
-			  PtDeclHeadArray lparamhead_array,
 			  PtDeclHeadArray declhead_array,
-			  PtStmt* stmt)
+			  const PtStmt* stmt)
 {
   void* p = alloc().get_memory(sizeof(SptTf));
   return new (p) SptTf(file_region,
@@ -1262,7 +1220,7 @@ SptFactory::new_TypedFunc(const FileRegion& file_region,
 		       sign, NULL, NULL,
 		       func_type,
 		       iohead_array,
-		       paramhead_array, lparamhead_array, declhead_array,
+		       declhead_array,
 		       stmt);
 }
 
@@ -1271,7 +1229,7 @@ SptFactory::new_TypedFunc(const FileRegion& file_region,
 // @param[in] type primitive の型
 // @param[in] elem_array 要素のリスト
 // @return 生成された gate instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
 		      PtInstArray elem_array)
@@ -1289,10 +1247,10 @@ SptFactory::new_GateH(const FileRegion& file_region,
 // @param[in] strength 信号強度
 // @param[in] elem_array 要素のリスト
 // @return 生成された gate instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
-		      PtStrength* strength,
+		      const PtStrength* strength,
 		      PtInstArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptGateH));
@@ -1308,10 +1266,10 @@ SptFactory::new_GateH(const FileRegion& file_region,
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
 // @return 生成された gate instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
-		      PtDelay* delay,
+		      const PtDelay* delay,
 		      PtInstArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptGateH));
@@ -1328,11 +1286,11 @@ SptFactory::new_GateH(const FileRegion& file_region,
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
 // @return 生成された gate instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_GateH(const FileRegion& file_region,
 		      tVpiPrimType type,
-		      PtStrength* strength,
-		      PtDelay* delay,
+		      const PtStrength* strength,
+		      const PtDelay* delay,
 		      PtInstArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptGateH));
@@ -1347,7 +1305,7 @@ SptFactory::new_GateH(const FileRegion& file_region,
 // @param[in] def_name 定義名
 // @param[in] elem_array 要素のリスト
 // @return 生成された module instance/UDP instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
 		    PtInstArray elem_array)
@@ -1365,10 +1323,10 @@ SptFactory::new_MuH(const FileRegion& file_region,
 // @param[in] strength 信号強度
 // @param[in] elem_array 要素のリスト
 // @return 生成された module instance/UDP instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
-		    PtStrength* strength,
+		    const PtStrength* strength,
 		    PtInstArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptMuH));
@@ -1384,10 +1342,10 @@ SptFactory::new_MuH(const FileRegion& file_region,
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
 // @return 生成された module instance/UDP instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
-		    PtDelay* delay,
+		    const PtDelay* delay,
 		    PtInstArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptMuH));
@@ -1404,11 +1362,11 @@ SptFactory::new_MuH(const FileRegion& file_region,
 // @param[in] delay 遅延値
 // @param[in] elem_array 要素のリスト
 // @return 生成された module instance/UDP instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
-		    PtStrength* strength,
-		    PtDelay* delay,
+		    const PtStrength* strength,
+		    const PtDelay* delay,
 		    PtInstArray elem_array)
 {
   void* p = alloc().get_memory(sizeof(SptMuH));
@@ -1424,7 +1382,7 @@ SptFactory::new_MuH(const FileRegion& file_region,
 // @param[in] con_array ポート割り当てリスト
 // @param[in] elem_array 要素のリスト
 // @return 生成された module instance/UDP instance 文のヘッダ
-PtItem*
+const PtItem*
 SptFactory::new_MuH(const FileRegion& file_region,
 		    const char* def_name,
 		    PtConnectionArray con_array,
@@ -1441,7 +1399,7 @@ SptFactory::new_MuH(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] con_list ポート割り当てリスト
 // @return 生成された module instance/UDP instance の要素
-PtInst*
+const PtInst*
 SptFactory::new_Inst(const FileRegion& file_region,
 		     PtConnectionArray con_array)
 {
@@ -1454,7 +1412,7 @@ SptFactory::new_Inst(const FileRegion& file_region,
 // @param[in] name 名前
 // @param[in] con_list ポート割り当てリスト
 // @return 生成された module instance/UDP instance の要素
-PtInst*
+const PtInst*
 SptFactory::new_InstN(const FileRegion& file_region,
 		      const char* name,
 		      PtConnectionArray con_array)
@@ -1470,301 +1428,15 @@ SptFactory::new_InstN(const FileRegion& file_region,
 // @param[in] right 範囲の右側の式
 // @param[in] con_list ポート割り当てリスト
 // @return 生成された module instance/UDP instance の要素
-PtInst*
+const PtInst*
 SptFactory::new_InstV(const FileRegion& file_region,
 		      const char* name,
-		      PtExpr* left,
-		      PtExpr* right,
+		      const PtExpr* left,
+		      const PtExpr* right,
 		      PtConnectionArray con_array)
 {
   void* p = alloc().get_memory(sizeof(SptInst));
   return new (p) SptInst(file_region, name, left, right, con_array);
-}
-
-// @brief generate 文の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] declhead_array 宣言のリスト
-// @param[in] item_array 要素のリスト
-// @return 生成された generate 文
-PtItem*
-SptFactory::new_Generate(const FileRegion& file_region,
-			 PtDeclHeadArray declhead_array,
-			 PtItemArray item_array)
-{
-  void* p = alloc().get_memory(sizeof(SptGenerate));
-  return new (p) SptGenerate(file_region, kPtItem_Generate, NULL,
-			     declhead_array, item_array);
-}
-
-// @brief generate block 文の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] declhead_array 宣言のリスト
-// @param[in] item_array 要素のリスト
-// @return 生成された generate block 文
-PtItem*
-SptFactory::new_GenBlock(const FileRegion& file_region,
-			 PtDeclHeadArray declhead_array,
-			 PtItemArray item_array)
-{
-  void* p = alloc().get_memory(sizeof(SptGenerate));
-  return new (p) SptGenerate(file_region, kPtItem_GenBlock, NULL,
-			     declhead_array, item_array);
-}
-
-// @brief 名前付き generate block 文の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] name 名前
-// @param[in] declhead_array 宣言のリスト
-// @param[in] item_array 要素のリスト
-// @return 生成された generate block 文
-PtItem*
-SptFactory::new_GenBlock(const FileRegion& file_region,
-			 const char* name,
-			 PtDeclHeadArray declhead_array,
-			 PtItemArray item_array)
-{
-  void* p = alloc().get_memory(sizeof(SptGenerate));
-  return new (p) SptGenerate(file_region, kPtItem_GenBlock, name,
-			     declhead_array, item_array);
-}
-
-// @brief generate if 文の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] cond 条件を表す式
-// @param[in] then_declhead_array 条件が成り立った時に生成する宣言のリスト
-// @param[in] then_item_array 条件が成り立った時に生成する要素のリスト
-// @param[in] else_declhead_array 条件が成り立たなかった時に生成する宣言のリスト
-// @param[in] else_item_array 条件が成り立たなかった時に生成する要素のリスト
-// @return 生成された generate if 文
-PtItem*
-SptFactory::new_GenIf(const FileRegion& file_region,
-		      PtExpr* cond,
-		      PtDeclHeadArray then_declhead_array,
-		      PtItemArray then_item_array,
-		      PtDeclHeadArray else_declhead_array,
-		      PtItemArray else_item_array)
-{
-  void* p = alloc().get_memory(sizeof(SptGenerate));
-  return new (p) SptGenIf(file_region, cond,
-			  then_declhead_array, then_item_array,
-			  else_declhead_array, else_item_array);
-}
-
-// @brief generate case 文の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] expr 選択式
-// @param[in] item_array generate case item のリスト
-// @return 生成された generate case 文
-PtItem*
-SptFactory::new_GenCase(const FileRegion& file_region,
-			PtExpr* expr,
-			PtGenCaseItemArray item_array)
-{
-  void* p = alloc().get_memory(sizeof(SptGenCase));
-  return new (p) SptGenCase(file_region, expr, item_array);
-}
-
-// @brief generate case の要素の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] label 比較式
-// @param[in] declhead_array 宣言のリスト
-// @param[in] item_array 要素のリスト
-// @return 生成された generate case item
-PtGenCaseItem*
-SptFactory::new_GenCaseItem(const FileRegion& file_region,
-			    PtExprArray label_array,
-			    PtDeclHeadArray declhead_array,
-			    PtItemArray item_array)
-{
-  void* p = alloc().get_memory(sizeof(SptGenCaseItem));
-  return new (p) SptGenCaseItem(file_region, label_array,
-				declhead_array, item_array);
-}
-
-// @brief generate for 文の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] loop_var ループ変数
-// @param[in] init_expr 初期化式
-// @param[in] cond ループ条件式
-// @param[in] next_expr 増加式
-// @param[in] block_name ブロック名
-// @param[in] declhead_array 宣言のリスト
-// @param[in] item_array 要素のリスト
-// @return 生成された generate for 文
-PtItem*
-SptFactory::new_GenFor(const FileRegion& file_region,
-		       const char* loop_var,
-		       PtExpr* init_expr,
-		       PtExpr* cond,
-		       PtExpr* next_expr,
-		       const char* block_name,
-		       PtDeclHeadArray declhead_array,
-		       PtItemArray item_array)
-{
-  void* p = alloc().get_memory(sizeof(SptGenFor));
-  return new (p) SptGenFor(file_region, loop_var, init_expr, cond,
-			   next_expr, block_name,
-			   declhead_array, item_array);
-}
-
-// @brief specify block item の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] id specify block item の種類
-// @param[in] terminal_list 端子のリスト
-// @return 生成された specify block item
-PtItem*
-SptFactory::new_SpecItem(const FileRegion& file_region,
-			 tVpiSpecItemType id,
-			 PtExprArray terminal_array)
-{
-  void* p = alloc().get_memory(sizeof(SptSpecItem));
-  return new (p) SptSpecItem(file_region, id, terminal_array);
-}
-
-// @brief path 仕様を生成する．
-// @param[in] file_region ファイル位置の情報
-// @param[in] id spec path の種類
-// @param[in] expr 条件式
-// @param[in] path_decl パス記述
-// @return 生成された spec path
-PtItem*
-SptFactory::new_SpecPath(const FileRegion& file_region,
-			 tVpiSpecPathType id,
-			 PtExpr* expr,
-			 PtPathDecl* path_decl)
-{
-  void* p = alloc().get_memory(sizeof(SptSpecPath));
-  return new (p) SptSpecPath(file_region, id, expr, path_decl);
-}
-
-// @brief パス記述の生成
-// @param[in] file_region ファイル位置の情報
-// @param[in] edge
-// @param[in] input_array
-// @param[in] input_pol
-// @param[in] op
-// @param[in] output_array
-// @param[in] output_pol
-// @param[in] expr
-// @param[in] path_delay
-// @return 生成されたパス記述
-PtPathDecl*
-SptFactory::new_PathDecl(const FileRegion& file_region,
-			 int edge,
-			 PtExprArray input_array,
-			 int input_pol,
-			 int op,
-			 PtExprArray output_array,
-			 int output_pol,
-			 PtExpr* expr,
-			 PtPathDelay* path_delay)
-{
-  void* p = alloc().get_memory(sizeof(SptPathDecl));
-  return new (p) SptPathDecl(file_region, edge, input_array, input_pol,
-			     op, output_array, output_pol,
-			     expr, path_delay);
-}
-
-// @brief path delay value の生成 (値が1つ)
-// @param[in] file_region ファイル位置の情報
-// @param[in] value 値
-// @return 生成された path delay value
-PtPathDelay*
-SptFactory::new_PathDelay(const FileRegion& file_region,
-			  PtExpr* value)
-{
-  void* p = alloc().get_memory(sizeof(SptPathDelay));
-  return new (p) SptPathDelay(file_region, value);
-}
-
-// @brief path delay value の生成 (値が2つ)
-// @param[in] file_region ファイル位置の情報
-// @param[in] value1 値1
-// @param[in] value2 値2
-// @return 生成された path delay value
-PtPathDelay*
-SptFactory::new_PathDelay(const FileRegion& file_region,
-			  PtExpr* value1,
-			  PtExpr* value2)
-{
-  void* p = alloc().get_memory(sizeof(SptPathDelay));
-  return new (p) SptPathDelay(file_region, value1, value2);
-}
-
-// @brief path delay value の生成 (値が3つ)
-// @param[in] file_region ファイル位置の情報
-// @param[in] value1 値1
-// @param[in] value2 値2
-// @param[in] value3 値3
-// @return 生成された path delay value
-PtPathDelay*
-SptFactory::new_PathDelay(const FileRegion& file_region,
-			  PtExpr* value1,
-			  PtExpr* value2,
-			  PtExpr* value3)
-{
-  void* p = alloc().get_memory(sizeof(SptPathDelay));
-  return new (p) SptPathDelay(file_region, value1, value2, value3);
-}
-
-// @brief path delay value の生成 (値が6つ)
-// @param[in] file_region ファイル位置の情報
-// @param[in] value1 値1
-// @param[in] value2 値2
-// @param[in] value3 値3
-// @param[in] value4 値4
-// @param[in] value5 値5
-// @param[in] value6 値6
-// @return 生成された path delay value
-PtPathDelay*
-SptFactory::new_PathDelay(const FileRegion& file_region,
-			  PtExpr* value1,
-			  PtExpr* value2,
-			  PtExpr* value3,
-			  PtExpr* value4,
-			  PtExpr* value5,
-			  PtExpr* value6)
-{
-  void* p = alloc().get_memory(sizeof(SptPathDelay));
-  return new (p) SptPathDelay(file_region, value1, value2, value3,
-			      value4, value5, value6);
-}
-
-// @brief path delay value の生成 (値が12個)
-// @param[in] file_region ファイル位置の情報
-// @param[in] value1 値1
-// @param[in] value2 値2
-// @param[in] value3 値3
-// @param[in] value4 値4
-// @param[in] value5 値5
-// @param[in] value6 値6
-// @param[in] value7 値7
-// @param[in] value8 値8
-// @param[in] value9 値9
-// @param[in] value10 値10
-// @param[in] value11 値11
-// @param[in] value12 値12
-// @return 生成された path delay value
-PtPathDelay*
-SptFactory::new_PathDelay(const FileRegion& file_region,
-			  PtExpr* value1,
-			  PtExpr* value2,
-			  PtExpr* value3,
-			  PtExpr* value4,
-			  PtExpr* value5,
-			  PtExpr* value6,
-			  PtExpr* value7,
-			  PtExpr* value8,
-			  PtExpr* value9,
-			  PtExpr* value10,
-			  PtExpr* value11,
-			  PtExpr* value12)
-{
-  void* p = alloc().get_memory(sizeof(SptPathDelay));
-  return new (p) SptPathDelay(file_region, value1, value2, value3,
-			      value4, value5, value6,
-			      value7, value8, value9,
-			      value10, value11, value12);
 }
 
 END_NAMESPACE_YM_VERILOG

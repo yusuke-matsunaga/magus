@@ -82,6 +82,12 @@ public:
 	 MislibPt* child1,
 	 MislibPt* child2);
 
+  /// @brief XOR ノードを生成する．
+  MislibPt*
+  new_xor(const FileRegion& loc,
+	  MislibPt* child1,
+	  MislibPt* child2);
+
   /// @brief PIN ノードを生成する．
   MislibPt*
   new_pin(const FileRegion& loc,

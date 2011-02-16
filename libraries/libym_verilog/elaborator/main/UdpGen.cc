@@ -51,10 +51,10 @@ void
 UdpGen::instantiate_udp(const PtUdp* pt_udp)
 {
   typedef hash_map<string, pair<const PtIOHead*, const PtIOItem*> > IODict;
-  
+
   const FileRegion& file_region = pt_udp->file_region();
   const char* def_name = pt_udp->name();
-  
+
   ostringstream buf;
   buf << "instantiating UDP \"" << def_name << "\".";
   put_msg(__FILE__, __LINE__,
@@ -73,7 +73,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
   // 最初のポート名 = 出力のポート名
   const char* outname = pt_udp->port(0)->ext_name();
-  
+
   // ポート名をキーにしたIOテンプレートの辞書を作る．
   IODict iodict;
   const PtIOHead* outhead = NULL;
@@ -100,7 +100,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
     const PtIOItem* pt_item = q->second.second;
     udp->set_io(i, pt_header, pt_item);
   }
-  
+
   // 初期化文を実体化させる．
   // initial 文がある場合と変数宣言の中に初期化式が含まれている場合がある．
   const PtExpr* pt_init_value = pt_udp->init_value();
@@ -113,20 +113,8 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
     const FileRegion& ifr = pt_init_value->file_region();
 
-    // 式の生成
-    ElbExpr* init_expr = instantiate_constant_expr(NULL, pt_init_value);
-    if ( !init_expr ) {
-      put_msg(__FILE__, __LINE__,
-	      ifr,
-	      kMsgError,
-	      "ELAB",
-	      "Constant value is required.");
-      return;
-    }
-
-    // その値は 1ビットの 0 か 1 か X でなければならない．
-    tVpiValueType type = init_expr->value_type();
-    if ( type == kVpiValueReal ) {
+    tVpiScalarVal val;
+    if ( !evaluate_scalar(NULL, pt_init_value, val, true) ) {
       put_msg(__FILE__, __LINE__,
 	      ifr,
 	      kMsgError,
@@ -134,18 +122,8 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	      "Only 1-bit constants are allowed here.");
       return;
     }
-    if ( is_sized_type(type) && unpack_size(type) != 1 ) {
-      put_msg(__FILE__, __LINE__,
-	      ifr,
-	      kMsgError,
-	      "ELAB",
-	      "Only 1-bit constants are allowed here.");
-      return;
-    }
-    tVpiScalarVal val = init_expr->eval_scalar();
-
     // 初期値を設定する．
-    udp->set_initial(init_expr, val);
+    udp->set_initial(pt_init_value, val);
   }
 
   // テーブルの中身を作る．
@@ -159,10 +137,10 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
     // 出力値の位置
     ymuint opos = row_size - 1;
-  
+
     // 一行文のデータを保持しておくためのバッファ
     vector<tVpiUdpVal> row_data(row_size);
-    
+
     PtUdpEntryArray table = pt_udp->table_array();
     for (ymuint i = 0; i < table.size(); ++ i) {
       const PtUdpEntry* pt_udp_entry = table[i];
@@ -253,19 +231,19 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
     // 現状態値の位置
     ymuint cpos = isize;
-    
+
     // 出力値の位置
     ymuint opos = io_size;
-  
+
     // 一行文のデータを保持しておくためのバッファ
     vector<tVpiUdpVal> row_data(row_size);
-    
+
     PtUdpEntryArray table = pt_udp->table_array();
     for (ymuint i = 0; i < table.size(); ++ i) {
       const PtUdpEntry* pt_udp_entry = table[i];
       const FileRegion& tfr = pt_udp_entry->file_region();
       PtUdpValueArray input_array = pt_udp_entry->input_array();
-      
+
       if ( input_array.size() != isize ) {
 	// サイズが合わない．
 	put_msg(__FILE__, __LINE__,
@@ -313,7 +291,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	}
 
 	tVpiUdpVal symbol = pt_v->symbol();
-	
+
 	if ( is_edge_symbol(symbol) ) {
 	  // エッジタイプの値は使えない．
 	  ostringstream buf;
@@ -341,7 +319,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
 	row_data[cpos] = symbol;
       }
-	
+
       { // 出力
 	const PtUdpValue* pt_v = pt_udp_entry->output();
 	tVpiUdpVal symbol = pt_v->symbol();

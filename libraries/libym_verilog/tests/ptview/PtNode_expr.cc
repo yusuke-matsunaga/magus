@@ -183,7 +183,7 @@ ExprNode::expand() const
 
   switch ( mExpr->type() ) {
   case kPtOprExpr:
-    mChildren.push_back( new OpTypeNode( mExpr->opr_type() ) );
+    mChildren.push_back( new OpTypeNode( mExpr->op_type() ) );
     for (ymuint i = 0; i < mExpr->operand_num(); ++ i) {
       mChildren.push_back( new ExprNode("Operand", mExpr->operand(i)) );
     }

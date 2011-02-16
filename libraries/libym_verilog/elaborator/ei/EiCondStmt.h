@@ -130,17 +130,6 @@ public:
   tVpiObjType
   type() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 };
 
 
@@ -183,17 +172,6 @@ public:
   tVpiObjType
   type() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
 };
 
 
@@ -235,18 +213,6 @@ public:
   virtual
   tVpiObjType
   type() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  /// @note このクラスは function 中では使えない．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 };
 
@@ -311,17 +277,6 @@ public:
   inc_stmt() const;
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -383,17 +338,6 @@ public:
   virtual
   const VlStmt*
   body_stmt() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 private:
@@ -461,17 +405,6 @@ public:
   virtual
   const VlStmt*
   body_stmt() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 protected:
@@ -548,17 +481,6 @@ public:
   virtual
   const VlStmt*
   else_stmt() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbStmt の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 private:
@@ -736,11 +658,6 @@ public:
 	       const PtCaseItem* pt_caseitem,
 	       ElbExpr** expr_array,
 	       ElbStmt* stmt);
-
-  /// @brief function 中の実行を行う．
-  virtual
-  const VlNamedObj*
-  func_exec(bool constant_function) const;
 
 
 private:

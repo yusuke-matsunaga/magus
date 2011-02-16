@@ -36,17 +36,25 @@ public:
   // VlModuleArray の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
+  /// @brief 範囲の MSB の値を返す．
   virtual
-  const VlExpr*
-  left_range() const = 0;
+  int
+  left_range_val() const = 0;
 
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
+  /// @brief 範囲の LSB の値を返す．
   virtual
-  const VlExpr*
-  right_range() const = 0;
+  int
+  right_range_val() const = 0;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  virtual
+  string
+  left_range_string() const = 0;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  virtual
+  string
+  right_range_string() const = 0;
 
   /// @brief 要素数を返す．
   virtual

@@ -32,12 +32,12 @@ class ElbIODecl;
 
 // in ElbDecl.h
 class ElbDeclHead;
-class ElbDeclBase;
 class ElbDecl;
 class ElbDeclArray;
 
 // in ElbParameter.h
 class ElbParamHead;
+class ElbParameter;
 
 // in ElbParamAssign.h
 class ElbParamAssign;

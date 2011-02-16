@@ -29,6 +29,17 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// IEEE1364-2001 では procedural timing control
 /// とこれを混同している．
 /// 正確には delay control はステートメントではない．
+///
+/// コントロールには，
+/// - delay control
+/// - event control
+/// - repeat control
+/// の3種類がある．
+/// このうち，delay control の場合には，delay() のみが意味のある値を返す．
+/// event control の場合には event_num() と event() のみが意味のある値を
+/// 返す．
+/// repeat control の場合には，expr(), event_num(), event() のみが意味の
+/// ある値を返す．
 //////////////////////////////////////////////////////////////////////
 class VlControl :
   public VlObj

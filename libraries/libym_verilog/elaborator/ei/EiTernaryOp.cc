@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr1 オペランド
 // @param[in] opr2 オペランド
 ElbExpr*
-EiFactory::new_TernaryOp(const PtBase* pt_expr,
+EiFactory::new_TernaryOp(const PtExpr* pt_expr,
 			 tVpiOpType op_type,
 			 ElbExpr* opr0,
 			 ElbExpr* opr1,
@@ -60,15 +60,15 @@ EiFactory::new_TernaryOp(const PtBase* pt_expr,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
-EiTernaryOp::EiTernaryOp(const PtBase* pt_obj,
+EiTernaryOp::EiTernaryOp(const PtExpr* pt_expr,
 			 ElbExpr* opr1,
 			 ElbExpr* opr2,
 			 ElbExpr* opr3) :
-  EiOperation(pt_obj)
+  EiOperation(pt_expr)
 {
   mOpr[0] = opr1;
   mOpr[1] = opr2;
@@ -111,15 +111,15 @@ EiTernaryOp::_operand(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
-EiConditionOp::EiConditionOp(const PtBase* pt_obj,
+EiConditionOp::EiConditionOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1,
 			     ElbExpr* opr2,
 			     ElbExpr* opr3) :
-  EiTernaryOp(pt_obj, opr1, opr2, opr3)
+  EiTernaryOp(pt_expr, opr1, opr2, opr3)
 {
   // 三項演算子の場合は第1オペランドが self determined で
   // 結果は第2オペランドと第3オペランドから決まる．
@@ -143,175 +143,6 @@ EiConditionOp::value_type() const
   return mType;
 }
 
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiConditionOp::eval_scalar() const
-{
-  switch ( operand1()->eval_logic() ) {
-  case kVpiScalar0:
-    if ( mType == kVpiValueReal ) {
-      return conv_to_scalar(operand3()->eval_real());
-    }
-    else {
-      return operand3()->eval_scalar();
-    }
-
-  case kVpiScalar1:
-    if ( mType == kVpiValueReal ) {
-      return conv_to_scalar(operand2()->eval_real());
-    }
-    else {
-      return operand2()->eval_scalar();
-    }
-
-  case kVpiScalarX:
-    if ( mType == kVpiValueReal ) {
-      return kVpiScalarX;
-    }
-    else {
-      BitVector bitvector;
-      BitVector tmp;
-      operand2()->eval_bitvector(bitvector, mType);
-      operand3()->eval_bitvector(tmp, mType);
-      bitvector.merge(tmp);
-      return bitvector.to_scalar();
-    }
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  // ダミー
-  return kVpiScalarX;
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiConditionOp::eval_logic() const
-{
-  switch ( operand1()->eval_logic() ) {
-  case kVpiScalar0:
-    if ( mType == kVpiValueReal ) {
-      return conv_to_scalar(operand3()->eval_real());
-    }
-    else {
-      return operand3()->eval_logic();
-    }
-
-  case kVpiScalar1:
-    if ( mType == kVpiValueReal ) {
-      return conv_to_scalar(operand2()->eval_real());
-    }
-    else {
-      return operand2()->eval_logic();
-    }
-
-  case kVpiScalarX:
-    if ( mType == kVpiValueReal ) {
-      return kVpiScalarX;
-    }
-    else {
-      BitVector bitvector;
-      BitVector tmp;
-      operand2()->eval_bitvector(bitvector, mType);
-      operand3()->eval_bitvector(tmp, mType);
-      bitvector.merge(tmp);
-      return bitvector.to_logic();
-    }
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  // ダミー
-  return kVpiScalarX;
-}
-
-// @brief real 型の値を返す．
-double
-EiConditionOp::eval_real() const
-{
-  switch ( operand1()->eval_logic() ) {
-  case kVpiScalar0:
-    if ( mType == kVpiValueReal ) {
-      return operand3()->eval_real();
-    }
-    else {
-      BitVector bitvector;
-      operand3()->eval_bitvector(bitvector, mType);
-      return bitvector.to_real();
-    }
-
-  case kVpiScalar1:
-    if ( mType == kVpiValueReal ) {
-      return operand2()->eval_real();
-    }
-    else {
-      BitVector bitvector;
-      operand2()->eval_bitvector(bitvector, mType);
-      return bitvector.to_real();
-    }
-
-  case kVpiScalarX:
-    if ( mType == kVpiValueReal ) {
-      return 0.0;
-    }
-    else {
-      BitVector bitvector;
-      BitVector tmp;
-      operand2()->eval_bitvector(bitvector, mType);
-      operand3()->eval_bitvector(tmp, mType);
-      bitvector.merge(tmp);
-      return bitvector.to_real();
-    }
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  // ダミー
-  return 0.0;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiConditionOp::eval_bitvector(BitVector& bitvector,
-			  tVpiValueType req_type) const
-{
-  switch ( operand1()->eval_logic() ) {
-  case kVpiScalar0:
-    if ( mType == kVpiValueReal ) {
-      bitvector = operand3()->eval_real();
-    }
-    else {
-      operand3()->eval_bitvector(bitvector, mType);
-    }
-    break;
-
-  case kVpiScalar1:
-    if ( mType == kVpiValueReal ) {
-      bitvector = operand2()->eval_real();
-    }
-    else {
-      operand2()->eval_bitvector(bitvector, mType);
-    }
-    break;
-
-  case kVpiScalarX:
-    if ( mType == kVpiValueReal ) {
-      bitvector = BitVector(kVpiScalar0, unpack_size(mType));
-    }
-    else {
-      BitVector tmp;
-      operand2()->eval_bitvector(bitvector, mType);
-      operand3()->eval_bitvector(tmp, mType);
-      bitvector.merge(tmp);
-    }
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-  bitvector.coerce(req_type);
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -327,28 +158,21 @@ EiConditionOp::set_reqsize(tVpiValueType type)
   operand3()->set_reqsize(mType);
 }
 
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiConditionOp::op_type() const
-{
-  return kVpiConditionOp;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiMinTypMaxOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
-EiMinTypMaxOp::EiMinTypMaxOp(const PtBase* pt_obj,
+EiMinTypMaxOp::EiMinTypMaxOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1,
 			     ElbExpr* opr2,
 			     ElbExpr* opr3) :
-  EiTernaryOp(pt_obj, opr1, opr2, opr3)
+  EiTernaryOp(pt_expr, opr1, opr2, opr3)
 {
   // とりあえず真ん中の式を使う．
   mType = opr2->value_type();
@@ -366,35 +190,6 @@ EiMinTypMaxOp::value_type() const
   return mType;
 }
 
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiMinTypMaxOp::eval_scalar() const
-{
-  return operand2()->eval_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiMinTypMaxOp::eval_logic() const
-{
-  return operand2()->eval_scalar();
-}
-
-// @brief real 型の値を返す．
-double
-EiMinTypMaxOp::eval_real() const
-{
-  return operand2()->eval_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiMinTypMaxOp::eval_bitvector(BitVector& bitvector,
-			      tVpiValueType req_type) const
-{
-  operand2()->eval_bitvector(bitvector, req_type);
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -407,13 +202,6 @@ EiMinTypMaxOp::set_reqsize(tVpiValueType type)
   operand1()->set_reqsize(mType);
   operand2()->set_reqsize(mType);
   operand3()->set_reqsize(mType);
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiMinTypMaxOp::op_type() const
-{
-  return kVpiMinTypMaxOp;
 }
 
 END_NAMESPACE_YM_VERILOG

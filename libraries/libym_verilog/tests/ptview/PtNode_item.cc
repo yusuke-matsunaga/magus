@@ -207,12 +207,6 @@ ItemNode::expand() const
       if ( mItem->iohead_array().size() > 0 ) {
 	++ n;
       }
-      if ( mItem->paramhead_array().size() > 0 ) {
-	++ n;
-      }
-      if ( mItem->localparamhead_array().size() > 0 ) {
-	++ n;
-      }
       if ( mItem->declhead_array().size() > 0 ) {
 	++ n;
       }
@@ -227,14 +221,6 @@ ItemNode::expand() const
       }
       if ( mItem->iohead_array().size() > 0 ) {
 	mChildren.push_back( new IOHeadListNode(mItem->iohead_array()) );
-      }
-      if ( mItem->paramhead_array().size() > 0 ) {
-	mChildren.push_back( new DeclHeadListNode("Parameter List",
-						  mItem->paramhead_array()) );
-      }
-      if ( mItem->localparamhead_array().size() > 0 ) {
-	mChildren.push_back( new DeclHeadListNode("Localparam List",
-						  mItem->localparamhead_array()) );
       }
       if ( mItem->declhead_array().size() > 0 ) {
 	mChildren.push_back( new DeclHeadListNode("Decl List",

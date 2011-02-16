@@ -27,7 +27,7 @@ CptUdp::CptUdp(const FileRegion& file_region,
 	       PtiPortArray port_array,
 	       PtIOHeadArray iohead_array,
 	       bool is_seq,
-	       PtExpr* init_value,
+	       const PtExpr* init_value,
 	       PtUdpEntryArray entry_array) :
   mFileRegion(file_region),
   mName(name),
@@ -113,7 +113,7 @@ CptUdp::table_array() const
 // コンストラクタ
 CptUdpEntry::CptUdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
-			 PtUdpValue* output) :
+			 const PtUdpValue* output) :
   mFileRegion(file_region),
   mInputArray(input_array),
   mOutput(output)
@@ -148,7 +148,7 @@ CptUdpEntry::current() const
 }
 
 // 出力の値を取り出す．
-PtUdpValue*
+const PtUdpValue*
 CptUdpEntry::output() const
 {
   return mOutput;
@@ -162,8 +162,8 @@ CptUdpEntry::output() const
 // コンストラクタ
 CptUdpEntryS::CptUdpEntryS(const FileRegion& file_region,
 			   PtUdpValueArray input_array,
-			   PtUdpValue* current,
-			   PtUdpValue* output) :
+			   const PtUdpValue* current,
+			   const PtUdpValue* output) :
   CptUdpEntry(file_region, input_array, output),
   mCurrent(current)
 {
@@ -175,7 +175,7 @@ CptUdpEntryS::~CptUdpEntryS()
 }
 
 // 現状態の値を取り出す．
-PtUdpValue*
+const PtUdpValue*
 CptUdpEntryS::current() const
 {
   return mCurrent;
@@ -225,7 +225,7 @@ CptUdpValue::symbol() const
 // @param iolist IOリスト
 // @param entry_top テーブルエントリのリスト
 // @return 生成された UDP
-PtUdp*
+const PtUdp*
 CptFactory::new_CmbUdp(const FileRegion& file_region,
 		       const char* name,
 		       PtiPortArray port_array,
@@ -251,12 +251,12 @@ CptFactory::new_CmbUdp(const FileRegion& file_region,
 // @param init_value 初期値を表す式
 // @param entry_top テーブルエントリのリスト
 // @return 生成された UDP
-PtUdp*
+const PtUdp*
 CptFactory::new_SeqUdp(const FileRegion& file_region,
 		       const char* name,
 		       PtiPortArray port_array,
 		       PtIOHeadArray iohead_array,
-		       PtExpr* init_value,
+		       const PtExpr* init_value,
 		       PtUdpEntryArray entry_array)
 {
   ++ mNumUdp;
@@ -275,10 +275,10 @@ CptFactory::new_SeqUdp(const FileRegion& file_region,
 // @param input_list 入力値のリスト
 // @param output 出力値のリスト
 // @return 生成されたテーブルエントリ
-PtUdpEntry*
+const PtUdpEntry*
 CptFactory::new_UdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
-			 PtUdpValue* output)
+			 const PtUdpValue* output)
 {
   ++ mNumUdpEntry;
   void* p = alloc().get_memory(sizeof(CptUdpEntry));
@@ -293,11 +293,11 @@ CptFactory::new_UdpEntry(const FileRegion& file_region,
 // @param current 現状態値
 // @param output 出力値のリスト
 // @return 生成されたテーブルエントリ
-PtUdpEntry*
+const PtUdpEntry*
 CptFactory::new_UdpEntry(const FileRegion& file_region,
 			 PtUdpValueArray input_array,
-			 PtUdpValue* current,
-			 PtUdpValue* output)
+			 const PtUdpValue* current,
+			 const PtUdpValue* output)
 {
   ++ mNumUdpEntryS;
   void* p = alloc().get_memory(sizeof(CptUdpEntryS));
@@ -311,7 +311,7 @@ CptFactory::new_UdpEntry(const FileRegion& file_region,
 // @param file_region ファイル位置の情報
 // @param symbol シンボル
 // @return 生成された値
-PtUdpValue*
+const PtUdpValue*
 CptFactory::new_UdpValue(const FileRegion& file_region,
 			 tVpiUdpVal symbol)
 {

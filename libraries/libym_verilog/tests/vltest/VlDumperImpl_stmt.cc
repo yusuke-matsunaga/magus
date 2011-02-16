@@ -15,14 +15,15 @@
 
 #include "VlDumperImpl.h"
 
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlDecl.h>
-#include <ym_verilog/vl/VlProcess.h>
-#include <ym_verilog/vl/VlStmt.h>
-#include <ym_verilog/vl/VlControl.h>
-#include <ym_verilog/vl/VlModule.h>
-#include <ym_verilog/vl/VlTaskFunc.h>
-#include <ym_verilog/vl/VlUserSystf.h>
+#include "ym_verilog/VlMgr.h"
+#include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlProcess.h"
+#include "ym_verilog/vl/VlStmt.h"
+#include "ym_verilog/vl/VlControl.h"
+#include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlTaskFunc.h"
+#include "ym_verilog/vl/VlUserSystf.h"
+#include "ym_verilog/vl/VlExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -104,27 +105,19 @@ VlDumperImpl::put_stmt(const char* label,
   switch ( stmt->type() ) {
   case kVpiNamedBegin:
   case kVpiNamedFork:
-    {
-      const VlNamedObj* scope = stmt->scope();
-      assert_cond( scope , __FILE__, __LINE__);
-      put("vpiFullName", scope->full_name() );
-      put_scope_sub(mgr, scope);
-    }
-    put_child_stmt_list("vpiStmt", mgr, stmt);
-    break;
-
+    // スコープとしての内容は別に出力されている．
   case kVpiBegin:
   case kVpiFork:
     put_child_stmt_list("vpiStmt", mgr, stmt);
     break;
 
   case kVpiEventStmt:
-    put("vpiNamedEvent", stmt->named_event()->full_name());
+    put("vpiNamedEvent", stmt->named_event()->decompile());
     break;
 
   case kVpiAssignment:
     put("vpiBlocking", stmt->is_blocking() );
-    put_expr("vpiLhs", mgr, stmt->lhs() );
+    put_lhs("vpiLhs", mgr, stmt->lhs() );
     put_expr("vpiRhs", mgr, stmt->rhs() );
     put_control("control", mgr, stmt->control() );
     break;
@@ -181,21 +174,14 @@ VlDumperImpl::put_stmt(const char* label,
     break;
 
   case kVpiAssignStmt:
-    put_expr("vpiLhs", mgr, stmt->lhs() );
-    put_expr("vpiRhs", mgr, stmt->rhs() );
-    break;
-
   case kVpiForce:
-    put_expr("vpiLhs", mgr, stmt->lhs() );
+    put_lhs("vpiLhs", mgr, stmt->lhs() );
     put_expr("vpiRhs", mgr, stmt->rhs() );
     break;
 
   case kVpiDeassign:
-    put_expr("vpiLhs", mgr, stmt->lhs() );
-    break;
-
   case kVpiRelease:
-    put_expr("vpiLhs", mgr, stmt->lhs() );
+    put_lhs("vpiLhs", mgr, stmt->lhs() );
     break;
 
   case kVpiTaskCall:

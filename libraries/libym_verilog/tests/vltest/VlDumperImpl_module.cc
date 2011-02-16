@@ -137,8 +137,8 @@ VlDumperImpl::put_modulearray(const char* label,
   put("FileRegion", module_array->file_region() );
   put("vpiFullName", module_array->full_name() );
   put("vpiSize", module_array->elem_num() );
-  put_expr("vpiLeftRange", mgr, module_array->left_range() );
-  put_expr("vpiRightRange", mgr, module_array->right_range() );
+  put("vpiLeftRange", module_array->left_range_val() );
+  put("vpiRightRange", module_array->right_range_val() );
 
 #if 0
   vector<VlObj*> obj_list;

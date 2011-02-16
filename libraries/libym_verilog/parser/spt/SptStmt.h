@@ -35,12 +35,12 @@ private:
   /// コンストラクタ
   SptStmt(const FileRegion& file_region,
 	  tPtStmtType type,
-	  PtStmt* body1 = NULL,
-	  PtStmt* body2 = NULL,
-	  PtStmt* body3 = NULL,
-	  PtExpr* expr1 = NULL,
-	  PtExpr* expr2 = NULL,
-	  PtControl* control = NULL,
+	  const PtStmt* body1 = NULL,
+	  const PtStmt* body2 = NULL,
+	  const PtStmt* body3 = NULL,
+	  const PtExpr* expr1 = NULL,
+	  const PtExpr* expr2 = NULL,
+	  const PtControl* control = NULL,
 	  const char* name = NULL,
 	  PtNameBranchArray nb_array = PtNameBranchArray(),
 	  PtCaseItemArray caseitem_array = PtCaseItemArray(),
@@ -184,22 +184,22 @@ private:
   const char* mName;
 
   // コントロール
-  PtControl* mControl;
+  const PtControl* mControl;
 
   // ステートメント1
-  PtStmt* mBody1;
+  const PtStmt* mBody1;
 
   // ステートメント2
-  PtStmt* mBody2;
+  const PtStmt* mBody2;
 
   // ステートメント3
-  PtStmt* mBody3;
+  const PtStmt* mBody3;
 
   // 式1
-  PtExpr* mExpr1;
+  const PtExpr* mExpr1;
 
   // 式2
-  PtExpr* mExpr2;
+  const PtExpr* mExpr2;
 
   // case item の配列
   PtCaseItemArray mCaseItemArray;
@@ -232,7 +232,7 @@ private:
   /// コンストラクタ
   SptCaseItem(const FileRegion& file_region,
 	      PtExprArray label_array,
-	      PtStmt* body);
+	      const PtStmt* body);
 
   /// デストラクタ
   ~SptCaseItem();
@@ -263,7 +263,7 @@ public:
 
   /// 本体のステートメントの取得
   virtual
-  PtStmt*
+  const PtStmt*
   body() const;
 
 
@@ -279,7 +279,7 @@ private:
   PtExprArray mLabelArray;
 
   // ラベルが一致したときに実行されるステートメント
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 

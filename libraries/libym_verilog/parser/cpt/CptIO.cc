@@ -184,8 +184,8 @@ CptIOHV::CptIOHV(const FileRegion& file_region,
 		 tVpiAuxType aux_type,
 		 tVpiNetType net_type,
 		 bool sign,
-		 PtExpr* left,
-		 PtExpr* right) :
+		 const PtExpr* left,
+		 const PtExpr* right) :
   CptIOHBase(file_region,
 	     type, aux_type,
 	     net_type, kVpiVarNone,
@@ -269,7 +269,7 @@ CptIOItem::init_value() const
 // @param[in] init_value 初期値
 CptIOItemI::CptIOItemI(const FileRegion& file_region,
 		       const char* name,
-		       PtExpr* init_value) :
+		       const PtExpr* init_value) :
   CptIOItem(file_region, name),
   mInitValue(init_value)
 {
@@ -381,8 +381,8 @@ PtiIOHead*
 CptFactory::new_IOHead(const FileRegion& file_region,
 		       tPtIOType type,
 		       bool sign,
-		       PtExpr* left,
-		       PtExpr* right)
+		       const PtExpr* left,
+		       const PtExpr* right)
 {
   ++ mNumIOHV;
   void* p = alloc().get_memory(sizeof(CptIOHV));
@@ -402,8 +402,8 @@ PtiIOHead*
 CptFactory::new_RegIOHead(const FileRegion& file_region,
 			  tPtIOType type,
 			  bool sign,
-			  PtExpr* left,
-			  PtExpr* right)
+			  const PtExpr* left,
+			  const PtExpr* right)
 {
   ++ mNumIOHV;
   void* p = alloc().get_memory(sizeof(CptIOHV));
@@ -425,8 +425,8 @@ CptFactory::new_NetIOHead(const FileRegion& file_region,
 			  tPtIOType type,
 			  tVpiNetType net_type,
 			  bool sign,
-			  PtExpr* left,
-			  PtExpr* right)
+			  const PtExpr* left,
+			  const PtExpr* right)
 {
   ++ mNumIOHV;
   void* p = alloc().get_memory(sizeof(CptIOHV));
@@ -454,7 +454,7 @@ CptFactory::new_IOItem(const FileRegion& file_region,
 PtIOItem*
 CptFactory::new_IOItem(const FileRegion& file_region,
 		       const char* name,
-		       PtExpr* init_value)
+		       const PtExpr* init_value)
 {
   ++ mNumIOItemI;
   void* p = alloc().get_memory(sizeof(CptIOItemI));

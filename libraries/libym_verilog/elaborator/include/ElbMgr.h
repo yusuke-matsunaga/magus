@@ -79,14 +79,14 @@ public:
   const ElbUserSystf*
   find_user_systf(const char* name) const;
 
-  /// @brief スコープに属する generate block のリストを取り出す．
+  /// @brief スコープに属する internal scope のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
   /// @param[out] scope_list 結果を格納するリスト
   /// @retval true 該当する要素が1つ以上あった．
   /// @retval false 該当する要素がなかった．
   bool
-  find_genblock_list(const VlNamedObj* parent,
-		     vector<const VlNamedObj*>& scope_list) const;
+  find_internalscope_list(const VlNamedObj* parent,
+			  vector<const VlNamedObj*>& scope_list) const;
 
   /// @brief スコープとタグから宣言要素を取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -100,6 +100,19 @@ public:
   find_decl_list(const VlNamedObj* parent,
 		 int tag,
 		 vector<const VlDecl*>& decl_list) const;
+
+  /// @brief スコープとタグから宣言要素の配列を取り出す．
+  /// @param[in] parent 検索対象のスコープ
+  /// @param[in] tag タグ
+  /// @param[out] declarray_list 結果を格納するリスト
+  /// @retval true 該当する要素が1つ以上あった．
+  /// @retval false 該当する要素がなかった．
+  /// @note scope というスコープ内の tag というタグを持つ宣言要素を
+  /// decl_list に入れる．
+  bool
+  find_declarray_list(const VlNamedObj* parent,
+		      int tag,
+		      vector<const VlDeclArray*>& declarray_list) const;
 
   /// @brief スコープに属する defparam のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
@@ -235,15 +248,10 @@ public:
   void
   reg_toplevel(const VlNamedObj* toplevel);
 
-  /// @brief generate block を登録する．
+  /// @brief internal scope を登録する．
   /// @param[in] obj 登録するオブジェクト
   void
-  reg_genblock(ElbScope* obj);
-
-  /// @brief block scope を登録する．
-  /// @param[in] obj 登録するオブジェクト
-  void
-  reg_blockscope(ElbScope* obj);
+  reg_internalscope(ElbScope* obj);
 
   /// @brief 宣言要素を登録する．
   /// @param[in] tag タグ
@@ -258,6 +266,13 @@ public:
   void
   reg_declarray(int tag,
 		ElbDeclArray* obj);
+
+  /// @brief パラメータを登録する．
+  /// @param[in] tag タグ
+  /// @param[in] obj 登録するオブジェクト
+  void
+  reg_parameter(int ga,
+		ElbParameter* obj);
 
   /// @brief defparam を登録する．
   /// @param[in] obj 登録するオブジェクト
@@ -411,17 +426,17 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief スコープに属する generate block のリストを取り出す．
+// @brief スコープに属する internal scope のリストを取り出す．
 // @param[in] parent 検索対象のスコープ
 // @param[out] scope_list 結果を格納するリスト
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 inline
 bool
-ElbMgr::find_genblock_list(const VlNamedObj* parent,
-			   vector<const VlNamedObj*>& scope_list) const
+ElbMgr::find_internalscope_list(const VlNamedObj* parent,
+				vector<const VlNamedObj*>& scope_list) const
 {
-  return mTagDict.find_genblock_list(parent, scope_list);
+  return mTagDict.find_internalscope_list(parent, scope_list);
 }
 
 // @brief スコープとタグから宣言要素を取り出す．
@@ -439,6 +454,27 @@ ElbMgr::find_decl_list(const VlNamedObj* parent,
 		       vector<const VlDecl*>& decl_list) const
 {
   return mTagDict.find_decl_list(parent, tag, decl_list);
+}
+
+// @brief スコープとタグから宣言要素の配列を取り出す．
+// @param[in] parent 検索対象のスコープ
+// @param[in] tag タグ
+// @param[out] declarray_list 結果を格納するリスト
+// @retval true 該当する要素が1つ以上あった．
+// @retval false 該当する要素がなかった．
+// @note scope というスコープ内の tag というタグを持つ宣言要素を
+// decl_list に入れる．
+inline
+bool
+ElbMgr::find_declarray_list(const VlNamedObj* parent,
+			    int tag,
+			    vector<const VlDeclArray*>& declarray_list) const
+{
+  if ( tag == vpiVariables ) {
+    // ちょっと汚い補正
+    tag += 100;
+  }
+  return mTagDict.find_declarray_list(parent, tag, declarray_list);
 }
 
 // @brief スコープに属する defparam のリストを取り出す．

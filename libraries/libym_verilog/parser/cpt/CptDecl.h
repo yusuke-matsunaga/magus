@@ -234,8 +234,8 @@ protected:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   CptParamHV(const FileRegion& file_region,
-	     PtExpr* left,
-	     PtExpr* right);
+	     const PtExpr* left,
+	     const PtExpr* right);
 
   /// @brief デストラクタ
   virtual
@@ -273,10 +273,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -296,8 +296,8 @@ protected:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   CptParamHSV(const FileRegion& file_region,
-	      PtExpr* left,
-	      PtExpr* right);
+	      const PtExpr* left,
+	      const PtExpr* right);
 
   /// @brief デストラクタ
   virtual
@@ -334,8 +334,8 @@ protected:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   CptLocalParamHV(const FileRegion& file_region,
-		  PtExpr* left,
-		  PtExpr* right);
+		  const PtExpr* left,
+		  const PtExpr* right);
 
   /// @brief デストラクタ
   virtual
@@ -371,8 +371,8 @@ protected:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   CptLocalParamHSV(const FileRegion& file_region,
-		   PtExpr* left,
-		   PtExpr* right);
+		   const PtExpr* left,
+		   const PtExpr* right);
 
   /// @brief デストラクタ
   virtual
@@ -424,6 +424,13 @@ public:
   virtual
   tPtDeclType
   type() const;
+
+  /// @brief 符号の取得
+  /// @retval true 符号つき
+  /// @retval false 符号なし
+  virtual
+  bool
+  is_signed() const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -560,8 +567,8 @@ protected:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   CptRegHV(const FileRegion& file_region,
-	   PtExpr* left,
-	   PtExpr* right);
+	   const PtExpr* left,
+	   const PtExpr* right);
 
   /// @brief デストラクタ
   ~CptRegHV();
@@ -597,10 +604,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -620,8 +627,8 @@ protected:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   CptRegHSV(const FileRegion& file_region,
-	    PtExpr* left,
-	    PtExpr* right);
+	    const PtExpr* left,
+	    const PtExpr* right);
 
   /// @brief デストラクタ
   ~CptRegHSV();
@@ -672,6 +679,13 @@ public:
   virtual
   tPtDeclType
   type() const;
+
+  /// @brief 符号の取得
+  /// @retval true 符号つき
+  /// @retval false 符号なし
+  virtual
+  bool
+  is_signed() const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -802,7 +816,7 @@ protected:
   CptNetHS(const FileRegion& file_region,
 	   tVpiNetType net_type,
 	   bool sign,
-	   PtStrength* strength);
+	   const PtStrength* strength);
 
   /// @brief デストラクタ
   virtual
@@ -827,7 +841,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
 };
 
@@ -850,7 +864,7 @@ protected:
   CptNetHD(const FileRegion& file_region,
 	   tVpiNetType net_type,
 	   bool sign,
-	   PtDelay* delay);
+	   const PtDelay* delay);
 
   /// @brief デストラクタ
   virtual
@@ -875,7 +889,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -899,8 +913,8 @@ protected:
   CptNetHSD(const FileRegion& file_region,
 	    tVpiNetType net_type,
 	    bool sign,
-	    PtStrength* strength,
-	    PtDelay* delay);
+	    const PtStrength* strength,
+	    const PtDelay* delay);
 
   /// @brief デストラクタ
   virtual
@@ -931,10 +945,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -960,8 +974,8 @@ protected:
 	   tVpiNetType net_type,
 	   tVpiVsType vstype,
 	   bool sign,
-	   PtExpr* left,
-	   PtExpr* right);
+	   const PtExpr* left,
+	   const PtExpr* right);
 
   /// @brief デストラクタ
   virtual
@@ -1000,10 +1014,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -1030,9 +1044,9 @@ protected:
 	    tVpiNetType net_type,
 	    tVpiVsType vstype,
 	    bool sign,
-	    PtExpr* left,
-	    PtExpr* right,
-	    PtStrength* strength);
+	    const PtExpr* left,
+	    const PtExpr* right,
+	    const PtStrength* strength);
 
   /// @brief デストラクタ
   virtual
@@ -1057,7 +1071,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
 };
 
@@ -1084,9 +1098,9 @@ protected:
 	    tVpiNetType net_type,
 	    tVpiVsType vstype,
 	    bool sign,
-	    PtExpr* left,
-	    PtExpr* right,
-	    PtDelay* delay);
+	    const PtExpr* left,
+	    const PtExpr* right,
+	    const PtDelay* delay);
 
   /// @brief デストラクタ
   virtual
@@ -1111,7 +1125,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -1139,10 +1153,10 @@ protected:
 	     tVpiNetType net_type,
 	     tVpiVsType vstype,
 	     bool sign,
-	     PtExpr* left,
-	     PtExpr* right,
-	     PtStrength* strength,
-	     PtDelay* delay);
+	     const PtExpr* left,
+	     const PtExpr* right,
+	     const PtStrength* strength,
+	     const PtDelay* delay);
 
   /// @brief デストラクタ
   virtual
@@ -1173,10 +1187,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -1262,8 +1276,8 @@ protected:
   /// @param[in] left 範囲の左側の式
   /// @param[in] right 範囲の右側の式
   CptSpecParamHV(const FileRegion& file_region,
-		 PtExpr* left,
-		 PtExpr* right);
+		 const PtExpr* left,
+		 const PtExpr* right);
 
   /// @brief デストラクタ
   virtual
@@ -1294,10 +1308,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 
@@ -1482,7 +1496,7 @@ protected:
   /// @param[in] init_value 初期値
   CptDeclItemI(const FileRegion& file_region,
 	       const char* name,
-	       PtExpr* init_value);
+	       const PtExpr* init_value);
 
   /// @brief デストラクタ
   virtual
@@ -1514,7 +1528,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 初期値
-  PtExpr* mInitValue;
+  const PtExpr* mInitValue;
 
 };
 
@@ -1530,8 +1544,8 @@ public:
 
   /// @brief コンストラクタ
   CptRange(const FileRegion& fr,
-	   PtExpr* msb,
-	   PtExpr* lsb);
+	   const PtExpr* msb,
+	   const PtExpr* lsb);
 
   /// @brief デストラクタ
   virtual
@@ -1568,10 +1582,10 @@ private:
   FileRegion mFileRegion;
 
   // MSB
-  PtExpr* mMsb;
+  const PtExpr* mMsb;
 
   // LSB
-  PtExpr* mLsb;
+  const PtExpr* mLsb;
 
 };
 

@@ -126,16 +126,6 @@ public:
   PtIOHeadArray
   iohead_array() const;
 
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const;
-
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const;
-
   /// @brief 宣言ヘッダ配列の取得
   virtual
   PtDeclHeadArray
@@ -283,7 +273,6 @@ public:
   next_expr() const;
 
 
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -360,7 +349,7 @@ private:
   SptDefParam(const FileRegion& file_region,
 	      PtNameBranchArray nb_array,
 	      const char* tail_name,
-	      PtExpr* value);
+	      const PtExpr* value);
 
   // デストラクタ
   virtual
@@ -408,7 +397,7 @@ private:
   const char* mName;
 
   // 値
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
 };
 
@@ -425,8 +414,8 @@ private:
 
   // コンストラクタ
   SptContAssignH(const FileRegion& file_region,
-		 PtStrength* strength,
-		 PtDelay* delay,
+		 const PtStrength* strength,
+		 const PtDelay* delay,
 		 PtContAssignArray ca_array);
 
   // デストラクタ
@@ -467,10 +456,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
   // 要素の配列
   PtContAssignArray mArray;
@@ -490,8 +479,8 @@ private:
 
   // コンストラクタ
   SptContAssign(const FileRegion& fr,
-		PtExpr* lhs,
-		PtExpr* rhs);
+		const PtExpr* lhs,
+		const PtExpr* rhs);
 
   // デストラクタ
   virtual
@@ -528,10 +517,10 @@ private:
   FileRegion mFileRegion;
 
   // 左辺式
-  PtExpr* mLhs;
+  const PtExpr* mLhs;
 
   // 右辺式
-  PtExpr* mRhs;
+  const PtExpr* mRhs;
 
 };
 
@@ -549,7 +538,7 @@ private:
   // コンストラクタ
   SptProcess(const FileRegion& file_region,
 	     tPtItemType type,
-	     PtStmt* body);
+	     const PtStmt* body);
 
   // デストラクタ
   virtual
@@ -573,7 +562,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 本体
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 
@@ -598,8 +587,6 @@ private:
   /// @param[in] right 範囲の右側の式
   /// @param[in] data_type 関数の戻値の型
   /// @param[in] iohead_array IO宣言のリスト
-  /// @param[in] paramhead_array parameter 宣言のリスト
-  /// @param[in] lparamhead_array localparam 宣言のリスト
   /// @param[in] declhead_array 宣言のリスト
   /// @param[in] stmt 本体のステートメント
   SptTf(const FileRegion& file_region,
@@ -607,14 +594,12 @@ private:
 	const char* name,
 	bool automatic,
 	bool sign,
-	PtExpr* left,
-	PtExpr* right,
+	const PtExpr* left,
+	const PtExpr* right,
 	tVpiVarType var_type,
 	PtIOHeadArray iohead_array,
-	PtDeclHeadArray paramhead_array,
-	PtDeclHeadArray localparamhead_array,
 	PtDeclHeadArray declhead_array,
-	PtStmt* stmt);
+	const PtStmt* stmt);
 
   // デストラクタ
   virtual
@@ -645,16 +630,6 @@ public:
   virtual
   PtIOHeadArray
   iohead_array() const;
-
-  /// @brief parameter 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  paramhead_array() const;
-
-  /// @brief localparam 宣言ヘッダ配列の取得
-  virtual
-  PtDeclHeadArray
-  localparamhead_array() const;
 
   /// @brief 宣言ヘッダ配列の取得
   virtual
@@ -717,10 +692,10 @@ private:
   bool mSigned;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
   // データ型
   tVpiVarType mDataType;
@@ -731,17 +706,11 @@ private:
   // IO宣言の配列
   PtIOHeadArray mIOHeadArray;
 
-  // paramter 宣言の配列
-  PtDeclHeadArray mParamHeadArray;
-
-  // localparam 宣言の配列
-  PtDeclHeadArray mLocalparamHeadArray;
-
   // その他の宣言の配列
   PtDeclHeadArray mDeclHeadArray;
 
   // 本体
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
   // 使用中かどうかを示すフラグ
   mutable
@@ -763,8 +732,8 @@ private:
   // コンストラクタ
   SptGateH(const FileRegion& file_region,
 	   tVpiPrimType prim_type,
-	   PtStrength* strength,
-	   PtDelay* delay,
+	   const PtStrength* strength,
+	   const PtDelay* delay,
 	   PtInstArray elem_array);
 
   // デストラクタ
@@ -813,10 +782,10 @@ private:
   tVpiPrimType mPrimType;
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
   // 要素の配列
   PtInstArray mElemArray;
@@ -838,8 +807,8 @@ private:
   SptMuH(const FileRegion& file_region,
 	 const char* def_name,
 	 PtConnectionArray con_array,
-	 PtStrength* strength,
-	 PtDelay* delay,
+	 const PtStrength* strength,
+	 const PtDelay* delay,
 	 PtInstArray elem_array);
 
   // デストラクタ
@@ -896,10 +865,10 @@ private:
   PtConnectionArray mParamArray;
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
   // 要素のリスト
   PtInstArray mElemArray;
@@ -920,8 +889,8 @@ private:
   // コンストラクタ
   SptInst(const FileRegion& file_region,
 	  const char* name,
-	  PtExpr* left,
-	  PtExpr* right,
+	  const PtExpr* left,
+	  const PtExpr* right,
 	  PtConnectionArray con_array);
 
   // デストラクタ
@@ -979,10 +948,10 @@ private:
   const char* mName;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
   // ポート割り当ての配列
   PtConnectionArray mPortArray;
@@ -1099,7 +1068,7 @@ private:
 
   // コンストラクタ
   SptGenIf(const FileRegion& file_region,
-	   PtExpr* cond,
+	   const PtExpr* cond,
 	   PtDeclHeadArray then_decl_array,
 	   PtItemArray then_item_array,
 	   PtDeclHeadArray else_decl_array,
@@ -1147,7 +1116,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 条件式
-  PtExpr* mCond;
+  const PtExpr* mCond;
 
   // 成り立ったとき生成される本体
   SptGenBody mThenBody;
@@ -1170,7 +1139,7 @@ private:
 
   // コンストラクタ
   SptGenCase(const FileRegion& file_region,
-	     PtExpr* expr,
+	     const PtExpr* expr,
 	     PtGenCaseItemArray item_array);
 
   // デストラクタ
@@ -1205,7 +1174,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 比較式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
   // case item の配列
   PtGenCaseItemArray mCaseItemArray;
@@ -1298,9 +1267,9 @@ private:
   // コンストラクタ
   SptGenFor(const FileRegion& file_region,
 	    const char* loop_var,
-	    PtExpr* init_expr,
-	    PtExpr* cond,
-	    PtExpr* next_expr,
+	    const PtExpr* init_expr,
+	    const PtExpr* cond,
+	    const PtExpr* next_expr,
 	    const char* block_name,
 	    PtDeclHeadArray decl_array,
 	    PtItemArray item_array);
@@ -1363,13 +1332,13 @@ private:
   const char* mLoopVar;
 
   // 初期化文の右辺
-  PtExpr* mInitExpr;
+  const PtExpr* mInitExpr;
 
   // 繰り返し条件
-  PtExpr* mCond;
+  const PtExpr* mCond;
 
   // 増加文の右辺
-  PtExpr* mNextExpr;
+  const PtExpr* mNextExpr;
 
   // 生成される本体
   SptGenBody mBody;
@@ -1446,8 +1415,8 @@ private:
   // コンストラクタ
   SptSpecPath(const FileRegion& file_region,
 	      tVpiSpecPathType id,
-	      PtExpr* expr,
-	      PtPathDecl* path_decl);
+	      const PtExpr* expr,
+	      const PtPathDecl* path_decl);
 
   // デストラクタ
   virtual
@@ -1484,10 +1453,10 @@ private:
   tVpiSpecPathType mId;
 
   // モジュールパスの式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
   // パス記述
-  PtPathDecl* mPathDecl;
+  const PtPathDecl* mPathDecl;
 
 };
 
@@ -1510,8 +1479,8 @@ private:
 	      int op,
 	      PtExprArray output_array,
 	      int output_pol,
-	      PtExpr* expr,
-	      PtPathDelay* path_delay);
+	      const PtExpr* expr,
+	      const PtPathDelay* path_delay);
 
   // デストラクタ
   virtual
@@ -1601,8 +1570,8 @@ private:
   int mOp;
   PtExprArray mOutputs;
   int mOutputPol;
-  PtExpr* mExpr;
-  PtPathDelay* mPathDelay;
+  const PtExpr* mExpr;
+  const PtPathDelay* mPathDelay;
 };
 
 
@@ -1618,34 +1587,38 @@ private:
 
   // コンストラクタ
   SptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1);
+	       const PtExpr* value1);
+
   SptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2);
+	       const PtExpr* value1,
+	       const PtExpr* value2);
+
   SptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2,
-	       PtExpr* value3);
+	       const PtExpr* value1,
+	       const PtExpr* value2,
+	       const PtExpr* value3);
+
   SptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2,
-	       PtExpr* value3,
-	       PtExpr* value4,
-	       PtExpr* value5,
-	       PtExpr* value6);
+	       const PtExpr* value1,
+	       const PtExpr* value2,
+	       const PtExpr* value3,
+	       const PtExpr* value4,
+	       const PtExpr* value5,
+	       const PtExpr* value6);
+
   SptPathDelay(const FileRegion& file_region,
-	       PtExpr* value1,
-	       PtExpr* value2,
-	       PtExpr* value3,
-	       PtExpr* value4,
-	       PtExpr* value5,
-	       PtExpr* value6,
-	       PtExpr* value7,
-	       PtExpr* value8,
-	       PtExpr* value9,
-	       PtExpr* value10,
-	       PtExpr* value11,
-	       PtExpr* value12);
+	       const PtExpr* value1,
+	       const PtExpr* value2,
+	       const PtExpr* value3,
+	       const PtExpr* value4,
+	       const PtExpr* value5,
+	       const PtExpr* value6,
+	       const PtExpr* value7,
+	       const PtExpr* value8,
+	       const PtExpr* value9,
+	       const PtExpr* value10,
+	       const PtExpr* value11,
+	       const PtExpr* value12);
 
   // デストラクタ
   virtual
@@ -1678,7 +1651,7 @@ private:
   FileRegion mFileRegion;
 
   // ディレイ値
-  PtExpr* mValues[12];
+  const PtExpr* mValues[12];
 
 };
 

@@ -13,21 +13,18 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_mvn_verilog.la
 
 libym_mvn_verilog_la_SOURCES = \
-	CfgMgr.h \
-	CfgMgr.cc \
-	CfgNode.h \
 	DeclHash.h \
 	DeclHash.cc \
 	DeclMap.h \
 	DeclMap.cc \
-	DfgBlock.h \
-	DfgBlock.cc \
 	Driver.h \
+	MapRec.h \\
 	MvVerilogReader.cc \
+	MvVlMap.cc \
 	ReaderImpl.h \
 	ReaderImpl.cc \
-	SsaMgr.h \
-	SsaMgr.cc
+	Env.h \
+	Env.cc
 
 libym_mvn_verilog_la_LDFLAGS =
 

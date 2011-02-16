@@ -44,7 +44,7 @@ main(int argc,
     return 1;
   }
 
-#if 0
+#if 1
   display_library(cout, *library);
 #else
   const char* filename = "celllibrary_test.data";

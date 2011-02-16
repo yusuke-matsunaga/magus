@@ -10,6 +10,7 @@
 
 
 #include "SptItem.h"
+#include "SptFactory.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -63,8 +64,8 @@ SptSpecItem::terminal(ymuint pos) const
 // コンストラクタ
 SptSpecPath::SptSpecPath(const FileRegion& file_region,
 			 tVpiSpecPathType id,
-			 PtExpr* expr,
-			 PtPathDecl* path_decl) :
+			 const PtExpr* expr,
+			 const PtPathDecl* path_decl) :
   SptItem(file_region, kPtItem_SpecPath),
   mId(id),
   mExpr(expr),
@@ -111,8 +112,8 @@ SptPathDecl::SptPathDecl(const FileRegion& file_region,
 			 int op,
 			 PtExprArray output_array,
 			 int output_pol,
-			 PtExpr* expr,
-			 PtPathDelay* path_delay) :
+			 const PtExpr* expr,
+			 const PtPathDelay* path_delay) :
   mFileRegion(file_region),
   mEdge(edge),
   mInputs(input_array),
@@ -222,7 +223,7 @@ SptPathDecl::path_delay() const
 
 // コンストラクタ
 SptPathDelay::SptPathDelay(const FileRegion& file_region,
-			   PtExpr* value) :
+			   const PtExpr* value) :
   mFileRegion(file_region)
 {
   mValues[0] = value;
@@ -231,8 +232,8 @@ SptPathDelay::SptPathDelay(const FileRegion& file_region,
   }
 }
 SptPathDelay::SptPathDelay(const FileRegion& file_region,
-			   PtExpr* value1,
-			   PtExpr* value2) :
+			   const PtExpr* value1,
+			   const PtExpr* value2) :
   mFileRegion(file_region)
 {
   mValues[0] = value1;
@@ -242,9 +243,9 @@ SptPathDelay::SptPathDelay(const FileRegion& file_region,
   }
 }
 SptPathDelay::SptPathDelay(const FileRegion& file_region,
-			   PtExpr* value1,
-			   PtExpr* value2,
-			   PtExpr* value3) :
+			   const PtExpr* value1,
+			   const PtExpr* value2,
+			   const PtExpr* value3) :
   mFileRegion(file_region)
 {
   mValues[0] = value1;
@@ -255,12 +256,12 @@ SptPathDelay::SptPathDelay(const FileRegion& file_region,
   }
 }
 SptPathDelay::SptPathDelay(const FileRegion& file_region,
-			   PtExpr* value1,
-			   PtExpr* value2,
-			   PtExpr* value3,
-			   PtExpr* value4,
-			   PtExpr* value5,
-			   PtExpr* value6) :
+			   const PtExpr* value1,
+			   const PtExpr* value2,
+			   const PtExpr* value3,
+			   const PtExpr* value4,
+			   const PtExpr* value5,
+			   const PtExpr* value6) :
   mFileRegion(file_region)
 {
   mValues[0] = value1;
@@ -274,18 +275,18 @@ SptPathDelay::SptPathDelay(const FileRegion& file_region,
   }
 }
 SptPathDelay::SptPathDelay(const FileRegion& file_region,
-			   PtExpr* value1,
-			   PtExpr* value2,
-			   PtExpr* value3,
-			   PtExpr* value4,
-			   PtExpr* value5,
-			   PtExpr* value6,
-			   PtExpr* value7,
-			   PtExpr* value8,
-			   PtExpr* value9,
-			   PtExpr* value10,
-			   PtExpr* value11,
-			   PtExpr* value12) :
+			   const PtExpr* value1,
+			   const PtExpr* value2,
+			   const PtExpr* value3,
+			   const PtExpr* value4,
+			   const PtExpr* value5,
+			   const PtExpr* value6,
+			   const PtExpr* value7,
+			   const PtExpr* value8,
+			   const PtExpr* value9,
+			   const PtExpr* value10,
+			   const PtExpr* value11,
+			   const PtExpr* value12) :
   mFileRegion(file_region)
 {
   mValues[0] = value1;
@@ -320,6 +321,174 @@ const PtExpr*
 SptPathDelay::value(ymuint pos) const
 {
   return mValues[pos];
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// item 関係の生成
+//////////////////////////////////////////////////////////////////////
+
+// @brief specify block item の生成
+// @param[in] file_region ファイル位置の情報
+// @param[in] id specify block item の種類
+// @param[in] terminal_list 端子のリスト
+// @return 生成された specify block item
+const PtItem*
+SptFactory::new_SpecItem(const FileRegion& file_region,
+			 tVpiSpecItemType id,
+			 PtExprArray terminal_array)
+{
+  void* p = alloc().get_memory(sizeof(SptSpecItem));
+  return new (p) SptSpecItem(file_region, id, terminal_array);
+}
+
+// @brief path 仕様を生成する．
+// @param[in] file_region ファイル位置の情報
+// @param[in] id spec path の種類
+// @param[in] expr 条件式
+// @param[in] path_decl パス記述
+// @return 生成された spec path
+const PtItem*
+SptFactory::new_SpecPath(const FileRegion& file_region,
+			 tVpiSpecPathType id,
+			 const PtExpr* expr,
+			 const PtPathDecl* path_decl)
+{
+  void* p = alloc().get_memory(sizeof(SptSpecPath));
+  return new (p) SptSpecPath(file_region, id, expr, path_decl);
+}
+
+// @brief パス記述の生成
+// @param[in] file_region ファイル位置の情報
+// @param[in] edge
+// @param[in] input_array
+// @param[in] input_pol
+// @param[in] op
+// @param[in] output_array
+// @param[in] output_pol
+// @param[in] expr
+// @param[in] path_delay
+// @return 生成されたパス記述
+const PtPathDecl*
+SptFactory::new_PathDecl(const FileRegion& file_region,
+			 int edge,
+			 PtExprArray input_array,
+			 int input_pol,
+			 int op,
+			 PtExprArray output_array,
+			 int output_pol,
+			 const PtExpr* expr,
+			 const PtPathDelay* path_delay)
+{
+  void* p = alloc().get_memory(sizeof(SptPathDecl));
+  return new (p) SptPathDecl(file_region, edge, input_array, input_pol,
+			     op, output_array, output_pol,
+			     expr, path_delay);
+}
+
+// @brief path delay value の生成 (値が1つ)
+// @param[in] file_region ファイル位置の情報
+// @param[in] value 値
+// @return 生成された path delay value
+const PtPathDelay*
+SptFactory::new_PathDelay(const FileRegion& file_region,
+			  const PtExpr* value)
+{
+  void* p = alloc().get_memory(sizeof(SptPathDelay));
+  return new (p) SptPathDelay(file_region, value);
+}
+
+// @brief path delay value の生成 (値が2つ)
+// @param[in] file_region ファイル位置の情報
+// @param[in] value1 値1
+// @param[in] value2 値2
+// @return 生成された path delay value
+const PtPathDelay*
+SptFactory::new_PathDelay(const FileRegion& file_region,
+			  const PtExpr* value1,
+			  const PtExpr* value2)
+{
+  void* p = alloc().get_memory(sizeof(SptPathDelay));
+  return new (p) SptPathDelay(file_region, value1, value2);
+}
+
+// @brief path delay value の生成 (値が3つ)
+// @param[in] file_region ファイル位置の情報
+// @param[in] value1 値1
+// @param[in] value2 値2
+// @param[in] value3 値3
+// @return 生成された path delay value
+const PtPathDelay*
+SptFactory::new_PathDelay(const FileRegion& file_region,
+			  const PtExpr* value1,
+			  const PtExpr* value2,
+			  const PtExpr* value3)
+{
+  void* p = alloc().get_memory(sizeof(SptPathDelay));
+  return new (p) SptPathDelay(file_region,
+			      value1, value2, value3);
+}
+
+// @brief path delay value の生成 (値が6つ)
+// @param[in] file_region ファイル位置の情報
+// @param[in] value1 値1
+// @param[in] value2 値2
+// @param[in] value3 値3
+// @param[in] value4 値4
+// @param[in] value5 値5
+// @param[in] value6 値6
+// @return 生成された path delay value
+const PtPathDelay*
+SptFactory::new_PathDelay(const FileRegion& file_region,
+			  const PtExpr* value1,
+			  const PtExpr* value2,
+			  const PtExpr* value3,
+			  const PtExpr* value4,
+			  const PtExpr* value5,
+			  const PtExpr* value6)
+{
+  void* p = alloc().get_memory(sizeof(SptPathDelay));
+  return new (p) SptPathDelay(file_region,
+			      value1, value2, value3,
+			      value4, value5, value6);
+}
+
+// @brief path delay value の生成 (値が12個)
+// @param[in] file_region ファイル位置の情報
+// @param[in] value1 値1
+// @param[in] value2 値2
+// @param[in] value3 値3
+// @param[in] value4 値4
+// @param[in] value5 値5
+// @param[in] value6 値6
+// @param[in] value7 値7
+// @param[in] value8 値8
+// @param[in] value9 値9
+// @param[in] value10 値10
+// @param[in] value11 値11
+// @param[in] value12 値12
+// @return 生成された path delay value
+const PtPathDelay*
+SptFactory::new_PathDelay(const FileRegion& file_region,
+			  const PtExpr* value1,
+			  const PtExpr* value2,
+			  const PtExpr* value3,
+			  const PtExpr* value4,
+			  const PtExpr* value5,
+			  const PtExpr* value6,
+			  const PtExpr* value7,
+			  const PtExpr* value8,
+			  const PtExpr* value9,
+			  const PtExpr* value10,
+			  const PtExpr* value11,
+			  const PtExpr* value12)
+{
+  void* p = alloc().get_memory(sizeof(SptPathDelay));
+  return new (p) SptPathDelay(file_region,
+			      value1, value2, value3,
+			      value4, value5, value6,
+			      value7, value8, value9,
+			      value10, value11, value12);
 }
 
 END_NAMESPACE_YM_VERILOG

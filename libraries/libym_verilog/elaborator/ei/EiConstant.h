@@ -23,13 +23,13 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @brief 定数を表すクラス
 //////////////////////////////////////////////////////////////////////
 class EiConstant :
-  public EiExprBase1
+  public EiExprBase
 {
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
-  EiConstant(const PtBase* pt_expr);
+  EiConstant(const PtExpr* pt_expr);
 
   /// @brief デストラクタ
   virtual
@@ -71,26 +71,13 @@ public:
   void
   set_reqsize(tVpiValueType type);
 
-  /// @brief スカラー値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
+  /// @brief オペランドを返す．
+  /// @param[in] pos 位置番号
+  /// @note 演算子の時，意味を持つ．
+  /// @note このクラスでは NULL を返す．
   virtual
-  void
-  set_scalar(tVpiScalarVal v);
-
-  /// @brief 実数値を書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_real(double v);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
+  ElbExpr*
+  _operand(ymuint pos) const;
 
 };
 
@@ -109,7 +96,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] value 値
-  EiIntConst(const PtBase* pt_expr,
+  EiIntConst(const PtExpr* pt_expr,
 	     int value);
 
   /// @brief デストラクタ
@@ -132,44 +119,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-  /// @brief int 型の値を返す．
-  virtual
-  bool
-  eval_int(int& val) const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:
@@ -198,7 +147,7 @@ private:
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] const_type 定数型
   /// @param[in] value 値
-  EiBitVectorConst(const PtBase* pt_expr,
+  EiBitVectorConst(const PtExpr* pt_expr,
 		   tVpiConstType const_type,
 		   const BitVector& value);
 
@@ -222,39 +171,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:
@@ -285,7 +201,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] value 値
-  EiRealConst(const PtBase* pt_expr,
+  EiRealConst(const PtExpr* pt_expr,
 	      double value);
 
   /// @brief デストラクタ
@@ -308,39 +224,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:
@@ -368,7 +251,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] value 値
-  EiStringConst(const PtBase* pt_expr,
+  EiStringConst(const PtExpr* pt_expr,
 		const string& value);
 
   /// @brief デストラクタ
@@ -391,39 +274,6 @@ public:
   virtual
   tVpiConstType
   constant_type() const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // EiExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 private:

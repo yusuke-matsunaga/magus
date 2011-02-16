@@ -54,7 +54,7 @@ SptExpr::type() const
 // @return 演算子の種類
 // このクラスでは kVpiNullOp を返す．
 tVpiOpType
-SptExpr::opr_type() const
+SptExpr::op_type() const
 {
   return kVpiNullOp;
 }
@@ -239,11 +239,11 @@ SptExpr::is_simple() const
 // @param[in] opr_list　オペランドのリスト
 SptOpr1::SptOpr1(const FileRegion& file_region,
 		 tVpiOpType op_type,
-		 PtExpr* opr1,
-		 PtExpr* opr2,
-		 PtExpr* opr3) :
+		 const PtExpr* opr1,
+		 const PtExpr* opr2,
+		 const PtExpr* opr3) :
   SptExpr(file_region, kPtOprExpr),
-  mOprType(op_type)
+  mOpType(op_type)
 {
   mExprList[0] = opr1;
   if ( (mExprList[1] = opr2) ) {
@@ -267,9 +267,9 @@ SptOpr1::~SptOpr1()
 // @brief 演算子の種類の取得
 // @return 演算子の種類
 tVpiOpType
-SptOpr1::opr_type() const
+SptOpr1::op_type() const
 {
-  return mOprType;
+  return mOpType;
 }
 
 // @brief インデックスとして使える式のチェック
@@ -279,7 +279,7 @@ bool
 SptOpr1::is_index_expr() const
 {
   // 算術演算なら本当はOKだけどめんどくさいので単項のマイナスのみOKとする．
-  if ( mOprType == kVpiMinusOp || mOprType == kVpiNullOp ) {
+  if ( mOpType == kVpiMinusOp || mOpType == kVpiNullOp ) {
     return operand(0)->is_index_expr();
   }
   else {
@@ -292,10 +292,10 @@ SptOpr1::is_index_expr() const
 int
 SptOpr1::index_value() const
 {
-  if ( mOprType == kVpiNullOp ) {
+  if ( mOpType == kVpiNullOp ) {
     return operand(0)->index_value();
   }
-  if ( mOprType == kVpiMinusOp ) {
+  if ( mOpType == kVpiMinusOp ) {
     return - operand(0)->index_value();
   }
   return 0;
@@ -331,7 +331,7 @@ SptOpr2::SptOpr2(const FileRegion& file_region,
 		 tVpiOpType op_type,
 		 PtExprArray opr_array) :
   SptExpr(file_region, kPtOprExpr),
-  mOprType(op_type),
+  mOpType(op_type),
   mExprArray(opr_array)
 {
 }
@@ -344,9 +344,9 @@ SptOpr2::~SptOpr2()
 // @brief 演算子の種類の取得
 // @return 演算子の種類
 tVpiOpType
-SptOpr2::opr_type() const
+SptOpr2::op_type() const
 {
-  return mOprType;
+  return mOpType;
 }
 
 // @brief インデックスとして使える式のチェック
@@ -464,8 +464,8 @@ SptPrimary::SptPrimary(const FileRegion& file_region,
 		       bool const_index,
 		       PtExprArray index_array,
 		       tVpiRangeMode mode,
-		       PtExpr* left,
-		       PtExpr* right) :
+		       const PtExpr* left,
+		       const PtExpr* right) :
   SptExpr(file_region, kPtPrimaryExpr),
   mNbArray(nb_array),
   mName(tail_name),
@@ -638,10 +638,10 @@ SptConstant::const_type() const
 // @param[in] type 演算の種類
 // @param[in] opr オペランド
 // @return 生成された演算子
-PtExpr*
+const PtExpr*
 SptFactory::new_Opr(const FileRegion& file_region,
 		    tVpiOpType type,
-		    PtExpr* opr)
+		    const PtExpr* opr)
 {
   void* p = alloc().get_memory(sizeof(SptOpr1));
   return new (p) SptOpr1(file_region, type,
@@ -654,11 +654,11 @@ SptFactory::new_Opr(const FileRegion& file_region,
 // @param[in] opr1 オペランド1
 // @param[in] opr2 オペランド2
 // @return 生成された演算子
-PtExpr*
+const PtExpr*
 SptFactory::new_Opr(const FileRegion& file_region,
 		    tVpiOpType type,
-		    PtExpr* opr1,
-		    PtExpr* opr2)
+		    const PtExpr* opr1,
+		    const PtExpr* opr2)
 {
   void* p = alloc().get_memory(sizeof(SptOpr1));
   return new (p) SptOpr1(file_region, type,
@@ -672,12 +672,12 @@ SptFactory::new_Opr(const FileRegion& file_region,
 // @param[in] opr2 オペランド2
 // @param[in] opr3 オペランド3
 // @return 生成された演算子
-PtExpr*
+const PtExpr*
 SptFactory::new_Opr(const FileRegion& file_region,
 		    tVpiOpType type,
-		    PtExpr* opr1,
-		    PtExpr* opr2,
-		    PtExpr* opr3)
+		    const PtExpr* opr1,
+		    const PtExpr* opr2,
+		    const PtExpr* opr3)
 {
   void* p = alloc().get_memory(sizeof(SptOpr1));
   return new (p) SptOpr1(file_region, type,
@@ -688,7 +688,7 @@ SptFactory::new_Opr(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] expr_list オペランドのリスト
 // @return 生成された concatination 演算子
-PtExpr*
+const PtExpr*
 SptFactory::new_Concat(const FileRegion& file_region,
 		       PtExprArray expr_array)
 {
@@ -700,7 +700,7 @@ SptFactory::new_Concat(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] expr_list 結合するオペランドのリスト
 // @return 生成された multi-concatination 演算子
-PtExpr*
+const PtExpr*
 SptFactory::new_MultiConcat(const FileRegion& file_region,
 			    PtExprArray expr_array)
 {
@@ -714,11 +714,11 @@ SptFactory::new_MultiConcat(const FileRegion& file_region,
 // @param[in] val1 typical 値
 // @param[in] val2 maximum 値
 // @return 生成された min/typ/max 演算子
-PtExpr*
+const PtExpr*
 SptFactory::new_MinTypMax(const FileRegion& file_region,
-			  PtExpr* val0,
-			  PtExpr* val1,
-			  PtExpr* val2)
+			  const PtExpr* val0,
+			  const PtExpr* val1,
+			  const PtExpr* val2)
 {
   void* p = alloc().get_memory(sizeof(SptOpr1));
   return new (p) SptOpr1(file_region, kVpiMinTypMaxOp,
@@ -729,7 +729,7 @@ SptFactory::new_MinTypMax(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] name 識別子名
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			const char* name)
 {
@@ -745,7 +745,7 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] name 識別子名
 // @param[in] index_array インデックスのリスト
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			const char* name,
 			PtExprArray index_array)
@@ -765,12 +765,12 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			const char* name,
 			tVpiRangeMode mode,
-			PtExpr* left,
-			PtExpr* right)
+			const PtExpr* left,
+			const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptPrimary));
   return new (p) SptPrimary(file_region,
@@ -789,13 +789,13 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			const char* name,
 			PtExprArray index_array,
 			tVpiRangeMode mode,
-			PtExpr* left,
-			PtExpr* right)
+			const PtExpr* left,
+			const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptPrimary));
   return new (p) SptPrimary(file_region,
@@ -811,7 +811,7 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] nb_array 識別子の階層部分のリスト
 // @param[in] tail_name 識別子の末尾
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			PtNameBranchArray nb_array,
 			const char* tail_name)
@@ -829,7 +829,7 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] tail_name 識別子の末尾
 // @param[in] index_array インデックスのリスト
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			PtNameBranchArray nb_array,
 			const char* tail_name,
@@ -851,13 +851,13 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			PtNameBranchArray nb_array,
 			const char* tail_name,
 			tVpiRangeMode mode,
-			PtExpr* left,
-			PtExpr* right)
+			const PtExpr* left,
+			const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptPrimary));
   return new (p) SptPrimary(file_region,
@@ -877,14 +877,14 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された primary
-PtExpr*
+const PtExpr*
 SptFactory::new_Primary(const FileRegion& file_region,
 			PtNameBranchArray nb_array,
 			const char* tail_name,
 			PtExprArray index_array,
 			tVpiRangeMode mode,
-			PtExpr* left,
-			PtExpr* right)
+			const PtExpr* left,
+			const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptPrimary));
   return new (p) SptPrimary(file_region,
@@ -900,7 +900,7 @@ SptFactory::new_Primary(const FileRegion& file_region,
 // @param[in] name 識別子名
 // @param[in] index_array インデックスのリスト
 // @return 生成された const primary
-PtExpr*
+const PtExpr*
 SptFactory::new_CPrimary(const FileRegion& file_region,
 			 const char* name,
 			 PtExprArray index_array)
@@ -920,12 +920,12 @@ SptFactory::new_CPrimary(const FileRegion& file_region,
 // @param[in] left 範囲の左側の式
 // @param[in] right 範囲の右側の式
 // @return 生成された constant primary
-PtExpr*
+const PtExpr*
 SptFactory::new_CPrimary(const FileRegion& file_region,
 			 const char* name,
 			 tVpiRangeMode mode,
-			 PtExpr* left,
-			 PtExpr* right)
+			 const PtExpr* left,
+			 const PtExpr* right)
 {
   void* p = alloc().get_memory(sizeof(SptPrimary));
   return new (p) SptPrimary(file_region,
@@ -942,7 +942,7 @@ SptFactory::new_CPrimary(const FileRegion& file_region,
 // @param[in] tail_name 識別子の末尾
 // @param[in] index_array インデックスのリスト
 // @return 生成された constant primary
-PtExpr*
+const PtExpr*
 SptFactory::new_CPrimary(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
 			 const char* tail_name,
@@ -962,7 +962,7 @@ SptFactory::new_CPrimary(const FileRegion& file_region,
 // @param[in] name 関数名
 // @param[in] arg_array 引数のリスト
 // @return 生成された function call
-PtExpr*
+const PtExpr*
 SptFactory::new_FuncCall(const FileRegion& file_region,
 			 const char* name,
 			 PtExprArray arg_array)
@@ -979,7 +979,7 @@ SptFactory::new_FuncCall(const FileRegion& file_region,
 // @param[in] tail_name 関数名の末尾
 // @param[in] arg_array 引数のリスト
 // @return 生成された function call
-PtExpr*
+const PtExpr*
 SptFactory::new_FuncCall(const FileRegion& file_region,
 			 PtNameBranchArray nb_array,
 			 const char* tail_name,
@@ -995,7 +995,7 @@ SptFactory::new_FuncCall(const FileRegion& file_region,
 // @param[in] name 関数名
 // @param[in] arg_array 引数のリスト
 // @return 生成された function call
-PtExpr*
+const PtExpr*
 SptFactory::new_SysFuncCall(const FileRegion& file_region,
 			    const char* name,
 			    PtExprArray arg_array)
@@ -1010,7 +1010,7 @@ SptFactory::new_SysFuncCall(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-PtExpr*
+const PtExpr*
 SptFactory::new_IntConst(const FileRegion& file_region,
 			 ymuint value)
 {
@@ -1023,7 +1023,7 @@ SptFactory::new_IntConst(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-PtExpr*
+const PtExpr*
 SptFactory::new_IntConst(const FileRegion& file_region,
 			 const char* value)
 {
@@ -1037,7 +1037,7 @@ SptFactory::new_IntConst(const FileRegion& file_region,
 // @param[in] const_type 定数の種類
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-PtExpr*
+const PtExpr*
 SptFactory::new_IntConst(const FileRegion& file_region,
 			 tVpiConstType const_type,
 			 const char* value)
@@ -1053,7 +1053,7 @@ SptFactory::new_IntConst(const FileRegion& file_region,
 // @param[in] const_type 定数の種類
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-PtExpr*
+const PtExpr*
 SptFactory::new_IntConst(const FileRegion& file_region,
 			 ymuint size,
 			 tVpiConstType const_type,
@@ -1068,7 +1068,7 @@ SptFactory::new_IntConst(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] value 定数の文字列表現
 // @return 生成された定数
-PtExpr*
+const PtExpr*
 SptFactory::new_RealConst(const FileRegion& file_region,
 			  double value)
 {
@@ -1081,7 +1081,7 @@ SptFactory::new_RealConst(const FileRegion& file_region,
 // @param[in] file_region ファイル位置の情報
 // @param[in] value 文字列
 // @return 生成された定数
-PtExpr*
+const PtExpr*
 SptFactory::new_StringConst(const FileRegion& file_region,
 			    const char* value)
 {

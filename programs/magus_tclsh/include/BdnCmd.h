@@ -1,8 +1,8 @@
-#ifndef MAGUS_MAGBDNCMD_H
-#define MAGUS_MAGBDNCMD_H
+#ifndef MAGUS_BDNCMD_H
+#define MAGUS_BDNCMD_H
 
-/// @file MagBdnCmd.h
-/// @brief MagBdnCmd のヘッダファイル
+/// @file BdnCmd.h
+/// @brief BdnCmd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,28 +12,31 @@
 /// All rights reserved.
 
 
-#include "MagCmd.h"
+#include "NetCmd.h"
 #include "ym_bdn/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class MagBdnCmd MagBdnCmd.h "MagBdnCmd.h"
+/// @class BdnCmd BdnCmd.h "BdnCmd.h"
 /// @ingroup MagusGroup
 /// @brief BdNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
-class MagBdnCmd :
-  public MagCmd
+class BdnCmd :
+  public NetCmd
 {
 public:
 
   /// @brief コンストラクタ
-  MagBdnCmd(MagMgr* mgr);
+  /// @param[in] mgr Magus の管理オブジェクト
+  /// @param[in] new_bdn_enable -new_bnet オプションを使用するとき true
+  BdnCmd(MagMgr* mgr,
+	 bool new_bdn_enable = true);
 
   /// @brief デストラクタ
   virtual
-  ~MagBdnCmd();
+  ~BdnCmd();
 
 
 protected:
@@ -54,38 +57,14 @@ protected:
 
   /// @brief コマンド行の引数をパーズする関数．
   /// @param[in] objv 引数の配列
-  /// objv で与えられるコマンド行引数のうちで，
-  /// -network <network名> | -nwk <network名>
-  /// の形のオプションがあればカレントネットワークのスタックに積む．
-  /// その場合には mNetworkSpecified のフラグに true がセットされる．
-  /// objv からはこれらのオプション文字列が削除される．
-  /// エラーが起きた時にはメッセージをインタプリタにセットして TCL_ERROR
-  /// を返す．
   virtual
   int
   before_cmd_proc(TclObjVector& objv);
 
   /// @brief コマンド処理関数の後で実行される関数
-  /// before_cmd_proc() で退避されたカレントネットワーク，
-  /// カレントライブラリを元に戻す．
   virtual
   void
   after_cmd_proc();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // メンバ変数
-  //////////////////////////////////////////////////////////////////////
-
-  // network オプションを解析するオブジェクト
-  TclPoptObj* mPoptNtwk;
-
-  // new_network オプションを解析するオブジェクト
-  TclPoptObj* mPoptNewNtwk;
-
-  // コマンドラインでネットワークの指定が行われたかを示すフラグ
-  bool mNetworkSpecified;
 
 };
 

@@ -206,33 +206,6 @@ protected:
 
 };
 
-
-//////////////////////////////////////////////////////////////////////
-/// @class WriteVerilog BNetIoCmd.h "BNetIoCmd.h"
-/// @brief ファイルに Verilog 形式で書き出すコマンド
-//////////////////////////////////////////////////////////////////////
-class WriteVerilog :
-  public BNetCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  WriteVerilog(MagMgr* mgr);
-
-  /// @brief デストラクタ
-  virtual
-  ~WriteVerilog();
-
-
-protected:
-
-  /// @brief コマンド処理関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-};
-
 END_NAMESPACE_MAGUS
 
 #endif // MAGUS_LOGBASE_BNETIOCMD_H

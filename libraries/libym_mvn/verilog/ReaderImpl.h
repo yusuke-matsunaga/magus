@@ -10,12 +10,14 @@
 
 
 #include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/MvVlMap.h"
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/MsgHandler.h"
 #include "DeclHash.h"
 #include "DeclMap.h"
 #include "Driver.h"
+#include "Env.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
@@ -59,31 +61,13 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvMgr& mgr,
-	      vector<pair<const VlDecl*, ymuint> >& node_map);
+	      MvVlMap& node_map);
 
   /// @brief メッセージハンドラを付加する．
   /// @param[in] msg_handler 登録するハンドラ
   /// @note このハンドラはこのオブジェクトの破壊に伴って破壊される．
   void
   add_msg_handler(MsgHandler* msg_handler);
-
-  /// @brief フリップフロップのセル名，ピン名を設定する．
-  /// @param[in] cell_name セル名
-  /// @param[in] data_pin_name データ入力ピン名
-  /// @param[in] clock_pin_name クロック入力ピン名
-  /// @param[in] q_pin_name ノーマル出力ピン名
-  /// @param[in] qn_pin_name 反転出力ピン名
-  /// @param[in] set_pin_name セットピン名
-  /// @param[in] reset_pin_name リセットピン名
-  /// @note 存在しない場合には空文字列を渡す．
-  void
-  set_ffname(const string& cell_name,
-	     const string& data_pin_name,
-	     const string& clock_pin_name,
-	     const string& q_pin_name,
-	     const string& qn_pin_name,
-	     const string& set_pin_name,
-	     const string& reset_pin_name);
 
 
 private:
@@ -144,100 +128,100 @@ private:
   gen_moduleinst(const VlModule* vl_module,
 		 MvModule* parent_module);
 
-  /// @brief プロセス文の生成を行う．
-  /// @param[in] module 親のモジュール
+  /// @brief プロセス文を生成する．
   /// @param[in] vl_process プロセス文
   bool
-  gen_process(MvModule* module,
+  gen_process(MvModule* parent_module,
 	      const VlProcess* process);
 
-  /// @brief 左辺式に接続する．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] expr 左辺式
-  /// @param[in] node 右辺に対応するノード
-  void
-  connect_lhs(MvModule* parent_module,
-	      const VlExpr* expr,
-	      MvNode* node);
+  /// @brief ステートメントの中身を生成する．
+  /// @param[in] module 親のモジュール
+  /// @param[in] stmt 本体のステートメント
+  /// @param[in] env 環境
+  bool
+  gen_stmt(MvModule* module,
+	   const VlStmt* stmt,
+	   ProcEnv& env);
 
-  /// @brief 左辺式に接続する．
+  /// @brief always latch のチェック
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] expr 左辺式
-  /// @param[in] node 右辺に対応するノード
-  /// @param[in] offset node に対するオフセット
-  void
-  connect_lhs_sub(MvModule* parent_module,
-		  const VlExpr* expr,
-		  MvNode* node,
-		  ymuint offset);
+  /// @param[in] src_node ソースノード
+  /// @param[out] cond_node 条件を表すノード
+  /// @retval 0 latch 条件はない．
+  /// @retval 1 常に latch
+  /// @retval 2 部分的な latch 条件あり
+  ymuint
+  latch_check(MvModule* parent_module,
+	      MvNode* src_node,
+	      MvNode*& cond_node);
 
   /// @brief プリミティブインスタンスの生成を行う．
+  /// @param[in] parent_module 親のモジュール
   /// @param[in] prim プリミティブ
-  /// @param[in] parent_module 親のモジュール
   void
-  gen_priminst(const VlPrimitive* prim,
-	       MvModule* parent_module);
+  gen_priminst(MvModule* parent_module,
+	       const VlPrimitive* prim);
 
-  /// @brief AND のバランス木を作る．
+  /// @brief 継続的代入文の生成を行う．
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_andtree(MvModule* parent_module,
-	      ymuint ni,
-	      vector<pair<MvNode*, ymuint> >& inputs,
-	      ymuint offset);
-
-  /// @brief OR のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_ortree(MvModule* parent_module,
-	     ymuint ni,
-	     vector<pair<MvNode*, ymuint> >& inputs,
-	     ymuint offset);
-
-  /// @brief XOR のバランス木を作る．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ピンを格納する配列
-  /// @param[in] offset inputs のオフセット
-  MvNode*
-  gen_xortree(MvModule* parent_module,
-	      ymuint ni,
-	      vector<pair<MvNode*, ymuint> >& inputs,
-	      ymuint offset);
+  /// @param[in] lhs 左辺式
+  /// @param[in] rhs 右辺式
+  void
+  gen_cont_assign(MvModule* parent_module,
+		  const VlExpr* lhs,
+		  const VlExpr* rhs);
 
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式
+  /// @param[in] env 環境
   MvNode*
-  gen_expr1(MvModule* parent_module,
-	    const VlExpr* expr);
+  gen_expr(MvModule* parent_module,
+	   const VlExpr* expr,
+	   const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
+  /// @param[in] env 環境
   MvNode*
-  gen_expr2(const VlExpr* expr);
+  gen_primary(const VlExpr* expr,
+	      const Env& env);
 
-  /// @brief 宣言要素への参照に対応するノードを作る．
-  /// @param[in] expr 式
-  /// @param[in] bitpos ビット位置
+  /// @brief 右辺式に対応するノードを返す．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] node 右辺式のノード
+  /// @param[in] offset オフセット
+  /// @param[in] bit_width ビット幅
+  /// @note node から [offset: offset + bit_width - 1] の選択するノードを返す．
+  /// @note 全範囲を選択する場合には node を返す．
+  /// @note 範囲が合わなかったら NULL を返す．
   MvNode*
-  gen_expr3(const VlExpr* expr,
-	    ymuint& bitpos);
+  gen_rhs(MvModule* parent_module,
+	  MvNode* node,
+	  ymuint offset,
+	  ymuint bit_width);
 
-  /// @brief 宣言要素への参照に対応するノードを作る．
-  /// @param[in] expr 式
-  /// @param[in] msb MSBのビット位置
-  /// @param[in] lsb LSBのビット位置
-  MvNode*
-  gen_expr4(const VlExpr* expr,
-	    ymuint& msb,
-	    ymuint& lsb);
+  /// @brief 左辺式に接続する．
+  /// @param[in] dst_node 左辺に対応するノード
+  /// @param[in] expr 左辺式
+  /// @param[in] src_node 右辺に対応するノード
+  void
+  connect_lhs(MvNode* dst_node,
+	      const VlExpr* expr,
+	      MvNode* src_node);
+
+  /// @brief 環境をマージする．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] env 対象の環境
+  /// @param[in] cond 条件を表すノード
+  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
+  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
+  void
+  merge_env(MvModule* parent_module,
+	    ProcEnv& env,
+	    MvNode* cond,
+	    const ProcEnv& then_env,
+	    const ProcEnv& else_env);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素
@@ -251,20 +235,16 @@ private:
   /// @param[in] node 登録するノード
   void
   reg_ionode(const VlDecl* decl,
-	   MvNode* node);
+	     MvNode* node);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素(配列型)
   /// @param[in] offset オフセット
   /// @param[in] node 登録するノード
   void
-  reg_node(const VlDecl* decl,
+  reg_node(const VlDeclArray* decl,
 	   ymuint offset,
 	   MvNode* node);
-
-  /// @brief mNodeMap を拡張する．
-  void
-  expand_nodemap(ymuint id);
 
   /// @brief ドライバーを登録する．
   /// @param[in] node 左辺に対応するノード
@@ -288,37 +268,6 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief FF のセル名，ピン名を表す構造体
-  struct FFInfo
-  {
-    /// @brief コンストラクタ
-    FFInfo(const string& data_pin_name,
-	   const string& clock_pin_name,
-	   const string& q_pin_name,
-	   const string& qn_pin_name,
-	   const string& set_pin_name,
-	   const string& reset_pin_name);
-
-    /// @brief データ入力ピン名
-    string mDataPinName;
-    /// @brief クロック入力ピン名
-    string mClockPinName;
-    /// @brief ノーマル出力ピン名
-    string mQPinName;
-    /// @brief 反転出力ピン名
-    string mQnPinName;
-    /// @brief セットピン名
-    string mSetPinName;
-    /// @brief リセットピン名
-    string mResetPinName;
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -328,14 +277,8 @@ private:
   // Verilog を扱うマネージャ
   VlMgr mVlMgr;
 
-  // FF セルの情報を保持するハッシュ表
-  hash_map<string, FFInfo> mFFInfoDict;
-
   // MvNetwork を扱うマネージャ
   MvMgr* mMvMgr;
-
-  // VlDecl と MvNode の対応付けをとるハッシュ表
-  DeclMap mDeclMap;
 
   // VlIODecl と MvNode の対応付けをとるハッシュ表
   DeclMap mIODeclMap;
@@ -343,38 +286,16 @@ private:
   // REG 型オブジェクトに ID 番号を割り当てるためのハッシュ表
   DeclHash mDeclHash;
 
-  // always 文の本体を登録しておくリスト
-  list<const VlStmt*> mProcessList;
+  // トップレベルの環境
+  Env mGlobalEnv;
 
-  // MvNode の ID番号をキーとして VlDecl の情報を保持する配列．
-  vector<pair<const VlDecl*, ymuint> > mNodeMap;
+  // MvNode の ID番号をキーとして VlDecl/VlDeclArray の情報を保持する配列
+  MvVlMap mNodeMap;
 
   // VlDecl のドライバーのリスト
   vector<vector<Driver> > mDriverList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-ReaderImpl::FFInfo::FFInfo(const string& data_pin_name,
-			   const string& clock_pin_name,
-			   const string& q_pin_name,
-			   const string& qn_pin_name,
-			   const string& set_pin_name,
-			   const string& reset_pin_name) :
-  mDataPinName(data_pin_name),
-  mClockPinName(clock_pin_name),
-  mQPinName(q_pin_name),
-  mQnPinName(qn_pin_name),
-  mSetPinName(set_pin_name),
-  mResetPinName(reset_pin_name)
-{
-}
 
 END_NAMESPACE_YM_MVN_VERILOG
 

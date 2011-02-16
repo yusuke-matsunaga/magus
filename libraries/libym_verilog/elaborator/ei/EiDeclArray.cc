@@ -185,22 +185,57 @@ EiDeclArray::is_signed() const
   return mHead->is_signed();
 }
 
-// @brief MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
-int
-EiDeclArray::left_range_const() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclArray::has_range() const
 {
-  return mHead->left_range_const();
+  return mHead->has_range();
 }
 
-// @brief LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiDeclArray::right_range_const() const
+EiDeclArray::left_range_val() const
 {
-  return mHead->right_range_const();
+  return mHead->left_range_val();
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclArray::right_range_val() const
+{
+  return mHead->right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclArray::left_range_string() const
+{
+  return mHead->left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclArray::right_range_string() const
+{
+  return mHead->right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclArray::is_big_endian() const
+{
+  return mHead->is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclArray::is_little_endian() const
+{
+  return mHead->is_little_endian();
 }
 
 // @brief ビット幅を返す．
@@ -284,67 +319,63 @@ EiDeclArray::delay() const
   return mHead->delay();
 }
 
-// @brief dimension list のサイズの取得
-// @return dimension list のサイズ
+// @brief 配列型オブジェクトの時に true を返す．
+bool
+EiDeclArray::is_array() const
+{
+  return true;
+}
+
+// @brief 多次元の配列型オブジェクトの時に true を返す．
+bool
+EiDeclArray::is_multi_array() const
+{
+  return dimension() > 1;
+}
+
+// @brief 配列型オブジェクトの場合の次元数の取得
 ymuint
-EiDeclArray::dimension_list_size() const
+EiDeclArray::dimension() const
 {
   return mRangeList.size();
 }
 
 // @brief 範囲の取得
-// @param[in] pos 位置 (0 <= pos < dimension_list_size())
+// @param[in] pos 位置 ( 0 <= pos < dimension() )
 const VlRange*
 EiDeclArray::range(ymuint pos) const
 {
   return mRangeList.range(pos);
 }
 
-// @brief 配列要素の時に true を返す．
-// @note このクラスでは false を返す．
-bool
-EiDeclArray::is_array_member() const
-{
-  return false;
-}
-
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclArray::_left_range() const
-{
-  return mHead->left_range();
-}
-
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclArray::_right_range() const
-{
-  return mHead->right_range();
-}
-
-// @brief インデックスからオフセットを計算する．
-// @param[in] index_array インデックス式の配列
+// @brief 配列の要素数の取得
 ymuint
-EiDeclArray::calc_offset(const vector<ElbExpr*>& index_array) const
+EiDeclArray::array_size() const
 {
-  ymuint n = mRangeList.size();
-  assert_cond( index_array.size() == n, __FILE__, __LINE__);
-  ymuint offset = 0;
-  for (ymuint i = 0; i < n; ++ i) {
-    const EiRange* r = mRangeList.range(i);
-    int k = r->size();
-    offset *= k;
-    int index;
-    bool stat = index_array[i]->eval_int(index);
-    assert_cond( stat, __FILE__, __LINE__);
-    int offset1 = r->roffset(index);
-    offset += offset1;
+  return mRangeList.elem_size();
+}
+
+// @brief 1次元配列の場合にインデックスからオフセットを計算する．
+// @param[in] index インデックス
+// @return index に対するオフセット値を返す．
+// @note index が範囲外の場合には -1 を返す．
+int
+EiDeclArray::array_offset(int index) const
+{
+  if ( mRangeList.size() == 1 ) {
+    return mRangeList.range(0)->offset(index);
   }
-  return offset;
+  return -1;
+}
+
+// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
+// @param[in] index_list インデックスのリスト
+// @return index_list に対するオフセット値を返す．
+// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+int
+EiDeclArray::array_offset(const vector<int>& index_list) const
+{
+  return mRangeList.offset(index_list);
 }
 
 

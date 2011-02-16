@@ -13,4 +13,5 @@ noinst_HEADERS = \
 	VlTime.h \
 	BitVector.h \
 	VlLineWatcher.h \
-	VlMgr.h
+	VlMgr.h \
+	VlValue.h

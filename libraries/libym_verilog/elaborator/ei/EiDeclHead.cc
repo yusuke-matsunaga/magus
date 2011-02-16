@@ -32,8 +32,8 @@ BEGIN_NAMESPACE_YM_VERILOG
 ElbDeclHead*
 EiFactory::new_DeclHead(const VlNamedObj* parent,
 			const PtDeclHead* pt_head,
-			ElbExpr* left,
-			ElbExpr* right,
+			const PtExpr* left,
+			const PtExpr* right,
 			int left_val,
 			int right_val,
 			bool delay)
@@ -89,8 +89,8 @@ ElbDeclHead*
 EiFactory::new_DeclHead(const VlNamedObj* parent,
 			const PtIOHead* pt_head,
 			tVpiAuxType aux_type,
-			ElbExpr* left,
-			ElbExpr* right,
+			const PtExpr* left,
+			const PtExpr* right,
 			int left_val,
 			int right_val)
 {
@@ -127,8 +127,8 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 ElbDeclHead*
 EiFactory::new_DeclHead(const VlNamedObj* parent,
 			const PtItem* pt_item,
-			ElbExpr* left,
-			ElbExpr* right,
+			const PtExpr* left,
+			const PtExpr* right,
 			int left_val,
 			int right_val)
 {
@@ -242,6 +242,59 @@ bool
 EiDeclHeadPt::is_signed() const
 {
   return mPtHead->is_signed();
+}
+
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclHeadPt::has_range() const
+{
+  return false;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt::left_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt::right_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt::right_range_string() const
+{
+  return string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt::is_little_endian() const
+{
+  return true;
 }
 
 // @brief ビット幅を返す．
@@ -461,8 +514,8 @@ EiDeclHeadPtD::set_delay(ElbDelay* delay)
 // @param[in] right_val 範囲の右側の値
 EiDeclHeadPtV::EiDeclHeadPtV(const VlNamedObj* parent,
 			     const PtDeclHead* pt_header,
-			     ElbExpr* left,
-			     ElbExpr* right,
+			     const PtExpr* left,
+			     const PtExpr* right,
 			     int left_val,
 			     int right_val) :
   EiDeclHeadPt(parent, pt_header)
@@ -475,36 +528,57 @@ EiDeclHeadPtV::~EiDeclHeadPtV()
 {
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclHeadPtV::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclHeadPtV::has_range() const
 {
-  return mRange.left_range();
+  return true;
 }
 
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclHeadPtV::right_range() const
-{
-  return mRange.right_range();
-}
-
-// @brief MSB の値を返す．
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiDeclHeadPtV::left_range_const() const
+EiDeclHeadPtV::left_range_val() const
 {
-  return mRange.left_range_const();
+  return mRange.left_range_val();
 }
 
-// @brief LSB の値を返す．
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiDeclHeadPtV::right_range_const() const
+EiDeclHeadPtV::right_range_val() const
 {
-  return mRange.right_range_const();
+  return mRange.right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPtV::left_range_string() const
+{
+  return mRange.left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPtV::right_range_string() const
+{
+  return mRange.right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPtV::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPtV::is_little_endian() const
+{
+  return mRange.is_little_endian();
 }
 
 // @brief ビット幅を返す．
@@ -538,8 +612,8 @@ EiDeclHeadPtV::bit_offset(int index) const
 // @param[in] right_val 範囲の右側の値
 EiDeclHeadPtVD::EiDeclHeadPtVD(const VlNamedObj* parent,
 			       const PtDeclHead* pt_header,
-			       ElbExpr* left,
-			       ElbExpr* right,
+			       const PtExpr* left,
+			       const PtExpr* right,
 			       int left_val,
 			       int right_val) :
   EiDeclHeadPtV(parent, pt_header, left, right, left_val, right_val),
@@ -621,6 +695,59 @@ bool
 EiDeclHeadPt2::is_signed() const
 {
   return mPtHead->is_signed();
+}
+
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclHeadPt2::has_range() const
+{
+  return false;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt2::left_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt2::right_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt2::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt2::right_range_string() const
+{
+  return string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt2::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt2::is_little_endian() const
+{
+  return true;
 }
 
 // @brief ビット幅を返す．
@@ -724,8 +851,8 @@ EiDeclHeadPt2::net_type() const
 EiDeclHeadPt2V::EiDeclHeadPt2V(const VlNamedObj* parent,
 			       const PtIOHead* pt_header,
 			       tVpiAuxType aux_type,
-			       ElbExpr* left,
-			       ElbExpr* right,
+			       const PtExpr* left,
+			       const PtExpr* right,
 			       int left_val,
 			       int right_val) :
   EiDeclHeadPt2(parent, pt_header, aux_type)
@@ -738,22 +865,57 @@ EiDeclHeadPt2V::~EiDeclHeadPt2V()
 {
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclHeadPt2V::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclHeadPt2V::has_range() const
 {
-  return mRange.left_range();
+  return true;
 }
 
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclHeadPt2V::right_range() const
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt2V::left_range_val() const
 {
-  return mRange.right_range();
+  return mRange.left_range_val();
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt2V::right_range_val() const
+{
+  return mRange.right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt2V::left_range_string() const
+{
+  return mRange.left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt2V::right_range_string() const
+{
+  return mRange.right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt2V::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt2V::is_little_endian() const
+{
+  return mRange.is_little_endian();
 }
 
 // @brief ビット幅を返す．
@@ -816,6 +978,59 @@ bool
 EiDeclHeadPt3::is_signed() const
 {
   return mPtItem->is_signed();
+}
+
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclHeadPt3::has_range() const
+{
+  return false;
+}
+
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt3::left_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt3::right_range_val() const
+{
+  return 0;
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt3::left_range_string() const
+{
+  return string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt3::right_range_string() const
+{
+  return string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt3::is_big_endian() const
+{
+  return true;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt3::is_little_endian() const
+{
+  return true;
 }
 
 // @brief ビット幅を返す．
@@ -903,8 +1118,8 @@ EiDeclHeadPt3::net_type() const
 // @param[in] right_val 範囲の右側の値
 EiDeclHeadPt3V::EiDeclHeadPt3V(const VlNamedObj* parent,
 			       const PtItem* pt_item,
-			       ElbExpr* left,
-			       ElbExpr* right,
+			       const PtExpr* left,
+			       const PtExpr* right,
 			       int left_val,
 			       int right_val) :
   EiDeclHeadPt3(parent, pt_item)
@@ -917,22 +1132,57 @@ EiDeclHeadPt3V::~EiDeclHeadPt3V()
 {
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclHeadPt3V::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiDeclHeadPt3V::has_range() const
 {
-  return mRange.left_range();
+  return true;
 }
 
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-ElbExpr*
-EiDeclHeadPt3V::right_range() const
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt3V::left_range_val() const
 {
-  return mRange.right_range();
+  return mRange.left_range_val();
+}
+
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
+int
+EiDeclHeadPt3V::right_range_val() const
+{
+  return mRange.right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt3V::left_range_string() const
+{
+  return mRange.left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiDeclHeadPt3V::right_range_string() const
+{
+  return mRange.right_range_string();
+}
+
+// @brief left_range >= right_range の時に true を返す．
+bool
+EiDeclHeadPt3V::is_big_endian() const
+{
+  return mRange.is_big_endian();
+}
+
+// @brief left_range <= right_range の時に true を返す．
+bool
+EiDeclHeadPt3V::is_little_endian() const
+{
+  return mRange.is_little_endian();
 }
 
 // @brief ビット幅を返す．

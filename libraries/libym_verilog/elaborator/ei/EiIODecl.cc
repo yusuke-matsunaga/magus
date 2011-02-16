@@ -260,40 +260,43 @@ EiIODecl::is_signed() const
   return mDecl->is_signed();
 }
 
-// @brief 範囲のMSBの取得
-// @retval 範囲のMSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-const VlExpr*
-EiIODecl::left_range() const
+// @brief 範囲指定を持つとき true を返す．
+bool
+EiIODecl::has_range() const
 {
-  return mDecl->left_range();
+  return mDecl->has_range();
 }
 
-// @brief 範囲のLSBの取得
-// @retval 範囲のLSB 範囲を持つとき
-// @retval NULL 範囲を持たないとき
-const VlExpr*
-EiIODecl::right_range() const
-{
-  return mDecl->right_range();
-}
-
-// @brief MSB の値を返す．
-// @retval 範囲のMSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @brief 範囲の MSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiIODecl::left_range_const() const
+EiIODecl::left_range_val() const
 {
-  return mDecl->left_range_const();
+  return mDecl->left_range_val();
 }
 
-// @brief LSB の値を返す．
-// @retval 範囲のLSBの値 範囲指定を持つとき
-// @retval -1 範囲指定を持たないとき
+// @brief 範囲の LSB の値を返す．
+// @note 範囲を持たないときの値は不定
 int
-EiIODecl::right_range_const() const
+EiIODecl::right_range_val() const
 {
-  return mDecl->right_range_const();
+  return mDecl->right_range_val();
+}
+
+// @brief 範囲のMSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiIODecl::left_range_string() const
+{
+  return mDecl->left_range_string();
+}
+
+// @brief 範囲のLSBを表す文字列の取得
+// @note 範囲を持たない時の値は不定
+string
+EiIODecl::right_range_string() const
+{
+  return mDecl->right_range_string();
 }
 
 // @brief ビット幅を返す．

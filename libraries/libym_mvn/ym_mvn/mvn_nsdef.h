@@ -39,7 +39,6 @@ BEGIN_NAMESPACE_YM_MVN
 // クラス名の先行宣言
 
 class MvMgr;
-class MvVerilogReader;
 class MvModule;
 class MvPort;
 class MvPortRef;
@@ -50,6 +49,9 @@ class MvNet;
 
 typedef DlList<MvInputPin> MvInputPinList;
 
+class MvVerilogReader;
+class MvVlMap;
+
 class Mvn2Sbj;
 class MvNodeMap;
 
@@ -58,7 +60,6 @@ END_NAMESPACE_YM_MVN
 BEGIN_NAMESPACE_YM
 
 using nsMvn::MvMgr;
-using nsMvn::MvVerilogReader;
 using nsMvn::MvModule;
 using nsMvn::MvPort;
 using nsMvn::MvPortRef;
@@ -67,6 +68,9 @@ using nsMvn::MvInputPin;
 using nsMvn::MvInputPinList;
 using nsMvn::MvOutputPin;
 using nsMvn::MvNet;
+
+using nsMvn::MvVerilogReader;
+using nsMvn::MvVlMap;
 
 using nsMvn::Mvn2Sbj;
 using nsMvn::MvNodeMap;

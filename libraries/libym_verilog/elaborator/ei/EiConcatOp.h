@@ -31,7 +31,7 @@ protected:
   /// @param[in] pt_expr パース木の定義要素
   /// @param[in] opr_size オペランド数
   /// @param[in] opr_array オペランドを格納する配列
-  EiConcatOp(const PtBase* pt_obj,
+  EiConcatOp(const PtExpr* pt_expr,
 	     ymuint opr_size,
 	     ElbExpr** opr_array);
 
@@ -56,48 +56,10 @@ public:
   bool
   is_const() const;
 
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
   /// @brief オペランド数を返す．
   virtual
   ymuint
   operand_num() const;
-
-  /// @brief スカラー値を返す．
-  virtual
-  tVpiScalarVal
-  eval_scalar() const;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数 (private)
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
 
 
 public:
@@ -111,13 +73,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
 
 
 public:
@@ -176,8 +131,8 @@ private:
   /// @param[in] opr_size オペランド数
   /// @param[in] opr_array オペランドを格納する配列
   /// @note は opr_size は繰り返し数のオペランドは含まない．
-  EiMultiConcatOp(const PtBase* pt_obj,
-		  ElbExpr* rep_expr,
+  EiMultiConcatOp(const PtExpr* pt_expr,
+		  const PtExpr* rep_expr,
 		  int rep_num,
 		  ymuint opr_size,
 		  ElbExpr** opr_array);
@@ -197,40 +152,16 @@ public:
   tVpiValueType
   value_type() const;
 
-  /// @brief 演算子のタイプを返す．
-  virtual
-  tVpiOpType
-  op_type() const;
-
   /// @brief オペランド数を返す．
   virtual
   ymuint
   operand_num() const;
 
-  /// @brief bitvector 型の値を返す．
+  /// @brief 繰り返し数を返す．
+  /// @note multiple concatenation の時のみ意味を持つ．
   virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ElbExpr の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief decompile() の実装関数
-  /// @param[in] pprim 親の演算子の優先順位
-  virtual
-  string
-  decompile_impl(int ppri) const;
-
-  /// @brief ビットベクタを書き込む．
-  /// @param[in] v 書き込む値
-  /// @note 左辺式の時のみ意味を持つ．
-  virtual
-  void
-  set_bitvector(const BitVector& v);
+  ymuint
+  rep_num() const;
 
 
 public:
@@ -251,7 +182,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 繰り返し数を表す式
-  ElbExpr* mRepExpr;
+  const PtExpr* mRepExpr;
 
   // 繰り返し数
   int mRepNum;

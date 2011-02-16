@@ -26,23 +26,23 @@ BEGIN_NAMESPACE_YM_VERILOG
 class VmNode
 {
   friend class VerilogModel;
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   VmNode();
 
   /// @brief デストラクタ
   virtual
   ~VmNode();
-  
-  
+
+
 public:
 
   /// @brief 親のインデックスを返す．
   QModelIndex
   parent_index() const;
-  
+
   /// @brief 子供の数を返す．
   int
   child_num() const;
@@ -54,12 +54,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const = 0;
-  
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -75,14 +75,14 @@ protected:
   /// @param[in] iodecl_list IO宣言のリスト
   void
   add_iolist(const vector<const VlIODecl*>& iodecl_list) const;
-  
+
   /// @brief ExprListNode を追加する．
   /// @param[in] label ラベル
   /// @param[in] expr_list 式の配列
   void
   add_exprlist(const QString& label,
 	       const vector<const VlExpr*>& expr_list) const;
-  
+
   /// @brief ExprNode を追加する．
   /// @param[in] label ラベル
   /// @param[in] expr 式
@@ -106,7 +106,7 @@ protected:
   /// @param[in] value 値
   void
   add_dir(tVpiDirection dir) const;
-  
+
   /// @brief 文字列型のノードを追加する．
   /// @param[in] label ラベル
   /// @param[in] value 値
@@ -148,11 +148,11 @@ protected:
   void
   add_int(const QString& label,
 	  ymuint value) const;
-  
+
   /// @brief 子供を追加する．
   void
   add_child(VmNode* node) const;
-    
+
 
 private:
 
@@ -161,23 +161,23 @@ private:
   void
   expand() const = 0;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親のノード
   QModelIndex mParentIndex;
-  
+
   // 子供の配列を作っているかを示すフラグ
   mutable
   bool mExpanded;
-  
+
   // 子供の配列
   mutable
   std::vector<VmNode*> mChildren;
-  
+
 };
 
 
@@ -189,7 +189,7 @@ class VmNode1 :
   public VmNode
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] mgr VlMgr
   VmNode1(const VlMgr& mgr);
@@ -207,7 +207,7 @@ protected:
   /// @brief VlMgr を取り出す．
   const VlMgr&
   vl_mgr() const;
-  
+
   /// @brief UdpListNode を追加する．
   void
   add_udplist() const;
@@ -227,6 +227,13 @@ protected:
   void
   add_decllist(const QString& label,
 	       const vector<const VlDecl*>& decl_list) const;
+
+  /// @brief DeclArrayListNode を追加する．
+  /// @param[in] label ラベル
+  /// @param[in] declarray_list 宣言のリスト
+  void
+  add_declarraylist(const QString& label,
+		    const vector<const VlDeclArray*>& declarray_list) const;
 
   /// @brief StmtNodeを追加する．
   /// @param[in] label ラベル
@@ -254,7 +261,7 @@ protected:
   /// @param[in] task_list タスクのリスト
   void
   add_tasklist(const vector<const VlTaskFunc*>& task_list) const;
-  
+
   /// @brief FuncListNode を追加する．
   /// @param[in] function_list 関数のリスト
   void
@@ -284,13 +291,13 @@ protected:
   /// @param[in] primarray_list プリミティブ配列のリスト
   void
   add_primarraylist(const vector<const VlPrimArray*>& primarray_list) const;
-  
+
   /// @brief ProcessListNode を追加する．
   /// @param[in] process_list プロセスのリスト
   void
   add_processlist(const vector<const VlProcess*>& process_list) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -313,7 +320,7 @@ VmNode::parent_index() const
 {
   return mParentIndex;
 }
-  
+
 // @brief 子供の数を返す．
 inline
 int

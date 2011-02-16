@@ -44,72 +44,27 @@ public:
   const char*
   ext_name() const = 0;
 
+  /// @brief 内側のポート結線を表す式の取得
+  virtual
+  const PtExpr*
+  portref() const = 0;
+
   /// @brief 内部のポート結線リストのサイズの取得
   virtual
   ymuint
-  portref_num() const = 0;
+  portref_size() const = 0;
 
   /// @brief 内部のポート結線リストの取得
   /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
-  const PtPortRef*
-  portref(ymuint pos) const = 0;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class PtPortRef PtPort.h <ym_verilog/pt/PtPort.h>
-/// @ingroup VlParser
-/// @ingroup PtGroup
-/// @brief port reference を表すクラス
-//////////////////////////////////////////////////////////////////////
-class PtPortRef :
-  public PtNamedBase
-{
-public:
-
-  /// @brief 仮想デストラクタ
-  virtual
-  ~PtPortRef() { }
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // PtPortRef の継承クラスが実装しなければならない仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief インデックスの取得
-  /// @return インデックスを表す式
-  virtual
   const PtExpr*
-  index() const = 0;
+  portref_elem(ymuint pos) const = 0;
 
-  /// @brief 範囲指定モードの取得
-  /// @retval kVpiNoRange 範囲指定なし
-  /// @retval kVpiConstRange [ a : b ] のタイプ
-  /// @retval kVpiPlusRange  [ a :+ b ] のタイプ
-  /// @retval kVpiMinusRange [ a :- b ] のタイプ
-  virtual
-  tVpiRangeMode
-  range_mode() const = 0;
-
-  /// @brief 範囲の左側の式の取得
-  /// @return 範囲の左側の式
-  virtual
-  const PtExpr*
-  left_range() const = 0;
-
-  /// @brief 範囲の右側の式の取得
-  /// @return 範囲の右側の式
-  virtual
-  const PtExpr*
-  right_range() const = 0;
-
-  /// @brief 方向を得る．
+  /// @brief 内部ポート結線の方向の取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
   virtual
   tVpiDirection
-  dir() const = 0;
+  portref_dir(ymuint pos) const = 0;
 
 };
 

@@ -46,10 +46,18 @@ MislibPtNot::is_expr() const
 }
 
 // 1番目の子供を取り出す．
-MislibPt*
+const MislibPt*
 MislibPtNot::child1() const
 {
   return mChild1;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtNot::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  return ~child1()->to_expr(name_map);
 }
 
 // 内容を出力する．
@@ -69,6 +77,47 @@ MislibPtNot::dump(ostream& s) const
 
 
 //////////////////////////////////////////////////////////////////////
+// 2項演算子を表すクラス
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+MislibPtBop::MislibPtBop(const FileRegion& loc,
+			 MislibPt* child1,
+			 MislibPt* child2) :
+  MislibPt(loc),
+  mChild1(child1),
+  mChild2(child2)
+{
+}
+
+// デストラクタ
+MislibPtBop::~MislibPtBop()
+{
+}
+
+// @brief 論理式を表す型のときに true を返す．
+bool
+MislibPtBop::is_expr() const
+{
+  return true;
+}
+
+// 1番目の子供を取り出す．
+const MislibPt*
+MislibPtBop::child1() const
+{
+  return mChild1;
+}
+
+// 2番目の子供を取り出す．
+const MislibPt*
+MislibPtBop::child2() const
+{
+  return mChild2;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // AND論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
 
@@ -76,9 +125,7 @@ MislibPtNot::dump(ostream& s) const
 MislibPtAnd::MislibPtAnd(const FileRegion& loc,
 			 MislibPt* child1,
 			 MislibPt* child2) :
-  MislibPt(loc),
-  mChild1(child1),
-  mChild2(child2)
+  MislibPtBop(loc, child1, child2)
 {
 }
 
@@ -94,25 +141,12 @@ MislibPtAnd::type() const
   return kAnd;
 }
 
-// @brief 論理式を表す型のときに true を返す．
-bool
-MislibPtAnd::is_expr() const
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtAnd::to_expr(const hash_map<ShString, ymuint>& name_map) const
 {
-  return true;
-}
-
-// 1番目の子供を取り出す．
-MislibPt*
-MislibPtAnd::child1() const
-{
-  return mChild1;
-}
-
-// 2番目の子供を取り出す．
-MislibPt*
-MislibPtAnd::child2() const
-{
-  return mChild2;
+  return child1()->to_expr(name_map) & child2()->to_expr(name_map);
 }
 
 // 内容を出力する．
@@ -143,9 +177,7 @@ MislibPtAnd::dump(ostream& s) const
 MislibPtOr::MislibPtOr(const FileRegion& loc,
 		       MislibPt* child1,
 		       MislibPt* child2) :
-  MislibPt(loc),
-  mChild1(child1),
-  mChild2(child2)
+  MislibPtBop(loc, child1, child2)
 {
 }
 
@@ -161,25 +193,12 @@ MislibPtOr::type() const
   return kOr;
 }
 
-// @brief 論理式を表す型のときに true を返す．
-bool
-MislibPtOr::is_expr() const
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtOr::to_expr(const hash_map<ShString, ymuint>& name_map) const
 {
-  return true;
-}
-
-// 1番目の子供を取り出す．
-MislibPt*
-MislibPtOr::child1() const
-{
-  return mChild1;
-}
-
-// 2番目の子供を取り出す．
-MislibPt*
-MislibPtOr::child2() const
-{
-  return mChild2;
+  return child1()->to_expr(name_map) | child2()->to_expr(name_map);
 }
 
 // 内容を出力する．
@@ -199,6 +218,58 @@ MislibPtOr::dump(ostream& s) const
   s << "</CHILD2>" << endl;
 
   s << "</OR>" << endl;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// XOR論理式を表すクラス
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+MislibPtXor::MislibPtXor(const FileRegion& loc,
+			 MislibPt* child1,
+			 MislibPt* child2) :
+  MislibPtBop(loc, child1, child2)
+{
+}
+
+// デストラクタ
+MislibPtXor::~MislibPtXor()
+{
+}
+
+// 種類を取り出す．
+MislibPt::tType
+MislibPtXor::type() const
+{
+  return kXor;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtXor::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  return child1()->to_expr(name_map) ^ child2()->to_expr(name_map);
+}
+
+// 内容を出力する．
+// デバッグ用
+void
+MislibPtXor::dump(ostream& s) const
+{
+  s << "<XOR>" << endl;
+  dump_loc(s);
+
+  s << "<CHILD1>" << endl;
+  child1()->dump(s);
+  s << "</CHILD1>" << endl;
+
+  s << "<CHILD2>" << endl;
+  child2()->dump(s);
+  s << "</CHILD2>" << endl;
+
+  s << "</XOR>" << endl;
 }
 
 

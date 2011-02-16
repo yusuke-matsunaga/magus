@@ -50,6 +50,9 @@ private:
   // verilog オプションの解析用オブジェクト
   TclPopt* mPoptVerilog;
 
+  // spice オプションの解析用オブジェクト
+  TclPopt* mPoptSpice;
+
 };
 
 END_NAMESPACE_MAGUS_TECHMAP

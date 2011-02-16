@@ -13,7 +13,7 @@
 
 #include "ym_utils/FileRegion.h"
 
-#include "ym_verilog/pt/PtExpr.h"
+#include "PtiExpr.h"
 #include "ym_verilog/pt/PtArray.h"
 
 
@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class SptExpr :
-  public PtExpr
+  public PtiExpr
 {
   friend class SptFactory;
 
@@ -58,7 +58,7 @@ public:
   /// @note このクラスでは kVpiNullOp を返す．
   virtual
   tVpiOpType
-  opr_type() const;
+  op_type() const;
 
   /// @brief 階層ブランチの取得
   /// system function call の場合は常に NULL
@@ -216,9 +216,9 @@ private:
   /// コンストラクタ
   SptOpr1(const FileRegion& file_region,
 	  tVpiOpType op_type,
-	  PtExpr* opr1,
-	  PtExpr* opr2 = NULL,
-	  PtExpr* opr3 = NULL);
+	  const PtExpr* opr1,
+	  const PtExpr* opr2 = NULL,
+	  const PtExpr* opr3 = NULL);
 
   /// デストラクタ
   virtual
@@ -242,7 +242,8 @@ public:
 
   /// 演算子の種類の取得
   virtual
-  tVpiOpType opr_type() const;
+  tVpiOpType
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数
@@ -262,13 +263,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の種類
-  tVpiOpType mOprType;
+  tVpiOpType mOpType;
 
   // オペランド数
   ymuint32 mSize;
 
   // オペランドの配列
-  PtExpr* mExprList[3];
+  const PtExpr* mExprList[3];
 
 };
 
@@ -310,7 +311,8 @@ public:
 
   /// 演算子の種類の取得
   virtual
-  tVpiOpType opr_type() const;
+  tVpiOpType
+  op_type() const;
 
   /// @brief オペランドの数の取得
   /// @return 子供の数
@@ -330,7 +332,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の種類
-  tVpiOpType mOprType;
+  tVpiOpType mOpType;
 
   // オペランドのリスト
   PtExprArray mExprArray;
@@ -420,8 +422,8 @@ private:
 	     bool const_index,
 	     PtExprArray index_array = PtExprArray(),
 	     tVpiRangeMode mode = kVpiNoRange,
-	     PtExpr* left = NULL,
-	     PtExpr* right = NULL);
+	     const PtExpr* left = NULL,
+	     const PtExpr* right = NULL);
 
   /// デストラクタ
   virtual
@@ -497,10 +499,10 @@ private:
   tVpiRangeMode mMode;
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 

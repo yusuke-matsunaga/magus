@@ -6,7 +6,12 @@ SUBDIRS =
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/spt \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/cpt \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/ei
 
 CLEANFILES =
 
@@ -16,7 +21,11 @@ noinst_LTLIBRARIES = libym_vl_common.la
 
 libym_vl_common_la_SOURCES = \
 	BitVector.cc \
+	VlValueRep.h \
+	VlValue.cc \
+	VlMgr.cc \
 	udpval.cc
+
 
 libym_vl_common_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

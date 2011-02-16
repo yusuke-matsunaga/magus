@@ -24,15 +24,15 @@ class ElbScope :
   public VlNamedObj
 {
   friend class CellScope;
-  
+
 protected:
 
   /// @brief コンストラクタ
-  ElbScope() { }
-  
+  ElbScope();
+
   /// @brief デストラクタ
   virtual
-  ~ElbScope() { }
+  ~ElbScope();
 
 
 public:
@@ -52,7 +52,7 @@ private:
 
   // 次の要素を指すポインタ
   ElbScope* mNext;
-  
+
 };
 
 

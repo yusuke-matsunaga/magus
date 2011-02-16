@@ -12,6 +12,7 @@
 #include "EiFactory.h"
 #include "EiConcatOp.h"
 
+#include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/BitVector.h"
 
 
@@ -26,7 +27,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr_num オペランド数
 // @param[in] opr_list オペランドのリスト
 ElbExpr*
-EiFactory::new_ConcatOp(const PtBase* pt_expr,
+EiFactory::new_ConcatOp(const PtExpr* pt_expr,
 			ymuint opr_size,
 			ElbExpr** opr_list)
 {
@@ -43,8 +44,8 @@ EiFactory::new_ConcatOp(const PtBase* pt_expr,
 // @param[in] opr_num オペランド数
 // @param[in] opr_list オペランドのリスト
 ElbExpr*
-EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
-			     ElbExpr* rep_expr,
+EiFactory::new_MultiConcatOp(const PtExpr* pt_expr,
+			     const PtExpr* rep_expr,
 			     int rep_num,
 			     ymuint opr_size,
 			     ElbExpr** opr_list)
@@ -62,13 +63,13 @@ EiFactory::new_MultiConcatOp(const PtBase* pt_expr,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] opr_size オペランド数
 // @param[in] opr_array オペランドを格納する配列
-EiConcatOp::EiConcatOp(const PtBase* pt_obj,
+EiConcatOp::EiConcatOp(const PtExpr* pt_expr,
 		       ymuint opr_size,
 		       ElbExpr** opr_array) :
-  EiOperation(pt_obj),
+  EiOperation(pt_expr),
   mOprNum(opr_size),
   mOprList(opr_array)
 {
@@ -111,64 +112,6 @@ EiConcatOp::is_const() const
   return true;
 }
 
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiConcatOp::eval_scalar() const
-{
-  // 最後の要素の LSB を返す．
-  return operand(operand_num() - 1)->eval_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiConcatOp::eval_logic() const
-{
-  BitVector bv;
-  eval_bitvector(bv);
-  return bv.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiConcatOp::eval_real() const
-{
-  BitVector bv;
-  eval_bitvector(bv);
-  return bv.to_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiConcatOp::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  ymuint n = operand_num();
-  vector<BitVector> vlist(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = operand(i);
-    expr->eval_bitvector(vlist[i]);
-  }
-  bitvector = concat(vlist);
-  bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiConcatOp::decompile_impl(int ppri) const
-{
-  string ans("{");
-  const char* delim = "";
-  ymuint n = operand_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = operand(i);
-    ans += delim + expr->decompile();
-    delim = ",";
-  }
-  ans += "}";
-  return ans;
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -176,22 +119,6 @@ void
 EiConcatOp::set_reqsize(tVpiValueType type)
 {
   // なにもしない．
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConcatOp::set_bitvector(const BitVector& v)
-{
-  #warning "TODO: 要素に合わせて v を切り刻む．"
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiConcatOp::op_type() const
-{
-  return kVpiConcatOp;
 }
 
 // @brief オペランド数を返す．
@@ -215,21 +142,20 @@ EiConcatOp::_operand(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] pt_obj パース木の定義要素
+// @param[in] pt_expr パース木の定義要素
 // @param[in] rep_expr 繰り返し数を表す式
 // @param[in] rep_num 繰り返し数
 // @param[in] opr_size オペランド数
 // @param[in] opr_array オペランドを格納する配列
-EiMultiConcatOp::EiMultiConcatOp(const PtBase* pt_obj,
-				 ElbExpr* rep_expr,
+EiMultiConcatOp::EiMultiConcatOp(const PtExpr* pt_expr,
+				 const PtExpr* rep_expr,
 				 int rep_num,
 				 ymuint opr_size,
 				 ElbExpr** opr_array) :
-  EiConcatOp(pt_obj, opr_size, opr_array),
+  EiConcatOp(pt_expr, opr_size, opr_array),
   mRepExpr(rep_expr),
   mRepNum(rep_num)
 {
-  mRepExpr->set_selfsize();
 }
 
 // @brief デストラクタ
@@ -244,60 +170,19 @@ EiMultiConcatOp::value_type() const
   return pack(kVpiValueUS, bit_size() * mRepNum);
 }
 
-// @brief bitvector 型の値を返す．
-void
-EiMultiConcatOp::eval_bitvector(BitVector& bitvector,
-				tVpiValueType req_type) const
-{
-  ymuint n = EiConcatOp::operand_num();
-  vector<BitVector> vlist(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = EiConcatOp::operand(i);
-    expr->eval_bitvector(vlist[i]);
-  }
-  bitvector = multi_concat(BitVector(mRepNum), vlist);
-  bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiMultiConcatOp::decompile_impl(int ppri) const
-{
-  string ans("{");
-  ans += mRepExpr->decompile() + "{";
-  const char* comma = "";
-  ymuint n = EiConcatOp::operand_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    const VlExpr* expr = EiConcatOp::operand(i);
-    ans += comma + expr->decompile();
-    comma = ",";
-  }
-  ans += "}}";
-  return ans;
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiMultiConcatOp::set_bitvector(const BitVector& v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 演算子のタイプを返す．
-tVpiOpType
-EiMultiConcatOp::op_type() const
-{
-  return kVpiMultiConcatOp;
-}
-
 // @brief オペランド数を返す．
 ymuint
 EiMultiConcatOp::operand_num() const
 {
   return EiConcatOp::operand_num() + 1;
+}
+
+// @brief 繰り返し数を返す．
+// @note multiple concatenation の時のみ意味を持つ．
+ymuint
+EiMultiConcatOp::rep_num() const
+{
+  return mRepNum;
 }
 
 // @brief オペランドを返す．
@@ -306,7 +191,8 @@ ElbExpr*
 EiMultiConcatOp::_operand(ymuint pos) const
 {
   if ( pos == 0 ) {
-    return mRepExpr;
+#warning "TODO: なんとかする．"
+    return NULL;
   }
   return EiConcatOp::_operand(pos - 1);
 }

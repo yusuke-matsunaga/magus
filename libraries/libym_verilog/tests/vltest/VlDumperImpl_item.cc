@@ -49,8 +49,8 @@ VlDumperImpl::put_primarray_list(const char* label,
     put("FileRegion", primarray->file_region() );
     put("vpiFullName", primarray->full_name() );
     put("vpiSize", primarray->elem_num() );
-    put_expr("vpiLeftRange", mgr, primarray->left_range() );
-    put_expr("vpiRightRange", mgr, primarray->right_range() );
+    put("vpiLeftRange", primarray->left_range_val() );
+    put("vpiRightRange", primarray->right_range_val() );
     put_delay("vpiDelay", mgr, primarray->delay() );
 
     ymuint n = primarray->elem_num();
@@ -168,9 +168,7 @@ VlDumperImpl::put_udp_defn(const char* label,
   }
   put_iodecl("vpiIODecl", mgr, udp->output());
 
-  if ( udp->init_expr() ) {
-    put_expr("vpiInitial", mgr, udp->init_expr() );
-  }
+  put("vpiInitial", udp->init_val_string());
 
   {
     VlDumpHeader x(this, "vpiTableEntry", "Iterator");
@@ -226,8 +224,8 @@ VlDumperImpl::put_function(const char* label,
   put("vpiFuncType", func->func_type() );
   put("vpiSigned", func->is_signed() );
   put("vpiSize", func->bit_size() );
-  put_expr("vpiLeftRange", mgr, func->left_range() );
-  put_expr("vpiRightRange", mgr, func->right_range() );
+  put("vpiLeftRange", func->left_range_val() );
+  put("vpiRightRange", func->right_range_val() );
 
   ymuint n = func->io_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -273,7 +271,8 @@ VlDumperImpl::put_contassign(const char* label,
   put("vpiStrength1", ca->drive1() );
   put("vpiDelay", ca->delay() );
 
-  put_expr("vpiLhs", mgr, ca->lhs() );
+  put_lhs("vpiLhs", mgr, ca->lhs() );
+
   put_expr("vpiRhs", mgr, ca->rhs() );
 
   put("vpiSize", ca->bit_size() );

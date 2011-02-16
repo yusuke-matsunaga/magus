@@ -108,16 +108,16 @@ public:
   bool
   is_protected() const;
 
-  /// @brief 初期値の式を返す．
-  virtual
-  const VlExpr*
-  init_expr() const;
-
   /// @brief 初期値を返す．
   /// @return 0/1/X を返す．
   virtual
   tVpiScalarVal
   init_val() const;
+
+  /// @brief 初期値を表す文字列を返す．
+  virtual
+  string
+  init_val_string() const;
 
   /// @brief table entry の行数を返す．
   virtual
@@ -150,7 +150,7 @@ public:
   /// @param[in] init_expr 初期値を表す式
   /// @param[in] init_val 初期値
   void
-  set_initial(ElbExpr* init_expr,
+  set_initial(const PtExpr* init_expr,
 	      tVpiScalarVal init_val);
 
   /// @brief table entry の内容を設定する．
@@ -181,7 +181,7 @@ private:
   EiUdpIO* mIODeclList;
 
   // 初期値の式
-  ElbExpr* mInitExpr;
+  const PtExpr* mInitExpr;
 
   // 初期値
   tVpiScalarVal mInitVal;
@@ -255,31 +255,34 @@ public:
   bool
   is_signed() const;
 
-  /// @brief 範囲の MSB の取得
-  /// @return このクラスは NULL を返す．
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  const VlExpr*
-  left_range() const;
-
-  /// @brief 範囲の LSB の取得
-  /// @return このクラスは NULL を返す．
-  virtual
-  const VlExpr*
-  right_range() const;
+  bool
+  has_range() const;
 
   /// @brief MSB の値を返す．
-  /// @retval 範囲のMSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief LSB の値を返す．
-  /// @retval 範囲のLSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @note 範囲を持たないときの値は不定
   virtual
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const;
 
   /// @brief サイズを返す．
   /// このクラスは 1 を返す．

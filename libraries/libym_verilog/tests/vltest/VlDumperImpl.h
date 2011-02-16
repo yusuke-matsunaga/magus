@@ -150,11 +150,24 @@ public:
 	   const VlMgr& mgr,
 	   const VlDecl* decl);
 
+  /// @brief 宣言要素の内容を出力する関数
+  /// @param[in] mgr VlMgr
+  void
+  put_declarray(const char* label,
+		const VlMgr& mgr,
+		const VlDeclArray* declarray);
+
   /// @brief 宣言要素のリストの内容を出力する関数
   void
   put_decl_list(const char* label,
 		const VlMgr& mgr,
 		const vector<const VlDecl*>& decl_list);
+
+  /// @brief 宣言要素のリストの内容を出力する関数
+  void
+  put_declarray_list(const char* label,
+		     const VlMgr& mgr,
+		     const vector<const VlDeclArray*>& decl_list);
 
   /// @brief def param のリストの内容を出力する関数
   void
@@ -277,6 +290,17 @@ public:
 	   const VlMgr& mgr,
 	   const VlExpr* expr);
 
+  /// @brief 左辺式の内容を出力する関数
+  void
+  put_lhs(const char* label,
+	  const VlMgr& mgr,
+	  const VlExpr* expr);
+
+  /// @brief プライマリ式を出力する関数
+  void
+  put_primary(const VlMgr& mgr,
+	      const VlExpr* expr);
+
   /// @brief 遅延値を出力する関数
   void
   put_delay(const char* label,
@@ -293,6 +317,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // その他の型
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief VlValue の情報を出力する．
+  /// @param[in] label ラベル
+  /// @param[in] value 値
+  void
+  put(const char* label,
+      const VlValue& value);
 
   /// @brief FileLoc の情報を出力する．
   /// @param[in] label ラベル
@@ -393,6 +424,34 @@ public:
   void
   put(const char* label,
       ymuint d);
+
+  /// @brief スカラー値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val スカラー値
+  void
+  put(const char* label,
+      tVpiScalarVal val);
+
+  /// @brief time値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val time値
+  void
+  put(const char* label,
+      VlTime val);
+
+  /// @brief 実数値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val 値
+  void
+  put(const char* label,
+      double val);
+
+  /// @brief ビットベクタ値の出力
+  /// @param[in] label ラベル
+  /// @param[in] val 値
+  void
+  put(const char* label,
+      const BitVector& val);
 
   /// @brief 文字列の出力
   /// @param[in] label ラベル

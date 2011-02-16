@@ -25,16 +25,19 @@ noinst_LTLIBRARIES = \
 ############################################################
 libym_vl_parser_main_la_SOURCES = \
 	verilog_grammer.yy \
-	PuHierName.h \
-	Parser_decl.h \
-	Parser_expr.h \
-	Parser_item.h \
-	Parser_misc.h \
-	Parser_port.h \
-	Parser_stmt.h \
 	Parser.cc \
-	Parser_udp.cc \
-	Parser_module.cc
+	Parser_decl.cc \
+	Parser_expr.cc \
+	Parser_generate.cc \
+	Parser_inst.cc \
+	Parser_int.h \
+	Parser_item.cc \
+	Parser_misc.cc \
+	Parser_module.cc \
+	Parser_port.cc \
+	Parser_stmt.cc \
+	Parser_udp.cc \c
+	PuHierName.h
 
 libym_vl_parser_main_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

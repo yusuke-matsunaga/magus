@@ -78,12 +78,6 @@ public:
   bool
   is_partselect() const = 0;
 
-  /// @brief 範囲指定のモードを返す．
-  /// @note is_partselect() == true の時のみ意味を持つ．
-  virtual
-  tVpiRangeMode
-  range_mode() const = 0;
-
   /// @brief 演算子の時に true を返す．
   virtual
   bool
@@ -99,12 +93,23 @@ public:
   bool
   is_sysfunccall() const = 0;
 
+  /// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlDeclBase*
+  decl_base() const = 0;
+
   /// @brief 宣言要素への参照の場合，対象のオブジェクトを返す．
-  /// @note 宣言要素に対するビット選択，部分選択の場合にも意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlDecl*
   decl_obj() const = 0;
+
+  /// @brief 宣言要素の配列への参照の場合，対象のオブジェクトを返す．
+  /// @note それ以外では NULL を返す．
+  virtual
+  const VlDeclArray*
+  declarray_obj() const = 0;
 
   /// @brief 配列型宣言要素への参照の場合，配列の次元を返す．
   /// @note それ以外では 0 を返す．
@@ -119,13 +124,21 @@ public:
   const VlExpr*
   declarray_index(ymuint pos) const = 0;
 
+  /// @brief 配列型宣言要素への参照のオフセットを返す．
+  /// @note 固定インデックスの場合のみ意味を持つ．
+  virtual
+  ymuint
+  declarray_offset() const = 0;
+
   /// @brief スコープへの参照の場合，対象のオブジェクトを返す．
   /// @note それ以外では NULL を返す．
+  /// @note スコープへの参照が式で用いられるのはシステム関数/タスクの引数だけ
   virtual
   const VlNamedObj*
   scope_obj() const = 0;
 
   /// @brief primitive への参照の場合，対象のオブジェクトを返す．
+  /// @note primitiveへの参照が式で用いられるのはシステム関数/タスクの引数だけ
   virtual
   const VlPrimitive*
   primitive_obj() const = 0;
@@ -138,60 +151,68 @@ public:
   parent_expr() const = 0;
 
   /// @brief インデックス式を返す．
-  /// @note 通常のビット選択の時，意味を持つ．
+  /// @note ビット選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
   index() const = 0;
 
   /// @brief インデックス値を返す．
-  /// @note 式に対するビット選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note 固定ビット選択の時，意味を持つ．
+  /// @note それ以外では値は不定
   virtual
   int
   index_val() const = 0;
 
+  /// @brief 範囲指定のモードを返す．
+  /// @retval kVpiNoRange 範囲指定なし
+  /// @retval kVpiConstRange 固定範囲
+  /// @retval kVpiPlusRange +: の可動範囲
+  /// @retval kVpiMinusRange -: の可動範囲
+  /// @note is_partselect() == true の時のみ意味を持つ．
+  virtual
+  tVpiRangeMode
+  range_mode() const = 0;
+
   /// @brief 範囲の MSB の式を返す．
-  /// @note 通常の範囲選択の時，意味を持つ．
+  /// @note 範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
   left_range() const = 0;
 
   /// @brief 範囲の MSB の値を返す．
-  /// @note 式に対する範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note それ以外では値は不定
   virtual
   int
   left_range_val() const = 0;
 
   /// @brief 範囲の LSB の式を返す．
-  /// @note 通常の範囲選択の時，意味を持つ．
+  /// @note 範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
   right_range() const = 0;
 
   /// @brief 範囲の LSB の値を返す．
-  /// @note 式に対する範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note それ以外では値は不定
   virtual
   int
   right_range_val() const = 0;
 
-  /// @brief 範囲のビット幅を表す式を返す．
+  /// @brief 範囲のベースを表す式を返す．
   /// @note 可変範囲選択の時，意味を持つ．
   /// @note それ以外では NULL を返す．
   virtual
   const VlExpr*
-  range_width() const = 0;
+  base() const = 0;
 
   /// @brief 範囲のビット幅を返す．
   /// @note 可変範囲選択の時，意味を持つ．
-  /// @note それ以外では 0 を返す．
+  /// @note それ以外では値は不定
   virtual
   int
-  range_width_val() const = 0;
+  range_width() const = 0;
 
   /// @brief 演算子の型を返す．
   /// @note kVpiOperation の時，意味を持つ．
@@ -214,6 +235,12 @@ public:
   virtual
   const VlExpr*
   operand(ymuint pos) const = 0;
+
+  /// @brief 繰り返し数を返す．
+  /// @note multiple concatenation の時のみ意味を持つ．
+  virtual
+  ymuint
+  rep_num() const = 0;
 
   /// @brief 定数型を返す．
   /// @note kVpiConstant の時，意味を持つ．
@@ -250,46 +277,19 @@ public:
   const VlExpr*
   argument(ymuint pos) const = 0;
 
-  /// @brief int 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return 整数値に変換できたら true を返す．
+  /// @brief 左辺式の要素数の取得
+  /// @note 通常は1だが，連結演算子の場合はその子供の数となる．
+  /// @note ただし，連結演算の入れ子はすべて平坦化して考える．
   virtual
-  bool
-  eval_int(int& val) const = 0;
+  ymuint
+  lhs_elem_num() const = 0;
 
-  /// @brief スカラー値を返す．
+  /// @brief 左辺式の要素の取得
+  /// @param[in] pos 位置 ( 0 <= pos < lhs_elem_num() )
+  /// @note 連結演算子の見かけと異なり LSB 側が0番めの要素となる．
   virtual
-  tVpiScalarVal
-  eval_scalar() const = 0;
-
-  /// @brief 論理値を返す．
-  virtual
-  tVpiScalarVal
-  eval_logic() const = 0;
-
-  /// @brief 論理値を返す．
-  virtual
-  bool
-  eval_bool() const = 0;
-
-  /// @brief real 型の値を返す．
-  virtual
-  double
-  eval_real() const = 0;
-
-  /// @brief VlTime 型の値を返す．
-  /// @param[out] val 結果を格納する変数
-  /// @return VlTime 値に変換できたら true を返す．
-  /// @note eval_bitvector() の結果から変換する．
-  virtual
-  bool
-  eval_time(VlTime& val) const = 0;
-
-  /// @brief bitvector 型の値を返す．
-  virtual
-  void
-  eval_bitvector(BitVector& bitvector,
-		 tVpiValueType req_type = kVpiValueNone) const = 0;
+  const VlExpr*
+  lhs_elem(ymuint pos) const = 0;
 
 };
 

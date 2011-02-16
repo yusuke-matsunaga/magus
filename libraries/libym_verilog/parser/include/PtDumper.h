@@ -121,14 +121,12 @@ private:
   /// @param[in] file_loc ファイルの位置情報
   void
   put_parent_file(const FileLoc& file_loc);
-  
+
   /// @brief 宣言を出力する．
   void
   put_decls(PtIOHeadArray iohead_array,
-	    PtDeclHeadArray paramhead_array,
-	    PtDeclHeadArray lparamhead_array,
 	    PtDeclHeadArray declhead_array);
-  
+
   /// @brief 宣言と要素を出力する．
   /// @param[in] label ラベル
   /// @param[in] decl_array 宣言の配列
@@ -137,11 +135,11 @@ private:
   put_decl_item(const char* label,
 		PtDeclHeadArray decl_array,
 		PtItemArray item_array);
-  
+
   /// @brief 階層名の出力
   void
   put(PtNameBranchArray nb_array);
-  
+
   /// @brief ブール型データの出力
   /// @param[in] label ラベル
   /// @param[in] b ブール値
@@ -339,10 +337,10 @@ private:
 
   // 出力ストリーム
   ostream& mStream;
-  
+
   // マーカ出力後に改行したことを示すフラグ
   list<bool> mDoCR;
-  
+
   // インデント量
   int mIndent;
 

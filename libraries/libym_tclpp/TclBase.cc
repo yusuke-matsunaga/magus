@@ -29,7 +29,7 @@ TclBase::TclBase() :
 TclBase::~TclBase()
 {
 }
-  
+
 // インタープリタを得る．
 // NULL の場合もあり得る．
 Tcl_Interp*
@@ -50,7 +50,7 @@ TclBase::eval(const TclObj& script) const
 {
   return Tcl_EvalObj(interp(), script.mPtr);
 }
-  
+
 // グローバルレベルで script を評価し，その完了コードを返す．
 // 結果またはエラーメッセージをインタープリタにセットする．
 int
@@ -58,7 +58,7 @@ TclBase::global_eval(const TclObj& script) const
 {
   return Tcl_GlobalEvalObj(interp(), script.mPtr);
 }
-  
+
 // file という名のファイルを評価し，その完了コードを返す．
 // 結果またはエラーメッセージをインタープリタにセットする．
 int
@@ -67,7 +67,7 @@ TclBase::eval_file(const string& file) const
   StrBuf sptr(file);
   return Tcl_EvalFile(interp(), sptr);
 }
-  
+
 // script を履歴リストにイベントとして登録し，flags が0ならば
 // 評価する．flags が TCL_NO_EVALなら評価しない．完了コードを返す．
 // 結果またはエラーメッセージをインタープリタにセットする．
@@ -77,7 +77,7 @@ TclBase::record_and_eval(const TclObj& script,
 {
   return Tcl_RecordAndEvalObj(interp(), script.mPtr, flags);
 }
-  
+
 
 //////////////////////////////////////////////////////////////////////
 // コマンド操作関数
@@ -94,14 +94,14 @@ TclBase::delete_command(const string& cmdName) const
   StrBuf sptr(cmdName);
   return Tcl_DeleteCommand(interp(), sptr);
 }
-  
+
 // token を使ってコマンドを削除する．
 int
 TclBase::delete_command(Tcl_Command token) const
 {
   return Tcl_DeleteCommandFromToken(interp(), token);
 }
-  
+
 // コマンドに関する情報を得る．
 // cmdName が登録されていれば info にその情報をセットし，0 を返す．
 // 登録されていなければ 1 を返す．
@@ -113,7 +113,7 @@ TclBase::command_info(const string& cmd_name,
   StrBuf sptr(cmd_name);
   return Tcl_GetCommandInfo(interp(), sptr, info);
 }
-  
+
 // コマンドに関する情報をセットする．
 // cmdName が登録されていれば info の情報を cmdName の情報にコピーし，
 // TCL_OK を返す．登録されていなければ TCL_ERROR を返す．
@@ -135,7 +135,7 @@ TclBase::command_name(Tcl_Command token) const
   CONST84 char* result = Tcl_GetCommandName(interp(), token);
   return string(result);
 }
-  
+
 
 //////////////////////////////////////////////////////////////////////
 // 結果にアクセスするための関数
@@ -154,7 +154,7 @@ TclBase::reset_result() const
 {
   Tcl_ResetResult(interp());
 }
-  
+
 // 結果を取り出す．
 TclObj
 TclBase::result() const
@@ -162,7 +162,7 @@ TclBase::result() const
   Tcl_Obj* tmp = Tcl_GetObjResult(interp());
   return TclObj(tmp);
 }
-  
+
 
 //////////////////////////////////////////////////////////////////////
 // オブジェクトの型変換
@@ -177,7 +177,7 @@ TclBase::int_conv(const TclObj& obj,
 {
   return obj.get_int(ans, interp());
 }
-  
+
 // オブジェクトを整数に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -187,7 +187,7 @@ TclBase::uint_conv(const TclObj& obj,
 {
   return obj.get_uint(ans, interp());
 }
-  
+
 // オブジェクトを long に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -197,7 +197,7 @@ TclBase::long_conv(const TclObj& obj,
 {
   return obj.get_long(ans, interp());
 }
-  
+
 // オブジェクトを unsigned long に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -207,7 +207,7 @@ TclBase::ulong_conv(const TclObj& obj,
 {
   return obj.get_ulong(ans, interp());
 }
-  
+
 // オブジェクトを double に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -217,7 +217,7 @@ TclBase::double_conv(const TclObj& obj,
 {
   return obj.get_double(ans, interp());
 }
-  
+
 // オブジェクトをブール値に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -227,7 +227,7 @@ TclBase::bool_conv(const TclObj& obj,
 {
   return obj.get_bool(ans, interp());
 }
-  
+
 // オブジェクトをリストに変換し，objv に代入する．
 // リストとして正しい文字列でなかった場合には TCL_ERROR を返す．
 int
@@ -242,7 +242,7 @@ TclBase::list_conv(const TclObj& obj,
 {
   return obj.list_elements(objv, interp());
 }
-  
+
 // オブジェクトをリストに変換し，リストの要素数を length に入れる．
 // リストとして正しい文字列でなかった場合には TCL_ERROR を返す．
 int
@@ -251,7 +251,7 @@ TclBase::list_length(const TclObj& obj,
 {
   return obj.list_length(length, interp());
 }
-  
+
 // オブジェクトをリストに変換し，index で指された位置の要素を取り出す．
 // リストとして正しい文字列でなかった場合には TCL_ERROR を返す．
 int
@@ -276,7 +276,7 @@ TclBase::expr_long(const TclObj& obj,
 {
   return Tcl_ExprLongObj(interp(), obj.mPtr, &ans);
 }
-  
+
 // オブジェクトを式として評価し，その値を double として
 // ans に代入し，TCL_OK を返す．
 // 評価中にエラーが発生した場合には TCL_ERROR を返し，
@@ -287,7 +287,7 @@ TclBase::expr_double(const TclObj& obj,
 {
   return Tcl_ExprDoubleObj(interp(), obj.mPtr, &ans);
 }
-  
+
 // オブジェクトを式として評価し，その値をブール値として ans に代入し，
 // TCL_OK を返す．評価中にエラーが発生した場合には TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -305,7 +305,7 @@ TclBase::expr_bool(const TclObj& obj,
   }
   return result;
 }
-  
+
 // オブジェクトを式として評価し，結果を格納する．
 int
 TclBase::expr(const TclObj& obj,
@@ -318,7 +318,7 @@ TclBase::expr(const TclObj& obj,
   }
   return result;
 }
-  
+
 // double を文字列に変換する．精度は Tcl 変数 tcl_precision で
 // 指定する．
 string
@@ -341,14 +341,14 @@ TclBase::add_errorinfo(const string& message) const
   StrBuf sptr(message);
   Tcl_AddErrorInfo(interp(), sptr);
 }
-  
+
 // obj を Tcl 変数 errorCode にセットする．
 void
 TclBase::set_errorcode(const TclObj& obj) const
 {
   Tcl_SetObjErrorCode(interp(), obj.mPtr);
 }
-  
+
 // バックグラウンドエラーの報告
 void
 TclBase::background_error() const
@@ -391,7 +391,7 @@ TclBase::set_var(const TclObj& base,
     Tcl_ObjSetVar2(interp(), base.mPtr, idx.mPtr, value.mPtr, flags);
   return TclObj(result);
 }
-  
+
 // name を変数名とする変数の値を返す．
 // エラーの場合には NULL を持つオブジェクトを返す．
 // flags については Tcl の本を参照
@@ -402,7 +402,7 @@ TclBase::var(const TclObj& name,
   Tcl_Obj* result = Tcl_ObjGetVar2(interp(), name.mPtr, NULL, flags);
   return TclObj(result);
 }
-  
+
 // base(idx) を変数名とする変数の値を返す．
 // エラーの場合には NULL を持つオブジェクト返す．
 // flags については Tcl の本を参照
@@ -414,7 +414,7 @@ TclBase::var(const TclObj& base,
   Tcl_Obj* result = Tcl_ObjGetVar2(interp(), base.mPtr, idx.mPtr, flags);
   return TclObj(result);
 }
-  
+
 // name を変数名とする変数を削除し，TCL_OKを返す．
 // 変数が存在しない場合には TCL_ERROR を返す．
 // flags については Tcl の本を参照
@@ -426,7 +426,7 @@ TclBase::unset_var(const string& name,
   int result = Tcl_UnsetVar(interp(), sptr, flags);
   return result;
 }
-  
+
 // base(idx) を変数名とする変数を削除し，TCL_OKを返す．
 // 変数が存在しない場合には TCL_ERROR を返す．
 // flags については Tcl の本を参照
@@ -452,7 +452,7 @@ TclBase::link_var(const string& name,
   int result = Tcl_LinkVar(interp(), sptr, addr, type);
   return result;
 }
-  
+
 // Tcl変数 name に対するリンクを削除する．
 void
 TclBase::unlink_var(const string& name) const
@@ -480,7 +480,7 @@ TclBase::int_from_var(const TclObj& name,
   }
   return obj.get_int(ans, interp());
 }
-  
+
 // base(idx) という変数の値を整数に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -496,7 +496,7 @@ TclBase::int_from_var(const TclObj& base,
   }
   return obj.get_int(ans, interp());
 }
-  
+
 // name という変数の値を符号なし整数に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -527,7 +527,7 @@ TclBase::uint_from_var(const TclObj& base,
   }
   return obj.get_uint(ans, interp());
 }
-  
+
 // name という変数の値を long整数に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -542,7 +542,7 @@ TclBase::long_from_var(const TclObj& name,
   }
   return obj.get_long(ans, interp());
 }
-  
+
 // base(idx) という変数の値を long整数に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -558,7 +558,7 @@ TclBase::long_from_var(const TclObj& base,
   }
   return obj.get_long(ans, interp());
 }
-  
+
 // name という変数の値を 符号なしlong整数に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -573,7 +573,7 @@ TclBase::ulong_from_var(const TclObj& name,
   }
   return obj.get_ulong(ans, interp());
 }
-  
+
 // base(idx) という変数の値を 符号なしlong整数に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -589,7 +589,7 @@ TclBase::ulong_from_var(const TclObj& base,
   }
   return obj.get_ulong(ans, interp());
 }
-  
+
 // name という変数の値を double に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -620,7 +620,7 @@ TclBase::double_from_var(const TclObj& base,
   }
   return obj.get_double(ans, interp());
 }
-  
+
 // name という変数の値をブール値に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -635,7 +635,7 @@ TclBase::bool_from_var(const TclObj& name,
   }
   return obj.get_bool(ans, interp());
 }
-  
+
 // base(idx) という変数の値をブール値に変換し，ans に代入する．
 // 正しい文字列なら TCL_OK を返し，エラーがあれば TCL_ERROR
 // を返し，エラーメッセージをインタプリタにセットする．
@@ -651,7 +651,7 @@ TclBase::bool_from_var(const TclObj& base,
   }
   return obj.get_bool(ans, interp());
 }
-  
+
 // name という変数の値をリストに変換し，objv に代入する．
 // リストとして正しい文字列でなかった場合には TCL_ERROR を返す．
 int
@@ -676,7 +676,7 @@ TclBase::list_from_var(const TclObj& name,
   }
   return obj.list_elements(objv, interp());
 }
-  
+
 // base(idx) という変数の値をリストに変換し，objv に代入する．
 // リストとして正しい文字列でなかった場合には TCL_ERROR を返す．
 int
@@ -727,7 +727,7 @@ TclBase::vartrace_info(const string& name,
 				       (ClientData) prev_obj);
   return (TclVarTrace*) result;
 }
-  
+
 // prev_obj が NULL ならば変数 base(idx) に設定してあるトレースの
 // うち，flags が一致する(ただし，flags には TCL_GLOBAL_ONLY だ
 // けが使われる)最初のトレースの TclVarTrace を返す．NULL でなければ，
@@ -769,13 +769,13 @@ TclBase::tilde_subst(const string& name,
     // いいんだろうか？
     return false;
   }
-  
+
   // string に内容をコピーする．
   subst_name = result;
-  
+
   // これで心おきなく buffer を解放できる．
   Tcl_DStringFree(&dstr);
-  
+
   // 正常終了
   return true;
 }
@@ -796,7 +796,8 @@ TclBase::posix_error() const
 // して false を返す．
 bool
 TclBase::open_ifile(ifstream& ifs,
-		    const string& name) const
+		    const string& name,
+		    ios::openmode openmode) const
 {
   // ファイル名の '~' 置換を行なう．
   string ex_name;
@@ -805,8 +806,8 @@ TclBase::open_ifile(ifstream& ifs,
     // ファイル名文字列の中に誤り
     return false;
   }
-  
-  ifs.open(ex_name.c_str());
+
+  ifs.open(ex_name.c_str(), openmode);
   if ( !ifs.is_open() ) {
     // 開けなかった．
     TclObj errmsg;
@@ -814,17 +815,18 @@ TclBase::open_ifile(ifstream& ifs,
     set_result(errmsg);
     return false;
   }
-  
+
   return true;
 }
-  
+
 // ファイル名の '~' 置換を行なって出力用ファイルを開く
 // 成功した場合には ofs に開いたファイルをセットする．
 // 失敗した場合にはメッセージをインタプリタにセット
 // して false を返す．
 bool
 TclBase::open_ofile(ofstream& ofs,
-		    const string& name) const
+		    const string& name,
+		    ios::openmode openmode) const
 {
   // ファイル名の '~' 置換を行なう．
   string ex_name;
@@ -833,8 +835,8 @@ TclBase::open_ofile(ofstream& ofs,
     // ファイル名文字列の中に誤り
     return false;
   }
-  
-  ofs.open(ex_name.c_str());
+
+  ofs.open(ex_name.c_str(), openmode);
   if ( !ofs.is_open() ) {
     // 開けなかった．
     TclObj errmsg;
@@ -842,10 +844,10 @@ TclBase::open_ofile(ofstream& ofs,
     set_result(errmsg);
     return false;
   }
-  
+
   return true;
 }
-  
+
 // Tcl コマンド string match と同様の処理を行なう．
 // いわゆる glob 形式のマッチング
 // 実はインタプリタを用いないのでただの関数にできるのだが，
@@ -860,7 +862,7 @@ TclBase::string_match(const string& str,
   StrBuf sptr2(pat);
   return Tcl_StringMatch(sptr1, sptr2);
 }
-  
+
 // string が正規表現 pat にマッチするか調べる．
 // マッチした場合には 1 を，マッチしなかった場合には 0 を返す．
 // パタンが正しくないときは -1 を返し，インタプリタにエラーメッセージ

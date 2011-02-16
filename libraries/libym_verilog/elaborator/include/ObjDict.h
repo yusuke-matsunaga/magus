@@ -74,7 +74,13 @@ public:
   /// @note このクラスでは NULL を返す．
   virtual
   ElbDeclArray*
-  decl_array();
+  declarray();
+
+  /// @brief ElbParameter を返す．
+  /// @note このクラスでは NULL を返す．
+  virtual
+  ElbParameter*
+  parameter();
 
   /// @brief ElbTaskFunc を返す．
   /// @note このクラスでは NULL を返す．
@@ -236,7 +242,7 @@ public:
   /// @brief ElbDeclArray を返す．
   virtual
   ElbDeclArray*
-  decl_array();
+  declarray();
 
 
 private:
@@ -246,6 +252,48 @@ private:
 
   // 対象のオブジェクト
   ElbDeclArray* mObj;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class ElbParamHandle
+//////////////////////////////////////////////////////////////////////
+class ElbParamHandle :
+  public ElbObjHandle
+{
+  friend class ObjDict;
+
+private:
+
+  /// @brief コンストラクタ
+  ElbParamHandle(ElbParameter* obj);
+
+  /// @brief デストラクタ
+  virtual
+  ~ElbParamHandle();
+
+
+public:
+
+  /// @brief VlNamedObj を返す．
+  virtual
+  const VlNamedObj*
+  obj();
+
+  /// @brief ElbParameterを返す．
+  virtual
+  ElbParameter*
+  parameter();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対象のオブジェクト
+  ElbParameter* mObj;
 
 };
 
@@ -547,6 +595,10 @@ public:
   /// @brief 要素を追加する．
   void
   add(ElbDeclArray* obj);
+
+  /// @brief 要素を追加する．
+  void
+  add(ElbParameter* obj);
 
   /// @brief 要素を追加する．
   void

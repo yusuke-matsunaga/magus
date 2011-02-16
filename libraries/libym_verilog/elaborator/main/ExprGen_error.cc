@@ -269,6 +269,15 @@ ExprGen::error_not_a_namedevent(const PtExpr* pt_expr)
 		   "Not a named-event.");
 }
 
+// @brief 要素の範囲の順番と範囲指定の順番が異なる．
+void
+ExprGen::error_range_order(const PtExpr* pt_expr)
+{
+  error_common(pt_expr,
+	       "ELABXXX",
+	       "Range order conflict.");
+}
+
 // @brief named-event に対する範囲指定
 void
 ExprGen::error_select_for_namedevent(const PtExpr* pt_expr)

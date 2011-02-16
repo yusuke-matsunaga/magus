@@ -109,7 +109,7 @@ VmParamAssignListNode::~VmParamAssignListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmParamAssignListNode::data(int column,
 			    int role) const
@@ -161,7 +161,7 @@ VmParamAssignNode::~VmParamAssignNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmParamAssignNode::data(int column,
 			int role) const
@@ -191,7 +191,7 @@ VmParamAssignNode::expand() const
   add_str("vpiModule", mParamAssign->parent()->full_name());
   add_bool("vpiConnByName", mParamAssign->is_conn_by_name());
   add_str("vpiLhs", mParamAssign->lhs()->full_name());
-  add_expr("vpiRhs", mParamAssign->rhs());
+  add_str("vpiRhs", mParamAssign->rhs_string());
 }
 
 
@@ -213,7 +213,7 @@ VmDefParamListNode::~VmDefParamListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmDefParamListNode::data(int column,
 			 int role) const
@@ -265,7 +265,7 @@ VmDefParamNode::~VmDefParamNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmDefParamNode::data(int column,
 		     int role) const
@@ -294,7 +294,7 @@ VmDefParamNode::expand() const
 {
   add_str("vpiModule", mDefParam->parent()->full_name());
   add_str("vpiLhs", mDefParam->lhs()->full_name());
-  add_expr("vpiRhs", mDefParam->rhs());
+  add_str("vpiRhs", mDefParam->rhs_string());
 }
 
 
@@ -319,7 +319,7 @@ VmScopeListNode::~VmScopeListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmScopeListNode::data(int column,
 		     int role) const
@@ -374,7 +374,7 @@ VmScopeNode::~VmScopeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmScopeNode::data(int column,
 		 int role) const
@@ -428,7 +428,7 @@ VmTaskListNode::~VmTaskListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmTaskListNode::data(int column,
 		     int role) const
@@ -483,7 +483,7 @@ VmTaskNode::~VmTaskNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmTaskNode::data(int column,
 		 int role) const
@@ -545,7 +545,7 @@ VmFunctionListNode::~VmFunctionListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmFunctionListNode::data(int column,
 			 int role) const
@@ -600,7 +600,7 @@ VmFunctionNode::~VmFunctionNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmFunctionNode::data(int column,
 		     int role) const
@@ -649,9 +649,11 @@ VmFunctionNode::expand() const
   add_str("vpiFuncType", functype2str(mFunction->func_type()));
   add_bool("vpiSigned", mFunction->is_signed());
   add_int("vpiSize", mFunction->bit_size());
-  if ( mFunction->left_range() ) {
-    add_expr("vpiLeftRange", mFunction->left_range());
-    add_expr("vpiRightRange", mFunction->right_range());
+  if ( mFunction->has_range() ) {
+    add_int("vpiLeftRange", mFunction->left_range_val());
+    add_int("vpiRightRange", mFunction->right_range_val());
+    add_str("vpiLeftRangeExpr", mFunction->left_range_string());
+    add_str("vpiRightRangeExpr", mFunction->right_range_string());
   }
   ymuint n = mFunction->io_num();
   vector<const VlIODecl*> io_array(n);
@@ -684,7 +686,7 @@ VmPrimArrayListNode::~VmPrimArrayListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPrimArrayListNode::data(int column,
 			  int role) const
@@ -736,7 +738,7 @@ VmPrimArrayNode::~VmPrimArrayNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPrimArrayNode::data(int column,
 		      int role) const
@@ -788,7 +790,7 @@ VmPrimitiveListNode::~VmPrimitiveListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPrimitiveListNode::data(int column,
 			  int role) const
@@ -840,7 +842,7 @@ VmPrimitiveNode::~VmPrimitiveNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPrimitiveNode::data(int column,
 		      int role) const
@@ -912,7 +914,7 @@ VmPrimTermListNode::~VmPrimTermListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPrimTermListNode::data(int column,
 			 int role) const
@@ -927,7 +929,7 @@ VmPrimTermListNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmPrimTermListNode::loc() const
@@ -972,7 +974,7 @@ VmPrimTermNode::~VmPrimTermNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPrimTermNode::data(int column,
 		     int role) const
@@ -987,7 +989,7 @@ VmPrimTermNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmPrimTermNode::loc() const
@@ -1024,7 +1026,7 @@ VmContAssignListNode::~VmContAssignListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmContAssignListNode::data(int column,
 			   int role) const
@@ -1076,7 +1078,7 @@ VmContAssignNode::~VmContAssignNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmContAssignNode::data(int column,
 		       int role) const

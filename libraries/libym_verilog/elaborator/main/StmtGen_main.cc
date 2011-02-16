@@ -113,7 +113,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
   case kPtNamedSeqBlockStmt:
     {
       ElbScope* block_scope = factory().new_StmtScope(parent, pt_stmt);
-      reg_blockscope(block_scope);
+      reg_internalscope(block_scope);
 
       for (ymuint i = 0; i < pt_stmt->stmt_array().size(); ++ i) {
 	const PtStmt* pt_stmt1 = pt_stmt->stmt_array()[i];
@@ -311,8 +311,12 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     assert_not_reached(__FILE__, __LINE__);
   }
   if ( stmt ) {
+#if 0
     // attribute instance の生成
-    //instantiate_attribute(pt_stmt->attr_top(), false, stmt);
+    instantiate_attribute(pt_stmt->attr_top(), false, stmt);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
   }
 
   return stmt;
@@ -572,7 +576,7 @@ StmtGen::instantiate_eventstmt(const VlNamedObj* parent,
 			       const PtStmt* pt_stmt)
 {
   const PtExpr* pt_expr = pt_stmt->primary();
-  ElbDecl* named_event = instantiate_namedevent(parent, pt_expr);
+  ElbExpr* named_event = instantiate_namedevent(parent, pt_expr);
   if ( !named_event ) {
     return NULL;
   }

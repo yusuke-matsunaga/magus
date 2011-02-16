@@ -21,8 +21,7 @@
 
 #include "ym_verilog/vl/VlModule.h"
 
-#include "ElbDecl.h"
-#include "ElbParamAssign.h"
+#include "ElbParameter.h"
 #include "ElbContAssign.h"
 #include "ElbProcess.h"
 #include "ElbScope.h"
@@ -152,8 +151,8 @@ ItemGen::defparam_override(const VlModule* module,
   if ( !handle ) {
     return false;
   }
-  ElbDecl* param = handle->decl();
-  if ( !param || param->type() != kVpiParameter ) {
+  ElbParameter* param = handle->parameter();
+  if ( !param ) {
     ostringstream buf;
     buf << "\"" << expand_full_name(nb_array, name)
 	<< "\" is not a parameter.";
@@ -181,27 +180,24 @@ ItemGen::defparam_override(const VlModule* module,
     return true;
   }
 
-  ElbExpr* expr = instantiate_constant_expr(module, pt_defparam->expr());
-  if ( !expr ) {
-    // もうこれ以降は処理したくないので true を返す．
-    return true;;
-  }
+  const PtExpr* rhs_expr = pt_defparam->expr();
+  VlValue rhs_value = evaluate_expr(module, rhs_expr, true);
 
   ostringstream buf;
   buf << "instantiating defparam: " << param->full_name()
-      << " = " << expr->decompile() << ".";
+      << " = " << rhs_expr->decompile() << ".";
   put_msg(__FILE__, __LINE__,
 	  fr,
 	  kMsgInfo,
 	  "ELAB",
 	  buf.str());
 
-  param->set_expr(expr);
+  param->set_expr(rhs_expr, rhs_value);
 
   ElbDefParam* dp = factory().new_DefParam(module,
 					   pt_header,
 					   pt_defparam,
-					   param, expr);
+					   param, rhs_expr, rhs_value);
   reg_defparam(dp);
 
   return true;
@@ -295,7 +291,7 @@ ItemGen::phase1_genblock(const VlNamedObj* parent,
   const char* name = pt_genblock->name();
   if ( name != NULL ) {
     ElbScope* genblock = factory().new_GenBlock(parent, pt_genblock);
-    reg_genblock(genblock);
+    reg_internalscope(genblock);
 
     parent = genblock;
   }
@@ -310,7 +306,7 @@ ItemGen::phase1_genif(const VlNamedObj* parent,
 		      const PtItem* pt_genif)
 {
   bool cond;
-  if ( !evaluate_expr_bool(parent, pt_genif->expr(), cond) ) {
+  if ( !evaluate_bool(parent, pt_genif->expr(), cond, true) ) {
     return;
   }
   if ( cond ) {
@@ -333,7 +329,7 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
 			const PtItem* pt_gencase)
 {
   BitVector val;
-  if ( !evaluate_expr_bitvector(parent, pt_gencase->expr(), val) ) {
+  if ( !evaluate_bitvector(parent, pt_gencase->expr(), val, true) ) {
     return;
   }
 
@@ -346,7 +342,7 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
     for (ymuint i = 0; i < n; ++ i) {
       const PtExpr* pt_expr = pt_caseitem->label(i);
       BitVector label_val;
-      if ( !evaluate_expr_bitvector(parent, pt_expr, label_val) ) {
+      if ( !evaluate_bitvector(parent, pt_expr, label_val, true) ) {
 	continue;
       }
       if ( label_val == val ) {
@@ -423,7 +419,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
 
   {
     int val;
-    if ( !evaluate_expr_int(parent, pt_genfor->init_expr(), val) ) {
+    if ( !evaluate_int(parent, pt_genfor->init_expr(), val, true) ) {
       return;
     }
     if ( val < 0 ) {
@@ -441,7 +437,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
   for ( ; ; ) {
     // 終了条件のチェック
     bool val;
-    if ( !evaluate_expr_bool(parent, pt_genfor->expr(), val) ) {
+    if ( !evaluate_bool(parent, pt_genfor->expr(), val, true) ) {
       break;
     }
     if ( !val ) {
@@ -453,7 +449,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
       int gvi = genvar->value();
       ElbScope* genblock = factory().new_GfBlock(parent, pt_genfor, gvi);
       gfroot->add(gvi, genblock);
-      reg_genblock(genblock);
+      reg_internalscope(genblock);
 
       const PtDeclItem* pt_item = genvar->pt_item();
       ElbGenvar* genvar1 = factory().new_Genvar(genblock, pt_item, gvi);
@@ -465,7 +461,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
     // genvar の増加分の処理．
     {
       int val;
-      if ( !evaluate_expr_int(parent, pt_genfor->next_expr(), val) ) {
+      if ( !evaluate_int(parent, pt_genfor->next_expr(), val, true) ) {
 	break;
       }
       if ( val < 0 ) {

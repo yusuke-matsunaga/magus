@@ -101,8 +101,8 @@ EiFactory::new_GenvarConstant(const PtExpr* pt_primary,
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-EiConstant::EiConstant(const PtBase* pt_expr) :
-  EiExprBase1(pt_expr)
+EiConstant::EiConstant(const PtExpr* pt_expr) :
+  EiExprBase(pt_expr)
 {
 }
 
@@ -135,31 +135,14 @@ EiConstant::set_reqsize(tVpiValueType type)
   // なにもしない．
 }
 
-// @brief スカラー値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConstant::set_scalar(tVpiScalarVal v)
+// @brief オペランドを返す．
+// @param[in] pos 位置番号
+// @note 演算子の時，意味を持つ．
+// @note このクラスでは NULL を返す．
+ElbExpr*
+EiConstant::_operand(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 実数値を書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConstant::set_real(double v)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief ビットベクタを書き込む．
-// @param[in] v 書き込む値
-// @note 左辺式の時のみ意味を持つ．
-void
-EiConstant::set_bitvector(const BitVector& v)
-{
-  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 
@@ -170,7 +153,7 @@ EiConstant::set_bitvector(const BitVector& v)
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] value 値
-EiIntConst::EiIntConst(const PtBase* pt_expr,
+EiIntConst::EiIntConst(const PtExpr* pt_expr,
 		       int value) :
   EiConstant(pt_expr),
   mValue(value)
@@ -197,55 +180,6 @@ EiIntConst::constant_type() const
   return kVpiIntConst;
 }
 
-// @brief int 型の値を返す．
-bool
-EiIntConst::eval_int(int& val) const
-{
-  val = mValue;
-  return true;
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiIntConst::eval_scalar() const
-{
-  return conv_to_scalar(mValue);
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiIntConst::eval_logic() const
-{
-  return conv_to_scalar(mValue);
-}
-
-// @brief real 型の値を返す．
-double
-EiIntConst::eval_real() const
-{
-  return static_cast<double>(mValue);
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiIntConst::eval_bitvector(BitVector& bitvector,
-			   tVpiValueType req_type) const
-{
-  BitVector tmp(mValue);
-  bitvector = mValue;
-  bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiIntConst::decompile_impl(int ppri) const
-{
-  ostringstream buf;
-  buf << mValue;
-  return buf.str();
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiBitVectorConst
@@ -255,7 +189,7 @@ EiIntConst::decompile_impl(int ppri) const
 // @param[in] pt_expr パース木の定義要素
 // @param[in] const_type 定数型
 // @param[in] value 値
-EiBitVectorConst::EiBitVectorConst(const PtBase* pt_expr,
+EiBitVectorConst::EiBitVectorConst(const PtExpr* pt_expr,
 				   tVpiConstType const_type,
 				   const BitVector& value) :
   EiConstant(pt_expr),
@@ -290,64 +224,6 @@ EiBitVectorConst::constant_type() const
   return mConstType;
 }
 
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiBitVectorConst::eval_scalar() const
-{
-  return mValue.to_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiBitVectorConst::eval_logic() const
-{
-  return mValue.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiBitVectorConst::eval_real() const
-{
-  return mValue.to_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiBitVectorConst::eval_bitvector(BitVector& bitvector,
-				 tVpiValueType req_type) const
-{
-  bitvector = mValue;
-  bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiBitVectorConst::decompile_impl(int ppri) const
-{
-  switch ( mConstType ) {
-  case kVpiSignedDecConst:
-  case kVpiDecConst:
-    return mValue.verilog_string(10);
-
-  case kVpiSignedBinaryConst:
-  case kVpiBinaryConst:
-    return mValue.verilog_string(2);
-
-  case kVpiSignedOctConst:
-  case kVpiOctConst:
-    return mValue.verilog_string(8);
-
-  case kVpiSignedHexConst:
-  case kVpiHexConst:
-    return mValue.verilog_string(16);
-
-  default:
-    ;
-  }
-  return "Type error"; // dummy
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiRealConst
@@ -356,7 +232,7 @@ EiBitVectorConst::decompile_impl(int ppri) const
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] value 値
-EiRealConst::EiRealConst(const PtBase* pt_expr,
+EiRealConst::EiRealConst(const PtExpr* pt_expr,
 			 double value) :
   EiConstant(pt_expr),
   mValue(value)
@@ -383,47 +259,6 @@ EiRealConst::constant_type() const
   return kVpiRealConst;
 }
 
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiRealConst::eval_scalar() const
-{
-#warning "TODO: 仕様を確認"
-  return kVpiScalarX;
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiRealConst::eval_logic() const
-{
-  return conv_to_scalar(eval_real());
-}
-
-// @brief real 型の値を返す．
-double
-EiRealConst::eval_real() const
-{
-  return mValue;
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiRealConst::eval_bitvector(BitVector& bitvector,
-			    tVpiValueType req_type) const
-{
-  bitvector = eval_real();
-  bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiRealConst::decompile_impl(int ppri) const
-{
-  ostringstream buf;
-  buf << eval_real();
-  return buf.str();
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiStringConst
@@ -432,7 +267,7 @@ EiRealConst::decompile_impl(int ppri) const
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
 // @param[in] value 値
-EiStringConst::EiStringConst(const PtBase* pt_expr,
+EiStringConst::EiStringConst(const PtExpr* pt_expr,
 			     const string& value) :
   EiConstant(pt_expr),
   mValue(value)
@@ -458,44 +293,6 @@ tVpiConstType
 EiStringConst::constant_type() const
 {
   return kVpiStringConst;
-}
-
-// @brief スカラー値を返す．
-tVpiScalarVal
-EiStringConst::eval_scalar() const
-{
-  return mValue.to_scalar();
-}
-
-// @brief 論理値を返す．
-tVpiScalarVal
-EiStringConst::eval_logic() const
-{
-  return mValue.to_logic();
-}
-
-// @brief real 型の値を返す．
-double
-EiStringConst::eval_real() const
-{
-  return mValue.to_real();
-}
-
-// @brief bitvector 型の値を返す．
-void
-EiStringConst::eval_bitvector(BitVector& bitvector,
-			      tVpiValueType req_type) const
-{
-  bitvector = mValue;
-  bitvector.coerce(req_type);
-}
-
-// @brief decompile() の実装関数
-// @param[in] pprim 親の演算子の優先順位
-string
-EiStringConst::decompile_impl(int ppri) const
-{
-  return mValue.to_string();
 }
 
 END_NAMESPACE_YM_VERILOG

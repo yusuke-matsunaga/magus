@@ -51,8 +51,14 @@ public:
 
   /// @brief 1番目の子供を取り出す．
   virtual
-  MislibPt*
+  const MislibPt*
   child1() const;
+
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+  virtual
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
@@ -73,11 +79,65 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibPtBop MislibPtImpl2.h "MislibPtImpl2.h"
+/// @brief 2項演算子を表すクラス
+//////////////////////////////////////////////////////////////////////
+class MislibPtBop :
+  public MislibPt
+{
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] loc 位置情報
+  /// @param[in] child1 1番目の子供
+  /// @param[in] child2 2番目の子供
+  MislibPtBop(const FileRegion& loc,
+	      MislibPt* child1,
+	      MislibPt* child2);
+
+  /// @brief デストラクタ
+  virtual
+  ~MislibPtBop();
+
+
+public:
+
+  /// @brief 論理式を表す型のときに true を返す．
+  virtual
+  bool
+  is_expr() const;
+
+  /// @brief 1番目の子供を取り出す．
+  virtual
+  const MislibPt*
+  child1() const;
+
+  /// @brief 2番目の子供を取り出す．
+  virtual
+  const MislibPt*
+  child2() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 1番目の子供
+  MislibPt* mChild1;
+
+  // 2番目の子供
+  MislibPt* mChild2;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class MislibPtAnd MislibPtImpl2.h "MislibPtImpl2.h"
 /// @brief AND論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MislibPtAnd :
-  public MislibPt
+  public MislibPtBop
 {
   friend class MislibParser;
 private:
@@ -102,38 +162,17 @@ public:
   tType
   type() const;
 
-  /// @brief 論理式を表す型のときに true を返す．
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  bool
-  is_expr() const;
-
-  /// @brief 1番目の子供を取り出す．
-  virtual
-  MislibPt*
-  child1() const;
-
-  /// @brief 2番目の子供を取り出す．
-  virtual
-  MislibPt*
-  child2() const;
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
   virtual
   void
   dump(ostream& s) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 1番目の子供
-  MislibPt* mChild1;
-
-  // 2番目の子供
-  MislibPt* mChild2;
 
 };
 
@@ -143,7 +182,7 @@ private:
 /// @brief OR論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MislibPtOr :
-  public MislibPt
+  public MislibPtBop
 {
   friend class MislibParser;
 private:
@@ -168,20 +207,11 @@ public:
   tType
   type() const;
 
-  /// @brief 論理式を表す型のときに true を返す．
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  bool
-  is_expr() const;
-
-  /// @brief 1番目の子供を取り出す．
-  virtual
-  MislibPt*
-  child1() const;
-
-  /// @brief 2番目の子供を取り出す．
-  virtual
-  MislibPt*
-  child2() const;
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
@@ -189,17 +219,50 @@ public:
   void
   dump(ostream& s) const;
 
+};
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class MislibPtXor MislibPtImpl2.h "MislibPtImpl2.h"
+/// @brief XOR論理式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class MislibPtXor :
+  public MislibPtBop
+{
+  friend class MislibParser;
 private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
 
-  // 1番目の子供
-  MislibPt* mChild1;
+  /// @brief コンストラクタ
+  /// @param[in] loc 位置情報
+  /// @param[in] child1 1番目の子供
+  /// @param[in] child2 2番目の子供
+  MislibPtXor(const FileRegion& loc,
+	      MislibPt* child1,
+	      MislibPt* child2);
 
-  // 2番目の子供
-  MislibPt* mChild2;
+  /// @brief デストラクタ
+  virtual
+  ~MislibPtXor();
+
+
+public:
+
+  /// @brief 種類を取り出す．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+  virtual
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
+
+  /// @brief 内容を出力する．
+  /// デバッグ用
+  virtual
+  void
+  dump(ostream& s) const;
 
 };
 

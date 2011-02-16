@@ -100,7 +100,7 @@ protected:
   /// @brief コンストラクタ
   CptGateHS(const FileRegion& file_region,
 	    tVpiPrimType prim_type,
-	    PtStrength* strength,
+	    const PtStrength* strength,
 	    PtInstArray inst_array);
 
   /// @brief デストラクタ
@@ -125,7 +125,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
 };
 
@@ -143,7 +143,7 @@ protected:
   /// @brief コンストラクタ
   CptGateHD(const FileRegion& file_region,
 	    tVpiPrimType prim_type,
-	    PtDelay* delay,
+	    const PtDelay* delay,
 	    PtInstArray inst_array);
 
   /// @brief デストラクタ
@@ -168,7 +168,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -186,8 +186,8 @@ protected:
   /// @brief コンストラクタ
   CptGateHSD(const FileRegion& file_region,
 	     tVpiPrimType prim_type,
-	     PtStrength* strength,
-	     PtDelay* delay,
+	     const PtStrength* strength,
+	     const PtDelay* delay,
 	     PtInstArray inst_array);
 
   /// @brief デストラクタ
@@ -217,10 +217,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -351,7 +351,7 @@ protected:
   /// @brief コンストラクタ
   CptMuHS(const FileRegion& file_region,
 	  const char* def_name,
-	  PtStrength* strength,
+	  const PtStrength* strength,
 	  PtInstArray inst_array);
 
   /// @brief デストラクタ
@@ -376,7 +376,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
 };
 
@@ -394,7 +394,7 @@ protected:
   /// @brief コンストラクタ
   CptMuHD(const FileRegion& file_region,
 	  const char* def_name,
-	  PtDelay* delay,
+	  const PtDelay* delay,
 	  PtInstArray inst_array);
 
   /// @brief デストラクタ
@@ -419,7 +419,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -437,8 +437,8 @@ protected:
   /// @brief コンストラクタ
   CptMuHSD(const FileRegion& file_region,
 	   const char* def_name,
-	   PtStrength* strength,
-	   PtDelay* delay,
+	   const PtStrength* strength,
+	   const PtDelay* delay,
 	   PtInstArray inst_array);
 
   /// @brief デストラクタ
@@ -468,10 +468,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // strength
-  PtStrength* mStrength;
+  const PtStrength* mStrength;
 
   // delay
-  PtDelay* mDelay;
+  const PtDelay* mDelay;
 
 };
 
@@ -608,8 +608,8 @@ protected:
   /// @brief コンストラクタ
   CptInstR(const FileRegion& file_region,
 	   const char* name,
-	   PtExpr* left,
-	   PtExpr* right,
+	   const PtExpr* left,
+	   const PtExpr* right,
 	   PtConnectionArray con_array);
 
   /// @brief デストラクタ
@@ -639,10 +639,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲のMSB
-  PtExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲のLSB
-  PtExpr* mRightRange;
+  const PtExpr* mRightRange;
 
 };
 

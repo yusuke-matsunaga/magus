@@ -190,15 +190,23 @@ public:
   void
   sweep();
 
-  /// @brief 非同期セット/リセットタイプの FF ノードを生成する．
+  /// @brief フリップフロップノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] np 非同期セットの制御信号数
+  /// @param[in] control_array 非同期セットの極性と値を入れた配列
+  /// @param[in] bit_width ビット幅
   MvNode*
-  new_dff1(MvModule* module,
-	   ymuint bit_width = 1);
+  new_dff(MvModule* module,
+	  ymuint np,
+	  const vector<ymuint32>& control_array,
+	  ymuint bit_width = 1);
 
-  /// @brief 同期セット/リセットタイプの FF ノードを生成する．
+  /// @brief ラッチノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   MvNode*
-  new_dff2(MvModule* module,
-	   ymuint bit_width = 1);
+  new_latch(MvModule* module,
+	    ymuint bit_width = 1);
 
   /// @brief through ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -218,26 +226,32 @@ public:
 
   /// @brief and ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
   new_and(MvModule* module,
+	  ymuint input_num,
 	  ymuint bit_width = 1);
 
   /// @brief or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
   new_or(MvModule* module,
+	 ymuint input_num,
 	 ymuint bit_width = 1);
 
   /// @brief xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvNode*
   new_xor(MvModule* module,
+	  ymuint input_num,
 	  ymuint bit_width = 1);
 
   /// @brief reduction and ノードを生成する．
@@ -246,7 +260,7 @@ public:
   /// @return 生成したノードを返す．
   MvNode*
   new_rand(MvModule* module,
-	   ymuint bit_width = 1);
+	   ymuint bit_width);
 
   /// @brief reduction or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -254,7 +268,7 @@ public:
   /// @return 生成したノードを返す．
   MvNode*
   new_ror(MvModule* module,
-	  ymuint bit_width = 1);
+	  ymuint bit_width);
 
   /// @brief reduction xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -262,7 +276,7 @@ public:
   /// @return 生成したノードを返す．
   MvNode*
   new_rxor(MvModule* module,
-	   ymuint bit_width = 1);
+	   ymuint bit_width);
 
   /// @brief equal ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -637,7 +651,7 @@ dump_verilog(ostream& s,
 void
 dump_node_map(ostream& s,
 	      const MvMgr& mgr,
-	      const vector<pair<const VlDecl*, ymuint> >& node_map);
+	      const MvVlMap& node_map);
 
 END_NAMESPACE_YM_MVN
 

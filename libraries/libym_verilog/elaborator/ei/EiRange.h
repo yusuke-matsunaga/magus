@@ -12,7 +12,6 @@
 
 
 #include "ElbRange.h"
-#include "ElbExpr.h"
 #include "ym_verilog/pt/PtDecl.h"
 
 
@@ -63,25 +62,29 @@ public:
   ymuint
   size() const;
 
-  /// @brief MSB を返す．
-  virtual
-  VlExpr*
-  left_range() const;
-
-  /// @brief LSB を返す．
-  virtual
-  VlExpr*
-  right_range() const;
-
   /// @brief MSB の値を返す．
+  /// @retval MSB の値 値が確定しているとき
+  /// @retval -1 値が確定していない
   virtual
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief LSB の値を返す．
+  /// @retval LSB の値 値が確定しているとき
+  /// @retval -1 値が確定していない
   virtual
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief MSB を表す文字列を返す．
+  virtual
+  string
+  left_range_string() const;
+
+  /// @brief LSB を表す文字列を返す．
+  virtual
+  string
+  right_range_string() const;
 
   /// @brief 範囲のチェック
   /// @param[in] index インデックス
@@ -215,10 +218,10 @@ private:
   const PtRange* mPtRange;
 
   // 範囲の MSB
-  ElbExpr* mLeftRange;
+  const PtExpr* mLeftRange;
 
   // 範囲の LSB
-  ElbExpr* mRightRange;
+  const PtExpr* mRightRange;
 
   // MSB の値
   int mLeftVal;
@@ -257,8 +260,8 @@ public:
   /// @param[in] left_val 範囲の MSB の値
   /// @param[in] right_val 範囲の LSB の値
   void
-  set(ElbExpr* left,
-      ElbExpr* right,
+  set(const PtExpr* left,
+      const PtExpr* right,
       int left_val,
       int right_val);
 
@@ -272,21 +275,29 @@ public:
   ymuint
   size() const;
 
-  /// @brief MSB を返す．
-  ElbExpr*
-  left_range() const;
-
-  /// @brief LSB を返す．
-  ElbExpr*
-  right_range() const;
-
   /// @brief MSB の値を返す．
   int
-  left_range_const() const;
+  left_range_val() const;
 
   /// @brief LSB の値を返す．
   int
-  right_range_const() const;
+  right_range_val() const;
+
+  /// @brief MSB を表す文字列を返す．
+  string
+  left_range_string() const;
+
+  /// @brief LSB を表す文字列を返す．
+  string
+  right_range_string() const;
+
+  /// @brief left_range >= right_range の時に true を返す．
+  bool
+  is_big_endian() const;
+
+  /// @brief left_range <= right_range の時に true を返す．
+  bool
+  is_little_endian() const;
 
   /// @brief 範囲のチェック
   /// @param[in] index インデックス
@@ -327,11 +338,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 範囲の MSB
-  ElbExpr* mLeftRange;
+  // 範囲の MSB を表す式
+  const PtExpr* mLeftRange;
 
-  // 範囲の LSB
-  ElbExpr* mRightRange;
+  // 範囲の LSB を表す式
+  const PtExpr* mRightRange;
 
   // MSB の値
   int mLeftVal;
@@ -368,22 +379,29 @@ public:
   ymuint
   size() const;
 
-  /// @brief pos 番めの範囲を返す．
-  /// @param[in] pos 位置番号
-  EiRange*
-  range(ymuint pos) const;
-
   /// @brief 要素数を計算する
   /// @return サイズを返す．
   ymuint
   elem_size() const;
 
-  /// @brief アドレス(オフセット)からインデックスの配列を作る．
+  /// @brief pos 番めの範囲を返す．
+  /// @param[in] pos 位置番号
+  EiRange*
+  range(ymuint pos) const;
+
+  /// @brief アドレス(オフセット)からインデックスのリストを作る．
   /// @param[in] offset オフセット
-  /// @param[out] index_array
+  /// @param[out] index_list インデックスのリスト
   void
   index(ymuint offset,
-	vector<int>& index_array) const;
+	vector<int>& index_list) const;
+
+  /// @brief インデックスのリストからオフセットを得る．
+  /// @param[in] index_list インデックスのリスト
+  /// @return index_list の値に対応したオフセット値
+  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+  int
+  offset(const vector<int>& index_list) const;
 
 
 private:
@@ -396,6 +414,9 @@ private:
 
   // 範囲の配列
   EiRange* mArray;
+
+  // 要素数
+  ymuint32 mElemSize;
 
 };
 
@@ -508,12 +529,37 @@ EiRange::rindex(int left,
   }
 }
 
+// @brief left_range >= right_range の時に true を返す．
+inline
+bool
+EiRangeImpl::is_big_endian() const
+{
+  return mLeftVal >= mRightVal;
+}
+
+// @brief left_range <= right_range の時に true を返す．
+inline
+bool
+EiRangeImpl::is_little_endian() const
+{
+  return mRightVal >= mLeftVal;
+}
+
 // @brief 次元数を得る．
 inline
 ymuint
 EiRangeArray::size() const
 {
   return mDimSize;
+}
+
+// @brief 要素数を計算する
+// @return サイズを返す．
+inline
+ymuint
+EiRangeArray::elem_size() const
+{
+  return mElemSize;
 }
 
 // @brief pos 番めの範囲を返す．

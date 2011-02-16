@@ -44,6 +44,15 @@ public:
   // DeclGen の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief parameter と genvar を実体化する．
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head_array 宣言ヘッダの配列
+  /// @param[in] force_to_local true なら parameter を localparam にする．
+  void
+  phase1_decl(const VlNamedObj* parent,
+	      PtDeclHeadArray pt_head_array,
+	      bool force_to_local);
+
   /// @brief IO宣言要素を実体化する．
   /// @param[in] module 親のモジュール
   /// @param[in] taskfunc 親のタスク/関数
@@ -61,20 +70,20 @@ public:
   instantiate_decl(const VlNamedObj* parent,
 		   PtDeclHeadArray pt_head_array);
 
-  /// @brief パラメータ用の instantiate 関数
-  /// @param[in] parent 親のスコープ
-  /// @param[in] pt_head_array 宣言ヘッダの配列
-  /// @param[in] is_local local_param の時 true
-  void
-  instantiate_param(const VlNamedObj* parent,
-		    PtDeclHeadArray pt_head_array,
-		    bool is_local);
-  
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief パラメータ用の instantiate 関数
+  /// @param[in] parent 親のスコープ
+  /// @param[in] pt_head 宣言ヘッダ
+  /// @param[in] is_local local_param にする時 true
+  void
+  instantiate_param_head(const VlNamedObj* parent,
+			 const PtDeclHead* pt_head,
+			 bool is_local);
 
   /// @brief net をインスタンス化する．
   /// @param[in] parent 親のスコープ
@@ -82,7 +91,7 @@ private:
   void
   instantiate_net_head(const VlNamedObj* parent,
 		       const PtDeclHead* pt_head);
-  
+
   /// @brief net の遅延値を生成する．
   /// @param[in] net_head ネットのヘッダ
   /// @param[in] pt_delay パース木の遅延式定義
@@ -133,7 +142,7 @@ private:
   instantiate_dimension_list(const VlNamedObj* parent,
 			     const PtDeclItem* pt_item,
 			     vector<ElbRangeSrc>& range_src);
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

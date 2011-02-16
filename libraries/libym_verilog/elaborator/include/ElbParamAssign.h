@@ -25,12 +25,12 @@ class ElbParamAssign :
   public VlParamAssign
 {
   friend class CellParamAssign;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbParamAssign();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbParamAssign();
@@ -44,7 +44,7 @@ public:
   /// @brief 次の要素を得る．
   const ElbParamAssign*
   next() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ private:
 
   // 次の要素を指すポインタ
   ElbParamAssign* mNext;
-  
+
 };
 
 
@@ -66,12 +66,12 @@ class ElbDefParam :
   public VlDefParam
 {
   friend class CellDefParam;
-  
+
 protected:
-  
+
   /// @brief コンストラクタ
   ElbDefParam();
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbDefParam();
@@ -85,8 +85,8 @@ public:
   /// @brief 次の要素を得る．
   const ElbDefParam*
   next() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -94,7 +94,7 @@ private:
 
   // 次の要素を指すポインタ
   ElbDefParam* mNext;
-  
+
 };
 
 
@@ -102,38 +102,12 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-inline
-ElbParamAssign::ElbParamAssign() :
-  mNext(NULL)
-{
-}
-  
-// @brief デストラクタ
-inline
-ElbParamAssign::~ElbParamAssign()
-{
-}
-
 // @brief 次の要素を得る．
 inline
 const ElbParamAssign*
 ElbParamAssign::next() const
 {
   return mNext;
-}
-  
-// @brief コンストラクタ
-inline
-ElbDefParam::ElbDefParam() :
-  mNext(NULL)
-{
-}
-
-// @brief デストラクタ
-inline
-ElbDefParam::~ElbDefParam()
-{
 }
 
 // @brief 次の要素を得る．

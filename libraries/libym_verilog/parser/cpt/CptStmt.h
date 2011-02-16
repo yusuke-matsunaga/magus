@@ -464,8 +464,8 @@ protected:
 
   /// @brief コンストラクタ
   CptCtrlStmt(const FileRegion& file_region,
-	      PtControl* delay,
-	      PtStmt* body);
+	      const PtControl* delay,
+	      const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -494,10 +494,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // コントロール
-  PtControl* mDelay;
+  const PtControl* mDelay;
 
   // 本体
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 
@@ -514,8 +514,8 @@ private:
 
   /// @brief コンストラクタ
   CptDcStmt(const FileRegion& file_region,
-	    PtControl* delay,
-	    PtStmt* body);
+	    const PtControl* delay,
+	    const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -548,8 +548,8 @@ private:
 
   /// @brief コンストラクタ
   CptEcStmt(const FileRegion& file_region,
-	    PtControl* event,
-	    PtStmt* body);
+	    const PtControl* event,
+	    const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -582,8 +582,8 @@ private:
 
   /// @brief コンストラクタ
   CptWait(const FileRegion& file_region,
-	  PtExpr* cond,
-	  PtStmt* body);
+	  const PtExpr* cond,
+	  const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -618,10 +618,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 条件
-  PtExpr* mCond;
+  const PtExpr* mCond;
 
   // 実行すべき本体
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 
@@ -636,7 +636,7 @@ protected:
 
   /// @brief コンストラクタ
   CptAssignBase(const FileRegion& file_region,
-		PtExpr* lhs);
+		const PtExpr* lhs);
 
   /// @brief デストラクタ
   virtual
@@ -666,7 +666,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 左辺
-  PtExpr* mLhs;
+  const PtExpr* mLhs;
 
 };
 
@@ -683,8 +683,8 @@ protected:
 
   /// @brief コンストラクタ
   CptAssign(const FileRegion& file_region,
-	    PtExpr* lhs,
-	    PtExpr* rhs);
+	    const PtExpr* lhs,
+	    const PtExpr* rhs);
 
   /// @brief デストラクタ
   virtual
@@ -714,7 +714,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 右辺
-  PtExpr* mRhs;
+  const PtExpr* mRhs;
 
 };
 
@@ -731,9 +731,9 @@ protected:
 
   /// @brief コンストラクタ
   CptAssignC(const FileRegion& file_region,
-	     PtExpr* lhs,
-	     PtExpr* rhs,
-	     PtControl* control);
+	     const PtExpr* lhs,
+	     const PtExpr* rhs,
+	     const PtControl* control);
 
   /// @brief デストラクタ
   virtual
@@ -757,7 +757,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // コントロール
-  PtControl* mControl;
+  const PtControl* mControl;
 
 };
 
@@ -774,8 +774,8 @@ protected:
 
   /// @brief コンストラクタ
   CptNbAssign(const FileRegion& file_region,
-	      PtExpr* lhs,
-	      PtExpr* rhs);
+	      const PtExpr* lhs,
+	      const PtExpr* rhs);
 
   /// @brief デストラクタ
   virtual
@@ -808,9 +808,9 @@ private:
 
   /// @brief コンストラクタ
   CptNbAssignC(const FileRegion& file_region,
-	       PtExpr* lhs,
-	       PtExpr* rhs,
-	       PtControl* control);
+	       const PtExpr* lhs,
+	       const PtExpr* rhs,
+	       const PtControl* control);
 
   /// @brief デストラクタ
   virtual
@@ -843,8 +843,8 @@ protected:
 
   /// @brief コンストラクタ
   CptPcAssign(const FileRegion& file_region,
-	      PtExpr* lhs,
-	      PtExpr* rhs);
+	      const PtExpr* lhs,
+	      const PtExpr* rhs);
 
   /// @brief デストラクタ
   virtual
@@ -874,7 +874,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 右辺
-  PtExpr* mRhs;
+  const PtExpr* mRhs;
 
 };
 
@@ -891,7 +891,7 @@ protected:
 
   /// @brief コンストラクタ
   CptDeassign(const FileRegion& file_region,
-	      PtExpr* lhs);
+	      const PtExpr* lhs);
 
   /// @brief デストラクタ
   virtual
@@ -924,8 +924,8 @@ private:
 
   /// @brief コンストラクタ
   CptForce(const FileRegion& file_region,
-	   PtExpr* lhs,
-	   PtExpr* rhs);
+	   const PtExpr* lhs,
+	   const PtExpr* rhs);
 
   /// @brief デストラクタ
   virtual
@@ -958,7 +958,7 @@ private:
 
   /// @brief コンストラクタ
   CptRelease(const FileRegion& file_region,
-	     PtExpr* lhs);
+	     const PtExpr* lhs);
 
   /// @brief デストラクタ
   virtual
@@ -991,7 +991,7 @@ protected:
 
   /// @brief コンストラクタ
   CptEventStmt(const FileRegion& file_region,
-	       PtExpr* event);
+	       const PtExpr* event);
 
   /// @brief デストラクタ
   virtual
@@ -1021,7 +1021,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // イベント名を表すプライマリ
-  PtExpr* mPrimary;
+  const PtExpr* mPrimary;
 
 };
 
@@ -1070,8 +1070,8 @@ protected:
 
   /// @brief コンストラクタ
   CptIf(const FileRegion& file_region,
-	PtExpr* expr,
-	PtStmt* then_body);
+	const PtExpr* expr,
+	const PtStmt* then_body);
 
   /// @brief デストラクタ
   virtual
@@ -1106,10 +1106,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 条件式
-  PtExpr* mCond;
+  const PtExpr* mCond;
 
   // 成り立ったとき実行されるステートメント
-  PtStmt* mThen;
+  const PtStmt* mThen;
 
 };
 
@@ -1126,9 +1126,9 @@ protected:
 
   /// @brief コンストラクタ
   CptIfElse(const FileRegion& file_region,
-	    PtExpr* expr,
-	    PtStmt* then_body,
-	    PtStmt* else_body);
+	    const PtExpr* expr,
+	    const PtStmt* then_body,
+	    const PtStmt* else_body);
 
   /// @brief デストラクタ
   virtual
@@ -1152,7 +1152,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 成り立たなかったとき実行されるステートメント
-  PtStmt* mElse;
+  const PtStmt* mElse;
 
 };
 
@@ -1170,7 +1170,7 @@ private:
   /// @brief コンストラクタ
   CptCaseItem(const FileRegion& file_region,
 	      PtExprArray label_array,
-	      PtStmt* body);
+	      const PtStmt* body);
 
   /// @brief デストラクタ
   ~CptCaseItem();
@@ -1201,7 +1201,7 @@ public:
 
   /// @brief 本体のステートメント得る．
   virtual
-  PtStmt*
+  const PtStmt*
   body() const;
 
 
@@ -1217,7 +1217,7 @@ private:
   PtExprArray mLabelArray;
 
   // ラベルが一致したときに実行されるステートメント
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 
@@ -1234,7 +1234,7 @@ protected:
 
   /// @brief コンストラクタ
   CptCase(const FileRegion& file_region,
-	  PtExpr* expr,
+	  const PtExpr* expr,
 	  PtCaseItemArray caseitem_array);
 
   /// @brief デストラクタ
@@ -1275,7 +1275,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 比較される式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
   // case item の配列
   PtCaseItemArray mCaseItemArray;
@@ -1295,7 +1295,7 @@ protected:
 
   /// @brief コンストラクタ
   CptCaseX(const FileRegion& file_region,
-	   PtExpr* expr,
+	   const PtExpr* expr,
 	   PtCaseItemArray caseitem_array);
 
   /// @brief デストラクタ
@@ -1329,7 +1329,7 @@ protected:
 
   /// @brief コンストラクタ
   CptCaseZ(const FileRegion& file_region,
-	   PtExpr* expr,
+	   const PtExpr* expr,
 	   PtCaseItemArray caseitem_array);
 
   /// @brief デストラクタ
@@ -1361,7 +1361,7 @@ protected:
 
   /// @brief コンストラクタ
   CptLoopStmt(const FileRegion& file_region,
-	      PtStmt* body);
+	      const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -1385,7 +1385,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実行すべき本体
-  PtStmt* mBody;
+  const PtStmt* mBody;
 
 };
 
@@ -1402,7 +1402,7 @@ private:
 
   /// @brief コンストラクタ
   CptForever(const FileRegion& file_region,
-	     PtStmt* body);
+	     const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -1435,8 +1435,8 @@ protected:
 
   /// @brief コンストラクタ
   CptRepeat(const FileRegion& file_region,
-	    PtExpr* expr,
-	    PtStmt* body);
+	    const PtExpr* expr,
+	    const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -1466,7 +1466,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 繰り返し式
-  PtExpr* mExpr;
+  const PtExpr* mExpr;
 
 };
 
@@ -1483,8 +1483,8 @@ protected:
 
   /// @brief コンストラクタ
   CptWhile(const FileRegion& file_region,
-	   PtExpr* cond,
-	   PtStmt* body);
+	   const PtExpr* cond,
+	   const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -1517,10 +1517,10 @@ protected:
 
   /// @brief コンストラクタ
   CptFor(const FileRegion& file_region,
-	 PtStmt* init,
-	 PtExpr* cond,
-	 PtStmt* next,
-	 PtStmt* body);
+	 const PtStmt* init,
+	 const PtExpr* cond,
+	 const PtStmt* next,
+	 const PtStmt* body);
 
   /// @brief デストラクタ
   virtual
@@ -1555,10 +1555,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 初期化文
-  PtStmt* mInit;
+  const PtStmt* mInit;
 
   // 増加処理文
-  PtStmt* mNext;
+  const PtStmt* mNext;
 
 };
 

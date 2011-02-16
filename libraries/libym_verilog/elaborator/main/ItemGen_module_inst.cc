@@ -5,7 +5,7 @@
 ///
 /// $Id: ItemGen_module_inst.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -63,7 +63,7 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
   const PtModule* pt_module = find_moduledef(defname);
   if ( pt_module ) {
     // モジュール定義が見つかった．
-  
+
     if ( pt_module->is_in_use() ) {
       // 依存関係が循環している．
       ostringstream buf;
@@ -98,16 +98,20 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
       }
       else {
 	// 単一の要素
-	ElbModule* module1 = factory().new_Module(parent, 
+	ElbModule* module1 = factory().new_Module(parent,
 						  pt_module,
 						  pt_head,
 						  pt_inst);
 	reg_module(module1);
-  
+
+#if 0
 	// attribute instance の生成
-	//instantiate_attribute(pt_module->attr_top(), true, module1);
-	//instantiate_attribute(pt_head->attr_top(), false, module1);
-	
+	instantiate_attribute(pt_module->attr_top(), true, module1);
+	instantiate_attribute(pt_head->attr_top(), false, module1);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
+
 	ostringstream buf;
 	buf << "\"" << module1->full_name() << "\" has been created.";
 	put_msg(__FILE__, __LINE__,
@@ -115,7 +119,7 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 		kMsgInfo,
 		"ELAB",
 		buf.str());
-	
+
 	// パラメータ割り当て式の生成
 	PtConnectionArray pa_array = pt_head->paramassign_array();
 	ymuint n = pa_array.size();
@@ -126,10 +130,11 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 	ElbParamCon param_con(pt_head->file_region(), n, named_con);
 	for (ymuint i = 0; i < n; ++ i) {
 	  const PtConnection* pt_con = pa_array[i];
-	  ElbExpr* expr = instantiate_constant_expr(parent, pt_con->expr());
-	  param_con.set(i, pt_con, expr);
+	  const PtExpr* expr = pt_con->expr();
+	  VlValue value = evaluate_expr(parent, expr, true);
+	  param_con.set(i, pt_con, expr, value);
 	}
-	
+
 	phase1_module_item(module1, pt_module, &param_con);
 	add_phase3stub(make_stub(this, &ItemGen::link_module,
 				 module1, pt_module, pt_inst));
@@ -162,13 +167,13 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 	      "UDP instance cannot have ordered parameter list.");
       return;
     }
-    
+
     // 今すぐには処理できないのでキューに積む．
     add_phase2stub(make_stub(this, &ItemGen::instantiate_udpheader,
 			     parent, pt_head, udpdefn));
     return;
   }
-  
+
   // どちらもなければエラー
   ostringstream buf;
   buf << defname << " : No such module or UDP.";
@@ -197,21 +202,18 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   const PtExpr* pt_left = pt_inst->left_range();
   const PtExpr* pt_right = pt_inst->right_range();
 
-  ElbExpr* left = NULL;
-  ElbExpr* right = NULL;
   int left_val = 0;
   int right_val = 0;
-  if ( !instantiate_range(parent, pt_left, pt_right,
-			  left, right,
-			  left_val, right_val) ) {
+  if ( !evaluate_range(parent, pt_left, pt_right,
+		       left_val, right_val) ) {
     return;
   }
-  
+
   ElbModuleArray* module_array = factory().new_ModuleArray(parent,
 							   pt_module,
 							   pt_head,
 							   pt_inst,
-							   left, right,
+							   pt_left, pt_right,
 							   left_val, right_val);
   reg_modulearray(module_array);
 
@@ -237,18 +239,23 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   ElbParamCon param_con(pt_head->file_region(), param_num, named_con);
   for (ymuint i = 0; i < param_num; ++ i) {
     const PtConnection* pt_con = pa_array[i];
-    ElbExpr* expr = instantiate_constant_expr(parent, pt_con->expr());
-    param_con.set(i, pt_con, expr);
+    const PtExpr* expr = pt_con->expr();
+    VlValue value = evaluate_expr(parent, expr, true);
+    param_con.set(i, pt_con, expr, value);
   }
 
   ymuint n = module_array->elem_num();
   for (ymuint i = 0; i < n; ++ i) {
     ElbModule* module1 = module_array->_module(i);
-  
+
+#if 0
     // attribute instance の生成
-    //instantiate_attribute(pt_module->attr_top(), true, module1);
-    //instantiate_attribute(pt_head->attr_top(), false, module1);
-    
+    instantiate_attribute(pt_module->attr_top(), true, module1);
+    instantiate_attribute(pt_head->attr_top(), false, module1);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
+
     ostringstream buf;
     buf << "\"" << module1->full_name() << "\" has been created.";
     put_msg(__FILE__, __LINE__,
@@ -321,6 +328,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     }
   }
 
+  // ポートに接続する式を生成する．
   ElbEnv env;
   for (ymuint i = 0; i < n; ++ i) {
     const PtConnection* pt_con = pt_inst->port(i);
@@ -329,8 +337,10 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       continue;
     }
 
-    ymuint index = i;
+    // この式が対応するインデックス
+    ymuint index;
     if ( conn_by_name ) {
+      // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
       assert_cond(port_name != NULL, __FILE__, __LINE__);
       hash_map<string, int>::iterator p = port_index.find(port_name);
@@ -348,14 +358,13 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       assert_cond(index < port_num, __FILE__, __LINE__);
     }
     else {
+      // 順序に割り当ての場合は単純に i
+      index = i;
+      // 前にも書いたように YACC の文法で規定されているのでこれは常に真
       assert_cond(pt_con->name() == NULL, __FILE__, __LINE__);
     }
 
-    ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
-    if ( !tmp ) {
-      continue;
-    }
-    
+    // 割り当てるポートを取り出す．
     const VlPort* port = module0->port(index);
     if ( port == NULL ) {
       // このポートはダミー
@@ -363,57 +372,108 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     }
 
     ymuint port_size = port->bit_size();
-    tVpiValueType type = tmp->value_type();
-    if ( type == kVpiValueReal ) {
-      put_msg(__FILE__, __LINE__,
-	      tmp->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Real expression cannot connect to module port.");
-      continue;
-    }
-    ymuint expr_size = unpack_size(type);
+    if ( port->direction() == kVpiInput ) {
+      // 入力ポートには任意の式を接続できる．
+      ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
+      if ( !tmp ) {
+	continue;
+      }
 
-    // 配列型インスタンスの場合 expr_size に制限がある．
-    if ( port_size == expr_size ) {
-      // サイズが等しい場合はそのまま接続する．
-      for (ymuint i = 0; i < module_size; ++ i) {
-	ElbModule* module1 = module_array->_module(i);
-	module1->set_port_high_conn(index, tmp, conn_by_name);
+      tVpiValueType type = tmp->value_type();
+      if ( type == kVpiValueReal ) {
+	put_msg(__FILE__, __LINE__,
+		tmp->file_region(),
+		kMsgError,
+		"ELAB",
+		"Real expression cannot connect to module port.");
+	continue;
       }
-    }
-    else if ( expr_size == 0 ) {
-      // もともとサイズがなければ port_size に合わせる．
-      tmp->set_reqsize(pack(kVpiValueUS, port_size));
-      for (ymuint i = 0; i < module_size; ++ i) {
-	ElbModule* module1 = module_array->_module(i);
-	module1->set_port_high_conn(index, tmp, conn_by_name);
+      ymuint expr_size = unpack_size(type);
+      if ( expr_size == 0 ) {
+	// もともとサイズがなければ port_size に合わせる．
+	tmp->set_reqsize(pack(kVpiValueUS, port_size));
+	expr_size = port_size;
       }
-    }
-    else if ( port_size * module_size == expr_size ) {
-      // tmp を 分割する．
-      for (ymuint i = 0; i < module_size; ++ i) {
-	ElbModule* module1 = module_array->_module(i);
-	int lsb = i;
-	int msb = lsb + port_size - 1;
-	ElbExpr* part = factory().new_PartSelect(pt_expr, tmp, msb, lsb);
-	module1->set_port_high_conn(index, part, conn_by_name);
+
+      // 配列型インスタンスの場合 expr_size に制限がある．
+      if ( port_size == expr_size ) {
+	// サイズが等しい場合はそのまま接続する．
+	for (ymuint i = 0; i < module_size; ++ i) {
+	  ElbModule* module1 = module_array->_module(i);
+	  module1->set_port_high_conn(index, tmp, conn_by_name);
+	}
+      }
+      else if ( port_size * module_size == expr_size ) {
+	assert_cond( module_size > 1, __FILE__, __LINE__);
+	// tmp を 分割する．
+	for (ymuint i = 0; i < module_size; ++ i) {
+	  ElbModule* module1 = module_array->_module(i);
+	  ElbExpr* tmp1 = NULL;
+	  if ( port_size == 1 ) {
+	    tmp1 = factory().new_BitSelect(pt_expr, tmp, i);
+	  }
+	  else {
+	    int lsb = i;
+	    int msb = lsb + port_size - 1;
+	    tmp1 = factory().new_PartSelect(pt_expr, tmp, msb, lsb);
+	  }
+	  module1->set_port_high_conn(index, tmp1, conn_by_name);
+	}
+      }
+      else {
+	ostringstream buf;
+	buf << module_array->full_name() << " : "
+	    << (index + 1) << num_suffix(index + 1)
+	    << " port : port size does not match with the expression.";
+	put_msg(__FILE__, __LINE__,
+		pt_expr->file_region(),
+		kMsgError,
+		"ELAB",
+		buf.str());
       }
     }
     else {
-      ostringstream buf;
-      buf << module_array->full_name() << " : "
-	  << (index + 1) << num_suffix(index + 1)
-	  << " port : port size does not match with the expression.";
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      // それ以外の場合には左辺式のみが接続できる．
+      ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
+      tVpiValueType type = tmp->value_type();
+      if ( type == kVpiValueReal ) {
+	put_msg(__FILE__, __LINE__,
+		tmp->file_region(),
+		kMsgError,
+		"ELAB",
+		"Real expression cannot connect to module port.");
+	continue;
+      }
+      ymuint expr_size = unpack_size(type);
+      if ( expr_size == port_size ) {
+	// 式のサイズとポートサイズが等しければ全部のモジュールに
+	// 同一の式を接続する．
+	// 普通に考えていいアイデアとは思えない．
+	for (ymuint i = 0; i < module_size; ++ i) {
+	  ElbModule* module1 = module_array->_module(i);
+	  module1->set_port_high_conn(index, tmp, conn_by_name);
+	}
+      }
+      else if ( expr_size == port_size * module_size ) {
+	// 式を分割する．
+#warning "TODO:2011-02-09-03"
+      }
+      else {
+	// サイズが合わない．
+	ostringstream buf;
+	buf << module_array->full_name() << " : "
+	    << (index + 1) << num_suffix(index + 1)
+	    << " port : port size does not match with the expression.";
+	put_msg(__FILE__, __LINE__,
+		pt_expr->file_region(),
+		kMsgError,
+		"ELAB",
+		buf.str());
+      }
     }
-    
-    // attribute の設定を行う．
+
 #if 0
+    // attribute instance の設定
     for (ymuint i = 0; i < module_size; ++ i) {
       ElbModule* module1 = module_array->_module(i);
       const VlPort* port = module1->port(index);
@@ -421,6 +481,8 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       // attribute instance の生成
       instantiate_attribute(pt_con->attr_top(), false, port);
     }
+#else
+#warning "TODO:2011-02-09-01"
 #endif
   }
 }
@@ -435,7 +497,7 @@ ItemGen::link_module(ElbModule* module,
 		     const PtInst* pt_inst)
 {
   const VlNamedObj* parent = module->parent();
-  
+
   const FileRegion& fr = pt_inst->file_region();
 
   ymuint port_num = module->port_num();
@@ -482,7 +544,8 @@ ItemGen::link_module(ElbModule* module,
       }
     }
   }
-  
+
+  // ポートに接続する式を生成する．
   ElbEnv env;
   for (ymuint i = 0; i < n; ++ i) {
     const PtConnection* pt_con = pt_inst->port(i);
@@ -491,8 +554,10 @@ ItemGen::link_module(ElbModule* module,
       continue;
     }
 
-    ymuint index = i;
+    // この式に対応するポート番号を求める．
+    ymuint index ;
     if ( conn_by_name ) {
+      // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
       assert_cond(port_name != NULL, __FILE__, __LINE__);
       hash_map<string, int>::iterator p = port_index.find(port_name);
@@ -510,12 +575,10 @@ ItemGen::link_module(ElbModule* module,
       assert_cond(index < port_num, __FILE__, __LINE__);
     }
     else {
+      // 順序による割り当ての場合は単純に i
+      index = i;
+      // 前にも書いたように YACC の文法から下の仮定は常になりたつはず．
       assert_cond(pt_con->name() == NULL, __FILE__, __LINE__);
-    }
-    
-    ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
-    if ( !tmp ) {
-      continue;
     }
 
     const VlPort* port = module->port(index);
@@ -525,37 +588,73 @@ ItemGen::link_module(ElbModule* module,
     }
 
     ymuint port_size = port->bit_size();
-    tVpiValueType type = tmp->value_type();
-    ymuint expr_size = unpack_size(type);
 
-    // 単独のインスタンスの場合 expr のサイズは補正される．
-    // ... でいいんだよね．
-    if ( port_size != expr_size ) {
-      if ( expr_size != 0 ) {
-	ostringstream buf;
-	buf << module->full_name() << " : "
-	    << (index + 1) << num_suffix(index + 1)
-	    << " port : port size does not match with the expression. "
-	    << "expression size is coereced.";
-	put_msg(__FILE__, __LINE__,
-		pt_expr->file_region(),
-		kMsgWarning,
-		"ELAB",
-		buf.str());
-	ostringstream buf2;
-	buf2 << "port_size: " << port_size << ", expr_size: " << expr_size;
-	put_msg(__FILE__, __LINE__,
-		pt_expr->file_region(),
-		kMsgDebug,
-		"ELAB",
-		buf2.str());
+    if ( port->direction() == kVpiInput ) {
+      // 入力ポートには任意の式を接続できる．
+      ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
+      if ( !tmp ) {
+	continue;
       }
-      tmp->set_reqsize(pack(kVpiValueUS, port_size));
-    }
-    module->set_port_high_conn(index, tmp, conn_by_name);
 
+      tVpiValueType type = tmp->value_type();
+      if ( type == kVpiValueReal ) {
+	put_msg(__FILE__, __LINE__,
+		tmp->file_region(),
+		kMsgError,
+		"ELAB",
+		"Real expression cannot connect to module port.");
+	continue;
+      }
+      ymuint expr_size = unpack_size(type);
+
+      // 単独のインスタンスの場合 expr のサイズは補正される．
+      // ... でいいんだよね．
+      if ( port_size != expr_size ) {
+	if ( expr_size != 0 ) {
+	  ostringstream buf;
+	  buf << module->full_name() << " : "
+	      << (index + 1) << num_suffix(index + 1)
+	      << " port : port size does not match with the expression. "
+	      << "expression size is coereced.";
+	  put_msg(__FILE__, __LINE__,
+		  pt_expr->file_region(),
+		  kMsgWarning,
+		  "ELAB",
+		  buf.str());
+	  ostringstream buf2;
+	  buf2 << "port_size: " << port_size << ", expr_size: " << expr_size;
+	  put_msg(__FILE__, __LINE__,
+		  pt_expr->file_region(),
+		  kMsgDebug,
+		  "ELAB",
+		  buf2.str());
+	}
+	tmp->set_reqsize(pack(kVpiValueUS, port_size));
+      }
+      module->set_port_high_conn(index, tmp, conn_by_name);
+    }
+    else {
+      // それ以外のポートに接続できるのは左辺式だけ．
+      ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
+      tVpiValueType type = tmp->value_type();
+      if ( type == kVpiValueReal ) {
+	put_msg(__FILE__, __LINE__,
+		tmp->file_region(),
+		kMsgError,
+		"ELAB",
+		"Real expression cannot connect to module port.");
+	continue;
+      }
+      // 左辺はサイズの補正をしても意味がないのでそのまま接続する．
+      module->set_port_high_conn(index, tmp, conn_by_name);
+    }
+
+#if 0
     // attribute instance の生成
-    //instantiate_attribute(pt_con->attr_top(), false, port);
+    instantiate_attribute(pt_con->attr_top(), false, port);
+#else
+#warning "TODO:2011-02-09-01"
+#endif
   }
 }
 

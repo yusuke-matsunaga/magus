@@ -30,6 +30,7 @@ ChgNetwork::ChgNetwork(MagMgr* mgr) :
 			    "new bdnetwork before change");
   mPoptNewMvn = new TclPopt(this, "new_mvn",
 			    "new mvnetwork before change");
+  new_popt_group(mPoptNewBNet, mPoptNewBdn, mPoptNewMvn);
   set_usage_string("<network-name>");
 }
 
@@ -61,7 +62,7 @@ ChgNetwork::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-// @brief -new_bnet, -new_bdn オプションの処理を行う．
+// @brief -new_bnet, -new_bdn -new_mvn オプションの処理を行う．
 // @param[in] name ネットワーク名
 int
 ChgNetwork::new_opt(string name)
@@ -75,7 +76,7 @@ ChgNetwork::new_opt(string name)
       return TCL_ERROR;
     }
   }
-  if ( mPoptNewBdn->is_specified() ) {
+  else if ( mPoptNewBdn->is_specified() ) {
     TclObj script;
     script.append_element("::magus::new_bdnetwork");
     script.append_element(name);
@@ -84,7 +85,7 @@ ChgNetwork::new_opt(string name)
       return TCL_ERROR;
     }
   }
-  if ( mPoptNewMvn->is_specified() ) {
+  else if ( mPoptNewMvn->is_specified() ) {
     TclObj script;
     script.append_element("::magus::new_mvnetwork");
     script.append_element(name);

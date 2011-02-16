@@ -10,15 +10,40 @@
 
 
 #include "ElbParameter.h"
-#include "ElbParamAssign.h"
-#include "ElbExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
+// クラス ElbParamHead
+//////////////////////////////////////////////////////////////////////
+
+
+// @brief コンストラクタ
+ElbParamHead::ElbParamHead()
+{
+}
+
+// @brief デストラクタ
+ElbParamHead::~ElbParamHead()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス ElbParameter
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+ElbParameter::ElbParameter() :
+  mNext(NULL)
+{
+}
+
+// @brief デストラクタ
+ElbParameter::~ElbParameter()
+{
+}
 
 // @brief 定数値を持つ型のときに true を返す．
 bool
@@ -104,125 +129,13 @@ ElbParameter::delay() const
   return NULL;
 }
 
-// @brief 配列型オブジェクトの時に true を返す．
-bool
-ElbParameter::is_array() const
-{
-  return false;
-}
-
-// @brief 多次元の配列型オブジェクトの時に true を返す．
-bool
-ElbParameter::is_multi_array() const
-{
-  return false;
-}
-
-// @brief 配列型オブジェクトの場合の次元数の取得
-// @note このクラスでは 0 を返す．
-ymuint
-ElbParameter::dimension() const
-{
-  return 0;
-}
-
-// @brief 範囲の取得
-// @param[in] pos 位置 ( 0 <= pos < dimension() )
-// @note このクラスでは NULL を返す．
-const VlRange*
-ElbParameter::range(ymuint pos) const
-{
-  return NULL;
-}
-
-// @brief 配列要素の時に true を返す．
-// @note このクラスでは false を返す．
-bool
-ElbParameter::is_array_member() const
-{
-  return false;
-}
-
-// @brief 多次元の配列要素の時に true を返す．
-bool
-ElbParameter::is_multi_array_member() const
-{
-  return false;
-}
-
-// @brief 配列要素の時に親の配列を返す．
-VlDecl*
-ElbParameter::parent_array() const
-{
-  return NULL;
-}
-
-// @brief 1次元配列要素の時にインデックスを返す．
+// @brief 初期値の取得
+// @retval 初期値
+// @retval NULL 設定がない場合
 const VlExpr*
-ElbParameter::index() const
+ElbParameter::init_value() const
 {
   return NULL;
-}
-
-// @brief 多次元配列要素の時にインデックスのリストを返す．
-// @param[out] index_list インデックスのリストを格納する変数
-void
-ElbParameter::index(vector<const VlExpr*>& index_list) const
-{
-  index_list.clear();
-}
-
-// @brief 符号付きに補正する．
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_signed()
-{
-}
-
-// @brief スカラー値を設定する．
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_scalar(tVpiScalarVal val)
-{
-}
-
-// @brief real 型の値を設定する．
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_real(double val)
-{
-}
-
-// @brief bitvector 型の値を設定する．
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_bitvector(const BitVector& val)
-{
-}
-
-// @brief ビット値を設定する．
-// @param[in] index ビット位置
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_bitselect(int index,
-			    tVpiScalarVal val)
-{
-}
-
-// @brief 範囲値を設定する．
-// @param[in] left 範囲の MSB
-// @param[in] right 範囲の LSB
-// @param[in] val 値
-// @note このクラスでは何もしない．
-void
-ElbParameter::set_partselect(int left,
-			     int right,
-			     const BitVector& val)
-{
 }
 
 END_NAMESPACE_YM_VERILOG

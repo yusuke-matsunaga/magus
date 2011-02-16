@@ -119,14 +119,6 @@ ModuleNode::expand() const
   if ( mModule->iohead_array().size() > 0 ) {
     mChildren.push_back( new IOHeadListNode(mModule->iohead_array()) );
   }
-  if ( mModule->paramhead_array().size() > 0 ) {
-    mChildren.push_back( new DeclHeadListNode("Parameter",
-					      mModule->paramhead_array()) );
-  }
-  if ( mModule->localparamhead_array().size() > 0 ) {
-    mChildren.push_back( new DeclHeadListNode("Localparam",
-					      mModule->localparamhead_array()) );
-  }
   if ( mModule->declhead_array().size() > 0 ) {
     mChildren.push_back( new DeclHeadListNode("Decl",
 					      mModule->declhead_array()) );

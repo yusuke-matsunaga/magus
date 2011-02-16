@@ -10,6 +10,7 @@
 
 
 #include "TagDict.h"
+#include "TagDictCell.h"
 #include "ym_verilog/vl/VlObj.h"
 #include "ElbScope.h"
 #include "ElbModule.h"
@@ -136,35 +137,48 @@ TagDict::hash_func(const VlNamedObj* parent,
 
 // 宣言要素を追加する．
 void
-TagDictCell::add_decl(ElbDeclBase* obj)
+TagDictCell::add_decl(ElbDecl* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // 宣言要素の先頭を得る．
-const ElbDeclBase*
+const ElbDecl*
 TagDictCell::decl()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
-#if 0
-// parameter 宣言を追加する．
+// 宣言要素配列を追加する．
+void
+TagDictCell::add_declarray(ElbDeclArray* obj)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// 宣言要素配列の先頭を得る．
+const ElbDeclArray*
+TagDictCell::declarray()
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief  パラメータを追加する．
 void
 TagDictCell::add_parameter(ElbParameter* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
-// parameter 宣言の先頭を得る．
+// @brief  パラメータの先頭を得る．
 const ElbParameter*
 TagDictCell::parameter()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-#endif
 
 // defparam を追加する．
 void
@@ -316,16 +330,16 @@ TagDictCell::process()
   return NULL;
 }
 
-// generate block を追加する．
+// internal scope を追加する．
 void
-TagDictCell::add_genblock(ElbScope* obj)
+TagDictCell::add_internalscope(ElbScope* obj)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
-// generate block の先頭を得る．
+// internal scope の先頭を得る．
 const ElbScope*
-TagDictCell::genblock()
+TagDictCell::internalscope()
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -333,7 +347,7 @@ TagDictCell::genblock()
 
 
 //////////////////////////////////////////////////////////////////////
-// generate block 用のセル
+// internal scope 用のセル
 //////////////////////////////////////////////////////////////////////
 class CellScope :
   public TagDictCell
@@ -346,12 +360,12 @@ public:
   /// @brief 要素の追加
   virtual
   void
-  add_genblock(ElbScope* obj);
+  add_internalscope(ElbScope* obj);
 
-  /// @brief generate block の先頭を得る．
+  /// @brief 要素の先頭を得る．
   virtual
   const ElbScope*
-  genblock();
+  internalscope();
 
   /// @brief 要素数の取得
   virtual
@@ -385,16 +399,16 @@ CellScope::CellScope(ElbScope* obj) :
 
 // @brief 要素の追加
 void
-CellScope::add_genblock(ElbScope* obj)
+CellScope::add_internalscope(ElbScope* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
   ++ mNum;
 }
 
-// @brief generate block の先頭を得る．
+// @brief 要素の先頭を得る．
 const ElbScope*
-CellScope::genblock()
+CellScope::internalscope()
 {
   return mTop;
 }
@@ -406,17 +420,17 @@ CellScope::num()
   return mNum;
 }
 
-// @brief generate block を追加する．
+// @brief internal scope を追加する．
 // @param[in] obj 登録する要素
 void
-TagDict::add_genblock(ElbScope* obj)
+TagDict::add_internalscope(ElbScope* obj)
 {
   const VlNamedObj* parent = obj->parent();
 
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiInternalScope);
   if ( cell ) {
-    cell->add_genblock(obj);
+    cell->add_internalscope(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellScope));
@@ -425,21 +439,21 @@ TagDict::add_genblock(ElbScope* obj)
   }
 }
 
-// @brief generate block のリストを取り出す．
+// @brief internal scope のリストを取り出す．
 // @param[in] parent 親のスコープ
 // @param[out] obj_list 結果を格納するリスト
 // @retval true 該当する要素が1つ以上あった．
 // @retval false 該当する要素がなかった．
 bool
-TagDict::find_genblock_list(const VlNamedObj* parent,
-			    vector<const VlNamedObj*>& obj_list) const
+TagDict::find_internalscope_list(const VlNamedObj* parent,
+				 vector<const VlNamedObj*>& obj_list) const
 {
   // 該当の Cell が存在するか調べる．
   TagDictCell* cell = find_cell(parent, vpiInternalScope);
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbScope* obj = cell->genblock();
+    for (const ElbScope* obj = cell->internalscope();
 	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
@@ -458,16 +472,16 @@ class CellDecl :
 public:
 
   /// @brief コンストラクタ
-  CellDecl(ElbDeclBase* obj);
+  CellDecl(ElbDecl* obj);
 
   /// @brief 要素の追加
   virtual
   void
-  add_decl(ElbDeclBase* obj);
+  add_decl(ElbDecl* obj);
 
   /// @brief 宣言要素の先頭を得る．
   virtual
-  ElbDeclBase*
+  ElbDecl*
   decl();
 
   /// @brief 要素数の取得
@@ -482,10 +496,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 先頭の要素
-  ElbDeclBase* mTop;
+  ElbDecl* mTop;
 
   // 末尾の要素
-  ElbDeclBase* mTail;
+  ElbDecl* mTail;
 
   // 要素数
   ymuint32 mNum;
@@ -493,7 +507,7 @@ private:
 };
 
 // @brief コンストラクタ
-CellDecl::CellDecl(ElbDeclBase* obj) :
+CellDecl::CellDecl(ElbDecl* obj) :
   mTop(obj),
   mTail(obj),
   mNum(1)
@@ -502,7 +516,7 @@ CellDecl::CellDecl(ElbDeclBase* obj) :
 
 // @brief 要素の追加
 void
-CellDecl::add_decl(ElbDeclBase* obj)
+CellDecl::add_decl(ElbDecl* obj)
 {
   mTail->mNext = obj;
   mTail = obj;
@@ -510,7 +524,7 @@ CellDecl::add_decl(ElbDeclBase* obj)
 }
 
 // @brief 宣言要素の先頭を得る．
-ElbDeclBase*
+ElbDecl*
 CellDecl::decl()
 {
   return mTop;
@@ -528,7 +542,7 @@ CellDecl::num()
 // @param[in] obj 登録する要素
 void
 TagDict::add_decl(int tag,
-		  ElbDeclBase* obj)
+		  ElbDecl* obj)
 {
   const VlNamedObj* parent = obj->parent();
 
@@ -562,7 +576,138 @@ TagDict::find_decl_list(const VlNamedObj* parent,
   if ( cell ) {
     obj_list.clear();
     obj_list.reserve(cell->num());
-    for (const ElbDeclBase* obj = cell->decl();
+    if ( tag == kVpiParameter || tag == kVpiSpecParam ) {
+      for (const ElbParameter* obj = cell->parameter();
+	   obj; obj = obj->next()) {
+	obj_list.push_back(obj);
+      }
+    }
+    else {
+      for (const ElbDecl* obj = cell->decl();
+	   obj; obj = obj->next()) {
+	obj_list.push_back(obj);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// 宣言要素用のセル
+//////////////////////////////////////////////////////////////////////
+class CellDeclArray :
+  public TagDictCell
+{
+public:
+
+  /// @brief コンストラクタ
+  CellDeclArray(ElbDeclArray* obj);
+
+  /// @brief 要素の追加
+  virtual
+  void
+  add_declarray(ElbDeclArray* obj);
+
+  /// @brief 宣言要素の先頭を得る．
+  virtual
+  ElbDeclArray*
+  declarray();
+
+  /// @brief 要素数の取得
+  virtual
+  ymuint
+  num();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 先頭の要素
+  ElbDeclArray* mTop;
+
+  // 末尾の要素
+  ElbDeclArray* mTail;
+
+  // 要素数
+  ymuint32 mNum;
+
+};
+
+// @brief コンストラクタ
+CellDeclArray::CellDeclArray(ElbDeclArray* obj) :
+  mTop(obj),
+  mTail(obj),
+  mNum(1)
+{
+}
+
+// @brief 要素の追加
+void
+CellDeclArray::add_declarray(ElbDeclArray* obj)
+{
+  mTail->mNext = obj;
+  mTail = obj;
+  ++ mNum;
+}
+
+// @brief 宣言要素の先頭を得る．
+ElbDeclArray*
+CellDeclArray::declarray()
+{
+  return mTop;
+}
+
+// @brief 要素数の取得
+ymuint
+CellDeclArray::num()
+{
+  return mNum;
+}
+
+// @brief 宣言要素を追加する．
+// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+// @param[in] obj 登録する要素
+void
+TagDict::add_declarray(int tag,
+		       ElbDeclArray* obj)
+{
+  const VlNamedObj* parent = obj->parent();
+
+  // 該当の Cell が存在するか調べる．
+  TagDictCell* cell = find_cell(parent, tag);
+  if ( cell ) {
+    cell->add_declarray(obj);
+  }
+  else {
+    void* p = mAlloc.get_memory(sizeof(CellDeclArray));
+    TagDictCell* cell = new (p) CellDeclArray(obj);
+    put_cell(parent, tag, cell);
+  }
+}
+
+// @brief タグから該当する宣言要素のリストを返す．
+// @param[in] parent 親のスコープ
+// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
+// @param[out] obj_list 結果を格納するリスト
+// @retval true 該当する要素が1つ以上あった．
+// @retval false 該当する要素がなかった．
+// @note scope というスコープ内の tag というタグを持つ要素を
+// obj_list に入れる．
+bool
+TagDict::find_declarray_list(const VlNamedObj* parent,
+			     int tag,
+			     vector<const VlDeclArray*>& obj_list) const
+{
+  // 該当の Cell が存在するか調べる．
+  TagDictCell* cell = find_cell(parent, tag);
+  if ( cell ) {
+    obj_list.clear();
+    obj_list.reserve(cell->num());
+    for (const ElbDeclArray* obj = cell->declarray();
 	 obj; obj = obj->next()) {
       obj_list.push_back(obj);
     }
@@ -572,9 +717,8 @@ TagDict::find_decl_list(const VlNamedObj* parent,
 }
 
 
-#if 0
 //////////////////////////////////////////////////////////////////////
-// parameter 宣言用のセル
+// パラメータ用ののセル
 //////////////////////////////////////////////////////////////////////
 class CellParam :
   public TagDictCell
@@ -589,7 +733,7 @@ public:
   void
   add_parameter(ElbParameter* obj);
 
-  /// @brief parameter 宣言の先頭を得る．
+  /// @brief 宣言要素の先頭を得る．
   virtual
   ElbParameter*
   parameter();
@@ -633,7 +777,7 @@ CellParam::add_parameter(ElbParameter* obj)
   ++ mNum;
 }
 
-// @brief parameter 宣言の先頭を得る．
+// @brief 宣言要素の先頭を得る．
 ElbParameter*
 CellParam::parameter()
 {
@@ -647,51 +791,26 @@ CellParam::num()
   return mNum;
 }
 
-// @brief parameter 宣言を追加する．
+// @brief 宣言要素を追加する．
+// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
 // @param[in] obj 登録する要素
 void
-TagDict::add_parameter(ElbParameter* obj)
+TagDict::add_parameter(int tag,
+		       ElbParameter* obj)
 {
   const VlNamedObj* parent = obj->parent();
 
   // 該当の Cell が存在するか調べる．
-  TagDictCell* cell = find_cell(parent, vpiParameter);
+  TagDictCell* cell = find_cell(parent, tag);
   if ( cell ) {
     cell->add_parameter(obj);
   }
   else {
     void* p = mAlloc.get_memory(sizeof(CellParam));
     TagDictCell* cell = new (p) CellParam(obj);
-    put_cell(parent, vpiParameter, cell);
+    put_cell(parent, tag, cell);
   }
 }
-
-// @brief タグから該当する宣言要素のリストを返す．
-// @param[in] parent 親のスコープ
-// @param[in] tag 要素の型を表すタグ (vpi_user.h 参照)
-// @param[out] obj_list 結果を格納するリスト
-// @retval true 該当する要素が1つ以上あった．
-// @retval false 該当する要素がなかった．
-// @note scope というスコープ内の tag というタグを持つ要素を
-// decl_list に入れる．
-bool
-TagDict::find_param_list(const VlNamedObj* parent,
-			 vector<const VlDecl*>& obj_list) const
-{
-  // 該当の Cell が存在するか調べる．
-  TagDictCell* cell = find_cell(parent, vpiParameter);
-  if ( cell ) {
-    obj_list.clear();
-    obj_list.reserve(cell->num());
-    for (const ElbParameter* obj = cell->parameter();
-	 obj; obj = obj->next()) {
-      obj_list.push_back(obj);
-    }
-    return true;
-  }
-  return false;
-}
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

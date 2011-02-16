@@ -42,6 +42,9 @@ public:
   name() const = 0;
 
   /// @brief 方向を返す．
+  /// @retval kVpiInput 入力
+  /// @retval kVpiOutput 出力
+  /// @retval kVpiInout 入出力
   virtual
   tVpiDirection
   direction() const = 0;
@@ -53,33 +56,34 @@ public:
   bool
   is_signed() const = 0;
 
-  /// @brief 範囲のMSBの取得
-  /// @retval 範囲のMSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
+  /// @brief 範囲指定を持つとき true を返す．
   virtual
-  const VlExpr*
-  left_range() const = 0;
-
-  /// @brief 範囲のLSBの取得
-  /// @retval 範囲のLSB 範囲を持つとき
-  /// @retval NULL 範囲を持たないとき
-  virtual
-  const VlExpr*
-  right_range() const = 0;
+  bool
+  has_range() const = 0;
 
   /// @brief MSB の値を返す．
-  /// @retval 範囲のMSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @note 範囲を持たない時の値は不定
   virtual
   int
-  left_range_const() const = 0;
+  left_range_val() const = 0;
 
   /// @brief LSB の値を返す．
-  /// @retval 範囲のLSBの値 範囲指定を持つとき
-  /// @retval -1 範囲指定を持たないとき
+  /// @note 範囲を持たない時の値は不定
   virtual
   int
-  right_range_const() const = 0;
+  right_range_val() const = 0;
+
+  /// @brief 範囲のMSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  left_range_string() const = 0;
+
+  /// @brief 範囲のLSBを表す文字列の取得
+  /// @note 範囲を持たない時の値は不定
+  virtual
+  string
+  right_range_string() const = 0;
 
   /// @brief ビット幅を返す．
   virtual
@@ -92,21 +96,25 @@ public:
   decl() const = 0;
 
   /// @brief 親のモジュールの取得
+  /// @note モジュールのIOの時にのみ意味を持つ．
   virtual
   const VlModule*
   module() const = 0;
 
   /// @brief 親の UDP の取得
+  /// @note UDPのIOの時にのみ意味を持つ．
   virtual
   const VlUdpDefn*
   udp_defn() const = 0;
 
   /// @brief 親のタスクの取得
+  /// @note タスクのIOの時にのみ意味を持つ．
   virtual
   const VlTaskFunc*
   task() const = 0;
 
   /// @brief 親の関数の取得
+  /// @note 関数のIOの時にのみ意味を持つ．
   virtual
   const VlTaskFunc*
   function() const = 0;

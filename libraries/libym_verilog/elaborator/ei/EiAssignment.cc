@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 代入文を生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -73,7 +73,7 @@ EiFactory::new_AssignStmt(const VlNamedObj* parent,
 
   return stmt;
 }
-  
+
 // @brief deassign ステートメントを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -111,7 +111,7 @@ EiFactory::new_ForceStmt(const VlNamedObj* parent,
 
   return stmt;
 }
-  
+
 // @brief release ステートメントを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] process 親のプロセス (or NULL)
@@ -156,28 +156,28 @@ EiAssignBase::EiAssignBase(const VlNamedObj* parent,
 EiAssignBase::~EiAssignBase()
 {
 }
-  
+
 // @brief 左辺を返す．
 const VlExpr*
 EiAssignBase::lhs() const
 {
   return mLhs;
 }
-  
+
 // @brief 右辺を返す．
 const VlExpr*
 EiAssignBase::rhs() const
 {
   return mRhs;
 }
-  
+
 // @brief 左辺を返す．
 ElbExpr*
 EiAssignBase::_lhs() const
 {
   return mLhs;
 }
-  
+
 // @brief 右辺を返す．
 ElbExpr*
 EiAssignBase::_rhs() const
@@ -219,20 +219,12 @@ EiNbAssignment::type() const
 {
   return kVpiAssignment;
 }
-  
+
 // @brief control を返す．NULL の場合もありうる．
 const VlControl*
 EiNbAssignment::control() const
 {
   return mControl;
-}
-
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiNbAssignment::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 
@@ -270,27 +262,6 @@ EiAssignment::is_blocking() const
   return true;
 }
 
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiAssignment::func_exec(bool constant_function) const
-{
-  assert_cond(control() == NULL, __FILE__, __LINE__);
-  if ( _lhs()->bit_size() == 1 ) {
-    tVpiScalarVal v = _rhs()->eval_scalar();
-    _lhs()->set_scalar(v);
-  }
-  else if ( _lhs()->value_type() == kVpiValueReal ) {
-    double v = _rhs()->eval_real();
-    _lhs()->set_real(v);
-  }
-  else {
-    BitVector v;
-    _rhs()->eval_bitvector(v, _lhs()->value_type());
-    _lhs()->set_bitvector(v);
-  }
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiAssignStmt
@@ -323,15 +294,6 @@ EiAssignStmt::type() const
   return kVpiAssignStmt;
 }
 
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiAssignStmt::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiForceStmt
@@ -356,21 +318,12 @@ EiForceStmt::EiForceStmt(const VlNamedObj* parent,
 EiForceStmt::~EiForceStmt()
 {
 }
-  
+
 // @brief このクラスの型を返す．
 tVpiObjType
 EiForceStmt::type() const
 {
   return kVpiForce;
-}
-  
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiForceStmt::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 
@@ -396,7 +349,7 @@ EiDeassignBase::EiDeassignBase(const VlNamedObj* parent,
 EiDeassignBase::~EiDeassignBase()
 {
 }
-  
+
 // @brief 左辺を返す．
 const VlExpr*
 EiDeassignBase::lhs() const
@@ -426,21 +379,12 @@ EiDeassignStmt::EiDeassignStmt(const VlNamedObj* parent,
 EiDeassignStmt::~EiDeassignStmt()
 {
 }
-  
+
 // @brief このクラスの型を返す．
 tVpiObjType
 EiDeassignStmt::type() const
 {
   return kVpiDeassign;
-}
-
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiDeassignStmt::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 
@@ -465,21 +409,12 @@ EiReleaseStmt::EiReleaseStmt(const VlNamedObj* parent,
 EiReleaseStmt::~EiReleaseStmt()
 {
 }
-  
+
 // @brief このクラスの型を返す．
 tVpiObjType
 EiReleaseStmt::type() const
 {
   return kVpiRelease;
-}
-
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiReleaseStmt::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -3,15 +3,16 @@
 /// @brief Parser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Parser_udp.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: Parser_module.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Parser.h"
-#include "Parser_port.h"
 
+#include "Lex.h"
+#include "LexModuleState.h"
 #include "PtMgr.h"
 #include "PtiFactory.h"
 #include "PtiDecl.h"
@@ -25,17 +26,45 @@ BEGIN_NAMESPACE_YM_VERILOG
 // UDP 関係
 //////////////////////////////////////////////////////////////////////
 
+// @brief UDP定義の開始
+// - port list の初期化
+// - iohead list の初期化
+// - declhead list の初期化
+// - UDP entry list の初期化
+// を行う．
+void
+Parser::init_udp()
+{
+  mPortList.clear();
+  mCurIOHeadList = &mModuleIOHeadList;
+  mCurDeclHeadList = &mModuleDeclHeadList;
+
+  mCurIOHeadList->clear();
+  mIOItemList.clear();
+
+  mCurDeclHeadList->clear();
+  mDeclItemList.clear();
+
+  mUdpEntryList.clear();
+}
+
+// @brief UDP 定義の終了
+void
+Parser::end_udp()
+{
+}
+
 // UDP を生成する．(Verilog-1995)
 void
 Parser::new_Udp1995(const FileRegion& file_region,
 		    const char* udp_name,
 		    const char* init_name,
 		    const FileRegion& init_loc,
-		    PtExpr* init_value,
-		    PtrList<PtAttrInst>* ai_list)
+		    const PtExpr* init_value,
+		    PtrList<const PtAttrInst>* ai_list)
 {
-  PtIOHeadArray iohead_array = get_io_array();
-  PtDeclHeadArray decl_array = get_decl_array();
+  PtIOHeadArray iohead_array = get_module_io_array();
+  PtDeclHeadArray decl_array = get_module_decl_array();
 
   const PtIOItem* out_item = NULL;
   bool is_seq = false;
@@ -199,10 +228,10 @@ Parser::new_Udp2001(const FileRegion& file_region,
 		    const char* udp_name,
 		    const char* init_name,
 		    const FileRegion& init_loc,
-		    PtExpr* init_value,
-		    PtrList<PtAttrInst>* ai_list)
+		    const PtExpr* init_value,
+		    PtrList<const PtAttrInst>* ai_list)
 {
-  PtIOHeadArray iohead_array = get_io_array();
+  PtIOHeadArray iohead_array = get_module_io_array();
 
   bool is_seq = false;
 
@@ -241,14 +270,14 @@ Parser::new_Udp(const FileRegion& file_region,
 		const char* udp_name,
 		const char* init_name,
 		const FileRegion& init_loc,
-		PtExpr* init_value,
-		PtrList<PtAttrInst>* ai_list,
+		const PtExpr* init_value,
+		PtrList<const PtAttrInst>* ai_list,
 		bool is_seq,
 		const PtIOItem* out_item,
 		PtiPortArray port_array,
 		PtIOHeadArray iohead_array)
 {
-  PtUdp* udp = NULL;
+  const PtUdp* udp = NULL;
   if ( is_seq ) {
     // 初期値の設定がある．
     if ( init_name ) {
@@ -321,7 +350,7 @@ Parser::new_UdpEntry(const FileRegion& fr,
 		     const FileRegion& output_loc,
 		     tVpiUdpVal output_symbol)
 {
-  PtUdpValue* output = mFactory.new_UdpValue(output_loc, output_symbol);
+  const PtUdpValue* output = mFactory.new_UdpValue(output_loc, output_symbol);
   add_udp_entry( mFactory.new_UdpEntry(fr, get_udp_value_array(), output) );
 }
 
@@ -338,8 +367,10 @@ Parser::new_UdpEntry(const FileRegion& fr,
 		     const FileRegion& output_loc,
 		     tVpiUdpVal output_symbol)
 {
-  PtUdpValue* current = mFactory.new_UdpValue(current_loc, current_symbol);
-  PtUdpValue* output = mFactory.new_UdpValue(output_loc, output_symbol);
+  const PtUdpValue* current = mFactory.new_UdpValue(current_loc,
+						    current_symbol);
+  const PtUdpValue* output = mFactory.new_UdpValue(output_loc,
+						   output_symbol);
   add_udp_entry( mFactory.new_UdpEntry(fr, get_udp_value_array(),
 				       current, output) );
 }
@@ -347,7 +378,7 @@ Parser::new_UdpEntry(const FileRegion& fr,
 // @brief UdpEntry を追加する．
 inline
 void
-Parser::add_udp_entry(PtUdpEntry* entry)
+Parser::add_udp_entry(const PtUdpEntry* entry)
 {
   mUdpEntryList.push_back(entry);
 }
@@ -381,7 +412,7 @@ Parser::init_udp_value_list()
 // @brief UdpValue を追加する．
 inline
 void
-Parser::add_udp_value(PtUdpValue* value)
+Parser::add_udp_value(const PtUdpValue* value)
 {
   mUdpValueList.push_back(value);
 }
@@ -392,6 +423,30 @@ PtUdpValueArray
 Parser::get_udp_value_array()
 {
   return mUdpValueList.to_array(mAlloc);
+}
+
+// @brief ポートリストを配列に変換する．
+inline
+PtiPortArray
+Parser::get_port_array()
+{
+  return mPortList.to_array(mAlloc);
+}
+
+// @brief IO宣言リストを配列に変換する．
+inline
+PtIOHeadArray
+Parser::get_module_io_array()
+{
+  return mModuleIOHeadList.to_array(mAlloc);
+}
+
+// @brief module 用の宣言リストを配列に変換する．
+inline
+PtDeclHeadArray
+Parser::get_module_decl_array()
+{
+  return mModuleDeclHeadList.to_array(mAlloc);
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -36,7 +36,7 @@ ElbStmt*
 EiFactory::new_EventStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbDecl* named_event)
+			 ElbExpr* named_event)
 {
   void* p = mAlloc.get_memory(sizeof(EiEventStmt));
   ElbStmt* stmt = new (p) EiEventStmt(parent, process, pt_stmt,
@@ -153,7 +153,7 @@ EiFactory::new_CtrlStmt(const VlNamedObj* parent,
 EiEventStmt::EiEventStmt(const VlNamedObj* parent,
 			 ElbProcess* process,
 			 const PtStmt* pt_stmt,
-			 ElbDecl* named_event) :
+			 ElbExpr* named_event) :
   EiStmtBase(parent, process, pt_stmt),
   mEvent(named_event)
 {
@@ -172,19 +172,10 @@ EiEventStmt::type() const
 }
 
 // @brief named event を返す．
-const VlDecl*
+const VlExpr*
 EiEventStmt::named_event() const
 {
   return mEvent;
-}
-
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiEventStmt::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 
@@ -213,14 +204,6 @@ tVpiObjType
 EiNullStmt::type() const
 {
   return kVpiNullStmt;
-}
-
-// @brief function 中の実行を行う．
-// @note このクラスでは何もしないで NULL を返す．
-const VlNamedObj*
-EiNullStmt::func_exec(bool constant_function) const
-{
-  return NULL;
 }
 
 
@@ -316,15 +299,6 @@ EiTaskCall::task() const
   return mTask;
 }
 
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiTaskCall::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス SysTaskCall
@@ -367,17 +341,6 @@ EiSysTaskCall::user_systf() const
   return mUserSystf;
 }
 
-// @brief function 中の実行を行う．
-// @note system task は function 中では無視される．
-const VlNamedObj*
-EiSysTaskCall::func_exec(bool constant_function) const
-{
-  if ( !constant_function ) {
-#warning "TODO: 未完"
-  }
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiDisableStmt
@@ -416,13 +379,6 @@ EiDisableStmt::type() const
 // のいずれか
 const VlNamedObj*
 EiDisableStmt::scope() const
-{
-  return mExpr;
-}
-
-// @brief function 中の実行を行う．
-const VlNamedObj*
-EiDisableStmt::func_exec(bool constant_function) const
 {
   return mExpr;
 }
@@ -473,15 +429,6 @@ const VlStmt*
 EiCtrlStmt::body_stmt() const
 {
   return mBodyStmt;
-}
-
-// @brief function 中の実行を行う．
-// @note このクラスは function 中では使えない．
-const VlNamedObj*
-EiCtrlStmt::func_exec(bool constant_function) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 END_NAMESPACE_YM_VERILOG

@@ -38,6 +38,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入出力の区別を得る．
+  /// @retval kVpiInput 入力
+  /// @retval kVpiOutput 出力
+  /// @retval kVpiInout 入出力
+  /// @retval kVpiMixedIO ビットごとに異なる混合タイプ
+  /// @retvla kVpiNoDirection 方向の属性なし．
   virtual
   tVpiDirection
   direction() const = 0;
