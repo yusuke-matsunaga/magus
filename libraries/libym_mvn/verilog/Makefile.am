@@ -23,6 +23,7 @@ libym_mvn_verilog_la_SOURCES = \
 	MvVlMap.cc \
 	ReaderImpl.h \
 	ReaderImpl.cc \
+	ReaderImpl_expr.cc \
 	Env.h \
 	Env.cc
 
