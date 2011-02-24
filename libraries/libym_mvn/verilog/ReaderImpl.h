@@ -180,6 +180,17 @@ private:
 	   const VlExpr* expr,
 	   const Env& env);
 
+  /// @brief 演算に対応したノードの木を作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] op_type 演算の種類
+  /// @param[in] operand_array オペランドに対応するノードの配列
+  /// @param[in] out_bw 出力のビット幅
+  MvNode*
+  gen_opr(MvModule* parent_module,
+	  nsYm::nsVerilog::tVpiOpType op_type,
+	  const vector<MvNode*>& operand_array,
+	  ymuint out_bw);
+
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
   /// @param[in] env 環境
