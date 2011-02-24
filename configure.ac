@@ -75,6 +75,7 @@ ym_libym_verilog_enable=1
 ym_libym_bnet_enable=1
 ym_libym_bdn_enable=1
 ym_libym_mvn_enable=1
+ym_libym_mvnbdnconv_enable=0
 ym_libym_sbj_enable=1
 ym_libym_aig_enable=1
 ym_libym_tgnet_enable=1
@@ -152,6 +153,12 @@ YM_BUILD_LIBRARY([libym_sbj],
 # libym_mvn
 YM_BUILD_LIBRARY([libym_mvn],
 		 [ym_libym_utils_enable])
+
+# libym_mvnbdnconv
+YM_BUILD_LIBRARY([libym_mvnbdnconv],
+		 [ym_libym_utils_enable,
+		  ym_libym_mvn_enable,
+		  ym_libym_bdn_enable])
 
 # libym_aig
 YM_BUILD_LIBRARY([libym_aig],
