@@ -42,7 +42,7 @@ TgBlifHandler::init()
   mConList.clear();
   return true;
 }
-    
+
 // @brief .model 文の処理
 // @param[in] loc1 .model の位置情報
 // @param[in] loc2 文字列の位置情報
@@ -66,7 +66,7 @@ TgBlifHandler::inputs_elem(ymuint32 name_id)
   mNetwork->set_to_input(node);
   return true;
 }
-  
+
 // @brief .output 文の読み込み
 bool
 TgBlifHandler::outputs_elem(ymuint32 name_id)
@@ -87,7 +87,7 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
 		     char opat)
 {
   ymuint32 n = name_id_array.size();
-  
+
   mCurFanins.clear();
   for (ymuint32 i = 0; i < n; ++ i) {
     ymuint32 id = name_id_array[i];
@@ -95,14 +95,14 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
     TgNode* node = mNetwork->find_node(name, true);
     mCurFanins.push_back(node);
   }
-  
+
   ymuint32 ni = n - 1;
   TgNode* node = mCurFanins[ni];
   mChd2.reserve(ni);
 
   LogExpr expr;
   mChd1.clear();
-  if ( opat == 1 ) {
+  if ( opat == '1' ) {
     for (ymuint32 c = 0; c < nc; ++ c) {
       mChd2.clear();
       for (ymuint32 i = 0; i < ni; ++ i) {
@@ -201,7 +201,7 @@ TgBlifHandler::gate_end()
 {
   return true;
 }
-  
+
 // @brief .latch 文の読み込み
 bool
 TgBlifHandler::latch(ymuint32 name1_id,
@@ -231,7 +231,7 @@ TgBlifHandler::end(const FileRegion& loc)
     mNetwork->connect(con.mFrom, con.mTo, con.mPos);
   }
   mConList.clear();
-  
+
   size_t n = mNetwork->node_num();
   for (size_t i = 0; i < n; ++ i) {
     const TgNode* node = mNetwork->node(i);
@@ -250,7 +250,7 @@ TgBlifHandler::end(const FileRegion& loc)
 
   return true;
 }
-  
+
 // @brief 終了処理
 void
 TgBlifHandler::normal_exit()
