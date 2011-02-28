@@ -200,8 +200,45 @@ ProcEnv::add(const VlDeclArray* decl,
 // @param[in] decl 宣言要素
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
-AssignInfo
+MvNode*
 ProcEnv::get(const VlDecl* decl) const
+{
+  ymuint id = mDeclHash.get_id(decl);
+  AssignInfo ans = get_from_id(id);
+  if ( ans.mRhs != NULL &&
+       ans.mNbFlag == false &&
+       ans.mCond == NULL ) {
+    return ans.mRhs;
+  }
+  return mGlobalEnv.get_from_id(id);
+}
+
+// @brief 対応するノードを取り出す(配列型)．
+// @param[in] decl 宣言要素
+// @param[in] offset オフセット
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型でない場合，
+// オフセットが範囲外の場合には NULL を返す．
+MvNode*
+ProcEnv::get(const VlDeclArray* decl,
+	     ymuint offset) const
+{
+  ymuint id = mDeclHash.get_id(decl, offset);
+  AssignInfo ans = get_from_id(id);
+  if ( ans.mRhs != NULL &&
+       ans.mNbFlag == false &&
+       ans.mCond == NULL ) {
+    return ans.mRhs;
+  }
+  return mGlobalEnv.get_from_id(id);
+}
+
+// @brief 対応するノードを取り出す．
+// @param[in] decl 宣言要素
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型の場合には NULL を返す．
+AssignInfo
+ProcEnv::get_info(const VlDecl* decl) const
 {
   ymuint id = mDeclHash.get_id(decl);
   AssignInfo ans = get_from_id(id);
@@ -219,8 +256,8 @@ ProcEnv::get(const VlDecl* decl) const
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
 AssignInfo
-ProcEnv::get(const VlDeclArray* decl,
-	    ymuint offset) const
+ProcEnv::get_info(const VlDeclArray* decl,
+		  ymuint offset) const
 {
   ymuint id = mDeclHash.get_id(decl, offset);
   AssignInfo ans = get_from_id(id);

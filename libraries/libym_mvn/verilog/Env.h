@@ -39,6 +39,12 @@ struct AssignInfo
   /// ただし常に代入する時は NULL
   MvNode* mCond;
 
+  /// @brief non-blocking 代入を表すフラグ
+  bool mNbFlag;
+
+  /// @brief 参照されたことを表すフラグ
+  bool mRefFlag;
+
 };
 
 
@@ -93,6 +99,7 @@ public:
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
+  virtual
   MvNode*
   get(const VlDecl* decl) const;
 
@@ -102,6 +109,7 @@ public:
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
+  virtual
   MvNode*
   get(const VlDeclArray* decl,
       ymuint offset) const;
@@ -138,7 +146,8 @@ private:
 /// @class ProcEnv Env.h "Env.h"
 /// @brief プロセス内部の Env
 //////////////////////////////////////////////////////////////////////
-class ProcEnv
+class ProcEnv :
+  public Env
 {
 public:
 
@@ -150,6 +159,7 @@ public:
   ProcEnv(const ProcEnv& tmp_env);
 
   /// @brief デストラクタ
+  virtual
   ~ProcEnv();
 
 
@@ -187,7 +197,8 @@ public:
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
-  AssignInfo
+  virtual
+  MvNode*
   get(const VlDecl* decl) const;
 
   /// @brief 対応するノードを取り出す(配列型)．
@@ -196,8 +207,26 @@ public:
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
-  AssignInfo
+  virtual
+  MvNode*
   get(const VlDeclArray* decl,
+      ymuint offset) const;
+
+  /// @brief 対応するノードを取り出す．
+  /// @param[in] decl 宣言要素
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型の場合には NULL を返す．
+  AssignInfo
+  get_info(const VlDecl* decl) const;
+
+  /// @brief 対応するノードを取り出す(配列型)．
+  /// @param[in] decl 宣言要素
+  /// @param[in] offset オフセット
+  /// @return 対応するノードを返す．
+  /// @note 登録されていない場合と配列型でない場合，
+  /// オフセットが範囲外の場合には NULL を返す．
+  AssignInfo
+  get_info(const VlDeclArray* decl,
       ymuint offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
