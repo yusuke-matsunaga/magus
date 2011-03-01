@@ -26,11 +26,15 @@ struct AssignInfo
   /// @brief コンストラクタ
   /// @param[in] rhs 代入の右辺
   /// @param[in] cond 代入条件
+  /// @param[in] block blocking 代入の時に true とするフラグ
   explicit
   AssignInfo(MvNode* rhs = NULL,
-	     MvNode* cond = NULL) :
+	     MvNode* cond = NULL,
+	     bool block = false) :
     mRhs(rhs),
-    mCond(cond) { }
+    mCond(cond),
+    mBlock(block),
+    mRefFlag(false) { }
 
   /// @brief 代入の右辺式を表すノード
   MvNode* mRhs;
@@ -39,8 +43,8 @@ struct AssignInfo
   /// ただし常に代入する時は NULL
   MvNode* mCond;
 
-  /// @brief non-blocking 代入を表すフラグ
-  bool mNbFlag;
+  /// @brief blocking 代入を表すフラグ
+  bool mBlock;
 
   /// @brief 参照されたことを表すフラグ
   bool mRefFlag;
@@ -177,21 +181,25 @@ public:
   /// @param[in] decl 宣言要素
   /// @param[in] node 代入式の右辺
   /// @param[in] cond 代入条件
+  /// @param[in] block blocking 代入の時に true とするフラグ
   void
   add(const VlDecl* decl,
       MvNode* node,
-      MvNode* cond);
+      MvNode* cond,
+      bool block);
 
   /// @brief 登録する(配列の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] offset
   /// @param[in] node 代入式の右辺
   /// @param[in] cond 代入条件
+  /// @param[in] block blocking 代入の時に true とするフラグ
   void
   add(const VlDeclArray* decl,
       ymuint offset,
       MvNode* node,
-      MvNode* cond);
+      MvNode* cond,
+      bool block);
 
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
@@ -230,18 +238,19 @@ public:
       ymuint offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
+  /// @param[in] id ID番号
+  /// @param[in] node 代入式の右辺
+  /// @param[in] cond 代入条件
+  /// @param[in] block blocking 代入の時に true とするフラグ
   void
   add_by_id(ymuint id,
 	    MvNode* node,
-	    MvNode* cond);
+	    MvNode* cond,
+	    bool block);
 
   /// @brief ID番号に対応するノードを取り出す．
   AssignInfo
   get_from_id(ymuint id) const;
-
-  /// @brief DeclHash を得る．
-  DeclHash&
-  decl_hash() const;
 
 
 private:
@@ -251,9 +260,6 @@ private:
 
   // 外側の Env
   const Env& mGlobalEnv;
-
-  // VlDecl 用のハッシュ表
-  DeclHash& mDeclHash;
 
   // VlDecl の ID をキーに AssignInfo の配列を格納する配列
   vector<AssignInfo> mNodeArray;

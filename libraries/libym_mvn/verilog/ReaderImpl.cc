@@ -728,7 +728,6 @@ ReaderImpl::gen_process(MvModule* parent_module,
     return false;
   }
 
-#if 0
   const VlStmt* stmt = process->stmt();
   if ( stmt->type() != kVpiEventControl ) {
     // always の直後は '@' でなければダメ
@@ -782,6 +781,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
       mMvMgr->connect(rhs, 0, node0, 0);
     }
     else {
+      cout << "latch" << endl;
       // latch を挿入
       ymuint bw = node0->output(0)->bit_width();
       MvNode* latch = mMvMgr->new_latch(parent_module, bw);
@@ -790,7 +790,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
       mMvMgr->connect(latch, 0, node0, 0);
     }
   }
-#endif
+
   return true;
 }
 
@@ -803,7 +803,6 @@ ReaderImpl::gen_stmt(MvModule* module,
 		     const VlStmt* stmt,
 		     ProcEnv& env)
 {
-#if 0
   switch ( stmt->type() ) {
   case kVpiAssignment:
     {
@@ -821,12 +820,12 @@ ReaderImpl::gen_stmt(MvModule* module,
 	AssignInfo old_dst;
 	ymuint lhs_offset = 0;
 	if ( lhs_decl ) {
-	  old_dst = env.get(lhs_decl);
+	  old_dst = env.get_info(lhs_decl);
 	}
 	else if ( lhs_declarray ) {
 	  if ( lhs1->is_constant_select() ) {
 	    lhs_offset = lhs1->declarray_offset();
-	    old_dst = env.get(lhs_declarray, lhs_offset);
+	    old_dst = env.get_info(lhs_declarray, lhs_offset);
 	  }
 	  else {
 	    assert_cond( lhs1->declarray_dimension()
@@ -847,6 +846,7 @@ ReaderImpl::gen_stmt(MvModule* module,
 	  mMvMgr->connect(src_node, 0, dst_node, 0);
 	}
 	else if ( lhs1->is_bitselect() ) {
+#if 0
 	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
 #warning "TODO: reg 型なら可変ビットセレクトもあり"
 	  ymuint index = lhs_declbase->bit_offset(lhs1->index_val());
@@ -880,8 +880,10 @@ ReaderImpl::gen_stmt(MvModule* module,
 	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
 	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
 	  }
+#endif
 	}
 	else if ( lhs1->is_partselect() ) {
+#if 0
 	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
 #warning "TODO: reg 型なら可変範囲セレクトもあり"
 	  ymuint msb = lhs_declbase->bit_offset(lhs1->left_range_val());
@@ -916,13 +918,14 @@ ReaderImpl::gen_stmt(MvModule* module,
 	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
 	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
 	  }
+#endif
 	}
 	assert_cond( dst_node, __FILE__, __LINE__);
 	if ( lhs_decl ) {
-	  env.add(lhs_decl, dst_node);
+	  env.add(lhs_decl, dst_node, NULL, stmt->is_blocking());
 	}
 	else {
-	  env.add(lhs_declarray, lhs_offset, dst_node);
+	  env.add(lhs_declarray, lhs_offset, dst_node, NULL, stmt->is_blocking());
 	}
 	offset += lhs1->bit_size();
       }
@@ -979,7 +982,7 @@ ReaderImpl::gen_stmt(MvModule* module,
     cerr << "can not synthesized" << endl;
     return false;
   }
-#endif
+
   return true;
 }
 
@@ -996,6 +999,7 @@ ReaderImpl::merge_env(MvModule* parent_module,
 		      const ProcEnv& then_env,
 		      const ProcEnv& else_env)
 {
+  cout << "merge env" << endl;
   ymuint n = env.max_id();
   for (ymuint i = 0; i < n; ++ i) {
     AssignInfo info0 = env.get_from_id(i);
@@ -1008,36 +1012,68 @@ ReaderImpl::merge_env(MvModule* parent_module,
     MvNode* node2 = info2.mRhs;
     MvNode* cond2 = info2.mCond;
 
+    if ( node1 == NULL ) {
+      cout << "node1 == NULL" << endl;
+    }
+    if ( node2 == NULL ) {
+      cout << "node2 == NULL" << endl;
+    }
+    if ( cond1 == NULL ) {
+      cout << "cond1 == NULL" << endl;
+    }
+    if ( cond2 == NULL ) {
+      cout << "cond2 == NULL" << endl;
+    }
     MvNode* new_node = NULL;
     MvNode* new_cond = NULL;
+    bool new_block = false;
     if ( node1 == node2 ) {
+      if ( node1 == NULL ) {
+	continue;
+      }
+      cout << "A" << endl;
       // 両方の結果が等しければ ITE を挿入しない．
       new_node = node1;
+      // 条件は ITE になる．
     }
     else if ( node1 == NULL ) {
+      cout << "B" << endl;
       // node1 が NULL
       assert_cond( node2 != NULL, __FILE__, __LINE__);
       new_node = node2;
+      new_block = info2.mBlock;
     }
     else if ( node2 == NULL ) {
+      cout << "C" << endl;
       // node2 が NULL
       assert_cond( node1 != NULL, __FILE__, __LINE__);
       new_node = node1;
+      new_block = info1.mBlock;
     }
     else {
+      cout << "D" << endl;
       ymuint bw = node1->output(0)->bit_width();
       new_node = mMvMgr->new_ite(parent_module, bw);
       mMvMgr->connect(cond, 0, new_node, 0);
       mMvMgr->connect(node1, 0, new_node, 1);
       mMvMgr->connect(node2, 0, new_node, 2);
+      if ( info1.mBlock != info2.mBlock ) {
+	// blocking 代入と non-blocking 代入の混在はエラー
+#warning "TODO: エラー処理"
+	continue;
+      }
+      new_block = info1.mBlock;
     }
     if ( cond1 == cond2 ) {
+      cout << "1" << endl;
       // 両方の条件が等しければ ITE を挿入しない
       new_cond = cond1;
     }
     else if ( cond1 == NULL ) {
+      cout << "2" << endl;
       assert_cond( cond2 != NULL, __FILE__, __LINE__);
       if ( node1 == NULL ) {
+      cout << "2.1" << endl;
 	// cond の時には代入はない．
 	// 代入条件は ~cond & cond2
 	MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
@@ -1047,6 +1083,7 @@ ReaderImpl::merge_env(MvModule* parent_module,
 	mMvMgr->connect(cond2, 0, new_cond, 1);
       }
       else {
+      cout << "2.2" << endl;
 	// cond の時には常に代入する．
 	// 代入条件は cond | cond2
 	new_cond = mMvMgr->new_or(parent_module, 1);
@@ -1055,8 +1092,10 @@ ReaderImpl::merge_env(MvModule* parent_module,
       }
     }
     else if ( cond2 == NULL ) {
+      cout << "3" << endl;
       assert_cond( cond1 != NULL, __FILE__, __LINE__);
       if ( node2 == NULL ) {
+      cout << "3.1" << endl;
 	// ~cond の時には代入はない．
 	// 代入条件は cond & cond1
 	new_cond = mMvMgr->new_and(parent_module, 1);
@@ -1064,6 +1103,7 @@ ReaderImpl::merge_env(MvModule* parent_module,
 	mMvMgr->connect(cond1, 0, new_cond, 1);
       }
       else {
+      cout << "3.2" << endl;
 	// ~cond の時には常に代入
 	// 代入条件は ~cond | cond1
 	MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
@@ -1074,6 +1114,7 @@ ReaderImpl::merge_env(MvModule* parent_module,
       }
     }
     else {
+      cout << "4" << endl;
       new_cond = mMvMgr->new_ite(parent_module, 1);
       mMvMgr->connect(cond, 0, new_cond, 0);
       mMvMgr->connect(cond1, 0, new_cond, 1);
@@ -1082,7 +1123,7 @@ ReaderImpl::merge_env(MvModule* parent_module,
     if ( new_node == NULL && new_cond == NULL ) {
       continue;
     }
-    env.add_by_id(i, new_node, new_cond);
+    env.add_by_id(i, new_node, new_cond, new_block);
   }
 }
 
