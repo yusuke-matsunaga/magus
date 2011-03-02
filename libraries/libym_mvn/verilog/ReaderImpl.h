@@ -139,9 +139,9 @@ private:
   /// @param[in] stmt 本体のステートメント
   /// @param[in] env 環境
   bool
-  gen_stmt(MvModule* module,
-	   const VlStmt* stmt,
-	   ProcEnv& env);
+  gen_stmt1(MvModule* module,
+	    const VlStmt* stmt,
+	    ProcEnv& env);
 
   /// @brief always latch のチェック
   /// @param[in] parent_module 親のモジュール
@@ -233,6 +233,18 @@ private:
 	    MvNode* cond,
 	    const ProcEnv& then_env,
 	    const ProcEnv& else_env);
+
+  /// @brief 代入条件をマージする．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] cond 切り替え条件
+  /// @param[in] then_cond cond が成り立ったときの代入条件
+  /// @param[in] else_cond cond が成り立たなかったときの代入条件
+  /// @note 基本的には ITE(cond, then_cond, else_cond) だが，NULL の場合がある．
+  MvNode*
+  merge_cond(MvModule* parent_module,
+	     MvNode* cond,
+	     MvNode* then_cond,
+	     MvNode* else_cond);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素
