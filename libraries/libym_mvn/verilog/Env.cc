@@ -52,9 +52,11 @@ Env::max_id() const
 // @brief 登録する(単一要素の場合)
 // @param[in] decl 宣言要素
 // @param[in] node 対応するノード
+// @param[in] block blocking 代入の時に true とするフラグ
 void
 Env::add(const VlDecl* decl,
-	 MvNode* node)
+	 MvNode* node,
+	 bool block)
 {
   ymuint id = mDeclHash.get_id(decl);
   add_by_id(id, node);
@@ -64,10 +66,12 @@ Env::add(const VlDecl* decl,
 // @param[in] decl 宣言要素
 // @param[in] offset
 // @param[in] node 対応するノード
+// @param[in] block blocking 代入の時に true とするフラグ
 void
 Env::add(const VlDeclArray* decl,
 	 ymuint offset,
-	 MvNode* node)
+	 MvNode* node,
+	 bool block)
 {
   ymuint id = mDeclHash.get_id(decl, offset);
   add_by_id(id, node);
@@ -171,33 +175,29 @@ ProcEnv::max_id() const
 // @brief 登録する(単一要素の場合)
 // @param[in] decl 宣言要素
 // @param[in] node 代入式の右辺
-// @param[in] cond 代入条件
 // @param[in] block blocking 代入の時に true とするフラグ
 void
 ProcEnv::add(const VlDecl* decl,
 	     MvNode* node,
-	     MvNode* cond,
 	     bool block)
 {
   ymuint id = decl_hash().get_id(decl);
-  add_by_id(id, node, cond, block);
+  add_by_id(id, node, NULL, block);
 }
 
 // @brief 登録する(配列の場合)
 // @param[in] decl 宣言要素
 // @param[in] offset
 // @param[in] node 代入式の右辺
-// @param[in] cond 代入条件
 // @param[in] block blocking 代入の時に true とするフラグ
 void
 ProcEnv::add(const VlDeclArray* decl,
 	     ymuint offset,
 	     MvNode* node,
-	     MvNode* cond,
 	     bool block)
 {
   ymuint id = decl_hash().get_id(decl, offset);
-  add_by_id(id, node, cond, block);
+  add_by_id(id, node, NULL, block);
 }
 
 // @brief 対応するノードを取り出す．

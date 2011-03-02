@@ -76,28 +76,36 @@ public:
 public:
 
   /// @brief 内容をクリアする．
+  virtual
   void
   clear();
 
   /// @brief ID番号の最大値+1を返す．
+  virtual
   ymuint
   max_id() const;
 
   /// @brief 登録する(単一要素の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] node 対応するノード
+  /// @param[in] block blocking 代入の時に true とするフラグ
+  virtual
   void
   add(const VlDecl* decl,
-      MvNode* node);
+      MvNode* node,
+      bool block);
 
   /// @brief 登録する(配列の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] offset
   /// @param[in] node 対応するノード
+  /// @param[in] block blocking 代入の時に true とするフラグ
+  virtual
   void
   add(const VlDeclArray* decl,
       ymuint offset,
-      MvNode* node);
+      MvNode* node,
+      bool block);
 
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
@@ -170,35 +178,35 @@ public:
 public:
 
   /// @brief 内容をクリアする．
+  virtual
   void
   clear();
 
   /// @brief ID番号の最大値+1を返す．
+  virtual
   ymuint
   max_id() const;
 
   /// @brief 登録する(単一要素の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] node 代入式の右辺
-  /// @param[in] cond 代入条件
   /// @param[in] block blocking 代入の時に true とするフラグ
+  virtual
   void
   add(const VlDecl* decl,
       MvNode* node,
-      MvNode* cond,
       bool block);
 
   /// @brief 登録する(配列の場合)
   /// @param[in] decl 宣言要素
   /// @param[in] offset
   /// @param[in] node 代入式の右辺
-  /// @param[in] cond 代入条件
   /// @param[in] block blocking 代入の時に true とするフラグ
+  virtual
   void
   add(const VlDeclArray* decl,
       ymuint offset,
       MvNode* node,
-      MvNode* cond,
       bool block);
 
   /// @brief 対応するノードを取り出す．
