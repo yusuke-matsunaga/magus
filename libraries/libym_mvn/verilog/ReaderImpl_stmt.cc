@@ -35,131 +35,7 @@ ReaderImpl::gen_stmt1(MvModule* module,
 {
   switch ( stmt->type() ) {
   case kVpiAssignment:
-    {
-      const VlExpr* rhs = stmt->rhs();
-      const VlExpr* lhs = stmt->lhs();
-      MvNode* node = gen_expr(module, rhs, env);
-      ymuint n = lhs->lhs_elem_num();
-      ymuint offset = 0;
-      for (ymuint i = 0; i < n; ++ i) {
-	const VlExpr* lhs1 = lhs->lhs_elem(i);
-	const VlDecl* lhs_decl = lhs1->decl_obj();
-	const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
-	const VlDeclBase* lhs_declbase = lhs1->decl_base();
-	ymuint bw = lhs_declbase->bit_size();
-	AssignInfo old_dst;
-	ymuint lhs_offset = 0;
-	if ( lhs_decl ) {
-	  old_dst = env.get_info(lhs_decl);
-	}
-	else if ( lhs_declarray ) {
-	  if ( lhs1->is_constant_select() ) {
-	    lhs_offset = lhs1->declarray_offset();
-	    old_dst = env.get_info(lhs_declarray, lhs_offset);
-	  }
-	  else {
-	    assert_cond( lhs1->declarray_dimension()
-			 == lhs_declarray->dimension(),
-			 __FILE__, __LINE__ );
-	    // lhs_offset は lhs->declarray_index() から計算される．
-#warning "TODO: 配列の可変インデックス時の処理"
-	  }
-	}
-	else {
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-
-	MvNode* src_node = gen_rhs(module, node, offset, bw);
-	MvNode* dst_node = NULL;
-	if ( lhs1->is_primary() ) {
-	  dst_node = mMvMgr->new_through(module, bw);
-	  mMvMgr->connect(src_node, 0, dst_node, 0);
-	}
-	else if ( lhs1->is_bitselect() ) {
-#if 0
-	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-#warning "TODO: reg 型なら可変ビットセレクトもあり"
-	  ymuint index = lhs_declbase->bit_offset(lhs1->index_val());
-	  vector<ymuint> bw_array;
-	  bw_array.reserve(3);
-	  if ( index < bw - 1 ) {
-	    bw_array.push_back(bw - index - 1);
-	  }
-	  bw_array.push_back(1);
-	  if ( index > 0 ) {
-	    bw_array.push_back(index);
-	  }
-	  dst_node = mMvMgr->new_concat(module, bw_array);
-	  ymuint pos = 0;
-	  if ( index < bw - 1 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   bw - 1,
-							   index + 1,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	    ++ pos;
-	  }
-	  mMvMgr->connect(src_node, 0, dst_node, pos);
-	  ++ pos;
-	  if ( index > 0 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   index - 1,
-							   0,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	  }
-#endif
-	}
-	else if ( lhs1->is_partselect() ) {
-#if 0
-	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-#warning "TODO: reg 型なら可変範囲セレクトもあり"
-	  ymuint msb = lhs_declbase->bit_offset(lhs1->left_range_val());
-	  ymuint lsb = lhs_declbase->bit_offset(lhs1->right_range_val());
-	  vector<ymuint> bw_array;
-	  bw_array.reserve(3);
-	  if ( msb < bw - 1 ) {
-	    bw_array.push_back(bw - msb - 1);
-	  }
-	  bw_array.push_back(msb - lsb + 1);
-	  if ( lsb > 0 ) {
-	    bw_array.push_back(lsb);
-	  }
-	  dst_node = mMvMgr->new_concat(module, bw_array);
-	  ymuint pos = 0;
-	  if ( msb < bw - 1 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   bw - 1,
-							   msb + 1,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	    ++ pos;
-	  }
-	  mMvMgr->connect(src_node, 0, dst_node, pos);
-	  ++ pos;
-	  if ( lsb > 0 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   lsb - 1,
-							   0,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	  }
-#endif
-	}
-	assert_cond( dst_node, __FILE__, __LINE__);
-	if ( lhs_decl ) {
-	  env.add(lhs_decl, dst_node, stmt->is_blocking());
-	}
-	else {
-	  env.add(lhs_declarray, lhs_offset, dst_node, stmt->is_blocking());
-	}
-	offset += lhs1->bit_size();
-      }
-    }
+    gen_assign(module, stmt, env);
     break;
 
   case kVpiBegin:
@@ -214,6 +90,207 @@ ReaderImpl::gen_stmt1(MvModule* module,
   }
 
   return true;
+}
+
+// @brief ステートメントの中身を生成する．
+// @param[in] module 親のモジュール
+// @param[in] stmt 本体のステートメント
+// @param[in] env 環境
+bool
+ReaderImpl::gen_stmt2(MvModule* module,
+		      const VlStmt* stmt,
+		      ProcEnv& env)
+{
+  switch ( stmt->type() ) {
+  case kVpiAssignment:
+    gen_assign(module, stmt, env);
+    break;
+
+  case kVpiBegin:
+  case kVpiNamedBegin:
+    {
+      ymuint n = stmt->child_stmt_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	const VlStmt* stmt1 = stmt->child_stmt(i);
+	gen_stmt2(module, stmt1, env);
+      }
+    }
+    break;
+
+  case kVpiIf:
+    {
+      const VlExpr* cond = stmt->expr();
+      MvNode* cond_node = gen_expr(module, cond, env);
+      ProcEnv then_env(env);
+      gen_stmt2(module, stmt->body_stmt(), then_env);
+      merge_env(module, env, cond_node, then_env, env);
+    }
+    break;
+
+  case kVpiIfElse:
+    {
+      const VlExpr* cond = stmt->expr();
+      MvNode* cond_node = gen_expr(module, cond, env);
+      ProcEnv then_env(env);
+      gen_stmt2(module, stmt->body_stmt(), then_env);
+      ProcEnv else_env(env);
+      gen_stmt2(module, stmt->else_stmt(), else_env);
+      merge_env(module, env, cond_node, then_env, else_env);
+    }
+    break;
+
+  case kVpiCase:
+#if 0
+    {
+      const VlExpr* cond = stmt->expr();
+      MvNode* cond_node = gen_expr(module, cond, env);
+
+    }
+#else
+#warning "TODO: case 文"
+#endif
+    break;
+
+  default:
+#warning "エラーメッセージをまともにする．"
+    cerr << "can not synthesized" << endl;
+    return false;
+  }
+
+  return true;
+}
+
+// @brief 代入文を生成する．
+// @param[in] module 親のモジュール
+// @param[in] stmt 本体のステートメント
+// @param[in] env 環境
+void
+ReaderImpl::gen_assign(MvModule* module,
+		       const VlStmt* stmt,
+		       ProcEnv& env)
+{
+  const VlExpr* rhs = stmt->rhs();
+  const VlExpr* lhs = stmt->lhs();
+  MvNode* node = gen_expr(module, rhs, env);
+  ymuint n = lhs->lhs_elem_num();
+  ymuint offset = 0;
+  for (ymuint i = 0; i < n; ++ i) {
+    const VlExpr* lhs1 = lhs->lhs_elem(i);
+    const VlDecl* lhs_decl = lhs1->decl_obj();
+    const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
+    const VlDeclBase* lhs_declbase = lhs1->decl_base();
+    ymuint bw = lhs_declbase->bit_size();
+    AssignInfo old_dst;
+    ymuint lhs_offset = 0;
+    if ( lhs_decl ) {
+      old_dst = env.get_info(lhs_decl);
+    }
+    else if ( lhs_declarray ) {
+      if ( lhs1->is_constant_select() ) {
+	lhs_offset = lhs1->declarray_offset();
+	old_dst = env.get_info(lhs_declarray, lhs_offset);
+      }
+      else {
+	assert_cond( lhs1->declarray_dimension() == lhs_declarray->dimension(),
+		     __FILE__, __LINE__ );
+	// lhs_offset は lhs->declarray_index() から計算される．
+#warning "TODO: 配列の可変インデックス時の処理"
+      }
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
+
+    MvNode* src_node = gen_rhs(module, node, offset, bw);
+    MvNode* dst_node = NULL;
+    if ( lhs1->is_primary() ) {
+      dst_node = mMvMgr->new_through(module, bw);
+      mMvMgr->connect(src_node, 0, dst_node, 0);
+    }
+    else if ( lhs1->is_bitselect() ) {
+#if 0
+      assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
+#warning "TODO: reg 型なら可変ビットセレクトもあり"
+      ymuint index = lhs_declbase->bit_offset(lhs1->index_val());
+      vector<ymuint> bw_array;
+      bw_array.reserve(3);
+      if ( index < bw - 1 ) {
+	bw_array.push_back(bw - index - 1);
+      }
+      bw_array.push_back(1);
+      if ( index > 0 ) {
+	bw_array.push_back(index);
+      }
+      dst_node = mMvMgr->new_concat(module, bw_array);
+      ymuint pos = 0;
+      if ( index < bw - 1 ) {
+	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+						       bw - 1,
+						       index + 1,
+						       bw);
+	mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+	++ pos;
+      }
+      mMvMgr->connect(src_node, 0, dst_node, pos);
+      ++ pos;
+      if ( index > 0 ) {
+	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+						       index - 1,
+						       0,
+						       bw);
+	mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+      }
+#endif
+    }
+    else if ( lhs1->is_partselect() ) {
+#if 0
+      assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
+#warning "TODO: reg 型なら可変範囲セレクトもあり"
+      ymuint msb = lhs_declbase->bit_offset(lhs1->left_range_val());
+      ymuint lsb = lhs_declbase->bit_offset(lhs1->right_range_val());
+      vector<ymuint> bw_array;
+      bw_array.reserve(3);
+      if ( msb < bw - 1 ) {
+	bw_array.push_back(bw - msb - 1);
+      }
+      bw_array.push_back(msb - lsb + 1);
+      if ( lsb > 0 ) {
+	bw_array.push_back(lsb);
+      }
+      dst_node = mMvMgr->new_concat(module, bw_array);
+      ymuint pos = 0;
+      if ( msb < bw - 1 ) {
+	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+						       bw - 1,
+						       msb + 1,
+						       bw);
+	mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+	++ pos;
+      }
+      mMvMgr->connect(src_node, 0, dst_node, pos);
+      ++ pos;
+      if ( lsb > 0 ) {
+	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+						       lsb - 1,
+						       0,
+						       bw);
+	mMvMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+      }
+#endif
+    }
+    assert_cond( dst_node, __FILE__, __LINE__);
+    if ( lhs_decl ) {
+      env.add(lhs_decl, dst_node, stmt->is_blocking());
+    }
+    else {
+      env.add(lhs_declarray, lhs_offset, dst_node, stmt->is_blocking());
+    }
+    offset += lhs1->bit_size();
+  }
 }
 
 // @brief 環境をマージする．

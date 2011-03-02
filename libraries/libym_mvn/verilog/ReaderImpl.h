@@ -121,39 +121,18 @@ private:
 	      ymuint& msb,
 	      ymuint& lsb);
 
-  /// @brief モジュールインスタンスの生成を行う．
-  /// @param[in] vl_module モジュール
-  /// @param[in] parent_module 親のモジュール
-  void
-  gen_moduleinst(const VlModule* vl_module,
-		 MvModule* parent_module);
-
   /// @brief プロセス文を生成する．
   /// @param[in] vl_process プロセス文
   bool
   gen_process(MvModule* parent_module,
 	      const VlProcess* process);
 
-  /// @brief ステートメントの中身を生成する．
-  /// @param[in] module 親のモジュール
-  /// @param[in] stmt 本体のステートメント
-  /// @param[in] env 環境
-  bool
-  gen_stmt1(MvModule* module,
-	    const VlStmt* stmt,
-	    ProcEnv& env);
-
-  /// @brief always latch のチェック
+  /// @brief モジュールインスタンスの生成を行う．
+  /// @param[in] vl_module モジュール
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] src_node ソースノード
-  /// @param[out] cond_node 条件を表すノード
-  /// @retval 0 latch 条件はない．
-  /// @retval 1 常に latch
-  /// @retval 2 部分的な latch 条件あり
-  ymuint
-  latch_check(MvModule* parent_module,
-	      MvNode* src_node,
-	      MvNode*& cond_node);
+  void
+  gen_moduleinst(const VlModule* vl_module,
+		 MvModule* parent_module);
 
   /// @brief プリミティブインスタンスの生成を行う．
   /// @param[in] parent_module 親のモジュール
@@ -170,6 +149,58 @@ private:
   gen_cont_assign(MvModule* parent_module,
 		  const VlExpr* lhs,
 		  const VlExpr* rhs);
+
+  /// @brief ステートメントの中身を生成する(combinational always用)．
+  /// @param[in] module 親のモジュール
+  /// @param[in] stmt 本体のステートメント
+  /// @param[in] env 環境
+  bool
+  gen_stmt1(MvModule* module,
+	    const VlStmt* stmt,
+	    ProcEnv& env);
+
+  /// @brief ステートメントの中身を生成する(sequential always用)．
+  /// @param[in] module 親のモジュール
+  /// @param[in] stmt 本体のステートメント
+  /// @param[in] env 環境
+  bool
+  gen_stmt2(MvModule* module,
+	    const VlStmt* stmt,
+	    ProcEnv& env);
+
+  /// @brief 代入文を生成する．
+  /// @param[in] module 親のモジュール
+  /// @param[in] stmt 本体のステートメント
+  /// @param[in] env 環境
+  void
+  gen_assign(MvModule* module,
+	     const VlStmt* stmt,
+	     ProcEnv& env);
+
+  /// @brief 環境をマージする．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] env 対象の環境
+  /// @param[in] cond 条件を表すノード
+  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
+  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
+  void
+  merge_env(MvModule* parent_module,
+	    ProcEnv& env,
+	    MvNode* cond,
+	    const ProcEnv& then_env,
+	    const ProcEnv& else_env);
+
+  /// @brief 代入条件をマージする．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] cond 切り替え条件
+  /// @param[in] then_cond cond が成り立ったときの代入条件
+  /// @param[in] else_cond cond が成り立たなかったときの代入条件
+  /// @note 基本的には ITE(cond, then_cond, else_cond) だが，NULL の場合がある．
+  MvNode*
+  merge_cond(MvModule* parent_module,
+	     MvNode* cond,
+	     MvNode* then_cond,
+	     MvNode* else_cond);
 
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -220,31 +251,6 @@ private:
   connect_lhs(MvNode* dst_node,
 	      const VlExpr* expr,
 	      MvNode* src_node);
-
-  /// @brief 環境をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] env 対象の環境
-  /// @param[in] cond 条件を表すノード
-  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
-  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
-  void
-  merge_env(MvModule* parent_module,
-	    ProcEnv& env,
-	    MvNode* cond,
-	    const ProcEnv& then_env,
-	    const ProcEnv& else_env);
-
-  /// @brief 代入条件をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] cond 切り替え条件
-  /// @param[in] then_cond cond が成り立ったときの代入条件
-  /// @param[in] else_cond cond が成り立たなかったときの代入条件
-  /// @note 基本的には ITE(cond, then_cond, else_cond) だが，NULL の場合がある．
-  MvNode*
-  merge_cond(MvModule* parent_module,
-	     MvNode* cond,
-	     MvNode* then_cond,
-	     MvNode* else_cond);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素
