@@ -123,7 +123,7 @@ ReaderImpl::gen_stmt2(MvModule* module,
       MvNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
       gen_stmt2(module, stmt->body_stmt(), then_env);
-      merge_env(module, env, cond_node, then_env, env);
+      merge_env2(module, env, cond_node, then_env, env);
     }
     break;
 
@@ -135,7 +135,7 @@ ReaderImpl::gen_stmt2(MvModule* module,
       gen_stmt2(module, stmt->body_stmt(), then_env);
       ProcEnv else_env(env);
       gen_stmt2(module, stmt->else_stmt(), else_env);
-      merge_env(module, env, cond_node, then_env, else_env);
+      merge_env2(module, env, cond_node, then_env, else_env);
     }
     break;
 
@@ -300,11 +300,11 @@ ReaderImpl::gen_assign(MvModule* module,
 // @param[in] then_env 条件が成り立ったときに通るパスの環境
 // @param[in] else_env 条件が成り立たなかったときに通るパスの環境
 void
-ReaderImpl::merge_env(MvModule* parent_module,
-		      ProcEnv& env,
-		      MvNode* cond,
-		      const ProcEnv& then_env,
-		      const ProcEnv& else_env)
+ReaderImpl::merge_env1(MvModule* parent_module,
+		       ProcEnv& env,
+		       MvNode* cond,
+		       const ProcEnv& then_env,
+		       const ProcEnv& else_env)
 {
   ymuint n = env.max_id();
   for (ymuint i = 0; i < n; ++ i) {
@@ -327,6 +327,12 @@ ReaderImpl::merge_env(MvModule* parent_module,
       }
       // 両方の結果が等しければ ITE を挿入しない．
       new_node = node1;
+      if ( info1.mBlock != info2.mBlock ) {
+	// blocking 代入と non-blocking 代入の混在はエラー
+#warning "TODO: エラー処理"
+	continue;
+      }
+      new_block = info1.mBlock;
       // 条件は ITE になる．
       new_cond = merge_cond(parent_module, cond, cond1, cond2);
     }
@@ -382,6 +388,105 @@ ReaderImpl::merge_env(MvModule* parent_module,
       }
       new_block = info1.mBlock;
       new_cond = merge_cond(parent_module, cond, cond1, cond2);
+    }
+    env.add_by_id(i, new_node, new_cond, new_block);
+  }
+}
+
+// @brief 環境をマージする．
+// @param[in] parent_module 親のモジュール
+// @param[in] env 対象の環境
+// @param[in] cond 条件を表すノード
+// @param[in] then_env 条件が成り立ったときに通るパスの環境
+// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
+void
+ReaderImpl::merge_env2(MvModule* parent_module,
+		       ProcEnv& env,
+		       MvNode* cond,
+		       const ProcEnv& then_env,
+		       const ProcEnv& else_env)
+{
+  ymuint n = env.max_id();
+  for (ymuint i = 0; i < n; ++ i) {
+    AssignInfo info0 = env.get_from_id(i);
+    MvNode* node0 = info0.mRhs;
+    assert_cond( info0.mCond == NULL, __FILE__, __LINE__);
+
+    AssignInfo info1 = then_env.get_from_id(i);
+    MvNode* node1 = info1.mRhs;
+    assert_cond( info1.mCond == NULL, __FILE__, __LINE__);
+
+    AssignInfo info2 = else_env.get_from_id(i);
+    MvNode* node2 = info2.mRhs;
+    assert_cond( info2.mCond == NULL, __FILE__, __LINE__);
+
+    MvNode* new_node = NULL;
+    bool new_block = false;
+    if ( node1 == node2 ) {
+      if ( node1 == NULL ) {
+	continue;
+      }
+      // 両方の結果が等しければ ITE を挿入しない．
+      new_node = node1;
+      if ( info1.mBlock != info2.mBlock ) {
+	// blocking 代入と non-blocking 代入の混在はエラー
+#warning "TODO: エラー処理"
+	continue;
+      }
+      new_block = info1.mBlock;
+    }
+    else if ( node1 == NULL ) {
+      // node1 が NULL
+      assert_cond( node0 != NULL, __FILE__, __LINE__);
+      assert_cond( node2 != NULL, __FILE__, __LINE__);
+      ymuint bw = node0->output(0)->bit_width();
+      if ( node2->output(0)->bit_width() != bw ) {
+	// ビット幅が異なる．
+#warning "TODO: エラー処理"
+      }
+      new_node = mMvMgr->new_ite(parent_module, bw);
+      mMvMgr->connect(cond, 0, new_node, 0);
+      mMvMgr->connect(node0, 0, new_node, 1);
+      mMvMgr->connect(node2, 0, new_node, 2);
+      new_block = info2.mBlock;
+    }
+    else if ( node2 == NULL ) {
+      // node2 が NULL
+      assert_cond( node0 != NULL, __FILE__, __LINE__);
+      assert_cond( node1 != NULL, __FILE__, __LINE__);
+      ymuint bw = node0->output(0)->bit_width();
+      if ( node1->output(0)->bit_width() != bw ) {
+	// ビット幅が異なる．
+#warning "TODO: エラー処理"
+      }
+      new_node = mMvMgr->new_ite(parent_module, bw);
+      mMvMgr->connect(cond, 0, new_node, 0);
+      mMvMgr->connect(node1, 0, new_node, 1);
+      mMvMgr->connect(node0, 0, new_node, 2);
+      new_block = info1.mBlock;
+    }
+    else {
+      // node1 も node2 も NULL ではない．
+      assert_cond( node0 != NULL, __FILE__, __LINE__);
+      ymuint bw = node0->output(0)->bit_width();
+      if ( node1->output(0)->bit_width() != bw ) {
+	// ビット幅が異なる．
+#warning "TODO: エラー処理"
+      }
+      if ( node2->output(0)->bit_width() != bw ) {
+	// ビット幅が異なる．
+#warning "TODO: エラー処理"
+      }
+      new_node = mMvMgr->new_ite(parent_module, bw);
+      mMvMgr->connect(cond, 0, new_node, 0);
+      mMvMgr->connect(node1, 0, new_node, 1);
+      mMvMgr->connect(node2, 0, new_node, 2);
+      if ( info1.mBlock != info2.mBlock ) {
+	// blocking 代入と non-blocking 代入の混在はエラー
+#warning "TODO: エラー処理"
+	continue;
+      }
+      new_block = info1.mBlock;
     }
     env.add_by_id(i, new_node, new_cond, new_block);
   }

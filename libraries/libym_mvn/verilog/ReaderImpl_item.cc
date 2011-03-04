@@ -184,10 +184,29 @@ ReaderImpl::gen_process(MvModule* parent_module,
 
 
   if ( has_edge_event ) {
-   if ( has_normal_event ) {
-     cerr << "edge-type events and normal events are mutual exclusive." << endl;
-     return false;
-   }
+    if ( has_normal_event ) {
+      cerr << "edge-type events and normal events are mutual exclusive." << endl;
+      return false;
+    }
+    ProcEnv top_env(mGlobalEnv);
+    gen_stmt2(parent_module, stmt->body_stmt(), top_env);
+
+    ymuint n = mGlobalEnv.max_id();
+    for (ymuint i = 0; i < n; ++ i) {
+      AssignInfo info1 = top_env.get_from_id(i);
+      MvNode* rhs = info1.mRhs;
+      if ( rhs == NULL ) {
+	continue;
+      }
+      assert_cond( info1.mCond == NULL, __FILE__, __LINE__);
+      MvNode* node0 = mGlobalEnv.get_from_id(i);
+      // FF を挿入
+      ymuint bw = node0->output(0)->bit_width();
+      MvNode* ff = mMvMgr->new_dff(parent_module, bw);
+      mMvMgr->connect(rhs, 0, latch, 0);
+      mMvMgr->connect(cond, 0, latch, 1);
+      mMvMgr->connect(latch, 0, node0, 0);
+    }
   }
   else {
     ProcEnv top_env(mGlobalEnv);

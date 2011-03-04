@@ -108,16 +108,20 @@ MvDff::control_value(ymuint pos,
 
 // @brief 非同期セット/リセットタイプの FF ノードを生成する．
 // @param[in] module ノードが属するモジュール
-// @param[in] np 非同期セットの制御信号数
 // @param[in] control_array 非同期セットの極性と値を入れた配列
 // @param[in] bit_width ビット幅
+// @note control_array の要素数が非同期セット信号数となる．
+// @note control_array[i] には i番めの非同期セット信号の
+//  - 極性 (最初の1ワード)
+//  - セット値 (残りのワード)
+// が入る．
 MvNode*
 MvMgr::new_dff(MvModule* module,
-	       ymuint np,
-	       const vector<ymuint32>& control_array,
+	       const vector<vector<ymuint32> >& control_array,
 	       ymuint bit_width)
 {
-  MvNode* node = new MvDff(module, bit_width, np, control_array);
+  ymuint np = control_array.size();
+  MvDff* node = new MvDff(module, bit_width, np, control_array);
   reg_node(node);
 
   return node;

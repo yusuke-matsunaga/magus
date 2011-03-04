@@ -184,11 +184,24 @@ private:
   /// @param[in] then_env 条件が成り立ったときに通るパスの環境
   /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
   void
-  merge_env(MvModule* parent_module,
-	    ProcEnv& env,
-	    MvNode* cond,
-	    const ProcEnv& then_env,
-	    const ProcEnv& else_env);
+  merge_env1(MvModule* parent_module,
+	     ProcEnv& env,
+	     MvNode* cond,
+	     const ProcEnv& then_env,
+	     const ProcEnv& else_env);
+
+  /// @brief 環境をマージする．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] env 対象の環境
+  /// @param[in] cond 条件を表すノード
+  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
+  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
+  void
+  merge_env2(MvModule* parent_module,
+	     ProcEnv& env,
+	     MvNode* cond,
+	     const ProcEnv& then_env,
+	     const ProcEnv& else_env);
 
   /// @brief 代入条件をマージする．
   /// @param[in] parent_module 親のモジュール
