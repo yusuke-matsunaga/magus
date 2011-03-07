@@ -626,7 +626,7 @@ void
 ReaderImpl::reg_node(const VlDecl* decl,
 		     MvNode* node)
 {
-  mGlobalEnv.add(decl, node, false);
+  mGlobalEnv.add(decl, node);
   mNodeMap.reg_node(node->id(), decl);
 }
 
@@ -650,7 +650,7 @@ ReaderImpl::reg_node(const VlDeclArray* decl,
 		     ymuint offset,
 		     MvNode* node)
 {
-  mGlobalEnv.add(decl, offset, node, false);
+  mGlobalEnv.add(decl, offset, node);
   mNodeMap.reg_node(node->id(), decl, offset);
 }
 

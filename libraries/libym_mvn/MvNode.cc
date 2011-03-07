@@ -46,6 +46,17 @@ MvNode::~MvNode()
   delete [] mOutputPins;
 }
 
+// @brief クロック信号の極性を得る．
+// @retval 1 正極性(posedge)
+// @retval 0 負極性(negedge)
+// @note type() が kDff の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvNode::clock_pol() const
+{
+  return 0;
+}
+
 // @brief 非同期セット信号の極性を得る．
 // @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
 // @retval 1 正極性(posedge)
@@ -56,17 +67,6 @@ ymuint
 MvNode::control_pol(ymuint pos) const
 {
   return 0;
-}
-
-// @brief 非同期セット信号のセット値を得る．
-// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
-// @param[out] val 値を格納するベクタ
-// @note type() が kDff の時のみ意味を持つ．
-// @note デフォルトの実装ではなにもしない．
-void
-MvNode::control_value(ymuint pos,
-		      vector<ymuint32>& val) const
-{
 }
 
 // @brief ビット位置を得る．

@@ -30,13 +30,16 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
+  /// @param[in] clock_pol クロックの極性
+  /// @param[in] control_array 非同期セットの極性を入れた配列
   /// @param[in] bit_width ビット幅
-  /// @param[in] np 非同期セット入力ピン数
-  /// @param[in] control_array 非同期セットの極性と値を入れた配列
+  /// @note 極性値は以下のとおり
+  ///  - 1 : 正極性(posedge)
+  ///  - 0 : 負極性(negedge)
   MvDff(MvModule* module,
-	ymuint bit_width,
-	ymuint np,
-	const vector<ymuint32>& control_array);
+	ymuint clock_pol,
+	const vector<ymuint>& control_array,
+	ymuint bit_width);
 
   /// @brief デストラクタ
   ~MvDff();
@@ -49,6 +52,15 @@ public:
   tType
   type() const;
 
+  /// @brief クロック信号の極性を得る．
+  /// @retval 1 正極性(posedge)
+  /// @retval 0 負極性(negedge)
+  /// @note type() が kDff の時のみ意味を持つ．
+  /// @note デフォルトの実装では 0 を返す．
+  virtual
+  ymuint
+  clock_pol() const;
+
   /// @brief 非同期セット信号の極性を得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
   /// @retval 1 正極性(posedge)
@@ -59,28 +71,14 @@ public:
   ymuint
   control_pol(ymuint pos) const;
 
-  /// @brief 非同期セット信号のセット値を得る．
-  /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
-  /// @param[out] val 値を格納するベクタ
-  /// @note type() が kDff の時のみ意味を持つ．
-  /// @note デフォルトの実装ではなにもしない．
-  virtual
-  void
-  control_value(ymuint pos,
-		vector<ymuint32>& val) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 非同期セット入力の極性の配列
+  // クロックと非同期セット入力の極性の配列
   ymuint32* mPolArray;
-
-  // 非同期セット入力のセット値の配列の配列
-  // 実際には1次元配列に詰めて格納する．
-  ymuint32* mValArray;
 
 };
 
