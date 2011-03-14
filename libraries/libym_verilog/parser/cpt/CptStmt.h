@@ -648,12 +648,6 @@ public:
   // PtStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief blocking assignment の時 true を返す．
-  /// @note デフォルトでは true を返す．
-  virtual
-  bool
-  is_blocking() const;
-
   /// @brief lhs を得る．
   virtual
   const PtExpr*
@@ -787,11 +781,11 @@ public:
   // PtStmt の派生クラスのための仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief blocking assignment の時 true を返す．
-  /// @note ここでは false を返す．
+  /// @brief クラスの型を返す仮想関数
+  /// @note このクラスは kPtNbAssignStmt を返す．
   virtual
-  bool
-  is_blocking() const;
+  tPtStmtType
+  type() const;
 
 };
 
@@ -822,11 +816,11 @@ public:
   // PtStmt の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief blocking assignment の時 true を返す．
-  /// @note ここでは false を返す．
+  /// @brief クラスの型を返す仮想関数
+  /// @note このクラスは kPtNbAssignStmt を返す．
   virtual
-  bool
-  is_blocking() const;
+  tPtStmtType
+  type() const;
 
 };
 
