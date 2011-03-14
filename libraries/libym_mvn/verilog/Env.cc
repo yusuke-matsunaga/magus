@@ -8,6 +8,7 @@
 
 
 #include "Env.h"
+#include "AsyncControl.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlRange.h"
 
@@ -52,11 +53,9 @@ Env::max_id() const
 // @brief 登録する(単一要素の場合)
 // @param[in] decl 宣言要素
 // @param[in] node 対応するノード
-// @param[in] block blocking 代入の時に true とするフラグ
 void
 Env::add(const VlDecl* decl,
-	 MvNode* node,
-	 bool block)
+	 MvNode* node)
 {
   ymuint id = mDeclHash.get_id(decl);
   add_by_id(id, node);
@@ -66,12 +65,10 @@ Env::add(const VlDecl* decl,
 // @param[in] decl 宣言要素
 // @param[in] offset
 // @param[in] node 対応するノード
-// @param[in] block blocking 代入の時に true とするフラグ
 void
 Env::add(const VlDeclArray* decl,
 	 ymuint offset,
-	 MvNode* node,
-	 bool block)
+	 MvNode* node)
 {
   ymuint id = mDeclHash.get_id(decl, offset);
   add_by_id(id, node);
@@ -297,6 +294,15 @@ ProcEnv::get_from_id(ymuint id) const
     return AssignInfo();
   }
   return mNodeArray[id];
+}
+
+// @brief コンストラクタ
+// @param[in] global_env プロセスの外側の Env
+AsyncControl::AsyncControl(const Env& global_env) :
+  mNode(NULL),
+  mPol(0),
+  mEnv(global_env)
+{
 }
 
 END_NAMESPACE_YM_MVN_VERILOG

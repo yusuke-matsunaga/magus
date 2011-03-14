@@ -194,20 +194,27 @@ ReaderImpl::gen_process(MvModule* parent_module,
     }
 
     // イベントリストの解析を行う．
-    ymuint nmax = mDeclHash.max_id();
-    vector<bool> event_map(nmax, false);
+    vector<pair<MvNode*, ymuint32> > event_node_array(ev_num);
+    for (ymuint i = 0; i < ev_num; ++ i) {
+      const VlExpr* expr = control->event(i);
+      const VlExpr* opr1 = expr->operand(0);
+      MvNode* node1 = gen_primary(opr1, mGlobalEnv);
+      ymuint pol = (expr->op_type() == kVpiPosedgeOp) ? 1 : 0;
+      event_node_array[i] = make_pair(node1, pol);
+    }
+    vector<bool> event_map(ev_num, false);
     vector<AsyncControl*> event_list;
     event_list.reserve(ev_num);
     const VlStmt* stmt1 = stmt->body_stmt();
     while ( stmt1 != NULL &&
 	    (stmt1->type() == kVpiIf || stmt1->type() == kVpiIfElse) ) {
       const VlExpr* cond = stmt1->expr();
-      bool inv = false;
+      ymuint pol = 1;
       MvNode* node = NULL;
       if ( cond->type() == kVpiOperation &&
 	   (cond->op_type() == kVpiNotOp  ||
 	    cond->op_type() == kVpiBitNegOp) ) {
-	inv = true;
+	pol = 0;
 	node = gen_primary(cond->operand(0), mGlobalEnv);
       }
       else {
@@ -215,50 +222,44 @@ ReaderImpl::gen_process(MvModule* parent_module,
       }
       assert_cond( node != NULL, __FILE__, __LINE__);
 
+      bool found = false;
       for (ymuint i = 0; i < ev_num; ++ i) {
-	const VlExpr* expr = control->event(i);
-	const VlExpr* opr1 = expr->operand(0);
-	MvNode* node1 = gen_primary(opr1, mGlobalEnv);
+	MvNode* node1 = event_node_array[i].first;
 	if ( node == node1 ) {
-	  bool inv = false;
-	  if ( expr->op_type() == kVpiPosedgeOp ) {
-	    inv = false;
+	  if ( pol != event_node_array[i].second ) {
+	    cerr << "Polarity mismatch." << endl;
+	    return false;
 	  }
-	  else if ( expr->op_type() == kVpiNegedgeOp ) {
-	    inv = true;
-	  }
-	  else {
-	    assert_not_reached(__FILE__, __LINE__);
-	  }
-
+	  found = true;
 	  AsyncControl* ctrl = new AsyncControl(mGlobalEnv);
 	  ctrl->mNode = node;
-	  ctrl->mInv = inv;
+	  ctrl->mPol = pol;
 	  gen_stmt2(parent_module, stmt->body_stmt(), ctrl->mEnv);
 	  event_list.push_back(ctrl);
-	  event_map[node->id()] = true;
+	  event_map[i] = true;
 	  break;
 	}
       }
+      assert_cond( found , __FILE__, __LINE__);
       stmt1 = stmt1->else_stmt();
     }
     if ( event_list.size() != ev_num - 1 ) {
+      cout << "event_list.size() = " << event_list.size() << ", ev_num = " << ev_num << endl;
       cerr << "Too few if branch against the event list" << endl;
       return false;
     }
 
     // クロック信号を調べる．
     MvNode* clock_node = NULL;
-    bool clock_inv = false;
+    ymuint clock_pol = 0;
     for (ymuint i = 0; i < ev_num; ++ i) {
-      const VlExpr* expr = control->event(i);
-      const VlExpr* opr1 = expr->operand(0);
-      MvNode* node1 = gen_primary(opr1, mGlobalEnv);
-      if ( !event_map[node1->id()] ) {
-	clock_node = node1;
-	clock_inv = (expr->op_type() == kVpiNegedgeOp);
+      if ( !event_map[i] ) {
+	clock_node = event_node_array[i].first;
+	clock_pol = event_node_array[i].second;
+	break;
       }
     }
+    assert_cond( clock_node != NULL, __FILE__, __LINE__);
 
     ProcEnv top_env(mGlobalEnv);
     gen_stmt2(parent_module, stmt->body_stmt(), top_env);
@@ -274,23 +275,29 @@ ReaderImpl::gen_process(MvModule* parent_module,
       MvNode* node0 = mGlobalEnv.get_from_id(i);
       // FF を挿入
       // このノードに関係しているコントロールを調べる．
-      vector<bool> pol_array;
+      vector<ymuint32> pol_array;
       vector<MvNode*> control_array;
+      vector<MvNode*> rhs_array;
       pol_array.reserve(ev_num);
       control_array.reserve(ev_num);
-      for (ymuint j = 0; j < ev_num; ++ j) {
+      rhs_array.reserve(ev_num);
+      for (ymuint j = 0; j < ev_num - 1; ++ j) {
 	AsyncControl* control = event_list[j];
-	if ( control->mEnv.get_from_id(i).mRhs ) {
-	  pol_array.push_back(control->mInv);
+	MvNode* rhs1 = control->mEnv.get_from_id(i).mRhs;
+	if ( rhs1 ) {
+	  pol_array.push_back(control->mPol);
 	  control_array.push_back(control->mNode);
+	  rhs_array.push_back(rhs1);
 	}
       }
+      ymuint n = pol_array.size();
       ymuint bw = node0->output(0)->bit_width();
-      MvNode* ff = mMvMgr->new_dff(parent_module, pol_array, bw);
-      mMvMgr->connect(clock_node, 0, ff, 0);
-      mMvMgr->connect(rhs, 0, ff, 1);
-      for (ymuint j = 0; j < pol_array.size(); ++ j) {
-	mMvMgr->connect(control_array[j], 0, ff, j + 2);
+      MvNode* ff = mMvMgr->new_dff(parent_module, clock_pol, pol_array, bw);
+      mMvMgr->connect(rhs, 0, ff, 0);
+      mMvMgr->connect(clock_node, 0, ff, 1);
+      for (ymuint j = 0; j < n; ++ j) {
+	mMvMgr->connect(control_array[j], 0, ff, (j * 2) + 2);
+	mMvMgr->connect(rhs_array[j], 0, ff, (j * 2) + 3);
       }
       mMvMgr->connect(ff, 0, node0, 0);
     }

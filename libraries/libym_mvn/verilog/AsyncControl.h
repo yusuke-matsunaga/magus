@@ -30,8 +30,8 @@ struct AsyncControl
   // コントロール信号
   MvNode* mNode;
 
-  // 極性 (true で反転)
-  bool mInv;
+  // 極性 ( 1 が正極性, 0 が負極性 )
+  ymuint32 mPol;
 
   // 環境
   ProcEnv mEnv;

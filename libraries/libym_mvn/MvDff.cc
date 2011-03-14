@@ -26,7 +26,7 @@ MvDff::MvDff(MvModule* module,
 	     ymuint clock_pol,
 	     const vector<ymuint>& control_array,
 	     ymuint bit_width) :
-  MvNode(module, control_array.size() + 2, 1)
+  MvNode(module, (control_array.size() * 2) + 2, 1)
 {
   ymuint np = control_array.size();
 
@@ -36,7 +36,10 @@ MvDff::MvDff(MvModule* module,
   set_ipin_bit_width(1, 1);
   // 非同期セット入力
   for (ymuint i = 0; i < np; ++ i) {
-    set_ipin_bit_width(i + 2, 1);
+    // コントロール
+    set_ipin_bit_width(i * 2 + 2, 1);
+    // データ
+    set_ipin_bit_width(i * 2 + 3, bit_width);
   }
   // データ出力
   set_opin_bit_width(0, bit_width);
@@ -104,7 +107,7 @@ MvMgr::new_dff(MvModule* module,
 	       const vector<ymuint>& control_array,
 	       ymuint bit_width)
 {
-  MvNode* node = new MvDff(module, clock_pol, control_prray, bit_width);
+  MvNode* node = new MvDff(module, clock_pol, control_array, bit_width);
   reg_node(node);
 
   return node;

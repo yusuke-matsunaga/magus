@@ -55,7 +55,7 @@ ReaderImpl::gen_stmt1(MvModule* module,
       MvNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
       gen_stmt1(module, stmt->body_stmt(), then_env);
-      merge_env(module, env, cond_node, then_env, env);
+      merge_env1(module, env, cond_node, then_env, env);
     }
     break;
 
@@ -67,7 +67,7 @@ ReaderImpl::gen_stmt1(MvModule* module,
       gen_stmt1(module, stmt->body_stmt(), then_env);
       ProcEnv else_env(env);
       gen_stmt1(module, stmt->else_stmt(), else_env);
-      merge_env(module, env, cond_node, then_env, else_env);
+      merge_env1(module, env, cond_node, then_env, else_env);
     }
     break;
 
@@ -488,7 +488,7 @@ ReaderImpl::merge_env2(MvModule* parent_module,
       }
       new_block = info1.mBlock;
     }
-    env.add_by_id(i, new_node, new_cond, new_block);
+    env.add_by_id(i, new_node, NULL, new_block);
   }
 }
 

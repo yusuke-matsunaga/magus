@@ -111,24 +111,31 @@ dump_node(ostream& s,
       const MvNode* src_node1 = src_pin1->node();
 
       s << "  always @ ( posedge " << node_name(src_node1);
-      for (ymuint i = 2; i < ni; ++ i) {
-	const MvInputPin* ipin2 = node->input(i);
+      ymuint nc = (ni - 2) / 2;
+      for (ymuint i = 0; i < nc; ++ i) {
+	ymuint base = (i * 2) + 2;
+	const MvInputPin* ipin2 = node->input(base);
 	const MvOutputPin* src_pin2 = ipin2->src_pin();
 	const MvNode* src_node2 = src_pin2->node();
-	const char* polstr = node->control_pol(i - 2) ? "posedge" : "negedge";
+	const char* polstr = node->control_pol(i) ? "posedge" : "negedge";
 	s << " or " << polstr << " " << node_name(src_node2);
       }
       s << " )" << endl;
       const char* elif = "if";
-      for (ymuint i = 2; i < ni; ++ i) {
-	const MvInputPin* ipin2 = node->input(i);
+      for (ymuint i = 0; i < nc; ++ i) {
+	ymuint base = (i * 2) + 2;
+	const MvInputPin* ipin2 = node->input(base);
 	const MvOutputPin* src_pin2 = ipin2->src_pin();
 	const MvNode* src_node2 = src_pin2->node();
+	const MvInputPin* ipin3 = node->input(base + 1);
+	const MvOutputPin* src_pin3 = ipin3->src_pin();
+	const MvNode* src_node3 = src_pin3->node();
 	s << "    " << elif << " ( " << node_name(src_node2) << " )" << endl
-	  << "      " << node_name(node) << " <= ";
+	  << "      " << node_name(node) << " <= "
+	  << node_name(src_node3) << endl;
 	elif = "else if";
       }
-      if ( ni > 2 ) {
+      if ( nc > 0 ) {
 	s << "    else" << endl
 	  << "  ";
       }
