@@ -30,11 +30,10 @@ EiFactory::new_Constant(const PtExpr* pt_expr)
   ymuint size = pt_expr->const_size();
   bool is_signed = false;
   ymuint base = 0;
-  void* p;
   switch ( const_type ) {
   case kVpiIntConst:
     if ( pt_expr->const_str() == NULL ) {
-      p = mAlloc.get_memory(sizeof(EiIntConst));
+      void* p = mAlloc.get_memory(sizeof(EiIntConst));
       return new (p) EiIntConst(pt_expr, pt_expr->const_uint());
     }
     break;
@@ -64,12 +63,16 @@ EiFactory::new_Constant(const PtExpr* pt_expr)
     break;
 
   case kVpiRealConst:
-    p = mAlloc.get_memory(sizeof(EiRealConst));
-    return new (p) EiRealConst(pt_expr, pt_expr->const_real());
+    {
+      void* p = mAlloc.get_memory(sizeof(EiRealConst));
+      return new (p) EiRealConst(pt_expr, pt_expr->const_real());
+    }
 
   case kVpiStringConst:
-    p = mAlloc.get_memory(sizeof(EiStringConst));
-    return new (p) EiStringConst(pt_expr, pt_expr->const_str());
+    {
+      void* p = mAlloc.get_memory(sizeof(EiStringConst));
+      return new (p) EiStringConst(pt_expr, pt_expr->const_str());
+    }
 
   default:
     assert_not_reached(__FILE__, __LINE__);
@@ -77,7 +80,7 @@ EiFactory::new_Constant(const PtExpr* pt_expr)
   }
 
   // ここに来たということはビットベクタ型
-  p = mAlloc.get_memory(sizeof(EiBitVectorConst));
+  void* p = mAlloc.get_memory(sizeof(EiBitVectorConst));
   return new (p) EiBitVectorConst(pt_expr, const_type,
 				  BitVector(size, is_signed, base,
 					    pt_expr->const_str()));
