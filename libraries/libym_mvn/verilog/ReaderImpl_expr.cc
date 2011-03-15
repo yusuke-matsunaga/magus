@@ -16,6 +16,7 @@
 #include "ym_mvn/MvPort.h"
 #include "ym_mvn/MvNode.h"
 #include "ym_verilog/BitVector.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlRange.h"
@@ -35,9 +36,9 @@ ReaderImpl::gen_expr(MvModule* parent_module,
 		     const Env& env)
 {
   if ( expr->is_const() ) {
+    VlValue value = expr->constant_value();
     assert_cond( is_bitvector_type(expr->value_type()), __FILE__, __LINE__);
-    BitVector bv;
-    //expr->eval_bitvector(bv);
+    BitVector bv = value.bitvector_value();
     ymuint bit_size = bv.size();
     ymuint n = (bit_size + 31) / 32;
     vector<ymuint32> tmp(n);

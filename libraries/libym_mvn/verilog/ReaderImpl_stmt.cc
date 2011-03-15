@@ -467,8 +467,8 @@ ReaderImpl::merge_env2(MvModule* parent_module,
     }
     else {
       // node1 も node2 も NULL ではない．
-      assert_cond( node0 != NULL, __FILE__, __LINE__);
-      ymuint bw = node0->output(0)->bit_width();
+      //assert_cond( node0 != NULL, __FILE__, __LINE__);
+      ymuint bw = node1->output(0)->bit_width();
       if ( node1->output(0)->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"

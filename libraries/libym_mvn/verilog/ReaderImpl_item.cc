@@ -244,7 +244,6 @@ ReaderImpl::gen_process(MvModule* parent_module,
       stmt1 = stmt1->else_stmt();
     }
     if ( event_list.size() != ev_num - 1 ) {
-      cout << "event_list.size() = " << event_list.size() << ", ev_num = " << ev_num << endl;
       cerr << "Too few if branch against the event list" << endl;
       return false;
     }
