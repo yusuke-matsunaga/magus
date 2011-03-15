@@ -12,6 +12,7 @@
 #include "EiFactory.h"
 #include "EiConstant.h"
 
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtExpr.h"
 
 
@@ -183,6 +184,15 @@ EiIntConst::constant_type() const
   return kVpiIntConst;
 }
 
+// @brief 定数値を返す．
+// @note kVpiConstant の時，意味を持つ．
+// @note それ以外では動作は不定
+VlValue
+EiIntConst::constant_value() const
+{
+  return VlValue(mValue);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiBitVectorConst
@@ -227,6 +237,15 @@ EiBitVectorConst::constant_type() const
   return mConstType;
 }
 
+// @brief 定数値を返す．
+// @note kVpiConstant の時，意味を持つ．
+// @note それ以外では動作は不定
+VlValue
+EiBitVectorConst::constant_value() const
+{
+  return VlValue(mValue);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス EiRealConst
@@ -260,6 +279,15 @@ tVpiConstType
 EiRealConst::constant_type() const
 {
   return kVpiRealConst;
+}
+
+// @brief 定数値を返す．
+// @note kVpiConstant の時，意味を持つ．
+// @note それ以外では動作は不定
+VlValue
+EiRealConst::constant_value() const
+{
+  return VlValue(mValue);
 }
 
 
@@ -296,6 +324,15 @@ tVpiConstType
 EiStringConst::constant_type() const
 {
   return kVpiStringConst;
+}
+
+// @brief 定数値を返す．
+// @note kVpiConstant の時，意味を持つ．
+// @note それ以外では動作は不定
+VlValue
+EiStringConst::constant_value() const
+{
+  return VlValue(mValue);
 }
 
 END_NAMESPACE_YM_VERILOG

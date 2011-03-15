@@ -249,6 +249,13 @@ public:
   tVpiConstType
   constant_type() const = 0;
 
+  /// @brief 定数値を返す．
+  /// @note kVpiConstant の時，意味を持つ．
+  /// @note それ以外では動作は不定
+  virtual
+  VlValue
+  constant_value() const = 0;
+
   /// @brief 対象の関数を返す．
   /// @note kVpiFuncCall の時，意味を持つ．
   /// @note それ以外では NULL を返す．
