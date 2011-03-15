@@ -170,6 +170,40 @@ type2str(tVpiObjType type)
   return "";
 }
 
+// 式の値の型を表す文字列を返す．
+QString
+value_type2str(tVpiValueType value_type)
+{
+  if ( value_type == kVpiValueInteger ) {
+    return "integer";
+  }
+  if ( value_type == kVpiValueReal ) {
+    return "real";
+  }
+  if ( value_type == kVpiValueTime ) {
+    return "time";
+  }
+  ymuint s = unpack_size(value_type);
+  ostringstream buf;
+  if ( is_signed_type(value_type) ) {
+    buf << "signed ";
+  }
+  else {
+    buf << "unsigned ";
+  }
+  if ( is_sized_type(value_type) ) {
+    buf << "sized ";
+  }
+  else {
+    buf << "unsized ";
+  }
+  if ( s > 0 ) {
+    buf << s << " bit ";
+  }
+  buf << "bitvector";
+  return buf.str().c_str();
+}
+
 // 演算子の型を表す文字列を返す．
 QString
 op_type_str(tVpiOpType type)
@@ -252,6 +286,7 @@ void
 VmExprNode::expand() const
 {
   add_str("vpiType", type2str(mExpr->type()));
+  add_str("vpiValueType", value_type2str(mExpr->value_type()));
   switch ( mExpr->type() ) {
   case kVpiOperation:
     add_str("vpiOpType", op_type_str(mExpr->op_type()));
