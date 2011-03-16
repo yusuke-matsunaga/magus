@@ -110,7 +110,14 @@ dump_node(ostream& s,
       assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
       const MvNode* src_node1 = src_pin1->node();
 
-      s << "  always @ ( posedge " << node_name(src_node1);
+      s << "  always @ ( ";
+      if ( node->clock_pol() == 1 ) {
+	s << "posedge";
+      }
+      else {
+	s << "negedge";
+      }
+      s << " " << node_name(src_node1);
       ymuint nc = (ni - 2) / 2;
       for (ymuint i = 0; i < nc; ++ i) {
 	ymuint base = (i * 2) + 2;
@@ -821,7 +828,11 @@ dump_module(ostream& s,
     assert_cond( node->output_num() == 1, __FILE__, __LINE__);
     ymuint bw = node->output(0)->bit_width();
     if ( node->type() == MvNode::kDff || node->type() == MvNode::kLatch ) {
-      s << "  reg  " << node_name(node) << ";" << endl;
+      s << "  reg  ";
+      if ( bw > 1 ) {
+	s << "[" << bw - 1 << ":" << "0]";
+      }
+      s << " " << node_name(node) << ";" << endl;
     }
     else {
       s << "  wire ";
