@@ -206,8 +206,14 @@ ReaderImpl::gen_process(MvModule* parent_module,
     vector<AsyncControl*> event_list;
     event_list.reserve(ev_num);
     const VlStmt* stmt1 = stmt->body_stmt();
-    while ( stmt1 != NULL &&
-	    (stmt1->type() == kVpiIf || stmt1->type() == kVpiIfElse) ) {
+    while ( stmt1 != NULL ) {
+      if ( (stmt1->type() == kVpiNamedBegin || stmt1->type() == kVpiBegin) &&
+	   stmt1->child_stmt_num() == 1 ) {
+	stmt1 = stmt1->child_stmt(0);
+      }
+      if ( stmt1->type() != kVpiIf && stmt1->type() != kVpiIfElse ) {
+	break;
+      }
       const VlExpr* cond = stmt1->expr();
       ymuint pol = 1;
       MvNode* node = NULL;
@@ -234,7 +240,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
 	  AsyncControl* ctrl = new AsyncControl(mGlobalEnv);
 	  ctrl->mNode = node;
 	  ctrl->mPol = pol;
-	  gen_stmt2(parent_module, stmt->body_stmt(), ctrl->mEnv);
+	  gen_stmt2(parent_module, stmt1->body_stmt(), ctrl->mEnv);
 	  event_list.push_back(ctrl);
 	  event_map[i] = true;
 	  break;
@@ -261,7 +267,7 @@ ReaderImpl::gen_process(MvModule* parent_module,
     assert_cond( clock_node != NULL, __FILE__, __LINE__);
 
     ProcEnv top_env(mGlobalEnv);
-    gen_stmt2(parent_module, stmt->body_stmt(), top_env);
+    gen_stmt2(parent_module, stmt1, top_env);
 
     ymuint n = mGlobalEnv.max_id();
     for (ymuint i = 0; i < n; ++ i) {
