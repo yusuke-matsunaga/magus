@@ -10,6 +10,7 @@
 
 
 #include "VmExprNode.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlTaskFunc.h"
@@ -278,6 +279,43 @@ constant_type_str(tVpiConstType type)
   return "";
 }
 
+// 値を表す文字列を返す．
+QString
+value2str(VlValue value)
+{
+  ostringstream buf;
+  switch ( value.type() ) {
+  case VlValue::kIntType:
+    buf << value.int_value();
+    break;
+
+  case VlValue::kUintType:
+    buf << value.uint_value();
+    break;
+
+  case VlValue::kScalarType:
+    buf << value.scalar_value();
+    break;
+
+  case VlValue::kRealType:
+    buf << value.real_value();
+    break;
+
+  case VlValue::kTimeType:
+    buf << value.time_value().value();
+    break;
+
+  case VlValue::kBitVectorType:
+    buf << value.bitvector_value();
+    break;
+
+  case VlValue::kErrorType:
+    buf << "error";
+    break;
+  }
+  return buf.str().c_str();
+}
+
 END_NONAMESPACE
 
 
@@ -297,6 +335,7 @@ VmExprNode::expand() const
 
   case kVpiConstant:
     add_str("vpiConstType", constant_type_str(mExpr->constant_type()));
+    add_str("vpiConstValue", value2str(mExpr->constant_value()));
     break;
 
   case kVpiFuncCall:
