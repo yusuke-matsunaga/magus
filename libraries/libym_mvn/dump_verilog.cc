@@ -749,7 +749,7 @@ dump_node(ostream& s,
       node->const_value(cv);
       for (ymuint i = 0; i < bw; ++ i) {
 	ymuint idx = bw - i - 1;
-	ymuint blk = idx + 31 / 32;
+	ymuint blk = idx / 32;
 	ymuint sft = idx % 32;
 	if ( (cv[blk] >> sft) & 1 ) {
 	  s << "1";
