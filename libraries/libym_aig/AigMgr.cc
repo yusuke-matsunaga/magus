@@ -340,7 +340,30 @@ AigMgr::sat(SatSolver* solver,
 	    AigHandle edge,
 	    vector<Bool3>& model)
 {
-  return kB3X;
+  ymuint n = node_num();
+  vector<ymuint> varidmap(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    AigNode* aignode = node(i);
+    tVarId id = solver->new_var();
+    varidmap[i] = id;
+    if ( !aignode->is_input() ) {
+      ymuint id0 = varidmap[aignode->fanin0()->node_id()];
+      tPol pol0 = aignode->fanin0_inv() ? kPolNega : kPolPosi;
+      ymuint id1 = varidmap[aignode->fanin1()->node_id()];
+      tPol pol1 = aignode->fanin1_inv() ? kPolNega : kPolPosi;
+      Literal lito(id, kPolPosi);
+      Literal lit1(id0, pol0);
+      Literal lit2(id1, pol1);
+      solver->add_clause(~lit1, ~lit2, lito);
+      solver->add_clause( lit1, ~lito);
+      solver->add_clause( lit2, ~lito);
+    }
+  }
+  vector<Literal> assumptions(1);
+  tPol pol = edge.inv() ? kPolNega : kPolPosi;
+  assumptions[0] = Literal(varidmap[edge.node_id()], pol);
+  Bool3 stat = solver->solve(assumptions, model);
+  return stat;
 }
 
 #if 0
