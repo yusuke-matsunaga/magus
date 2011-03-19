@@ -71,19 +71,23 @@ dfs(ostream& s,
     AigNode* node,
     hash_set<ymuint>& mark)
 {
+  if ( node == NULL ) {
+    return;
+  }
   ymuint id = node->node_id();
-  if ( mark.count(id) == 0 ) {
-    mark.insert(id);
-    s << "Node#" << id << ": ";
-    if ( node->is_input() ) {
-      s << "Input#" << node->input_id() << endl;
-    }
-    else {
-      s << "And(" << node->fanin0_handle() << ", "
-	<< node->fanin1_handle() << ")" << endl;
-      dfs(s, node->fanin0(), mark);
-      dfs(s, node->fanin1(), mark);
-    }
+  if ( mark.count(id) > 0 ) {
+    return;
+  }
+  mark.insert(id);
+  s << "Node#" << id << ": ";
+  if ( node->is_input() ) {
+    s << "Input#" << node->input_id() << endl;
+  }
+  else {
+    s << "And(" << node->fanin0_handle() << ", "
+      << node->fanin1_handle() << ")" << endl;
+    dfs(s, node->fanin0(), mark);
+    dfs(s, node->fanin1(), mark);
   }
 }
 
