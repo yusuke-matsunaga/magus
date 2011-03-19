@@ -63,6 +63,50 @@ AigMgr::node(ymuint pos) const
   return mImpl->node(pos);
 }
 
+
+BEGIN_NONAMESPACE
+
+void
+dfs(ostream& s,
+    AigNode* node,
+    hash_set<ymuint>& mark)
+{
+  ymuint id = node->node_id();
+  if ( mark.count(id) == 0 ) {
+    mark.insert(id);
+    s << "Node#" << id << ": ";
+    if ( node->is_input() ) {
+      s << "Input#" << node->input_id() << endl;
+    }
+    else {
+      s << "And(" << node->fanin0_handle() << ", "
+	<< node->fanin1_handle() << ")" << endl;
+      dfs(s, node->fanin0(), mark);
+      dfs(s, node->fanin1(), mark);
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] handle_list 対象のハンドルのリスト
+void
+AigMgr::dump_handles(ostream& s,
+		     const list<AigHandle>& handle_list) const
+{
+  ymuint i = 0;
+  hash_set<ymuint> mark;
+  for (list<AigHandle>::const_iterator p = handle_list.begin();
+       p != handle_list.end(); ++ p) {
+    AigHandle handle = *p;
+    s << "Root#" << i << ": " << handle << endl;
+    ++ i;
+    dfs(s, handle.node(), mark);
+  }
+}
+
 // @brief 定数0関数をつくる．
 AigHandle
 AigMgr::make_zero()

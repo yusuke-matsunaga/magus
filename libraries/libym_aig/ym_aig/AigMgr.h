@@ -59,6 +59,13 @@ public:
   AigNode*
   node(ymuint pos) const;
 
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] handle_list 対象のハンドルのリスト
+  void
+  dump_handles(ostream& s,
+	       const list<AigHandle>& handle_list) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
