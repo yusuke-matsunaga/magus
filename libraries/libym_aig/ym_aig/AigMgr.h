@@ -106,6 +106,22 @@ public:
   AigHandle
   make_and(const list<AigHandle>& edge_list);
 
+  /// @brief 2つのノードの NAND を取る．
+  /// @param[in] edge1, edge2 入力の AIG ハンドル
+  AigHandle
+  make_nand(AigHandle edge1,
+	    AigHandle edge2);
+
+  /// @brief 複数のノードの NAND を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  AigHandle
+  make_nand(const vector<AigHandle>& edge_list);
+
+  /// @brief 複数のノードの NAND を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  AigHandle
+  make_nand(const list<AigHandle>& edge_list);
+
   /// @brief 2つのノードの OR を取る．
   /// @param[in] edge1, edge2 入力の AIG ハンドル
   AigHandle
@@ -122,6 +138,22 @@ public:
   AigHandle
   make_or(const list<AigHandle>& edge_list);
 
+  /// @brief 2つのノードの NOR を取る．
+  /// @param[in] edge1, edge2 入力の AIG ハンドル
+  AigHandle
+  make_nor(AigHandle edge1,
+	   AigHandle edge2);
+
+  /// @brief 複数のノードの NOR を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  AigHandle
+  make_nor(const vector<AigHandle>& edge_list);
+
+  /// @brief 複数のノードの NOR を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  AigHandle
+  make_nor(const list<AigHandle>& edge_list);
+
   /// @brief 2つのノードの XOR を取る．
   /// @param[in] edge1, edge2 入力の AIG ハンドル
   AigHandle
@@ -137,6 +169,22 @@ public:
   /// @param[in] edge_list 入力の AIG ハンドルのリスト
   AigHandle
   make_xor(const list<AigHandle>& edge_list);
+
+  /// @brief 2つのノードの XNOR を取る．
+  /// @param[in] edge1, edge2 入力の AIG ハンドル
+  AigHandle
+  make_xnor(AigHandle edge1,
+	    AigHandle edge2);
+
+  /// @brief 複数のノードの XNOR を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  AigHandle
+  make_xnor(const vector<AigHandle>& edge_list);
+
+  /// @brief 複数のノードの XNOR を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  AigHandle
+  make_xnor(const list<AigHandle>& edge_list);
 
   /// @brief 論理式に対応するノード(木)をつくる．
   /// @param[in] expr 対象の論理式
@@ -197,6 +245,34 @@ AigMgr::make_not(AigHandle edge)
   return ~edge;
 }
 
+// @brief 2つのノードの NAND を取る．
+// @param[in] edge1, edge2 入力の AIG ハンドル
+inline
+AigHandle
+AigMgr::make_nand(AigHandle edge1,
+		  AigHandle edge2)
+{
+  return make_not(make_and(edge1, edge2));
+}
+
+// @brief 複数のノードの NAND を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+AigHandle
+AigMgr::make_nand(const vector<AigHandle>& edge_list)
+{
+  return make_not(make_and(edge_list));
+}
+
+// @brief 複数のノードの NAND を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+AigHandle
+AigMgr::make_nand(const list<AigHandle>& edge_list)
+{
+  return make_not(make_and(edge_list));
+}
+
 // @brief 2つのノードの OR を取る．
 inline
 AigHandle
@@ -204,6 +280,34 @@ AigMgr::make_or(AigHandle edge1,
 		AigHandle edge2)
 {
   return make_not(make_and(make_not(edge1), make_not(edge2)));
+}
+
+// @brief 2つのノードの NOR を取る．
+// @param[in] edge1, edge2 入力の AIG ハンドル
+inline
+AigHandle
+AigMgr::make_nor(AigHandle edge1,
+		 AigHandle edge2)
+{
+  return make_and(make_not(edge1), make_not(edge2));
+}
+
+// @brief 複数のノードの NOR を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+AigHandle
+AigMgr::make_nor(const vector<AigHandle>& edge_list)
+{
+  return make_not(make_or(edge_list));
+}
+
+// @brief 複数のノードの NOR を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+AigHandle
+AigMgr::make_nor(const list<AigHandle>& edge_list)
+{
+  return make_not(make_or(edge_list));
 }
 
 // @brief 2つのノードの XOR を取る．
@@ -214,6 +318,35 @@ AigMgr::make_xor(AigHandle edge1,
 {
   return make_or(make_and(edge1, make_not(edge2)),
 		 make_and(make_not(edge1), edge2));
+}
+
+// @brief 2つのノードの XNOR を取る．
+// @param[in] edge1, edge2 入力の AIG ハンドル
+inline
+AigHandle
+AigMgr::make_xnor(AigHandle edge1,
+		  AigHandle edge2)
+{
+  return make_nor(make_and(edge1, make_not(edge2)),
+		  make_and(make_not(edge1), edge2));
+}
+
+// @brief 複数のノードの XNOR を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+AigHandle
+AigMgr::make_xnor(const vector<AigHandle>& edge_list)
+{
+  return make_not(make_xor(edge_list));
+}
+
+// @brief 複数のノードの XNOR を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+AigHandle
+AigMgr::make_xnor(const list<AigHandle>& edge_list)
+{
+  return make_not(make_xor(edge_list));
 }
 
 END_NAMESPACE_YM_AIG
