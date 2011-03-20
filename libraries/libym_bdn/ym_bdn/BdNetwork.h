@@ -105,13 +105,13 @@ public:
   string
   output_name(ymuint pos) const;
 
-  /// @brief ラッチ数を得る．
+  /// @brief DFF数を得る．
   ymuint
-  latch_num() const;
+  dff_num() const;
 
-  /// @brief ラッチのリストを得る．
+  /// @brief D-FFのリストを得る．
   const BdnNodeList&
-  latch_list() const;
+  dff_list() const;
 
   /// @brief 論理ノード数を得る．
   ymuint
@@ -168,27 +168,38 @@ public:
   change_output(BdnNode* node,
 		BdnNodeHandle inode_handle);
 
-  /// @brief ラッチを作る．
-  /// @param[in] reset_val リセット値 ( 0 / 1 / 2 )
+  /// @brief D-FF を作る．
   /// @return 生成されたラッチを返す．
-  /// @note reset_val = 2 の時は不定
   BdnNode*
-  new_latch(int reset_val = 2);
+  new_dff();
 
-  /// @brief ラッチのファンインを変更する．
-  /// @param[in] latch 変更対象のラッチ
-  /// @param[in] input_handle ラッチの入力に接続しているノード+極性
+  /// @brief D-FF のデータ入力を変更する．
+  /// @param[in] dff 変更対象の D-FF
+  /// @param[in] input_handle ラッチのデータ入力に接続しているノード+極性
   void
-  change_latch(BdnNode* latch,
+  set_dff_data(BdnNode* dff,
 	       BdnNodeHandle input_handle);
 
-  /// @brief ラッチのリセット値を変更する．
-  /// @param[in] latch 変更対象のラッチ
-  /// @param[in] reset_val リセット値 ( 0 / 1 / 2 )
-  /// @note reset_val = 2 の時は不定
+  /// @brief D-FF のクロック入力を変更する．
+  /// @param[in] dff 変更対象の D-FF
+  /// @param[in] input_handle ラッチのクロック入力に接続しているノード+極性
   void
-  change_reset_value(BdnNode* latch,
-		     int reset_val);
+  set_dff_clock(BdnNode* dff,
+		BdnNodeHandle input_handle);
+
+  /// @brief D-FF のリセット入力を変更する．
+  /// @param[in] dff 変更対象の D-FF
+  /// @param[in] input_handle ラッチのリセット入力に接続しているノード+極性
+  void
+  set_dff_rst(BdnNode* dff,
+	      BdnNodeHandle input_handle);
+
+  /// @brief D-FF のセット入力を変更する．
+  /// @param[in] dff 変更対象の D-FF
+  /// @param[in] input_handle ラッチの入力に接続しているノード+極性
+  void
+  set_dff_set(BdnNode* dff,
+	      BdnNodeHandle input_handle);
 
   /// @brief 論理ノードを作る．
   /// @param[in] fcode 機能コード
@@ -196,11 +207,108 @@ public:
   /// @param[in] inode2_handle 2番めの入力ノード+極性
   /// @return 作成したノードを返す．
   /// @note fcode の出力極性を正規化する．
-  /// @note すでに同じ機能コード，同じファンインを持つノードがあればそれを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
   BdnNodeHandle
   new_logic(ymuint fcode,
 	    BdnNodeHandle inode1_handle,
 	    BdnNodeHandle inode2_handle);
+
+  /// @brief AND ノードを作る．
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_and(BdnNodeHandle inode1_handle,
+	  BdnNodeHandle inode2_handle);
+
+  /// @brief AND ノードを作る．
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_and(const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief NAND ノードを作る．
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return 作成したノードを返す．
+  /// @note fcode の出力極性を正規化する．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_nand(BdnNodeHandle inode1_handle,
+	   BdnNodeHandle inode2_handle);
+
+  /// @brief NAND ノードを作る．
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_nand(const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief OR ノードを作る．
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_or(BdnNodeHandle inode1_handle,
+	 BdnNodeHandle inode2_handle);
+
+  /// @brief OR ノードを作る．
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_or(const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief NOR ノードを作る．
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_nor(BdnNodeHandle inode1_handle,
+	  BdnNodeHandle inode2_handle);
+
+  /// @brief NOR ノードを作る．
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_nor(const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief XOR ノードを作る．
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_xor(BdnNodeHandle inode1_handle,
+	  BdnNodeHandle inode2_handle);
+
+  /// @brief XOR ノードを作る．
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_xor(const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief XNOR ノードを作る．
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_xnor(BdnNodeHandle inode1_handle,
+	   BdnNodeHandle inode2_handle);
+
+  /// @brief XNOR ノードを作る．
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  /// @return 作成したノードを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
+  BdnNodeHandle
+  new_xnor(const vector<BdnNodeHandle>& inode_handle_list);
 
   /// @brief 論理ノードの内容を変更する．
   /// @param[in] node 変更対象の論理ノード
@@ -267,9 +375,9 @@ private:
   /// @param[in] inode2_handle 2番めの入力ノード+極性
   /// @return ノード＋極性を返す．
   /// @note fcode の出力極性を正規化する．
-  /// @note すでに同じ機能コード，同じファンインを持つノードがあればそれを返す．
+  /// @note すでに構造的に同じノードがあればそれを返す．
   /// @note なければ node に設定する．
-  /// pnote node が NULL の場合，新しいノードを確保する．
+  /// @note node が NULL の場合，新しいノードを確保する．
   BdnNodeHandle
   set_logic(BdnNode* node,
 	    ymuint fcode,
@@ -334,8 +442,8 @@ private:
   // 外部出力ノードの名前の配列
   vector<string> mOutputNameArray;
 
-  // ラッチノードのリスト
-  BdnNodeList mLatchList;
+  // D-FFノードのリスト
+  BdnNodeList mDffList;
 
   // 論理ノードのリスト
   BdnNodeList mLnodeList;
@@ -450,20 +558,20 @@ BdNetwork::output_name(ymuint pos) const
   return mOutputNameArray[pos];
 }
 
-// @brief ラッチ数を得る．
+// @brief D-FF数を得る．
 inline
 ymuint
-BdNetwork::latch_num() const
+BdNetwork::dff_num() const
 {
-  return mLatchList.size();
+  return mDffList.size();
 }
 
-// @brief ラッチのリストを得る．
+// @brief D-FFのリストを得る．
 inline
 const BdnNodeList&
-BdNetwork::latch_list() const
+BdNetwork::dff_list() const
 {
-  return mLatchList;
+  return mDffList;
 }
 
 // 論理ノード数を得る．

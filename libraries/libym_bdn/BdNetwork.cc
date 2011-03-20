@@ -62,7 +62,7 @@ BdnNode::id_str() const
   else if ( is_output() ) {
     buf << "O" << id();
   }
-  else if ( is_latch() ) {
+  else if ( is_dff() ) {
     buf << "Q" << id();
   }
   else {
@@ -122,7 +122,7 @@ BdNetwork::copy(const BdNetwork& src)
   ymuint n = src.max_node_id();
   vector<BdnNode*> nodemap(n);
 
-  const BdnNodeList& src_latch_list = src.latch_list();
+  const BdnNodeList& src_dff_list = src.dff_list();
 
   // 外部入力ノードの生成
   ymuint ni = src.input_num();
@@ -131,11 +131,11 @@ BdNetwork::copy(const BdNetwork& src)
     BdnNode* dst_node = new_input(src.input_name(i));
     nodemap[src_node->id()] = dst_node;
   }
-  // ラッチノードの生成
-  for (BdnNodeList::const_iterator p = src_latch_list.begin();
-       p != src_latch_list.end(); ++ p) {
+  // D-FFノードの生成
+  for (BdnNodeList::const_iterator p = src_dff_list.begin();
+       p != src_dff_list.end(); ++ p) {
     BdnNode* src_node = *p;
-    BdnNode* dst_node = new_latch(src_node->reset_val());
+    BdnNode* dst_node = new_dff();
     nodemap[src_node->id()] = dst_node;
   }
 
@@ -176,19 +176,19 @@ BdNetwork::copy(const BdNetwork& src)
     nodemap[src_onode->id()] = dst_onode;
   }
 
-  // ラッチノードの入力の設定
-  for (BdnNodeList::const_iterator p = src_latch_list.begin();
-       p != src_latch_list.end(); ++ p) {
+  // D-FFノードの入力の設定
+  for (BdnNodeList::const_iterator p = src_dff_list.begin();
+       p != src_dff_list.end(); ++ p) {
     const BdnNode* src_input = *p;
     const BdnNode* src_output = src_input->fanin(0);
     BdnNode* dst_input = nodemap[src_input->id()];
-    assert_cond(dst_input->is_latch(), __FILE__, __LINE__);
+    assert_cond(dst_input->is_dff(), __FILE__, __LINE__);
     BdnNode* dst_output = NULL;
     if ( src_output ) {
       dst_output = nodemap[src_output->id()];
     }
     BdnNodeHandle dst_handle(dst_output, src_input->output_inv());
-    change_latch(dst_input, dst_handle);
+    set_dff_data(dst_input, dst_handle);
   }
 }
 
@@ -200,7 +200,7 @@ BdNetwork::clear()
   mInputNameArray.clear();
   mOutputArray.clear();
   mOutputNameArray.clear();
-  mLatchList.clear();
+  mDffList.clear();
   mLnodeList.clear();
   mItvlMgr.clear();
   mLevel = 0U;
@@ -250,8 +250,8 @@ BdNetwork::sort(vector<BdnNode*>& node_list) const
     marks[node->id()] = true;
     sort_sub(node, marks, node_list);
   }
-  for (BdnNodeList::const_iterator p = latch_list().begin();
-       p != latch_list().end(); ++ p) {
+  for (BdnNodeList::const_iterator p = dff_list().begin();
+       p != dff_list().end(); ++ p) {
     BdnNode* node = *p;
     marks[node->id()] = true;
     sort_sub(node, marks, node_list);
@@ -314,8 +314,8 @@ BdNetwork::rsort(vector<BdnNode*>& node_list) const
     BdnNode* inode = node->fanin(0);
     rsort_sub(inode, marks, node_list);
   }
-  for (BdnNodeList::const_iterator p = latch_list().begin();
-       p != latch_list().end(); ++ p) {
+  for (BdnNodeList::const_iterator p = dff_list().begin();
+       p != dff_list().end(); ++ p) {
     BdnNode* node = *p;
     marks[node->id()] = true;
     BdnNode* inode = node->fanin(0);
@@ -393,44 +393,58 @@ BdNetwork::change_output(BdnNode* node,
   mLevel = 0U;
 }
 
-// @brief ラッチを作る．
-// @param[in] reset_val リセット値 ( 0 / 1 / 2 )
-// @note reset_val = 2 の時は不定
+// @brief D-FFを作る．
 BdnNode*
-BdNetwork::new_latch(int reset_val)
+BdNetwork::new_dff()
 {
   BdnNode* node = new_node();
 
-  node->set_latch(reset_val);
+  node->set_dff();
 
-  // ラッチリストに登録
-  mLatchList.push_back(node);
+  // D-FFリストに登録
+  mDffList.push_back(node);
 
   mLevel = 0U;
 
   return node;
 }
 
-// @brief ラッチのファンインを変更する．
-// @param[in] latch 変更対象のラッチ
-// @param[in] input_handle ラッチの入力に接続しているノード+極性
+// @brief D-FF のデータ入力を変更する．
+// @param[in] dff 変更対象の D-FF
+// @param[in] input_handle ラッチのデータ入力に接続しているノード+極性
 void
-BdNetwork::change_latch(BdnNode* latch,
+BdNetwork::set_dff_data(BdnNode* dff,
 			BdnNodeHandle input_handle)
 {
   // 実はこれと同じ
-  change_output(latch, input_handle);
+  change_output(dff, input_handle);
 }
 
-// @brief ラッチのリセット値を変更する．
-// @param[in] latch 変更対象のラッチ
-// @param[in] reset_val リセット値 ( 0 / 1 / 2 )
-// @note reset_val = 2 の時は不定
+// @brief D-FF のクロック入力を変更する．
+// @param[in] dff 変更対象の D-FF
+// @param[in] input_handle ラッチのクロック入力に接続しているノード+極性
 void
-BdNetwork::change_reset_value(BdnNode* latch,
-			      int reset_val)
+BdNetwork::set_dff_clock(BdnNode* dff,
+			 BdnNodeHandle input_handle)
 {
-  latch->set_latch(reset_val);
+}
+
+// @brief D-FF のリセット入力を変更する．
+// @param[in] dff 変更対象の D-FF
+// @param[in] input_handle ラッチのリセット入力に接続しているノード+極性
+void
+BdNetwork::set_dff_rst(BdnNode* dff,
+		       BdnNodeHandle input_handle)
+{
+}
+
+// @brief D-FF のセット入力を変更する．
+// @param[in] dff 変更対象の D-FF
+// @param[in] input_handle ラッチの入力に接続しているノード+極性
+void
+BdNetwork::set_dff_set(BdnNode* dff,
+		       BdnNodeHandle input_handle)
+{
 }
 
 // @brief 論理ノードを作る．
@@ -462,7 +476,8 @@ BdNetwork::change_logic(BdnNode* node ,
 			BdnNodeHandle inode1_handle,
 			BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = set_logic(node, fcode, inode1_handle, inode2_handle);
+  BdnNodeHandle new_handle = set_logic(node, fcode,
+				       inode1_handle, inode2_handle);
   if ( new_handle == BdnNodeHandle(node, false) ) {
     // 変化なし
     return;
@@ -490,8 +505,8 @@ BdNetwork::change_logic(BdnNode* node ,
     else if ( onode->is_output() ) {
       change_output(onode, new_handle);
     }
-    else if ( onode->is_latch() ) {
-      change_latch(onode, new_handle);
+    else if ( onode->is_dff() ) {
+      set_dff_data(onode, new_handle);
     }
   }
 }
@@ -838,9 +853,9 @@ dump(ostream& s,
     }
     s << " : = INPUT" << endl;
   }
-  const BdnNodeList& latch_list = network.latch_list();
-  for (BdnNodeList::const_iterator p = latch_list.begin();
-       p != latch_list.end(); ++ p) {
+  const BdnNodeList& dff_list = network.dff_list();
+  for (BdnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
     const BdnNode* node = *p;
     s << node->id_str();
     s << " : = LATCH(";

@@ -12,4 +12,6 @@ noinst_HEADERS = \
 	BdnNode.h \
 	BdnNodeHandle.h \
 	BlifBdnConv.h \
+	MvnBdnConv.h \
+	MvnBdnMap.h \
 	bdn_nsdef.h

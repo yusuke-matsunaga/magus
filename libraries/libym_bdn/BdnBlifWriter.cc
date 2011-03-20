@@ -5,7 +5,7 @@
 ///
 /// $Id: BdnBlifWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -67,10 +67,10 @@ BdnBlifWriter::operator()(ostream& s,
     name_array[node->id()] = name;
   }
 
-  // ラッチノードに名前をつける．
-  const BdnNodeList& latch_list = network.latch_list();
-  for (BdnNodeList::const_iterator p = latch_list.begin();
-       p != latch_list.end(); ++ p) {
+  // D-FFノードに名前をつける．
+  const BdnNodeList& dff_list = network.dff_list();
+  for (BdnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
     const BdnNode* node = *p;
     string name = name_mgr.new_name(true);
     name_array[node->id()] = name;
@@ -107,8 +107,8 @@ BdnBlifWriter::operator()(ostream& s,
     s << ".outputs " << name_array[node->id()] << endl;
   }
 
-  for (BdnNodeList::const_iterator p = latch_list.begin();
-       p != latch_list.end(); ++ p) {
+  for (BdnNodeList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
     const BdnNode* node = *p;
     const BdnNode* inode = node->fanin0();
     string iname;

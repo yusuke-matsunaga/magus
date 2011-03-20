@@ -121,13 +121,13 @@ private:
 /// ノードの種類は
 /// - 外部入力ノード
 /// - 外部出力ノード
-/// - ラッチノード
+/// - D-FFノード
 /// - 論理ノード
 /// の 4種類がある．
 ///
 /// 全てのノードはID番号をもつ．
 /// 外部入力ノードと外部出力ノードはそれぞれ外部入力番号，外部出力番号を持つ．
-/// ラッチノードは1つのファンインとリセット値(0/1/2)を持つ．
+/// D-FFノードはデータ入力，クロック入力，リセット入力，セット入力を持つ．
 /// 論理ノードは2つのファンインと機能コードを持つ．
 /// 外部出力以外のノードは複数のファンアウトを持つ．
 ///
@@ -145,8 +145,8 @@ public:
     kINPUT  = 0,
     /// @brief 外部出力ノード
     kOUTPUT = 1,
-    /// @brief ラッチノード
-    kLATCH  = 2,
+    /// @brief D-FFノード
+    kDFF  = 2,
     /// @brief 論理ノード
     kLOGIC  = 3
   };
@@ -190,9 +190,9 @@ public:
   bool
   is_output() const;
 
-  /// @brief ラッチノードの時に true を返す．
+  /// @brief D-FFノードの時に true を返す．
   bool
-  is_latch() const;
+  is_dff() const;
 
   /// @brief 論理ノードの時に true を返す．
   bool
@@ -299,10 +299,9 @@ private:
   void
   set_output(ymuint id);
 
-  /// @brief タイプをラッチに設定する．
-  /// @param[in] reset_val リセット値
+  /// @brief タイプを D-FF に設定する．
   void
-  set_latch(int reset_val);
+  set_dff();
 
   /// @brief 出力もしくはラッチの入力の極性を設定する．
   /// @param[in] inv 極性
@@ -505,12 +504,12 @@ BdnNode::is_output() const
   return type() == kOUTPUT;
 }
 
-// ラッチノードの時に true を返す．
+// D-FFノードの時に true を返す．
 inline
 bool
-BdnNode::is_latch() const
+BdnNode::is_dff() const
 {
-  return type() == kLATCH;
+  return type() == kDFF;
 }
 
 // 論理ノードの時に true を返す．
@@ -670,13 +669,12 @@ BdnNode::set_output(ymuint id)
   mFlags = static_cast<ymuint32>(kOUTPUT) | (id << kIdShift);
 }
 
-// @brief タイプをラッチに設定する．
-// @param[in] reset_val リセット値
+// @brief タイプを D-FF に設定する．
 inline
 void
-BdnNode::set_latch(int reset_val)
+BdnNode::set_dff()
 {
-  mFlags = static_cast<ymuint32>(kLATCH) | ((reset_val & 3) << kRstShift);
+  mFlags = static_cast<ymuint32>(kDFF);
 }
 
 // @brief 出力の極性を設定する．

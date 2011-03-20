@@ -5,7 +5,7 @@
 ///
 /// $Id: BlifBdnConv.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -39,7 +39,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   ymuint32 n = blif_network.max_node_id();
   mNodeMap.resize(n);
   mNodeFlag.resize(n, false);
-  
+
   // モデル名の設定
   mNetwork->set_name(blif_network.name());
 
@@ -51,7 +51,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     put_node(blif_node, BdnNodeHandle(node, false));
   }
 
-  // ラッチの出力(擬似入力)ノードの生成
+  // D-FFの出力(擬似入力)ノードの生成
   ymuint32 nff = blif_network.nff();
   for (ymuint32 i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
@@ -62,7 +62,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     else if ( blif_node->opat() == '1' ) {
       reset_val = 1;
     }
-    BdnNode* node = mNetwork->new_latch(reset_val);
+    BdnNode* node = mNetwork->new_dff();
     put_node(blif_node, BdnNodeHandle(node, false));
   }
 
@@ -74,17 +74,17 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     (void) mNetwork->new_output(blif_node->name(), node_h);
   }
 
-  // ラッチに用いられているノードを再帰的に生成
+  // D-FFに用いられているノードを再帰的に生成
   for (ymuint32 i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
     BdnNodeHandle node_h;
     bool stat = get_node(blif_node, node_h);
     assert_cond(stat, __FILE__, __LINE__);
     assert_cond(node_h.inv() == false, __FILE__, __LINE__);
-    BdnNode* latch = node_h.node();
-    
+    BdnNode* dff = node_h.node();
+
     BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
-    mNetwork->change_latch(latch, inode_h);
+    mNetwork->set_dff_data(dff, inode_h);
   }
 
   return true;
@@ -102,7 +102,7 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
     for (ymuint32 i = 0; i < ni; ++ i) {
       fanins[i] = make_node(blif_node->fanin(i));
     }
-    
+
     ymuint32 nc = blif_node->nc();
     if ( blif_node->opat() == '1' ) {
       vector<BdnNodeHandle> or_leaves;
@@ -162,7 +162,7 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
   }
   return node_handle;
 }
-  
+
 // @brief 2分木を生成する．
 BdnNodeHandle
 BlifBdnConv::bidecomp(ymuint32 fcode,

@@ -5,6 +5,7 @@
 SUBDIRS = \
 	ym_bdn \
 	. \
+	mvnconv \
 	tests
 
 INCLUDES = \
@@ -19,10 +20,11 @@ libym_bdn_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_bdn_la_LDFLAGS = 
+libym_bdn_la_LDFLAGS =
 
 libym_bdn_la_SOURCES = \
 	BdNetwork.cc \
 	BdnBlifWriter.cc \
-	BlifBdnConv.cc
+	BlifBdnConv.cc \
+	mvnconv/libym_bdn_mvnconv.la
 
