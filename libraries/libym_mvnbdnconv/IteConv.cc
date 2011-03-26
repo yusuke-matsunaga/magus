@@ -1,19 +1,20 @@
 
-/// @file libym_mvn/conv/IteConv.cc
+/// @file libym_mvnbdnconv/IteConv.cc
 /// @brief IteConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "IteConv.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNodeMap.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
+#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 // @brief コンストラクタ
 IteConv::IteConv()
@@ -25,16 +26,16 @@ IteConv::~IteConv()
 {
 }
 
-// @brief MvNode を SbjGraph に変換する．
+// @brief MvNode を BdnNetwork に変換する．
 // @param[in] node ノード
-// @param[in] sbjgraph 変換結果のサブジェクトグラフ
+// @param[in] bdnetwork 変換結果のサブジェクトグラフ
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 IteConv::operator()(const MvNode* node,
-		    SbjGraph& sbjgraph,
-		    MvNodeMap& nodemap)
+		    BdNetwork& bdnetwork,
+		    MvnBdnMap& nodemap)
 {
   if ( node->type() == MvNode::kIte ) {
     const MvInputPin* ipin0 = node->input(0);
@@ -52,14 +53,14 @@ IteConv::operator()(const MvNode* node,
     ymuint bw = node->output(0)->bit_width();
     assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
     assert_cond( src_pin2->bit_width() == bw, __FILE__, __LINE__);
-    SbjHandle sbjhandle0 = nodemap.get(src_node0);
+    BdnNodeHandle handle0 = nodemap.get(src_node0);
 
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjHandle sbjhandle1 = nodemap.get(src_node1, i);
-      SbjHandle sbjhandle2 = nodemap.get(src_node2, i);
-      SbjHandle and1 = sbjgraph.new_and(sbjhandle0, sbjhandle1);
-      SbjHandle and2 = sbjgraph.new_and(~sbjhandle0, sbjhandle2);
-      SbjHandle or1 = sbjgraph.new_or(and1, and2);
+      BdnNodeHandle handle1 = nodemap.get(src_node1, i);
+      BdnNodeHandle handle2 = nodemap.get(src_node2, i);
+      BdnNodeHandle and1 = bdnetwork.new_and(handle0, handle1);
+      BdnNodeHandle and2 = bdnetwork.new_and(~handle0, handle2);
+      BdnNodeHandle or1 = bdnetwork.new_or(and1, and2);
       nodemap.put(node, i, or1);
     }
     return true;
@@ -67,4 +68,4 @@ IteConv::operator()(const MvNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV

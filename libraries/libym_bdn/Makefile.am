@@ -5,7 +5,6 @@
 SUBDIRS = \
 	ym_bdn \
 	. \
-	mvnconv \
 	tests
 
 INCLUDES = \
@@ -25,6 +24,5 @@ libym_bdn_la_LDFLAGS =
 libym_bdn_la_SOURCES = \
 	BdNetwork.cc \
 	BdnBlifWriter.cc \
-	BlifBdnConv.cc \
-	mvnconv/libym_bdn_mvnconv.la
+	BlifBdnConv.cc
 

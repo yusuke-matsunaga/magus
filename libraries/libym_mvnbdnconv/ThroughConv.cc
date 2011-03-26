@@ -1,5 +1,5 @@
 
-/// @file libym_mvn/conv/ThroughConv.cc
+/// @file libym_mvnbdnconv/ThroughConv.cc
 /// @brief ThroughConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,11 +9,12 @@
 
 #include "ThroughConv.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNodeMap.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
+#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 // @brief コンストラクタ
 ThroughConv::ThroughConv()
@@ -25,16 +26,16 @@ ThroughConv::~ThroughConv()
 {
 }
 
-// @brief MvNode を SbjGraph に変換する．
+// @brief MvNode を BdNetwork に変換する．
 // @param[in] node ノード
-// @param[in] sbjgraph 変換結果のサブジェクトグラフ
+// @param[in] bdnetwork 変換結果の BdNetwork
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 ThroughConv::operator()(const MvNode* node,
-			SbjGraph& sbjgraph,
-			MvNodeMap& nodemap)
+			BdNetwork& sbjgraph,
+			MvnBdnMap& nodemap)
 {
   if ( node->type() == MvNode::kThrough ) {
     const MvInputPin* ipin = node->input(0);
@@ -42,12 +43,12 @@ ThroughConv::operator()(const MvNode* node,
     const MvNode* src_node = opin->node();
     ymuint bw = opin->bit_width();
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjHandle sbjhandle = nodemap.get(src_node, i);
-      nodemap.put(node, i, sbjhandle);
+      BdnNodeHandle handle = nodemap.get(src_node, i);
+      nodemap.put(node, i, handle);
     }
     return true;
   }
   return false;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV

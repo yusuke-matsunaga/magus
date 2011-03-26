@@ -1,18 +1,18 @@
 #ifndef LIBYM_MVNBDNCONV_ADDCONV_H
 #define LIBYM_MVNBDNCONV_ADDCONV_H
 
-/// @file libym_mvnbdnconv/AddConv.h
+/// @file libym_bdn_mvnconv/AddConv.h
 /// @brief AddConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class AddConv AddConv.h "AddConv.h"
@@ -46,11 +46,11 @@ public:
   bool
   operator()(const MvNode* node,
 	     BdNetwork& bdnetwork,
-	     MvNodeMap& nodemap);
+	     MvnBdnMap& nodemap);
 
 };
 
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV
 
 #endif // LIBYM_MVNBDNCONV_ADDCONV_H

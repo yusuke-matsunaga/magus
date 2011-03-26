@@ -23,9 +23,10 @@
 ///   出力ノードは一度生成されたら削除されない．
 ///   ファンイン(or NULL)と反転属性を持つ．
 ///
-/// - ラッチノード
-///   ラッチに相当するノード．
-///   リセット値(0, 1, 2)を持つ．2 の場合にはリセット値は不定
+/// - D-FFノード
+///   D-FFに相当するノード．
+///   データ入力，クロック入力，セット信号入力，リセット信号入力を持つ．
+///   セット信号とリセット信号はオプショナル．
 ///
 /// - 論理ノード
 ///   2つのファンイン(常に != NULL)とローカルな論理関数
@@ -91,14 +92,14 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_BDN
 
 class BdNetwork;
-class BdnBlifWriter;
-class BlifBdnConv;
 
 class BdnNode;
 class BdnNodeHandle;
 
 class BdnEdge;
 
+class BdnBlifWriter;
+class BlifBdnConv;
 
 /// @brief 枝のリスト
 /// @ingroup BdnGroup

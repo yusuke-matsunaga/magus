@@ -1,18 +1,18 @@
-#ifndef LIBYM_MVN_CONV_RORCONV_H
-#define LIBYM_MVN_CONV_RORCONV_H
+#ifndef LIBYM_MVNBDNCONV_RORCONV_H
+#define LIBYM_MVNBDNCONV_RORCONV_H
 
-/// @file libym_mvn/conv/RorConv.h
+/// @file libym_mvnbdnconv/RorConv.h
 /// @brief RorConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class RorConv RorConv.h "RorConv.h"
@@ -36,21 +36,21 @@ public:
   // MvnConv の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief MvNode を SbjGraph に変換する．
+  /// @brief MvNode を BdNetwork に変換する．
   /// @param[in] node ノード
-  /// @param[in] sbjgraph 変換結果のサブジェクトグラフ
+  /// @param[in] bdnetwork 変換結果の BdNetwork
   /// @param[in] nodemap ノードの対応関係を表すマップ
   /// @retval true このクラスで変換処理を行った．
   /// @retval false このクラスでは変換処理を行わなかった．
   virtual
   bool
   operator()(const MvNode* node,
-	     SbjGraph& sbjgraph,
-	     MvNodeMap& nodemap);
+	     BdNetwork& bdnetwork,
+	     MvnBdnMap& nodemap);
 
 };
 
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV
 
-#endif // LIBYM_MVN_CONV_RORCONV_H
+#endif // LIBYM_MVNBDNCONV_RORCONV_H

@@ -3,17 +3,18 @@
 /// @brief AddConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "AddConv.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNodeMap.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
 #include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 // @brief コンストラクタ
 AddConv::AddConv()
@@ -27,14 +28,14 @@ AddConv::~AddConv()
 
 // @brief MvNode を BdNetwork に変換する．
 // @param[in] node ノード
-// @param[in] bdnetwork 変換結果のサブジェクトグラフ
+// @param[in] bdnetwork 変換結果の BdNetwork
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 AddConv::operator()(const MvNode* node,
 		    BdNetwork& bdnetwork,
-		    MvNodeMap& nodemap)
+		    MvnBdnMap& nodemap)
 {
   if ( node->type() == MvNode::kAdd ) {
     const MvInputPin* ipin0 = node->input(0);
@@ -72,4 +73,4 @@ AddConv::operator()(const MvNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV

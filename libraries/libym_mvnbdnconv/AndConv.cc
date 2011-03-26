@@ -1,19 +1,20 @@
 
-/// @file libym_mvn/conv/AndConv.cc
+/// @file libym_mvnbdnconv/AndConv.cc
 /// @brief AndConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "AndConv.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNodeMap.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
+#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 // @brief コンストラクタ
 AndConv::AndConv()
@@ -25,16 +26,16 @@ AndConv::~AndConv()
 {
 }
 
-// @brief MvNode を SbjGraph に変換する．
+// @brief MvNode を BdNetwork に変換する．
 // @param[in] node ノード
-// @param[in] sbjgraph 変換結果のサブジェクトグラフ
+// @param[in] bdnetwork 変換結果の BdNetwork
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 AndConv::operator()(const MvNode* node,
-		    SbjGraph& sbjgraph,
-		    MvNodeMap& nodemap)
+		    BdNetwork& bdnetwork,
+		    MvnBdnMap& nodemap)
 {
   if ( node->type() == MvNode::kAnd ) {
     ymuint ni = node->input_num();
@@ -43,7 +44,7 @@ AndConv::operator()(const MvNode* node,
     assert_cond( no == 1, __FILE__, __LINE__);
 
     ymuint bw = node->output(0)->bit_width();
-    vector<vector<SbjHandle> > input_list_array(bw);
+    vector<vector<BdnNodeHandle> > input_list_array(bw);
     for (ymuint b = 0; b < bw; ++ b) {
       input_list_array[b].resize(ni);
     }
@@ -57,12 +58,12 @@ AndConv::operator()(const MvNode* node,
       }
     }
     for (ymuint b = 0; b < bw; ++ b) {
-      SbjHandle sbjhandle = sbjgraph.new_and(input_list_array[b]);
-      nodemap.put(node, b, sbjhandle);
+      BdnNodeHandle handle = bdnetwork.new_and(input_list_array[b]);
+      nodemap.put(node, b, handle);
     }
     return true;
   }
   return false;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV

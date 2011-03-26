@@ -2,7 +2,9 @@
 
 ## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = \
+	. \
+	tests
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -13,8 +15,9 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_mvnbdnconv.la
 
 libym_mvnbdnconv_la_SOURCES = \
-	MvNodeMap.cc \
-	Mvn2Sbj.cc \
+	MvnBdnMap.cc \
+	MvnBdnConv.cc \
+	MvnConv.h \
 	ThroughConv.h \
 	ThroughConv.cc \
 	NotConv.h \

@@ -11,6 +11,7 @@
 /// All rights reserved.
 
 #include <ym_bdn/bdn_nsdef.h>
+#include <ym_bdn/BdnNodeHandle.h>
 #include <ym_utils/Alloc.h>
 #include <ym_utils/ItvlMgr.h>
 
@@ -25,7 +26,7 @@ BEGIN_NAMESPACE_YM_BDN
 /// ノードは，
 ///  - 入力ノード
 ///  - 出力ノード
-///  - ラッチノード
+///  - D-FF ノード
 ///  - 論理ノード
 /// の4種類がある(@sa BdnNode)．
 /// 入力ノード，出力ノードは入力 ID 番号，および出力 ID 番号を持って
@@ -37,7 +38,7 @@ BEGIN_NAMESPACE_YM_BDN
 /// 論理ノードを入力からのトポロジカル順で処理するためには sort()
 /// を用いてソートされたノードのベクタを得る．
 ///
-/// その他に記憶素子を表すラッチがある．ラッチは
+/// その他に記憶素子を表すD-FFがある．D-FFは
 ///  - 入力に接続する "出力"ノード
 ///  - 出力に接続する "入力"ノード
 ///  - リセット値
@@ -206,6 +207,7 @@ public:
   /// @param[in] inode1_handle 1番めの入力ノード+極性
   /// @param[in] inode2_handle 2番めの入力ノード+極性
   /// @return 作成したノードを返す．
+  /// @note fcode は2入力関数の真理値表ベクタ
   /// @note fcode の出力極性を正規化する．
   /// @note すでに構造的に同じノードがあればそれを返す．
   BdnNodeHandle
@@ -367,6 +369,17 @@ private:
   /// @param[in] src コピー元のオブジェクト
   void
   copy(const BdNetwork& src);
+
+  /// @brief バランス木を作る．
+  /// @param[in] fcode 機能コード
+  /// @param[in] start 開始位置
+  /// @param[in] num 要素数
+  /// @param[in] node_list ノードのリスト
+  BdnNodeHandle
+  make_tree(ymuint fcode,
+	    ymuint start,
+	    ymuint num,
+	    const vector<BdnNodeHandle>& node_list);
 
   /// @brief 論理ノードの内容を設定する．
   /// @param[in] node 設定するノード
@@ -588,6 +601,79 @@ const BdnNodeList&
 BdNetwork::lnode_list() const
 {
   return mLnodeList;
+}
+
+// @brief NAND ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note fcode の出力極性を正規化する．
+// @note すでに構造的に同じノードがあればそれを返す．
+inline
+BdnNodeHandle
+BdNetwork::new_nand(BdnNodeHandle inode1_handle,
+		    BdnNodeHandle inode2_handle)
+{
+  return ~new_and(inode1_handle, inode2_handle);
+}
+
+// @brief NAND ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+inline
+BdnNodeHandle
+BdNetwork::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~new_and(inode_handle_list);
+}
+
+// @brief NOR ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+inline
+BdnNodeHandle
+BdNetwork::new_nor(BdnNodeHandle inode1_handle,
+		   BdnNodeHandle inode2_handle)
+{
+  return ~new_or(inode1_handle, inode2_handle);
+}
+
+// @brief NOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+inline
+BdnNodeHandle
+BdNetwork::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~new_or(inode_handle_list);
+}
+
+// @brief XNOR ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+inline
+BdnNodeHandle
+BdNetwork::new_xnor(BdnNodeHandle inode1_handle,
+		    BdnNodeHandle inode2_handle)
+{
+  return ~new_xor(inode1_handle, inode2_handle);
+}
+
+// @brief XNOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+inline
+BdnNodeHandle
+BdNetwork::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~new_xor(inode_handle_list);
 }
 
 END_NAMESPACE_YM_BDN

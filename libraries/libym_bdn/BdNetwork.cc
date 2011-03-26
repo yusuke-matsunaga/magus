@@ -463,6 +463,103 @@ BdNetwork::new_logic(ymuint fcode,
   return set_logic(NULL, fcode, inode1_handle, inode2_handle);
 }
 
+// @brief AND ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdNetwork::new_and(BdnNodeHandle inode1_handle,
+		   BdnNodeHandle inode2_handle)
+{
+  return new_logic(0x8, inode1_handle, inode2_handle);
+}
+
+// @brief AND ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdNetwork::new_and(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return make_tree(0x8, 0, inode_handle_list.size(), inode_handle_list);
+}
+
+// @brief OR ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdNetwork::new_or(BdnNodeHandle inode1_handle,
+		  BdnNodeHandle inode2_handle)
+{
+  return new_logic(0xe, inode1_handle, inode2_handle);
+}
+
+// @brief OR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdNetwork::new_or(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return make_tree(0xe, 0, inode_handle_list.size(), inode_handle_list);
+}
+
+// @brief XOR ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdNetwork::new_xor(BdnNodeHandle inode1_handle,
+		   BdnNodeHandle inode2_handle)
+{
+  return new_logic(0x6, inode1_handle, inode2_handle);
+}
+
+// @brief XOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdNetwork::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return make_tree(0x6, 0, inode_handle_list.size(), inode_handle_list);
+}
+
+// @brief バランス木を作る．
+// @param[in] fcode 機能コード
+// @param[in] start 開始位置
+// @param[in] num 要素数
+// @param[in] node_list ノードのリスト
+BdnNodeHandle
+BdNetwork::make_tree(ymuint fcode,
+		     ymuint start,
+		     ymuint num,
+		     const vector<BdnNodeHandle>& node_list)
+{
+  switch ( num ) {
+  case 0:
+    assert_not_reached(__FILE__, __LINE__);
+
+  case 1:
+    return node_list[0];
+
+  case 2:
+    return new_logic(fcode, node_list[0], node_list[1]);
+
+  default:
+    break;
+  }
+
+  ymuint nh = num / 2;
+  BdnNodeHandle l = make_tree(fcode, start, nh, node_list);
+  BdnNodeHandle r = make_tree(fcode, start + nh, num - nh, node_list);
+  return new_logic(fcode, l, r);
+}
+
 // @brief 論理ノードの内容を変更する．
 // @param[in] node 変更対象の論理ノード
 // @param[in] fcode 機能コード

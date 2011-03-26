@@ -1,5 +1,5 @@
 
-/// @file libym_mvn/conv/SrlConv.cc
+/// @file libym_mvnbdnconv/SrlConv.cc
 /// @brief SrlConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,11 +9,12 @@
 
 #include "SrlConv.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNodeMap.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
+#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 // @brief コンストラクタ
 SrlConv::SrlConv()
@@ -25,16 +26,16 @@ SrlConv::~SrlConv()
 {
 }
 
-// @brief MvNode を SbjGraph に変換する．
+// @brief MvNode を BdNetwork に変換する．
 // @param[in] node ノード
-// @param[in] sbjgraph 変換結果のサブジェクトグラフ
+// @param[in] bdnetwork 変換結果のサブジェクトグラフ
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 SrlConv::operator()(const MvNode* node,
-		    SbjGraph& sbjgraph,
-		    MvNodeMap& nodemap)
+		    BdNetwork& bdnetwork,
+		    MvnBdnMap& nodemap)
 {
   if ( node->type() == MvNode::kSrl ) {
     cerr << "Converter for SRL is not implemented" << endl;
@@ -51,10 +52,10 @@ SrlConv::operator()(const MvNode* node,
     assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
     assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
     for (ymuint i = 0; i < bw; ++ i) {
-      SbjHandle sbjhandle0 = nodemap.get(src_node0, i);
-      SbjHandle sbjhandle1 = nodemap.get(src_node1, i);
-      SbjHandle sbjhandle = sbjgraph.new_and(sbjhandle0, sbjhandle1);
-      nodemap.put(node, i, sbjhandle);
+      BdnNodeHandle handle0 = nodemap.get(src_node0, i);
+      BdnNodeHandle handle1 = nodemap.get(src_node1, i);
+      BdnNodeHandle handle = bdnetwork.new_and(handle0, handle1);
+      nodemap.put(node, i, handle);
     }
 #endif
     return true;
@@ -62,4 +63,4 @@ SrlConv::operator()(const MvNode* node,
   return false;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV

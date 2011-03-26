@@ -1,19 +1,20 @@
 
-/// @file libym_mvn/conv/RandConv.cc
+/// @file libym_mvnbdnconv/RandConv.cc
 /// @brief RandConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "RandConv.h"
 #include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvNodeMap.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
+#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 // @brief コンストラクタ
 RandConv::RandConv()
@@ -25,16 +26,16 @@ RandConv::~RandConv()
 {
 }
 
-// @brief MvNode を SbjGraph に変換する．
+// @brief MvNode を BdNetwork に変換する．
 // @param[in] node ノード
-// @param[in] sbjgraph 変換結果のサブジェクトグラフ
+// @param[in] bdnetwork 変換結果の BdNetwork
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 RandConv::operator()(const MvNode* node,
-		     SbjGraph& sbjgraph,
-		     MvNodeMap& nodemap)
+		     BdNetwork& bdnetwork,
+		     MvnBdnMap& nodemap)
 {
   if ( node->type() == MvNode::kRand ) {
     const MvInputPin* ipin0 = node->input(0);
@@ -42,15 +43,15 @@ RandConv::operator()(const MvNode* node,
     const MvNode* src_node0 = src_pin0->node();
 
     ymuint bw = src_pin0->bit_width();
-    vector<SbjHandle> input_list(bw);
+    vector<BdnNodeHandle> input_list(bw);
     for (ymuint i = 0; i < bw; ++ i) {
       input_list[i] = nodemap.get(src_node0, i);
     }
-    SbjHandle sbjhandle = sbjgraph.new_and(input_list);
-    nodemap.put(node, 0, sbjhandle);
+    BdnNodeHandle handle = bdnetwork.new_and(input_list);
+    nodemap.put(node, 0, handle);
     return true;
   }
   return false;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_MVNBDNCONV
