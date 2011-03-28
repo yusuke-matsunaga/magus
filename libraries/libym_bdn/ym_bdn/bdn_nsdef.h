@@ -7,7 +7,7 @@
 ///
 /// $Id: bdn_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BdnGroup Binary Decomposed Network パッケージ
@@ -96,6 +96,10 @@ class BdNetwork;
 class BdnNode;
 class BdnNodeHandle;
 
+class BdnDff;
+
+class BdnLatch;
+
 class BdnEdge;
 
 class BdnBlifWriter;
@@ -117,6 +121,12 @@ typedef vector<BdnNode*> BdnNodeVector;
 /// @ingroup BdnGroup
 typedef DlList<BdnNode> BdnNodeList;
 
+/// @brief DFF のリスト
+typedef DlList<BdnDff> BdnDffList;
+
+/// @brief ラッチのリスト
+typedef DlList<BdnLatch> BdnLatchList;
+
 END_NAMESPACE_YM_BDN
 
 BEGIN_NAMESPACE_YM
@@ -129,6 +139,12 @@ using nsBdn::BdnNode;
 using nsBdn::BdnNodeHandle;
 using nsBdn::BdnNodeVector;
 using nsBdn::BdnNodeList;
+
+using nsBdn::BdnDff;
+using nsBdn::BdnDffList;
+
+using nsBdn::BdnLatch;
+using nsBdn::BdnLatchList;
 
 using nsBdn::BdnEdge;
 using nsBdn::BdnEdgeList;

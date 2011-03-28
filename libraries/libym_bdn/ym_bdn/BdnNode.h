@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_BDN
 
 //////////////////////////////////////////////////////////////////////
-/// @class BdnEdge BdnNode.h <ym_bdn/BdnNode.h>
+/// @class BdnEdge BdnNode.h "ym_bdn/BdnNode.h"
 /// @brief ノード間の枝を表すクラス
 ///
 /// - 入力側のノード
@@ -93,23 +93,8 @@ private:
   // 入力側のノード
   BdnNode* mFrom;
 
-  // 出力側のノード
-  BdnNode* mTo;
-
-  // 種々のフラグ
-  ymuint32 mFlags;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 定数
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const int kIposShift = 0;
-
-  static
-  const ymuint32 kIposMask = (1U << kIposShift);
+  // 出力側のノード + 入力位置(1bit)
+  ympuint mToPos;
 
 };
 
@@ -119,15 +104,12 @@ private:
 /// @brief ノードを表すクラス
 ///
 /// ノードの種類は
-/// - 外部入力ノード
-/// - 外部出力ノード
-/// - D-FFノード
+/// - 入力ノード
+/// - 出力ノード
 /// - 論理ノード
-/// の 4種類がある．
+/// の 3種類がある．
 ///
 /// 全てのノードはID番号をもつ．
-/// 外部入力ノードと外部出力ノードはそれぞれ外部入力番号，外部出力番号を持つ．
-/// D-FFノードはデータ入力，クロック入力，リセット入力，セット入力を持つ．
 /// 論理ノードは2つのファンインと機能コードを持つ．
 /// 外部出力以外のノードは複数のファンアウトを持つ．
 ///
@@ -137,6 +119,7 @@ class BdnNode :
   public DlElem
 {
   friend class BdNetwork;
+  friend class BdnDff;
 
 public:
   /// @brief ノードの型
@@ -145,10 +128,8 @@ public:
     kINPUT  = 0,
     /// @brief 外部出力ノード
     kOUTPUT = 1,
-    /// @brief D-FFノード
-    kDFF  = 2,
     /// @brief 論理ノード
-    kLOGIC  = 3
+    kLOGIC  = 2
   };
 
 
@@ -190,37 +171,58 @@ public:
   bool
   is_output() const;
 
-  /// @brief D-FFノードの時に true を返す．
-  bool
-  is_dff() const;
-
   /// @brief 論理ノードの時に true を返す．
   bool
   is_logic() const;
 
-  /// @brief 外部入力番号を返す．
-  /// @note 外部入力ノードでない場合の値は不定
+  /// @brief ファンアウト数を得る．
   ymuint
-  input_id() const;
+  fanout_num() const;
 
-  /// @brief 外部出力番号を返す．
-  /// @note 外部出力ノードでない場合の値は不定
-  ymuint
-  output_id() const;
+  /// @brief ファンアウトリストを得る．
+  const BdnFanoutList&
+  fanout_list() const;
 
-  /// @brief 出力ノードの極性を返す．
-  /// @return 反転していたら true を返す．
-  /// @note 出力ノードおよびラッチノードの場合のみ意味を持つ．
+  /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
-  output_inv() const;
+  pomark() const;
 
-  /// @brief リセット値を得る．
-  /// @retval 0 0
-  /// @retval 1 1
-  /// @retval 2 不定
-  /// @note ラッチノードの場合のみ意味を持つ．
-  int
-  reset_val() const;
+  /// @brief レベルを得る．
+  ymuint
+  level() const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name 出力ノードの情報を取り出す関数
+  /// @{
+
+  /// @brief ファンインのノードを得る．
+  /// @note 出力ノードの場合のみ意味を持つ．
+  const BdnNode*
+  output_fanin() const;
+
+  /// @brief ファンインのノードを得る．
+  /// @note 出力ノードの場合のみ意味を持つ．
+  BdnNode*
+  output_fanin();
+
+  /// @brief ファンインの極性を得る．
+  /// @note 出力ノードの場合のみ意味を持つ．
+  bool
+  output_fanin_inv() const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name 論理ノードの情報を取り出す関数
+  /// @{
 
   /// @brief 機能コードを得る．
   /// @note 論理ノードの場合のみ意味を持つ．
@@ -264,22 +266,6 @@ public:
   BdnNode*
   fanin1();
 
-  /// @brief ファンアウト数を得る．
-  ymuint
-  fanout_num() const;
-
-  /// @brief ファンアウトリストを得る．
-  const BdnFanoutList&
-  fanout_list() const;
-
-  /// @brief 出力ノードにファンアウトしているとき true を返す．
-  bool
-  pomark() const;
-
-  /// @brief レベルを得る．
-  ymuint
-  level() const;
-
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -290,20 +276,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief タイプを入力に設定する．
-  /// @param[in] id 入力番号
   void
-  set_input(ymuint id);
+  set_input();
 
   /// @brief タイプを出力に設定する．
-  /// @param[in] id 出力番号
   void
-  set_output(ymuint id);
+  set_output();
 
-  /// @brief タイプを D-FF に設定する．
-  void
-  set_dff();
-
-  /// @brief 出力もしくはラッチの入力の極性を設定する．
+  /// @brief 出力ノードのファンインの極性を設定する．
   /// @param[in] inv 極性
   void
   set_inv(bool inv);
@@ -328,7 +308,6 @@ private:
   // タイプ(3bit) + POマーク(1bit) + 機能コード(4bit)
   //                               + 出力極性(1bit) + 出力番号
   //                               +                + 入力番号
-  //                               + 出力極性(1bit) + リセット値(2bit)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
@@ -340,7 +319,7 @@ private:
   // ハッシュ用のリンク
   BdnNode* mLink;
 
-  // レベル
+  // レベル + POマーク(下位1bit)
   ymuint32 mLevel;
 
 
@@ -360,15 +339,11 @@ private:
   const int kInvShift = 4;
   static
   const int kIdShift = 5;
-  static
-  const int kRstShift = 5;
 
   static
   const ymuint32 kPoMask = 1U << kPoShift;
   static
   const ymuint32 kInvMask = 1U << kInvShift;
-  static
-  const ymuint32 kRstMask = 3U << kRstShift;
 
 };
 
@@ -385,8 +360,7 @@ private:
 inline
 BdnEdge::BdnEdge() :
   mFrom(NULL),
-  mTo(NULL),
-  mFlags(0U)
+  mToPos(0UL)
 {
 }
 
@@ -404,14 +378,6 @@ BdnEdge::from() const
   return mFrom;
 }
 
-// 出力側のノードを得る．
-inline
-const BdnNode*
-BdnEdge::to() const
-{
-  return mTo;
-}
-
 // 入力側のノードを得る．
 inline
 BdnNode*
@@ -422,10 +388,18 @@ BdnEdge::from()
 
 // 出力側のノードを得る．
 inline
+const BdnNode*
+BdnEdge::to() const
+{
+  return reinterpret_cast<const BdnNode*>(mToPos & ~1UL);
+}
+
+// 出力側のノードを得る．
+inline
 BdnNode*
 BdnEdge::to()
 {
-  return mTo;
+  return reinterpret_cast<BdnNode*>(mToPos & ~1UL);
 }
 
 // 出力側のノードの何番目の入力かを示す．
@@ -433,7 +407,7 @@ inline
 ymuint
 BdnEdge::pos() const
 {
-  return (mFlags >> kIposShift) & 1U;
+  return static_cast<ymuint>(mToPos & 1UL);
 }
 
 // @brief from ノードをセットする．
@@ -450,13 +424,7 @@ void
 BdnEdge::set_to(BdnNode* to,
 		ymuint pos)
 {
-  mTo = to;
-  if ( pos ) {
-    mFlags |= kIposMask;
-  }
-  else {
-    mFlags &= ~kIposMask;
-  }
+  mToPos = reinterpret_cast<ympuint>(to) | (pos & 1UL);
 }
 
 // @brief 出力ノードに接続している時 true を返す．
@@ -504,14 +472,6 @@ BdnNode::is_output() const
   return type() == kOUTPUT;
 }
 
-// D-FFノードの時に true を返す．
-inline
-bool
-BdnNode::is_dff() const
-{
-  return type() == kDFF;
-}
-
 // 論理ノードの時に true を返す．
 inline
 bool
@@ -520,42 +480,33 @@ BdnNode::is_logic() const
   return type() == kLOGIC;
 }
 
-// @brief 外部入力番号を返す．
-// @note 外部入力ノードでない場合の値は不定
+// @brief ファンインのノードを得る．
+// @note 出力ノードの場合のみ意味を持つ．
 inline
-ymuint
-BdnNode::input_id() const
+const BdnNode*
+BdnNode::output_fanin() const
 {
-  return (mFlags >> kIdShift);
+  // 実はこれと同じ
+  return fanin0();
 }
 
-// @brief 外部出力番号を返す．
-// @note 外部出力ノードでない場合の値は不定
+// @brief ファンインのノードを得る．
+// @note 出力ノードの場合のみ意味を持つ．
 inline
-ymuint
-BdnNode::output_id() const
+BdnNode*
+BdnNode::output_fanin()
 {
-  return (mFlags >> kIdShift);
+  // 実はこれと同じ
+  return fanin0();
 }
 
-// @brief 出力ノードの極性を得る．
+// @brief ファンインの極性を得る．
+// @note 出力ノードの場合のみ意味を持つ．
 inline
 bool
-BdnNode::output_inv() const
+BdnNode::output_fanin_inv() const
 {
   return static_cast<bool>((mFlags >> kInvShift) & 1U);
-}
-
-// @brief リセット値を得る．
-// @retval 0 0
-// @retval 1 1
-// @retval 2 不定
-// @note ラッチノードの場合のみ意味を持つ．
-inline
-int
-BdnNode::reset_val() const
-{
-  return static_cast<int>((mFlags >> kRstShift) & 3U);
 }
 
 // @brief 機能コードを得る．
@@ -641,7 +592,7 @@ inline
 bool
 BdnNode::pomark() const
 {
-  return static_cast<bool>((mFlags >> kPoShift) & 1U);
+  return static_cast<bool>(mLevel & 1U);
 }
 
 // @brief レベルを得る．
@@ -649,32 +600,23 @@ inline
 ymuint
 BdnNode::level() const
 {
-  return mLevel;
+  return (mLevel >> 1);
 }
 
 // タイプを入力に設定する．
 inline
 void
-BdnNode::set_input(ymuint id)
+BdnNode::set_input()
 {
-  mFlags = static_cast<ymuint32>(kINPUT) | (id << kIdShift);
+  mFlags = static_cast<ymuint32>(kINPUT);
 }
 
 // @brief タイプを出力に設定する．
-// @param[in] id 出力番号
 inline
 void
-BdnNode::set_output(ymuint id)
+BdnNode::set_output()
 {
-  mFlags = static_cast<ymuint32>(kOUTPUT) | (id << kIdShift);
-}
-
-// @brief タイプを D-FF に設定する．
-inline
-void
-BdnNode::set_dff()
-{
-  mFlags = static_cast<ymuint32>(kDFF);
+  mFlags = static_cast<ymuint32>(kOUTPUT);
 }
 
 // @brief 出力の極性を設定する．

@@ -13,6 +13,7 @@
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
+#include "ym_bdn/BdnDff.h"
 #include "ym_blif/BlifNetwork.h"
 
 
@@ -36,7 +37,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
 			BdNetwork& network)
 {
   mNetwork = &network;
-  ymuint32 n = blif_network.max_node_id();
+  ymuint n = blif_network.max_node_id();
   mNodeMap.resize(n);
   mNodeFlag.resize(n, false);
 
@@ -44,16 +45,17 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   mNetwork->set_name(blif_network.name());
 
   // 外部入力ノードの生成
-  ymuint32 npi = blif_network.npi();
-  for (ymuint32 i = 0; i < npi; ++ i) {
+  ymuint npi = blif_network.npi();
+  for (ymuint i = 0; i < npi; ++ i) {
     const BlifNode* blif_node = blif_network.pi(i);
-    BdnNode* node = mNetwork->new_input(blif_node->name());
+    BdnNode* node = mNetwork->new_input();
     put_node(blif_node, BdnNodeHandle(node, false));
   }
 
   // D-FFの出力(擬似入力)ノードの生成
-  ymuint32 nff = blif_network.nff();
-  for (ymuint32 i = 0; i < nff; ++ i) {
+  ymuint nff = blif_network.nff();
+  vector<BdnDff*> dff_array(nff);
+  for (ymuint i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
     int reset_val = 2;
     if ( blif_node->opat() == '0' ) {
@@ -62,29 +64,27 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     else if ( blif_node->opat() == '1' ) {
       reset_val = 1;
     }
-    BdnNode* node = mNetwork->new_dff();
-    put_node(blif_node, BdnNodeHandle(node, false));
+    // 今はリセット値は無視
+    BdnDff* dff = mNetwork->new_dff();
+    put_node(blif_node, BdnNodeHandle(dff->output(), false));
+    dff_array[i] = dff;
   }
 
   // 外部出力に用いられているノードを再帰的に生成
-  ymuint32 npo = blif_network.npo();
-  for (ymuint32 i = 0; i < npo; ++ i) {
+  ymuint npo = blif_network.npo();
+  for (ymuint i = 0; i < npo; ++ i) {
     const BlifNode* blif_node = blif_network.po(i);
     BdnNodeHandle node_h = make_node(blif_node);
-    (void) mNetwork->new_output(blif_node->name(), node_h);
+    (void) mNetwork->new_output(node_h);
   }
 
   // D-FFに用いられているノードを再帰的に生成
-  for (ymuint32 i = 0; i < nff; ++ i) {
+  for (ymuint i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
-    BdnNodeHandle node_h;
-    bool stat = get_node(blif_node, node_h);
-    assert_cond(stat, __FILE__, __LINE__);
-    assert_cond(node_h.inv() == false, __FILE__, __LINE__);
-    BdnNode* dff = node_h.node();
-
     BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
-    mNetwork->set_dff_data(dff, inode_h);
+    BdnDff* dff = dff_array[i];
+    BdnNode* dff_input = dff->input();
+    mNetwork->set_output_fanin(dff_input, inode_h);
   }
 
   return true;

@@ -3,74 +3,17 @@
 /// @brief BdNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
+#include "ym_bdn/BdnDff.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
-
-///////////////////////////////////////////////////////////////////////
-// クラス BdnNode
-///////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-BdnNode::BdnNode() :
-  mFlags(0),
-  mLevel(0)
-{
-  mFanins[0].set_to(this, 0);
-  mFanins[1].set_to(this, 1);
-}
-
-// デストラクタ
-BdnNode::~BdnNode()
-{
-}
-
-// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
-void
-BdnNode::scan_po()
-{
-  mFlags &= ~kPoMask;
-  const BdnFanoutList& folist = fanout_list();
-  for (BdnFanoutList::const_iterator p = folist.begin();
-       p != folist.end(); ++ p) {
-    BdnEdge* e = *p;
-    if ( e->to()->is_output() ) {
-      mFlags |= kPoMask;
-      break;
-    }
-  }
-}
-
-// @brief ID を表す文字列の取得
-string
-BdnNode::id_str() const
-{
-  ostringstream buf;
-  if ( is_input() ) {
-    buf << "I" << id();
-  }
-  else if ( is_logic() ) {
-    buf << "L" << id();
-  }
-  else if ( is_output() ) {
-    buf << "O" << id();
-  }
-  else if ( is_dff() ) {
-    buf << "Q" << id();
-  }
-  else {
-    buf << "X" << id();
-  }
-  return buf.str();
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // クラス BdNetwork
@@ -122,21 +65,38 @@ BdNetwork::copy(const BdNetwork& src)
   ymuint n = src.max_node_id();
   vector<BdnNode*> nodemap(n);
 
-  const BdnNodeList& src_dff_list = src.dff_list();
+  // D-FFノードの生成
+  const BdnDffList& src_dff_list = src.dff_list();
+  for (BdnDffList::const_iterator p = src_dff_list.begin();
+       p != src_dff_list.end(); ++ p) {
+    const BdnDff* src_dff = *p;
+    BdnDff* dst_dff = new_dff();
+
+    const BdnNode* src_output = src_dff->output();
+    nodemap[src_output->id()] = dst_dff->output();
+
+    const BdnNode* src_input = src_dff->input();
+    nodemap[src_input->id()] = dst_dff->input();
+
+    const BdnNode* src_clock = src_dff->clock();
+    nodemap[src_clock->id()] = dst_dff->clock();
+
+    const BdnNode* src_set = src_dff->set();
+    nodemap[src_set->id()] = dst_dff->set();
+
+    const BdnNode* src_reset = src_dff->reset();
+    nodemap[src_reset->id()] = dst_dff->reset();
+  }
 
   // 外部入力ノードの生成
-  ymuint ni = src.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    BdnNode* src_node = src.input(i);
-    BdnNode* dst_node = new_input(src.input_name(i));
-    nodemap[src_node->id()] = dst_node;
-  }
-  // D-FFノードの生成
-  for (BdnNodeList::const_iterator p = src_dff_list.begin();
-       p != src_dff_list.end(); ++ p) {
+  const BdnNodeList& src_input_list = src.input_list();
+  for (BdnNodeList::const_iterator p = src_input_list.begin();
+       p != src_input_list.end(); ++ p) {
     BdnNode* src_node = *p;
-    BdnNode* dst_node = new_dff();
-    nodemap[src_node->id()] = dst_node;
+    if ( nodemap[src_node->id()] == NULL ) {
+      BdnNode* dst_node = new_input();
+      nodemap[src_node->id()] = dst_node;
+    }
   }
 
   // 論理ノードの生成
@@ -163,32 +123,24 @@ BdNetwork::copy(const BdNetwork& src)
   }
 
   // 外部出力ノードの生成
-  ymuint no = src.output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    BdnNode* src_onode = src.output(i);
+  const BdnNodeList& src_output_list = src.output_list();
+  for (BdnNodeList::const_iterator p = src_output_list.begin();
+       p != src_output_list.end(); ++ p) {
+    BdnNode* src_onode = *p;
     BdnNode* src_inode = src_onode->fanin(0);
     BdnNode* dst_inode = NULL;
     if ( src_inode ) {
       dst_inode = nodemap[src_inode->id()];
     }
-    BdnNodeHandle dst_handle(dst_inode, src_onode->output_inv());
-    BdnNode* dst_onode = new_output(src.output_name(i), dst_handle);
-    nodemap[src_onode->id()] = dst_onode;
-  }
-
-  // D-FFノードの入力の設定
-  for (BdnNodeList::const_iterator p = src_dff_list.begin();
-       p != src_dff_list.end(); ++ p) {
-    const BdnNode* src_input = *p;
-    const BdnNode* src_output = src_input->fanin(0);
-    BdnNode* dst_input = nodemap[src_input->id()];
-    assert_cond(dst_input->is_dff(), __FILE__, __LINE__);
-    BdnNode* dst_output = NULL;
-    if ( src_output ) {
-      dst_output = nodemap[src_output->id()];
+    BdnNodeHandle dst_handle(dst_inode, src_onode->output_fanin_inv());
+    BdnNode* dst_onode = nodemap[src_onode->id()];
+    if ( dst_onode == NULL ) {
+      dst_onode = new_output(dst_handle);
+      nodemap[src_onode->id()] = dst_onode;
     }
-    BdnNodeHandle dst_handle(dst_output, src_input->output_inv());
-    set_dff_data(dst_input, dst_handle);
+    else {
+      set_output_fanin(dst_onode, dst_handle);
+    }
   }
 }
 
@@ -196,14 +148,14 @@ BdNetwork::copy(const BdNetwork& src)
 void
 BdNetwork::clear()
 {
-  mInputArray.clear();
-  mInputNameArray.clear();
-  mOutputArray.clear();
-  mOutputNameArray.clear();
-  mDffList.clear();
+  mInputList.clear();
+  mOutputList.clear();
   mLnodeList.clear();
   mItvlMgr.clear();
   mLevel = 0U;
+  mDffList.clear();
+  mDffItvlMgr.clear();
+  // mNodeArray, mDffArray はクリアしない．
 }
 
 BEGIN_NONAMESPACE
@@ -243,15 +195,9 @@ BdNetwork::sort(vector<BdnNode*>& node_list) const
   ymuint n = max_node_id();
   vector<bool> marks(n, false);
 
-  // 外部入力とラッチのみをファンインにするノードを node_list に追加する．
-  ymuint ni = input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    BdnNode* node = input(i);
-    marks[node->id()] = true;
-    sort_sub(node, marks, node_list);
-  }
-  for (BdnNodeList::const_iterator p = dff_list().begin();
-       p != dff_list().end(); ++ p) {
+  // 外部入力のみをファンインにするノードを node_list に追加する．
+  for (BdnNodeList::const_iterator p = mInputList.begin();
+       p != mInputList.end(); ++ p) {
     BdnNode* node = *p;
     marks[node->id()] = true;
     sort_sub(node, marks, node_list);
@@ -306,16 +252,9 @@ BdNetwork::rsort(vector<BdnNode*>& node_list) const
   ymuint n = max_node_id();
   vector<bool> marks(n, false);
 
-  // 外部出力とラッチのみをファンアウトにするノードを node_list に追加する．
-  ymuint no = output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    BdnNode* node = output(i);
-    marks[node->id()] = true;
-    BdnNode* inode = node->fanin(0);
-    rsort_sub(inode, marks, node_list);
-  }
-  for (BdnNodeList::const_iterator p = dff_list().begin();
-       p != dff_list().end(); ++ p) {
+  // 外部出力のみをファンアウトにするノードを node_list に追加する．
+  for (BdnNodeList::const_iterator p = mOutputList.begin();
+       p != mOutputList.end(); ++ p) {
     BdnNode* node = *p;
     marks[node->id()] = true;
     BdnNode* inode = node->fanin(0);
@@ -334,46 +273,27 @@ BdNetwork::rsort(vector<BdnNode*>& node_list) const
 
 // 入力ノードを作る．
 BdnNode*
-BdNetwork::new_input(const string& name)
+BdNetwork::new_input()
 {
-  assert_cond(mInputArray.size() == mInputNameArray.size(), __FILE__, __LINE__);
-
   BdnNode* node = new_node();
-
-  // 入力ノード配列に登録
-  ymuint id = mInputArray.size();
-  mInputArray.push_back(node);
-
-  // 入力名の配列に名前を登録．
-  mInputNameArray.push_back(name);
-
-  node->set_input(id);
+  node->set_input();
   node->mLevel = 0;
+
+  mInputList.push_back(node);
 
   return node;
 }
 
 // 出力ノードを作る．
 BdnNode*
-BdNetwork::new_output(const string& name,
-		      BdnNodeHandle inode_handle)
+BdNetwork::new_output(BdnNodeHandle inode_handle)
 {
-  assert_cond(mOutputArray.size() == mOutputNameArray.size(), __FILE__, __LINE__);
-
   BdnNode* node = new_node();
-
-  // 出力ノード配列に登録
-  ymuint id = mOutputArray.size();
-  mOutputArray.push_back(node);
-
-  // 出力名の配列に名前を登録
-  mOutputNameArray.push_back(name);
-
-  node->set_output(id);
-
-  change_output(node, inode_handle);
-
+  node->set_output();
   mLevel = 0U;
+  set_output_fanin(node, inode_handle);
+
+  mOutputList.push_back(node);
 
   return node;
 }
@@ -382,69 +302,18 @@ BdNetwork::new_output(const string& name,
 // @param[in] 変更対象の出力ノード
 // @param[in] inode 入力のノード
 void
-BdNetwork::change_output(BdnNode* node,
-			 BdnNodeHandle inode_handle)
+BdNetwork::set_output_fanin(BdnNode* node,
+			    BdnNodeHandle inode_handle)
 {
+  assert_cond( node->type() == BdnNode::kOUTPUT, __FILE__, __LINE__);
+
   bool inv = inode_handle.inv();
   node->set_inv(inv);
+
   BdnNode* inode = inode_handle.node();
   connect(inode, node, 0);
 
   mLevel = 0U;
-}
-
-// @brief D-FFを作る．
-BdnNode*
-BdNetwork::new_dff()
-{
-  BdnNode* node = new_node();
-
-  node->set_dff();
-
-  // D-FFリストに登録
-  mDffList.push_back(node);
-
-  mLevel = 0U;
-
-  return node;
-}
-
-// @brief D-FF のデータ入力を変更する．
-// @param[in] dff 変更対象の D-FF
-// @param[in] input_handle ラッチのデータ入力に接続しているノード+極性
-void
-BdNetwork::set_dff_data(BdnNode* dff,
-			BdnNodeHandle input_handle)
-{
-  // 実はこれと同じ
-  change_output(dff, input_handle);
-}
-
-// @brief D-FF のクロック入力を変更する．
-// @param[in] dff 変更対象の D-FF
-// @param[in] input_handle ラッチのクロック入力に接続しているノード+極性
-void
-BdNetwork::set_dff_clock(BdnNode* dff,
-			 BdnNodeHandle input_handle)
-{
-}
-
-// @brief D-FF のリセット入力を変更する．
-// @param[in] dff 変更対象の D-FF
-// @param[in] input_handle ラッチのリセット入力に接続しているノード+極性
-void
-BdNetwork::set_dff_rst(BdnNode* dff,
-		       BdnNodeHandle input_handle)
-{
-}
-
-// @brief D-FF のセット入力を変更する．
-// @param[in] dff 変更対象の D-FF
-// @param[in] input_handle ラッチの入力に接続しているノード+極性
-void
-BdNetwork::set_dff_set(BdnNode* dff,
-		       BdnNodeHandle input_handle)
-{
 }
 
 // @brief 論理ノードを作る．
@@ -600,12 +469,30 @@ BdNetwork::change_logic(BdnNode* node ,
       change_logic(onode, onode->fcode(), inode1_handle, inode2_handle);
     }
     else if ( onode->is_output() ) {
-      change_output(onode, new_handle);
-    }
-    else if ( onode->is_dff() ) {
-      set_dff_data(onode, new_handle);
+      set_output_fanin(onode, new_handle);
     }
   }
+}
+
+// @brief D-FF を作る．
+// @return 生成されたD-FFを返す．
+BdnDff*
+BdNetwork::new_dff()
+{
+  // 空いているIDを探してノード配列へ登録
+  int id = mDffItvlMgr.avail_num();
+  mItvlMgr.erase(id);
+
+  ymuint uid = static_cast<ymuint>(id);
+  while( mDffArray.size() <= uid ) {
+    // mDffArray の大きさが小さいときのための埋め草
+    void* p = mAlloc.get_memory(sizeof(BdnDff));
+    BdnDff* node = new (p) BdnDff;
+    mDffArray.push_back(node);
+  }
+  BdnDff* dff = mDffArray[uid];
+  dff->mId = uid;
+  return dff;
 }
 
 
@@ -803,7 +690,7 @@ BdNetwork::connect(BdnNode* from,
 {
   // BdnNode::mFaoutList を変更するのはここだけ
 
-  BdnEdge* edge = &to->mFanins[pos];
+  BdnEdge* edge = &(to->mFanins[pos]);
   BdnNode* old_from = edge->from();
   if ( old_from ) {
     old_from->mFanoutList.erase(edge);
@@ -857,8 +744,6 @@ BdNetwork::alloc_table(ymuint req_size)
 BdnNode*
 BdNetwork::new_node()
 {
-  BdnNode* node = NULL;
-
   // 空いているIDを探してノード配列へ登録
   int id = mItvlMgr.avail_num();
   mItvlMgr.erase(id);
@@ -870,7 +755,7 @@ BdNetwork::new_node()
     BdnNode* node = new (p) BdnNode;
     mNodeArray.push_back(node);
   }
-  node = mNodeArray[uid];
+  BdnNode* node = mNodeArray[uid];
   node->mId = uid;
   node->mFlags = 0U;
 
@@ -897,9 +782,9 @@ ymuint
 BdNetwork::level() const
 {
   if ( (mLevel & 1U) == 0U ) {
-    ymuint ni = input_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      BdnNode* node = input(i);
+    for (BdnNodeList::const_iterator p = mInputList.begin();
+	 p != mInputList.end(); ++ p) {
+      BdnNode* node = *p;
       node->mLevel = 0;
     }
 
@@ -919,9 +804,9 @@ BdNetwork::level() const
     }
 
     ymuint max_l = 0;
-    ymuint no = output_num();
-    for (ymuint i = 0; i < no; ++ i) {
-      BdnNode* node = output(i);
+    for (BdnNodeList::const_iterator p = mOutputList.begin();
+	 p != mOutputList.end(); ++ p) {
+      BdnNode* node = *p;
       BdnNode* inode = node->fanin0();
       if ( inode ) {
 	ymuint l1 = inode->mLevel;
@@ -940,39 +825,11 @@ void
 dump(ostream& s,
      const BdNetwork& network)
 {
-  ymuint ni = network.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BdnNode* node = network.input(i);
-    s << node->id_str();
-    string name = network.input_name(i);
-    if ( name != string() ) {
-      s << "(" << name << ") ";
-    }
-    s << " : = INPUT" << endl;
-  }
-  const BdnNodeList& dff_list = network.dff_list();
-  for (BdnNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
+  const BdnNodeList& input_list = network.input_list();
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
-    s << node->id_str();
-    s << " : = LATCH(";
-    const BdnNode* inode = node->fanin0();
-    if ( inode ) {
-      if ( node->output_inv() ) {
-	s << "~";
-      }
-      s << inode->id_str();
-    }
-    else {
-      if ( node->output_inv() ) {
-	s << "1";
-      }
-      else {
-	s << "0";
-      }
-    }
-    s << ", reset_value = " << node->reset_val()
-      << ")" << endl;
+    s << node->id_str() << " : = INPUT" << endl;
   }
 
   const BdnNodeList& lnode_list = network.lnode_list();
@@ -989,31 +846,50 @@ dump(ostream& s,
       << ")" << endl;
   }
 
-  ymuint no = network.output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    const BdnNode* node = network.output(i);
-    s << node->id_str();
-    string name = network.output_name(i);
-    if ( name != string() ) {
-      s << "(" << name << ") ";
-    }
-    s << " : = OUTPUT(";
-    const BdnNode* inode = node->fanin0();
+  const BdnNodeList& output_list = network.output_list();
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* node = *p;
+    s << node->id_str() << " : = OUTPUT(";
+    const BdnNode* inode = node->output_fanin();
+    bool oinv = node->output_fanin_inv();
     if ( inode ) {
       // 普通のノードの場合
-      if ( node->output_inv() ) {
+      if ( oinv ) {
 	s << "~";
       }
       s << inode->id_str();
     }
     else {
       // 定数ノードの場合
-      if ( node->output_inv() ) {
+      if ( oinv ) {
 	s << "1";
       }
       else {
 	s << "0";
       }
+    }
+    s << ")" << endl;
+  }
+
+  const BdnDffList& dff_list = network.dff_list();
+  for (BdnDffList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const BdnDff* dff = *p;
+    const BdnNode* output = dff->output();
+    const BdnNode* input = dff->input();
+    const BdnNode* clock = dff->clock();
+    const BdnNode* set = dff->set();
+    const BdnNode* reset = dff->reset();
+    s << dff->id_str() << " : = DFF("
+      << "OUTPUT: " << output->id_str()
+      << ", INPUT: " << input->id_str()
+      << ", CLOCK: " << clock->id_str();
+    if ( set ) {
+      s << ", SET: " << set->id_str();
+    }
+    if ( reset ) {
+      s << ", RESET: " << reset->id_str();
     }
     s << ")" << endl;
   }

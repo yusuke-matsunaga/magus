@@ -11,6 +11,7 @@
 #include "ym_mvnbdnconv/MvnBdnMap.h"
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNodeHandle.h"
+#include "ym_bdn/BdnDff.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
@@ -161,13 +162,16 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   vector<bool> mark(nmax, false);
   list<const MvNode*> queue;
 
+  // DFF 用のマップ
+  vector<vector<BdnDff*> > dff_map(nmax);
+
   // 外部入力を作る．
   ymuint ni = module->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const MvNode* node = module->input(i);
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
-      BdnNode* bdnnode = bdnetwork.new_input(string());
+      BdnNode* bdnnode = bdnetwork.new_input();
       mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
     }
     mark[node->id()] = true;
@@ -180,7 +184,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     const MvNode* node = module->inout(i);
     ymuint bw = node->output(0)->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
-      BdnNode* bdnnode = bdnetwork.new_input(string());
+      BdnNode* bdnnode = bdnetwork.new_input();
       mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
     }
     mark[node->id()] = true;
@@ -195,8 +199,14 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     if ( node->type() == MvNode::kDff ) {
       // DFF
       ymuint bw = node->output(0)->bit_width();
+      vector<BdnDff*>& dff_array = dff_map[node->id()];
+      if ( dff_array.size() != bw ) {
+	dff_array.resize(bw);
+      }
       for (ymuint j = 0; j < bw; ++ j) {
-	BdnNode* bdnnode = bdnetwork.new_dff();
+	BdnDff* bdndff = bdnetwork.new_dff();
+	dff_array[j] = bdndff;
+	BdnNode* bdnnode = bdndff->output();
 	mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
       }
       mark[node->id()] = true;
@@ -260,19 +270,20 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     const MvNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
     if ( node->type() == MvNode::kDff ) {
+      // データ入力
       const MvInputPin* ipin = node->input(0);
       const MvOutputPin* opin = ipin->src_pin();
       assert_cond( opin != NULL, __FILE__, __LINE__);
       const MvNode* src_node = opin->node();
       ymuint bw = ipin->bit_width();
+      vector<BdnDff*>& dff_array = dff_map[node->id()];
       for (ymuint j = 0; j < bw; ++ j) {
-	BdnNodeHandle handle = mvnode_map.get(node, j);
+	BdnDff* bdndff = dff_array[j];
 	BdnNodeHandle ihandle = mvnode_map.get(src_node, j);
-	assert_cond( handle.inv() == false, __FILE__, __LINE__);
-	BdnNode* node = handle.node();
-	bdnetwork.set_dff_data(node, ihandle);
+	BdnNode* dff_input = bdndff->input();
+	bdnetwork.set_output_fanin(dff_input, ihandle);
       }
-
+      // クロック
       const MvInputPin* ipin1 = node->input(1);
       const MvOutputPin* opin1 = ipin1->src_pin();
       assert_cond( opin1 != NULL, __FILE__, __LINE__);
@@ -280,12 +291,11 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
       const MvNode* src_node1 = opin1->node();
       BdnNodeHandle ihandle1 = mvnode_map.get(src_node1);
       for (ymuint j = 0; j < bw; ++ j) {
-	BdnNodeHandle handle = mvnode_map.get(node, j);
-	assert_cond( handle.inv() == false, __FILE__, __LINE__);
-	BdnNode* node = handle.node();
-	bdnetwork.set_dff_clock(node, ihandle1);
+	BdnDff* bdndff = dff_array[j];
+	BdnNode* dff_clock = bdndff->clock();
+	bdnetwork.set_output_fanin(dff_clock, ihandle1);
       }
-
+      // リセット
       const MvInputPin* ipin2 = node->input(2);
       const MvOutputPin* opin2 = ipin2->src_pin();
       if ( opin2 ) {
@@ -293,13 +303,12 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 	const MvNode* src_node2 = opin2->node();
 	BdnNodeHandle ihandle2 = mvnode_map.get(src_node2);
 	for (ymuint j = 0; j < bw; ++ j) {
-	  BdnNodeHandle handle = mvnode_map.get(node, j);
-	  assert_cond( handle.inv() == false, __FILE__, __LINE__);
-	  BdnNode* node = handle.node();
-	  bdnetwork.set_dff_rst(node, ihandle2);
+	  BdnDff* bdndff = dff_array[j];
+	  BdnNode* dff_reset = bdndff->reset();
+	  bdnetwork.set_output_fanin(dff_reset, ihandle2);
 	}
       }
-
+      // セット
       const MvInputPin* ipin3 = node->input(3);
       const MvOutputPin* opin3 = ipin3->src_pin();
       if ( opin3 ) {
@@ -307,10 +316,9 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 	const MvNode* src_node3 = opin3->node();
 	BdnNodeHandle ihandle3 = mvnode_map.get(src_node3);
 	for (ymuint j = 0; j < bw; ++ j) {
-	  BdnNodeHandle handle = mvnode_map.get(node, j);
-	  assert_cond( handle.inv() == false, __FILE__, __LINE__);
-	  BdnNode* node = handle.node();;
-	  bdnetwork.set_dff_set(node, ihandle3);
+	  BdnDff* bdndff = dff_array[j];
+	  BdnNode* dff_set = bdndff->set();
+	  bdnetwork.set_output_fanin(dff_set, ihandle3);
 	}
       }
     }
@@ -328,7 +336,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     ymuint bw = ipin->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       BdnNodeHandle handle = mvnode_map.get(src_node, j);
-      BdnNode* onode = bdnetwork.new_output(string(), handle);
+      BdnNode* onode = bdnetwork.new_output(handle);
       mvnode_map.put(node, j, BdnNodeHandle(onode, false));
     }
   }

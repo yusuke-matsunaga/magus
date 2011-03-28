@@ -7,13 +7,13 @@
 ///
 /// $Id: BdNetwork.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_bdn/bdn_nsdef.h>
-#include <ym_bdn/BdnNodeHandle.h>
-#include <ym_utils/Alloc.h>
-#include <ym_utils/ItvlMgr.h>
+#include "ym_bdn/bdn_nsdef.h"
+#include "ym_bdn/BdnNodeHandle.h"
+#include "ym_utils/Alloc.h"
+#include "ym_utils/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
@@ -22,28 +22,26 @@ BEGIN_NAMESPACE_YM_BDN
 /// @class BdNetwork BdNetwork.h <ym_bdn/BdNetwork.h>
 /// @brief 2入力ノードのネットワークを表すクラス
 ///
-///
 /// ノードは，
 ///  - 入力ノード
 ///  - 出力ノード
-///  - D-FF ノード
 ///  - 論理ノード
-/// の4種類がある(@sa BdnNode)．
-/// 入力ノード，出力ノードは入力 ID 番号，および出力 ID 番号を持って
-/// おり，それらの ID 番号からノードを取り出すことができる．
-/// ( @sa input(ymuint id), output(ymuint id) )
-/// 論理ノードはリストの形で保持される( @sa lnode_list() )．
-/// また，すべてのノードに唯一な ID 番号を割り振っており，その ID 番号
-/// からノードを取り出すこともできる( @sa node(ymuint id) )．
+/// の3種類がある(@sa BdnNode)．
+///
+/// 入力ノードはファンインを持たない．
+/// 出力ノードはただ一つのファンインを持ち，ファンアウトを持たない．
+/// 論理ノードは2つのファンインと機能コードを持ち，ファンアウトを持つ．
+/// 入力ノード，出力ノード，論理ノードはそれぞれリストの形で保持される．
+/// また，すべてのノードは唯一に定められた ID 番号を持っており，
+/// その ID 番号からノードを取り出すことができる( @sa node(ymuint id) )．
 /// 論理ノードを入力からのトポロジカル順で処理するためには sort()
 /// を用いてソートされたノードのベクタを得る．
 ///
-/// その他に記憶素子を表すD-FFがある．D-FFは
-///  - 入力に接続する "出力"ノード
-///  - 出力に接続する "入力"ノード
-///  - リセット値
-/// を持つ(@sa BdnLatch)．
-/// ラッチはリストの形で保持される(@sa latch_list)
+/// その他にネットワーク全体の機能を表すためのデータ構造として，
+///  - 入出力ポート(@sa BdnPort)
+///  - DFF(@sa BdnDff)
+///  - ラッチ(@sa BdnLatch)
+/// がある．
 //////////////////////////////////////////////////////////////////////
 class BdNetwork
 {
@@ -82,6 +80,11 @@ public:
   ymuint
   input_num() const;
 
+  /// @brief 入力ノードのリストを得る．
+  const BdnNodeList&
+  input_list() const;
+
+#if 0
   /// @brief 外部入力番号から外部入力ノードを得る．
   /// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
   BdnNode*
@@ -91,11 +94,17 @@ public:
   /// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
   string
   input_name(ymuint pos) const;
+#endif
 
   /// @brief 出力ノード数を得る．
   ymuint
   output_num() const;
 
+  /// @brief 出力ノードのリストを得る．
+  const BdnNodeList&
+  output_list() const;
+
+#if 0
   /// @brief 外部出力番号から外部出力ノードを得る．
   /// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
   BdnNode*
@@ -105,14 +114,7 @@ public:
   /// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
   string
   output_name(ymuint pos) const;
-
-  /// @brief DFF数を得る．
-  ymuint
-  dff_num() const;
-
-  /// @brief D-FFのリストを得る．
-  const BdnNodeList&
-  dff_list() const;
+#endif
 
   /// @brief 論理ノード数を得る．
   ymuint
@@ -139,6 +141,14 @@ public:
   ymuint
   level() const;
 
+  /// @brief DFF数を得る．
+  ymuint
+  dff_num() const;
+
+  /// @brief D-FFのリストを得る．
+  const BdnDffList&
+  dff_list() const;
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -149,58 +159,22 @@ public:
   /// @{
 
   /// @brief 入力ノードを作る．
-  /// @param[in] name 名前
   /// @return 作成したノードを返す．
   BdnNode*
-  new_input(const string& name);
+  new_input();
 
   /// @brief 出力ノードを作る．
-  /// @param[in] name 名前
   /// @param[in] inode_handle 入力のノード+極性
   /// @return 作成したノードを返す．
   BdnNode*
-  new_output(const string& name,
-	     BdnNodeHandle inode_handle);
+  new_output(BdnNodeHandle inode_handle);
 
-  /// @brief 出力ノードの内容を変更する
+  /// @brief 出力ノードのファンインを変更する
   /// @param[in] node 変更対象の出力ノード
-  /// @param[in] inode_handle 入力のノード+極性
+  /// @param[in] inode_handle ファンインのノード+極性
   void
-  change_output(BdnNode* node,
-		BdnNodeHandle inode_handle);
-
-  /// @brief D-FF を作る．
-  /// @return 生成されたラッチを返す．
-  BdnNode*
-  new_dff();
-
-  /// @brief D-FF のデータ入力を変更する．
-  /// @param[in] dff 変更対象の D-FF
-  /// @param[in] input_handle ラッチのデータ入力に接続しているノード+極性
-  void
-  set_dff_data(BdnNode* dff,
-	       BdnNodeHandle input_handle);
-
-  /// @brief D-FF のクロック入力を変更する．
-  /// @param[in] dff 変更対象の D-FF
-  /// @param[in] input_handle ラッチのクロック入力に接続しているノード+極性
-  void
-  set_dff_clock(BdnNode* dff,
-		BdnNodeHandle input_handle);
-
-  /// @brief D-FF のリセット入力を変更する．
-  /// @param[in] dff 変更対象の D-FF
-  /// @param[in] input_handle ラッチのリセット入力に接続しているノード+極性
-  void
-  set_dff_rst(BdnNode* dff,
-	      BdnNodeHandle input_handle);
-
-  /// @brief D-FF のセット入力を変更する．
-  /// @param[in] dff 変更対象の D-FF
-  /// @param[in] input_handle ラッチの入力に接続しているノード+極性
-  void
-  set_dff_set(BdnNode* dff,
-	      BdnNodeHandle input_handle);
+  set_output_fanin(BdnNode* node,
+		   BdnNodeHandle inode_handle);
 
   /// @brief 論理ノードを作る．
   /// @param[in] fcode 機能コード
@@ -325,6 +299,11 @@ public:
 	       BdnNodeHandle inode1_handle,
 	       BdnNodeHandle inode2_handle);
 
+  /// @brief D-FF を作る．
+  /// @return 生成されたD-FFを返す．
+  BdnDff*
+  new_dff();
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -350,11 +329,6 @@ public:
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
   clean_up();
-
-  /// @brief 内容を出力する．
-  /// @param[in] s 出力先のストリーム
-  void
-  dump(ostream& s) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -441,6 +415,7 @@ private:
   // ID 番号を管理するためのオブジェクト
   ItvlMgr mItvlMgr;
 
+#if 0
   // 外部入力ノードの配列
   // 配列上の位置が外部入力ノードの入力番号となる．
   vector<BdnNode*> mInputArray;
@@ -454,9 +429,13 @@ private:
 
   // 外部出力ノードの名前の配列
   vector<string> mOutputNameArray;
+#endif
 
-  // D-FFノードのリスト
-  BdnNodeList mDffList;
+  // 入力ノードのリスト
+  BdnNodeList mInputList;
+
+  // 出力ノードのリスト
+  BdnNodeList mOutputList;
 
   // 論理ノードのリスト
   BdnNodeList mLnodeList;
@@ -473,6 +452,15 @@ private:
   // 最大レベル (最下位ビットは valid フラグ)
   mutable
   ymuint32 mLevel;
+
+  // D-FF の ID 番号を管理するためのオブジェクト
+  ItvlMgr mDffItvlMgr;
+
+  // ID 番号をキーにした DFF の配列
+  vector<BdnDff*> mDffArray;
+
+  // D-FFノードのリスト
+  BdnDffList mDffList;
 
 };
 
@@ -524,9 +512,18 @@ inline
 ymuint
 BdNetwork::input_num() const
 {
-  return mInputArray.size();
+  return mInputList.size();
 }
 
+// @brief 入力ノードのリストを得る．
+inline
+const BdnNodeList&
+BdNetwork::input_list() const
+{
+  return mInputList;
+}
+
+#if 0
 // @brief 外部入力番号から外部入力ノードを得る．
 // @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
 inline
@@ -544,15 +541,25 @@ BdNetwork::input_name(ymuint pos) const
 {
   return mInputNameArray[pos];
 }
+#endif
 
 // @brief 出力ノード数を得る．
 inline
 ymuint
 BdNetwork::output_num() const
 {
-  return mOutputArray.size();
+  return mOutputList.size();
 }
 
+// @brief 出力ノードのリストを得る．
+inline
+const BdnNodeList&
+BdNetwork::output_list() const
+{
+  return mOutputList;
+}
+
+#if 0
 // @brief 外部出力番号から外部出力ノードを得る．
 // @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
 inline
@@ -570,22 +577,7 @@ BdNetwork::output_name(ymuint pos) const
 {
   return mOutputNameArray[pos];
 }
-
-// @brief D-FF数を得る．
-inline
-ymuint
-BdNetwork::dff_num() const
-{
-  return mDffList.size();
-}
-
-// @brief D-FFのリストを得る．
-inline
-const BdnNodeList&
-BdNetwork::dff_list() const
-{
-  return mDffList;
-}
+#endif
 
 // 論理ノード数を得る．
 inline
@@ -601,6 +593,22 @@ const BdnNodeList&
 BdNetwork::lnode_list() const
 {
   return mLnodeList;
+}
+
+// @brief D-FF数を得る．
+inline
+ymuint
+BdNetwork::dff_num() const
+{
+  return mDffList.size();
+}
+
+// @brief D-FFのリストを得る．
+inline
+const BdnDffList&
+BdNetwork::dff_list() const
+{
+  return mDffList;
 }
 
 // @brief NAND ノードを作る．

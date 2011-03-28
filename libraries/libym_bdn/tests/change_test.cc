@@ -20,11 +20,11 @@ change_test()
 
   network.set_name("change_test");
 
-  BdnNode* a = network.new_input("a");
-  BdnNode* b = network.new_input("b");
-  BdnNode* c = network.new_input("c");
-  BdnNode* d = network.new_output("x", BdnNodeHandle(NULL, false));
-  
+  BdnNode* a = network.new_input();
+  BdnNode* b = network.new_input();
+  BdnNode* c = network.new_input();
+  BdnNode* d = network.new_output(BdnNodeHandle(NULL, false));
+
   // a & b
   BdnNodeHandle h1 = network.new_logic(0x8,
 				       BdnNodeHandle(a, false),
@@ -38,8 +38,8 @@ change_test()
   // (a & b) | (a & c)
   BdnNodeHandle h3 = network.new_logic(0xe, h1, h2);
 
-  network.change_output(d, h3);
-  
+  network.set_output_fanin(d, h3);
+
   cout << "===Before change_logic===" << endl;
   dump(cout, network);
 
@@ -64,7 +64,7 @@ change_test()
 
   cout << "===After change_logic(2)===" << endl;
   dump(cout, network);
-  
+
 }
 
 END_NAMESPACE_YM_BDN
