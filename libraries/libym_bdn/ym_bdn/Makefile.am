@@ -10,7 +10,9 @@ noinst_HEADERS = \
 	BdNetwork.h \
 	BdnBlifWriter.h \
 	BdnDff.h \
+	BdnLatch.h \
 	BdnNode.h \
 	BdnNodeHandle.h \
+	BdnPort.h \
 	BlifBdnConv.h \
 	bdn_nsdef.h

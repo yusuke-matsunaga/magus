@@ -49,6 +49,8 @@ main(int argc,
 	return 1;
       }
     }
+
+
     cerr << "Generating MvNetwork" << endl;
     MvVlMap node_map;
     bool stat = reader.gen_network(mgr, node_map);
@@ -57,6 +59,8 @@ main(int argc,
       cerr << "error occured" << endl;
       return 2;
     }
+
+    dump(cout, mgr);
 
     BdNetwork bdnetwork;
     MvnBdnConv conv;

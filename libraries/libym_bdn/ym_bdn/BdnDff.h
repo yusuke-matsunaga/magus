@@ -10,14 +10,13 @@
 
 
 #include "ym_bdn/bdn_nsdef.h"
-#include "ym_bdn/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnDff BdnDff.h "ym_bdn/BdnDff.h"
-/// @brief DFFを表すクラス
+/// @brief D-FFを表すクラス
 //////////////////////////////////////////////////////////////////////
 class BdnDff :
   public DlElem
@@ -34,9 +33,6 @@ private:
 
 
 public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name 構造に関する情報を取り出す関数
-  /// @{
 
   /// @brief ID 番号の取得
   /// @return ID 番号を返す．
@@ -45,10 +41,9 @@ public:
   ymuint
   id() const;
 
-  /// @brief ID を表す文字列の取得
-  /// @note デバッグ時にしか意味を持たない
+  /// @brief 名前を返す．
   string
-  id_str() const;
+  name() const;
 
   /// @brief データ出力ノードを返す．
   const BdnNode*
@@ -94,8 +89,26 @@ public:
   BdnNode*
   reset();
 
-  /// @}
+
+private:
   //////////////////////////////////////////////////////////////////////
+  // 内容を変更する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を設定する．
+  /// @param[in] name 名前
+  /// @param[in] output 出力ノード
+  /// @param[in] input 入力ノード
+  /// @param[in] clock クロックノード
+  /// @param[in] set セットノード
+  /// @param[in] reset リセットノード
+  void
+  set(const string& name,
+      BdnNode* output,
+      BdnNode* input,
+      BdnNode* clock,
+      BdnNode* set,
+      BdnNode* reset);
 
 
 private:
@@ -106,20 +119,23 @@ private:
   // ID 番号
   ymuint32 mId;
 
+  // 名前
+  string mName;
+
   // データ出力ノード
-  BdnNode mOutput;
+  BdnNode* mOutput;
 
   // データ入力ノード
-  BdnNode mInput;
+  BdnNode* mInput;
 
   // クロックノード
-  BdnNode mClock;
+  BdnNode* mClock;
 
   // セット信号ノード
-  BdnNode mSet;
+  BdnNode* mSet;
 
   // リセット信号ノード
-  BdnNode mReset;
+  BdnNode* mReset;
 
 };
 
@@ -127,6 +143,18 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+BdnDff::BdnDff()
+{
+}
+
+// @brief デストラクタ
+inline
+BdnDff::~BdnDff()
+{
+}
 
 // @brief ID 番号の取得
 // @return ID 番号を返す．
@@ -139,12 +167,20 @@ BdnDff::id() const
   return mId;
 }
 
+// @brief 名前を返す．
+inline
+string
+BdnDff::name() const
+{
+  return mName;
+}
+
 // @brief データ出力ノードを返す．
 inline
 const BdnNode*
 BdnDff::output() const
 {
-  return &mOutput;
+  return mOutput;
 }
 
 // @brief データ出力ノードを返す．
@@ -152,7 +188,7 @@ inline
 BdnNode*
 BdnDff::output()
 {
-  return &mOutput;
+  return mOutput;
 }
 
 // @brief データ入力ノードを返す．
@@ -160,7 +196,7 @@ inline
 const BdnNode*
 BdnDff::input() const
 {
-  return &mInput;
+  return mInput;
 }
 
 // @brief データ入力ノードを返す．
@@ -168,7 +204,7 @@ inline
 BdnNode*
 BdnDff::input()
 {
-  return &mInput;
+  return mInput;
 }
 
 // @brief クロックのノードを返す．
@@ -176,7 +212,7 @@ inline
 const BdnNode*
 BdnDff::clock() const
 {
-  return &mClock;
+  return mClock;
 }
 
 // @brief クロックのノードを返す．
@@ -184,7 +220,7 @@ inline
 BdnNode*
 BdnDff::clock()
 {
-  return &mClock;
+  return mClock;
 }
 
 // @brief セット信号のノードを返す．
@@ -193,7 +229,7 @@ inline
 const BdnNode*
 BdnDff::set() const
 {
-  return &mSet;
+  return mSet;
 }
 
 // @brief セット信号のノードを返す．
@@ -202,7 +238,7 @@ inline
 BdnNode*
 BdnDff::set()
 {
-  return &mSet;
+  return mSet;
 }
 
 // @brief リセット信号のノードを返す．
@@ -211,7 +247,7 @@ inline
 const BdnNode*
 BdnDff::reset() const
 {
-  return &mReset;
+  return mReset;
 }
 
 // @brief リセット信号のノードを返す．
@@ -220,7 +256,31 @@ inline
 BdnNode*
 BdnDff::reset()
 {
-  return &mReset;
+  return mReset;
+}
+
+// @brief 内容を設定する．
+// @param[in] name 名前
+// @param[in] output 出力ノード
+// @param[in] input 入力ノード
+// @param[in] clock クロックノード
+// @param[in] set セットノード
+// @param[in] reset リセットノード
+inline
+void
+BdnDff::set(const string& name,
+	    BdnNode* output,
+	    BdnNode* input,
+	    BdnNode* clock,
+	    BdnNode* set,
+	    BdnNode* reset)
+{
+  mName = name;
+  mOutput = output;
+  mInput = input;
+  mClock = clock;
+  mSet = set;
+  mReset = reset;
 }
 
 END_NAMESPACE_YM_BDN

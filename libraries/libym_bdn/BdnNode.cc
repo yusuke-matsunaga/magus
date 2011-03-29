@@ -7,9 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNode.h"
-#include "ym_bdn/BdnDff.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
@@ -67,31 +65,5 @@ BdnNode::id_str() const
   }
   return buf.str();
 }
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス BdnDff
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-BdnDff::BdnDff()
-{
-}
-
-// @brief デストラクタ
-BdnDff::~BdnDff()
-{
-}
-
-// @brief ID を表す文字列の取得
-// @note デバッグ時にしか意味を持たない
-string
-BdnDff::id_str() const
-{
-  ostringstream buf;
-  buf << "DFF" << id();
-  return buf.str();
-}
-
 
 END_NAMESPACE_YM_BDN

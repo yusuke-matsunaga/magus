@@ -162,9 +162,6 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   vector<bool> mark(nmax, false);
   list<const MvNode*> queue;
 
-  // DFF 用のマップ
-  vector<vector<BdnDff*> > dff_map(nmax);
-
   // 外部入力を作る．
   ymuint ni = module->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -199,14 +196,8 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     if ( node->type() == MvNode::kDff ) {
       // DFF
       ymuint bw = node->output(0)->bit_width();
-      vector<BdnDff*>& dff_array = dff_map[node->id()];
-      if ( dff_array.size() != bw ) {
-	dff_array.resize(bw);
-      }
       for (ymuint j = 0; j < bw; ++ j) {
-	BdnDff* bdndff = bdnetwork.new_dff();
-	dff_array[j] = bdndff;
-	BdnNode* bdnnode = bdndff->output();
+	BdnNode* bdnnode = bdnetwork.new_input();
 	mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
       }
       mark[node->id()] = true;
@@ -271,55 +262,52 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     if ( node == NULL ) continue;
     if ( node->type() == MvNode::kDff ) {
       // データ入力
-      const MvInputPin* ipin = node->input(0);
-      const MvOutputPin* opin = ipin->src_pin();
-      assert_cond( opin != NULL, __FILE__, __LINE__);
-      const MvNode* src_node = opin->node();
-      ymuint bw = ipin->bit_width();
-      vector<BdnDff*>& dff_array = dff_map[node->id()];
-      for (ymuint j = 0; j < bw; ++ j) {
-	BdnDff* bdndff = dff_array[j];
-	BdnNodeHandle ihandle = mvnode_map.get(src_node, j);
-	BdnNode* dff_input = bdndff->input();
-	bdnetwork.set_output_fanin(dff_input, ihandle);
-      }
+      const MvInputPin* data_ipin = node->input(0);
+      const MvOutputPin* data_opin = data_ipin->src_pin();
+      assert_cond( data_opin != NULL, __FILE__, __LINE__);
+      const MvNode* data_src_node = data_opin->node();
+      ymuint bw = data_ipin->bit_width();
+
       // クロック
-      const MvInputPin* ipin1 = node->input(1);
-      const MvOutputPin* opin1 = ipin1->src_pin();
-      assert_cond( opin1 != NULL, __FILE__, __LINE__);
-      assert_cond( opin1->bit_width() == 1, __FILE__, __LINE__);
-      const MvNode* src_node1 = opin1->node();
-      BdnNodeHandle ihandle1 = mvnode_map.get(src_node1);
-      for (ymuint j = 0; j < bw; ++ j) {
-	BdnDff* bdndff = dff_array[j];
-	BdnNode* dff_clock = bdndff->clock();
-	bdnetwork.set_output_fanin(dff_clock, ihandle1);
-      }
+      const MvInputPin* clock_ipin = node->input(1);
+      const MvOutputPin* clock_opin = clock_ipin->src_pin();
+      assert_cond( clock_opin != NULL, __FILE__, __LINE__);
+      assert_cond( clock_opin->bit_width() == 1, __FILE__, __LINE__);
+      const MvNode* clock_src_node = clock_opin->node();
+      BdnNodeHandle clock_ihandle = mvnode_map.get(clock_src_node);
+
+#if 0 // 今は非同期信号を無視
       // リセット
-      const MvInputPin* ipin2 = node->input(2);
-      const MvOutputPin* opin2 = ipin2->src_pin();
-      if ( opin2 ) {
-	assert_cond( opin2->bit_width() == 1, __FILE__, __LINE__);
-	const MvNode* src_node2 = opin2->node();
-	BdnNodeHandle ihandle2 = mvnode_map.get(src_node2);
-	for (ymuint j = 0; j < bw; ++ j) {
-	  BdnDff* bdndff = dff_array[j];
-	  BdnNode* dff_reset = bdndff->reset();
-	  bdnetwork.set_output_fanin(dff_reset, ihandle2);
-	}
+      const MvInputPin* reset_ipin = node->input(2);
+      const MvOutputPin* reset_opin = reset_ipin->src_pin();
+      BdnNodeHandle reset_ihandle;
+      if ( reset_opin ) {
+	assert_cond( reset_opin->bit_width() == 1, __FILE__, __LINE__);
+	const MvNode* src_node = reset_opin->node();
+	reset_ihandle = mvnode_map.get(src_node);
       }
+
       // セット
-      const MvInputPin* ipin3 = node->input(3);
-      const MvOutputPin* opin3 = ipin3->src_pin();
-      if ( opin3 ) {
-	assert_cond( opin3->bit_width() == 1, __FILE__, __LINE__);
-	const MvNode* src_node3 = opin3->node();
-	BdnNodeHandle ihandle3 = mvnode_map.get(src_node3);
-	for (ymuint j = 0; j < bw; ++ j) {
-	  BdnDff* bdndff = dff_array[j];
-	  BdnNode* dff_set = bdndff->set();
-	  bdnetwork.set_output_fanin(dff_set, ihandle3);
-	}
+      const MvInputPin* set_ipin = node->input(3);
+      const MvOutputPin* set_opin = set_ipin->src_pin();
+      BdnNodeHandle set_ihandle;
+      if ( set_opin ) {
+	assert_cond( set_opin->bit_width() == 1, __FILE__, __LINE__);
+	const MvNode* src_node = set_opin->node();
+	set_ihandle = mvnode_map.get(src_node);
+      }
+#endif
+
+      for (ymuint j = 0; j < bw; ++ j) {
+	BdnNodeHandle ohandle = mvnode_map.get(node, j);
+	assert_cond( ohandle.inv() == false, __FILE__, __LINE__);
+	BdnNode* output = ohandle.node();
+	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
+	BdnNode* input = bdnetwork.new_output(data_ihandle);
+	BdnNode* clock = bdnetwork.new_output(clock_ihandle);
+	BdnNode* set = NULL;
+	BdnNode* reset = NULL;
+	(void) bdnetwork.new_dff(string(), output, input, clock, set, reset);
       }
     }
   }

@@ -22,7 +22,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " blif-file" << endl;
     return 2;
@@ -43,7 +43,7 @@ main(int argc,
       cerr << "Error in reading " << filename << endl;
       return 4;
     }
-    
+
     BdNetwork network;
     BlifBdnConv conv;
     bool stat = conv(blif_network, network);
@@ -51,11 +51,14 @@ main(int argc,
       cerr << "Error in converting from BlifNetwork to BdNetwork" << endl;
       return 5;
     }
-    
-    //dump(cout, bdn);
+
+#if 1
+    dump(cout, network);
+#else
     BdnBlifWriter blif_writer;
 
     blif_writer(cout, network);
+#endif
 
 #if 0
   }
@@ -63,6 +66,6 @@ main(int argc,
     cout << x << endl;
   }
 #endif
-  
+
   return 0;
 }

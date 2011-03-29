@@ -21,27 +21,6 @@ BEGIN_NAMESPACE_YM_BDN
 //////////////////////////////////////////////////////////////////////
 /// @class BdNetwork BdNetwork.h <ym_bdn/BdNetwork.h>
 /// @brief 2入力ノードのネットワークを表すクラス
-///
-/// ノードは，
-///  - 入力ノード
-///  - 出力ノード
-///  - 論理ノード
-/// の3種類がある(@sa BdnNode)．
-///
-/// 入力ノードはファンインを持たない．
-/// 出力ノードはただ一つのファンインを持ち，ファンアウトを持たない．
-/// 論理ノードは2つのファンインと機能コードを持ち，ファンアウトを持つ．
-/// 入力ノード，出力ノード，論理ノードはそれぞれリストの形で保持される．
-/// また，すべてのノードは唯一に定められた ID 番号を持っており，
-/// その ID 番号からノードを取り出すことができる( @sa node(ymuint id) )．
-/// 論理ノードを入力からのトポロジカル順で処理するためには sort()
-/// を用いてソートされたノードのベクタを得る．
-///
-/// その他にネットワーク全体の機能を表すためのデータ構造として，
-///  - 入出力ポート(@sa BdnPort)
-///  - DFF(@sa BdnDff)
-///  - ラッチ(@sa BdnLatch)
-/// がある．
 //////////////////////////////////////////////////////////////////////
 class BdNetwork
 {
@@ -67,7 +46,63 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name ノードとラッチ関連の情報の取得
+  /// @name ネットワーク全体の情報
+  /// @{
+
+  /// @brief 名前の取得
+  string
+  name() const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name ポート関連の情報の取得
+  /// @{
+
+  /// @brief ポート数の取得
+  ymuint
+  port_num() const;
+
+  /// @brief ポートの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
+  const BdnPort*
+  port(ymuint pos) const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name D-FF/ラッチ関連の情報の取得
+  /// @{
+
+  /// @brief D-FF 数の取得
+  ymuint
+  dff_num() const;
+
+  /// @brief D-FF のリストの取得
+  const BdnDffList&
+  dff_list() const;
+
+  /// @brief ラッチ数の取得
+  ymuint
+  latch_num() const;
+
+  /// @brief ラッチのリストの取得
+  const BdnLatchList&
+  latch_list() const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name ノード関連の情報の取得
   /// @{
 
   /// @brief ノードIDの最大値 + 1 の取得
@@ -84,18 +119,6 @@ public:
   const BdnNodeList&
   input_list() const;
 
-#if 0
-  /// @brief 外部入力番号から外部入力ノードを得る．
-  /// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
-  BdnNode*
-  input(ymuint pos) const;
-
-  /// @brief 外部入力の名前を得る．
-  /// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
-  string
-  input_name(ymuint pos) const;
-#endif
-
   /// @brief 出力ノード数を得る．
   ymuint
   output_num() const;
@@ -103,18 +126,6 @@ public:
   /// @brief 出力ノードのリストを得る．
   const BdnNodeList&
   output_list() const;
-
-#if 0
-  /// @brief 外部出力番号から外部出力ノードを得る．
-  /// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
-  BdnNode*
-  output(ymuint pos) const;
-
-  /// @brief 外部出力の名前を得る．
-  /// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
-  string
-  output_name(ymuint pos) const;
-#endif
 
   /// @brief 論理ノード数を得る．
   ymuint
@@ -141,14 +152,6 @@ public:
   ymuint
   level() const;
 
-  /// @brief DFF数を得る．
-  ymuint
-  dff_num() const;
-
-  /// @brief D-FFのリストを得る．
-  const BdnDffList&
-  dff_list() const;
-
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -158,6 +161,42 @@ public:
   /// @name ノードの生成および変更を行う関数
   /// @{
 
+  /// @brief ポートを作る．
+  /// @param[in] name 名前
+  /// @param[in] bit_width ビット幅
+  BdnPort*
+  new_port(const string& name,
+	   ymuint bit_width);
+
+  /// @brief D-FF を作る．
+  /// @param[in] name 名前
+  /// @param[in] output 出力ノード
+  /// @param[in] input 入力ノード
+  /// @param[in] clock クロックノード
+  /// @param[in] set セット信号ノード
+  /// @param[in] reset リセット信号ノード
+  /// @return 生成されたD-FFを返す．
+  BdnDff*
+  new_dff(const string& name,
+	  BdnNode* output,
+	  BdnNode* input,
+	  BdnNode* clock,
+	  BdnNode* set,
+	  BdnNode* reset);
+
+  /// @brief ラッチを作る．
+  /// @param[in] name 名前
+  /// @param[in] output 出力ノード
+  /// @param[in] input 入力ノード
+  /// @param[in] enable ラッチイネーブルノード
+  /// @return 生成されたラッチを返す．
+  BdnLatch*
+  new_latch(const string& name,
+	    BdnNode* output,
+	    BdnNode* input,
+	    BdnNode* enable);
+
+  /// @brief
   /// @brief 入力ノードを作る．
   /// @return 作成したノードを返す．
   BdnNode*
@@ -299,11 +338,6 @@ public:
 	       BdnNodeHandle inode1_handle,
 	       BdnNodeHandle inode2_handle);
 
-  /// @brief D-FF を作る．
-  /// @return 生成されたD-FFを返す．
-  BdnDff*
-  new_dff();
-
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -312,10 +346,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name その他の関数
   /// @{
-
-  /// @brief 名前を得る．
-  string
-  name() const;
 
   /// @brief 名前を設定する．
   /// @param[in] name 新しい名前
@@ -402,34 +432,39 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ノードを確保するためのアロケータ
+  // メモリアロケータ
   SimpleAlloc mAlloc;
 
   // ネットワーク名
   string mName;
 
+  // ID 番号をキーにしたポートの配列
+  vector<BdnPort*> mPortArray;
+
+  // D-FF の ID 番号を管理するためのオブジェクト
+  ItvlMgr mDffItvlMgr;
+
+  // ID 番号をキーにした DFF の配列
+  vector<BdnDff*> mDffArray;
+
+  // D-FFノードのリスト
+  BdnDffList mDffList;
+
+  // ラッチの ID番号を管理するためのオブジェクト
+  ItvlMgr mLatchItvlMgr;
+
+  // ID番号をキーにしたラッチの配列
+  vector<BdnLatch*> mLatchArray;
+
+  // ラッチのリスト
+  BdnLatchList mLatchList;
+
+  // ID 番号を管理するためのオブジェクト
+  ItvlMgr mNodeItvlMgr;
+
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
   vector<BdnNode*> mNodeArray;
-
-  // ID 番号を管理するためのオブジェクト
-  ItvlMgr mItvlMgr;
-
-#if 0
-  // 外部入力ノードの配列
-  // 配列上の位置が外部入力ノードの入力番号となる．
-  vector<BdnNode*> mInputArray;
-
-  // 外部入力ノードの名前の配列
-  vector<string> mInputNameArray;
-
-  // 外部出力ノードの配列
-  // 配列上の位置が外部出力ノードの出力番号となる．
-  vector<BdnNode*> mOutputArray;
-
-  // 外部出力ノードの名前の配列
-  vector<string> mOutputNameArray;
-#endif
 
   // 入力ノードのリスト
   BdnNodeList mInputList;
@@ -452,15 +487,6 @@ private:
   // 最大レベル (最下位ビットは valid フラグ)
   mutable
   ymuint32 mLevel;
-
-  // D-FF の ID 番号を管理するためのオブジェクト
-  ItvlMgr mDffItvlMgr;
-
-  // ID 番号をキーにした DFF の配列
-  vector<BdnDff*> mDffArray;
-
-  // D-FFノードのリスト
-  BdnDffList mDffList;
 
 };
 
@@ -498,6 +524,55 @@ BdNetwork::set_name(const string& name)
   mName = name;
 }
 
+// @brief ポート数の取得
+inline
+ymuint
+BdNetwork::port_num() const
+{
+  return mPortArray.size();
+}
+
+// @brief ポートの取得
+// @param[in] pos 位置番号 ( 0 <= pos < port_num() )
+inline
+const BdnPort*
+BdNetwork::port(ymuint pos) const
+{
+  return mPortArray[pos];
+}
+
+// @brief D-FF 数の取得
+inline
+ymuint
+BdNetwork::dff_num() const
+{
+  return mDffList.size();
+}
+
+// @brief D-FF のリストの取得
+inline
+const BdnDffList&
+BdNetwork::dff_list() const
+{
+  return mDffList;
+}
+
+// @brief ラッチ数の取得
+inline
+ymuint
+BdNetwork::latch_num() const
+{
+  return mLatchList.size();
+}
+
+// @brief ラッチのリストの取得
+inline
+const BdnLatchList&
+BdNetwork::latch_list() const
+{
+  return mLatchList;
+}
+
 // ノード番号の最大値 + 1 を返す．
 inline
 ymuint
@@ -523,26 +598,6 @@ BdNetwork::input_list() const
   return mInputList;
 }
 
-#if 0
-// @brief 外部入力番号から外部入力ノードを得る．
-// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
-inline
-BdnNode*
-BdNetwork::input(ymuint pos) const
-{
-  return mInputArray[pos];
-}
-
-// @brief 外部入力の名前を得る．
-// @param[in] pos 外部入力番号 ( 0 <= pos < input_num() )
-inline
-string
-BdNetwork::input_name(ymuint pos) const
-{
-  return mInputNameArray[pos];
-}
-#endif
-
 // @brief 出力ノード数を得る．
 inline
 ymuint
@@ -559,26 +614,6 @@ BdNetwork::output_list() const
   return mOutputList;
 }
 
-#if 0
-// @brief 外部出力番号から外部出力ノードを得る．
-// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
-inline
-BdnNode*
-BdNetwork::output(ymuint pos) const
-{
-  return mOutputArray[pos];
-}
-
-// @brief 外部出力の名前を得る．
-// @param[in] pos 外部出力番号 ( 0 <= pos < output_num() )
-inline
-string
-BdNetwork::output_name(ymuint pos) const
-{
-  return mOutputNameArray[pos];
-}
-#endif
-
 // 論理ノード数を得る．
 inline
 ymuint
@@ -593,22 +628,6 @@ const BdnNodeList&
 BdNetwork::lnode_list() const
 {
   return mLnodeList;
-}
-
-// @brief D-FF数を得る．
-inline
-ymuint
-BdNetwork::dff_num() const
-{
-  return mDffList.size();
-}
-
-// @brief D-FFのリストを得る．
-inline
-const BdnDffList&
-BdNetwork::dff_list() const
-{
-  return mDffList;
 }
 
 // @brief NAND ノードを作る．

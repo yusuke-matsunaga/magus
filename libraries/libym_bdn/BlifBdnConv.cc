@@ -54,7 +54,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
 
   // D-FFの出力(擬似入力)ノードの生成
   ymuint nff = blif_network.nff();
-  vector<BdnDff*> dff_array(nff);
+  vector<BdnNode*> dff_array(nff);
   for (ymuint i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
     int reset_val = 2;
@@ -65,9 +65,9 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
       reset_val = 1;
     }
     // 今はリセット値は無視
-    BdnDff* dff = mNetwork->new_dff();
-    put_node(blif_node, BdnNodeHandle(dff->output(), false));
-    dff_array[i] = dff;
+    BdnNode* node = mNetwork->new_input();
+    put_node(blif_node, BdnNodeHandle(node, false));
+    dff_array[i] = node;
   }
 
   // 外部出力に用いられているノードを再帰的に生成
@@ -79,12 +79,19 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   }
 
   // D-FFに用いられているノードを再帰的に生成
+  BdnNode* clock = mNetwork->new_input();
   for (ymuint i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
     BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
-    BdnDff* dff = dff_array[i];
-    BdnNode* dff_input = dff->input();
-    mNetwork->set_output_fanin(dff_input, inode_h);
+    BdnNode* dff_output = dff_array[i];
+    BdnNode* dff_input = mNetwork->new_output(inode_h);
+    cout << "new_dff(" << blif_node->name() << ")" << endl;
+    (void) mNetwork->new_dff(blif_node->name(),
+			     dff_output,
+			     dff_input,
+			     clock,
+			     NULL,
+			     NULL);
   }
 
   return true;

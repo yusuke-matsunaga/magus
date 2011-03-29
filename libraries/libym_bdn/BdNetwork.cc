@@ -8,9 +8,11 @@
 
 
 #include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnPort.h"
+#include "ym_bdn/BdnDff.h"
+#include "ym_bdn/BdnLatch.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
-#include "ym_bdn/BdnDff.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
@@ -65,38 +67,13 @@ BdNetwork::copy(const BdNetwork& src)
   ymuint n = src.max_node_id();
   vector<BdnNode*> nodemap(n);
 
-  // D-FFノードの生成
-  const BdnDffList& src_dff_list = src.dff_list();
-  for (BdnDffList::const_iterator p = src_dff_list.begin();
-       p != src_dff_list.end(); ++ p) {
-    const BdnDff* src_dff = *p;
-    BdnDff* dst_dff = new_dff();
-
-    const BdnNode* src_output = src_dff->output();
-    nodemap[src_output->id()] = dst_dff->output();
-
-    const BdnNode* src_input = src_dff->input();
-    nodemap[src_input->id()] = dst_dff->input();
-
-    const BdnNode* src_clock = src_dff->clock();
-    nodemap[src_clock->id()] = dst_dff->clock();
-
-    const BdnNode* src_set = src_dff->set();
-    nodemap[src_set->id()] = dst_dff->set();
-
-    const BdnNode* src_reset = src_dff->reset();
-    nodemap[src_reset->id()] = dst_dff->reset();
-  }
-
   // 外部入力ノードの生成
   const BdnNodeList& src_input_list = src.input_list();
   for (BdnNodeList::const_iterator p = src_input_list.begin();
        p != src_input_list.end(); ++ p) {
     BdnNode* src_node = *p;
-    if ( nodemap[src_node->id()] == NULL ) {
-      BdnNode* dst_node = new_input();
-      nodemap[src_node->id()] = dst_node;
-    }
+    BdnNode* dst_node = new_input();
+    nodemap[src_node->id()] = dst_node;
   }
 
   // 論理ノードの生成
@@ -133,14 +110,74 @@ BdNetwork::copy(const BdNetwork& src)
       dst_inode = nodemap[src_inode->id()];
     }
     BdnNodeHandle dst_handle(dst_inode, src_onode->output_fanin_inv());
-    BdnNode* dst_onode = nodemap[src_onode->id()];
-    if ( dst_onode == NULL ) {
-      dst_onode = new_output(dst_handle);
-      nodemap[src_onode->id()] = dst_onode;
+    BdnNode* dst_onode = new_output(dst_handle);
+    nodemap[src_onode->id()] = dst_onode;
+  }
+
+  // ポートの生成
+  ymuint np = src.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const BdnPort* src_port = src.port(i);
+    ymuint bw = src_port->bit_width();
+    BdnPort* dst_port = new_port(src_port->name(), bw);
+    for (ymuint j = 0; j < bw; ++ j) {
+      const BdnNode* src_input = src_port->input(j);
+      if ( src_input ) {
+	BdnNode* dst_input = nodemap[src_input->id()];
+	dst_port->mInputArray[j] = dst_input;
+      }
+      const BdnNode* src_output = src_port->output(j);
+      if ( src_output ) {
+	BdnNode* dst_output = nodemap[src_output->id()];
+	dst_port->mOutputArray[j] = dst_output;
+      }
     }
-    else {
-      set_output_fanin(dst_onode, dst_handle);
+  }
+
+  // D-FFノードの生成
+  const BdnDffList& src_dff_list = src.dff_list();
+  for (BdnDffList::const_iterator p = src_dff_list.begin();
+       p != src_dff_list.end(); ++ p) {
+    const BdnDff* src_dff = *p;
+    const BdnNode* src_output = src_dff->output();
+    BdnNode* dst_output = nodemap[src_output->id()];
+    const BdnNode* src_input = src_dff->input();
+    BdnNode* dst_input = nodemap[src_input->id()];
+    const BdnNode* src_clock = src_dff->clock();
+    BdnNode* dst_clock = nodemap[src_clock->id()];
+    const BdnNode* src_set = src_dff->set();
+    BdnNode* dst_set = NULL;
+    if ( src_set ) {
+      dst_set = nodemap[src_set->id()];
     }
+    const BdnNode* src_reset = src_dff->reset();
+    BdnNode* dst_reset = NULL;
+    if ( src_reset ) {
+      dst_reset = nodemap[src_reset->id()];
+    }
+    (void) new_dff(src_dff->name(),
+		   dst_output,
+		   dst_input,
+		   dst_clock,
+		   dst_set,
+		   dst_reset);
+  }
+
+  // ラッチノードの生成
+  const BdnLatchList& src_latch_list = src.latch_list();
+  for (BdnLatchList::const_iterator p = src_latch_list.begin();
+       p != src_latch_list.end(); ++ p) {
+    const BdnLatch* src_latch = *p;
+    const BdnNode* src_output = src_latch->output();
+    BdnNode* dst_output = nodemap[src_output->id()];
+    const BdnNode* src_input = src_latch->input();
+    BdnNode* dst_input = nodemap[src_input->id()];
+    const BdnNode* src_enable = src_latch->enable();
+    BdnNode* dst_enable = nodemap[src_enable->id()];
+    (void) new_latch(src_latch->name(),
+		     dst_output,
+		     dst_input,
+		     dst_enable);
   }
 }
 
@@ -148,14 +185,19 @@ BdNetwork::copy(const BdNetwork& src)
 void
 BdNetwork::clear()
 {
+  mName = string();
+  mPortArray.clear();
+  mDffItvlMgr.clear();
+  mDffList.clear();
+  mLatchItvlMgr.clear();
+  mLatchList.clear();
+  mNodeItvlMgr.clear();
   mInputList.clear();
   mOutputList.clear();
   mLnodeList.clear();
-  mItvlMgr.clear();
   mLevel = 0U;
-  mDffList.clear();
-  mDffItvlMgr.clear();
-  // mNodeArray, mDffArray はクリアしない．
+
+  // mNodeArray, mDffArray, mLatchArray はクリアしない．
 }
 
 BEGIN_NONAMESPACE
@@ -269,6 +311,94 @@ BdNetwork::rsort(vector<BdnNode*>& node_list) const
   }
   // うまくいっていればすべての論理ノードが node_list に入っているはず．
   assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+}
+
+// @brief ポートを作る．
+BdnPort*
+BdNetwork::new_port(const string& name,
+		    ymuint bit_width)
+{
+  void* p = mAlloc.get_memory(sizeof(BdnPort));
+  void* q = mAlloc.get_memory(sizeof(BdnNode*) * bit_width);
+  BdnNode** input_array = new (q) BdnNode*[bit_width];
+  void* r = mAlloc.get_memory(sizeof(BdnNode*) * bit_width);
+  BdnNode** output_array = new (r) BdnNode*[bit_width];
+  BdnPort* port = new (p) BdnPort(name, bit_width, input_array, output_array);
+
+  port->mId = mPortArray.size();
+  mPortArray.push_back(port);
+
+  return port;
+}
+
+// @brief D-FF を作る．
+// @param[in] name 名前
+// @param[in] output 出力ノード
+// @param[in] input 入力ノード
+// @param[in] clock クロックノード
+// @param[in] set セット信号ノード
+// @param[in] reset リセット信号ノード
+// @return 生成されたD-FFを返す．
+BdnDff*
+BdNetwork::new_dff(const string& name,
+		   BdnNode* output,
+		   BdnNode* input,
+		   BdnNode* clock,
+		   BdnNode* set,
+		   BdnNode* reset)
+{
+  // 空いているIDを探して配列へ登録
+  int id = mDffItvlMgr.avail_num();
+  assert_cond( id >= 0, __FILE__, __LINE__);
+  mDffItvlMgr.erase(id);
+
+  ymuint uid = static_cast<ymuint>(id);
+  while( mDffArray.size() <= uid ) {
+    // mDffArray の大きさが小さいときのための埋め草
+    void* p = mAlloc.get_memory(sizeof(BdnDff));
+    BdnDff* dff = new (p) BdnDff;
+    dff->mId = mDffArray.size();
+    mDffArray.push_back(dff);
+  }
+  BdnDff* dff = mDffArray[uid];
+  dff->set(name, output, input, clock, set, reset);
+
+  mDffList.push_back(dff);
+
+  return dff;
+}
+
+// @brief ラッチを作る．
+// @param[in] name 名前
+// @param[in] output 出力ノード
+// @param[in] input 入力ノード
+// @param[in] enable ラッチイネーブルノード
+// @return 生成されたラッチを返す．
+BdnLatch*
+BdNetwork::new_latch(const string& name,
+		     BdnNode* output,
+		     BdnNode* input,
+		     BdnNode* enable)
+{
+  // 空いているIDを探して配列へ登録する．
+  int id = mLatchItvlMgr.avail_num();
+  assert_cond( id >= 0, __FILE__, __LINE__);
+  mLatchItvlMgr.erase(id);
+
+  ymuint uid = static_cast<ymuint>(id);
+  while ( mLatchArray.size() <= uid ) {
+    // mLatchArray の大きさが小さいときのための埋め草
+    void* p = mAlloc.get_memory(sizeof(BdnLatch));
+    BdnLatch* latch = new (p) BdnLatch;
+    latch->mId = mLatchArray.size();
+    mLatchArray.push_back(latch);
+  }
+  BdnLatch* latch = mLatchArray[uid];
+  latch->set(name, output, input, enable);
+
+  mLatchList.push_back(latch);
+
+  return latch;
 }
 
 // 入力ノードを作る．
@@ -472,27 +602,6 @@ BdNetwork::change_logic(BdnNode* node ,
       set_output_fanin(onode, new_handle);
     }
   }
-}
-
-// @brief D-FF を作る．
-// @return 生成されたD-FFを返す．
-BdnDff*
-BdNetwork::new_dff()
-{
-  // 空いているIDを探してノード配列へ登録
-  int id = mDffItvlMgr.avail_num();
-  mItvlMgr.erase(id);
-
-  ymuint uid = static_cast<ymuint>(id);
-  while( mDffArray.size() <= uid ) {
-    // mDffArray の大きさが小さいときのための埋め草
-    void* p = mAlloc.get_memory(sizeof(BdnDff));
-    BdnDff* node = new (p) BdnDff;
-    mDffArray.push_back(node);
-  }
-  BdnDff* dff = mDffArray[uid];
-  dff->mId = uid;
-  return dff;
 }
 
 
@@ -745,8 +854,9 @@ BdnNode*
 BdNetwork::new_node()
 {
   // 空いているIDを探してノード配列へ登録
-  int id = mItvlMgr.avail_num();
-  mItvlMgr.erase(id);
+  int id = mNodeItvlMgr.avail_num();
+  assert_cond( id >= 0, __FILE__, __LINE__);
+  mNodeItvlMgr.erase(id);
 
   ymuint uid = static_cast<ymuint>(id);
   while( mNodeArray.size() <= uid ) {
@@ -771,7 +881,7 @@ BdNetwork::delete_node(BdnNode* node)
   }
 
   // new_node の逆の処理を行なう．
-  mItvlMgr.add(static_cast<int>(node->mId));
+  mNodeItvlMgr.add(static_cast<int>(node->mId));
 
   // mNodeArray 内のエントリはクリアしない．
   // id の再利用と同様に BdnNode も再利用する．
@@ -818,81 +928,6 @@ BdNetwork::level() const
     mLevel = (max_l << 1) | 1U;
   }
   return (mLevel >> 1);
-}
-
-// @brief BdNetwork の内容をダンプする関数
-void
-dump(ostream& s,
-     const BdNetwork& network)
-{
-  const BdnNodeList& input_list = network.input_list();
-  for (BdnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const BdnNode* node = *p;
-    s << node->id_str() << " : = INPUT" << endl;
-  }
-
-  const BdnNodeList& lnode_list = network.lnode_list();
-  for (BdnNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const BdnNode* node = *p;
-    s << node->id_str();
-    s << " :  = LOGIC[";
-    ymuint fcode = node->fcode();
-    s << ((fcode >> 3) & 1) << ((fcode >> 2) & 1)
-      << ((fcode >> 1) & 1) << (fcode & 1) << "] ("
-      << " " << node->fanin0()->id_str()
-      << ", " << node->fanin1()->id_str()
-      << ")" << endl;
-  }
-
-  const BdnNodeList& output_list = network.output_list();
-  for (BdnNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const BdnNode* node = *p;
-    s << node->id_str() << " : = OUTPUT(";
-    const BdnNode* inode = node->output_fanin();
-    bool oinv = node->output_fanin_inv();
-    if ( inode ) {
-      // 普通のノードの場合
-      if ( oinv ) {
-	s << "~";
-      }
-      s << inode->id_str();
-    }
-    else {
-      // 定数ノードの場合
-      if ( oinv ) {
-	s << "1";
-      }
-      else {
-	s << "0";
-      }
-    }
-    s << ")" << endl;
-  }
-
-  const BdnDffList& dff_list = network.dff_list();
-  for (BdnDffList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const BdnDff* dff = *p;
-    const BdnNode* output = dff->output();
-    const BdnNode* input = dff->input();
-    const BdnNode* clock = dff->clock();
-    const BdnNode* set = dff->set();
-    const BdnNode* reset = dff->reset();
-    s << dff->id_str() << " : = DFF("
-      << "OUTPUT: " << output->id_str()
-      << ", INPUT: " << input->id_str()
-      << ", CLOCK: " << clock->id_str();
-    if ( set ) {
-      s << ", SET: " << set->id_str();
-    }
-    if ( reset ) {
-      s << ", RESET: " << reset->id_str();
-    }
-    s << ")" << endl;
-  }
 }
 
 END_NAMESPACE_YM_BDN
