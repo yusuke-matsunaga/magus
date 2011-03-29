@@ -17,6 +17,35 @@
 
 BEGIN_NAMESPACE_YM_BDN
 
+BEGIN_NONAMESPACE
+
+// 出力ノードの内容を出力する．
+void
+dump_output(ostream& s,
+	    const BdnNode* node)
+{
+  const BdnNode* inode = node->output_fanin();
+  bool oinv = node->output_fanin_inv();
+  if ( inode ) {
+    // 普通のノードの場合
+    if ( oinv ) {
+      s << "~";
+    }
+    s << inode->id_str();
+  }
+  else {
+    // 定数ノードの場合
+    if ( oinv ) {
+      s << "1";
+    }
+    else {
+      s << "0";
+    }
+  }
+}
+
+END_NONAMESPACE
+
 // @brief BdNetwork の内容をダンプする関数
 void
 dump(ostream& s,
@@ -48,24 +77,7 @@ dump(ostream& s,
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;
     s << node->id_str() << " : = OUTPUT(";
-    const BdnNode* inode = node->output_fanin();
-    bool oinv = node->output_fanin_inv();
-    if ( inode ) {
-      // 普通のノードの場合
-      if ( oinv ) {
-	s << "~";
-      }
-      s << inode->id_str();
-    }
-    else {
-      // 定数ノードの場合
-      if ( oinv ) {
-	s << "1";
-      }
-      else {
-	s << "0";
-      }
-    }
+    dump_output(s, node);
     s << ")" << endl;
   }
 
@@ -80,13 +92,17 @@ dump(ostream& s,
     const BdnNode* reset = dff->reset();
     s << "DFF#" << dff->id() << "("
       << "OUTPUT: " << output->id_str()
-      << ", INPUT: " << input->id_str()
-      << ", CLOCK: " << clock->id_str();
+      << ", INPUT: ";
+    dump_output(s, input);
+    s << ", CLOCK: ";
+    dump_output(s, clock);
     if ( set ) {
-      s << ", SET: " << set->id_str();
+      s << ", SET: ";
+      dump_output(s, set);
     }
     if ( reset ) {
-      s << ", RESET: " << reset->id_str();
+      s << ", RESET: ";
+      dump_output(s, reset);
     }
     s << ")" << endl;
   }
