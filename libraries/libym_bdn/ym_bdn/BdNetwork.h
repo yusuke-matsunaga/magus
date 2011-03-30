@@ -170,43 +170,37 @@ public:
 
   /// @brief D-FF を作る．
   /// @param[in] name 名前
-  /// @param[in] output 出力ノード
-  /// @param[in] input 入力ノード
-  /// @param[in] clock クロックノード
-  /// @param[in] set セット信号ノード
-  /// @param[in] reset リセット信号ノード
   /// @return 生成されたD-FFを返す．
   BdnDff*
-  new_dff(const string& name,
-	  BdnNode* output,
-	  BdnNode* input,
-	  BdnNode* clock,
-	  BdnNode* set,
-	  BdnNode* reset);
+  new_dff(const string& name = string());
 
   /// @brief ラッチを作る．
   /// @param[in] name 名前
-  /// @param[in] output 出力ノード
-  /// @param[in] input 入力ノード
-  /// @param[in] enable ラッチイネーブルノード
   /// @return 生成されたラッチを返す．
   BdnLatch*
-  new_latch(const string& name,
-	    BdnNode* output,
-	    BdnNode* input,
-	    BdnNode* enable);
+  new_latch(const string& name = string());
 
-  /// @brief
-  /// @brief 入力ノードを作る．
+  /// @brief 外部入力を作る．
+  /// @param[in] port ポート
+  /// @param[in] bitpos ビット位置
   /// @return 作成したノードを返す．
+  /// @note エラー条件は以下の通り
+  ///  - bitpos が port のビット幅を越えている．
+  ///  - port の bitpos にすでにノードがある．
   BdnNode*
-  new_input();
+  new_port_input(BdnPort* port,
+		 ymuint bitpos);
 
-  /// @brief 出力ノードを作る．
-  /// @param[in] inode_handle 入力のノード+極性
+  /// @brief 外部出力ノードを作る．
+  /// @param[in] port ポート
+  /// @param[in] bitpos ビット位置
   /// @return 作成したノードを返す．
+  /// @note エラー条件は以下の通り
+  ///  - bitpos が port のビット幅を越えている．
+  ///  - port の bitpos にすでにノードがある．
   BdnNode*
-  new_output(BdnNodeHandle inode_handle);
+  new_port_output(BdnPort* port,
+		  ymuint bitpos);
 
   /// @brief 出力ノードのファンインを変更する
   /// @param[in] node 変更対象の出力ノード
@@ -411,12 +405,44 @@ private:
 	  BdnNode* to,
 	  ymuint pos);
 
+  /// @brief D-FF の領域を確保する．
+  BdnDff*
+  alloc_dff();
+
+  /// @brief ラッチの領域を確保する．
+  BdnLatch*
+  alloc_latch();
+
+  /// @brief ポートに関連するノードを作成する．
+  /// @param[in] port 関連するポート
+  /// @param[in] bitpos ビット位置
+  /// @return 作成されたノードを返す．
+  BdnNode*
+  alloc_portnode(BdnPort* port,
+		 ymuint bitpos);
+
+  /// @brief D-FF に関連するノードを作成する．
+  /// @param[in] dff 関連する D-FF
+  /// @return 作成されたノードを返す．
+  BdnNode*
+  alloc_dffnode(BdnDff* dff);
+
+  /// @brief ラッチに関連するノードを作成する．
+  /// @param[in] latch 関連するラッチ
+  /// @return 作成されたノードを返す．
+  BdnNode*
+  alloc_latchnode(BdnLatch* latch);
+
   /// @brief 新しいノードを作成し mNodeList に登録する．
   /// @return 作成されたノードを返す．
   BdnNode*
-  new_node();
+  alloc_logicnode();
 
-  /// @note node を削除する．
+  /// @brief ノードに ID を割り当てる．
+  void
+  reg_node(BdnNode* node);
+
+  /// @brief node を削除する．
   /// @param[in] node 削除対象のノード
   void
   delete_node(BdnNode* node);
@@ -483,6 +509,9 @@ private:
 
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
+
+  // 論理ノードの再利用リスト
+  BdnNode* mAvailLogic;
 
   // 最大レベル (最下位ビットは valid フラグ)
   mutable

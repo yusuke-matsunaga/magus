@@ -167,8 +167,9 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   for (ymuint i = 0; i < ni; ++ i) {
     const MvNode* node = module->input(i);
     ymuint bw = node->output(0)->bit_width();
+    BdnPort* port = bdnetwork.new_port(string(), bw);
     for (ymuint j = 0; j < bw; ++ j) {
-      BdnNode* bdnnode = bdnetwork.new_input();
+      BdnNode* bdnnode = bdnetwork.new_port_input(port, j);
       mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
     }
     mark[node->id()] = true;
@@ -180,8 +181,9 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   for (ymuint i = 0; i < nio; ++ i) {
     const MvNode* node = module->inout(i);
     ymuint bw = node->output(0)->bit_width();
+    BdnPort* port = bdnetwork.new_port(string(), bw);
     for (ymuint j = 0; j < bw; ++ j) {
-      BdnNode* bdnnode = bdnetwork.new_input();
+      BdnNode* bdnnode = bdnetwork.new_port_input(port, j);
       mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
     }
     mark[node->id()] = true;
@@ -190,14 +192,19 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 
   // DFF と定数ノードを作る．
   const list<MvNode*>& node_list = module->node_list();
+  vector<vector<BdnDff*> > dff_map(nmax);
   for (list<MvNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const MvNode* node = *p;
     if ( node->type() == MvNode::kDff ) {
       // DFF
       ymuint bw = node->output(0)->bit_width();
+      vector<BdnDff*>& dff_array = dff_map[node->id()];
+      dff_array.resize(bw, NULL);
       for (ymuint j = 0; j < bw; ++ j) {
-	BdnNode* bdnnode = bdnetwork.new_input();
+	BdnDff* dff = bdnetwork.new_dff();
+	dff_array[j] = dff;
+	BdnNode* bdnnode = dff->output();
 	mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
       }
       mark[node->id()] = true;
@@ -297,17 +304,12 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 	set_ihandle = mvnode_map.get(src_node);
       }
 #endif
-
+      vector<BdnDff*>& dff_array = dff_map[node->id()];
       for (ymuint j = 0; j < bw; ++ j) {
-	BdnNodeHandle ohandle = mvnode_map.get(node, j);
-	assert_cond( ohandle.inv() == false, __FILE__, __LINE__);
-	BdnNode* output = ohandle.node();
+	BdnDff* dff = dff_array[j];
 	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
-	BdnNode* input = bdnetwork.new_output(data_ihandle);
-	BdnNode* clock = bdnetwork.new_output(clock_ihandle);
-	BdnNode* set = NULL;
-	BdnNode* reset = NULL;
-	(void) bdnetwork.new_dff(string(), output, input, clock, set, reset);
+	bdnetwork.set_output_fanin(dff->input(), data_ihandle);
+	bdnetwork.set_output_fanin(dff->clock(), clock_ihandle);
       }
     }
   }
@@ -322,9 +324,11 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     const MvNode* src_node = opin->node();
 
     ymuint bw = ipin->bit_width();
+    BdnPort* port = bdnetwork.new_port(string(), bw);
     for (ymuint j = 0; j < bw; ++ j) {
       BdnNodeHandle handle = mvnode_map.get(src_node, j);
-      BdnNode* onode = bdnetwork.new_output(handle);
+      BdnNode* onode = bdnetwork.new_port_output(port, j);
+      bdnetwork.set_output_fanin(onode, handle);
       mvnode_map.put(node, j, BdnNodeHandle(onode, false));
     }
   }

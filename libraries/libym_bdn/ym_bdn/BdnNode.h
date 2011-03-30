@@ -8,10 +8,12 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_bdn/bdn_nsdef.h>
+#include "ym_bdn/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
+
+class BdnAuxData;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnEdge BdnNode.h "ym_bdn/BdnNode.h"
@@ -108,6 +110,20 @@ private:
 /// - 論理ノード
 /// の 3種類がある．
 ///
+/// ただし，入力ノードは以下の様に細分化される．
+/// - 外部入力
+/// - D-FF の出力
+/// - ラッチの出力
+///
+/// 出力ノードは以下の様に細分化される．
+/// - 外部出力
+/// - D-FF のデータ入力
+/// - D-FF のクロック
+/// - D-FF のセット信号
+/// - D-FF のリセット信号
+/// - ラッチのデータ入力
+/// - ラッチのイネーブル信号
+///
 /// 全てのノードはID番号をもつ．
 /// 論理ノードは2つのファンインと機能コードを持つ．
 /// 外部出力以外のノードは複数のファンアウトを持つ．
@@ -118,24 +134,43 @@ class BdnNode :
   public DlElem
 {
   friend class BdNetwork;
-  friend class BdnDff;
 
 public:
+
   /// @brief ノードの型
   enum tType {
     /// @brief 外部入力ノード
-    kINPUT  = 0,
+    kINPUT        = 0,
+    /// @brief D-FF の出力ノード
+    kDFF_OUTPUT   = 1,
+    /// @brief ラッチの出力ノード
+    kLATCH_OUTPUT = 2,
+
     /// @brief 外部出力ノード
-    kOUTPUT = 1,
+    kOUTPUT       = 8,
+    /// @brief D-FF の入力ノード
+    kDFF_INPUT    = 9,
+    /// @brief D-FF のクロックノード
+    kDFF_CLOCK    = 10,
+    /// @brief D-FF のセットノード
+    kDFF_SET      = 11,
+    /// @brief D-FF のリセットノード
+    kDFF_RESET    = 12,
+    /// @brief ラッチの入力ノード
+    kLATCH_INPUT  = 14,
+    /// @brief ラッチのイネーブルノード
+    kLATCH_ENABLE = 15,
+
     /// @brief 論理ノード
-    kLOGIC  = 2
+    kLOGIC        = 4
   };
 
 
-private:
+protected:
 
   /// @brief コンストラクタ
-  BdnNode();
+  /// @param[in] data 補助的な情報
+  BdnNode(BdnAuxData* data);
 
   /// @brief デストラクタ
   ~BdnNode();
@@ -189,6 +224,37 @@ public:
   /// @brief レベルを得る．
   ymuint
   level() const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name 入出力ノードの情報を取り出す関数
+  /// @{
+
+  /// @brief 関連するポートを返す．
+  /// @note kINPUT および kOUTPUT の時に意味を持つ．
+  /// @note それ以外では NULL を返す．
+  const BdnPort*
+  port() const;
+
+  /// @brief ポート中の位置を返す．
+  /// @note kINPUT および kOUTPUT の時に意味を持つ．
+  /// @note それ以外では 0 を返す．
+  ymuint
+  port_bitpos() const;
+
+  /// @brief 関連する D-FF を返す．
+  /// @note D-FF に関連していない場合には NULL を返す．
+  const BdnDff*
+  dff() const;
+
+  /// @brief 関連するラッチを返す．
+  /// @note ラッチに関連していない場合には NULL を返す．
+  const BdnLatch*
+  latch() const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -274,22 +340,18 @@ private:
   // プライベートメンバ関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief タイプを入力に設定する．
+  /// @brief タイプを設定する．
   void
-  set_input();
-
-  /// @brief タイプを出力に設定する．
-  void
-  set_output();
+  set_type(tType type);
 
   /// @brief 出力ノードのファンインの極性を設定する．
   /// @param[in] inv 極性
   void
   set_inv(bool inv);
 
-  /// @brief タイプを論理に設定する．
+  /// @brief 機能コードを設定する．
   void
-  set_logic(ymuint fcode);
+  set_fcode(ymuint fcode);
 
   /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
   void
@@ -304,9 +366,9 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // タイプ(3bit) + POマーク(1bit) + 機能コード(4bit)
-  //                               + 出力極性(1bit) + 出力番号
-  //                               +                + 入力番号
+  // 入力ノード: タイプ(4bit) + POマーク(1bit)
+  // 出力ノード:     〃       + 出力極性(1bit)
+  // 論理ノード:     〃       + POマーク(1bit) + 機能コード(4bit)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
@@ -318,8 +380,11 @@ private:
   // ハッシュ用のリンク
   BdnNode* mLink;
 
-  // レベル + POマーク(下位1bit)
+  // レベル
   ymuint32 mLevel;
+
+  // 補助的な情報を持つオブジェクト
+  BdnAuxData* mAuxData;
 
 
 private:
@@ -331,13 +396,11 @@ private:
   static
   const int kTypeShift = 0;
   static
-  const int kPoShift = 3;
-  static
-  const int kFcodeShift = 4;
+  const int kPoShift = 4;
   static
   const int kInvShift = 4;
   static
-  const int kIdShift = 5;
+  const int kFcodeShift = 5;
 
   static
   const ymuint32 kPoMask = 1U << kPoShift;
@@ -452,7 +515,7 @@ inline
 BdnNode::tType
 BdnNode::type() const
 {
-  return static_cast<tType>(mFlags & 7U);
+  return static_cast<tType>(mFlags & 15U);
 }
 
 // 入力ノードの時に true を返す．
@@ -460,7 +523,8 @@ inline
 bool
 BdnNode::is_input() const
 {
-  return type() == kINPUT;
+  // ちょっとトリッキー
+  return (mFlags & 15U) < 4;
 }
 
 // 出力ノードの時に true を返す．
@@ -468,7 +532,8 @@ inline
 bool
 BdnNode::is_output() const
 {
-  return type() == kOUTPUT;
+  // ちょっとトリッキー
+  return static_cast<bool>((mFlags >> 3) & 1U);
 }
 
 // 論理ノードの時に true を返す．
@@ -591,7 +656,7 @@ inline
 bool
 BdnNode::pomark() const
 {
-  return static_cast<bool>(mLevel & 1U);
+  return !is_output() && static_cast<bool>((mFlags >> kPoShift) & 1U);
 }
 
 // @brief レベルを得る．
@@ -599,23 +664,16 @@ inline
 ymuint
 BdnNode::level() const
 {
-  return (mLevel >> 1);
+  return mLevel;
 }
 
-// タイプを入力に設定する．
+// タイプを設定する．
 inline
 void
-BdnNode::set_input()
+BdnNode::set_type(tType type)
 {
-  mFlags = static_cast<ymuint32>(kINPUT);
-}
-
-// @brief タイプを出力に設定する．
-inline
-void
-BdnNode::set_output()
-{
-  mFlags = static_cast<ymuint32>(kOUTPUT);
+  mFlags &= ~15U;
+  mFlags |= static_cast<ymuint32>(type);
 }
 
 // @brief 出力の極性を設定する．
@@ -632,12 +690,13 @@ BdnNode::set_inv(bool inv)
   }
 }
 
-// タイプを論理に設定する．
+// 機能コードを設定する．
 inline
 void
-BdnNode::set_logic(ymuint fcode)
+BdnNode::set_fcode(ymuint fcode)
 {
-  mFlags = static_cast<ymuint32>(kLOGIC) | (fcode << kFcodeShift);
+  mFlags &= ~(15U << kFcodeShift);
+  mFlags |= (fcode << kFcodeShift);
 }
 
 END_NAMESPACE_YM_BDN

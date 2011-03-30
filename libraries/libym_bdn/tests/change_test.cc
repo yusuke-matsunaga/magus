@@ -20,10 +20,16 @@ change_test()
 
   network.set_name("change_test");
 
-  BdnNode* a = network.new_input();
-  BdnNode* b = network.new_input();
-  BdnNode* c = network.new_input();
-  BdnNode* d = network.new_output(BdnNodeHandle(NULL, false));
+  BdnPort* port_a = network.new_port("a", 1);
+  BdnPort* port_b = network.new_port("b", 1);
+  BdnPort* port_c = network.new_port("c", 1);
+  BdnPort* port_d = network.new_port("d", 1);
+
+  BdnNode* a = network.new_port_input(port_a, 0);
+  BdnNode* b = network.new_port_input(port_b, 0);
+  BdnNode* c = network.new_port_input(port_c, 0);
+  BdnNode* d = network.new_port_output(port_d, 0);
+
 
   // a & b
   BdnNodeHandle h1 = network.new_logic(0x8,

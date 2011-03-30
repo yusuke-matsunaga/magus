@@ -76,13 +76,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を設定する．
-  /// @param[in] name 名前
   /// @param[in] output 出力ノード
   /// @param[in] input 入力ノード
   /// @param[in] enable ラッチイネーブルノード
   void
-  set(const string& name,
-      BdnNode* output,
+  set(BdnNode* output,
       BdnNode* input,
       BdnNode* enable);
 
@@ -194,18 +192,15 @@ BdnLatch::enable()
 }
 
 // @brief 内容を設定する．
-// @param[in] name 名前
 // @param[in] output 出力ノード
 // @param[in] input 入力ノード
 // @param[in] enable ラッチイネーブルノード
 inline
 void
-BdnLatch::set(const string& name,
-	      BdnNode* output,
+BdnLatch::set(BdnNode* output,
 	      BdnNode* input,
 	      BdnNode* enable)
 {
-  mName = name;
   mOutput = output;
   mInput = input;
   mEnable = enable;

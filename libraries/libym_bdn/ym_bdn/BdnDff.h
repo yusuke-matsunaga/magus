@@ -96,15 +96,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を設定する．
-  /// @param[in] name 名前
   /// @param[in] output 出力ノード
   /// @param[in] input 入力ノード
   /// @param[in] clock クロックノード
   /// @param[in] set セットノード
   /// @param[in] reset リセットノード
   void
-  set(const string& name,
-      BdnNode* output,
+  set(BdnNode* output,
       BdnNode* input,
       BdnNode* clock,
       BdnNode* set,
@@ -260,7 +258,6 @@ BdnDff::reset()
 }
 
 // @brief 内容を設定する．
-// @param[in] name 名前
 // @param[in] output 出力ノード
 // @param[in] input 入力ノード
 // @param[in] clock クロックノード
@@ -268,14 +265,12 @@ BdnDff::reset()
 // @param[in] reset リセットノード
 inline
 void
-BdnDff::set(const string& name,
-	    BdnNode* output,
+BdnDff::set(BdnNode* output,
 	    BdnNode* input,
 	    BdnNode* clock,
 	    BdnNode* set,
 	    BdnNode* reset)
 {
-  mName = name;
   mOutput = output;
   mInput = input;
   mClock = clock;

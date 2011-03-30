@@ -48,13 +48,14 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   ymuint npi = blif_network.npi();
   for (ymuint i = 0; i < npi; ++ i) {
     const BlifNode* blif_node = blif_network.pi(i);
-    BdnNode* node = mNetwork->new_input();
+    BdnPort* port = mNetwork->new_port(blif_node->name(), 1);
+    BdnNode* node = mNetwork->new_port_input(port, 0);
     put_node(blif_node, BdnNodeHandle(node, false));
   }
 
   // D-FFの出力(擬似入力)ノードの生成
   ymuint nff = blif_network.nff();
-  vector<BdnNode*> dff_array(nff);
+  vector<BdnDff*> dff_array(nff);
   for (ymuint i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
     int reset_val = 2;
@@ -65,33 +66,36 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
       reset_val = 1;
     }
     // 今はリセット値は無視
-    BdnNode* node = mNetwork->new_input();
+    BdnDff* dff = mNetwork->new_dff(blif_node->name());
+    BdnNode* node = dff->output();
     put_node(blif_node, BdnNodeHandle(node, false));
-    dff_array[i] = node;
+    dff_array[i] = dff;
   }
 
   // 外部出力に用いられているノードを再帰的に生成
   ymuint npo = blif_network.npo();
   for (ymuint i = 0; i < npo; ++ i) {
     const BlifNode* blif_node = blif_network.po(i);
-    BdnNodeHandle node_h = make_node(blif_node);
-    (void) mNetwork->new_output(node_h);
+    BdnPort* port = mNetwork->new_port(blif_node->name(), 1);
+    BdnNode* node = mNetwork->new_port_output(port, 0);
+    BdnNodeHandle inode_h = make_node(blif_node);
+    mNetwork->set_output_fanin(node, inode_h);
   }
 
   // D-FFに用いられているノードを再帰的に生成
-  BdnNode* clock = mNetwork->new_input();
-  for (ymuint i = 0; i < nff; ++ i) {
-    const BlifNode* blif_node = blif_network.ff(i);
-    BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
-    BdnNode* dff_output = dff_array[i];
-    BdnNode* dff_input = mNetwork->new_output(inode_h);
-    cout << "new_dff(" << blif_node->name() << ")" << endl;
-    (void) mNetwork->new_dff(blif_node->name(),
-			     dff_output,
-			     dff_input,
-			     clock,
-			     NULL,
-			     NULL);
+  if ( nff > 0 ) {
+    BdnPort* clock_port = mNetwork->new_port("clock", 1);
+    BdnNode* clock = mNetwork->new_port_input(clock_port, 0);
+    BdnNodeHandle clock_h(clock, false);
+    for (ymuint i = 0; i < nff; ++ i) {
+      const BlifNode* blif_node = blif_network.ff(i);
+      BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
+      BdnDff* dff = dff_array[i];
+      BdnNode* dff_input = dff->input();
+      mNetwork->set_output_fanin(dff_input, inode_h);
+      BdnNode* dff_clock = dff->clock();
+      mNetwork->set_output_fanin(dff_clock, clock_h);
+    }
   }
 
   return true;
