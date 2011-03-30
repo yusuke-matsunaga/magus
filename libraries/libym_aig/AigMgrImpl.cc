@@ -2,7 +2,7 @@
 /// @file libym_aig/AigMgrImpl.cc
 /// @brief AigMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: AigMgrImpl.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -27,7 +27,7 @@ AigMgrImpl::AigMgrImpl() :
 {
   alloc_table(1024);
 }
-  
+
 // @brief デストラクタ
 AigMgrImpl::~AigMgrImpl()
 {
@@ -39,10 +39,11 @@ AigMgrImpl::~AigMgrImpl()
 AigHandle
 AigMgrImpl::make_input()
 {
-  AigNode* node = new_node(true);
+  AigNode* node = new_node();
   ymuint input_id = mInputNodes.size();
-  node->mFanins[0].mPackedData = input_id;
+  node->set_input(input_id);
   mInputNodes.push_back(node);
+
   AigHandle ans(node, false);
   return ans;
 }
@@ -86,11 +87,10 @@ AigMgrImpl::make_and(AigHandle handle1,
       return AigHandle(node, false);
     }
   }
-  
+
   // 新しいノードを作る．
-  AigNode* node = new_node(false);
-  node->mFanins[0] = handle1;
-  node->mFanins[1] = handle2;
+  AigNode* node = new_node();
+  node->set_and(handle1, handle2);
 
   // ハッシュ表に登録する．
   if ( node_num() >= mNextLimit ) {
@@ -100,7 +100,7 @@ AigMgrImpl::make_and(AigHandle handle1,
   }
   node->mLink = mHashTable[idx];
   mHashTable[idx] = node;
-  
+
   AigHandle ans(node, false);
   return ans;
 }
@@ -108,22 +108,22 @@ AigMgrImpl::make_and(AigHandle handle1,
 // 新しいノードを作成する．
 // 作成されたノードを返す．
 AigNode*
-AigMgrImpl::new_node(bool input)
+AigMgrImpl::new_node()
 {
   ymuint id = mAllNodes.size();
   void* p = mAlloc.get_memory(sizeof(AigNode));
-  AigNode* node = new (p) AigNode(input, id);
+  AigNode* node = new (p) AigNode(id);
   mAllNodes.push_back(node);
   return node;
 }
-  
+
 // @brief ハッシュ表を確保する．
 void
 AigMgrImpl::alloc_table(ymuint req_size)
 {
   AigNode** old_table = mHashTable;
   ymuint old_size = mHashSize;
-  
+
   if ( mHashSize == 0 ) {
     mHashSize = 1024;
   }

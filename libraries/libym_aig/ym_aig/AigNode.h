@@ -4,10 +4,10 @@
 /// @file libym_aig/AigNode.h
 /// @brief AigNodeのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: AigNode.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,31 +17,29 @@
 BEGIN_NAMESPACE_YM_AIG
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigNode AigNode.h "AigNode.h"
+/// @class AigNode AigNode.h "ym_aig/AigNode.h"
 /// @brief ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
 class AigNode
 {
   friend class AigMgrImpl;
-  
+
 private:
   // このクラスは AigMgrImpl 内でしか生成／破壊できない．
-  
+
   /// @brief コンストラクタ
-  /// @param[in] input 外部入力のときに true とするフラグ
   /// @param[in] id ノード番号
-  AigNode(bool input,
-	  ymuint id);
-  
+  AigNode(ymuint id);
+
   /// @brief デストラクタ
   ~AigNode();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 型とID番号に関する情報を得る関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 外部入力ノードのとき true を返す．
   bool
   is_input() const;
@@ -49,27 +47,27 @@ public:
   /// @brief ANDノードのとき true を返す．
   bool
   is_and() const;
-  
+
   /// @brief 通し番号を得る．
   ymuint
   node_id() const;
-  
+
   /// @brief 外部入力ノードのときの入力番号を返す．
   /// @note is_input() の時のみ意味を持つ．
   ymuint
   input_id() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ファンインに関する情報を得る関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief pos で指示されたファンインのノードを得る．
   /// @note pos は 0 か 1 でなければならない．
   AigNode*
   fanin(ymuint pos) const;
-  
+
   /// @brief fanin0 のノードを得る．
   AigNode*
   fanin0() const;
@@ -77,7 +75,7 @@ public:
   /// @brief fanin1 のノードを得る．
   AigNode*
   fanin1() const;
-  
+
   /// @brief pos で指示されたファンインの極性を得る．
   /// @note pos は 0 か 1 でなければならない．
   bool
@@ -103,8 +101,25 @@ public:
   /// @brief fanin1 のハンドルを得る．
   AigHandle
   fanin1_handle() const;
- 
-  
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力タイプに設定する．
+  /// @param[in] input_id 入力番号
+  void
+  set_input(ymuint input_id);
+
+  /// @brief ANDタイプに設定する．
+  /// @param[in] fanin0, fanin1 ファンインのハンドル
+  void
+  set_and(AigHandle fanin0,
+	  AigHandle fanin1);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -112,14 +127,14 @@ private:
 
   // 通し番号 + ノードタイプ
   ymuint32 mFlags;
-  
+
   // ファンインの枝の配列
   AigHandle mFanins[2];
-  
+
   // ハッシュ用のリンクポインタ
   AigNode* mLink;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // mFlags で用いるシフト定数
@@ -128,11 +143,11 @@ private:
   // 型
   static
   const int kSftT = 0;
-  
+
   // id 番号
   static
   const int kSftN = 4;
-  
+
 };
 
 
@@ -163,7 +178,7 @@ AigNode::node_id() const
 {
   return static_cast<ymuint>(mFlags >> kSftN);
 }
-  
+
 // @brief 外部入力ノードのときの入力番号を返す．
 // @note is_input() の時のみ意味を持つ．
 inline

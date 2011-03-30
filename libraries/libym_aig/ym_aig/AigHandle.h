@@ -7,7 +7,7 @@
 ///
 /// $Id: AigHandle.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_AIG
 class AigNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigHandle AigHandle.h <ym_aig/AigHandle.h>
+/// @class AigHandle AigHandle.h "ym_aig/AigHandle.h"
 /// @brief 枝を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AigHandle

@@ -291,7 +291,7 @@ AigMgr::make_logic(const LogExpr& expr,
 // @param[in] pol 極性
 AigHandle
 AigMgr::make_cofactor(AigHandle edge,
-		      tVarId id,
+		      ymuint id,
 		      tPol pol)
 {
   if ( edge.is_const() ) {

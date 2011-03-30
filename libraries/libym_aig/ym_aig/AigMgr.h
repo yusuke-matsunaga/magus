@@ -7,7 +7,7 @@
 ///
 /// $Id: AigMgr.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_AIG
 class AigMgrImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigMgr AigMgr.h <ym_aig/AigMgr.h>
+/// @class AigMgr AigMgr.h "ym_aig/AigMgr.h"
 /// @brief AIGを管理するクラス(の純粋仮想クラス)
 //////////////////////////////////////////////////////////////////////
 class AigMgr
@@ -199,7 +199,7 @@ public:
   /// @param[in] pol 極性
   AigHandle
   make_cofactor(AigHandle edge,
-		tVarId id,
+		ymuint id,
 		tPol pol);
 
 

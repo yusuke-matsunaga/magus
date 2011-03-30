@@ -4,7 +4,7 @@
 /// @file libym_aig/AigMgrImpl.h
 /// @brief AigMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: AigMgrImpl.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -26,20 +26,20 @@ BEGIN_NAMESPACE_YM_AIG
 class AigMgrImpl
 {
 public:
-  
+
   /// @brief コンストラクタ
   AigMgrImpl();
-  
+
   /// @brief デストラクタ
   virtual
   ~AigMgrImpl();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // AigMgr の機能を実現しているメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入力ノード数を得る．
   size_t
   input_num() const;
@@ -58,7 +58,7 @@ public:
   /// @note ANDノードの他に入力ノードも含まれる．
   AigNode*
   node(size_t pos) const;
-  
+
   /// @brief 定数0関数をつくる．
   AigHandle
   make_zero();
@@ -70,24 +70,23 @@ public:
   /// @brief 外部入力を作る．
   AigHandle
   make_input();
-  
+
   /// @brief 2つのノードの AND を取る．
   /// @param[in] edge1, edge2 入力の AIG ハンドル
   AigHandle
   make_and(AigHandle edge1,
 	   AigHandle edge2);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ノードを作る．
-  /// @param[in] input 外部入力ノードの時に true にするフラグ
   AigNode*
-  new_node(bool input);
-  
+  new_node();
+
   /// @brief ハッシュ表を確保する．
   void
   alloc_table(ymuint req_size);
@@ -98,7 +97,7 @@ private:
   hash_func(AigHandle handle1,
 	    AigHandle handle2);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -110,26 +109,26 @@ private:
   // ID 番号をキーにしたノードの配列
   // 全てのノードのリスト(mInputNodes + mAndNodes)
   vector<AigNode*> mAllNodes;
-  
+
   // 入力ノードの配列
   vector<AigNode*> mInputNodes;
-  
+
   // AND ノードのハッシュ表
   AigNode** mHashTable;
 
   // mHashTable のサイズ
   ymuint32 mHashSize;
-  
+
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 入力ノード数を得る．
 inline
 size_t
