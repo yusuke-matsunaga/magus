@@ -146,7 +146,7 @@ private:
 
   // id 番号
   static
-  const int kSftN = 4;
+  const int kSftN = 1;
 
 };
 

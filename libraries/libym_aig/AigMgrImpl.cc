@@ -82,7 +82,8 @@ AigMgrImpl::make_and(AigHandle handle1,
   ymuint pos = hash_func(handle1, handle2);
   ymuint idx = pos % mHashSize;
   for (AigNode* node = mHashTable[idx]; node; node = node->mLink) {
-    if ( node->mFanins[0] == handle1 && node->mFanins[1] == handle2 ) {
+    if ( node->fanin0_handle() == handle1 &&
+	 node->fanin1_handle() == handle2 ) {
       // 同じノードがあった．
       return AigHandle(node, false);
     }
@@ -139,7 +140,7 @@ AigMgrImpl::alloc_table(ymuint req_size)
       AigNode* next = NULL;
       for (AigNode* node = old_table[i]; node; node = next) {
 	next = node->mLink;
-	ymuint pos = hash_func(node->mFanins[0], node->mFanins[1]);
+	ymuint pos = hash_func(node->fanin0_handle(), node->fanin1_handle());
 	ymuint idx = pos % mHashSize;
 	node->mLink = mHashTable[idx];
 	mHashTable[idx] = node;
