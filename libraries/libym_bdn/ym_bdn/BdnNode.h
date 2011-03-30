@@ -169,8 +169,7 @@ public:
 protected:
 
   /// @brief コンストラクタ
-  /// @param[in] data 補助的な情報
-  BdnNode(BdnAuxData* data);
+  BdnNode();
 
   /// @brief デストラクタ
   ~BdnNode();

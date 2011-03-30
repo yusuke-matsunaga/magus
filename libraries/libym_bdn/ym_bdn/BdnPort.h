@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_BDN
 
+class BdnAuxData;
+
 //////////////////////////////////////////////////////////////////////
 /// @class BdnPort BdnPort.h "BdnPort.h"
 /// @brief 外部入出力ポートを表すクラス
@@ -25,14 +27,7 @@ class BdnPort
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] name 名前
-  /// @param[in] bit_width ビット幅
-  /// @param[in] input_array mInputArray 用のメモリ領域
-  /// @param[in] output_array mOutputArray 用のメモリ領域
-  BdnPort(const string& name,
-	  ymuint bit_width,
-	  BdnNode** input_array,
-	  BdnNode** output_array);
+  BdnPort();
 
   /// @brief デストラクタ
   ~BdnPort();
@@ -85,35 +80,15 @@ private:
   // 出力ノードの配列
   BdnNode** mOutputArray;
 
+  // BdnNode に付加する情報
+  BdnAuxData** mAuxDataArray;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] name 名前
-// @param[in] bit_width ビット幅
-// @param[in] input_array mInputArray 用のメモリ領域
-// @param[in] output_array mOutputArray 用のメモリ領域
-inline
-BdnPort::BdnPort(const string& name,
-		 ymuint bit_width,
-		 BdnNode** input_array,
-		 BdnNode** output_array) :
-  mName(name),
-  mBitWidth(bit_width),
-  mInputArray(input_array),
-  mOutputArray(output_array)
-{
-}
-
-// @brief デストラクタ
-inline
-BdnPort::~BdnPort()
-{
-}
 
 // @brief ID 番号を得る．
 inline

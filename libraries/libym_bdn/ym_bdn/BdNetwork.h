@@ -170,9 +170,13 @@ public:
 
   /// @brief D-FF を作る．
   /// @param[in] name 名前
+  /// @param[in] has_set set 信号を持つ時 true
+  /// @param[in] has_reset reset 信号を持つとき true
   /// @return 生成されたD-FFを返す．
   BdnDff*
-  new_dff(const string& name = string());
+  new_dff(const string& name = string(),
+	  bool has_set = false,
+	  bool has_reset = false);
 
   /// @brief ラッチを作る．
   /// @param[in] name 名前
@@ -405,42 +409,20 @@ private:
 	  BdnNode* to,
 	  ymuint pos);
 
-  /// @brief D-FF の領域を確保する．
-  BdnDff*
-  alloc_dff();
-
-  /// @brief ラッチの領域を確保する．
-  BdnLatch*
-  alloc_latch();
-
-  /// @brief ポートに関連するノードを作成する．
-  /// @param[in] port 関連するポート
-  /// @param[in] bitpos ビット位置
-  /// @return 作成されたノードを返す．
-  BdnNode*
-  alloc_portnode(BdnPort* port,
-		 ymuint bitpos);
-
-  /// @brief D-FF に関連するノードを作成する．
-  /// @param[in] dff 関連する D-FF
-  /// @return 作成されたノードを返す．
-  BdnNode*
-  alloc_dffnode(BdnDff* dff);
-
-  /// @brief ラッチに関連するノードを作成する．
-  /// @param[in] latch 関連するラッチ
-  /// @return 作成されたノードを返す．
-  BdnNode*
-  alloc_latchnode(BdnLatch* latch);
-
-  /// @brief 新しいノードを作成し mNodeList に登録する．
-  /// @return 作成されたノードを返す．
-  BdnNode*
-  alloc_logicnode();
-
-  /// @brief ノードに ID を割り当てる．
+  /// @brief D-FF を削除する．
+  /// @param[in] dff 削除対象の D-FF
   void
-  reg_node(BdnNode* node);
+  delete_dff(BdnDff* dff);
+
+  /// @brief ラッチを削除する．
+  /// @param[in] latch 削除対象のラッチ
+  void
+  delete_latch(BdnLatch* latch);
+
+  /// @brief ノードを作成する．
+  /// @return 作成されたノードを返す．
+  BdnNode*
+  alloc_node();
 
   /// @brief node を削除する．
   /// @param[in] node 削除対象のノード
@@ -509,9 +491,6 @@ private:
 
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
-
-  // 論理ノードの再利用リスト
-  BdnNode* mAvailLogic;
 
   // 最大レベル (最下位ビットは valid フラグ)
   mutable

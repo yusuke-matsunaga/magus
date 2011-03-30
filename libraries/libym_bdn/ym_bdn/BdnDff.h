@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_BDN
 
+class BdnAuxData;
+
 //////////////////////////////////////////////////////////////////////
 /// @class BdnDff BdnDff.h "ym_bdn/BdnDff.h"
 /// @brief D-FFを表すクラス
@@ -92,25 +94,6 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内容を変更する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容を設定する．
-  /// @param[in] output 出力ノード
-  /// @param[in] input 入力ノード
-  /// @param[in] clock クロックノード
-  /// @param[in] set セットノード
-  /// @param[in] reset リセットノード
-  void
-  set(BdnNode* output,
-      BdnNode* input,
-      BdnNode* clock,
-      BdnNode* set,
-      BdnNode* reset);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -135,24 +118,15 @@ private:
   // リセット信号ノード
   BdnNode* mReset;
 
+  // BdnNode に付加するデータ
+  BdnAuxData* mAuxData;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-BdnDff::BdnDff()
-{
-}
-
-// @brief デストラクタ
-inline
-BdnDff::~BdnDff()
-{
-}
 
 // @brief ID 番号の取得
 // @return ID 番号を返す．
@@ -255,27 +229,6 @@ BdnNode*
 BdnDff::reset()
 {
   return mReset;
-}
-
-// @brief 内容を設定する．
-// @param[in] output 出力ノード
-// @param[in] input 入力ノード
-// @param[in] clock クロックノード
-// @param[in] set セットノード
-// @param[in] reset リセットノード
-inline
-void
-BdnDff::set(BdnNode* output,
-	    BdnNode* input,
-	    BdnNode* clock,
-	    BdnNode* set,
-	    BdnNode* reset)
-{
-  mOutput = output;
-  mInput = input;
-  mClock = clock;
-  mSet = set;
-  mReset = reset;
 }
 
 END_NAMESPACE_YM_BDN

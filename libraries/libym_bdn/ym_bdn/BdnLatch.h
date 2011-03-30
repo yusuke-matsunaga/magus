@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_BDN
 
+class BdnAuxData;
+
 //////////////////////////////////////////////////////////////////////
 /// @class BdnLatch BdnLatch.h "ym_bdn/BdnLatch.h"
 /// @brief ラッチを表すクラス
@@ -76,11 +78,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を設定する．
+  /// @param[in] name 名前
   /// @param[in] output 出力ノード
   /// @param[in] input 入力ノード
   /// @param[in] enable ラッチイネーブルノード
   void
-  set(BdnNode* output,
+  set(const string& name,
+      BdnNode* output,
       BdnNode* input,
       BdnNode* enable);
 
@@ -105,24 +109,15 @@ private:
   // ラッチイネーブルノード
   BdnNode* mEnable;
 
+  // BdnNode の付加するデータ
+  BdnAuxData* mAuxData;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-BdnLatch::BdnLatch()
-{
-}
-
-// @brief デストラクタ
-inline
-BdnLatch::~BdnLatch()
-{
-}
 
 // @brief ID番号の取得
 // @return ID番号を返す．
@@ -189,21 +184,6 @@ BdnNode*
 BdnLatch::enable()
 {
   return mEnable;
-}
-
-// @brief 内容を設定する．
-// @param[in] output 出力ノード
-// @param[in] input 入力ノード
-// @param[in] enable ラッチイネーブルノード
-inline
-void
-BdnLatch::set(BdnNode* output,
-	      BdnNode* input,
-	      BdnNode* enable)
-{
-  mOutput = output;
-  mInput = input;
-  mEnable = enable;
 }
 
 END_NAMESPACE_YM_BDN

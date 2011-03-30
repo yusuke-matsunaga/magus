@@ -72,10 +72,14 @@ dump(ostream& s,
     dump_output(s, input);
     s << ", CLOCK=";
     dump_output(s, clock);
-    s << ", SET=";
-    dump_output(s, set);
-    s << ", RESET=";
-    dump_output(s, reset);
+    if ( set ) {
+      s << ", SET=";
+      dump_output(s, set);
+    }
+    if ( reset ) {
+      s << ", RESET=";
+      dump_output(s, reset);
+    }
     s << ")" << endl;
   }
 
