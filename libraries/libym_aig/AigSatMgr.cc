@@ -103,12 +103,24 @@ AigSatMgr::sat(const vector<AigHandle>& edge_list,
   vector<AigSatData> data_array(n);
 
   // edge_list の TFI に印を付ける．
+  bool have_zero = false;
+  bool all_one = true;
   for (vector<AigHandle>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     AigHandle edge = *p;
-    AigNode* node = edge.node();
-    dfs(node, data_array);
-    data_array[node->node_id()].set_root_mark();
+    if ( edge.is_zero() ) {
+      return kB3False;
+    }
+    if ( !edge.is_one() ) {
+      all_one = false;
+      AigNode* node = edge.node();
+      dfs(node, data_array);
+      data_array[node->node_id()].set_root_mark();
+    }
+  }
+  if ( all_one ) {
+    // TODO: model をどうする．
+    return kB3True;
   }
 
   // 極大AND木の根に印をつける．
@@ -171,45 +183,5 @@ AigSatMgr::sat(const vector<AigHandle>& edge_list,
   Bool3 stat = mSolver.solve(assumptions, model);
   return stat;
 }
-
-#if 0
-// @brief 構造に対応した CNF を作成する．
-// @param[in] solver SAT ソルバ
-// @param[out] varidmap AigNode の ID 番号をキーにして SAT 変数番号を入れる配列
-void
-AigMgr::make_cnf(SatSolver& solver,
-		 vector<ymuint>& varidmap)
-{
-  ymuint n = node_num();
-  varidmap.clear();
-  varidmap.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    AigNode* aignode = node(i);
-    tVarId id = solver.new_var();
-    varidmap[i] = id;
-    if ( !aignode->is_input() ) {
-      ymuint id0 = varidmap[aignode->fanin0()->node_id()];
-      tPol pol0 = aignode->fanin0_inv() ? kPolNega : kPolPosi;
-      ymuint id1 = varidmap[aignode->fanin1()->node_id()];
-      tPol pol1 = aignode->fanin1_inv() ? kPolNega : kPolPosi;
-      Literal lito(id, kPolPosi);
-      Literal lit1(id0, pol0);
-      Literal lit2(id1, pol1);
-      solver.add_clause(~lit1, ~lit2, lito);
-      solver.add_clause( lit1, ~lito);
-      solver.add_clause( lit2, ~lito);
-      AigHandle rep = aignode->rep_handle();
-      if ( rep.node() != aignode ) {
-	ymuint rep_id = varidmap[rep.node()->node_id()];
-	tPol rep_pol = rep.inv() ? kPolNega : kPolPosi;
-	Literal rep_lit(rep_id, rep_pol);
-	solver.add_clause( lito, ~rep_lit);
-	solver.add_clause(~lito,  rep_lit);
-      }
-    }
-  }
-
-}
-#endif
 
 END_NAMESPACE_YM_AIG
