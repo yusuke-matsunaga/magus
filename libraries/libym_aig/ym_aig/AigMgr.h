@@ -13,7 +13,6 @@
 
 #include "ym_aig/AigHandle.h"
 #include "ym_lexp/LogExpr.h"
-#include "ym_sat/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
@@ -201,24 +200,6 @@ public:
   make_cofactor(AigHandle edge,
 		ymuint id,
 		tPol pol);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // SAT solver とのインターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief SAT 問題を解く．
-  /// @param[in] solver SAT-solver
-  /// @param[in] edge この出力を1にできるか調べる．
-  /// @param[out] model 外部入力の割り当てを入れる配列
-  /// @retval kB3False 充足不能
-  /// @retval kB3True 充足可能
-  /// @retval kB3X 不明
-  Bool3
-  sat(SatSolver* solver,
-      AigHandle edge,
-      vector<Bool3>& model);
 
 
 private:

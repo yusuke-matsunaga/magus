@@ -23,12 +23,14 @@ libym_aig_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_aig_la_LDFLAGS = 
+libym_aig_la_LDFLAGS =
 
 libym_aig_la_SOURCES = \
 	AigNode.cc \
 	AigMgr.cc \
 	AigMgrImpl.h \
 	AigMgrImpl.cc \
+	AigSatData.h \
+	AigSatMgr.cc \
 	AigTemplate.h \
 	AigTemplate.cc

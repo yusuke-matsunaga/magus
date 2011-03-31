@@ -14,6 +14,9 @@
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigHandle.h"
 
+#include "ym_aig/AigSatMgr.h"
+#include "ym_sat/SatSolver.h"
+
 
 BEGIN_NAMESPACE_YM
 
@@ -61,8 +64,11 @@ bnet2aig(const BNetwork& network,
     vector<AigHandle> ianodes(ni);
     for (size_t pos = 0; pos < ni; ++ pos) {
       ianodes[pos] = find_node(bnode->fanin(pos), assoc);
+      cout << "ianodes[" << pos << "] = " << ianodes[pos] << endl;
     }
+    cout << "bnode->func() = " << bnode->func() << endl;
     AigHandle anode = aig_mgr.make_logic(bnode->func(), ianodes);
+    cout << "anode = " << anode << endl;
     assoc.insert(make_pair(bnode, anode));
   }
 
@@ -78,6 +84,12 @@ bnet2aig(const BNetwork& network,
   }
 
   aig_mgr.dump_handles(cout, output_handle_list);
+
+  SatSolver* solver = SatSolverFactory::gen_solver();
+  AigSatMgr aigsat(aig_mgr, *solver);
+  AigHandle root = output_handle_list.front();
+  vector<Bool3> model;
+  Bool3 stat = aigsat.sat(root, model);
 }
 
 END_NAMESPACE_YM

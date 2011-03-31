@@ -4,7 +4,7 @@
 /// @file ym_aig/aig_nsdef.h
 /// @brief AIG パッケージ用の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: aig_nsdef.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -31,8 +31,7 @@ class AigMgr;
 class AigHandle;
 class AigNode;
 
-class FraigMgr;
-class FraigHandle;
+class AigSatMgr;
 
 END_NAMESPACE_YM_AIG
 
@@ -43,8 +42,7 @@ using nsAig::AigMgr;
 using nsAig::AigHandle;
 using nsAig::AigNode;
 
-using nsAig::FraigMgr;
-using nsAig::FraigHandle;
+using nsAig::AigSatMgr;
 
 END_NAMESPACE_YM
 

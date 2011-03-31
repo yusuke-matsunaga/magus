@@ -260,7 +260,7 @@ AigMgr::make_logic(const LogExpr& expr,
   if ( expr.is_and() ) {
     ymuint n = expr.child_num();
     vector<AigHandle> tmp_list(n);
-    for (ymuint i = 1; i < n; ++ i) {
+    for (ymuint i = 0; i < n; ++ i) {
       tmp_list[i] = make_logic(expr.child(i), inputs);
     }
     return make_and(tmp_list);
@@ -268,7 +268,7 @@ AigMgr::make_logic(const LogExpr& expr,
   if ( expr.is_or() ) {
     ymuint n = expr.child_num();
     vector<AigHandle> tmp_list(n);
-    for (ymuint i = 1; i < n; ++ i) {
+    for (ymuint i = 0; i < n; ++ i) {
       tmp_list[i] = make_logic(expr.child(i), inputs);
     }
     return make_or(tmp_list);
@@ -276,7 +276,7 @@ AigMgr::make_logic(const LogExpr& expr,
   if ( expr.is_xor() ) {
     ymuint n = expr.child_num();
     vector<AigHandle> tmp_list(n);
-    for (ymuint i = 1; i < n; ++ i) {
+    for (ymuint i = 0; i < n; ++ i) {
       tmp_list[i] = make_logic(expr.child(i), inputs);
     }
     return make_xor(tmp_list);
@@ -327,83 +327,5 @@ AigMgr::make_cofactor(AigHandle edge,
   }
   return ans;
 }
-
-// @brief SAT 問題を解く．
-// @param[in] solver SAT-solver
-// @param[in] edge この出力を1にできるか調べる．
-// @param[out] model 外部入力の割り当てを入れる配列
-// @retval kB3False 充足不能
-// @retval kB3True 充足可能
-// @retval kB3X 不明
-Bool3
-AigMgr::sat(SatSolver* solver,
-	    AigHandle edge,
-	    vector<Bool3>& model)
-{
-  ymuint n = node_num();
-  vector<ymuint> varidmap(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    AigNode* aignode = node(i);
-    tVarId id = solver->new_var();
-    varidmap[i] = id;
-    if ( !aignode->is_input() ) {
-      ymuint id0 = varidmap[aignode->fanin0()->node_id()];
-      tPol pol0 = aignode->fanin0_inv() ? kPolNega : kPolPosi;
-      ymuint id1 = varidmap[aignode->fanin1()->node_id()];
-      tPol pol1 = aignode->fanin1_inv() ? kPolNega : kPolPosi;
-      Literal lito(id, kPolPosi);
-      Literal lit1(id0, pol0);
-      Literal lit2(id1, pol1);
-      solver->add_clause(~lit1, ~lit2, lito);
-      solver->add_clause( lit1, ~lito);
-      solver->add_clause( lit2, ~lito);
-    }
-  }
-  vector<Literal> assumptions(1);
-  tPol pol = edge.inv() ? kPolNega : kPolPosi;
-  assumptions[0] = Literal(varidmap[edge.node_id()], pol);
-  Bool3 stat = solver->solve(assumptions, model);
-  return stat;
-}
-
-#if 0
-// @brief 構造に対応した CNF を作成する．
-// @param[in] solver SAT ソルバ
-// @param[out] varidmap AigNode の ID 番号をキーにして SAT 変数番号を入れる配列
-void
-AigMgr::make_cnf(SatSolver& solver,
-		 vector<ymuint>& varidmap)
-{
-  ymuint n = node_num();
-  varidmap.clear();
-  varidmap.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    AigNode* aignode = node(i);
-    tVarId id = solver.new_var();
-    varidmap[i] = id;
-    if ( !aignode->is_input() ) {
-      ymuint id0 = varidmap[aignode->fanin0()->node_id()];
-      tPol pol0 = aignode->fanin0_inv() ? kPolNega : kPolPosi;
-      ymuint id1 = varidmap[aignode->fanin1()->node_id()];
-      tPol pol1 = aignode->fanin1_inv() ? kPolNega : kPolPosi;
-      Literal lito(id, kPolPosi);
-      Literal lit1(id0, pol0);
-      Literal lit2(id1, pol1);
-      solver.add_clause(~lit1, ~lit2, lito);
-      solver.add_clause( lit1, ~lito);
-      solver.add_clause( lit2, ~lito);
-      AigHandle rep = aignode->rep_handle();
-      if ( rep.node() != aignode ) {
-	ymuint rep_id = varidmap[rep.node()->node_id()];
-	tPol rep_pol = rep.inv() ? kPolNega : kPolPosi;
-	Literal rep_lit(rep_id, rep_pol);
-	solver.add_clause( lito, ~rep_lit);
-	solver.add_clause(~lito,  rep_lit);
-      }
-    }
-  }
-
-}
-#endif
 
 END_NAMESPACE_YM_AIG
