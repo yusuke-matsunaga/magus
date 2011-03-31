@@ -173,11 +173,16 @@ AigSatMgr::sat(const vector<AigHandle>& edge_list,
   cout << "# of clauses: " << mSolver.clause_num() << endl;
 
   ymuint ne = edge_list.size();
-  vector<Literal> assumptions(ne);
+  vector<Literal> assumptions;
+  assumptions.reserve(ne);
   for (ymuint i = 0; i < ne; ++ i) {
     AigHandle edge = edge_list[i];
-    tPol pol = edge.inv() ? kPolNega : kPolPosi;
-    assumptions[i] = Literal(data_array[edge.node_id()].varid(), pol);
+    if ( !edge.is_one() ) {
+      ymuint varid = data_array[edge.node_id()].varid();
+      tPol pol = edge.inv() ? kPolNega : kPolPosi;
+      Literal lit(varid, pol);
+      assumptions.push_back(lit);
+    }
   }
 
   Bool3 stat = mSolver.solve(assumptions, model);
