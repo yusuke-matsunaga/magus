@@ -143,20 +143,20 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
   BdnNodeHandle node_handle;
   if ( !get_node(blif_node, node_handle) ) {
     assert_cond( blif_node->type() == BlifNode::kLogic, __FILE__, __LINE__);
-    ymuint32 ni = blif_node->ni();
+    ymuint ni = blif_node->ni();
     vector<BdnNodeHandle> fanins(ni);
-    for (ymuint32 i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = make_node(blif_node->fanin(i));
     }
 
-    ymuint32 nc = blif_node->nc();
+    ymuint nc = blif_node->nc();
     if ( blif_node->opat() == '1' ) {
       vector<BdnNodeHandle> or_leaves;
       or_leaves.reserve(nc);
-      for (ymuint32 c = 0; c < nc; ++ c) {
+      for (ymuint c = 0; c < nc; ++ c) {
 	vector<BdnNodeHandle> and_leaves;
 	and_leaves.reserve(ni);
-	for (ymuint32 i = 0; i < ni; ++ i) {
+	for (ymuint i = 0; i < ni; ++ i) {
 	  char v = blif_node->cube_pat(c, i);
 	  if ( v == '0' ) {
 	    and_leaves.push_back(~fanins[i]);
@@ -165,11 +165,11 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
 	    and_leaves.push_back(fanins[i]);
 	  }
 	}
-	ymuint32 n = and_leaves.size();
+	ymuint n = and_leaves.size();
 	assert_cond( n > 0, __FILE__, __LINE__);
 	or_leaves.push_back(bidecomp(0x8, 0, n, and_leaves));
       }
-      ymuint32 n = or_leaves.size();
+      ymuint n = or_leaves.size();
       if ( n == 0 ) {
 	node_handle = BdnNodeHandle::make_one();
       }
@@ -180,10 +180,10 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
     else {
       vector<BdnNodeHandle> and_leaves;
       and_leaves.reserve(nc);
-      for (ymuint32 c = 0; c < nc; ++ c) {
+      for (ymuint c = 0; c < nc; ++ c) {
 	vector<BdnNodeHandle> or_leaves;
 	or_leaves.reserve(ni);
-	for (ymuint32 i = 0; i < ni; ++ i) {
+	for (ymuint i = 0; i < ni; ++ i) {
 	  char v = blif_node->cube_pat(c, i);
 	  if ( v == '0' ) {
 	    or_leaves.push_back(fanins[i]);
@@ -192,11 +192,11 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
 	    or_leaves.push_back(~fanins[i]);
 	  }
 	}
-	ymuint32 n = or_leaves.size();
+	ymuint n = or_leaves.size();
 	assert_cond( n > 0, __FILE__, __LINE__);
 	and_leaves.push_back(bidecomp(0xE, 0, n, or_leaves));
       }
-      ymuint32 n = and_leaves.size();
+      ymuint n = and_leaves.size();
       if ( n == 0 ) {
 	node_handle = BdnNodeHandle::make_zero();
       }
@@ -211,17 +211,17 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
 
 // @brief 2分木を生成する．
 BdnNodeHandle
-BlifBdnConv::bidecomp(ymuint32 fcode,
-		      ymuint32 start,
-		      ymuint32 size,
+BlifBdnConv::bidecomp(ymuint fcode,
+		      ymuint start,
+		      ymuint size,
 		      const vector<BdnNodeHandle>& child_array)
 {
   if ( size == 1 ) {
     return child_array[start];
   }
-  ymuint32 nl = size / 2;
+  ymuint nl = size / 2;
   BdnNodeHandle l = bidecomp(fcode, start, nl, child_array);
-  ymuint32 nr = size - nl;
+  ymuint nr = size - nl;
   BdnNodeHandle r = bidecomp(fcode, start + nl, nr, child_array);
   return mNetwork->new_logic(fcode, l, r);
 }

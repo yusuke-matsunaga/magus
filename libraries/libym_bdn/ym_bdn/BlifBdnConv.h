@@ -7,18 +7,18 @@
 ///
 /// $Id: BlifBdnConv.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdn/bdn_nsdef.h>
-#include <ym_blif/blif_nsdef.h>
+#include "ym_bdn/bdn_nsdef.h"
+#include "ym_blif/blif_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifBdnConv BlifBdnConv.h <ym_bdn/BlifBdnConv.h>
+/// @class BlifBdnConv BlifBdnConv.h "ym_bdn/BlifBdnConv.h"
 /// @ingroup BdnGroup
 /// @brief BlifNetwork を BdNetwork に変換するクラス
 /// @sa BdNetwork nsYm::nsBlif::BlifNetwork
@@ -57,9 +57,9 @@ private:
 
   /// @brief 2分木を生成する．
   BdnNodeHandle
-  bidecomp(ymuint32 fcode,
-	   ymuint32 start,
-	   ymuint32 size,
+  bidecomp(ymuint fcode,
+	   ymuint start,
+	   ymuint size,
 	   const vector<BdnNodeHandle>& child_array);
 
   /// @brief blif_node に対応した BdnNode を取り出す．
