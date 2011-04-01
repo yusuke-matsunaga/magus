@@ -206,6 +206,10 @@ dump(ostream& s,
     for (ymuint j = 0;j < no; ++ j) {
       dump_node(s, module->output(j));
     }
+    ymuint nio = module->inout_num();
+    for (ymuint j = 0; j < nio; ++ j) {
+      dump_node(s, module->inout(j));
+    }
     for (list<MvNode*>::const_iterator p = module->nodes_begin();
 	 p != module->nodes_end(); ++ p) {
       MvNode* node = *p;

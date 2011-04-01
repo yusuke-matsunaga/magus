@@ -583,6 +583,13 @@ void
 BdNetwork::set_output_fanin(BdnNode* node,
 			    BdnNodeHandle inode_handle)
 {
+  if ( node->is_input() ) {
+    // BdnNode::alt_node() と同じコードだが const がつかない．
+    const BdnPort* port = node->port();
+    assert_cond( port != NULL, __FILE__, __LINE__);
+    node = port->mOutputArray[node->port_bitpos()];
+    assert_cond( node != NULL, __FILE__, __LINE__);
+  }
   assert_cond( node->is_output(), __FILE__, __LINE__);
 
   bool inv = inode_handle.inv();

@@ -365,7 +365,8 @@ MvMgr::sweep()
   for (ymuint i = 0; i < n; ++ i) {
     MvNode* node = _node(i);
     if ( node == NULL ) continue;
-    if ( node->type() == MvNode::kOutput ) continue;
+    if ( node->type() == MvNode::kOutput ||
+	 node->type() == MvNode::kInout ) continue;
     if ( no_fanouts(node) ) {
       node_queue.push_back(node);
     }
@@ -609,7 +610,9 @@ MvMgr::reg_node(MvNode* node)
   }
   mNodeArray[id] = node;
 
-  if ( node->type() != MvNode::kInput && node->type() != MvNode::kOutput ) {
+  if ( node->type() != MvNode::kInput &&
+       node->type() != MvNode::kOutput &&
+       node->type() != MvNode::kInout ) {
     MvModule* module = node->mParent;
     list<MvNode*>& nodelist = module->mNodeList;
     nodelist.push_back(node);
@@ -626,7 +629,9 @@ MvMgr::unreg_node(MvNode* node)
 {
   mNodeItvlMgr.add(node->id());
   mNodeArray[node->id()] = NULL;
-  if ( node->type() != MvNode::kInput && node->type() != MvNode::kOutput ) {
+  if ( node->type() != MvNode::kInput &&
+       node->type() != MvNode::kOutput &&
+       node->type() != MvNode::kInout ) {
     MvModule* module = node->mParent;
     module->mNodeList.erase(node->mSelfRef);
   }

@@ -57,7 +57,7 @@ main(int argc,
       return 2;
     }
 
-    //dump(cout, mgr);
+    dump(cout, mgr);
     dump_verilog(cout, mgr);
     dump_node_map(cout, mgr, node_map);
 #if 0

@@ -47,8 +47,79 @@
 
 BEGIN_NAMESPACE_YM_MVNBDNCONV
 
+// @brief コンストラクタ
+MvnBdnConv::MvnBdnConv()
+{
+  mConvList.push_back(new ThroughConv);
+  mConvList.push_back(new NotConv);
+  mConvList.push_back(new AndConv);
+  mConvList.push_back(new OrConv);
+  mConvList.push_back(new XorConv);
+  mConvList.push_back(new RandConv);
+  mConvList.push_back(new RorConv);
+  mConvList.push_back(new RxorConv);
+  mConvList.push_back(new CmplConv);
+  mConvList.push_back(new AddConv);
+  mConvList.push_back(new SubConv);
+  mConvList.push_back(new MultConv);
+  mConvList.push_back(new DivConv);
+  mConvList.push_back(new ModConv);
+  mConvList.push_back(new PowConv);
+  mConvList.push_back(new SllConv);
+  mConvList.push_back(new SrlConv);
+  mConvList.push_back(new SlaConv);
+  mConvList.push_back(new SraConv);
+  mConvList.push_back(new EqConv);
+  mConvList.push_back(new LtConv);
+  mConvList.push_back(new IteConv);
+  mConvList.push_back(new ConcatConv);
+  mConvList.push_back(new ConstBitSelectConv);
+  mConvList.push_back(new ConstPartSelectConv);
+}
+
+// @brief デストラクタ
+MvnBdnConv::~MvnBdnConv()
+{
+  for (list<MvnConv*>::iterator p = mConvList.begin();
+       p != mConvList.end(); ++ p) {
+    delete *p;
+  }
+}
+
 BEGIN_NONAMESPACE
 
+// 入出力ノードを作る．
+void
+make_io(BdNetwork& bdnetwork,
+	MvnBdnMap& mvnode_map,
+	const MvNode* node,
+	ymuint src_bitpos,
+	BdnPort* bdnport,
+	ymuint dst_bitpos)
+{
+  MvNode::tType type = node->type();
+  if ( type == MvNode::kInput ) {
+    BdnNode* input = bdnetwork.new_port_input(bdnport, dst_bitpos);
+    mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
+  }
+  else if ( type == MvNode::kOutput ) {
+    BdnNode* output = bdnetwork.new_port_output(bdnport, dst_bitpos);
+    mvnode_map.put(node, src_bitpos, BdnNodeHandle(output, false));
+  }
+  else if ( type == MvNode::kInout ) {
+    BdnNode* input = bdnetwork.new_port_input(bdnport, dst_bitpos);
+    mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
+    (void) bdnetwork.new_port_output(bdnport, dst_bitpos);
+    // この出力ノードは input->alt_node() でアクセス可能
+  }
+}
+
+// 次に処理可能なノードをキューに積む．
+// 具体的には node0 のファンアウト先のノードで
+// - D-FF， ラッチ，定数，出力以外
+// - すでにキューに積まれていない(mark[node->id()] が false)
+// - 全てのファンインが処理済み
+// の条件を満たすものをキューに積む．
 void
 enqueue(const MvNode* node0,
 	list<const MvNode*>& queue,
@@ -96,45 +167,6 @@ enqueue(const MvNode* node0,
 END_NONAMESPACE
 
 
-// @brief コンストラクタ
-MvnBdnConv::MvnBdnConv()
-{
-  mConvList.push_back(new ThroughConv);
-  mConvList.push_back(new NotConv);
-  mConvList.push_back(new AndConv);
-  mConvList.push_back(new OrConv);
-  mConvList.push_back(new XorConv);
-  mConvList.push_back(new RandConv);
-  mConvList.push_back(new RorConv);
-  mConvList.push_back(new RxorConv);
-  mConvList.push_back(new CmplConv);
-  mConvList.push_back(new AddConv);
-  mConvList.push_back(new SubConv);
-  mConvList.push_back(new MultConv);
-  mConvList.push_back(new DivConv);
-  mConvList.push_back(new ModConv);
-  mConvList.push_back(new PowConv);
-  mConvList.push_back(new SllConv);
-  mConvList.push_back(new SrlConv);
-  mConvList.push_back(new SlaConv);
-  mConvList.push_back(new SraConv);
-  mConvList.push_back(new EqConv);
-  mConvList.push_back(new LtConv);
-  mConvList.push_back(new IteConv);
-  mConvList.push_back(new ConcatConv);
-  mConvList.push_back(new ConstBitSelectConv);
-  mConvList.push_back(new ConstPartSelectConv);
-}
-
-// @brief デストラクタ
-MvnBdnConv::~MvnBdnConv()
-{
-  for (list<MvnConv*>::iterator p = mConvList.begin();
-       p != mConvList.end(); ++ p) {
-    delete *p;
-  }
-}
-
 // @brief MvMgr の内容を BdNetwork に変換する．
 // @param[in] mvmgr 対象の MvNetwork
 // @param[out] bdnetwork 変換先の BdNetwork
@@ -159,33 +191,62 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 
   bdnetwork.set_name(module->name());
 
+  // 入力側から処理するためのキューと
+  // キューに積まれたことを記録するためのマーク
   vector<bool> mark(nmax, false);
   list<const MvNode*> queue;
 
-  // 外部入力を作る．
+  // ポートを生成する．
+  ymuint np = module->port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const MvPort* port = module->port(i);
+    ymuint nb = port->bit_width();
+    BdnPort* bdnport = bdnetwork.new_port(port->name(), nb);
+    vector<BdnNode*> tmp;
+    tmp.reserve(nb);
+    ymuint bitpos = 0;
+    ymuint n = port->port_ref_num();
+    for (ymuint j = 0; j < n; ++ j) {
+      const MvPortRef* port_ref = port->port_ref(j);
+      ymuint nb1 = port_ref->bit_width();
+      const MvNode* node = port_ref->node();
+      if ( port_ref->is_simple() ) {
+	for (ymuint k = 0; k < nb1; ++ k) {
+	  make_io(bdnetwork, mvnode_map, node, k, bdnport, bitpos);
+	  ++ bitpos;
+	}
+      }
+      else if ( port_ref->has_bitselect() ) {
+	make_io(bdnetwork, mvnode_map, node, port_ref->bitpos(),
+		bdnport, bitpos);
+	++ bitpos;
+      }
+      else if ( port_ref->has_partselect() ) {
+	ymuint msb = port_ref->msb();
+	ymuint lsb = port_ref->lsb();
+	for (ymuint k = lsb; k <= msb; ++ k) {
+	  make_io(bdnetwork, mvnode_map, node, k, bdnport, bitpos);
+	  ++ bitpos;
+	}
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+  }
+
+  // 外部入力ノードをキューに積む．
   ymuint ni = module->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const MvNode* node = module->input(i);
-    ymuint bw = node->output(0)->bit_width();
-    BdnPort* port = bdnetwork.new_port(string(), bw);
-    for (ymuint j = 0; j < bw; ++ j) {
-      BdnNode* bdnnode = bdnetwork.new_port_input(port, j);
-      mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
-    }
     mark[node->id()] = true;
     enqueue(node, queue, mark);
   }
 
-  // 外部入出力を作る．
+  // 外部入出力をキューに積む．
   ymuint nio = module->inout_num();
   for (ymuint i = 0; i < nio; ++ i) {
     const MvNode* node = module->inout(i);
-    ymuint bw = node->output(0)->bit_width();
-    BdnPort* port = bdnetwork.new_port(string(), bw);
-    for (ymuint j = 0; j < bw; ++ j) {
-      BdnNode* bdnnode = bdnetwork.new_port_input(port, j);
-      mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
-    }
     mark[node->id()] = true;
     enqueue(node, queue, mark);
   }
@@ -198,6 +259,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     const MvNode* node = *p;
     if ( node->type() == MvNode::kDff ) {
       // DFF
+      // TODO: 非同期セット/非同期リセットの情報を取り出し設定する．
       ymuint bw = node->output(0)->bit_width();
       vector<BdnDff*>& dff_array = dff_map[node->id()];
       dff_array.resize(bw, NULL);
@@ -212,6 +274,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     }
     else if ( node->type() == MvNode::kLatch ) {
       // LATCH
+      // TODO: 作る．
     }
     else if ( node->type() == MvNode::kConst ) {
       // 定数
@@ -247,7 +310,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     const MvNode* node = queue.front();
     queue.pop_front();
 
-    // node に対応する SbjNode を作る．
+    // node に対応する BdnNode を作る．
     bool done = false;
     for (list<MvnConv*>::iterator p = mConvList.begin();
 	 p != mConvList.end(); ++ p) {
@@ -314,68 +377,45 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     }
   }
 
-  // 外部出力ノードを作る．
+  // 外部出力ノードのファンインを接続する．
   ymuint no = module->output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const MvNode* node = module->output(i);
     const MvInputPin* ipin = node->input(0);
     const MvOutputPin* opin = ipin->src_pin();
-    assert_cond( opin != NULL, __FILE__, __LINE__);
+    if ( opin == NULL ) continue;
+
     const MvNode* src_node = opin->node();
 
     ymuint bw = ipin->bit_width();
-    BdnPort* port = bdnetwork.new_port(string(), bw);
     for (ymuint j = 0; j < bw; ++ j) {
-      BdnNodeHandle handle = mvnode_map.get(src_node, j);
-      BdnNode* onode = bdnetwork.new_port_output(port, j);
-      bdnetwork.set_output_fanin(onode, handle);
-      mvnode_map.put(node, j, BdnNodeHandle(onode, false));
+      BdnNodeHandle handle = mvnode_map.get(node, j);
+      assert_cond( handle.inv() == false, __FILE__, __LINE__);
+      BdnNode* onode = handle.node();
+      assert_cond( onode != NULL, __FILE__, __LINE__);
+      BdnNodeHandle ihandle = mvnode_map.get(src_node, j);
+      bdnetwork.set_output_fanin(onode, ihandle);
     }
   }
 
-  // ポートを生成する．
-  ymuint np = module->port_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    const MvPort* port = module->port(i);
-    ymuint nb = port->bit_width();
-    vector<BdnNode*> tmp;
-    tmp.reserve(nb);
-    ymuint n = port->port_ref_num();
-    for (ymuint j = 0; j < n; ++ j) {
-      const MvPortRef* port_ref = port->port_ref(j);
-      ymuint nb1 = port_ref->bit_width();
-      const MvNode* node = port_ref->node();
-      if ( port_ref->is_simple() ) {
-	for (ymuint k = 0; k < nb1; ++ k) {
-	  BdnNodeHandle handle = mvnode_map.get(node, k);
-	  assert_cond( handle.inv() == false, __FILE__, __LINE__);
-	  BdnNode* bdnnode = handle.node();
-	  tmp.push_back(bdnnode);
-	}
-      }
-      else if ( port_ref->has_bitselect() ) {
-	BdnNodeHandle handle = mvnode_map.get(node, port_ref->bitpos());
-	assert_cond( handle.inv() == false, __FILE__, __LINE__);
-	BdnNode* bdnnode = handle.node();
-	tmp.push_back(bdnnode);
-      }
-      else if ( port_ref->has_partselect() ) {
-	ymuint msb = port_ref->msb();
-	ymuint lsb = port_ref->lsb();
-	for (ymuint k = lsb; k <= msb; ++ k) {
-	  BdnNodeHandle handle = mvnode_map.get(node, k);
-	  assert_cond( handle.inv() == false, __FILE__, __LINE__);
-	  BdnNode* bdnnode = handle.node();
-	  tmp.push_back(bdnnode);
-	}
-      }
-      else {
-	assert_not_reached(__FILE__, __LINE__);
-      }
+  // 外部入出力ノードのファンインを接続する．
+  for (ymuint i = 0; i < nio; ++ i) {
+    const MvNode* node = module->inout(i);
+    const MvInputPin* ipin = node->input(0);
+    const MvOutputPin* opin = ipin->src_pin();
+    if ( opin == NULL ) continue;
+
+    const MvNode* src_node = opin->node();
+
+    ymuint bw = ipin->bit_width();
+    for (ymuint j = 0; j < bw; ++ j) {
+      BdnNodeHandle handle = mvnode_map.get(node, j);
+      assert_cond( handle.inv() == false, __FILE__, __LINE__);
+      BdnNode* input = handle.node();
+      assert_cond( input != NULL, __FILE__, __LINE__);
+      BdnNodeHandle ihandle = mvnode_map.get(src_node, j);
+      bdnetwork.set_output_fanin(input, ihandle);
     }
-#if 0
-    bdnetwork.add_port(port->name(), tmp);
-#endif
   }
 }
 

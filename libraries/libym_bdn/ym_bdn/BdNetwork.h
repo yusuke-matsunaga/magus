@@ -127,6 +127,10 @@ public:
   const BdnNodeList&
   output_list() const;
 
+  /// @brief 入出力ノードのリストを得る．
+  const BdnNodeList&
+  inout_list() const;
+
   /// @brief 論理ノード数を得る．
   ymuint
   lnode_num() const;

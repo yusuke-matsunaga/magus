@@ -134,6 +134,22 @@ BdnNode::port_bitpos() const
   return mAuxData->port_bitpos();
 }
 
+// @brief 入出力ノードの場合に相方のノードを返す．
+const BdnNode*
+BdnNode::alt_node() const
+{
+  const BdnPort* port = mAuxData->port();
+  if ( port ) {
+    ymuint pos = port_bitpos();
+    if ( is_input() ) {
+      return port->output(pos);
+    }
+    else {
+      return port->input(pos);
+    }
+  }
+}
+
 // @brief 関連する D-FF を返す．
 // @note D-FF に関連していない場合には NULL を返す．
 const BdnDff*

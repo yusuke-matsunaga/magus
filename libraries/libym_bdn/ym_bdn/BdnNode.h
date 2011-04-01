@@ -124,6 +124,8 @@ private:
 /// - ラッチのデータ入力
 /// - ラッチのイネーブル信号
 ///
+/// 入出力ノードは入力ノードと出力ノードの対で表す．
+///
 /// 全てのノードはID番号をもつ．
 /// 論理ノードは2つのファンインと機能コードを持つ．
 /// 外部出力以外のノードは複数のファンアウトを持つ．
@@ -138,31 +140,35 @@ class BdnNode :
 public:
 
   /// @brief ノードの型
+  /// @note ビットの意味は以下の通り
+  /// - 0〜2 : 細分化
+  /// - 3    : 入力
+  /// - 4    : 出力
   enum tType {
+    /// @brief 論理ノード
+    kLOGIC        = 0,
+
     /// @brief 外部入力ノード
-    kINPUT        = 0,
+    kINPUT        = 8,
     /// @brief D-FF の出力ノード
-    kDFF_OUTPUT   = 1,
+    kDFF_OUTPUT   = 9,
     /// @brief ラッチの出力ノード
-    kLATCH_OUTPUT = 2,
+    kLATCH_OUTPUT = 10,
 
     /// @brief 外部出力ノード
-    kOUTPUT       = 8,
+    kOUTPUT       = 16,
     /// @brief D-FF の入力ノード
-    kDFF_INPUT    = 9,
+    kDFF_INPUT    = 17,
     /// @brief D-FF のクロックノード
-    kDFF_CLOCK    = 10,
+    kDFF_CLOCK    = 18,
     /// @brief D-FF のセットノード
-    kDFF_SET      = 11,
+    kDFF_SET      = 19,
     /// @brief D-FF のリセットノード
-    kDFF_RESET    = 12,
+    kDFF_RESET    = 20,
     /// @brief ラッチの入力ノード
-    kLATCH_INPUT  = 14,
+    kLATCH_INPUT  = 21,
     /// @brief ラッチのイネーブルノード
-    kLATCH_ENABLE = 15,
-
-    /// @brief 論理ノード
-    kLOGIC        = 4
+    kLATCH_ENABLE = 22
   };
 
 
@@ -234,16 +240,20 @@ public:
   /// @{
 
   /// @brief 関連するポートを返す．
-  /// @note kINPUT および kOUTPUT の時に意味を持つ．
+  /// @note kINPUT および kOUTPUT, kINOUT の時に意味を持つ．
   /// @note それ以外では NULL を返す．
   const BdnPort*
   port() const;
 
   /// @brief ポート中の位置を返す．
-  /// @note kINPUT および kOUTPUT の時に意味を持つ．
+  /// @note kINPUT および kOUTPUT, KINOUT の時に意味を持つ．
   /// @note それ以外では 0 を返す．
   ymuint
   port_bitpos() const;
+
+  /// @brief 入出力ノードの場合に相方のノードを返す．
+  const BdnNode*
+  alt_node() const;
 
   /// @brief 関連する D-FF を返す．
   /// @note D-FF に関連していない場合には NULL を返す．
@@ -365,9 +375,9 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // 入力ノード: タイプ(4bit) + POマーク(1bit)
-  // 出力ノード:     〃       + 出力極性(1bit)
-  // 論理ノード:     〃       + POマーク(1bit) + 機能コード(4bit)
+  // 入力ノード  : タイプ(5bit) + POマーク(1bit)
+  // 出力ノード  :     〃       + 出力極性(1bit)
+  // 論理ノード  :     〃       + POマーク(1bit) + 機能コード(4bit)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
@@ -395,11 +405,11 @@ private:
   static
   const int kTypeShift = 0;
   static
-  const int kPoShift = 4;
+  const int kPoShift = 5;
   static
-  const int kInvShift = 4;
+  const int kInvShift = 5;
   static
-  const int kFcodeShift = 5;
+  const int kFcodeShift = 6;
 
   static
   const ymuint32 kPoMask = 1U << kPoShift;
@@ -514,7 +524,7 @@ inline
 BdnNode::tType
 BdnNode::type() const
 {
-  return static_cast<tType>(mFlags & 15U);
+  return static_cast<tType>(mFlags & 31U);
 }
 
 // 入力ノードの時に true を返す．
@@ -523,7 +533,7 @@ bool
 BdnNode::is_input() const
 {
   // ちょっとトリッキー
-  return (mFlags & 15U) < 4;
+  return static_cast<bool>((mFlags >> 3) & 1U);
 }
 
 // 出力ノードの時に true を返す．
@@ -532,7 +542,7 @@ bool
 BdnNode::is_output() const
 {
   // ちょっとトリッキー
-  return static_cast<bool>((mFlags >> 3) & 1U);
+  return static_cast<bool>((mFlags >> 4) & 1U);
 }
 
 // 論理ノードの時に true を返す．
