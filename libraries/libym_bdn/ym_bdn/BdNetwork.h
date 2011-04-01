@@ -195,6 +195,13 @@ public:
   new_port_input(BdnPort* port,
 		 ymuint bitpos);
 
+  /// @brief 外部入力とポートを同時に作る．
+  /// @param[in] port_name ポート名
+  /// @return 作成したノードを返す．
+  /// @note ポートのビット幅は1ビットとなる．
+  BdnNode*
+  new_port_input(const string& port_name);
+
   /// @brief 外部出力ノードを作る．
   /// @param[in] port ポート
   /// @param[in] bitpos ビット位置
@@ -205,6 +212,13 @@ public:
   BdnNode*
   new_port_output(BdnPort* port,
 		  ymuint bitpos);
+
+  /// @brief 外部出力ノードとポートを同時にを作る．
+  /// @param[in] port_name ポート名
+  /// @return 作成したノードを返す．
+  /// @note ポートのビット幅は1ビットとなる．
+  BdnNode*
+  new_port_output(const string& port_name);
 
   /// @brief 出力ノードのファンインを変更する
   /// @param[in] node 変更対象の出力ノード

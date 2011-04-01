@@ -530,6 +530,17 @@ BdNetwork::new_port_input(BdnPort* port,
   return node;
 }
 
+// @brief 外部入力とポートを同時に作る．
+// @param[in] port_name ポート名
+// @return 作成したノードを返す．
+// @note ポートのビット幅は1ビットとなる．
+BdnNode*
+BdNetwork::new_port_input(const string& port_name)
+{
+  BdnPort* port = new_port(port_name, 1);
+  return new_port_input(port, 0);
+}
+
 // @brief 外部出力ノードを作る．
 // @param[in] port ポート
 // @param[in] bitpos ビット位置
@@ -552,6 +563,17 @@ BdNetwork::new_port_output(BdnPort* port,
   mOutputList.push_back(node);
 
   return node;
+}
+
+// @brief 外部出力ノードとポートを同時にを作る．
+// @param[in] port_name ポート名
+// @return 作成したノードを返す．
+// @note ポートのビット幅は1ビットとなる．
+BdnNode*
+BdNetwork::new_port_output(const string& port_name)
+{
+  BdnPort* port = new_port(port_name, 1);
+  return new_port_output(port, 0);
 }
 
 // @brief 出力ノードの内容を変更する

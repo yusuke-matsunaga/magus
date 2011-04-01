@@ -33,30 +33,35 @@ public:
   /// @brief デストラクタ
   ~BlifBdnConv();
 
-  
+
 public:
-  
+
   /// @brief 変換する
   /// @param[in] blif_network 変換元のネットワーク
   /// @param[in] network 変換先のネットワーク
+  /// @param[in] clock_name クロック信号のポート名
+  /// @param[in] reset_name リセット信号のポート名
+  /// @note clock_name と reset_name はオプション
   bool
   operator()(const BlifNetwork& blif_network,
-	     BdNetwork& network);
+	     BdNetwork& network,
+	     const string& clock_name = "clock",
+	     const string& reset_name = "reset");
 
-  
+
 private:
-  
+
   /// @brief blif_node に対応した BdnNode を生成する．
   BdnNodeHandle
   make_node(const BlifNode* blif_node);
-  
+
   /// @brief 2分木を生成する．
   BdnNodeHandle
   bidecomp(ymuint32 fcode,
 	   ymuint32 start,
 	   ymuint32 size,
 	   const vector<BdnNodeHandle>& child_array);
-  
+
   /// @brief blif_node に対応した BdnNode を取り出す．
   bool
   get_node(const BlifNode* blif_node,
@@ -75,14 +80,14 @@ private:
 
   // 変換先のネットワーク
   BdNetwork* mNetwork;
-  
+
   // BlifNode の ID をキーとして対応する BdnNodeHandle を収める配列
   vector<BdnNodeHandle> mNodeMap;
 
   // BlifNode の ID をキーとして対応する BdnNodeHandle が登録されて
   // いるかどうかを記録する配列
   vector<bool> mNodeFlag;
-  
+
 };
 
 END_NAMESPACE_YM_BDN

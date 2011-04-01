@@ -32,9 +32,13 @@ BlifBdnConv::~BlifBdnConv()
 // @brief 変換する
 // @param[in] blif_network 変換元のネットワーク
 // @param[in] network 変換先のネットワーク
+// @param[in] clock_name クロック信号のポート名
+// @param[in] reset_name リセット信号のポート名
 bool
 BlifBdnConv::operator()(const BlifNetwork& blif_network,
-			BdNetwork& network)
+			BdNetwork& network,
+			const string& clock_name,
+			const string& reset_name)
 {
   mNetwork = &network;
   ymuint n = blif_network.max_node_id();
@@ -48,54 +52,85 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
   ymuint npi = blif_network.npi();
   for (ymuint i = 0; i < npi; ++ i) {
     const BlifNode* blif_node = blif_network.pi(i);
-    BdnPort* port = mNetwork->new_port(blif_node->name(), 1);
-    BdnNode* node = mNetwork->new_port_input(port, 0);
+    BdnNode* node = mNetwork->new_port_input(blif_node->name());
     put_node(blif_node, BdnNodeHandle(node, false));
   }
 
-  // D-FFの出力(擬似入力)ノードの生成
+  // D-FFの生成
   ymuint nff = blif_network.nff();
   vector<BdnDff*> dff_array(nff);
+  BdnNodeHandle clock_h;
+  BdnNodeHandle reset_h;
+  if ( nff > 0 ) {
+    // クロック用の外部入力の生成
+    BdnNode* clock = mNetwork->new_port_input(clock_name);
+    clock_h = BdnNodeHandle(clock, false);
+
+    // リセット用の外部入力の生成
+    bool need_reset = false;
+    for (ymuint i = 0; i < nff; ++ i) {
+      const BlifNode* blif_node = blif_network.ff(i);
+      int opat = blif_node->opat();
+      if ( opat == '0' || opat == '1' ) {
+	need_reset = true;
+	break;
+      }
+    }
+    if ( need_reset ) {
+      BdnNode* reset = mNetwork->new_port_input(reset_name);
+      reset_h = BdnNodeHandle(reset, false);
+    }
+  }
   for (ymuint i = 0; i < nff; ++ i) {
     const BlifNode* blif_node = blif_network.ff(i);
-    int reset_val = 2;
+    bool has_set = false;
+    bool has_reset = false;
     if ( blif_node->opat() == '0' ) {
-      reset_val = 0;
+      has_reset = true;
     }
     else if ( blif_node->opat() == '1' ) {
-      reset_val = 1;
+      has_set = true;
     }
-    // 今はリセット値は無視
-    BdnDff* dff = mNetwork->new_dff(blif_node->name());
+
+    // D-FF の生成
+    BdnDff* dff = mNetwork->new_dff(blif_node->name(), has_set, has_reset);
+    dff_array[i] = dff;
+
+    // D-FF の出力の登録
     BdnNode* node = dff->output();
     put_node(blif_node, BdnNodeHandle(node, false));
-    dff_array[i] = dff;
+
+    // クロック信号の設定
+    BdnNode* dff_clock = dff->clock();
+    mNetwork->set_output_fanin(dff_clock, clock_h);
+
+    // リセット(もしくはセット)信号の設定
+    if ( has_reset ) {
+      BdnNode* dff_reset = dff->reset();
+      mNetwork->set_output_fanin(dff_reset, reset_h);
+    }
+    else if ( has_set ) {
+      BdnNode* dff_set = dff->set();
+      mNetwork->set_output_fanin(dff_set, reset_h);
+    }
   }
 
   // 外部出力に用いられているノードを再帰的に生成
   ymuint npo = blif_network.npo();
   for (ymuint i = 0; i < npo; ++ i) {
     const BlifNode* blif_node = blif_network.po(i);
-    BdnPort* port = mNetwork->new_port(blif_node->name(), 1);
-    BdnNode* node = mNetwork->new_port_output(port, 0);
+    BdnNode* node = mNetwork->new_port_output(blif_node->name());
     BdnNodeHandle inode_h = make_node(blif_node);
     mNetwork->set_output_fanin(node, inode_h);
   }
 
   // D-FFに用いられているノードを再帰的に生成
-  if ( nff > 0 ) {
-    BdnPort* clock_port = mNetwork->new_port("clock", 1);
-    BdnNode* clock = mNetwork->new_port_input(clock_port, 0);
-    BdnNodeHandle clock_h(clock, false);
-    for (ymuint i = 0; i < nff; ++ i) {
-      const BlifNode* blif_node = blif_network.ff(i);
-      BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
-      BdnDff* dff = dff_array[i];
-      BdnNode* dff_input = dff->input();
-      mNetwork->set_output_fanin(dff_input, inode_h);
-      BdnNode* dff_clock = dff->clock();
-      mNetwork->set_output_fanin(dff_clock, clock_h);
-    }
+  for (ymuint i = 0; i < nff; ++ i) {
+    const BlifNode* blif_node = blif_network.ff(i);
+    BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
+    BdnDff* dff = dff_array[i];
+    BdnNode* dff_input = dff->input();
+    mNetwork->set_output_fanin(dff_input, inode_h);
   }
 
   return true;
