@@ -696,10 +696,10 @@ BdNetwork::make_tree(ymuint fcode,
     assert_not_reached(__FILE__, __LINE__);
 
   case 1:
-    return node_list[0];
+    return node_list[start];
 
   case 2:
-    return new_logic(fcode, node_list[0], node_list[1]);
+    return new_logic(fcode, node_list[start], node_list[start + 1]);
 
   default:
     break;
