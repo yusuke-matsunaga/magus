@@ -309,6 +309,37 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   MvModule* module = mMvMgr->new_module(vl_module->name(), np,
 					ibw_array, obw_array, iobw_array);
 
+  // 入出力ノードの対応表を作る．
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  ymuint i3 = 0;
+  for (ymuint i = 0; i < nio_all; ++ i) {
+    const VlIODecl* io = vl_module->io(i);
+    const VlDecl* decl = io->decl();
+    MvNode* node = NULL;
+    switch ( io->direction() ) {
+    case kVpiInput:
+      node = module->input(i1);
+      ++ i1;
+      break;
+
+    case kVpiOutput:
+      node = module->output(i2);
+      ++ i2;
+      break;
+
+    case kVpiInout:
+      node = module->inout(i3);
+      ++ i3;
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+    reg_ionode(decl, node);
+  }
+
   // 宣言要素を生成する．
   bool stat = gen_decl(module, vl_module);
   if ( !stat ) {
@@ -319,39 +350,6 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   stat = gen_item(module, vl_module);
   if ( !stat ) {
     return NULL;
-  }
-
-  // 入出力ノードの対応表を作る．
-  ymuint i1 = 0;
-  ymuint i2 = 0;
-  ymuint i3 = 0;
-  for (ymuint i = 0; i < nio_all; ++ i) {
-    const VlIODecl* io = vl_module->io(i);
-    const VlDecl* decl = io->decl();
-    MvNode* node = mGlobalEnv.get(decl);
-    assert_cond( node != NULL, __FILE__, __LINE__);
-    switch ( io->direction() ) {
-    case kVpiInput:
-      mMvMgr->connect(module->input(i1), 0, node, 0);
-      reg_ionode(decl, module->input(i1));
-      ++ i1;
-      break;
-
-    case kVpiOutput:
-      mMvMgr->connect(node, 0, module->output(i2), 0);
-      reg_ionode(decl, module->output(i2));
-      ++ i2;
-      break;
-
-    case kVpiInout:
-      mMvMgr->connect(module->inout(i3), 0, node, 0);
-      reg_ionode(decl, module->inout(i3));
-      ++ i3;
-      break;
-
-    default:
-      break;
-    }
   }
 
   // ポートの接続を行う．
@@ -429,10 +427,13 @@ ReaderImpl::gen_decl(MvModule* module,
       for (vector<const VlDecl*>::iterator p = net_list.begin();
 	   p != net_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
-	// 仮の through ノードに対応させる．
-	ymuint bw = vl_decl->bit_size();
-	MvNode* node = mMvMgr->new_through(module, bw);
-	reg_node(vl_decl, node);
+	// IO に接続している要素は生成済みなので除外する．
+	if ( mGlobalEnv.get(vl_decl) == NULL ) {
+	  // 仮の through ノードに対応させる．
+	  ymuint bw = vl_decl->bit_size();
+	  MvNode* node = mMvMgr->new_through(module, bw);
+	  reg_node(vl_decl, node);
+	}
       }
     }
   }
@@ -462,11 +463,14 @@ ReaderImpl::gen_decl(MvModule* module,
       for (vector<const VlDecl*>::iterator p = reg_list.begin();
 	   p != reg_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
-	// 仮の through ノードに対応させる．
-	ymuint bw = vl_decl->bit_size();
-	MvNode* node = mMvMgr->new_through(module, bw);
-	reg_node(vl_decl, node);
-	(void) mDeclHash.get_id(vl_decl);
+	// IO に接続している要素は生成済みなので除外する．
+	if ( mGlobalEnv.get(vl_decl) == NULL ) {
+	  // 仮の through ノードに対応させる．
+	  ymuint bw = vl_decl->bit_size();
+	  MvNode* node = mMvMgr->new_through(module, bw);
+	  reg_node(vl_decl, node);
+	  (void) mDeclHash.get_id(vl_decl);
+	}
       }
     }
   }
@@ -638,6 +642,7 @@ ReaderImpl::reg_ionode(const VlDecl* decl,
 		       MvNode* node)
 {
   mIODeclMap.add(decl, node);
+  mGlobalEnv.add(decl, node);
   mNodeMap.reg_node(node->id(), decl);
 }
 

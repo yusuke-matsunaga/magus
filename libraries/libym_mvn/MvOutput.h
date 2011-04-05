@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "MvUnaryOp.h"
+#include "ym_mvn/MvNode.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_MVN
 /// @brief 出力ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
 class MvOutput :
-  public MvUnaryOp
+  public MvNode
 {
   friend class MvMgr;
 

@@ -94,6 +94,22 @@ dump_node(ostream& s,
     }
     break;
 
+  case MvNode::kInout:
+    {
+      ymuint ni = node->input_num();
+      assert_cond( ni == 1, __FILE__, __LINE__);
+      ymuint no = node->output_num();
+      assert_cond( no == 1, __FILE__, __LINE__);
+
+      const MvInputPin* ipin = node->input(0);
+      const MvOutputPin* src_pin = ipin->src_pin();
+      const MvNode* src_node = src_pin->node();
+      s << "  assign " << node_name(node)
+	<< " = " << node_name(src_node)
+	<< ";" << endl;
+    }
+    break;
+
   case MvNode::kDff:
     { // ピン位置と属性は決め打ち
       ymuint ni = node->input_num();
@@ -819,6 +835,20 @@ dump_module(ostream& s,
     }
     s << node_name(node) << ";" << endl;
   }
+
+  ymuint nio = module->inout_num();
+  for (ymuint i = 0; i < nio; ++ i) {
+    const MvNode* node = module->inout(i);
+    ymuint bw = node->input(0)->bit_width();
+    assert_cond( bw > 0, __FILE__, __LINE__);
+    if ( bw == 1 ) {
+      s << "  inout ";
+    }
+    else {
+      s << "  inout [" << bw - 1 << ":0] ";
+    }
+    s << node_name(node) << ";" << endl;
+  }
   s << endl;
 
   const list<MvNode*>& node_list = module->node_list();
@@ -844,14 +874,17 @@ dump_module(ostream& s,
   }
   s << endl;
 
+  for (ymuint i = 0; i < ni; ++ i) {
+    const MvNode* node = module->input(i);
+    dump_node(s, node);
+  }
   for (ymuint i = 0; i < no; ++ i) {
     const MvNode* node = module->output(i);
-    const MvInputPin* ipin = node->input(0);
-    const MvOutputPin* src_pin = ipin->src_pin();
-    const MvNode* src_node = src_pin->node();
-    s << "  assign " << node_name(node)
-      << " = " << node_name(src_node)
-      << ";" << endl;
+    dump_node(s, node);
+  }
+  for (ymuint i = 0; i < nio; ++ i) {
+    const MvNode* node = module->inout(i);
+    dump_node(s, node);
   }
   for (list<MvNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {

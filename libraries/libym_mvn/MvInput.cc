@@ -17,8 +17,9 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] bit_width ビット幅
 MvInput::MvInput(MvModule* module,
 		 ymuint bit_width) :
-  MvUnaryOp(module, bit_width, bit_width)
+  MvNode(module, 0, 1)
 {
+  set_opin_bit_width(0, bit_width);
 }
 
 // @brief デストラクタ
