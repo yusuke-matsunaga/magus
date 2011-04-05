@@ -133,7 +133,8 @@ enqueue(const MvNode* node0,
     if ( node->type() == MvNode::kDff ||
 	 node->type() == MvNode::kLatch ||
 	 node->type() == MvNode::kConst ||
-	 node->type() == MvNode::kOutput ) {
+	 node->type() == MvNode::kOutput ||
+	 node->type() == MvNode::kInout ) {
       continue;
     }
     if ( mark[node->id()] ) {
