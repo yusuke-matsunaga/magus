@@ -17,9 +17,10 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] bit_width ビット幅
 MvOutput::MvOutput(MvModule* module,
 		   ymuint bit_width) :
-  MvNode(module, 1, 0)
+  MvNode(module, 1, 1)
 {
   set_ipin_bit_width(0, bit_width);
+  set_opin_bit_width(0, bit_width);
 }
 
 // @brief デストラクタ

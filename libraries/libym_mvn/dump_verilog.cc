@@ -82,8 +82,6 @@ dump_node(ostream& s,
     {
       ymuint ni = node->input_num();
       assert_cond( ni == 1, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 0, __FILE__, __LINE__);
 
       const MvInputPin* ipin = node->input(0);
       const MvOutputPin* src_pin = ipin->src_pin();
