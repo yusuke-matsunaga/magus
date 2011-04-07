@@ -119,6 +119,7 @@ LIBRARIES=\
  libym_bdd \
  libym_npn \
  libym_sat \
+ libym_smtlibv2 \
  libym_mincov \
  libym_blif \
  libym_iscas89 \

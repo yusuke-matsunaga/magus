@@ -68,6 +68,7 @@ ym_libym_lexp_enable=1
 ym_libym_bdd_enable=1
 ym_libym_npn_enable=1
 ym_libym_sat_enable=1
+ym_libym_smtlibv2_enable=1
 ym_libym_blif_enable=1
 ym_libym_iscas89_enable=1
 ym_libym_cell_enable=1
@@ -113,6 +114,11 @@ YM_BUILD_LIBRARY([libym_npn],
 # libym_sat
 YM_BUILD_LIBRARY([libym_sat],
 		 [ym_libym_utils_enable])
+
+# libym_smtlibv2
+YM_BUILD_LIBRARY([libym_smtlibv2],
+		 [ym_libym_utils_enable,
+		  ym_libym_sat_enable])
 
 # libym_mincov
 YM_BUILD_LIBRARY([libym_mincov],
