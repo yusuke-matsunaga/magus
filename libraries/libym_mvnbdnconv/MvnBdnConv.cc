@@ -12,6 +12,7 @@
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNodeHandle.h"
 #include "ym_bdn/BdnDff.h"
+#include "ym_bdn/BdnLatch.h"
 #include "ym_mvn/MvMgr.h"
 #include "ym_mvn/MvModule.h"
 #include "ym_mvn/MvPort.h"
@@ -255,6 +256,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   // DFF と定数ノードを作る．
   const list<MvNode*>& node_list = module->node_list();
   vector<vector<BdnDff*> > dff_map(nmax);
+  vector<vector<BdnLatch*> > latch_map(nmax);
   for (list<MvNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const MvNode* node = *p;
@@ -275,7 +277,17 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     }
     else if ( node->type() == MvNode::kLatch ) {
       // LATCH
-      // TODO: 作る．
+      ymuint bw = node->output(0)->bit_width();
+      vector<BdnLatch*>& latch_array = latch_map[node->id()];
+      latch_array.resize(bw, NULL);
+      for (ymuint j = 0; j < bw; ++ j) {
+	BdnLatch* latch = bdnetwork.new_latch();
+	latch_array[j] = latch;
+	BdnNode* bdnnode = latch->output();
+	mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
+      }
+      mark[node->id()] = true;
+      enqueue(node, queue, mark);
     }
     else if ( node->type() == MvNode::kConst ) {
       // 定数
@@ -327,7 +339,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     enqueue(node, queue, mark);
   }
 
-  // DFFノードの入力を接続する．
+  // DFFノードとラッチノードの入力を接続する．
   for (ymuint i = 0; i < nmax; ++ i) {
     const MvNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
@@ -368,12 +380,36 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 	set_ihandle = mvnode_map.get(src_node);
       }
 #endif
-      vector<BdnDff*>& dff_array = dff_map[node->id()];
+      const vector<BdnDff*>& dff_array = dff_map[node->id()];
       for (ymuint j = 0; j < bw; ++ j) {
 	BdnDff* dff = dff_array[j];
 	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
 	bdnetwork.set_output_fanin(dff->input(), data_ihandle);
 	bdnetwork.set_output_fanin(dff->clock(), clock_ihandle);
+      }
+    }
+    else if ( node->type() == MvNode::kLatch ) {
+      // データ入力
+      const MvInputPin* data_ipin = node->input(0);
+      const MvOutputPin* data_opin = data_ipin->src_pin();
+      assert_cond( data_opin != NULL, __FILE__, __LINE__);
+      const MvNode* data_src_node = data_opin->node();
+      ymuint bw = data_ipin->bit_width();
+
+      // イネーブル
+      const MvInputPin* enable_ipin = node->input(1);
+      const MvOutputPin* enable_opin = enable_ipin->src_pin();
+      assert_cond( enable_opin != NULL, __FILE__, __LINE__);
+      assert_cond( enable_opin->bit_width() == 1, __FILE__, __LINE__);
+      const MvNode* enable_src_node = enable_opin->node();
+      BdnNodeHandle enable_ihandle = mvnode_map.get(enable_src_node);
+
+      const vector<BdnLatch*>& latch_array = latch_map[node->id()];
+      for (ymuint j = 0; j < bw; ++ j) {
+	BdnLatch* latch = latch_array[j];
+	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
+	bdnetwork.set_output_fanin(latch->input(), data_ihandle);
+	bdnetwork.set_output_fanin(latch->enable(), enable_ihandle);
       }
     }
   }
