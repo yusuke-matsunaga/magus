@@ -8,7 +8,8 @@
 
 
 #include "DeclHash.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/mvn_nsdef.h"
+//#include "ym_mvn/MvnNode.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
 

@@ -18,14 +18,14 @@ BEGIN_NAMESPACE_YM_MVNBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnBdnMap MvnBdnMap.h "MvnBdnMap.h"
-/// @brief MvNode と BdNode の対応を記録するクラス
+/// @brief MvnNode と BdNode の対応を記録するクラス
 //////////////////////////////////////////////////////////////////////
 class MvnBdnMap
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] n MvNode の ID の最大値
+  /// @param[in] n MvnNode の ID の最大値
   MvnBdnMap(ymuint n);
 
   /// @brief デストラクタ
@@ -35,33 +35,33 @@ public:
 public:
 
   /// @brief 登録する．(1ビット版)
-  /// @param[in] mvnode MvNode
+  /// @param[in] mvnode MvnNode
   /// @param[in] handle BdnNodeHandle
   void
-  put(const MvNode* mvnode,
+  put(const MvnNode* mvnode,
       BdnNodeHandle handle);
 
   /// @brief 登録する．(ベクタ版)
-  /// @param[in] mvnode MvNode
+  /// @param[in] mvnode MvnNode
   /// @param[in] index ビット位置
   /// @param[in] handle BdnNodeHandle
   void
-  put(const MvNode* mvnode,
+  put(const MvnNode* mvnode,
       ymuint index,
       BdnNodeHandle handle);
 
   /// @brief 探す．(1ビット版)
-  /// @param[in] mvnode MvNode
+  /// @param[in] mvnode MvnNode
   /// @return 対応するハンドルを返す．
   BdnNodeHandle
-  get(const MvNode* mvnode) const;
+  get(const MvnNode* mvnode) const;
 
   /// @brief 探す．(ベクタ版)
-  /// @param[in] mvnode MvNode
+  /// @param[in] mvnode MvnNode
   /// @param[in] index ビット位置
   /// @return 対応するハンドルを返す．
   BdnNodeHandle
-  get(const MvNode* mvnode,
+  get(const MvnNode* mvnode,
       ymuint index) const;
 
 
@@ -75,11 +75,11 @@ private:
 };
 
 
-/// @relates MvnBdnMap, MvMgr
+/// @relates MvnBdnMap, MvnMgr
 /// @brief MvnBdnMap の内容を出力する．
 void
 dump_mvnode_map(ostream& s,
-		const MvMgr& mvmgr,
+		const MvnMgr& mvmgr,
 		const MvnBdnMap& mvnode_map);
 
 END_NAMESPACE_YM_MVNBDNCONV

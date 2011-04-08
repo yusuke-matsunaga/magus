@@ -10,9 +10,9 @@
 
 
 #include "MvnReadVerilog.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvVerilogReader.h"
-#include "ym_mvn/MvVlMap.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnVerilogReader.h"
+#include "ym_mvn/MvnVlMap.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -37,7 +37,7 @@ MvnReadVerilog::~MvnReadVerilog()
 int
 MvnReadVerilog::cmd_proc(TclObjVector& objv)
 {
-  MvVerilogReader reader;
+  MvnVerilogReader reader;
   MsgHandler* mh = new StreamMsgHandler(&cerr);
   mh->set_mask(MsgHandler::kMaskAll);
   mh->delete_mask(kMsgInfo);
@@ -67,7 +67,7 @@ MvnReadVerilog::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  MvVlMap node_map;
+  MvnVlMap node_map;
   bool stat = reader.gen_network(*neth->_mvn(), node_map);
   if ( !stat ) {
     TclObj emsg;

@@ -28,7 +28,7 @@ struct AsyncControl
   AsyncControl(const Env& global_env);
 
   // コントロール信号
-  MvNode* mNode;
+  MvnNode* mNode;
 
   // 極性 ( 1 が正極性, 0 が負極性 )
   ymuint32 mPol;

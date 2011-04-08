@@ -8,7 +8,7 @@
 
 
 #include "AndConv.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/MvnNode.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNodeHandle.h"
@@ -26,18 +26,18 @@ AndConv::~AndConv()
 {
 }
 
-// @brief MvNode を BdNetwork に変換する．
+// @brief MvnNode を BdNetwork に変換する．
 // @param[in] node ノード
 // @param[in] bdnetwork 変換結果の BdNetwork
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-AndConv::operator()(const MvNode* node,
+AndConv::operator()(const MvnNode* node,
 		    BdNetwork& bdnetwork,
 		    MvnBdnMap& nodemap)
 {
-  if ( node->type() == MvNode::kAnd ) {
+  if ( node->type() == MvnNode::kAnd ) {
     ymuint ni = node->input_num();
     assert_cond( ni >= 2, __FILE__, __LINE__);
     ymuint no = node->output_num();
@@ -49,9 +49,9 @@ AndConv::operator()(const MvNode* node,
       input_list_array[b].resize(ni);
     }
     for (ymuint i = 0; i < ni; ++ i) {
-      const MvInputPin* ipin = node->input(i);
-      const MvOutputPin* src_pin = ipin->src_pin();
-      const MvNode* src_node = src_pin->node();
+      const MvnInputPin* ipin = node->input(i);
+      const MvnOutputPin* src_pin = ipin->src_pin();
+      const MvnNode* src_node = src_pin->node();
       assert_cond( src_pin->bit_width() == bw, __FILE__, __LINE__);
       for (ymuint b = 0; b < bw; ++ b) {
 	input_list_array[b][i] = nodemap.get(src_node, b);

@@ -13,11 +13,11 @@
 #include "ym_bdn/BdnNodeHandle.h"
 #include "ym_bdn/BdnDff.h"
 #include "ym_bdn/BdnLatch.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvModule.h"
-#include "ym_mvn/MvPort.h"
-#include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvPin.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnModule.h"
+#include "ym_mvn/MvnPort.h"
+#include "ym_mvn/MvnNode.h"
+#include "ym_mvn/MvnPin.h"
 
 #include "ThroughConv.h"
 #include "NotConv.h"
@@ -93,21 +93,21 @@ BEGIN_NONAMESPACE
 void
 make_io(BdNetwork& bdnetwork,
 	MvnBdnMap& mvnode_map,
-	const MvNode* node,
+	const MvnNode* node,
 	ymuint src_bitpos,
 	BdnPort* bdnport,
 	ymuint dst_bitpos)
 {
-  MvNode::tType type = node->type();
-  if ( type == MvNode::kInput ) {
+  MvnNode::tType type = node->type();
+  if ( type == MvnNode::kInput ) {
     BdnNode* input = bdnetwork.new_port_input(bdnport, dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
   }
-  else if ( type == MvNode::kOutput ) {
+  else if ( type == MvnNode::kOutput ) {
     BdnNode* output = bdnetwork.new_port_output(bdnport, dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(output, false));
   }
-  else if ( type == MvNode::kInout ) {
+  else if ( type == MvnNode::kInout ) {
     BdnNode* input = bdnetwork.new_port_input(bdnport, dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
     (void) bdnetwork.new_port_output(bdnport, dst_bitpos);
@@ -122,20 +122,20 @@ make_io(BdNetwork& bdnetwork,
 // - 全てのファンインが処理済み
 // の条件を満たすものをキューに積む．
 void
-enqueue(const MvNode* node0,
-	list<const MvNode*>& queue,
+enqueue(const MvnNode* node0,
+	list<const MvnNode*>& queue,
 	vector<bool>& mark)
 {
-  const MvInputPinList& folist = node0->output(0)->dst_pin_list();
-  for (MvInputPinList::const_iterator p = folist.begin();
+  const MvnInputPinList& folist = node0->output(0)->dst_pin_list();
+  for (MvnInputPinList::const_iterator p = folist.begin();
        p != folist.end(); ++ p) {
-    const MvInputPin* dst_pin = *p;
-    const MvNode* node = dst_pin->node();
-    if ( node->type() == MvNode::kDff ||
-	 node->type() == MvNode::kLatch ||
-	 node->type() == MvNode::kConst ||
-	 node->type() == MvNode::kOutput ||
-	 node->type() == MvNode::kInout ) {
+    const MvnInputPin* dst_pin = *p;
+    const MvnNode* node = dst_pin->node();
+    if ( node->type() == MvnNode::kDff ||
+	 node->type() == MvnNode::kLatch ||
+	 node->type() == MvnNode::kConst ||
+	 node->type() == MvnNode::kOutput ||
+	 node->type() == MvnNode::kInout ) {
       continue;
     }
     if ( mark[node->id()] ) {
@@ -143,16 +143,16 @@ enqueue(const MvNode* node0,
     }
     ymuint ni = node->input_num();
     bool marked = true;
-    const MvNode* unmark = NULL;
+    const MvnNode* unmark = NULL;
     for (ymuint i = 0; i < ni; ++ i) {
-      const MvInputPin* ipin = node->input(i);
-      const MvOutputPin* opin = ipin->src_pin();
+      const MvnInputPin* ipin = node->input(i);
+      const MvnOutputPin* opin = ipin->src_pin();
       if ( opin == NULL ) {
 	cerr << "node" << node->id() << "->input(" << i
 	     << ") has no source" << endl;
 	abort();
       }
-      const MvNode* inode = opin->node();
+      const MvnNode* inode = opin->node();
       if ( !mark[inode->id()] ) {
 	marked = false;
 	unmark = inode;
@@ -169,18 +169,18 @@ enqueue(const MvNode* node0,
 END_NONAMESPACE
 
 
-// @brief MvMgr の内容を BdNetwork に変換する．
-// @param[in] mvmgr 対象の MvNetwork
+// @brief MvnMgr の内容を BdNetwork に変換する．
+// @param[in] mvmgr 対象の MvnNetwork
 // @param[out] bdnetwork 変換先の BdNetwork
 // @param[out] mvnode_map 対応関係を格納するオブジェクト
 void
-MvnBdnConv::operator()(const MvMgr& mvmgr,
+MvnBdnConv::operator()(const MvnMgr& mvmgr,
 		       BdNetwork& bdnetwork,
 		       MvnBdnMap& mvnode_map)
 {
   bdnetwork.clear();
 
-  list<const MvModule*> module_list;
+  list<const MvnModule*> module_list;
   ymuint n = mvmgr.topmodule_list(module_list);
   if ( n != 1 ) {
     cerr << "# of topmodules is not 1" << endl;
@@ -189,19 +189,19 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 
   ymuint nmax = mvmgr.max_node_id();
 
-  const MvModule* module = module_list.front();
+  const MvnModule* module = module_list.front();
 
   bdnetwork.set_name(module->name());
 
   // 入力側から処理するためのキューと
   // キューに積まれたことを記録するためのマーク
   vector<bool> mark(nmax, false);
-  list<const MvNode*> queue;
+  list<const MvnNode*> queue;
 
   // ポートを生成する．
   ymuint np = module->port_num();
   for (ymuint i = 0; i < np; ++ i) {
-    const MvPort* port = module->port(i);
+    const MvnPort* port = module->port(i);
     ymuint nb = port->bit_width();
     BdnPort* bdnport = bdnetwork.new_port(port->name(), nb);
     vector<BdnNode*> tmp;
@@ -209,9 +209,9 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     ymuint bitpos = 0;
     ymuint n = port->port_ref_num();
     for (ymuint j = 0; j < n; ++ j) {
-      const MvPortRef* port_ref = port->port_ref(j);
+      const MvnPortRef* port_ref = port->port_ref(j);
       ymuint nb1 = port_ref->bit_width();
-      const MvNode* node = port_ref->node();
+      const MvnNode* node = port_ref->node();
       if ( port_ref->is_simple() ) {
 	for (ymuint k = 0; k < nb1; ++ k) {
 	  make_io(bdnetwork, mvnode_map, node, k, bdnport, bitpos);
@@ -240,7 +240,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   // 外部入力ノードをキューに積む．
   ymuint ni = module->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    const MvNode* node = module->input(i);
+    const MvnNode* node = module->input(i);
     mark[node->id()] = true;
     enqueue(node, queue, mark);
   }
@@ -248,19 +248,19 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   // 外部入出力をキューに積む．
   ymuint nio = module->inout_num();
   for (ymuint i = 0; i < nio; ++ i) {
-    const MvNode* node = module->inout(i);
+    const MvnNode* node = module->inout(i);
     mark[node->id()] = true;
     enqueue(node, queue, mark);
   }
 
   // DFF と定数ノードを作る．
-  const list<MvNode*>& node_list = module->node_list();
+  const list<MvnNode*>& node_list = module->node_list();
   vector<vector<BdnDff*> > dff_map(nmax);
   vector<vector<BdnLatch*> > latch_map(nmax);
-  for (list<MvNode*>::const_iterator p = node_list.begin();
+  for (list<MvnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    const MvNode* node = *p;
-    if ( node->type() == MvNode::kDff ) {
+    const MvnNode* node = *p;
+    if ( node->type() == MvnNode::kDff ) {
       // DFF
       ymuint bw = node->output(0)->bit_width();
       vector<BdnDff*>& dff_array = dff_map[node->id()];
@@ -274,7 +274,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
       mark[node->id()] = true;
       enqueue(node, queue, mark);
     }
-    else if ( node->type() == MvNode::kLatch ) {
+    else if ( node->type() == MvnNode::kLatch ) {
       // LATCH
       ymuint bw = node->output(0)->bit_width();
       vector<BdnLatch*>& latch_array = latch_map[node->id()];
@@ -288,7 +288,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
       mark[node->id()] = true;
       enqueue(node, queue, mark);
     }
-    else if ( node->type() == MvNode::kConst ) {
+    else if ( node->type() == MvnNode::kConst ) {
       // 定数
       ymuint bw = node->output(0)->bit_width();
       vector<ymuint32> value;
@@ -319,7 +319,7 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 
   // 論理ノードを作る．
   while ( !queue.empty() ) {
-    const MvNode* node = queue.front();
+    const MvnNode* node = queue.front();
     queue.pop_front();
 
     // node に対応する BdnNode を作る．
@@ -340,22 +340,22 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 
   // DFFノードとラッチノードの入力を接続する．
   for (ymuint i = 0; i < nmax; ++ i) {
-    const MvNode* node = mvmgr.node(i);
+    const MvnNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
-    if ( node->type() == MvNode::kDff ) {
+    if ( node->type() == MvnNode::kDff ) {
       // データ入力
-      const MvInputPin* data_ipin = node->input(0);
-      const MvOutputPin* data_opin = data_ipin->src_pin();
+      const MvnInputPin* data_ipin = node->input(0);
+      const MvnOutputPin* data_opin = data_ipin->src_pin();
       assert_cond( data_opin != NULL, __FILE__, __LINE__);
-      const MvNode* data_src_node = data_opin->node();
+      const MvnNode* data_src_node = data_opin->node();
       ymuint bw = data_ipin->bit_width();
 
       // クロック
-      const MvInputPin* clock_ipin = node->input(1);
-      const MvOutputPin* clock_opin = clock_ipin->src_pin();
+      const MvnInputPin* clock_ipin = node->input(1);
+      const MvnOutputPin* clock_opin = clock_ipin->src_pin();
       assert_cond( clock_opin != NULL, __FILE__, __LINE__);
       assert_cond( clock_opin->bit_width() == 1, __FILE__, __LINE__);
-      const MvNode* clock_src_node = clock_opin->node();
+      const MvnNode* clock_src_node = clock_opin->node();
       BdnNodeHandle clock_ihandle = mvnode_map.get(clock_src_node);
 
       // 非同期セット/非同期リセット
@@ -364,13 +364,13 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
       ymuint nc = (node->input_num() - 2) / 2;
       BdnNodeHandle mask = BdnNodeHandle::make_one();
       for (ymuint k = 0; k < nc; ++ k) {
-	const MvInputPin* ctrl_ipin = node->input(k * 2 + 2);
-	const MvOutputPin* ctrl_opin = ctrl_ipin->src_pin();
-	const MvNode* ctrl_src_node = ctrl_opin->node();
+	const MvnInputPin* ctrl_ipin = node->input(k * 2 + 2);
+	const MvnOutputPin* ctrl_opin = ctrl_ipin->src_pin();
+	const MvnNode* ctrl_src_node = ctrl_opin->node();
 	BdnNodeHandle ctrl_dst_ihandle = mvnode_map.get(ctrl_src_node);
-	const MvInputPin* val_ipin = node->input(k * 2 + 3);
-	const MvOutputPin* val_opin = val_ipin->src_pin();
-	const MvNode* val_src_node = val_opin->node();
+	const MvnInputPin* val_ipin = node->input(k * 2 + 3);
+	const MvnOutputPin* val_opin = val_ipin->src_pin();
+	const MvnNode* val_src_node = val_opin->node();
 	BdnNodeHandle cond = bdnetwork.new_and(mask, ctrl_dst_ihandle);
 	mask = bdnetwork.new_and(mask, ~ctrl_dst_ihandle);
 	for (ymuint j = 0; j < bw; ++ j) {
@@ -398,20 +398,20 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 	}
       }
     }
-    else if ( node->type() == MvNode::kLatch ) {
+    else if ( node->type() == MvnNode::kLatch ) {
       // データ入力
-      const MvInputPin* data_ipin = node->input(0);
-      const MvOutputPin* data_opin = data_ipin->src_pin();
+      const MvnInputPin* data_ipin = node->input(0);
+      const MvnOutputPin* data_opin = data_ipin->src_pin();
       assert_cond( data_opin != NULL, __FILE__, __LINE__);
-      const MvNode* data_src_node = data_opin->node();
+      const MvnNode* data_src_node = data_opin->node();
       ymuint bw = data_ipin->bit_width();
 
       // イネーブル
-      const MvInputPin* enable_ipin = node->input(1);
-      const MvOutputPin* enable_opin = enable_ipin->src_pin();
+      const MvnInputPin* enable_ipin = node->input(1);
+      const MvnOutputPin* enable_opin = enable_ipin->src_pin();
       assert_cond( enable_opin != NULL, __FILE__, __LINE__);
       assert_cond( enable_opin->bit_width() == 1, __FILE__, __LINE__);
-      const MvNode* enable_src_node = enable_opin->node();
+      const MvnNode* enable_src_node = enable_opin->node();
       BdnNodeHandle enable_ihandle = mvnode_map.get(enable_src_node);
 
       const vector<BdnLatch*>& latch_array = latch_map[node->id()];
@@ -427,12 +427,12 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
   // 外部出力ノードのファンインを接続する．
   ymuint no = module->output_num();
   for (ymuint i = 0; i < no; ++ i) {
-    const MvNode* node = module->output(i);
-    const MvInputPin* ipin = node->input(0);
-    const MvOutputPin* opin = ipin->src_pin();
+    const MvnNode* node = module->output(i);
+    const MvnInputPin* ipin = node->input(0);
+    const MvnOutputPin* opin = ipin->src_pin();
     if ( opin == NULL ) continue;
 
-    const MvNode* src_node = opin->node();
+    const MvnNode* src_node = opin->node();
 
     ymuint bw = ipin->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
@@ -447,12 +447,12 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
 
   // 外部入出力ノードのファンインを接続する．
   for (ymuint i = 0; i < nio; ++ i) {
-    const MvNode* node = module->inout(i);
-    const MvInputPin* ipin = node->input(0);
-    const MvOutputPin* opin = ipin->src_pin();
+    const MvnNode* node = module->inout(i);
+    const MvnInputPin* ipin = node->input(0);
+    const MvnOutputPin* opin = ipin->src_pin();
     if ( opin == NULL ) continue;
 
-    const MvNode* src_node = opin->node();
+    const MvnNode* src_node = opin->node();
 
     ymuint bw = ipin->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {

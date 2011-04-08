@@ -7,14 +7,14 @@
 /// All rights reserved.
 
 
-#include "ym_mvn/MvMgr.h"
+#include "ym_mvn/MvnMgr.h"
 
-#include "ym_mvn/MvModule.h"
-#include "ym_mvn/MvPort.h"
-#include "ym_mvn/MvNode.h"
-#include "ym_mvn/MvPin.h"
+#include "ym_mvn/MvnModule.h"
+#include "ym_mvn/MvnPort.h"
+#include "ym_mvn/MvnNode.h"
+#include "ym_mvn/MvnPin.h"
 
-#include "ym_mvn/MvVlMap.h"
+#include "ym_mvn/MvnVlMap.h"
 
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
@@ -25,88 +25,88 @@ BEGIN_NAMESPACE_YM_MVN
 
 BEGIN_NONAMESPACE
 
-// MvInputPin の内容を出力する．
+// MvnInputPin の内容を出力する．
 void
 dump_inputpin(ostream& s,
-	      const MvInputPin* pin)
+	      const MvnInputPin* pin)
 {
   s << "  InputPin#" << pin->pos()
     << "(" << pin->bit_width() << ")" << endl;
-  const MvOutputPin* opin = pin->src_pin();
+  const MvnOutputPin* opin = pin->src_pin();
   if ( opin ) {
     s << "    <== OutputPin#" << opin->pos()
       << "@node#" << opin->node()->id() << endl;
   }
 }
 
-// MvOutputPin の内容を出力する．
+// MvnOutputPin の内容を出力する．
 void
 dump_outputpin(ostream& s,
-	       const MvOutputPin* pin)
+	       const MvnOutputPin* pin)
 {
   s << "  OutputPin#" << pin->pos()
     << "(" << pin->bit_width() << ")" << endl;
-  const MvInputPinList& fo_list = pin->dst_pin_list();
-  for (MvInputPinList::const_iterator p = fo_list.begin();
+  const MvnInputPinList& fo_list = pin->dst_pin_list();
+  for (MvnInputPinList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
-    const MvInputPin* ipin = *p;
+    const MvnInputPin* ipin = *p;
     s << "    ==> InputPin#" << ipin->pos()
       << "@node#" << ipin->node()->id() << endl;
   }
 }
 
-// MvNode の内容を出力する．
+// MvnNode の内容を出力する．
 void
 dump_node(ostream& s,
-	  const MvNode* node)
+	  const MvnNode* node)
 {
   s << "Node#" << node->id()
     << ":";
   switch ( node->type() ) {
-  case MvNode::kInput:      s << "Input"; break;
-  case MvNode::kInout:      s << "Inout"; break;
-  case MvNode::kOutput:     s << "Output"; break;
-  case MvNode::kDff:        s << "DFF"; break;
-  case MvNode::kLatch:      s << "Latch"; break;
-  case MvNode::kThrough:    s << "Through"; break;
-  case MvNode::kNot:        s << "Not"; break;
-  case MvNode::kAnd:        s << "And"; break;
-  case MvNode::kOr:         s << "Or"; break;
-  case MvNode::kXor:        s << "Xor"; break;
-  case MvNode::kRand:       s << "Rand"; break;
-  case MvNode::kRor:        s << "Ror"; break;
-  case MvNode::kRxor:       s << "Rxor"; break;
-  case MvNode::kEq:         s << "Eq"; break;
-  case MvNode::kLt:         s << "Lt"; break;
-  case MvNode::kSll:        s << "Sll"; break;
-  case MvNode::kSrl:        s << "Srl"; break;
-  case MvNode::kSla:        s << "Sla"; break;
-  case MvNode::kSra:        s << "Sra"; break;
-  case MvNode::kAdd:        s << "Add"; break;
-  case MvNode::kSub:        s << "Sub"; break;
-  case MvNode::kMult:       s << "Mult"; break;
-  case MvNode::kDiv:        s << "Div"; break;
-  case MvNode::kMod:        s << "Mod"; break;
-  case MvNode::kPow:        s << "Pow"; break;
-  case MvNode::kIte:        s << "Ite"; break;
-  case MvNode::kConcat:     s << "Concat"; break;
-  case MvNode::kConstBitSelect:
+  case MvnNode::kInput:      s << "Input"; break;
+  case MvnNode::kInout:      s << "Inout"; break;
+  case MvnNode::kOutput:     s << "Output"; break;
+  case MvnNode::kDff:        s << "DFF"; break;
+  case MvnNode::kLatch:      s << "Latch"; break;
+  case MvnNode::kThrough:    s << "Through"; break;
+  case MvnNode::kNot:        s << "Not"; break;
+  case MvnNode::kAnd:        s << "And"; break;
+  case MvnNode::kOr:         s << "Or"; break;
+  case MvnNode::kXor:        s << "Xor"; break;
+  case MvnNode::kRand:       s << "Rand"; break;
+  case MvnNode::kRor:        s << "Ror"; break;
+  case MvnNode::kRxor:       s << "Rxor"; break;
+  case MvnNode::kEq:         s << "Eq"; break;
+  case MvnNode::kLt:         s << "Lt"; break;
+  case MvnNode::kSll:        s << "Sll"; break;
+  case MvnNode::kSrl:        s << "Srl"; break;
+  case MvnNode::kSla:        s << "Sla"; break;
+  case MvnNode::kSra:        s << "Sra"; break;
+  case MvnNode::kAdd:        s << "Add"; break;
+  case MvnNode::kSub:        s << "Sub"; break;
+  case MvnNode::kMult:       s << "Mult"; break;
+  case MvnNode::kDiv:        s << "Div"; break;
+  case MvnNode::kMod:        s << "Mod"; break;
+  case MvnNode::kPow:        s << "Pow"; break;
+  case MvnNode::kIte:        s << "Ite"; break;
+  case MvnNode::kConcat:     s << "Concat"; break;
+  case MvnNode::kConstBitSelect:
     s << "ConstBitSelect["
       << node->bitpos()
       << "]";
     break;
-  case MvNode::kConstPartSelect:
+  case MvnNode::kConstPartSelect:
     s << "ConstPartSelect["
       << node->msb()
       << ":"
       << node->lsb()
       << "]";
     break;
-  case MvNode::kBitSelect:  s << "BitSelect"; break;
-  case MvNode::kPartSelect: s << "PartSelect"; break;
-  case MvNode::kCombUdp:    s << "Combinational UDP"; break;
-  case MvNode::kSeqUdp:     s << "Sequential UDP"; break;
-  case MvNode::kConst:
+  case MvnNode::kBitSelect:  s << "BitSelect"; break;
+  case MvnNode::kPartSelect: s << "PartSelect"; break;
+  case MvnNode::kCombUdp:    s << "Combinational UDP"; break;
+  case MvnNode::kSeqUdp:     s << "Sequential UDP"; break;
+  case MvnNode::kConst:
     {
       s << "Const(";
       vector<ymuint32> val;
@@ -125,15 +125,15 @@ dump_node(ostream& s,
   s << endl;
   ymuint ni = node->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    const MvInputPin* pin = node->input(i);
+    const MvnInputPin* pin = node->input(i);
     dump_inputpin(s, pin);
   }
   ymuint no = node->output_num();
   for (ymuint i = 0; i < no; ++ i) {
-    const MvOutputPin* pin = node->output(i);
+    const MvnOutputPin* pin = node->output(i);
     dump_outputpin(s, pin);
   }
-  if ( node->type() == MvNode::kDff ) {
+  if ( node->type() == MvnNode::kDff ) {
     ymuint nc = (ni - 2) / 2;
     for (ymuint i = 0; i < nc; ++ i) {
       s << "  Control#" << i << "(InputPin#" << (i * 2) + 2 << ")" << endl
@@ -159,19 +159,19 @@ END_NONAMESPACE
 
 // @brief 内容を出力する
 // @param[in] s 出力先のストリーム
-// @param[in] mgr MvMgr
+// @param[in] mgr MvnMgr
 // @note デバッグ用
 void
 dump(ostream& s,
-     const MvMgr& mgr)
+     const MvnMgr& mgr)
 {
   ymuint n = mgr.max_module_id();
   for (ymuint i = 0; i < n; ++ i) {
-    const MvModule* module = mgr.module(i);
+    const MvnModule* module = mgr.module(i);
     if ( module == NULL ) continue;
 
     s << "Module#" << module->id() << "(" << module->name() << ")" << endl;
-    const MvNode* pnode = module->parent();
+    const MvnNode* pnode = module->parent();
     if ( pnode ) {
       s << "  parent node: Module#" << pnode->parent()->id()
 	<< ":" << pnode->id() << endl;
@@ -182,11 +182,11 @@ dump(ostream& s,
 
     ymuint np = module->port_num();
     for (ymuint j = 0; j < np; ++ j) {
-      const MvPort* port = module->port(j);
+      const MvnPort* port = module->port(j);
       s << "  Port#" << j << "(" << port->name() << ")" << endl;
       ymuint n = port->port_ref_num();
       for (ymuint k = 0; k < n; ++ k) {
-	const MvPortRef* port_ref = port->port_ref(k);
+	const MvnPortRef* port_ref = port->port_ref(k);
 	s << "    node#" << port_ref->node()->id();
 	if ( port_ref->has_bitselect() ) {
 	  s << "[" << port_ref->bitpos() << "]";
@@ -210,9 +210,9 @@ dump(ostream& s,
     for (ymuint j = 0; j < nio; ++ j) {
       dump_node(s, module->inout(j));
     }
-    for (list<MvNode*>::const_iterator p = module->nodes_begin();
+    for (list<MvnNode*>::const_iterator p = module->nodes_begin();
 	 p != module->nodes_end(); ++ p) {
-      MvNode* node = *p;
+      MvnNode* node = *p;
       dump_node(s, node);
     }
 
@@ -223,12 +223,12 @@ dump(ostream& s,
 // @brief ノード番号ともとのVerilog名の対応を出力する．
 void
 dump_node_map(ostream& s,
-	      const MvMgr& mgr,
-	      const MvVlMap& node_map)
+	      const MvnMgr& mgr,
+	      const MvnVlMap& node_map)
 {
   ymuint n = mgr.max_node_id();
   for (ymuint i = 0; i < n; ++ i) {
-    const MvNode* node = mgr.node(i);
+    const MvnNode* node = mgr.node(i);
     if ( node == NULL ) continue;
 
     s << "// node" << node->id() << " : ";

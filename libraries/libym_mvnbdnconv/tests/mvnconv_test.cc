@@ -8,9 +8,9 @@
 
 
 #include "ym_bdn/BdNetwork.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvVerilogReader.h"
-#include "ym_mvn/MvVlMap.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnVerilogReader.h"
+#include "ym_mvn/MvnVlMap.h"
 #include "ym_mvnbdnconv/MvnBdnConv.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
 
@@ -30,8 +30,8 @@ main(int argc,
 #if !defined(YM_DEBUG)
   try {
 #endif
-    MvMgr mgr;
-    MvVerilogReader reader;
+    MvnMgr mgr;
+    MvnVerilogReader reader;
     MsgHandler* mh = new StreamMsgHandler(&cerr);
     mh->set_mask(MsgHandler::kMaskAll);
     mh->delete_mask(kMsgInfo);
@@ -51,8 +51,8 @@ main(int argc,
     }
 
 
-    cerr << "Generating MvNetwork" << endl;
-    MvVlMap node_map;
+    cerr << "Generating MvnNetwork" << endl;
+    MvnVlMap node_map;
     bool stat = reader.gen_network(mgr, node_map);
     cerr << " End" << endl;
     if ( !stat ) {
@@ -69,7 +69,7 @@ main(int argc,
 
     dump(cout, bdnetwork);
 
-#if !YM_DEBUG
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError x) {
     cout << x << endl;

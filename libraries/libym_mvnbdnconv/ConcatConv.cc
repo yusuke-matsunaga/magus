@@ -8,7 +8,7 @@
 
 
 #include "ConcatConv.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/MvnNode.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNodeHandle.h"
@@ -26,25 +26,25 @@ ConcatConv::~ConcatConv()
 {
 }
 
-// @brief MvNode を BdNetwork に変換する．
+// @brief MvnNode を BdNetwork に変換する．
 // @param[in] node ノード
 // @param[in] bdnetwork 変換結果のサブジェクトグラフ
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-ConcatConv::operator()(const MvNode* node,
+ConcatConv::operator()(const MvnNode* node,
 		       BdNetwork& bdnetwork,
 		       MvnBdnMap& nodemap)
 {
-  if ( node->type() == MvNode::kConcat ) {
+  if ( node->type() == MvnNode::kConcat ) {
     ymuint bw = node->output(0)->bit_width();
     ymuint ni = node->input_num();
     ymuint offset = bw;
     for (ymuint i = 0; i < ni; ++ i) {
-      const MvInputPin* ipin = node->input(i);
-      const MvOutputPin* opin = ipin->src_pin();
-      const MvNode* src_node = opin->node();
+      const MvnInputPin* ipin = node->input(i);
+      const MvnOutputPin* opin = ipin->src_pin();
+      const MvnNode* src_node = opin->node();
       ymuint bw1 = opin->bit_width();
       offset -= bw1;
       for (ymuint j = 0; j < bw1; ++ j) {

@@ -10,14 +10,14 @@
 
 
 #include "NetHandle.h"
-#include "ym_mvn/MvMgr.h"
+#include "ym_mvn/MvnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnHandle MvnHandle.h "MvnHandle.h"
-/// @brief MvMgr を持つネットハンドル
+/// @brief MvnMgr を持つネットハンドル
 //////////////////////////////////////////////////////////////////////
 class MvnHandle :
   public NetHandle
@@ -40,14 +40,14 @@ public:
   tType
   type() const;
 
-  /// @brief MvMgr を得る．
+  /// @brief MvnMgr を得る．
   virtual
-  const MvMgr*
+  const MvnMgr*
   mvn() const;
 
-  /// @brief MvMgr を得る．
+  /// @brief MvnMgr を得る．
   virtual
-  MvMgr*
+  MvnMgr*
   _mvn();
 
   /// @brief ネットワークをクリアする．
@@ -71,7 +71,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ネットワークの実体
-  MvMgr mNetwork;
+  MvnMgr mNetwork;
 
 };
 

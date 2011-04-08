@@ -5,7 +5,6 @@
 SUBDIRS = \
 	ym_mvn \
 	verilog \
-	conv \
 	. \
 	tests
 
@@ -20,59 +19,58 @@ noinst_LTLIBRARIES = libym_mvn.la
 libym_mvn_la_SOURCES = \
 	dump.cc \
 	dump_verilog.cc \
-	MvArithOp.h \
-	MvArithOp.cc \
-	MvBinaryOp.h \
-	MvBinaryOp.cc \
-	MvBitSelect.h \
-	MvBitSelect.cc \
-	MvCmpl.h \
-	MvCmpl.cc \
-	MvConcat.h \
-	MvConcat.cc \
-	MvConst.h \
-	MvConst.cc \
-	MvConstBitSelect.h \
-	MvConstBitSelect.cc \
-	MvConstPartSelect.h \
-	MvConstPartSelect.cc \
-	MvDff.h \
-	MvDff.cc \
-	MvInput.h \
-	MvInput.cc \
-	MvInout.h \
-	MvInout.cc \
-	MvIte.h \
-	MvIte.cc \
-	MvLogOp.h \
-	MvLogOp.cc \
-	MvMgr.cc \
-	MvModule.cc \
-	MvNode.cc \
-	MvNot.h \
-	MvNot.cc \
-	MvOutput.h \
-	MvOutput.cc \
-	MvPartSelect.h \
-	MvPartSelect.cc \
-	MvPort.cc \
-	MvRelOp.h \
-	MvRelOp.cc \
-	MvRop.h \
-	MvRop.cc \
-	MvTernaryOp.h \
-	MvTernaryOp.cc \
-	MvThrough.h \
-	MvThrough.cc \
-	MvUdp.h \
-	MvUdp.cc \
-	MvUnaryOp.h \
-	MvUnaryOp.cc
+	MvnArithOp.h \
+	MvnArithOp.cc \
+	MvnBinaryOp.h \
+	MvnBinaryOp.cc \
+	MvnBitSelect.h \
+	MvnBitSelect.cc \
+	MvnCmpl.h \
+	MvnCmpl.cc \
+	MvnConcat.h \
+	MvnConcat.cc \
+	MvnConst.h \
+	MvnConst.cc \
+	MvnConstBitSelect.h \
+	MvnConstBitSelect.cc \
+	MvnConstPartSelect.h \
+	MvnConstPartSelect.cc \
+	MvnDff.h \
+	MvnDff.cc \
+	MvnInput.h \
+	MvnInput.cc \
+	MvnInout.h \
+	MvnInout.cc \
+	MvnIte.h \
+	MvnIte.cc \
+	MvnLogOp.h \
+	MvnLogOp.cc \
+	MvnMgr.cc \
+	MvnModule.cc \
+	MvnNode.cc \
+	MvnNot.h \
+	MvnNot.cc \
+	MvnOutput.h \
+	MvnOutput.cc \
+	MvnPartSelect.h \
+	MvnPartSelect.cc \
+	MvnPort.cc \
+	MvnRelOp.h \
+	MvnRelOp.cc \
+	MvnRop.h \
+	MvnRop.cc \
+	MvnTernaryOp.h \
+	MvnTernaryOp.cc \
+	MvnThrough.h \
+	MvnThrough.cc \
+	MvnUdp.h \
+	MvnUdp.cc \
+	MvnUnaryOp.h \
+	MvnUnaryOp.cc
 
 libym_mvn_la_LDFLAGS =
 
 libym_mvn_la_LIBADD = \
 	verilog/libym_mvn_verilog.la \
-	conv/libym_mvn_conv.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

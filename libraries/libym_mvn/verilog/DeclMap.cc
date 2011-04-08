@@ -8,7 +8,7 @@
 
 
 #include "DeclMap.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/MvnNode.h"
 #include "ym_verilog/vl/VlDecl.h"
 
 
@@ -52,7 +52,7 @@ DeclMap::clear()
 // @param[in] node 対応するノード
 void
 DeclMap::add(const VlDecl* decl,
-	     MvNode* node)
+	     MvnNode* node)
 {
   if ( debug_declmap ) {
     cerr << "DeclMap::add(" << decl->full_name()
@@ -75,7 +75,7 @@ DeclMap::add(const VlDecl* decl,
 void
 DeclMap::add(const VlDecl* decl,
 	     ymuint offset,
-	     MvNode* node)
+	     MvnNode* node)
 {
   if ( debug_declmap ) {
     cerr << "DeclMap::add(" << decl->full_name()
@@ -96,7 +96,7 @@ DeclMap::add(const VlDecl* decl,
 // @param[in] decl 宣言要素
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
-MvNode*
+MvnNode*
 DeclMap::get(const VlDecl* decl) const
 {
   Cell* cell = find_cell(decl, 0);
@@ -112,7 +112,7 @@ DeclMap::get(const VlDecl* decl) const
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
-MvNode*
+MvnNode*
 DeclMap::get(const VlDecl* decl,
 	     ymuint offset) const
 {
@@ -127,7 +127,7 @@ DeclMap::get(const VlDecl* decl,
 void
 DeclMap::put_cell(const VlDecl* decl,
 		  ymuint offset,
-		  MvNode* node)
+		  MvnNode* node)
 {
   if ( mNum >= mLimit ) {
     // テーブルを拡大する．

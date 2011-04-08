@@ -8,7 +8,7 @@
 
 
 #include "ConstPartSelectConv.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/MvnNode.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNodeHandle.h"
@@ -26,21 +26,21 @@ ConstPartSelectConv::~ConstPartSelectConv()
 {
 }
 
-// @brief MvNode を BdnNetwork に変換する．
+// @brief MvnNode を BdnNetwork に変換する．
 // @param[in] node ノード
 // @param[in] bdnetwork 変換結果の BdNetwork
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
-ConstPartSelectConv::operator()(const MvNode* node,
+ConstPartSelectConv::operator()(const MvnNode* node,
 				BdNetwork& bdnetwork,
 				MvnBdnMap& nodemap)
 {
-  if ( node->type() == MvNode::kConstPartSelect ) {
-    const MvInputPin* ipin = node->input(0);
-    const MvOutputPin* src_pin = ipin->src_pin();
-    const MvNode* src_node = src_pin->node();
+  if ( node->type() == MvnNode::kConstPartSelect ) {
+    const MvnInputPin* ipin = node->input(0);
+    const MvnOutputPin* src_pin = ipin->src_pin();
+    const MvnNode* src_node = src_pin->node();
 
     ymuint bw = node->output(0)->bit_width();
     ymuint msb = node->msb();

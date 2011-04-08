@@ -37,14 +37,14 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief MvMgr の内容を SbjGraph に変換する．
+  /// @brief MvnMgr の内容を SbjGraph に変換する．
   /// @param[in] mvmgr 対象の MvNetwork
   /// @param[out] sbjgraph 変換先のサブジェクトグラフ
   /// @param[out] mvnode_map 対応関係を格納するオブジェクト
   void
-  operator()(const MvMgr& mvmgr,
+  operator()(const MvnMgr& mvmgr,
 	     SbjGraph& sbjgraph,
-	     MvNodeMap& mvnode_map);
+	     MvnNodeMap& mvnode_map);
 
 
 private:

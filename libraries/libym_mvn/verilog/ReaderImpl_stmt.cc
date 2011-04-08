@@ -10,8 +10,8 @@
 #include "ReaderImpl.h"
 #include "DeclMap.h"
 #include "Env.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnNode.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
@@ -29,7 +29,7 @@ using namespace nsYm::nsVerilog;
 // @param[in] stmt 本体のステートメント
 // @param[in] env 環境
 bool
-ReaderImpl::gen_stmt1(MvModule* module,
+ReaderImpl::gen_stmt1(MvnModule* module,
 		      const VlStmt* stmt,
 		      ProcEnv& env)
 {
@@ -52,7 +52,7 @@ ReaderImpl::gen_stmt1(MvModule* module,
   case kVpiIf:
     {
       const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
+      MvnNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
       gen_stmt1(module, stmt->body_stmt(), then_env);
       merge_env1(module, env, cond_node, then_env, env);
@@ -62,7 +62,7 @@ ReaderImpl::gen_stmt1(MvModule* module,
   case kVpiIfElse:
     {
       const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
+      MvnNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
       gen_stmt1(module, stmt->body_stmt(), then_env);
       ProcEnv else_env(env);
@@ -75,7 +75,7 @@ ReaderImpl::gen_stmt1(MvModule* module,
 #if 0
     {
       const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
+      MvnNode* cond_node = gen_expr(module, cond, env);
 
     }
 #else
@@ -97,7 +97,7 @@ ReaderImpl::gen_stmt1(MvModule* module,
 // @param[in] stmt 本体のステートメント
 // @param[in] env 環境
 bool
-ReaderImpl::gen_stmt2(MvModule* module,
+ReaderImpl::gen_stmt2(MvnModule* module,
 		      const VlStmt* stmt,
 		      ProcEnv& env)
 {
@@ -120,7 +120,7 @@ ReaderImpl::gen_stmt2(MvModule* module,
   case kVpiIf:
     {
       const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
+      MvnNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
       gen_stmt2(module, stmt->body_stmt(), then_env);
       merge_env2(module, env, cond_node, then_env, env);
@@ -130,7 +130,7 @@ ReaderImpl::gen_stmt2(MvModule* module,
   case kVpiIfElse:
     {
       const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
+      MvnNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
       gen_stmt2(module, stmt->body_stmt(), then_env);
       ProcEnv else_env(env);
@@ -143,7 +143,7 @@ ReaderImpl::gen_stmt2(MvModule* module,
 #if 0
     {
       const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
+      MvnNode* cond_node = gen_expr(module, cond, env);
 
     }
 #else
@@ -165,13 +165,13 @@ ReaderImpl::gen_stmt2(MvModule* module,
 // @param[in] stmt 本体のステートメント
 // @param[in] env 環境
 void
-ReaderImpl::gen_assign(MvModule* module,
+ReaderImpl::gen_assign(MvnModule* module,
 		       const VlStmt* stmt,
 		       ProcEnv& env)
 {
   const VlExpr* rhs = stmt->rhs();
   const VlExpr* lhs = stmt->lhs();
-  MvNode* node = gen_expr(module, rhs, env);
+  MvnNode* node = gen_expr(module, rhs, env);
   ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
   for (ymuint i = 0; i < n; ++ i) {
@@ -201,11 +201,11 @@ ReaderImpl::gen_assign(MvModule* module,
       assert_not_reached(__FILE__, __LINE__);
     }
 
-    MvNode* src_node = gen_rhs(module, node, offset, bw);
-    MvNode* dst_node = NULL;
+    MvnNode* src_node = gen_rhs(module, node, offset, bw);
+    MvnNode* dst_node = NULL;
     if ( lhs1->is_primary() ) {
-      dst_node = mMvMgr->new_through(module, bw);
-      mMvMgr->connect(src_node, 0, dst_node, 0);
+      dst_node = mMvnMgr->new_through(module, bw);
+      mMvnMgr->connect(src_node, 0, dst_node, 0);
     }
     else if ( lhs1->is_bitselect() ) {
 #if 0
@@ -221,26 +221,26 @@ ReaderImpl::gen_assign(MvModule* module,
       if ( index > 0 ) {
 	bw_array.push_back(index);
       }
-      dst_node = mMvMgr->new_concat(module, bw_array);
+      dst_node = mMvnMgr->new_concat(module, bw_array);
       ymuint pos = 0;
       if ( index < bw - 1 ) {
-	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
 						       bw - 1,
 						       index + 1,
 						       bw);
-	mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	++ pos;
       }
-      mMvMgr->connect(src_node, 0, dst_node, pos);
+      mMvnMgr->connect(src_node, 0, dst_node, pos);
       ++ pos;
       if ( index > 0 ) {
-	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
 						       index - 1,
 						       0,
 						       bw);
-	mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
       }
 #endif
     }
@@ -259,26 +259,26 @@ ReaderImpl::gen_assign(MvModule* module,
       if ( lsb > 0 ) {
 	bw_array.push_back(lsb);
       }
-      dst_node = mMvMgr->new_concat(module, bw_array);
+      dst_node = mMvnMgr->new_concat(module, bw_array);
       ymuint pos = 0;
       if ( msb < bw - 1 ) {
-	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
 						       bw - 1,
 						       msb + 1,
 						       bw);
-	mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	++ pos;
       }
-      mMvMgr->connect(src_node, 0, dst_node, pos);
+      mMvnMgr->connect(src_node, 0, dst_node, pos);
       ++ pos;
       if ( lsb > 0 ) {
-	MvNode* tmp_node = mMvMgr->new_constpartselect(module,
+	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
 						       lsb - 1,
 						       0,
 						       bw);
-	mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvMgr->connect(tmp_node, 0, dst_node, pos);
+	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
       }
 #endif
     }
@@ -300,26 +300,26 @@ ReaderImpl::gen_assign(MvModule* module,
 // @param[in] then_env 条件が成り立ったときに通るパスの環境
 // @param[in] else_env 条件が成り立たなかったときに通るパスの環境
 void
-ReaderImpl::merge_env1(MvModule* parent_module,
+ReaderImpl::merge_env1(MvnModule* parent_module,
 		       ProcEnv& env,
-		       MvNode* cond,
+		       MvnNode* cond,
 		       const ProcEnv& then_env,
 		       const ProcEnv& else_env)
 {
   ymuint n = env.max_id();
   for (ymuint i = 0; i < n; ++ i) {
     AssignInfo info0 = env.get_from_id(i);
-    MvNode* node0 = info0.mRhs;
-    MvNode* cond0 = info0.mCond;
+    MvnNode* node0 = info0.mRhs;
+    MvnNode* cond0 = info0.mCond;
     AssignInfo info1 = then_env.get_from_id(i);
-    MvNode* node1 = info1.mRhs;
-    MvNode* cond1 = info1.mCond;
+    MvnNode* node1 = info1.mRhs;
+    MvnNode* cond1 = info1.mCond;
     AssignInfo info2 = else_env.get_from_id(i);
-    MvNode* node2 = info2.mRhs;
-    MvNode* cond2 = info2.mCond;
+    MvnNode* node2 = info2.mRhs;
+    MvnNode* cond2 = info2.mCond;
 
-    MvNode* new_node = NULL;
-    MvNode* new_cond = NULL;
+    MvnNode* new_node = NULL;
+    MvnNode* new_cond = NULL;
     bool new_block = false;
     if ( node1 == node2 ) {
       if ( node1 == NULL ) {
@@ -343,17 +343,17 @@ ReaderImpl::merge_env1(MvModule* parent_module,
       new_node = node2;
       new_block = info2.mBlock;
 
-      MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
-      mMvMgr->connect(cond, 0, cond_bar, 0);
+      MvnNode* cond_bar = mMvnMgr->new_not(parent_module, 1);
+      mMvnMgr->connect(cond, 0, cond_bar, 0);
       if ( cond2 == NULL ) {
 	// 代入条件は ~cond
 	new_cond = cond_bar;
       }
       else {
 	// 代入条件は ~cond & cond2
-	new_cond = mMvMgr->new_and(parent_module, 1);
-	mMvMgr->connect(cond_bar, 0, new_cond, 0);
-	mMvMgr->connect(cond2, 0, new_cond, 1);
+	new_cond = mMvnMgr->new_and(parent_module, 1);
+	mMvnMgr->connect(cond_bar, 0, new_cond, 0);
+	mMvnMgr->connect(cond2, 0, new_cond, 1);
       }
     }
     else if ( node2 == NULL ) {
@@ -369,18 +369,18 @@ ReaderImpl::merge_env1(MvModule* parent_module,
       }
       else {
 	// 代入条件は cond & cond1
-	new_cond = mMvMgr->new_and(parent_module, 1);
-	mMvMgr->connect(cond, 0, new_cond, 0);
-	mMvMgr->connect(cond1, 0, new_cond, 1);
+	new_cond = mMvnMgr->new_and(parent_module, 1);
+	mMvnMgr->connect(cond, 0, new_cond, 0);
+	mMvnMgr->connect(cond1, 0, new_cond, 1);
       }
     }
     else {
       // node1 も node2 も NULL ではない．
       ymuint bw = node1->output(0)->bit_width();
-      new_node = mMvMgr->new_ite(parent_module, bw);
-      mMvMgr->connect(cond, 0, new_node, 0);
-      mMvMgr->connect(node1, 0, new_node, 1);
-      mMvMgr->connect(node2, 0, new_node, 2);
+      new_node = mMvnMgr->new_ite(parent_module, bw);
+      mMvnMgr->connect(cond, 0, new_node, 0);
+      mMvnMgr->connect(node1, 0, new_node, 1);
+      mMvnMgr->connect(node2, 0, new_node, 2);
       if ( info1.mBlock != info2.mBlock ) {
 	// blocking 代入と non-blocking 代入の混在はエラー
 #warning "TODO: エラー処理"
@@ -400,27 +400,27 @@ ReaderImpl::merge_env1(MvModule* parent_module,
 // @param[in] then_env 条件が成り立ったときに通るパスの環境
 // @param[in] else_env 条件が成り立たなかったときに通るパスの環境
 void
-ReaderImpl::merge_env2(MvModule* parent_module,
+ReaderImpl::merge_env2(MvnModule* parent_module,
 		       ProcEnv& env,
-		       MvNode* cond,
+		       MvnNode* cond,
 		       const ProcEnv& then_env,
 		       const ProcEnv& else_env)
 {
   ymuint n = env.max_id();
   for (ymuint i = 0; i < n; ++ i) {
     AssignInfo info0 = env.get_from_id(i);
-    MvNode* node0 = info0.mRhs;
+    MvnNode* node0 = info0.mRhs;
     assert_cond( info0.mCond == NULL, __FILE__, __LINE__);
 
     AssignInfo info1 = then_env.get_from_id(i);
-    MvNode* node1 = info1.mRhs;
+    MvnNode* node1 = info1.mRhs;
     assert_cond( info1.mCond == NULL, __FILE__, __LINE__);
 
     AssignInfo info2 = else_env.get_from_id(i);
-    MvNode* node2 = info2.mRhs;
+    MvnNode* node2 = info2.mRhs;
     assert_cond( info2.mCond == NULL, __FILE__, __LINE__);
 
-    MvNode* new_node = NULL;
+    MvnNode* new_node = NULL;
     bool new_block = false;
     if ( node1 == node2 ) {
       if ( node1 == NULL ) {
@@ -444,10 +444,10 @@ ReaderImpl::merge_env2(MvModule* parent_module,
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
       }
-      new_node = mMvMgr->new_ite(parent_module, bw);
-      mMvMgr->connect(cond, 0, new_node, 0);
-      mMvMgr->connect(node0, 0, new_node, 1);
-      mMvMgr->connect(node2, 0, new_node, 2);
+      new_node = mMvnMgr->new_ite(parent_module, bw);
+      mMvnMgr->connect(cond, 0, new_node, 0);
+      mMvnMgr->connect(node0, 0, new_node, 1);
+      mMvnMgr->connect(node2, 0, new_node, 2);
       new_block = info2.mBlock;
     }
     else if ( node2 == NULL ) {
@@ -459,10 +459,10 @@ ReaderImpl::merge_env2(MvModule* parent_module,
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
       }
-      new_node = mMvMgr->new_ite(parent_module, bw);
-      mMvMgr->connect(cond, 0, new_node, 0);
-      mMvMgr->connect(node1, 0, new_node, 1);
-      mMvMgr->connect(node0, 0, new_node, 2);
+      new_node = mMvnMgr->new_ite(parent_module, bw);
+      mMvnMgr->connect(cond, 0, new_node, 0);
+      mMvnMgr->connect(node1, 0, new_node, 1);
+      mMvnMgr->connect(node0, 0, new_node, 2);
       new_block = info1.mBlock;
     }
     else {
@@ -477,10 +477,10 @@ ReaderImpl::merge_env2(MvModule* parent_module,
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
       }
-      new_node = mMvMgr->new_ite(parent_module, bw);
-      mMvMgr->connect(cond, 0, new_node, 0);
-      mMvMgr->connect(node1, 0, new_node, 1);
-      mMvMgr->connect(node2, 0, new_node, 2);
+      new_node = mMvnMgr->new_ite(parent_module, bw);
+      mMvnMgr->connect(cond, 0, new_node, 0);
+      mMvnMgr->connect(node1, 0, new_node, 1);
+      mMvnMgr->connect(node2, 0, new_node, 2);
       if ( info1.mBlock != info2.mBlock ) {
 	// blocking 代入と non-blocking 代入の混在はエラー
 #warning "TODO: エラー処理"
@@ -498,36 +498,36 @@ ReaderImpl::merge_env2(MvModule* parent_module,
 // @param[in] then_cond cond が成り立ったときの代入条件
 // @param[in] else_cond cond が成り立たなかったときの代入条件
 // @note 基本的には ITE(cond, then_cond, else_cond) だが，NULL の場合がある．
-MvNode*
-ReaderImpl::merge_cond(MvModule* parent_module,
-		       MvNode* cond,
-		       MvNode* then_cond,
-		       MvNode* else_cond)
+MvnNode*
+ReaderImpl::merge_cond(MvnModule* parent_module,
+		       MvnNode* cond,
+		       MvnNode* then_cond,
+		       MvnNode* else_cond)
 {
-  MvNode* new_cond = NULL;
+  MvnNode* new_cond = NULL;
   if ( then_cond == else_cond ) {
     // 両方の条件が等しければ ITE を挿入しない
     new_cond = then_cond;
   }
   else if ( then_cond == NULL ) {
     // 代入条件は cond | else_cond
-    new_cond = mMvMgr->new_or(parent_module, 1);
-    mMvMgr->connect(cond, 0, new_cond, 0);
-    mMvMgr->connect(else_cond, 0, new_cond, 1);
+    new_cond = mMvnMgr->new_or(parent_module, 1);
+    mMvnMgr->connect(cond, 0, new_cond, 0);
+    mMvnMgr->connect(else_cond, 0, new_cond, 1);
   }
   else if ( else_cond == NULL ) {
     // 代入条件は ~cond | then_cond
-    MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
-    mMvMgr->connect(cond, 0, cond_bar, 0);
-    new_cond = mMvMgr->new_or(parent_module, 1);
-    mMvMgr->connect(cond_bar, 0, new_cond, 0);
-    mMvMgr->connect(then_cond, 0, new_cond, 1);
+    MvnNode* cond_bar = mMvnMgr->new_not(parent_module, 1);
+    mMvnMgr->connect(cond, 0, cond_bar, 0);
+    new_cond = mMvnMgr->new_or(parent_module, 1);
+    mMvnMgr->connect(cond_bar, 0, new_cond, 0);
+    mMvnMgr->connect(then_cond, 0, new_cond, 1);
   }
   else {
-    new_cond = mMvMgr->new_ite(parent_module, 1);
-    mMvMgr->connect(cond, 0, new_cond, 0);
-    mMvMgr->connect(then_cond, 0, new_cond, 1);
-    mMvMgr->connect(else_cond, 0, new_cond, 2);
+    new_cond = mMvnMgr->new_ite(parent_module, 1);
+    mMvnMgr->connect(cond, 0, new_cond, 0);
+    mMvnMgr->connect(then_cond, 0, new_cond, 1);
+    mMvnMgr->connect(else_cond, 0, new_cond, 2);
   }
   return new_cond;
 }

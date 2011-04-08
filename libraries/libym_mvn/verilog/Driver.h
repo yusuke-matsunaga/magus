@@ -25,19 +25,19 @@ public:
   /// @brief 単純な形式のコンストラクタ
   /// @param[in] node 右辺のノード
   explicit
-  Driver(MvNode* node = NULL);
+  Driver(MvnNode* node = NULL);
 
   /// @brief ビット指定形式のコンストラクタ
   /// @param[in] node 右辺のノード
   /// @param[in] index ビット指定位置
-  Driver(MvNode* node,
+  Driver(MvnNode* node,
 	 ymuint index);
 
   /// @brief 範囲指定形式のコンストラクタ
   /// @param[in] node 右辺のノード
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
-  Driver(MvNode* node,
+  Driver(MvnNode* node,
 	 ymuint msb,
 	 ymuint lsb);
 
@@ -48,7 +48,7 @@ public:
   /// @brief 代入演算子
   const Driver&
   operator=(const Driver& src);
-  
+
   /// @brief デストラクタ
   ~Driver();
 
@@ -56,7 +56,7 @@ public:
 public:
 
   /// @brief 右辺のノードを返す．
-  MvNode*
+  MvnNode*
   rhs_node() const;
 
   /// @brief 単純な形式の時 true を返す．
@@ -97,7 +97,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 右辺のノード
-  MvNode* mNode;
+  MvnNode* mNode;
 
   // ビット指定位置 or 範囲指定の MSB
   ymuint32 mMsb;
@@ -120,7 +120,7 @@ operator!=(const Driver& lhs,
 // @brief 単純な形式のコンストラクタ
 // @param[in] node 右辺のノード
 inline
-Driver::Driver(MvNode* node) :
+Driver::Driver(MvnNode* node) :
   mNode(node),
   mMsb(0U),
   mLsb(0U)
@@ -131,7 +131,7 @@ Driver::Driver(MvNode* node) :
 // @param[in] node 右辺のノード
 // @param[in] index ビット指定位置
 inline
-Driver::Driver(MvNode* node,
+Driver::Driver(MvnNode* node,
 	       ymuint index) :
   mNode(node),
   mMsb((index << 1) | 1U),
@@ -144,7 +144,7 @@ Driver::Driver(MvNode* node,
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
 inline
-Driver::Driver(MvNode* node,
+Driver::Driver(MvnNode* node,
 	       ymuint msb,
 	       ymuint lsb) :
   mNode(node),
@@ -182,7 +182,7 @@ Driver::~Driver()
 
 // @brief 右辺のノードを返す．
 inline
-MvNode*
+MvnNode*
 Driver::rhs_node() const
 {
   return mNode;

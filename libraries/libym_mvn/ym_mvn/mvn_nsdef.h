@@ -38,42 +38,42 @@ BEGIN_NAMESPACE_YM_MVN
 
 // クラス名の先行宣言
 
-class MvMgr;
-class MvModule;
-class MvPort;
-class MvPortRef;
-class MvNode;
-class MvInputPin;
-class MvOutputPin;
-class MvNet;
+class MvnMgr;
+class MvnModule;
+class MvnPort;
+class MvnPortRef;
+class MvnNode;
+class MvnInputPin;
+class MvnOutputPin;
+class MvnNet;
 
-typedef DlList<MvInputPin> MvInputPinList;
+typedef DlList<MvnInputPin> MvnInputPinList;
 
-class MvVerilogReader;
-class MvVlMap;
+class MvnVerilogReader;
+class MvnVlMap;
 
 class Mvn2Sbj;
-class MvNodeMap;
+class MvnNodeMap;
 
 END_NAMESPACE_YM_MVN
 
 BEGIN_NAMESPACE_YM
 
-using nsMvn::MvMgr;
-using nsMvn::MvModule;
-using nsMvn::MvPort;
-using nsMvn::MvPortRef;
-using nsMvn::MvNode;
-using nsMvn::MvInputPin;
-using nsMvn::MvInputPinList;
-using nsMvn::MvOutputPin;
-using nsMvn::MvNet;
+using nsMvn::MvnMgr;
+using nsMvn::MvnModule;
+using nsMvn::MvnPort;
+using nsMvn::MvnPortRef;
+using nsMvn::MvnNode;
+using nsMvn::MvnInputPin;
+using nsMvn::MvnInputPinList;
+using nsMvn::MvnOutputPin;
+using nsMvn::MvnNet;
 
-using nsMvn::MvVerilogReader;
-using nsMvn::MvVlMap;
+using nsMvn::MvnVerilogReader;
+using nsMvn::MvnVlMap;
 
 using nsMvn::Mvn2Sbj;
-using nsMvn::MvNodeMap;
+using nsMvn::MvnNodeMap;
 
 END_NAMESPACE_YM
 

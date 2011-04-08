@@ -60,14 +60,14 @@ NetHandle::_bdn()
 }
 
 // @brief MvNetwork を得る．
-const MvMgr*
+const MvnMgr*
 NetHandle::mvn() const
 {
   return NULL;
 }
 
 // @brief MvNetwork を得る．
-MvMgr*
+MvnMgr*
 NetHandle::_mvn()
 {
   return NULL;

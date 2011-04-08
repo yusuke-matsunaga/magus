@@ -20,7 +20,7 @@ using nsYm::nsVerilog::VlDecl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DeclMap DeclMap.h "DeclMap.h"
-/// @brief VlDecl と MvNode の対応付けを行うハッシュ表
+/// @brief VlDecl と MvnNode の対応付けを行うハッシュ表
 //////////////////////////////////////////////////////////////////////
 class DeclMap
 {
@@ -44,7 +44,7 @@ public:
   /// @param[in] node 対応するノード
   void
   add(const VlDecl* decl,
-      MvNode* node);
+      MvnNode* node);
 
   /// @brief 登録する(配列の場合)
   /// @param[in] decl 宣言要素
@@ -53,13 +53,13 @@ public:
   void
   add(const VlDecl* decl,
       ymuint offset,
-      MvNode* node);
+      MvnNode* node);
 
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型の場合には NULL を返す．
-  MvNode*
+  MvnNode*
   get(const VlDecl* decl) const;
 
   /// @brief 対応するノードを取り出す(配列型)．
@@ -68,7 +68,7 @@ public:
   /// @return 対応するノードを返す．
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には NULL を返す．
-  MvNode*
+  MvnNode*
   get(const VlDecl* decl,
       ymuint offset) const;
 
@@ -85,9 +85,9 @@ private:
 
     // オフセット
     ymuint32 mOffset;
-    
+
     // 対応するノード
-    MvNode* mNode;
+    MvnNode* mNode;
 
     // 次の要素を指すリンク
     Cell* mLink;
@@ -104,7 +104,7 @@ private:
   void
   put_cell(const VlDecl* decl,
 	   ymuint offset,
-	   MvNode* node);
+	   MvnNode* node);
 
   /// @brief Cell を探す．
   Cell*

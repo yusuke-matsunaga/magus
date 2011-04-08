@@ -11,9 +11,8 @@
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvModule.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnNode.h"
 
 
 BEGIN_NAMESPACE_YM_MVNBDNCONV
@@ -30,21 +29,21 @@ MvnBdnMap::~MvnBdnMap()
 }
 
 // @brief 登録する．(1ビット版)
-// @param[in] mvnode MvNode
+// @param[in] mvnode MvnNode
 // @param[in] nodehandle BdnNodeHandle
 void
-MvnBdnMap::put(const MvNode* mvnode,
+MvnBdnMap::put(const MvnNode* mvnode,
 	       BdnNodeHandle nodehandle)
 {
   put(mvnode, 0, nodehandle);
 }
 
 // @brief 登録する．(ベクタ版)
-// @param[in] mvnode MvNode
+// @param[in] mvnode MvnNode
 // @param[in] index ビット位置
 // @param[in] nodehandle BdnNodeHandle
 void
-MvnBdnMap::put(const MvNode* mvnode,
+MvnBdnMap::put(const MvnNode* mvnode,
 	       ymuint index,
 	       BdnNodeHandle nodehandle)
 {
@@ -57,18 +56,18 @@ MvnBdnMap::put(const MvNode* mvnode,
 }
 
 // @brief 探す．(1ビット版)
-// @param[in] mvnode MvNode
+// @param[in] mvnode MvnNode
 BdnNodeHandle
-MvnBdnMap::get(const MvNode* mvnode) const
+MvnBdnMap::get(const MvnNode* mvnode) const
 {
   return get(mvnode, 0);
 }
 
 // @brief 探す．(ベクタ版)
-// @param[in] mvnode MvNode
+// @param[in] mvnode MvnNode
 // @param[in] index ビット位置
 BdnNodeHandle
-MvnBdnMap::get(const MvNode* mvnode,
+MvnBdnMap::get(const MvnNode* mvnode,
 	       ymuint index) const
 {
   assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
@@ -106,14 +105,14 @@ END_NONAMESPACE
 
 void
 dump_mvnode_map(ostream& s,
-		const MvMgr& mvmgr,
+		const MvnMgr& mvmgr,
 		const MvnBdnMap& mvnode_map)
 {
   ymuint n = mvmgr.max_node_id();
   for (ymuint i = 0; i < n; ++ i) {
-    const MvNode* node = mvmgr.node(i);
+    const MvnNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
-    const MvOutputPin* opin = node->output(0);
+    const MvnOutputPin* opin = node->output(0);
     ymuint bw = opin->bit_width();
     if ( bw == 1 ) {
       BdnNodeHandle nodehandle = mvnode_map.get(node);

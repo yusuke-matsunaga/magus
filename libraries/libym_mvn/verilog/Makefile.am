@@ -19,8 +19,8 @@ libym_mvn_verilog_la_SOURCES = \
 	DeclMap.cc \
 	Driver.h \
 	MapRec.h \
-	MvVerilogReader.cc \
-	MvVlMap.cc \
+	MvnVerilogReader.cc \
+	MvnVlMap.cc \
 	ReaderImpl.h \
 	ReaderImpl.cc \
 	ReaderImpl_item.cc \
