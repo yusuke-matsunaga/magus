@@ -28,7 +28,6 @@ BdNetwork::BdNetwork() :
   mHashTable(NULL),
   mHashSize(0),
   mLevel(0U)
-
 {
   alloc_table(1024);
 }
@@ -40,6 +39,8 @@ BdNetwork::BdNetwork(const BdNetwork& src) :
   mHashSize(0),
   mLevel(0U)
 {
+  alloc_table(1024);
+
   copy(src);
 }
 
@@ -93,7 +94,9 @@ BdNetwork::copy(const BdNetwork& src)
   for (BdnDffList::const_iterator p = src_dff_list.begin();
        p != src_dff_list.end(); ++ p) {
     const BdnDff* src_dff = *p;
-    BdnDff* dst_dff = new_dff(src_dff->name());
+    bool has_set = (src_dff->set() != NULL);
+    bool has_reset = (src_dff->reset() != NULL);
+    BdnDff* dst_dff = new_dff(src_dff->name(), has_set, has_reset);
 
     const BdnNode* src_output = src_dff->output();
     BdnNode* dst_output = dst_dff->output();
@@ -107,13 +110,17 @@ BdNetwork::copy(const BdNetwork& src)
     BdnNode* dst_clock = dst_dff->clock();
     nodemap[src_clock->id()] = dst_clock;
 
-    const BdnNode* src_set = src_dff->set();
-    BdnNode* dst_set = dst_dff->set();
-    nodemap[src_set->id()] = dst_set;
+    if ( has_set ) {
+      const BdnNode* src_set = src_dff->set();
+      BdnNode* dst_set = dst_dff->set();
+      nodemap[src_set->id()] = dst_set;
+    }
 
-    const BdnNode* src_reset = src_dff->reset();
-    BdnNode* dst_reset = dst_dff->reset();
-    nodemap[src_reset->id()] = dst_reset;
+    if ( has_reset ) {
+      const BdnNode* src_reset = src_dff->reset();
+      BdnNode* dst_reset = dst_dff->reset();
+      nodemap[src_reset->id()] = dst_reset;
+    }
   }
 
   // ラッチノードの生成

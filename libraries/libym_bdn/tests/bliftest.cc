@@ -29,7 +29,7 @@ main(int argc,
   }
   string filename = argv[1];
 
-#if 0
+#if !defined(YM_DEBUG)
   try {
 #endif
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
@@ -52,15 +52,20 @@ main(int argc,
       return 5;
     }
 
-#if 1
     dump(cout, network);
-#else
     BdnBlifWriter blif_writer;
-
     blif_writer(cout, network);
-#endif
 
-#if 0
+    cout << endl;
+    cout << "after copy" << endl;
+    cout << endl;
+
+    BdNetwork network2 = network;
+
+    dump(cout, network2);
+    blif_writer(cout, network2);
+
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError x) {
     cout << x << endl;
