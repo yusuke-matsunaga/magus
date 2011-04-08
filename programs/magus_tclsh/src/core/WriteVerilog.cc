@@ -12,7 +12,7 @@
 #include "WriteVerilog.h"
 
 #include "ym_bnet/BNetVerilogWriter.h"
-#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnVerilogWriter.h"
 #include "ym_tclpp/TclPopt.h"
 
 
@@ -80,8 +80,9 @@ WriteVerilog::cmd_proc(TclObjVector& objv)
 
   case NetHandle::kMagMvn:
     {
-      const MvnMgr& mgr = *neth->mvn();
-      dump_verilog(*osp, mgr);
+      // Mvn の場合
+      MvnVerilogWriter writer;
+      writer(*osp, *neth->mvn());
       // この関数はfailしない．
       stat = TCL_OK;
     }

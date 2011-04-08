@@ -640,14 +640,6 @@ void
 dump(ostream& s,
      const MvnMgr& mgr);
 
-
-/// @brief 内容を Verilog-HDL 形式で出力する
-/// @param[in] s 出力先のストリーム
-/// @param[in] mgr MvnMgr
-void
-dump_verilog(ostream& s,
-	     const MvnMgr& mgr);
-
 /// @brief ノード番号ともとのVerilog名の対応を出力する．
 void
 dump_node_map(ostream& s,

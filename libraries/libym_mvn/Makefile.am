@@ -18,7 +18,6 @@ noinst_LTLIBRARIES = libym_mvn.la
 
 libym_mvn_la_SOURCES = \
 	dump.cc \
-	dump_verilog.cc \
 	MvnArithOp.h \
 	MvnArithOp.cc \
 	MvnBinaryOp.h \
@@ -66,7 +65,8 @@ libym_mvn_la_SOURCES = \
 	MvnUdp.h \
 	MvnUdp.cc \
 	MvnUnaryOp.h \
-	MvnUnaryOp.cc
+	MvnUnaryOp.cc \
+	MvnVerilogWriter.cc
 
 libym_mvn_la_LDFLAGS =
 

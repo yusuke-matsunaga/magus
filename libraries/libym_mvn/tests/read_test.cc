@@ -12,6 +12,7 @@
 #include "ym_mvn/MvnMgr.h"
 #include "ym_mvn/MvnVerilogReader.h"
 #include "ym_mvn/MvnVlMap.h"
+#include "ym_mvn/MvnVerilogWriter.h"
 
 
 int
@@ -58,8 +59,13 @@ main(int argc,
     }
 
     dump(cout, mgr);
-    dump_verilog(cout, mgr);
+
+    MvnVerilogWriter vl_writer;
+
+    vl_writer(cout, mgr);
+
     dump_node_map(cout, mgr, node_map);
+
 #if !defined(YM_DEBUG)
   }
   catch ( AssertError x) {

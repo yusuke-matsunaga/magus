@@ -12,7 +12,8 @@
 #include "ym_mvn/MvnModule.h"
 #include "ym_mvn/MvnPort.h"
 #include "ym_mvn/MvnNode.h"
-#include "ym_mvn/MvnPin.h"
+#include "ym_mvn/MvnInputPin.h"
+#include "ym_mvn/MvnOutputPin.h"
 
 #include "ym_mvn/MvnVlMap.h"
 

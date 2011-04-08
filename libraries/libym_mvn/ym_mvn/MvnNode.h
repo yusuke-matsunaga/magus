@@ -10,7 +10,8 @@
 
 
 #include "ym_mvn/mvn_nsdef.h"
-#include "ym_mvn/MvnPin.h"
+#include "ym_mvn/MvnInputPin.h"
+#include "ym_mvn/MvnOutputPin.h"
 
 
 BEGIN_NAMESPACE_YM_MVN

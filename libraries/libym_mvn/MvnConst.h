@@ -10,7 +10,6 @@
 
 
 #include "ym_mvn/MvnNode.h"
-#include "ym_mvn/MvnPin.h"
 
 
 BEGIN_NAMESPACE_YM_MVN

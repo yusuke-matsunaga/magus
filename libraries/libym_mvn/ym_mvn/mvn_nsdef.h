@@ -52,8 +52,7 @@ typedef DlList<MvnInputPin> MvnInputPinList;
 class MvnVerilogReader;
 class MvnVlMap;
 
-class Mvn2Sbj;
-class MvnNodeMap;
+class MvnVerilogWriter;
 
 END_NAMESPACE_YM_MVN
 
@@ -72,8 +71,7 @@ using nsMvn::MvnNet;
 using nsMvn::MvnVerilogReader;
 using nsMvn::MvnVlMap;
 
-using nsMvn::Mvn2Sbj;
-using nsMvn::MvnNodeMap;
+using nsMvn::MvnVerilogWriter;
 
 END_NAMESPACE_YM
 

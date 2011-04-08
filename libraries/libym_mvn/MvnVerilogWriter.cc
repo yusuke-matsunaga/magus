@@ -1,18 +1,20 @@
 
-/// @file libym_mvn/dump.cc
-/// @brief dump() の実装ファイル
+/// @file libym_mvn/MvnVerilogWriter.cc
+/// @brief MvnVerilogWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnVerilogWriter.h"
 
+#include "ym_mvn/MvnMgr.h"
 #include "ym_mvn/MvnModule.h"
 #include "ym_mvn/MvnPort.h"
 #include "ym_mvn/MvnNode.h"
-#include "ym_mvn/MvnPin.h"
+#include "ym_mvn/MvnInputPin.h"
+#include "ym_mvn/MvnOutputPin.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -898,15 +900,25 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// グローバル関数
+// クラス MvnVerilogWriter
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+MvnVerilogWriter::MvnVerilogWriter()
+{
+}
+
+// @brief デストラクタ
+MvnVerilogWriter::~MvnVerilogWriter()
+{
+}
 
 // @brief 内容を Verilog-HDL 形式で出力する
 // @param[in] s 出力先のストリーム
 // @param[in] mgr MvnMgr
 void
-dump_verilog(ostream& s,
-	     const MvnMgr& mgr)
+MvnVerilogWriter::operator()(ostream& s,
+			     const MvnMgr& mgr)
 {
   ymuint n = mgr.max_module_id();
   for (ymuint i = 0; i < n; ++ i) {
