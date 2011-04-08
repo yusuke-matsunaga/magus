@@ -94,9 +94,7 @@ BdNetwork::copy(const BdNetwork& src)
   for (BdnDffList::const_iterator p = src_dff_list.begin();
        p != src_dff_list.end(); ++ p) {
     const BdnDff* src_dff = *p;
-    bool has_set = (src_dff->set() != NULL);
-    bool has_reset = (src_dff->reset() != NULL);
-    BdnDff* dst_dff = new_dff(src_dff->name(), has_set, has_reset);
+    BdnDff* dst_dff = new_dff(src_dff->name());
 
     const BdnNode* src_output = src_dff->output();
     BdnNode* dst_output = dst_dff->output();
@@ -110,17 +108,13 @@ BdNetwork::copy(const BdNetwork& src)
     BdnNode* dst_clock = dst_dff->clock();
     nodemap[src_clock->id()] = dst_clock;
 
-    if ( has_set ) {
-      const BdnNode* src_set = src_dff->set();
-      BdnNode* dst_set = dst_dff->set();
-      nodemap[src_set->id()] = dst_set;
-    }
+    const BdnNode* src_set = src_dff->set();
+    BdnNode* dst_set = dst_dff->set();
+    nodemap[src_set->id()] = dst_set;
 
-    if ( has_reset ) {
-      const BdnNode* src_reset = src_dff->reset();
-      BdnNode* dst_reset = dst_dff->reset();
-      nodemap[src_reset->id()] = dst_reset;
-    }
+    const BdnNode* src_reset = src_dff->reset();
+    BdnNode* dst_reset = dst_dff->reset();
+    nodemap[src_reset->id()] = dst_reset;
   }
 
   // ラッチノードの生成
@@ -350,13 +344,9 @@ BdNetwork::new_port(const string& name,
 
 // @brief D-FF を作る．
 // @param[in] name 名前
-// @param[in] has_set set 信号を持つ時 true
-// @param[in] has_reset reset 信号を持つとき true
 // @return 生成されたD-FFを返す．
 BdnDff*
-BdNetwork::new_dff(const string& name,
-		   bool has_set,
-		   bool has_reset)
+BdNetwork::new_dff(const string& name)
 {
   // 空いているIDを探して配列へ登録
   int id = mDffItvlMgr.avail_num();
@@ -399,27 +389,17 @@ BdNetwork::new_dff(const string& name,
   clock->mAuxData = dff->mAuxData;
   mOutputList.push_back(clock);
 
-  if ( has_set ) {
-    BdnNode* set = alloc_node();
-    dff->mSet = set;
-    set->set_type(BdnNode::kDFF_SET);
-    set->mAuxData = dff->mAuxData;
-    mOutputList.push_back(set);
-  }
-  else {
-    dff->mSet = NULL;
-  }
+  BdnNode* set = alloc_node();
+  dff->mSet = set;
+  set->set_type(BdnNode::kDFF_SET);
+  set->mAuxData = dff->mAuxData;
+  mOutputList.push_back(set);
 
-  if ( has_reset ) {
-    BdnNode* reset = alloc_node();
-    dff->mReset = reset;
-    reset->set_type(BdnNode::kDFF_RESET);
-    reset->mAuxData = dff->mAuxData;
-    mOutputList.push_back(reset);
-  }
-  else {
-    dff->mReset = NULL;
-  }
+  BdnNode* reset = alloc_node();
+  dff->mReset = reset;
+  reset->set_type(BdnNode::kDFF_RESET);
+  reset->mAuxData = dff->mAuxData;
+  mOutputList.push_back(reset);
 
   mDffList.push_back(dff);
 

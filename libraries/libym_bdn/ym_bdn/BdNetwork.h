@@ -174,13 +174,9 @@ public:
 
   /// @brief D-FF を作る．
   /// @param[in] name 名前
-  /// @param[in] has_set set 信号を持つ時 true
-  /// @param[in] has_reset reset 信号を持つとき true
   /// @return 生成されたD-FFを返す．
   BdnDff*
-  new_dff(const string& name = string(),
-	  bool has_set = false,
-	  bool has_reset = false);
+  new_dff(const string& name = string());
 
   /// @brief ラッチを作る．
   /// @param[in] name 名前

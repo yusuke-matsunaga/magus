@@ -93,7 +93,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     }
 
     // D-FF の生成
-    BdnDff* dff = mNetwork->new_dff(blif_node->name(), has_set, has_reset);
+    BdnDff* dff = mNetwork->new_dff(blif_node->name());
     dff_array[i] = dff;
 
     // D-FF の出力の登録

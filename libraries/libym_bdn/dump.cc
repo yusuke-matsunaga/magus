@@ -72,11 +72,11 @@ dump(ostream& s,
     dump_output(s, input);
     s << ", CLOCK=";
     dump_output(s, clock);
-    if ( set ) {
+    if ( set->output_fanin() ) {
       s << ", SET=";
       dump_output(s, set);
     }
-    if ( reset ) {
+    if ( reset->output_fanin() ) {
       s << ", RESET=";
       dump_output(s, reset);
     }

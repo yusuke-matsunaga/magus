@@ -262,7 +262,6 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
     const MvNode* node = *p;
     if ( node->type() == MvNode::kDff ) {
       // DFF
-      // TODO: 非同期セット/非同期リセットの情報を取り出し設定する．
       ymuint bw = node->output(0)->bit_width();
       vector<BdnDff*>& dff_array = dff_map[node->id()];
       dff_array.resize(bw, NULL);
@@ -359,33 +358,44 @@ MvnBdnConv::operator()(const MvMgr& mvmgr,
       const MvNode* clock_src_node = clock_opin->node();
       BdnNodeHandle clock_ihandle = mvnode_map.get(clock_src_node);
 
-#if 0 // 今は非同期信号を無視
-      // リセット
-      const MvInputPin* reset_ipin = node->input(2);
-      const MvOutputPin* reset_opin = reset_ipin->src_pin();
-      BdnNodeHandle reset_ihandle;
-      if ( reset_opin ) {
-	assert_cond( reset_opin->bit_width() == 1, __FILE__, __LINE__);
-	const MvNode* src_node = reset_opin->node();
-	reset_ihandle = mvnode_map.get(src_node);
+      // 非同期セット/非同期リセット
+      vector<BdnNodeHandle> set_array(bw, BdnNodeHandle::make_zero());
+      vector<BdnNodeHandle> reset_array(bw, BdnNodeHandle::make_zero());
+      ymuint nc = (node->input_num() - 2) / 2;
+      BdnNodeHandle mask = BdnNodeHandle::make_one();
+      for (ymuint k = 0; k < nc; ++ k) {
+	const MvInputPin* ctrl_ipin = node->input(k * 2 + 2);
+	const MvOutputPin* ctrl_opin = ctrl_ipin->src_pin();
+	const MvNode* ctrl_src_node = ctrl_opin->node();
+	BdnNodeHandle ctrl_dst_ihandle = mvnode_map.get(ctrl_src_node);
+	const MvInputPin* val_ipin = node->input(k * 2 + 3);
+	const MvOutputPin* val_opin = val_ipin->src_pin();
+	const MvNode* val_src_node = val_opin->node();
+	BdnNodeHandle cond = bdnetwork.new_and(mask, ctrl_dst_ihandle);
+	mask = bdnetwork.new_and(mask, ~ctrl_dst_ihandle);
+	for (ymuint j = 0; j < bw; ++ j) {
+	  BdnNodeHandle val_dst_ihandle = mvnode_map.get(val_src_node, j);
+	  BdnNodeHandle new_set = bdnetwork.new_and(cond, val_dst_ihandle);
+	  BdnNodeHandle new_reset = bdnetwork.new_and(cond, ~val_dst_ihandle);
+	  set_array[j] = bdnetwork.new_or(set_array[j], new_set);
+	  reset_array[j] = bdnetwork.new_or(reset_array[j], new_reset);
+	}
       }
 
-      // セット
-      const MvInputPin* set_ipin = node->input(3);
-      const MvOutputPin* set_opin = set_ipin->src_pin();
-      BdnNodeHandle set_ihandle;
-      if ( set_opin ) {
-	assert_cond( set_opin->bit_width() == 1, __FILE__, __LINE__);
-	const MvNode* src_node = set_opin->node();
-	set_ihandle = mvnode_map.get(src_node);
-      }
-#endif
       const vector<BdnDff*>& dff_array = dff_map[node->id()];
       for (ymuint j = 0; j < bw; ++ j) {
 	BdnDff* dff = dff_array[j];
 	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
 	bdnetwork.set_output_fanin(dff->input(), data_ihandle);
 	bdnetwork.set_output_fanin(dff->clock(), clock_ihandle);
+	BdnNodeHandle set_ihandle = set_array[j];
+	if ( !set_ihandle.is_zero() ) {
+	  bdnetwork.set_output_fanin(dff->set(), set_ihandle);
+	}
+	BdnNodeHandle reset_ihandle = reset_array[j];
+	if ( !reset_ihandle.is_zero() ) {
+	  bdnetwork.set_output_fanin(dff->reset(), reset_ihandle);
+	}
       }
     }
     else if ( node->type() == MvNode::kLatch ) {
