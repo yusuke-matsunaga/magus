@@ -5,11 +5,11 @@
 /// @brief MvnConstPartSelect のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MvnUnaryOp.h"
+#include "MvnNodeBase.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -19,15 +19,31 @@ BEGIN_NAMESPACE_YM_MVN
 /// @brief 定数ビット指定を表すノード
 //////////////////////////////////////////////////////////////////////
 class MvnConstPartSelect :
-  public MvnUnaryOp
+  public MvnNodeBase
 {
   friend class MvnMgr;
-public:
 
-  /// @brief ノードの種類を得る．
-  virtual
-  tType
-  type() const;
+private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  /// @param[in] module 親のモジュール
+  /// @param[in] msb 範囲指定の MSB
+  /// @param[in] lsb 範囲指定の LSB
+  MvnConstPartSelect(MvnModule* module,
+		     ymuint msb,
+		     ymuint lsb);
+
+  /// @brief デストラクタ
+  ~MvnConstPartSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を参照するための関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 範囲指定の MSB を得る．
   /// @note type() が kConstPartSelect の時のみ意味を持つ．
@@ -42,25 +58,6 @@ public:
   virtual
   ymuint
   lsb() const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // コンストラクタ / デストラクタ
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  /// @param[in] module 親のモジュール
-  /// @param[in] msb 範囲指定の MSB
-  /// @param[in] lsb 範囲指定の LSB
-  /// @param[in] bit_width 入力のビット幅
-  MvnConstPartSelect(MvnModule* module,
-		     ymuint msb,
-		     ymuint lsb,
-		     ymuint bit_width);
-
-  /// @brief デストラクタ
-  ~MvnConstPartSelect();
 
 
 private:

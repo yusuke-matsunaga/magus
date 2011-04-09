@@ -22,7 +22,7 @@ class MvnInputPin :
   public DlElem
 {
   friend class MvnMgr;
-  friend class MvnNode;
+  friend class MvnNodeBase;
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -58,17 +58,28 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 設定用の関数
+  void
+  init(MvnNode* node,
+       ymuint pos);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 親のノード
   MvnNode* mNode;
 
-  // ビット幅
-  ymuint32 mBitWidth;
-
   // 位置
   ymuint32 mPos;
+
+  // ビット幅
+  ymuint32 mBitWidth;
 
   // 接続している出力ピン
   MvnOutputPin* mSrcPin;
@@ -111,6 +122,18 @@ MvnOutputPin*
 MvnInputPin::src_pin() const
 {
   return mSrcPin;
+}
+
+// @brief 設定用の関数
+inline
+void
+MvnInputPin::init(MvnNode* node,
+		  ymuint pos)
+{
+  mNode = node;
+  mPos = pos;
+  mBitWidth = 1;
+  mSrcPin = NULL;
 }
 
 END_NAMESPACE_YM_MVN

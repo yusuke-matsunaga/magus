@@ -16,11 +16,9 @@ BEGIN_NAMESPACE_YM_MVN
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
 // @param[in] bitpos ビット位置
-// @param[in] bit_width 入力のビット幅
 MvnConstBitSelect::MvnConstBitSelect(MvnModule* module,
-				     ymuint bitpos,
-				     ymuint bit_width) :
-  MvnUnaryOp(module, bit_width, 1),
+				     ymuint bitpos) :
+  MvnNodeBase(module, MvnNode::kConstBitSelect, 1, 1),
   mBitPos(bitpos)
 {
 }
@@ -28,13 +26,6 @@ MvnConstBitSelect::MvnConstBitSelect(MvnModule* module,
 // @brief デストラクタ
 MvnConstBitSelect::~MvnConstBitSelect()
 {
-}
-
-// @brief ノードの種類を得る．
-MvnNode::tType
-MvnConstBitSelect::type() const
-{
-  return kConstBitSelect;
 }
 
 // @brief ビット位置を得る．
@@ -48,16 +39,19 @@ MvnConstBitSelect::bitpos() const
 
 // @brief bit-selectノードを生成する．
 // @param[in] module ノードが属するモジュール
-// @param[in] bitpos ビット位置
 // @param[in] bit_width ビット幅
+// @param[in] bitpos ビット位置
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_constbitselect(MvnModule* module,
-			   ymuint bitpos,
-			   ymuint bit_width)
+			   ymuint bit_width,
+			   ymuint bitpos)
 {
-  MvnNode* node = new MvnConstBitSelect(module, bitpos, bit_width);
+  MvnNode* node = new MvnConstBitSelect(module, bitpos);
   reg_node(node);
+
+  node->_input(0)->mBitWidth = bit_width;
+  node->_output(0)->mBitWidth = 1;
 
   return node;
 }

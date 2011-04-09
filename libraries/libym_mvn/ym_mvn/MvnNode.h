@@ -125,6 +125,20 @@ public:
   };
 
 
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  /// @param[in] module 親のモジュール
+  MvnNode(MvnModule* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~MvnNode();
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 情報を参照するための関数
@@ -144,22 +158,26 @@ public:
   type() const = 0;
 
   /// @brief 入力ピン数を得る．
+  virtual
   ymuint
-  input_num() const;
+  input_num() const = 0;
 
   /// @brief 入力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
+  virtual
   const MvnInputPin*
-  input(ymuint pos) const;
+  input(ymuint pos) const = 0;
 
   /// @brief 出力ピン数を得る．
+  virtual
   ymuint
-  output_num() const;
+  output_num() const = 0;
 
   /// @brief 出力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
+  virtual
   const MvnOutputPin*
-  output(ymuint pos) const;
+  output(ymuint pos) const = 0;
 
   /// @brief クロック信号の極性を得る．
   /// @retval 1 正極性(posedge)
@@ -212,50 +230,20 @@ public:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // コンストラクタ / デストラクタ
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief コンストラクタ
-  /// @param[in] module 親のモジュール
-  /// @param[in] ni 入力ピン数
-  /// @param[in] no 出力ピン数
-  MvnNode(MvnModule* parent,
-	 ymuint ni,
-	 ymuint no);
-
-  /// @brief デストラクタ
-  virtual
-  ~MvnNode();
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
+  virtual
   MvnInputPin*
-  _input(ymuint pos);
+  _input(ymuint pos) = 0;
 
   /// @brief 出力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
+  virtual
   MvnOutputPin*
-  _output(ymuint pos);
-
-  /// @brief 入力ピンのビット幅を設定する．
-  /// @param[in] pos 対象のピン番号
-  /// @param[in] bit_width ビット幅
-  void
-  set_ipin_bit_width(ymuint pos,
-		     ymuint bit_width);
-
-  /// @brief 出力ピンのビット幅を設定する．
-  /// @param[in] pos 対象のピン番号
-  /// @param[in] bit_width ビット幅
-  void
-  set_opin_bit_width(ymuint pos,
-		     ymuint bit_width);
+  _output(ymuint pos) = 0;
 
 
 private:
@@ -271,18 +259,6 @@ private:
 
   // mNodeList からの削除で用いる反復子
   list<MvnNode*>::iterator mSelfRef;
-
-  // 入力ピン数
-  ymuint32 mNi;
-
-  // 入力ピンの配列
-  MvnInputPin* mInputPins;
-
-  // 出力ピン数
-  ymuint32 mNo;
-
-  // 出力ピンの配列
-  MvnOutputPin* mOutputPins;
 
 };
 
@@ -305,58 +281,6 @@ const MvnModule*
 MvnNode::parent() const
 {
   return mParent;
-}
-
-// @brief 入力ピン数を得る．
-inline
-ymuint
-MvnNode::input_num() const
-{
-  return mNi;
-}
-
-// @brief 入力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < input_num() )
-inline
-const MvnInputPin*
-MvnNode::input(ymuint pos) const
-{
-  return &mInputPins[pos];
-}
-
-// @brief 入力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < input_num() )
-inline
-MvnInputPin*
-MvnNode::_input(ymuint pos)
-{
-  return &mInputPins[pos];
-}
-
-// @brief 出力ピン数を得る．
-inline
-ymuint
-MvnNode::output_num() const
-{
-  return mNo;
-}
-
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-inline
-const MvnOutputPin*
-MvnNode::output(ymuint pos) const
-{
-  return &mOutputPins[pos];
-}
-
-// @brief 出力ピンを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-inline
-MvnOutputPin*
-MvnNode::_output(ymuint pos)
-{
-  return &mOutputPins[pos];
 }
 
 END_NAMESPACE_YM_MVN

@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_MVN
 class MvnOutputPin
 {
   friend class MvnMgr;
-  friend class MvnNode;
+  friend class MvnNodeBase;
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -57,17 +57,28 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 設定用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 設定用の関数
+  void
+  init(MvnNode* node,
+       ymuint pos);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 親のノード
   MvnNode* mNode;
 
-  // ビット幅
-  ymuint32 mBitWidth;
-
   // 位置
   ymuint32 mPos;
+
+  // ビット幅
+  ymuint32 mBitWidth;
 
   // 接続している入力ピンのリスト
   MvnInputPinList mDstPinList;
@@ -110,6 +121,17 @@ const MvnInputPinList&
 MvnOutputPin::dst_pin_list() const
 {
   return mDstPinList;
+}
+
+// @brief 設定用の関数
+inline
+void
+MvnOutputPin::init(MvnNode* node,
+		   ymuint pos)
+{
+  mNode = node;
+  mPos = pos;
+  mBitWidth = 1;
 }
 
 END_NAMESPACE_YM_MVN

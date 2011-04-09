@@ -12,10 +12,6 @@
 #include "ym_mvn/MvnModule.h"
 #include "ym_mvn/MvnPort.h"
 
-#include "MvnInput.h"
-#include "MvnOutput.h"
-#include "MvnInout.h"
-
 
 BEGIN_NAMESPACE_YM_MVN
 
@@ -183,18 +179,15 @@ MvnMgr::new_module(const char* name,
   mModuleArray[id] = module;
 
   for (ymuint i = 0; i < ni; ++ i) {
-    MvnNode* node = new MvnInput(module, ibitwidth_array[i]);
-    reg_node(node);
+    MvnNode* node = new_input(module, ibitwidth_array[i]);
     module->mInputArray[i] = node;
   }
   for (ymuint i = 0; i < no; ++ i) {
-    MvnNode* node = new MvnOutput(module, obitwidth_array[i]);
-    reg_node(node);
+    MvnNode* node = new_output(module, obitwidth_array[i]);
     module->mOutputArray[i] = node;
   }
   for (ymuint i = 0; i < nio; ++ i) {
-    MvnNode* node = new MvnInout(module, iobitwidth_array[i]);
-    reg_node(node);
+    MvnNode* node = new_inout(module, iobitwidth_array[i]);
     module->mInoutArray[i] = node;
   }
   return module;
@@ -645,8 +638,8 @@ MvnMgr::unreg_node(MvnNode* node)
 // @brief コンストラクタ
 MvnInputPin::MvnInputPin() :
   mNode(NULL),
-  mBitWidth(0),
   mPos(0),
+  mBitWidth(0),
   mSrcPin(NULL)
 {
 }
@@ -664,8 +657,8 @@ MvnInputPin::~MvnInputPin()
 // @brief コンストラクタ
 MvnOutputPin::MvnOutputPin() :
   mNode(NULL),
-  mBitWidth(0),
-  mPos(0)
+  mPos(0),
+  mBitWidth(0)
 {
 }
 

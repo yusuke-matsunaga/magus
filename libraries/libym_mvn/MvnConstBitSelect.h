@@ -5,11 +5,11 @@
 /// @brief MvnConstBitSelect のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MvnUnaryOp.h"
+#include "MvnNodeBase.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -19,25 +19,11 @@ BEGIN_NAMESPACE_YM_MVN
 /// @brief 定数ビット指定を表すノード
 //////////////////////////////////////////////////////////////////////
 class MvnConstBitSelect :
-  public MvnUnaryOp
+  public MvnNodeBase
 {
   friend class MvnMgr;
-public:
 
-  /// @brief ノードの種類を得る．
-  virtual
-  tType
-  type() const;
-
-  /// @brief ビット位置を得る．
-  /// @note type() が kConstBitSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  virtual
-  ymuint
-  bitpos() const;
-
-
-public:
+private:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ / デストラクタ
   //////////////////////////////////////////////////////////////////////
@@ -45,13 +31,24 @@ public:
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] bitpos ビット位置
-  /// @param[in] bit_width 入力のビット幅
   MvnConstBitSelect(MvnModule* module,
-		    ymuint bitpos,
-		    ymuint bit_width);
+		    ymuint bitpos);
 
   /// @brief デストラクタ
   ~MvnConstBitSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を参照するための関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ビット位置を得る．
+  /// @note type() が kConstBitSelect の時のみ意味を持つ．
+  /// @note デフォルトの実装では 0 を返す．
+  virtual
+  ymuint
+  bitpos() const;
 
 
 private:

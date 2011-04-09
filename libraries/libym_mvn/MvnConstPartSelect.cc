@@ -17,12 +17,10 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] module 親のモジュール
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
-// @param[in] bit_width 入力のビット幅
 MvnConstPartSelect::MvnConstPartSelect(MvnModule* module,
 				       ymuint msb,
-				       ymuint lsb,
-				       ymuint bit_width) :
-  MvnUnaryOp(module, bit_width, msb - lsb + 1),
+				       ymuint lsb) :
+  MvnNodeBase(module, MvnNode::kConstPartSelect, 1, 1),
   mMsb(msb),
   mLsb(lsb)
 {
@@ -31,13 +29,6 @@ MvnConstPartSelect::MvnConstPartSelect(MvnModule* module,
 // @brief デストラクタ
 MvnConstPartSelect::~MvnConstPartSelect()
 {
-}
-
-// @brief ノードの種類を得る．
-MvnNode::tType
-MvnConstPartSelect::type() const
-{
-  return kConstPartSelect;
 }
 
 // @brief 範囲指定の MSB を得る．
@@ -66,12 +57,15 @@ MvnConstPartSelect::lsb() const
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_constpartselect(MvnModule* module,
+			    ymuint bit_width,
 			    ymuint msb,
-			    ymuint lsb,
-			    ymuint bit_width)
+			    ymuint lsb)
 {
-  MvnNode* node = new MvnConstPartSelect(module, msb, lsb, bit_width);
+  MvnNode* node = new MvnConstPartSelect(module, msb, lsb);
   reg_node(node);
+
+  node->_input(0)->mBitWidth = bit_width;
+  node->_output(0)->mBitWidth = msb - lsb + 1;
 
   return node;
 }

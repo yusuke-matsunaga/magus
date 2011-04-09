@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_mvn/MvnNode.h"
+#include "MvnNodeBase.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -19,23 +19,9 @@ BEGIN_NAMESPACE_YM_MVN
 /// @brief 入力ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
 class MvnConst :
-  public MvnNode
+  public MvnNodeBase
 {
   friend class MvnMgr;
-
-public:
-
-  /// @brief ノードの種類を得る．
-  virtual
-  tType
-  type() const;
-
-  /// @brief 定数値を得る．
-  /// @param[out] val 値を格納するベクタ
-  /// @note type() が kConst の時のみ意味を持つ．
-  virtual
-  void
-  const_value(vector<ymuint32>& val) const;
 
 
 private:
@@ -45,14 +31,25 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
-  /// @param[in] bit_width ビット幅
   /// @param[in] val 値
   MvnConst(MvnModule* module,
-	   ymuint bit_width,
 	   const vector<ymuint32>& val);
 
   /// @brief デストラクタ
   ~MvnConst();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を参照するための関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 定数値を得る．
+  /// @param[out] val 値を格納するベクタ
+  /// @note type() が kConst の時のみ意味を持つ．
+  virtual
+  void
+  const_value(vector<ymuint32>& val) const;
 
 
 private:

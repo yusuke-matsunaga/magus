@@ -21,28 +21,12 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] module 親のモジュール
 // @param[in] clock_pol クロックの極性
 // @param[in] control_array 非同期セットの極性を入れた配列
-// @param[in] bit_width ビット幅
 MvnDff::MvnDff(MvnModule* module,
 	       ymuint clock_pol,
-	       const vector<ymuint>& control_array,
-	       ymuint bit_width) :
-  MvnNode(module, (control_array.size() * 2) + 2, 1)
+	       const vector<ymuint>& control_array) :
+  MvnNodeBase(module, MvnNode::kDff, (control_array.size() * 2) + 2, 1)
 {
   ymuint np = control_array.size();
-
-  // データ入力
-  set_ipin_bit_width(0, bit_width);
-  // クロック入力
-  set_ipin_bit_width(1, 1);
-  // 非同期セット入力
-  for (ymuint i = 0; i < np; ++ i) {
-    // コントロール
-    set_ipin_bit_width(i * 2 + 2, 1);
-    // データ
-    set_ipin_bit_width(i * 2 + 3, bit_width);
-  }
-  // データ出力
-  set_opin_bit_width(0, bit_width);
 
   ymuint n1 = (np + 32) / 32;
   mPolArray = new ymuint32[n1];
@@ -63,13 +47,6 @@ MvnDff::MvnDff(MvnModule* module,
 MvnDff::~MvnDff()
 {
   delete [] mPolArray;
-}
-
-// @brief ノードの種類を得る．
-MvnNode::tType
-MvnDff::type() const
-{
-  return kDff;
 }
 
 // @brief クロック信号の極性を得る．
@@ -107,53 +84,24 @@ MvnMgr::new_dff(MvnModule* module,
 		const vector<ymuint>& control_array,
 		ymuint bit_width)
 {
-  MvnNode* node = new MvnDff(module, clock_pol, control_array, bit_width);
+  MvnNode* node = new MvnDff(module, clock_pol, control_array);
   reg_node(node);
 
-  return node;
-}
+  ymuint np = control_array.size();
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス MvnLatch
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] module 親のモジュール
-// @param[in] bit_width ビット幅
-MvnLatch::MvnLatch(MvnModule* module,
-		   ymuint bit_width) :
-  MvnNode(module, 2, 1)
-{
   // データ入力
-  set_ipin_bit_width(0, bit_width);
-  // イネーブル入力
-  set_ipin_bit_width(1, 1);
+  node->_input(0)->mBitWidth = bit_width;
+  // クロック入力
+  node->_input(1)->mBitWidth = 1;
+  // 非同期セット入力
+  for (ymuint i = 0; i < np; ++ i) {
+    // コントロール
+    node->_input(i * 2 + 2)->mBitWidth = 1;
+    // データ
+    node->_input(i * 2 + 3)->mBitWidth = bit_width;
+  }
   // データ出力
-  set_opin_bit_width(0, bit_width);
-}
-
-// @brief デストラクタ
-MvnLatch::~MvnLatch()
-{
-}
-
-// @brief ノードの種類を得る．
-MvnNode::tType
-MvnLatch::type() const
-{
-  return kLatch;
-}
-
-// @brief ラッチノードを生成する．
-// @param[in] module ノードが属するモジュール
-// @param[in] bit_width ビット幅
-MvnNode*
-MvnMgr::new_latch(MvnModule* module,
-		  ymuint bit_width)
-{
-  MvnNode* node = new MvnLatch(module, bit_width);
-  reg_node(node);
+  node->_output(0)->mBitWidth = bit_width;
 
   return node;
 }

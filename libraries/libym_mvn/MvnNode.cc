@@ -14,36 +14,14 @@ BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
-// @param[in] ni 入力ピン数
-// @param[in] no 出力ピン数
-MvnNode::MvnNode(MvnModule* parent,
-		 ymuint ni,
-		 ymuint no) :
-  mParent(parent),
-  mNi(ni),
-  mInputPins(new MvnInputPin[ni]),
-  mNo(no),
-  mOutputPins(new MvnOutputPin[no])
+MvnNode::MvnNode(MvnModule* parent) :
+  mParent(parent)
 {
-  for (ymuint i = 0; i < ni; ++ i) {
-    MvnInputPin* pin = &mInputPins[i];
-    pin->mNode = this;
-    pin->mPos = i;
-    pin->mBitWidth = 1;
-  }
-  for (ymuint i = 0; i < no; ++ i) {
-    MvnOutputPin* pin = &mOutputPins[i];
-    pin->mNode = this;
-    pin->mPos = i;
-    pin->mBitWidth = 1;
-  }
 }
 
 // @brief デストラクタ
 MvnNode::~MvnNode()
 {
-  delete [] mInputPins;
-  delete [] mOutputPins;
 }
 
 // @brief クロック信号の極性を得る．
@@ -103,26 +81,6 @@ MvnNode::lsb() const
 void
 MvnNode::const_value(vector<ymuint32>& val) const
 {
-}
-
-// @brief 入力ピンのビット幅を設定する．
-// @param[in] pos 対象のピン番号
-// @param[in] bit_width ビット幅
-void
-MvnNode::set_ipin_bit_width(ymuint pos,
-			    ymuint bit_width)
-{
-  mInputPins[pos].mBitWidth = bit_width;
-}
-
-// @brief 出力ピンのビット幅を設定する．
-// @param[in] pos 対象のピン番号
-// @param[in] bit_width ビット幅
-void
-MvnNode::set_opin_bit_width(ymuint pos,
-			    ymuint bit_width)
-{
-  mOutputPins[pos].mBitWidth = bit_width;
 }
 
 END_NAMESPACE_YM_MVN

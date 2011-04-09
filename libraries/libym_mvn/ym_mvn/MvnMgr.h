@@ -5,11 +5,12 @@
 /// @brief MvnMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_mvn/mvn_nsdef.h"
+#include "ym_mvn/MvnNode.h"
 #include "ym_utils/ItvlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
 
@@ -189,6 +190,33 @@ public:
   /// @brief 冗長な through ノードを取り除く
   void
   sweep();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ノードの生成
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  MvnNode*
+  new_input(MvnModule* module,
+	    ymuint bit_width);
+
+  /// @brief 出力ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  MvnNode*
+  new_output(MvnModule* module,
+	     ymuint bit_width);
+
+  /// @brief 入出力ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  MvnNode*
+  new_inout(MvnModule* module,
+	    ymuint bit_width);
 
   /// @brief フリップフロップノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -443,25 +471,25 @@ public:
 
   /// @brief bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
-  /// @param[in] bitpos ビット位置
   /// @param[in] bit_width ビット幅
+  /// @param[in] bitpos ビット位置
   /// @return 生成したノードを返す．
   MvnNode*
   new_constbitselect(MvnModule* module,
-		     ymuint bitpos,
-		     ymuint bit_width);
+		     ymuint bit_width,
+		     ymuint bitpos);
 
   /// @brief part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
-  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvnNode*
   new_constpartselect(MvnModule* module,
+		      ymuint bit_width,
 		      ymuint msb,
-		      ymuint lsb,
-		      ymuint bit_width);
+		      ymuint lsb);
 
   /// @brief 可変 bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -484,22 +512,6 @@ public:
 		 ymuint bit_width1,
 		 ymuint bit_width2,
 		 ymuint bit_width3);
-
-  /// @brief combinational UDP ノードを生成する．
-  /// @param[in] module ノードが属するモジュール
-  /// @param[in] ni 入力数
-  /// @note ビット幅はすべて1ビット
-  MvnNode*
-  new_combudp(MvnModule* module,
-	      ymuint ni);
-
-  /// @brief sequential UDP ノードを生成する．
-  /// @param[in] module ノードが属するモジュール
-  /// @param[in] ni 入力数
-  /// @note ビット幅はすべて1ビット
-  MvnNode*
-  new_sequdp(MvnModule* module,
-	     ymuint ni);
 
   /// @brief constant ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -592,6 +604,67 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 多入力論理演算ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] type 型
+  /// @param[in] input_num 入力数
+  /// @param[in] bit_width ビット幅
+  MvnNode*
+  new_log_op(MvnModule* module,
+	     MvnNode::tType type,
+	     ymuint input_num,
+	     ymuint bit_width);
+
+  /// @brief 1入力演算ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] type 型
+  /// @param[in] ibit_width1 入力のビット幅
+  /// @param[in] obit_width 出力のビット幅
+  MvnNode*
+  new_unary_op(MvnModule* module,
+	       MvnNode::tType type,
+	       ymuint ibit_width1,
+	       ymuint obit_width);
+
+  /// @brief 2入力演算ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] type 型
+  /// @param[in] ibit_width1 入力1のビット幅
+  /// @param[in] ibit_width2 入力2のビット幅
+  /// @param[in] obit_width 出力のビット幅
+  MvnNode*
+  new_binary_op(MvnModule* module,
+		MvnNode::tType type,
+		ymuint ibit_width1,
+		ymuint ibit_width2,
+		ymuint obit_width);
+
+  /// @brief 3入力演算ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] type 型
+  /// @param[in] ibit_width1 入力1のビット幅
+  /// @param[in] ibit_width2 入力2のビット幅
+  /// @param[in] ibit_width3 入力3のビット幅
+  /// @param[in] obit_width 出力のビット幅
+  MvnNode*
+  new_ternary_op(MvnModule* module,
+		 MvnNode::tType type,
+		 ymuint ibit_width1,
+		 ymuint ibit_width2,
+		 ymuint ibit_width3,
+		 ymuint obit_width);
+
+  /// @brief 多入力演算ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] type 型
+  /// @param[in] ibit_width_array 入力のビット幅の幅
+  /// @param[in] obit_width 出力のビット幅
+  MvnNode*
+  new_nary_op(MvnModule* module,
+	      MvnNode::tType type,
+	      const vector<ymuint>& ibit_width_array,
+	      ymuint obit_width);
 
   /// @brief ノードを登録する．
   /// @param[in] node 対象のノード

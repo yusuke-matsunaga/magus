@@ -3,7 +3,7 @@
 /// @brief MvnConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,27 +15,17 @@ BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
-// @param[in] bit_width ビット幅
 // @param[in] val 値
 MvnConst::MvnConst(MvnModule* module,
-		   ymuint bit_width,
 		   const vector<ymuint32>& val) :
-  MvnNode(module, 0, 1),
+  MvnNodeBase(module, MvnNode::kConst, 0, 1),
   mVal(val)
 {
-  set_opin_bit_width(0, bit_width);
 }
 
 // @brief デストラクタ
 MvnConst::~MvnConst()
 {
-}
-
-// @brief ノードの種類を得る．
-MvnNode::tType
-MvnConst::type() const
-{
-  return kConst;
 }
 
 // @brief 定数値を得る．
@@ -56,11 +46,10 @@ MvnMgr::new_const(MvnModule* module,
 		  ymuint bit_width,
 		  const vector<ymuint32>& val)
 {
-  MvnNode* node = new MvnConst(module, bit_width, val);
+  MvnNode* node = new MvnConst(module, val);
   reg_node(node);
 
-  assert_cond( node->input_num() == 0, __FILE__, __LINE__);
-  assert_cond( node->output_num() == 1, __FILE__, __LINE__);
+  node->_output(0)->mBitWidth = bit_width;
 
   return node;
 }

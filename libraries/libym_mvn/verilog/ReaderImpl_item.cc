@@ -505,27 +505,15 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case kVpiCombPrim:
     {
+#warning "TODO: エラーメッセージを出力する．"
       assert_not_reached(__FILE__, __LINE__);
-      const VlUdpDefn* udp = prim->udp_defn();
-      ymuint ni = udp->port_num() - 1;
-      MvnNode* node = mMvnMgr->new_combudp(parent_module, ni);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      outputs[0] = node;
     }
     break;
 
   case kVpiSeqPrim:
     {
+#warning "TODO: エラーメッセージを出力する．"
       assert_not_reached(__FILE__, __LINE__);
-      const VlUdpDefn* udp = prim->udp_defn();
-      ymuint ni = udp->port_num() - 1;
-      MvnNode* node = mMvnMgr->new_sequdp(parent_module, ni);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      outputs[0] = node;
     }
     break;
 
