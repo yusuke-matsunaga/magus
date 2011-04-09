@@ -522,29 +522,6 @@ public:
 	    ymuint bit_width,
 	    const vector<ymuint32>& val);
 
-  /// @brief 連結演算からビットを抜き出す．
-  /// @param[in] src_node 連結演算ノード
-  /// @param[in] bitpos 抜き出すビット位置
-  MvnNode*
-  select_from_concat(MvnNode* src_node,
-		     ymuint bitpos);
-
-  /// @brief 部分指定子からビットを抜き出す．
-  /// @param[in] src_node 部分指定ノード
-  /// @param[in] bitpos 抜き出すビット位置
-  MvnNode*
-  select_from_partselect(MvnNode* src_node,
-			 ymuint bitpos);
-
-  /// @brief 連結演算から部分を抜き出す．
-  /// @param[in] src_node 連結演算ノード
-  /// @param[in] msb 抜き出す部分の MSB
-  /// @param[in] lsb 抜き出す部分の LSB
-  MvnNode*
-  select(MvnNode* src_node,
-	 ymuint msb,
-	 ymuint lsb);
-
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード
   /// @note 入力ノード, 出力ノードは削除できない
@@ -588,6 +565,26 @@ public:
 	     MvnNode* dst_node,
 	     ymuint dst_pin_pos);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 連結演算からビットを抜き出す．
+  /// @param[in] src_node 連結演算ノード
+  /// @param[in] bitpos 抜き出すビット位置
+  MvnNode*
+  select_from_concat(MvnNode* src_node,
+		     ymuint bitpos);
+
+  /// @brief 部分指定子からビットを抜き出す．
+  /// @param[in] src_node 部分指定ノード
+  /// @param[in] bitpos 抜き出すビット位置
+  MvnNode*
+  select_from_partselect(MvnNode* src_node,
+			 ymuint bitpos);
+
   /// @brief 接続を切り替える．
   /// @param[in] old_node 元のノード
   /// @param[in] old_pin_pos 元のピン番号
@@ -598,12 +595,6 @@ public:
 	    ymuint old_pin_pos,
 	    MvnNode* new_node,
 	    ymuint new_pin_pos);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
   /// @brief 多入力論理演算ノードを生成する．
   /// @param[in] module ノードが属するモジュール

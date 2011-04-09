@@ -328,29 +328,26 @@ MvnMgr::sweep()
   for (vector<MvnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     MvnNode* node = *p;
-    if ( node->type() == MvnNode::kConstBitSelect ) {
+    MvnNode* alt_node = NULL;
+    if ( node->type() == MvnNode::kThrough ) {
+      const MvnOutputPin* src_pin = node->input(0)->src_pin();
+      if ( src_pin != NULL ) {
+	alt_node = src_pin->node();
+      }
+    }
+    else if ( node->type() == MvnNode::kConstBitSelect ) {
       MvnNode* src_node = node->input(0)->src_pin()->node();
       if ( src_node->type() == MvnNode::kConcat ) {
-	MvnNode* alt_node = select_from_concat(src_node, node->bitpos());
-	// node を alt_node に置き換える．
-	replace(node, alt_node);
+	alt_node = select_from_concat(src_node, node->bitpos());
       }
       else if ( src_node->type() == MvnNode::kConstPartSelect ) {
-	MvnNode* alt_node = select_from_partselect(src_node, node->bitpos());
-	// node を alt_node に置き換える．
-	replace(node, alt_node);
+	alt_node = select_from_partselect(src_node, node->bitpos());
       }
     }
-#if 0
-    else if ( node->type() == MvnNode::kConstPartSelect ) {
-      MvnNode* src_node = node->input(0)->src_pin()->node();
-      if ( src_node->type() == MvnNode::kConcat ) {
-	MvnNdoe* alt_node = select(src_node, node->mbs(), node->lsb());
-	// node を alt_node に置き換える．
-	replace(node, alt_node);
-      }
+    if ( alt_node != NULL ) {
+      // node を alt_node に置き換える．
+      replace(node, alt_node);
     }
-#endif
   }
 
   // どこにも出力していないノードを削除する．
@@ -450,39 +447,6 @@ MvnMgr::select_from_partselect(MvnNode* src_node,
     connect(inode, 0, bitsel, 0);
     return bitsel;
   }
-}
-
-// @brief 連結演算から部分を抜き出す．
-// @param[in] src_node 連結演算ノード
-// @param[in] msb 抜き出す部分の MSB
-// @param[in] lsb 抜き出す部分の LSB
-MvnNode*
-MvnMgr::select(MvnNode* src_node,
-	       ymuint msb,
-	       ymuint lsb)
-{
-#if 0
-  assert_cond( src_node->type() == MvnNode::kConcat, __FILE__, __LINE__);
-  ymuint ni = src_node->input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const MvnInputPin* ipin = src_node->input(i);
-    ymuint bw = ipin->bit_width();
-    if ( bitpos < bw ) {
-      MvnNode* inode = ipin->net()->src_pin()->node();
-      if ( inode->type() == MvnNode::kConcat ) {
-	return select(inode, bitpos);
-      }
-      else {
-	MvnNode* bitsel = new_constbitselect(src_node->mParent, bitpos, bw);
-	connect(inode, 0, bitsel, 0);
-	return bitsel;
-      }
-    }
-    bitpos -= bw;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-#endif
-  return NULL;
 }
 
 // @brief node を alt_node に置き換える．

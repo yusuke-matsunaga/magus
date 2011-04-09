@@ -223,28 +223,15 @@ ReaderImpl::gen_network(MvnMgr& mgr,
 
   // 冗長な through ノードを取り除く
   {
-    vector<MvnNode*> node_list;
-    node_list.reserve(n);
     for (ymuint i = 0; i < n; ++ i) {
       MvnNode* node = mMvnMgr->_node(i);
-      if ( node == NULL ) continue;
-      if ( node->type() != MvnNode::kThrough ) continue;
-      node_list.push_back(node);
-    }
-    for (vector<MvnNode*>::iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      MvnNode* node = *p;
-
-      const MvnInputPin* ipin = node->input(0);
-      const MvnOutputPin* src_pin = ipin->src_pin();
-      if ( src_pin == NULL ) continue;
-
-      MvnNode* src_node = src_pin->node();
-      ymuint src_pos = src_pin->pos();
-      mMvnMgr->disconnect(src_node, src_pos, node, 0);
-      mMvnMgr->reconnect(node, 0, src_node, src_pos);
-      mNodeMap.copy(src_node->id(), node->id());
-      mMvnMgr->delete_node(node);
+      if ( node != NULL && node->type() == MvnNode::kThrough ) {
+	const MvnOutputPin* src_pin = node->input(0)->src_pin();
+	if ( src_pin != NULL ) {
+	  MvnNode* src_node = src_pin->node();
+	  mNodeMap.copy(src_node->id(), node->id());
+	}
+      }
     }
   }
 
