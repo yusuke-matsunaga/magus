@@ -696,14 +696,6 @@ private:
 };
 
 
-/// @brief 内容を出力する
-/// @param[in] s 出力先のストリーム
-/// @param[in] mgr MvnMgr
-/// @note デバッグ用
-void
-dump(ostream& s,
-     const MvnMgr& mgr);
-
 /// @brief ノード番号ともとのVerilog名の対応を出力する．
 void
 dump_node_map(ostream& s,

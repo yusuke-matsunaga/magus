@@ -12,6 +12,7 @@
 #include "ym_mvn/MvnMgr.h"
 #include "ym_mvn/MvnModule.h"
 #include "ym_mvn/MvnNode.h"
+#include "ym_mvn/MvnDumper.h"
 
 
 int
@@ -79,6 +80,7 @@ main(int argc,
     val[0] = 10;
     MvnNode* node41 = mgr.new_const(module, 8, val);
 
+    MvnDumper dump;
     dump(cout, mgr);
   }
   catch ( AssertError x) {

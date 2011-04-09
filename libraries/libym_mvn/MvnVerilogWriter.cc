@@ -16,6 +16,12 @@
 #include "ym_mvn/MvnInputPin.h"
 #include "ym_mvn/MvnOutputPin.h"
 
+#include "ym_mvn/MvnVlMap.h"
+
+#include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlDeclArray.h"
+#include "ym_verilog/vl/VlRange.h"
+
 
 BEGIN_NAMESPACE_YM_MVN
 
@@ -736,28 +742,6 @@ dump_node(ostream& s,
     }
     break;
 
-  case MvnNode::kCombUdp:
-    {
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-      s << "  MVN_UDP" << node->id()
-	<< " U" << node->id()
-	<< " ("
-	<< " " << node_name(node);
-      ymuint ni = node->input_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	const MvnInputPin* ipin = node->input(i);
-	const MvnOutputPin* src_pin = ipin->src_pin();
-	const MvnNode* src_node = src_pin->node();
-	s << ", " << node_name(src_node);
-      }
-      s << ");" << endl;
-    }
-    break;
-
-  case MvnNode::kSeqUdp:
-    break;
-
   case MvnNode::kConst:
     {
       ymuint ni = node->input_num();
@@ -926,6 +910,55 @@ MvnVerilogWriter::operator()(ostream& s,
     if ( module == NULL ) continue;
 
     dump_module(s, module, mgr);
+  }
+}
+
+// @brief 内容を Verilog-HDL 形式で出力する
+// @param[in] s 出力先のストリーム
+// @param[in] mgr MvnMgr
+// @param[in] node_map ノードと Verilog 名の対応表
+void
+MvnVerilogWriter::operator()(ostream& s,
+			     const MvnMgr& mgr,
+			     const MvnVlMap& node_map)
+{
+  ymuint n = mgr.max_module_id();
+  for (ymuint i = 0; i < n; ++ i) {
+    const MvnModule* module = mgr.module(i);
+    if ( module == NULL ) continue;
+
+    dump_module(s, module, mgr);
+  }
+
+  ymuint node_num = mgr.max_node_id();
+  for (ymuint i = 0; i < node_num; ++ i) {
+    const MvnNode* node = mgr.node(i);
+    if ( node == NULL ) continue;
+
+    s << "// node" << node->id() << " : ";
+    if ( node_map.is_single_elem(i) ) {
+      const VlDecl* decl = node_map.get_single_elem(i);
+      assert_cond( decl != NULL, __FILE__, __LINE__);
+      s << decl->full_name();
+    }
+    else if ( node_map.is_array_elem(i) ) {
+      const VlDeclArray* declarray = node_map.get_array_elem(i);
+      assert_cond( declarray != NULL, __FILE__, __LINE__);
+      ymuint offset = node_map.get_array_offset(i);
+      ymuint d = declarray->dimension();
+      vector<int> index_array(d);
+      for (ymuint i = 0; i < d; ++ i) {
+	const VlRange* range = declarray->range(i);
+	ymuint n = range->size();
+	index_array[i] = offset % n;
+	offset /= n;
+      }
+      s << declarray->full_name();
+      for (ymuint i = 0; i < d; ++ i) {
+	s << "[" << index_array[d - i - 1] << "]";
+      }
+    }
+    s << endl;
   }
 }
 

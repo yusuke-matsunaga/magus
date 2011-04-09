@@ -122,7 +122,9 @@ class BdnNodeHandle;
 
 class BdnEdge;
 
+class BdnDumper;
 class BdnBlifWriter;
+
 class BlifBdnConv;
 
 /// @brief 枝のリスト
@@ -173,7 +175,9 @@ using nsBdn::BdnEdgeList;
 
 using nsBdn::BdnFanoutList;
 
+using nsBdn::BdnDumper;
 using nsBdn::BdnBlifWriter;
+
 using nsBdn::BlifBdnConv;
 
 END_NAMESPACE_YM

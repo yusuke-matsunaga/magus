@@ -1,11 +1,13 @@
 
-/// @file libym_bdn/BdNetwork.cc
-/// @brief BdNetwork の実装ファイル
+/// @file libym_bdn/BdnDumper.cc
+/// @brief BdnDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
+
+#include "ym_bdn/BdnDumper.h"
 
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnPort.h"
@@ -46,10 +48,22 @@ dump_output(ostream& s,
 
 END_NONAMESPACE
 
+// @brief コンストラクタ
+BdnDumper::BdnDumper()
+{
+}
+
+// @brief デストラクタ
+BdnDumper::~BdnDumper()
+{
+}
+
 // @brief BdNetwork の内容をダンプする関数
+// @param[in] s 出力先のストリーム
+// @param[in] network 対象のネットワーク
 void
-dump(ostream& s,
-     const BdNetwork& network)
+BdnDumper::operator()(ostream& s,
+		      const BdNetwork& network)
 {
   ymuint np = network.port_num();
   for (ymuint i = 0; i < np; ++ i) {

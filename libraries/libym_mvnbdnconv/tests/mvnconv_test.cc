@@ -8,9 +8,11 @@
 
 
 #include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnDumper.h"
 #include "ym_mvn/MvnMgr.h"
 #include "ym_mvn/MvnVerilogReader.h"
 #include "ym_mvn/MvnVlMap.h"
+#include "ym_mvn/MvnDumper.h"
 #include "ym_mvnbdnconv/MvnBdnConv.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
 
@@ -60,14 +62,16 @@ main(int argc,
       return 2;
     }
 
-    dump(cout, mgr);
+    MvnDumper dump_mvn;
+    dump_mvn(cout, mgr);
 
     BdNetwork bdnetwork;
     MvnBdnConv conv;
     MvnBdnMap mvnode_map(mgr.max_node_id());
     conv(mgr, bdnetwork, mvnode_map);
 
-    dump(cout, bdnetwork);
+    BdnDumper dump_bdn;
+    dump_bdn(cout, bdnetwork);
 
 #if !defined(YM_DEBUG)
   }

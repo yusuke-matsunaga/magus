@@ -513,15 +513,6 @@ private:
 };
 
 
-/// @relates BdNetwork
-/// @brief BdNetwork の内容をダンプする関数
-/// @param[in] s 出力先のストリーム
-/// @param[in] network 対象のネットワーク
-void
-dump(ostream& s,
-     const BdNetwork& network);
-
-
 //////////////////////////////////////////////////////////////////////
 // inline 関数の定義
 //////////////////////////////////////////////////////////////////////

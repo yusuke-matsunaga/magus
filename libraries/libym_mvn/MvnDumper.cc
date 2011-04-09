@@ -1,11 +1,13 @@
 
-/// @file libym_mvn/dump.cc
-/// @brief dump() の実装ファイル
+/// @file libym_mvn/MvnDumper.cc
+/// @brief MvnDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
+
+#include "ym_mvn/MvnDumper.h"
 
 #include "ym_mvn/MvnMgr.h"
 
@@ -155,16 +157,25 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// グローバル関数
+// クラス MvnDumper
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+MvnDumper::MvnDumper()
+{
+}
+
+// @brief デストラクタ
+MvnDumper::~MvnDumper()
+{
+}
 
 // @brief 内容を出力する
 // @param[in] s 出力先のストリーム
 // @param[in] mgr MvnMgr
-// @note デバッグ用
 void
-dump(ostream& s,
-     const MvnMgr& mgr)
+MvnDumper::operator()(ostream& s,
+		      const MvnMgr& mgr)
 {
   ymuint n = mgr.max_module_id();
   for (ymuint i = 0; i < n; ++ i) {
@@ -217,44 +228,6 @@ dump(ostream& s,
       dump_node(s, node);
     }
 
-    s << endl;
-  }
-}
-
-// @brief ノード番号ともとのVerilog名の対応を出力する．
-void
-dump_node_map(ostream& s,
-	      const MvnMgr& mgr,
-	      const MvnVlMap& node_map)
-{
-  ymuint n = mgr.max_node_id();
-  for (ymuint i = 0; i < n; ++ i) {
-    const MvnNode* node = mgr.node(i);
-    if ( node == NULL ) continue;
-
-    s << "// node" << node->id() << " : ";
-    if ( node_map.is_single_elem(i) ) {
-      const VlDecl* decl = node_map.get_single_elem(i);
-      assert_cond( decl != NULL, __FILE__, __LINE__);
-      s << decl->full_name();
-    }
-    else if ( node_map.is_array_elem(i) ) {
-      const VlDeclArray* declarray = node_map.get_array_elem(i);
-      assert_cond( declarray != NULL, __FILE__, __LINE__);
-      ymuint offset = node_map.get_array_offset(i);
-      ymuint d = declarray->dimension();
-      vector<int> index_array(d);
-      for (ymuint i = 0; i < d; ++ i) {
-	const VlRange* range = declarray->range(i);
-	ymuint n = range->size();
-	index_array[i] = offset % n;
-	offset /= n;
-      }
-      s << declarray->full_name();
-      for (ymuint i = 0; i < d; ++ i) {
-	s << "[" << index_array[d - i - 1] << "]";
-      }
-    }
     s << endl;
   }
 }

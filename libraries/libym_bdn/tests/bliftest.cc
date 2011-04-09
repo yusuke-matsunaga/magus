@@ -13,6 +13,7 @@
 #include "ym_blif/BlifNetworkReader.h"
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BlifBdnConv.h"
+#include "ym_bdn/BdnDumper.h"
 #include "ym_bdn/BdnBlifWriter.h"
 
 
@@ -52,7 +53,9 @@ main(int argc,
       return 5;
     }
 
+    BdnDumper dump;
     dump(cout, network);
+
     BdnBlifWriter blif_writer;
     blif_writer(cout, network);
 

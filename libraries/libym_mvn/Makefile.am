@@ -17,7 +17,6 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_mvn.la
 
 libym_mvn_la_SOURCES = \
-	dump.cc \
 	MvnConst.h \
 	MvnConst.cc \
 	MvnConstBitSelect.h \
@@ -26,6 +25,7 @@ libym_mvn_la_SOURCES = \
 	MvnConstPartSelect.cc \
 	MvnDff.h \
 	MvnDff.cc \
+	MvnDumper.cc \
 	MvnMgr.cc \
 	MvnModule.cc \
 	MvnNode.cc \

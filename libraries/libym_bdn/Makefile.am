@@ -23,10 +23,10 @@ libym_bdn_la_LDFLAGS =
 
 libym_bdn_la_SOURCES = \
 	BdNetwork.cc \
+	BdnDumper.cc \
 	BdnNode1.h \
 	BdnNode2.h \
 	BdnNode.cc \
 	BdnBlifWriter.cc \
-	BlifBdnConv.cc \
-	dump.cc
+	BlifBdnConv.cc
 

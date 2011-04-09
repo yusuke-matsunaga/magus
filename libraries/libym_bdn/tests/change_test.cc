@@ -9,6 +9,7 @@
 
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNodeHandle.h"
+#include "ym_bdn/BdnDumper.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
@@ -17,6 +18,7 @@ void
 change_test()
 {
   BdNetwork network;
+  BdnDumper dump;
 
   network.set_name("change_test");
 
@@ -29,7 +31,6 @@ change_test()
   BdnNode* b = network.new_port_input(port_b, 0);
   BdnNode* c = network.new_port_input(port_c, 0);
   BdnNode* d = network.new_port_output(port_d, 0);
-
 
   // a & b
   BdnNodeHandle h1 = network.new_logic(0x8,
