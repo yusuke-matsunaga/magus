@@ -15,5 +15,6 @@ noinst_HEADERS = \
 	BdnNode.h \
 	BdnNodeHandle.h \
 	BdnPort.h \
+	BdnVerilogWriter.h \
 	BlifBdnConv.h \
 	bdn_nsdef.h

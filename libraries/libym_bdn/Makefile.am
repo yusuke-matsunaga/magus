@@ -28,5 +28,6 @@ libym_bdn_la_SOURCES = \
 	BdnNode2.h \
 	BdnNode.cc \
 	BdnBlifWriter.cc \
+	BdnVerilogWriter.cc \
 	BlifBdnConv.cc
 
