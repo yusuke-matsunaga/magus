@@ -9,6 +9,7 @@
 
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnDumper.h"
+#include "ym_bdn/BdnVerilogWriter.h"
 #include "ym_mvn/MvnMgr.h"
 #include "ym_mvn/MvnVerilogReader.h"
 #include "ym_mvn/MvnVlMap.h"
@@ -72,6 +73,9 @@ main(int argc,
 
     BdnDumper dump_bdn;
     dump_bdn(cout, bdnetwork);
+
+    BdnVerilogWriter verilog_writer;
+    verilog_writer(cout, bdnetwork);
 
 #if !defined(YM_DEBUG)
   }

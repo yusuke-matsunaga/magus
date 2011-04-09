@@ -5,7 +5,7 @@
 ///
 /// $Id: bliftest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,6 +15,7 @@
 #include "ym_bdn/BlifBdnConv.h"
 #include "ym_bdn/BdnDumper.h"
 #include "ym_bdn/BdnBlifWriter.h"
+#include "ym_bdn/BdnVerilogWriter.h"
 
 
 int
@@ -54,10 +55,12 @@ main(int argc,
     }
 
     BdnDumper dump;
-    dump(cout, network);
-
     BdnBlifWriter blif_writer;
+    BdnVerilogWriter verilog_writer;
+
+    dump(cout, network);
     blif_writer(cout, network);
+    verilog_writer(cout, network);
 
     cout << endl;
     cout << "after copy" << endl;
@@ -67,6 +70,7 @@ main(int argc,
 
     dump(cout, network2);
     blif_writer(cout, network2);
+    verilog_writer(cout, network2);
 
 #if !defined(YM_DEBUG)
   }

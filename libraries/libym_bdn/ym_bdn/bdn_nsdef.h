@@ -124,6 +124,7 @@ class BdnEdge;
 
 class BdnDumper;
 class BdnBlifWriter;
+class BdnVerilogWriter;
 
 class BlifBdnConv;
 
@@ -177,6 +178,7 @@ using nsBdn::BdnFanoutList;
 
 using nsBdn::BdnDumper;
 using nsBdn::BdnBlifWriter;
+using nsBdn::BdnVerilogWriter;
 
 using nsBdn::BlifBdnConv;
 
