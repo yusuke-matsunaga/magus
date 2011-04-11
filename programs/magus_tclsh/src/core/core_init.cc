@@ -23,6 +23,8 @@
 #include "CurNetwork.h"
 #include "ListNetwork.h"
 #include "ForNetwork.h"
+#include "ReadBlif.h"
+#include "WriteBlif.h"
 #include "WriteVerilog.h"
 
 
@@ -38,25 +40,44 @@ core_init(Tcl_Interp* interp,
   //////////////////////////////////////////////////////////////////////
 
   // ネットワークの生成／削除／複写コマンド
-  TclCmdBinder1<NewBNetwork, MagMgr*>::reg(interp, mgr,  "magus::new_bnetwork");
-  TclCmdBinder1<NewBdn, MagMgr*>::reg(interp, mgr,  "magus::new_bdnetwork");
-  TclCmdBinder1<NewMvn, MagMgr*>::reg(interp, mgr,  "magus::new_mvnetwork");
-  TclCmdBinder1<DelNetwork, MagMgr*>::reg(interp, mgr,  "magus::delete_network");
-  TclCmdBinder1<CopyNetwork, MagMgr*>::reg(interp, mgr, "magus::::copy_network");
-  TclCmdBinder1<ClrNetwork, MagMgr*>::reg(interp, mgr,  "magus::::clear_network");
+  TclCmdBinder1<NewBNetwork, MagMgr*>::reg(interp, mgr,
+					   "magus::new_bnetwork");
+  TclCmdBinder1<NewBdn, MagMgr*>::reg(interp, mgr,
+				      "magus::new_bdnetwork");
+  TclCmdBinder1<NewMvn, MagMgr*>::reg(interp, mgr,
+				      "magus::new_mvnetwork");
+  TclCmdBinder1<DelNetwork, MagMgr*>::reg(interp, mgr,
+					  "magus::delete_network");
+  TclCmdBinder1<CopyNetwork, MagMgr*>::reg(interp, mgr,
+					   "magus::::copy_network");
+  TclCmdBinder1<ClrNetwork, MagMgr*>::reg(interp, mgr,
+					  "magus::::clear_network");
 
   // 操作対象のネットワークを指定するコマンド
-  TclCmdBinder1<PushNetwork, MagMgr*>::reg(interp, mgr, "magus::push_current_network");
-  TclCmdBinder1<PopNetwork, MagMgr*>::reg(interp, mgr,  "magus::pop_current_network");
-  TclCmdBinder1<ChgNetwork, MagMgr*>::reg(interp, mgr, "magus::change_current_network");
-  TclCmdBinder1<CurNetwork, MagMgr*>::reg(interp, mgr,  "magus::current_network");
+  TclCmdBinder1<PushNetwork, MagMgr*>::reg(interp, mgr,
+					   "magus::push_current_network");
+  TclCmdBinder1<PopNetwork, MagMgr*>::reg(interp, mgr,
+					  "magus::pop_current_network");
+  TclCmdBinder1<ChgNetwork, MagMgr*>::reg(interp, mgr,
+					  "magus::change_current_network");
+  TclCmdBinder1<CurNetwork, MagMgr*>::reg(interp, mgr,
+					  "magus::current_network");
 
   // ネットワーク名の列挙を行うコマンド
-  TclCmdBinder1<ListNetwork, MagMgr*>::reg(interp, mgr, "magus::network_list");
-  TclCmdBinder1<ForNetwork, MagMgr*>::reg(interp, mgr,  "magus::foreach_network");
+  TclCmdBinder1<ListNetwork, MagMgr*>::reg(interp, mgr,
+					   "magus::network_list");
+  TclCmdBinder1<ForNetwork, MagMgr*>::reg(interp, mgr,
+					  "magus::foreach_network");
+
+  // ネットワークのファイル入力を行うコマンド
+  TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr,
+					"magus::read_blif");
 
   // ネットワークのファイル出力を行うコマンド
-  TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr,  "magus::write_verilog");
+  TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr,
+					 "magus::write_blif");
+  TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr,
+					    "magus::write_verilog");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -109,6 +130,8 @@ core_init(Tcl_Interp* interp,
     "proc complete(current_network) { t s e l p m } { return \"\" }\n"
     "proc complete(network_list) { t s e l p m } { return \"\" }\n"
     "proc complete(foreach_network) { t s e l p m } { return \"\" }\n"
+    "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
+    "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";

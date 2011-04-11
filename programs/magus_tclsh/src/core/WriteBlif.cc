@@ -1,6 +1,6 @@
 
-/// @file src/core/WriteVerilog.cc
-/// @brief WriteVerilog の実装ファイル
+/// @file src/core/WriteBlif.cc
+/// @brief WriteBlif の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,34 +9,33 @@
 /// All rights reserved.
 
 
-#include "WriteVerilog.h"
+#include "WriteBlif.h"
 
-#include "ym_bnet/BNetVerilogWriter.h"
-#include "ym_bdn/BdnVerilogWriter.h"
-#include "ym_mvn/MvnVerilogWriter.h"
+#include "ym_bnet/BNetBlifWriter.h"
+#include "ym_bdn/BdnBlifWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// ファイルに Verilog 形式で書き出すコマンド
+// ファイルに blif 形式で書き出すコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-WriteVerilog::WriteVerilog(MagMgr* mgr) :
+WriteBlif::WriteBlif(MagMgr* mgr) :
   NetCmd(mgr, false, false, false)
 {
   set_usage_string("?<filename>?");
 }
 
 // @brief デストラクタ
-WriteVerilog::~WriteVerilog()
+WriteBlif::~WriteBlif()
 {
 }
 
 // コマンドを実行する．
 int
-WriteVerilog::cmd_proc(TclObjVector& objv)
+WriteBlif::cmd_proc(TclObjVector& objv)
 {
   ymuint objc = objv.size();
 
@@ -65,8 +64,7 @@ WriteVerilog::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBNet:
     {
-      // BNetwork の場合
-      BNetVerilogWriter writer;
+      BNetBlifWriter writer;
       writer.dump(*osp, *neth->bnetwork());
       // この関数はfailしない．
       stat = TCL_OK;
@@ -75,24 +73,22 @@ WriteVerilog::cmd_proc(TclObjVector& objv)
 
   case NetHandle::kMagBdn:
     {
-      // Bdn の場合
-      BdnVerilogWriter writer;
+      BdnBlifWriter writer;
       writer(*osp, *neth->bdn());
-      stat = TCL_ERROR;
+      // この関数はfailしない．
+      stat = TCL_OK;
     }
     break;
 
   case NetHandle::kMagMvn:
     {
-      // Mvn の場合
-      MvnVerilogWriter writer;
-      writer(*osp, *neth->mvn());
-      // この関数はfailしない．
-      stat = TCL_OK;
+      TclObj emsg;
+      emsg << "Network type mismatch.";
+      set_result(emsg);
+      stat = TCL_ERROR;
     }
     break;
   }
-
   return stat;
 }
 

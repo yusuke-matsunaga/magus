@@ -14,6 +14,7 @@ noinst_HEADERS = \
 	BNetCmd.h \
 	BdnCmd.h \
 	MvnCmd.h \
-	NetHandle.h
+	NetHandle.h \
+	TclObjMsgHandler.h
 
 

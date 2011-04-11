@@ -10,64 +10,17 @@
 
 
 #include "BNetIoCmd.h"
+#include "TclObjMsgHandler.h"
 
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bnet/BNetBlifWriter.h"
 #include "ym_bnet/BNetEquWriter.h"
 #include "ym_bnet/BNetVerilogWriter.h"
-#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
-//////////////////////////////////////////////////////////////////////
-// TclObj に出力するメッセージハンドラ
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-TclObjMsgHandler::TclObjMsgHandler()
-{
-}
-
-// @brief デストラクタ
-TclObjMsgHandler::~TclObjMsgHandler()
-{
-}
-
-// @brief メッセージが登録されるたびに呼ばれる仮想関数
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] loc ファイル位置
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-TclObjMsgHandler::put_msg(const char* src_file,
-			  int src_line,
-			  const FileRegion& loc,
-			  tMsgType type,
-			  const char* label,
-			  const char* body)
-{
-  ostringstream buf;
-  buf << loc << type << " [" << label << "]: " << body << endl;
-  mMsg << buf.str();
-}
-
-// @brief 内容をクリアする．
-void
-TclObjMsgHandler::clear()
-{
-  mMsg.clear();
-}
-
-// @brief メッセージオブジェクトを取り出す．
-TclObj
-TclObjMsgHandler::msg_obj() const
-{
-  return mMsg;
-}
-
-
+#if 0
 //////////////////////////////////////////////////////////////////////
 // blif 形式のファイルを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
@@ -147,6 +100,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   // 正常終了
   return TCL_OK;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
