@@ -20,7 +20,7 @@ class MvnConv;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnBdnConv MvnBdnConv.h "MvnBdnConv.h"
-/// @brief Mvn から BdNetwork に変換するクラス
+/// @brief Mvn から BdnMgr に変換するクラス
 //////////////////////////////////////////////////////////////////////
 class MvnBdnConv
 {
@@ -38,13 +38,13 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief MvnMgr の内容を BdNetwork に変換する．
+  /// @brief MvnMgr の内容を BdnMgr に変換する．
   /// @param[in] mvmgr 対象の MvNetwork
-  /// @param[out] bdn 変換先の BdNetwork
+  /// @param[out] bdn 変換先の BdnMgr
   /// @param[out] mvnode_map 対応関係を格納するオブジェクト
   void
   operator()(const MvnMgr& mvmgr,
-	     BdNetwork& bdn,
+	     BdnMgr& bdn,
 	     MvnBdnMap& mvnode_map);
 
 

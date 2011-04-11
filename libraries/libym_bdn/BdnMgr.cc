@@ -1,13 +1,13 @@
 
-/// @file libym_bdn/BdNetwork.cc
-/// @brief BdNetwork の実装ファイル
+/// @file libym_bdn/BdnMgr.cc
+/// @brief BdnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnPort.h"
 #include "ym_bdn/BdnDff.h"
 #include "ym_bdn/BdnLatch.h"
@@ -19,11 +19,11 @@
 BEGIN_NAMESPACE_YM_BDN
 
 ///////////////////////////////////////////////////////////////////////
-// クラス BdNetwork
+// クラス BdnMgr
 ///////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-BdNetwork::BdNetwork() :
+BdnMgr::BdnMgr() :
   mAlloc(4096),
   mHashTable(NULL),
   mHashSize(0),
@@ -33,7 +33,7 @@ BdNetwork::BdNetwork() :
 }
 
 // コピーコンストラクタ
-BdNetwork::BdNetwork(const BdNetwork& src) :
+BdnMgr::BdnMgr(const BdnMgr& src) :
   mAlloc(4096),
   mHashTable(NULL),
   mHashSize(0),
@@ -45,8 +45,8 @@ BdNetwork::BdNetwork(const BdNetwork& src) :
 }
 
 // 代入演算子
-const BdNetwork&
-BdNetwork::operator=(const BdNetwork& src)
+const BdnMgr&
+BdnMgr::operator=(const BdnMgr& src)
 {
   if ( &src != this ) {
     clear();
@@ -56,7 +56,7 @@ BdNetwork::operator=(const BdNetwork& src)
 }
 
 // デストラクタ
-BdNetwork::~BdNetwork()
+BdnMgr::~BdnMgr()
 {
   clear();
   delete [] mHashTable;
@@ -64,7 +64,7 @@ BdNetwork::~BdNetwork()
 
 // 複製する．
 void
-BdNetwork::copy(const BdNetwork& src)
+BdnMgr::copy(const BdnMgr& src)
 {
   ymuint n = src.max_node_id();
   vector<BdnNode*> nodemap(n);
@@ -178,7 +178,7 @@ BdNetwork::copy(const BdNetwork& src)
 
 // 空にする．
 void
-BdNetwork::clear()
+BdnMgr::clear()
 {
   mName = string();
   mPortArray.clear();
@@ -223,7 +223,7 @@ END_NONAMESPACE
 
 // @brief ソートされたノードのリストを得る．
 void
-BdNetwork::sort(vector<BdnNode*>& node_list) const
+BdnMgr::sort(vector<BdnNode*>& node_list) const
 {
   node_list.clear();
   node_list.reserve(lnode_num());
@@ -280,7 +280,7 @@ END_NONAMESPACE
 
 // @brief 逆順でソートされたノードのリストを得る．
 void
-BdNetwork::rsort(vector<BdnNode*>& node_list) const
+BdnMgr::rsort(vector<BdnNode*>& node_list) const
 {
   node_list.clear();
   node_list.reserve(lnode_num());
@@ -310,8 +310,8 @@ BdNetwork::rsort(vector<BdnNode*>& node_list) const
 
 // @brief ポートを作る．
 BdnPort*
-BdNetwork::new_port(const string& name,
-		    ymuint bit_width)
+BdnMgr::new_port(const string& name,
+		 ymuint bit_width)
 {
   void* p = mAlloc.get_memory(sizeof(BdnPort));
   BdnPort* port = new (p) BdnPort();
@@ -346,7 +346,7 @@ BdNetwork::new_port(const string& name,
 // @param[in] name 名前
 // @return 生成されたD-FFを返す．
 BdnDff*
-BdNetwork::new_dff(const string& name)
+BdnMgr::new_dff(const string& name)
 {
   // 空いているIDを探して配列へ登録
   int id = mDffItvlMgr.avail_num();
@@ -409,7 +409,7 @@ BdNetwork::new_dff(const string& name)
 // @brief D-FF を削除する．
 // @param[in] dff 削除対象の D-FF
 void
-BdNetwork::delete_dff(BdnDff* dff)
+BdnMgr::delete_dff(BdnDff* dff)
 {
   // new_dff() と逆の処理を行う．
   mDffItvlMgr.add(static_cast<int>(dff->id()));
@@ -431,7 +431,7 @@ BdNetwork::delete_dff(BdnDff* dff)
 // @param[in] name 名前
 // @return 生成されたラッチを返す．
 BdnLatch*
-BdNetwork::new_latch(const string& name)
+BdnMgr::new_latch(const string& name)
 {
   // 空いているIDを探して配列へ登録する．
   int id = mLatchItvlMgr.avail_num();
@@ -481,7 +481,7 @@ BdNetwork::new_latch(const string& name)
 // @brief ラッチを削除する．
 // @param[in] latch 削除対象のラッチ
 void
-BdNetwork::delete_latch(BdnLatch* latch)
+BdnMgr::delete_latch(BdnLatch* latch)
 {
   // new_latch() と逆の処理を行う．
   mLatchItvlMgr.add(static_cast<int>(latch->id()));
@@ -501,8 +501,8 @@ BdNetwork::delete_latch(BdnLatch* latch)
 //  - bitpos が port のビット幅を越えている．
 //  - port の bitpos にすでにノードがある．
 BdnNode*
-BdNetwork::new_port_input(BdnPort* port,
-			  ymuint bitpos)
+BdnMgr::new_port_input(BdnPort* port,
+		       ymuint bitpos)
 {
   assert_cond( bitpos < port->bit_width(), __FILE__, __LINE__);
   assert_cond( port->mInputArray[bitpos] == NULL, __FILE__, __LINE__);
@@ -522,7 +522,7 @@ BdNetwork::new_port_input(BdnPort* port,
 // @return 作成したノードを返す．
 // @note ポートのビット幅は1ビットとなる．
 BdnNode*
-BdNetwork::new_port_input(const string& port_name)
+BdnMgr::new_port_input(const string& port_name)
 {
   BdnPort* port = new_port(port_name, 1);
   return new_port_input(port, 0);
@@ -536,8 +536,8 @@ BdNetwork::new_port_input(const string& port_name)
 //  - bitpos が port のビット幅を越えている．
 //  - port の bitpos にすでにノードがある．
 BdnNode*
-BdNetwork::new_port_output(BdnPort* port,
-			   ymuint bitpos)
+BdnMgr::new_port_output(BdnPort* port,
+			ymuint bitpos)
 {
   assert_cond( bitpos < port->bit_width(), __FILE__, __LINE__);
   assert_cond( port->mOutputArray[bitpos] == NULL, __FILE__, __LINE__);
@@ -557,7 +557,7 @@ BdNetwork::new_port_output(BdnPort* port,
 // @return 作成したノードを返す．
 // @note ポートのビット幅は1ビットとなる．
 BdnNode*
-BdNetwork::new_port_output(const string& port_name)
+BdnMgr::new_port_output(const string& port_name)
 {
   BdnPort* port = new_port(port_name, 1);
   return new_port_output(port, 0);
@@ -567,8 +567,8 @@ BdNetwork::new_port_output(const string& port_name)
 // @param[in] 変更対象の出力ノード
 // @param[in] inode 入力のノード
 void
-BdNetwork::set_output_fanin(BdnNode* node,
-			    BdnNodeHandle inode_handle)
+BdnMgr::set_output_fanin(BdnNode* node,
+			 BdnNodeHandle inode_handle)
 {
   if ( node->is_input() ) {
     // BdnNode::alt_node() と同じコードだが const がつかない．
@@ -594,9 +594,9 @@ BdNetwork::set_output_fanin(BdnNode* node,
 // @note fcode の出力極性を正規化する．
 // @note すでに同じ機能コード，同じファンインを持つノードがあればそれを返す．
 BdnNodeHandle
-BdNetwork::new_logic(ymuint fcode,
-		     BdnNodeHandle inode1_handle,
-		     BdnNodeHandle inode2_handle)
+BdnMgr::new_logic(ymuint fcode,
+		  BdnNodeHandle inode1_handle,
+		  BdnNodeHandle inode2_handle)
 {
   return set_logic(NULL, fcode, inode1_handle, inode2_handle);
 }
@@ -607,8 +607,8 @@ BdNetwork::new_logic(ymuint fcode,
 // @return 作成したノードを返す．
 // @note すでに構造的に同じノードがあればそれを返す．
 BdnNodeHandle
-BdNetwork::new_and(BdnNodeHandle inode1_handle,
-		   BdnNodeHandle inode2_handle)
+BdnMgr::new_and(BdnNodeHandle inode1_handle,
+		BdnNodeHandle inode2_handle)
 {
   return new_logic(0x8, inode1_handle, inode2_handle);
 }
@@ -618,7 +618,7 @@ BdNetwork::new_and(BdnNodeHandle inode1_handle,
 // @return 作成したノードを返す．
 // @note すでに構造的に同じノードがあればそれを返す．
 BdnNodeHandle
-BdNetwork::new_and(const vector<BdnNodeHandle>& inode_handle_list)
+BdnMgr::new_and(const vector<BdnNodeHandle>& inode_handle_list)
 {
   return make_tree(0x8, 0, inode_handle_list.size(), inode_handle_list);
 }
@@ -629,8 +629,8 @@ BdNetwork::new_and(const vector<BdnNodeHandle>& inode_handle_list)
 // @return 作成したノードを返す．
 // @note すでに構造的に同じノードがあればそれを返す．
 BdnNodeHandle
-BdNetwork::new_or(BdnNodeHandle inode1_handle,
-		  BdnNodeHandle inode2_handle)
+BdnMgr::new_or(BdnNodeHandle inode1_handle,
+	       BdnNodeHandle inode2_handle)
 {
   return new_logic(0xe, inode1_handle, inode2_handle);
 }
@@ -640,7 +640,7 @@ BdNetwork::new_or(BdnNodeHandle inode1_handle,
 // @return 作成したノードを返す．
 // @note すでに構造的に同じノードがあればそれを返す．
 BdnNodeHandle
-BdNetwork::new_or(const vector<BdnNodeHandle>& inode_handle_list)
+BdnMgr::new_or(const vector<BdnNodeHandle>& inode_handle_list)
 {
   return make_tree(0xe, 0, inode_handle_list.size(), inode_handle_list);
 }
@@ -651,7 +651,7 @@ BdNetwork::new_or(const vector<BdnNodeHandle>& inode_handle_list)
 // @return 作成したノードを返す．
 // @note すでに構造的に同じノードがあればそれを返す．
 BdnNodeHandle
-BdNetwork::new_xor(BdnNodeHandle inode1_handle,
+BdnMgr::new_xor(BdnNodeHandle inode1_handle,
 		   BdnNodeHandle inode2_handle)
 {
   return new_logic(0x6, inode1_handle, inode2_handle);
@@ -662,7 +662,7 @@ BdNetwork::new_xor(BdnNodeHandle inode1_handle,
 // @return 作成したノードを返す．
 // @note すでに構造的に同じノードがあればそれを返す．
 BdnNodeHandle
-BdNetwork::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
+BdnMgr::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
 {
   return make_tree(0x6, 0, inode_handle_list.size(), inode_handle_list);
 }
@@ -673,10 +673,10 @@ BdNetwork::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
 // @param[in] num 要素数
 // @param[in] node_list ノードのリスト
 BdnNodeHandle
-BdNetwork::make_tree(ymuint fcode,
-		     ymuint start,
-		     ymuint num,
-		     const vector<BdnNodeHandle>& node_list)
+BdnMgr::make_tree(ymuint fcode,
+		  ymuint start,
+		  ymuint num,
+		  const vector<BdnNodeHandle>& node_list)
 {
   switch ( num ) {
   case 0:
@@ -706,10 +706,10 @@ BdNetwork::make_tree(ymuint fcode,
 // @note fcode の出力極性を正規化する．
 // @note 実際には新しいノードを作ってそこへのリンクを内部で持つ．
 void
-BdNetwork::change_logic(BdnNode* node ,
-			ymuint fcode,
-			BdnNodeHandle inode1_handle,
-			BdnNodeHandle inode2_handle)
+BdnMgr::change_logic(BdnNode* node ,
+		     ymuint fcode,
+		     BdnNodeHandle inode1_handle,
+		     BdnNodeHandle inode2_handle)
 {
   BdnNodeHandle new_handle = set_logic(node, fcode,
 				       inode1_handle, inode2_handle);
@@ -759,10 +759,10 @@ END_NONAMESPACE
 
 // 論理ノードの内容を設定する．
 BdnNodeHandle
-BdNetwork::set_logic(BdnNode* node,
-		     ymuint fcode,
-		     BdnNodeHandle inode0_handle,
-		     BdnNodeHandle inode1_handle)
+BdnMgr::set_logic(BdnNode* node,
+		  ymuint fcode,
+		  BdnNodeHandle inode0_handle,
+		  BdnNodeHandle inode1_handle)
 {
   // 入力の極性を fcode に反映させる．
   if ( inode0_handle.inv() ) {
@@ -931,9 +931,9 @@ BdNetwork::set_logic(BdnNode* node,
 // from を to の pos 番目のファンインとする．
 // to の pos 番目にすでに接続があった場合には自動的に削除される．
 void
-BdNetwork::connect(BdnNode* from,
-		   BdnNode* to,
-		   ymuint pos)
+BdnMgr::connect(BdnNode* from,
+		BdnNode* to,
+		ymuint pos)
 {
   // BdnNode::mFaoutList を変更するのはここだけ
 
@@ -956,7 +956,7 @@ BdNetwork::connect(BdnNode* from,
 // @brief ノードを作成する．
 // @return 作成されたノードを返す．
 BdnNode*
-BdNetwork::alloc_node()
+BdnMgr::alloc_node()
 {
   // 空いているIDを探してノード配列へ登録
   int id = mNodeItvlMgr.avail_num();
@@ -983,7 +983,7 @@ BdNetwork::alloc_node()
 
 // node を削除する．
 void
-BdNetwork::delete_node(BdnNode* node)
+BdnMgr::delete_node(BdnNode* node)
 {
   // alloc_node の逆の処理を行なう．
   mNodeItvlMgr.add(static_cast<int>(node->id()));
@@ -1004,7 +1004,7 @@ BdNetwork::delete_node(BdnNode* node)
 
 // @brief 段数を求める．
 ymuint
-BdNetwork::level() const
+BdnMgr::level() const
 {
   if ( (mLevel & 1U) == 0U ) {
     for (BdnNodeList::const_iterator p = mInputList.begin();
@@ -1047,7 +1047,7 @@ BdNetwork::level() const
 
 // @brief ハッシュ表を確保する．
 void
-BdNetwork::alloc_table(ymuint req_size)
+BdnMgr::alloc_table(ymuint req_size)
 {
   BdnNode** old_table = mHashTable;
   ymuint old_size = mHashSize;

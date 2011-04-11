@@ -10,7 +10,7 @@
 
 
 #include "ym_bdn/BdnBlifWriter.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnDff.h"
 #include "ym_utils/NameMgr.h"
@@ -32,7 +32,7 @@ BdnBlifWriter::~BdnBlifWriter()
 // ブーリアンネットワークをblif形式で表示
 void
 BdnBlifWriter::operator()(ostream& s,
-			  const BdNetwork& network)
+			  const BdnMgr& network)
 {
   // 名前を管理するオブジェクト
   NameMgr name_mgr("[", "]");

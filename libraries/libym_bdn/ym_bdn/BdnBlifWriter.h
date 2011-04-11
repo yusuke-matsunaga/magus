@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_BDN
 //////////////////////////////////////////////////////////////////////
 /// @class BdnBlifWriter BdnBlifWriter.h <ym_bdn/BdnBlifWriter.h>
 /// @ingroup BnetGroup
-/// @brief Bdnwork の内容を blif 形式で出力するクラス
+/// @brief BdnMgr の内容を blif 形式で出力するクラス
 /// @sa Bdnwork
 //////////////////////////////////////////////////////////////////////
 class BdnBlifWriter
@@ -38,7 +38,7 @@ public:
   /// @brief 出力する．
   void
   operator()(ostream& s,
-	     const BdNetwork& network);
+	     const BdnMgr& network);
 
 };
 

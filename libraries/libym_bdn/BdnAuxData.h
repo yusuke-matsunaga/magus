@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_BDN
 //////////////////////////////////////////////////////////////////////
 class BdnAuxData
 {
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 protected:
 
@@ -70,7 +70,7 @@ public:
 class BdnPortData :
   public BdnAuxData
 {
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 private:
 
@@ -126,7 +126,7 @@ private:
 class BdnDffData :
   public BdnAuxData
 {
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 private:
 
@@ -169,7 +169,7 @@ private:
 class BdnLatchData :
   public BdnAuxData
 {
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 private:
 

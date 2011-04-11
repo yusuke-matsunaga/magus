@@ -9,7 +9,6 @@
 
 #include "MvnHandle.h"
 #include "ym_mvn/MvnMgr.h"
-#include "ym_bdn/BdNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS

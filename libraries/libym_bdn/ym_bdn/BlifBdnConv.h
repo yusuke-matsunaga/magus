@@ -20,8 +20,8 @@ BEGIN_NAMESPACE_YM_BDN
 //////////////////////////////////////////////////////////////////////
 /// @class BlifBdnConv BlifBdnConv.h "ym_bdn/BlifBdnConv.h"
 /// @ingroup BdnGroup
-/// @brief BlifNetwork を BdNetwork に変換するクラス
-/// @sa BdNetwork nsYm::nsBlif::BlifNetwork
+/// @brief BlifNetwork を BdnMgr に変換するクラス
+/// @sa BdnMgr nsYm::nsBlif::BlifNetwork
 //////////////////////////////////////////////////////////////////////
 class BlifBdnConv
 {
@@ -44,7 +44,7 @@ public:
   /// @note clock_name と reset_name はオプション
   bool
   operator()(const BlifNetwork& blif_network,
-	     BdNetwork& network,
+	     BdnMgr& network,
 	     const string& clock_name = "clock",
 	     const string& reset_name = "reset");
 
@@ -79,7 +79,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変換先のネットワーク
-  BdNetwork* mNetwork;
+  BdnMgr* mNetwork;
 
   // BlifNode の ID をキーとして対応する BdnNodeHandle を収める配列
   vector<BdnNodeHandle> mNodeMap;

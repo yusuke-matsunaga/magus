@@ -10,7 +10,7 @@
 
 
 #include "ym_bdn/BlifBdnConv.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
 #include "ym_bdn/BdnDff.h"
@@ -36,7 +36,7 @@ BlifBdnConv::~BlifBdnConv()
 // @param[in] reset_name リセット信号のポート名
 bool
 BlifBdnConv::operator()(const BlifNetwork& blif_network,
-			BdNetwork& network,
+			BdnMgr& network,
 			const string& clock_name,
 			const string& reset_name)
 {

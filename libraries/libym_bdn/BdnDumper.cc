@@ -9,7 +9,7 @@
 
 #include "ym_bdn/BdnDumper.h"
 
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnPort.h"
 #include "ym_bdn/BdnDff.h"
 #include "ym_bdn/BdnLatch.h"
@@ -58,12 +58,12 @@ BdnDumper::~BdnDumper()
 {
 }
 
-// @brief BdNetwork の内容をダンプする関数
+// @brief BdnMgr の内容をダンプする関数
 // @param[in] s 出力先のストリーム
 // @param[in] network 対象のネットワーク
 void
 BdnDumper::operator()(ostream& s,
-		      const BdNetwork& network)
+		      const BdnMgr& network)
 {
   ymuint np = network.port_num();
   for (ymuint i = 0; i < np; ++ i) {

@@ -10,7 +10,7 @@
 
 
 #include "ym_bnet/BNetwork.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
 
@@ -22,13 +22,13 @@ BEGIN_NAMESPACE_YM_BDN
 // 2-feasible でない場合には false を返す．
 bool
 bnet2bdn(const BNetwork& network,
-	 BdNetwork& bdn,
+	 BdnMgr& bdn,
 	 ostream& err_out)
 {
   bdn.set_name(network.model_name());
-  
+
   ymuint n = network.max_node_id();
-  
+
   // BNetwork 中のノードと BinGraph 中のノードの対応を持つ配列
   vector<BdnNodeHandle> assoc(n);
 
@@ -113,7 +113,7 @@ bnet2bdn(const BNetwork& network,
 	  inode1_handle = ~inode1_handle;
 	}
       }
-      
+
       ymuint fcode = 0;
       if ( expr.is_and() ) {
 	fcode = 0x8; // 1000

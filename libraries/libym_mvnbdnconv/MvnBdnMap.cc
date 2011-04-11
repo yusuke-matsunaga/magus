@@ -8,7 +8,6 @@
 
 
 #include "ym_mvnbdnconv/MvnBdnMap.h"
-#include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
 #include "ym_mvn/MvnMgr.h"

@@ -10,7 +10,7 @@
 #include "IteConv.h"
 #include "ym_mvn/MvnNode.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNodeHandle.h"
 
 
@@ -34,7 +34,7 @@ IteConv::~IteConv()
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 IteConv::operator()(const MvnNode* node,
-		    BdNetwork& bdnetwork,
+		    BdnMgr& bdnetwork,
 		    MvnBdnMap& nodemap)
 {
   if ( node->type() == MvnNode::kIte ) {

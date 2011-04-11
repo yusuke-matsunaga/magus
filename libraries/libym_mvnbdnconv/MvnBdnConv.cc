@@ -9,7 +9,7 @@
 
 #include "ym_mvnbdnconv/MvnBdnConv.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNodeHandle.h"
 #include "ym_bdn/BdnDff.h"
 #include "ym_bdn/BdnLatch.h"
@@ -92,7 +92,7 @@ BEGIN_NONAMESPACE
 
 // 入出力ノードを作る．
 void
-make_io(BdNetwork& bdnetwork,
+make_io(BdnMgr& bdnetwork,
 	MvnBdnMap& mvnode_map,
 	const MvnNode* node,
 	ymuint src_bitpos,
@@ -170,13 +170,13 @@ enqueue(const MvnNode* node0,
 END_NONAMESPACE
 
 
-// @brief MvnMgr の内容を BdNetwork に変換する．
+// @brief MvnMgr の内容を BdnMgr に変換する．
 // @param[in] mvmgr 対象の MvnNetwork
-// @param[out] bdnetwork 変換先の BdNetwork
+// @param[out] bdnetwork 変換先の BdnMgr
 // @param[out] mvnode_map 対応関係を格納するオブジェクト
 void
 MvnBdnConv::operator()(const MvnMgr& mvmgr,
-		       BdNetwork& bdnetwork,
+		       BdnMgr& bdnetwork,
 		       MvnBdnMap& mvnode_map)
 {
   bdnetwork.clear();

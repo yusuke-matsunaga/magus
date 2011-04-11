@@ -1,6 +1,6 @@
 
 /// @file libym_bdn/tests/base_test.cc
-/// @brief BdNetwork の基本機能のテスト
+/// @brief BdnMgr の基本機能のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: base_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnNodeHandle.h"
 
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_BDN
 bool
 base_test()
 {
-  BdNetwork network;
+  BdnMgr network;
 
   // name(), set_name() のテスト
   network.set_name("foo");

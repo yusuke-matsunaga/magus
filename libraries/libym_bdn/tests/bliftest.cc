@@ -11,7 +11,7 @@
 
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BlifBdnConv.h"
 #include "ym_bdn/BdnDumper.h"
 #include "ym_bdn/BdnBlifWriter.h"
@@ -46,11 +46,11 @@ main(int argc,
       return 4;
     }
 
-    BdNetwork network;
+    BdnMgr network;
     BlifBdnConv conv;
     bool stat = conv(blif_network, network);
     if ( !stat ) {
-      cerr << "Error in converting from BlifNetwork to BdNetwork" << endl;
+      cerr << "Error in converting from BlifNetwork to BdnMgr" << endl;
       return 5;
     }
 
@@ -66,7 +66,7 @@ main(int argc,
     cout << "after copy" << endl;
     cout << endl;
 
-    BdNetwork network2 = network;
+    BdnMgr network2 = network;
 
     dump(cout, network2);
     blif_writer(cout, network2);

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnDumper.h"
 #include "ym_bdn/BdnVerilogWriter.h"
 #include "ym_mvn/MvnMgr.h"
@@ -66,7 +66,7 @@ main(int argc,
     MvnDumper dump_mvn;
     dump_mvn(cout, mgr);
 
-    BdNetwork bdnetwork;
+    BdnMgr bdnetwork;
     MvnBdnConv conv;
     MvnBdnMap mvnode_map(mgr.max_node_id());
     conv(mgr, bdnetwork, mvnode_map);

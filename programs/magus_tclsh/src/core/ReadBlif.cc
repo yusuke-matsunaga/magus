@@ -91,7 +91,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
       bool stat = conv(blif_network, *neth->_bdn());
       if ( !stat ) {
 	TclObj emsg;
-	emsg << "Error in converting from BlifNetowrk to bBdNetwork";
+	emsg << "Error in converting from BlifNetowrk to BdMgr";
 	set_result(emsg);
 	return TCL_ERROR;
       }

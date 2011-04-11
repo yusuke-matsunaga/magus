@@ -1,13 +1,13 @@
 
 /// @file libym_bdn/tests/change_test.cc
-/// @brief BdNetwork::change_logic() のテスト
+/// @brief BdnMgr::change_logic() のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNodeHandle.h"
 #include "ym_bdn/BdnDumper.h"
 
@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_BDN
 void
 change_test()
 {
-  BdNetwork network;
+  BdnMgr network;
   BdnDumper dump;
 
   network.set_name("change_test");

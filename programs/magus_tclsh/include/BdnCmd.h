@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 /// @class BdnCmd BdnCmd.h "BdnCmd.h"
 /// @ingroup MagusGroup
-/// @brief BdNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
+/// @brief BdnMgr を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
 class BdnCmd :
   public NetCmd
@@ -46,7 +46,7 @@ protected:
 
   /// @brief カレントネットワークの取得
   /// @note カレントネットワークが BNetwork でない場合には NULL を返す．
-  BdNetwork*
+  BdnMgr*
   cur_network() const;
 
 

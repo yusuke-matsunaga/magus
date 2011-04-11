@@ -101,7 +101,7 @@ MagMgr::new_bnethandle(const string& name,
   return neth;
 }
 
-// @brief 新たな BdNetwork を作成して登録する．
+// @brief 新たな BdnMgr を作成して登録する．
 // @param[in] name 名前
 // @param[in] err_out エラー出力
 // @return 作成したネットハンドル

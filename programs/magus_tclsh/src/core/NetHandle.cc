@@ -45,15 +45,15 @@ NetHandle::_bnetwork()
   return NULL;
 }
 
-// @brief BdNetwork を得る．
-const BdNetwork*
+// @brief BdnMgr を得る．
+const BdnMgr*
 NetHandle::bdn() const
 {
   return NULL;
 }
 
-// @brief BdNetwork を得る．
-BdNetwork*
+// @brief BdnMgr を得る．
+BdnMgr*
 NetHandle::_bdn()
 {
   return NULL;

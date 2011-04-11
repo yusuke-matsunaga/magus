@@ -23,13 +23,13 @@ class BdnAuxData;
 /// - 出力側のノード
 /// - 出力側のノードの何番目(0 or 1)の入力か
 /// の情報を持つ．
-/// @sa BdnNode BdNetwork
+/// @sa BdnNode BdnMgr
 //////////////////////////////////////////////////////////////////////
 class BdnEdge :
   public DlElem
 {
   friend class BdnNode;
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 public:
 
@@ -130,12 +130,12 @@ private:
 /// 論理ノードは2つのファンインと機能コードを持つ．
 /// 外部出力以外のノードは複数のファンアウトを持つ．
 ///
-/// @sa BdnEdge BdNetwork
+/// @sa BdnEdge BdnMgr
 //////////////////////////////////////////////////////////////////////
 class BdnNode :
   public DlElem
 {
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 public:
 
@@ -188,8 +188,8 @@ public:
 
   /// @brief ID 番号の取得
   /// @return ID 番号を返す．
-  /// @note ID 番号はノードの生成時に BdNetwork により自動的に割り振られる．
-  /// @sa BdNetwork
+  /// @note ID 番号はノードの生成時に BdnMgr により自動的に割り振られる．
+  /// @sa BdnMgr
   ymuint
   id() const;
 

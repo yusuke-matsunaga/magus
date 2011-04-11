@@ -23,7 +23,7 @@ class BdnAuxData;
 class BdnLatch :
   public DlElem
 {
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 private:
 
@@ -38,8 +38,8 @@ public:
 
   /// @brief ID番号の取得
   /// @return ID番号を返す．
-  /// @note ID番号はラッチの生成時に BdNetwork により自動的に割り振られる．
-  /// @sa BdNetwork
+  /// @note ID番号はラッチの生成時に BdnMgr により自動的に割り振られる．
+  /// @sa BdnMgr
   ymuint
   id() const;
 
@@ -121,8 +121,8 @@ private:
 
 // @brief ID番号の取得
 // @return ID番号を返す．
-// @note ID番号はラッチの生成時に BdNetwork により自動的に割り振られる．
-// @sa BdNetwork
+// @note ID番号はラッチの生成時に BdnMgr により自動的に割り振られる．
+// @sa BdnMgr
 inline
 ymuint
 BdnLatch::id() const

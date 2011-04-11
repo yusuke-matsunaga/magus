@@ -10,7 +10,7 @@
 #include "SllConv.h"
 #include "ym_mvn/MvnNode.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNodeHandle.h"
 
 
@@ -26,7 +26,7 @@ SllConv::~SllConv()
 {
 }
 
-// @brief MvnNode を BdNetwork に変換する．
+// @brief MvnNode を BdnMgr に変換する．
 // @param[in] node ノード
 // @param[in] bdnetwork 変換結果のサブジェクトグラフ
 // @param[in] nodemap ノードの対応関係を表すマップ
@@ -34,7 +34,7 @@ SllConv::~SllConv()
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 SllConv::operator()(const MvnNode* node,
-		    BdNetwork& bdnetwork,
+		    BdnMgr& bdnetwork,
 		    MvnBdnMap& nodemap)
 {
   if ( node->type() == MvnNode::kSll ) {

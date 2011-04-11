@@ -1,11 +1,11 @@
-#ifndef YM_BDN_BDNETWORK_H
-#define YM_BDN_BDNETWORK_H
+#ifndef YM_BDN_BDNMGR_H
+#define YM_BDN_BDNMGR_H
 
-/// @file ym_bdn/BdNetwork.h
-/// @brief BdNetwork のヘッダファイル
+/// @file ym_bdn/BdnMgr.h
+/// @brief BdnMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BdNetwork.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: BdnMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -19,29 +19,29 @@
 BEGIN_NAMESPACE_YM_BDN
 
 //////////////////////////////////////////////////////////////////////
-/// @class BdNetwork BdNetwork.h <ym_bdn/BdNetwork.h>
+/// @class BdnMgr BdnMgr.h <ym_bdn/BdnMgr.h>
 /// @brief 2入力ノードのネットワークを表すクラス
 //////////////////////////////////////////////////////////////////////
-class BdNetwork
+class BdnMgr
 {
 public:
 
   /// @brief コンストラクタ
   /// @note 空のネットワークに初期化される．
-  BdNetwork();
+  BdnMgr();
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
-  BdNetwork(const BdNetwork& src);
+  BdnMgr(const BdnMgr& src);
 
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   /// @return 自分自身への参照を返す．
-  const BdNetwork&
-  operator=(const BdNetwork& src);
+  const BdnMgr&
+  operator=(const BdnMgr& src);
 
   /// @brief デストラクタ
-  ~BdNetwork();
+  ~BdnMgr();
 
 
 public:
@@ -384,7 +384,7 @@ private:
   /// @brief コピーコンストラクタと代入演算子用のサブルーティン
   /// @param[in] src コピー元のオブジェクト
   void
-  copy(const BdNetwork& src);
+  copy(const BdnMgr& src);
 
   /// @brief バランス木を作る．
   /// @param[in] fcode 機能コード
@@ -518,13 +518,13 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-// クラス BdNetwork
+// クラス BdnMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief 名前を得る．
 inline
 string
-BdNetwork::name() const
+BdnMgr::name() const
 {
   return mName;
 }
@@ -532,7 +532,7 @@ BdNetwork::name() const
 // @brief 名前を設定する．
 inline
 void
-BdNetwork::set_name(const string& name)
+BdnMgr::set_name(const string& name)
 {
   mName = name;
 }
@@ -540,7 +540,7 @@ BdNetwork::set_name(const string& name)
 // @brief ポート数の取得
 inline
 ymuint
-BdNetwork::port_num() const
+BdnMgr::port_num() const
 {
   return mPortArray.size();
 }
@@ -549,7 +549,7 @@ BdNetwork::port_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < port_num() )
 inline
 const BdnPort*
-BdNetwork::port(ymuint pos) const
+BdnMgr::port(ymuint pos) const
 {
   return mPortArray[pos];
 }
@@ -557,7 +557,7 @@ BdNetwork::port(ymuint pos) const
 // @brief D-FF 数の取得
 inline
 ymuint
-BdNetwork::dff_num() const
+BdnMgr::dff_num() const
 {
   return mDffList.size();
 }
@@ -565,7 +565,7 @@ BdNetwork::dff_num() const
 // @brief D-FF のリストの取得
 inline
 const BdnDffList&
-BdNetwork::dff_list() const
+BdnMgr::dff_list() const
 {
   return mDffList;
 }
@@ -573,7 +573,7 @@ BdNetwork::dff_list() const
 // @brief ラッチ数の取得
 inline
 ymuint
-BdNetwork::latch_num() const
+BdnMgr::latch_num() const
 {
   return mLatchList.size();
 }
@@ -581,7 +581,7 @@ BdNetwork::latch_num() const
 // @brief ラッチのリストの取得
 inline
 const BdnLatchList&
-BdNetwork::latch_list() const
+BdnMgr::latch_list() const
 {
   return mLatchList;
 }
@@ -589,7 +589,7 @@ BdNetwork::latch_list() const
 // ノード番号の最大値 + 1 を返す．
 inline
 ymuint
-BdNetwork::max_node_id() const
+BdnMgr::max_node_id() const
 {
   return mNodeArray.size();
 }
@@ -598,7 +598,7 @@ BdNetwork::max_node_id() const
 // @return 入力ノード数を返す．
 inline
 ymuint
-BdNetwork::input_num() const
+BdnMgr::input_num() const
 {
   return mInputList.size();
 }
@@ -606,7 +606,7 @@ BdNetwork::input_num() const
 // @brief 入力ノードのリストを得る．
 inline
 const BdnNodeList&
-BdNetwork::input_list() const
+BdnMgr::input_list() const
 {
   return mInputList;
 }
@@ -614,7 +614,7 @@ BdNetwork::input_list() const
 // @brief 出力ノード数を得る．
 inline
 ymuint
-BdNetwork::output_num() const
+BdnMgr::output_num() const
 {
   return mOutputList.size();
 }
@@ -622,7 +622,7 @@ BdNetwork::output_num() const
 // @brief 出力ノードのリストを得る．
 inline
 const BdnNodeList&
-BdNetwork::output_list() const
+BdnMgr::output_list() const
 {
   return mOutputList;
 }
@@ -630,7 +630,7 @@ BdNetwork::output_list() const
 // 論理ノード数を得る．
 inline
 ymuint
-BdNetwork::lnode_num() const
+BdnMgr::lnode_num() const
 {
   return mLnodeList.size();
 }
@@ -638,7 +638,7 @@ BdNetwork::lnode_num() const
 // 論理ノードのリストを得る．
 inline
 const BdnNodeList&
-BdNetwork::lnode_list() const
+BdnMgr::lnode_list() const
 {
   return mLnodeList;
 }
@@ -651,8 +651,8 @@ BdNetwork::lnode_list() const
 // @note すでに構造的に同じノードがあればそれを返す．
 inline
 BdnNodeHandle
-BdNetwork::new_nand(BdnNodeHandle inode1_handle,
-		    BdnNodeHandle inode2_handle)
+BdnMgr::new_nand(BdnNodeHandle inode1_handle,
+		 BdnNodeHandle inode2_handle)
 {
   return ~new_and(inode1_handle, inode2_handle);
 }
@@ -663,7 +663,7 @@ BdNetwork::new_nand(BdnNodeHandle inode1_handle,
 // @note すでに構造的に同じノードがあればそれを返す．
 inline
 BdnNodeHandle
-BdNetwork::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
+BdnMgr::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
 {
   return ~new_and(inode_handle_list);
 }
@@ -675,8 +675,8 @@ BdNetwork::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
 // @note すでに構造的に同じノードがあればそれを返す．
 inline
 BdnNodeHandle
-BdNetwork::new_nor(BdnNodeHandle inode1_handle,
-		   BdnNodeHandle inode2_handle)
+BdnMgr::new_nor(BdnNodeHandle inode1_handle,
+		BdnNodeHandle inode2_handle)
 {
   return ~new_or(inode1_handle, inode2_handle);
 }
@@ -687,7 +687,7 @@ BdNetwork::new_nor(BdnNodeHandle inode1_handle,
 // @note すでに構造的に同じノードがあればそれを返す．
 inline
 BdnNodeHandle
-BdNetwork::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
+BdnMgr::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
 {
   return ~new_or(inode_handle_list);
 }
@@ -699,8 +699,8 @@ BdNetwork::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
 // @note すでに構造的に同じノードがあればそれを返す．
 inline
 BdnNodeHandle
-BdNetwork::new_xnor(BdnNodeHandle inode1_handle,
-		    BdnNodeHandle inode2_handle)
+BdnMgr::new_xnor(BdnNodeHandle inode1_handle,
+		 BdnNodeHandle inode2_handle)
 {
   return ~new_xor(inode1_handle, inode2_handle);
 }
@@ -711,11 +711,11 @@ BdNetwork::new_xnor(BdnNodeHandle inode1_handle,
 // @note すでに構造的に同じノードがあればそれを返す．
 inline
 BdnNodeHandle
-BdNetwork::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
+BdnMgr::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
 {
   return ~new_xor(inode_handle_list);
 }
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNETWORK_H
+#endif // YM_BDN_BDNMGR_H

@@ -12,7 +12,7 @@
 #include "LutmapCmd.h"
 #include "ym_bnet/BNet2Sbj.h"
 #include "ym_mvn/MvnMgr.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_mvnbdnconv/MvnBdnConv.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
 
@@ -67,7 +67,7 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
       const MvnMgr& mgr = *neth->mvn();
       MvnBdnConv conv;
       MvnBdnMap mvnode_map(mgr.max_node_id());
-      BdNetwork bdnetwork;
+      BdnMgr bdnetwork;
       conv(mgr, bdnetwork, mvnode_map);
 #warning "TODO: code is broken"
       stat = true;

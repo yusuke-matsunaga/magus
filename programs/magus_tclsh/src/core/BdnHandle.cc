@@ -8,7 +8,7 @@
 
 
 #include "BdnHandle.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetDecomp.h"
 
@@ -38,15 +38,15 @@ BdnHandle::type() const
   return kMagBdn;
 }
 
-// @brief BdNetwork を得る．
-const BdNetwork*
+// @brief BdnMgr を得る．
+const BdnMgr*
 BdnHandle::bdn() const
 {
   return &mNetwork;
 }
 
-// @brief BdNetwork を得る．
-BdNetwork*
+// @brief BdnMgr を得る．
+BdnMgr*
 BdnHandle::_bdn()
 {
   return &mNetwork;

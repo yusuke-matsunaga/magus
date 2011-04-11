@@ -35,7 +35,7 @@ public:
   enum tType {
     /// @brief BNetwork
     kMagBNet,
-    /// @brief BdNetwork
+    /// @brief BdnMgr
     kMagBdn,
     /// @brief MvNetwork
     kMagMvn
@@ -78,14 +78,14 @@ public:
   BNetwork*
   _bnetwork();
 
-  /// @brief BdNetwork を得る．
+  /// @brief BdnMgr を得る．
   virtual
-  const BdNetwork*
+  const BdnMgr*
   bdn() const;
 
-  /// @brief BdNetwork を得る．
+  /// @brief BdnMgr を得る．
   virtual
-  BdNetwork*
+  BdnMgr*
   _bdn();
 
   /// @brief MvNetwork を得る．

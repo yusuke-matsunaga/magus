@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnDumper BdnDumper.h "ym_bdn/BdnDumper.h"
-/// @brief BdNetwork の内容を出力するためのクラス
+/// @brief BdnMgr の内容を出力するためのクラス
 //////////////////////////////////////////////////////////////////////
 class BdnDumper
 {
@@ -31,12 +31,12 @@ public:
 
 public:
 
-  /// @brief BdNetwork の内容をダンプする関数
+  /// @brief BdnMgr の内容をダンプする関数
   /// @param[in] s 出力先のストリーム
   /// @param[in] network 対象のネットワーク
   void
   operator()(ostream& s,
-	     const BdNetwork& network);
+	     const BdnMgr& network);
 
 };
 

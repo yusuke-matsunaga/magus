@@ -23,7 +23,7 @@ class BdnAuxData;
 class BdnDff :
   public DlElem
 {
-  friend class BdNetwork;
+  friend class BdnMgr;
 
 private:
 
@@ -38,8 +38,8 @@ public:
 
   /// @brief ID 番号の取得
   /// @return ID 番号を返す．
-  /// @note ID 番号は D-FF の生成時に BdNetwork により自動的に割り振られる．
-  /// @sa BdNetwork
+  /// @note ID 番号は D-FF の生成時に BdnMgr により自動的に割り振られる．
+  /// @sa BdnMgr
   ymuint
   id() const;
 
@@ -130,8 +130,8 @@ private:
 
 // @brief ID 番号の取得
 // @return ID 番号を返す．
-// @note ID 番号は D-FF の生成時に BdNetwork により自動的に割り振られる．
-// @sa BdNetwork
+// @note ID 番号は D-FF の生成時に BdnMgr により自動的に割り振られる．
+// @sa BdnMgr
 inline
 ymuint
 BdnDff::id() const

@@ -10,7 +10,7 @@
 
 
 #include "ym_bdn/BdnVerilogWriter.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnPort.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_bdn/BdnDff.h"
@@ -127,7 +127,7 @@ END_NONAMESPACE
 // ブーリアンネットワークをblif形式で表示
 void
 BdnVerilogWriter::operator()(ostream& s,
-			     const BdNetwork& network)
+			     const BdnMgr& network)
 {
   s << "module " << verilog_name(network.name()) << "(";
   ymuint np = network.port_num();

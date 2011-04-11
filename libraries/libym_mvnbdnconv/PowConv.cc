@@ -10,7 +10,7 @@
 #include "PowConv.h"
 #include "ym_mvn/MvnNode.h"
 #include "ym_mvnbdnconv/MvnBdnMap.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BdnNodeHandle.h"
 
 
@@ -26,15 +26,15 @@ PowConv::~PowConv()
 {
 }
 
-// @brief MvnNode を BdNetwork に変換する．
+// @brief MvnNode を BdnMgr に変換する．
 // @param[in] node ノード
-// @param[in] bdnetwork 変換結果の BdNetwork
+// @param[in] bdnetwork 変換結果の BdnMgr
 // @param[in] nodemap ノードの対応関係を表すマップ
 // @retval true このクラスで変換処理を行った．
 // @retval false このクラスでは変換処理を行わなかった．
 bool
 PowConv::operator()(const MvnNode* node,
-		    BdNetwork& bdnetwork,
+		    BdnMgr& bdnetwork,
 		    MvnBdnMap& nodemap)
 {
   if ( node->type() == MvnNode::kPow ) {

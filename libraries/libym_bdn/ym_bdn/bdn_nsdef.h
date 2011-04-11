@@ -109,7 +109,7 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_BDN
 
-class BdNetwork;
+class BdnMgr;
 
 class BdnPort;
 
@@ -156,7 +156,7 @@ END_NAMESPACE_YM_BDN
 
 BEGIN_NAMESPACE_YM
 
-using nsBdn::BdNetwork;
+using nsBdn::BdnMgr;
 
 using nsBdn::BdnPort;
 

@@ -36,16 +36,16 @@ public:
   // MvnConv の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief MvnNode を BdNetwork に変換する．
+  /// @brief MvnNode を BdnMgr に変換する．
   /// @param[in] node ノード
-  /// @param[in] bdnetwork 変換結果の BdNetwork
+  /// @param[in] bdnetwork 変換結果の BdnMgr
   /// @param[in] nodemap ノードの対応関係を表すマップ
   /// @retval true このクラスで変換処理を行った．
   /// @retval false このクラスでは変換処理を行わなかった．
   virtual
   bool
   operator()(const MvnNode* node,
-	     BdNetwork& bdnetwork,
+	     BdnMgr& bdnetwork,
 	     MvnBdnMap& nodemap);
 
 };

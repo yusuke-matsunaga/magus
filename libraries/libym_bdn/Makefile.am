@@ -22,12 +22,12 @@ libym_bdn_la_LIBADD = \
 libym_bdn_la_LDFLAGS =
 
 libym_bdn_la_SOURCES = \
-	BdNetwork.cc \
+	BdnBlifWriter.cc \
 	BdnDumper.cc \
+	BdnMgr.cc \
 	BdnNode1.h \
 	BdnNode2.h \
 	BdnNode.cc \
-	BdnBlifWriter.cc \
 	BdnVerilogWriter.cc \
 	BlifBdnConv.cc
 
