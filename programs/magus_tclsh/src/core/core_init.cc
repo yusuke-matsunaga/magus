@@ -24,6 +24,7 @@
 #include "ListNetwork.h"
 #include "ForNetwork.h"
 #include "ReadBlif.h"
+#include "ReadIscas89.h"
 #include "WriteBlif.h"
 #include "WriteVerilog.h"
 
@@ -72,6 +73,8 @@ core_init(Tcl_Interp* interp,
   // ネットワークのファイル入力を行うコマンド
   TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr,
 					"magus::read_blif");
+  TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr,
+					"magus::read_iscas89");
 
   // ネットワークのファイル出力を行うコマンド
   TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr,
@@ -131,6 +134,7 @@ core_init(Tcl_Interp* interp,
     "proc complete(network_list) { t s e l p m } { return \"\" }\n"
     "proc complete(foreach_network) { t s e l p m } { return \"\" }\n"
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
+    "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
     "}\n"

@@ -1,6 +1,6 @@
 
-/// @file src/core/ReadBlif.cc
-/// @brief ReadBlif の実装ファイル
+/// @file src/core/ReadIscas89.cc
+/// @brief ReadIscas89 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,21 +9,17 @@
 /// All rights reserved.
 
 
-#include "ReadBlif.h"
-
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
-#include "ym_bdn/BlifBdnConv.h"
+#include "ReadIscas89.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-// blif 形式のファイルを読み込むコマンド
+// iscas89 形式のファイルを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ReadBlif::ReadBlif(MagMgr* mgr) :
+ReadIscas89::ReadIscas89(MagMgr* mgr) :
   NetCmd(mgr, true, true, false)
 {
   mReader.add_msg_handler(&mMsgHandler);
@@ -31,13 +27,13 @@ ReadBlif::ReadBlif(MagMgr* mgr) :
 }
 
 // @brief デストラクタ
-ReadBlif::~ReadBlif()
+ReadIscas89::~ReadIscas89()
 {
 }
 
 // コマンドを実行する．
 int
-ReadBlif::cmd_proc(TclObjVector& objv)
+ReadIscas89::cmd_proc(TclObjVector& objv)
 {
   ymuint objc = objv.size();
 
@@ -53,7 +49,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   string ex_file_name;
   bool stat = tilde_subst(file_name, ex_file_name);
   if ( !stat ) {
-    // ファイル名文字列の中に誤りがあった．
+    // ファイル名の文字列中に誤りがあった．
     return TCL_ERROR;
   }
 
@@ -77,24 +73,6 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 
   case NetHandle::kMagBdn:
     {
-      BlifNetworkReader reader;
-      TclObjMsgHandler msg_handler;
-      reader.add_msg_handler(&msg_handler);
-
-      BlifNetwork blif_network;
-
-      if ( !reader.read(ex_file_name, blif_network) ) {
-	return TCL_ERROR;
-      }
-
-      BlifBdnConv conv;
-      bool stat = conv(blif_network, *neth->_bdn());
-      if ( !stat ) {
-	TclObj emsg;
-	emsg << "Error in converting from BlifNetowrk to bBdNetwork";
-	set_result(emsg);
-	return TCL_ERROR;
-      }
     }
     break;
 

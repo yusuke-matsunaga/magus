@@ -56,6 +56,8 @@ libmagus_core_tcl_la_SOURCES = \
 	ForNetwork.cc \
 	ReadBlif.h \
 	ReadBlif.cc \
+	ReadIscas89.h \
+	ReadIscas89.cc \
 	WriteBlif.h \
 	WriteBlif.cc \
 	WriteVerilog.h \

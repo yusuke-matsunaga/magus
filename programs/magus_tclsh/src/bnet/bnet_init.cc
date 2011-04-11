@@ -37,8 +37,8 @@ bnet_init(Tcl_Interp* interp,
   // ネットワークのファイル入出力コマンド
 #if 0
   TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr, "magus::read_blif");
-#endif
   TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr, "magus::read_iscas89");
+#endif
   TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
 
   // ネットワーク上での処理コマンド(その2)
@@ -90,8 +90,8 @@ bnet_init(Tcl_Interp* interp,
     "proc complete(print_stats) { t s e l p m } { return \"\" }\n"
 #if 0
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
-#endif
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
+#endif
     "proc complete(write_equ) { t s e l p m } { return \"\" }\n"
     "proc complete(eliminate) { t s e l p m } { return \"\" }\n"
     "proc complete(sweep) { t s e l p m } { return \"\" }\n"

@@ -78,7 +78,8 @@ WriteVerilog::cmd_proc(TclObjVector& objv)
       // Bdn の場合
       BdnVerilogWriter writer;
       writer(*osp, *neth->bdn());
-      stat = TCL_ERROR;
+      // この関数はfailしない．
+      stat = TCL_OK;
     }
     break;
 
