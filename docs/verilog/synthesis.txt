@@ -1,0 +1,36 @@
+        IEEE1364-1.2002 合成用 Verilog-HDL 記述の覚え書き
+
+- Modeling Combinational Logic
+  - continuous assignment, net declaration, always を使う．
+  - always 文の event list 中には edge 記述を含めることはできない．
+  - ただし，event list 中の記述は合成結果に影響は与えない．
+  - 中間変数は event list に入れる必要はない．
+  - ただし，event list 中の記述は simulation とのミスマッチを起こす可
+    能性がある．
+  - always 文中では，同一の変数に対して blocking 代入と non-blocking
+    代入が混在してはいけない．
+
+- Modeling Edge-Sensitive Sequential Logic
+  - event list は必ず edge 記述でなければならない．
+  - event list は clock 信号と非同期 set/reset 信号を記述する．
+  - 仕様書には event list 中での順番に関する記述はなし．
+    たぶん，順序は意味を持たない．
+  - N 個の event があったら，そのうちの (N - 1) 個の event
+    に対応した if 文 (else-if 文)が always 文のトップレベルに
+    なければならない．
+  - event list 中の極性(posedge/negede)と if 文の条件式の極性
+    は一致していなければならない．
+  - 代入は non-blocking 代入が望ましい．blocking 代入は中間変数
+    でのみ使う．ただし，最終的な変数に対する blocking での代入は
+    エラーではないが，simulation 結果とのミスマッチを起こす可能性があ
+    る．
+
+- Modeling Level-Sensitive Storage Devices
+  - combinational always と同じスタイル．
+  - ある条件において明示的な代入が実行されない変数がある．
+  - 代入は non-blocking 代入が望ましい．blocking 代入は中間変数
+    でのみ使う．ただし，最終的な変数に対する blocking での代入は
+    エラーではないが，simulation 結果とのミスマッチを起こす可能性があ
+    る．
+
+

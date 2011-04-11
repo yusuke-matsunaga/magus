@@ -5,15 +5,15 @@
 ///
 /// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "WriteVerilog.h"
 
 #include "ym_bnet/BNetVerilogWriter.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_tclpp/TclPopt.h"
+#include "ym_bdn/BdnVerilogWriter.h"
+#include "ym_mvn/MvnVerilogWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -74,14 +74,20 @@ WriteVerilog::cmd_proc(TclObjVector& objv)
     break;
 
   case NetHandle::kMagBdn:
-    // 今は対応する関数がない．
-    stat = TCL_ERROR;
+    {
+      // Bdn の場合
+      BdnVerilogWriter writer;
+      writer(*osp, *neth->bdn());
+      // この関数はfailしない．
+      stat = TCL_OK;
+    }
     break;
 
   case NetHandle::kMagMvn:
     {
-      const MvMgr& mgr = *neth->mvn();
-      dump_verilog(*osp, mgr);
+      // Mvn の場合
+      MvnVerilogWriter writer;
+      writer(*osp, *neth->mvn());
       // この関数はfailしない．
       stat = TCL_OK;
     }

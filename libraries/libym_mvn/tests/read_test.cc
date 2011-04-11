@@ -1,6 +1,6 @@
 
 /// @file libym_mvn/tests/read_test.cc
-/// @brief MvNode を生成するテスト
+/// @brief MvnNode を生成するテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: read.cc 1343 2008-03-25 17:15:35Z matsunaga $
@@ -9,9 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvVerilogReader.h"
-#include "ym_mvn/MvVlMap.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnVerilogReader.h"
+#include "ym_mvn/MvnVlMap.h"
+#include "ym_mvn/MvnDumper.h"
+#include "ym_mvn/MvnVerilogWriter.h"
 
 
 int
@@ -26,11 +28,11 @@ main(int argc,
     filename_list.push_back(argv[i]);
   }
 
-#if 0
+#if !defined(YM_DEBUG)
   try {
 #endif
-    MvMgr mgr;
-    MvVerilogReader reader;
+    MvnMgr mgr;
+    MvnVerilogReader reader;
     MsgHandler* mh = new StreamMsgHandler(&cerr);
     mh->set_mask(MsgHandler::kMaskAll);
     mh->delete_mask(kMsgInfo);
@@ -48,8 +50,8 @@ main(int argc,
 	return 1;
       }
     }
-    cerr << "Generating MvNetwork" << endl;
-    MvVlMap node_map;
+    cerr << "Generating MvnNetwork" << endl;
+    MvnVlMap node_map;
     bool stat = reader.gen_network(mgr, node_map);
     cerr << " End" << endl;
     if ( !stat ) {
@@ -57,10 +59,14 @@ main(int argc,
       return 2;
     }
 
-    //dump(cout, mgr);
-    dump_verilog(cout, mgr);
-    dump_node_map(cout, mgr, node_map);
-#if 0
+    MvnDumper dump;
+    dump(cout, mgr);
+
+    MvnVerilogWriter vl_writer;
+
+    vl_writer(cout, mgr, node_map);
+
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError x) {
     cout << x << endl;

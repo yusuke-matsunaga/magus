@@ -33,12 +33,13 @@ base_test()
     return false;
   }
 
-  // new_input() のテスト
+  // new_port_input() のテスト
   if ( network.input_num() != 0 ) {
     cout << "ERROR[new_input_test]: input_num() != 0" << endl;
     return false;
   }
-  BdnNode* input0 = network.new_input("input0");
+  BdnPort* port0 = network.new_port("port0", 1);
+  BdnNode* input0 = network.new_port_input(port0, 0);
   if ( network.input_num() != 1 ) {
     cout << "ERROR[new_input_test]: input_num() != 1" << endl;
     return false;
@@ -47,22 +48,16 @@ base_test()
     cout << "ERROR[new_input_test]: input0 == NULL" << endl;
     return false;
   }
-  if ( network.input_name(0) != "input0" ) {
-    cout << "ERROR[new_input_test]: input0_name == \"input0\"" << endl;
-    return false;
-  }
 
-  BdnNode* input1 = network.new_input("input1");
-  if ( network.input_num() != 2 ) {
-    cout << "ERROR[new_input_test]: input_num() != 2" << endl;
+  BdnPort* port1 = network.new_port("port1", 2);
+  BdnNode* input1_0 = network.new_port_input(port1, 0);
+  BdnNode* input1 = network.new_port_input(port1, 1);
+  if ( network.input_num() != 3 ) {
+    cout << "ERROR[new_input_test]: input_num() != 3" << endl;
     return false;
   }
   if ( input1 == NULL ) {
-    cout << "ERROR[new_input_test]: input1 == NULL" << endl;
-    return false;
-  }
-  if ( network.input_name(1) != "input1" ) {
-    cout << "ERROR[new_input_test]: input_name == \"input1\"" << endl;
+    cout << "ERROR[new_input_test]: input1_1 == NULL" << endl;
     return false;
   }
 

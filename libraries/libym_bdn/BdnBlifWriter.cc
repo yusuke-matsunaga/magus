@@ -5,13 +5,14 @@
 ///
 /// $Id: BdnBlifWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_bdn/BdnBlifWriter.h"
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BdnNode.h"
+#include "ym_bdn/BdnDff.h"
 #include "ym_utils/NameMgr.h"
 
 
@@ -42,37 +43,18 @@ BdnBlifWriter::operator()(ostream& s,
   vector<string> name_array(n);
 
   // 外部入力，外部出力の名前を登録
-  ymuint ni = network.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    string name = network.input_name(i);
-    if ( name != string() ) {
-      name_mgr.add(name.c_str());
-    }
-    else {
-      name = name_mgr.new_name(true);
-    }
-    BdnNode* node = network.input(i);
-    name_array[node->id()] = name;
-  }
-  ymuint no = network.output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    string name = network.output_name(i);
-    if ( name != string() ) {
-      name_mgr.add(name.c_str());
-    }
-    else {
-      name = name_mgr.new_name(true);
-    }
-    BdnNode* node = network.output(i);
-    name_array[node->id()] = name;
-  }
-
-  // ラッチノードに名前をつける．
-  const BdnNodeList& latch_list = network.latch_list();
-  for (BdnNodeList::const_iterator p = latch_list.begin();
-       p != latch_list.end(); ++ p) {
-    const BdnNode* node = *p;
+  const BdnNodeList& input_list = network.input_list();
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
     string name = name_mgr.new_name(true);
+    BdnNode* node = *p;
+    name_array[node->id()] = name;
+  }
+  const BdnNodeList& output_list = network.output_list();
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    string name = name_mgr.new_name(true);
+    BdnNode* node = *p;
     name_array[node->id()] = name;
   }
 
@@ -85,7 +67,7 @@ BdnBlifWriter::operator()(ostream& s,
 	 node->pomark() ) {
       BdnFanoutList::const_iterator p = node->fanout_list().begin();
       const BdnNode* onode = (*p)->to();
-      if ( !onode->output_inv() ) {
+      if ( !onode->output_fanin_inv() ) {
 	// 外部出力と同じ名前にする．
 	name_array[node->id()] = name_array[onode->id()];
 	continue;
@@ -97,24 +79,29 @@ BdnBlifWriter::operator()(ostream& s,
 
   // ファイルに出力する．
   s << ".model " << network.name() << endl;
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BdnNode* node = network.input(i);
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
+    const BdnNode* node = *p;
     s << ".inputs " << name_array[node->id()] << endl;
   }
 
-  for (ymuint i = 0; i < no; ++ i) {
-    const BdnNode* node = network.output(i);
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* node = *p;
     s << ".outputs " << name_array[node->id()] << endl;
   }
 
-  for (BdnNodeList::const_iterator p = latch_list.begin();
-       p != latch_list.end(); ++ p) {
-    const BdnNode* node = *p;
-    const BdnNode* inode = node->fanin0();
+  const BdnDffList& dff_list = network.dff_list();
+  for (BdnDffList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const BdnDff* dff = *p;
+    const BdnNode* node = dff->output();
+    const BdnNode* inode = dff->input()->output_fanin();
+    bool oinv = dff->input()->output_fanin_inv();
     string iname;
     if ( inode ) {
       iname = name_array[inode->id()];
-      if ( node->output_inv() ) {
+      if ( oinv ) {
 	string name = name_mgr.new_name(true);
 	s << ".names " << iname
 	  << " " << name << endl
@@ -125,7 +112,7 @@ BdnBlifWriter::operator()(ostream& s,
     else {
       iname = name_mgr.new_name(true);
       s << ".names " << iname << endl;
-      if ( node->output_inv() ) {
+      if ( oinv ) {
 	s << "0" << endl;
       }
       else {
@@ -133,18 +120,23 @@ BdnBlifWriter::operator()(ostream& s,
       }
     }
     s << ".latch " << iname << " " << name_array[node->id()];
-    if ( node->reset_val() != 2 ) {
-      s << " " << node->reset_val();
+    if ( dff->set()->output_fanin() ) {
+      s << " 1";
+    }
+    else if ( dff->reset()->output_fanin() ) {
+      s << " 0";
     }
     s << endl;
   }
 
-  for (ymuint i = 0; i < no; ++ i) {
-    const BdnNode* node = network.output(i);
-    const BdnNode* inode = node->fanin(0);
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.begin(); ++ p) {
+    const BdnNode* node = *p;
+    const BdnNode* inode = node->output_fanin();
+    bool oinv = node->output_fanin_inv();
     if ( inode == 0 ) {
       s << ".names " << name_array[node->id()] << endl;
-      if ( node->output_inv() ) {
+      if ( oinv ) {
 	s << "1" << endl;
       }
       else {
@@ -155,7 +147,7 @@ BdnBlifWriter::operator()(ostream& s,
     else if ( name_array[inode->id()] != name_array[node->id()] ) {
       s << ".names " << name_array[inode->id()]
 	<< " " << name_array[node->id()] << endl;
-      if ( node->output_inv() ) {
+      if ( oinv ) {
 	s << "0 1" << endl;
       }
       else {

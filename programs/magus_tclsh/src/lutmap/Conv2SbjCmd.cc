@@ -11,9 +11,10 @@
 
 #include "LutmapCmd.h"
 #include "ym_bnet/BNet2Sbj.h"
-#include "ym_mvn/Mvn2Sbj.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvNodeMap.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_bdn/BdNetwork.h"
+#include "ym_mvnbdnconv/MvnBdnConv.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
 
 
 
@@ -63,11 +64,13 @@ Conv2SbjCmd::cmd_proc(TclObjVector& objv)
 
   case NetHandle::kMagMvn:
     {
-      const MvMgr& mgr = *neth->mvn();
-      MvNodeMap mvnode_map(mgr.max_node_id());
-      Mvn2Sbj conv;
-
-      conv(mgr, sbjgraph(), mvnode_map);
+      const MvnMgr& mgr = *neth->mvn();
+      MvnBdnConv conv;
+      MvnBdnMap mvnode_map(mgr.max_node_id());
+      BdNetwork bdnetwork;
+      conv(mgr, bdnetwork, mvnode_map);
+#warning "TODO: code is broken"
+      stat = true;
     }
     break;
   }

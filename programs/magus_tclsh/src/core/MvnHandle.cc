@@ -8,7 +8,7 @@
 
 
 #include "MvnHandle.h"
-#include "ym_mvn/MvMgr.h"
+#include "ym_mvn/MvnMgr.h"
 #include "ym_bdn/BdNetwork.h"
 
 
@@ -37,15 +37,15 @@ MvnHandle::type() const
   return kMagMvn;
 }
 
-// @brief MvMgr を得る．
-const MvMgr*
+// @brief MvnMgr を得る．
+const MvnMgr*
 MvnHandle::mvn() const
 {
   return &mNetwork;
 }
 
-// @brief MvMgr を得る．
-MvMgr*
+// @brief MvnMgr を得る．
+MvnMgr*
 MvnHandle::_mvn()
 {
   return &mNetwork;

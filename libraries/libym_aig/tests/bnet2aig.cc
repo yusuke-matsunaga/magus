@@ -14,6 +14,9 @@
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigHandle.h"
 
+#include "ym_aig/AigSatMgr.h"
+#include "ym_sat/SatSolver.h"
+
 
 BEGIN_NAMESPACE_YM
 
@@ -41,7 +44,7 @@ bnet2aig(const BNetwork& network,
 {
   // BNetwork 中のノードと AIG 中のノードの対応を持つ連想配列
   BNodeMap assoc;
-  
+
   // 外部入力を作る．
   for (BNodeList::const_iterator p = network.inputs_begin();
        p != network.inputs_end(); ++p) {
@@ -61,20 +64,32 @@ bnet2aig(const BNetwork& network,
     vector<AigHandle> ianodes(ni);
     for (size_t pos = 0; pos < ni; ++ pos) {
       ianodes[pos] = find_node(bnode->fanin(pos), assoc);
+      cout << "ianodes[" << pos << "] = " << ianodes[pos] << endl;
     }
+    cout << "bnode->func() = " << bnode->func() << endl;
     AigHandle anode = aig_mgr.make_logic(bnode->func(), ianodes);
+    cout << "anode = " << anode << endl;
     assoc.insert(make_pair(bnode, anode));
   }
 
   // 外部出力を作る．
+  list<AigHandle> output_handle_list;
   const BNodeList& output_list = network.outputs();
   for (BNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     BNode* obnode = *p;
     BNode* ibnode = obnode->fanin(0);
     AigHandle ianode = find_node(ibnode, assoc);
-    assoc.insert(make_pair(obnode, ianode));
+    output_handle_list.push_back(ianode);
   }
+
+  aig_mgr.dump_handles(cout, output_handle_list);
+
+  SatSolver* solver = SatSolverFactory::gen_solver();
+  AigSatMgr aigsat(aig_mgr, *solver);
+  AigHandle root = output_handle_list.front();
+  vector<Bool3> model;
+  Bool3 stat = aigsat.sat(root, model);
 }
 
 END_NAMESPACE_YM
@@ -86,14 +101,14 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " blif-file" << endl;
     return 2;
   }
 
   string filename = argv[1];
-  
+
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
 
@@ -107,8 +122,6 @@ main(int argc,
 
     AigMgr aig_mgr;
     bnet2aig(network, aig_mgr);
-
-    //dump(outputs, cout);
   }
   catch ( AssertError x) {
     cout << x << endl;

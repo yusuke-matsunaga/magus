@@ -21,6 +21,7 @@ libmagus_core_tcl_la_LDFLAGS =
 libmagus_core_tcl_la_SOURCES = \
 	MagMgr.cc \
 	NetHandle.cc \
+	TclObjMsgHandler.cc \
 	BNetHandle.h \
 	BNetHandle.cc \
 	BdnHandle.h \
@@ -53,6 +54,12 @@ libmagus_core_tcl_la_SOURCES = \
 	ListNetwork.cc \
 	ForNetwork.h \
 	ForNetwork.cc \
+	ReadBlif.h \
+	ReadBlif.cc \
+	ReadIscas89.h \
+	ReadIscas89.cc \
+	WriteBlif.h \
+	WriteBlif.cc \
 	WriteVerilog.h \
 	WriteVerilog.cc \
 	core_init.cc

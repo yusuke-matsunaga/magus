@@ -14,6 +14,7 @@
 
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/VlTime.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtExpr.h"
 
 
@@ -305,6 +306,15 @@ EiExpr::constant_type() const
 {
   // とは言っても何か返さなければならない．
   return kVpiDecConst;
+}
+
+// @brief 定数値を返す．
+// @note kVpiConstant の時，意味を持つ．
+// @note それ以外では動作は不定
+VlValue
+EiExpr::constant_value() const
+{
+  return VlValue();
 }
 
 // @brief 対象の関数を返す．

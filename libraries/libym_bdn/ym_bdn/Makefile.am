@@ -9,7 +9,12 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	BdNetwork.h \
 	BdnBlifWriter.h \
+	BdnDff.h \
+	BdnDumper.h \
+	BdnLatch.h \
 	BdnNode.h \
 	BdnNodeHandle.h \
+	BdnPort.h \
+	BdnVerilogWriter.h \
 	BlifBdnConv.h \
 	bdn_nsdef.h

@@ -4,10 +4,10 @@
 /// @file ym_aig/AigHandle.h
 /// @brief AigHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: AigHandle.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_AIG
 class AigNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigHandle AigHandle.h <ym_aig/AigHandle.h>
+/// @class AigHandle AigHandle.h "ym_aig/AigHandle.h"
 /// @brief 枝を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AigHandle
 {
   friend class AigMgrImpl;
   friend class AigNode;
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ/デストラクタと生成/内容の設定
@@ -51,7 +51,7 @@ public:
   set(AigNode* node,
       bool inv);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 内部の情報を取得するメンバ関数
@@ -64,7 +64,7 @@ public:
   /// @brief ノードを得る．
   AigNode*
   node() const;
-  
+
   /// @brief ノードの通し番号を得る．
   ymuint
   node_id() const;
@@ -85,16 +85,16 @@ public:
   /// @brief 定数を指しているとき true を返す．
   bool
   is_const() const;
-  
+
   /// @brief 外部入力ノードへのハンドルのとき true を返す．
   bool
   is_input() const;
-  
+
   /// @brief 外部入力ノードへのハンドルのとき，入力番号を返す．
   /// @note is_input() の時のみ意味を持つ．
   ymuint
   input_id() const;
-  
+
   /// @brief ANDノードへのハンドルのとき true を返す．
   bool
   is_and() const;
@@ -114,12 +114,12 @@ public:
   /// @note is_and() の時のみ意味を持つ．
   AigHandle
   fanin1_handle() const;
-  
+
   /// @brief ハッシュ値を返す．
   ymuint32
   hash_func() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // friend 関数の宣言
@@ -130,7 +130,7 @@ public:
   operator==(AigHandle src1,
 	     AigHandle src2);
 
-  
+
 private:
 
   /// @brief 内容を直接指定したコンストラクタ
@@ -159,16 +159,6 @@ operator==(AigHandle src1,
 bool
 operator!=(AigHandle src1,
 	   AigHandle src2);
-
-/// @relates AigHandle
-/// @brief 内容をダンプする関数
-/// @param[in] src 根の枝
-/// @param[in] mark すでに処理したノードの番号を保持するマーク
-/// @param[in] s 出力先のストリーム
-void
-dump_handle(AigHandle src,
-	    hash_set<ymuint>& mark,
-	    ostream& s);
 
 /// @relates AigHandle
 /// @brief 内容を出力する関数
@@ -266,7 +256,7 @@ AigHandle::is_const() const
 {
   return (mPackedData & ~1UL) == 0UL;
 }
-  
+
 // @brief ハッシュ値を返す．
 inline
 ymuint32

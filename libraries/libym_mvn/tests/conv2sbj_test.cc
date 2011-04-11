@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvVerilogReader.h"
-#include "ym_mvn/MvVlMap.h"
-#include "ym_mvn/MvNodeMap.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnVerilogReader.h"
+#include "ym_mvn/MvnVlMap.h"
+#include "ym_mvn/MvnNodeMap.h"
 #include "ym_mvn/Mvn2Sbj.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_sbj/SbjDumper.h"
@@ -28,11 +28,11 @@ main(int argc,
     filename_list.push_back(argv[i]);
   }
 
-#if !YM_DEBUG
+#if !defined(YM_DEBUG)
   try {
 #endif
-    MvMgr mgr;
-    MvVerilogReader reader;
+    MvnMgr mgr;
+    MvnVerilogReader reader;
     MsgHandler* mh = new StreamMsgHandler(&cerr);
     mh->set_mask(MsgHandler::kMaskAll);
     mh->delete_mask(kMsgInfo);
@@ -50,8 +50,8 @@ main(int argc,
 	return 1;
       }
     }
-    cerr << "Generating MvNetwork" << endl;
-    MvVlMap node_map;
+    cerr << "Generating MvnNetwork" << endl;
+    MvnVlMap node_map;
     bool stat = reader.gen_network(mgr, node_map);
     cerr << " End" << endl;
     if ( !stat ) {
@@ -61,13 +61,13 @@ main(int argc,
 
     SbjGraph sbjgraph;
     Mvn2Sbj conv;
-    MvNodeMap mvnode_map(mgr.max_node_id());
+    MvnNodeMap mvnode_map(mgr.max_node_id());
     conv(mgr, sbjgraph, mvnode_map);
 
     SbjDumper dumper;
 
     dumper.dump_verilog(cout, sbjgraph);
-#if !YM_DEBUG
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError x) {
     cout << x << endl;

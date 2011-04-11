@@ -1,0 +1,45 @@
+#ifndef YM_BDN_BDNDUMPER_H
+#define YM_BDN_BDNDUMPER_H
+
+/// @file ym_bdn/BdnDumper.h
+/// @brief BdnDumper のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ym_bdn/bdn_nsdef.h"
+
+
+BEGIN_NAMESPACE_YM_BDN
+
+//////////////////////////////////////////////////////////////////////
+/// @class BdnDumper BdnDumper.h "ym_bdn/BdnDumper.h"
+/// @brief BdNetwork の内容を出力するためのクラス
+//////////////////////////////////////////////////////////////////////
+class BdnDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  BdnDumper();
+
+  /// @brief デストラクタ
+  ~BdnDumper();
+
+
+public:
+
+  /// @brief BdNetwork の内容をダンプする関数
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] network 対象のネットワーク
+  void
+  operator()(ostream& s,
+	     const BdNetwork& network);
+
+};
+
+END_NAMESPACE_YM_BDN
+
+#endif // YM_BDN_BDNDUMPER_H

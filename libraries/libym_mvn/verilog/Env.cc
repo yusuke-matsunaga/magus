@@ -8,6 +8,7 @@
 
 
 #include "Env.h"
+#include "AsyncControl.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlRange.h"
 
@@ -54,7 +55,7 @@ Env::max_id() const
 // @param[in] node 対応するノード
 void
 Env::add(const VlDecl* decl,
-	 MvNode* node)
+	 MvnNode* node)
 {
   ymuint id = mDeclHash.get_id(decl);
   add_by_id(id, node);
@@ -67,7 +68,7 @@ Env::add(const VlDecl* decl,
 void
 Env::add(const VlDeclArray* decl,
 	 ymuint offset,
-	 MvNode* node)
+	 MvnNode* node)
 {
   ymuint id = mDeclHash.get_id(decl, offset);
   add_by_id(id, node);
@@ -77,7 +78,7 @@ Env::add(const VlDeclArray* decl,
 // @param[in] decl 宣言要素
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
-MvNode*
+MvnNode*
 Env::get(const VlDecl* decl) const
 {
   ymuint id = mDeclHash.get_id(decl);
@@ -90,7 +91,7 @@ Env::get(const VlDecl* decl) const
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
-MvNode*
+MvnNode*
 Env::get(const VlDeclArray* decl,
 	 ymuint offset) const
 {
@@ -101,7 +102,7 @@ Env::get(const VlDeclArray* decl,
 // @brief ID番号に対応するノードを登録する．
 void
 Env::add_by_id(ymuint id,
-	       MvNode* node)
+	       MvnNode* node)
 {
   while ( mNodeArray.size() <= id ) {
     mNodeArray.push_back(NULL);
@@ -110,7 +111,7 @@ Env::add_by_id(ymuint id,
 }
 
 // @brief ID番号に対応するノードを取り出す．
-MvNode*
+MvnNode*
 Env::get_from_id(ymuint id) const
 {
   if ( mNodeArray.size() <= id ) {
@@ -134,16 +135,16 @@ Env::decl_hash() const
 // @brief コンストラクタ
 // @param[in] global_env プロセスの外側の Env
 ProcEnv::ProcEnv(const Env& global_env) :
+  Env(global_env.decl_hash()),
   mGlobalEnv(global_env),
-  mDeclHash(global_env.decl_hash()),
   mNodeArray(global_env.max_id())
 {
 }
 
 // @brief コピーコンストラクタ
 ProcEnv::ProcEnv(const ProcEnv& src) :
+  Env(src.decl_hash()),
   mGlobalEnv(src.mGlobalEnv),
-  mDeclHash(src.mDeclHash),
   mNodeArray(src.mNodeArray)
 {
 }
@@ -158,42 +159,79 @@ void
 ProcEnv::clear()
 {
   mNodeArray.clear();
-  mNodeArray.resize(mDeclHash.max_id());
+  mNodeArray.resize(max_id());
 }
 
 // @brief ID番号の最大値+1を返す．
 ymuint
 ProcEnv::max_id() const
 {
-  return mDeclHash.max_id();
+  return decl_hash().max_id();
 }
 
 // @brief 登録する(単一要素の場合)
 // @param[in] decl 宣言要素
 // @param[in] node 代入式の右辺
-// @param[in] cond 代入条件
+// @param[in] block blocking 代入の時に true とするフラグ
 void
 ProcEnv::add(const VlDecl* decl,
-	     MvNode* node,
-	     MvNode* cond)
+	     MvnNode* node,
+	     bool block)
 {
-  ymuint id = mDeclHash.get_id(decl);
-  add_by_id(id, node, cond);
+  ymuint id = decl_hash().get_id(decl);
+  add_by_id(id, node, NULL, block);
 }
 
 // @brief 登録する(配列の場合)
 // @param[in] decl 宣言要素
 // @param[in] offset
 // @param[in] node 代入式の右辺
-// @param[in] cond 代入条件
+// @param[in] block blocking 代入の時に true とするフラグ
 void
 ProcEnv::add(const VlDeclArray* decl,
 	     ymuint offset,
-	     MvNode* node,
-	     MvNode* cond)
+	     MvnNode* node,
+	     bool block)
 {
-  ymuint id = mDeclHash.get_id(decl, offset);
-  add_by_id(id, node, cond);
+  ymuint id = decl_hash().get_id(decl, offset);
+  add_by_id(id, node, NULL, block);
+}
+
+// @brief 対応するノードを取り出す．
+// @param[in] decl 宣言要素
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型の場合には NULL を返す．
+MvnNode*
+ProcEnv::get(const VlDecl* decl) const
+{
+  ymuint id = decl_hash().get_id(decl);
+  AssignInfo ans = get_from_id(id);
+  if ( ans.mRhs != NULL &&
+       ans.mBlock == true &&
+       ans.mCond == NULL ) {
+    return ans.mRhs;
+  }
+  return mGlobalEnv.get_from_id(id);
+}
+
+// @brief 対応するノードを取り出す(配列型)．
+// @param[in] decl 宣言要素
+// @param[in] offset オフセット
+// @return 対応するノードを返す．
+// @note 登録されていない場合と配列型でない場合，
+// オフセットが範囲外の場合には NULL を返す．
+MvnNode*
+ProcEnv::get(const VlDeclArray* decl,
+	     ymuint offset) const
+{
+  ymuint id = decl_hash().get_id(decl, offset);
+  AssignInfo ans = get_from_id(id);
+  if ( ans.mRhs != NULL &&
+       ans.mBlock == true &&
+       ans.mCond == NULL ) {
+    return ans.mRhs;
+  }
+  return mGlobalEnv.get_from_id(id);
 }
 
 // @brief 対応するノードを取り出す．
@@ -201,12 +239,12 @@ ProcEnv::add(const VlDeclArray* decl,
 // @return 対応するノードを返す．
 // @note 登録されていない場合と配列型の場合には NULL を返す．
 AssignInfo
-ProcEnv::get(const VlDecl* decl) const
+ProcEnv::get_info(const VlDecl* decl) const
 {
-  ymuint id = mDeclHash.get_id(decl);
+  ymuint id = decl_hash().get_id(decl);
   AssignInfo ans = get_from_id(id);
   if ( ans.mRhs == NULL ) {
-    MvNode* node = mGlobalEnv.get(decl);
+    MvnNode* node = mGlobalEnv.get(decl);
     return AssignInfo(node);
   }
   return ans;
@@ -219,28 +257,33 @@ ProcEnv::get(const VlDecl* decl) const
 // @note 登録されていない場合と配列型でない場合，
 // オフセットが範囲外の場合には NULL を返す．
 AssignInfo
-ProcEnv::get(const VlDeclArray* decl,
-	    ymuint offset) const
+ProcEnv::get_info(const VlDeclArray* decl,
+		  ymuint offset) const
 {
-  ymuint id = mDeclHash.get_id(decl, offset);
+  ymuint id = decl_hash().get_id(decl, offset);
   AssignInfo ans = get_from_id(id);
   if ( ans.mRhs == NULL ) {
-    MvNode* node = mGlobalEnv.get(decl, offset);
+    MvnNode* node = mGlobalEnv.get(decl, offset);
     return AssignInfo(node);
   }
   return ans;
 }
 
 // @brief ID番号に対応するノードを登録する．
+// @param[in] id ID番号
+// @param[in] node 代入式の右辺
+// @param[in] cond 代入条件
+// @param[in] block blocking 代入の時に true とするフラグ
 void
 ProcEnv::add_by_id(ymuint id,
-		   MvNode* node,
-		   MvNode* cond)
+		   MvnNode* node,
+		   MvnNode* cond,
+		   bool block)
 {
   while ( mNodeArray.size() <= id ) {
     mNodeArray.push_back(AssignInfo());
   }
-  mNodeArray[id] = AssignInfo(node, cond);
+  mNodeArray[id] = AssignInfo(node, cond, block);
 }
 
 // @brief ID番号に対応するノードを取り出す．
@@ -253,11 +296,13 @@ ProcEnv::get_from_id(ymuint id) const
   return mNodeArray[id];
 }
 
-// @brief DeclHash を得る．
-DeclHash&
-ProcEnv::decl_hash() const
+// @brief コンストラクタ
+// @param[in] global_env プロセスの外側の Env
+AsyncControl::AsyncControl(const Env& global_env) :
+  mNode(NULL),
+  mPol(0),
+  mEnv(global_env)
 {
-  return mDeclHash;
 }
 
 END_NAMESPACE_YM_MVN_VERILOG

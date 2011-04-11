@@ -7,27 +7,46 @@
 ///
 /// $Id: bdn_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BdnGroup Binary Decomposed Network パッケージ
 ///
 /// ネットワーク全体として以下の情報(データ)を持つ．
 ///
-/// - 外部入力ノード
-///   各々が外部入力IDを持つ．外部入力IDは0から始まる連続した整数．
-///   入力ノードは一度生成されたら削除されない．
+/// - BdnPort: 外部入出力ポート
+///   ネットワークの外部インターフェイスを表すオブジェクト．
+///   各々が ID を持つ．ID は 0 から始まる連続した整数．
+///   ポートは名前を持つことができる(名無しもポートもある)．
+///   ポートはビット幅を持つ．
+///   ポートは一度生成されたら削除されない．
 ///
-/// - 外部出力ノード
-///   各々が外部出力IDを持つ．外部出力IDは0から始まる連続した整数．
-///   出力ノードは一度生成されたら削除されない．
-///   ファンイン(or NULL)と反転属性を持つ．
+/// - BdnDff: D-FF
+///   ネットワークの内部状態を表すオブジェクト．
+///   常に 1 ビット．データ入力，クロック入力，データ出力を持つ．
+///   非同期セット信号と非同期リセット信号をオプショナルに持つ．
+///   各々が ID を持つ．ID は 0 以上の整数．
+///   D-FF は名前を持つことができる(名無しも D-FF もある)．
+///   D-FF は削除されることがある．
 ///
-/// - ラッチノード
-///   ラッチに相当するノード．
-///   リセット値(0, 1, 2)を持つ．2 の場合にはリセット値は不定
+/// - BdnLatch: ラッチ
+///   常に 1 ビット．データ入力，ラッチイネーブル信号，データ出力を持つ．
+///   各々が ID を持つ．ID は 0 以上の整数．
+///   ラッチは名前を持つことができる(名無しもラッチもある)．
+///   ラッチは削除されることがある．
 ///
-/// - 論理ノード
+/// - BdnNode: 入力ノード
+///   組み合わせ回路部分の入力を表すノード．
+///   常に1ビット．
+///   外部入力ポート，D-FF やラッチのデータ出力に関連付けられる．
+///
+/// - BdnNode: 出力ノード
+///   組み合わせ回路部分の出力を表すノード．
+///   常に1ビット．
+///   外部出力ポート，D-FF やラッチのデータ入力などに関連付けられる．
+///   ファンインの極性の情報を持つ．
+///
+/// - BdnNode: 論理ノード
 ///   2つのファンイン(常に != NULL)とローカルな論理関数
 ///   (真理値表の形で4ビット)を持つ．ただし，真理値表ベクタ
 ///   の最初のビットは常に0 (ということは省略可)．
@@ -91,14 +110,23 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_BDN
 
 class BdNetwork;
-class BdnBlifWriter;
-class BlifBdnConv;
+
+class BdnPort;
+
+class BdnDff;
+
+class BdnLatch;
 
 class BdnNode;
 class BdnNodeHandle;
 
 class BdnEdge;
 
+class BdnDumper;
+class BdnBlifWriter;
+class BdnVerilogWriter;
+
+class BlifBdnConv;
 
 /// @brief 枝のリスト
 /// @ingroup BdnGroup
@@ -116,13 +144,27 @@ typedef vector<BdnNode*> BdnNodeVector;
 /// @ingroup BdnGroup
 typedef DlList<BdnNode> BdnNodeList;
 
+/// @brief DFF のリスト
+/// @ingroup BdnGroup
+typedef DlList<BdnDff> BdnDffList;
+
+/// @brief ラッチのリスト
+/// @ingroup BdnGroup
+typedef DlList<BdnLatch> BdnLatchList;
+
 END_NAMESPACE_YM_BDN
 
 BEGIN_NAMESPACE_YM
 
 using nsBdn::BdNetwork;
-using nsBdn::BdnBlifWriter;
-using nsBdn::BlifBdnConv;
+
+using nsBdn::BdnPort;
+
+using nsBdn::BdnDff;
+using nsBdn::BdnDffList;
+
+using nsBdn::BdnLatch;
+using nsBdn::BdnLatchList;
 
 using nsBdn::BdnNode;
 using nsBdn::BdnNodeHandle;
@@ -133,6 +175,12 @@ using nsBdn::BdnEdge;
 using nsBdn::BdnEdgeList;
 
 using nsBdn::BdnFanoutList;
+
+using nsBdn::BdnDumper;
+using nsBdn::BdnBlifWriter;
+using nsBdn::BdnVerilogWriter;
+
+using nsBdn::BlifBdnConv;
 
 END_NAMESPACE_YM
 

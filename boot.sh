@@ -119,6 +119,7 @@ LIBRARIES=\
  libym_bdd \
  libym_npn \
  libym_sat \
+ libym_smtlibv2 \
  libym_mincov \
  libym_blif \
  libym_iscas89 \
@@ -127,6 +128,7 @@ LIBRARIES=\
  libym_bnet \
  libym_bdn \
  libym_mvn \
+ libym_mvnbdnconv \
  libym_sbj \
  libym_aig \
  libym_tgnet \
@@ -141,8 +143,7 @@ PROGRAMS=\
 "magus_tclsh \
  matpg \
  atpg \
- seal \
- lutmap"
+ seal"
 
 # 第1引数に応じた処理を行う．
 case "$1" in

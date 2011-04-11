@@ -35,9 +35,10 @@ bnet_init(Tcl_Interp* interp,
   TclCmdBinder1<BNetPrintStats, MagMgr*>::reg(interp, mgr, "magus::print_stats");
 
   // ネットワークのファイル入出力コマンド
+#if 0
   TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr, "magus::read_blif");
   TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr, "magus::read_iscas89");
-  TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr, "magus::write_blif");
+#endif
   TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
 
   // ネットワーク上での処理コマンド(その2)
@@ -87,9 +88,10 @@ bnet_init(Tcl_Interp* interp,
     "proc complete(network_info) { t s e l p m } { return \"\" }\n"
     "proc complete(network_allinfo) { t s e l p m } { return \"\" }\n"
     "proc complete(print_stats) { t s e l p m } { return \"\" }\n"
+#if 0
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
-    "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
+#endif
     "proc complete(write_equ) { t s e l p m } { return \"\" }\n"
     "proc complete(eliminate) { t s e l p m } { return \"\" }\n"
     "proc complete(sweep) { t s e l p m } { return \"\" }\n"

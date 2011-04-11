@@ -11,10 +11,9 @@
 #include "DeclMap.h"
 #include "Driver.h"
 #include "Env.h"
-#include "ym_mvn/MvMgr.h"
-#include "ym_mvn/MvModule.h"
-#include "ym_mvn/MvPort.h"
-#include "ym_mvn/MvNode.h"
+#include "ym_mvn/MvnMgr.h"
+#include "ym_mvn/MvnModule.h"
+#include "ym_mvn/MvnNode.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
@@ -49,7 +48,7 @@ ReaderImpl::ReaderImpl() :
   mVlMgr(mMsgMgr),
   mGlobalEnv(mDeclHash)
 {
-  mMvMgr = NULL;
+  mMvnMgr = NULL;
 }
 
 // @brief デストラクタ
@@ -83,8 +82,8 @@ ReaderImpl::read(const string& filename,
 // @retval true 正常に処理を行った．
 // @retval false 生成中にエラーが起こった．
 bool
-ReaderImpl::gen_network(MvMgr& mgr,
-			MvVlMap& node_map)
+ReaderImpl::gen_network(MvnMgr& mgr,
+			MvnVlMap& node_map)
 {
   if ( mMsgMgr.error_num() > 0 ) {
     return false;
@@ -96,7 +95,7 @@ ReaderImpl::gen_network(MvMgr& mgr,
     return false;
   }
 
-  mMvMgr = &mgr;
+  mMvnMgr = &mgr;
 
   mIODeclMap.clear();
   mDeclHash.clear();
@@ -104,7 +103,7 @@ ReaderImpl::gen_network(MvMgr& mgr,
   mNodeMap.clear();
   mDriverList.clear();
 
-  MvModule* module0 = NULL;
+  MvnModule* module0 = NULL;
   list<const VlModule*> tmp_list(mVlMgr.topmodule_list());
   for (list<const VlModule*>::const_iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
@@ -113,7 +112,7 @@ ReaderImpl::gen_network(MvMgr& mgr,
     if ( vl_module->is_cell_instance() ) continue;
 
     // module を実体化
-    MvModule* module = gen_module(vl_module);
+    MvnModule* module = gen_module(vl_module);
     if ( module == NULL ) {
       return false;
     }
@@ -126,9 +125,9 @@ ReaderImpl::gen_network(MvMgr& mgr,
   }
 
   // 結線を行う．
-  ymuint n = mMvMgr->max_node_id();
+  ymuint n = mMvnMgr->max_node_id();
   for (ymuint i = 0; i < n; ++ i) {
-    MvNode* node = mMvMgr->_node(i);
+    MvnNode* node = mMvnMgr->_node(i);
     if ( node == NULL ) continue;
     const vector<Driver>& dlist = driver_list(node);
     if ( dlist.empty() ) continue;
@@ -169,7 +168,7 @@ ReaderImpl::gen_network(MvMgr& mgr,
       if ( tmp[i].rhs_node() == NULL ) {
 #warning "TODO: warning メッセージを出すようにする．"
 	vector<ymuint32> val(1, 0);
-	MvNode* ud_node = mMvMgr->new_const(module0, 1, val);
+	MvnNode* ud_node = mMvnMgr->new_const(module0, 1, val);
 	if ( bw == 1 ) {
 	  tmp[i] = Driver(ud_node);
 	}
@@ -195,8 +194,8 @@ ReaderImpl::gen_network(MvMgr& mgr,
     ymuint nd = tmp2.size();
     if ( nd == 1 ) {
       const Driver& driver = tmp2[0];
-      MvNode* src_node = driver.rhs_node();
-      mMvMgr->connect(src_node, 0, node, 0);
+      MvnNode* src_node = driver.rhs_node();
+      mMvnMgr->connect(src_node, 0, node, 0);
     }
     else {
       vector<ymuint> bw_array(nd);
@@ -213,44 +212,31 @@ ReaderImpl::gen_network(MvMgr& mgr,
 	  assert_not_reached(__FILE__, __LINE__);
 	}
       }
-      MvNode* node1 = mMvMgr->new_concat(module0, bw_array);
-      mMvMgr->connect(node1, 0, node, 0);
+      MvnNode* node1 = mMvnMgr->new_concat(module0, bw_array);
+      mMvnMgr->connect(node1, 0, node, 0);
       for (ymuint i = 0; i < nd; ++ i) {
 	const Driver& driver = tmp2[i];
-	mMvMgr->connect(driver.rhs_node(), 0, node1, i);
+	mMvnMgr->connect(driver.rhs_node(), 0, node1, i);
       }
     }
   }
 
   // 冗長な through ノードを取り除く
   {
-    vector<MvNode*> node_list;
-    node_list.reserve(n);
     for (ymuint i = 0; i < n; ++ i) {
-      MvNode* node = mMvMgr->_node(i);
-      if ( node == NULL ) continue;
-      if ( node->type() != MvNode::kThrough ) continue;
-      node_list.push_back(node);
-    }
-    for (vector<MvNode*>::iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      MvNode* node = *p;
-
-      const MvInputPin* ipin = node->input(0);
-      const MvOutputPin* src_pin = ipin->src_pin();
-      if ( src_pin == NULL ) continue;
-
-      MvNode* src_node = src_pin->node();
-      ymuint src_pos = src_pin->pos();
-      mMvMgr->disconnect(src_node, src_pos, node, 0);
-      mMvMgr->reconnect(node, 0, src_node, src_pos);
-      mNodeMap.copy(src_node->id(), node->id());
-      mMvMgr->delete_node(node);
+      MvnNode* node = mMvnMgr->_node(i);
+      if ( node != NULL && node->type() == MvnNode::kThrough ) {
+	const MvnOutputPin* src_pin = node->input(0)->src_pin();
+	if ( src_pin != NULL ) {
+	  MvnNode* src_node = src_pin->node();
+	  mNodeMap.copy(src_node->id(), node->id());
+	}
+      }
     }
   }
 
   // 冗長な through ノードを削除する．
-  mMvMgr->sweep();
+  mMvnMgr->sweep();
 
   node_map = mNodeMap;
 
@@ -266,7 +252,7 @@ ReaderImpl::add_msg_handler(MsgHandler* msg_handler)
 
 // @brief module を生成する．
 // @param[in] vl_module 対象のモジュール
-MvModule*
+MvnModule*
 ReaderImpl::gen_module(const VlModule* vl_module)
 {
   // ポート数，入出力のビット幅を調べる．
@@ -306,8 +292,39 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     }
   }
 
-  MvModule* module = mMvMgr->new_module(vl_module->name(), np,
+  MvnModule* module = mMvnMgr->new_module(vl_module->name(), np,
 					ibw_array, obw_array, iobw_array);
+
+  // 入出力ノードの対応表を作る．
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  ymuint i3 = 0;
+  for (ymuint i = 0; i < nio_all; ++ i) {
+    const VlIODecl* io = vl_module->io(i);
+    const VlDecl* decl = io->decl();
+    MvnNode* node = NULL;
+    switch ( io->direction() ) {
+    case kVpiInput:
+      node = module->input(i1);
+      ++ i1;
+      break;
+
+    case kVpiOutput:
+      node = module->output(i2);
+      ++ i2;
+      break;
+
+    case kVpiInout:
+      node = module->inout(i3);
+      ++ i3;
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+    reg_ionode(decl, node);
+  }
 
   // 宣言要素を生成する．
   bool stat = gen_decl(module, vl_module);
@@ -321,39 +338,6 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     return NULL;
   }
 
-  // 入出力ノードの対応表を作る．
-  ymuint i1 = 0;
-  ymuint i2 = 0;
-  ymuint i3 = 0;
-  for (ymuint i = 0; i < nio_all; ++ i) {
-    const VlIODecl* io = vl_module->io(i);
-    const VlDecl* decl = io->decl();
-    MvNode* node = mGlobalEnv.get(decl);
-    assert_cond( node != NULL, __FILE__, __LINE__);
-    switch ( io->direction() ) {
-    case kVpiInput:
-      mMvMgr->connect(module->input(i1), 0, node, 0);
-      reg_ionode(decl, module->input(i1));
-      ++ i1;
-      break;
-
-    case kVpiOutput:
-      mMvMgr->connect(node, 0, module->output(i2), 0);
-      reg_ionode(decl, module->output(i2));
-      ++ i2;
-      break;
-
-    case kVpiInout:
-      mMvMgr->connect(module->inout(i3), 0, node, 0);
-      reg_ionode(decl, module->inout(i3));
-      ++ i3;
-      break;
-
-    default:
-      break;
-    }
-  }
-
   // ポートの接続を行う．
   for (ymuint i = 0; i < np; ++ i) {
     const VlPort* port = vl_module->port(i);
@@ -361,22 +345,22 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     if ( expr->is_operation() ) {
       assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
       ymuint n = expr->operand_num();
-      mMvMgr->init_port(module, i, port->name(), n);
+      mMvnMgr->init_port(module, i, port->name(), n);
       for (ymuint j = 0; j < n; ++ j) {
-	MvNode* node;
+	MvnNode* node;
 	ymuint msb;
 	ymuint lsb;
 	switch ( gen_portref(expr->operand(j), node, msb, lsb) ) {
 	case 0:
-	  mMvMgr->set_port_ref(module, i, j, node);
+	  mMvnMgr->set_port_ref(module, i, j, node);
 	  break;
 
 	case 1:
-	  mMvMgr->set_port_ref(module, i, j, node, msb);
+	  mMvnMgr->set_port_ref(module, i, j, node, msb);
 	  break;
 
 	case 2:
-	  mMvMgr->set_port_ref(module, i, j, node, msb, lsb);
+	  mMvnMgr->set_port_ref(module, i, j, node, msb, lsb);
 	  break;
 
 	default:
@@ -386,21 +370,21 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       }
     }
     else {
-      mMvMgr->init_port(module, i, port->name(), 1);
-      MvNode* node;
+      mMvnMgr->init_port(module, i, port->name(), 1);
+      MvnNode* node;
       ymuint msb;
       ymuint lsb;
       switch ( gen_portref(expr, node, msb, lsb) ) {
       case 0:
-	mMvMgr->set_port_ref(module, i, 0, node);
+	mMvnMgr->set_port_ref(module, i, 0, node);
 	break;
 
       case 1:
-	mMvMgr->set_port_ref(module, i, 0, node, msb);
+	mMvnMgr->set_port_ref(module, i, 0, node, msb);
 	break;
 
       case 2:
-	mMvMgr->set_port_ref(module, i, 0, node, msb, lsb);
+	mMvnMgr->set_port_ref(module, i, 0, node, msb, lsb);
 	break;
 
       default:
@@ -419,7 +403,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
 // @retval true 成功した．
 // @retval false エラーが起こった．
 bool
-ReaderImpl::gen_decl(MvModule* module,
+ReaderImpl::gen_decl(MvnModule* module,
 		     const VlNamedObj* vl_scope)
 {
   // ネットの生成
@@ -429,10 +413,13 @@ ReaderImpl::gen_decl(MvModule* module,
       for (vector<const VlDecl*>::iterator p = net_list.begin();
 	   p != net_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
-	// 仮の through ノードに対応させる．
-	ymuint bw = vl_decl->bit_size();
-	MvNode* node = mMvMgr->new_through(module, bw);
-	reg_node(vl_decl, node);
+	// IO に接続している要素は生成済みなので除外する．
+	if ( mGlobalEnv.get(vl_decl) == NULL ) {
+	  // 仮の through ノードに対応させる．
+	  ymuint bw = vl_decl->bit_size();
+	  MvnNode* node = mMvnMgr->new_through(module, bw);
+	  reg_node(vl_decl, node);
+	}
       }
     }
   }
@@ -448,7 +435,7 @@ ReaderImpl::gen_decl(MvModule* module,
 	for (ymuint i = 0; i < array_size; ++ i) {
 	  // 仮の through ノードに対応させる．
 	  ymuint bw = vl_decl->bit_size();
-	  MvNode* node = mMvMgr->new_through(module, bw);
+	  MvnNode* node = mMvnMgr->new_through(module, bw);
 	  reg_node(vl_decl, i, node);
 	}
       }
@@ -462,11 +449,14 @@ ReaderImpl::gen_decl(MvModule* module,
       for (vector<const VlDecl*>::iterator p = reg_list.begin();
 	   p != reg_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
-	// 仮の through ノードに対応させる．
-	ymuint bw = vl_decl->bit_size();
-	MvNode* node = mMvMgr->new_through(module, bw);
-	reg_node(vl_decl, node);
-	(void) mDeclHash.get_id(vl_decl);
+	// IO に接続している要素は生成済みなので除外する．
+	if ( mGlobalEnv.get(vl_decl) == NULL ) {
+	  // 仮の through ノードに対応させる．
+	  ymuint bw = vl_decl->bit_size();
+	  MvnNode* node = mMvnMgr->new_through(module, bw);
+	  reg_node(vl_decl, node);
+	  (void) mDeclHash.get_id(vl_decl);
+	}
       }
     }
   }
@@ -483,7 +473,7 @@ ReaderImpl::gen_decl(MvModule* module,
 	for (ymuint i = 0; i < array_size; ++ i) {
 	  // 仮の through ノードに対応させる．
 	  ymuint bw = vl_decl->bit_size();
-	  MvNode* node = mMvMgr->new_through(module, bw);
+	  MvnNode* node = mMvnMgr->new_through(module, bw);
 	  reg_node(vl_decl, i, node);
 	}
       }
@@ -508,116 +498,6 @@ ReaderImpl::gen_decl(MvModule* module,
   return true;
 }
 
-// @brief 要素を生成する．
-// @param[in] module モジュール
-// @param[in] vl_scope 対象のスコープ
-// @retval true 成功した．
-// @retval false エラーが起こった．
-bool
-ReaderImpl::gen_item(MvModule* module,
-		     const VlNamedObj* vl_scope)
-{
-  // モジュールインスタンスの生成
-  {
-    vector<const VlModule*> module_list;
-    if ( mVlMgr.find_module_list(vl_scope, module_list) ) {
-      for (vector<const VlModule*>::iterator p = module_list.begin();
-	   p != module_list.end(); ++ p) {
-	const VlModule* vl_module = *p;
-	gen_moduleinst(vl_module, module);
-      }
-    }
-  }
-
-  // モジュール配列インスタンスの生成
-  {
-    vector<const VlModuleArray*> modulearray_list;
-    if ( mVlMgr.find_modulearray_list(vl_scope, modulearray_list) ) {
-      for (vector<const VlModuleArray*>::iterator p = modulearray_list.begin();
-	   p != modulearray_list.end(); ++ p) {
-	const VlModuleArray* vl_module_array = *p;
-	ymuint n = vl_module_array->elem_num();
-	for (ymuint i = 0; i < n; ++ i) {
-	  const VlModule* vl_module = vl_module_array->elem_by_offset(i);
-	  gen_moduleinst(vl_module, module);
-	}
-      }
-    }
-  }
-
-  // プリミティブインスタンスの生成
-  {
-    vector<const VlPrimitive*> primitive_list;
-    if ( mVlMgr.find_primitive_list(vl_scope, primitive_list) ) {
-      for (vector<const VlPrimitive*>::iterator p = primitive_list.begin();
-	   p != primitive_list.end(); ++ p) {
-	const VlPrimitive* prim = *p;
-	gen_priminst(module, prim);
-      }
-    }
-  }
-
-  // プリミティブ配列インスタンスの生成
-  {
-    vector<const VlPrimArray*> primarray_list;
-    if ( mVlMgr.find_primarray_list(vl_scope, primarray_list) ) {
-      for (vector<const VlPrimArray*>::iterator p = primarray_list.begin();
-	   p != primarray_list.end(); ++ p) {
-	const VlPrimArray* vl_primarray = *p;
-	ymuint n = vl_primarray->elem_num();
-	for (ymuint i = 0; i < n; ++ i) {
-	  const VlPrimitive* prim = vl_primarray->elem_by_offset(i);
-	  gen_priminst(module, prim);
-	}
-      }
-    }
-  }
-
-  // 継続的代入文の生成
-  {
-    vector<const VlContAssign*> contassign_list;
-    if ( mVlMgr.find_contassign_list(vl_scope, contassign_list) ) {
-      for (vector<const VlContAssign*>::iterator p = contassign_list.begin();
-	   p != contassign_list.end(); ++ p) {
-	const VlContAssign* cont_assign = *p;
-	gen_cont_assign(module, cont_assign->lhs(), cont_assign->rhs());
-      }
-    }
-  }
-
-  // プロセスの生成
-  {
-    vector<const VlProcess*> process_list;
-    if ( mVlMgr.find_process_list(vl_scope, process_list) ) {
-      for (vector<const VlProcess*>::const_iterator p = process_list.begin();
-	   p != process_list.end(); ++ p) {
-	const VlProcess* process = *p;
-	bool stat1 = gen_process(module, process);
-	if ( !stat1 ) {
-	  return NULL;
-	}
-      }
-    }
-  }
-
-  // 内部スコープ要素の生成
-  {
-    vector<const VlNamedObj*> scope_list;
-    if ( mVlMgr.find_internalscope_list(vl_scope, scope_list) ) {
-      for (vector<const VlNamedObj*>::iterator p = scope_list.begin();
-	   p != scope_list.end(); ++ p) {
-	const VlNamedObj* vl_scope1 = *p;
-	bool stat = gen_item(module, vl_scope1);
-	if ( !stat ) {
-	  return false;
-	}
-      }
-    }
-  }
-
-  return true;
-}
-
 // @brief portref の実体化を行う．
 // @param[in] expr 対象の式
 // @param[out] node 対応するノードを格納する変数
@@ -628,7 +508,7 @@ ReaderImpl::gen_item(MvModule* module,
 // @retval 2 範囲指定形式だった．
 int
 ReaderImpl::gen_portref(const VlExpr* expr,
-			MvNode*& node,
+			MvnNode*& node,
 			ymuint& msb,
 			ymuint& lsb)
 {
@@ -658,744 +538,14 @@ ReaderImpl::gen_portref(const VlExpr* expr,
   return 0;
 }
 
-// @brief モジュールインスタンスの生成を行う．
-// @param[in] vl_module モジュール
-// @param[in] parent_module 親のモジュール
-// @return 対応するノードを返す．
-void
-ReaderImpl::gen_moduleinst(const VlModule* vl_module,
-			   MvModule* parent_module)
-{
-  // 宣言要素を生成する．
-  bool stat = gen_decl(parent_module, vl_module);
-  if ( !stat ) {
-    return;
-  }
-
-  // 要素を生成する．
-  stat = gen_item(parent_module, vl_module);
-  if ( !stat ) {
-    return;
-  }
-
-  // ポートの接続を行う．
-  ymuint np = vl_module->port_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    const VlPort* vl_port = vl_module->port(i);
-    const VlExpr* hi = vl_port->high_conn();
-    if ( hi == NULL ) continue;
-    const VlExpr* lo = vl_port->low_conn();
-    switch ( vl_port->direction() ) {
-    case kVpiInput:
-      // hi は右辺式
-      // lo は左辺式
-      gen_cont_assign(parent_module, lo, hi);
-      break;
-
-    case kVpiOutput:
-      // hi は左辺式
-      // lo は右辺式
-      gen_cont_assign(parent_module, hi, lo);
-      break;
-
-    case kVpiInout:
-      // hi は単純な参照か連結のみ
-      break;
-
-    case kVpiMixedIO:
-      // hi は単純な参照か連結のみ
-      //connect_port2(port, hi);
-      // TODO: connect_port2 を作る
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-    }
-  }
-}
-
-// @brief プロセス文を生成する．
-// @param[in] vl_process プロセス文
-bool
-ReaderImpl::gen_process(MvModule* parent_module,
-			const VlProcess* process)
-{
-  if ( process->type() != kVpiAlways ) {
-    // always 文以外(initial文)はダメ
-    cerr << "initial should not be used." << endl;
-    return false;
-  }
-
-#if 0
-  const VlStmt* stmt = process->stmt();
-  if ( stmt->type() != kVpiEventControl ) {
-    // always の直後は '@' でなければダメ
-    cerr << "only '@' is allowed here." << endl;
-    return false;
-  }
-
-  bool has_edge_event = false;
-  bool has_normal_event = false;
-  const VlControl* control = stmt->control();
-  for (ymuint i = 0; i < control->event_num(); ++ i) {
-    const VlExpr* expr = control->event(i);
-    if ( expr->type() == kVpiOperation ) {
-      if ( expr->op_type() == kVpiPosedgeOp ||
-	   expr->op_type() == kVpiNegedgeOp ) {
-	has_edge_event = true;
-      }
-      else {
-	cerr << "only edge descriptor should be used." << endl;
-	return false;
-      }
-    }
-    else if ( expr->decl_obj() != NULL ) {
-      has_normal_event = true;
-    }
-    else {
-      cerr << "illegal type" << endl;
-      return false;
-    }
-  }
-
-  if ( has_edge_event && has_normal_event ) {
-    cerr << "edge-type events and normal events are mutual exclusive." << endl;
-    return false;
-  }
-
-  ProcEnv top_env(mGlobalEnv);
-  gen_stmt(parent_module, stmt->body_stmt(), top_env);
-
-  ymuint n = mGlobalEnv.max_id();
-  for (ymuint i = 0; i < n; ++ i) {
-    AssignInfo info1 = top_env.get_from_id(i);
-    MvNode* rhs = info1.mRhs;
-    MvNode* cond = info1.mCond;
-    if ( rhs == NULL ) {
-      continue;
-    }
-    MvNode* node0 = mGlobalEnv.get_from_id(i);
-    if ( cond == NULL ) {
-      // 単純な組み合わせ論理
-      mMvMgr->connect(rhs, 0, node0, 0);
-    }
-    else {
-      // latch を挿入
-      ymuint bw = node0->output(0)->bit_width();
-      MvNode* latch = mMvMgr->new_latch(parent_module, bw);
-      mMvMgr->connect(rhs, 0, latch, 0);
-      mMvMgr->connect(cond, 0, latch, 1);
-      mMvMgr->connect(latch, 0, node0, 0);
-    }
-  }
-#endif
-  return true;
-}
-
-// @brief ステートメントの中身を生成する．
-// @param[in] module 親のモジュール
-// @param[in] stmt 本体のステートメント
-// @param[in] env 環境
-bool
-ReaderImpl::gen_stmt(MvModule* module,
-		     const VlStmt* stmt,
-		     ProcEnv& env)
-{
-#if 0
-  switch ( stmt->type() ) {
-  case kVpiAssignment:
-    {
-      const VlExpr* rhs = stmt->rhs();
-      const VlExpr* lhs = stmt->lhs();
-      MvNode* node = gen_expr(module, rhs, env);
-      ymuint n = lhs->lhs_elem_num();
-      ymuint offset = 0;
-      for (ymuint i = 0; i < n; ++ i) {
-	const VlExpr* lhs1 = lhs->lhs_elem(i);
-	const VlDecl* lhs_decl = lhs1->decl_obj();
-	const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
-	const VlDeclBase* lhs_declbase = lhs1->decl_base();
-	ymuint bw = lhs_declbase->bit_size();
-	AssignInfo old_dst;
-	ymuint lhs_offset = 0;
-	if ( lhs_decl ) {
-	  old_dst = env.get(lhs_decl);
-	}
-	else if ( lhs_declarray ) {
-	  if ( lhs1->is_constant_select() ) {
-	    lhs_offset = lhs1->declarray_offset();
-	    old_dst = env.get(lhs_declarray, lhs_offset);
-	  }
-	  else {
-	    assert_cond( lhs1->declarray_dimension()
-			 == lhs_declarray->dimension(),
-			 __FILE__, __LINE__ );
-	    // lhs_offset は lhs->declarray_index() から計算される．
-#warning "TODO: 配列の可変インデックス時の処理"
-	  }
-	}
-	else {
-	  assert_not_reached(__FILE__, __LINE__);
-	}
-
-	MvNode* src_node = gen_rhs(module, node, offset, bw);
-	MvNode* dst_node = NULL;
-	if ( lhs1->is_primary() ) {
-	  dst_node = mMvMgr->new_through(module, bw);
-	  mMvMgr->connect(src_node, 0, dst_node, 0);
-	}
-	else if ( lhs1->is_bitselect() ) {
-	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-#warning "TODO: reg 型なら可変ビットセレクトもあり"
-	  ymuint index = lhs_declbase->bit_offset(lhs1->index_val());
-	  vector<ymuint> bw_array;
-	  bw_array.reserve(3);
-	  if ( index < bw - 1 ) {
-	    bw_array.push_back(bw - index - 1);
-	  }
-	  bw_array.push_back(1);
-	  if ( index > 0 ) {
-	    bw_array.push_back(index);
-	  }
-	  dst_node = mMvMgr->new_concat(module, bw_array);
-	  ymuint pos = 0;
-	  if ( index < bw - 1 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   bw - 1,
-							   index + 1,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	    ++ pos;
-	  }
-	  mMvMgr->connect(src_node, 0, dst_node, pos);
-	  ++ pos;
-	  if ( index > 0 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   index - 1,
-							   0,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	  }
-	}
-	else if ( lhs1->is_partselect() ) {
-	  assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-#warning "TODO: reg 型なら可変範囲セレクトもあり"
-	  ymuint msb = lhs_declbase->bit_offset(lhs1->left_range_val());
-	  ymuint lsb = lhs_declbase->bit_offset(lhs1->right_range_val());
-	  vector<ymuint> bw_array;
-	  bw_array.reserve(3);
-	  if ( msb < bw - 1 ) {
-	    bw_array.push_back(bw - msb - 1);
-	  }
-	  bw_array.push_back(msb - lsb + 1);
-	  if ( lsb > 0 ) {
-	    bw_array.push_back(lsb);
-	  }
-	  dst_node = mMvMgr->new_concat(module, bw_array);
-	  ymuint pos = 0;
-	  if ( msb < bw - 1 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   bw - 1,
-							   msb + 1,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	    ++ pos;
-	  }
-	  mMvMgr->connect(src_node, 0, dst_node, pos);
-	  ++ pos;
-	  if ( lsb > 0 ) {
-	    MvNode* tmp_node = mMvMgr->new_constpartselect(module,
-							   lsb - 1,
-							   0,
-							   bw);
-	    mMvMgr->connect(old_dst, 0, tmp_node, 0);
-	    mMvMgr->connect(tmp_node, 0, dst_node, pos);
-	  }
-	}
-	assert_cond( dst_node, __FILE__, __LINE__);
-	if ( lhs_decl ) {
-	  env.add(lhs_decl, dst_node);
-	}
-	else {
-	  env.add(lhs_declarray, lhs_offset, dst_node);
-	}
-	offset += lhs1->bit_size();
-      }
-    }
-    break;
-
-  case kVpiBegin:
-  case kVpiNamedBegin:
-    {
-      ymuint n = stmt->child_stmt_num();
-      for (ymuint i = 0; i < n; ++ i) {
-	const VlStmt* stmt1 = stmt->child_stmt(i);
-	gen_stmt(module, stmt1, env);
-      }
-    }
-    break;
-
-  case kVpiIf:
-    {
-      const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
-      ProcEnv then_env(env);
-      gen_stmt(module, stmt->body_stmt(), then_env);
-      merge_env(module, env, cond_node, then_env, env);
-    }
-    break;
-
-  case kVpiIfElse:
-    {
-      const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
-      ProcEnv then_env(env);
-      gen_stmt(module, stmt->body_stmt(), then_env);
-      ProcEnv else_env(env);
-      gen_stmt(module, stmt->else_stmt(), else_env);
-      merge_env(module, env, cond_node, then_env, else_env);
-    }
-    break;
-
-  case kVpiCase:
-#if 0
-    {
-      const VlExpr* cond = stmt->expr();
-      MvNode* cond_node = gen_expr(module, cond, env);
-
-    }
-#else
-#warning "TODO: case 文"
-#endif
-    break;
-
-  default:
-#warning "エラーメッセージをまともにする．"
-    cerr << "can not synthesized" << endl;
-    return false;
-  }
-#endif
-  return true;
-}
-
-// @brief 環境をマージする．
-// @param[in] parent_module 親のモジュール
-// @param[in] env 対象の環境
-// @param[in] cond 条件を表すノード
-// @param[in] then_env 条件が成り立ったときに通るパスの環境
-// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
-void
-ReaderImpl::merge_env(MvModule* parent_module,
-		      ProcEnv& env,
-		      MvNode* cond,
-		      const ProcEnv& then_env,
-		      const ProcEnv& else_env)
-{
-  ymuint n = env.max_id();
-  for (ymuint i = 0; i < n; ++ i) {
-    AssignInfo info0 = env.get_from_id(i);
-    MvNode* node0 = info0.mRhs;
-    MvNode* cond0 = info0.mCond;
-    AssignInfo info1 = then_env.get_from_id(i);
-    MvNode* node1 = info1.mRhs;
-    MvNode* cond1 = info1.mCond;
-    AssignInfo info2 = else_env.get_from_id(i);
-    MvNode* node2 = info2.mRhs;
-    MvNode* cond2 = info2.mCond;
-
-    MvNode* new_node = NULL;
-    MvNode* new_cond = NULL;
-    if ( node1 == node2 ) {
-      // 両方の結果が等しければ ITE を挿入しない．
-      new_node = node1;
-    }
-    else if ( node1 == NULL ) {
-      // node1 が NULL
-      assert_cond( node2 != NULL, __FILE__, __LINE__);
-      new_node = node2;
-    }
-    else if ( node2 == NULL ) {
-      // node2 が NULL
-      assert_cond( node1 != NULL, __FILE__, __LINE__);
-      new_node = node1;
-    }
-    else {
-      ymuint bw = node1->output(0)->bit_width();
-      new_node = mMvMgr->new_ite(parent_module, bw);
-      mMvMgr->connect(cond, 0, new_node, 0);
-      mMvMgr->connect(node1, 0, new_node, 1);
-      mMvMgr->connect(node2, 0, new_node, 2);
-    }
-    if ( cond1 == cond2 ) {
-      // 両方の条件が等しければ ITE を挿入しない
-      new_cond = cond1;
-    }
-    else if ( cond1 == NULL ) {
-      assert_cond( cond2 != NULL, __FILE__, __LINE__);
-      if ( node1 == NULL ) {
-	// cond の時には代入はない．
-	// 代入条件は ~cond & cond2
-	MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
-	mMvMgr->connect(cond, 0, cond_bar, 0);
-	new_cond = mMvMgr->new_and(parent_module, 1);
-	mMvMgr->connect(cond_bar, 0, new_cond, 0);
-	mMvMgr->connect(cond2, 0, new_cond, 1);
-      }
-      else {
-	// cond の時には常に代入する．
-	// 代入条件は cond | cond2
-	new_cond = mMvMgr->new_or(parent_module, 1);
-	mMvMgr->connect(cond, 0, new_cond, 0);
-	mMvMgr->connect(cond2, 0, new_cond, 1);
-      }
-    }
-    else if ( cond2 == NULL ) {
-      assert_cond( cond1 != NULL, __FILE__, __LINE__);
-      if ( node2 == NULL ) {
-	// ~cond の時には代入はない．
-	// 代入条件は cond & cond1
-	new_cond = mMvMgr->new_and(parent_module, 1);
-	mMvMgr->connect(cond, 0, new_cond, 0);
-	mMvMgr->connect(cond1, 0, new_cond, 1);
-      }
-      else {
-	// ~cond の時には常に代入
-	// 代入条件は ~cond | cond1
-	MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
-	mMvMgr->connect(cond, 0, cond_bar, 0);
-	new_cond = mMvMgr->new_or(parent_module, 1);
-	mMvMgr->connect(cond_bar, 0, new_cond, 0);
-	mMvMgr->connect(cond1, 0, new_cond, 1);
-      }
-    }
-    else {
-      new_cond = mMvMgr->new_ite(parent_module, 1);
-      mMvMgr->connect(cond, 0, new_cond, 0);
-      mMvMgr->connect(cond1, 0, new_cond, 1);
-      mMvMgr->connect(cond2, 0, new_cond, 2);
-    }
-    if ( new_node == NULL && new_cond == NULL ) {
-      continue;
-    }
-    env.add_by_id(i, new_node, new_cond);
-  }
-}
-
-#if 0
-// @brief always latch のチェック
-// @param[in] parent_module 親のモジュール
-// @param[in] src_node ソースノード
-// @param[out] cond_node 条件を表すノード
-// @retval 0 latch 条件はない．
-// @retval 1 常に latch
-// @retval 2 部分的な latch 条件あり
-ymuint
-ReaderImpl::latch_check(MvModule* parent_module,
-			MvNode* src_node,
-			MvNode*& cond_node)
-{
-  if ( src_node->type() == MvNode::kIte ) {
-    // src_node が ITE ノードだった場合，if 文の結果挿入された可能性がある．
-
-    // then 節に対する latch_check() の結果
-    ymuint cond1 = 0;
-    // then 節に対する latch_check() の cond_node の結果
-    MvNode* cond1_node = NULL;
-    if ( src_node->input(1)->src_pin() == NULL ) {
-      // NULL ということは代入なしなので常に latch
-      cond1 = 1;
-    }
-    else {
-      MvNode* node1 = src_node->input(1)->src_pin()->node();
-      cond1 = latch_check(parent_module, node1, cond1_node);
-    }
-
-    // else 節に対する latch_check() の結果
-    ymuint cond2 = 0;
-    // else 節に対する latch_check() の cond_node の結果
-    MvNode* cond2_node = NULL;
-   if ( src_node->input(2)->src_pin() == NULL ) {
-      // NULL ということは代入なしなので常に latch
-      cond2 = 1;
-    }
-    else {
-      MvNode* node2 = src_node->input(2)->src_pin()->node();
-      cond2 = latch_check(parent_module, node2, cond2_node);
-    }
-
-    MvNode* cond = src_node->input(0)->src_pin()->node();
-    switch ( cond1 ) {
-    case 0:
-      switch ( cond2 ) {
-      case 0:
-	// ともに 0 なら明かに 0
-	return 0;
-
-      case 1:
-	// else の時に latch するので条件は ~cond
-	cond_node = mMvMgr->new_not(parent_module, 1);
-	mMvMgr->connect(cond, 0, cond_node, 0);
-	return 2;
-
-      case 2:
-	// else の時に cond2_node の条件で latch するので ~cond & cond2_node
-	{
-	  MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(cond, 0, cond_bar, 0);
-	  cond_node = mMvMgr->new_and(parent_module, 2, 1);
-	  mMvMgr->connect(cond_bar, 0, cond_node, 0);
-	  mMvMgr->connect(cond2_node, 0, cond_node, 1);
-	  return 2;
-	}
-      }
-      break;
-
-    case 1:
-      switch ( cond2 ) {
-      case 0:
-	// then の時に latch するので cond そのものが結果
-	cond_node = cond;
-	return 2;
-
-      case 1:
-	// ともに 1 なら明かに 1
-	return 1;
-
-      case 2:
-	// then の時と cond2_node の時に latch する．
-	cond_node = mMvMgr->new_or(parent_module, 2, 1);
-	mMvMgr->connect(cond, 0, cond_node, 0);
-	mMvMgr->connect(cond2_node, 0, cond_node, 1);
-	return 2;
-      }
-      break;
-
-    case 2:
-      switch ( cond2 ) {
-      case 0:
-	// then の cond1_node の時に latch する．
-	cond_node = mMvMgr->new_and(parent_module, 2, 1);
-	mMvMgr->connect(cond, 0, cond_node, 0);
-	mMvMgr->connect(cond1_node, 0, cond_node, 1);
-	return 2;
-
-      case 1:
-	// then の cond1_node の時と else の時に latch する．
-	// cond & cond1_node | ~cond = cond1_node | ~cond
-	{
-	  MvNode* cond_bar = mMvMgr->new_not(parent_module, 1);
-	  mMvMgr->connect(cond, 0, cond_bar, 0);
-	  cond_node = mMvMgr->new_or(parent_module, 2, 1);
-	  mMvMgr->connect(cond_bar, 0, cond_node, 0);
-	  mMvMgr->connect(cond1_node, 0, cond_node, 1);
-	  return 2;
-	}
-
-      case 2:
-	// then の cond1_node と時と else の cond2_node の時に latch する．
-	cond_node = mMvMgr->new_ite(parent_module, 1);
-	mMvMgr->connect(cond, 0, cond_node, 0);
-	mMvMgr->connect(cond1_node, 0, cond_node, 1);
-	mMvMgr->connect(cond2_node, 1, cond_node, 2);
-	return 2;
-      }
-    }
-  }
-  return 0;
-}
-#endif
-
-// @brief プリミティブインスタンスの生成を行う．
-// @param[in] parent_module 親のモジュール
-// @param[in] prim プリミティブ
-void
-ReaderImpl::gen_priminst(MvModule* parent_module,
-			 const VlPrimitive* prim)
-{
-  ymuint nt = prim->port_num();
-  ymuint ni = 0;
-  ymuint no = 0;
-  if ( prim->prim_type() == kVpiBufPrim ) {
-    ni = 1;
-    no = nt - 1;
-  }
-  else {
-    ni = nt - 1;
-    no = 1;
-  }
-
-  vector<pair<MvNode*, ymuint> > inputs(ni);
-  vector<MvNode*> outputs(no);
-
-  switch ( prim->prim_type() ) {
-  case kVpiBufPrim:
-    {
-      MvNode* node = mMvMgr->new_through(parent_module, 1);
-      inputs[0] = make_pair(node, 0);
-      for (ymuint i = 0; i < no; ++ i) {
-	outputs[i] = node;
-      }
-    }
-    break;
-
-  case kVpiNotPrim:
-    {
-      MvNode* node = mMvMgr->new_not(parent_module, 1);
-      inputs[0] = make_pair(node, 0);
-      outputs[0] = node;
-    }
-    break;
-
-  case kVpiAndPrim:
-    {
-      MvNode* node = mMvMgr->new_and(parent_module, ni, 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      outputs[0] = node;
-    }
-    break;
-
-  case kVpiNandPrim:
-    {
-      MvNode* node = mMvMgr->new_and(parent_module, ni, 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-      mMvMgr->connect(node, 0, node1, 0);
-      outputs[0] = node1;
-    }
-    break;
-
-  case kVpiOrPrim:
-    {
-      MvNode* node = mMvMgr->new_or(parent_module, ni, 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      outputs[0] = node;
-    }
-    break;
-
-  case kVpiNorPrim:
-    {
-      MvNode* node = mMvMgr->new_or(parent_module, ni, 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-      mMvMgr->connect(node, 0, node1, 0);
-      outputs[0] = node1;
-    }
-    break;
-
-  case kVpiXorPrim:
-    {
-      MvNode* node = mMvMgr->new_xor(parent_module, ni, 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      outputs[0] = node;
-    }
-    break;
-
-  case kVpiXnorPrim:
-    {
-      MvNode* node = mMvMgr->new_xor(parent_module, ni, 1);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      MvNode* node1 = mMvMgr->new_not(parent_module, 1);
-      mMvMgr->connect(node, 0, node1, 0);
-      outputs[0] = node1;
-    }
-    break;
-
-  case kVpiCombPrim:
-    {
-      assert_not_reached(__FILE__, __LINE__);
-      const VlUdpDefn* udp = prim->udp_defn();
-      ymuint ni = udp->port_num() - 1;
-      MvNode* node = mMvMgr->new_combudp(parent_module, ni);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      outputs[0] = node;
-    }
-    break;
-
-  case kVpiSeqPrim:
-    {
-      assert_not_reached(__FILE__, __LINE__);
-      const VlUdpDefn* udp = prim->udp_defn();
-      ymuint ni = udp->port_num() - 1;
-      MvNode* node = mMvMgr->new_sequdp(parent_module, ni);
-      for (ymuint i = 0; i < ni; ++ i) {
-	inputs[i] = make_pair(node, i);
-      }
-      outputs[0] = node;
-    }
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-
-  ymuint pos = 0;
-  for (ymuint i = 0; i < no; ++ i) {
-    const VlPrimTerm* term = prim->prim_term(pos);
-    ++ pos;
-    const VlExpr* expr = term->expr();
-    MvNode* dst_node = gen_primary(expr, mGlobalEnv);
-    connect_lhs(dst_node, expr, outputs[i]);
-  }
-  for (ymuint i = 0; i < ni; ++ i) {
-    const VlPrimTerm* term = prim->prim_term(pos);
-    ++ pos;
-    const VlExpr* expr = term->expr();
-    MvNode* node = gen_expr(parent_module, expr, mGlobalEnv);
-    const pair<MvNode*, ymuint>& p = inputs[i];
-    mMvMgr->connect(node, 0, p.first, p.second);
-  }
-}
-
-// @brief 継続的代入文の生成を行う．
-// @param[in] parent_module 親のモジュール
-// @param[in] lhs 左辺式
-// @param[in] rhs 右辺式
-void
-ReaderImpl::gen_cont_assign(MvModule* parent_module,
-			    const VlExpr* lhs,
-			    const VlExpr* rhs)
-{
-  MvNode* node = gen_expr(parent_module, rhs, mGlobalEnv);
-  ymuint n = lhs->lhs_elem_num();
-  ymuint offset = 0;
-  for (ymuint i = 0; i < n; i ++ ) {
-    const VlExpr* lhs_elem = lhs->lhs_elem(i);
-    MvNode* dst_node = gen_primary(lhs_elem, mGlobalEnv);
-    ymuint dst_bw = lhs_elem->bit_size();
-    MvNode* src_node = gen_rhs(parent_module, node, offset, dst_bw);
-    connect_lhs(dst_node, lhs_elem, src_node);
-    offset += dst_bw;
-  }
-}
-
 // @brief 左辺式に接続する．
 // @param[in] dst_node 左辺に対応するノード
 // @param[in] expr 左辺式
 // @param[in] src_node 右辺に対応するノード
 void
-ReaderImpl::connect_lhs(MvNode* dst_node,
+ReaderImpl::connect_lhs(MvnNode* dst_node,
 			const VlExpr* expr,
-			MvNode* src_node)
+			MvnNode* src_node)
 {
   if ( expr->is_primary() ) {
     reg_driver(dst_node, Driver(src_node));
@@ -1427,9 +577,9 @@ ReaderImpl::connect_lhs(MvNode* dst_node,
 // @note node から [offset: offset + bit_width - 1] の選択するノードを返す．
 // @note 全範囲を選択する場合には node を返す．
 // @note 範囲が合わなかったら NULL を返す．
-MvNode*
-ReaderImpl::gen_rhs(MvModule* parent_module,
-		    MvNode* node,
+MvnNode*
+ReaderImpl::gen_rhs(MvnModule* parent_module,
+		    MvnNode* node,
 		    ymuint offset,
 		    ymuint bit_width)
 {
@@ -1438,23 +588,23 @@ ReaderImpl::gen_rhs(MvModule* parent_module,
     cerr << "bit width mismatch" << endl;
     assert_not_reached(__FILE__, __LINE__);
   }
-  MvNode* src_node = NULL;
+  MvnNode* src_node = NULL;
   if ( offset == 0 && bit_width == src_bw ) {
     // 全範囲の選択
     src_node = node;
   }
   else if ( bit_width == 1 ) {
-    src_node = mMvMgr->new_constbitselect(parent_module,
+    src_node = mMvnMgr->new_constbitselect(parent_module,
 					  offset,
 					  src_bw);
-    mMvMgr->connect(node, 0, src_node, 0);
+    mMvnMgr->connect(node, 0, src_node, 0);
   }
   else {
-    src_node = mMvMgr->new_constpartselect(parent_module,
+    src_node = mMvnMgr->new_constpartselect(parent_module,
 					   offset,
 					   offset + bit_width - 1,
 					   src_bw);
-    mMvMgr->connect(node, 0, src_node, 0);
+    mMvnMgr->connect(node, 0, src_node, 0);
   }
   return src_node;
 }
@@ -1464,7 +614,7 @@ ReaderImpl::gen_rhs(MvModule* parent_module,
 // @param[in] node 登録するノード
 void
 ReaderImpl::reg_node(const VlDecl* decl,
-		     MvNode* node)
+		     MvnNode* node)
 {
   mGlobalEnv.add(decl, node);
   mNodeMap.reg_node(node->id(), decl);
@@ -1475,9 +625,10 @@ ReaderImpl::reg_node(const VlDecl* decl,
 // @param[in] node 登録するノード
 void
 ReaderImpl::reg_ionode(const VlDecl* decl,
-		       MvNode* node)
+		       MvnNode* node)
 {
   mIODeclMap.add(decl, node);
+  mGlobalEnv.add(decl, node);
   mNodeMap.reg_node(node->id(), decl);
 }
 
@@ -1488,7 +639,7 @@ ReaderImpl::reg_ionode(const VlDecl* decl,
 void
 ReaderImpl::reg_node(const VlDeclArray* decl,
 		     ymuint offset,
-		     MvNode* node)
+		     MvnNode* node)
 {
   mGlobalEnv.add(decl, offset, node);
   mNodeMap.reg_node(node->id(), decl, offset);
@@ -1498,7 +649,7 @@ ReaderImpl::reg_node(const VlDeclArray* decl,
 // @param[in] node 左辺に対応するノード
 // @param[in] driver ドライバー
 void
-ReaderImpl::reg_driver(MvNode* node,
+ReaderImpl::reg_driver(MvnNode* node,
 		       const Driver& driver)
 {
   if ( debug_driver ) {
@@ -1519,7 +670,7 @@ ReaderImpl::reg_driver(MvNode* node,
 // @param[in] node 対応するノード
 // @note なければ空のリストを作る．
 vector<Driver>&
-ReaderImpl::driver_list(MvNode* node)
+ReaderImpl::driver_list(MvnNode* node)
 {
   assert_cond( node != NULL, __FILE__, __LINE__);
   ymuint id = node->id();
@@ -1531,7 +682,7 @@ ReaderImpl::driver_list(MvNode* node)
 
 // @brief 複数のドライバがある時にエラーメッセージを出力する．
 void
-ReaderImpl::error_drivers(MvNode* node,
+ReaderImpl::error_drivers(MvnNode* node,
 			  const Driver& driver1,
 			  const Driver& driver2)
 {

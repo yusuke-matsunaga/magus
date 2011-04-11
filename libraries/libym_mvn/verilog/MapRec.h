@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_MVN
 //////////////////////////////////////////////////////////////////////
 class MapRec
 {
-  friend class MvVlMap;
+  friend class MvnVlMap;
 
 protected:
 
@@ -72,7 +72,7 @@ public:
 class SingleMapRec :
   public MapRec
 {
-  friend class MvVlMap;
+  friend class MvnVlMap;
 
 private:
 
@@ -132,7 +132,7 @@ private:
 class ArrayMapRec :
   public MapRec
 {
-  friend class MvVlMap;
+  friend class MvnVlMap;
 
 private:
 

@@ -8,11 +8,12 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	mvn_nsdef.h \
-	MvMgr.h \
-	MvModule.h \
-	MvNode.h \
-	MvNodeMap.h \
-	MvPin.h \
-	MvPort.h \
-	MvVerilogReader.h \
-	Mvn2Sbj.h
+	MvnDumper.h \
+	MvnInputPin.h \
+	MvnMgr.h \
+	MvnModule.h \
+	MvnNode.h \
+	MvnOutputPin.h \
+	MvnPort.h \
+	MvnVerilogReader.h \
+	MvnVerilogWriter.h

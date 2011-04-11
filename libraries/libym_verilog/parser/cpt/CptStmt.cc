@@ -564,13 +564,6 @@ CptAssignBase::~CptAssignBase()
 {
 }
 
-// blocking assignment の時 true を返す．
-bool
-CptAssignBase::is_blocking() const
-{
-  return true;
-}
-
 // lhs を得る．
 const PtExpr*
 CptAssignBase::lhs() const
@@ -658,11 +651,11 @@ CptNbAssign::~CptNbAssign()
 {
 }
 
-// blocking assignment の時 true を返す．
-bool
-CptNbAssign::is_blocking() const
+// クラスの型を返す仮想関数
+tPtStmtType
+CptNbAssign::type() const
 {
-  return false;
+  return kPtNbAssignStmt;
 }
 
 
@@ -684,11 +677,11 @@ CptNbAssignC::~CptNbAssignC()
 {
 }
 
-// blocking assignment の時 true を返す．
-bool
-CptNbAssignC::is_blocking() const
+// クラスの型を返す仮想関数
+tPtStmtType
+CptNbAssignC::type() const
 {
-  return false;
+  return kPtNbAssignStmt;
 }
 
 

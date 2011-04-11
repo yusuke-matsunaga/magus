@@ -19,10 +19,15 @@ libym_bdn_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_bdn_la_LDFLAGS = 
+libym_bdn_la_LDFLAGS =
 
 libym_bdn_la_SOURCES = \
 	BdNetwork.cc \
+	BdnDumper.cc \
+	BdnNode1.h \
+	BdnNode2.h \
+	BdnNode.cc \
 	BdnBlifWriter.cc \
+	BdnVerilogWriter.cc \
 	BlifBdnConv.cc
 

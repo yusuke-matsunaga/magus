@@ -5,7 +5,7 @@
 ///
 /// $Id: bliftest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +13,9 @@
 #include "ym_blif/BlifNetworkReader.h"
 #include "ym_bdn/BdNetwork.h"
 #include "ym_bdn/BlifBdnConv.h"
+#include "ym_bdn/BdnDumper.h"
 #include "ym_bdn/BdnBlifWriter.h"
+#include "ym_bdn/BdnVerilogWriter.h"
 
 
 int
@@ -22,14 +24,14 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " blif-file" << endl;
     return 2;
   }
   string filename = argv[1];
 
-#if 0
+#if !defined(YM_DEBUG)
   try {
 #endif
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
@@ -43,7 +45,7 @@ main(int argc,
       cerr << "Error in reading " << filename << endl;
       return 4;
     }
-    
+
     BdNetwork network;
     BlifBdnConv conv;
     bool stat = conv(blif_network, network);
@@ -51,18 +53,31 @@ main(int argc,
       cerr << "Error in converting from BlifNetwork to BdNetwork" << endl;
       return 5;
     }
-    
-    //dump(cout, bdn);
+
+    BdnDumper dump;
     BdnBlifWriter blif_writer;
+    BdnVerilogWriter verilog_writer;
 
+    dump(cout, network);
     blif_writer(cout, network);
+    verilog_writer(cout, network);
 
-#if 0
+    cout << endl;
+    cout << "after copy" << endl;
+    cout << endl;
+
+    BdNetwork network2 = network;
+
+    dump(cout, network2);
+    blif_writer(cout, network2);
+    verilog_writer(cout, network2);
+
+#if !defined(YM_DEBUG)
   }
   catch ( AssertError x) {
     cout << x << endl;
   }
 #endif
-  
+
   return 0;
 }

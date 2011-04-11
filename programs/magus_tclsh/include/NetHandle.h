@@ -90,12 +90,12 @@ public:
 
   /// @brief MvNetwork を得る．
   virtual
-  const MvMgr*
+  const MvnMgr*
   mvn() const;
 
   /// @brief MvNetwork を得る．
   virtual
-  MvMgr*
+  MvnMgr*
   _mvn();
 
   /// @brief ネットワークをクリアする．
