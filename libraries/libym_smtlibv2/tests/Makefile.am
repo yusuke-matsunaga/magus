@@ -27,7 +27,9 @@ bin_PROGRAMS =
 
 
 noinst_PROGRAMS = \
-	lextest
+	lextest \
+	parsertest
+
 
 ############################################################
 ## lextest
@@ -39,4 +41,19 @@ lextest_LDADD = \
 	../parser/libym_smt_parser.la
 
 lextest_CXXFLAGS = \
-	-I$(top_srcdir)/parser
+	-I$(top_srcdir)/parser \
+	-I$(top_builddir)/parser
+
+
+############################################################
+## parsertest
+############################################################
+parsertest_SOURCES = \
+	parsertest.cc
+
+parsertest_LDADD = \
+	../parser/libym_smt_parser.la
+
+parsertest_CXXFLAGS = \
+	-I$(top_srcdir)/parser \
+	-I$(top_builddir)/parser

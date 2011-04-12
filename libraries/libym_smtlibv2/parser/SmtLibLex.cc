@@ -14,7 +14,7 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-//#include "dotlib_grammer.h"
+#include "smtlib_grammer.h"
 
 
 // コンストラクタ
@@ -57,6 +57,7 @@ SmtLibLex::close_file()
 void
 SmtLibLex::init()
 {
+  mCurFileDesc = NULL;
   mUngetChar = 0;
   mCR = false;
   mCurLine = 1;
@@ -241,7 +242,7 @@ SmtLibLex::read_token()
     goto ST_SYM1;
   }
   unget();
-  return S_SYM;
+  return SYMBOL;
 
  ST_DQ: // 一文字目が " だった時
   c = get();
@@ -275,7 +276,7 @@ SmtLibLex::read_token()
  ST_Q_SYM1: // 一文字目が | だった時
   c = get();
   if ( c == '|' ) {
-    return Q_SYM;
+    return SYMBOL;
   }
   if ( c == '\\' ) {
     // | ... | の間にバックスラッシュがあった．

@@ -20,18 +20,6 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-/// @brief トークンの値
-const int NUM     = 300;
-const int DEC     = 301;
-const int BIN     = 302;
-const int HEX     = 303;
-const int STRING  = 304;
-const int S_SYM   = 305;
-const int Q_SYM   = 306;
-const int KEYWORD = 307;
-
-const int ERROR   = 500;
-
 //////////////////////////////////////////////////////////////////////
 /// SmtLib 用の LEX クラス
 //////////////////////////////////////////////////////////////////////

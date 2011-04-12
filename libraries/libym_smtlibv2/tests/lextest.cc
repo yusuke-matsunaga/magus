@@ -12,6 +12,9 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
+#include "smtlib_grammer.h"
+
+
 void
 lextest(const string& filename)
 {
@@ -52,12 +55,8 @@ lextest(const string& filename)
       cout << "STRING:  " << lex.cur_string() << endl;
       break;
 
-    case S_SYM:
-      cout << "S_SYM:   " << lex.cur_string() << endl;
-      break;
-
-    case Q_SYM:
-      cout << "Q_SYM:   " << lex.cur_string() << endl;
+    case SYMBOL:
+      cout << "SYMBOL:  " << lex.cur_string() << endl;
       break;
 
     case KEYWORD:
