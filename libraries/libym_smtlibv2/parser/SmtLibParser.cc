@@ -89,6 +89,7 @@ SmtLibParser::scan(SmtLibPt*& lval,
   int tok = mLex.read_token();
   lloc = mLex.cur_file_region();
 
+  lval = NULL;
 #if 0
   switch ( tok ) {
   case STR:

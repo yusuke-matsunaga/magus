@@ -53,11 +53,23 @@ BEGIN_NONAMESPACE
 inline
 FileRegion
 loc_merge(const FileRegion loc_array[],
-	  size_t n)
+	  ymuint n)
 {
-  const FileRegion& first = loc_array[1];
-  const FileRegion& last = loc_array[n];
-  return FileRegion(first.start_loc(), last.end_loc());
+  if ( n == 0 ) {
+    return FileRegion();
+  }
+
+  // 真の先頭を求める．
+  ymuint i;
+  for (i = 1; i <= n && !loc_array[i].is_valid(); ++ i) ;
+  const FileRegion& first = loc_array[i];
+
+  // 真の末尾を求める．
+  ymuint j;
+  for (j = n; i >= i && !loc_array[j].is_valid(); -- j) ;
+  const FileRegion& last = loc_array[j];
+
+  return FileRegion(first, last);
 }
 
 END_NONAMESPACE
