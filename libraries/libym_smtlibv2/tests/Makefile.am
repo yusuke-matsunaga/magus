@@ -26,4 +26,17 @@ distclean-local:
 bin_PROGRAMS =
 
 
-noinst_PROGRAMS =
+noinst_PROGRAMS = \
+	lextest
+
+############################################################
+## lextest
+############################################################
+lextest_SOURCES = \
+	lextest.cc
+
+lextest_LDADD = \
+	../parser/libym_smt_parser.la
+
+lextest_CXXFLAGS = \
+	-I$(top_srcdir)/parser
