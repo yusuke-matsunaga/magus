@@ -13,7 +13,7 @@
 #include "PatGen.h"
 #include "PgNode.h"
 #include "PgHandle.h"
-#include "ym_techmap/PatMgr.h"
+#include "../PatMgr.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/BinIO.h"

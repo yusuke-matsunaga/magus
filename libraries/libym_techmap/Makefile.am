@@ -29,8 +29,10 @@ libym_techmap_la_SOURCES = \
 	PatGraph.h \
 	PatMatcher.h \
 	PatMatcher.cc \
+	PatMgr.h \
 	PatMgr.cc \
-	RepFunc.h
+	RepFunc.h \
+	TechMap.cc
 
 libym_techmap_la_LIBADD = \
 	patgen/libym_techmap_patgen.la \

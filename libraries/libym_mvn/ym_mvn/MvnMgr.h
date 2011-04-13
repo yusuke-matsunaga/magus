@@ -476,8 +476,8 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_constbitselect(MvnModule* module,
-		     ymuint bit_width,
-		     ymuint bitpos);
+		     ymuint bitpos,
+		     ymuint bit_width);
 
   /// @brief part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -487,9 +487,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_constpartselect(MvnModule* module,
-		      ymuint bit_width,
 		      ymuint msb,
-		      ymuint lsb);
+		      ymuint lsb,
+		      ymuint bit_width);
 
   /// @brief 可変 bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール

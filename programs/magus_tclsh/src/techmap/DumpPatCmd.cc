@@ -10,7 +10,7 @@
 #include "DumpPatCmd.h"
 
 #include "ym_cell/CellMislibReader.h"
-#include "ym_techmap/PatMgr.h"
+#include "ym_techmap/TechMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -61,7 +61,7 @@ DumpPatCmd::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
 
-    PatMgr::dump_library(os, *library);
+    TechMap::dump_library(os, *library);
 
     return TCL_OK;
   }

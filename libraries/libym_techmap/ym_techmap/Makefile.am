@@ -9,4 +9,4 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	techmap_nsdef.h \
 	CnGraph.h \
-	PatMgr.h
+	TechMap.h

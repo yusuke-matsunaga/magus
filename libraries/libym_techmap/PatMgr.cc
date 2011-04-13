@@ -7,12 +7,10 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/PatMgr.h"
+#include "PatMgr.h"
 #include "PatGraph.h"
 #include "RepFunc.h"
 #include "FuncGroup.h"
-#include "patgen/patgen_nsdef.h"
-#include "patgen/PgFuncMgr.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/BinIO.h"
@@ -260,19 +258,6 @@ PatMgr::load(istream& s)
   }
 
   return true;
-}
-
-// @brief セルライブラリの内容(+パタングラフ)をバイナリファイルに書き出す．
-void
-PatMgr::dump_library(ostream& s,
-		     const CellLibrary& library)
-{
-  using namespace nsPatgen;
-
-  PgFuncMgr pgf_mgr;
-  pgf_mgr.set_library(&library);
-
-  pg_dump(s, pgf_mgr);
 }
 
 // @brief このセルライブラリに含まれるセルの最大の入力数を得る．

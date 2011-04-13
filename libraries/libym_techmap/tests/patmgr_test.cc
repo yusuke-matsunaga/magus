@@ -8,7 +8,8 @@
 
 
 #include "patgen/patgen_nsdef.h"
-#include "ym_techmap/PatMgr.h"
+#include "ym_techmap/TechMap.h"
+#include "PatMgr.h"
 #include "ym_cell/CellMislibReader.h"
 
 
@@ -36,7 +37,7 @@ main(int argc,
     cerr << "Could not create " << datafile << endl;
     return 2;
   }
-  PatMgr::dump_library(os, *library);
+  TechMap::dump_library(os, *library);
   os.close();
 
 

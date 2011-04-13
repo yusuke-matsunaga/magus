@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
+class PatMgr;
+
 //////////////////////////////////////////////////////////////////////
 /// @class PatGraph PatGraph.h "PatGraph.h"
 /// @brief パタングラフを表すクラス
