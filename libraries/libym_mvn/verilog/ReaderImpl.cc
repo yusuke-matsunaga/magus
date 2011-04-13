@@ -229,7 +229,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
 	const MvnOutputPin* src_pin = node->input(0)->src_pin();
 	if ( src_pin != NULL ) {
 	  MvnNode* src_node = src_pin->node();
-	  mNodeMap.copy(src_node->id(), node->id());
+	  mNodeMap.copy(node->id(), src_node->id());
 	}
       }
     }
