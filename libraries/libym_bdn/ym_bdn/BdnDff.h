@@ -23,7 +23,7 @@ class BdnAuxData;
 class BdnDff :
   public DlElem
 {
-  friend class BdnMgr;
+  friend class BdnMgrImpl;
 
 private:
 

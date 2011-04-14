@@ -43,7 +43,7 @@ change_test()
   // (a & b) | (a & c)
   BdnNodeHandle h3 = network.new_or(h1, h2);
 
-  network.set_output_fanin(d, h3);
+  network.change_output_fanin(d, h3);
 
   cout << "===Before change_logic===" << endl;
   dump(cout, network);

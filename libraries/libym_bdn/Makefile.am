@@ -25,6 +25,8 @@ libym_bdn_la_SOURCES = \
 	BdnBlifWriter.cc \
 	BdnDumper.cc \
 	BdnMgr.cc \
+	BdnMgrImpl.h \
+	BdnMgrImpl.cc \
 	BdnNode1.h \
 	BdnNode2.h \
 	BdnNode.cc \

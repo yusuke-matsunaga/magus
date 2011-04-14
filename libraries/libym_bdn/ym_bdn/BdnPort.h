@@ -22,7 +22,7 @@ class BdnAuxData;
 //////////////////////////////////////////////////////////////////////
 class BdnPort
 {
-  friend class BdnMgr;
+  friend class BdnMgrImpl;
 
 private:
 

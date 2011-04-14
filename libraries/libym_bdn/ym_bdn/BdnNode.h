@@ -29,7 +29,7 @@ class BdnEdge :
   public DlElem
 {
   friend class BdnNode;
-  friend class BdnMgr;
+  friend class BdnMgrImpl;
 
 public:
 
@@ -135,7 +135,7 @@ private:
 class BdnNode :
   public DlElem
 {
-  friend class BdnMgr;
+  friend class BdnMgrImpl;
 
 public:
 

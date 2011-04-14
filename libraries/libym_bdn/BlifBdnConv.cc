@@ -102,16 +102,16 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
 
     // クロック信号の設定
     BdnNode* dff_clock = dff->clock();
-    mNetwork->set_output_fanin(dff_clock, clock_h);
+    mNetwork->change_output_fanin(dff_clock, clock_h);
 
     // リセット(もしくはセット)信号の設定
     if ( has_reset ) {
       BdnNode* dff_reset = dff->reset();
-      mNetwork->set_output_fanin(dff_reset, reset_h);
+      mNetwork->change_output_fanin(dff_reset, reset_h);
     }
     else if ( has_set ) {
       BdnNode* dff_set = dff->set();
-      mNetwork->set_output_fanin(dff_set, reset_h);
+      mNetwork->change_output_fanin(dff_set, reset_h);
     }
   }
 
@@ -121,7 +121,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     const BlifNode* blif_node = blif_network.po(i);
     BdnNode* node = mNetwork->new_port_output(blif_node->name());
     BdnNodeHandle inode_h = make_node(blif_node);
-    mNetwork->set_output_fanin(node, inode_h);
+    mNetwork->change_output_fanin(node, inode_h);
   }
 
   // D-FFに用いられているノードを再帰的に生成
@@ -130,7 +130,7 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
     BdnNodeHandle inode_h = make_node(blif_node->fanin(0));
     BdnDff* dff = dff_array[i];
     BdnNode* dff_input = dff->input();
-    mNetwork->set_output_fanin(dff_input, inode_h);
+    mNetwork->change_output_fanin(dff_input, inode_h);
   }
 
   return true;
