@@ -152,7 +152,7 @@ BdnMgr::copy(const BdnMgr& src)
     BdnNode* input1 = nodemap[src_inode1->id()];
     assert_cond(input1, __FILE__, __LINE__);
 
-    BdnNodeHandle tmp_h = new_logic(src_node->fcode(),
+    BdnNodeHandle tmp_h = set_logic(NULL, src_node->_fcode(),
 				    BdnNodeHandle(input0, false),
 				    BdnNodeHandle(input1, false));
     assert_cond(tmp_h.inv() == false, __FILE__, __LINE__);
@@ -373,31 +373,31 @@ BdnMgr::new_dff(const string& name)
 
   BdnNode* output = alloc_node();
   dff->mOutput = output;
-  output->set_type(BdnNode::kDFF_OUTPUT);
+  output->set_input_type(BdnNode::kDFF_OUTPUT);
   output->mAuxData = dff->mAuxData;
   mInputList.push_back(output);
 
   BdnNode* input = alloc_node();
   dff->mInput = input;
-  input->set_type(BdnNode::kDFF_INPUT);
+  input->set_output_type(BdnNode::kDFF_DATA);
   input->mAuxData = dff->mAuxData;
   mOutputList.push_back(input);
 
   BdnNode* clock = alloc_node();
   dff->mClock = clock;
-  clock->set_type(BdnNode::kDFF_CLOCK);
+  clock->set_output_type(BdnNode::kDFF_CLOCK);
   clock->mAuxData = dff->mAuxData;
   mOutputList.push_back(clock);
 
   BdnNode* set = alloc_node();
   dff->mSet = set;
-  set->set_type(BdnNode::kDFF_SET);
+  set->set_output_type(BdnNode::kDFF_SET);
   set->mAuxData = dff->mAuxData;
   mOutputList.push_back(set);
 
   BdnNode* reset = alloc_node();
   dff->mReset = reset;
-  reset->set_type(BdnNode::kDFF_RESET);
+  reset->set_output_type(BdnNode::kDFF_RESET);
   reset->mAuxData = dff->mAuxData;
   mOutputList.push_back(reset);
 
@@ -457,19 +457,19 @@ BdnMgr::new_latch(const string& name)
 
   BdnNode* output = alloc_node();
   latch->mOutput = output;
-  output->set_type(BdnNode::kLATCH_OUTPUT);
+  output->set_input_type(BdnNode::kLATCH_OUTPUT);
   output->mAuxData = latch->mAuxData;
   mInputList.push_back(output);
 
   BdnNode* input = alloc_node();
   latch->mInput = input;
-  input->set_type(BdnNode::kLATCH_INPUT);
+  input->set_output_type(BdnNode::kLATCH_DATA);
   input->mAuxData = latch->mAuxData;
   mOutputList.push_back(input);
 
   BdnNode* enable = alloc_node();
   latch->mEnable = enable;
-  enable->set_type(BdnNode::kLATCH_ENABLE);
+  enable->set_output_type(BdnNode::kLATCH_ENABLE);
   enable->mAuxData = latch->mAuxData;
   mOutputList.push_back(enable);
 
@@ -508,7 +508,7 @@ BdnMgr::new_port_input(BdnPort* port,
   assert_cond( port->mInputArray[bitpos] == NULL, __FILE__, __LINE__);
 
   BdnNode* node = alloc_node();
-  node->set_type(BdnNode::kINPUT);
+  node->set_input_type(BdnNode::kPRIMARY_INPUT);
   node->mAuxData = port->mAuxDataArray[bitpos];
   port->mInputArray[bitpos] = node;
 
@@ -543,7 +543,7 @@ BdnMgr::new_port_output(BdnPort* port,
   assert_cond( port->mOutputArray[bitpos] == NULL, __FILE__, __LINE__);
 
   BdnNode* node = alloc_node();
-  node->set_type(BdnNode::kOUTPUT);
+  node->set_output_type(BdnNode::kPRIMARY_OUTPUT);
   node->mAuxData = port->mAuxDataArray[bitpos];
   port->mOutputArray[bitpos] = node;
 
@@ -580,26 +580,47 @@ BdnMgr::set_output_fanin(BdnNode* node,
   assert_cond( node->is_output(), __FILE__, __LINE__);
 
   bool inv = inode_handle.inv();
-  node->set_inv(inv);
+  node->set_output_fanin_inv(inv);
 
   BdnNode* inode = inode_handle.node();
   connect(inode, node, 0);
 }
 
-// @brief 論理ノードを作る．
-// @param[in] fcode 機能コード
-// @param[in] inode1_handle 1番めの入力ノード+極性
-// @param[in] inode2_handle 2番めの入力ノード+極性
-// @return 作成したノードを返す．
-// @note fcode の出力極性を正規化する．
-// @note すでに同じ機能コード，同じファンインを持つノードがあればそれを返す．
-BdnNodeHandle
-BdnMgr::new_logic(ymuint fcode,
-		  BdnNodeHandle inode1_handle,
-		  BdnNodeHandle inode2_handle)
-{
-  return set_logic(NULL, fcode, inode1_handle, inode2_handle);
-}
+
+BEGIN_NONAMESPACE
+
+// new_logic 用の定数
+const ymuint I0_BIT  = 1U;
+const ymuint I1_BIT  = 2U;
+const ymuint AND_BIT = 0U;
+const ymuint XOR_BIT = 4U;
+const ymuint O_BIT   = 8U;
+
+const ymuint AND_00  = AND_BIT;
+const ymuint AND_01  = AND_BIT | I0_BIT;
+const ymuint AND_10  = AND_BIT | I1_BIT;
+const ymuint AND_11  = AND_BIT | I0_BIT | I1_BIT;
+
+const ymuint NAND_00 = AND_00 | O_BIT;
+const ymuint NAND_01 = AND_01 | O_BIT;
+const ymuint NAND_10 = AND_10 | O_BIT;
+const ymuint NAND_11 = AND_11 | O_BIT;
+
+const ymuint OR_00   = NAND_11;
+const ymuint OR_01   = NAND_10;
+const ymuint OR_10   = NAND_01;
+const ymuint OR_11   = NAND_00;
+
+const ymuint NOR_00  = OR_00 | O_BIT;
+const ymuint NOR_01  = OR_01 | O_BIT;
+const ymuint NOR_10  = OR_10 | O_BIT;
+const ymuint NOR_11  = OR_11 | O_BIT;
+
+const ymuint XOR     = XOR_BIT;
+
+const ymuint XNOR    = XOR_BIT | O_BIT;
+
+END_NONAMESPACE
 
 // @brief AND ノードを作る．
 // @param[in] inode1_handle 1番めの入力ノード+極性
@@ -610,7 +631,7 @@ BdnNodeHandle
 BdnMgr::new_and(BdnNodeHandle inode1_handle,
 		BdnNodeHandle inode2_handle)
 {
-  return new_logic(0x8, inode1_handle, inode2_handle);
+  return set_logic(NULL, AND_00, inode1_handle, inode2_handle);
 }
 
 // @brief AND ノードを作る．
@@ -620,7 +641,30 @@ BdnMgr::new_and(BdnNodeHandle inode1_handle,
 BdnNodeHandle
 BdnMgr::new_and(const vector<BdnNodeHandle>& inode_handle_list)
 {
-  return make_tree(0x8, 0, inode_handle_list.size(), inode_handle_list);
+  return make_and_tree(NULL, inode_handle_list);
+}
+
+// @brief NAND ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note fcode の出力極性を正規化する．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_nand(BdnNodeHandle inode1_handle,
+		 BdnNodeHandle inode2_handle)
+{
+  return set_logic(NULL, NAND_00, inode1_handle, inode2_handle);
+}
+
+// @brief NAND ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~new_and(inode_handle_list);
 }
 
 // @brief OR ノードを作る．
@@ -632,7 +676,7 @@ BdnNodeHandle
 BdnMgr::new_or(BdnNodeHandle inode1_handle,
 	       BdnNodeHandle inode2_handle)
 {
-  return new_logic(0xe, inode1_handle, inode2_handle);
+  return set_logic(NULL, OR_00, inode1_handle, inode2_handle);
 }
 
 // @brief OR ノードを作る．
@@ -642,7 +686,29 @@ BdnMgr::new_or(BdnNodeHandle inode1_handle,
 BdnNodeHandle
 BdnMgr::new_or(const vector<BdnNodeHandle>& inode_handle_list)
 {
-  return make_tree(0xe, 0, inode_handle_list.size(), inode_handle_list);
+  return make_or_tree(NULL, inode_handle_list);
+}
+
+// @brief NOR ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_nor(BdnNodeHandle inode1_handle,
+		BdnNodeHandle inode2_handle)
+{
+  return set_logic(NULL, NOR_00, inode1_handle, inode2_handle);
+}
+
+// @brief NOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~new_or(inode_handle_list);
 }
 
 // @brief XOR ノードを作る．
@@ -652,9 +718,9 @@ BdnMgr::new_or(const vector<BdnNodeHandle>& inode_handle_list)
 // @note すでに構造的に同じノードがあればそれを返す．
 BdnNodeHandle
 BdnMgr::new_xor(BdnNodeHandle inode1_handle,
-		   BdnNodeHandle inode2_handle)
+		BdnNodeHandle inode2_handle)
 {
-  return new_logic(0x6, inode1_handle, inode2_handle);
+  return set_logic(NULL, XOR, inode1_handle, inode2_handle);
 }
 
 // @brief XOR ノードを作る．
@@ -664,16 +730,224 @@ BdnMgr::new_xor(BdnNodeHandle inode1_handle,
 BdnNodeHandle
 BdnMgr::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
 {
-  return make_tree(0x6, 0, inode_handle_list.size(), inode_handle_list);
+  return make_xor_tree(NULL, inode_handle_list);
+}
+
+// @brief XNOR ノードを作る．
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_xnor(BdnNodeHandle inode1_handle,
+		 BdnNodeHandle inode2_handle)
+{
+  return set_logic(NULL, XNOR, inode1_handle, inode2_handle);
+}
+
+// @brief XNOR ノードを作る．
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+// @return 作成したノードを返す．
+// @note すでに構造的に同じノードがあればそれを返す．
+BdnNodeHandle
+BdnMgr::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
+{
+  return ~new_xor(inode_handle_list);
+}
+
+// @brief AND タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+void
+BdnMgr::change_and(BdnNode* node,
+		   BdnNodeHandle inode1_handle,
+		   BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle new_handle = set_logic(node, AND_00,
+				       inode1_handle, inode2_handle);
+  change_logic(node, new_handle);
+}
+
+// @brief AND タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+void
+BdnMgr::change_and(BdnNode* node,
+		   const vector<BdnNodeHandle>& inode_handle_list)
+{
+  BdnNodeHandle new_handle = make_and_tree(node, inode_handle_list);
+  change_logic(node, new_handle);
+}
+
+// @brief NAND タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+void
+BdnMgr::change_nand(BdnNode* node,
+		    BdnNodeHandle inode1_handle,
+		    BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle new_handle = set_logic(node, NAND_00,
+				       inode1_handle, inode2_handle);
+  change_logic(node, new_handle);
+}
+
+// @brief NAND タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+void
+BdnMgr::change_nand(BdnNode* node,
+		    const vector<BdnNodeHandle>& inode_handle_list)
+{
+  BdnNodeHandle new_handle = make_and_tree(node, inode_handle_list);
+  change_logic(node, ~new_handle);
+}
+
+// @brief OR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+void
+BdnMgr::change_or(BdnNode* node,
+		  BdnNodeHandle inode1_handle,
+		  BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle new_handle = set_logic(node, OR_00,
+				       inode1_handle, inode2_handle);
+  change_logic(node, new_handle);
+}
+
+// @brief OR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+void
+BdnMgr::change_or(BdnNode* node,
+		  const vector<BdnNodeHandle>& inode_handle_list)
+{
+  BdnNodeHandle new_handle = make_or_tree(node, inode_handle_list);
+  change_logic(node, new_handle);
+}
+
+// @brief NOR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+void
+BdnMgr::change_nor(BdnNode* node,
+		   BdnNodeHandle inode1_handle,
+		   BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle new_handle = set_logic(node, NOR_00,
+				       inode1_handle, inode2_handle);
+  change_logic(node, new_handle);
+}
+
+// @brief NOR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+void
+BdnMgr::change_nor(BdnNode* node,
+		   const vector<BdnNodeHandle>& inode_handle_list)
+{
+  BdnNodeHandle new_handle = make_or_tree(node, inode_handle_list);
+  change_logic(node, ~new_handle);
+}
+
+// @brief XOR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+void
+BdnMgr::change_xor(BdnNode* node,
+		   BdnNodeHandle inode1_handle,
+		   BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle new_handle = set_logic(node, XOR,
+				       inode1_handle, inode2_handle);
+  change_logic(node, new_handle);
+}
+
+// @brief XOR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+void
+BdnMgr::change_xor(BdnNode* node,
+		   const vector<BdnNodeHandle>& inode_handle_list)
+{
+  BdnNodeHandle new_handle = make_xor_tree(node, inode_handle_list);
+  change_logic(node, new_handle);
+}
+
+// @brief XNOR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode1_handle 1番めの入力ノード+極性
+// @param[in] inode2_handle 2番めの入力ノード+極性
+void
+BdnMgr::change_xnor(BdnNode* node,
+		    BdnNodeHandle inode1_handle,
+		    BdnNodeHandle inode2_handle)
+{
+  BdnNodeHandle new_handle = set_logic(node, XNOR,
+				       inode1_handle, inode2_handle);
+  change_logic(node, new_handle);
+}
+
+// @brief XNOR タイプに変更する．
+// @param[in] node 対象のノード
+// @param[in] inode_handle_list 入力ノード+極性のリスト
+void
+BdnMgr::change_xnor(BdnNode* node,
+		    const vector<BdnNodeHandle>& inode_handle_list)
+{
+  BdnNodeHandle new_handle = make_xor_tree(node, inode_handle_list);
+  change_logic(node, ~new_handle);
+}
+
+// @brief AND のバランス木を作る．
+// @param[in] node 根のノード
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgr::make_and_tree(BdnNode* node,
+		      const vector<BdnNodeHandle>& node_list)
+{
+  return make_tree(node, AND_00, 0, node_list.size(), node_list);
+}
+
+// @brief OR のバランス木を作る．
+// @param[in] node 根のノード
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgr::make_or_tree(BdnNode* node,
+		     const vector<BdnNodeHandle>& node_list)
+{
+  return make_tree(node, OR_00, 0, node_list.size(), node_list);
+}
+
+// @brief XOR のバランス木を作る．
+// @param[in] node 根のノード
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgr::make_xor_tree(BdnNode* node,
+		      const vector<BdnNodeHandle>& node_list)
+{
+  return make_tree(node, XOR, 0, node_list.size(), node_list);
 }
 
 // @brief バランス木を作る．
+// @param[in] node 根のノード
 // @param[in] fcode 機能コード
 // @param[in] start 開始位置
 // @param[in] num 要素数
-// @param[in] node_list ノードのリスト
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
 BdnNodeHandle
-BdnMgr::make_tree(ymuint fcode,
+BdnMgr::make_tree(BdnNode* node,
+		  ymuint fcode,
 		  ymuint start,
 		  ymuint num,
 		  const vector<BdnNodeHandle>& node_list)
@@ -686,42 +960,44 @@ BdnMgr::make_tree(ymuint fcode,
     return node_list[start];
 
   case 2:
-    return new_logic(fcode, node_list[start], node_list[start + 1]);
+    return set_logic(node, fcode, node_list[start], node_list[start + 1]);
 
   default:
     break;
   }
 
   ymuint nh = num / 2;
-  BdnNodeHandle l = make_tree(fcode, start, nh, node_list);
-  BdnNodeHandle r = make_tree(fcode, start + nh, num - nh, node_list);
-  return new_logic(fcode, l, r);
+  BdnNodeHandle l = make_tree(NULL, fcode, start, nh, node_list);
+  BdnNodeHandle r = make_tree(NULL, fcode, start + nh, num - nh, node_list);
+  return set_logic(node, fcode, l, r);
 }
 
 // @brief 論理ノードの内容を変更する．
 // @param[in] node 変更対象の論理ノード
-// @param[in] fcode 機能コード
-// @param[in] inode1_handle 1番めの入力ノード+極性
-// @param[in] inode2_handle 2番めの入力ノード+極性
-// @note fcode の出力極性を正規化する．
-// @note 実際には新しいノードを作ってそこへのリンクを内部で持つ．
+// @param[in] new_handle 設定する新しいハンドル
+// @note node のファンアウト先の情報を書き換える．
 void
 BdnMgr::change_logic(BdnNode* node ,
-		     ymuint fcode,
-		     BdnNodeHandle inode1_handle,
-		     BdnNodeHandle inode2_handle)
+		     BdnNodeHandle new_handle)
 {
-  BdnNodeHandle new_handle = set_logic(node, fcode,
-				       inode1_handle, inode2_handle);
   if ( new_handle == BdnNodeHandle(node, false) ) {
     // 変化なし
     return;
   }
 
-  // node のファンアウト先の内容を変える．
   const BdnFanoutList& fo_list = node->fanout_list();
+  // ループ中で接続が変わる可能性があるので BdnEdge のリストをコピーする．
+  vector<BdnEdge*> tmp_list;
+  tmp_list.reserve(fo_list.size());
   for (BdnFanoutList::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
+    BdnEdge* edge = *p;
+    tmp_list.push_back(edge);
+  }
+
+  // node のファンアウト先の内容を変える．
+  for (vector<BdnEdge*>::iterator p = tmp_list.begin();
+       p != tmp_list.end(); ++ p) {
     BdnEdge* edge = *p;
     BdnNode* onode = edge->to();
     if ( onode->is_logic() ) {
@@ -733,7 +1009,9 @@ BdnMgr::change_logic(BdnNode* node ,
       else {
 	inode2_handle = new_handle;
       }
-      change_logic(onode, onode->fcode(), inode1_handle, inode2_handle);
+      BdnNodeHandle new_oh = set_logic(onode, onode->_fcode(),
+				       inode1_handle, inode2_handle);
+      change_logic(onode, new_oh);
     }
     else if ( onode->is_output() ) {
       set_output_fanin(onode, new_handle);
@@ -751,7 +1029,7 @@ hash_func(ymuint fcode,
 	  const BdnNode* node1,
 	  const BdnNode* node2)
 {
-  return (node1->id() * 3 + node2->id() << 3) | (fcode >> 1);
+  return (node1->id() * 3 + node2->id() << 3) | fcode;
 }
 
 END_NONAMESPACE
@@ -764,125 +1042,102 @@ BdnMgr::set_logic(BdnNode* node,
 		  BdnNodeHandle inode0_handle,
 		  BdnNodeHandle inode1_handle)
 {
-  // 入力の極性を fcode に反映させる．
-  if ( inode0_handle.inv() ) {
-    ymuint tmp0 = fcode & 0x5; // 0101
-    ymuint tmp1 = fcode & 0xa; // 1010
-    fcode = (tmp0 << 1) | (tmp1 >> 1);
+  // 境界条件の検査
+  if ( fcode & 4U ) {
+    // XOR の場合
+    if ( inode0_handle.is_zero() ) {
+      // 入力0が定数0だった．
+      return inode1_handle;
+    }
+    else if ( inode0_handle.is_one() ) {
+      // 入力0が定数1だった．
+      return ~inode1_handle;
+    }
+    else if ( inode1_handle.is_zero() ) {
+      // 入力1が定数0だった．
+      return inode0_handle;
+    }
+    else if ( inode1_handle.is_one() ) {
+      // 入力1が定数1だった．
+      return ~inode0_handle;
+    }
+    else if ( inode0_handle == inode1_handle ) {
+      // 2つの入力が同一だった．
+      return BdnNodeHandle::make_zero();
+    }
+    else if ( inode0_handle == ~inode1_handle ) {
+      // 2つの入力が極性違いだった．
+      return BdnNodeHandle::make_one();
+    }
   }
-  if ( inode1_handle.inv() ) {
-    ymuint tmp0 = fcode & 0x3; // 0011
-    ymuint tmp1 = fcode & 0xc; // 1100
-    fcode = (tmp0 << 2) | (tmp1 >> 2);
+  else {
+    // AND の場合
+    if ( inode0_handle.is_zero() ) {
+      // 入力0が定数0だった．
+      return BdnNodeHandle::make_zero();
+    }
+    else if ( inode0_handle.is_one() ) {
+      // 入力0が定数1だった．
+      return inode1_handle;
+    }
+    else if ( inode1_handle.is_zero() ) {
+      // 入力1が定数0だった．
+      return BdnNodeHandle::make_zero();
+    }
+    else if ( inode1_handle.is_one() ) {
+      // 入力1が定数1だった．
+      return inode0_handle;
+    }
+    else if ( inode0_handle == inode1_handle ) {
+      // 2つの入力が同じだった．
+      return inode0_handle;
+    }
+    else if ( inode0_handle == ~inode1_handle ) {
+      // 2つの入力が極性違いだった．
+      return BdnNodeHandle::make_zero();
+    }
   }
 
+  // 入力の反転属性
+  bool inv0 = inode0_handle.inv() ^ static_cast<bool>(fcode & 1U);
+  bool inv1 = inode1_handle.inv() ^ static_cast<bool>((fcode >> 1) & 1U);
+
+  // 入力のノード
   BdnNode* inode0 = inode0_handle.node();
   BdnNode* inode1 = inode1_handle.node();
-
-  // 境界条件の検査
-  if ( inode0 == NULL ) {
-    if ( inode1 == NULL ) {
-      if ( (fcode & 1U) == 1U ) {
-	return BdnNodeHandle::make_one();
-      }
-      else {
-	return BdnNodeHandle::make_zero();
-      }
-    }
-    if ( (fcode & 1U) == 1U ) {
-      if ( (fcode & 4U) == 4U ) {
-	// 11 なので定数1
-	return BdnNodeHandle::make_one();
-      }
-      else {
-	// 10 なので ~(inode1)
-	return BdnNodeHandle(inode1, true);
-      }
-    }
-    else {
-      if ( (fcode & 4U) == 4U ) {
-	// 01 なので inode1
-	return BdnNodeHandle(inode1, false);
-      }
-      else {
-	// 00 なので定数0
-	return BdnNodeHandle::make_zero();
-      }
-    }
-  }
-  if ( inode1 == NULL ) {
-    if ( (fcode & 1U) == 1U ) {
-      if ( (fcode & 2U) == 2U ) {
-	// 11 なので定数1
-	return BdnNodeHandle::make_one();
-      }
-      else {
-	// 10 なので ~(inode0)
-	return BdnNodeHandle(inode0, true);
-      }
-    }
-    else {
-      if ( (fcode & 2U) == 2U ) {
-	// 01 なので inode0
-	return BdnNodeHandle(inode0, false);
-      }
-      else {
-	// 00 なので定数0
-	return BdnNodeHandle::make_zero();
-      }
-    }
-  }
-  if ( inode0 == inode1 ) {
-    if ( (fcode & 1U) == 1U ) {
-      if ( (fcode & 8U) == 8U ) {
-	return BdnNodeHandle::make_one();
-      }
-      else {
-	return BdnNodeHandle(inode0, true);
-      }
-    }
-    else {
-      if ( (fcode & 8U) == 8U ) {
-	return BdnNodeHandle(inode0, false);
-      }
-      else {
-	return BdnNodeHandle::make_zero();
-      }
-    }
-  }
-
-  // 出力極性の正規化
-  bool inv = (fcode & 1U) == 1U;
-  if ( inv ) {
-    fcode ^= 0xf;
-  }
 
   // ファンインの順番の正規化
   if ( inode0->id() > inode1->id() ) {
     BdnNode* tmp = inode0;
     inode0 = inode1;
     inode1 = tmp;
-    if ( fcode & 2U ) {
-      if ( (fcode & 4U) == 0U ) {
-	fcode &= 8U;
-	fcode |= 4U;
-      }
-    }
-    else if ( fcode & 4U ) {
-      fcode &= 8U;
-      fcode |= 2U;
-    }
+    bool tmp_inv = inv0;
+    inv0 = inv1;
+    inv1 = tmp_inv;
+  }
+
+  // 出力の反転属性
+  bool oinv = static_cast<bool>((fcode >> 3) & 1U);
+
+  // fcode の正規化
+  if ( fcode & 4U ) {
+    // XOR の場合には入力に反転属性はつかない．
+    oinv = inv0 ^ inv1;
+    fcode = 4U;
+  }
+  else {
+    fcode = static_cast<ymuint>(inv0) | (static_cast<ymuint>(inv1) << 1);
   }
 
   // 同じ構造を持つノードが既にないか調べる．
   ymuint pos = hash_func(fcode, inode0, inode1);
   ymuint idx = pos % mHashSize;
   for (BdnNode* node1 = mHashTable[idx]; node1; node1 = node1->mLink) {
-    if ( node1->fcode() == fcode &&
+    if ( node1->_fcode() == fcode &&
 	 node1->fanin0() == inode0 &&
 	 node1->fanin1() == inode1 ) {
       // 同じノードがあった．
-      return BdnNodeHandle(node1, inv);
+      return BdnNodeHandle(node1, oinv);
     }
   }
 
@@ -901,7 +1156,7 @@ BdnMgr::set_logic(BdnNode* node,
   }
   else {
     // ハッシュ表から取り除く
-    ymuint pos0 = hash_func(node->fcode(), node->fanin0(), node->fanin1());
+    ymuint pos0 = hash_func(node->_fcode(), node->fanin0(), node->fanin1());
     ymuint idx0 = pos0 % mHashSize;
     BdnNode* prev = mHashTable[idx0];
     if ( prev == node ) {
@@ -916,8 +1171,7 @@ BdnMgr::set_logic(BdnNode* node,
     // エラーチェック(node0 == NULL) はしていない．
   }
 
-  node->set_type(BdnNode::kLOGIC);
-  node->set_fcode(fcode);
+  node->set_logic_type(fcode);
   connect(inode0, node, 0);
   connect(inode1, node, 1);
 
@@ -925,7 +1179,7 @@ BdnMgr::set_logic(BdnNode* node,
   node->mLink = mHashTable[idx];
   mHashTable[idx] = node;
 
-  return BdnNodeHandle(node, inv);
+  return BdnNodeHandle(node, oinv);
 }
 
 // from を to の pos 番目のファンインとする．
@@ -1067,7 +1321,7 @@ BdnMgr::alloc_table(ymuint req_size)
       BdnNode* next = NULL;
       for (BdnNode* node = old_table[i]; node; node = next) {
 	next = node->mLink;
-	ymuint pos = hash_func(node->fcode(), node->fanin0(), node->fanin1());
+	ymuint pos = hash_func(node->_fcode(), node->fanin0(), node->fanin1());
 	ymuint idx = pos % mHashSize;
 	node->mLink = mHashTable[idx];
 	mHashTable[idx] = node;

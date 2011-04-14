@@ -236,68 +236,9 @@ BdnVerilogWriter::operator()(ostream& s,
     const BdnNode* input1 = node->fanin1();
     string i0_str = node_name(input0);
     string i1_str = node_name(input1);
-    const char* i0_inv = "";
-    const char* i1_inv = "";
-    const char* op_str = "&";
-    switch ( node->fcode() ) {
-    case 0x0: // 0000
-    case 0x3: // 0011
-    case 0x5: // 0101
-    case 0xa: // 1010
-    case 0xc: // 1100
-    case 0xf: // 1111
-      // 定数関数や1入力関数は現れないはず．
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-
-    case 0x1: // 0001 = ~x0 & ~x1
-      i0_inv = "~";
-      i1_inv = "~";
-      op_str = "&";
-      break;
-
-    case 0x2: // 0010 =  x0 & ~x1
-      i1_inv = "~";
-      op_str = "&";
-      break;
-
-    case 0x4: // 0100 = ~x0 &  x1
-      i0_inv = "~";
-      op_str = "&";
-      break;
-
-    case 0x6: // 0110 =  x0 ^  x1
-      op_str = "^";
-      break;
-
-    case 0x7: // 0111 = ~x0 | ~x1
-      i0_inv = "~";
-      i1_inv = "~";
-      op_str = "|";
-      break;
-
-    case 0x8: // 1000 =  x0 &  x1
-      op_str = "&";
-      break;
-
-    case 0x9: // 1001 = ~(x0 ^ x1)
-      op_str = "~^";
-      break;
-
-    case 0xb: // 1011 =  x0 | ~x1
-      i1_inv = "~";
-      op_str = "|";
-      break;
-
-    case 0xd: // 1101 = ~x0 |  x1
-      i0_inv = "~";
-      op_str = "|";
-      break;
-
-    case 0xe: // 1110 =  x0 |  x1
-      op_str = "|";
-      break;
-    }
+    const char* i0_inv = node->fanin0_inv() ? "~" : "";
+    const char* i1_inv = node->fanin1_inv() ? "~" : "";
+    const char* op_str = node->is_xor() ? "^" : "&";
     s << "  assign " << node_name(node) << " = "
       << i0_inv << i0_str
       << " " << op_str << " "

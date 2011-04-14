@@ -33,17 +33,15 @@ change_test()
   BdnNode* d = network.new_port_output(port_d, 0);
 
   // a & b
-  BdnNodeHandle h1 = network.new_logic(0x8,
-				       BdnNodeHandle(a, false),
-				       BdnNodeHandle(b, false));
+  BdnNodeHandle h1 = network.new_and(BdnNodeHandle(a, false),
+				     BdnNodeHandle(b, false));
 
   // a & c
-  BdnNodeHandle h2 = network.new_logic(0x8,
-				       BdnNodeHandle(a, false),
-				       BdnNodeHandle(c, false));
+  BdnNodeHandle h2 = network.new_and(BdnNodeHandle(a, false),
+				     BdnNodeHandle(c, false));
 
   // (a & b) | (a & c)
-  BdnNodeHandle h3 = network.new_logic(0xe, h1, h2);
+  BdnNodeHandle h3 = network.new_or(h1, h2);
 
   network.set_output_fanin(d, h3);
 
@@ -51,23 +49,20 @@ change_test()
   dump(cout, network);
 
   // (b | c)
-  BdnNodeHandle h4 = network.new_logic(0xe,
-				       BdnNodeHandle(b, false),
-				       BdnNodeHandle(c, false));
+  BdnNodeHandle h4 = network.new_or(BdnNodeHandle(b, false),
+				    BdnNodeHandle(c, false));
 
-  network.change_logic(h3.node(),
-		       0x8,
-		       BdnNodeHandle(a, false),
-		       h4);
+  network.change_and(h3.node(),
+		     BdnNodeHandle(a, false),
+		     h4);
 
   cout << "===After change_logic===" << endl;
   dump(cout, network);
 
   // 論理を反転
-  network.change_logic(h3.node(),
-		       0x7,
-		       BdnNodeHandle(a, false),
-		       h4);
+  network.change_nand(h3.node(),
+		      BdnNodeHandle(a, false),
+		      h4);
 
   cout << "===After change_logic(2)===" << endl;
   dump(cout, network);

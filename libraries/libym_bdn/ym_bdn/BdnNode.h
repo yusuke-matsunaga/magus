@@ -140,35 +140,41 @@ class BdnNode :
 public:
 
   /// @brief ノードの型
-  /// @note ビットの意味は以下の通り
-  /// - 0〜2 : 細分化
-  /// - 3    : 入力
-  /// - 4    : 出力
   enum tType {
     /// @brief 論理ノード
     kLOGIC        = 0,
-
     /// @brief 外部入力ノード
-    kINPUT        = 8,
-    /// @brief D-FF の出力ノード
-    kDFF_OUTPUT   = 9,
-    /// @brief ラッチの出力ノード
-    kLATCH_OUTPUT = 10,
-
+    kINPUT        = 1,
     /// @brief 外部出力ノード
-    kOUTPUT       = 16,
-    /// @brief D-FF の入力ノード
-    kDFF_INPUT    = 17,
-    /// @brief D-FF のクロックノード
-    kDFF_CLOCK    = 18,
-    /// @brief D-FF のセットノード
-    kDFF_SET      = 19,
-    /// @brief D-FF のリセットノード
-    kDFF_RESET    = 20,
-    /// @brief ラッチの入力ノード
-    kLATCH_INPUT  = 21,
-    /// @brief ラッチのイネーブルノード
-    kLATCH_ENABLE = 22
+    kOUTPUT       = 2,
+  };
+
+  /// @brief 入力ノードのサブタイプ
+  enum tInputType {
+    /// @brief 外部入力
+    kPRIMARY_INPUT  = 0,
+    /// @brief DFFの出力
+    kDFF_OUTPUT     = 1,
+    /// @brief ラッチの出力
+    kLATCH_OUTPUT   = 2
+  };
+
+  /// @brief 出力ノードのサブタイプ
+  enum tOutputType {
+    /// @brief 外部出力
+    kPRIMARY_OUTPUT = 0,
+    /// @brief DFFのデータ
+    kDFF_DATA       = 1,
+    /// @brief DFFのクロック
+    kDFF_CLOCK      = 2,
+    /// @brief DFFのセット信号
+    kDFF_SET        = 3,
+    /// @brief DFFのリセット信号
+    kDFF_RESET      = 4,
+    /// @brief ラッチのデータ
+    kLATCH_DATA     = 5,
+    /// @brief ラッチのイネーブル
+    kLATCH_ENABLE   = 6
   };
 
 
@@ -236,22 +242,31 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name 入出力ノードの情報を取り出す関数
+  /// @name 入力ノードおよび出力ノードに関係した情報を取り出す関数
   /// @{
 
+  /// @brief 入力ノードのサブタイプを得る．
+  tInputType
+  input_type() const;
+
+  /// @brief 出力ノードのサブタイプを得る．
+  tOutputType
+  output_type() const;
+
   /// @brief 関連するポートを返す．
-  /// @note kINPUT および kOUTPUT, kINOUT の時に意味を持つ．
+  /// @note kPRIMARY_INPUT および kPRIMARY_OUTPUT の時のみ意味を持つ．
   /// @note それ以外では NULL を返す．
   const BdnPort*
   port() const;
 
-  /// @brief ポート中の位置を返す．
-  /// @note kINPUT および kOUTPUT, KINOUT の時に意味を持つ．
+  /// @brief ポート中のビット位置を返す．
+  /// @note kPRIMARY_INPUT および kPRIMARY_OUTPUT の時のみ意味を持つ．
   /// @note それ以外では 0 を返す．
   ymuint
   port_bitpos() const;
 
   /// @brief 入出力ノードの場合に相方のノードを返す．
+  /// @note なければ NULL を返す．
   const BdnNode*
   alt_node() const;
 
@@ -264,15 +279,6 @@ public:
   /// @note ラッチに関連していない場合には NULL を返す．
   const BdnLatch*
   latch() const;
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name 出力ノードの情報を取り出す関数
-  /// @{
 
   /// @brief ファンインのノードを得る．
   /// @note 出力ノードの場合のみ意味を持つ．
@@ -298,11 +304,13 @@ public:
   /// @name 論理ノードの情報を取り出す関数
   /// @{
 
-  /// @brief 機能コードを得る．
-  /// @note 論理ノードの場合のみ意味を持つ．
-  /// @note 機能コードは2入力の真理値表(4bit)
-  ymuint32
-  fcode() const;
+  /// @brief AND タイプのときに true を返す．
+  bool
+  is_and() const;
+
+  /// @brief XOR タイプのときに true を返す．
+  bool
+  is_xor() const;
 
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号(0 or 1)
@@ -318,6 +326,11 @@ public:
   BdnNode*
   fanin(ymuint pos);
 
+  /// @brief ファンインの反転属性を得る．
+  /// @param[in] pos 入力番号(0 or 1)
+  bool
+  fanin_inv(ymuint pos) const;
+
   /// @brief ファンイン0のノードを得る．
   /// @return 0番めのファンインのノード
   const BdnNode*
@@ -327,6 +340,10 @@ public:
   /// @return 0番めのファンインのノード
   BdnNode*
   fanin0();
+
+  /// @brief ファンイン0の反転属性を得る．
+  bool
+  fanin0_inv() const;
 
   /// @brief ファンイン1のノードを得る．
   /// @return 1番めのファンインのノード
@@ -340,6 +357,10 @@ public:
   BdnNode*
   fanin1();
 
+  /// @brief ファンイン1の反転属性を得る．
+  bool
+  fanin1_inv() const;
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -349,18 +370,34 @@ private:
   // プライベートメンバ関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief タイプを設定する．
+  /// @brief 機能コードを得る．
+  /// @note 論理ノードの場合のみ意味を持つ．
+  /// @note 機能コードは以下の3ビットの情報を持つ．
+  ///  - 0bit: ファンイン0の反転属性
+  ///  - 1bit: ファンイン1の反転属性
+  ///  - 2bit: XOR/AND フラグ(0: AND, 1:XOR)
+  ymuint32
+  _fcode() const;
+
+  /// @brief 機能コードを設定する．
+  /// @note 副作用で論理ノードタイプに設定される．
   void
-  set_type(tType type);
+  set_logic_type(ymuint fcode);
+
+  /// @brief 入力タイプを設定する．
+  /// @note 副作用で入力ノードタイプに設定される．
+  void
+  set_input_type(tInputType type);
+
+  /// @brief 出力タイプを設定する．
+  /// @note 副作用で出力ノードタイプに設定される．
+  void
+  set_output_type(tOutputType type);
 
   /// @brief 出力ノードのファンインの極性を設定する．
   /// @param[in] inv 極性
   void
-  set_inv(bool inv);
-
-  /// @brief 機能コードを設定する．
-  void
-  set_fcode(ymuint fcode);
+  set_output_fanin_inv(bool inv);
 
   /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
   void
@@ -375,9 +412,9 @@ private:
   // ID 番号
   ymuint32 mId;
 
-  // 入力ノード  : タイプ(5bit) + POマーク(1bit)
-  // 出力ノード  :     〃       + 出力極性(1bit)
-  // 論理ノード  :     〃       + POマーク(1bit) + 機能コード(4bit)
+  // 入力ノード  : タイプ(2bit) + POマーク(1bit) + サブタイプ(2bit)
+  // 出力ノード  :     〃       + 出力極性(1bit) + サブタイプ(3bit)
+  // 論理ノード  :     〃       + POマーク(1bit) + 機能コード(3bit)
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
@@ -405,16 +442,24 @@ private:
   static
   const int kTypeShift = 0;
   static
-  const int kPoShift = 5;
+  const int kPoShift = 3;
   static
-  const int kInvShift = 5;
+  const int kOInvShift = 3;
   static
-  const int kFcodeShift = 6;
+  const int kIsubShift = 4;
+  static
+  const int kOsubShift = 4;
+  static
+  const int kFcodeShift = 4;
 
   static
   const ymuint32 kPoMask = 1U << kPoShift;
   static
-  const ymuint32 kInvMask = 1U << kInvShift;
+  const ymuint32 kOInvMask = 1U << kOInvShift;
+  static
+  const ymuint32 kIsubMask = 3U << kIsubShift;
+  static
+  const ymuint32 kOsubMask = 7U << kOsubShift;
 
 };
 
@@ -524,7 +569,7 @@ inline
 BdnNode::tType
 BdnNode::type() const
 {
-  return static_cast<tType>(mFlags & 31U);
+  return static_cast<tType>(mFlags & 3U);
 }
 
 // 入力ノードの時に true を返す．
@@ -532,8 +577,7 @@ inline
 bool
 BdnNode::is_input() const
 {
-  // ちょっとトリッキー
-  return static_cast<bool>((mFlags >> 3) & 1U);
+  return type() == kINPUT;
 }
 
 // 出力ノードの時に true を返す．
@@ -541,8 +585,7 @@ inline
 bool
 BdnNode::is_output() const
 {
-  // ちょっとトリッキー
-  return static_cast<bool>((mFlags >> 4) & 1U);
+  return type() == kOUTPUT;
 }
 
 // 論理ノードの時に true を返す．
@@ -551,6 +594,22 @@ bool
 BdnNode::is_logic() const
 {
   return type() == kLOGIC;
+}
+
+// @brief 入力ノードのサブタイプを得る．
+inline
+BdnNode::tInputType
+BdnNode::input_type() const
+{
+  return static_cast<tInputType>((mFlags >> kIsubShift) & 3U);
+}
+
+// @brief 出力ノードのサブタイプを得る．
+inline
+BdnNode::tOutputType
+BdnNode::output_type() const
+{
+  return static_cast<tOutputType>((mFlags >> kOsubShift) & 7U);
 }
 
 // @brief ファンインのノードを得る．
@@ -579,15 +638,31 @@ inline
 bool
 BdnNode::output_fanin_inv() const
 {
-  return static_cast<bool>((mFlags >> kInvShift) & 1U);
+  return static_cast<bool>((mFlags >> kOInvShift) & 1U);
 }
 
 // @brief 機能コードを得る．
 inline
 ymuint
-BdnNode::fcode() const
+BdnNode::_fcode() const
 {
-  return (mFlags >> kFcodeShift) & 0xf;
+  return (mFlags >> kFcodeShift) & 0x7;
+}
+
+// @brief AND タイプのときに true を返す．
+inline
+bool
+BdnNode::is_and() const
+{
+  return !is_xor();
+}
+
+// @brief XOR タイプのときに true を返す．
+inline
+bool
+BdnNode::is_xor() const
+{
+  return static_cast<bool>((mFlags >> (kFcodeShift + 2)) & 1U);
 }
 
 // @brief ファンインのノードを得る．
@@ -604,6 +679,15 @@ BdnNode*
 BdnNode::fanin(ymuint pos)
 {
   return mFanins[pos & 1U].from();
+}
+
+// @brief ファンインの反転属性を得る．
+// @param[in] pos 入力番号(0 or 1)
+inline
+bool
+BdnNode::fanin_inv(ymuint pos) const
+{
+  return static_cast<bool>((mFlags >> (kFcodeShift + pos)) & 1U);
 }
 
 // @brief ファンイン0のノードを得る．
@@ -624,6 +708,14 @@ BdnNode::fanin0()
   return mFanins[0].from();
 }
 
+// @brief ファンイン0の反転属性を得る．
+inline
+bool
+BdnNode::fanin0_inv() const
+{
+  return static_cast<bool>((mFlags >> kFcodeShift) & 1U);
+}
+
 // @brief ファンイン1のノードを得る．
 // @return 1番めのファンインのノード
 // @note 該当するファンインがなければ NULL を返す．
@@ -642,6 +734,14 @@ BdnNode*
 BdnNode::fanin1()
 {
   return mFanins[1].from();
+}
+
+// @brief ファンイン1の反転属性を得る．
+inline
+bool
+BdnNode::fanin1_inv() const
+{
+  return static_cast<bool>((mFlags >> (kFcodeShift + 1)) & 1U);
 }
 
 // ファンアウトリストを得る．
@@ -676,36 +776,45 @@ BdnNode::level() const
   return mLevel;
 }
 
-// タイプを設定する．
+// @brief 機能コードを設定する．
+// @note 副作用で論理ノードタイプに設定される．
 inline
 void
-BdnNode::set_type(tType type)
+BdnNode::set_logic_type(ymuint fcode)
 {
-  mFlags &= ~15U;
-  mFlags |= static_cast<ymuint32>(type);
+  mFlags = kLOGIC | (fcode << kFcodeShift);
+}
+
+// @brief 入力タイプを設定する．
+// @note 副作用で入力ノードタイプに設定される．
+inline
+void
+BdnNode::set_input_type(tInputType type)
+{
+  mFlags = kINPUT | (static_cast<ymuint>(type) << kIsubShift);
+}
+
+// @brief 出力タイプを設定する．
+// @note 副作用で出力ノードタイプに設定される．
+inline
+void
+BdnNode::set_output_type(tOutputType type)
+{
+  mFlags = kOUTPUT | (static_cast<ymuint>(type) << kOsubShift);
 }
 
 // @brief 出力の極性を設定する．
 // @param[in] inv 極性
 inline
 void
-BdnNode::set_inv(bool inv)
+BdnNode::set_output_fanin_inv(bool inv)
 {
   if ( inv ) {
-    mFlags |= kInvMask;
+    mFlags |= kOInvMask;
   }
   else {
-    mFlags &= ~kInvMask;
+    mFlags &= ~kOInvMask;
   }
-}
-
-// 機能コードを設定する．
-inline
-void
-BdnNode::set_fcode(ymuint fcode)
-{
-  mFlags &= ~(15U << kFcodeShift);
-  mFlags |= (fcode << kFcodeShift);
 }
 
 END_NAMESPACE_YM_BDN

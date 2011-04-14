@@ -227,19 +227,6 @@ public:
   set_output_fanin(BdnNode* node,
 		   BdnNodeHandle inode_handle);
 
-  /// @brief 論理ノードを作る．
-  /// @param[in] fcode 機能コード
-  /// @param[in] inode1_handle 1番めの入力ノード+極性
-  /// @param[in] inode2_handle 2番めの入力ノード+極性
-  /// @return 作成したノードを返す．
-  /// @note fcode は2入力関数の真理値表ベクタ
-  /// @note fcode の出力極性を正規化する．
-  /// @note すでに構造的に同じノードがあればそれを返す．
-  BdnNodeHandle
-  new_logic(ymuint fcode,
-	    BdnNodeHandle inode1_handle,
-	    BdnNodeHandle inode2_handle);
-
   /// @brief AND ノードを作る．
   /// @param[in] inode1_handle 1番めの入力ノード+極性
   /// @param[in] inode2_handle 2番めの入力ノード+極性
@@ -260,7 +247,6 @@ public:
   /// @param[in] inode1_handle 1番めの入力ノード+極性
   /// @param[in] inode2_handle 2番めの入力ノード+極性
   /// @return 作成したノードを返す．
-  /// @note fcode の出力極性を正規化する．
   /// @note すでに構造的に同じノードがあればそれを返す．
   BdnNodeHandle
   new_nand(BdnNodeHandle inode1_handle,
@@ -337,18 +323,101 @@ public:
   BdnNodeHandle
   new_xnor(const vector<BdnNodeHandle>& inode_handle_list);
 
-  /// @brief 論理ノードの内容を変更する．
-  /// @param[in] node 変更対象の論理ノード
-  /// @param[in] fcode 機能コード
+  /// @brief AND タイプに変更する．
+  /// @param[in] node 対象のノード
   /// @param[in] inode1_handle 1番めの入力ノード+極性
   /// @param[in] inode2_handle 2番めの入力ノード+極性
-  /// @note fcode の出力極性を正規化する．
-  /// @note 実際には新しいノードを作ってそこへのリンクを内部で持つ．
   void
-  change_logic(BdnNode* node ,
-	       ymuint fcode,
-	       BdnNodeHandle inode1_handle,
-	       BdnNodeHandle inode2_handle);
+  change_and(BdnNode* node,
+	     BdnNodeHandle inode1_handle,
+	     BdnNodeHandle inode2_handle);
+
+  /// @brief AND タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  void
+  change_and(BdnNode* node,
+	     const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief NAND タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  void
+  change_nand(BdnNode* node,
+	     BdnNodeHandle inode1_handle,
+	     BdnNodeHandle inode2_handle);
+
+  /// @brief NAND タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  void
+  change_nand(BdnNode* node,
+	      const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief OR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  void
+  change_or(BdnNode* node,
+	    BdnNodeHandle inode1_handle,
+	    BdnNodeHandle inode2_handle);
+
+  /// @brief OR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  void
+  change_or(BdnNode* node,
+	    const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief NOR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  void
+  change_nor(BdnNode* node,
+	     BdnNodeHandle inode1_handle,
+	     BdnNodeHandle inode2_handle);
+
+  /// @brief NOR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  void
+  change_nor(BdnNode* node,
+	     const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief XOR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  void
+  change_xor(BdnNode* node,
+	     BdnNodeHandle inode1_handle,
+	     BdnNodeHandle inode2_handle);
+
+  /// @brief XOR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  void
+  change_xor(BdnNode* node,
+	     const vector<BdnNodeHandle>& inode_handle_list);
+
+  /// @brief XNOR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode1_handle 1番めの入力ノード+極性
+  /// @param[in] inode2_handle 2番めの入力ノード+極性
+  void
+  change_xnor(BdnNode* node,
+	      BdnNodeHandle inode1_handle,
+	      BdnNodeHandle inode2_handle);
+
+  /// @brief XNOR タイプに変更する．
+  /// @param[in] node 対象のノード
+  /// @param[in] inode_handle_list 入力ノード+極性のリスト
+  void
+  change_xnor(BdnNode* node,
+	      const vector<BdnNodeHandle>& inode_handle_list);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -386,13 +455,45 @@ private:
   void
   copy(const BdnMgr& src);
 
+  /// @brief AND のバランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  make_and_tree(BdnNode* node,
+		const vector<BdnNodeHandle>& node_list);
+
+  /// @brief OR のバランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  make_or_tree(BdnNode* node,
+	       const vector<BdnNodeHandle>& node_list);
+
+  /// @brief XOR のバランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  make_xor_tree(BdnNode* node,
+		const vector<BdnNodeHandle>& node_list);
+
   /// @brief バランス木を作る．
+  /// @param[in] node 根のノード
   /// @param[in] fcode 機能コード
   /// @param[in] start 開始位置
   /// @param[in] num 要素数
-  /// @param[in] node_list ノードのリスト
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  /// @note fcode の各ビットの意味は以下のとおり，
+  ///  - 0bit: ファンイン0の反転属性
+  ///  - 1bit: ファンイン1の反転属性
+  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+  ///  - 3bit: 出力の反転属性
   BdnNodeHandle
-  make_tree(ymuint fcode,
+  make_tree(BdnNode* node,
+	    ymuint fcode,
 	    ymuint start,
 	    ymuint num,
 	    const vector<BdnNodeHandle>& node_list);
@@ -403,7 +504,11 @@ private:
   /// @param[in] inode1_handle 1番めの入力ノード+極性
   /// @param[in] inode2_handle 2番めの入力ノード+極性
   /// @return ノード＋極性を返す．
-  /// @note fcode の出力極性を正規化する．
+  /// @note fcode の各ビットの意味は以下のとおり，
+  ///  - 0bit: ファンイン0の反転属性
+  ///  - 1bit: ファンイン1の反転属性
+  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+  ///  - 3bit: 出力の反転属性
   /// @note すでに構造的に同じノードがあればそれを返す．
   /// @note なければ node に設定する．
   /// @note node が NULL の場合，新しいノードを確保する．
@@ -412,6 +517,14 @@ private:
 	    ymuint fcode,
 	    BdnNodeHandle inode1_handle,
 	    BdnNodeHandle inode2_handle);
+
+  /// @brief 論理ノードの内容を変更する．
+  /// @param[in] node 変更対象の論理ノード
+  /// @param[in] new_handle 設定する新しいハンドル
+  /// @note node のファンアウト先の情報を書き換える．
+  void
+  change_logic(BdnNode* node ,
+	       BdnNodeHandle new_handle);
 
   /// @brief ノード間の接続を変更する．
   /// @param[in] from 接続の入力側のノード
@@ -641,79 +754,6 @@ const BdnNodeList&
 BdnMgr::lnode_list() const
 {
   return mLnodeList;
-}
-
-// @brief NAND ノードを作る．
-// @param[in] inode1_handle 1番めの入力ノード+極性
-// @param[in] inode2_handle 2番めの入力ノード+極性
-// @return 作成したノードを返す．
-// @note fcode の出力極性を正規化する．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nand(BdnNodeHandle inode1_handle,
-		 BdnNodeHandle inode2_handle)
-{
-  return ~new_and(inode1_handle, inode2_handle);
-}
-
-// @brief NAND ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~new_and(inode_handle_list);
-}
-
-// @brief NOR ノードを作る．
-// @param[in] inode1_handle 1番めの入力ノード+極性
-// @param[in] inode2_handle 2番めの入力ノード+極性
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nor(BdnNodeHandle inode1_handle,
-		BdnNodeHandle inode2_handle)
-{
-  return ~new_or(inode1_handle, inode2_handle);
-}
-
-// @brief NOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~new_or(inode_handle_list);
-}
-
-// @brief XNOR ノードを作る．
-// @param[in] inode1_handle 1番めの入力ノード+極性
-// @param[in] inode2_handle 2番めの入力ノード+極性
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_xnor(BdnNodeHandle inode1_handle,
-		 BdnNodeHandle inode2_handle)
-{
-  return ~new_xor(inode1_handle, inode2_handle);
-}
-
-// @brief XNOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~new_xor(inode_handle_list);
 }
 
 END_NAMESPACE_YM_BDN

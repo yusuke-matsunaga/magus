@@ -103,8 +103,8 @@ BdnDumper::operator()(ostream& s,
     const BdnNode* node = *p;
     assert_cond( node->is_input(), __FILE__, __LINE__);
     s << node->id_str() << ": ";
-    switch ( node->type() ) {
-    case BdnNode::kINPUT:
+    switch ( node->input_type() ) {
+    case BdnNode::kPRIMARY_INPUT:
       s << " PORT#" << node->port()->id();
       if ( node->port()->bit_width() > 1 ) {
 	s << "[" << node->port_bitpos() << "]";
@@ -133,12 +133,13 @@ BdnDumper::operator()(ostream& s,
     assert_cond( node->is_logic(), __FILE__, __LINE__);
     s << node->id_str();
     s << " :  = LOGIC[";
-    ymuint fcode = node->fcode();
-    s << ((fcode >> 3) & 1) << ((fcode >> 2) & 1)
-      << ((fcode >> 1) & 1) << (fcode & 1) << "] ("
-      << " " << node->fanin0()->id_str()
-      << ", " << node->fanin1()->id_str()
-      << ")" << endl;
+    const char* f0 = node->fanin0_inv() ? "~" : "";
+    const char* f1 = node->fanin1_inv() ? "~" : "";
+    const char* op = node->is_xor() ? "^" : "&";
+    s << f0 << node->fanin0()->id_str()
+      << " " << op << " "
+      << f1 << node->fanin1()->id_str()
+      << "]" << endl;
   }
 
   const BdnNodeList& output_list = network.output_list();
@@ -147,16 +148,16 @@ BdnDumper::operator()(ostream& s,
     const BdnNode* node = *p;
     assert_cond( node->is_output(), __FILE__, __LINE__);
     s << node->id_str() << ": ";
-    switch ( node->type() ) {
-    case BdnNode::kOUTPUT:
+    switch ( node->output_type() ) {
+    case BdnNode::kPRIMARY_OUTPUT:
       s << "PORT#" << node->port()->id();
       if ( node->port()->bit_width() > 1 ) {
 	s << "[" << node->port_bitpos() << "]";
       }
       break;
 
-    case BdnNode::kDFF_INPUT:
-      s << "INPUT@DFF#" << node->dff()->id();
+    case BdnNode::kDFF_DATA:
+      s << "DATA@DFF#" << node->dff()->id();
       break;
 
     case BdnNode::kDFF_CLOCK:
@@ -171,8 +172,8 @@ BdnDumper::operator()(ostream& s,
       s << "RESET@DFF#" << node->dff()->id();
       break;
 
-    case BdnNode::kLATCH_INPUT:
-      s << "INPUT@LATCH#" << node->latch()->id();
+    case BdnNode::kLATCH_DATA:
+      s << "DATA@LATCH#" << node->latch()->id();
       break;
 
     case BdnNode::kLATCH_ENABLE:

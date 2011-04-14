@@ -148,6 +148,7 @@ BdnNode::alt_node() const
       return port->input(pos);
     }
   }
+  return NULL;
 }
 
 // @brief 関連する D-FF を返す．

@@ -64,9 +64,8 @@ base_test()
   // new_logic() のテスト
 
   // 0 & 1 を作る．
-  BdnNodeHandle and11_h = network.new_logic(0x8,
-					    BdnNodeHandle(input0, false),
-					    BdnNodeHandle(input1, false));
+  BdnNodeHandle and11_h = network.new_and(BdnNodeHandle(input0, false),
+					  BdnNodeHandle(input1, false));
   if ( network.lnode_num() != 1 ) {
     cout << "ERROR[new_logic_test]: lnode_num() != 1" << endl;
     return false;
@@ -80,47 +79,58 @@ base_test()
     return false;
   }
   BdnNode* and11 = and11_h.node();
-  if ( and11->fcode() != 0x8 ) {
-    cout << "ERROR[new_logic_test]: and11->fcode() != 1000" << endl;
+  if ( !and11->is_and() ) {
+    cout << "ERROR[new_logic_test]: !and11->is_and()" << endl;
     return false;
   }
   if ( and11->fanin0() != input0 ) {
     cout << "ERROR[new_logic_test]: and11->fanin0() != input0" << endl;
     return false;
   }
+  if ( and11->fanin0_inv() ) {
+    cout << "ERROR[new_logic_test]: and11->fanin0_inv()" << endl;
+    return false;
+  }
   if ( and11->fanin1() != input1 ) {
     cout << "ERROR[new_logic_test]: and11->fanin1() != input1" << endl;
     return false;
   }
+  if ( and11->fanin1_inv() ) {
+    cout << "ERROR[new_logic_test]: and11->fanin1_inv()" << endl;
+    return false;
+  }
 
-  BdnNodeHandle and11_h2 = network.new_logic(0x4,
-					     BdnNodeHandle(input0, true),
-					     BdnNodeHandle(input1, false));
+  BdnNodeHandle and11_h2 = network.new_and(~BdnNodeHandle(input0, true),
+					   BdnNodeHandle(input1, false));
   if ( and11_h2 != and11_h ) {
     cout << "ERROR[new_logic_test]: and11_h2 != and11_h" << endl;
     return false;
   }
 
-  BdnNodeHandle and11_h3 = network.new_logic(0x2,
-					     BdnNodeHandle(input0, false),
-					     BdnNodeHandle(input1, true));
+  BdnNodeHandle and11_h3 = network.new_and(BdnNodeHandle(input0, false),
+					   ~BdnNodeHandle(input1, true));
   if ( and11_h3 != and11_h ) {
     cout << "ERROR[new_logic_test]: and11_h3 != and11_h" << endl;
     return false;
   }
 
-  BdnNodeHandle and11_h4 = network.new_logic(0x1,
-					     BdnNodeHandle(input0, true),
-					     BdnNodeHandle(input1, true));
+  BdnNodeHandle and11_h4 = network.new_and(~BdnNodeHandle(input0, true),
+					   ~BdnNodeHandle(input1, true));
   if ( and11_h4 != and11_h ) {
     cout << "ERROR[new_logic_test]: and11_h4 != and11_h" << endl;
     return false;
   }
 
+  BdnNodeHandle and11_h5 = network.new_and(BdnNodeHandle(input1, false),
+					   BdnNodeHandle(input0, false));
+  if ( and11_h5 != and11_h ) {
+    cout << "ERROR[new_logic_test]: and11_h5 != and11_h" << endl;
+    return false;
+  }
+
   // ~0 & 1 を作る．
-  BdnNodeHandle and01_h = network.new_logic(0x8,
-					    BdnNodeHandle(input0, true),
-					    BdnNodeHandle(input1, false));
+  BdnNodeHandle and01_h = network.new_and(BdnNodeHandle(input0, true),
+					  BdnNodeHandle(input1, false));
   if ( network.lnode_num() != 2 ) {
     cout << "ERROR[new_logic_test]: lnode_num() != 2" << endl;
     return false;
@@ -134,90 +144,89 @@ base_test()
     return false;
   }
   BdnNode* and01 = and01_h.node();
-  if ( and01->fcode() != 0x4 ) {
-    cout << "ERROR[new_logic_test]: and01->fcode() != 0100" << endl;
+  if ( !and01->is_and() ) {
+    cout << "ERROR[new_logic_test]: !and01->is_and()" << endl;
     return false;
   }
   if ( and01->fanin0() != input0 ) {
     cout << "ERROR[new_logic_test]: and01->fanin0() != input0" << endl;
     return false;
   }
+  if ( !and01->fanin0_inv() ) {
+    cout << "ERROR[new_logic_test]: !and01->fanin0_inv()" << endl;
+    return false;
+  }
   if ( and01->fanin1() != input1 ) {
     cout << "ERROR[new_logic_test]: and01->fanin1() != input1" << endl;
     return false;
   }
+  if ( and01->fanin1_inv() ) {
+    cout << "ERROR[new_logic_test]: and01->fanin1_inv()" << endl;
+    return false;
+  }
 
-  BdnNodeHandle and01_h2 = network.new_logic(0x4,
-					     BdnNodeHandle(input0, false),
-					     BdnNodeHandle(input1, false));
+  BdnNodeHandle and01_h2 = network.new_and(~BdnNodeHandle(input0, false),
+					   BdnNodeHandle(input1, false));
   if ( and01_h2 != and01_h ) {
     cout << "ERROR[new_logic_test]: and01_h2 != and01_h" << endl;
     return false;
   }
 
-  BdnNodeHandle and01_h3 = network.new_logic(0x1,
-					     BdnNodeHandle(input0, false),
-					     BdnNodeHandle(input1, true));
+  BdnNodeHandle and01_h3 = network.new_and(~BdnNodeHandle(input0, false),
+					   ~BdnNodeHandle(input1, true));
   if ( and01_h3 != and01_h ) {
     cout << "ERROR[new_logic_test]: and01_h3 != and01_h" << endl;
     return false;
   }
 
-  BdnNodeHandle and01_h4 = network.new_logic(0x2,
-					     BdnNodeHandle(input0, true),
-					     BdnNodeHandle(input1, true));
+  BdnNodeHandle and01_h4 = network.new_and(BdnNodeHandle(input0, true),
+					   ~BdnNodeHandle(input1, true));
   if ( and01_h4 != and01_h ) {
     cout << "ERROR[new_logic_test]: and01_h4 != and01_h" << endl;
     return false;
   }
 
   // 定数0との XOR
-  BdnNodeHandle tmp1_h = network.new_logic(0x6,
-					   BdnNodeHandle::make_zero(),
-					   and11_h);
+  BdnNodeHandle tmp1_h = network.new_xor(BdnNodeHandle::make_zero(),
+					 and11_h);
   if ( tmp1_h != and11_h ) {
     cout << "ERROR[new_logic_test]: tmp1_h != and11_h" << endl;
     return false;
   }
 
   // 定数1との XOR
-  BdnNodeHandle tmp2_h = network.new_logic(0x6,
-					   and11_h,
-					   BdnNodeHandle::make_one());
+  BdnNodeHandle tmp2_h = network.new_xor(and11_h,
+					 BdnNodeHandle::make_one());
   if ( tmp2_h != ~and11_h ) {
     cout << "ERROR[new_logic_test]: tmp2_h != ~and11_h" << endl;
     return false;
   }
 
   // 自分自身との AND
-  BdnNodeHandle tmp3_h = network.new_logic(0x8,
-					   and11_h, and11_h);
+  BdnNodeHandle tmp3_h = network.new_and(and11_h, and11_h);
   if ( tmp3_h != and11_h ) {
     cout << "ERROR[new_logic_test]: tmp3_h != and11_h" << endl;
     return false;
   }
 
   // 自分自身との XOR
-  BdnNodeHandle tmp4_h = network.new_logic(0x6,
-					   and11_h, and11_h);
+  BdnNodeHandle tmp4_h = network.new_xor(and11_h, and11_h);
   if ( tmp4_h != BdnNodeHandle::make_zero() ) {
     cout << "ERROR[new_logic_test]: tmp4_h != 0" << endl;
     return false;
   }
 
   // 定数0との AND
-  BdnNodeHandle tmp5_h = network.new_logic(0x8,
-					   BdnNodeHandle::make_zero(),
-					   and11_h);
+  BdnNodeHandle tmp5_h = network.new_and(BdnNodeHandle::make_zero(),
+					 and11_h);
   if ( tmp5_h != BdnNodeHandle::make_zero() ) {
     cout << "ERROR[new_logic_test]: tmp5_h != 0" << endl;
     return false;
   }
 
   // 定数1との AND
-  BdnNodeHandle tmp6_h = network.new_logic(0x8,
-					   and11_h,
-					   BdnNodeHandle::make_one());
+  BdnNodeHandle tmp6_h = network.new_and(and11_h,
+					 BdnNodeHandle::make_one());
   if ( tmp6_h != and11_h ) {
     cout << "ERROR[new_logic_test]: tmp6_h != and11_h" << endl;
     return false;

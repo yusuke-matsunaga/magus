@@ -167,14 +167,14 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
 	}
 	ymuint n = and_leaves.size();
 	assert_cond( n > 0, __FILE__, __LINE__);
-	or_leaves.push_back(bidecomp(0x8, 0, n, and_leaves));
+	or_leaves.push_back(mNetwork->new_and(and_leaves));
       }
       ymuint n = or_leaves.size();
       if ( n == 0 ) {
 	node_handle = BdnNodeHandle::make_one();
       }
       else {
-	node_handle = bidecomp(0xE, 0, n, or_leaves);
+	node_handle = mNetwork->new_or(or_leaves);
       }
     }
     else {
@@ -194,36 +194,19 @@ BlifBdnConv::make_node(const BlifNode* blif_node)
 	}
 	ymuint n = or_leaves.size();
 	assert_cond( n > 0, __FILE__, __LINE__);
-	and_leaves.push_back(bidecomp(0xE, 0, n, or_leaves));
+	and_leaves.push_back(mNetwork->new_or(or_leaves));
       }
       ymuint n = and_leaves.size();
       if ( n == 0 ) {
 	node_handle = BdnNodeHandle::make_zero();
       }
       else {
-	node_handle = bidecomp(0x8, 0, n, and_leaves);
+	node_handle = mNetwork->new_and(and_leaves);
       }
     }
     put_node(blif_node, node_handle);
   }
   return node_handle;
-}
-
-// @brief 2分木を生成する．
-BdnNodeHandle
-BlifBdnConv::bidecomp(ymuint fcode,
-		      ymuint start,
-		      ymuint size,
-		      const vector<BdnNodeHandle>& child_array)
-{
-  if ( size == 1 ) {
-    return child_array[start];
-  }
-  ymuint nl = size / 2;
-  BdnNodeHandle l = bidecomp(fcode, start, nl, child_array);
-  ymuint nr = size - nl;
-  BdnNodeHandle r = bidecomp(fcode, start + nl, nr, child_array);
-  return mNetwork->new_logic(fcode, l, r);
 }
 
 // @brief blif_node に対応した BdnNode を取り出す．

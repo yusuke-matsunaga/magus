@@ -163,62 +163,14 @@ BdnBlifWriter::operator()(ostream& s,
     s << ".names " << name_array[node->fanin(0)->id()]
       << " " << name_array[node->fanin(1)->id()]
       << " " << name_array[node->id()] << endl;
-    switch ( node->fcode() ) {
-    case 0x0: // 0000
-    case 0x3: // 0011
-    case 0x5: // 0101
-    case 0xa: // 1010
-    case 0xc: // 1100
-    case 0xf: // 1111
-      // 定数関数や1入力関数は現れないはず．
-      assert_not_reached(__FILE__, __LINE__);
-      break;
-
-    case 0x1: // 0001 = ~x0 & ~x1
-      s << "00 1" << endl;
-      break;
-
-    case 0x2: // 0010 =  x0 & ~x1
-      s << "10 1" << endl;
-      break;
-
-    case 0x4: // 0100 = ~x0 &  x1
-      s << "01 1" << endl;
-      break;
-
-    case 0x6: // 0110 =  x0 ^  x1
-      s << "10 1" << endl
-	<< "01 1" << endl;
-      break;
-
-    case 0x7: // 0111 = ~x0 | ~x1
-      s << "0- 1" << endl
-	<< "-0 1" << endl;
-      break;
-
-    case 0x8: // 1000 =  x0 &  x1
-      s << "11 1" << endl;
-      break;
-
-    case 0x9: // 1001 = ~(x0 ^ x1)
+    if ( node->is_xor() ) {
       s << "00 1" << endl
 	<< "11 1" << endl;
-      break;
-
-    case 0xb: // 1011 =  x0 | ~x1
-      s << "1- 1" << endl
-	<< "-0 1" << endl;
-      break;
-
-    case 0xd: // 1101 = ~x0 |  x1
-      s << "0- 1" << endl
-	<< "-1 1" << endl;
-      break;
-
-    case 0xe: // 1110 =  x0 |  x1
-      s << "1- 1" << endl
-	<< "-1 1" << endl;
-      break;
+    }
+    else {
+      char f0 = node->fanin0_inv() ? '0' : '1';
+      char f1 = node->fanin1_inv() ? '0' : '1';
+      s << f0 << f1 << " 1" << endl;
     }
     s << endl;
   }

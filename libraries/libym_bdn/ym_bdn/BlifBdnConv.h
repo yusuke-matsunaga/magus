@@ -55,13 +55,6 @@ private:
   BdnNodeHandle
   make_node(const BlifNode* blif_node);
 
-  /// @brief 2分木を生成する．
-  BdnNodeHandle
-  bidecomp(ymuint fcode,
-	   ymuint start,
-	   ymuint size,
-	   const vector<BdnNodeHandle>& child_array);
-
   /// @brief blif_node に対応した BdnNode を取り出す．
   bool
   get_node(const BlifNode* blif_node,
