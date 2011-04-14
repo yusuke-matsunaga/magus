@@ -70,7 +70,7 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  area_map(sbjgraph(), pat_mgr(), 0, cngraph());
+  techmap().area_map(sbjgraph(), 0, cngraph());
 
   return TCL_OK;
 }

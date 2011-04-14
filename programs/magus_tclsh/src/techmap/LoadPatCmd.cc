@@ -52,7 +52,7 @@ LoadPatCmd::cmd_proc(TclObjVector& objv)
       set_result(emsg);
       return TCL_ERROR;
     }
-    if ( !pat_mgr().load(is) ) {
+    if ( !techmap().load_library(is) ) {
       TclObj emsg;
       emsg << "Error occured in reading " << filename;
       set_result(emsg);

@@ -223,7 +223,7 @@ MvnMgr::new_xor(MvnModule* module,
 		ymuint input_num,
 		ymuint bit_width)
 {
-  MvnNode* node = new_log_op(module, MvnNode::kOr,
+  MvnNode* node = new_log_op(module, MvnNode::kXor,
 			     input_num, bit_width);
   return node;
 }

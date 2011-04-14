@@ -39,13 +39,13 @@ MvnConstBitSelect::bitpos() const
 
 // @brief bit-selectノードを生成する．
 // @param[in] module ノードが属するモジュール
-// @param[in] bit_width ビット幅
 // @param[in] bitpos ビット位置
+// @param[in] bit_width ビット幅
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_constbitselect(MvnModule* module,
-			   ymuint bit_width,
-			   ymuint bitpos)
+			   ymuint bitpos,
+			   ymuint bit_width)
 {
   MvnNode* node = new MvnConstBitSelect(module, bitpos);
   reg_node(node);

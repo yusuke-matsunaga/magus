@@ -12,8 +12,8 @@
 #include "ym_bnet/BNetDecomp.h"
 #include "ym_bnet/BNet2Sbj.h"
 #include "ym_sbj/SbjGraph.h"
+#include "ym_techmap/TechMap.h"
 #include "ym_techmap/CnGraph.h"
-#include "ym_techmap/PatMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -39,7 +39,8 @@ void
 test(string pat_filename,
      string sbj_filename)
 {
-  PatMgr pat_mgr;
+  TechMap mapper;
+
   {
     ifstream ifs;
     ifs.open(pat_filename.c_str(), ios::binary);
@@ -49,7 +50,11 @@ test(string pat_filename,
       return;
     }
 
-    pat_mgr.load(ifs);
+    if ( !mapper.load_library(ifs) ) {
+      // エラー
+      cerr << "Error occured during load_library()" << endl;
+      return;
+    }
   }
 
   SbjGraph sbjgraph;
@@ -80,9 +85,9 @@ test(string pat_filename,
 
   CnGraph mapnetwork;
 
-  area_map(sbjgraph, pat_mgr, 0, mapnetwork);
+  mapper.area_map(sbjgraph, 0, mapnetwork);
 
-#if 0
+#if 1
   dump_verilog(cout, mapnetwork);
 #else
   dump_spice(cout, mapnetwork);

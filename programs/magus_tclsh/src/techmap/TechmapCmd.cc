@@ -37,11 +37,11 @@ TechmapCmd::~TechmapCmd()
 {
 }
 
-// @brief PatMgr を得る．
-PatMgr&
-TechmapCmd::pat_mgr()
+// @brief TechMap を得る．
+TechMap&
+TechmapCmd::techmap()
 {
-  return mData->mPatMgr;
+  return mData->mTechMap;
 }
 
 // @brief SbjGraph を得る．

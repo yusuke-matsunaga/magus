@@ -12,7 +12,7 @@
 
 
 #include "MagCmd.h"
-#include "ym_techmap/PatMgr.h"
+#include "ym_techmap/TechMap.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_techmap/CnGraph.h"
 
@@ -36,8 +36,8 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 struct TechmapData
 {
-  // パタンマネージャ
-  PatMgr mPatMgr;
+  // テクノロジマッパー
+  TechMap mTechMap;
 
   // サブジェクトグラフ
   SbjGraph mSbjGraph;
@@ -68,9 +68,9 @@ public:
 
 protected:
 
-  /// @brief PatMgr を得る．
-  PatMgr&
-  pat_mgr();
+  /// @brief TechMap を得る．
+  TechMap&
+  techmap();
 
   /// @brief SbjGraph を得る．
   SbjGraph&

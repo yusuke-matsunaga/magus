@@ -57,9 +57,9 @@ MvnConstPartSelect::lsb() const
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_constpartselect(MvnModule* module,
-			    ymuint bit_width,
 			    ymuint msb,
-			    ymuint lsb)
+			    ymuint lsb,
+			    ymuint bit_width)
 {
   MvnNode* node = new MvnConstPartSelect(module, msb, lsb);
   reg_node(node);

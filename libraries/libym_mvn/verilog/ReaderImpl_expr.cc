@@ -98,8 +98,8 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       ymuint bitpos = decl->bit_offset(expr->index_val());
       const MvnOutputPin* pin = node->output(0);
       MvnNode* node1 = mMvnMgr->new_constbitselect(parent_module,
-						 bitpos,
-						 pin->bit_width());
+						   bitpos,
+						   pin->bit_width());
       assert_cond( node, __FILE__, __LINE__);
       mMvnMgr->connect(node, 0, node1, 0);
       return node1;
@@ -110,8 +110,8 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       const MvnOutputPin* pin0 = node->output(0);
       const MvnOutputPin* pin1 = node1->output(0);
       MvnNode* node2 = mMvnMgr->new_bitselect(parent_module,
-					    pin0->bit_width(),
-					    pin1->bit_width());
+					      pin0->bit_width(),
+					      pin1->bit_width());
       mMvnMgr->connect(node, 0, node2, 0);
       mMvnMgr->connect(node1, 0, node2, 1);
       return node2;
@@ -124,8 +124,8 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       ymuint lsb = decl->bit_offset(expr->right_range_val());
       const MvnOutputPin* pin = node->output(0);
       MvnNode* node1 = mMvnMgr->new_constpartselect(parent_module,
-						  msb, lsb,
-						  pin->bit_width());
+						    msb, lsb,
+						    pin->bit_width());
       mMvnMgr->connect(node, 0, node1, 0);
       return node1;
     }
