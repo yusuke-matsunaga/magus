@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # $Id: mk.subr 2507 2009-10-17 16:24:02Z matsunaga $
-# 
+#
 # Copyright (C) 2005-2010 Yusuke Matsunaga
 # All rights reserved
 
@@ -29,11 +29,11 @@ clean() {
 # 生成されるファイルを指定しているのでツールのバージョンが上がると
 # 変更しなければならないかも
 clean_config() {
-    echo "Cleaning config files in $1 ..." | tee -a $MK_LOG
+    echo "Cleaning config files in $1/config ..." | tee -a $MK_LOG
     for file in config.guess config.sub install-sh ltconfig ltmain.sh \
 	missing mkinstalldirs stamp-h.in depcomp ylwrap \
 	ltsugar.m4 libtool.m4 ltversion.m4 lt~obsolete.m4 ltoptions.m4; do
-	$RM -r -f $1/$file 2>> $MK_LOG
+	$RM -r -f $1/config/$file 2>> $MK_LOG
     done
     echo "  done" | tee -a $MK_LOG
 }
@@ -219,4 +219,4 @@ display_version() {
     echo "----"
     $LIBTOOLIZE --version
     echo "----"
-} 
+}
