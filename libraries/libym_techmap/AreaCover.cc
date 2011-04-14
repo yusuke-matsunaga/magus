@@ -8,6 +8,7 @@
 
 
 #include "AreaCover.h"
+#include "ym_bdn/BdnMgr.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_cell/Cell.h"
 #include "PatMgr.h"
@@ -39,7 +40,7 @@ AreaCover::~AreaCover()
 // @param[in] pat_mgr パタングラフを管理するオブジェクト
 // @param[out] mapnetwork マッピング結果
 void
-AreaCover::operator()(const SbjGraph& sbjgraph,
+AreaCover::operator()(const BdnMgr& sbjgraph,
 		      const PatMgr& pat_mgr,
 		      CnGraph& mapnetwork)
 {
@@ -59,7 +60,7 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 // @param[in] pat_mgr パタングラフを管理するオブジェクト
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const SbjGraph& sbjgraph,
+AreaCover::record_cuts(const BdnMgr& sbjgraph,
 		       const PatMgr& patmgr,
 		       MapRecord& maprec)
 {
@@ -75,20 +76,10 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   const FuncGroup& inv_func = patmgr.inv_func();
 
   // 入力のコストを設定
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
+  const BdnNodeList& input_list = sbjgraph.input_list();
+  for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    double& p_cost = cost(node, false);
-    p_cost = 0.0;
-    double& n_cost = cost(node, true);
-    n_cost = DBL_MAX;
-    add_inv(node, true, inv_func, maprec);
-  }
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     double& p_cost = cost(node, false);
     p_cost = 0.0;
     double& n_cost = cost(node, true);
@@ -99,11 +90,11 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   // 論理ノードのコストを入力側から計算
   PatMatcher pat_match(patmgr);
   ymuint np = patmgr.pat_num();
-  vector<const SbjNode*> snode_list;
+  vector<BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
+  for (vector<BdnNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
 
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
@@ -124,7 +115,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	  for (ymuint i = 0; i < ni; ++ i) {
 	    tNpnImap imap = npn_map.imap(i);
 	    ymuint pos = npnimap_pos(imap);
-	    const SbjNode* inode = pat_match.leaf_node(pos);
+	    const BdnNode* inode = pat_match.leaf_node(pos);
 	    bool iinv = pat_match.leaf_inv(pos);
 	    if ( npnimap_pol(imap) == kPolNega ) {
 	      iinv = !iinv;
@@ -151,7 +142,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	    const Cell* cell = func.cell(c_pos);
 	    double cur_cost = cell->area().value();
 	    for (ymuint i = 0; i < ni; ++ i) {
-	      const SbjNode* leaf_node = c_match.leaf_node(i);
+	      const BdnNode* leaf_node = c_match.leaf_node(i);
 	      bool leaf_inv = c_match.leaf_inv(i);
 	      cur_cost += cost(leaf_node, leaf_inv) * mWeight[i];
 	    }
@@ -181,7 +172,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 // @param[in] inv 極性
 // @param[in] inv_func インバータの関数グループ
 void
-AreaCover::add_inv(const SbjNode* node,
+AreaCover::add_inv(const BdnNode* node,
 		   bool inv,
 		   const FuncGroup& inv_func,
 		   MapRecord& maprec)
@@ -211,7 +202,7 @@ AreaCover::add_inv(const SbjNode* node,
 
 // @brief node から各入力にいたる経路の重みを計算する．
 void
-AreaCover::calc_weight(const SbjNode* node,
+AreaCover::calc_weight(const BdnNode* node,
 		       double cur_weight)
 {
   for ( ; ; ) {
@@ -225,7 +216,7 @@ AreaCover::calc_weight(const SbjNode* node,
     }
     assert_cond( !node->is_input(), __FILE__, __LINE__);
 
-    const SbjNode* inode0 = node->fanin(0);
+    const BdnNode* inode0 = node->fanin(0);
     double cur_weight0 = cur_weight / inode0->fanout_num();
     calc_weight(inode0, cur_weight0);
     node = node->fanin(1);

@@ -68,7 +68,7 @@ TechMap::dump_library(ostream& s,
 //  - 3: weighted フロー, resub あり
 // @param[out] mapnetwork マッピング結果
 void
-TechMap::area_map(const SbjGraph& sbjgraph,
+TechMap::area_map(const BdnMgr& sbjgraph,
 		  ymuint mode,
 		  CnGraph& mapnetwork)
 {

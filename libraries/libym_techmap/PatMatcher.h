@@ -5,11 +5,12 @@
 /// @brief PatMatcher のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_techmap/techmap_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
@@ -41,7 +42,7 @@ public:
   /// @retval true マッチした．
   /// @retval false マッチしなかった．
   bool
-  operator()(const SbjNode* sbj_root,
+  operator()(const BdnNode* sbj_root,
 	     const PatGraph& pat_graph);
 
   /// @brief 直前のマッチングにおける出力の極性を得る．
@@ -52,7 +53,7 @@ public:
 
   /// @brief 直前のマッチングにおける入力のノードを得る．
   /// @param[in] pos 入力番号
-  const SbjNode*
+  const BdnNode*
   leaf_node(ymuint pos) const;
 
   /// @brief 直前のマッチングにおける入力の極性を得る．
@@ -75,7 +76,7 @@ private:
   /// @retval true バインドが成功した．
   /// @retval false バインドが失敗した．
   bool
-  bind(const SbjNode* sbj_node,
+  bind(const BdnNode* sbj_node,
        ymuint pat_id,
        bool inv);
 
@@ -89,7 +90,7 @@ private:
   const PatMgr& mPatMgr;
 
   // パタンノードの ID をキーとしてサブジェクトノードを入れる配列
-  vector<const SbjNode*> mSbjMap;
+  vector<const BdnNode*> mSbjMap;
 
   // サブジェクトノードの ID をキーとしてパタンノードの ID を
   // 入れる配列
@@ -102,7 +103,7 @@ private:
   vector<ymuint> mClearQueue;
 
   // 直前のマッチングにおけるパタンの入力ノードを記録する配列
-  vector<const SbjNode*> mLeafNodeArray;
+  vector<const BdnNode*> mLeafNodeArray;
 
   // 直前のマッチングにおけるパタンの入力の極性を記録する配列
   vector<bool> mLeafInvArray;
@@ -117,7 +118,7 @@ private:
 // @brief 直前のマッチングにおける入力のノードを得る．
 // @param[in] pos 入力番号
 inline
-const SbjNode*
+const BdnNode*
 PatMatcher::leaf_node(ymuint pos) const
 {
   return mLeafNodeArray[pos];

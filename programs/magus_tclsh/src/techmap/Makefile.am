@@ -17,14 +17,10 @@ noinst_LTLIBRARIES = libmagus_techmap_tcl.la
 libmagus_techmap_tcl_la_SOURCES = \
 	AreaMapCmd.h \
 	AreaMapCmd.cc \
-	Conv2SbjCmd.h \
-	Conv2SbjCmd.cc \
 	DumpCnCmd.h \
 	DumpCnCmd.cc \
 	DumpPatCmd.h \
 	DumpPatCmd.cc \
-	DumpSbjCmd.h \
-	DumpSbjCmd.cc \
 	LoadPatCmd.h \
 	LoadPatCmd.cc \
 	TechmapCmd.h \
@@ -32,7 +28,6 @@ libmagus_techmap_tcl_la_SOURCES = \
 
 libmagus_techmap_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_mvnbdnconv/libym_mvnbdnconv.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_mvn/libym_mvn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \

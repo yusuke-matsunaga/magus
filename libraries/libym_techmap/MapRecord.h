@@ -39,7 +39,7 @@ public:
   /// @brief @brief 作業領域を初期化する．
   /// @param[in] sbjgraph サブジェクトグラフ
   void
-  init(const SbjGraph& sbjgraph);
+  init(const BdnMgr& sbjgraph);
 
   /// @brief マッチの情報だけコピーする．
   void
@@ -51,7 +51,7 @@ public:
   /// @param[in] match 対応するマッチ
   /// @param[in] cell セル
   void
-  set_match(const SbjNode* node,
+  set_match(const BdnNode* node,
 	    bool inv,
 	    const Match& match,
 	    const Cell* cell);
@@ -61,7 +61,7 @@ public:
   /// @param[in] inv 極性
   /// @param[in] cell セル
   void
-  set_inv_match(const SbjNode* node,
+  set_inv_match(const BdnNode* node,
 		bool inv,
 		const Cell* cell);
 
@@ -69,7 +69,7 @@ public:
   /// @param[in] node 該当のノード
   /// @param[in] inv
   const Match&
-  get_match(const SbjNode* node,
+  get_match(const BdnNode* node,
 	    bool inv);
 
   /// @brief マッピング結果を CnGraph にセットする．
@@ -78,7 +78,7 @@ public:
   /// @param[in] const1_cell 定数1のセル
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
   void
-  gen_mapgraph(const SbjGraph& sbjgraph,
+  gen_mapgraph(const BdnMgr& sbjgraph,
 	       const Cell* const0_cell,
 	       const Cell* const1_cell,
 	       CnGraph& mapgraph);
@@ -91,7 +91,7 @@ private:
 
   // 最終結果を作るためのバックトレースを行う．
   CnNode*
-  back_trace(const SbjNode* node,
+  back_trace(const BdnNode* node,
 	     bool inv,
 	     CnGraph& mapnetwork);
 
@@ -123,7 +123,7 @@ private:
 
   /// @brief NodeInfo を取り出す．
   NodeInfo&
-  node_info(const SbjNode* node,
+  node_info(const BdnNode* node,
 	    bool inv);
 
 

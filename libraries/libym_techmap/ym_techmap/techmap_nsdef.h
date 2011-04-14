@@ -7,12 +7,11 @@
 ///
 /// $Id: lutmap.h 555 2007-04-08 07:20:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ymtools.h"
-#include "ym_sbj/sbj_nsdef.h"
 #include "ym_utils/DlList.h"
 
 

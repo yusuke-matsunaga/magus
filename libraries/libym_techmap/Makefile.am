@@ -36,7 +36,7 @@ libym_techmap_la_SOURCES = \
 
 libym_techmap_la_LIBADD = \
 	patgen/libym_techmap_patgen.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

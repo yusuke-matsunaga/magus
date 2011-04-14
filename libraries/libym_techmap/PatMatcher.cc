@@ -3,12 +3,12 @@
 /// @brief PatMatcher の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PatMatcher.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnNode.h"
 #include "PatMgr.h"
 #include "PatGraph.h"
 #include "Match.h"
@@ -38,9 +38,9 @@ PatMatcher::~PatMatcher()
 // @param[out] match マッチング結果
 // @retval true マッチした．
 // @retval false マッチしなかった．
-// @note input_map の中身は (SbjNode->i() << 1) | pol
+// @note input_map の中身は (BdnNode->id() << 1) | pol
 bool
-PatMatcher::operator()(const SbjNode* sbj_root,
+PatMatcher::operator()(const BdnNode* sbj_root,
 		       const PatGraph& pat_graph)
 {
   // 根のノードを調べる．
@@ -78,8 +78,8 @@ PatMatcher::operator()(const SbjNode* sbj_root,
     ymuint to_id = mPatMgr.edge_to(edge_id);
     ymuint from_id = mPatMgr.edge_from(edge_id);
     ymuint f_pos = mPatMgr.edge_pos(edge_id);
-    const SbjNode* to_node = mSbjMap[to_id];
-    const SbjNode* from_node = to_node->fanin(f_pos);
+    const BdnNode* to_node = mSbjMap[to_id];
+    const BdnNode* from_node = to_node->fanin(f_pos);
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
     switch ( mPatMgr.node_type(from_id) ) {
@@ -151,7 +151,7 @@ PatMatcher::operator()(const SbjNode* sbj_root,
 // @retval true バインドが成功した．
 // @retval false バインドが失敗した．
 bool
-PatMatcher::bind(const SbjNode* sbj_node,
+PatMatcher::bind(const BdnNode* sbj_node,
 		 ymuint pat_id,
 		 bool inv)
 {

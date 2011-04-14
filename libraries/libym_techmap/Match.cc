@@ -3,11 +3,12 @@
 /// @brief Match の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Match.h"
+#include "ym_bdn/BdnNode.h"
 #include "ym_npn/NpnMap.h"
 
 
@@ -24,7 +25,7 @@ Match::Match(ymuint nl) :
   mInvArray(0U)
 {
   if ( nl > 0 ) {
-    mLeafArray = new const SbjNode*[nl];
+    mLeafArray = new const BdnNode*[nl];
   }
   else {
     mLeafArray = NULL;
@@ -37,7 +38,7 @@ Match::Match(const Match& src) :
   mInvArray(src.mInvArray)
 {
   if ( mLeafNum > 0 ) {
-    mLeafArray = new const SbjNode*[mLeafNum];
+    mLeafArray = new const BdnNode*[mLeafNum];
     for (ymuint i = 0; i < mLeafNum; ++ i) {
       mLeafArray[i] = src.mLeafArray[i];
     }

@@ -13,7 +13,6 @@
 
 #include "MagCmd.h"
 #include "ym_techmap/TechMap.h"
-#include "ym_sbj/SbjGraph.h"
 #include "ym_techmap/CnGraph.h"
 
 
@@ -38,9 +37,6 @@ struct TechmapData
 {
   // テクノロジマッパー
   TechMap mTechMap;
-
-  // サブジェクトグラフ
-  SbjGraph mSbjGraph;
 
   // セルネットワーク
   CnGraph mCnGraph;
@@ -71,10 +67,6 @@ protected:
   /// @brief TechMap を得る．
   TechMap&
   techmap();
-
-  /// @brief SbjGraph を得る．
-  SbjGraph&
-  sbjgraph();
 
   /// @brief セルネットワークを得る．
   CnGraph&

@@ -5,11 +5,12 @@
 /// @brief Match のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_techmap/techmap_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 #include "ym_npn/npn_nsdef.h"
 
 
@@ -54,7 +55,7 @@ public:
   /// @param[in] leaf_inv 葉の極性
   void
   set_leaf(ymuint pos,
-	   const SbjNode* leaf_node,
+	   const BdnNode* leaf_node,
 	   bool leaf_inv);
 
 
@@ -69,7 +70,7 @@ public:
 
   /// @brief 葉のノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
-  const SbjNode*
+  const BdnNode*
   leaf_node(ymuint pos) const;
 
   /// @brief 葉の極性を得る．
@@ -87,7 +88,7 @@ private:
   ymuint32 mLeafNum;
 
   // 葉のノードの配列
-  const SbjNode** mLeafArray;
+  const BdnNode** mLeafArray;
 
   // 根と葉の極性をパックしたもの
   ymuint32 mInvArray;
@@ -107,7 +108,7 @@ Match::resize(ymuint nl)
   if ( mLeafNum != nl ) {
     delete [] mLeafArray;
     mLeafNum = nl;
-    mLeafArray = new const SbjNode*[nl];
+    mLeafArray = new const BdnNode*[nl];
   }
   mInvArray = 0U;
 }
@@ -119,7 +120,7 @@ Match::resize(ymuint nl)
 inline
 void
 Match::set_leaf(ymuint pos,
-		const SbjNode* leaf_node,
+		const BdnNode* leaf_node,
 		bool leaf_inv)
 {
   assert_cond( pos < leaf_num(), __FILE__, __LINE__);
@@ -138,7 +139,7 @@ Match::leaf_num() const
 // @brief 葉のノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
 inline
-const SbjNode*
+const BdnNode*
 Match::leaf_node(ymuint pos) const
 {
   return mLeafArray[pos];

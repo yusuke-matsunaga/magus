@@ -10,6 +10,7 @@
 
 
 #include "ym_techmap/techmap_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
 
 
@@ -59,7 +60,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 面積最小化 DAG covering のヒューリスティック関数
-  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] sbjgraph サブジェクトグラフを表す Bdn
   /// @param[in] mode モード
   ///  - 0: fanout フロー, resub なし
   ///  - 1: weighted フロー, resub なし
@@ -67,7 +68,7 @@ public:
   ///  - 3: weighted フロー, resub あり
   /// @param[out] mapnetwork マッピング結果
   void
-  area_map(const SbjGraph& sbjgraph,
+  area_map(const BdnMgr& sbjgraph,
 	   ymuint mode,
 	   CnGraph& mapnetwork);
 

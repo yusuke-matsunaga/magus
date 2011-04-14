@@ -12,6 +12,11 @@
 #include "AreaMapCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
+#include "ym_mvn/MvnMgr.h"
+#include "ym_bdn/BdnMgr.h"
+#include "ym_mvnbdnconv/MvnBdnConv.h"
+#include "ym_mvnbdnconv/MvnBdnMap.h"
+
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
 
@@ -70,7 +75,26 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  techmap().area_map(sbjgraph(), 0, cngraph());
+  NetHandle* neth = cur_nethandle();
+  switch ( neth->type() ) {
+  case NetHandle::kMagBNet:
+    break;
+
+  case NetHandle::kMagBdn:
+    techmap().area_map(*neth->bdn(), 0, cngraph());
+    break;
+
+  case NetHandle::kMagMvn:
+    {
+      const MvnMgr& mvn = *neth->mvn();
+      MvnBdnConv conv;
+      BdnMgr tmp_network;
+      MvnBdnMap mvnode_map(mvn.max_node_id());
+      conv(mvn, tmp_network, mvnode_map);
+      techmap().area_map(tmp_network, 0, cngraph());
+    }
+    break;
+  }
 
   return TCL_OK;
 }

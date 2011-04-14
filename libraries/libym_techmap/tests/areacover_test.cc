@@ -3,15 +3,14 @@
 /// @brief AreaCover のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_bnet/BNetwork.h"
-#include "ym_bnet/BNetBlifReader.h"
-#include "ym_bnet/BNetDecomp.h"
-#include "ym_bnet/BNet2Sbj.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_blif/BlifNetwork.h"
+#include "ym_blif/BlifNetworkReader.h"
+#include "ym_bdn/BdnMgr.h"
+#include "ym_bdn/BlifBdnConv.h"
 #include "ym_techmap/TechMap.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_utils/MsgHandler.h"
@@ -57,28 +56,24 @@ test(string pat_filename,
     }
   }
 
-  SbjGraph sbjgraph;
+  BdnMgr sbjgraph;
   {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    BNetBlifReader reader;
+    BlifNetworkReader reader;
 
     reader.add_msg_handler(msg_handler);
 
-    BNetwork network;
+    BlifNetwork blif_network;
 
-    if ( !reader.read(sbj_filename, network) ) {
+    if ( !reader.read(sbj_filename, blif_network) ) {
       cerr << "Error in reading " << sbj_filename << endl;
       return;
     }
 
-    BNetDecomp decomp;
-
-    decomp(network, 2);
-
-    BNet2Sbj bnet2sbj;
-
-    if ( !bnet2sbj(network, sbjgraph, cerr) ) {
-      cerr << "Error occured in BNet2Sbj()" << endl;
+    BlifBdnConv conv;
+    bool stat = conv(blif_network, sbjgraph);
+    if ( !stat ) {
+      cerr << "Error in converting form BlifNetwork to BdnMgr" << endl;
       return;
     }
   }
