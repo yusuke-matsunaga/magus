@@ -5,7 +5,7 @@
 ///
 /// $Id: AreaMapCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,6 +13,8 @@
 #include "ym_tclpp/TclPopt.h"
 
 #include "ym_lutmap/LutMap.h"
+
+#include "ym_bnetbdnconv/BNetBdnConv.h"
 
 #include "ym_mvn/MvnMgr.h"
 #include "ym_bdn/BdnMgr.h"
@@ -91,6 +93,13 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
   case NetHandle::kMagBNet:
+    {
+      BNetBdnConv conv;
+
+      BdnMgr tmp_network;
+      conv(*neth->bnetwork(), tmp_network);
+      lutmap.area_map(tmp_network, limit, mode, lutnetwork(), lut_num, depth);
+    }
     break;
 
   case NetHandle::kMagBdn:
