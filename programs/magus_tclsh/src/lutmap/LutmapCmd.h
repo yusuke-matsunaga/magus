@@ -12,7 +12,6 @@
 
 
 #include "MagCmd.h"
-#include "ym_sbj/SbjGraph.h"
 #include "ym_lutmap/LnGraph.h"
 
 
@@ -24,9 +23,6 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 struct LutmapData
 {
-
-  // サブジェクトグラフ
-  SbjGraph mSbjGraph;
 
   // LUTネットワーク
   LnGraph mLutNetwork;
@@ -54,10 +50,6 @@ public:
 
 protected:
 
-  /// @brief SbjGraph を得る．
-  SbjGraph&
-  sbjgraph();
-
   /// @brief LutNetwork を得る．
   LnGraph&
   lutnetwork();
@@ -69,34 +61,6 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   LutmapData* mData;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class Conv2SbjCmd LutmapCmd "LutmapCmd.h"
-/// @brief BNetwork から SbjGraph に変換するコマンド
-//////////////////////////////////////////////////////////////////////
-class Conv2SbjCmd :
-  public LutmapCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  Conv2SbjCmd(MagMgr* mgr,
-	      LutmapData* data);
-
-  /// @brief デストラクタ
-  virtual
-  ~Conv2SbjCmd();
-
-
-protected:
-
-  /// @brief コマンドを実行する仮想関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
 
 };
 
@@ -125,46 +89,6 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class DumpSbjCmd LutmapCmd "LutmapCmd.h"
-/// @brief SbjGraph の内容をダンプするコマンド
-//////////////////////////////////////////////////////////////////////
-class DumpSbjCmd :
-  public LutmapCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  DumpSbjCmd(MagMgr* mgr,
-	     LutmapData* data);
-
-  /// @brief デストラクタ
-  virtual
-  ~DumpSbjCmd();
-
-
-protected:
-
-  /// @brief コマンドを実行する仮想関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // blif オプションの解析用オブジェクト
-  TclPopt* mPoptBlif;
-
-  // verilog オプションの解析用オブジェクト
-  TclPopt* mPoptVerilog;
 
 };
 

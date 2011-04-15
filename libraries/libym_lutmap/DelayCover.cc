@@ -10,7 +10,7 @@
 
 
 #include "DelayCover.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnMgr.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
@@ -41,7 +41,7 @@ DelayCover::~DelayCover()
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-DelayCover::operator()(const SbjGraph& sbjgraph,
+DelayCover::operator()(const BdnMgr& sbjgraph,
 		       ymuint limit,
 		       ymuint slack,
 		       ymuint mode,
@@ -73,14 +73,14 @@ DelayCover::operator()(const SbjGraph& sbjgraph,
 // @param[in] slack 最小段数に対するスラック
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-DelayCover::record_cuts(const SbjGraph& sbjgraph,
+DelayCover::record_cuts(const BdnMgr& sbjgraph,
 			ymuint limit,
 			ymuint slack,
 			MapRecord& maprec)
 {
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
+  const BdnNodeList& input_list = sbjgraph.input_list();
+  const BdnNodeList& output_list = sbjgraph.output_list();
+
   ymuint n = sbjgraph.max_node_id();
 
   maprec.init(sbjgraph);
@@ -95,52 +95,31 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   mIcostLists.resize(limit);
 
   // 入力のコストの設定
-  for (SbjNodeList::const_iterator p = input_list.begin();
+  for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    NodeInfo& t = mNodeInfo[node->id()];
-    t.mCostList.insert(NULL, 0, 0.0);
-    t.mMinDepth = 0;
-  }
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     NodeInfo& t = mNodeInfo[node->id()];
     t.mCostList.insert(NULL, 0, 0.0);
     t.mMinDepth = 0;
   }
 
   // 各ノードごとにカットを記録
-  vector<const SbjNode*> snode_list;
+  vector<BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
+  for (vector<BdnNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     record(node);
   }
 
   // 最小段数の最大値をもとめる．
-  vector<const SbjNode*> onode_list;
-  onode_list.reserve(output_list.size() + dff_list.size());
+  vector<const BdnNode*> onode_list;
+  onode_list.reserve(output_list.size());
   int min_depth = 0;
-  for (SbjNodeList::const_iterator p = output_list.begin();
+  for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
-    const SbjNode* onode = *p;
-    const SbjNode* node = onode->fanin(0);
-    if ( node == NULL) continue;
-    if ( node->is_logic() ) {
-      onode_list.push_back(node);
-    }
-    NodeInfo& node_info = mNodeInfo[node->id()];
-    int depth = node_info.mMinDepth;
-    if ( min_depth < depth ) {
-      min_depth = depth;
-    }
-  }
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* onode = *p;
-    const SbjNode* node = onode->fanin(0);
+    const BdnNode* onode = *p;
+    const BdnNode* node = onode->output_fanin();
     if ( node == NULL) continue;
     if ( node->is_logic() ) {
       onode_list.push_back(node);
@@ -154,23 +133,23 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 
   // それに slack を足したものが制約となる．
   min_depth += slack;
-  for (vector<const SbjNode*>::const_iterator p = onode_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = onode_list.begin();
        p != onode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     mNodeInfo[node->id()].mReqDepth = min_depth;
   }
 
   // 要求された段数制約を満たす中でコスト最小の解を選ぶ．
-  for (vector<const SbjNode*>::reverse_iterator p = snode_list.rbegin();
+  for (vector<BdnNode*>::reverse_iterator p = snode_list.rbegin();
        p != snode_list.rend(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     select(node, maprec);
   }
 }
 
 // node のカットを選択する．
 void
-DelayCover::record(const SbjNode* node)
+DelayCover::record(const BdnNode* node)
 {
   int min_depth = INT_MAX;
   NodeInfo& t = mNodeInfo[node->id()];
@@ -183,7 +162,7 @@ DelayCover::record(const SbjNode* node)
     if ( mMode & 1 ) {
       // ファンアウトモード
       for (ymuint i = 0; i < ni; ++ i) {
-	const SbjNode* inode = cut->input(i);
+	const BdnNode* inode = cut->input(i);
 	mWeight[i] = 1.0 / inode->fanout_num();
       }
     }
@@ -197,7 +176,7 @@ DelayCover::record(const SbjNode* node)
 
     int max_input_depth = 0;
     for (ymuint i = 0; i < ni; ++ i) {
-      const SbjNode* inode = cut->input(i);
+      const BdnNode* inode = cut->input(i);
       NodeInfo& u = mNodeInfo[inode->id()];
       if ( max_input_depth < u.mMinDepth ) {
 	max_input_depth = u.mMinDepth;
@@ -248,7 +227,7 @@ DelayCover::record(const SbjNode* node)
 
 // node から各入力にいたる経路の重みを計算する．
 void
-DelayCover::calc_weight(const SbjNode* node,
+DelayCover::calc_weight(const BdnNode* node,
 			const Cut* cut,
 			double cur_weight)
 {
@@ -261,16 +240,16 @@ DelayCover::calc_weight(const SbjNode* node,
 	return;
       }
     }
-    const SbjNode* inode0 = node->fanin(0);
+    const BdnNode* inode0 = node->fanin0();
     calc_weight(inode0, cut, cur_weight / inode0->fanout_num());
-    node = node->fanin(1);
+    node = node->fanin1();
     cur_weight /= node->fanout_num();
   }
 }
 
 // node のカットを選択する．
 void
-DelayCover::select(const SbjNode* node,
+DelayCover::select(const BdnNode* node,
 		   MapRecord& maprec)
 {
   NodeInfo& t = mNodeInfo[node->id()];
@@ -292,38 +271,12 @@ DelayCover::select(const SbjNode* node,
   maprec.set_cut(node, cut);
   -- rd;
   for (ymuint i = 0; i < cut->ni(); ++ i) {
-    const SbjNode* inode = cut->input(i);
+    const BdnNode* inode = cut->input(i);
     NodeInfo& u = mNodeInfo[inode->id()];
     if ( u.mReqDepth == 0 || u.mReqDepth > rd ) {
       u.mReqDepth = rd;
     }
   }
-}
-
-// @brief 段数最小化 DAG covering のヒューリスティック関数
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] limit カットサイズ
-// @param[in] slack 最小段数に対するスラック
-// @param[in] mode モード
-//  - 0: fanout フロー, resub なし
-//  - 1: weighted フロー, resub なし
-//  - 2: fanout フロー, resub あり
-//  - 3: weighted フロー, resub あり
-// @param[out] mapnetwork マッピング結果
-// @param[out] lut_num LUT数
-// @param[out] depth 段数
-void
-delay_map(const SbjGraph& sbjgraph,
-	  ymuint limit,
-	  ymuint slack,
-	  ymuint mode,
-	  LnGraph& mapnetwork,
-	  ymuint& lut_num,
-	  ymuint& depth)
-{
-  DelayCover delay_cover;
-
-  delay_cover(sbjgraph, limit, slack, mode, mapnetwork, lut_num, depth);
 }
 
 END_NAMESPACE_YM_LUTMAP

@@ -10,7 +10,8 @@
 
 
 #include "CutResub.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnMgr.h"
+#include "ym_bdn/BdnNode.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
@@ -39,7 +40,7 @@ CutResub::~CutResub()
 // @param[in] cut_holder サブジェクトグラフ上のカット集合
 // @param[inout] maprec マッピング結果
 void
-CutResub::operator()(const SbjGraph& sbjgraph,
+CutResub::operator()(const BdnMgr& sbjgraph,
 		     const CutHolder& cut_holder,
 		     MapRecord& maprec,
 		     int slack)
@@ -56,27 +57,26 @@ CutResub::operator()(const SbjGraph& sbjgraph,
   mLQ.init(max_size);
   mRQ.init(max_size);
 
-  vector<const SbjNode*> snode_list;
+  vector<BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
 
   // 外部入力ノードの対応付けを行う．
-  vector<const SbjNode*> tmp_list;
-  sbjgraph.ppi_list(tmp_list);
-  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-       p != tmp_list.end(); ++ p) {
-    const SbjNode* sbjnode = *p;
+  const BdnNodeList& input_list = sbjgraph.input_list();
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
+    const BdnNode* sbjnode = *p;
     CrNode* node = alloc_node();
     mNodeArray[sbjnode->id()] = node;
     node->set_sbjnode(sbjnode);
   }
 
   // 外部出力からバックトレースを行う．
-  sbjgraph.ppo_list(tmp_list);
-  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-       p != tmp_list.end(); ++ p) {
-    const SbjNode* onode = *p;
-    const SbjNode* sbjnode = onode->fanin(0);
-    if ( sbjnode && !sbjnode->is_ppi() ) {
+  const BdnNodeList& output_list = sbjgraph.output_list();
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* onode = *p;
+    const BdnNode* sbjnode = onode->output_fanin();
+    if ( sbjnode && !sbjnode->is_input() ) {
       back_trace(sbjnode, maprec, NULL);
     }
   }
@@ -88,9 +88,9 @@ CutResub::operator()(const SbjGraph& sbjgraph,
     vector<CrNode*> root_list;
     root_list.reserve(sbjgraph.max_node_id());
     ymuint max_level = 0;
-    for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
+    for (vector<BdnNode*>::const_iterator p = snode_list.begin();
 	 p != snode_list.end(); ++ p) {
-      const SbjNode* node = *p;
+      const BdnNode* node = *p;
       CrNode* crnode = mNodeArray[node->id()];
       if ( crnode == NULL ) continue;
 
@@ -182,9 +182,9 @@ CutResub::operator()(const SbjGraph& sbjgraph,
 #if 0
     for ( ; ; ) {
       bool changed = false;
-      for (vector<SbjNode*>::const_reverse_iterator p = snode_list.rbegin();
+      for (vector<BdnNode*>::const_reverse_iterator p = snode_list.rbegin();
 	   p != snode_list.rend(); ++ p) {
-	const SbjNode* node = *p;
+	const BdnNode* node = *p;
 	CrNode* crnode = mNodeArray[node->id()];
 	if ( crnode == NULL || crnode->is_output() ) continue;
 	if ( find_subst2(crnode, subst_list) ) {
@@ -237,7 +237,7 @@ CutResub::operator()(const SbjGraph& sbjgraph,
 
 // node の最適カットを選ぶ．
 void
-CutResub::back_trace(const SbjNode* sbjnode,
+CutResub::back_trace(const BdnNode* sbjnode,
 		     MapRecord& maprec,
 		     CrNode* from)
 {
@@ -253,8 +253,8 @@ CutResub::back_trace(const SbjNode* sbjnode,
     // ファンインのノードのカットを選ぶ．
     // 同時にファンアウトリストを構築する．
     for (ymuint i = 0; i < cut->ni(); ++ i) {
-      const SbjNode* inode = cut->input(i);
-      if ( !inode->is_ppi() ) {
+      const BdnNode* inode = cut->input(i);
+      if ( !inode->is_input() ) {
 	back_trace(inode, maprec, node);
       }
     }
@@ -386,7 +386,7 @@ CutResub::find_subst2(CrNode* node,
     fo->lock();
   }
 
-  // 処理順を SbjNode のレベルの低い順にする．
+  // 処理順を BdnNode のレベルの低い順にする．
   // こうすることによって fo が他のノードをファンインに持つ場合でも
   // ただしくレベルの計算が行える．
   bool ans = true;

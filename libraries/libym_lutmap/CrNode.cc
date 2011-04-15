@@ -10,7 +10,7 @@
 
 
 #include "CrNode.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -36,12 +36,12 @@ CrNode::~CrNode()
 {
 }
 
-// @brief 対応する SbjNode を設定する．
+// @brief 対応する BdnNode を設定する．
 void
-CrNode::set_sbjnode(const SbjNode* node)
+CrNode::set_sbjnode(const BdnNode* node)
 {
   mNode = node;
-  if ( node->is_ppi() ) {
+  if ( node->is_input() ) {
     mFlags |= (1U << kInputShift);
   }
   if ( node->pomark() ) {

@@ -7,12 +7,12 @@
 ///
 /// $Id: Cut.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_sbj/sbj_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 #include "ym_lexp/LogExpr.h"
 
 
@@ -41,7 +41,7 @@ private:
 public:
 
   /// @brief 根のノードを得る．
-  const SbjNode*
+  const BdnNode*
   root() const;
 
   /// @brief 入力のサイズを得る．
@@ -49,7 +49,7 @@ public:
   ni() const;
 
   /// @brief pos 番目の入力を得る．
-  const SbjNode*
+  const BdnNode*
   input(ymuint pos) const;
 
   /// @brief 内容を表す論理式を得る．
@@ -68,7 +68,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 根のノード
-  const SbjNode* mRoot;
+  const BdnNode* mRoot;
 
   // 次のカットを指すポインタ
   Cut* mLink;
@@ -77,7 +77,7 @@ private:
   ymuint32 mNi;
 
   // 入力のノード配列
-  const SbjNode* mInputs[1];
+  const BdnNode* mInputs[1];
 
 };
 
@@ -203,7 +203,7 @@ private:
 
 // 根のノードを得る．
 inline
-const SbjNode*
+const BdnNode*
 Cut::root() const
 {
   return mRoot;
@@ -219,7 +219,7 @@ Cut::ni() const
 
 // pos 番目の入力を得る．
 inline
-const SbjNode*
+const BdnNode*
 Cut::input(ymuint pos) const
 {
   return mInputs[pos];

@@ -5,12 +5,13 @@
 ///
 /// $Id: MapRecord.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MapRecord.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnMgr.h"
+#include "ym_bdn/BdnNode.h"
 #include "ym_lutmap/LnGraph.h"
 #include "Cut.h"
 
@@ -30,7 +31,7 @@ MapRecord::~MapRecord()
 // @brief @brief 作業領域を初期化する．
 // @param[in] sbjgraph サブジェクトグラフ
 void
-MapRecord::init(const SbjGraph& sbjgraph)
+MapRecord::init(const BdnMgr& sbjgraph)
 {
   mNodeInfo.clear();
   mNodeInfo.resize(sbjgraph.max_node_id());
@@ -52,7 +53,7 @@ MapRecord::copy(const MapRecord& src)
 // @param[in] node 該当のノード
 // @param[in] cut 対応するカット
 void
-MapRecord::set_cut(const SbjNode* node,
+MapRecord::set_cut(const BdnNode* node,
 		   const Cut* cut)
 {
   mNodeInfo[node->id()].mCut = cut;
@@ -61,14 +62,14 @@ MapRecord::set_cut(const SbjNode* node,
 // @brief カットを取り出す．
 // @param[in] node 該当のノード
 const Cut*
-MapRecord::get_cut(const SbjNode* node)
+MapRecord::get_cut(const BdnNode* node)
 {
   return mNodeInfo[node->id()].mCut;
 }
 
 // @brief マッピング結果を LnGraph にセットする．
 void
-MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
+MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
 			LnGraph& mapgraph,
 			ymuint& lut_num,
 			ymuint& depth)
@@ -78,35 +79,37 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   mapgraph.set_name(sbjgraph.name());
 
   // 外部入力の生成
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
+  const BdnNodeList& input_list = sbjgraph.input_list();
+  for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     LnNode* mapnode = mapgraph.new_input();
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.mMapNode[0] = mapnode;
     node_info.mDepth = 0;
   }
 
+#if 0
   // DFFの生成
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
+  const BdnNodeList& dff_list = sbjgraph.dff_list();
+  for (BdnNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     LnNode* mapnode = mapgraph.new_dff();
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.mMapNode[0] = mapnode;
     node_info.mDepth = 0;
   }
+#endif
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
-  const SbjNodeList& output_list = sbjgraph.output_list();
+  const BdnNodeList& output_list = sbjgraph.output_list();
   int max_depth = 0;
-  for (SbjNodeList::const_iterator p = output_list.begin();
+  for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
-    const SbjNode* onode = *p;
-    const SbjNode* node = onode->fanin(0);
-    bool inv = onode->output_inv();
+    const BdnNode* onode = *p;
+    const BdnNode* node = onode->output_fanin();
+    bool inv = onode->output_fanin_inv();
     LnNode* mapnode = NULL;
     if ( node ) {
       mapnode = back_trace(node, inv, mapgraph);
@@ -129,13 +132,14 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     mNodeInfo[onode->id()].mMapNode[0] = omapnode;
   }
 
+#if 0
   // DFFからバックトレースを行い全ノードの生成を行う．
-  for (SbjNodeList::const_iterator p = dff_list.begin();
+  for (BdnNodeList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
-    const SbjNode* onode = *p;
+    const BdnNode* onode = *p;
 
     {
-      const SbjNode* node = onode->fanin_data();
+      const BdnNode* node = onode->fanin_data();
       bool inv = onode->fanin_data_inv();
       LnNode* mapnode = NULL;
       if ( node ) {
@@ -159,7 +163,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       mapgraph.set_dff_input(omapnode, mapnode);
     }
     {
-      const SbjNode* node = onode->fanin_clock();
+      const BdnNode* node = onode->fanin_clock();
       bool inv = onode->fanin_clock_inv();
       LnNode* mapnode = NULL;
       if ( node ) {
@@ -173,7 +177,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       }
     }
     {
-      const SbjNode* node = onode->fanin_set();
+      const BdnNode* node = onode->fanin_set();
       bool inv = onode->fanin_set_inv();
       LnNode* mapnode = NULL;
       if ( node ) {
@@ -187,7 +191,7 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       }
     }
     {
-      const SbjNode* node = onode->fanin_rst();
+      const BdnNode* node = onode->fanin_rst();
       bool inv = onode->fanin_rst_inv();
       LnNode* mapnode = NULL;
       if ( node ) {
@@ -201,7 +205,9 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       }
     }
   }
+#endif
 
+#if 0
   // ポートを生成する．
   ymuint np = sbjgraph.port_num();
   for (ymuint i = 0; i < np; ++ i) {
@@ -209,13 +215,14 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     ymuint nb = sbjport->bit_width();
     vector<LnNode*> tmp(nb);
     for (ymuint j = 0; j < nb; ++ j) {
-      const SbjNode* sbjnode = sbjport->bit(j);
+      const BdnNode* sbjnode = sbjport->bit(j);
       LnNode* node = mNodeInfo[sbjnode->id()].mMapNode[0];
       assert_cond( node != NULL, __FILE__, __LINE__);
       tmp[j] = node;
     }
     mapgraph.add_port(sbjport->name(), tmp);
   }
+#endif
 
   lut_num = mapgraph.lnode_num();
   depth = max_depth;
@@ -281,7 +288,7 @@ END_NONAMESPACE
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
 LnNode*
-MapRecord::back_trace(const SbjNode* node,
+MapRecord::back_trace(const BdnNode* node,
 		      bool inv,
 		      LnGraph& mapnetwork)
 {
@@ -293,7 +300,7 @@ MapRecord::back_trace(const SbjNode* node,
     return mapnode;
   }
 
-  if ( node->is_ppi() ) {
+  if ( node->is_input() ) {
     // ということは inv = true のはず．
     assert_cond(inv, __FILE__, __LINE__);
     // NOT ゲートを表す LUT を作る．
@@ -312,7 +319,7 @@ MapRecord::back_trace(const SbjNode* node,
   // その入力に対応するノードを再帰的に生成する．
   ymuint ni = cut->ni();
   for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = cut->input(i);
+    const BdnNode* inode = cut->input(i);
     back_trace(inode, false, mapnetwork);
   }
 
@@ -320,7 +327,7 @@ MapRecord::back_trace(const SbjNode* node,
   mTmpFanins.resize(ni);
   int idepth = 0;
   for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = cut->input(i);
+    const BdnNode* inode = cut->input(i);
     NodeInfo& inode_info = mNodeInfo[inode->id()];
     LnNode* imapnode = inode_info.mMapNode[0];
     mTmpFanins[i] = imapnode;
@@ -350,7 +357,7 @@ MapRecord::back_trace(const SbjNode* node,
 
 // @brief マッピング結果の LUT 数を見積もる．
 int
-MapRecord::estimate(const SbjGraph& sbjgraph)
+MapRecord::estimate(const BdnMgr& sbjgraph)
 {
   for (vector<NodeInfo>::iterator p = mNodeInfo.begin();
        p != mNodeInfo.end(); ++ p) {
@@ -362,28 +369,27 @@ MapRecord::estimate(const SbjGraph& sbjgraph)
   }
 
   // 外部入力の生成
-  vector<const SbjNode*> tmp_list;
-  sbjgraph.ppi_list(tmp_list);
-  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-       p != tmp_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  const BdnNodeList& input_list = sbjgraph.input_list();
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
+    const BdnNode* node = *p;
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.mMapCount[0] = 1;
   }
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   int lut_num = 0;
-  sbjgraph.ppo_list(tmp_list);
-  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-       p != tmp_list.end(); ++ p) {
-    const SbjNode* onode = *p;
-    const SbjNode* node = onode->fanin(0);
+  const BdnNodeList& output_list = sbjgraph.output_list();
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* onode = *p;
+    const BdnNode* node = onode->output_fanin();
     if ( node && node->is_logic() ) {
       if ( mNodeInfo[node->id()].mCut == NULL ) {
 	lut_num = -1;
 	break;
       }
-      bool inv = onode->output_inv();
+      bool inv = onode->output_fanin_inv();
       lut_num += back_trace2(node, inv);
     }
   }
@@ -393,7 +399,7 @@ MapRecord::estimate(const SbjGraph& sbjgraph)
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
 int
-MapRecord::back_trace2(const SbjNode* node,
+MapRecord::back_trace2(const BdnNode* node,
 		       bool inv)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
@@ -403,7 +409,7 @@ MapRecord::back_trace2(const SbjNode* node,
     return 0;
   }
 
-  if ( node->is_ppi() ) {
+  if ( node->is_input() ) {
     // ということは inv = true のはず．
     node_info.mMapCount[1] = 1;
     // インバーターが必要ということ
@@ -415,7 +421,7 @@ MapRecord::back_trace2(const SbjNode* node,
 
   // cut のカバーしているノードの mCovCount を1つ増やす．
   for (ymuint i = 0; i < cut->ni(); ++ i) {
-    const SbjNode* leaf = cut->input(i);
+    const BdnNode* leaf = cut->input(i);
     mNodeInfo[leaf->id()].mTmpFlag = true;
   }
   mark_cover(node, cut);
@@ -425,7 +431,7 @@ MapRecord::back_trace2(const SbjNode* node,
   // その入力に対応するノードを再帰的に生成する．
   ymuint ni = cut->ni();
   for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = cut->input(i);
+    const BdnNode* inode = cut->input(i);
     lut_num += back_trace2(inode, false);
   }
 
@@ -434,7 +440,7 @@ MapRecord::back_trace2(const SbjNode* node,
 
 // @brief 直前の estimate の結果 node が fanout node なら true を返す．
 bool
-MapRecord::check_fonode(const SbjNode* node)
+MapRecord::check_fonode(const BdnNode* node)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   return (node_info.mMapCount[0] + node_info.mMapCount[1]) > 1;
@@ -442,7 +448,7 @@ MapRecord::check_fonode(const SbjNode* node)
 
 // @brief 直前の estimate の結果で node のカバーされている回数を返す．
 int
-MapRecord::cover_count(const SbjNode* node)
+MapRecord::cover_count(const BdnNode* node)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   return node_info.mCovCount;
@@ -450,28 +456,28 @@ MapRecord::cover_count(const SbjNode* node)
 
 // cut でカバーされるノードの mCovCount を一つ増やす．
 void
-MapRecord::mark_cover(const SbjNode* node,
+MapRecord::mark_cover(const BdnNode* node,
 		      const Cut* cut)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   if ( !node_info.mTmpFlag ) {
     node_info.mTmpFlag = true;
     ++ node_info.mCovCount;
-    mark_cover(node->fanin(0), cut);
-    mark_cover(node->fanin(1), cut);
+    mark_cover(node->fanin0(), cut);
+    mark_cover(node->fanin1(), cut);
   }
 }
 
 // mark_cover でつけた mTmpFlag を下ろす．
 void
-MapRecord::clear_mark(const SbjNode* node)
+MapRecord::clear_mark(const BdnNode* node)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   if ( node_info.mTmpFlag ) {
     node_info.mTmpFlag = false;
     if ( node->is_logic() ) {
-      clear_mark(node->fanin(0));
-      clear_mark(node->fanin(1));
+      clear_mark(node->fanin0());
+      clear_mark(node->fanin1());
     }
   }
 }

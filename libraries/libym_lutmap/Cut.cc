@@ -5,12 +5,12 @@
 ///
 /// $Id: Cut.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Cut.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -32,7 +32,7 @@ BEGIN_NONAMESPACE
 // inputs に登録されているノードを終端と見なしたときの node の表す論理式
 // を返す．
 LogExpr
-calc_expr_for_node(const SbjNode* node,
+calc_expr_for_node(const BdnNode* node,
 		   const hash_map<ymuint, LogExpr>& logmap)
 {
   LogExpr ans;
@@ -47,17 +47,16 @@ calc_expr_for_node(const SbjNode* node,
     else {
       assert_cond( node->is_logic(), __FILE__, __LINE__);
 
-      LogExpr cexp0 = calc_expr_for_node(node->fanin(0), logmap);
-      LogExpr cexp1 = calc_expr_for_node(node->fanin(1), logmap);
-      ymuint fcode = node->fcode();
+      LogExpr cexp0 = calc_expr_for_node(node->fanin0(), logmap);
+      LogExpr cexp1 = calc_expr_for_node(node->fanin1(), logmap);
 
-      if ( fcode & 1U ) {
+      if ( node->fanin0_inv() ) {
 	cexp0 = ~cexp0;
       }
-      if ( fcode & 2U ) {
+      if ( node->fanin1_inv() ) {
 	cexp1 = ~cexp1;
       }
-      if ( fcode & 4U ) {
+      if ( node->is_xor() ) {
 	ans = cexp0 ^ cexp1;
       }
       else {
@@ -80,7 +79,7 @@ Cut::expr() const
 
   hash_map<ymuint, LogExpr> logmap;
   for (ymuint i = 0; i < ni(); i ++) {
-    const SbjNode* node = mInputs[i];
+    const BdnNode* node = mInputs[i];
     ymuint id = node->id();
     logmap.insert(make_pair(id, LogExpr::make_posiliteral(i)));
   }
@@ -98,7 +97,7 @@ Cut::dump(ostream& s) const
     s << root()->id_str() << " : ";
     string comma = "";
     for (ymuint i = 0; i < ni(); i ++) {
-      const SbjNode* node = mInputs[i];
+      const BdnNode* node = mInputs[i];
       s << comma << node->id_str();
       comma = ", ";
     }

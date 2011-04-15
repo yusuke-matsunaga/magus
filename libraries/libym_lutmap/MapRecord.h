@@ -7,12 +7,12 @@
 ///
 /// $Id: MapRecord.h 1293 2008-02-21 02:25:52Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_sbj/sbj_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -40,7 +40,7 @@ public:
   /// @brief @brief 作業領域を初期化する．
   /// @param[in] sbjgraph サブジェクトグラフ
   void
-  init(const SbjGraph& sbjgraph);
+  init(const BdnMgr& sbjgraph);
 
   /// @brief カットの情報だけコピーする．
   void
@@ -50,13 +50,13 @@ public:
   /// @param[in] node 該当のノード
   /// @param[in] cut 対応するカット
   void
-  set_cut(const SbjNode* node,
+  set_cut(const BdnNode* node,
 	  const Cut* cut);
 
   /// @brief カットを取り出す．
   /// @param[in] node 該当のノード
   const Cut*
-  get_cut(const SbjNode* node);
+  get_cut(const BdnNode* node);
 
   /// @brief マッピング結果を LnGraph にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -65,22 +65,22 @@ public:
   /// @param[out] lut_num LUT数
   /// @param[out] depth 最大段数
   void
-  gen_mapgraph(const SbjGraph& sbjgraph,
+  gen_mapgraph(const BdnMgr& sbjgraph,
 	       LnGraph& mapgraph,
 	       ymuint& lut_num,
 	       ymuint& depth);
 
   /// @brief マッピング結果の LUT 数を数える．
   int
-  estimate(const SbjGraph& sbjgraph);
+  estimate(const BdnMgr& sbjgraph);
 
   /// @brief 直前の estimate の結果 node が fanout node なら true を返す．
   bool
-  check_fonode(const SbjNode* node);
+  check_fonode(const BdnNode* node);
 
   /// @brief 直前の estimate の結果で node のカバーされている回数を返す．
   int
-  cover_count(const SbjNode* node);
+  cover_count(const BdnNode* node);
 
 
 private:
@@ -90,23 +90,23 @@ private:
 
   // 最終結果を作るためのバックトレースを行う．
   LnNode*
-  back_trace(const SbjNode* node,
+  back_trace(const BdnNode* node,
 	     bool inv,
 	     LnGraph& mapnetwork);
 
   // estimate() で用いるバックトレース
   int
-  back_trace2(const SbjNode* node,
+  back_trace2(const BdnNode* node,
 	      bool inv);
 
   // cut でカバーされるノードの mCovCount を一つ増やす．
   void
-  mark_cover(const SbjNode* node,
+  mark_cover(const BdnNode* node,
 	     const Cut* cut);
 
   // mark_cover でつけた mTmpFlag を下ろす．
   void
-  clear_mark(const SbjNode* node);
+  clear_mark(const BdnNode* node);
 
 
 private:

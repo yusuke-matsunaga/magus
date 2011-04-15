@@ -12,7 +12,7 @@
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_sbj/sbj_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 
 #include "ym_utils/Alloc.h"
 #include "CrNode.h"
@@ -49,7 +49,7 @@ public:
   /// @param[in] cut_holder サブジェクトグラフ上のカット集合
   /// @param[inout] maprec マッピング結果
   void
-  operator()(const SbjGraph& sbjgraph,
+  operator()(const BdnMgr& sbjgraph,
 	     const CutHolder& cut_holder,
 	     MapRecord& maprec,
 	     int slack = -1);
@@ -62,7 +62,7 @@ private:
 
   // node の最適カットを選ぶ．
   void
-  back_trace(const SbjNode* node,
+  back_trace(const BdnNode* node,
 	     MapRecord& maprec,
 	     CrNode* from);
 

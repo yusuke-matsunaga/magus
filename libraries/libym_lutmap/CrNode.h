@@ -7,12 +7,12 @@
 ///
 /// $Id: CrNode.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_sbj/sbj_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -38,12 +38,12 @@ public:
 
 public:
 
-  /// @brief 対応する SbjNode を設定する．
+  /// @brief 対応する BdnNode を設定する．
   void
-  set_sbjnode(const SbjNode* node);
+  set_sbjnode(const BdnNode* node);
 
-  /// @brief 対応する SbjNode を返す．
-  const SbjNode*
+  /// @brief 対応する BdnNode を返す．
+  const BdnNode*
   sbjnode() const;
 
   /// @brief 外部入力ノードのとき true を返す．
@@ -192,7 +192,7 @@ public:
 private:
 
   // 根のノード
-  const SbjNode* mNode;
+  const BdnNode* mNode;
 
   // このノードを根とする最適カット
   const Cut* mCurCut;
@@ -271,9 +271,9 @@ compare(CrNode* node1,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 対応する SbjNode を返す．
+// @brief 対応する BdnNode を返す．
 inline
-const SbjNode*
+const BdnNode*
 CrNode::sbjnode() const
 {
   return mNode;

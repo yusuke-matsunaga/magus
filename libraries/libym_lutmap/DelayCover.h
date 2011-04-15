@@ -7,12 +7,12 @@
 ///
 /// $Id: DelayCover.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_sbj/sbj_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 #include "ADCost.h"
@@ -50,7 +50,7 @@ public:
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
   void
-  operator()(const SbjGraph& sbjgraph,
+  operator()(const BdnMgr& sbjgraph,
 	     ymuint limit,
 	     ymuint slack,
 	     ymuint mode,
@@ -69,23 +69,23 @@ private:
   /// @param[in] limit LUT の入力数
   /// @param[in] slack 最小段数に対するスラック
   void
-  record_cuts(const SbjGraph& sbjgraph,
+  record_cuts(const BdnMgr& sbjgraph,
 	      ymuint limit,
 	      ymuint slack,
 	      MapRecord& maprec);
 
   // node のカットを記録する．
   void
-  record(const SbjNode* node);
+  record(const BdnNode* node);
 
   // node のカットを選択する．
   void
-  select(const SbjNode* node,
+  select(const BdnNode* node,
 	 MapRecord& maprec);
 
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(const SbjNode* node,
+  calc_weight(const BdnNode* node,
 	      const Cut* cut,
 	      double cur_weight);
 

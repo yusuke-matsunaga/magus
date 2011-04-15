@@ -1,16 +1,16 @@
 
-/// @file magus/lutmap/WeightCover.cc
+/// @file libym_lutmap/AreaCover.cc
 /// @brief DAG covering のヒューリスティック
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: WeightCover.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "AreaCover.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnMgr.h"
 #include "Cut.h"
 #include "MapRecord.h"
 
@@ -39,7 +39,7 @@ AreaCover::~AreaCover()
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-AreaCover::operator()(const SbjGraph& sbjgraph,
+AreaCover::operator()(const BdnMgr& sbjgraph,
 		      ymuint limit,
 		      ymuint mode,
 		      LnGraph& mapnetwork,
@@ -69,7 +69,7 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 // @param[in] limit LUT の入力数
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const SbjGraph& sbjgraph,
+AreaCover::record_cuts(const BdnMgr& sbjgraph,
 		       ymuint limit,
 		       MapRecord& maprec)
 {
@@ -81,20 +81,20 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   maprec.init(sbjgraph);
 
   // 入力のコストを設定
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
+  const BdnNodeList& input_list = sbjgraph.input_list();
+  for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
     maprec.set_cut(node, NULL);
     mBestCost[node->id()] = 0.0;
   }
 
   // 論理ノードのコストを入力側から計算
-  vector<const SbjNode*> snode_list;
+  vector<BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
+  for (vector<BdnNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+    const BdnNode* node = *p;
 
     double min_cost = DBL_MAX;
     const Cut* best_cut = NULL;
@@ -106,7 +106,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       ymuint ni = cut->ni();
       bool ng = false;
       for (ymuint i = 0; i < ni; ++ i) {
-	const SbjNode* inode = cut->input(i);
+	const BdnNode* inode = cut->input(i);
 	if ( mBestCost[inode->id()] == DBL_MAX ) {
 	  ng = true;
 	  break;
@@ -117,7 +117,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       if ( mMode & 1 ) {
 	// ファンアウトモード
 	for (ymuint i = 0; i < ni; ++ i) {
-	  const SbjNode* inode = cut->input(i);
+	  const BdnNode* inode = cut->input(i);
 	  mWeight[i] = 1.0 / inode->fanout_num();
 	}
       }
@@ -131,7 +131,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
       double cur_cost = 1.0;
       for (ymuint i = 0; i < ni; ++ i) {
-	const SbjNode* inode = cut->input(i);
+	const BdnNode* inode = cut->input(i);
 	cur_cost += mBestCost[inode->id()] * mWeight[i];
       }
       if ( min_cost > cur_cost ) {
@@ -148,7 +148,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
 // node から各入力にいたる経路の重みを計算する．
 void
-AreaCover::calc_weight(const SbjNode* node,
+AreaCover::calc_weight(const BdnNode* node,
 		       const Cut* cut,
 		       double cur_weight)
 {
@@ -162,36 +162,12 @@ AreaCover::calc_weight(const SbjNode* node,
 	return;
       }
     }
-    const SbjNode* inode0 = node->fanin(0);
+    const BdnNode* inode0 = node->fanin0();
     double cur_weight0 = cur_weight / inode0->fanout_num();
     calc_weight(inode0, cut, cur_weight0);
-    node = node->fanin(1);
+    node = node->fanin1();
     cur_weight /= node->fanout_num();
   }
-}
-
-// @brief 面積最小化 DAG covering のヒューリスティック関数
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] limit カットサイズ
-// @param[in] mode モード
-//  - 0: fanout フロー, resub なし
-//  - 1: weighted フロー, resub なし
-//  - 2: fanout フロー, resub あり
-//  - 3: weighted フロー, resub あり
-// @param[out] mapnetwork マッピング結果
-// @param[out] lut_num LUT数
-// @param[out] depth 段数
-void
-area_map(const SbjGraph& sbjgraph,
-	 ymuint limit,
-	 ymuint mode,
-	 LnGraph& mapnetwork,
-	 ymuint& lut_num,
-	 ymuint& depth)
-{
-  AreaCover area_cover;
-
-  area_cover(sbjgraph, limit, mode, mapnetwork, lut_num, depth);
 }
 
 END_NAMESPACE_YM_LUTMAP

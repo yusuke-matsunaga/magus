@@ -5,13 +5,13 @@
 ///
 /// $Id: CutHolder.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "CutHolder.h"
 #include "Cut.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -46,7 +46,7 @@ CutHolder::clear()
 
 // 最初に呼ばれる関数
 void
-CutHolder::all_init(const SbjGraph& sbjgraph,
+CutHolder::all_init(const BdnMgr& sbjgraph,
 		    ymuint limit)
 {
   clear();
@@ -56,20 +56,20 @@ CutHolder::all_init(const SbjGraph& sbjgraph,
 }
 
 void
-CutHolder::node_init(const SbjNode* node,
+CutHolder::node_init(const BdnNode* node,
 		     ymuint pos)
 {
 }
 
 void
-CutHolder::found(const SbjNode* root)
+CutHolder::found(const BdnNode* root)
 {
 }
 
 void
-CutHolder::found(const SbjNode* root,
+CutHolder::found(const BdnNode* root,
 		 ymuint ni,
-		 const SbjNode* inputs[])
+		 const BdnNode* inputs[])
 {
   Cut* cut = alloc_cut(ni);
   cut->mRoot = root;
@@ -81,7 +81,7 @@ CutHolder::found(const SbjNode* root,
 }
 
 void
-CutHolder::node_end(const SbjNode* node,
+CutHolder::node_end(const BdnNode* node,
 		    ymuint pos,
 		    ymuint ncuts)
 {
@@ -89,7 +89,7 @@ CutHolder::node_end(const SbjNode* node,
 
 // 最後に呼ばれる関数
 void
-CutHolder::all_end(const SbjGraph& sbjgraph,
+CutHolder::all_end(const BdnMgr& sbjgraph,
 		   ymuint limit)
 {
 }
@@ -98,7 +98,7 @@ CutHolder::all_end(const SbjGraph& sbjgraph,
 Cut*
 CutHolder::alloc_cut(ymuint ni)
 {
-  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const SbjNode*);
+  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const BdnNode*);
   assert_cond(size < kPageSize, __FILE__, __LINE__);
   if ( mCurChunk == NULL || mLast + size > kPageSize ) {
     mCurChunk = new char[kPageSize];

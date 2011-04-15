@@ -5,13 +5,13 @@
 ///
 /// $Id: CrLevelQ.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "CrLevelQ.h"
 #include "CrNode.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

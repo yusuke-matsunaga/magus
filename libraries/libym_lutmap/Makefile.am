@@ -16,34 +16,35 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_lutmap_la_SOURCES = \
-	LnGraph.cc \
-	LnGraph_dump.cc \
-	EnumCutOp.h \
-	EnumCutOp.cc \
-	EnumCut.h \
-	EnumCut.cc \
-	Cut.h \
-	Cut.cc \
-	CutHolder.h \
-	CutHolder.cc \
-	MapRecord.h \
-	MapRecord.cc \
-	CutResub.h \
-	CutResub.cc \
-	CrNode.h \
-	CrNode.cc \
-	CrHeap.h \
-	CrHeap.cc \
-	CrLevelQ.h \
-	CrLevelQ.cc \
 	ADCost.h \
 	AreaCover.h \
 	AreaCover.cc \
 	DelayCover.h \
-	DelayCover.cc
+	DelayCover.cc \
+	EnumCut.h \
+	EnumCut.cc \
+	EnumCutOp.h \
+	EnumCutOp.cc \
+	CrHeap.h \
+	CrHeap.cc \
+	CrLevelQ.h \
+	CrLevelQ.cc \
+	CrNode.h \
+	CrNode.cc \
+	Cut.h \
+	Cut.cc \
+	CutHolder.h \
+	CutHolder.cc \
+	CutResub.h \
+	CutResub.cc \
+	LnGraph.cc \
+	LnGraph_dump.cc \
+	LutMap.cc \
+	MapRecord.h \
+	MapRecord.cc
 
 libym_lutmap_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

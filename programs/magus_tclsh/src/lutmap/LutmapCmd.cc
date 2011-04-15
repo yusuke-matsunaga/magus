@@ -34,13 +34,6 @@ LutmapCmd::~LutmapCmd()
 {
 }
 
-// @brief SbjGraph を得る．
-SbjGraph&
-LutmapCmd::sbjgraph()
-{
-  return mData->mSbjGraph;
-}
-
 // @brief LutNetwork を得る．
 LnGraph&
 LutmapCmd::lutnetwork()
@@ -55,11 +48,6 @@ lutmap_init(Tcl_Interp* interp,
 {
   LutmapData* data = new LutmapData;
 
-  TclCmdBinder2<Conv2SbjCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
-							"magus::lutmap::conv2sbj");
-
-  TclCmdBinder2<DumpSbjCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
-						       "magus::lutmap::dump_sbjgraph");
   TclCmdBinder2<AreaMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 						       "magus::lutmap::area_map");
   TclCmdBinder2<DelayMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
@@ -76,8 +64,6 @@ lutmap_init(Tcl_Interp* interp,
     "namespace eval tclreadline {\n"
     "namespace eval magus {\n"
     "namespace eval lutmap {\n"
-    "proc complete(conv2sbj) { text start end line pos mod } { return \"\" }\n"
-    "proc complete(dump_sbjgraph) { text start end line pos mod } { return \"\" }\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
     "proc complete(delay_map) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_lutnetwork) { text start end line pos mod } { return \"\" }\n"

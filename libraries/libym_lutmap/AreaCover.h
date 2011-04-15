@@ -1,18 +1,18 @@
 #ifndef LIBYM_LUTMAP_AREACOVER_H
 #define LIBYM_LUTMAP_AREACOVER_H
 
-/// @file magus/lutmap/WeightCover.h
+/// @file libym_lutmap/AreaCover.h
 /// @brief DAG covering のヒューリスティック
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: WeightCover.h 1077 2007-12-03 10:18:47Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_lutmap/lutmap_nsdef.h"
-#include "ym_sbj/sbj_nsdef.h"
+#include "ym_bdn/bdn_nsdef.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 
@@ -49,7 +49,7 @@ public:
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
   void
-  operator()(const SbjGraph& sbjgraph,
+  operator()(const BdnMgr& sbjgraph,
 	     ymuint limit,
 	     ymuint mode,
 	     LnGraph& mapnetwork,
@@ -67,13 +67,13 @@ private:
   /// @param[in] limit LUT の入力数
   /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
-  record_cuts(const SbjGraph& sbjgraph,
+  record_cuts(const BdnMgr& sbjgraph,
 	      ymuint limit,
 	      MapRecord& maprec);
 
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(const SbjNode* node,
+  calc_weight(const BdnNode* node,
 	      const Cut* cut,
 	      double cur_weight);
 

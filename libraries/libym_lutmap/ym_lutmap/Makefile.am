@@ -8,4 +8,5 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	lutmap_nsdef.h \
-	LnGraph.h
+	LnGraph.h \
+	LutMap.h

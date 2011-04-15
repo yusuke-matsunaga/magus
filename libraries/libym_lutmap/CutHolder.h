@@ -7,13 +7,13 @@
 ///
 /// $Id: CutHolder.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "EnumCutOp.h"
 #include "Cut.h"
-#include "ym_sbj/SbjGraph.h"
+#include "ym_bdn/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -39,7 +39,7 @@ public:
 
   /// @brief node を根とするカットのリストを取り出す．
   const CutList&
-  cut_list(const SbjNode* node) const;
+  cut_list(const BdnNode* node) const;
 
   /// @brief 現在のカットを列挙したときのカットサイズを返す．
   ymuint
@@ -60,7 +60,7 @@ private:
   /// @param[in] limit カットサイズ
   virtual
   void
-  all_init(const SbjGraph& sbjgraph,
+  all_init(const BdnMgr& sbjgraph,
 	   ymuint limit);
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
@@ -68,14 +68,14 @@ private:
   /// @param[in] cur_pos node の処理順
   virtual
   void
-  node_init(const SbjNode* node,
+  node_init(const BdnNode* node,
 	    ymuint cur_pos);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
   /// @param[in] root 根のノード
   virtual
   void
-  found(const SbjNode* root);
+  found(const BdnNode* root);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
   /// @param[in] root 根のノード
@@ -83,9 +83,9 @@ private:
   /// @param[in] inputs 入力ノードの配列
   virtual
   void
-  found(const SbjNode* root,
+  found(const BdnNode* root,
 	ymuint ni,
-	const SbjNode* inputs[]);
+	const BdnNode* inputs[]);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
@@ -93,7 +93,7 @@ private:
   /// @param[in] ncuts 列挙されたカット数
   virtual
   void
-  node_end(const SbjNode* node,
+  node_end(const BdnNode* node,
 	   ymuint cur_pos,
 	   ymuint ncuts);
 
@@ -104,7 +104,7 @@ private:
   /// 用いられたものと同じものが与えられる．
   virtual
   void
-  all_end(const SbjGraph& sbjgraph,
+  all_end(const BdnMgr& sbjgraph,
 	  ymuint limit);
 
 
@@ -145,7 +145,7 @@ private:
 // @brief node を根とするカットのリストを取り出す．
 inline
 const CutList&
-CutHolder::cut_list(const SbjNode* node) const
+CutHolder::cut_list(const BdnNode* node) const
 {
   return mCutList[node->id()];
 }
