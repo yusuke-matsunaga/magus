@@ -198,63 +198,6 @@ BNetBdnConv::make_node(const BNode* bnode)
 
     LogExpr func = bnode->func();
     node_handle = make_node_sub(*mNetwork, func, fanins);
-#if 0
-    ymuint nc = bnode->nc();
-    if ( bnode->opat() == '1' ) {
-      vector<BdnNodeHandle> or_leaves;
-      or_leaves.reserve(nc);
-      for (ymuint c = 0; c < nc; ++ c) {
-	vector<BdnNodeHandle> and_leaves;
-	and_leaves.reserve(ni);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  char v = bnode->cube_pat(c, i);
-	  if ( v == '0' ) {
-	    and_leaves.push_back(~fanins[i]);
-	  }
-	  else if ( v == '1' ) {
-	    and_leaves.push_back(fanins[i]);
-	  }
-	}
-	ymuint n = and_leaves.size();
-	assert_cond( n > 0, __FILE__, __LINE__);
-	or_leaves.push_back(mNetwork->new_and(and_leaves));
-      }
-      ymuint n = or_leaves.size();
-      if ( n == 0 ) {
-	node_handle = BdnNodeHandle::make_one();
-      }
-      else {
-	node_handle = mNetwork->new_or(or_leaves);
-      }
-    }
-    else {
-      vector<BdnNodeHandle> and_leaves;
-      and_leaves.reserve(nc);
-      for (ymuint c = 0; c < nc; ++ c) {
-	vector<BdnNodeHandle> or_leaves;
-	or_leaves.reserve(ni);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  char v = bnode->cube_pat(c, i);
-	  if ( v == '0' ) {
-	    or_leaves.push_back(fanins[i]);
-	  }
-	  else if ( v == '1' ) {
-	    or_leaves.push_back(~fanins[i]);
-	  }
-	}
-	ymuint n = or_leaves.size();
-	assert_cond( n > 0, __FILE__, __LINE__);
-	and_leaves.push_back(mNetwork->new_or(or_leaves));
-      }
-      ymuint n = and_leaves.size();
-      if ( n == 0 ) {
-	node_handle = BdnNodeHandle::make_zero();
-      }
-      else {
-	node_handle = mNetwork->new_and(and_leaves);
-      }
-    }
-#endif
     put_node(bnode, node_handle);
   }
   return node_handle;
