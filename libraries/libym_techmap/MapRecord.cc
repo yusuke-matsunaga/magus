@@ -11,6 +11,7 @@
 
 #include "MapRecord.h"
 #include "ym_bdn/BdnMgr.h"
+#include "ym_bdn/BdnPort.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_techmap/CnGraph.h"
 #include "Match.h"
@@ -194,22 +195,28 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
   }
 #endif
 
-#if 0
-  // ポートを生成する．
+  // ポートの生成
   ymuint np = sbjgraph.port_num();
   for (ymuint i = 0; i < np; ++ i) {
-    const SbjPort* sbjport = sbjgraph.port(i);
+    const BdnPort* sbjport = sbjgraph.port(i);
     ymuint nb = sbjport->bit_width();
     vector<CnNode*> tmp(nb);
     for (ymuint j = 0; j < nb; ++ j) {
-      const BdnNode* sbjnode = sbjport->bit(j);
-      CnNode* node = node_info(sbjnode, false).mMapNode;
-      assert_cond( node != NULL, __FILE__, __LINE__);
+      CnNode* node = NULL;
+      const BdnNode* input = sbjport->input(j);
+      const BdnNode* output = sbjport->output(j);
+      if ( input ) {
+	node = node_info(input, false).mMapNode;
+	assert_cond( node != NULL, __FILE__, __LINE__);
+      }
+      else if ( output ) {
+	node = node_info(output, false).mMapNode;
+	assert_cond( node != NULL, __FILE__, __LINE__);
+      }
       tmp[j] = node;
     }
     mapgraph.add_port(sbjport->name(), tmp);
   }
-#endif
 }
 
 // サブジェクトグラフの node に対応するマップされたノードを

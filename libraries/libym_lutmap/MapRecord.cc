@@ -11,6 +11,7 @@
 
 #include "MapRecord.h"
 #include "ym_bdn/BdnMgr.h"
+#include "ym_bdn/BdnPort.h"
 #include "ym_bdn/BdnNode.h"
 #include "ym_lutmap/LnGraph.h"
 #include "Cut.h"
@@ -207,22 +208,28 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
   }
 #endif
 
-#if 0
-  // ポートを生成する．
+  // ポートの生成
   ymuint np = sbjgraph.port_num();
   for (ymuint i = 0; i < np; ++ i) {
-    const SbjPort* sbjport = sbjgraph.port(i);
+    const BdnPort* sbjport = sbjgraph.port(i);
     ymuint nb = sbjport->bit_width();
     vector<LnNode*> tmp(nb);
     for (ymuint j = 0; j < nb; ++ j) {
-      const BdnNode* sbjnode = sbjport->bit(j);
-      LnNode* node = mNodeInfo[sbjnode->id()].mMapNode[0];
-      assert_cond( node != NULL, __FILE__, __LINE__);
+      LnNode* node = NULL;
+      const BdnNode* input = sbjport->input(j);
+      const BdnNode* output = sbjport->output(j);
+      if ( input ) {
+	node = mNodeInfo[input->id()].mMapNode[0];
+	assert_cond( node != NULL, __FILE__, __LINE__);
+      }
+      else if ( output ) {
+	node = mNodeInfo[output->id()].mMapNode[0];
+	assert_cond( node != NULL, __FILE__, __LINE__);
+      }
       tmp[j] = node;
     }
     mapgraph.add_port(sbjport->name(), tmp);
   }
-#endif
 
   lut_num = mapgraph.lnode_num();
   depth = max_depth;
