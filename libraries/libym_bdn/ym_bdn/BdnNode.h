@@ -654,7 +654,8 @@ inline
 bool
 BdnNode::is_and() const
 {
-  return !is_xor();
+  // 32(XOR) + 3(type)
+  return ((mFlags & 35U) == 0U);
 }
 
 // @brief XOR タイプのときに true を返す．
@@ -662,7 +663,8 @@ inline
 bool
 BdnNode::is_xor() const
 {
-  return static_cast<bool>((mFlags >> (kFcodeShift + 2)) & 1U);
+  // 32(XOR) + 3(type)
+  return ((mFlags & 35U) == 32U);
 }
 
 // @brief ファンインのノードを得る．
