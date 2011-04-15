@@ -442,15 +442,15 @@ private:
   static
   const int kTypeShift = 0;
   static
-  const int kPoShift = 3;
+  const int kPoShift = 2;
   static
-  const int kOInvShift = 3;
+  const int kOInvShift = 2;
   static
-  const int kIsubShift = 4;
+  const int kIsubShift = 3;
   static
-  const int kOsubShift = 4;
+  const int kOsubShift = 3;
   static
-  const int kFcodeShift = 4;
+  const int kFcodeShift = 3;
 
   static
   const ymuint32 kPoMask = 1U << kPoShift;
