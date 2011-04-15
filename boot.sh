@@ -127,6 +127,7 @@ LIBRARIES=\
  libym_verilog \
  libym_bnet \
  libym_bdn \
+ libym_bnetbdnconv \
  libym_mvn \
  libym_mvnbdnconv \
  libym_sbj \
