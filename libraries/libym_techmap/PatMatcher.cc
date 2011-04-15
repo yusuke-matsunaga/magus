@@ -79,6 +79,7 @@ PatMatcher::operator()(const BdnNode* sbj_root,
     ymuint from_id = mPatMgr.edge_from(edge_id);
     ymuint f_pos = mPatMgr.edge_pos(edge_id);
     const BdnNode* to_node = mSbjMap[to_id];
+    assert_cond( to_node->is_logic(), __FILE__, __LINE__);
     const BdnNode* from_node = to_node->fanin(f_pos);
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
@@ -157,9 +158,11 @@ PatMatcher::bind(const BdnNode* sbj_node,
 {
   if ( mSbjMap[pat_id] != NULL ) {
     if ( mSbjMap[pat_id] != sbj_node ) {
+      // パタンノード(pat_id)が既に他のノードにバインドしていた．
       return false;
     }
     if ( mInvMap[pat_id] != inv ) {
+      // 既に逆極性でバインドしていた．
       return false;
     }
   }
@@ -172,13 +175,13 @@ PatMatcher::bind(const BdnNode* sbj_node,
   hash_map<ymuint, ymuint>::iterator p = mPatMap.find(sbj_node->id());
   if ( p != mPatMap.end() ) {
     if ( p->second != pat_id ) {
+      // SbjNode が既に他のノードにバインドしていた．
       return false;
     }
   }
   else {
     mPatMap.insert(make_pair(sbj_node->id(), pat_id));
   }
-
   return true;
 }
 
