@@ -11,6 +11,7 @@
 #include "ym_blif/BlifNetworkReader.h"
 #include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BlifBdnConv.h"
+#include "ym_bdn/BdnDumper.h"
 #include "ym_techmap/TechMap.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_utils/MsgHandler.h"
@@ -77,6 +78,9 @@ test(string pat_filename,
       return;
     }
   }
+
+  BdnDumper bdn_dumper;
+  bdn_dumper(cout, sbjgraph);
 
   CnGraph mapnetwork;
 
