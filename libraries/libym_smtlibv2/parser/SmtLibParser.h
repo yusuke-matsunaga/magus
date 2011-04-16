@@ -22,11 +22,6 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-class SmtLibPt
-{
-  int foo;
-};
-
 //////////////////////////////////////////////////////////////////////
 /// @class SmtLibParser SmtLibParser.h "SmtLibParser.h"
 /// @brief SmtLib ファイルのパーサーの実装クラス
@@ -55,23 +50,77 @@ public:
   MsgMgr&
   msg_mgr();
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // smtlib_grammer.yy で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
   /// @brief 今までに生成したすべてのオブジェクトを解放する．
   void
   clear();
 
-  /// @brief 字句解析を行う．
-  /// @param[out] lval トークンの値を格納する変数
-  /// @param[out] lloc トークンの位置を格納する変数
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // read() の中で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief S式の読み込みを行う．
+  /// @param[out] node 読み込んだ S式を格納するノード
   /// @return トークンの型を返す．
-  int
-  scan(SmtLibPt*& lval,
-       FileRegion& lloc);
+  tTokenType
+  read_sexp(SmtLibNode*& node);
+
+  /// @brief NUM タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] val 値
+  SmtLibNode*
+  new_num(const FileRegion& loc,
+	  StrId val);
+
+  /// @brief DEC タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] val 値
+  SmtLibNode*
+  new_dec(const FileRegion& loc,
+	  StrId val);
+
+  /// @brief HEX タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] val 値
+  SmtLibNode*
+  new_hex(const FileRegion& loc,
+	  StrId val);
+
+  /// @brief BIN タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] val 値
+  SmtLibNode*
+  new_bin(const FileRegion& loc,
+	  StrId val);
+
+  /// @brief STRING タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] val 値
+  SmtLibNode*
+  new_string(const FileRegion& loc,
+	     StrId val);
+
+  /// @brief SYMBOL タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] val 値
+  SmtLibNode*
+  new_symbol(const FileRegion& loc,
+	     StrId val);
+
+  /// @brief KEYWORD タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] val 値
+  SmtLibNode*
+  new_keyword(const FileRegion& loc,
+	      StrId val);
+
+  /// @brief LIST タイプのノードを生成する．
+  /// @param[in] loc ファイル上の位置
+  /// @param[in] child_list 子供のノードのリスト
+  SmtLibNode*
+  new_list(const FileRegion& loc,
+	   const list<SmtLibNode*>& child_list);
 
   /// @brief エラーメッセージを出力する．
   /// @note 副作用で mError が true にセットされる．
@@ -79,18 +128,19 @@ public:
   error(const FileRegion& loc,
 	const char* msg);
 
+  /// @brief S式の内容を出力する．
+  /// @note デバッグ用
+  void
+  dump(ostream& s,
+       const SmtLibNode* node);
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部でのみ使われるメンバ関数
-  //////////////////////////////////////////////////////////////////////
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SmtLibPt のメモリ確保用アロケータ
+  // SmtLibNode のメモリ確保用アロケータ
   SimpleAlloc mAlloc;
 
   // 字句解析器

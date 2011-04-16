@@ -14,9 +14,6 @@
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
-#include "smtlib_grammer.h"
-
-
 // コンストラクタ
 SmtLibLex::SmtLibLex(MsgMgr& msg_mgr) :
   mMsgMgr(msg_mgr)
@@ -67,6 +64,8 @@ SmtLibLex::init()
 
 BEGIN_NONAMESPACE
 
+// symbol/keyword などに用いることの
+// できる文字の場合に true を返す．
 inline
 bool
 is_strchar(int c)
@@ -95,11 +94,28 @@ is_strchar(int c)
   }
 }
 
+// is_strchar() に数字をプラスしたもの．
 inline
 bool
 is_strdigitchar(int c)
 {
   return isdigit(c) || is_strchar(c);
+}
+
+// 2進数を表す文字の時に true を返す．
+inline
+bool
+is_binchar(int c)
+{
+  return c == '0' || c == '1';
+}
+
+// 16進数を表す文字の時に true を返す．
+inline
+bool
+is_hexchar(int c)
+{
+  return isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 }
 
 END_NONAMESPACE
@@ -125,7 +141,7 @@ END_NONAMESPACE
 // S_SYMが予約語かどうかはここでは判定しない．
 // - 改行は改行として扱う．
 // - 空白，タブ，バックスラッシュ＋改行は区切り文字とみなす．
-int
+tTokenType
 SmtLibLex::read_token()
 {
   int c;
@@ -150,7 +166,7 @@ SmtLibLex::read_token()
 
   switch (c) {
   case EOF:
-    return EOF;
+    return kEofToken;
 
   case ' ':
   case '\t':
@@ -158,8 +174,10 @@ SmtLibLex::read_token()
 
   case '\n':
     nl();
-    goto ST_INIT;
-    //return NL;
+    return kNlToken;
+
+  case '#':
+    goto ST_SHARP;
 
   case '\"':
     goto ST_DQ;
@@ -175,18 +193,15 @@ SmtLibLex::read_token()
   case ';':
     goto ST_COMMENT1;
 
+  case '(':
+    return kLpToken;
+
+  case ')':
+    return kRpToken;
+
   default:
-#if 0
-    // ここに来たらエラー？
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
-		    kMsgError,
-		    "SMTLIB_LEX",
-		    "syntax error");
-    return ERROR;
-#else
-    // それ以外は文字そのものを返す．
-    return c;
-#endif
+    // それ以外はエラー
+    goto SYNTAX_ERROR;
   }
   assert_not_reached(__FILE__, __LINE__);
 
@@ -197,7 +212,7 @@ SmtLibLex::read_token()
     goto ST_DEC1;
   }
   unget();
-  return NUM;
+  return kNumToken;
 
  ST_NUM1: // 一文字目が[1-9]の時
   c = get();
@@ -210,7 +225,7 @@ SmtLibLex::read_token()
     goto ST_DEC1;
   }
   unget();
-  return NUM;
+  return kNumToken;
 
  ST_DEC1: // 0|[1-9][0-9]*'.' を読み込んだ時
   c = get();
@@ -223,7 +238,7 @@ SmtLibLex::read_token()
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "digit number expected after dot.");
-    return ERROR;
+    return kErrorToken;
   }
 
  ST_DEC2: // 0|[1-9][0-9]*'.'[0-9]* を読み込んだ時
@@ -233,7 +248,54 @@ SmtLibLex::read_token()
     goto ST_DEC2;
   }
   unget();
-  return DEC;
+  return kDecToken;
+
+ ST_SHARP: // 一文字目が # だった時
+  c = get();
+  if ( c == 'b' ) {
+    goto ST_BIN;
+  }
+  if ( c == 'x' ) {
+    goto ST_HEX;
+  }
+  // それ以外はエラー
+  goto SYNTAX_ERROR;
+
+ ST_BIN: // "#b" を読み込んだ後
+  c = get();
+  if ( is_binchar(c) ) {
+    mCurString.put_char(c);
+    goto ST_BIN1;
+  }
+  // 最低1文字は2進数を表すもじがなければならない．
+  goto SYNTAX_ERROR;
+
+ ST_BIN1: // "#b[01]+" を読み込んだ後
+  c = get();
+  if ( is_binchar(c) ) {
+    mCurString.put_char(c);
+    goto ST_BIN1;
+  }
+  unget();
+  return kBinToken;
+
+ ST_HEX: // "#x" を読み込んだ後
+  c = get();
+  if ( is_hexchar(c) ) {
+    mCurString.put_char(c);
+    goto ST_HEX1;
+  }
+  // 最低1文字は16進数を表す文字がなければならない．
+  goto SYNTAX_ERROR;
+
+ ST_HEX1: // "#x[0-9a-fA-F]+" を読み込んだ後
+  c = get();
+  if ( is_hexchar(c) ) {
+    mCurString.put_char(c);
+    goto ST_HEX1;
+  }
+  unget();
+  return kHexToken;
 
  ST_SYM1: // 一文字目が文字だった時
   c = get();
@@ -242,7 +304,7 @@ SmtLibLex::read_token()
     goto ST_SYM1;
   }
   unget();
-  return SYMBOL;
+  return kSymbolToken;
 
  ST_DQ: // 一文字目が " だった時
   c = get();
@@ -253,7 +315,7 @@ SmtLibLex::read_token()
     }
   }
   if ( c == '"' ) {
-    return STRING;
+    return kStringToken;
   }
   if ( c == '\n' ) {
     // " ... " の間に改行があった．
@@ -261,14 +323,14 @@ SmtLibLex::read_token()
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "newline inside double-quoted string.");
-    return ERROR;
+    return kErrorToken;
   }
   if ( c == EOF ) {
     mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "unexpected end-of-file in double-quoted string.");
-    return ERROR;
+    return kErrorToken;
   }
   mCurString.put_char(c);
   goto ST_DQ;
@@ -276,7 +338,7 @@ SmtLibLex::read_token()
  ST_Q_SYM1: // 一文字目が | だった時
   c = get();
   if ( c == '|' ) {
-    return SYMBOL;
+    return kSymbolToken;
   }
   if ( c == '\\' ) {
     // | ... | の間にバックスラッシュがあった．
@@ -284,14 +346,15 @@ SmtLibLex::read_token()
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "baskslash inside quoted symbol.");
-    return ERROR;
+    return kErrorToken;
   }
   if ( c == EOF ) {
+    // | ... | が終わる前に EOF が来た．
     mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
 		    kMsgError,
 		    "SMTLIB_LEX",
 		    "unexpected end-of-file in quoted symbol.");
-    return ERROR;
+    return kErrorToken;
   }
   if ( c == '\n' ) {
     nl();
@@ -306,7 +369,7 @@ SmtLibLex::read_token()
     goto ST_KEY1;
   }
   unget();
-  return KEYWORD;
+  return kKeywordToken;
 
  ST_COMMENT1: // ; を読み込んだ直後
   c = get();
@@ -315,10 +378,17 @@ SmtLibLex::read_token()
     goto ST_INIT;
   }
   if ( c == EOF ) {
-    return EOF;
+    return kEofToken;
   }
   goto ST_COMMENT1;
 
+ SYNTAX_ERROR:
+  mMsgMgr.put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "SMTLIB_LEX",
+		  "syntax error");
+  return kErrorToken;
 }
 
 // 一文字読み出す．

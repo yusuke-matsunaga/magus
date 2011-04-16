@@ -48,7 +48,7 @@ public:
   close_file();
 
   /// @brief トークンを一つとってくる．
-  int
+  tTokenType
   read_token();
 
   /// @brief 直前の read_token() に対応する文字列を返す．

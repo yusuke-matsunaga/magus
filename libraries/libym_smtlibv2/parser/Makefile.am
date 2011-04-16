@@ -8,10 +8,7 @@ INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-YFLAGS = -d -v
-
-CLEANFILES = \
-	smtlib_grammer.cc smtlib_grammer.h y.output smtlib_grammer.output
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -23,8 +20,9 @@ noinst_LTLIBRARIES = \
 ## libym_smt_parser.la
 ############################################################
 libym_smt_parser_la_SOURCES = \
-	smtlib_grammer.yy \
 	SmtLibLex.cc \
+	SmtLibNodeImpl.h \
+	SmtLibNodeImpl.cc \
 	SmtLibParser.h \
 	SmtLibParser.cc
 

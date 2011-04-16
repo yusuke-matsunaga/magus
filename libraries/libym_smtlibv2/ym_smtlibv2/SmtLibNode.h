@@ -10,6 +10,7 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -22,55 +23,41 @@ class SmtLibNode
 {
 public:
 
-  /// @brief ノードの種類
-  enum tType {
-    /// @brief NUMERAL
-    kNum,
-    /// @brief DECIMAL
-    kDec,
-    /// @brief HEXADECIMAL
-    kHex,
-    /// @brief BINARY
-    kBin,
-    /// @brief STRING
-    kString,
-    /// @brief SYMBOL
-    kSymbol,
-    /// @brief KEYWORD
-    kKeyword,
-    /// @brief LIST
-    kList
-  };
-
-
-public:
-
   /// @brief デストラクタ
   virtual
   ~SmtLibNode() { }
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスが実装する仮想関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 型を返す．
   virtual
-  tType
-  type() = 0;
+  tTokenType
+  type() const = 0;
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const = 0;
 
   /// @brief 終端型の場合の値を返す．
   virtual
-  string
-  value() = 0;
+  const char*
+  value() const = 0;
 
-  /// @brief LIST型の場合の car を返す．
+  /// @brief LIST型の場合の子供のノードの要素数を返す．
+  virtual
+  ymuint
+  child_num() const = 0;
+
+  /// @brief LIST型の場合の子供のノードを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
   virtual
   const SmtLibNode*
-  car() = 0;
-
-  /// @brief LIST型の場合の cdr を返す．
-  virtual
-  const SmtLibNode*
-  cdr() = 0;
+  child(ymuint pos) const = 0;
 
 };
 

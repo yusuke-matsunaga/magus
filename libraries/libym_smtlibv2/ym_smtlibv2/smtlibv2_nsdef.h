@@ -25,6 +25,44 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
+/// @brief トークンの種類
+enum tTokenType {
+  /// @brief NUMERAL
+  kNumToken,
+  /// @brief DECIMAL
+  kDecToken,
+  /// @brief HEXADECIMAL
+  kHexToken,
+  /// @brief BINARY
+  kBinToken,
+  /// @brief STRING
+  kStringToken,
+  /// @brief SYMBOL
+  kSymbolToken,
+  /// @brief KEYWORD
+  kKeywordToken,
+  /// @brief LIST
+  kListToken,
+  /// @brief (
+  kLpToken,
+  /// @brief )
+  kRpToken,
+  /// @brief NL
+  kNlToken,
+  /// @brief ERROR
+  kErrorToken,
+  /// @brief EOF
+  kEofToken
+};
+
+
+// クラス名の宣言
+class SmtLibNode;
+
 END_NAMESPACE_YM_SMTLIBV2
+
+BEGIN_NAMESPACE_YM
+
+END_NAMESPACE_YM
 
 #endif // YM_SMTLIBV2_SMTLIBV2_NSDEF_H
