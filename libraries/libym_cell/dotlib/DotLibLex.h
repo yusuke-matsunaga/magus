@@ -21,8 +21,20 @@
 BEGIN_NAMESPACE_YM_CELL
 
 /// @brief トークンの値
-const int STR = 257;
-const int ERROR = 300;
+const int COLON = static_cast<int>(':');
+const int SEMICOLON = static_cast<int>(';');
+const int COMMA = static_cast<int>(',');
+const int MINUS = static_cast<int>('-');
+const int LP = static_cast<int>('(');
+const int RP = static_cast<int>(')');
+const int LCB = static_cast<int>('{');
+const int RCB = static_cast<int>('}');
+const int INT_NUM = 301;
+const int FLOAT_NUM = 302;
+const int STR = 303;
+const int NL = 400;
+const int ERROR = 500;
+
 
 //////////////////////////////////////////////////////////////////////
 /// DotLib 用の LEX クラス

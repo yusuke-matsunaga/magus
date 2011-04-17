@@ -22,19 +22,19 @@ main(int argc,
 {
   using namespace nsYm;
   using namespace nsYm::nsCell;
-  
+
   if ( argc < 2 ) {
     cerr << "USAGE: " << argv[0]
 	 << " <file-name> ..." << endl;
     return -1;
   }
-  
+
   MsgMgr msg_mgr;
   DotLibLex lex(msg_mgr);
-  
+
   StopWatch timer;
   timer.start();
-  
+
   for (int i = 1; i < argc; ++ i) {
     if ( !lex.open_file(argv[i]) ) {
       cerr << argv[i] << " : cannot open" << endl;
@@ -50,14 +50,65 @@ main(int argc,
 	   << ", column: " << setw(3) << lex.first_column()
 	   << " - " << setw(3) << lex.cur_column() << "\t";
       switch ( id ) {
+      case COLON:
+	cout << ":";
+	break;
+
+      case SEMICOLON:
+	cout << ";";
+	break;
+
+      case COMMA:
+	cout << ",";
+	break;
+
+      case MINUS:
+	cout << "-";
+	break;
+
+      case LP:
+	cout << "(";
+	break;
+
+      case RP:
+	cout << ")";
+	break;
+
+      case LCB:
+	cout << "{";
+	break;
+
+      case RCB:
+	cout << "}";
+	break;
+
+      case INT_NUM:
+	cout << "INT_NUM(" << lex.cur_string() << ")";
+	break;
+
+      case FLOAT_NUM:
+	cout << "FLOAT_NUM(" << lex.cur_string() << ")";
+	break;
+
       case STR:
 	cout << "STR(\"" << lex.cur_string() << "\")";
 	break;
+
+      case NL:
+	cout << "NL";
+	break;
+
       case ERROR:
 	cout << "ERROR";
 	break;
+
       default:
-	cout << static_cast<char>(id);
+	if ( isascii(id) ) {
+	  cout << "CHAR( " << static_cast<char>(id) << " )" << endl;
+	}
+	else {
+	  cout << "UNKNOWN(" << id << ")";
+	}
 	break;
       }
       cout << endl;
@@ -67,6 +118,6 @@ main(int argc,
   timer.stop();
   USTime time = timer.time();
   cout << "Time: " << time << endl;
-  
+
   return 0;
 }

@@ -16,13 +16,6 @@ BEGIN_NAMESPACE_YM_CELL
 
 //#include "dotlib_grammer.h"
 
-#define INT_NUM 301
-#define FLOAT_NUM 302
-#define STR 303
-#define NL 400
-#define ERROR 500
-
-
 // コンストラクタ
 DotLibLex::DotLibLex(MsgMgr& msg_mgr) :
   mMsgMgr(msg_mgr)
@@ -133,10 +126,35 @@ DotLibLex::read_token()
   case '/':
     goto ST_COMMENT1;
 
+  case ':':
+    return COLON;
+
+  case ';':
+    return SEMICOLON;
+
+  case ',':
+    return COMMA;
+
+  case '-':
+    return MINUS;
+
+  case '(':
+    return LP;
+
+  case ')':
+    return RP;
+
+  case '{':
+    return LCB;
+
+  case '}':
+    return RCB;
+
   default:
-    break;
+    // それ以外はエラーなんじゃない？
+    return c;
   }
-  return c;
+  assert_not_reached(__FILE__, __LINE__);
 
  ST_NUM1: // 一文字目が[0-9]の時
   c = get();
