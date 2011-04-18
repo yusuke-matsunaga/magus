@@ -5,16 +5,14 @@
 ///
 /// $Id: DotLibLex.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "DotLibLex.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
-
-//#include "dotlib_grammer.h"
+BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 // コンストラクタ
 DotLibLex::DotLibLex(MsgMgr& msg_mgr) :
@@ -74,7 +72,7 @@ DotLibLex::init()
 // - 改行は改行として扱う．
 // - 空白，タブ，バックスラッシュ＋改行は区切り文字とみなす．
 // - それ以外の文字はそのまま返す．
-int
+tTokenType
 DotLibLex::read_token()
 {
   int c;
@@ -99,7 +97,7 @@ DotLibLex::read_token()
     goto ST_DOT;
 
   case EOF:
-    return EOF;
+    return END;
 
   case ' ':
   case '\t':
@@ -130,7 +128,7 @@ DotLibLex::read_token()
     return COLON;
 
   case ';':
-    return SEMICOLON;
+    return SEMI;
 
   case ',':
     return COMMA;
@@ -152,7 +150,11 @@ DotLibLex::read_token()
 
   default:
     // それ以外はエラーなんじゃない？
-    return c;
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    "syntax error");
+    return ERROR;
   }
   assert_not_reached(__FILE__, __LINE__);
 
@@ -234,7 +236,7 @@ DotLibLex::read_token()
     goto ST_ID;
   }
   unget();
-  return STR;
+  return ID_STR;
 
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
   c = get();
@@ -270,8 +272,11 @@ DotLibLex::read_token()
   if ( c == '*' ) { // C スタイルのコメント
     goto ST_COMMENT3;
   }
-  unget();
-  return '/';
+  mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+		  kMsgError,
+		  "DOTLIB_LEX",
+		  "syntax error.");
+  return ERROR;
 
  ST_COMMENT2: // 改行まで読み飛ばす．
   c = get();
@@ -280,7 +285,7 @@ DotLibLex::read_token()
     goto ST_INIT;
   }
   if ( c == EOF ) {
-    return EOF;
+    return END;
   }
   goto ST_COMMENT2;
 
@@ -291,6 +296,9 @@ DotLibLex::read_token()
   }
   if ( c == '*' ) {
     goto ST_COMMENT4;
+  }
+  if ( c == '\n' ) {
+    nl();
   }
   goto ST_COMMENT3;
 
@@ -387,4 +395,4 @@ DotLibLex::nl()
   mCurColumn = 0;
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_DOTLIB

@@ -27,7 +27,8 @@ distclean-local:
 
 bin_PROGRAMS = \
 	mislibparser_test \
-	dotlib_lex_test
+	dotlib_lex_test \
+	dotlib_parser_test
 
 mislibparser_test_SOURCES = \
 	mislibparser_test.cc
@@ -43,4 +44,12 @@ dotlib_lex_test_SOURCES = \
 dotlib_lex_test_LDFLAGS =
 
 dotlib_lex_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+
+dotlib_parser_test_SOURCES = \
+	dotlib_parser_test.cc
+
+dotlib_parser_test_LDFLAGS =
+
+dotlib_parser_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la

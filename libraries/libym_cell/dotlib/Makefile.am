@@ -11,10 +11,7 @@ INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-YFLAGS=-d -v
-
-CLEANFILES = \
-	dotlib_grammer.cc dotlib_grammer.h y.output dotlib_grammer.output
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -27,6 +24,23 @@ libym_cell_dotlib_la_LIBADD = \
 libym_cell_dotlib_la_LDFLAGS =
 
 libym_cell_dotlib_la_SOURCES = \
+	dotlib_nsdef.h \
+	DotLibHandler.h \
+	DotLibHandler.cc \
 	DotLibLex.cc \
-	DotLibLex.h
+	DotLibLex.h \
+	DotLibParser.h \
+	DotLibParser.cc \
+	LibraryGroupHandler.h \
+	LibraryGroupHandler.cc \
+	LibSimple.h \
+	LibSimple.cc \
+	LibComplex.h \
+	LibComplex.cc \
+	DummySimpleHandler.h \
+	DummySimpleHandler.cc \
+	DummyComplexHandler.h \
+	DummyComplexHandler.cc
+
+
 

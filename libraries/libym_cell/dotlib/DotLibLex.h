@@ -1,5 +1,5 @@
-#ifndef YM_CELL_DOTLIB_DOTLIBLEX_H
-#define YM_CELL_DOTLIB_DOTLIBLEX_H
+#ifndef LIBYM_CELL_DOTLIB_DOTLIBLEX_H
+#define LIBYM_CELL_DOTLIB_DOTLIBLEX_H
 
 /// @file libym_cell/dotlib/DotLibLex.h
 /// @brief DotLibLex のヘッダファイル
@@ -7,34 +7,18 @@
 ///
 /// $Id: DotLibLex.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/cell_nsdef.h"
+#include "dotlib_nsdef.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/StrBuff.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
-
-/// @brief トークンの値
-const int COLON = static_cast<int>(':');
-const int SEMICOLON = static_cast<int>(';');
-const int COMMA = static_cast<int>(',');
-const int MINUS = static_cast<int>('-');
-const int LP = static_cast<int>('(');
-const int RP = static_cast<int>(')');
-const int LCB = static_cast<int>('{');
-const int RCB = static_cast<int>('}');
-const int INT_NUM = 301;
-const int FLOAT_NUM = 302;
-const int STR = 303;
-const int NL = 400;
-const int ERROR = 500;
-
+BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
 /// DotLib 用の LEX クラス
@@ -64,7 +48,7 @@ public:
   close_file();
 
   /// @brief トークンを一つとってくる．
-  int
+  tTokenType
   read_token();
 
   /// @brief 直前の read_token() に対応する文字列を返す．
@@ -197,6 +181,6 @@ DotLibLex::cur_column() const
   return mCurColumn;
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // YM_CELL_DOTLIB_DOTLIBLEX_H
+#endif // LIBYM_CELL_DOTLIB_DOTLIBLEX_H

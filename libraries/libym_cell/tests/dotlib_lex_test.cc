@@ -16,19 +16,12 @@
 #include "ym_utils/MsgHandler.h"
 
 
+BEGIN_NAMESPACE_YM_CELL_DOTLIB
+
 int
-main(int argc,
-     char** argv)
+dotliblex_test(int argc,
+	       char** argv)
 {
-  using namespace nsYm;
-  using namespace nsYm::nsCell;
-
-  if ( argc < 2 ) {
-    cerr << "USAGE: " << argv[0]
-	 << " <file-name> ..." << endl;
-    return -1;
-  }
-
   MsgMgr msg_mgr;
   DotLibLex lex(msg_mgr);
 
@@ -42,8 +35,8 @@ main(int argc,
     }
 
     for ( ; ; ) {
-      int id = lex.read_token();
-      if ( id == EOF ) {
+      tTokenType id = lex.read_token();
+      if ( id == END ) {
 	break;
       }
       cout << "line: " << setw(4) << lex.cur_line()
@@ -54,7 +47,7 @@ main(int argc,
 	cout << ":";
 	break;
 
-      case SEMICOLON:
+      case SEMI:
 	cout << ";";
 	break;
 
@@ -90,6 +83,10 @@ main(int argc,
 	cout << "FLOAT_NUM(" << lex.cur_string() << ")";
 	break;
 
+      case ID_STR:
+	cout << "ID(" << lex.cur_string() << ")";
+	break;
+
       case STR:
 	cout << "STR(\"" << lex.cur_string() << "\")";
 	break;
@@ -103,12 +100,7 @@ main(int argc,
 	break;
 
       default:
-	if ( isascii(id) ) {
-	  cout << "CHAR( " << static_cast<char>(id) << " )" << endl;
-	}
-	else {
-	  cout << "UNKNOWN(" << id << ")";
-	}
+	assert_not_reached(__FILE__, __LINE__);
 	break;
       }
       cout << endl;
@@ -120,4 +112,23 @@ main(int argc,
   cout << "Time: " << time << endl;
 
   return 0;
+}
+
+END_NAMESPACE_YM_CELL_DOTLIB
+
+int
+main(int argc,
+     char** argv)
+{
+  using namespace nsYm;
+
+  if ( argc < 2 ) {
+    cerr << "USAGE: " << argv[0]
+	 << " <file-name> ..." << endl;
+    return -1;
+  }
+
+  int stat = nsYm::nsCell::nsDotlib::dotliblex_test(argc, argv);
+
+  return stat;
 }
