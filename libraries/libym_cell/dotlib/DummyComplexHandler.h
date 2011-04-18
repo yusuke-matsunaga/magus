@@ -38,12 +38,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値の読み込み処理を行う．
-  /// @param[in] name 属性名
+  /// @param[in] attr_name 属性名
   /// @param[in] value_list 値の型と値を表す文字列のペアのリスト
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_value(const char* name,
+  read_value(const string& attr_name,
 	     const list<pair<tTokenType, string> >& value_list);
 
 };

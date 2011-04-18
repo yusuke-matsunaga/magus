@@ -29,14 +29,14 @@ DummyComplexHandler::~DummyComplexHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] value_list 値の型と値を表す文字列のペアのリスト
 // @return エラーが起きたら false を返す．
 bool
-DummyComplexHandler::read_value(const char* name,
+DummyComplexHandler::read_value(const string& attr_name,
 				const list<pair<tTokenType, string> >& value_list)
 {
-  cout << name << " (";
+  cout << attr_name << " (";
   const char* comma = "";
   for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
        p != value_list.end(); ++ p) {

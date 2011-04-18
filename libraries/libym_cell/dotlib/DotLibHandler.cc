@@ -81,7 +81,7 @@ SimpleHandler::~SimpleHandler()
 // @param[in] attr_name 属性名
 // @return エラーが起きたら false を返す．
 bool
-SimpleHandler::read_attr(const char* attr_name)
+SimpleHandler::read_attr(const string& attr_name)
 {
   if ( !expect(COLON) ) {
     return false;
@@ -122,10 +122,10 @@ ComplexHandler::~ComplexHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @return エラーが起きたら false を返す．
 bool
-ComplexHandler::read_attr(const char* name)
+ComplexHandler::read_attr(const string& attr_name)
 {
   if ( !expect(LP) ) {
     return false;
@@ -149,7 +149,7 @@ ComplexHandler::read_attr(const char* name)
       return false;
     }
   }
-  if ( !read_value(name, value_list) ) {
+  if ( !read_value(attr_name, value_list) ) {
     return false;
   }
 
@@ -182,10 +182,10 @@ GroupHandler::~GroupHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @return エラーが起きたら false を返す．
 bool
-GroupHandler::read_attr(const char* name)
+GroupHandler::read_attr(const string& attr_name)
 {
   if ( !expect(LP) ) {
     return false;
@@ -196,7 +196,7 @@ GroupHandler::read_attr(const char* name)
   }
 
   string group_name = lex().cur_string();
-  read_group_name(name, group_name);
+  read_group_name(attr_name, group_name);
 
   if ( !expect(RP) ) {
     return false;
@@ -254,8 +254,7 @@ void
 GroupHandler::reg_handler(const char* name,
 			  DotLibHandler* handler)
 {
-  string name_str(name);
-  mHandlerMap.insert(make_pair(name_str, handler));
+  mHandlerMap.insert(make_pair(string(name), handler));
 }
 
 

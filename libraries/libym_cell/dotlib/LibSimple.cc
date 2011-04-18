@@ -30,12 +30,12 @@ BusNamingStyleHandler::~BusNamingStyleHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-BusNamingStyleHandler::read_value(const char* name,
+BusNamingStyleHandler::read_value(const string& attr_name,
 				   tTokenType type,
 				   const string& value)
 {
@@ -61,12 +61,12 @@ CommentHandler::~CommentHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-CommentHandler::read_value(const char* name,
+CommentHandler::read_value(const string& attr_name,
 			   tTokenType type,
 			   const string& value)
 {
@@ -92,12 +92,12 @@ CurrentUnitHandler::~CurrentUnitHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-CurrentUnitHandler::read_value(const char* name,
+CurrentUnitHandler::read_value(const string& attr_name,
 			       tTokenType type,
 			       const string& value)
 {
@@ -123,12 +123,12 @@ DateHandler::~DateHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-DateHandler::read_value(const char* name,
+DateHandler::read_value(const string& attr_name,
 			tTokenType type,
 			const string& value)
 {
@@ -154,18 +154,18 @@ DelayModelHandler::~DelayModelHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-DelayModelHandler::read_value(const char* name,
+DelayModelHandler::read_value(const string& attr_name,
 			      tTokenType type,
 			      const string& value)
 {
   // delay_model : generic_cmos|table_lookup|cmos2|piecewise_cmos|dcm ;
 
-  assert_cond( strcmp(name, "delay_model") == 0, __FILE__, __LINE__);
+  assert_cond( attr_name == "delay_model", __FILE__, __LINE__);
 
   cout << "delay_model : " << value << endl;
 
@@ -210,12 +210,12 @@ InPlaceSwapModeHandler::~InPlaceSwapModeHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-InPlaceSwapModeHandler::read_value(const char* name,
+InPlaceSwapModeHandler::read_value(const string& attr_name,
 				   tTokenType type,
 				   const string& value)
 {
@@ -241,12 +241,12 @@ LeakagePowerUnitHandler::~LeakagePowerUnitHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-LeakagePowerUnitHandler::read_value(const char* name,
+LeakagePowerUnitHandler::read_value(const string& attr_name,
 				    tTokenType type,
 				    const string& value)
 {
@@ -272,12 +272,12 @@ PieceTypeHandler::~PieceTypeHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-PieceTypeHandler::read_value(const char* name,
+PieceTypeHandler::read_value(const string& attr_name,
 			     tTokenType type,
 			     const string& value)
 {
@@ -303,12 +303,12 @@ PullingResistanceUnitHandler::~PullingResistanceUnitHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-PullingResistanceUnitHandler::read_value(const char* name,
+PullingResistanceUnitHandler::read_value(const string& attr_name,
 					 tTokenType type,
 					 const string& value)
 {
@@ -334,12 +334,12 @@ RevisionHandler::~RevisionHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-RevisionHandler::read_value(const char* name,
+RevisionHandler::read_value(const string& attr_name,
 			    tTokenType type,
 			    const string& value)
 {
@@ -365,12 +365,12 @@ SimulationHandler::~SimulationHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-SimulationHandler::read_value(const char* name,
+SimulationHandler::read_value(const string& attr_name,
 			      tTokenType type,
 			      const string& value)
 {
@@ -396,12 +396,12 @@ TimeUnitHandler::~TimeUnitHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-TimeUnitHandler::read_value(const char* name,
+TimeUnitHandler::read_value(const string& attr_name,
 			    tTokenType type,
 			    const string& value)
 {
@@ -427,12 +427,12 @@ VoltageUnitHandler::~VoltageUnitHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] type 値の型
 // @param[in] value 値を表す文字列
 // @return エラーが起きたら false を返す．
 bool
-VoltageUnitHandler::read_value(const char* name,
+VoltageUnitHandler::read_value(const string& attr_name,
 			       tTokenType type,
 			       const string& value)
 {

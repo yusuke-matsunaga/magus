@@ -37,12 +37,12 @@ public:
   // DotLibHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 構文要素を処理する．
-  /// @param[in] name 属性名
+  /// @brief 属性値を読み込む．
+  /// @param[in] attr_name 属性名
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const char* name);
+  read_attr(const string& attr_name);
 
 
 private:
@@ -51,11 +51,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief グループ名を読み込んだ時の処理
-  /// @param[in] name 属性名
+  /// @param[in] attr_name 属性名
   /// @param[in] group_name グループ名
   virtual
   bool
-  read_group_name(const char* name,
+  read_group_name(const string& attr_name,
 		  const string& group_name) = 0;
 
 

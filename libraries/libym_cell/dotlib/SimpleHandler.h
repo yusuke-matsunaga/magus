@@ -37,12 +37,12 @@ public:
   // DotLibHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 構文要素を処理する．
-  /// @param[in] name 属性名
+  /// @brief 属性値を読み込む．
+  /// @param[in] attr_name 属性名
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const char* name);
+  read_attr(const string& attr_name);
 
 
 private:
@@ -51,13 +51,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値の読み込み処理を行う．
-  /// @param[in] name 属性名
+  /// @param[in] attr_name 属性名
   /// @param[in] type 値の型
   /// @param[in] value 値を表す文字列
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_value(const char* name,
+  read_value(const string& name,
 	     tTokenType type,
 	     const string& value) = 0;
 

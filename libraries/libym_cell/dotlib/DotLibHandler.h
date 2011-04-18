@@ -38,11 +38,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．
-  /// @param[in] name 属性名
+  /// @param[in] attr_name 属性名
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const char* name) = 0;
+  read_attr(const string& attr_name) = 0;
 
 
 protected:

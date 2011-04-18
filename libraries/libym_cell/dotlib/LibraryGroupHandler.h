@@ -38,11 +38,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief グループ名を読み込んだ時の処理
-  /// @param[in] name 属性名
+  /// @param[in] attr_name 属性名
   /// @param[in] group_name グループ名
   virtual
   bool
-  read_group_name(const char* name,
+  read_group_name(const string& attr_name,
 		  const string& group_name);
 
 

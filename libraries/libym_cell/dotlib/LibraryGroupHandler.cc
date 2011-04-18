@@ -220,6 +220,8 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& _parser) :
   reg_handler("piece_define", new PieceDefineHandler(parser()));
   reg_handler("routing_layers", new RoutingLayersHandler(parser()));
   reg_handler("technology", new TechnologyHandler(parser()));
+
+  //
 }
 
 // @brief デストラクタ
@@ -228,10 +230,10 @@ LibraryGroupHandler::~LibraryGroupHandler()
 }
 
 // @brief グループ名を読み込んだ時の処理
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] group_name グループ名
 bool
-LibraryGroupHandler::read_group_name(const char* name,
+LibraryGroupHandler::read_group_name(const string& attr_name,
 				     const string& group_name)
 {
   cout << "library ( " << group_name << " )" << endl;

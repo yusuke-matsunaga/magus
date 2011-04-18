@@ -29,11 +29,11 @@ CapacitiveLoadUnitHandler::~CapacitiveLoadUnitHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] value_list 値の型と値を表す文字列のペアのリスト
 // @return エラーが起きたら false を返す．
 bool
-CapacitiveLoadUnitHandler::read_value(const char* name,
+CapacitiveLoadUnitHandler::read_value(const string& attr_name,
 				      const list<pair<tTokenType, string> >& value_list)
 {
   cout << "capacitive_load_unit (";
@@ -65,11 +65,11 @@ DefineCellAreaHandler::~DefineCellAreaHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] value_list 値の型と値を表す文字列のペアのリスト
 // @return エラーが起きたら false を返す．
 bool
-DefineCellAreaHandler::read_value(const char* name,
+DefineCellAreaHandler::read_value(const string& attr_name,
 				  const list<pair<tTokenType, string> >& value_list)
 {
   cout << "define_cell_area (";
@@ -101,11 +101,11 @@ LibraryFeaturesHandler::~LibraryFeaturesHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] value_list 値の型と値を表す文字列のペアのリスト
 // @return エラーが起きたら false を返す．
 bool
-LibraryFeaturesHandler::read_value(const char* name,
+LibraryFeaturesHandler::read_value(const string& attr_name,
 				   const list<pair<tTokenType, string> >& value_list)
 {
   cout << "library_features (";
@@ -137,11 +137,11 @@ PieceDefineHandler::~PieceDefineHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] value_list 値の型と値を表す文字列のペアのリスト
 // @return エラーが起きたら false を返す．
 bool
-PieceDefineHandler::read_value(const char* name,
+PieceDefineHandler::read_value(const string& attr_name,
 			       const list<pair<tTokenType, string> >& value_list)
 {
   cout << "piece_define (";
@@ -173,11 +173,11 @@ RoutingLayersHandler::~RoutingLayersHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] value_list 値の型と値を表す文字列のペアのリスト
 // @return エラーが起きたら false を返す．
 bool
-RoutingLayersHandler::read_value(const char* name,
+RoutingLayersHandler::read_value(const string& attr_name,
 				 const list<pair<tTokenType, string> >& value_list)
 {
   cout << "routing_layers (";
@@ -209,11 +209,11 @@ TechnologyHandler::~TechnologyHandler()
 }
 
 // @brief 属性値の読み込み処理を行う．
-// @param[in] name 属性名
+// @param[in] attr_name 属性名
 // @param[in] value_list 値の型と値を表す文字列のペアのリスト
 // @return エラーが起きたら false を返す．
 bool
-TechnologyHandler::read_value(const char* name,
+TechnologyHandler::read_value(const string& attr_name,
 			      const list<pair<tTokenType, string> >& value_list)
 {
   // technlogy ( cmos|FPGA ) ;
