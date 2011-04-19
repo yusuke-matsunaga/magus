@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_LIBRARYGROUPHANDLER_H
-#define LIBYM_CELL_DOTLIB_LIBRARYGROUPHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_STATETABLEHANDLER_H
+#define LIBYM_CELL_DOTLIB_STATETABLEHANDLER_H
 
-/// @file libym_cell/dotlib/LibraryGroupHandler.h
-/// @brief LibraryGroupHandler のヘッダファイル
+/// @file libym_cell/dotlib/StateTableHandler.h
+/// @brief StateTableHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,24 +15,24 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class LibraryGroupHandler LibraryGroupHandler.h "LibraryGroupHandler.h"
-/// @brie library グループ属性
+/// @class StateTableHandler StateTableHandler.h "StateTableHandler.h"
+/// @brief ダミーの GroupHandler
 //////////////////////////////////////////////////////////////////////
-class LibraryGroupHandler :
+class StateTableHandler :
   public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  LibraryGroupHandler(DotLibParser& parser);
+  StateTableHandler(DotLibParser& parser);
 
   /// @brief デストラクタ
   virtual
-  ~LibraryGroupHandler();
+  ~StateTableHandler();
 
 
-private:
+public:
   //////////////////////////////////////////////////////////////////////
   // GroupHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
@@ -50,9 +50,8 @@ private:
   bool
   end_group();
 
-
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_LIBRARYGROUPHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_STATETABLEHANDLER_H

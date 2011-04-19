@@ -196,7 +196,9 @@ GroupHandler::read_attr(const string& attr_name)
   }
 
   string group_name = lex().cur_string();
-  read_group_name(attr_name, group_name);
+  if ( !read_group_name(attr_name, group_name) ) {
+    return false;
+  }
 
   if ( !expect(RP) ) {
     return false;
@@ -240,6 +242,9 @@ GroupHandler::read_attr(const string& attr_name)
     if ( !handler->read_attr(name1) ) {
       return false;
     }
+  }
+  if ( !end_group() ) {
+    return false;
   }
 
   if ( !expect(NL) ) {

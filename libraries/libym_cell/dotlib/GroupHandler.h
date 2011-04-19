@@ -58,6 +58,11 @@ private:
   read_group_name(const string& attr_name,
 		  const string& group_name) = 0;
 
+  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
+  virtual
+  bool
+  end_group() = 0;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////

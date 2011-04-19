@@ -37,10 +37,24 @@ libym_cell_dotlib_la_SOURCES = \
 	LibSimple.cc \
 	LibComplex.h \
 	LibComplex.cc \
+	CellHandler.h \
+	CellHandler.cc \
+	BusHandler.h \
+	BusHandler.cc \
+	PinHandler.h \
+	PinHandler.cc \
+	FfHandler.h \
+	FfHandler.cc \
+	LatchHandler.h \
+	LatchHandler.cc \
+	StateTableHandler.h \
+	StateTableHandler.cc \
 	DummySimpleHandler.h \
 	DummySimpleHandler.cc \
 	DummyComplexHandler.h \
-	DummyComplexHandler.cc
+	DummyComplexHandler.cc \
+	DummyGroupHandler.h \
+	DummyGroupHandler.cc
 
 
 
