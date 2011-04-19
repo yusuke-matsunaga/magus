@@ -243,15 +243,6 @@ DotLibLex::read_token()
   if ( c == '\"' ) {
     return STR;
   }
-  if ( c == '\n' ) {
-    ostringstream buf;
-    buf << "unexpected newline in quoted string.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
-		    kMsgError,
-		    "DOTLIB_LEX",
-		    buf.str());
-    return ERROR;
-  }
   if ( c == EOF ) {
     ostringstream buf;
     buf << "unexpected end-of-file in quoted string.";
@@ -260,6 +251,9 @@ DotLibLex::read_token()
 		    "DOTLIB_LEX",
 		    buf.str());
     return ERROR;
+  }
+  if ( c == '\n' ) {
+    nl();
   }
   mCurString.put_char(c);
   goto ST_DQ;

@@ -10,6 +10,7 @@
 #include "PinHandler.h"
 
 #include "TimingHandler.h"
+#include "InternalPowerHandler.h"
 
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
@@ -105,7 +106,7 @@ PinHandler::PinHandler(DotLibParser& parser) :
   reg_handler("hyperbolic_noise_below_low", dummy_group);
   reg_handler("hyperbolic_noise_high", dummy_group);
   reg_handler("hyperbolic_noise_low", dummy_group);
-  reg_handler("internal_power", dummy_group);
+  reg_handler("internal_power", new InternalPowerHandler(parser));
   reg_handler("max_trans", dummy_group);
   reg_handler("min_pulse_width", dummy_group);
   reg_handler("minimum_period", dummy_group);

@@ -9,6 +9,8 @@
 
 #include "StateTableHandler.h"
 
+#include "DummySimpleHandler.h"
+
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
@@ -21,6 +23,10 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 StateTableHandler::StateTableHandler(DotLibParser& parser) :
   GroupHandler(parser)
 {
+  DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
+
+  // simple attributes
+  reg_handler("table", dummy_simple);
 }
 
 // @brief デストラクタ

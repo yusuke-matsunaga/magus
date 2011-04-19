@@ -66,6 +66,8 @@ libym_cell_dotlib_la_SOURCES = \
 	LeakagePowerHandler.cc \
 	TimingHandler.h \
 	TimingHandler.cc \
+	InternalPowerHandler.h \
+	InternalPowerHandler.cc \
 	DummySimpleHandler.h \
 	DummySimpleHandler.cc \
 	DummyComplexHandler.h \
