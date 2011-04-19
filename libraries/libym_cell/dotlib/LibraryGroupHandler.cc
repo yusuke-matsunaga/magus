@@ -13,6 +13,8 @@
 #include "LibComplex.h"
 
 #include "CellHandler.h"
+#include "DefineHandler.h"
+#include "OperatingConditionsHandler.h"
 
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
@@ -218,7 +220,7 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   // complex attributes
   reg_handler("capacitive_load_unit", new CapacitiveLoadUnitHandler(parser));
   reg_handler("default_part", dummy_complex);
-  reg_handler("define", dummy_complex);
+  reg_handler("define", new DefineHandler(this));
   reg_handler("define_cell_area", new DefineCellAreaHandler(parser));
   reg_handler("define_group", dummy_complex);
   reg_handler("library_features", new LibraryFeaturesHandler(parser));
@@ -239,7 +241,8 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   reg_handler("iv_lut_template", dummy_group);
   reg_handler("lu_table_template", dummy_group);
   reg_handler("noise_lut_template", dummy_group);
-  reg_handler("operating_conditions", dummy_group);
+  reg_handler("operating_conditions",
+	      new OperatingConditionsHandler(parser));
   reg_handler("output_voltage", dummy_group);
   reg_handler("part", dummy_group);
   reg_handler("poly_template", dummy_group);

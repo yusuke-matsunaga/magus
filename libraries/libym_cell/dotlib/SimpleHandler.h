@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class SimpleHandler DotLibHandler.h "DotLibHandler.h"
+/// @class SimpleHandler SimpleHandler.h "SimpleHandler.h"
 /// @brief simple attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class SimpleHandler :
@@ -43,6 +43,22 @@ public:
   virtual
   bool
   read_attr(const string& attr_name);
+
+  /// @brief ハンドラの登録を行う．
+  /// @param[in] attr_name 属性名
+  /// @param[in] handler 対応付けるハンドラ
+  /// @note エラーが起きたら false を返す．
+  virtual
+  bool
+  reg_handler(const string& attr_name,
+	      DotLibHandler* handler);
+
+  /// @brief ハンドラを取り出す．
+  /// @param[in] attr_name 属性名
+  /// @note なければ NULL を返す．
+  virtual
+  DotLibHandler*
+  find_handler(const string& name);
 
 
 private:

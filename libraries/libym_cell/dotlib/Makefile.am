@@ -39,6 +39,10 @@ libym_cell_dotlib_la_SOURCES = \
 	LibComplex.cc \
 	CellHandler.h \
 	CellHandler.cc \
+	DefineHandler.h \
+	DefineHandler.cc \
+	OperatingConditionsHandler.h \
+	OperatingConditionsHandler.cc \
 	BusHandler.h \
 	BusHandler.cc \
 	PinHandler.h \

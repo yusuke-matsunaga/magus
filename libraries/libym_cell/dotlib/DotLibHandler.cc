@@ -104,6 +104,28 @@ SimpleHandler::read_attr(const string& attr_name)
   return true;
 }
 
+// @brief ハンドラの登録を行う．
+// @param[in] attr_name 属性名
+// @param[in] handler 対応付けるハンドラ
+// @note エラーが起きたら false を返す．
+bool
+SimpleHandler::reg_handler(const string& attr_name,
+			   DotLibHandler* handler)
+{
+  // simple attribute は子供を持てない．
+  return false;
+}
+
+// @brief ハンドラを取り出す．
+// @param[in] attr_name 属性名
+// @note なければ NULL を返す．
+DotLibHandler*
+SimpleHandler::find_handler(const string& name)
+{
+  // simple attribute は子供を持てない．
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス ComplexHandler
@@ -164,6 +186,28 @@ ComplexHandler::read_attr(const string& attr_name)
   return true;
 }
 
+// @brief ハンドラの登録を行う．
+// @param[in] attr_name 属性名
+// @param[in] handler 対応付けるハンドラ
+// @note エラーが起きたら false を返す．
+bool
+ComplexHandler::reg_handler(const string& attr_name,
+			    DotLibHandler* handler)
+{
+  // complex attribute は子供を持てない．
+  return false;
+}
+
+// @brief ハンドラを取り出す．
+// @param[in] attr_name 属性名
+// @note なければ NULL を返す．
+DotLibHandler*
+ComplexHandler::find_handler(const string& name)
+{
+  // complex attribute は子供を持てない．
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス GroupHandler
@@ -191,7 +235,12 @@ GroupHandler::read_attr(const string& attr_name)
     return false;
   }
 
-  if ( !expect(ID_STR) ) {
+  tTokenType type = lex().read_token();
+  if ( type != ID_STR && type != STR ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_file_region(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "syntax error. string is expected.");
     return false;
   }
 
@@ -255,12 +304,29 @@ GroupHandler::read_attr(const string& attr_name)
 }
 
 // @brief ハンドラの登録を行う．
-void
-GroupHandler::reg_handler(const char* name,
+// @param[in] attr_name 属性名
+// @note エラーが起きたら false を返す．
+bool
+GroupHandler::reg_handler(const string& attr_name,
 			  DotLibHandler* handler)
 {
-  mHandlerMap.insert(make_pair(string(name), handler));
+  mHandlerMap.insert(make_pair(attr_name, handler));
+  return true;
 }
 
+// @brief ハンドラを取り出す．
+// @param[in] attr_name 属性名
+// @note なければ NULL を返す．
+DotLibHandler*
+GroupHandler::find_handler(const string& name)
+{
+  hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name);
+  if ( p == mHandlerMap.end() ) {
+    return NULL;
+  }
+  else {
+    return p->second;
+  }
+}
 
 END_NAMESPACE_YM_CELL_DOTLIB
