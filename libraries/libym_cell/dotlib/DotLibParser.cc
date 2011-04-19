@@ -139,6 +139,25 @@ DotLibParser::expect(tTokenType type)
   return false;
 }
 
+// @brief 行末まで読み込む．
+bool
+DotLibParser::expect_nl()
+{
+  for ( ; ; ) {
+    tTokenType token = lex().read_token();
+    if ( token == NL ) {
+      return true;
+    }
+    if ( token != SEMI ) {
+      ostringstream buf;
+      mMsgMgr.put_msg(__FILE__, __LINE__, lex().cur_loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "syntax error.");
+    }
+  }
+}
+
 // @brief メッセージ出力管理オブジェクトを返す．
 MsgMgr&
 DotLibParser::msg_mgr()

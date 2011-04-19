@@ -59,7 +59,7 @@ public:
   /// @note なければ NULL を返す．
   virtual
   DotLibHandler*
-  find_handler(const string& name);
+  find_handler(const string& attr_name);
 
 
 private:
@@ -73,7 +73,7 @@ private:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_value(const string& name,
+  read_value(const string& attr_name,
 	     const vector<Token>& token_list) = 0;
 
 };

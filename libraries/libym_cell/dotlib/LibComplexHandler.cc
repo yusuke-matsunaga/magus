@@ -1,5 +1,5 @@
 
-/// @file libym_cell/dotlib/LibComplex.cc
+/// @file libym_cell/dotlib/LibComplexHandler.cc
 /// @brief library グループの complex attribute のハンドラの実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "LibComplex.h"
+#include "LibComplexHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB

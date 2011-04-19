@@ -14,6 +14,7 @@
 #include "LatchHandler.h"
 #include "PinHandler.h"
 #include "StateTableHandler.h"
+#include "LeakagePowerHandler.h"
 
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
@@ -84,7 +85,7 @@ CellHandler::CellHandler(DotLibParser& parser) :
   reg_handler("latch", new LatchHandler(parser));
   reg_handler("latch_bank", dummy_group);
   reg_handler("leakage_current", dummy_group);
-  reg_handler("leakage_power", dummy_group);
+  reg_handler("leakage_power", new LeakagePowerHandler(parser));
   reg_handler("lut", dummy_group);
   reg_handler("mode_definition", dummy_group);
   reg_handler("pin", new PinHandler(parser));

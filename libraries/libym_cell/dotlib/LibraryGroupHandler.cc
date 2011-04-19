@@ -9,13 +9,16 @@
 
 #include "LibraryGroupHandler.h"
 
-#include "LibSimple.h"
-#include "LibComplex.h"
+#include "LibSimpleHandler.h"
+#include "LibComplexHandler.h"
 
 #include "CellHandler.h"
 #include "DefineHandler.h"
 #include "OperatingConditionsHandler.h"
 #include "WireLoadHandler.h"
+#include "LuTableTemplateHandler.h"
+#include "OutputCurrentTemplateHandler.h"
+#include "PowerLutTemplateHandler.h"
 
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
@@ -240,14 +243,18 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   reg_handler("faults_lut_template", dummy_group);
   reg_handler("input_voltage", dummy_group);
   reg_handler("iv_lut_template", dummy_group);
-  reg_handler("lu_table_template", dummy_group);
+  reg_handler("lu_table_template",
+	      new LuTableTemplateHandler(parser));
   reg_handler("noise_lut_template", dummy_group);
   reg_handler("operating_conditions",
 	      new OperatingConditionsHandler(parser));
   reg_handler("output_voltage", dummy_group);
+  reg_handler("output_current_template",
+	      new OutputCurrentTemplateHandler(parser));
   reg_handler("part", dummy_group);
   reg_handler("poly_template", dummy_group);
-  reg_handler("power_lut_template", dummy_group);
+  reg_handler("power_lut_template",
+	      new PowerLutTemplateHandler(parser));
   reg_handler("power_poly_template", dummy_group);
   reg_handler("power_supply", dummy_group);
   reg_handler("propagation_lut_template", dummy_group);

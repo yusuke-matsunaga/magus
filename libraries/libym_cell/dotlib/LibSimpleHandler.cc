@@ -1,5 +1,5 @@
 
-/// @file libym_cell/dotlib/LibSimple.cc
+/// @file libym_cell/dotlib/LibSimpleHandler.cc
 /// @brief LibSimple の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "LibSimple.h"
+#include "LibSimpleHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB

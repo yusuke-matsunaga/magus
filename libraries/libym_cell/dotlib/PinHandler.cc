@@ -9,6 +9,8 @@
 
 #include "PinHandler.h"
 
+#include "TimingHandler.h"
+
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
 #include "DummyGroupHandler.h"
@@ -107,7 +109,7 @@ PinHandler::PinHandler(DotLibParser& parser) :
   reg_handler("max_trans", dummy_group);
   reg_handler("min_pulse_width", dummy_group);
   reg_handler("minimum_period", dummy_group);
-  reg_handler("timing", dummy_group);
+  reg_handler("timing", new TimingHandler(parser));
   reg_handler("tlatch", dummy_group);
 }
 

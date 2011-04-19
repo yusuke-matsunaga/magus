@@ -39,6 +39,13 @@ DotLibHandler::expect(tTokenType type)
   return mParser.expect(type);
 }
 
+// @brief 行末まで読み込む．
+bool
+DotLibHandler::expect_nl()
+{
+  return mParser.expect_nl();
+}
+
 // @brief パーサーを得る．
 DotLibParser&
 DotLibHandler::parser()
@@ -93,6 +100,7 @@ SimpleHandler::read_attr(const string& attr_name)
     return false;
   }
 
+#if 0
   if ( !expect(SEMI) ) {
     return false;
   }
@@ -100,6 +108,11 @@ SimpleHandler::read_attr(const string& attr_name)
   if ( !expect(NL) ) {
     return false;
   }
+#else
+  if ( !expect_nl() ) {
+    return false;
+  }
+#endif
 
   return true;
 }
@@ -154,28 +167,32 @@ ComplexHandler::read_attr(const string& attr_name)
   }
 
   vector<Token> token_list;
-  for ( ; ; ) {
-    tTokenType type = lex().read_token();
-    string value = lex().cur_string();
-    FileRegion loc = lex().cur_loc();
-    token_list.push_back(Token(type, value, loc));
+  tTokenType type = lex().read_token();
+  if ( type != RP ) {
+    for ( ; ; ) {
+      string value = lex().cur_string();
+      FileRegion loc = lex().cur_loc();
+      token_list.push_back(Token(type, value, loc));
 
-    tTokenType type1 = lex().read_token();
-    if ( type1 == RP ) {
-      break;
-    }
-    if ( type1 != COMMA ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			"syntax error. ',' is expected.");
-      return false;
+      tTokenType type1 = lex().read_token();
+      if ( type1 == RP ) {
+	break;
+      }
+      if ( type1 != COMMA ) {
+	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+			  kMsgError,
+			  "DOTLIB_PARSER",
+			  "syntax error. ',' is expected.");
+	return false;
+      }
+      type = lex().read_token();
     }
   }
   if ( !read_value(attr_name, token_list) ) {
     return false;
   }
 
+#if 0
   if ( !expect(SEMI) ) {
     return false;
   }
@@ -183,6 +200,11 @@ ComplexHandler::read_attr(const string& attr_name)
   if ( !expect(NL) ) {
     return false;
   }
+#else
+  if ( !expect_nl() ) {
+    return false;
+  }
+#endif
 
   return true;
 }
@@ -237,22 +259,25 @@ GroupHandler::read_attr(const string& attr_name)
   }
 
   vector<Token> token_list;
-  for ( ; ; ) {
-    tTokenType type = lex().read_token();
-    string value = lex().cur_string();
-    FileRegion loc = lex().cur_loc();
-    token_list.push_back(Token(type, value, loc));
+  tTokenType type = lex().read_token();
+  if ( type != RP ) {
+    for ( ; ; ) {
+      string value = lex().cur_string();
+      FileRegion loc = lex().cur_loc();
+      token_list.push_back(Token(type, value, loc));
 
-    tTokenType type1 = lex().read_token();
-    if ( type1 == RP ) {
-      break;
-    }
-    if ( type1 != COMMA ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			"syntax error. ',' is expected.");
-      return false;
+      tTokenType type1 = lex().read_token();
+      if ( type1 == RP ) {
+	break;
+      }
+      if ( type1 != COMMA ) {
+	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+			  kMsgError,
+			  "DOTLIB_PARSER",
+			  "syntax error. ',' is expected.");
+	return false;
+      }
+      type = lex().read_token();
     }
   }
   if ( !begin_group(attr_name, token_list) ) {

@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_DOTLIB_LIBSIMPLE_H
-#define LIBYM_CELL_DOTLIB_LIBSIMPLE_H
+#ifndef LIBYM_CELL_DOTLIB_LIBSIMPLEHANDLER_H
+#define LIBYM_CELL_DOTLIB_LIBSIMPLEHANDLER_H
 
-/// @file libym_cell/dotlib/LibSimple.h
+/// @file libym_cell/dotlib/LibSimpleHandler.h
 /// @brief library グループの simple attribute のハンドラのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -20,7 +20,7 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class BusNamingStyleHandler LibSimple.h "LibSimple.h"
+/// @class BusNamingStyleHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief bus_naming_style 属性
 //////////////////////////////////////////////////////////////////////
 class BusNamingStyleHandler :
@@ -57,7 +57,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CommentHandler LibSimple.h "LibSimple.h"
+/// @class CommentHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief comment 属性
 //////////////////////////////////////////////////////////////////////
 class CommentHandler :
@@ -94,7 +94,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CurrentUnitHandler LibSimple.h "LibSimple.h"
+/// @class CurrentUnitHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief current_unit 属性
 //////////////////////////////////////////////////////////////////////
 class CurrentUnitHandler :
@@ -131,7 +131,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DateHandler LibSimple.h "LibSimple.h"
+/// @class DateHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief date 属性
 //////////////////////////////////////////////////////////////////////
 class DateHandler :
@@ -168,7 +168,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DelayModelHandler LibSimple.h "LibSimple.h"
+/// @class DelayModelHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief delay_model 属性
 //////////////////////////////////////////////////////////////////////
 class DelayModelHandler :
@@ -209,7 +209,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class InPlaceSwapModeHandler LibSimple.h "LibSimple.h"
+/// @class InPlaceSwapModeHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief in_place_swap_mode 属性
 //////////////////////////////////////////////////////////////////////
 class InPlaceSwapModeHandler :
@@ -250,7 +250,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class LeakagePowerUnitHandler LibSimple.h "LibSimple.h"
+/// @class LeakagePowerUnitHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief leakage_power_unit 属性
 //////////////////////////////////////////////////////////////////////
 class LeakagePowerUnitHandler :
@@ -299,7 +299,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PieceTypeHandler LibSimple.h "LibSimple.h"
+/// @class PieceTypeHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief piece_type 属性
 //////////////////////////////////////////////////////////////////////
 class PieceTypeHandler :
@@ -344,7 +344,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PullingResistanceUnitHandler LibSimple.h "LibSimple.h"
+/// @class PullingResistanceUnitHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief pulling_resistance_unit 属性
 //////////////////////////////////////////////////////////////////////
 class PullingResistanceUnitHandler :
@@ -381,7 +381,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class RevisionHandler LibSimple.h "LibSimple.h"
+/// @class RevisionHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief revision 属性
 //////////////////////////////////////////////////////////////////////
 class RevisionHandler :
@@ -418,7 +418,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SimulationHandler LibSimple.h "LibSimple.h"
+/// @class SimulationHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief simulation 属性
 //////////////////////////////////////////////////////////////////////
 class SimulationHandler :
@@ -465,7 +465,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TimeUnitHandler LibSimple.h "LibSimple.h"
+/// @class TimeUnitHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief time_unit 属性
 //////////////////////////////////////////////////////////////////////
 class TimeUnitHandler :
@@ -502,7 +502,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VoltageUnitHandler LibSimple.h "LibSimple.h"
+/// @class VoltageUnitHandler LibSimpleHandler.h "LibSimpleHandler.h"
 /// @brief voltage_unit 属性
 //////////////////////////////////////////////////////////////////////
 class VoltageUnitHandler :
@@ -539,4 +539,4 @@ public:
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_LIBSIMPLE_H
+#endif // LIBYM_CELL_DOTLIB_LIBSIMPLEHANDLER_H

@@ -71,6 +71,10 @@ public:
   bool
   expect(tTokenType type);
 
+  /// @brief 行末まで読み込む．
+  bool
+  expect_nl();
+
   /// @brief パーサーを得る．
   DotLibParser&
   parser();

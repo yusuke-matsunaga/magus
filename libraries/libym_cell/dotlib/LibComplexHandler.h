@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_DOTLIB_LIBCOMPLEX_H
-#define LIBYM_CELL_DOTLIB_LIBCOMPLEX_H
+#ifndef LIBYM_CELL_DOTLIB_LIBCOMPLEXHANDLER_H
+#define LIBYM_CELL_DOTLIB_LIBCOMPLEXHANDLER_H
 
-/// @file libym_cell/dotlib/LibComplex.h
+/// @file libym_cell/dotlib/LibComplexHandler.h
 /// @brief library グループの complex attribute のハンドラのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -20,7 +20,7 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class CapacitiveLoadUnitHandler LibComplex.h "LibComplex.h"
+/// @class CapacitiveLoadUnitHandler LibComplexHandler.h "LibComplexHandler.h"
 /// @brief capacitive_load_unit 属性
 //////////////////////////////////////////////////////////////////////
 class CapacitiveLoadUnitHandler :
@@ -60,7 +60,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DefineCellAreaHandler LibComplex.h "LibComplex.h"
+/// @class DefineCellAreaHandler LibComplexHandler.h "LibComplexHandler.h"
 /// @brief define_cell_area 属性
 //////////////////////////////////////////////////////////////////////
 class DefineCellAreaHandler :
@@ -98,7 +98,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class LibraryFeaturesHandler LibComplex.h "LibComplex.h"
+/// @class LibraryFeaturesHandler LibComplexHandler.h "LibComplexHandler.h"
 /// @brief library_features 属性
 //////////////////////////////////////////////////////////////////////
 class LibraryFeaturesHandler :
@@ -133,7 +133,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PieceDefineHandler LibComplex.h "LibComplex.h"
+/// @class PieceDefineHandler LibComplexHandler.h "LibComplexHandler.h"
 /// @brief piece_define 属性
 //////////////////////////////////////////////////////////////////////
 class PieceDefineHandler :
@@ -168,7 +168,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class RoutingLayersHandler LibComplex.h "LibComplex.h"
+/// @class RoutingLayersHandler LibComplexHandler.h "LibComplexHandler.h"
 /// @brief routing_layers 属性
 //////////////////////////////////////////////////////////////////////
 class RoutingLayersHandler :
@@ -203,7 +203,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TechnologyHandler LibComplex.h "LibComplex.h"
+/// @class TechnologyHandler LibComplexHandler.h "LibComplexHandler.h"
 /// @brief technology 属性
 //////////////////////////////////////////////////////////////////////
 class TechnologyHandler :
@@ -238,4 +238,4 @@ public:
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_LIBCOMPLEX_H
+#endif // LIBYM_CELL_DOTLIB_LIBCOMPLEXHANDLER_H

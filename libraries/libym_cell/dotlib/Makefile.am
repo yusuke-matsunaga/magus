@@ -34,10 +34,10 @@ libym_cell_dotlib_la_SOURCES = \
 	DotLibParser.cc \
 	LibraryGroupHandler.h \
 	LibraryGroupHandler.cc \
-	LibSimple.h \
-	LibSimple.cc \
-	LibComplex.h \
-	LibComplex.cc \
+	LibSimpleHandler.h \
+	LibSimpleHandler.cc \
+	LibComplexHandler.h \
+	LibComplexHandler.cc \
 	CellHandler.h \
 	CellHandler.cc \
 	DefineHandler.h \
@@ -46,6 +46,12 @@ libym_cell_dotlib_la_SOURCES = \
 	OperatingConditionsHandler.cc \
 	WireLoadHandler.h \
 	WireLoadHandler.cc \
+	LuTableTemplateHandler.h \
+	LuTableTemplateHandler.cc \
+	OutputCurrentTemplateHandler.h \
+	OutputCurrentTemplateHandler.cc \
+	PowerLutTemplateHandler.h \
+	PowerLutTemplateHandler.cc \
 	BusHandler.h \
 	BusHandler.cc \
 	PinHandler.h \
@@ -56,6 +62,10 @@ libym_cell_dotlib_la_SOURCES = \
 	LatchHandler.cc \
 	StateTableHandler.h \
 	StateTableHandler.cc \
+	LeakagePowerHandler.h \
+	LeakagePowerHandler.cc \
+	TimingHandler.h \
+	TimingHandler.cc \
 	DummySimpleHandler.h \
 	DummySimpleHandler.cc \
 	DummyComplexHandler.h \
