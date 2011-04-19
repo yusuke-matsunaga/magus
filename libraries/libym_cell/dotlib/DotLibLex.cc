@@ -150,7 +150,7 @@ DotLibLex::read_token()
 
   default:
     // それ以外はエラーなんじゃない？
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "DOTLIB_LEX",
 		    "syntax error");
@@ -180,7 +180,7 @@ DotLibLex::read_token()
   { // '.' の直後はかならず数字
     ostringstream buf;
     buf << "digit number expected after dot";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "DOTLIB_LEX",
 		    buf.str());
@@ -213,7 +213,7 @@ DotLibLex::read_token()
   { // (e|E) の直後はかならず数字か符号
     ostringstream buf;
     buf << "exponent value expected";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "DOTLIB_LEX",
 		    buf.str());
@@ -236,7 +236,7 @@ DotLibLex::read_token()
     goto ST_ID;
   }
   unget();
-  return ID_STR;
+  return STR;
 
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
   c = get();
@@ -246,7 +246,7 @@ DotLibLex::read_token()
   if ( c == '\n' ) {
     ostringstream buf;
     buf << "unexpected newline in quoted string.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "DOTLIB_LEX",
 		    buf.str());
@@ -255,7 +255,7 @@ DotLibLex::read_token()
   if ( c == EOF ) {
     ostringstream buf;
     buf << "unexpected end-of-file in quoted string.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "DOTLIB_LEX",
 		    buf.str());
@@ -272,7 +272,7 @@ DotLibLex::read_token()
   if ( c == '*' ) { // C スタイルのコメント
     goto ST_COMMENT3;
   }
-  mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+  mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
 		  kMsgError,
 		  "DOTLIB_LEX",
 		  "syntax error.");
@@ -322,7 +322,7 @@ DotLibLex::read_token()
   {
     ostringstream buf;
     buf << "Unexpected end-of-file in comment block.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_file_region(),
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
 		    kMsgError,
 		    "DOTLIB_LEX",
 		    buf.str());

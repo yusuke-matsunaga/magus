@@ -57,7 +57,7 @@ public:
 
   // 現在のファイル位置
   FileRegion
-  cur_file_region();
+  cur_loc();
 
   /// @brief 現在の行番号を返す．
   int
@@ -150,7 +150,7 @@ DotLibLex::cur_string() const
 // 現在のファイル位置
 inline
 FileRegion
-DotLibLex::cur_file_region()
+DotLibLex::cur_loc()
 {
   return FileRegion(mCurFileDesc,
 		    mCurLine, mFirstColumn,

@@ -25,6 +25,7 @@ libym_cell_dotlib_la_LDFLAGS =
 
 libym_cell_dotlib_la_SOURCES = \
 	dotlib_nsdef.h \
+	Token.h \
 	DotLibHandler.h \
 	DotLibHandler.cc \
 	DotLibLex.cc \
@@ -43,6 +44,8 @@ libym_cell_dotlib_la_SOURCES = \
 	DefineHandler.cc \
 	OperatingConditionsHandler.h \
 	OperatingConditionsHandler.cc \
+	WireLoadHandler.h \
+	WireLoadHandler.cc \
 	BusHandler.h \
 	BusHandler.cc \
 	PinHandler.h \

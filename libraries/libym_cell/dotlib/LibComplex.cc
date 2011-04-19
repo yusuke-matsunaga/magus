@@ -30,17 +30,17 @@ CapacitiveLoadUnitHandler::~CapacitiveLoadUnitHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 CapacitiveLoadUnitHandler::read_value(const string& attr_name,
-				      const list<pair<tTokenType, string> >& value_list)
+				      const vector<Token>& token_list)
 {
   cout << "capacitive_load_unit (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << p->value();
     comma = ", ";
   }
   cout << ")" << endl;
@@ -66,17 +66,17 @@ DefineCellAreaHandler::~DefineCellAreaHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 DefineCellAreaHandler::read_value(const string& attr_name,
-				  const list<pair<tTokenType, string> >& value_list)
+				  const vector<Token>& token_list)
 {
   cout << "define_cell_area (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << p->value();
     comma = ", ";
   }
   cout << ")" << endl;
@@ -102,17 +102,17 @@ LibraryFeaturesHandler::~LibraryFeaturesHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 LibraryFeaturesHandler::read_value(const string& attr_name,
-				   const list<pair<tTokenType, string> >& value_list)
+				   const vector<Token>& token_list)
 {
   cout << "library_features (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << p->value();
     comma = ", ";
   }
   cout << ")" << endl;
@@ -138,17 +138,17 @@ PieceDefineHandler::~PieceDefineHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+ /// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 PieceDefineHandler::read_value(const string& attr_name,
-			       const list<pair<tTokenType, string> >& value_list)
+			       const vector<Token>& token_list)
 {
   cout << "piece_define (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << p->value();
     comma = ", ";
   }
   cout << ")" << endl;
@@ -174,17 +174,17 @@ RoutingLayersHandler::~RoutingLayersHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 RoutingLayersHandler::read_value(const string& attr_name,
-				 const list<pair<tTokenType, string> >& value_list)
+				 const vector<Token>& token_list)
 {
   cout << "routing_layers (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << p->value();
     comma = ", ";
   }
   cout << ")" << endl;
@@ -210,19 +210,19 @@ TechnologyHandler::~TechnologyHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 TechnologyHandler::read_value(const string& attr_name,
-			      const list<pair<tTokenType, string> >& value_list)
+			      const vector<Token>& token_list)
 {
   // technlogy ( cmos|FPGA ) ;
 
   cout << "technology (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << p->value();
     comma = ", ";
   }
   cout << ")" << endl;

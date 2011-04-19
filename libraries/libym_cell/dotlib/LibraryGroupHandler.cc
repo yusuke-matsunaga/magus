@@ -15,6 +15,7 @@
 #include "CellHandler.h"
 #include "DefineHandler.h"
 #include "OperatingConditionsHandler.h"
+#include "WireLoadHandler.h"
 
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
@@ -256,7 +257,7 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   reg_handler("timing", dummy_group);
   reg_handler("timing_range", dummy_group);
   reg_handler("type", dummy_group);
-  reg_handler("wire_load", dummy_group);
+  reg_handler("wire_load", new WireLoadHandler(parser));
   reg_handler("wire_load_selection", dummy_group);
   reg_handler("wire_load_table", dummy_group);
 }
@@ -268,12 +269,27 @@ LibraryGroupHandler::~LibraryGroupHandler()
 
 // @brief グループ名を読み込んだ時の処理
 // @param[in] attr_name 属性名
-// @param[in] group_name グループ名
+// @param[in] token_list トークンのリスト
 bool
-LibraryGroupHandler::read_group_name(const string& attr_name,
-				     const string& group_name)
+LibraryGroupHandler::begin_group(const string& attr_name,
+				 const vector<Token>& token_list)
 {
-  cout << "library ( " << group_name << " )" << endl;
+  assert_cond( attr_name == "library", __FILE__, __LINE__);
+
+  if ( token_list.size() != 1 ) {
+    FileRegion loc;
+    if ( token_list.size() > 1 ) {
+      loc = token_list[2].loc();
+    }
+    msg_mgr().put_msg(__FILE__, __LINE__, loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "library statement require only one token");
+    return false;
+  }
+
+  cout << "library ( " << token_list[0].value() << " )" << endl;
+
   return true;
 }
 

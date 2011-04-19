@@ -36,24 +36,24 @@ DefineHandler::~DefineHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 DefineHandler::read_value(const string& attr_name,
-			  const list<pair<tTokenType, string> >& value_list)
+			  const vector<Token>& token_list)
 {
   assert_cond( attr_name == "define", __FILE__, __LINE__);
 
   cout << attr_name << " (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << p->value();
     comma = ", ";
   }
   cout << ")" << endl;
 
-  if ( value_list.size() != 3 ) {
+  if ( token_list.size() != 3 ) {
     msg_mgr().put_msg(__FILE__, __LINE__, FileRegion(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
@@ -61,35 +61,28 @@ DefineHandler::read_value(const string& attr_name,
     return false;
   }
 
-  list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-
   bool error = false;
-  tTokenType type1 = p->first;
-  string value1 = p->second;
-  if ( type1 != ID_STR && type1 != STR ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, FileRegion(),
+  Token keyword = token_list[0];
+  if ( keyword.type() != STR ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, keyword.loc(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
 		      "string value is expected for 1st argument.");
     error = true;
   }
 
-  ++ p;
-  tTokenType type2 = p->first;
-  string value2 = p->second;
-  if ( type2 != ID_STR && type2 != STR ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, FileRegion(),
+  Token group = token_list[1];
+  if ( group.type() != STR ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, group.loc(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
 		      "string value is expected for 2nd argument.");
     error = true;
   }
 
-  ++ p;
-  tTokenType type3 = p->first;
-  string value3 = p->second;
-  if ( type3 != ID_STR && type3 != STR ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, FileRegion(),
+  Token type = token_list[2];
+  if ( type.type() != STR ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, type.loc(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
 		      "string value is expected for 3rd argument.");
@@ -99,19 +92,21 @@ DefineHandler::read_value(const string& attr_name,
     return false;
   }
 
-  DotLibHandler* handler = mParent->find_handler(value2);
+  DotLibHandler* handler = mParent->find_handler(group.value());
   if ( handler == NULL ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, FileRegion(),
+    ostringstream buf;
+    buf << group.value() << ": Unknown attribute. ignored.";
+    msg_mgr().put_msg(__FILE__, __LINE__, group.loc(),
 		      kMsgWarning,
 		      "DOTLIB_PARSER",
-		      "unknown attribute. ignored.");
+		      buf.str());
     return true;
   }
 
-  // 今は value を無視
+  // 今は type を無視
   DotLibHandler* new_handler = new DummySimpleHandler(parser());
 
-  handler->reg_handler(value1, new_handler);
+  handler->reg_handler(keyword.value(), new_handler);
 
   return true;
 }

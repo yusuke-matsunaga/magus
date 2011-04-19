@@ -10,6 +10,7 @@
 
 
 #include "DotLibHandler.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -68,12 +69,12 @@ private:
 
   /// @brief 属性値の読み込み処理を行う．
   /// @param[in] attr_name 属性名
-  /// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+  /// @param[in] token_list トークンのリスト
   /// @return エラーが起きたら false を返す．
   virtual
   bool
   read_value(const string& name,
-	     const list<pair<tTokenType, string> >& value_list) = 0;
+	     const vector<Token>& token_list) = 0;
 
 };
 

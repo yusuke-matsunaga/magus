@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_LATCHHANDLER_H
-#define LIBYM_CELL_DOTLIB_LATCHHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_WIRELOADHANDLER_H
+#define LIBYM_CELL_DOTLIB_WIRELOADHANDLER_H
 
-/// @file libym_cell/dotlib/LatchHandler.h
-/// @brief LatchHandler のヘッダファイル
+/// @file libym_cell/dotlib/WireLoadHandler.h
+/// @brief WireLoadHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,21 +15,21 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class LatchHandler LatchHandler.h "LatchHandler.h"
-/// @brief latch グループのハンドラ
+/// @class WireLoadHandler WireLoadHandler.h "WireLoadHandler.h"
+/// @brief wire_load グループのハンドラ
 //////////////////////////////////////////////////////////////////////
-class LatchHandler :
+class WireLoadHandler :
   public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  LatchHandler(DotLibParser& parser);
+  WireLoadHandler(DotLibParser& parser);
 
   /// @brief デストラクタ
   virtual
-  ~LatchHandler();
+  ~WireLoadHandler();
 
 
 public:
@@ -54,4 +54,4 @@ public:
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_LATCHHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_WIRELOADHANDLER_H

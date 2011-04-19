@@ -10,6 +10,7 @@
 
 
 #include "DotLibHandler.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -68,11 +69,11 @@ private:
 
   /// @brief グループ名を読み込んだ時の処理
   /// @param[in] attr_name 属性名
-  /// @param[in] group_name グループ名
+  /// @param[in] token_list トークンのリスト
   virtual
   bool
-  read_group_name(const string& attr_name,
-		  const string& group_name) = 0;
+  begin_group(const string& attr_name,
+	      const vector<Token>& token_list) = 0;
 
   /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
   virtual

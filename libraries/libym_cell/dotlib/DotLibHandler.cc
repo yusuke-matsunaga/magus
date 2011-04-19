@@ -153,25 +153,26 @@ ComplexHandler::read_attr(const string& attr_name)
     return false;
   }
 
-  list<pair<tTokenType, string> > value_list;
+  vector<Token> token_list;
   for ( ; ; ) {
     tTokenType type = lex().read_token();
     string value = lex().cur_string();
-    value_list.push_back(make_pair(type, value));
+    FileRegion loc = lex().cur_loc();
+    token_list.push_back(Token(type, value, loc));
 
     tTokenType type1 = lex().read_token();
     if ( type1 == RP ) {
       break;
     }
     if ( type1 != COMMA ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_file_region(),
+      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			"syntax error. ',' is expected.");
       return false;
     }
   }
-  if ( !read_value(attr_name, value_list) ) {
+  if ( !read_value(attr_name, token_list) ) {
     return false;
   }
 
@@ -235,21 +236,26 @@ GroupHandler::read_attr(const string& attr_name)
     return false;
   }
 
-  tTokenType type = lex().read_token();
-  if ( type != ID_STR && type != STR ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_file_region(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "syntax error. string is expected.");
-    return false;
-  }
+  vector<Token> token_list;
+  for ( ; ; ) {
+    tTokenType type = lex().read_token();
+    string value = lex().cur_string();
+    FileRegion loc = lex().cur_loc();
+    token_list.push_back(Token(type, value, loc));
 
-  string group_name = lex().cur_string();
-  if ( !read_group_name(attr_name, group_name) ) {
-    return false;
+    tTokenType type1 = lex().read_token();
+    if ( type1 == RP ) {
+      break;
+    }
+    if ( type1 != COMMA ) {
+      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+			kMsgError,
+			"DOTLIB_PARSER",
+			"syntax error. ',' is expected.");
+      return false;
+    }
   }
-
-  if ( !expect(RP) ) {
+  if ( !begin_group(attr_name, token_list) ) {
     return false;
   }
 
@@ -269,19 +275,19 @@ GroupHandler::read_attr(const string& attr_name)
     if ( type == NL ) {
       continue;
     }
-    if ( type != ID_STR ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_file_region(),
+    if ( type != STR ) {
+      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
-			"identifier expected.");
+			"string value is expected.");
       return false;
     }
-    const char* name1 = lex().cur_string();
+    const string name1 = lex().cur_string();
     hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name1);
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
       buf << name1 << ": unknown keyword.";
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_file_region(),
+      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			buf.str());

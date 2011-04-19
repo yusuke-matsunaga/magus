@@ -169,7 +169,7 @@ DelayModelHandler::read_value(const string& attr_name,
 
   cout << "delay_model : " << value << endl;
 
-  if ( type != ID_STR ) {
+  if ( type != STR ) {
 #warning "TODO: エラーメッセージ"
     return false;
   }

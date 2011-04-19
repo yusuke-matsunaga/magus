@@ -1,42 +1,44 @@
 
-/// @file libym_cell/dotlib/BusHandler.cc
-/// @brief BusHandler の実装ファイル
+/// @file libym_cell/dotlib/WireLoadHandler.cc
+/// @brief WireLoadHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BusHandler.h"
-
-#include "PinHandler.h"
+#include "WireLoadHandler.h"
 
 #include "DummySimpleHandler.h"
+#include "DummyComplexHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-// クラス BusHandler
+// クラス WireLoadHandler
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] parser パーサー
-BusHandler::BusHandler(DotLibParser& parser) :
+WireLoadHandler::WireLoadHandler(DotLibParser& parser) :
   GroupHandler(parser)
 {
   DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
+  DotLibHandler* dummy_complex = new DummyComplexHandler(parser);
 
-  // simple attributes
-  reg_handler("bus_type", dummy_simple);
+  // simple attribute
+  reg_handler("area", dummy_simple);
+  reg_handler("capacitance", dummy_simple);
+  reg_handler("resistance", dummy_simple);
+  reg_handler("slope", dummy_simple);
 
-  // group statements
-  reg_handler("pin", new PinHandler(parser));
-
+  // complex attribute
+  reg_handler("fanout_length", dummy_complex);
 }
 
 // @brief デストラクタ
-BusHandler::~BusHandler()
+WireLoadHandler::~WireLoadHandler()
 {
 }
 
@@ -44,14 +46,14 @@ BusHandler::~BusHandler()
 // @param[in] attr_name 属性名
 // @param[in] token_list トークンのリスト
 bool
-BusHandler::begin_group(const string& attr_name,
-			const vector<Token>& token_list)
+WireLoadHandler::begin_group(const string& attr_name,
+			     const vector<Token>& token_list)
 {
   cout << attr_name << "( ";
+  ymuint n = token_list.size();
   const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
+  for (ymuint i = 0; i < n; ++ i) {
+    cout << comma << token_list[i].value();
     comma = ", ";
   }
   cout << " ) {" << endl;
@@ -60,7 +62,7 @@ BusHandler::begin_group(const string& attr_name,
 
 // @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
 bool
-BusHandler::end_group()
+WireLoadHandler::end_group()
 {
   cout << "}" << endl;
   return true;

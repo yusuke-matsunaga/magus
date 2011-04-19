@@ -42,13 +42,13 @@ DotLibParser::read_file(const string& filename)
   bool error = false;
   for ( ; ; ) {
     tTokenType token = lex().read_token();
-    if ( token == ID_STR ) {
+    if ( token == STR ) {
       const char* name = lex().cur_string();
       DotLibHandler* handler = find_handler(name);
       if ( handler == NULL ) {
 	ostringstream buf;
 	buf << name << ": unknown keyword.";
-	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_file_region(),
+	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
 			  kMsgError,
 			  "DOTLIB_PARSER",
 			  buf.str());
@@ -68,7 +68,7 @@ DotLibParser::read_file(const string& filename)
       break;
     }
     else {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_file_region(),
+      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			"identifier expected.");
@@ -125,15 +125,14 @@ DotLibParser::expect(tTokenType type)
   case RCB:       type_str = "'}'"; break;
   case INT_NUM:   type_str = "integer value"; break;
   case FLOAT_NUM: type_str = "float value"; break;
-  case ID_STR:    type_str = "identifier"; break;
-  case STR:       type_str = "double-quoted string"; break;
+  case STR:       type_str = "string"; break;
   case NL:        type_str = "new-line"; break;
   case ERROR:     assert_not_reached(__FILE__, __LINE__);
   case END:       assert_not_reached(__FILE__, __LINE__);
   }
   ostringstream buf;
   buf << "syntax error. " << type_str << " is expected.";
-  mMsgMgr.put_msg(__FILE__, __LINE__, lex().cur_file_region(),
+  mMsgMgr.put_msg(__FILE__, __LINE__, lex().cur_loc(),
 		  kMsgError,
 		  "DOTLIB_PARSER",
 		  buf.str());

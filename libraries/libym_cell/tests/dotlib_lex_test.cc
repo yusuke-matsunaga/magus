@@ -83,10 +83,6 @@ dotliblex_test(int argc,
 	cout << "FLOAT_NUM(" << lex.cur_string() << ")";
 	break;
 
-      case ID_STR:
-	cout << "ID(" << lex.cur_string() << ")";
-	break;
-
       case STR:
 	cout << "STR(\"" << lex.cur_string() << "\")";
 	break;

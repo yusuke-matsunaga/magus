@@ -51,8 +51,6 @@ enum tTokenType {
   INT_NUM,
   /// @brief 実数値
   FLOAT_NUM,
-  /// @brief 識別子
-  ID_STR,
   /// @brief 文字列
   STR,
   /// @brief 改行

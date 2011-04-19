@@ -30,17 +30,17 @@ DummyComplexHandler::~DummyComplexHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値の型と値を表す文字列のペアのリスト
+// @param[in] token_list トークンのリスト
 // @return エラーが起きたら false を返す．
 bool
 DummyComplexHandler::read_value(const string& attr_name,
-				const list<pair<tTokenType, string> >& value_list)
+				const vector<Token>& token_list)
 {
   cout << attr_name << " (";
   const char* comma = "";
-  for (list<pair<tTokenType, string> >::const_iterator p = value_list.begin();
-       p != value_list.end(); ++ p) {
-    cout << comma << p->second;
+  ymuint n = token_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    cout << comma << token_list[i].value();
     comma = ", ";
   }
   cout << ")" << endl;

@@ -30,12 +30,19 @@ DummyGroupHandler::~DummyGroupHandler()
 
 // @brief グループ名を読み込んだ時の処理
 // @param[in] attr_name 属性名
-// @param[in] group_name グループ名
+// @param[in] token_list トークンのリスト
 bool
-DummyGroupHandler::read_group_name(const string& attr_name,
-				   const string& group_name)
+DummyGroupHandler::begin_group(const string& attr_name,
+			       const vector<Token>& token_list)
 {
-  cout << attr_name << "( " << group_name << " ) {" << endl;
+  cout << attr_name << "( ";
+  ymuint n = token_list.size();
+  const char* comma = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    cout << comma << token_list[i].value();
+    comma = ", ";
+  }
+  cout << " ) {" << endl;
   return true;
 }
 
