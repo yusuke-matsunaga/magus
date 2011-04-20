@@ -16,6 +16,8 @@
 #include "StateTableHandler.h"
 #include "LeakagePowerHandler.h"
 
+#include "InternalPowerHandler.h"
+
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
 #include "DummyGroupHandler.h"
@@ -68,6 +70,8 @@ CellHandler::CellHandler(DotLibParser& parser) :
   reg_handler("use_for_size_only", dummy_simple);
   reg_handler("vhdl_name", dummy_simple);
 
+  reg_handler("is_filler_cell", dummy_simple);
+
   // complex attributes
   reg_handler("pin_opposite", dummy_complex);
   reg_handler("rail_connection", dummy_complex);
@@ -91,6 +95,8 @@ CellHandler::CellHandler(DotLibParser& parser) :
   reg_handler("pin", new PinHandler(parser));
   reg_handler("routing_track", dummy_group);
   reg_handler("statetable", new StateTableHandler(parser));
+
+  reg_handler("internal_power", new CellInternalPowerHandler(parser));
 }
 
 // @brief デストラクタ

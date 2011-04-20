@@ -19,6 +19,8 @@
 #include "LuTableTemplateHandler.h"
 #include "OutputCurrentTemplateHandler.h"
 #include "PowerLutTemplateHandler.h"
+#include "InputVoltageHandler.h"
+#include "OutputVoltageHandler.h"
 
 #include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
@@ -183,43 +185,43 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   reg_handler("k_temp_slope_rise", dummy_simple);
   reg_handler("k_temp_wire_cap", dummy_simple);
   reg_handler("k_temp_wire_res", dummy_simple);
-  reg_handler("k_vol_cell_fall", dummy_simple);
-  reg_handler("k_vol_cell_leakage_power", dummy_simple);
-  reg_handler("k_vol_cell_rise", dummy_simple);
-  reg_handler("k_vol_drive_current", dummy_simple);
-  reg_handler("k_vol_drive_fall", dummy_simple);
-  reg_handler("k_vol_drive_rise", dummy_simple);
-  reg_handler("k_vol_fall_delay_intercept", dummy_simple);
-  reg_handler("k_vol_fall_pin_resistance", dummy_simple);
-  reg_handler("k_vol_fall_propagation", dummy_simple);
-  reg_handler("k_vol_fall_transition", dummy_simple);
-  reg_handler("k_vol_hold_fall", dummy_simple);
-  reg_handler("k_vol_hold_rise", dummy_simple);
-  reg_handler("k_vol_internal_power", dummy_simple);
-  reg_handler("k_vol_intrinsic_fall", dummy_simple);
-  reg_handler("k_vol_intrinsic_rise", dummy_simple);
-  reg_handler("k_vol_min_period", dummy_simple);
-  reg_handler("k_vol_min_pulse_width_high", dummy_simple);
-  reg_handler("k_vol_min_pulse_width_low", dummy_simple);
-  reg_handler("k_vol_nochange_fall", dummy_simple);
-  reg_handler("k_vol_nochange_rise", dummy_simple);
-  reg_handler("k_vol_pin_cap", dummy_simple);
-  reg_handler("k_vol_recovery_fall", dummy_simple);
-  reg_handler("k_vol_recovery_rise", dummy_simple);
-  reg_handler("k_vol_removal_fall", dummy_simple);
-  reg_handler("k_vol_removal_rise", dummy_simple);
-  reg_handler("k_vol_rise_delay_intercept", dummy_simple);
-  reg_handler("k_vol_rise_pin_resistance", dummy_simple);
-  reg_handler("k_vol_rise_propagation", dummy_simple);
-  reg_handler("k_vol_rise_transition", dummy_simple);
-  reg_handler("k_vol_setup_fall", dummy_simple);
-  reg_handler("k_vol_setup_rise", dummy_simple);
-  reg_handler("k_vol_skew_fall", dummy_simple);
-  reg_handler("k_vol_skew_rise", dummy_simple);
-  reg_handler("k_vol_slope_fall", dummy_simple);
-  reg_handler("k_vol_slope_rise", dummy_simple);
-  reg_handler("k_vol_wire_cap", dummy_simple);
-  reg_handler("k_vol_wire_res", dummy_simple);
+  reg_handler("k_volt_cell_fall", dummy_simple);
+  reg_handler("k_volt_cell_leakage_power", dummy_simple);
+  reg_handler("k_volt_cell_rise", dummy_simple);
+  reg_handler("k_volt_drive_current", dummy_simple);
+  reg_handler("k_volt_drive_fall", dummy_simple);
+  reg_handler("k_volt_drive_rise", dummy_simple);
+  reg_handler("k_volt_fall_delay_intercept", dummy_simple);
+  reg_handler("k_volt_fall_pin_resistance", dummy_simple);
+  reg_handler("k_volt_fall_propagation", dummy_simple);
+  reg_handler("k_volt_fall_transition", dummy_simple);
+  reg_handler("k_volt_hold_fall", dummy_simple);
+  reg_handler("k_volt_hold_rise", dummy_simple);
+  reg_handler("k_volt_internal_power", dummy_simple);
+  reg_handler("k_volt_intrinsic_fall", dummy_simple);
+  reg_handler("k_volt_intrinsic_rise", dummy_simple);
+  reg_handler("k_volt_min_period", dummy_simple);
+  reg_handler("k_volt_min_pulse_width_high", dummy_simple);
+  reg_handler("k_volt_min_pulse_width_low", dummy_simple);
+  reg_handler("k_volt_nochange_fall", dummy_simple);
+  reg_handler("k_volt_nochange_rise", dummy_simple);
+  reg_handler("k_volt_pin_cap", dummy_simple);
+  reg_handler("k_volt_recovery_fall", dummy_simple);
+  reg_handler("k_volt_recovery_rise", dummy_simple);
+  reg_handler("k_volt_removal_fall", dummy_simple);
+  reg_handler("k_volt_removal_rise", dummy_simple);
+  reg_handler("k_volt_rise_delay_intercept", dummy_simple);
+  reg_handler("k_volt_rise_pin_resistance", dummy_simple);
+  reg_handler("k_volt_rise_propagation", dummy_simple);
+  reg_handler("k_volt_rise_transition", dummy_simple);
+  reg_handler("k_volt_setup_fall", dummy_simple);
+  reg_handler("k_volt_setup_rise", dummy_simple);
+  reg_handler("k_volt_skew_fall", dummy_simple);
+  reg_handler("k_volt_skew_rise", dummy_simple);
+  reg_handler("k_volt_slope_fall", dummy_simple);
+  reg_handler("k_volt_slope_rise", dummy_simple);
+  reg_handler("k_volt_wire_cap", dummy_simple);
+  reg_handler("k_volt_wire_res", dummy_simple);
 
   // complex attributes
   reg_handler("capacitive_load_unit", new CapacitiveLoadUnitHandler(parser));
@@ -241,14 +243,14 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   reg_handler("em_lut_template", dummy_group);
   reg_handler("fall_transition_degradation", dummy_group);
   reg_handler("faults_lut_template", dummy_group);
-  reg_handler("input_voltage", dummy_group);
+  reg_handler("input_voltage", new InputVoltageHandler(parser));
   reg_handler("iv_lut_template", dummy_group);
   reg_handler("lu_table_template",
 	      new LuTableTemplateHandler(parser));
   reg_handler("noise_lut_template", dummy_group);
   reg_handler("operating_conditions",
 	      new OperatingConditionsHandler(parser));
-  reg_handler("output_voltage", dummy_group);
+  reg_handler("output_voltage", new OutputVoltageHandler(parser));
   reg_handler("output_current_template",
 	      new OutputCurrentTemplateHandler(parser));
   reg_handler("part", dummy_group);
@@ -265,8 +267,8 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   reg_handler("timing_range", dummy_group);
   reg_handler("type", dummy_group);
   reg_handler("wire_load", new WireLoadHandler(parser));
-  reg_handler("wire_load_selection", dummy_group);
-  reg_handler("wire_load_table", dummy_group);
+  reg_handler("wire_load_selection", new WireLoadSelectionHandler(parser));
+  reg_handler("wire_load_table", new WireLoadTableHandler(parser));
 }
 
 // @brief デストラクタ

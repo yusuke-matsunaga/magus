@@ -288,6 +288,7 @@ GroupHandler::read_attr(const string& attr_name)
     return false;
   }
 
+#if 0
   if ( !expect(NL) ) {
     return false;
   }
@@ -323,11 +324,41 @@ GroupHandler::read_attr(const string& attr_name)
       return false;
     }
   }
-  if ( !end_group() ) {
+#else
+  for (type = lex().read_token(); type != RCB; type = lex().read_token()) {
+    if ( type == NL ) {
+      continue;
+    }
+    if ( type != STR ) {
+      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+			kMsgError,
+			"DOTLIB_PARSER",
+			"string value is expected.");
+      return false;
+    }
+    const string name1 = lex().cur_string();
+    hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name1);
+    if ( p == mHandlerMap.end() ) {
+      ostringstream buf;
+      buf << name1 << ": unknown keyword.";
+      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+			kMsgError,
+			"DOTLIB_PARSER",
+			buf.str());
+      return false;
+    }
+    DotLibHandler* handler = p->second;
+    if ( !handler->read_attr(name1) ) {
+      return false;
+    }
+  }
+#endif
+
+  if ( !expect(NL) ) {
     return false;
   }
 
-  if ( !expect(NL) ) {
+  if ( !end_group() ) {
     return false;
   }
 

@@ -38,6 +38,9 @@ InternalPowerHandler::InternalPowerHandler(DotLibParser& parser) :
   reg_handler("switching_together_group", dummy_simple);
   reg_handler("when", dummy_simple);
 
+  reg_handler("related_inputs", dummy_simple);
+  reg_handler("related_outputs", dummy_simple);
+
   // complex attribute
 
   // group statements
@@ -73,6 +76,58 @@ InternalPowerHandler::begin_group(const string& attr_name,
 // @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
 bool
 InternalPowerHandler::end_group()
+{
+  cout << "}" << endl;
+  return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CellInternalPowerHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parser パーサー
+CellInternalPowerHandler::CellInternalPowerHandler(DotLibParser& parser) :
+  GroupHandler(parser)
+{
+  DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
+  DotLibHandler* dummy_complex = new DummyComplexHandler(parser);
+
+  // simple attributes
+  reg_handler("related_inputs", dummy_simple);
+  reg_handler("related_outputs", dummy_simple);
+
+  // complex attribute
+  reg_handler("values", dummy_complex);
+}
+
+// @brief デストラクタ
+CellInternalPowerHandler::~CellInternalPowerHandler()
+{
+}
+
+// @brief グループ名を読み込んだ時の処理
+// @param[in] attr_name 属性名
+// @param[in] token_list トークンのリスト
+bool
+CellInternalPowerHandler::begin_group(const string& attr_name,
+				      const vector<Token>& token_list)
+{
+  cout << attr_name << "( ";
+  ymuint n = token_list.size();
+  const char* comma = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    cout << comma << token_list[i].value();
+    comma = ", ";
+  }
+  cout << " ) {" << endl;
+  return true;
+}
+
+// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
+bool
+CellInternalPowerHandler::end_group()
 {
   cout << "}" << endl;
   return true;

@@ -52,6 +52,10 @@ libym_cell_dotlib_la_SOURCES = \
 	OutputCurrentTemplateHandler.cc \
 	PowerLutTemplateHandler.h \
 	PowerLutTemplateHandler.cc \
+	InputVoltageHandler.h \
+	InputVoltageHandler.cc \
+	OutputVoltageHandler.h \
+	OutputVoltageHandler.cc \
 	BusHandler.h \
 	BusHandler.cc \
 	PinHandler.h \

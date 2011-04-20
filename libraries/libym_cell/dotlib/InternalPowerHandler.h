@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @class InternalPowerHandler InternalPowerHandler.h "InternalPowerHandler.h"
-/// @brief timing グループのハンドラ
+/// @brief internal_power グループのハンドラ
 //////////////////////////////////////////////////////////////////////
 class InternalPowerHandler :
   public GroupHandler
@@ -30,6 +30,45 @@ public:
   /// @brief デストラクタ
   virtual
   ~InternalPowerHandler();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief グループ名を読み込んだ時の処理
+  /// @param[in] attr_name 属性名
+  /// @param[in] token_list トークンのリスト
+  virtual
+  bool
+  begin_group(const string& attr_name,
+	      const vector<Token>& token_list);
+
+  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
+  virtual
+  bool
+  end_group();
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class CellInternalPowerHandler InternalPowerHandler.h "InternalPowerHandler.h"
+/// @brief cell レベルの internal_power グループのハンドラ
+//////////////////////////////////////////////////////////////////////
+class CellInternalPowerHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parser パーサー
+  CellInternalPowerHandler(DotLibParser& parser);
+
+  /// @brief デストラクタ
+  virtual
+  ~CellInternalPowerHandler();
 
 
 public:

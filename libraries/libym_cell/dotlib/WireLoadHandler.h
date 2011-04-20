@@ -52,6 +52,84 @@ public:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class WireLoadSelectionHandler WireLoadSelectionHandler.h "WireLoadSelectionHandler.h"
+/// @brief wire_load グループのハンドラ
+//////////////////////////////////////////////////////////////////////
+class WireLoadSelectionHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parser パーサー
+  WireLoadSelectionHandler(DotLibParser& parser);
+
+  /// @brief デストラクタ
+  virtual
+  ~WireLoadSelectionHandler();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief グループ名を読み込んだ時の処理
+  /// @param[in] attr_name 属性名
+  /// @param[in] token_list トークンのリスト
+  virtual
+  bool
+  begin_group(const string& attr_name,
+	      const vector<Token>& token_list);
+
+  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
+  virtual
+  bool
+  end_group();
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class WireLoadTableHandler WireLoadTableHandler.h "WireLoadTableHandler.h"
+/// @brief wire_load グループのハンドラ
+//////////////////////////////////////////////////////////////////////
+class WireLoadTableHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parser パーサー
+  WireLoadTableHandler(DotLibParser& parser);
+
+  /// @brief デストラクタ
+  virtual
+  ~WireLoadTableHandler();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief グループ名を読み込んだ時の処理
+  /// @param[in] attr_name 属性名
+  /// @param[in] token_list トークンのリスト
+  virtual
+  bool
+  begin_group(const string& attr_name,
+	      const vector<Token>& token_list);
+
+  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
+  virtual
+  bool
+  end_group();
+
+};
+
 END_NAMESPACE_YM_CELL_DOTLIB
 
 #endif // LIBYM_CELL_DOTLIB_WIRELOADHANDLER_H
