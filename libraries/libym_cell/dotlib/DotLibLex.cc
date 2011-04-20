@@ -252,8 +252,21 @@ DotLibLex::read_token()
 		    buf.str());
     return ERROR;
   }
+  if ( c == '\\' ) {
+    c = get();
+    if ( c == '\n' ) {
+      // ただの空白に置き換える．
+      c = ' ';
+      nl();
+    }
+  }
   if ( c == '\n' ) {
-    nl();
+    ostringstream buf;
+    buf << "unexpected newline in quoted string.";
+    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
   }
   mCurString.put_char(c);
   goto ST_DQ;
