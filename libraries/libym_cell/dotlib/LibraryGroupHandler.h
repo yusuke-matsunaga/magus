@@ -10,6 +10,7 @@
 
 
 #include "GroupHandler.h"
+#include "../ci/CiLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -50,6 +51,14 @@ private:
   bool
   end_group();
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対象のライブラリ
+  CiLibrary* mLibrary;
 
 };
 

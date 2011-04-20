@@ -44,15 +44,6 @@ DefineHandler::read_value(const string& attr_name,
 {
   assert_cond( attr_name == "define", __FILE__, __LINE__);
 
-  cout << attr_name << " (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
-
   if ( token_list.size() != 3 ) {
     msg_mgr().put_msg(__FILE__, __LINE__, FileRegion(),
 		      kMsgError,

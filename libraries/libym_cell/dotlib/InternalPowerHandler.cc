@@ -62,14 +62,6 @@ bool
 InternalPowerHandler::begin_group(const string& attr_name,
 			   const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -77,7 +69,6 @@ InternalPowerHandler::begin_group(const string& attr_name,
 bool
 InternalPowerHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -114,14 +105,6 @@ bool
 CellInternalPowerHandler::begin_group(const string& attr_name,
 				      const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -129,7 +112,6 @@ CellInternalPowerHandler::begin_group(const string& attr_name,
 bool
 CellInternalPowerHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -170,14 +152,6 @@ bool
 PowerHandler::begin_group(const string& attr_name,
 			  const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -185,7 +159,6 @@ PowerHandler::begin_group(const string& attr_name,
 bool
 PowerHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -226,14 +199,6 @@ bool
 FallPowerHandler::begin_group(const string& attr_name,
 			      const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -241,7 +206,6 @@ FallPowerHandler::begin_group(const string& attr_name,
 bool
 FallPowerHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -282,14 +246,6 @@ bool
 RisePowerHandler::begin_group(const string& attr_name,
 			      const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -297,7 +253,6 @@ RisePowerHandler::begin_group(const string& attr_name,
 bool
 RisePowerHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 

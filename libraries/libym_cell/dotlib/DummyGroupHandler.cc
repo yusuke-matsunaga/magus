@@ -35,14 +35,6 @@ bool
 DummyGroupHandler::begin_group(const string& attr_name,
 			       const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -50,7 +42,6 @@ DummyGroupHandler::begin_group(const string& attr_name,
 bool
 DummyGroupHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 

@@ -31,15 +31,12 @@ BusNamingStyleHandler::~BusNamingStyleHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 BusNamingStyleHandler::read_value(const string& attr_name,
-				   tTokenType type,
-				   const string& value)
+				  Token token)
 {
-  cout << "bus_naming_style : " << value << endl;
   return true;
 }
 
@@ -62,15 +59,12 @@ CommentHandler::~CommentHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 CommentHandler::read_value(const string& attr_name,
-			   tTokenType type,
-			   const string& value)
+			   Token token)
 {
-  cout << "comment : " << value << endl;
   return true;
 }
 
@@ -93,15 +87,12 @@ CurrentUnitHandler::~CurrentUnitHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 CurrentUnitHandler::read_value(const string& attr_name,
-			       tTokenType type,
-			       const string& value)
+			       Token token)
 {
-  cout << "current_unit : " << value << endl;
   return true;
 }
 
@@ -124,15 +115,12 @@ DateHandler::~DateHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 DateHandler::read_value(const string& attr_name,
-			tTokenType type,
-			const string& value)
+			Token token)
 {
-  cout << "date : " << value << endl;
   return true;
 }
 
@@ -155,25 +143,22 @@ DelayModelHandler::~DelayModelHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 DelayModelHandler::read_value(const string& attr_name,
-			      tTokenType type,
-			      const string& value)
+			      Token token)
 {
   // delay_model : generic_cmos|table_lookup|cmos2|piecewise_cmos|dcm ;
 
   assert_cond( attr_name == "delay_model", __FILE__, __LINE__);
 
-  cout << "delay_model : " << value << endl;
-
-  if ( type != STR ) {
+  if ( token.type() != STR ) {
 #warning "TODO: エラーメッセージ"
     return false;
   }
 
+  string value = token.value();
   if ( value == "generic_cmos" ) {
   }
   else if ( value == "table_lookup" ) {
@@ -211,15 +196,12 @@ InPlaceSwapModeHandler::~InPlaceSwapModeHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 InPlaceSwapModeHandler::read_value(const string& attr_name,
-				   tTokenType type,
-				   const string& value)
+				   Token token)
 {
-  cout << "in_place_swap_mode : " << value << endl;
   return true;
 }
 
@@ -242,15 +224,12 @@ LeakagePowerUnitHandler::~LeakagePowerUnitHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 LeakagePowerUnitHandler::read_value(const string& attr_name,
-				    tTokenType type,
-				    const string& value)
+				    Token token)
 {
-  cout << "leakage_power_unit : " << value << endl;
   return true;
 }
 
@@ -273,15 +252,12 @@ PieceTypeHandler::~PieceTypeHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 PieceTypeHandler::read_value(const string& attr_name,
-			     tTokenType type,
-			     const string& value)
+			     Token token)
 {
-  cout << "piece_type : " << value << endl;
   return true;
 }
 
@@ -304,15 +280,12 @@ PullingResistanceUnitHandler::~PullingResistanceUnitHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 PullingResistanceUnitHandler::read_value(const string& attr_name,
-					 tTokenType type,
-					 const string& value)
+					 Token token)
 {
-  cout << "pulling_resistance_unit : " << value << endl;
   return true;
 }
 
@@ -335,15 +308,12 @@ RevisionHandler::~RevisionHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 RevisionHandler::read_value(const string& attr_name,
-			    tTokenType type,
-			    const string& value)
+			    Token token)
 {
-  cout << "revision : " << value << endl;
   return true;
 }
 
@@ -366,15 +336,12 @@ SimulationHandler::~SimulationHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 SimulationHandler::read_value(const string& attr_name,
-			      tTokenType type,
-			      const string& value)
+			      Token token)
 {
-  cout << "simulation : " << value << endl;
   return true;
 }
 
@@ -397,15 +364,12 @@ TimeUnitHandler::~TimeUnitHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 TimeUnitHandler::read_value(const string& attr_name,
-			    tTokenType type,
-			    const string& value)
+			    Token token)
 {
-  cout << "time_unit : " << value << endl;
   return true;
 }
 
@@ -428,15 +392,12 @@ VoltageUnitHandler::~VoltageUnitHandler()
 
 // @brief 属性値の読み込み処理を行う．
 // @param[in] attr_name 属性名
-// @param[in] type 値の型
-// @param[in] value 値を表す文字列
+// @param[in] value 値を表すトークン
 // @return エラーが起きたら false を返す．
 bool
 VoltageUnitHandler::read_value(const string& attr_name,
-			       tTokenType type,
-			       const string& value)
+			       Token token)
 {
-  cout << "time_unit : " << value << endl;
   return true;
 }
 

@@ -18,9 +18,9 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 // コンストラクタ
 DotLibParser::DotLibParser() :
-  mLex(mMsgMgr)
+  mLex(mMsgMgr),
+  mLibraryHandler(new LibraryGroupHandler(*this))
 {
-  init_handler();
 }
 
 // デストラクタ
@@ -40,68 +40,48 @@ DotLibParser::read_file(const string& filename)
   }
 
   bool error = false;
+  tTokenType type;
+  string name;
   for ( ; ; ) {
-    tTokenType token = lex().read_token();
-    if ( token == STR ) {
-      const char* name = lex().cur_string();
-      DotLibHandler* handler = find_handler(name);
-      if ( handler == NULL ) {
-	ostringstream buf;
-	buf << name << ": unknown keyword.";
-	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
-			  kMsgError,
-			  "DOTLIB_PARSER",
-			  buf.str());
-	error = true;
-	break;
-      }
-      bool stat = handler->read_attr(name);
-      if ( !stat ) {
-	error = true;
-	break;
-      }
-    }
-    else if ( token == NL ) {
-      continue;
-    }
-    else if ( token == END ) {
-      break;
-    }
-    else {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			"identifier expected.");
-      error = true;
+    type = lex().read_token();
+    if ( type != NL ) {
+      name = lex().cur_string();
       break;
     }
   }
+  if ( type != STR || name != "library" ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "'library' keyword is expected "
+		      "on the top of the structure");
+    error = true;
+    goto last;
+  }
+  if ( !mLibraryHandler->read_attr(name) ) {
+    error = true;
+    goto last;
+  }
 
+  if ( !expect_nl() ) {
+    error = true;
+    goto last;
+  }
+  for ( ; ; ) {
+    tTokenType type = lex().read_token();
+    if ( type == END ) {
+      break;
+    }
+    msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+		      kMsgWarning,
+		      "DOTLIB_PARSER",
+		      "contents after library group are ignored.");
+  }
+
+last:
   lex().close_file();
 
   return !error;
-}
-
-// @brief ハンドラを登録する．
-void
-DotLibParser::init_handler()
-{
-  DotLibHandler* handler = new LibraryGroupHandler(*this);
-  string name("library");
-  mHandlerMap.insert(make_pair(name, handler));
-}
-
-// @brief キーワードに対応した構文要素を返す．
-// @param[in] name キーワード
-// @note なければ NULL を返す．
-DotLibHandler*
-DotLibParser::find_handler(const char* name)
-{
-  hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name);
-  if ( p == mHandlerMap.end() ) {
-    return NULL;
-  }
-  return p->second;
 }
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．

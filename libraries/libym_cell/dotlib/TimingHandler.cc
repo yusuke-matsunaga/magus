@@ -109,14 +109,6 @@ bool
 TimingHandler::begin_group(const string& attr_name,
 			   const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -124,7 +116,6 @@ TimingHandler::begin_group(const string& attr_name,
 bool
 TimingHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -163,14 +154,6 @@ bool
 CellFallHandler::begin_group(const string& attr_name,
 			     const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -178,7 +161,6 @@ CellFallHandler::begin_group(const string& attr_name,
 bool
 CellFallHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -217,14 +199,6 @@ bool
 CellRiseHandler::begin_group(const string& attr_name,
 			     const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -232,7 +206,6 @@ CellRiseHandler::begin_group(const string& attr_name,
 bool
 CellRiseHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -271,14 +244,6 @@ bool
 FallTransitionHandler::begin_group(const string& attr_name,
 				   const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -286,7 +251,6 @@ FallTransitionHandler::begin_group(const string& attr_name,
 bool
 FallTransitionHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -325,14 +289,6 @@ bool
 RiseTransitionHandler::begin_group(const string& attr_name,
 				   const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -340,7 +296,6 @@ RiseTransitionHandler::begin_group(const string& attr_name,
 bool
 RiseTransitionHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -379,14 +334,6 @@ bool
 FallConstraintHandler::begin_group(const string& attr_name,
 				   const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -394,7 +341,6 @@ FallConstraintHandler::begin_group(const string& attr_name,
 bool
 FallConstraintHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -433,14 +379,6 @@ bool
 RiseConstraintHandler::begin_group(const string& attr_name,
 				   const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -448,7 +386,6 @@ RiseConstraintHandler::begin_group(const string& attr_name,
 bool
 RiseConstraintHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 

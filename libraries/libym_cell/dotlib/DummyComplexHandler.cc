@@ -36,14 +36,6 @@ bool
 DummyComplexHandler::read_value(const string& attr_name,
 				const vector<Token>& token_list)
 {
-  cout << attr_name << " (";
-  const char* comma = "";
-  ymuint n = token_list.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
   return true;
 }
 

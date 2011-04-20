@@ -36,7 +36,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] parser パーサー
 LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
-  GroupHandler(parser)
+  GroupHandler(parser),
+  mLibrary(NULL)
 {
   DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
   DotLibHandler* dummy_complex = new DummyComplexHandler(parser);
@@ -297,7 +298,16 @@ LibraryGroupHandler::begin_group(const string& attr_name,
     return false;
   }
 
-  cout << "library ( " << token_list[0].value() << " )" << endl;
+  if ( token_list[0].type() != STR ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, token_list[0].loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "string type is expected.");
+    return false;
+  }
+
+  string name = token_list[0].value();
+  mLibrary = new CiLibrary(name);
 
   return true;
 }
@@ -306,7 +316,6 @@ LibraryGroupHandler::begin_group(const string& attr_name,
 bool
 LibraryGroupHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 

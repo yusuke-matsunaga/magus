@@ -49,14 +49,6 @@ bool
 WireLoadHandler::begin_group(const string& attr_name,
 			     const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -64,7 +56,6 @@ WireLoadHandler::begin_group(const string& attr_name,
 bool
 WireLoadHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -98,14 +89,6 @@ bool
 WireLoadSelectionHandler::begin_group(const string& attr_name,
 				      const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -113,7 +96,6 @@ WireLoadSelectionHandler::begin_group(const string& attr_name,
 bool
 WireLoadSelectionHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 
@@ -150,14 +132,6 @@ bool
 WireLoadTableHandler::begin_group(const string& attr_name,
 				  const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  ymuint n = token_list.size();
-  const char* comma = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    cout << comma << token_list[i].value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -165,7 +139,6 @@ WireLoadTableHandler::begin_group(const string& attr_name,
 bool
 WireLoadTableHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 

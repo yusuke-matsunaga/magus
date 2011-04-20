@@ -111,14 +111,6 @@ bool
 CellHandler::begin_group(const string& attr_name,
 			 const vector<Token>& token_list)
 {
-  cout << attr_name << "( ";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << " ) {" << endl;
   return true;
 }
 
@@ -126,7 +118,6 @@ CellHandler::begin_group(const string& attr_name,
 bool
 CellHandler::end_group()
 {
-  cout << "}" << endl;
   return true;
 }
 

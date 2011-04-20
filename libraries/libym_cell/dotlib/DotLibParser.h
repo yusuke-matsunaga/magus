@@ -66,22 +66,6 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ハンドラを登録する．
-  void
-  init_handler();
-
-  /// @brief キーワードに対応した構文要素を返す．
-  /// @param[in] name キーワード
-  /// @note なければ NULL を返す．
-  DotLibHandler*
-  find_handler(const char* name);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -91,23 +75,8 @@ private:
   // 字句解析器
   DotLibLex mLex;
 
-  // 構文要素のキーワードとハンドラの対応を保持する連想配列
-  hash_map<string, DotLibHandler*> mHandlerMap;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // このクラスに関係した定数の定義
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const ymuint IntMask = 1U;
-  static
-  const ymuint FloatMask = 2U;
-  static
-  const ymuint IdMask = 4U;
-  static
-  const ymuint StrMask = 8U;
+  // library グループを処理するハンドラ
+  DotLibHandler* mLibraryHandler;
 
 };
 

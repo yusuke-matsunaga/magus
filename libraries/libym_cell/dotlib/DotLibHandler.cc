@@ -12,6 +12,7 @@
 #include "SimpleHandler.h"
 #include "ComplexHandler.h"
 #include "GroupHandler.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -94,9 +95,14 @@ SimpleHandler::read_attr(const string& attr_name)
     return false;
   }
 
-  tTokenType token = lex().read_token();
+  tTokenType type = lex().read_token();
   string value = lex().cur_string();
-  if ( !read_value(attr_name, token, value) ) {
+  FileRegion loc = lex().cur_loc();
+  Token token(type, value, loc);
+
+  cout << attr_name << " : " << token << endl;
+
+  if ( !read_value(attr_name, token) ) {
     return false;
   }
 
@@ -188,6 +194,16 @@ ComplexHandler::read_attr(const string& attr_name)
       type = lex().read_token();
     }
   }
+
+  cout << attr_name << " (";
+  const char* comma = "";
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << *p;
+    comma = ", ";
+  }
+  cout << ")" << endl;
+
   if ( !read_value(attr_name, token_list) ) {
     return false;
   }
@@ -280,6 +296,16 @@ GroupHandler::read_attr(const string& attr_name)
       type = lex().read_token();
     }
   }
+
+  cout << attr_name << "( ";
+  const char* comma = "";
+  for (vector<Token>::const_iterator p = token_list.begin();
+       p != token_list.end(); ++ p) {
+    cout << comma << *p;
+    comma = ", ";
+  }
+  cout << " ) {" << endl;
+
   if ( !begin_group(attr_name, token_list) ) {
     return false;
   }
@@ -358,6 +384,7 @@ GroupHandler::read_attr(const string& attr_name)
     return false;
   }
 
+  cout << "}" << endl;
   if ( !end_group() ) {
     return false;
   }
@@ -390,5 +417,49 @@ GroupHandler::find_handler(const string& name)
     return p->second;
   }
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス Token
+//////////////////////////////////////////////////////////////////////
+
+// @relates Token
+// @brief 内容をストリームに出力する．
+ostream&
+operator<<(ostream& s,
+	   Token token)
+{
+  const char* type_str = NULL;
+  switch ( token.type() ) {
+  case COLON:     type_str = "':'"; break;
+  case SEMI:      type_str = "';'"; break;
+  case COMMA:     type_str = "','"; break;
+  case MINUS:     type_str = "'-'"; break;
+  case LP:        type_str = "'('"; break;
+  case RP:        type_str = "')'"; break;
+  case LCB:       type_str = "'{'"; break;
+  case RCB:       type_str = "'}'"; break;
+  case INT_NUM:   type_str = "integer value"; break;
+  case FLOAT_NUM: type_str = "float value"; break;
+  case STR:       type_str = "string"; break;
+  case NL:        type_str = "new-line"; break;
+  case ERROR:     assert_not_reached(__FILE__, __LINE__);
+  case END:       assert_not_reached(__FILE__, __LINE__);
+  }
+  s << type_str;
+  switch ( token.type() ) {
+  case INT_NUM:
+  case FLOAT_NUM:
+  case STR:
+    s << "(" << token.value() << ")";
+    break;
+
+  default:
+    break;
+  }
+
+  return s;
+}
+
 
 END_NAMESPACE_YM_CELL_DOTLIB

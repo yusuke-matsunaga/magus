@@ -36,14 +36,6 @@ bool
 CapacitiveLoadUnitHandler::read_value(const string& attr_name,
 				      const vector<Token>& token_list)
 {
-  cout << "capacitive_load_unit (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
   return true;
 }
 
@@ -72,14 +64,6 @@ bool
 DefineCellAreaHandler::read_value(const string& attr_name,
 				  const vector<Token>& token_list)
 {
-  cout << "define_cell_area (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
   return true;
 }
 
@@ -108,14 +92,6 @@ bool
 LibraryFeaturesHandler::read_value(const string& attr_name,
 				   const vector<Token>& token_list)
 {
-  cout << "library_features (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
   return true;
 }
 
@@ -144,14 +120,6 @@ bool
 PieceDefineHandler::read_value(const string& attr_name,
 			       const vector<Token>& token_list)
 {
-  cout << "piece_define (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
   return true;
 }
 
@@ -180,14 +148,6 @@ bool
 RoutingLayersHandler::read_value(const string& attr_name,
 				 const vector<Token>& token_list)
 {
-  cout << "routing_layers (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
   return true;
 }
 
@@ -218,14 +178,6 @@ TechnologyHandler::read_value(const string& attr_name,
 {
   // technlogy ( cmos|FPGA ) ;
 
-  cout << "technology (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << p->value();
-    comma = ", ";
-  }
-  cout << ")" << endl;
   return true;
 }
 
