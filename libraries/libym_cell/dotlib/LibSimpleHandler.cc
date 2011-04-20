@@ -12,7 +12,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス BusNamingStyleHandler
 //////////////////////////////////////////////////////////////////////
@@ -400,5 +400,5 @@ VoltageUnitHandler::read_value(const string& attr_name,
 {
   return true;
 }
-
+#endif
 END_NAMESPACE_YM_CELL_DOTLIB

@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+class LibraryGroupHandler;
+
 //////////////////////////////////////////////////////////////////////
 /// @class CellHandler CellHandler.h "CellHandler.h"
 /// @brief cell グループ用のハンドラ
@@ -24,7 +26,7 @@ class CellHandler :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parser パーサー
+  /// @param[in] lib_handler 親のハンドラ
   CellHandler(DotLibParser& parser);
 
   /// @brief デストラクタ

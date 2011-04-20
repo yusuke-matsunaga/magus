@@ -30,11 +30,15 @@ DotLibParser::~DotLibParser()
 
 // @brief ファイルを読み込む．
 // @param[in] filename ファイル名
+// @param[in] debug デバッグモード
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-DotLibParser::read_file(const string& filename)
+DotLibParser::read_file(const string& filename,
+			bool debug)
 {
+  mDebug = debug;
+
   if ( !lex().open_file(filename) ) {
     return false;
   }
@@ -150,6 +154,13 @@ DotLibLex&
 DotLibParser::lex()
 {
   return mLex;
+}
+
+// @brief デバッグモードの時 true を返す．
+bool
+DotLibParser::debug()
+{
+  return mDebug;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

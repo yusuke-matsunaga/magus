@@ -158,6 +158,13 @@ public:
   // 情報設定用の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 属性を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  void
+  set_attr(const string& attr_name,
+	   const string& value);
+
   /// @brief セル数を設定する．
   /// @param[in] num 設定する値
   void

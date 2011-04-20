@@ -22,7 +22,6 @@
 #include "InputVoltageHandler.h"
 #include "OutputVoltageHandler.h"
 
-#include "DummySimpleHandler.h"
 #include "DummyComplexHandler.h"
 #include "DummyGroupHandler.h"
 
@@ -39,190 +38,189 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   GroupHandler(parser),
   mLibrary(NULL)
 {
-  DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
   DotLibHandler* dummy_complex = new DummyComplexHandler(parser);
   DotLibHandler* dummy_group = new DummyGroupHandler(parser);
 
   // simple attributes
-  reg_handler("bus_naming_style", new BusNamingStyleHandler(parser));
-  reg_handler("comment", new CommentHandler(parser));
-  reg_handler("current_unit", new CurrentUnitHandler(parser));
-  reg_handler("date", new DateHandler(parser));
-  reg_handler("delay_model", new DelayModelHandler(parser));
-  reg_handler("em_temp_degradation_factor", dummy_simple);
-  reg_handler("fpga_technology", dummy_simple);
-  reg_handler("in_place_swap_mode", new InPlaceSwapModeHandler(parser));
-  reg_handler("input_threshold_pct_fall", dummy_simple);
-  reg_handler("input_threshold_pct_rise", dummy_simple);
-  reg_handler("leakage_power_unit", new LeakagePowerUnitHandler(parser));
-  reg_handler("nom_calc_mode", dummy_simple);
-  reg_handler("nom_process", dummy_simple);
-  reg_handler("nom_temperature", dummy_simple);
-  reg_handler("nom_voltage", dummy_simple);
-  reg_handler("output_threshold_pct_fall", dummy_simple);
-  reg_handler("output_threshold_pct_rise", dummy_simple);
-  reg_handler("piece_type", new PieceTypeHandler(parser));
-  reg_handler("power_model", dummy_simple);
-  reg_handler("preferred_output_pad_slew_rate_control", dummy_simple);
-  reg_handler("preferred_input_pad_voltage", dummy_simple);
-  reg_handler("preferred_output_pad_voltage", dummy_simple);
-  reg_handler("pulling_resistance_unit",
-	      new PullingResistanceUnitHandler(parser));
-  reg_handler("revision", new RevisionHandler(parser));
-  reg_handler("simulation", new SimulationHandler(parser));
-  reg_handler("slew_derate_from_library", dummy_simple);
-  reg_handler("slew_lower_threshold_pct_fall", dummy_simple);
-  reg_handler("slew_lower_threshold_pct_rise", dummy_simple);
-  reg_handler("slew_upper_threshold_pct_fall", dummy_simple);
-  reg_handler("slew_upper_threshold_pct_rise", dummy_simple);
-  reg_handler("time_unit", new TimeUnitHandler(parser));
-  reg_handler("voltage_unit", new VoltageUnitHandler(parser));
+  LibSimpleHandler* simple = new LibSimpleHandler(this);
+  reg_handler("bus_naming_style", simple);
+  reg_handler("comment", simple);
+  reg_handler("current_unit", simple);
+  reg_handler("date", simple);
+  reg_handler("delay_model", simple);
+  reg_handler("em_temp_degradation_factor", simple);
+  reg_handler("fpga_technology", simple);
+  reg_handler("in_place_swap_mode", simple);
+  reg_handler("input_threshold_pct_fall", simple);
+  reg_handler("input_threshold_pct_rise", simple);
+  reg_handler("leakage_power_unit", simple);
+  reg_handler("nom_calc_mode", simple);
+  reg_handler("nom_process", simple);
+  reg_handler("nom_temperature", simple);
+  reg_handler("nom_voltage", simple);
+  reg_handler("output_threshold_pct_fall", simple);
+  reg_handler("output_threshold_pct_rise", simple);
+  reg_handler("piece_type", simple);
+  reg_handler("power_model", simple);
+  reg_handler("preferred_output_pad_slew_rate_control", simple);
+  reg_handler("preferred_input_pad_voltage", simple);
+  reg_handler("preferred_output_pad_voltage", simple);
+  reg_handler("pulling_resistance_unit", simple);
+  reg_handler("revision", simple);
+  reg_handler("simulation", simple);
+  reg_handler("slew_derate_from_library", simple);
+  reg_handler("slew_lower_threshold_pct_fall", simple);
+  reg_handler("slew_lower_threshold_pct_rise", simple);
+  reg_handler("slew_upper_threshold_pct_fall", simple);
+  reg_handler("slew_upper_threshold_pct_rise", simple);
+  reg_handler("time_unit", simple);
+  reg_handler("voltage_unit", simple);
 
   // default attributes
-  reg_handler("default_cell_leakage_power", dummy_simple);
-  reg_handler("default_connection_class", dummy_simple);
-  reg_handler("default_fall_delay_intercept", dummy_simple);
-  reg_handler("default_fall_pin_resistance", dummy_simple);
-  reg_handler("default_fanout_load", dummy_simple);
-  reg_handler("default_inout_pin_cap", dummy_simple);
-  reg_handler("default_inout_pin_fall_res", dummy_simple);
-  reg_handler("default_inout_pin_rise_res", dummy_simple);
-  reg_handler("default_input_pin_cap", dummy_simple);
-  reg_handler("default_intrinsic_fall", dummy_simple);
-  reg_handler("default_intrinsic_rise", dummy_simple);
-  reg_handler("default_leakage_power_density", dummy_simple);
-  reg_handler("default_max_capacitance", dummy_simple);
-  reg_handler("default_max_fanout", dummy_simple);
-  reg_handler("default_max_transition", dummy_simple);
-  reg_handler("default_max_utilization", dummy_simple);
-  reg_handler("default_min_porosity", dummy_simple);
-  reg_handler("default_operating_conditions", dummy_simple);
-  reg_handler("default_output_pin_cap", dummy_simple);
-  reg_handler("default_output_pin_fall_res", dummy_simple);
-  reg_handler("default_output_pin_rise_res", dummy_simple);
-  reg_handler("default_rise_delay_intercept", dummy_simple);
-  reg_handler("default_rise_pin_resistance", dummy_simple);
-  reg_handler("default_slope_fall", dummy_simple);
-  reg_handler("default_slope_rise", dummy_simple);
-  reg_handler("default_wire_load", dummy_simple);
-  reg_handler("default_wire_load_area", dummy_simple);
-  reg_handler("default_wire_load_capacitance", dummy_simple);
-  reg_handler("default_wire_load_mode", dummy_simple);
-  reg_handler("default_wire_load_resistance", dummy_simple);
-  reg_handler("default_wire_load_selection", dummy_simple);
+  reg_handler("default_cell_leakage_power", simple);
+  reg_handler("default_connection_class", simple);
+  reg_handler("default_fall_delay_intercept", simple);
+  reg_handler("default_fall_pin_resistance", simple);
+  reg_handler("default_fanout_load", simple);
+  reg_handler("default_inout_pin_cap", simple);
+  reg_handler("default_inout_pin_fall_res", simple);
+  reg_handler("default_inout_pin_rise_res", simple);
+  reg_handler("default_input_pin_cap", simple);
+  reg_handler("default_intrinsic_fall", simple);
+  reg_handler("default_intrinsic_rise", simple);
+  reg_handler("default_leakage_power_density", simple);
+  reg_handler("default_max_capacitance", simple);
+  reg_handler("default_max_fanout", simple);
+  reg_handler("default_max_transition", simple);
+  reg_handler("default_max_utilization", simple);
+  reg_handler("default_min_porosity", simple);
+  reg_handler("default_operating_conditions", simple);
+  reg_handler("default_output_pin_cap", simple);
+  reg_handler("default_output_pin_fall_res", simple);
+  reg_handler("default_output_pin_rise_res", simple);
+  reg_handler("default_rise_delay_intercept", simple);
+  reg_handler("default_rise_pin_resistance", simple);
+  reg_handler("default_slope_fall", simple);
+  reg_handler("default_slope_rise", simple);
+  reg_handler("default_wire_load", simple);
+  reg_handler("default_wire_load_area", simple);
+  reg_handler("default_wire_load_capacitance", simple);
+  reg_handler("default_wire_load_mode", simple);
+  reg_handler("default_wire_load_resistance", simple);
+  reg_handler("default_wire_load_selection", simple);
 
   // scaling attributes
-  reg_handler("k_process_cell_fall", dummy_simple);
-  reg_handler("k_process_cell_leakage_power", dummy_simple);
-  reg_handler("k_process_cell_rise", dummy_simple);
-  reg_handler("k_process_drive_current", dummy_simple);
-  reg_handler("k_process_drive_fall", dummy_simple);
-  reg_handler("k_process_drive_rise", dummy_simple);
-  reg_handler("k_process_fall_delay_intercept", dummy_simple);
-  reg_handler("k_process_fall_pin_resistance", dummy_simple);
-  reg_handler("k_process_fall_propagation", dummy_simple);
-  reg_handler("k_process_fall_transition", dummy_simple);
-  reg_handler("k_process_hold_fall", dummy_simple);
-  reg_handler("k_process_hold_rise", dummy_simple);
-  reg_handler("k_process_internal_power", dummy_simple);
-  reg_handler("k_process_intrinsic_fall", dummy_simple);
-  reg_handler("k_process_intrinsic_rise", dummy_simple);
-  reg_handler("k_process_min_period", dummy_simple);
-  reg_handler("k_process_min_pulse_width_high", dummy_simple);
-  reg_handler("k_process_min_pulse_width_low", dummy_simple);
-  reg_handler("k_process_nochange_fall", dummy_simple);
-  reg_handler("k_process_nochange_rise", dummy_simple);
-  reg_handler("k_process_pin_cap", dummy_simple);
-  reg_handler("k_process_recovery_fall", dummy_simple);
-  reg_handler("k_process_recovery_rise", dummy_simple);
-  reg_handler("k_process_removal_fall", dummy_simple);
-  reg_handler("k_process_removal_rise", dummy_simple);
-  reg_handler("k_process_rise_delay_intercept", dummy_simple);
-  reg_handler("k_process_rise_pin_resistance", dummy_simple);
-  reg_handler("k_process_rise_propagation", dummy_simple);
-  reg_handler("k_process_rise_transition", dummy_simple);
-  reg_handler("k_process_setup_fall", dummy_simple);
-  reg_handler("k_process_setup_rise", dummy_simple);
-  reg_handler("k_process_skew_fall", dummy_simple);
-  reg_handler("k_process_skew_rise", dummy_simple);
-  reg_handler("k_process_slope_fall", dummy_simple);
-  reg_handler("k_process_slope_rise", dummy_simple);
-  reg_handler("k_process_wire_cap", dummy_simple);
-  reg_handler("k_process_wire_res", dummy_simple);
-  reg_handler("k_temp_cell_fall", dummy_simple);
-  reg_handler("k_temp_cell_leakage_power", dummy_simple);
-  reg_handler("k_temp_cell_rise", dummy_simple);
-  reg_handler("k_temp_drive_current", dummy_simple);
-  reg_handler("k_temp_drive_fall", dummy_simple);
-  reg_handler("k_temp_drive_rise", dummy_simple);
-  reg_handler("k_temp_fall_delay_intercept", dummy_simple);
-  reg_handler("k_temp_fall_pin_resistance", dummy_simple);
-  reg_handler("k_temp_fall_propagation", dummy_simple);
-  reg_handler("k_temp_fall_transition", dummy_simple);
-  reg_handler("k_temp_hold_fall", dummy_simple);
-  reg_handler("k_temp_hold_rise", dummy_simple);
-  reg_handler("k_temp_internal_power", dummy_simple);
-  reg_handler("k_temp_intrinsic_fall", dummy_simple);
-  reg_handler("k_temp_intrinsic_rise", dummy_simple);
-  reg_handler("k_temp_min_period", dummy_simple);
-  reg_handler("k_temp_min_pulse_width_high", dummy_simple);
-  reg_handler("k_temp_min_pulse_width_low", dummy_simple);
-  reg_handler("k_temp_nochange_fall", dummy_simple);
-  reg_handler("k_temp_nochange_rise", dummy_simple);
-  reg_handler("k_temp_pin_cap", dummy_simple);
-  reg_handler("k_temp_recovery_fall", dummy_simple);
-  reg_handler("k_temp_recovery_rise", dummy_simple);
-  reg_handler("k_temp_removal_fall", dummy_simple);
-  reg_handler("k_temp_removal_rise", dummy_simple);
-  reg_handler("k_temp_rise_delay_intercept", dummy_simple);
-  reg_handler("k_temp_rise_pin_resistance", dummy_simple);
-  reg_handler("k_temp_rise_propagation", dummy_simple);
-  reg_handler("k_temp_rise_transition", dummy_simple);
-  reg_handler("k_temp_setup_fall", dummy_simple);
-  reg_handler("k_temp_setup_rise", dummy_simple);
-  reg_handler("k_temp_skew_fall", dummy_simple);
-  reg_handler("k_temp_skew_rise", dummy_simple);
-  reg_handler("k_temp_slope_fall", dummy_simple);
-  reg_handler("k_temp_slope_rise", dummy_simple);
-  reg_handler("k_temp_wire_cap", dummy_simple);
-  reg_handler("k_temp_wire_res", dummy_simple);
-  reg_handler("k_volt_cell_fall", dummy_simple);
-  reg_handler("k_volt_cell_leakage_power", dummy_simple);
-  reg_handler("k_volt_cell_rise", dummy_simple);
-  reg_handler("k_volt_drive_current", dummy_simple);
-  reg_handler("k_volt_drive_fall", dummy_simple);
-  reg_handler("k_volt_drive_rise", dummy_simple);
-  reg_handler("k_volt_fall_delay_intercept", dummy_simple);
-  reg_handler("k_volt_fall_pin_resistance", dummy_simple);
-  reg_handler("k_volt_fall_propagation", dummy_simple);
-  reg_handler("k_volt_fall_transition", dummy_simple);
-  reg_handler("k_volt_hold_fall", dummy_simple);
-  reg_handler("k_volt_hold_rise", dummy_simple);
-  reg_handler("k_volt_internal_power", dummy_simple);
-  reg_handler("k_volt_intrinsic_fall", dummy_simple);
-  reg_handler("k_volt_intrinsic_rise", dummy_simple);
-  reg_handler("k_volt_min_period", dummy_simple);
-  reg_handler("k_volt_min_pulse_width_high", dummy_simple);
-  reg_handler("k_volt_min_pulse_width_low", dummy_simple);
-  reg_handler("k_volt_nochange_fall", dummy_simple);
-  reg_handler("k_volt_nochange_rise", dummy_simple);
-  reg_handler("k_volt_pin_cap", dummy_simple);
-  reg_handler("k_volt_recovery_fall", dummy_simple);
-  reg_handler("k_volt_recovery_rise", dummy_simple);
-  reg_handler("k_volt_removal_fall", dummy_simple);
-  reg_handler("k_volt_removal_rise", dummy_simple);
-  reg_handler("k_volt_rise_delay_intercept", dummy_simple);
-  reg_handler("k_volt_rise_pin_resistance", dummy_simple);
-  reg_handler("k_volt_rise_propagation", dummy_simple);
-  reg_handler("k_volt_rise_transition", dummy_simple);
-  reg_handler("k_volt_setup_fall", dummy_simple);
-  reg_handler("k_volt_setup_rise", dummy_simple);
-  reg_handler("k_volt_skew_fall", dummy_simple);
-  reg_handler("k_volt_skew_rise", dummy_simple);
-  reg_handler("k_volt_slope_fall", dummy_simple);
-  reg_handler("k_volt_slope_rise", dummy_simple);
-  reg_handler("k_volt_wire_cap", dummy_simple);
-  reg_handler("k_volt_wire_res", dummy_simple);
+  reg_handler("k_process_cell_fall", simple);
+  reg_handler("k_process_cell_leakage_power", simple);
+  reg_handler("k_process_cell_rise", simple);
+  reg_handler("k_process_drive_current", simple);
+  reg_handler("k_process_drive_fall", simple);
+  reg_handler("k_process_drive_rise", simple);
+  reg_handler("k_process_fall_delay_intercept", simple);
+  reg_handler("k_process_fall_pin_resistance", simple);
+  reg_handler("k_process_fall_propagation", simple);
+  reg_handler("k_process_fall_transition", simple);
+  reg_handler("k_process_hold_fall", simple);
+  reg_handler("k_process_hold_rise", simple);
+  reg_handler("k_process_internal_power", simple);
+  reg_handler("k_process_intrinsic_fall", simple);
+  reg_handler("k_process_intrinsic_rise", simple);
+  reg_handler("k_process_min_period", simple);
+  reg_handler("k_process_min_pulse_width_high", simple);
+  reg_handler("k_process_min_pulse_width_low", simple);
+  reg_handler("k_process_nochange_fall", simple);
+  reg_handler("k_process_nochange_rise", simple);
+  reg_handler("k_process_pin_cap", simple);
+  reg_handler("k_process_recovery_fall", simple);
+  reg_handler("k_process_recovery_rise", simple);
+  reg_handler("k_process_removal_fall", simple);
+  reg_handler("k_process_removal_rise", simple);
+  reg_handler("k_process_rise_delay_intercept", simple);
+  reg_handler("k_process_rise_pin_resistance", simple);
+  reg_handler("k_process_rise_propagation", simple);
+  reg_handler("k_process_rise_transition", simple);
+  reg_handler("k_process_setup_fall", simple);
+  reg_handler("k_process_setup_rise", simple);
+  reg_handler("k_process_skew_fall", simple);
+  reg_handler("k_process_skew_rise", simple);
+  reg_handler("k_process_slope_fall", simple);
+  reg_handler("k_process_slope_rise", simple);
+  reg_handler("k_process_wire_cap", simple);
+  reg_handler("k_process_wire_res", simple);
+  reg_handler("k_temp_cell_fall", simple);
+  reg_handler("k_temp_cell_leakage_power", simple);
+  reg_handler("k_temp_cell_rise", simple);
+  reg_handler("k_temp_drive_current", simple);
+  reg_handler("k_temp_drive_fall", simple);
+  reg_handler("k_temp_drive_rise", simple);
+  reg_handler("k_temp_fall_delay_intercept", simple);
+  reg_handler("k_temp_fall_pin_resistance", simple);
+  reg_handler("k_temp_fall_propagation", simple);
+  reg_handler("k_temp_fall_transition", simple);
+  reg_handler("k_temp_hold_fall", simple);
+  reg_handler("k_temp_hold_rise", simple);
+  reg_handler("k_temp_internal_power", simple);
+  reg_handler("k_temp_intrinsic_fall", simple);
+  reg_handler("k_temp_intrinsic_rise", simple);
+  reg_handler("k_temp_min_period", simple);
+  reg_handler("k_temp_min_pulse_width_high", simple);
+  reg_handler("k_temp_min_pulse_width_low", simple);
+  reg_handler("k_temp_nochange_fall", simple);
+  reg_handler("k_temp_nochange_rise", simple);
+  reg_handler("k_temp_pin_cap", simple);
+  reg_handler("k_temp_recovery_fall", simple);
+  reg_handler("k_temp_recovery_rise", simple);
+  reg_handler("k_temp_removal_fall", simple);
+  reg_handler("k_temp_removal_rise", simple);
+  reg_handler("k_temp_rise_delay_intercept", simple);
+  reg_handler("k_temp_rise_pin_resistance", simple);
+  reg_handler("k_temp_rise_propagation", simple);
+  reg_handler("k_temp_rise_transition", simple);
+  reg_handler("k_temp_setup_fall", simple);
+  reg_handler("k_temp_setup_rise", simple);
+  reg_handler("k_temp_skew_fall", simple);
+  reg_handler("k_temp_skew_rise", simple);
+  reg_handler("k_temp_slope_fall", simple);
+  reg_handler("k_temp_slope_rise", simple);
+  reg_handler("k_temp_wire_cap", simple);
+  reg_handler("k_temp_wire_res", simple);
+  reg_handler("k_volt_cell_fall", simple);
+  reg_handler("k_volt_cell_leakage_power", simple);
+  reg_handler("k_volt_cell_rise", simple);
+  reg_handler("k_volt_drive_current", simple);
+  reg_handler("k_volt_drive_fall", simple);
+  reg_handler("k_volt_drive_rise", simple);
+  reg_handler("k_volt_fall_delay_intercept", simple);
+  reg_handler("k_volt_fall_pin_resistance", simple);
+  reg_handler("k_volt_fall_propagation", simple);
+  reg_handler("k_volt_fall_transition", simple);
+  reg_handler("k_volt_hold_fall", simple);
+  reg_handler("k_volt_hold_rise", simple);
+  reg_handler("k_volt_internal_power", simple);
+  reg_handler("k_volt_intrinsic_fall", simple);
+  reg_handler("k_volt_intrinsic_rise", simple);
+  reg_handler("k_volt_min_period", simple);
+  reg_handler("k_volt_min_pulse_width_high", simple);
+  reg_handler("k_volt_min_pulse_width_low", simple);
+  reg_handler("k_volt_nochange_fall", simple);
+  reg_handler("k_volt_nochange_rise", simple);
+  reg_handler("k_volt_pin_cap", simple);
+  reg_handler("k_volt_recovery_fall", simple);
+  reg_handler("k_volt_recovery_rise", simple);
+  reg_handler("k_volt_removal_fall", simple);
+  reg_handler("k_volt_removal_rise", simple);
+  reg_handler("k_volt_rise_delay_intercept", simple);
+  reg_handler("k_volt_rise_pin_resistance", simple);
+  reg_handler("k_volt_rise_propagation", simple);
+  reg_handler("k_volt_rise_transition", simple);
+  reg_handler("k_volt_setup_fall", simple);
+  reg_handler("k_volt_setup_rise", simple);
+  reg_handler("k_volt_skew_fall", simple);
+  reg_handler("k_volt_skew_rise", simple);
+  reg_handler("k_volt_slope_fall", simple);
+  reg_handler("k_volt_slope_rise", simple);
+  reg_handler("k_volt_wire_cap", simple);
+  reg_handler("k_volt_wire_res", simple);
 
   // complex attributes
   reg_handler("capacitive_load_unit", new CapacitiveLoadUnitHandler(parser));
@@ -239,7 +237,7 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
   //rise_net_delay : name ;
 
   // group statements
-  reg_handler("cell", new CellHandler(parser));
+  reg_handler("cell", new CellHandler(this));
   reg_handler("dc_current_template", dummy_group);
   reg_handler("em_lut_template", dummy_group);
   reg_handler("fall_transition_degradation", dummy_group);
@@ -275,6 +273,13 @@ LibraryGroupHandler::LibraryGroupHandler(DotLibParser& parser) :
 // @brief デストラクタ
 LibraryGroupHandler::~LibraryGroupHandler()
 {
+}
+
+// @brief 対象のセルライブラリを返す．
+CiLibrary*
+LibraryGroupHandler::library()
+{
+  return mLibrary;
 }
 
 // @brief グループ名を読み込んだ時の処理
@@ -316,6 +321,60 @@ LibraryGroupHandler::begin_group(const string& attr_name,
 bool
 LibraryGroupHandler::end_group()
 {
+  return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス LibAttrHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] lib_handler 親のハンドラ
+LibAttrHandler::LibAttrHandler(LibraryGroupHandler* lib_handler) :
+  SimpleHandler(lib_handler->parser()),
+  mLibHandler(lib_handler)
+{
+}
+
+// @brief デストラクタ
+LibAttrHandler::~LibAttrHandler()
+{
+}
+
+// 親のハンドラを返す．
+LibraryGroupHandler*
+LibAttrHandler::lib_handler()
+{
+  return mLibHandler;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス LibSimpleHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] lib_handler 親のハンドラ
+LibSimpleHandler::LibSimpleHandler(LibraryGroupHandler* lib_handler) :
+  LibAttrHandler(lib_handler)
+{
+}
+
+// @brief デストラクタ
+LibSimpleHandler::~LibSimpleHandler()
+{
+}
+
+// @brief 属性値の読み込み処理を行う．
+// @param[in] attr_name 属性名
+// @param[in] value 値を表すトークン
+// @return エラーが起きたら false を返す．
+bool
+LibSimpleHandler::read_value(const string& attr_name,
+			     Token token)
+{
+  lib_handler()->library()->set_attr(attr_name, token.value());
   return true;
 }
 

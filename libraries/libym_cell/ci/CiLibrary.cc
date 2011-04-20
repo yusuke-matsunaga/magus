@@ -172,6 +172,45 @@ CiLibrary::cell(const char* name) const
   return NULL;
 }
 
+// @brief 属性を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value 値
+void
+CiLibrary::set_attr(const string& attr_name,
+		    const string& value)
+{
+  if ( attr_name == "bus_naming_style" ) {
+    mBusNamingStyle = value;
+  }
+  else if ( attr_name == "date" ) {
+    mDate = value;
+  }
+  else if ( attr_name == "revision" ) {
+    mRevision = value;
+  }
+  else if ( attr_name == "comment" ) {
+    mComment = value;
+  }
+  else if ( attr_name == "time_unit" ) {
+    mTimeUnit = value;
+  }
+  else if ( attr_name == "voltage_unit" ) {
+    mVoltageUnit = value;
+  }
+  else if ( attr_name == "current_unit" ) {
+    mCurrentUnit = value;
+  }
+  else if ( attr_name == "pulling_resistance_unit" ) {
+    mPullingResistanceUnit = value;
+  }
+  else if ( attr_name == "capacitiveLoad_unit" ) {
+    mCapacitiveLoadUnit = value;
+  }
+  else if ( attr_name == "leakage_power_unit" ) {
+    mLeakagePowerUnit = value;
+  }
+}
+
 // @brief セル数を設定する．
 // @param[in] num 設定する値
 void

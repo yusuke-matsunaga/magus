@@ -68,6 +68,13 @@ DotLibHandler::lex()
   return mParser.lex();
 }
 
+// @brief デバッグモードの時に true を返す．
+bool
+DotLibHandler::debug()
+{
+  return mParser.debug();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス SimpleHandler
@@ -100,7 +107,9 @@ SimpleHandler::read_attr(const string& attr_name)
   FileRegion loc = lex().cur_loc();
   Token token(type, value, loc);
 
-  cout << attr_name << " : " << token << endl;
+  if ( debug() ) {
+    cout << attr_name << " : " << token << endl;
+  }
 
   if ( !read_value(attr_name, token) ) {
     return false;
@@ -195,14 +204,16 @@ ComplexHandler::read_attr(const string& attr_name)
     }
   }
 
-  cout << attr_name << " (";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << *p;
-    comma = ", ";
+  if ( debug() ) {
+    cout << attr_name << " (";
+    const char* comma = "";
+    for (vector<Token>::const_iterator p = token_list.begin();
+	 p != token_list.end(); ++ p) {
+      cout << comma << *p;
+      comma = ", ";
+    }
+    cout << ")" << endl;
   }
-  cout << ")" << endl;
 
   if ( !read_value(attr_name, token_list) ) {
     return false;
@@ -297,14 +308,16 @@ GroupHandler::read_attr(const string& attr_name)
     }
   }
 
-  cout << attr_name << "( ";
-  const char* comma = "";
-  for (vector<Token>::const_iterator p = token_list.begin();
-       p != token_list.end(); ++ p) {
-    cout << comma << *p;
-    comma = ", ";
+  if ( debug() ) {
+    cout << attr_name << "( ";
+    const char* comma = "";
+    for (vector<Token>::const_iterator p = token_list.begin();
+	 p != token_list.end(); ++ p) {
+      cout << comma << *p;
+      comma = ", ";
+    }
+    cout << " ) {" << endl;
   }
-  cout << " ) {" << endl;
 
   if ( !begin_group(attr_name, token_list) ) {
     return false;
@@ -384,7 +397,10 @@ GroupHandler::read_attr(const string& attr_name)
     return false;
   }
 
-  cout << "}" << endl;
+  if ( debug() ) {
+    cout << "}" << endl;
+  }
+
   if ( !end_group() ) {
     return false;
   }
@@ -460,6 +476,5 @@ operator<<(ostream& s,
 
   return s;
 }
-
 
 END_NAMESPACE_YM_CELL_DOTLIB

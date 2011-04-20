@@ -36,10 +36,12 @@ public:
 
   /// @brief ファイルを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] debug デバッグモード
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  read_file(const string& filename);
+  read_file(const string& filename,
+	    bool debug);
 
 
 public:
@@ -63,6 +65,10 @@ public:
   DotLibLex&
   lex();
 
+  /// @brief デバッグモードの時 true を返す．
+  bool
+  debug();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -77,6 +83,9 @@ private:
 
   // library グループを処理するハンドラ
   DotLibHandler* mLibraryHandler;
+
+  // デバッグモード
+  bool mDebug;
 
 };
 
