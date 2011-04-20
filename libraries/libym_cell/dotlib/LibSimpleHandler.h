@@ -14,7 +14,7 @@
 //  /* Library Description: Simple Attributes */
 
 
-#include "LibAttrHandler.h"
+#include "SimpleHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @brief library グループの simple attribute 用ハンドラ
 //////////////////////////////////////////////////////////////////////
 class LibSimpleHandler :
-  public LibAttrHandler
+  public SimpleHandler
 {
 public:
 
@@ -50,6 +50,25 @@ public:
   bool
   read_value(const string& attr_name,
 	     Token token);
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  // 親のハンドラを返す．
+  LibraryGroupHandler*
+  lib_handler();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 親のハンドラ
+  LibraryGroupHandler* mLibHandler;
 
 };
 

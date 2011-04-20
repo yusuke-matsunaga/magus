@@ -8,9 +8,47 @@
 
 
 #include "LibSimpleHandler.h"
+#include "LibraryGroupHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
+
+//////////////////////////////////////////////////////////////////////
+// クラス LibSimpleHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] lib_handler 親のハンドラ
+LibSimpleHandler::LibSimpleHandler(LibraryGroupHandler* lib_handler) :
+  SimpleHandler(lib_handler->parser()),
+  mLibHandler(lib_handler)
+{
+}
+
+// @brief デストラクタ
+LibSimpleHandler::~LibSimpleHandler()
+{
+}
+
+// @brief 属性値の読み込み処理を行う．
+// @param[in] attr_name 属性名
+// @param[in] value 値を表すトークン
+// @return エラーが起きたら false を返す．
+bool
+LibSimpleHandler::read_value(const string& attr_name,
+			     Token token)
+{
+  lib_handler()->library()->set_attr(attr_name, token.value());
+  return true;
+}
+
+// 親のハンドラを返す．
+LibraryGroupHandler*
+LibSimpleHandler::lib_handler()
+{
+  return mLibHandler;
+}
+
 
 #if 0
 //////////////////////////////////////////////////////////////////////

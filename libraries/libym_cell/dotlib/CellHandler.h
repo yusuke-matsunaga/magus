@@ -9,25 +9,24 @@
 /// All rights reserved.
 
 
-#include "GroupHandler.h"
+#include "LibGroupHandler.h"
+#include "../ci/CiCell.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
-
-class LibraryGroupHandler;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellHandler CellHandler.h "CellHandler.h"
 /// @brief cell グループ用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class CellHandler :
-  public GroupHandler
+  public LibGroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] lib_handler 親のハンドラ
-  CellHandler(DotLibParser& parser);
+  CellHandler(LibraryGroupHandler* lib_handler);
 
   /// @brief デストラクタ
   virtual
@@ -51,6 +50,25 @@ public:
   virtual
   bool
   end_group();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 他のクラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 対象のセルを返す．
+  CiCell*
+  cell();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対象のセル．
+  CiCell* mCell;
 
 };
 

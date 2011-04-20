@@ -30,13 +30,14 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parser パーサー
-CellHandler::CellHandler(DotLibParser& parser) :
-  GroupHandler(parser)
+// @param[in] lib_handler 親のハンドラ
+CellHandler::CellHandler(LibraryGroupHandler* lib_handler) :
+  LibGroupHandler(lib_handler),
+  mCell(NULL)
 {
-  DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
-  DotLibHandler* dummy_complex = new DummyComplexHandler(parser);
-  DotLibHandler* dummy_group = new DummyGroupHandler(parser);
+  DotLibHandler* dummy_simple = new DummySimpleHandler(parser());
+  DotLibHandler* dummy_complex = new DummyComplexHandler(parser());
+  DotLibHandler* dummy_group = new DummyGroupHandler(parser());
 
   // simple attributes
   reg_handler("area", dummy_simple);
@@ -111,6 +112,30 @@ bool
 CellHandler::begin_group(const string& attr_name,
 			 const vector<Token>& token_list)
 {
+  assert_cond( attr_name == "cell", __FILE__, __LINE__);
+
+  if ( token_list.size() != 1 ) {
+    FileRegion loc;
+    if ( token_list.size() > 1 ) {
+      loc = token_list[2].loc();
+    }
+    msg_mgr().put_msg(__FILE__, __LINE__, loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "cell statement require only one token");
+    return false;
+  }
+
+  if ( token_list[0].type() != STR ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, token_list[0].loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "string type is expected.");
+    return false;
+  }
+
+  string name = token_list[0].value();
+  mCell =
   return true;
 }
 
@@ -119,6 +144,13 @@ bool
 CellHandler::end_group()
 {
   return true;
+}
+
+// @brief 対象のセルを返す．
+CiCell*
+CellHandler::cell()
+{
+  return mCell;
 }
 
 
