@@ -9,7 +9,7 @@
 
 #include "FfHandler.h"
 
-#include "DummySimpleHandler.h"
+#include "SimpleHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -19,43 +19,25 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parser パーサー
-FfHandler::FfHandler(DotLibParser& parser) :
-  GroupHandler(parser)
+// @param[in] parent 親のハンドラ
+FfHandler::FfHandler(GroupHandler* parent) :
+  GroupHandler(parent->parser(), parent)
 {
-  DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
+  DotLibHandler* simple = new SimpleHandler(parser(), this);
 
   // simple attributes
-  reg_handler("clear", dummy_simple);
-  reg_handler("clear_preset_var1", dummy_simple);
-  reg_handler("clear_preset_var2", dummy_simple);
-  reg_handler("clocked_on", dummy_simple);
-  reg_handler("clocked_on_also", dummy_simple);
-  reg_handler("next_state", dummy_simple);
-  reg_handler("preset", dummy_simple);
+  reg_handler("clear", simple);
+  reg_handler("clear_preset_var1", simple);
+  reg_handler("clear_preset_var2", simple);
+  reg_handler("clocked_on", simple);
+  reg_handler("clocked_on_also", simple);
+  reg_handler("next_state", simple);
+  reg_handler("preset", simple);
 }
 
 // @brief デストラクタ
 FfHandler::~FfHandler()
 {
 }
-
-// @brief グループ名を読み込んだ時の処理
-// @param[in] attr_name 属性名
-/// @param[in] token_list トークンのリスト
-bool
-FfHandler::begin_group(const string& attr_name,
-		       const vector<Token>& token_list)
-{
-  return true;
-}
-
-// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
-bool
-FfHandler::end_group()
-{
-  return true;
-}
-
 
 END_NAMESPACE_YM_CELL_DOTLIB

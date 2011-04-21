@@ -10,6 +10,7 @@
 
 
 #include "dotlib_nsdef.h"
+#include "PtNode.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -25,7 +26,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  DotLibHandler(DotLibParser& parser);
+  /// @param[in] parent 親のハンドラ
+  DotLibHandler(DotLibParser& parser,
+		GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -42,23 +45,7 @@ public:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const string& attr_name) = 0;
-
-  /// @brief ハンドラの登録を行う．
-  /// @param[in] attr_name 属性名
-  /// @param[in] handler 対応付けるハンドラ
-  /// @note エラーが起きたら false を返す．
-  virtual
-  bool
-  reg_handler(const string& attr_name,
-	      DotLibHandler* handler) = 0;
-
-  /// @brief ハンドラを取り出す．
-  /// @param[in] attr_name 属性名
-  /// @note なければ NULL を返す．
-  virtual
-  DotLibHandler*
-  find_handler(const string& name) = 0;
+  read_attr(Token attr_name) = 0;
 
 
 public:
@@ -74,6 +61,10 @@ public:
   /// @brief 行末まで読み込む．
   bool
   expect_nl();
+
+  /// @brief 親のハンドラを得る．
+  GroupHandler*
+  parent();
 
   /// @brief パーサーを得る．
   DotLibParser&
@@ -99,6 +90,9 @@ private:
 
   // パーサー
   DotLibParser& mParser;
+
+  // 親のハンドラ
+  GroupHandler* mParent;
 
 };
 

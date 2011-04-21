@@ -26,7 +26,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  GroupHandler(DotLibParser& parser);
+  /// @param[in] parent 親のハンドラ
+  GroupHandler(DotLibParser& parser,
+	       GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -39,17 +41,16 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．
-  /// @param[in] attr_name 属性名
+  /// @param[in] attr_token 属性名を表すトークン
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const string& attr_name);
+  read_attr(Token attr_token);
 
   /// @brief ハンドラの登録を行う．
   /// @param[in] attr_name 属性名
   /// @param[in] handler 対応付けるハンドラ
   /// @note エラーが起きたら false を返す．
-  virtual
   bool
   reg_handler(const string& attr_name,
 	      DotLibHandler* handler);
@@ -57,28 +58,47 @@ public:
   /// @brief ハンドラを取り出す．
   /// @param[in] attr_name 属性名
   /// @note なければ NULL を返す．
-  virtual
   DotLibHandler*
-  find_handler(const string& name);
+  find_handler(const string& attr_name);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 他のクラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 対応する PtNode を返す．
+  PtNode*
+  pt_node();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 自身と継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 対応する PtNode を設定する．
+  void
+  set_pt_node(PtNode* ndoe);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // GroupHandler の継承クラスが実装する仮想関数
+  // 内部で用いられる仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief グループ名を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] token_list トークンのリスト
+  /// @brief group statement の最初に呼ばれる関数
+  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] value_list 値を表すトークンのリスト
   virtual
   bool
-  begin_group(const string& attr_name,
-	      const vector<Token>& token_list) = 0;
+  begin_group(Token attr_token,
+	      const vector<Token>& value_list);
 
-  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
+  /// @brief group statement の最後に呼ばれる関数
   virtual
   bool
-  end_group() = 0;
+  end_group();
 
 
 private:
@@ -88,6 +108,9 @@ private:
 
   // ハンドラの連想配列
   hash_map<string, DotLibHandler*> mHandlerMap;
+
+  // 対応する PtNode
+  PtNode* mPtNode;
 
 };
 

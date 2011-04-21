@@ -9,7 +9,7 @@
 
 #include "LatchHandler.h"
 
-#include "DummySimpleHandler.h"
+#include "SimpleHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -19,43 +19,25 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parser パーサー
-LatchHandler::LatchHandler(DotLibParser& parser) :
-  GroupHandler(parser)
+// @param[in] parent 親のハンドラ
+LatchHandler::LatchHandler(GroupHandler* parent) :
+  GroupHandler(parent->parser())
 {
-  DotLibHandler* dummy_simple = new DummySimpleHandler(parser);
+  DotLibHandler* simple = new SimpleHandler(parser(), this);
 
   // simple attributes
-  reg_handler("clear", dummy_simple);
-  reg_handler("clear_preset_var1", dummy_simple);
-  reg_handler("clear_preset_var2", dummy_simple);
-  reg_handler("data_in", dummy_simple);
-  reg_handler("enable", dummy_simple);
-  reg_handler("enable_also", dummy_simple);
-  reg_handler("preset", dummy_simple);
+  reg_handler("clear", simple);
+  reg_handler("clear_preset_var1", simple);
+  reg_handler("clear_preset_var2", simple);
+  reg_handler("data_in", simple);
+  reg_handler("enable", simple);
+  reg_handler("enable_also", simple);
+  reg_handler("preset", simple);
 }
 
 // @brief デストラクタ
 LatchHandler::~LatchHandler()
 {
 }
-
-// @brief グループ名を読み込んだ時の処理
-// @param[in] attr_name 属性名
-// @param[in] token_list トークンのリスト
-bool
-LatchHandler::begin_group(const string& attr_name,
-			  const vector<Token>& token_list)
-{
-  return true;
-}
-
-// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
-bool
-LatchHandler::end_group()
-{
-  return true;
-}
-
 
 END_NAMESPACE_YM_CELL_DOTLIB

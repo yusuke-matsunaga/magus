@@ -46,15 +46,17 @@ DotLibParser::read_file(const string& filename,
   bool error = false;
   tTokenType type;
   string name;
+  FileRegion loc;
   for ( ; ; ) {
     type = lex().read_token();
     if ( type != NL ) {
       name = lex().cur_string();
+      loc = lex().cur_loc();
       break;
     }
   }
   if ( type != STR || name != "library" ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+    msg_mgr().put_msg(__FILE__, __LINE__, loc,
 		      kMsgError,
 		      "DOTLIB_PARSER",
 		      "'library' keyword is expected "
@@ -62,7 +64,7 @@ DotLibParser::read_file(const string& filename,
     error = true;
     goto last;
   }
-  if ( !mLibraryHandler->read_attr(name) ) {
+  if ( !mLibraryHandler->read_attr(Token(type, name, loc)) ) {
     error = true;
     goto last;
   }
@@ -129,7 +131,7 @@ DotLibParser::expect_nl()
 {
   for ( ; ; ) {
     tTokenType token = lex().read_token();
-    if ( token == NL ) {
+    if ( token == NL || token == END ) {
       return true;
     }
     if ( token != SEMI ) {

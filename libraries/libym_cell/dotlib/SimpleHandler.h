@@ -26,7 +26,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  SimpleHandler(DotLibParser& parser);
+  /// @param[in] parent 親のハンドラ
+  SimpleHandler(DotLibParser& parser,
+		GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -39,12 +41,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．
-  /// @param[in] attr_name 属性名
+  /// @param[in] attr_token 属性名を表すトークン
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const string& attr_name);
+  read_attr(Token attr_token);
 
+#if 0
   /// @brief ハンドラの登録を行う．
   /// @param[in] attr_name 属性名
   /// @param[in] handler 対応付けるハンドラ
@@ -59,22 +62,8 @@ public:
   /// @note なければ NULL を返す．
   virtual
   DotLibHandler*
-  find_handler(const string& name);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // SimpleHandler の継承クラスが実装する仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 属性値の読み込み処理を行う．
-  /// @param[in] attr_name 属性名
-  /// @param[in] value 値を表すトークン
-  /// @return エラーが起きたら false を返す．
-  virtual
-  bool
-  read_value(const string& name,
-	     Token token) = 0;
+  find_handler(const string& attr_name);
+#endif
 
 };
 

@@ -10,7 +10,6 @@
 
 
 #include "DotLibHandler.h"
-#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -26,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  ComplexHandler(DotLibParser& parser);
+  /// @param[in] parent 親のハンドラ
+  ComplexHandler(DotLibParser& parser,
+		 GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -39,42 +40,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．
-  /// @param[in] attr_name 属性名
+  /// @param[in] attr_token 属性名を表すトークン
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const string& attr_name);
-
-  /// @brief ハンドラの登録を行う．
-  /// @param[in] attr_name 属性名
-  /// @param[in] handler 対応付けるハンドラ
-  /// @note エラーが起きたら false を返す．
-  virtual
-  bool
-  reg_handler(const string& attr_name,
-	      DotLibHandler* handler);
-
-  /// @brief ハンドラを取り出す．
-  /// @param[in] attr_name 属性名
-  /// @note なければ NULL を返す．
-  virtual
-  DotLibHandler*
-  find_handler(const string& attr_name);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // ComplexHandler の継承クラスが実装する仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 属性値の読み込み処理を行う．
-  /// @param[in] attr_name 属性名
-  /// @param[in] token_list トークンのリスト
-  /// @return エラーが起きたら false を返す．
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const vector<Token>& token_list) = 0;
+  read_attr(Token attr_token);
 
 };
 

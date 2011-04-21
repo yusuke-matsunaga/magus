@@ -9,8 +9,7 @@
 /// All rights reserved.
 
 
-#include "LibGroupHandler.h"
-#include "../ci/CiCell.h"
+#include "GroupHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -20,55 +19,17 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @brief cell グループ用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class CellHandler :
-  public LibGroupHandler
+  public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] lib_handler 親のハンドラ
-  CellHandler(LibraryGroupHandler* lib_handler);
+  /// @param[in] parent 親のハンドラ
+  CellHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
   ~CellHandler();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // GroupHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief グループ名を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] token_list トークンのリスト
-  virtual
-  bool
-  begin_group(const string& attr_name,
-	      const vector<Token>& token_list);
-
-  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
-  virtual
-  bool
-  end_group();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 他のクラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対象のセルを返す．
-  CiCell*
-  cell();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 対象のセル．
-  CiCell* mCell;
 
 };
 

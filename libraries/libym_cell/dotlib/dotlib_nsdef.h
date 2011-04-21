@@ -65,6 +65,7 @@ enum tTokenType {
 class DotLibParser;
 class DotLibLex;
 class DotLibHandler;
+class GroupHandler;
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

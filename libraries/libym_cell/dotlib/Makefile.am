@@ -27,57 +27,19 @@ libym_cell_dotlib_la_SOURCES = \
 	dotlib_nsdef.h \
 	Token.h \
 	DotLibHandler.h \
+	SimpleHandler.h \
+	ComplexHandler.h \
 	DotLibHandler.cc \
 	DotLibLex.cc \
 	DotLibLex.h \
 	DotLibParser.h \
 	DotLibParser.cc \
+	PtNode.h \
+	PtNode.cc \
 	LibraryGroupHandler.h \
 	LibraryGroupHandler.cc \
-	LibSimpleHandler.h \
-	LibSimpleHandler.cc \
-	LibComplexHandler.h \
-	LibComplexHandler.cc \
-	CellHandler.h \
-	CellHandler.cc \
 	DefineHandler.h \
-	DefineHandler.cc \
-	OperatingConditionsHandler.h \
-	OperatingConditionsHandler.cc \
-	WireLoadHandler.h \
-	WireLoadHandler.cc \
-	LuTableTemplateHandler.h \
-	LuTableTemplateHandler.cc \
-	OutputCurrentTemplateHandler.h \
-	OutputCurrentTemplateHandler.cc \
-	PowerLutTemplateHandler.h \
-	PowerLutTemplateHandler.cc \
-	InputVoltageHandler.h \
-	InputVoltageHandler.cc \
-	OutputVoltageHandler.h \
-	OutputVoltageHandler.cc \
-	BusHandler.h \
-	BusHandler.cc \
-	PinHandler.h \
-	PinHandler.cc \
-	FfHandler.h \
-	FfHandler.cc \
-	LatchHandler.h \
-	LatchHandler.cc \
-	StateTableHandler.h \
-	StateTableHandler.cc \
-	LeakagePowerHandler.h \
-	LeakagePowerHandler.cc \
-	TimingHandler.h \
-	TimingHandler.cc \
-	InternalPowerHandler.h \
-	InternalPowerHandler.cc \
-	DummySimpleHandler.h \
-	DummySimpleHandler.cc \
-	DummyComplexHandler.h \
-	DummyComplexHandler.cc \
-	DummyGroupHandler.h \
-	DummyGroupHandler.cc
+	DefineHandler.cc
 
 
 

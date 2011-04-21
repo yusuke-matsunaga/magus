@@ -63,7 +63,7 @@ DotLibLex::init()
 // トークンを一つとってくる．
 // 仕様
 // - [0-9]* からなる文字列を整数値として認識する．
-// - [0-9]*.[0-9]+(e|E)(+|-)?[0-9]+ を浮動小数点値として認識する．
+// - (+|-)?[0-9]*.[0-9]+(e|E)(+|-)?[0-9]+ を浮動小数点値として認識する．
 // - [a-zA-Z_][a-zA-Z0-9_]* からなる文字列を識別子として認識する．
 // - "..." の中身を文字列として認識する．
 // - 識別子が予約語かどうかはここでは判定しない．
@@ -134,7 +134,10 @@ DotLibLex::read_token()
     return COMMA;
 
   case '-':
-    return MINUS;
+    goto ST_MINUS;
+
+  case '+':
+    goto ST_PLUS;
 
   case '(':
     return LP;
@@ -228,6 +231,29 @@ DotLibLex::read_token()
   }
   unget();
   return FLOAT_NUM;
+
+ ST_MINUS: // - を読み込んだ直後
+  c = get();
+  if ( isdigit(c) ) {
+    mCurString.put_char('-');
+    mCurString.put_char(c);
+    goto ST_NUM1;
+  }
+  unget();
+  return MINUS;
+
+ ST_PLUS: // + を読み込んだ直後
+  c = get();
+  if ( isdigit(c) ) {
+    // '+' は無視する．
+    mCurString.put_char(c);
+    goto ST_NUM1;
+  }
+  mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
+		  kMsgError,
+		  "DOTLIB_LEX",
+		  "syntax error");
+  return ERROR;
 
  ST_ID: // 一文字目が[a-zA-Z_]の時
   c = get();

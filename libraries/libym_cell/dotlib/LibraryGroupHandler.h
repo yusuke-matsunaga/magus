@@ -10,7 +10,7 @@
 
 
 #include "GroupHandler.h"
-#include "../ci/CiLibrary.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -35,40 +35,21 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // GroupHandler の仮想関数
+  // 内部で用いられる仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief グループ名を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] token_list トークンのリスト
+  /// @brief group statement の最初に呼ばれる関数
+  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] value_list 値を表すトークンのリスト
   virtual
   bool
-  begin_group(const string& attr_name,
-	      const vector<Token>& token_list);
+  begin_group(Token attr_token,
+	      const vector<Token>& value_list);
 
-  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
+  /// @brief group statement の最後に呼ばれる関数
   virtual
   bool
   end_group();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 他のクラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対象のセルライブラリを返す．
-  CiLibrary*
-  library();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 対象のライブラリ
-  CiLibrary* mLibrary;
 
 };
 

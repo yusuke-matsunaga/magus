@@ -23,8 +23,11 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 // @brief コンストラクタ
 // @param[in] parser パーサー
-DotLibHandler::DotLibHandler(DotLibParser& parser) :
-  mParser(parser)
+// @param[in] parent 親のハンドラ
+DotLibHandler::DotLibHandler(DotLibParser& parser,
+			     GroupHandler* parent) :
+  mParser(parser),
+  mParent(parent)
 {
 }
 
@@ -45,6 +48,13 @@ bool
 DotLibHandler::expect_nl()
 {
   return mParser.expect_nl();
+}
+
+// @brief 親のハンドラを得る．
+GroupHandler*
+DotLibHandler::parent()
+{
+  return mParent;
 }
 
 // @brief パーサーを得る．
@@ -82,8 +92,10 @@ DotLibHandler::debug()
 
 // @brief コンストラクタ
 // @param[in] parser パーサー
-SimpleHandler::SimpleHandler(DotLibParser& parser) :
-  DotLibHandler(parser)
+// @param[in] parent 親のハンドラ
+SimpleHandler::SimpleHandler(DotLibParser& parser,
+			     GroupHandler* parent) :
+  DotLibHandler(parser, parent)
 {
 }
 
@@ -93,27 +105,26 @@ SimpleHandler::~SimpleHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] attr_name 属性名
+// @param[in] attr_token 属性名を表すトークン
 // @return エラーが起きたら false を返す．
 bool
-SimpleHandler::read_attr(const string& attr_name)
+SimpleHandler::read_attr(Token attr_token)
 {
   if ( !expect(COLON) ) {
     return false;
   }
 
   tTokenType type = lex().read_token();
-  string value = lex().cur_string();
+  string str = lex().cur_string();
   FileRegion loc = lex().cur_loc();
-  Token token(type, value, loc);
+  Token value(type, str, loc);
 
   if ( debug() ) {
-    cout << attr_name << " : " << token << endl;
+    cout << attr_token << " : " << value << endl;
   }
 
-  if ( !read_value(attr_name, token) ) {
-    return false;
-  }
+  PtNode* node = new PtNode(attr_token, value);
+  parent()->pt_node()->add_child(node);
 
 #if 0
   if ( !expect(SEMI) ) {
@@ -132,28 +143,6 @@ SimpleHandler::read_attr(const string& attr_name)
   return true;
 }
 
-// @brief ハンドラの登録を行う．
-// @param[in] attr_name 属性名
-// @param[in] handler 対応付けるハンドラ
-// @note エラーが起きたら false を返す．
-bool
-SimpleHandler::reg_handler(const string& attr_name,
-			   DotLibHandler* handler)
-{
-  // simple attribute は子供を持てない．
-  return false;
-}
-
-// @brief ハンドラを取り出す．
-// @param[in] attr_name 属性名
-// @note なければ NULL を返す．
-DotLibHandler*
-SimpleHandler::find_handler(const string& name)
-{
-  // simple attribute は子供を持てない．
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス ComplexHandler
@@ -161,8 +150,10 @@ SimpleHandler::find_handler(const string& name)
 
 // @brief コンストラクタ
 // @param[in] parser パーサー
-ComplexHandler::ComplexHandler(DotLibParser& parser) :
-  DotLibHandler(parser)
+// @param[in] parent 親のハンドラ
+ComplexHandler::ComplexHandler(DotLibParser& parser,
+			       GroupHandler* parent) :
+  DotLibHandler(parser, parent)
 {
 }
 
@@ -172,22 +163,22 @@ ComplexHandler::~ComplexHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] attr_name 属性名
+// @param[in] attr_token 属性名を表すトークン
 // @return エラーが起きたら false を返す．
 bool
-ComplexHandler::read_attr(const string& attr_name)
+ComplexHandler::read_attr(Token attr_token)
 {
   if ( !expect(LP) ) {
     return false;
   }
 
-  vector<Token> token_list;
+  vector<Token> value_list;
   tTokenType type = lex().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
       string value = lex().cur_string();
       FileRegion loc = lex().cur_loc();
-      token_list.push_back(Token(type, value, loc));
+      value_list.push_back(Token(type, value, loc));
 
       tTokenType type1 = lex().read_token();
       if ( type1 == RP ) {
@@ -205,19 +196,18 @@ ComplexHandler::read_attr(const string& attr_name)
   }
 
   if ( debug() ) {
-    cout << attr_name << " (";
+    cout << attr_token << " (";
     const char* comma = "";
-    for (vector<Token>::const_iterator p = token_list.begin();
-	 p != token_list.end(); ++ p) {
+    for (vector<Token>::const_iterator p = value_list.begin();
+	 p != value_list.end(); ++ p) {
       cout << comma << *p;
       comma = ", ";
     }
     cout << ")" << endl;
   }
 
-  if ( !read_value(attr_name, token_list) ) {
-    return false;
-  }
+  PtNode* node = new PtNode(attr_token, value_list);
+  parent()->pt_node()->add_child(node);
 
 #if 0
   if ( !expect(SEMI) ) {
@@ -236,6 +226,7 @@ ComplexHandler::read_attr(const string& attr_name)
   return true;
 }
 
+#if 0
 // @brief ハンドラの登録を行う．
 // @param[in] attr_name 属性名
 // @param[in] handler 対応付けるハンドラ
@@ -252,11 +243,12 @@ ComplexHandler::reg_handler(const string& attr_name,
 // @param[in] attr_name 属性名
 // @note なければ NULL を返す．
 DotLibHandler*
-ComplexHandler::find_handler(const string& name)
+ComplexHandler::find_handler(const string& attr_name)
 {
   // complex attribute は子供を持てない．
   return NULL;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -265,8 +257,10 @@ ComplexHandler::find_handler(const string& name)
 
 // @brief コンストラクタ
 // @param[in] parser パーサー
-GroupHandler::GroupHandler(DotLibParser& parser) :
-  DotLibHandler(parser)
+// @param[in] parent 親のハンドラ
+GroupHandler::GroupHandler(DotLibParser& parser,
+			   GroupHandler* parent) :
+  DotLibHandler(parser, parent)
 {
 }
 
@@ -276,22 +270,22 @@ GroupHandler::~GroupHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] attr_name 属性名
+// @param[in] attr_token 属性名を表すトークン
 // @return エラーが起きたら false を返す．
 bool
-GroupHandler::read_attr(const string& attr_name)
+GroupHandler::read_attr(Token attr_token)
 {
   if ( !expect(LP) ) {
     return false;
   }
 
-  vector<Token> token_list;
+  vector<Token> value_list;
   tTokenType type = lex().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
       string value = lex().cur_string();
       FileRegion loc = lex().cur_loc();
-      token_list.push_back(Token(type, value, loc));
+      value_list.push_back(Token(type, value, loc));
 
       tTokenType type1 = lex().read_token();
       if ( type1 == RP ) {
@@ -309,17 +303,17 @@ GroupHandler::read_attr(const string& attr_name)
   }
 
   if ( debug() ) {
-    cout << attr_name << "( ";
+    cout << attr_token << "( ";
     const char* comma = "";
-    for (vector<Token>::const_iterator p = token_list.begin();
-	 p != token_list.end(); ++ p) {
+    for (vector<Token>::const_iterator p = value_list.begin();
+	 p != value_list.end(); ++ p) {
       cout << comma << *p;
       comma = ", ";
     }
     cout << " ) {" << endl;
   }
 
-  if ( !begin_group(attr_name, token_list) ) {
+  if ( !begin_group(attr_token, value_list) ) {
     return false;
   }
 
@@ -376,18 +370,19 @@ GroupHandler::read_attr(const string& attr_name)
       return false;
     }
     const string name1 = lex().cur_string();
+    FileRegion loc1 = lex().cur_loc();
     hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name1);
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
       buf << name1 << ": unknown keyword.";
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+      msg_mgr().put_msg(__FILE__, __LINE__, loc1,
 			kMsgError,
 			"DOTLIB_PARSER",
 			buf.str());
       return false;
     }
     DotLibHandler* handler = p->second;
-    if ( !handler->read_attr(name1) ) {
+    if ( !handler->read_attr(Token(STR, name1, loc1)) ) {
       return false;
     }
   }
@@ -399,10 +394,6 @@ GroupHandler::read_attr(const string& attr_name)
 
   if ( debug() ) {
     cout << "}" << endl;
-  }
-
-  if ( !end_group() ) {
-    return false;
   }
 
   return true;
@@ -423,15 +414,51 @@ GroupHandler::reg_handler(const string& attr_name,
 // @param[in] attr_name 属性名
 // @note なければ NULL を返す．
 DotLibHandler*
-GroupHandler::find_handler(const string& name)
+GroupHandler::find_handler(const string& attr_name)
 {
-  hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name);
+  hash_map<string, DotLibHandler*>::const_iterator p
+    = mHandlerMap.find(attr_name);
   if ( p == mHandlerMap.end() ) {
     return NULL;
   }
   else {
     return p->second;
   }
+}
+
+// @brief 対応する PtNode を返す．
+PtNode*
+GroupHandler::pt_node()
+{
+  return mPtNode;
+}
+
+// @brief 対応する PtNode を設定する．
+void
+GroupHandler::set_pt_node(PtNode* node)
+{
+  mPtNode = node;
+}
+
+// @brief group statement の最初に呼ばれる関数
+// @param[in] attr_token 属性名を表すトークン
+// @param[in] value_list 値を表すトークンのリスト
+bool
+GroupHandler::begin_group(Token attr_token,
+			  const vector<Token>& value_list)
+{
+  PtNode* node = new PtNode(attr_token, value_list);
+  set_pt_node(node);
+  parent()->pt_node()->add_child(node);
+
+  return true;
+}
+
+// @brief group statement の最後に呼ばれる関数
+bool
+GroupHandler::end_group()
+{
+  return true;
 }
 
 

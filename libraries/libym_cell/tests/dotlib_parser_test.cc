@@ -31,7 +31,7 @@ dotlibparser_test(int argc,
   timer.start();
 
   for (int i = 1; i < argc; ++ i) {
-    bool stat = parser.read_file(argv[i], true);
+    bool stat = parser.read_file(argv[i], false);
     if ( !stat ) {
       return -1;
     }

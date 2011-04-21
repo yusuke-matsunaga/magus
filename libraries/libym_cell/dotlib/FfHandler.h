@@ -24,31 +24,12 @@ class FfHandler :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parser パーサー
-  FfHandler(DotLibParser& parser);
+  /// @param[in] parent 親のハンドラ
+  FfHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
   ~FfHandler();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // GroupHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief グループ名を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] token_list トークンのリスト
-  virtual
-  bool
-  begin_group(const string& attr_name,
-	      const vector<Token>& token_list);
-
-  /// @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
-  virtual
-  bool
-  end_group();
 
 };
 
