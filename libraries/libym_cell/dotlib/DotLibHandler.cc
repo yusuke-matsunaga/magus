@@ -275,47 +275,13 @@ GroupHandler::read_attr(Token attr_token)
     return false;
   }
 
-#if 0
-  if ( !expect(NL) ) {
-    return false;
-  }
-
   for ( ; ; ) {
-    tTokenType type = parser().read_token(kNormal);
+    type = parser().read_token(kNormal);
+    if ( type == NL ) {
+      continue;
+    }
     if ( type == RCB ) {
       break;
-    }
-    if ( type == NL ) {
-      continue;
-    }
-    if ( type != SYMBOL ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			"string value is expected.");
-      return false;
-    }
-    const string name1 = parser().cur_string();
-    hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name1);
-    if ( p == mHandlerMap.end() ) {
-      ostringstream buf;
-      buf << name1 << ": unknown keyword.";
-      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			buf.str());
-      return false;
-    }
-    DotLibHandler* handler = p->second;
-    if ( !handler->read_attr(name1) ) {
-      return false;
-    }
-  }
-#else
-  for (type = parser().read_token(kNormal);
-       type != RCB; type = parser().read_token(kNormal)) {
-    if ( type == NL ) {
-      continue;
     }
     if ( type != SYMBOL ) {
       msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
@@ -326,7 +292,8 @@ GroupHandler::read_attr(Token attr_token)
     }
     const string name1 = parser().cur_string();
     FileRegion loc1 = parser().cur_loc();
-    hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name1);
+    hash_map<string, DotLibHandler*>::const_iterator p
+      = mHandlerMap.find(name1);
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
       buf << name1 << ": unknown keyword.";
@@ -341,7 +308,6 @@ GroupHandler::read_attr(Token attr_token)
       return false;
     }
   }
-#endif
 
   if ( !expect(NL) ) {
     return false;
