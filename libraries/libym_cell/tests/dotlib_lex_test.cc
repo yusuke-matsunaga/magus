@@ -12,7 +12,7 @@
 #include <iomanip>
 
 #include "ym_utils/StopWatch.h"
-#include "../dotlib/DotLibLex.h"
+#include "../dotlib/DotLibParser.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -22,8 +22,7 @@ int
 dotliblex_test(int argc,
 	       char** argv)
 {
-  MsgMgr msg_mgr;
-  DotLibLex lex(msg_mgr);
+  DotLibParser lex;
 
   StopWatch timer;
   timer.start();
@@ -35,7 +34,7 @@ dotliblex_test(int argc,
     }
 
     for ( ; ; ) {
-      tTokenType id = lex.read_token();
+      tTokenType id = lex.read_token(kNormal);
       if ( id == END ) {
 	break;
       }
@@ -55,8 +54,20 @@ dotliblex_test(int argc,
 	cout << ",";
 	break;
 
+      case PLUS:
+	cout << "+";
+	break;
+
       case MINUS:
 	cout << "-";
+	break;
+
+      case MULT:
+	cout << "*";
+	break;
+
+      case DIV:
+	cout << "/";
 	break;
 
       case LP:
@@ -75,16 +86,8 @@ dotliblex_test(int argc,
 	cout << "}";
 	break;
 
-      case INT_NUM:
-	cout << "INT_NUM(" << lex.cur_string() << ")";
-	break;
-
-      case FLOAT_NUM:
-	cout << "FLOAT_NUM(" << lex.cur_string() << ")";
-	break;
-
-      case STR:
-	cout << "STR(\"" << lex.cur_string() << "\")";
+      case SYMBOL:
+	cout << "SYMBOL(\"" << lex.cur_string() << "\")";
 	break;
 
       case NL:

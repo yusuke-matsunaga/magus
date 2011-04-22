@@ -8,7 +8,7 @@
 
 
 #include "DefineHandler.h"
-#include "DotLibLex.h"
+#include "DotLibParser.h"
 #include "SimpleHandler.h"
 #include "GroupHandler.h"
 
@@ -44,25 +44,25 @@ DefineHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = lex().read_token();
+  tTokenType type = parser().read_token(kNormal);
   if ( type != RP ) {
     for ( ; ; ) {
-      string value = lex().cur_string();
-      FileRegion loc = lex().cur_loc();
+      string value = parser().cur_string();
+      FileRegion loc = parser().cur_loc();
       value_list.push_back(Token(type, value, loc));
 
-      tTokenType type1 = lex().read_token();
+      tTokenType type1 = parser().read_token(kNormal);
       if ( type1 == RP ) {
 	break;
       }
       if ( type1 != COMMA ) {
-	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+	msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			  kMsgError,
 			  "DOTLIB_PARSER",
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = lex().read_token();
+      type = parser().read_token(kNormal);
     }
   }
 
@@ -93,7 +93,7 @@ DefineHandler::read_attr(Token attr_token)
 
   bool error = false;
   Token keyword = value_list[0];
-  if ( keyword.type() != STR ) {
+  if ( keyword.type() != SYMBOL ) {
     msg_mgr().put_msg(__FILE__, __LINE__, keyword.loc(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
@@ -102,7 +102,7 @@ DefineHandler::read_attr(Token attr_token)
   }
 
   Token group = value_list[1];
-  if ( group.type() != STR ) {
+  if ( group.type() != SYMBOL ) {
     msg_mgr().put_msg(__FILE__, __LINE__, group.loc(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
@@ -111,7 +111,7 @@ DefineHandler::read_attr(Token attr_token)
   }
 
   Token type_token = value_list[2];
-  if ( type_token.type() != STR ) {
+  if ( type_token.type() != SYMBOL ) {
     msg_mgr().put_msg(__FILE__, __LINE__, type_token.loc(),
 		      kMsgError,
 		      "DOTLIB_PARSER",
@@ -137,7 +137,7 @@ DefineHandler::read_attr(Token attr_token)
   assert_cond( g_handler != NULL, __FILE__, __LINE__);
 
   // 今は type を無視
-  DotLibHandler* new_handler = new SimpleHandler(parser(), g_handler);
+  DotLibHandler* new_handler = new SimpleHandler(parser(), g_handler, kNormal);
 
   g_handler->reg_handler(keyword.value(), new_handler);
 

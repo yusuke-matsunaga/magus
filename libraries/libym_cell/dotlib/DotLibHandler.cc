@@ -71,13 +71,6 @@ DotLibHandler::msg_mgr()
   return mParser.msg_mgr();
 }
 
-// @brief 字句解析器を得る．
-DotLibLex&
-DotLibHandler::lex()
-{
-  return mParser.lex();
-}
-
 // @brief デバッグモードの時に true を返す．
 bool
 DotLibHandler::debug()
@@ -93,9 +86,12 @@ DotLibHandler::debug()
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
+// @param[in] req_type 要求する値のタイプ
 SimpleHandler::SimpleHandler(DotLibParser& parser,
-			     GroupHandler* parent) :
-  DotLibHandler(parser, parent)
+			     GroupHandler* parent,
+			     tValueType req_type) :
+  DotLibHandler(parser, parent),
+  mReqType(req_type)
 {
 }
 
@@ -114,9 +110,19 @@ SimpleHandler::read_attr(Token attr_token)
     return false;
   }
 
-  tTokenType type = lex().read_token();
-  string str = lex().cur_string();
-  FileRegion loc = lex().cur_loc();
+#if 0
+  cout << "attr = " << attr_token << endl;
+  switch ( mReqType ) {
+  case kNormal: cout << "kNormal"; break;
+  case kFloat:  cout << "kFloat"; break;
+  default:      cout << "unknown"; break;
+  }
+  cout << endl;
+#endif
+
+  tTokenType type = parser().read_token(mReqType);
+  string str = parser().cur_string();
+  FileRegion loc = parser().cur_loc();
   Token value(type, str, loc);
 
   if ( debug() ) {
@@ -126,21 +132,7 @@ SimpleHandler::read_attr(Token attr_token)
   PtNode* node = new PtNode(attr_token, value);
   parent()->pt_node()->add_child(node);
 
-#if 0
-  if ( !expect(SEMI) ) {
-    return false;
-  }
-
-  if ( !expect(NL) ) {
-    return false;
-  }
-#else
-  if ( !expect_nl() ) {
-    return false;
-  }
-#endif
-
-  return true;
+  return expect_nl();
 }
 
 
@@ -173,25 +165,25 @@ ComplexHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = lex().read_token();
+  tTokenType type = parser().read_token(kFloat);
   if ( type != RP ) {
     for ( ; ; ) {
-      string value = lex().cur_string();
-      FileRegion loc = lex().cur_loc();
+      string value = parser().cur_string();
+      FileRegion loc = parser().cur_loc();
       value_list.push_back(Token(type, value, loc));
 
-      tTokenType type1 = lex().read_token();
+      tTokenType type1 = parser().read_token(kNormal);
       if ( type1 == RP ) {
 	break;
       }
       if ( type1 != COMMA ) {
-	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+	msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			  kMsgError,
 			  "DOTLIB_PARSER",
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = lex().read_token();
+      type = parser().read_token(kFloat);
     }
   }
 
@@ -209,46 +201,8 @@ ComplexHandler::read_attr(Token attr_token)
   PtNode* node = new PtNode(attr_token, value_list);
   parent()->pt_node()->add_child(node);
 
-#if 0
-  if ( !expect(SEMI) ) {
-    return false;
-  }
-
-  if ( !expect(NL) ) {
-    return false;
-  }
-#else
-  if ( !expect_nl() ) {
-    return false;
-  }
-#endif
-
-  return true;
+  return expect_nl();
 }
-
-#if 0
-// @brief ハンドラの登録を行う．
-// @param[in] attr_name 属性名
-// @param[in] handler 対応付けるハンドラ
-// @note エラーが起きたら false を返す．
-bool
-ComplexHandler::reg_handler(const string& attr_name,
-			    DotLibHandler* handler)
-{
-  // complex attribute は子供を持てない．
-  return false;
-}
-
-// @brief ハンドラを取り出す．
-// @param[in] attr_name 属性名
-// @note なければ NULL を返す．
-DotLibHandler*
-ComplexHandler::find_handler(const string& attr_name)
-{
-  // complex attribute は子供を持てない．
-  return NULL;
-}
-#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -280,25 +234,25 @@ GroupHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = lex().read_token();
+  tTokenType type = parser().read_token(kFloat);
   if ( type != RP ) {
     for ( ; ; ) {
-      string value = lex().cur_string();
-      FileRegion loc = lex().cur_loc();
+      string value = parser().cur_string();
+      FileRegion loc = parser().cur_loc();
       value_list.push_back(Token(type, value, loc));
 
-      tTokenType type1 = lex().read_token();
+      tTokenType type1 = parser().read_token(kNormal);
       if ( type1 == RP ) {
 	break;
       }
       if ( type1 != COMMA ) {
-	msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+	msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			  kMsgError,
 			  "DOTLIB_PARSER",
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = lex().read_token();
+      type = parser().read_token(kFloat);
     }
   }
 
@@ -327,26 +281,26 @@ GroupHandler::read_attr(Token attr_token)
   }
 
   for ( ; ; ) {
-    tTokenType type = lex().read_token();
+    tTokenType type = parser().read_token(kNormal);
     if ( type == RCB ) {
       break;
     }
     if ( type == NL ) {
       continue;
     }
-    if ( type != STR ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+    if ( type != SYMBOL ) {
+      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			"string value is expected.");
       return false;
     }
-    const string name1 = lex().cur_string();
+    const string name1 = parser().cur_string();
     hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name1);
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
       buf << name1 << ": unknown keyword.";
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			buf.str());
@@ -358,19 +312,20 @@ GroupHandler::read_attr(Token attr_token)
     }
   }
 #else
-  for (type = lex().read_token(); type != RCB; type = lex().read_token()) {
+  for (type = parser().read_token(kNormal);
+       type != RCB; type = parser().read_token(kNormal)) {
     if ( type == NL ) {
       continue;
     }
-    if ( type != STR ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, lex().cur_loc(),
+    if ( type != SYMBOL ) {
+      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			"string value is expected.");
       return false;
     }
-    const string name1 = lex().cur_string();
-    FileRegion loc1 = lex().cur_loc();
+    const string name1 = parser().cur_string();
+    FileRegion loc1 = parser().cur_loc();
     hash_map<string, DotLibHandler*>::const_iterator p = mHandlerMap.find(name1);
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
@@ -382,7 +337,7 @@ GroupHandler::read_attr(Token attr_token)
       return false;
     }
     DotLibHandler* handler = p->second;
-    if ( !handler->read_attr(Token(STR, name1, loc1)) ) {
+    if ( !handler->read_attr(Token(SYMBOL, name1, loc1)) ) {
       return false;
     }
   }
@@ -477,28 +432,26 @@ operator<<(ostream& s,
   case COLON:     type_str = "':'"; break;
   case SEMI:      type_str = "';'"; break;
   case COMMA:     type_str = "','"; break;
+  case PLUS:      type_str = "'+'"; break;
   case MINUS:     type_str = "'-'"; break;
+  case MULT:      type_str = "'*'"; break;
+  case DIV:       type_str = "'/'"; break;
   case LP:        type_str = "'('"; break;
   case RP:        type_str = "')'"; break;
   case LCB:       type_str = "'{'"; break;
   case RCB:       type_str = "'}'"; break;
-  case INT_NUM:   type_str = "integer value"; break;
-  case FLOAT_NUM: type_str = "float value"; break;
-  case STR:       type_str = "string"; break;
+  case INT_NUM: type_str = "FLOAT"; break;
+  case FLOAT_NUM: type_str = "FLOAT"; break;
+  case SYMBOL:    type_str = "SYMBOL"; break;
   case NL:        type_str = "new-line"; break;
   case ERROR:     assert_not_reached(__FILE__, __LINE__);
   case END:       assert_not_reached(__FILE__, __LINE__);
   }
   s << type_str;
-  switch ( token.type() ) {
-  case INT_NUM:
-  case FLOAT_NUM:
-  case STR:
+  if ( token.type() == INT_NUM ||
+       token.type() == FLOAT_NUM ||
+       token.type() == SYMBOL ) {
     s << "(" << token.value() << ")";
-    break;
-
-  default:
-    break;
   }
 
   return s;

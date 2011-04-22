@@ -30,8 +30,6 @@ libym_cell_dotlib_la_SOURCES = \
 	SimpleHandler.h \
 	ComplexHandler.h \
 	DotLibHandler.cc \
-	DotLibLex.cc \
-	DotLibLex.h \
 	DotLibParser.h \
 	DotLibParser.cc \
 	PtNode.h \

@@ -37,8 +37,14 @@ enum tTokenType {
   SEMI,
   /// @brief コンマ(,)
   COMMA,
-  /// @brief ハイフン(-)
+  /// @brief マイナス
   MINUS,
+  /// @brief プラス
+  PLUS,
+  /// @brief かける
+  MULT,
+  /// @brief わる
+  DIV,
   /// @brief 左括弧( ( )
   LP,
   /// @brief 右括弧( ) )
@@ -47,12 +53,12 @@ enum tTokenType {
   LCB,
   /// @brief 右中括弧( } )
   RCB,
+  /// @brief シンボル
+  SYMBOL,
   /// @brief 整数値
   INT_NUM,
-  /// @brief 実数値
+  /// @brief 浮動小数点数値
   FLOAT_NUM,
-  /// @brief 文字列
-  STR,
   /// @brief 改行
   NL,
   /// @brief エラー

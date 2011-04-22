@@ -10,7 +10,7 @@
 
 
 #include "DotLibHandler.h"
-#include "Token.h"
+#include "DotLibParser.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -27,8 +27,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
+  /// @param[in] req_type 要求する値のタイプ
   SimpleHandler(DotLibParser& parser,
-		GroupHandler* parent);
+		GroupHandler* parent,
+		tValueType req_type);
 
   /// @brief デストラクタ
   virtual
@@ -47,23 +49,14 @@ public:
   bool
   read_attr(Token attr_token);
 
-#if 0
-  /// @brief ハンドラの登録を行う．
-  /// @param[in] attr_name 属性名
-  /// @param[in] handler 対応付けるハンドラ
-  /// @note エラーが起きたら false を返す．
-  virtual
-  bool
-  reg_handler(const string& attr_name,
-	      DotLibHandler* handler);
 
-  /// @brief ハンドラを取り出す．
-  /// @param[in] attr_name 属性名
-  /// @note なければ NULL を返す．
-  virtual
-  DotLibHandler*
-  find_handler(const string& attr_name);
-#endif
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 要求するタイプ
+  tValueType mReqType;
 
 };
 

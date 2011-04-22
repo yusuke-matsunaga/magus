@@ -74,10 +74,6 @@ public:
   MsgMgr&
   msg_mgr();
 
-  /// @brief 字句解析器を得る．
-  DotLibLex&
-  lex();
-
   /// @brief デバッグモードの時に true を返す．
   bool
   debug();
