@@ -20,14 +20,6 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-/// @brief read_token() で要求する値のタイプ
-enum tValueType {
-  kNormal,
-  kFloat,
-  kExpression
-};
-
-
 //////////////////////////////////////////////////////////////////////
 /// DotLib 用のパーサークラス
 //////////////////////////////////////////////////////////////////////
@@ -80,13 +72,9 @@ public:
   close_file();
 
   /// @brief トークンを一つとってくる．
+  /// @param[in] symbol_mode 数字も文字とみなすモード
   tTokenType
-  read_token(tValueType req_type);
-
-  /// @brief 浮動小数点モードの読み出しを行う．
-  /// @return 読み出しが成功したら true を返す．
-  tTokenType
-  read_float_token();
+  read_token(bool symbol_mode = false);
 
   /// @brief 直前の read_token() に対応する文字列を返す．
   const char*
@@ -126,17 +114,18 @@ private:
   void
   init();
 
-  // 一文字読み出す．
+  /// @brief c が文字の時に true を返す．
+  /// @note mSymbolMode が true なら数字も文字とみなす．
+  bool
+  is_symbol(int c);
+
+  /// @brief 一文字読み出す．
   int
   get();
 
-  // 直前の get() を無かったことにする．
+  /// @brief 直前の get() を無かったことにする．
   void
   unget();
-
-  // 改行を読み込んだ時の処理
-  void
-  nl();
 
 
 private:
@@ -155,6 +144,9 @@ private:
 
   // 行末のセミコロンなしを許すかどうかのフラグ
   bool mAllowNoSemi;
+
+  // シンボルモード
+  bool mSymbolMode;
 
   // ファイルを管理するオブジェクト
   FileDescMgr mFileDescMgr;

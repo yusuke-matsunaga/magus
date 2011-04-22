@@ -86,12 +86,12 @@ DotLibHandler::debug()
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-// @param[in] req_type 要求する値のタイプ
+// @param[in] symbol_mode シンボルモード
 SimpleHandler::SimpleHandler(DotLibParser& parser,
 			     GroupHandler* parent,
-			     tValueType req_type) :
+			     bool symbol_mode) :
   DotLibHandler(parser, parent),
-  mReqType(req_type)
+  mSymbolMode(symbol_mode)
 {
 }
 
@@ -120,7 +120,7 @@ SimpleHandler::read_attr(Token attr_token)
   cout << endl;
 #endif
 
-  tTokenType type = parser().read_token(mReqType);
+  tTokenType type = parser().read_token(mSymbolMode);
   string str = parser().cur_string();
   FileRegion loc = parser().cur_loc();
   Token value(type, str, loc);
@@ -165,14 +165,14 @@ ComplexHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = parser().read_token(kFloat);
+  tTokenType type = parser().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
       string value = parser().cur_string();
       FileRegion loc = parser().cur_loc();
       value_list.push_back(Token(type, value, loc));
 
-      tTokenType type1 = parser().read_token(kNormal);
+      tTokenType type1 = parser().read_token();
       if ( type1 == RP ) {
 	break;
       }
@@ -183,7 +183,7 @@ ComplexHandler::read_attr(Token attr_token)
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = parser().read_token(kFloat);
+      type = parser().read_token();
     }
   }
 
@@ -234,14 +234,14 @@ GroupHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = parser().read_token(kFloat);
+  tTokenType type = parser().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
       string value = parser().cur_string();
       FileRegion loc = parser().cur_loc();
       value_list.push_back(Token(type, value, loc));
 
-      tTokenType type1 = parser().read_token(kNormal);
+      tTokenType type1 = parser().read_token();
       if ( type1 == RP ) {
 	break;
       }
@@ -252,7 +252,7 @@ GroupHandler::read_attr(Token attr_token)
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = parser().read_token(kFloat);
+      type = parser().read_token();
     }
   }
 
@@ -276,7 +276,7 @@ GroupHandler::read_attr(Token attr_token)
   }
 
   for ( ; ; ) {
-    type = parser().read_token(kNormal);
+    type = parser().read_token();
     if ( type == NL ) {
       continue;
     }

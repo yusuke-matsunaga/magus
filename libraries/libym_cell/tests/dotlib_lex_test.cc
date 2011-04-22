@@ -34,7 +34,7 @@ dotliblex_test(int argc,
     }
 
     for ( ; ; ) {
-      tTokenType id = lex.read_token(kNormal);
+      tTokenType id = lex.read_token();
       if ( id == END ) {
 	break;
       }
@@ -88,6 +88,14 @@ dotliblex_test(int argc,
 
       case SYMBOL:
 	cout << "SYMBOL(\"" << lex.cur_string() << "\")";
+	break;
+
+      case INT_NUM:
+	cout << "INT(\"" << lex.cur_string() << "\")";
+	break;
+
+      case FLOAT_NUM:
+	cout << "FLOAT(\"" << lex.cur_string() << "\")";
 	break;
 
       case NL:

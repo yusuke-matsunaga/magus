@@ -44,14 +44,14 @@ DefineHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = parser().read_token(kNormal);
+  tTokenType type = parser().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
       string value = parser().cur_string();
       FileRegion loc = parser().cur_loc();
       value_list.push_back(Token(type, value, loc));
 
-      tTokenType type1 = parser().read_token(kNormal);
+      tTokenType type1 = parser().read_token();
       if ( type1 == RP ) {
 	break;
       }
@@ -62,7 +62,7 @@ DefineHandler::read_attr(Token attr_token)
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = parser().read_token(kNormal);
+      type = parser().read_token();
     }
   }
 
@@ -137,7 +137,7 @@ DefineHandler::read_attr(Token attr_token)
   assert_cond( g_handler != NULL, __FILE__, __LINE__);
 
   // 今は type を無視
-  DotLibHandler* new_handler = new SimpleHandler(parser(), g_handler, kNormal);
+  DotLibHandler* new_handler = new SimpleHandler(parser(), g_handler, false);
 
   g_handler->reg_handler(keyword.value(), new_handler);
 

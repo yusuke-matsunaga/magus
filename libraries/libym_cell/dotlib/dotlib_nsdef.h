@@ -37,13 +37,13 @@ enum tTokenType {
   SEMI,
   /// @brief コンマ(,)
   COMMA,
-  /// @brief マイナス
-  MINUS,
-  /// @brief プラス
+  /// @brief プラス(+)
   PLUS,
-  /// @brief かける
+  /// @brief マイナス(-)
+  MINUS,
+  /// @brief かける(*)
   MULT,
-  /// @brief わる
+  /// @brief わる(/)
   DIV,
   /// @brief 左括弧( ( )
   LP,

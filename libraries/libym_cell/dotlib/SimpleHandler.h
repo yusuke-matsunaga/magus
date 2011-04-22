@@ -27,10 +27,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  /// @param[in] req_type 要求する値のタイプ
+  /// @param[in] symbol_mode シンボルモード
   SimpleHandler(DotLibParser& parser,
 		GroupHandler* parent,
-		tValueType req_type);
+		bool symbol_mode);
 
   /// @brief デストラクタ
   virtual
@@ -55,8 +55,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 要求するタイプ
-  tValueType mReqType;
+  // シンボルモード
+  bool mSymbolMode;
 
 };
 
