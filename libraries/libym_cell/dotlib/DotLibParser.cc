@@ -48,16 +48,10 @@ DotLibParser::read_file(const string& filename,
 
   bool error = false;
   tTokenType type;
-  string name;
-  FileRegion loc;
-  for ( ; ; ) {
-    type = read_token();
-    if ( type != NL ) {
-      name = cur_string();
-      loc = cur_loc();
-      break;
-    }
-  }
+  // 空行を読み飛ばす．
+  for (type = _read_token(); type == NL; type = _read_token()) { }
+  string name = cur_string();
+  FileRegion loc = cur_loc();
   if ( type != SYMBOL || name != "library" ) {
     msg_mgr().put_msg(__FILE__, __LINE__, loc,
 		      kMsgError,
@@ -77,7 +71,7 @@ DotLibParser::read_file(const string& filename,
     goto last;
   }
   for ( ; ; ) {
-    tTokenType type = read_token();
+    tTokenType type = _read_token();
     if ( type == END ) {
       break;
     }
@@ -97,8 +91,8 @@ last:
 bool
 DotLibParser::expect(tTokenType type)
 {
-  tTokenType token = read_token();
-  if ( token == type ) {
+  Token token = read_token();
+  if ( token.type() == type ) {
     return true;
   }
 
@@ -124,7 +118,7 @@ DotLibParser::expect(tTokenType type)
   }
   ostringstream buf;
   buf << "syntax error. " << type_str << " is expected.";
-  mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
+  mMsgMgr.put_msg(__FILE__, __LINE__, token.loc(),
 		  kMsgError,
 		  "DOTLIB_PARSER",
 		  buf.str());
@@ -136,15 +130,15 @@ bool
 DotLibParser::expect_nl()
 {
   if ( mAllowNoSemi ) {
-    tTokenType token = read_token();
-    if ( token == SEMI ) {
+    Token token = read_token();
+    if ( token.type() == SEMI ) {
       token = read_token();
     }
-    if ( token == NL || token == END ) {
+    if ( token.type() == NL || token.type() == END ) {
       return true;
     }
     ostringstream buf;
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
+    mMsgMgr.put_msg(__FILE__, __LINE__, token.loc(),
 		    kMsgError,
 		    "DOTLIB_PARSER",
 		    "Syntax error. Semicolon is expected.");
@@ -206,12 +200,41 @@ DotLibParser::init()
   mCR = false;
   mCurLine = 1;
   mCurColumn = 0;
+  mUngetToken = Token(ERROR, string(), FileRegion());
+}
+
+// @brief トークンを一つとってくる．
+// @param[in] symbol_mode 数字も文字とみなすモード
+Token
+DotLibParser::read_token(bool symbol_mode)
+{
+  tTokenType type;
+  string value;
+  FileRegion loc;
+  if ( (type = mUngetToken.type()) != ERROR ) {
+    value = mUngetToken.value();
+    loc = mUngetToken.loc();
+    mUngetToken = Token(ERROR, string(), FileRegion());
+  }
+  else {
+    type = _read_token(symbol_mode);
+    value = cur_string();
+    loc = cur_loc();
+  }
+  return Token(type, value, loc);
+}
+
+// @brief トークンを戻す．
+void
+DotLibParser::unget_token(Token token)
+{
+  mUngetToken = token;
 }
 
 // @brief トークンを一つとってくる．
 // @param[in] symbol_mode 数字も文字とみなすモード
 tTokenType
-DotLibParser::read_token(bool symbol_mode)
+DotLibParser::_read_token(bool symbol_mode)
 {
   mSymbolMode = symbol_mode;
 

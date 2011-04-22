@@ -34,7 +34,10 @@ dotliblex_test(int argc,
     }
 
     for ( ; ; ) {
-      tTokenType id = lex.read_token();
+      Token token = lex.read_token();
+      tTokenType id = token.type();
+      string value = token.value();
+      FileRegion loc = token.loc();
       if ( id == END ) {
 	break;
       }

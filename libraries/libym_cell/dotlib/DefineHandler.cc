@@ -44,25 +44,23 @@ DefineHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = parser().read_token();
-  if ( type != RP ) {
+  Token token = parser().read_token();
+  if ( token.type() != RP ) {
     for ( ; ; ) {
-      string value = parser().cur_string();
-      FileRegion loc = parser().cur_loc();
-      value_list.push_back(Token(type, value, loc));
+      value_list.push_back(token);
 
-      tTokenType type1 = parser().read_token();
-      if ( type1 == RP ) {
+      token = parser().read_token();
+      if ( token.type() == RP ) {
 	break;
       }
-      if ( type1 != COMMA ) {
-	msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
+      if ( token.type() != COMMA ) {
+	msg_mgr().put_msg(__FILE__, __LINE__, token.loc(),
 			  kMsgError,
 			  "DOTLIB_PARSER",
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = parser().read_token();
+      token = parser().read_token();
     }
   }
 
@@ -77,19 +75,9 @@ DefineHandler::read_attr(Token attr_token)
     cout << ")" << endl;
   }
 
-#if 0
-  if ( !expect(SEMI) ) {
-    return false;
-  }
-
-  if ( !expect(NL) ) {
-    return false;
-  }
-#else
   if ( !expect_nl() ) {
     return false;
   }
-#endif
 
   bool error = false;
   Token keyword = value_list[0];

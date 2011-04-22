@@ -10,6 +10,7 @@
 #include "LibraryGroupHandler.h"
 
 #include "SimpleHandler.h"
+#include "ExprHandler.h"
 #include "ComplexHandler.h"
 
 #include "DefineHandler.h"
@@ -512,7 +513,7 @@ new_input_voltage(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotLibHandler* simple = new_simple(handler, false);
+  DotLibHandler* simple = new ExprHandler(parent->parser(), parent);
   handler->reg_handler("vil", simple);
   handler->reg_handler("vih", simple);
   handler->reg_handler("vimin", simple);
@@ -527,7 +528,7 @@ new_output_voltage(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotLibHandler* simple = new_simple(handler, false);
+  DotLibHandler* simple = new ExprHandler(parent->parser(), parent);
   handler->reg_handler("vol", simple);
   handler->reg_handler("voh", simple);
   handler->reg_handler("vomin", simple);

@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_SIMPLEHANDLER_H
-#define LIBYM_CELL_DOTLIB_SIMPLEHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_EXPRHANDLER_H
+#define LIBYM_CELL_DOTLIB_EXPRHANDLER_H
 
-/// @file libym_cell/dotlib/SimpleHandler.h
-/// @brief SimpleHandler のヘッダファイル
+/// @file libym_cell/dotlib/ExprHandler.h
+/// @brief ExprHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class SimpleHandler SimpleHandler.h "SimpleHandler.h"
-/// @brief simple attribute 用のハンドラ
+/// @class ExprHandler ExprHandler.h "ExprHandler.h"
+/// @brief expression の値をとる simple attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
-class SimpleHandler :
+class ExprHandler :
   public DotLibHandler
 {
 public:
@@ -26,14 +26,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  /// @param[in] symbol_mode シンボルモード
-  SimpleHandler(DotLibParser& parser,
-		GroupHandler* parent,
-		bool symbol_mode);
+  ExprHandler(DotLibParser& parser,
+	      GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
-  ~SimpleHandler();
+  ~ExprHandler();
 
 
 public:
@@ -51,14 +49,23 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // データメンバ
+  // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  // シンボルモード
-  bool mSymbolMode;
+  /// @brief primary を読み込む．
+  PtNode*
+  read_primary();
+
+  /// @brief prudct を読み込む．
+  PtNode*
+  read_product();
+
+  /// @brief expression を読み込む．
+  PtNode*
+  read_expr(tTokenType end_marker);
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_SIMPLEHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_EXPRHANDLER_H

@@ -10,6 +10,7 @@
 #include "DotLibHandler.h"
 #include "DotLibParser.h"
 #include "SimpleHandler.h"
+#include "ExprHandler.h"
 #include "ComplexHandler.h"
 #include "GroupHandler.h"
 #include "Token.h"
@@ -110,20 +111,7 @@ SimpleHandler::read_attr(Token attr_token)
     return false;
   }
 
-#if 0
-  cout << "attr = " << attr_token << endl;
-  switch ( mReqType ) {
-  case kNormal: cout << "kNormal"; break;
-  case kFloat:  cout << "kFloat"; break;
-  default:      cout << "unknown"; break;
-  }
-  cout << endl;
-#endif
-
-  tTokenType type = parser().read_token(mSymbolMode);
-  string str = parser().cur_string();
-  FileRegion loc = parser().cur_loc();
-  Token value(type, str, loc);
+  Token value = parser().read_token(mSymbolMode);
 
   if ( debug() ) {
     cout << attr_token << " : " << value << endl;
@@ -133,6 +121,142 @@ SimpleHandler::read_attr(Token attr_token)
   parent()->pt_node()->add_child(node);
 
   return expect_nl();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス ExprHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parser パーサー
+// @param[in] parent 親のハンドラ
+ExprHandler::ExprHandler(DotLibParser& parser,
+			 GroupHandler* parent) :
+  DotLibHandler(parser, parent)
+{
+}
+
+// @brief デストラクタ
+ExprHandler::~ExprHandler()
+{
+}
+
+// @brief 構文要素を処理する．
+// @param[in] attr_token 属性名を表すトークン
+// @return エラーが起きたら false を返す．
+bool
+ExprHandler::read_attr(Token attr_token)
+{
+  if ( !expect(COLON) ) {
+    return false;
+  }
+
+  PtNode* expr_node = read_expr(SEMI);
+
+  Token value;
+  if ( debug() ) {
+    cout << attr_token << " : " << endl;
+  }
+
+  PtNode* node = new PtNode(attr_token, value);
+  parent()->pt_node()->add_child(node);
+
+  return expect_nl();
+}
+
+// @brief primary を読み込む．
+PtNode*
+ExprHandler::read_primary()
+{
+  Token token = parser().read_token();
+  if ( token.type() == LP ) {
+    return read_expr(RP);
+  }
+  if ( token.type() == SYMBOL ) {
+    string name = token.value();
+    if ( name != "VDD" && name != "VSS" && name != "VCC" ) {
+      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
+			kMsgError,
+			"DOTLIBPARSER",
+			"Syntax error. "
+			"Only 'VDD', 'VSS', and 'VCC' are allowed.");
+      return NULL;
+    }
+  }
+  else if ( token.type() != FLOAT_NUM && token.type() != INT_NUM ) {
+    msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
+		      kMsgError,
+		      "DOTLIBPARSER",
+		      "Syntax error. number is expected.");
+    return NULL;
+  }
+  return new PtNode(token, Token());
+}
+
+// @brief prudct を読み込む．
+PtNode*
+ExprHandler::read_product()
+{
+  for ( ; ; ) {
+    PtNode* opr1 = read_primary();
+    if ( opr1 == NULL ) {
+      return NULL;
+    }
+
+    Token token = parser().read_token();
+    if ( token.type() == MULT || token.type() == DIV ) {
+      PtNode* opr2 = read_primary();
+      if ( opr2 == NULL ) {
+	return NULL;
+      }
+
+      PtNode* node = new PtNode(token, Token());
+      node->add_child(opr1);
+      node->add_child(opr2);
+      return node;
+    }
+    else {
+      // token を戻す．
+      parser().unget_token(token);
+      return opr1;
+    }
+  }
+}
+
+// @brief expression を読み込む．
+PtNode*
+ExprHandler::read_expr(tTokenType end_marker)
+{
+  for ( ; ; ) {
+    PtNode* opr1 = read_product();
+    if ( opr1 == NULL ) {
+      return NULL;
+    }
+
+    Token token = parser().read_token();
+    if ( token.type() == end_marker ) {
+      return opr1;
+    }
+    else if ( token.type() == PLUS || token.type() == MINUS ) {
+      PtNode* opr2 = read_product();
+      if ( opr2 == NULL ) {
+	return NULL;
+      }
+
+      PtNode* node = new PtNode(token, Token());
+      node->add_child(opr1);
+      node->add_child(opr2);
+      return node;
+    }
+    else {
+      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
+			kMsgError,
+			"DOTLIBPARSER",
+			"Syntax error.");
+      return NULL;
+    }
+  }
 }
 
 
@@ -165,25 +289,23 @@ ComplexHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = parser().read_token();
-  if ( type != RP ) {
+  Token token = parser().read_token();
+  if ( token.type() != RP ) {
     for ( ; ; ) {
-      string value = parser().cur_string();
-      FileRegion loc = parser().cur_loc();
-      value_list.push_back(Token(type, value, loc));
+      value_list.push_back(token);
 
-      tTokenType type1 = parser().read_token();
-      if ( type1 == RP ) {
+      Token token1 = parser().read_token();
+      if ( token1.type() == RP ) {
 	break;
       }
-      if ( type1 != COMMA ) {
+      if ( token1.type() != COMMA ) {
 	msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			  kMsgError,
 			  "DOTLIB_PARSER",
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = parser().read_token();
+      token = parser().read_token();
     }
   }
 
@@ -234,25 +356,23 @@ GroupHandler::read_attr(Token attr_token)
   }
 
   vector<Token> value_list;
-  tTokenType type = parser().read_token();
-  if ( type != RP ) {
+  Token token = parser().read_token();
+  if ( token.type() != RP ) {
     for ( ; ; ) {
-      string value = parser().cur_string();
-      FileRegion loc = parser().cur_loc();
-      value_list.push_back(Token(type, value, loc));
+      value_list.push_back(token);
 
-      tTokenType type1 = parser().read_token();
-      if ( type1 == RP ) {
+      Token token1 = parser().read_token();
+      if ( token1.type() == RP ) {
 	break;
       }
-      if ( type1 != COMMA ) {
+      if ( token1.type() != COMMA ) {
 	msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			  kMsgError,
 			  "DOTLIB_PARSER",
 			  "syntax error. ',' is expected.");
 	return false;
       }
-      type = parser().read_token();
+      token = parser().read_token();
     }
   }
 
@@ -276,35 +396,33 @@ GroupHandler::read_attr(Token attr_token)
   }
 
   for ( ; ; ) {
-    type = parser().read_token();
-    if ( type == NL ) {
+    token = parser().read_token();
+    if ( token.type() == NL ) {
       continue;
     }
-    if ( type == RCB ) {
+    if ( token.type() == RCB ) {
       break;
     }
-    if ( type != SYMBOL ) {
+    if ( token.type() != SYMBOL ) {
       msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			"string value is expected.");
       return false;
     }
-    const string name1 = parser().cur_string();
-    FileRegion loc1 = parser().cur_loc();
     hash_map<string, DotLibHandler*>::const_iterator p
-      = mHandlerMap.find(name1);
+      = mHandlerMap.find(token.value());
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
-      buf << name1 << ": unknown keyword.";
-      msg_mgr().put_msg(__FILE__, __LINE__, loc1,
+      buf << token.value() << ": unknown keyword.";
+      msg_mgr().put_msg(__FILE__, __LINE__, token.loc(),
 			kMsgError,
 			"DOTLIB_PARSER",
 			buf.str());
       return false;
     }
     DotLibHandler* handler = p->second;
-    if ( !handler->read_attr(Token(SYMBOL, name1, loc1)) ) {
+    if ( !handler->read_attr(token) ) {
       return false;
     }
   }

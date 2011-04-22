@@ -12,6 +12,7 @@
 
 
 #include "dotlib_nsdef.h"
+#include "Token.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
@@ -73,8 +74,12 @@ public:
 
   /// @brief トークンを一つとってくる．
   /// @param[in] symbol_mode 数字も文字とみなすモード
-  tTokenType
+  Token
   read_token(bool symbol_mode = false);
+
+  /// @brief トークンを戻す．
+  void
+  unget_token(Token token);
 
   /// @brief 直前の read_token() に対応する文字列を返す．
   const char*
@@ -113,6 +118,11 @@ private:
   /// @brief 初期化を行う．
   void
   init();
+
+  /// @brief トークンを一つとってくる．
+  /// @param[in] symbol_mode 数字も文字とみなすモード
+  tTokenType
+  _read_token(bool symbol_mode = false);
 
   /// @brief c が文字の時に true を返す．
   /// @note mSymbolMode が true なら数字も文字とみなす．
@@ -177,6 +187,9 @@ private:
 
   // 現在のコラム位置
   int mCurColumn;
+
+  // 読みもどしたトークン
+  Token mUngetToken;
 
 };
 
