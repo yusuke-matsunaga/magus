@@ -55,6 +55,11 @@ DotlibMgr::gen_library(const PtNode* root)
 
   CiLibrary* library = new CiLibrary(root_value.value());
 
+  ymuint n = root->child_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    const PtNode* node = root->child(i);
+    Token attr = node->attr_token();
+  }
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

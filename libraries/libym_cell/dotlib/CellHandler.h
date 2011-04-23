@@ -1,37 +1,37 @@
-#ifndef LIBYM_CELL_DOTLIB_GROUPHANDLER_H
-#define LIBYM_CELL_DOTLIB_GROUPHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_CELLHANDLER_H
+#define LIBYM_CELL_DOTLIB_CELLHANDLER_H
 
-/// @file libym_cell/dotlib/GroupHandler.h
-/// @brief GroupHandler のヘッダファイル
+/// @file libym_cell/dotlib/CellHandler.h
+/// @brief CellHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DotlibHandler.h"
+#include "GroupHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class GroupHandler GroupHandler.h "GroupHandler.h"
-/// @brief group statement 用のハンドラ
+/// @class CellHandler CellHandler.h "CellHandler.h"
+/// @brief group attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
-class GroupHandler :
-  public DotlibHandler
+class CellHandler :
+  public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  GroupHandler(DotlibParser& parser,
-	       GroupHandler* parent);
+  CellHandler(DotlibParser& parser,
+	      GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
-  ~GroupHandler();
+  ~CellHandler();
 
 
 public:
@@ -108,11 +108,11 @@ private:
   // ハンドラの連想配列
   hash_map<string, DotlibHandler*> mHandlerMap;
 
-  // 対応する PtNode
-  PtNode* mPtNode;
+  // 対応する PtCell
+  PtCell* mPtCell;
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_GROUPHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_CELLHANDLER_H

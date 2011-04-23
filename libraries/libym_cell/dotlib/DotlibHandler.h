@@ -67,6 +67,11 @@ public:
   new_ptnode(Token attr_token,
 	     const vector<Token>& value_list);
 
+  /// @brief group attribute 用のパースを行う．
+  /// @param[out] value_list 読み込んだトークンを格納するリスト
+  bool
+  parse_complex(vector<Token>& value_list);
+
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
   /// @param[in] type 要求するトークンの型
   bool

@@ -39,29 +39,9 @@ DefineHandler::~DefineHandler()
 bool
 DefineHandler::read_attr(Token attr_token)
 {
-  if ( !expect(LP) ) {
-    return false;
-  }
-
   vector<Token> value_list;
-  Token token = parser().read_token();
-  if ( token.type() != RP ) {
-    for ( ; ; ) {
-      value_list.push_back(token);
-
-      token = parser().read_token();
-      if ( token.type() == RP ) {
-	break;
-      }
-      if ( token.type() != COMMA ) {
-	msg_mgr().put_msg(__FILE__, __LINE__, token.loc(),
-			  kMsgError,
-			  "DOTLIB_PARSER",
-			  "syntax error. ',' is expected.");
-	return false;
-      }
-      token = parser().read_token();
-    }
+  if ( !parse_complex(value_list) ) {
+    return false;
   }
 
   if ( debug() ) {
