@@ -7,11 +7,11 @@
 ///
 /// $Id: MislibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/cell_nsdef.h"
+#include "mislib_nsdef.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
@@ -21,7 +21,7 @@
 #include "MislibLex.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @class MislibParser MislibParser.h "MislibParser.h"
@@ -40,11 +40,11 @@ public:
 
 public:
 
-  /// @brief mislib ファイルを読み込んでライブラリを生成する．
+  /// @brief mislib ファイルを読み込む．
   /// @param[in] filename ファイル名
-  /// @return 生成したライブラリを返す．
+  /// @return パース木の根のノードを返す．
   /// @note 読み込みが失敗したら NULL を返す．
-  const CellLibrary*
+  const MislibPt*
   read(const string& filename);
 
   /// @brief メッセージマネージャの取得
@@ -212,6 +212,6 @@ MislibParser::msg_mgr()
   return mMsgMgr;
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_MISLIB
 
 #endif // LIBYM_CELL_MISLIB_MISLIBPARSER_H

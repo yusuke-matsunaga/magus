@@ -5,14 +5,14 @@
 ///
 /// $Id: MislibPtImpl2.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MislibPtImpl2.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
 // NOT論理式を表すクラス
@@ -32,7 +32,7 @@ MislibPtNot::~MislibPtNot()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtNot::type() const
 {
   return kNot;
@@ -135,7 +135,7 @@ MislibPtAnd::~MislibPtAnd()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtAnd::type() const
 {
   return kAnd;
@@ -187,7 +187,7 @@ MislibPtOr::~MislibPtOr()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtOr::type() const
 {
   return kOr;
@@ -239,7 +239,7 @@ MislibPtXor::~MislibPtXor()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtXor::type() const
 {
   return kXor;
@@ -306,7 +306,7 @@ MislibPtPin::~MislibPtPin()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtPin::type() const
 {
   return kPin;
@@ -463,7 +463,7 @@ MislibPtGate::~MislibPtGate()
 }
 
 // @brief 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtGate::type() const
 {
   return kGate;
@@ -548,4 +548,4 @@ MislibPtGate::dump(ostream& s) const
   s << "</GATE>" << endl;
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_MISLIB

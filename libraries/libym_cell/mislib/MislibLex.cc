@@ -5,14 +5,14 @@
 ///
 /// $Id: MislibLex.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MislibLex.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 #include "mislib_grammer.h"
 
@@ -274,4 +274,4 @@ MislibLex::cur_loc() const
 		    mCurLine, mCurColumn);
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_MISLIB

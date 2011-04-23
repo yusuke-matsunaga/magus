@@ -17,7 +17,9 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
-class MislibParser;
+namespace nsMislib {
+  class MislibParser;
+}
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellMislibReader CellMislibReader.h <ym_cell/CellMislibReader.h>
@@ -55,7 +57,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // mislib のパーサー
-  MislibParser* mParser;
+  nsMislib::MislibParser* mParser;
 
 };
 

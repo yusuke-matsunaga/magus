@@ -27,6 +27,7 @@ libym_cell_mislib_la_LIBADD = \
 libym_cell_mislib_la_LDFLAGS =
 
 libym_cell_mislib_la_SOURCES = \
+	mislib_nsdef.h \
 	mislib_grammer.yy \
 	CellMislibReader.cc \
 	MislibLex.h \
@@ -37,4 +38,6 @@ libym_cell_mislib_la_SOURCES = \
 	MislibPtImpl1.h \
 	MislibPtImpl1.cc \
 	MislibPtImpl2.h \
-	MislibPtImpl2.cc
+	MislibPtImpl2.cc \
+	MislibMgr.h \
+	MislibMgr.cc

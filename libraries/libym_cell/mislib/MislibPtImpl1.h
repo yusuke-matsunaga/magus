@@ -7,14 +7,14 @@
 ///
 /// $Id: MislibPtImpl1.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MislibPt.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @brief 文字列を表すクラス
@@ -372,6 +372,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_MISLIB
 
 #endif // LIBYM_CELL_MISLIB_MISLIBPTIMPL_H

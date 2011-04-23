@@ -7,17 +7,18 @@
 ///
 /// $Id: MislibPt.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/cell_nsdef.h"
+#include "mislib_nsdef.h"
+
 #include "ym_utils/ShString.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_lexp/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @class MislibPt MislibPt.h "MislibPt.h"
@@ -28,38 +29,6 @@ class MislibPt
   friend class MislibParser;
 
 public:
-
-  /// @brief ノードの種類
-  enum tType {
-    /// @brief 文字列
-    kStr,
-    /// @brief 数値
-    kNum,
-    /// @brief NONINV 極性
-    kNoninv,
-    /// @brief INV 極性
-    kInv,
-    /// @brief UNKOWN 極性
-    kUnknown,
-    /// @brief 定数0
-    kConst0,
-    /// @brief 定数1
-    kConst1,
-    /// @brief リスト
-    kList,
-    /// @brief NOT論理式
-    kNot,
-    /// @brief AND論理式
-    kAnd,
-    /// @brief OR論理式
-    kOr,
-    /// @brief XOR論理式
-    kXor,
-    /// @brief 入力ピン
-    kPin,
-    /// @brief ゲート
-    kGate
-  };
 
 
 protected:
@@ -296,6 +265,6 @@ MislibPt::loc() const
   return mLoc;
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_MISLIB
 
 #endif // LIBYM_CELL_MISLIB_MISLIBPT_H

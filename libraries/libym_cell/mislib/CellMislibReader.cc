@@ -11,6 +11,7 @@
 
 #include "ym_cell/CellMislibReader.h"
 #include "MislibParser.h"
+#include "MislibMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -22,7 +23,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @brief コンストラクタ
 CellMislibReader::CellMislibReader()
 {
-  mParser = new MislibParser;
+  mParser = new nsMislib::MislibParser;
 }
 
 // @brief デストラクタ
@@ -38,7 +39,13 @@ CellMislibReader::~CellMislibReader()
 const CellLibrary*
 CellMislibReader::read(const string& filename)
 {
-  return mParser->read(filename);
+  using nsMislib::MislibPt;
+  using nsMislib::MislibMgr;
+
+  const MislibPt* root = mParser->read(filename);
+
+  MislibMgr mgr;
+  return mgr.gen_library(filename, root);
 }
 
 // @brief メッセージハンドラの登録

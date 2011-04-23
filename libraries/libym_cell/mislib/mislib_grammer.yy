@@ -10,7 +10,8 @@
 /// All rights reserved.
 
 
-#include "ym_cell/cell_nsdef.h"
+#include "mislib_nsdef.h"
+
 #include "ym_utils/FileRegion.h"
 #include "MislibParser.h"
 #include "MislibPt.h"
@@ -31,7 +32,7 @@
 #define YYLLOC_DEFAULT(Current, Rhs, N) Current = loc_merge(Rhs, N);
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 // 字句解析関数の宣言
 int
@@ -243,4 +244,4 @@ yyerror(YYLTYPE* llocp,
   return 1;
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_MISLIB

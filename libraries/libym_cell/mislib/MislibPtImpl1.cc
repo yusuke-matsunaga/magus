@@ -5,14 +5,14 @@
 ///
 /// $Id: MislibPtImpl1.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MislibPtImpl1.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
 // トークンを表す基底クラス
@@ -233,7 +233,7 @@ MislibPtStr::~MislibPtStr()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtStr::type() const
 {
   return kStr;
@@ -293,7 +293,7 @@ MislibPtNum::~MislibPtNum()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtNum::type() const
 {
   return kNum;
@@ -334,7 +334,7 @@ MislibPtNoninv::~MislibPtNoninv()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtNoninv::type() const
 {
   return kNoninv;
@@ -367,7 +367,7 @@ MislibPtInv::~MislibPtInv()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtInv::type() const
 {
   return kInv;
@@ -400,7 +400,7 @@ MislibPtUnknown::~MislibPtUnknown()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtUnknown::type() const
 {
   return kUnknown;
@@ -433,7 +433,7 @@ MislibPtConst0::~MislibPtConst0()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtConst0::type() const
 {
   return kConst0;
@@ -481,7 +481,7 @@ MislibPtConst1::~MislibPtConst1()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtConst1::type() const
 {
   return kConst1;
@@ -531,7 +531,7 @@ MislibPtList::~MislibPtList()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtList::type() const
 {
   return kList;
@@ -572,4 +572,4 @@ MislibPtList::dump(ostream& s) const
   s << "</PT_LIST>" << endl;
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM_CELL_MISLIB
