@@ -11,12 +11,10 @@
 
 #include "ym_cell/CellDotlibReader.h"
 #include "DotlibParser.h"
-#include "PtNode.h"
+#include "DotlibMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
-
-using nsDotlib::PtNode;
 
 //////////////////////////////////////////////////////////////////////
 // MisLibPt オブジェクトを管理するクラス
@@ -41,7 +39,10 @@ CellDotlibReader::~CellDotlibReader()
 const CellLibrary*
 CellDotlibReader::read(const string& filename)
 {
-  PtNode* root = mParser->read_file(filename, false, true);
+  const PtNode* root = mParser->read_file(filename, false, true);
+
+  DotlibMgr mgr;
+  return mgr.gen_library(root);
 }
 
 // @brief メッセージハンドラの登録
