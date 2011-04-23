@@ -56,6 +56,7 @@ class CellLutTemplate;
 class CellLut;
 
 class CellMislibReader;
+class CellDotlibReader;
 
 END_NAMESPACE_YM_CELL
 

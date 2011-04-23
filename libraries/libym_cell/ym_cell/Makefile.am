@@ -14,6 +14,7 @@ noinst_HEADERS = \
 	CellBus.h \
 	CellLibrary.h \
 	CellLut.h \
+	CellDotlibReader.h \
 	CellMislibReader.h \
 	CellPin.h \
 	CellTiming.h

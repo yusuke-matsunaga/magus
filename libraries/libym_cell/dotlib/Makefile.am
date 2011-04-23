@@ -18,7 +18,6 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_cell_dotlib.la
 
 libym_cell_dotlib_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_cell_dotlib_la_LDFLAGS =
@@ -41,7 +40,8 @@ libym_cell_dotlib_la_SOURCES = \
 	PtNode.h \
 	PtNode.cc \
 	PtDumper.h \
-	PtDumper.cc
+	PtDumper.cc \
+	CellDotlibReader.cc
 
 
 
