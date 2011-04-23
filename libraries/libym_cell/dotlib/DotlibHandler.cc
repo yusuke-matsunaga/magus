@@ -37,6 +37,26 @@ DotlibHandler::~DotlibHandler()
 {
 }
 
+// @brief PtNode を生成する．
+// @param[in] attr_token 属性名を表すトークン
+// @param[in] value_token 値を表すトークン
+PtNode*
+DotlibHandler::new_ptnode(Token attr_token,
+			  Token value_token)
+{
+  return mParser.new_ptnode(attr_token, value_token);
+}
+
+// @brief PtNode を生成する．
+// @param[in] attr_token 属性名を表すトークン
+// @param[in] value_list 値を表すトークンのリスト
+PtNode*
+DotlibHandler::new_ptnode(Token attr_token,
+			  const vector<Token>& value_list)
+{
+  return mParser.new_ptnode(attr_token, value_list);
+}
+
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
 bool
 DotlibHandler::expect(tTokenType type)
@@ -117,7 +137,7 @@ SimpleHandler::read_attr(Token attr_token)
     cout << attr_token << " : " << value << endl;
   }
 
-  PtNode* node = new PtNode(attr_token, value);
+  PtNode* node = new_ptnode(attr_token, value);
   parent()->pt_node()->add_child(node);
 
   return expect_nl();
@@ -158,7 +178,7 @@ ExprHandler::read_attr(Token attr_token)
     cout << attr_token << " : " << endl;
   }
 
-  PtNode* node = new PtNode(attr_token, Token(EXPRESSION));
+  PtNode* node = new_ptnode(attr_token, Token(EXPRESSION));
   node->add_child(expr_node);
   parent()->pt_node()->add_child(node);
 
@@ -191,7 +211,7 @@ ExprHandler::read_primary()
 		      "Syntax error. number is expected.");
     return NULL;
   }
-  return new PtNode(token, Token(EXPRESSION));
+  return new_ptnode(token, Token(EXPRESSION));
 }
 
 // @brief prudct を読み込む．
@@ -211,7 +231,7 @@ ExprHandler::read_product()
 	return NULL;
       }
 
-      PtNode* node = new PtNode(token, Token(EXPRESSION));
+      PtNode* node = new_ptnode(token, Token(EXPRESSION));
       node->add_child(opr1);
       node->add_child(opr2);
       return node;
@@ -244,7 +264,7 @@ ExprHandler::read_expr(tTokenType end_marker)
 	return NULL;
       }
 
-      PtNode* node = new PtNode(token, Token(EXPRESSION));
+      PtNode* node = new_ptnode(token, Token(EXPRESSION));
       node->add_child(opr1);
       node->add_child(opr2);
       return node;
@@ -320,7 +340,7 @@ ComplexHandler::read_attr(Token attr_token)
     cout << ")" << endl;
   }
 
-  PtNode* node = new PtNode(attr_token, value_list);
+  PtNode* node = new_ptnode(attr_token, value_list);
   parent()->pt_node()->add_child(node);
 
   return expect_nl();
@@ -486,7 +506,7 @@ bool
 GroupHandler::begin_group(Token attr_token,
 			  const vector<Token>& value_list)
 {
-  PtNode* node = new PtNode(attr_token, value_list);
+  PtNode* node = new_ptnode(attr_token, value_list);
   set_pt_node(node);
   parent()->pt_node()->add_child(node);
 

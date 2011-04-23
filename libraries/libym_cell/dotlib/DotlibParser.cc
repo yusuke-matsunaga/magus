@@ -11,12 +11,14 @@
 
 #include "DotlibParser.h"
 #include "LibraryHandler.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 // コンストラクタ
 DotlibParser::DotlibParser() :
+  mAlloc(4096),
   mLibraryHandler(new LibraryHandler(*this))
 {
   init();
@@ -88,6 +90,28 @@ last:
     return NULL;
   }
   return mLibraryHandler->pt_node();
+}
+
+// @brief PtNode を生成する．
+// @param[in] attr_token 属性名を表すトークン
+// @param[in] value_token 値を表すトークン
+PtNode*
+DotlibParser::new_ptnode(Token attr_token,
+			 Token value_token)
+{
+  void* p = mAlloc.get_memory(sizeof(PtNode));
+  return new (p) PtNode(attr_token, value_token);
+}
+
+// @brief PtNode を生成する．
+// @param[in] attr_token 属性名を表すトークン
+// @param[in] value_list 値を表すトークンのリスト
+PtNode*
+DotlibParser::new_ptnode(Token attr_token,
+			 const vector<Token>& value_list)
+{
+  void* p = mAlloc.get_memory(sizeof(PtNode));
+  return new (p) PtNode(attr_token, value_list);
 }
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
@@ -200,6 +224,7 @@ DotlibParser::close_file()
 void
 DotlibParser::init()
 {
+  mAlloc.destroy();
   mUngetChar = 0;
   mCR = false;
   mCurLine = 1;

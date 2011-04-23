@@ -17,6 +17,7 @@
 #include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/StrBuff.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -55,6 +56,20 @@ public:
   //////////////////////////////////////////////////////////////////////
   // DotlibHandler から用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief PtNode を生成する．
+  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] value_token 値を表すトークン
+  PtNode*
+  new_ptnode(Token attr_token,
+	     Token value_token);
+
+  /// @brief PtNode を生成する．
+  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] value_list 値を表すトークンのリスト
+  PtNode*
+  new_ptnode(Token attr_token,
+	     const vector<Token>& value_list);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
   bool
@@ -147,6 +162,9 @@ private:
 
   // メッセージを管理するオブジェクト
   MsgMgr mMsgMgr;
+
+  // PtNode 用のメモリアロケータ
+  SimpleAlloc mAlloc;
 
   // library グループを処理するハンドラ
   LibraryHandler* mLibraryHandler;

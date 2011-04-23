@@ -53,6 +53,20 @@ public:
   // 派生クラスが用いる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief PtNode を生成する．
+  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] value_token 値を表すトークン
+  PtNode*
+  new_ptnode(Token attr_token,
+	     Token value_token);
+
+  /// @brief PtNode を生成する．
+  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] value_list 値を表すトークンのリスト
+  PtNode*
+  new_ptnode(Token attr_token,
+	     const vector<Token>& value_list);
+
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
   /// @param[in] type 要求するトークンの型
   bool
