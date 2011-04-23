@@ -32,8 +32,8 @@ public:
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
   Token(tTokenType type,
-	const string& value,
-	const FileRegion& loc);
+	const string& value = string(),
+	const FileRegion& loc = FileRegion());
 
   /// @brief デストラクタ
   ~Token();

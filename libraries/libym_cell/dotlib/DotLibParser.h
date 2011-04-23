@@ -21,6 +21,8 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+class LibraryGroupHandler;
+
 //////////////////////////////////////////////////////////////////////
 /// DotLib 用のパーサークラス
 //////////////////////////////////////////////////////////////////////
@@ -41,9 +43,9 @@ public:
   /// @param[in] filename ファイル名
   /// @param[in] debug デバッグモード
   /// @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
-  /// @retval true 読み込みが成功した．
-  /// @retval false 読み込みが失敗した．
-  bool
+  /// @return パース木の根のノードを返す．
+  /// @note エラーが起きたら NULL を返す．
+  PtNode*
   read_file(const string& filename,
 	    bool debug,
 	    bool allow_no_semi = true);
@@ -61,16 +63,6 @@ public:
   /// @brief 行末まで読み込む．
   bool
   expect_nl();
-
-  /// @brief ファイルをオープンする．
-  /// @param[in] filename ファイル名
-  /// @return ファイルのオープンに失敗したら false を返す．
-  bool
-  open_file(const string& filename);
-
-  /// @brief ファイルをクローズする．
-  void
-  close_file();
 
   /// @brief トークンを一つとってくる．
   /// @param[in] symbol_mode 数字も文字とみなすモード
@@ -115,6 +107,16 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ファイルをオープンする．
+  /// @param[in] filename ファイル名
+  /// @return ファイルのオープンに失敗したら false を返す．
+  bool
+  open_file(const string& filename);
+
+  /// @brief ファイルをクローズする．
+  void
+  close_file();
+
   /// @brief 初期化を行う．
   void
   init();
@@ -147,7 +149,7 @@ private:
   MsgMgr mMsgMgr;
 
   // library グループを処理するハンドラ
-  DotLibHandler* mLibraryHandler;
+  LibraryGroupHandler* mLibraryHandler;
 
   // デバッグモード
   bool mDebug;

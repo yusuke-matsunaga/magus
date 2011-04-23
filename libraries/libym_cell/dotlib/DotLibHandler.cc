@@ -154,12 +154,12 @@ ExprHandler::read_attr(Token attr_token)
 
   PtNode* expr_node = read_expr(SEMI);
 
-  Token value;
   if ( debug() ) {
     cout << attr_token << " : " << endl;
   }
 
-  PtNode* node = new PtNode(attr_token, value);
+  PtNode* node = new PtNode(attr_token, Token(EXPRESSION));
+  node->add_child(expr_node);
   parent()->pt_node()->add_child(node);
 
   return expect_nl();
@@ -191,7 +191,7 @@ ExprHandler::read_primary()
 		      "Syntax error. number is expected.");
     return NULL;
   }
-  return new PtNode(token, Token());
+  return new PtNode(token, Token(EXPRESSION));
 }
 
 // @brief prudct を読み込む．
@@ -211,7 +211,7 @@ ExprHandler::read_product()
 	return NULL;
       }
 
-      PtNode* node = new PtNode(token, Token());
+      PtNode* node = new PtNode(token, Token(EXPRESSION));
       node->add_child(opr1);
       node->add_child(opr2);
       return node;
@@ -244,7 +244,7 @@ ExprHandler::read_expr(tTokenType end_marker)
 	return NULL;
       }
 
-      PtNode* node = new PtNode(token, Token());
+      PtNode* node = new PtNode(token, Token(EXPRESSION));
       node->add_child(opr1);
       node->add_child(opr2);
       return node;
@@ -513,23 +513,24 @@ operator<<(ostream& s,
 {
   const char* type_str = NULL;
   switch ( token.type() ) {
-  case COLON:     type_str = "':'"; break;
-  case SEMI:      type_str = "';'"; break;
-  case COMMA:     type_str = "','"; break;
-  case PLUS:      type_str = "'+'"; break;
-  case MINUS:     type_str = "'-'"; break;
-  case MULT:      type_str = "'*'"; break;
-  case DIV:       type_str = "'/'"; break;
-  case LP:        type_str = "'('"; break;
-  case RP:        type_str = "')'"; break;
-  case LCB:       type_str = "'{'"; break;
-  case RCB:       type_str = "'}'"; break;
-  case INT_NUM: type_str = "FLOAT"; break;
-  case FLOAT_NUM: type_str = "FLOAT"; break;
-  case SYMBOL:    type_str = "SYMBOL"; break;
-  case NL:        type_str = "new-line"; break;
-  case ERROR:     assert_not_reached(__FILE__, __LINE__);
-  case END:       assert_not_reached(__FILE__, __LINE__);
+  case COLON:      type_str = "':'"; break;
+  case SEMI:       type_str = "';'"; break;
+  case COMMA:      type_str = "','"; break;
+  case PLUS:       type_str = "'+'"; break;
+  case MINUS:      type_str = "'-'"; break;
+  case MULT:       type_str = "'*'"; break;
+  case DIV:        type_str = "'/'"; break;
+  case LP:         type_str = "'('"; break;
+  case RP:         type_str = "')'"; break;
+  case LCB:        type_str = "'{'"; break;
+  case RCB:        type_str = "'}'"; break;
+  case INT_NUM:    type_str = "INT"; break;
+  case FLOAT_NUM:  type_str = "FLOAT"; break;
+  case SYMBOL:     type_str = "SYMBOL"; break;
+  case EXPRESSION: type_str = "EXPRESSION"; break;
+  case NL:         type_str = "new-line"; break;
+  case ERROR :     assert_not_reached(__FILE__, __LINE__);
+  case END:        assert_not_reached(__FILE__, __LINE__);
   }
   s << type_str;
   if ( token.type() == INT_NUM ||

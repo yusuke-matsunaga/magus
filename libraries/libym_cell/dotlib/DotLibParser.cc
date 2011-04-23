@@ -32,9 +32,9 @@ DotLibParser::~DotLibParser()
 // @param[in] filename ファイル名
 // @param[in] debug デバッグモード
 // @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
-// @retval true 読み込みが成功した．
-// @retval false 読み込みが失敗した．
-bool
+// @return パース木の根のノードを返す．
+// @note エラーが起きたら NULL を返す．
+PtNode*
 DotLibParser::read_file(const string& filename,
 			bool debug,
 			bool allow_no_semi)
@@ -43,7 +43,7 @@ DotLibParser::read_file(const string& filename,
   mAllowNoSemi = allow_no_semi;
 
   if ( !open_file(filename) ) {
-    return false;
+    return NULL;
   }
 
   bool error = false;
@@ -84,7 +84,10 @@ DotLibParser::read_file(const string& filename,
 last:
   close_file();
 
-  return !error;
+  if ( error ) {
+    return NULL;
+  }
+  return mLibraryHandler->pt_node();
 }
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
@@ -112,6 +115,7 @@ DotLibParser::expect(tTokenType type)
   case SYMBOL:    type_str = "STR"; break;
   case INT_NUM:   type_str = "INT"; break;
   case FLOAT_NUM: type_str = "FLOAT"; break;
+  case EXPRESSION: type_str = "EXPRESSION"; break;
   case NL:        type_str = "new-line"; break;
   case ERROR:     assert_not_reached(__FILE__, __LINE__);
   case END:       assert_not_reached(__FILE__, __LINE__);

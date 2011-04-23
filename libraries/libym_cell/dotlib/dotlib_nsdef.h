@@ -59,6 +59,8 @@ enum tTokenType {
   INT_NUM,
   /// @brief 浮動小数点数値
   FLOAT_NUM,
+  /// @brief 式
+  EXPRESSION,
   /// @brief 改行
   NL,
   /// @brief エラー
@@ -72,6 +74,7 @@ class DotLibParser;
 class DotLibLex;
 class DotLibHandler;
 class GroupHandler;
+class PtNode;
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

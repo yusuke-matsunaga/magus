@@ -38,7 +38,9 @@ libym_cell_dotlib_la_SOURCES = \
 	LibraryGroupHandler.h \
 	LibraryGroupHandler.cc \
 	PtNode.h \
-	PtNode.cc
+	PtNode.cc \
+	PtDumper.h \
+	PtDumper.cc
 
 
 

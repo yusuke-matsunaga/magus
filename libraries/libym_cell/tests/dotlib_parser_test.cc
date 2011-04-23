@@ -12,8 +12,9 @@
 #include <iomanip>
 
 #include "ym_utils/StopWatch.h"
-#include "../dotlib/DotLibParser.h"
 #include "ym_utils/MsgHandler.h"
+#include "../dotlib/DotLibParser.h"
+#include "../dotlib/PtDumper.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -27,13 +28,19 @@ dotlibparser_test(int argc,
   MsgHandler* handler = new StreamMsgHandler(&cerr);
   parser.msg_mgr().reg_handler(handler);
 
+  PtDumper pt_dump;
+
   StopWatch timer;
   timer.start();
 
+  bool error = false;
   for (int i = 1; i < argc; ++ i) {
-    bool stat = parser.read_file(argv[i], false);
-    if ( !stat ) {
-      return -1;
+    PtNode* node = parser.read_file(argv[i], false);
+    if ( node == NULL ) {
+      error = true;
+    }
+    else {
+      pt_dump(cout, node);
     }
   }
 
@@ -41,7 +48,7 @@ dotlibparser_test(int argc,
   USTime time = timer.time();
   cout << "Time: " << time << endl;
 
-  return 0;
+  return error ? 0 : -1;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB
