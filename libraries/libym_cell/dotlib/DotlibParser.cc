@@ -1,29 +1,29 @@
 
-/// @file libym_cell/dotlib/DotLibParser.cc
-/// @brief DotLibParser の実装ファイル
+/// @file libym_cell/dotlib/DotlibParser.cc
+/// @brief DotlibParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DotLibParser.cc 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: DotlibParser.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DotLibParser.h"
-#include "LibraryGroupHandler.h"
+#include "DotlibParser.h"
+#include "LibraryHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 // コンストラクタ
-DotLibParser::DotLibParser() :
-  mLibraryHandler(new LibraryGroupHandler(*this))
+DotlibParser::DotlibParser() :
+  mLibraryHandler(new LibraryHandler(*this))
 {
   init();
 }
 
 // デストラクタ
-DotLibParser::~DotLibParser()
+DotlibParser::~DotlibParser()
 {
   close_file();
 }
@@ -35,7 +35,7 @@ DotLibParser::~DotLibParser()
 // @return パース木の根のノードを返す．
 // @note エラーが起きたら NULL を返す．
 PtNode*
-DotLibParser::read_file(const string& filename,
+DotlibParser::read_file(const string& filename,
 			bool debug,
 			bool allow_no_semi)
 {
@@ -92,7 +92,7 @@ last:
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
 bool
-DotLibParser::expect(tTokenType type)
+DotlibParser::expect(tTokenType type)
 {
   Token token = read_token();
   if ( token.type() == type ) {
@@ -131,7 +131,7 @@ DotLibParser::expect(tTokenType type)
 
 // @brief 行末まで読み込む．
 bool
-DotLibParser::expect_nl()
+DotlibParser::expect_nl()
 {
   if ( mAllowNoSemi ) {
     Token token = read_token();
@@ -161,14 +161,14 @@ DotLibParser::expect_nl()
 
 // @brief メッセージ出力管理オブジェクトを返す．
 MsgMgr&
-DotLibParser::msg_mgr()
+DotlibParser::msg_mgr()
 {
   return mMsgMgr;
 }
 
 // @brief デバッグモードの時 true を返す．
 bool
-DotLibParser::debug()
+DotlibParser::debug()
 {
   return mDebug;
 }
@@ -177,7 +177,7 @@ DotLibParser::debug()
 // 自動的にに clear() を呼ぶ．
 // ファイルのオープンに失敗したら false を返す．
 bool
-DotLibParser::open_file(const string& filename)
+DotlibParser::open_file(const string& filename)
 {
   init();
   mInput.open(filename.c_str());
@@ -190,7 +190,7 @@ DotLibParser::open_file(const string& filename)
 
 // ファイルをクローズする．
 void
-DotLibParser::close_file()
+DotlibParser::close_file()
 {
   mInput.close();
   mCurFileDesc = NULL;
@@ -198,7 +198,7 @@ DotLibParser::close_file()
 
 // 初期化
 void
-DotLibParser::init()
+DotlibParser::init()
 {
   mUngetChar = 0;
   mCR = false;
@@ -210,7 +210,7 @@ DotLibParser::init()
 // @brief トークンを一つとってくる．
 // @param[in] symbol_mode 数字も文字とみなすモード
 Token
-DotLibParser::read_token(bool symbol_mode)
+DotlibParser::read_token(bool symbol_mode)
 {
   tTokenType type;
   string value;
@@ -230,7 +230,7 @@ DotLibParser::read_token(bool symbol_mode)
 
 // @brief トークンを戻す．
 void
-DotLibParser::unget_token(Token token)
+DotlibParser::unget_token(Token token)
 {
   mUngetToken = token;
 }
@@ -238,7 +238,7 @@ DotLibParser::unget_token(Token token)
 // @brief トークンを一つとってくる．
 // @param[in] symbol_mode 数字も文字とみなすモード
 tTokenType
-DotLibParser::_read_token(bool symbol_mode)
+DotlibParser::_read_token(bool symbol_mode)
 {
   mSymbolMode = symbol_mode;
 
@@ -513,7 +513,7 @@ DotLibParser::_read_token(bool symbol_mode)
 // @brief c が文字の時に true を返す．
 // @note mSymbolMode が true なら数字も文字とみなす．
 bool
-DotLibParser::is_symbol(int c)
+DotlibParser::is_symbol(int c)
 {
   if ( isalpha(c) || c == '_' ) {
     return true;
@@ -528,7 +528,7 @@ DotLibParser::is_symbol(int c)
 
 // 一文字読み出す．
 int
-DotLibParser::get()
+DotlibParser::get()
 {
   int c = 0;
 
@@ -581,7 +581,7 @@ DotLibParser::get()
 
 // 一文字読み戻す．
 void
-DotLibParser::unget()
+DotlibParser::unget()
 {
   mUngetChar = mLastChar;
   -- mCurColumn;

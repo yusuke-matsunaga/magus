@@ -70,9 +70,10 @@ enum tTokenType {
 };
 
 // クラス名の前方宣言
-class DotLibParser;
-class DotLibLex;
-class DotLibHandler;
+class CellDotlibReader;
+class DotlibParser;
+class DotlibLex;
+class DotlibHandler;
 class GroupHandler;
 class PtNode;
 
@@ -81,7 +82,7 @@ END_NAMESPACE_YM_CELL_DOTLIB
 
 BEGIN_NAMESPACE_YM_CELL
 
-using nsYm::nsCell::nsDotlib::DotLibParser;
+using nsYm::nsCell::nsDotlib::CellDotlibReader;
 
 END_NAMESPACE_YM_CELL
 

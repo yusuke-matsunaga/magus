@@ -1,11 +1,11 @@
 #ifndef YM_CELL_DOTLIBPARSER_H
 #define YM_CELL_DOTLIBPARSER_H
 
-/// @file libym_cell/DotLibParser.h
-/// @brief DotLibParser のヘッダファイル
+/// @file libym_cell/DotlibParser.h
+/// @brief DotlibParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DotLibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: DotlibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -21,20 +21,20 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-class LibraryGroupHandler;
+class LibraryHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// DotLib 用のパーサークラス
+/// Dotlib 用のパーサークラス
 //////////////////////////////////////////////////////////////////////
-class DotLibParser
+class DotlibParser
 {
 public:
 
   /// @brief コンストラクタ
-  DotLibParser();
+  DotlibParser();
 
   /// @brief デストラクタ
-  ~DotLibParser();
+  ~DotlibParser();
 
 
 public:
@@ -53,7 +53,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DotLibHandler から用いられる関数
+  // DotlibHandler から用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
@@ -149,7 +149,7 @@ private:
   MsgMgr mMsgMgr;
 
   // library グループを処理するハンドラ
-  LibraryGroupHandler* mLibraryHandler;
+  LibraryHandler* mLibraryHandler;
 
   // デバッグモード
   bool mDebug;
@@ -203,7 +203,7 @@ private:
 // 直前の read_token() に対応する文字列を返す．
 inline
 const char*
-DotLibParser::cur_string() const
+DotlibParser::cur_string() const
 {
   return mCurString.c_str();
 }
@@ -211,7 +211,7 @@ DotLibParser::cur_string() const
 // 現在のファイル位置
 inline
 FileRegion
-DotLibParser::cur_loc()
+DotlibParser::cur_loc()
 {
   return FileRegion(mCurFileDesc,
 		    mCurLine, mFirstColumn,
@@ -221,7 +221,7 @@ DotLibParser::cur_loc()
 // 現在の行番号を返す．
 inline
 int
-DotLibParser::cur_line() const
+DotlibParser::cur_line() const
 {
   return mCurLine;
 }
@@ -229,7 +229,7 @@ DotLibParser::cur_line() const
 // 現在のトークンの開始位置
 inline
 int
-DotLibParser::first_column() const
+DotlibParser::first_column() const
 {
   return mFirstColumn;
 }
@@ -237,7 +237,7 @@ DotLibParser::first_column() const
 // 現在のコラム位置を返す．
 inline
 int
-DotLibParser::cur_column() const
+DotlibParser::cur_column() const
 {
   return mCurColumn;
 }

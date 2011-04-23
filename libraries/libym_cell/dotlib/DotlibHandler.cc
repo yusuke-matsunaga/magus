@@ -1,14 +1,14 @@
 
-/// @file libym_cell/dotlib/DotLibHandler.cc
-/// @brief DotLibHandler の実装ファイル
+/// @file libym_cell/dotlib/DotlibHandler.cc
+/// @brief DotlibHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DotLibHandler.h"
-#include "DotLibParser.h"
+#include "DotlibHandler.h"
+#include "DotlibParser.h"
 #include "SimpleHandler.h"
 #include "ExprHandler.h"
 #include "ComplexHandler.h"
@@ -19,13 +19,13 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-// クラス DotLibHandler
+// クラス DotlibHandler
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-DotLibHandler::DotLibHandler(DotLibParser& parser,
+DotlibHandler::DotlibHandler(DotlibParser& parser,
 			     GroupHandler* parent) :
   mParser(parser),
   mParent(parent)
@@ -33,48 +33,48 @@ DotLibHandler::DotLibHandler(DotLibParser& parser,
 }
 
 // @brief デストラクタ
-DotLibHandler::~DotLibHandler()
+DotlibHandler::~DotlibHandler()
 {
 }
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
 bool
-DotLibHandler::expect(tTokenType type)
+DotlibHandler::expect(tTokenType type)
 {
   return mParser.expect(type);
 }
 
 // @brief 行末まで読み込む．
 bool
-DotLibHandler::expect_nl()
+DotlibHandler::expect_nl()
 {
   return mParser.expect_nl();
 }
 
 // @brief 親のハンドラを得る．
 GroupHandler*
-DotLibHandler::parent()
+DotlibHandler::parent()
 {
   return mParent;
 }
 
 // @brief パーサーを得る．
-DotLibParser&
-DotLibHandler::parser()
+DotlibParser&
+DotlibHandler::parser()
 {
   return mParser;
 }
 
 // @brief メッセージ出力管理オブジェクトを得る．
 MsgMgr&
-DotLibHandler::msg_mgr()
+DotlibHandler::msg_mgr()
 {
   return mParser.msg_mgr();
 }
 
 // @brief デバッグモードの時に true を返す．
 bool
-DotLibHandler::debug()
+DotlibHandler::debug()
 {
   return mParser.debug();
 }
@@ -88,10 +88,10 @@ DotLibHandler::debug()
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
 // @param[in] symbol_mode シンボルモード
-SimpleHandler::SimpleHandler(DotLibParser& parser,
+SimpleHandler::SimpleHandler(DotlibParser& parser,
 			     GroupHandler* parent,
 			     bool symbol_mode) :
-  DotLibHandler(parser, parent),
+  DotlibHandler(parser, parent),
   mSymbolMode(symbol_mode)
 {
 }
@@ -131,9 +131,9 @@ SimpleHandler::read_attr(Token attr_token)
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-ExprHandler::ExprHandler(DotLibParser& parser,
+ExprHandler::ExprHandler(DotlibParser& parser,
 			 GroupHandler* parent) :
-  DotLibHandler(parser, parent)
+  DotlibHandler(parser, parent)
 {
 }
 
@@ -267,9 +267,9 @@ ExprHandler::read_expr(tTokenType end_marker)
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-ComplexHandler::ComplexHandler(DotLibParser& parser,
+ComplexHandler::ComplexHandler(DotlibParser& parser,
 			       GroupHandler* parent) :
-  DotLibHandler(parser, parent)
+  DotlibHandler(parser, parent)
 {
 }
 
@@ -334,9 +334,9 @@ ComplexHandler::read_attr(Token attr_token)
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-GroupHandler::GroupHandler(DotLibParser& parser,
+GroupHandler::GroupHandler(DotlibParser& parser,
 			   GroupHandler* parent) :
-  DotLibHandler(parser, parent)
+  DotlibHandler(parser, parent)
 {
 }
 
@@ -410,7 +410,7 @@ GroupHandler::read_attr(Token attr_token)
 			"string value is expected.");
       return false;
     }
-    hash_map<string, DotLibHandler*>::const_iterator p
+    hash_map<string, DotlibHandler*>::const_iterator p
       = mHandlerMap.find(token.value());
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
@@ -421,7 +421,7 @@ GroupHandler::read_attr(Token attr_token)
 			buf.str());
       return false;
     }
-    DotLibHandler* handler = p->second;
+    DotlibHandler* handler = p->second;
     if ( !handler->read_attr(token) ) {
       return false;
     }
@@ -443,7 +443,7 @@ GroupHandler::read_attr(Token attr_token)
 // @note エラーが起きたら false を返す．
 bool
 GroupHandler::reg_handler(const string& attr_name,
-			  DotLibHandler* handler)
+			  DotlibHandler* handler)
 {
   mHandlerMap.insert(make_pair(attr_name, handler));
   return true;
@@ -452,10 +452,10 @@ GroupHandler::reg_handler(const string& attr_name,
 // @brief ハンドラを取り出す．
 // @param[in] attr_name 属性名
 // @note なければ NULL を返す．
-DotLibHandler*
+DotlibHandler*
 GroupHandler::find_handler(const string& attr_name)
 {
-  hash_map<string, DotLibHandler*>::const_iterator p
+  hash_map<string, DotlibHandler*>::const_iterator p
     = mHandlerMap.find(attr_name);
   if ( p == mHandlerMap.end() ) {
     return NULL;

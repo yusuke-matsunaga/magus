@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_LIBRARYGROUPHANDLER_H
-#define LIBYM_CELL_DOTLIB_LIBRARYGROUPHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_LIBRARYHANDLER_H
+#define LIBYM_CELL_DOTLIB_LIBRARYHANDLER_H
 
-/// @file libym_cell/dotlib/LibraryGroupHandler.h
-/// @brief LibraryGroupHandler のヘッダファイル
+/// @file libym_cell/dotlib/LibraryHandler.h
+/// @brief LibraryHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -16,21 +16,21 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class LibraryGroupHandler LibraryGroupHandler.h "LibraryGroupHandler.h"
+/// @class LibraryHandler LibraryHandler.h "LibraryHandler.h"
 /// @brie library グループ属性
 //////////////////////////////////////////////////////////////////////
-class LibraryGroupHandler :
+class LibraryHandler :
   public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  LibraryGroupHandler(DotLibParser& parser);
+  LibraryHandler(DotlibParser& parser);
 
   /// @brief デストラクタ
   virtual
-  ~LibraryGroupHandler();
+  ~LibraryHandler();
 
 
 private:
@@ -55,4 +55,4 @@ private:
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_LIBRARYGROUPHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_LIBRARYHANDLER_H

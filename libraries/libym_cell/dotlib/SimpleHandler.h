@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "DotLibHandler.h"
+#include "DotlibHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @brief simple attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class SimpleHandler :
-  public DotLibHandler
+  public DotlibHandler
 {
 public:
 
@@ -27,7 +27,7 @@ public:
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
   /// @param[in] symbol_mode シンボルモード
-  SimpleHandler(DotLibParser& parser,
+  SimpleHandler(DotlibParser& parser,
 		GroupHandler* parent,
 		bool symbol_mode);
 
@@ -38,7 +38,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DotLibHandler の仮想関数
+  // DotlibHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．

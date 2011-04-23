@@ -8,7 +8,7 @@
 
 
 #include "DefineHandler.h"
-#include "DotLibParser.h"
+#include "DotlibParser.h"
 #include "SimpleHandler.h"
 #include "GroupHandler.h"
 
@@ -22,9 +22,9 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-DefineHandler::DefineHandler(DotLibParser& parser,
+DefineHandler::DefineHandler(DotlibParser& parser,
 			     GroupHandler* parent) :
-  DotLibHandler(parser, parent)
+  DotlibHandler(parser, parent)
 {
 }
 
@@ -110,7 +110,7 @@ DefineHandler::read_attr(Token attr_token)
     return false;
   }
 
-  DotLibHandler* handler = parent()->find_handler(group.value());
+  DotlibHandler* handler = parent()->find_handler(group.value());
   if ( handler == NULL ) {
     ostringstream buf;
     buf << group.value() << ": Unknown attribute. ignored.";
@@ -125,7 +125,7 @@ DefineHandler::read_attr(Token attr_token)
   assert_cond( g_handler != NULL, __FILE__, __LINE__);
 
   // 今は type を無視
-  DotLibHandler* new_handler = new SimpleHandler(parser(), g_handler, false);
+  DotlibHandler* new_handler = new SimpleHandler(parser(), g_handler, false);
 
   g_handler->reg_handler(keyword.value(), new_handler);
 

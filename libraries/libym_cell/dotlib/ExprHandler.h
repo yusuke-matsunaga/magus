@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "DotLibHandler.h"
+#include "DotlibHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @brief expression の値をとる simple attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class ExprHandler :
-  public DotLibHandler
+  public DotlibHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  ExprHandler(DotLibParser& parser,
+  ExprHandler(DotlibParser& parser,
 	      GroupHandler* parent);
 
   /// @brief デストラクタ
@@ -36,7 +36,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DotLibHandler の仮想関数
+  // DotlibHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．

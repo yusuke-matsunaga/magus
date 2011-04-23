@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "DotLibHandler.h"
+#include "DotlibHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -21,14 +21,14 @@ class LibraryGroupHandler;
 /// @brief define attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class DefineHandler :
-  public DotLibHandler
+  public DotlibHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  DefineHandler(DotLibParser& parser,
+  DefineHandler(DotlibParser& parser,
 		GroupHandler* parent);
 
   /// @brief デストラクタ
@@ -38,7 +38,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DotLibHandler の仮想関数
+  // DotlibHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．

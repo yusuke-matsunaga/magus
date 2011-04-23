@@ -9,24 +9,24 @@
 /// All rights reserved.
 
 
-#include "DotLibHandler.h"
+#include "DotlibHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class GroupHandler DotLibHandler.h "DotLibHandler.h"
+/// @class GroupHandler DotlibHandler.h "DotlibHandler.h"
 /// @brief group attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class GroupHandler :
-  public DotLibHandler
+  public DotlibHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  GroupHandler(DotLibParser& parser,
+  GroupHandler(DotlibParser& parser,
 	       GroupHandler* parent);
 
   /// @brief デストラクタ
@@ -36,7 +36,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DotLibHandler の仮想関数
+  // DotlibHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．
@@ -52,12 +52,12 @@ public:
   /// @note エラーが起きたら false を返す．
   bool
   reg_handler(const string& attr_name,
-	      DotLibHandler* handler);
+	      DotlibHandler* handler);
 
   /// @brief ハンドラを取り出す．
   /// @param[in] attr_name 属性名
   /// @note なければ NULL を返す．
-  DotLibHandler*
+  DotlibHandler*
   find_handler(const string& attr_name);
 
 
@@ -106,7 +106,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ハンドラの連想配列
-  hash_map<string, DotLibHandler*> mHandlerMap;
+  hash_map<string, DotlibHandler*> mHandlerMap;
 
   // 対応する PtNode
   PtNode* mPtNode;

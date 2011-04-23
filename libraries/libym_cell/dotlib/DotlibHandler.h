@@ -1,7 +1,7 @@
 #ifndef LIBYM_CELL_DOTLIB_DOTLIBHANDLER_H
 #define LIBYM_CELL_DOTLIB_DOTLIBHANDLER_H
 
-/// @file libym_cell/dotlib/DotLibHandler.h
+/// @file libym_cell/dotlib/DotlibHandler.h
 /// @brief DotlibHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -17,22 +17,22 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class DotLibHandler DotLibHandler.h "DotLibHandler.h"
+/// @class DotlibHandler DotlibHandler.h "DotlibHandler.h"
 /// @brief liberty ファイルの各構文要素を読み込むためのクラス
 //////////////////////////////////////////////////////////////////////
-class DotLibHandler
+class DotlibHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  DotLibHandler(DotLibParser& parser,
+  DotlibHandler(DotlibParser& parser,
 		GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
-  ~DotLibHandler();
+  ~DotlibHandler();
 
 
 public:
@@ -67,7 +67,7 @@ public:
   parent();
 
   /// @brief パーサーを得る．
-  DotLibParser&
+  DotlibParser&
   parser();
 
   /// @brief メッセージ出力管理オブジェクトを得る．
@@ -85,7 +85,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // パーサー
-  DotLibParser& mParser;
+  DotlibParser& mParser;
 
   // 親のハンドラ
   GroupHandler* mParent;

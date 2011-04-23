@@ -26,17 +26,18 @@ libym_cell_dotlib_la_LDFLAGS =
 libym_cell_dotlib_la_SOURCES = \
 	dotlib_nsdef.h \
 	Token.h \
-	DotLibParser.h \
-	DotLibParser.cc \
-	DotLibHandler.h \
-	DotLibHandler.cc \
+	DotlibParser.h \
+	DotlibParser.cc \
+	DotlibHandler.h \
+	DotlibHandler.cc \
 	SimpleHandler.h \
 	ExprHandler.h \
 	ComplexHandler.h \
 	DefineHandler.h \
 	DefineHandler.cc \
-	LibraryGroupHandler.h \
-	LibraryGroupHandler.cc \
+	GroupHandler.h \
+	LibraryHandler.h \
+	LibraryHandler.cc \
 	PtNode.h \
 	PtNode.cc \
 	PtDumper.h \
