@@ -18,7 +18,6 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 // コンストラクタ
 DotlibParser::DotlibParser() :
-  mAlloc(4096),
   mLibraryHandler(new LibraryHandler(*this))
 {
   init();
@@ -51,19 +50,19 @@ DotlibParser::read_file(const string& filename,
   bool error = false;
   tTokenType type;
   // 空行を読み飛ばす．
-  for (type = _read_token(); type == NL; type = _read_token()) { }
+  for (type = read_token(); type == NL; type = read_token()) { }
   string name = cur_string();
   FileRegion loc = cur_loc();
   if ( type != SYMBOL || name != "library" ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, loc,
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "'library' keyword is expected "
-		      "on the top of the structure");
+    put_msg(__FILE__, __LINE__, loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "'library' keyword is expected "
+	    "on the top of the structure");
     error = true;
     goto last;
   }
-  if ( !mLibraryHandler->read_attr(Token(type, name, loc)) ) {
+  if ( !mLibraryHandler->read_attr(name, loc) ) {
     error = true;
     goto last;
   }
@@ -73,14 +72,14 @@ DotlibParser::read_file(const string& filename,
     goto last;
   }
   for ( ; ; ) {
-    tTokenType type = _read_token();
+    tTokenType type = read_token();
     if ( type == END ) {
       break;
     }
-    msg_mgr().put_msg(__FILE__, __LINE__, cur_loc(),
-		      kMsgWarning,
-		      "DOTLIB_PARSER",
-		      "contents after library group are ignored.");
+    put_msg(__FILE__, __LINE__, cur_loc(),
+	    kMsgWarning,
+	    "DOTLIB_PARSER",
+	    "contents after library group are ignored.");
   }
 
 last:
@@ -92,64 +91,42 @@ last:
   return mLibraryHandler->pt_node();
 }
 
-// @brief PtNode を生成する．
-// @param[in] attr_token 属性名を表すトークン
-// @param[in] value_token 値を表すトークン
-PtNode*
-DotlibParser::new_ptnode(Token attr_token,
-			 Token value_token)
-{
-  void* p = mAlloc.get_memory(sizeof(PtNode));
-  return new (p) PtNode(attr_token, value_token);
-}
-
-// @brief PtNode を生成する．
-// @param[in] attr_token 属性名を表すトークン
-// @param[in] value_list 値を表すトークンのリスト
-PtNode*
-DotlibParser::new_ptnode(Token attr_token,
-			 const vector<Token>& value_list)
-{
-  void* p = mAlloc.get_memory(sizeof(PtNode));
-  return new (p) PtNode(attr_token, value_list);
-}
-
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
 bool
-DotlibParser::expect(tTokenType type)
+DotlibParser::expect(tTokenType req_type)
 {
-  Token token = read_token();
-  if ( token.type() == type ) {
+  tTokenType type = read_token();
+  if ( type == req_type ) {
     return true;
   }
 
   const char* type_str = NULL;
-  switch ( type ) {
-  case COLON:     type_str = "':'"; break;
-  case SEMI:      type_str = "';'"; break;
-  case COMMA:     type_str = "','"; break;
-  case PLUS:      type_str = "'+'"; break;
-  case MINUS:     type_str = "'-'"; break;
-  case MULT:      type_str = "'*'"; break;
-  case DIV:       type_str = "'/'"; break;
-  case LP:        type_str = "'('"; break;
-  case RP:        type_str = "')'"; break;
-  case LCB:       type_str = "'{'"; break;
-  case RCB:       type_str = "'}'"; break;
-  case SYMBOL:    type_str = "STR"; break;
-  case INT_NUM:   type_str = "INT"; break;
-  case FLOAT_NUM: type_str = "FLOAT"; break;
+  switch ( req_type ) {
+  case COLON:      type_str = "':'"; break;
+  case SEMI:       type_str = "';'"; break;
+  case COMMA:      type_str = "','"; break;
+  case PLUS:       type_str = "'+'"; break;
+  case MINUS:      type_str = "'-'"; break;
+  case MULT:       type_str = "'*'"; break;
+  case DIV:        type_str = "'/'"; break;
+  case LP:         type_str = "'('"; break;
+  case RP:         type_str = "')'"; break;
+  case LCB:        type_str = "'{'"; break;
+  case RCB:        type_str = "'}'"; break;
+  case SYMBOL:     type_str = "STR"; break;
+  case INT_NUM:    type_str = "INT"; break;
+  case FLOAT_NUM:  type_str = "FLOAT"; break;
   case EXPRESSION: type_str = "EXPRESSION"; break;
-  case NL:        type_str = "new-line"; break;
-  case ERROR:     assert_not_reached(__FILE__, __LINE__);
-  case END:       assert_not_reached(__FILE__, __LINE__);
+  case NL:         type_str = "new-line"; break;
+  case ERROR:      assert_not_reached(__FILE__, __LINE__);
+  case END:        assert_not_reached(__FILE__, __LINE__);
   }
   ostringstream buf;
   buf << "syntax error. " << type_str << " is expected.";
-  mMsgMgr.put_msg(__FILE__, __LINE__, token.loc(),
-		  kMsgError,
-		  "DOTLIB_PARSER",
-		  buf.str());
+  put_msg(__FILE__, __LINE__, cur_loc(),
+	  kMsgError,
+	  "DOTLIB_PARSER",
+	  buf.str());
   return false;
 }
 
@@ -158,18 +135,18 @@ bool
 DotlibParser::expect_nl()
 {
   if ( mAllowNoSemi ) {
-    Token token = read_token();
-    if ( token.type() == SEMI ) {
-      token = read_token();
+    tTokenType type = read_token();
+    if ( type == SEMI ) {
+      type = read_token();
     }
-    if ( token.type() == NL || token.type() == END ) {
+    if ( type == NL || type == END ) {
       return true;
     }
     ostringstream buf;
-    mMsgMgr.put_msg(__FILE__, __LINE__, token.loc(),
-		    kMsgError,
-		    "DOTLIB_PARSER",
-		    "Syntax error. Semicolon is expected.");
+    put_msg(__FILE__, __LINE__, cur_loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "Syntax error. Semicolon is expected.");
     return false;
   }
   else {
@@ -183,11 +160,63 @@ DotlibParser::expect_nl()
   return true;
 }
 
+// @brief 直前の read_token() に対応する整数値を返す．
+// @note 型が INT_NUM でなかったときの値は不定
+int
+DotlibParser::cur_int() const
+{
+  return strtol(cur_string(), NULL, 10);
+}
+
+// @brief 直前の read_token() に対応する実数値を返す．
+// @note 型が FLOAT_NUM/INT_NUM でなかったときの値は不定
+double
+DotlibParser::cur_float() const
+{
+  return strtod(cur_string(), NULL);
+}
+
 // @brief メッセージ出力管理オブジェクトを返す．
 MsgMgr&
 DotlibParser::msg_mgr()
 {
   return mMsgMgr;
+}
+
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] file_loc ファイル位置
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
+void
+DotlibParser::put_msg(const char* src_file,
+		      int src_line,
+		      const FileRegion& file_loc,
+		      tMsgType type,
+		      const char* label,
+		      const char* msg)
+{
+  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
+}
+
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] file_loc ファイル位置
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
+void
+DotlibParser::put_msg(const char* src_file,
+		      int src_line,
+		      const FileRegion& file_loc,
+		      tMsgType type,
+		      const char* label,
+		      const string& msg)
+{
+  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 // @brief デバッグモードの時 true を返す．
@@ -224,46 +253,16 @@ DotlibParser::close_file()
 void
 DotlibParser::init()
 {
-  mAlloc.destroy();
   mUngetChar = 0;
   mCR = false;
   mCurLine = 1;
   mCurColumn = 0;
-  mUngetToken = Token(ERROR, string(), FileRegion());
-}
-
-// @brief トークンを一つとってくる．
-// @param[in] symbol_mode 数字も文字とみなすモード
-Token
-DotlibParser::read_token(bool symbol_mode)
-{
-  tTokenType type;
-  string value;
-  FileRegion loc;
-  if ( (type = mUngetToken.type()) != ERROR ) {
-    value = mUngetToken.value();
-    loc = mUngetToken.loc();
-    mUngetToken = Token(ERROR, string(), FileRegion());
-  }
-  else {
-    type = _read_token(symbol_mode);
-    value = cur_string();
-    loc = cur_loc();
-  }
-  return Token(type, value, loc);
-}
-
-// @brief トークンを戻す．
-void
-DotlibParser::unget_token(Token token)
-{
-  mUngetToken = token;
 }
 
 // @brief トークンを一つとってくる．
 // @param[in] symbol_mode 数字も文字とみなすモード
 tTokenType
-DotlibParser::_read_token(bool symbol_mode)
+DotlibParser::read_token(bool symbol_mode)
 {
   mSymbolMode = symbol_mode;
 
@@ -347,10 +346,10 @@ DotlibParser::_read_token(bool symbol_mode)
 
   default:
     // それ以外はエラーなんじゃない？
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
-		    kMsgError,
-		    "DOTLIB_LEX",
-		    "syntax error");
+    put_msg(__FILE__, __LINE__, cur_loc(),
+	    kMsgError,
+	    "DOTLIB_LEX",
+	    "syntax error");
     return ERROR;
   }
   assert_not_reached(__FILE__, __LINE__);
@@ -387,10 +386,10 @@ DotlibParser::_read_token(bool symbol_mode)
   { // '.' の直後はかならず数字
     ostringstream buf;
     buf << "digit number expected after dot";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
-		    kMsgError,
-		    "DOTLIB_LEX",
-		    buf.str());
+    put_msg(__FILE__, __LINE__, cur_loc(),
+	    kMsgError,
+	    "DOTLIB_LEX",
+	    buf.str());
     return ERROR;
   }
 
@@ -420,10 +419,10 @@ DotlibParser::_read_token(bool symbol_mode)
   { // (e|E) の直後はかならず数字か符号
     ostringstream buf;
     buf << "exponent value expected";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
-		    kMsgError,
-		    "DOTLIB_LEX",
-		    buf.str());
+    put_msg(__FILE__, __LINE__, cur_loc(),
+	    kMsgError,
+	    "DOTLIB_LEX",
+	    buf.str());
     return ERROR;
   }
 
@@ -461,10 +460,10 @@ DotlibParser::_read_token(bool symbol_mode)
   else if ( c == '\n' ) {
     ostringstream buf;
     buf << "unexpected newline in quoted string.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
-		    kMsgError,
-		    "DOTLIB_LEX",
-		    buf.str());
+    put_msg(__FILE__, __LINE__, cur_loc(),
+	    kMsgError,
+	    "DOTLIB_LEX",
+	    buf.str());
     return ERROR;
   }
   if ( c == EOF ) {
@@ -527,10 +526,10 @@ DotlibParser::_read_token(bool symbol_mode)
   {
     ostringstream buf;
     buf << "Unexpected end-of-file in comment block.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
-		    kMsgError,
-		    "DOTLIB_LEX",
-		    buf.str());
+    put_msg(__FILE__, __LINE__, cur_loc(),
+	    kMsgError,
+	    "DOTLIB_LEX",
+	    buf.str());
   }
   return ERROR;
 }

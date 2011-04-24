@@ -9,7 +9,7 @@
 
 #include "DotlibHandler.h"
 #include "DotlibParser.h"
-#include "Token.h"
+#include "PtMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -33,53 +33,54 @@ DotlibHandler::~DotlibHandler()
 {
 }
 
-// @brief PtNode を生成する．
-// @param[in] attr_token 属性名を表すトークン
-// @param[in] value_token 値を表すトークン
-PtNode*
-DotlibHandler::new_ptnode(Token attr_token,
-			  Token value_token)
-{
-  return mParser.new_ptnode(attr_token, value_token);
-}
-
-// @brief PtNode を生成する．
-// @param[in] attr_token 属性名を表すトークン
-// @param[in] value_list 値を表すトークンのリスト
-PtNode*
-DotlibHandler::new_ptnode(Token attr_token,
-			  const vector<Token>& value_list)
-{
-  return mParser.new_ptnode(attr_token, value_list);
-}
-
 // @brief group attribute 用のパースを行う．
 // @param[out] value_list 読み込んだトークンを格納するリスト
 bool
-DotlibHandler::parse_complex(vector<Token>& value_list)
+DotlibHandler::parse_complex(vector<const PtValue*>& value_list)
 {
   if ( !expect(LP) ) {
     return false;
   }
 
   value_list.clear();
-  Token token = parser().read_token();
-  if ( token.type() != RP ) {
+  tTokenType type = parser().read_token();
+  if ( type != RP ) {
     for ( ; ; ) {
-      value_list.push_back(token);
-
-      Token token1 = parser().read_token();
-      if ( token1.type() == RP ) {
+      PtValue* value = NULL;
+      switch ( type ) {
+      case INT_NUM:
+	value = ptmgr().new_value(parser().cur_int(), parser().cur_loc());
 	break;
-      }
-      if ( token1.type() != COMMA ) {
-	msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
-			  kMsgError,
-			  "DOTLIB_PARSER",
-			  "syntax error. ',' is expected.");
+
+      case FLOAT_NUM:
+	value = ptmgr().new_value(parser().cur_float(), parser().cur_loc());
+	break;
+
+      case SYMBOL:
+	value = ptmgr().new_value(parser().cur_string(), parser().cur_loc());
+	break;
+
+      default:
+	put_msg(__FILE__, __LINE__, parser().cur_loc(),
+		kMsgError,
+		"DOTLIB_PARSER",
+		"Syntax error. int/float/string value is expected.");
 	return false;
       }
-      token = parser().read_token();
+      value_list.push_back(value);
+
+      tTokenType type1 = parser().read_token();
+      if ( type1 == RP ) {
+	break;
+      }
+      if ( type1 != COMMA ) {
+	put_msg(__FILE__, __LINE__, parser().cur_loc(),
+		kMsgError,
+		"DOTLIB_PARSER",
+		"syntax error. ',' is expected.");
+	return false;
+      }
+      type = parser().read_token();
     }
   }
   return true;
@@ -113,11 +114,40 @@ DotlibHandler::parser()
   return mParser;
 }
 
-// @brief メッセージ出力管理オブジェクトを得る．
-MsgMgr&
-DotlibHandler::msg_mgr()
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] file_loc ファイル位置
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
+void
+DotlibHandler::put_msg(const char* src_file,
+		       int src_line,
+		       const FileRegion& file_loc,
+		       tMsgType type,
+		       const char* label,
+		       const char* msg)
 {
-  return mParser.msg_mgr();
+  mParser.msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
+}
+
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] file_loc ファイル位置
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
+void
+DotlibHandler::put_msg(const char* src_file,
+		       int src_line,
+		       const FileRegion& file_loc,
+		       tMsgType type,
+		       const char* label,
+		       const string& msg)
+{
+  mParser.msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 // @brief デバッグモードの時に true を返す．
@@ -127,19 +157,13 @@ DotlibHandler::debug()
   return mParser.debug();
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス Token
-//////////////////////////////////////////////////////////////////////
-
-// @relates Token
-// @brief 内容をストリームに出力する．
+// @brief tTokenType 内容をストリームに出力する．
 ostream&
 operator<<(ostream& s,
-	   Token token)
+	   tTokenType type)
 {
   const char* type_str = NULL;
-  switch ( token.type() ) {
+  switch ( type ) {
   case COLON:      type_str = "':'"; break;
   case SEMI:       type_str = "';'"; break;
   case COMMA:      type_str = "','"; break;
@@ -156,16 +180,12 @@ operator<<(ostream& s,
   case SYMBOL:     type_str = "SYMBOL"; break;
   case EXPRESSION: type_str = "EXPRESSION"; break;
   case NL:         type_str = "new-line"; break;
-  case ERROR :     assert_not_reached(__FILE__, __LINE__);
-  case END:        assert_not_reached(__FILE__, __LINE__);
+  case ERROR :     type_str = "error"; break;
+  case END:        type_str = "end-of-file"; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
   }
   s << type_str;
-  if ( token.type() == INT_NUM ||
-       token.type() == FLOAT_NUM ||
-       token.type() == SYMBOL ) {
-    s << "(" << token.value() << ")";
-  }
-
   return s;
 }
 

@@ -41,10 +41,18 @@ public:
 
   /// @brief 属性値を読み込む．
   /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] attr_loc ファイル上の位置
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(Token attr_token);
+  read_attr(const string& attr_name,
+	    const FileRegion& attr_loc);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // GroupHandler の関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ハンドラの登録を行う．
   /// @param[in] attr_name 属性名
@@ -87,12 +95,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief group statement の最初に呼ばれる関数
-  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value_list 値を表すトークンのリスト
   virtual
   bool
-  begin_group(Token attr_token,
-	      const vector<Token>& value_list);
+  begin_group(const string& attr_name,
+	      const FileRegion& attr_loc,
+	      const vector<const PtValue*>& value_list);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual

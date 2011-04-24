@@ -10,6 +10,8 @@
 #include "ExprHandler.h"
 #include "DotlibParser.h"
 #include "GroupHandler.h"
+#include "PtMgr.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -23,7 +25,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @param[in] parent 親のハンドラ
 ExprHandler::ExprHandler(DotlibParser& parser,
 			 GroupHandler* parent) :
-  DotlibHandler(parser, parent)
+  DotlibHandler(parser, parent),
+  mUngetType(ERROR)
 {
 }
 
@@ -33,120 +36,143 @@ ExprHandler::~ExprHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] attr_token 属性名を表すトークン
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-ExprHandler::read_attr(Token attr_token)
+ExprHandler::read_attr(const string& attr_name,
+		       const FileRegion& attr_loc)
 {
   if ( !expect(COLON) ) {
     return false;
   }
 
-  PtNode* expr_node = read_expr(SEMI);
+  PtValue* expr = read_expr(SEMI);
 
   if ( debug() ) {
-    cout << attr_token << " : " << endl;
+    cout << attr_name << " : " << expr << endl;
   }
 
-  PtNode* node = new_ptnode(attr_token, Token(EXPRESSION));
-  node->add_child(expr_node);
-  parent()->pt_node()->add_child(node);
+  parent()->pt_node()->add_value(attr_name, attr_loc, expr);
 
   return expect_nl();
 }
 
 // @brief primary を読み込む．
-PtNode*
+PtValue*
 ExprHandler::read_primary()
 {
-  Token token = parser().read_token();
-  if ( token.type() == LP ) {
+  tTokenType type = parser().read_token();
+  if ( type == LP ) {
     return read_expr(RP);
   }
-  if ( token.type() == SYMBOL ) {
-    string name = token.value();
+  FileRegion loc = parser().cur_loc();
+  if ( type == SYMBOL ) {
+    string name = parser().cur_string();
     if ( name != "VDD" && name != "VSS" && name != "VCC" ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
-			kMsgError,
-			"DOTLIBPARSER",
-			"Syntax error. "
-			"Only 'VDD', 'VSS', and 'VCC' are allowed.");
+      put_msg(__FILE__, __LINE__, loc,
+	      kMsgError,
+	      "DOTLIB_PARSER",
+	      "Syntax error. "
+	      "Only 'VDD', 'VSS', and 'VCC' are allowed.");
       return NULL;
     }
+    return ptmgr().new_value(name, loc);
   }
-  else if ( token.type() != FLOAT_NUM && token.type() != INT_NUM ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
-		      kMsgError,
-		      "DOTLIBPARSER",
-		      "Syntax error. number is expected.");
-    return NULL;
+  if ( type == FLOAT_NUM || type == INT_NUM ) {
+    return ptmgr().new_value(parser().cur_float(), loc);
   }
-  return new_ptnode(token, Token(EXPRESSION));
+
+  put_msg(__FILE__, __LINE__, loc,
+	  kMsgError,
+	  "DOTLIB_PARSER",
+	  "Syntax error. number is expected.");
+  return NULL;
 }
 
 // @brief prudct を読み込む．
-PtNode*
+PtValue*
 ExprHandler::read_product()
 {
-  for ( ; ; ) {
-    PtNode* opr1 = read_primary();
-    if ( opr1 == NULL ) {
-      return NULL;
-    }
+  PtValue* opr1 = read_primary();
+  if ( opr1 == NULL ) {
+    return NULL;
+  }
 
-    Token token = parser().read_token();
-    if ( token.type() == MULT || token.type() == DIV ) {
-      PtNode* opr2 = read_primary();
+  for ( ; ; ) {
+    tTokenType type = parser().read_token();
+    if ( type == MULT || type == DIV ) {
+      PtValue* opr2 = read_primary();
       if ( opr2 == NULL ) {
 	return NULL;
       }
-
-      PtNode* node = new_ptnode(token, Token(EXPRESSION));
-      node->add_child(opr1);
-      node->add_child(opr2);
-      return node;
+      opr1 = ptmgr().new_value(type, opr1, opr2);
     }
     else {
       // token を戻す．
-      parser().unget_token(token);
+      mUngetType = type;
+      mUngetLoc = parser().cur_loc();
       return opr1;
     }
   }
 }
 
 // @brief expression を読み込む．
-PtNode*
+PtValue*
 ExprHandler::read_expr(tTokenType end_marker)
 {
-  for ( ; ; ) {
-    PtNode* opr1 = read_product();
-    if ( opr1 == NULL ) {
-      return NULL;
-    }
+  // ここだけ mUngetType, mUngetLoc を考慮する必要があるので
+  // parser().read_token(), parser().cur_loc() を読んではいけない．
 
-    Token token = parser().read_token();
-    if ( token.type() == end_marker ) {
+  PtValue* opr1 = read_product();
+  if ( opr1 == NULL ) {
+    return NULL;
+  }
+  for ( ; ; ) {
+    tTokenType type = read_token();
+    if ( type == end_marker ) {
       return opr1;
     }
-    else if ( token.type() == PLUS || token.type() == MINUS ) {
-      PtNode* opr2 = read_product();
+    if ( type == PLUS || type == MINUS ) {
+      PtValue* opr2 = read_product();
       if ( opr2 == NULL ) {
 	return NULL;
       }
 
-      PtNode* node = new_ptnode(token, Token(EXPRESSION));
-      node->add_child(opr1);
-      node->add_child(opr2);
-      return node;
+      opr1 = ptmgr().new_value(type, opr1, opr2);
     }
     else {
-      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
-			kMsgError,
-			"DOTLIBPARSER",
-			"Syntax error.");
+      put_msg(__FILE__, __LINE__, cur_loc(),
+	      kMsgError,
+	      "DOTLIB_PARSER",
+	      "Syntax error.");
       return NULL;
     }
   }
+}
+
+// @brief トークンを読み込む．
+tTokenType
+ExprHandler::read_token()
+{
+  if ( mUngetType != ERROR ) {
+    tTokenType ans = mUngetType;
+    mCurLoc = mUngetLoc;
+    mUngetType = ERROR;
+    return ans;
+  }
+  else {
+    tTokenType ans = parser().read_token();
+    mCurLoc = parser().cur_loc();
+    return ans;
+  }
+}
+
+// @brief 直前に読み込んだトークンの位置を返す．
+FileRegion
+ExprHandler::cur_loc()
+{
+  return mCurLoc;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

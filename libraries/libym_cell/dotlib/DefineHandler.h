@@ -42,11 +42,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性値を読み込む．
-  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(Token attr_token);
+  read_attr(const string& attr_name,
+	    const FileRegion& attr_loc);
 
 };
 

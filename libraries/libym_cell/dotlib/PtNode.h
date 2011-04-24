@@ -43,6 +43,26 @@ public:
   void
   add_child(PtNode* node);
 
+  /// @brief 値を追加する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値
+  virtual
+  void
+  add_value(const string& attr_name,
+	    const FileRegion& attr_loc,
+	    const PtValue* value);
+
+  /// @brief 値のリストを追加する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value_list 値のリスト
+  virtual
+  void
+  add_value(const string& attr_name,
+	    const FileRegion& attr_loc,
+	    const vector<const PtValue*>& value_list);
+
 
 public:
   //////////////////////////////////////////////////////////////////////

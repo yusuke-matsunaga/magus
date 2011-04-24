@@ -39,11 +39,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief group statement の最初に呼ばれる関数
-  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value_list 値を表すトークンのリスト
   virtual
   bool
-  begin_group(Token attr_token,
+  begin_group(const string& attr_name,
+	      const FileRegion& attr_loc,
 	      const vector<Token>& value_list);
 
   /// @brief group statement の最後に呼ばれる関数

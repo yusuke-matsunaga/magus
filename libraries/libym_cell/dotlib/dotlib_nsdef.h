@@ -69,12 +69,19 @@ enum tTokenType {
   END
 };
 
+// @brief tTokenType 内容をストリームに出力する．
+ostream&
+operator<<(ostream& s,
+	   tTokenType type);
+
 // クラス名の前方宣言
 class DotlibParser;
 class DotlibLex;
 class DotlibHandler;
 class GroupHandler;
+class PtMgr;
 class PtNode;
+class PtValue;
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

@@ -9,6 +9,8 @@
 
 #include "GroupHandler.h"
 #include "DotlibParser.h"
+#include "PtMgr.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -32,21 +34,23 @@ GroupHandler::~GroupHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] attr_token 属性名を表すトークン
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-GroupHandler::read_attr(Token attr_token)
+GroupHandler::read_attr(const string& attr_name,
+			const FileRegion& attr_loc)
 {
-  vector<Token> value_list;
+  vector<const PtValue*> value_list;
 
   if ( !parse_complex(value_list) ) {
     return false;
   }
 
   if ( debug() ) {
-    cout << attr_token << "( ";
+    cout << attr_name << "( ";
     const char* comma = "";
-    for (vector<Token>::const_iterator p = value_list.begin();
+    for (vector<const PtValue*>::const_iterator p = value_list.begin();
 	 p != value_list.end(); ++ p) {
       cout << comma << *p;
       comma = ", ";
@@ -54,7 +58,7 @@ GroupHandler::read_attr(Token attr_token)
     cout << " ) {" << endl;
   }
 
-  if ( !begin_group(attr_token, value_list) ) {
+  if ( !begin_group(attr_name, attr_loc, value_list) ) {
     return false;
   }
 
@@ -63,33 +67,34 @@ GroupHandler::read_attr(Token attr_token)
   }
 
   for ( ; ; ) {
-    Token token = parser().read_token();
-    if ( token.type() == NL ) {
+    tTokenType type = parser().read_token();
+    if ( type == NL ) {
       continue;
     }
-    if ( token.type() == RCB ) {
+    if ( type == RCB ) {
       break;
     }
-    if ( token.type() != SYMBOL ) {
-      msg_mgr().put_msg(__FILE__, __LINE__, parser().cur_loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			"string value is expected.");
+    if ( type != SYMBOL ) {
+      put_msg(__FILE__, __LINE__, parser().cur_loc(),
+	      kMsgError,
+	      "DOTLIB_PARSER",
+	      "string value is expected.");
       return false;
     }
-    hash_map<string, DotlibHandler*>::const_iterator p
-      = mHandlerMap.find(token.value());
+    string name = parser().cur_string();
+    FileRegion loc = parser().cur_loc();
+    hash_map<string, DotlibHandler*>::const_iterator p = mHandlerMap.find(name);
     if ( p == mHandlerMap.end() ) {
       ostringstream buf;
-      buf << token.value() << ": unknown keyword.";
-      msg_mgr().put_msg(__FILE__, __LINE__, token.loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			buf.str());
+      buf << name << ": unknown keyword.";
+      put_msg(__FILE__, __LINE__, loc,
+	      kMsgError,
+	      "DOTLIB_PARSER",
+	      buf.str());
       return false;
     }
     DotlibHandler* handler = p->second;
-    if ( !handler->read_attr(token) ) {
+    if ( !handler->read_attr(name, loc) ) {
       return false;
     }
   }
@@ -122,8 +127,7 @@ GroupHandler::reg_handler(const string& attr_name,
 DotlibHandler*
 GroupHandler::find_handler(const string& attr_name)
 {
-  hash_map<string, DotlibHandler*>::const_iterator p
-    = mHandlerMap.find(attr_name);
+  hash_map<string, DotlibHandler*>::const_iterator p = mHandlerMap.find(attr_name);
   if ( p == mHandlerMap.end() ) {
     return NULL;
   }
@@ -147,13 +151,15 @@ GroupHandler::set_pt_node(PtNode* node)
 }
 
 // @brief group statement の最初に呼ばれる関数
-// @param[in] attr_token 属性名を表すトークン
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-GroupHandler::begin_group(Token attr_token,
-			  const vector<Token>& value_list)
+GroupHandler::begin_group(const string& attr_name,
+			  const FileRegion& attr_loc,
+			  const vector<const PtValue*>& value_list)
 {
-  PtNode* node = new_ptnode(attr_token, value_list);
+  PtNode* node = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
   set_pt_node(node);
   parent()->pt_node()->add_child(node);
 

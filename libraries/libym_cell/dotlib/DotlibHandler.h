@@ -10,7 +10,6 @@
 
 
 #include "dotlib_nsdef.h"
-#include "PtNode.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -42,10 +41,12 @@ public:
 
   /// @brief 属性値を読み込む．
   /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(Token attr_name) = 0;
+  read_attr(const string& attr_name,
+	    const FileRegion& attr_loc) = 0;
 
 
 public:
@@ -53,29 +54,15 @@ public:
   // 派生クラスが用いる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief PtNode を生成する．
-  /// @param[in] attr_token 属性名を表すトークン
-  /// @param[in] value_token 値を表すトークン
-  PtNode*
-  new_ptnode(Token attr_token,
-	     Token value_token);
-
-  /// @brief PtNode を生成する．
-  /// @param[in] attr_token 属性名を表すトークン
-  /// @param[in] value_list 値を表すトークンのリスト
-  PtNode*
-  new_ptnode(Token attr_token,
-	     const vector<Token>& value_list);
-
   /// @brief group attribute 用のパースを行う．
   /// @param[out] value_list 読み込んだトークンを格納するリスト
   bool
-  parse_complex(vector<Token>& value_list);
+  parse_complex(vector<const PtValue*>& value_list);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
-  /// @param[in] type 要求するトークンの型
+  /// @param[in] req_type 要求するトークンの型
   bool
-  expect(tTokenType type);
+  expect(tTokenType req_type);
 
   /// @brief 行末まで読み込む．
   bool
@@ -85,13 +72,43 @@ public:
   GroupHandler*
   parent();
 
+  /// @brief PtMgr を得る．
+  PtMgr&
+  ptmgr();
+
   /// @brief パーサーを得る．
   DotlibParser&
   parser();
 
-  /// @brief メッセージ出力管理オブジェクトを得る．
-  MsgMgr&
-  msg_mgr();
+  /// @brief メッセージを出力する．
+  /// @param[in] src_file この関数を読んでいるソースファイル名
+  /// @param[in] src_line この関数を読んでいるソースの行番号
+  /// @param[in] file_loc ファイル位置
+  /// @param[in] type メッセージの種類
+  /// @param[in] label メッセージラベル
+  /// @param[in] body メッセージ本文
+  void
+  put_msg(const char* src_file,
+	  int src_line,
+	  const FileRegion& file_loc,
+	  tMsgType type,
+	  const char* label,
+	  const char* msg);
+
+  /// @brief メッセージを出力する．
+  /// @param[in] src_file この関数を読んでいるソースファイル名
+  /// @param[in] src_line この関数を読んでいるソースの行番号
+  /// @param[in] file_loc ファイル位置
+  /// @param[in] type メッセージの種類
+  /// @param[in] label メッセージラベル
+  /// @param[in] body メッセージ本文
+  void
+  put_msg(const char* src_file,
+	  int src_line,
+	  const FileRegion& file_loc,
+	  tMsgType type,
+	  const char* label,
+	  const string& msg);
 
   /// @brief デバッグモードの時に true を返す．
   bool

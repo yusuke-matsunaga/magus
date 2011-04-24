@@ -34,53 +34,6 @@ public:
   ~CellHandler();
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // DotlibHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 属性値を読み込む．
-  /// @param[in] attr_token 属性名を表すトークン
-  /// @return エラーが起きたら false を返す．
-  virtual
-  bool
-  read_attr(Token attr_token);
-
-  /// @brief ハンドラの登録を行う．
-  /// @param[in] attr_name 属性名
-  /// @param[in] handler 対応付けるハンドラ
-  /// @note エラーが起きたら false を返す．
-  bool
-  reg_handler(const string& attr_name,
-	      DotlibHandler* handler);
-
-  /// @brief ハンドラを取り出す．
-  /// @param[in] attr_name 属性名
-  /// @note なければ NULL を返す．
-  DotlibHandler*
-  find_handler(const string& attr_name);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 他のクラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対応する PtNode を返す．
-  PtNode*
-  pt_node();
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 自身と継承クラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対応する PtNode を設定する．
-  void
-  set_pt_node(PtNode* ndoe);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる仮想関数
@@ -105,11 +58,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ハンドラの連想配列
-  hash_map<string, DotlibHandler*> mHandlerMap;
-
-  // 対応する PtCell
-  PtCell* mPtCell;
+  // 対応する CiCell
+  CiCell* mCell;
 
 };
 

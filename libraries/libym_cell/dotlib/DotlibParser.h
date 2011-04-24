@@ -12,12 +12,10 @@
 
 
 #include "dotlib_nsdef.h"
-#include "Token.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/StrBuff.h"
-#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -57,20 +55,6 @@ public:
   // DotlibHandler から用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief PtNode を生成する．
-  /// @param[in] attr_token 属性名を表すトークン
-  /// @param[in] value_token 値を表すトークン
-  PtNode*
-  new_ptnode(Token attr_token,
-	     Token value_token);
-
-  /// @brief PtNode を生成する．
-  /// @param[in] attr_token 属性名を表すトークン
-  /// @param[in] value_list 値を表すトークンのリスト
-  PtNode*
-  new_ptnode(Token attr_token,
-	     const vector<Token>& value_list);
-
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
   bool
   expect(tTokenType type);
@@ -79,18 +63,25 @@ public:
   bool
   expect_nl();
 
-  /// @brief トークンを一つとってくる．
+  /// @brief トークンを一つ読み込む．
   /// @param[in] symbol_mode 数字も文字とみなすモード
-  Token
+  /// @return トークンの型を返す．
+  tTokenType
   read_token(bool symbol_mode = false);
-
-  /// @brief トークンを戻す．
-  void
-  unget_token(Token token);
 
   /// @brief 直前の read_token() に対応する文字列を返す．
   const char*
   cur_string() const;
+
+  /// @brief 直前の read_token() に対応する整数値を返す．
+  /// @note 型が INT_NUM でなかったときの値は不定
+  int
+  cur_int() const;
+
+  /// @brief 直前の read_token() に対応する実数値を返す．
+  /// @note 型が FLOAT_NUM/INT_NUM でなかったときの値は不定
+  double
+  cur_float() const;
 
   // 現在のファイル位置
   FileRegion
@@ -111,6 +102,36 @@ public:
   /// @brief メッセージ出力管理オブジェクトを返す．
   MsgMgr&
   msg_mgr();
+
+  /// @brief メッセージを出力する．
+  /// @param[in] src_file この関数を読んでいるソースファイル名
+  /// @param[in] src_line この関数を読んでいるソースの行番号
+  /// @param[in] file_loc ファイル位置
+  /// @param[in] type メッセージの種類
+  /// @param[in] label メッセージラベル
+  /// @param[in] body メッセージ本文
+  void
+  put_msg(const char* src_file,
+	  int src_line,
+	  const FileRegion& file_loc,
+	  tMsgType type,
+	  const char* label,
+	  const char* msg);
+
+  /// @brief メッセージを出力する．
+  /// @param[in] src_file この関数を読んでいるソースファイル名
+  /// @param[in] src_line この関数を読んでいるソースの行番号
+  /// @param[in] file_loc ファイル位置
+  /// @param[in] type メッセージの種類
+  /// @param[in] label メッセージラベル
+  /// @param[in] body メッセージ本文
+  void
+  put_msg(const char* src_file,
+	  int src_line,
+	  const FileRegion& file_loc,
+	  tMsgType type,
+	  const char* label,
+	  const string& msg);
 
   /// @brief デバッグモードの時 true を返す．
   bool
@@ -136,11 +157,6 @@ private:
   void
   init();
 
-  /// @brief トークンを一つとってくる．
-  /// @param[in] symbol_mode 数字も文字とみなすモード
-  tTokenType
-  _read_token(bool symbol_mode = false);
-
   /// @brief c が文字の時に true を返す．
   /// @note mSymbolMode が true なら数字も文字とみなす．
   bool
@@ -162,9 +178,6 @@ private:
 
   // メッセージを管理するオブジェクト
   MsgMgr mMsgMgr;
-
-  // PtNode 用のメモリアロケータ
-  SimpleAlloc mAlloc;
 
   // library グループを処理するハンドラ
   LibraryHandler* mLibraryHandler;
@@ -207,9 +220,6 @@ private:
 
   // 現在のコラム位置
   int mCurColumn;
-
-  // 読みもどしたトークン
-  Token mUngetToken;
 
 };
 

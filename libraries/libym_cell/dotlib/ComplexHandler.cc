@@ -10,6 +10,7 @@
 #include "ComplexHandler.h"
 #include "DotlibParser.h"
 #include "GroupHandler.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -33,21 +34,23 @@ ComplexHandler::~ComplexHandler()
 }
 
 // @brief 構文要素を処理する．
-// @param[in] attr_token 属性名を表すトークン
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-ComplexHandler::read_attr(Token attr_token)
+ComplexHandler::read_attr(const string& attr_name,
+			  const FileRegion& attr_loc)
 {
-  vector<Token> value_list;
+  vector<const PtValue*> value_list;
 
   if ( !parse_complex(value_list) ) {
     return false;
   }
 
   if ( debug() ) {
-    cout << attr_token << " (";
+    cout << attr_name << " (";
     const char* comma = "";
-    for (vector<Token>::const_iterator p = value_list.begin();
+    for (vector<const PtValue*>::const_iterator p = value_list.begin();
 	 p != value_list.end(); ++ p) {
       cout << comma << *p;
       comma = ", ";
@@ -55,8 +58,7 @@ ComplexHandler::read_attr(Token attr_token)
     cout << ")" << endl;
   }
 
-  PtNode* node = new_ptnode(attr_token, value_list);
-  parent()->pt_node()->add_child(node);
+  parent()->pt_node()->add_value(attr_name, attr_loc, value_list);
 
   return expect_nl();
 }
