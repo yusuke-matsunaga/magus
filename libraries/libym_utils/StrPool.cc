@@ -116,12 +116,24 @@ StrPool::alloc_table(ymuint32 new_size)
 // ShString
 //////////////////////////////////////////////////////////////////////
 
+BEGIN_NONAMESPACE
+
+StrPool thePool;
+
+END_NONAMESPACE
+
 // 共有文字列を作ってセットする．
 void
 ShString::set(const char* str)
 {
-  static StrPool thePool;
   mPtr = thePool.reg(str);
+}
+
+// @brief ShString 関連でアロケートされたメモリサイズ
+ymuint
+ShString::allocated_size()
+{
+  return thePool.accum_alloc_size();
 }
 
 // ShString 用ストリーム出力演算子

@@ -16,8 +16,6 @@
 
 BEGIN_NAMESPACE_YM
 
-class StrPool;
-
 //////////////////////////////////////////////////////////////////////
 /// @class ShString ShString.h <ym_utils/ShString.h>
 /// @ingroup ShStringGroup
@@ -81,6 +79,11 @@ public:
   /// @brief ハッシュ用のキーを返す．
   size_t
   hash() const;
+
+  /// @brief ShString 関連でアロケートされたメモリサイズ
+  static
+  ymuint
+  allocated_size();
 
 
 private:
