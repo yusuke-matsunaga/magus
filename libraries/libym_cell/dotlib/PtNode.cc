@@ -211,10 +211,10 @@ PtGroupNode::~PtGroupNode()
 void
 PtGroupNode::add_child(PtNode* node)
 {
-#if 1
+#if 0
   mChildList.push_back(node);
 #endif
-#if 1
+#if 0
   ShString attr_name = node->attr_name();
   if ( mChildMap.count(attr_name) == 0 ) {
     mChildMap.insert(make_pair(attr_name, vector<PtNode*>(1, node)));
@@ -254,7 +254,7 @@ PtGroupNode::child(ymuint pos) const
 ymuint
 PtGroupNode::child_attr_num() const
 {
-#if 1
+#if 0
   return mAttrList.size();
 #else
   return 0;
@@ -266,7 +266,7 @@ PtGroupNode::child_attr_num() const
 ShString
 PtGroupNode::child_attr_name(ymuint pos) const
 {
-#if 1
+#if 0
   assert_cond( pos < child_attr_num(), __FILE__, __LINE__);
   return mAttrList[pos];
 #else
@@ -280,7 +280,7 @@ PtGroupNode::child_attr_name(ymuint pos) const
 ymuint
 PtGroupNode::child_num(ShString attr_name) const
 {
-#if 1
+#if 0
   hash_map<ShString, vector<PtNode*> >::const_iterator p
     = mChildMap.find(attr_name);
   const vector<PtNode*>& child_list = p->second;
@@ -297,7 +297,7 @@ const PtNode*
 PtGroupNode::child(ShString attr_name,
 		   ymuint pos) const
 {
-#if 1
+#if 0
   hash_map<ShString, vector<PtNode*> >::const_iterator p
     = mChildMap.find(attr_name);
   const vector<PtNode*>& child_list = p->second;

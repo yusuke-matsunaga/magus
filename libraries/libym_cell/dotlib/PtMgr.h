@@ -104,6 +104,9 @@ public:
 	  PtValue* opr1,
 	  PtValue* opr2);
 
+  void
+  show_stats();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -113,6 +116,13 @@ private:
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
+  ymuint32 mSimpleNum;
+  ymuint32 mComplexNum;
+  ymuint32 mGroupNum;
+  ymuint32 mIntNum;
+  ymuint32 mFloatNum;
+  ymuint32 mStrNum;
+  ymuint32 mOprNum;
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

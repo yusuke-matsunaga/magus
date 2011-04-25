@@ -170,7 +170,7 @@ GroupHandler::begin_group(ShString attr_name,
 			  const FileRegion& attr_loc,
 			  const vector<const PtValue*>& value_list)
 {
-#if 1
+#if 0
   mPtNode = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
   parent()->pt_node()->add_child(mPtNode);
 #endif

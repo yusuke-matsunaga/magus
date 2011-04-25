@@ -25,6 +25,13 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 PtMgr::PtMgr() :
   mAlloc(4096)
 {
+  mSimpleNum = 0;
+  mComplexNum = 0;
+  mGroupNum = 0;
+  mIntNum = 0;
+  mFloatNum = 0;
+  mStrNum = 0;
+  mOprNum = 0;
 }
 
 // @brief デストラクタ
@@ -49,6 +56,7 @@ PtMgr::new_ptsimple(ShString attr_name,
 		    const FileRegion& attr_loc,
 		    const PtValue* value)
 {
+  ++ mSimpleNum;
   void* p = mAlloc.get_memory(sizeof(PtSimpleNode));
   return new (p) PtSimpleNode(attr_name, attr_loc, value);
 }
@@ -62,6 +70,7 @@ PtMgr::new_ptcomplex(ShString attr_name,
 		     const FileRegion& attr_loc,
 		     const vector<const PtValue*>& value_list)
 {
+  ++ mComplexNum;
   void* p = mAlloc.get_memory(sizeof(PtComplexNode));
   return new (p) PtComplexNode(attr_name, attr_loc, value_list);
 }
@@ -75,6 +84,7 @@ PtMgr::new_ptgroup(ShString attr_name,
 		   const FileRegion& attr_loc,
 		   const vector<const PtValue*>& value_list)
 {
+  ++ mGroupNum;
   void* p = mAlloc.get_memory(sizeof(PtGroupNode));
   return new (p) PtGroupNode(attr_name, attr_loc, value_list);
 }
@@ -99,6 +109,7 @@ PtValue*
 PtMgr::new_int(int value,
 	       const FileRegion& loc)
 {
+  ++ mIntNum;
   void* p = mAlloc.get_memory(sizeof(PtInt));
   return new (p) PtInt(value, loc);
 }
@@ -110,6 +121,7 @@ PtValue*
 PtMgr::new_float(double value,
 		 const FileRegion& loc)
 {
+  ++ mFloatNum;
   void* p = mAlloc.get_memory(sizeof(PtFloat));
   return new (p) PtFloat(value, loc);
 }
@@ -121,6 +133,7 @@ PtValue*
 PtMgr::new_string(ShString value,
 		  const FileRegion& loc)
 {
+  ++ mStrNum;
   void* p = mAlloc.get_memory(sizeof(PtString));
   return new (p) PtString(value, loc);
 }
@@ -133,8 +146,41 @@ PtMgr::new_opr(tTokenType type,
 		 PtValue* opr1,
 		 PtValue* opr2)
 {
+  ++ mOprNum;
   void* p = mAlloc.get_memory(sizeof(PtOpr));
   return new (p) PtOpr(type, opr1, opr2);
+}
+
+void
+PtMgr::show_stats()
+{
+  cout << "PtSimple:     " << setw(7) << mSimpleNum
+       << " x " << setw(3) << sizeof(PtSimpleNode)
+       << " = " << setw(10) << mSimpleNum * sizeof(PtSimpleNode) << endl
+       << "PtComplex:    " << setw(7) << mComplexNum
+       << " x " << setw(3) << sizeof(PtComplexNode)
+       << " = " << setw(10) << mComplexNum * sizeof(PtComplexNode) << endl
+       << "PtGroup:      " << setw(7) << mGroupNum
+       << " x " << setw(3) << sizeof(PtGroupNode)
+       << " = " << setw(10) << mGroupNum * sizeof(PtGroupNode) << endl
+       << "PtInt:        " << setw(7) << mIntNum
+       << " x " << setw(3) << sizeof(PtInt)
+       << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl
+       << "PtFloat:      " << setw(7) << mFloatNum
+       << " x " << setw(3) << sizeof(PtFloat)
+       << " = " << setw(10) << mFloatNum * sizeof(PtFloat) << endl
+       << "PtString:     " << setw(7) << mStrNum
+       << " x " << setw(3) << sizeof(PtString)
+       << " = " << setw(10) << mStrNum * sizeof(PtString) << endl
+       << "PtOpr:        " << setw(7) << mOprNum
+       << " x " << setw(3) << sizeof(PtOpr)
+       << " = " << setw(10) << mOprNum * sizeof(PtOpr) << endl
+       << "Total memory:               = "
+       << setw(10) << mAlloc.used_size() << endl
+       << "Allocated memory:           = "
+       << setw(10) << mAlloc.allocated_size() << endl
+       << "ShString:                   = "
+       << setw(10) << ShString::allocated_size() << endl;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

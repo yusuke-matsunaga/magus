@@ -57,7 +57,7 @@ ComplexHandler::read_attr(ShString attr_name,
     cout << ")" << endl;
   }
 
-#if 1
+#if 0
   PtNode* node = ptmgr().new_ptcomplex(attr_name, attr_loc, value_list);
   parent()->pt_node()->add_child(node);
 #endif

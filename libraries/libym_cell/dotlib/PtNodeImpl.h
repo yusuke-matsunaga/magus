@@ -201,12 +201,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-#if 1
+#if 0
   // 子供のノードのリスト
   vector<PtNode*> mChildList;
 #endif
 
-#if 1
+#if 0
   // 属性名のリスト
   vector<ShString> mAttrList;
 

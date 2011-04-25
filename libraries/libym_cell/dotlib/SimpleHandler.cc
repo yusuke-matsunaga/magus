@@ -77,7 +77,7 @@ SimpleHandler::read_attr(ShString attr_name,
     return false;
   }
 
-#if 1
+#if 0
   PtNode* node = ptmgr().new_ptsimple(attr_name, attr_loc, value);
   parent()->pt_node()->add_child(node);
 #endif
