@@ -150,13 +150,6 @@ GroupHandler::pt_node()
   return mPtNode;
 }
 
-// @brief 対応する PtNode を設定する．
-void
-GroupHandler::set_pt_node(PtNode* node)
-{
-  mPtNode = node;
-}
-
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
@@ -166,9 +159,8 @@ GroupHandler::begin_group(const string& attr_name,
 			  const FileRegion& attr_loc,
 			  const vector<const PtValue*>& value_list)
 {
-  PtNode* node = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
-  set_pt_node(node);
-  parent()->pt_node()->add_child(node);
+  mPtNode = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
+  parent()->pt_node()->add_child(mPtNode);
 
   return true;
 }

@@ -10,6 +10,7 @@
 #include "PtMgr.h"
 #include "PtNode.h"
 #include "PtNodeImpl.h"
+#include "PtCell.h"
 #include "PtValue.h"
 #include "PtValueImpl.h"
 
@@ -76,6 +77,19 @@ PtMgr::new_ptgroup(const string& attr_name,
 {
   void* p = mAlloc.get_memory(sizeof(PtGroupNode));
   return new (p) PtGroupNode(attr_name, attr_loc, value_list);
+}
+
+// @brief PtCell を生成する．
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value 値
+PtCell*
+PtMgr::new_ptcell(const string& attr_name,
+		  const FileRegion& attr_loc,
+		  const PtValue* value)
+{
+  void* p = mAlloc.get_memory(sizeof(PtCell));
+  return new (p) PtCell(attr_name, attr_loc, value);
 }
 
 // @brief 整数値を表す PtValue を生成する．

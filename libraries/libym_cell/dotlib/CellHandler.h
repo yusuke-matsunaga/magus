@@ -24,14 +24,23 @@ class CellHandler :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  CellHandler(DotlibParser& parser,
-	      GroupHandler* parent);
+  CellHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
   ~CellHandler();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 他のクラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 対応する PtNode を返す．
+  virtual
+  PtNode*
+  pt_node();
 
 
 private:
@@ -40,12 +49,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief group statement の最初に呼ばれる関数
-  /// @param[in] attr_token 属性名を表すトークン
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value_list 値を表すトークンのリスト
   virtual
   bool
-  begin_group(Token attr_token,
-	      const vector<Token>& value_list);
+  begin_group(const string& attr_name,
+	      const FileRegion& attr_loc,
+	      const vector<const PtValue*>& value_list);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual
@@ -58,8 +69,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 対応する CiCell
-  CiCell* mCell;
+  // 対応する PtCell;
+  PtCell* mCell;
 
 };
 

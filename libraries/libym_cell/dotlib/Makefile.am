@@ -24,7 +24,6 @@ libym_cell_dotlib_la_LDFLAGS =
 
 libym_cell_dotlib_la_SOURCES = \
 	dotlib_nsdef.h \
-	Token.h \
 	DotlibParser.h \
 	DotlibParser.cc \
 	DotlibHandler.h \
@@ -41,6 +40,8 @@ libym_cell_dotlib_la_SOURCES = \
 	GroupHandler.cc \
 	LibraryHandler.h \
 	LibraryHandler.cc \
+	CellHandler.h \
+	CellHandler.cc \
 	PtMgr.h \
 	PtMgr.cc \
 	PtValue.h \
@@ -48,6 +49,10 @@ libym_cell_dotlib_la_SOURCES = \
 	PtNode.h \
 	PtNodeImpl.h \
 	PtNode.cc \
+	PtCell.h \
+	PtCell.cc \
+	PtPin.h \
+	PtPin.cc \
 	PtDumper.h \
 	PtDumper.cc \
 	CellDotlibReader.cc

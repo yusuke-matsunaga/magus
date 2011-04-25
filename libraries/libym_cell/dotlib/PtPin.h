@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_PTCELL_H
-#define LIBYM_CELL_DOTLIB_PTCELL_H
+#ifndef LIBYM_CELL_DOTLIB_PTPIN_H
+#define LIBYM_CELL_DOTLIB_PTPIN_H
 
-/// @file libym_cell/dotlib/PtCell.h
-/// @brief PtCell のヘッダファイル
+/// @file libym_cell/dotlib/PtPin.h
+/// @brief PtPin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtCell PtCell.h "PtCell.h"
-/// @brief cell グループを表すパース木の要素
+/// @class PtPin PtPin.h "PtPin.h"
+/// @brief ピンを表す PtNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class PtCell :
+class PtPin :
   public PtNode
 {
   friend class PtMgr;
@@ -26,16 +26,16 @@ class PtCell :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] attr_name 属性名(ここでは cell)
+  /// @param[in] attr_name 属性名(ここでは pin)
   /// @param[in] attr_loc 属性名のファイル上の位置
-  /// @param[in] value 値(ここではセル名)
-  PtCell(const string& attr_name,
-	 const FileRegion& attr_loc,
-	 const PtValue* value);
+  /// @param[in] value 値(ここではピン名)
+  PtPin(const string& attr_name,
+	const FileRegion& attr_loc,
+	const PtValue* value);
 
   /// @brief デストラクタ
   virtual
-  ~PtCell();
+  ~PtPin();
 
 
 public:
@@ -81,17 +81,17 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // PtCell に独自の関数
+  // PtPin に独自の関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief pin グループの数を返す．
+  /// @brief timing グループの数を返す．
   ymuint
-  pin_num() const;
+  timing_num() const;
 
-  /// @brief pin グループのパース木を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
-  const PtPin*
-  pin(ymuint pos) const;
+  /// @brief timingグループのパース木を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < timing_num() )
+  const PtNode*
+  timing(ymuint pos) const;
 
 
 private:
@@ -102,14 +102,14 @@ private:
   // 値(名前)
   const PtValue* mValue;
 
-  // ピンのリスト(配列)
-  vector<const PtPin*> mPinList;
+  // タイミング情報のリスト(配列)
+  vector<const PtNode*> mTimingList;
 
-  // ピン以外の子供のリスト(配列)
+  // タイミング情報以外の子供のリスト(配列)
   vector<const PtNode*> mChildList;
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_PTCELL_H
+#endif // LIBYM_CELL_DOTLIB_PTPIN_H

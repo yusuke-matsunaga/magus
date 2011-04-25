@@ -65,6 +65,15 @@ public:
 	      const FileRegion& attr_loc,
 	      const vector<const PtValue*>& value_list);
 
+  /// @brief PtCell を生成する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値
+  PtCell*
+  new_ptcell(const string& attr_name,
+	     const FileRegion& attr_loc,
+	     const PtValue* value);
+
   /// @brief 整数値を表す PtValue を生成する．
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置

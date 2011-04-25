@@ -32,9 +32,8 @@ DotlibMgr::~DotlibMgr()
 const CellLibrary*
 DotlibMgr::gen_library(const PtNode* root)
 {
-  Token root_attr = root->attr_token();
-  assert_cond( root_attr.type() == SYMBOL, __FILE__, __LINE__);
-  assert_cond( root_attr.value() == "library", __FILE__, __LINE__);
+  string root_attr = root->attr_name();
+  assert_cond( root_attr == "library", __FILE__, __LINE__);
 
   if ( root->value_num() != 1 ) {
     // エラー
@@ -44,8 +43,9 @@ DotlibMgr::gen_library(const PtNode* root)
 	    "'library' attribute require only one value.");
     return NULL;
   }
-  Token root_value = root->value(0);
-  if ( root_value.type() != SYMBOL ) {
+
+  const PtNode* root_value = root->value(0);
+  if ( root_value->type() != SYMBOL ) {
     put_msg(__FILE__, __LINE__, root_value.loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -53,12 +53,12 @@ DotlibMgr::gen_library(const PtNode* root)
     return NULL;
   }
 
-  CiLibrary* library = new CiLibrary(root_value.value());
+  CiLibrary* library = new CiLibrary(root_value->string_value());
 
   ymuint n = root->child_num();
   for (ymuint i = 0; i < n; ++ i) {
     const PtNode* node = root->child(i);
-    Token attr = node->attr_token();
+    string attr = node->attr_name();
   }
 }
 

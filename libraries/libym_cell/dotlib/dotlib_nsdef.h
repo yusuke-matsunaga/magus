@@ -81,6 +81,8 @@ class DotlibHandler;
 class GroupHandler;
 class PtMgr;
 class PtNode;
+class PtCell;
+class PtPin;
 class PtValue;
 
 END_NAMESPACE_YM_CELL_DOTLIB
