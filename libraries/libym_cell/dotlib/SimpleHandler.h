@@ -24,10 +24,8 @@ class SimpleHandler :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  SimpleHandler(DotlibParser& parser,
-		GroupHandler* parent);
+  SimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -60,41 +58,45 @@ private:
   bool
   symbol_mode();
 
-  /// @brief 整数値を読み込んだ時の処理
+  /// @brief 値を読み込んだ時の処理
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
+  /// @note デフォルトの実装ではなにもしないで true を返す．
   virtual
   bool
   read_value(const string& attr_name,
 	     const FileRegion& attr_loc,
-	     int value,
-	     const FileRegion& value_loc) = 0;
+	     const PtValue* value);
 
-  /// @brief 実数値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     double value,
-	     const FileRegion& value_loc) = 0;
+};
 
-  /// @brief 文字列を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
+
+//////////////////////////////////////////////////////////////////////
+/// @class SymSimpleHandler SimpleHandler.h "SimpleHandler.h"
+/// @brief 数字で始まっていても SYMBOL とみなす SimpleHandler
+//////////////////////////////////////////////////////////////////////
+class SymSimpleHandler :
+  public SimpleHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  SymSimpleHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  ~SymSimpleHandler();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // SimpleHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief シンボルモードで read_token() を呼ぶときに true を返す．
   virtual
   bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     const string& value,
-	     const FileRegion& value_loc) = 0;
+  symbol_mode();
 
 };
 
@@ -109,8 +111,7 @@ class IntSimpleHandler :
 public:
 
   /// @brief コンストラクタ
-  IntSimpleHandler(DotlibParser& parser,
-		   GroupHandler* parent);
+  IntSimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   ~IntSimpleHandler();
@@ -121,41 +122,15 @@ private:
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 整数値を読み込んだ時の処理
+  /// @brief 値を読み込んだ時の処理
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
   virtual
   bool
   read_value(const string& attr_name,
 	     const FileRegion& attr_loc,
-	     int value,
-	     const FileRegion& value_loc);
-
-  /// @brief 実数値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     double value,
-	     const FileRegion& value_loc);
-
-  /// @brief 文字列を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     const string& value,
-	     const FileRegion& value_loc);
+	     const PtValue* value);
 
 };
 
@@ -170,8 +145,7 @@ class BoolSimpleHandler :
 public:
 
   /// @brief コンストラクタ
-  BoolSimpleHandler(DotlibParser& parser,
-		    GroupHandler* parent);
+  BoolSimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   ~BoolSimpleHandler();
@@ -182,41 +156,15 @@ private:
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 整数値を読み込んだ時の処理
+  /// @brief 値を読み込んだ時の処理
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
   virtual
   bool
   read_value(const string& attr_name,
 	     const FileRegion& attr_loc,
-	     int value,
-	     const FileRegion& value_loc);
-
-  /// @brief 実数値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     double value,
-	     const FileRegion& value_loc);
-
-  /// @brief 文字列を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     const string& value,
-	     const FileRegion& value_loc);
+	     const PtValue* value);
 
 };
 
@@ -231,8 +179,7 @@ class FloatSimpleHandler :
 public:
 
   /// @brief コンストラクタ
-  FloatSimpleHandler(DotlibParser& parser,
-		     GroupHandler* parent);
+  FloatSimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   ~FloatSimpleHandler();
@@ -243,41 +190,15 @@ private:
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 整数値を読み込んだ時の処理
+  /// @brief 値を読み込んだ時の処理
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
   virtual
   bool
   read_value(const string& attr_name,
 	     const FileRegion& attr_loc,
-	     int value,
-	     const FileRegion& value_loc);
-
-  /// @brief 実数値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     double value,
-	     const FileRegion& value_loc);
-
-  /// @brief 文字列を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     const string& value,
-	     const FileRegion& value_loc);
+	     const PtValue* value);
 
 };
 
@@ -292,8 +213,7 @@ class StrSimpleHandler :
 public:
 
   /// @brief コンストラクタ
-  StrSimpleHandler(DotlibParser& parser,
-		   GroupHandler* parent);
+  StrSimpleHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   ~StrSimpleHandler();
@@ -304,41 +224,15 @@ private:
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 整数値を読み込んだ時の処理
+  /// @brief 値を読み込んだ時の処理
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
   virtual
   bool
   read_value(const string& attr_name,
 	     const FileRegion& attr_loc,
-	     int value,
-	     const FileRegion& value_loc);
-
-  /// @brief 実数値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     double value,
-	     const FileRegion& value_loc);
-
-  /// @brief 文字列を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  /// @param[in] value_loc 値のファイル上の位置
-  virtual
-  bool
-  read_value(const string& attr_name,
-	     const FileRegion& attr_loc,
-	     const string& value,
-	     const FileRegion& value_loc);
+	     const PtValue* value);
 
 };
 

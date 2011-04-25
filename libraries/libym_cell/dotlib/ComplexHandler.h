@@ -24,10 +24,8 @@ class ComplexHandler :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  ComplexHandler(DotlibParser& parser,
-		 GroupHandler* parent);
+  ComplexHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual

@@ -9,6 +9,7 @@
 
 #include "PtDumper.h"
 #include "PtNode.h"
+#include "PtValue.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB

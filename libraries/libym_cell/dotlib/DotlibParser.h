@@ -30,7 +30,8 @@ class DotlibParser
 public:
 
   /// @brief コンストラクタ
-  DotlibParser();
+  /// @param[in] ptmgr パース木を管理するオブジェクト
+  DotlibParser(PtMgr& ptmgr);
 
   /// @brief デストラクタ
   ~DotlibParser();

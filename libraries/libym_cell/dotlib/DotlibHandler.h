@@ -25,8 +25,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
+  /// @param[in] ptmgr パース木を管理するオブジェクト
   /// @param[in] parent 親のハンドラ
   DotlibHandler(DotlibParser& parser,
+		PtMgr& ptmgr,
 		GroupHandler* parent);
 
   /// @brief デストラクタ
@@ -72,13 +74,13 @@ public:
   GroupHandler*
   parent();
 
-  /// @brief PtMgr を得る．
-  PtMgr&
-  ptmgr();
-
   /// @brief パーサーを得る．
   DotlibParser&
   parser();
+
+  /// @brief PtMgr を得る．
+  PtMgr&
+  ptmgr();
 
   /// @brief メッセージを出力する．
   /// @param[in] src_file この関数を読んでいるソースファイル名
@@ -122,6 +124,9 @@ private:
 
   // パーサー
   DotlibParser& mParser;
+
+  // パース木を管理するオブジェクト
+  PtMgr& mPtMgr;
 
   // 親のハンドラ
   GroupHandler* mParent;

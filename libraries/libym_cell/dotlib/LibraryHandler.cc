@@ -12,8 +12,9 @@
 #include "SimpleHandler.h"
 #include "ExprHandler.h"
 #include "ComplexHandler.h"
-
 #include "DefineHandler.h"
+#include "PtMgr.h"
+#include "PtValue.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -23,24 +24,23 @@ BEGIN_NONAMESPACE
 
 inline
 SimpleHandler*
-new_simple(GroupHandler* parent,
-	   bool symbol_mode)
+new_simple(GroupHandler* parent)
 {
-  return new SimpleHandler(parent->parser(), parent, symbol_mode);
+  return new SimpleHandler(parent);
 }
 
 inline
 ComplexHandler*
 new_complex(GroupHandler* parent)
 {
-  return new ComplexHandler(parent->parser(), parent);
+  return new ComplexHandler(parent);
 }
 
 inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GroupHandler(parent->parser(), parent);
+  return new GroupHandler(parent);
 }
 
 DotlibHandler*
@@ -50,7 +50,7 @@ new_ff(GroupHandler* parent)
 
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("clear", simple);
   handler->reg_handler("clear_preset_var1", simple);
   handler->reg_handler("clear_preset_var2", simple);
@@ -68,7 +68,7 @@ new_latch(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("clear", simple);
   handler->reg_handler("clear_preset_var1", simple);
   handler->reg_handler("clear_preset_var2", simple);
@@ -86,7 +86,7 @@ new_leakage_power(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("power_level", simple);
   handler->reg_handler("related_pg_pin", simple);
   handler->reg_handler("when", simple);
@@ -123,7 +123,7 @@ new_internal_power(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("equal_or_opposite_output", simple);
   handler->reg_handler("falling_together_group", simple);
   handler->reg_handler("power_level", simple);
@@ -170,7 +170,7 @@ new_timing(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("edge_rate_sensitivity_f0", simple);
   handler->reg_handler("edge_rate_sensitivity_f1", simple);
   handler->reg_handler("edge_rate_sensitivity_r0", simple);
@@ -247,7 +247,7 @@ new_pin(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("bit_width", simple);
   handler->reg_handler("capacitance", simple);
   handler->reg_handler("clock", simple);
@@ -338,7 +338,7 @@ new_bus(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("bus_type", simple);
 
   // group statements
@@ -353,7 +353,7 @@ new_bundle(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("capacitance", simple);
   handler->reg_handler("direction", simple);
   handler->reg_handler("function", simple);
@@ -385,7 +385,7 @@ new_cell_internal_power(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("related_inputs", simple);
   handler->reg_handler("related_outputs", simple);
 
@@ -403,7 +403,7 @@ new_statetable(GroupHandler* parent)
 
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("table", simple);
 
   return handler;
@@ -439,7 +439,7 @@ new_cell(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("area", simple);
   handler->reg_handler("auxiliary_pad_cell", simple);
   handler->reg_handler("base_name", simple);
@@ -513,7 +513,7 @@ new_input_voltage(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new ExprHandler(parent->parser(), parent);
+  DotlibHandler* simple = new ExprHandler(parent);
   handler->reg_handler("vil", simple);
   handler->reg_handler("vih", simple);
   handler->reg_handler("vimin", simple);
@@ -528,7 +528,7 @@ new_output_voltage(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new ExprHandler(parent->parser(), parent);
+  DotlibHandler* simple = new ExprHandler(parent);
   handler->reg_handler("vol", simple);
   handler->reg_handler("voh", simple);
   handler->reg_handler("vomin", simple);
@@ -543,7 +543,7 @@ new_template(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("variable_1", simple);
   handler->reg_handler("variable_2", simple);
   handler->reg_handler("variable_3", simple);
@@ -566,7 +566,7 @@ new_operating_conditions(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("calc_mode", simple);
   handler->reg_handler("parameter1", simple);
   handler->reg_handler("parameter2", simple);
@@ -591,7 +591,7 @@ new_wire_load(GroupHandler* parent)
   GroupHandler* handler = new_group(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(handler, false);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("area", simple);
   handler->reg_handler("capacitance", simple);
   handler->reg_handler("resistance", simple);
@@ -640,13 +640,15 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parser パーサー
-LibraryHandler::LibraryHandler(DotlibParser& parser) :
-  GroupHandler(parser, NULL)
+// @param[in] ptmgr パース木を管理するオブジェクト
+LibraryHandler::LibraryHandler(DotlibParser& parser,
+			       PtMgr& ptmgr) :
+  GroupHandler(parser, ptmgr)
 {
 
   // simple attributes
-  DotlibHandler* simple = new SimpleHandler(parser, this, false);
-  DotlibHandler* simple2 = new SimpleHandler(parser, this, true);
+  DotlibHandler* simple = new SimpleHandler(this);
+  DotlibHandler* simple2 = new SymSimpleHandler(this);
   reg_handler("bus_naming_style", simple);
   reg_handler("comment", simple);
   reg_handler("current_unit", simple2);
@@ -827,10 +829,10 @@ LibraryHandler::LibraryHandler(DotlibParser& parser) :
   reg_handler("k_volt_wire_res", simple);
 
   // complex attributes
-  DotlibHandler* complex = new ComplexHandler(parser, this);
+  DotlibHandler* complex = new ComplexHandler(this);
   reg_handler("capacitive_load_unit", complex);
   reg_handler("default_part", complex);
-  reg_handler("define", new DefineHandler(parser, this));
+  reg_handler("define", new DefineHandler(this));
   reg_handler("define_cell_area", complex);
   reg_handler("define_group", complex);
   reg_handler("library_features", complex);
@@ -878,35 +880,42 @@ LibraryHandler::~LibraryHandler()
 }
 
 // @brief グループ名を読み込んだ時の処理
-// @param[in] attr_token 属性名を表すトークン
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-LibraryHandler::begin_group(Token attr_token,
-			    const vector<Token>& value_list)
+LibraryHandler::begin_group(const string& attr_name,
+			    const FileRegion& attr_loc,
+			    const vector<const PtValue*>& value_list)
 {
-  assert_cond( attr_token.value() == "library", __FILE__, __LINE__);
+  assert_cond( attr_name == "library", __FILE__, __LINE__);
 
-  if ( value_list.size() != 1 ) {
-    FileRegion loc;
-    if ( value_list.size() > 1 ) {
-      loc = value_list[2].loc();
-    }
-    msg_mgr().put_msg(__FILE__, __LINE__, loc,
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "library statement require only one token");
+  if ( value_list.size() == 0 ) {
+    FileRegion loc = attr_loc;
+    put_msg(__FILE__, __LINE__, loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "library statement requires library name.");
+    return false;
+  }
+  if ( value_list.size() > 1 ) {
+    FileRegion loc = value_list[2]->loc();
+    put_msg(__FILE__, __LINE__, loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "library statement requires only one token");
     return false;
   }
 
-  if ( value_list[0].type() != SYMBOL ) {
-    msg_mgr().put_msg(__FILE__, __LINE__, value_list[0].loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "string type is expected.");
+  if ( value_list[0]->type() != SYMBOL ) {
+    put_msg(__FILE__, __LINE__, value_list[0]->loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "string value is expected.");
     return false;
   }
 
-  set_pt_node( new PtNode(attr_token, value_list) );
+  set_pt_node( ptmgr().new_ptgroup(attr_name, attr_loc, value_list) );
 
   return true;
 }

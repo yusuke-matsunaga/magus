@@ -8,7 +8,10 @@
 
 
 #include "PtMgr.h"
+#include "PtNode.h"
+#include "PtNodeImpl.h"
 #include "PtValue.h"
+#include "PtValueImpl.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -34,6 +37,45 @@ void
 PtMgr::init()
 {
   mAlloc.destroy();
+}
+
+// @brief simple attribute を表す PtNode を生成する．
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value 値
+PtNode*
+PtMgr::new_ptsimple(const string& attr_name,
+		    const FileRegion& attr_loc,
+		    const PtValue* value)
+{
+  void* p = mAlloc.get_memory(sizeof(PtSimpleNode));
+  return new (p) PtSimpleNode(attr_name, attr_loc, value);
+}
+
+// @brief complex attribute を表す PtNode を生成する．
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value_list 値のリスト
+PtNode*
+PtMgr::new_ptcomplex(const string& attr_name,
+		     const FileRegion& attr_loc,
+		     const vector<const PtValue*>& value_list)
+{
+  void* p = mAlloc.get_memory(sizeof(PtComplexNode));
+  return new (p) PtComplexNode(attr_name, attr_loc, value_list);
+}
+
+// @brief group statement を表す PtNode を生成する．
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value_list 値のリスト
+PtNode*
+PtMgr::new_ptgroup(const string& attr_name,
+		   const FileRegion& attr_loc,
+		   const vector<const PtValue*>& value_list)
+{
+  void* p = mAlloc.get_memory(sizeof(PtGroupNode));
+  return new (p) PtGroupNode(attr_name, attr_loc, value_list);
 }
 
 // @brief 整数値を表す PtValue を生成する．
@@ -63,7 +105,7 @@ PtMgr::new_value(double value,
 // @param[in] loc ファイル上の位置
 PtValue*
 PtMgr::new_value(const string& value,
-		 cponst FileRegion& loc)
+		 const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(PtString));
   return new (p) PtString(value, loc);

@@ -25,10 +25,8 @@ class ExprHandler :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  ExprHandler(DotlibParser& parser,
-	      GroupHandler* parent);
+  ExprHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual

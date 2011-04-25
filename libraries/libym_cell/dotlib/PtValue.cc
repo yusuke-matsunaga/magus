@@ -8,6 +8,7 @@
 
 
 #include "PtValue.h"
+#include "PtValueImpl.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -67,66 +68,60 @@ PtValue::opr2() const
 }
 
 
+// @relates PtValue
+// @brief PtValue の内容をストリームに出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] value 値
+ostream&
+operator<<(ostream& s,
+	   const PtValue* value)
+{
+  switch ( value->type() ) {
+  case INT_NUM:
+    s << "int(" << value->int_value() << ")";
+    break;
+
+  case FLOAT_NUM:
+    s << "float(" << value->float_value() << ")";
+    break;
+
+  case SYMBOL:
+    s << "string(" << value->string_value() << ")";
+    break;
+
+  case PLUS:
+    s << "(" << value->opr1() << " + " << value->opr2() << ")";
+    break;
+
+  case MINUS:
+    s << "(" << value->opr1() << " - " << value->opr2() << ")";
+    break;
+
+  case MULT:
+    s << "(" << value->opr1() << " * " << value->opr2() << ")";
+    break;
+
+  case DIV:
+    s << "(" << value->opr1() << " / " << value->opr2() << ")";
+    break;
+
+  default:
+    s << "unknown type";
+    break;
+  }
+  return s;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 /// クラス PtInt
 //////////////////////////////////////////////////////////////////////
-class PtInt :
-  public PtValue
-{
-
-  /// @brief コンストラクタ
-  /// @param[in] value 値
-  /// @param[in] loc ファイル上の位置
-  PtInt(int value,
-	const FileRegion& loc);
-
-  /// @brief デストラクタ
-  ~PtInt();
-
-
-public:
-
-  /// @brief 型を得る．
-  virtual
-  tTokenType
-  type() const;
-
-  /// @brief 式全体のファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-  /// @brief 整数値を返す．
-  /// @note type() が INT_NUM の時のみ意味を持つ．
-  virtual
-  int
-  int_value() const;
-
-  /// @brief 数値を返す．
-  /// @note type() が FLOAT_NUM の時のみ意味を持つ．
-  virtual
-  double
-  float_value() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 値
-  int mValue;
-
-  // ファイル上の位置
-  FileRegion mLoc;
-
-};
 
 // @brief コンストラクタ
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtInt::PtInt(double value,
-		 const FileRegion& loc) :
+PtInt::PtInt(int value,
+	     const FileRegion& loc) :
   mValue(value),
   mLoc(loc)
 {
@@ -141,7 +136,7 @@ PtInt::~PtInt()
 tTokenType
 PtInt::type() const
 {
-  return FLOAT_NUM;
+  return INT_NUM;
 }
 
 // @brief 式全体のファイル上の位置を返す．
@@ -164,58 +159,13 @@ PtInt::int_value() const
 double
 PtInt::float_value() const
 {
-  return stati_cast<double>(mValue);
+  return static_cast<double>(mValue);
 }
 
 
 //////////////////////////////////////////////////////////////////////
 /// クラス PtFloat
 //////////////////////////////////////////////////////////////////////
-class PtFloat :
-  public PtValue
-{
-
-  /// @brief コンストラクタ
-  /// @param[in] value 値
-  /// @param[in] loc ファイル上の位置
-  PtFloat(double value,
-	  const FileRegion& loc);
-
-  /// @brief デストラクタ
-  ~PtFloat();
-
-
-public:
-
-  /// @brief 型を得る．
-  virtual
-  tTokenType
-  type() const;
-
-  /// @brief 式全体のファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-  /// @brief 数値を返す．
-  /// @note type() が FLOAT_NUM の時のみ意味を持つ．
-  virtual
-  double
-  float_value() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 値
-  double mValue;
-
-  // ファイル上の位置
-  FileRegion mLoc;
-
-};
 
 // @brief コンストラクタ
 // @param[in] value 値
@@ -258,51 +208,6 @@ PtFloat::float_value() const
 //////////////////////////////////////////////////////////////////////
 /// クラス PtString
 //////////////////////////////////////////////////////////////////////
-class PtString :
-  public PtValue
-{
-
-  /// @brief コンストラクタ
-  /// @param[in] value 値
-  /// @param[in] loc ファイル上の位置
-  PtString(const string& value,
-	   const FileRegion& loc);
-
-  /// @brief デストラクタ
-  ~PtString();
-
-
-public:
-
-  /// @brief 型を得る．
-  virtual
-  tTokenType
-  type() const;
-
-  /// @brief 式全体のファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-  /// @brief 定数シンボルを返す．
-  /// @note type() が SYMBOL の時のみ意味を持つ．
-  virtual
-  string
-  string_value() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 値
-  string mValue;
-
-  // ファイル上の位置
-  FileRegion mLoc;
-
-};
 
 // @brief コンストラクタ
 // @param[in] value 値
@@ -345,63 +250,6 @@ PtString::string_value() const
 //////////////////////////////////////////////////////////////////////
 // クラス PtOpr
 //////////////////////////////////////////////////////////////////////
-class PtOpr :
-  public PtValue
-{
-public:
-
-  /// @brief 表すコンストラクタ
-  /// @param[in] type 演算子の型
-  /// @param[in] opr1, opr2 オペランド
-  PtOpr(tTokenType type,
-	PtValue* opr1,
-	PtValue* opr2);
-
-  /// @brief デストラクタ
-  virtual
-  ~PtOpr();
-
-
-public:
-
-  /// @brief 型を得る．
-  virtual
-  tTokenType
-  type() const;
-
-  /// @brief 式全体のファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
-  /// @brief 第一オペランドを返す．
-  /// @note type() が演算子の型の時のみ意味を持つ．
-  virtual
-  const PtValue*
-  opr1() const;
-
-  /// @brief 第二オペランドを返す．
-  /// @note type() が演算子の型の時のみ意味を持つ．
-  virtual
-  const PtValue*
-  opr2() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 型
-  tTokenType mType;
-
-  // 第一オペランド
-  const PtValue* mOpr1;
-
-  // 第二オペランド
-  const PtValue* mOpr2;
-
-};
 
 // @brief 表すコンストラクタ
 // @param[in] type 演算子の型

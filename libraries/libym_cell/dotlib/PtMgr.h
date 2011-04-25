@@ -10,6 +10,7 @@
 
 
 #include "dotlib_nsdef.h"
+#include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
 
 
@@ -37,10 +38,28 @@ public:
   void
   init();
 
-  /// @brief PtGroup を生成する．
+  /// @brief simple attribute を表す PtNode を生成する．
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value_list 値を表すトークンのリスト
+  /// @param[in] value 値
+  PtNode*
+  new_ptsimple(const string& attr_name,
+	       const FileRegion& attr_loc,
+	       const PtValue* value);
+
+  /// @brief complex attribute を表す PtNode を生成する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value_list 値のリスト
+  PtNode*
+  new_ptcomplex(const string& attr_name,
+		const FileRegion& attr_loc,
+		const vector<const PtValue*>& value_list);
+
+  /// @brief group statement を表す PtNode を生成する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value_list 値のリスト
   PtNode*
   new_ptgroup(const string& attr_name,
 	      const FileRegion& attr_loc,

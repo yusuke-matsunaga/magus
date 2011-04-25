@@ -19,12 +19,19 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // クラス GroupHandler
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-// @param[in] parser パーサー
+// @brief 親がある場合のコンストラクタ
 // @param[in] parent 親のハンドラ
+GroupHandler::GroupHandler(GroupHandler* parent) :
+  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
+{
+}
+
+// @brief 親がない場合のコンストラクタ
+// @param[in] parser パーサー
+// @param[in] ptmgr パース木を管理するオブジェクト
 GroupHandler::GroupHandler(DotlibParser& parser,
-			   GroupHandler* parent) :
-  DotlibHandler(parser, parent)
+			   PtMgr& ptmgr) :
+  DotlibHandler(parser, ptmgr, NULL)
 {
 }
 

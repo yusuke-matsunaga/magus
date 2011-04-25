@@ -26,10 +26,8 @@ class DefineHandler :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parser パーサー
   /// @param[in] parent 親のハンドラ
-  DefineHandler(DotlibParser& parser,
-		GroupHandler* parent);
+  DefineHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual

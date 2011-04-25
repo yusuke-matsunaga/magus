@@ -16,9 +16,10 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-// コンストラクタ
-DotlibParser::DotlibParser() :
-  mLibraryHandler(new LibraryHandler(*this))
+// @brief コンストラクタ
+// @param[in] ptmgr パース木を管理するオブジェクト
+DotlibParser::DotlibParser(PtMgr& ptmgr) :
+  mLibraryHandler(new LibraryHandler(*this, ptmgr))
 {
   init();
 }
@@ -27,6 +28,8 @@ DotlibParser::DotlibParser() :
 DotlibParser::~DotlibParser()
 {
   close_file();
+
+  delete mLibraryHandler;
 }
 
 // @brief ファイルを読み込む．

@@ -10,6 +10,7 @@
 #include "ComplexHandler.h"
 #include "DotlibParser.h"
 #include "GroupHandler.h"
+#include "PtMgr.h"
 #include "PtNode.h"
 
 
@@ -20,11 +21,9 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-ComplexHandler::ComplexHandler(DotlibParser& parser,
-			       GroupHandler* parent) :
-  DotlibHandler(parser, parent)
+ComplexHandler::ComplexHandler(GroupHandler* parent) :
+  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
 {
 }
 
@@ -58,7 +57,8 @@ ComplexHandler::read_attr(const string& attr_name,
     cout << ")" << endl;
   }
 
-  parent()->pt_node()->add_value(attr_name, attr_loc, value_list);
+  PtNode* node = ptmgr().new_ptcomplex(attr_name, attr_loc, value_list);
+  parent()->pt_node()->add_child(node);
 
   return expect_nl();
 }

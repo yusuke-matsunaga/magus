@@ -21,11 +21,9 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-ExprHandler::ExprHandler(DotlibParser& parser,
-			 GroupHandler* parent) :
-  DotlibHandler(parser, parent),
+ExprHandler::ExprHandler(GroupHandler* parent) :
+  DotlibHandler(parent->parser(), parent->ptmgr(), parent),
   mUngetType(ERROR)
 {
 }
@@ -53,7 +51,8 @@ ExprHandler::read_attr(const string& attr_name,
     cout << attr_name << " : " << expr << endl;
   }
 
-  parent()->pt_node()->add_value(attr_name, attr_loc, expr);
+  PtNode* node = ptmgr().new_ptsimple(attr_name, attr_loc, expr);
+  parent()->pt_node()->add_child(node);
 
   return expect_nl();
 }

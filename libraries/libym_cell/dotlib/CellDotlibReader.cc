@@ -11,6 +11,7 @@
 
 #include "ym_cell/CellDotlibReader.h"
 #include "DotlibParser.h"
+#include "PtMgr.h"
 #include "DotlibMgr.h"
 
 
@@ -23,13 +24,15 @@ BEGIN_NAMESPACE_YM_CELL
 // @brief コンストラクタ
 CellDotlibReader::CellDotlibReader()
 {
-  mParser = new nsDotlib::DotlibParser;
+  mPtMgr = new nsDotlib::PtMgr;
+  mParser = new nsDotlib::DotlibParser(*mPtMgr);
 }
 
 // @brief デストラクタ
 CellDotlibReader::~CellDotlibReader()
 {
   delete mParser;
+  delete mPtMgr;
 }
 
 // @brief mislib ファイルを読み込む

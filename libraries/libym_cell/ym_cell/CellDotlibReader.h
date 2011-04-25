@@ -18,6 +18,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 namespace nsDotlib {
+  class PtMgr;
   class DotlibParser;
 }
 
@@ -55,6 +56,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // dotlib のパース木を管理するオブジェクト
+  nsDotlib::PtMgr* mPtMgr;
 
   // dotlib のパーサー
   nsDotlib::DotlibParser* mParser;

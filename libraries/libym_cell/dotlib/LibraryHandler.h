@@ -26,7 +26,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
-  LibraryHandler(DotlibParser& parser);
+  /// @param[in] ptmgr パース木を管理するオブジェクト
+  LibraryHandler(DotlibParser& parser,
+		 PtMgr& ptmgr);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +48,7 @@ private:
   bool
   begin_group(const string& attr_name,
 	      const FileRegion& attr_loc,
-	      const vector<Token>& value_list);
+	      const vector<const PtValue*>& value_list);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual

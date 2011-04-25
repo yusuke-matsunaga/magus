@@ -21,11 +21,9 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parser パーサー
 // @param[in] parent 親のハンドラ
-DefineHandler::DefineHandler(DotlibParser& parser,
-			     GroupHandler* parent) :
-  DotlibHandler(parser, parent)
+DefineHandler::DefineHandler(GroupHandler* parent) :
+  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
 {
 }
 
@@ -118,13 +116,13 @@ DefineHandler::read_attr(const string& attr_name,
   DotlibHandler* new_handler = NULL;
   string type_str = type_token->string_value();
   if ( type_str == "int" ) {
-    new_handler = new IntSimpleHandler(parser(), g_handler);
+    new_handler = new IntSimpleHandler(g_handler);
   }
   else if ( type_str == "float" ) {
-    new_handler = new FloatSimpleHandler(parser(), g_handler);
+    new_handler = new FloatSimpleHandler(g_handler);
   }
   else if ( type_str == "string" ) {
-    new_handler = new StrSimpleHandler(parser(), g_handler);
+    new_handler = new StrSimpleHandler(g_handler);
   }
   else {
     ostringstream buf;

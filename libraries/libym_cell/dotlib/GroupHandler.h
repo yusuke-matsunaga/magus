@@ -23,11 +23,15 @@ class GroupHandler :
 {
 public:
 
-  /// @brief コンストラクタ
-  /// @param[in] parser パーサー
+  /// @brief 親がある場合のコンストラクタ
   /// @param[in] parent 親のハンドラ
+  GroupHandler(GroupHandler* parent);
+
+  /// @brief 親がない場合のコンストラクタ
+  /// @param[in] parser パーサー
+  /// @param[in] ptmgr パース木を管理するオブジェクト
   GroupHandler(DotlibParser& parser,
-	       GroupHandler* parent);
+	       PtMgr& ptmgr);
 
   /// @brief デストラクタ
   virtual

@@ -10,7 +10,7 @@
 
 
 #include "dotlib_nsdef.h"
-#include "Token.h"
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -21,47 +21,32 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 class PtNode
 {
-public:
+  friend class PtMgr;
+
+protected:
 
   /// @brief simple attribute 用のコンストラクタ
-  /// @param[in] attr_name 属性名を表すトークン
-  /// @param[in] value 値を表すトークン
-  PtNode(Token attr_name,
-	 Token value);
-
-  /// @brief complex attribute/group statement 用のコンストラクタ
-  /// @param[in] attr_name 属性名を表すトークン
-  /// @param[in] value 値を表すトークンのリスト
-  PtNode(Token attr_name,
-	 const vector<Token>& value_list);
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc attr_name のファイル上の位置
+  PtNode(const string& attr_name,
+	 const FileRegion& attr_loc);
 
   /// @brief デストラクタ
+  virtual
   ~PtNode();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 子供を追加する．
   /// @param[in] node 追加する子供のノード
+  /// @note デフォルトの実装はなにもしない．
+  virtual
   void
   add_child(PtNode* node);
-
-  /// @brief 値を追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  virtual
-  void
-  add_value(const string& attr_name,
-	    const FileRegion& attr_loc,
-	    const PtValue* value);
-
-  /// @brief 値のリストを追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value_list 値のリスト
-  virtual
-  void
-  add_value(const string& attr_name,
-	    const FileRegion& attr_loc,
-	    const vector<const PtValue*>& value_list);
 
 
 public:
@@ -69,26 +54,35 @@ public:
   // 内容を参照する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 属性名を表すトークンを返す．
-  Token
+  /// @brief 属性名をを返す．
+  string
   attr_name() const;
+
+  /// @brief 属性名のファイル上の位置を返す．
+  FileRegion
+  attr_loc() const;
 
   /// @brief 値の数を返す．
   /// @note simple attribute なら常に1
+  virtual
   ymuint
-  value_num() const;
+  value_num() const = 0;
 
-  /// @brief 値を表すトークンを返す．
+  /// @brief 値を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-  Token
-  value(ymuint pos) const;
+  virtual
+  const PtValue*
+  value(ymuint pos) const = 0;
 
   /// @brief 子供のノードの要素数を返す．
+  /// @note デフォルトの実装は 0 を返す．
+  virtual
   ymuint
   child_num() const;
 
   /// @brief 子供のノードを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
+  virtual
   const PtNode*
   child(ymuint pos) const;
 
@@ -99,13 +93,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 属性名
-  Token mAttrName;
+  string mAttrName;
 
-  // 値のリスト
-  vector<Token> mValueList;
-
-  // 子供のノードのリスト
-  vector<PtNode*> mChildList;
+  // 属性名のファイル上の位置
+  FileRegion mAttrLoc;
 
 };
 

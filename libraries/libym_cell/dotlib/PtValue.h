@@ -10,6 +10,7 @@
 
 
 #include "dotlib_nsdef.h"
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -20,7 +21,9 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 class PtValue
 {
-public:
+  friend class PtMgr;
+
+protected:
 
   /// @brief コンストラクタ
   PtValue();
@@ -73,6 +76,15 @@ public:
   opr2() const;
 
 };
+
+
+/// @relates PtValue
+/// @brief PtValue の内容をストリームに出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] value 値
+ostream&
+operator<<(ostream& s,
+	   const PtValue* value);
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
