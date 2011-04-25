@@ -44,7 +44,6 @@ CellDotlibReader::read(const string& filename)
 {
   using nsDotlib::PtNode;
   using nsDotlib::DotlibMgr;
-
   const PtNode* root = mParser->read_file(filename, false, true);
 
   DotlibMgr mgr;

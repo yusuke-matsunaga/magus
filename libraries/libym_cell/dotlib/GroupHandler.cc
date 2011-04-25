@@ -134,7 +134,8 @@ GroupHandler::reg_handler(const string& attr_name,
 DotlibHandler*
 GroupHandler::find_handler(const string& attr_name)
 {
-  hash_map<string, DotlibHandler*>::const_iterator p = mHandlerMap.find(attr_name);
+  hash_map<string, DotlibHandler*>::const_iterator p
+    = mHandlerMap.find(attr_name);
   if ( p == mHandlerMap.end() ) {
     return NULL;
   }
@@ -161,7 +162,6 @@ GroupHandler::begin_group(const string& attr_name,
 {
   mPtNode = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
   parent()->pt_node()->add_child(mPtNode);
-
   return true;
 }
 

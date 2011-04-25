@@ -53,12 +53,28 @@ dump_sub(ostream& s,
     s << indent_str(indent)
       << "Value#" << i << ": " << node->value(i) << endl;
   }
+
+#if 1
   ymuint nc = node->child_num();
   for (ymuint i = 0; i < nc; ++ i) {
     s << indent_str(indent)
       << "Child#" << i << ":" << endl;
     dump_sub(s, node->child(i), indent + 2);
   }
+#else
+  ymuint nk = node->child_attr_num();
+  for (ymuint i = 0; i < nk; ++ i) {
+    string attr = node->child_attr_name(i);
+    s << indent_str(indent)
+      << "Attr#" << i << ":" << endl;
+    ymuint nc = node->child_num(attr);
+    for (ymuint j = 0; j < nc; ++ j) {
+      s << indent_str(indent + 2)
+	<< "Child#" << j << ":" << endl;
+      dump_sub(s, node->child(attr, j), indent + 2);
+    }
+  }
+#endif
 }
 
 END_NONAMESPACE

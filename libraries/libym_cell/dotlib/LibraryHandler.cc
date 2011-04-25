@@ -45,120 +45,6 @@ new_group(GroupHandler* parent)
   return new GroupHandler(parent);
 }
 
-#if 0
-
-DotlibHandler*
-new_ff(GroupHandler* parent)
-{
-  GroupHandler* handler = new_group(parent);
-
-
-  // simple attributes
-  DotlibHandler* simple = new_simple(handler);
-  handler->reg_handler("clear", simple);
-  handler->reg_handler("clear_preset_var1", simple);
-  handler->reg_handler("clear_preset_var2", simple);
-  handler->reg_handler("clocked_on", simple);
-  handler->reg_handler("clocked_on_also", simple);
-  handler->reg_handler("next_state", simple);
-  handler->reg_handler("preset", simple);
-
-  return handler;
-}
-
-DotlibHandler*
-new_latch(GroupHandler* parent)
-{
-  GroupHandler* handler = new_group(parent);
-
-  // simple attributes
-  DotlibHandler* simple = new_simple(handler);
-  handler->reg_handler("clear", simple);
-  handler->reg_handler("clear_preset_var1", simple);
-  handler->reg_handler("clear_preset_var2", simple);
-  handler->reg_handler("data_in", simple);
-  handler->reg_handler("enable", simple);
-  handler->reg_handler("enable_also", simple);
-  handler->reg_handler("preset", simple);
-
-  return handler;
-}
-
-DotlibHandler*
-new_cell(GroupHandler* parent)
-{
-  GroupHandler* handler = new_group(parent);
-
-  // simple attributes
-  DotlibHandler* simple = new_simple(handler);
-  handler->reg_handler("area", simple);
-  handler->reg_handler("auxiliary_pad_cell", simple);
-  handler->reg_handler("base_name", simple);
-  handler->reg_handler("bus_naming_style", simple);
-  handler->reg_handler("cell_footprint", simple);
-  handler->reg_handler("cell_leakage_power", simple);
-  handler->reg_handler("clock_gating_integrated_cell", simple);
-  handler->reg_handler("contention_condition", simple);
-  handler->reg_handler("dont_fault", simple);
-  handler->reg_handler("dont_touch", simple);
-  handler->reg_handler("dont_use", simple);
-  handler->reg_handler("driver_type", simple);
-  handler->reg_handler("edif_name", simple);
-  handler->reg_handler("em_temp_degradation_factor", simple);
-  handler->reg_handler("fpga_domain_style", simple);
-  handler->reg_handler("geometry_print", simple);
-  handler->reg_handler("handle_negative_constraint", simple);
-  handler->reg_handler("interface_timing", simple);
-  handler->reg_handler("io_type", simple);
-  handler->reg_handler("is_clock_gating_cell", simple);
-  handler->reg_handler("map_only", simple);
-  handler->reg_handler("pad_cell", simple);
-  handler->reg_handler("pad_type", simple);
-  handler->reg_handler("power_cell_type", simple);
-  handler->reg_handler("preferred", simple);
-  handler->reg_handler("scaling_factors", simple);
-  handler->reg_handler("single_bit_degenerate", simple);
-  handler->reg_handler("slew_type", simple);
-  handler->reg_handler("timing_model_type", simple);
-  handler->reg_handler("use_for_size_only", simple);
-  handler->reg_handler("vhdl_name", simple);
-
-  handler->reg_handler("is_filler_cell", simple);
-
-  // complex attributes
-  DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("pin_opposite", complex);
-  handler->reg_handler("rail_connection", complex);
-  handler->reg_handler("power_supply_namestring", complex);
-  handler->reg_handler("resource_usage", complex);
-
-  // group statements
-  handler->reg_handler("bus", new_bus(handler));
-  handler->reg_handler("bundle", new_bundle(handler));
-  handler->reg_handler("dynamic_current", new_group(handler));
-  handler->reg_handler("ff", new_ff(handler));
-  handler->reg_handler("ff_bank", new_ff(handler));
-  handler->reg_handler("functional_yield_metric", new_group(handler));
-  handler->reg_handler("generated_clock", new_group(handler));
-  handler->reg_handler("intrinsic_parasitic", new_group(handler));
-  handler->reg_handler("latch", new_latch(handler));
-  handler->reg_handler("latch_bank", new_latch(handler));
-  handler->reg_handler("leakage_current", new_group(handler));
-  handler->reg_handler("leakage_power", new_leakage_power(handler));
-  handler->reg_handler("lut", new_group(handler));
-  handler->reg_handler("mode_definition", new_group(handler));
-  handler->reg_handler("pin", new_pin(handler));
-  handler->reg_handler("routing_track", new_group(handler));
-  handler->reg_handler("statetable", new_statetable(handler));
-
-  handler->reg_handler("internal_power", new_cell_internal_power(handler));
-
-  handler->reg_handler("test_cell", new_test_cell(handler));
-
-  return handler;
-}
-#endif
-
 DotlibHandler*
 new_input_voltage(GroupHandler* parent)
 {
@@ -297,7 +183,6 @@ LibraryHandler::LibraryHandler(DotlibParser& parser,
 			       PtMgr& ptmgr) :
   GroupHandler(parser, ptmgr)
 {
-
   // simple attributes
   DotlibHandler* simple = new SimpleHandler(this);
   DotlibHandler* simple2 = new SymSimpleHandler(this);
@@ -523,7 +408,6 @@ LibraryHandler::LibraryHandler(DotlibParser& parser,
   reg_handler("wire_load", new_wire_load(this));
   reg_handler("wire_load_selection", new_wire_load_selection(this));
   reg_handler("wire_load_table", new_wire_load_table(this));
-
 }
 
 // @brief デストラクタ

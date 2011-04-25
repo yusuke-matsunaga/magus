@@ -241,7 +241,6 @@ DotlibParser::open_file(const string& filename)
     return false;
   }
   mCurFileDesc = mFileDescMgr.new_file_desc(filename);
-  return true;
 }
 
 // ファイルをクローズする．

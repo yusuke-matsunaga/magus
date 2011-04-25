@@ -521,6 +521,7 @@ CellHandler::~CellHandler()
 {
 }
 
+#if 0
 // @brief 対応する PtNode を返す．
 PtNode*
 CellHandler::pt_node()
@@ -572,6 +573,7 @@ CellHandler::end_group()
   mCell = NULL;
   return true;
 }
+#endif
 
 
 END_NAMESPACE_YM_CELL_DOTLIB

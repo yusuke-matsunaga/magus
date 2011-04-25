@@ -72,6 +72,43 @@ PtNode::child(ymuint pos) const
   return NULL;
 }
 
+// @brief 子供の属性名の個数を返す．
+// @note デフォルトの実装は 0 を返す．
+ymuint
+PtNode::child_attr_num() const
+{
+  return 0;
+}
+
+// @brief 子供の属性名を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
+string
+PtNode::child_attr_name(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return string();
+}
+
+// @brief 属性に対応した子供の要素数を返す．
+// @param[in] attr_name 子供の属性名
+// @note デフォルトの実装は 0 を返す．
+ymuint
+PtNode::child_num(const string& attr_name) const
+{
+  return 0;
+}
+
+// @brief 属性に対応した子供を返す．
+// @param[in] attr_name 子供の属性名
+// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
+const PtNode*
+PtNode::child(const string& attr_name,
+	      ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス PtSimpleNode
@@ -175,6 +212,16 @@ void
 PtGroupNode::add_child(PtNode* node)
 {
   mChildList.push_back(node);
+
+  string attr_name = node->attr_name();
+  if ( mChildMap.count(attr_name) == 0 ) {
+    mChildMap.insert(make_pair(attr_name, vector<PtNode*>(1, node)));
+    mAttrList.push_back(attr_name);
+  }
+  else {
+    hash_map<string, vector<PtNode*> >::iterator p = mChildMap.find(attr_name);
+    (p->second).push_back(node);
+  }
 }
 
 // @brief 子供のノードの要素数を返す．
@@ -190,6 +237,49 @@ const PtNode*
 PtGroupNode::child(ymuint pos) const
 {
   return mChildList[pos];
+}
+
+// @brief 子供の属性名の個数を返す．
+// @note デフォルトの実装は 0 を返す．
+ymuint
+PtGroupNode::child_attr_num() const
+{
+  return mAttrList.size();
+}
+
+// @brief 子供の属性名を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
+string
+PtGroupNode::child_attr_name(ymuint pos) const
+{
+  assert_cond( pos < child_attr_num(), __FILE__, __LINE__);
+  return mAttrList[pos];
+}
+
+// @brief 属性に対応した子供の要素数を返す．
+// @param[in] attr_name 子供の属性名
+// @note デフォルトの実装は 0 を返す．
+ymuint
+PtGroupNode::child_num(const string& attr_name) const
+{
+  hash_map<string, vector<PtNode*> >::const_iterator p
+    = mChildMap.find(attr_name);
+  const vector<PtNode*>& child_list = p->second;
+  return child_list.size();
+}
+
+// @brief 属性に対応した子供を返す．
+// @param[in] attr_name 子供の属性名
+// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
+const PtNode*
+PtGroupNode::child(const string& attr_name,
+		   ymuint pos) const
+{
+  hash_map<string, vector<PtNode*> >::const_iterator p
+    = mChildMap.find(attr_name);
+  const vector<PtNode*>& child_list = p->second;
+  assert_cond( pos < child_list.size(), __FILE__, __LINE__);
+  return child_list[pos];
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

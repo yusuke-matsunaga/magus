@@ -86,6 +86,33 @@ public:
   const PtNode*
   child(ymuint pos) const;
 
+  /// @brief 子供の属性名の個数を返す．
+  /// @note デフォルトの実装は 0 を返す．
+  virtual
+  ymuint
+  child_attr_num() const;
+
+  /// @brief 子供の属性名を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
+  virtual
+  string
+  child_attr_name(ymuint pos) const;
+
+  /// @brief 属性に対応した子供の要素数を返す．
+  /// @param[in] attr_name 子供の属性名
+  /// @note デフォルトの実装は 0 を返す．
+  virtual
+  ymuint
+  child_num(const string& attr_name) const;
+
+  /// @brief 属性に対応した子供を返す．
+  /// @param[in] attr_name 子供の属性名
+  /// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
+  virtual
+  const PtNode*
+  child(const string& attr_name,
+	ymuint pos) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

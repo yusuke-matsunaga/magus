@@ -86,6 +86,7 @@ DotlibHandler::parse_complex(vector<const PtValue*>& value_list)
       type = parser().read_token();
     }
   }
+
   return true;
 }
 
