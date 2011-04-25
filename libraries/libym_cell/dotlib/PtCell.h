@@ -29,7 +29,7 @@ private:
   /// @param[in] attr_name 属性名(ここでは cell)
   /// @param[in] attr_loc 属性名のファイル上の位置
   /// @param[in] value 値(ここではセル名)
-  PtCell(const string& attr_name,
+  PtCell(ShString attr_name,
 	 const FileRegion& attr_loc,
 	 const PtValue* value);
 

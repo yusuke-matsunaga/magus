@@ -11,6 +11,7 @@
 
 #include "dotlib_nsdef.h"
 #include "ym_utils/MsgHandler.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -47,7 +48,7 @@ public:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const string& attr_name,
+  read_attr(ShString attr_name,
 	    const FileRegion& attr_loc) = 0;
 
 

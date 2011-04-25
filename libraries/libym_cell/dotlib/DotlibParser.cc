@@ -54,7 +54,7 @@ DotlibParser::read_file(const string& filename,
   tTokenType type;
   // 空行を読み飛ばす．
   for (type = read_token(); type == NL; type = read_token()) { }
-  string name = cur_string();
+  ShString name(cur_string());
   FileRegion loc = cur_loc();
   if ( type != SYMBOL || name != "library" ) {
     put_msg(__FILE__, __LINE__, loc,
@@ -65,6 +65,7 @@ DotlibParser::read_file(const string& filename,
     error = true;
     goto last;
   }
+
   if ( !mLibraryHandler->read_attr(name, loc) ) {
     error = true;
     goto last;
@@ -241,6 +242,7 @@ DotlibParser::open_file(const string& filename)
     return false;
   }
   mCurFileDesc = mFileDescMgr.new_file_desc(filename);
+  return true;
 }
 
 // ファイルをクローズする．

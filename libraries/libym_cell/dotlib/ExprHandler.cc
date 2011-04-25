@@ -38,7 +38,7 @@ ExprHandler::~ExprHandler()
 // @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-ExprHandler::read_attr(const string& attr_name,
+ExprHandler::read_attr(ShString attr_name,
 		       const FileRegion& attr_loc)
 {
   if ( !expect(COLON) ) {
@@ -67,8 +67,10 @@ ExprHandler::read_primary()
   }
   FileRegion loc = parser().cur_loc();
   if ( type == SYMBOL ) {
-    string name = parser().cur_string();
-    if ( name != "VDD" && name != "VSS" && name != "VCC" ) {
+    ShString name(parser().cur_string());
+    if ( name != "VDD" &&
+	 name != "VSS" &&
+	 name != "VCC" ) {
       put_msg(__FILE__, __LINE__, loc,
 	      kMsgError,
 	      "DOTLIB_PARSER",
@@ -76,10 +78,10 @@ ExprHandler::read_primary()
 	      "Only 'VDD', 'VSS', and 'VCC' are allowed.");
       return NULL;
     }
-    return ptmgr().new_value(name, loc);
+    return ptmgr().new_string(name, loc);
   }
   if ( type == FLOAT_NUM || type == INT_NUM ) {
-    return ptmgr().new_value(parser().cur_float(), loc);
+    return ptmgr().new_float(parser().cur_float(), loc);
   }
 
   put_msg(__FILE__, __LINE__, loc,
@@ -105,7 +107,7 @@ ExprHandler::read_product()
       if ( opr2 == NULL ) {
 	return NULL;
       }
-      opr1 = ptmgr().new_value(type, opr1, opr2);
+      opr1 = ptmgr().new_opr(type, opr1, opr2);
     }
     else {
       // token を戻す．
@@ -138,7 +140,7 @@ ExprHandler::read_expr(tTokenType end_marker)
 	return NULL;
       }
 
-      opr1 = ptmgr().new_value(type, opr1, opr2);
+      opr1 = ptmgr().new_opr(type, opr1, opr2);
     }
     else {
       put_msg(__FILE__, __LINE__, cur_loc(),

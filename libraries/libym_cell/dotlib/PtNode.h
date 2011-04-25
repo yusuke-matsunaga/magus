@@ -11,6 +11,7 @@
 
 #include "dotlib_nsdef.h"
 #include "ym_utils/FileRegion.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -28,7 +29,7 @@ protected:
   /// @brief simple attribute 用のコンストラクタ
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc attr_name のファイル上の位置
-  PtNode(const string& attr_name,
+  PtNode(ShString attr_name,
 	 const FileRegion& attr_loc);
 
   /// @brief デストラクタ
@@ -55,7 +56,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 属性名をを返す．
-  string
+  ShString
   attr_name() const;
 
   /// @brief 属性名のファイル上の位置を返す．
@@ -95,7 +96,7 @@ public:
   /// @brief 子供の属性名を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
   virtual
-  string
+  ShString
   child_attr_name(ymuint pos) const;
 
   /// @brief 属性に対応した子供の要素数を返す．
@@ -103,14 +104,14 @@ public:
   /// @note デフォルトの実装は 0 を返す．
   virtual
   ymuint
-  child_num(const string& attr_name) const;
+  child_num(ShString attr_name) const;
 
   /// @brief 属性に対応した子供を返す．
   /// @param[in] attr_name 子供の属性名
   /// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
   virtual
   const PtNode*
-  child(const string& attr_name,
+  child(ShString attr_name,
 	ymuint pos) const;
 
 
@@ -120,7 +121,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 属性名
-  string mAttrName;
+  ShString mAttrName;
 
   // 属性名のファイル上の位置
   FileRegion mAttrLoc;

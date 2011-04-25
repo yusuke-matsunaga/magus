@@ -11,6 +11,7 @@
 
 #include "dotlib_nsdef.h"
 #include "ym_utils/FileRegion.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -60,7 +61,7 @@ public:
   /// @brief 文字列シンボルを返す．
   /// @note type() が SYMBOL の時のみ意味を持つ．
   virtual
-  string
+  ShString
   string_value() const;
 
   /// @brief 第一オペランドを返す．

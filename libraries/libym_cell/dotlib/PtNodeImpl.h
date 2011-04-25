@@ -29,7 +29,7 @@ private:
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc attr_name のファイル上の位置
   /// @param[in] value 値を表すトークン
-  PtSimpleNode(const string& attr_name,
+  PtSimpleNode(ShString attr_name,
 	 const FileRegion& attr_loc,
 	 const PtValue* value);
 
@@ -80,7 +80,7 @@ public:
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc attr_name のファイル上の位置
   /// @param[in] value_list 値を表すトークンのリスト
-  PtComplexNode(const string& attr_name,
+  PtComplexNode(ShString attr_name,
 		const FileRegion& attr_loc,
 		const vector<const PtValue*>& value_list);
 
@@ -130,7 +130,7 @@ public:
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc attr_name のファイル上の位置
   /// @param[in] value_list 値を表すトークンのリスト
-  PtGroupNode(const string& attr_name,
+  PtGroupNode(ShString attr_name,
 	      const FileRegion& attr_loc,
 	      const vector<const PtValue*>& value_list);
 
@@ -177,7 +177,7 @@ public:
   /// @brief 子供の属性名を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
   virtual
-  string
+  ShString
   child_attr_name(ymuint pos) const;
 
   /// @brief 属性に対応した子供の要素数を返す．
@@ -185,14 +185,14 @@ public:
   /// @note デフォルトの実装は 0 を返す．
   virtual
   ymuint
-  child_num(const string& attr_name) const;
+  child_num(ShString attr_name) const;
 
   /// @brief 属性に対応した子供を返す．
   /// @param[in] attr_name 子供の属性名
   /// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
   virtual
   const PtNode*
-  child(const string& attr_name,
+  child(ShString attr_name,
 	ymuint pos) const;
 
 
@@ -201,16 +201,18 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-
+#if 1
   // 子供のノードのリスト
   vector<PtNode*> mChildList;
+#endif
 
+#if 1
   // 属性名のリスト
-  vector<string> mAttrList;
+  vector<ShString> mAttrList;
 
   // 属性名をキーにして子供のリストを格納する連想配列
-  hash_map<string, vector<PtNode*> > mChildMap;
-
+  hash_map<ShString, vector<PtNode*> > mChildMap;
+#endif
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

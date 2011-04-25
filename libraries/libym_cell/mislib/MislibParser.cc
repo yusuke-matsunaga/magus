@@ -305,7 +305,7 @@ MislibParser::scan(MislibPt*& lval,
 
   switch ( tok ) {
   case STR:
-    lval = new_str(lloc, ShString(mLex.cur_string()).id());
+    lval = new_str(lloc, ShString(mLex.cur_string()));
     break;
 
   case NUM:

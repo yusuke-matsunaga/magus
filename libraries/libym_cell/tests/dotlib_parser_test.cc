@@ -46,6 +46,8 @@ dotlibparser_test(int argc,
     }
   }
 
+  for ( ; ; ) { }
+
   timer.stop();
   USTime time = timer.time();
   cout << "Time: " << time << endl;

@@ -50,17 +50,18 @@ DotlibHandler::parse_complex(vector<const PtValue*>& value_list)
   if ( type != RP ) {
     for ( ; ; ) {
       PtValue* value = NULL;
+      FileRegion loc(parser().cur_loc());
       switch ( type ) {
       case INT_NUM:
-	value = ptmgr().new_value(parser().cur_int(), parser().cur_loc());
+	value = ptmgr().new_int(parser().cur_int(), loc);
 	break;
 
       case FLOAT_NUM:
-	value = ptmgr().new_value(parser().cur_float(), parser().cur_loc());
+	value = ptmgr().new_float(parser().cur_float(), loc);
 	break;
 
       case SYMBOL:
-	value = ptmgr().new_value(parser().cur_string(), parser().cur_loc());
+	value = ptmgr().new_string(ShString(parser().cur_string()), loc);
 	break;
 
       default:

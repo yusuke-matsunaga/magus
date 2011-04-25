@@ -10,6 +10,7 @@
 
 
 #include "dotlib_nsdef.h"
+#include "ym_utils/ShString.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
 
@@ -43,7 +44,7 @@ public:
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
   PtNode*
-  new_ptsimple(const string& attr_name,
+  new_ptsimple(ShString attr_name,
 	       const FileRegion& attr_loc,
 	       const PtValue* value);
 
@@ -52,7 +53,7 @@ public:
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value_list 値のリスト
   PtNode*
-  new_ptcomplex(const string& attr_name,
+  new_ptcomplex(ShString attr_name,
 		const FileRegion& attr_loc,
 		const vector<const PtValue*>& value_list);
 
@@ -61,7 +62,7 @@ public:
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value_list 値のリスト
   PtNode*
-  new_ptgroup(const string& attr_name,
+  new_ptgroup(ShString attr_name,
 	      const FileRegion& attr_loc,
 	      const vector<const PtValue*>& value_list);
 
@@ -70,7 +71,7 @@ public:
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
   PtCell*
-  new_ptcell(const string& attr_name,
+  new_ptcell(ShString attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value);
 
@@ -78,30 +79,30 @@ public:
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
   PtValue*
-  new_value(int value,
-	    const FileRegion& loc);
+  new_int(int value,
+	  const FileRegion& loc);
 
   /// @brief 実数値を表す PtValue を生成する．
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
   PtValue*
-  new_value(double value,
+  new_float(double value,
 	    const FileRegion& loc);
 
   /// @brief 文字列シンボルを表す PtValue を生成する．
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
   PtValue*
-  new_value(const string& value,
-	    const FileRegion& loc);
+  new_string(ShString value,
+	     const FileRegion& loc);
 
   /// @brief 演算子を表す PtValue を生成する．
   /// @param[in] type 型
   /// @param[in] opr1, opr2 オペランド
   PtValue*
-  new_value(tTokenType type,
-	    PtValue* opr1,
-	    PtValue* opr2);
+  new_opr(tTokenType type,
+	  PtValue* opr1,
+	  PtValue* opr2);
 
 
 private:

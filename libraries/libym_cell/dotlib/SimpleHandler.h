@@ -43,7 +43,7 @@ public:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const string& attr_name,
+  read_attr(ShString attr_name,
 	    const FileRegion& attr_loc);
 
 
@@ -65,7 +65,7 @@ private:
   /// @note デフォルトの実装ではなにもしないで true を返す．
   virtual
   bool
-  read_value(const string& attr_name,
+  read_value(ShString attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value);
 
@@ -128,7 +128,7 @@ private:
   /// @param[in] value 値
   virtual
   bool
-  read_value(const string& attr_name,
+  read_value(ShString attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value);
 
@@ -162,7 +162,7 @@ private:
   /// @param[in] value 値
   virtual
   bool
-  read_value(const string& attr_name,
+  read_value(ShString attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value);
 
@@ -196,7 +196,7 @@ private:
   /// @param[in] value 値
   virtual
   bool
-  read_value(const string& attr_name,
+  read_value(ShString attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value);
 
@@ -230,7 +230,7 @@ private:
   /// @param[in] value 値
   virtual
   bool
-  read_value(const string& attr_name,
+  read_value(ShString attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value);
 

@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @param[in] attr_name 属性名(ここでは pin)
 // @param[in] attr_loc 属性名のファイル上の位置
 // @param[in] value 値(ここではピン名)
-PtPin::PtPin(const string& attr_name,
+PtPin::PtPin(ShString attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value) :
   PtNode(attr_name, attr_loc),

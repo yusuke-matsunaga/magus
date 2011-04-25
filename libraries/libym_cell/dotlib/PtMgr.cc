@@ -45,7 +45,7 @@ PtMgr::init()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
 PtNode*
-PtMgr::new_ptsimple(const string& attr_name,
+PtMgr::new_ptsimple(ShString attr_name,
 		    const FileRegion& attr_loc,
 		    const PtValue* value)
 {
@@ -58,7 +58,7 @@ PtMgr::new_ptsimple(const string& attr_name,
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値のリスト
 PtNode*
-PtMgr::new_ptcomplex(const string& attr_name,
+PtMgr::new_ptcomplex(ShString attr_name,
 		     const FileRegion& attr_loc,
 		     const vector<const PtValue*>& value_list)
 {
@@ -71,7 +71,7 @@ PtMgr::new_ptcomplex(const string& attr_name,
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値のリスト
 PtNode*
-PtMgr::new_ptgroup(const string& attr_name,
+PtMgr::new_ptgroup(ShString attr_name,
 		   const FileRegion& attr_loc,
 		   const vector<const PtValue*>& value_list)
 {
@@ -84,7 +84,7 @@ PtMgr::new_ptgroup(const string& attr_name,
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
 PtCell*
-PtMgr::new_ptcell(const string& attr_name,
+PtMgr::new_ptcell(ShString attr_name,
 		  const FileRegion& attr_loc,
 		  const PtValue* value)
 {
@@ -96,8 +96,8 @@ PtMgr::new_ptcell(const string& attr_name,
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
 PtValue*
-PtMgr::new_value(int value,
-		 const FileRegion& loc)
+PtMgr::new_int(int value,
+	       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(PtInt));
   return new (p) PtInt(value, loc);
@@ -107,7 +107,7 @@ PtMgr::new_value(int value,
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
 PtValue*
-PtMgr::new_value(double value,
+PtMgr::new_float(double value,
 		 const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(PtFloat));
@@ -118,8 +118,8 @@ PtMgr::new_value(double value,
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
 PtValue*
-PtMgr::new_value(const string& value,
-		 const FileRegion& loc)
+PtMgr::new_string(ShString value,
+		  const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(PtString));
   return new (p) PtString(value, loc);
@@ -129,7 +129,7 @@ PtMgr::new_value(const string& value,
 // @param[in] type 型
 // @param[in] opr1, opr2 オペランド
 PtValue*
-PtMgr::new_value(tTokenType type,
+PtMgr::new_opr(tTokenType type,
 		 PtValue* opr1,
 		 PtValue* opr2)
 {

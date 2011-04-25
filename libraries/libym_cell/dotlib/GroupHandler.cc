@@ -45,7 +45,7 @@ GroupHandler::~GroupHandler()
 // @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-GroupHandler::read_attr(const string& attr_name,
+GroupHandler::read_attr(ShString attr_name,
 			const FileRegion& attr_loc)
 {
   vector<const PtValue*> value_list;
@@ -88,10 +88,10 @@ GroupHandler::read_attr(const string& attr_name,
 	      "string value is expected.");
       return false;
     }
-    string name = parser().cur_string();
+    ShString name(parser().cur_string());
     FileRegion loc = parser().cur_loc();
-    hash_map<string, DotlibHandler*>::const_iterator p = mHandlerMap.find(name);
-    if ( p == mHandlerMap.end() ) {
+    DotlibHandler* handler = find_handler(name);
+    if ( handler == NULL ) {
       ostringstream buf;
       buf << name << ": unknown keyword.";
       put_msg(__FILE__, __LINE__, loc,
@@ -100,7 +100,6 @@ GroupHandler::read_attr(const string& attr_name,
 	      buf.str());
       return false;
     }
-    DotlibHandler* handler = p->second;
     if ( !handler->read_attr(name, loc) ) {
       return false;
     }
@@ -119,9 +118,20 @@ GroupHandler::read_attr(const string& attr_name,
 
 // @brief ハンドラの登録を行う．
 // @param[in] attr_name 属性名
+// @param[in] handler 対応付けるハンドラ
 // @note エラーが起きたら false を返す．
 bool
-GroupHandler::reg_handler(const string& attr_name,
+GroupHandler::reg_handler(const char* attr_name,
+			  DotlibHandler* handler)
+{
+  return reg_handler(ShString(attr_name), handler);
+}
+
+// @brief ハンドラの登録を行う．
+// @param[in] attr_name 属性名
+// @note エラーが起きたら false を返す．
+bool
+GroupHandler::reg_handler(ShString attr_name,
 			  DotlibHandler* handler)
 {
   mHandlerMap.insert(make_pair(attr_name, handler));
@@ -132,9 +142,9 @@ GroupHandler::reg_handler(const string& attr_name,
 // @param[in] attr_name 属性名
 // @note なければ NULL を返す．
 DotlibHandler*
-GroupHandler::find_handler(const string& attr_name)
+GroupHandler::find_handler(const ShString& attr_name)
 {
-  hash_map<string, DotlibHandler*>::const_iterator p
+  hash_map<ShString, DotlibHandler*>::const_iterator p
     = mHandlerMap.find(attr_name);
   if ( p == mHandlerMap.end() ) {
     return NULL;
@@ -156,12 +166,14 @@ GroupHandler::pt_node()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-GroupHandler::begin_group(const string& attr_name,
+GroupHandler::begin_group(ShString attr_name,
 			  const FileRegion& attr_loc,
 			  const vector<const PtValue*>& value_list)
 {
+#if 1
   mPtNode = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
   parent()->pt_node()->add_child(mPtNode);
+#endif
   return true;
 }
 

@@ -38,7 +38,7 @@ SimpleHandler::~SimpleHandler()
 // @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-SimpleHandler::read_attr(const string& attr_name,
+SimpleHandler::read_attr(ShString attr_name,
 			 const FileRegion& attr_loc)
 {
   if ( !expect(COLON) ) {
@@ -46,22 +46,23 @@ SimpleHandler::read_attr(const string& attr_name,
   }
 
   tTokenType value_type = parser().read_token( symbol_mode() );
+  FileRegion loc = parser().cur_loc();
   PtValue* value = NULL;
   switch ( value_type ) {
   case INT_NUM:
-    value = ptmgr().new_value(parser().cur_int(), parser().cur_loc());
+    value = ptmgr().new_int(parser().cur_int(), loc);
     break;
 
   case FLOAT_NUM:
-    value = ptmgr().new_value(parser().cur_float(), parser().cur_loc());
+    value = ptmgr().new_float(parser().cur_float(), loc);
     break;
 
   case SYMBOL:
-    value = ptmgr().new_value(parser().cur_string(), parser().cur_loc());
+    value = ptmgr().new_string(ShString(parser().cur_string()), loc);
     break;
 
   default:
-    put_msg(__FILE__, __LINE__, parser().cur_loc(),
+    put_msg(__FILE__, __LINE__, loc,
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "Syntax error. int/float/string value is expected.");
@@ -76,8 +77,10 @@ SimpleHandler::read_attr(const string& attr_name,
     return false;
   }
 
+#if 1
   PtNode* node = ptmgr().new_ptsimple(attr_name, attr_loc, value);
   parent()->pt_node()->add_child(node);
+#endif
 
   return expect_nl();
 }
@@ -96,7 +99,7 @@ SimpleHandler::symbol_mode()
 // @param[in] value 値
 // @note デフォルトの実装ではなにもしないで true を返す．
 bool
-SimpleHandler::read_value(const string& attr_name,
+SimpleHandler::read_value(ShString attr_name,
 			  const FileRegion& attr_loc,
 			  const PtValue* value)
 {
@@ -147,7 +150,7 @@ IntSimpleHandler::~IntSimpleHandler()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
 bool
-IntSimpleHandler::read_value(const string& attr_name,
+IntSimpleHandler::read_value(ShString attr_name,
 			     const FileRegion& attr_loc,
 			     const PtValue* value)
 {
@@ -181,7 +184,7 @@ FloatSimpleHandler::~FloatSimpleHandler()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
 bool
-FloatSimpleHandler::read_value(const string& attr_name,
+FloatSimpleHandler::read_value(ShString attr_name,
 			       const FileRegion& attr_loc,
 			       const PtValue* value)
 {
@@ -215,7 +218,7 @@ StrSimpleHandler::~StrSimpleHandler()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
 bool
-StrSimpleHandler::read_value(const string& attr_name,
+StrSimpleHandler::read_value(ShString attr_name,
 			     const FileRegion& attr_loc,
 			     const PtValue* value)
 {

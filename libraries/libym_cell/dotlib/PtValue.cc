@@ -45,10 +45,10 @@ PtValue::float_value() const
 
 // @brief 定数シンボルを返す．
 // @note type() が SYMBOL の時のみ意味を持つ．
-string
+ShString
 PtValue::string_value() const
 {
-  return string();
+  return ShString();
 }
 
 // @brief 第一オペランドを返す．
@@ -212,7 +212,7 @@ PtFloat::float_value() const
 // @brief コンストラクタ
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtString::PtString(const string& value,
+PtString::PtString(ShString value,
 		   const FileRegion& loc) :
   mValue(value),
   mLoc(loc)
@@ -240,7 +240,7 @@ PtString::loc() const
 
 // @brief 定数シンボルを返す．
 // @note type() が SYMBOL の時のみ意味を持つ．
-string
+ShString
 PtString::string_value() const
 {
   return mValue;

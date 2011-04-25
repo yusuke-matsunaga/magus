@@ -142,7 +142,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
-  PtString(const string& value,
+  PtString(ShString value,
 	   const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -164,7 +164,7 @@ public:
   /// @brief 定数シンボルを返す．
   /// @note type() が SYMBOL の時のみ意味を持つ．
   virtual
-  string
+  ShString
   string_value() const;
 
 
@@ -174,7 +174,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  string mValue;
+  ShString mValue;
 
   // ファイル上の位置
   FileRegion mLoc;

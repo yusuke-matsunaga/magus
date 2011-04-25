@@ -49,7 +49,7 @@ public:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(const string& attr_name,
+  read_attr(ShString attr_name,
 	    const FileRegion& attr_loc);
 
 
@@ -63,14 +63,22 @@ public:
   /// @param[in] handler 対応付けるハンドラ
   /// @note エラーが起きたら false を返す．
   bool
-  reg_handler(const string& attr_name,
+  reg_handler(const char* attr_name,
+	      DotlibHandler* handler);
+
+  /// @brief ハンドラの登録を行う．
+  /// @param[in] attr_name 属性名
+  /// @param[in] handler 対応付けるハンドラ
+  /// @note エラーが起きたら false を返す．
+  bool
+  reg_handler(ShString attr_name,
 	      DotlibHandler* handler);
 
   /// @brief ハンドラを取り出す．
   /// @param[in] attr_name 属性名
   /// @note なければ NULL を返す．
   DotlibHandler*
-  find_handler(const string& attr_name);
+  find_handler(const ShString& attr_name);
 
 
 public:
@@ -96,7 +104,7 @@ private:
   /// @param[in] value_list 値を表すトークンのリスト
   virtual
   bool
-  begin_group(const string& attr_name,
+  begin_group(ShString attr_name,
 	      const FileRegion& attr_loc,
 	      const vector<const PtValue*>& value_list);
 
@@ -112,7 +120,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ハンドラの連想配列
-  hash_map<string, DotlibHandler*> mHandlerMap;
+  hash_map<ShString, DotlibHandler*> mHandlerMap;
 
   // 対応する PtNode
   PtNode* mPtNode;

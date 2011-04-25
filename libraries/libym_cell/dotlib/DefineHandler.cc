@@ -37,7 +37,7 @@ DefineHandler::~DefineHandler()
 // @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-DefineHandler::read_attr(const string& attr_name,
+DefineHandler::read_attr(ShString attr_name,
 			 const FileRegion& attr_loc)
 {
   vector<const PtValue*> value_list;
@@ -114,7 +114,7 @@ DefineHandler::read_attr(const string& attr_name,
   }
 
   DotlibHandler* new_handler = NULL;
-  string type_str = type_token->string_value();
+  ShString type_str = type_token->string_value();
   if ( type_str == "int" ) {
     new_handler = new IntSimpleHandler(g_handler);
   }
