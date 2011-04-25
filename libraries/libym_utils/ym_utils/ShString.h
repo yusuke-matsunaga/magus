@@ -7,7 +7,7 @@
 ///
 /// $Id: ShString.h 1052 2007-10-24 11:08:51Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,13 +18,6 @@ BEGIN_NAMESPACE_YM
 
 class StrPool;
 
-/// @relates ShString
-/// @ingroup YmUtils
-/// @brief 共有された文字列用の ID 番号の型
-/// @note 実際には const char* をキャストしただけ
-typedef const void* StrId;
-
-
 //////////////////////////////////////////////////////////////////////
 /// @class ShString ShString.h <ym_utils/ShString.h>
 /// @ingroup ShStringGroup
@@ -34,13 +27,10 @@ typedef const void* StrId;
 class ShString
 {
 public:
+
   /// @brief 空のコンストラクタ
   /// @note NULL がセットされる．
   ShString();
-
-  /// @brief id を指定したコンストラクタ
-  /// @param[in] id 文字列ID
-  ShString(StrId id);
 
   /// @brief C文字列を指定したコンストラクタ
   /// @param[in] str C文字列
@@ -51,7 +41,7 @@ public:
   /// @param[in] str 文字列 (string)
   explicit
   ShString(const string& str);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   ShString(const ShString& src);
@@ -73,7 +63,7 @@ public:
   /// @return 自分自身を返す．
   const ShString&
   operator=(const string& src);
-  
+
   /// @brief デストラクタ
   ~ShString();
 
@@ -84,15 +74,19 @@ public:
   operator string() const;
 
   /// @brief id を返す．
-  StrId
+  /// @note 実際には文字列へのポインタをキャストしたもの
+  ympuint
   id() const;
 
   /// @brief ハッシュ用のキーを返す．
   size_t
   hash() const;
 
-  
+
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 共有文字列を作ってセットする．
   /// @param[in] str 入力の文字列
@@ -134,6 +128,46 @@ operator!=(const ShString& a,
 
 /// @relates ShString
 /// @ingroup YmUtils
+/// @brief 等価比較演算子
+/// @param[in] a, b 比較対象の文字列
+/// @return a と b が同じ文字列を表しているとき true を返す．
+/// @note b を ShString() に変換するよりも strcmp() を使ったほうがよい．
+bool
+operator==(const ShString& a,
+	   const char* b);
+
+/// @relates ShString
+/// @ingroup YmUtils
+/// @brief 等価比較演算子
+/// @param[in] a, b 比較対象の文字列
+/// @return a と b が同じ文字列を表しているとき true を返す．
+/// @note a を ShString() に変換するよりも strcmp() を使ったほうがよい．
+bool
+operator==(const char* a,
+	   const ShString& b);
+
+/// @relates ShString
+/// @ingroup YmUtils
+/// @brief 等価比較演算子
+/// @param[in] a, b 比較対象の文字列
+/// @return a と b が同じ文字列を表しているとき true を返す．
+/// @note b を ShString() に変換するよりも strcmp() を使ったほうがよい．
+bool
+operator!=(const ShString& a,
+	   const char* b);
+
+/// @relates ShString
+/// @ingroup YmUtils
+/// @brief 等価比較演算子
+/// @param[in] a, b 比較対象の文字列
+/// @return a と b が同じ文字列を表しているとき true を返す．
+/// @note a を ShString() に変換するよりも strcmp() を使ったほうがよい．
+bool
+operator!=(const char* a,
+	   const ShString& b);
+
+/// @relates ShString
+/// @ingroup YmUtils
 /// @brief ShString 用のストリーム出力演算子
 /// @param[in] s 出力ストリーム
 /// @param[in] str 出力対象の文字列
@@ -153,13 +187,6 @@ operator<<(ostream& s,
 inline
 ShString::ShString() :
   mPtr(NULL)
-{
-}
-
-// id を指定したコンストラクタ
-inline
-ShString::ShString(StrId id) :
-  mPtr(static_cast<const char*>(id))
 {
 }
 
@@ -236,12 +263,12 @@ ShString::operator string() const
   }
 }
 
-// 共有文字列 ID の取得
+// ID の取得
 inline
-StrId
+ympuint
 ShString::id() const
 {
-  return static_cast<StrId>(mPtr);
+  return reinterpret_cast<ympuint>(mPtr);
 }
 
 // @brief ハッシュ用のキーを返す．
@@ -269,6 +296,58 @@ operator!=(const ShString& a,
 	   const ShString& b)
 {
   return !(a == b);
+}
+
+// @brief 等価比較演算子
+// @param[in] a, b 比較対象の文字列
+// @return a と b が同じ文字列を表しているとき true を返す．
+// @note b を ShString() に変換するよりも strcmp() を使ったほうがよい．
+inline
+bool
+operator==(const ShString& a,
+	   const char* b)
+{
+  if ( b == NULL ) {
+    // 境界条件のチェック
+    return false;
+  }
+  return strcmp(a.operator const char*(), b) == 0;
+}
+
+// @brief 等価比較演算子
+// @param[in] a, b 比較対象の文字列
+// @return a と b が同じ文字列を表しているとき true を返す．
+// @note a を ShString() に変換するよりも strcmp() を使ったほうがよい．
+inline
+bool
+operator==(const char* a,
+	   const ShString& b)
+{
+  return operator==(b, a);
+}
+
+// @brief 等価比較演算子
+// @param[in] a, b 比較対象の文字列
+// @return a と b が同じ文字列を表しているとき true を返す．
+// @note b を ShString() に変換するよりも strcmp() を使ったほうがよい．
+inline
+bool
+operator!=(const ShString& a,
+	   const char* b)
+{
+  return !operator==(a, b);
+}
+
+// @brief 等価比較演算子
+// @param[in] a, b 比較対象の文字列
+// @return a と b が同じ文字列を表しているとき true を返す．
+// @note a を ShString() に変換するよりも strcmp() を使ったほうがよい．
+inline
+bool
+operator!=(const char* a,
+	   const ShString& b)
+{
+  return !operator==(b, a);
 }
 
 END_NAMESPACE_YM
