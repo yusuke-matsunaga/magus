@@ -23,11 +23,15 @@ class GroupHandler :
 {
 public:
 
-  /// @brief コンストラクタ
+  /// @brief 親を持たないハンドラ用のコンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] ptmgr パース木を管理するオブジェクト
   GroupHandler(DotlibParser& parser,
 	       PtMgr& ptmgr);
+
+  /// @brief 親を持つハンドラ用のコンストラクタ
+  /// @param[in] parent 親のハンドラ
+  GroupHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -79,13 +83,57 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 他のクラスから用いられる関数
+  // 他のクラスから用いられる仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 対応する PtNode を返す．
   virtual
   PtNode*
   pt_node() = 0;
+
+  /// @brief セルを追加する．
+  /// @param[in] cell セル
+  /// @note library の時のみ有効
+  virtual
+  void
+  add_cell(PtCell* cell);
+
+  /// @brief ピンを追加する．
+  /// @param[in] pin ピン
+  /// @note cell/bus/bundle の時のみ有効
+  virtual
+  void
+  add_pin(PtPin* pin);
+
+  /// @brief バスを追加する．
+  /// @param[in] bus バス
+  /// @note cell の時のみ有効
+  virtual
+  void
+  add_bus(PtBus* bus);
+
+  /// @brief バンドルを追加する．
+  /// @param[in] bundle バンドル
+  /// @note cell の時のみ有効
+  virtual
+  void
+  add_bundle(PtBundle* bundle);
+
+  /// @brief タイミングを追加する．
+  /// @param[in] timing タイミング条件
+  /// @note pin の時のみ有効
+  virtual
+  void
+  add_timing(PtTiming* timing);
+
+  /// @brief テーブルを追加する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] table テーブル
+  /// @note
+  virtual
+  void
+  add_table(const ShString& attr_name,
+	    PtTable* table);
 
 
 private:
@@ -166,24 +214,10 @@ private:
   end_group();
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // DotlibHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 親のハンドラを得る．
-  virtual
-  GroupHandler*
-  parent();
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 親のハンドラ
-  GroupHandler* mParent;
 
   // 対応する PtNode
   PtNode* mPtNode;

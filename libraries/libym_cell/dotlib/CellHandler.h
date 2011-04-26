@@ -9,25 +9,23 @@
 /// All rights reserved.
 
 
-#include "PinHolderHandler.h"
+#include "GroupHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
-
-class LibraryHandler;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellHandler CellHandler.h "CellHandler.h"
 /// @brief cell group 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class CellHandler :
-  public PinHolderHandler
+  public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  CellHandler(LibraryHandler* parent);
+  CellHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -36,24 +34,8 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // DotlibHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 親のハンドラを得る．
-  virtual
-  GroupHandler*
-  parent();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // 他のクラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対応する PtNode を返す．
-  virtual
-  PtNode*
-  pt_node();
 
   /// @brief ピンを追加する．
   virtual
@@ -61,10 +43,12 @@ public:
   add_pin(PtPin* pin);
 
   /// @brief バスを追加する．
+  virtual
   void
   add_bus(PtBus* bus);
 
   /// @brief バンドルを追加する．
+  virtual
   void
   add_bundle(PtBundle* bundle);
 
@@ -94,9 +78,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 親のハンドラ
-  LibraryHandler* mParent;
 
   // 対応する PtCell;
   PtCell* mCell;

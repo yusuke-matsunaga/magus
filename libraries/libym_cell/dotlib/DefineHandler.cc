@@ -45,6 +45,10 @@ DefineHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
+  if ( !expect_nl() ) {
+    return false;
+  }
+
   if ( debug() ) {
     cout << attr_name << " (";
     const char* comma = "";
@@ -54,10 +58,6 @@ DefineHandler::read_attr(const ShString& attr_name,
       comma = ", ";
     }
     cout << ")" << endl;
-  }
-
-  if ( !expect_nl() ) {
-    return false;
   }
 
   bool error = false;

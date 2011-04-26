@@ -76,9 +76,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-TimingHandler::TimingHandler(PinHandler* parent) :
-  GroupHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent),
+TimingHandler::TimingHandler(GroupHandler* parent) :
+  GroupHandler(parent),
   mTiming(NULL)
 {
   // simple attributes
@@ -156,13 +155,6 @@ TimingHandler::~TimingHandler()
 {
 }
 
-// @brief 親のハンドラを得る．
-GroupHandler*
-TimingHandler::parent()
-{
-  return mParent;
-}
-
 // @brief 対応する PtNode を返す．
 PtNode*
 TimingHandler::pt_node()
@@ -197,7 +189,7 @@ TimingHandler::begin_group(const ShString& attr_name,
   }
 
   mTiming = ptmgr().new_pttiming();
-  mParent->add_timing(mTiming);
+  parent()->add_timing(mTiming);
 
   return true;
 }

@@ -417,9 +417,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-CellHandler::CellHandler(LibraryHandler* parent) :
-  PinHolderHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent),
+CellHandler::CellHandler(GroupHandler* parent) :
+  GroupHandler(parent),
   mCell(NULL)
 {
   // simple attributes
@@ -494,20 +493,6 @@ CellHandler::~CellHandler()
 {
 }
 
-// @brief 親のハンドラを得る．
-GroupHandler*
-CellHandler::parent()
-{
-  return mParent;
-}
-
-// @brief 対応する PtNode を返す．
-PtNode*
-CellHandler::pt_node()
-{
-  return mCell;
-}
-
 // @brief ピンを追加する．
 void
 CellHandler::add_pin(PtPin* pin)
@@ -561,7 +546,7 @@ CellHandler::begin_group(const ShString& attr_name,
     return false;
   }
   mCell = ptmgr().new_ptcell(value_list[0]);
-  mParent->add_cell(mCell);
+  parent()->add_cell(mCell);
 
   return true;
 }

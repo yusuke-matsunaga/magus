@@ -23,8 +23,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 ComplexHandler::ComplexHandler(GroupHandler* parent) :
-  DotlibHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent)
+  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
 {
 }
 
@@ -47,6 +46,10 @@ ComplexHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
+  if ( !expect_nl() ) {
+    return false;
+  }
+
   if ( debug() ) {
     cout << attr_name << " (";
     const char* comma = "";
@@ -65,14 +68,7 @@ ComplexHandler::read_attr(const ShString& attr_name,
   PtNode* node = ptmgr().new_ptcomplex(value_list);
   parent()->pt_node()->add_child(attr_name, node);
 
-  return expect_nl();
-}
-
-// @brief 親のハンドラを得る．
-GroupHandler*
-ComplexHandler::parent()
-{
-  return mParent;
+  return true;
 }
 
 // @brief 値を読み込んだ時の処理

@@ -55,9 +55,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-TableHandler::TableHandler(TimingHandler* parent) :
-  GroupHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent),
+TableHandler::TableHandler(GroupHandler* parent) :
+  GroupHandler(parent),
   mTable(NULL)
 {
   // simple attributes
@@ -76,13 +75,6 @@ TableHandler::TableHandler(TimingHandler* parent) :
 // @brief デストラクタ
 TableHandler::~TableHandler()
 {
-}
-
-// @brief 親のハンドラを得る．
-GroupHandler*
-TableHandler::parent()
-{
-  return mParent;
 }
 
 // @brief 対応する PtNode を返す．
@@ -119,7 +111,7 @@ TableHandler::begin_group(const ShString& attr_name,
   }
 
   mTable = ptmgr().new_pttable(value_list[0]);
-  mParent->add_table(attr_name, mTable);
+  parent()->add_table(attr_name, mTable);
 
   return true;
 }

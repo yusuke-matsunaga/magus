@@ -26,21 +26,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  TableHandler(TimingHandler* parent);
+  TableHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   ~TableHandler();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // DotlibHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 親のハンドラを得る．
-  virtual
-  GroupHandler*
-  parent();
 
 
 public:
@@ -79,9 +68,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 親のハンドラ
-  TimingHandler* mParent;
 
   // 対応する PtTable
   PtTable* mTable;

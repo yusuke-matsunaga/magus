@@ -203,9 +203,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-BundleHandler::BundleHandler(CellHandler* parent) :
-  PinHolderHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent),
+BundleHandler::BundleHandler(GroupHandler* parent) :
+  GroupHandler(parent),
   mBundle(NULL)
 {
   // simple attributes
@@ -236,20 +235,6 @@ BundleHandler::BundleHandler(CellHandler* parent) :
 // @brief デストラクタ
 BundleHandler::~BundleHandler()
 {
-}
-
-// @brief 親のハンドラを得る．
-GroupHandler*
-BundleHandler::parent()
-{
-  return mParent;
-}
-
-// @brief 対応する PtNode を返す．
-PtNode*
-BundleHandler::pt_node()
-{
-  return mBundle;
 }
 
 // @brief ピンを追加する．
@@ -291,7 +276,7 @@ BundleHandler::begin_group(const ShString& attr_name,
     return false;
   }
   mBundle = ptmgr().new_ptbundle(value_list[0]);
-  mParent->add_bundle(mBundle);
+  parent()->add_bundle(mBundle);
 
   return true;
 }
@@ -303,6 +288,5 @@ BundleHandler::end_group()
   mBundle = NULL;
   return true;
 }
-
 
 END_NAMESPACE_YM_CELL_DOTLIB

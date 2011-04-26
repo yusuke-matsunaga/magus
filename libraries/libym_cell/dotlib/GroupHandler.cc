@@ -25,7 +25,14 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @param[in] ptmgr パース木を管理するオブジェクト
 GroupHandler::GroupHandler(DotlibParser& parser,
 			   PtMgr& ptmgr) :
-  DotlibHandler(parser, ptmgr)
+  DotlibHandler(parser, ptmgr, NULL)
+{
+}
+
+// @brief 親を持つハンドラ用のコンストラクタ
+// @param[in] parent 親のハンドラ
+GroupHandler::GroupHandler(GroupHandler* parent) :
+  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
 {
 }
 
@@ -110,6 +117,62 @@ GroupHandler::read_attr(const ShString& attr_name,
   return true;
 }
 
+// @brief セルを追加する．
+// @param[in] cell セル
+// @note library の時のみ有効
+void
+GroupHandler::add_cell(PtCell* cell)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief ピンを追加する．
+// @param[in] pin ピン
+// @note cell/bus/bundle の時のみ有効
+void
+GroupHandler::add_pin(PtPin* pin)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief バスを追加する．
+// @param[in] bus バス
+// @note cell の時のみ有効
+void
+GroupHandler::add_bus(PtBus* bus)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief バンドルを追加する．
+// @param[in] bundle バンドル
+// @note cell の時のみ有効
+void
+GroupHandler::add_bundle(PtBundle* bundle)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief タイミングを追加する．
+// @param[in] timing タイミング条件
+// @note pin の時のみ有効
+void
+GroupHandler::add_timing(PtTiming* timing)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief テーブルを追加する．
+// @param[in] attr_name 属性名
+// @param[in] table テーブル
+// @note
+void
+GroupHandler::add_table(const ShString& attr_name,
+			PtTable* table)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
 // @brief ハンドラの登録を行う．
 // @param[in] attr_name 属性名
 // @param[in] handler 対応付けるハンドラ
@@ -156,10 +219,9 @@ GroupHandler::find_handler(const ShString& attr_name)
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 GenGroupHandler::GenGroupHandler(GroupHandler* parent) :
-  GroupHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent)
+  GroupHandler(parent),
+  mPtNode(NULL)
 {
-  mPtNode = NULL;
 }
 
 // @brief デストラクタ
@@ -193,13 +255,6 @@ bool
 GenGroupHandler::end_group()
 {
   return true;
-}
-
-// @brief 親のハンドラを得る．
-GroupHandler*
-GenGroupHandler::parent()
-{
-  return mParent;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

@@ -40,7 +40,6 @@ libym_cell_dotlib_la_SOURCES = \
 	GroupHandler.cc \
 	LibraryHandler.h \
 	LibraryHandler.cc \
-	PinHolderHandler.h \
 	CellHandler.h \
 	CellHandler.cc \
 	BusHandler.h \

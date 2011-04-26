@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-class PinHolderHandler;
-
 //////////////////////////////////////////////////////////////////////
 /// @class PinHandler PinHandler.h "PinHandler.h"
 //////////////////////////////////////////////////////////////////////
@@ -26,21 +24,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  PinHandler(PinHolderHandler* parent);
+  PinHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   ~PinHandler();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // DotlibHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 親のハンドラを得る．
-  virtual
-  GroupHandler*
-  parent();
 
 
 public:
@@ -54,6 +41,7 @@ public:
   pt_node();
 
   /// @brief ピンを追加する．
+  virtual
   void
   add_timing(PtTiming* timing);
 
@@ -83,9 +71,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 親のハンドラ
-  PinHolderHandler* mParent;
 
   // 対応する PtPin
   PtPin* mPin;

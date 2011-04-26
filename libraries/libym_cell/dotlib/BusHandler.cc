@@ -57,9 +57,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-BusHandler::BusHandler(CellHandler* parent) :
-  PinHolderHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent),
+BusHandler::BusHandler(GroupHandler* parent) :
+  GroupHandler(parent),
   mBus(NULL)
 {
   // simple attributes
@@ -73,20 +72,6 @@ BusHandler::BusHandler(CellHandler* parent) :
 // @brief デストラクタ
 BusHandler::~BusHandler()
 {
-}
-
-// @brief 親のハンドラを得る．
-GroupHandler*
-BusHandler::parent()
-{
-  return mParent;
-}
-
-// @brief 対応する PtNode を返す．
-PtNode*
-BusHandler::pt_node()
-{
-  return mBus;
 }
 
 // @brief ピンを追加する．
@@ -128,7 +113,7 @@ BusHandler::begin_group(const ShString& attr_name,
     return false;
   }
   mBus = ptmgr().new_ptbus(value_list[0]);
-  mParent->add_bus(mBus);
+  parent()->add_bus(mBus);
 
   return true;
 }

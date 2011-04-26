@@ -27,8 +27,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] ptmgr パース木を管理するオブジェクト
+  /// @param[in] parent 親のハンドラ
   DotlibHandler(DotlibParser& parser,
-		PtMgr& ptmgr);
+		PtMgr& ptmgr,
+		GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -49,15 +51,24 @@ public:
   read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc) = 0;
 
-  /// @brief 親のハンドラを得る．
-  virtual
-  GroupHandler*
-  parent() = 0;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 派生クラスが用いる関数
+  // 他のクラスが用いる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief パーサーを得る．
+  DotlibParser&
+  parser();
+
+  /// @brief PtMgr を得る．
+  PtMgr&
+  ptmgr();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief group attribute 用のパースを行う．
@@ -80,13 +91,9 @@ public:
   bool
   expect_nl();
 
-  /// @brief パーサーを得る．
-  DotlibParser&
-  parser();
-
-  /// @brief PtMgr を得る．
-  PtMgr&
-  ptmgr();
+  /// @brief 親のハンドラを得る．
+  GroupHandler*
+  parent();
 
   /// @brief メッセージを出力する．
   /// @param[in] src_file この関数を読んでいるソースファイル名
@@ -133,6 +140,9 @@ private:
 
   // パース木を管理するオブジェクト
   PtMgr& mPtMgr;
+
+  // 親のハンドラ
+  GroupHandler* mParent;
 
 };
 

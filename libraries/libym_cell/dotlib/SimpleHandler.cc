@@ -24,8 +24,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 SimpleHandler::SimpleHandler(GroupHandler* parent) :
-  DotlibHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent)
+  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
 {
 }
 
@@ -65,13 +64,6 @@ SimpleHandler::read_attr(const ShString& attr_name,
   p_node->add_child(attr_name, node);
 
   return expect_nl();
-}
-
-// @brief 親のハンドラを得る．
-GroupHandler*
-SimpleHandler::parent()
-{
-  return mParent;
 }
 
 // @brief シンボルモードで read_token() を呼ぶときに true を返す．

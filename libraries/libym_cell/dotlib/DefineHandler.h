@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-class LibraryGroupHandler;
-
 //////////////////////////////////////////////////////////////////////
 /// @class DefineHandler DefineHandler.h "DefineHandler.h"
 /// @brief define attribute 用のハンドラ

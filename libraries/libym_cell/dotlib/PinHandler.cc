@@ -12,7 +12,7 @@
 #include "SimpleHandler.h"
 #include "ComplexHandler.h"
 #include "GroupHandler.h"
-#include "PinHolderHandler.h"
+
 #include "TimingHandler.h"
 
 #include "PtMgr.h"
@@ -104,9 +104,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-PinHandler::PinHandler(PinHolderHandler* parent) :
-  GroupHandler(parent->parser(), parent->ptmgr()),
-  mParent(parent),
+PinHandler::PinHandler(GroupHandler* parent) :
+  GroupHandler(parent),
   mPin(NULL)
 {
   // simple attributes
@@ -198,13 +197,6 @@ PinHandler::~PinHandler()
 {
 }
 
-// @brief 親のハンドラを得る．
-GroupHandler*
-PinHandler::parent()
-{
-  return mParent;
-}
-
 // @brief 対応する PtNode を返す．
 PtNode*
 PinHandler::pt_node()
@@ -251,7 +243,7 @@ PinHandler::begin_group(const ShString& attr_name,
     return false;
   }
   mPin = ptmgr().new_ptpin(value_list[0]);
-  mParent->add_pin(mPin);
+  parent()->add_pin(mPin);
 
   return true;
 }
