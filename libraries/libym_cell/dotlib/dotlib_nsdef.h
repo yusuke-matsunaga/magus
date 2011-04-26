@@ -79,6 +79,7 @@ class DotlibParser;
 class DotlibLex;
 class DotlibHandler;
 class GroupHandler;
+
 class PtMgr;
 class PtNode;
 class PtLibrary;
@@ -86,6 +87,8 @@ class PtCell;
 class PtBus;
 class PtBundle;
 class PtPin;
+class PtTiming;
+class PtTable;
 class PtValue;
 
 END_NAMESPACE_YM_CELL_DOTLIB

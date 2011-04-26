@@ -79,6 +79,15 @@ public:
   PtPin*
   new_ptpin(const PtValue* name);
 
+  /// @brief PtTiming を生成する．
+  PtTiming*
+  new_pttiming();
+
+  /// @brief PtTable を生成する．
+  /// @param[in] name テーブルのテンプレート名
+  PtTable*
+  new_pttable(const PtValue* name);
+
   /// @brief 整数値を表す PtValue を生成する．
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
@@ -127,6 +136,8 @@ private:
   ymuint32 mBusNum;
   ymuint32 mBundleNum;
   ymuint32 mPinNum;
+  ymuint32 mTimingNum;
+  ymuint32 mTableNum;
   ymuint32 mIntNum;
   ymuint32 mFloatNum;
   ymuint32 mStrNum;

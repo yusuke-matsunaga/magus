@@ -51,6 +51,8 @@ libym_cell_dotlib_la_SOURCES = \
 	PinHandler.cc \
 	TimingHandler.h \
 	TimingHandler.cc \
+	TableHandler.h \
+	TableHandler.cc \
 	PtMgr.h \
 	PtMgr.cc \
 	PtValue.h \
@@ -70,6 +72,8 @@ libym_cell_dotlib_la_SOURCES = \
 	PtPin.cc \
 	PtTiming.h \
 	PtTiming.cc \
+	PtTable.h \
+	PtTable.cc \
 	PtDumper.h \
 	PtDumper.cc \
 	CellDotlibReader.cc

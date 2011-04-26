@@ -53,6 +53,11 @@ public:
   PtNode*
   pt_node();
 
+  /// @brief テーブルを追加する．
+  void
+  add_table(const ShString& attr_name,
+	    PtTable* table);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -15,6 +15,8 @@
 #include "PtBus.h"
 #include "PtBundle.h"
 #include "PtPin.h"
+#include "PtTiming.h"
+#include "PtTable.h"
 #include "PtValue.h"
 #include "PtValueImpl.h"
 
@@ -36,6 +38,8 @@ PtMgr::PtMgr() :
   mBusNum = 0;
   mBundleNum = 0;
   mPinNum = 0;
+  mTimingNum = 0;
+  mTableNum = 0;
   mIntNum = 0;
   mFloatNum = 0;
   mStrNum = 0;
@@ -134,6 +138,26 @@ PtMgr::new_ptpin(const PtValue* name)
   return new (p) PtPin(name);
 }
 
+// @brief PtTiming を生成する．
+// @param[in] name ピン名
+PtTiming*
+PtMgr::new_pttiming()
+{
+  ++ mTimingNum;
+  void* p = mAlloc.get_memory(sizeof(PtTiming));
+  return new (p) PtTiming;
+}
+
+// @brief PtTable を生成する．
+// @param[in] name テーブルのテンプレート名
+PtTable*
+PtMgr::new_pttable(const PtValue* name)
+{
+  ++ mTableNum;
+  void* p = mAlloc.get_memory(sizeof(PtTable));
+  return new (p) PtTable(name);
+}
+
 // @brief 整数値を表す PtValue を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
@@ -189,35 +213,62 @@ PtMgr::show_stats()
   cout << "PtSimple:     " << setw(7) << mSimpleNum
        << " x " << setw(3) << sizeof(PtSimpleNode)
        << " = " << setw(10) << mSimpleNum * sizeof(PtSimpleNode) << endl
+
        << "PtComplex:    " << setw(7) << mComplexNum
        << " x " << setw(3) << sizeof(PtComplexNode)
        << " = " << setw(10) << mComplexNum * sizeof(PtComplexNode) << endl
+
        << "PtGroup:      " << setw(7) << mGroupNum
        << " x " << setw(3) << sizeof(PtGroupNode)
        << " = " << setw(10) << mGroupNum * sizeof(PtGroupNode) << endl
+
        << "PtCell:       " << setw(7) << mCellNum
        << " x " << setw(3) << sizeof(PtCell)
        << " = " << setw(10) << mCellNum * sizeof(PtCell) << endl
+
+       << "PtBus:        " << setw(7) << mBusNum
+       << " x " << setw(3) << sizeof(PtBus)
+       << " = " << setw(10) << mBusNum * sizeof(PtBus) << endl
+
+       << "PtBundle:     " << setw(7) << mBundleNum
+       << " x " << setw(3) << sizeof(PtBundle)
+       << " = " << setw(10) << mBundleNum * sizeof(PtBundle) << endl
+
        << "PtPin:        " << setw(7) << mPinNum
        << " x " << setw(3) << sizeof(PtPin)
        << " = " << setw(10) << mPinNum * sizeof(PtPin) << endl
+
+       << "PtTiming:     " << setw(7) << mTimingNum
+       << " x " << setw(3) << sizeof(PtTiming)
+       << " = " << setw(10) << mTimingNum * sizeof(PtTiming) << endl
+
+       << "PtTable :     " << setw(7) << mTableNum
+       << " x " << setw(3) << sizeof(PtTable)
+       << " = " << setw(10) << mTableNum * sizeof(PtTable) << endl
+
        << "PtInt:        " << setw(7) << mIntNum
        << " x " << setw(3) << sizeof(PtInt)
        << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl
+
        << "PtFloat:      " << setw(7) << mFloatNum
        << " x " << setw(3) << sizeof(PtFloat)
        << " = " << setw(10) << mFloatNum * sizeof(PtFloat) << endl
+
        << "PtString:     " << setw(7) << mStrNum
        << " x " << setw(3) << sizeof(PtString)
        << " = " << setw(10) << mStrNum * sizeof(PtString) << endl
+
        << "PtOpr:        " << setw(7) << mOprNum
        << " x " << setw(3) << sizeof(PtOpr)
        << " = " << setw(10) << mOprNum * sizeof(PtOpr) << endl
+
        << "Total memory:               = "
        << setw(10) << mAlloc.used_size() << endl
        << endl
+
        << "Allocated memory:           = "
        << setw(10) << mAlloc.allocated_size() << endl
+
        << "ShString:                   = "
        << setw(10) << ShString::allocated_size() << endl;
 }

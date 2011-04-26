@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_PTPIN_H
-#define LIBYM_CELL_DOTLIB_PTPIN_H
+#ifndef LIBYM_CELL_DOTLIB_PTTABLE_H
+#define LIBYM_CELL_DOTLIB_PTTABLE_H
 
-/// @file libym_cell/dotlib/PtPin.h
-/// @brief PtPin のヘッダファイル
+/// @file libym_cell/dotlib/PtTable.h
+/// @brief PtTable のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtPin PtPin.h "PtPin.h"
-/// @brief ピンを表す PtNode の継承クラス
+/// @class PtTable PtTable.h "PtTable.h"
+/// @brief タイミング情報を表す PtNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class PtPin :
+class PtTable :
   public PtNode
 {
   friend class PtMgr;
@@ -26,12 +26,12 @@ class PtPin :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] value 値(ここではピン名)
-  PtPin(const PtValue* value);
+  /// @param[in] name テンプレート名
+  PtTable(const PtValue* name);
 
   /// @brief デストラクタ
   virtual
-  ~PtPin();
+  ~PtTable();
 
 
 public:
@@ -46,10 +46,6 @@ public:
   void
   add_child(const ShString& attr_name,
 	    PtNode* node);
-
-  /// @brief タイミング情報を追加する．
-  void
-  add_timing(PtTiming* timing);
 
 
 public:
@@ -72,17 +68,8 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // PtPin に独自の関数
+  // PtTable に独自の関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief timing グループの数を返す．
-  ymuint
-  timing_num() const;
-
-  /// @brief timingグループのパース木を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < timing_num() )
-  const PtTiming*
-  timing(ymuint pos) const;
 
 
 private:
@@ -90,17 +77,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値(名前)
-  const PtValue* mValue;
-
-  // タイミング情報のリスト(配列)
-  vector<const PtTiming*> mTimingList;
-
-  // タイミング情報以外の子供のリスト(配列)
-  vector<const PtNode*> mChildList;
+  // テンプレート名
+  const PtValue* mName;
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_PTPIN_H
+#endif // LIBYM_CELL_DOTLIB_PTTABLE_H

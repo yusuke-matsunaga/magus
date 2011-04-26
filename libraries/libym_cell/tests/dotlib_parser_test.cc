@@ -36,13 +36,19 @@ dotlibparser_test(int argc,
   timer.start();
 
   bool error = false;
+  bool debug = false;
   for (int i = 1; i < argc; ++ i) {
-    PtNode* node = parser.read_file(argv[i], true);
-    if ( node == NULL ) {
-      error = true;
+    if ( strcmp(argv[i], "-d") == 0 ) {
+      debug = true;
     }
     else {
-      pt_dump(cout, node);
+      PtNode* node = parser.read_file(argv[i], debug);
+      if ( node == NULL ) {
+	error = true;
+      }
+      else {
+	pt_dump(cout, node);
+      }
     }
   }
 

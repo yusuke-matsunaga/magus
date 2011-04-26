@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_PINHANDLER_H
-#define LIBYM_CELL_DOTLIB_PINHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_TABLEHANDLER_H
+#define LIBYM_CELL_DOTLIB_TABLEHANDLER_H
 
-/// @file libym_cell/dotlib/PinHandler.h
-/// @brief PinHandler のヘッダファイル
+/// @file libym_cell/dotlib/TableHandler.h
+/// @brief TableHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -14,22 +14,22 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-class PinHolderHandler;
+class TimingHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PinHandler PinHandler.h "PinHandler.h"
+/// @class TableHandler TableHandler.h "TableHandler.h"
 //////////////////////////////////////////////////////////////////////
-class PinHandler :
+class TableHandler :
   public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  PinHandler(PinHolderHandler* parent);
+  TableHandler(TimingHandler* parent);
 
   /// @brief デストラクタ
-  ~PinHandler();
+  ~TableHandler();
 
 
 public:
@@ -52,10 +52,6 @@ public:
   virtual
   PtNode*
   pt_node();
-
-  /// @brief ピンを追加する．
-  void
-  add_timing(PtTiming* timing);
 
 
 private:
@@ -85,13 +81,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親のハンドラ
-  PinHolderHandler* mParent;
+  TimingHandler* mParent;
 
-  // 対応する PtPin
-  PtPin* mPin;
+  // 対応する PtTable
+  PtTable* mTable;
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_PINHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_TABLEHANDLER_H

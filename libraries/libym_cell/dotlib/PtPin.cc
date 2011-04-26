@@ -39,7 +39,7 @@ PtPin::add_child(const ShString& attr_name,
 
 // @brief タイミング情報を追加する．
 void
-PtPin::add_timing(PtNode* timing)
+PtPin::add_timing(PtTiming* timing)
 {
   mTimingList.push_back(timing);
 }
@@ -70,7 +70,7 @@ PtPin::timing_num() const
 
 // @brief timing グループのパース木を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
-const PtNode*
+const PtTiming*
 PtPin::timing(ymuint pos) const
 {
   assert_cond( pos < timing_num(), __FILE__, __LINE__);
