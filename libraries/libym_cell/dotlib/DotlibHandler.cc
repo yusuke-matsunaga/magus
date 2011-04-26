@@ -49,26 +49,8 @@ DotlibHandler::parse_complex(vector<const PtValue*>& value_list)
   tTokenType type = parser().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
-      PtValue* value = NULL;
-      FileRegion loc(parser().cur_loc());
-      switch ( type ) {
-      case INT_NUM:
-	value = ptmgr().new_int(parser().cur_int(), loc);
-	break;
-
-      case FLOAT_NUM:
-	value = ptmgr().new_float(parser().cur_float(), loc);
-	break;
-
-      case SYMBOL:
-	value = ptmgr().new_string(ShString(parser().cur_string()), loc);
-	break;
-
-      default:
-	put_msg(__FILE__, __LINE__, parser().cur_loc(),
-		kMsgError,
-		"DOTLIB_PARSER",
-		"Syntax error. int/float/string value is expected.");
+      const PtValue* value = new_ptvalue(type);
+      if ( value == NULL ) {
 	return false;
       }
       value_list.push_back(value);
@@ -89,6 +71,36 @@ DotlibHandler::parse_complex(vector<const PtValue*>& value_list)
   }
 
   return true;
+}
+
+// @brief PtValue を生成する．
+// @param[in] type 型
+// @note 残りの情報は parser() からとってくる．
+const PtValue*
+DotlibHandler::new_ptvalue(tTokenType type)
+{
+  FileRegion loc(parser().cur_loc());
+  switch ( type ) {
+  case INT_NUM:
+    return ptmgr().new_int(parser().cur_int(), loc);
+    break;
+
+  case FLOAT_NUM:
+    return ptmgr().new_float(parser().cur_float(), loc);
+    break;
+
+  case SYMBOL:
+    return ptmgr().new_string(ShString(parser().cur_string()), loc);
+    break;
+
+  default:
+    break;
+  }
+  put_msg(__FILE__, __LINE__, parser().cur_loc(),
+	  kMsgError,
+	  "DOTLIB_PARSER",
+	  "Syntax error. int/float/string value is expected.");
+  return NULL;
 }
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．

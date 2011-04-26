@@ -46,8 +46,6 @@ dump_sub(ostream& s,
 	 const PtNode* node,
 	 ymuint indent)
 {
-  s << indent_str(indent)
-    << "Attr: " << node->attr_name() << endl;
   ymuint nv = node->value_num();
   for (ymuint i = 0; i < nv; ++ i) {
     s << indent_str(indent)
@@ -66,7 +64,7 @@ dump_sub(ostream& s,
   for (ymuint i = 0; i < nk; ++ i) {
     ShString attr = node->child_attr_name(i);
     s << indent_str(indent)
-      << "Attr#" << i << ":" << endl;
+      << "Attr:" << attr << endl;
     ymuint nc = node->child_num(attr);
     for (ymuint j = 0; j < nc; ++ j) {
       s << indent_str(indent + 2)

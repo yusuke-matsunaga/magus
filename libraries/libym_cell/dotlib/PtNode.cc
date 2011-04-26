@@ -18,12 +18,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief simple attribute 用のコンストラクタ
-// @param[in] attr_name 属性名
-// @param[in] attr_loc attr_name のファイル上の位置
-PtNode::PtNode(ShString attr_name,
-	       const FileRegion& attr_loc) :
-  mAttrName(attr_name),
-  mAttrLoc(attr_loc)
+PtNode::PtNode()
 {
 }
 
@@ -33,43 +28,15 @@ PtNode::~PtNode()
 }
 
 // @brief 子供を追加する．
+// @param[in] attr_name 属性名
 // @param[in] node 追加する子供のノード
 // @note デフォルトの実装はなにもしない．
 void
-PtNode::add_child(PtNode* node)
+PtNode::add_child(const ShString& attr_name,
+		  PtNode* node)
 {
   // っていうか呼ばれたらエラーだよね．
   assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief 属性名を表すトークンを返す．
-ShString
-PtNode::attr_name() const
-{
-  return mAttrName;
-}
-
-// @brief 属性名のファイル上の位置を返す．
-FileRegion
-PtNode::attr_loc() const
-{
-  return mAttrLoc;
-}
-
-// @brief 子供のノードの要素数を返す．
-ymuint
-PtNode::child_num() const
-{
-  return 0;
-}
-
-// @brief 子供のノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-const PtNode*
-PtNode::child(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 // @brief 子供の属性名の個数を返す．
@@ -93,7 +60,7 @@ PtNode::child_attr_name(ymuint pos) const
 // @param[in] attr_name 子供の属性名
 // @note デフォルトの実装は 0 を返す．
 ymuint
-PtNode::child_num(ShString attr_name) const
+PtNode::child_num(const ShString& attr_name) const
 {
   return 0;
 }
@@ -102,7 +69,7 @@ PtNode::child_num(ShString attr_name) const
 // @param[in] attr_name 子供の属性名
 // @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
 const PtNode*
-PtNode::child(ShString attr_name,
+PtNode::child(const ShString& attr_name,
 	      ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -115,13 +82,8 @@ PtNode::child(ShString attr_name,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] attr_name 属性名
-// @param[in] attr_loc attr_name のファイル上の位置
 // @param[in] value 値を表すトークン
-PtSimpleNode::PtSimpleNode(ShString attr_name,
-			   const FileRegion& attr_loc,
-			   const PtValue* value) :
-  PtNode(attr_name, attr_loc),
+PtSimpleNode::PtSimpleNode(const PtValue* value) :
   mValue(value)
 {
 }
@@ -154,13 +116,8 @@ PtSimpleNode::value(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief 用のコンストラクタ
-// @param[in] attr_name 属性名
-// @param[in] attr_loc attr_name のファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
-PtComplexNode::PtComplexNode(ShString attr_name,
-			     const FileRegion& attr_loc,
-			     const vector<const PtValue*>& value_list) :
-  PtNode(attr_name, attr_loc),
+PtComplexNode::PtComplexNode(const vector<const PtValue*>& value_list) :
   mValueList(value_list)
 {
 }
@@ -191,13 +148,9 @@ PtComplexNode::value(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] attr_name 属性名
-// @param[in] attr_loc attr_name のファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
-PtGroupNode::PtGroupNode(ShString attr_name,
-			 const FileRegion& attr_loc,
-			 const vector<const PtValue*>& value_list) :
-  PtComplexNode(attr_name, attr_loc, value_list)
+PtGroupNode::PtGroupNode(const vector<const PtValue*>& value_list) :
+  PtComplexNode(value_list)
 {
 }
 
@@ -207,15 +160,13 @@ PtGroupNode::~PtGroupNode()
 }
 
 // @brief 子供を追加する．
+// @param[in] attr_name 属性名
 // @param[in] node 追加する子供のノード
 void
-PtGroupNode::add_child(PtNode* node)
+PtGroupNode::add_child(const ShString& attr_name,
+		       PtNode* node)
 {
-#if 0
-  mChildList.push_back(node);
-#endif
-#if 0
-  ShString attr_name = node->attr_name();
+#if 1
   if ( mChildMap.count(attr_name) == 0 ) {
     mChildMap.insert(make_pair(attr_name, vector<PtNode*>(1, node)));
     mAttrList.push_back(attr_name);
@@ -227,34 +178,11 @@ PtGroupNode::add_child(PtNode* node)
 #endif
 }
 
-// @brief 子供のノードの要素数を返す．
-ymuint
-PtGroupNode::child_num() const
-{
-#if 0
-  return mChildList.size();
-#else
-  return 0;
-#endif
-}
-
-// @brief 子供のノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-const PtNode*
-PtGroupNode::child(ymuint pos) const
-{
-#if 0
-  return mChildList[pos];
-#else
-  return NULL;
-#endif
-}
-
 // @brief 子供の属性名の個数を返す．
 ymuint
 PtGroupNode::child_attr_num() const
 {
-#if 0
+#if 1
   return mAttrList.size();
 #else
   return 0;
@@ -266,7 +194,7 @@ PtGroupNode::child_attr_num() const
 ShString
 PtGroupNode::child_attr_name(ymuint pos) const
 {
-#if 0
+#if 1
   assert_cond( pos < child_attr_num(), __FILE__, __LINE__);
   return mAttrList[pos];
 #else
@@ -278,9 +206,9 @@ PtGroupNode::child_attr_name(ymuint pos) const
 // @param[in] attr_name 子供の属性名
 // @note デフォルトの実装は 0 を返す．
 ymuint
-PtGroupNode::child_num(ShString attr_name) const
+PtGroupNode::child_num(const ShString& attr_name) const
 {
-#if 0
+#if 1
   hash_map<ShString, vector<PtNode*> >::const_iterator p
     = mChildMap.find(attr_name);
   const vector<PtNode*>& child_list = p->second;
@@ -294,10 +222,10 @@ PtGroupNode::child_num(ShString attr_name) const
 // @param[in] attr_name 子供の属性名
 // @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
 const PtNode*
-PtGroupNode::child(ShString attr_name,
+PtGroupNode::child(const ShString& attr_name,
 		   ymuint pos) const
 {
-#if 0
+#if 1
   hash_map<ShString, vector<PtNode*> >::const_iterator p
     = mChildMap.find(attr_name);
   const vector<PtNode*>& child_list = p->second;

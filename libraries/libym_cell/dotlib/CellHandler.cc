@@ -534,7 +534,7 @@ CellHandler::pt_node()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-CellHandler::begin_group(const string& attr_name,
+CellHandler::begin_group(const ShString& attr_name,
 			 const FileRegion& attr_loc,
 			 const vector<const PtValue*>& value_list)
 {

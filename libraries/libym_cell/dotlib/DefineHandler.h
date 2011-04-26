@@ -45,7 +45,7 @@ public:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(ShString attr_name,
+  read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc);
 
 };

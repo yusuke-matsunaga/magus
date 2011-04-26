@@ -38,7 +38,7 @@ ExprHandler::~ExprHandler()
 // @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-ExprHandler::read_attr(ShString attr_name,
+ExprHandler::read_attr(const ShString& attr_name,
 		       const FileRegion& attr_loc)
 {
   if ( !expect(COLON) ) {
@@ -51,8 +51,8 @@ ExprHandler::read_attr(ShString attr_name,
     cout << attr_name << " : " << expr << endl;
   }
 
-  PtNode* node = ptmgr().new_ptsimple(attr_name, attr_loc, expr);
-  parent()->pt_node()->add_child(node);
+  PtNode* node = ptmgr().new_ptsimple(expr);
+  parent()->pt_node()->add_child(attr_name, node);
 
   return expect_nl();
 }

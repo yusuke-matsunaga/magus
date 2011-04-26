@@ -18,13 +18,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] attr_name 属性名(ここでは cell)
-// @param[in] attr_loc 属性名のファイル上の位置
 // @param[in] value 値(ここではセル名)
-PtCell::PtCell(ShString attr_name,
-	       const FileRegion& attr_loc,
-	       const PtValue* value) :
-  PtNode(attr_name, attr_loc),
+PtCell::PtCell(const PtValue* value) :
   mValue(value)
 {
 }
@@ -35,9 +30,11 @@ PtCell::~PtCell()
 }
 
 // @brief 子供を追加する．
+// @param[in] attr_name 属性名
 // @param[in] node 追加する子供のノード
 void
-PtCell::add_child(PtNode* node)
+PtCell::add_child(const ShString& attr_name,
+		  PtNode* node)
 {
 #if 0
   if ( node->attr_name() == "pin" ) {
@@ -68,22 +65,6 @@ PtCell::value(ymuint pos) const
 {
   assert_cond( pos == 0, __FILE__, __LINE__);
   return mValue;
-}
-
-// @brief 子供のノードの要素数を返す．
-ymuint
-PtCell::child_num() const
-{
-  return mChildList.size();
-}
-
-// @brief 子供のノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-const PtNode*
-PtCell::child(ymuint pos) const
-{
-  assert_cond( pos < child_num(), __FILE__, __LINE__);
-  return mChildList[pos];
 }
 
 // @brief pin グループの数を返す．

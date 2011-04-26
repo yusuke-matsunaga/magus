@@ -26,12 +26,8 @@ class PtPin :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] attr_name 属性名(ここでは pin)
-  /// @param[in] attr_loc 属性名のファイル上の位置
   /// @param[in] value 値(ここではピン名)
-  PtPin(ShString attr_name,
-	const FileRegion& attr_loc,
-	const PtValue* value);
+  PtPin(const PtValue* value);
 
   /// @brief デストラクタ
   virtual
@@ -44,10 +40,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 子供を追加する．
+  /// @param[in] attr_name 属性名
   /// @param[in] node 追加する子供のノード
   virtual
   void
-  add_child(PtNode* node);
+  add_child(const ShString& attr_name,
+	    PtNode* node);
 
 
 public:
@@ -66,17 +64,6 @@ public:
   virtual
   const PtValue*
   value(ymuint pos) const;
-
-  /// @brief 子供のノードの要素数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-  virtual
-  const PtNode*
-  child(ymuint pos) const;
 
 
 public:

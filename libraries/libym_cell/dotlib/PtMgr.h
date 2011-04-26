@@ -40,40 +40,24 @@ public:
   init();
 
   /// @brief simple attribute を表す PtNode を生成する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
   PtNode*
-  new_ptsimple(ShString attr_name,
-	       const FileRegion& attr_loc,
-	       const PtValue* value);
+  new_ptsimple(const PtValue* value);
 
   /// @brief complex attribute を表す PtNode を生成する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value_list 値のリスト
   PtNode*
-  new_ptcomplex(ShString attr_name,
-		const FileRegion& attr_loc,
-		const vector<const PtValue*>& value_list);
+  new_ptcomplex(const vector<const PtValue*>& value_list);
 
   /// @brief group statement を表す PtNode を生成する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value_list 値のリスト
   PtNode*
-  new_ptgroup(ShString attr_name,
-	      const FileRegion& attr_loc,
-	      const vector<const PtValue*>& value_list);
+  new_ptgroup(const vector<const PtValue*>& value_list);
 
   /// @brief PtCell を生成する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値
   PtCell*
-  new_ptcell(ShString attr_name,
-	     const FileRegion& attr_loc,
-	     const PtValue* value);
+  new_ptcell(const PtValue* value);
 
   /// @brief 整数値を表す PtValue を生成する．
   /// @param[in] value 値

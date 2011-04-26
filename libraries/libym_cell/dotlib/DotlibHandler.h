@@ -48,7 +48,7 @@ public:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(ShString attr_name,
+  read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc) = 0;
 
 
@@ -61,6 +61,12 @@ public:
   /// @param[out] value_list 読み込んだトークンを格納するリスト
   bool
   parse_complex(vector<const PtValue*>& value_list);
+
+  /// @brief PtValue を生成する．
+  /// @param[in] type 型
+  /// @note 残りの情報は parser() からとってくる．
+  const PtValue*
+  new_ptvalue(tTokenType type);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
   /// @param[in] req_type 要求するトークンの型

@@ -427,7 +427,7 @@ LibraryHandler::pt_node()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-LibraryHandler::begin_group(ShString attr_name,
+LibraryHandler::begin_group(const ShString& attr_name,
 			    const FileRegion& attr_loc,
 			    const vector<const PtValue*>& value_list)
 {
@@ -458,7 +458,7 @@ LibraryHandler::begin_group(ShString attr_name,
     return false;
   }
 
-  mLibrary = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
+  mLibrary = ptmgr().new_ptgroup(value_list);
 
   return true;
 }

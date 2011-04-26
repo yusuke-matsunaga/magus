@@ -45,7 +45,7 @@ GroupHandler::~GroupHandler()
 // @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-GroupHandler::read_attr(ShString attr_name,
+GroupHandler::read_attr(const ShString& attr_name,
 			const FileRegion& attr_loc)
 {
   vector<const PtValue*> value_list;
@@ -131,7 +131,7 @@ GroupHandler::reg_handler(const char* attr_name,
 // @param[in] attr_name 属性名
 // @note エラーが起きたら false を返す．
 bool
-GroupHandler::reg_handler(ShString attr_name,
+GroupHandler::reg_handler(const ShString& attr_name,
 			  DotlibHandler* handler)
 {
   mHandlerMap.insert(make_pair(attr_name, handler));
@@ -166,14 +166,12 @@ GroupHandler::pt_node()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-GroupHandler::begin_group(ShString attr_name,
+GroupHandler::begin_group(const ShString& attr_name,
 			  const FileRegion& attr_loc,
 			  const vector<const PtValue*>& value_list)
 {
-#if 0
-  mPtNode = ptmgr().new_ptgroup(attr_name, attr_loc, value_list);
-  parent()->pt_node()->add_child(mPtNode);
-#endif
+  mPtNode = ptmgr().new_ptgroup(value_list);
+  parent()->pt_node()->add_child(attr_name, mPtNode);
   return true;
 }
 

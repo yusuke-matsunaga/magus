@@ -26,11 +26,8 @@ class PtNode
 
 protected:
 
-  /// @brief simple attribute 用のコンストラクタ
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc attr_name のファイル上の位置
-  PtNode(ShString attr_name,
-	 const FileRegion& attr_loc);
+  /// @brief コンストラクタ
+  PtNode();
 
   /// @brief デストラクタ
   virtual
@@ -43,25 +40,19 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 子供を追加する．
+  /// @param[in] attr_name 属性名
   /// @param[in] node 追加する子供のノード
   /// @note デフォルトの実装はなにもしない．
   virtual
   void
-  add_child(PtNode* node);
+  add_child(const ShString& attr_name,
+	    PtNode* node);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を参照する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 属性名をを返す．
-  ShString
-  attr_name() const;
-
-  /// @brief 属性名のファイル上の位置を返す．
-  FileRegion
-  attr_loc() const;
 
   /// @brief 値の数を返す．
   /// @note simple attribute なら常に1
@@ -74,18 +65,6 @@ public:
   virtual
   const PtValue*
   value(ymuint pos) const = 0;
-
-  /// @brief 子供のノードの要素数を返す．
-  /// @note デフォルトの実装は 0 を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-  virtual
-  const PtNode*
-  child(ymuint pos) const;
 
   /// @brief 子供の属性名の個数を返す．
   /// @note デフォルトの実装は 0 を返す．
@@ -104,27 +83,15 @@ public:
   /// @note デフォルトの実装は 0 を返す．
   virtual
   ymuint
-  child_num(ShString attr_name) const;
+  child_num(const ShString& attr_name) const;
 
   /// @brief 属性に対応した子供を返す．
   /// @param[in] attr_name 子供の属性名
   /// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
   virtual
   const PtNode*
-  child(ShString attr_name,
+  child(const ShString& attr_name,
 	ymuint pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 属性名
-  ShString mAttrName;
-
-  // 属性名のファイル上の位置
-  FileRegion mAttrLoc;
 
 };
 

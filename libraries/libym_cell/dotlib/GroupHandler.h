@@ -49,7 +49,7 @@ public:
   /// @return エラーが起きたら false を返す．
   virtual
   bool
-  read_attr(ShString attr_name,
+  read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc);
 
 
@@ -71,7 +71,7 @@ public:
   /// @param[in] handler 対応付けるハンドラ
   /// @note エラーが起きたら false を返す．
   bool
-  reg_handler(ShString attr_name,
+  reg_handler(const ShString& attr_name,
 	      DotlibHandler* handler);
 
   /// @brief ハンドラを取り出す．
@@ -104,7 +104,7 @@ private:
   /// @param[in] value_list 値を表すトークンのリスト
   virtual
   bool
-  begin_group(ShString attr_name,
+  begin_group(const ShString& attr_name,
 	      const FileRegion& attr_loc,
 	      const vector<const PtValue*>& value_list);
 

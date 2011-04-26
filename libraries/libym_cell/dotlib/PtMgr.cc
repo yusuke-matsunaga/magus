@@ -48,58 +48,42 @@ PtMgr::init()
 }
 
 // @brief simple attribute を表す PtNode を生成する．
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
 PtNode*
-PtMgr::new_ptsimple(ShString attr_name,
-		    const FileRegion& attr_loc,
-		    const PtValue* value)
+PtMgr::new_ptsimple(const PtValue* value)
 {
   ++ mSimpleNum;
   void* p = mAlloc.get_memory(sizeof(PtSimpleNode));
-  return new (p) PtSimpleNode(attr_name, attr_loc, value);
+  return new (p) PtSimpleNode(value);
 }
 
 // @brief complex attribute を表す PtNode を生成する．
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値のリスト
 PtNode*
-PtMgr::new_ptcomplex(ShString attr_name,
-		     const FileRegion& attr_loc,
-		     const vector<const PtValue*>& value_list)
+PtMgr::new_ptcomplex(const vector<const PtValue*>& value_list)
 {
   ++ mComplexNum;
   void* p = mAlloc.get_memory(sizeof(PtComplexNode));
-  return new (p) PtComplexNode(attr_name, attr_loc, value_list);
+  return new (p) PtComplexNode(value_list);
 }
 
 // @brief group statement を表す PtNode を生成する．
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値のリスト
 PtNode*
-PtMgr::new_ptgroup(ShString attr_name,
-		   const FileRegion& attr_loc,
-		   const vector<const PtValue*>& value_list)
+PtMgr::new_ptgroup(const vector<const PtValue*>& value_list)
 {
   ++ mGroupNum;
   void* p = mAlloc.get_memory(sizeof(PtGroupNode));
-  return new (p) PtGroupNode(attr_name, attr_loc, value_list);
+  return new (p) PtGroupNode(value_list);
 }
 
 // @brief PtCell を生成する．
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
 PtCell*
-PtMgr::new_ptcell(ShString attr_name,
-		  const FileRegion& attr_loc,
-		  const PtValue* value)
+PtMgr::new_ptcell(const PtValue* value)
 {
   void* p = mAlloc.get_memory(sizeof(PtCell));
-  return new (p) PtCell(attr_name, attr_loc, value);
+  return new (p) PtCell(value);
 }
 
 // @brief 整数値を表す PtValue を生成する．
@@ -177,6 +161,7 @@ PtMgr::show_stats()
        << " = " << setw(10) << mOprNum * sizeof(PtOpr) << endl
        << "Total memory:               = "
        << setw(10) << mAlloc.used_size() << endl
+       << endl
        << "Allocated memory:           = "
        << setw(10) << mAlloc.allocated_size() << endl
        << "ShString:                   = "

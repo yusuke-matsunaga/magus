@@ -26,12 +26,8 @@ class PtSimpleNode :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc attr_name のファイル上の位置
   /// @param[in] value 値を表すトークン
-  PtSimpleNode(ShString attr_name,
-	 const FileRegion& attr_loc,
-	 const PtValue* value);
+  PtSimpleNode(const PtValue* value);
 
   /// @brief デストラクタ
   virtual
@@ -77,12 +73,8 @@ class PtComplexNode :
 public:
 
   /// @brief 用のコンストラクタ
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc attr_name のファイル上の位置
   /// @param[in] value_list 値を表すトークンのリスト
-  PtComplexNode(ShString attr_name,
-		const FileRegion& attr_loc,
-		const vector<const PtValue*>& value_list);
+  PtComplexNode(const vector<const PtValue*>& value_list);
 
   /// @brief デストラクタ
   virtual
@@ -127,12 +119,8 @@ class PtGroupNode :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc attr_name のファイル上の位置
   /// @param[in] value_list 値を表すトークンのリスト
-  PtGroupNode(ShString attr_name,
-	      const FileRegion& attr_loc,
-	      const vector<const PtValue*>& value_list);
+  PtGroupNode(const vector<const PtValue*>& value_list);
 
   /// @brief デストラクタ
   virtual
@@ -145,28 +133,18 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 子供を追加する．
+  /// @param[in] attr_name 属性名
   /// @param[in] node 追加する子供のノード
-  /// @note デフォルトの実装はなにもしない．
   virtual
   void
-  add_child(PtNode* node);
+  add_child(const ShString& attr_name,
+	    PtNode* node);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を参照する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 子供のノードの要素数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供のノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-  virtual
-  const PtNode*
-  child(ymuint pos) const;
 
   /// @brief 子供の属性名の個数を返す．
   /// @note デフォルトの実装は 0 を返す．
@@ -185,14 +163,14 @@ public:
   /// @note デフォルトの実装は 0 を返す．
   virtual
   ymuint
-  child_num(ShString attr_name) const;
+  child_num(const ShString& attr_name) const;
 
   /// @brief 属性に対応した子供を返す．
   /// @param[in] attr_name 子供の属性名
   /// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
   virtual
   const PtNode*
-  child(ShString attr_name,
+  child(const ShString& attr_name,
 	ymuint pos) const;
 
 
@@ -201,15 +179,10 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-#if 0
-  // 子供のノードのリスト
-  vector<PtNode*> mChildList;
-#endif
-
-#if 0
   // 属性名のリスト
   vector<ShString> mAttrList;
 
+#if 1
   // 属性名をキーにして子供のリストを格納する連想配列
   hash_map<ShString, vector<PtNode*> > mChildMap;
 #endif

@@ -37,7 +37,7 @@ DefineHandler::~DefineHandler()
 // @param[in] attr_loc ファイル上の位置
 // @return エラーが起きたら false を返す．
 bool
-DefineHandler::read_attr(ShString attr_name,
+DefineHandler::read_attr(const ShString& attr_name,
 			 const FileRegion& attr_loc)
 {
   vector<const PtValue*> value_list;
