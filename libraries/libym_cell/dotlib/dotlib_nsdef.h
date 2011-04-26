@@ -81,7 +81,10 @@ class DotlibHandler;
 class GroupHandler;
 class PtMgr;
 class PtNode;
+class PtLibrary;
 class PtCell;
+class PtBus;
+class PtBundle;
 class PtPin;
 class PtValue;
 

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "DotlibHandler.h"
+#include "ComplexHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -21,7 +21,7 @@ class LibraryGroupHandler;
 /// @brief define attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class DefineHandler :
-  public DotlibHandler
+  public ComplexHandler
 {
 public:
 

@@ -40,8 +40,17 @@ libym_cell_dotlib_la_SOURCES = \
 	GroupHandler.cc \
 	LibraryHandler.h \
 	LibraryHandler.cc \
+	PinHolderHandler.h \
 	CellHandler.h \
 	CellHandler.cc \
+	BusHandler.h \
+	BusHandler.cc \
+	BundleHandler.h \
+	BundleHandler.cc \
+	PinHandler.h \
+	PinHandler.cc \
+	TimingHandler.h \
+	TimingHandler.cc \
 	PtMgr.h \
 	PtMgr.cc \
 	PtValue.h \
@@ -49,10 +58,18 @@ libym_cell_dotlib_la_SOURCES = \
 	PtNode.h \
 	PtNodeImpl.h \
 	PtNode.cc \
+	PtLibrary.h \
+	PtLibrary.cc \
 	PtCell.h \
 	PtCell.cc \
+	PtBus.h \
+	PtBus.cc \
+	PtBundle.h \
+	PtBundle.cc \
 	PtPin.h \
 	PtPin.cc \
+	PtTiming.h \
+	PtTiming.cc \
 	PtDumper.h \
 	PtDumper.cc \
 	CellDotlibReader.cc

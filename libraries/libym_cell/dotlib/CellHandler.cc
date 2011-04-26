@@ -12,6 +12,10 @@
 #include "SimpleHandler.h"
 #include "ComplexHandler.h"
 #include "GroupHandler.h"
+#include "LibraryHandler.h"
+#include "BusHandler.h"
+#include "BundleHandler.h"
+#include "PinHandler.h"
 
 #include "PtMgr.h"
 #include "PtNode.h"
@@ -43,7 +47,7 @@ inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GroupHandler(parent);
+  return new GenGroupHandler(parent);
 }
 
 DotlibHandler*
@@ -336,38 +340,6 @@ new_bus(GroupHandler* parent)
 }
 
 DotlibHandler*
-new_bundle(GroupHandler* parent)
-{
-  GroupHandler* handler = new_group(parent);
-
-  // simple attributes
-  DotlibHandler* simple = new_simple(handler);
-  handler->reg_handler("capacitance", simple);
-  handler->reg_handler("direction", simple);
-  handler->reg_handler("function", simple);
-
-  // complex attributes
-  DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("members", complex);
-
-  // group statements
-  handler->reg_handler("pin", new_pin(handler));
-  handler->reg_handler("electromigration", new_group(handler));
-  handler->reg_handler("hyperbolic_noise_above_high", new_group(handler));
-  handler->reg_handler("hyperbolic_noise_below_low", new_group(handler));
-  handler->reg_handler("hyperbolic_noise_high", new_group(handler));
-  handler->reg_handler("hyperbolic_noise_low", new_group(handler));
-  handler->reg_handler("internal_power", new_internal_power(handler));
-  handler->reg_handler("max_trans", new_group(handler));
-  handler->reg_handler("min_pulse_width", new_group(handler));
-  handler->reg_handler("minimum_period", new_group(handler));
-  handler->reg_handler("timing", new_timing(handler));
-  handler->reg_handler("tlatch", new_group(handler));
-
-  return handler;
-}
-
-DotlibHandler*
 new_cell_internal_power(GroupHandler* parent)
 {
   GroupHandler* handler = new_group(parent);
@@ -445,8 +417,9 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-CellHandler::CellHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+CellHandler::CellHandler(LibraryHandler* parent) :
+  PinHolderHandler(parent->parser(), parent->ptmgr()),
+  mParent(parent),
   mCell(NULL)
 {
   // simple attributes
@@ -493,8 +466,8 @@ CellHandler::CellHandler(GroupHandler* parent) :
   reg_handler("resource_usage", complex);
 
   // group statements
-  reg_handler("bus", new_bus(this));
-  reg_handler("bundle", new_bundle(this));
+  reg_handler("bus", new BusHandler(this));
+  reg_handler("bundle", new BundleHandler(this));
   reg_handler("dynamic_current", new_group(this));
   reg_handler("ff", new_ff(this));
   reg_handler("ff_bank", new_ff(this));
@@ -507,7 +480,7 @@ CellHandler::CellHandler(GroupHandler* parent) :
   reg_handler("leakage_power", new_leakage_power(this));
   reg_handler("lut", new_group(this));
   reg_handler("mode_definition", new_group(this));
-  reg_handler("pin", new_pin(this));
+  reg_handler("pin", new PinHandler(this));
   reg_handler("routing_track", new_group(this));
   reg_handler("statetable", new_statetable(this));
 
@@ -521,12 +494,39 @@ CellHandler::~CellHandler()
 {
 }
 
-#if 0
+// @brief 親のハンドラを得る．
+GroupHandler*
+CellHandler::parent()
+{
+  return mParent;
+}
+
 // @brief 対応する PtNode を返す．
 PtNode*
 CellHandler::pt_node()
 {
   return mCell;
+}
+
+// @brief ピンを追加する．
+void
+CellHandler::add_pin(PtPin* pin)
+{
+  mCell->add_pin(pin);
+}
+
+// @brief バスを追加する．
+void
+CellHandler::add_bus(PtBus* bus)
+{
+  mCell->add_bus(bus);
+}
+
+// @brief バンドルを追加する．
+void
+CellHandler::add_bundle(PtBundle* bundle)
+{
+  mCell->add_bundle(bundle);
 }
 
 // @brief group statement の最初に呼ばれる関数
@@ -560,8 +560,8 @@ CellHandler::begin_group(const ShString& attr_name,
 	    "string value is exprected.");
     return false;
   }
-  mCell = ptmgr().new_ptcell(attr_name, attr_loc, value_list[0]);
-  parent()->pt_node()->add_child(mCell);
+  mCell = ptmgr().new_ptcell(value_list[0]);
+  mParent->add_cell(mCell);
 
   return true;
 }
@@ -573,7 +573,6 @@ CellHandler::end_group()
   mCell = NULL;
   return true;
 }
-#endif
 
 
 END_NAMESPACE_YM_CELL_DOTLIB

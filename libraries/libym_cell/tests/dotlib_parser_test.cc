@@ -37,7 +37,7 @@ dotlibparser_test(int argc,
 
   bool error = false;
   for (int i = 1; i < argc; ++ i) {
-    PtNode* node = parser.read_file(argv[i], false);
+    PtNode* node = parser.read_file(argv[i], true);
     if ( node == NULL ) {
       error = true;
     }

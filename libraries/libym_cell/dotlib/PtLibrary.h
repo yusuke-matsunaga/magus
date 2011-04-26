@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "dotlib_nsdef.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -18,16 +18,36 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @class PtLibrary PtLibrary.h "PtLibrary.h"
 /// @brief library グループを表すパース木の要素
 //////////////////////////////////////////////////////////////////////
-class PtLibrary
+class PtLibrary :
+  public PtNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name ライブラリ名
-  PtLibrary(const string& name);
+  PtLibrary(const PtValue* name);
 
   /// @brief デストラクタ
   ~PtLibrary();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 子供を追加する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] node 追加する子供のノード
+  /// @note デフォルトの実装はなにもしない．
+  virtual
+  void
+  add_child(const ShString& attr_name,
+	    PtNode* node);
+
+  /// @brief セルを追加する．
+  void
+  add_cell(PtCell* cell);
 
 
 public:
@@ -41,6 +61,35 @@ public:
   const PtCell*
   cell(ymuint pos) const;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を参照する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値の数を返す．
+  /// @note simple attribute なら常に1
+  virtual
+  ymuint
+  value_num() const;
+
+  /// @brief 値を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
+  virtual
+  const PtValue*
+  value(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  const PtValue* mName;
+
+  // セルのリスト
+  vector<PtCell*> mCellList;
 
 };
 

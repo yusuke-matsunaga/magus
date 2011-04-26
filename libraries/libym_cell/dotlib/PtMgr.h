@@ -54,10 +54,30 @@ public:
   PtNode*
   new_ptgroup(const vector<const PtValue*>& value_list);
 
+  /// @brief PtLibrary を生成する．
+  /// @param[in] name ライブラリ名
+  PtLibrary*
+  new_ptlibrary(const PtValue* name);
+
   /// @brief PtCell を生成する．
-  /// @param[in] value 値
+  /// @param[in] name セル名
   PtCell*
-  new_ptcell(const PtValue* value);
+  new_ptcell(const PtValue* name);
+
+  /// @brief PtBus を生成する．
+  /// @param[in] name バス名
+  PtBus*
+  new_ptbus(const PtValue* name);
+
+  /// @brief PtBundle を生成する．
+  /// @param[in] name バンドル名
+  PtBundle*
+  new_ptbundle(const PtValue* name);
+
+  /// @brief PtPin を生成する．
+  /// @param[in] name ピン名
+  PtPin*
+  new_ptpin(const PtValue* name);
 
   /// @brief 整数値を表す PtValue を生成する．
   /// @param[in] value 値
@@ -103,6 +123,10 @@ private:
   ymuint32 mSimpleNum;
   ymuint32 mComplexNum;
   ymuint32 mGroupNum;
+  ymuint32 mCellNum;
+  ymuint32 mBusNum;
+  ymuint32 mBundleNum;
+  ymuint32 mPinNum;
   ymuint32 mIntNum;
   ymuint32 mFloatNum;
   ymuint32 mStrNum;

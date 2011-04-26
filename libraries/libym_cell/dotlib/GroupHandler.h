@@ -23,11 +23,7 @@ class GroupHandler :
 {
 public:
 
-  /// @brief 親がある場合のコンストラクタ
-  /// @param[in] parent 親のハンドラ
-  GroupHandler(GroupHandler* parent);
-
-  /// @brief 親がない場合のコンストラクタ
+  /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] ptmgr パース木を管理するオブジェクト
   GroupHandler(DotlibParser& parser,
@@ -89,14 +85,70 @@ public:
   /// @brief 対応する PtNode を返す．
   virtual
   PtNode*
-  pt_node();
-
+  pt_node() = 0;
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる仮想関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief group statement の最初に呼ばれる関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value_list 値を表すトークンのリスト
+  virtual
+  bool
+  begin_group(const ShString& attr_name,
+	      const FileRegion& attr_loc,
+	      const vector<const PtValue*>& value_list) = 0;
+
+  /// @brief group statement の最後に呼ばれる関数
+  virtual
+  bool
+  end_group() = 0;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ハンドラの連想配列
+  hash_map<ShString, DotlibHandler*> mHandlerMap;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class GenGroupHandler GroupHandler.h "GroupHandler.h"
+/// @brief 汎用の GroupHandler
+//////////////////////////////////////////////////////////////////////
+class GenGroupHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
+  GenGroupHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  ~GenGroupHandler();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 対応する PtNode を返す．
+  virtual
+  PtNode*
+  pt_node();
+
+
+private:
 
   /// @brief group statement の最初に呼ばれる関数
   /// @param[in] attr_name 属性名
@@ -114,13 +166,24 @@ private:
   end_group();
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // DotlibHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 親のハンドラを得る．
+  virtual
+  GroupHandler*
+  parent();
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ハンドラの連想配列
-  hash_map<ShString, DotlibHandler*> mHandlerMap;
+  // 親のハンドラ
+  GroupHandler* mParent;
 
   // 対応する PtNode
   PtNode* mPtNode;

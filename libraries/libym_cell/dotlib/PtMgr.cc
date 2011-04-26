@@ -10,7 +10,11 @@
 #include "PtMgr.h"
 #include "PtNode.h"
 #include "PtNodeImpl.h"
+#include "PtLibrary.h"
 #include "PtCell.h"
+#include "PtBus.h"
+#include "PtBundle.h"
+#include "PtPin.h"
 #include "PtValue.h"
 #include "PtValueImpl.h"
 
@@ -28,6 +32,10 @@ PtMgr::PtMgr() :
   mSimpleNum = 0;
   mComplexNum = 0;
   mGroupNum = 0;
+  mCellNum = 0;
+  mBusNum = 0;
+  mBundleNum = 0;
+  mPinNum = 0;
   mIntNum = 0;
   mFloatNum = 0;
   mStrNum = 0;
@@ -77,13 +85,53 @@ PtMgr::new_ptgroup(const vector<const PtValue*>& value_list)
   return new (p) PtGroupNode(value_list);
 }
 
-// @brief PtCell を生成する．
-// @param[in] value 値
-PtCell*
-PtMgr::new_ptcell(const PtValue* value)
+// @brief PtLibrary を生成する．
+// @param[in] name ライブラリ名
+PtLibrary*
+PtMgr::new_ptlibrary(const PtValue* name)
 {
+  void* p = mAlloc.get_memory(sizeof(PtLibrary));
+  return new (p) PtLibrary(name);
+}
+
+// @brief PtCell を生成する．
+// @param[in] name セル名
+PtCell*
+PtMgr::new_ptcell(const PtValue* name)
+{
+  ++ mCellNum;
   void* p = mAlloc.get_memory(sizeof(PtCell));
-  return new (p) PtCell(value);
+  return new (p) PtCell(name);
+}
+
+// @brief PtBus を生成する．
+// @param[in] name バス名
+PtBus*
+PtMgr::new_ptbus(const PtValue* name)
+{
+  ++ mBusNum;
+  void* p = mAlloc.get_memory(sizeof(PtBus));
+  return new (p) PtBus(name);
+}
+
+// @brief PtBundle を生成する．
+// @param[in] name バンドル名
+PtBundle*
+PtMgr::new_ptbundle(const PtValue* name)
+{
+  ++ mBundleNum;
+  void* p = mAlloc.get_memory(sizeof(PtBundle));
+  return new (p) PtBundle(name);
+}
+
+// @brief PtPin を生成する．
+// @param[in] name ピン名
+PtPin*
+PtMgr::new_ptpin(const PtValue* name)
+{
+  ++ mPinNum;
+  void* p = mAlloc.get_memory(sizeof(PtPin));
+  return new (p) PtPin(name);
 }
 
 // @brief 整数値を表す PtValue を生成する．
@@ -147,6 +195,12 @@ PtMgr::show_stats()
        << "PtGroup:      " << setw(7) << mGroupNum
        << " x " << setw(3) << sizeof(PtGroupNode)
        << " = " << setw(10) << mGroupNum * sizeof(PtGroupNode) << endl
+       << "PtCell:       " << setw(7) << mCellNum
+       << " x " << setw(3) << sizeof(PtCell)
+       << " = " << setw(10) << mCellNum * sizeof(PtCell) << endl
+       << "PtPin:        " << setw(7) << mPinNum
+       << " x " << setw(3) << sizeof(PtPin)
+       << " = " << setw(10) << mPinNum * sizeof(PtPin) << endl
        << "PtInt:        " << setw(7) << mIntNum
        << " x " << setw(3) << sizeof(PtInt)
        << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl

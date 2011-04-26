@@ -36,18 +36,30 @@ void
 PtCell::add_child(const ShString& attr_name,
 		  PtNode* node)
 {
-#if 0
-  if ( node->attr_name() == "pin" ) {
-    PtPin* pin = dynamic_cast<PtPin*>(node);
-    assert_cond( pin != NULL, __FILE__, __LINE__);
-    mPinList.push_back(pin);
-  }
-  else {
-    mChildList.push_back(node);
-  }
-#else
   mChildList.push_back(node);
-#endif
+}
+
+// @brief ピンを追加する．
+void
+PtCell::add_pin(PtPin* pin)
+{
+  mPinList.push_back(pin);
+}
+
+// @brief バスを追加する．
+// @param[in] bus 対象のバス
+void
+PtCell::add_bus(PtBus* bus)
+{
+  mBusList.push_back(bus);
+}
+
+// @brief バンドルを追加する．
+// @param[in] bundle 対象のバンドル
+void
+PtCell::add_bundle(PtBundle* bundle)
+{
+  mBundleList.push_back(bundle);
 }
 
 // @brief 値の数を返す．
@@ -81,6 +93,38 @@ PtCell::pin(ymuint pos) const
 {
   assert_cond( pos < pin_num(), __FILE__, __LINE__);
   return mPinList[pos];
+}
+
+// @brief bus グループの数を返す．
+ymuint
+PtCell::bus_num() const
+{
+  return mBusList.size();
+}
+
+// @brief bus グループのパース木を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
+const PtBus*
+PtCell::bus(ymuint pos) const
+{
+  assert_cond( pos < bus_num(), __FILE__, __LINE__);
+  return mBusList[pos];
+}
+
+// @brief bundle グループの数を返す．
+ymuint
+PtCell::bundle_num() const
+{
+  return mBundleList.size();
+}
+
+// @brief bundle グループのパース木を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
+const PtBundle*
+PtCell::bundle(ymuint pos) const
+{
+  assert_cond( pos < bundle_num(), __FILE__, __LINE__);
+  return mBundleList[pos];
 }
 
 

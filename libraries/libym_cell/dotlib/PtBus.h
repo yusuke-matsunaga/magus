@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_PTCELL_H
-#define LIBYM_CELL_DOTLIB_PTCELL_H
+#ifndef LIBYM_CELL_DOTLIB_PTBUS_H
+#define LIBYM_CELL_DOTLIB_PTBUS_H
 
-/// @file libym_cell/dotlib/PtCell.h
-/// @brief PtCell のヘッダファイル
+/// @file libym_cell/dotlib/PtBus.h
+/// @brief PtBus のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtCell PtCell.h "PtCell.h"
-/// @brief cell グループを表すパース木の要素
+/// @class PtBus PtBus.h "PtBus.h"
+/// @brief bus グループを表すパース木の要素
 //////////////////////////////////////////////////////////////////////
-class PtCell :
+class PtBus :
   public PtNode
 {
   friend class PtMgr;
@@ -26,12 +26,12 @@ class PtCell :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] value 値(ここではセル名)
-  PtCell(const PtValue* value);
+  /// @param[in] value 値(ここではバス名)
+  PtBus(const PtValue* value);
 
   /// @brief デストラクタ
   virtual
-  ~PtCell();
+  ~PtBus();
 
 
 public:
@@ -51,16 +51,6 @@ public:
   /// @param[in] pin 対象のピン
   void
   add_pin(PtPin* pin);
-
-  /// @brief バスを追加する．
-  /// @param[in] bus 対象のバス
-  void
-  add_bus(PtBus* bus);
-
-  /// @brief バンドルを追加する．
-  /// @param[in] bundle 対象のバンドル
-  void
-  add_bundle(PtBundle* bundel);
 
 
 public:
@@ -83,7 +73,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // PtCell に独自の関数
+  // PtBus に独自の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief pin グループの数を返す．
@@ -94,24 +84,6 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < pin_num() )
   const PtPin*
   pin(ymuint pos) const;
-
-  /// @brief bus グループの数を返す．
-  ymuint
-  bus_num() const;
-
-  /// @brief bus グループのパース木を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
-  const PtBus*
-  bus(ymuint pos) const;
-
-  /// @brief bundle グループの数を返す．
-  ymuint
-  bundle_num() const;
-
-  /// @brief bundle グループのパース木を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
-  const PtBundle*
-  bundle(ymuint pos) const;
 
 
 private:
@@ -125,12 +97,6 @@ private:
   // ピンのリスト(配列)
   vector<const PtPin*> mPinList;
 
-  // バスのリスト(配列)
-  vector<const PtBus*> mBusList;
-
-  // バンドルのリスト(配列)
-  vector<const PtBundle*> mBundleList;
-
   // ピン以外の子供のリスト(配列)
   vector<const PtNode*> mChildList;
 
@@ -138,4 +104,4 @@ private:
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_PTCELL_H
+#endif // LIBYM_CELL_DOTLIB_PTBUS_H

@@ -16,6 +16,9 @@
 #include "GroupHandler.h"
 #include "CellHandler.h"
 #include "PtMgr.h"
+#include "PtNode.h"
+#include "PtLibrary.h"
+#include "PtCell.h"
 #include "PtValue.h"
 
 
@@ -42,7 +45,7 @@ inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GroupHandler(parent);
+  return new GenGroupHandler(parent);
 }
 
 DotlibHandler*
@@ -415,11 +418,26 @@ LibraryHandler::~LibraryHandler()
 {
 }
 
+// @brief 親のハンドラを得る．
+// @note このクラスは NULL を返す．
+GroupHandler*
+LibraryHandler::parent()
+{
+  return NULL;
+}
+
 // @brief 対応する PtNode を返す．
 PtNode*
 LibraryHandler::pt_node()
 {
   return mLibrary;
+}
+
+// @brief セルを追加する．
+void
+LibraryHandler::add_cell(PtCell* cell)
+{
+  mLibrary->add_cell(cell);
 }
 
 // @brief グループ名を読み込んだ時の処理
@@ -458,7 +476,7 @@ LibraryHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  mLibrary = ptmgr().new_ptgroup(value_list);
+  mLibrary = ptmgr().new_ptlibrary(value_list[0]);
 
   return true;
 }

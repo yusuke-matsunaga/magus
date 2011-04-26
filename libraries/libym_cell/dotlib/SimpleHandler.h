@@ -46,6 +46,11 @@ public:
   read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc);
 
+  /// @brief 親のハンドラを得る．
+  virtual
+  GroupHandler*
+  parent();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -68,6 +73,15 @@ private:
   read_value(const ShString& attr_name,
 	     const FileRegion& attr_loc,
 	     const PtValue* value);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 親のハンドラ
+  GroupHandler* mParent;
 
 };
 

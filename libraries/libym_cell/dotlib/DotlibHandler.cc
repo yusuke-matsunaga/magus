@@ -21,13 +21,10 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] parser パーサー
 // @param[in] ptmgr パース木を管理するオブジェクト
-// @param[in] parent 親のハンドラ
 DotlibHandler::DotlibHandler(DotlibParser& parser,
-			     PtMgr& ptmgr,
-			     GroupHandler* parent) :
+			     PtMgr& ptmgr) :
   mParser(parser),
-  mPtMgr(ptmgr),
-  mParent(parent)
+  mPtMgr(ptmgr)
 {
 }
 
@@ -115,13 +112,6 @@ bool
 DotlibHandler::expect_nl()
 {
   return mParser.expect_nl();
-}
-
-// @brief 親のハンドラを得る．
-GroupHandler*
-DotlibHandler::parent()
-{
-  return mParent;
 }
 
 // @brief パーサーを得る．

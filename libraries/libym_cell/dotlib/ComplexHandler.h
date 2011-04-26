@@ -46,6 +46,37 @@ public:
   read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc);
 
+  /// @brief 親のハンドラを得る．
+  virtual
+  GroupHandler*
+  parent();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // ComplexHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値を読み込んだ時の処理
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value_list 値のリスト
+  /// @note デフォルトの実装ではなにもしないで true を返す．
+  virtual
+  bool
+  read_value(const ShString& attr_name,
+	     const FileRegion& attr_loc,
+	     const vector<const PtValue*>& value_list);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 親のハンドラ
+  GroupHandler* mParent;
+
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

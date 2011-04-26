@@ -182,7 +182,7 @@ private:
   // 属性名のリスト
   vector<ShString> mAttrList;
 
-#if 1
+#if 0
   // 属性名をキーにして子供のリストを格納する連想配列
   hash_map<ShString, vector<PtNode*> > mChildMap;
 #endif

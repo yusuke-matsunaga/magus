@@ -47,6 +47,10 @@ public:
   add_child(const ShString& attr_name,
 	    PtNode* node);
 
+  /// @brief タイミング情報を追加する．
+  void
+  add_timing(PtNode* timing);
+
 
 public:
   //////////////////////////////////////////////////////////////////////

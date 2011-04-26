@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "DotlibHandler.h"
+#include "SimpleHandler.h"
 #include "ym_utils/FileRegion.h"
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @brief expression の値をとる simple attribute 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class ExprHandler :
-  public DotlibHandler
+  public SimpleHandler
 {
 public:
 

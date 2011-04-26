@@ -19,19 +19,12 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // クラス GroupHandler
 //////////////////////////////////////////////////////////////////////
 
-// @brief 親がある場合のコンストラクタ
-// @param[in] parent 親のハンドラ
-GroupHandler::GroupHandler(GroupHandler* parent) :
-  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
-{
-}
-
 // @brief 親がない場合のコンストラクタ
 // @param[in] parser パーサー
 // @param[in] ptmgr パース木を管理するオブジェクト
 GroupHandler::GroupHandler(DotlibParser& parser,
 			   PtMgr& ptmgr) :
-  DotlibHandler(parser, ptmgr, NULL)
+  DotlibHandler(parser, ptmgr)
 {
 }
 
@@ -81,15 +74,15 @@ GroupHandler::read_attr(const ShString& attr_name,
     if ( type == RCB ) {
       break;
     }
+    FileRegion loc = parser().cur_loc();
     if ( type != SYMBOL ) {
-      put_msg(__FILE__, __LINE__, parser().cur_loc(),
+      put_msg(__FILE__, __LINE__, loc,
 	      kMsgError,
 	      "DOTLIB_PARSER",
 	      "string value is expected.");
       return false;
     }
     ShString name(parser().cur_string());
-    FileRegion loc = parser().cur_loc();
     DotlibHandler* handler = find_handler(name);
     if ( handler == NULL ) {
       ostringstream buf;
@@ -154,9 +147,28 @@ GroupHandler::find_handler(const ShString& attr_name)
   }
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス GenGroupHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のハンドラ
+GenGroupHandler::GenGroupHandler(GroupHandler* parent) :
+  GroupHandler(parent->parser(), parent->ptmgr()),
+  mParent(parent)
+{
+  mPtNode = NULL;
+}
+
+// @brief デストラクタ
+GenGroupHandler::~GenGroupHandler()
+{
+}
+
 // @brief 対応する PtNode を返す．
 PtNode*
-GroupHandler::pt_node()
+GenGroupHandler::pt_node()
 {
   return mPtNode;
 }
@@ -166,9 +178,9 @@ GroupHandler::pt_node()
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-GroupHandler::begin_group(const ShString& attr_name,
-			  const FileRegion& attr_loc,
-			  const vector<const PtValue*>& value_list)
+GenGroupHandler::begin_group(const ShString& attr_name,
+			     const FileRegion& attr_loc,
+			     const vector<const PtValue*>& value_list)
 {
   mPtNode = ptmgr().new_ptgroup(value_list);
   parent()->pt_node()->add_child(attr_name, mPtNode);
@@ -177,9 +189,16 @@ GroupHandler::begin_group(const ShString& attr_name,
 
 // @brief group statement の最後に呼ばれる関数
 bool
-GroupHandler::end_group()
+GenGroupHandler::end_group()
 {
   return true;
+}
+
+// @brief 親のハンドラを得る．
+GroupHandler*
+GenGroupHandler::parent()
+{
+  return mParent;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

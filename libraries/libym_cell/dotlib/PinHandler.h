@@ -1,37 +1,35 @@
-#ifndef LIBYM_CELL_DOTLIB_CELLHANDLER_H
-#define LIBYM_CELL_DOTLIB_CELLHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_PINHANDLER_H
+#define LIBYM_CELL_DOTLIB_PINHANDLER_H
 
-/// @file libym_cell/dotlib/CellHandler.h
-/// @brief CellHandler のヘッダファイル
+/// @file libym_cell/dotlib/PinHandler.h
+/// @brief PinHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "PinHolderHandler.h"
+#include "GroupHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-class LibraryHandler;
+class PinHolderHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellHandler CellHandler.h "CellHandler.h"
-/// @brief cell group 用のハンドラ
+/// @class PinHandler PinHandler.h "PinHandler.h"
 //////////////////////////////////////////////////////////////////////
-class CellHandler :
-  public PinHolderHandler
+class PinHandler :
+  public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  CellHandler(LibraryHandler* parent);
+  PinHandler(PinHolderHandler* parent);
 
   /// @brief デストラクタ
-  virtual
-  ~CellHandler();
+  ~PinHandler();
 
 
 public:
@@ -54,19 +52,6 @@ public:
   virtual
   PtNode*
   pt_node();
-
-  /// @brief ピンを追加する．
-  virtual
-  void
-  add_pin(PtPin* pin);
-
-  /// @brief バスを追加する．
-  void
-  add_bus(PtBus* bus);
-
-  /// @brief バンドルを追加する．
-  void
-  add_bundle(PtBundle* bundle);
 
 
 private:
@@ -96,13 +81,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親のハンドラ
-  LibraryHandler* mParent;
+  PinHolderHandler* mParent;
 
-  // 対応する PtCell;
-  PtCell* mCell;
+  // 対応する PtPin
+  PtPin* mPin;
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_CELLHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_PINHANDLER_H

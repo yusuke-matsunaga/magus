@@ -27,10 +27,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] ptmgr パース木を管理するオブジェクト
-  /// @param[in] parent 親のハンドラ
   DotlibHandler(DotlibParser& parser,
-		PtMgr& ptmgr,
-		GroupHandler* parent);
+		PtMgr& ptmgr);
 
   /// @brief デストラクタ
   virtual
@@ -50,6 +48,11 @@ public:
   bool
   read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc) = 0;
+
+  /// @brief 親のハンドラを得る．
+  virtual
+  GroupHandler*
+  parent() = 0;
 
 
 public:
@@ -76,10 +79,6 @@ public:
   /// @brief 行末まで読み込む．
   bool
   expect_nl();
-
-  /// @brief 親のハンドラを得る．
-  GroupHandler*
-  parent();
 
   /// @brief パーサーを得る．
   DotlibParser&
@@ -135,10 +134,8 @@ private:
   // パース木を管理するオブジェクト
   PtMgr& mPtMgr;
 
-  // 親のハンドラ
-  GroupHandler* mParent;
-
 };
+
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

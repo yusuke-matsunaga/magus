@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 DefineHandler::DefineHandler(GroupHandler* parent) :
-  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
+  ComplexHandler(parent)
 {
 }
 
