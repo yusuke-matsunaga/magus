@@ -26,8 +26,8 @@ class PtBus :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] value 値(ここではバス名)
-  PtBus(const PtValue* value);
+  /// @param[in] name 名前
+  PtBus(const ShString& name);
 
   /// @brief デストラクタ
   virtual
@@ -38,14 +38,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 子供を追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] node 追加する子供のノード
-  virtual
-  void
-  add_child(const ShString& attr_name,
-	    PtNode* node);
 
   /// @brief ピンを追加する．
   /// @param[in] pin 対象のピン
@@ -59,7 +51,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 値の数を返す．
-  /// @note このクラスでは常に 1
+  /// @note このクラスでは常に 0
   virtual
   ymuint
   value_num() const;
@@ -76,6 +68,10 @@ public:
   // PtBus に独自の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 名前を返す．
+  ShString
+  name() const;
+
   /// @brief pin グループの数を返す．
   ymuint
   pin_num() const;
@@ -91,8 +87,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値(名前)
-  const PtValue* mValue;
+  // 名前
+  ShString mName;
 
   // ピンのリスト(配列)
   vector<const PtPin*> mPinList;

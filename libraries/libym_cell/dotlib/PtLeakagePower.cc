@@ -1,53 +1,43 @@
 
-/// @file libym_cell/dotlib/PtTiming.cc
-/// @brief PtTiming の実装ファイル
+/// @file libym_cell/dotlib/PtLeakagePower.h
+/// @brief PtLeakagePower の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "PtTiming.h"
+#include "PtLeakagePower.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-// クラス PtTiming
+// クラス PtLeakagePower
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PtTiming::PtTiming()
+PtLeakagePower::PtLeakagePower()
 {
 }
 
 // @brief デストラクタ
-PtTiming::~PtTiming()
-{
-}
-
-// @brief テーブルを追加する．
-// @param[in] attr_name 属性名
-// @param[in] table テーブル
-void
-PtTiming::add_table(const ShString& attr_name,
-		    PtTable* table)
+PtLeakagePower::~PtLeakagePower()
 {
 }
 
 // @brief 値の数を返す．
-// @note このクラスでは常に 0
+// @note simple attribute なら常に1
 ymuint
-PtTiming::value_num() const
+PtLeakagePower::value_num() const
 {
   return 0;
 }
 
 // @brief 値を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-// @note このクラスでの呼び出しはエラーになる．
 const PtValue*
-PtTiming::value(ymuint pos) const
+PtLeakagePower::value(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;

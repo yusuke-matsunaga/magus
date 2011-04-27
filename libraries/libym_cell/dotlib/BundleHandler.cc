@@ -276,7 +276,7 @@ BundleHandler::begin_group(const ShString& attr_name,
 	    "string value is exprected.");
     return false;
   }
-  mBundle = ptmgr().new_ptbundle(value_list[0]);
+  mBundle = ptmgr().new_ptbundle(value_list[0]->string_value());
   parent()->add_bundle(mBundle);
 
   return true;

@@ -17,25 +17,15 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] value 値(ここではバス名)
-PtBundle::PtBundle(const PtValue* value) :
-  mValue(value)
+// @param[in] name 名前
+PtBundle::PtBundle(const ShString& name) :
+  mName(name)
 {
 }
 
 // @brief デストラクタ
 PtBundle::~PtBundle()
 {
-}
-
-// @brief 子供を追加する．
-// @param[in] attr_name 属性名
-// @param[in] node 追加する子供のノード
-void
-PtBundle::add_child(const ShString& attr_name,
-		 PtNode* node)
-{
-  mChildList.push_back(node);
 }
 
 // @brief ピンを追加する．
@@ -50,7 +40,7 @@ PtBundle::add_pin(PtPin* pin)
 ymuint
 PtBundle::value_num() const
 {
-  return 1;
+  return 0;
 }
 
 // @brief 値を返す．
@@ -58,8 +48,15 @@ PtBundle::value_num() const
 const PtValue*
 PtBundle::value(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return mValue;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 名前を返す．
+ShString
+PtBundle::name() const
+{
+  return mName;
 }
 
 // @brief pin グループの数を返す．

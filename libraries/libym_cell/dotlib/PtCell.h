@@ -26,8 +26,8 @@ class PtCell :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] value 値(ここではセル名)
-  PtCell(const PtValue* value);
+  /// @param[in] name セル名
+  PtCell(const ShString& name);
 
   /// @brief デストラクタ
   virtual
@@ -39,13 +39,10 @@ public:
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 子供を追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] node 追加する子供のノード
-  virtual
-  void
-  add_child(const ShString& attr_name,
-	    PtNode* node);
+  /// @brief leakge_power を追加する．
+  /// @param[in] lp 対象の leakage_power
+  bool
+  add_leakage_power(PtLeakagePower* lp);
 
   /// @brief ピンを追加する．
   /// @param[in] pin 対象のピン
@@ -123,8 +120,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値(名前)
-  const PtValue* mValue;
+  // セル名
+  ShString mName;
+
+  // leakage_power のリスト
+  vector<const PtLeakagePower*> mLeakagePowerList;
 
   // ピンのリスト(配列)
   vector<const PtPin*> mPinList;

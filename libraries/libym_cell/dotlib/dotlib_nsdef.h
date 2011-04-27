@@ -84,6 +84,7 @@ class PtMgr;
 class PtNode;
 class PtLibrary;
 class PtCell;
+class PtLeakagePower;
 class PtBus;
 class PtBundle;
 class PtPin;

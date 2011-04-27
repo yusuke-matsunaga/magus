@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name ライブラリ名
-  PtLibrary(const PtValue* name);
+  PtLibrary(const ShString& name);
 
   /// @brief デストラクタ
   ~PtLibrary();
@@ -54,6 +54,13 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // PtLibrary の情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ライブラリ名を得る．
+  ShString
+  name() const;
 
   /// @brief セル数を得る．
   ymuint
@@ -89,7 +96,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 名前
-  const PtValue* mName;
+  ShString mName;
 
   // セルのリスト
   vector<PtCell*> mCellList;

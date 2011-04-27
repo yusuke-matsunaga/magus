@@ -130,7 +130,7 @@ TableHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  mTable = ptmgr().new_pttable(value_list[0]);
+  mTable = ptmgr().new_pttable(value_list[0]->string_value());
   parent()->add_table(attr_name, mTable);
 
   return true;

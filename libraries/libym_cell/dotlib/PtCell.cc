@@ -18,9 +18,9 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] value 値(ここではセル名)
-PtCell::PtCell(const PtValue* value) :
-  mValue(value)
+// @param[in] name セル名
+PtCell::PtCell(const ShString& name) :
+  mName(name)
 {
 }
 
@@ -29,14 +29,20 @@ PtCell::~PtCell()
 {
 }
 
-// @brief 子供を追加する．
-// @param[in] attr_name 属性名
-// @param[in] node 追加する子供のノード
-void
-PtCell::add_child(const ShString& attr_name,
-		  PtNode* node)
+// @brief セル名を返す．
+ShString
+PtCell::name() const
 {
-  mChildList.push_back(node);
+  return mName;
+}
+
+// @brief leakge_power を追加する．
+// @param[in] lp 対象の leakage_power
+bool
+PtCell::add_leakage_power(PtLeakagePower* lp)
+{
+  mLeakagePowerList.push_back(lp);
+  return true;
 }
 
 // @brief ピンを追加する．
@@ -70,7 +76,7 @@ PtCell::add_bundle(PtBundle* bundle)
 ymuint
 PtCell::value_num() const
 {
-  return 1;
+  return 0;
 }
 
 // @brief 値を返す．
@@ -78,8 +84,8 @@ PtCell::value_num() const
 const PtValue*
 PtCell::value(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return mValue;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 // @brief pin グループの数を返す．
@@ -129,6 +135,5 @@ PtCell::bundle(ymuint pos) const
   assert_cond( pos < bundle_num(), __FILE__, __LINE__);
   return mBundleList[pos];
 }
-
 
 END_NAMESPACE_YM_CELL_DOTLIB

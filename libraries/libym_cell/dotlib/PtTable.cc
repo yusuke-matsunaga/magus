@@ -17,7 +17,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PtTable::PtTable(const PtValue* name) :
+// @param[in] name テンプレート名
+PtTable::PtTable(const ShString& name) :
   mName(name)
 {
 }
@@ -27,13 +28,30 @@ PtTable::~PtTable()
 {
 }
 
-// @brief 子供を追加する．
+// @brief 属性をセットする．
 // @param[in] attr_name 属性名
-// @param[in] node 追加する子供のノード
-void
-PtTable::add_child(const ShString& attr_name,
-		    PtNode* node)
+// @param[in] value_list 値のリスト
+bool
+PtTable::add_complex_attr(const ShString& attr_name,
+			  const vector<const PtValue*>& value_list)
 {
+  if ( attr_name == "index_1" ) {
+    mIndex1 = value_list;
+  }
+  else if ( attr_name == "index_2" ) {
+    mIndex2 = value_list;
+  }
+  else if ( attr_name == "index_3" ) {
+    mIndex3 = value_list;
+  }
+  else if ( attr_name == "values" ) {
+    mValues = value_list;
+  }
+  else {
+#warning "TODO: エラーメッセージの出力"
+    return false;
+  }
+  return true;
 }
 
 // @brief 値の数を返す．
@@ -41,7 +59,7 @@ PtTable::add_child(const ShString& attr_name,
 ymuint
 PtTable::value_num() const
 {
-  return 1;
+  return 0;
 }
 
 // @brief 値を返す．
@@ -49,7 +67,14 @@ PtTable::value_num() const
 const PtValue*
 PtTable::value(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 名前を返す．
+ShString
+PtTable::name() const
+{
   return mName;
 }
 

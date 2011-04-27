@@ -17,25 +17,15 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] value 値(ここではバス名)
-PtBus::PtBus(const PtValue* value) :
-  mValue(value)
+// @param[in] name 名前
+PtBus::PtBus(const ShString& name) :
+  mName(name)
 {
 }
 
 // @brief デストラクタ
 PtBus::~PtBus()
 {
-}
-
-// @brief 子供を追加する．
-// @param[in] attr_name 属性名
-// @param[in] node 追加する子供のノード
-void
-PtBus::add_child(const ShString& attr_name,
-		 PtNode* node)
-{
-  mChildList.push_back(node);
 }
 
 // @brief ピンを追加する．
@@ -46,11 +36,11 @@ PtBus::add_pin(PtPin* pin)
 }
 
 // @brief 値の数を返す．
-// @note このクラスでは常に 1
+// @note このクラスでは常に 0
 ymuint
 PtBus::value_num() const
 {
-  return 1;
+  return 0;
 }
 
 // @brief 値を返す．
@@ -58,8 +48,15 @@ PtBus::value_num() const
 const PtValue*
 PtBus::value(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return mValue;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 名前を返す．
+ShString
+PtBus::name() const
+{
+  return mName;
 }
 
 // @brief pin グループの数を返す．

@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_PTTIMING_H
-#define LIBYM_CELL_DOTLIB_PTTIMING_H
+#ifndef LIBYM_CELL_DOTLIB_PTLEAKAGEPOWER_H
+#define LIBYM_CELL_DOTLIB_PTLEAKAGEPOWER_H
 
-/// @file libym_cell/dotlib/PtTiming.h
-/// @brief PtTiming のヘッダファイル
+/// @file libym_cell/dotlib/PtLeakagePower.h
+/// @brief PtLeakagePower のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtTiming PtTiming.h "PtTiming.h"
-/// @brief タイミング情報を表す PtNode の継承クラス
+/// @class PtLeakagePower PtLeakagePower.h "PtLeakagePower.h"
+/// @brief
 //////////////////////////////////////////////////////////////////////
-class PtTiming :
+class PtLeakagePower :
   public PtNode
 {
   friend class PtMgr;
@@ -26,24 +26,17 @@ class PtTiming :
 private:
 
   /// @brief コンストラクタ
-  PtTiming();
+  PtLeakagePower();
 
   /// @brief デストラクタ
   virtual
-  ~PtTiming();
+  ~PtLeakagePower();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief テーブルを追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] table テーブル
-  void
-  add_table(const ShString& attr_name,
-	    PtTable* table);
 
 
 public:
@@ -52,14 +45,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 値の数を返す．
-  /// @note このクラスでは常に 0
+  /// @note simple attribute なら常に1
   virtual
   ymuint
   value_num() const;
 
   /// @brief 値を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-  /// @note このクラスでの呼び出しはエラーになる．
   virtual
   const PtValue*
   value(ymuint pos) const;
@@ -67,23 +59,30 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // PtTiming に独自の関数
+  // 内容を参照する関数
   //////////////////////////////////////////////////////////////////////
 
+  // power_level 属性を得る．
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // タイミング情報のリスト(配列)
-  vector<const PtNode*> mTimingList;
+  // power_level 属性
+  PtValue* mPowerLevel;
 
-  // タイミング情報以外の子供のリスト(配列)
-  vector<const PtNode*> mChildList;
+  // related_pg_pin 属性
+  PtValue* mRelatedPgPin;
+
+  // when 属性
+  PtValue* mWhen;
+
+  // value 属性
+  PtValue* mValue;
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_PTTIMING_H
+#endif // LIBYM_CELL_DOTLIB_PTLEAKAGEPOWER_H

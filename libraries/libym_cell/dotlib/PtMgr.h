@@ -57,27 +57,31 @@ public:
   /// @brief PtLibrary を生成する．
   /// @param[in] name ライブラリ名
   PtLibrary*
-  new_ptlibrary(const PtValue* name);
+  new_ptlibrary(const ShString& name);
 
   /// @brief PtCell を生成する．
   /// @param[in] name セル名
   PtCell*
-  new_ptcell(const PtValue* name);
+  new_ptcell(const ShString& name);
+
+  /// @brief PtLeakagePower を生成する．
+  PtLeakagePower*
+  new_ptleakage_power();
 
   /// @brief PtBus を生成する．
   /// @param[in] name バス名
   PtBus*
-  new_ptbus(const PtValue* name);
+  new_ptbus(const ShString& name);
 
   /// @brief PtBundle を生成する．
   /// @param[in] name バンドル名
   PtBundle*
-  new_ptbundle(const PtValue* name);
+  new_ptbundle(const ShString& name);
 
   /// @brief PtPin を生成する．
   /// @param[in] name ピン名
   PtPin*
-  new_ptpin(const PtValue* name);
+  new_ptpin(const ShString& name);
 
   /// @brief PtTiming を生成する．
   PtTiming*
@@ -86,7 +90,7 @@ public:
   /// @brief PtTable を生成する．
   /// @param[in] name テーブルのテンプレート名
   PtTable*
-  new_pttable(const PtValue* name);
+  new_pttable(const ShString& name);
 
   /// @brief 整数値を表す PtValue を生成する．
   /// @param[in] value 値
@@ -133,6 +137,7 @@ private:
   ymuint32 mComplexNum;
   ymuint32 mGroupNum;
   ymuint32 mCellNum;
+  ymuint32 mLeakagePowerNum;
   ymuint32 mBusNum;
   ymuint32 mBundleNum;
   ymuint32 mPinNum;

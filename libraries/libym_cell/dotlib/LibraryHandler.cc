@@ -476,7 +476,7 @@ LibraryHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  mLibrary = ptmgr().new_ptlibrary(value_list[0]);
+  mLibrary = ptmgr().new_ptlibrary(value_list[0]->string_value());
 
   return true;
 }

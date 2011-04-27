@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // クラス PtNode
 //////////////////////////////////////////////////////////////////////
 
-// @brief simple attribute 用のコンストラクタ
+// @brief コンストラクタ
 PtNode::PtNode()
 {
 }
@@ -25,18 +25,6 @@ PtNode::PtNode()
 // @brief デストラクタ
 PtNode::~PtNode()
 {
-}
-
-// @brief 子供を追加する．
-// @param[in] attr_name 属性名
-// @param[in] node 追加する子供のノード
-// @note デフォルトの実装はなにもしない．
-void
-PtNode::add_child(const ShString& attr_name,
-		  PtNode* node)
-{
-  // っていうか呼ばれたらエラーだよね．
-  assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief 子供の属性名の個数を返す．

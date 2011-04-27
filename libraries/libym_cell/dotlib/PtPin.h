@@ -26,8 +26,8 @@ class PtPin :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] value 値(ここではピン名)
-  PtPin(const PtValue* value);
+  /// @param[in] name 名前
+  PtPin(const ShString& name);
 
   /// @brief デストラクタ
   virtual
@@ -38,14 +38,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 子供を追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] node 追加する子供のノード
-  virtual
-  void
-  add_child(const ShString& attr_name,
-	    PtNode* node);
 
   /// @brief タイミング情報を追加する．
   void
@@ -58,7 +50,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 値の数を返す．
-  /// @note このクラスでは常に 1
+  /// @note このクラスでは常に 0
   virtual
   ymuint
   value_num() const;
@@ -75,6 +67,10 @@ public:
   // PtPin に独自の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 名前を返す．
+  ShString
+  name() const;
+
   /// @brief timing グループの数を返す．
   ymuint
   timing_num() const;
@@ -90,8 +86,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値(名前)
-  const PtValue* mValue;
+  // 名前
+  ShString mName;
 
   // タイミング情報のリスト(配列)
   vector<const PtTiming*> mTimingList;

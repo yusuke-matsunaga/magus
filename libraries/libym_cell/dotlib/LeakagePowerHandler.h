@@ -1,8 +1,8 @@
-#ifndef LIBYM_CELL_DOTLIB_CELLHANDLER_H
-#define LIBYM_CELL_DOTLIB_CELLHANDLER_H
+#ifndef LIBYM_CELL_DOTLIB_LEAKAGEPOWERHANDLER_H
+#define LIBYM_CELL_DOTLIB_LEAKAGEPOWERHANDLER_H
 
-/// @file libym_cell/dotlib/CellHandler.h
-/// @brief CellHandler のヘッダファイル
+/// @file libym_cell/dotlib/LeakagePowerHandler.h
+/// @brief LeakagePowerHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,47 +15,27 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellHandler CellHandler.h "CellHandler.h"
+/// @class LeakagePowerHandler LeakagePowerHandler.h "LeakagePowerHandler.h"
 /// @brief cell group 用のハンドラ
 //////////////////////////////////////////////////////////////////////
-class CellHandler :
+class LeakagePowerHandler :
   public GroupHandler
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のハンドラ
-  CellHandler(GroupHandler* parent);
+  LeakagePowerHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
-  ~CellHandler();
+  ~LeakagePowerHandler();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 他のクラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief leakage_power を追加する．
-  virtual
-  bool
-  add_leakage_power(PtLeakagePower* lp);
-
-  /// @brief ピンを追加する．
-  virtual
-  bool
-  add_pin(PtPin* pin);
-
-  /// @brief バスを追加する．
-  virtual
-  bool
-  add_bus(PtBus* bus);
-
-  /// @brief バンドルを追加する．
-  virtual
-  bool
-  add_bundle(PtBundle* bundle);
 
 
 protected:
@@ -84,11 +64,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 対応する PtCell;
-  PtCell* mCell;
+  // 対応する PtLeakagePower;
+  PtLeakagePower* mLeakagePower;
 
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB
 
-#endif // LIBYM_CELL_DOTLIB_CELLHANDLER_H
+#endif // LIBYM_CELL_DOTLIB_LEAKAGEPOWERHANDLER_H

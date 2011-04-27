@@ -1,23 +1,25 @@
 
-/// @file libym_cell/dotlib/BusHandler.cc
-/// @brief BusHandler の実装ファイル
+/// @file libym_cell/dotlib/LeakagePowerHandler.cc
+/// @brief LeakagePowerHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BusHandler.h"
+#include "LeakagePowerHandler.h"
 
 #include "SimpleHandler.h"
 #include "ComplexHandler.h"
 #include "GroupHandler.h"
-#include "CellHandler.h"
-#include "PinHandler.h"
+//#include "LibraryHandler.h"
+//#include "BusHandler.h"
+//#include "BundleHandler.h"
+//#include "PinHandler.h"
 
 #include "PtMgr.h"
 #include "PtNode.h"
-#include "PtBus.h"
+#include "PtLeakagePower.h"
 #include "PtValue.h"
 
 #include "ym_utils/FileRegion.h"
@@ -48,38 +50,39 @@ new_group(GroupHandler* parent)
   return new GenGroupHandler(parent);
 }
 
+DotlibHandler*
+new_leakage_power(GroupHandler* parent)
+{
+  GroupHandler* handler = new_group(parent);
+
+
+  return handler;
+}
+
 END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス BusHandler
+// クラス LeakagePowerHandler
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
-BusHandler::BusHandler(GroupHandler* parent) :
+LeakagePowerHandler::LeakagePowerHandler(GroupHandler* parent) :
   GroupHandler(parent),
-  mBus(NULL)
+  mLeakagePower(NULL)
 {
   // simple attributes
   DotlibHandler* simple = new_simple(this);
-  reg_handler("bus_type", simple);
-
-  // group statements
-  reg_handler("pin", new PinHandler(this));
+  reg_handler("power_level", simple);
+  reg_handler("related_pg_pin", simple);
+  reg_handler("when", simple);
+  reg_handler("value", simple);
 }
 
 // @brief デストラクタ
-BusHandler::~BusHandler()
+LeakagePowerHandler::~LeakagePowerHandler()
 {
-}
-
-// @brief ピンを追加する．
-bool
-BusHandler::add_pin(PtPin* pin)
-{
-  mBus->add_pin(pin);
-  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数
@@ -87,43 +90,27 @@ BusHandler::add_pin(PtPin* pin)
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
 bool
-BusHandler::begin_group(const ShString& attr_name,
-			const FileRegion& attr_loc,
-			const vector<const PtValue*>& value_list)
+LeakagePowerHandler::begin_group(const ShString& attr_name,
+				 const FileRegion& attr_loc,
+				 const vector<const PtValue*>& value_list)
 {
-  if ( value_list.size() != 1 ) {
-    FileRegion loc;
-    if ( value_list.size() > 1 ) {
-      loc = value_list[1]->loc();
-    }
-    else {
-      loc = attr_loc;
-    }
-    put_msg(__FILE__, __LINE__, loc,
+  if ( value_list.size() != 0 ) {
+    put_msg(__FILE__, __LINE__, attr_loc,
 	    kMsgError,
 	    "DOTLIBPARSER",
-	    "cell group requires just one string as a parameter.");
+	    "leakage_power group does not have parameters.");
     return false;
   }
 
-  if ( value_list[0]->type() != SYMBOL ) {
-    put_msg(__FILE__, __LINE__, value_list[0]->loc(),
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "string value is exprected.");
-    return false;
-  }
-  mBus = ptmgr().new_ptbus(value_list[0]->string_value());
-  parent()->add_bus(mBus);
-
-  return true;
+  mLeakagePower = ptmgr().new_ptleakage_power();
+  return parent()->add_leakage_power(mLeakagePower);
 }
 
 // @brief group statement の最後に呼ばれる関数
 bool
-BusHandler::end_group()
+LeakagePowerHandler::end_group()
 {
-  mBus = NULL;
+  mLeakagePower = NULL;
   return true;
 }
 

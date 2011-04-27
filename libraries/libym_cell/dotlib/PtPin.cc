@@ -17,23 +17,14 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] value 値(ここではピン名)
-PtPin::PtPin(const PtValue* value) :
-  mValue(value)
+// @param[in] name 名前
+PtPin::PtPin(const ShString& name) :
+  mName(name)
 {
 }
 
 // @brief デストラクタ
 PtPin::~PtPin()
-{
-}
-
-// @brief 子供を追加する．
-// @param[in] attr_name 属性名
-// @param[in] node 追加する子供のノード
-void
-PtPin::add_child(const ShString& attr_name,
-		 PtNode* node)
 {
 }
 
@@ -45,11 +36,11 @@ PtPin::add_timing(PtTiming* timing)
 }
 
 // @brief 値の数を返す．
-// @note このクラスでは常に 1
+// @note このクラスでは常に 0
 ymuint
 PtPin::value_num() const
 {
-  return 1;
+  return 0;
 }
 
 // @brief 値を返す．
@@ -57,8 +48,15 @@ PtPin::value_num() const
 const PtValue*
 PtPin::value(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return mValue;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 名前を返す．
+ShString
+PtPin::name() const
+{
+  return mName;
 }
 
 // @brief timing グループの数を返す．

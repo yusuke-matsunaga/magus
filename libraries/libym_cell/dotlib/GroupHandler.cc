@@ -127,6 +127,14 @@ GroupHandler::add_cell(PtCell* cell)
   return false;
 }
 
+// @brief leakage_power を追加する．
+bool
+GroupHandler::add_leakage_power(PtLeakagePower* lp)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
 // @brief ピンを追加する．
 // @param[in] pin ピン
 // @note cell/bus/bundle の時のみ有効
@@ -274,8 +282,8 @@ GenGroupHandler::begin_group(const ShString& attr_name,
 			     const FileRegion& attr_loc,
 			     const vector<const PtValue*>& value_list)
 {
-#if 0
   mPtNode = ptmgr().new_ptgroup(value_list);
+#if 0
   parent()->pt_node()->add_child(attr_name, mPtNode);
 #endif
   return true;

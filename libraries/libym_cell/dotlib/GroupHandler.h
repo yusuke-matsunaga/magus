@@ -93,6 +93,11 @@ public:
   bool
   add_cell(PtCell* cell);
 
+  /// @brief leakage_power を追加する．
+  virtual
+  bool
+  add_leakage_power(PtLeakagePower* lp);
+
   /// @brief ピンを追加する．
   /// @param[in] pin ピン
   /// @note cell/bus/bundle の時のみ有効

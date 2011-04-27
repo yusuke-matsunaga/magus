@@ -42,6 +42,8 @@ libym_cell_dotlib_la_SOURCES = \
 	LibraryHandler.cc \
 	CellHandler.h \
 	CellHandler.cc \
+	LeakagePowerHandler.h \
+	LeakagePowerHandler.cc \
 	BusHandler.h \
 	BusHandler.cc \
 	BundleHandler.h \
@@ -63,6 +65,8 @@ libym_cell_dotlib_la_SOURCES = \
 	PtLibrary.cc \
 	PtCell.h \
 	PtCell.cc \
+	PtLeakagePower.h \
+	PtLeakagePower.cc \
 	PtBus.h \
 	PtBus.cc \
 	PtBundle.h \

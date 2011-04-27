@@ -236,7 +236,7 @@ PinHandler::begin_group(const ShString& attr_name,
 	    "string value is exprected.");
     return false;
   }
-  mPin = ptmgr().new_ptpin(value_list[0]);
+  mPin = ptmgr().new_ptpin(value_list[0]->string_value());
   parent()->add_pin(mPin);
 
   return true;

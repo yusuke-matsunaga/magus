@@ -12,6 +12,7 @@
 #include "PtNodeImpl.h"
 #include "PtLibrary.h"
 #include "PtCell.h"
+#include "PtLeakagePower.h"
 #include "PtBus.h"
 #include "PtBundle.h"
 #include "PtPin.h"
@@ -35,6 +36,7 @@ PtMgr::PtMgr() :
   mComplexNum = 0;
   mGroupNum = 0;
   mCellNum = 0;
+  mLeakagePowerNum = 0;
   mBusNum = 0;
   mBundleNum = 0;
   mPinNum = 0;
@@ -92,7 +94,7 @@ PtMgr::new_ptgroup(const vector<const PtValue*>& value_list)
 // @brief PtLibrary を生成する．
 // @param[in] name ライブラリ名
 PtLibrary*
-PtMgr::new_ptlibrary(const PtValue* name)
+PtMgr::new_ptlibrary(const ShString& name)
 {
   void* p = mAlloc.get_memory(sizeof(PtLibrary));
   return new (p) PtLibrary(name);
@@ -101,17 +103,26 @@ PtMgr::new_ptlibrary(const PtValue* name)
 // @brief PtCell を生成する．
 // @param[in] name セル名
 PtCell*
-PtMgr::new_ptcell(const PtValue* name)
+PtMgr::new_ptcell(const ShString& name)
 {
   ++ mCellNum;
   void* p = mAlloc.get_memory(sizeof(PtCell));
   return new (p) PtCell(name);
 }
 
+// @brief PtLeakagePower を生成する．
+PtLeakagePower*
+PtMgr::new_ptleakage_power()
+{
+  ++ mLeakagePowerNum;
+  void* p = mAlloc.get_memory(sizeof(PtLeakagePower));
+  return new (p) PtLeakagePower;
+}
+
 // @brief PtBus を生成する．
 // @param[in] name バス名
 PtBus*
-PtMgr::new_ptbus(const PtValue* name)
+PtMgr::new_ptbus(const ShString& name)
 {
   ++ mBusNum;
   void* p = mAlloc.get_memory(sizeof(PtBus));
@@ -121,7 +132,7 @@ PtMgr::new_ptbus(const PtValue* name)
 // @brief PtBundle を生成する．
 // @param[in] name バンドル名
 PtBundle*
-PtMgr::new_ptbundle(const PtValue* name)
+PtMgr::new_ptbundle(const ShString& name)
 {
   ++ mBundleNum;
   void* p = mAlloc.get_memory(sizeof(PtBundle));
@@ -131,7 +142,7 @@ PtMgr::new_ptbundle(const PtValue* name)
 // @brief PtPin を生成する．
 // @param[in] name ピン名
 PtPin*
-PtMgr::new_ptpin(const PtValue* name)
+PtMgr::new_ptpin(const ShString& name)
 {
   ++ mPinNum;
   void* p = mAlloc.get_memory(sizeof(PtPin));
@@ -151,7 +162,7 @@ PtMgr::new_pttiming()
 // @brief PtTable を生成する．
 // @param[in] name テーブルのテンプレート名
 PtTable*
-PtMgr::new_pttable(const PtValue* name)
+PtMgr::new_pttable(const ShString& name)
 {
   ++ mTableNum;
   void* p = mAlloc.get_memory(sizeof(PtTable));
@@ -210,66 +221,71 @@ PtMgr::new_opr(tTokenType type,
 void
 PtMgr::show_stats()
 {
-  cout << "PtSimple:     " << setw(7) << mSimpleNum
+  cout << "PtSimple:       " << setw(7) << mSimpleNum
        << " x " << setw(3) << sizeof(PtSimpleNode)
        << " = " << setw(10) << mSimpleNum * sizeof(PtSimpleNode) << endl
 
-       << "PtComplex:    " << setw(7) << mComplexNum
+       << "PtComplex:      " << setw(7) << mComplexNum
        << " x " << setw(3) << sizeof(PtComplexNode)
        << " = " << setw(10) << mComplexNum * sizeof(PtComplexNode) << endl
 
-       << "PtGroup:      " << setw(7) << mGroupNum
+       << "PtGroup:        " << setw(7) << mGroupNum
        << " x " << setw(3) << sizeof(PtGroupNode)
        << " = " << setw(10) << mGroupNum * sizeof(PtGroupNode) << endl
 
-       << "PtCell:       " << setw(7) << mCellNum
+       << "PtCell:         " << setw(7) << mCellNum
        << " x " << setw(3) << sizeof(PtCell)
        << " = " << setw(10) << mCellNum * sizeof(PtCell) << endl
 
-       << "PtBus:        " << setw(7) << mBusNum
+       << "PtLeakagePower: " << setw(7) << mLeakagePowerNum
+       << " x " << setw(3) << sizeof(PtLeakagePower)
+       << " = " << setw(10)
+       << mLeakagePowerNum * sizeof(PtLeakagePower) << endl
+
+       << "PtBus:          " << setw(7) << mBusNum
        << " x " << setw(3) << sizeof(PtBus)
        << " = " << setw(10) << mBusNum * sizeof(PtBus) << endl
 
-       << "PtBundle:     " << setw(7) << mBundleNum
+       << "PtBundle:       " << setw(7) << mBundleNum
        << " x " << setw(3) << sizeof(PtBundle)
        << " = " << setw(10) << mBundleNum * sizeof(PtBundle) << endl
 
-       << "PtPin:        " << setw(7) << mPinNum
+       << "PtPin:          " << setw(7) << mPinNum
        << " x " << setw(3) << sizeof(PtPin)
        << " = " << setw(10) << mPinNum * sizeof(PtPin) << endl
 
-       << "PtTiming:     " << setw(7) << mTimingNum
+       << "PtTiming:       " << setw(7) << mTimingNum
        << " x " << setw(3) << sizeof(PtTiming)
        << " = " << setw(10) << mTimingNum * sizeof(PtTiming) << endl
 
-       << "PtTable :     " << setw(7) << mTableNum
+       << "PtTable :       " << setw(7) << mTableNum
        << " x " << setw(3) << sizeof(PtTable)
        << " = " << setw(10) << mTableNum * sizeof(PtTable) << endl
 
-       << "PtInt:        " << setw(7) << mIntNum
+       << "PtInt:          " << setw(7) << mIntNum
        << " x " << setw(3) << sizeof(PtInt)
        << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl
 
-       << "PtFloat:      " << setw(7) << mFloatNum
+       << "PtFloat:        " << setw(7) << mFloatNum
        << " x " << setw(3) << sizeof(PtFloat)
        << " = " << setw(10) << mFloatNum * sizeof(PtFloat) << endl
 
-       << "PtString:     " << setw(7) << mStrNum
+       << "PtString:       " << setw(7) << mStrNum
        << " x " << setw(3) << sizeof(PtString)
        << " = " << setw(10) << mStrNum * sizeof(PtString) << endl
 
-       << "PtOpr:        " << setw(7) << mOprNum
+       << "PtOpr:          " << setw(7) << mOprNum
        << " x " << setw(3) << sizeof(PtOpr)
        << " = " << setw(10) << mOprNum * sizeof(PtOpr) << endl
 
-       << "Total memory:               = "
+       << "Total memory:                 = "
        << setw(10) << mAlloc.used_size() << endl
        << endl
 
-       << "Allocated memory:           = "
+       << "Allocated memory:             = "
        << setw(10) << mAlloc.allocated_size() << endl
 
-       << "ShString:                   = "
+       << "ShString:                     = "
        << setw(10) << ShString::allocated_size() << endl;
 }
 

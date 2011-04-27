@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 // @brief コンストラクタ
 // @param[in] name ライブラリ名
-PtLibrary::PtLibrary(const PtValue* name) :
+PtLibrary::PtLibrary(const ShString& name) :
   mName(name)
 {
 }
@@ -54,6 +54,13 @@ PtLibrary::add_cell(PtCell* cell)
   return true;
 }
 
+// @brief ライブラリ名を得る．
+ShString
+PtLibrary::name() const
+{
+  return mName;
+}
+
 // @brief セル数を得る．
 ymuint
 PtLibrary::cell_num() const
@@ -73,7 +80,7 @@ PtLibrary::cell(ymuint pos) const
 ymuint
 PtLibrary::value_num() const
 {
-  return 1;
+  return 0;
 }
 
 // @brief 値を返す．
@@ -81,7 +88,8 @@ PtLibrary::value_num() const
 const PtValue*
 PtLibrary::value(ymuint pos) const
 {
-  return mName;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB
