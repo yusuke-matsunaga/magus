@@ -36,21 +36,36 @@ public:
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 子供を追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] node 追加する子供のノード
-  /// @note デフォルトの実装はなにもしない．
-  virtual
-  void
-  add_child(const ShString& attr_name,
-	    PtNode* node);
-
   /// @brief セルを追加する．
   /// @param[in] cell セル
   /// @retval true 成功した．
   /// @retval false エラーが起こった．
   bool
   add_cell(PtCell* cell);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する PtNode の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief simple attribute を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  /// @return 設定が失敗したら false を返す．
+  virtual
+  bool
+  add_simple_attr(const ShString& attr_name,
+		  const PtValue* value);
+
+  /// @brief complex attribute を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value_list 値のリスト
+  /// @return 設定が失敗したら false を返す．
+  virtual
+  bool
+  add_complex_attr(const ShString& attr_name,
+		   const vector<const PtValue*>& value_list);
 
 
 public:
@@ -72,24 +87,6 @@ public:
   cell(ymuint pos) const;
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 値の数を返す．
-  /// @note simple attribute なら常に1
-  virtual
-  ymuint
-  value_num() const;
-
-  /// @brief 値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-  virtual
-  const PtValue*
-  value(ymuint pos) const;
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -100,9 +97,6 @@ private:
 
   // セルのリスト
   vector<PtCell*> mCellList;
-
-  // セル名をキーにした連想配列
-  hash_map<ShString, PtCell*> mCellMap;
 
 };
 

@@ -29,16 +29,6 @@ PtLibrary::~PtLibrary()
 {
 }
 
-// @brief 子供を追加する．
-// @param[in] attr_name 属性名
-// @param[in] node 追加する子供のノード
-// @note デフォルトの実装はなにもしない．
-void
-PtLibrary::add_child(const ShString& attr_name,
-		     PtNode* node)
-{
-}
-
 // @brief セルを追加する．
 bool
 PtLibrary::add_cell(PtCell* cell)
@@ -51,6 +41,28 @@ PtLibrary::add_cell(PtCell* cell)
   }
   mCellList.push_back(cell);
   mCellMap.insert(make_pair(name, cell));
+  return true;
+}
+
+// @brief simple attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value 値
+// @return 設定が失敗したら false を返す．
+bool
+PtLibrary::add_simple_attr(const ShString& attr_name,
+			   const PtValue* value)
+{
+  return true;
+}
+
+// @brief complex attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+// @return 設定が失敗したら false を返す．
+bool
+PtLibrary::add_complex_attr(const ShString& attr_name,
+			    const vector<const PtValue*>& value_list)
+{
   return true;
 }
 

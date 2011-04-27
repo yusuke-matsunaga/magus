@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @class PtNode PtNode.h "PtNode.h"
-/// @brief パース木の構造を表すためのクラス
+/// @brief パース木の構造を表すための基底クラス
 //////////////////////////////////////////////////////////////////////
 class PtNode
 {
@@ -36,48 +36,36 @@ protected:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
+  // 内容を設定する仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値の数を返す．
-  /// @note simple attribute なら常に1
+  /// @brief simple attribute を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  /// @return 設定が失敗したら false を返す．
   virtual
-  ymuint
-  value_num() const = 0;
+  bool
+  add_simple_attr(const ShString& attr_name,
+		  const PtValue* value);
 
-  /// @brief 値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
+  /// @brief complex attribute を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value_list 値のリスト
+  /// @return 設定が失敗したら false を返す．
   virtual
-  const PtValue*
-  value(ymuint pos) const = 0;
+  bool
+  add_complex_attr(const ShString& attr_name,
+		   const vector<const PtValue*>& value_list);
 
-  /// @brief 子供の属性名の個数を返す．
-  /// @note デフォルトの実装は 0 を返す．
-  virtual
-  ymuint
-  child_attr_num() const;
 
-  /// @brief 子供の属性名を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
-  virtual
-  ShString
-  child_attr_name(ymuint pos) const;
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 属性に対応した子供の要素数を返す．
-  /// @param[in] attr_name 子供の属性名
-  /// @note デフォルトの実装は 0 を返す．
-  virtual
-  ymuint
-  child_num(const ShString& attr_name) const;
-
-  /// @brief 属性に対応した子供を返す．
-  /// @param[in] attr_name 子供の属性名
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
-  virtual
-  const PtNode*
-  child(const ShString& attr_name,
-	ymuint pos) const;
-
+  // 属性名をキーにして simple attribute を格納するハッシュ表
+  // おなじ属性の値が複数あったら PtValue->next() でつなげる．
+  hash_map<ShString, PtValue*> mSimpleAttrMap;
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

@@ -117,6 +117,32 @@ GroupHandler::read_attr(const ShString& attr_name,
   return true;
 }
 
+// @brief simple attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value 値
+// @return 設定が失敗したら false を返す．
+// @note デフォルトの実装はエラーとなる．
+bool
+GroupHandler::add_simple_attr(const ShString& attr_name,
+			      const PtValue* value)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief complex attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+// @return 設定が失敗したら false を返す．
+// @note デフォルトの実装はエラーとなる．
+bool
+GroupHandler::add_complex_attr(const ShString& attr_name,
+			       const vector<const PtValue*>& value_list)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
 // @brief セルを追加する．
 // @param[in] cell セル
 // @note library の時のみ有効
@@ -263,8 +289,7 @@ GroupHandler::find_handler(const ShString& attr_name)
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 GenGroupHandler::GenGroupHandler(GroupHandler* parent) :
-  GroupHandler(parent),
-  mPtNode(NULL)
+  GroupHandler(parent)
 {
 }
 
@@ -282,10 +307,6 @@ GenGroupHandler::begin_group(const ShString& attr_name,
 			     const FileRegion& attr_loc,
 			     const vector<const PtValue*>& value_list)
 {
-  mPtNode = ptmgr().new_ptgroup(value_list);
-#if 0
-  parent()->pt_node()->add_child(attr_name, mPtNode);
-#endif
   return true;
 }
 

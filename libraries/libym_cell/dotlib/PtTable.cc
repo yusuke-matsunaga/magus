@@ -19,7 +19,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] name テンプレート名
 PtTable::PtTable(const ShString& name) :
-  mName(name)
+  mName(name),
+  mDomain(NULL)
 {
 }
 
@@ -28,54 +29,46 @@ PtTable::~PtTable()
 {
 }
 
-// @brief 属性をセットする．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-bool
-PtTable::add_complex_attr(const ShString& attr_name,
-			  const vector<const PtValue*>& value_list)
-{
-  if ( attr_name == "index_1" ) {
-    mIndex1 = value_list;
-  }
-  else if ( attr_name == "index_2" ) {
-    mIndex2 = value_list;
-  }
-  else if ( attr_name == "index_3" ) {
-    mIndex3 = value_list;
-  }
-  else if ( attr_name == "values" ) {
-    mValues = value_list;
-  }
-  else {
-#warning "TODO: エラーメッセージの出力"
-    return false;
-  }
-  return true;
-}
-
-// @brief 値の数を返す．
-// @note このクラスでは常に 0
-ymuint
-PtTable::value_num() const
-{
-  return 0;
-}
-
-// @brief 値を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-const PtValue*
-PtTable::value(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 // @brief 名前を返す．
 ShString
 PtTable::name() const
 {
   return mName;
+}
+
+/// @brief index_1 属性の値を返す．
+const vector<const PtValue*>&
+PtTable::index_1() const
+{
+  return mIndex1;
+}
+
+// @brief index_2 属性の値を返す．
+const vector<const PtValue*>&
+PtTable::index_2() const
+{
+  return mIndex2;
+}
+
+// @brief index_3 属性の値を返す．
+const vector<const PtValue*>&
+PtTable::index_3() const
+{
+  return mIndex3;
+}
+
+// @brief values 属性の値を返す．
+const vector<const PtValue*>&
+PtTable::values() const
+{
+  return mValues;
+}
+
+// @brief domain グループを返す．
+const PtDomain*
+PtTable::domain() const
+{
+  return mDomain;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

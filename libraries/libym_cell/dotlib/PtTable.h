@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "PtNode.h"
+#include "dotlib_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -18,10 +18,10 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @class PtTable PtTable.h "PtTable.h"
 /// @brief タイミング情報を表す PtNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class PtTable :
-  public PtNode
+class PtTable
 {
   friend class PtMgr;
+  friend class TableHandler;
 
 private:
 
@@ -36,43 +36,32 @@ private:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 属性をセットする．
-  /// @param[in] attr_name 属性名
-  /// @param[in] value_list 値のリスト
-  bool
-  add_complex_attr(const ShString& attr_name,
-		   const vector<const PtValue*>& value_list);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // 内容を参照する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 値の数を返す．
-  /// @note このクラスでは常に 0
-  virtual
-  ymuint
-  value_num() const;
-
-  /// @brief 値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-  virtual
-  const PtValue*
-  value(ymuint pos) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // PtTable に独自の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 名前を返す．
   ShString
   name() const;
+
+  /// @brief index_1 属性の値を返す．
+  const vector<const PtValue*>&
+  index_1() const;
+
+  /// @brief index_2 属性の値を返す．
+  const vector<const PtValue*>&
+  index_2() const;
+
+  /// @brief index_3 属性の値を返す．
+  const vector<const PtValue*>&
+  index_3() const;
+
+  /// @brief values 属性の値を返す．
+  const vector<const PtValue*>&
+  values() const;
+
+  /// @brief domain グループを返す．
+  const PtDomain*
+  domain() const;
 
 
 private:
@@ -95,6 +84,8 @@ private:
   // vaues の値
   vector<const PtValue*> mValues;
 
+  // domain グループ
+  PtDomain* mDomain;
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

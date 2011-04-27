@@ -86,12 +86,7 @@ SimpleHandler::set_value(const ShString& attr_name,
 			 const FileRegion& attr_loc,
 			 const PtValue* value)
 {
-#if 0
-  PtNode* node = ptmgr().new_ptsimple(value);
-  PtNode* p_node = parent()->pt_node();
-  p_node->add_child(attr_name, node);
-#endif
-  return true;
+  return parent()->add_simple_attr(attr_name, value);
 }
 
 

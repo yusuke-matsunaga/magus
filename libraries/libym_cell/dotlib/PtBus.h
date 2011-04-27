@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "PtNode.h"
+#include "PtPin.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @brief bus グループを表すパース木の要素
 //////////////////////////////////////////////////////////////////////
 class PtBus :
-  public PtNode
+  public PtPin
 {
   friend class PtMgr;
 
@@ -47,30 +47,36 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
+  // 内容を設定する PtNode の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値の数を返す．
-  /// @note このクラスでは常に 0
+  /// @brief simple attribute を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  /// @return 設定が失敗したら false を返す．
   virtual
-  ymuint
-  value_num() const;
+  bool
+  add_simple_attr(const ShString& attr_name,
+		  const PtValue* value);
 
-  /// @brief 値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
+  /// @brief complex attribute を設定する．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value_list 値のリスト
+  /// @return 設定が失敗したら false を返す．
   virtual
-  const PtValue*
-  value(ymuint pos) const;
+  bool
+  add_complex_attr(const ShString& attr_name,
+		   const vector<const PtValue*>& value_list);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // PtBus に独自の関数
+  // 内容を参照する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 名前を返す．
+  /// @brief bus_type 属性の値を返す．
   ShString
-  name() const;
+  bus_type() const;
 
   /// @brief pin グループの数を返す．
   ymuint
@@ -87,14 +93,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前
-  ShString mName;
+  // bus_type 属性
+  ShString mBusType;
 
   // ピンのリスト(配列)
   vector<const PtPin*> mPinList;
-
-  // ピン以外の子供のリスト(配列)
-  vector<const PtNode*> mChildList;
 
 };
 

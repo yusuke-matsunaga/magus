@@ -27,43 +27,6 @@ PtNode::~PtNode()
 {
 }
 
-// @brief 子供の属性名の個数を返す．
-// @note デフォルトの実装は 0 を返す．
-ymuint
-PtNode::child_attr_num() const
-{
-  return 0;
-}
-
-// @brief 子供の属性名を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
-ShString
-PtNode::child_attr_name(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return ShString();
-}
-
-// @brief 属性に対応した子供の要素数を返す．
-// @param[in] attr_name 子供の属性名
-// @note デフォルトの実装は 0 を返す．
-ymuint
-PtNode::child_num(const ShString& attr_name) const
-{
-  return 0;
-}
-
-// @brief 属性に対応した子供を返す．
-// @param[in] attr_name 子供の属性名
-// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
-const PtNode*
-PtNode::child(const ShString& attr_name,
-	      ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス PtSimpleNode

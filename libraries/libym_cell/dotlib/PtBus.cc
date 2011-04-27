@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] name 名前
 PtBus::PtBus(const ShString& name) :
-  mName(name)
+  PtPin(name)
 {
 }
 
@@ -35,28 +35,38 @@ PtBus::add_pin(PtPin* pin)
   mPinList.push_back(pin);
 }
 
-// @brief 値の数を返す．
-// @note このクラスでは常に 0
-ymuint
-PtBus::value_num() const
+// @brief simple attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value 値
+// @return 設定が失敗したら false を返す．
+bool
+PtBus::add_simple_attr(const ShString& attr_name,
+		       const PtValue* value)
 {
-  return 0;
+  if ( attr_name == "bus_type" &&
+       value->type() == SYMBOL ) {
+    mBusType = value->string_value();
+    return true;
+  }
+  return PtPin::add_simple_attr(attr_name, value);
 }
 
-// @brief 値を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-const PtValue*
-PtBus::value(ymuint pos) const
+// @brief complex attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+// @return 設定が失敗したら false を返す．
+bool
+PtBus::add_complex_attr(const ShString& attr_name,
+			const vector<const PtValue*>& value_list)
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+  return PtPin::add_complex_attr(attr_name, value_list);
 }
 
-// @brief 名前を返す．
+// @brief bus_type 属性の値を返す．
 ShString
-PtBus::name() const
+PtBus::bus_type() const
 {
-  return mName;
+  return mBusType;
 }
 
 // @brief pin グループの数を返す．

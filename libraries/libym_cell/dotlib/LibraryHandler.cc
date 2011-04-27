@@ -433,6 +433,30 @@ LibraryHandler::parent()
   return NULL;
 }
 
+// @brief simple attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value 値
+// @return 設定が失敗したら false を返す．
+bool
+LibraryHandler::add_simple_attr(const ShString& attr_name,
+				const PtValue* value)
+{
+#warning "未完"
+  return true;
+}
+
+// @brief complex attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+// @return 設定が失敗したら false を返す．
+bool
+LibraryHandler::add_complex_attr(const ShString& attr_name,
+				 const vector<const PtValue*>& value_list)
+{
+#warning "未完"
+  return true;
+}
+
 // @brief セルを追加する．
 bool
 LibraryHandler::add_cell(PtCell* cell)
@@ -485,6 +509,7 @@ LibraryHandler::begin_group(const ShString& attr_name,
 bool
 LibraryHandler::end_group()
 {
+  mLibrary = NULL;
   return true;
 }
 

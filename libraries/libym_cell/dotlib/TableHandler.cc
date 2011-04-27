@@ -77,22 +77,44 @@ TableHandler::~TableHandler()
 {
 }
 
-// @brief index_x 属性をセットする．
+// @brief simple attribute を設定する．
 // @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
+// @param[in] value 値
+// @return 設定が失敗したら false を返す．
 bool
-TableHandler::add_index_x(const ShString& attr_name,
-			  const vector<const PtValue*>& value_list)
+TableHandler::add_simple_attr(const ShString& attr_name,
+			      const PtValue* value)
 {
-  return true;
+  // このクラスには simple attribute はない．
+  return false;
 }
 
-// @brief values 属性をセットする．
+// @brief complex attribute を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value_list 値のリスト
+// @return 設定が失敗したら false を返す．
 bool
-TableHandler::add_values(const vector<const PtValue*>& value_list)
+TableHandler::add_complex_attr(const ShString& attr_name,
+			       const vector<const PtValue*>& value_list)
 {
+  assert_cond( mTable != NULL, __FILE__, __LINE__);
+
+  if ( attr_name == "index_1" ) {
+    mTable->mIndex1 = value_list;
+  }
+  else if ( attr_name == "index_2" ) {
+    mTable->mIndex2 = value_list;
+  }
+  else if ( attr_name == "index_3" ) {
+    mTable->mIndex3 = value_list;
+  }
+  else if ( attr_name == "values" ) {
+    mTable->mValues = value_list;
+  }
+  else {
+#warning "TODO: エラーメッセージの出力"
+    return false;
+  }
   return true;
 }
 
@@ -101,6 +123,11 @@ TableHandler::add_values(const vector<const PtValue*>& value_list)
 bool
 TableHandler::add_domain(PtDomain* domain)
 {
+  if ( mDomain != NULL ) {
+#warning "TODO: エラーメッセージの出力"
+    return false;
+  }
+  mDmain = domain;
   return true;
 }
 

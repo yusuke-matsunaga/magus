@@ -74,12 +74,35 @@ BusHandler::~BusHandler()
 {
 }
 
+// @brief simple attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value 値
+// @return 設定が失敗したら false を返す．
+bool
+BusHandler::add_simple_attr(const ShString& attr_name,
+			    const PtValue* value)
+{
+#warning "未完"
+  return true;
+}
+
+// @brief complex attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+// @return 設定が失敗したら false を返す．
+bool
+BusHandler::add_complex_attr(const ShString& attr_name,
+			     const vector<const PtValue*>& value_list)
+{
+#warning "未完"
+  return true;
+}
+
 // @brief ピンを追加する．
 bool
 BusHandler::add_pin(PtPin* pin)
 {
-  mBus->add_pin(pin);
-  return true;
+  return mBus->add_pin(pin);
 }
 
 // @brief group statement の最初に呼ばれる関数
@@ -101,7 +124,7 @@ BusHandler::begin_group(const ShString& attr_name,
     }
     put_msg(__FILE__, __LINE__, loc,
 	    kMsgError,
-	    "DOTLIBPARSER",
+	    "DOTLIB_PARSER",
 	    "cell group requires just one string as a parameter.");
     return false;
   }
@@ -109,7 +132,7 @@ BusHandler::begin_group(const ShString& attr_name,
   if ( value_list[0]->type() != SYMBOL ) {
     put_msg(__FILE__, __LINE__, value_list[0]->loc(),
 	    kMsgError,
-	    "DOTLIBPARSER",
+	    "DOTLIB_PARSER",
 	    "string value is exprected.");
     return false;
   }

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "PtNode.h"
+#include "dotlib_nsdef.h
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -18,8 +18,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @class PtTiming PtTiming.h "PtTiming.h"
 /// @brief タイミング情報を表す PtNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class PtTiming :
-  public PtNode
+class PtTiming
 {
   friend class PtMgr;
 
@@ -51,36 +50,11 @@ public:
   // 内容を参照する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値の数を返す．
-  /// @note このクラスでは常に 0
-  virtual
-  ymuint
-  value_num() const;
-
-  /// @brief 値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-  /// @note このクラスでの呼び出しはエラーになる．
-  virtual
-  const PtValue*
-  value(ymuint pos) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // PtTiming に独自の関数
-  //////////////////////////////////////////////////////////////////////
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // タイミング情報のリスト(配列)
-  vector<const PtNode*> mTimingList;
-
-  // タイミング情報以外の子供のリスト(配列)
-  vector<const PtNode*> mChildList;
 
 };
 

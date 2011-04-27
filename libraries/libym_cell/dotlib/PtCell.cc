@@ -29,13 +29,6 @@ PtCell::~PtCell()
 {
 }
 
-// @brief セル名を返す．
-ShString
-PtCell::name() const
-{
-  return mName;
-}
-
 // @brief leakge_power を追加する．
 // @param[in] lp 対象の leakage_power
 bool
@@ -71,21 +64,49 @@ PtCell::add_bundle(PtBundle* bundle)
   return true;
 }
 
-// @brief 値の数を返す．
-// @note このクラスでは常に 1
-ymuint
-PtCell::value_num() const
+// @brief simple attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value 値
+// @return 設定が失敗したら false を返す．
+bool
+PtCell::add_simple_attr(const ShString& attr_name,
+			const PtValue* value)
 {
-  return 0;
+  return true;
 }
 
-// @brief 値を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-const PtValue*
-PtCell::value(ymuint pos) const
+// @brief complex attribute を設定する．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+// @return 設定が失敗したら false を返す．
+bool
+PtCell::add_complex_attr(const ShString& attr_name,
+			 const vector<const PtValue*>& value_list)
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+  return true;
+}
+
+// @brief セル名を返す．
+ShString
+PtCell::name() const
+{
+  return mName;
+}
+
+// @brief leakage_power グループの数を返す．
+ymuint
+PtCell::leakage_power_num() const
+{
+  return mLeakagePowerList.size();
+}
+
+// @brief leakage_power グループのパース木を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < leakage_power_num() )
+const PtLeakagePower*
+PtCell::leakage_power(ymuint pos) const
+{
+  assert_cond( pos < leakage_power_num(), __FILE__, __LINE__);
+  return mLeakagePowerList[pos];
 }
 
 // @brief pin グループの数を返す．

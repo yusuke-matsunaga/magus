@@ -18,7 +18,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PtValue::PtValue()
+PtValue::PtValue() :
+  mNext(NULL)
 {
 }
 
@@ -67,6 +68,13 @@ PtValue::opr2() const
   return NULL;
 }
 
+// @brief 次の要素を得る．
+const PtValue*
+PtValue::next() const
+{
+  return mNext;
+}
+
 
 // @relates PtValue
 // @brief PtValue の内容をストリームに出力する．
@@ -78,15 +86,15 @@ operator<<(ostream& s,
 {
   switch ( value->type() ) {
   case INT_NUM:
-    s << "int(" << value->int_value() << ")";
+    s << "INT(" << value->int_value() << ")";
     break;
 
   case FLOAT_NUM:
-    s << "float(" << value->float_value() << ")";
+    s << "FLOAT(" << value->float_value() << ")";
     break;
 
   case SYMBOL:
-    s << "string(" << value->string_value() << ")";
+    s << "STRING(" << value->string_value() << ")";
     break;
 
   case PLUS:
