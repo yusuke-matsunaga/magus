@@ -46,6 +46,7 @@ PtMgr::PtMgr() :
   mFloatNum = 0;
   mStrNum = 0;
   mOprNum = 0;
+  mListNum = 0;
 }
 
 // @brief デストラクタ
@@ -205,88 +206,135 @@ PtMgr::new_string(ShString value,
   return new (p) PtString(value, loc);
 }
 
-// @brief 演算子を表す PtValue を生成する．
-// @param[in] type 型
+// @brief + 演算子を表す PtValue を生成する．
 // @param[in] opr1, opr2 オペランド
 PtValue*
-PtMgr::new_opr(tTokenType type,
-		 PtValue* opr1,
+PtMgr::new_plus(PtValue* opr1,
+		PtValue* opr2)
+{
+  ++ mOprNum;
+  void* p = mAlloc.get_memory(sizeof(PtOpr));
+  return new (p) PtOpr(PtValue::kPlus, opr1, opr2);
+}
+
+// @brief - 演算子を表す PtValue を生成する．
+// @param[in] opr1, opr2 オペランド
+PtValue*
+PtMgr::new_minus(PtValue* opr1,
 		 PtValue* opr2)
 {
   ++ mOprNum;
   void* p = mAlloc.get_memory(sizeof(PtOpr));
-  return new (p) PtOpr(type, opr1, opr2);
+  return new (p) PtOpr(PtValue::kMinus, opr1, opr2);
 }
 
-void
-PtMgr::show_stats()
+// @brief * 演算子を表す PtValue を生成する．
+// @param[in] opr1, opr2 オペランド
+PtValue*
+PtMgr::new_mult(PtValue* opr1,
+		PtValue* opr2)
 {
-  cout << "PtSimple:       " << setw(7) << mSimpleNum
-       << " x " << setw(3) << sizeof(PtSimpleNode)
-       << " = " << setw(10) << mSimpleNum * sizeof(PtSimpleNode) << endl
+  ++ mOprNum;
+  void* p = mAlloc.get_memory(sizeof(PtOpr));
+  return new (p) PtOpr(PtValue::kMult, opr1, opr2);
+}
 
-       << "PtComplex:      " << setw(7) << mComplexNum
-       << " x " << setw(3) << sizeof(PtComplexNode)
-       << " = " << setw(10) << mComplexNum * sizeof(PtComplexNode) << endl
+// @brief / 演算子を表す PtValue を生成する．
+// @param[in] opr1, opr2 オペランド
+PtValue*
+PtMgr::new_div(PtValue* opr1,
+	       PtValue* opr2)
+{
+  ++ mOprNum;
+  void* p = mAlloc.get_memory(sizeof(PtOpr));
+  return new (p) PtOpr(PtValue::kDiv, opr1, opr2);
+}
 
-       << "PtGroup:        " << setw(7) << mGroupNum
-       << " x " << setw(3) << sizeof(PtGroupNode)
-       << " = " << setw(10) << mGroupNum * sizeof(PtGroupNode) << endl
+// @brief リストを表す PtValue を生成する．
+// @param[in] top 先頭の要素
+PtValue*
+PtMgr::new_list(PtValue* top)
+{
+  ++ mListNum;
+  void* p = mAlloc.get_memory(sizeof(PtList));
+  return new (p) PtList(top);
+}
 
-       << "PtCell:         " << setw(7) << mCellNum
-       << " x " << setw(3) << sizeof(PtCell)
-       << " = " << setw(10) << mCellNum * sizeof(PtCell) << endl
+// @brief 使用メモリ量の一覧を出力する．
+// @param[in] s 出力先のストリーム
+void
+PtMgr::show_stats(ostream& s)
+{
+  s << "PtSimple:       " << setw(7) << mSimpleNum
+    << " x " << setw(3) << sizeof(PtSimpleNode)
+    << " = " << setw(10) << mSimpleNum * sizeof(PtSimpleNode) << endl
 
-       << "PtLeakagePower: " << setw(7) << mLeakagePowerNum
-       << " x " << setw(3) << sizeof(PtLeakagePower)
-       << " = " << setw(10)
-       << mLeakagePowerNum * sizeof(PtLeakagePower) << endl
+    << "PtComplex:      " << setw(7) << mComplexNum
+    << " x " << setw(3) << sizeof(PtComplexNode)
+    << " = " << setw(10) << mComplexNum * sizeof(PtComplexNode) << endl
 
-       << "PtBus:          " << setw(7) << mBusNum
-       << " x " << setw(3) << sizeof(PtBus)
-       << " = " << setw(10) << mBusNum * sizeof(PtBus) << endl
+    << "PtGroup:        " << setw(7) << mGroupNum
+    << " x " << setw(3) << sizeof(PtGroupNode)
+    << " = " << setw(10) << mGroupNum * sizeof(PtGroupNode) << endl
 
-       << "PtBundle:       " << setw(7) << mBundleNum
-       << " x " << setw(3) << sizeof(PtBundle)
-       << " = " << setw(10) << mBundleNum * sizeof(PtBundle) << endl
+    << "PtCell:         " << setw(7) << mCellNum
+    << " x " << setw(3) << sizeof(PtCell)
+    << " = " << setw(10) << mCellNum * sizeof(PtCell) << endl
 
-       << "PtPin:          " << setw(7) << mPinNum
-       << " x " << setw(3) << sizeof(PtPin)
-       << " = " << setw(10) << mPinNum * sizeof(PtPin) << endl
+    << "PtLeakagePower: " << setw(7) << mLeakagePowerNum
+    << " x " << setw(3) << sizeof(PtLeakagePower)
+    << " = " << setw(10)
+    << mLeakagePowerNum * sizeof(PtLeakagePower) << endl
 
-       << "PtTiming:       " << setw(7) << mTimingNum
-       << " x " << setw(3) << sizeof(PtTiming)
-       << " = " << setw(10) << mTimingNum * sizeof(PtTiming) << endl
+    << "PtBus:          " << setw(7) << mBusNum
+    << " x " << setw(3) << sizeof(PtBus)
+    << " = " << setw(10) << mBusNum * sizeof(PtBus) << endl
 
-       << "PtTable :       " << setw(7) << mTableNum
-       << " x " << setw(3) << sizeof(PtTable)
-       << " = " << setw(10) << mTableNum * sizeof(PtTable) << endl
+    << "PtBundle:       " << setw(7) << mBundleNum
+    << " x " << setw(3) << sizeof(PtBundle)
+    << " = " << setw(10) << mBundleNum * sizeof(PtBundle) << endl
 
-       << "PtInt:          " << setw(7) << mIntNum
-       << " x " << setw(3) << sizeof(PtInt)
-       << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl
+    << "PtPin:          " << setw(7) << mPinNum
+    << " x " << setw(3) << sizeof(PtPin)
+    << " = " << setw(10) << mPinNum * sizeof(PtPin) << endl
 
-       << "PtFloat:        " << setw(7) << mFloatNum
-       << " x " << setw(3) << sizeof(PtFloat)
-       << " = " << setw(10) << mFloatNum * sizeof(PtFloat) << endl
+    << "PtTiming:       " << setw(7) << mTimingNum
+    << " x " << setw(3) << sizeof(PtTiming)
+    << " = " << setw(10) << mTimingNum * sizeof(PtTiming) << endl
 
-       << "PtString:       " << setw(7) << mStrNum
-       << " x " << setw(3) << sizeof(PtString)
-       << " = " << setw(10) << mStrNum * sizeof(PtString) << endl
+    << "PtTable :       " << setw(7) << mTableNum
+    << " x " << setw(3) << sizeof(PtTable)
+    << " = " << setw(10) << mTableNum * sizeof(PtTable) << endl
 
-       << "PtOpr:          " << setw(7) << mOprNum
-       << " x " << setw(3) << sizeof(PtOpr)
-       << " = " << setw(10) << mOprNum * sizeof(PtOpr) << endl
+    << "PtInt:          " << setw(7) << mIntNum
+    << " x " << setw(3) << sizeof(PtInt)
+    << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl
 
-       << "Total memory:                 = "
-       << setw(10) << mAlloc.used_size() << endl
-       << endl
+    << "PtFloat:        " << setw(7) << mFloatNum
+    << " x " << setw(3) << sizeof(PtFloat)
+    << " = " << setw(10) << mFloatNum * sizeof(PtFloat) << endl
 
-       << "Allocated memory:             = "
-       << setw(10) << mAlloc.allocated_size() << endl
+    << "PtString:       " << setw(7) << mStrNum
+    << " x " << setw(3) << sizeof(PtString)
+    << " = " << setw(10) << mStrNum * sizeof(PtString) << endl
 
-       << "ShString:                     = "
-       << setw(10) << ShString::allocated_size() << endl;
+    << "PtOpr:          " << setw(7) << mOprNum
+    << " x " << setw(3) << sizeof(PtOpr)
+    << " = " << setw(10) << mOprNum * sizeof(PtOpr) << endl
+
+    << "PtList:         " << setw(7) << mListNum
+    << " x " << setw(3) << sizeof(PtList)
+    << " = " << setw(10) << mListNum * sizeof(PtList) << endl
+
+    << "Total memory:                 = "
+    << setw(10) << mAlloc.used_size() << endl
+    << endl
+
+    << "Allocated memory:             = "
+    << setw(10) << mAlloc.allocated_size() << endl
+
+    << "ShString:                     = "
+    << setw(10) << ShString::allocated_size() << endl;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

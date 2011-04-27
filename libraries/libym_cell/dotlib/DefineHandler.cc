@@ -40,8 +40,8 @@ bool
 DefineHandler::read_attr(const ShString& attr_name,
 			 const FileRegion& attr_loc)
 {
-  vector<const PtValue*> value_list;
-  if ( !parse_complex(value_list) ) {
+  PtValue* value = parse_complex();
+  if ( value == NULL ) {
     return false;
   }
 
@@ -50,44 +50,33 @@ DefineHandler::read_attr(const ShString& attr_name,
   }
 
   if ( debug() ) {
-    cout << attr_name << " (";
-    const char* comma = "";
-    for (vector<const PtValue*>::const_iterator p = value_list.begin();
-	 p != value_list.end(); ++ p) {
-      cout << comma << *p;
-      comma = ", ";
-    }
-    cout << ")" << endl;
+    cout << attr_name << value << endl;
   }
 
-  bool error = false;
-  const PtValue* keyword = value_list[0];
-  if ( keyword->type() != SYMBOL ) {
+  const PtValue* keyword = value;
+  if ( keyword == NULL || keyword->type() != PtValue::kString ) {
     put_msg(__FILE__, __LINE__, keyword->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "string value is expected for 1st argument.");
-    error = true;
+    return false;
   }
 
-  const PtValue* group = value_list[1];
-  if ( group->type() != SYMBOL ) {
+  const PtValue* group = keyword->next();
+  if ( group == NULL || group->type() != PtValue::kString ) {
     put_msg(__FILE__, __LINE__, group->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "string value is expected for 2nd argument.");
-    error = true;
+    return false;
   }
 
-  const PtValue* type_token = value_list[2];
-  if ( type_token->type() != SYMBOL ) {
+  const PtValue* type_token = group->next();
+  if ( type_token == NULL || type_token->type() != PtValue::kString ) {
     put_msg(__FILE__, __LINE__, type_token->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "string value is expected for 3rd argument.");
-    error = true;
-  }
-  if ( error ) {
     return false;
   }
 

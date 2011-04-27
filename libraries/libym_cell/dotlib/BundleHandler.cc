@@ -14,6 +14,7 @@
 #include "GroupHandler.h"
 #include "CellHandler.h"
 #include "PinHandler.h"
+#include "TimingHandler.h"
 
 #include "PtMgr.h"
 #include "PtNode.h"
@@ -157,8 +158,8 @@ BundleHandler::add_simple_attr(const ShString& attr_name,
 // @param[in] value_list 値のリスト
 // @return 設定が失敗したら false を返す．
 bool
-BundleHandler::::add_complex_attr(const ShString& attr_name,
-				  const vector<const PtValue*>& value_list)
+BundleHandler::add_complex_attr(const ShString& attr_name,
+				const vector<const PtValue*>& value_list)
 {
 #warning "未完"
   return true;
@@ -196,7 +197,7 @@ BundleHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  if ( value_list[0]->type() != SYMBOL ) {
+  if ( value_list[0]->type() != PtValue::kString ) {
     put_msg(__FILE__, __LINE__, value_list[0]->loc(),
 	    kMsgError,
 	    "DOTLIBPARSER",

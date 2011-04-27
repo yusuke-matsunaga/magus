@@ -23,7 +23,7 @@ class PtPin :
 {
   friend class PtMgr;
 
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
@@ -97,9 +97,6 @@ private:
 
   // タイミング情報のリスト(配列)
   vector<const PtTiming*> mTimingList;
-
-  // タイミング情報以外の子供のリスト(配列)
-  vector<const PtNode*> mChildList;
 
 };
 

@@ -88,20 +88,4 @@ PtLibrary::cell(ymuint pos) const
   return mCellList[pos];
 }
 
-// @brief 値の数を返す．
-ymuint
-PtLibrary::value_num() const
-{
-  return 0;
-}
-
-// @brief 値を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-const PtValue*
-PtLibrary::value(ymuint pos) const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
 END_NAMESPACE_YM_CELL_DOTLIB

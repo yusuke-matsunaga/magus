@@ -43,7 +43,7 @@ protected:
   /// @note エラーが起きたら NULL を返す．
   /// @note ここでは expression のパースを行う．
   virtual
-  const PtValue*
+  PtValue*
   read_value();
 
 

@@ -10,6 +10,7 @@
 #include "DotlibHandler.h"
 #include "DotlibParser.h"
 #include "PtMgr.h"
+#include "PtValue.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -37,23 +38,25 @@ DotlibHandler::~DotlibHandler()
 }
 
 // @brief group attribute 用のパースを行う．
-// @param[out] value_list 読み込んだトークンを格納するリスト
-bool
-DotlibHandler::parse_complex(vector<const PtValue*>& value_list)
+// @return 読み込んだ値(リスト)を返す．
+// @note エラーが起きたら NULL を返す．
+PtValue*
+DotlibHandler::parse_complex()
 {
   if ( !expect(LP) ) {
-    return false;
+    return NULL;
   }
 
-  value_list.clear();
+  PtValueList value_list;
   tTokenType type = parser().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
-      const PtValue* value = new_ptvalue(type);
+      PtValue* value = new_ptvalue(type);
       if ( value == NULL ) {
-	return false;
+	return NULL;
       }
-      value_list.push_back(value);
+
+      value_list.add(value);
 
       tTokenType type1 = parser().read_token();
       if ( type1 == RP ) {
@@ -70,13 +73,13 @@ DotlibHandler::parse_complex(vector<const PtValue*>& value_list)
     }
   }
 
-  return true;
+  return value_list.top();
 }
 
 // @brief PtValue を生成する．
 // @param[in] type 型
 // @note 残りの情報は parser() からとってくる．
-const PtValue*
+PtValue*
 DotlibHandler::new_ptvalue(tTokenType type)
 {
   FileRegion loc(parser().cur_loc());

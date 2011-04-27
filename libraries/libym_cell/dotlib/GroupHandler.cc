@@ -49,24 +49,16 @@ bool
 GroupHandler::read_attr(const ShString& attr_name,
 			const FileRegion& attr_loc)
 {
-  vector<const PtValue*> value_list;
-
-  if ( !parse_complex(value_list) ) {
+  PtValue* value = parse_complex();
+  if ( value == NULL ) {
     return false;
   }
 
   if ( debug() ) {
-    cout << attr_name << "( ";
-    const char* comma = "";
-    for (vector<const PtValue*>::const_iterator p = value_list.begin();
-	 p != value_list.end(); ++ p) {
-      cout << comma << *p;
-      comma = ", ";
-    }
-    cout << " ) {" << endl;
+    cout << attr_name << value << endl;
   }
 
-  if ( !begin_group(attr_name, attr_loc, value_list) ) {
+  if ( !begin_group(attr_name, attr_loc, value) ) {
     return false;
   }
 
@@ -117,27 +109,14 @@ GroupHandler::read_attr(const ShString& attr_name,
   return true;
 }
 
-// @brief simple attribute を設定する．
+// @brief attribute を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
 // @return 設定が失敗したら false を返す．
 // @note デフォルトの実装はエラーとなる．
 bool
-GroupHandler::add_simple_attr(const ShString& attr_name,
-			      const PtValue* value)
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return false;
-}
-
-// @brief complex attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-// @return 設定が失敗したら false を返す．
-// @note デフォルトの実装はエラーとなる．
-bool
-GroupHandler::add_complex_attr(const ShString& attr_name,
-			       const vector<const PtValue*>& value_list)
+GroupHandler::add_attr(const ShString& attr_name,
+		       PtValue* value)
 {
   assert_not_reached(__FILE__, __LINE__);
   return false;
@@ -213,27 +192,6 @@ GroupHandler::add_table(const ShString& attr_name,
   return false;
 }
 
-// @brief index_x 属性をセットする．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-bool
-GroupHandler::add_index_x(const ShString& attr_name,
-			  const vector<const PtValue*>& value_list)
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return false;
-}
-
-// @brief values 属性をセットする．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-bool
-GroupHandler::add_values(const vector<const PtValue*>& value_list)
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return false;
-}
-
 // @brief domain グループをセットする．
 // @param[in] domain ドメイン
 bool
@@ -301,12 +259,13 @@ GenGroupHandler::~GenGroupHandler()
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
+// @param[in] value 値を表すトークンのリスト
 bool
 GenGroupHandler::begin_group(const ShString& attr_name,
 			     const FileRegion& attr_loc,
-			     const vector<const PtValue*>& value_list)
+			     PtValue* value)
 {
+  parent()->add_attr(attr_name, value);
   return true;
 }
 

@@ -29,42 +29,56 @@ PtValue::~PtValue()
 }
 
 // @brief 整数値を返す．
-// @note type() が INT_NUM の時のみ意味を持つ．
+// @note type() が kInt の時のみ意味を持つ．
 int
 PtValue::int_value() const
 {
+  assert_not_reached(__FILE__, __LINE__);
   return 0;
 }
 
 // @brief 数値を返す．
-// @note type() が FLOAT_NUM の時のみ意味を持つ．
+// @note type() が kFloat の時のみ意味を持つ．
 double
 PtValue::float_value() const
 {
+  assert_not_reached(__FILE__, __LINE__);
   return 0.0;
 }
 
 // @brief 定数シンボルを返す．
-// @note type() が SYMBOL の時のみ意味を持つ．
+// @note type() が kString の時のみ意味を持つ．
 ShString
 PtValue::string_value() const
 {
+  assert_not_reached(__FILE__, __LINE__);
   return ShString();
 }
 
 // @brief 第一オペランドを返す．
-// @note type() が演算子の型の時のみ意味を持つ．
+// @note type() が演算子の型(kPlus, kMinus, kMult, kDiv)の時のみ意味を持つ．
 const PtValue*
 PtValue::opr1() const
 {
+  assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
 // @brief 第二オペランドを返す．
-// @note type() が演算子の型の時のみ意味を持つ．
+// @note type() が演算子の型(kPlus, kMinus, kMult, kDiv)の時のみ意味を持つ．
 const PtValue*
 PtValue::opr2() const
 {
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief リストの先頭の要素を返す．
+// @note type() が kList の時のみ意味をもつ．
+const PtValue*
+PtValue::top() const
+{
+  assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
@@ -85,32 +99,44 @@ operator<<(ostream& s,
 	   const PtValue* value)
 {
   switch ( value->type() ) {
-  case INT_NUM:
+  case PtValue::kInt:
     s << "INT(" << value->int_value() << ")";
     break;
 
-  case FLOAT_NUM:
+  case PtValue::kFloat:
     s << "FLOAT(" << value->float_value() << ")";
     break;
 
-  case SYMBOL:
+  case PtValue::kString:
     s << "STRING(" << value->string_value() << ")";
     break;
 
-  case PLUS:
+  case PtValue::kPlus:
     s << "(" << value->opr1() << " + " << value->opr2() << ")";
     break;
 
-  case MINUS:
+  case PtValue::kMinus:
     s << "(" << value->opr1() << " - " << value->opr2() << ")";
     break;
 
-  case MULT:
+  case PtValue::kMult:
     s << "(" << value->opr1() << " * " << value->opr2() << ")";
     break;
 
-  case DIV:
+  case PtValue::kDiv:
     s << "(" << value->opr1() << " / " << value->opr2() << ")";
+    break;
+
+  case PtValue::kList:
+    {
+      const char* comma = "";
+      s << "{ ";
+      for (const PtValue* v1 = value->top(); v1; v1 = v1->next()) {
+	s << comma << v1;
+	comma = ", ";
+      }
+      s << " }";
+    }
     break;
 
   default:
@@ -118,6 +144,30 @@ operator<<(ostream& s,
     break;
   }
   return s;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PtValueBase
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] loc ファイル上の位置
+PtValueBase::PtValueBase(const FileRegion& loc) :
+  mLoc(loc)
+{
+}
+
+// @brief デストラクタ
+PtValueBase::~PtValueBase()
+{
+}
+
+// @brief ファイル上の位置を返す．
+FileRegion
+PtValueBase::loc() const
+{
+  return mLoc;
 }
 
 
@@ -130,8 +180,8 @@ operator<<(ostream& s,
 // @param[in] loc ファイル上の位置
 PtInt::PtInt(int value,
 	     const FileRegion& loc) :
-  mValue(value),
-  mLoc(loc)
+  PtValueBase(loc),
+  mValue(value)
 {
 }
 
@@ -141,21 +191,14 @@ PtInt::~PtInt()
 }
 
 // @brief 型を得る．
-tTokenType
+PtValue::tType
 PtInt::type() const
 {
-  return INT_NUM;
-}
-
-// @brief 式全体のファイル上の位置を返す．
-FileRegion
-PtInt::loc() const
-{
-  return mLoc;
+  return kInt;
 }
 
 // @brief 整数値を返す．
-// @note type() が INT_NUM の時のみ意味を持つ．
+// @note type() が kInt の時のみ意味を持つ．
 int
 PtInt::int_value() const
 {
@@ -163,7 +206,7 @@ PtInt::int_value() const
 }
 
 // @brief 数値を返す．
-// @note type() が FLOAT_NUM の時のみ意味を持つ．
+// @note type() が kFloat の時のみ意味を持つ．
 double
 PtInt::float_value() const
 {
@@ -180,8 +223,8 @@ PtInt::float_value() const
 // @param[in] loc ファイル上の位置
 PtFloat::PtFloat(double value,
 		 const FileRegion& loc) :
-  mValue(value),
-  mLoc(loc)
+  PtValueBase(loc),
+  mValue(value)
 {
 }
 
@@ -191,21 +234,14 @@ PtFloat::~PtFloat()
 }
 
 // @brief 型を得る．
-tTokenType
+PtValue::tType
 PtFloat::type() const
 {
-  return FLOAT_NUM;
-}
-
-// @brief 式全体のファイル上の位置を返す．
-FileRegion
-PtFloat::loc() const
-{
-  return mLoc;
+  return kFloat;
 }
 
 // @brief 数値を返す．
-// @note type() が FLOAT_NUM の時のみ意味を持つ．
+// @note type() が kFloat の時のみ意味を持つ．
 double
 PtFloat::float_value() const
 {
@@ -222,8 +258,8 @@ PtFloat::float_value() const
 // @param[in] loc ファイル上の位置
 PtString::PtString(ShString value,
 		   const FileRegion& loc) :
-  mValue(value),
-  mLoc(loc)
+  PtValueBase(loc),
+  mValue(value)
 {
 }
 
@@ -233,17 +269,10 @@ PtString::~PtString()
 }
 
 // @brief 型を得る．
-tTokenType
+PtValue::tType
 PtString::type() const
 {
-  return SYMBOL;
-}
-
-// @brief 式全体のファイル上の位置を返す．
-FileRegion
-PtString::loc() const
-{
-  return mLoc;
+  return kString;
 }
 
 // @brief 定数シンボルを返す．
@@ -262,13 +291,12 @@ PtString::string_value() const
 // @brief 表すコンストラクタ
 // @param[in] type 演算子の型
 // @param[in] opr1, opr2 オペランド
-PtOpr::PtOpr(tTokenType type,
+PtOpr::PtOpr(tType type,
 	     PtValue* opr1,
 	     PtValue* opr2) :
   mType(type),
   mOpr1(opr1),
   mOpr2(opr2)
-
 {
 }
 
@@ -278,7 +306,7 @@ PtOpr::~PtOpr()
 }
 
 // @brief 型を得る．
-tTokenType
+PtValue::tType
 PtOpr::type() const
 {
   return mType;
@@ -305,6 +333,91 @@ const PtValue*
 PtOpr::opr2() const
 {
   return mOpr2;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PtList
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] top 先頭要素
+PtList::PtList(PtValue* top) :
+  mTop(top)
+{
+}
+
+// @brief デストラクタ
+PtList::~PtList()
+{
+}
+
+// @brief 型を得る．
+PtValue::tType
+PtList::type() const
+{
+  return kList;
+}
+
+// @brief 式全体のファイル上の位置を返す．
+FileRegion
+PtList::loc() const
+{
+  const PtValue* top = mTop;
+  if ( top == NULL ) {
+    return FileRegion();
+  }
+  const PtValue* end = top;
+  for ( ; end->next() != NULL; end = end->next() ) ;
+  return FileRegion(top->loc(), end->loc());
+}
+
+// @brief リストの先頭の要素を返す．
+// @note type() が kList の時のみ意味をもつ．
+const PtValue*
+PtList::top() const
+{
+  return mTop;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PtValueList
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @note 空のリストとなる．
+PtValueList::PtValueList()
+{
+  mTop = NULL;
+  mTail = NULL;
+}
+
+// @brief デストラクタ
+PtValueList::~PtValueList()
+{
+}
+
+// @brief 要素を追加する．
+void
+PtValueList::add(PtValue* value)
+{
+  if ( mTop == NULL ) {
+    mTop = mTail = value;
+  }
+  else {
+    mTail->mNext = value;
+    mTail = value;
+  }
+  // 念のため
+  assert_cond( value->mNext == NULL, __FILE__, __LINE__);
+}
+
+// @brief 先頭の要素を取り出す．
+PtValue*
+PtValueList::top()
+{
+  return mTop;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

@@ -53,20 +53,20 @@ dump_sub(ostream& s,
 	 const PtNode* node,
 	 ymuint indent)
 {
+#if 0
   ymuint nv = node->value_num();
   for (ymuint i = 0; i < nv; ++ i) {
     s << indent_str(indent)
       << "Value#" << i << ": " << node->value(i) << endl;
   }
 
-#if 0
   ymuint nc = node->child_num();
   for (ymuint i = 0; i < nc; ++ i) {
     s << indent_str(indent)
       << "Child#" << i << ":" << endl;
     dump_sub(s, node->child(i), indent + 2);
   }
-#else
+
   ymuint nk = node->child_attr_num();
   for (ymuint i = 0; i < nk; ++ i) {
     ShString attr = node->child_attr_name(i);

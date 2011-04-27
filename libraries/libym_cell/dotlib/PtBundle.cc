@@ -29,31 +29,11 @@ PtBundle::~PtBundle()
 }
 
 // @brief ピンを追加する．
-void
+bool
 PtBundle::add_pin(PtPin* pin)
 {
+#warning "TODO: ピン名の重複チェック?"
   mPinList.push_back(pin);
-}
-
-// @brief simple attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @return 設定が失敗したら false を返す．
-bool
-Pt::Bundle::add_simple_attr(const ShString& attr_name,
-			    const PtValue* value)
-{
-  return true;
-}
-
-// @brief complex attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-// @return 設定が失敗したら false を返す．
-bool
-Pt::Bundle::add_complex_attr(const ShString& attr_name,
-			     const vector<const PtValue*>& value_list)
-{
   return true;
 }
 

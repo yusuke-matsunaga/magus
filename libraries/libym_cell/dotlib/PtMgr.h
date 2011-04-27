@@ -39,6 +39,7 @@ public:
   void
   init();
 
+#if 0
   /// @brief simple attribute を表す PtNode を生成する．
   /// @param[in] value 値
   PtNode*
@@ -53,6 +54,7 @@ public:
   /// @param[in] value_list 値のリスト
   PtNode*
   new_ptgroup(const vector<const PtValue*>& value_list);
+#endif
 
   /// @brief PtLibrary を生成する．
   /// @param[in] name ライブラリ名
@@ -113,16 +115,39 @@ public:
   new_string(ShString value,
 	     const FileRegion& loc);
 
-  /// @brief 演算子を表す PtValue を生成する．
-  /// @param[in] type 型
+  /// @brief + 演算子を表す PtValue を生成する．
   /// @param[in] opr1, opr2 オペランド
   PtValue*
-  new_opr(tTokenType type,
-	  PtValue* opr1,
+  new_plus(PtValue* opr1,
+	   PtValue* opr2);
+
+  /// @brief - 演算子を表す PtValue を生成する．
+  /// @param[in] opr1, opr2 オペランド
+  PtValue*
+  new_minus(PtValue* opr1,
+	    PtValue* opr2);
+
+  /// @brief * 演算子を表す PtValue を生成する．
+  /// @param[in] opr1, opr2 オペランド
+  PtValue*
+  new_mult(PtValue* opr1,
+	   PtValue* opr2);
+
+  /// @brief / 演算子を表す PtValue を生成する．
+  /// @param[in] opr1, opr2 オペランド
+  PtValue*
+  new_div(PtValue* opr1,
 	  PtValue* opr2);
 
+  /// @brief リストを表す PtValue を生成する．
+  /// @param[in] top 先頭の要素
+  PtValue*
+  new_list(PtValue* top);
+
+  /// @brief 使用メモリ量の一覧を出力する．
+  /// @param[in] s 出力先のストリーム
   void
-  show_stats();
+  show_stats(ostream& s);
 
 
 private:
@@ -133,6 +158,7 @@ private:
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
+  // 個々の要素の使用数
   ymuint32 mSimpleNum;
   ymuint32 mComplexNum;
   ymuint32 mGroupNum;
@@ -147,6 +173,7 @@ private:
   ymuint32 mFloatNum;
   ymuint32 mStrNum;
   ymuint32 mOprNum;
+  ymuint32 mListNum;
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

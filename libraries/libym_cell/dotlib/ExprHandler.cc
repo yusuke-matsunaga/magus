@@ -37,7 +37,7 @@ ExprHandler::~ExprHandler()
 // @return 値を表す PtValue を返す．
 // @note エラーが起きたら NULL を返す．
 // @note ここでは expression のパースを行う．
-const PtValue*
+PtValue*
 ExprHandler::read_value()
 {
   PtValue* expr = read_expr(SEMI);
@@ -95,7 +95,12 @@ ExprHandler::read_product()
       if ( opr2 == NULL ) {
 	return NULL;
       }
-      opr1 = ptmgr().new_opr(type, opr1, opr2);
+      if ( type == MULT ) {
+	opr1 = ptmgr().new_mult(opr1, opr2);
+      }
+      else {
+	opr1 = ptmgr().new_div(opr1, opr2);
+      }
     }
     else {
       // token を戻す．
@@ -127,8 +132,12 @@ ExprHandler::read_expr(tTokenType end_marker)
       if ( opr2 == NULL ) {
 	return NULL;
       }
-
-      opr1 = ptmgr().new_opr(type, opr1, opr2);
+      if ( type == PLUS ) {
+	opr1 = ptmgr().new_plus(opr1, opr2);
+      }
+      else {
+	opr1 = ptmgr().new_minus(opr1, opr2);
+      }
     }
     else {
       put_msg(__FILE__, __LINE__, cur_loc(),

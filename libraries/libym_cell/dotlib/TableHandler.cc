@@ -123,11 +123,11 @@ TableHandler::add_complex_attr(const ShString& attr_name,
 bool
 TableHandler::add_domain(PtDomain* domain)
 {
-  if ( mDomain != NULL ) {
+  if ( mTable->mDomain != NULL ) {
 #warning "TODO: エラーメッセージの出力"
     return false;
   }
-  mDmain = domain;
+  mTable->mDomain = domain;
   return true;
 }
 

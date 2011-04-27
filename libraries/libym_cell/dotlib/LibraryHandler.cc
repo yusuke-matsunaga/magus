@@ -433,28 +433,16 @@ LibraryHandler::parent()
   return NULL;
 }
 
-// @brief simple attribute を設定する．
+// @brief attribute を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
 // @return 設定が失敗したら false を返す．
 bool
-LibraryHandler::add_simple_attr(const ShString& attr_name,
-				const PtValue* value)
+LibraryHandler::add_attr(const ShString& attr_name,
+			 PtValue* value)
 {
 #warning "未完"
-  return true;
-}
-
-// @brief complex attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-// @return 設定が失敗したら false を返す．
-bool
-LibraryHandler::add_complex_attr(const ShString& attr_name,
-				 const vector<const PtValue*>& value_list)
-{
-#warning "未完"
-  return true;
+  return GroupHandler::add_attr(attr_name, value);
 }
 
 // @brief セルを追加する．
@@ -467,15 +455,15 @@ LibraryHandler::add_cell(PtCell* cell)
 // @brief グループ名を読み込んだ時の処理
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
+// @param[in] value 値を表すトークンのリスト
 bool
 LibraryHandler::begin_group(const ShString& attr_name,
 			    const FileRegion& attr_loc,
-			    const vector<const PtValue*>& value_list)
+			    PtValue* value)
 {
   assert_cond( attr_name == "library", __FILE__, __LINE__);
 
-  if ( value_list.size() == 0 ) {
+  if ( value == NULL ) {
     FileRegion loc = attr_loc;
     put_msg(__FILE__, __LINE__, loc,
 	    kMsgError,
@@ -483,8 +471,8 @@ LibraryHandler::begin_group(const ShString& attr_name,
 	    "library statement requires library name.");
     return false;
   }
-  if ( value_list.size() > 1 ) {
-    FileRegion loc = value_list[2]->loc();
+  if ( value->next() != NULL ) {
+    FileRegion loc = value->next()->loc();
     put_msg(__FILE__, __LINE__, loc,
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -492,15 +480,15 @@ LibraryHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  if ( value_list[0]->type() != SYMBOL ) {
-    put_msg(__FILE__, __LINE__, value_list[0]->loc(),
+  if ( value->type() != PtValue::kString ) {
+    put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "string value is expected.");
     return false;
   }
 
-  mLibrary = ptmgr().new_ptlibrary(value_list[0]->string_value());
+  mLibrary = ptmgr().new_ptlibrary(value->string_value());
 
   return true;
 }

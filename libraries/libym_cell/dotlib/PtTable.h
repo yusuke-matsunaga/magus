@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "dotlib_nsdef.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -18,7 +18,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @class PtTable PtTable.h "PtTable.h"
 /// @brief タイミング情報を表す PtNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class PtTable
+class PtTable :
+  public PtNode
 {
   friend class PtMgr;
   friend class TableHandler;
@@ -86,6 +87,7 @@ private:
 
   // domain グループ
   PtDomain* mDomain;
+
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

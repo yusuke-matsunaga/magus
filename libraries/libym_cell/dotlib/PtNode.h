@@ -36,26 +36,28 @@ protected:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を設定する仮想関数
+  // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief simple attribute を設定する．
+  /// @brief attribute を設定する．
   /// @param[in] attr_name 属性名
   /// @param[in] value 値
   /// @return 設定が失敗したら false を返す．
-  virtual
   bool
-  add_simple_attr(const ShString& attr_name,
-		  const PtValue* value);
+  add_attr(const ShString& attr_name,
+	   PtValue* value);
 
-  /// @brief complex attribute を設定する．
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を参照する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief attribute を取得する．
   /// @param[in] attr_name 属性名
-  /// @param[in] value_list 値のリスト
-  /// @return 設定が失敗したら false を返す．
-  virtual
-  bool
-  add_complex_attr(const ShString& attr_name,
-		   const vector<const PtValue*>& value_list);
+  /// @note 該当する属性がなければ NULL を返す．
+  const PtValue*
+  get_attr(const ShString& attr_name) const;
 
 
 private:
@@ -63,9 +65,10 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 属性名をキーにして simple attribute を格納するハッシュ表
+  // 属性名をキーにして attribute を格納するハッシュ表
   // おなじ属性の値が複数あったら PtValue->next() でつなげる．
-  hash_map<ShString, PtValue*> mSimpleAttrMap;
+  hash_map<ShString, PtValue*> mAttrMap;
+
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

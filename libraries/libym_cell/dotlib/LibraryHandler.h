@@ -59,23 +59,14 @@ public:
   // 外部から用いられる GroupHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief simple attribute を設定する．
+  /// @brief attribute を設定する．
   /// @param[in] attr_name 属性名
   /// @param[in] value 値
   /// @return 設定が失敗したら false を返す．
   virtual
   bool
-  add_simple_attr(const ShString& attr_name,
-		  const PtValue* value);
-
-  /// @brief complex attribute を設定する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] value_list 値のリスト
-  /// @return 設定が失敗したら false を返す．
-  virtual
-  bool
-  add_complex_attr(const ShString& attr_name,
-		   const vector<const PtValue*>& value_list);
+  add_attr(const ShString& attr_name,
+	   PtValue* value);
 
   /// @brief セルを追加する．
   virtual
@@ -91,12 +82,12 @@ protected:
   /// @brief group statement の最初に呼ばれる関数
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value_list 値を表すトークンのリスト
+  /// @param[in] value 値を表すトークンのリスト
   virtual
   bool
   begin_group(const ShString& attr_name,
 	      const FileRegion& attr_loc,
-	      const vector<const PtValue*>& value_list);
+	      PtValue* value);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual

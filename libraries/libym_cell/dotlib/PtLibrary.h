@@ -98,6 +98,9 @@ private:
   // セルのリスト
   vector<PtCell*> mCellList;
 
+  // セル名をキーにしてセルを格納する連想配列
+  hash_map<ShString, PtCell*> mCellMap;
+
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

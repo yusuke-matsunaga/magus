@@ -72,14 +72,15 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief group attribute 用のパースを行う．
-  /// @param[out] value_list 読み込んだトークンを格納するリスト
-  bool
-  parse_complex(vector<const PtValue*>& value_list);
+  /// @return 読み込んだ値(リスト)を返す．
+  /// @note エラーが起きたら NULL を返す．
+  PtValue*
+  parse_complex();
 
   /// @brief PtValue を生成する．
   /// @param[in] type 型
   /// @note 残りの情報は parser() からとってくる．
-  const PtValue*
+  PtValue*
   new_ptvalue(tTokenType type);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．

@@ -9,6 +9,8 @@
 
 #include "PtBus.h"
 
+#include "PtValue.h"
+
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
@@ -29,37 +31,12 @@ PtBus::~PtBus()
 }
 
 // @brief ピンを追加する．
-void
+bool
 PtBus::add_pin(PtPin* pin)
 {
+#warning "TODO: ピン名の重複チェック？"
   mPinList.push_back(pin);
-}
-
-// @brief simple attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @return 設定が失敗したら false を返す．
-bool
-PtBus::add_simple_attr(const ShString& attr_name,
-		       const PtValue* value)
-{
-  if ( attr_name == "bus_type" &&
-       value->type() == SYMBOL ) {
-    mBusType = value->string_value();
-    return true;
-  }
-  return PtPin::add_simple_attr(attr_name, value);
-}
-
-// @brief complex attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-// @return 設定が失敗したら false を返す．
-bool
-PtBus::add_complex_attr(const ShString& attr_name,
-			const vector<const PtValue*>& value_list)
-{
-  return PtPin::add_complex_attr(attr_name, value_list);
+  return true;
 }
 
 // @brief bus_type 属性の値を返す．

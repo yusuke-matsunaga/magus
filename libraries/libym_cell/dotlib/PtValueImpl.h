@@ -15,11 +15,47 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
+/// @class PtValueBase PtValueImple.h "PtValueImpl.h"
+/// @brief 直接値を表すクラスの基底クラス
+//////////////////////////////////////////////////////////////////////
+class PtValueBase :
+  public PtValue
+{
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] loc ファイル上の位置
+  PtValueBase(const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~PtValueBase();
+
+
+public:
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ファイル上の位置
+  FileRegion mLoc;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class PtInt PtValueImple.h "PtValueImpl.h"
 /// @brief 整数値を表すクラス
 //////////////////////////////////////////////////////////////////////
 class PtInt :
-  public PtValue
+  public PtValueBase
 {
   friend class PtMgr;
 
@@ -39,22 +75,18 @@ public:
 
   /// @brief 型を得る．
   virtual
-  tTokenType
+  tType
   type() const;
 
-  /// @brief 式全体のファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
   /// @brief 整数値を返す．
-  /// @note type() が INT_NUM の時のみ意味を持つ．
+  /// @note type() が kInt の時のみ意味を持つ．
   virtual
   int
   int_value() const;
 
   /// @brief 数値を返す．
-  /// @note type() が FLOAT_NUM の時のみ意味を持つ．
+  /// @note type() が kFloat の時のみ意味を持つ．
+  /// @note 実は kInt でもOK
   virtual
   double
   float_value() const;
@@ -68,9 +100,6 @@ private:
   // 値
   int mValue;
 
-  // ファイル上の位置
-  FileRegion mLoc;
-
 };
 
 
@@ -79,7 +108,7 @@ private:
 /// @brief 実数値を表すクラス
 //////////////////////////////////////////////////////////////////////
 class PtFloat :
-  public PtValue
+  public PtValueBase
 {
   friend class PtMgr;
 
@@ -99,16 +128,11 @@ public:
 
   /// @brief 型を得る．
   virtual
-  tTokenType
+  tType
   type() const;
 
-  /// @brief 式全体のファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
   /// @brief 数値を返す．
-  /// @note type() が FLOAT_NUM の時のみ意味を持つ．
+  /// @note type() が kFloat の時のみ意味を持つ．
   virtual
   double
   float_value() const;
@@ -122,9 +146,6 @@ private:
   // 値
   double mValue;
 
-  // ファイル上の位置
-  FileRegion mLoc;
-
 };
 
 
@@ -133,7 +154,7 @@ private:
 /// @brief 文字列を表すクラス
 //////////////////////////////////////////////////////////////////////
 class PtString :
-  public PtValue
+  public PtValueBase
 {
   friend class PtMgr;
 
@@ -153,16 +174,11 @@ public:
 
   /// @brief 型を得る．
   virtual
-  tTokenType
+  tType
   type() const;
 
-  /// @brief 式全体のファイル上の位置を返す．
-  virtual
-  FileRegion
-  loc() const;
-
   /// @brief 定数シンボルを返す．
-  /// @note type() が SYMBOL の時のみ意味を持つ．
+  /// @note type() が kString の時のみ意味を持つ．
   virtual
   ShString
   string_value() const;
@@ -175,9 +191,6 @@ private:
 
   // 値
   ShString mValue;
-
-  // ファイル上の位置
-  FileRegion mLoc;
 
 };
 
@@ -193,10 +206,10 @@ class PtOpr :
 
 private:
 
-  /// @brief 表すコンストラクタ
+  /// @brief コンストラクタ
   /// @param[in] type 演算子の型
   /// @param[in] opr1, opr2 オペランド
-  PtOpr(tTokenType type,
+  PtOpr(tType type,
 	PtValue* opr1,
 	PtValue* opr2);
 
@@ -209,10 +222,10 @@ public:
 
   /// @brief 型を得る．
   virtual
-  tTokenType
+  tType
   type() const;
 
-  /// @brief 式全体のファイル上の位置を返す．
+  /// @brief ファイル上の位置を返す．
   virtual
   FileRegion
   loc() const;
@@ -236,13 +249,63 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 型
-  tTokenType mType;
+  tType mType;
 
   // 第一オペランド
   const PtValue* mOpr1;
 
   // 第二オペランド
   const PtValue* mOpr2;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtList PtValueImpl.h "PtValueImpl.h"
+/// @brief リストを表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtList :
+  public PtValue
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] top 先頭要素
+  PtList(PtValue* top);
+
+  /// @brief デストラクタ
+  virtual
+  ~PtList();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+  /// @brief リストの先頭の要素を返す．
+  /// @note type() が kList の時のみ意味をもつ．
+  virtual
+  const PtValue*
+  top() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 先頭要素
+  const PtValue* mTop;
 
 };
 
