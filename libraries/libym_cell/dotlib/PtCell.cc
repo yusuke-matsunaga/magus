@@ -40,26 +40,29 @@ PtCell::add_child(const ShString& attr_name,
 }
 
 // @brief ピンを追加する．
-void
+bool
 PtCell::add_pin(PtPin* pin)
 {
   mPinList.push_back(pin);
+  return true;
 }
 
 // @brief バスを追加する．
 // @param[in] bus 対象のバス
-void
+bool
 PtCell::add_bus(PtBus* bus)
 {
   mBusList.push_back(bus);
+  return true;
 }
 
 // @brief バンドルを追加する．
 // @param[in] bundle 対象のバンドル
-void
+bool
 PtCell::add_bundle(PtBundle* bundle)
 {
   mBundleList.push_back(bundle);
+  return true;
 }
 
 // @brief 値の数を返す．

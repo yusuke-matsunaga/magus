@@ -497,24 +497,21 @@ CellHandler::~CellHandler()
 bool
 CellHandler::add_pin(PtPin* pin)
 {
-  mCell->add_pin(pin);
-  return true;
+  return mCell->add_pin(pin);
 }
 
 // @brief バスを追加する．
 bool
 CellHandler::add_bus(PtBus* bus)
 {
-  mCell->add_bus(bus);
-  return true;
+  return mCell->add_bus(bus);
 }
 
 // @brief バンドルを追加する．
 bool
 CellHandler::add_bundle(PtBundle* bundle)
 {
-  mCell->add_bundle(bundle);
-  return true;
+  return mCell->add_bundle(bundle);
 }
 
 // @brief group statement の最初に呼ばれる関数
@@ -549,9 +546,7 @@ CellHandler::begin_group(const ShString& attr_name,
     return false;
   }
   mCell = ptmgr().new_ptcell(value_list[0]);
-  parent()->add_cell(mCell);
-
-  return true;
+  return parent()->add_cell(mCell);
 }
 
 // @brief group statement の最後に呼ばれる関数

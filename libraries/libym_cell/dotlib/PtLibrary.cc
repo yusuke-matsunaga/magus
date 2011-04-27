@@ -8,6 +8,7 @@
 
 
 #include "PtLibrary.h"
+#include "PtCell.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -39,10 +40,18 @@ PtLibrary::add_child(const ShString& attr_name,
 }
 
 // @brief セルを追加する．
-void
+bool
 PtLibrary::add_cell(PtCell* cell)
 {
+  ShString name = cell->name();
+  if ( mCellMap.count(name) > 0 ) {
+    // 名前が重複
+#warning "TODO: エラーメッセージの出力方法"
+    return false;
+  }
   mCellList.push_back(cell);
+  mCellMap.insert(make_pair(name, cell));
+  return true;
 }
 
 // @brief セル数を得る．

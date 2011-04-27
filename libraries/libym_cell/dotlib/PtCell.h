@@ -49,17 +49,17 @@ public:
 
   /// @brief ピンを追加する．
   /// @param[in] pin 対象のピン
-  void
+  bool
   add_pin(PtPin* pin);
 
   /// @brief バスを追加する．
   /// @param[in] bus 対象のバス
-  void
+  bool
   add_bus(PtBus* bus);
 
   /// @brief バンドルを追加する．
   /// @param[in] bundle 対象のバンドル
-  void
+  bool
   add_bundle(PtBundle* bundel);
 
 
@@ -85,6 +85,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // PtCell に独自の関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief セル名を返す．
+  ShString
+  name() const;
 
   /// @brief pin グループの数を返す．
   ymuint

@@ -46,7 +46,10 @@ public:
 	    PtNode* node);
 
   /// @brief セルを追加する．
-  void
+  /// @param[in] cell セル
+  /// @retval true 成功した．
+  /// @retval false エラーが起こった．
+  bool
   add_cell(PtCell* cell);
 
 
@@ -90,6 +93,9 @@ private:
 
   // セルのリスト
   vector<PtCell*> mCellList;
+
+  // セル名をキーにした連想配列
+  hash_map<ShString, PtCell*> mCellMap;
 
 };
 

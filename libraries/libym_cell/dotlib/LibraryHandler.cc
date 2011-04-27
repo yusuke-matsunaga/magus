@@ -437,8 +437,7 @@ LibraryHandler::parent()
 bool
 LibraryHandler::add_cell(PtCell* cell)
 {
-  mLibrary->add_cell(cell);
-  return false;
+  return mLibrary->add_cell(cell);
 }
 
 // @brief グループ名を読み込んだ時の処理
