@@ -117,7 +117,7 @@ SymSimpleHandler::~SymSimpleHandler()
 const PtValue*
 SymSimpleHandler::read_value()
 {
-  tTokenType value_type = parser().read_token(false);
+  tTokenType value_type = parser().read_token(true);
   const PtValue* value = new_ptvalue(value_type);
   return value;
 }
