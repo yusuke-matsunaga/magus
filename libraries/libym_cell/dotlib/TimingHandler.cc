@@ -57,7 +57,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 TimingHandler::TimingHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+  EmptyGroupHandler(parent),
   mTiming(NULL)
 {
   // simple attributes
@@ -135,25 +135,13 @@ TimingHandler::~TimingHandler()
 {
 }
 
-// @brief simple attribute を設定する．
+// @brief attribute を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
 // @return 設定が失敗したら false を返す．
 bool
-TimingHandler::add_simple_attr(const ShString& attr_name,
-			       const PtValue* value)
-{
-#warning "未完"
-  return true;
-}
-
-// @brief complex attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-// @return 設定が失敗したら false を返す．
-bool
-TimingHandler::add_complex_attr(const ShString& attr_name,
-				const vector<const PtValue*>& value_list)
+TimingHandler::add_attr(const ShString& attr_name,
+			PtValue* value)
 {
 #warning "未完"
   return true;
@@ -164,32 +152,24 @@ bool
 TimingHandler::add_table(const ShString& attr_name,
 			 PtTable* table)
 {
-  mTiming->add_table(attr_name, table);
+  if ( mTiming->mTableMap.count(attr_name) > 0 ) {
+    // 属性名の重複
+#warning "TODO: エラーメッセージ"
+    return false;
+  }
+  mTiming->mTableMap.insert(make_pair(attr_name, table));
   return true;
 }
 
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
 bool
 TimingHandler::begin_group(const ShString& attr_name,
-			   const FileRegion& attr_loc,
-			   const vector<const PtValue*>& value_list)
+			   const FileRegion& attr_loc)
 {
-  if ( value_list.size() != 0 ) {
-    FileRegion loc = value_list[0]->loc();
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "timing group does not have a parameter.");
-    return false;
-  }
-
   mTiming = ptmgr().new_pttiming();
-  parent()->add_timing(mTiming);
-
-  return true;
+  return parent()->add_timing(mTiming);
 }
 
 // @brief group statement の最後に呼ばれる関数

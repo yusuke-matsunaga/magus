@@ -22,6 +22,7 @@ class PtCell :
   public PtNode
 {
   friend class PtMgr;
+  friend class CellHandler;
 
 private:
 
@@ -32,32 +33,6 @@ private:
   /// @brief デストラクタ
   virtual
   ~PtCell();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief leakge_power を追加する．
-  /// @param[in] lp 対象の leakage_power
-  bool
-  add_leakage_power(PtLeakagePower* lp);
-
-  /// @brief ピンを追加する．
-  /// @param[in] pin 対象のピン
-  bool
-  add_pin(PtPin* pin);
-
-  /// @brief バスを追加する．
-  /// @param[in] bus 対象のバス
-  bool
-  add_bus(PtBus* bus);
-
-  /// @brief バンドルを追加する．
-  /// @param[in] bundle 対象のバンドル
-  bool
-  add_bundle(PtBundle* bundel);
 
 
 public:

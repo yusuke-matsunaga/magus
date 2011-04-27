@@ -58,7 +58,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 BusHandler::BusHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+  Str1GroupHandler(parent),
   mBus(NULL)
 {
   // simple attributes
@@ -96,44 +96,21 @@ BusHandler::add_attr(const ShString& attr_name,
 bool
 BusHandler::add_pin(PtPin* pin)
 {
-  return mBus->add_pin(pin);
+  mBus->mPinList.push_back(pin);
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
+// @param[in] value 値
 bool
 BusHandler::begin_group(const ShString& attr_name,
 			const FileRegion& attr_loc,
-			const vector<const PtValue*>& value_list)
+			const ShString& value)
 {
-  if ( value_list.size() != 1 ) {
-    FileRegion loc;
-    if ( value_list.size() > 1 ) {
-      loc = value_list[1]->loc();
-    }
-    else {
-      loc = attr_loc;
-    }
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "cell group requires just one string as a parameter.");
-    return false;
-  }
-
-  if ( value_list[0]->type() != PtValue::kString ) {
-    put_msg(__FILE__, __LINE__, value_list[0]->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is exprected.");
-    return false;
-  }
-  mBus = ptmgr().new_ptbus(value_list[0]->string_value());
-  parent()->add_bus(mBus);
-
-  return true;
+  mBus = ptmgr().new_ptbus(value);
+  return parent()->add_bus(mBus);
 }
 
 // @brief group statement の最後に呼ばれる関数

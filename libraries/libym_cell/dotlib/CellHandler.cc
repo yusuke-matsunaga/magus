@@ -202,7 +202,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 CellHandler::CellHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+  Str1GroupHandler(parent),
   mCell(NULL)
 {
   // simple attributes
@@ -293,62 +293,44 @@ CellHandler::add_attr(const ShString& attr_name,
 bool
 CellHandler::add_leakage_power(PtLeakagePower* lp)
 {
-  return mCell->add_leakage_power(lp);
+  mCell->mLeakagePowerList.push_back(lp);
+  return true;
 }
 
 // @brief ピンを追加する．
 bool
 CellHandler::add_pin(PtPin* pin)
 {
-  return mCell->add_pin(pin);
+  mCell->mPinList.push_back(pin);
+  return true;
 }
 
 // @brief バスを追加する．
 bool
 CellHandler::add_bus(PtBus* bus)
 {
-  return mCell->add_bus(bus);
+  mCell->mBusList.push_back(bus);
+  return true;
 }
 
 // @brief バンドルを追加する．
 bool
 CellHandler::add_bundle(PtBundle* bundle)
 {
-  return mCell->add_bundle(bundle);
+  mCell->mBundleList.push_back(bundle);
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
+// @param[in] value 値
 bool
 CellHandler::begin_group(const ShString& attr_name,
 			 const FileRegion& attr_loc,
-			 const vector<const PtValue*>& value_list)
+			 const ShString& value)
 {
-  if ( value_list.size() != 1 ) {
-    FileRegion loc;
-    if ( value_list.size() > 1 ) {
-      loc = value_list[1]->loc();
-    }
-    else {
-      loc = attr_loc;
-    }
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "cell group requires just one string as a parameter.");
-    return false;
-  }
-
-  if ( value_list[0]->type() != PtValue::kString ) {
-    put_msg(__FILE__, __LINE__, value_list[0]->loc(),
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "string value is exprected.");
-    return false;
-  }
-  mCell = ptmgr().new_ptcell(value_list[0]->string_value());
+  mCell = ptmgr().new_ptcell(value);
   return parent()->add_cell(mCell);
 }
 

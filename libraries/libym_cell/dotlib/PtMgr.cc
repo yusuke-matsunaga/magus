@@ -62,6 +62,7 @@ PtMgr::init()
   mAlloc.destroy();
 }
 
+#if 0
 // @brief simple attribute を表す PtNode を生成する．
 // @param[in] value 値
 PtNode*
@@ -91,6 +92,7 @@ PtMgr::new_ptgroup(const vector<const PtValue*>& value_list)
   void* p = mAlloc.get_memory(sizeof(PtGroupNode));
   return new (p) PtGroupNode(value_list);
 }
+#endif
 
 // @brief PtLibrary を生成する．
 // @param[in] name ライブラリ名

@@ -108,7 +108,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 BundleHandler::BundleHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+  Str1GroupHandler(parent),
   mBundle(NULL)
 {
   // simple attributes
@@ -141,25 +141,13 @@ BundleHandler::~BundleHandler()
 {
 }
 
-// @brief simple attribute を設定する．
+// @brief attribute を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
 // @return 設定が失敗したら false を返す．
 bool
-BundleHandler::add_simple_attr(const ShString& attr_name,
-			       const PtValue* value)
-{
-#warning "未完"
-  return true;
-}
-
-// @brief complex attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-// @return 設定が失敗したら false を返す．
-bool
-BundleHandler::add_complex_attr(const ShString& attr_name,
-				const vector<const PtValue*>& value_list)
+BundleHandler::add_attr(const ShString& attr_name,
+			PtValue* value)
 {
 #warning "未完"
   return true;
@@ -169,45 +157,20 @@ BundleHandler::add_complex_attr(const ShString& attr_name,
 bool
 BundleHandler::add_pin(PtPin* pin)
 {
-  mBundle->add_pin(pin);
-  return false;
+  return mBundle->add_pin(pin);
 }
 
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
+// @param[in] value 値
 bool
 BundleHandler::begin_group(const ShString& attr_name,
 			   const FileRegion& attr_loc,
-			   const vector<const PtValue*>& value_list)
+			   const ShString& value)
 {
-  if ( value_list.size() != 1 ) {
-    FileRegion loc;
-    if ( value_list.size() > 1 ) {
-      loc = value_list[1]->loc();
-    }
-    else {
-      loc = attr_loc;
-    }
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "cell group requires just one string as a parameter.");
-    return false;
-  }
-
-  if ( value_list[0]->type() != PtValue::kString ) {
-    put_msg(__FILE__, __LINE__, value_list[0]->loc(),
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "string value is exprected.");
-    return false;
-  }
-  mBundle = ptmgr().new_ptbundle(value_list[0]->string_value());
-  parent()->add_bundle(mBundle);
-
-  return true;
+  mBundle = ptmgr().new_ptbundle(value);
+  return parent()->add_bundle(mBundle);
 }
 
 // @brief group statement の最後に呼ばれる関数

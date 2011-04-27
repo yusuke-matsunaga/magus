@@ -69,7 +69,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 LeakagePowerHandler::LeakagePowerHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+  EmptyGroupHandler(parent),
   mLeakagePower(NULL)
 {
   // simple attributes
@@ -88,20 +88,10 @@ LeakagePowerHandler::~LeakagePowerHandler()
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
 bool
 LeakagePowerHandler::begin_group(const ShString& attr_name,
-				 const FileRegion& attr_loc,
-				 const vector<const PtValue*>& value_list)
+				 const FileRegion& attr_loc)
 {
-  if ( value_list.size() != 0 ) {
-    put_msg(__FILE__, __LINE__, attr_loc,
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "leakage_power group does not have parameters.");
-    return false;
-  }
-
   mLeakagePower = ptmgr().new_ptleakage_power();
   return parent()->add_leakage_power(mLeakagePower);
 }

@@ -184,7 +184,7 @@ END_NONAMESPACE
 // @param[in] ptmgr パース木を管理するオブジェクト
 LibraryHandler::LibraryHandler(DotlibParser& parser,
 			       PtMgr& ptmgr) :
-  GroupHandler(parser, ptmgr)
+  Str1GroupHandler(parser, ptmgr)
 {
   // simple attributes
   DotlibHandler* simple = new SimpleHandler(this);
@@ -455,40 +455,15 @@ LibraryHandler::add_cell(PtCell* cell)
 // @brief グループ名を読み込んだ時の処理
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value 値を表すトークンのリスト
+// @param[in] value 値
 bool
 LibraryHandler::begin_group(const ShString& attr_name,
 			    const FileRegion& attr_loc,
-			    PtValue* value)
+			    const ShString& value)
 {
   assert_cond( attr_name == "library", __FILE__, __LINE__);
 
-  if ( value == NULL ) {
-    FileRegion loc = attr_loc;
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "library statement requires library name.");
-    return false;
-  }
-  if ( value->next() != NULL ) {
-    FileRegion loc = value->next()->loc();
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "library statement requires only one token");
-    return false;
-  }
-
-  if ( value->type() != PtValue::kString ) {
-    put_msg(__FILE__, __LINE__, value->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected.");
-    return false;
-  }
-
-  mLibrary = ptmgr().new_ptlibrary(value->string_value());
+  mLibrary = ptmgr().new_ptlibrary(value);
 
   return true;
 }

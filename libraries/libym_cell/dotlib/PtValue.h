@@ -101,10 +101,15 @@ public:
   opr2() const;
 
   /// @brief リストの先頭の要素を返す．
-  /// @note type() が kList の時のみ意味をもつ．
+  /// @note type() が kList の時のみ意味を持つ．
   virtual
   const PtValue*
   top() const;
+
+  /// @brief リストの要素数を返す．
+  /// @note type() が kList の時のみ意味を持つ．
+  ymuint
+  list_size() const;
 
   /// @brief リストの次の要素を得る．
   /// @note これはすべての型で意味を持つ．

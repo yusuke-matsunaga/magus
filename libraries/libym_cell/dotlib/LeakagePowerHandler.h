@@ -16,10 +16,10 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @class LeakagePowerHandler LeakagePowerHandler.h "LeakagePowerHandler.h"
-/// @brief cell group 用のハンドラ
+/// @brief leakage_power group 用のハンドラ
 //////////////////////////////////////////////////////////////////////
 class LeakagePowerHandler :
-  public GroupHandler
+  public EmptyGroupHandler
 {
 public:
 
@@ -46,12 +46,11 @@ protected:
   /// @brief group statement の最初に呼ばれる関数
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value_list 値を表すトークンのリスト
+  /// @param[in] value 値
   virtual
   bool
   begin_group(const ShString& attr_name,
-	      const FileRegion& attr_loc,
-	      const vector<const PtValue*>& value_list);
+	      const FileRegion& attr_loc);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual

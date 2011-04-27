@@ -20,6 +20,10 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @param[in] name テンプレート名
 PtTable::PtTable(const ShString& name) :
   mName(name),
+  mIndex1(NULL),
+  mIndex2(NULL),
+  mIndex3(NULL),
+  mValues(NULL),
   mDomain(NULL)
 {
 }
@@ -37,28 +41,28 @@ PtTable::name() const
 }
 
 /// @brief index_1 属性の値を返す．
-const vector<const PtValue*>&
+const PtValue*
 PtTable::index_1() const
 {
   return mIndex1;
 }
 
 // @brief index_2 属性の値を返す．
-const vector<const PtValue*>&
+const PtValue*
 PtTable::index_2() const
 {
   return mIndex2;
 }
 
 // @brief index_3 属性の値を返す．
-const vector<const PtValue*>&
+const PtValue*
 PtTable::index_3() const
 {
   return mIndex3;
 }
 
 // @brief values 属性の値を返す．
-const vector<const PtValue*>&
+const PtValue*
 PtTable::values() const
 {
   return mValues;

@@ -30,15 +30,6 @@ PtBus::~PtBus()
 {
 }
 
-// @brief ピンを追加する．
-bool
-PtBus::add_pin(PtPin* pin)
-{
-#warning "TODO: ピン名の重複チェック？"
-  mPinList.push_back(pin);
-  return true;
-}
-
 // @brief bus_type 属性の値を返す．
 ShString
 PtBus::bus_type() const

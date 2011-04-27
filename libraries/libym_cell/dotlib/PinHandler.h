@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 /// @class PinHandler PinHandler.h "PinHandler.h"
 //////////////////////////////////////////////////////////////////////
 class PinHandler :
-  public GroupHandler
+  public Str1GroupHandler
 {
 public:
 
@@ -58,12 +58,12 @@ protected:
   /// @brief group statement の最初に呼ばれる関数
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value_list 値を表すトークンのリスト
+  /// @param[in] valuet 値
   virtual
   bool
   begin_group(const ShString& attr_name,
 	      const FileRegion& attr_loc,
-	      const vector<const PtValue*>& value_list);
+	      const ShString& value);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual

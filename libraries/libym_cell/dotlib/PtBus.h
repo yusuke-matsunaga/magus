@@ -22,6 +22,7 @@ class PtBus :
   public PtPin
 {
   friend class PtMgr;
+  friend class BusHandler;
 
 private:
 
@@ -32,17 +33,6 @@ private:
   /// @brief デストラクタ
   virtual
   ~PtBus();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ピンを追加する．
-  /// @param[in] pin 対象のピン
-  bool
-  add_pin(PtPin* pin);
 
 
 public:

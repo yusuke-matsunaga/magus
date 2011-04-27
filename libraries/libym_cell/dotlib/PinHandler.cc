@@ -105,7 +105,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 PinHandler::PinHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+  Str1GroupHandler(parent),
   mPin(NULL)
 {
   // simple attributes
@@ -213,44 +213,21 @@ PinHandler::add_attr(const ShString& attr_name,
 bool
 PinHandler::add_timing(PtTiming* timing)
 {
-  return mPin->add_timing(timing);
+  mPin->mTimingList.push_back(timing);
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
+// @param[in] value 値
 bool
 PinHandler::begin_group(const ShString& attr_name,
 			const FileRegion& attr_loc,
-			const vector<const PtValue*>& value_list)
+			const ShString& value)
 {
-  if ( value_list.size() != 1 ) {
-    FileRegion loc;
-    if ( value_list.size() > 1 ) {
-      loc = value_list[1]->loc();
-    }
-    else {
-      loc = attr_loc;
-    }
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "pin group requires just one string as a parameter.");
-    return false;
-  }
-
-  if ( value_list[0]->type() != PtValue::kString ) {
-    put_msg(__FILE__, __LINE__, value_list[0]->loc(),
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    "string value is exprected.");
-    return false;
-  }
-  mPin = ptmgr().new_ptpin(value_list[0]->string_value());
-  parent()->add_pin(mPin);
-
-  return true;
+  mPin = ptmgr().new_ptpin(value);
+  return parent()->add_pin(mPin);
 }
 
 // @brief group statement の最後に呼ばれる関数

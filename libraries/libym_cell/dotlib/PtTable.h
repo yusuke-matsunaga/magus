@@ -45,19 +45,19 @@ public:
   name() const;
 
   /// @brief index_1 属性の値を返す．
-  const vector<const PtValue*>&
+  const PtValue*
   index_1() const;
 
   /// @brief index_2 属性の値を返す．
-  const vector<const PtValue*>&
+  const PtValue*
   index_2() const;
 
   /// @brief index_3 属性の値を返す．
-  const vector<const PtValue*>&
+  const PtValue*
   index_3() const;
 
   /// @brief values 属性の値を返す．
-  const vector<const PtValue*>&
+  const PtValue*
   values() const;
 
   /// @brief domain グループを返す．
@@ -74,16 +74,16 @@ private:
   ShString mName;
 
   // index_1 の値
-  vector<const PtValue*> mIndex1;
+  PtValue* mIndex1;
 
   // index_2 の値
-  vector<const PtValue*> mIndex2;
+  PtValue* mIndex2;
 
   // index_3 の値
-  vector<const PtValue*> mIndex3;
+  PtValue* mIndex3;
 
   // vaues の値
-  vector<const PtValue*> mValues;
+  PtValue* mValues;
 
   // domain グループ
   PtDomain* mDomain;

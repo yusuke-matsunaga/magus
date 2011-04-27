@@ -82,6 +82,21 @@ PtValue::top() const
   return NULL;
 }
 
+// @brief リストの要素数を返す．
+// @note type() が kList の時のみ意味を持つ．
+ymuint
+PtValue::list_size() const
+{
+  if ( type() == kList ) {
+    ymuint n = 0;
+    for (const PtValue* v = top(); v; v = v->next()) {
+      ++ n;
+    }
+    return n;
+  }
+  return 0;
+}
+
 // @brief 次の要素を得る．
 const PtValue*
 PtValue::next() const

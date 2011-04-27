@@ -185,6 +185,115 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class Str1GroupHandler GroupHandler.h "GroupHadler.h"
+/// @brief 1つの文字列型をとるグループ用のハンドラ
+//////////////////////////////////////////////////////////////////////
+class Str1GroupHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief 親を持たないハンドラ用のコンストラクタ
+  /// @param[in] parser パーサー
+  /// @param[in] ptmgr パース木を管理するオブジェクト
+  Str1GroupHandler(DotlibParser& parser,
+		   PtMgr& ptmgr);
+
+  /// @brief 親を持つハンドラ用のコンストラクタ
+  /// @param[in] parent 親のハンドラ
+  Str1GroupHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~Str1GroupHandler();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief group statement の最初に呼ばれる関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値を表すトークンのリスト
+  virtual
+  bool
+  begin_group(const ShString& attr_name,
+	      const FileRegion& attr_loc,
+	      PtValue* value);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // Str1GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief group statement の最初に呼ばれる関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値
+  virtual
+  bool
+  begin_group(const ShString& attr_name,
+	      const FileRegion& attr_loc,
+	      const ShString& value) = 0;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EmptyGroupHandler GroupHandler.h "GroupHadler.h"
+/// @brief 値をとらないグループ用のハンドラ
+//////////////////////////////////////////////////////////////////////
+class EmptyGroupHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
+  EmptyGroupHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~EmptyGroupHandler();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief group statement の最初に呼ばれる関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value_list 値を表すトークンのリスト
+  virtual
+  bool
+  begin_group(const ShString& attr_name,
+	      const FileRegion& attr_loc,
+	      PtValue* value_list);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // EmptyGroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief group statement の最初に呼ばれる関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  virtual
+  bool
+  begin_group(const ShString& attr_name,
+	      const FileRegion& attr_loc) = 0;
+
+};
+
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class GenGroupHandler GroupHandler.h "GroupHandler.h"
 /// @brief 汎用の GroupHandler
 //////////////////////////////////////////////////////////////////////

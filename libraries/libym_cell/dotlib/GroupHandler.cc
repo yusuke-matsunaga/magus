@@ -241,6 +241,118 @@ GroupHandler::find_handler(const ShString& attr_name)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス Str1GroupHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief 親を持たないハンドラ用のコンストラクタ
+// @param[in] parser パーサー
+// @param[in] ptmgr パース木を管理するオブジェクト
+Str1GroupHandler::Str1GroupHandler(DotlibParser& parser,
+				   PtMgr& ptmgr) :
+  GroupHandler(parser, ptmgr)
+{
+}
+
+// @brief 親を持つハンドラ用のコンストラクタ
+// @param[in] parent 親のハンドラ
+Str1GroupHandler::Str1GroupHandler(GroupHandler* parent) :
+  GroupHandler(parent)
+{
+}
+
+// @brief デストラクタ
+Str1GroupHandler::~Str1GroupHandler()
+{
+}
+
+// @brief group statement の最初に呼ばれる関数
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value_list 値を表すトークンのリスト
+bool
+Str1GroupHandler::begin_group(const ShString& attr_name,
+			      const FileRegion& attr_loc,
+			      PtValue* value_list)
+{
+  ymuint n = value_list->list_size();
+  if ( n == 0 ) {
+    ostringstream buf;
+    buf << attr_name << " statement requires a string parameter.";
+    put_msg(__FILE__, __LINE__, attr_loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    buf.str());
+    return false;
+  }
+
+  const PtValue* top = value_list->top();
+  if ( n > 1 ) {
+    const PtValue* second = top->next();
+    FileRegion loc = second->loc();
+    ostringstream buf;
+    buf << attr_name << " statement has only one string parameter.";
+    put_msg(__FILE__, __LINE__, loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    buf.str());
+    return false;
+  }
+
+  if ( top->type() != PtValue::kString ) {
+    put_msg(__FILE__, __LINE__, top->loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "string value is expected.");
+    return false;
+  }
+
+  return begin_group(attr_name, attr_loc, top->string_value());
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス EmptyGroupHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のハンドラ
+EmptyGroupHandler::EmptyGroupHandler(GroupHandler* parent) :
+  GroupHandler(parent)
+{
+}
+
+// @brief デストラクタ
+EmptyGroupHandler::~EmptyGroupHandler()
+{
+}
+
+// @brief group statement の最初に呼ばれる関数
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value_list 値を表すトークンのリスト
+bool
+EmptyGroupHandler::begin_group(const ShString& attr_name,
+			       const FileRegion& attr_loc,
+			       PtValue* value_list)
+{
+  ymuint n = value_list->list_size();
+  if ( n > 0 ) {
+    const PtValue* top = value_list->top();
+    FileRegion loc = top->loc();
+    ostringstream buf;
+    buf << attr_name << " statement does not have parameters.";
+    put_msg(__FILE__, __LINE__, loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    buf.str());
+    return false;
+  }
+
+  return begin_group(attr_name, attr_loc);
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス GenGroupHandler
 //////////////////////////////////////////////////////////////////////
 
@@ -259,13 +371,12 @@ GenGroupHandler::~GenGroupHandler()
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value 値を表すトークンのリスト
+// @param[in] value_list 値を表すトークンのリスト
 bool
 GenGroupHandler::begin_group(const ShString& attr_name,
 			     const FileRegion& attr_loc,
-			     PtValue* value)
+			     PtValue* value_list)
 {
-  parent()->add_attr(attr_name, value);
   return true;
 }
 

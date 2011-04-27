@@ -56,7 +56,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 TableHandler::TableHandler(GroupHandler* parent) :
-  GroupHandler(parent),
+  Str1GroupHandler(parent),
   mTable(NULL)
 {
   // simple attributes
@@ -77,39 +77,27 @@ TableHandler::~TableHandler()
 {
 }
 
-// @brief simple attribute を設定する．
+// @brief attribute を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
 // @return 設定が失敗したら false を返す．
 bool
-TableHandler::add_simple_attr(const ShString& attr_name,
-			      const PtValue* value)
-{
-  // このクラスには simple attribute はない．
-  return false;
-}
-
-// @brief complex attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value_list 値のリスト
-// @return 設定が失敗したら false を返す．
-bool
-TableHandler::add_complex_attr(const ShString& attr_name,
-			       const vector<const PtValue*>& value_list)
+TableHandler::add_attr(const ShString& attr_name,
+		       PtValue* value)
 {
   assert_cond( mTable != NULL, __FILE__, __LINE__);
 
   if ( attr_name == "index_1" ) {
-    mTable->mIndex1 = value_list;
+    mTable->mIndex1 = value;
   }
   else if ( attr_name == "index_2" ) {
-    mTable->mIndex2 = value_list;
+    mTable->mIndex2 = value;
   }
   else if ( attr_name == "index_3" ) {
-    mTable->mIndex3 = value_list;
+    mTable->mIndex3 = value;
   }
   else if ( attr_name == "values" ) {
-    mTable->mValues = value_list;
+    mTable->mValues = value;
   }
   else {
 #warning "TODO: エラーメッセージの出力"
@@ -134,33 +122,14 @@ TableHandler::add_domain(PtDomain* domain)
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
+// @param[in] valuet 値
 bool
 TableHandler::begin_group(const ShString& attr_name,
 			  const FileRegion& attr_loc,
-			  const vector<const PtValue*>& value_list)
+			  const ShString& value)
 {
-  if ( value_list.size() != 1 ) {
-    FileRegion loc;
-    if ( value_list.size() > 1 ) {
-      loc = value_list[1]->loc();
-    }
-    else {
-      loc = attr_loc;
-    }
-    ostringstream buf;
-    buf << attr_name << " group requires just one string as a parameter.";
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIBPARSER",
-	    buf.str());
-    return false;
-  }
-
-  mTable = ptmgr().new_pttable(value_list[0]->string_value());
-  parent()->add_table(attr_name, mTable);
-
-  return true;
+  mTable = ptmgr().new_pttable(value);
+  return parent()->add_table(attr_name, mTable);
 }
 
 // @brief group statement の最後に呼ばれる関数

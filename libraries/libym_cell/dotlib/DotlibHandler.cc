@@ -73,7 +73,7 @@ DotlibHandler::parse_complex()
     }
   }
 
-  return value_list.top();
+  return ptmgr().new_list(value_list.top());
 }
 
 // @brief PtValue を生成する．
