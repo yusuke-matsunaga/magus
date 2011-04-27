@@ -30,8 +30,9 @@ DotlibMgr::~DotlibMgr()
 // @brief パース木から CellLibrary を生成する．
 // @param[in] root パース木の根のノード
 const CellLibrary*
-DotlibMgr::gen_library(const PtNode* root)
+DotlibMgr::gen_library(const PtLibrary* root)
 {
+#if 0
   string root_attr = root->attr_name();
   assert_cond( root_attr == "library", __FILE__, __LINE__);
 
@@ -60,6 +61,9 @@ DotlibMgr::gen_library(const PtNode* root)
     const PtNode* node = root->child(i);
     string attr = node->attr_name();
   }
+#else
+  return NULL;
+#endif
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

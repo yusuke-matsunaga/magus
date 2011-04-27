@@ -238,10 +238,11 @@ BundleHandler::~BundleHandler()
 }
 
 // @brief ピンを追加する．
-void
+bool
 BundleHandler::add_pin(PtPin* pin)
 {
   mBundle->add_pin(pin);
+  return false;
 }
 
 // @brief group statement の最初に呼ばれる関数

@@ -42,12 +42,12 @@ dotlibparser_test(int argc,
       debug = true;
     }
     else {
-      PtNode* node = parser.read_file(argv[i], debug);
-      if ( node == NULL ) {
+      const PtLibrary* library = parser.read_file(argv[i], debug);
+      if ( library == NULL ) {
 	error = true;
       }
       else {
-	pt_dump(cout, node);
+	pt_dump(cout, library);
       }
     }
   }

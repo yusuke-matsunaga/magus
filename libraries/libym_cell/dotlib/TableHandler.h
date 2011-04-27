@@ -37,13 +37,29 @@ public:
   // 他のクラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 対応する PtNode を返す．
+  /// @brief index_x 属性をセットする．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value_list 値のリスト
   virtual
-  PtNode*
-  pt_node();
+  bool
+  add_index_x(const ShString& attr_name,
+	      const vector<const PtValue*>& value_list);
+
+  /// @brief values 属性をセットする．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value_list 値のリスト
+  virtual
+  bool
+  add_values(const vector<const PtValue*>& value_list);
+
+  /// @brief domain グループをセットする．
+  /// @param[in] domain ドメイン
+  virtual
+  bool
+  add_domain(PtDomain* domain);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる仮想関数
   //////////////////////////////////////////////////////////////////////

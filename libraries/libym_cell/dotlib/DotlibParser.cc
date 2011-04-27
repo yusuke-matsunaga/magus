@@ -11,7 +11,6 @@
 
 #include "DotlibParser.h"
 #include "LibraryHandler.h"
-#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -38,7 +37,7 @@ DotlibParser::~DotlibParser()
 // @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
 // @return パース木の根のノードを返す．
 // @note エラーが起きたら NULL を返す．
-PtNode*
+const PtLibrary*
 DotlibParser::read_file(const string& filename,
 			bool debug,
 			bool allow_no_semi)
@@ -92,7 +91,7 @@ last:
   if ( error ) {
     return NULL;
   }
-  return mLibraryHandler->pt_node();
+  return mLibraryHandler->library();
 }
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．

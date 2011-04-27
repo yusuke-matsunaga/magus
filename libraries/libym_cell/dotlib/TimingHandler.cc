@@ -47,26 +47,6 @@ new_group(GroupHandler* parent)
   return new GenGroupHandler(parent);
 }
 
-DotlibHandler*
-new_tbl(GroupHandler* parent)
-{
-  GroupHandler* handler = new_group(parent);
-
-  // simple attributes
-
-  // complex attribute
-  DotlibHandler* complex = new_complex(handler);
-  handler->reg_handler("index_1", complex);
-  handler->reg_handler("index_2", complex);
-  handler->reg_handler("index_3", complex);
-  handler->reg_handler("values", complex);
-
-  // group statements
-  handler->reg_handler("domain", new_group(handler));
-
-  return handler;
-}
-
 END_NONAMESPACE
 
 
@@ -155,19 +135,13 @@ TimingHandler::~TimingHandler()
 {
 }
 
-// @brief 対応する PtNode を返す．
-PtNode*
-TimingHandler::pt_node()
-{
-  return mTiming;
-}
-
 // @brief テーブルを追加する．
-void
+bool
 TimingHandler::add_table(const ShString& attr_name,
 			 PtTable* table)
 {
   mTiming->add_table(attr_name, table);
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数

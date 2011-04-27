@@ -12,6 +12,7 @@
 #include "ym_cell/CellDotlibReader.h"
 #include "DotlibParser.h"
 #include "PtMgr.h"
+#include "PtLibrary.h"
 #include "DotlibMgr.h"
 
 
@@ -42,9 +43,9 @@ CellDotlibReader::~CellDotlibReader()
 const CellLibrary*
 CellDotlibReader::read(const string& filename)
 {
-  using nsDotlib::PtNode;
+  using nsDotlib::PtLibrary;
   using nsDotlib::DotlibMgr;
-  const PtNode* root = mParser->read_file(filename, false, true);
+  const PtLibrary* root = mParser->read_file(filename, false, true);
 
   DotlibMgr mgr;
   return mgr.gen_library(root);

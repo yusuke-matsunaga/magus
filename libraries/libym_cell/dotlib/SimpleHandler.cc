@@ -45,9 +45,11 @@ SimpleHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  tTokenType value_type = parser().read_token( symbol_mode() );
-  const PtValue* value = new_ptvalue(value_type);
+  const PtValue* value = read_value();
   if ( value == NULL ) {
+    return false;
+  }
+  if ( !expect_nl() ) {
     return false;
   }
 
@@ -55,23 +57,23 @@ SimpleHandler::read_attr(const ShString& attr_name,
     cout << attr_name << " : " << value << endl;
   }
 
-  if ( !read_value(attr_name, attr_loc, value) ) {
+  if ( !set_value(attr_name, attr_loc, value) ) {
     return false;
   }
 
-  PtNode* node = ptmgr().new_ptsimple(value);
-  PtNode* p_node = parent()->pt_node();
-  p_node->add_child(attr_name, node);
-
-  return expect_nl();
+  return true;
 }
 
-// @brief シンボルモードで read_token() を呼ぶときに true を返す．
-// @note デフォルトの実装では false を返す．
-bool
-SimpleHandler::symbol_mode()
+// @brief 値を読み込む処理
+// @return 値を表す PtValue を返す．
+// @note エラーが起きたら NULL を返す．
+// @note デフォルトの実装では普通に DotlibParser::read_token() を呼ぶ．
+const PtValue*
+SimpleHandler::read_value()
 {
-  return false;
+  tTokenType value_type = parser().read_token(false);
+  const PtValue* value = new_ptvalue(value_type);
+  return value;
 }
 
 // @brief 値を読み込んだ時の処理
@@ -80,10 +82,15 @@ SimpleHandler::symbol_mode()
 // @param[in] value 値
 // @note デフォルトの実装ではなにもしないで true を返す．
 bool
-SimpleHandler::read_value(const ShString& attr_name,
-			  const FileRegion& attr_loc,
-			  const PtValue* value)
+SimpleHandler::set_value(const ShString& attr_name,
+			 const FileRegion& attr_loc,
+			 const PtValue* value)
 {
+#if 0
+  PtNode* node = ptmgr().new_ptsimple(value);
+  PtNode* p_node = parent()->pt_node();
+  p_node->add_child(attr_name, node);
+#endif
   return true;
 }
 
@@ -103,11 +110,16 @@ SymSimpleHandler::~SymSimpleHandler()
 {
 }
 
-// @brief シンボルモードで read_token() を呼ぶときに true を返す．
-bool
-SymSimpleHandler::symbol_mode()
+// @brief 値を読み込む処理
+// @return 値を表す PtValue を返す．
+// @note エラーが起きたら NULL を返す．
+// @note ここではシンボルモードで DotlibParser::read_token() を呼ぶ．
+const PtValue*
+SymSimpleHandler::read_value()
 {
-  return true;
+  tTokenType value_type = parser().read_token(false);
+  const PtValue* value = new_ptvalue(value_type);
+  return value;
 }
 
 
@@ -126,22 +138,19 @@ IntSimpleHandler::~IntSimpleHandler()
 {
 }
 
-// @brief 値を読み込んだ時の処理
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value 値
-bool
-IntSimpleHandler::read_value(const ShString& attr_name,
-			     const FileRegion& attr_loc,
-			     const PtValue* value)
+// @brief 値を読み込む．
+const PtValue*
+IntSimpleHandler::read_value()
 {
+  const PtValue* value = SimpleHandler::read_value();
   if ( value->type() != INT_NUM ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "Syntax error. int value is expected.");
+    return NULL;
   }
-  return true;
+  return value;
 }
 
 
@@ -160,22 +169,19 @@ FloatSimpleHandler::~FloatSimpleHandler()
 {
 }
 
-// @brief 値を読み込んだ時の処理
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value 値
-bool
-FloatSimpleHandler::read_value(const ShString& attr_name,
-			       const FileRegion& attr_loc,
-			       const PtValue* value)
+// @brief 値を読み込む．
+const PtValue*
+FloatSimpleHandler::read_value()
 {
+  const PtValue* value = SimpleHandler::read_value();
   if ( value->type() != FLOAT_NUM && value->type() != INT_NUM ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "Syntax error. float value is expected.");
+    return NULL;
   }
-  return true;
+  return value;
 }
 
 
@@ -194,22 +200,19 @@ StrSimpleHandler::~StrSimpleHandler()
 {
 }
 
-// @brief 値を読み込んだ時の処理
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value 値
-bool
-StrSimpleHandler::read_value(const ShString& attr_name,
-			     const FileRegion& attr_loc,
-			     const PtValue* value)
+// @brief 値を読み込む．
+const PtValue*
+StrSimpleHandler::read_value()
 {
+  const PtValue* value = SimpleHandler::read_value();
   if ( value->type() != SYMBOL ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "Syntax error. string value is expected.");
+    return NULL;
   }
-  return true;
+  return value;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

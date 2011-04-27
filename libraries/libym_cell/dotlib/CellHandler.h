@@ -39,21 +39,21 @@ public:
 
   /// @brief ピンを追加する．
   virtual
-  void
+  bool
   add_pin(PtPin* pin);
 
   /// @brief バスを追加する．
   virtual
-  void
+  bool
   add_bus(PtBus* bus);
 
   /// @brief バンドルを追加する．
   virtual
-  void
+  bool
   add_bundle(PtBundle* bundle);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる仮想関数
   //////////////////////////////////////////////////////////////////////

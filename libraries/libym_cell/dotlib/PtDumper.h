@@ -36,7 +36,7 @@ public:
   /// @param[in] root パース木のノード
   void
   operator()(ostream& s,
-	     const PtNode* root);
+	     const PtLibrary* root);
 
 };
 

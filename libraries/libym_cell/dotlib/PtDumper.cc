@@ -9,6 +9,13 @@
 
 #include "PtDumper.h"
 #include "PtNode.h"
+#include "PtLibrary.h"
+#include "PtCell.h"
+#include "PtBundle.h"
+#include "PtBus.h"
+#include "PtPin.h"
+#include "PtTiming.h"
+#include "PtTable.h"
 #include "PtValue.h"
 
 
@@ -83,7 +90,7 @@ END_NONAMESPACE
 // @param[in] root パース木のノード
 void
 PtDumper::operator()(ostream& s,
-		     const PtNode* root)
+		     const PtLibrary* root)
 {
   dump_sub(s, root, 0);
 }

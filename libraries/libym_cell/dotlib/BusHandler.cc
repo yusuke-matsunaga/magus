@@ -75,10 +75,11 @@ BusHandler::~BusHandler()
 }
 
 // @brief ピンを追加する．
-void
+bool
 BusHandler::add_pin(PtPin* pin)
 {
   mBus->add_pin(pin);
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数

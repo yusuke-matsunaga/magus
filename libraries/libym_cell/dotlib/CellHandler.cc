@@ -494,24 +494,27 @@ CellHandler::~CellHandler()
 }
 
 // @brief ピンを追加する．
-void
+bool
 CellHandler::add_pin(PtPin* pin)
 {
   mCell->add_pin(pin);
+  return true;
 }
 
 // @brief バスを追加する．
-void
+bool
 CellHandler::add_bus(PtBus* bus)
 {
   mCell->add_bus(bus);
+  return true;
 }
 
 // @brief バンドルを追加する．
-void
+bool
 CellHandler::add_bundle(PtBundle* bundle)
 {
   mCell->add_bundle(bundle);
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数

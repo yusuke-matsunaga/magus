@@ -77,11 +77,31 @@ TableHandler::~TableHandler()
 {
 }
 
-// @brief 対応する PtNode を返す．
-PtNode*
-TableHandler::pt_node()
+// @brief index_x 属性をセットする．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+bool
+TableHandler::add_index_x(const ShString& attr_name,
+			  const vector<const PtValue*>& value_list)
 {
-  return mTable;
+  return true;
+}
+
+// @brief values 属性をセットする．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+bool
+TableHandler::add_values(const vector<const PtValue*>& value_list)
+{
+  return true;
+}
+
+// @brief domain グループをセットする．
+// @param[in] domain ドメイン
+bool
+TableHandler::add_domain(PtDomain* domain)
+{
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数

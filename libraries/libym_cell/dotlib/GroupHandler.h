@@ -90,35 +90,35 @@ public:
   /// @param[in] cell セル
   /// @note library の時のみ有効
   virtual
-  void
+  bool
   add_cell(PtCell* cell);
 
   /// @brief ピンを追加する．
   /// @param[in] pin ピン
   /// @note cell/bus/bundle の時のみ有効
   virtual
-  void
+  bool
   add_pin(PtPin* pin);
 
   /// @brief バスを追加する．
   /// @param[in] bus バス
   /// @note cell の時のみ有効
   virtual
-  void
+  bool
   add_bus(PtBus* bus);
 
   /// @brief バンドルを追加する．
   /// @param[in] bundle バンドル
   /// @note cell の時のみ有効
   virtual
-  void
+  bool
   add_bundle(PtBundle* bundle);
 
   /// @brief タイミングを追加する．
   /// @param[in] timing タイミング条件
   /// @note pin の時のみ有効
   virtual
-  void
+  bool
   add_timing(PtTiming* timing);
 
   /// @brief テーブルを追加する．
@@ -126,12 +126,33 @@ public:
   /// @param[in] table テーブル
   /// @note
   virtual
-  void
+  bool
   add_table(const ShString& attr_name,
 	    PtTable* table);
 
+  /// @brief index_x 属性をセットする．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value_list 値のリスト
+  virtual
+  bool
+  add_index_x(const ShString& attr_name,
+	      const vector<const PtValue*>& value_list);
 
-private:
+  /// @brief values 属性をセットする．
+  /// @param[in] attr_name 属性名
+  /// @param[in] value_list 値のリスト
+  virtual
+  bool
+  add_values(const vector<const PtValue*>& value_list);
+
+  /// @brief domain グループをセットする．
+  /// @param[in] domain ドメイン
+  virtual
+  bool
+  add_domain(PtDomain* domain);
+
+
+protected:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる仮想関数
   //////////////////////////////////////////////////////////////////////
@@ -180,18 +201,10 @@ public:
   ~GenGroupHandler();
 
 
-public:
+protected:
   //////////////////////////////////////////////////////////////////////
   // GroupHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対応する PtNode を返す．
-  virtual
-  PtNode*
-  pt_node();
-
-
-private:
 
   /// @brief group statement の最初に呼ばれる関数
   /// @param[in] attr_name 属性名

@@ -418,6 +418,13 @@ LibraryHandler::~LibraryHandler()
 {
 }
 
+// @brief パース木の根のノードを返す．
+const PtLibrary*
+LibraryHandler::library()
+{
+  return mLibrary;
+}
+
 // @brief 親のハンドラを得る．
 // @note このクラスは NULL を返す．
 GroupHandler*
@@ -426,18 +433,12 @@ LibraryHandler::parent()
   return NULL;
 }
 
-// @brief 対応する PtNode を返す．
-PtNode*
-LibraryHandler::pt_node()
-{
-  return mLibrary;
-}
-
 // @brief セルを追加する．
-void
+bool
 LibraryHandler::add_cell(PtCell* cell)
 {
   mLibrary->add_cell(cell);
+  return false;
 }
 
 // @brief グループ名を読み込んだ時の処理

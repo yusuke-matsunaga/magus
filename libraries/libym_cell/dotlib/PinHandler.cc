@@ -197,18 +197,12 @@ PinHandler::~PinHandler()
 {
 }
 
-// @brief 対応する PtNode を返す．
-PtNode*
-PinHandler::pt_node()
-{
-  return mPin;
-}
-
 // @brief ピンを追加する．
-void
+bool
 PinHandler::add_timing(PtTiming* timing)
 {
   mPin->add_timing(timing);
+  return true;
 }
 
 // @brief group statement の最初に呼ばれる関数

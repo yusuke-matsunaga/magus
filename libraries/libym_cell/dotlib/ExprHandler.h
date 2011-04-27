@@ -33,19 +33,18 @@ public:
   ~ExprHandler();
 
 
-public:
+protected:
   //////////////////////////////////////////////////////////////////////
-  // DotlibHandler の仮想関数
+  // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 属性値を読み込む．
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @return エラーが起きたら false を返す．
+  /// @brief 値を読み込む処理
+  /// @return 値を表す PtValue を返す．
+  /// @note エラーが起きたら NULL を返す．
+  /// @note ここでは expression のパースを行う．
   virtual
-  bool
-  read_attr(const ShString& attr_name,
-	    const FileRegion& attr_loc);
+  const PtValue*
+  read_value();
 
 
 private:

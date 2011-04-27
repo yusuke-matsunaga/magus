@@ -33,28 +33,16 @@ ExprHandler::~ExprHandler()
 {
 }
 
-// @brief 構文要素を処理する．
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @return エラーが起きたら false を返す．
-bool
-ExprHandler::read_attr(const ShString& attr_name,
-		       const FileRegion& attr_loc)
+// @brief 値を読み込む処理
+// @return 値を表す PtValue を返す．
+// @note エラーが起きたら NULL を返す．
+// @note ここでは expression のパースを行う．
+const PtValue*
+ExprHandler::read_value()
 {
-  if ( !expect(COLON) ) {
-    return false;
-  }
-
   PtValue* expr = read_expr(SEMI);
 
-  if ( debug() ) {
-    cout << attr_name << " : " << expr << endl;
-  }
-
-  PtNode* node = ptmgr().new_ptsimple(expr);
-  parent()->pt_node()->add_child(attr_name, node);
-
-  return expect_nl();
+  return expr;
 }
 
 // @brief primary を読み込む．

@@ -89,6 +89,7 @@ class PtBundle;
 class PtPin;
 class PtTiming;
 class PtTable;
+class PtDomain;
 class PtValue;
 
 END_NAMESPACE_YM_CELL_DOTLIB

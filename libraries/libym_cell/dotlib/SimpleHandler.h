@@ -47,16 +47,18 @@ public:
 	    const FileRegion& attr_loc);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief シンボルモードで read_token() を呼ぶときに true を返す．
-  /// @note デフォルトの実装では false を返す．
+  /// @brief 値を読み込む処理
+  /// @return 値を表す PtValue を返す．
+  /// @note エラーが起きたら NULL を返す．
+  /// @note デフォルトの実装では普通に DotlibParser::read_token() を呼ぶ．
   virtual
-  bool
-  symbol_mode();
+  const PtValue*
+  read_value();
 
   /// @brief 値を読み込んだ時の処理
   /// @param[in] attr_name 属性名
@@ -65,9 +67,9 @@ private:
   /// @note デフォルトの実装ではなにもしないで true を返す．
   virtual
   bool
-  read_value(const ShString& attr_name,
-	     const FileRegion& attr_loc,
-	     const PtValue* value);
+  set_value(const ShString& attr_name,
+	    const FileRegion& attr_loc,
+	    const PtValue* value);
 
 };
 
@@ -88,15 +90,18 @@ public:
   ~SymSimpleHandler();
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief シンボルモードで read_token() を呼ぶときに true を返す．
+  /// @brief 値を読み込む処理
+  /// @return 値を表す PtValue を返す．
+  /// @note エラーが起きたら NULL を返す．
+  /// @note ここではシンボルモードで DotlibParser::read_token() を呼ぶ．
   virtual
-  bool
-  symbol_mode();
+  const PtValue*
+  read_value();
 
 };
 
@@ -117,20 +122,15 @@ public:
   ~IntSimpleHandler();
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
+  /// @brief 値を読み込む．
   virtual
-  bool
-  read_value(const ShString& attr_name,
-	     const FileRegion& attr_loc,
-	     const PtValue* value);
+  const PtValue*
+  read_value();
 
 };
 
@@ -151,20 +151,15 @@ public:
   ~BoolSimpleHandler();
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
+  /// @brief 値を読み込む．
   virtual
-  bool
-  read_value(const ShString& attr_name,
-	     const FileRegion& attr_loc,
-	     const PtValue* value);
+  const PtValue*
+  read_value();
 
 };
 
@@ -185,20 +180,15 @@ public:
   ~FloatSimpleHandler();
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
+  /// @brief 値を読み込む．
   virtual
-  bool
-  read_value(const ShString& attr_name,
-	     const FileRegion& attr_loc,
-	     const PtValue* value);
+  const PtValue*
+  read_value();
 
 };
 
@@ -219,20 +209,15 @@ public:
   ~StrSimpleHandler();
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // SimpleHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値を読み込んだ時の処理
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
+  /// @brief 値を読み込む．
   virtual
-  bool
-  read_value(const ShString& attr_name,
-	     const FileRegion& attr_loc,
-	     const PtValue* value);
+  const PtValue*
+  read_value();
 
 };
 

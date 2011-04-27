@@ -47,7 +47,7 @@ public:
 	    const FileRegion& attr_loc);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // ComplexHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
@@ -59,9 +59,9 @@ private:
   /// @note デフォルトの実装ではなにもしないで true を返す．
   virtual
   bool
-  read_value(const ShString& attr_name,
-	     const FileRegion& attr_loc,
-	     const vector<const PtValue*>& value_list);
+  set_value(const ShString& attr_name,
+	    const FileRegion& attr_loc,
+	    const vector<const PtValue*>& value_list);
 
 };
 

@@ -61,12 +61,9 @@ ComplexHandler::read_attr(const ShString& attr_name,
     cout << ")" << endl;
   }
 
-  if ( !read_value(attr_name, attr_loc, value_list) ) {
+  if ( !set_value(attr_name, attr_loc, value_list) ) {
     return false;
   }
-
-  PtNode* node = ptmgr().new_ptcomplex(value_list);
-  parent()->pt_node()->add_child(attr_name, node);
 
   return true;
 }
@@ -77,10 +74,15 @@ ComplexHandler::read_attr(const ShString& attr_name,
 // @param[in] value_list 値のリスト
 // @note デフォルトの実装ではなにもしないで true を返す．
 bool
-ComplexHandler::read_value(const ShString& attr_name,
-			   const FileRegion& attr_loc,
-			   const vector<const PtValue*>& value_list)
+ComplexHandler::set_value(const ShString& attr_name,
+			  const FileRegion& attr_loc,
+			  const vector<const PtValue*>& value_list)
 {
+#if 0
+  PtNode* node = ptmgr().new_ptcomplex(value_list);
+  parent()->pt_node()->add_child(attr_name, node);
+#endif
+
   return true;
 }
 

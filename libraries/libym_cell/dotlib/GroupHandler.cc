@@ -120,57 +120,93 @@ GroupHandler::read_attr(const ShString& attr_name,
 // @brief セルを追加する．
 // @param[in] cell セル
 // @note library の時のみ有効
-void
+bool
 GroupHandler::add_cell(PtCell* cell)
 {
   assert_not_reached(__FILE__, __LINE__);
+  return false;
 }
 
 // @brief ピンを追加する．
 // @param[in] pin ピン
 // @note cell/bus/bundle の時のみ有効
-void
+bool
 GroupHandler::add_pin(PtPin* pin)
 {
   assert_not_reached(__FILE__, __LINE__);
+  return false;
 }
 
 // @brief バスを追加する．
 // @param[in] bus バス
 // @note cell の時のみ有効
-void
+bool
 GroupHandler::add_bus(PtBus* bus)
 {
   assert_not_reached(__FILE__, __LINE__);
+  return false;
 }
 
 // @brief バンドルを追加する．
 // @param[in] bundle バンドル
 // @note cell の時のみ有効
-void
+bool
 GroupHandler::add_bundle(PtBundle* bundle)
 {
   assert_not_reached(__FILE__, __LINE__);
+  return false;
 }
 
 // @brief タイミングを追加する．
 // @param[in] timing タイミング条件
 // @note pin の時のみ有効
-void
+bool
 GroupHandler::add_timing(PtTiming* timing)
 {
   assert_not_reached(__FILE__, __LINE__);
+  return false;
 }
 
 // @brief テーブルを追加する．
 // @param[in] attr_name 属性名
 // @param[in] table テーブル
 // @note
-void
+bool
 GroupHandler::add_table(const ShString& attr_name,
 			PtTable* table)
 {
   assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief index_x 属性をセットする．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+bool
+GroupHandler::add_index_x(const ShString& attr_name,
+			  const vector<const PtValue*>& value_list)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief values 属性をセットする．
+// @param[in] attr_name 属性名
+// @param[in] value_list 値のリスト
+bool
+GroupHandler::add_values(const vector<const PtValue*>& value_list)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief domain グループをセットする．
+// @param[in] domain ドメイン
+bool
+GroupHandler::add_domain(PtDomain* domain)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
 }
 
 // @brief ハンドラの登録を行う．
@@ -229,13 +265,6 @@ GenGroupHandler::~GenGroupHandler()
 {
 }
 
-// @brief 対応する PtNode を返す．
-PtNode*
-GenGroupHandler::pt_node()
-{
-  return mPtNode;
-}
-
 // @brief group statement の最初に呼ばれる関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
@@ -245,8 +274,10 @@ GenGroupHandler::begin_group(const ShString& attr_name,
 			     const FileRegion& attr_loc,
 			     const vector<const PtValue*>& value_list)
 {
+#if 0
   mPtNode = ptmgr().new_ptgroup(value_list);
   parent()->pt_node()->add_child(attr_name, mPtNode);
+#endif
   return true;
 }
 
