@@ -135,7 +135,7 @@ dump_sub(ostream& s,
       s << indent_str(indent + 2) << attr->attr_name() << ": ";
       dump_sub(s, attr->value(), indent + 2);
       if ( attr->value()->type() != PtNode::kGroup ) {
-	s << endl;
+	s << ";" << endl;
       }
     }
     s << indent_str(indent) << "}" << endl;
@@ -153,6 +153,7 @@ void
 PtDumper::operator()(ostream& s,
 		     const PtNode* root)
 {
+  s << "library ";
   dump_sub(s, root, 0);
 }
 
