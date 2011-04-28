@@ -39,61 +39,6 @@ public:
   void
   init();
 
-#if 0
-  /// @brief simple attribute を表す PtNode を生成する．
-  /// @param[in] value 値
-  PtNode*
-  new_ptsimple(const PtNode* value);
-
-  /// @brief complex attribute を表す PtNode を生成する．
-  /// @param[in] value_list 値のリスト
-  PtNode*
-  new_ptcomplex(const vector<const PtNode*>& value_list);
-
-  /// @brief group statement を表す PtNode を生成する．
-  /// @param[in] value_list 値のリスト
-  PtNode*
-  new_ptgroup(const vector<const PtNode*>& value_list);
-
-  /// @brief PtLibrary を生成する．
-  /// @param[in] name ライブラリ名
-  PtLibrary*
-  new_ptlibrary(const ShString& name);
-
-  /// @brief PtCell を生成する．
-  /// @param[in] name セル名
-  PtCell*
-  new_ptcell(const ShString& name);
-
-  /// @brief PtLeakagePower を生成する．
-  PtLeakagePower*
-  new_ptleakage_power();
-
-  /// @brief PtBus を生成する．
-  /// @param[in] name バス名
-  PtBus*
-  new_ptbus(const ShString& name);
-
-  /// @brief PtBundle を生成する．
-  /// @param[in] name バンドル名
-  PtBundle*
-  new_ptbundle(const ShString& name);
-
-  /// @brief PtPin を生成する．
-  /// @param[in] name ピン名
-  PtPin*
-  new_ptpin(const ShString& name);
-
-  /// @brief PtTiming を生成する．
-  PtTiming*
-  new_pttiming();
-
-  /// @brief PtTable を生成する．
-  /// @param[in] name テーブルのテンプレート名
-  PtTable*
-  new_pttable(const ShString& name);
-#endif
-
   /// @brief 整数値を表す PtNode を生成する．
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
@@ -171,13 +116,6 @@ private:
   SimpleAlloc mAlloc;
 
   // 個々の要素の使用数
-  ymuint32 mCellNum;
-  ymuint32 mLeakagePowerNum;
-  ymuint32 mBusNum;
-  ymuint32 mBundleNum;
-  ymuint32 mPinNum;
-  ymuint32 mTimingNum;
-  ymuint32 mTableNum;
   ymuint32 mIntNum;
   ymuint32 mFloatNum;
   ymuint32 mStrNum;

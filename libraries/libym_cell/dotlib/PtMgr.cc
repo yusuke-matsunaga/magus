@@ -23,13 +23,6 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 PtMgr::PtMgr() :
   mAlloc(4096)
 {
-  mCellNum = 0;
-  mLeakagePowerNum = 0;
-  mBusNum = 0;
-  mBundleNum = 0;
-  mPinNum = 0;
-  mTimingNum = 0;
-  mTableNum = 0;
   mIntNum = 0;
   mFloatNum = 0;
   mStrNum = 0;
@@ -51,118 +44,6 @@ PtMgr::init()
 {
   mAlloc.destroy();
 }
-
-#if 0
-// @brief simple attribute を表す PtNode を生成する．
-// @param[in] value 値
-PtNode*
-PtMgr::new_ptsimple(const PtNode* value)
-{
-  ++ mSimpleNum;
-  void* p = mAlloc.get_memory(sizeof(PtSimpleNode));
-  return new (p) PtSimpleNode(value);
-}
-
-// @brief complex attribute を表す PtNode を生成する．
-// @param[in] value_list 値のリスト
-PtNode*
-PtMgr::new_ptcomplex(const vector<const PtNode*>& value_list)
-{
-  ++ mComplexNum;
-  void* p = mAlloc.get_memory(sizeof(PtComplexNode));
-  return new (p) PtComplexNode(value_list);
-}
-
-// @brief group statement を表す PtNode を生成する．
-// @param[in] value_list 値のリスト
-PtNode*
-PtMgr::new_ptgroup(const vector<const PtNode*>& value_list)
-{
-  ++ mGroupNum;
-  void* p = mAlloc.get_memory(sizeof(PtGroupNode));
-  return new (p) PtGroupNode(value_list);
-}
-#endif
-
-#if 0
-// @brief PtLibrary を生成する．
-// @param[in] name ライブラリ名
-PtLibrary*
-PtMgr::new_ptlibrary(const ShString& name)
-{
-  void* p = mAlloc.get_memory(sizeof(PtLibrary));
-  return new (p) PtLibrary(name);
-}
-
-// @brief PtCell を生成する．
-// @param[in] name セル名
-PtCell*
-PtMgr::new_ptcell(const ShString& name)
-{
-  ++ mCellNum;
-  void* p = mAlloc.get_memory(sizeof(PtCell));
-  return new (p) PtCell(name);
-}
-
-// @brief PtLeakagePower を生成する．
-PtLeakagePower*
-PtMgr::new_ptleakage_power()
-{
-  ++ mLeakagePowerNum;
-  void* p = mAlloc.get_memory(sizeof(PtLeakagePower));
-  return new (p) PtLeakagePower;
-}
-
-// @brief PtBus を生成する．
-// @param[in] name バス名
-PtBus*
-PtMgr::new_ptbus(const ShString& name)
-{
-  ++ mBusNum;
-  void* p = mAlloc.get_memory(sizeof(PtBus));
-  return new (p) PtBus(name);
-}
-
-// @brief PtBundle を生成する．
-// @param[in] name バンドル名
-PtBundle*
-PtMgr::new_ptbundle(const ShString& name)
-{
-  ++ mBundleNum;
-  void* p = mAlloc.get_memory(sizeof(PtBundle));
-  return new (p) PtBundle(name);
-}
-
-// @brief PtPin を生成する．
-// @param[in] name ピン名
-PtPin*
-PtMgr::new_ptpin(const ShString& name)
-{
-  ++ mPinNum;
-  void* p = mAlloc.get_memory(sizeof(PtPin));
-  return new (p) PtPin(name);
-}
-
-// @brief PtTiming を生成する．
-// @param[in] name ピン名
-PtTiming*
-PtMgr::new_pttiming()
-{
-  ++ mTimingNum;
-  void* p = mAlloc.get_memory(sizeof(PtTiming));
-  return new (p) PtTiming;
-}
-
-// @brief PtTable を生成する．
-// @param[in] name テーブルのテンプレート名
-PtTable*
-PtMgr::new_pttable(const ShString& name)
-{
-  ++ mTableNum;
-  void* p = mAlloc.get_memory(sizeof(PtTable));
-  return new (p) PtTable(name);
-}
-#endif
 
 // @brief 整数値を表す PtNode を生成する．
 // @param[in] value 値

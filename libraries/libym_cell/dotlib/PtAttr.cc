@@ -22,7 +22,8 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 PtAttr::PtAttr(const ShString& attr_name,
 	       const PtNode* value) :
   mAttrName(attr_name),
-  mValue(value)
+  mValue(value),
+  mNext(NULL)
 {
 }
 
