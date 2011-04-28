@@ -46,33 +46,78 @@ dump_sub(ostream& s,
 	 const PtNode* node,
 	 ymuint indent)
 {
-#if 0
-  ymuint nv = node->value_num();
-  for (ymuint i = 0; i < nv; ++ i) {
-    s << indent_str(indent)
-      << "Value#" << i << ": " << node->value(i) << endl;
-  }
+  switch ( node->type() ) {
+  case PtNode::kInt:
+    s << node->int_value();
+    break;
 
-  ymuint nc = node->child_num();
-  for (ymuint i = 0; i < nc; ++ i) {
-    s << indent_str(indent)
-      << "Child#" << i << ":" << endl;
-    dump_sub(s, node->child(i), indent + 2);
-  }
+  case PtNode::kFloat:
+    s << node->float_value();
+    break;
 
-  ymuint nk = node->child_attr_num();
-  for (ymuint i = 0; i < nk; ++ i) {
-    ShString attr = node->child_attr_name(i);
-    s << indent_str(indent)
-      << "Attr:" << attr << endl;
-    ymuint nc = node->child_num(attr);
-    for (ymuint j = 0; j < nc; ++ j) {
-      s << indent_str(indent + 2)
-	<< "Child#" << j << ":" << endl;
-      dump_sub(s, node->child(attr, j), indent + 2);
+  case PtNode::kString:
+    s << node->string_value();
+    break;
+
+  case PtNode::kPlus:
+    s << "( ";
+    dump_sub(s, node->opr1(), indent);
+    s << " + ";
+    dump_sub(s, node->opr2(), indent);
+    s << " )";
+    break;
+
+  case PtNode::kMinus:
+    s << "( ";
+    dump_sub(s, node->opr1(), indent);
+    s << " - ";
+    dump_sub(s, node->opr2(), indent);
+    s << " )";
+    break;
+
+  case PtNode::kMult:
+    s << "( ";
+    dump_sub(s, node->opr1(), indent);
+    s << " * ";
+    dump_sub(s, node->opr2(), indent);
+    s << " )";
+    break;
+
+  case PtNode::kDiv:
+    s << "( ";
+    dump_sub(s, node->opr1(), indent);
+    s << " / ";
+    dump_sub(s, node->opr2(), indent);
+    s << " )";
+    break;
+
+  case PtNode::kList:
+    {
+      s << "{ ";
+      const char* comma = "";
+      for (const PtNode* v = node->top(); v; v = v->next()) {
+	s << comma;
+	dump_sub(s, v, indent);
+	comma = ", ";
+      }
+      s << " }";
     }
+    break;
+
+  case PtNode::kGroup:
+    s << "( ";
+    dump_sub(s, node->value(), 0);
+    s << " ) {" << endl;
+    for (const PtAttr* attr = node->attr_top(); attr; attr = attr->next()) {
+      s << indent_str(indent + 2) << attr->attr_name() << ": ";
+      dump_sub(s, attr->value(), indent + 2);
+      if ( attr->value()->type() != PtNode::kGroup ) {
+	s << endl;
+      }
+    }
+    s << indent_str(indent) << "}" << endl;
+    break;
   }
-#endif
 }
 
 END_NONAMESPACE

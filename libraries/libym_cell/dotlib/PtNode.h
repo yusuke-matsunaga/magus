@@ -112,6 +112,7 @@ public:
 
   /// @brief リストの要素数を返す．
   /// @note type() が kList の時のみ意味を持つ．
+  virtual
   ymuint
   list_size() const;
 
@@ -122,11 +123,13 @@ public:
 
   /// @brief 値を得る．
   /// @note type() が kGroup の時のみ意味を持つ．
+  virtual
   const PtNode*
   value() const;
 
   /// @brief 先頭の属性を得る．
   /// @note type() が kGroup の時のみ意味を持つ．
+  virtual
   const PtAttr*
   attr_top() const;
 
