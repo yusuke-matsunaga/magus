@@ -10,7 +10,9 @@
 
 
 #include "DotlibParser.h"
-#include "LibraryHandler.h"
+#include "DotlibHandler.h"
+#include "HandlerFactory.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -18,7 +20,7 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 // @brief コンストラクタ
 // @param[in] ptmgr パース木を管理するオブジェクト
 DotlibParser::DotlibParser(PtMgr& ptmgr) :
-  mLibraryHandler(new LibraryHandler(*this, ptmgr))
+  mLibraryHandler(HandlerFactory::new_library(*this, ptmgr))
 {
   init();
 }

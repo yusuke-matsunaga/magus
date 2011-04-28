@@ -38,22 +38,8 @@ libym_cell_dotlib_la_SOURCES = \
 	DefineHandler.cc \
 	GroupHandler.h \
 	GroupHandler.cc \
-	LibraryHandler.h \
-	LibraryHandler.cc \
-	CellHandler.h \
-	CellHandler.cc \
-	LeakagePowerHandler.h \
-	LeakagePowerHandler.cc \
-	BusHandler.h \
-	BusHandler.cc \
-	BundleHandler.h \
-	BundleHandler.cc \
-	PinHandler.h \
-	PinHandler.cc \
-	TimingHandler.h \
-	TimingHandler.cc \
-	TableHandler.h \
-	TableHandler.cc \
+	HandlerFactory.h \
+	HandlerFactory.cc \
 	PtMgr.h \
 	PtMgr.cc \
 	PtNode.h \

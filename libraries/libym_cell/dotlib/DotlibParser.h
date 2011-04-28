@@ -20,7 +20,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
-class LibraryHandler;
+class DotlibHandler;
 
 //////////////////////////////////////////////////////////////////////
 /// Dotlib 用のパーサークラス
@@ -181,7 +181,7 @@ private:
   MsgMgr mMsgMgr;
 
   // library グループを処理するハンドラ
-  LibraryHandler* mLibraryHandler;
+  DotlibHandler* mLibraryHandler;
 
   // デバッグモード
   bool mDebug;

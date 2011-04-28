@@ -37,6 +37,14 @@ DotlibHandler::~DotlibHandler()
 {
 }
 
+// @brief 対応するノードを得る．
+// @note デフォルトの実装は NULL を返す．
+PtNode*
+DotlibHandler::pt_node()
+{
+  return NULL;
+}
+
 // @brief group attribute 用のパースを行う．
 // @return 読み込んだ値(リスト)を返す．
 // @note エラーが起きたら NULL を返す．

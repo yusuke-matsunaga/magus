@@ -97,6 +97,7 @@ public:
 	   PtNode* value);
 
   /// @brief 対応するノードを得る．
+  virtual
   PtNode*
   pt_node();
 
@@ -149,6 +150,44 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class EmptyGroupHandler GroupHandler.h "GroupHadler.h"
+/// @brief 値をとらないグループ用のハンドラ
+//////////////////////////////////////////////////////////////////////
+class EmptyGroupHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] parent 親のハンドラ
+  EmptyGroupHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~EmptyGroupHandler();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief group statement の引数のチェックを行う仮想関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値を表すトークンのリスト
+  /// @note begin_group() の中で呼ばれる．
+  /// @note デフォルトの実装はなにもしないで true を返す．
+  virtual
+  bool
+  check_group_value(const ShString& attr_name,
+		    const FileRegion& attr_loc,
+		    PtNode* value);
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class Str1GroupHandler GroupHandler.h "GroupHadler.h"
 /// @brief 1つの文字列型をとるグループ用のハンドラ
 //////////////////////////////////////////////////////////////////////
@@ -193,21 +232,21 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EmptyGroupHandler GroupHandler.h "GroupHadler.h"
-/// @brief 値をとらないグループ用のハンドラ
+/// @class Str2GroupHandler GroupHandler.h "GroupHadler.h"
+/// @brief 2つの文字列型をとるグループ用のハンドラ
 //////////////////////////////////////////////////////////////////////
-class EmptyGroupHandler :
+class Str2GroupHandler :
   public GroupHandler
 {
 public:
 
-  /// @brief コンストラクタ
+  /// @brief 親を持つハンドラ用のコンストラクタ
   /// @param[in] parent 親のハンドラ
-  EmptyGroupHandler(GroupHandler* parent);
+  Str2GroupHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
-  ~EmptyGroupHandler();
+  ~Str2GroupHandler();
 
 
 protected:

@@ -292,6 +292,50 @@ GroupHandler::check_group_value(const ShString& attr_name,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス EmptyGroupHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] parent 親のハンドラ
+EmptyGroupHandler::EmptyGroupHandler(GroupHandler* parent) :
+  GroupHandler(parent)
+{
+}
+
+// @brief デストラクタ
+EmptyGroupHandler::~EmptyGroupHandler()
+{
+}
+
+// @brief group statement の引数のチェックを行う仮想関数
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value_list 値を表すトークンのリスト
+// @note begin_group() の中で呼ばれる．
+// @note デフォルトの実装はなにもしないで true を返す．
+bool
+EmptyGroupHandler::check_group_value(const ShString& attr_name,
+				     const FileRegion& attr_loc,
+				     PtNode* value_list)
+{
+  ymuint n = value_list->list_size();
+  if ( n > 0 ) {
+    const PtNode* top = value_list->top();
+    FileRegion loc = top->loc();
+    ostringstream buf;
+    buf << attr_name << " statement does not have parameters.";
+    put_msg(__FILE__, __LINE__, loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    buf.str());
+    return false;
+  }
+
+  return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス Str1GroupHandler
 //////////////////////////////////////////////////////////////////////
 
@@ -364,18 +408,18 @@ Str1GroupHandler::check_group_value(const ShString& attr_name,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EmptyGroupHandler
+// クラス Str2GroupHandler
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
+// @brief ハンドラ用のコンストラクタ
 // @param[in] parent 親のハンドラ
-EmptyGroupHandler::EmptyGroupHandler(GroupHandler* parent) :
+Str2GroupHandler::Str2GroupHandler(GroupHandler* parent) :
   GroupHandler(parent)
 {
 }
 
 // @brief デストラクタ
-EmptyGroupHandler::~EmptyGroupHandler()
+Str2GroupHandler::~Str2GroupHandler()
 {
 }
 
@@ -386,20 +430,47 @@ EmptyGroupHandler::~EmptyGroupHandler()
 // @note begin_group() の中で呼ばれる．
 // @note デフォルトの実装はなにもしないで true を返す．
 bool
-EmptyGroupHandler::check_group_value(const ShString& attr_name,
-				     const FileRegion& attr_loc,
-				     PtNode* value_list)
+Str2GroupHandler::check_group_value(const ShString& attr_name,
+				    const FileRegion& attr_loc,
+				    PtNode* value_list)
 {
   ymuint n = value_list->list_size();
-  if ( n > 0 ) {
-    const PtNode* top = value_list->top();
-    FileRegion loc = top->loc();
+  if ( n < 2 ) {
     ostringstream buf;
-    buf << attr_name << " statement does not have parameters.";
+    buf << attr_name << " statement requires two string parameters.";
+    put_msg(__FILE__, __LINE__, attr_loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    buf.str());
+    return false;
+  }
+
+  const PtNode* top = value_list->top();
+  const PtNode* second = top->next();
+  if ( n > 2 ) {
+    const PtNode* third = second->next();
+    FileRegion loc = third->loc();
+    ostringstream buf;
+    buf << attr_name << " statement has two string parameters.";
     put_msg(__FILE__, __LINE__, loc,
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    buf.str());
+    return false;
+  }
+
+  if ( top->type() != PtNode::kString ) {
+    put_msg(__FILE__, __LINE__, top->loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "string value is expected.");
+    return false;
+  }
+  if ( second->type() != PtNode::kString ) {
+    put_msg(__FILE__, __LINE__, second->loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "string value is expected.");
     return false;
   }
 

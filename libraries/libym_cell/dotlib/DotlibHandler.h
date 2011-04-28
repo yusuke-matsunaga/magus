@@ -51,6 +51,12 @@ public:
   read_attr(const ShString& attr_name,
 	    const FileRegion& attr_loc) = 0;
 
+  /// @brief 対応するノードを得る．
+  /// @note デフォルトの実装は NULL を返す．
+  virtual
+  PtNode*
+  pt_node();
+
 
 public:
   //////////////////////////////////////////////////////////////////////
