@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class PtTable PtTable.h "PtTable.h"
 /// @brief タイミング情報を表す PtNode の継承クラス
@@ -45,19 +46,19 @@ public:
   name() const;
 
   /// @brief index_1 属性の値を返す．
-  const PtValue*
+  const PtNode*
   index_1() const;
 
   /// @brief index_2 属性の値を返す．
-  const PtValue*
+  const PtNode*
   index_2() const;
 
   /// @brief index_3 属性の値を返す．
-  const PtValue*
+  const PtNode*
   index_3() const;
 
   /// @brief values 属性の値を返す．
-  const PtValue*
+  const PtNode*
   values() const;
 
   /// @brief domain グループを返す．
@@ -74,21 +75,22 @@ private:
   ShString mName;
 
   // index_1 の値
-  PtValue* mIndex1;
+  PtNode* mIndex1;
 
   // index_2 の値
-  PtValue* mIndex2;
+  PtNode* mIndex2;
 
   // index_3 の値
-  PtValue* mIndex3;
+  PtNode* mIndex3;
 
   // vaues の値
-  PtValue* mValues;
+  PtNode* mValues;
 
   // domain グループ
   PtDomain* mDomain;
 
 };
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

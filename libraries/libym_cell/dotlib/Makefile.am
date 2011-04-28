@@ -56,27 +56,11 @@ libym_cell_dotlib_la_SOURCES = \
 	TableHandler.cc \
 	PtMgr.h \
 	PtMgr.cc \
-	PtValue.h \
-	PtValue.cc \
 	PtNode.h \
 	PtNodeImpl.h \
+	PtAttr.h \
+	PtAttr.cc \
 	PtNode.cc \
-	PtLibrary.h \
-	PtLibrary.cc \
-	PtCell.h \
-	PtCell.cc \
-	PtLeakagePower.h \
-	PtLeakagePower.cc \
-	PtBus.h \
-	PtBus.cc \
-	PtBundle.h \
-	PtBundle.cc \
-	PtPin.h \
-	PtPin.cc \
-	PtTiming.h \
-	PtTiming.cc \
-	PtTable.h \
-	PtTable.cc \
 	PtDumper.h \
 	PtDumper.cc \
 	CellDotlibReader.cc

@@ -94,62 +94,11 @@ public:
   virtual
   bool
   add_attr(const ShString& attr_name,
-	   PtValue* value);
+	   PtNode* value);
 
-  /// @brief セルを追加する．
-  /// @param[in] cell セル
-  /// @note library の時のみ有効
-  virtual
-  bool
-  add_cell(PtCell* cell);
-
-  /// @brief leakage_power を追加する．
-  virtual
-  bool
-  add_leakage_power(PtLeakagePower* lp);
-
-  /// @brief ピンを追加する．
-  /// @param[in] pin ピン
-  /// @note cell/bus/bundle の時のみ有効
-  virtual
-  bool
-  add_pin(PtPin* pin);
-
-  /// @brief バスを追加する．
-  /// @param[in] bus バス
-  /// @note cell の時のみ有効
-  virtual
-  bool
-  add_bus(PtBus* bus);
-
-  /// @brief バンドルを追加する．
-  /// @param[in] bundle バンドル
-  /// @note cell の時のみ有効
-  virtual
-  bool
-  add_bundle(PtBundle* bundle);
-
-  /// @brief タイミングを追加する．
-  /// @param[in] timing タイミング条件
-  /// @note pin の時のみ有効
-  virtual
-  bool
-  add_timing(PtTiming* timing);
-
-  /// @brief テーブルを追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] table テーブル
-  /// @note
-  virtual
-  bool
-  add_table(const ShString& attr_name,
-	    PtTable* table);
-
-  /// @brief domain グループをセットする．
-  /// @param[in] domain ドメイン
-  virtual
-  bool
-  add_domain(PtDomain* domain);
+  /// @brief 対応するノードを得る．
+  PtNode*
+  pt_node();
 
 
 protected:
@@ -165,12 +114,24 @@ protected:
   bool
   begin_group(const ShString& attr_name,
 	      const FileRegion& attr_loc,
-	      PtValue* value) = 0;
+	      PtNode* value);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual
   bool
-  end_group() = 0;
+  end_group();
+
+  /// @brief group statement の引数のチェックを行う仮想関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値を表すトークンのリスト
+  /// @note begin_group() の中で呼ばれる．
+  /// @note デフォルトの実装はなにもしないで true を返す．
+  virtual
+  bool
+  check_group_value(const ShString& attr_name,
+		    const FileRegion& attr_loc,
+		    PtNode* value);
 
 
 private:
@@ -180,6 +141,9 @@ private:
 
   // ハンドラの連想配列
   hash_map<ShString, DotlibHandler*> mHandlerMap;
+
+  // 対応する PtNode
+  PtNode* mNode;
 
 };
 
@@ -213,31 +177,17 @@ protected:
   // 内部で用いられる GroupHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief group statement の最初に呼ばれる関数
+  /// @brief group statement の引数のチェックを行う仮想関数
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値を表すトークンのリスト
+  /// @note begin_group() の中で呼ばれる．
+  /// @note デフォルトの実装はなにもしないで true を返す．
   virtual
   bool
-  begin_group(const ShString& attr_name,
-	      const FileRegion& attr_loc,
-	      PtValue* value);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // Str1GroupHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief group statement の最初に呼ばれる関数
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value 値
-  virtual
-  bool
-  begin_group(const ShString& attr_name,
-	      const FileRegion& attr_loc,
-	      const ShString& value) = 0;
+  check_group_value(const ShString& attr_name,
+		    const FileRegion& attr_loc,
+		    PtNode* value);
 
 };
 
@@ -265,70 +215,17 @@ protected:
   // 内部で用いられる GroupHandler の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief group statement の最初に呼ばれる関数
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  /// @param[in] value_list 値を表すトークンのリスト
-  virtual
-  bool
-  begin_group(const ShString& attr_name,
-	      const FileRegion& attr_loc,
-	      PtValue* value_list);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // EmptyGroupHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief group statement の最初に呼ばれる関数
-  /// @param[in] attr_name 属性名
-  /// @param[in] attr_loc ファイル上の位置
-  virtual
-  bool
-  begin_group(const ShString& attr_name,
-	      const FileRegion& attr_loc) = 0;
-
-};
-
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class GenGroupHandler GroupHandler.h "GroupHandler.h"
-/// @brief 汎用の GroupHandler
-//////////////////////////////////////////////////////////////////////
-class GenGroupHandler :
-  public GroupHandler
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親のハンドラ
-  GenGroupHandler(GroupHandler* parent);
-
-  /// @brief デストラクタ
-  ~GenGroupHandler();
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // GroupHandler の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief group statement の最初に呼ばれる関数
+  /// @brief group statement の引数のチェックを行う仮想関数
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値を表すトークンのリスト
+  /// @note begin_group() の中で呼ばれる．
+  /// @note デフォルトの実装はなにもしないで true を返す．
   virtual
   bool
-  begin_group(const ShString& attr_name,
-	      const FileRegion& attr_loc,
-	      PtValue* value);
-
-  /// @brief group statement の最後に呼ばれる関数
-  virtual
-  bool
-  end_group();
+  check_group_value(const ShString& attr_name,
+		    const FileRegion& attr_loc,
+		    PtNode* value);
 
 };
 

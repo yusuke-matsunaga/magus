@@ -34,7 +34,7 @@ public:
   /// @brief パース木から CellLibrary を生成する．
   /// @param[in] root パース木の根のノード
   const CellLibrary*
-  gen_library(const PtLibrary* root);
+  gen_library(const PtNode* root);
 
 };
 

@@ -10,7 +10,7 @@
 #include "DotlibHandler.h"
 #include "DotlibParser.h"
 #include "PtMgr.h"
-#include "PtValue.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -40,23 +40,23 @@ DotlibHandler::~DotlibHandler()
 // @brief group attribute 用のパースを行う．
 // @return 読み込んだ値(リスト)を返す．
 // @note エラーが起きたら NULL を返す．
-PtValue*
+PtNode*
 DotlibHandler::parse_complex()
 {
   if ( !expect(LP) ) {
     return NULL;
   }
 
-  PtValueList value_list;
+  PtNode* value_list = ptmgr().new_list();
   tTokenType type = parser().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
-      PtValue* value = new_ptvalue(type);
+      PtNode* value = new_ptvalue(type);
       if ( value == NULL ) {
 	return NULL;
       }
 
-      value_list.add(value);
+      value_list->add_node(value);
 
       tTokenType type1 = parser().read_token();
       if ( type1 == RP ) {
@@ -67,19 +67,19 @@ DotlibHandler::parse_complex()
 		kMsgError,
 		"DOTLIB_PARSER",
 		"syntax error. ',' is expected.");
-	return false;
+	return NULL;
       }
       type = parser().read_token();
     }
   }
 
-  return ptmgr().new_list(value_list.top());
+  return value_list;
 }
 
-// @brief PtValue を生成する．
+// @brief PtNode を生成する．
 // @param[in] type 型
 // @note 残りの情報は parser() からとってくる．
-PtValue*
+PtNode*
 DotlibHandler::new_ptvalue(tTokenType type)
 {
   FileRegion loc(parser().cur_loc());

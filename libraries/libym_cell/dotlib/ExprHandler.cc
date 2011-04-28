@@ -34,19 +34,19 @@ ExprHandler::~ExprHandler()
 }
 
 // @brief 値を読み込む処理
-// @return 値を表す PtValue を返す．
+// @return 値を表す PtNode を返す．
 // @note エラーが起きたら NULL を返す．
 // @note ここでは expression のパースを行う．
-PtValue*
+PtNode*
 ExprHandler::read_value()
 {
-  PtValue* expr = read_expr(SEMI);
+  PtNode* expr = read_expr(SEMI);
 
   return expr;
 }
 
 // @brief primary を読み込む．
-PtValue*
+PtNode*
 ExprHandler::read_primary()
 {
   tTokenType type = parser().read_token();
@@ -80,10 +80,10 @@ ExprHandler::read_primary()
 }
 
 // @brief prudct を読み込む．
-PtValue*
+PtNode*
 ExprHandler::read_product()
 {
-  PtValue* opr1 = read_primary();
+  PtNode* opr1 = read_primary();
   if ( opr1 == NULL ) {
     return NULL;
   }
@@ -91,7 +91,7 @@ ExprHandler::read_product()
   for ( ; ; ) {
     tTokenType type = parser().read_token();
     if ( type == MULT || type == DIV ) {
-      PtValue* opr2 = read_primary();
+      PtNode* opr2 = read_primary();
       if ( opr2 == NULL ) {
 	return NULL;
       }
@@ -112,13 +112,13 @@ ExprHandler::read_product()
 }
 
 // @brief expression を読み込む．
-PtValue*
+PtNode*
 ExprHandler::read_expr(tTokenType end_marker)
 {
   // ここだけ mUngetType, mUngetLoc を考慮する必要があるので
   // parser().read_token(), parser().cur_loc() を読んではいけない．
 
-  PtValue* opr1 = read_product();
+  PtNode* opr1 = read_product();
   if ( opr1 == NULL ) {
     return NULL;
   }
@@ -128,7 +128,7 @@ ExprHandler::read_expr(tTokenType end_marker)
       return opr1;
     }
     if ( type == PLUS || type == MINUS ) {
-      PtValue* opr2 = read_product();
+      PtNode* opr2 = read_product();
       if ( opr2 == NULL ) {
 	return NULL;
       }

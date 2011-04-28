@@ -17,8 +17,6 @@
 
 #include "PtMgr.h"
 #include "PtNode.h"
-#include "PtPin.h"
-#include "PtValue.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -43,7 +41,7 @@ inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GenGroupHandler(parent);
+  return new GroupHandler(parent);
 }
 
 DotlibHandler*
@@ -105,8 +103,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 PinHandler::PinHandler(GroupHandler* parent) :
-  Str1GroupHandler(parent),
-  mPin(NULL)
+  Str1GroupHandler(parent)
 {
   // simple attributes
   DotlibHandler* simple = new_simple(this);
@@ -195,47 +192,6 @@ PinHandler::PinHandler(GroupHandler* parent) :
 // @brief デストラクタ
 PinHandler::~PinHandler()
 {
-}
-
-// @brief attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @return 設定が失敗したら false を返す．
-bool
-PinHandler::add_attr(const ShString& attr_name,
-		     PtValue* value)
-{
-#warning "未完"
-  return GroupHandler::add_attr(attr_name, value);
-}
-
-// @brief ピンを追加する．
-bool
-PinHandler::add_timing(PtTiming* timing)
-{
-  mPin->mTimingList.push_back(timing);
-  return true;
-}
-
-// @brief group statement の最初に呼ばれる関数
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value 値
-bool
-PinHandler::begin_group(const ShString& attr_name,
-			const FileRegion& attr_loc,
-			const ShString& value)
-{
-  mPin = ptmgr().new_ptpin(value);
-  return parent()->add_pin(mPin);
-}
-
-// @brief group statement の最後に呼ばれる関数
-bool
-PinHandler::end_group()
-{
-  mPin = NULL;
-  return true;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

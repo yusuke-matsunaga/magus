@@ -49,7 +49,7 @@ bool
 GroupHandler::read_attr(const ShString& attr_name,
 			const FileRegion& attr_loc)
 {
-  PtValue* value = parse_complex();
+  PtNode* value = parse_complex();
   if ( value == NULL ) {
     return false;
   }
@@ -116,12 +116,14 @@ GroupHandler::read_attr(const ShString& attr_name,
 // @note デフォルトの実装はエラーとなる．
 bool
 GroupHandler::add_attr(const ShString& attr_name,
-		       PtValue* value)
+		       PtNode* value)
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return false;
+  PtAttr* attr = ptmgr().new_attr(attr_name, value);
+  mNode->add_attr(attr);
+  return true;
 }
 
+#if 0
 // @brief セルを追加する．
 // @param[in] cell セル
 // @note library の時のみ有効
@@ -200,6 +202,7 @@ GroupHandler::add_domain(PtDomain* domain)
   assert_not_reached(__FILE__, __LINE__);
   return false;
 }
+#endif
 
 // @brief ハンドラの登録を行う．
 // @param[in] attr_name 属性名
@@ -239,6 +242,55 @@ GroupHandler::find_handler(const ShString& attr_name)
   }
 }
 
+// @brief group statement の最初に呼ばれる関数
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value_list 値を表すトークンのリスト
+bool
+GroupHandler::begin_group(const ShString& attr_name,
+			  const FileRegion& attr_loc,
+			  PtNode* value_list)
+{
+  if ( !check_group_value(attr_name, attr_loc, value_list) ) {
+    return false;
+  }
+
+  mNode = ptmgr().new_group(value_list, attr_loc);
+  if ( attr_name != "library" ) {
+    parent()->add_attr(attr_name, mNode);
+  }
+  return true;
+}
+
+// @brief group statement の最後に呼ばれる関数
+bool
+GroupHandler::end_group()
+{
+  mNode = NULL;
+  return true;
+}
+
+// @brief 対応するノードを得る．
+PtNode*
+GroupHandler::pt_node()
+{
+  return mNode;
+}
+
+// @brief group statement の引数のチェックを行う仮想関数
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value 値を表すトークンのリスト
+// @note begin_group() の中で呼ばれる．
+// @note デフォルトの実装はなにもしないで true を返す．
+bool
+GroupHandler::check_group_value(const ShString& attr_name,
+				const FileRegion& attr_loc,
+				PtNode* value)
+{
+  return true;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス Str1GroupHandler
@@ -265,14 +317,16 @@ Str1GroupHandler::~Str1GroupHandler()
 {
 }
 
-// @brief group statement の最初に呼ばれる関数
+// @brief group statement の引数のチェックを行う仮想関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
+// @note begin_group() の中で呼ばれる．
+// @note デフォルトの実装はなにもしないで true を返す．
 bool
-Str1GroupHandler::begin_group(const ShString& attr_name,
-			      const FileRegion& attr_loc,
-			      PtValue* value_list)
+Str1GroupHandler::check_group_value(const ShString& attr_name,
+				    const FileRegion& attr_loc,
+				    PtNode* value_list)
 {
   ymuint n = value_list->list_size();
   if ( n == 0 ) {
@@ -285,9 +339,9 @@ Str1GroupHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  const PtValue* top = value_list->top();
+  const PtNode* top = value_list->top();
   if ( n > 1 ) {
-    const PtValue* second = top->next();
+    const PtNode* second = top->next();
     FileRegion loc = second->loc();
     ostringstream buf;
     buf << attr_name << " statement has only one string parameter.";
@@ -298,7 +352,7 @@ Str1GroupHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  if ( top->type() != PtValue::kString ) {
+  if ( top->type() != PtNode::kString ) {
     put_msg(__FILE__, __LINE__, top->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -306,7 +360,7 @@ Str1GroupHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  return begin_group(attr_name, attr_loc, top->string_value());
+  return true;
 }
 
 
@@ -326,18 +380,20 @@ EmptyGroupHandler::~EmptyGroupHandler()
 {
 }
 
-// @brief group statement の最初に呼ばれる関数
+// @brief group statement の引数のチェックを行う仮想関数
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値を表すトークンのリスト
+// @note begin_group() の中で呼ばれる．
+// @note デフォルトの実装はなにもしないで true を返す．
 bool
-EmptyGroupHandler::begin_group(const ShString& attr_name,
-			       const FileRegion& attr_loc,
-			       PtValue* value_list)
+EmptyGroupHandler::check_group_value(const ShString& attr_name,
+				     const FileRegion& attr_loc,
+				     PtNode* value_list)
 {
   ymuint n = value_list->list_size();
   if ( n > 0 ) {
-    const PtValue* top = value_list->top();
+    const PtNode* top = value_list->top();
     FileRegion loc = top->loc();
     ostringstream buf;
     buf << attr_name << " statement does not have parameters.";
@@ -348,42 +404,6 @@ EmptyGroupHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  return begin_group(attr_name, attr_loc);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス GenGroupHandler
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] parent 親のハンドラ
-GenGroupHandler::GenGroupHandler(GroupHandler* parent) :
-  GroupHandler(parent)
-{
-}
-
-// @brief デストラクタ
-GenGroupHandler::~GenGroupHandler()
-{
-}
-
-// @brief group statement の最初に呼ばれる関数
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value_list 値を表すトークンのリスト
-bool
-GenGroupHandler::begin_group(const ShString& attr_name,
-			     const FileRegion& attr_loc,
-			     PtValue* value_list)
-{
-  return true;
-}
-
-// @brief group statement の最後に呼ばれる関数
-bool
-GenGroupHandler::end_group()
-{
   return true;
 }
 

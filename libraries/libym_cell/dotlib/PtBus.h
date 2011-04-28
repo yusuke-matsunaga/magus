@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class PtBus PtBus.h "PtBus.h"
 /// @brief bus グループを表すパース木の要素
@@ -66,6 +67,7 @@ private:
   vector<const PtPin*> mPinList;
 
 };
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

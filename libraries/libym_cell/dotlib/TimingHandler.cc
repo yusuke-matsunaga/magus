@@ -15,12 +15,6 @@
 #include "PinHandler.h"
 #include "TableHandler.h"
 
-#include "PtMgr.h"
-#include "PtNode.h"
-#include "PtPin.h"
-#include "PtTiming.h"
-#include "PtValue.h"
-
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
@@ -44,7 +38,7 @@ inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GenGroupHandler(parent);
+  return new GroupHandler(parent);
 }
 
 END_NONAMESPACE
@@ -57,8 +51,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 TimingHandler::TimingHandler(GroupHandler* parent) :
-  EmptyGroupHandler(parent),
-  mTiming(NULL)
+  EmptyGroupHandler(parent)
 {
   // simple attributes
   DotlibHandler* simple = new_simple(this);
@@ -133,51 +126,6 @@ TimingHandler::TimingHandler(GroupHandler* parent) :
 // @brief デストラクタ
 TimingHandler::~TimingHandler()
 {
-}
-
-// @brief attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @return 設定が失敗したら false を返す．
-bool
-TimingHandler::add_attr(const ShString& attr_name,
-			PtValue* value)
-{
-#warning "未完"
-  return true;
-}
-
-// @brief テーブルを追加する．
-bool
-TimingHandler::add_table(const ShString& attr_name,
-			 PtTable* table)
-{
-  if ( mTiming->mTableMap.count(attr_name) > 0 ) {
-    // 属性名の重複
-#warning "TODO: エラーメッセージ"
-    return false;
-  }
-  mTiming->mTableMap.insert(make_pair(attr_name, table));
-  return true;
-}
-
-// @brief group statement の最初に呼ばれる関数
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-bool
-TimingHandler::begin_group(const ShString& attr_name,
-			   const FileRegion& attr_loc)
-{
-  mTiming = ptmgr().new_pttiming();
-  return parent()->add_timing(mTiming);
-}
-
-// @brief group statement の最後に呼ばれる関数
-bool
-TimingHandler::end_group()
-{
-  mTiming = NULL;
-  return true;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

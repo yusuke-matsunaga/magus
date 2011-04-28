@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class PtTiming PtTiming.h "PtTiming.h"
 /// @brief タイミング情報を表す PtNode の継承クラス
@@ -49,6 +50,7 @@ private:
   hash_map<ShString, const PtTable*> mTableMap;
 
 };
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

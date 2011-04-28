@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class PtCell PtCell.h "PtCell.h"
 /// @brief cell グループを表すパース木の要素
@@ -105,6 +106,7 @@ private:
   vector<const PtNode*> mChildList;
 
 };
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

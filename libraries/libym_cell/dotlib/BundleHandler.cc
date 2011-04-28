@@ -16,10 +16,6 @@
 #include "PinHandler.h"
 #include "TimingHandler.h"
 
-#include "PtMgr.h"
-#include "PtNode.h"
-#include "PtBundle.h"
-#include "PtValue.h"
 
 #include "ym_utils/FileRegion.h"
 
@@ -46,7 +42,7 @@ inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GenGroupHandler(parent);
+  return new GroupHandler(parent);
 }
 
 DotlibHandler*
@@ -108,8 +104,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 BundleHandler::BundleHandler(GroupHandler* parent) :
-  Str1GroupHandler(parent),
-  mBundle(NULL)
+  Str1GroupHandler(parent)
 {
   // simple attributes
   DotlibHandler* simple = new_simple(this);
@@ -139,46 +134,6 @@ BundleHandler::BundleHandler(GroupHandler* parent) :
 // @brief デストラクタ
 BundleHandler::~BundleHandler()
 {
-}
-
-// @brief attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @return 設定が失敗したら false を返す．
-bool
-BundleHandler::add_attr(const ShString& attr_name,
-			PtValue* value)
-{
-#warning "未完"
-  return true;
-}
-
-// @brief ピンを追加する．
-bool
-BundleHandler::add_pin(PtPin* pin)
-{
-  return mBundle->add_pin(pin);
-}
-
-// @brief group statement の最初に呼ばれる関数
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value 値
-bool
-BundleHandler::begin_group(const ShString& attr_name,
-			   const FileRegion& attr_loc,
-			   const ShString& value)
-{
-  mBundle = ptmgr().new_ptbundle(value);
-  return parent()->add_bundle(mBundle);
-}
-
-// @brief group statement の最後に呼ばれる関数
-bool
-BundleHandler::end_group()
-{
-  mBundle = NULL;
-  return true;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

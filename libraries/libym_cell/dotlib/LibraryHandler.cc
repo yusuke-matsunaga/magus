@@ -17,9 +17,6 @@
 #include "CellHandler.h"
 #include "PtMgr.h"
 #include "PtNode.h"
-#include "PtLibrary.h"
-#include "PtCell.h"
-#include "PtValue.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -45,7 +42,7 @@ inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GenGroupHandler(parent);
+  return new GroupHandler(parent);
 }
 
 DotlibHandler*
@@ -418,13 +415,6 @@ LibraryHandler::~LibraryHandler()
 {
 }
 
-// @brief パース木の根のノードを返す．
-const PtLibrary*
-LibraryHandler::library()
-{
-  return mLibrary;
-}
-
 // @brief 親のハンドラを得る．
 // @note このクラスは NULL を返す．
 GroupHandler*
@@ -433,46 +423,11 @@ LibraryHandler::parent()
   return NULL;
 }
 
-// @brief attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @return 設定が失敗したら false を返す．
-bool
-LibraryHandler::add_attr(const ShString& attr_name,
-			 PtValue* value)
-{
-#warning "未完"
-  return GroupHandler::add_attr(attr_name, value);
-}
-
-// @brief セルを追加する．
-bool
-LibraryHandler::add_cell(PtCell* cell)
-{
-  return mLibrary->add_cell(cell);
-}
-
-// @brief グループ名を読み込んだ時の処理
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value 値
-bool
-LibraryHandler::begin_group(const ShString& attr_name,
-			    const FileRegion& attr_loc,
-			    const ShString& value)
-{
-  assert_cond( attr_name == "library", __FILE__, __LINE__);
-
-  mLibrary = ptmgr().new_ptlibrary(value);
-
-  return true;
-}
-
 // @brief グループ内のステートメントをすべて処理したときに呼ばれる関数
 bool
 LibraryHandler::end_group()
 {
-  mLibrary = NULL;
+  // なにもしないことに意味がある．
   return true;
 }
 

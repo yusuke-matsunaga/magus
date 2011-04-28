@@ -12,6 +12,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス PtPin
 //////////////////////////////////////////////////////////////////////
@@ -50,5 +51,7 @@ PtPin::timing(ymuint pos) const
   assert_cond( pos < timing_num(), __FILE__, __LINE__);
   return mTimingList[pos];
 }
+
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB

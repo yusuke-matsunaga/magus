@@ -19,11 +19,6 @@
 #include "BundleHandler.h"
 #include "PinHandler.h"
 
-#include "PtMgr.h"
-#include "PtNode.h"
-#include "PtCell.h"
-#include "PtValue.h"
-
 #include "ym_utils/FileRegion.h"
 
 
@@ -49,7 +44,7 @@ inline
 GroupHandler*
 new_group(GroupHandler* parent)
 {
-  return new GenGroupHandler(parent);
+  return new GroupHandler(parent);
 }
 
 DotlibHandler*
@@ -202,8 +197,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 CellHandler::CellHandler(GroupHandler* parent) :
-  Str1GroupHandler(parent),
-  mCell(NULL)
+  Str1GroupHandler(parent)
 {
   // simple attributes
   DotlibHandler* simple = new SimpleHandler(this);
@@ -275,71 +269,6 @@ CellHandler::CellHandler(GroupHandler* parent) :
 // @brief デストラクタ
 CellHandler::~CellHandler()
 {
-}
-
-// @brief attribute を設定する．
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @return 設定が失敗したら false を返す．
-bool
-CellHandler::add_attr(const ShString& attr_name,
-		      PtValue* value)
-{
-#warning "未完"
-  return GroupHandler::add_attr(attr_name, value);
-}
-
-// @brief leakage_power を追加する．
-bool
-CellHandler::add_leakage_power(PtLeakagePower* lp)
-{
-  mCell->mLeakagePowerList.push_back(lp);
-  return true;
-}
-
-// @brief ピンを追加する．
-bool
-CellHandler::add_pin(PtPin* pin)
-{
-  mCell->mPinList.push_back(pin);
-  return true;
-}
-
-// @brief バスを追加する．
-bool
-CellHandler::add_bus(PtBus* bus)
-{
-  mCell->mBusList.push_back(bus);
-  return true;
-}
-
-// @brief バンドルを追加する．
-bool
-CellHandler::add_bundle(PtBundle* bundle)
-{
-  mCell->mBundleList.push_back(bundle);
-  return true;
-}
-
-// @brief group statement の最初に呼ばれる関数
-// @param[in] attr_name 属性名
-// @param[in] attr_loc ファイル上の位置
-// @param[in] value 値
-bool
-CellHandler::begin_group(const ShString& attr_name,
-			 const FileRegion& attr_loc,
-			 const ShString& value)
-{
-  mCell = ptmgr().new_ptcell(value);
-  return parent()->add_cell(mCell);
-}
-
-// @brief group statement の最後に呼ばれる関数
-bool
-CellHandler::end_group()
-{
-  mCell = NULL;
-  return true;
 }
 
 END_NAMESPACE_YM_CELL_DOTLIB

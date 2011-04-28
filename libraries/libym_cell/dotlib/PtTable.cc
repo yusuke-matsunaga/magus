@@ -12,6 +12,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス PtTable
 //////////////////////////////////////////////////////////////////////
@@ -41,28 +42,28 @@ PtTable::name() const
 }
 
 /// @brief index_1 属性の値を返す．
-const PtValue*
+const PtNode*
 PtTable::index_1() const
 {
   return mIndex1;
 }
 
 // @brief index_2 属性の値を返す．
-const PtValue*
+const PtNode*
 PtTable::index_2() const
 {
   return mIndex2;
 }
 
 // @brief index_3 属性の値を返す．
-const PtValue*
+const PtNode*
 PtTable::index_3() const
 {
   return mIndex3;
 }
 
 // @brief values 属性の値を返す．
-const PtValue*
+const PtNode*
 PtTable::values() const
 {
   return mValues;
@@ -74,5 +75,6 @@ PtTable::domain() const
 {
   return mDomain;
 }
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB

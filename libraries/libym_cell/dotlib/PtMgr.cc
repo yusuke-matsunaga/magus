@@ -10,16 +10,7 @@
 #include "PtMgr.h"
 #include "PtNode.h"
 #include "PtNodeImpl.h"
-#include "PtLibrary.h"
-#include "PtCell.h"
-#include "PtLeakagePower.h"
-#include "PtBus.h"
-#include "PtBundle.h"
-#include "PtPin.h"
-#include "PtTiming.h"
-#include "PtTable.h"
-#include "PtValue.h"
-#include "PtValueImpl.h"
+#include "PtAttr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -32,9 +23,6 @@ BEGIN_NAMESPACE_YM_CELL_DOTLIB
 PtMgr::PtMgr() :
   mAlloc(4096)
 {
-  mSimpleNum = 0;
-  mComplexNum = 0;
-  mGroupNum = 0;
   mCellNum = 0;
   mLeakagePowerNum = 0;
   mBusNum = 0;
@@ -47,6 +35,8 @@ PtMgr::PtMgr() :
   mStrNum = 0;
   mOprNum = 0;
   mListNum = 0;
+  mGroupNum = 0;
+  mAttrNum = 0;
 }
 
 // @brief デストラクタ
@@ -66,7 +56,7 @@ PtMgr::init()
 // @brief simple attribute を表す PtNode を生成する．
 // @param[in] value 値
 PtNode*
-PtMgr::new_ptsimple(const PtValue* value)
+PtMgr::new_ptsimple(const PtNode* value)
 {
   ++ mSimpleNum;
   void* p = mAlloc.get_memory(sizeof(PtSimpleNode));
@@ -76,7 +66,7 @@ PtMgr::new_ptsimple(const PtValue* value)
 // @brief complex attribute を表す PtNode を生成する．
 // @param[in] value_list 値のリスト
 PtNode*
-PtMgr::new_ptcomplex(const vector<const PtValue*>& value_list)
+PtMgr::new_ptcomplex(const vector<const PtNode*>& value_list)
 {
   ++ mComplexNum;
   void* p = mAlloc.get_memory(sizeof(PtComplexNode));
@@ -86,7 +76,7 @@ PtMgr::new_ptcomplex(const vector<const PtValue*>& value_list)
 // @brief group statement を表す PtNode を生成する．
 // @param[in] value_list 値のリスト
 PtNode*
-PtMgr::new_ptgroup(const vector<const PtValue*>& value_list)
+PtMgr::new_ptgroup(const vector<const PtNode*>& value_list)
 {
   ++ mGroupNum;
   void* p = mAlloc.get_memory(sizeof(PtGroupNode));
@@ -94,6 +84,7 @@ PtMgr::new_ptgroup(const vector<const PtValue*>& value_list)
 }
 #endif
 
+#if 0
 // @brief PtLibrary を生成する．
 // @param[in] name ライブラリ名
 PtLibrary*
@@ -171,11 +162,12 @@ PtMgr::new_pttable(const ShString& name)
   void* p = mAlloc.get_memory(sizeof(PtTable));
   return new (p) PtTable(name);
 }
+#endif
 
-// @brief 整数値を表す PtValue を生成する．
+// @brief 整数値を表す PtNode を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtValue*
+PtNode*
 PtMgr::new_int(int value,
 	       const FileRegion& loc)
 {
@@ -184,10 +176,10 @@ PtMgr::new_int(int value,
   return new (p) PtInt(value, loc);
 }
 
-// @brief 実数値を表す PtValue を生成する．
+// @brief 実数値を表す PtNode を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtValue*
+PtNode*
 PtMgr::new_float(double value,
 		 const FileRegion& loc)
 {
@@ -196,10 +188,10 @@ PtMgr::new_float(double value,
   return new (p) PtFloat(value, loc);
 }
 
-// @brief 定数シンボルを表す PtValue を生成する．
+// @brief 定数シンボルを表す PtNode を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtValue*
+PtNode*
 PtMgr::new_string(ShString value,
 		  const FileRegion& loc)
 {
@@ -208,58 +200,79 @@ PtMgr::new_string(ShString value,
   return new (p) PtString(value, loc);
 }
 
-// @brief + 演算子を表す PtValue を生成する．
+// @brief + 演算子を表す PtNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtValue*
-PtMgr::new_plus(PtValue* opr1,
-		PtValue* opr2)
+PtNode*
+PtMgr::new_plus(PtNode* opr1,
+		PtNode* opr2)
 {
   ++ mOprNum;
   void* p = mAlloc.get_memory(sizeof(PtOpr));
-  return new (p) PtOpr(PtValue::kPlus, opr1, opr2);
+  return new (p) PtOpr(PtNode::kPlus, opr1, opr2);
 }
 
-// @brief - 演算子を表す PtValue を生成する．
+// @brief - 演算子を表す PtNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtValue*
-PtMgr::new_minus(PtValue* opr1,
-		 PtValue* opr2)
+PtNode*
+PtMgr::new_minus(PtNode* opr1,
+		 PtNode* opr2)
 {
   ++ mOprNum;
   void* p = mAlloc.get_memory(sizeof(PtOpr));
-  return new (p) PtOpr(PtValue::kMinus, opr1, opr2);
+  return new (p) PtOpr(PtNode::kMinus, opr1, opr2);
 }
 
-// @brief * 演算子を表す PtValue を生成する．
+// @brief * 演算子を表す PtNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtValue*
-PtMgr::new_mult(PtValue* opr1,
-		PtValue* opr2)
+PtNode*
+PtMgr::new_mult(PtNode* opr1,
+		PtNode* opr2)
 {
   ++ mOprNum;
   void* p = mAlloc.get_memory(sizeof(PtOpr));
-  return new (p) PtOpr(PtValue::kMult, opr1, opr2);
+  return new (p) PtOpr(PtNode::kMult, opr1, opr2);
 }
 
-// @brief / 演算子を表す PtValue を生成する．
+// @brief / 演算子を表す PtNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtValue*
-PtMgr::new_div(PtValue* opr1,
-	       PtValue* opr2)
+PtNode*
+PtMgr::new_div(PtNode* opr1,
+	       PtNode* opr2)
 {
   ++ mOprNum;
   void* p = mAlloc.get_memory(sizeof(PtOpr));
-  return new (p) PtOpr(PtValue::kDiv, opr1, opr2);
+  return new (p) PtOpr(PtNode::kDiv, opr1, opr2);
 }
 
-// @brief リストを表す PtValue を生成する．
-// @param[in] top 先頭の要素
-PtValue*
-PtMgr::new_list(PtValue* top)
+// @brief リストを表す PtNode を生成する．
+PtNode*
+PtMgr::new_list()
 {
   ++ mListNum;
   void* p = mAlloc.get_memory(sizeof(PtList));
-  return new (p) PtList(top);
+  return new (p) PtList();
+}
+
+// @brief グループを表す PtNode を生成する．
+// @param[in] value 値
+// @param[in] loc ファイル上の位置
+PtNode*
+PtMgr::new_group(const PtNode* value,
+		 const FileRegion& loc)
+{
+  ++ mGroupNum;
+  void* p = mAlloc.get_memory(sizeof(PtGroup));
+  return new (p) PtGroup(value, loc);
+}
+
+// @brief PtAttr を生成する．
+PtAttr*
+PtMgr::new_attr(const ShString& attr_name,
+		const PtNode* value)
+{
+  ++ mAttrNum;
+  void* p = mAlloc.get_memory(sizeof(PtAttr));
+  return new (p) PtAttr(attr_name, value);
 }
 
 // @brief 使用メモリ量の一覧を出力する．
@@ -267,48 +280,7 @@ PtMgr::new_list(PtValue* top)
 void
 PtMgr::show_stats(ostream& s)
 {
-  s << "PtSimple:       " << setw(7) << mSimpleNum
-    << " x " << setw(3) << sizeof(PtSimpleNode)
-    << " = " << setw(10) << mSimpleNum * sizeof(PtSimpleNode) << endl
-
-    << "PtComplex:      " << setw(7) << mComplexNum
-    << " x " << setw(3) << sizeof(PtComplexNode)
-    << " = " << setw(10) << mComplexNum * sizeof(PtComplexNode) << endl
-
-    << "PtGroup:        " << setw(7) << mGroupNum
-    << " x " << setw(3) << sizeof(PtGroupNode)
-    << " = " << setw(10) << mGroupNum * sizeof(PtGroupNode) << endl
-
-    << "PtCell:         " << setw(7) << mCellNum
-    << " x " << setw(3) << sizeof(PtCell)
-    << " = " << setw(10) << mCellNum * sizeof(PtCell) << endl
-
-    << "PtLeakagePower: " << setw(7) << mLeakagePowerNum
-    << " x " << setw(3) << sizeof(PtLeakagePower)
-    << " = " << setw(10)
-    << mLeakagePowerNum * sizeof(PtLeakagePower) << endl
-
-    << "PtBus:          " << setw(7) << mBusNum
-    << " x " << setw(3) << sizeof(PtBus)
-    << " = " << setw(10) << mBusNum * sizeof(PtBus) << endl
-
-    << "PtBundle:       " << setw(7) << mBundleNum
-    << " x " << setw(3) << sizeof(PtBundle)
-    << " = " << setw(10) << mBundleNum * sizeof(PtBundle) << endl
-
-    << "PtPin:          " << setw(7) << mPinNum
-    << " x " << setw(3) << sizeof(PtPin)
-    << " = " << setw(10) << mPinNum * sizeof(PtPin) << endl
-
-    << "PtTiming:       " << setw(7) << mTimingNum
-    << " x " << setw(3) << sizeof(PtTiming)
-    << " = " << setw(10) << mTimingNum * sizeof(PtTiming) << endl
-
-    << "PtTable :       " << setw(7) << mTableNum
-    << " x " << setw(3) << sizeof(PtTable)
-    << " = " << setw(10) << mTableNum * sizeof(PtTable) << endl
-
-    << "PtInt:          " << setw(7) << mIntNum
+  s << "PtInt:          " << setw(7) << mIntNum
     << " x " << setw(3) << sizeof(PtInt)
     << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl
 
@@ -327,6 +299,14 @@ PtMgr::show_stats(ostream& s)
     << "PtList:         " << setw(7) << mListNum
     << " x " << setw(3) << sizeof(PtList)
     << " = " << setw(10) << mListNum * sizeof(PtList) << endl
+
+    << "PtGroup:        " << setw(7) << mGroupNum
+    << " x " << setw(3) << sizeof(PtGroup)
+    << " = " << setw(10) << mGroupNum * sizeof(PtGroup) << endl
+
+    << "PtAttr:         " << setw(7) << mAttrNum
+    << " x " << setw(3) << sizeof(PtAttr)
+    << " = " << setw(10) << mAttrNum * sizeof(PtAttr) << endl
 
     << "Total memory:                 = "
     << setw(10) << mAlloc.used_size() << endl

@@ -12,7 +12,6 @@
 #include "GroupHandler.h"
 #include "PtMgr.h"
 #include "PtNode.h"
-#include "PtValue.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -45,7 +44,7 @@ SimpleHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  PtValue* value = read_value();
+  PtNode* value = read_value();
   if ( value == NULL ) {
     return false;
   }
@@ -65,14 +64,14 @@ SimpleHandler::read_attr(const ShString& attr_name,
 }
 
 // @brief 値を読み込む処理
-// @return 値を表す PtValue を返す．
+// @return 値を表す PtNode を返す．
 // @note エラーが起きたら NULL を返す．
 // @note デフォルトの実装では普通に DotlibParser::read_token() を呼ぶ．
-PtValue*
+PtNode*
 SimpleHandler::read_value()
 {
   tTokenType value_type = parser().read_token(false);
-  PtValue* value = new_ptvalue(value_type);
+  PtNode* value = new_ptvalue(value_type);
   return value;
 }
 
@@ -84,7 +83,7 @@ SimpleHandler::read_value()
 bool
 SimpleHandler::set_value(const ShString& attr_name,
 			 const FileRegion& attr_loc,
-			 PtValue* value)
+			 PtNode* value)
 {
   return parent()->add_attr(attr_name, value);
 }
@@ -106,14 +105,14 @@ SymSimpleHandler::~SymSimpleHandler()
 }
 
 // @brief 値を読み込む処理
-// @return 値を表す PtValue を返す．
+// @return 値を表す PtNode を返す．
 // @note エラーが起きたら NULL を返す．
 // @note ここではシンボルモードで DotlibParser::read_token() を呼ぶ．
-PtValue*
+PtNode*
 SymSimpleHandler::read_value()
 {
   tTokenType value_type = parser().read_token(true);
-  PtValue* value = new_ptvalue(value_type);
+  PtNode* value = new_ptvalue(value_type);
   return value;
 }
 
@@ -134,11 +133,11 @@ IntSimpleHandler::~IntSimpleHandler()
 }
 
 // @brief 値を読み込む．
-PtValue*
+PtNode*
 IntSimpleHandler::read_value()
 {
-  PtValue* value = SimpleHandler::read_value();
-  if ( value->type() != PtValue::kInt ) {
+  PtNode* value = SimpleHandler::read_value();
+  if ( value->type() != PtNode::kInt ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -165,11 +164,11 @@ FloatSimpleHandler::~FloatSimpleHandler()
 }
 
 // @brief 値を読み込む．
-PtValue*
+PtNode*
 FloatSimpleHandler::read_value()
 {
-  PtValue* value = SimpleHandler::read_value();
-  if ( value->type() != PtValue::kFloat && value->type() != PtValue::kInt ) {
+  PtNode* value = SimpleHandler::read_value();
+  if ( value->type() != PtNode::kFloat && value->type() != PtNode::kInt ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -196,11 +195,11 @@ StrSimpleHandler::~StrSimpleHandler()
 }
 
 // @brief 値を読み込む．
-PtValue*
+PtNode*
 StrSimpleHandler::read_value()
 {
-  PtValue* value = SimpleHandler::read_value();
-  if ( value->type() != PtValue::kString ) {
+  PtNode* value = SimpleHandler::read_value();
+  if ( value->type() != PtNode::kString ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",

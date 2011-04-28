@@ -13,6 +13,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス PtCell
 //////////////////////////////////////////////////////////////////////
@@ -99,5 +100,6 @@ PtCell::bundle(ymuint pos) const
   assert_cond( pos < bundle_num(), __FILE__, __LINE__);
   return mBundleList[pos];
 }
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB

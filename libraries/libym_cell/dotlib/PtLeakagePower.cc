@@ -36,7 +36,7 @@ PtLeakagePower::value_num() const
 
 // @brief 値を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < value_num() )
-const PtValue*
+const PtNode*
 PtLeakagePower::value(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);

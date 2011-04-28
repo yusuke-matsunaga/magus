@@ -39,11 +39,11 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を読み込む処理
-  /// @return 値を表す PtValue を返す．
+  /// @return 値を表す PtNode を返す．
   /// @note エラーが起きたら NULL を返す．
   /// @note ここでは expression のパースを行う．
   virtual
-  PtValue*
+  PtNode*
   read_value();
 
 
@@ -53,15 +53,15 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief primary を読み込む．
-  PtValue*
+  PtNode*
   read_primary();
 
   /// @brief prudct を読み込む．
-  PtValue*
+  PtNode*
   read_product();
 
   /// @brief expression を読み込む．
-  PtValue*
+  PtNode*
   read_expr(tTokenType end_marker);
 
   /// @brief トークンを読み込む．

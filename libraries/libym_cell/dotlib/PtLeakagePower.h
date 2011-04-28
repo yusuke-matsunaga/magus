@@ -53,7 +53,7 @@ public:
   /// @brief 値を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
   virtual
-  const PtValue*
+  const PtNode*
   value(ymuint pos) const;
 
 
@@ -70,16 +70,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // power_level 属性
-  PtValue* mPowerLevel;
+  PtNode* mPowerLevel;
 
   // related_pg_pin 属性
-  PtValue* mRelatedPgPin;
+  PtNode* mRelatedPgPin;
 
   // when 属性
-  PtValue* mWhen;
+  PtNode* mWhen;
 
   // value 属性
-  PtValue* mValue;
+  PtNode* mValue;
 
 };
 

@@ -11,7 +11,7 @@
 #include "DotlibParser.h"
 #include "SimpleHandler.h"
 #include "GroupHandler.h"
-#include "PtValue.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -40,7 +40,7 @@ bool
 DefineHandler::read_attr(const ShString& attr_name,
 			 const FileRegion& attr_loc)
 {
-  PtValue* value = parse_complex();
+  PtNode* value = parse_complex();
   if ( value == NULL ) {
     return false;
   }
@@ -53,8 +53,8 @@ DefineHandler::read_attr(const ShString& attr_name,
     cout << attr_name << value << endl;
   }
 
-  const PtValue* keyword = value;
-  if ( keyword == NULL || keyword->type() != PtValue::kString ) {
+  const PtNode* keyword = value->top();
+  if ( keyword == NULL || keyword->type() != PtNode::kString ) {
     put_msg(__FILE__, __LINE__, keyword->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -62,8 +62,8 @@ DefineHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  const PtValue* group = keyword->next();
-  if ( group == NULL || group->type() != PtValue::kString ) {
+  const PtNode* group = keyword->next();
+  if ( group == NULL || group->type() != PtNode::kString ) {
     put_msg(__FILE__, __LINE__, group->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -71,8 +71,8 @@ DefineHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  const PtValue* type_token = group->next();
-  if ( type_token == NULL || type_token->type() != PtValue::kString ) {
+  const PtNode* type_token = group->next();
+  if ( type_token == NULL || type_token->type() != PtNode::kString ) {
     put_msg(__FILE__, __LINE__, type_token->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",

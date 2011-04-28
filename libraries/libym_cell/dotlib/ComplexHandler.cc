@@ -12,7 +12,6 @@
 #include "GroupHandler.h"
 #include "PtMgr.h"
 #include "PtNode.h"
-#include "PtValue.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
@@ -41,7 +40,7 @@ bool
 ComplexHandler::read_attr(const ShString& attr_name,
 			  const FileRegion& attr_loc)
 {
-  PtValue* value = parse_complex();
+  PtNode* value = parse_complex();
   if ( value == NULL ) {
     return false;
   }
@@ -69,7 +68,7 @@ ComplexHandler::read_attr(const ShString& attr_name,
 bool
 ComplexHandler::set_value(const ShString& attr_name,
 			  const FileRegion& attr_loc,
-			  PtValue* value)
+			  PtNode* value)
 {
   return parent()->add_attr(attr_name, value);
 }

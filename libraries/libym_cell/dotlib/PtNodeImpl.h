@@ -15,41 +15,81 @@
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtSimpleNode PtNodeImpl.h "PtNodeImpl.h"
-/// @brief simple attribute を表す PtNode の継承クラス
+/// @class PtNodeBase PtNodeImple.h "PtNodeImpl.h"
+/// @brief 直接値を表すクラスの基底クラス
 //////////////////////////////////////////////////////////////////////
-class PtSimpleNode :
+class PtNodeBase :
   public PtNode
+{
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] loc ファイル上の位置
+  PtNodeBase(const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~PtNodeBase();
+
+
+public:
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ファイル上の位置
+  FileRegion mLoc;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtInt PtNodeImple.h "PtNodeImpl.h"
+/// @brief 整数値を表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtInt :
+  public PtNodeBase
 {
   friend class PtMgr;
 
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] value 値を表すトークン
-  PtSimpleNode(const PtValue* value);
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtInt(int value,
+	const FileRegion& loc);
 
   /// @brief デストラクタ
-  virtual
-  ~PtSimpleNode();
+  ~PtInt();
 
 
 public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
-  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値の数を返す．
-  /// @note simple attribute なら常に1
+  /// @brief 型を得る．
   virtual
-  ymuint
-  value_num() const;
+  tType
+  type() const;
 
-  /// @brief 値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
+  /// @brief 整数値を返す．
+  /// @note type() が kInt の時のみ意味を持つ．
   virtual
-  const PtValue*
-  value(ymuint pos) const;
+  int
+  int_value() const;
+
+  /// @brief 数値を返す．
+  /// @note type() が kFloat の時のみ意味を持つ．
+  /// @note 実は kInt でもOK
+  virtual
+  double
+  float_value() const;
 
 
 private:
@@ -58,44 +98,44 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  const PtValue* mValue;
+  int mValue;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtComplexNode PtNodeImpl.h "PtNodeImpl.h"
-/// @brief complex attribute を表す PtNode の継承クラス
+/// @class PtFloat PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 実数値を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PtComplexNode :
-  public PtNode
+class PtFloat :
+  public PtNodeBase
 {
-public:
+  friend class PtMgr;
 
-  /// @brief 用のコンストラクタ
-  /// @param[in] value_list 値を表すトークンのリスト
-  PtComplexNode(const vector<const PtValue*>& value_list);
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtFloat(double value,
+	  const FileRegion& loc);
 
   /// @brief デストラクタ
-  virtual
-  ~PtComplexNode();
+  ~PtFloat();
 
 
 public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
-  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 値の数を返す．
+  /// @brief 型を得る．
   virtual
-  ymuint
-  value_num() const;
+  tType
+  type() const;
 
-  /// @brief 値を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < value_num() )
+  /// @brief 数値を返す．
+  /// @note type() が kFloat の時のみ意味を持つ．
   virtual
-  const PtValue*
-  value(ymuint pos) const;
+  double
+  float_value() const;
 
 
 private:
@@ -103,28 +143,159 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値のリスト
-  vector<const PtValue*> mValueList;
+  // 値
+  double mValue;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtGroupNode PtNodeImpl.h "PtNodeImpl.h"
-/// @brief group statement を表す PtNode の継承クラス
+/// @class PtString PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 文字列を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PtGroupNode :
-  public PtComplexNode
+class PtString :
+  public PtNodeBase
 {
-public:
+  friend class PtMgr;
+
+private:
 
   /// @brief コンストラクタ
-  /// @param[in] value_list 値を表すトークンのリスト
-  PtGroupNode(const vector<const PtValue*>& value_list);
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtString(ShString value,
+	   const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~PtString();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 定数シンボルを返す．
+  /// @note type() が kString の時のみ意味を持つ．
+  virtual
+  ShString
+  string_value() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  ShString mValue;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtOpr PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 演算子を表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtOpr :
+  public PtNode
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] type 演算子の型
+  /// @param[in] opr1, opr2 オペランド
+  PtOpr(tType type,
+	PtNode* opr1,
+	PtNode* opr2);
 
   /// @brief デストラクタ
   virtual
-  ~PtGroupNode();
+  ~PtOpr();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+  /// @brief 第一オペランドを返す．
+  /// @note type() が演算子の型の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  opr1() const;
+
+  /// @brief 第二オペランドを返す．
+  /// @note type() が演算子の型の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  opr2() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 型
+  tType mType;
+
+  // 第一オペランド
+  const PtNode* mOpr1;
+
+  // 第二オペランド
+  const PtNode* mOpr2;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtList PtNodeImpl.h "PtNodeImpl.h"
+/// @brief リストを表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtList :
+  public PtNode
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  PtList();
+
+  /// @brief デストラクタ
+  virtual
+  ~PtList();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+  /// @brief リストの先頭の要素を返す．
+  /// @note type() が kList の時のみ意味をもつ．
+  virtual
+  const PtNode*
+  top() const;
 
 
 public:
@@ -132,46 +303,12 @@ public:
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 子供を追加する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] node 追加する子供のノード
+  /// @brief 要素を追加する．
+  /// @param[in] node 追加する要素
+  /// @note type() が kList の時のみ意味を持つ．
   virtual
   void
-  add_child(const ShString& attr_name,
-	    PtNode* node);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 子供の属性名の個数を返す．
-  /// @note デフォルトの実装は 0 を返す．
-  virtual
-  ymuint
-  child_attr_num() const;
-
-  /// @brief 子供の属性名を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_attr_num() )
-  virtual
-  ShString
-  child_attr_name(ymuint pos) const;
-
-  /// @brief 属性に対応した子供の要素数を返す．
-  /// @param[in] attr_name 子供の属性名
-  /// @note デフォルトの実装は 0 を返す．
-  virtual
-  ymuint
-  child_num(const ShString& attr_name) const;
-
-  /// @brief 属性に対応した子供を返す．
-  /// @param[in] attr_name 子供の属性名
-  /// @param[in] pos 位置番号 ( 0 <= pos < child_num(attr_name) )
-  virtual
-  const PtNode*
-  child(const ShString& attr_name,
-	ymuint pos) const;
+  add_node(PtNode* node);
 
 
 private:
@@ -179,13 +316,83 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 属性名のリスト
-  vector<ShString> mAttrList;
+  // 先頭の要素
+  const PtNode* mTop;
 
-#if 1
-  // 属性名をキーにして子供のリストを格納する連想配列
-  hash_map<ShString, vector<PtNode*> > mChildMap;
-#endif
+  // 末尾の要素
+  PtNode* mTail;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtGroup PtNodeImpl.h "PtNodeImpl.h"
+/// @brief group statement を表す PtNode の継承クラス
+//////////////////////////////////////////////////////////////////////
+class PtGroup :
+  public PtNodeBase
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtGroup(const PtNode* value,
+	  const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~PtGroup();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を参照する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 値を得る．
+  /// @note type() が kGroup の時のみ意味を持つ．
+  const PtNode*
+  value() const;
+
+  /// @brief 先頭の属性を得る．
+  /// @note type() が kGroup の時のみ意味を持つ．
+  const PtAttr*
+  attr_top() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief attribute を設定する．
+  /// @param[in] attr 属性
+  /// @note type() が kGroup の時のみ意味を持つ．
+  virtual
+  void
+  add_attr(PtAttr* attr);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  const PtNode* mValue;
+
+  // 属性の先頭
+  PtAttr* mAttrTop;
+
+  // 属性の末尾
+  PtAttr* mAttrTail;
+
 };
 
 END_NAMESPACE_YM_CELL_DOTLIB

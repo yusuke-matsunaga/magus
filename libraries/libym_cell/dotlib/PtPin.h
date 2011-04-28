@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class PtPin PtPin.h "PtPin.h"
 /// @brief ピンを表す PtNode の継承クラス
@@ -66,6 +67,7 @@ private:
   vector<const PtTiming*> mTimingList;
 
 };
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

@@ -13,7 +13,7 @@
 
 
 BEGIN_NAMESPACE_YM_CELL_DOTLIB
-
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class PtLibrary PtLibrary.h "PtLibrary.h"
 /// @brief library グループを表すパース木の要素
@@ -42,30 +42,6 @@ public:
   /// @retval false エラーが起こった．
   bool
   add_cell(PtCell* cell);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を設定する PtNode の仮想関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief simple attribute を設定する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] value 値
-  /// @return 設定が失敗したら false を返す．
-  virtual
-  bool
-  add_simple_attr(const ShString& attr_name,
-		  const PtValue* value);
-
-  /// @brief complex attribute を設定する．
-  /// @param[in] attr_name 属性名
-  /// @param[in] value_list 値のリスト
-  /// @return 設定が失敗したら false を返す．
-  virtual
-  bool
-  add_complex_attr(const ShString& attr_name,
-		   const vector<const PtValue*>& value_list);
 
 
 public:
@@ -102,6 +78,7 @@ private:
   hash_map<ShString, PtCell*> mCellMap;
 
 };
+#endif
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

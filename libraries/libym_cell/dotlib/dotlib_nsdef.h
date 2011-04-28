@@ -82,16 +82,7 @@ class GroupHandler;
 
 class PtMgr;
 class PtNode;
-class PtLibrary;
-class PtCell;
-class PtLeakagePower;
-class PtBus;
-class PtBundle;
-class PtPin;
-class PtTiming;
-class PtTable;
-class PtDomain;
-class PtValue;
+class PtAttr;
 
 END_NAMESPACE_YM_CELL_DOTLIB
 

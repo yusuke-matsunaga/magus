@@ -74,13 +74,13 @@ protected:
   /// @brief group attribute 用のパースを行う．
   /// @return 読み込んだ値(リスト)を返す．
   /// @note エラーが起きたら NULL を返す．
-  PtValue*
+  PtNode*
   parse_complex();
 
-  /// @brief PtValue を生成する．
+  /// @brief PtNode を生成する．
   /// @param[in] type 型
   /// @note 残りの情報は parser() からとってくる．
-  PtValue*
+  PtNode*
   new_ptvalue(tTokenType type);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
