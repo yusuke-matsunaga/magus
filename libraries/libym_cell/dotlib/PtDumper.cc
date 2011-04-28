@@ -41,6 +41,29 @@ indent_str(ymuint indent)
   return ans;
 }
 
+// str 中に [a-zA-Z0-9_] 以外の文字が含まれていたら
+// " " で囲んで出力する．
+void
+dump_str(ostream& s,
+	 const ShString& str)
+{
+  bool need_quote = false;
+  for (const char* p = str; *p; ++ p) {
+    int c = *p;
+    if ( !isalnum(c) && c != '_' ) {
+      need_quote = true;
+      break;
+    }
+  }
+  if ( need_quote ) {
+    s << "\"";
+  }
+  s << str;
+  if ( need_quote ) {
+    s << "\"";
+  }
+}
+
 void
 dump_sub(ostream& s,
 	 const PtNode* node,
@@ -56,7 +79,7 @@ dump_sub(ostream& s,
     break;
 
   case PtNode::kString:
-    s << node->string_value();
+    dump_str(s, node->string_value());
     break;
 
   case PtNode::kPlus:
@@ -93,21 +116,21 @@ dump_sub(ostream& s,
 
   case PtNode::kList:
     {
-      s << "{ ";
+      s << "( ";
       const char* comma = "";
       for (const PtNode* v = node->top(); v; v = v->next()) {
 	s << comma;
 	dump_sub(s, v, indent);
 	comma = ", ";
       }
-      s << " }";
+      s << " )";
     }
     break;
 
   case PtNode::kGroup:
-    s << "( ";
+    s << " ";
     dump_sub(s, node->value(), 0);
-    s << " ) {" << endl;
+    s << " {" << endl;
     for (const PtAttr* attr = node->attr_top(); attr; attr = attr->next()) {
       s << indent_str(indent + 2) << attr->attr_name() << ": ";
       dump_sub(s, attr->value(), indent + 2);
