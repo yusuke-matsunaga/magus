@@ -15,8 +15,6 @@
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
-class PtNodeImpl;
-
 //////////////////////////////////////////////////////////////////////
 /// @class ExprHandler ExprHandler.h "ExprHandler.h"
 /// @brief expression の値をとる simple attribute 用のハンドラ

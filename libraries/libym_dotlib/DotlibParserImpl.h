@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_dotlib/dotlib_nsdef.h"
+#include "dotlib_int.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
@@ -20,8 +20,6 @@
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
-
-class DotlibHandler;
 
 //////////////////////////////////////////////////////////////////////
 /// DotlibParser の実装クラス

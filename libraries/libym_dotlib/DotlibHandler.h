@@ -9,16 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_dotlib/dotlib_nsdef.h"
+#include "dotlib_int.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
-
-class DotlibParserImpl;
-class GroupHandler;
-class PtNodeImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DotlibHandler DotlibHandler.h "DotlibHandler.h"

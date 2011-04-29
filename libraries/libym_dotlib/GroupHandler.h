@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
-class PtNodeImpl;
-
 //////////////////////////////////////////////////////////////////////
 /// @class GroupHandler GroupHandler.h "GroupHandler.h"
 /// @brief group statement 用のハンドラ

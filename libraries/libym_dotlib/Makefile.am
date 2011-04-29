@@ -26,6 +26,7 @@ libym_dotlib_la_LIBADD = \
 libym_dotlib_la_LDFLAGS =
 
 libym_dotlib_la_SOURCES = \
+	dotlib_int.h \
 	DotlibParser.cc \
 	DotlibParserImpl.h \
 	DotlibParserImpl.cc \

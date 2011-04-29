@@ -9,15 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_dotlib/dotlib_nsdef.h"
+#include "dotlib_int.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
-
-class DotlibHandler;
-class GroupHandler;
-class DotlibParserImpl;
-class PtMgr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class HandlerFactory HandlerFactory.h "HandlerFactory.h"
