@@ -1,0 +1,593 @@
+#ifndef LIBYM_DOTLIB_PTNODEIMPL_H
+#define LIBYM_DOTLIB_PTNODEIMPL_H
+
+/// @file libym_dotlib/PtNodeImpl.h
+/// @brief PtNode の継承クラスのヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ym_dotlib/PtNode.h"
+
+
+BEGIN_NAMESPACE_YM_DOTLIB
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtNodeImpl PtNodeImple.h "PtNodeImpl.h"
+/// @brief PtNode の実装クラス
+//////////////////////////////////////////////////////////////////////
+class PtNodeImpl :
+  public PtNode
+{
+  friend class PtList;
+
+protected:
+
+  /// @brief コンストラクタ
+  PtNodeImpl();
+
+  /// @brief デストラクタ
+  ~PtNodeImpl();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // PtNode の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 整数型(kInt)の時に true を返す．
+  virtual
+  bool
+  is_int() const;
+
+  /// @brief 数値型(kInt か kFloat)の時に true を返す．
+  virtual
+  bool
+  is_float() const;
+
+  /// @brief 文字列型(kString)の時に true を返す．
+  virtual
+  bool
+  is_string() const;
+
+  /// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
+  virtual
+  bool
+  is_opr() const;
+
+  /// @brief リスト型(kList)の時に true を返す．
+  virtual
+  bool
+  is_list() const;
+
+  /// @brief グループ型(kGroup)の時に true を返す．
+  virtual
+  bool
+  is_group() const;
+
+  /// @brief 整数値を返す．
+  /// @note is_int() = true の時のみ意味を持つ．
+  virtual
+  int
+  int_value() const;
+
+  /// @brief 数値を返す．
+  /// @note is_float() = true の時のみ意味を持つ．
+  virtual
+  double
+  float_value() const;
+
+  /// @brief 文字列シンボルを返す．
+  /// @note is_string() = true の時のみ意味を持つ．
+  virtual
+  ShString
+  string_value() const;
+
+  /// @brief 第一オペランドを返す．
+  /// @note is_opr() = true の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  opr1() const;
+
+  /// @brief 第二オペランドを返す．
+  /// @note is_opr() = true の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  opr2() const;
+
+  /// @brief リストの先頭の要素を返す．
+  /// @note is_list() = true の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  top() const;
+
+  /// @brief リストの要素数を返す．
+  /// @note is_list() = true の時のみ意味を持つ．
+  virtual
+  ymuint
+  list_size() const;
+
+  /// @brief リストの次の要素を得る．
+  /// @note これはすべての型で意味を持つ．
+  virtual
+  const PtNode*
+  next() const;
+
+  /// @brief 値を得る．
+  /// @note is_group() = true の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  value() const;
+
+  /// @brief 先頭の属性を得る．
+  /// @note is_group() = true の時のみ意味を持つ．
+  virtual
+  const PtAttr*
+  attr_top() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 要素を追加する．
+  /// @param[in] node 追加する要素
+  /// @note is_list() = true の時のみ意味を持つ．
+  virtual
+  void
+  add_node(PtNodeImpl* node);
+
+  /// @brief attribute を設定する．
+  /// @param[in] attr 属性
+  /// @note is_group() = true の時のみ意味を持つ．
+  virtual
+  void
+  add_attr(PtAttr* attr);
+
+  /// @brief 次の要素を設定する．
+  /// @param[in] next 次の要素
+  void
+  set_next(PtNodeImpl* next);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 次の要素を指すリンクポインタ
+  PtNodeImpl* mNext;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtNodeBase PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 直接値を表すクラスの基底クラス
+//////////////////////////////////////////////////////////////////////
+class PtNodeBase :
+  public PtNodeImpl
+{
+protected:
+
+  /// @brief コンストラクタ
+  /// @param[in] loc ファイル上の位置
+  PtNodeBase(const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~PtNodeBase();
+
+
+public:
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ファイル上の位置
+  FileRegion mLoc;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtInt PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 整数値を表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtInt :
+  public PtNodeBase
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtInt(int value,
+	const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~PtInt();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 整数型(kInt)の時に true を返す．
+  virtual
+  bool
+  is_int() const;
+
+  /// @brief 数値型(kInt か kFloat)の時に true を返す．
+  virtual
+  bool
+  is_float() const;
+
+  /// @brief 整数値を返す．
+  /// @note type() が kInt の時のみ意味を持つ．
+  virtual
+  int
+  int_value() const;
+
+  /// @brief 数値を返す．
+  /// @note type() が kFloat の時のみ意味を持つ．
+  /// @note 実は kInt でもOK
+  virtual
+  double
+  float_value() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  int mValue;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtFloat PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 実数値を表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtFloat :
+  public PtNodeBase
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtFloat(double value,
+	  const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~PtFloat();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 数値型(kInt か kFloat)の時に true を返す．
+  virtual
+  bool
+  is_float() const;
+
+  /// @brief 数値を返す．
+  /// @note type() が kFloat の時のみ意味を持つ．
+  virtual
+  double
+  float_value() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  double mValue;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtString PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 文字列を表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtString :
+  public PtNodeBase
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtString(ShString value,
+	   const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~PtString();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 文字列型(kString)の時に true を返す．
+  virtual
+  bool
+  is_string() const;
+
+  /// @brief 定数シンボルを返す．
+  /// @note type() が kString の時のみ意味を持つ．
+  virtual
+  ShString
+  string_value() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  ShString mValue;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtOpr PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 演算子を表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtOpr :
+  public PtNodeImpl
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] type 演算子の型
+  /// @param[in] opr1, opr2 オペランド
+  PtOpr(tType type,
+	PtNode* opr1,
+	PtNode* opr2);
+
+  /// @brief デストラクタ
+  virtual
+  ~PtOpr();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
+  virtual
+  bool
+  is_opr() const;
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+  /// @brief 第一オペランドを返す．
+  /// @note type() が演算子の型の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  opr1() const;
+
+  /// @brief 第二オペランドを返す．
+  /// @note type() が演算子の型の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  opr2() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 型
+  tType mType;
+
+  // 第一オペランド
+  const PtNode* mOpr1;
+
+  // 第二オペランド
+  const PtNode* mOpr2;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtList PtNodeImpl.h "PtNodeImpl.h"
+/// @brief リストを表すクラス
+//////////////////////////////////////////////////////////////////////
+class PtList :
+  public PtNodeImpl
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  PtList();
+
+  /// @brief デストラクタ
+  virtual
+  ~PtList();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief リスト型(kList)の時に true を返す．
+  virtual
+  bool
+  is_list() const;
+
+  /// @brief ファイル上の位置を返す．
+  virtual
+  FileRegion
+  loc() const;
+
+  /// @brief リストの先頭の要素を返す．
+  /// @note type() が kList の時のみ意味をもつ．
+  virtual
+  const PtNode*
+  top() const;
+
+  /// @brief リストの要素数を返す．
+  /// @note is_list() = true の時のみ意味を持つ．
+  virtual
+  ymuint
+  list_size() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 要素を追加する．
+  /// @param[in] node 追加する要素
+  /// @note type() が kList の時のみ意味を持つ．
+  virtual
+  void
+  add_node(PtNodeImpl* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 先頭の要素
+  const PtNodeImpl* mTop;
+
+  // 末尾の要素
+  PtNodeImpl* mTail;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtGroup PtNodeImpl.h "PtNodeImpl.h"
+/// @brief group statement を表す PtNode の継承クラス
+//////////////////////////////////////////////////////////////////////
+class PtGroup :
+  public PtNodeBase
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtGroup(const PtNode* value,
+	  const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~PtGroup();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を参照する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief グループ型(kGroup)の時に true を返す．
+  virtual
+  bool
+  is_group() const;
+
+  /// @brief 値を得る．
+  /// @note type() が kGroup の時のみ意味を持つ．
+  virtual
+  const PtNode*
+  value() const;
+
+  /// @brief 先頭の属性を得る．
+  /// @note type() が kGroup の時のみ意味を持つ．
+  virtual
+  const PtAttr*
+  attr_top() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief attribute を設定する．
+  /// @param[in] attr 属性
+  /// @note type() が kGroup の時のみ意味を持つ．
+  virtual
+  void
+  add_attr(PtAttr* attr);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 値
+  const PtNode* mValue;
+
+  // 属性の先頭
+  PtAttr* mAttrTop;
+
+  // 属性の末尾
+  PtAttr* mAttrTail;
+
+};
+
+END_NAMESPACE_YM_DOTLIB
+
+#endif // LIBYM_DOTLIB_PTNODEIMPL_H

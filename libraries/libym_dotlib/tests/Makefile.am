@@ -26,21 +26,12 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 bin_PROGRAMS = \
-	mislib_parser_test \
-	mislib_reader_test
+	dotlib_parser_test
 
-mislib_parser_test_SOURCES = \
-	mislib_parser_test.cc
+dotlib_parser_test_SOURCES = \
+	dotlib_parser_test.cc
 
-mislib_parser_test_LDFLAGS =
+dotlib_parser_test_LDFLAGS =
 
-mislib_parser_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
-
-mislib_reader_test_SOURCES = \
-	mislib_reader_test.cc
-
-mislib_reader_test_LDFLAGS =
-
-mislib_reader_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+dotlib_parser_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la

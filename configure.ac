@@ -71,6 +71,7 @@ ym_libym_sat_enable=1
 ym_libym_smtlibv2_enable=1
 ym_libym_blif_enable=1
 ym_libym_iscas89_enable=1
+ym_libym_dotlib_enable=1
 ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_bnet_enable=1
@@ -131,6 +132,10 @@ YM_BUILD_LIBRARY([libym_blif],
 
 # libym_iscas89
 YM_BUILD_LIBRARY([libym_iscas89],
+		 [ym_libym_utils_enable])
+
+# libym_dotlib
+YM_BUILD_LIBRARY([libym_dotlib],
 		 [ym_libym_utils_enable])
 
 # libym_cell

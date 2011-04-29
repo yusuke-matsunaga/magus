@@ -123,6 +123,7 @@ LIBRARIES=\
  libym_mincov \
  libym_blif \
  libym_iscas89 \
+ libym_dotlib \
  libym_cell \
  libym_verilog \
  libym_bnet \
