@@ -46,4 +46,19 @@ DotlibParser::read_file(const string& filename,
   return mImpl->read_file(filename, debug, allow_no_semi);
 }
 
+// @brief 直前の read_file() で確保したパース木を解放する．
+void
+DotlibParser::clear_node()
+{
+  mImpl->clear_node();
+}
+
+// @brief メモリ使用量のサマリを出力する．
+// @param[in] s 出力先のストリーム
+void
+DotlibParser::show_stats(ostream& s)
+{
+  mImpl->show_stats(s);
+}
+
 END_NAMESPACE_YM_DOTLIB

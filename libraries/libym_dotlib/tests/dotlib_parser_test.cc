@@ -55,10 +55,8 @@ dotlibparser_test(int argc,
   USTime time = timer.time();
   cout << "Time: " << time << endl;
 
-#if 0
-  ptmgr.show_stats(cout);
+  parser.show_stats(cout);
   for ( ; ; ) { }
-#endif
 
   return error ? 0 : -1;
 }

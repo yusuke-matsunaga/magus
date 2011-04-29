@@ -97,6 +97,21 @@ last:
   return mLibraryHandler->pt_node();
 }
 
+// @brief 直前の read_file() で確保したパース木を解放する．
+void
+DotlibParserImpl::clear_node()
+{
+  mPtMgr.init();
+}
+
+// @brief メモリ使用量のサマリを出力する．
+// @param[in] s 出力先のストリーム
+void
+DotlibParserImpl::show_stats(ostream& s)
+{
+  mPtMgr.show_stats(s);
+}
+
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
 bool
 DotlibParserImpl::expect(tTokenType req_type)

@@ -47,6 +47,15 @@ public:
 	    bool debug,
 	    bool allow_no_semi = true);
 
+  /// @brief 直前の read_file() で確保したパース木を解放する．
+  void
+  clear_node();
+
+  /// @brief メモリ使用量のサマリを出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  show_stats(ostream& s);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
