@@ -8,8 +8,7 @@
 
 
 #include "ym_dotlib/PtDumper.h"
-#include "ym_dotlib/PtNode.h"
-#include "ym_dotlib/PtAttr.h"
+#include "ym_dotlib/DotlibNode.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -66,23 +65,23 @@ dump_str(ostream& s,
 
 void
 dump_sub(ostream& s,
-	 const PtNode* node,
+	 const DotlibNode* node,
 	 ymuint indent)
 {
   switch ( node->type() ) {
-  case PtNode::kInt:
+  case DotlibNode::kInt:
     s << node->int_value();
     break;
 
-  case PtNode::kFloat:
+  case DotlibNode::kFloat:
     s << node->float_value();
     break;
 
-  case PtNode::kString:
+  case DotlibNode::kString:
     dump_str(s, node->string_value());
     break;
 
-  case PtNode::kPlus:
+  case DotlibNode::kPlus:
     s << "( ";
     dump_sub(s, node->opr1(), indent);
     s << " + ";
@@ -90,7 +89,7 @@ dump_sub(ostream& s,
     s << " )";
     break;
 
-  case PtNode::kMinus:
+  case DotlibNode::kMinus:
     s << "( ";
     dump_sub(s, node->opr1(), indent);
     s << " - ";
@@ -98,7 +97,7 @@ dump_sub(ostream& s,
     s << " )";
     break;
 
-  case PtNode::kMult:
+  case DotlibNode::kMult:
     s << "( ";
     dump_sub(s, node->opr1(), indent);
     s << " * ";
@@ -106,7 +105,7 @@ dump_sub(ostream& s,
     s << " )";
     break;
 
-  case PtNode::kDiv:
+  case DotlibNode::kDiv:
     s << "( ";
     dump_sub(s, node->opr1(), indent);
     s << " / ";
@@ -114,11 +113,11 @@ dump_sub(ostream& s,
     s << " )";
     break;
 
-  case PtNode::kList:
+  case DotlibNode::kList:
     {
       s << "( ";
       const char* comma = "";
-      for (const PtNode* v = node->top(); v; v = v->next()) {
+      for (const DotlibNode* v = node->top(); v; v = v->next()) {
 	s << comma;
 	dump_sub(s, v, indent);
 	comma = ", ";
@@ -127,18 +126,24 @@ dump_sub(ostream& s,
     }
     break;
 
-  case PtNode::kGroup:
+  case DotlibNode::kGroup:
     s << " ";
-    dump_sub(s, node->value(), 0);
+    dump_sub(s, node->group_value(), 0);
     s << " {" << endl;
-    for (const PtAttr* attr = node->attr_top(); attr; attr = attr->next()) {
+    for (const DotlibNode* attr = node->attr_top(); attr; attr = attr->next()) {
+      assert_cond( attr->is_attr() == true, __FILE__, __LINE__);
       s << indent_str(indent + 2) << attr->attr_name() << ": ";
-      dump_sub(s, attr->value(), indent + 2);
-      if ( attr->value()->type() != PtNode::kGroup ) {
+      const DotlibNode* value = attr->attr_value();
+      dump_sub(s, value, indent + 2);
+      if ( !value->is_group() ) {
 	s << ";" << endl;
       }
     }
     s << indent_str(indent) << "}" << endl;
+    break;
+
+  case DotlibNode::kAttr:
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
 }
@@ -151,7 +156,7 @@ END_NONAMESPACE
 // @param[in] root パース木のノード
 void
 PtDumper::operator()(ostream& s,
-		     const PtNode* root)
+		     const DotlibNode* root)
 {
   s << "library ";
   dump_sub(s, root, 0);

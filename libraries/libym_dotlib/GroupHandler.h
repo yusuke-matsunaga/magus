@@ -26,8 +26,7 @@ public:
   /// @brief 親を持たないハンドラ用のコンストラクタ
   /// @param[in] parser パーサー
   /// @param[in] ptmgr パース木を管理するオブジェクト
-  GroupHandler(DotlibParserImpl& parser,
-	       PtMgr& ptmgr);
+  GroupHandler(DotlibParserImpl& parser);
 
   /// @brief 親を持つハンドラ用のコンストラクタ
   /// @param[in] parent 親のハンドラ
@@ -89,16 +88,18 @@ public:
   /// @brief attribute を設定する．
   /// @param[in] attr_name 属性名
   /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
   /// @return 設定が失敗したら false を返す．
   /// @note デフォルトの実装はエラーとなる．
   virtual
   bool
   add_attr(const ShString& attr_name,
-	   PtNodeImpl* value);
+	   PtNodeImpl* value,
+	   const FileRegion& loc);
 
   /// @brief 対応するノードを得る．
   virtual
-  PtNode*
+  const DotlibNode*
   pt_node();
 
 
@@ -198,9 +199,7 @@ public:
 
   /// @brief 親を持たないハンドラ用のコンストラクタ
   /// @param[in] parser パーサー
-  /// @param[in] ptmgr パース木を管理するオブジェクト
-  Str1GroupHandler(DotlibParserImpl& parser,
-		   PtMgr& ptmgr);
+  Str1GroupHandler(DotlibParserImpl& parser);
 
   /// @brief 親を持つハンドラ用のコンストラクタ
   /// @param[in] parent 親のハンドラ

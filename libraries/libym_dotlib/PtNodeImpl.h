@@ -9,19 +9,21 @@
 /// All rights reserved.
 
 
-#include "ym_dotlib/PtNode.h"
+#include "ym_dotlib/DotlibNode.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @class PtNodeImpl PtNodeImple.h "PtNodeImpl.h"
-/// @brief PtNode の実装クラス
+/// @brief DotlibNode の実装クラス
 //////////////////////////////////////////////////////////////////////
 class PtNodeImpl :
-  public PtNode
+  public DotlibNode
 {
+  friend class PtMgr;
   friend class PtList;
+  friend class PtGroup;
 
 protected:
 
@@ -29,6 +31,7 @@ protected:
   PtNodeImpl();
 
   /// @brief デストラクタ
+  virtual
   ~PtNodeImpl();
 
 
@@ -67,6 +70,11 @@ public:
   bool
   is_group() const;
 
+  /// @brief 属性型(kAttr)の時に true を返す．
+  virtual
+  bool
+  is_attr() const;
+
   /// @brief 整数値を返す．
   /// @note is_int() = true の時のみ意味を持つ．
   virtual
@@ -88,19 +96,19 @@ public:
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   opr1() const;
 
   /// @brief 第二オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   opr2() const;
 
   /// @brief リストの先頭の要素を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   top() const;
 
   /// @brief リストの要素数を返す．
@@ -109,23 +117,35 @@ public:
   ymuint
   list_size() const;
 
-  /// @brief リストの次の要素を得る．
-  /// @note これはすべての型で意味を持つ．
-  virtual
-  const PtNode*
-  next() const;
-
-  /// @brief 値を得る．
+  /// @brief グループの値を得る．
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
-  value() const;
+  const DotlibNode*
+  group_value() const;
 
   /// @brief 先頭の属性を得る．
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
-  const PtAttr*
+  const DotlibNode*
   attr_top() const;
+
+  /// @brief 属性名を得る．
+  /// @note is_attr() = true の時のみ意味を持つ．
+  virtual
+  ShString
+  attr_name() const;
+
+  /// @brief 属性の値を得る．
+  /// @note is_attr() = true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  attr_value() const;
+
+  /// @brief リストの次の要素を得る．
+  /// @note これはすべての型で意味を持つ．
+  virtual
+  const DotlibNode*
+  next() const;
 
 
 public:
@@ -145,7 +165,7 @@ public:
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
   void
-  add_attr(PtAttr* attr);
+  add_attr(PtNodeImpl* attr);
 
   /// @brief 次の要素を設定する．
   /// @param[in] next 次の要素
@@ -160,6 +180,9 @@ private:
 
   // 次の要素を指すリンクポインタ
   PtNodeImpl* mNext;
+
+  // PtMgr::clear() 用のリンクポインタ
+  PtNodeImpl* mClearLink;
 
 };
 
@@ -380,8 +403,8 @@ private:
   /// @param[in] type 演算子の型
   /// @param[in] opr1, opr2 オペランド
   PtOpr(tType type,
-	PtNode* opr1,
-	PtNode* opr2);
+	const DotlibNode* opr1,
+	const DotlibNode* opr2);
 
   /// @brief デストラクタ
   virtual
@@ -408,13 +431,13 @@ public:
   /// @brief 第一オペランドを返す．
   /// @note type() が演算子の型の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   opr1() const;
 
   /// @brief 第二オペランドを返す．
   /// @note type() が演算子の型の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   opr2() const;
 
 
@@ -427,10 +450,10 @@ private:
   tType mType;
 
   // 第一オペランド
-  const PtNode* mOpr1;
+  const DotlibNode* mOpr1;
 
   // 第二オペランド
-  const PtNode* mOpr2;
+  const DotlibNode* mOpr2;
 
 };
 
@@ -474,7 +497,7 @@ public:
   /// @brief リストの先頭の要素を返す．
   /// @note type() が kList の時のみ意味をもつ．
   virtual
-  const PtNode*
+  const DotlibNode*
   top() const;
 
   /// @brief リストの要素数を返す．
@@ -523,7 +546,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
-  PtGroup(const PtNode* value,
+  PtGroup(const DotlibNode* value,
 	  const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -546,16 +569,16 @@ public:
   bool
   is_group() const;
 
-  /// @brief 値を得る．
+  /// @brief グループの値を得る．
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
-  const PtNode*
-  value() const;
+  const DotlibNode*
+  group_value() const;
 
   /// @brief 先頭の属性を得る．
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
-  const PtAttr*
+  const DotlibNode*
   attr_top() const;
 
 
@@ -569,7 +592,7 @@ public:
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
   void
-  add_attr(PtAttr* attr);
+  add_attr(PtNodeImpl* attr);
 
 
 private:
@@ -578,13 +601,77 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  const PtNode* mValue;
+  const DotlibNode* mValue;
 
   // 属性の先頭
-  PtAttr* mAttrTop;
+  PtNodeImpl* mAttrTop;
 
   // 属性の末尾
-  PtAttr* mAttrTail;
+  PtNodeImpl* mAttrTail;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PtAttr PtNodeImpl.h "PtNodeImpl.h"
+/// @brief 属性を表す PtNode の継承クラス
+//////////////////////////////////////////////////////////////////////
+class PtAttr :
+  public PtNodeBase
+{
+  friend class PtMgr;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  /// @param[in] loc ファイル上の位置
+  PtAttr(const ShString& attr_name,
+	 const DotlibNode* value,
+	 const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~PtAttr();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を参照する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 属性型(kAttr)の時に true を返す．
+  virtual
+  bool
+  is_attr() const;
+
+  /// @brief 属性名を得る．
+  virtual
+  ShString
+  attr_name() const;
+
+  /// @brief 属性の値を得る．
+  virtual
+  const DotlibNode*
+  attr_value() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 属性名
+  ShString mAttrName;
+
+  // 値
+  const DotlibNode* mValue;
 
 };
 

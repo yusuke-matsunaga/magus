@@ -21,17 +21,15 @@ BEGIN_NAMESPACE_YM_DOTLIB
 
 // @brief 親がない場合のコンストラクタ
 // @param[in] parser パーサー
-// @param[in] ptmgr パース木を管理するオブジェクト
-GroupHandler::GroupHandler(DotlibParserImpl& parser,
-			   PtMgr& ptmgr) :
-  DotlibHandler(parser, ptmgr, NULL)
+GroupHandler::GroupHandler(DotlibParserImpl& parser) :
+  DotlibHandler(parser)
 {
 }
 
 // @brief 親を持つハンドラ用のコンストラクタ
 // @param[in] parent 親のハンドラ
 GroupHandler::GroupHandler(GroupHandler* parent) :
-  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
+  DotlibHandler(parent)
 {
 }
 
@@ -111,13 +109,15 @@ GroupHandler::read_attr(const ShString& attr_name,
 // @brief attribute を設定する．
 // @param[in] attr_name 属性名
 // @param[in] value 値
+// @param[in] loc ファイル上の位置
 // @return 設定が失敗したら false を返す．
 // @note デフォルトの実装はエラーとなる．
 bool
 GroupHandler::add_attr(const ShString& attr_name,
-		       PtNodeImpl* value)
+		       PtNodeImpl* value,
+		       const FileRegion& loc)
 {
-  PtAttr* attr = ptmgr().new_attr(attr_name, value);
+  PtNodeImpl* attr = pt_mgr().new_attr(attr_name, value, loc);
   mNode->add_attr(attr);
   return true;
 }
@@ -173,9 +173,10 @@ GroupHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  mNode = ptmgr().new_group(value_list, attr_loc);
+  mNode = pt_mgr().new_group(value_list, attr_loc);
   if ( attr_name != "library" ) {
-    parent()->add_attr(attr_name, mNode);
+    FileRegion loc(attr_loc, mNode->loc());
+    parent()->add_attr(attr_name, mNode, loc);
   }
   return true;
 }
@@ -189,7 +190,7 @@ GroupHandler::end_group()
 }
 
 // @brief 対応するノードを得る．
-PtNode*
+const DotlibNode*
 GroupHandler::pt_node()
 {
   return mNode;
@@ -239,7 +240,7 @@ EmptyGroupHandler::check_group_value(const ShString& attr_name,
 {
   ymuint n = value_list->list_size();
   if ( n > 0 ) {
-    const PtNode* top = value_list->top();
+    const DotlibNode* top = value_list->top();
     FileRegion loc = top->loc();
     ostringstream buf;
     buf << attr_name << " statement does not have parameters.";
@@ -260,10 +261,8 @@ EmptyGroupHandler::check_group_value(const ShString& attr_name,
 
 // @brief 親を持たないハンドラ用のコンストラクタ
 // @param[in] parser パーサー
-// @param[in] ptmgr パース木を管理するオブジェクト
-Str1GroupHandler::Str1GroupHandler(DotlibParserImpl& parser,
-				   PtMgr& ptmgr) :
-  GroupHandler(parser, ptmgr)
+Str1GroupHandler::Str1GroupHandler(DotlibParserImpl& parser) :
+  GroupHandler(parser)
 {
 }
 
@@ -301,9 +300,9 @@ Str1GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const PtNode* top = value_list->top();
+  const DotlibNode* top = value_list->top();
   if ( n > 1 ) {
-    const PtNode* second = top->next();
+    const DotlibNode* second = top->next();
     FileRegion loc = second->loc();
     ostringstream buf;
     buf << attr_name << " statement has only one string parameter.";
@@ -314,7 +313,7 @@ Str1GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  if ( top->type() != PtNode::kString ) {
+  if ( !top->is_string() ) {
     put_msg(__FILE__, __LINE__, top->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -364,10 +363,10 @@ Str2GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const PtNode* top = value_list->top();
-  const PtNode* second = top->next();
+  const DotlibNode* top = value_list->top();
+  const DotlibNode* second = top->next();
   if ( n > 2 ) {
-    const PtNode* third = second->next();
+    const DotlibNode* third = second->next();
     FileRegion loc = third->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string parameters.";
@@ -378,14 +377,14 @@ Str2GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  if ( top->type() != PtNode::kString ) {
+  if ( !top->is_string() ) {
     put_msg(__FILE__, __LINE__, top->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "string value is expected.");
     return false;
   }
-  if ( second->type() != PtNode::kString ) {
+  if ( !second->is_string() ) {
     put_msg(__FILE__, __LINE__, second->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -436,11 +435,11 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const PtNode* top = value_list->top();
-  const PtNode* second = top->next();
-  const PtNode* third = second->next();
+  const DotlibNode* top = value_list->top();
+  const DotlibNode* second = top->next();
+  const DotlibNode* third = second->next();
   if ( n > 3 ) {
-    const PtNode* forth = third->next();
+    const DotlibNode* forth = third->next();
   FileRegion loc = forth->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string and an integer parameters.";
@@ -451,21 +450,21 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  if ( top->type() != PtNode::kString ) {
+  if ( !top->is_string() ) {
     put_msg(__FILE__, __LINE__, top->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "string value is expected.");
     return false;
   }
-  if ( second->type() != PtNode::kString ) {
+  if ( !second->is_string() ) {
     put_msg(__FILE__, __LINE__, second->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "string value is expected.");
     return false;
   }
-  if ( third->type() != PtNode::kInt ) {
+  if ( !third->is_string() ) {
     put_msg(__FILE__, __LINE__, second->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",

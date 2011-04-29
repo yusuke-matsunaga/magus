@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @param[in] msg_mgr メッセージを管理するオブジェクト
 DotlibParserImpl::DotlibParserImpl(MsgMgr& msg_mgr) :
   mMsgMgr(msg_mgr),
-  mLibraryHandler( HandlerFactory::new_library(*this, mPtMgr) )
+  mLibraryHandler( HandlerFactory::new_library(*this) )
 {
   init();
 }
@@ -40,7 +40,7 @@ DotlibParserImpl::~DotlibParserImpl()
 // @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
 // @return パース木の根のノードを返す．
 // @note エラーが起きたら NULL を返す．
-const PtNode*
+const DotlibNode*
 DotlibParserImpl::read_file(const string& filename,
 			    bool debug,
 			    bool allow_no_semi)
@@ -101,7 +101,7 @@ last:
 void
 DotlibParserImpl::clear_node()
 {
-  mPtMgr.init();
+  mPtMgr.clear();
 }
 
 // @brief メモリ使用量のサマリを出力する．
@@ -238,6 +238,13 @@ DotlibParserImpl::put_msg(const char* src_file,
 			  const string& msg)
 {
   mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
+}
+
+// @brief パース木を管理するオブジェクトを返す．
+PtMgr&
+DotlibParserImpl::pt_mgr()
+{
+  return mPtMgr;
 }
 
 // @brief デバッグモードの時 true を返す．

@@ -66,10 +66,10 @@ ExprHandler::read_primary()
 	      "Only 'VDD', 'VSS', and 'VCC' are allowed.");
       return NULL;
     }
-    return ptmgr().new_string(name, loc);
+    return pt_mgr().new_string(name, loc);
   }
   if ( type == FLOAT_NUM || type == INT_NUM ) {
-    return ptmgr().new_float(parser().cur_float(), loc);
+    return pt_mgr().new_float(parser().cur_float(), loc);
   }
 
   put_msg(__FILE__, __LINE__, loc,
@@ -96,10 +96,10 @@ ExprHandler::read_product()
 	return NULL;
       }
       if ( type == MULT ) {
-	opr1 = ptmgr().new_mult(opr1, opr2);
+	opr1 = pt_mgr().new_mult(opr1, opr2);
       }
       else {
-	opr1 = ptmgr().new_div(opr1, opr2);
+	opr1 = pt_mgr().new_div(opr1, opr2);
       }
     }
     else {
@@ -133,10 +133,10 @@ ExprHandler::read_expr(tTokenType end_marker)
 	return NULL;
       }
       if ( type == PLUS ) {
-	opr1 = ptmgr().new_plus(opr1, opr2);
+	opr1 = pt_mgr().new_plus(opr1, opr2);
       }
       else {
-	opr1 = ptmgr().new_minus(opr1, opr2);
+	opr1 = pt_mgr().new_minus(opr1, opr2);
       }
     }
     else {

@@ -31,11 +31,16 @@ BEGIN_NAMESPACE_YM_DOTLIB
 
 // クラス名の前方宣言
 class DotlibParser;
-
-class PtMgr;
-class PtNode;
-class PtAttr;
+class DotlibNode;
 
 END_NAMESPACE_YM_DOTLIB
+
+
+BEGIN_NAMESPACE_YM
+
+using nsDotlib::DotlibParser;
+using nsDotlib::DotlibNode;
+
+END_NAMESPACE_YM
 
 #endif // YM_DOTLIB_DOTLIB_NSDEF_H

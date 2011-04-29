@@ -44,7 +44,7 @@ public:
   /// @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
   /// @return パース木の根のノードを返す．
   /// @note エラーが起きたら NULL を返す．
-  const PtNode*
+  const DotlibNode*
   read_file(const string& filename,
 	    bool debug,
 	    bool allow_no_semi = true);
@@ -142,6 +142,10 @@ public:
 	  const char* label,
 	  const string& msg);
 
+  /// @brief パース木を管理するオブジェクトを返す．
+  PtMgr&
+  pt_mgr();
+
   /// @brief デバッグモードの時 true を返す．
   bool
   debug();
@@ -188,7 +192,7 @@ private:
   // メッセージを管理するオブジェクト
   MsgMgr& mMsgMgr;
 
-  // PtNode を管理するオブジェクト
+  // DotlibNode を管理するオブジェクト
   PtMgr mPtMgr;
 
   // library グループを処理するハンドラ

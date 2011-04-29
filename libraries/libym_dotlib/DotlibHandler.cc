@@ -9,6 +9,7 @@
 
 #include "DotlibHandler.h"
 #include "DotlibParserImpl.h"
+#include "GroupHandler.h"
 #include "PtMgr.h"
 #include "PtNodeImpl.h"
 
@@ -19,15 +20,18 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // クラス DotlibHandler
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
+// @brief 親のハンドラを持たない場合のコンストラクタ
 // @param[in] parser パーサー
-// @param[in] ptmgr パース木を管理するオブジェクト
-// @param[in] parent 親のハンドラ
-DotlibHandler::DotlibHandler(DotlibParserImpl& parser,
-			     PtMgr& ptmgr,
-			     GroupHandler* parent) :
+DotlibHandler::DotlibHandler(DotlibParserImpl& parser) :
   mParser(parser),
-  mPtMgr(ptmgr),
+  mParent(NULL)
+{
+}
+
+// @brief 親のハンドラを持つ場合のコンストラクタ
+// @param[in] parent 親のハンドラ
+DotlibHandler::DotlibHandler(GroupHandler* parent) :
+  mParser(parent->parser()),
   mParent(parent)
 {
 }
@@ -39,7 +43,7 @@ DotlibHandler::~DotlibHandler()
 
 // @brief 対応するノードを得る．
 // @note デフォルトの実装は NULL を返す．
-PtNode*
+const DotlibNode*
 DotlibHandler::pt_node()
 {
   return NULL;
@@ -55,7 +59,7 @@ DotlibHandler::parse_complex()
     return NULL;
   }
 
-  PtNodeImpl* value_list = ptmgr().new_list();
+  PtNodeImpl* value_list = pt_mgr().new_list();
   tTokenType type = parser().read_token();
   if ( type != RP ) {
     for ( ; ; ) {
@@ -93,15 +97,15 @@ DotlibHandler::new_ptvalue(tTokenType type)
   FileRegion loc(parser().cur_loc());
   switch ( type ) {
   case INT_NUM:
-    return ptmgr().new_int(parser().cur_int(), loc);
+    return pt_mgr().new_int(parser().cur_int(), loc);
     break;
 
   case FLOAT_NUM:
-    return ptmgr().new_float(parser().cur_float(), loc);
+    return pt_mgr().new_float(parser().cur_float(), loc);
     break;
 
   case SYMBOL:
-    return ptmgr().new_string(ShString(parser().cur_string()), loc);
+    return pt_mgr().new_string(ShString(parser().cur_string()), loc);
     break;
 
   default:
@@ -137,9 +141,9 @@ DotlibHandler::parser()
 
 // @brief PtMgr を得る．
 PtMgr&
-DotlibHandler::ptmgr()
+DotlibHandler::pt_mgr()
 {
-  return mPtMgr;
+  return mParser.pt_mgr();
 }
 
 // @brief 親のハンドラを得る．

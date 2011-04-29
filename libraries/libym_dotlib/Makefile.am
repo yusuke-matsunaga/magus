@@ -48,8 +48,6 @@ libym_dotlib_la_SOURCES = \
 	PtMgr.cc \
 	PtNodeImpl.h \
 	PtNodeImpl.cc \
-	PtAttr.h \
-	PtAttr.cc \
 	PtDumper.cc
 
 

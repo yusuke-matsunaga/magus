@@ -8,7 +8,6 @@
 
 
 #include "PtNodeImpl.h"
-#include "ym_dotlib/PtAttr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -70,6 +69,13 @@ PtNodeImpl::is_group() const
   return false;
 }
 
+// @brief 属性型(kAttr)の時に true を返す．
+bool
+PtNodeImpl::is_attr() const
+{
+  return false;
+}
+
 // @brief 整数値を返す．
 // @note is_int() = true の時のみ意味を持つ．
 int
@@ -99,7 +105,7 @@ PtNodeImpl::string_value() const
 
 // @brief 第一オペランドを返す．
 // @note is_opr() = true の時のみ意味を持つ．
-const PtNode*
+const DotlibNode*
 PtNodeImpl::opr1() const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -108,7 +114,7 @@ PtNodeImpl::opr1() const
 
 // @brief 第二オペランドを返す．
 // @note is_opr() = true の時のみ意味を持つ．
-const PtNode*
+const DotlibNode*
 PtNodeImpl::opr2() const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -117,7 +123,7 @@ PtNodeImpl::opr2() const
 
 // @brief リストの先頭の要素を返す．
 // @note is_list() = true の時のみ意味を持つ．
-const PtNode*
+const DotlibNode*
 PtNodeImpl::top() const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -133,17 +139,10 @@ PtNodeImpl::list_size() const
   return 0;
 }
 
-// @brief 次の要素を得る．
-const PtNode*
-PtNodeImpl::next() const
-{
-  return mNext;
-}
-
-// @brief 値を得る．
+// @brief グループの値を得る．
 // @note is_group() = true の時のみ意味を持つ．
-const PtNode*
-PtNodeImpl::value() const
+const DotlibNode*
+PtNodeImpl::group_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -151,11 +150,36 @@ PtNodeImpl::value() const
 
 // @brief 先頭の属性を得る．
 // @note is_group() = true の時のみ意味を持つ．
-const PtAttr*
+const DotlibNode*
 PtNodeImpl::attr_top() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
+}
+
+// @brief 属性名を得る．
+// @note is_attr() = true の時のみ意味を持つ．
+ShString
+PtNodeImpl::attr_name() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return ShString();
+}
+
+// @brief 属性の値を得る．
+// @note is_attr() = true の時のみ意味を持つ．
+const DotlibNode*
+PtNodeImpl::attr_value() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief 次の要素を得る．
+const DotlibNode*
+PtNodeImpl::next() const
+{
+  return mNext;
 }
 
 // @brief 要素を追加する．
@@ -171,7 +195,7 @@ PtNodeImpl::add_node(PtNodeImpl* node)
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-PtNodeImpl::add_attr(PtAttr* attr)
+PtNodeImpl::add_attr(PtNodeImpl* attr)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -221,7 +245,7 @@ PtInt::~PtInt()
 }
 
 // @brief 型を得る．
-PtNode::tType
+DotlibNode::tType
 PtInt::type() const
 {
   return kInt;
@@ -278,7 +302,7 @@ PtFloat::~PtFloat()
 }
 
 // @brief 型を得る．
-PtNode::tType
+DotlibNode::tType
 PtFloat::type() const
 {
   return kFloat;
@@ -320,7 +344,7 @@ PtString::~PtString()
 }
 
 // @brief 型を得る．
-PtNode::tType
+DotlibNode::tType
 PtString::type() const
 {
   return kString;
@@ -350,8 +374,8 @@ PtString::string_value() const
 // @param[in] type 演算子の型
 // @param[in] opr1, opr2 オペランド
 PtOpr::PtOpr(tType type,
-	     PtNode* opr1,
-	     PtNode* opr2) :
+	     const DotlibNode* opr1,
+	     const DotlibNode* opr2) :
   mType(type),
   mOpr1(opr1),
   mOpr2(opr2)
@@ -364,7 +388,7 @@ PtOpr::~PtOpr()
 }
 
 // @brief 型を得る．
-PtNode::tType
+DotlibNode::tType
 PtOpr::type() const
 {
   return mType;
@@ -386,7 +410,7 @@ PtOpr::loc() const
 
 // @brief 第一オペランドを返す．
 // @note type() が演算子の型の時のみ意味を持つ．
-const PtNode*
+const DotlibNode*
 PtOpr::opr1() const
 {
   return mOpr1;
@@ -394,7 +418,7 @@ PtOpr::opr1() const
 
 // @brief 第二オペランドを返す．
 // @note type() が演算子の型の時のみ意味を持つ．
-const PtNode*
+const DotlibNode*
 PtOpr::opr2() const
 {
   return mOpr2;
@@ -418,7 +442,7 @@ PtList::~PtList()
 }
 
 // @brief 型を得る．
-PtNode::tType
+DotlibNode::tType
 PtList::type() const
 {
   return kList;
@@ -443,7 +467,7 @@ PtList::loc() const
 
 // @brief リストの先頭の要素を返す．
 // @note type() が kList の時のみ意味をもつ．
-const PtNode*
+const DotlibNode*
 PtList::top() const
 {
   return mTop;
@@ -484,7 +508,7 @@ PtList::add_node(PtNodeImpl* node)
 // @brief コンストラクタ
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtGroup::PtGroup(const PtNode* value,
+PtGroup::PtGroup(const DotlibNode* value,
 		 const FileRegion& loc) :
   PtNodeBase(loc),
   mValue(value),
@@ -499,7 +523,7 @@ PtGroup::~PtGroup()
 }
 
 // @brief 型を得る．
-PtNode::tType
+DotlibNode::tType
 PtGroup::type() const
 {
   return kGroup;
@@ -512,17 +536,17 @@ PtGroup::is_group() const
   return true;
 }
 
-// @brief 値を得る．
+// @brief グループの値を得る．
 // @note type() が kGroup の時のみ意味を持つ．
-const PtNode*
-PtGroup::value() const
+const DotlibNode*
+PtGroup::group_value() const
 {
   return mValue;
 }
 
 // @brief 先頭の属性を得る．
 // @note type() が kGroup の時のみ意味を持つ．
-const PtAttr*
+const DotlibNode*
 PtGroup::attr_top() const
 {
   return mAttrTop;
@@ -532,7 +556,7 @@ PtGroup::attr_top() const
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-PtGroup::add_attr(PtAttr* attr)
+PtGroup::add_attr(PtNodeImpl* attr)
 {
   if ( mAttrTop != NULL ) {
     mAttrTail->mNext = attr;
@@ -541,6 +565,57 @@ PtGroup::add_attr(PtAttr* attr)
   else {
     mAttrTop = mAttrTail = attr;
   }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PtAttr
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] attr_name 属性名
+// @param[in] value 値
+// @param[in] loc ファイル上の位置
+PtAttr::PtAttr(const ShString& attr_name,
+	       const DotlibNode* value,
+	       const FileRegion& loc) :
+  PtNodeBase(loc),
+  mAttrName(attr_name),
+  mValue(value)
+{
+}
+
+// @brief デストラクタ
+PtAttr::~PtAttr()
+{
+}
+
+// @brief 型を得る．
+DotlibNode::tType
+PtAttr::type() const
+{
+  return kAttr;
+}
+
+// @brief 属性型(kAttr)の時に true を返す．
+bool
+PtAttr::is_attr() const
+{
+  return true;
+}
+
+// @brief 属性名を得る．
+ShString
+PtAttr::attr_name() const
+{
+  return mAttrName;
+}
+
+// @brief 属性の値を得る．
+const DotlibNode*
+PtAttr::attr_value() const
+{
+  return mValue;
 }
 
 END_NAMESPACE_YM_DOTLIB

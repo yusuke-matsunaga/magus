@@ -35,9 +35,9 @@ public:
 public:
 
   /// @brief 初期化する．
-  /// @note 以前，生成されたオブジェクトは(デストラクタ抜きで)破壊される．
+  /// @note 以前，生成されたオブジェクトは破壊される．
   void
-  init();
+  clear();
 
   /// @brief 整数値を表す PtNode を生成する．
   /// @param[in] value 値
@@ -63,26 +63,26 @@ public:
   /// @brief + 演算子を表す PtNode を生成する．
   /// @param[in] opr1, opr2 オペランド
   PtNodeImpl*
-  new_plus(PtNodeImpl* opr1,
-	   PtNodeImpl* opr2);
+  new_plus(const DotlibNode* opr1,
+	   const DotlibNode* opr2);
 
   /// @brief - 演算子を表す PtNode を生成する．
   /// @param[in] opr1, opr2 オペランド
   PtNodeImpl*
-  new_minus(PtNodeImpl* opr1,
-	    PtNodeImpl* opr2);
+  new_minus(const DotlibNode* opr1,
+	    const DotlibNode* opr2);
 
   /// @brief * 演算子を表す PtNode を生成する．
   /// @param[in] opr1, opr2 オペランド
   PtNodeImpl*
-  new_mult(PtNodeImpl* opr1,
-	   PtNodeImpl* opr2);
+  new_mult(const DotlibNode* opr1,
+	   const DotlibNode* opr2);
 
   /// @brief / 演算子を表す PtNode を生成する．
   /// @param[in] opr1, opr2 オペランド
   PtNodeImpl*
-  new_div(PtNodeImpl* opr1,
-	  PtNodeImpl* opr2);
+  new_div(const DotlibNode* opr1,
+	  const DotlibNode* opr2);
 
   /// @brief リストを表す PtNode を生成する．
   /// @note 空のリストが返される．
@@ -93,13 +93,14 @@ public:
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
   PtNodeImpl*
-  new_group(const PtNodeImpl* value,
+  new_group(const DotlibNode* value,
 	    const FileRegion& loc);
 
   /// @brief PtAttr を生成する．
-  PtAttr*
+  PtNodeImpl*
   new_attr(const ShString& attr_name,
-	   const PtNode* value);
+	   const DotlibNode* value,
+	   const FileRegion& loc);
 
   /// @brief 使用メモリ量の一覧を出力する．
   /// @param[in] s 出力先のストリーム
@@ -109,11 +110,25 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 生成したノードをリンクにつなぐ．
+  void
+  add_node(PtNodeImpl* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // メモリアロケータ
   SimpleAlloc mAlloc;
+
+  // ここで確保したオブジェクトのリストの先頭
+  // PtNodeImpl::mClearLink をつかってリンクとリストを構成する．
+  PtNodeImpl* mTop;
 
   // 個々の要素の使用数
   ymuint32 mIntNum;

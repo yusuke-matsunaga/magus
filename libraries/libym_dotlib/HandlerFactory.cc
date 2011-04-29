@@ -34,12 +34,10 @@ HandlerFactory::~HandlerFactory()
 
 // @brief library group 用のハンドラを作る．
 // @param[in] parser パーサー
-// @param[in] ptmgr パース木を管理するオブジェクト
 DotlibHandler*
-HandlerFactory::new_library(DotlibParserImpl& parser,
-			    PtMgr& ptmgr)
+HandlerFactory::new_library(DotlibParserImpl& parser)
 {
-  GroupHandler* handler = new Str1GroupHandler(parser, ptmgr);
+  GroupHandler* handler = new Str1GroupHandler(parser);
 
   // simple attributes
   DotlibHandler* simple = new_simple(handler);

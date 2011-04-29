@@ -40,7 +40,7 @@ bool
 DefineHandler::read_attr(const ShString& attr_name,
 			 const FileRegion& attr_loc)
 {
-  PtNode* value = parse_complex();
+  const DotlibNode* value = parse_complex();
   if ( value == NULL ) {
     return false;
   }
@@ -50,11 +50,11 @@ DefineHandler::read_attr(const ShString& attr_name,
   }
 
   if ( debug() ) {
-    cout << attr_name << value << endl;
+    cout << attr_name << " : " << value << endl;
   }
 
-  const PtNode* keyword = value->top();
-  if ( keyword == NULL || keyword->type() != PtNode::kString ) {
+  const DotlibNode* keyword = value->top();
+  if ( keyword == NULL || !keyword->is_string() ) {
     put_msg(__FILE__, __LINE__, keyword->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -62,8 +62,8 @@ DefineHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  const PtNode* group = keyword->next();
-  if ( group == NULL || group->type() != PtNode::kString ) {
+  const DotlibNode* group = keyword->next();
+  if ( group == NULL || !group->is_string() ) {
     put_msg(__FILE__, __LINE__, group->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -71,8 +71,8 @@ DefineHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  const PtNode* type_token = group->next();
-  if ( type_token == NULL || type_token->type() != PtNode::kString ) {
+  const DotlibNode* type_token = group->next();
+  if ( type_token == NULL || !type_token->is_string() ) {
     put_msg(__FILE__, __LINE__, type_token->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",

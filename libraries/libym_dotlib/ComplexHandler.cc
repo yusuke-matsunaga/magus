@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 ComplexHandler::ComplexHandler(GroupHandler* parent) :
-  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
+  DotlibHandler(parent)
 {
 }
 
@@ -64,13 +64,13 @@ ComplexHandler::read_attr(const ShString& attr_name,
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値のリスト
-// @note デフォルトの実装ではなにもしないで true を返す．
 bool
 ComplexHandler::set_value(const ShString& attr_name,
 			  const FileRegion& attr_loc,
 			  PtNodeImpl* value)
 {
-  return parent()->add_attr(attr_name, value);
+  FileRegion loc(attr_loc, value->loc());
+  return parent()->add_attr(attr_name, value, loc);
 }
 
 END_NAMESPACE_YM_DOTLIB

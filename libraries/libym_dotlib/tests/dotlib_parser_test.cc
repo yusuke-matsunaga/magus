@@ -41,7 +41,7 @@ dotlibparser_test(int argc,
       debug = true;
     }
     else {
-      const PtNode* library = parser.read_file(argv[i], debug);
+      const DotlibNode* library = parser.read_file(argv[i], debug);
       if ( library == NULL ) {
 	error = true;
       }

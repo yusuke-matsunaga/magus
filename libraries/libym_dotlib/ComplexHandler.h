@@ -56,7 +56,6 @@ protected:
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値のリスト
-  /// @note デフォルトの実装ではなにもしないで true を返す．
   virtual
   bool
   set_value(const ShString& attr_name,

@@ -39,8 +39,7 @@ public:
   /// @param[in] ptmgr パース木を管理するオブジェクト
   static
   DotlibHandler*
-  new_library(DotlibParserImpl& parser,
-	      PtMgr& ptmgr);
+  new_library(DotlibParserImpl& parser);
 
   /// @brief input_voltage group 用のハンドラを作る．
   /// @param[in] parent 親のハンドラ

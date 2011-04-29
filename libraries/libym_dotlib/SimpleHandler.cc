@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 SimpleHandler::SimpleHandler(GroupHandler* parent) :
-  DotlibHandler(parent->parser(), parent->ptmgr(), parent)
+  DotlibHandler(parent)
 {
 }
 
@@ -79,13 +79,13 @@ SimpleHandler::read_value()
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value 値
-// @note デフォルトの実装ではなにもしないで true を返す．
 bool
 SimpleHandler::set_value(const ShString& attr_name,
 			 const FileRegion& attr_loc,
 			 PtNodeImpl* value)
 {
-  return parent()->add_attr(attr_name, value);
+  FileRegion loc(attr_loc, value->loc());
+  return parent()->add_attr(attr_name, value, loc);
 }
 
 
@@ -137,7 +137,7 @@ PtNodeImpl*
 IntSimpleHandler::read_value()
 {
   PtNodeImpl* value = SimpleHandler::read_value();
-  if ( value->type() != PtNode::kInt ) {
+  if ( !value->is_int() ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -168,7 +168,7 @@ PtNodeImpl*
 FloatSimpleHandler::read_value()
 {
   PtNodeImpl* value = SimpleHandler::read_value();
-  if ( value->type() != PtNode::kFloat && value->type() != PtNode::kInt ) {
+  if ( !value->is_float() ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",
@@ -199,7 +199,7 @@ PtNodeImpl*
 StrSimpleHandler::read_value()
 {
   PtNodeImpl* value = SimpleHandler::read_value();
-  if ( value->type() != PtNode::kString ) {
+  if ( !value->is_string() ) {
     put_msg(__FILE__, __LINE__, value->loc(),
 	    kMsgError,
 	    "DOTLIB_PARSER",

@@ -24,13 +24,13 @@ class DotlibHandler
 {
 public:
 
-  /// @brief コンストラクタ
+  /// @brief 親のハンドラを持たない場合のコンストラクタ
   /// @param[in] parser パーサー
-  /// @param[in] ptmgr パース木を管理するオブジェクト
+  DotlibHandler(DotlibParserImpl& parser);
+
+  /// @brief 親のハンドラを持つ場合のコンストラクタ
   /// @param[in] parent 親のハンドラ
-  DotlibHandler(DotlibParserImpl& parser,
-		PtMgr& ptmgr,
-		GroupHandler* parent);
+  DotlibHandler(GroupHandler* parent);
 
   /// @brief デストラクタ
   virtual
@@ -54,7 +54,7 @@ public:
   /// @brief 対応するノードを得る．
   /// @note デフォルトの実装は NULL を返す．
   virtual
-  PtNode*
+  const DotlibNode*
   pt_node();
 
 
@@ -69,7 +69,7 @@ public:
 
   /// @brief PtMgr を得る．
   PtMgr&
-  ptmgr();
+  pt_mgr();
 
 
 protected:
@@ -83,7 +83,7 @@ protected:
   PtNodeImpl*
   parse_complex();
 
-  /// @brief PtNode を生成する．
+  /// @brief DotlibNode (の派生クラス)を生成する．
   /// @param[in] type 型
   /// @note 残りの情報は parser() からとってくる．
   PtNodeImpl*
@@ -144,9 +144,6 @@ private:
 
   // パーサー
   DotlibParserImpl& mParser;
-
-  // パース木を管理するオブジェクト
-  PtMgr& mPtMgr;
 
   // 親のハンドラ
   GroupHandler* mParent;

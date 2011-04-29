@@ -1,8 +1,8 @@
-#ifndef YM_DOTLIB_PTNODE_H
-#define YM_DOTLIB_PTNODE_H
+#ifndef YM_DOTLIB_DOTLIBNODE_H
+#define YM_DOTLIB_DOTLIBNODE_H
 
-/// @file ym_dotlib/PtNode.h
-/// @brief PtNode のヘッダファイル
+/// @file ym_dotlib/DotlibNode.h
+/// @brief DotlibNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,10 +17,10 @@
 BEGIN_NAMESPACE_YM_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtNode PtNode.h "ym_dotlib/PtNode.h"
+/// @class DotlibNode DotlibNode.h "ym_dotlib/DotlibNode.h"
 /// @brief パース木の構造を表すための基底クラス
 //////////////////////////////////////////////////////////////////////
-class PtNode
+class DotlibNode
 {
 public:
 
@@ -43,14 +43,16 @@ public:
     /// @brief リスト
     kList,
     /// @brief グループ
-    kGroup
+    kGroup,
+    /// @brief 属性
+    kAttr
   };
 
 protected:
 
   /// @brief デストラクタ
   virtual
-  ~PtNode() { }
+  ~DotlibNode() { }
 
 
 public:
@@ -93,6 +95,11 @@ public:
   bool
   is_group() const = 0;
 
+  /// @brief 属性型(kAttr)の時に true を返す．
+  virtual
+  bool
+  is_attr() const = 0;
+
   /// @brief ファイル上の位置を返す．
   virtual
   FileRegion
@@ -119,19 +126,19 @@ public:
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   opr1() const = 0;
 
   /// @brief 第二オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   opr2() const = 0;
 
   /// @brief リストの先頭の要素を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
+  const DotlibNode*
   top() const = 0;
 
   /// @brief リストの要素数を返す．
@@ -140,26 +147,39 @@ public:
   ymuint
   list_size() const = 0;
 
-  /// @brief リストの次の要素を得る．
-  /// @note これはすべての型で意味を持つ．
-  virtual
-  const PtNode*
-  next() const = 0;
-
-  /// @brief 値を得る．
+  /// @brief グループの値を得る．
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
-  const PtNode*
-  value() const = 0;
+  const DotlibNode*
+  group_value() const = 0;
 
   /// @brief 先頭の属性を得る．
   /// @note is_group() = true の時のみ意味を持つ．
+  /// @note 返り値のノードの型は kAttr
   virtual
-  const PtAttr*
+  const DotlibNode*
   attr_top() const = 0;
+
+  /// @brief 属性名を得る．
+  /// @note is_attr() = true の時のみ意味を持つ．
+  virtual
+  ShString
+  attr_name() const = 0;
+
+  /// @brief 属性の値を得る．
+  /// @note is_attr() = true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  attr_value() const = 0;
+
+  /// @brief リストの次の要素を得る．
+  /// @note これはすべての型で意味を持つ．
+  virtual
+  const DotlibNode*
+  next() const = 0;
 
 };
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // YM_DOTLIB_PTNODE_H
+#endif // YM_DOTLIB_DOTLIBNODE_H
