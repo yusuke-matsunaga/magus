@@ -268,6 +268,44 @@ protected:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class Str2IntGroupHandler GroupHandler.h "GroupHadler.h"
+/// @brief 2つの文字列型と1つの整数型をとるグループ用のハンドラ
+//////////////////////////////////////////////////////////////////////
+class Str2IntGroupHandler :
+  public GroupHandler
+{
+public:
+
+  /// @brief 親を持つハンドラ用のコンストラクタ
+  /// @param[in] parent 親のハンドラ
+  Str2IntGroupHandler(GroupHandler* parent);
+
+  /// @brief デストラクタ
+  virtual
+  ~Str2IntGroupHandler();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる GroupHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief group statement の引数のチェックを行う仮想関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc ファイル上の位置
+  /// @param[in] value 値を表すトークンのリスト
+  /// @note begin_group() の中で呼ばれる．
+  /// @note デフォルトの実装はなにもしないで true を返す．
+  virtual
+  bool
+  check_group_value(const ShString& attr_name,
+		    const FileRegion& attr_loc,
+		    PtNode* value);
+
+};
+
 END_NAMESPACE_YM_CELL_DOTLIB
 
 #endif // LIBYM_CELL_DOTLIB_GROUPHANDLER_H

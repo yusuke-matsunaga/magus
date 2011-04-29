@@ -385,7 +385,7 @@ HandlerFactory::new_wire_load(GroupHandler* parent)
 DotlibHandler*
 HandlerFactory::new_wire_load_selection(GroupHandler* parent)
 {
-  GroupHandler* handler = new Str1GroupHandler(parent);
+  GroupHandler* handler = new EmptyGroupHandler(parent);
 
   // complex attributes
   DotlibHandler* complex = new_complex(handler);
@@ -556,7 +556,7 @@ HandlerFactory::new_ff(GroupHandler* parent)
 DotlibHandler*
 HandlerFactory::new_ff_bank(GroupHandler* parent)
 {
-  GroupHandler* handler = new Str2GroupHandler(parent);
+  GroupHandler* handler = new Str2IntGroupHandler(parent);
 
   // simple attributes
   DotlibHandler* simple = new_string_simple(handler);
@@ -596,7 +596,7 @@ HandlerFactory::new_latch(GroupHandler* parent)
 DotlibHandler*
 HandlerFactory::new_latch_bank(GroupHandler* parent)
 {
-  GroupHandler* handler = new Str2GroupHandler(parent);
+  GroupHandler* handler = new Str2IntGroupHandler(parent);
 
   // simple attributes
   DotlibHandler* simple = new_string_simple(handler);

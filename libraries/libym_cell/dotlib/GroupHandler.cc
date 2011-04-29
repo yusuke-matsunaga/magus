@@ -477,4 +477,84 @@ Str2GroupHandler::check_group_value(const ShString& attr_name,
   return true;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス Str2IntGroupHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief ハンドラ用のコンストラクタ
+// @param[in] parent 親のハンドラ
+Str2IntGroupHandler::Str2IntGroupHandler(GroupHandler* parent) :
+  GroupHandler(parent)
+{
+}
+
+// @brief デストラクタ
+Str2IntGroupHandler::~Str2IntGroupHandler()
+{
+}
+
+// @brief group statement の引数のチェックを行う仮想関数
+// @param[in] attr_name 属性名
+// @param[in] attr_loc ファイル上の位置
+// @param[in] value_list 値を表すトークンのリスト
+// @note begin_group() の中で呼ばれる．
+// @note デフォルトの実装はなにもしないで true を返す．
+bool
+Str2IntGroupHandler::check_group_value(const ShString& attr_name,
+				       const FileRegion& attr_loc,
+				       PtNode* value_list)
+{
+  ymuint n = value_list->list_size();
+  if ( n < 3 ) {
+    ostringstream buf;
+    buf << attr_name
+	<< " statement requires two string and an integer parameters.";
+    put_msg(__FILE__, __LINE__, attr_loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    buf.str());
+    return false;
+  }
+
+  const PtNode* top = value_list->top();
+  const PtNode* second = top->next();
+  const PtNode* third = second->next();
+  if ( n > 3 ) {
+    const PtNode* forth = third->next();
+  FileRegion loc = forth->loc();
+    ostringstream buf;
+    buf << attr_name << " statement has two string and an integer parameters.";
+    put_msg(__FILE__, __LINE__, loc,
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    buf.str());
+    return false;
+  }
+
+  if ( top->type() != PtNode::kString ) {
+    put_msg(__FILE__, __LINE__, top->loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "string value is expected.");
+    return false;
+  }
+  if ( second->type() != PtNode::kString ) {
+    put_msg(__FILE__, __LINE__, second->loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "string value is expected.");
+    return false;
+  }
+  if ( third->type() != PtNode::kInt ) {
+    put_msg(__FILE__, __LINE__, second->loc(),
+	    kMsgError,
+	    "DOTLIB_PARSER",
+	    "integer value is expected.");
+    return false;
+  }
+
+  return true;
+}
+
 END_NAMESPACE_YM_CELL_DOTLIB
