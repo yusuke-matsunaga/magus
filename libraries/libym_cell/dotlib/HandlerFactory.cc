@@ -385,7 +385,7 @@ HandlerFactory::new_wire_load(GroupHandler* parent)
 DotlibHandler*
 HandlerFactory::new_wire_load_selection(GroupHandler* parent)
 {
-  GroupHandler* handler = new EmptyGroupHandler(parent);
+  GroupHandler* handler = new GroupHandler(parent);
 
   // complex attributes
   DotlibHandler* complex = new_complex(handler);
