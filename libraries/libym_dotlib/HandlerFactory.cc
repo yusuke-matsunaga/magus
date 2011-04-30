@@ -279,7 +279,7 @@ HandlerFactory::new_input_voltage(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_expr_simple(parent);
+  DotlibHandler* simple = new_expr_simple(handler);
   handler->reg_handler("vil", simple);
   handler->reg_handler("vih", simple);
   handler->reg_handler("vimin", simple);
@@ -296,7 +296,7 @@ HandlerFactory::new_output_voltage(GroupHandler* parent)
   GroupHandler* handler = new Str1GroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_expr_simple(parent);
+  DotlibHandler* simple = new_expr_simple(handler);
   handler->reg_handler("vol", simple);
   handler->reg_handler("voh", simple);
   handler->reg_handler("vomin", simple);
