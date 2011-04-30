@@ -5,6 +5,10 @@
 ## $Revision: 1.1.1.1 $
 ## $Date: 2005/12/11 17:07:26 $
 
+SUBDIRS = \
+	. \
+	ptview
+
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
