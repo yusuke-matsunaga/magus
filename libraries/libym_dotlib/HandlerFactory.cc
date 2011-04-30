@@ -493,7 +493,7 @@ HandlerFactory::new_leakage_power(GroupHandler* parent)
   GroupHandler* handler = new EmptyGroupHandler(parent);
 
   // simple attributes
-  DotlibHandler* simple = new_simple(parent);
+  DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("power_level", simple);
   handler->reg_handler("related_pg_pin", simple);
   handler->reg_handler("when", simple);
@@ -935,7 +935,7 @@ HandlerFactory::new_table(GroupHandler* parent)
   // simple attributes
 
   // complex attribute
-  DotlibHandler* complex = new_complex(parent);
+  DotlibHandler* complex = new_complex(handler);
   handler->reg_handler("index_1", complex);
   handler->reg_handler("index_2", complex);
   handler->reg_handler("index_3", complex);
