@@ -285,10 +285,11 @@ DotlibParserImpl::close_file()
 void
 DotlibParserImpl::init()
 {
-  mUngetChar = 0;
   mCR = false;
+  mCurChar = 0;
   mCurLine = 1;
   mCurColumn = 0;
+  mNeedUpdate = true;
 }
 
 // @brief トークンを一つとってくる．
@@ -304,20 +305,20 @@ DotlibParserImpl::read_token(bool symbol_mode)
 
  ST_INIT: // 初期状態
   c = get();
-  mFirstColumn = mCurColumn;
+  mFirstColumn = cur_column();
 
   if ( is_symbol(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_ID;
   }
   if ( isdigit(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM1;
   }
 
   switch (c) {
   case '.':
-    mCurString.put_char(c);
+    accept(c);
     goto ST_DOT;
 
   case EOF:
@@ -390,7 +391,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
   c = get();
   if ( isdigit(c) ) {
     mCurString.put_char('-');
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM1;
   }
   unget();
@@ -399,11 +400,11 @@ DotlibParserImpl::read_token(bool symbol_mode)
  ST_NUM1: // 一文字目が[0-9]の時
   c = get();
   if ( isdigit(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM1;
   }
   if ( c == '.' ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_DOT;
   }
   unget();
@@ -412,7 +413,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
  ST_DOT: // [0-9]*'.' を読み込んだ時
   c = get();
   if ( isdigit(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM2;
   }
   { // '.' の直後はかならず数字
@@ -428,11 +429,11 @@ DotlibParserImpl::read_token(bool symbol_mode)
  ST_NUM2: // [0-9]*'.'[0-9]* を読み込んだ時
   c = get();
   if ( isdigit(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM2;
   }
   if ( c == 'e' || c == 'E' ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM3;
   }
   unget();
@@ -441,11 +442,11 @@ DotlibParserImpl::read_token(bool symbol_mode)
  ST_NUM3: // [0-9]*'.'[0-9]*(e|E)を読み込んだ時
   c = get();
   if ( isdigit(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM4;
   }
   if ( c == '+' || c == '-' ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM4;
   }
   { // (e|E) の直後はかならず数字か符号
@@ -461,7 +462,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
  ST_NUM4: // [0-9]*'.'[0-9]*(e|E)(+|-)?[0-9]*を読み込んだ直後
   c = get();
   if ( isdigit(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_NUM4;
   }
   unget();
@@ -470,7 +471,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
  ST_ID: // 一文字目が[a-zA-Z_]の時
   c = get();
   if ( is_symbol(c) || isdigit(c) ) {
-    mCurString.put_char(c);
+    accept(c);
     goto ST_ID;
   }
   unget();
@@ -484,10 +485,10 @@ DotlibParserImpl::read_token(bool symbol_mode)
   if ( c == '\\' ) {
     c = get();
     if ( c == '\n' ) {
-      mCurString.put_char(c);
+      accept(c);
     }
     // それ以外はバックスラッシュを無視する．
-    mCurString.put_char(c);
+    accept(c);
   }
   else if ( c == '\n' ) {
     ostringstream buf;
@@ -507,7 +508,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
 		    buf.str());
     return ERROR;
   }
-  mCurString.put_char(c);
+  accept(c);
   goto ST_DQ;
 
  ST_COMMENT1: // '/' を読み込んだ直後
@@ -582,18 +583,20 @@ DotlibParserImpl::is_symbol(int c)
   return false;
 }
 
+// @brief 文字を受け入れる．
+void
+DotlibParserImpl::accept(int c)
+{
+  mCurString.put_char(c);
+  mLastColumn = cur_column();
+}
+
 // 一文字読み出す．
 int
 DotlibParserImpl::get()
 {
-  int c = 0;
-
-  if ( mUngetChar != 0 ) {
-    // 戻された文字があったらそれを返す．
-    c = mUngetChar;
-    mUngetChar = 0;
-  }
-  else {
+  if ( mNeedUpdate ) {
+    int c = 0;
     for ( ; ; ) {
       c = mInput.get();
       if ( c == EOF ) {
@@ -625,22 +628,24 @@ DotlibParserImpl::get()
       mCR = false;
       break;
     }
-    if ( c == '\n' ) {
+    if ( mCurChar == '\n' ) {
       ++ mCurLine;
-      mCurColumn = 0;
+      mCurColumn = 1;
     }
+    else {
+      ++ mCurColumn;
+    }
+    mCurChar = c;
   }
-  ++ mCurColumn;
-  mLastChar = c;
-  return c;
+  mNeedUpdate = true;
+  return mCurChar;
 }
 
 // 一文字読み戻す．
 void
 DotlibParserImpl::unget()
 {
-  mUngetChar = mLastChar;
-  -- mCurColumn;
+  mNeedUpdate = false;
 }
 
 END_NAMESPACE_YM_DOTLIB
