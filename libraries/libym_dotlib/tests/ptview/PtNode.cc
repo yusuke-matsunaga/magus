@@ -17,6 +17,69 @@
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
+BEGIN_NONAMESPACE
+
+const char*
+opr_str(DotlibNode::tType type)
+{
+  switch ( type ) {
+  case DotlibNode::kPlus:  return "+";
+  case DotlibNode::kMinus: return "-";
+  case DotlibNode::kMult:  return "*";
+  case DotlibNode::kDiv:   return "/";
+  default: break;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return "";
+}
+
+void
+vs_sub(ostream& s,
+       const DotlibNode* node)
+{
+  if ( node->is_int() ) {
+    s << node->int_value();
+  }
+  else if ( node->is_float() ) {
+    s << node->float_value();
+  }
+  else if ( node->is_string() ) {
+    s << node->string_value();
+  }
+  else if ( node->is_opr() ) {
+    s << "( ";
+    vs_sub(s, node->opr1());
+    s << " " << opr_str(node->type()) << " ";
+    vs_sub(s, node->opr2());
+    s << " )";
+  }
+  else if ( node->is_list() ) {
+    const char* comma = "";
+    s << "(";
+    for (const DotlibNode* node1 = node->top(); node1;
+	 node1 = node1->next()) {
+      s << comma;
+      vs_sub(s, node1);
+      comma = ", ";
+    }
+    s << ")";
+  }
+  else if ( node->is_group() ) {
+    vs_sub(s, node->group_value());
+  }
+}
+
+string
+value_str(const DotlibNode* node)
+{
+  ostringstream buf;
+  vs_sub(buf, node);
+  return buf.str();
+}
+
+END_NONAMESPACE
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス PtNode
 //////////////////////////////////////////////////////////////////////
@@ -37,6 +100,59 @@ PtNode::parent_index() const
 {
   return mParentIndex;
 }
+
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス PtRootNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] node 対応するパース木のノード
+PtRootNode::PtRootNode(const DotlibNode* node) :
+  mRoot(new PtBaseNode(node))
+{
+}
+
+// @brief デストラクタ
+PtRootNode::~PtRootNode()
+{
+  delete mRoot;
+}
+
+// @brief 子供の数を返す．
+int
+PtRootNode::child_num() const
+{
+  return 1;
+}
+
+// @brief 子供を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < row_num() )
+PtNode*
+PtRootNode::child(int pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return mRoot;
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role
+QVariant
+PtRootNode::data(int column,
+		 int role) const
+{
+  return QVariant();
+}
+
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+PtRootNode::loc() const
+{
+  return mRoot->loc();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス PtBaseNode
@@ -88,49 +204,60 @@ PtBaseNode::data(int column,
 		 int role) const
 {
   if ( role == Qt::DisplayRole ) {
-    if ( column == 0 ) {
-      if ( mNode->is_group() ) {
+    if ( mNode->is_int() ) {
+      if ( column == 0 ) {
+	return "int";
       }
-      else if ( mNode->is_attr() ) {
-	return (const char*)mNode->attr_name();
+      else if ( column == 1 ) {
+	return mNode->int_value();
       }
     }
-    else if ( column == 1 ) {
-      if ( mNode->is_attr() ) {
-	const DotlibNode* node = mNode->attr_value();
-	if ( node->is_int() ) {
-	  return node->int_value();
-	}
-	else if ( node->is_float() ) {
-	  return node->float_value();
-	}
-	else if ( node->is_string() ) {
-	  return (const char*)node->string_value();
-	}
-	else if ( node->is_group() ) {
-	  const DotlibNode* value = node->group_value();
-	  if ( value->list_size() == 1 ) {
-	    return (const char*)value->top()->string_value();
-	  }
-	  else {
-	    ostringstream buf;
-	    const char* comma = "";
-	    for (const DotlibNode* node = value->top();
-		 node; node = node->next()) {
-	      buf << comma;
-	      if ( node->is_int() ) {
-		buf << node->int_value();
-	      }
-	      else if ( node->is_float() ) {
-		buf << node->float_value();
-	      }
-	      else if ( node->is_string() ) {
-		buf << (const char*)node->string_value();
-	      }
-	      comma = ", ";
-	    }
-	  }
-	}
+    else if ( mNode->is_float() ) {
+      if ( column == 0 ) {
+	return "float";
+      }
+      else if ( column == 1 ) {
+	return mNode->float_value();
+      }
+    }
+    else if ( mNode->is_string() ) {
+      if ( column == 0 ) {
+	return "string";
+      }
+      else if ( column == 1 ) {
+	return (const char*)mNode->string_value();
+      }
+    }
+    else if ( mNode->is_opr() ) {
+      if ( column == 0 ) {
+	return opr_str(mNode->type());
+      }
+    }
+    else if ( mNode->is_list() ) {
+      if ( column == 0 ) {
+	return "list";
+      }
+      else if ( column == 1 ) {
+	string str = value_str(mNode);
+	return QVariant(str.c_str());
+      }
+    }
+    else if ( mNode->is_group() ) {
+      if ( column == 0 ) {
+	return "value";
+      }
+      else if ( column == 1 ) {
+	string str = value_str(mNode->group_value());
+	return QVariant(str.c_str());
+      }
+    }
+    else if ( mNode->is_attr() ) {
+      if ( column == 0 ) {
+	return (const char*)mNode->attr_name();
+      }
+      else if ( column == 1 ) {
+	string str = value_str(mNode->attr_value());
+	return QVariant(str.c_str());
       }
     }
   }
@@ -141,14 +268,24 @@ PtBaseNode::data(int column,
 FileRegion
 PtBaseNode::loc() const
 {
-  return mNode->loc();
+  if ( mNode->is_group() ) {
+    return mNode->group_value()->loc();
+  }
+  else {
+    return mNode->loc();
+  }
 }
 
 // @brief 子供の配列を作る．
 void
 PtBaseNode::expand() const
 {
-  if ( mNode->is_list() ) {
+  if ( mNode->is_opr() ) {
+    mChildren.resize(2);
+    mChildren[0] = new PtBaseNode(mNode->opr1());
+    mChildren[1] = new PtBaseNode(mNode->opr2());
+  }
+  else if ( mNode->is_list() ) {
     ymuint n = mNode->list_size();
     mChildren.resize(n);
     ymuint i = 0;
@@ -157,75 +294,33 @@ PtBaseNode::expand() const
       ++ i;
     }
   }
+  else if ( mNode->is_group() ) {
+    mChildren.resize(1);
+    mChildren[0] = new PtBaseNode(mNode->group_value());
+  }
   else if ( mNode->is_attr() ) {
-    const DotlibNode* node = mNode->attr_value();
-    if ( node->is_group() ) {
-      ymuint n = 0;
-      for (const DotlibNode* node1 = node->attr_top(); node1;
+    const DotlibNode* value = mNode->attr_value();
+    if ( value->is_group() ) {
+      ymuint n = 1;
+      for (const DotlibNode* node1 = value->attr_top(); node1;
 	   node1 = node1->next()) {
 	++ n;
       }
       mChildren.resize(n);
-      n = 0;
-      for (const DotlibNode* node1 = node->attr_top(); node1;
+      mChildren[0] = new PtBaseNode(value);
+      n = 1;
+      for (const DotlibNode* node1 = value->attr_top(); node1;
 	   node1 = node1->next()) {
 	mChildren[n] = new PtBaseNode(node1);
 	++ n;
       }
     }
+    else {
+      mChildren.resize(1);
+      mChildren[0] = new PtBaseNode(value);
+    }
   }
   mExpanded = true;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス PtRootNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] node 対応するパース木のノード
-PtRootNode::PtRootNode(const DotlibNode* node) :
-  mRoot(new PtBaseNode(node))
-{
-}
-
-// @brief デストラクタ
-PtRootNode::~PtRootNode()
-{
-  delete mRoot;
-}
-
-// @brief 子供の数を返す．
-int
-PtRootNode::child_num() const
-{
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < row_num() )
-PtNode*
-PtRootNode::child(int pos) const
-{
-  assert_cond( pos == 0, __FILE__, __LINE__);
-  return mRoot;
-}
-
-// @brief データを返す．
-// @param[in] column コラム番号
-// @param[in] role
-QVariant
-PtRootNode::data(int column,
-		 int role) const
-{
-  return QVariant();
-}
-
-// @brief 対象のファイル上での位置を返す．
-FileRegion
-PtRootNode::loc() const
-{
-  return mRoot->loc();
 }
 
 END_NAMESPACE_YM_DOTLIB
