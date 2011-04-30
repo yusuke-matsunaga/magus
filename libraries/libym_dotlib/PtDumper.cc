@@ -160,7 +160,6 @@ void
 PtDumper::operator()(ostream& s,
 		     const DotlibNode* root)
 {
-  s << "library ";
   dump_sub(s, root, 0);
 }
 
