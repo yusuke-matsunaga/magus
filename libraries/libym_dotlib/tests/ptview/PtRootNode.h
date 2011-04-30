@@ -1,57 +1,51 @@
-#ifndef PTNODE_H
-#define PTNODE_H
+#ifndef PTROOTNODE_H
+#define PTROOTNODE_H
 
-/// @file libym_dotlib/tests/ptview/PtNode.h
-/// @brief PtNode のヘッダファイル
+/// @file libym_dotlib/tests/ptview/PtRootNode.h
+/// @brief PtRootNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: PtNode.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <QAbstractItemModel>
-#include "ym_dotlib/dotlib_nsdef.h"
-#include "ym_utils/FileRegion.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtNode PtNode.h
-/// @brief dotlib のパース木を表示するためのモデル
+/// @class PtRootNode PtRootNode.h
+/// @brief 根のノード
 //////////////////////////////////////////////////////////////////////
-class PtNode
+class PtRootNode :
+  public PtNode
 {
-  friend class ParseTreeModel;
-
 public:
 
   /// @brief コンストラクタ
-  PtNode();
+  /// @param[in] node 対応するパース木のノード
+  PtRootNode(const DotlibNode* node);
 
   /// @brief デストラクタ
   virtual
-  ~PtNode();
+  ~PtRootNode();
 
 
 public:
-
-  /// @brief 親のインデックスを返す．
-  QModelIndex
-  parent_index() const;
 
   /// @brief 子供の数を返す．
   virtual
   int
-  child_num() const = 0;
+  child_num() const;
 
   /// @brief 子供を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < row_num() )
   virtual
   PtNode*
-  child(int pos) const = 0;
+  child(int pos) const;
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
@@ -59,12 +53,12 @@ public:
   virtual
   QVariant
   data(int column,
-       int role) const = 0;
+       int role) const;
 
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
-  loc() const = 0;
+  loc() const;
 
 
 private:
@@ -72,11 +66,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親のノード
-  QModelIndex mParentIndex;
+  // 根元のノード
+  PtNode* mRoot;
 
 };
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // PTNODE_H
+#endif // PTROOTNODE_H

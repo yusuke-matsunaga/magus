@@ -25,6 +25,8 @@ ptview_SOURCES = \
 	ParseTreeView.h \
 	ParseTreeView.cc \
 	PtNode.h \
+	PtNodeImpl.h \
+	PtRootNode.h \
 	PtNode.cc \
 	ptview_main.cc
 

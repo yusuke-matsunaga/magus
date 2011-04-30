@@ -11,6 +11,7 @@
 
 #include "ParseTreeModel.h"
 #include "PtNode.h"
+#include "PtRootNode.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

@@ -10,6 +10,8 @@
 
 
 #include "PtNode.h"
+#include "PtBaseNode.h"
+#include "PtRootNode.h"
 #include "ym_dotlib/DotlibNode.h"
 
 
@@ -20,20 +22,13 @@ BEGIN_NAMESPACE_YM_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] node 対応するパース木のノード
-PtNode::PtNode(const DotlibNode* node) :
-  mNode(node),
-  mExpanded(false)
+PtNode::PtNode()
 {
 }
 
 // @brief デストラクタ
 PtNode::~PtNode()
 {
-  for (vector<PtNode*>::iterator p = mChildren.begin();
-       p != mChildren.end(); ++ p) {
-    delete *p;
-  }
 }
 
 // @brief 親のインデックスを返す．
@@ -43,9 +38,30 @@ PtNode::parent_index() const
   return mParentIndex;
 }
 
+//////////////////////////////////////////////////////////////////////
+// クラス PtBaseNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] node 対応するパース木のノード
+PtBaseNode::PtBaseNode(const DotlibNode* node) :
+  mNode(node),
+  mExpanded(false)
+{
+}
+
+// @brief デストラクタ
+PtBaseNode::~PtBaseNode()
+{
+  for (vector<PtNode*>::iterator p = mChildren.begin();
+       p != mChildren.end(); ++ p) {
+    delete *p;
+  }
+}
+
 // @brief 子供の数を返す．
 int
-PtNode::child_num() const
+PtBaseNode::child_num() const
 {
   if ( !mExpanded ) {
     expand();
@@ -56,7 +72,7 @@ PtNode::child_num() const
 // @brief 子供を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < row_num() )
 PtNode*
-PtNode::child(int pos) const
+PtBaseNode::child(int pos) const
 {
   if ( !mExpanded ) {
     expand();
@@ -68,8 +84,8 @@ PtNode::child(int pos) const
 // @param[in] column コラム番号
 // @param[in] role
 QVariant
-PtNode::data(int column,
-	     int role) const
+PtBaseNode::data(int column,
+		 int role) const
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
@@ -123,21 +139,21 @@ PtNode::data(int column,
 
 // @brief 対象のファイル上での位置を返す．
 FileRegion
-PtNode::loc() const
+PtBaseNode::loc() const
 {
   return mNode->loc();
 }
 
 // @brief 子供の配列を作る．
 void
-PtNode::expand() const
+PtBaseNode::expand() const
 {
   if ( mNode->is_list() ) {
     ymuint n = mNode->list_size();
     mChildren.resize(n);
     ymuint i = 0;
     for (const DotlibNode* node = mNode->top(); node; node = node->next()) {
-      mChildren[i] = new PtNode(node);
+      mChildren[i] = new PtBaseNode(node);
       ++ i;
     }
   }
@@ -153,7 +169,7 @@ PtNode::expand() const
       n = 0;
       for (const DotlibNode* node1 = node->attr_top(); node1;
 	   node1 = node1->next()) {
-	mChildren[n] = new PtNode(node1);
+	mChildren[n] = new PtBaseNode(node1);
 	++ n;
       }
     }
@@ -169,14 +185,14 @@ PtNode::expand() const
 // @brief コンストラクタ
 // @param[in] node 対応するパース木のノード
 PtRootNode::PtRootNode(const DotlibNode* node) :
-  PtNode(node),
-  mRoot(new PtNode(node))
+  mRoot(new PtBaseNode(node))
 {
 }
 
 // @brief デストラクタ
 PtRootNode::~PtRootNode()
 {
+  delete mRoot;
 }
 
 // @brief 子供の数を返す．
@@ -210,12 +226,6 @@ FileRegion
 PtRootNode::loc() const
 {
   return mRoot->loc();
-}
-
-// @brief 子供の配列を作る．
-void
-PtRootNode::expand() const
-{
 }
 
 END_NAMESPACE_YM_DOTLIB

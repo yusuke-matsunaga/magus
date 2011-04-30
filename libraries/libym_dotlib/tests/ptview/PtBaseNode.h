@@ -1,57 +1,53 @@
-#ifndef PTNODE_H
-#define PTNODE_H
+#ifndef PTBASEIMPL_H
+#define PTBASEIMPL_H
 
-/// @file libym_dotlib/tests/ptview/PtNode.h
-/// @brief PtNode のヘッダファイル
+/// @file libym_dotlib/tests/ptview/PtBaseNode.h
+/// @brief PtBaseNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: PtNode.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <QAbstractItemModel>
-#include "ym_dotlib/dotlib_nsdef.h"
-#include "ym_utils/FileRegion.h"
+#include "PtNode.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtNode PtNode.h
-/// @brief dotlib のパース木を表示するためのモデル
+/// @class PtBaseNode PtBaseNode.h
+/// @brief PtNode の実装クラス
 //////////////////////////////////////////////////////////////////////
-class PtNode
+class PtBaseNode :
+  public PtNode
 {
   friend class ParseTreeModel;
 
 public:
 
   /// @brief コンストラクタ
-  PtNode();
+  /// @param[in] node 対応するパース木のノード
+  PtBaseNode(const DotlibNode* node);
 
   /// @brief デストラクタ
   virtual
-  ~PtNode();
+  ~PtBaseNode();
 
 
 public:
 
-  /// @brief 親のインデックスを返す．
-  QModelIndex
-  parent_index() const;
-
   /// @brief 子供の数を返す．
   virtual
   int
-  child_num() const = 0;
+  child_num() const;
 
   /// @brief 子供を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < row_num() )
   virtual
   PtNode*
-  child(int pos) const = 0;
+  child(int pos) const;
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
@@ -59,12 +55,22 @@ public:
   virtual
   QVariant
   data(int column,
-       int role) const = 0;
+       int role) const;
 
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
-  loc() const = 0;
+  loc() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 子供の配列を作る．
+  void
+  expand() const;
 
 
 private:
@@ -72,11 +78,19 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親のノード
-  QModelIndex mParentIndex;
+  // 対応するノード
+  const DotlibNode* mNode;
+
+  // 子供の配列を作っているかを示すフラグ
+  mutable
+  bool mExpanded;
+
+  // 子供の配列
+  mutable
+  std::vector<PtNode*> mChildren;
 
 };
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // PTNODE_H
+#endif // PTBASEIMPL_H
