@@ -161,4 +161,61 @@ PtNode::expand() const
   mExpanded = true;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス PtRootNode
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] node 対応するパース木のノード
+PtRootNode::PtRootNode(const DotlibNode* node) :
+  PtNode(node),
+  mRoot(new PtNode(node))
+{
+}
+
+// @brief デストラクタ
+PtRootNode::~PtRootNode()
+{
+}
+
+// @brief 子供の数を返す．
+int
+PtRootNode::child_num() const
+{
+  return 1;
+}
+
+// @brief 子供を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < row_num() )
+PtNode*
+PtRootNode::child(int pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return mRoot;
+}
+
+// @brief データを返す．
+// @param[in] column コラム番号
+// @param[in] role
+QVariant
+PtRootNode::data(int column,
+		 int role) const
+{
+  return QVariant();
+}
+
+// @brief 対象のファイル上での位置を返す．
+FileRegion
+PtRootNode::loc() const
+{
+  return mRoot->loc();
+}
+
+// @brief 子供の配列を作る．
+void
+PtRootNode::expand() const
+{
+}
+
 END_NAMESPACE_YM_DOTLIB

@@ -118,7 +118,9 @@ void
 ParseTreeModel::set_pt(const DotlibNode* library)
 {
   delete mRootNode;
-  mRootNode = new PtNode(library);
+  assert_cond( library->is_attr() == true, __FILE__, __LINE__);
+  assert_cond( library->attr_name() == "library", __FILE__, __LINE__);
+  mRootNode = new PtRootNode(library);
 }
 
 // @brief トークンのファイル上の位置を返す．
