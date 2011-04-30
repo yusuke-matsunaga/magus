@@ -625,13 +625,13 @@ DotlibParserImpl::get()
       mCR = false;
       break;
     }
+    if ( c == '\n' ) {
+      ++ mCurLine;
+      mCurColumn = 0;
+    }
   }
   ++ mCurColumn;
   mLastChar = c;
-  if ( c == '\n' ) {
-    ++ mCurLine;
-    mCurColumn = 0;
-  }
   return c;
 }
 
