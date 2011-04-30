@@ -480,6 +480,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
   c = get();
   if ( c == '\"' ) {
+    ++ mLastColumn;
     return SYMBOL;
   }
   if ( c == '\\' ) {
