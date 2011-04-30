@@ -143,7 +143,9 @@ dump_sub(ostream& s,
     break;
 
   case DotlibNode::kAttr:
-    assert_not_reached(__FILE__, __LINE__);
+    s << node->attr_name() << ": ";
+    dump_sub(s, node->attr_value(), indent);
+    s << endl;
     break;
   }
 }

@@ -13,6 +13,7 @@
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
 #include "ym_utils/ShString.h"
+#include "PtNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -94,7 +95,10 @@ last:
   if ( error ) {
     return NULL;
   }
-  return mLibraryHandler->pt_node();
+
+  const DotlibNode* library = mLibraryHandler->pt_node();
+  const DotlibNode* root = mPtMgr.new_attr(ShString("library"), library, library->loc());
+  return root;
 }
 
 // @brief 直前の read_file() で確保したパース木を解放する．

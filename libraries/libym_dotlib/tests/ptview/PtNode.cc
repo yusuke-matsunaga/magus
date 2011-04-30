@@ -49,7 +49,6 @@ PtNode::child_num() const
 {
   if ( !mExpanded ) {
     expand();
-    mExpanded = true;
   }
   return mChildren.size();
 }
@@ -61,7 +60,6 @@ PtNode::child(int pos) const
 {
   if ( !mExpanded ) {
     expand();
-    mExpanded = true;
   }
   return mChildren[pos];
 }
@@ -75,19 +73,48 @@ PtNode::data(int column,
 {
   if ( role == Qt::DisplayRole ) {
     if ( column == 0 ) {
-      if ( mNode->is_attr() ) {
+      if ( mNode->is_group() ) {
+      }
+      else if ( mNode->is_attr() ) {
 	return (const char*)mNode->attr_name();
       }
     }
     else if ( column == 1 ) {
-      if ( mNode->is_int() ) {
-	return mNode->int_value();
-      }
-      else if ( mNode->is_float() ) {
-	return mNode->float_value();
-      }
-      else if ( mNode->is_string() ) {
-	return (const char*)mNode->string_value();
+      if ( mNode->is_attr() ) {
+	const DotlibNode* node = mNode->attr_value();
+	if ( node->is_int() ) {
+	  return node->int_value();
+	}
+	else if ( node->is_float() ) {
+	  return node->float_value();
+	}
+	else if ( node->is_string() ) {
+	  return (const char*)node->string_value();
+	}
+	else if ( node->is_group() ) {
+	  const DotlibNode* value = node->group_value();
+	  if ( value->list_size() == 1 ) {
+	    return (const char*)value->top()->string_value();
+	  }
+	  else {
+	    ostringstream buf;
+	    const char* comma = "";
+	    for (const DotlibNode* node = value->top();
+		 node; node = node->next()) {
+	      buf << comma;
+	      if ( node->is_int() ) {
+		buf << node->int_value();
+	      }
+	      else if ( node->is_float() ) {
+		buf << node->float_value();
+	      }
+	      else if ( node->is_string() ) {
+		buf << (const char*)node->string_value();
+	      }
+	      comma = ", ";
+	    }
+	  }
+	}
       }
     }
   }
@@ -114,24 +141,24 @@ PtNode::expand() const
       ++ i;
     }
   }
-  else if ( mNode->is_group() ) {
-    ymuint n = 0;
-    for (const DotlibNode* node = mNode->attr_top(); node;
-	 node = node->next()) {
-      ++ n;
-    }
-    mChildren.resize(n);
-    n = 0;
-    for (const DotlibNode* node = mNode->attr_top(); node;
-	 node = node->next()) {
-      mChildren[n] = new PtNode(node);
-      ++ n;
-    }
-  }
   else if ( mNode->is_attr() ) {
-    mChildren.resize(1);
-    mChildren[0] = new PtNode(mNode->attr_value());
+    const DotlibNode* node = mNode->attr_value();
+    if ( node->is_group() ) {
+      ymuint n = 0;
+      for (const DotlibNode* node1 = node->attr_top(); node1;
+	   node1 = node1->next()) {
+	++ n;
+      }
+      mChildren.resize(n);
+      n = 0;
+      for (const DotlibNode* node1 = node->attr_top(); node1;
+	   node1 = node1->next()) {
+	mChildren[n] = new PtNode(node1);
+	++ n;
+      }
+    }
   }
+  mExpanded = true;
 }
 
 END_NAMESPACE_YM_DOTLIB
