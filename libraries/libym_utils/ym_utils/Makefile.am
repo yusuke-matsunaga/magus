@@ -16,6 +16,7 @@ noinst_HEADERS = \
 	FileDesc.h \
 	FileLoc.h \
 	FileRegion.h \
+	FileScanner.h \
 	Generator.h \
 	HeapTree.h \
 	ItvlMgr.h \

@@ -22,6 +22,7 @@ libym_utils_la_SOURCES = \
 	DlList.cc \
 	File.cc \
 	FileLoc.cc \
+	FileScanner.cc \
 	FragAlloc.cc \
 	Generator.cc \
 	ItvlCell.h \
