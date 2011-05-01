@@ -11,8 +11,6 @@
 
 #include "MislibParser.h"
 
-#include "ym_utils/FileDescMgr.h"
-//#include "ym_lexp/LogExpr.h"
 
 #include "MislibPtImpl1.h"
 #include "MislibPtImpl2.h"
@@ -49,9 +47,7 @@ MislibParser::read(const string& filename)
 {
   int yyparse(MislibParser& parser);
 
-  ifstream input_stream;
-  input_stream.open(filename.c_str());
-  if ( !input_stream ) {
+  if ( !mLex.open_file(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -59,10 +55,6 @@ MislibParser::read(const string& filename)
 		    kMsgFailure, "MISLIB_PARSER", buf.str());
     return false;
   }
-  FileDescMgr fdmgr;
-  const FileDesc* file_desc = fdmgr.new_file_desc(filename);
-
-  mLex.init(input_stream, file_desc);
 
   // 初期化
   clear();

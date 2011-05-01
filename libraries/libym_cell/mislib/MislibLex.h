@@ -14,6 +14,8 @@
 #include "mislib_nsdef.h"
 
 #include "ym_utils/StrBuff.h"
+#include "ym_utils/FileDescMgr.h"
+#include "ym_utils/FileScanner.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/MsgHandler.h"
 
@@ -21,7 +23,8 @@
 BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
-/// Mislib 用の LEX クラス
+/// @class MislibLex MislibLex.h "MislibLex.h"
+/// @brief Mislib 用の LEX クラス
 //////////////////////////////////////////////////////////////////////
 class MislibLex
 {
@@ -37,12 +40,11 @@ public:
 
 public:
 
-  /// @brief 入力ストリームを設定する．
-  /// @param[in] istr 入力ストリーム
-  /// @param[in] file_desc ファイル記述子
-  void
-  init(istream& istr,
-       const FileDesc* file_desc);
+  /// @brief ファイルを開く
+  /// @param[in] filename ファイル名
+  /// @return 失敗したら false を返す．
+  bool
+  open_file(const string& filename);
 
   /// @brief トークンを一つとってくる．
   int
@@ -66,13 +68,9 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  // 一文字読み出す．
-  int
-  get();
-
-  // 直前の get() を無かったことにする．
+  // 直前の読み込みを確定させる．
   void
-  unget();
+  accept(int c);
 
 
 private:
@@ -83,32 +81,23 @@ private:
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
 
+  // ファイル記述子を管理するオブジェクト
+  FileDescMgr mFdMgr;
+
   // 現在のファイル記述子
   const FileDesc* mFileDesc;
 
-  // 入力ストリーム
-  istream* mInput;
+  // ファイル入力用のオブジェクト
+  FileScanner mFileScanner;
 
-  // 直前に読んだ文字
-  int mLastChar;
-
-  // unget() 用の文字バッファ
-  int mUngetChar;
-
-  // 直前の文字が \r の時に true となるフラグ
-  bool mCR;
-
-  // read_token の結果の文字列を格納する
+  // 現在読込中の文字列を貯めておくバッファ
   StrBuff mCurString;
-
-  // 現在の行番号
-  ymuint32 mCurLine;
 
   // 現在のトークンの開始位置
   ymuint32 mFirstColumn;
 
-  // 現在のコラム位置
-  ymuint32 mCurColumn;
+  // 現在のトークンの終了位置
+  ymuint32 mLastColumn;
 
 };
 
