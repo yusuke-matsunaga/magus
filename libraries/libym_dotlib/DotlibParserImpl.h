@@ -97,14 +97,6 @@ public:
   FileRegion
   cur_loc();
 
-  /// @brief 現在の行番号を返す．
-  int
-  cur_line() const;
-
-  /// @brief 現在のコラム位置
-  int
-  cur_column() const;
-
   /// @brief メッセージ出力管理オブジェクトを返す．
   MsgMgr&
   msg_mgr();
@@ -163,22 +155,11 @@ private:
   void
   close_file();
 
-#if 0
-  /// @brief 初期化を行う．
-  void
-  init();
-#endif
-
   /// @brief c が文字の時に true を返す．
   /// @note mSymbolMode が true なら数字も文字とみなす．
   bool
   is_symbol(int c);
 
-  /// @brief 文字を受け入れる．
-  void
-  accept(int c);
-
-#if 0
   /// @brief 一文字読み出す．
   int
   get();
@@ -186,7 +167,6 @@ private:
   /// @brief 直前の get() を無かったことにする．
   void
   unget();
-#endif
 
 
 private:
@@ -224,11 +204,11 @@ private:
   // read_token の結果の文字列を格納する
   StrBuff mCurString;
 
-  // 現在のトークンの開始位置
-  ymuint32 mFirstColumn;
+  // 現在のトークンの開始位置の行番号
+  ymuint32 mFirstLine;
 
-  // 現在のトークンの終了位置
-  ymuint32 mLastColumn;
+  // 現在のトークンの開始位置のコラム位置
+  ymuint32 mFirstColumn;
 
 };
 
@@ -251,24 +231,24 @@ FileRegion
 DotlibParserImpl::cur_loc()
 {
   return FileRegion(mCurFileDesc,
-		    cur_line(), mFirstColumn,
-		    cur_line(), mLastColumn);
+		    mFirstLine, mFirstColumn,
+		    mFileScanner.last_line(), mFileScanner.last_column());
 }
 
-// 現在の行番号を返す．
+// @brief 一文字読み出す．
 inline
 int
-DotlibParserImpl::cur_line() const
+DotlibParserImpl::get()
 {
-  return mFileScanner.cur_line();
+  return mFileScanner.get();
 }
 
-// 現在のコラム位置を返す．
+// @brief 直前の get() を無かったことにする．
 inline
-int
-DotlibParserImpl::cur_column() const
+void
+DotlibParserImpl::unget()
 {
-  return mFileScanner.cur_column();
+  mFileScanner.unget();
 }
 
 END_NAMESPACE_YM_DOTLIB

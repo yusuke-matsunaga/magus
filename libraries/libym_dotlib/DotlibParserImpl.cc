@@ -296,21 +296,21 @@ DotlibParserImpl::read_token(bool symbol_mode)
   mCurString.clear();
 
  ST_INIT: // 初期状態
-  c = mFileScanner.get();
-  mFirstColumn = cur_column();
-
+  c = get();
+  mFirstLine = mFileScanner.cur_line();
+  mFirstColumn = mFileScanner.cur_column();
   if ( is_symbol(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_ID;
   }
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM1;
   }
 
   switch (c) {
   case '.':
-    accept(c);
+    mCurString.put_char(c);
     goto ST_DOT;
 
   case EOF:
@@ -327,13 +327,13 @@ DotlibParserImpl::read_token(bool symbol_mode)
     goto ST_DQ;
 
   case '\\':
-    c = mFileScanner.get();
+    c = get();
     if ( c == '\n' ) {
       // 無視する．
       goto ST_INIT;
     }
     // それ以外はバックスラッシュがなかったことにする．
-    mFileScanner.unget();
+    unget();
     goto ST_INIT;
 
   case '/':
@@ -380,32 +380,32 @@ DotlibParserImpl::read_token(bool symbol_mode)
   assert_not_reached(__FILE__, __LINE__);
 
  ST_MINUS: // '-' を読み込んだ時
-  c = mFileScanner.get();
+  c = get();
   if ( isdigit(c) ) {
     mCurString.put_char('-');
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM1;
   }
-  mFileScanner.unget();
+  unget();
   return MINUS;
 
  ST_NUM1: // 一文字目が[0-9]の時
-  c = mFileScanner.get();
+  c = get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM1;
   }
   if ( c == '.' ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_DOT;
   }
-  mFileScanner.unget();
+  unget();
   return INT_NUM;
 
  ST_DOT: // [0-9]*'.' を読み込んだ時
-  c = mFileScanner.get();
+  c = get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM2;
   }
   { // '.' の直後はかならず数字
@@ -419,26 +419,26 @@ DotlibParserImpl::read_token(bool symbol_mode)
   }
 
  ST_NUM2: // [0-9]*'.'[0-9]* を読み込んだ時
-  c = mFileScanner.get();
+  c = get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM2;
   }
   if ( c == 'e' || c == 'E' ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM3;
   }
-  mFileScanner.unget();
+  unget();
   return FLOAT_NUM;
 
  ST_NUM3: // [0-9]*'.'[0-9]*(e|E)を読み込んだ時
-  c = mFileScanner.get();
+  c = get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM4;
   }
   if ( c == '+' || c == '-' ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM4;
   }
   { // (e|E) の直後はかならず数字か符号
@@ -452,36 +452,35 @@ DotlibParserImpl::read_token(bool symbol_mode)
   }
 
  ST_NUM4: // [0-9]*'.'[0-9]*(e|E)(+|-)?[0-9]*を読み込んだ直後
-  c = mFileScanner.get();
+  c = get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_NUM4;
   }
-  mFileScanner.unget();
+  unget();
   return FLOAT_NUM;
 
  ST_ID: // 一文字目が[a-zA-Z_]の時
-  c = mFileScanner.get();
+  c = get();
   if ( is_symbol(c) || isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto ST_ID;
   }
-  mFileScanner.unget();
+  unget();
   return SYMBOL;
 
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
-  c = mFileScanner.get();
+  c = get();
   if ( c == '\"' ) {
-    ++ mLastColumn;
     return SYMBOL;
   }
   if ( c == '\\' ) {
-    c = mFileScanner.get();
+    c = get();
     if ( c == '\n' ) {
-      accept(c);
+      mCurString.put_char(c);
     }
     // それ以外はバックスラッシュを無視する．
-    accept(c);
+    mCurString.put_char(c);
   }
   else if ( c == '\n' ) {
     ostringstream buf;
@@ -501,22 +500,22 @@ DotlibParserImpl::read_token(bool symbol_mode)
 		    buf.str());
     return ERROR;
   }
-  accept(c);
+  mCurString.put_char(c);
   goto ST_DQ;
 
  ST_COMMENT1: // '/' を読み込んだ直後
-  c = mFileScanner.get();
+  c = get();
   if ( c == '/' ) { // C++ スタイルのコメント
     goto ST_COMMENT2;
   }
   if ( c == '*' ) { // C スタイルのコメント
     goto ST_COMMENT3;
   }
-  mFileScanner.unget();
+  unget();
   return DIV;
 
  ST_COMMENT2: // 改行まで読み飛ばす．
-  c = mFileScanner.get();
+  c = get();
   if ( c == '\n' ) {
     goto ST_INIT;
   }
@@ -526,7 +525,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
   goto ST_COMMENT2;
 
  ST_COMMENT3: // "/*" を読み込んだ直後
-  c = mFileScanner.get();
+  c = get();
   if ( c == EOF ) {
     goto ST_EOF;
   }
@@ -536,7 +535,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
   goto ST_COMMENT3;
 
  ST_COMMENT4: // "/* 〜 *" まで読み込んだ直後
-  c = mFileScanner.get();
+  c = get();
   if ( c == EOF ) {
     goto ST_EOF;
   }
@@ -574,14 +573,6 @@ DotlibParserImpl::is_symbol(int c)
     }
   }
   return false;
-}
-
-// @brief 文字を受け入れる．
-void
-DotlibParserImpl::accept(int c)
-{
-  mCurString.put_char(c);
-  mLastColumn = cur_column();
 }
 
 END_NAMESPACE_YM_DOTLIB
