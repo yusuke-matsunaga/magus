@@ -10,6 +10,7 @@
 
 
 #include "ym_utils/FileScanner.h"
+#include <fcntl.h>
 
 
 BEGIN_NAMESPACE_YM
@@ -33,8 +34,8 @@ bool
 FileScanner::open_file(const string& filename)
 {
   init();
-  mInput.open(filename.c_str());
-  if ( !mInput ) {
+  mFd = open(filename.c_str(), O_RDONLY);
+  if ( mFd < 0 ) {
     return false;
   }
   return true;
@@ -44,13 +45,17 @@ FileScanner::open_file(const string& filename)
 void
 FileScanner::close_file()
 {
-  mInput.close();
+  close(mFd);
+  mFd = -1;
 }
 
 // 初期化
 void
 FileScanner::init()
 {
+  mFd = -1;
+  mReadPos = 0;
+  mEndPos = 0;
   mCR = false;
   mCurChar = 0;
   mCurLine = 1;
@@ -65,10 +70,26 @@ FileScanner::get()
   if ( mNeedUpdate ) {
     int c = 0;
     for ( ; ; ) {
-      c = mInput.get();
-      if ( c == EOF ) {
-	break;
+      if ( mReadPos >= mEndPos ) {
+	mReadPos = 0;
+	if ( mFd >= 0 ) {
+	  ssize_t n = read(mFd, mBuff, 4096);
+	  if ( n < 0 ) {
+	    // ファイル読み込みエラー
+	    return -1;
+	  }
+	  mEndPos = n;
+	}
+	else {
+	  mEndPos = 0;
+	}
       }
+      if ( mEndPos == 0 ) {
+	return EOF;
+      }
+      c = mBuff[mReadPos];
+      ++ mReadPos;
+
       // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
       // 強制的に '\n' に書き換えてしまう．
       // Windows : '\r', '\n'
