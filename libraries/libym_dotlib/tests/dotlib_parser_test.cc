@@ -36,16 +36,24 @@ dotlibparser_test(int argc,
 
   bool error = false;
   bool debug = false;
+  bool loop = false;
+  bool dump = false;
   for (int i = 1; i < argc; ++ i) {
     if ( strcmp(argv[i], "-d") == 0 ) {
       debug = true;
+    }
+    else if ( strcmp(argv[i], "-l") == 0 ) {
+      loop = true;
+    }
+    else if ( strcmp(argv[i], "-v") == 0 ) {
+      dump = true;
     }
     else {
       const DotlibNode* library = parser.read_file(argv[i], debug);
       if ( library == NULL ) {
 	error = true;
       }
-      else {
+      else if ( dump ) {
 	pt_dump(cout, library);
       }
     }
@@ -56,7 +64,10 @@ dotlibparser_test(int argc,
   cout << "Time: " << time << endl;
 
   parser.show_stats(cout);
-  for ( ; ; ) { }
+
+  if ( loop ) {
+    for ( ; ; ) { }
+  }
 
   return error ? 0 : -1;
 }
