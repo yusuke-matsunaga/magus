@@ -68,6 +68,18 @@ public:
   int
   cur_column() const;
 
+  /// @brief 最後の文字の行番号を返す．
+  /// @note 通常は cur_line() と同一だが，
+  /// unget() の直後は一つ前の行番号を返す．
+  int
+  last_line() const;
+
+  /// @brief 最後の文字のコラム位置を返す．
+  /// @note 通常は cur_column() と同一だが，
+  /// unget() の直後は一つ前のコラム位置を返す．
+  int
+  last_column() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -77,10 +89,6 @@ private:
   /// @brief 初期化を行う．
   void
   init();
-
-  /// @brief 文字を受け入れる．
-  void
-  accept(int c);
 
 
 private:
@@ -112,6 +120,18 @@ private:
   // 現在のコラム位置
   ymuint32 mCurColumn;
 
+  // 最後の文字の行番号
+  ymuint32 mLastLine;
+
+  // 最後の文字のコラム位置
+  ymuint32 mLastColumn;
+
+  // unget() 用の行番号
+  ymuint32 mUngetLine;
+
+  // unget() 用のコラム位置
+  ymuint32 mUngetColumn;
+
   // 新しい文字を読み込む必要がある時 true となるフラグ
   bool mNeedUpdate;
 
@@ -136,6 +156,22 @@ int
 FileScanner::cur_column() const
 {
   return mCurColumn;
+}
+
+// @brief 最後の文字の行番号を返す．
+inline
+int
+FileScanner::last_line() const
+{
+  return mLastLine;
+}
+
+// @brief 最後の文字のコラム位置を返す．
+inline
+int
+FileScanner::last_column() const
+{
+  return mLastColumn;
 }
 
 END_NAMESPACE_YM

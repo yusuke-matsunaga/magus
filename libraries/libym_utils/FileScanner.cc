@@ -69,6 +69,8 @@ FileScanner::get()
 {
   if ( mNeedUpdate ) {
     int c = 0;
+    mUngetLine = mCurLine;
+    mUngetColumn = mCurColumn;
     for ( ; ; ) {
       if ( mReadPos >= mEndPos ) {
 	mReadPos = 0;
@@ -123,6 +125,8 @@ FileScanner::get()
     mCurChar = c;
     ++ mCurColumn;
   }
+  mLastLine = mCurLine;
+  mLastColumn = mCurColumn;
   mNeedUpdate = true;
   return mCurChar;
 }
@@ -132,6 +136,8 @@ void
 FileScanner::unget()
 {
   mNeedUpdate = false;
+  mLastLine = mUngetLine;
+  mLastColumn = mUngetColumn;
 }
 
 END_NAMESPACE_YM
