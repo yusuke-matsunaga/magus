@@ -15,6 +15,7 @@
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
+#include "ym_utils/FileScanner.h"
 #include "ym_utils/StrBuff.h"
 #include "PtMgr.h"
 
@@ -100,14 +101,6 @@ public:
   int
   cur_line() const;
 
-  /// @brief 現在のトークンの最初のコラム位置
-  int
-  first_column() const;
-
-  /// @brief 現在のトークンの最後のコラム位置
-  int
-  last_column() const;
-
   /// @brief 現在のコラム位置
   int
   cur_column() const;
@@ -170,9 +163,11 @@ private:
   void
   close_file();
 
+#if 0
   /// @brief 初期化を行う．
   void
   init();
+#endif
 
   /// @brief c が文字の時に true を返す．
   /// @note mSymbolMode が true なら数字も文字とみなす．
@@ -183,6 +178,7 @@ private:
   void
   accept(int c);
 
+#if 0
   /// @brief 一文字読み出す．
   int
   get();
@@ -190,6 +186,7 @@ private:
   /// @brief 直前の get() を無かったことにする．
   void
   unget();
+#endif
 
 
 private:
@@ -221,11 +218,8 @@ private:
   // 現在オープン中のファイル
   const FileDesc* mCurFileDesc;
 
-  // 入力ストリーム
-  ifstream mInput;
-
-  // 直前の文字が \r の時に true となるフラグ
-  bool mCR;
+  // ファイル入力用のオブジェクト
+  FileScanner mFileScanner;
 
   // read_token の結果の文字列を格納する
   StrBuff mCurString;
@@ -235,18 +229,6 @@ private:
 
   // 現在のトークンの終了位置
   ymuint32 mLastColumn;
-
-  // 現在の文字
-  int mCurChar;
-
-  // 現在の行番号
-  ymuint32 mCurLine;
-
-  // 現在のコラム位置
-  ymuint32 mCurColumn;
-
-  // 新しい文字を読み込む必要がある時 true となるフラグ
-  bool mNeedUpdate;
 
 };
 
@@ -269,8 +251,8 @@ FileRegion
 DotlibParserImpl::cur_loc()
 {
   return FileRegion(mCurFileDesc,
-		    cur_line(), first_column(),
-		    cur_line(), last_column());
+		    cur_line(), mFirstColumn,
+		    cur_line(), mLastColumn);
 }
 
 // 現在の行番号を返す．
@@ -278,23 +260,7 @@ inline
 int
 DotlibParserImpl::cur_line() const
 {
-  return mCurLine;
-}
-
-// 現在のトークンの開始位置
-inline
-int
-DotlibParserImpl::first_column() const
-{
-  return mFirstColumn;
-}
-
-// @brief 現在のトークンの最後のコラム位置
-inline
-int
-DotlibParserImpl::last_column() const
-{
-  return mLastColumn;
+  return mFileScanner.cur_line();
 }
 
 // 現在のコラム位置を返す．
@@ -302,7 +268,7 @@ inline
 int
 DotlibParserImpl::cur_column() const
 {
-  return mCurColumn;
+  return mFileScanner.cur_column();
 }
 
 END_NAMESPACE_YM_DOTLIB
