@@ -96,12 +96,6 @@ private:
   // 現在読込中の文字列を貯めておくバッファ
   StrBuff mCurString;
 
-  // 現在のトークンの開始位置の行番号
-  ymuint32 mFirstLine;
-
-  // 現在のトークンの開始位置のコラム位置
-  ymuint32 mFirstColumn;
-
 };
 
 
@@ -123,6 +117,14 @@ double
 MislibLex::cur_num() const
 {
   return strtod(cur_string(), static_cast<char**>(NULL));
+}
+
+// @brief 現在のトークンの位置情報を返す．
+inline
+FileRegion
+MislibLex::cur_loc() const
+{
+  return mFileScanner.cur_loc();
 }
 
 // @brief 一文字読み出す．

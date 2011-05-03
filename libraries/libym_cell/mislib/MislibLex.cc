@@ -52,8 +52,7 @@ MislibLex::read_token()
 
  state1:
   c = get();
-  mFirstLine = mFileScanner.cur_line();
-  mFirstColumn = mFileScanner.cur_column();
+  mFileScanner.set_first_loc();
   if ( isalpha(c) || (c == '_') ) {
     mCurString.put_char(c);
     goto state2;
@@ -212,15 +211,6 @@ MislibLex::read_token()
 		    "MISLIB_PARSE", buf.str().c_str());
   }
   return ERROR;
-}
-
-// @brief 現在のトークンの位置情報を返す．
-FileRegion
-MislibLex::cur_loc() const
-{
-  return FileRegion(mFileScanner.file_info(),
-		    mFirstLine, mFirstColumn,
-		    mFileScanner.cur_line(), mFileScanner.cur_column());
 }
 
 END_NAMESPACE_YM_CELL_MISLIB
