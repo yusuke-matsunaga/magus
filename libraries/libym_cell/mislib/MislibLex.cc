@@ -39,7 +39,6 @@ MislibLex::open_file(const string& filename)
   if ( !stat ) {
     return false;
   }
-  mFileInfo = FileInfoMgr::new_file_info(filename);
   return true;
 }
 
@@ -53,14 +52,14 @@ MislibLex::read_token()
 
  state1:
   c = mFileScanner.get();
+  mFirstLine = mFileScanner.cur_line();
   mFirstColumn = mFileScanner.cur_column();
-  mLastColumn = mFirstColumn;
   if ( isalpha(c) || (c == '_') ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state2;
   }
   if ( isdigit(c) || (c == '-') ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state3;
   }
   switch (c) {
@@ -88,7 +87,7 @@ MislibLex::read_token()
  state2:
   c = mFileScanner.get();
   if ( isalpha(c) || isdigit(c) || (c == '_') ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state2;
   }
   mFileScanner.unget();
@@ -122,15 +121,15 @@ MislibLex::read_token()
  state3:
   c = mFileScanner.get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state3;
   }
   if ( c == '.' ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state5;
   }
   if ( c == 'E' || c == 'e' ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state8;
   }
   goto state_NUM;
@@ -140,7 +139,7 @@ MislibLex::read_token()
   mCurString = ".";
   c = mFileScanner.get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state5;
   }
   goto error;
@@ -149,11 +148,11 @@ MislibLex::read_token()
  state5:
   c = mFileScanner.get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state5;
   }
   if ( c == 'E' || c == 'e' ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state8;
   }
   goto state_NUM;
@@ -162,11 +161,11 @@ MislibLex::read_token()
  state8:
   c = mFileScanner.get();
   if ( c == '-' ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state9;
   }
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state9;
   }
   goto state_NUM;
@@ -175,7 +174,7 @@ MislibLex::read_token()
  state9:
   c = mFileScanner.get();
   if ( isdigit(c) ) {
-    accept(c);
+    mCurString.put_char(c);
     goto state9;
   }
 
@@ -197,7 +196,7 @@ MislibLex::read_token()
   if ( c == '\"' ) {
     return STR;
   }
-  accept(c);
+  mCurString.put_char(c);
   goto state7;
 
  error:
@@ -215,17 +214,9 @@ MislibLex::read_token()
 FileRegion
 MislibLex::cur_loc() const
 {
-  return FileRegion(mFileInfo,
-		    mFileScanner.cur_line(), mFirstColumn,
-		    mFileScanner.cur_line(), mLastColumn);
-}
-
-// 直前の読み込みを確定させる．
-void
-MislibLex::accept(int c)
-{
-  mCurString.put_char(c);
-  mLastColumn = mFileScanner.cur_column();
+  return FileRegion(mFileScanner.file_info(),
+		    mFirstLine, mFirstColumn,
+		    mFileScanner.last_line(), mFileScanner.last_column());
 }
 
 END_NAMESPACE_YM_CELL_MISLIB

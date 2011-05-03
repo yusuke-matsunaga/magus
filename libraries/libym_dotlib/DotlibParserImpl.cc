@@ -97,7 +97,8 @@ last:
   }
 
   const DotlibNode* library = mLibraryHandler->pt_node();
-  const DotlibNode* root = mPtMgr.new_attr(ShString("library"), library, library->loc());
+  const DotlibNode* root = mPtMgr.new_attr(ShString("library"),
+					   library, library->loc());
   return root;
 }
 
@@ -273,7 +274,6 @@ DotlibParserImpl::open_file(const string& filename)
 	    buf.str());
     return false;
   }
-  mCurFileInfo = FileInfoMgr::new_file_info(filename);
 
   return true;
 }
@@ -283,7 +283,6 @@ void
 DotlibParserImpl::close_file()
 {
   mFileScanner.close_file();
-  mCurFileInfo = FileInfo();
 }
 
 // @brief トークンを一つとってくる．

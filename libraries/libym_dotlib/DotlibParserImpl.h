@@ -191,9 +191,6 @@ private:
   // シンボルモード
   bool mSymbolMode;
 
-  // 現在オープン中のファイル
-  FileInfo mCurFileInfo;
-
   // ファイル入力用のオブジェクト
   FileScanner mFileScanner;
 
@@ -226,7 +223,7 @@ inline
 FileRegion
 DotlibParserImpl::cur_loc()
 {
-  return FileRegion(mCurFileInfo,
+  return FileRegion(mFileScanner.file_info(),
 		    mFirstLine, mFirstColumn,
 		    mFileScanner.last_line(), mFileScanner.last_column());
 }
