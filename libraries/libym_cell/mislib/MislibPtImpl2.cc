@@ -453,7 +453,8 @@ MislibPtGate::MislibPtGate(const FileRegion& loc,
   mArea(area),
   mOpinName(opin_name),
   mOpinExpr(opin_expr),
-  mIpinList(ipin_list)
+  mIpinList(ipin_list),
+  mNext(NULL)
 {
 }
 
@@ -506,9 +507,9 @@ MislibPtGate::ipin_list() const
 
 // 次の要素を設定する．
 void
-MislibPtGate::set_next(MislibPt* pin)
+MislibPtGate::set_next(MislibPt* next)
 {
-  mNext = pin;
+  mNext = next;
 }
 
 // 次の要素を取り出す．

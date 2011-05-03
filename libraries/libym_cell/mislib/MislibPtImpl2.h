@@ -466,7 +466,7 @@ public:
   /// @brief 次の要素を設定する．
   virtual
   void
-  set_next(MislibPt* pin);
+  set_next(MislibPt* next);
 
   /// @brief 次の要素を取り出す．
   virtual
