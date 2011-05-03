@@ -24,30 +24,13 @@ const bool debug_get_token = false;
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-BlifScanner::BlifScanner() :
-  mInput(NULL)
+BlifScanner::BlifScanner()
 {
 }
 
 // @brief デストラクタ
 BlifScanner::~BlifScanner()
 {
-}
-
-// @brief 入力ストリームを設定する．
-// @param[in] istr 入力ストリーム
-// @param[in] file_info ファイル情報
-void
-BlifScanner::init(istream& istr,
-		  FileInfo file_info)
-{
-  mInput = &istr;
-  mFileInfo = file_info;
-  mCR = false;
-  mCurChar = -1;
-  mCurLineNo = 1;
-  mCurColumn = 0;
-  mUngetToken = kTokenEOF;
 }
 
 // @brief トークンを一つ読み出す．
@@ -57,27 +40,18 @@ BlifScanner::get_token()
   if ( debug_get_token ) {
     cerr << "get_token()" << " --> ";
   }
-  if ( mUngetToken != kTokenEOF ) {
-    // トークンバッファに値がある場合にはそれを返す．
-    tToken tk = mUngetToken;
-    mUngetToken = kTokenEOF;
-    if ( debug_get_token ) {
-      cerr << "(token_buf) " << tk << endl;
-    }
-    return tk;
-  }
 
   mCurString = "";
   bool StartWithDot = false;
-  int start = 0;
   int c;
 
   // 状態遷移を goto 文で表現したもの
   // 効率はよい．
 
  ST_INIT:
-  c = cur_char();
-  start = mCurColumn;
+  c = get();
+  set_first_loc();
+
   switch ( c ) {
   case EOF:
     if ( debug_get_token ) {
@@ -94,19 +68,12 @@ BlifScanner::get_token()
     if ( debug_get_token ) {
       cerr << kTokenNL << endl;
     }
-    // ファイル位置を1つ進める．
-    {
-      int line = mCurLoc.start_line();
-      int column = mCurLoc.end_column();
-      mCurLoc = FileRegion(mFileInfo, line, column + 1, line, column + 1);
-    }
     return kTokenNL;
 
   case '=':
     if ( debug_get_token ) {
       cerr << kTokenEQ << endl;
     }
-    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     return kTokenEQ;
 
   case '.':
@@ -117,14 +84,13 @@ BlifScanner::get_token()
     goto ST_SHARP;
 
   case '/':
-    if ( peek_next() != '*' ) {
-      mCurString.put_char('/');
-      goto ST_STR;
+    if ( peek() == '*' ) {
+      accept();
+      // ここまでで "/*" を読んでいる．
+      goto ST_CM1;
     }
-    // peek_next() を確定させるための空読み
-    cur_char();
-    // ここまでで "/*" を読んでいる．
-    goto ST_CM1;
+    mCurString.put_char('/');
+    goto ST_STR;
 
   case '\\':
     goto ST_ESC;
@@ -135,54 +101,46 @@ BlifScanner::get_token()
   }
 
  ST_SHARP:
-  c = cur_char();
+  c = get();
   if ( c == '\n' ) {
-    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     return kTokenNL;
   }
-  else if ( c == EOF ) {
+  if ( c == EOF ) {
     return kTokenEOF;
   }
-  else {
-    // 改行までは読み飛ばす．
-    goto ST_SHARP;
-  }
+  // 改行までは読み飛ばす．
+  goto ST_SHARP;
 
  ST_CM1:
-  c = cur_char();
+  c = get();
   if ( c == '*' ) {
     goto ST_CM2;
   }
-  else if ( c == EOF ) {
+  if ( c == EOF ) {
     return kTokenEOF;
   }
-  else {
-    // '*' までは読み飛ばす．
-    goto ST_CM1;
-  }
+  // '*' までは読み飛ばす．
+  goto ST_CM1;
 
  ST_CM2:
-  c = cur_char();
+  c = get();
   if ( c == '/' ) {
     // コメントは空白扱いにする．
     goto ST_INIT;
   }
-  else if ( c == EOF ) {
+  if ( c == EOF ) {
     return kTokenEOF;
   }
-  else {
-    goto ST_CM1;
-  }
+  goto ST_CM1;
 
  ST_ESC:
-  c = cur_char();
+  c = get();
   if ( c == '\n' ) {
     // エスケープされた改行は空白扱いにする．
     goto ST_INIT;
   }
-  else if ( c == EOF ) {
+  if ( c == EOF ) {
     // これはおかしいけど無視する．
-    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     if ( StartWithDot ) {
       // 予約後の検索
       tToken token = mDic.get_token(mCurString.c_str());
@@ -198,14 +156,12 @@ BlifScanner::get_token()
     }
     return kTokenSTRING;
   }
-  else {
-    // それ以外は普通の文字として扱う．
-    mCurString.put_char(c);
-    goto ST_STR;
-  }
+  // それ以外は普通の文字として扱う．
+  mCurString.put_char(c);
+  goto ST_STR;
 
  ST_STR:
-  c = peek_next();
+  c = peek();
   switch ( c ) {
   case ' ':
   case '\t':
@@ -215,7 +171,6 @@ BlifScanner::get_token()
   case '\\':
   case EOF:
     // 文字列の終わり
-    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     if ( StartWithDot ) {
       // 予約後の検索
       tToken token = mDic.get_token(mCurString.c_str());
@@ -232,68 +187,9 @@ BlifScanner::get_token()
     return kTokenSTRING;
 
   default:
-    // peek_next() を確定させるための空読み
-    cur_char();
+    accept();
     mCurString.put_char(c);
     goto ST_STR;
-  }
-}
-
-// 現在の文字を読み出す．
-int
-BlifScanner::cur_char()
-{
-  int ans;
-  if ( mCurChar != -1 ) {
-    ans = mCurChar;
-    mCurChar = -1;
-  }
-  else {
-    ans = read_char();
-  }
-  if ( ans == '\n' ) {
-    ++ mCurLineNo;
-    mCurColumn = 0;
-  }
-  else {
-    ++ mCurColumn;
-  }
-  return ans;
-}
-
-// 実際に文字を読み出す
-int
-BlifScanner::read_char()
-{
-  for ( ; ; ) {
-    char c;
-    if ( !mInput->get(c) ) {
-      return EOF;
-    }
-    // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
-    // 強制的に '\n' に書き換えてしまう．
-    // Windows : '\r', '\n'
-    // Mac     : '\r'
-    // UNIX    : '\n'
-    // なので '\r' を '\n' に書き換えてしまう．
-    // ただし次に本当の '\n' が来たときには無視するために
-    // mCR を true にしておく．
-    if ( c == '\r' ) {
-      mCR = true;
-      return '\n';
-    }
-    if ( c == '\n' ) {
-      if ( mCR ) {
-	// 直前に '\r' を読んで '\n' を返していたので今の '\n' を
-	// 無視する．これが唯一ループを回る条件
-	mCR = false;
-	continue;
-      }
-      return c;
-    }
-    // 普通の文字の時はそのまま返す．
-    mCR = false;
-    return c;
   }
 }
 

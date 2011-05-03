@@ -63,9 +63,7 @@ bool
 BlifParserImpl::read(const string& filename)
 {
   // ファイルをオープンする．
-  ifstream input_stream;
-  input_stream.open(filename.c_str());
-  if ( !input_stream ) {
+  if ( !mScanner.open_file(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -75,9 +73,8 @@ BlifParserImpl::read(const string& filename)
   }
 
   // 初期化を行う．
-  FileInfo file_info = FileInfoMgr::new_file_info(filename);
-  mScanner.init(input_stream, file_info);
   mIdHash.clear();
+  mUngetToken = kTokenEOF;
 
   // 一つの .inputs/.outputs 文中のトークンの数
   ymuint n_token = 0;
@@ -97,19 +94,19 @@ BlifParserImpl::read(const string& filename)
  ST_INIT:
   // 読込開始
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenNL ) {
       // 読み飛ばす
       goto ST_INIT;
     }
     if ( tk == kTokenMODEL ) {
       // .model 文の開始
-      mLoc1 = mScanner.cur_loc();
+      mLoc1 = mCurLoc;
       goto ST_MODEL;
     }
     // それ以外はエラー
     mMsgMgr.put_msg(__FILE__, __LINE__,
-		    mScanner.cur_loc(),
+		    mCurLoc,
 		    kMsgError,
 		    "SYN01",
 		    "No '.model' statement.");
@@ -119,16 +116,16 @@ BlifParserImpl::read(const string& filename)
  ST_MODEL:
   // .model 文の処理
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk != kTokenSTRING ) {
       mMsgMgr.put_msg(__FILE__, __LINE__,
-		      mScanner.cur_loc(),
+		      mCurLoc,
 		      kMsgError,
 		      "SYN02",
 		      "String expected after '.model'.");
       goto ST_ERROR_EXIT;
     }
-    FileRegion loc = mScanner.cur_loc();
+    FileRegion loc = mCurLoc;
     const char* name = mScanner.cur_string().c_str();
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
@@ -141,9 +138,9 @@ BlifParserImpl::read(const string& filename)
       goto ST_ERROR_EXIT;
     }
 
-    if ( mScanner.get_token() != kTokenNL ) {
+    if ( get_token() != kTokenNL ) {
       mMsgMgr.put_msg(__FILE__, __LINE__,
-		      mScanner.cur_loc(),
+		      mCurLoc,
 		      kMsgError,
 		      "SYN03",
 		      "Newline expected.");
@@ -156,8 +153,8 @@ BlifParserImpl::read(const string& filename)
  ST_NEUTRAL:
   // 本体の処理
   {
-    tToken tk= mScanner.get_token();
-    mLoc1 = mScanner.cur_loc();
+    tToken tk= get_token();
+    mLoc1 = mCurLoc;
     switch (tk) {
     case kTokenNL:
       goto ST_NEUTRAL;
@@ -249,9 +246,9 @@ BlifParserImpl::read(const string& filename)
 
  ST_INPUTS:
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenSTRING ) {
-      FileRegion loc = mScanner.cur_loc();
+      FileRegion loc = mCurLoc;
       const char* name = mScanner.cur_string().c_str();
       IdCell* cell = mIdHash.find(name, true);
       if ( cell->is_defined() ) {
@@ -289,7 +286,7 @@ BlifParserImpl::read(const string& filename)
     }
     if ( tk == kTokenNL ) {
       if ( n_token == 0 ) {
-	mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+	mMsgMgr.put_msg(__FILE__, __LINE__, mCurLoc,
 			kMsgWarning,
 			"SYN07", "Empty '.inputs' statement. Ignored.");
       }
@@ -300,9 +297,9 @@ BlifParserImpl::read(const string& filename)
 
  ST_OUTPUTS:
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenSTRING ) {
-      FileRegion loc = mScanner.cur_loc();
+      FileRegion loc = mCurLoc;
       const char* name = mScanner.cur_string().c_str();
       IdCell* cell = mIdHash.find(name, true);
       if ( cell->is_output() ) {
@@ -340,7 +337,7 @@ BlifParserImpl::read(const string& filename)
     }
     if ( tk == kTokenNL ) {
       if ( n_token == 0 ) {
-	mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+	mMsgMgr.put_msg(__FILE__, __LINE__, mCurLoc,
 			kMsgWarning,
 			"SYN08", "Empty '.outputs' statement. Ignored.");
       }
@@ -351,9 +348,9 @@ BlifParserImpl::read(const string& filename)
 
  ST_NAMES:
   { // str* nl
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenSTRING ) {
-      FileRegion loc = mScanner.cur_loc();
+      FileRegion loc = mCurLoc;
       const char* name = mScanner.cur_string().c_str();
       IdCell* cell = mIdHash.find(name, true);
       cell->set_loc(loc);
@@ -364,7 +361,7 @@ BlifParserImpl::read(const string& filename)
       size_t n = mNameArray.size();
       if ( n == 0 ) {
 	// 名前が1つもない場合
-	mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+	mMsgMgr.put_msg(__FILE__, __LINE__, mCurLoc,
 			kMsgError,
 			"SYN09",
 			"Empty '.names' statement.");
@@ -384,11 +381,11 @@ BlifParserImpl::read(const string& filename)
 
  ST_NAMES0:
   { // str nl
-    tToken tk= mScanner.get_token();
-    FileRegion loc1 = mScanner.cur_loc();
+    tToken tk= get_token();
+    FileRegion loc1 = mCurLoc;
     if ( tk == kTokenSTRING ) {
       mName1 = mScanner.cur_string();
-      FileRegion loc2 = mScanner.cur_loc();
+      FileRegion loc2 = mCurLoc;
       char opat = mName1[0];
       if ( opat != '0' && opat != '1' ) {
 	mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
@@ -407,7 +404,7 @@ BlifParserImpl::read(const string& filename)
 			"Outpat pattern mismatch.");
 	goto ST_ERROR_EXIT;
       }
-      if ( mScanner.get_token() == kTokenNL ) {
+      if ( get_token() == kTokenNL ) {
 	++ mNc;
 	goto ST_NAMES0;
       }
@@ -422,22 +419,23 @@ BlifParserImpl::read(const string& filename)
       goto ST_NAMES0;
     }
     else {
-      mScanner.unget_token(tk, loc1);
+      unget_token(tk, loc1);
       goto ST_NAMES_END;
     }
   }
 
  ST_NAMES1:
   { // str str nl
-    tToken tk= mScanner.get_token();
-    FileRegion loc1 = mScanner.cur_loc();
+    tToken tk= get_token();
+    FileRegion loc1 = mCurLoc;
     if ( tk == kTokenSTRING ) {
       mName1 = mScanner.cur_string();
       if ( mName1.size() != mNameArray.size() - 1 ) {
 	mMsgMgr.put_msg(__FILE__, __LINE__, loc1,
 			kMsgError,
 			"SYN12",
-			"Input pattern does not fit with the number of fanins.");
+			"Input pattern does not fit "
+			"with the number of fanins.");
 	goto ST_ERROR_EXIT;
       }
       ymuint n = mName1.size();
@@ -461,9 +459,9 @@ BlifParserImpl::read(const string& filename)
 	  goto ST_ERROR_EXIT;
 	}
       }
-      tk = mScanner.get_token();
+      tk = get_token();
       if ( tk == kTokenSTRING ) {
-	FileRegion loc2 = mScanner.cur_loc();
+	FileRegion loc2 = mCurLoc;
 	char opat = mScanner.cur_string()[0];
 	if ( opat != '0' && opat != '1' ) {
 	  mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
@@ -481,7 +479,7 @@ BlifParserImpl::read(const string& filename)
 			  "Outpat pattern mismatch.");
 	  goto ST_ERROR_EXIT;
 	}
-	if ( mScanner.get_token() != kTokenNL ) {
+	if ( get_token() != kTokenNL ) {
 	  mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
 			  kMsgError, "SYN14",
 			  "Newline is expected.");
@@ -500,7 +498,7 @@ BlifParserImpl::read(const string& filename)
       goto ST_NAMES1;
     }
     else {
-      mScanner.unget_token(tk, loc1);
+      unget_token(tk, loc1);
       goto ST_NAMES_END;
     }
   }
@@ -538,11 +536,11 @@ BlifParserImpl::read(const string& filename)
 
  ST_GATE:
   { // str -> ST_GATE1
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk != kTokenSTRING ) {
       goto ST_GATE_SYNERROR;
     }
-    FileRegion loc = mScanner.cur_loc();
+    FileRegion loc = mCurLoc;
     const char* name = mScanner.cur_string().c_str();
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
@@ -560,20 +558,20 @@ BlifParserImpl::read(const string& filename)
 
  ST_GATE1:
   { // (str '=' str)* nl
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenSTRING ) {
-      FileRegion loc1 = mScanner.cur_loc();
+      FileRegion loc1 = mCurLoc;
       mName1 = mScanner.cur_string();
       const char* name1 = mName1.c_str();
-      tk = mScanner.get_token();
+      tk = get_token();
       if ( tk != kTokenEQ ) {
 	goto ST_GATE_SYNERROR;
       }
-      tk = mScanner.get_token();
+      tk = get_token();
       if ( tk != kTokenSTRING ) {
 	goto ST_GATE_SYNERROR;
       }
-      FileRegion loc2 = mScanner.cur_loc();
+      FileRegion loc2 = mCurLoc;
       const char* name2 = mScanner.cur_string().c_str();
       IdCell* cell = mIdHash.find(name2, true);
       cell->set_loc(loc2);
@@ -626,25 +624,25 @@ BlifParserImpl::read(const string& filename)
   }
 
  ST_GATE_SYNERROR:
-  mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+  mMsgMgr.put_msg(__FILE__, __LINE__, mCurLoc,
 		  kMsgError,
 		  "SYN16", "Syntax error in '.gate' statement.");
   goto ST_ERROR_EXIT;
 
  ST_LATCH:
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenSTRING ) {
-      FileRegion loc2 = mScanner.cur_loc();
+      FileRegion loc2 = mCurLoc;
       const char* name1 = mScanner.cur_string().c_str();
       IdCell* cell1 = mIdHash.find(name1, true);
       cell1->set_loc(loc2);
 
-      tk = mScanner.get_token();
+      tk = get_token();
       if ( tk != kTokenSTRING ) {
 	goto ST_LATCH_SYNERROR;
       }
-      FileRegion loc3 = mScanner.cur_loc();
+      FileRegion loc3 = mCurLoc;
       const char* name2 = mScanner.cur_string().c_str();
       IdCell* cell2 = mIdHash.find(name2, true);
       cell2->set_loc(loc3);
@@ -661,9 +659,9 @@ BlifParserImpl::read(const string& filename)
       }
       cell2->set_defined();
 
-      tk = mScanner.get_token();
+      tk = get_token();
       char rval = ' ';
-      FileRegion loc4 = mScanner.cur_loc();
+      FileRegion loc4 = mCurLoc;
       if ( tk == kTokenSTRING ) {
 	rval = mScanner.cur_string()[0];
 	if ( rval != '0' && rval != '1' ) {
@@ -673,7 +671,7 @@ BlifParserImpl::read(const string& filename)
 			  "Illegal character for reset value.");
 	  goto ST_ERROR_EXIT;
 	}
-	tk = mScanner.get_token();
+	tk = get_token();
       }
       if ( tk != kTokenNL ) {
 	goto ST_LATCH_SYNERROR;
@@ -698,19 +696,19 @@ BlifParserImpl::read(const string& filename)
   }
 
  ST_LATCH_SYNERROR:
-  mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+  mMsgMgr.put_msg(__FILE__, __LINE__, mCurLoc,
 		  kMsgError,
 		  "SYN17", "Syntax error in '.latch' statement.");
   goto ST_ERROR_EXIT;
 
  ST_AFTER_END:
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenEOF ) {
       goto ST_NORMAL_EXIT;
     }
     if ( tk != kTokenNL ) {
-      mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+      mMsgMgr.put_msg(__FILE__, __LINE__, mCurLoc,
 		      kMsgWarning,
 		      "SYN06",
 		      "Statement after '.end' is ignored.");
@@ -720,7 +718,7 @@ BlifParserImpl::read(const string& filename)
 
  ST_EXDC:
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenEND ) {
       goto ST_NEUTRAL;
     }
@@ -729,7 +727,7 @@ BlifParserImpl::read(const string& filename)
 
  ST_DUMMY_READ1:
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token();
     if ( tk == kTokenNL ) {
       goto ST_NEUTRAL;
     }
@@ -738,7 +736,7 @@ BlifParserImpl::read(const string& filename)
 
  ST_AFTER_EOF:
   {
-    FileRegion loc = mScanner.cur_loc();
+    FileRegion loc = mCurLoc;
     mMsgMgr.put_msg(__FILE__, __LINE__, loc,
 		    kMsgWarning,
 		    "SYN05",
@@ -780,7 +778,7 @@ BlifParserImpl::read(const string& filename)
   return true;
 
  ST_SYNTAX_ERROR:
-  mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+  mMsgMgr.put_msg(__FILE__, __LINE__, mCurLoc,
 		  kMsgError,
 		  "SYN00",
 		  "Syntax error.");
@@ -803,6 +801,22 @@ BlifParserImpl::add_handler(BlifHandler* handler)
 {
   mHandlerList.push_back(handler);
   handler->mParser = this;
+}
+
+// @brief トークンを一つ読み出す．
+tToken
+BlifParserImpl::get_token()
+{
+  if ( mUngetToken != kTokenEOF ) {
+    // トークンバッファに値がある場合にはそれを返す．
+    tToken tk = mUngetToken;
+    mUngetToken = kTokenEOF;
+    mCurLoc = mUngetTokenLoc;
+    return tk;
+  }
+  tToken token = mScanner.get_token();
+  mCurLoc = mScanner.cur_loc();
+  return token;
 }
 
 END_NAMESPACE_YM_BLIF

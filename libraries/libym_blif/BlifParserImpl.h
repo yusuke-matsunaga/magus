@@ -69,11 +69,35 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief トークンを一つ読み出す．
+  tToken
+  get_token();
+
+  /// @brief トークンを戻す．
+  void
+  unget_token(tToken token,
+	      const FileRegion& loc);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 字句解析器
   BlifScanner mScanner;
+
+  // 直前の get_token() の位置情報
+  FileRegion mCurLoc;
+
+  // 読み戻されたトークン
+  tToken mUngetToken;
+
+  // mUngetToken に対応する位置情報
+  FileRegion mUngetTokenLoc;
 
   // イベントハンドラのリスト
   list<BlifHandler*> mHandlerList;
@@ -148,6 +172,16 @@ const FileRegion&
 BlifParserImpl::id2def_loc(ymuint32 id)
 {
   return mIdHash.def_loc(id);
+}
+
+// @brief トークンを戻す．
+inline
+void
+BlifParserImpl::unget_token(tToken token,
+			    const FileRegion& loc)
+{
+  mUngetToken = token;
+  mUngetTokenLoc = loc;
 }
 
 END_NAMESPACE_YM_BLIF

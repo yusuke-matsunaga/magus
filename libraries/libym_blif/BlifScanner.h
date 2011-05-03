@@ -15,6 +15,7 @@
 #include "ym_utils/StrBuff.h"
 #include "ym_utils/FileInfo.h"
 #include "ym_utils/FileRegion.h"
+#include "ym_utils/FileScanner.h"
 #include "BlifDic.h"
 
 
@@ -24,7 +25,8 @@ BEGIN_NAMESPACE_YM_BLIF
 /// @class BlifScanner BlifScanner.h "BlifScanner.h"
 /// @brief blif 用の字句解析器
 //////////////////////////////////////////////////////////////////////
-class BlifScanner
+class BlifScanner :
+  public FileScanner
 {
 public:
 
@@ -37,44 +39,13 @@ public:
 
 public:
 
-  /// @brief 入力ストリームを設定する．
-  /// @param[in] istr 入力ストリーム
-  /// @param[in] file_info ファイル情報
-  void
-  init(istream& istr,
-       FileInfo file_info);
-
   /// @brief トークンを一つ読み出す．
   tToken
   get_token();
 
-  /// @brief トークンを戻す．
-  void
-  unget_token(tToken token,
-	      const FileRegion& loc);
-
   /// @brief 最後の get_token() で読み出した字句の文字列を返す．
   const StrBuff&
   cur_string();
-
-  /// @brief 最後の get_token() で読み出した字句の位置情報を返す．
-  const FileRegion&
-  cur_loc();
-
-
-private:
-
-  // 次の文字を先読みする．
-  int
-  peek_next();
-
-  // 現在の文字を読み出す．
-  int
-  cur_char();
-
-  // 実際に文字を読み出す
-  int
-  read_char();
 
 
 private:
@@ -82,38 +53,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 読み込み元の入力ストリーム
-  istream* mInput;
-
-  // ファイル情報
-  FileInfo mFileInfo;
-
-  // 直前の文字が '\r' だったときに true となるフラグ
-  bool mCR;
-
-  // 文字バッファ
-  int mCurChar;
-
-  // 読み戻されたトークン
-  tToken mUngetToken;
-
-  // mUngetToken に対応する位置情報
-  FileRegion mUngetTokenLoc;
-
   // 予約語テーブル
   BlifDic mDic;
 
   // 文字列バッファ
   StrBuff mCurString;
-
-  // 現在処理中の行番号
-  int mCurLineNo;
-
-  // 現在処理中のコラム位置
-  int mCurColumn;
-
-  // 現在の読み出し位置
-  FileRegion mCurLoc;
 
 };
 
@@ -122,41 +66,12 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief トークンを戻す．
-inline
-void
-BlifScanner::unget_token(tToken token,
-			 const FileRegion& loc)
-{
-  mUngetToken = token;
-  mUngetTokenLoc = loc;
-}
-
 // @brief 最後の get_token() で読み出した字句の文字列を返す．
 inline
 const StrBuff&
 BlifScanner::cur_string()
 {
   return mCurString;
-}
-
-// @brief 最後の get_token() で読み出した字句の位置情報を返す．
-inline
-const FileRegion&
-BlifScanner::cur_loc()
-{
-  return mCurLoc;
-}
-
-// 次の文字を先読みする．
-inline
-int
-BlifScanner::peek_next()
-{
-  if ( mCurChar == -1 ) {
-    mCurChar = read_char();
-  }
-  return mCurChar;
 }
 
 END_NAMESPACE_YM_BLIF
