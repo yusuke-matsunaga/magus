@@ -64,6 +64,26 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 一文字読み出す．
+  /// @note 実際には peek(); acept() と等価
+  int
+  get();
+
+  /// @brief 次の文字を読み出す．
+  /// @note ファイル位置の情報等は変わらない
+  int
+  peek();
+
+  /// @brief 直前の peek() を確定させる．
+  void
+  accept();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -103,6 +123,32 @@ double
 MislibLex::cur_num() const
 {
   return strtod(cur_string(), static_cast<char**>(NULL));
+}
+
+// @brief 一文字読み出す．
+// @note 実際には peek(); acept() と等価
+inline
+int
+MislibLex::get()
+{
+  return mFileScanner.get();
+}
+
+// @brief 次の文字を読み出す．
+// @note ファイル位置の情報等は変わらない
+inline
+int
+MislibLex::peek()
+{
+  return mFileScanner.peek();
+}
+
+// @brief 直前の peek() を確定させる．
+inline
+void
+MislibLex::accept()
+{
+  return mFileScanner.accept();
 }
 
 END_NAMESPACE_YM_CELL_MISLIB

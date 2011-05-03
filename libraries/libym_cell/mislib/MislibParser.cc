@@ -15,6 +15,12 @@
 #include "MislibPtImpl1.h"
 #include "MislibPtImpl2.h"
 
+BEGIN_NONAMESPACE
+
+// MislibLex::read_token() をデバッグする時に true にする．
+bool debug_read_token = false;
+
+END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_CELL_MISLIB
 
@@ -324,7 +330,95 @@ MislibParser::scan(MislibPt*& lval,
     lval = new_const1(lloc);
     break;
 
+  default:
+    break;
   }
+
+  if ( debug_read_token ) {
+    cout << "MislibParser::scan(): ";
+    switch ( tok ) {
+    case STR:
+      cout << "STR(" << mLex.cur_string() << ")" << endl;
+      break;
+
+    case NUM:
+      cout << "NUM(" << mLex.cur_num() << ")" << endl;
+      break;
+
+    case NONINV:
+      cout << "NONINV" << endl;
+      break;
+
+    case INV:
+      cout << "INV" << endl;
+      break;
+
+    case UNKNOWN:
+      cout << "UNKNOWN" << endl;
+      break;
+
+    case CONST0:
+      cout << "CONST0" << endl;
+      break;
+
+    case CONST1:
+      cout << "CONST1" << endl;
+      break;
+
+    case LP:
+      cout << "LP" << endl;
+      break;
+
+    case RP:
+      cout << "RP" << endl;
+      break;
+
+    case SEMI:
+      cout << "SEMI" << endl;
+      break;
+
+    case EQ:
+      cout << "EQ" << endl;
+      break;
+
+    case GATE:
+      cout << "GATE" << endl;
+      break;
+
+    case PIN:
+      cout << "PIN" << endl;
+      break;
+
+    case ERROR:
+      cout << "ERROR" << endl;
+      break;
+
+    case PLUS:
+      cout << "PLUS" << endl;
+      break;
+
+    case HAT:
+      cout << "HAT" << endl;
+      break;
+
+    case STAR:
+      cout << "STAR" << endl;
+      break;
+
+    case NOT:
+      cout << "NOT" << endl;
+      break;
+
+    case EOF:
+      cout << "EOF" << endl;
+      break;
+
+    default:
+      cout << tok << endl;
+      break;
+    }
+  }
+
   return tok;
 }
 

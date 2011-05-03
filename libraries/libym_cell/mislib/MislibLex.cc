@@ -51,7 +51,7 @@ MislibLex::read_token()
   mCurString.clear();
 
  state1:
-  c = mFileScanner.get();
+  c = get();
   mFirstLine = mFileScanner.cur_line();
   mFirstColumn = mFileScanner.cur_column();
   if ( isalpha(c) || (c == '_') ) {
@@ -67,7 +67,7 @@ MislibLex::read_token()
   case ' ':
   case '\t': goto state1;
   case '\n': goto state1;
-  case '.': goto state4;
+  case '.': mCurString.put_char(c); goto state4;
   case ';': return SEMI;
   case '=': return EQ;
   case '(': return LP;
@@ -85,12 +85,12 @@ MislibLex::read_token()
 
   // 一文字目が[a-zA-Z_]の時
  state2:
-  c = mFileScanner.get();
+  c = peek();
   if ( isalpha(c) || isdigit(c) || (c == '_') ) {
+    accept();
     mCurString.put_char(c);
     goto state2;
   }
-  mFileScanner.unget();
 
   // 予約語（？）の検査
   // 数が少ないのでナイーブな方法をとっている．
@@ -119,25 +119,27 @@ MislibLex::read_token()
 
   // 一文字目が[0-9]の時
  state3:
-  c = mFileScanner.get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state3;
   }
   if ( c == '.' ) {
+    accept();
     mCurString.put_char(c);
     goto state5;
   }
   if ( c == 'E' || c == 'e' ) {
+    accept();
     mCurString.put_char(c);
     goto state8;
   }
-  goto state_NUM;
+  return NUM;
 
   // 一文字目が"."の時
  state4:
-  mCurString = ".";
-  c = mFileScanner.get();
+  c = get();
   if ( isdigit(c) ) {
     mCurString.put_char(c);
     goto state5;
@@ -146,45 +148,47 @@ MislibLex::read_token()
 
   // [0-9]*"."を読み終えたところ
  state5:
-  c = mFileScanner.get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state5;
   }
   if ( c == 'E' || c == 'e' ) {
+    accept();
     mCurString.put_char(c);
     goto state8;
   }
-  goto state_NUM;
+  return NUM;
 
   // [0-9]*"."[Ee]を読み終えたところ
  state8:
-  c = mFileScanner.get();
+  c = peek();
   if ( c == '-' ) {
+    accept();
     mCurString.put_char(c);
     goto state9;
   }
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state9;
   }
-  goto state_NUM;
+  return NUM;
 
   // [0-9]*"."[Ee]-?を読み終えたところ
  state9:
-  c = mFileScanner.get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state9;
   }
-
- state_NUM:
-  mFileScanner.unget();
   return NUM;
 
   // '#'があったら改行までループする．
  state6:
-  c = mFileScanner.get();
+  c = get();
   if ( c == '\n' ) {
     goto state1;
   }
@@ -192,7 +196,7 @@ MislibLex::read_token()
 
   // "があったら次の"までを強制的に文字列だと思う．
  state7:
-  c = mFileScanner.get();
+  c = get();
   if ( c == '\"' ) {
     return STR;
   }
@@ -216,7 +220,7 @@ MislibLex::cur_loc() const
 {
   return FileRegion(mFileScanner.file_info(),
 		    mFirstLine, mFirstColumn,
-		    mFileScanner.last_line(), mFileScanner.last_column());
+		    mFileScanner.cur_line(), mFileScanner.cur_column());
 }
 
 END_NAMESPACE_YM_CELL_MISLIB
