@@ -202,12 +202,6 @@ private:
   // read_token の結果の文字列を格納する
   StrBuff mCurString;
 
-  // 現在のトークンの開始位置の行番号
-  ymuint32 mFirstLine;
-
-  // 現在のトークンの開始位置のコラム位置
-  ymuint32 mFirstColumn;
-
 };
 
 
@@ -228,9 +222,7 @@ inline
 FileRegion
 DotlibParserImpl::cur_loc()
 {
-  return FileRegion(mFileScanner.file_info(),
-		    mFirstLine, mFirstColumn,
-		    mFileScanner.cur_line(), mFileScanner.cur_column());
+  return mFileScanner.cur_loc();
 }
 
 // @brief 一文字読み出す．

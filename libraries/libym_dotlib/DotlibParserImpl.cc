@@ -298,8 +298,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
 
  ST_INIT: // 初期状態
   c = get();
-  mFirstLine = mFileScanner.cur_line();
-  mFirstColumn = mFileScanner.cur_column();
+  mFileScanner.set_first_loc();
   if ( is_symbol(c) ) {
     mCurString.put_char(c);
     goto ST_ID;
