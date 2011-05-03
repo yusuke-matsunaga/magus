@@ -25,7 +25,8 @@ BEGIN_NAMESPACE_YM_CELL_MISLIB
 /// @class MislibLex MislibLex.h "MislibLex.h"
 /// @brief Mislib 用の LEX クラス
 //////////////////////////////////////////////////////////////////////
-class MislibLex
+class MislibLex :
+  public FileScanner
 {
 public:
 
@@ -39,12 +40,6 @@ public:
 
 public:
 
-  /// @brief ファイルを開く
-  /// @param[in] filename ファイル名
-  /// @return 失敗したら false を返す．
-  bool
-  open_file(const string& filename);
-
   /// @brief トークンを一つとってくる．
   int
   read_token();
@@ -57,30 +52,6 @@ public:
   double
   cur_num() const;
 
-  /// @brief 現在のトークンの位置情報を返す．
-  FileRegion
-  cur_loc() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 一文字読み出す．
-  /// @note 実際には peek(); acept() と等価
-  int
-  get();
-
-  /// @brief 次の文字を読み出す．
-  /// @note ファイル位置の情報等は変わらない
-  int
-  peek();
-
-  /// @brief 直前の peek() を確定させる．
-  void
-  accept();
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -89,9 +60,6 @@ private:
 
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
-
-  // ファイル入力用のオブジェクト
-  FileScanner mFileScanner;
 
   // 現在読込中の文字列を貯めておくバッファ
   StrBuff mCurString;
@@ -117,40 +85,6 @@ double
 MislibLex::cur_num() const
 {
   return strtod(cur_string(), static_cast<char**>(NULL));
-}
-
-// @brief 現在のトークンの位置情報を返す．
-inline
-FileRegion
-MislibLex::cur_loc() const
-{
-  return mFileScanner.cur_loc();
-}
-
-// @brief 一文字読み出す．
-// @note 実際には peek(); acept() と等価
-inline
-int
-MislibLex::get()
-{
-  return mFileScanner.get();
-}
-
-// @brief 次の文字を読み出す．
-// @note ファイル位置の情報等は変わらない
-inline
-int
-MislibLex::peek()
-{
-  return mFileScanner.peek();
-}
-
-// @brief 直前の peek() を確定させる．
-inline
-void
-MislibLex::accept()
-{
-  return mFileScanner.accept();
 }
 
 END_NAMESPACE_YM_CELL_MISLIB

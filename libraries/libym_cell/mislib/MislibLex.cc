@@ -29,19 +29,6 @@ MislibLex::~MislibLex()
 {
 }
 
-// @brief ファイルを開く
-// @param[in] filename ファイル名
-// @return 失敗したら false を返す．
-bool
-MislibLex::open_file(const string& filename)
-{
-  bool stat = mFileScanner.open_file(filename);
-  if ( !stat ) {
-    return false;
-  }
-  return true;
-}
-
 // トークンを一つとってくる．
 int
 MislibLex::read_token()
@@ -52,7 +39,7 @@ MislibLex::read_token()
 
  state1:
   c = get();
-  mFileScanner.set_first_loc();
+  set_first_loc();
   if ( isalpha(c) || (c == '_') ) {
     mCurString.put_char(c);
     goto state2;
