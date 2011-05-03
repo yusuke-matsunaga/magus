@@ -68,18 +68,19 @@ FileScanner::init()
   mCR = false;
   mCurChar = 0;
   mCurLine = 1;
-  mCurColumn = 0;
+  mCurColumn = 1;
+  mNextLine = 1;
+  mNextColumn = 1;
   mNeedUpdate = true;
 }
 
-// 一文字読み出す．
+// @brief 次の文字を読み出す．
+// @note ファイル位置の情報等は変わらない
 int
-FileScanner::get()
+FileScanner::peek()
 {
   if ( mNeedUpdate ) {
     int c = 0;
-    mUngetLine = mCurLine;
-    mUngetColumn = mCurColumn;
     for ( ; ; ) {
       if ( mReadPos >= mEndPos ) {
 	mReadPos = 0;
@@ -87,7 +88,8 @@ FileScanner::get()
 	  ssize_t n = read(mFd, mBuff, 4096);
 	  if ( n < 0 ) {
 	    // ファイル読み込みエラー
-	    return -1;
+	    c = -1;
+	    break;
 	  }
 	  mEndPos = n;
 	}
@@ -96,7 +98,8 @@ FileScanner::get()
 	}
       }
       if ( mEndPos == 0 ) {
-	return EOF;
+	c = EOF;
+	break;
       }
       c = mBuff[mReadPos];
       ++ mReadPos;
@@ -127,26 +130,27 @@ FileScanner::get()
       mCR = false;
       break;
     }
-    if ( mCurChar == '\n' ) {
-      ++ mCurLine;
-      mCurColumn = 0;
-    }
-    mCurChar = c;
-    ++ mCurColumn;
+    mNeedUpdate = false;
+    mNextChar = c;
   }
-  mLastLine = mCurLine;
-  mLastColumn = mCurColumn;
-  mNeedUpdate = true;
-  return mCurChar;
+  return mNextChar;
 }
 
-// 一文字読み戻す．
+// @brief 直前の peek() を確定させる．
 void
-FileScanner::unget()
+FileScanner::accept()
 {
-  mNeedUpdate = false;
-  mLastLine = mUngetLine;
-  mLastColumn = mUngetColumn;
+  assert_cond( mNeedUpdate == false, __FILE__, __LINE__);
+  mNeedUpdate = true;
+  mCurChar = mNextChar;
+  mCurLine = mNextLine;
+  mCurColumn = mNextColumn;
+  // mNextLine と mNextColumn を先に設定しておく
+  if ( mCurChar == '\n' ) {
+    ++ mNextLine;
+    mNextColumn = 0;
+  }
+  ++ mNextColumn;
 }
 
 END_NAMESPACE_YM

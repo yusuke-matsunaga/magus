@@ -26,9 +26,9 @@ BEGIN_NAMESPACE_YM
 /// - ファイルのオープン (open_file)
 /// - ファイルのクローズ (close_file)
 /// - 一文字読み出し     (get)
-/// - 直前の読み出しの無効化 (unget)
-///
-/// で，直前の get() に対応するファイル上の位置を
+/// - 一文字の先読み     (peek)
+/// - 先読みした文字の確定 (accept)
+/// で，直前の get(), accept() に対応するファイル上の位置を
 /// cur_line, cur_column で返す．
 //////////////////////////////////////////////////////////////////////
 class FileScanner
@@ -61,12 +61,18 @@ public:
   close_file();
 
   /// @brief 一文字読み出す．
+  /// @note 実際には peek(); acept() と等価
   int
   get();
 
-  /// @brief 直前の get() を無かったことにする．
+  /// @brief 次の文字を読み出す．
+  /// @note ファイル位置の情報等は変わらない
+  int
+  peek();
+
+  /// @brief 直前の peek() を確定させる．
   void
-  unget();
+  accept();
 
 
 public:
@@ -85,18 +91,6 @@ public:
   /// @brief 現在のコラム位置を返す．
   ymuint
   cur_column() const;
-
-  /// @brief 最後の文字の行番号を返す．
-  /// @note 通常は cur_line() と同一だが，
-  /// unget() の直後は一つ前の行番号を返す．
-  ymuint
-  last_line() const;
-
-  /// @brief 最後の文字のコラム位置を返す．
-  /// @note 通常は cur_column() と同一だが，
-  /// unget() の直後は一つ前のコラム位置を返す．
-  ymuint
-  last_column() const;
 
 
 private:
@@ -141,17 +135,14 @@ private:
   // 現在のコラム位置
   ymuint32 mCurColumn;
 
-  // 最後の文字の行番号
-  ymuint32 mLastLine;
+  // peek() した文字
+  int mNextChar;
 
-  // 最後の文字のコラム位置
-  ymuint32 mLastColumn;
+  // peek() した文字の行番号
+  ymuint32 mNextLine;
 
-  // unget() 用の行番号
-  ymuint32 mUngetLine;
-
-  // unget() 用のコラム位置
-  ymuint32 mUngetColumn;
+  // peek() した文字のコラム位置
+  ymuint32 mNextColumn;
 
   // 新しい文字を読み込む必要がある時 true となるフラグ
   bool mNeedUpdate;
@@ -162,6 +153,16 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// 一文字読み出す．
+inline
+int
+FileScanner::get()
+{
+  (void) peek();
+  accept();
+  return mCurChar;
+}
 
 // @brief ファイル情報を返す．
 inline
@@ -185,22 +186,6 @@ ymuint
 FileScanner::cur_column() const
 {
   return mCurColumn;
-}
-
-// @brief 最後の文字の行番号を返す．
-inline
-ymuint
-FileScanner::last_line() const
-{
-  return mLastLine;
-}
-
-// @brief 最後の文字のコラム位置を返す．
-inline
-ymuint
-FileScanner::last_column() const
-{
-  return mLastColumn;
 }
 
 END_NAMESPACE_YM
