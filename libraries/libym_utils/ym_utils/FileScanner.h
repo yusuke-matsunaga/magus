@@ -43,6 +43,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ファイル操作を行う関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ファイルをオープンする．
   /// @param[in] filename ファイル名
@@ -65,28 +68,34 @@ public:
   void
   unget();
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を取り出す関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief ファイル情報を返す．
   FileInfo
-  file_info();
+  file_info() const;
 
   /// @brief 現在の行番号を返す．
-  int
+  ymuint
   cur_line() const;
 
   /// @brief 現在のコラム位置を返す．
-  int
+  ymuint
   cur_column() const;
 
   /// @brief 最後の文字の行番号を返す．
   /// @note 通常は cur_line() と同一だが，
   /// unget() の直後は一つ前の行番号を返す．
-  int
+  ymuint
   last_line() const;
 
   /// @brief 最後の文字のコラム位置を返す．
   /// @note 通常は cur_column() と同一だが，
   /// unget() の直後は一つ前のコラム位置を返す．
-  int
+  ymuint
   last_column() const;
 
 
@@ -157,14 +166,14 @@ private:
 // @brief ファイル情報を返す．
 inline
 FileInfo
-FileScanner::file_info()
+FileScanner::file_info() const
 {
   return mFileInfo;
 }
 
 // 現在の行番号を返す．
 inline
-int
+ymuint
 FileScanner::cur_line() const
 {
   return mCurLine;
@@ -172,7 +181,7 @@ FileScanner::cur_line() const
 
 // 現在のコラム位置を返す．
 inline
-int
+ymuint
 FileScanner::cur_column() const
 {
   return mCurColumn;
@@ -180,7 +189,7 @@ FileScanner::cur_column() const
 
 // @brief 最後の文字の行番号を返す．
 inline
-int
+ymuint
 FileScanner::last_line() const
 {
   return mLastLine;
@@ -188,7 +197,7 @@ FileScanner::last_line() const
 
 // @brief 最後の文字のコラム位置を返す．
 inline
-int
+ymuint
 FileScanner::last_column() const
 {
   return mLastColumn;
