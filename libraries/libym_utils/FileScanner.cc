@@ -10,6 +10,7 @@
 
 
 #include "ym_utils/FileScanner.h"
+#include "ym_utils/FileInfoMgr.h"
 #include <fcntl.h>
 
 
@@ -21,23 +22,28 @@ FileScanner::FileScanner()
   init();
 }
 
-// デストラクタ
+// @brief デストラクタ
 FileScanner::~FileScanner()
 {
   close_file();
 }
 
-// ファイルをセットする．
-// 自動的にに clear() を呼ぶ．
-// ファイルのオープンに失敗したら false を返す．
+
+// @brief ファイルをオープンする．
+// @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元のファイル位置
+// @return ファイルのオープンに失敗したら false を返す．
+// @note parent_loc を省略したら単独のオープンとみなす．
 bool
-FileScanner::open_file(const string& filename)
+FileScanner::open_file(const string& filename,
+		       const FileLoc& parent_loc)
 {
   init();
   mFd = open(filename.c_str(), O_RDONLY);
   if ( mFd < 0 ) {
     return false;
   }
+  mFileInfo = FileInfoMgr::new_file_info(filename, parent_loc);
   return true;
 }
 
@@ -47,6 +53,7 @@ FileScanner::close_file()
 {
   close(mFd);
   mFd = -1;
+  mFileInfo = FileInfo();
 }
 
 // 初期化
@@ -54,6 +61,8 @@ void
 FileScanner::init()
 {
   mFd = -1;
+  // mFileInfo を無効化するためのコード
+  mFileInfo = FileInfo();
   mReadPos = 0;
   mEndPos = 0;
   mCR = false;

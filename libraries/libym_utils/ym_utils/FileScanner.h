@@ -12,6 +12,8 @@
 
 
 #include "ymtools.h"
+#include "ym_utils/FileInfo.h"
+#include "ym_utils/FileLoc.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -44,9 +46,12 @@ public:
 
   /// @brief ファイルをオープンする．
   /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元のファイル位置
   /// @return ファイルのオープンに失敗したら false を返す．
+  /// @note parent_loc を省略したら単独のオープンとみなす．
   bool
-  open_file(const string& filename);
+  open_file(const string& filename,
+	    const FileLoc& parent_loc = FileLoc());
 
   /// @brief ファイルをクローズする．
   void
@@ -59,6 +64,10 @@ public:
   /// @brief 直前の get() を無かったことにする．
   void
   unget();
+
+  /// @brief ファイル情報を返す．
+  FileInfo
+  file_info();
 
   /// @brief 現在の行番号を返す．
   int
@@ -98,6 +107,9 @@ private:
 
   // UNIX のファイル記述子
   int mFd;
+
+  // ファイル情報
+  FileInfo mFileInfo;
 
   // バッファ
   char mBuff[4096];
@@ -141,6 +153,14 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief ファイル情報を返す．
+inline
+FileInfo
+FileScanner::file_info()
+{
+  return mFileInfo;
+}
 
 // 現在の行番号を返す．
 inline
