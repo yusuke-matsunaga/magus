@@ -29,7 +29,7 @@ public:
 
   /// @brief コンストラクタ
   BlifParserImpl();
-  
+
   /// @brief デストラクタ
   ~BlifParserImpl();
 
@@ -47,9 +47,9 @@ public:
   void
   add_handler(BlifHandler* handler);
 
-  
+
 public:
-  
+
   /// @brief メッセージマネージャの取得
   MsgMgr&
   msg_mgr();
@@ -65,7 +65,7 @@ public:
   /// @brief ID番号からそれに関連した位置情報を得る．
   const FileRegion&
   id2def_loc(ymuint32 id);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -77,16 +77,16 @@ private:
 
   // イベントハンドラのリスト
   list<BlifHandler*> mHandlerList;
-  
+
   // メッセージハンドラの管理者
   MsgMgr mMsgMgr;
 
   // 識別子のハッシュ表
   IdHash mIdHash;
-  
+
   // 位置情報の配列
   vector<FileRegion> mLocArray;
-  
+
   // IdCellの配列
   vector<IdCell*> mNameArray;
 
@@ -95,29 +95,29 @@ private:
 
   // キューブ数
   ymuint32 mNc;
-  
+
   // パタンのバッファ
   StrBuff mCoverPat;
 
   // 出力の極性
   char mOpat;
-  
+
   // 位置情報バッファ
   FileRegion mLoc1;
-  
+
   // 文字列バッファ1
   StrBuff mName1;
 
   // 文字列バッファ2
   StrBuff mName2;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief メッセージマネージャの取得
 inline
 MsgMgr&

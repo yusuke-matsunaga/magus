@@ -13,6 +13,7 @@
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
 #include "ym_utils/ShString.h"
+#include "ym_utils/FileInfoMgr.h"
 #include "PtNodeImpl.h"
 
 
@@ -272,7 +273,8 @@ DotlibParserImpl::open_file(const string& filename)
 	    buf.str());
     return false;
   }
-  mCurFileDesc = mFileDescMgr.new_file_desc(filename);
+  mCurFileInfo = FileInfoMgr::new_file_info(filename);
+
   return true;
 }
 
@@ -281,7 +283,7 @@ void
 DotlibParserImpl::close_file()
 {
   mFileScanner.close_file();
-  mCurFileDesc = NULL;
+  mCurFileInfo = FileInfo();
 }
 
 // @brief トークンを一つとってくる．

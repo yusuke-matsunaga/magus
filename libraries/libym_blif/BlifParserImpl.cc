@@ -11,7 +11,7 @@
 
 #include "BlifParserImpl.h"
 #include "ym_blif/BlifHandler.h"
-#include "ym_utils/FileDescMgr.h"
+#include "ym_utils/FileInfoMgr.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -73,16 +73,15 @@ BlifParserImpl::read(const string& filename)
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
-  
+
   // 初期化を行う．
-  FileDescMgr fdmgr;
-  const FileDesc* file_desc = fdmgr.new_file_desc(filename);
-  mScanner.init(input_stream, file_desc);
+  FileInfo file_info = FileInfoMgr::new_file_info(filename);
+  mScanner.init(input_stream, file_info);
   mIdHash.clear();
 
   // 一つの .inputs/.outputs 文中のトークンの数
-  size_t n_token = 0;
-  
+  ymuint n_token = 0;
+
   bool stat = true;
   for (list<BlifHandler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
@@ -94,7 +93,7 @@ BlifParserImpl::read(const string& filename)
   if ( !stat ) {
     goto ST_ERROR_EXIT;
   }
-  
+
  ST_INIT:
   // 読込開始
   {
@@ -141,7 +140,7 @@ BlifParserImpl::read(const string& filename)
     if ( !stat ) {
       goto ST_ERROR_EXIT;
     }
-    
+
     if ( mScanner.get_token() != kTokenNL ) {
       mMsgMgr.put_msg(__FILE__, __LINE__,
 		      mScanner.cur_loc(),
@@ -165,7 +164,7 @@ BlifParserImpl::read(const string& filename)
 
     case kTokenEOF:
       goto ST_AFTER_EOF;
-      
+
     case kTokenMODEL:
       mMsgMgr.put_msg(__FILE__, __LINE__,
 		      mLoc1,
@@ -173,11 +172,11 @@ BlifParserImpl::read(const string& filename)
 		      "SYN04",
 		      "Multiple '.model' statements.");
       goto ST_ERROR_EXIT;
-	
+
     case kTokenINPUTS:
       n_token = 0;
       goto ST_INPUTS;
-      
+
     case kTokenOUTPUTS:
       n_token = 0;
       goto ST_OUTPUTS;
@@ -211,37 +210,37 @@ BlifParserImpl::read(const string& filename)
 
     case kTokenEXDC:
       goto ST_EXDC;
-      
+
     case kTokenWIRE_LOAD_SLOPE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenWIRE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenINPUT_ARRIVAL:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_INPUT_ARRIVAL:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenOUTPUT_REQUIRED:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_OUTPUT_REQUIRED:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenINPUT_DRIVE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_INPUT_DRIVE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenOUTPUT_LOAD:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_OUTPUT_LOAD:
       goto ST_DUMMY_READ1;
-      
+
     default:
       break;
     }
@@ -427,7 +426,7 @@ BlifParserImpl::read(const string& filename)
       goto ST_NAMES_END;
     }
   }
-  
+
  ST_NAMES1:
   { // str str nl
     tToken tk= mScanner.get_token();
@@ -536,7 +535,7 @@ BlifParserImpl::read(const string& filename)
     }
     goto ST_NEUTRAL;
   }
-  
+
  ST_GATE:
   { // str -> ST_GATE1
     tToken tk= mScanner.get_token();
@@ -578,7 +577,7 @@ BlifParserImpl::read(const string& filename)
       const char* name2 = mScanner.cur_string().c_str();
       IdCell* cell = mIdHash.find(name2, true);
       cell->set_loc(loc2);
-      
+
       // 注意! 出力ピン名を 'o' もしくは 'O' と仮定している．
       if ( strcmp(name1, "o") == 0 ||
 	   strcmp(name1, "O") == 0 ) {
@@ -588,13 +587,13 @@ BlifParserImpl::read(const string& filename)
 	  buf << cell->str() << ": Defined more than once. "
 	      << "Previsous Definition is " << cell->def_loc() << ".";
 	  mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
-			  kMsgError, 
+			  kMsgError,
 			  "MLTDEF01", buf.str().c_str());
 	  goto ST_ERROR_EXIT;
 	}
 	cell->set_defined();
       }
-      
+
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	BlifHandler* handler = *p;
@@ -628,10 +627,10 @@ BlifParserImpl::read(const string& filename)
 
  ST_GATE_SYNERROR:
   mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
-		  kMsgError, 
+		  kMsgError,
 		  "SYN16", "Syntax error in '.gate' statement.");
   goto ST_ERROR_EXIT;
-  
+
  ST_LATCH:
   {
     tToken tk= mScanner.get_token();
@@ -640,7 +639,7 @@ BlifParserImpl::read(const string& filename)
       const char* name1 = mScanner.cur_string().c_str();
       IdCell* cell1 = mIdHash.find(name1, true);
       cell1->set_loc(loc2);
-      
+
       tk = mScanner.get_token();
       if ( tk != kTokenSTRING ) {
 	goto ST_LATCH_SYNERROR;
@@ -649,7 +648,7 @@ BlifParserImpl::read(const string& filename)
       const char* name2 = mScanner.cur_string().c_str();
       IdCell* cell2 = mIdHash.find(name2, true);
       cell2->set_loc(loc3);
-      
+
       if ( cell2->is_defined() ) {
 	// 二重定義
 	ostringstream buf;
@@ -661,7 +660,7 @@ BlifParserImpl::read(const string& filename)
 	goto ST_ERROR_EXIT;
       }
       cell2->set_defined();
-      
+
       tk = mScanner.get_token();
       char rval = ' ';
       FileRegion loc4 = mScanner.cur_loc();
@@ -697,13 +696,13 @@ BlifParserImpl::read(const string& filename)
       goto ST_LATCH_SYNERROR;
     }
   }
-  
+
  ST_LATCH_SYNERROR:
   mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
 		  kMsgError,
 		  "SYN17", "Syntax error in '.latch' statement.");
   goto ST_ERROR_EXIT;
-  
+
  ST_AFTER_END:
   {
     tToken tk= mScanner.get_token();
@@ -756,7 +755,7 @@ BlifParserImpl::read(const string& filename)
     }
     goto ST_NORMAL_EXIT;
   }
-  
+
  ST_NORMAL_EXIT:
   {
     size_t n = mIdHash.num();
@@ -787,14 +786,14 @@ BlifParserImpl::read(const string& filename)
 		  "Syntax error.");
   // わざと次の行につづく
   // goto ST_ERROR_EXIT;
-  
+
  ST_ERROR_EXIT:
   for (list<BlifHandler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
     BlifHandler* handler = *p;
     handler->error_exit();
   }
-  
+
   return false;
 }
 

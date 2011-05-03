@@ -10,6 +10,7 @@
 
 
 #include "MislibLex.h"
+#include "ym_utils/FileInfoMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_MISLIB
@@ -38,7 +39,7 @@ MislibLex::open_file(const string& filename)
   if ( !stat ) {
     return false;
   }
-  mFileDesc = mFdMgr.new_file_desc(filename);
+  mFileInfo = FileInfoMgr::new_file_info(filename);
   return true;
 }
 
@@ -214,7 +215,7 @@ MislibLex::read_token()
 FileRegion
 MislibLex::cur_loc() const
 {
-  return FileRegion(mFileDesc,
+  return FileRegion(mFileInfo,
 		    mFileScanner.cur_line(), mFirstColumn,
 		    mFileScanner.cur_line(), mLastColumn);
 }

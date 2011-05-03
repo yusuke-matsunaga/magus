@@ -40,9 +40,7 @@ lex_mode(const list<string>& filename_list,
     MsgHandler* handler = new StreamMsgHandler(&cerr);
     msg_mgr.reg_handler(handler);
 
-    FileDescMgr fd_mgr;
-
-    Lex lex(msg_mgr, fd_mgr);
+    Lex lex(msg_mgr);
 
     if ( spath ) {
       SearchPathList splist(spath);

@@ -15,7 +15,6 @@
 
 #include "ym_utils/File.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/FileDescMgr.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/StrBuff.h"
 
@@ -30,7 +29,7 @@ class RawLex;
 /// @class InputMgr InputMgr.h "InputMgr.h"
 /// @ingroup VlParser
 /// @brief 入力ファイルを管理するクラス
-/// @sa InputFile FileDesc
+/// @sa InputFile FileInfo
 //////////////////////////////////////////////////////////////////////
 class InputMgr
 {
@@ -38,9 +37,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] lex 親の Lex
-  /// @param[in] fd_mgr ファイル記述子を管理するクラス
-  InputMgr(RawLex* lex,
-	   FileDescMgr& fd_mgr);
+  InputMgr(RawLex* lex);
 
   /// @brief デストラクタ
   ~InputMgr();
@@ -86,20 +83,24 @@ public:
   check_file(const char* filename) const;
 
   /// @brief 現在のファイル位置を強制的に書き換える．
-  /// @param[in] filename 新しいファイル名
+  /// @param[in] new_filename 新しいファイル名
   /// @param[in] line     新しい行番号
   /// @param[in] level
   ///           - 0 インクルード関係のレベル変化無し
   ///           - 1 新しいファイルはインクルードされたファイル
   ///           - 2 新しいファイルはインクルードもとのファイル
   void
-  set_file_loc(const char* filename,
+  set_file_loc(const char* new_filename,
 	       ymuint line,
 	       ymuint level);
 
   /// @brief 現在のファイルを返す．
   InputFile*
-  cur_file();
+  cur_file() const;
+
+  /// @brief 現在のファイル名を返す．
+  string
+  cur_filename() const;
 
   /// @brief 現在の InputFile が EOF を返したときの処理
   /// @return 処理を続けられる時 true を返す．
@@ -112,34 +113,11 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 新しい FileDesc を作る
-  /// @param[in] filename ファイル名
-  /// @return 生成された FileDesc
-  const FileDesc*
-  new_file_desc(const char* filename);
-
-  /// @brief 新しい FileDesc を作る
-  /// @param[in] filename ファイル名
-  /// @param[in] parent_file_loc インクルード元の親ファイルの情報
-  /// @return 生成された FileDesc
-  const FileDesc*
-  new_file_desc(const char* filename,
-		const FileLoc& parent_file_loc);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 親の Lex
   RawLex* mLex;
-
-  // ファイル記述子を管理するクラス
-  FileDescMgr& mFdMgr;
 
   // サーチパス
   SearchPathList mSearchPathList;
@@ -151,19 +129,6 @@ private:
   vector<InputFile*> mFileStack;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 現在のファイルを返す．
-inline
-InputFile*
-InputMgr::cur_file()
-{
-  return mCurFile;
-}
 
 END_NAMESPACE_YM_VERILOG
 

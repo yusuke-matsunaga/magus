@@ -14,7 +14,6 @@
 
 #include "ym_utils/StrBuff.h"
 #include "ym_utils/File.h"
-#include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Binder.h"
 #include "ym_utils/MsgHandler.h"
@@ -71,9 +70,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] msg_mgr メッセージマネージャ
-  /// @param[in] fd_mgr ファイル記述子を管理するクラス
-  RawLex(MsgMgr& msg_mgr,
-	 FileDescMgr& fd_mgr);
+  RawLex(MsgMgr& msg_mgr);
 
   /// @brief デストラクタ
   ~RawLex();

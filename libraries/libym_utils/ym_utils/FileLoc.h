@@ -7,86 +7,81 @@
 ///
 /// $Id: FileLoc.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ymtools.h"
+#include "ym_utils/FileInfo.h"
 
 
 BEGIN_NAMESPACE_YM
 
-// 前方参照のためのクラス宣言
-// 本物は <ym_tuils/FileDesc.h> に定義してある．
-class FileDesc;
-
 //////////////////////////////////////////////////////////////////////
-/// @class FileLoc FileLoc.h <ym_utils/FileLoc.h>
+/// @class FileLoc FileLoc.h "ym_utils/FileLoc.h"
 /// @ingroup YmUtils
 /// @brief ファイル位置を表すクラス
 ///
 /// 基本的には
-/// - ファイル名
+/// - ファイル情報
 /// - 行番号
 /// - コラム位置
 /// の情報を持つ
-/// 実際にはファイルがインクルードされているときに親のファイルの情報
-/// も持つのでファイル名の代わりに FileDesc へのポインタを持つ．
-/// @sa FileDesc FileRegion
+/// @sa FileInfo FileInfoMgr FileRegion
 //////////////////////////////////////////////////////////////////////
 class FileLoc
 {
+  friend class FileRegion;
+
 public:
 
   /// @brief 空のコンストラクタ
   /// @note 無効なデータを持つ
   FileLoc();
-  
+
   /// @brief 内容を指定するコンストラクタ
-  /// @param[in] file_desc ファイル記述子
+  /// @param[in] file_info ファイル情報
   /// @param[in] line 行番号
   /// @param[in] column コラム番号
-  FileLoc(const FileDesc* file_desc,
+  FileLoc(FileInfo file_info,
 	  ymuint line,
 	  ymuint column);
-  
+
   /// @brief デストラクタ
   ~FileLoc();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief データの妥当性のチェック
   /// @retval true 意味のある値を持っている時
   /// @retval false 無効なデータの時
   bool
   is_valid() const;
-  
-  /// @brief ファイル記述子の取得
-  /// @return ファイル記述子を返す．
-  const FileDesc*
-  file_desc() const;
-  
-  /// @brief ファイル名の取得
-  /// @return ファイル名を返す．
-  const char*
+
+  /// @brief ファイル情報の取得
+  /// @return ファイル情報を返す．
+  FileInfo
+  file_info() const;
+
+  /// @brief ファイル名を返す．
+  string
   filename() const;
 
-  /// @brief インクルード元の親のファイル情報を返す．
-  /// @return インクルード元の親のファイル位置情報を返す．
-  /// @note インクルードされていないファイルの場合には
-  /// NULL が返される．
-  const FileLoc*
-  parent_file_loc() const;
+  /// @brief インクルード元のファイル位置を返す．
+  /// @note インクルードされていないファイルの場合には無効なデータが返される．
+  FileLoc
+  parent_loc() const;
 
-  /// @brief インクルード元の親のファイル情報をリストに積む．
+  /// @brief インクルード元のファイル位置の情報をすべてリストに積む．
+  /// @param[out] loc_list ファイルの位置情報のリスト
   /// @note トップレベルのファイルが先頭になる．
   void
-  parent_file_list(list<const FileLoc*> file_list) const;
-  
+  parent_loc_list(list<FileLoc>& loc_list) const;
+
   /// @brief 行番号の取得
   /// @return 行番号
   ymuint
@@ -103,8 +98,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファイル記述子
-  const FileDesc* mFileDesc;
+  // ファイル情報
+  FileInfo mFileInfo;
 
   // 行番号とコラム位置
   // 上位 20 ビットが行番号
@@ -119,10 +114,10 @@ private:
 /// @{
 
 /// @relates FileLoc
-/// @brief FileLoc の内容をストリームに出力する
+/// @brief FileLoc を表示するための関数
 /// @param[in] s 出力ストリーム
-/// @param[in] file_loc ファイル位置を表すオブジェクト
-/// @return s を返す．
+/// @param[in] file_loc ファイル位置の情報
+/// @return s をそのまま返す
 ostream&
 operator<<(ostream& s,
 	   const FileLoc& file_loc);
@@ -139,20 +134,20 @@ operator<<(ostream& s,
 // 無効なデータを持つ
 inline
 FileLoc::FileLoc() :
-  mFileDesc(NULL),
   mLineColumn(0)
 {
+  // FileInfo のデフォルトコンストラクタは無効なデータで初期化する．
 }
 
 // @brief 内容を指定するコンストラクタ
-// @param[in] file_desc ファイル記述子
+// @param[in] file_info ファイル情報
 // @param[in] line 行番号
 // @param[in] column コラム番号
 inline
-FileLoc::FileLoc(const FileDesc* file_desc,
+FileLoc::FileLoc(FileInfo file_info,
 		 ymuint line,
 		 ymuint column) :
-  mFileDesc(file_desc),
+  mFileInfo(file_info),
   mLineColumn((line << 12) | (column & 0xfff))
 {
 }
@@ -170,17 +165,34 @@ inline
 bool
 FileLoc::is_valid() const
 {
-  return mFileDesc != NULL;
+  return mFileInfo.is_valid();
 }
 
 // @brief ファイル記述子の取得
 // @return ファイル記述子を返す．
 inline
-const FileDesc*
-FileLoc::file_desc() const
+FileInfo
+FileLoc::file_info() const
 {
-  return mFileDesc;
-} 
+  return mFileInfo;
+}
+
+// @brief ファイル名を返す．
+inline
+string
+FileLoc::filename() const
+{
+  return file_info().filename();
+}
+
+// @brief インクルード元のファイル位置を返す．
+// @note インクルードされていないファイルの場合には無効なデータが返される．
+inline
+FileLoc
+FileLoc::parent_loc() const
+{
+  return file_info().parent_loc();
+}
 
 // @brief 行番号の取得
 // @return 行番号

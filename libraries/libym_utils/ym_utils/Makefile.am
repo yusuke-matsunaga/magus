@@ -12,8 +12,8 @@ noinst_HEADERS = \
 	BinIO.h \
 	DlList.h \
 	File.h \
-	FileDescMgr.h \
-	FileDesc.h \
+	FileInfo.h \
+	FileInfoMgr.h \
 	FileLoc.h \
 	FileRegion.h \
 	FileScanner.h \

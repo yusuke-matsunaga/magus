@@ -14,7 +14,6 @@
 #include "mislib_nsdef.h"
 
 #include "ym_utils/StrBuff.h"
-#include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileScanner.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/MsgHandler.h"
@@ -81,11 +80,8 @@ private:
   // メッセージマネージャ
   MsgMgr& mMsgMgr;
 
-  // ファイル記述子を管理するオブジェクト
-  FileDescMgr mFdMgr;
-
-  // 現在のファイル記述子
-  const FileDesc* mFileDesc;
+  // 現在のファイル情報
+  FileInfo mFileInfo;
 
   // ファイル入力用のオブジェクト
   FileScanner mFileScanner;

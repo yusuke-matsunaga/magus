@@ -13,6 +13,7 @@
 
 #include "ym_blif/blif_nsdef.h"
 #include "ym_utils/StrBuff.h"
+#include "ym_utils/FileInfo.h"
 #include "ym_utils/FileRegion.h"
 #include "BlifDic.h"
 
@@ -38,10 +39,10 @@ public:
 
   /// @brief 入力ストリームを設定する．
   /// @param[in] istr 入力ストリーム
-  /// @param[in] file_desc ファイル記述子
+  /// @param[in] file_info ファイル情報
   void
   init(istream& istr,
-       const FileDesc* file_desc);
+       FileInfo file_info);
 
   /// @brief トークンを一つ読み出す．
   tToken
@@ -75,7 +76,7 @@ private:
   int
   read_char();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -83,10 +84,10 @@ private:
 
   // 読み込み元の入力ストリーム
   istream* mInput;
-  
-  // ファイル記述子
-  const FileDesc* mFileDesc;
-  
+
+  // ファイル情報
+  FileInfo mFileInfo;
+
   // 直前の文字が '\r' だったときに true となるフラグ
   bool mCR;
 
@@ -113,7 +114,7 @@ private:
 
   // 現在の読み出し位置
   FileRegion mCurLoc;
-  
+
 };
 
 
@@ -157,7 +158,6 @@ BlifScanner::peek_next()
   }
   return mCurChar;
 }
-
 
 END_NAMESPACE_YM_BLIF
 

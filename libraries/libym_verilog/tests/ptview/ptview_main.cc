@@ -29,13 +29,12 @@ main(int argc,
 {
   using namespace nsYm;
   using namespace nsYm::nsVerilog;
-  
+
   QApplication app(argc, argv);
-  
+
   MsgMgr msg_mgr;
-  FileDescMgr fd_mgr;
-  Lex lex(msg_mgr, fd_mgr);
   VlMgr vl_mgr(msg_mgr);
+  Lex lex(msg_mgr);
 
   // サーチパスリスト
   // 今は未設定
@@ -73,7 +72,7 @@ main(int argc,
   VerilogView* vlview = new VerilogView;
   TokenView* token_view = new TokenView;
   ParseTreeView* pt_view = new ParseTreeView;
-  
+
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(pt_view);
   splitter->addWidget(vlview);
@@ -82,7 +81,7 @@ main(int argc,
   splitter->setStretchFactor(1, 4);
   splitter->setStretchFactor(2, 2);
   splitter->resize(1024, 760);
-  
+
   if ( !vlview->open(argv[1]) ) {
     return 2;
   }
@@ -103,8 +102,8 @@ main(int argc,
 
   goto_line->set_minimum(1);
   goto_line->set_maximum(100000);
-  
+
   goto_line->show();
-  
+
   return app.exec();
 }

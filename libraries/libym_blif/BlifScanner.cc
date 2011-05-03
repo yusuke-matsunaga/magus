@@ -35,12 +35,14 @@ BlifScanner::~BlifScanner()
 }
 
 // @brief 入力ストリームを設定する．
+// @param[in] istr 入力ストリーム
+// @param[in] file_info ファイル情報
 void
 BlifScanner::init(istream& istr,
-		  const FileDesc* file_desc)
+		  FileInfo file_info)
 {
   mInput = &istr;
-  mFileDesc = file_desc;
+  mFileInfo = file_info;
   mCR = false;
   mCurChar = -1;
   mCurLineNo = 1;
@@ -87,17 +89,16 @@ BlifScanner::get_token()
   case '\t':
     // ホワイトスペースは読み飛ばす．
     goto ST_INIT;
-	
+
   case '\n':
     if ( debug_get_token ) {
       cerr << kTokenNL << endl;
     }
     // ファイル位置を1つ進める．
     {
-      const FileDesc* fd = mCurLoc.file_desc();
       int line = mCurLoc.start_line();
       int column = mCurLoc.end_column();
-      mCurLoc = FileRegion(fd, line, column + 1, line, column + 1);
+      mCurLoc = FileRegion(mFileInfo, line, column + 1, line, column + 1);
     }
     return kTokenNL;
 
@@ -105,7 +106,7 @@ BlifScanner::get_token()
     if ( debug_get_token ) {
       cerr << kTokenEQ << endl;
     }
-    mCurLoc = FileRegion(mFileDesc, mCurLineNo, start, mCurLineNo, mCurColumn);
+    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     return kTokenEQ;
 
   case '.':
@@ -136,7 +137,7 @@ BlifScanner::get_token()
  ST_SHARP:
   c = cur_char();
   if ( c == '\n' ) {
-    mCurLoc = FileRegion(mFileDesc, mCurLineNo, start, mCurLineNo, mCurColumn);
+    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     return kTokenNL;
   }
   else if ( c == EOF ) {
@@ -181,7 +182,7 @@ BlifScanner::get_token()
   }
   else if ( c == EOF ) {
     // これはおかしいけど無視する．
-    mCurLoc = FileRegion(mFileDesc, mCurLineNo, start, mCurLineNo, mCurColumn);
+    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     if ( StartWithDot ) {
       // 予約後の検索
       tToken token = mDic.get_token(mCurString.c_str());
@@ -202,7 +203,7 @@ BlifScanner::get_token()
     mCurString.put_char(c);
     goto ST_STR;
   }
-  
+
  ST_STR:
   c = peek_next();
   switch ( c ) {
@@ -214,7 +215,7 @@ BlifScanner::get_token()
   case '\\':
   case EOF:
     // 文字列の終わり
-    mCurLoc = FileRegion(mFileDesc, mCurLineNo, start, mCurLineNo, mCurColumn);
+    mCurLoc = FileRegion(mFileInfo, mCurLineNo, start, mCurLineNo, mCurColumn);
     if ( StartWithDot ) {
       // 予約後の検索
       tToken token = mDic.get_token(mCurString.c_str());

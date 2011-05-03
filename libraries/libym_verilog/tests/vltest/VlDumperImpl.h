@@ -11,9 +11,9 @@
 /// All rights reserved.
 
 
-#include <ym_verilog/verilog.h>
-#include <ym_verilog/vl/VlFwd.h>
-#include <ym_utils/FileRegion.h>
+#include "ym_verilog/verilog.h"
+#include "ym_verilog/vl/VlFwd.h"
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

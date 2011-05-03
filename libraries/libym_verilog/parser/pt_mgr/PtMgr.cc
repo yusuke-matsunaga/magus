@@ -36,7 +36,7 @@ PtMgr::clear()
   mUdpList.clear();
   mModuleList.clear();
   mDefNames.clear();
-}  
+}
 
 // @brief 登録されているモジュールのリストを返す．
 // @return 登録されているモジュールのリスト

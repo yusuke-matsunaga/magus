@@ -39,10 +39,10 @@ Iscas89Scanner::~Iscas89Scanner()
 // @brief 入力ストリームを設定する．
 void
 Iscas89Scanner::init(istream& istr,
-		     const FileDesc* file_desc)
+		     FileInfo file_info)
 {
   mInput = &istr;
-  mFileDesc = file_desc;
+  mFileInfo = file_info;
   mCR = false;
   mCurChar = -1;
   mCurLineNo = 1;
@@ -106,7 +106,7 @@ Iscas89Scanner::get_token()
       cerr << "," << endl;
     }
     return ',';
-    
+
   default:
     mCurString.put_char(c);
     goto ST_STR;
@@ -122,7 +122,7 @@ Iscas89Scanner::get_token()
   }
   // 改行までは読み飛ばす．
   goto ST_SHARP;
-  
+
  ST_STR:
   c = peek_next();
   switch ( c ) {
@@ -136,7 +136,7 @@ Iscas89Scanner::get_token()
   case ',':
   case EOF:
     // 文字列の終わり
-    mCurTokenLoc = FileRegion(mFileDesc,
+    mCurTokenLoc = FileRegion(mFileInfo,
 			      mCurLineNo, start,
 			      mCurLineNo, mCurColumn);
     // 予約後の検索

@@ -11,7 +11,7 @@
 
 #include "Iscas89ParserImpl.h"
 #include "ym_iscas89/Iscas89Handler.h"
-#include "ym_utils/FileDescMgr.h"
+#include "ym_utils/FileInfoMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
@@ -43,7 +43,7 @@ bool
 Iscas89ParserImpl::read(const string& filename)
 {
   int yyparse(Iscas89ParserImpl&);
-  
+
   // ファイルをオープンする．
   ifstream input_stream;
   input_stream.open(filename.c_str());
@@ -55,11 +55,10 @@ Iscas89ParserImpl::read(const string& filename)
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
-  
+
   // 初期化する．
-  FileDescMgr fdmgr;
-  const FileDesc* file_desc = fdmgr.new_file_desc(filename);
-  mScanner.init(input_stream, file_desc);
+  FileInfo file_info = FileInfoMgr::new_file_info(filename);
+  mScanner.init(input_stream, file_info);
 
   for (list<Iscas89Handler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
@@ -100,7 +99,7 @@ Iscas89ParserImpl::add_handler(Iscas89Handler* handler)
   mHandlerList.push_back(handler);
   handler->mParser = this;
 }
-  
+
 // @brief yylex() 用の処理を行う．
 // @param[out] lval トークンの値を格納する変数
 // @param[out] lloc トークンの位置を格納する変数

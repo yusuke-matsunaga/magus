@@ -12,7 +12,6 @@
 
 
 #include "ym_verilog/pt/PtP.h"
-#include "ym_utils/FileDescMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -25,12 +24,12 @@ BEGIN_NAMESPACE_YM_VERILOG
 class PtMgr
 {
   friend class Parser;
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   PtMgr();
-  
+
   /// @brief デストラクタ
   ~PtMgr();
 
@@ -39,10 +38,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 情報を取得する関数
   //////////////////////////////////////////////////////////////////////
-  
-  /// @brief 今までに生成したインスタンスをすべて破壊する．
-  void
-  clear();
 
   /// @brief 登録されているモジュールのリストを返す．
   /// @return 登録されているモジュールのリスト
@@ -53,7 +48,7 @@ public:
   /// @return 登録されている UDP のリスト
   const list<const PtUdp*>&
   pt_udp_list() const;
-  
+
   /// @brief インスタンス記述で用いられている名前かどうか調べる．
   /// @param[in] name 調べる名前
   /// @return 用いられていたら true を返す．
@@ -65,6 +60,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // データをセットする関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 今までに生成したインスタンスをすべて破壊する．
+  void
+  clear();
 
   /// @brief UDP 定義を追加する．
   void
@@ -78,25 +77,22 @@ public:
   void
   reg_defname(const char* name);
 
-  
+
 private:
-  ////////////////////////////////////////////////////////////////////// 
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
-  // ファイル記述子を管理するクラス
-  FileDescMgr mFdMgr;
 
   // UDP 定義のリスト
   list<const PtUdp*> mUdpList;
 
   // モジュール定義のリスト
   list<const PtModule*> mModuleList;
-  
+
   // インスタンス記述で用いられている名前
   // たぶんモジュール名か UDP名のはず
   hash_set<string> mDefNames;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

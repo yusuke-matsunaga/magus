@@ -32,7 +32,7 @@ public:
 
   /// @brief コンストラクタ
   Iscas89ParserImpl();
-  
+
   /// @brief デストラクタ
   ~Iscas89ParserImpl();
 
@@ -52,11 +52,11 @@ public:
 
 
 public:
-  
+
   /// @brief メッセージマネージャを取り出す．
   MsgMgr&
   msg_mgr();
-  
+
   /// @brief yylex() 用の処理を行う．
   /// @param[out] lval トークンの値を格納する変数
   /// @param[out] lloc トークンの位置を格納する変数
@@ -64,7 +64,7 @@ public:
   int
   scan(ymuint32& lval,
        FileRegion& lloc);
-  
+
   /// @brief INPUT 文を読み込む．
   /// @param[in] loc ファイル位置
   /// @param[in] name_id 入力ピン名の ID 番号
@@ -91,12 +91,12 @@ public:
   read_gate(const FileRegion& loc,
 	    ymuint32 oname_id,
 	    tIscas89GateType type);
-  
+
   /// @brief 名前をリストに追加する．
   /// @param[in] str_id 文字列の ID 番号
   void
   push_str(ymuint32 str_id);
-  
+
   /// @brief 文字列用の領域を確保する．
   /// @param[in] src_str ソース文字列
   /// @param[in] loc 文字列の位置情報
@@ -104,19 +104,19 @@ public:
   ymuint32
   reg_str(const StrBuff& src_str,
 	  const FileRegion& loc);
-  
+
   /// @brief ID 番号から IdCell を得る．
   IdCell*
   id2cell(ymuint32 id) const;
-  
+
   /// @brief ID 番号から文字列を得る．
   const char*
   id2str(ymuint32 id) const;
-  
+
   /// @brief ID 番号から位置情報を得る．
   FileRegion
   id2loc(ymuint32 id) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -128,26 +128,26 @@ private:
 
   // イベントハンドラのリスト
   list<Iscas89Handler*> mHandlerList;
-  
+
   // メッセージハンドラの管理者
   MsgMgr mMsgMgr;
-  
+
   // 文字列のハッシュ
   IdHash mIdHash;
-  
+
   // 位置情報バッファ
   FileRegion mLoc1;
 
   // 入力IDのリスト
   vector<ymuint32> mInputList;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief メッセージマネージャを取り出す．
 inline
 MsgMgr&
@@ -155,7 +155,7 @@ Iscas89ParserImpl::msg_mgr()
 {
   return mMsgMgr;
 }
-  
+
 // @brief ID 番号から IdCell を得る．
 inline
 IdCell*
@@ -163,7 +163,7 @@ Iscas89ParserImpl::id2cell(ymuint32 id) const
 {
   return mIdHash.cell(id);
 }
-  
+
 // @brief ID 番号から文字列を得る．
 inline
 const char*
@@ -171,7 +171,7 @@ Iscas89ParserImpl::id2str(ymuint32 id) const
 {
   return mIdHash.str(id);
 }
-  
+
 // @brief ID 番号から位置情報を得る．
 inline
 FileRegion

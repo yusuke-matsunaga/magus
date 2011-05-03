@@ -13,7 +13,6 @@
 
 #include "dotlib_int.h"
 #include "ym_utils/MsgHandler.h"
-#include "ym_utils/FileDescMgr.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/FileScanner.h"
 #include "ym_utils/StrBuff.h"
@@ -192,11 +191,8 @@ private:
   // シンボルモード
   bool mSymbolMode;
 
-  // ファイルを管理するオブジェクト
-  FileDescMgr mFileDescMgr;
-
   // 現在オープン中のファイル
-  const FileDesc* mCurFileDesc;
+  FileInfo mCurFileInfo;
 
   // ファイル入力用のオブジェクト
   FileScanner mFileScanner;
@@ -230,7 +226,7 @@ inline
 FileRegion
 DotlibParserImpl::cur_loc()
 {
-  return FileRegion(mCurFileDesc,
+  return FileRegion(mCurFileInfo,
 		    mFirstLine, mFirstColumn,
 		    mFileScanner.last_line(), mFileScanner.last_column());
 }

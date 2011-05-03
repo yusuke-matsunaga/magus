@@ -12,10 +12,10 @@
 
 #include "ym_iscas89/iscas89_nsdef.h"
 #include "ym_iscas89/Iscas89Handler.h"
-  
+
 #include "Iscas89ParserImpl.h"
 #include "Iscas89Scanner.h"
-  
+
 
 // より詳細なエラー情報を出力させる．
 #define YYERROR_VERBOSE 1
@@ -29,8 +29,8 @@
 
 // YYLTYPE を書き換えたので以下のマクロも書き換えが必要
 #define YYLLOC_DEFAULT(Current, Rhs, N)	Current = loc_merge(Rhs, N);
-  
-  
+
+
 BEGIN_NAMESPACE_YM_ISCAS89
 
 // yacc/bison が生成するヘッダファイル
@@ -62,7 +62,7 @@ loc_merge(const FileRegion loc_array[],
 }
 
 END_NONAMESPACE
-  
+
 %}
 
 // "pure" parser にする．
@@ -209,9 +209,7 @@ loc_merge(const FileRegion loc_array[],
 {
   const FileRegion& first = loc_array[1];
   const FileRegion& last = loc_array[n];
-  return FileRegion(first.file_desc(),
-		    first.start_line(), first.start_column(),
-		    last.end_line(), last.end_column());
+  return FileRegion(first, last);
 }
 
 // yacc パーサーが内部で呼び出す関数
@@ -244,7 +242,7 @@ yyerror(YYLTYPE *llocp,
   else {
     msg2 = msg;
   }
-  
+
   parser.msg_mgr().put_msg(__FILE__, __LINE__, *llocp,
 			   kMsgError, "ER_SYN01", msg);
 
