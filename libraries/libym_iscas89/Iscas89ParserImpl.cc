@@ -45,9 +45,7 @@ Iscas89ParserImpl::read(const string& filename)
   int yyparse(Iscas89ParserImpl&);
 
   // ファイルをオープンする．
-  ifstream input_stream;
-  input_stream.open(filename.c_str());
-  if ( !input_stream ) {
+  if ( !mScanner.open_file(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -55,10 +53,6 @@ Iscas89ParserImpl::read(const string& filename)
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
-
-  // 初期化する．
-  FileInfo file_info = FileInfoMgr::new_file_info(filename);
-  mScanner.init(input_stream, file_info);
 
   for (list<Iscas89Handler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
