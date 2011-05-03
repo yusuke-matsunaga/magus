@@ -14,6 +14,7 @@
 #include "ymtools.h"
 #include "ym_utils/FileInfo.h"
 #include "ym_utils/FileLoc.h"
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -74,6 +75,10 @@ public:
   void
   accept();
 
+  /// @brief 現在の位置をトークンの最初の位置にセットする．
+  void
+  set_first_loc();
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -91,6 +96,10 @@ public:
   /// @brief 現在のコラム位置を返す．
   ymuint
   cur_column() const;
+
+  /// @brief 直前の set_first_loc() から現在の位置までを返す．
+  FileRegion
+  cur_loc() const;
 
 
 private:
@@ -127,7 +136,7 @@ private:
   bool mCR;
 
   // 現在の文字
-  int mCurChar;
+  ymint16 mCurChar;
 
   // 現在の行番号
   ymuint32 mCurLine;
@@ -135,8 +144,14 @@ private:
   // 現在のコラム位置
   ymuint32 mCurColumn;
 
+  // トークンの最初の行番号
+  ymuint32 mFirstLine;
+
+  // トークンの最初のコラム位置
+  ymuint32 mFirstColumn;
+
   // peek() した文字
-  int mNextChar;
+  ymint16 mNextChar;
 
   // peek() した文字の行番号
   ymuint32 mNextLine;
@@ -186,6 +201,14 @@ ymuint
 FileScanner::cur_column() const
 {
   return mCurColumn;
+}
+
+// @brief 直前の set_first_loc() から現在の位置までを返す．
+inline
+FileRegion
+FileScanner::cur_loc() const
+{
+  return FileRegion(mFileInfo, mFirstLine, mFirstColumn, mCurLine, mCurColumn);
 }
 
 END_NAMESPACE_YM

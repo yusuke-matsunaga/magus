@@ -69,6 +69,8 @@ FileScanner::init()
   mCurChar = 0;
   mCurLine = 1;
   mCurColumn = 1;
+  mFirstLine = 1;
+  mFirstColumn = 1;
   mNextLine = 1;
   mNextColumn = 1;
   mNeedUpdate = true;
@@ -151,6 +153,14 @@ FileScanner::accept()
     mNextColumn = 0;
   }
   ++ mNextColumn;
+}
+
+// @brief 現在の位置をトークンの最初の位置にセットする．
+void
+FileScanner::set_first_loc()
+{
+  mFirstLine = mCurLine;
+  mFirstColumn = mCurColumn;
 }
 
 END_NAMESPACE_YM
