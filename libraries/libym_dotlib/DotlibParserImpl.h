@@ -163,9 +163,14 @@ private:
   int
   get();
 
-  /// @brief 直前の get() を無かったことにする．
+  /// @brief 次の文字を読み出す．
+  /// @note ファイル位置の情報等は変わらない
+  int
+  peek();
+
+  /// @brief 直前の peek() を確定させる．
   void
-  unget();
+  accept();
 
 
 private:
@@ -225,7 +230,7 @@ DotlibParserImpl::cur_loc()
 {
   return FileRegion(mFileScanner.file_info(),
 		    mFirstLine, mFirstColumn,
-		    mFileScanner.last_line(), mFileScanner.last_column());
+		    mFileScanner.cur_line(), mFileScanner.cur_column());
 }
 
 // @brief 一文字読み出す．
@@ -236,12 +241,21 @@ DotlibParserImpl::get()
   return mFileScanner.get();
 }
 
-// @brief 直前の get() を無かったことにする．
+// @brief 次の文字を読み出す．
+// @note ファイル位置の情報等は変わらない
+inline
+int
+DotlibParserImpl::peek()
+{
+  return mFileScanner.peek();
+}
+
+// @brief 直前の peek() を確定させる．
 inline
 void
-DotlibParserImpl::unget()
+DotlibParserImpl::accept()
 {
-  mFileScanner.unget();
+  mFileScanner.accept();
 }
 
 END_NAMESPACE_YM_DOTLIB

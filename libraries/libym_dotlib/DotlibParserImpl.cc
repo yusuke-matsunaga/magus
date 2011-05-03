@@ -328,13 +328,13 @@ DotlibParserImpl::read_token(bool symbol_mode)
     goto ST_DQ;
 
   case '\\':
-    c = get();
+    c = peek();
     if ( c == '\n' ) {
       // 無視する．
+      accept();
       goto ST_INIT;
     }
     // それ以外はバックスラッシュがなかったことにする．
-    unget();
     goto ST_INIT;
 
   case '/':
@@ -381,31 +381,33 @@ DotlibParserImpl::read_token(bool symbol_mode)
   assert_not_reached(__FILE__, __LINE__);
 
  ST_MINUS: // '-' を読み込んだ時
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char('-');
     mCurString.put_char(c);
     goto ST_NUM1;
   }
-  unget();
   return MINUS;
 
  ST_NUM1: // 一文字目が[0-9]の時
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM1;
   }
   if ( c == '.' ) {
+    accept();
     mCurString.put_char(c);
     goto ST_DOT;
   }
-  unget();
   return INT_NUM;
 
  ST_DOT: // [0-9]*'.' を読み込んだ時
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM2;
   }
@@ -420,25 +422,28 @@ DotlibParserImpl::read_token(bool symbol_mode)
   }
 
  ST_NUM2: // [0-9]*'.'[0-9]* を読み込んだ時
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM2;
   }
   if ( c == 'e' || c == 'E' ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM3;
   }
-  unget();
   return FLOAT_NUM;
 
  ST_NUM3: // [0-9]*'.'[0-9]*(e|E)を読み込んだ時
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM4;
   }
   if ( c == '+' || c == '-' ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM4;
   }
@@ -453,21 +458,21 @@ DotlibParserImpl::read_token(bool symbol_mode)
   }
 
  ST_NUM4: // [0-9]*'.'[0-9]*(e|E)(+|-)?[0-9]*を読み込んだ直後
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_NUM4;
   }
-  unget();
   return FLOAT_NUM;
 
  ST_ID: // 一文字目が[a-zA-Z_]の時
-  c = get();
+  c = peek();
   if ( is_symbol(c) || isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto ST_ID;
   }
-  unget();
   return SYMBOL;
 
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
@@ -475,15 +480,7 @@ DotlibParserImpl::read_token(bool symbol_mode)
   if ( c == '\"' ) {
     return SYMBOL;
   }
-  if ( c == '\\' ) {
-    c = get();
-    if ( c == '\n' ) {
-      mCurString.put_char(c);
-    }
-    // それ以外はバックスラッシュを無視する．
-    mCurString.put_char(c);
-  }
-  else if ( c == '\n' ) {
+  if ( c == '\n' ) {
     ostringstream buf;
     buf << "unexpected newline in quoted string.";
     put_msg(__FILE__, __LINE__, cur_loc(),
@@ -501,18 +498,26 @@ DotlibParserImpl::read_token(bool symbol_mode)
 		    buf.str());
     return ERROR;
   }
+  if ( c == '\\' ) {
+    c = get();
+    if ( c != '\n' ) {
+      // 改行以外はバックスラッシュをそのまま解釈する．
+      mCurString.put_char('\\');
+    }
+  }
   mCurString.put_char(c);
   goto ST_DQ;
 
  ST_COMMENT1: // '/' を読み込んだ直後
-  c = get();
+  c = peek();
   if ( c == '/' ) { // C++ スタイルのコメント
+    accept();
     goto ST_COMMENT2;
   }
   if ( c == '*' ) { // C スタイルのコメント
+    accept();
     goto ST_COMMENT3;
   }
-  unget();
   return DIV;
 
  ST_COMMENT2: // 改行まで読み飛ばす．
