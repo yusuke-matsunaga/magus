@@ -56,11 +56,13 @@ protected:
   /// @param[in] attr_name 属性名
   /// @param[in] attr_loc ファイル上の位置
   /// @param[in] value 値のリスト
+  /// @param[in] end_loc 右括弧の位置
   virtual
   bool
   set_value(const ShString& attr_name,
 	    const FileRegion& attr_loc,
-	    DotlibNodeImpl* value);
+	    DotlibNodeImpl* value,
+	    const FileRegion& end_loc);
 
 };
 

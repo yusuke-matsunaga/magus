@@ -51,10 +51,11 @@ DotlibHandler::node()
 }
 
 // @brief group attribute 用のパースを行う．
+// @param[out] end_loc 右括弧の位置を格納する変数
 // @return 読み込んだ値(リスト)を返す．
 // @note エラーが起きたら NULL を返す．
 DotlibNodeImpl*
-DotlibHandler::parse_complex()
+DotlibHandler::parse_complex(FileRegion& end_loc)
 {
   if ( !expect(LP) ) {
     return NULL;
@@ -87,6 +88,7 @@ DotlibHandler::parse_complex()
       type = parser().read_token(loc);
     }
   }
+  end_loc = loc;
 
   return value_list;
 }

@@ -78,10 +78,11 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief group attribute 用のパースを行う．
+  /// @param[out] end_loc 右括弧の位置を格納する変数
   /// @return 読み込んだ値(リスト)を返す．
   /// @note エラーが起きたら NULL を返す．
   DotlibNodeImpl*
-  parse_complex();
+  parse_complex(FileRegion& end_loc);
 
   /// @brief DotlibNode (の派生クラス)を生成する．
   /// @param[in] type 型

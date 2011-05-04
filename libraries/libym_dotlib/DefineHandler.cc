@@ -41,7 +41,8 @@ bool
 DefineHandler::read_attr(const ShString& attr_name,
 			 const FileRegion& attr_loc)
 {
-  const DotlibNode* value = parse_complex();
+  FileRegion dummy_loc;
+  const DotlibNode* value = parse_complex(dummy_loc);
   if ( value == NULL ) {
     return false;
   }

@@ -39,7 +39,8 @@ bool
 ComplexHandler::read_attr(const ShString& attr_name,
 			  const FileRegion& attr_loc)
 {
-  DotlibNodeImpl* value = parse_complex();
+  FileRegion end_loc;
+  DotlibNodeImpl* value = parse_complex(end_loc);
   if ( value == NULL ) {
     return false;
   }
@@ -52,7 +53,7 @@ ComplexHandler::read_attr(const ShString& attr_name,
     cout << attr_name << value << endl;
   }
 
-  if ( !set_value(attr_name, attr_loc, value) ) {
+  if ( !set_value(attr_name, attr_loc, value, end_loc) ) {
     return false;
   }
 
@@ -63,12 +64,14 @@ ComplexHandler::read_attr(const ShString& attr_name,
 // @param[in] attr_name 属性名
 // @param[in] attr_loc ファイル上の位置
 // @param[in] value_list 値のリスト
+// @param[in] end_loc 右括弧の位置
 bool
 ComplexHandler::set_value(const ShString& attr_name,
 			  const FileRegion& attr_loc,
-			  DotlibNodeImpl* value)
+			  DotlibNodeImpl* value,
+			  const FileRegion& end_loc)
 {
-  FileRegion loc(attr_loc, value->loc());
+  FileRegion loc(attr_loc, end_loc);
   return parent()->add_attr(attr_name, value, loc);
 }
 
