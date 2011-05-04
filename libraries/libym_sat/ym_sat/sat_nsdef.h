@@ -43,6 +43,9 @@ class SatSolverFactory;
 class SatStats;
 class SatMsgHandler;
 
+class DimacsParser;
+class DimacsHandler;
+
 END_NAMESPACE_YM_SAT
 
 BEGIN_NAMESPACE_YM
@@ -51,6 +54,9 @@ using nsSat::SatSolver;
 using nsSat::SatSolverFactory;
 using nsSat::SatStats;
 using nsSat::SatMsgHandler;
+
+using nsSat::DimacsParser;
+using nsSat::DimacsHandler;
 
 END_NAMESPACE_YM
 

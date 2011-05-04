@@ -23,7 +23,7 @@ libym_sat_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_sat_la_LDFLAGS = 
+libym_sat_la_LDFLAGS =
 
 libym_sat_la_SOURCES = \
 	SatReason.h \
@@ -39,4 +39,7 @@ libym_sat_la_SOURCES = \
 	SatSolverImplR.cc \
 	SatSolver.cc \
 	SatSolverFactory.cc \
-	DimacsParser.cc
+	DimacsParser.cc \
+	DimacsParserImpl.h \
+	DimacsScanner.h \
+	DimacsScanner.cc

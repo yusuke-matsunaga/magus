@@ -10,21 +10,17 @@
 
 
 #include "ym_sat/DimacsParser.h"
+#include "DimacsParserImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
-
-BEGIN_NONAMESPACE
-const bool debug_read_token = false;
-END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // DimacsHandler
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DimacsHandler::DimacsHandler() :
-  mParser(NULL)
+DimacsHandler::DimacsHandler()
 {
 }
 
@@ -33,12 +29,14 @@ DimacsHandler::~DimacsHandler()
 {
 }
 
+#if 0
 // パーサーを得る．
 DimacsParser*
 DimacsHandler::parser() const
 {
   return mParser;
 }
+#endif
 
 // @brief 初期化
 bool
@@ -48,13 +46,13 @@ DimacsHandler::init()
 }
 
 // @brief p 行の読込み
-// @param[in] lineno 行番号
+// @param[in] loc ファイル上の位置情報
 // @param[in] nv 変数の数
 // @param[in] nc 節の数
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-DimacsHandler::read_p(int lineno,
+DimacsHandler::read_p(const FileRegion& loc,
 		      size_t nv,
 		      size_t nc)
 {
@@ -62,12 +60,12 @@ DimacsHandler::read_p(int lineno,
 }
 
 // @brief clause 行の読込み
-// @param[in] lineno 行番号
+// @param[in] loc ファイル上の位置情報
 // @param[in] lits リテラルの配列．最後の0は含まない
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-DimacsHandler::read_clause(int lineno,
+DimacsHandler::read_clause(const FileRegion& loc,
 			   const vector<int>& lits)
 {
   return true;
@@ -89,38 +87,59 @@ DimacsHandler::error_exit()
 
 
 //////////////////////////////////////////////////////////////////////
-// DimacsMsgHandler
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-DimacsMsgHandler::DimacsMsgHandler() :
-  mParser(NULL)
-{
-}
-
-// @brief デストラクタ
-DimacsMsgHandler::~DimacsMsgHandler()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // DimacsParser
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-DimacsParser::DimacsParser()
+DimacsParser::DimacsParser() :
+  mImpl(new DimacsParserImpl)
 {
 }
 
 // デストラクタ
 DimacsParser::~DimacsParser()
 {
+  delete mImpl;
 }
 
-// 読み込みを行なう．
+// @brief 読み込みを行う．
+// @param[in] filename ファイル名
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
 bool
-DimacsParser::read(istream& in)
+DimacsParser::read(const string& filename)
+{
+  return mImpl->read(filename);
+}
+
+// @brief イベントハンドラの登録
+void
+DimacsParser::add_handler(DimacsHandler* handler)
+{
+  mImpl->add_handler(handler);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス DimacsParserImpl
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+DimacsParserImpl::DimacsParserImpl()
+{
+}
+
+// @brief デストラクタ
+DimacsParserImpl::~DimacsParserImpl()
+{
+}
+
+// @brief 読み込みを行なう．
+// @param[in] filename ファイル名
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+bool
+DimacsParserImpl::read(const string& filename)
 {
   // 読込用の内部状態
   enum {
@@ -145,6 +164,20 @@ DimacsParser::read(istream& in)
 
   vector<int> lits;
 
+  if ( !mScanner.open_file(filename) ) {
+    // ファイルが開けなかった．
+#if 0
+    ostringstream buf;
+    buf << filename << " : No such file.";
+    mMsgMgr.put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgFailure,
+		    "DIMACS_PARSER",
+		    buf.str());
+#endif
+    return false;
+  }
+
   bool stat = true;
   for (list<DimacsHandler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
@@ -156,12 +189,10 @@ DimacsParser::read(istream& in)
   if ( !stat ) {
     goto error;
   }
-  
-  mLineNo = 1;
-  mCR = false;
-  mNL = false;
+
   for ( ; ; ) {
-    tToken tk = read_token(in);
+    FileRegion loc;
+    tToken tk = mScanner.read_token(loc);
     if ( tk == kERR ) {
       return false;
     }
@@ -181,7 +212,7 @@ DimacsParser::read(istream& in)
       if ( tk != kNUM ) {
 	goto p_error;
       }
-      dec_nv = mCurVal;
+      dec_nv = mScanner.cur_val();
       state = ST_P2;
       break;
 
@@ -189,7 +220,7 @@ DimacsParser::read(istream& in)
       if ( tk != kNUM ) {
 	goto p_error;
       }
-      dec_nc = mCurVal;
+      dec_nc = mScanner.cur_val();
       state = ST_P3;
       break;
 
@@ -200,7 +231,7 @@ DimacsParser::read(istream& in)
       for (list<DimacsHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	DimacsHandler* handler = *p;
-	if ( !handler->read_p(mLineNo - 1, dec_nv, dec_nc) ) {
+	if ( !handler->read_p(loc, dec_nv, dec_nc) ) {
 	  stat = false;
 	}
       }
@@ -212,8 +243,14 @@ DimacsParser::read(istream& in)
 
     case ST_BODY1:
       if ( tk == kP ) {
-	add_msg(__FILE__, __LINE__, mLineNo,
-		"ERR01", "duplicated 'p' lines");
+#if 0
+	put_msg(__FILE__, __LINE__,
+		loc,
+		kMsgError,
+		"ERR01",
+		"duplicated 'p' lines");
+#endif
+	cout << "ERR01: duplicated 'p' lines" << endl;
 	return false;
       }
       if ( tk == kEOF ) {
@@ -222,20 +259,21 @@ DimacsParser::read(istream& in)
       if ( tk == kNL ) {
 	continue;
       }
-      if ( tk != kNUM ) {
-	goto n_error;
+      if ( tk == kNUM ) {
+	int v = mScanner.cur_val();
+	lits.clear();
+	lits.push_back(v);
+	if ( v < 0 ) {
+	  v = - v;
+	}
+	if ( max_v < v ) {
+	  max_v = v;
+	}
+	state = ST_BODY2;
+	break;
       }
-      
-      lits.clear();
-      lits.push_back(mCurVal);
-      if ( mCurVal < 0 ) {
-	mCurVal = - mCurVal;
-      }
-      if ( max_v < mCurVal ) {
-	max_v = mCurVal;
-      }
-      state = ST_BODY2;
-      break;
+      // それ以外はエラー
+      goto n_error;
 
     case ST_BODY2:
       if ( tk == kZERO ) {
@@ -245,12 +283,13 @@ DimacsParser::read(istream& in)
 	continue;
       }
       else if ( tk == kNUM ) {
-	lits.push_back(mCurVal);
-	if ( mCurVal < 0 ) {
-	  mCurVal = - mCurVal;
+	int v = mScanner.cur_val();
+	lits.push_back(v);
+	if ( v < 0 ) {
+	  v = - v;
 	}
-	if ( max_v < mCurVal ) {
-	  max_v = mCurVal;
+	if ( max_v < v ) {
+	  max_v = v;
 	}
       }
       else {
@@ -266,7 +305,7 @@ DimacsParser::read(istream& in)
       for (list<DimacsHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	DimacsHandler* handler = *p;
-	if ( !handler->read_clause(mLineNo - 1, lits) ) {
+	if ( !handler->read_clause(loc, lits) ) {
 	  stat = false;
 	}
       }
@@ -280,21 +319,42 @@ DimacsParser::read(istream& in)
 
   normal_end:
   if ( dec_nv == 0 ) {
-    add_msg(__FILE__, __LINE__, mLineNo,
-	    "ERR02", "unexpected end-of-file");
+#if 0
+    add_msg(__FILE__, __LINE__,
+	    loc,
+	    kMsgError,
+	    "ERR02",
+	    "unexpected end-of-file");
+#endif
+    cout << "ERR02: unexpected end-of-file" << endl;
     goto error;
   }
   if ( dec_nv < max_v ) {
-    add_msg(__FILE__, __LINE__, mLineNo,
-	    "WRN01", "actual number of variables is more than the declared");
+#if 0
+    add_msg(__FILE__, __LINE__,
+	    loc,
+	    kMsgWarning,
+	    "WRN01",
+	    "actual number of variables is more than the declared");
+#endif
   }
   if ( dec_nc > act_nc ) {
-    add_msg(__FILE__, __LINE__, mLineNo,
-	    "WRN02", "actual number of clauses is less than the declared");
+#if 0
+    add_msg(__FILE__, __LINE__,
+	    loc,
+	    kMsgWarning,
+	    "WRN02",
+	    "actual number of clauses is less than the declared");
+#endif
   }
   else if ( dec_nc < act_nc ) {
-    add_msg(__FILE__, __LINE__, mLineNo,
-	    "WRN03", "actual number of clauses is more than the declared");
+#if 0
+    add_msg(__FILE__, __LINE__,
+	    loc,
+	    kMsgWarning,
+	    "WRN03",
+	    "actual number of clauses is more than the declared");
+#endif
   }
 
   for (list<DimacsHandler*>::iterator p = mHandlerList.begin();
@@ -310,226 +370,50 @@ DimacsParser::read(istream& in)
   return true;
 
  p_error:
-  add_msg(__FILE__, __LINE__, mLineNo,
-	  "ERR03", "syntax error \"p cnf <num of vars> <num of clauses>\" expected");
+#if 0
+  add_msg(__FILE__, __LINE__,
+	  loc,
+	  kMsgError,
+	  "ERR03",
+	  "syntax error \"p cnf <num of vars> <num of clauses>\" expected");
+#endif
+  cout << "ERR03 : "
+       << "syntax error \"p cnf <num of vars> <num of clauses>\" expected"
+       << endl;
+
   goto error;
 
  n_error:
-  add_msg(__FILE__, __LINE__, mLineNo,
-	  "ERR04", "syntax error \"<lit_1> <lit_2> ... <lit_n> 0\" expected");
+#if 0
+  add_msg(__FILE__, __LINE__,
+	  loc,
+	  kMsgError,
+	  "ERR04",
+	  "syntax error \"<lit_1> <lit_2> ... <lit_n> 0\" expected");
+#endif
+  cout << "ERR04 : "
+       << "syntax error \"<lit_1> <lit_2> ... <lit_n> 0\" expected"
+       << endl;
   goto error;
-  
+
  error:
   for (list<DimacsHandler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
     DimacsHandler* handler = *p;
     handler->error_exit();
   }
-  
+
   return false;
 }
 
 // @brief イベントハンドラの登録
 void
-DimacsParser::add_handler(DimacsHandler* handler)
+DimacsParserImpl::add_handler(DimacsHandler* handler)
 {
+#if 0
   handler->mParser = this;
+#endif
   mHandlerList.push_back(handler);
-}
-
-// @brief メッセージハンドラの登録
-void
-DimacsParser::add_msg_handler(DimacsMsgHandler* handler)
-{
-  handler->mParser = this;
-  mMsgHandlerList.push_back(handler);
-}
-
-// @brief トークンの読込み
-DimacsParser::tToken
-DimacsParser::read_token(istream& in)
-{
-  // トークンとは空白もしくは改行で区切られたもの
-  // とりあえずそれ以外の文字はすべてトークンの構成要素とみなす．
-  // 改行は単独のトークンとみなす．
-  // EOF も単独のトークンとみなす．
-
-  if ( mNL ) {
-    mNL = false;
-    ++ mLineNo;
-    if ( debug_read_token ) {
-      cerr << "kNL <-- read_token()" << endl;
-    }
-    return kNL;
-  }
-  
-  // 最初の空白文字をスキップする．
-  int c;
-  for ( ; ; ) {
-    c = read_char(in);
-    if ( c == EOF ) {
-      if ( debug_read_token ) {
-	cerr << "kEOF <-- read_token()" << endl;
-      }
-      return kEOF;
-    }
-    if ( c == '\n' ) {
-      ++ mLineNo;
-      if ( debug_read_token ) {
-	cerr << "kNL <-- read_token()" << endl;
-      }
-      return kNL;
-    }
-    if ( c != ' ' && c != '\t' ) {
-      break;
-    }
-  }
-
-  if ( c == 'c' ) {
-    // 手抜きで次の NL まで読み飛ばす．
-    while ( (c = read_char(in)) != '\n' && c != EOF ) ;
-    if ( c == '\n' ) {
-      ++ mLineNo;
-    }
-    if ( debug_read_token ) {
-      cerr << "kC <-- read_token()" << endl;
-    }
-    return kC;
-  }
-  if ( c == 'p' ) {
-    c = read_char(in);
-    // 次は空白でなければならない．
-    if ( c != ' ' && c != '\t' ) {
-      goto p_error;
-    }
-    // 続く空白を読み飛ばす．
-    for ( ; ; ) {
-      c = read_char(in);
-      if ( c != ' ' && c != '\t' ) {
-	break;
-      }
-    }
-    // 次は "cnf" のはず．
-    if ( c != 'c' ) {
-      goto p_error;
-    }
-    c = read_char(in);
-    if ( c != 'n' ) {
-      goto p_error;
-    }
-    c = read_char(in);
-    if ( c != 'f' ) {
-      goto p_error;
-    }
-    c = read_char(in);
-    // 次は空白のはず．
-    if ( c != ' ' && c != '\t' ) {
-      goto p_error;
-    }
-    if ( debug_read_token ) {
-      cerr << "kP <-- read_token()" << endl;
-    }
-    return kP;
-
-  p_error:
-    add_msg(__FILE__, __LINE__, mLineNo,
-	    "ERR05", "syntax error");
-    return kERR;
-  }
-  
-  bool minus_flag = false;
-  if ( c == '-' ) {
-    minus_flag = true;
-    c = read_char(in);
-  }
-
-  int val = 0;
-  for ( ; ; ) {
-    if ( c < '0' || '9' < c ) {
-      add_msg(__FILE__, __LINE__, mLineNo,
-	      "ERR06", "syntax error");
-      return kERR;
-    }
-    val = val * 10 + (c - '0');
-
-    c = read_char(in);
-    if ( c == ' ' || c == '\t' || c == '\n' || c == EOF ) {
-      if ( c == '\n' ) {
-	mNL = true;
-      }
-      if ( minus_flag ) {
-	mCurVal = - val;
-      }
-      else {
-	mCurVal = val;
-      }
-      if ( mCurVal == 0 ) {
-	if ( debug_read_token ) {
-	  cerr << "kZERO <-- read_token()" << endl;
-	}
-	return kZERO;
-      }
-      if ( debug_read_token ) {
-	cerr << "kNUM(" << mCurVal << ") <-- read_token()" << endl;
-      }
-      return kNUM;
-    }
-  }
-}
-
-// 一文字読み出す．
-int
-DimacsParser::read_char(istream& in)
-{
-  for ( ; ; ) {
-    int c = in.get();
-    if ( c == std::char_traits<char>::eof() ) {
-      return EOF;
-    }
-    // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
-    // 強制的に '\n' に書き換えてしまう．
-    // Windows : '\r', '\n'
-    // Mac     : '\r'
-    // UNIX    : '\n'
-    // なので '\r' を '\n' に書き換えてしまう．
-    // ただし次に本当の '\n' が来たときには無視するために
-    // mCR を true にしておく．
-    if ( c == '\r' ) {
-      mCR = true;
-      return '\n';
-    }
-    if ( c == '\n' ) {
-      if ( mCR ) {
-	// 直前に '\r' を読んで '\n' を返していたので今の '\n' を
-	// 無視する．これが唯一ループを回る条件
-	mCR = false;
-	continue;
-      }
-      return '\n';
-    }
-    // 普通の文字の時はそのまま返す．
-    mCR = false;
-    return c;
-  }
-}
-
-// @brief メッセージの追加
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] loc ファイル位置
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-DimacsParser::add_msg(const char* src_file,
-		      int src_line,
-		      int lineno,
-		      const string& label,
-		      const string& body)
-{
-  for (list<DimacsMsgHandler*>::iterator p = mMsgHandlerList.begin();
-       p != mMsgHandlerList.end(); ++ p) {
-    (*(*p))(src_file, src_line, lineno, label, body);
-  }
 }
 
 END_NAMESPACE_YM_SAT
