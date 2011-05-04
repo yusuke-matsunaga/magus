@@ -29,15 +29,6 @@ DimacsHandler::~DimacsHandler()
 {
 }
 
-#if 0
-// パーサーを得る．
-DimacsParser*
-DimacsHandler::parser() const
-{
-  return mParser;
-}
-#endif
-
 // @brief 初期化
 bool
 DimacsHandler::init()
@@ -53,8 +44,8 @@ DimacsHandler::init()
 // @retval false エラーが起こった．
 bool
 DimacsHandler::read_p(const FileRegion& loc,
-		      size_t nv,
-		      size_t nc)
+		      ymuint nv,
+		      ymuint nc)
 {
   return true;
 }
