@@ -13,6 +13,8 @@
 #include "ym_mvn/MvnMgr.h"
 #include "ym_mvn/MvnVerilogReader.h"
 #include "ym_mvn/MvnVlMap.h"
+
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -37,12 +39,13 @@ MvnReadVerilog::~MvnReadVerilog()
 int
 MvnReadVerilog::cmd_proc(TclObjVector& objv)
 {
+  StreamMsgHandler mh(&cerr);
+  mh.set_mask(kMaskAll);
+  mh.delete_mask(kMsgInfo);
+  mh.delete_mask(kMsgDebug);
+  MsgMgr::reg_handler(&mh);
+
   MvnVerilogReader reader;
-  MsgHandler* mh = new StreamMsgHandler(&cerr);
-  mh->set_mask(MsgHandler::kMaskAll);
-  mh->delete_mask(kMsgInfo);
-  mh->delete_mask(kMsgDebug);
-  reader.add_msg_handler(mh);
 
   // Verilog ファイルの読み込み
   for (ymuint i = 1; i < objv.size(); ++ i) {

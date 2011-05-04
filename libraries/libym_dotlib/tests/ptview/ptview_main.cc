@@ -14,6 +14,8 @@
 #include "VerilogView.h"
 #include "ParseTreeModel.h"
 #include "ParseTreeView.h"
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 #include "ym_dotlib/DotlibParser.h"
 
@@ -27,8 +29,10 @@ main(int argc,
 
   QApplication app(argc, argv);
 
-  MsgMgr msg_mgr;
-  DotlibParser parser(msg_mgr);
+  MsgHandler* handler = new StreamMsgHandler(&cerr);
+  MsgMgr::reg_handler(handler);
+
+  DotlibParser parser;
 
   // パース木を作る．
   const DotlibNode* library = parser.read_file(argv[1], false);

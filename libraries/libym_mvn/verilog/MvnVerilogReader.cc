@@ -57,11 +57,4 @@ MvnVerilogReader::gen_network(MvnMgr& mgr,
   return mImpl->gen_network(mgr, node_map);
 }
 
-// @brief メッセージハンドラを付加する．
-void
-MvnVerilogReader::add_msg_handler(MsgHandler* msg_handler)
-{
-  mImpl->add_msg_handler(msg_handler);
-}
-
 END_NAMESPACE_YM_MVN

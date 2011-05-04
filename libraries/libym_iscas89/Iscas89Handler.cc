@@ -87,21 +87,14 @@ void
 Iscas89Handler::error_exit()
 {
 }
-  
-// @brief メッセージマネージャの取得
-MsgMgr&
-Iscas89Handler::msg_mgr()
-{
-  return mParser->msg_mgr();
-}
-  
+
 // @brief ID 番号から文字列を得る．
 const char*
 Iscas89Handler::id2str(ymuint32 id) const
 {
   return mParser->id2str(id);
 }
-  
+
 // @brief ID 番号から位置情報を得る．
 FileRegion
 Iscas89Handler::id2loc(ymuint32 id) const

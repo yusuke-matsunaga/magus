@@ -13,6 +13,7 @@
 #include <fcntl.h>
 
 #include "ym_utils/FileInfo.h"
+#include "ym_utils/MsgMgr.h"
 
 #include "parser.h"
 
@@ -179,11 +180,11 @@ InputFile::_read_token(StrBuff& buff)
       ostringstream buf;
       buf << "illegal character \'" << static_cast<char>(c) << "\',"
 	  << "only B|b|O|o|D|d|H|h is allowed here.";
-      put_msg(__FILE__, __LINE__,
-	      cur_file_region(),
-	      kMsgError,
-	      "LEX",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_file_region(),
+		      kMsgError,
+		      "LEX",
+		      buf.str());
     }
     return ERROR;
 
@@ -358,11 +359,11 @@ InputFile::_read_token(StrBuff& buff)
       ostringstream buf;
       buf << "illegal charactor \'" << static_cast<char>(c)
 	  << "\' [" << c << " in digit code].";
-      put_msg(__FILE__, __LINE__,
-	      cur_file_region(),
-	      kMsgError,
-	      "LEX",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_file_region(),
+		      kMsgError,
+		      "LEX",
+		      buf.str());
       return ERROR;
     }
 
@@ -398,11 +399,11 @@ InputFile::_read_token(StrBuff& buff)
   ostringstream buf;
   buf << "illegal charactor \'" << static_cast<char>(c)
       << "\' [" << c << " in digit code].";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  buf.str());
   return ERROR;
 }
 
@@ -462,11 +463,11 @@ InputFile::read_bin_str(int c,
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'01xXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -526,11 +527,11 @@ InputFile::read_oct_str(int c,
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-7xXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -608,11 +609,11 @@ InputFile::read_dec_str(int c,
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-9xXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -674,11 +675,11 @@ InputFile::read_hex_str(int c,
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-9a-ha-HxXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -818,11 +819,11 @@ InputFile::read_dq_str(StrBuff& buff)
 
  ERR_END:
   // 文字列が終わらないうちに改行が来てしまった．
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  "new line in quoted string.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  "new line in quoted string.");
   return ERROR;
 }
 
@@ -845,11 +846,11 @@ InputFile::read_esc_str(StrBuff& buff)
   }
   if ( !isascii(c) ) {
     // escaped identifier でも非 ascii 文字は違反
-    put_msg(__FILE__, __LINE__,
-	    cur_file_region(),
-	    kMsgError,
-	    "LEX",
-	    "non-ascii character in escaped string.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_file_region(),
+		    kMsgError,
+		    "LEX",
+		    "non-ascii character in escaped string.");
     return ERROR;
   }
 
@@ -1124,11 +1125,11 @@ InputFile::read_comment(StrBuff& buff)
       if ( mReadPos >= mEndPos ) {
 	if ( fill_buff() == 0 ) {
 	  // '*/' を読む前に EOF になってしまった．
-	  put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
-		  kMsgError,
-		  "LEX",
-		  "unexpected end-of-file in comment block(/*).");
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  cur_file_region(),
+			  kMsgError,
+			  "LEX",
+			  "unexpected end-of-file in comment block(/*).");
 	  return ERROR;
 	}
       }
@@ -1173,11 +1174,11 @@ InputFile::peek()
       else {
 	// ファイル末尾が NL でなければ NL を挿入する．
 #if ALLOW_EOF_WITHOUT_NL == 0
-	put_msg(__FILE__, __LINE__,
-		cur_file_region(),
-		kMsgWarning,
-		"LEX",
-		"Unexpected EOF, NL is assumed.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			cur_file_region(),
+			kMsgWarning,
+			"LEX",
+			"Unexpected EOF, NL is assumed.");
 #endif
 	return '\n';
       }

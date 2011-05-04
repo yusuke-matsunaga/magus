@@ -7,13 +7,12 @@
 ///
 /// $Id: Iscas89ParserImpl.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_iscas89/iscas89_nsdef.h"
 #include "ym_iscas89/Iscas89Handler.h"
-#include "ym_utils/MsgHandler.h"
 #include "Iscas89Scanner.h"
 
 #include "ym_utils/StrBuff.h"
@@ -52,10 +51,6 @@ public:
 
 
 public:
-
-  /// @brief メッセージマネージャを取り出す．
-  MsgMgr&
-  msg_mgr();
 
   /// @brief yylex() 用の処理を行う．
   /// @param[out] lval トークンの値を格納する変数
@@ -135,9 +130,6 @@ private:
   // イベントハンドラのリスト
   list<Iscas89Handler*> mHandlerList;
 
-  // メッセージハンドラの管理者
-  MsgMgr mMsgMgr;
-
   // 文字列のハッシュ
   IdHash mIdHash;
 
@@ -153,14 +145,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief メッセージマネージャを取り出す．
-inline
-MsgMgr&
-Iscas89ParserImpl::msg_mgr()
-{
-  return mMsgMgr;
-}
 
 // @brief ID 番号から IdCell を得る．
 inline

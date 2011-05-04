@@ -10,12 +10,14 @@
 
 
 #if HAVE_CONFIG_H
-#include <ymconfig.h>
+#include "ymconfig.h"
 #endif
 
-#include <ym_utils/StopWatch.h>
+#include "ym_utils/StopWatch.h"
 #include "VlTestLineWatcher.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 #include "Lex.h"
 #include "print_token.h"
@@ -33,10 +35,10 @@ rawlex_mode(const list<string>& filename_list,
 	    bool verbose,
 	    bool dump_token)
 {
-  MsgMgr msg_mgr;
   MsgHandler* handler = new StreamMsgHandler(&cerr);
-  msg_mgr.reg_handler(handler);
-  Lex lex(msg_mgr);
+  MsgMgr::reg_handler(handler);
+
+  Lex lex;
 
   if ( spath ) {
     SearchPathList splist(spath);

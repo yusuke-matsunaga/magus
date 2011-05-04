@@ -14,6 +14,8 @@
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -374,11 +376,11 @@ ExprGen::error_common(const PtExpr* pt_expr,
 		      const char* label,
 		      const char* msg)
 {
-  put_msg(__FILE__, __LINE__,
-	  pt_expr->file_region(),
-	  kMsgError,
-	  label,
-	  msg);
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  pt_expr->file_region(),
+		  kMsgError,
+		  label,
+		  msg);
 }
 
 END_NAMESPACE_YM_VERILOG

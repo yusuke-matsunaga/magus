@@ -13,7 +13,6 @@
 
 #include "ym_verilog/verilog.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/MsgHandler.h"
 #include "RawLex.h"
 
 
@@ -31,7 +30,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] lex 親の lexer オブジェクト
   LexState(RawLex& lex);
-  
+
   /// @brief デストラクタ
   virtual
   ~LexState();
@@ -60,42 +59,6 @@ protected:
   /// @return 親の Lex オブジェクト
   RawLex&
   lex() const;
-  
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // メッセージ出力用の便利関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const char* msg);
-  
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const string& msg);
 
 
 private:
@@ -105,7 +68,7 @@ private:
 
   // 親の Lex
   RawLex& mLex;
-  
+
 };
 
 
@@ -129,44 +92,6 @@ bool
 LexState::debug() const
 {
   return mLex.debug();
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-LexState::put_msg(const char* src_file,
-		  int src_line,
-		  const FileRegion& file_loc,
-		  tMsgType type,
-		  const char* label,
-		  const char* msg)
-{
-  mLex.msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-  
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-LexState::put_msg(const char* src_file,
-		  int src_line,
-		  const FileRegion& file_loc,
-		  tMsgType type,
-		  const char* label,
-		  const string& msg)
-{
-  mLex.msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 END_NAMESPACE_YM_VERILOG

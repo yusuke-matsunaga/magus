@@ -14,6 +14,8 @@
 #include "ym_tgnet/TgNetwork.h"
 #include "ym_tgnet/TgNode.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_TGNET
 
@@ -151,11 +153,11 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
     // .names の後の要素数とパタンの列数が異なる．
     ostringstream buf;
     buf << node->name() << ": illegal cover" << endl;
-    msg_mgr().put_msg(__FILE__, __LINE__,
-		      id2loc(name_id_array[ni]),
-		      kMsgError,
-		      "TG_BLIF_005",
-		      buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    id2loc(name_id_array[ni]),
+		    kMsgError,
+		    "TG_BLIF_005",
+		    buf.str());
     return false;
   }
   for (ymuint32 i = 0; i < ni; ++ i) {
@@ -239,11 +241,11 @@ TgBlifHandler::end(const FileRegion& loc)
       // node は定義されていない
       ostringstream buf;
       buf << node->name() << ": undefined";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			loc,
-			kMsgError,
-			"TG_BLIF_03",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "TG_BLIF_03",
+		      buf.str());
       return false;
     }
   }

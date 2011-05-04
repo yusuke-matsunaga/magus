@@ -35,17 +35,13 @@ public:
 
 
 public:
-  
+
   /// @brief blif ファイルを読み込む．
   /// @param[in] filename ファイル名
   /// @param[in] network 設定対象のネットワーク
   bool
   operator()(const string& filename,
 	     TgNetwork& network);
-
-  /// @brief メッセージハンドラを追加する．
-  void
-  add_msg_handler(MsgHandler* msg_handler);
 
 
 private:
@@ -58,7 +54,7 @@ private:
 
   // ISCAS89 ファイルを TgNetwork に変換するためのハンドラ
   TgIscas89Handler* mHandler;
-  
+
 };
 
 END_NAMESPACE_YM_TGNET

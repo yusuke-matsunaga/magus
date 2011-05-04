@@ -209,36 +209,6 @@ private:
   int
   fill_buff();
 
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const char* msg);
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const string& msg);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -414,48 +384,6 @@ InputFile::fill_buff()
     mEndPos = 0;
   }
   return mEndPos;
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-InputFile::put_msg(const char* src_file,
-		   int src_line,
-		   const FileRegion& file_loc,
-		   tMsgType type,
-		   const char* label,
-		   const char* msg)
-{
-  mLex->msg_mgr().put_msg(src_file, src_line,
-			  file_loc, type,
-			  label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-InputFile::put_msg(const char* src_file,
-		   int src_line,
-		   const FileRegion& file_loc,
-		   tMsgType type,
-		   const char* label,
-		   const string& msg)
-{
-  mLex->msg_mgr().put_msg(src_file, src_line,
-			  file_loc, type,
-			  label, msg);
 }
 
 END_NAMESPACE_YM_VERILOG

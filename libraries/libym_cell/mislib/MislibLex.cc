@@ -11,6 +11,7 @@
 
 #include "MislibLex.h"
 #include "ym_utils/FileInfoMgr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_MISLIB
@@ -19,8 +20,7 @@ BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 
 // コンストラクタ
-MislibLex::MislibLex(MsgMgr& msg_mgr) :
-  mMsgMgr(msg_mgr)
+MislibLex::MislibLex()
 {
 }
 
@@ -204,9 +204,11 @@ MislibLex::scan()
   {
     ostringstream buf;
     buf << "Syntax error: illegal input (" << mCurString << ").";
-    mMsgMgr.put_msg(__FILE__, __LINE__,
-		    cur_loc(), kMsgError,
-		    "MISLIB_PARSE", buf.str().c_str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
+		    kMsgError,
+		    "MISLIB_PARSE",
+		    buf.str().c_str());
   }
   return ERROR;
 }

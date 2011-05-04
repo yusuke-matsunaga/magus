@@ -15,7 +15,6 @@
 #include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/pt/PtArray.h"
-#include "ym_utils/MsgHandler.h"
 #include "Elaborator.h"
 #include "ElbMgr.h"
 #include "ElbFactory.h"
@@ -624,52 +623,12 @@ protected:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // メッセージの出力
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const char* msg);
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const string& msg);
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
   // メンバへのアクセス
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ファクトリオブジェクトを得る．
   ElbFactory&
   factory();
-
-  /// @brief メッセージマネージャを得る．
-  MsgMgr&
-  msg_mgr();
 
 
 private:
@@ -1058,52 +1017,6 @@ ElbFactory&
 ElbProxy::factory()
 {
   return mFactory;
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-ElbProxy::put_msg(const char* src_file,
-		  int src_line,
-		  const FileRegion& file_loc,
-		  tMsgType type,
-		  const char* label,
-		  const char* msg)
-{
-  return msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-ElbProxy::put_msg(const char* src_file,
-		  int src_line,
-		  const FileRegion& file_loc,
-		  tMsgType type,
-		  const char* label,
-		  const string& msg)
-{
-  return msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
-// @brief メッセージマネージャを得る．
-inline
-MsgMgr&
-ElbProxy::msg_mgr()
-{
-  return mElaborator.msg_mgr();
 }
 
 

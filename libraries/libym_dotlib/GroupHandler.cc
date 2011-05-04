@@ -11,6 +11,7 @@
 #include "DotlibParserImpl.h"
 #include "PtMgr.h"
 #include "PtNodeImpl.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -73,11 +74,11 @@ GroupHandler::read_attr(const ShString& attr_name,
       break;
     }
     if ( type != SYMBOL ) {
-      put_msg(__FILE__, __LINE__,
-	      loc,
-	      kMsgError,
-	      "DOTLIB_PARSER",
-	      "string value is expected.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "string value is expected.");
       return false;
     }
     ShString name(parser().cur_string());
@@ -85,11 +86,11 @@ GroupHandler::read_attr(const ShString& attr_name,
     if ( handler == NULL ) {
       ostringstream buf;
       buf << name << ": unknown keyword.";
-      put_msg(__FILE__, __LINE__,
-	      loc,
-	      kMsgError,
-	      "DOTLIB_PARSER",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      buf.str());
       return false;
     }
     if ( !handler->read_attr(name, loc) ) {
@@ -246,10 +247,10 @@ EmptyGroupHandler::check_group_value(const ShString& attr_name,
     FileRegion loc = top->loc();
     ostringstream buf;
     buf << attr_name << " statement does not have parameters.";
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 
@@ -295,10 +296,10 @@ Str1GroupHandler::check_group_value(const ShString& attr_name,
   if ( n == 0 ) {
     ostringstream buf;
     buf << attr_name << " statement requires a string parameter.";
-    put_msg(__FILE__, __LINE__, attr_loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__, attr_loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 
@@ -308,18 +309,18 @@ Str1GroupHandler::check_group_value(const ShString& attr_name,
     FileRegion loc = second->loc();
     ostringstream buf;
     buf << attr_name << " statement has only one string parameter.";
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 
   if ( !top->is_string() ) {
-    put_msg(__FILE__, __LINE__, top->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__, top->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected.");
     return false;
   }
 
@@ -358,10 +359,10 @@ Str2GroupHandler::check_group_value(const ShString& attr_name,
   if ( n < 2 ) {
     ostringstream buf;
     buf << attr_name << " statement requires two string parameters.";
-    put_msg(__FILE__, __LINE__, attr_loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__, attr_loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 
@@ -372,25 +373,25 @@ Str2GroupHandler::check_group_value(const ShString& attr_name,
     FileRegion loc = third->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string parameters.";
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 
   if ( !top->is_string() ) {
-    put_msg(__FILE__, __LINE__, top->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__, top->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected.");
     return false;
   }
   if ( !second->is_string() ) {
-    put_msg(__FILE__, __LINE__, second->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__, second->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected.");
     return false;
   }
 
@@ -430,10 +431,10 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
     ostringstream buf;
     buf << attr_name
 	<< " statement requires two string and an integer parameters.";
-    put_msg(__FILE__, __LINE__, attr_loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__, attr_loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 
@@ -445,32 +446,32 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
   FileRegion loc = forth->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string and an integer parameters.";
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 
   if ( !top->is_string() ) {
-    put_msg(__FILE__, __LINE__, top->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__, top->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected.");
     return false;
   }
   if ( !second->is_string() ) {
-    put_msg(__FILE__, __LINE__, second->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__, second->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected.");
     return false;
   }
   if ( !third->is_string() ) {
-    put_msg(__FILE__, __LINE__, second->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "integer value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__, second->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "integer value is expected.");
     return false;
   }
 

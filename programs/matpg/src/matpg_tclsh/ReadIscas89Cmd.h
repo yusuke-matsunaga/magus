@@ -12,14 +12,12 @@
 
 
 #include "matpg_nsdef.h"
-#include <ym_tclpp/TclCmd.h>
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tgnet/TgIscas89Reader.h>
+#include "ym_tclpp/TclCmd.h"
+#include "ym_tgnet/TgNetwork.h"
+#include "ym_tgnet/TgIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_YM_MATPG
-
-class MatpgMsgHandler;
 
 //////////////////////////////////////////////////////////////////////
 // 故障の設定を行うコマンド
@@ -43,19 +41,16 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // iscas89 パーサ
   TgIscas89Reader mReader;
 
-  // メッセージハンドラ
-  MatpgMsgHandler* mMsgHandler;
-  
   // 読み込んだネットワークを保存しておくクラス
   TgNetwork mNetwork;
 

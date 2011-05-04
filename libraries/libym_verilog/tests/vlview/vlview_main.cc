@@ -15,7 +15,10 @@
 #include "VerilogModel.h"
 #include "VerilogView.h"
 
-#include <ym_verilog/VlMgr.h>
+#include "ym_verilog/VlMgr.h"
+
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 int
@@ -24,16 +27,18 @@ main(int argc,
 {
   using namespace nsYm;
   using namespace nsYm::nsVerilog;
-  
+
   QApplication app(argc, argv);
-  MsgMgr msg_mgr;
 
   list<string> filename_list;
   for (ymuint i = 1; i < argc; ++ i) {
     filename_list.push_back(argv[i]);
   }
 
-  VlMgr vl_mgr(msg_mgr);
+  MsgHandler* tmh = new StreamMsgHandler(&cerr);
+  MsgMgr::reg_handler(tmh);
+
+  VlMgr vl_mgr;
   for (list<string>::const_iterator p = filename_list.begin();
        p != filename_list.end(); ++ p) {
     const string& name = *p;
@@ -42,10 +47,10 @@ main(int argc,
     }
   }
   vl_mgr.elaborate();
-  
+
   VlView* vlview = new VlView;
   VerilogView* verilog_view = new VerilogView;
-  
+
   QSplitter* splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(verilog_view);
   splitter->addWidget(vlview);
@@ -55,9 +60,9 @@ main(int argc,
 
   VerilogModel* model = new VerilogModel;
   model->set_vlmgr(vl_mgr);
-  
+
   verilog_view->setModel(model);
-  
+
   if ( !vlview->open(argv[1]) ) {
     return 2;
   }
@@ -65,8 +70,8 @@ main(int argc,
   QObject::connect(verilog_view, SIGNAL(select_token(int, int, int, int)),
 		   vlview, SLOT(hilight(int, int, int, int)));
 
-  
+
   splitter->show();
-  
+
   return app.exec();
 }

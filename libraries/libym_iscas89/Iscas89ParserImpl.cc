@@ -12,6 +12,7 @@
 #include "Iscas89ParserImpl.h"
 #include "ym_iscas89/Iscas89Handler.h"
 #include "ym_utils/FileInfoMgr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
@@ -49,7 +50,7 @@ Iscas89ParserImpl::read(const string& filename)
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, FileRegion(),
+    MsgMgr::put_msg(__FILE__, __LINE__, FileRegion(),
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
@@ -122,7 +123,7 @@ Iscas89ParserImpl::read_input(const FileRegion& loc,
     ostringstream buf;
     buf << cell->str() << ": Defined more than once. Previous definition is "
 	<< cell->def_loc();
-    mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		    kMsgError,
 		    "ER_MLTDEF01",
 		    buf.str());
@@ -154,7 +155,7 @@ Iscas89ParserImpl::read_output(const FileRegion& loc,
     buf << cell->str() << ": Defined as both input and output. "
 	<< "Previous definition is "
 	<< cell->def_loc();
-    mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		    kMsgWarning,
 		    "WR_MLTDEF02",
 		    buf.str());
@@ -187,7 +188,7 @@ Iscas89ParserImpl::read_gate(const FileRegion& loc,
     ostringstream buf;
     buf << cell->str() << ": Defined more than once. "
 	<< "Previsous Definition is " << cell->def_loc();
-    mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		    kMsgError,
 		    "ER_MLTDEF01",
 		    buf.str());

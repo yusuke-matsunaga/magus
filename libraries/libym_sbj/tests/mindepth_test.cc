@@ -14,6 +14,7 @@
 #include "ym_bnet/BNetDecomp.h"
 #include "ym_bnet/BNet2Sbj.h"
 #include "ym_sbj/SbjGraph.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/StopWatch.h"
 
@@ -53,9 +54,9 @@ main(int argc,
   try {
 #endif
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    BNetBlifReader reader;
+    MsgMgr::reg_handler(msg_handler);
 
-    reader.add_msg_handler(msg_handler);
+    BNetBlifReader reader;
 
     BNetwork network;
 

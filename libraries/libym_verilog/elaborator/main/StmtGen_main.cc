@@ -22,6 +22,8 @@
 
 #include "ElbStub.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -327,11 +329,11 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     ostringstream buf;
     buf << pt_stmt->stmt_name()
 	<< " : cannot be used in a constant function.";
-    put_msg(__FILE__, __LINE__,
-	    pt_stmt->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    pt_stmt->file_region(),
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
   }
   return NULL;
 }
@@ -362,11 +364,11 @@ StmtGen::instantiate_disable(const VlNamedObj* parent,
   if ( !handle ) {
     ostringstream buf;
     buf << expand_full_name(nb_array, name) << " : Not found.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return NULL;
   }
 
@@ -377,11 +379,11 @@ StmtGen::instantiate_disable(const VlNamedObj* parent,
     ostringstream buf;
     buf << handle->full_name()
 	<< " : Not a named block, nor a task.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return NULL;
   }
   const VlNamedObj* scope = handle->obj();
@@ -412,21 +414,21 @@ StmtGen::instantiate_enable(const VlNamedObj* parent,
   if ( !cell ) {
     ostringstream buf;
     buf << expand_full_name(nb_array, name) << " : Not found.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return NULL;
   }
   if ( cell->type() != kVpiTask ) {
     ostringstream buf;
     buf << expand_full_name(nb_array, name) << " : Not a task.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
   }
   ElbTaskFunc* task = cell->taskfunc();
   assert_cond( task != NULL, __FILE__, __LINE__);
@@ -470,11 +472,11 @@ StmtGen::instantiate_sysenable(const VlNamedObj* parent,
   if ( user_systf == NULL ) {
     ostringstream buf;
     buf << name << " : No such system task.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return NULL;
   }
 

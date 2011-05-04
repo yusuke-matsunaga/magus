@@ -19,6 +19,8 @@
 #include "ym_verilog/pt/PtUdp.h"
 #include "ym_verilog/pt/PtExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -84,11 +86,11 @@ Parser::new_Udp1995(const FileRegion& file_region,
     if ( io->type() == kPtIO_Output ) {
       if ( out_item ) {
 	// 複数の出力宣言があった．
-	put_msg(__FILE__, __LINE__,
-		io->file_region(),
-		kMsgError,
-		"PARS",
-		"More than two output declarations");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			io->file_region(),
+			kMsgError,
+			"PARS",
+			"More than two output declarations");
 	sane = false;
 	break;
       }
@@ -108,11 +110,11 @@ Parser::new_Udp1995(const FileRegion& file_region,
 	// 二重登録
 	ostringstream buf;
 	buf << elem->name() << ": Defined more than once.";
-	put_msg(__FILE__, __LINE__,
-		elem->file_region(),
-		kMsgError,
-		"PARS",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			elem->file_region(),
+			kMsgError,
+			"PARS",
+			buf.str());
 	sane = false;
 	break;
       }
@@ -129,11 +131,11 @@ Parser::new_Udp1995(const FileRegion& file_region,
     if ( q == iomap.end() ) {
       ostringstream buf;
       buf << "\"" << port_name << "\" undefined.";
-      put_msg(__FILE__, __LINE__,
-	      file_region,
-	      kMsgError,
-	      "PARS",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      file_region,
+		      kMsgError,
+		      "PARS",
+		      buf.str());
       sane = false;
       break;
     }
@@ -143,11 +145,11 @@ Parser::new_Udp1995(const FileRegion& file_region,
 	// 最初の名前は output でなければならない．
 	ostringstream buf;
 	buf << port_name << " must be an output.";
-	put_msg(__FILE__, __LINE__,
-		ioelem->file_region(),
-		kMsgError,
-		"PARS",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			ioelem->file_region(),
+			kMsgError,
+			"PARS",
+			buf.str());
 	sane = false;
 	break;
       }
@@ -162,11 +164,11 @@ Parser::new_Udp1995(const FileRegion& file_region,
       const PtIOItem* ioelem = q->second;
       ostringstream buf;
       buf << "\"" << ioelem->name() << "\" does not appear in portlist.";
-      put_msg(__FILE__, __LINE__,
-	      ioelem->file_region(),
-	      kMsgError,
-	      "PARS",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      ioelem->file_region(),
+		      kMsgError,
+		      "PARS",
+		      buf.str());
     }
     sane = false;
   }
@@ -176,11 +178,11 @@ Parser::new_Udp1995(const FileRegion& file_region,
   // ちなみに YACC の文法から REG 以外の宣言要素はありえない．
   if ( decl_array.size() > 1 ) {
     // 二つ以上の reg 宣言があった．
-    put_msg(__FILE__, __LINE__,
-	    decl_array[1]->file_region(),
-	    kMsgError,
-	    "PARS",
-	    "More than two 'reg' declarations.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    decl_array[1]->file_region(),
+		    kMsgError,
+		    "PARS",
+		    "More than two 'reg' declarations.");
     sane = false;
   }
   else if ( decl_array.size() == 1 ) {
@@ -197,11 +199,11 @@ Parser::new_Udp1995(const FileRegion& file_region,
 	buf << "Reg name \"" << regitem->name()
 	    << "\" differes from output name \""
 	    << out_item->name() << "\".";
-	put_msg(__FILE__, __LINE__,
-		regitem->file_region(),
-		kMsgError,
-		"PARS",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			regitem->file_region(),
+			kMsgError,
+			"PARS",
+			buf.str());
 	sane = false;
       }
     }
@@ -289,24 +291,24 @@ Parser::new_Udp(const FileRegion& file_region,
 	buf << "Lhs of initial \"" << init_name
 	    << "\" differes from output name \""
 	    << out_item->name() << "\".";
-	put_msg(__FILE__, __LINE__,
-		init_loc,
-		kMsgError,
-		"PARS",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			init_loc,
+			kMsgError,
+			"PARS",
+			buf.str());
 	return;
       }
 
       if ( out_item->init_value() ) {
 	// output 文にも初期値割り当てがある．
 	// これは warning にする．
-	put_msg(__FILE__, __LINE__,
-		init_value->file_region(),
-		kMsgWarning,
-		"PARS",
-		"Both output declaration and initial block"
-		" have the initial values,"
-		" output declarations's initial value is ignored.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			init_value->file_region(),
+			kMsgWarning,
+			"PARS",
+			"Both output declaration and initial block"
+			" have the initial values,"
+			" output declarations's initial value is ignored.");
       }
     }
 
@@ -323,11 +325,11 @@ Parser::new_Udp(const FileRegion& file_region,
   else {
     if ( init_name ) {
       // sequential primitive でなければ初期値を持てない．
-      put_msg(__FILE__, __LINE__,
-	      init_loc,
-	      kMsgError,
-	      "PARS",
-	      "Combinational primitive can not have the initial value.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      init_loc,
+		      kMsgError,
+		      "PARS",
+		      "Combinational primitive can not have the initial value.");
       return;
     }
     udp = mFactory.new_CmbUdp(file_region,

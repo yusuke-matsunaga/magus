@@ -12,6 +12,7 @@
 
 #include "ym_iscas89/iscas89_nsdef.h"
 #include "ym_iscas89/Iscas89Handler.h"
+#include "ym_utils/MsgMgr.h"
 
 #include "Iscas89ParserImpl.h"
 #include "Iscas89Scanner.h"
@@ -243,8 +244,11 @@ yyerror(YYLTYPE *llocp,
     msg2 = msg;
   }
 
-  parser.msg_mgr().put_msg(__FILE__, __LINE__, *llocp,
-			   kMsgError, "ER_SYN01", msg);
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  *llocp,
+		  kMsgError,
+		  "ER_SYN01",
+		  msg);
 
   return 1;
 }

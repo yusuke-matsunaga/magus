@@ -5,7 +5,7 @@
 ///
 /// $Id: read.cc 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,6 +14,9 @@
 #include "ym_mvn/MvnVlMap.h"
 #include "ym_mvn/MvnDumper.h"
 #include "ym_mvn/MvnVerilogWriter.h"
+
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 int
@@ -31,13 +34,13 @@ main(int argc,
 #if !defined(YM_DEBUG)
   try {
 #endif
-    MvnMgr mgr;
-    MvnVerilogReader reader;
     MsgHandler* mh = new StreamMsgHandler(&cerr);
-    mh->set_mask(MsgHandler::kMaskAll);
+    mh->set_mask(kMaskAll);
     mh->delete_mask(kMsgInfo);
     mh->delete_mask(kMsgDebug);
-    reader.add_msg_handler(mh);
+    MsgMgr::reg_handler(mh);
+
+    MvnVerilogReader reader;
 
     for (list<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
@@ -51,6 +54,7 @@ main(int argc,
       }
     }
     cerr << "Generating MvnNetwork" << endl;
+    MvnMgr mgr;
     MvnVlMap node_map;
     bool stat = reader.gen_network(mgr, node_map);
     cerr << " End" << endl;

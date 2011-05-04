@@ -12,7 +12,6 @@
 
 
 #include "ym_cell/cell_type.h"
-#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -45,10 +44,6 @@ public:
   /// @note エラーが起きたら NULL を返す．
   const CellLibrary*
   read(const string& filename);
-
-  /// @brief メッセージハンドラを付加する．
-  void
-  add_msg_handler(MsgHandler* msg_handler);
 
 
 private:

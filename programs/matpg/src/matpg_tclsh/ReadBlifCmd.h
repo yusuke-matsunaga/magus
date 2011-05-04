@@ -12,14 +12,12 @@
 
 
 #include "matpg_nsdef.h"
-#include <ym_tclpp/TclCmd.h>
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tgnet/TgBlifReader.h>
+#include "ym_tclpp/TclCmd.h"
+#include "ym_tgnet/TgNetwork.h"
+#include "ym_tgnet/TgBlifReader.h"
 
 
 BEGIN_NAMESPACE_YM_MATPG
-
-class MatpgMsgHandler;
 
 //////////////////////////////////////////////////////////////////////
 // 故障の設定を行うコマンド
@@ -43,22 +41,19 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // blif パーサ
   TgBlifReader mReader;
 
-  // メッセージハンドラ
-  MatpgMsgHandler* mMsgHandler;
-  
   // 読み込んだネットワークを保存しておくクラス
   TgNetwork mNetwork;
-  
+
 };
 
 END_NAMESPACE_YM_MATPG

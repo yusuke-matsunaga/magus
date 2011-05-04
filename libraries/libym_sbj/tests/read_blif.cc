@@ -5,7 +5,7 @@
 ///
 /// $Id: bliftest.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,6 +15,8 @@
 #include "ym_bnet/BNet2Sbj.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_sbj/SbjDumper.h"
+
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -73,9 +75,9 @@ main(int argc,
 
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    BNetBlifReader reader;
+    MsgMgr::reg_handler(msg_handler);
 
-    reader.add_msg_handler(msg_handler);
+    BNetBlifReader reader;
 
     BNetwork network;
 

@@ -5,7 +5,7 @@
 ///
 /// $Id: bliftest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,6 +14,8 @@
 #include "ym_bdn/BdnMgr.h"
 #include "ym_bnetbdnconv/BNetBdnConv.h"
 #include "ym_bdn/BdnDumper.h"
+
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -33,11 +35,10 @@ main(int argc,
 #if !defined(YM_DEBUG)
   try {
 #endif
-    MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
+    StreamMsgHandler msg_handler(&cerr);
+    MsgMgr::reg_handler(&msg_handler);
+
     BNetBlifReader reader;
-
-    reader.add_msg_handler(msg_handler);
-
     BNetwork bnetwork;
 
     if ( !reader.read(filename, bnetwork) ) {

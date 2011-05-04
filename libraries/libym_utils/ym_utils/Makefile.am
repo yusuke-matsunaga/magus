@@ -22,10 +22,12 @@ noinst_HEADERS = \
 	ItvlMgr.h \
 	MFSet.h \
 	MsgHandler.h \
+	MsgMgr.h \
 	NameMgr.h \
 	RandGen.h \
 	RefCount.h \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \
+	msg_type.h \
 	random.h

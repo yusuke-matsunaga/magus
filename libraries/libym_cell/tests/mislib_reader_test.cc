@@ -9,6 +9,7 @@
 /// All rights reserved.
 
 
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellLibrary.h"
@@ -26,10 +27,10 @@ mislib_reader_test(const string& filename)
   CellMislibReader reader;
 
   MsgHandler* mh = new StreamMsgHandler(&cerr);
-  mh->set_mask(MsgHandler::kMaskAll);
+  mh->set_mask(kMaskAll);
   mh->delete_mask(kMsgInfo);
   mh->delete_mask(kMsgDebug);
-  reader.add_msg_handler(mh);
+  MsgMgr::reg_handler(mh);
 
   const CellLibrary* library = reader.read(filename);
   if ( library == NULL) {

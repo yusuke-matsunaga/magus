@@ -17,6 +17,8 @@
 #include "parser.h"
 #include "print_token.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -47,12 +49,12 @@ LpDefine::parse()
 {
   // 次の非空白文字が IDENTIFIER でなければエラー
   if ( !expect(IDENTIFIER) ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting an identifier after `define.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting an identifier after `define.");
     return false;
   }
 
@@ -61,11 +63,11 @@ LpDefine::parse()
     ostringstream buf;
     buf << "Could not overwrite predefined compiler directive: "
 	<< cur_string() << ".";
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    buf.str());
     return false;
   }
 
@@ -85,12 +87,12 @@ LpDefine::parse()
     // パラメータを param_dic に記録
     ymuint pos = 0;
     if ( !expect(IDENTIFIER) ) {
-      put_msg(__FILE__, __LINE__,
-	      cur_token_loc(),
-	      kMsgError,
-	      "LEX",
-	      "Syntax error: "
-	      "expecting an identifier after '('.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_token_loc(),
+		      kMsgError,
+		      "LEX",
+		      "Syntax error: "
+		      "expecting an identifier after '('.");
       return false;
     }
     param_dic.insert(make_pair(cur_string(), pos));
@@ -104,12 +106,12 @@ LpDefine::parse()
 
       case ',':
 	if ( !expect(IDENTIFIER) ) {
-	  put_msg(__FILE__, __LINE__,
-		  cur_token_loc(),
-		  kMsgError,
-		  "LEX",
-		  "Syntax error: "
-		  "expecting an identifier after ','.");
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  cur_token_loc(),
+			  kMsgError,
+			  "LEX",
+			  "Syntax error: "
+			  "expecting an identifier after ','.");
 	  return false;
 	}
 	param_dic.insert(make_pair(cur_string(), pos));
@@ -117,24 +119,24 @@ LpDefine::parse()
 	break;
 
       default:
-	put_msg(__FILE__, __LINE__,
-		cur_token_loc(),
-		kMsgError,
-		"LEX",
-		"Syntax error: "
-		"expecting ')' or ',' after an identifier.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			cur_token_loc(),
+			kMsgError,
+			"LEX",
+			"Syntax error: "
+			"expecting ')' or ',' after an identifier.");
 	return false;
       }
     }
   }
   else {
     // それ以外はエラー
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting '(' or SPACE after a macro-name.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting '(' or SPACE after a macro-name.");
     return false;
   }
 
@@ -178,11 +180,11 @@ LpDefine::parse()
 	buf << *token;
       }
     }
-    put_msg(__FILE__, __LINE__,
-	    macro_loc,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    macro_loc,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 
   return true;
@@ -215,12 +217,12 @@ bool
 LpUndef::parse()
 {
   if ( !expect(IDENTIFIER) ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting an identifier after `undef.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting an identifier after `undef.");
     return false;
   }
 
@@ -228,12 +230,12 @@ LpUndef::parse()
   FileRegion cur_loc = cur_token_loc();
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after macro-name.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after macro-name.");
     return false;
   }
 
@@ -241,22 +243,22 @@ LpUndef::parse()
     if ( debug() ) {
       ostringstream buf;
       buf << "forgetting a macro \"" << macroname << "\".";
-      put_msg(__FILE__, __LINE__,
-	      cur_loc,
-	      kMsgDebug,
-	      "LEX",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_loc,
+		      kMsgDebug,
+		      "LEX",
+		      buf.str());
     }
   }
   else {
     // warning にするんだそうだ
     ostringstream buf;
     buf << "macro `" << macroname << " is not defined.";
-    put_msg(__FILE__, __LINE__,
-	    cur_loc,
-	    kMsgWarning,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc,
+		    kMsgWarning,
+		    "LEX",
+		    buf.str());
   }
 
   return true;
@@ -295,22 +297,22 @@ LpMacro::parse()
   if ( lex().check_macro(name()) ) {
     ostringstream buf;
     buf << "macro `" << name() << " depends on itself.";
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    buf.str());
     return false;
   }
 
   if ( debug() ) {
     ostringstream buf;
     buf << "macro `" << name() << " found.";
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 
   // マクロ置換用のデータを作る．
@@ -318,12 +320,12 @@ LpMacro::parse()
   if ( mNumParam > 0 ) {
     param_array = new TokenList[mNumParam];
     if ( !expect('(') ) {
-      put_msg(__FILE__, __LINE__,
-	      cur_token_loc(),
-	      kMsgError,
-	      "LEX",
-	      "Syntax error: "
-	      "'(' is expected.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_token_loc(),
+		      kMsgError,
+		      "LEX",
+		      "Syntax error: "
+		      "'(' is expected.");
       return false;
     }
     ymuint pos = 0;
@@ -349,11 +351,11 @@ LpMacro::parse()
 	  << pos << ") differs from"
 	  << " # of formal paramters ("
 	  << mNumParam << ").";
-      put_msg(__FILE__, __LINE__,
-	      cur_token_loc(),
-	      kMsgError,
-	      "LEX",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_token_loc(),
+		      kMsgError,
+		      "LEX",
+		      buf.str());
       return false;
     }
   }

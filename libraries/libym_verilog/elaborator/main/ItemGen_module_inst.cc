@@ -26,6 +26,8 @@
 #include "ElbModule.h"
 #include "ElbExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -68,11 +70,11 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
       // 依存関係が循環している．
       ostringstream buf;
       buf << pt_module->name() << " : instantiated within itself.";
-      put_msg(__FILE__, __LINE__,
-	      pt_module->file_region(),
-	      kMsgError,
-	      "PARS",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_module->file_region(),
+		      kMsgError,
+		      "PARS",
+		      buf.str());
       return;
     }
 
@@ -81,11 +83,11 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
       const char* name = pt_inst->name();
       if ( name == NULL ) {
 	// 名無しのモジュールインスタンスはない
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		"No module instance name given.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			fr,
+			kMsgError,
+			"ELAB",
+			"No module instance name given.");
 	return;
       }
 
@@ -114,11 +116,11 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
 
 	ostringstream buf;
 	buf << "\"" << module1->full_name() << "\" has been created.";
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgInfo,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			fr,
+			kMsgInfo,
+			"ELAB",
+			buf.str());
 
 	// パラメータ割り当て式の生成
 	PtConnectionArray pa_array = pt_head->paramassign_array();
@@ -152,19 +154,19 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
     ymuint param_size = pa_array.size();
     const PtDelay* pt_delay = pt_head->delay();
     if ( param_size > 0 && pa_array[0]->name() != NULL ) {
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      "UDP instance cannot have named parameter list.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      fr,
+		      kMsgError,
+		      "ELAB",
+		      "UDP instance cannot have named parameter list.");
       return;
     }
     if ( (pt_delay && param_size > 0) || param_size > 1 ) {
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      "UDP instance cannot have ordered parameter list.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      fr,
+		      kMsgError,
+		      "ELAB",
+		      "UDP instance cannot have ordered parameter list.");
       return;
     }
 
@@ -177,11 +179,11 @@ ItemGen::phase1_muheader(const VlNamedObj* parent,
   // どちらもなければエラー
   ostringstream buf;
   buf << defname << " : No such module or UDP.";
-  put_msg(__FILE__, __LINE__,
-	  fr,
-	  kMsgError,
-	  "ELAB",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  fr,
+		  kMsgError,
+		  "ELAB",
+		  buf.str());
 }
 
 // @brief module array のインスタンス化を行う．
@@ -220,11 +222,11 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
   ostringstream buf;
   buf << "instantiating module array \"" << name << "\" of \""
       << defname << "\" [" << left_val << " : " << right_val << "].";
-  put_msg(__FILE__, __LINE__,
-	  fr,
-	  kMsgInfo,
-	  "ELAB",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  fr,
+		  kMsgInfo,
+		  "ELAB",
+		  buf.str());
 
   add_phase3stub(make_stub(this, &ItemGen::link_module_array,
 			   module_array, pt_module, pt_inst));
@@ -258,11 +260,11 @@ ItemGen::phase1_module_array(const VlNamedObj* parent,
 
     ostringstream buf;
     buf << "\"" << module1->full_name() << "\" has been created.";
-    put_msg(__FILE__, __LINE__,
-	    module_array->file_region(),
-	    kMsgInfo,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    module_array->file_region(),
+		    kMsgInfo,
+		    "ELAB",
+		    buf.str());
 
     // モジュール要素を作る．
     phase1_module_item(module1, pt_module, &param_con);
@@ -304,11 +306,11 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
   if ( n > port_num ) {
     ostringstream buf;
     buf << "Too many items (" << n << ") in the port list.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return;
   }
   // どうやら実際のポート数よりも少ないのはいいらしい
@@ -347,11 +349,11 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       if ( p == port_index.end() ) {
 	ostringstream buf;
 	buf << port_name << " : does not exist in the port list.";
-	put_msg(__FILE__, __LINE__,
-		pt_con->file_region(),
-		kMsgError,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_con->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
 	continue;
       }
       index = p->second;
@@ -381,11 +383,11 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 
       tVpiValueType type = tmp->value_type();
       if ( type == kVpiValueReal ) {
-	put_msg(__FILE__, __LINE__,
-		tmp->file_region(),
-		kMsgError,
-		"ELAB",
-		"Real expression cannot connect to module port.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			tmp->file_region(),
+			kMsgError,
+			"ELAB",
+			"Real expression cannot connect to module port.");
 	continue;
       }
       ymuint expr_size = unpack_size(type);
@@ -425,11 +427,11 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 	buf << module_array->full_name() << " : "
 	    << (index + 1) << num_suffix(index + 1)
 	    << " port : port size does not match with the expression.";
-	put_msg(__FILE__, __LINE__,
-		pt_expr->file_region(),
-		kMsgError,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_expr->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
       }
     }
     else {
@@ -437,11 +439,11 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
       tVpiValueType type = tmp->value_type();
       if ( type == kVpiValueReal ) {
-	put_msg(__FILE__, __LINE__,
-		tmp->file_region(),
-		kMsgError,
-		"ELAB",
-		"Real expression cannot connect to module port.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			tmp->file_region(),
+			kMsgError,
+			"ELAB",
+			"Real expression cannot connect to module port.");
 	continue;
       }
       ymuint expr_size = unpack_size(type);
@@ -464,11 +466,11 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 	buf << module_array->full_name() << " : "
 	    << (index + 1) << num_suffix(index + 1)
 	    << " port : port size does not match with the expression.";
-	put_msg(__FILE__, __LINE__,
-		pt_expr->file_region(),
-		kMsgError,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_expr->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
       }
     }
 
@@ -521,11 +523,11 @@ ItemGen::link_module(ElbModule* module,
   if ( n > port_num ) {
     ostringstream buf;
     buf << "Too many items (" << n << ") in the port list.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return;
   }
   // どうやら実際のポート数よりも少ないのはいいらしい
@@ -564,11 +566,11 @@ ItemGen::link_module(ElbModule* module,
       if ( p == port_index.end() ) {
 	ostringstream buf;
 	buf << port_name << " : does not exist in the port list.";
-	put_msg(__FILE__, __LINE__,
-		pt_con->file_region(),
-		kMsgError,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_con->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
 	continue;
       }
       index = p->second;
@@ -598,11 +600,11 @@ ItemGen::link_module(ElbModule* module,
 
       tVpiValueType type = tmp->value_type();
       if ( type == kVpiValueReal ) {
-	put_msg(__FILE__, __LINE__,
-		tmp->file_region(),
-		kMsgError,
-		"ELAB",
-		"Real expression cannot connect to module port.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			tmp->file_region(),
+			kMsgError,
+			"ELAB",
+			"Real expression cannot connect to module port.");
 	continue;
       }
       ymuint expr_size = unpack_size(type);
@@ -616,18 +618,18 @@ ItemGen::link_module(ElbModule* module,
 	      << (index + 1) << num_suffix(index + 1)
 	      << " port : port size does not match with the expression. "
 	      << "expression size is coereced.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_expr->file_region(),
-		  kMsgWarning,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_expr->file_region(),
+			  kMsgWarning,
+			  "ELAB",
+			  buf.str());
 	  ostringstream buf2;
 	  buf2 << "port_size: " << port_size << ", expr_size: " << expr_size;
-	  put_msg(__FILE__, __LINE__,
-		  pt_expr->file_region(),
-		  kMsgDebug,
-		  "ELAB",
-		  buf2.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_expr->file_region(),
+			  kMsgDebug,
+			  "ELAB",
+			  buf2.str());
 	}
 	tmp->set_reqsize(pack(kVpiValueUS, port_size));
       }
@@ -638,11 +640,11 @@ ItemGen::link_module(ElbModule* module,
       ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
       tVpiValueType type = tmp->value_type();
       if ( type == kVpiValueReal ) {
-	put_msg(__FILE__, __LINE__,
-		tmp->file_region(),
-		kMsgError,
-		"ELAB",
-		"Real expression cannot connect to module port.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			tmp->file_region(),
+			kMsgError,
+			"ELAB",
+			"Real expression cannot connect to module port.");
 	continue;
       }
       // 左辺はサイズの補正をしても意味がないのでそのまま接続する．

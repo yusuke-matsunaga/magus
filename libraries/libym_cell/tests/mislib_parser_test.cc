@@ -10,6 +10,7 @@
 
 
 #include "mislib/MislibParser.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -21,10 +22,10 @@ mislib_parser_test(const string& filename)
   MislibParser parser;
 
   MsgHandler* mh = new StreamMsgHandler(&cerr);
-  mh->set_mask(MsgHandler::kMaskAll);
+  mh->set_mask(kMaskAll);
   mh->delete_mask(kMsgInfo);
   mh->delete_mask(kMsgDebug);
-  parser.msg_mgr().reg_handler(mh);
+  MsgMgr::reg_handler(mh);
 
   const MislibPt* root = parser.read(filename);
   if ( root == NULL) {

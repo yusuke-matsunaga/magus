@@ -7,7 +7,7 @@
 ///
 /// $Id: BlifNetworkReader.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -35,7 +35,7 @@ public:
   /// @brief デストラクタ
   ~BlifNetworkReader();
 
-  
+
 public:
 
   /// @brief BLIF 形式のファイルを読み込む
@@ -47,10 +47,6 @@ public:
   read(const string& filename,
        BlifNetwork& network);
 
-  /// @brief メッセージハンドラを付加する．
-  void
-  add_msg_handler(MsgHandler* msg_handler);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -59,10 +55,10 @@ private:
 
   // blif パーサー
   BlifParser mParser;
-  
+
   // ハンドラ
   BlifNetworkHandler* mHandler;
-  
+
 };
 
 END_NAMESPACE_YM_BLIF

@@ -26,7 +26,7 @@ Iscas89Parser::~Iscas89Parser()
 {
   delete mRep;
 }
-  
+
 // @brief 読み込みを行う．
 bool
 Iscas89Parser::read(const string& filename)
@@ -39,13 +39,6 @@ void
 Iscas89Parser::add_handler(Iscas89Handler* handler)
 {
   mRep->add_handler(handler);
-}
-
-// @brief メッセージハンドラの登録
-void
-Iscas89Parser::add_msg_handler(MsgHandler* handler)
-{
-  mRep->msg_mgr().reg_handler(handler);
 }
 
 END_NAMESPACE_YM_ISCAS89

@@ -10,6 +10,7 @@
 /// All rights reserved.
 
 
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/pt/PtItem.h"
@@ -4176,11 +4177,11 @@ init_val
 : UNUM_INT
 { // 実際には {1|0} のみ
   if ( $1 != 0 && $1 != 1 ) {
-    parser.put_msg(__FILE__, __LINE__,
-		   @1,
-		   kMsgError,
-		   "PARSER",
-		   "expectiong 1 or 0.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    @1,
+		    kMsgError,
+		    "PARSER",
+		    "expectiong 1 or 0.");
     YYERROR;
   }
   else {
@@ -4190,20 +4191,20 @@ init_val
 | UNUM_INT BASE_B UNUMBER
 { // 実際には 1'b{0|1|x} のみ
   if ( $1 != 1 ) {
-    parser.put_msg(__FILE__, __LINE__,
-		   @1,
-		   kMsgError,
-		   "PARSER",
-		   "UDP's initial constant size should be 1.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    @1,
+		    kMsgError,
+		    "PARSER",
+		    "UDP's initial constant size should be 1.");
     YYERROR;
   }
   else if ( strcmp($3, "z") == 0 ||
 	    strcmp($3, "Z") == 0 ) {
-    parser.put_msg(__FILE__, __LINE__,
-		   @3,
-		   kMsgError,
-		   "PARSER",
-		   "Z value is not allowd here.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    @3,
+		    kMsgError,
+		    "PARSER",
+		    "Z value is not allowd here.");
     YYERROR;
   }
   else {
@@ -4212,29 +4213,29 @@ init_val
 }
 | UNUM_INT wrong_base UNUMBER
 {
-  parser.put_msg(__FILE__, __LINE__,
-		 @1,
-		 kMsgError,
-		 "PARSER",
-		 "illegal base: only 'b is allowed here.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  @1,
+		  kMsgError,
+		  "PARSER",
+		  "illegal base: only 'b is allowed here.");
   YYERROR;
 }
 | UNUM_BIG BASE_B UNUMBER
 {
-  parser.put_msg(__FILE__, __LINE__,
-		 @1,
-		 kMsgError,
-		 "PARS",
-		 "UDP's initial constant size should be 1.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  @1,
+		  kMsgError,
+		  "PARS",
+		  "UDP's initial constant size should be 1.");
   YYERROR;
 }
 | numbase UNUMBER
 {
-  parser.put_msg(__FILE__, __LINE__,
-		 @1,
-		 kMsgError,
-		 "PARSER",
-		 "UDP's initial constant size should be 1.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  @1,
+		  kMsgError,
+		  "PARSER",
+		  "UDP's initial constant size should be 1.");
   YYERROR;
 }
 ;
@@ -6726,11 +6727,11 @@ number
 }
 | UNUM_BIG numbase UNUMBER
 {
-  parser.put_msg(__FILE__, __LINE__,
-		 @1,
-		 kMsgError,
-		 "PAR",
-		 "size is too big.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  @1,
+		  kMsgError,
+		  "PAR",
+		  "size is too big.");
   YYERROR;
 }
 | rnumber
@@ -6966,11 +6967,11 @@ hierarchical_identifier
 {
   if ( !$3->is_index_expr() ) {
     // エラー: 添字に使える式ではなかった．
-    parser.put_msg(__FILE__, __LINE__,
-		   $3->file_region(),
-		   kMsgError,
-		   "PARS",
-		   "illegal expression in hierarchical identifier.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    $3->file_region(),
+		    kMsgError,
+		    "PARS",
+		    "illegal expression in hierarchical identifier.");
     $$ = NULL;
     YYERROR;
   }
@@ -6987,11 +6988,11 @@ hierarchical_identifier
 {
   if ( !$3->is_index_expr() ) {
     // エラー: 添字に使える式ではなかった．
-    parser.put_msg(__FILE__, __LINE__,
-		   $3->file_region(),
-		   kMsgError,
-		   "PARS",
-		   "illegal expression in hierarchical identifier.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    $3->file_region(),
+		    kMsgError,
+		    "PARS",
+		    "illegal expression in hierarchical identifier.");
     $$ = NULL;
     YYERROR;
   }
@@ -7055,11 +7056,11 @@ yyerror(YYLTYPE* llocp,
     s2 = s;
   }
 
-  parser.put_msg(__FILE__, __LINE__,
-		 *llocp,
-		 kMsgError,
-		 "PARS",
-		 s2);
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  *llocp,
+		  kMsgError,
+		  "PARS",
+		  s2);
 
   return 1;
 }

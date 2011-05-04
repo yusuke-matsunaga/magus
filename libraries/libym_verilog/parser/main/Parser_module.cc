@@ -19,6 +19,8 @@
 #include "ym_verilog/pt/PtModule.h"
 #include "ym_verilog/pt/PtExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -133,21 +135,21 @@ Parser::new_Module1995(const FileRegion& file_region,
 	// 未定義エラー
 	ostringstream buf;
 	buf << "\"" << elem_name << "\" is not defined in the port list.";
-	put_msg(__FILE__, __LINE__,
-		elem->file_region(),
-		kMsgError,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			elem->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
       }
       if ( iodecl_dirs.count(elem_name) > 0 ) {
 	// 二重登録エラー
 	ostringstream buf;
 	buf << "\"" << elem_name << "\" is redefined.";
-	put_msg(__FILE__, __LINE__,
-		elem->file_region(),
-		kMsgError,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			elem->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
       }
       else {
 	iodecl_dirs.insert(make_pair(elem_name, dir));
@@ -174,11 +176,11 @@ Parser::new_Module1995(const FileRegion& file_region,
 	// name は IOH リストに存在しない．
 	ostringstream buf;
 	buf << "\"" << name << "\" is in the port list but not declared.";
-	put_msg(__FILE__, __LINE__,
-		port->file_region(),
-		kMsgError,
-		"ELAB",
-		buf.str());
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			port->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
       }
       else {
 	tVpiDirection dir = p->second;

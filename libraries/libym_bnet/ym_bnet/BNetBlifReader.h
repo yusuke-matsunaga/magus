@@ -35,7 +35,7 @@ public:
   /// @brief デストラクタ
   ~BNetBlifReader();
 
-  
+
 public:
 
   /// @brief blif 形式のファイルを読み込む
@@ -46,10 +46,6 @@ public:
   bool
   read(const string& filename,
        BNetwork& network);
-
-  /// @brief メッセージハンドラを付加する．
-  void
-  add_msg_handler(MsgHandler* msg_handler);
 
 
 private:
@@ -62,7 +58,7 @@ private:
 
   // ハンドラ
   BNetBlifHandler* mHandler;
-  
+
 };
 
 END_NAMESPACE_YM_BNET

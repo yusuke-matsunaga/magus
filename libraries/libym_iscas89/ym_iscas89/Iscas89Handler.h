@@ -7,13 +7,12 @@
 ///
 /// $Id: Iscas89Handler.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_iscas89/iscas89_nsdef.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -51,7 +50,7 @@ protected:
 
   /// @brief コンストラクタ
   Iscas89Handler();
-  
+
   /// @brief デストラクタ
   virtual
   ~Iscas89Handler();
@@ -103,7 +102,7 @@ public:
 	    tIscas89GateType type,
 	    ymuint32 oname_id,
 	    const vector<ymuint32>& iname_list);
-  
+
   /// @brief 通常終了時の処理
   virtual
   void
@@ -119,20 +118,16 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスが利用することのできる関数
   //////////////////////////////////////////////////////////////////////
-  
-  /// @brief メッセージマネージャの取得
-  MsgMgr&
-  msg_mgr();
-  
+
   /// @brief ID 番号から文字列を得る．
   const char*
   id2str(ymuint32 id) const;
-  
+
   /// @brief ID 番号から位置情報を得る．
   FileRegion
   id2loc(ymuint32 id) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ

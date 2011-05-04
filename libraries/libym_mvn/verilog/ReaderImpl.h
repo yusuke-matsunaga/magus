@@ -13,7 +13,6 @@
 #include "ym_mvn/MvnVlMap.h"
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
-#include "ym_utils/MsgHandler.h"
 #include "DeclHash.h"
 #include "DeclMap.h"
 #include "Driver.h"
@@ -62,12 +61,6 @@ public:
   bool
   gen_network(MvnMgr& mgr,
 	      MvnVlMap& node_map);
-
-  /// @brief メッセージハンドラを付加する．
-  /// @param[in] msg_handler 登録するハンドラ
-  /// @note このハンドラはこのオブジェクトの破壊に伴って破壊される．
-  void
-  add_msg_handler(MsgHandler* msg_handler);
 
 
 private:
@@ -312,9 +305,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メッセージハンドラの管理者
-  MsgMgr mMsgMgr;
 
   // Verilog を扱うマネージャ
   VlMgr mVlMgr;

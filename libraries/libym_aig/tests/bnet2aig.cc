@@ -17,6 +17,9 @@
 #include "ym_aig/AigSatMgr.h"
 #include "ym_sat/SatSolver.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
+
 
 BEGIN_NAMESPACE_YM
 
@@ -111,10 +114,10 @@ main(int argc,
 
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
+    MsgMgr::reg_handler(msg_handler);
 
     BNetwork network;
     BNetBlifReader reader;
-    reader.add_msg_handler(msg_handler);
     if ( !reader.read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;

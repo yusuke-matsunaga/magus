@@ -12,7 +12,6 @@
 
 
 #include "dotlib_nsdef.h"
-#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -27,8 +26,7 @@ class DotlibParser
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージを管理するオブジェクト
-  DotlibParser(MsgMgr& msg_mgr);
+  DotlibParser();
 
   /// @brief デストラクタ
   /// @note 内部で確保したパース木は解放される．

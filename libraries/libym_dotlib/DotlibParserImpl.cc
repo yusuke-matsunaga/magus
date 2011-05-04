@@ -12,6 +12,7 @@
 #include "DotlibParserImpl.h"
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/ShString.h"
 #include "PtNodeImpl.h"
 
@@ -19,10 +20,7 @@
 BEGIN_NAMESPACE_YM_DOTLIB
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージを管理するオブジェクト
-DotlibParserImpl::DotlibParserImpl(MsgMgr& msg_mgr) :
-  mMsgMgr(msg_mgr),
-  mScanner(msg_mgr),
+DotlibParserImpl::DotlibParserImpl() :
   mLibraryHandler( HandlerFactory::new_library(*this) )
 {
 }
@@ -50,10 +48,11 @@ DotlibParserImpl::read_file(const string& filename,
   if ( !mScanner.open_file(filename) ) {
     ostringstream buf;
     buf << filename << ": Could not open.";
-    put_msg(__FILE__, __LINE__, FileRegion(),
-	    kMsgFailure,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgFailure,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return NULL;
   }
 
@@ -64,11 +63,12 @@ DotlibParserImpl::read_file(const string& filename,
   for (type = read_token(loc); type == NL; type = read_token(loc)) { }
   ShString name(cur_string());
   if ( type != SYMBOL || name != "library" ) {
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "'library' keyword is expected "
-	    "on the top of the structure");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "'library' keyword is expected "
+		    "on the top of the structure");
     error = true;
     goto last;
   }
@@ -87,10 +87,11 @@ DotlibParserImpl::read_file(const string& filename,
     if ( type == END ) {
       break;
     }
-    put_msg(__FILE__, __LINE__, loc,
-	    kMsgWarning,
-	    "DOTLIB_PARSER",
-	    "contents after library group are ignored.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc,
+		    kMsgWarning,
+		    "DOTLIB_PARSER",
+		    "contents after library group are ignored.");
   }
 
 last:
@@ -154,11 +155,11 @@ DotlibParserImpl::expect(tTokenType req_type)
   }
   ostringstream buf;
   buf << "syntax error. " << type_str << " is expected.";
-  put_msg(__FILE__, __LINE__,
-	  loc,
-	  kMsgError,
-	  "DOTLIB_PARSER",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  loc,
+		  kMsgError,
+		  "DOTLIB_PARSER",
+		  buf.str());
   return false;
 }
 
@@ -175,12 +176,11 @@ DotlibParserImpl::expect_nl()
     if ( type == NL || type == END ) {
       return true;
     }
-    ostringstream buf;
-    put_msg(__FILE__, __LINE__,
-	    loc,
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "Syntax error. Semicolon is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc,
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error. Semicolon is expected.");
     return false;
   }
   else {
@@ -192,49 +192,6 @@ DotlibParserImpl::expect_nl()
     }
   }
   return true;
-}
-
-// @brief メッセージ出力管理オブジェクトを返す．
-MsgMgr&
-DotlibParserImpl::msg_mgr()
-{
-  return mMsgMgr;
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-DotlibParserImpl::put_msg(const char* src_file,
-			  int src_line,
-			  const FileRegion& file_loc,
-			  tMsgType type,
-			  const char* label,
-			  const char* msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-DotlibParserImpl::put_msg(const char* src_file,
-			  int src_line,
-			  const FileRegion& file_loc,
-			  tMsgType type,
-			  const char* label,
-			  const string& msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 // @brief パース木を管理するオブジェクトを返す．

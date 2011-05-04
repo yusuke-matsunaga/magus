@@ -12,6 +12,7 @@
 #include "GroupHandler.h"
 #include "PtMgr.h"
 #include "PtNodeImpl.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -59,12 +60,12 @@ ExprHandler::read_primary()
     if ( name != "VDD" &&
 	 name != "VSS" &&
 	 name != "VCC" ) {
-      put_msg(__FILE__, __LINE__,
-	      loc,
-	      kMsgError,
-	      "DOTLIB_PARSER",
-	      "Syntax error. "
-	      "Only 'VDD', 'VSS', and 'VCC' are allowed.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. "
+		      "Only 'VDD', 'VSS', and 'VCC' are allowed.");
       return NULL;
     }
     return pt_mgr().new_string(name, loc);
@@ -73,11 +74,11 @@ ExprHandler::read_primary()
     return pt_mgr().new_float(parser().cur_float(), loc);
   }
 
-  put_msg(__FILE__, __LINE__,
-	  loc,
-	  kMsgError,
-	  "DOTLIB_PARSER",
-	  "Syntax error. number is expected.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  loc,
+		  kMsgError,
+		  "DOTLIB_PARSER",
+		  "Syntax error. number is expected.");
   return NULL;
 }
 
@@ -144,11 +145,11 @@ ExprHandler::read_expr(tTokenType end_marker)
       }
     }
     else {
-      put_msg(__FILE__, __LINE__,
-	      loc,
-	      kMsgError,
-	      "DOTLIB_PARSER",
-	      "Syntax error.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error.");
       return NULL;
     }
   }

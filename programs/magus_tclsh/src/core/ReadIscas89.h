@@ -12,7 +12,6 @@
 
 
 #include "NetCmd.h"
-#include "TclObjMsgHandler.h"
 
 #include "ym_bnet/BNetIscas89Reader.h"
 
@@ -51,9 +50,6 @@ private:
 
   // iscas89 ファイルを読み込むためのパーサ
   BNetIscas89Reader mReader;
-
-  // メッセージハンドラ
-  TclObjMsgHandler mMsgHandler;
 
 };
 

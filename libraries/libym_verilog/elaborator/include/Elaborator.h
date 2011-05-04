@@ -16,7 +16,6 @@
 #include "ym_verilog/vl/VlFwd.h"
 
 #include "ym_utils/Alloc.h"
-#include "ym_utils/MsgHandler.h"
 
 #include "CfDict.h"
 #include "AttrDict.h"
@@ -54,11 +53,9 @@ class Elaborator
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージマネージャ
   /// @param[in] elb_mgr Elbオブジェクトを管理するクラス
   /// @param[in] elb_factory Elbオブジェクトを生成するファクトリクラス
-  Elaborator(MsgMgr& msg_mgr,
-	     ElbMgr& elb_mgr,
+  Elaborator(ElbMgr& elb_mgr,
 	     ElbFactory& elb_factory);
 
   /// @brief デストラクタ
@@ -78,10 +75,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // elaboration で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief メッセージマネージャを取り出す．
-  MsgMgr&
-  msg_mgr();
 
   /// @brief 後で処理する defparam 文を登録する．
   /// @param[in] header アイテムテンプレートのヘッダ (defparam を持つ)
@@ -176,9 +169,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // メッセージマネージャ
-  MsgMgr& mMsgMgr;
-
   // 生成したオブジェクトを管理するクラス
   ElbMgr& mMgr;
 
@@ -243,19 +233,6 @@ private:
   bool mAllowEmptyIORange;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief メッセージマネージャを取り出す．
-inline
-MsgMgr&
-Elaborator::msg_mgr()
-{
-  return mMsgMgr;
-}
 
 END_NAMESPACE_YM_VERILOG
 

@@ -20,9 +20,8 @@ BEGIN_NAMESPACE_YM_DOTLIB
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージを管理するオブジェクト
-DotlibParser::DotlibParser(MsgMgr& msg_mgr) :
-  mImpl(new DotlibParserImpl(msg_mgr))
+DotlibParser::DotlibParser() :
+  mImpl(new DotlibParserImpl)
 {
 }
 

@@ -14,6 +14,7 @@
 #include "ym_dotlib/DotlibParser.h"
 #include "ym_dotlib/PtDumper.h"
 #include "ym_utils/StopWatch.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -23,11 +24,10 @@ int
 dotlibparser_test(int argc,
 		  char** argv)
 {
-  MsgMgr msg_mgr;
   MsgHandler* handler = new StreamMsgHandler(&cerr);
-  msg_mgr.reg_handler(handler);
+  MsgMgr::reg_handler(handler);
 
-  DotlibParser parser(msg_mgr);
+  DotlibParser parser;
 
   PtDumper pt_dump;
 

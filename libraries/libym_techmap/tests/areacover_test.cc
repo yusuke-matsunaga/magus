@@ -14,6 +14,7 @@
 #include "ym_bdn/BdnDumper.h"
 #include "ym_techmap/TechMap.h"
 #include "ym_techmap/CnGraph.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
@@ -60,9 +61,9 @@ test(string pat_filename,
   BdnMgr sbjgraph;
   {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    BlifNetworkReader reader;
+    MsgMgr::reg_handler(msg_handler);
 
-    reader.add_msg_handler(msg_handler);
+    BlifNetworkReader reader;
 
     BlifNetwork blif_network;
 

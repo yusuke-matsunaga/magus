@@ -17,6 +17,9 @@
 #include "ym_bdn/BdnBlifWriter.h"
 #include "ym_bdn/BdnVerilogWriter.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
+
 
 int
 main(int argc,
@@ -35,9 +38,9 @@ main(int argc,
   try {
 #endif
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    BlifNetworkReader reader;
+    MsgMgr::reg_handler(msg_handler);
 
-    reader.add_msg_handler(msg_handler);
+    BlifNetworkReader reader;
 
     BlifNetwork blif_network;
 

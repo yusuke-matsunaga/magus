@@ -7,7 +7,7 @@
 ///
 /// $Id: Binder.h 1343 2008-03-25 17:15:35Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BinderGroup 汎用バインダ
@@ -89,12 +89,12 @@ public:
   /// @brief コンストラクタ
   /// @note この時点では特定の BindMgr には結び付いていない．
   Binder();
-  
+
   /// @brief デストラクタ
   /// @note BindMgr にバインドしていたらバインドを解除する．
   virtual
   ~Binder();
-  
+
   /// @brief BindMgr の取得
   /// @retval バインドしている BindMgr　バインドしている場合
   /// @retval NULL バインドしていない場合
@@ -130,7 +130,7 @@ public:
 
   /// @brief コンストラクタ
   BindMgr();
-  
+
   /// @brief デストラクタ
   /// @note バインド中のすべての Binder オブジェクトとのバインドを
   /// 解除する．
@@ -140,18 +140,22 @@ public:
 
 
 protected:
-  
+
   /// @brief binder の登録
   /// @param[in] binder 登録する Binder
   void
   _reg_binder(Binder* binder);
-  
+
   /// @brief binder の登録の解除
   /// @param[in] binder 登録を解除する Binder
   void
   _unreg_binder(Binder* binder);
 
-  
+  /// @brief 全ての binder の登録の解除
+  void
+  _unreg_all_binders();
+
+
 protected:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -208,17 +212,21 @@ public:
   /// @brief デストラクタ
   virtual
   ~EventBindMgr();
-  
+
   /// @brief EventBinder を登録する．
   /// @param[in] binder 登録する EventBinder
   void
   reg_binder(EventBinder* binder);
-  
+
   /// @brief EventBinder の登録を削除する．
   /// @param[in] binder 登録を削除する EventBinder
   /// @note binder が登録されていない場合には何もしない．
   void
   unreg_binder(EventBinder* binder);
+
+  /// @brief 全ての binder の登録の解除
+  void
+  unreg_all_binders();
 
   /// @brief ここに登録されたすべての binder にイベントを伝える．
   void
@@ -270,18 +278,22 @@ public:
 
   /// @brief デストラクタ
   ~T1BindMgr() { }
-  
+
+  /// @brief TBinder を登録する．
+  /// @param[in] binder 登録する対象
+  void
+  reg_binder(TBinder* binder) { _reg_binder(binder); }
+
   /// @brief TBinder の登録を削除する．
   /// @param[in] binder 登録を削除する対象
   /// @note binder が登録されていない場合には何もしない．
   void
   unreg_binder(TBinder* binder) { _unreg_binder(binder); }
-  
-  /// @brief TBinder を登録する．
-  /// @param[in] binder 登録する対象
+
+  /// @brief 全ての binder の登録の解除
   void
-  reg_binder(TBinder* binder) { _reg_binder(binder); }
-  
+  unreg_all_binders() { _unreg_all_binders(); }
+
   /// @brief ここに登録されたすべての binder に T1 のオブジェクトを伝える．
   /// @param[in] data ブロードキャストする内容
   void
@@ -343,18 +355,22 @@ public:
 
   /// @brief デストラクタ
   ~T2BindMgr() { }
-  
+
+  /// @brief TBinder を登録する．
+  /// @param[in] binder 登録する対象
+  void
+  reg_binder(TBinder* binder) { _reg_binder(binder); }
+
   /// @brief TBinder の登録を削除する．
   /// @param[in] binder 登録を削除する対象
   /// @note binder が登録されていない場合には何もしない．
   void
   unreg_binder(TBinder* binder) { _unreg_binder(binder); }
-  
-  /// @brief TBinder を登録する．
-  /// @param[in] binder 登録する対象
+
+  /// @brief 全ての binder の登録の解除
   void
-  reg_binder(TBinder* binder) { _reg_binder(binder); }
-  
+  unreg_all_binders() { _unreg_all_binders(); }
+
   /// @brief ここに登録されたすべての binder に (T1, T2)
   /// @brief のオブジェクトを伝える．
   /// @param[in] data1, data2 ブロードキャストする内容
@@ -394,7 +410,7 @@ private:
   event_proc(T1 obj1,
 	     T2 obj2,
 	     T3 obj3) = 0;
-  
+
 };
 
 
@@ -421,18 +437,22 @@ public:
 
   /// @brief デストラクタ
   ~T3BindMgr() { }
-  
+
+  /// @brief TBinder を登録する．
+  /// @param[in] binder 登録する対象
+  void
+  reg_binder(TBinder* binder) { _reg_binder(binder); }
+
   /// @brief TBinderの登録を削除する．
   /// @param[in] binder 登録を削除する対象
   /// @note binder が登録されていない場合には何もしない．
   void
   unreg_binder(TBinder* binder) { _unreg_binder(binder); }
-  
-  /// @brief TBinder を登録する．
-  /// @param[in] binder 登録する対象
+
+  /// @brief 全ての binder の登録の解除
   void
-  reg_binder(TBinder* binder) { _reg_binder(binder); }
-  
+  unreg_all_binders() { _unreg_all_binders(); }
+
   /// @brief ここに登録されたすべての binder に (T1, T2, T3)
   /// @brief のオブジェクトを伝える．
   /// @param[in] data1, data2, data3 ブロードキャストする内容
@@ -505,18 +525,22 @@ public:
 
   /// @brief デストラクタ
   ~T4BindMgr() { }
-  
+
+  /// @brief TBinder を登録する．
+  /// @param[in] binder 登録する対象
+  void
+  reg_binder(TBinder* binder) { _reg_binder(binder); }
+
   /// @brief TBinder の登録を削除する．
   /// @param[in] binder 登録を削除する対象
   /// @note binder が登録されていない場合には何もしない．
   void
   unreg_binder(TBinder* binder) { _unreg_binder(binder); }
-  
-  /// @brief TBinder を登録する．
-  /// @param[in] binder 登録する対象
+
+  /// @brief 全ての binder の登録の解除
   void
-  reg_binder(TBinder* binder) { _reg_binder(binder); }
-  
+  unreg_all_binders() { _unreg_all_binders(); }
+
   /// @brief ここに登録されたすべての binder に (T1, T2, T3, T4)
   /// @brief のオブジェクトを伝える．
   /// @param[in] data1, data2, data3, data4 ブロードキャストする内容
@@ -593,18 +617,22 @@ public:
 
   /// @brief デストラクタ
   ~T5BindMgr() { }
-  
+
+  /// @brief TBinder を登録する．
+  /// @param[in] binder 登録する対象
+  void
+  reg_binder(TBinder* binder) { _reg_binder(binder); }
+
   /// @brief TBinder の登録を削除する．
   /// @param[in] binder 登録を削除する対象
   /// @note binder が登録されていない場合には何もしない．
   void
   unreg_binder(TBinder* binder) { _unreg_binder(binder); }
-  
-  /// @brief TBinder を登録する．
-  /// @param[in] binder 登録する対象
+
+  /// @brief 全ての binder の登録の解除
   void
-  reg_binder(TBinder* binder) { _reg_binder(binder); }
-  
+  unreg_all_binders() { _unreg_all_binders(); }
+
   /// @brief ここに登録されたすべての binder に (T1, T2, T3, T4, T5)
   /// @brief のオブジェクトを伝える．
   /// @param[in] data1, data2, data3, data4, data5 ブロードキャストする内容
@@ -655,7 +683,7 @@ private:
 	     T4 obj4,
 	     T5 obj5,
 	     T6 obj6) = 0;
-  
+
 };
 
 
@@ -685,18 +713,22 @@ public:
 
   /// @brief デストラクタ
   ~T6BindMgr() { }
-  
+
+  /// @brief TBinder を登録する．
+  /// @param[in] binder 登録する対象
+  void
+  reg_binder(TBinder* binder) { _reg_binder(binder); }
+
   /// @brief TBinder の登録を削除する．
   /// @param[in] binder 登録を削除する対象
   /// @note binder が登録されていない場合には何もしない．
   void
   unreg_binder(TBinder* binder) { _unreg_binder(binder); }
-  
-  /// @brief TBinder を登録する．
-  /// @param[in] binder 登録する対象
+
+  /// @brief 全ての binder の登録の解除
   void
-  reg_binder(TBinder* binder) { _reg_binder(binder); }
-  
+  unreg_all_binders() { _unreg_all_binders(); }
+
   /// @brief ここに登録されたすべての binder に (T1, T2, T3, T4, T5, T6)
   /// @brief のオブジェクトを伝える．
   /// @param[in] data1, data2, data3, data4, data5, data6

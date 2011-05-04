@@ -20,6 +20,8 @@
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtStmt.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 const int debug = 0;
 #define dout cout
@@ -37,19 +39,16 @@ const int check_memory_leak = 0;
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージマネージャ
 // @param[in] ptmgr 読んだ結果のパース木を登録するマネージャ
 // @param[in] alloc メモリアロケータ
 // @param[in] ptifactory パース木の要素を生成するファクトリクラス
-Parser::Parser(MsgMgr& msg_mgr,
-	       PtMgr& ptmgr,
+Parser::Parser(PtMgr& ptmgr,
 	       AllocBase& alloc,
 	       PtiFactory& ptifactory) :
-  mMsgMgr(msg_mgr),
   mPtMgr(ptmgr),
   mAlloc(alloc),
   mFactory(ptifactory),
-  mLex(new Lex(msg_mgr)),
+  mLex(new Lex),
   mTmpAlloc(4096),
   mCellAlloc(sizeof(PtrList<void>::Cell), 1024),
   mPortList(mCellAlloc),
@@ -99,10 +98,11 @@ Parser::read_file(const string& filename,
   if ( !lex().open_file(filename) ) {
     ostringstream buf;
     buf << filename << " : No such file.";
-    put_msg(__FILE__, __LINE__, FileRegion(),
-	    kMsgFailure,
-	    "VLPARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgFailure,
+		    "VLPARSER",
+		    buf.str());
     return false;
   }
 
@@ -242,11 +242,11 @@ Parser::check_function_statement(const PtStmt* stmt)
   ostringstream buf;
   buf << stmt->stmt_name()
       << " cannot be used in function declaration.";
-  put_msg(__FILE__, __LINE__,
-	  stmt->file_region(),
-	  kMsgError,
-	  "PARS",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  stmt->file_region(),
+		  kMsgError,
+		  "PARS",
+		  buf.str());
   return false;
 }
 
@@ -261,11 +261,11 @@ Parser::check_default_label(const PtrList<const PtCaseItem>* ci_list)
     if ( ci->label_num() == 0 ) {
       ++ n;
       if ( n > 1 ) {
-	put_msg(__FILE__, __LINE__,
-		ci->file_region(),
-		kMsgError,
-		"PARS",
-		" more than one 'default' labels.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			ci->file_region(),
+			kMsgError,
+			"PARS",
+			" more than one 'default' labels.");
 	return false;
       }
     }
@@ -377,42 +377,6 @@ Parser::add_item(const PtItem* item,
     reg_attrinst(item, attr_list);
     mCurItemList->push_back(item);
   }
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-Parser::put_msg(const char* src_file,
-		int src_line,
-		const FileRegion& file_loc,
-		tMsgType type,
-		const char* label,
-		const char* msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-Parser::put_msg(const char* src_file,
-		int src_line,
-		const FileRegion& file_loc,
-		tMsgType type,
-		const char* label,
-		const string& msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 // @brief block-statment の開始

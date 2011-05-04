@@ -5,7 +5,7 @@
 ///
 /// $Id: BlifHandler.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,13 +27,6 @@ BlifHandler::BlifHandler()
 // @brief デストラクタ
 BlifHandler::~BlifHandler()
 {
-}
-  
-// @brief メッセージマネージャの取得
-MsgMgr&
-BlifHandler::msg_mgr()
-{
-  return mParser->msg_mgr();
 }
 
 // @brief ID番号から文字列を得る．

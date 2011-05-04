@@ -29,6 +29,8 @@
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlRange.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
@@ -45,7 +47,6 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 ReaderImpl::ReaderImpl() :
-  mVlMgr(mMsgMgr),
   mGlobalEnv(mDeclHash)
 {
   mMvnMgr = NULL;
@@ -85,13 +86,13 @@ bool
 ReaderImpl::gen_network(MvnMgr& mgr,
 			MvnVlMap& node_map)
 {
-  if ( mMsgMgr.error_num() > 0 ) {
+  if ( MsgMgr::error_num() > 0 ) {
     return false;
   }
 
   mVlMgr.elaborate();
 
-  if ( mMsgMgr.error_num() > 0 ) {
+  if ( MsgMgr::error_num() > 0 ) {
     return false;
   }
 
@@ -243,13 +244,6 @@ ReaderImpl::gen_network(MvnMgr& mgr,
   return true;
 }
 
-// @brief メッセージハンドラを付加する．
-void
-ReaderImpl::add_msg_handler(MsgHandler* msg_handler)
-{
-  mMsgMgr.reg_handler(msg_handler);
-}
-
 // @brief module を生成する．
 // @param[in] vl_module 対象のモジュール
 MvnModule*
@@ -268,7 +262,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     case kVpiOutput: ++ no; break;
     case kVpiInout:  ++ nio; break;
     default:
-      mMsgMgr.put_msg(__FILE__, __LINE__,
+      MsgMgr::put_msg(__FILE__, __LINE__,
 		      io->file_region(),
 		      kMsgError,
 		      "MVN_VL01",

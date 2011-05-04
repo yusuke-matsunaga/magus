@@ -16,7 +16,6 @@
 #include "ym_utils/StrBuff.h"
 #include "ym_utils/FileScanner.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_MISLIB
@@ -31,8 +30,7 @@ class MislibLex :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージマネージャ
-  MislibLex(MsgMgr& msg_mgr);
+  MislibLex();
 
   /// @brief デストラクタ
   ~MislibLex();
@@ -69,9 +67,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メッセージマネージャ
-  MsgMgr& mMsgMgr;
 
   // 現在読込中の文字列を貯めておくバッファ
   StrBuff mCurString;

@@ -12,7 +12,6 @@
 
 
 #include "mislib_nsdef.h"
-#include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
@@ -46,10 +45,6 @@ public:
   /// @note 読み込みが失敗したら NULL を返す．
   const MislibPt*
   read(const string& filename);
-
-  /// @brief メッセージマネージャの取得
-  MsgMgr&
-  msg_mgr();
 
 
 public:
@@ -188,9 +183,6 @@ private:
   // 字句解析器
   MislibLex mLex;
 
-  // メッセージハンドラの管理者
-  MsgMgr mMsgMgr;
-
   // ゲートのリスト
   MislibPt* mGateList;
 
@@ -198,19 +190,6 @@ private:
   bool mError;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief メッセージマネージャの取得
-inline
-MsgMgr&
-MislibParser::msg_mgr()
-{
-  return mMsgMgr;
-}
 
 END_NAMESPACE_YM_CELL_MISLIB
 

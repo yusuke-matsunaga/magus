@@ -12,6 +12,7 @@
 #include "GroupHandler.h"
 #include "PtMgr.h"
 #include "PtNodeImpl.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -76,10 +77,11 @@ DotlibHandler::parse_complex()
 	break;
       }
       if ( type1 != COMMA ) {
-	put_msg(__FILE__, __LINE__, loc,
-		kMsgError,
-		"DOTLIB_PARSER",
-		"syntax error. ',' is expected.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			loc,
+			kMsgError,
+			"DOTLIB_PARSER",
+			"syntax error. ',' is expected.");
 	return NULL;
       }
       type = parser().read_token(loc);
@@ -113,11 +115,11 @@ DotlibHandler::new_ptvalue(tTokenType type,
   default:
     break;
   }
-  put_msg(__FILE__, __LINE__,
-	  loc,
-	  kMsgError,
-	  "DOTLIB_PARSER",
-	  "Syntax error. int/float/string value is expected.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  loc,
+		  kMsgError,
+		  "DOTLIB_PARSER",
+		  "Syntax error. int/float/string value is expected.");
   return NULL;
 }
 
@@ -154,42 +156,6 @@ GroupHandler*
 DotlibHandler::parent()
 {
   return mParent;
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-DotlibHandler::put_msg(const char* src_file,
-		       int src_line,
-		       const FileRegion& file_loc,
-		       tMsgType type,
-		       const char* label,
-		       const char* msg)
-{
-  mParser.msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-DotlibHandler::put_msg(const char* src_file,
-		       int src_line,
-		       const FileRegion& file_loc,
-		       tMsgType type,
-		       const char* label,
-		       const string& msg)
-{
-  mParser.msg_mgr().put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 // @brief デバッグモードの時に true を返す．

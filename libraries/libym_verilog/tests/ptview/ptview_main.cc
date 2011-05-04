@@ -21,6 +21,8 @@
 #include "Lex.h"
 #include "ym_verilog/VlMgr.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 int
@@ -32,9 +34,11 @@ main(int argc,
 
   QApplication app(argc, argv);
 
-  MsgMgr msg_mgr;
-  VlMgr vl_mgr(msg_mgr);
-  Lex lex(msg_mgr);
+  MsgHandler* tmh = new StreamMsgHandler(&cerr);
+  MsgMgr::reg_handler(tmh);
+
+  VlMgr vl_mgr;
+  Lex lex;
 
   // サーチパスリスト
   // 今は未設定

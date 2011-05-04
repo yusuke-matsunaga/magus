@@ -7,13 +7,12 @@
 ///
 /// $Id: BlifHandler.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_blif/blif_nsdef.h"
-#include "ym_utils/FileLoc.h"
-#include "ym_utils/MsgHandler.h"
+#include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -29,12 +28,12 @@ BEGIN_NAMESPACE_YM_BLIF
 class BlifHandler
 {
   friend class BlifParserImpl;
-  
+
 protected:
 
   /// @brief コンストラクタ
   BlifHandler();
-  
+
   /// @brief デストラクタ
   virtual
   ~BlifHandler();
@@ -52,7 +51,7 @@ public:
   virtual
   bool
   init() = 0;
-  
+
   /// @brief .model 文の処理
   /// @param[in] loc1 .model の位置情報
   /// @param[in] loc2 文字列の位置情報
@@ -166,10 +165,6 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスが利用することのできる関数
   //////////////////////////////////////////////////////////////////////
-  
-  /// @brief メッセージマネージャの取得
-  MsgMgr&
-  msg_mgr();
 
   /// @brief ID番号から文字列を得る．
   const char*
@@ -183,7 +178,7 @@ protected:
   const FileRegion&
   id2def_loc(ymuint32 id);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ

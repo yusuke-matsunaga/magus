@@ -7,12 +7,11 @@
 ///
 /// $Id: BlifParserImpl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_blif/blif_nsdef.h"
-#include "ym_utils/MsgHandler.h"
 #include "BlifScanner.h"
 #include "IdHash.h"
 
@@ -49,10 +48,6 @@ public:
 
 
 public:
-
-  /// @brief メッセージマネージャの取得
-  MsgMgr&
-  msg_mgr();
 
   /// @brief ID番号から文字列を得る．
   const char*
@@ -100,9 +95,6 @@ private:
   // イベントハンドラのリスト
   list<BlifHandler*> mHandlerList;
 
-  // メッセージハンドラの管理者
-  MsgMgr mMsgMgr;
-
   // 識別子のハッシュ表
   IdHash mIdHash;
 
@@ -139,14 +131,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief メッセージマネージャの取得
-inline
-MsgMgr&
-BlifParserImpl::msg_mgr()
-{
-  return mMsgMgr;
-}
 
 // @brief ID番号から文字列を得る．
 inline

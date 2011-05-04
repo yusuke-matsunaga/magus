@@ -30,8 +30,7 @@ class Lex :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージマネージャ
-  Lex(MsgMgr& msg_mgr);
+  Lex();
 
   /// @brief デストラクタ
   ~Lex();

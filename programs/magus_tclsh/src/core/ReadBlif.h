@@ -12,7 +12,6 @@
 
 
 #include "NetCmd.h"
-#include "TclObjMsgHandler.h"
 #include "ym_bnet/BNetBlifReader.h"
 #include "ym_bdn/BlifBdnConv.h"
 
@@ -54,9 +53,6 @@ private:
 
   // blif から Bdn に変換する関数
   BlifBdnConv mBlifBdnConv;
-
-  // メッセージハンドラ
-  TclObjMsgHandler mMsgHandler;
 
 };
 

@@ -13,7 +13,6 @@
 
 #include "dotlib_int.h"
 #include "ym_utils/FileScanner.h"
-#include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/StrBuff.h"
 
@@ -30,8 +29,7 @@ class DotlibScanner :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージを管理するオブジェクト
-  DotlibScanner(MsgMgr& msg_mgr);
+  DotlibScanner();
 
   /// @brief デストラクタ
   ~DotlibScanner();
@@ -61,40 +59,6 @@ public:
   double
   cur_float() const;
 
-  /// @brief メッセージ出力管理オブジェクトを返す．
-  MsgMgr&
-  msg_mgr();
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const char* msg);
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const string& msg);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -116,9 +80,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メッセージを管理するオブジェクト
-  MsgMgr& mMsgMgr;
 
   // シンボルモード
   bool mSymbolMode;

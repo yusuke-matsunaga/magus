@@ -25,19 +25,16 @@
 #include "PtMgr.h"
 #include "ElbModule.h"
 
-#include "PtDumper.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージマネージャ
 // @param[in] elb_mgr Elbオブジェクトを管理するクラス
 // @param[in] elb_factory Elbオブジェクトを生成するファクトリクラス
-Elaborator::Elaborator(MsgMgr& msg_mgr,
-		       ElbMgr& elb_mgr,
+Elaborator::Elaborator(ElbMgr& elb_mgr,
 		       ElbFactory& elb_factory) :
-  mMsgMgr(msg_mgr),
   mMgr(elb_mgr),
   mFactory(elb_factory),
   mAlloc(4096)
@@ -103,21 +100,21 @@ Elaborator::operator()(const PtMgr& pt_mgr)
       ostringstream buf;
       buf << "\"" << name
 	  << "\" is duplicately defined as module and as UDP.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			module->file_region(),
-			kMsgError,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      module->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
       ++ nerr;
     }
     else if ( mModuleDict.count(name) > 0 ) {
       ostringstream buf;
       buf << "module \"" << name<< "\" is redefined.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			module->file_region(),
-			kMsgError,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      module->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
       ++ nerr;
     }
     else {
@@ -151,11 +148,11 @@ Elaborator::operator()(const PtMgr& pt_mgr)
     // 配列型 module instance および generate 文から骨組みの生成を行う．
     for ( ; ; ) {
       // defparam 文で適用できるものがあれば適用する．
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			FileRegion(),
-			kMsgDebug,
-			"ELAB",
-			"\"instantiate_defparam\" starts.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      FileRegion(),
+		      kMsgDebug,
+		      "ELAB",
+		      "\"instantiate_defparam\" starts.");
 
       // 未処理の defparam 文を処理する．
       // 処理された要素は mDefParamList から削除される．
@@ -178,11 +175,11 @@ Elaborator::operator()(const PtMgr& pt_mgr)
 
       // その結果にもとづいてモジュール配列インスタンスや
       // generate block の生成を行う．
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			FileRegion(),
-			kMsgDebug,
-			"ELAB",
-			"Phase 1 starts.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      FileRegion(),
+		      kMsgDebug,
+		      "ELAB",
+		      "Phase 1 starts.");
 
       if ( mPhase1StubList1.empty() ) {
 	// 処理する要素が残っていない．
@@ -199,30 +196,30 @@ Elaborator::operator()(const PtMgr& pt_mgr)
       buf << expand_full_name(pt_defparam->namebranch_array(),
 			      pt_defparam->name())
 	  << " : not found.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_defparam->file_region(),
-			kMsgError,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_defparam->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
     }
 
     // Phase 2
     // 配列要素やビット要素の生成を行う．
-    msg_mgr().put_msg(__FILE__, __LINE__,
-		      FileRegion(),
-		      kMsgDebug,
-		      "ELAB",
-		      "Phase 2 starts.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgDebug,
+		    "ELAB",
+		    "Phase 2 starts.");
 
     mPhase2StubList.eval();
 
     // Phase 3
     // 名前の解決(リンク)を行う．
-    msg_mgr().put_msg(__FILE__, __LINE__,
-		      FileRegion(),
-		      kMsgDebug,
-		      "ELAB",
-		      "Phase 3 starts.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgDebug,
+		    "ELAB",
+		    "Phase 3 starts.");
 
     mPhase3StubList.eval();
 

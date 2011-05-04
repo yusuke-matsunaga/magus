@@ -48,13 +48,4 @@ CellMislibReader::read(const string& filename)
   return mgr.gen_library(filename, root);
 }
 
-// @brief メッセージハンドラの登録
-// @param[in] handler 登録するハンドラ
-// @note handler はこのインスタンスが破壊される時に同時に破壊される．
-void
-CellMislibReader::add_msg_handler(MsgHandler* handler)
-{
-  mParser->msg_mgr().reg_handler(handler);
-}
-
 END_NAMESPACE_YM_CELL

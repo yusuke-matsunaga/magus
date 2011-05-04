@@ -12,6 +12,7 @@
 #include "SimpleHandler.h"
 #include "GroupHandler.h"
 #include "PtNodeImpl.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -55,28 +56,31 @@ DefineHandler::read_attr(const ShString& attr_name,
 
   const DotlibNode* keyword = value->top();
   if ( keyword == NULL || !keyword->is_string() ) {
-    put_msg(__FILE__, __LINE__, keyword->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected for 1st argument.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    keyword->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected for 1st argument.");
     return false;
   }
 
   const DotlibNode* group = keyword->next();
   if ( group == NULL || !group->is_string() ) {
-    put_msg(__FILE__, __LINE__, group->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected for 2nd argument.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    group->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected for 2nd argument.");
     return false;
   }
 
   const DotlibNode* type_token = group->next();
   if ( type_token == NULL || !type_token->is_string() ) {
-    put_msg(__FILE__, __LINE__, type_token->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "string value is expected for 3rd argument.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    type_token->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "string value is expected for 3rd argument.");
     return false;
   }
 
@@ -84,10 +88,11 @@ DefineHandler::read_attr(const ShString& attr_name,
   if ( handler == NULL ) {
     ostringstream buf;
     buf << group->string_value() << ": Unknown attribute. ignored.";
-    put_msg(__FILE__, __LINE__, group->loc(),
-	    kMsgWarning,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    group->loc(),
+		    kMsgWarning,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return true;
   }
 
@@ -95,10 +100,11 @@ DefineHandler::read_attr(const ShString& attr_name,
   if ( g_handler == NULL ) {
     ostringstream buf;
     buf << group->string_value() << ": is not a group statement.";
-    put_msg(__FILE__, __LINE__, group->loc(),
-	    kMsgWarning,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    group->loc(),
+		    kMsgWarning,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return true;
   }
 
@@ -116,10 +122,11 @@ DefineHandler::read_attr(const ShString& attr_name,
   else {
     ostringstream buf;
     buf << "Unknown type: " << type_str << ".";
-    put_msg(__FILE__, __LINE__, type_token->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    type_token->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
     return false;
   }
 

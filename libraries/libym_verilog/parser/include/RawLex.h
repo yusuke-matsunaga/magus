@@ -16,7 +16,6 @@
 #include "ym_utils/File.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Binder.h"
-#include "ym_utils/MsgHandler.h"
 
 #include "LexPluginDict.h"
 
@@ -69,8 +68,7 @@ public:
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージマネージャ
-  RawLex(MsgMgr& msg_mgr);
+  RawLex();
 
   /// @brief デストラクタ
   ~RawLex();
@@ -221,10 +219,6 @@ public:
   /// @name その他
   /// @{
 
-  /// @brief メッセージマネージャの取得
-  MsgMgr&
-  msg_mgr();
-
   /// @brief `resetall の処理
   void
   resetall(const FileRegion& file_region);
@@ -278,9 +272,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メッセージマネージャ
-  MsgMgr& mMsgMgr;
 
   // 入力ファイルを管理するオブジェクト
   InputMgr* mInputMgr;
@@ -365,14 +356,6 @@ double
 RawLex::cur_rnumber() const
 {
   return strtod(mCurString, static_cast<char**>(NULL));
-}
-
-// @brief メッセージマネージャの取得
-inline
-MsgMgr&
-RawLex::msg_mgr()
-{
-  return mMsgMgr;
 }
 
 // @brief コンテキストを返す．

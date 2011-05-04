@@ -14,6 +14,8 @@
 
 #include "parser.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -46,25 +48,25 @@ bool
 LpCellDefine::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgWarning,
-	    "LEX",
-	    "`celldefine in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgWarning,
+		    "LEX",
+		    "`celldefine in module definition.");
   }
 
   FileRegion loc = cur_token_loc();
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after `celldefine.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after `celldefine.");
     return false;
   }
-  
+
   mState->set_cell_define(true, loc);
 
   return true;
@@ -100,22 +102,22 @@ bool
 LpEndCellDefine::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgWarning,
-	    "LEX",
-	    "`endcelldefine in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgWarning,
+		    "LEX",
+		    "`endcelldefine in module definition.");
   }
 
   FileRegion loc = cur_token_loc();
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after `endcelldefine.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after `endcelldefine.");
     return false;
   }
 
@@ -142,7 +144,7 @@ LpNetType::LpNetType(RawLex& lex,
   mState(nettype)
 {
 }
-  
+
 // @brief デストラクタ
 LpNetType::~LpNetType()
 {
@@ -155,16 +157,16 @@ bool
 LpNetType::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "`default_nettype in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "`default_nettype in module definition.");
     return false;
   }
 
   FileRegion file_region = cur_token_loc();
-  
+
   int id = get_nospace_token();
   tVpiNetType val = kVpiNone;
   switch ( id ) {
@@ -186,27 +188,27 @@ LpNetType::parse()
     }
     // わざと default に続く
   default:
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting net-type value after `default_net_type.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting net-type value after `default_net_type.");
     return false;
   }
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "new-line is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "new-line is expected.");
     return false;
   }
 
   mState->set_default_nettype(val, file_region);
-  
+
   return true;
 }
 
@@ -240,11 +242,11 @@ bool
 LpTimeScale::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "`timescale in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "`timescale in module definition.");
     return false;
   }
 
@@ -256,12 +258,12 @@ LpTimeScale::parse()
   }
 
   if ( !expect('/') ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting '/' after time-unit value.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting '/' after time-unit value.");
     return false;
   }
 
@@ -273,21 +275,21 @@ LpTimeScale::parse()
   }
 
   if ( unit < precision ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "time precision is coarser than time unit.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "time precision is coarser than time unit.");
     return false;
   }
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after time-precision value.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after time-precision value.");
     return false;
   }
 
@@ -327,12 +329,12 @@ LpTimeScale::parse_unit(int& unit)
 	break;
       }
     }
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting 1/10/100.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting 1/10/100.");
     return false;
   }
 
@@ -365,12 +367,12 @@ LpTimeScale::parse_unit(int& unit)
 	break;
       }
     }
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting s/ms/us/ns/ps/fs.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting s/ms/us/ns/ps/fs.");
     return false;
   }
 
@@ -409,11 +411,11 @@ bool
 LpUnconnDrive::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "`unconnected_drive in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "`unconnected_drive in module definition.");
     return false;
   }
 
@@ -423,23 +425,23 @@ LpUnconnDrive::parse()
   case PULL0: ud = kVpiPull0; break;
   case PULL1: ud = kVpiPull1; break;
   default:
-    put_msg(__FILE__, __LINE__,
-	    loc,
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting \"pull0\" or \"pull1\""
-	    " after `unconneccted_drive.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc,
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting \"pull0\" or \"pull1\""
+		    " after `unconneccted_drive.");
     return false;
   }
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line.");
     return false;
   }
 
@@ -478,23 +480,23 @@ bool
 LpNounconnDrive::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "`nounconnected_drive in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "`nounconnected_drive in module definition.");
     return false;
   }
 
   FileRegion loc = cur_token_loc();
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after `nounconnected_drive.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after `nounconnected_drive.");
     return false;
   }
 
@@ -521,7 +523,7 @@ LpDecayTime::LpDecayTime(RawLex& lex,
   mState(state)
 {
 }
-  
+
 // @brief デストラクタ
 LpDecayTime::~LpDecayTime()
 {
@@ -533,11 +535,11 @@ bool
 LpDecayTime::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "`default_decay_time in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "`default_decay_time in module definition.");
     return false;
   }
 
@@ -546,7 +548,7 @@ LpDecayTime::parse()
   for ( ; ; ) {
     // 別にループにする必要はないけど
     // これが一番簡単
-    
+
     int id = get_nospace_token();
     loc = cur_token_loc();
     if ( id == UNUM_INT ) {
@@ -559,28 +561,28 @@ LpDecayTime::parse()
 	break;
       }
     }
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting an integer or \"infinite\""
-	    " after `default_decay_time.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting an integer or \"infinite\""
+		    " after `default_decay_time.");
     return false;
   }
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "new-line is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "new-line is expected.");
     return false;
   }
 
   mState->set_default_decay_time(val, loc);
-  
+
   return true;
 }
 
@@ -614,11 +616,11 @@ bool
 LpTriregStrength::parse()
 {
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "`default_trireg_strength in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "`default_trireg_strength in module definition.");
     return false;
   }
 
@@ -632,23 +634,23 @@ LpTriregStrength::parse()
 	break;
       }
     }
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting an integer between 0 and 250 "
-	    "after `default_trireg_strength.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting an integer between 0 and 250 "
+		    "after `default_trireg_strength.");
     return false;
   }
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line.");
     return false;
   }
 
@@ -689,23 +691,23 @@ bool
 LpDelayMode::parse()
 {
   FileRegion loc = cur_token_loc();
-  
+
   if ( is_in_module() ) {
-    put_msg(__FILE__, __LINE__,
-	    loc,
-	    kMsgError,
-	    "LEX",
-	    "`delay_mode in module definition.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc,
+		    kMsgError,
+		    "LEX",
+		    "`delay_mode in module definition.");
     return false;
   }
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line.");
     return false;
   }
 

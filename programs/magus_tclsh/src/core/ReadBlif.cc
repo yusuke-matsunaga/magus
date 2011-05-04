@@ -15,6 +15,9 @@
 #include "ym_blif/BlifNetworkReader.h"
 #include "ym_bdn/BlifBdnConv.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "TclObjMsgHandler.h"
+
 
 BEGIN_NAMESPACE_MAGUS
 
@@ -26,7 +29,6 @@ BEGIN_NAMESPACE_MAGUS
 ReadBlif::ReadBlif(MagMgr* mgr) :
   NetCmd(mgr, true, true, false)
 {
-  mReader.add_msg_handler(&mMsgHandler);
   set_usage_string("<filename>");
 }
 
@@ -57,6 +59,9 @@ ReadBlif::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
+  TclObjMsgHandler mh;
+  MsgMgr::reg_handler(&mh);
+
   // 実際の読み込みを行う．
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
@@ -66,8 +71,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 
       // エラーが起きていないか調べる．
       if ( !result ) {
-	TclObj emsg = mMsgHandler.msg_obj();
-	mMsgHandler.clear();
+	TclObj emsg = mh.msg_obj();
 	emsg << "Error occurred in reading " << objv[1];
 	set_result(emsg);
 	return TCL_ERROR;
@@ -78,9 +82,6 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   case NetHandle::kMagBdn:
     {
       BlifNetworkReader reader;
-      TclObjMsgHandler msg_handler;
-      reader.add_msg_handler(&msg_handler);
-
       BlifNetwork blif_network;
 
       if ( !reader.read(ex_file_name, blif_network) ) {
@@ -89,9 +90,10 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 
       BlifBdnConv conv;
       bool stat = conv(blif_network, *neth->_bdn());
+
       if ( !stat ) {
-	TclObj emsg;
-	emsg << "Error in converting from BlifNetowrk to BdMgr";
+	TclObj emsg = mh.msg_obj();
+	emsg << ": Error in converting from BlifNetowrk to BdMgr";
 	set_result(emsg);
 	return TCL_ERROR;
       }

@@ -21,9 +21,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージマネージャ
-Lex::Lex(MsgMgr& msg_mgr) :
-  RawLex(msg_mgr)
+Lex::Lex()
 {
   mModuleState = new LexModuleState(*this);
 

@@ -10,14 +10,13 @@
 
 
 #include "DotlibScanner.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージを管理するオブジェクト
-DotlibScanner::DotlibScanner(MsgMgr& msg_mgr) :
-  mMsgMgr(msg_mgr)
+DotlibScanner::DotlibScanner()
 {
 }
 
@@ -40,49 +39,6 @@ double
 DotlibScanner::cur_float() const
 {
   return strtod(cur_string(), NULL);
-}
-
-// @brief メッセージ出力管理オブジェクトを返す．
-MsgMgr&
-DotlibScanner::msg_mgr()
-{
-  return mMsgMgr;
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-DotlibScanner::put_msg(const char* src_file,
-			  int src_line,
-			  const FileRegion& file_loc,
-			  tMsgType type,
-			  const char* label,
-			  const char* msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-void
-DotlibScanner::put_msg(const char* src_file,
-			  int src_line,
-			  const FileRegion& file_loc,
-			  tMsgType type,
-			  const char* label,
-			  const string& msg)
-{
-  mMsgMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
 // @brief トークンを一つとってくる．
@@ -182,10 +138,11 @@ DotlibScanner::scan()
 
   default:
     // それ以外はエラーなんじゃない？
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    "syntax error");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    "syntax error");
     return ERROR;
   }
   assert_not_reached(__FILE__, __LINE__);
@@ -224,10 +181,11 @@ DotlibScanner::scan()
   { // '.' の直後はかならず数字
     ostringstream buf;
     buf << "digit number expected after dot";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
     return ERROR;
   }
 
@@ -260,10 +218,11 @@ DotlibScanner::scan()
   { // (e|E) の直後はかならず数字か符号
     ostringstream buf;
     buf << "exponent value expected";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
     return ERROR;
   }
 
@@ -293,16 +252,18 @@ DotlibScanner::scan()
   if ( c == '\n' ) {
     ostringstream buf;
     buf << "unexpected newline in quoted string.";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
     return ERROR;
   }
   if ( c == EOF ) {
     ostringstream buf;
     buf << "unexpected end-of-file in quoted string.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
 		    kMsgError,
 		    "DOTLIB_LEX",
 		    buf.str());
@@ -367,10 +328,11 @@ DotlibScanner::scan()
   {
     ostringstream buf;
     buf << "Unexpected end-of-file in comment block.";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
   }
   return ERROR;
 }

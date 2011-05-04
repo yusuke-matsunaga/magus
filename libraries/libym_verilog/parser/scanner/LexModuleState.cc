@@ -11,6 +11,8 @@
 
 #include "LexModuleState.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -26,7 +28,7 @@ LexModuleState::LexModuleState(RawLex& lex) :
 {
   resetall(FileRegion());
 }
-  
+
 // @brief デストラクタ
 LexModuleState::~LexModuleState()
 {
@@ -48,11 +50,11 @@ LexModuleState::set_cell_define(bool val,
     else {
       buf << "OFF";
     }
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 
@@ -76,11 +78,11 @@ LexModuleState::set_default_nettype(tVpiNetType val,
     ostringstream buf;
     buf << "default_nettype is set to "
 	<< nettype2str(val) << ".";
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 
@@ -101,11 +103,11 @@ LexModuleState::set_time_unit(int unit,
   if ( debug() ) {
     ostringstream buf;
     buf << "time_unit is set to " << unit2str(unit) << ".";
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 
@@ -119,11 +121,11 @@ LexModuleState::set_time_precision(int precision,
   if ( debug() ) {
     ostringstream buf;
     buf << "time_precision is set to " << unit2str(precision) << ".";
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 
@@ -156,11 +158,11 @@ LexModuleState::set_unconnected_drive(tVpiUnconnDrive val,
     case kVpiPull0: buf << "pull0"; break;
     case kVpiPull1: buf << "pull1"; break;
     }
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 
@@ -187,11 +189,11 @@ LexModuleState::set_default_decay_time(int val,
     else {
       buf << "\"infinite\"";
     }
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 
@@ -212,11 +214,11 @@ LexModuleState::set_default_trireg_strength(int val,
   if ( debug() ) {
     ostringstream buf;
     buf << "default_trireg_strength is set to " << val << ".";
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 
@@ -245,11 +247,11 @@ LexModuleState::set_delay_mode(tVpiDefDelayMode val,
     case kVpiDelayModeMTM:     buf << "\"MTM\""; break;
     case kVpiDelayModeNone:    buf << "\"none\""; break;
     }
-    put_msg(__FILE__, __LINE__,
-	    file_region,
-	    kMsgDebug,
-	    "LEX",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgDebug,
+		    "LEX",
+		    buf.str());
   }
 }
 

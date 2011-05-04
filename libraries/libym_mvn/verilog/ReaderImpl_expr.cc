@@ -20,6 +20,8 @@
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlRange.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
@@ -49,7 +51,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       case kVpiScalar0: break;
       case kVpiScalarX:
       case kVpiScalarZ:
-	mMsgMgr.put_msg(__FILE__, __LINE__,
+	MsgMgr::put_msg(__FILE__, __LINE__,
 			expr->file_region(),
 			kMsgError,
 			"MVN_VLXXX",

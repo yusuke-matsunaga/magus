@@ -10,6 +10,8 @@
 
 
 #include "MislibMgr.h"
+#include "MislibPt.h"
+
 #include "ym_lexp/LogExpr.h"
 #if 0
 #include "ym_npn/TvFunc.h"

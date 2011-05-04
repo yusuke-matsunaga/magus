@@ -66,12 +66,6 @@ public:
   gen_network(MvnMgr& mgr,
 	      MvnVlMap& node_map);
 
-  /// @brief メッセージハンドラを付加する．
-  /// @param[in] msg_handler 登録するハンドラ
-  /// @note このハンドラはこのオブジェクトの破壊に伴って破壊される．
-  void
-  add_msg_handler(MsgHandler* msg_handler);
-
 
 private:
   //////////////////////////////////////////////////////////////////////

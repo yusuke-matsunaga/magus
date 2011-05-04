@@ -15,6 +15,8 @@
 
 #include "parser.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -32,7 +34,7 @@ LexCondState::LexCondState(RawLex& lex) :
   mTrueNestLevel(0)
 {
 }
-  
+
 // @brief デストラクタ
 LexCondState::~LexCondState()
 {
@@ -78,7 +80,7 @@ LexCondPlugin::LexCondPlugin(RawLex& lex,
 LexCondPlugin::~LexCondPlugin()
 {
 }
-  
+
 // @brief 条件コンパイル用のプラグインの時 true を返す仮想関数
 bool
 LexCondPlugin::is_cond_plugin()
@@ -94,7 +96,7 @@ LexCondPlugin::cond()
 {
   return mCondState->mCurCond;
 }
-  
+
 // @brief condition の書き換え
 // @param[in] flag 設定する値
 void
@@ -102,7 +104,7 @@ LexCondPlugin::set_cond(bool flag)
 {
   mCondState->mCurCond = flag;
 }
-  
+
 // @brief condition の反転
 void
 LexCondPlugin::flip_cond()
@@ -179,7 +181,7 @@ LexCondPlugin::pop_else_flag()
 {
   mCondState->mElseFlag.pop_back();
 }
-  
+
 // @brief マクロ定義の検査
 // @param[in] name 名前
 // @return name という名のマクロが定義されていたら true を返す．
@@ -217,24 +219,24 @@ bool
 LpIfdef::parse()
 {
   if ( !expect(IDENTIFIER) ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting an identifier after `ifdef/`ifndef");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting an identifier after `ifdef/`ifndef");
     return false;
   }
 
   StrBuff macroname = cur_string();
-  
+
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after an identifier.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after an identifier.");
     return false;
   }
 
@@ -289,33 +291,33 @@ LpElse::parse()
   FileRegion loc = cur_token_loc();
 
   if ( else_flag() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "duplicated `else.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "duplicated `else.");
     return false;
   }
   set_else_flag(true);
-  
+
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after `else.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after `else.");
     return false;
   }
 
   if ( false_nest_level() == 0 ) {
     if ( true_nest_level() == 0 ) {
-      put_msg(__FILE__, __LINE__,
-	      loc,
-	      kMsgError,
-	      "LEX",
-	      "Unbalanced `else.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "LEX",
+		      "Unbalanced `else.");
       return false;
     }
     flip_cond();
@@ -352,22 +354,22 @@ bool
 LpElsif::parse()
 {
   if ( else_flag() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "duplicated `elsif.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "duplicated `elsif.");
     return false;
   }
 
   if ( !expect(IDENTIFIER) ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting an identifier after `elsif.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting an identifier after `elsif.");
     return false;
   }
 
@@ -375,12 +377,12 @@ LpElsif::parse()
   FileRegion loc = cur_token_loc();
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after an identifier.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after an identifier.");
     return false;
   }
 
@@ -389,11 +391,11 @@ LpElsif::parse()
 
   if ( false_nest_level() == 0 ) {
     if ( true_nest_level() == 0 ) {
-      put_msg(__FILE__, __LINE__,
-	      loc,
-	      kMsgError,
-	      "LEX",
-	      "Unbalanced `elsif.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "LEX",
+		      "Unbalanced `elsif.");
       return false;
     }
     if ( !cond() ) {
@@ -434,23 +436,23 @@ LpEndif::parse()
   FileRegion loc = cur_token_loc();
 
   if ( !expect_nl() ) {
-    put_msg(__FILE__, __LINE__,
-	    cur_token_loc(),
-	    kMsgError,
-	    "LEX",
-	    "Syntax error: "
-	    "expecting new-line after `endif.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_token_loc(),
+		    kMsgError,
+		    "LEX",
+		    "Syntax error: "
+		    "expecting new-line after `endif.");
     return false;
   }
 
   pop_else_flag();
   if ( false_nest_level() == 0 ) {
     if ( true_nest_level() == 0 ) {
-      put_msg(__FILE__, __LINE__,
-	      loc,
-	      kMsgError,
-	      "LEX",
-	      "Unbalanced `endif.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "LEX",
+		      "Unbalanced `endif.");
       return false;
     }
     set_cond(true);

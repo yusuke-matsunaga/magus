@@ -31,7 +31,7 @@ TgIscas89Reader::~TgIscas89Reader()
 {
   // mHandler は Iscas89Reader が責任をもって破壊してくれる．
 }
-  
+
 // @brief blif ファイルを読み込む．
 bool
 TgIscas89Reader::operator()(const string& filename,
@@ -40,13 +40,6 @@ TgIscas89Reader::operator()(const string& filename,
   mHandler->set_network(network);
   bool stat = mParser.read(filename);
   return stat;
-}
-
-// @brief メッセージハンドラを追加する．
-void
-TgIscas89Reader::add_msg_handler(MsgHandler* msg_handler)
-{
-  mParser.add_msg_handler(msg_handler);
 }
 
 END_NAMESPACE_YM_TGNET

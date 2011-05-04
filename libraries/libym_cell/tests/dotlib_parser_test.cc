@@ -12,6 +12,7 @@
 #include <iomanip>
 
 #include "ym_utils/StopWatch.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 #include "../dotlib/PtMgr.h"
 #include "../dotlib/DotlibParser.h"
@@ -28,7 +29,7 @@ dotlibparser_test(int argc,
   DotlibParser parser(ptmgr);
 
   MsgHandler* handler = new StreamMsgHandler(&cerr);
-  parser.msg_mgr().reg_handler(handler);
+  MsgMgr::reg_handler(handler);
 
   PtDumper pt_dump;
 

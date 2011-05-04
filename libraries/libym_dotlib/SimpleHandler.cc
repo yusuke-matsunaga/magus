@@ -12,6 +12,7 @@
 #include "GroupHandler.h"
 #include "PtMgr.h"
 #include "PtNodeImpl.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -140,10 +141,11 @@ IntSimpleHandler::read_value()
 {
   PtNodeImpl* value = SimpleHandler::read_value();
   if ( !value->is_int() ) {
-    put_msg(__FILE__, __LINE__, value->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "Syntax error. int value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    value->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error. int value is expected.");
     return NULL;
   }
   return value;
@@ -171,10 +173,11 @@ FloatSimpleHandler::read_value()
 {
   PtNodeImpl* value = SimpleHandler::read_value();
   if ( !value->is_float() ) {
-    put_msg(__FILE__, __LINE__, value->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "Syntax error. float value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    value->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error. float value is expected.");
     return NULL;
   }
   return value;
@@ -202,10 +205,11 @@ StrSimpleHandler::read_value()
 {
   PtNodeImpl* value = SimpleHandler::read_value();
   if ( !value->is_string() ) {
-    put_msg(__FILE__, __LINE__, value->loc(),
-	    kMsgError,
-	    "DOTLIB_PARSER",
-	    "Syntax error. string value is expected.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    value->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Syntax error. string value is expected.");
     return NULL;
   }
   return value;

@@ -10,10 +10,10 @@
 
 
 #include "MislibParser.h"
-
-
 #include "MislibPtImpl1.h"
 #include "MislibPtImpl2.h"
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NONAMESPACE
 
@@ -33,8 +33,7 @@ BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 // コンストラクタ
 MislibParser::MislibParser() :
-  mAlloc(4096),
-  mLex(mMsgMgr)
+  mAlloc(4096)
 {
 }
 
@@ -57,8 +56,11 @@ MislibParser::read(const string& filename)
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, FileRegion(),
-		    kMsgFailure, "MISLIB_PARSER", buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    FileRegion(),
+		    kMsgFailure,
+		    "MISLIB_PARSER",
+		    buf.str());
     return false;
   }
 
@@ -439,8 +441,11 @@ MislibParser::error(const FileRegion& loc,
     msg2 = msg;
   }
 
-  msg_mgr().put_msg(__FILE__, __LINE__, loc,
-		    kMsgError, "MISLIB_PARSER", msg2);
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  loc,
+		  kMsgError,
+		  "MISLIB_PARSER",
+		  msg2);
   mError = true;
 }
 

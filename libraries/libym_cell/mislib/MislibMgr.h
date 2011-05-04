@@ -11,17 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_cell/cell_nsdef.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_utils/FileRegion.h"
-#include "ym_utils/Alloc.h"
-#include "ym_utils/ShString.h"
-
-#include "MislibPt.h"
-#include "MislibLex.h"
+#include "mislib_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_MISLIB
+
+class MislibPt;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MislibMgr MislibMgr.h "MislibMgr.h"
@@ -49,33 +44,7 @@ public:
   gen_library(const string& lib_name,
 	      const MislibPt* root);
 
-  /// @brief メッセージマネージャの取得
-  MsgMgr&
-  msg_mgr();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // メッセージハンドラの管理者
-  MsgMgr mMsgMgr;
-
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief メッセージマネージャの取得
-inline
-MsgMgr&
-MislibMgr::msg_mgr()
-{
-  return mMsgMgr;
-}
 
 END_NAMESPACE_YM_CELL_MISLIB
 

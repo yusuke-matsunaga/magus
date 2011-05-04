@@ -31,7 +31,7 @@ TgBlifReader::~TgBlifReader()
 {
   // mHandler は BlifParser が責任をもって破壊してくれる．
 }
-  
+
 // @brief blif ファイルを読み込む．
 bool
 TgBlifReader::operator()(const string& filename,
@@ -40,13 +40,6 @@ TgBlifReader::operator()(const string& filename,
   mHandler->set_network(network);
   bool stat = mParser.read(filename);
   return stat;
-}
-
-// @brief メッセージハンドラを追加する．
-void
-TgBlifReader::add_msg_handler(MsgHandler* msg_handler)
-{
-  mParser.add_msg_handler(msg_handler);
 }
 
 END_NAMESPACE_YM_TGNET
