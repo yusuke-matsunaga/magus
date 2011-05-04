@@ -1,77 +1,115 @@
 
-/// @file libym_dotlib/PtNodeImpl.cc
-/// @brief PtNode の実装ファイル
+/// @file libym_dotlib/DotlibNodeImpl.cc
+/// @brief DotlibNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
+BEGIN_NONAMESPACE
+
+// インデント用の空白文字列を作る．
+string
+indent_str(ymuint indent)
+{
+  string ans;
+  for (ymuint i = 0; i < indent; ++ i) {
+    ans += ' ';
+  }
+  return ans;
+}
+
+// str 中に [a-zA-Z0-9_] 以外の文字が含まれていたら
+// " " で囲んで出力する．
+void
+dump_str(ostream& s,
+	 const ShString& str)
+{
+  bool need_quote = false;
+  for (const char* p = str; *p; ++ p) {
+    int c = *p;
+    if ( !isalnum(c) && c != '_' ) {
+      need_quote = true;
+      break;
+    }
+  }
+  if ( need_quote ) {
+    s << "\"";
+  }
+  s << str;
+  if ( need_quote ) {
+    s << "\"";
+  }
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
-// クラス PtNodeImpl
+// クラス DotlibNodeImpl
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PtNodeImpl::PtNodeImpl() :
+DotlibNodeImpl::DotlibNodeImpl() :
   mNext(NULL)
 {
 }
 
 // @brief デストラクタ
-PtNodeImpl::~PtNodeImpl()
+DotlibNodeImpl::~DotlibNodeImpl()
 {
 }
 
 // @brief 整数型(kInt)の時に true を返す．
 bool
-PtNodeImpl::is_int() const
+DotlibNodeImpl::is_int() const
 {
   return false;
 }
 
 // @brief 数値型(kInt か kFloat)の時に true を返す．
 bool
-PtNodeImpl::is_float() const
+DotlibNodeImpl::is_float() const
 {
   return false;
 }
 
 // @brief 文字列型(kString)の時に true を返す．
 bool
-PtNodeImpl::is_string() const
+DotlibNodeImpl::is_string() const
 {
   return false;
 }
 
 // @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
 bool
-PtNodeImpl::is_opr() const
+DotlibNodeImpl::is_opr() const
 {
   return false;
 }
 
 // @brief リスト型(kList)の時に true を返す．
 bool
-PtNodeImpl::is_list() const
+DotlibNodeImpl::is_list() const
 {
   return false;
 }
 
 // @brief グループ型(kGroup)の時に true を返す．
 bool
-PtNodeImpl::is_group() const
+DotlibNodeImpl::is_group() const
 {
   return false;
 }
 
 // @brief 属性型(kAttr)の時に true を返す．
 bool
-PtNodeImpl::is_attr() const
+DotlibNodeImpl::is_attr() const
 {
   return false;
 }
@@ -79,7 +117,7 @@ PtNodeImpl::is_attr() const
 // @brief 整数値を返す．
 // @note is_int() = true の時のみ意味を持つ．
 int
-PtNodeImpl::int_value() const
+DotlibNodeImpl::int_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
@@ -88,7 +126,7 @@ PtNodeImpl::int_value() const
 // @brief 数値を返す．
 // @note is_float() = true の時のみ意味を持つ．
 double
-PtNodeImpl::float_value() const
+DotlibNodeImpl::float_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0.0;
@@ -97,7 +135,7 @@ PtNodeImpl::float_value() const
 // @brief 定数シンボルを返す．
 // @note is_string() = true の時のみ意味を持つ．
 ShString
-PtNodeImpl::string_value() const
+DotlibNodeImpl::string_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return ShString();
@@ -106,7 +144,7 @@ PtNodeImpl::string_value() const
 // @brief 第一オペランドを返す．
 // @note is_opr() = true の時のみ意味を持つ．
 const DotlibNode*
-PtNodeImpl::opr1() const
+DotlibNodeImpl::opr1() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -115,7 +153,7 @@ PtNodeImpl::opr1() const
 // @brief 第二オペランドを返す．
 // @note is_opr() = true の時のみ意味を持つ．
 const DotlibNode*
-PtNodeImpl::opr2() const
+DotlibNodeImpl::opr2() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -124,7 +162,7 @@ PtNodeImpl::opr2() const
 // @brief リストの先頭の要素を返す．
 // @note is_list() = true の時のみ意味を持つ．
 const DotlibNode*
-PtNodeImpl::top() const
+DotlibNodeImpl::top() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -133,7 +171,7 @@ PtNodeImpl::top() const
 // @brief リストの要素数を返す．
 // @note is_list() = true の時のみ意味を持つ．
 ymuint
-PtNodeImpl::list_size() const
+DotlibNodeImpl::list_size() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
@@ -142,7 +180,7 @@ PtNodeImpl::list_size() const
 // @brief グループの値を得る．
 // @note is_group() = true の時のみ意味を持つ．
 const DotlibNode*
-PtNodeImpl::group_value() const
+DotlibNodeImpl::group_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -151,7 +189,7 @@ PtNodeImpl::group_value() const
 // @brief 先頭の属性を得る．
 // @note is_group() = true の時のみ意味を持つ．
 const DotlibNode*
-PtNodeImpl::attr_top() const
+DotlibNodeImpl::attr_top() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -160,7 +198,7 @@ PtNodeImpl::attr_top() const
 // @brief 属性名を得る．
 // @note is_attr() = true の時のみ意味を持つ．
 ShString
-PtNodeImpl::attr_name() const
+DotlibNodeImpl::attr_name() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return ShString();
@@ -169,7 +207,7 @@ PtNodeImpl::attr_name() const
 // @brief 属性の値を得る．
 // @note is_attr() = true の時のみ意味を持つ．
 const DotlibNode*
-PtNodeImpl::attr_value() const
+DotlibNodeImpl::attr_value() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
@@ -177,7 +215,7 @@ PtNodeImpl::attr_value() const
 
 // @brief 次の要素を得る．
 const DotlibNode*
-PtNodeImpl::next() const
+DotlibNodeImpl::next() const
 {
   return mNext;
 }
@@ -186,7 +224,7 @@ PtNodeImpl::next() const
 // @param[in] node 追加する要素
 // @note type() が kList の時のみ意味を持つ．
 void
-PtNodeImpl::add_node(PtNodeImpl* node)
+DotlibNodeImpl::add_node(DotlibNodeImpl* node)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -195,72 +233,72 @@ PtNodeImpl::add_node(PtNodeImpl* node)
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-PtNodeImpl::add_attr(PtNodeImpl* attr)
+DotlibNodeImpl::add_attr(DotlibNodeImpl* attr)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス PtNodeBase
+// クラス DotlibNodeBase
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
-PtNodeBase::PtNodeBase(const FileRegion& loc) :
+DotlibNodeBase::DotlibNodeBase(const FileRegion& loc) :
   mLoc(loc)
 {
 }
 
 // @brief デストラクタ
-PtNodeBase::~PtNodeBase()
+DotlibNodeBase::~DotlibNodeBase()
 {
 }
 
 // @brief ファイル上の位置を返す．
 FileRegion
-PtNodeBase::loc() const
+DotlibNodeBase::loc() const
 {
   return mLoc;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-/// クラス PtInt
+/// クラス DotlibInt
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtInt::PtInt(int value,
-	     const FileRegion& loc) :
-  PtNodeBase(loc),
+DotlibInt::DotlibInt(int value,
+		     const FileRegion& loc) :
+  DotlibNodeBase(loc),
   mValue(value)
 {
 }
 
 // @brief デストラクタ
-PtInt::~PtInt()
+DotlibInt::~DotlibInt()
 {
 }
 
 // @brief 型を得る．
 DotlibNode::tType
-PtInt::type() const
+DotlibInt::type() const
 {
   return kInt;
 }
 
 // @brief 整数型(kInt)の時に true を返す．
 bool
-PtInt::is_int() const
+DotlibInt::is_int() const
 {
   return true;
 }
 
 // @brief 数値型(kInt か kFloat)の時に true を返す．
 bool
-PtInt::is_float() const
+DotlibInt::is_float() const
 {
   return true;
 }
@@ -268,7 +306,7 @@ PtInt::is_float() const
 // @brief 整数値を返す．
 // @note type() が kInt の時のみ意味を持つ．
 int
-PtInt::int_value() const
+DotlibInt::int_value() const
 {
   return mValue;
 }
@@ -276,41 +314,51 @@ PtInt::int_value() const
 // @brief 数値を返す．
 // @note type() が kFloat の時のみ意味を持つ．
 double
-PtInt::float_value() const
+DotlibInt::float_value() const
 {
   return static_cast<double>(mValue);
 }
 
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibInt::dump(ostream& s,
+		ymuint indent) const
+{
+  s << int_value();
+}
+
 
 //////////////////////////////////////////////////////////////////////
-/// クラス PtFloat
+/// クラス DotlibFloat
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtFloat::PtFloat(double value,
-		 const FileRegion& loc) :
-  PtNodeBase(loc),
+DotlibFloat::DotlibFloat(double value,
+			 const FileRegion& loc) :
+  DotlibNodeBase(loc),
   mValue(value)
 {
 }
 
 // @brief デストラクタ
-PtFloat::~PtFloat()
+DotlibFloat::~DotlibFloat()
 {
 }
 
 // @brief 型を得る．
 DotlibNode::tType
-PtFloat::type() const
+DotlibFloat::type() const
 {
   return kFloat;
 }
 
 // @brief 数値型(kInt か kFloat)の時に true を返す．
 bool
-PtFloat::is_float() const
+DotlibFloat::is_float() const
 {
   return true;
 }
@@ -318,41 +366,51 @@ PtFloat::is_float() const
 // @brief 数値を返す．
 // @note type() が kFloat の時のみ意味を持つ．
 double
-PtFloat::float_value() const
+DotlibFloat::float_value() const
 {
   return mValue;
 }
 
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibFloat::dump(ostream& s,
+		  ymuint indent) const
+{
+  s << float_value();
+}
+
 
 //////////////////////////////////////////////////////////////////////
-/// クラス PtString
+/// クラス DotlibString
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtString::PtString(ShString value,
-		   const FileRegion& loc) :
-  PtNodeBase(loc),
+DotlibString::DotlibString(ShString value,
+			   const FileRegion& loc) :
+  DotlibNodeBase(loc),
   mValue(value)
 {
 }
 
 // @brief デストラクタ
-PtString::~PtString()
+DotlibString::~DotlibString()
 {
 }
 
 // @brief 型を得る．
 DotlibNode::tType
-PtString::type() const
+DotlibString::type() const
 {
   return kString;
 }
 
 // @brief 文字列型(kString)の時に true を返す．
 bool
-PtString::is_string() const
+DotlibString::is_string() const
 {
   return true;
 }
@@ -360,22 +418,32 @@ PtString::is_string() const
 // @brief 定数シンボルを返す．
 // @note type() が SYMBOL の時のみ意味を持つ．
 ShString
-PtString::string_value() const
+DotlibString::string_value() const
 {
   return mValue;
 }
 
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibString::dump(ostream& s,
+		   ymuint indent) const
+{
+  dump_str(s, string_value());
+}
+
 
 //////////////////////////////////////////////////////////////////////
-// クラス PtOpr
+// クラス DotlibOpr
 //////////////////////////////////////////////////////////////////////
 
 // @brief 表すコンストラクタ
 // @param[in] type 演算子の型
 // @param[in] opr1, opr2 オペランド
-PtOpr::PtOpr(tType type,
-	     const DotlibNode* opr1,
-	     const DotlibNode* opr2) :
+DotlibOpr::DotlibOpr(tType type,
+		     const DotlibNode* opr1,
+		     const DotlibNode* opr2) :
   mType(type),
   mOpr1(opr1),
   mOpr2(opr2)
@@ -383,27 +451,27 @@ PtOpr::PtOpr(tType type,
 }
 
 // @brief デストラクタ
-PtOpr::~PtOpr()
+DotlibOpr::~DotlibOpr()
 {
 }
 
 // @brief 型を得る．
 DotlibNode::tType
-PtOpr::type() const
+DotlibOpr::type() const
 {
   return mType;
 }
 
 // @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
 bool
-PtOpr::is_opr() const
+DotlibOpr::is_opr() const
 {
   return true;
 }
 
 // @brief 式全体のファイル上の位置を返す．
 FileRegion
-PtOpr::loc() const
+DotlibOpr::loc() const
 {
   return FileRegion(mOpr1->loc(), mOpr2->loc());
 }
@@ -411,7 +479,7 @@ PtOpr::loc() const
 // @brief 第一オペランドを返す．
 // @note type() が演算子の型の時のみ意味を持つ．
 const DotlibNode*
-PtOpr::opr1() const
+DotlibOpr::opr1() const
 {
   return mOpr1;
 }
@@ -419,45 +487,69 @@ PtOpr::opr1() const
 // @brief 第二オペランドを返す．
 // @note type() が演算子の型の時のみ意味を持つ．
 const DotlibNode*
-PtOpr::opr2() const
+DotlibOpr::opr2() const
 {
   return mOpr2;
 }
 
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibOpr::dump(ostream& s,
+		ymuint indent) const
+{
+  for (ymuint i = 0; i < indent; ++ i) {
+    s << ' ';
+  }
+  s << "( ";
+  opr1()->dump(s, 0);
+  switch ( type() ) {
+  case kPlus:  s << " + "; break;
+  case kMinus: s << " - "; break;
+  case kMult:  s << " * "; break;
+  case kDiv:   s << " / "; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  opr2()->dump(s, 0);
+  s << " )";
+}
+
 
 //////////////////////////////////////////////////////////////////////
-// クラス PtList
+// クラス DotlibList
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PtList::PtList() :
+DotlibList::DotlibList() :
   mTop(NULL),
   mTail(NULL)
 {
 }
 
 // @brief デストラクタ
-PtList::~PtList()
+DotlibList::~DotlibList()
 {
 }
 
 // @brief 型を得る．
 DotlibNode::tType
-PtList::type() const
+DotlibList::type() const
 {
   return kList;
 }
 
 // @brief リスト型(kList)の時に true を返す．
 bool
-PtList::is_list() const
+DotlibList::is_list() const
 {
   return true;
 }
 
 // @brief 式全体のファイル上の位置を返す．
 FileRegion
-PtList::loc() const
+DotlibList::loc() const
 {
   if ( mTop == NULL ) {
     return FileRegion();
@@ -468,7 +560,7 @@ PtList::loc() const
 // @brief リストの先頭の要素を返す．
 // @note type() が kList の時のみ意味をもつ．
 const DotlibNode*
-PtList::top() const
+DotlibList::top() const
 {
   return mTop;
 }
@@ -476,20 +568,37 @@ PtList::top() const
 // @brief リストの要素数を返す．
 // @note is_list() = true の時のみ意味を持つ．
 ymuint
-PtList::list_size() const
+DotlibList::list_size() const
 {
   ymuint n = 0;
-  for (const PtNodeImpl* v = mTop; v; v = v->mNext) {
+  for (const DotlibNode* v = top(); v; v = v->next()) {
     ++ n;
   }
   return n;
+}
+
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibList::dump(ostream& s,
+		 ymuint indent) const
+{
+  s << "(";
+  const char* comma = "";
+  for (const DotlibNode* v = top(); v; v = v->next()) {
+    s << comma;
+    v->dump(s, 0);
+    comma = ", ";
+  }
+  s << ")";
 }
 
 // @brief 要素を追加する．
 // @param[in] node 追加する要素
 // @note type() が kList の時のみ意味を持つ．
 void
-PtList::add_node(PtNodeImpl* node)
+DotlibList::add_node(DotlibNodeImpl* node)
 {
   if ( mTop != NULL ) {
     mTail->mNext = node;
@@ -502,15 +611,15 @@ PtList::add_node(PtNodeImpl* node)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス PtGroup
+// クラス DotlibGroup
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtGroup::PtGroup(const DotlibNode* value,
-		 const FileRegion& loc) :
-  PtNodeBase(loc),
+DotlibGroup::DotlibGroup(const DotlibNode* value,
+			 const FileRegion& loc) :
+  DotlibNodeBase(loc),
   mValue(value),
   mAttrTop(NULL),
   mAttrTail(NULL)
@@ -518,20 +627,20 @@ PtGroup::PtGroup(const DotlibNode* value,
 }
 
 // @brief デストラクタ
-PtGroup::~PtGroup()
+DotlibGroup::~DotlibGroup()
 {
 }
 
 // @brief 型を得る．
 DotlibNode::tType
-PtGroup::type() const
+DotlibGroup::type() const
 {
   return kGroup;
 }
 
 // @brief グループ型(kGroup)の時に true を返す．
 bool
-PtGroup::is_group() const
+DotlibGroup::is_group() const
 {
   return true;
 }
@@ -539,7 +648,7 @@ PtGroup::is_group() const
 // @brief グループの値を得る．
 // @note type() が kGroup の時のみ意味を持つ．
 const DotlibNode*
-PtGroup::group_value() const
+DotlibGroup::group_value() const
 {
   return mValue;
 }
@@ -547,16 +656,32 @@ PtGroup::group_value() const
 // @brief 先頭の属性を得る．
 // @note type() が kGroup の時のみ意味を持つ．
 const DotlibNode*
-PtGroup::attr_top() const
+DotlibGroup::attr_top() const
 {
   return mAttrTop;
+}
+
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibGroup::dump(ostream& s,
+		  ymuint indent) const
+{
+  s << ' ';
+  group_value()->dump(s, 0);
+  s << " {" << endl;
+  for (const DotlibNode* node = attr_top(); node; node = node->next()) {
+    node->dump(s, indent + 2);
+  }
+  s << indent_str(indent) << "}";
 }
 
 // @brief attribute を設定する．
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-PtGroup::add_attr(PtNodeImpl* attr)
+DotlibGroup::add_attr(DotlibNodeImpl* attr)
 {
   if ( mAttrTop != NULL ) {
     mAttrTail->mNext = attr;
@@ -569,53 +694,68 @@ PtGroup::add_attr(PtNodeImpl* attr)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス PtAttr
+// クラス DotlibAttr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] attr_name 属性名
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtAttr::PtAttr(const ShString& attr_name,
-	       const DotlibNode* value,
-	       const FileRegion& loc) :
-  PtNodeBase(loc),
+DotlibAttr::DotlibAttr(const ShString& attr_name,
+		       const DotlibNode* value,
+		       const FileRegion& loc) :
+  DotlibNodeBase(loc),
   mAttrName(attr_name),
   mValue(value)
 {
 }
 
 // @brief デストラクタ
-PtAttr::~PtAttr()
+DotlibAttr::~DotlibAttr()
 {
 }
 
 // @brief 型を得る．
 DotlibNode::tType
-PtAttr::type() const
+DotlibAttr::type() const
 {
   return kAttr;
 }
 
 // @brief 属性型(kAttr)の時に true を返す．
 bool
-PtAttr::is_attr() const
+DotlibAttr::is_attr() const
 {
   return true;
 }
 
 // @brief 属性名を得る．
 ShString
-PtAttr::attr_name() const
+DotlibAttr::attr_name() const
 {
   return mAttrName;
 }
 
 // @brief 属性の値を得る．
 const DotlibNode*
-PtAttr::attr_value() const
+DotlibAttr::attr_value() const
 {
   return mValue;
+}
+
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibAttr::dump(ostream& s,
+		 ymuint indent) const
+{
+  s << indent_str(indent) << attr_name() << ": ";
+  attr_value()->dump(s, indent);
+  if ( attr_value()->type() != kGroup ) {
+    s << ";";
+  }
+  s << endl;
 }
 
 END_NAMESPACE_YM_DOTLIB

@@ -60,7 +60,7 @@ protected:
   bool
   set_value(const ShString& attr_name,
 	    const FileRegion& attr_loc,
-	    PtNodeImpl* value);
+	    DotlibNodeImpl* value);
 
 };
 

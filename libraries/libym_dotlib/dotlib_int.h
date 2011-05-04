@@ -64,7 +64,7 @@ class DotlibParserImpl;
 class DotlibHandler;
 class GroupHandler;
 class PtMgr;
-class PtNodeImpl;
+class DotlibNodeImpl;
 
 END_NAMESPACE_YM_DOTLIB
 

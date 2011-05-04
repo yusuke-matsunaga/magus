@@ -94,7 +94,7 @@ public:
   virtual
   bool
   add_attr(const ShString& attr_name,
-	   PtNodeImpl* value,
+	   DotlibNodeImpl* value,
 	   const FileRegion& loc);
 
   /// @brief 対応するノードを得る．
@@ -116,7 +116,7 @@ protected:
   bool
   begin_group(const ShString& attr_name,
 	      const FileRegion& attr_loc,
-	      PtNodeImpl* value);
+	      DotlibNodeImpl* value);
 
   /// @brief group statement の最後に呼ばれる関数
   virtual
@@ -133,7 +133,7 @@ protected:
   bool
   check_group_value(const ShString& attr_name,
 		    const FileRegion& attr_loc,
-		    PtNodeImpl* value);
+		    DotlibNodeImpl* value);
 
 
 private:
@@ -144,8 +144,8 @@ private:
   // ハンドラの連想配列
   hash_map<ShString, DotlibHandler*> mHandlerMap;
 
-  // 対応する PtNode
-  PtNodeImpl* mNode;
+  // 対応する DotlibNode
+  DotlibNodeImpl* mNode;
 
 };
 
@@ -183,7 +183,7 @@ protected:
   bool
   check_group_value(const ShString& attr_name,
 		    const FileRegion& attr_loc,
-		    PtNodeImpl* value);
+		    DotlibNodeImpl* value);
 
 };
 
@@ -225,7 +225,7 @@ protected:
   bool
   check_group_value(const ShString& attr_name,
 		    const FileRegion& attr_loc,
-		    PtNodeImpl* value);
+		    DotlibNodeImpl* value);
 
 };
 
@@ -263,7 +263,7 @@ protected:
   bool
   check_group_value(const ShString& attr_name,
 		    const FileRegion& attr_loc,
-		    PtNodeImpl* value);
+		    DotlibNodeImpl* value);
 
 };
 
@@ -301,7 +301,7 @@ protected:
   bool
   check_group_value(const ShString& attr_name,
 		    const FileRegion& attr_loc,
-		    PtNodeImpl* value);
+		    DotlibNodeImpl* value);
 
 };
 

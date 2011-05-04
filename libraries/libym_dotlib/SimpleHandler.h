@@ -53,11 +53,11 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を読み込む処理
-  /// @return 値を表す PtNode を返す．
+  /// @return 値を表す DotlibNode を返す．
   /// @note エラーが起きたら NULL を返す．
   /// @note デフォルトの実装では普通に DotlibParser::read_token() を呼ぶ．
   virtual
-  PtNodeImpl*
+  DotlibNodeImpl*
   read_value();
 
   /// @brief 値を読み込んだ時の処理
@@ -68,7 +68,7 @@ protected:
   bool
   set_value(const ShString& attr_name,
 	    const FileRegion& attr_loc,
-	    PtNodeImpl* value);
+	    DotlibNodeImpl* value);
 
 };
 
@@ -95,11 +95,11 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を読み込む処理
-  /// @return 値を表す PtNode を返す．
+  /// @return 値を表す DotlibNode を返す．
   /// @note エラーが起きたら NULL を返す．
   /// @note ここではシンボルモードで DotlibParser::read_token() を呼ぶ．
   virtual
-  PtNodeImpl*
+  DotlibNodeImpl*
   read_value();
 
 };
@@ -128,7 +128,7 @@ protected:
 
   /// @brief 値を読み込む．
   virtual
-  PtNodeImpl*
+  DotlibNodeImpl*
   read_value();
 
 };
@@ -157,7 +157,7 @@ protected:
 
   /// @brief 値を読み込む．
   virtual
-  PtNodeImpl*
+  DotlibNodeImpl*
   read_value();
 
 };
@@ -186,7 +186,7 @@ protected:
 
   /// @brief 値を読み込む．
   virtual
-  PtNodeImpl*
+  DotlibNodeImpl*
   read_value();
 
 };
@@ -215,7 +215,7 @@ protected:
 
   /// @brief 値を読み込む．
   virtual
-  PtNodeImpl*
+  DotlibNodeImpl*
   read_value();
 
 };

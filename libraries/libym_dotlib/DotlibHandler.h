@@ -80,14 +80,14 @@ protected:
   /// @brief group attribute 用のパースを行う．
   /// @return 読み込んだ値(リスト)を返す．
   /// @note エラーが起きたら NULL を返す．
-  PtNodeImpl*
+  DotlibNodeImpl*
   parse_complex();
 
   /// @brief DotlibNode (の派生クラス)を生成する．
   /// @param[in] type 型
   /// @param[in] loc ファイル上の位置情報
   /// @note 残りの情報は parser() からとってくる．
-  PtNodeImpl*
+  DotlibNodeImpl*
   new_ptvalue(tTokenType type,
 	      const FileRegion& loc);
 

@@ -14,7 +14,7 @@
 #include "HandlerFactory.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/ShString.h"
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

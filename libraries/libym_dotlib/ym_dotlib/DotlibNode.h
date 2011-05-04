@@ -178,6 +178,14 @@ public:
   const DotlibNode*
   next() const = 0;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const = 0;
+
 };
 
 END_NAMESPACE_YM_DOTLIB

@@ -9,7 +9,7 @@
 
 #include "PtMgr.h"
 
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -43,143 +43,143 @@ PtMgr::~PtMgr()
 void
 PtMgr::clear()
 {
-  for (PtNodeImpl* node = mTop; node; ) {
-    PtNodeImpl* next = node->mClearLink;
-    node->~PtNodeImpl();
+  for (DotlibNodeImpl* node = mTop; node; ) {
+    DotlibNodeImpl* next = node->mClearLink;
+    node->~DotlibNodeImpl();
     node = next;
   }
   mTop = NULL;
   mAlloc.destroy();
 }
 
-// @brief 整数値を表す PtNode を生成する．
+// @brief 整数値を表す DotlibNode を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_int(int value,
 	       const FileRegion& loc)
 {
   ++ mIntNum;
-  void* p = mAlloc.get_memory(sizeof(PtInt));
-  PtNodeImpl* node = new (p) PtInt(value, loc);
+  void* p = mAlloc.get_memory(sizeof(DotlibInt));
+  DotlibNodeImpl* node = new (p) DotlibInt(value, loc);
   add_node(node);
   return node;
 }
 
-// @brief 実数値を表す PtNode を生成する．
+// @brief 実数値を表す DotlibNode を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_float(double value,
 		 const FileRegion& loc)
 {
   ++ mFloatNum;
-  void* p = mAlloc.get_memory(sizeof(PtFloat));
-  PtNodeImpl* node = new (p) PtFloat(value, loc);
+  void* p = mAlloc.get_memory(sizeof(DotlibFloat));
+  DotlibNodeImpl* node = new (p) DotlibFloat(value, loc);
   add_node(node);
   return node;
 }
 
-// @brief 定数シンボルを表す PtNode を生成する．
+// @brief 定数シンボルを表す DotlibNode を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_string(ShString value,
 		  const FileRegion& loc)
 {
   ++ mStrNum;
-  void* p = mAlloc.get_memory(sizeof(PtString));
-  PtNodeImpl* node = new (p) PtString(value, loc);
+  void* p = mAlloc.get_memory(sizeof(DotlibString));
+  DotlibNodeImpl* node = new (p) DotlibString(value, loc);
   add_node(node);
   return node;
 }
 
-// @brief + 演算子を表す PtNode を生成する．
+// @brief + 演算子を表す DotlibNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_plus(const DotlibNode* opr1,
 		const DotlibNode* opr2)
 {
   ++ mOprNum;
-  void* p = mAlloc.get_memory(sizeof(PtOpr));
-  PtNodeImpl* node = new (p) PtOpr(DotlibNode::kPlus, opr1, opr2);
+  void* p = mAlloc.get_memory(sizeof(DotlibOpr));
+  DotlibNodeImpl* node = new (p) DotlibOpr(DotlibNode::kPlus, opr1, opr2);
   add_node(node);
   return node;
 }
 
-// @brief - 演算子を表す PtNode を生成する．
+// @brief - 演算子を表す DotlibNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_minus(const DotlibNode* opr1,
 		 const DotlibNode* opr2)
 {
   ++ mOprNum;
-  void* p = mAlloc.get_memory(sizeof(PtOpr));
-  PtNodeImpl* node = new (p) PtOpr(DotlibNode::kMinus, opr1, opr2);
+  void* p = mAlloc.get_memory(sizeof(DotlibOpr));
+  DotlibNodeImpl* node = new (p) DotlibOpr(DotlibNode::kMinus, opr1, opr2);
   add_node(node);
   return node;
 }
 
-// @brief * 演算子を表す PtNode を生成する．
+// @brief * 演算子を表す DotlibNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_mult(const DotlibNode* opr1,
 		const DotlibNode* opr2)
 {
   ++ mOprNum;
-  void* p = mAlloc.get_memory(sizeof(PtOpr));
-  PtNodeImpl* node =  new (p) PtOpr(DotlibNode::kMult, opr1, opr2);
+  void* p = mAlloc.get_memory(sizeof(DotlibOpr));
+  DotlibNodeImpl* node =  new (p) DotlibOpr(DotlibNode::kMult, opr1, opr2);
   add_node(node);
   return node;
 }
 
-// @brief / 演算子を表す PtNode を生成する．
+// @brief / 演算子を表す DotlibNode を生成する．
 // @param[in] opr1, opr2 オペランド
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_div(const DotlibNode* opr1,
 	       const DotlibNode* opr2)
 {
   ++ mOprNum;
-  void* p = mAlloc.get_memory(sizeof(PtOpr));
-  PtNodeImpl* node = new (p) PtOpr(DotlibNode::kDiv, opr1, opr2);
+  void* p = mAlloc.get_memory(sizeof(DotlibOpr));
+  DotlibNodeImpl* node = new (p) DotlibOpr(DotlibNode::kDiv, opr1, opr2);
   add_node(node);
   return node;
 }
 
-// @brief リストを表す PtNode を生成する．
-PtNodeImpl*
+// @brief リストを表す DotlibNode を生成する．
+DotlibNodeImpl*
 PtMgr::new_list()
 {
   ++ mListNum;
-  void* p = mAlloc.get_memory(sizeof(PtList));
-  PtNodeImpl* node =  new (p) PtList();
+  void* p = mAlloc.get_memory(sizeof(DotlibList));
+  DotlibNodeImpl* node =  new (p) DotlibList();
   add_node(node);
   return node;
 }
 
-// @brief グループを表す PtNode を生成する．
+// @brief グループを表す DotlibNode を生成する．
 // @param[in] value 値
 // @param[in] loc ファイル上の位置
-PtNodeImpl*
+DotlibNodeImpl*
 PtMgr::new_group(const DotlibNode* value,
 		 const FileRegion& loc)
 {
   ++ mGroupNum;
-  void* p = mAlloc.get_memory(sizeof(PtGroup));
-  PtNodeImpl* node =  new (p) PtGroup(value, loc);
+  void* p = mAlloc.get_memory(sizeof(DotlibGroup));
+  DotlibNodeImpl* node =  new (p) DotlibGroup(value, loc);
   add_node(node);
   return node;
 }
 
-// @brief PtAttr を生成する．
-PtNodeImpl*
+// @brief DotlibAttr を生成する．
+DotlibNodeImpl*
 PtMgr::new_attr(const ShString& attr_name,
 		const DotlibNode* value,
 		const FileRegion& loc)
 {
   ++ mAttrNum;
-  void* p = mAlloc.get_memory(sizeof(PtAttr));
-  PtNodeImpl* node =  new (p) PtAttr(attr_name, value, loc);
+  void* p = mAlloc.get_memory(sizeof(DotlibAttr));
+  DotlibNodeImpl* node =  new (p) DotlibAttr(attr_name, value, loc);
   add_node(node);
   return node;
 }
@@ -189,33 +189,33 @@ PtMgr::new_attr(const ShString& attr_name,
 void
 PtMgr::show_stats(ostream& s)
 {
-  s << "PtInt:          " << setw(7) << mIntNum
-    << " x " << setw(3) << sizeof(PtInt)
-    << " = " << setw(10) << mIntNum * sizeof(PtInt) << endl
+  s << "DotlibInt:          " << setw(7) << mIntNum
+    << " x " << setw(3) << sizeof(DotlibInt)
+    << " = " << setw(10) << mIntNum * sizeof(DotlibInt) << endl
 
-    << "PtFloat:        " << setw(7) << mFloatNum
-    << " x " << setw(3) << sizeof(PtFloat)
-    << " = " << setw(10) << mFloatNum * sizeof(PtFloat) << endl
+    << "DotlibFloat:        " << setw(7) << mFloatNum
+    << " x " << setw(3) << sizeof(DotlibFloat)
+    << " = " << setw(10) << mFloatNum * sizeof(DotlibFloat) << endl
 
-    << "PtString:       " << setw(7) << mStrNum
-    << " x " << setw(3) << sizeof(PtString)
-    << " = " << setw(10) << mStrNum * sizeof(PtString) << endl
+    << "DotlibString:       " << setw(7) << mStrNum
+    << " x " << setw(3) << sizeof(DotlibString)
+    << " = " << setw(10) << mStrNum * sizeof(DotlibString) << endl
 
-    << "PtOpr:          " << setw(7) << mOprNum
-    << " x " << setw(3) << sizeof(PtOpr)
-    << " = " << setw(10) << mOprNum * sizeof(PtOpr) << endl
+    << "DotlibOpr:          " << setw(7) << mOprNum
+    << " x " << setw(3) << sizeof(DotlibOpr)
+    << " = " << setw(10) << mOprNum * sizeof(DotlibOpr) << endl
 
-    << "PtList:         " << setw(7) << mListNum
-    << " x " << setw(3) << sizeof(PtList)
-    << " = " << setw(10) << mListNum * sizeof(PtList) << endl
+    << "DotlibList:         " << setw(7) << mListNum
+    << " x " << setw(3) << sizeof(DotlibList)
+    << " = " << setw(10) << mListNum * sizeof(DotlibList) << endl
 
-    << "PtGroup:        " << setw(7) << mGroupNum
-    << " x " << setw(3) << sizeof(PtGroup)
-    << " = " << setw(10) << mGroupNum * sizeof(PtGroup) << endl
+    << "DotlibGroup:        " << setw(7) << mGroupNum
+    << " x " << setw(3) << sizeof(DotlibGroup)
+    << " = " << setw(10) << mGroupNum * sizeof(DotlibGroup) << endl
 
-    << "PtAttr:         " << setw(7) << mAttrNum
-    << " x " << setw(3) << sizeof(PtAttr)
-    << " = " << setw(10) << mAttrNum * sizeof(PtAttr) << endl
+    << "DotlibAttr:         " << setw(7) << mAttrNum
+    << " x " << setw(3) << sizeof(DotlibAttr)
+    << " = " << setw(10) << mAttrNum * sizeof(DotlibAttr) << endl
 
     << "Total memory:                 = "
     << setw(10) << mAlloc.used_size() << endl
@@ -230,7 +230,7 @@ PtMgr::show_stats(ostream& s)
 
 // @brief 生成したノードをリンクにつなぐ．
 void
-PtMgr::add_node(PtNodeImpl* node)
+PtMgr::add_node(DotlibNodeImpl* node)
 {
   node->mClearLink = mTop;
   mTop = node;

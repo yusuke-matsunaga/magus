@@ -11,7 +11,7 @@
 #include "DotlibParserImpl.h"
 #include "GroupHandler.h"
 #include "PtMgr.h"
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -45,7 +45,7 @@ SimpleHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  PtNodeImpl* value = read_value();
+  DotlibNodeImpl* value = read_value();
   if ( value == NULL ) {
     return false;
   }
@@ -65,15 +65,15 @@ SimpleHandler::read_attr(const ShString& attr_name,
 }
 
 // @brief 値を読み込む処理
-// @return 値を表す PtNode を返す．
+// @return 値を表す DotlibNode を返す．
 // @note エラーが起きたら NULL を返す．
 // @note デフォルトの実装では普通に DotlibParser::read_token() を呼ぶ．
-PtNodeImpl*
+DotlibNodeImpl*
 SimpleHandler::read_value()
 {
   FileRegion loc;
   tTokenType value_type = parser().read_token(loc, false);
-  PtNodeImpl* value = new_ptvalue(value_type, loc);
+  DotlibNodeImpl* value = new_ptvalue(value_type, loc);
   return value;
 }
 
@@ -84,7 +84,7 @@ SimpleHandler::read_value()
 bool
 SimpleHandler::set_value(const ShString& attr_name,
 			 const FileRegion& attr_loc,
-			 PtNodeImpl* value)
+			 DotlibNodeImpl* value)
 {
   FileRegion loc(attr_loc, value->loc());
   return parent()->add_attr(attr_name, value, loc);
@@ -107,15 +107,15 @@ SymSimpleHandler::~SymSimpleHandler()
 }
 
 // @brief 値を読み込む処理
-// @return 値を表す PtNode を返す．
+// @return 値を表す DotlibNode を返す．
 // @note エラーが起きたら NULL を返す．
 // @note ここではシンボルモードで DotlibParser::read_token() を呼ぶ．
-PtNodeImpl*
+DotlibNodeImpl*
 SymSimpleHandler::read_value()
 {
   FileRegion loc;
   tTokenType value_type = parser().read_token(loc, true);
-  PtNodeImpl* value = new_ptvalue(value_type, loc);
+  DotlibNodeImpl* value = new_ptvalue(value_type, loc);
   return value;
 }
 
@@ -136,10 +136,10 @@ IntSimpleHandler::~IntSimpleHandler()
 }
 
 // @brief 値を読み込む．
-PtNodeImpl*
+DotlibNodeImpl*
 IntSimpleHandler::read_value()
 {
-  PtNodeImpl* value = SimpleHandler::read_value();
+  DotlibNodeImpl* value = SimpleHandler::read_value();
   if ( !value->is_int() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    value->loc(),
@@ -168,10 +168,10 @@ FloatSimpleHandler::~FloatSimpleHandler()
 }
 
 // @brief 値を読み込む．
-PtNodeImpl*
+DotlibNodeImpl*
 FloatSimpleHandler::read_value()
 {
-  PtNodeImpl* value = SimpleHandler::read_value();
+  DotlibNodeImpl* value = SimpleHandler::read_value();
   if ( !value->is_float() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    value->loc(),
@@ -200,10 +200,10 @@ StrSimpleHandler::~StrSimpleHandler()
 }
 
 // @brief 値を読み込む．
-PtNodeImpl*
+DotlibNodeImpl*
 StrSimpleHandler::read_value()
 {
-  PtNodeImpl* value = SimpleHandler::read_value();
+  DotlibNodeImpl* value = SimpleHandler::read_value();
   if ( !value->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    value->loc(),

@@ -11,7 +11,7 @@
 #include "DotlibParserImpl.h"
 #include "SimpleHandler.h"
 #include "GroupHandler.h"
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
 

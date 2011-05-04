@@ -1,8 +1,8 @@
-#ifndef LIBYM_DOTLIB_PTNODEIMPL_H
-#define LIBYM_DOTLIB_PTNODEIMPL_H
+#ifndef LIBYM_DOTLIB_DOTLIBNODEIMPL_H
+#define LIBYM_DOTLIB_DOTLIBNODEIMPL_H
 
-/// @file libym_dotlib/PtNodeImpl.h
-/// @brief PtNode の継承クラスのヘッダファイル
+/// @file libym_dotlib/DotlibNodeImpl.h
+/// @brief DotlibNode の継承クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,29 +15,29 @@
 BEGIN_NAMESPACE_YM_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtNodeImpl PtNodeImple.h "PtNodeImpl.h"
+/// @class DotlibNodeImpl DotlibNodeImple.h "DotlibNodeImpl.h"
 /// @brief DotlibNode の実装クラス
 //////////////////////////////////////////////////////////////////////
-class PtNodeImpl :
+class DotlibNodeImpl :
   public DotlibNode
 {
   friend class PtMgr;
-  friend class PtList;
-  friend class PtGroup;
+  friend class DotlibList;
+  friend class DotlibGroup;
 
 protected:
 
   /// @brief コンストラクタ
-  PtNodeImpl();
+  DotlibNodeImpl();
 
   /// @brief デストラクタ
   virtual
-  ~PtNodeImpl();
+  ~DotlibNodeImpl();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // PtNode の仮想関数
+  // DotlibNode の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 整数型(kInt)の時に true を返す．
@@ -158,19 +158,19 @@ public:
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
   void
-  add_node(PtNodeImpl* node);
+  add_node(DotlibNodeImpl* node);
 
   /// @brief attribute を設定する．
   /// @param[in] attr 属性
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
   void
-  add_attr(PtNodeImpl* attr);
+  add_attr(DotlibNodeImpl* attr);
 
   /// @brief 次の要素を設定する．
   /// @param[in] next 次の要素
   void
-  set_next(PtNodeImpl* next);
+  set_next(DotlibNodeImpl* next);
 
 
 private:
@@ -179,29 +179,29 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 次の要素を指すリンクポインタ
-  PtNodeImpl* mNext;
+  DotlibNodeImpl* mNext;
 
   // PtMgr::clear() 用のリンクポインタ
-  PtNodeImpl* mClearLink;
+  DotlibNodeImpl* mClearLink;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtNodeBase PtNodeImpl.h "PtNodeImpl.h"
+/// @class DotlibNodeBase DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief 直接値を表すクラスの基底クラス
 //////////////////////////////////////////////////////////////////////
-class PtNodeBase :
-  public PtNodeImpl
+class DotlibNodeBase :
+  public DotlibNodeImpl
 {
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル上の位置
-  PtNodeBase(const FileRegion& loc);
+  DotlibNodeBase(const FileRegion& loc);
 
   /// @brief デストラクタ
-  ~PtNodeBase();
+  ~DotlibNodeBase();
 
 
 public:
@@ -224,11 +224,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtInt PtNodeImpl.h "PtNodeImpl.h"
+/// @class DotlibInt DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief 整数値を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PtInt :
-  public PtNodeBase
+class DotlibInt :
+  public DotlibNodeBase
 {
   friend class PtMgr;
 
@@ -237,11 +237,11 @@ private:
   /// @brief コンストラクタ
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
-  PtInt(int value,
-	const FileRegion& loc);
+  DotlibInt(int value,
+	    const FileRegion& loc);
 
   /// @brief デストラクタ
-  ~PtInt();
+  ~DotlibInt();
 
 
 public:
@@ -274,6 +274,14 @@ public:
   double
   float_value() const;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -287,11 +295,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtFloat PtNodeImpl.h "PtNodeImpl.h"
+/// @class DotlibFloat DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief 実数値を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PtFloat :
-  public PtNodeBase
+class DotlibFloat :
+  public DotlibNodeBase
 {
   friend class PtMgr;
 
@@ -300,11 +308,11 @@ private:
   /// @brief コンストラクタ
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
-  PtFloat(double value,
-	  const FileRegion& loc);
+  DotlibFloat(double value,
+	      const FileRegion& loc);
 
   /// @brief デストラクタ
-  ~PtFloat();
+  ~DotlibFloat();
 
 
 public:
@@ -325,6 +333,14 @@ public:
   double
   float_value() const;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -338,11 +354,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtString PtNodeImpl.h "PtNodeImpl.h"
+/// @class DotlibString DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief 文字列を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PtString :
-  public PtNodeBase
+class DotlibString :
+  public DotlibNodeBase
 {
   friend class PtMgr;
 
@@ -351,11 +367,11 @@ private:
   /// @brief コンストラクタ
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
-  PtString(ShString value,
-	   const FileRegion& loc);
+  DotlibString(ShString value,
+	       const FileRegion& loc);
 
   /// @brief デストラクタ
-  ~PtString();
+  ~DotlibString();
 
 
 public:
@@ -376,6 +392,14 @@ public:
   ShString
   string_value() const;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -389,11 +413,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtOpr PtNodeImpl.h "PtNodeImpl.h"
+/// @class DotlibOpr DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief 演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PtOpr :
-  public PtNodeImpl
+class DotlibOpr :
+  public DotlibNodeImpl
 {
   friend class PtMgr;
 
@@ -402,13 +426,13 @@ private:
   /// @brief コンストラクタ
   /// @param[in] type 演算子の型
   /// @param[in] opr1, opr2 オペランド
-  PtOpr(tType type,
-	const DotlibNode* opr1,
-	const DotlibNode* opr2);
+  DotlibOpr(tType type,
+	    const DotlibNode* opr1,
+	    const DotlibNode* opr2);
 
   /// @brief デストラクタ
   virtual
-  ~PtOpr();
+  ~DotlibOpr();
 
 
 public:
@@ -440,6 +464,14 @@ public:
   const DotlibNode*
   opr2() const;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -459,22 +491,22 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtList PtNodeImpl.h "PtNodeImpl.h"
+/// @class DotlibList DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief リストを表すクラス
 //////////////////////////////////////////////////////////////////////
-class PtList :
-  public PtNodeImpl
+class DotlibList :
+  public DotlibNodeImpl
 {
   friend class PtMgr;
 
 private:
 
   /// @brief コンストラクタ
-  PtList();
+  DotlibList();
 
   /// @brief デストラクタ
   virtual
-  ~PtList();
+  ~DotlibList();
 
 
 public:
@@ -506,6 +538,14 @@ public:
   ymuint
   list_size() const;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -517,7 +557,7 @@ public:
   /// @note type() が kList の時のみ意味を持つ．
   virtual
   void
-  add_node(PtNodeImpl* node);
+  add_node(DotlibNodeImpl* node);
 
 
 private:
@@ -526,32 +566,32 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 先頭の要素
-  const PtNodeImpl* mTop;
+  const DotlibNodeImpl* mTop;
 
   // 末尾の要素
-  PtNodeImpl* mTail;
+  DotlibNodeImpl* mTail;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtGroup PtNodeImpl.h "PtNodeImpl.h"
-/// @brief group statement を表す PtNode の継承クラス
+/// @class DotlibGroup DotlibNodeImpl.h "DotlibNodeImpl.h"
+/// @brief group statement を表す DotlibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class PtGroup :
-  public PtNodeBase
+class DotlibGroup :
+  public DotlibNodeBase
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
-  PtGroup(const DotlibNode* value,
-	  const FileRegion& loc);
+  DotlibGroup(const DotlibNode* value,
+	      const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~PtGroup();
+  ~DotlibGroup();
 
 
 public:
@@ -581,6 +621,14 @@ public:
   const DotlibNode*
   attr_top() const;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -592,7 +640,7 @@ public:
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
   void
-  add_attr(PtNodeImpl* attr);
+  add_attr(DotlibNodeImpl* attr);
 
 
 private:
@@ -604,20 +652,20 @@ private:
   const DotlibNode* mValue;
 
   // 属性の先頭
-  PtNodeImpl* mAttrTop;
+  DotlibNodeImpl* mAttrTop;
 
   // 属性の末尾
-  PtNodeImpl* mAttrTail;
+  DotlibNodeImpl* mAttrTail;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtAttr PtNodeImpl.h "PtNodeImpl.h"
-/// @brief 属性を表す PtNode の継承クラス
+/// @class DotlibAttr DotlibNodeImpl.h "DotlibNodeImpl.h"
+/// @brief 属性を表す DotlibNode の継承クラス
 //////////////////////////////////////////////////////////////////////
-class PtAttr :
-  public PtNodeBase
+class DotlibAttr :
+  public DotlibNodeBase
 {
   friend class PtMgr;
 
@@ -627,13 +675,13 @@ private:
   /// @param[in] attr_name 属性名
   /// @param[in] value 値
   /// @param[in] loc ファイル上の位置
-  PtAttr(const ShString& attr_name,
-	 const DotlibNode* value,
-	 const FileRegion& loc);
+  DotlibAttr(const ShString& attr_name,
+	     const DotlibNode* value,
+	     const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~PtAttr();
+  ~DotlibAttr();
 
 
 public:
@@ -661,6 +709,14 @@ public:
   const DotlibNode*
   attr_value() const;
 
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -677,4 +733,4 @@ private:
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // LIBYM_DOTLIB_PTNODEIMPL_H
+#endif // LIBYM_DOTLIB_DOTLIBNODEIMPL_H

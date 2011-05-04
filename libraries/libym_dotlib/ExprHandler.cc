@@ -11,7 +11,7 @@
 #include "DotlibParserImpl.h"
 #include "GroupHandler.h"
 #include "PtMgr.h"
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -35,19 +35,19 @@ ExprHandler::~ExprHandler()
 }
 
 // @brief 値を読み込む処理
-// @return 値を表す PtNode を返す．
+// @return 値を表す DotlibNode を返す．
 // @note エラーが起きたら NULL を返す．
 // @note ここでは expression のパースを行う．
-PtNodeImpl*
+DotlibNodeImpl*
 ExprHandler::read_value()
 {
-  PtNodeImpl* expr = read_expr(SEMI);
+  DotlibNodeImpl* expr = read_expr(SEMI);
 
   return expr;
 }
 
 // @brief primary を読み込む．
-PtNodeImpl*
+DotlibNodeImpl*
 ExprHandler::read_primary()
 {
   FileRegion loc;
@@ -83,10 +83,10 @@ ExprHandler::read_primary()
 }
 
 // @brief prudct を読み込む．
-PtNodeImpl*
+DotlibNodeImpl*
 ExprHandler::read_product()
 {
-  PtNodeImpl* opr1 = read_primary();
+  DotlibNodeImpl* opr1 = read_primary();
   if ( opr1 == NULL ) {
     return NULL;
   }
@@ -95,7 +95,7 @@ ExprHandler::read_product()
     FileRegion loc;
     tTokenType type = parser().read_token(loc);
     if ( type == MULT || type == DIV ) {
-      PtNodeImpl* opr2 = read_primary();
+      DotlibNodeImpl* opr2 = read_primary();
       if ( opr2 == NULL ) {
 	return NULL;
       }
@@ -116,13 +116,13 @@ ExprHandler::read_product()
 }
 
 // @brief expression を読み込む．
-PtNodeImpl*
+DotlibNodeImpl*
 ExprHandler::read_expr(tTokenType end_marker)
 {
   // ここだけ mUngetType, mUngetLoc を考慮する必要があるので
   // じかに parser().read_token() を呼んではいけない．
 
-  PtNodeImpl* opr1 = read_product();
+  DotlibNodeImpl* opr1 = read_product();
   if ( opr1 == NULL ) {
     return NULL;
   }
@@ -133,7 +133,7 @@ ExprHandler::read_expr(tTokenType end_marker)
       return opr1;
     }
     if ( type == PLUS || type == MINUS ) {
-      PtNodeImpl* opr2 = read_product();
+      DotlibNodeImpl* opr2 = read_product();
       if ( opr2 == NULL ) {
 	return NULL;
       }

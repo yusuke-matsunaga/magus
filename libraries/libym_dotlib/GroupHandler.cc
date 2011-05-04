@@ -10,7 +10,7 @@
 #include "GroupHandler.h"
 #include "DotlibParserImpl.h"
 #include "PtMgr.h"
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -47,7 +47,7 @@ bool
 GroupHandler::read_attr(const ShString& attr_name,
 			const FileRegion& attr_loc)
 {
-  PtNodeImpl* value = parse_complex();
+  DotlibNodeImpl* value = parse_complex();
   if ( value == NULL ) {
     return false;
   }
@@ -117,10 +117,10 @@ GroupHandler::read_attr(const ShString& attr_name,
 // @note デフォルトの実装はエラーとなる．
 bool
 GroupHandler::add_attr(const ShString& attr_name,
-		       PtNodeImpl* value,
+		       DotlibNodeImpl* value,
 		       const FileRegion& loc)
 {
-  PtNodeImpl* attr = pt_mgr().new_attr(attr_name, value, loc);
+  DotlibNodeImpl* attr = pt_mgr().new_attr(attr_name, value, loc);
   mNode->add_attr(attr);
   return true;
 }
@@ -170,7 +170,7 @@ GroupHandler::find_handler(const ShString& attr_name)
 bool
 GroupHandler::begin_group(const ShString& attr_name,
 			  const FileRegion& attr_loc,
-			  PtNodeImpl* value_list)
+			  DotlibNodeImpl* value_list)
 {
   if ( !check_group_value(attr_name, attr_loc, value_list) ) {
     return false;
@@ -208,7 +208,7 @@ GroupHandler::pt_node()
 bool
 GroupHandler::check_group_value(const ShString& attr_name,
 				const FileRegion& attr_loc,
-				PtNodeImpl* value)
+				DotlibNodeImpl* value)
 {
   return true;
 }
@@ -239,7 +239,7 @@ EmptyGroupHandler::~EmptyGroupHandler()
 bool
 EmptyGroupHandler::check_group_value(const ShString& attr_name,
 				     const FileRegion& attr_loc,
-				     PtNodeImpl* value_list)
+				     DotlibNodeImpl* value_list)
 {
   ymuint n = value_list->list_size();
   if ( n > 0 ) {
@@ -290,7 +290,7 @@ Str1GroupHandler::~Str1GroupHandler()
 bool
 Str1GroupHandler::check_group_value(const ShString& attr_name,
 				    const FileRegion& attr_loc,
-				    PtNodeImpl* value_list)
+				    DotlibNodeImpl* value_list)
 {
   ymuint n = value_list->list_size();
   if ( n == 0 ) {
@@ -353,7 +353,7 @@ Str2GroupHandler::~Str2GroupHandler()
 bool
 Str2GroupHandler::check_group_value(const ShString& attr_name,
 				    const FileRegion& attr_loc,
-				    PtNodeImpl* value_list)
+				    DotlibNodeImpl* value_list)
 {
   ymuint n = value_list->list_size();
   if ( n < 2 ) {
@@ -424,7 +424,7 @@ Str2IntGroupHandler::~Str2IntGroupHandler()
 bool
 Str2IntGroupHandler::check_group_value(const ShString& attr_name,
 				       const FileRegion& attr_loc,
-				       PtNodeImpl* value_list)
+				       DotlibNodeImpl* value_list)
 {
   ymuint n = value_list->list_size();
   if ( n < 3 ) {

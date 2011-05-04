@@ -11,7 +11,7 @@
 #include "DotlibParserImpl.h"
 #include "GroupHandler.h"
 #include "PtMgr.h"
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -53,19 +53,19 @@ DotlibHandler::pt_node()
 // @brief group attribute 用のパースを行う．
 // @return 読み込んだ値(リスト)を返す．
 // @note エラーが起きたら NULL を返す．
-PtNodeImpl*
+DotlibNodeImpl*
 DotlibHandler::parse_complex()
 {
   if ( !expect(LP) ) {
     return NULL;
   }
 
-  PtNodeImpl* value_list = pt_mgr().new_list();
+  DotlibNodeImpl* value_list = pt_mgr().new_list();
   FileRegion loc;
   tTokenType type = parser().read_token(loc);
   if ( type != RP ) {
     for ( ; ; ) {
-      PtNodeImpl* value = new_ptvalue(type, loc);
+      DotlibNodeImpl* value = new_ptvalue(type, loc);
       if ( value == NULL ) {
 	return NULL;
       }
@@ -91,11 +91,11 @@ DotlibHandler::parse_complex()
   return value_list;
 }
 
-// @brief PtNode を生成する．
+// @brief DotlibNode を生成する．
 // @param[in] type 型
 // @param[in] loc ファイル上の位置情報
 // @note 残りの情報は parser() からとってくる．
-PtNodeImpl*
+DotlibNodeImpl*
 DotlibHandler::new_ptvalue(tTokenType type,
 			   const FileRegion& loc)
 {

@@ -48,9 +48,8 @@ libym_dotlib_la_SOURCES = \
 	HandlerFactory.cc \
 	PtMgr.h \
 	PtMgr.cc \
-	PtNodeImpl.h \
-	PtNodeImpl.cc \
-	PtDumper.cc
+	DotlibNodeImpl.h \
+	DotlibNodeImpl.cc
 
 
 

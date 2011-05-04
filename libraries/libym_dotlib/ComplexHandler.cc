@@ -11,7 +11,7 @@
 #include "DotlibParserImpl.h"
 #include "GroupHandler.h"
 #include "PtMgr.h"
-#include "PtNodeImpl.h"
+#include "DotlibNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -40,7 +40,7 @@ bool
 ComplexHandler::read_attr(const ShString& attr_name,
 			  const FileRegion& attr_loc)
 {
-  PtNodeImpl* value = parse_complex();
+  DotlibNodeImpl* value = parse_complex();
   if ( value == NULL ) {
     return false;
   }
@@ -67,7 +67,7 @@ ComplexHandler::read_attr(const ShString& attr_name,
 bool
 ComplexHandler::set_value(const ShString& attr_name,
 			  const FileRegion& attr_loc,
-			  PtNodeImpl* value)
+			  DotlibNodeImpl* value)
 {
   FileRegion loc(attr_loc, value->loc());
   return parent()->add_attr(attr_name, value, loc);
