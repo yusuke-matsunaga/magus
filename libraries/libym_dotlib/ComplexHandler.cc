@@ -10,7 +10,6 @@
 #include "ComplexHandler.h"
 #include "DotlibParserImpl.h"
 #include "GroupHandler.h"
-#include "PtMgr.h"
 #include "DotlibNodeImpl.h"
 
 

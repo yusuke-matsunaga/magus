@@ -17,6 +17,7 @@
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
+#include "ym_dotlib/DotlibMgr.h"
 #include "ym_dotlib/DotlibParser.h"
 
 
@@ -32,13 +33,18 @@ main(int argc,
   MsgHandler* handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(handler);
 
-  DotlibParser parser;
+  DotlibMgr mgr;
 
-  // パース木を作る．
-  const DotlibNode* library = parser.read_file(argv[1], false);
-  if ( library == NULL ) {
-    return 1;
+  {
+    DotlibParser parser;
+
+    // パース木を作る．
+    if ( !parser.read_file(argv[1], mgr, false) ) {
+      return -1;
+    }
   }
+
+  const DotlibNode* library = mgr.root_node();
 
   ParseTreeModel* pt_model = new ParseTreeModel;
   pt_model->set_pt(library);

@@ -1,8 +1,8 @@
-#ifndef LIBYM_DOTLIB_PTMGR_H
-#define LIBYM_DOTLIB_PTMGR_H
+#ifndef LIBYM_DOTLIB_DOTLIBMGRIMPL_H
+#define LIBYM_DOTLIB_DOTLIBMGRIMPL_H
 
-/// @file libym_dotlib/PtMgr.h
-/// @brief PtMgr のヘッダファイル
+/// @file libym_dotlib/DotlibMgrImpl.h
+/// @brief DotlibMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -18,18 +18,18 @@
 BEGIN_NAMESPACE_YM_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtMgr PtMgr.h "PtMgr.h"
-/// @brief DotlibNode を管理するためのクラス
+/// @class DotlibMgrImpl DotlibMgrImpl.h "DotlibMgrImpl.h"
+/// @brief DotlibMgr の実装クラス
 //////////////////////////////////////////////////////////////////////
-class PtMgr
+class DotlibMgrImpl
 {
 public:
 
   /// @brief コンストラクタ
-  PtMgr();
+  DotlibMgrImpl();
 
   /// @brief デストラクタ
-  ~PtMgr();
+  ~DotlibMgrImpl();
 
 
 public:
@@ -102,20 +102,18 @@ public:
 	   const DotlibNode* value,
 	   const FileRegion& loc);
 
+  /// @brief 根のノードを設定する．
+  void
+  set_root_node(DotlibNodeImpl* root);
+
+  /// @brief 根のノードを返す．
+  const DotlibNode*
+  root_node() const;
+
   /// @brief 使用メモリ量の一覧を出力する．
   /// @param[in] s 出力先のストリーム
   void
-  show_stats(ostream& s);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 生成したノードをリンクにつなぐ．
-  void
-  add_node(DotlibNodeImpl* node);
+  show_stats(ostream& s) const;
 
 
 private:
@@ -126,9 +124,8 @@ private:
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
-  // ここで確保したオブジェクトのリストの先頭
-  // DotlibNodeImpl::mClearLink をつかってリンクとリストを構成する．
-  DotlibNodeImpl* mTop;
+  // 根のノード
+  DotlibNodeImpl* mRoot;
 
   // 個々の要素の使用数
   ymuint32 mIntNum;
@@ -142,4 +139,4 @@ private:
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // LIBYM_DOTLIB_PTMGR_H
+#endif // LIBYM_DOTLIB_DOTLIBMGRIMPL_H

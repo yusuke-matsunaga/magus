@@ -63,7 +63,7 @@ operator<<(ostream& s,
 class DotlibParserImpl;
 class DotlibHandler;
 class GroupHandler;
-class PtMgr;
+class DotlibMgrImpl;
 class DotlibNodeImpl;
 
 END_NAMESPACE_YM_DOTLIB

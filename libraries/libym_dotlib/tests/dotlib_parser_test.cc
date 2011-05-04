@@ -11,6 +11,7 @@
 
 #include <iomanip>
 
+#include "ym_dotlib/DotlibMgr.h"
 #include "ym_dotlib/DotlibParser.h"
 #include "ym_dotlib/DotlibNode.h"
 #include "ym_utils/StopWatch.h"
@@ -26,6 +27,8 @@ dotlibparser_test(int argc,
 {
   StreamMsgHandler handler(&cerr);
   MsgMgr::reg_handler(&handler);
+
+  DotlibMgr mgr;
 
   DotlibParser parser;
 
@@ -47,21 +50,24 @@ dotlibparser_test(int argc,
       dump = true;
     }
     else {
-      const DotlibNode* library = parser.read_file(argv[i], debug);
-      if ( library == NULL ) {
+      bool stat = parser.read_file(argv[i], mgr, debug);
+      if ( !stat ) {
 	error = true;
       }
-      else if ( dump ) {
-	library->dump(cout);
-      }
+      break;
     }
+  }
+
+  if ( dump ) {
+    const DotlibNode* library = mgr.root_node();
+    library->dump(cout);
   }
 
   timer.stop();
   USTime time = timer.time();
   cout << "Time: " << time << endl;
 
-  parser.show_stats(cout);
+  mgr.show_stats(cout);
 
   if ( loop ) {
     for ( ; ; ) { }

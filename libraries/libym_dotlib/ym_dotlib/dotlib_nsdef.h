@@ -30,6 +30,7 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_DOTLIB
 
 // クラス名の前方宣言
+class DotlibMgr;
 class DotlibParser;
 class DotlibNode;
 
@@ -38,6 +39,7 @@ END_NAMESPACE_YM_DOTLIB
 
 BEGIN_NAMESPACE_YM
 
+using nsDotlib::DotlibMgr;
 using nsDotlib::DotlibParser;
 using nsDotlib::DotlibNode;
 

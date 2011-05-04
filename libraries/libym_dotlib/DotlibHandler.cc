@@ -9,8 +9,8 @@
 
 #include "DotlibHandler.h"
 #include "DotlibParserImpl.h"
+#include "DotlibMgrImpl.h"
 #include "GroupHandler.h"
-#include "PtMgr.h"
 #include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
@@ -45,7 +45,7 @@ DotlibHandler::~DotlibHandler()
 // @brief 対応するノードを得る．
 // @note デフォルトの実装は NULL を返す．
 const DotlibNode*
-DotlibHandler::pt_node()
+DotlibHandler::node()
 {
   return NULL;
 }
@@ -60,12 +60,12 @@ DotlibHandler::parse_complex()
     return NULL;
   }
 
-  DotlibNodeImpl* value_list = pt_mgr().new_list();
+  DotlibNodeImpl* value_list = mgr()->new_list();
   FileRegion loc;
   tTokenType type = parser().read_token(loc);
   if ( type != RP ) {
     for ( ; ; ) {
-      DotlibNodeImpl* value = new_ptvalue(type, loc);
+      DotlibNodeImpl* value = new_value(type, loc);
       if ( value == NULL ) {
 	return NULL;
       }
@@ -96,20 +96,20 @@ DotlibHandler::parse_complex()
 // @param[in] loc ファイル上の位置情報
 // @note 残りの情報は parser() からとってくる．
 DotlibNodeImpl*
-DotlibHandler::new_ptvalue(tTokenType type,
-			   const FileRegion& loc)
+DotlibHandler::new_value(tTokenType type,
+			 const FileRegion& loc)
 {
   switch ( type ) {
   case INT_NUM:
-    return pt_mgr().new_int(parser().cur_int(), loc);
+    return mgr()->new_int(parser().cur_int(), loc);
     break;
 
   case FLOAT_NUM:
-    return pt_mgr().new_float(parser().cur_float(), loc);
+    return mgr()->new_float(parser().cur_float(), loc);
     break;
 
   case SYMBOL:
-    return pt_mgr().new_string(ShString(parser().cur_string()), loc);
+    return mgr()->new_string(ShString(parser().cur_string()), loc);
     break;
 
   default:
@@ -144,11 +144,11 @@ DotlibHandler::parser()
   return mParser;
 }
 
-// @brief PtMgr を得る．
-PtMgr&
-DotlibHandler::pt_mgr()
+// @brief DotlibMgrImpl* を得る．
+DotlibMgrImpl*
+DotlibHandler::mgr()
 {
-  return mParser.pt_mgr();
+  return mParser.mgr();
 }
 
 // @brief 親のハンドラを得る．

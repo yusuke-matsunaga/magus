@@ -21,7 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibNodeImpl :
   public DotlibNode
 {
-  friend class PtMgr;
   friend class DotlibList;
   friend class DotlibGroup;
 
@@ -181,9 +180,6 @@ private:
   // 次の要素を指すリンクポインタ
   DotlibNodeImpl* mNext;
 
-  // PtMgr::clear() 用のリンクポインタ
-  DotlibNodeImpl* mClearLink;
-
 };
 
 
@@ -230,7 +226,7 @@ private:
 class DotlibInt :
   public DotlibNodeBase
 {
-  friend class PtMgr;
+  friend class DotlibMgrImpl;
 
 private:
 
@@ -301,7 +297,7 @@ private:
 class DotlibFloat :
   public DotlibNodeBase
 {
-  friend class PtMgr;
+  friend class DotlibMgrImpl;
 
 private:
 
@@ -360,7 +356,7 @@ private:
 class DotlibString :
   public DotlibNodeBase
 {
-  friend class PtMgr;
+  friend class DotlibMgrImpl;
 
 private:
 
@@ -419,7 +415,7 @@ private:
 class DotlibOpr :
   public DotlibNodeImpl
 {
-  friend class PtMgr;
+  friend class DotlibMgrImpl;
 
 private:
 
@@ -497,7 +493,7 @@ private:
 class DotlibList :
   public DotlibNodeImpl
 {
-  friend class PtMgr;
+  friend class DotlibMgrImpl;
 
 private:
 
@@ -667,7 +663,7 @@ private:
 class DotlibAttr :
   public DotlibNodeBase
 {
-  friend class PtMgr;
+  friend class DotlibMgrImpl;
 
 private:
 

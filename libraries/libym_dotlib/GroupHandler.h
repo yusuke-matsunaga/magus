@@ -25,7 +25,6 @@ public:
 
   /// @brief 親を持たないハンドラ用のコンストラクタ
   /// @param[in] parser パーサー
-  /// @param[in] ptmgr パース木を管理するオブジェクト
   GroupHandler(DotlibParserImpl& parser);
 
   /// @brief 親を持つハンドラ用のコンストラクタ
@@ -100,7 +99,7 @@ public:
   /// @brief 対応するノードを得る．
   virtual
   const DotlibNode*
-  pt_node();
+  node();
 
 
 protected:

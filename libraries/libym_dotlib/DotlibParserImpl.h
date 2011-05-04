@@ -14,7 +14,6 @@
 #include "dotlib_int.h"
 #include "DotlibScanner.h"
 #include "ym_utils/FileRegion.h"
-#include "PtMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -38,23 +37,16 @@ public:
 
   /// @brief ファイルを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] mgr DotlibNode を管理するオブジェクト
   /// @param[in] debug デバッグモード
   /// @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
-  /// @return パース木の根のノードを返す．
-  /// @note エラーが起きたら NULL を返す．
-  const DotlibNode*
+  /// @return 読み込みが成功したら true を返す．
+  /// @note パース木は mgr にセットされる．
+  bool
   read_file(const string& filename,
+	    DotlibMgrImpl* mgr,
 	    bool debug,
 	    bool allow_no_semi = true);
-
-  /// @brief 直前の read_file() で確保したパース木を解放する．
-  void
-  clear_node();
-
-  /// @brief メモリ使用量のサマリを出力する．
-  /// @param[in] s 出力先のストリーム
-  void
-  show_stats(ostream& s);
 
 
 public:
@@ -92,9 +84,9 @@ public:
   double
   cur_float() const;
 
-  /// @brief パース木を管理するオブジェクトを返す．
-  PtMgr&
-  pt_mgr();
+  /// @brief DotlibMgrImpl* を返す．
+  DotlibMgrImpl*
+  mgr();
 
   /// @brief デバッグモードの時 true を返す．
   bool
@@ -110,7 +102,7 @@ private:
   DotlibScanner mScanner;
 
   // DotlibNode を管理するオブジェクト
-  PtMgr mPtMgr;
+  DotlibMgrImpl* mDotlibMgr;
 
   // library グループを処理するハンドラ
   DotlibHandler* mLibraryHandler;
@@ -164,6 +156,14 @@ double
 DotlibParserImpl::cur_float() const
 {
   return mScanner.cur_float();
+}
+
+// @brief DotlibMgrImpl* を返す．
+inline
+DotlibMgrImpl*
+DotlibParserImpl::mgr()
+{
+  return mDotlibMgr;
 }
 
 END_NAMESPACE_YM_DOTLIB

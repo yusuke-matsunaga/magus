@@ -10,6 +10,7 @@
 
 
 #include "DotlibParserImpl.h"
+#include "DotlibMgrImpl.h"
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
 #include "ym_utils/MsgMgr.h"
@@ -21,6 +22,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 
 // @brief コンストラクタ
 DotlibParserImpl::DotlibParserImpl() :
+  mDotlibMgr(NULL),
   mLibraryHandler( HandlerFactory::new_library(*this) )
 {
 }
@@ -33,15 +35,19 @@ DotlibParserImpl::~DotlibParserImpl()
 
 // @brief ファイルを読み込む．
 // @param[in] filename ファイル名
+// @param[in] mgr DotlibNode を管理するオブジェクト
 // @param[in] debug デバッグモード
 // @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
-// @return パース木の根のノードを返す．
-// @note エラーが起きたら NULL を返す．
-const DotlibNode*
+// @return 読み込みが成功したら true を返す．
+// @note パース木は mgr にセットされる．
+bool
 DotlibParserImpl::read_file(const string& filename,
+			    DotlibMgrImpl* mgr,
 			    bool debug,
 			    bool allow_no_semi)
 {
+  mDotlibMgr = mgr;
+
   mDebug = debug;
   mAllowNoSemi = allow_no_semi;
 
@@ -53,7 +59,7 @@ DotlibParserImpl::read_file(const string& filename,
 		    kMsgFailure,
 		    "DOTLIB_PARSER",
 		    buf.str());
-    return NULL;
+    return false;
   }
 
   bool error = false;
@@ -98,28 +104,15 @@ last:
   mScanner.close_file();
 
   if ( error ) {
-    return NULL;
+    return false;
   }
 
-  const DotlibNode* library = mLibraryHandler->pt_node();
-  const DotlibNode* root = mPtMgr.new_attr(ShString("library"),
-					   library, library->loc());
-  return root;
-}
+  const DotlibNode* library = mLibraryHandler->node();
+  DotlibNodeImpl* root = mgr->new_attr(ShString("library"),
+				       library, library->loc());
+  mgr->set_root_node(root);
 
-// @brief 直前の read_file() で確保したパース木を解放する．
-void
-DotlibParserImpl::clear_node()
-{
-  mPtMgr.clear();
-}
-
-// @brief メモリ使用量のサマリを出力する．
-// @param[in] s 出力先のストリーム
-void
-DotlibParserImpl::show_stats(ostream& s)
-{
-  mPtMgr.show_stats(s);
+  return true;
 }
 
 // @brief 引数の種類のトークンでなければエラーメッセージを出力する．
@@ -192,13 +185,6 @@ DotlibParserImpl::expect_nl()
     }
   }
   return true;
-}
-
-// @brief パース木を管理するオブジェクトを返す．
-PtMgr&
-DotlibParserImpl::pt_mgr()
-{
-  return mPtMgr;
 }
 
 // @brief デバッグモードの時 true を返す．

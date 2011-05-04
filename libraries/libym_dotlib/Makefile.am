@@ -46,8 +46,9 @@ libym_dotlib_la_SOURCES = \
 	GroupHandler.cc \
 	HandlerFactory.h \
 	HandlerFactory.cc \
-	PtMgr.h \
-	PtMgr.cc \
+	DotlibMgr.cc \
+	DotlibMgrImpl.h \
+	DotlibMgrImpl.cc \
 	DotlibNodeImpl.h \
 	DotlibNodeImpl.cc
 

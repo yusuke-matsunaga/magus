@@ -9,7 +9,7 @@
 
 #include "GroupHandler.h"
 #include "DotlibParserImpl.h"
-#include "PtMgr.h"
+#include "DotlibMgrImpl.h"
 #include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
@@ -120,7 +120,7 @@ GroupHandler::add_attr(const ShString& attr_name,
 		       DotlibNodeImpl* value,
 		       const FileRegion& loc)
 {
-  DotlibNodeImpl* attr = pt_mgr().new_attr(attr_name, value, loc);
+  DotlibNodeImpl* attr = mgr()->new_attr(attr_name, value, loc);
   mNode->add_attr(attr);
   return true;
 }
@@ -176,7 +176,7 @@ GroupHandler::begin_group(const ShString& attr_name,
     return false;
   }
 
-  mNode = pt_mgr().new_group(value_list, attr_loc);
+  mNode = mgr()->new_group(value_list, attr_loc);
   if ( attr_name != "library" ) {
     FileRegion loc(attr_loc, mNode->loc());
     parent()->add_attr(attr_name, mNode, loc);
@@ -194,7 +194,7 @@ GroupHandler::end_group()
 
 // @brief 対応するノードを得る．
 const DotlibNode*
-GroupHandler::pt_node()
+GroupHandler::node()
 {
   return mNode;
 }

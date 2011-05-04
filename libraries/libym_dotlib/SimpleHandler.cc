@@ -9,8 +9,8 @@
 
 #include "SimpleHandler.h"
 #include "DotlibParserImpl.h"
+#include "DotlibMgrImpl.h"
 #include "GroupHandler.h"
-#include "PtMgr.h"
 #include "DotlibNodeImpl.h"
 #include "ym_utils/MsgMgr.h"
 
@@ -73,7 +73,7 @@ SimpleHandler::read_value()
 {
   FileRegion loc;
   tTokenType value_type = parser().read_token(loc, false);
-  DotlibNodeImpl* value = new_ptvalue(value_type, loc);
+  DotlibNodeImpl* value = new_value(value_type, loc);
   return value;
 }
 
@@ -115,7 +115,7 @@ SymSimpleHandler::read_value()
 {
   FileRegion loc;
   tTokenType value_type = parser().read_token(loc, true);
-  DotlibNodeImpl* value = new_ptvalue(value_type, loc);
+  DotlibNodeImpl* value = new_value(value_type, loc);
   return value;
 }
 

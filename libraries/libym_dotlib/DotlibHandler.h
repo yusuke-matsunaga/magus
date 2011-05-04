@@ -55,7 +55,7 @@ public:
   /// @note デフォルトの実装は NULL を返す．
   virtual
   const DotlibNode*
-  pt_node();
+  node();
 
 
 public:
@@ -67,9 +67,9 @@ public:
   DotlibParserImpl&
   parser();
 
-  /// @brief PtMgr を得る．
-  PtMgr&
-  pt_mgr();
+  /// @brief DotlibMgrImpl を得る．
+  DotlibMgrImpl*
+  mgr();
 
 
 protected:
@@ -88,8 +88,8 @@ protected:
   /// @param[in] loc ファイル上の位置情報
   /// @note 残りの情報は parser() からとってくる．
   DotlibNodeImpl*
-  new_ptvalue(tTokenType type,
-	      const FileRegion& loc);
+  new_value(tTokenType type,
+	    const FileRegion& loc);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
   /// @param[in] req_type 要求するトークンの型

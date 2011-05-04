@@ -9,4 +9,5 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	dotlib_nsdef.h \
 	DotlibParser.h \
+	DotlibMgr.h \
 	DotlibNode.h
