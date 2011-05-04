@@ -118,9 +118,14 @@ protected:
 	      DotlibNodeImpl* value);
 
   /// @brief group statement の最後に呼ばれる関数
+  /// @param[in] attr_name 属性名
+  /// @param[in] attr_loc attr_name のファイル上の位置
+  /// @param[in] end_loc 閉じ括弧のファイル上の位置
   virtual
   bool
-  end_group();
+  end_group(const ShString& attr_name,
+	    const FileRegion& attr_loc,
+	    const FileRegion& end_loc);
 
   /// @brief group statement の引数のチェックを行う仮想関数
   /// @param[in] attr_name 属性名

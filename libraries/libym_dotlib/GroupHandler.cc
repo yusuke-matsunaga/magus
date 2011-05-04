@@ -71,6 +71,9 @@ GroupHandler::read_attr(const ShString& attr_name,
       continue;
     }
     if ( type == RCB ) {
+      if ( !end_group(attr_name, attr_loc, loc) ) {
+	return false;
+      }
       break;
     }
     if ( type != SYMBOL ) {
@@ -177,17 +180,26 @@ GroupHandler::begin_group(const ShString& attr_name,
   }
 
   mNode = mgr()->new_group(value_list, attr_loc);
-  if ( attr_name != "library" ) {
-    FileRegion loc(attr_loc, mNode->loc());
-    parent()->add_attr(attr_name, mNode, loc);
-  }
   return true;
 }
 
 // @brief group statement の最後に呼ばれる関数
+// @param[in] attr_name 属性名
+// @param[in] attr_loc attr_name のファイル上の位置
+// @param[in] end_loc 閉じ括弧のファイル上の位置
 bool
-GroupHandler::end_group()
+GroupHandler::end_group(const ShString& attr_name,
+			const FileRegion& attr_loc,
+			const FileRegion& end_loc)
 {
+  FileRegion loc(attr_loc, end_loc);
+  if ( attr_name == "library" ) {
+    DotlibNodeImpl* root = mgr()->new_attr(attr_name, mNode, loc);
+    mgr()->set_root_node(root);
+  }
+  else {
+    parent()->add_attr(attr_name, mNode, loc);
+  }
   mNode = NULL;
   return true;
 }

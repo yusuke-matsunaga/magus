@@ -107,11 +107,6 @@ last:
     return false;
   }
 
-  const DotlibNode* library = mLibraryHandler->node();
-  DotlibNodeImpl* root = mgr->new_attr(ShString("library"),
-				       library, library->loc());
-  mgr->set_root_node(root);
-
   return true;
 }
 
