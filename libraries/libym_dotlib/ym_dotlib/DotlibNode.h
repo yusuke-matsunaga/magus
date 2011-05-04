@@ -188,6 +188,16 @@ public:
 
 };
 
+/// @brief ストリーム出力演算子
+inline
+ostream&
+operator<<(ostream& s,
+	   const DotlibNode* node)
+{
+  node->dump(s, 0);
+  return s;
+}
+
 END_NAMESPACE_YM_DOTLIB
 
 #endif // YM_DOTLIB_DOTLIBNODE_H

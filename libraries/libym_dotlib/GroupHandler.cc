@@ -53,7 +53,7 @@ GroupHandler::read_attr(const ShString& attr_name,
   }
 
   if ( debug() ) {
-    cout << attr_name << value << endl;
+    cout << attr_name << value << " {" << endl;
   }
 
   if ( !begin_group(attr_name, attr_loc, value) ) {
