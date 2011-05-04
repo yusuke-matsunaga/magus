@@ -65,12 +65,9 @@ private:
   read_expr(tTokenType end_marker);
 
   /// @brief トークンを読み込む．
+  /// @param[out] loc 対応するファイル上の位置情報を格納する変数
   tTokenType
-  read_token();
-
-  /// @brief 直前に読み込んだトークンの位置を返す．
-  FileRegion
-  cur_loc();
+  read_token(FileRegion& loc);
 
 
 private:
@@ -83,9 +80,6 @@ private:
 
   // 読み戻したトークンの位置
   FileRegion mUngetLoc;
-
-  // トークンの位置
-  FileRegion mCurLoc;
 
 };
 

@@ -70,8 +70,9 @@ SimpleHandler::read_attr(const ShString& attr_name,
 PtNodeImpl*
 SimpleHandler::read_value()
 {
-  tTokenType value_type = parser().read_token(false);
-  PtNodeImpl* value = new_ptvalue(value_type);
+  FileRegion loc;
+  tTokenType value_type = parser().read_token(loc, false);
+  PtNodeImpl* value = new_ptvalue(value_type, loc);
   return value;
 }
 
@@ -111,8 +112,9 @@ SymSimpleHandler::~SymSimpleHandler()
 PtNodeImpl*
 SymSimpleHandler::read_value()
 {
-  tTokenType value_type = parser().read_token(true);
-  PtNodeImpl* value = new_ptvalue(value_type);
+  FileRegion loc;
+  tTokenType value_type = parser().read_token(loc, true);
+  PtNodeImpl* value = new_ptvalue(value_type, loc);
   return value;
 }
 

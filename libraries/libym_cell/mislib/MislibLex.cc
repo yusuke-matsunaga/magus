@@ -30,10 +30,21 @@ MislibLex::~MislibLex()
 }
 
 // トークンを一つとってくる．
+// @param[out] loc 対応するファイル上の位置を格納する変数
 int
-MislibLex::read_token()
+MislibLex::read_token(FileRegion& loc)
 {
-  int c;
+  int token = scan();
+  loc = cur_loc();
+  return token;
+}
+
+// @brief read_token の下請け関数
+// @return トークンを返す．
+int
+MislibLex::scan()
+{
+  int c = 0;
 
   mCurString.clear();
 

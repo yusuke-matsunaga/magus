@@ -13,7 +13,6 @@
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
 #include "ym_utils/ShString.h"
-#include "ym_utils/FileInfoMgr.h"
 #include "PtNodeImpl.h"
 
 
@@ -23,6 +22,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @param[in] msg_mgr メッセージを管理するオブジェクト
 DotlibParserImpl::DotlibParserImpl(MsgMgr& msg_mgr) :
   mMsgMgr(msg_mgr),
+  mScanner(msg_mgr),
   mLibraryHandler( HandlerFactory::new_library(*this) )
 {
 }
@@ -30,8 +30,6 @@ DotlibParserImpl::DotlibParserImpl(MsgMgr& msg_mgr) :
 // デストラクタ
 DotlibParserImpl::~DotlibParserImpl()
 {
-  close_file();
-
   delete mLibraryHandler;
 }
 
@@ -49,16 +47,22 @@ DotlibParserImpl::read_file(const string& filename,
   mDebug = debug;
   mAllowNoSemi = allow_no_semi;
 
-  if ( !open_file(filename) ) {
+  if ( !mScanner.open_file(filename) ) {
+    ostringstream buf;
+    buf << filename << ": Could not open.";
+    put_msg(__FILE__, __LINE__, FileRegion(),
+	    kMsgFailure,
+	    "DOTLIB_PARSER",
+	    buf.str());
     return NULL;
   }
 
   bool error = false;
   tTokenType type;
+  FileRegion loc;
   // 空行を読み飛ばす．
-  for (type = read_token(); type == NL; type = read_token()) { }
+  for (type = read_token(loc); type == NL; type = read_token(loc)) { }
   ShString name(cur_string());
-  FileRegion loc = cur_loc();
   if ( type != SYMBOL || name != "library" ) {
     put_msg(__FILE__, __LINE__, loc,
 	    kMsgError,
@@ -79,18 +83,18 @@ DotlibParserImpl::read_file(const string& filename,
     goto last;
   }
   for ( ; ; ) {
-    tTokenType type = read_token();
+    tTokenType type = read_token(loc);
     if ( type == END ) {
       break;
     }
-    put_msg(__FILE__, __LINE__, cur_loc(),
+    put_msg(__FILE__, __LINE__, loc,
 	    kMsgWarning,
 	    "DOTLIB_PARSER",
 	    "contents after library group are ignored.");
   }
 
 last:
-  close_file();
+  mScanner.close_file();
 
   if ( error ) {
     return NULL;
@@ -121,7 +125,8 @@ DotlibParserImpl::show_stats(ostream& s)
 bool
 DotlibParserImpl::expect(tTokenType req_type)
 {
-  tTokenType type = read_token();
+  FileRegion loc;
+  tTokenType type = read_token(loc);
   if ( type == req_type ) {
     return true;
   }
@@ -149,7 +154,8 @@ DotlibParserImpl::expect(tTokenType req_type)
   }
   ostringstream buf;
   buf << "syntax error. " << type_str << " is expected.";
-  put_msg(__FILE__, __LINE__, cur_loc(),
+  put_msg(__FILE__, __LINE__,
+	  loc,
 	  kMsgError,
 	  "DOTLIB_PARSER",
 	  buf.str());
@@ -161,15 +167,17 @@ bool
 DotlibParserImpl::expect_nl()
 {
   if ( mAllowNoSemi ) {
-    tTokenType type = read_token();
+    FileRegion loc;
+    tTokenType type = read_token(loc);
     if ( type == SEMI ) {
-      type = read_token();
+      type = read_token(loc);
     }
     if ( type == NL || type == END ) {
       return true;
     }
     ostringstream buf;
-    put_msg(__FILE__, __LINE__, cur_loc(),
+    put_msg(__FILE__, __LINE__,
+	    loc,
 	    kMsgError,
 	    "DOTLIB_PARSER",
 	    "Syntax error. Semicolon is expected.");
@@ -184,22 +192,6 @@ DotlibParserImpl::expect_nl()
     }
   }
   return true;
-}
-
-// @brief 直前の read_token() に対応する整数値を返す．
-// @note 型が INT_NUM でなかったときの値は不定
-int
-DotlibParserImpl::cur_int() const
-{
-  return strtol(cur_string(), NULL, 10);
-}
-
-// @brief 直前の read_token() に対応する実数値を返す．
-// @note 型が FLOAT_NUM/INT_NUM でなかったときの値は不定
-double
-DotlibParserImpl::cur_float() const
-{
-  return strtod(cur_string(), NULL);
 }
 
 // @brief メッセージ出力管理オブジェクトを返す．
@@ -257,327 +249,6 @@ bool
 DotlibParserImpl::debug()
 {
   return mDebug;
-}
-
-// ファイルをセットする．
-// 自動的にに clear() を呼ぶ．
-// ファイルのオープンに失敗したら false を返す．
-bool
-DotlibParserImpl::open_file(const string& filename)
-{
-  if ( !mFileScanner.open_file(filename) ) {
-    ostringstream buf;
-    buf << filename << ": Could not open.";
-    put_msg(__FILE__, __LINE__, FileRegion(),
-	    kMsgFailure,
-	    "DOTLIB_PARSER",
-	    buf.str());
-    return false;
-  }
-
-  return true;
-}
-
-// ファイルをクローズする．
-void
-DotlibParserImpl::close_file()
-{
-  mFileScanner.close_file();
-}
-
-// @brief トークンを一つとってくる．
-// @param[in] symbol_mode 数字も文字とみなすモード
-tTokenType
-DotlibParserImpl::read_token(bool symbol_mode)
-{
-  mSymbolMode = symbol_mode;
-
-  int c;
-
-  mCurString.clear();
-
- ST_INIT: // 初期状態
-  c = get();
-  mFileScanner.set_first_loc();
-  if ( is_symbol(c) ) {
-    mCurString.put_char(c);
-    goto ST_ID;
-  }
-  if ( isdigit(c) ) {
-    mCurString.put_char(c);
-    goto ST_NUM1;
-  }
-
-  switch (c) {
-  case '.':
-    mCurString.put_char(c);
-    goto ST_DOT;
-
-  case EOF:
-    return END;
-
-  case ' ':
-  case '\t':
-    goto ST_INIT; // 最初の空白は読み飛ばす．
-
-  case '\n':
-    return NL;
-
-  case '\"':
-    goto ST_DQ;
-
-  case '\\':
-    c = peek();
-    if ( c == '\n' ) {
-      // 無視する．
-      accept();
-      goto ST_INIT;
-    }
-    // それ以外はバックスラッシュがなかったことにする．
-    goto ST_INIT;
-
-  case '/':
-    goto ST_COMMENT1;
-
-  case ':':
-    return COLON;
-
-  case ';':
-    return SEMI;
-
-  case ',':
-    return COMMA;
-
-  case '+':
-    return PLUS;
-
-  case '-':
-    goto ST_MINUS;
-
-  case '*':
-    return MULT;
-
-  case '(':
-    return LP;
-
-  case ')':
-    return RP;
-
-  case '{':
-    return LCB;
-
-  case '}':
-    return RCB;
-
-  default:
-    // それ以外はエラーなんじゃない？
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    "syntax error");
-    return ERROR;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-
- ST_MINUS: // '-' を読み込んだ時
-  c = peek();
-  if ( isdigit(c) ) {
-    accept();
-    mCurString.put_char('-');
-    mCurString.put_char(c);
-    goto ST_NUM1;
-  }
-  return MINUS;
-
- ST_NUM1: // 一文字目が[0-9]の時
-  c = peek();
-  if ( isdigit(c) ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_NUM1;
-  }
-  if ( c == '.' ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_DOT;
-  }
-  return INT_NUM;
-
- ST_DOT: // [0-9]*'.' を読み込んだ時
-  c = peek();
-  if ( isdigit(c) ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_NUM2;
-  }
-  { // '.' の直後はかならず数字
-    ostringstream buf;
-    buf << "digit number expected after dot";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
-    return ERROR;
-  }
-
- ST_NUM2: // [0-9]*'.'[0-9]* を読み込んだ時
-  c = peek();
-  if ( isdigit(c) ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_NUM2;
-  }
-  if ( c == 'e' || c == 'E' ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_NUM3;
-  }
-  return FLOAT_NUM;
-
- ST_NUM3: // [0-9]*'.'[0-9]*(e|E)を読み込んだ時
-  c = peek();
-  if ( isdigit(c) ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_NUM4;
-  }
-  if ( c == '+' || c == '-' ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_NUM4;
-  }
-  { // (e|E) の直後はかならず数字か符号
-    ostringstream buf;
-    buf << "exponent value expected";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
-    return ERROR;
-  }
-
- ST_NUM4: // [0-9]*'.'[0-9]*(e|E)(+|-)?[0-9]*を読み込んだ直後
-  c = peek();
-  if ( isdigit(c) ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_NUM4;
-  }
-  return FLOAT_NUM;
-
- ST_ID: // 一文字目が[a-zA-Z_]の時
-  c = peek();
-  if ( is_symbol(c) || isdigit(c) ) {
-    accept();
-    mCurString.put_char(c);
-    goto ST_ID;
-  }
-  return SYMBOL;
-
- ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
-  c = get();
-  if ( c == '\"' ) {
-    return SYMBOL;
-  }
-  if ( c == '\n' ) {
-    ostringstream buf;
-    buf << "unexpected newline in quoted string.";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
-    return ERROR;
-  }
-  if ( c == EOF ) {
-    ostringstream buf;
-    buf << "unexpected end-of-file in quoted string.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, cur_loc(),
-		    kMsgError,
-		    "DOTLIB_LEX",
-		    buf.str());
-    return ERROR;
-  }
-  if ( c == '\\' ) {
-    c = get();
-    if ( c != '\n' ) {
-      // 改行以外はバックスラッシュをそのまま解釈する．
-      mCurString.put_char('\\');
-    }
-  }
-  mCurString.put_char(c);
-  goto ST_DQ;
-
- ST_COMMENT1: // '/' を読み込んだ直後
-  c = peek();
-  if ( c == '/' ) { // C++ スタイルのコメント
-    accept();
-    goto ST_COMMENT2;
-  }
-  if ( c == '*' ) { // C スタイルのコメント
-    accept();
-    goto ST_COMMENT3;
-  }
-  return DIV;
-
- ST_COMMENT2: // 改行まで読み飛ばす．
-  c = get();
-  if ( c == '\n' ) {
-    goto ST_INIT;
-  }
-  if ( c == EOF ) {
-    return END;
-  }
-  goto ST_COMMENT2;
-
- ST_COMMENT3: // "/*" を読み込んだ直後
-  c = get();
-  if ( c == EOF ) {
-    goto ST_EOF;
-  }
-  if ( c == '*' ) {
-    goto ST_COMMENT4;
-  }
-  goto ST_COMMENT3;
-
- ST_COMMENT4: // "/* 〜 *" まで読み込んだ直後
-  c = get();
-  if ( c == EOF ) {
-    goto ST_EOF;
-  }
-  if ( c == '/' ) {
-    goto ST_INIT;
-  }
-  if ( c == '*' ) {
-    goto ST_COMMENT4;
-  }
-  goto ST_COMMENT3;
-
- ST_EOF:
-  {
-    ostringstream buf;
-    buf << "Unexpected end-of-file in comment block.";
-    put_msg(__FILE__, __LINE__, cur_loc(),
-	    kMsgError,
-	    "DOTLIB_LEX",
-	    buf.str());
-  }
-  return ERROR;
-}
-
-// @brief c が文字の時に true を返す．
-// @note mSymbolMode が true なら数字も文字とみなす．
-bool
-DotlibParserImpl::is_symbol(int c)
-{
-  if ( isalpha(c) || c == '_' ) {
-    return true;
-  }
-  if ( mSymbolMode ) {
-    if ( isdigit(c) || c == '.' ) {
-      return true;
-    }
-  }
-  return false;
 }
 
 END_NAMESPACE_YM_DOTLIB

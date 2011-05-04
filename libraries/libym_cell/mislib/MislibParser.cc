@@ -298,8 +298,7 @@ int
 MislibParser::scan(MislibPt*& lval,
 		   FileRegion& lloc)
 {
-  int tok = mLex.read_token();
-  lloc = mLex.cur_loc();
+  int tok = mLex.read_token(lloc);
 
   switch ( tok ) {
   case STR:

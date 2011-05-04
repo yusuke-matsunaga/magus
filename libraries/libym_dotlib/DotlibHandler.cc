@@ -60,28 +60,29 @@ DotlibHandler::parse_complex()
   }
 
   PtNodeImpl* value_list = pt_mgr().new_list();
-  tTokenType type = parser().read_token();
+  FileRegion loc;
+  tTokenType type = parser().read_token(loc);
   if ( type != RP ) {
     for ( ; ; ) {
-      PtNodeImpl* value = new_ptvalue(type);
+      PtNodeImpl* value = new_ptvalue(type, loc);
       if ( value == NULL ) {
 	return NULL;
       }
 
       value_list->add_node(value);
 
-      tTokenType type1 = parser().read_token();
+      tTokenType type1 = parser().read_token(loc);
       if ( type1 == RP ) {
 	break;
       }
       if ( type1 != COMMA ) {
-	put_msg(__FILE__, __LINE__, parser().cur_loc(),
+	put_msg(__FILE__, __LINE__, loc,
 		kMsgError,
 		"DOTLIB_PARSER",
 		"syntax error. ',' is expected.");
 	return NULL;
       }
-      type = parser().read_token();
+      type = parser().read_token(loc);
     }
   }
 
@@ -90,11 +91,12 @@ DotlibHandler::parse_complex()
 
 // @brief PtNode を生成する．
 // @param[in] type 型
+// @param[in] loc ファイル上の位置情報
 // @note 残りの情報は parser() からとってくる．
 PtNodeImpl*
-DotlibHandler::new_ptvalue(tTokenType type)
+DotlibHandler::new_ptvalue(tTokenType type,
+			   const FileRegion& loc)
 {
-  FileRegion loc(parser().cur_loc());
   switch ( type ) {
   case INT_NUM:
     return pt_mgr().new_int(parser().cur_int(), loc);
@@ -111,7 +113,8 @@ DotlibHandler::new_ptvalue(tTokenType type)
   default:
     break;
   }
-  put_msg(__FILE__, __LINE__, parser().cur_loc(),
+  put_msg(__FILE__, __LINE__,
+	  loc,
 	  kMsgError,
 	  "DOTLIB_PARSER",
 	  "Syntax error. int/float/string value is expected.");

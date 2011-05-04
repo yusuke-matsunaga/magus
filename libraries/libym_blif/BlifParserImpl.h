@@ -73,8 +73,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンを一つ読み出す．
+  /// @param[out] loc トークンの位置を格納する変数
   tToken
-  get_token();
+  get_token(FileRegion& loc);
 
   /// @brief トークンを戻す．
   void
@@ -89,9 +90,6 @@ private:
 
   // 字句解析器
   BlifScanner mScanner;
-
-  // 直前の get_token() の位置情報
-  FileRegion mCurLoc;
 
   // 読み戻されたトークン
   tToken mUngetToken;

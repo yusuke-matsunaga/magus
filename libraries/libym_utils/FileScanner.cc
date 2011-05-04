@@ -66,7 +66,6 @@ FileScanner::init()
   mReadPos = 0;
   mEndPos = 0;
   mCR = false;
-  mCurChar = 0;
   mCurLine = 1;
   mCurColumn = 1;
   mFirstLine = 1;
@@ -144,11 +143,10 @@ FileScanner::accept()
 {
   assert_cond( mNeedUpdate == false, __FILE__, __LINE__);
   mNeedUpdate = true;
-  mCurChar = mNextChar;
   mCurLine = mNextLine;
   mCurColumn = mNextColumn;
   // mNextLine と mNextColumn を先に設定しておく
-  if ( mCurChar == '\n' ) {
+  if ( mNextChar == '\n' ) {
     ++ mNextLine;
     mNextColumn = 0;
   }

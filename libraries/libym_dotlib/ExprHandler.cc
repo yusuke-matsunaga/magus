@@ -49,17 +49,18 @@ ExprHandler::read_value()
 PtNodeImpl*
 ExprHandler::read_primary()
 {
-  tTokenType type = parser().read_token();
+  FileRegion loc;
+  tTokenType type = parser().read_token(loc);
   if ( type == LP ) {
     return read_expr(RP);
   }
-  FileRegion loc = parser().cur_loc();
   if ( type == SYMBOL ) {
     ShString name(parser().cur_string());
     if ( name != "VDD" &&
 	 name != "VSS" &&
 	 name != "VCC" ) {
-      put_msg(__FILE__, __LINE__, loc,
+      put_msg(__FILE__, __LINE__,
+	      loc,
 	      kMsgError,
 	      "DOTLIB_PARSER",
 	      "Syntax error. "
@@ -72,7 +73,8 @@ ExprHandler::read_primary()
     return pt_mgr().new_float(parser().cur_float(), loc);
   }
 
-  put_msg(__FILE__, __LINE__, loc,
+  put_msg(__FILE__, __LINE__,
+	  loc,
 	  kMsgError,
 	  "DOTLIB_PARSER",
 	  "Syntax error. number is expected.");
@@ -89,7 +91,8 @@ ExprHandler::read_product()
   }
 
   for ( ; ; ) {
-    tTokenType type = parser().read_token();
+    FileRegion loc;
+    tTokenType type = parser().read_token(loc);
     if ( type == MULT || type == DIV ) {
       PtNodeImpl* opr2 = read_primary();
       if ( opr2 == NULL ) {
@@ -105,7 +108,7 @@ ExprHandler::read_product()
     else {
       // token を戻す．
       mUngetType = type;
-      mUngetLoc = parser().cur_loc();
+      mUngetLoc = loc;
       return opr1;
     }
   }
@@ -116,14 +119,15 @@ PtNodeImpl*
 ExprHandler::read_expr(tTokenType end_marker)
 {
   // ここだけ mUngetType, mUngetLoc を考慮する必要があるので
-  // parser().read_token(), parser().cur_loc() を読んではいけない．
+  // じかに parser().read_token() を呼んではいけない．
 
   PtNodeImpl* opr1 = read_product();
   if ( opr1 == NULL ) {
     return NULL;
   }
   for ( ; ; ) {
-    tTokenType type = read_token();
+    FileRegion loc;
+    tTokenType type = read_token(loc);
     if ( type == end_marker ) {
       return opr1;
     }
@@ -140,7 +144,8 @@ ExprHandler::read_expr(tTokenType end_marker)
       }
     }
     else {
-      put_msg(__FILE__, __LINE__, cur_loc(),
+      put_msg(__FILE__, __LINE__,
+	      loc,
 	      kMsgError,
 	      "DOTLIB_PARSER",
 	      "Syntax error.");
@@ -150,27 +155,19 @@ ExprHandler::read_expr(tTokenType end_marker)
 }
 
 // @brief トークンを読み込む．
+// @param[out] loc 対応するファイル上の位置情報を格納する変数
 tTokenType
-ExprHandler::read_token()
+ExprHandler::read_token(FileRegion& loc)
 {
   if ( mUngetType != ERROR ) {
     tTokenType ans = mUngetType;
-    mCurLoc = mUngetLoc;
+    loc = mUngetLoc;
     mUngetType = ERROR;
     return ans;
   }
   else {
-    tTokenType ans = parser().read_token();
-    mCurLoc = parser().cur_loc();
-    return ans;
+    return parser().read_token(loc);
   }
-}
-
-// @brief 直前に読み込んだトークンの位置を返す．
-FileRegion
-ExprHandler::cur_loc()
-{
-  return mCurLoc;
 }
 
 END_NAMESPACE_YM_DOTLIB

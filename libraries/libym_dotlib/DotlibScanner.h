@@ -1,8 +1,8 @@
-#ifndef LIBYM_DOTLIB_DOTLIBPARSERIMPL_H
-#define LIBYM_DOTLIB_DOTLIBPARSERIMPL_H
+#ifndef LIBYM_DOTLIB_DOTLIBSCANNER_H
+#define LIBYM_DOTLIB_DOTLIBSCANNER_H
 
-/// @file libym_dotlib/DotlibParserImpl.h
-/// @brief DotlibParserImpl のヘッダファイル
+/// @file libym_dotlib/DotlibScanner.h
+/// @brief DotlibScanner のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: DotlibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
@@ -12,65 +12,32 @@
 
 
 #include "dotlib_int.h"
-#include "DotlibScanner.h"
+#include "ym_utils/FileScanner.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileRegion.h"
-#include "PtMgr.h"
+#include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class DotlibParserImpl DotlibParserImpl.h "DotlibParserImpl.h"
-/// @brief DotlibParser の実装クラス
+/// @class DotlibScanner DotlibScanner.h "DotlibScanner.h"
+/// @brief dotlib フォーマットの字句解析器
 //////////////////////////////////////////////////////////////////////
-class DotlibParserImpl
+class DotlibScanner :
+  public FileScanner
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] msg_mgr メッセージを管理するオブジェクト
-  DotlibParserImpl(MsgMgr& msg_mgr);
+  DotlibScanner(MsgMgr& msg_mgr);
 
   /// @brief デストラクタ
-  ~DotlibParserImpl();
+  ~DotlibScanner();
 
 
 public:
-
-  /// @brief ファイルを読み込む．
-  /// @param[in] filename ファイル名
-  /// @param[in] debug デバッグモード
-  /// @param[in] allow_no_semi 行末のセミコロンなしを許すかどうか
-  /// @return パース木の根のノードを返す．
-  /// @note エラーが起きたら NULL を返す．
-  const DotlibNode*
-  read_file(const string& filename,
-	    bool debug,
-	    bool allow_no_semi = true);
-
-  /// @brief 直前の read_file() で確保したパース木を解放する．
-  void
-  clear_node();
-
-  /// @brief メモリ使用量のサマリを出力する．
-  /// @param[in] s 出力先のストリーム
-  void
-  show_stats(ostream& s);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // DotlibHandler から用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
-  bool
-  expect(tTokenType type);
-
-  /// @brief 行末まで読み込む．
-  bool
-  expect_nl();
 
   /// @brief トークンを一つ読み込む．
   /// @param[out] loc ファイル上の位置情報を格納する変数
@@ -128,13 +95,21 @@ public:
 	  const char* label,
 	  const string& msg);
 
-  /// @brief パース木を管理するオブジェクトを返す．
-  PtMgr&
-  pt_mgr();
 
-  /// @brief デバッグモードの時 true を返す．
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief read_token() の下請け関数
+  /// @return トークンの型を返す．
+  tTokenType
+  scan();
+
+  /// @brief c が文字の時に true を返す．
+  /// @note mSymbolMode が true なら数字も文字とみなす．
   bool
-  debug();
+  is_symbol(int c);
 
 
 private:
@@ -145,20 +120,11 @@ private:
   // メッセージを管理するオブジェクト
   MsgMgr& mMsgMgr;
 
-  // 字句解析器
-  DotlibScanner mScanner;
+  // シンボルモード
+  bool mSymbolMode;
 
-  // DotlibNode を管理するオブジェクト
-  PtMgr mPtMgr;
-
-  // library グループを処理するハンドラ
-  DotlibHandler* mLibraryHandler;
-
-  // デバッグモード
-  bool mDebug;
-
-  // 行末のセミコロンなしを許すかどうかのフラグ
-  bool mAllowNoSemi;
+  // read_token の結果の文字列を格納する
+  StrBuff mCurString;
 
 };
 
@@ -167,44 +133,14 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief トークンを一つ読み込む．
-// @param[out] loc ファイル上の位置情報を格納する変数
-// @param[in] symbol_mode 数字も文字とみなすモード
-// @return トークンの型を返す．
-inline
-tTokenType
-DotlibParserImpl::read_token(FileRegion& loc,
-			     bool symbol_mode)
-{
-  return mScanner.read_token(loc, symbol_mode);
-}
-
-// @brief 直前の read_token() に対応する文字列を返す．
+// 直前の read_token() に対応する文字列を返す．
 inline
 const char*
-DotlibParserImpl::cur_string() const
+DotlibScanner::cur_string() const
 {
-  return mScanner.cur_string();
-}
-
-// @brief 直前の read_token() に対応する整数値を返す．
-// @note 型が INT_NUM でなかったときの値は不定
-inline
-int
-DotlibParserImpl::cur_int() const
-{
-  return mScanner.cur_int();
-}
-
-// @brief 直前の read_token() に対応する実数値を返す．
-// @note 型が FLOAT_NUM/INT_NUM でなかったときの値は不定
-inline
-double
-DotlibParserImpl::cur_float() const
-{
-  return mScanner.cur_float();
+  return mCurString.c_str();
 }
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // LIBYM_DOTLIB_DOTLIBPARSERIMPL_H
+#endif // LIBYM_DOTLIB_DOTLIBSCANNER_H

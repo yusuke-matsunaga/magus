@@ -7,15 +7,13 @@
 ///
 /// $Id: Iscas89Scanner.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_iscas89/iscas89_nsdef.h"
-#include "ym_utils/StrBuff.h"
-#include "ym_utils/FileInfo.h"
-#include "ym_utils/FileRegion.h"
 #include "ym_utils/FileScanner.h"
+#include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
@@ -39,12 +37,24 @@ public:
 public:
 
   /// @brief トークンを一つ読み出す．
+  /// @param[out] loc トークンの位置を格納する変数
   int
-  get_token();
+  read_token(FileRegion& loc);
 
-  /// @brief 最後の get_token() で読み出した字句の文字列を返す．
-  const StrBuff&
+  /// @brief 最後の read_token() で読み出した字句の文字列を返す．
+  const char*
   cur_string();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief read_token() の下請け関数
+  /// @return トークンを返す．
+  int
+  scan();
 
 
 private:
@@ -62,12 +72,12 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 最後の get_token() で読み出した字句の文字列を返す．
+// @brief 最後の read_token() で読み出した字句の文字列を返す．
 inline
-const StrBuff&
+const char*
 Iscas89Scanner::cur_string()
 {
-  return mCurString;
+  return mCurString.c_str();
 }
 
 END_NAMESPACE_YM_ISCAS89

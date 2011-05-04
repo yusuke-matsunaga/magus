@@ -102,8 +102,7 @@ int
 Iscas89ParserImpl::scan(ymuint32& lval,
 			FileRegion& lloc)
 {
-  int id = mScanner.get_token();
-  lloc = mScanner.cur_loc();
+  int id = mScanner.read_token(lloc);
   if ( id == NAME ) {
     lval = reg_str(mScanner.cur_string(), lloc);
   }
@@ -222,10 +221,10 @@ Iscas89ParserImpl::push_str(ymuint32 str_id)
 // @param[in] loc 文字列の位置情報
 // @return 文字列の ID 番号
 ymuint32
-Iscas89ParserImpl::reg_str(const StrBuff& src_str,
+Iscas89ParserImpl::reg_str(const char* src_str,
 			   const FileRegion& loc)
 {
-  IdCell* cell = mIdHash.find(src_str.c_str(), true);
+  IdCell* cell = mIdHash.find(src_str, true);
   cell->set_loc(loc);
   return cell->id();
 }

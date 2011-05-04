@@ -29,8 +29,8 @@ BEGIN_NAMESPACE_YM
 /// - 一文字読み出し     (get)
 /// - 一文字の先読み     (peek)
 /// - 先読みした文字の確定 (accept)
-/// で，直前の get(), accept() に対応するファイル上の位置を
-/// cur_line, cur_column で返す．
+/// これ以外にトークンの開始位置を set_first_loc() で記録して
+/// cur_loc() で現在の位置までの領域を求める．
 //////////////////////////////////////////////////////////////////////
 class FileScanner
 {
@@ -61,6 +61,12 @@ public:
   void
   close_file();
 
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 一文字読み出す．
   /// @note 実際には peek(); acept() と等価
   int
@@ -78,24 +84,6 @@ public:
   /// @brief 現在の位置をトークンの最初の位置にセットする．
   void
   set_first_loc();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を取り出す関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ファイル情報を返す．
-  FileInfo
-  file_info() const;
-
-  /// @brief 現在の行番号を返す．
-  ymuint
-  cur_line() const;
-
-  /// @brief 現在のコラム位置を返す．
-  ymuint
-  cur_column() const;
 
   /// @brief 直前の set_first_loc() から現在の位置までを返す．
   FileRegion
@@ -135,9 +123,6 @@ private:
   // 直前の文字が \r の時に true となるフラグ
   bool mCR;
 
-  // 現在の文字
-  ymint16 mCurChar;
-
   // 現在の行番号
   ymuint32 mCurLine;
 
@@ -176,31 +161,7 @@ FileScanner::get()
 {
   (void) peek();
   accept();
-  return mCurChar;
-}
-
-// @brief ファイル情報を返す．
-inline
-FileInfo
-FileScanner::file_info() const
-{
-  return mFileInfo;
-}
-
-// 現在の行番号を返す．
-inline
-ymuint
-FileScanner::cur_line() const
-{
-  return mCurLine;
-}
-
-// 現在のコラム位置を返す．
-inline
-ymuint
-FileScanner::cur_column() const
-{
-  return mCurColumn;
+  return mNextChar;
 }
 
 // @brief 直前の set_first_loc() から現在の位置までを返す．

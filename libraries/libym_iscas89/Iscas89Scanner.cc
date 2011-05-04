@@ -12,13 +12,16 @@
 #include "Iscas89Scanner.h"
 
 
+BEGIN_NONAMESPACE
+
+// read_token() の動作をデバッグするときに true にする．
+const bool debug_read_token = false;
+
+END_NONAMESPACE
+
 BEGIN_NAMESPACE_YM_ISCAS89
 
 #include "iscas89_grammer.h"
-
-// get_token() の動作をデバッグするときに true にする．
-static
-const bool debug_get_token = false;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -36,15 +39,46 @@ Iscas89Scanner::~Iscas89Scanner()
 }
 
 // @brief トークンを一つ読み出す．
+// @param[out] loc トークンの位置を格納する変数
 int
-Iscas89Scanner::get_token()
+Iscas89Scanner::read_token(FileRegion& loc)
 {
-  if ( debug_get_token ) {
-    cerr << "get_token()" << " --> ";
+  int token = scan();
+  loc = cur_loc();
+
+  if ( debug_read_token ) {
+    cerr << "read_token()" << " --> "
+	 << loc << ": ";
+    switch ( token ) {
+    case INPUT:  cerr << "INPUT"; break;
+    case OUTPUT: cerr << "OUTPUT"; break;
+    case BUFF:   cerr << "BUFF"; break;
+    case NOT:    cerr << "NOT"; break;
+    case AND:    cerr << "AND"; break;
+    case NAND:   cerr << "NAND"; break;
+    case OR:     cerr << "OR"; break;
+    case NOR:    cerr << "NOR"; break;
+    case XOR:    cerr << "XOR"; break;
+    case XNOR:   cerr << "XNOR"; break;
+    case DFF:    cerr << "DFF"; break;
+    case NAME:   cerr << "NAME(" << cur_string() << ")"; break;
+    case EOF:    cerr << "EOF"; break;
+    default:     cerr << static_cast<char>(token); break;
+    }
+    cerr << endl;
   }
 
-  mCurString = "";
+  return token;
+}
+
+// @brief read_token() の下請け関数
+// @return トークンを返す．
+int
+Iscas89Scanner::scan()
+{
   int c;
+
+  mCurString = "";
 
   // 状態遷移を goto 文で表現したもの
   // 効率はよい．
@@ -54,9 +88,6 @@ Iscas89Scanner::get_token()
   set_first_loc();
   switch ( c ) {
   case EOF:
-    if ( debug_get_token ) {
-      cerr << "EOF" << endl;
-    }
     return EOF;
 
   case ' ':
@@ -69,27 +100,15 @@ Iscas89Scanner::get_token()
     goto ST_SHARP;
 
   case '=':
-    if ( debug_get_token ) {
-      cerr << "=" << endl;
-    }
     return '=';
 
   case '(':
-    if ( debug_get_token ) {
-      cerr << "(" << endl;
-    }
     return '(';
 
   case ')':
-    if ( debug_get_token ) {
-      cerr << ")" << endl;
-    }
     return ')';
 
   case ',':
-    if ( debug_get_token ) {
-      cerr << "," << endl;
-    }
     return ',';
 
   default:
@@ -124,79 +143,40 @@ Iscas89Scanner::get_token()
 
     // 予約後の検索
     if ( mCurString == "INPUT" ) {
-      if ( debug_get_token ) {
-	cerr << "INPUT" << endl;
-      }
       return INPUT;
     }
     if ( mCurString == "OUTPUT" ) {
-      if ( debug_get_token ) {
-	cerr << "OUTPUT" << endl;
-      }
       return OUTPUT;
     }
     if ( mCurString == "BUFF" ) {
-      if ( debug_get_token ) {
-	cerr << "BUFF" << endl;
-      }
       return BUFF;
     }
     if ( mCurString == "NOT" ) {
-      if ( debug_get_token ) {
-	cerr << "NOT" << endl;
-      }
       return NOT;
     }
     if ( mCurString == "INV" ) {
-      if ( debug_get_token ) {
-	cerr << "INV" << endl;
-      }
       return NOT;
     }
     if ( mCurString == "AND" ) {
-      if ( debug_get_token ) {
-	cerr << "AND" << endl;
-      }
       return AND;
     }
     if ( mCurString == "NAND" ) {
-      if ( debug_get_token ) {
-	cerr << "NAND" << endl;
-      }
       return NAND;
     }
     if ( mCurString == "OR" ) {
-      if ( debug_get_token ) {
-	cerr << "OR" << endl;
-      }
       return OR;
     }
     if ( mCurString == "NOR" ) {
-      if ( debug_get_token ) {
-	cerr << "NOR" << endl;
-      }
       return NOR;
     }
     if ( mCurString == "XOR" ) {
-      if ( debug_get_token ) {
-	cerr << "XOR" << endl;
-      }
       return XOR;
     }
     if ( mCurString == "XNOR" ) {
-      if ( debug_get_token ) {
-	cerr << "XNOR" << endl;
-      }
       return XNOR;
     }
     if ( mCurString == "DFF" ) {
-      if ( debug_get_token ) {
-	cerr << "DFF" << endl;
-      }
       return DFF;
-    }
-    if ( debug_get_token ) {
-      cerr << "NAME(\'" << mCurString << "\')" << endl;
     }
     return NAME;
 

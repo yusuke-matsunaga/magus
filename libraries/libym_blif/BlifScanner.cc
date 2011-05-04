@@ -5,7 +5,7 @@
 ///
 /// $Id: BlifScanner.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,9 +14,12 @@
 
 BEGIN_NAMESPACE_YM_BLIF
 
-// get_token() の動作をデバッグするときに true にする．
-static
-const bool debug_get_token = false;
+BEGIN_NONAMESPACE
+
+// read_token() の動作をデバッグするときに true にする．
+const bool debug_read_token = false;
+
+END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
@@ -34,13 +37,31 @@ BlifScanner::~BlifScanner()
 }
 
 // @brief トークンを一つ読み出す．
+// @param[out] loc トークンの位置を格納する変数
 tToken
-BlifScanner::get_token()
+BlifScanner::read_token(FileRegion& loc)
 {
-  if ( debug_get_token ) {
-    cerr << "get_token()" << " --> ";
+  tToken token = scan();
+  loc = cur_loc();
+
+  if ( debug_read_token ) {
+    cerr << "read_token()" << " --> "
+	 << loc << ": "
+	 << token;
+    if ( token == kTokenSTRING ) {
+      cerr << "(\'" << cur_string() << "\')";
+    }
+    cerr<< endl;
   }
 
+  return token;
+}
+
+// @brief read_token() の下請け関数
+// @return トークンを返す．
+tToken
+BlifScanner::scan()
+{
   mCurString = "";
   bool StartWithDot = false;
   int c;
@@ -54,9 +75,6 @@ BlifScanner::get_token()
 
   switch ( c ) {
   case EOF:
-    if ( debug_get_token ) {
-      cerr << kTokenEOF << endl;
-    }
     return kTokenEOF;
 
   case ' ':
@@ -65,15 +83,9 @@ BlifScanner::get_token()
     goto ST_INIT;
 
   case '\n':
-    if ( debug_get_token ) {
-      cerr << kTokenNL << endl;
-    }
     return kTokenNL;
 
   case '=':
-    if ( debug_get_token ) {
-      cerr << kTokenEQ << endl;
-    }
     return kTokenEQ;
 
   case '.':
@@ -141,20 +153,7 @@ BlifScanner::get_token()
   }
   if ( c == EOF ) {
     // これはおかしいけど無視する．
-    if ( StartWithDot ) {
-      // 予約後の検索
-      tToken token = mDic.get_token(mCurString.c_str());
-      if ( token != kTokenEOF ) {
-	if ( debug_get_token ) {
-	  cerr << token << endl;
-	}
-	return token;
-      }
-    }
-    if ( debug_get_token ) {
-      cerr << kTokenSTRING << "(\'" << mCurString << "\')" << endl;
-    }
-    return kTokenSTRING;
+    return check_word(StartWithDot);
   }
   // それ以外は普通の文字として扱う．
   mCurString.put_char(c);
@@ -171,26 +170,29 @@ BlifScanner::get_token()
   case '\\':
   case EOF:
     // 文字列の終わり
-    if ( StartWithDot ) {
-      // 予約後の検索
-      tToken token = mDic.get_token(mCurString.c_str());
-      if ( token != kTokenEOF ) {
-	if ( debug_get_token ) {
-	  cerr << token << endl;
-	}
-	return token;
-      }
-    }
-    if ( debug_get_token ) {
-      cerr << kTokenSTRING << "(\'" << mCurString << "\')" << endl;
-    }
-    return kTokenSTRING;
+    return check_word(StartWithDot);
 
   default:
     accept();
     mCurString.put_char(c);
     goto ST_STR;
   }
+}
+
+// @brief 予約後の検査をする．
+// @param[in] start_with_dot '.' で始まっている時に true を渡す．
+// @return トークンを返す．
+tToken
+BlifScanner::check_word(bool start_with_dot)
+{
+  if ( start_with_dot ) {
+    // 予約後の検索
+    tToken token = mDic.get_token(cur_string());
+    if ( token != kTokenEOF ) {
+      return token;
+    }
+  }
+  return kTokenSTRING;
 }
 
 END_NAMESPACE_YM_BLIF

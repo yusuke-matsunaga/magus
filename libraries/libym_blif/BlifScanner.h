@@ -12,10 +12,8 @@
 
 
 #include "ym_blif/blif_nsdef.h"
-#include "ym_utils/StrBuff.h"
-#include "ym_utils/FileInfo.h"
-#include "ym_utils/FileRegion.h"
 #include "ym_utils/FileScanner.h"
+#include "ym_utils/StrBuff.h"
 #include "BlifDic.h"
 
 
@@ -40,12 +38,30 @@ public:
 public:
 
   /// @brief トークンを一つ読み出す．
+  /// @param[out] loc トークンの位置を格納する変数
   tToken
-  get_token();
+  read_token(FileRegion& loc);
 
   /// @brief 最後の get_token() で読み出した字句の文字列を返す．
-  const StrBuff&
+  const char*
   cur_string();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief read_token() の下請け関数
+  /// @return トークンを返す．
+  tToken
+  scan();
+
+  /// @brief 予約後の検査をする．
+  /// @param[in] start_with_dot '.' で始まっている時に true を渡す．
+  /// @return トークンを返す．
+  tToken
+  check_word(bool start_with_dot);
 
 
 private:
@@ -68,10 +84,10 @@ private:
 
 // @brief 最後の get_token() で読み出した字句の文字列を返す．
 inline
-const StrBuff&
+const char*
 BlifScanner::cur_string()
 {
-  return mCurString;
+  return mCurString.c_str();
 }
 
 END_NAMESPACE_YM_BLIF

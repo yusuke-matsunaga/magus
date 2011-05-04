@@ -97,14 +97,6 @@ public:
   void
   push_str(ymuint32 str_id);
 
-  /// @brief 文字列用の領域を確保する．
-  /// @param[in] src_str ソース文字列
-  /// @param[in] loc 文字列の位置情報
-  /// @return 文字列の ID 番号
-  ymuint32
-  reg_str(const StrBuff& src_str,
-	  const FileRegion& loc);
-
   /// @brief ID 番号から IdCell を得る．
   IdCell*
   id2cell(ymuint32 id) const;
@@ -116,6 +108,20 @@ public:
   /// @brief ID 番号から位置情報を得る．
   FileRegion
   id2loc(ymuint32 id) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 文字列用の領域を確保する．
+  /// @param[in] src_str ソース文字列
+  /// @param[in] loc 文字列の位置情報
+  /// @return 文字列の ID 番号
+  ymuint32
+  reg_str(const char* src_str,
+	  const FileRegion& loc);
 
 
 private:

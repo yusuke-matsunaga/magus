@@ -85,9 +85,11 @@ protected:
 
   /// @brief DotlibNode (の派生クラス)を生成する．
   /// @param[in] type 型
+  /// @param[in] loc ファイル上の位置情報
   /// @note 残りの情報は parser() からとってくる．
   PtNodeImpl*
-  new_ptvalue(tTokenType type);
+  new_ptvalue(tTokenType type,
+	      const FileRegion& loc);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．
   /// @param[in] req_type 要求するトークンの型

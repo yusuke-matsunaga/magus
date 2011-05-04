@@ -41,8 +41,9 @@ public:
 public:
 
   /// @brief トークンを一つとってくる．
+  /// @param[out] loc 対応するファイル上の位置を格納する変数
   int
-  read_token();
+  read_token(FileRegion& loc);
 
   /// @brief 直前の read_token() に対応する文字列を返す．
   const char*
@@ -51,6 +52,17 @@ public:
   /// @brief cur_string() を double に変換したものを返す．
   double
   cur_num() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief read_token の下請け関数
+  /// @return トークンを返す．
+  int
+  scan();
 
 
 private:

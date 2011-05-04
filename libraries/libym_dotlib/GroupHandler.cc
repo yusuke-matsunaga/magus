@@ -64,16 +64,17 @@ GroupHandler::read_attr(const ShString& attr_name,
   }
 
   for ( ; ; ) {
-    tTokenType type = parser().read_token();
+    FileRegion loc;
+    tTokenType type = parser().read_token(loc);
     if ( type == NL ) {
       continue;
     }
     if ( type == RCB ) {
       break;
     }
-    FileRegion loc = parser().cur_loc();
     if ( type != SYMBOL ) {
-      put_msg(__FILE__, __LINE__, loc,
+      put_msg(__FILE__, __LINE__,
+	      loc,
 	      kMsgError,
 	      "DOTLIB_PARSER",
 	      "string value is expected.");
@@ -84,7 +85,8 @@ GroupHandler::read_attr(const ShString& attr_name,
     if ( handler == NULL ) {
       ostringstream buf;
       buf << name << ": unknown keyword.";
-      put_msg(__FILE__, __LINE__, loc,
+      put_msg(__FILE__, __LINE__,
+	      loc,
 	      kMsgError,
 	      "DOTLIB_PARSER",
 	      buf.str());

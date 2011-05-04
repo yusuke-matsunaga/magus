@@ -30,6 +30,8 @@ libym_dotlib_la_SOURCES = \
 	DotlibParser.cc \
 	DotlibParserImpl.h \
 	DotlibParserImpl.cc \
+	DotlibScanner.h \
+	DotlibScanner.cc \
 	DotlibHandler.h \
 	DotlibHandler.cc \
 	SimpleHandler.h \
