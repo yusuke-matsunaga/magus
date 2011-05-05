@@ -124,31 +124,14 @@ const CellLibrary*
 gen_library(const string& lib_name,
 	    const MislibNode* gate_list)
 {
-  bool error = false;
-
-  // 名前が重複していないかチェック
-  hash_map<ShString, const MislibNode*> gate_map;
-  for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
-    ShString name = gate->name()->str();
-    hash_map<ShString, const MislibNode*>::iterator p = gate_map.find(name);
-    if ( p != gate_map.end() ) {
-      // TODO エラーメッセージをちゃんとする．
-      cerr << name << " is already defined" << endl;
-      error = true;
-    }
-    else {
-      gate_map.insert(make_pair(name, gate));
-    }
-  }
-  if ( error ) {
-    return NULL;
-  }
-
   // ライブラリの生成
   CiLibrary* library = new CiLibrary(lib_name);
 
   // セル数の設定
-  ymuint cell_num = gate_map.size();
+  ymuint cell_num = 0;
+  for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
+    ++ cell_num;
+  }
   library->set_cell_num(cell_num);
 
   // セルの内容の設定
@@ -169,38 +152,10 @@ gen_library(const string& lib_name,
       for (const MislibNode* pin = ipin_list->top(); pin; pin = pin->next()) {
 	assert_cond( pin->type() == MislibNode::kPin, __FILE__, __LINE__);
 	ShString name = pin->name()->str();
-	if ( ipin_name_map.count(name) > 0 ) {
-	  // 同じ名前のピンが既にある．
-	  cerr << name << " is appeared more than once" << endl;
-	  error = true;
-	}
-	else {
-	  ipin_name_map.insert(make_pair(name, ipin_array.size()));
-	  ipin_array.push_back(pin);
-	  ipin_name_list.push_back(name);
-	}
-      }
-      // 念のため，論理式に現れるピン名と比較してみる．
-      vector<ShString> ipin_name_list2;
-      hash_map<ShString, ymuint> ipin_name_map2;
-      dfs(opin_expr, ipin_name_list2, ipin_name_map2);
-      for (ymuint i = 0; i < ipin_array.size(); ++ i) {
-	ShString name = ipin_array[i]->name()->str();
-	if ( ipin_name_map2.count(name) == 0 ) {
-	  // 入力ピン記述には現れているが，論理式には現れない
-	  // これは警告
-	  cerr << name << " is not appeared in the logic expression" << endl;
-	}
-      }
-      for (ymuint i = 0; i < ipin_name_list2.size(); ++ i) {
-	ShString name = ipin_name_list2[i];
-	if ( ipin_name_map.count(name) == 0 ) {
-	  // 論理式に現れる名前の入力ピンが存在しない．
-	  // これはエラー
-	  cerr << name << " is appeared in the logic expression,"
-	       << " but has no pin definition" << endl;
-	  error = true;
-	}
+	assert_cond( ipin_name_map.count(name) == 0, __FILE__, __LINE__);
+	ipin_name_map.insert(make_pair(name, ipin_array.size()));
+	ipin_array.push_back(pin);
+	ipin_name_list.push_back(name);
       }
     }
     else if ( ipin_list->type() == MislibNode::kPin ) {
@@ -261,11 +216,6 @@ gen_library(const string& lib_name,
 					       r_r, f_r);
       library->set_opin_timing(opin, i, sense, timing);
     }
-  }
-
-  if ( error ) {
-    delete library;
-    return NULL;
   }
 
   return library;
