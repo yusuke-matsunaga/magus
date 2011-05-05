@@ -91,6 +91,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 論理演算を伴った代入
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 自分自身を否定する．
   /// @return 自身への参照を返す．
@@ -120,11 +123,14 @@ public:
   /// @param[in] pol 極性
   /// @return 自身への参照を返す．
   const TvFunc&
-  cofactor(ymuint varid,
-	   tPol pol);
+  set_cofactor(ymuint varid,
+	       tPol pol);
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  //　情報の取得
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力数を得る．
   ymuint
@@ -199,12 +205,6 @@ public:
 	    tVarId pos2,
 	    tPol pol = kPolPosi) const;
 
-  /// @brief npnmap に従った変換を行う．
-  /// @param[in] npnmap 変換マップ
-  /// @return 変換した関数を返す．
-  TvFunc
-  xform(const NpnMap& npnmap) const;
-
   /// @brief ハッシュ値を返す．
   ymuint
   hash() const;
@@ -219,6 +219,29 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 論理演算
+  // 多くは演算子のオーバーロードになっているのでここは少ない．
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コファクターを返す．
+  /// @param[in] varid 変数番号
+  /// @param[in] pol 極性
+  TvFunc
+  cofactor(ymuint varid,
+	   tPol pol) const;
+
+  /// @brief npnmap に従った変換を行う．
+  /// @param[in] npnmap 変換マップ
+  /// @return 変換した関数を返す．
+  TvFunc
+  xform(const NpnMap& npnmap) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // その他の実装依存の関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief ブロック数を得る．
   ymuint
@@ -230,6 +253,10 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // フレンド関数の定義
+  // ここの public に意味はない
+  //////////////////////////////////////////////////////////////////////
 
   friend
   bool
@@ -240,6 +267,11 @@ public:
   bool
   operator<(const TvFunc& func1,
 	    const TvFunc& func2);
+
+  friend
+  bool
+  operator&&(const TvFunc& func1,
+	     const TvFunc& func2);
 
 
 private:
@@ -349,6 +381,12 @@ operator>=(const TvFunc& src1,
 	   const TvFunc& src2);
 
 /// @relates TvFunc
+/// @brief 交差チェック
+bool
+operator&&(const TvFunc& src1,
+	   const TvFunc& src2);
+
+/// @relates TvFunc
 /// @brief ストリームに対する出力
 ostream&
 operator<<(ostream& s,
@@ -452,6 +490,17 @@ operator^(const TvFunc& src1,
 	  const TvFunc& src2)
 {
   return TvFunc(src1).operator^=(src2);
+}
+
+// @brief コファクターを返す．
+// @param[in] varid 変数番号
+// @param[in] pol 極性
+inline
+TvFunc
+TvFunc::cofactor(ymuint varid,
+		 tPol pol) const
+{
+  return TvFunc(*this).set_cofactor(varid, pol);
 }
 
 // 等価比較
