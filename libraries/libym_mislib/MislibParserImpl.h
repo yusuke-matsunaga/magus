@@ -13,7 +13,6 @@
 
 #include "ym_mislib/mislib_nsdef.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
 
 #include "MislibNodeImpl.h"
@@ -21,6 +20,8 @@
 
 
 BEGIN_NAMESPACE_YM_MISLIB
+
+class MislibMgrImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MislibParserImpl MislibParserImpl.h "MislibParserImpl.h"
@@ -41,85 +42,18 @@ public:
 
   /// @brief mislib ファイルを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] mgr MislibNode を管理するオブジェクト
   /// @return パース木の根のノードを返す．
-  /// @note 読み込みが失敗したら NULL を返す．
-  const MislibNode*
-  read(const string& filename);
+  /// @note 読み込みが失敗したら false を返す．
+  bool
+  read_file(const string& filename,
+	    MislibMgrImpl* mgr);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // mislib_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 今までに生成したすべてのオブジェクトを解放する．
-  void
-  clear();
-
-  /// @brief リストノードを生成する．
-  MislibNodeImpl*
-  new_list();
-
-  /// @brief NOT ノードを生成する．
-  MislibNodeImpl*
-  new_not(const FileRegion& loc,
-	  const MislibNode* child1);
-
-  /// @brief AND ノードを生成する．
-  MislibNodeImpl*
-  new_and(const FileRegion& loc,
-	  const MislibNode* child1,
-	  const MislibNode* child2);
-
-  /// @brief OR ノードを生成する．
-  MislibNodeImpl*
-  new_or(const FileRegion& loc,
-	 const MislibNode* child1,
-	 const MislibNode* child2);
-
-  /// @brief XOR ノードを生成する．
-  MislibNodeImpl*
-  new_xor(const FileRegion& loc,
-	  const MislibNode* child1,
-	  const MislibNode* child2);
-
-  /// @brief PIN ノードを生成する．
-  MislibNodeImpl*
-  new_pin(const FileRegion& loc,
-	  const MislibNode* name,
-	  const MislibNode* phase,
-	  const MislibNode* input_load,
-	  const MislibNode* max_load,
-	  const MislibNode* rise_block_delay,
-	  const MislibNode* rise_fanout_delay,
-	  const MislibNode* fall_block_delay,
-	  const MislibNode* fall_fanout_delay);
-
-  /// @brief GATE ノードを生成する．(通常版)
-  void
-  new_gate1(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr,
-	    const MislibNode* ipin_list);
-
-  /// @brief GATE ノードを生成する．(ワイルドカードの入力ピン)
-  void
-  new_gate2(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr,
-	    const MislibNode* ipin);
-
-  /// @brief GATE ノードを生成する．(入力ピンなし:定数ノード)
-  void
-  new_gate3(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr);
 
   /// @brief 字句解析を行う．
   /// @param[out] lval トークンの値を格納する変数
@@ -138,53 +72,14 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部でのみ使われるメンバ関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 文字列ノードを生成する．
-  MislibNodeImpl*
-  new_str(const FileRegion& loc,
-	  ShString str);
-
-  /// @brief 数値ノードを生成する．
-  MislibNodeImpl*
-  new_num(const FileRegion& loc,
-	  double num);
-
-  /// @brief NONINV ノードを生成する．
-  MislibNodeImpl*
-  new_noninv(const FileRegion& loc);
-
-  /// @brief INV ノードを生成する．
-  MislibNodeImpl*
-  new_inv(const FileRegion& loc);
-
-  /// @brief UNKNOWN ノードを生成する．
-  MislibNodeImpl*
-  new_unknown(const FileRegion& loc);
-
-  /// @brief 定数0ノードを生成する．
-  MislibNodeImpl*
-  new_const0(const FileRegion& loc);
-
-  /// @brief 定数1ノードを生成する．
-  MislibNodeImpl*
-  new_const1(const FileRegion& loc);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // const MislibNode のメモリ確保用アロケータ
-  SimpleAlloc mAlloc;
 
   // 字句解析器
   MislibLex mLex;
 
-  // ゲートのリスト
-  MislibNodeImpl* mGateList;
+  // MislibNode を管理するオブジェクト
+  MislibMgrImpl* mMislibMgr;
 
   // 読み込み時のエラーの有無を示すフラグ
   bool mError;

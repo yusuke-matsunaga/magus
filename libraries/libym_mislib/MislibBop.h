@@ -77,7 +77,7 @@ private:
 class MislibAnd :
   public MislibBop
 {
-  friend class MislibParserImpl;
+  friend class MislibMgrImpl;
 
 private:
 
@@ -123,7 +123,7 @@ public:
 class MislibOr :
   public MislibBop
 {
-  friend class MislibParserImpl;
+  friend class MislibMgrImpl;
 
 private:
 
@@ -169,7 +169,7 @@ public:
 class MislibXor :
   public MislibBop
 {
-  friend class MislibParserImpl;
+  friend class MislibMgrImpl;
 
 private:
 

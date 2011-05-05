@@ -10,6 +10,7 @@
 
 
 #include "ym_mislib/MislibParser.h"
+#include "ym_mislib/MislibMgr.h"
 #include "MislibParserImpl.h"
 
 
@@ -33,12 +34,14 @@ MislibParser::~MislibParser()
 
 // @brief mislib ファイルを読み込んでライブラリを生成する．
 // @param[in] filename ファイル名
-// @return パース木の根のノードを返す．
-// @note 読み込みが失敗したら NULL を返す．
-const MislibNode*
-MislibParser::read(const string& filename)
+// @param[in] mgr MislibNode を管理するクラス
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+bool
+MislibParser::read_file(const string& filename,
+			MislibMgr& mgr)
 {
-  return mImpl->read(filename);
+  return mImpl->read_file(filename, mgr.mImpl);
 }
 
 END_NAMESPACE_YM_MISLIB

@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_MISLIB
 class MislibNoninv :
   public MislibNodeImpl
 {
-  friend class MislibParserImpl;
+  friend class MislibMgrImpl;
 
 private:
 
@@ -59,7 +59,7 @@ public:
 class MislibInv :
   public MislibNodeImpl
 {
-  friend class MislibParserImpl;
+  friend class MislibMgrImpl;
 
 private:
 
@@ -95,7 +95,7 @@ public:
 class MislibUnknown :
   public MislibNodeImpl
 {
-  friend class MislibParserImpl;
+  friend class MislibMgrImpl;
 
 private:
 

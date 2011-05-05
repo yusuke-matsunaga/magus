@@ -11,6 +11,7 @@
 
 #include "ym_cell/CellMislibReader.h"
 #include "ym_mislib/MislibParser.h"
+#include "ym_mislib/MislibMgr.h"
 #include "ym_mislib/MislibNode.h"
 #include "ym_lexp/LogExpr.h"
 #if 0
@@ -116,18 +117,18 @@ expr_to_tvfunc(const LogExpr& expr,
 
 // @brief MislibNode から CellLibrary を生成する．
 // @param[in] lib_name ライブラリ名
-// @param[in] root パース木のルート
+// @param[in] gate_list パース木のルート
 // @return 生成したライブラリを返す．
 // @note 生成が失敗したら NULL を返す．
 const CellLibrary*
 gen_library(const string& lib_name,
-	    const MislibNode* root)
+	    const MislibNode* gate_list)
 {
   bool error = false;
 
   // 名前が重複していないかチェック
   hash_map<ShString, const MislibNode*> gate_map;
-  for (const MislibNode* gate = root->top(); gate; gate = gate->next()) {
+  for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
     ShString name = gate->name()->str();
     hash_map<ShString, const MislibNode*>::iterator p = gate_map.find(name);
     if ( p != gate_map.end() ) {
@@ -152,7 +153,7 @@ gen_library(const string& lib_name,
 
   // セルの内容の設定
   ymuint cell_id = 0;
-  for (const MislibNode* gate = root->top(); gate;
+  for (const MislibNode* gate = gate_list->top(); gate;
        gate = gate->next(), ++ cell_id) {
     ShString name = gate->name()->str();
     CellArea area(gate->area()->num());
@@ -294,9 +295,12 @@ CellMislibReader::~CellMislibReader()
 const CellLibrary*
 CellMislibReader::read(const string& filename)
 {
+  MislibMgr mgr;
   MislibParser parser;
-  const MislibNode* root = parser.read(filename);
-  return gen_library(filename, root);
+  if ( !parser.read_file(filename, mgr) ) {
+    return NULL;
+  }
+  return gen_library(filename, mgr.gate_list());
 }
 
 END_NAMESPACE_YM_CELL

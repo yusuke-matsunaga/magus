@@ -10,6 +10,7 @@
 
 
 #include "ym_mislib/MislibParser.h"
+#include "ym_mislib/MislibMgr.h"
 #include "ym_mislib/MislibNode.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -20,6 +21,7 @@ BEGIN_NAMESPACE_YM_MISLIB
 int
 mislib_parser_test(const string& filename)
 {
+  MislibMgr mgr;
   MislibParser parser;
 
   MsgHandler* mh = new StreamMsgHandler(&cerr);
@@ -28,13 +30,14 @@ mislib_parser_test(const string& filename)
   mh->delete_mask(kMsgDebug);
   MsgMgr::reg_handler(mh);
 
-  const MislibNode* root = parser.read(filename);
-  if ( root == NULL) {
-    return 1;
+  if ( !parser.read_file(filename, mgr) ) {
+    return -1;
   }
 
-  for ( ; root != NULL; root = root->next()) {
-    root->dump(cout);
+  const MislibNode* gate_list = mgr.gate_list();
+  for (const MislibNode* gate = gate_list->top();
+       gate != NULL; gate = gate->next()) {
+    gate->dump(cout);
   }
 
   return 0;

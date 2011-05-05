@@ -37,10 +37,12 @@ public:
 
   /// @brief mislib ファイルを読み込む．
   /// @param[in] filename ファイル名
-  /// @return パース木の根のノードを返す．
-  /// @note 読み込みが失敗したら NULL を返す．
-  const MislibNode*
-  read(const string& filename);
+  /// @param[in] mgr MislibNode を管理するクラス
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  bool
+  read_file(const string& filename,
+	    MislibMgr& mgr);
 
 
 private:

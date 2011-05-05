@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_MISLIB
 class MislibStr :
   public MislibNodeImpl
 {
-  friend class MislibParserImpl;
+  friend class MislibMgrImpl;
 
 private:
 

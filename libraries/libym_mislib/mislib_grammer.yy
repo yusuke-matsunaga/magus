@@ -14,6 +14,7 @@
 
 #include "ym_utils/FileRegion.h"
 #include "MislibParserImpl.h"
+#include "MislibMgrImpl.h"
 #include "MislibNodeImpl.h"
 #include "MislibLex.h"
 
@@ -44,6 +45,7 @@ yylex(YYSTYPE*,
 int
 yyerror(YYLTYPE*,
 	MislibParserImpl&,
+	MislibMgrImpl*,
 	const char*);
 
 BEGIN_NONAMESPACE
@@ -71,6 +73,7 @@ END_NONAMESPACE
 
 // yyparse の引数
 %parse-param {MislibParserImpl& parser}
+%parse-param {MislibMgrImpl* mgr}
 
 // yylex の引数
 %lex-param {MislibParserImpl& parser}
@@ -118,15 +121,15 @@ file
 gate
 : GATE STR NUM STR EQ expr SEMI pin_list
 { // 通常のパタン
-  parser.new_gate1(@$, $2, $3, $4, $6, $8);
+  mgr->new_gate1(@$, $2, $3, $4, $6, $8);
 }
 | GATE STR NUM STR EQ expr SEMI star_pin
 { // ワイルドカード '*' を使ったピン定義
-  parser.new_gate2(@$, $2, $3, $4, $6, $8);
+  mgr->new_gate2(@$, $2, $3, $4, $6, $8);
 }
 | GATE STR NUM STR EQ expr SEMI
 { // 入力ピンのないパタン (定数セル)
-  parser.new_gate3(@$, $2, $3, $4, $6);
+  mgr->new_gate3(@$, $2, $3, $4, $6);
 }
 | GATE error
 {
@@ -148,19 +151,19 @@ expr
 }
 | NOT expr
 {
-  $$ = parser.new_not(@$, $2);
+  $$ = mgr->new_not(@$, $2);
 }
 | expr STAR expr
 {
-  $$ = parser.new_and(@$, $1, $3);
+  $$ = mgr->new_and(@$, $1, $3);
 }
 | expr PLUS expr
 {
-  $$ = parser.new_or(@$, $1, $3);
+  $$ = mgr->new_or(@$, $1, $3);
 }
 | expr HAT expr
 {
-  $$ = parser.new_xor(@$, $1, $3);
+  $$ = mgr->new_xor(@$, $1, $3);
 }
 | CONST0
 {
@@ -176,7 +179,7 @@ expr
 pin_list
 : pin
 {
-  $$ = parser.new_list();
+  $$ = mgr->new_list();
   $$->push_back($1);
 }
 | pin_list pin
@@ -189,7 +192,7 @@ pin_list
 pin
 : PIN STR phase NUM NUM NUM NUM NUM NUM
 {
-  $$ = parser.new_pin(@$, $2, $3, $4, $5, $6, $7, $8, $9);
+  $$ = mgr->new_pin(@$, $2, $3, $4, $5, $6, $7, $8, $9);
 }
 ;
 
@@ -198,7 +201,7 @@ star_pin
 : PIN STAR phase NUM NUM NUM NUM NUM NUM
 {
   // STAR(*) はワイルドカード
-  $$ = parser.new_pin(@$, NULL, $3, $4, $5, $6, $7, $8, $9);
+  $$ = mgr->new_pin(@$, NULL, $3, $4, $5, $6, $7, $8, $9);
 }
 
 // 極性情報
@@ -238,6 +241,7 @@ yylex(YYSTYPE* lvalp,
 int
 yyerror(YYLTYPE* llocp,
 	MislibParserImpl& parser,
+	MislibMgrImpl* mgr,
 	const char* msg)
 {
   parser.error(*llocp, msg);

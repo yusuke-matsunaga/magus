@@ -30,15 +30,17 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_MISLIB
 
 // クラス名の前方宣言
-class MislibParser;
+class MislibMgr;
 class MislibNode;
+class MislibParser;
 
 END_NAMESPACE_YM_MISLIB
 
 BEGIN_NAMESPACE_YM
 
-using nsMislib::MislibParser;
+using nsMislib::MislibMgr;
 using nsMislib::MislibNode;
+using nsMislib::MislibParser;
 
 END_NAMESPACE_YM
 

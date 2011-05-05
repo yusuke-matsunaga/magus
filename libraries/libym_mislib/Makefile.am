@@ -33,6 +33,9 @@ libym_mislib_la_SOURCES = \
 	mislib_grammer.yy \
 	MislibLex.h \
 	MislibLex.cc \
+	MislibMgr.cc \
+	MislibMgrImpl.h \
+	MislibMgrImpl.cc \
 	MislibParser.cc \
 	MislibParserImpl.h \
 	MislibParserImpl.cc \
