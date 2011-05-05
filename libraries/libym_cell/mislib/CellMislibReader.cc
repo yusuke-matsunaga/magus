@@ -14,11 +14,9 @@
 #include "ym_mislib/MislibMgr.h"
 #include "ym_mislib/MislibNode.h"
 #include "ym_lexp/LogExpr.h"
-#if 0
 #include "ym_npn/TvFunc.h"
-#endif
 #include "../ci/CiLibrary.h"
-
+#include "ym_utils/MsgMgr.h"
 
 BEGIN_NAMESPACE_YM_CELL
 
@@ -66,7 +64,6 @@ dfs(const MislibNode* node,
   }
 }
 
-#if 0
 // @brief LogExpr を TvFunc に変換する．
 // @param[in] expr 対象の論理式
 // @param[in] ni 全入力数
@@ -113,7 +110,6 @@ expr_to_tvfunc(const LogExpr& expr,
   }
   return func;
 }
-#endif
 
 // @brief MislibNode から CellLibrary を生成する．
 // @param[in] lib_name ライブラリ名
@@ -189,23 +185,71 @@ gen_library(const string& lib_name,
 						 CellTime(0.0));
     LogExpr function = opin_expr->to_expr(ipin_name_map);
     library->set_opin_function(opin, function);
-#if 0
+
     TvFunc tv_function = expr_to_tvfunc(function, ni);
-#endif
     for (ymuint i = 0; i < ni; ++ i) {
       // タイミング情報の設定
       const MislibNode* pt_pin = ipin_array[i];
-#if 0
-      int unate = tv_function.check_unateness(i);
-#else
-      tCellTimingSense sense;
-      switch ( pt_pin->phase()->type() ) {
-      case MislibNode::kNoninv:  sense = kSensePosiUnate; break;
-      case MislibNode::kInv:     sense = kSenseNegaUnate; break;
-      case MislibNode::kUnknown: sense = kSenseNonUnate; break;
-      default: assert_not_reached(__FILE__, __LINE__); break;
+      TvFunc p_func = tv_function.cofactor(i, kPolPosi);
+      TvFunc n_func = tv_function.cofactor(i, kPolNega);
+      tCellTimingSense sense_real = kSenseNonUnate;
+      bool redundant = false;
+      if ( ~p_func && n_func ) {
+	if ( ~n_func && p_func ) {
+	  sense_real = kSenseNonUnate;
+	}
+	else {
+	  sense_real = kSenseNegaUnate;
+	}
       }
-#endif
+      else {
+	if ( ~n_func && p_func ) {
+	  sense_real = kSensePosiUnate;
+	}
+	else {
+	  // つまり p_func == n_func ということ．
+	  // つまりこの変数は出力に影響しない．
+	  ostringstream buf;
+	  buf << "The output function does not depend on the input pin, "
+	      << pt_pin->name()->str() << ".";
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_pin->loc(),
+			  kMsgWarning,
+			  "MISLIB_PARSER",
+			  buf.str());
+	  redundant = true;
+	}
+      }
+
+      tCellTimingSense sense = kSenseNonUnate;
+      switch ( pt_pin->phase()->type() ) {
+      case MislibNode::kNoninv:
+	sense = kSensePosiUnate;
+	break;
+
+      case MislibNode::kInv:
+	sense = kSenseNegaUnate;
+	break;
+
+      case MislibNode::kUnknown:
+	sense = kSenseNonUnate;
+	break;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__); break;
+      }
+
+      if ( sense != sense_real ) {
+	ostringstream buf;
+	buf << "Phase description does not match the logic expression. "
+	    << "Ignored.";
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_pin->phase()->loc(),
+			kMsgWarning,
+			"MISLIB_PARSER",
+			buf.str());
+	sense = sense_real;
+      }
       CellTime r_i(pt_pin->rise_block_delay()->num());
       CellResistance r_r(pt_pin->rise_fanout_delay()->num());
       CellTime f_i(pt_pin->fall_block_delay()->num());
@@ -214,7 +258,9 @@ gen_library(const string& lib_name,
 					       r_i, f_i,
 					       CellTime(0.0), CellTime(0.0),
 					       r_r, f_r);
-      library->set_opin_timing(opin, i, sense, timing);
+      if ( !redundant ) {
+	library->set_opin_timing(opin, i, sense, timing);
+      }
     }
   }
 
