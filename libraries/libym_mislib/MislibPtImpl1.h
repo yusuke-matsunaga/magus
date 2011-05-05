@@ -1,20 +1,20 @@
-#ifndef LIBYM_MISLIB_MISLIBPTIMPL1_H
-#define LIBYM_MISLIB_MISLIBPTIMPL1_H
+#ifndef LIBYM_CELL_MISLIB_MISLIBPTIMPL1_H
+#define LIBYM_CELL_MISLIB_MISLIBPTIMPL1_H
 
-/// @file libym_mislib/MislibPtImpl1.h
+/// @file libym_cell/mislib/MislibPtImpl1.h
 /// @brief MislibPt の派生クラスのヘッダファイル(その1)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibPtImpl1.h 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: MislibPtImpl1.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MislibPt.h"
 
 
-BEGIN_NAMESPACE_YM_MISLIB
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
 /// @brief 文字列を表すクラス
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_MISLIB
 class MislibPtStr :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -34,14 +34,14 @@ private:
   /// @brief デストラクタ
   ~MislibPtStr();
 
-  
+
 public:
 
   /// @brief 種類を取り出す．
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -51,6 +51,12 @@ public:
   virtual
   ShString
   str() const;
+
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+  virtual
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
@@ -76,7 +82,7 @@ private:
 class MislibPtNum :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -125,7 +131,7 @@ private:
 class MislibPtNoninv :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -149,7 +155,7 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -159,7 +165,7 @@ public:
 class MislibPtInv :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -183,7 +189,7 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -193,7 +199,7 @@ public:
 class MislibPtUnknown :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -217,7 +223,7 @@ public:
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -227,7 +233,7 @@ public:
 class MislibPtConst0 :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -245,18 +251,24 @@ public:
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
   is_expr() const;
+
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+  virtual
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
 
@@ -266,7 +278,7 @@ public:
 class MislibPtConst1 :
   public MislibPt
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
@@ -284,20 +296,82 @@ public:
   virtual
   tType
   type() const;
-  
+
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
   is_expr() const;
+
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+  virtual
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
   virtual
   void
   dump(ostream& s) const;
-  
+
 };
 
-END_NAMESPACE_YM_MISLIB
 
-#endif // LIBYM_MISLIB_MISLIBPTIMPL_H
+//////////////////////////////////////////////////////////////////////
+/// @class MislibPtList MislibPtImpl1.h "MislibPtImpl1.h"
+/// @brief MislibPtのリストを表すクラス
+//////////////////////////////////////////////////////////////////////
+class MislibPtList :
+  public MislibPt
+{
+  friend class MislibParser;
+private:
+
+  /// @brief コンストラクタ
+  MislibPtList();
+
+  /// @brief デストラクタ
+  virtual
+  ~MislibPtList();
+
+
+public:
+
+  /// @brief 種類を取り出す．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 末尾に要素を追加する．
+  virtual
+  void
+  push_back(MislibPt* pin);
+
+  /// @brief 先頭の要素を取り出す．
+  virtual
+  MislibPt*
+  top() const;
+
+  /// @brief 内容を出力する．
+  /// デバッグ用
+  virtual
+  void
+  dump(ostream& s) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 先頭の要素
+  MislibPt* mTop;
+
+  // 末尾の要素
+  MislibPt* mEnd;
+
+};
+
+END_NAMESPACE_YM_CELL_MISLIB
+
+#endif // LIBYM_CELL_MISLIB_MISLIBPTIMPL_H

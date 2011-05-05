@@ -1,19 +1,17 @@
 
-/// @file ym_mislib/MislibLex.cc
+/// @file libym_cell/mislib/MislibLex.cc
 /// @brief MislibLex の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibLex.cc 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: MislibLex.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2008 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG
-#include <ymconfig.h>
-#endif
 
 #include "MislibLex.h"
-#include "MislibParserImpl.h"
+#include "ym_utils/FileInfoMgr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
@@ -22,8 +20,7 @@ BEGIN_NAMESPACE_YM_MISLIB
 
 
 // コンストラクタ
-MislibLex::MislibLex(MsgMgr& msg_mgr) :
-  mMsgMgr(msg_mgr)
+MislibLex::MislibLex()
 {
 }
 
@@ -32,32 +29,28 @@ MislibLex::~MislibLex()
 {
 }
 
-// @brief 入力ストリームを設定する．
-// @param[in] istr 入力ストリーム
-// @param[in] file_desc ファイル記述子
-void
-MislibLex::init(istream& istr,
-		const FileDesc* file_desc)
+// トークンを一つとってくる．
+// @param[out] loc 対応するファイル上の位置を格納する変数
+int
+MislibLex::read_token(FileRegion& loc)
 {
-  mInput = &istr;
-  mFileDesc = file_desc;
-  mUngetChar = 0;
-  mCR = false;
-  mCurLine = 1;
-  mCurColumn = 0;
+  int token = scan();
+  loc = cur_loc();
+  return token;
 }
 
-// トークンを一つとってくる．
+// @brief read_token の下請け関数
+// @return トークンを返す．
 int
-MislibLex::read_token()
+MislibLex::scan()
 {
-  int c;
+  int c = 0;
 
   mCurString.clear();
-  
+
  state1:
   c = get();
-  mFirstColumn = mCurColumn;
+  set_first_loc();
   if ( isalpha(c) || (c == '_') ) {
     mCurString.put_char(c);
     goto state2;
@@ -70,15 +63,18 @@ MislibLex::read_token()
   case EOF: return EOF;
   case ' ':
   case '\t': goto state1;
-  case '\n': ++ mCurLine; mCurColumn = 0; goto state1;
-  case '.': goto state4;
+  case '\n': goto state1;
+  case '.': mCurString.put_char(c); goto state4;
   case ';': return SEMI;
   case '=': return EQ;
   case '(': return LP;
   case ')': return RP;
   case '!': return NOT;
   case '*': return STAR;
+  case '&': return STAR;
   case '+': return PLUS;
+  case '|': return PLUS;
+  case '^': return HAT;
   case '#': goto state6;
   case '\"': goto state7;
   }
@@ -86,12 +82,12 @@ MislibLex::read_token()
 
   // 一文字目が[a-zA-Z_]の時
  state2:
-  c = get();
+  c = peek();
   if ( isalpha(c) || isdigit(c) || (c == '_') ) {
+    accept();
     mCurString.put_char(c);
     goto state2;
   }
-  unget();
 
   // 予約語（？）の検査
   // 数が少ないのでナイーブな方法をとっている．
@@ -120,71 +116,77 @@ MislibLex::read_token()
 
   // 一文字目が[0-9]の時
  state3:
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state3;
   }
   if ( c == '.' ) {
+    accept();
     mCurString.put_char(c);
     goto state5;
   }
   if ( c == 'E' || c == 'e' ) {
+    accept();
     mCurString.put_char(c);
     goto state8;
   }
-  goto state_NUM;
+  return NUM;
 
   // 一文字目が"."の時
  state4:
-  mCurString = ".";
-  mCurString.put_char(c = get());
-  if ( isdigit(c) ) goto state5;
+  c = get();
+  if ( isdigit(c) ) {
+    mCurString.put_char(c);
+    goto state5;
+  }
   goto error;
 
   // [0-9]*"."を読み終えたところ
  state5:
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state5;
   }
   if ( c == 'E' || c == 'e' ) {
+    accept();
     mCurString.put_char(c);
     goto state8;
   }
-  goto state_NUM;
+  return NUM;
 
   // [0-9]*"."[Ee]を読み終えたところ
  state8:
-  c = get();
+  c = peek();
   if ( c == '-' ) {
+    accept();
     mCurString.put_char(c);
     goto state9;
   }
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state9;
   }
-  goto state_NUM;
+  return NUM;
 
   // [0-9]*"."[Ee]-?を読み終えたところ
  state9:
-  c = get();
+  c = peek();
   if ( isdigit(c) ) {
+    accept();
     mCurString.put_char(c);
     goto state9;
   }
-
- state_NUM:
-  unget();
   return NUM;
 
   // '#'があったら改行までループする．
  state6:
   c = get();
   if ( c == '\n' ) {
-    unget();
     goto state1;
   }
   goto state6;
@@ -202,79 +204,13 @@ MislibLex::read_token()
   {
     ostringstream buf;
     buf << "Syntax error: illegal input (" << mCurString << ").";
-    mMsgMgr.put_msg(__FILE__, __LINE__,
-		    FileRegion(mFileDesc, mCurLine, mFirstColumn,
-			       mCurLine, mCurColumn),
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
 		    kMsgError,
-		    "MISLIB_PARSE", buf.str().c_str());
+		    "MISLIB_PARSE",
+		    buf.str().c_str());
   }
   return ERROR;
-}
-
-// 一文字読み出す．
-int
-MislibLex::get()
-{
-  int c = 0;
-  
-  if ( mUngetChar != 0 ) {
-    // 戻された文字があったらそれを返す．
-    c = mUngetChar;
-    mUngetChar = 0;
-  }
-  else {
-    for ( ; ; ) {
-      c = mInput->get();
-      if ( c == EOF ) {
-	break;
-      }
-      // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
-      // 強制的に '\n' に書き換えてしまう．
-      // Windows : '\r', '\n'
-      // Mac     : '\r'
-      // UNIX    : '\n'
-      // なので '\r' を '\n' に書き換えてしまう．
-      // ただし次に本当の '\n' が来たときには無視するために
-      // mCR を true にしておく．
-      if ( c == '\r' ) {
-	mCR = true;
-	c = '\n';
-	break;
-      }
-      if ( c == '\n' ) {
-	if ( mCR ) {
-	  // 直前に '\r' を読んで '\n' を返していたので今の '\n' を
-	  // 無視する．これが唯一ループを回る条件
-	  mCR = false;
-	  continue;
-	}
-	break;
-      }
-      // 普通の文字の時はそのまま返す．
-      mCR = false;
-      break;
-    }
-  }
-  ++ mCurColumn;
-  mLastChar = c;
-  return c;
-}
-
-// 一文字読み戻す．
-void
-MislibLex::unget()
-{
-  mUngetChar = mLastChar;
-  -- mCurColumn;
-}
-
-// @brief 現在のトークンの位置情報を返す．
-FileRegion
-MislibLex::cur_loc() const
-{
-  return FileRegion(mFileDesc,
-		    mCurLine, mFirstColumn,
-		    mCurLine, mCurColumn);
 }
 
 END_NAMESPACE_YM_MISLIB

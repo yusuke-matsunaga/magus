@@ -1,24 +1,25 @@
-#ifndef YM_MISLIB_MISLIBPARSER_H
-#define YM_MISLIB_MISLIBPARSER_H
+#ifndef LIBYM_MISLIB_MISLIBPARSER_H
+#define LIBYM_MISLIB_MISLIBPARSER_H
 
-/// @file libym_cell/MislibParser.h
+/// @file libym_mislib/MislibParser.h
 /// @brief MislibParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibParser.h 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: MislibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_mislib/mislib_nsdef.h>
-#include <ym_utils/MsgHandler.h>
+#include "ym_mislib/mislib_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
 
+class MislibParserImpl;
+
 //////////////////////////////////////////////////////////////////////
-/// @class MislibParser MislibParser.h "mislib/MislibParser.h"
+/// @class MislibParser MislibParser.h "ym_mislib/MislibParser.h"
 /// @brief Mislib ファイルのパーサー
 //////////////////////////////////////////////////////////////////////
 class MislibParser
@@ -30,40 +31,28 @@ public:
 
   /// @brief デストラクタ
   ~MislibParser();
-  
+
 
 public:
-  
-  /// @brief mislib ファイルを読み込む
+
+  /// @brief mislib ファイルを読み込む．
   /// @param[in] filename ファイル名
-  /// @retval true 読み込みが成功した．
-  /// @retval false 読み込みが失敗した．
-  bool
+  /// @return パース木の根のノードを返す．
+  /// @note 読み込みが失敗したら NULL を返す．
+  const MislibNode*
   read(const string& filename);
 
-  /// @brief イベントハンドラの登録
-  /// @param[in] handler 登録するハンドラ
-  /// @note handler はこのインスタンスが破壊される時に同時に破壊される．
-  void
-  add_handler(MislibHandler* handler);
-  
-  /// @brief メッセージハンドラの登録
-  /// @param[in] handler 登録するハンドラ
-  /// @note handler はこのインスタンスが破壊される時に同時に破壊される．
-  void
-  add_msg_handler(MsgHandler* handler);
 
-  
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
-  // パーサーの実体
-  MislibParserImpl* mRep;
+
+  // 実際の処理を行うクラス
+  MislibParserImpl* mImpl;
 
 };
 
 END_NAMESPACE_YM_MISLIB
 
-#endif // YM_MISLIB_MISLIBPARSER_H
+#endif // LIBYM_MISLIB_MISLIBPARSER_H

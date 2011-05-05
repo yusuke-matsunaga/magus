@@ -7,18 +7,14 @@
 ///
 /// $Id: CellMislibReader.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/cell_type.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
-
-namespace nsMislib {
-  class MislibParser;
-}
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellMislibReader CellMislibReader.h <ym_cell/CellMislibReader.h>
@@ -44,15 +40,6 @@ public:
   /// @note エラーが起きたら NULL を返す．
   const CellLibrary*
   read(const string& filename);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // mislib のパーサー
-  nsMislib::MislibParser* mParser;
 
 };
 

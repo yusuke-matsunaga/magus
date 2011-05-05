@@ -1,19 +1,13 @@
 #ifndef YM_MISLIB_MISLIB_NSDEF_H
 #define YM_MISLIB_MISLIB_NSDEF_H
 
-/// @file ym_cell/cell_nsdef.h
-/// @brief libym_cell 用の名前空間の定義
+/// @file libym_mislib/mislib_nsdef.h
+/// @brief mislib サブモジュールの定義ファイル
+/// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// @author Yusuke Matsunaga
-///
-/// $Id: mislib_nsdef.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-/// @defgroup CellGroup セルライブラリ
-///
-/// セルライブラリを扱うためのクラスライブラリ
 
 #include "ymtools.h"
 
@@ -22,42 +16,30 @@
 // 名前空間を定義するためのマクロ
 //////////////////////////////////////////////////////////////////////
 
-/// @brief ym_cell の名前空間の開始
+/// @brief mislib の名前空間の開始
 #define BEGIN_NAMESPACE_YM_MISLIB \
 BEGIN_NAMESPACE_YM \
 BEGIN_NAMESPACE(nsMislib)
 
-/// @brief ym_cell の名前空間の終了
+/// @brief mislib の名前空間の終了
 #define END_NAMESPACE_YM_MISLIB \
 END_NAMESPACE(nsMislib) \
 END_NAMESPACE_YM
 
-/// @namespace nsYm::nsMislib
-/// @brief mislib ファイル用パーサークラスが属する名前空間
-///
-/// ただし，主要なものは nsYm にインポートされている．
-/// 実装用のローカルな要素だけがこの名前空間に存在する．
-
 
 BEGIN_NAMESPACE_YM_MISLIB
 
-//////////////////////////////////////////////////////////////////////
-// クラスの前方参照
-//////////////////////////////////////////////////////////////////////
-
+// クラス名の前方宣言
 class MislibParser;
-class MislibParserImpl;
-class MislibPin;
-class MislibHandler;
+class MislibNode;
 
 END_NAMESPACE_YM_MISLIB
 
 BEGIN_NAMESPACE_YM
 
 using nsMislib::MislibParser;
-using nsMislib::MislibPin;
-using nsMislib::MislibHandler;
+using nsMislib::MislibNode;
 
 END_NAMESPACE_YM
 
-#endif // YM_MISLIB_MISLIB_NSDEF_H
+#endif // LIBYM_MISLIB_MISLIB_NSDEF_H

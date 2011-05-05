@@ -9,12 +9,13 @@
 /// All rights reserved.
 
 
-#include "mislib/MislibParser.h"
+#include "ym_mislib/MislibParser.h"
+#include "ym_mislib/MislibNode.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_MISLIB
+BEGIN_NAMESPACE_YM_MISLIB
 
 int
 mislib_parser_test(const string& filename)
@@ -27,7 +28,7 @@ mislib_parser_test(const string& filename)
   mh->delete_mask(kMsgDebug);
   MsgMgr::reg_handler(mh);
 
-  const MislibPt* root = parser.read(filename);
+  const MislibNode* root = parser.read(filename);
   if ( root == NULL) {
     return 1;
   }
@@ -39,7 +40,7 @@ mislib_parser_test(const string& filename)
   return 0;
 }
 
-END_NAMESPACE_YM_CELL_MISLIB
+END_NAMESPACE_YM_MISLIB
 
 
 int
@@ -53,7 +54,7 @@ main(int argc,
     return 255;
   }
 
-  int stat = nsYm::nsCell::nsMislib::mislib_parser_test(argv[1]);
+  int stat = nsYm::nsMislib::mislib_parser_test(argv[1]);
 
   return stat;
 }

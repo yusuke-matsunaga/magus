@@ -1,21 +1,18 @@
 
-/// @file libym_mislib/MislibPtImpl1.cc
+/// @file libym_cell/mislib/MislibPtImpl1.cc
 /// @brief MislibPtImpl1 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibPtImpl1.cc 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: MislibPtImpl1.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "MislibPtImpl1.h"
 
 
-BEGIN_NAMESPACE_YM_MISLIB
+BEGIN_NAMESPACE_YM_CELL_MISLIB
 
 //////////////////////////////////////////////////////////////////////
 // トークンを表す基底クラス
@@ -32,7 +29,7 @@ MislibPt::MislibPt(const FileRegion& loc) :
 MislibPt::~MislibPt()
 {
 }
-  
+
 // @brief 論理式を表す型のときに true を返す．
 // @note 定数0と定数1は false を返す．
 // @note デフォルトでは false を返す．
@@ -60,7 +57,7 @@ MislibPt::num() const
 
 // 1番目の子供を取り出す．
 // デフォルトでは NULL を返す．
-MislibPt*
+const MislibPt*
 MislibPt::child1() const
 {
   return NULL;
@@ -68,10 +65,20 @@ MislibPt::child1() const
 
 // 2番目の子供を取り出す．
 // デフォルトでは NULL を返す．
-MislibPt*
+const MislibPt*
 MislibPt::child2() const
 {
   return NULL;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPt::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  // デフォルトではエラーとなる．
+  assert_not_reached(__FILE__, __LINE__);
+  return LogExpr();
 }
 
 // ピン名を表すオブジェクトを取り出す．
@@ -153,17 +160,49 @@ MislibPt::next() const
   return NULL;
 }
 
-// 末尾にピンを追加する．
+// 末尾に要素を追加する．
 // デフォルトでは何もしない．
 void
 MislibPt::push_back(MislibPt* pin)
 {
 }
 
-// 先頭のピンを取り出す．
+// 先頭の要素を取り出す．
 // デフォルトでは NULL を返す．
 MislibPt*
-MislibPt::pin() const
+MislibPt::top() const
+{
+  return NULL;
+}
+
+// @brief 面積を表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::area() const
+{
+  return NULL;
+}
+
+// @brief 出力ピン名を表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::opin_name() const
+{
+  return NULL;
+}
+
+// @brief 出力の論理式を表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::opin_expr() const
+{
+  return NULL;
+}
+
+// @brief 入力ピンのリストを表すオブジェクトを返す．
+// @note デフォルトでは NULL を返す．
+MislibPt*
+MislibPt::ipin_list() const
 {
   return NULL;
 }
@@ -194,7 +233,7 @@ MislibPtStr::~MislibPtStr()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtStr::type() const
 {
   return kStr;
@@ -212,6 +251,16 @@ ShString
 MislibPtStr::str() const
 {
   return mStr;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtStr::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  hash_map<ShString, ymuint>::const_iterator p = name_map.find(str());
+  assert_cond( p != name_map.end(), __FILE__, __LINE__);
+  return LogExpr::make_posiliteral(p->second);
 }
 
 // 内容を出力する．
@@ -244,7 +293,7 @@ MislibPtNum::~MislibPtNum()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtNum::type() const
 {
   return kNum;
@@ -285,7 +334,7 @@ MislibPtNoninv::~MislibPtNoninv()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtNoninv::type() const
 {
   return kNoninv;
@@ -318,7 +367,7 @@ MislibPtInv::~MislibPtInv()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtInv::type() const
 {
   return kInv;
@@ -351,7 +400,7 @@ MislibPtUnknown::~MislibPtUnknown()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtUnknown::type() const
 {
   return kUnknown;
@@ -384,7 +433,7 @@ MislibPtConst0::~MislibPtConst0()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtConst0::type() const
 {
   return kConst0;
@@ -395,6 +444,14 @@ bool
 MislibPtConst0::is_expr() const
 {
   return true;
+}
+
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtConst0::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  return LogExpr::make_zero();
 }
 
 // 内容を出力する．
@@ -424,7 +481,7 @@ MislibPtConst1::~MislibPtConst1()
 }
 
 // 種類を取り出す．
-MislibPt::tType
+tType
 MislibPtConst1::type() const
 {
   return kConst1;
@@ -437,6 +494,14 @@ MislibPtConst1::is_expr() const
   return true;
 }
 
+// @brief 対応する論理式を生成する．
+// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+LogExpr
+MislibPtConst1::to_expr(const hash_map<ShString, ymuint>& name_map) const
+{
+  return LogExpr::make_one();
+}
+
 // 内容を出力する．
 // デバッグ用
 void
@@ -447,4 +512,64 @@ MislibPtConst1::dump(ostream& s) const
   s << "</CONST1>" << endl;
 }
 
-END_NAMESPACE_YM_MISLIB
+
+//////////////////////////////////////////////////////////////////////
+/// MislibPtのリストを表すクラス
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+MislibPtList::MislibPtList() :
+  MislibPt(FileRegion())
+{
+  mTop = NULL;
+  mEnd = NULL;
+}
+
+// デストラクタ
+MislibPtList::~MislibPtList()
+{
+}
+
+// 種類を取り出す．
+tType
+MislibPtList::type() const
+{
+  return kList;
+}
+
+// 末尾に要素を追加する．
+void
+MislibPtList::push_back(MislibPt* obj)
+{
+  if ( mEnd ) {
+    mEnd->set_next(obj);
+    mEnd = obj;
+  }
+  else {
+    mTop = mEnd = obj;
+  }
+}
+
+// 先頭の要素を取り出す．
+MislibPt*
+MislibPtList::top() const
+{
+  return mTop;
+}
+
+// 内容を出力する．
+// デバッグ用
+void
+MislibPtList::dump(ostream& s) const
+{
+  s << "<PT_LIST>" << endl;
+  dump_loc(s);
+
+  for (MislibPt* tmp = top(); tmp; tmp = tmp->next()) {
+    tmp->dump(s);
+  }
+
+  s << "</PT_LIST>" << endl;
+}
+
+END_NAMESPACE_YM_CELL_MISLIB

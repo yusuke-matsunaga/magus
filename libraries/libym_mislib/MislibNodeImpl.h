@@ -1,45 +1,39 @@
-#ifndef LIBYM_CELL_MISLIB_MISLIBPT_H
-#define LIBYM_CELL_MISLIB_MISLIBPT_H
+#ifndef LIBYM_MISLIB_MISLIBNODEIMPL_H
+#define LIBYM_MISLIB_MISLIBNODEIMPL_H
 
-/// @file libym_cell/mislib/MislibPt.h
-/// @brief MislibPt のヘッダファイル
+/// @file libym_mislib/MislibNodeImpl.h
+/// @brief MislibNodeImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibPt.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: MislibNodeImpl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "mislib_nsdef.h"
-
-#include "ym_utils/ShString.h"
-#include "ym_utils/FileRegion.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_mislib/MislibNode.h"
 
 
-BEGIN_NAMESPACE_YM_CELL_MISLIB
+BEGIN_NAMESPACE_YM_MISLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @class MislibPt MislibPt.h "MislibPt.h"
-/// @brief トークンを表す基底クラス
+/// @class MislibNodeImpl MislibNodeImpl.h "MislibNodeImpl.h"
+/// @brief MislibNode の実装クラス
 //////////////////////////////////////////////////////////////////////
-class MislibPt
+class MislibNodeImpl :
+  public MislibNode
 {
-  friend class MislibParser;
-
-public:
-
+  friend class MislibParserImpl;
 
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] loc 位置情報
-  MislibPt(const FileRegion& loc);
+  MislibNodeImpl(const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~MislibPt();
+  ~MislibNodeImpl();
 
 
 public:
@@ -48,13 +42,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 位置情報を取り出す．
-  const FileRegion&
-  loc() const;
-
-  /// @brief 種類を取り出す．
   virtual
-  tType
-  type() const = 0;
+  FileRegion
+  loc() const;
 
   /// @brief 論理式を表す型のときに true を返す．
   /// @note 文字列や定数0と定数1も論理式とみなす．
@@ -62,12 +52,6 @@ public:
   virtual
   bool
   is_expr() const;
-
-  /// @brief 内容を出力する．
-  /// デバッグ用
-  virtual
-  void
-  dump(ostream& s) const = 0;
 
 
 public:
@@ -102,13 +86,13 @@ public:
   /// @brief 1番目の子供を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  const MislibPt*
+  const MislibNode*
   child1() const;
 
   /// @brief 2番目の子供を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  const MislibPt*
+  const MislibNode*
   child2() const;
 
   /// @brief 対応する論理式を生成する．
@@ -126,61 +110,61 @@ public:
   /// @brief ピン名/ゲート名を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   name() const;
 
   /// @brief 極性情報を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   phase() const;
 
   /// @brief 入力負荷を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   input_load() const;
 
   /// @brief 最大駆動負荷を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   max_load() const;
 
   /// @brief 立ち上がり固定遅延を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   rise_block_delay() const;
 
   /// @brief 立ち上がり負荷依存遅延を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   rise_fanout_delay() const;
 
   /// @brief 立ち下がり固定遅延を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   fall_block_delay() const;
 
   /// @brief 立ち下がり負荷依存遅延を表すオブジェクトを取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   fall_fanout_delay() const;
 
   /// @brief 次の要素を設定する．
   /// @note デフォルトでは何もしない．
   virtual
   void
-  set_next(MislibPt* pin);
+  set_next(MislibNodeImpl* pin);
 
   /// @brief 次の要素を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   next() const;
 
 
@@ -193,12 +177,12 @@ public:
   /// @note デフォルトでは何もしない．
   virtual
   void
-  push_back(MislibPt* pin);
+  push_back(MislibNodeImpl* pin);
 
   /// @brief 先頭の要素を取り出す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   top() const;
 
 
@@ -210,25 +194,25 @@ public:
   /// @brief 面積を表すオブジェクトを返す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   area() const;
 
   /// @brief 出力ピン名を表すオブジェクトを返す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   opin_name() const;
 
   /// @brief 出力の論理式を表すオブジェクトを返す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   opin_expr() const;
 
   /// @brief 入力ピンのリストを表すオブジェクトを返す．
   /// @note デフォルトでは NULL を返す．
   virtual
-  MislibPt*
+  const MislibNode*
   ipin_list() const;
 
 
@@ -257,14 +241,6 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 位置情報を取り出す．
-inline
-const FileRegion&
-MislibPt::loc() const
-{
-  return mLoc;
-}
+END_NAMESPACE_YM_MISLIB
 
-END_NAMESPACE_YM_CELL_MISLIB
-
-#endif // LIBYM_CELL_MISLIB_MISLIBPT_H
+#endif // LIBYM_MISLIB_MISLIBNODEIMPL_H

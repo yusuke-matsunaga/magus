@@ -7,6 +7,6 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	MislibHandler.h \
+	MislibNode.h \
 	MislibParser.h \
 	mislib_nsdef.h

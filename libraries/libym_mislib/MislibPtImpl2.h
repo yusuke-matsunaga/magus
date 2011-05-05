@@ -5,44 +5,41 @@
 /// @brief MislibPt の派生クラスのヘッダファイル(その2)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibPtImpl2.h 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: MislibPtImpl2.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MislibPt.h"
+#include "MislibNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
 
 //////////////////////////////////////////////////////////////////////
-/// @brief NOT論理式を表すクラス
+/// @class MislibBop MislibImpl2.h "MislibImpl2.h"
+/// @brief 2項演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
-class MislibPtNot :
-  public MislibPt
+class MislibBop :
+  public MislibNodeImpl
 {
-  friend class MislibParserImpl;
-private:
+protected:
 
   /// @brief コンストラクタ
   /// @param[in] loc 位置情報
   /// @param[in] child1 1番目の子供
-  MislibPtNot(const FileRegion& loc,
-	      MislibPt* child1);
+  /// @param[in] child2 2番目の子供
+  MislibBop(const FileRegion& loc,
+	    const MislibNode* child1,
+	    const MislibNode* child2);
 
   /// @brief デストラクタ
   virtual
-  ~MislibPtNot();
+  ~MislibBop();
 
 
 public:
 
-  /// @brief 種類を取り出す．
-  virtual
-  tType
-  type() const;
-  
   /// @brief 論理式を表す型のときに true を返す．
   virtual
   bool
@@ -50,14 +47,13 @@ public:
 
   /// @brief 1番目の子供を取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   child1() const;
 
-  /// @brief 内容を出力する．
-  /// デバッグ用
+  /// @brief 2番目の子供を取り出す．
   virtual
-  void
-  dump(ostream& s) const;
+  const MislibNode*
+  child2() const;
 
 
 private:
@@ -65,32 +61,35 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 子供
-  MislibPt* mChild1;
-  
+  // 1番目の子供
+  const MislibNode* mChild1;
+
+  // 2番目の子供
+  const MislibNode* mChild2;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibAnd MislibImpl2.h "MislibImpl2.h"
 /// @brief AND論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
-class MislibPtAnd :
-  public MislibPt
+class MislibAnd :
+  public MislibBop
 {
-  friend class MislibParserImpl;
 private:
 
   /// @brief コンストラクタ
   /// @param[in] loc 位置情報
   /// @param[in] child1 1番目の子供
   /// @param[in] child2 2番目の子供
-  MislibPtAnd(const FileRegion& loc,
-	      MislibPt* child1,
-	      MislibPt* child2);
+  MislibAnd(const FileRegion& loc,
+	    const MislibNode* child1,
+	    const MislibNode* child2);
 
   /// @brief デストラクタ
   virtual
-  ~MislibPtAnd();
+  ~MislibAnd();
 
 
 public:
@@ -99,21 +98,12 @@ public:
   virtual
   tType
   type() const;
-  
-  /// @brief 論理式を表す型のときに true を返す．
-  virtual
-  bool
-  is_expr() const;
 
-  /// @brief 1番目の子供を取り出す．
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  MislibPt*
-  child1() const;
-
-  /// @brief 2番目の子供を取り出す．
-  virtual
-  MislibPt*
-  child2() const;
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
@@ -121,41 +111,29 @@ public:
   void
   dump(ostream& s) const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 1番目の子供
-  MislibPt* mChild1;
-
-  // 2番目の子供
-  MislibPt* mChild2;
-  
 };
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibOr MislibImpl2.h "MislibImpl2.h"
 /// @brief OR論理式を表すクラス
 //////////////////////////////////////////////////////////////////////
-class MislibPtOr :
-  public MislibPt
+class MislibOr :
+  public MislibBop
 {
-  friend class MislibParserImpl;
 private:
 
   /// @brief コンストラクタ
   /// @param[in] loc 位置情報
   /// @param[in] child1 1番目の子供
   /// @param[in] child2 2番目の子供
-  MislibPtOr(const FileRegion& loc,
-	     MislibPt* child1,
-	     MislibPt* child2);
+  MislibOr(const FileRegion& loc,
+	   const MislibNode* child1,
+	   const MislibNode* child2);
 
   /// @brief デストラクタ
   virtual
-  ~MislibPtOr();
+  ~MislibOr();
 
 
 public:
@@ -164,21 +142,12 @@ public:
   virtual
   tType
   type() const;
-  
-  /// @brief 論理式を表す型のときに true を返す．
-  virtual
-  bool
-  is_expr() const;
 
-  /// @brief 1番目の子供を取り出す．
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  MislibPt*
-  child1() const;
-
-  /// @brief 2番目の子供を取り出す．
-  virtual
-  MislibPt*
-  child2() const;
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
@@ -186,29 +155,60 @@ public:
   void
   dump(ostream& s) const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 1番目の子供
-  MislibPt* mChild1;
-
-  // 2番目の子供
-  MislibPt* mChild2;
-  
 };
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class MislibXor MislibImpl2.h "MislibImpl2.h"
+/// @brief XOR論理式を表すクラス
+//////////////////////////////////////////////////////////////////////
+class MislibXor :
+  public MislibBop
+{
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] loc 位置情報
+  /// @param[in] child1 1番目の子供
+  /// @param[in] child2 2番目の子供
+  MislibXor(const FileRegion& loc,
+	    const MislibNode* child1,
+	    const MislibNode* child2);
+
+  /// @brief デストラクタ
+  virtual
+  ~MislibXor();
+
+
+public:
+
+  /// @brief 種類を取り出す．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 対応する論理式を生成する．
+  /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
+  virtual
+  LogExpr
+  to_expr(const hash_map<ShString, ymuint>& name_map) const;
+
+  /// @brief 内容を出力する．
+  /// デバッグ用
+  virtual
+  void
+  dump(ostream& s) const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class MislibPin MislibImpl2.h "MislibImpl2.h"
 /// @brief ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MislibPtPin :
-  public MislibPt
+class MislibPin :
+  public MislibNodeImpl
 {
-  friend class MislibParserImpl;
-  friend class MislibPtPinList;
 private:
 
   /// @brief コンストラクタ
@@ -221,19 +221,19 @@ private:
   /// @param[in] rise_fanout_delay 立ち上がり負荷依存遅延
   /// @param[in] fall_block_delay 立ち下がり固定遅延
   /// @param[in] fall_fanout_delay 立ち下がり負荷依存遅延
-  MislibPtPin(const FileRegion& loc,
-	      MislibPt* name,
-	      MislibPt* phase,
-	      MislibPt* input_load,
-	      MislibPt* max_load,
-	      MislibPt* rise_block_delay,
-	      MislibPt* rise_fanout_delay,
-	      MislibPt* fall_block_delay,
-	      MislibPt* fall_fanout_delay);
-  
+  MislibPin(const FileRegion& loc,
+	    const MislibNode* name,
+	    const MislibNode* phase,
+	    const MislibNode* input_load,
+	    const MislibNode* max_load,
+	    const MislibNode* rise_block_delay,
+	    const MislibNode* rise_fanout_delay,
+	    const MislibNode* fall_block_delay,
+	    const MislibNode* fall_fanout_delay);
+
   /// @brief デストラクタ
   virtual
-  ~MislibPtPin();
+  ~MislibPin();
 
 
 public:
@@ -245,52 +245,52 @@ public:
 
   /// @brief ピン名を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   name() const;
 
   /// @brief 極性情報を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   phase() const;
 
   /// @brief 入力負荷を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   input_load() const;
 
   /// @brief 最大駆動負荷を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   max_load() const;
 
   /// @brief 立ち上がり固定遅延を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   rise_block_delay() const;
 
   /// @brief 立ち上がり負荷依存遅延を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   rise_fanout_delay() const;
 
   /// @brief 立ち下がり固定遅延を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   fall_block_delay() const;
 
   /// @brief 立ち下がり負荷依存遅延を表すオブジェクトを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   fall_fanout_delay() const;
 
   /// @brief 次のピンを設定する．
   virtual
   void
-  set_next(MislibPt* pin);
+  set_next(const MislibNode* pin);
 
   /// @brief 次のピンを取り出す．
   virtual
-  MislibPt*
+  const MislibNode*
   next() const;
 
   /// @brief 内容を出力する．
@@ -304,52 +304,64 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 入力ピン名
-  MislibPt* mName;
+  const MislibNode* mName;
 
   // 極性情報
-  MislibPt* mPhase;
+  const MislibNode* mPhase;
 
   // 入力負荷
-  MislibPt* mInputLoad;
+  const MislibNode* mInputLoad;
 
   // 最大駆動負荷
-  MislibPt* mMaxLoad;
+  const MislibNode* mMaxLoad;
 
   // 立ち上がり固有遅延
-  MislibPt* mRiseBlockDelay;
+  const MislibNode* mRiseBlockDelay;
 
   // 立ち上がり負荷依存遅延係数
-  MislibPt* mRiseFanoutDelay;
+  const MislibNode* mRiseFanoutDelay;
 
   // 立ち下がり固有遅延
-  MislibPt* mFallBlockDelay;
+  const MislibNode* mFallBlockDelay;
 
   // 立ち下がり負荷依存遅延係数
-  MislibPt* mFallFanoutDelay;
+  const MislibNode* mFallFanoutDelay;
 
   // 次のピン
-  MislibPt* mNext;
+  const MislibNode* mNext;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @brief ピンのリストを表すクラス
+/// @class MislibGate MislibImpl2.h "MislibImpl2.h"
+/// @brief ゲート(セル)を表すクラス
 //////////////////////////////////////////////////////////////////////
-class MislibPtPinList :
-  public MislibPt
+class MislibGate :
+  public const MislibNode
 {
-  friend class MislibParserImpl;
+  friend class MislibParser;
 private:
 
   /// @brief コンストラクタ
-  MislibPtPinList();
+  /// @param[in] loc 位置情報
+  /// @param[in] name 名前を表すパース木
+  /// @param[in] area 面積を表すパース木
+  /// @param[in] opin_name 出力ピン名を表すパース木
+  /// @param[in] opin_expr 出力の論理式を表すパース木
+  /// @param[in] ipin_list 入力ピンのリストを表すパース木
+  MislibGate(const FileRegion& loc,
+	       const MislibNode* name,
+	       const MislibNode* area,
+	       const MislibNode* opin_name,
+	       const MislibNode* opin_expr,
+	       const MislibNode* ipin_list);
 
   /// @brief デストラクタ
   virtual
-  ~MislibPtPinList();
+  ~MislibGate();
 
 
 public:
@@ -359,15 +371,40 @@ public:
   tType
   type() const;
 
-  /// @brief 末尾にピンを追加する．
+  /// @brief ピン名/ゲート名を表すオブジェクトを取り出す．
+  virtual
+  const MislibNode*
+  name() const;
+
+  /// @brief 面積を表すオブジェクトを返す．
+  virtual
+  const MislibNode*
+  area() const;
+
+  /// @brief 出力ピン名を表すオブジェクトを返す．
+  virtual
+  const MislibNode*
+  opin_name() const;
+
+  /// @brief 出力の論理式を表すオブジェクトを返す．
+  virtual
+  const MislibNode*
+  opin_expr() const;
+
+  /// @brief 入力ピンのリストを表すオブジェクトを返す．
+  virtual
+  const MislibNode*
+  ipin_list() const;
+
+  /// @brief 次の要素を設定する．
   virtual
   void
-  push_back(MislibPt* pin);
+  set_next(const MislibNode* next);
 
-  /// @brief 先頭のピンを取り出す．
+  /// @brief 次の要素を取り出す．
   virtual
-  MislibPt*
-  pin() const;
+  const MislibNode*
+  next() const;
 
   /// @brief 内容を出力する．
   /// デバッグ用
@@ -381,11 +418,23 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 先頭のピン
-  MislibPt* mTop;
+  // 名前
+  const MislibNode* mName;
 
-  // 末尾のピン
-  MislibPt* mEnd;
+  // 面積
+  const MislibNode* mArea;
+
+  // 出力ピン名
+  const MislibNode* mOpinName;
+
+  // 出力の論理式
+  const MislibNode* mOpinExpr;
+
+  // 入力ピンのリスト
+  const MislibNode* mIpinList;
+
+  // 次の要素
+  const MislibNode* mNext;
 
 };
 
