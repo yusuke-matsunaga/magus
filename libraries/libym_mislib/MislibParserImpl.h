@@ -64,7 +64,6 @@ public:
        FileRegion& lloc);
 
   /// @brief エラーメッセージを出力する．
-  /// @note 副作用で mError が true にセットされる．
   void
   error(const FileRegion& loc,
 	const char* msg);
@@ -80,9 +79,6 @@ private:
 
   // MislibNode を管理するオブジェクト
   MislibMgrImpl* mMislibMgr;
-
-  // 読み込み時のエラーの有無を示すフラグ
-  bool mError;
 
 };
 

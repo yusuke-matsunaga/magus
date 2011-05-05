@@ -25,7 +25,6 @@ BEGIN_NAMESPACE_YM_MISLIB
 
 #include "mislib_grammer.h"
 
-
 //////////////////////////////////////////////////////////////////////
 // クラス MislibParserImpl
 //////////////////////////////////////////////////////////////////////
@@ -39,6 +38,44 @@ MislibParserImpl::MislibParserImpl()
 MislibParserImpl::~MislibParserImpl()
 {
 }
+
+
+BEGIN_NONAMESPACE
+
+// 論理式中に現れる名前を ipin_set に積む．
+void
+get_ipin_names(const MislibNode* expr_node,
+	       hash_set<ShString>& ipin_set)
+{
+  ShString name;
+
+  switch ( expr_node->type() ) {
+  case MislibNode::kConst0:
+  case MislibNode::kConst1:
+    // 定数は無視
+    return;
+
+  case MislibNode::kStr:
+    ipin_set.insert(expr_node->str());
+    break;
+
+  case MislibNode::kNot:
+    get_ipin_names(expr_node->child1(), ipin_set);
+    break;
+
+  case MislibNode::kAnd:
+  case MislibNode::kOr:
+  case MislibNode::kXor:
+    get_ipin_names(expr_node->child1(), ipin_set);
+    get_ipin_names(expr_node->child2(), ipin_set);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
+END_NONAMESPACE
 
 // @brief mislib ファイルを読み込んでライブラリを生成する．
 // @param[in] filename ファイル名
@@ -68,17 +105,116 @@ MislibParserImpl::read_file(const string& filename,
   mMislibMgr = mgr;
   mMislibMgr->clear();
 
-  mError = false;
+  ymuint prev_errnum = MsgMgr::error_num();
 
   // パース木を作る．
-  // 結果は mGateList に入っている．
+  // 結果は MislibMgrImpl が持っている．
   yyparse(*this, mgr);
 
-  if ( mError ) {
+  if ( MsgMgr::error_num() > prev_errnum ) {
     // 異常終了
     return false;
   }
 
+  // 重複したセル名がないかチェック
+  // また，セル内のピン名が重複していないか，出力ピンの論理式に現れるピン名
+  // と入力ピンに齟齬がないかもチェックする．
+  const MislibNode* gate_list = mgr->gate_list();
+  hash_map<ShString, const MislibNode*> cell_map;
+  for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
+    assert_cond( gate->type() == MislibNode::kGate, __FILE__, __LINE__);
+    ShString name = gate->name()->str();
+    hash_map<ShString, const MislibNode*>::iterator p = cell_map.find(name);
+    if ( p != cell_map.end() ) {
+      ostringstream buf;
+      buf << "Cell name, " << name << " is defined more than once. "
+	  << "Previous definition is " << p->second->name()->loc() << ".";
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      gate->name()->loc(),
+		      kMsgError,
+		      "MISLIB_PARSER",
+		      buf.str());
+      // このセルについては以降のチェックをスキップする．
+      continue;
+    }
+    // 情報を登録する．
+    cell_map.insert(make_pair(name, gate));
+
+    // 入力ピン名のチェック
+    const MislibNode* ipin_list = gate->ipin_list();
+    if ( ipin_list->type() == MislibNode::kList ) {
+      // 通常の入力ピン定義の場合
+      hash_map<ShString, const MislibNode*> ipin_map;
+      for (const MislibNode* ipin = ipin_list->top(); ipin; ipin = ipin->next()) {
+	assert_cond( ipin->type() == MislibNode::kPin, __FILE__, __LINE__);
+	ShString name = ipin->name()->str();
+	hash_map<ShString, const MislibNode*>::iterator p = ipin_map.find(name);
+	if ( p != ipin_map.end() ) {
+	  ostringstream buf;
+	  buf << "Pin name, " << name << " is defined more than once. "
+	      << "Previous definition is "
+	      << p->second->name()->loc() << ".";
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  ipin->name()->loc(),
+			  kMsgError,
+			  "MISLIB_PARSER",
+			  buf.str());
+	}
+	else {
+	  ipin_map.insert(make_pair(name, ipin));
+	}
+      }
+      // 論理式に現れる名前の集合を求める．
+      hash_set<ShString> ipin_set;
+      get_ipin_names(gate->opin_expr(), ipin_set);
+      for (hash_map<ShString, const MislibNode*>::iterator p = ipin_map.begin();
+	   p != ipin_map.end(); ++ p) {
+	ShString name = p->first;
+	if ( ipin_set.count(name) == 0 ) {
+	  // ピン定義に現れる名前が論理式中に現れない．
+	  // エラーではないが，このピンのタイミング情報は意味をもたない．
+	  ostringstream buf;
+	  buf << "Input pin, " << name
+	      << " does not appear in the logic expression. "
+	      << "Timing information will be ignored.";
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  p->second->loc(),
+			  kMsgWarning,
+			  "MISLIB_PARSER",
+			  buf.str());
+	}
+      }
+      for (hash_set<ShString>::iterator p = ipin_set.begin();
+	   p != ipin_set.end(); ++ p) {
+	ShString name = *p;
+	if ( ipin_map.count(name) == 0 ) {
+	  // 論理式中に現れる名前の入力ピンが存在しない．
+	  // これはエラー
+	  ostringstream buf;
+	  buf << name << " appears in the logic expression, "
+	      << "but is not defined in PIN statement.";
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  gate->opin_expr()->loc(),
+			  kMsgError,
+			  "MISLIB_PARSER",
+			  buf.str());
+	}
+      }
+    }
+    else if ( ipin_list->type() == MislibNode::kPin ) {
+      // ワイルドカードの場合
+      // シンタックス的にはエラーとなることはない．
+    }
+    else {
+      // yacc の文法からありえない．
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
+
+  if ( MsgMgr::error_num() > prev_errnum ) {
+    // 異常終了
+    return false;
+  }
   // 読み込みまではうまくいった．
   return true;
 }
@@ -215,7 +351,6 @@ MislibParserImpl::scan(MislibNodeImpl*& lval,
 }
 
 // @brief エラーメッセージを出力する．
-// @note 副作用で mError が true にセットされる．
 void
 MislibParserImpl::error(const FileRegion& loc,
 			const char* msg)
@@ -237,7 +372,6 @@ MislibParserImpl::error(const FileRegion& loc,
 		  kMsgError,
 		  "MISLIB_PARSER",
 		  msg2);
-  mError = true;
 }
 
 END_NAMESPACE_YM_MISLIB
