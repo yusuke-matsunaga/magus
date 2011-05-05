@@ -45,7 +45,8 @@ TvFuncTestCmd::usage()
     "                   check_sup <func> <pos>\n"
     "                   check_sym <func> <pos1> <pos2>\n"
     "                   walsh_w0 <func> <ibits>\n"
-    "                   walsh_w1 <func> <pos> <ibits>\n";
+    "                   walsh_w1 <func> <pos> <ibits>\n"
+    "                   cofactor <func> <pos> <pol>\n"
   set_result(usage);
 }
 
@@ -157,7 +158,7 @@ TvFuncTestCmd::cmd_proc(TclObjVector& objv)
     if ( code != TCL_OK ) {
       return code;
     }
-    
+
     unsigned int pos;
     code = get_pos(objv[3], func.ni(), pos);
     if ( code != TCL_OK ) {
@@ -325,6 +326,39 @@ TvFuncTestCmd::cmd_proc(TclObjVector& objv)
     }
 
     test.check_walsh_w1(func, pos1, ibits);
+    return TCL_OK;
+  }
+
+  if ( subcmd == "cofactor" ) {
+    if ( objv.size() != 5 ) {
+      usage();
+      return TCL_ERROR;
+    }
+
+    TvFunc func;
+    int code = get_tvfunc(objv[2], func);
+    if ( code != TCL_OK ) {
+      return code;
+    }
+
+    ymuint pos1;
+    code = get_pos(objv[3], func.ni(), pos1);
+    if ( code != TCL_OK ) {
+      return code;
+    }
+
+    ymuint pol;
+    code = uint_conv(objv[4], pol);
+    if ( code != TCL_OK ) {
+      return code;
+    }
+    if ( pol != 0 && pol != 1 ) {
+      TclObj emsg;
+      emsg << "pol should be 0 or 1";
+      set_result(emsg);
+      return TCL_ERROR;
+    }
+    test.check_cofactor(func, pos1, pol);
     return TCL_OK;
   }
 

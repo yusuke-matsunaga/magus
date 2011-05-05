@@ -115,6 +115,14 @@ public:
   const TvFunc&
   operator^=(const TvFunc& src1);
 
+  /// @brief コファクターを計算し自分に代入する．
+  /// @param[in] varid 変数番号
+  /// @param[in] pol 極性
+  /// @return 自身への参照を返す．
+  const TvFunc&
+  cofactor(ymuint varid,
+	   tPol pol);
+
 
 public:
 

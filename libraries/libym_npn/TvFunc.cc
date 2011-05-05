@@ -681,6 +681,51 @@ TvFunc::operator^=(const TvFunc& src1)
   return *this;
 }
 
+// @brief コファクターを計算し自分に代入する．
+// @param[in] pos 変数番号
+// @param[in] pol 極性
+// @return 自身への参照を返す．
+const TvFunc&
+TvFunc::cofactor(ymuint pos,
+		 tPol pol)
+{
+  if ( pos < NIPW ) {
+    ymulong mask = c_masks[pos];
+    if ( pol == kPolNega ) {
+      mask = ~mask;
+    }
+    ymulong* endp = mVector + mNblk;
+    int shift = 1 << pos;
+    for (ymulong* bp = mVector; bp != endp; ++ bp) {
+      ymulong pat = *bp & mask;
+      if ( pol == kPolPosi ) {
+	pat |= (pat >> shift);
+      }
+      else {
+	pat |= (pat << shift);
+      }
+      *bp = pat;
+    }
+  }
+  else {
+    pos -= NIPW;
+    ymuint bit = 1U << pos;
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      if ( pol == kPolPosi ) {
+	if ( (i & bit) == 0U ) {
+	  mVector[i] = mVector[i ^ bit];
+	}
+      }
+      else {
+	if ( (i & bit) == bit ) {
+	  mVector[i] = mVector[i ^ bit];
+	}
+      }
+    }
+  }
+  return *this;
+}
+
 BEGIN_NONAMESPACE
 
 // word の中の 1 のビットを数える．
