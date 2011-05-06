@@ -86,6 +86,7 @@ ym_libym_lutmap_enable=1
 ym_libym_techmap_enable=1
 ym_libym_seal_enable=1
 ym_libym_tclpp_enable=1
+ym_libym_ymsh_enable=1
 
 
 YM_INIT_LIBRARIES_SUBDIRS
@@ -209,6 +210,11 @@ YM_BUILD_LIBRARY([libym_seal],
 # libym_tclpp
 YM_BUILD_LIBRARY([libym_tclpp],
 		 [])
+
+# libym_ymsh
+YM_BUILD_LIBRARY([libym_ymsh],
+		 [])
+
 
 YM_FINISH_LIBRARIES_SUBDIRS
 

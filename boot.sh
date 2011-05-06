@@ -137,7 +137,8 @@ LIBRARIES=\
  libym_lutmap \
  libym_techmap \
  libym_seal \
- libym_tclpp"
+ libym_tclpp \
+ libym_ymsh"
 
 PROGRAMS=\
 "magus_tclsh \
