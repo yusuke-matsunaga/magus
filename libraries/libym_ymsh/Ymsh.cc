@@ -12,6 +12,7 @@
 
 #include "SetCmd.h"
 #include "AliasCmd.h"
+#include "ExitCmd.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH
@@ -65,6 +66,9 @@ Ymsh::Ymsh()
 
   YmshCmd* unalias_cmd = new UnaliasCmd;
   impl()->reg_command(unalias_cmd);
+
+  YmshCmd* exit_cmd = new ExitCmd;
+  impl()->reg_command(exit_cmd);
 }
 
 // @brief デストラクタ

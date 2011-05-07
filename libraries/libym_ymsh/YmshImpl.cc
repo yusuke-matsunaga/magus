@@ -230,11 +230,11 @@ END_NONAMESPACE
 void
 YmshImpl::run()
 {
-  for ( ; ; ) {
+  for (mLoop = true; mLoop; ) {
     char* line = readline(mPrompt1.c_str());
     if ( line == NULL ) {
       if ( mAllowCtrlDExit ) {
-	break;
+	mLoop = false;
       }
       printf("\n");
       continue;
@@ -400,6 +400,13 @@ YmshImpl::get_var_name_list(vector<const char*>& var_list)
 {
   mVarTable.get_name_list(var_list);
   sort(var_list.begin(), var_list.end(), StrCmp());
+}
+
+// @brief コマンドループを終了する．
+void
+YmshImpl::exit()
+{
+  mLoop = false;
 }
 
 END_NAMESPACE_YM_YMSH
