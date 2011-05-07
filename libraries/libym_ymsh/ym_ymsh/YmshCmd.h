@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_YMSH
 
+class YmshImpl;
+
 //////////////////////////////////////////////////////////////////////
 /// @class YmshCmd YmshCmd.h "ym_ymsh/YmshCmd.h"
 /// @brief Ymsh のコマンドの基底クラス
@@ -58,7 +60,7 @@ public:
   name() const;
 
   /// @brief 親のインタープリタを返す．
-  Ymsh*
+  YmshImpl*
   ymsh() const;
 
 

@@ -10,6 +10,8 @@
 #include "ym_ymsh/Ymsh.h"
 #include "YmshImpl.h"
 
+#include "SetCmd.h"
+
 
 BEGIN_NAMESPACE_YM_YMSH
 
@@ -21,6 +23,8 @@ BEGIN_NAMESPACE_YM_YMSH
 YmshBase::YmshBase() :
   mImpl(new YmshImpl)
 {
+  YmshCmd* set_cmd = new SetCmd;
+  mImpl->reg_command(set_cmd);
 }
 
 // @brief デストラクタ

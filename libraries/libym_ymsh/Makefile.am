@@ -30,5 +30,7 @@ libym_ymsh_la_SOURCES = \
 	YmshImpl.cc \
 	YmshCmd.cc \
 	YmshAlias.cc \
-	YmshVar.cc
+	YmshVar.cc \
+	SetCmd.h \
+	SetCmd.cc
 

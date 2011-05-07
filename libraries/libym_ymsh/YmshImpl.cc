@@ -178,6 +178,14 @@ YmshImpl::run()
     }
     else {
       cout << cmdname << ": command not found." << endl;
+      vector<const char*> tmp_list;
+      get_command_name_list(tmp_list);
+      cout << "Possible commands are";
+      for (vector<const char*>::iterator p = tmp_list.begin();
+	   p != tmp_list.end(); ++ p) {
+	cout << " " << *p;
+      }
+      cout << endl;
     }
 
     // 文字列領域を解放する．
@@ -290,20 +298,23 @@ YmshImpl::get_alias_name_list(vector<const char*>& alias_list)
   sort(alias_list.begin(), alias_list.end(), StrCmp());
 }
 
-// @brief 変数を登録する．
-// @param[in] var 変数
-// @retval true 登録が成功した．
-// @retval false 登録が失敗した．同名の変数がすでに登録済み
-bool
-YmshImpl::reg_var(YmshVar* var)
+// @brief 変数を得る．
+// @param[in] name 変数名
+// @return 対応する変数の値
+// @note なければ登録する．
+vector<string>&
+YmshImpl::get_var(const char* name)
 {
-  if ( mVarTable.count(var->name()) > 0 ) {
-    // 同名の変数が登録されていた．
-    return false;
+  YmshVar* var = NULL;
+  hash_map<const char*, YmshVar*>::iterator p = mVarTable.find(name);
+  if ( p == mVarTable.end() ) {
+    var = new YmshVar(name);
+    mVarTable.insert(make_pair(name, var));
   }
-
-  mVarTable.insert(make_pair(var->name(), var));
-  return true;
+  else {
+    var = p->second;
+  }
+  return var->value();
 }
 
 // @brief 変数の登録を解除する．
@@ -312,20 +323,12 @@ YmshImpl::reg_var(YmshVar* var)
 void
 YmshImpl::unreg_var(const char* name)
 {
-  mVarTable.erase(name);
-}
-
-// @brief 変数を得る．
-// @param[in] name 変数名
-// @note 見つからなければ NULL を返す．
-YmshVar*
-YmshImpl::get_var(const char* name)
-{
   hash_map<const char*, YmshVar*>::iterator p = mVarTable.find(name);
-  if ( p == mVarTable.end() ) {
-    return NULL;
+  if ( p != mVarTable.end() ) {
+    YmshVar* var = p->second;
+    delete var;
+    mVarTable.erase(p);
   }
-  return p->second;
 }
 
 // @brief 変数名のリストを得る．

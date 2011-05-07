@@ -8,6 +8,7 @@
 
 
 #include "SetCmd.h"
+#include "YmshImpl.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH
@@ -39,10 +40,8 @@ SetCmd::exec(const vector<string>& argv)
     for (vector<const char*>::iterator p = var_list.begin();
 	 p != var_list.end(); ++ p ) {
       const char* name = *p;
-      YmshVar* var = ymsh()->get_var(name);
-      assert_cond( var != NULL, __FILE__, __LINE__);
+      vector<string>& value = ymsh()->get_var(name);
       cout << name << "\t";
-      const vector<string>& value = var->value();
       ymuint n = value.size();
       if ( n == 1 ) {
 	cout << value[0];
@@ -62,9 +61,29 @@ SetCmd::exec(const vector<string>& argv)
   else {
     for (ymuint i = 1; i < argv.size(); ++ i) {
       string tmp = argv[i];
-      ymuint
+      string::size_type index = tmp.find("=");
+      string varname;
+      string value_str;
+      if ( index == string::npos ) {
+	varname = tmp;
+	value_str = string();
+      }
+      else {
+	varname = tmp.substr(0, index);
+	value_str = tmp.substr(index + 1);
+      }
+      vector<string>& value = ymsh()->get_var(varname);
+      // 仮
+      if ( value_str == string() ) {
+	value.clear();
+      }
+      else {
+	value.resize(1);
+	value[0] = value_str;
+      }
     }
   }
+  return 0;
 }
 
 END_NAMESPACE_YM_YMSH

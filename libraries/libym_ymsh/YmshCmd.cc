@@ -38,10 +38,10 @@ YmshCmd::name() const
 }
 
 // @brief 親のインタープリタを返す．
-Ymsh*
+YmshImpl*
 YmshCmd::ymsh() const
 {
-  reutrn mYmsh;
+  return mYmsh;
 }
 
 END_NAMESPACE_YM_YMSH

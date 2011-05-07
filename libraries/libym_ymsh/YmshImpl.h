@@ -105,12 +105,19 @@ public:
   // 変数に関連した関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数を登録する．
-  /// @param[in] var 変数
-  /// @retval true 登録が成功した．
-  /// @retval false 登録が失敗した．同名の変数がすでに登録済み
-  bool
-  reg_var(YmshVar* var);
+  /// @brief 変数を得る．
+  /// @param[in] name 変数名
+  /// @return 対応する変数の値
+  /// @note なければ登録する．
+  vector<string>&
+  get_var(const char* name);
+
+  /// @brief 変数を得る．
+  /// @param[in] name 変数名
+  /// @return 対応する変数の値
+  /// @note なければ登録する．
+  vector<string>&
+  get_var(const string& name);
 
   /// @brief 変数の登録を解除する．
   /// @param[in] name 登録を解除する変数名
@@ -118,11 +125,11 @@ public:
   void
   unreg_var(const char* name);
 
-  /// @brief 変数を得る．
-  /// @param[in] name 変数名
-  /// @note 見つからなければ NULL を返す．
-  YmshVar*
-  get_var(const char* name);
+  /// @brief 変数の登録を解除する．
+  /// @param[in] name 登録を解除する変数名
+  /// @note 登録されていなくてもエラーとはならない．
+  void
+  unreg_var(const string& name);
 
   /// @brief 変数名のリストを得る．
   /// @param[out] var_list 結果のリストを格納するための変数
@@ -169,6 +176,32 @@ private:
   bool mAllowCtrlDExit;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 変数を得る．
+// @param[in] name 変数名
+// @return 対応する変数の値
+// @note なければ登録する．
+inline
+vector<string>&
+YmshImpl::get_var(const string& name)
+{
+  return get_var(name.c_str());
+}
+
+// @brief 変数の登録を解除する．
+// @param[in] name 登録を解除する変数名
+// @note 登録されていなくてもエラーとはならない．
+inline
+void
+YmshImpl::unreg_var(const string& name)
+{
+  return unreg_var(name.c_str());
+}
 
 END_NAMESPACE_YM_YMSH
 
