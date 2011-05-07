@@ -25,6 +25,9 @@ YmshBase::YmshBase() :
 {
   YmshCmd* set_cmd = new SetCmd;
   mImpl->reg_command(set_cmd);
+
+  YmshCmd* unset_cmd = new UnsetCmd;
+  mImpl->reg_command(unset_cmd);
 }
 
 // @brief デストラクタ

@@ -25,7 +25,7 @@ struct StrCmp
   operator()(const char* left,
 	     const char* right)
   {
-    return strcmp(left, right);
+    return ( strcmp(left, right) <= 0 );
   }
 };
 

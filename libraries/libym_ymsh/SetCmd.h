@@ -45,6 +45,38 @@ public:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class UnsetCmd SetCmd.h "SetCmd.h"
+/// @brief unset コマンドのクラス
+//////////////////////////////////////////////////////////////////////
+class UnsetCmd :
+  public YmshCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  UnsetCmd();
+
+  /// @brief デストラクタ
+  virtual
+  ~UnsetCmd();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 処理を行うメイン関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コマンドの実行を行う．
+  /// @param[in] argv コマンド行の引数のベクタ(空白で切り分けてある)
+  /// @return 実行後の状態を表すコードを返す．
+  virtual
+  int
+  exec(const vector<string>& argv);
+
+};
+
 END_NAMESPACE_YM_YMSH
 
 #endif // LIBYM_YMSH_SETCMD_H

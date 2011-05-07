@@ -86,4 +86,37 @@ SetCmd::exec(const vector<string>& argv)
   return 0;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス UnsetCmd
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+UnsetCmd::UnsetCmd() :
+  YmshCmd("unset")
+{
+}
+
+// @brief デストラクタ
+UnsetCmd::~UnsetCmd()
+{
+}
+
+// @brief コマンドの実行を行う．
+// @param[in] argv コマンド行の引数のベクタ(空白で切り分けてある)
+// @return 実行後の状態を表すコードを返す．
+int
+UnsetCmd::exec(const vector<string>& argv)
+{
+  if ( argv.size() == 1 ) {
+    cout << argv[0] << ": Too few arguments." << endl;
+    return -1;
+  }
+
+  for (ymuint i = 1; i < argv.size(); ++ i) {
+    ymsh()->unreg_var(argv[i]);
+  }
+  return 0;
+}
+
 END_NAMESPACE_YM_YMSH
