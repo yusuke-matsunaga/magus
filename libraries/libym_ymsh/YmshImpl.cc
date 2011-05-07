@@ -57,6 +57,22 @@ YmshImpl::~YmshImpl()
 
 BEGIN_NONAMESPACE
 
+char*
+chop(char* line)
+{
+  char* s;
+  for (s = line; *s && isspace(*s); ++ s) ;
+  if ( *s == 0 ) {
+    return s;
+  }
+
+  char* t = line + strlen(line) - 1;
+  for ( ; t > s && isspace(*t); -- t) ;
+  ++ t;
+  *t = '\0';
+  return s;
+}
+
 bool
 parse_line(const char* line,
 	   vector<string>& argv)
@@ -141,7 +157,12 @@ YmshImpl::run()
       continue;
     }
 
-    add_history(line);
+    char* str = chop(line);
+    if ( *str == '\0' ) {
+      continue;
+    }
+
+    add_history(str);
     ++ mHistoryNum;
     if ( mHistoryNum > mMaxHistory ) {
       // あふれたヒストリを削除する．
@@ -152,7 +173,7 @@ YmshImpl::run()
 
     // コマンドラインの文字列を空白で切り分ける．
     vector<string> argv;
-    parse_line(line, argv);
+    parse_line(str, argv);
 
     string cmdname = argv[0];
 
