@@ -24,17 +24,6 @@ BEGIN_NAMESPACE_YM_YMSH
 YmshBase::YmshBase() :
   mImpl(new YmshImpl)
 {
-  YmshCmd* set_cmd = new SetCmd;
-  mImpl->reg_command(set_cmd);
-
-  YmshCmd* unset_cmd = new UnsetCmd;
-  mImpl->reg_command(unset_cmd);
-
-  YmshCmd* alias_cmd = new AliasCmd;
-  mImpl->reg_command(alias_cmd);
-
-  YmshCmd* unalias_cmd = new UnaliasCmd;
-  mImpl->reg_command(unalias_cmd);
 }
 
 // @brief デストラクタ
@@ -50,6 +39,13 @@ YmshBase::run()
   mImpl->run();
 }
 
+// @brief 実装クラスを返す．
+YmshImpl*
+YmshBase::impl()
+{
+  return mImpl;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス Ymsh
@@ -58,6 +54,17 @@ YmshBase::run()
 // @brief コンストラクタ
 Ymsh::Ymsh()
 {
+  YmshCmd* set_cmd = new SetCmd;
+  impl()->reg_command(set_cmd);
+
+  YmshCmd* unset_cmd = new UnsetCmd;
+  impl()->reg_command(unset_cmd);
+
+  YmshCmd* alias_cmd = new AliasCmd;
+  impl()->reg_command(alias_cmd);
+
+  YmshCmd* unalias_cmd = new UnaliasCmd;
+  impl()->reg_command(unalias_cmd);
 }
 
 // @brief デストラクタ

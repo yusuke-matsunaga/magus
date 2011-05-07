@@ -179,7 +179,7 @@ YmshImpl::run()
       cout << cmdname << ": command not found." << endl;
       vector<const char*> tmp_list;
       get_command_name_list(tmp_list);
-      cout << "Possible commands are";
+      cout << "Possible commands are :";
       for (vector<const char*>::iterator p = tmp_list.begin();
 	   p != tmp_list.end(); ++ p) {
 	cout << " " << *p;
