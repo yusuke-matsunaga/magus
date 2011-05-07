@@ -32,6 +32,87 @@ struct StrCmp
 END_NONAMESPACE
 
 
+BEGIN_NONAMESPACE
+
+// Ymsh
+YmshImpl* gYmsh = NULL;
+
+/* Generator function for command completion.  STATE lets us
+   know whether to start from scratch; without any state
+   (i.e. STATE == 0), then we start at the top of the list. */
+char *
+command_generator (const char *text,
+		   int state)
+{
+  static int len;
+  static vector<const char*> command_list;
+  static vector<const char*>::iterator list_index;
+
+  /* If this is a new word to complete, initialize now.  This
+     includes saving the length of TEXT for efficiency, and
+     initializing the index variable to 0. */
+  if ( !state ) {
+    len = strlen (text);
+    gYmsh->get_command_name_list(command_list);
+    list_index = command_list.begin();
+  }
+
+  /* Return the next name which partially matches from the
+     command list. */
+  while ( list_index != command_list.end() ) {
+    const char* name = *list_index;
+    ++ list_index;
+
+    if ( strncmp (name, text, len) == 0 ) {
+      ymuint size = strlen(name);
+      char* str = static_cast<char*>(malloc(size + 1));
+      for (ymuint i = 0; i < size; ++ i) {
+	str[i] = name[i];
+      }
+      str[size] = '\0';
+      return str;
+    }
+  }
+
+  /* If no names matched, then return NULL. */
+  return ((char *)NULL);
+}
+
+/* Attempt to complete on the contents of TEXT.  START and END
+   bound the region of rl_line_buffer that contains the word to
+   complete.  TEXT is the word to complete.  We can use the entire
+   contents of rl_line_buffer in case we want to do some simple
+   parsing.  Returnthe array of matches, or NULL if there aren't any. */
+char **
+ymsh_completion (const char *text,
+		 int start,
+		 int end)
+{
+  char **matches;
+
+  matches = (char **)NULL;
+
+  /* If this word is at the start of the line, then it is a command
+     to complete.  Otherwise it is the name of a file in the current
+     directory. */
+  if ( start == 0 )
+    matches = rl_completion_matches (text, command_generator);
+
+  return (matches);
+}
+
+// readline の completion 機能の設定を行う．
+void
+initialize_rl_completion(YmshImpl* impl)
+{
+  gYmsh = impl;
+
+  rl_attempted_completion_function = ymsh_completion;
+
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス YmshImpl
 //////////////////////////////////////////////////////////////////////
@@ -47,6 +128,8 @@ YmshImpl::YmshImpl()
   mHistoryNum = 0;
 
   mAllowCtrlDExit = false;
+
+  initialize_rl_completion(this);
 }
 
 // @brief デストラクタ
