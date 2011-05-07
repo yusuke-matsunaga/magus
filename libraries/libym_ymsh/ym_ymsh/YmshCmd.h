@@ -25,6 +25,7 @@ class YmshImpl;
 class YmshCmd
 {
   friend class YmshImpl;
+  friend class YmshCmdTable;
 
 public:
 
@@ -74,6 +75,9 @@ private:
 
   // 親のインタープリタ
   YmshImpl* mYmsh;
+
+  // ハッシュ表のためのリンク
+  YmshCmd* mLink;
 
 };
 

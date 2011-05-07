@@ -11,6 +11,4 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	ymsh_nsdef.h \
 	Ymsh.h \
-	YmshCmd.h \
-	YmshAlias.h \
-	YmshVar.h
+	YmshCmd.h

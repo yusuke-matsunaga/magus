@@ -9,8 +9,7 @@
 
 #include "YmshImpl.h"
 #include "ym_ymsh/YmshCmd.h"
-#include "ym_ymsh/YmshAlias.h"
-#include "ym_ymsh/YmshVar.h"
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -159,11 +158,11 @@ YmshImpl::run()
 
     // まずエイリアスを探す．
     if ( cmdname[0] != '\\' ) {
-      YmshAlias* alias = get_alias(cmdname.c_str());
-      if ( alias != NULL ) {
-	// argv[0] を alias->value() で置き換える．
+      if ( check_alias(cmdname) ) {
+	vector<string>& value = get_alias(cmdname);
+	// argv[0] を value で置き換える．
 	argv.erase(argv.begin());
-	argv.insert(argv.begin(), alias->value().begin(), alias->value().end());
+	argv.insert(argv.begin(), value.begin(), value.end());
       }
     }
 
@@ -172,7 +171,7 @@ YmshImpl::run()
     if ( cmdname[0] == '\\' ) {
       cmdname.erase(cmdname.begin());
     }
-    YmshCmd* cmd = get_command(cmdname.c_str());
+    YmshCmd* cmd = find_command(cmdname.c_str());
     if ( cmd != NULL ) {
       int code = cmd->exec(argv);
     }
@@ -200,14 +199,11 @@ YmshImpl::run()
 bool
 YmshImpl::reg_command(YmshCmd* cmd)
 {
-  if ( mCmdTable.count(cmd->name()) > 0 ) {
-    // 同名のコマンドが登録済み
-    return false;
+  bool stat = mCmdTable.reg_obj(cmd);
+  if ( stat ) {
+    cmd->mYmsh = this;
   }
-
-  mCmdTable.insert(make_pair(cmd->name(), cmd));
-  cmd->mYmsh = this;
-  return true;
+  return stat;
 }
 
 // @brief コマンドの登録を削除する．
@@ -216,20 +212,16 @@ YmshImpl::reg_command(YmshCmd* cmd)
 void
 YmshImpl::unreg_command(const char* name)
 {
-  mCmdTable.erase(name);
+  mCmdTable.unreg_obj(name);
 }
 
 // @brief コマンド名に対応したコマンドを返す．
 // @param[in] name コマンド名
 // @note なければ NULL を返す．
 YmshCmd*
-YmshImpl::get_command(const char* name)
+YmshImpl::find_command(const char* name)
 {
-  hash_map<const char*, YmshCmd*>::iterator p = mCmdTable.find(name);
-  if ( p == mCmdTable.end() ) {
-    return NULL;
-  }
-  return p->second;
+  return mCmdTable.find_obj(name);
 }
 
 // @brief コマンド名のリストを得る．
@@ -237,29 +229,27 @@ YmshImpl::get_command(const char* name)
 void
 YmshImpl::get_command_name_list(vector<const char*>& command_list)
 {
-  command_list.clear();
-  for (hash_map<const char*, YmshCmd*>::iterator p = mCmdTable.begin();
-       p != mCmdTable.end(); ++ p) {
-    const char* name = p->first;
-    command_list.push_back(name);
-  }
+  mCmdTable.get_name_list(command_list);
   sort(command_list.begin(), command_list.end(), StrCmp());
 }
 
-// @brief エイリアスを登録する．
-// @param[in] alias エイリアス
-// @retval true 登録が成功した．
-// @retval false 登録が失敗した．同名のエイリアスがすでに登録済み
+// @brief エイリアスが登録されているか調べる．
+// @param[in] name エイリアス名
+// @return name という名のエイリアスが登録されていたら true を返す．
 bool
-YmshImpl::reg_alias(YmshAlias* alias)
+YmshImpl::check_alias(const char* name)
 {
-  if ( mAliasTable.count(alias->name()) > 0 ) {
-    // 同名のエイリアスがすでに登録されていた．
-    return false;
-  }
+  return mAliasTable.check_obj(name);
+}
 
-  mAliasTable.insert(make_pair(alias->name(), alias));
-  return true;
+// @brief エイリアスを得る．
+// @param[in] name エイリアス名
+// @return 対応する値を返す．
+// @note 登録してなかったら新しいエイリアスを作る．
+vector<string>&
+YmshImpl::get_alias(const char* name)
+{
+  return mAliasTable.get_obj(name);
 }
 
 // @brief エイリアスの登録を解除する．
@@ -268,20 +258,7 @@ YmshImpl::reg_alias(YmshAlias* alias)
 void
 YmshImpl::unreg_alias(const char* name)
 {
-  mAliasTable.erase(name);
-}
-
-// @brief エイリアスを得る．
-// @param[in] name エイリアス名
-// @note 登録されていなかったら NULL を返す．
-YmshAlias*
-YmshImpl::get_alias(const char* name)
-{
-  hash_map<const char*, YmshAlias*>::iterator p = mAliasTable.find(name);
-  if ( p == mAliasTable.end() ) {
-    return NULL;
-  }
-  return p->second;
+  mAliasTable.unreg_obj(name);
 }
 
 // @brief エイリアス名のリストを得る．
@@ -289,12 +266,7 @@ YmshImpl::get_alias(const char* name)
 void
 YmshImpl::get_alias_name_list(vector<const char*>& alias_list)
 {
-  alias_list.clear();
-  for (hash_map<const char*, YmshAlias*>::iterator p = mAliasTable.begin();
-       p != mAliasTable.end(); ++ p) {
-    const char* name = p->first;
-    alias_list.push_back(name);
-  }
+  mAliasTable.get_name_list(alias_list);
   sort(alias_list.begin(), alias_list.end(), StrCmp());
 }
 
@@ -305,16 +277,7 @@ YmshImpl::get_alias_name_list(vector<const char*>& alias_list)
 vector<string>&
 YmshImpl::get_var(const char* name)
 {
-  YmshVar* var = NULL;
-  hash_map<const char*, YmshVar*>::iterator p = mVarTable.find(name);
-  if ( p == mVarTable.end() ) {
-    var = new YmshVar(name);
-    mVarTable.insert(make_pair(name, var));
-  }
-  else {
-    var = p->second;
-  }
-  return var->value();
+  return mVarTable.get_obj(name);
 }
 
 // @brief 変数の登録を解除する．
@@ -323,12 +286,7 @@ YmshImpl::get_var(const char* name)
 void
 YmshImpl::unreg_var(const char* name)
 {
-  hash_map<const char*, YmshVar*>::iterator p = mVarTable.find(name);
-  if ( p != mVarTable.end() ) {
-    YmshVar* var = p->second;
-    delete var;
-    mVarTable.erase(p);
-  }
+  mVarTable.unreg_obj(name);
 }
 
 // @brief 変数名のリストを得る．
@@ -336,12 +294,7 @@ YmshImpl::unreg_var(const char* name)
 void
 YmshImpl::get_var_name_list(vector<const char*>& var_list)
 {
-  var_list.clear();
-  for (hash_map<const char*, YmshVar*>::iterator p = mVarTable.begin();
-       p != mVarTable.end(); ++ p) {
-    const char* name = p->first;
-    var_list.push_back(name);
-  }
+  mVarTable.get_name_list(var_list);
   sort(var_list.begin(), var_list.end(), StrCmp());
 }
 

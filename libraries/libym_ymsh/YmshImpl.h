@@ -11,6 +11,8 @@
 
 #include "ym_ymsh/ymsh_nsdef.h"
 #include "ym_utils/StrBuff.h"
+#include "YmshCmdTable.h"
+#include "YmshObjTable.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH
@@ -62,7 +64,7 @@ public:
   /// @param[in] name コマンド名
   /// @note なければ NULL を返す．
   YmshCmd*
-  get_command(const char* name);
+  find_command(const char* name);
 
   /// @brief コマンド名のリストを得る．
   /// @param[out] command_list 結果のリストを格納するための変数
@@ -75,12 +77,31 @@ public:
   // エイリアスに関連した関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief エイリアスを登録する．
-  /// @param[in] alias エイリアス
-  /// @retval true 登録が成功した．
-  /// @retval false 登録が失敗した．同名のエイリアスがすでに登録済み
+  /// @brief エイリアスが登録されているか調べる．
+  /// @param[in] name エイリアス名
+  /// @return name という名のエイリアスが登録されていたら true を返す．
   bool
-  reg_alias(YmshAlias* alias);
+  check_alias(const char* name);
+
+  /// @brief エイリアスが登録されているか調べる．
+  /// @param[in] name エイリアス名
+  /// @return name という名のエイリアスが登録されていたら true を返す．
+  bool
+  check_alias(const string& name);
+
+  /// @brief エイリアスを得る．
+  /// @param[in] name エイリアス名
+  /// @return 対応する値を返す．
+  /// @note 登録してなかったら新しいエイリアスを作る．
+  vector<string>&
+  get_alias(const char* name);
+
+  /// @brief エイリアスを得る．
+  /// @param[in] name エイリアス名
+  /// @return 対応する値を返す．
+  /// @note 登録してなかったら新しいエイリアスを作る．
+  vector<string>&
+  get_alias(const string& name);
 
   /// @brief エイリアスの登録を解除する．
   /// @param[in] name 登録を解除するエイリアス名
@@ -88,11 +109,11 @@ public:
   void
   unreg_alias(const char* name);
 
-  /// @brief エイリアスを得る．
-  /// @param[in] name エイリアス名
-  /// @note 登録されていなかったら NULL を返す．
-  YmshAlias*
-  get_alias(const char* name);
+  /// @brief エイリアスの登録を解除する．
+  /// @param[in] name 登録を解除するエイリアス名
+  /// @note 登録されていなくてもエラーとはならない．
+  void
+  unreg_alias(const string& name);
 
   /// @brief エイリアス名のリストを得る．
   /// @param[out] alias_list 結果のリストを格納するための変数
@@ -104,6 +125,18 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 変数に関連した関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数が登録されているか調べる．
+  /// @param[in] name 変数名
+  /// @return name という名の変数が登録されていたら true を返す．
+  bool
+  check_var(const char* name);
+
+  /// @brief 変数が登録されているか調べる．
+  /// @param[in] name 変数名
+  /// @return name という名の変数が登録されていたら true を返す．
+  bool
+  check_var(const string& name);
 
   /// @brief 変数を得る．
   /// @param[in] name 変数名
@@ -149,13 +182,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // コマンドのテーブル
-  hash_map<const char*, YmshCmd*> mCmdTable;
+  YmshCmdTable mCmdTable;
 
   // エイリアスのテーブル
-  hash_map<const char*, YmshAlias*> mAliasTable;
+  YmshObjTable mAliasTable;
 
   // 変数のテーブル
-  hash_map<const char*, YmshVar*> mVarTable;
+  YmshObjTable mVarTable;
 
   // プロンプト文字列1
   StrBuff mPrompt1;
@@ -181,6 +214,47 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief エイリアスが登録されているか調べる．
+// @param[in] name エイリアス名
+// @return name という名のエイリアスが登録されていたら true を返す．
+inline
+bool
+YmshImpl::check_alias(const string& name)
+{
+  return check_alias(name.c_str());
+}
+
+// @brief エイリアスを得る．
+// @param[in] name エイリアス名
+// @return 対応する値を返す．
+// @note 登録してなかったら新しいエイリアスを作る．
+inline
+vector<string>&
+YmshImpl::get_alias(const string& name)
+{
+  return get_alias(name.c_str());
+}
+
+// @brief エイリアスの登録を解除する．
+// @param[in] name 登録を解除するエイリアス名
+// @note 登録されていなくてもエラーとはならない．
+inline
+void
+YmshImpl::unreg_alias(const string& name)
+{
+  return unreg_alias(name.c_str());
+}
+
+// @brief 変数が登録されているか調べる．
+// @param[in] name 変数名
+// @return name という名の変数が登録されていたら true を返す．
+inline
+bool
+YmshImpl::check_var(const string& name)
+{
+  return check_var(name.c_str());
+}
 
 // @brief 変数を得る．
 // @param[in] name 変数名

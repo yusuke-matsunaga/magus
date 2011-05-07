@@ -11,6 +11,7 @@
 
 #include "ym_ymsh/ymsh_nsdef.h"
 #include "ym_utils/Alloc.h"
+#include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH
@@ -45,16 +46,19 @@ public:
 
   /// @brief 登録されている名前のリストを返す．
   /// @param[out] name_list 答を格納するリスト
-  /// @return 要素数を返す．
-  ymuint
+  void
   get_name_list(vector<const char*>& name_list) const;
 
-  /// @brief 要素の追加を行う．
+  /// @brief name という名の要素が登録されているか調べる．
   /// @param[in] name 名前
-  /// @return 要素番号を返す．
-  /// @note すでに name という要素が登録されていた場合にはその番号を返す．
-  ymuint
-  reg_obj(const char* name);
+  bool
+  check_obj(const char* name) const;
+
+  /// @brief name という名の値を返す．
+  /// @param[in] name 名前
+  /// @note 登録してなければ新しく作る．
+  vector<string>&
+  get_obj(const char* name);
 
   /// @brief 要素をテーブルから取り除く
   /// @param[in] name 取り除く名前
@@ -62,22 +66,44 @@ public:
   void
   unreg_obj(const char* name);
 
-  /// @brief name という名の要素を探す．
-  /// @param[in] name 名前
-  /// @return 要素番号を返す．
-  /// @note 見つからなかった場合には kBadId が返される．
-  ymuint
-  find_obj(const char* name) const;
 
-
-public:
+private:
   //////////////////////////////////////////////////////////////////////
-  // 外部に公開している定数
+  // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 無効な要素番号
-  static
-  const ymuint32 kBadId = 0xFFFFFFFF;
+  struct Cell
+  {
+
+    // コンストラクタ
+    Cell(const char* name) :
+      mName(name),
+      mLink(NULL)
+    {
+    }
+
+    // デストラクタ
+    ~Cell()
+    {
+    }
+
+    // 名前を返す．
+    const char*
+    name() const
+    {
+      return mName.c_str();
+    }
+
+    // 名前
+    StrBuff mName;
+
+    // 値
+    vector<string> mValue;
+
+    // つぎのセルを指すポインタ
+    Cell* mLink;
+
+  };
 
 
 private:
@@ -86,8 +112,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief Cell を確保する．
+  /// @param[in] name 名前
   Cell*
-  new_cell();
+  new_cell(const char* name);
 
   /// @brief Cell を解放する．
   void
@@ -101,25 +128,6 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct Cell
-  {
-    // 名前
-    const char* mName;
-
-    // 要素番号
-    ymuint32 mId;
-
-    // つぎのセルを指すポインタ
-    Cell* mLink;
-
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -127,13 +135,13 @@ private:
   UnitAlloc mAlloc;
 
   // ハッシュ表のサイズ
-  ymuint32 mSize;
+  ymuint32 mTableSize;
 
   // ハッシュ表
   Cell** mTable;
 
   // ハッシュ表を拡大するしきい値
-  ymuint32 mLimit;
+  ymuint32 mNextLimit;
 
   // 要素数
   ymuint32 mNum;

@@ -27,9 +27,6 @@ BEGIN_NAMESPACE_YM_YMSH
 
 class Ymsh;
 class YmshCmd;
-class YmshEnv;
-class YmshAlias;
-class YmshVar;
 
 END_NAMESPACE_YM_YMSH
 
@@ -38,9 +35,6 @@ BEGIN_NAMESPACE_YM
 
 using nsYmsh::Ymsh;
 using nsYmsh::YmshCmd;
-using nsYmsh::YmshEnv;
-using nsYmsh::YmshAlias;
-using nsYmsh::YmshVar;
 
 END_NAMESPACE_YM
 

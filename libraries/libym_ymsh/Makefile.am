@@ -28,9 +28,11 @@ libym_ymsh_la_SOURCES = \
 	Ymsh.cc \
 	YmshImpl.h \
 	YmshImpl.cc \
+	YmshCmdTable.h \
+	YmshCmdTable.cc \
 	YmshCmd.cc \
-	YmshAlias.cc \
-	YmshVar.cc \
+	YmshObjTable.h \
+	YmshObjTable.cc \
 	SetCmd.h \
 	SetCmd.cc
 
