@@ -34,5 +34,7 @@ libym_ymsh_la_SOURCES = \
 	YmshObjTable.h \
 	YmshObjTable.cc \
 	SetCmd.h \
-	SetCmd.cc
+	SetCmd.cc \
+	AliasCmd.h \
+	AliasCmd.cc
 
