@@ -129,6 +129,8 @@ YmshImpl::YmshImpl()
 
   mAllowCtrlDExit = false;
 
+  mLoop = false;
+
   initialize_rl_completion(this);
 }
 

@@ -38,5 +38,7 @@ libym_ymsh_la_SOURCES = \
 	AliasCmd.h \
 	AliasCmd.cc \
 	ExitCmd.h \
-	ExitCmd.cc
+	ExitCmd.cc \
+	DirCmd.h \
+	DirCmd.cc
 

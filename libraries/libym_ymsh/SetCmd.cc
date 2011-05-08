@@ -34,7 +34,9 @@ SetCmd::~SetCmd()
 int
 SetCmd::exec(const vector<string>& argv)
 {
-  if ( argv.size() == 1 ) {
+  ymuint n = argv.size();
+  if ( n == 1 ) {
+    // 現在の変数の値を表示する．
     vector<const char*> var_list;
     ymsh()->get_var_name_list(var_list);
     for (vector<const char*>::iterator p = var_list.begin();
@@ -59,21 +61,35 @@ SetCmd::exec(const vector<string>& argv)
     }
   }
   else {
-    for (ymuint i = 1; i < argv.size(); ++ i) {
-      string tmp = argv[i];
+    // <変数名>=<値> の形をパースして値の設定を行う．
+    // ただし，<変数名> '=' <値>の形もある．
+    for (ymuint pos = 1; pos < n; ) {
+      string tmp = argv[pos];
       string::size_type index = tmp.find("=");
       string varname;
       string value_str;
       if ( index == string::npos ) {
 	varname = tmp;
-	value_str = string();
+	++ pos;
+	if ( pos >= n ) {
+	  goto end;
+	}
+	if ( argv[pos] == "=" ) {
+	  ++ pos;
+	  if ( pos >= n ) {
+	    goto end;
+	  }
+	  value_str = argv[pos];
+	  ++ pos;
+	}
       }
       else {
 	varname = tmp.substr(0, index);
 	value_str = tmp.substr(index + 1);
+	++ pos;
       }
+    end:
       vector<string>& value = ymsh()->get_var(varname);
-      // 仮
       if ( value_str == string() ) {
 	value.clear();
       }

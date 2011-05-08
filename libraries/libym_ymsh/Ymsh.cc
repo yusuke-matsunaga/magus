@@ -13,6 +13,7 @@
 #include "SetCmd.h"
 #include "AliasCmd.h"
 #include "ExitCmd.h"
+#include "DirCmd.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH
@@ -69,6 +70,21 @@ Ymsh::Ymsh()
 
   YmshCmd* exit_cmd = new ExitCmd;
   impl()->reg_command(exit_cmd);
+
+  YmshCmd* umask_cmd = new UmaskCmd;
+  impl()->reg_command(umask_cmd);
+
+  YmshCmd* pwd_cmd = new PwdCmd;
+  impl()->reg_command(pwd_cmd);
+
+  YmshCmd* cd_cmd = new CdCmd;
+  impl()->reg_command(cd_cmd);
+
+  YmshCmd* mkdir_cmd = new MkdirCmd;
+  impl()->reg_command(mkdir_cmd);
+
+  YmshCmd* rmdir_cmd = new RmdirCmd;
+  impl()->reg_command(rmdir_cmd);
 }
 
 // @brief デストラクタ
