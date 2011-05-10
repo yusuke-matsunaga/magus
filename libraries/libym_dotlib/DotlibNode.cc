@@ -36,6 +36,24 @@ get_float(const DotlibNode* node,
   return true;
 }
 
+/// @brief 文字列を取り出す．
+/// @note 型が違ったらエラーを MsgMgr に出力する．
+bool
+get_string(const DotlibNode* node,
+	   ShString& value)
+{
+  if ( !node->is_string() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    node->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "String value is expected.");
+    return false;
+  }
+  value = node->string_value();
+  return true;
+}
+
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
@@ -242,12 +260,12 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
   if ( min_fo_node ) {
-    if ( !get_float(min_fo_node, pin_info.mMaxFanout) ) {
+    if ( !get_float(min_fo_node, pin_info.mMinFanout) ) {
       return false;
     }
   }
   else {
-    pin_info.mMaxFanout = 0.0;
+    pin_info.mMinFanout = 0.0;
   }
 
   // 'max_capacitance' を取り出す．
@@ -256,12 +274,12 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
   if ( max_cap_node ) {
-    if ( !get_float(max_cap_node, pin_info.mMaxFanout) ) {
+    if ( !get_float(max_cap_node, pin_info.mMaxCapacitance) ) {
       return false;
     }
   }
   else {
-    pin_info.mMaxFanout = 0.0;
+    pin_info.mMaxCapacitance = 0.0;
   }
   // 'min_capacitance' を取り出す．
   const DotlibNode* min_cap_node = NULL;
@@ -269,12 +287,12 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
   if ( min_cap_node ) {
-    if ( !get_float(min_cap_node, pin_info.mMaxFanout) ) {
+    if ( !get_float(min_cap_node, pin_info.mMinCapacitance) ) {
       return false;
     }
   }
   else {
-    pin_info.mMaxFanout = 0.0;
+    pin_info.mMinCapacitance = 0.0;
   }
 
   // 'max_transition' を取り出す．
@@ -283,12 +301,12 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
   if ( max_trans_node ) {
-    if ( !get_float(max_trans_node, pin_info.mMaxFanout) ) {
+    if ( !get_float(max_trans_node, pin_info.mMaxTransition) ) {
       return false;
     }
   }
   else {
-    pin_info.mMaxFanout = 0.0;
+    pin_info.mMaxTransition = 0.0;
   }
   // 'min_transition' を取り出す．
   const DotlibNode* min_trans_node = NULL;
@@ -296,12 +314,23 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
   if ( min_trans_node ) {
-    if ( !get_float(min_trans_node, pin_info.mMaxFanout) ) {
+    if ( !get_float(min_trans_node, pin_info.mMinTransition) ) {
       return false;
     }
   }
   else {
-    pin_info.mMaxFanout = 0.0;
+    pin_info.mMinTransition = 0.0;
+  }
+
+  // 'function' を取り出す．
+  const DotlibNode* func_node = NULL;
+  if ( !pin_info.get_singleton_or_null("function", func_node) ) {
+    return false;
+  }
+  if ( func_node ) {
+    if ( !get_string(func_node, pin_info.mFunction) ) {
+      return false;
+    }
   }
 
   return true;

@@ -101,7 +101,7 @@ public:
   min_transition() const;
 
   /// @brief "function" を返す．
-  const DotlibNode*
+  ShString
   function() const;
 
   /// @brief "internal_node" を返す．
@@ -156,7 +156,7 @@ private:
   double mMinTransition;
 
   // "function"
-  const DotlibNode* mFunction;
+  ShString mFunction;
 
   // "internal_node"
   const DotlibNode* mInternalNode;

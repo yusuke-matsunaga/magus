@@ -135,6 +135,11 @@ dotlibparser_test(int argc,
 		 << "        min_transition = "
 		 << pin_info.min_transition() << endl;
 	  }
+	  if ( pin_info.direction() == DotlibPin::kOutput ) {
+	    if ( pin_info.function() != ShString() ) {
+	      cout << "        function = " << pin_info.function() << endl;
+	    }
+	  }
 	}
 	for (list<const DotlibNode*>::const_iterator q = dt_bus_list.begin();
 	     q != dt_bus_list.end(); ++ q) {
