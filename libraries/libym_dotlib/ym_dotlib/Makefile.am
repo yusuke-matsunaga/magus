@@ -10,4 +10,8 @@ noinst_HEADERS = \
 	dotlib_nsdef.h \
 	DotlibParser.h \
 	DotlibMgr.h \
-	DotlibNode.h
+	DotlibNode.h \
+	DotlibAttrMap.h \
+	DotlibLibrary.h \
+	DotlibCell.h \
+	DotlibPin.h

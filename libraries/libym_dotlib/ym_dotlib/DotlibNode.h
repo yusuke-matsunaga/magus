@@ -186,6 +186,41 @@ public:
   dump(ostream& s,
        ymuint indent = 0) const = 0;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // パーズ用の便利関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 1つの文字列からなるリストの場合に文字列を返す．
+  /// @note 仮定が外れたらアボートする．
+  ShString
+  get_string_from_value_list() const;
+
+  /// @brief ライブラリを表すノードから情報を取り出す．
+  /// @param[out] library_info ライブラリの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_library_info(DotlibLibrary& library_info) const;
+
+  /// @brief セルを表すノードから情報を取り出す．
+  /// @param[out] cell_info セルの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_cell_info(DotlibCell& cell_info) const;
+
+  /// @brief ピンを表すノードから情報を取り出す．
+  /// @param[out] pin_info ピンの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_pin_info(DotlibPin& pin_info) const;
+
 };
 
 /// @brief ストリーム出力演算子

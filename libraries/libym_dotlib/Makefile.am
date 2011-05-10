@@ -50,7 +50,11 @@ libym_dotlib_la_SOURCES = \
 	DotlibMgrImpl.h \
 	DotlibMgrImpl.cc \
 	DotlibNodeImpl.h \
-	DotlibNodeImpl.cc
+	DotlibNodeImpl.cc \
+	DotlibAttrMap.cc \
+	DotlibLibrary.cc \
+	DotlibCell.cc \
+	DotlibPin.cc
 
 
 

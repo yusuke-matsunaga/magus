@@ -10,6 +10,7 @@
 
 
 #include "ym_dotlib/dotlib_nsdef.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -20,10 +21,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 //////////////////////////////////////////////////////////////////////
 class DotlibAttrMap
 {
-public:
-
-  typedef hash_map<ShString, list<DotlibNode*> >::const_iterator const_iterator;
-  typedef hash_map<ShString, list<DotlibNode*> >::iterator iterator;
+  friend class DotlibNode;
 
 public:
 
@@ -35,6 +33,22 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 値を得る．
+  /// @param[in] name 属性名
+  /// @param[out] node_list 値のリストを格納する変数
+  void
+  get(const ShString& name,
+      vector<const DotlibNode*>& node_list) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // DotlibNode から用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 値を追加する．
   /// @param[in] name 属性名
@@ -43,18 +57,16 @@ public:
   add(const ShString& name,
       const DotlibNode* node);
 
-  /// @brief 値のリストを取り出す．
-  /// @param[in] name 属性名
-  /// @param[in]
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // ハッシュ表
-  hash_map<ShString, list<DotlibNode*> > mHash;
+  hash_map<ShString, list<const DotlibNode*> > mHash;
 
-}
+};
 
 END_NAMESPACE_YM_DOTLIB
 

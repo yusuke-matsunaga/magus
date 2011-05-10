@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_dotlib/dotlib_nsdef.h"
+#include "ym_dotlib/DotlibAttrMap.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -18,8 +18,11 @@ BEGIN_NAMESPACE_YM_DOTLIB
 /// @class DotlibLibrary DotlibLibrary.h "ym_dotlib/DotlibLibrary.h"
 /// @brief DotlibNode の木から取り出したライブラリの情報を表すクラス
 //////////////////////////////////////////////////////////////////////
-class DotlibLibrary
+class DotlibLibrary :
+  public DotlibAttrMap
 {
+  friend class DotlibNode;
+
 public:
 
   /// @brief コンストラクタ
@@ -36,42 +39,77 @@ public:
   name() const;
 
   /// @brief "bus_naming_style" を返す．
-  ShString
+  const DotlibNode*
   bus_naming_style() const;
 
   /// @brief "comment" を返す．
-  ShString
+  const DotlibNode*
   comment() const;
 
   /// @brief "date" を返す．
-  ShString
+  const DotlibNode*
   date() const;
 
   /// @brief "revision" を返す．
-  ShString
+  const DotlibNode*
   revision() const;
 
   /// @brief "current_unit" を返す．
-  ShString
+  const DotlibNode*
   current_unit() const;
 
   /// @brief "leakage_power_unit" を返す．
-  ShString
+  const DotlibNode*
   leakage_power_unit() const;
 
   /// @brief "time_unit" を返す．
-  ShString
+  const DotlibNode*
   time_unit() const;
 
   /// @brief "voltage_unit" を返す．
-  ShString
+  const DotlibNode*
   voltage_unit() const;
 
   /// @brief セル定義のリストを返す．
   const list<const DotlibNode*>&
   cell_list() const;
 
-  /// @brief その他の属性
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ライブラリ名
+  ShString mName;
+
+  // "bus_naming_style"
+  const DotlibNode* mBusNamingStyle;
+
+  // "comment"
+  const DotlibNode* mComment;
+
+  // "date"
+  const DotlibNode* mDate;
+
+  // "revision"
+  const DotlibNode* mRevision;
+
+  // "current_unit"
+  const DotlibNode* mCurrentUnit;
+
+  // "leakage_power_unit"
+  const DotlibNode* mLeakagePowerUnit;
+
+  // "time_unit"
+  const DotlibNode* mTimeUnit;
+
+  // "voltage_unit"
+  const DotlibNode* mVoltageUnit;
+
+  // セル定義のリスト
+  list<const DotlibNode*> mCellList;
+
 };
 
 END_NAMESPACE_YM_DOTLIB
