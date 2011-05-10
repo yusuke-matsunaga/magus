@@ -33,7 +33,7 @@ DotlibCell::clear()
 {
   DotlibAttrMap::clear();
 
-  mArea = NULL;
+  mArea = 0.0;
   mBusNamingStyle = NULL;
   mFf = NULL;
   mLatch = NULL;
@@ -52,7 +52,7 @@ DotlibCell::name() const
 }
 
 // @brief 面積を返す．
-const DotlibNode*
+double
 DotlibCell::area() const
 {
   return mArea;

@@ -16,6 +16,28 @@
 
 BEGIN_NAMESPACE_YM_DOTLIB
 
+BEGIN_NONAMESPACE
+
+/// @brief float 値を取り出す．
+/// @note 型が違ったらエラーを MsgMgr に出力する．
+bool
+get_float(const DotlibNode* node,
+	  double& value)
+{
+  if ( !node->is_float() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    node->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Float value is expected.");
+    return false;
+  }
+  value = node->float_value();
+  return true;
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス DotlibNode
 //////////////////////////////////////////////////////////////////////
@@ -74,28 +96,10 @@ DotlibNode::get_cell_info(DotlibCell& cell_info) const
   cell_info.mName = group_value()->get_string_from_value_list();
 
   // 属性のリストを作る．
-  const DotlibNode* area_node = NULL;
-  FileRegion area_loc;
   for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
     ShString attr_name = attr->attr_name();
     const DotlibNode* attr_value = attr->attr_value();
-    if ( attr_name == "area" ) {
-      if ( area_node != NULL ) {
-	// area 属性が2回以上現れた．
-	ostringstream buf;
-	buf << cell_info.name() << ": More than one 'area' definition."
-	    << " First occurence is " << area_loc << ".";
-	MsgMgr::put_msg(__FILE__, __LINE__,
-			attr->loc(),
-			kMsgError,
-			"DOTLIB_PARSER",
-			buf.str());
-	return false;
-      }
-      area_node = attr_value;
-      area_loc = attr->loc();
-    }
-    else if ( attr_name == "pin" ) {
+    if ( attr_name == "pin" ) {
       cell_info.mPinList.push_back(attr_value);
     }
     else if ( attr_name == "bus" ) {
@@ -110,25 +114,13 @@ DotlibNode::get_cell_info(DotlibCell& cell_info) const
   }
 
   // 面積を得る．
-  if ( area_node == NULL ) {
-    ostringstream buf;
-    buf << cell_info.name() << ": No area definition.";
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    loc(),
-		    kMsgError,
-		    "DOTLIB_PARSER",
-		    buf.str());
+  const DotlibNode* area_node;
+  if ( !cell_info.get_singleton("area", loc(), area_node) ) {
     return false;
   }
-  if ( !area_node->is_float() ) {
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    area_node->loc(),
-		    kMsgError,
-		    "DOTLIB_PARSER",
-		    "Float value is expected.");
+  if ( !get_float(area_node, cell_info.mArea) ) {
     return false;
   }
-  cell_info.mArea = area_node;
 
   return true;
 }
@@ -156,6 +148,160 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     else {
       pin_info.add(attr_name, attr_value);
     }
+  }
+
+  // 'direction' の翻訳をする．
+  const DotlibNode* direction_node;
+  if ( !pin_info.get_singleton("direction", loc(), direction_node) ) {
+    return false;
+  }
+  if ( !direction_node->is_string() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    direction_node->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "String value is expected.");
+    return false;
+  }
+  ShString value = direction_node->string_value();
+  if ( value == "input" ) {
+    pin_info.mDirection = DotlibPin::kInput;
+  }
+  else if ( value == "output" ) {
+    pin_info.mDirection = DotlibPin::kOutput;
+  }
+  else if ( value == "inout" ) {
+    pin_info.mDirection = DotlibPin::kInout;
+  }
+  else if ( value == "internal" ) {
+    pin_info.mDirection = DotlibPin::kInternal;
+  }
+  else {
+    ostringstream buf;
+    buf << value << ": Illegal value for 'direction'."
+	<< " 'input', 'output', 'inout' or 'internal' are expected.";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    direction_node->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    buf.str());
+    return false;
+  }
+
+  // 'capacitance' を取り出す．
+  const DotlibNode* cap_node = NULL;
+  if ( !pin_info.get_singleton_or_null("capacitance", cap_node) ) {
+    return false;
+  }
+  if ( cap_node ) {
+    if ( !get_float(cap_node, pin_info.mCapacitance) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mCapacitance = NULL;
+  }
+
+  const DotlibNode* rcap_node = NULL;
+  const DotlibNode* fcap_node = NULL;
+  if ( !pin_info.get_singleton_or_null("rise_capacitance", rcap_node) ) {
+    return false;
+  }
+  if ( !pin_info.get_singleton_or_null("fall_capacitance", fcap_node) ) {
+    return false;
+  }
+  if ( rcap_node && fcap_node ) {
+    if ( !get_float(rcap_node, pin_info.mRiseCapacitance) ) {
+      return false;
+    }
+    if ( !get_float(fcap_node, pin_info.mFallCapacitance) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mRiseCapacitance = pin_info.mCapacitance;
+    pin_info.mFallCapacitance = pin_info.mCapacitance;
+  }
+
+  // 'max_fanout' を取り出す．
+  const DotlibNode* max_fo_node = NULL;
+  if ( !pin_info.get_singleton_or_null("max_fanout", max_fo_node) ) {
+    return false;
+  }
+  if ( max_fo_node ) {
+    if ( !get_float(max_fo_node, pin_info.mMaxFanout) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mMaxFanout = 0.0;
+  }
+  // 'min_fanout' を取り出す．
+  const DotlibNode* min_fo_node = NULL;
+  if ( !pin_info.get_singleton_or_null("min_fanout", min_fo_node) ) {
+    return false;
+  }
+  if ( min_fo_node ) {
+    if ( !get_float(min_fo_node, pin_info.mMaxFanout) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mMaxFanout = 0.0;
+  }
+
+  // 'max_capacitance' を取り出す．
+  const DotlibNode* max_cap_node = NULL;
+  if ( !pin_info.get_singleton_or_null("max_capacitance", max_cap_node) ) {
+    return false;
+  }
+  if ( max_cap_node ) {
+    if ( !get_float(max_cap_node, pin_info.mMaxFanout) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mMaxFanout = 0.0;
+  }
+  // 'min_capacitance' を取り出す．
+  const DotlibNode* min_cap_node = NULL;
+  if ( !pin_info.get_singleton_or_null("min_capacitance", min_cap_node) ) {
+    return false;
+  }
+  if ( min_cap_node ) {
+    if ( !get_float(min_cap_node, pin_info.mMaxFanout) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mMaxFanout = 0.0;
+  }
+
+  // 'max_transition' を取り出す．
+  const DotlibNode* max_trans_node = NULL;
+  if ( !pin_info.get_singleton_or_null("max_transition", max_trans_node) ) {
+    return false;
+  }
+  if ( max_trans_node ) {
+    if ( !get_float(max_trans_node, pin_info.mMaxFanout) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mMaxFanout = 0.0;
+  }
+  // 'min_transition' を取り出す．
+  const DotlibNode* min_trans_node = NULL;
+  if ( !pin_info.get_singleton_or_null("min_transition", min_trans_node) ) {
+    return false;
+  }
+  if ( min_trans_node ) {
+    if ( !get_float(min_trans_node, pin_info.mMaxFanout) ) {
+      return false;
+    }
+  }
+  else {
+    pin_info.mMaxFanout = 0.0;
   }
 
   return true;

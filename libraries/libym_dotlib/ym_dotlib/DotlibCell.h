@@ -43,7 +43,7 @@ public:
   name() const;
 
   /// @brief 面積を返す．
-  const DotlibNode*
+  double
   area() const;
 
   /// @brief ピングループのリストを返す．
@@ -83,7 +83,7 @@ private:
   ShString mName;
 
   // 面積
-  const DotlibNode* mArea;
+  double mArea;
 
   // "bus_naming_style"
   const DotlibNode* mBusNamingStyle;

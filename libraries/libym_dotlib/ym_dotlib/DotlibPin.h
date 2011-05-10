@@ -24,6 +24,24 @@ class DotlibPin :
   friend class DotlibNode;
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 列挙型の定義
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ピンの方向を表す型
+  enum tDirection {
+    /// @brief 入力
+    kInput,
+    /// @brief 出力
+    kOutput,
+    /// @brief 入出力
+    kInout,
+    /// @brief 内部ピン
+    kInternal
+  };
+
+
+public:
 
   /// @brief コンストラクタ
   DotlibPin();
@@ -42,29 +60,45 @@ public:
   ShString
   name() const;
 
-  /// @brief "bit_width" を返す．
-  const DotlibNode*
-  bit_width() const;
-
-  /// @brief "capacitance" を返す．
-  const DotlibNode*
-  capacitance() const;
-
-  /// @brief "clock" を返す．
-  const DotlibNode*
-  clock() const;
-
   /// @brief "direction" を返す．
-  const DotlibNode*
+  tDirection
   direction() const;
 
+  /// @brief "capacitance" を返す．
+  double
+  capacitance() const;
+
+  /// @brief "rise_capacitance" を返す．
+  double
+  rise_capacitance() const;
+
   /// @brief "fall_capacitance" を返す．
-  const DotlibNode*
+  double
   fall_capacitance() const;
 
-  /// @brief "fanout_load" を返す．
-  const DotlibNode*
-  fanout_load() const;
+  /// @brief "max_fanout" を返す．
+  double
+  max_fanout() const;
+
+  /// @brief "min_fanout" を返す．
+  double
+  min_fanout() const;
+
+  /// @brief "max_capacitance" を返す．
+  double
+  max_capacitance() const;
+
+  /// @brief "min_capacitance" を返す．
+  double
+  min_capacitance() const;
+
+  /// @brief "max_transition" を返す．
+  double
+  max_transition() const;
+
+  /// @brief "min_transition" を返す．
+  double
+  min_transition() const;
 
   /// @brief "function" を返す．
   const DotlibNode*
@@ -74,37 +108,9 @@ public:
   const DotlibNode*
   internal_node() const;
 
-  /// @brief "max_capacitance" を返す．
-  const DotlibNode*
-  max_capacitance() const;
-
-  /// @brief "max_fanout" を返す．
-  const DotlibNode*
-  max_fanout() const;
-
-  /// @brief "max_transition" を返す．
-  const DotlibNode*
-  max_transition() const;
-
-  /// @brief "min_capacitance" を返す．
-  const DotlibNode*
-  min_capacitance() const;
-
-  /// @brief "min_fanout" を返す．
-  const DotlibNode*
-  min_fanout() const;
-
-  /// @brief "min_transition" を返す．
-  const DotlibNode*
-  min_transition() const;
-
   /// @brief "pin_func_type" を返す．
   const DotlibNode*
   pin_func_type() const;
-
-  /// @brief "rise_capacitance" を返す．
-  const DotlibNode*
-  rise_capacitance() const;
 
   /// @brief "timing" グループのリストを得る．
   const list<const DotlibNode*>&
@@ -119,23 +125,35 @@ private:
   // ピン名
   ShString mName;
 
-  // "bit_width"
-  const DotlibNode* mBitWidth;
+  // "direction"
+  tDirection mDirection;
 
   // "capacitance"
-  const DotlibNode* mCapacitance;
+  double mCapacitance;
 
-  // "clock"
-  const DotlibNode* mClock;
-
-  // "direction"
-  const DotlibNode* mDirection;
+  // "rise_capacitance"
+  double mRiseCapacitance;
 
   // "fall_capacitance"
-  const DotlibNode* mFallCapacitance;
+  double mFallCapacitance;
 
-  // "fanout_load"
-  const DotlibNode* mFanoutLoad;
+  // "max_fanout"
+  double mMaxFanout;
+
+  // "min_fanout"
+  double mMinFanout;
+
+  // "max_capacitance"
+  double mMaxCapacitance;
+
+  // "min_capacitance"
+  double mMinCapacitance;
+
+  // "max_transition"
+  double mMaxTransition;
+
+  // "min_transition"
+  double mMinTransition;
 
   // "function"
   const DotlibNode* mFunction;
@@ -143,29 +161,8 @@ private:
   // "internal_node"
   const DotlibNode* mInternalNode;
 
-  // "max_capacitance"
-  const DotlibNode* mMaxCapacitance;
-
-  // "max_fanout"
-  const DotlibNode* mMaxFanout;
-
-  // "max_transition"
-  const DotlibNode* mMaxTransition;
-
-  // "min_capacitance"
-  const DotlibNode* mMinCapacitance;
-
-  // "min_fanout"
-  const DotlibNode* mMinFanout;
-
-  // "min_transition"
-  const DotlibNode* mMinTransition;
-
   // "pin_func_type"
   const DotlibNode* mPinFuncType;
-
-  // "rise_capacitance"
-  const DotlibNode* mRiseCapacitance;
 
   // "timing"
   list<const DotlibNode*> mTimingList;

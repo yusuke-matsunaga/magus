@@ -138,70 +138,93 @@ gen_library(const DotlibNode* dt_library)
   // セルの内容の設定
   ymuint cell_id = 0;
   for (list<const DotlibNode*>::const_iterator p = dt_cell_list.begin();
-       p != dt_cell_list.end(); ++ p) {
-    cosnt DotlibNode* cell_attr = *p;
-    const DotlibNode* dt_cell = cell_attr->attr_value();
+       p != dt_cell_list.end(); ++ p, ++ cell_id) {
+    const DotlibNode* dt_cell = *p;
 
+    // セル情報の読み出し
     DotlibCell cell_info;
     if ( !dt_cell->get_cell_info(cell_info) ) {
       continue;
     }
-    assert_cond( dt_cell->is_group(), __FILE__, __LINE__);
-    // セル名
-    ShString name = get_string(dt_cell->group_value());
+    const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();
+    const list<const DotlibNode*>& dt_bus_list = cell_info.bus_list();
+    const list<const DotlibNode*>& dot_bundle_list = cell_info.bundle_list();
 
-    // 属性のリストを作る．
-    hash_map<ShString, list<const DotlibNode*> > attr_map;
-    for (const DotlibNode* attr = dt_cell->attr_top();
-	 attr; attr = attr->next()) {
-      ShString attr_name = attr->attr_name();
-      const DotlibNode* attr_value = attr->attr_value();
-      // なかなか大胆なコード
-      attr_map[attr_name].push_back(attr_value);
+    // セルの生成
+    ShString cell_name = cell_info.name();
+    double area = cell_info.area();
+    ymuint npin = dt_pin_list.size();
+    ymuint nbus = dt_bus_list.size();
+    ymuint nbundle = dt_bundle_list.size();
+    CiCell* cell = library->new_cell(cell_id, cell_name, area,
+				     npin, nbus, nbundle);
+
+    // ピンの生成
+    ymuint pin_id = 0;
+    for (list<const DotlibNode*>::const_iterator q = dt_pin_list.begin();
+	 q != dt_pin_list.end(); ++ q, ++ pin_id) {
+      const DotlibNode* dt_pin = *q;
+
+      // ピン情報の読み出し
+      DotlibCell pin_info;
+      if ( !dt_pin->get_pin_info(pin_info) ) {
+	continue;
+      }
+
+      ShString pin_name = pin_info.name();
+      switch ( pin_info.direction() ) {
+      case DotlibPin::kInput:
+	{
+	  CellCapacitance cap = pin_info.capacitance();
+	  CellCapacitance rise_cap = pin_info.rise_capacitance();
+	  CellCapacitance fall_cap = pin_info.fall_capacitance();
+	  library->new_cell_input(cell, pin_id, pin_name,
+				  cap, rise_cap, fall_cap);
+	}
+	break;
+
+      case DotlibPin::kOutput:
+	{
+	  CellCapacitance max_fanout = pin_info.max_fanout();
+	  CellCapacitance min_fanout = pin_info.min_fanout();
+	  CellCapacitance max_capacitance = pin_info.max_capacitance();
+	  CellCapacitance min_capacitance = pin_info.min_capacitance();
+	  CellTime max_transition = pin_info.max_transition();
+	  CellTime min_transition = pin_info.min_transition();
+	  library->new_cell_output(cell, pin_id, pin_name,
+				   max_fanout, min_fanout,
+				   max_capacitance, min_capacitance,
+				   max_transition, min_transition);
+	}
+	break;
+
+      case DotlibPin::kInout:
+	{
+	  CellCapacitance cap = pin_info.capacitance();
+	  CellCapacitance rise_cap = pin_info.rise_capacitance();
+	  CellCapacitance fall_cap = pin_info.fall_capacitance();
+	  CellCapacitance max_fanout = pin_info.max_fanout();
+	  CellCapacitance min_fanout = pin_info.min_fanout();
+	  CellCapacitance max_capacitance = pin_info.max_capacitance();
+	  CellCapacitance min_capacitance = pin_info.min_capacitance();
+	  CellTime max_transition = pin_info.max_transition();
+	  CellTime min_transition = pin_info.min_transition();
+	  library->new_cell_output(cell, pin_id, pin_name,
+				   max_fanout, min_fanout,
+				   max_capacitance, min_capacitance,
+				   max_transition, min_transition);
+	}
+	break;
+
+      case DotlibPin::kInternal:
+#warning "TODO: 未完"
+	break;
+
+      default:
+	assert_not_reached(__FILE__, __LINE__);
+      }
     }
 
-    // 面積を得る．
-    hash_map<ShString, list<const DotlibNode*> >::iterator p;
-    p = attr_map.find("area");
-    if ( p == attr_map.end() ) {
-      ostringstream buf;
-      buf << name << ": No area definition.";
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      dt_cell->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      buf.str());
-      continue;
-    }
-    list<const DotlibNode*>& area_list = p->second;
-    if ( vlist.size() != 1 ) {
-      list<const DotlibNode*>::iterator q = vlist.begin();
-      const DotlibNode* first = *q;
-      ++ q;
-      const DotlibNode* second = *q;
-      ostringstream buf;
-      buf << name << ": More than one area definition."
-	  << " First occurence is " << first->loc() << ".";
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      second->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      buf.str());
-      continue;
-    }
-    const DotlibNode* area_node = vlist.front();
-    if ( !area_node->is_float() ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      area_node->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "Float value is expected.");
-      continue;
-    }
-    CellArea area(area_node->float_value());
-
-    // ピン数を数える．
-    const
     ShString opin_name = gate->opin_name()->str();
     const DotlibNode* opin_expr = gate->opin_expr();
     const DotlibNode* ipin_list = gate->ipin_list();
@@ -233,7 +256,6 @@ gen_library(const DotlibNode* dt_library)
     }
 
     ymuint ni = ipin_name_list.size();
-    CiCell* cell = library->new_cell(cell_id, name, area, ni +  1, 0, 0);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];

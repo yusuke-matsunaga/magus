@@ -45,6 +45,13 @@ DotlibLibrary::clear()
   mCellList.clear();
 }
 
+// @brief 名前を返す．
+ShString
+DotlibLibrary::name() const
+{
+  return mName;
+}
+
 // @brief "bus_naming_style" を返す．
 const DotlibNode*
 DotlibLibrary::bus_naming_style() const
