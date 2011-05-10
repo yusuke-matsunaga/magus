@@ -34,6 +34,10 @@ public:
 
 public:
 
+  /// @brief 内容を初期化する．
+  void
+  clear();
+
   /// @brief 名前を返す．
   ShString
   name() const;

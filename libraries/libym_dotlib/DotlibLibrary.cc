@@ -19,6 +19,20 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibLibrary::DotlibLibrary()
 {
+  clear();
+}
+
+// @brief デストラクタ
+DotlibLibrary::~DotlibLibrary()
+{
+}
+
+// @brief 内容を初期化する．
+void
+DotlibLibrary::clear()
+{
+  DotlibAttrMap::clear();
+
   mBusNamingStyle = NULL;
   mComment = NULL;
   mDate = NULL;
@@ -27,11 +41,8 @@ DotlibLibrary::DotlibLibrary()
   mLeakagePowerUnit = NULL;
   mTimeUnit = NULL;
   mVoltageUnit = NULL;
-}
 
-// @brief デストラクタ
-DotlibLibrary::~DotlibLibrary()
-{
+  mCellList.clear();
 }
 
 // @brief "bus_naming_style" を返す．

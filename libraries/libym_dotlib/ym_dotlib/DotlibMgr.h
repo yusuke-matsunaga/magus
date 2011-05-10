@@ -52,40 +52,6 @@ public:
   show_stats(ostream& s) const;
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // パース木から情報を取り出す便利関数
-  // 実はこのクラスの関数である必要はない．
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 1つの文字列からなる value_list から文字列を取り出す．
-  /// @note 仮定が外れたらアボートする．
-  static
-  ShString
-  get_string(const DotlibNode* value_list);
-
-  /// @brief セルを表すノードから情報を取り出す．
-  /// @param[in] cell セルを表すパース木のノード
-  /// @param[out] name セル名を格納する変数
-  /// @param[out] area 面積を格納する変数
-  /// @param[out] pin_list ピングループのリスト
-  /// @param[out] bus_list バスグループのリスト
-  /// @param[out] bundle_list バンドルグループのリスト
-  /// @param[out] その他の属性のリスト
-  /// @retval true 正しく読み込めた．
-  /// @retval false エラーが起こった．
-  /// @note エラーは MsgMgr に出力する．
-  static
-  bool
-  get_cell_info(const DotlibNode* cell,
-		ShString& name,
-		double& area,
-		list<const DotlibNode*>& pin_list,
-		list<const DotlibNode*>& bus_list,
-		list<const DotlibNode*>& bundle_list,
-		list<const DotlibNode*>& other_list);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ

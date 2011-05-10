@@ -19,16 +19,29 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibCell::DotlibCell()
 {
-  mArea = NULL;
-  mBusNamingStyle = NULL;
-  mFf = NULL;
-  mLatch = NULL;
-  mStatetable = NULL;
+  clear();
 }
 
 // @brief デストラクタ
 DotlibCell::~DotlibCell()
 {
+}
+
+// @brief 内容を初期化する．
+void
+DotlibCell::clear()
+{
+  DotlibAttrMap::clear();
+
+  mArea = NULL;
+  mBusNamingStyle = NULL;
+  mFf = NULL;
+  mLatch = NULL;
+  mStatetable = NULL;
+
+  mPinList.clear();
+  mBusList.clear();
+  mBundleList.clear();
 }
 
 // @brief 名前を返す．

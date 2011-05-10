@@ -13,6 +13,9 @@
 #include "ym_dotlib/DotlibParser.h"
 #include "ym_dotlib/DotlibMgr.h"
 #include "ym_dotlib/DotlibNode.h"
+#include "ym_dotlib/DotlibLibrary.h"
+#include "ym_dotlib/DotlibCell.h"
+#include "ym_dotlib/DotlibPin.h"
 
 #include "ym_lexp/LogExpr.h"
 #include "ym_npn/TvFunc.h"
@@ -112,19 +115,6 @@ expr_to_tvfunc(const LogExpr& expr,
   return func;
 }
 
-
-// 1つの文字列からなる value_list から文字列を取り出す．
-// 仮定が外れたらアボートする．
-ShString
-get_string(const DotlibNode* value_list)
-{
-  assert_cond( value_list->is_list(), __FILE__, __LINE__);
-  assert_cond( value_list->list_size() == 1, __FILE__, __LINE__);
-  const DotlibNode* value = value_list->top();
-  assert_cond( value->is_string(), __FILE__, __LINE__);
-  return root_value->string_value();
-}
-
 // @brief DotlibNode から CellLibrary を生成する．
 // @param[in] dt_library ライブラリを表すパース木のルート
 // @return 生成したライブラリを返す．
@@ -132,31 +122,30 @@ get_string(const DotlibNode* value_list)
 const CellLibrary*
 gen_library(const DotlibNode* dt_library)
 {
-  assert_cond( dt_library->is_attr(), __FILE__, __LINE__);
-  assert_cond( dt_library->attr_name() == "library", __FILE__, __LINE__);
-  const DotlibNode* root_group = dt_library->attr_value();
-  assert_cond( root_group->is_group(), __FILE__, __LINE__);
-  ShString library_name = get_string(root_group->group_value());
+  DotlibLibrary library_info;
+
+  if ( !dt_library->get_library_info(library_info) ) {
+    return NULL;
+  }
 
   // ライブラリの生成
-  CiLibrary* library = new CiLibrary(library_name.c_str());
+  CiLibrary* library = new CiLibrary(library_info.name().c_str());
 
   // セル数の設定
-  list<const DotlibNode*> dt_cell_list;
-  for (const DotlibNode* attr = dt_library->attr_top();
-       attr; attr = attr->next()) {
-    if ( attr->attr_name() == "cell" ) {
-      dt_cell_list.push_back(attr);
-    }
-  }
+  const list<const DotlibNode*>& dt_cell_list = library_info.cell_list();
   library->set_cell_num(dt_cell_list.size());
 
   // セルの内容の設定
   ymuint cell_id = 0;
-  for (list<const DotlibNode*>::iterator p = dt_cell_list.begin();
+  for (list<const DotlibNode*>::const_iterator p = dt_cell_list.begin();
        p != dt_cell_list.end(); ++ p) {
     cosnt DotlibNode* cell_attr = *p;
     const DotlibNode* dt_cell = cell_attr->attr_value();
+
+    DotlibCell cell_info;
+    if ( !dt_cell->get_cell_info(cell_info) ) {
+      continue;
+    }
     assert_cond( dt_cell->is_group(), __FILE__, __LINE__);
     // セル名
     ShString name = get_string(dt_cell->group_value());

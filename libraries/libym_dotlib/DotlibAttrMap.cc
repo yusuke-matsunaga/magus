@@ -26,6 +26,13 @@ DotlibAttrMap::~DotlibAttrMap()
 {
 }
 
+// @brief 内容を初期化する．
+void
+DotlibAttrMap::clear()
+{
+  mHash.clear();
+}
+
 // @brief 値を得る．
 // @param[in] name 属性名
 // @param[out] node_list 値のリストを格納する変数

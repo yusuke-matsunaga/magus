@@ -19,6 +19,20 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibPin::DotlibPin()
 {
+  clear();
+}
+
+// @brief デストラクタ
+DotlibPin::~DotlibPin()
+{
+}
+
+// @brief 内容を初期化する．
+void
+DotlibPin::clear()
+{
+  DotlibAttrMap::clear();
+
   mBitWidth = NULL;
   mCapacitance = NULL;
   mClock = NULL;
@@ -35,11 +49,8 @@ DotlibPin::DotlibPin()
   mMinTransition = NULL;
   mPinFuncType = NULL;
   mRiseCapacitance = NULL;
-}
 
-// @brief デストラクタ
-DotlibPin::~DotlibPin()
-{
+  mTimingList.clear();
 }
 
 // @brief 名前を返す．
