@@ -136,8 +136,11 @@ dotlibparser_test(int argc,
 		 << pin_info.min_transition() << endl;
 	  }
 	  if ( pin_info.direction() == DotlibPin::kOutput ) {
-	    if ( pin_info.function() != ShString() ) {
-	      cout << "        function = " << pin_info.function() << endl;
+	    const DotlibNode* func_node = pin_info.function();
+	    if ( func_node ) {
+	      cout << "        function = ";
+	      func_node->dump(cout);
+	      cout << endl;
 	    }
 	  }
 	}

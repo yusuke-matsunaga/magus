@@ -33,6 +33,7 @@ DotlibPin::clear()
 {
   DotlibAttrMap::clear();
 
+  mFunction = NULL;
   mInternalNode = NULL;
   mPinFuncType = NULL;
 
@@ -117,7 +118,7 @@ DotlibPin::min_transition() const
 }
 
 // @brief "function" を返す．
-ShString
+const DotlibNode*
 DotlibPin::function() const
 {
   return mFunction;

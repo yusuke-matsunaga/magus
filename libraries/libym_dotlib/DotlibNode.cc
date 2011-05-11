@@ -323,14 +323,8 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
   }
 
   // 'function' を取り出す．
-  const DotlibNode* func_node = NULL;
-  if ( !pin_info.get_singleton_or_null("function", func_node) ) {
+  if ( !pin_info.get_singleton_or_null("function", pin_info.mFunction) ) {
     return false;
-  }
-  if ( func_node ) {
-    if ( !get_string(func_node, pin_info.mFunction) ) {
-      return false;
-    }
   }
 
   return true;
