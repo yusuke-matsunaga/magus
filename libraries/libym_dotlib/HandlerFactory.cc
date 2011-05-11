@@ -14,6 +14,7 @@
 #include "DefineHandler.h"
 #include "GroupHandler.h"
 #include "ExprHandler.h"
+#include "FuncHandler.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -693,7 +694,7 @@ HandlerFactory::new_bundle(GroupHandler* parent)
   DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("capacitance", simple);
   handler->reg_handler("direction", simple);
-  handler->reg_handler("function", simple);
+  handler->reg_handler("function", new FuncHandler(handler));
 
   // complex attributes
   DotlibHandler* complex = new_complex(handler);
@@ -746,7 +747,7 @@ HandlerFactory::new_pin(GroupHandler* parent)
   handler->reg_handler("fall_time_before_threshold", simple);
   handler->reg_handler("fanout_load", simple);
   handler->reg_handler("fault_model", simple);
-  handler->reg_handler("function", simple);
+  handler->reg_handler("function", new FuncHandler(handler));
   handler->reg_handler("has_builtin_pad", simple);
   handler->reg_handler("hysteresis", simple);
   handler->reg_handler("input_map", simple);

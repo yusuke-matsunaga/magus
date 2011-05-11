@@ -25,6 +25,7 @@ DotlibMgrImpl::DotlibMgrImpl() :
   mFloatNum = 0;
   mStrNum = 0;
   mOprNum = 0;
+  mNotNum = 0;
   mListNum = 0;
   mGroupNum = 0;
   mAttrNum = 0;
@@ -131,6 +132,55 @@ DotlibMgrImpl::new_div(const DotlibNode* opr1,
   return node;
 }
 
+// @brief NOT 演算子を表す DotlibNode を生成する．
+// @param[in] opr オペランド
+// @param[in] loc ファイル上の位置
+DotlibNodeImpl*
+DotlibMgrImpl::new_not(const DotlibNode* opr,
+		       const FileRegion& loc)
+{
+  ++ mNotNum;
+  void* p = mAlloc.get_memory(sizeof(DotlibNot));
+  DotlibNodeImpl* node = new (p) DotlibNot(opr, loc);
+  return node;
+}
+
+// @brief AND 演算子を表す DotlibNode を生成する．
+// @param[in] opr1, opr2 オペランド
+DotlibNodeImpl*
+DotlibMgrImpl::new_and(const DotlibNode* opr1,
+		       const DotlibNode* opr2)
+{
+  ++ mOprNum;
+  void* p = mAlloc.get_memory(sizeof(DotlibOpr));
+  DotlibNodeImpl* node = new (p) DotlibOpr(DotlibNode::kAnd, opr1, opr2);
+  return node;
+}
+
+// @brief OR 演算子を表す DotlibNode を生成する．
+// @param[in] opr1, opr2 オペランド
+DotlibNodeImpl*
+DotlibMgrImpl::new_or(const DotlibNode* opr1,
+		      const DotlibNode* opr2)
+{
+  ++ mOprNum;
+  void* p = mAlloc.get_memory(sizeof(DotlibOpr));
+  DotlibNodeImpl* node = new (p) DotlibOpr(DotlibNode::kOr, opr1, opr2);
+  return node;
+}
+
+// @brief XOR 演算子を表す DotlibNode を生成する．
+// @param[in] opr1, opr2 オペランド
+DotlibNodeImpl*
+DotlibMgrImpl::new_xor(const DotlibNode* opr1,
+		       const DotlibNode* opr2)
+{
+  ++ mOprNum;
+  void* p = mAlloc.get_memory(sizeof(DotlibOpr));
+  DotlibNodeImpl* node = new (p) DotlibOpr(DotlibNode::kXor, opr1, opr2);
+  return node;
+}
+
 // @brief リストを表す DotlibNode を生成する．
 DotlibNodeImpl*
 DotlibMgrImpl::new_list()
@@ -200,6 +250,10 @@ DotlibMgrImpl::show_stats(ostream& s) const
     << "DotlibOpr:          " << setw(7) << mOprNum
     << " x " << setw(3) << sizeof(DotlibOpr)
     << " = " << setw(10) << mOprNum * sizeof(DotlibOpr) << endl
+
+    << "DotlibNot:          " << setw(7) << mNotNum
+    << " x " << setw(3) << sizeof(DotlibNot)
+    << " = " << setw(10) << mNotNum * sizeof(DotlibNot) << endl
 
     << "DotlibList:         " << setw(7) << mListNum
     << " x " << setw(3) << sizeof(DotlibList)

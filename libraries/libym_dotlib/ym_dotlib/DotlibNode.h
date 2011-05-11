@@ -40,6 +40,14 @@ public:
     kMult,
     /// @brief / 演算子
     kDiv,
+    /// @brief NOT 演算子
+    kNot,
+    /// @brief AND 演算子
+    kAnd,
+    /// @brief OR 演算子
+    kOr,
+    /// @brief XOR 演算子
+    kXor,
     /// @brief リスト
     kList,
     /// @brief グループ

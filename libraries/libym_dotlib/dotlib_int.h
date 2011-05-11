@@ -30,6 +30,14 @@ enum tTokenType {
   MULT,
   /// @brief わる(/)
   DIV,
+  /// @brief NOT
+  NOT,
+  /// @brief AND
+  AND,
+  /// @brief OR
+  OR,
+  /// @brief XOR
+  XOR,
   /// @brief 左括弧( ( )
   LP,
   /// @brief 右括弧( ) )

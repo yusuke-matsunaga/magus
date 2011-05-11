@@ -10,6 +10,7 @@
 
 
 #include "SimpleHandler.h"
+#include "FhScanner.h"
 #include "ym_utils/FileRegion.h"
 
 
@@ -75,14 +76,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // パーズ中の文字列
-  const char* mString;
-
-  // mString のファイル位置
-  FileRegion mCurLoc;
-
-  // 現在の読み出し位置
-  ymuint mCurPos;
+  // 字句解析器
+  FhScanner mScanner;
 
   // 読み戻したトークンの型
   tTokenType mUngetType;

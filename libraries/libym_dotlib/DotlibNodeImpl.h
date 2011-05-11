@@ -409,6 +409,66 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class DotlibNot DotlibNodeImpl.h "DotlibNodeImpl.h"
+/// @brief NOT 演算子を表すクラス
+//////////////////////////////////////////////////////////////////////
+class DotlibNot :
+  public DotlibNodeBase
+{
+  friend class DotlibMgrImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] opr オペランド
+  /// @param[in] loc ファイル上の位置
+  DotlibNot(const DotlibNode* opr,
+	    const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~DotlibNot();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
+  virtual
+  bool
+  is_opr() const;
+
+  /// @brief 第一オペランドを返す．
+  /// @note type() が演算子の型の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  opr1() const;
+
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 第一オペランド
+  const DotlibNode* mOpr1;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class DotlibOpr DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief 演算子を表すクラス
 //////////////////////////////////////////////////////////////////////

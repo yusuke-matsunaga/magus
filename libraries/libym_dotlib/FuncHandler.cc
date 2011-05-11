@@ -40,20 +40,21 @@ FuncHandler::~FuncHandler()
 DotlibNodeImpl*
 FuncHandler::read_value()
 {
-  tTokenType value_type = parser().read_token(mCurLoc, false);
+  FileRegion loc;
+  tTokenType value_type = parser().read_token(loc, false);
   if ( value_type != SYMBOL ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
-		    mCurLoc,
+		    loc,
 		    kMsgError,
 		    "DOTLIB_PARSER",
 		    "String value is expected.");
     return NULL;
   }
 
-  mString = parser().cur_string();
-  mCurPos;
+  mScanner.init(parser().cur_string(), loc);
+  mUngetType = ERROR;
 
-  DotlibNodeImpl* expr = read_expr(EOF);
+  DotlibNodeImpl* expr = read_expr(END);
 
   return expr;
 }
@@ -68,11 +69,15 @@ FuncHandler::read_primary()
     return read_expr(RP);
   }
   if ( type == SYMBOL ) {
-    ShString name(parser().cur_string());
+    ShString name(mScanner.cur_string());
     return mgr()->new_string(name, loc);
   }
   if ( type == INT_NUM ) {
-    return mgr()->new_int(parser().cur_int(), loc);
+    return mgr()->new_int(mScanner.cur_int(), loc);
+  }
+  if ( type == NOT ) {
+    DotlibNodeImpl* opr = read_primary();
+    return mgr()->new_not(opr, FileRegion(loc, opr->loc()));
   }
 
   MsgMgr::put_msg(__FILE__, __LINE__,
@@ -95,17 +100,12 @@ FuncHandler::read_product()
   for ( ; ; ) {
     FileRegion loc;
     tTokenType type = read_token(loc);
-    if ( type == MULT || type == DIV ) {
+    if ( type == AND ) {
       DotlibNodeImpl* opr2 = read_primary();
       if ( opr2 == NULL ) {
 	return NULL;
       }
-      if ( type == MULT ) {
-	opr1 = mgr()->new_mult(opr1, opr2);
-      }
-      else {
-	opr1 = mgr()->new_div(opr1, opr2);
-      }
+      opr1 = mgr()->new_and(opr1, opr2);
     }
     else {
       // token を戻す．
@@ -130,16 +130,16 @@ FuncHandler::read_expr(tTokenType end_marker)
     if ( type == end_marker ) {
       return opr1;
     }
-    if ( type == PLUS || type == MINUS ) {
+    if ( type == OR || type == XOR ) {
       DotlibNodeImpl* opr2 = read_product();
       if ( opr2 == NULL ) {
 	return NULL;
       }
-      if ( type == PLUS ) {
-	opr1 = mgr()->new_plus(opr1, opr2);
+      if ( type == OR ) {
+	opr1 = mgr()->new_or(opr1, opr2);
       }
       else {
-	opr1 = mgr()->new_minus(opr1, opr2);
+	opr1 = mgr()->new_xor(opr1, opr2);
       }
     }
     else {
@@ -165,8 +165,7 @@ FuncHandler::read_token(FileRegion& loc)
     return ans;
   }
   else {
-
-    return parser().read_token(loc);
+    return mScanner.read_token(loc);
   }
 }
 
