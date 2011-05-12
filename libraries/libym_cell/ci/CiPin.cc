@@ -139,6 +139,13 @@ CiPin::set_function(const LogExpr& function)
   assert_not_reached(__FILE__, __LINE__);
 }
 
+// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
+void
+CiPin::set_timing_array(const CellTiming** timing_array)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
 // @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
 // @param[in] pin_id 入力ピンのピン番号
 // @param[in] sense タイミング情報の適用条件
@@ -329,6 +336,13 @@ CiOutputPin::set_function(const LogExpr& function)
   mFunction = function;
 }
 
+// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
+void
+CiOutputPin::set_timing_array(const CellTiming** timing_array)
+{
+  mTimingArray = timing_array;
+}
+
 // @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
 // @param[in] pin_id 入力ピンのピン番号
 // @param[in] sense タイミング情報の適用条件
@@ -424,5 +438,30 @@ CiInoutPin::fall_capacitance() const
 {
   return mFallCapacitance;
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CiInternalPin
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name ピン名
+CiInternalPin::CiInternalPin(const ShString& name) :
+  CiPin(name)
+{
+}
+
+// @brief デストラクタ
+CiInternalPin::~CiInternalPin()
+{
+}
+
+// @brief 方向を返す．
+tCellDirection
+CiInternalPin::direction() const
+{
+  return kDirInternal;
+}
+
 
 END_NAMESPACE_YM_CELL

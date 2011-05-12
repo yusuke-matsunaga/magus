@@ -18,9 +18,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 class CiCell;
-class CiInputPin;
-class CiOutputPin;
-class CiInoutPin;
+class CiPin;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CiLibrary CiLibrary.h "ci/CiLibrary.h"
@@ -193,8 +191,7 @@ public:
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
   /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
-  /// @return 入力ピンへのポインタを返す．
-  CiInputPin*
+  void
   new_cell_input(CiCell* cell,
 		 ymuint pin_id,
 		 ShString name,
@@ -212,8 +209,7 @@ public:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  /// @return 出力ピンへのポインタを返す．
-  CiOutputPin*
+  void
   new_cell_output(CiCell* cell,
 		  ymuint pin_id,
 		  ShString name,
@@ -237,8 +233,7 @@ public:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  /// @return 入出力ピンへのポインタを返す．
-  CiInoutPin*
+  void
   new_cell_inout(CiCell* cell,
 		 ymuint pin_id,
 		 ShString name,
@@ -252,13 +247,14 @@ public:
 		 CellTime max_transition,
 		 CellTime min_transition);
 
-  /// @brief タイミング情報を格納する配列を確保する．
-  /// @param[in] pin ピン
-  /// @param[in] np 総ピン数
-  /// @note 配列のサイズは np x 2
+  /// @brief セルの内部ピンを生成する．
+  /// @param[in] cell セル
+  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] name 内部ピン名
   void
-  set_timing_array(CiOutputPin* pin,
-		   ymuint np);
+  new_cell_internal(CiCell* cell,
+		    ymuint pin_id,
+		    ShString name);
 
   /// @brief タイミング情報を作る．
   /// @param[in] id ID番号
@@ -280,22 +276,40 @@ public:
 	     CellResistance fall_resistance);
 
   /// @brief セルのタイミング情報を設定する．
-  /// @param[in] pin 出力(入出力)ピン
+  /// @param[in] cell セル
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
   /// @param[in] ipin_id 関連する入力(入出力)ピン番号
   /// @param[in] sense タイミング条件
   /// @param[in] timing 設定するタイミング情報
   void
-  set_opin_timing(CiOutputPin* pin,
+  set_opin_timing(CiCell* cell,
+		  ymuint opin_id,
 		  ymuint ipin_id,
 		  tCellTimingSense sense,
 		  const CellTiming* timing);
 
   /// @brief 出力ピンの機能を設定する．
-  /// @param[in] pin 出力(入出力)ピン
+  /// @param[in] cell セル
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
   /// @param[in] function 機能を表す論理式
   void
-  set_opin_function(CiOutputPin* pin,
+  set_opin_function(CiCell* cell,
+		    ymuint opin_id,
 		    const LogExpr& function);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief タイミング情報を格納する配列を確保する．
+  /// @param[in] pin ピン
+  /// @param[in] np 総ピン数
+  /// @note 配列のサイズは np x 2
+  void
+  set_timing_array(CiPin* pin,
+		   ymuint np);
 
 
 private:

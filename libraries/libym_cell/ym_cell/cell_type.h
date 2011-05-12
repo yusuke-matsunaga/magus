@@ -41,7 +41,8 @@ enum tCellDelayModel {
 enum tCellDirection {
   kDirInput,
   kDirOutput,
-  kDirInout
+  kDirInout,
+  kDirInternal
 };
 
 

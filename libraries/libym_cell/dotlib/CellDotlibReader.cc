@@ -177,7 +177,6 @@ gen_library(const DotlibNode* dt_library)
     // ピン名とピン番号の連想配列
     hash_map<ShString, ymuint> pin_map;
 
-    cout << "Cell name: " << cell_name << endl;
     // ピン情報の読み出し
     {
       ymuint pin_id = 0;
@@ -195,7 +194,6 @@ gen_library(const DotlibNode* dt_library)
 
 	ShString pin_name = pin_info.name();
 	pin_map.insert(make_pair(pin_name, pin_id));
-	cout << "Pin#" << pin_id << ": " << pin_name << endl;
       }
       if ( error ) {
 	continue;
@@ -224,19 +222,14 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  CiOutputPin* pin = library->new_cell_output(cell,
-						      i,
-						      pin_info.name(),
-						      max_fanout,
-						      min_fanout,
-						      max_capacitance,
-						      min_capacitance,
-						      max_transition,
-						      min_transition);
+	  library->new_cell_output(cell, i, pin_info.name(),
+				   max_fanout, min_fanout,
+				   max_capacitance, min_capacitance,
+				   max_transition, min_transition);
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
-	    library->set_opin_function(pin, expr);
+	    library->set_opin_function(cell, i, expr);
 
 #if 0
 	    TvFunc tv_function = expr_to_tvfunc(expr, ni);
@@ -332,9 +325,7 @@ gen_library(const DotlibNode* dt_library)
 	  CellCapacitance min_capacitance(pin_info.min_capacitance());
 	  CellTime max_transition(pin_info.max_transition());
 	  CellTime min_transition(pin_info.min_transition());
-	  library->new_cell_inout(cell,
-				  i,
-				  pin_info.name(),
+	  library->new_cell_inout(cell, i, pin_info.name(),
 				  cap, rise_cap, fall_cap,
 				  max_fanout, min_fanout,
 				  max_capacitance, min_capacitance,
@@ -343,7 +334,7 @@ gen_library(const DotlibNode* dt_library)
 	break;
 
       case DotlibPin::kInternal:
-#warning "TODO: 未完"
+	library->new_cell_internal(cell, i, pin_info.name());
 	break;
 
       default:

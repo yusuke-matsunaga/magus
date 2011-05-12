@@ -142,6 +142,11 @@ private:
   void
   set_function(const LogExpr& function);
 
+  /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
+  virtual
+  void
+  set_timing_array(const CellTiming** timing_array);
+
   /// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
   /// @param[in] pin_id 入力ピンのピン番号
   /// @param[in] sense タイミング情報の適用条件
@@ -352,6 +357,11 @@ private:
   void
   set_function(const LogExpr& function);
 
+  /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
+  virtual
+  void
+  set_timing_array(const CellTiming** timing_array);
+
   /// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
   /// @param[in] pin_id 入力ピンのピン番号
   /// @param[in] sense タイミング情報の適用条件
@@ -486,6 +496,39 @@ private:
 
   // fall 負荷
   CellCapacitance mFallCapacitance;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class CiInternalPin CiPin.h "CiPin.h"
+/// @brief セルの内部ピンを表すクラス
+//////////////////////////////////////////////////////////////////////
+class CiInternalPin :
+  public CiPin
+{
+  friend class CiLibrary;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] name ピン名
+  CiInternalPin(const ShString& name);
+
+  /// @brief デストラクタ
+  virtual
+  ~CiInternalPin();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 共通属性
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 方向を返す．
+  virtual
+  tCellDirection
+  direction() const;
 
 };
 

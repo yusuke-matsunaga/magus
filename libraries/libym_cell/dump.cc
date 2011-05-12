@@ -173,6 +173,10 @@ dump_library(ostream& s,
 	}
 	BinIO::write_32(s, 0); // timing 情報が終わった印
 	break;
+
+      case kDirInternal:
+	// Internal のつもり
+	BinIO::write_32(s, 4);
       }
     }
   }
@@ -273,6 +277,10 @@ display_library(ostream& s,
 	  display_timing(s, cell, pin, k, kSensePosiUnate);
 	  display_timing(s, cell, pin, k, kSenseNegaUnate);
 	}
+	break;
+
+      case kDirInternal:
+	s << "    Direction        = INTERNAL" << endl;
 	break;
 
       default:
