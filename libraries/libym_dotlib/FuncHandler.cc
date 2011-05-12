@@ -73,7 +73,16 @@ FuncHandler::read_primary()
     return mgr()->new_string(name, loc);
   }
   if ( type == INT_NUM ) {
-    return mgr()->new_int(mScanner.cur_int(), loc);
+    int v = mScanner.cur_int();
+    if ( v != 0 && v != 1 ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. 0 or 1 is expected.");
+      return NULL;
+    }
+    return mgr()->new_int(v, loc);
   }
   if ( type == NOT ) {
     DotlibNodeImpl* opr = read_primary();
