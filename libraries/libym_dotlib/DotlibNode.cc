@@ -140,6 +140,78 @@ DotlibNode::get_cell_info(DotlibCell& cell_info) const
     return false;
   }
 
+  // statetable を取り出す．
+  if ( !cell_info.get_singleton_or_null("statetable", cell_info.mStateTable) ) {
+    return false;
+  }
+
+  // ff と latch と statetable は排他的
+  {
+    const char* first_name = NULL;
+    const char* last_name = NULL;
+    FileRegion first_loc;
+    FileRegion last_loc;
+    if ( cell_info.mFF && cell_info.mLatch ) {
+      FileRegion ff_loc = cell_info.mFF->loc();
+      FileRegion latch_loc = cell_info.mLatch->loc();
+      if ( ff_loc.start_line() < latch_loc.start_line() ) {
+	first_name = "ff";
+	first_loc = ff_loc;
+	last_name = "latch";
+	last_loc = latch_loc;
+      }
+      else {
+	first_name = "latch";
+	first_loc = latch_loc;
+	last_name = "ff";
+	last_loc = ff_loc;
+      }
+    }
+    else if ( cell_info.mFF && cell_info.mStateTable ) {
+      FileRegion ff_loc = cell_info.mFF->loc();
+      FileRegion st_loc = cell_info.mStateTable->loc();
+      if ( ff_loc.start_line() < st_loc.start_line() ) {
+	first_name = "ff";
+	first_loc = ff_loc;
+	last_name = "statetable";
+	last_loc = st_loc;
+      }
+      else {
+	first_name = "statetable";
+	first_loc = st_loc;
+	last_name = "ff";
+	last_loc = ff_loc;
+      }
+    }
+    else if ( cell_info.mLatch && cell_info.mStateTable ) {
+      FileRegion latch_loc = cell_info.mLatch->loc();
+      FileRegion st_loc = cell_info.mStateTable->loc();
+      if ( latch_loc.start_line() < st_loc.start_line() ) {
+	first_name = "latch";
+	first_loc = latch_loc;
+	last_name = "statetable";
+	last_loc = st_loc;
+      }
+      else {
+	first_name = "statetable";
+	first_loc = st_loc;
+	last_name = "latch";
+	last_loc = latch_loc;
+      }
+    }
+    if ( first_name ) {
+      ostringstream buf;
+      buf << "'" << last_name << "' group cannot be used with '"
+	  << first_name << "' group at "
+	  << first_loc << ".";
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      last_loc,
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      buf.str());
+      return false;
+    }
+  }
   return true;
 }
 

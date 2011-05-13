@@ -104,7 +104,7 @@ private:
   const DotlibNode* mLatch;
 
   // statetable グループ
-  const DotlibNode* mStatetable;
+  const DotlibNode* mStateTable;
 
 };
 

@@ -37,7 +37,7 @@ DotlibCell::clear()
   mBusNamingStyle = NULL;
   mFF = NULL;
   mLatch = NULL;
-  mStatetable = NULL;
+  mStateTable = NULL;
 
   mPinList.clear();
   mBusList.clear();
@@ -100,7 +100,7 @@ DotlibCell::latch() const
 const DotlibNode*
 DotlibCell::statetable() const
 {
-  return mStatetable;
+  return mStateTable;
 }
 
 END_NAMESPACE_YM_DOTLIB
