@@ -15,6 +15,8 @@
 #include "ym_dotlib/DotlibNode.h"
 #include "ym_dotlib/DotlibLibrary.h"
 #include "ym_dotlib/DotlibCell.h"
+#include "ym_dotlib/DotlibFF.h"
+#include "ym_dotlib/DotlibLatch.h"
 #include "ym_dotlib/DotlibPin.h"
 
 #include "ym_lexp/LogExpr.h"
@@ -198,6 +200,27 @@ gen_library(const DotlibNode* dt_library)
       if ( error ) {
 	continue;
       }
+    }
+
+    const DotlibNode* dt_ff = cell_info.ff();
+    const DotlibNode* dt_latch = cell_info.latch();
+    DotlibFF ff_info;
+    DotlibLatch latch_info;
+    if ( dt_ff ) {
+      if ( !dt_ff->get_ff_info(ff_info) ) {
+	continue;
+      }
+      // pin_map に登録しておく
+      pin_map.insert(make_pair(ff_info.var1_name(), npin));
+      pin_map.insert(make_pair(ff_info.var2_name(), npin + 1));
+    }
+    else if ( dt_latch ) {
+      if ( !dt_latch->get_latch_info(latch_info) ) {
+	continue;
+      }
+      // pin_map に登録しておく
+      pin_map.insert(make_pair(latch_info.var1_name(), npin));
+      pin_map.insert(make_pair(latch_info.var2_name(), npin + 1));
     }
 
     // ピンの生成
