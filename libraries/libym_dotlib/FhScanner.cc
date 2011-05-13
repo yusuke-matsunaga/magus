@@ -75,10 +75,12 @@ FhScanner::read_token(FileRegion& loc)
     return NOT;
 
   case '|':
+  case '+':
     loc = cur_loc();
     return OR;
 
   case '&':
+  case '*':
     loc = cur_loc();
     return AND;
 
@@ -93,6 +95,10 @@ FhScanner::read_token(FileRegion& loc)
   case ')':
     loc = cur_loc();
     return RP;
+
+  case '\'':
+    loc = cur_loc();
+    return PRIME;
 
   default:
     // それ以外はエラー

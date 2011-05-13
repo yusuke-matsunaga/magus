@@ -15,6 +15,9 @@
 BEGIN_NAMESPACE_YM_DOTLIB
 
 /// @brief トークンの値
+/// 基本的には dotlib のシンタックスにしたがっているが，
+/// 一部，function 属性の文字列の中身をパーズする時のみ現れるシンボルがある．
+/// AND, OR, XOR, PRIME がそれ．
 enum tTokenType {
   /// @brief コロン(:)
   COLON,
@@ -46,6 +49,8 @@ enum tTokenType {
   LCB,
   /// @brief 右中括弧( } )
   RCB,
+  /// @brief プライム( ' )
+  PRIME,
   /// @brief シンボル
   SYMBOL,
   /// @brief 整数値

@@ -84,10 +84,6 @@ FuncHandler::read_primary()
     }
     return mgr()->new_int(v, loc);
   }
-  if ( type == NOT ) {
-    DotlibNodeImpl* opr = read_primary();
-    return mgr()->new_not(opr, FileRegion(loc, opr->loc()));
-  }
 
   MsgMgr::put_msg(__FILE__, __LINE__,
 		  loc,
@@ -97,11 +93,40 @@ FuncHandler::read_primary()
   return NULL;
 }
 
+// @brief プライム付きの primary を読み込む．
+DotlibNodeImpl*
+FuncHandler::read_primary2()
+{
+  FileRegion loc;
+  tTokenType type = read_token(loc);
+  if ( type == NOT ) {
+    DotlibNodeImpl* opr = read_primary();
+    if ( opr == NULL ) {
+      return NULL;
+    }
+    return mgr()->new_not(opr, FileRegion(loc, opr->loc()));
+  }
+  unget_token(type, loc);
+
+  DotlibNodeImpl* node = read_primary();
+  if ( node == NULL ) {
+    return NULL;
+  }
+
+  type = read_token(loc);
+  if ( type == PRIME ) {
+    return mgr()->new_not(node, FileRegion(node->loc(), loc));
+  }
+  unget_token(type, loc);
+
+  return node;
+}
+
 // @brief prudct を読み込む．
 DotlibNodeImpl*
 FuncHandler::read_product()
 {
-  DotlibNodeImpl* opr1 = read_primary();
+  DotlibNodeImpl* opr1 = read_primary2();
   if ( opr1 == NULL ) {
     return NULL;
   }
@@ -110,7 +135,15 @@ FuncHandler::read_product()
     FileRegion loc;
     tTokenType type = read_token(loc);
     if ( type == AND ) {
-      DotlibNodeImpl* opr2 = read_primary();
+      DotlibNodeImpl* opr2 = read_primary2();
+      if ( opr2 == NULL ) {
+	return NULL;
+      }
+      opr1 = mgr()->new_and(opr1, opr2);
+    }
+    else if ( type == NOT || type == LP || type == SYMBOL ) {
+      unget_token(type, loc);
+      DotlibNodeImpl* opr2 = read_primary2();
       if ( opr2 == NULL ) {
 	return NULL;
       }
@@ -118,8 +151,7 @@ FuncHandler::read_product()
     }
     else {
       // token を戻す．
-      mUngetType = type;
-      mUngetLoc = loc;
+      unget_token(type, loc);
       return opr1;
     }
   }
@@ -144,11 +176,11 @@ FuncHandler::read_expr(tTokenType end_marker)
       if ( opr2 == NULL ) {
 	return NULL;
       }
-      if ( type == OR ) {
-	opr1 = mgr()->new_or(opr1, opr2);
+      if ( type == XOR ) {
+	opr1 = mgr()->new_xor(opr1, opr2);
       }
       else {
-	opr1 = mgr()->new_xor(opr1, opr2);
+	opr1 = mgr()->new_or(opr1, opr2);
       }
     }
     else {
@@ -176,6 +208,17 @@ FuncHandler::read_token(FileRegion& loc)
   else {
     return mScanner.read_token(loc);
   }
+}
+
+// @brief 読み込んだトークンを戻す．
+// @param[in] type トークンの型
+// @param[in] loc トークンの位置
+void
+FuncHandler::unget_token(tTokenType type,
+			 const FileRegion& loc)
+{
+  mUngetType = type;
+  mUngetLoc = loc;
 }
 
 END_NAMESPACE_YM_DOTLIB

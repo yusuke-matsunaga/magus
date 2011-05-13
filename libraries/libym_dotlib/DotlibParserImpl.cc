@@ -133,6 +133,7 @@ DotlibParserImpl::expect(tTokenType req_type)
   case AND:        type_str = "'&'"; break;
   case OR:         type_str = "'|'"; break;
   case XOR:        type_str = "'^'"; break;
+  case PRIME:      type_str = "'"; break;
   case LP:         type_str = "'('"; break;
   case RP:         type_str = "')'"; break;
   case LCB:        type_str = "'{'"; break;

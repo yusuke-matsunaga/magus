@@ -57,6 +57,10 @@ private:
   DotlibNodeImpl*
   read_primary();
 
+  /// @brief プライム付きの primary を読み込む．
+  DotlibNodeImpl*
+  read_primary2();
+
   /// @brief prudct を読み込む．
   DotlibNodeImpl*
   read_product();
@@ -69,6 +73,13 @@ private:
   /// @param[out] loc 対応するファイル上の位置情報を格納する変数
   tTokenType
   read_token(FileRegion& loc);
+
+  /// @brief 読み込んだトークンを戻す．
+  /// @param[in] type トークンの型
+  /// @param[in] loc トークンの位置
+  void
+  unget_token(tTokenType type,
+	      const FileRegion& loc);
 
 
 private:
