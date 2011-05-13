@@ -14,4 +14,6 @@ noinst_HEADERS = \
 	DotlibAttrMap.h \
 	DotlibLibrary.h \
 	DotlibCell.h \
+	DotlibFF.h \
+	DotlibLatch.h \
 	DotlibPin.h

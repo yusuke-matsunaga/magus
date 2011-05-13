@@ -35,7 +35,7 @@ DotlibCell::clear()
 
   mArea = 0.0;
   mBusNamingStyle = NULL;
-  mFf = NULL;
+  mFF = NULL;
   mLatch = NULL;
   mStatetable = NULL;
 
@@ -84,7 +84,7 @@ DotlibCell::bundle_list() const
 const DotlibNode*
 DotlibCell::ff() const
 {
-  return mFf;
+  return mFF;
 }
 
 // @brief latch グループを返す．

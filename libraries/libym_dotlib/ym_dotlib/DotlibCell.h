@@ -98,7 +98,7 @@ private:
   list<const DotlibNode*> mBundleList;
 
   // ff グループ
-  const DotlibNode* mFf;
+  const DotlibNode* mFF;
 
   // latch グループ
   const DotlibNode* mLatch;

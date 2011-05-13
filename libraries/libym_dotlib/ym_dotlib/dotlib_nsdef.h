@@ -35,6 +35,8 @@ class DotlibParser;
 class DotlibNode;
 class DotlibLibrary;
 class DotlibCell;
+class DotlibFF;
+class DotlibLatch;
 class DotlibPin;
 
 END_NAMESPACE_YM_DOTLIB
@@ -47,6 +49,8 @@ using nsDotlib::DotlibParser;
 using nsDotlib::DotlibNode;
 using nsDotlib::DotlibLibrary;
 using nsDotlib::DotlibCell;
+using nsDotlib::DotlibFF;
+using nsDotlib::DotlibLatch;
 using nsDotlib::DotlibPin;
 
 END_NAMESPACE_YM

@@ -539,13 +539,14 @@ HandlerFactory::new_ff(GroupHandler* parent)
 
   // simple attributes
   DotlibHandler* simple = new_string_simple(handler);
-  handler->reg_handler("clear", simple);
+  DotlibHandler* fhandler = new FuncHandler(handler);
+  handler->reg_handler("clear", fhandler);
   handler->reg_handler("clear_preset_var1", simple);
   handler->reg_handler("clear_preset_var2", simple);
-  handler->reg_handler("clocked_on", simple);
-  handler->reg_handler("clocked_on_also", simple);
-  handler->reg_handler("next_state", simple);
-  handler->reg_handler("preset", simple);
+  handler->reg_handler("clocked_on", fhandler);
+  handler->reg_handler("clocked_on_also", fhandler);
+  handler->reg_handler("next_state", fhandler);
+  handler->reg_handler("preset", fhandler);
 
   return handler;
 }
@@ -579,13 +580,14 @@ HandlerFactory::new_latch(GroupHandler* parent)
 
   // simple attributes
   DotlibHandler* simple = new_string_simple(handler);
-  handler->reg_handler("clear", simple);
+  DotlibHandler* fhandler = new FuncHandler(handler);
+  handler->reg_handler("clear", fhandler);
   handler->reg_handler("clear_preset_var1", simple);
   handler->reg_handler("clear_preset_var2", simple);
-  handler->reg_handler("data_in", simple);
-  handler->reg_handler("enable", simple);
-  handler->reg_handler("enable_also", simple);
-  handler->reg_handler("preset", simple);
+  handler->reg_handler("data_in", fhandler);
+  handler->reg_handler("enable", fhandler);
+  handler->reg_handler("enable_also", fhandler);
+  handler->reg_handler("preset", fhandler);
 
   return handler;
 }

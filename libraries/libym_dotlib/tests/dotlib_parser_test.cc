@@ -16,6 +16,8 @@
 #include "ym_dotlib/DotlibNode.h"
 #include "ym_dotlib/DotlibLibrary.h"
 #include "ym_dotlib/DotlibCell.h"
+#include "ym_dotlib/DotlibFF.h"
+#include "ym_dotlib/DotlibLatch.h"
 #include "ym_dotlib/DotlibPin.h"
 
 #include "ym_utils/StopWatch.h"
@@ -92,6 +94,100 @@ dotlibparser_test(int argc,
 	cout << endl
 	     << "  cell name = " << cell_info.name() << endl
 	     << "       area = " << cell_info.area() << endl;
+	const DotlibNode* dt_ff = cell_info.ff();
+	if ( dt_ff ) {
+	  DotlibFF ff_info;
+	  if ( !dt_ff->get_ff_info(ff_info) ) {
+	    continue;
+	  }
+	  cout << "       ff (" << ff_info.var1_name()
+	       << ", " << ff_info.var2_name() << ")" << endl;
+	  const DotlibNode* next_state = ff_info.next_state();
+	  if ( next_state ) {
+	    cout << "          next_state = ";
+	    next_state->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clocked_on = ff_info.clocked_on();
+	  if ( clocked_on ) {
+	    cout << "          clocked_on = ";
+	    clocked_on->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clocked_on_also = ff_info.clocked_on_also();
+	  if ( clocked_on_also ) {
+	    cout << "          clocked_on_also = ";
+	    clocked_on_also->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clear = ff_info.clear_pin();
+	  if ( clear ) {
+	    cout << "          clear = ";
+	    clear->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* preset = ff_info.preset();
+	  if ( preset ) {
+	    cout << "          preset = ";
+	    preset->dump(cout);
+	    cout << endl;
+	  }
+	  ShString cp_var1 = ff_info.clear_preset_var1();
+	  if ( cp_var1 != ShString() ) {
+	    cout << "          clear_preset_var1 = " << cp_var1 << endl;
+	  }
+	  ShString cp_var2 = ff_info.clear_preset_var2();
+	  if ( cp_var2 != ShString() ) {
+	    cout << "          clear_preset_var2 = " << cp_var2 << endl;
+	  }
+	}
+	const DotlibNode* dt_latch = cell_info.latch();
+	if ( dt_latch ) {
+	  DotlibLatch latch_info;
+	  if ( !dt_latch->get_latch_info(latch_info) ) {
+	    continue;
+	  }
+	  cout << "       latch (" << latch_info.var1_name()
+	       << ", " << latch_info.var2_name() << ")" << endl;
+	  const DotlibNode* data_in = latch_info.data_in();
+	  if ( data_in ) {
+	    cout << "          data_in = ";
+	    data_in->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* enable = latch_info.enable();
+	  if ( enable ) {
+	    cout << "          enable = ";
+	    enable->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* enable_also = latch_info.enable_also();
+	  if ( enable_also ) {
+	    cout << "          enable_also = ";
+	    enable_also->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clear = latch_info.clear_pin();
+	  if ( clear ) {
+	    cout << "          clear = ";
+	    clear->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* preset = latch_info.preset();
+	  if ( preset ) {
+	    cout << "          preset = ";
+	    preset->dump(cout);
+	    cout << endl;
+	  }
+	  ShString cp_var1 = latch_info.clear_preset_var1();
+	  if ( cp_var1 != ShString() ) {
+	    cout << "          clear_preset_var1 = " << cp_var1 << endl;
+	  }
+	  ShString cp_var2 = latch_info.clear_preset_var2();
+	  if ( cp_var2 != ShString() ) {
+	    cout << "          clear_preset_var2 = " << cp_var2 << endl;
+	  }
+	}
 	const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();
 	const list<const DotlibNode*>& dt_bus_list = cell_info.bus_list();
 	const list<const DotlibNode*>& dt_bundle_list = cell_info.bundle_list();

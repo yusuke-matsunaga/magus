@@ -10,6 +10,8 @@
 #include "ym_dotlib/DotlibNode.h"
 #include "ym_dotlib/DotlibLibrary.h"
 #include "ym_dotlib/DotlibCell.h"
+#include "ym_dotlib/DotlibFF.h"
+#include "ym_dotlib/DotlibLatch.h"
 #include "ym_dotlib/DotlibPin.h"
 #include "ym_utils/MsgMgr.h"
 
@@ -59,18 +61,6 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 // クラス DotlibNode
 //////////////////////////////////////////////////////////////////////
-
-// @brief 1つの文字列からなるリストの場合に文字列を返す．
-// @note 仮定が外れたらアボートする．
-ShString
-DotlibNode::get_string_from_value_list() const
-{
-  assert_cond( is_list(), __FILE__, __LINE__);
-  assert_cond( list_size() == 1, __FILE__, __LINE__);
-  const DotlibNode* value = top();
-  assert_cond( value->is_string(), __FILE__, __LINE__);
-  return value->string_value();
-}
 
 // @brief ライブラリを表すノードから情報を取り出す．
 // @param[out] library_info ライブラリの情報を格納する変数
@@ -138,6 +128,184 @@ DotlibNode::get_cell_info(DotlibCell& cell_info) const
   }
   if ( !get_float(area_node, cell_info.mArea) ) {
     return false;
+  }
+
+  // ff を取り出す．
+  if ( !cell_info.get_singleton_or_null("ff", cell_info.mFF) ) {
+    return false;
+  }
+
+  // latch を取り出す．
+  if ( !cell_info.get_singleton_or_null("latch", cell_info.mLatch) ) {
+    return false;
+  }
+
+  return true;
+}
+
+// @brief FFを表すノードから情報を取り出す．
+// @param[out] ff_info FFの情報を格納する変数
+// @retval true 正しく読み込めた．
+// @retval false エラーが起こった．
+// @note エラーは MsgMgr に出力する．
+bool
+DotlibNode::get_ff_info(DotlibFF& ff_info) const
+{
+  ff_info.clear();
+
+  // 状態変数名を得る．
+  if ( !group_value()->get_string_pair(ff_info.mVar1, ff_info.mVar2) ) {
+    return false;
+  }
+
+  // 属性のリストを作る．
+  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+    ShString attr_name = attr->attr_name();
+    const DotlibNode* attr_value = attr->attr_value();
+    ff_info.add(attr_name, attr_value);
+  }
+
+  // next_state を取り出す．
+  if ( !ff_info.get_singleton("next_state", loc(), ff_info.mNextState) ) {
+    return false;
+  }
+
+  // clocked_on を取り出す．
+  if ( !ff_info.get_singleton("clocked_on", loc(), ff_info.mClockedOn) ) {
+    return false;
+  }
+
+  // clocked_on_also を取り出す．
+  if ( !ff_info.get_singleton_or_null("clocked_on_also", ff_info.mClockedOnAlso) ) {
+    return false;
+  }
+
+  // clear を取り出す．
+  if ( !ff_info.get_singleton_or_null("clear", ff_info.mClear) ) {
+    return false;
+  }
+
+  // preset を取り出す．
+  if ( !ff_info.get_singleton_or_null("preset", ff_info.mPreset) ) {
+    return false;
+  }
+
+  // clear_preset_var1 を取り出す．
+  const DotlibNode* tmp_node1 = NULL;
+  if ( !ff_info.get_singleton_or_null("clear_preset_var1", tmp_node1) ) {
+    return false;
+  }
+  if ( tmp_node1 ) {
+    if ( !tmp_node1->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node1->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "String value is expected.");
+      return false;
+    }
+    ff_info.mClearPresetVar1 = tmp_node1->string_value();
+  }
+
+  // clear_preset_var2 を取り出す．
+  const DotlibNode* tmp_node2 = NULL;
+  if ( !ff_info.get_singleton_or_null("clear_preset_var2", tmp_node2) ) {
+    return false;
+  }
+  if ( tmp_node2 ) {
+    if ( !tmp_node2->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node2->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "String value is expected.");
+      return false;
+    }
+    ff_info.mClearPresetVar2 = tmp_node2->string_value();
+  }
+
+  return true;
+}
+
+// @brief ラッチを表すノードから情報を取り出す．
+// @param[out] latch_info ラッチの情報を格納する変数
+// @retval true 正しく読み込めた．
+// @retval false エラーが起こった．
+// @note エラーは MsgMgr に出力する．
+bool
+DotlibNode::get_latch_info(DotlibLatch& latch_info) const
+{
+  latch_info.clear();
+
+  // 状態変数名を得る．
+  if ( !group_value()->get_string_pair(latch_info.mVar1, latch_info.mVar2) ) {
+    return false;
+  }
+
+  // 属性のリストを作る．
+  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+    ShString attr_name = attr->attr_name();
+    const DotlibNode* attr_value = attr->attr_value();
+    latch_info.add(attr_name, attr_value);
+  }
+
+  // data_in を取り出す．
+  if ( !latch_info.get_singleton_or_null("data_in", latch_info.mDataIn) ) {
+    return false;
+  }
+
+  // enable を取り出す．
+  if ( !latch_info.get_singleton_or_null("enable", latch_info.mEnable) ) {
+    return false;
+  }
+
+  // enable_also を取り出す．
+  if ( !latch_info.get_singleton_or_null("enable_also", latch_info.mEnableAlso) ) {
+    return false;
+  }
+
+  // clear を取り出す．
+  if ( !latch_info.get_singleton_or_null("clear", latch_info.mClear) ) {
+    return false;
+  }
+
+  // preset を取り出す．
+  if ( !latch_info.get_singleton_or_null("preset", latch_info.mPreset) ) {
+    return false;
+  }
+
+  // clear_preset_var1 を取り出す．
+  const DotlibNode* tmp_node1 = NULL;
+  if ( !latch_info.get_singleton_or_null("clear_preset_var1", tmp_node1) ) {
+    return false;
+  }
+  if ( tmp_node1 ) {
+    if ( !tmp_node1->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node1->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "String value is expected.");
+      return false;
+    }
+    latch_info.mClearPresetVar1 = tmp_node1->string_value();
+  }
+
+  // clear_preset_var2 を取り出す．
+  const DotlibNode* tmp_node2 = NULL;
+  if ( !latch_info.get_singleton_or_null("clear_preset_var2", tmp_node2) ) {
+    return false;
+  }
+  if ( tmp_node2 ) {
+    if ( !tmp_node2->is_string() ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node2->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "String value is expected.");
+      return false;
+    }
+    latch_info.mClearPresetVar2 = tmp_node2->string_value();
   }
 
   return true;
@@ -327,6 +495,62 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
 
+  return true;
+}
+
+// @brief 1つの文字列からなるリストの場合に文字列を返す．
+// @note 仮定が外れたらアボートする．
+ShString
+DotlibNode::get_string_from_value_list() const
+{
+  assert_cond( is_list(), __FILE__, __LINE__);
+  assert_cond( list_size() == 1, __FILE__, __LINE__);
+  const DotlibNode* value = top();
+  assert_cond( value->is_string(), __FILE__, __LINE__);
+  return value->string_value();
+}
+
+// @brief 2つの文字列からなるリストの内容を取り出す．
+// @param[out] str1 1つ目の文字列を格納する変数
+// @param[out] str2 2つ目の文字列を格納する変数
+// @retval true 正しく読み込めた．
+// @retval false エラーが起こった．
+// @note エラーは MsgMgr に出力する．
+bool
+DotlibNode::get_string_pair(ShString& str1,
+			    ShString& str2) const
+{
+  assert_cond ( is_list(), __FILE__, __LINE__);
+  if ( list_size() != 2 ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "Expected list size is 2.");
+    return false;
+  }
+  const DotlibNode* node1 = top();
+  assert_cond( node1 != NULL, __FILE__, __LINE__);
+  if ( !node1->is_string() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    node1->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "String value is expected.");
+    return false;
+  }
+  const DotlibNode* node2 = node1->next();
+  assert_cond( node2 != NULL, __FILE__, __LINE__);
+  if ( !node2->is_string() ) {
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    node2->loc(),
+		    kMsgError,
+		    "DOTLIB_PARSER",
+		    "String value is expected.");
+    return false;
+  }
+  str1 = node1->string_value();
+  str2 = node2->string_value();
   return true;
 }
 
