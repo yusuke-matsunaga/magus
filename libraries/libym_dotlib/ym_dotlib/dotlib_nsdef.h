@@ -35,6 +35,7 @@ class DotlibParser;
 class DotlibNode;
 class DotlibLibrary;
 class DotlibCell;
+class DotlibFL;
 class DotlibFF;
 class DotlibLatch;
 class DotlibPin;

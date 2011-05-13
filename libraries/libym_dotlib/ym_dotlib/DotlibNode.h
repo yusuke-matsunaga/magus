@@ -255,6 +255,16 @@ public:
   get_string_pair(ShString& str1,
 		  ShString& str2) const;
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief get_ff_info() と get_latch_info() の共通処理
+  bool
+  get_fl_info(DotlibFL& fl_info) const;
+
 };
 
 /// @brief ストリーム出力演算子

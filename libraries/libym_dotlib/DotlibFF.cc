@@ -31,27 +31,11 @@ DotlibFF::~DotlibFF()
 void
 DotlibFF::init()
 {
-  DotlibAttrMap::init();
+  DotlibFL::init();
 
   mNextState = NULL;
   mClockedOn = NULL;
   mClockedOnAlso = NULL;
-  mClear = NULL;
-  mPreset = NULL;
-}
-
-// @brief var1 の名前を返す．
-ShString
-DotlibFF::var1_name() const
-{
-  return mVar1;
-}
-
-// @brief var2 の名前を返す．
-ShString
-DotlibFF::var2_name() const
-{
-  return mVar2;
 }
 
 // @brief "next_state" を返す．
@@ -73,34 +57,6 @@ const DotlibNode*
 DotlibFF::clocked_on_also() const
 {
   return mClockedOnAlso;
-}
-
-// @brief "clear" を返す．
-const DotlibNode*
-DotlibFF::clear() const
-{
-  return mClear;
-}
-
-// @brief "preset" を返す．
-const DotlibNode*
-DotlibFF::preset() const
-{
-  return mPreset;
-}
-
-// @brief "clear_preset_var1" を返す．
-ShString
-DotlibFF::clear_preset_var1() const
-{
-  return mClearPresetVar1;
-}
-
-// @brief "clear_preset_var2" を返す．
-ShString
-DotlibFF::clear_preset_var2() const
-{
-  return mClearPresetVar2;
 }
 
 END_NAMESPACE_YM_DOTLIB

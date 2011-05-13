@@ -31,27 +31,11 @@ DotlibLatch::~DotlibLatch()
 void
 DotlibLatch::init()
 {
-  DotlibAttrMap::init();
+  DotlibFL::init();
 
   mDataIn = NULL;
   mEnable = NULL;
   mEnableAlso = NULL;
-  mClear = NULL;
-  mPreset = NULL;
-}
-
-// @brief var1 の名前を返す．
-ShString
-DotlibLatch::var1_name() const
-{
-  return mVar1;
-}
-
-// @brief var2 の名前を返す．
-ShString
-DotlibLatch::var2_name() const
-{
-  return mVar2;
 }
 
 // @brief "data_in" を返す．
@@ -73,34 +57,6 @@ const DotlibNode*
 DotlibLatch::enable_also() const
 {
   return mEnableAlso;
-}
-
-// @brief "clear" を返す．
-const DotlibNode*
-DotlibLatch::clear() const
-{
-  return mClear;
-}
-
-// @brief "preset" を返す．
-const DotlibNode*
-DotlibLatch::preset() const
-{
-  return mPreset;
-}
-
-// @brief "clear_preset_var1" を返す．
-ShString
-DotlibLatch::clear_preset_var1() const
-{
-  return mClearPresetVar1;
-}
-
-// @brief "clear_preset_var2" を返す．
-ShString
-DotlibLatch::clear_preset_var2() const
-{
-  return mClearPresetVar2;
 }
 
 END_NAMESPACE_YM_DOTLIB

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_dotlib/DotlibAttrMap.h"
+#include "ym_dotlib/DotlibFL.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 /// @brief DotlibNode の木から取り出した FF の情報を表すクラス
 //////////////////////////////////////////////////////////////////////
 class DotlibFF :
-  public DotlibAttrMap
+  public DotlibFL
 {
   friend class DotlibNode;
 
@@ -38,14 +38,6 @@ public:
   void
   init();
 
-  /// @brief var1 の名前を返す．
-  ShString
-  var1_name() const;
-
-  /// @brief var2 の名前を返す．
-  ShString
-  var2_name() const;
-
   /// @brief "next_state" を返す．
   const DotlibNode*
   next_state() const;
@@ -58,33 +50,11 @@ public:
   const DotlibNode*
   clocked_on_also() const;
 
-  /// @brief "clear" を返す．
-  const DotlibNode*
-  clear() const;
-
-  /// @brief "preset" を返す．
-  const DotlibNode*
-  preset() const;
-
-  /// @brief "clear_preset_var1" を返す．
-  ShString
-  clear_preset_var1() const;
-
-  /// @brief "clear_preset_var2" を返す．
-  ShString
-  clear_preset_var2() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // var1
-  ShString mVar1;
-
-  // var2
-  ShString mVar2;
 
   // next_state
   const DotlibNode* mNextState;
@@ -94,18 +64,6 @@ private:
 
   // clocked_on_also
   const DotlibNode* mClockedOnAlso;
-
-  // clear
-  const DotlibNode* mClear;
-
-  // preset
-  const DotlibNode* mPreset;
-
-  // clear_preset_var1
-  ShString mClearPresetVar1;
-
-  // clear_preset_var2
-  ShString mClearPresetVar2;
 
 };
 

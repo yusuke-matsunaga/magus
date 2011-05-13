@@ -59,6 +59,7 @@ libym_dotlib_la_SOURCES = \
 	DotlibAttrMap.cc \
 	DotlibLibrary.cc \
 	DotlibCell.cc \
+	DotlibFL.cc \
 	DotlibFF.cc \
 	DotlibLatch.cc \
 	DotlibPin.cc

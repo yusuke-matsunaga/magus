@@ -225,16 +225,8 @@ DotlibNode::get_ff_info(DotlibFF& ff_info) const
 {
   ff_info.init();
 
-  // 状態変数名を得る．
-  if ( !group_value()->get_string_pair(ff_info.mVar1, ff_info.mVar2) ) {
+  if ( !get_fl_info(ff_info) ) {
     return false;
-  }
-
-  // 属性のリストを作る．
-  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
-    ShString attr_name = attr->attr_name();
-    const DotlibNode* attr_value = attr->attr_value();
-    ff_info.add(attr_name, attr_value);
   }
 
   // next_state を取り出す．
@@ -252,50 +244,6 @@ DotlibNode::get_ff_info(DotlibFF& ff_info) const
     return false;
   }
 
-  // clear を取り出す．
-  if ( !ff_info.get_singleton_or_null("clear", ff_info.mClear) ) {
-    return false;
-  }
-
-  // preset を取り出す．
-  if ( !ff_info.get_singleton_or_null("preset", ff_info.mPreset) ) {
-    return false;
-  }
-
-  // clear_preset_var1 を取り出す．
-  const DotlibNode* tmp_node1 = NULL;
-  if ( !ff_info.get_singleton_or_null("clear_preset_var1", tmp_node1) ) {
-    return false;
-  }
-  if ( tmp_node1 ) {
-    if ( !tmp_node1->is_string() ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      tmp_node1->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "String value is expected.");
-      return false;
-    }
-    ff_info.mClearPresetVar1 = tmp_node1->string_value();
-  }
-
-  // clear_preset_var2 を取り出す．
-  const DotlibNode* tmp_node2 = NULL;
-  if ( !ff_info.get_singleton_or_null("clear_preset_var2", tmp_node2) ) {
-    return false;
-  }
-  if ( tmp_node2 ) {
-    if ( !tmp_node2->is_string() ) {
-      MsgMgr::put_msg(__FILE__, __LINE__,
-		      tmp_node2->loc(),
-		      kMsgError,
-		      "DOTLIB_PARSER",
-		      "String value is expected.");
-      return false;
-    }
-    ff_info.mClearPresetVar2 = tmp_node2->string_value();
-  }
-
   return true;
 }
 
@@ -309,16 +257,8 @@ DotlibNode::get_latch_info(DotlibLatch& latch_info) const
 {
   latch_info.init();
 
-  // 状態変数名を得る．
-  if ( !group_value()->get_string_pair(latch_info.mVar1, latch_info.mVar2) ) {
+  if ( !get_fl_info(latch_info) ) {
     return false;
-  }
-
-  // 属性のリストを作る．
-  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
-    ShString attr_name = attr->attr_name();
-    const DotlibNode* attr_value = attr->attr_value();
-    latch_info.add(attr_name, attr_value);
   }
 
   // data_in を取り出す．
@@ -336,19 +276,38 @@ DotlibNode::get_latch_info(DotlibLatch& latch_info) const
     return false;
   }
 
+  return true;
+}
+
+// @brief get_ff_info() と get_latch_info() の共通処理
+bool
+DotlibNode::get_fl_info(DotlibFL& fl_info) const
+{
+  // 状態変数名を得る．
+  if ( !group_value()->get_string_pair(fl_info.mVar1, fl_info.mVar2) ) {
+    return false;
+  }
+
+  // 属性のリストを作る．
+  for (const DotlibNode* attr = attr_top(); attr; attr = attr->next()) {
+    ShString attr_name = attr->attr_name();
+    const DotlibNode* attr_value = attr->attr_value();
+    fl_info.add(attr_name, attr_value);
+  }
+
   // clear を取り出す．
-  if ( !latch_info.get_singleton_or_null("clear", latch_info.mClear) ) {
+  if ( !fl_info.get_singleton_or_null("clear", fl_info.mClear) ) {
     return false;
   }
 
   // preset を取り出す．
-  if ( !latch_info.get_singleton_or_null("preset", latch_info.mPreset) ) {
+  if ( !fl_info.get_singleton_or_null("preset", fl_info.mPreset) ) {
     return false;
   }
 
   // clear_preset_var1 を取り出す．
   const DotlibNode* tmp_node1 = NULL;
-  if ( !latch_info.get_singleton_or_null("clear_preset_var1", tmp_node1) ) {
+  if ( !fl_info.get_singleton_or_null("clear_preset_var1", tmp_node1) ) {
     return false;
   }
   if ( tmp_node1 ) {
@@ -360,12 +319,26 @@ DotlibNode::get_latch_info(DotlibLatch& latch_info) const
 		      "String value is expected.");
       return false;
     }
-    latch_info.mClearPresetVar1 = tmp_node1->string_value();
+    ShString str = tmp_node1->string_value();
+    if ( str == "L" || str == "l" ) {
+      fl_info.mClearPresetVar1 = 0;
+    }
+    else if ( str == "H" || str == "h" ) {
+      fl_info.mClearPresetVar1 = 1;
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node1->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. \"L\" or \"H\" is expected.");
+      return false;
+    }
   }
 
   // clear_preset_var2 を取り出す．
   const DotlibNode* tmp_node2 = NULL;
-  if ( !latch_info.get_singleton_or_null("clear_preset_var2", tmp_node2) ) {
+  if ( !fl_info.get_singleton_or_null("clear_preset_var2", tmp_node2) ) {
     return false;
   }
   if ( tmp_node2 ) {
@@ -377,7 +350,21 @@ DotlibNode::get_latch_info(DotlibLatch& latch_info) const
 		      "String value is expected.");
       return false;
     }
-    latch_info.mClearPresetVar2 = tmp_node2->string_value();
+    ShString str = tmp_node2->string_value();
+    if ( str == "L" || str == "l" ) {
+      fl_info.mClearPresetVar2 = 0;
+    }
+    else if ( str == "H" || str == "h" ) {
+      fl_info.mClearPresetVar2 = 1;
+    }
+    else {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp_node2->loc(),
+		      kMsgError,
+		      "DOTLIB_PARSER",
+		      "Syntax error. \"L\" or \"H\" is expected.");
+      return false;
+    }
   }
 
   return true;
