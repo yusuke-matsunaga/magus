@@ -25,12 +25,64 @@ restore_library(istream& s)
   library->set_cell_num(nc);
 
   for (ymuint i = 0; i < nc; ++ i) {
+    ymuint type = BinIO::read_32(s);
     ShString name( BinIO::read_str(s) );
     CellArea area( BinIO::read_double(s) );
     ymuint np = BinIO::read_32(s);
     ymuint nb = BinIO::read_32(s);
     ymuint nc = BinIO::read_32(s);
-    CiCell* cell = library->new_cell(i, name, area, np, nb, nc);
+    CiCell* cell = NULL;
+    switch ( type ) {
+    case 0: // kLogic
+      cell = library->new_logic_cell(i, name, area, np, nb, nc);
+      break;
+
+    case 1: // kFF
+      {
+	ShString var1;
+	ShString var2;
+	LogExpr next_state;
+	LogExpr clocked_on;
+	LogExpr clocked_on_also;
+	LogExpr clear;
+	LogExpr preset;
+	ymuint clear_preset_var1;
+	ymuint clear_preset_var2;
+	cell = library->new_ff_cell(i, name, area,
+				    var1, var2,
+				    next_state, clocked_on, clocked_on_also,
+				    clear, preset,
+				    clear_preset_var1,
+				    clear_preset_var2,
+				    np, nb, nc);
+      }
+      break;
+
+    case 2: // kLatch
+      {
+	ShString var1;
+	ShString var2;
+	LogExpr data_in;
+	LogExpr enable;
+	LogExpr enable_also;
+	LogExpr clear;
+	LogExpr preset;
+	ymuint clear_preset_var1;
+	ymuint clear_preset_var2;
+	cell = library->new_latch_cell(i, name, area,
+				       var1, var2,
+				       data_in, enable, enable_also,
+				       clear, preset,
+				       clear_preset_var1,
+				       clear_preset_var2,
+				       np, nb, nc);
+      }
+      break;
+
+    case 3: // kFSM
+#warning "TODO: 未完"
+      break;
+    }
 
     ymuint nt = BinIO::read_32(s);
     vector<const CellTiming*> timing_list(nt);

@@ -34,6 +34,11 @@ LogExpr
 dot2expr(const DotlibNode* node,
 	 const hash_map<ShString, ymuint>& pin_map)
 {
+  // 特例
+  if ( node == NULL ) {
+    return LogExpr::make_zero();
+  }
+
   if ( node->is_int() ) {
     int v = node->int_value();
     if ( v == 0 ) {
@@ -160,24 +165,20 @@ gen_library(const DotlibNode* dt_library)
     if ( !dt_cell->get_cell_info(cell_info) ) {
       continue;
     }
+    ShString cell_name = cell_info.name();
+    CellArea area(cell_info.area());
     const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();
     const list<const DotlibNode*>& dt_bus_list = cell_info.bus_list();
     const list<const DotlibNode*>& dt_bundle_list = cell_info.bundle_list();
-
-    // セルの生成
-    ShString cell_name = cell_info.name();
-    CellArea area(cell_info.area());
     ymuint npin = dt_pin_list.size();
     ymuint nbus = dt_bus_list.size();
     ymuint nbundle = dt_bundle_list.size();
-    CiCell* cell = library->new_cell(cell_id, cell_name, area,
-				     npin, nbus, nbundle);
-
-    // ピン情報の配列
-    vector<DotlibPin> pin_info_array(npin);
 
     // ピン名とピン番号の連想配列
     hash_map<ShString, ymuint> pin_map;
+
+    // ピン情報の配列
+    vector<DotlibPin> pin_info_array(npin);
 
     // ピン情報の読み出し
     {
@@ -204,23 +205,62 @@ gen_library(const DotlibNode* dt_library)
 
     const DotlibNode* dt_ff = cell_info.ff();
     const DotlibNode* dt_latch = cell_info.latch();
-    DotlibFF ff_info;
-    DotlibLatch latch_info;
+
+    // セルの生成
+    CiCell* cell = NULL;
     if ( dt_ff ) {
+      DotlibFF ff_info;
       if ( !dt_ff->get_ff_info(ff_info) ) {
 	continue;
       }
+      ShString var1 = ff_info.var1_name();
+      ShString var2 = ff_info.var2_name();
+      LogExpr next_state = dot2expr(ff_info.next_state(), pin_map);
+      LogExpr clocked_on = dot2expr(ff_info.clocked_on(), pin_map);
+      LogExpr clocked_on_also = dot2expr(ff_info.clocked_on_also(), pin_map);
+      LogExpr clear = dot2expr(ff_info.clear(), pin_map);
+      LogExpr preset = dot2expr(ff_info.preset(), pin_map);
+      ymuint v1 = ff_info.clear_preset_var1();
+      ymuint v2 = ff_info.clear_preset_var2();
+
+      cell = library->new_ff_cell(cell_id, cell_name, area,
+				  var1, var2,
+				  next_state, clocked_on, clocked_on_also,
+				  clear, preset, v1, v2,
+				  npin, nbus, nbundle);
+
       // pin_map に登録しておく
-      pin_map.insert(make_pair(ff_info.var1_name(), npin));
-      pin_map.insert(make_pair(ff_info.var2_name(), npin + 1));
+      pin_map.insert(make_pair(var1, npin));
+      pin_map.insert(make_pair(var2, npin + 1));
     }
     else if ( dt_latch ) {
+      DotlibLatch latch_info;
       if ( !dt_latch->get_latch_info(latch_info) ) {
 	continue;
       }
+      ShString var1 = latch_info.var1_name();
+      ShString var2 = latch_info.var2_name();
+      LogExpr data_in = dot2expr(latch_info.data_in(), pin_map);
+      LogExpr enable = dot2expr(latch_info.enable(), pin_map);
+      LogExpr enable_also = dot2expr(latch_info.enable_also(), pin_map);
+      LogExpr clear = dot2expr(latch_info.clear(), pin_map);
+      LogExpr preset = dot2expr(latch_info.preset(), pin_map);
+      ymuint v1 = latch_info.clear_preset_var1();
+      ymuint v2 = latch_info.clear_preset_var2();
+
+      cell = library->new_latch_cell(cell_id, cell_name, area,
+				     var1, var2,
+				     data_in, enable, enable_also,
+				     clear, preset, v1, v2,
+				     npin, nbus, nbundle);
+
       // pin_map に登録しておく
-      pin_map.insert(make_pair(latch_info.var1_name(), npin));
-      pin_map.insert(make_pair(latch_info.var2_name(), npin + 1));
+      pin_map.insert(make_pair(var1, npin));
+      pin_map.insert(make_pair(var2, npin + 1));
+    }
+    else {
+      cell = library->new_logic_cell(cell_id, cell_name, area,
+				     npin, nbus, nbundle);
     }
 
     // ピンの生成

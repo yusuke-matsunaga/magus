@@ -168,7 +168,7 @@ public:
   void
   set_cell_num(ymuint num);
 
-  /// @brief セルの内容を設定する．
+  /// @brief 論理セルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
   /// @param[in] area 面積
@@ -177,12 +177,78 @@ public:
   /// @param[in] nc バンドル数
   /// @return セルへのポインタを返す．
   CiCell*
-  new_cell(ymuint cell_id,
-	   ShString name,
-	   CellArea area,
-	   ymuint np,
-	   ymuint nb,
-	   ymuint nc);
+  new_logic_cell(ymuint cell_id,
+		 ShString name,
+		 CellArea area,
+		 ymuint np,
+		 ymuint nb,
+		 ymuint nc);
+
+  /// @brief FFセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] var1, var2 状態変数名
+  /// @param[in] next_state "next_state" 関数の式
+  /// @param[in] clocked_on "clocked_on" 関数の式
+  /// @param[in] clocked_on_also "clocked_on_also" 関数の式
+  /// @param[in] clear "clear" 関数の式
+  /// @param[in] preset "preset" 関数の式
+  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
+  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
+  /// @param[in] np ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @return セルへのポインタを返す．
+  CiCell*
+  new_ff_cell(ymuint cell_id,
+	      ShString name,
+	      CellArea area,
+	      const ShString& var1,
+	      const ShString& var2,
+	      const LogExpr& next_state,
+	      const LogExpr& clocked_on,
+	      const LogExpr& clocked_on_also,
+	      const LogExpr& clear,
+	      const LogExpr& preset,
+	      ymuint clear_preset_var1,
+	      ymuint clear_preset_var2,
+	      ymuint np,
+	      ymuint nb,
+	      ymuint nc);
+
+  /// @brief ラッチセルを生成する．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] name 名前
+  /// @param[in] area 面積
+  /// @param[in] var1, var2 状態変数名
+  /// @param[in] data_in "data_in" 関数の式
+  /// @param[in] enable "enable" 関数の式
+  /// @param[in] enable_also "enable_also" 関数の式
+  /// @param[in] clear "clear" 関数の式
+  /// @param[in] preset "preset" 関数の式
+  /// @param[in] clear_preset_var1 "clear_preset_var1" の値
+  /// @param[in] clear_preset_var2 "clear_preset_var2" の値
+  /// @param[in] np ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  /// @return セルへのポインタを返す．
+  CiCell*
+  new_latch_cell(ymuint cell_id,
+		 ShString name,
+		 CellArea area,
+		 const ShString& var1,
+		 const ShString& var2,
+		 const LogExpr& data_in,
+		 const LogExpr& enable,
+		 const LogExpr& enable_also,
+		 const LogExpr& clear,
+		 const LogExpr& preset,
+		 ymuint clear_preset_var1,
+		 ymuint clear_preset_var2,
+		 ymuint np,
+		 ymuint nb,
+		 ymuint nc);
 
   /// @brief セルの入力ピンを生成する．
   /// @param[in] cell セル
@@ -303,6 +369,17 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief セルにピン数，バス数，バンドル数の設定をする．
+  /// @param[in] cell セル
+  /// @param[in] np ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
+  void
+  set_pbb(CiCell* cell,
+	  ymuint np,
+	  ymuint nb,
+	  ymuint nc);
+
   /// @brief タイミング情報を格納する配列を確保する．
   /// @param[in] pin ピン
   /// @param[in] np 総ピン数
@@ -357,7 +434,7 @@ private:
   ymuint32 mCellNum;
 
   // セルの配列
-  CiCell* mCellArray;
+  CiCell** mCellArray;
 
 };
 

@@ -227,6 +227,45 @@ display_library(ostream& s,
     s << "Cell (" << cell->name() << ")" << endl;
     s << "  area = " << cell->area() << endl;
 
+    if ( cell->is_ff() ) {
+      s << "  ff ( " << cell->var1_name()
+	<< ", " << cell->var2_name() << " )" << endl
+	<< "    next_state        = " << cell->next_state() << endl
+	<< "    clocked_on        = " << cell->clocked_on() << endl;
+      if ( !cell->clocked_on_also().is_zero() ) {
+	s << "    clocked_on_also   = " << cell->clocked_on_also() << endl;
+      }
+      if ( !cell->clear().is_zero() ) {
+	s << "    clear             = " << cell->clear() << endl;
+      }
+      if ( !cell->preset().is_zero() ) {
+	s << "    preset            = " << cell->preset() << endl;
+      }
+      if ( !cell->clear().is_zero() && !cell->preset().is_zero() ) {
+	s << "    clear_preset_var1 = " << cell->clear_preset_var1() << endl
+	  << "    clear_preset_var2 = " << cell->clear_preset_var2() << endl;
+      }
+    }
+    else if ( cell->is_latch() ) {
+      s << "  latch ( " << cell->var1_name()
+	<< ", " << cell->var2_name() << " )" << endl
+	<< "    data_in           = " << cell->data_in() << endl
+	<< "    enable            = " << cell->enable() << endl;
+      if ( !cell->enable().is_zero() ) {
+	s << "    enable_also       = " << cell->enable_also() << endl;
+      }
+      if ( !cell->clear().is_zero() ) {
+	s << "    clear             = " << cell->clear() << endl;
+      }
+      if ( !cell->preset().is_zero() ) {
+	s << "    preset            = " << cell->preset() << endl;
+      }
+      if ( !cell->clear().is_zero() && !cell->preset().is_zero() ) {
+	s << "    clear_preset_var1 = " << cell->clear_preset_var1() << endl
+	  << "    clear_preset_var2 = " << cell->clear_preset_var2() << endl;
+      }
+    }
+
     ymuint np = cell->pin_num();
     for (ymuint j = 0; j < np; ++ j) {
       const CellPin* pin = cell->pin(j);

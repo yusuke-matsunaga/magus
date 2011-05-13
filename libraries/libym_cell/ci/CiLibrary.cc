@@ -161,7 +161,7 @@ CiLibrary::cell_num() const
 const Cell*
 CiLibrary::cell(ymuint pos) const
 {
-  return &mCellArray[pos];
+  return mCellArray[pos];
 }
 
 // @brief 名前からのセルの取得
@@ -217,11 +217,11 @@ void
 CiLibrary::set_cell_num(ymuint num)
 {
   mCellNum = num;
-  void* p = mAlloc.get_memory(sizeof(CiCell) * num);
-  mCellArray = new (p) CiCell[num];
+  void* p = mAlloc.get_memory(sizeof(CiCell*) * num);
+  mCellArray = new (p) CiCell*[num];
 }
 
-// @brief セルの内容を設定する．
+// @brief 論理セルを生成する．
 // @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
 // @param[in] name 名前
 // @param[in] area 面積
@@ -230,25 +230,136 @@ CiLibrary::set_cell_num(ymuint num)
 // @param[in] nc バンドル数
 // @return セルへのポインタを返す．
 CiCell*
-CiLibrary::new_cell(ymuint cell_id,
-		    ShString name,
-		    CellArea area,
-		    ymuint np,
-		    ymuint nb,
-		    ymuint nc)
+CiLibrary::new_logic_cell(ymuint cell_id,
+			  ShString name,
+			  CellArea area,
+			  ymuint np,
+			  ymuint nb,
+			  ymuint nc)
 {
-  CiCell* cell = &mCellArray[cell_id];
-  cell->mId = cell_id;
-  cell->mName = name;
-  cell->mArea = area;
+  void* p = mAlloc.get_memory(sizeof(CiLogicCell));
+  CiCell* cell = new (p) CiLogicCell(cell_id, name, area);
+  mCellArray[cell_id] = cell;
 
+  set_pbb(cell, np, nb, nc);
+
+  return cell;
+}
+
+// @brief FFセルを生成する．
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+// @param[in] name 名前
+// @param[in] area 面積
+// @param[in] var1, var2 状態変数名
+// @param[in] next_state "next_state" 関数の式
+// @param[in] clocked_on "clocked_on" 関数の式
+// @param[in] clocked_on_also "clocked_on_also" 関数の式
+// @param[in] clear "clear" 関数の式
+// @param[in] preset "preset" 関数の式
+// @param[in] clear_preset_var1 "clear_preset_var1" の値
+// @param[in] clear_preset_var2 "clear_preset_var2" の値
+// @param[in] np ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+// @return セルへのポインタを返す．
+CiCell*
+CiLibrary::new_ff_cell(ymuint cell_id,
+		       ShString name,
+		       CellArea area,
+		       const ShString& var1,
+		       const ShString& var2,
+		       const LogExpr& next_state,
+		       const LogExpr& clocked_on,
+		       const LogExpr& clocked_on_also,
+		       const LogExpr& clear,
+		       const LogExpr& preset,
+		       ymuint clear_preset_var1,
+		       ymuint clear_preset_var2,
+		       ymuint np,
+		       ymuint nb,
+		       ymuint nc)
+{
+  void* p = mAlloc.get_memory(sizeof(CiFFCell));
+  CiCell* cell = new (p) CiFFCell(cell_id, name, area,
+				  var1, var2,
+				  next_state, clocked_on, clocked_on_also,
+				  clear, preset,
+				  clear_preset_var1,
+				  clear_preset_var2);
+  mCellArray[cell_id] = cell;
+
+  set_pbb(cell, np, nb, nc);
+
+  return cell;
+}
+
+// @brief ラッチセルを生成する．
+// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+// @param[in] name 名前
+// @param[in] area 面積
+// @param[in] var1, var2 状態変数名
+// @param[in] data_in "data_in" 関数の式
+// @param[in] enable "enable" 関数の式
+// @param[in] enable_also "enable_also" 関数の式
+// @param[in] clear "clear" 関数の式
+// @param[in] preset "preset" 関数の式
+// @param[in] clear_preset_var1 "clear_preset_var1" の値
+// @param[in] clear_preset_var2 "clear_preset_var2" の値
+// @param[in] np ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+// @return セルへのポインタを返す．
+CiCell*
+CiLibrary::new_latch_cell(ymuint cell_id,
+			  ShString name,
+			  CellArea area,
+			  const ShString& var1,
+			  const ShString& var2,
+			  const LogExpr& data_in,
+			  const LogExpr& enable,
+			  const LogExpr& enable_also,
+			  const LogExpr& clear,
+			  const LogExpr& preset,
+			  ymuint clear_preset_var1,
+			  ymuint clear_preset_var2,
+			  ymuint np,
+			  ymuint nb,
+			  ymuint nc)
+{
+  void* p = mAlloc.get_memory(sizeof(CiLatchCell));
+  CiCell* cell = new (p) CiLatchCell(cell_id, name, area,
+				     var1, var2,
+				     data_in, enable, enable_also,
+				     clear, preset,
+				     clear_preset_var1,
+				     clear_preset_var2);
+  mCellArray[cell_id] = cell;
+
+  set_pbb(cell, np, nb, nc);
+
+  return cell;
+}
+
+// @brief セルにピン数，バス数，バンドル数の設定をする．
+// @param[in] cell セル
+// @param[in] np ピン数
+// @param[in] nb バス数
+// @param[in] nc バンドル数
+void
+CiLibrary::set_pbb(CiCell* cell,
+		   ymuint np,
+		   ymuint nb,
+		   ymuint nc)
+{
   cell->mPinNum = np;
   void* p = mAlloc.get_memory(sizeof(CiPin*) * np);
   cell->mPinArray = new (p) CiPin*[np];
 
   // バス，バンドル関係は未完
 
-  return cell;
+  cell->mBusNum = nb;
+
+  cell->mBundleNum = nc;
 }
 
 // @brief セルの入力ピンの内容を設定する．

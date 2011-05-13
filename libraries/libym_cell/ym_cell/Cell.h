@@ -12,6 +12,7 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/cell_type.h"
+#include "ym_lexp/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -22,6 +23,24 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class Cell
 {
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 列挙型の定義
+  //////////////////////////////////////////////////////////////////////
+
+
+  /// @brief セルの種類を表す型
+  enum tType {
+    /// @brief 組み合わせ論理
+    kLogic,
+    /// @brief FF
+    kFF,
+    /// @brief ラッチ
+    kLatch,
+    /// @brief FSM (statetable 記述)
+    kFSM
+  };
+
 public:
 
   /// @brief コンストラクタ．
@@ -52,6 +71,108 @@ public:
   virtual
   CellArea
   area() const = 0;
+
+  /// @brief 型の取得
+  virtual
+  tType
+  type() const = 0;
+
+  /// @brief 組み合わせ論理セルの時に true を返す．
+  /// @note type() == kLogic と等価
+  virtual
+  bool
+  is_logic() const = 0;
+
+  /// @brief FFセルの時に true を返す．
+  /// @note type() == kFF と等価
+  virtual
+  bool
+  is_ff() const = 0;
+
+  /// @brief ラッチセルの時に true を返す．
+  /// @note type() == kLatch と等価
+  virtual
+  bool
+  is_latch() const = 0;
+
+  /// @brief FSMセルの時に true を返す．
+  /// @note type() == kFSM と等価
+  virtual
+  bool
+  is_fsm() const = 0;
+
+  /// @brief 状態変数1の名前を返す．
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  string
+  var1_name() const = 0;
+
+  /// @brief 状態変数2の名前を返す．
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  string
+  var2_name() const = 0;
+
+  /// @brief next_state 関数の取得
+  /// @note FFセルの時に意味を持つ．
+  virtual
+  LogExpr
+  next_state() const = 0;
+
+  /// @brief clocked_on 関数の取得
+  /// @note FFセルの時に意味を持つ．
+  virtual
+  LogExpr
+  clocked_on() const = 0;
+
+  /// @brief clocked_on_also 関数の取得
+  /// @note FFセルの時に意味を持つ．
+  virtual
+  LogExpr
+  clocked_on_also() const = 0;
+
+  /// @brief data_in 関数の取得
+  virtual
+  LogExpr
+  data_in() const = 0;
+
+  /// @brief enable 関数の取得
+  virtual
+  LogExpr
+  enable() const = 0;
+
+  /// @brief enable_also 関数の取得
+  virtual
+  LogExpr
+  enable_also() const = 0;
+
+  /// @brief clear 関数の取得
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  LogExpr
+  clear() const = 0;
+
+  /// @brief preset 関数の取得
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  LogExpr
+  preset() const = 0;
+
+  /// @brief clear_preset_var1 の取得
+  /// @retval 0 "L"
+  /// @retval 1 "H"
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  ymuint
+  clear_preset_var1() const = 0;
+
+  /// @brief clear_preset_var2 の取得
+  /// @retval 0 "L"
+  /// @retval 1 "H"
+  /// @note FFセルとラッチセルの時に意味を持つ．
+  virtual
+  ymuint
+  clear_preset_var2() const = 0;
 
   /// @brief ピン数の取得
   virtual

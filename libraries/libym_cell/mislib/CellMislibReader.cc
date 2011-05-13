@@ -167,7 +167,7 @@ gen_library(const string& lib_name,
     }
 
     ymuint ni = ipin_name_list.size();
-    CiCell* cell = library->new_cell(cell_id, name, area, ni +  1, 0, 0);
+    CiCell* cell = library->new_logic_cell(cell_id, name, area, ni +  1, 0, 0);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];
