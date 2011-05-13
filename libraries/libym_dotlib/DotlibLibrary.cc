@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibLibrary::DotlibLibrary()
 {
-  clear();
+  init();
 }
 
 // @brief デストラクタ
@@ -29,9 +29,9 @@ DotlibLibrary::~DotlibLibrary()
 
 // @brief 内容を初期化する．
 void
-DotlibLibrary::clear()
+DotlibLibrary::init()
 {
-  DotlibAttrMap::clear();
+  DotlibAttrMap::init();
 
   mBusNamingStyle = NULL;
   mComment = NULL;

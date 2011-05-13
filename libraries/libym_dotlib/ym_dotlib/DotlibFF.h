@@ -36,7 +36,7 @@ public:
 
   /// @brief 内容を初期化する．
   void
-  clear();
+  init();
 
   /// @brief var1 の名前を返す．
   ShString
@@ -60,7 +60,7 @@ public:
 
   /// @brief "clear" を返す．
   const DotlibNode*
-  clear_pin() const;
+  clear() const;
 
   /// @brief "preset" を返す．
   const DotlibNode*

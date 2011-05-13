@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibFF::DotlibFF()
 {
-  clear();
+  init();
 }
 
 // @brief デストラクタ
@@ -29,9 +29,9 @@ DotlibFF::~DotlibFF()
 
 // @brief 内容を初期化する．
 void
-DotlibFF::clear()
+DotlibFF::init()
 {
-  DotlibAttrMap::clear();
+  DotlibAttrMap::init();
 
   mNextState = NULL;
   mClockedOn = NULL;
@@ -77,7 +77,7 @@ DotlibFF::clocked_on_also() const
 
 // @brief "clear" を返す．
 const DotlibNode*
-DotlibFF::clear_pin() const
+DotlibFF::clear() const
 {
   return mClear;
 }

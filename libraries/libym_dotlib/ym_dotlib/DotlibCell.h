@@ -36,7 +36,7 @@ public:
 
   /// @brief 内容を初期化する．
   void
-  clear();
+  init();
 
   /// @brief 名前を返す．
   ShString

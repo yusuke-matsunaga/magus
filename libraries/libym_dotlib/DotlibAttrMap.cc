@@ -30,7 +30,7 @@ DotlibAttrMap::~DotlibAttrMap()
 
 // @brief 内容を初期化する．
 void
-DotlibAttrMap::clear()
+DotlibAttrMap::init()
 {
   mHash.clear();
 }

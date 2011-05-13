@@ -70,7 +70,7 @@ END_NONAMESPACE
 bool
 DotlibNode::get_library_info(DotlibLibrary& library_info) const
 {
-  library_info.clear();
+  library_info.init();
 
   // ライブラリ名をを得る．
   library_info.mName = group_value()->get_string_from_value_list();
@@ -98,7 +98,7 @@ DotlibNode::get_library_info(DotlibLibrary& library_info) const
 bool
 DotlibNode::get_cell_info(DotlibCell& cell_info) const
 {
-  cell_info.clear();
+  cell_info.init();
 
   // セル名を得る．
   cell_info.mName = group_value()->get_string_from_value_list();
@@ -223,7 +223,7 @@ DotlibNode::get_cell_info(DotlibCell& cell_info) const
 bool
 DotlibNode::get_ff_info(DotlibFF& ff_info) const
 {
-  ff_info.clear();
+  ff_info.init();
 
   // 状態変数名を得る．
   if ( !group_value()->get_string_pair(ff_info.mVar1, ff_info.mVar2) ) {
@@ -307,7 +307,7 @@ DotlibNode::get_ff_info(DotlibFF& ff_info) const
 bool
 DotlibNode::get_latch_info(DotlibLatch& latch_info) const
 {
-  latch_info.clear();
+  latch_info.init();
 
   // 状態変数名を得る．
   if ( !group_value()->get_string_pair(latch_info.mVar1, latch_info.mVar2) ) {
@@ -391,7 +391,7 @@ DotlibNode::get_latch_info(DotlibLatch& latch_info) const
 bool
 DotlibNode::get_pin_info(DotlibPin& pin_info) const
 {
-  pin_info.clear();
+  pin_info.init();
 
   // ピン名を得る．
   pin_info.mName = group_value()->get_string_from_value_list();

@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibPin::DotlibPin()
 {
-  clear();
+  init();
 }
 
 // @brief デストラクタ
@@ -29,9 +29,9 @@ DotlibPin::~DotlibPin()
 
 // @brief 内容を初期化する．
 void
-DotlibPin::clear()
+DotlibPin::init()
 {
-  DotlibAttrMap::clear();
+  DotlibAttrMap::init();
 
   mFunction = NULL;
   mInternalNode = NULL;

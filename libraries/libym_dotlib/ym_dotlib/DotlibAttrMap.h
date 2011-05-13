@@ -34,7 +34,7 @@ public:
 
   /// @brief 内容を初期化する．
   void
-  clear();
+  init();
 
 
 public:

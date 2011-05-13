@@ -120,7 +120,7 @@ dotlibparser_test(int argc,
 	    clocked_on_also->dump(cout);
 	    cout << endl;
 	  }
-	  const DotlibNode* clear = ff_info.clear_pin();
+	  const DotlibNode* clear = ff_info.clear();
 	  if ( clear ) {
 	    cout << "          clear = ";
 	    clear->dump(cout);
@@ -167,7 +167,7 @@ dotlibparser_test(int argc,
 	    enable_also->dump(cout);
 	    cout << endl;
 	  }
-	  const DotlibNode* clear = latch_info.clear_pin();
+	  const DotlibNode* clear = latch_info.clear();
 	  if ( clear ) {
 	    cout << "          clear = ";
 	    clear->dump(cout);

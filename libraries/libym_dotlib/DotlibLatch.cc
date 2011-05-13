@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibLatch::DotlibLatch()
 {
-  clear();
+  init();
 }
 
 // @brief デストラクタ
@@ -29,9 +29,9 @@ DotlibLatch::~DotlibLatch()
 
 // @brief 内容を初期化する．
 void
-DotlibLatch::clear()
+DotlibLatch::init()
 {
-  DotlibAttrMap::clear();
+  DotlibAttrMap::init();
 
   mDataIn = NULL;
   mEnable = NULL;
@@ -77,7 +77,7 @@ DotlibLatch::enable_also() const
 
 // @brief "clear" を返す．
 const DotlibNode*
-DotlibLatch::clear_pin() const
+DotlibLatch::clear() const
 {
   return mClear;
 }
