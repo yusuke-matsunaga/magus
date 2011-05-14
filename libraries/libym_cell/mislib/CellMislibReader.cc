@@ -15,7 +15,7 @@
 #include "ym_mislib/MislibNode.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_npn/TvFunc.h"
-#include "../ci/CiLibrary.h"
+#include "../CiLibrary.h"
 #include "ym_utils/MsgMgr.h"
 
 BEGIN_NAMESPACE_YM_CELL
