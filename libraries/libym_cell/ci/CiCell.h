@@ -1,4 +1,4 @@
-#ifndef LIBYM_CELL_CI_CIELLL_H
+#ifndef LIBYM_CELL_CI_CICELL_H
 #define LIBYM_CELL_CI_CICELL_H
 
 /// @file libym_cell/ci/CiCelll.h
