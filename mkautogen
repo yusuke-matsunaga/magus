@@ -69,6 +69,9 @@ configure:
 
 EOF
 
+# update スクリプトのコピー
+cp etc/update $builddir/update
+
 # サブモジュールのディレクトリ名
 #SUBMODULE=`cat ./modules`
 #for dir in $SUBMODULE
