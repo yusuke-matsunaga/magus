@@ -222,6 +222,7 @@ pg_dump(ostream& s,
 {
   nsYm::nsCell::dump_library(s, pgf_mgr.library());
 
+#if 0
   ymuint nf = pgf_mgr.func_num();
   BinIO::write_32(s, nf);
   for (ymuint i = 0; i < nf; ++ i) {
@@ -246,11 +247,6 @@ pg_dump(ostream& s,
     BinIO::write_32(s, ne);
     for (ymuint j = 0; j < ne; ++ j) {
       BinIO::write_32(s, rep->func(j)->id());
-    }
-    ymuint np = rep->pat_num();
-    BinIO::write_32(s, np);
-    for (ymuint j = 0; j < np; ++ j) {
-      BinIO::write_32(s, rep->pat_id(j));
     }
   }
 
@@ -299,6 +295,7 @@ pg_dump(ostream& s,
       BinIO::write_32(s, val_list[i]);
     }
   }
+#endif
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN

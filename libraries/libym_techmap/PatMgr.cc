@@ -9,105 +9,10 @@
 
 #include "PatMgr.h"
 #include "PatGraph.h"
-#include "RepFunc.h"
-#include "FuncGroup.h"
-#include "ym_cell/CellLibrary.h"
-#include "ym_cell/Cell.h"
 #include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP
-
-BEGIN_NONAMESPACE
-
-void
-read_map(istream& s,
-	 NpnMap& map)
-{
-  ymuint32 tmp = BinIO::read_32(s);
-  ymuint ni = (tmp >> 1);
-  map.resize(ni);
-  tPol opol = (tmp & 1U) ? kPolNega : kPolPosi;
-  map.set_opol(opol);
-  for (ymuint i = 0; i < ni; ++ i) {
-    ymuint32 tmp = BinIO::read_32(s);
-    ymuint pos = (tmp >> 1);
-    tPol ipol = (tmp & 1U) ? kPolNega : kPolPosi;
-    map.set(i, pos, ipol);
-  }
-}
-
-END_NONAMESPACE
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス FuncGroup
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-FuncGroup::FuncGroup() :
-  mCellNum(0),
-  mCellList(NULL)
-{
-}
-
-// @brief デストラクタ
-FuncGroup::~FuncGroup()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス RepFunc
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-RepFunc::RepFunc() :
-  mFuncNum(0U),
-  mFuncArray(NULL),
-  mPatNum(0U),
-  mPatArray(NULL)
-{
-}
-
-// @brief デストラクタ
-RepFunc::~RepFunc()
-{
-  delete [] mFuncArray;
-  delete [] mPatArray;
-}
-
-// @brief バイナリ形式のファイルを読み込む．
-// @param[in] s 入力ストリーム
-// @return 読み込みが成功したら true を返す．
-bool
-RepFunc::load(istream& s)
-{
-  mFuncNum = BinIO::read_32(s);
-  if ( mFuncNum > 0 ) {
-    mFuncArray = new ymuint32[mFuncNum];
-    for (ymuint i = 0; i < mFuncNum; ++ i) {
-      mFuncArray[i] = BinIO::read_32(s);
-    }
-  }
-  else {
-    mFuncArray = NULL;
-  }
-
-  mPatNum = BinIO::read_32(s);
-  if ( mPatNum > 0 ) {
-    mPatArray = new ymuint32[mPatNum];
-    for (ymuint i = 0; i < mPatNum; ++ i) {
-      mPatArray[i] = BinIO::read_32(s);
-    }
-  }
-  else {
-    mPatArray = NULL;
-  }
-
-  return true;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス PatGraph
@@ -156,7 +61,6 @@ PatGraph::load(istream& s)
 
 // @brief コンストラクタ
 PatMgr::PatMgr() :
-  mLibrary(NULL),
   mNodeNum(0U),
   mNodeTypeArray(NULL),
   mEdgeArray(NULL),
@@ -176,7 +80,6 @@ PatMgr::~PatMgr()
 void
 PatMgr::init()
 {
-  delete mLibrary;
   delete [] mNodeTypeArray;
   delete [] mEdgeArray;
   delete [] mPatArray;
@@ -193,38 +96,6 @@ PatMgr::load(istream& s)
 {
   // 以前の内容を捨てる．
   init();
-
-  // ライブラリを読み込む．
-  mLibrary = nsYm::nsCell::restore_library(s);
-
-  // 関数の情報を読み込む．
-  mFuncNum = BinIO::read_32(s);
-  mFuncArray = new FuncGroup[mFuncNum];
-  for (ymuint i = 0; i < mFuncNum; ++ i) {
-    FuncGroup& func = mFuncArray[i];
-    read_map(s, func.mNpnMap);
-    ymuint n = BinIO::read_32(s);
-    func.mCellNum = n;
-    if ( n > 0 ) {
-      func.mCellList = new const Cell*[n];
-      for (ymuint j = 0; j < n; ++ j) {
-	ymuint id = BinIO::read_32(s);
-	func.mCellList[j] = mLibrary->cell(id);
-      }
-    }
-    else {
-      func.mCellList = NULL;
-    }
-  }
-
-  // 代表関数の情報を読み込む．
-  mRepNum = BinIO::read_32(s);
-  mRepArray = new RepFunc[mRepNum];
-  for (ymuint i = 0; i < mRepNum; ++ i) {
-    if ( !mRepArray[i].load(s) ) {
-      return false;
-    }
-  }
 
   // ノードと枝の情報を読み込む．
   mNodeNum = BinIO::read_32(s);
@@ -248,15 +119,6 @@ PatMgr::load(istream& s)
     }
   }
 
-  // 代表関数とパタングラフの対応関係をとる．
-  for (ymuint i = 0; i < mRepNum; ++ i) {
-    RepFunc& rep = mRepArray[i];
-    for (ymuint j = 0; j < rep.mPatNum; ++ j) {
-      PatGraph& pat = mPatArray[rep.mPatArray[j]];
-      pat.mRepId = i;
-    }
-  }
-
   return true;
 }
 
@@ -265,35 +127,14 @@ ymuint
 PatMgr::max_input() const
 {
   ymuint ans = 0;
-  for (ymuint i = 0; i < rep_num(); ++ i) {
-    const RepFunc& rep = this->rep(i);
-    if ( rep.pat_num() == 0 ) {
-      // これは定数かインバーターだから無視しても大丈夫
-      continue;
-    }
-    const PatGraph& pat = this->pat(rep.pat_id(0));
+  for (ymuint i = 0; i < mPatNum; ++ i) {
+    const PatGraph& pat = this->pat(i);
     ymuint ni = pat.input_num();
     if ( ans < ni ) {
       ans = ni;
     }
   }
   return ans;
-}
-
-// @brief 関数グループを返す．
-// @param[in] id 関数番号　( 0 <= id < func_num() )
-const FuncGroup&
-PatMgr::func_group(ymuint id) const
-{
-  return mFuncArray[id];
-}
-
-// @brief 代表関数を返す．
-// @param[in] id 代表関数番号
-const RepFunc&
-PatMgr::rep(ymuint id) const
-{
-  return mRepArray[id];
 }
 
 // @brief パタンを返す．
@@ -313,57 +154,6 @@ dump(ostream& s,
      const PatMgr& pat_mgr)
 {
   s << "==== PatMgr dump start ====" << endl;
-
-  // 関数情報の出力
-  const FuncGroup& func0 = pat_mgr.const0_func();
-  const FuncGroup& func1 = pat_mgr.const1_func();
-  const FuncGroup& func2 = pat_mgr.buf_func();
-  const FuncGroup& func3 = pat_mgr.inv_func();
-  ymuint nf = pat_mgr.func_num();
-  for (ymuint i = 0; i < nf; ++ i) {
-    const FuncGroup& func = pat_mgr.func_group(i);
-    if ( &func == &func0 ) {
-      s << "Const0" << endl;
-    }
-    else if ( &func == &func1 ) {
-      s << "Const1" << endl;
-    }
-    else if ( &func == &func2 ) {
-      s << "Buffer" << endl;
-    }
-    else if ( &func == &func3 ) {
-      s << "Inverter" << endl;
-    }
-    else {
-      const NpnMap& map = func.npn_map();
-      s << "Func#" << i << ": " << map << endl;
-    }
-    ymuint nc = func.cell_num();
-    for (ymuint j = 0; j < nc; ++ j) {
-      const Cell* cell = func.cell(j);
-      s << "  " << cell->name() << endl;
-    }
-  }
-  s << endl;
-
-  // 代表関数情報の出力
-  ymuint nr = pat_mgr.rep_num();
-  for (ymuint i = 0; i < nr; ++ i) {
-    const RepFunc& rep = pat_mgr.rep(i);
-    s << "Rep#" << i << endl;
-    s << "  equivalence = ";
-    ymuint nf = rep.func_num();
-    for (ymuint j = 0; j < nf; ++ j) {
-      s << " Func#" << rep.func_id(j);
-    }
-    s << endl;
-    ymuint np = rep.pat_num();
-    s << "  patterns = ";
-    for (ymuint j = 0; j < np; ++ j) {
-      s << " Pat#" << rep.pat_id(j);
-    }
-    s << endl;
-  }
 
   // ノードの種類の出力
   ymuint nn = pat_mgr.node_num();

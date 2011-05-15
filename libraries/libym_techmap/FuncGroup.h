@@ -16,7 +16,7 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
-class PatMgr;
+class CellMgr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class FuncGroup FuncGroup.h "FuncGroup.h"
@@ -24,7 +24,7 @@ class PatMgr;
 //////////////////////////////////////////////////////////////////////
 class FuncGroup
 {
-  friend class PatMgr;
+  friend class CellMgr;
 
 private:
 

@@ -25,7 +25,7 @@ restore_library(istream& s)
   library->set_cell_num(nc);
 
   for (ymuint i = 0; i < nc; ++ i) {
-    ymuint type = BinIO::read_32(s);
+    ymuint type = BinIO::read_8(s);
     ShString name( BinIO::read_str(s) );
     CellArea area( BinIO::read_double(s) );
     ymuint np = BinIO::read_32(s);
@@ -48,6 +48,7 @@ restore_library(istream& s)
 	LogExpr preset;
 	ymuint clear_preset_var1;
 	ymuint clear_preset_var2;
+#warning "TODO:未完"
 	cell = library->new_ff_cell(i, name, area,
 				    var1, var2,
 				    next_state, clocked_on, clocked_on_also,
@@ -69,6 +70,7 @@ restore_library(istream& s)
 	LogExpr preset;
 	ymuint clear_preset_var1;
 	ymuint clear_preset_var2;
+#warning "TODO:未完"
 	cell = library->new_latch_cell(i, name, area,
 				       var1, var2,
 				       data_in, enable, enable_also,
@@ -99,7 +101,7 @@ restore_library(istream& s)
 
     for (ymuint j = 0; j < np; ++ j) {
       ShString name( BinIO::read_str(s) );
-      ymuint d = BinIO::read_32(s);
+      ymuint d = BinIO::read_8(s);
       switch ( d ) {
       case 1: // 入力
 	{
@@ -123,7 +125,7 @@ restore_library(istream& s)
 				   max_c, min_c,
 				   max_t, min_t);
 	  for ( ; ; ) {
-	    ymuint unate = BinIO::read_32(s);
+	    ymuint unate = BinIO::read_8(s);
 	    if ( unate == 0 ) break;
 	    if ( unate == 1 ) {
 	      ymuint pin_id = BinIO::read_32(s);

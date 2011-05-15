@@ -29,14 +29,14 @@ LIBYM_TECHMAP = $(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la
 LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
-	patmgr_test \
+	cell_mgr_test \
 	pgfuncmgr_test \
 	areacover_test
 
-patmgr_test_SOURCES = \
-	patmgr_test.cc
+cell_mgr_test_SOURCES = \
+	cell_mgr_test.cc
 
-patmgr_test_LDADD = \
+cell_mgr_test_LDADD = \
 	$(LIBYM_TECHMAP)
 
 pgfuncmgr_test_SOURCES = \

@@ -16,7 +16,7 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
-class PatMgr;
+class CellMgr;
 
 //////////////////////////////////////////////////////////////////////
 /// @class TechMap TechMap.h "TechMap.h"
@@ -101,8 +101,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // セルライブラリとパタングラフの情報を持つオブジェクト
-  PatMgr* mPatMgr;
+  // セルライブラリの情報を持つオブジェクト
+  CellMgr* mCellMgr;
 
 };
 

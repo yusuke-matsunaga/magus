@@ -51,6 +51,15 @@ dump_library(ostream& s,
   BinIO::write_32(s, nc);
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = library.cell(i);
+    ymuint tid = 0;
+    switch ( cell->type() ) {
+    case Cell::kLogic: tid = 0; break;
+    case Cell::kFF:    tid = 1; break;
+    case Cell::kLatch: tid = 2; break;
+    case Cell::kFSM:   tid = 3; break;
+    default: assert_not_reached(__FILE__, __LINE__); break;
+    }
+    BinIO::write_8(s, tid);
     BinIO::write_str(s, cell->name());
     BinIO::write_double(s, cell->area().value());
 
@@ -105,7 +114,7 @@ dump_library(ostream& s,
       switch ( pin->direction() ) {
       case kDirInput:
 	// Input のつもり
-	BinIO::write_32(s, 1);
+	BinIO::write_8(s, 1);
 	BinIO::write_double(s, pin->capacitance().value());
 	BinIO::write_double(s, pin->rise_capacitance().value());
 	BinIO::write_double(s, pin->fall_capacitance().value());
@@ -113,7 +122,7 @@ dump_library(ostream& s,
 
       case kDirOutput:
 	// Output のつもり
-	BinIO::write_32(s, 2);
+	BinIO::write_8(s, 2);
 	BinIO::write_double(s, pin->max_fanout().value());
 	BinIO::write_double(s, pin->min_fanout().value());
 	BinIO::write_double(s, pin->max_capacitance().value());
@@ -125,7 +134,7 @@ dump_library(ostream& s,
 	  if ( timing_p ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_p->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	    BinIO::write_32(s, 1);
+	    BinIO::write_8(s, 1);
 	    BinIO::write_32(s, k);
 	    BinIO::write_32(s, p->second);
 	  }
@@ -133,17 +142,17 @@ dump_library(ostream& s,
 	  if ( timing_n ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	    BinIO::write_32(s, 2);
+	    BinIO::write_8(s, 2);
 	    BinIO::write_32(s, k);
 	    BinIO::write_32(s, p->second);
 	  }
 	}
-	BinIO::write_32(s, 0); // timing 情報が終わった印
+	BinIO::write_8(s, 0); // timing 情報が終わった印
 	break;
 
       case kDirInout:
 	// InOut のつもり
-	BinIO::write_32(s, 3);
+	BinIO::write_8(s, 3);
 	BinIO::write_double(s, pin->capacitance().value());
 	BinIO::write_double(s, pin->rise_capacitance().value());
 	BinIO::write_double(s, pin->fall_capacitance().value());
@@ -176,7 +185,7 @@ dump_library(ostream& s,
 
       case kDirInternal:
 	// Internal のつもり
-	BinIO::write_32(s, 4);
+	BinIO::write_8(s, 4);
       }
     }
   }

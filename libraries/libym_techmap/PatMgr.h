@@ -15,8 +15,6 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
-class FuncGroup;
-class RepFunc;
 class PatGraph;
 
 //////////////////////////////////////////////////////////////////////
@@ -67,56 +65,12 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 論理関数グループに関する情報を取得する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief セルライブラリを返す．
-  const CellLibrary&
-  library() const;
-
-  /// @brief このセルライブラリに含まれるセルの最大の入力数を得る．
-  ymuint
-  max_input() const;
-
-  /// @brief 論理関数の個数を返す．
-  ymuint
-  func_num() const;
-
-  /// @brief 関数グループを返す．
-  /// @param[in] id 関数番号　( 0 <= id < func_num() )
-  const FuncGroup&
-  func_group(ymuint id) const;
-
-  /// @brief 定数0の関数グループを返す．
-  const FuncGroup&
-  const0_func() const;
-
-  /// @brief 定数1の関数グループを返す．
-  const FuncGroup&
-  const1_func() const;
-
-  /// @brief バッファセルの関数グループを返す．
-  const FuncGroup&
-  buf_func() const;
-
-  /// @brief インバータセルの関数グループを返す．
-  const FuncGroup&
-  inv_func() const;
-
-  /// @brief 代表関数の個数を返す．
-  ymuint
-  rep_num() const;
-
-  /// @brief 代表関数を返す．
-  /// @param[in] id 代表関数番号
-  const RepFunc&
-  rep(ymuint id) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // パタングラフ関係の情報取得用の関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief パタンの最大の入力数を得る．
+  ymuint
+  max_input() const;
 
   /// @brief 総ノード数を返す．
   ymuint
@@ -189,23 +143,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // セルライブラリ
-  const CellLibrary* mLibrary;
-
-  // 関数の数
-  ymuint32 mFuncNum;
-
-  // 関数グループの配列
-  // サイズは mFuncNum
-  FuncGroup* mFuncArray;
-
-  // 代表関数の数
-  ymuint32 mRepNum;
-
-  // 代表関数の配列
-  // サイズは mRepNum
-  RepFunc* mRepArray;
-
   // ノード数
   ymuint32 mNodeNum;
 
@@ -239,58 +176,6 @@ dump(ostream& s,
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @bireif 論理関数の個数を返す．
-inline
-ymuint
-PatMgr::func_num() const
-{
-  return mFuncNum;
-}
-
-// @brief 定数0の関数グループを返す．
-inline
-const FuncGroup&
-PatMgr::const0_func() const
-{
-  // 決め打ち
-  return func_group(0);
-}
-
-// @brief 定数1の関数グループを返す．
-inline
-const FuncGroup&
-PatMgr::const1_func() const
-{
-  // 決め打ち
-  return func_group(1);
-}
-
-// @brief バッファセルの関数グループを返す．
-inline
-const FuncGroup&
-PatMgr::buf_func() const
-{
-  // 決め打ち
-  return func_group(2);
-}
-
-// @brief インバータセルの関数グループを返す．
-inline
-const FuncGroup&
-PatMgr::inv_func() const
-{
-  // 決め打ち
-  return func_group(3);
-}
-
-// @brief 代表関数の個数を返す．
-inline
-ymuint
-PatMgr::rep_num() const
-{
-  return mRepNum;
-}
 
 // @brief ノード数を返す．
 inline

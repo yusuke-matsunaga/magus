@@ -11,6 +11,7 @@
 #include "ym_bdn/BdnMgr.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_cell/Cell.h"
+#include "CellMgr.h"
 #include "PatMgr.h"
 #include "PatMatcher.h"
 #include "PatGraph.h"
@@ -37,43 +38,45 @@ AreaCover::~AreaCover()
 
 // @brief 面積最小化マッピングを行う．
 // @param[in] sbjgraph サブジェクトグラフ
+// @param[in] cell_mgr セルを管理するオブジェクト
 // @param[in] pat_mgr パタングラフを管理するオブジェクト
 // @param[out] mapnetwork マッピング結果
 void
 AreaCover::operator()(const BdnMgr& sbjgraph,
-		      const PatMgr& pat_mgr,
+		      const CellMgr& cell_mgr,
 		      CnGraph& mapnetwork)
 {
   MapRecord maprec;
 
   // マッピング結果を maprec に記録する．
-  record_cuts(sbjgraph, pat_mgr, maprec);
+  record_cuts(sbjgraph, cell_mgr, maprec);
 
   // maprec の情報から mapnetwork を生成する．
-  const Cell* c0_cell = pat_mgr.const0_func().cell(0);
-  const Cell* c1_cell = pat_mgr.const1_func().cell(0);
+  const Cell* c0_cell = cell_mgr.const0_func().cell(0);
+  const Cell* c1_cell = cell_mgr.const1_func().cell(0);
   maprec.gen_mapgraph(sbjgraph, c0_cell, c1_cell, mapnetwork);
 }
 
 // @brief best cut の記録を行う．
 // @param[in] sbjgraph サブジェクトグラフ
-// @param[in] pat_mgr パタングラフを管理するオブジェクト
+// @param[in] cell_mgr セルを管理するオブジェクト
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 AreaCover::record_cuts(const BdnMgr& sbjgraph,
-		       const PatMgr& patmgr,
+		       const CellMgr& cell_mgr,
 		       MapRecord& maprec)
 {
+  const PatMgr& pat_mgr = cell_mgr.pat_mgr();
   ymuint n = sbjgraph.max_node_id();
   mCostArray.resize(n * 2);
-  ymuint max_input = patmgr.max_input();
+  ymuint max_input = pat_mgr.max_input();
   mWeight.resize(max_input);
   mLeafNum.clear();
   mLeafNum.resize(n, -1);
 
   maprec.init(sbjgraph);
 
-  const FuncGroup& inv_func = patmgr.inv_func();
+  const FuncGroup& inv_func = cell_mgr.inv_func();
 
   // 入力のコストを設定
   const BdnNodeList& input_list = sbjgraph.input_list();
@@ -88,8 +91,8 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   }
 
   // 論理ノードのコストを入力側から計算
-  PatMatcher pat_match(patmgr);
-  ymuint np = patmgr.pat_num();
+  PatMatcher pat_match(pat_mgr);
+  ymuint np = pat_mgr.pat_num();
   vector<BdnNode*> snode_list;
   sbjgraph.sort(snode_list);
   for (vector<BdnNode*>::const_iterator p = snode_list.begin();
@@ -101,15 +104,15 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
     p_cost = DBL_MAX;
     n_cost = DBL_MAX;
     for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
-      const PatGraph& pat = patmgr.pat(pat_id);
+      const PatGraph& pat = pat_mgr.pat(pat_id);
       ymuint ni = pat.input_num();
       if ( pat_match(node, pat) ) {
 	ymuint rep_id = pat.rep_id();
-	const RepFunc& rep = patmgr.rep(rep_id);
+	const RepFunc& rep = cell_mgr.rep(rep_id);
 	ymuint nf = rep.func_num();
 	for (ymuint f_pos = 0; f_pos < nf; ++ f_pos) {
 	  ymuint func_id = rep.func_id(f_pos);
-	  const FuncGroup& func = patmgr.func_group(func_id);
+	  const FuncGroup& func = cell_mgr.func_group(func_id);
 	  const NpnMap& npn_map = func.npn_map();
 	  Match c_match(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {

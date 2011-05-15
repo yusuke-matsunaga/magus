@@ -14,13 +14,15 @@
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
+class CellMgr;
+
 //////////////////////////////////////////////////////////////////////
 /// @class RepFunc RepFunc.h "RepFunc.h"
 /// @brief 代表関数を表すクラス
 //////////////////////////////////////////////////////////////////////
 class RepFunc
 {
-  friend class PatMgr;
+  friend class CellMgr;
 
 private:
 
@@ -57,16 +59,6 @@ public:
   ymuint
   func_id(ymuint pos) const;
 
-  /// @brief パタン数を返す．
-  ymuint
-  pat_num() const;
-
-  /// @brief パタン番号を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < pat_num() )
-  ymuint
-  pat_id(ymuint pos) const;
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -77,12 +69,6 @@ private:
 
   // 関数番号の配列
   ymuint32* mFuncArray;
-
-  // パタン数
-  ymuint32 mPatNum;
-
-  // パタン番号の配列
-  ymuint32* mPatArray;
 
 };
 
@@ -106,23 +92,6 @@ ymuint
 RepFunc::func_id(ymuint pos) const
 {
   return mFuncArray[pos];
-}
-
-// @brief パタン数を返す．
-inline
-ymuint
-RepFunc::pat_num() const
-{
-  return mPatNum;
-}
-
-// @brief パタン番号を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < pat_num() )
-inline
-ymuint
-RepFunc::pat_id(ymuint pos) const
-{
-  return mPatArray[pos];
 }
 
 END_NAMESPACE_YM_TECHMAP

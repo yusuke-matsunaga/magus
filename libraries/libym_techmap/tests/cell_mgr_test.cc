@@ -1,5 +1,5 @@
 
-/// @file libym_techmap/test/patmgr_test.cc
+/// @file libym_techmap/test/cell_mgr_test.cc
 /// @brief PatMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,9 +9,9 @@
 
 #include "patgen/patgen_nsdef.h"
 #include "ym_techmap/TechMap.h"
-#include "PatMgr.h"
+#include "CellMgr.h"
 #include "ym_cell/CellMislibReader.h"
-
+#include "ym_cell/CellLibrary.h"
 
 int
 main(int argc,
@@ -37,11 +37,14 @@ main(int argc,
     cerr << "Could not create " << datafile << endl;
     return 2;
   }
+#if 0
   TechMap::dump_library(os, *library);
+#else
+  nsYm::nsCell::dump_library(os, *library);
+#endif
   os.close();
 
-
-  PatMgr pat_mgr;
+  CellMgr cell_mgr;
   {
     ifstream ifs;
     ifs.open(datafile, ios::binary);
@@ -50,9 +53,16 @@ main(int argc,
       cerr << "Could not open " << filename << endl;
       return 3;
     }
-
-    pat_mgr.load(ifs);
+#if 0
+    cell_mgr.load(ifs);
+#else
+    const CellLibrary* library2 = nsYm::nsCell::restore_library(ifs);
+    if ( library2 ) {
+      display_library(cout, *library2);
+    }
+#endif
   }
-
-  dump(cout, pat_mgr);
+#if 0
+  dump(cout, cell_mgr);
+#endif
 }

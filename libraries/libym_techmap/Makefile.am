@@ -19,6 +19,8 @@ INCLUDES = \
 libym_techmap_la_SOURCES = \
 	AreaCover.h \
 	AreaCover.cc \
+	CellMgr.h \
+	CellMgr.cc \
 	CnGraph.cc \
 	CnGraph_dump.cc \
 	FuncGroup.h \

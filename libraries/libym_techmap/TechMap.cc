@@ -8,7 +8,7 @@
 
 
 #include "ym_techmap/TechMap.h"
-#include "PatMgr.h"
+#include "CellMgr.h"
 #include "AreaCover.h"
 
 #include "patgen/patgen_nsdef.h"
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_TECHMAP
 
 // @brief コンストラクタ
 TechMap::TechMap() :
-  mPatMgr(NULL)
+  mCellMgr(NULL)
 {
 }
 
 // @brief デストラクタ
 TechMap::~TechMap()
 {
-  delete mPatMgr;
+  delete mCellMgr;
 }
 
 // @brief セルライブラリのデータを読み込んでセットする．
@@ -36,12 +36,12 @@ TechMap::~TechMap()
 bool
 TechMap::load_library(istream& s)
 {
-  delete mPatMgr;
-  mPatMgr = new PatMgr;
-  bool stat = mPatMgr->load(s);
+  delete mCellMgr;
+  mCellMgr = new CellMgr;
+  bool stat = mCellMgr->load(s);
   if ( !stat ) {
-    delete mPatMgr;
-    mPatMgr = NULL;
+    delete mCellMgr;
+    mCellMgr = NULL;
   }
   return stat;
 }
@@ -74,7 +74,7 @@ TechMap::area_map(const BdnMgr& sbjgraph,
 {
   AreaCover area_cover;
 
-  area_cover(sbjgraph, *mPatMgr, mapnetwork);
+  area_cover(sbjgraph, *mCellMgr, mapnetwork);
 }
 
 END_NAMESPACE_YM_TECHMAP
