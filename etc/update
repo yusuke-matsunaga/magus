@@ -3,22 +3,26 @@
 # Copyright (C) 2005-2011 Yusuke Matsunaga
 # All rights reserved
 
-# [概要]
+# 概要
 #
 # モジュールの Makefile を更新するスクリプト
 #
-# [使用方法]
+# 使用方法
 #
 # ./update <module-name> ...
 
 case $# in
-    1)
+    0)
 	echo "Usage: $0 <module-name> ..."
 	exit 255
 	;;
 esac
 
-for dir in opt debug prof
+while [ $# -gt 0 ]
 do
-  (cd $dir/$1; make Makefile)
+    for dir in opt debug prof
+    do
+	(cd $dir/$1; make Makefile)
+    done
+    shift
 done
