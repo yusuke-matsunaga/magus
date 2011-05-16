@@ -27,7 +27,8 @@ distclean-local:
 
 bin_PROGRAMS = \
 	mislib_reader_test \
-	dotlib_reader_test
+	dotlib_reader_test \
+	dump_restore_test
 
 mislib_reader_test_SOURCES = \
 	mislib_reader_test.cc
@@ -43,4 +44,12 @@ dotlib_reader_test_SOURCES = \
 dotlib_reader_test_LDFLAGS =
 
 dotlib_reader_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+
+dump_restore_test_SOURCES = \
+	dump_restore_test.cc
+
+dump_restore_test_LDFLAGS =
+
+dump_restore_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
