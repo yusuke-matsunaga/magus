@@ -131,7 +131,6 @@ CellMgr::load(istream& s)
   // ライブラリを読み込む．
   mLibrary = nsYm::nsCell::restore_library(s);
 
-#if 0
   // 関数の情報を読み込む．
   mFuncNum = BinIO::read_32(s);
   mFuncArray = new FuncGroup[mFuncNum];
@@ -165,7 +164,6 @@ CellMgr::load(istream& s)
   if ( !mPatMgr.load(s) ) {
     return false;
   }
-#endif
 
   return true;
 }

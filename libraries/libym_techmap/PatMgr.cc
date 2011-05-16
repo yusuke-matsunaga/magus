@@ -50,6 +50,7 @@ PatGraph::load(istream& s)
   else {
     mEdgeList = NULL;
   }
+  mRepId = BinIO::read_32(s);
 
   return true;
 }

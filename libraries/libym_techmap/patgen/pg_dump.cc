@@ -220,9 +220,10 @@ void
 pg_dump(ostream& s,
 	const PgFuncMgr& pgf_mgr)
 {
+  // セルライブラリをダンプする．
   nsYm::nsCell::dump_library(s, pgf_mgr.library());
 
-#if 0
+  // 関数の情報をダンプする．
   ymuint nf = pgf_mgr.func_num();
   BinIO::write_32(s, nf);
   for (ymuint i = 0; i < nf; ++ i) {
@@ -238,8 +239,14 @@ pg_dump(ostream& s,
     }
   }
 
+  const PatGen& pat_gen = pgf_mgr.pat_gen();
+  ymuint np = pat_gen.pat_num();
+
+  // 代表関数の情報をダンプする．
   ymuint nr = pgf_mgr.rep_num();
   BinIO::write_32(s, nr);
+  // パタン番号をキーにして代表関数番号を記憶する配列
+  vector<ymint> rep_array(np);
   for (ymuint i = 0; i < nr; ++ i) {
     const PgFuncRep* rep = pgf_mgr.rep(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
@@ -248,10 +255,15 @@ pg_dump(ostream& s,
     for (ymuint j = 0; j < ne; ++ j) {
       BinIO::write_32(s, rep->func(j)->id());
     }
+    ymuint m = rep->pat_num();
+    for (ymuint j = 0; j < m; ++ j) {
+      ymuint pat_id = rep->pat_id(j);
+      rep_array[pat_id] = i;
+    }
   }
 
-  const PatGen& pat_gen = pgf_mgr.pat_gen();
 
+  // パタンノードの情報をダンプする．
   ymuint nn = pat_gen.node_num();
   BinIO::write_32(s, nn);
   for (ymuint i = 0; i < nn; ++ i) {
@@ -275,7 +287,7 @@ pg_dump(ostream& s,
   vector<ymuint> val_list;
   val_list.reserve(nn * 2);
 
-  ymuint np = pat_gen.pat_num();
+  // パタンの情報をダンプする．
   BinIO::write_32(s, np);
   for (ymuint i = 0; i < np; ++ i) {
     PgHandle root = pat_gen.pat_root(i);
@@ -291,11 +303,11 @@ pg_dump(ostream& s,
     BinIO::write_32(s, v);
     ymuint ne = val_list.size();
     BinIO::write_32(s, ne);
-    for (ymuint i = 0; i < ne; ++ i) {
-      BinIO::write_32(s, val_list[i]);
+    for (ymuint j = 0; j < ne; ++ j) {
+      BinIO::write_32(s, val_list[j]);
     }
+    BinIO::write_32(s, rep_array[i]);
   }
-#endif
 }
 
 END_NAMESPACE_YM_TECHMAP_PATGEN
