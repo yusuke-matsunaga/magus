@@ -18,6 +18,8 @@ BEGIN_NAMESPACE_YM_TECHMAP
 
 class FuncGroup;
 class RepFunc;
+class FFGroup;
+class LatchGroup;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellMgr CellMgr.h "CellMgr.h"
@@ -26,6 +28,8 @@ class RepFunc;
 /// このクラスが持っている情報は
 /// - 各々のセルに対応する論理関数
 /// - その論理関数とNPN同値な関数の集合
+/// - FF セルの集合
+/// - ラッチセルの集合
 ///
 /// 情報の設定は専用形式のバイナリファイルを読み込むことでのみ行える．
 /// バイナリファイルの生成は patgen/PatGen, pg_dump を参照のこと．
@@ -103,12 +107,6 @@ public:
   // パタンに関する情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-#if 0
-  /// @brief パタンの最大の入力数を得る．
-  ymuint
-  max_input() const;
-#endif
-
   /// @brief パタンを管理するオブジェクトを得る．
   const PatMgr&
   pat_mgr() const;
@@ -150,16 +148,28 @@ private:
   // パタンを管理するオブジェクト
   PatMgr mPatMgr;
 
+  // FFグループの数
+  ymuint32 mFFNum;
+
+  // FFグループの配列
+  FFGroup* mFFArray;
+
+  // ラッチグループの数
+  ymuint32 mLatchNum;
+
+  // ラッチグループの配列
+  LatchGroup* mLatchGroup;
+
 };
 
 
 /// @relates CellMgr
 /// @brief CellMgr の内容を出力する．
 /// @param[in] s 出力先のストリーム
-/// @param[in] patgraph パタングラフ
+/// @param[in] cell_mgr セルライブラリの情報を持つオブジェクト
 void
 dump(ostream& s,
-     const CellMgr& patgraph);
+     const CellMgr& cell_mgr);
 
 
 //////////////////////////////////////////////////////////////////////
