@@ -8,21 +8,25 @@
 
 
 #include "ym_techmap/CellMap.h"
-#include "CellMapImpl.h"
+#include "CellMgr.h"
+#include "AreaCover.h"
+
+#include "patgen/patgen_nsdef.h"
+#include "patgen/PgFuncMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 // @brief コンストラクタ
 CellMap::CellMap() :
-  mImpl(new CellMapImpl)
+  mCellMgr(new CellMgr)
 {
 }
 
 // @brief デストラクタ
 CellMap::~CellMap()
 {
-  delete mImpl;
+  delete mCellMgr;
 }
 
 // @brief セルライブラリのデータを読み込んでセットする．
@@ -32,7 +36,7 @@ CellMap::~CellMap()
 bool
 CellMap::load_library(istream& s)
 {
-  return mImpl->load_library(s);
+  return mCellMgr->load_library(s);
 }
 
 // @brief セルライブラリの内容(+パタングラフ)をバイナリファイルに書き出す．
@@ -40,7 +44,12 @@ void
 CellMap::dump_library(ostream& s,
 		      const CellLibrary& library)
 {
-  mImpl->dump_library(s, library);
+  using namespace nsPatgen;
+
+  PgFuncMgr pgf_mgr;
+  pgf_mgr.set_library(&library);
+
+  pg_dump(s, pgf_mgr);
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数
@@ -56,7 +65,9 @@ CellMap::area_map(const BdnMgr& sbjgraph,
 		  ymuint mode,
 		  CnGraph& mapnetwork)
 {
-  mImpl->area_map(sbjgraph, mode, mapnetwork);
+  AreaCover area_cover;
+
+  area_cover(sbjgraph, *mCellMgr, mapnetwork);
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_CELLMAP

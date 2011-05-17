@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "cellmap_nsdef.h"
+#include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
 #include "ym_npn/NpnMap.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class FuncGroup FuncGroup.h "FuncGroup.h"
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
 //////////////////////////////////////////////////////////////////////
 class FuncGroup
 {
-  friend class nsTechmap::CellMapImpl;
+  friend class CellMgr;
 
 private:
 
@@ -95,6 +95,6 @@ FuncGroup::cell(ymuint pos) const
   return mCellList[pos];
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP
 
 #endif // LIBYM_TECHMAP_CELLMAP_FUNCGROUP_H

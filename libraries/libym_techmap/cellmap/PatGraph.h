@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "cellmap_nsdef.h"
+#include "ym_techmap/cellmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 class PatMgr;
 
@@ -152,6 +152,6 @@ PatGraph::edge(ymuint pos) const
   return mEdgeList[pos];
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP
 
 #endif // LIBYM_TECHMAP_CELLMAP_PATGRAPH_H

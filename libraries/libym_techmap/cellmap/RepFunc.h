@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "cellmap_nsdef.h"
+#include "ym_techmap/cellmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class RepFunc RepFunc.h "RepFunc.h"
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
 //////////////////////////////////////////////////////////////////////
 class RepFunc
 {
-  friend class nsTechmap::CellMapImpl;
+  friend class CellMgr;
 
 private:
 
@@ -93,6 +93,6 @@ RepFunc::func_id(ymuint pos) const
   return mFuncArray[pos];
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP
 
 #endif // LIBYM_TECHMAP_CELLMAP_REPFUNC_H

@@ -13,7 +13,7 @@
 #include "CrNode.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス CrHeap
@@ -177,4 +177,4 @@ CrHeap::get(ymuint pos)
   return mHeap[pos];
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

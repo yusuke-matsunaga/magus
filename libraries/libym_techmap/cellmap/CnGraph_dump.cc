@@ -12,7 +12,7 @@
 #include "ym_cell/CellPin.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 void
 dump(ostream& s,
@@ -264,4 +264,4 @@ dump_spice(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_CELLMAP

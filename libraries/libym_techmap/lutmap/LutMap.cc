@@ -12,7 +12,7 @@
 #include "DelayCover.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス LutMap
@@ -78,5 +78,5 @@ LutMap::delay_map(const BdnMgr& sbjgraph,
   delay_cover(sbjgraph, limit, slack, mode, mapnetwork, lut_num, depth);
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP
 

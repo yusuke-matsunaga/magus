@@ -15,7 +15,7 @@
 //#define DEBUG_ENUM_RECUR
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス EnumCut
@@ -460,4 +460,4 @@ EnumCut::set_cut_node_list_recur(const BdnNode* node,
   }
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

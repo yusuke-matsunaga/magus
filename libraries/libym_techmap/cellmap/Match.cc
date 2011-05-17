@@ -12,7 +12,7 @@
 #include "ym_npn/NpnMap.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス Match
@@ -67,4 +67,4 @@ Match::~Match()
   delete [] mLeafArray;
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP

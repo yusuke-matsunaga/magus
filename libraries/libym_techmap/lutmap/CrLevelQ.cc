@@ -14,7 +14,7 @@
 #include "ym_bdn/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス CrLevelQ
@@ -114,4 +114,4 @@ CrLevelQ::getmax()
   return NULL;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

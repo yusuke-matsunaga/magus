@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "cellmap_nsdef.h"
+#include "ym_techmap/cellmap_nsdef.h"
 #include "ym_bdn/bdn_nsdef.h"
 #include "ym_npn/npn_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class Match Match.h "Match.h"
@@ -154,6 +154,6 @@ Match::leaf_inv(ymuint pos) const
   return static_cast<bool>((mInvArray >> pos) & 1U);
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP
 
 #endif // LIBYM_TECHMAP_CELLMAP_MATCH_H

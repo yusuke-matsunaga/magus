@@ -14,7 +14,7 @@
 #include "ym_bdn/BdnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
 CutHolder::CutHolder()
@@ -110,4 +110,4 @@ CutHolder::alloc_cut(ymuint ni)
   return reinterpret_cast<Cut*>(top);
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

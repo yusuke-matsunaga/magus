@@ -21,7 +21,6 @@ INCLUDES = \
 libym_techmap_la_SOURCES =
 
 libym_techmap_la_LIBADD = \
-	patgen/libym_techmap_patgen.la \
 	sbjgraph/libym_techmap_sbj.la \
 	cellmap/libym_techmap_cell.la \
 	lutmap/libym_techmap_lut.la \

@@ -13,7 +13,7 @@
 #include "ym_bdn/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // 空のコンストラクタ
 Cut::Cut() :
@@ -107,4 +107,4 @@ Cut::dump(ostream& s) const
   }
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

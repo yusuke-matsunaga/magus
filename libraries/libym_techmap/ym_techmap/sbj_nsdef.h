@@ -1,13 +1,13 @@
-#ifndef YM_SBJ_SBJ_NSDEF_H
-#define YM_SBJ_SBJ_NSDEF_H
+#ifndef YM_TECHMAP_SBJ_NSDEF_H
+#define YM_TECHMAP_SBJ_NSDEF_H
 
-/// @file ym_sbj/sbj_nsdef.h
+/// @file ym_techmap/sbj_nsdef.h
 /// @brief sbj パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: lutmap.h 555 2007-04-08 07:20:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

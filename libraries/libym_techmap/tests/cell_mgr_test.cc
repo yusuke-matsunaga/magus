@@ -1,14 +1,15 @@
 
 /// @file libym_techmap/test/cell_mgr_test.cc
-/// @brief CellMap のテストプログラム
+/// @brief CellMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "cellmap/CellMapImpl.h"
-#include "cellmap/patgen/patgen_nsdef.h"
+#include "ym_techmap/CellMap.h"
+#include "cellmap/CellMgr.h"
+//#include "cellmap/patgen/patgen_nsdef.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellLibrary.h"
 
@@ -19,7 +20,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using namespace nsYm::nsTechmap;
+  using namespace nsYm::nsCellmap;
 
   const char* filename = argv[1];
   CellMislibReader reader;
@@ -30,7 +31,7 @@ main(int argc,
 
   const char* datafile = "patdata.bin";
 
-  CellMapImpl cellmap;
+  CellMap cell_map;
   {
     ofstream os;
     os.open(datafile, ios::binary);
@@ -40,10 +41,11 @@ main(int argc,
       return 2;
     }
 
-    cellmap.dump_library(os, *library);
+    cell_map.dump_library(os, *library);
     os.close();
   }
 
+  CellMgr cell_mgr;
   {
     ifstream ifs;
     ifs.open(datafile, ios::binary);
@@ -52,7 +54,7 @@ main(int argc,
       cerr << "Could not open " << datafile << endl;
       return 3;
     }
-    cellmap.load_library(ifs);
+    cell_mgr.load_library(ifs);
   }
-  dump(cout, cellmap);
+  dump(cout, cell_mgr);
 }

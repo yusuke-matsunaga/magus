@@ -12,7 +12,7 @@
 #include "AreaMapCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
-#include "ym_lutmap/LutMap.h"
+#include "ym_techmap/LutMap.h"
 
 #include "ym_bnetbdnconv/BNetBdnConv.h"
 

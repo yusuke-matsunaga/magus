@@ -13,7 +13,7 @@
 #include "ym_techmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 // @brief コンストラクタ
 SbjDumper::SbjDumper()
@@ -459,4 +459,4 @@ SbjDumper::dump_verilog(ostream& s,
   s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ

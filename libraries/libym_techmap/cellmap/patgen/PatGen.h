@@ -14,7 +14,7 @@
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
 class PgNode;
 class PgHandle;
@@ -186,6 +186,6 @@ void
 pg_display(ostream& s,
 	   const PatGen& pat_gen);
 
-END_NAMESPACE_YM_TECHMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_PATGEN
 
 #endif // LIBYM_TECHMAP_PATGEN_PATGEN_H

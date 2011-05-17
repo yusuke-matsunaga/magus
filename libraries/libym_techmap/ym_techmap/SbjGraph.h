@@ -11,14 +11,14 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/sbj_nsdef.h"
 
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
 /// @class SbjEdge SbjGraph.h "ym_techmap/SbjGraph.h"
@@ -1775,6 +1775,6 @@ SbjGraph::dff_list() const
   return mDffList;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
 #endif // YM_TECHMAP_SBJGRAPH_H

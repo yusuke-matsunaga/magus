@@ -2,26 +2,26 @@
 #define YM_TECHMAP_LNGRAPH_H
 
 /// @file ym_techmap/LnGraph.h
-/// @brief LutNetwork のヘッダファイル
+/// @brief LnGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: LutNetwork.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/lutmap_nsdef.h"
 
 #include "ym_utils/Alloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LnEdge LnGraph.h "LnGraph.h"
+/// @class LnEdge LnGraph.h "ym_techmap/LnGraph.h"
 /// @brief LUTネットワークの枝を表すクラス
 ///
 /// - 入力側のノード
@@ -117,7 +117,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class LnNode LnGraph.h "LnGraph.h"
+/// @class LnNode LnGraph.h "ym_techmap/LnGraph.h"
 /// @brief LUTネットワークを構成するLUTノードを表すクラス
 ///
 /// ノードの種類は
@@ -338,7 +338,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class LnPort LnGraph.h "LnGraph.h"
+/// @class LnPort LnGraph.h "ym_techmap/LnGraph.h"
 /// @brief ポートを表すクラス
 //////////////////////////////////////////////////////////////////////
 class LnPort
@@ -394,7 +394,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class LnGraph LnGraph.h "LnGraph.h"
+/// @class LnGraph LnGraph.h "ym_techmap/LnGraph.h"
 /// @brief LUTネットワークを表すクラス
 ///
 /// 入力ノード，出力ノード，LUT ノード，DFF ノードを分けてリストで持つ
@@ -1233,6 +1233,6 @@ LnGraph::dff_list() const
   return mDffList;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP
 
 #endif // YM_TECHMAP_LNGRAPH_H

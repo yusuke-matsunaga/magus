@@ -13,7 +13,7 @@
 #include "SbjMinDepth.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 ///////////////////////////////////////////////////////////////////////
 // クラス SbjNode
@@ -1113,4 +1113,4 @@ SbjGraph::get_min_depth(ymuint k,
   return smd(k, depth_array);
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ

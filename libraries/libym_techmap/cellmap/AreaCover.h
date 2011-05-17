@@ -9,12 +9,13 @@
 /// All rights reserved.
 
 
-#include "cellmap_nsdef.h"
+#include "ym_techmap/cellmap_nsdef.h"
 #include "ym_bdn/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
+class CellMgr;
 class FuncGroup;
 class MapRecord;
 
@@ -41,7 +42,7 @@ public:
   /// @param[out] mapnetwork マッピング結果
   void
   operator()(const BdnMgr& sbjgraph,
-	     const CellMapImpl& cell_mgr,
+	     const CellMgr& cell_mgr,
 	     CnGraph& mapnetwork);
 
 
@@ -56,7 +57,7 @@ private:
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
   record_cuts(const BdnMgr& sbjgraph,
-	      const CellMapImpl& cell_mgr,
+	      const CellMgr& cell_mgr,
 	      MapRecord& maprec);
 
   /// @brief 逆極性の解にインバーターを付加した解を追加する．
@@ -113,6 +114,6 @@ AreaCover::cost(const BdnNode* node,
   return mCostArray[node->id() * 2 + static_cast<ymuint>(inv)];
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP
 
 #endif // LIBYM_TECHMAP_CELLMAP_AREACOVER_H

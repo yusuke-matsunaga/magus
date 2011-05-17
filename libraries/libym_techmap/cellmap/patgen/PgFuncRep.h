@@ -14,7 +14,7 @@
 #include "ym_npn/TvFunc.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
 class PgFunc;
 
@@ -149,6 +149,6 @@ PgFuncRep::pat_id(ymuint pos) const
   return mPatList[pos];
 }
 
-END_NAMESPACE_YM_TECHMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_PATGEN
 
 #endif // LIBYM_TECHMAP_PATGEN_PGFUNCREP_H

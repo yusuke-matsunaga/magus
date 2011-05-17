@@ -101,7 +101,7 @@ int pat6[n_pat6][11] = {
 
 END_NONAMESPACE
 
-BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
 //////////////////////////////////////////////////////////////////////
 // クラス PgNode
@@ -591,4 +591,4 @@ PatGen::hash_func(ymuint type,
   return type + l * 5 + r;
 }
 
-END_NAMESPACE_YM_TECHMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_PATGEN

@@ -10,7 +10,7 @@
 
 
 #include "Ln2BNet.h"
-#include "ym_lutmap/LnGraph.h"
+#include "ym_techmap/LnGraph.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_bnet/BNetManip.h"
 

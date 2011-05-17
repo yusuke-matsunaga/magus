@@ -12,7 +12,7 @@
 #include "patgen_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
 class PgNode;
 
@@ -112,6 +112,6 @@ PgHandle::set(PgNode* node,
   mData = reinterpret_cast<ympuint>(node) | (static_cast<ympuint>(inv) & 1UL);
 }
 
-END_NAMESPACE_YM_TECHMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_PATGEN
 
 #endif // LIBYM_TECHMAP_PATGEN_PGHANDLE_H

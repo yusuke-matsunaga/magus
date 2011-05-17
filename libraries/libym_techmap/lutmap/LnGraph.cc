@@ -12,7 +12,7 @@
 #include "ym_techmap/LnGraph.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 ///////////////////////////////////////////////////////////////////////
 // クラス LnNode
@@ -775,4 +775,4 @@ LnGraph::level() const
   return mLevel;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/sbj_nsdef.h"
 #include "ym_techmap/SbjGraph.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 class SmdNode;
 
@@ -109,6 +109,6 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
 #endif // LIBYM_TECHMAP_SBJGRAPH_SBJMINDEPTH_H

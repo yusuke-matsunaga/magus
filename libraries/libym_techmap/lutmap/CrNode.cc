@@ -13,7 +13,7 @@
 #include "ym_bdn/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス CrNode
@@ -98,4 +98,4 @@ compare(CrNode* node1,
   return node1->sbjnode()->id() < node2->sbjnode()->id();
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

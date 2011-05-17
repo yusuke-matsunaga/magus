@@ -12,7 +12,7 @@
 
 
 #include "MagCmd.h"
-#include "ym_techmap/TechMap.h"
+#include "ym_techmap/CellMap.h"
 #include "ym_techmap/CnGraph.h"
 
 
@@ -36,7 +36,7 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 struct TechmapData
 {
   // テクノロジマッパー
-  TechMap mTechMap;
+  CellMap mCellMap;
 
   // セルネットワーク
   CnGraph mCnGraph;
@@ -64,8 +64,8 @@ public:
 
 protected:
 
-  /// @brief TechMap を得る．
-  TechMap&
+  /// @brief CellMap を得る．
+  CellMap&
   techmap();
 
   /// @brief セルネットワークを得る．

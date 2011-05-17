@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/sbj_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmdEdge SmdNode.h "SmdNode.h"
@@ -511,6 +511,6 @@ SmdNode::set_depth(ymuint depth)
   mDepth = depth;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
 #endif // LIBYM_TECHMAP_SBJGRAPH_SMDNODE_H

@@ -16,7 +16,7 @@
 //#define DEBUG_ENUM_RECUR
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 /// クラス EnumCutOp
@@ -104,4 +104,4 @@ EnumCutOp::all_end(const BdnMgr& sbjgraph,
 {
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

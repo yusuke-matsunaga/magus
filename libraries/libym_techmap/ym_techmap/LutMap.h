@@ -1,5 +1,5 @@
-#ifndef YM_TECHMAP_TECHMAP_H
-#define YM_TECHMAP_TECHMAP_H
+#ifndef YM_TECHMAP_LUTMAP_H
+#define YM_TECHMAP_LUTMAP_H
 
 /// @file ym_techmap/LutMap.h
 /// @brief LutMap のヘッダファイル
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/lutmap_nsdef.h"
 #include "ym_bdn/bdn_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class LutMap LutMap.h "ym_techmap/LutMap.h"
@@ -79,6 +79,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP
 
 #endif // YM_TECHMAP_LUTMAP_H

@@ -1,6 +1,6 @@
 
-/// @file libym_techmap/cell/CnGraph.cc
-/// @brief LutNetwork の実装ファイル
+/// @file libym_techmap/cellmap/CnGraph.cc
+/// @brief CnGraph の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: LutNetwork.cc 2274 2009-06-10 07:45:29Z matsunaga $
@@ -12,7 +12,7 @@
 #include "ym_techmap/CnGraph.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 ///////////////////////////////////////////////////////////////////////
 // クラス CnNode
@@ -701,4 +701,4 @@ CnGraph::connect(CnNode* from,
   }
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_CELLMAP

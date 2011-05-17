@@ -17,7 +17,7 @@
 #include "Cut.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
 MapRecord::MapRecord()
@@ -489,4 +489,4 @@ MapRecord::clear_mark(const BdnNode* node)
   }
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP

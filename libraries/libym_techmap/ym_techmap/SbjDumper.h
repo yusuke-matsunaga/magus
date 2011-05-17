@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/sbj_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
 /// @class SbjDumper SbjDumper.h "ym_techmap/SbjDumper.h"
@@ -58,6 +58,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ
 
 #endif // YM_TECHMAP_SBJDUMPER_H

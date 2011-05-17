@@ -1,7 +1,7 @@
 #ifndef YM_LUTMAP_LN2BNET_H
 #define YM_LUTMAP_LN2BNET_H
 
-/// @file ym_lutmap/Ln2BNet.h 
+/// @file ym_lutmap/Ln2BNet.h
 /// @brief Ln2BNet のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_lutmap/lutmap_nsdef.h"
+#include "ym_techmap/lutmap_nsdef.h"
 #include "ym_bnet/bnet_nsdef.h"
 
 
@@ -31,7 +31,7 @@ public:
   void
   operator()(const LnGraph& src_network,
 	     BNetwork& dst_network);
-  
+
 };
 
 END_NAMESPACE_YM

@@ -12,7 +12,7 @@
 #include "ym_utils/BinIO.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス PatGraph
@@ -202,4 +202,4 @@ dump(ostream& s,
   s << "==== PatMgr dump end ====" << endl;
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP

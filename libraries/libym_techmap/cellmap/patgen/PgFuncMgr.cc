@@ -25,7 +25,7 @@ const int debug = 0;
 
 END_NONAMESPACE
 
-BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
 //////////////////////////////////////////////////////////////////////
 // クラス PgFuncMgr
@@ -303,5 +303,5 @@ PgFuncMgr::find_repfunc(const TvFunc& f)
   return pgrep;
 }
 
-END_NAMESPACE_YM_TECHMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_PATGEN
 

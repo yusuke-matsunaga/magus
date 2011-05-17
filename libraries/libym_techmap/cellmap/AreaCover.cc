@@ -11,7 +11,7 @@
 #include "ym_bdn/BdnMgr.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_cell/Cell.h"
-#include "CellMapImpl.h"
+#include "CellMgr.h"
 #include "PatMgr.h"
 #include "PatMatcher.h"
 #include "PatGraph.h"
@@ -20,7 +20,7 @@
 #include "MapRecord.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス AreaCover
@@ -43,7 +43,7 @@ AreaCover::~AreaCover()
 // @param[out] mapnetwork マッピング結果
 void
 AreaCover::operator()(const BdnMgr& sbjgraph,
-		      const CellMapImpl& cell_mgr,
+		      const CellMgr& cell_mgr,
 		      CnGraph& mapnetwork)
 {
   MapRecord maprec;
@@ -63,7 +63,7 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 AreaCover::record_cuts(const BdnMgr& sbjgraph,
-		       const CellMapImpl& cell_mgr,
+		       const CellMgr& cell_mgr,
 		       MapRecord& maprec)
 {
   const PatMgr& pat_mgr = cell_mgr.pat_mgr();
@@ -227,4 +227,4 @@ AreaCover::calc_weight(const BdnNode* node,
   }
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP

@@ -1,13 +1,13 @@
-#ifndef YM_LUTMAP_LUTMAP_NSDEF_H
-#define YM_LUTMAP_LUTMAP_NSDEF_H
+#ifndef YM_TECHMAP_LUTMAP_NSDEF_H
+#define YM_TECHMAP_LUTMAP_NSDEF_H
 
-/// @file magus/lutmap/lutmap.h
+/// @file ym_techmap/lutmap_nsdef.h
 /// @brief luttmap パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: lutmap.h 555 2007-04-08 07:20:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -53,4 +53,4 @@ using nsLutmap::LnNodeList;
 
 END_NAMESPACE_YM
 
-#endif // YM_LUTMAP_LUTMAP_NSDEF_H
+#endif // YM_TECHMAP_LUTMAP_NSDEF_H

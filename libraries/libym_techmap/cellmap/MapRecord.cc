@@ -17,7 +17,7 @@
 #include "Match.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 // コンストラクタ
 MapRecord::MapRecord()
@@ -270,4 +270,4 @@ MapRecord::node_info(const BdnNode* node,
   return mNodeInfo[node->id() * 2 + static_cast<ymuint>(inv)];
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP

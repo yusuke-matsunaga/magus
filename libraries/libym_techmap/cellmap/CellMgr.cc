@@ -1,26 +1,22 @@
 
-/// @file libym_techmap/cellmap/CellMapImpl.cc
-/// @brief CellMapImpl の実装ファイル
+/// @file libym_techmap/cellmap/CellMgr.cc
+/// @brief CellMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CellMapImpl.h"
+#include "CellMgr.h"
 #include "RepFunc.h"
 #include "FuncGroup.h"
-#include "AreaCover.h"
 
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/BinIO.h"
 
-#include "patgen/patgen_nsdef.h"
-#include "patgen/PgFuncMgr.h"
 
-
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 // クラス FuncGroup
@@ -76,11 +72,6 @@ RepFunc::load(istream& s)
   return true;
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
-
-
-BEGIN_NAMESPACE_YM_TECHMAP
-
 BEGIN_NONAMESPACE
 
 void
@@ -104,17 +95,17 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellMapImpl
+// クラス CellMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CellMapImpl::CellMapImpl() :
+CellMgr::CellMgr() :
   mLibrary(NULL)
 {
 }
 
 // @brief デストラクタ
-CellMapImpl::~CellMapImpl()
+CellMgr::~CellMgr()
 {
   init();
 }
@@ -122,7 +113,7 @@ CellMapImpl::~CellMapImpl()
 // @brief 内容を初期化する．
 // @note 以前確保されたメモリは開放される．
 void
-CellMapImpl::init()
+CellMgr::init()
 {
   delete mLibrary;
 }
@@ -132,7 +123,7 @@ CellMapImpl::init()
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-CellMapImpl::load_library(istream& s)
+CellMgr::load_library(istream& s)
 {
   // 以前の内容を捨てる．
   init();
@@ -177,41 +168,10 @@ CellMapImpl::load_library(istream& s)
   return true;
 }
 
-// @brief セルライブラリの内容(+パタングラフ)をバイナリファイルに書き出す．
-void
-CellMapImpl::dump_library(ostream& s,
-			  const CellLibrary& library)
-{
-  using namespace nsPatgen;
-
-  PgFuncMgr pgf_mgr;
-  pgf_mgr.set_library(&library);
-
-  pg_dump(s, pgf_mgr);
-}
-
-// @brief 面積最小化 DAG covering のヒューリスティック関数
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] mode モード
-//  - 0: fanout フロー, resub なし
-//  - 1: weighted フロー, resub なし
-//  - 2: fanout フロー, resub あり
-//  - 3: weighted フロー, resub あり
-// @param[out] mapnetwork マッピング結果
-void
-CellMapImpl::area_map(const BdnMgr& sbjgraph,
-		      ymuint mode,
-		      CnGraph& mapnetwork)
-{
-  nsCellmap::AreaCover area_cover;
-
-  area_cover(sbjgraph, *this, mapnetwork);
-}
-
 // @brief 関数グループを返す．
 // @param[in] id 関数番号　( 0 <= id < func_num() )
 const FuncGroup&
-CellMapImpl::func_group(ymuint id) const
+CellMgr::func_group(ymuint id) const
 {
   return mFuncArray[id];
 }
@@ -219,20 +179,20 @@ CellMapImpl::func_group(ymuint id) const
 // @brief 代表関数を返す．
 // @param[in] id 代表関数番号
 const RepFunc&
-CellMapImpl::rep(ymuint id) const
+CellMgr::rep(ymuint id) const
 {
   return mRepArray[id];
 }
 
-// @relates CellMapImpl
-// @brief CellMapImpl の内容を出力する．
+// @relates CellMgr
+// @brief CellMgr の内容を出力する．
 // @param[in] s 出力先のストリーム
 // @param[in] cell_mgr セルライブラリ
 void
 dump(ostream& s,
-     const CellMapImpl& cell_mgr)
+     const CellMgr& cell_mgr)
 {
-  s << "==== CellMapImpl dump start ====" << endl;
+  s << "==== CellMgr dump start ====" << endl;
 
   // 関数情報の出力
   const FuncGroup& func0 = cell_mgr.const0_func();
@@ -282,7 +242,7 @@ dump(ostream& s,
   // パタンの情報の出力
   dump(s, cell_mgr.pat_mgr());
 
-  s << "==== CellMapImpl dump end ====" << endl;
+  s << "==== CellMgr dump end ====" << endl;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_CELLMAP

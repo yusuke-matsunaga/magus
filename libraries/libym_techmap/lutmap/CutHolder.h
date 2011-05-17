@@ -16,7 +16,7 @@
 #include "ym_bdn/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class CutHolder
@@ -158,6 +158,6 @@ CutHolder::limit() const
   return mLimit;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP
 
 #endif // LIBYM_TECHMAP_LUTMAP_CUTHOLDER_H

@@ -12,7 +12,7 @@
 #include "ym_techmap/SbjGraph.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmdNode
@@ -385,4 +385,4 @@ SbjMinDepth::dfs(SmdNode* cur_node,
   return false;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_SBJ

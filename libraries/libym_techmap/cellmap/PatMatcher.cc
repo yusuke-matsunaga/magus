@@ -14,7 +14,11 @@
 #include "Match.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_CELLMAP
+BEGIN_NAMESPACE_YM_CELLMAP
+
+//////////////////////////////////////////////////////////////////////
+// クラス PatMatcher
+//////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] pat_mgr パタンを管理するクラス
@@ -185,4 +189,4 @@ PatMatcher::bind(const BdnNode* sbj_node,
   return true;
 }
 
-END_NAMESPACE_YM_TECHMAP_CELLMAP
+END_NAMESPACE_YM_CELLMAP

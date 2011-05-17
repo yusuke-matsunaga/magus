@@ -10,10 +10,10 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/lutmap_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_LUTMAP
 
 class Cut;
 
@@ -537,6 +537,6 @@ ADCostList<AreaT>::insert(const Cut* cut,
   }
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_LUTMAP
 
 #endif // LIBYM_TECHMAP_LUTMAP_ADCOST_H

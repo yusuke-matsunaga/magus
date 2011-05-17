@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/cellmap_nsdef.h"
 #include "ym_bdn/bdn_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
-class CellMapImpl;
+class CellMgr;
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellMap CellMap.h "CellMap.h"
+/// @class CellMap CellMap.h "ym_techmap/CellMap.h"
 /// @brief セルライブラリ用ののテクノロジマッピングを行うクラス
 //////////////////////////////////////////////////////////////////////
 class CellMap
@@ -100,11 +100,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実装クラス
-  CellMapImpl* mImpl;
+  // セルライブラリを管理するオブジェクト
+  CellMgr* mCellMgr;
 
 };
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_CELLMAP
 
 #endif // YM_TECHMAP_CELLMAP_H

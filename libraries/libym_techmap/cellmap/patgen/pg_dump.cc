@@ -19,9 +19,7 @@
 #include "ym_utils/BinIO.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
-
-using nsTechmap::nsCellmap::PatMgr;
+BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
 BEGIN_NONAMESPACE
 
@@ -312,4 +310,4 @@ pg_dump(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_TECHMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_PATGEN
