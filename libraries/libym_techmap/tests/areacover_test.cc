@@ -12,7 +12,7 @@
 #include "ym_bdn/BdnMgr.h"
 #include "ym_bdn/BlifBdnConv.h"
 #include "ym_bdn/BdnDumper.h"
-#include "ym_techmap/TechMap.h"
+#include "ym_techmap/CellMap.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -40,7 +40,7 @@ void
 test(string pat_filename,
      string sbj_filename)
 {
-  TechMap mapper;
+  CellMap mapper;
 
   {
     ifstream ifs;

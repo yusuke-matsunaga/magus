@@ -132,12 +132,10 @@ LIBRARIES=\
  libym_bnetbdnconv \
  libym_mvn \
  libym_mvnbdnconv \
- libym_sbj \
  libym_aig \
  libym_tgnet \
  libym_gds \
  libym_cec \
- libym_lutmap \
  libym_techmap \
  libym_seal \
  libym_tclpp \

@@ -28,6 +28,16 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_TECHMAP
 
+class SbjGraph;
+class SbjPort;
+class SbjEdge;
+class SbjNode;
+class SbjHandle;
+class SbjDumper;
+
+typedef DlList<SbjEdge> SbjEdgeList;
+typedef DlList<SbjNode> SbjNodeList;
+
 class TechMap;
 
 class CnGraph;
@@ -36,10 +46,28 @@ class CnNode;
 
 typedef DlList<CnEdge> CnEdgeList;
 typedef DlList<CnNode> CnNodeList;
+class LutMap;
+
+class LnGraph;
+class LnEdge;
+class LnNode;
+
+typedef DlList<LnEdge> LnEdgeList;
+typedef DlList<LnNode> LnNodeList;
 
 END_NAMESPACE_YM_TECHMAP
 
 BEGIN_NAMESPACE_YM
+
+using nsTechmap::SbjGraph;
+using nsTechmap::SbjPort;
+using nsTechmap::SbjEdge;
+using nsTechmap::SbjNode;
+using nsTechmap::SbjHandle;
+using nsTechmap::SbjDumper;
+
+using nsTechmap::SbjEdgeList;
+using nsTechmap::SbjNodeList;
 
 using nsTechmap::TechMap;
 
@@ -49,6 +77,15 @@ using nsTechmap::CnNode;
 
 using nsTechmap::CnEdgeList;
 using nsTechmap::CnNodeList;
+
+using nsTechmap::LutMap;
+
+using nsTechmap::LnGraph;
+using nsTechmap::LnEdge;
+using nsTechmap::LnNode;
+
+using nsTechmap::LnEdgeList;
+using nsTechmap::LnNodeList;
 
 END_NAMESPACE_YM
 

@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "patgen/patgen_nsdef.h"
-#include "patgen/PgFuncMgr.h"
-#include "patgen/PgFuncRep.h"
-#include "patgen/PgFunc.h"
+#include "cellmap/patgen/patgen_nsdef.h"
+#include "cellmap/patgen/PgFuncMgr.h"
+#include "cellmap/patgen/PgFuncRep.h"
+#include "cellmap/patgen/PgFunc.h"
 #include "ym_lexp/LogExpr.h"
-#include "PatMgr.h"
+#include "cellmap/PatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_TECHMAP_PATGEN

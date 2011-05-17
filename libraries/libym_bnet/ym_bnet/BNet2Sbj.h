@@ -10,7 +10,7 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
+#if 0
 #include "ym_bnet/bnet_nsdef.h"
 #include "ym_sbj/sbj_nsdef.h"
 
@@ -39,5 +39,5 @@ public:
 };
 
 END_NAMESPACE_YM
-
+#endif
 #endif // YM_BNET_BNET2SBJ_H

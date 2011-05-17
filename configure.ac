@@ -80,12 +80,10 @@ ym_libym_bdn_enable=1
 ym_libym_bnetbdnconv_enable=1
 ym_libym_mvn_enable=1
 ym_libym_mvnbdnconv_enable=1
-ym_libym_sbj_enable=1
 ym_libym_aig_enable=1
 ym_libym_tgnet_enable=1
 ym_libym_gds_enable=1
 ym_libym_cec_enable=1
-ym_libym_lutmap_enable=1
 ym_libym_techmap_enable=1
 ym_libym_seal_enable=1
 ym_libym_tclpp_enable=1
@@ -171,11 +169,6 @@ YM_BUILD_LIBRARY([libym_bnetbdnconv],
 		  ym_libym_utils_enable,
 		  ym_libym_lexp_enable])
 
-# libym_sbj
-YM_BUILD_LIBRARY([libym_sbj],
-		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
-
 # libym_mvn
 YM_BUILD_LIBRARY([libym_mvn],
 		 [ym_libym_utils_enable])
@@ -209,17 +202,10 @@ YM_BUILD_LIBRARY([libym_cec],
 		  ym_libym_sat_enable,
 		  ym_libym_aig_enable])
 
-# libym_lutmap
-YM_BUILD_LIBRARY([libym_lutmap],
-		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable,
-		  ym_libym_sbj_enable])
-
 # libym_techmap
 YM_BUILD_LIBRARY([libym_techmap],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable,
-		  ym_libym_sbj_enable])
+		  ym_libym_lexp_enable])
 
 # libym_seal
 YM_BUILD_LIBRARY([libym_seal],

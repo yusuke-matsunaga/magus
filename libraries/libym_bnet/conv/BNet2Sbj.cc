@@ -8,7 +8,7 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-
+#if 0
 #include "ym_bnet/BNet2Sbj.h"
 #include "ym_bnet/BNetwork.h"
 #include "ym_sbj/SbjGraph.h"
@@ -239,3 +239,4 @@ BNet2Sbj::operator()(const BNetwork& network,
 }
 
 END_NAMESPACE_YM_BNET
+#endif
