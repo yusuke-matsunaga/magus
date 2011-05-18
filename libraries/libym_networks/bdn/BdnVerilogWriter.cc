@@ -184,13 +184,13 @@ BdnVerilogWriter::operator()(ostream& s,
     const BdnNode* c_node = clock->output_fanin();
     bool c_inv = clock->output_fanin_inv();
 
-    const BdnNode* set = dff->set();
-    const BdnNode* s_node = set->output_fanin();
-    bool s_inv = set->output_fanin_inv();
+    const BdnNode* clear = dff->clear();
+    const BdnNode* r_node = clear->output_fanin();
+    bool r_inv = clear->output_fanin_inv();
 
-    const BdnNode* reset = dff->reset();
-    const BdnNode* r_node = reset->output_fanin();
-    bool r_inv = reset->output_fanin_inv();
+    const BdnNode* preset = dff->preset();
+    const BdnNode* s_node = preset->output_fanin();
+    bool s_inv = preset->output_fanin_inv();
 
     s << "  always @ ( "
       << inv_to_edge(c_inv) << " " << node_name(c_node);
@@ -201,23 +201,23 @@ BdnVerilogWriter::operator()(ostream& s,
       s << " or " << inv_to_edge(r_inv) << " " << node_name(r_node);
     }
     s << ") begin" << endl;
-    bool has_set_reset = false;
+    bool has_clear_preset = false;
     const char* else_str = "";
     if ( s_node ) {
       s << "    if (" << inv_to_symbol(s_inv) << node_name(s_node)
 	<< ")" << endl
 	<< "      " << node_name(node) << " <= 1'b1;" << endl;
-      has_set_reset = true;
+      has_clear_preset = true;
       else_str = "else ";
     }
     if ( r_node ) {
       s << "    " << else_str << "if ("
 	<< inv_to_symbol(r_inv) << node_name(r_node) << ")" << endl
 	<< "      " << node_name(node) << " <= 1'b0;" << endl;
-      has_set_reset = true;
+      has_clear_preset = true;
       else_str = "else";
     }
-    if ( has_set_reset ) {
+    if ( has_clear_preset ) {
       s << "    else" << endl
 	<< "      ";
     }

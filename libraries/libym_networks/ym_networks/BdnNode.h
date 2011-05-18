@@ -119,10 +119,12 @@ private:
 /// - 外部出力
 /// - D-FF のデータ入力
 /// - D-FF のクロック
-/// - D-FF のセット信号
-/// - D-FF のリセット信号
+/// - D-FF のクリア信号
+/// - D-FF のプリセット信号
 /// - ラッチのデータ入力
 /// - ラッチのイネーブル信号
+/// - ラッチのクリア信号
+/// - ラッチのプリセット信号
 ///
 /// 入出力ノードは入力ノードと出力ノードの対で表す．
 ///
@@ -167,10 +169,10 @@ public:
     kDFF_DATA       = 1,
     /// @brief DFFのクロック
     kDFF_CLOCK      = 2,
-    /// @brief DFFのセット信号
-    kDFF_SET        = 3,
-    /// @brief DFFのリセット信号
-    kDFF_RESET      = 4,
+    /// @brief DFFのクリア信号
+    kDFF_CLEAR      = 3,
+    /// @brief DFFのプリセット信号
+    kDFF_PRESET     = 4,
     /// @brief ラッチのデータ
     kLATCH_DATA     = 5,
     /// @brief ラッチのイネーブル

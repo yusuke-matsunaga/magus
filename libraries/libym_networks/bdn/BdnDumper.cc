@@ -78,21 +78,21 @@ BdnDumper::operator()(ostream& s,
     const BdnNode* output = dff->output();
     const BdnNode* input = dff->input();
     const BdnNode* clock = dff->clock();
-    const BdnNode* set = dff->set();
-    const BdnNode* reset = dff->reset();
+    const BdnNode* clear = dff->clear();
+    const BdnNode* preset = dff->preset();
     s << "DFF#" << dff->id() << ": " << dff->name() << " ("
       << "OUTPUT=" << output->id_str()
       << ", INPUT=";
     dump_output(s, input);
     s << ", CLOCK=";
     dump_output(s, clock);
-    if ( set->output_fanin() ) {
-      s << ", SET=";
-      dump_output(s, set);
+    if ( clear->output_fanin() ) {
+      s << ", CLEAR=";
+      dump_output(s, clear);
     }
-    if ( reset->output_fanin() ) {
-      s << ", RESET=";
-      dump_output(s, reset);
+    if ( preset->output_fanin() ) {
+      s << ", PRESET=";
+      dump_output(s, preset);
     }
     s << ")" << endl;
   }
@@ -164,12 +164,12 @@ BdnDumper::operator()(ostream& s,
       s << "CLOCK@DFF#" << node->dff()->id();
       break;
 
-    case BdnNode::kDFF_SET:
-      s << "SET@DFF#" << node->dff()->id();
+    case BdnNode::kDFF_CLEAR:
+      s << "CLEAR@DFF#" << node->dff()->id();
       break;
 
-    case BdnNode::kDFF_RESET:
-      s << "RESET@DFF#" << node->dff()->id();
+    case BdnNode::kDFF_PRESET:
+      s << "PRESET@DFF#" << node->dff()->id();
       break;
 
     case BdnNode::kLATCH_DATA:

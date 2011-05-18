@@ -360,8 +360,8 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       BdnNodeHandle clock_ihandle = mvnode_map.get(clock_src_node);
 
       // 非同期セット/非同期リセット
-      vector<BdnNodeHandle> set_array(bw, BdnNodeHandle::make_zero());
-      vector<BdnNodeHandle> reset_array(bw, BdnNodeHandle::make_zero());
+      vector<BdnNodeHandle> preset_array(bw, BdnNodeHandle::make_zero());
+      vector<BdnNodeHandle> clear_array(bw, BdnNodeHandle::make_zero());
       ymuint nc = (node->input_num() - 2) / 2;
       BdnNodeHandle mask = BdnNodeHandle::make_one();
       for (ymuint k = 0; k < nc; ++ k) {
@@ -376,10 +376,10 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
 	mask = bdnetwork.new_and(mask, ~ctrl_dst_ihandle);
 	for (ymuint j = 0; j < bw; ++ j) {
 	  BdnNodeHandle val_dst_ihandle = mvnode_map.get(val_src_node, j);
-	  BdnNodeHandle new_set = bdnetwork.new_and(cond, val_dst_ihandle);
-	  BdnNodeHandle new_reset = bdnetwork.new_and(cond, ~val_dst_ihandle);
-	  set_array[j] = bdnetwork.new_or(set_array[j], new_set);
-	  reset_array[j] = bdnetwork.new_or(reset_array[j], new_reset);
+	  BdnNodeHandle new_preset = bdnetwork.new_and(cond, val_dst_ihandle);
+	  BdnNodeHandle new_clear = bdnetwork.new_and(cond, ~val_dst_ihandle);
+	  preset_array[j] = bdnetwork.new_or(preset_array[j], new_preset);
+	  clear_array[j] = bdnetwork.new_or(clear_array[j], new_clear);
 	}
       }
 
@@ -389,13 +389,13 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
 	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
 	bdnetwork.change_output_fanin(dff->input(), data_ihandle);
 	bdnetwork.change_output_fanin(dff->clock(), clock_ihandle);
-	BdnNodeHandle set_ihandle = set_array[j];
-	if ( !set_ihandle.is_zero() ) {
-	  bdnetwork.change_output_fanin(dff->set(), set_ihandle);
+	BdnNodeHandle preset_ihandle = preset_array[j];
+	if ( !preset_ihandle.is_zero() ) {
+	  bdnetwork.change_output_fanin(dff->preset(), preset_ihandle);
 	}
-	BdnNodeHandle reset_ihandle = reset_array[j];
-	if ( !reset_ihandle.is_zero() ) {
-	  bdnetwork.change_output_fanin(dff->reset(), reset_ihandle);
+	BdnNodeHandle clear_ihandle = clear_array[j];
+	if ( !clear_ihandle.is_zero() ) {
+	  bdnetwork.change_output_fanin(dff->clear(), clear_ihandle);
 	}
       }
     }

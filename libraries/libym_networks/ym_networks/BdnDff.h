@@ -71,25 +71,25 @@ public:
   BdnNode*
   clock();
 
-  /// @brief セット信号のノードを返す．
+  /// @brief クリア信号のノードを返す．
   /// @note NULL の場合もある．
   const BdnNode*
-  set() const;
+  clear() const;
 
-  /// @brief セット信号のノードを返す．
+  /// @brief クリア信号のノードを返す．
   /// @note NULL の場合もある．
   BdnNode*
-  set();
+  clear();
 
-  /// @brief リセット信号のノードを返す．
+  /// @brief プリセット信号のノードを返す．
   /// @note NULL の場合もある．
   const BdnNode*
-  reset() const;
+  preset() const;
 
-  /// @brief リセット信号のノードを返す．
+  /// @brief プリセット信号のノードを返す．
   /// @note NULL の場合もある．
   BdnNode*
-  reset();
+  preset();
 
 
 private:
@@ -112,11 +112,11 @@ private:
   // クロックノード
   BdnNode* mClock;
 
-  // セット信号ノード
-  BdnNode* mSet;
+  // クリア信号ノード
+  BdnNode* mClear;
 
-  // リセット信号ノード
-  BdnNode* mReset;
+  // プリセット信号ノード
+  BdnNode* mPreset;
 
   // BdnNode に付加するデータ
   BdnAuxData* mAuxData;
@@ -195,40 +195,40 @@ BdnDff::clock()
   return mClock;
 }
 
-// @brief セット信号のノードを返す．
+// @brief クリア信号のノードを返す．
 // @note NULL の場合もある．
 inline
 const BdnNode*
-BdnDff::set() const
+BdnDff::clear() const
 {
-  return mSet;
+  return mClear;
 }
 
-// @brief セット信号のノードを返す．
+// @brief クリア信号のノードを返す．
 // @note NULL の場合もある．
 inline
 BdnNode*
-BdnDff::set()
+BdnDff::clear()
 {
-  return mSet;
+  return mClear;
 }
 
-// @brief リセット信号のノードを返す．
+// @brief プリセット信号のノードを返す．
 // @note NULL の場合もある．
 inline
 const BdnNode*
-BdnDff::reset() const
+BdnDff::preset() const
 {
-  return mReset;
+  return mPreset;
 }
 
-// @brief リセット信号のノードを返す．
+// @brief プリセット信号のノードを返す．
 // @note NULL の場合もある．
 inline
 BdnNode*
-BdnDff::reset()
+BdnDff::preset()
 {
-  return mReset;
+  return mPreset;
 }
 
 END_NAMESPACE_YM_BDN

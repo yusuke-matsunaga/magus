@@ -33,12 +33,12 @@ BNetBdnConv::~BNetBdnConv()
 // @param[in] bnetwork 変換元のネットワーク
 // @param[in] network 変換先のネットワーク
 // @param[in] clock_name クロック信号のポート名
-// @param[in] reset_name リセット信号のポート名
+// @param[in] clear_name クリア信号のポート名
 bool
 BNetBdnConv::operator()(const BNetwork& bnetwork,
 			BdnMgr& network,
 			const string& clock_name,
-			const string& reset_name)
+			const string& clear_name)
 {
   mNetwork = &network;
   ymuint n = bnetwork.max_node_id();
@@ -60,40 +60,40 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
   ymuint nff = bnetwork.latch_node_num();
   vector<BdnDff*> dff_array(nff);
   BdnNodeHandle clock_h;
-  BdnNodeHandle reset_h;
+  BdnNodeHandle clear_h;
   if ( nff > 0 ) {
     // クロック用の外部入力の生成
     BdnNode* clock = mNetwork->new_port_input(clock_name);
     clock_h = BdnNodeHandle(clock, false);
 
     // リセット用の外部入力の生成
-    bool need_reset = false;
+    bool need_clear = false;
     for (BNodeList::const_iterator p = bnetwork.latch_nodes_begin();
 	 p != bnetwork.latch_nodes_end(); ++ p) {
       const BNode* bnode = *p;
       int rval = bnode->reset_value();
       if ( rval == 0 || rval == 1 ) {
-	need_reset = true;
+	need_clear = true;
 	break;
       }
     }
-    if ( need_reset ) {
-      BdnNode* reset = mNetwork->new_port_input(reset_name);
-      reset_h = BdnNodeHandle(reset, false);
+    if ( need_clear ) {
+      BdnNode* clear = mNetwork->new_port_input(clear_name);
+      clear_h = BdnNodeHandle(clear, false);
     }
   }
   ymuint i = 0;
   for (BNodeList::const_iterator p = bnetwork.latch_nodes_begin();
        p != bnetwork.latch_nodes_end(); ++ p, ++ i) {
     const BNode* bnode = *p;
-    bool has_set = false;
-    bool has_reset = false;
+    bool has_clear = false;
+    bool has_preset = false;
     int rval = bnode->reset_value();
     if ( rval == 0 ) {
-      has_reset = true;
+      has_clear = true;
     }
     else if ( rval == 1 ) {
-      has_set = true;
+      has_preset = true;
     }
 
     // D-FF の生成
@@ -109,13 +109,13 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
     mNetwork->change_output_fanin(dff_clock, clock_h);
 
     // リセット(もしくはセット)信号の設定
-    if ( has_reset ) {
-      BdnNode* dff_reset = dff->reset();
-      mNetwork->change_output_fanin(dff_reset, reset_h);
+    if ( has_clear ) {
+      BdnNode* dff_clear = dff->clear();
+      mNetwork->change_output_fanin(dff_clear, clear_h);
     }
-    else if ( has_set ) {
-      BdnNode* dff_set = dff->set();
-      mNetwork->change_output_fanin(dff_set, reset_h);
+    else if ( has_preset ) {
+      BdnNode* dff_preset = dff->preset();
+      mNetwork->change_output_fanin(dff_preset, clear_h);
     }
   }
 

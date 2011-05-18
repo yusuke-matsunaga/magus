@@ -120,10 +120,10 @@ BdnBlifWriter::operator()(ostream& s,
       }
     }
     s << ".latch " << iname << " " << name_array[node->id()];
-    if ( dff->set()->output_fanin() ) {
+    if ( dff->preset()->output_fanin() ) {
       s << " 1";
     }
-    else if ( dff->reset()->output_fanin() ) {
+    else if ( dff->clear()->output_fanin() ) {
       s << " 0";
     }
     s << endl;

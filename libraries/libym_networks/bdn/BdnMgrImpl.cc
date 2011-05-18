@@ -85,13 +85,13 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnNode* dst_clock = dst_dff->clock();
     nodemap[src_clock->id()] = dst_clock;
 
-    const BdnNode* src_set = src_dff->set();
-    BdnNode* dst_set = dst_dff->set();
-    nodemap[src_set->id()] = dst_set;
+    const BdnNode* src_clear = src_dff->clear();
+    BdnNode* dst_clear = dst_dff->clear();
+    nodemap[src_clear->id()] = dst_clear;
 
-    const BdnNode* src_reset = src_dff->reset();
-    BdnNode* dst_reset = dst_dff->reset();
-    nodemap[src_reset->id()] = dst_reset;
+    const BdnNode* src_preset = src_dff->preset();
+    BdnNode* dst_preset = dst_dff->preset();
+    nodemap[src_preset->id()] = dst_preset;
   }
 
   // ラッチノードの生成
@@ -366,17 +366,17 @@ BdnMgrImpl::new_dff(const string& name)
   clock->mAuxData = dff->mAuxData;
   mOutputList.push_back(clock);
 
-  BdnNode* set = alloc_node();
-  dff->mSet = set;
-  set->set_output_type(BdnNode::kDFF_SET);
-  set->mAuxData = dff->mAuxData;
-  mOutputList.push_back(set);
+  BdnNode* clear = alloc_node();
+  dff->mClear = clear;
+  clear->set_output_type(BdnNode::kDFF_CLEAR);
+  clear->mAuxData = dff->mAuxData;
+  mOutputList.push_back(clear);
 
-  BdnNode* reset = alloc_node();
-  dff->mReset = reset;
-  reset->set_output_type(BdnNode::kDFF_RESET);
-  reset->mAuxData = dff->mAuxData;
-  mOutputList.push_back(reset);
+  BdnNode* preset = alloc_node();
+  dff->mPreset = preset;
+  preset->set_output_type(BdnNode::kDFF_PRESET);
+  preset->mAuxData = dff->mAuxData;
+  mOutputList.push_back(preset);
 
   mDffList.push_back(dff);
 
@@ -396,11 +396,11 @@ BdnMgrImpl::delete_dff(BdnDff* dff)
   delete_node(dff->output());
   delete_node(dff->input());
   delete_node(dff->clock());
-  if ( dff->set() ) {
-    delete_node(dff->set());
+  if ( dff->clear() ) {
+    delete_node(dff->clear());
   }
-  if ( dff->reset() ) {
-    delete_node(dff->reset());
+  if ( dff->preset() ) {
+    delete_node(dff->preset());
   }
 }
 
