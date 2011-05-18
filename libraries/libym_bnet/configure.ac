@@ -109,7 +109,6 @@ AC_SUBST([YM_EXTRA_LIBADD])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_bnet/Makefile])
-AC_CONFIG_FILES([conv/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

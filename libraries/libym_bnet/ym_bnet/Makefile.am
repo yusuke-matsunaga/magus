@@ -8,7 +8,6 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	bnet_nsdef.h \
-	BNet2Sbj.h \
 	BNetwork.h \
 	BNetManip.h \
 	BNetDecomp.h \
