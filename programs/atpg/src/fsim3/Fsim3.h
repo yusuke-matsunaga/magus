@@ -14,8 +14,8 @@
 
 #include "fsim3_nsdef.h"
 #include "ModBase.h"
-#include "ym_tgnet/tgnet_nsdef.h"
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/TgNode.h"
 #include "ym_lexp/LogExpr.h"
 #include "EventQ.h"
 #include "FsimFault.h"

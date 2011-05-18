@@ -10,9 +10,9 @@
 
 
 #include "MvnReadVerilog.h"
-#include "ym_mvn/MvnMgr.h"
-#include "ym_mvn/MvnVerilogReader.h"
-#include "ym_mvn/MvnVlMap.h"
+#include "ym_networks/MvnMgr.h"
+#include "ym_networks/MvnVerilogReader.h"
+#include "ym_networks/MvnVlMap.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"

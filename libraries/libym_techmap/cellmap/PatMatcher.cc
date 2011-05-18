@@ -8,7 +8,7 @@
 
 
 #include "PatMatcher.h"
-#include "ym_bdn/BdnNode.h"
+#include "ym_networks/BdnNode.h"
 #include "PatMgr.h"
 #include "PatGraph.h"
 #include "Match.h"

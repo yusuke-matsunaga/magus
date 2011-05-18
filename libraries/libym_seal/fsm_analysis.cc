@@ -13,7 +13,7 @@
 #include "BddFsm.h"
 #include "IdxMapper.h"
 #include "ym_utils/StopWatch.h"
-#include "ym_bnet/BNetwork.h"
+#include "ym_networks/BNetwork.h"
 #include "ym_bdd/Bdd.h"
 #include "ym_bdd/BddVarSet.h"
 #include "ym_bdd/BmcFactory.h"

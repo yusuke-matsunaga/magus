@@ -12,7 +12,7 @@
 
 #include "atpg_nsdef.h"
 #include "SaFault.h"
-#include <ym_tgnet/tgnet_nsdef.h>
+#include <ym_networks/tgnet_nsdef.h>
 #include <ym_utils/Alloc.h>
 
 

@@ -11,7 +11,7 @@
 
 #include "BNetIoCmd.h"
 
-#include "ym_bnet/BNetEquWriter.h"
+#include "ym_networks/BNetEquWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS

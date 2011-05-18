@@ -8,7 +8,7 @@
 
 
 #include "AreaCover.h"
-#include "ym_bdn/BdnMgr.h"
+#include "ym_networks/BdnMgr.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_cell/Cell.h"
 #include "CellMgr.h"

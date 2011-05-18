@@ -41,7 +41,7 @@
 
 #include "matpg.h"
 #include "val.h"
-#include <ym_tgnet/TgGateTemplate.h>
+#include <ym_networks/TgGateTemplate.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

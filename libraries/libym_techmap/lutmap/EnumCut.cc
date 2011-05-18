@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_bdn/BdnMgr.h"
+#include "ym_networks/BdnMgr.h"
 #include "EnumCut.h"
 
 //#define DEBUG_ENUM_RECUR

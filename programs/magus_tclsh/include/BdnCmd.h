@@ -13,7 +13,7 @@
 
 
 #include "NetCmd.h"
-#include "ym_bdn/bdn_nsdef.h"
+#include "ym_networks/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_MAGUS

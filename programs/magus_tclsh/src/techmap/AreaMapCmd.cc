@@ -12,12 +12,12 @@
 #include "AreaMapCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
-#include "ym_bnetbdnconv/BNetBdnConv.h"
+#include "ym_networks/BNetBdnConv.h"
 
-#include "ym_mvn/MvnMgr.h"
-#include "ym_bdn/BdnMgr.h"
-#include "ym_mvnbdnconv/MvnBdnConv.h"
-#include "ym_mvnbdnconv/MvnBdnMap.h"
+#include "ym_networks/MvnMgr.h"
+#include "ym_networks/BdnMgr.h"
+#include "ym_networks/MvnBdnConv.h"
+#include "ym_networks/MvnBdnMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

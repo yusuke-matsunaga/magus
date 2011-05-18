@@ -9,9 +9,9 @@
 
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"
-#include "ym_bdn/BdnMgr.h"
-#include "ym_bdn/BlifBdnConv.h"
-#include "ym_bdn/BdnDumper.h"
+#include "ym_networks/BdnMgr.h"
+#include "ym_networks/BlifBdnConv.h"
+#include "ym_networks/BdnDumper.h"
 #include "ym_techmap/CellMap.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_utils/MsgMgr.h"

@@ -1,5 +1,5 @@
 
-/// @file libym_bnet/BlifScanner.cc
+/// @file libym_networks/BlifScanner.cc
 /// @brief BlibScanner の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

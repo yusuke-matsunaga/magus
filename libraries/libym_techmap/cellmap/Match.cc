@@ -8,7 +8,7 @@
 
 
 #include "Match.h"
-#include "ym_bdn/BdnNode.h"
+#include "ym_networks/BdnNode.h"
 #include "ym_npn/NpnMap.h"
 
 

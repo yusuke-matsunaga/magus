@@ -10,7 +10,7 @@
 
 
 #include "AreaCover.h"
-#include "ym_bdn/BdnMgr.h"
+#include "ym_networks/BdnMgr.h"
 #include "Cut.h"
 #include "MapRecord.h"
 

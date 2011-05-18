@@ -11,8 +11,8 @@
 
 #include "AtpgCmd.h"
 #include "AtpgMgr.h"
-#include "ym_tgnet/TgNetwork.h"
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/TgNetwork.h"
+#include "ym_networks/TgNode.h"
 #include "SaFault.h"
 
 

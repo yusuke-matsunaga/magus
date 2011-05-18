@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_bnet/BNetwork.h"
-#include "ym_bnet/BNetBlifReader.h"
-#include "ym_bnet/BNetDecomp.h"
-#include "ym_bnet/BNet2Sbj.h"
+#include "ym_networks/BNetwork.h"
+#include "ym_networks/BNetBlifReader.h"
+#include "ym_networks/BNetDecomp.h"
+#include "ym_networks/BNet2Sbj.h"
 #include "ym_sbj/SbjGraph.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"

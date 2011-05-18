@@ -12,10 +12,10 @@
 
 #include "BNetElimCmd.h"
 
-#include "ym_bnet/BNetManip.h"
-#include "ym_bnet/BNetDecomp.h"
-#include "ym_bnet/BNetGateDecomp.h"
-#include "ym_bnet/BNetSopDecomp.h"
+#include "ym_networks/BNetManip.h"
+#include "ym_networks/BNetDecomp.h"
+#include "ym_networks/BNetGateDecomp.h"
+#include "ym_networks/BNetSopDecomp.h"
 #include "ym_tclpp/TclPopt.h"
 
 

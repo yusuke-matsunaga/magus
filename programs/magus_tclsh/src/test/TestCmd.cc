@@ -10,11 +10,11 @@
 
 
 #include "TestCmd.h"
-#include "ym_bnet/BNetwork.h"
+#include "ym_networks/BNetwork.h"
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"
-#include "ym_blifbnetconv/BlifBNetConv.h"
-#include "ym_bnet/BNetVerilogWriter.h"
+#include "ym_networks/BlifBNetConv.h"
+#include "ym_networks/BNetVerilogWriter.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"

@@ -11,7 +11,7 @@
 
 #include "EnumCutOp.h"
 #include "EnumCut.h"
-#include "ym_bdn/BdnMgr.h"
+#include "ym_networks/BdnMgr.h"
 
 //#define DEBUG_ENUM_RECUR
 

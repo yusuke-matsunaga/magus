@@ -12,7 +12,7 @@
 
 
 #include "ym_techmap/lutmap_nsdef.h"
-#include "ym_bdn/BdnNode.h"
+#include "ym_networks/BdnNode.h"
 #include "EnumCutOp.h"
 
 

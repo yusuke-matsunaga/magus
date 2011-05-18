@@ -13,8 +13,8 @@
 
 #include "dtpgcl_nsdef.h"
 #include "Val3.h"
-#include "ym_tgnet/tgnet_nsdef.h"
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

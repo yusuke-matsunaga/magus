@@ -16,7 +16,7 @@
 #include "fsim_nsdef.h"
 #include "fsim3_nsdef.h"
 #include "fsimx_nsdef.h"
-#include "ym_tgnet/TgNetwork.h"
+#include "ym_networks/TgNetwork.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
 #include "ym_utils/StopWatch.h"

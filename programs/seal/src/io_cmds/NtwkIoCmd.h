@@ -12,8 +12,8 @@
 
 
 #include "SealCmd.h"
-#include <ym_tgnet/TgBlifReader.h>
-#include <ym_tgnet/TgIscas89Reader.h>
+#include <ym_networks/TgBlifReader.h>
+#include <ym_networks/TgIscas89Reader.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL

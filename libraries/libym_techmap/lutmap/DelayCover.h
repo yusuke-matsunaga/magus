@@ -12,7 +12,7 @@
 
 
 #include "ym_techmap/lutmap_nsdef.h"
-#include "ym_bdn/bdn_nsdef.h"
+#include "ym_networks/bdn_nsdef.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 #include "ADCost.h"
