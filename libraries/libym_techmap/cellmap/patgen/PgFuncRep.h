@@ -25,7 +25,7 @@ class PgFunc;
 class PgFuncRep
 {
   friend class PgFuncMgr;
-  friend class PatGen;
+  friend class PgDumper;
 private:
 
   /// @brief コンストラクタ

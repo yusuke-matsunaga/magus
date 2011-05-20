@@ -46,11 +46,12 @@ public:
   init();
 
   /// @brief 論理式から生成されるパタンを登録する．
-  /// @param[in] pgfunc この式に対応する関数情報
   /// @param[in] expr パタンの元となる論理式
+  /// @param[inout] pat_list パタン番号を追加するリスト
+  /// @note pat_list に同形のパタンがあれば追加しない．
   void
-  reg_pat(PgFunc* pgfunc,
-	  const LogExpr& expr);
+  reg_pat(const LogExpr& expr,
+	  vector<ymuint32>& pat_list);
 
 
 public:

@@ -61,6 +61,13 @@ private:
   void
   reg_expr(const LogExpr& expr);
 
+  /// @brief 論理式から生成されるパタンを登録する．
+  /// @param[in] pgfunc この式に対応する関数情報
+  /// @param[in] expr パタンの元となる論理式
+  void
+  reg_pat(PgFunc* pgfunc,
+	  const LogExpr& expr);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

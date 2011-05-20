@@ -82,6 +82,32 @@ expr2tvfunc(const LogExpr& expr)
   return TvFunc(ni, vals);
 }
 
+// 論理式の変数を map にしたがって変換する．
+LogExpr
+xform_expr(const LogExpr& expr,
+	   const NpnMap& map)
+{
+  ymuint ni = map.ni();
+  VarLogExprMap vlm;
+  for (ymuint i = 0; i < ni; ++ i) {
+    tNpnImap imap = map.imap(i);
+    ymuint j = npnimap_pos(imap);
+    LogExpr expr;
+    if ( npnimap_pol(imap) == kPolPosi) {
+      expr = LogExpr::make_posiliteral(j);
+    }
+    else {
+      expr = LogExpr::make_negaliteral(j);
+    }
+    vlm.insert(make_pair(i, expr));
+  }
+  LogExpr cexpr = expr.compose(vlm);
+  if ( map.opol() == kPolNega ) {
+    cexpr = ~cexpr;
+  }
+  return expr;
+}
+
 void
 display_edge(ostream& s,
 	     PgNode* node,
@@ -239,7 +265,7 @@ PgDumper::gen_pat(const CellLibrary& library)
     TvFunc tv = expr2tvfunc(expr);
     PgFunc* pgfunc = mPgfMgr.reg_func(tv, cell->id());
 
-    mPatGen.reg_pat(pgfunc, expr);
+    reg_pat(pgfunc, expr);
   }
 }
 
@@ -252,7 +278,28 @@ PgDumper::reg_expr(const LogExpr& expr)
   PgFunc* pgfunc = mPgfMgr.find_func(f);
 
   // expr から生成されるパタンを pgfunc に登録する．
-  mPatGen.reg_pat(pgfunc, expr);
+  reg_pat(pgfunc, expr);
+}
+
+// @brief 論理式から生成されるパタンを登録する．
+// @param[in] pgfunc この式に対応する関数情報
+// @param[in] expr パタンの元となる論理式
+void
+PgDumper::reg_pat(PgFunc* pgfunc,
+		  const LogExpr& expr)
+{
+  PgFuncRep* pgrep = pgfunc->mRep;
+
+  // pgrep->rep_func() を用いる理由は論理式に現れる変数が
+  // 真のサポートとは限らないから
+  if ( pgrep->rep_func().ni() > 1 ) {
+    // expr を変換したパタンを登録する．
+    LogExpr cexpr = xform_expr(expr, pgfunc->mMap);
+
+    assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
+
+    mPatGen.reg_pat(cexpr, pgrep->mPatList);
+  }
 }
 
 // @brief グラフ構造全体をダンプする．
