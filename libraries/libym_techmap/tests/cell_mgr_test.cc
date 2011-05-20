@@ -38,10 +38,7 @@ dump_load_test(const char* in_filename,
     }
 
     PgDumper pg_dumper;
-
-    nsYm::nsCell::dump_library(os, *library);
-    pg_dumper.gen_pat(*library);
-    pg_dumper.dump(os);
+    pg_dumper.dump(os, *library);
 
     os.close();
   }

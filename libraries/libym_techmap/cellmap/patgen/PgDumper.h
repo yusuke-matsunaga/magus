@@ -34,28 +34,32 @@ public:
 
 public:
 
-  /// @brief ライブラリの情報からパタンを生成する．
-  /// @param[in] library 対象のセルライブラリ
-  void
-  gen_pat(const CellLibrary& library);
-
   /// @brief グラフ構造全体の内容を表示する．
   /// @param[in] s 出力先のストリーム
+  /// @param[in] library 対象のセルライブラリ
   void
-  display(ostream& s);
+  display(ostream& s,
+	  const CellLibrary& library);
 
   /// @relates PgFuncMgr
   /// @brief グラフ構造全体をダンプする．
   /// @param[in] s 出力先のストリーム
+  /// @param[in] library 対象のセルライブラリ
   /// @note ダンプされた情報はそのまま PatMgr で読み込むことができる．
   void
-  dump(ostream& s);
+  dump(ostream& s,
+       const CellLibrary& library);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ライブラリの情報からパタンを生成する．
+  /// @param[in] library 対象のセルライブラリ
+  void
+  gen_pat(const CellLibrary& library);
 
   /// @brief expr から生成されるパタンを登録する．
   void

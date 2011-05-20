@@ -45,9 +45,7 @@ CellMap::dump_library(ostream& s,
   using nsPatgen::PgDumper;
 
   PgDumper pg_dumper;
-
-  pg_dumper.gen_pat(library);
-  pg_dumper.dump(s);
+  pg_dumper.dump(s, library);
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数

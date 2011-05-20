@@ -304,9 +304,13 @@ PgDumper::reg_pat(PgFunc* pgfunc,
 
 // @brief グラフ構造全体をダンプする．
 // @param[in] s 出力先のストリーム
+// @param[in] library 対象のセルライブラリ
 void
-PgDumper::display(ostream& s)
+PgDumper::display(ostream& s,
+		  const CellLibrary& library)
 {
+  gen_pat(library);
+
   s << "*** FUNCTION SECTION ***" << endl;
   for (ymuint i = 0; i < mPgfMgr.func_num(); ++ i) {
     const PgFunc* func = mPgfMgr.func(i);
@@ -391,10 +395,17 @@ PgDumper::display(ostream& s)
 
 // @brief グラフ構造全体をダンプする．
 // @param[in] s 出力先のストリーム
+// @param[in] library 対象のセルライブラリ
 // @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
 void
-PgDumper::dump(ostream& s)
+PgDumper::dump(ostream& s,
+	       const CellLibrary& library)
 {
+  gen_pat(library);
+
+  // ライブラリの情報をダンプする．
+  nsYm::nsCell::dump_library(s, library);
+
   // 関数の情報をダンプする．
   ymuint nf = mPgfMgr.func_num();
   BinIO::write_32(s, nf);
