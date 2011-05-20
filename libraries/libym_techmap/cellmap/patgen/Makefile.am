@@ -16,10 +16,11 @@ libym_techmap_patgen_la_SOURCES = \
 	patgen_nsdef.h \
 	PatGen.h \
 	PatGen.cc \
+	PgDumper.h \
+	PgDumper.cc \
 	PgFuncMgr.h \
 	PgFuncMgr.cc \
-	PgNode.h \
-	pg_dump.cc
+	PgNode.h
 
 libym_techmap_patgen_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \

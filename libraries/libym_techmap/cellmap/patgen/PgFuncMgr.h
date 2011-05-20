@@ -10,10 +10,6 @@
 
 
 #include "patgen_nsdef.h"
-#include "PatGen.h"
-#include "ym_cell/cell_nsdef.h"
-#include "ym_lexp/lexp_nsdef.h"
-#include "ym_npn/npn_nsdef.h"
 #include "ym_npn/TvFunc.h"
 
 
@@ -42,9 +38,27 @@ public:
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief セルライブラリに対応したパタンを作る．
+  /// @brief 初期化する．
+  /// @note 定数関数，リテラル関数を登録しておく
+  ///
+  /// 常に定数0，定数1，肯定リテラル，否定リテラルの関数番号が
+  /// 0, 1, 2, 3 になるようにする．
   void
-  set_library(const CellLibrary* library);
+  init();
+
+  /// @brief 関数と対応するセル番号を登録する．
+  /// @param[in] tvfunc 論理関数関数
+  /// @param[in] cell_id セル番号
+  /// @return 関数情報のオブジェクトを返す．
+  PgFunc*
+  reg_func(const TvFunc& tvfunc,
+	   ymuint cell_id);
+
+  /// @brief f に対応する PgFunc を求める．
+  /// @param[in] f 関数
+  /// @note なければ新規に作る．
+  PgFunc*
+  find_func(const TvFunc& f);
 
 
 public:
@@ -52,15 +66,11 @@ public:
   // 内容情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief セルライブラリを返す．
-  const CellLibrary&
-  library() const;
-
   /// @brief 論理関数の数を返す．
   ymuint
   func_num() const;
 
-  /// @brief 論理関数を返す．
+  /// @brief 論理関数情報のオブジェクトを返す．
   /// @param[in] id 関数番号 ( 0 <= id < func_num() )
   const PgFunc*
   func(ymuint id) const;
@@ -74,27 +84,11 @@ public:
   const PgFuncRep*
   rep(ymuint id) const;
 
-  /// @breif PatGen を返す．
-  const PatGen&
-  pat_gen() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 論理式を登録する．
-  /// @param[in] expr 元になる論理式
-  /// @return 論理関数を返す．
-  PgFunc*
-  reg_expr(const LogExpr& expr);
-
-  /// @brief f に対応する PgFunc を求める．
-  /// @param[in] f 関数
-  /// @note なければ新規に作る．
-  PgFunc*
-  find_func(const TvFunc& f);
 
   /// @brief f に対応する PgFuncRep を求める．
   /// @param[in] f 関数
@@ -108,12 +102,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // セルライブラリ
-  const CellLibrary* mLibrary;
-
-  // パタングラフを管理するクラス
-  PatGen mPatGen;
 
   // 論理関数のリスト
   // この配列上の位置と関数番号は一致している．
@@ -158,14 +146,6 @@ pg_dump(ostream& s,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief セルライブラリを返す．
-inline
-const CellLibrary&
-PgFuncMgr::library() const
-{
-  return *mLibrary;
-}
-
 // @brief 論理関数の数を返す．
 inline
 ymuint
@@ -198,14 +178,6 @@ const PgFuncRep*
 PgFuncMgr::rep(ymuint id) const
 {
   return mRepList[id];
-}
-
-// @breif PatGen を返す．
-inline
-const PatGen&
-PgFuncMgr::pat_gen() const
-{
-  return mPatGen;
 }
 
 END_NAMESPACE_YM_CELLMAP_PATGEN

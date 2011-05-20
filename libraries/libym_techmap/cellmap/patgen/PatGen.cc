@@ -8,6 +8,8 @@
 
 
 #include "PatGen.h"
+#include "PgFunc.h"
+#include "PgFuncRep.h"
 #include "PgNode.h"
 #include "PgHandle.h"
 #include "ym_lexp/LogExpr.h"
@@ -135,6 +137,9 @@ PgNode::set_locked()
   }
 }
 
+
+BEGIN_NONAMESPACE
+
 // @relates PgNode
 // @brief 同形か調べる．
 // @param[in] node1, node2 根のノード
@@ -176,6 +181,34 @@ check_isomorphic(const PgNode* node1,
   }
   return true;
 }
+
+// 論理式の変数を map にしたがって変換する．
+LogExpr
+xform_expr(const LogExpr& expr,
+	   const NpnMap& map)
+{
+  ymuint ni = map.ni();
+  VarLogExprMap vlm;
+  for (ymuint i = 0; i < ni; ++ i) {
+    tNpnImap imap = map.imap(i);
+    ymuint j = npnimap_pos(imap);
+    LogExpr expr;
+    if ( npnimap_pol(imap) == kPolPosi) {
+      expr = LogExpr::make_posiliteral(j);
+    }
+    else {
+      expr = LogExpr::make_negaliteral(j);
+    }
+    vlm.insert(make_pair(i, expr));
+  }
+  LogExpr cexpr = expr.compose(vlm);
+  if ( map.opol() == kPolNega ) {
+    cexpr = ~cexpr;
+  }
+  return expr;
+}
+
+END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
@@ -240,28 +273,54 @@ PatGen::pat_root(ymuint id) const
   return mPatList[id];
 }
 
-// @brief パタングラフを生成する再帰関数
-// @param[in] expr 元になる論理式
-// @param[out] pat_list パタンのリスト
-// @note expr は定数を含んではいけない．
+// @brief 論理式から生成されるパタンを登録する．
+// @param[in] pgfunc この式に対応する関数情報
+// @param[in] expr パタンの元となる論理式
 void
-PatGen::operator()(const LogExpr& expr,
-		   vector<PgHandle>& pat_list)
+PatGen::reg_pat(PgFunc* pgfunc,
+		const LogExpr& expr)
 {
-  assert_cond( !expr.is_constant(), __FILE__, __LINE__);
-  pg_sub(expr, pat_list);
-}
+  PgFuncRep* pgrep = pgfunc->mRep;
 
-// @brief パタンを登録する．
-// @param[in] root 根のハンドル
-// @return パタン番号を返す．
-ymuint
-PatGen::reg_pat(PgHandle root)
-{
-  ymuint id = mPatList.size();
-  mPatList.push_back(root);
-  root.node()->set_locked();
-  return id;
+  // pgrep->rep_func() を用いる理由は論理式に現れる変数が
+  // 真のサポートとは限らないから
+  if ( pgrep->rep_func().ni() > 1 ) {
+    // expr を変換したパタンを登録する．
+    LogExpr cexpr = xform_expr(expr, pgfunc->mMap);
+
+    assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
+
+    vector<PgHandle> tmp_pat_list;
+    pg_sub(cexpr, tmp_pat_list);
+
+    vector<ymuint>& pat_list = pgrep->mPatList;
+
+    // 重複チェック
+    // 今は2乗オーダーのバカなアルゴリズムを使っている．
+    for (vector<PgHandle>::iterator p = tmp_pat_list.begin();
+	 p != tmp_pat_list.end(); ++ p) {
+      PgHandle pat1 = *p;
+      bool found = false;
+      for (vector<ymuint32>::iterator q = pat_list.begin();
+	   q != pat_list.end(); ++ q) {
+	ymuint pat_id2 = *q;
+	PgHandle pat2 = pat_root(pat_id2);
+	if ( pat1.inv() == pat2.inv() &&
+	     check_isomorphic(pat1.node(), pat2.node()) ) {
+	  found = true;
+	  break;
+	}
+      }
+      if ( !found ) {
+	// pat1 にパタン番号を割り当てる．
+	ymuint pat_id = mPatList.size();
+	mPatList.push_back(pat1);
+	pat1.node()->set_locked();
+	pat_list.push_back(pat_id);
+      }
+    }
+    sweep();
+  }
 }
 
 // @brief 使われていないパタンとノードを削除してID番号を詰める．

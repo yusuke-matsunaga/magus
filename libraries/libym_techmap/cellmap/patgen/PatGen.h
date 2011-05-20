@@ -16,6 +16,7 @@
 
 BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
+class PgFunc;
 class PgNode;
 class PgHandle;
 
@@ -44,24 +45,12 @@ public:
   void
   init();
 
-  /// @brief 論理式から対応するパタングラフを生成する．
-  /// @param[in] expr 元になる論理式
-  /// @param[out] pat_list パタン番号のリスト
-  /// @note expr は定数を含んではいけない．
+  /// @brief 論理式から生成されるパタンを登録する．
+  /// @param[in] pgfunc この式に対応する関数情報
+  /// @param[in] expr パタンの元となる論理式
   void
-  operator()(const LogExpr& expr,
-	     vector<PgHandle>& pat_list);
-
-  /// @brief パタンを登録する．
-  /// @param[in] root 根のハンドル
-  /// @return パタン番号を返す．
-  ymuint
-  reg_pat(PgHandle root);
-
-  /// @brief 使われていないパタンとノードを削除してID番号を詰める．
-  /// @note 同時に入力ノードの入力番号とノード番号を一致させる．
-  void
-  sweep();
+  reg_pat(PgFunc* pgfunc,
+	  const LogExpr& expr);
 
 
 public:
@@ -99,6 +88,11 @@ private:
   void
   pg_sub(const LogExpr& expr,
 	 vector<PgHandle>& pg_list);
+
+  /// @brief 使われていないパタンとノードを削除してID番号を詰める．
+  /// @note 同時に入力ノードの入力番号とノード番号を一致させる．
+  void
+  sweep();
 
   /// @brief 入力ノードを作る．
   /// @param[in] id 入力番号

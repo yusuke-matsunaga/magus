@@ -8,25 +8,9 @@
 
 
 #include "cellmap/CellMgr.h"
-#include "cellmap/patgen/PgFuncMgr.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellLibrary.h"
-
-
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
-
-// セルライブラリのパタンを生成してダンプする．
-void
-dump_patdata(ostream& s,
-	     const CellLibrary& library)
-{
-  PgFuncMgr pgf_mgr;
-  pgf_mgr.set_library(&library);
-
-  pg_dump(s, pgf_mgr);
-}
-
-END_NAMESPACE_YM_CELLMAP_PATGEN
+#include "cellmap/patgen/PgDumper.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -35,7 +19,7 @@ bool
 dump_load_test(const char* in_filename,
 	       const char* data_filename)
 {
-  using nsPatgen::dump_patdata;
+  using nsPatgen::PgDumper;
 
   CellMislibReader reader;
   const CellLibrary* library = reader.read(in_filename);
@@ -44,17 +28,23 @@ dump_load_test(const char* in_filename,
     return false;
   }
 
-  ofstream os;
-  os.open(data_filename, ios::binary);
-  if ( !os ) {
-    // エラー
-    cerr << "Could not create " << data_filename << endl;
-    return false;
+  {
+    ofstream os;
+    os.open(data_filename, ios::binary);
+    if ( !os ) {
+      // エラー
+      cerr << "Could not create " << data_filename << endl;
+      return false;
+    }
+
+    PgDumper pg_dumper;
+
+    nsYm::nsCell::dump_library(os, *library);
+    pg_dumper.gen_pat(*library);
+    pg_dumper.dump(os);
+
+    os.close();
   }
-
-  dump_patdata(os, *library);
-
-  os.close();
 
   CellMgr cell_mgr;
   {
