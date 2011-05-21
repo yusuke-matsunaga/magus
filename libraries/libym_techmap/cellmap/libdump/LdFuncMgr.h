@@ -35,7 +35,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
+  // このクラスのメインの関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
@@ -46,19 +46,21 @@ public:
   void
   init();
 
-  /// @brief 関数と対応するセル番号を登録する．
-  /// @param[in] tvfunc 論理関数関数
-  /// @param[in] cell_id セル番号
-  /// @return 関数情報のオブジェクトを返す．
-  LdFunc*
-  reg_func(const TvFunc& tvfunc,
-	   ymuint cell_id);
-
   /// @brief f に対応する LdFunc を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
   LdFunc*
   find_func(const TvFunc& f);
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  void
+  dump(ostream& s) const;
+
+  /// @brief 内容を出力する．(デバッグ用)
+  /// @param[in] s 出力先のストリーム
+  void
+  display(ostream& s) const;
 
 
 public:
@@ -96,6 +98,14 @@ private:
   /// @note f は NpnMgr によって正規化されている必要がある．
   LdFuncRep*
   find_repfunc(const TvFunc& f);
+
+  /// @brief 変換マップの内容をダンプする．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] map 変換マップ
+  static
+  void
+  dump_map(ostream& s,
+	   const NpnMap& map);
 
 
 private:

@@ -40,6 +40,10 @@ public:
   ymuint
   id() const;
 
+  /// @brief セル番号を追加する．
+  void
+  add_cell(ymuint cell_id);
+
   /// @brief 属しているセルの番号のリストを返す．
   const vector<ymuint>&
   cell_list() const;
@@ -95,6 +99,14 @@ ymuint
 LdFunc::id() const
 {
   return mId;
+}
+
+// @brief セル番号を追加する．
+inline
+void
+LdFunc::add_cell(ymuint cell_id)
+{
+  mCellList.push_back(cell_id);
 }
 
 // @brief 属しているセルの番号のリストを返す．

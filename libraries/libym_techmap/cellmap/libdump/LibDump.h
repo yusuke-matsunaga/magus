@@ -79,7 +79,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数情報を管理するオブジェクト
-  LdFuncMgr mPgfMgr;
+  LdFuncMgr mLdFuncMgr;
 
   // パタングラフを管理するオブジェクト
   LdPatMgr mLdPatMgr;

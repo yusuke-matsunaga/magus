@@ -11,6 +11,7 @@
 #include "LdFuncRep.h"
 #include "LdFunc.h"
 #include "ym_npn/NpnMgr.h"
+#include "ym_utils/BinIO.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
@@ -70,19 +71,6 @@ LdFuncMgr::init()
   }
 }
 
-// @brief 関数と対応するセル番号を登録する．
-// @param[in] tvfunc 論理関数関数
-// @param[in] cell_id セル番号
-// @return 関数情報のオブジェクトを返す．
-LdFunc*
-LdFuncMgr::reg_func(const TvFunc& tvfunc,
-		    ymuint cell_id)
-{
-  LdFunc* pgfunc = find_func(tvfunc);
-  pgfunc->mCellList.push_back(cell_id);
-  return pgfunc;
-}
-
 // @brief f に対応する LdFunc を求める．
 // @param[in] f 関数
 // @note なければ新規に作る．
@@ -138,6 +126,126 @@ LdFuncMgr::find_repfunc(const TvFunc& f)
     pgrep = p->second;
   }
   return pgrep;
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+LdFuncMgr::dump(ostream& s) const
+{
+  // 関数の情報をダンプする．
+  ymuint nf = func_num();
+  BinIO::write_32(s, nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    const LdFunc* func = this->func(i);
+    assert_cond( func->id() == i, __FILE__, __LINE__);
+    // 代表関数に対する変換マップをダンプする．
+    dump_map(s, func->map());
+    // 属しているセル番号をダンプする．
+    const vector<ymuint>& cell_list = func->cell_list();
+    ymuint nc = cell_list.size();
+    BinIO::write_32(s, nc);
+    for (ymuint i = 0; i < nc; ++ i) {
+      BinIO::write_32(s, cell_list[i]);
+    }
+  }
+
+  // 代表関数の情報をダンプする．
+  ymuint nr = rep_num();
+  BinIO::write_32(s, nr);
+  for (ymuint i = 0; i < nr; ++ i) {
+    const LdFuncRep* rep = this->rep(i);
+    assert_cond( rep->id() == i , __FILE__, __LINE__);
+    ymuint ne = rep->func_num();
+    BinIO::write_32(s, ne);
+    for (ymuint j = 0; j < ne; ++ j) {
+      BinIO::write_32(s, rep->func(j)->id());
+    }
+  }
+}
+
+// @brief 内容を出力する．(デバッグ用)
+// @param[in] s 出力先のストリーム
+void
+LdFuncMgr::display(ostream& s) const
+{
+  s << "*** LdFuncMgr BEGIN ***" << endl;
+  s << "*** FUNCTION SECTION ***" << endl;
+  for (ymuint i = 0; i < func_num(); ++ i) {
+    const LdFunc* func = this->func(i);
+    assert_cond( func->id() == i, __FILE__, __LINE__);
+    s << "FUNC#" << i << ": REP#" << func->rep()->id()
+      << ": " << func->map() << endl;
+    s << "  CELL#ID" << endl;
+    const vector<ymuint>& cell_list = func->cell_list();
+    for (vector<ymuint>::const_iterator p = cell_list.begin();
+	 p != cell_list.end(); ++ p) {
+      s << "    " << *p << endl;
+    }
+  }
+  s << endl;
+
+  s << "*** REPRESENTATIVE SECTION ***" << endl;
+  for (ymuint i = 0; i < rep_num(); ++ i) {
+    const LdFuncRep* rep = this->rep(i);
+    assert_cond( rep->id() == i , __FILE__, __LINE__);
+    s << "REP#" << i << ": ";
+    rep->rep_func().dump(s, 2);
+    s << endl;
+    s << "  equivalence = ";
+    for (ymuint j = 0; j < rep->func_num(); ++ j) {
+      s << " FUNC#" << rep->func(j)->id();
+    }
+    s << endl;
+  }
+  s << endl;
+  s << "*** LdFuncMgr END ***" << endl;
+}
+
+#if 0
+void
+dump_func(ostream& s,
+	  const TvFunc& f)
+{
+  ymuint ni = f.ni();
+  BinIO::write_32(s, ni);
+  ymuint nip = (1U << ni);
+  ymuint32 v = 0U;
+  ymuint base = 0;
+  for (ymuint p = 0; p < nip; ++ p) {
+    v |= (f.value(p) << (p - base));
+    if ( (p % 32) == 31 ) {
+      BinIO::write_32(s, v);
+      base += 32;
+      v = 0U;
+    }
+  }
+  if ( ni <= 4 ) {
+    BinIO::write_32(s, v);
+  }
+}
+#endif
+
+void
+LdFuncMgr::dump_map(ostream& s,
+		    const NpnMap& map)
+{
+  ymuint ni = map.ni();
+  ymuint32 v = (ni << 1);
+  if ( map.opol() == kPolNega ) {
+    v |= 1U;
+  }
+  BinIO::write_32(s, v);
+  for (ymuint i = 0; i < ni; ++ i) {
+    tNpnImap imap = map.imap(i);
+    // 手抜きでは imap を ymuint32 にキャストすればよい．
+    ymuint j = npnimap_pos(imap);
+    ymuint32 v = (j << 1);
+    if ( npnimap_pol(imap) ) {
+      v |= 1U;
+    }
+    BinIO::write_32(s, v);
+  }
 }
 
 END_NAMESPACE_YM_CELLMAP_LIBDUMP
