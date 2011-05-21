@@ -129,9 +129,9 @@ LdFuncMgr::find_repfunc(const TvFunc& f)
     // まだ登録されていない．
     pgrep = new LdFuncRep;
     pgrep->mId = mRepList.size();
+    pgrep->mFunc = f;
     mRepList.push_back(pgrep);
     mRepMap.insert(make_pair(f, pgrep));
-    pgrep->mFunc = f;
   }
   else {
     // 登録されていた．

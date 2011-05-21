@@ -24,7 +24,7 @@ class LdFuncRep;
 class LdFunc
 {
   friend class LdFuncMgr;
-  friend class LibDump;
+
 private:
 
   /// @brief コンストラクタ

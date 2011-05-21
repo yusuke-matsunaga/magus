@@ -239,13 +239,13 @@ void
 LibDump::reg_pat(LdFunc* pgfunc,
 		 const LogExpr& expr)
 {
-  LdFuncRep* pgrep = pgfunc->mRep;
+  const LdFuncRep* pgrep = pgfunc->rep();
 
   // pgrep->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
   if ( pgrep->rep_func().ni() > 1 ) {
     // expr を変換したパタンを登録する．
-    LogExpr cexpr = xform_expr(expr, pgfunc->mMap);
+    LogExpr cexpr = xform_expr(expr, pgfunc->map());
 
     assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
