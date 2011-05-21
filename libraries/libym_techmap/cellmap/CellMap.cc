@@ -10,7 +10,7 @@
 #include "ym_techmap/CellMap.h"
 #include "CellMgr.h"
 #include "AreaCover.h"
-#include "patgen/PgDumper.h"
+#include "libdump/LibDump.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -42,10 +42,10 @@ void
 CellMap::dump_library(ostream& s,
 		      const CellLibrary& library)
 {
-  using nsPatgen::PgDumper;
+  using nsLibDump::LibDump;
 
-  PgDumper pg_dumper;
-  pg_dumper.dump(s, library);
+  LibDump libdump;
+  libdump.dump(s, library);
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数

@@ -1,38 +1,37 @@
-#ifndef LIBYM_TECHMAP_PATGEN_PGFUNCREP_H
-#define LIBYM_TECHMAP_PATGEN_PGFUNCREP_H
+#ifndef LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNCREP_H
+#define LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNCREP_H
 
-/// @file libym_techmap/patgen/PgFuncRep.h
-/// @brief PgFuncRep のヘッダファイル
+/// @file libym_techmap/cellmap/libdump/LdFuncRep.h
+/// @brief LdFuncRep のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "patgen_nsdef.h"
-#include "ym_npn/npn_nsdef.h"
+#include "libdump_nsdef.h"
 #include "ym_npn/TvFunc.h"
 
 
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-class PgFunc;
+class LdFunc;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PgFuncRep PgFuncRep.h "PgFuncRep.h"
+/// @class LdFuncRep LdFuncRep.h "LdFuncRep.h"
 /// @brief NPN同値類の代表関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PgFuncRep
+class LdFuncRep
 {
-  friend class PgFuncMgr;
-  friend class PgDumper;
+  friend class LdFuncMgr;
+  friend class LibDump;
 private:
 
   /// @brief コンストラクタ
-  PgFuncRep();
+  LdFuncRep();
 
   /// @brief デストラクタ
-  ~PgFuncRep();
+  ~LdFuncRep();
 
 
 public:
@@ -51,17 +50,8 @@ public:
 
   /// @brief 関数を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < func_num() )
-  const PgFunc*
+  const LdFunc*
   func(ymuint pos) const;
-
-  /// @brief パタン数を返す．
-  ymuint
-  pat_num() const;
-
-  /// @brief パタン番号を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < pat_num() )
-  ymuint
-  pat_id(ymuint pos) const;
 
 
 private:
@@ -76,10 +66,7 @@ private:
   TvFunc mFunc;
 
   // 関数のリスト
-  vector<PgFunc*> mFuncList;
-
-  // パタン番号のリスト
-  vector<ymuint32> mPatList;
+  vector<LdFunc*> mFuncList;
 
 };
 
@@ -90,20 +77,20 @@ private:
 
 // @brief コンストラクタ
 inline
-PgFuncRep::PgFuncRep()
+LdFuncRep::LdFuncRep()
 {
 }
 
 // @brief デストラクタ
 inline
-PgFuncRep::~PgFuncRep()
+LdFuncRep::~LdFuncRep()
 {
 }
 
 // @brief ID番号を返す．
 inline
 ymuint
-PgFuncRep::id() const
+LdFuncRep::id() const
 {
   return mId;
 }
@@ -111,7 +98,7 @@ PgFuncRep::id() const
 // @brief 代表関数を返す．
 inline
 const TvFunc&
-PgFuncRep::rep_func() const
+LdFuncRep::rep_func() const
 {
   return mFunc;
 }
@@ -119,7 +106,7 @@ PgFuncRep::rep_func() const
 // @brief 自分の同値類に属する関数の数を返す．
 inline
 ymuint
-PgFuncRep::func_num() const
+LdFuncRep::func_num() const
 {
   return mFuncList.size();
 }
@@ -127,29 +114,12 @@ PgFuncRep::func_num() const
 // @brief 関数を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < func_num() )
 inline
-const PgFunc*
-PgFuncRep::func(ymuint pos) const
+const LdFunc*
+LdFuncRep::func(ymuint pos) const
 {
   return mFuncList[pos];
 }
 
-// @brief パタン数を返す．
-inline
-ymuint
-PgFuncRep::pat_num() const
-{
-  return mPatList.size();
-}
+END_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-// @brief パタン番号を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < pat_num() )
-inline
-ymuint
-PgFuncRep::pat_id(ymuint pos) const
-{
-  return mPatList[pos];
-}
-
-END_NAMESPACE_YM_CELLMAP_PATGEN
-
-#endif // LIBYM_TECHMAP_PATGEN_PGFUNCREP_H
+#endif // LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNCREP_H

@@ -1,36 +1,36 @@
-#ifndef LIBYM_TECHMAP_PATGEN_PGFUNCMGR_H
-#define LIBYM_TECHMAP_PATGEN_PGFUNCMGR_H
+#ifndef LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNCMGR_H
+#define LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNCMGR_H
 
-/// @file libym_techmap/patgen/PgFuncMgr.h
-/// @brief PgFuncMgr.h
+/// @file libym_techmap/cellmap/libdump/LdFuncMgr.h
+/// @brief LdFuncMgr.h
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "patgen_nsdef.h"
+#include "libdump_nsdef.h"
 #include "ym_npn/TvFunc.h"
 
 
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-class PgFunc;
-class PgFuncRep;
+class LdFunc;
+class LdFuncRep;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PgFuncMgr PgFuncMgr.h "PgFuncMgr.h"
+/// @class LdFuncMgr LdFuncMgr.h "LdFuncMgr.h"
 /// @brief セルライブラリを表すクラス
 //////////////////////////////////////////////////////////////////////
-class PgFuncMgr
+class LdFuncMgr
 {
 public:
 
   /// @brief コンストラクタ
-  PgFuncMgr();
+  LdFuncMgr();
 
   /// @brief デストラクタ
-  ~PgFuncMgr();
+  ~LdFuncMgr();
 
 
 public:
@@ -50,14 +50,14 @@ public:
   /// @param[in] tvfunc 論理関数関数
   /// @param[in] cell_id セル番号
   /// @return 関数情報のオブジェクトを返す．
-  PgFunc*
+  LdFunc*
   reg_func(const TvFunc& tvfunc,
 	   ymuint cell_id);
 
-  /// @brief f に対応する PgFunc を求める．
+  /// @brief f に対応する LdFunc を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
-  PgFunc*
+  LdFunc*
   find_func(const TvFunc& f);
 
 
@@ -72,7 +72,7 @@ public:
 
   /// @brief 論理関数情報のオブジェクトを返す．
   /// @param[in] id 関数番号 ( 0 <= id < func_num() )
-  const PgFunc*
+  const LdFunc*
   func(ymuint id) const;
 
   /// @brief 代表関数の数を返す．
@@ -81,7 +81,7 @@ public:
 
   /// @brief 代表関数を返す．
   /// @param[in] id 代表関数番号 ( 0 <= id < rep_num() )
-  const PgFuncRep*
+  const LdFuncRep*
   rep(ymuint id) const;
 
 
@@ -90,11 +90,11 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief f に対応する PgFuncRep を求める．
+  /// @brief f に対応する LdFuncRep を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
   /// @note f は NpnMgr によって正規化されている必要がある．
-  PgFuncRep*
+  LdFuncRep*
   find_repfunc(const TvFunc& f);
 
 
@@ -105,41 +105,19 @@ private:
 
   // 論理関数のリスト
   // この配列上の位置と関数番号は一致している．
-  vector<PgFunc*> mFuncList;
+  vector<LdFunc*> mFuncList;
 
   // 論理関数のハッシュ表
-  hash_map<TvFunc, PgFunc*> mFuncMap;
+  hash_map<TvFunc, LdFunc*> mFuncMap;
 
   // 代表関数のリスト
   // この配列上の位置と代表関数番号は一致している．
-  vector<PgFuncRep*> mRepList;
+  vector<LdFuncRep*> mRepList;
 
   // 代表関数のハッシュ表
-  hash_map<TvFunc, PgFuncRep*> mRepMap;
+  hash_map<TvFunc, LdFuncRep*> mRepMap;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// 関連する関数
-//////////////////////////////////////////////////////////////////////
-
-/// @relates PgFuncMgr
-/// @brief グラフ構造全体の内容を表示する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] pgf_mgr 対象のオブジェクト
-void
-pg_display(ostream& s,
-	   const PgFuncMgr& pgf_mgr);
-
-/// @relates PgFuncMgr
-/// @brief グラフ構造全体をダンプする．
-/// @param[in] s 出力先のストリーム
-/// @param[in] pgf_mgr 対象のオブジェクト
-/// @note ダンプされた情報はそのまま PatMgr で読み込むことができる．
-void
-pg_dump(ostream& s,
-	const PgFuncMgr& pat_gen);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -149,7 +127,7 @@ pg_dump(ostream& s,
 // @brief 論理関数の数を返す．
 inline
 ymuint
-PgFuncMgr::func_num() const
+LdFuncMgr::func_num() const
 {
   return mFuncList.size();
 }
@@ -157,8 +135,8 @@ PgFuncMgr::func_num() const
 // @brief 論理関数を返す．
 // @param[in] id 関数番号 ( 0 <= id < func_num() )
 inline
-const PgFunc*
-PgFuncMgr::func(ymuint id) const
+const LdFunc*
+LdFuncMgr::func(ymuint id) const
 {
   return mFuncList[id];
 }
@@ -166,7 +144,7 @@ PgFuncMgr::func(ymuint id) const
 // @brief 代表関数の数を返す．
 inline
 ymuint
-PgFuncMgr::rep_num() const
+LdFuncMgr::rep_num() const
 {
   return mRepList.size();
 }
@@ -174,12 +152,12 @@ PgFuncMgr::rep_num() const
 // @brief 代表関数を返す．
 // @param[in] id 代表関数番号 ( 0 <= id < rep_num() )
 inline
-const PgFuncRep*
-PgFuncMgr::rep(ymuint id) const
+const LdFuncRep*
+LdFuncMgr::rep(ymuint id) const
 {
   return mRepList[id];
 }
 
-END_NAMESPACE_YM_CELLMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-#endif // LIBYM_TECHMAP_PATGEN_PGFUNCMGR_H
+#endif // LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNCMGR_H

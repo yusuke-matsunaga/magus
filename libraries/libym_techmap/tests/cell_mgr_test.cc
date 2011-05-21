@@ -10,7 +10,7 @@
 #include "cellmap/CellMgr.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellLibrary.h"
-#include "cellmap/patgen/PgDumper.h"
+#include "cellmap/libdump/LibDump.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -19,7 +19,7 @@ bool
 dump_load_test(const char* in_filename,
 	       const char* data_filename)
 {
-  using nsPatgen::PgDumper;
+  using nsLibDump::LibDump;
 
   CellMislibReader reader;
   const CellLibrary* library = reader.read(in_filename);
@@ -37,8 +37,8 @@ dump_load_test(const char* in_filename,
       return false;
     }
 
-    PgDumper pg_dumper;
-    pg_dumper.dump(os, *library);
+    LibDump libdump;
+    libdump.dump(os, *library);
 
     os.close();
   }

@@ -1,35 +1,35 @@
-#ifndef LIBYM_TECHMAP_PATGEN_PGDUMPER_H
-#define LIBYM_TECHMAP_PATGEN_PGDUMPER_H
+#ifndef LIBYM_TECHMAP_CELLMAP_LIBDUMP_PGDUMPER_H
+#define LIBYM_TECHMAP_CELLMAP_LIBDUMP_PGDUMPER_H
 
-/// @file libym_techmap/patgen/PgDumper.h
-/// @brief PgDumper のヘッダファイル
+/// @file libym_techmap/libdump/LibDump.h
+/// @brief LibDump のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "patgen_nsdef.h"
-#include "PgFuncMgr.h"
-#include "PatGen.h"
+#include "libdump_nsdef.h"
+#include "LdFuncMgr.h"
+#include "LdPatMgr.h"
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
 //////////////////////////////////////////////////////////////////////
-/// @class PgDumper PgDumper.h "PgDumper.h"
+/// @class LibDump LibDump.h "LibDump.h"
 /// @brief パタングラフの情報をダンプするためのクラス
 //////////////////////////////////////////////////////////////////////
-class PgDumper
+class LibDump
 {
 public:
 
   /// @brief コンストラクタ
-  PgDumper();
+  LibDump();
 
   /// @brief デストラクタ
-  ~PgDumper();
+  ~LibDump();
 
 
 public:
@@ -41,7 +41,7 @@ public:
   display(ostream& s,
 	  const CellLibrary& library);
 
-  /// @relates PgFuncMgr
+  /// @relates LdFuncMgr
   /// @brief グラフ構造全体をダンプする．
   /// @param[in] s 出力先のストリーム
   /// @param[in] library 対象のセルライブラリ
@@ -69,7 +69,7 @@ private:
   /// @param[in] pgfunc この式に対応する関数情報
   /// @param[in] expr パタンの元となる論理式
   void
-  reg_pat(PgFunc* pgfunc,
+  reg_pat(LdFunc* pgfunc,
 	  const LogExpr& expr);
 
 
@@ -79,13 +79,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数情報を管理するオブジェクト
-  PgFuncMgr mPgfMgr;
+  LdFuncMgr mPgfMgr;
 
   // パタングラフを管理するオブジェクト
-  PatGen mPatGen;
+  LdPatMgr mLdPatMgr;
 
 };
 
-END_NAMESPACE_YM_CELLMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-#endif // LIBYM_TECHMAP_PATGEN_PGDUMPER_H
+#endif // LIBYM_TECHMAP_CELLMAP_LIBDUMP_PGDUMPER_H

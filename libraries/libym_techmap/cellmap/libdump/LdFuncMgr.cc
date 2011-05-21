@@ -1,31 +1,31 @@
 
-/// @file libym_techmap/patgen/PgFuncMgr.cc
-/// @brief PgFuncMgr の実装ファイル
+/// @file libym_techmap/cellmap/libdump/LdFuncMgr.cc
+/// @brief LdFuncMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "PgFuncMgr.h"
-#include "PgFuncRep.h"
-#include "PgFunc.h"
+#include "LdFuncMgr.h"
+#include "LdFuncRep.h"
+#include "LdFunc.h"
 #include "ym_npn/NpnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
 //////////////////////////////////////////////////////////////////////
-// クラス PgFuncMgr
+// クラス LdFuncMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PgFuncMgr::PgFuncMgr()
+LdFuncMgr::LdFuncMgr()
 {
 }
 
 // @brief デストラクタ
-PgFuncMgr::~PgFuncMgr()
+LdFuncMgr::~LdFuncMgr()
 {
   init();
 }
@@ -33,15 +33,15 @@ PgFuncMgr::~PgFuncMgr()
 // @brief 初期化する．
 // 定数関数，リテラル関数を登録しておく
 // 常に定数0，定数1，肯定リテラル，否定リテラルの関数番号が
-// 0, 1, 2, 3, 4 になるようにする．
+// 0, 1, 2, 3 になるようにする．
 void
-PgFuncMgr::init()
+LdFuncMgr::init()
 {
-  for (vector<PgFunc*>::iterator p = mFuncList.begin();
+  for (vector<LdFunc*>::iterator p = mFuncList.begin();
        p != mFuncList.end(); ++ p) {
     delete *p;
   }
-  for (vector<PgFuncRep*>::iterator p = mRepList.begin();
+  for (vector<LdFuncRep*>::iterator p = mRepList.begin();
        p != mRepList.end(); ++ p) {
     delete *p;
   }
@@ -53,19 +53,19 @@ PgFuncMgr::init()
   // 既定関数の登録
   {
     TvFunc const0 = TvFunc::const_zero(0);
-    PgFunc* func0 = find_func(const0);
+    LdFunc* func0 = find_func(const0);
     assert_cond( func0->id() == 0, __FILE__, __LINE__);
 
     TvFunc const1 = TvFunc::const_one(0);
-    PgFunc* func1 = find_func(const1);
+    LdFunc* func1 = find_func(const1);
     assert_cond( func1->id() == 1, __FILE__, __LINE__);
 
     TvFunc plit = TvFunc::posi_literal(1, 0);
-    PgFunc* func2 = find_func(plit);
+    LdFunc* func2 = find_func(plit);
     assert_cond( func2->id() == 2, __FILE__, __LINE__);
 
     TvFunc nlit = TvFunc::nega_literal(1, 0);
-    PgFunc* func3 = find_func(nlit);
+    LdFunc* func3 = find_func(nlit);
     assert_cond( func3->id() == 3, __FILE__, __LINE__);
   }
 }
@@ -74,26 +74,26 @@ PgFuncMgr::init()
 // @param[in] tvfunc 論理関数関数
 // @param[in] cell_id セル番号
 // @return 関数情報のオブジェクトを返す．
-PgFunc*
-PgFuncMgr::reg_func(const TvFunc& tvfunc,
+LdFunc*
+LdFuncMgr::reg_func(const TvFunc& tvfunc,
 		    ymuint cell_id)
 {
-  PgFunc* pgfunc = find_func(tvfunc);
+  LdFunc* pgfunc = find_func(tvfunc);
   pgfunc->mCellList.push_back(cell_id);
   return pgfunc;
 }
 
-// @brief f に対応する PgFunc を求める．
+// @brief f に対応する LdFunc を求める．
 // @param[in] f 関数
 // @note なければ新規に作る．
-PgFunc*
-PgFuncMgr::find_func(const TvFunc& f)
+LdFunc*
+LdFuncMgr::find_func(const TvFunc& f)
 {
-  PgFunc* pgfunc = NULL;
-  hash_map<TvFunc, PgFunc*>::iterator p = mFuncMap.find(f);
+  LdFunc* pgfunc = NULL;
+  hash_map<TvFunc, LdFunc*>::iterator p = mFuncMap.find(f);
   if ( p == mFuncMap.end() ) {
     // なかったので新たに作る．
-    pgfunc = new PgFunc;
+    pgfunc = new LdFunc;
     pgfunc->mId = mFuncList.size();
     mFuncList.push_back(pgfunc);
     mFuncMap.insert(make_pair(f, pgfunc));
@@ -103,7 +103,7 @@ PgFuncMgr::find_func(const TvFunc& f)
     npnmgr.cannonical(f, pgfunc->mMap);
 
     TvFunc repfunc = f.xform(pgfunc->mMap);
-    PgFuncRep* pgrep = find_repfunc(repfunc);
+    LdFuncRep* pgrep = find_repfunc(repfunc);
 
     // 関数を追加する．
     pgrep->mFuncList.push_back(pgfunc);
@@ -116,18 +116,18 @@ PgFuncMgr::find_func(const TvFunc& f)
   return pgfunc;
 }
 
-// @brief f に対応する PgFuncRep を求める．
+// @brief f に対応する LdFuncRep を求める．
 // @param[in] f 関数
 // @note なければ新規に作る．
 // @note f は NpnMgr によって正規化されている必要がある．
-PgFuncRep*
-PgFuncMgr::find_repfunc(const TvFunc& f)
+LdFuncRep*
+LdFuncMgr::find_repfunc(const TvFunc& f)
 {
-  PgFuncRep* pgrep = NULL;
-  hash_map<TvFunc, PgFuncRep*>::iterator p = mRepMap.find(f);
+  LdFuncRep* pgrep = NULL;
+  hash_map<TvFunc, LdFuncRep*>::iterator p = mRepMap.find(f);
   if ( p == mRepMap.end() ) {
     // まだ登録されていない．
-    pgrep = new PgFuncRep;
+    pgrep = new LdFuncRep;
     pgrep->mId = mRepList.size();
     mRepList.push_back(pgrep);
     mRepMap.insert(make_pair(f, pgrep));
@@ -140,4 +140,4 @@ PgFuncMgr::find_repfunc(const TvFunc& f)
   return pgrep;
 }
 
-END_NAMESPACE_YM_CELLMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_LIBDUMP

@@ -1,38 +1,37 @@
-#ifndef LIBYM_TECHMAP_PATGEN_PGFUNC_H
-#define LIBYM_TECHMAP_PATGEN_PGFUNC_H
+#ifndef LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNC_H
+#define LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNC_H
 
-/// @file libym_techmap/patgen/PgFunc.h
-/// @brief PgFunc のヘッダファイル
+/// @file libym_techmap/cellmap/libdump/LdFunc.h
+/// @brief LdFunc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "patgen_nsdef.h"
-#include "ym_npn/npn_nsdef.h"
+#include "libdump_nsdef.h"
 #include "ym_npn/NpnMap.h"
 
 
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-class PgFuncRep;
+class LdFuncRep;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PgFunc PgFunc.h "PgFunc.h"
+/// @class LdFunc LdFunc.h "LdFunc.h"
 /// @brief 論理関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PgFunc
+class LdFunc
 {
-  friend class PgFuncMgr;
-  friend class PgDumper;
+  friend class LdFuncMgr;
+  friend class LibDump;
 private:
 
   /// @brief コンストラクタ
-  PgFunc();
+  LdFunc();
 
   /// @brief デストラクタ
-  ~PgFunc();
+  ~LdFunc();
 
 
 public:
@@ -46,7 +45,7 @@ public:
   cell_list() const;
 
   /// @brief 親の代表関数を返す．
-  const PgFuncRep*
+  const LdFuncRep*
   rep() const;
 
   /// @brief 親に対する変換マップを返す．
@@ -66,7 +65,7 @@ private:
   vector<ymuint> mCellList;
 
   // 親の代表関数
-  PgFuncRep* mRep;
+  LdFuncRep* mRep;
 
   // 代表関数から自分自身へ変換するマップ
   NpnMap mMap;
@@ -80,20 +79,20 @@ private:
 
 // @brief コンストラクタ
 inline
-PgFunc::PgFunc()
+LdFunc::LdFunc()
 {
 }
 
 // @brief デストラクタ
 inline
-PgFunc::~PgFunc()
+LdFunc::~LdFunc()
 {
 }
 
 // @brief ID番号を返す．
 inline
 ymuint
-PgFunc::id() const
+LdFunc::id() const
 {
   return mId;
 }
@@ -101,15 +100,15 @@ PgFunc::id() const
 // @brief 属しているセルの番号のリストを返す．
 inline
 const vector<ymuint>&
-PgFunc::cell_list() const
+LdFunc::cell_list() const
 {
   return mCellList;
 }
 
 // @brief 親の代表関数を返す．
 inline
-const PgFuncRep*
-PgFunc::rep() const
+const LdFuncRep*
+LdFunc::rep() const
 {
   return mRep;
 }
@@ -117,11 +116,11 @@ PgFunc::rep() const
 // @brief 親に対する変換マップを返す．
 inline
 const NpnMap&
-PgFunc::map() const
+LdFunc::map() const
 {
   return mMap;
 }
 
-END_NAMESPACE_YM_CELLMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-#endif // LIBYM_TECHMAP_PATGEN_PGFUNC_H
+#endif // LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDFUNC_H

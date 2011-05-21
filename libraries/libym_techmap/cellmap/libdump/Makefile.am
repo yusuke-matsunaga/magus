@@ -6,25 +6,29 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_techmap_patgen.la
+noinst_LTLIBRARIES = libym_techmap_libdump.la
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-libym_techmap_patgen_la_SOURCES = \
-	patgen_nsdef.h \
-	PatGen.h \
-	PatGen.cc \
-	PgDumper.h \
-	PgDumper.cc \
-	PgFuncMgr.h \
-	PgFuncMgr.cc \
-	PgNode.h
+libym_techmap_libdump_la_SOURCES = \
+	libdump_nsdef.h \
+	LdFunc.h \
+	LdFuncMgr.h \
+	LdFuncMgr.cc \
+	LdFuncRep.h \
+	LdPatHandler.h \
+	LdPatMgr.h \
+	LdPatMgr.cc \
+	LdPatNode.h \
+	LdPatNode.cc \
+	LibDump.h \
+	LibDump.cc
 
-libym_techmap_patgen_la_LIBADD = \
+libym_techmap_libdump_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_techmap_patgen_la_LDFLAGS =
+libym_techmap_libdump_la_LDFLAGS =

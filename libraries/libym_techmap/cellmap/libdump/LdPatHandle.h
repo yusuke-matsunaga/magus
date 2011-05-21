@@ -1,26 +1,26 @@
-#ifndef LIBYM_TECHMAP_PATGEN_PGHANDLE_H
-#define LIBYM_TECHMAP_PATGEN_PGHANDLE_H
+#ifndef LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDPATHANDLE_H
+#define LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDPATHANDLE_H
 
-/// @file libym_techmap/patgen/PgHandle.h
-/// @brief PgHandle のヘッダファイル
+/// @file libym_techmap/cellmap/libdump/LdPatHandle.h
+/// @brief LdPatHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "patgen_nsdef.h"
+#include "libdump_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-class PgNode;
+class LdPatNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class PgHandle PgHandle.h "PgHandle.h"
-/// @brief PgNode と極性を表すクラス
+/// @class LdPatHandle LdPatHandle.h "LdPatHandle.h"
+/// @brief LdPatNode と極性を表すクラス
 //////////////////////////////////////////////////////////////////////
-class PgHandle
+class LdPatHandle
 {
 public:
 
@@ -28,17 +28,17 @@ public:
   /// @param[in] node ノード
   /// @param[in] inv 反転属性
   explicit
-  PgHandle(PgNode* node = NULL,
-	   bool inv = false);
+  LdPatHandle(LdPatNode* node = NULL,
+	      bool inv = false);
 
   /// @brief デストラクタ
-  ~PgHandle();
+  ~LdPatHandle();
 
 
 public:
 
   /// @brief ノードを取り出す．
-  PgNode*
+  LdPatNode*
   node() const;
 
   /// @brief 反転属性を取り出す．
@@ -49,7 +49,7 @@ public:
   /// @param[in] node ノード
   /// @param[in] inv 反転属性
   void
-  set(PgNode* node,
+  set(LdPatNode* node,
       bool inv);
 
 
@@ -72,30 +72,30 @@ private:
 // @param[in] node ノード
 // @param[in] inv 反転属性
 inline
-PgHandle::PgHandle(PgNode* node,
-		   bool inv)
+LdPatHandle::LdPatHandle(LdPatNode* node,
+			 bool inv)
 {
   set(node, inv);
 }
 
 // @brief デストラクタ
 inline
-PgHandle::~PgHandle()
+LdPatHandle::~LdPatHandle()
 {
 }
 
 // @brief ノードを取り出す．
 inline
-PgNode*
-PgHandle::node() const
+LdPatNode*
+LdPatHandle::node() const
 {
-  return reinterpret_cast<PgNode*>(mData & ~1UL);
+  return reinterpret_cast<LdPatNode*>(mData & ~1UL);
 }
 
 // @brief 反転属性を取り出す．
 inline
 bool
-PgHandle::inv() const
+LdPatHandle::inv() const
 {
   return static_cast<bool>(mData & 1UL);
 }
@@ -105,13 +105,13 @@ PgHandle::inv() const
 // @param[in] inv 反転属性
 inline
 void
-PgHandle::set(PgNode* node,
-	      bool inv)
+LdPatHandle::set(LdPatNode* node,
+		 bool inv)
 {
   // bool に対する & 1UL は不必要だが念のため．
   mData = reinterpret_cast<ympuint>(node) | (static_cast<ympuint>(inv) & 1UL);
 }
 
-END_NAMESPACE_YM_CELLMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-#endif // LIBYM_TECHMAP_PATGEN_PGHANDLE_H
+#endif // LIBYM_TECHMAP_CELLMAP_LIBDUMP_LDPATHANDLE_H

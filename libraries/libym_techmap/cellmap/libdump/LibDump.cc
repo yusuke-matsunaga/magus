@@ -1,18 +1,17 @@
 
-/// @file libym_techmap/patgen/PgDumper.cc
-/// @brief PgDumper の実装ファイル
+/// @file libym_techmap/cellmap/libdump/LibDump.cc
+/// @brief LibDump の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "PgDumper.h"
-#include "PgFuncRep.h"
-#include "PgFunc.h"
-#include "PgNode.h"
-#include "PgHandle.h"
-#include "../PatMgr.h"
+#include "LibDump.h"
+#include "LdFuncRep.h"
+#include "LdFunc.h"
+#include "LdPatNode.h"
+#include "LdPatHandle.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
@@ -21,7 +20,7 @@
 #include "ym_utils/BinIO.h"
 
 
-BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
 BEGIN_NONAMESPACE
 
@@ -110,7 +109,7 @@ xform_expr(const LogExpr& expr,
 
 void
 display_edge(ostream& s,
-	     PgNode* node,
+	     LdPatNode* node,
 	     ymuint fanin_pos)
 {
   if ( node->fanin_inv(fanin_pos) ) {
@@ -163,67 +162,30 @@ dump_map(ostream& s,
   }
 }
 
-void
-dump_edge(ostream& s,
-	  PgNode* node,
-	  ymuint fanin_pos)
-{
-  ymuint v = 0U;
-  if ( !node->is_input() ) {
-    v = node->fanin(fanin_pos)->id() * 2;
-    if ( node->fanin_inv(fanin_pos) ) {
-      v |= 1U;
-    }
-  }
-  BinIO::write_32(s, v);
-}
-
-void
-dump_dfs(PgNode* node,
-	 vector<bool>& vmark,
-	 vector<ymuint>& val_list,
-	 ymuint& max_input)
-{
-  if ( node->is_input() ) {
-    if ( max_input < node->input_id() ) {
-      max_input = node->input_id();
-    }
-    return;
-  }
-  if ( vmark[node->id()] ) {
-    return;
-  }
-  vmark[node->id()] = true;
-  val_list.push_back(node->id() * 2);
-  dump_dfs(node->fanin(0), vmark, val_list, max_input);
-  val_list.push_back(node->id() * 2 + 1);
-  dump_dfs(node->fanin(1), vmark, val_list, max_input);
-}
-
 END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス PgDumper
+// クラス LibDump
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PgDumper::PgDumper()
+LibDump::LibDump()
 {
 }
 
 // @brief デストラクタ
-PgDumper::~PgDumper()
+LibDump::~LibDump()
 {
 }
 
 // @brief ライブラリの情報からパタンを生成する．
 // @param[in] library 対象のセルライブラリ
 void
-PgDumper::gen_pat(const CellLibrary& library)
+LibDump::gen_pat(const CellLibrary& library)
 {
   mPgfMgr.init();
-  mPatGen.init();
+  mLdPatMgr.init();
 
   // XOR のパタンを登録しておく．
   // これはちょっとしたハック
@@ -263,7 +225,7 @@ PgDumper::gen_pat(const CellLibrary& library)
 
     LogExpr expr = opin->function();
     TvFunc tv = expr2tvfunc(expr);
-    PgFunc* pgfunc = mPgfMgr.reg_func(tv, cell->id());
+    LdFunc* pgfunc = mPgfMgr.reg_func(tv, cell->id());
 
     reg_pat(pgfunc, expr);
   }
@@ -271,11 +233,11 @@ PgDumper::gen_pat(const CellLibrary& library)
 
 // @brief expr から生成されるパタンを登録する．
 void
-PgDumper::reg_expr(const LogExpr& expr)
+LibDump::reg_expr(const LogExpr& expr)
 {
-  // expr に対応する PgFunc を求める．
+  // expr に対応する LdFunc を求める．
   TvFunc f = expr2tvfunc(expr);
-  PgFunc* pgfunc = mPgfMgr.find_func(f);
+  LdFunc* pgfunc = mPgfMgr.find_func(f);
 
   // expr から生成されるパタンを pgfunc に登録する．
   reg_pat(pgfunc, expr);
@@ -285,10 +247,10 @@ PgDumper::reg_expr(const LogExpr& expr)
 // @param[in] pgfunc この式に対応する関数情報
 // @param[in] expr パタンの元となる論理式
 void
-PgDumper::reg_pat(PgFunc* pgfunc,
-		  const LogExpr& expr)
+LibDump::reg_pat(LdFunc* pgfunc,
+		 const LogExpr& expr)
 {
-  PgFuncRep* pgrep = pgfunc->mRep;
+  LdFuncRep* pgrep = pgfunc->mRep;
 
   // pgrep->rep_func() を用いる理由は論理式に現れる変数が
   // 真のサポートとは限らないから
@@ -298,7 +260,7 @@ PgDumper::reg_pat(PgFunc* pgfunc,
 
     assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
-    mPatGen.reg_pat(cexpr, pgrep->mPatList);
+    mLdPatMgr.reg_pat(cexpr, pgrep->id());
   }
 }
 
@@ -306,14 +268,14 @@ PgDumper::reg_pat(PgFunc* pgfunc,
 // @param[in] s 出力先のストリーム
 // @param[in] library 対象のセルライブラリ
 void
-PgDumper::display(ostream& s,
-		  const CellLibrary& library)
+LibDump::display(ostream& s,
+		 const CellLibrary& library)
 {
   gen_pat(library);
 
   s << "*** FUNCTION SECTION ***" << endl;
   for (ymuint i = 0; i < mPgfMgr.func_num(); ++ i) {
-    const PgFunc* func = mPgfMgr.func(i);
+    const LdFunc* func = mPgfMgr.func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
     s << "FUNC#" << i << ": REP#" << func->rep()->id()
       << ": " << func->map() << endl;
@@ -328,7 +290,7 @@ PgDumper::display(ostream& s,
 
   s << "*** REPRESENTATIVE SECTION ***" << endl;
   for (ymuint i = 0; i < mPgfMgr.rep_num(); ++ i) {
-    const PgFuncRep* rep = mPgfMgr.rep(i);
+    const LdFuncRep* rep = mPgfMgr.rep(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
     s << "REP#" << i << ": ";
     rep->rep_func().dump(s, 2);
@@ -338,18 +300,20 @@ PgDumper::display(ostream& s,
       s << " FUNC#" << rep->func(j)->id();
     }
     s << endl;
+#if 0
     s << "  patterns = ";
     for (ymuint j = 0; j < rep->pat_num(); ++ j) {
       s << " PAT#" << rep->pat_id(j);
     }
     s << endl;
+#endif
   }
   s << endl;
 
   s << "*** NODE SECTION ***" << endl;
-  ymuint n = mPatGen.node_num();
+  ymuint n = mLdPatMgr.node_num();
   for (ymuint i = 0; i < n; ++ i) {
-    PgNode* node = mPatGen.node(i);
+    LdPatNode* node = mLdPatMgr.node(i);
     if ( node->is_locked() ) {
       s << "*";
     }
@@ -381,14 +345,16 @@ PgDumper::display(ostream& s,
   s << endl;
 
   s << "*** PATTERN SECTION ***" << endl;
-  ymuint np = mPatGen.pat_num();
+  ymuint np = mLdPatMgr.pat_num();
   for (ymuint i = 0; i < np; ++ i) {
-    PgHandle root = mPatGen.pat_root(i);
+    LdPatHandle root = mLdPatMgr.pat_root(i);
     s << "Pat#" << i << ": ";
     if ( root.inv() ) {
       s << "~";
     }
-    s << "Node#" << root.node()->id() << endl;
+    s << "Node#" << root.node()->id()
+      << " --> Rep#" << mLdPatMgr.rep_id(i)
+      << endl;
   }
   s << "*** END ***" << endl;
 }
@@ -398,8 +364,8 @@ PgDumper::display(ostream& s,
 // @param[in] library 対象のセルライブラリ
 // @note ダンプされた情報はそのまま PatGraph で読み込むことができる．
 void
-PgDumper::dump(ostream& s,
-	       const CellLibrary& library)
+LibDump::dump(ostream& s,
+	      const CellLibrary& library)
 {
   gen_pat(library);
 
@@ -410,7 +376,7 @@ PgDumper::dump(ostream& s,
   ymuint nf = mPgfMgr.func_num();
   BinIO::write_32(s, nf);
   for (ymuint i = 0; i < nf; ++ i) {
-    const PgFunc* func = mPgfMgr.func(i);
+    const LdFunc* func = mPgfMgr.func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
     // 代表関数に対する変換マップをダンプする．
     dump_map(s, func->map());
@@ -423,74 +389,21 @@ PgDumper::dump(ostream& s,
     }
   }
 
-  ymuint np = mPatGen.pat_num();
-
   // 代表関数の情報をダンプする．
   ymuint nr = mPgfMgr.rep_num();
   BinIO::write_32(s, nr);
-  // パタン番号をキーにして代表関数番号を記憶する配列
-  vector<ymint> rep_array(np);
   for (ymuint i = 0; i < nr; ++ i) {
-    const PgFuncRep* rep = mPgfMgr.rep(i);
+    const LdFuncRep* rep = mPgfMgr.rep(i);
     assert_cond( rep->id() == i , __FILE__, __LINE__);
     ymuint ne = rep->func_num();
     BinIO::write_32(s, ne);
     for (ymuint j = 0; j < ne; ++ j) {
       BinIO::write_32(s, rep->func(j)->id());
     }
-    ymuint m = rep->pat_num();
-    for (ymuint j = 0; j < m; ++ j) {
-      ymuint pat_id = rep->pat_id(j);
-      rep_array[pat_id] = i;
-    }
   }
 
-
-  // パタンノードの情報をダンプする．
-  ymuint nn = mPatGen.node_num();
-  BinIO::write_32(s, nn);
-  for (ymuint i = 0; i < nn; ++ i) {
-    PgNode* node = mPatGen.node(i);
-    ymuint v = 0U;
-    if ( node->is_input() ) {
-      v = PatMgr::kInput | (node->input_id() << 2);
-    }
-    else if ( node->is_and() ) {
-      v = PatMgr::kAnd;
-    }
-    else if ( node->is_xor() ) {
-      v = PatMgr::kXor;
-    }
-    BinIO::write_32(s, v);
-    dump_edge(s, node, 0);
-    dump_edge(s, node, 1);
-  }
-
-  vector<bool> vmark(nn);
-  vector<ymuint> val_list;
-  val_list.reserve(nn * 2);
-
-  // パタンの情報をダンプする．
-  BinIO::write_32(s, np);
-  for (ymuint i = 0; i < np; ++ i) {
-    PgHandle root = mPatGen.pat_root(i);
-    vmark.clear();
-    vmark.resize(nn, false);
-    val_list.clear();
-    ymuint max_input = 0;
-    dump_dfs(root.node(), vmark, val_list, max_input);
-    ymuint v = (max_input + 1) << 1;
-    if ( root.inv() ) {
-      v |= 1U;
-    }
-    BinIO::write_32(s, v);
-    ymuint ne = val_list.size();
-    BinIO::write_32(s, ne);
-    for (ymuint j = 0; j < ne; ++ j) {
-      BinIO::write_32(s, val_list[j]);
-    }
-    BinIO::write_32(s, rep_array[i]);
-  }
+  // パタングラフの情報をダンプする．
+  mLdPatMgr.dump(s);
 }
 
-END_NAMESPACE_YM_CELLMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_LIBDUMP

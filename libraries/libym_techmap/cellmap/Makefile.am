@@ -3,7 +3,7 @@
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
 SUBDIRS = \
-	patgen \
+	libdump \
 	.
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -36,7 +36,7 @@ libym_techmap_cell_la_SOURCES = \
 	RepFunc.h
 
 libym_techmap_cell_la_LIBADD = \
-	patgen/libym_techmap_patgen.la \
+	libdump/libym_techmap_libdump.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
