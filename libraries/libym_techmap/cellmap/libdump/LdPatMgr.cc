@@ -579,6 +579,11 @@ LdPatMgr::hash_func(ymuint type,
   return type + l * 5 + r;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// dump() 奸計の関数
+//////////////////////////////////////////////////////////////////////
+
 // @brief 内容をバイナリダンプする．
 // @param[in] s 出力先のストリーム
 void
@@ -675,6 +680,82 @@ LdPatMgr::dump_dfs(LdPatNode* node,
     id = id1;
   }
   return id;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// display() 関係の関数
+//////////////////////////////////////////////////////////////////////
+
+// @brief 内容を出力する．(デバッグ用)
+// @param[in] s 出力先のストリーム
+void
+LdPatMgr::display(ostream& s) const
+{
+  s << "*** LdPatMgr BEGIN ***" << endl;
+
+  s << "*** NODE SECTION ***" << endl;
+  ymuint n = node_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    LdPatNode* node = this->node(i);
+    if ( node->is_locked() ) {
+      s << "*";
+    }
+    else {
+      s << " ";
+    }
+    s << "Node#" << node->id() << ": ";
+    if ( node->is_input() ) {
+      s << "Input#" << node->input_id();
+    }
+    else {
+      if ( node->is_and() ) {
+	s << "And";
+      }
+      else if ( node->is_xor() ) {
+	s << "Xor";
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+      s << "( ";
+      display_edge(s, node, 0);
+      s << ", ";
+      display_edge(s, node, 1);
+      s << ")";
+    }
+    s << endl;
+  }
+  s << endl;
+
+  s << "*** PATTERN SECTION ***" << endl;
+  ymuint np = pat_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    LdPatHandle root = pat_root(i);
+    s << "Pat#" << i << ": ";
+    if ( root.inv() ) {
+      s << "~";
+    }
+    s << "Node#" << root.node()->id()
+      << " --> Rep#" << rep_id(i)
+      << endl;
+  }
+  s << "*** LdPatMgr END ***" << endl;
+}
+
+// @brief 枝の情報を出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] node 親のノード
+// @param[in] fanin_pos ファンイン番号
+void
+LdPatMgr::display_edge(ostream& s,
+		       LdPatNode* node,
+		       ymuint fanin_pos)
+{
+  if ( node->fanin_inv(fanin_pos) ) {
+    s << "~";
+  }
+  s << "Node#" << node->fanin(fanin_pos)->id();
 }
 
 END_NAMESPACE_YM_CELLMAP_LIBDUMP

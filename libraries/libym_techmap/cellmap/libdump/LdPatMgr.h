@@ -57,8 +57,13 @@ public:
   void
   dump(ostream& s) const;
 
+  /// @brief 内容を出力する．(デバッグ用)
+  /// @param[in] s 出力先のストリーム
+  void
+  display(ostream& s) const;
 
-public:
+
+private:
   //////////////////////////////////////////////////////////////////////
   // 内容情報を取得する関数
   //////////////////////////////////////////////////////////////////////
@@ -189,6 +194,22 @@ private:
   dump_dfs(LdPatNode* node,
 	   vector<bool>& vmark,
 	   vector<ymuint>& val_list);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // display() 用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 枝の情報を出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] node 親のノード
+  /// @param[in] fanin_pos ファンイン番号
+  static
+  void
+  display_edge(ostream& s,
+	       LdPatNode* node,
+	       ymuint fanin_pos);
 
 
 private:

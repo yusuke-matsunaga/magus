@@ -108,17 +108,6 @@ xform_expr(const LogExpr& expr,
 }
 
 void
-display_edge(ostream& s,
-	     LdPatNode* node,
-	     ymuint fanin_pos)
-{
-  if ( node->fanin_inv(fanin_pos) ) {
-    s << "~";
-  }
-  s << "Node#" << node->fanin(fanin_pos)->id();
-}
-
-void
 dump_func(ostream& s,
 	  const TvFunc& f)
 {
@@ -300,63 +289,11 @@ LibDump::display(ostream& s,
       s << " FUNC#" << rep->func(j)->id();
     }
     s << endl;
-#if 0
-    s << "  patterns = ";
-    for (ymuint j = 0; j < rep->pat_num(); ++ j) {
-      s << " PAT#" << rep->pat_id(j);
-    }
-    s << endl;
-#endif
   }
   s << endl;
 
-  s << "*** NODE SECTION ***" << endl;
-  ymuint n = mLdPatMgr.node_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    LdPatNode* node = mLdPatMgr.node(i);
-    if ( node->is_locked() ) {
-      s << "*";
-    }
-    else {
-      s << " ";
-    }
-    s << "Node#" << node->id() << ": ";
-    if ( node->is_input() ) {
-      s << "Input#" << node->input_id();
-    }
-    else {
-      if ( node->is_and() ) {
-	s << "And";
-      }
-      else if ( node->is_xor() ) {
-	s << "Xor";
-      }
-      else {
-	assert_not_reached(__FILE__, __LINE__);
-      }
-      s << "( ";
-      display_edge(s, node, 0);
-      s << ", ";
-      display_edge(s, node, 1);
-      s << ")";
-    }
-    s << endl;
-  }
-  s << endl;
-
-  s << "*** PATTERN SECTION ***" << endl;
-  ymuint np = mLdPatMgr.pat_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    LdPatHandle root = mLdPatMgr.pat_root(i);
-    s << "Pat#" << i << ": ";
-    if ( root.inv() ) {
-      s << "~";
-    }
-    s << "Node#" << root.node()->id()
-      << " --> Rep#" << mLdPatMgr.rep_id(i)
-      << endl;
-  }
-  s << "*** END ***" << endl;
+  // パタングラフの情報を出力する．
+  mLdPatMgr.display(s);
 }
 
 // @brief グラフ構造全体をダンプする．
