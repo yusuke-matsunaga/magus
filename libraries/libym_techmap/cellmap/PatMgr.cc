@@ -29,30 +29,7 @@ PatGraph::PatGraph() :
 // @brief デストラクタ
 PatGraph::~PatGraph()
 {
-  delete [] mEdgeList;
-}
-
-// @brief データを読み込んでセットする．
-// @param[in] s 入力元のストリーム
-// @retval true 読み込みが成功した．
-// @retval false 読み込みが失敗した．
-bool
-PatGraph::load(istream& s)
-{
-  mInputNum = BinIO::read_32(s);
-  mEdgeNum = BinIO::read_32(s);
-  if ( mEdgeNum > 0 ) {
-    mEdgeList = new ymuint32[mEdgeNum];
-    for (ymuint i = 0; i < mEdgeNum; ++ i) {
-      mEdgeList[i] = BinIO::read_32(s);
-    }
-  }
-  else {
-    mEdgeList = NULL;
-  }
-  mRepId = BinIO::read_32(s);
-
-  return true;
+  // mEdgeList はメモリアロケータが管理している．
 }
 
 
@@ -61,7 +38,9 @@ PatGraph::load(istream& s)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-PatMgr::PatMgr() :
+// @param[in] alloc メモリアロケータ
+PatMgr::PatMgr(AllocBase& alloc) :
+  mAlloc(alloc),
   mNodeNum(0U),
   mNodeTypeArray(NULL),
   mEdgeArray(NULL),
@@ -81,9 +60,7 @@ PatMgr::~PatMgr()
 void
 PatMgr::init()
 {
-  delete [] mNodeTypeArray;
-  delete [] mEdgeArray;
-  delete [] mPatArray;
+  // mAlloc の初期化は CellMgr で行われる．
   mNodeNum = 0U;
   mPatNum = 0U;
 }
@@ -100,8 +77,10 @@ PatMgr::load(istream& s)
 
   // ノードと枝の情報を読み込む．
   mNodeNum = BinIO::read_32(s);
-  mNodeTypeArray = new ymuint32[mNodeNum];
-  mEdgeArray = new ymuint32[mNodeNum * 2];
+  void* p = mAlloc.get_memory(sizeof(ymuint32) * mNodeNum);
+  mNodeTypeArray = new (p) ymuint32[mNodeNum];
+  void* q = mAlloc.get_memory(sizeof(ymuint32) * mNodeNum * 2);
+  mEdgeArray = new (q) ymuint32[mNodeNum * 2];
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     mNodeTypeArray[i] = BinIO::read_32(s);
     mEdgeArray[i * 2] = BinIO::read_32(s);
@@ -113,14 +92,37 @@ PatMgr::load(istream& s)
 
   // パタングラフの情報を読み込む．
   mPatNum = BinIO::read_32(s);
-  mPatArray = new PatGraph[mPatNum];
+  void* r = mAlloc.get_memory(sizeof(PatGraph) * mPatNum);
+  mPatArray = new (r) PatGraph[mPatNum];
   for (ymuint i = 0; i < mPatNum; ++ i) {
-    if ( !mPatArray[i].load(s) ) {
-      return false;
-    }
+    load_patgraph(s, i);
   }
 
   return true;
+}
+
+// @brief データを読み込んでセットする．
+// @param[in] s 入力元のストリーム
+// @param[in] id 番号
+void
+PatMgr::load_patgraph(istream& s,
+		      ymuint id)
+{
+  PatGraph& pg = mPatArray[id];
+  pg.mInputNum = BinIO::read_32(s);
+  ymuint n = BinIO::read_32(s);
+  pg.mEdgeNum = n;
+  if ( n > 0 ) {
+    void* p = mAlloc.get_memory(sizeof(ymuint32) * n);
+    pg.mEdgeList = new (p) ymuint32[n];
+    for (ymuint i = 0; i < n; ++ i) {
+      pg.mEdgeList[i] = BinIO::read_32(s);
+    }
+  }
+  else {
+    pg.mEdgeList = NULL;
+  }
+  pg.mRepId = BinIO::read_32(s);
 }
 
 // @brief このセルライブラリに含まれるセルの最大の入力数を得る．

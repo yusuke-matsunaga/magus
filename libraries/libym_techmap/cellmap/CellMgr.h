@@ -13,6 +13,7 @@
 #include "ym_networks/bdn_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
 #include "PatMgr.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -147,11 +148,21 @@ private:
   void
   init();
 
+  /// @brief RepFunc の内容をロードする．
+  /// @param[in] s 入力ストリーム
+  /// @param[in] id 代表番号
+  void
+  load_repfunc(istream& s,
+	       ymuint id);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // メモリアロケータ
+  SimpleAlloc mAlloc;
 
   // セルライブラリ
   const CellLibrary* mLibrary;

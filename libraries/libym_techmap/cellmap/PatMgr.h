@@ -11,6 +11,7 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -44,7 +45,8 @@ public:
 public:
 
   /// @brief コンストラクタ
-  PatMgr();
+  /// @param[in] alloc メモリアロケータ
+  PatMgr(AllocBase& alloc);
 
   /// @brief デストラクタ
   ~PatMgr();
@@ -137,11 +139,21 @@ private:
   void
   init();
 
+  /// @brief PatGraph の内容を読み込む．
+  /// @param[in] s 入力元のストリーム
+  /// @param[in] id 番号
+  void
+  load_patgraph(istream& s,
+		ymuint id);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // メモリアロケータ
+  AllocBase& mAlloc;
 
   // ノード数
   ymuint32 mNodeNum;

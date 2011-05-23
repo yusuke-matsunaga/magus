@@ -33,18 +33,6 @@ private:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 情報を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief バイナリ形式のファイルを読み込む．
-  /// @param[in] s 入力ストリーム
-  /// @return 読み込みが成功したら true を返す．
-  bool
-  load(istream& s);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // 情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
@@ -67,7 +55,7 @@ private:
   ymuint32 mFuncNum;
 
   // 関数番号の配列
-  ymuint32* mFuncArray;
+  ymuint32* mFuncIdList;
 
 };
 
@@ -90,7 +78,7 @@ inline
 ymuint
 RepFunc::func_id(ymuint pos) const
 {
-  return mFuncArray[pos];
+  return mFuncIdList[pos];
 }
 
 END_NAMESPACE_YM_CELLMAP

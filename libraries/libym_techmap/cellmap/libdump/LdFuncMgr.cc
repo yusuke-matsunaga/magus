@@ -174,8 +174,10 @@ LdFuncMgr::display(ostream& s) const
   for (ymuint i = 0; i < func_num(); ++ i) {
     const LdFunc* func = this->func(i);
     assert_cond( func->id() == i, __FILE__, __LINE__);
-    s << "FUNC#" << i << ": REP#" << func->rep()->id()
-      << ": " << func->map() << endl;
+    s << "FUNC#" << i
+      << ": REP#" << func->rep()->id()
+      << ": " << func->map()
+      << endl;
     s << "  CELL#ID" << endl;
     const vector<ymuint>& cell_list = func->cell_list();
     for (vector<ymuint>::const_iterator p = cell_list.begin();

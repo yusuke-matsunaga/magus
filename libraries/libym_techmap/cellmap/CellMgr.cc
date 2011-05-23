@@ -34,7 +34,7 @@ CellGroup::CellGroup() :
 // @brief デストラクタ
 CellGroup::~CellGroup()
 {
-  delete [] mCellList;
+  // mCellList は CellMgr が管理している．
 }
 
 
@@ -60,34 +60,14 @@ FuncGroup::~FuncGroup()
 // @brief コンストラクタ
 RepFunc::RepFunc() :
   mFuncNum(0U),
-  mFuncArray(NULL)
+  mFuncIdList(NULL)
 {
 }
 
 // @brief デストラクタ
 RepFunc::~RepFunc()
 {
-  delete [] mFuncArray;
-}
-
-// @brief バイナリ形式のファイルを読み込む．
-// @param[in] s 入力ストリーム
-// @return 読み込みが成功したら true を返す．
-bool
-RepFunc::load(istream& s)
-{
-  mFuncNum = BinIO::read_32(s);
-  if ( mFuncNum > 0 ) {
-    mFuncArray = new ymuint32[mFuncNum];
-    for (ymuint i = 0; i < mFuncNum; ++ i) {
-      mFuncArray[i] = BinIO::read_32(s);
-    }
-  }
-  else {
-    mFuncArray = NULL;
-  }
-
-  return true;
+  // mFuncIdList は CellMgr が管理している．
 }
 
 BEGIN_NONAMESPACE
@@ -118,6 +98,7 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 CellMgr::CellMgr() :
+  mAlloc(4096),
   mLibrary(NULL),
   mFuncNum(0),
   mFuncArray(NULL),
@@ -126,7 +107,8 @@ CellMgr::CellMgr() :
   mFFClassNum(0),
   mFFArray(NULL),
   mLatchClassNum(0),
-  mLatchArray(NULL)
+  mLatchArray(NULL),
+  mPatMgr(mAlloc)
 {
 }
 
@@ -141,6 +123,7 @@ CellMgr::~CellMgr()
 void
 CellMgr::init()
 {
+  mAlloc.destroy();
   delete mLibrary;
 }
 
@@ -159,7 +142,8 @@ CellMgr::load_library(istream& s)
 
   // 関数の情報を読み込む．
   mFuncNum = BinIO::read_32(s);
-  mFuncArray = new FuncGroup[mFuncNum];
+  void* p = mAlloc.get_memory(sizeof(FuncGroup) * mFuncNum);
+  mFuncArray = new (p) FuncGroup[mFuncNum];
   for (ymuint i = 0; i < mFuncNum; ++ i) {
     FuncGroup& func = mFuncArray[i];
     read_map(s, func.mNpnMap);
@@ -179,11 +163,10 @@ CellMgr::load_library(istream& s)
 
   // 代表関数の情報を読み込む．
   mRepNum = BinIO::read_32(s);
-  mRepArray = new RepFunc[mRepNum];
+  void* q = mAlloc.get_memory(sizeof(RepFunc) * mRepNum);
+  mRepArray = new (q) RepFunc[mRepNum];
   for (ymuint i = 0; i < mRepNum; ++ i) {
-    if ( !mRepArray[i].load(s) ) {
-      return false;
-    }
+    load_repfunc(s, i);
   }
 
   // パタンの情報を読み込む．
@@ -192,6 +175,28 @@ CellMgr::load_library(istream& s)
   }
 
   return true;
+}
+
+// @brief RepFunc の内容をロードする．
+// @param[in] s 入力ストリーム
+// @param[in] id 代表番号
+void
+CellMgr::load_repfunc(istream& s,
+		      ymuint id)
+{
+  RepFunc& rep = mRepArray[id];
+  ymuint n = BinIO::read_32(s);
+  rep.mFuncNum = n;
+  if ( n > 0 ) {
+    void* p = mAlloc.get_memory(sizeof(ymuint32) * n);
+    rep.mFuncIdList = new (p) ymuint32[n];
+    for (ymuint i = 0; i < n; ++ i) {
+      rep.mFuncIdList[i] = BinIO::read_32(s);
+    }
+  }
+  else {
+    rep.mFuncIdList = NULL;
+  }
 }
 
 // @bireif 論理関数の個数を返す．

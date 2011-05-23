@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "libdump_nsdef.h"
+#include "LdCellGroup.h"
 #include "ym_npn/NpnMap.h"
 
 
@@ -21,7 +21,8 @@ class LdFuncRep;
 /// @class LdFunc LdFunc.h "LdFunc.h"
 /// @brief 論理関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class LdFunc
+class LdFunc :
+  public LdCellGroup
 {
   friend class LdFuncMgr;
 
@@ -40,14 +41,6 @@ public:
   ymuint
   id() const;
 
-  /// @brief セル番号を追加する．
-  void
-  add_cell(ymuint cell_id);
-
-  /// @brief 属しているセルの番号のリストを返す．
-  const vector<ymuint>&
-  cell_list() const;
-
   /// @brief 親の代表関数を返す．
   const LdFuncRep*
   rep() const;
@@ -64,9 +57,6 @@ private:
 
   // ID番号
   ymuint32 mId;
-
-  // セル番号のリスト
-  vector<ymuint> mCellList;
 
   // 親の代表関数
   LdFuncRep* mRep;
@@ -99,22 +89,6 @@ ymuint
 LdFunc::id() const
 {
   return mId;
-}
-
-// @brief セル番号を追加する．
-inline
-void
-LdFunc::add_cell(ymuint cell_id)
-{
-  mCellList.push_back(cell_id);
-}
-
-// @brief 属しているセルの番号のリストを返す．
-inline
-const vector<ymuint>&
-LdFunc::cell_list() const
-{
-  return mCellList;
 }
 
 // @brief 親の代表関数を返す．
