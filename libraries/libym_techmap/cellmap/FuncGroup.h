@@ -9,8 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/cellmap_nsdef.h"
-#include "ym_cell/cell_nsdef.h"
+#include "CellGroup.h"
 #include "ym_npn/NpnMap.h"
 
 
@@ -20,7 +19,8 @@ BEGIN_NAMESPACE_YM_CELLMAP
 /// @class FuncGroup FuncGroup.h "FuncGroup.h"
 /// @brief 論理的に等価なセルのグループを表すクラス
 //////////////////////////////////////////////////////////////////////
-class FuncGroup
+class FuncGroup :
+  public CellGroup
 {
   friend class CellMgr;
 
@@ -39,15 +39,6 @@ public:
   const NpnMap&
   npn_map() const;
 
-  /// @brief セル数を返す．
-  ymuint
-  cell_num() const;
-
-  /// @brief セルを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
-  const Cell*
-  cell(ymuint pos) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -56,12 +47,6 @@ private:
 
   // 代表関数に対する変換マップ
   NpnMap mNpnMap;
-
-  // セル数
-  ymuint32 mCellNum;
-
-  // セルのポインタの配列
-  const Cell** mCellList;
 
 };
 
@@ -76,23 +61,6 @@ const NpnMap&
 FuncGroup::npn_map() const
 {
   return mNpnMap;
-}
-
-// @brief セル数を返す．
-inline
-ymuint
-FuncGroup::cell_num() const
-{
-  return mCellNum;
-}
-
-// @brief セルを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
-inline
-const Cell*
-FuncGroup::cell(ymuint pos) const
-{
-  return mCellList[pos];
 }
 
 END_NAMESPACE_YM_CELLMAP

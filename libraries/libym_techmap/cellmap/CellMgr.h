@@ -19,8 +19,8 @@ BEGIN_NAMESPACE_YM_CELLMAP
 
 class FuncGroup;
 class RepFunc;
-class FFGroup;
-class LatchGroup;
+class FFClass;
+class LatchClass;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellMgr CellMgr.h "CellMgr.h"
@@ -58,15 +58,15 @@ public:
   bool
   load_library(istream& s);
 
+  /// @brief セルライブラリを返す．
+  const CellLibrary&
+  library() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 論理関数グループに関する情報を取得する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief セルライブラリを返す．
-  const CellLibrary&
-  library() const;
 
   /// @brief 論理関数の個数を返す．
   ymuint
@@ -101,6 +101,30 @@ public:
   /// @param[in] id 代表関数番号
   const RepFunc&
   rep(ymuint id) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // FF/ラッチに関する情報を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief FFクラス数を返す．
+  ymuint
+  ff_class_num() const;
+
+  /// @brief FFクラスを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < ff_class_num() )
+  const FFClass&
+  ff_class(ymuint pos) const;
+
+  /// @brief ラッチクラス数を返す．
+  ymuint
+  latch_class_num() const;
+
+  /// @brief ラッチクラスを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < latch_class_num() )
+  const LatchClass&
+  latch_class(ymuint pos) const;
 
 
 public:
@@ -146,20 +170,20 @@ private:
   // サイズは mRepNum
   RepFunc* mRepArray;
 
+  // FFクラス数
+  ymuint32 mFFClassNum;
+
+  // FFクラスの(実体の)配列
+  FFClass* mFFArray;
+
+  // ラッチクラスの数
+  ymuint32 mLatchClassNum;
+
+  // ラッチクラスの(実体の)配列
+  LatchClass* mLatchArray;
+
   // パタンを管理するオブジェクト
   PatMgr mPatMgr;
-
-  // FFグループの数
-  ymuint32 mFFNum;
-
-  // FFグループの配列
-  FFGroup* mFFArray;
-
-  // ラッチグループの数
-  ymuint32 mLatchNum;
-
-  // ラッチグループの配列
-  LatchGroup* mLatchGroup;
 
 };
 
@@ -171,71 +195,6 @@ private:
 void
 dump(ostream& s,
      const CellMgr& cell_mgr);
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @bireif 論理関数の個数を返す．
-inline
-ymuint
-CellMgr::func_num() const
-{
-  return mFuncNum;
-}
-
-// @brief 定数0の関数グループを返す．
-inline
-const FuncGroup&
-CellMgr::const0_func() const
-{
-  // 決め打ち
-  return func_group(0);
-}
-
-// @brief 定数1の関数グループを返す．
-inline
-const FuncGroup&
-CellMgr::const1_func() const
-{
-  // 決め打ち
-  return func_group(1);
-}
-
-// @brief バッファセルの関数グループを返す．
-inline
-const FuncGroup&
-CellMgr::buf_func() const
-{
-  // 決め打ち
-  return func_group(2);
-}
-
-// @brief インバータセルの関数グループを返す．
-inline
-const FuncGroup&
-CellMgr::inv_func() const
-{
-  // 決め打ち
-  return func_group(3);
-}
-
-// @brief 代表関数の個数を返す．
-inline
-ymuint
-CellMgr::rep_num() const
-{
-  return mRepNum;
-}
-
-// @brief パタンを管理するオブジェクトを得る．
-inline
-const PatMgr&
-CellMgr::pat_mgr() const
-{
-  return mPatMgr;
-}
 
 END_NAMESPACE_YM_CELLMAP
 

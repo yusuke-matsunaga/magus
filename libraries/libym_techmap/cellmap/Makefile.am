@@ -18,12 +18,21 @@ libym_techmap_cell_la_SOURCES = \
 	cellmap_nsdef.h \
 	AreaCover.h \
 	AreaCover.cc \
+	CellGroup.h \
 	CellMap.cc \
 	CellMgr.h \
 	CellMgr.cc \
 	CnGraph.cc \
 	CnGraph_dump.cc \
+	FFClass.h \
+	FFClass.cc \
+	FFGroup.h \
+	FFGroup.cc \
 	FuncGroup.h \
+	LatchClass.h \
+	LatchClass.cc \
+	LatchGroup.h \
+	LatchGroup.cc \
 	MapRecord.h \
 	MapRecord.cc \
 	Match.h \

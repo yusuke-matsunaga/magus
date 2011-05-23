@@ -10,6 +10,8 @@
 #include "CellMgr.h"
 #include "RepFunc.h"
 #include "FuncGroup.h"
+#include "FFClass.h"
+#include "LatchClass.h"
 
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
@@ -19,13 +21,29 @@
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
+// クラス CellGroup
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+CellGroup::CellGroup() :
+  mCellNum(0),
+  mCellList(NULL)
+{
+}
+
+// @brief デストラクタ
+CellGroup::~CellGroup()
+{
+  delete [] mCellList;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス FuncGroup
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-FuncGroup::FuncGroup() :
-  mCellNum(0),
-  mCellList(NULL)
+FuncGroup::FuncGroup()
 {
 }
 
@@ -100,7 +118,15 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 CellMgr::CellMgr() :
-  mLibrary(NULL)
+  mLibrary(NULL),
+  mFuncNum(0),
+  mFuncArray(NULL),
+  mRepNum(0),
+  mRepArray(NULL),
+  mFFClassNum(0),
+  mFFArray(NULL),
+  mLatchClassNum(0),
+  mLatchArray(NULL)
 {
 }
 
@@ -168,6 +194,13 @@ CellMgr::load_library(istream& s)
   return true;
 }
 
+// @bireif 論理関数の個数を返す．
+ymuint
+CellMgr::func_num() const
+{
+  return mFuncNum;
+}
+
 // @brief 関数グループを返す．
 // @param[in] id 関数番号　( 0 <= id < func_num() )
 const FuncGroup&
@@ -176,12 +209,88 @@ CellMgr::func_group(ymuint id) const
   return mFuncArray[id];
 }
 
+// @brief 定数0の関数グループを返す．
+const FuncGroup&
+CellMgr::const0_func() const
+{
+  // 決め打ち
+  return func_group(0);
+}
+
+// @brief 定数1の関数グループを返す．
+const FuncGroup&
+CellMgr::const1_func() const
+{
+  // 決め打ち
+  return func_group(1);
+}
+
+// @brief バッファセルの関数グループを返す．
+const FuncGroup&
+CellMgr::buf_func() const
+{
+  // 決め打ち
+  return func_group(2);
+}
+
+// @brief インバータセルの関数グループを返す．
+const FuncGroup&
+CellMgr::inv_func() const
+{
+  // 決め打ち
+  return func_group(3);
+}
+
+// @brief 代表関数の個数を返す．
+ymuint
+CellMgr::rep_num() const
+{
+  return mRepNum;
+}
+
 // @brief 代表関数を返す．
 // @param[in] id 代表関数番号
 const RepFunc&
 CellMgr::rep(ymuint id) const
 {
   return mRepArray[id];
+}
+
+// @brief FFクラス数を返す．
+ymuint
+CellMgr::ff_class_num() const
+{
+  return mFFClassNum;
+}
+
+// @brief FFクラスを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < ff_class_num() )
+const FFClass&
+CellMgr::ff_class(ymuint pos) const
+{
+  return mFFArray[pos];
+}
+
+// @brief ラッチクラス数を返す．
+ymuint
+CellMgr::latch_class_num() const
+{
+  return mLatchClassNum;
+}
+
+// @brief ラッチクラスを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < latch_class_num() )
+const LatchClass&
+CellMgr::latch_class(ymuint pos) const
+{
+  return mLatchArray[pos];
+}
+
+// @brief パタンを管理するオブジェクトを得る．
+const PatMgr&
+CellMgr::pat_mgr() const
+{
+  return mPatMgr;
 }
 
 // @relates CellMgr
