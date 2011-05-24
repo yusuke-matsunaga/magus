@@ -100,7 +100,7 @@ FFClass::group_num() const
 const FFGroup&
 FFClass::group(ymuint pos) const
 {
-  return mGroupList[pos];
+  return *mGroupList[pos];
 }
 
 END_NAMESPACE_YM_CELLMAP

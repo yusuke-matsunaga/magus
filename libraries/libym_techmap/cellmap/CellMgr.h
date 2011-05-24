@@ -18,8 +18,10 @@
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
+class CellGroup;
 class FuncGroup;
 class RepFunc;
+class FFGroup;
 class FFClass;
 class LatchClass;
 
@@ -148,6 +150,13 @@ private:
   void
   init();
 
+  /// @brief CellGroup の内容をロードする．
+  /// @param[in] s 入力ストリーム
+  /// @param[in] cell_group ロード対象の CellGroup
+  void
+  load_cellgroup(istream& s,
+		 CellGroup& cell_group);
+
   /// @brief RepFunc の内容をロードする．
   /// @param[in] s 入力ストリーム
   /// @param[in] id 代表番号
@@ -181,11 +190,17 @@ private:
   // サイズは mRepNum
   RepFunc* mRepArray;
 
+  // FFグループ数
+  ymuint32 mFFGroupNum;
+
+  // FFグループの(実体の)配列
+  FFGroup* mFFGroupArray;
+
   // FFクラス数
   ymuint32 mFFClassNum;
 
   // FFクラスの(実体の)配列
-  FFClass* mFFArray;
+  FFClass* mFFClassArray;
 
   // ラッチクラスの数
   ymuint32 mLatchClassNum;

@@ -87,8 +87,8 @@ private:
   // グループ数
   ymuint32 mGroupNum;
 
-  // グループの(実体の)配列
-  FFGroup* mGroupList;
+  // グループの配列
+  const FFGroup** mGroupList;
 
 };
 

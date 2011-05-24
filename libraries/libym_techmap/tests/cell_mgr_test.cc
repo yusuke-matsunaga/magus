@@ -9,6 +9,7 @@
 
 #include "cellmap/CellMgr.h"
 #include "ym_cell/CellMislibReader.h"
+#include "ym_cell/CellDotlibReader.h"
 #include "ym_cell/CellLibrary.h"
 #include "cellmap/libdump/LibDump.h"
 
@@ -21,7 +22,12 @@ dump_load_test(const char* in_filename,
 {
   using nsLibDump::LibDump;
 
+
+#if 0
   CellMislibReader reader;
+#else
+  CellDotlibReader reader;
+#endif
   const CellLibrary* library = reader.read(in_filename);
   if ( library == NULL ) {
     cerr << in_filename << ": Error in reading library" << endl;

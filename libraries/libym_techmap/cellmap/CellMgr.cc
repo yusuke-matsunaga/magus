@@ -11,6 +11,7 @@
 #include "RepFunc.h"
 #include "FuncGroup.h"
 #include "FFClass.h"
+#include "FFGroup.h"
 #include "LatchClass.h"
 
 #include "ym_cell/CellLibrary.h"
@@ -104,8 +105,10 @@ CellMgr::CellMgr() :
   mFuncArray(NULL),
   mRepNum(0),
   mRepArray(NULL),
+  mFFGroupNum(0),
+  mFFGroupArray(NULL),
   mFFClassNum(0),
-  mFFArray(NULL),
+  mFFClassArray(NULL),
   mLatchClassNum(0),
   mLatchArray(NULL),
   mPatMgr(mAlloc)
@@ -142,29 +145,22 @@ CellMgr::load_library(istream& s)
 
   // 関数の情報を読み込む．
   mFuncNum = BinIO::read_32(s);
-  void* p = mAlloc.get_memory(sizeof(FuncGroup) * mFuncNum);
-  mFuncArray = new (p) FuncGroup[mFuncNum];
+  {
+    void* p = mAlloc.get_memory(sizeof(FuncGroup) * mFuncNum);
+    mFuncArray = new (p) FuncGroup[mFuncNum];
+  }
   for (ymuint i = 0; i < mFuncNum; ++ i) {
     FuncGroup& func = mFuncArray[i];
     read_map(s, func.mNpnMap);
-    ymuint n = BinIO::read_32(s);
-    func.mCellNum = n;
-    if ( n > 0 ) {
-      func.mCellList = new const Cell*[n];
-      for (ymuint j = 0; j < n; ++ j) {
-	ymuint id = BinIO::read_32(s);
-	func.mCellList[j] = mLibrary->cell(id);
-      }
-    }
-    else {
-      func.mCellList = NULL;
-    }
+    load_cellgroup(s, func);
   }
 
   // 代表関数の情報を読み込む．
   mRepNum = BinIO::read_32(s);
-  void* q = mAlloc.get_memory(sizeof(RepFunc) * mRepNum);
-  mRepArray = new (q) RepFunc[mRepNum];
+  {
+    void* p = mAlloc.get_memory(sizeof(RepFunc) * mRepNum);
+    mRepArray = new (p) RepFunc[mRepNum];
+  }
   for (ymuint i = 0; i < mRepNum; ++ i) {
     load_repfunc(s, i);
   }
@@ -174,8 +170,65 @@ CellMgr::load_library(istream& s)
     return false;
   }
 
+  // FFグループの情報を読み込む．
+  mFFGroupNum = BinIO::read_32(s);
+  {
+    void* p = mAlloc.get_memory(sizeof(FFGroup) * mFFGroupNum);
+    mFFGroupArray = new (p) FFGroup[mFFGroupNum];
+  }
+  for (ymuint i = 0; i < mFFGroupNum; ++ i) {
+    FFGroup& ff_group = mFFGroupArray[i];
+    ff_group.mPosArray = BinIO::read_32(s);
+    load_cellgroup(s, ff_group);
+  }
+
+  // FFクラスの情報を読み込む．
+  mFFClassNum = BinIO::read_32(s);
+  {
+    void* p = mAlloc.get_memory(sizeof(FFClass) * mFFClassNum);
+    mFFClassArray = new (p) FFClass[mFFClassNum];
+  }
+  for (ymuint i = 0; i < mFFClassNum; ++ i) {
+    FFClass& ff_class = mFFClassArray[i];
+    ff_class.mBits = BinIO::read_8(s);
+    ymuint ng = BinIO::read_32(s);
+    ff_class.mGroupNum = ng;
+    {
+      void* p = mAlloc.get_memory(sizeof(const FFGroup*) * ng);
+      ff_class.mGroupList = new (p) const FFGroup*[ng];
+    }
+    for (ymuint j = 0; j < ng; ++ j) {
+      ymuint id = BinIO::read_32(s);
+      ff_class.mGroupList[j] = &mFFGroupArray[id];
+    }
+  }
+
   return true;
 }
+
+// @brief CellGroup の内容をロードする．
+// @param[in] s 入力ストリーム
+// @param[in] cell_group ロード対象の CellGroup
+void
+CellMgr::load_cellgroup(istream& s,
+			CellGroup& cell_group)
+{
+  ymuint n = BinIO::read_32(s);
+  cell_group.mCellNum = n;
+  if ( n > 0 ) {
+    {
+      void* p = mAlloc.get_memory(sizeof(const Cell*) * n);
+      cell_group.mCellList = new (p) const Cell*[n];
+    }
+    for (ymuint j = 0; j < n; ++ j) {
+      ymuint id = BinIO::read_32(s);
+      cell_group.mCellList[j] = mLibrary->cell(id);
+    }
+  }
+  else {
+    cell_group.mCellList = NULL;
+  }
+ }
 
 // @brief RepFunc の内容をロードする．
 // @param[in] s 入力ストリーム
@@ -188,8 +241,10 @@ CellMgr::load_repfunc(istream& s,
   ymuint n = BinIO::read_32(s);
   rep.mFuncNum = n;
   if ( n > 0 ) {
-    void* p = mAlloc.get_memory(sizeof(ymuint32) * n);
-    rep.mFuncIdList = new (p) ymuint32[n];
+    {
+      void* p = mAlloc.get_memory(sizeof(ymuint32) * n);
+      rep.mFuncIdList = new (p) ymuint32[n];
+    }
     for (ymuint i = 0; i < n; ++ i) {
       rep.mFuncIdList[i] = BinIO::read_32(s);
     }
@@ -197,6 +252,13 @@ CellMgr::load_repfunc(istream& s,
   else {
     rep.mFuncIdList = NULL;
   }
+}
+
+// @brief セルライブラリを返す．
+const CellLibrary&
+CellMgr::library() const
+{
+  return *mLibrary;
 }
 
 // @bireif 論理関数の個数を返す．
@@ -273,7 +335,7 @@ CellMgr::ff_class_num() const
 const FFClass&
 CellMgr::ff_class(ymuint pos) const
 {
-  return mFFArray[pos];
+  return mFFClassArray[pos];
 }
 
 // @brief ラッチクラス数を返す．
@@ -307,6 +369,9 @@ dump(ostream& s,
      const CellMgr& cell_mgr)
 {
   s << "==== CellMgr dump start ====" << endl;
+
+  // ライブラリ情報の出力
+  display_library(s, cell_mgr.library());
 
   // 関数情報の出力
   const FuncGroup& func0 = cell_mgr.const0_func();
@@ -349,6 +414,82 @@ dump(ostream& s,
     ymuint nf = rep.func_num();
     for (ymuint j = 0; j < nf; ++ j) {
       s << " Func#" << rep.func_id(j);
+    }
+    s << endl;
+  }
+
+  // FF情報の出力
+  ymuint nff = cell_mgr.ff_class_num();
+  for (ymuint i = 0; i < nff; ++ i) {
+    const FFClass& ff_class = cell_mgr.ff_class(i);
+    s << "FF-Class#" << i << endl;
+    s << "  CLOCK: ";
+    if ( ff_class.clock_sense() == 1 ) {
+      s << "POSITIVE";
+    }
+    else {
+      s << "NEGATIVE";
+    }
+    s << endl;
+
+    ymuint r0 = ff_class.clear_sense();
+    if ( r0 != 0 ) {
+      s << "  CLEAR: ";
+      if ( r0 == 1 ) {
+	s << "HIGH";
+      }
+      else {
+	s << "LOW";
+      }
+      s << endl;
+    }
+
+    ymuint r1 = ff_class.preset_sense();
+    if ( r1 != 0 ) {
+      s << "  PRESET: ";
+      if ( r1 == 1 ) {
+	s << "HIGH";
+      }
+      else {
+	s << "LOW";
+      }
+      s << endl;
+    }
+
+    ymuint ng = ff_class.group_num();
+    for (ymuint j = 0; j < ng; ++ j) {
+      const FFGroup& ff_group = ff_class.group(j);
+      s << "    FF-Group:" << endl
+	<< "      DATA   = Pin#" << ff_group.data_pos() << endl;
+      s << "      CLOCK  = ";
+      if ( ff_class.clock_sense() == 2 ) {
+	s << "!";
+      }
+      s << "Pin#" << ff_group.clock_pos() << endl
+	<< "      Q      = Pin#" << ff_group.q_pos() << endl
+	<< "      IQ     = Pin#" << ff_group.iq_pos() << endl;
+      if ( ff_class.has_clear() ) {
+	s << "      CLEAR  = ";
+	if ( ff_class.clear_sense() == 2 ) {
+	  s << "!";
+	}
+	s << "Pin#" << ff_group.clear_pos() << endl;
+      }
+      if ( ff_class.has_preset() ) {
+	s << "      PRESET = ";
+	if ( ff_class.preset_sense() == 2 ) {
+	  s << "!";
+	}
+	s << "Pin#" << ff_group.preset_pos() << endl;
+      }
+      s << "      CELLS  =";
+      ymuint nc = ff_group.cell_num();
+      for (ymuint k = 0; k < nc; ++ k) {
+	const Cell* cell = ff_group.cell(k);
+	s << "  " << cell->name();
+      }
+      s << endl;
+      s << endl;
     }
     s << endl;
   }

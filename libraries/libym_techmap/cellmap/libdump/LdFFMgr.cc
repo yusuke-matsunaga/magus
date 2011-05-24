@@ -221,8 +221,8 @@ LdFFMgr::dump(ostream& s) const
     const vector<ymuint>& cell_list = ff_group->cell_list();
     ymuint nc = cell_list.size();
     BinIO::write_32(s, nc);
-    for (ymuint i = 0; i < nc; ++ i) {
-      BinIO::write_32(s, cell_list[i]);
+    for (ymuint j = 0; j < nc; ++ j) {
+      BinIO::write_32(s, cell_list[j]);
     }
   }
 
@@ -236,9 +236,10 @@ LdFFMgr::dump(ostream& s) const
     BinIO::write_8(s, ff_class->signature());
     // 属しているFFグループ番号をダンプする．
     const vector<LdFFGroup*>& group_list = ff_class->group_list();
-    for (vector<LdFFGroup*>::const_iterator p = group_list.begin();
-	 p != group_list.end(); ++ p) {
-      const LdFFGroup* ff_group = *p;
+    ymuint ng = group_list.size();
+    BinIO::write_32(s, ng);
+    for (ymuint j = 0; j < ng; ++ j) {
+      const LdFFGroup* ff_group = group_list[j];
       BinIO::write_32(s, ff_group->id());
     }
   }
