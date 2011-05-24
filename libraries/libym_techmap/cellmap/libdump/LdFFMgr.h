@@ -14,7 +14,7 @@
 
 BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-class LdFFGruop;
+class LdFFGroup;
 class LdFFClass;
 
 //////////////////////////////////////////////////////////////////////
@@ -66,44 +66,6 @@ public:
   display(ostream& s) const;
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容情報を取得する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief FFグループの数を返す．
-  ymuint
-  group_num() const;
-
-  /// @brief FFグループを返す．
-  /// @param[in] id グループ番号 ( 0 <= id < group_num() )
-  const LdFFGroup*
-  group(ymuint id) const;
-
-  /// @brief FFクラスの数を返す．
-  ymuint
-  class_num() const;
-
-  /// @brief 代表関数を返す．
-  /// @param[in] id 代表関数番号 ( 0 <= id < rep_num() )
-  const LdFuncRep*
-  rep(ymuint id) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 対応する LdFFClass を求める．
-  /// @param[in] f 関数
-  /// @note なければ新規に作る．
-  LdFFClass*
-  find_class(ymuint clock_sense,
-	     ymuint clear_sense,
-	     ymuint preset_sense);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -118,41 +80,6 @@ private:
   vector<LdFFClass*> mFFClassList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief FFグループの数を返す．
-ymuint
-LdFFMgr::group_num() const
-{
-  return mFFGroupList.size();
-}
-
-// @brief FFグループを返す．
-// @param[in] id グループ番号 ( 0 <= id < group_num() )
-const LdFFGroup*
-LdFFMgr::group(ymuint id) const
-{
-  return mFFGroupList[id];
-}
-
-// @brief FFクラスの数を返す．
-ymuint
-LdFFMgr::class_num() const
-{
-  return mFFClassList.size();
-}
-
-// @brief 代表関数を返す．
-// @param[in] id 代表関数番号 ( 0 <= id < rep_num() )
-const LdFuncRep*
-LdFFMgr::rep(ymuint id) const
-{
-  return mFFClassList[id];
-}
 
 END_NAMESPACE_YM_CELLMAP_LIBDUMP
 

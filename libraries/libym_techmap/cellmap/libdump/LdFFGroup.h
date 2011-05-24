@@ -81,6 +81,9 @@ private:
   // ID番号
   ymuint32 mId;
 
+  // 親のFFクラス
+  LdFFClass* mParent;
+
   // ピン番号の情報をパックしたもの
   ymuint32 mPosArray;
 
@@ -109,6 +112,14 @@ ymuint
 LdFFGroup::id() const
 {
   return mId;
+}
+
+// @brief 親の FFClass を返す．
+inline
+const LdFFClass*
+LdFFGroup::parent() const
+{
+  return mParent;
 }
 
 END_NAMESPACE_YM_CELLMAP_LIBDUMP

@@ -12,6 +12,7 @@
 #include "LdFunc.h"
 #include "LdPatNode.h"
 #include "LdPatHandle.h"
+#include "LdFFGroup.h"
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
@@ -144,35 +145,128 @@ LibDump::gen_pat(const CellLibrary& library)
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = library.cell(i);
     ymuint np = cell->pin_num();
-    const CellPin* opin = NULL;
-    ymuint ni = 0;
-    for (ymuint j = 0; j < np; ++ j) {
-      const CellPin* pin = cell->pin(j);
-      if ( pin->direction() == nsCell::kDirOutput ) {
-	if ( opin != NULL ) {
-	  // 出力ピンが複数あるセルは対象外
-	  opin = NULL;
-	  break;
+
+    if ( cell->is_logic() ) {
+      const CellPin* opin = NULL;
+      ymuint ni = 0;
+      for (ymuint j = 0; j < np; ++ j) {
+	const CellPin* pin = cell->pin(j);
+	if ( pin->direction() == nsCell::kDirOutput ) {
+	  if ( opin != NULL ) {
+	    // 出力ピンが複数あるセルは対象外
+	    opin = NULL;
+	    break;
+	  }
+	  opin = pin;
 	}
-	opin = pin;
+	else if ( pin->direction() == nsCell::kDirInput ) {
+	  ++ ni;
+	}
       }
-      else if ( pin->direction() == nsCell::kDirInput ) {
-	++ ni;
+      if ( opin == NULL ) continue;
+
+      if ( !opin->has_function() ) {
+	// 論理式を持たないセルも対象外
+	continue;
       }
+
+      LogExpr expr = opin->function();
+      TvFunc tv = expr2tvfunc(expr);
+      LdFunc* pgfunc = mLdFuncMgr.find_func(tv);
+      pgfunc->add_cell(cell->id());
+
+      reg_pat(pgfunc, expr);
     }
-    if ( opin == NULL ) continue;
+    if ( cell->is_ff() ) {
+      LogExpr d_expr = cell->next_state();
+      if ( !d_expr.is_posiliteral() ) {
+	// next_state が肯定リテラルでなかった．
+	continue;
+      }
+      ymuint data_pos = d_expr.varid();
 
-    if ( !opin->has_function() ) {
-      // 論理式を持たないセルも対象外
-      continue;
+      LogExpr c_expr = cell->clocked_on();
+      if ( !c_expr.is_literal() ) {
+	// clocked_on がリテラルでなかった．
+	continue;
+      }
+      ymuint clock_pos = c_expr.varid();
+      ymuint clock_sense = c_expr.is_posiliteral() ? 1 : 2;
+
+      LogExpr r0_expr = cell->clear();
+      ymuint clear_pos = 0;
+      ymuint clear_sense = 0;
+      if ( !r0_expr.is_zero() ) {
+	if ( r0_expr.is_literal() ) {
+	  clear_pos = r0_expr.varid();
+	  clear_sense = r0_expr.is_posiliteral() ? 1 : 2;
+	}
+	else {
+	  continue;
+	}
+      }
+
+      LogExpr r1_expr = cell->preset();
+      ymuint preset_pos = 0;
+      ymuint preset_sense = 0;
+      if ( !r1_expr.is_zero() ) {
+	if ( r1_expr.is_literal() ) {
+	  preset_pos = r1_expr.varid();
+	  preset_sense = r1_expr.is_posiliteral() ? 1 : 2;
+	}
+	else {
+	  continue;
+	}
+      }
+
+      const CellPin* q_pin = NULL;
+      const CellPin* iq_pin = NULL;
+      for (ymuint j = 0; j < np; ++ j) {
+	const CellPin* pin = cell->pin(j);
+	if ( pin->direction() == nsCell::kDirOutput ) {
+	  if ( !pin->has_function() ) {
+	    continue;
+	  }
+	  LogExpr expr = pin->function();
+	  if ( !expr.is_posiliteral() ) {
+	    continue;
+	  }
+	  ymuint pos = expr.varid();
+	  if ( pos == np ) {
+	    if ( q_pin != NULL ) {
+	      // Q ピンが2つ以上ある．
+	      q_pin = NULL;
+	      break;
+	    }
+	    q_pin = pin;
+	  }
+	  else if ( pos == (np + 1) ) {
+	    if ( iq_pin != NULL ) {
+	      // IQ ピンが2つ以上ある．
+	      iq_pin = NULL;
+	      break;
+	    }
+	    iq_pin = pin;
+	  }
+	}
+      }
+      if ( q_pin == NULL || iq_pin == NULL ) {
+	continue;
+      }
+      ymuint q_pos = q_pin->id();
+      ymuint iq_pos = iq_pin->id();
+
+      LdFFGroup* ff_group = mLdFFMgr.find_group(clock_sense,
+						clear_sense,
+						preset_sense,
+						data_pos,
+						clock_pos,
+						clear_pos,
+						preset_pos,
+						q_pos,
+						iq_pos);
+      ff_group->add_cell(cell->id());
     }
-
-    LogExpr expr = opin->function();
-    TvFunc tv = expr2tvfunc(expr);
-    LdFunc* pgfunc = mLdFuncMgr.find_func(tv);
-    pgfunc->add_cell(cell->id());
-
-    reg_pat(pgfunc, expr);
   }
 }
 
@@ -218,11 +312,17 @@ LibDump::display(ostream& s,
 {
   gen_pat(library);
 
+  // ライブラリの情報を出力する．
+  display_library(s, library);
+
   // 関数の情報を出力する．
   mLdFuncMgr.display(s);
 
   // パタングラフの情報を出力する．
   mLdPatMgr.display(s);
+
+  // FF の情報を出力する．
+  mLdFFMgr.display(s);
 }
 
 // @brief グラフ構造全体をダンプする．
@@ -243,6 +343,9 @@ LibDump::dump(ostream& s,
 
   // パタングラフの情報をダンプする．
   mLdPatMgr.dump(s);
+
+  // FF の情報を出力する．
+  mLdFFMgr.dump(s);
 }
 
 END_NAMESPACE_YM_CELLMAP_LIBDUMP

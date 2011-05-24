@@ -12,6 +12,7 @@
 #include "libdump_nsdef.h"
 #include "LdFuncMgr.h"
 #include "LdPatMgr.h"
+#include "LdFFMgr.h"
 #include "ym_cell/cell_nsdef.h"
 
 
@@ -83,6 +84,9 @@ private:
 
   // パタングラフを管理するオブジェクト
   LdPatMgr mLdPatMgr;
+
+  // FFの情報を管理するオブジェクト
+  LdFFMgr mLdFFMgr;
 
 };
 

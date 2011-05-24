@@ -30,12 +30,19 @@ LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
 	cell_mgr_test \
-	areacover_test
+	areacover_test \
+	libdump_test
 
 cell_mgr_test_SOURCES = \
 	cell_mgr_test.cc
 
 cell_mgr_test_LDADD = \
+	$(LIBYM_TECHMAP)
+
+libdump_test_SOURCES = \
+	libdump_test.cc
+
+libdump_test_LDADD = \
 	$(LIBYM_TECHMAP)
 
 areacover_test_SOURCES = \

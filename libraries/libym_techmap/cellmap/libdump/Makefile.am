@@ -14,6 +14,10 @@ INCLUDES = \
 
 libym_techmap_libdump_la_SOURCES = \
 	libdump_nsdef.h \
+	LdFFClass.h \
+	LdFFGroup.h \
+	LdFFMgr.h \
+	LdFFMgr.cc \
 	LdFunc.h \
 	LdFuncMgr.h \
 	LdFuncMgr.cc \

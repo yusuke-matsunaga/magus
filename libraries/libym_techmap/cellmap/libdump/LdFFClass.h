@@ -34,7 +34,67 @@ private:
 
 public:
 
+  /// @brief ID番号を返す．
+  ymuint
+  id() const;
+
+  /// @brief シグネチャを返す．
+  ymuint
+  signature() const;
+
+  /// @brief クロック入力のタイプを返す．
+  ymuint
+  clock_sense() const;
+
+  /// @brief クリア入力のタイプを返す．
+  ymuint
+  clear_sense() const;
+
+  /// @brief プリセット入力のタイプを返す．
+  ymuint
+  preset_sense() const;
+
+  /// @brief このクラスに属しているFFグループのリストを返す．
+  const vector<LdFFGroup*>&
+  group_list() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ID番号
+  ymuint32 mId;
+
+  // ピン情報をパックしたもの
+  ymuint32 mBits;
+
+  // FFグループのリスト
+  vector<LdFFGroup*> mGroupList;
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief ID番号を返す．
+inline
+ymuint
+LdFFClass::id() const
+{
+  return mId;
+}
+
+// @brief このクラスに属しているFFグループのリストを返す．
+inline
+const vector<LdFFGroup*>&
+LdFFClass::group_list() const
+{
+  return mGroupList;
+}
 
 END_NAMESPACE_YM_CELLMAP_LIBDUMP
 
