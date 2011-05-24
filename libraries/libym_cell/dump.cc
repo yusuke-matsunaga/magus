@@ -233,7 +233,7 @@ display_library(ostream& s,
   ymuint n = library.cell_num();
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = library.cell(i);
-    s << "Cell (" << cell->name() << ")" << endl;
+    s << "Cell#" << cell->id() << " (" << cell->name() << ")" << endl;
     s << "  area = " << cell->area() << endl;
 
     if ( cell->is_ff() ) {
