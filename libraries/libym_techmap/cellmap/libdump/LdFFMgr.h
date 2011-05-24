@@ -14,8 +14,8 @@
 
 BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
-class LdFunc;
-class LdFuncRep;
+class LdFFGruop;
+class LdFFClass;
 
 //////////////////////////////////////////////////////////////////////
 /// @class LdFFMgr LdFFMgr.h "LdFFMgr.h"
@@ -41,11 +41,19 @@ public:
   void
   init();
 
-  /// @brief f に対応する LdFunc を求める．
+  /// @brief 対応する LdFFGroup を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
-  LdFunc*
-  find_func(const TvFunc& f);
+  LdFFGroup*
+  find_group(ymuint clock_sense,
+	     ymuint clear_sense,
+	     ymuint preset_sense,
+	     ymuint data_pos,
+	     ymuint clock_pos,
+	     ymuint clear_pos,
+	     ymuint preset_pos,
+	     ymuint q_pos,
+	     ymuint iq_pos);
 
   /// @brief 内容をバイナリダンプする．
   /// @param[in] s 出力先のストリーム
@@ -63,18 +71,18 @@ public:
   // 内容情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 論理関数の数を返す．
+  /// @brief FFグループの数を返す．
   ymuint
-  func_num() const;
+  group_num() const;
 
-  /// @brief 論理関数情報のオブジェクトを返す．
-  /// @param[in] id 関数番号 ( 0 <= id < func_num() )
-  const LdFunc*
-  func(ymuint id) const;
+  /// @brief FFグループを返す．
+  /// @param[in] id グループ番号 ( 0 <= id < group_num() )
+  const LdFFGroup*
+  group(ymuint id) const;
 
-  /// @brief 代表関数の数を返す．
+  /// @brief FFクラスの数を返す．
   ymuint
-  rep_num() const;
+  class_num() const;
 
   /// @brief 代表関数を返す．
   /// @param[in] id 代表関数番号 ( 0 <= id < rep_num() )
@@ -87,20 +95,13 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief f に対応する LdFuncRep を求める．
+  /// @brief 対応する LdFFClass を求める．
   /// @param[in] f 関数
   /// @note なければ新規に作る．
-  /// @note f は NpnMgr によって正規化されている必要がある．
-  LdFuncRep*
-  find_repfunc(const TvFunc& f);
-
-  /// @brief 変換マップの内容をダンプする．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] map 変換マップ
-  static
-  void
-  dump_map(ostream& s,
-	   const NpnMap& map);
+  LdFFClass*
+  find_class(ymuint clock_sense,
+	     ymuint clear_sense,
+	     ymuint preset_sense);
 
 
 private:
@@ -108,19 +109,13 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 論理関数のリスト
-  // この配列上の位置と関数番号は一致している．
-  vector<LdFunc*> mFuncList;
+  // FFグループのリスト
+  // この配列上の位置とグループ番号は一致している．
+  vector<LdFFGroup*> mFFGroupList;
 
-  // 論理関数のハッシュ表
-  hash_map<TvFunc, LdFunc*> mFuncMap;
-
-  // 代表関数のリスト
-  // この配列上の位置と代表関数番号は一致している．
-  vector<LdFuncRep*> mRepList;
-
-  // 代表関数のハッシュ表
-  hash_map<TvFunc, LdFuncRep*> mRepMap;
+  // FFクラスのリスト
+  // この配列上の位置とクラス番号は一致している．
+  vector<LdFFClass*> mFFClassList;
 
 };
 
@@ -129,38 +124,34 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 論理関数の数を返す．
-inline
+// @brief FFグループの数を返す．
 ymuint
-LdFFMgr::func_num() const
+LdFFMgr::group_num() const
 {
-  return mFuncList.size();
+  return mFFGroupList.size();
 }
 
-// @brief 論理関数を返す．
-// @param[in] id 関数番号 ( 0 <= id < func_num() )
-inline
-const LdFunc*
-LdFFMgr::func(ymuint id) const
+// @brief FFグループを返す．
+// @param[in] id グループ番号 ( 0 <= id < group_num() )
+const LdFFGroup*
+LdFFMgr::group(ymuint id) const
 {
-  return mFuncList[id];
+  return mFFGroupList[id];
 }
 
-// @brief 代表関数の数を返す．
-inline
+// @brief FFクラスの数を返す．
 ymuint
-LdFFMgr::rep_num() const
+LdFFMgr::class_num() const
 {
-  return mRepList.size();
+  return mFFClassList.size();
 }
 
 // @brief 代表関数を返す．
 // @param[in] id 代表関数番号 ( 0 <= id < rep_num() )
-inline
 const LdFuncRep*
 LdFFMgr::rep(ymuint id) const
 {
-  return mRepList[id];
+  return mFFClassList[id];
 }
 
 END_NAMESPACE_YM_CELLMAP_LIBDUMP

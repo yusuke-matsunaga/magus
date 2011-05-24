@@ -18,7 +18,7 @@ class LdFFClass;
 
 //////////////////////////////////////////////////////////////////////
 /// @class LdFFGroup LdFFGroup.h "LdFFGroup.h"
-/// @brief 論理関数を表すクラス
+/// @brief FFのグループを表すクラス
 //////////////////////////////////////////////////////////////////////
 class LdFFGroup :
   public LdCellGroup
@@ -39,6 +39,10 @@ public:
   /// @brief ID番号を返す．
   ymuint
   id() const;
+
+  /// @brief シグネチャを返す．
+  ymuint
+  signature() const;
 
   /// @brief 親の FFClass を返す．
   const LdFFClass*
