@@ -55,6 +55,18 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+inline
+FuncGroup::FuncGroup()
+{
+}
+
+// @brief デストラクタ
+inline
+FuncGroup::~FuncGroup()
+{
+}
+
 // @brief 代表関数に対する変換マップを返す．
 inline
 const NpnMap&

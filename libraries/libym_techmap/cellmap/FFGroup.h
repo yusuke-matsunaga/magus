@@ -10,13 +10,14 @@
 
 
 #include "CellGroup.h"
+#include "FFPosArray.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class FFGroup FFGroup.h "FFGroup.h"
-/// @brief FF のグループを表すセル
+/// @brief FF のグループを表すクラス
 //////////////////////////////////////////////////////////////////////
 class FFGroup :
   public CellGroup
@@ -69,10 +70,77 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ピン番号をパックしたもの(3bitずつ)
-  ymuint32 mPosArray;
+  // ピン番号の情報
+  FFPosArray mPosArray;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+FFGroup::FFGroup()
+{
+}
+
+// @brief デストラクタ
+inline
+FFGroup::~FFGroup()
+{
+}
+
+// @brief データ入力のピン番号を返す．
+inline
+ymuint
+FFGroup::data_pos() const
+{
+  return mPosArray.data_pos();
+}
+
+// @brief クロック入力のピン番号を返す．
+inline
+ymuint
+FFGroup::clock_pos() const
+{
+  return mPosArray.clock_pos();
+}
+
+// @brief クリア入力のピン番号を返す．
+// @note クリア入力がない場合の値は不定
+inline
+ymuint
+FFGroup::clear_pos() const
+{
+  return mPosArray.clear_pos();
+}
+
+// @brief プリセット入力のピン番号を返す．
+// @note プリセット入力がない場合の値は不定
+inline
+ymuint
+FFGroup::preset_pos() const
+{
+  return mPosArray.preset_pos();
+}
+
+// @brief 肯定出力のピン番号を返す．
+inline
+ymuint
+FFGroup::q_pos() const
+{
+  return mPosArray.q_pos();
+}
+
+// @brief 否定出力のピン番号を返す．
+inline
+ymuint
+FFGroup::iq_pos() const
+{
+  return mPosArray.iq_pos();
+}
 
 END_NAMESPACE_YM_CELLMAP
 

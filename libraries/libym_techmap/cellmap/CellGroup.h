@@ -62,6 +62,21 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+inline
+CellGroup::CellGroup() :
+  mCellNum(0),
+  mCellList(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+CellGroup::~CellGroup()
+{
+  // mCellList は CellMgr が管理している．
+}
+
 // @brief セル数を返す．
 inline
 ymuint

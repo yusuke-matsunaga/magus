@@ -27,7 +27,8 @@ libym_techmap_cell_la_SOURCES = \
 	FFClass.h \
 	FFClass.cc \
 	FFGroup.h \
-	FFGroup.cc \
+	FFPosArray.h \
+	FFPosArray.cc \
 	FuncGroup.h \
 	LatchClass.h \
 	LatchClass.cc \

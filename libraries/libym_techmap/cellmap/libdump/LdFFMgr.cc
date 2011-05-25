@@ -16,60 +16,6 @@
 BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP
 
 //////////////////////////////////////////////////////////////////////
-// クラス LdFFGroup
-//////////////////////////////////////////////////////////////////////
-
-// @brief シグネチャを返す．
-ymuint
-LdFFGroup::signature() const
-{
-  return mPosArray;
-}
-
-// @brief データ入力のピン番号を返す．
-ymuint
-LdFFGroup::data_pos() const
-{
-  return (mPosArray >> 0) & 7U;
-}
-
-// @brief クロック入力のピン番号を返す．
-ymuint
-LdFFGroup::clock_pos() const
-{
-  return (mPosArray >> 3) & 7U;
-}
-
-// @brief クリア入力のピン番号を返す．
-ymuint
-LdFFGroup::clear_pos() const
-{
-  return (mPosArray >> 12) & 7U;
-}
-
-// @brief プリセット入力のピン番号を返す．
-ymuint
-LdFFGroup::preset_pos() const
-{
-  return (mPosArray >> 15) & 7U;
-}
-
-// @brief 肯定出力のピン番号を返す．
-ymuint
-LdFFGroup::q_pos() const
-{
-  return (mPosArray >> 6) & 7U;
-}
-
-// @brief 否定出力のピン番号を返す．
-ymuint
-LdFFGroup::iq_pos() const
-{
-  return (mPosArray >> 9) & 7U;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス LdFFClass
 //////////////////////////////////////////////////////////////////////
 
@@ -175,19 +121,14 @@ LdFFMgr::find_group(ymuint clock_sense,
     ff_class->mBits = sig;
   }
 
-  ymuint sig2 = 0U;
-  sig2 |= (data_pos << 0);
-  sig2 |= (clock_pos << 3);
-  sig2 |= (clear_pos << 12);
-  sig2 |= (preset_pos << 15);
-  sig2 |= (q_pos << 6);
-  sig2 |= (iq_pos << 9);
+  FFPosArray sig2;
+  sig2.set(data_pos, clock_pos, clear_pos, preset_pos, q_pos, iq_pos);
 
   LdFFGroup* ff_group = NULL;
   for (vector<LdFFGroup*>::iterator p = ff_class->mGroupList.begin();
        p != ff_class->mGroupList.end(); ++ p) {
     LdFFGroup* ff_group1 = *p;
-    if ( ff_group1->signature() == sig2 ) {
+    if ( ff_group1->signature() == sig2.signature() ) {
       ff_group = ff_group1;
       break;
     }

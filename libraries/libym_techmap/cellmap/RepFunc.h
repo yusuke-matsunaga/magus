@@ -64,6 +64,21 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+inline
+RepFunc::RepFunc() :
+  mFuncNum(0U),
+  mFuncIdList(NULL)
+{
+}
+
+// @brief デストラクタ
+inline
+RepFunc::~RepFunc()
+{
+  // mFuncIdList は CellMgr が管理している．
+}
+
 // @brief NPN同値類の数を返す．
 inline
 ymuint

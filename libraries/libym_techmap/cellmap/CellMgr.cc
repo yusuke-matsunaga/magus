@@ -22,54 +22,8 @@
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
-// クラス CellGroup
+// クラス CellMgr
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-CellGroup::CellGroup() :
-  mCellNum(0),
-  mCellList(NULL)
-{
-}
-
-// @brief デストラクタ
-CellGroup::~CellGroup()
-{
-  // mCellList は CellMgr が管理している．
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス FuncGroup
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-FuncGroup::FuncGroup()
-{
-}
-
-// @brief デストラクタ
-FuncGroup::~FuncGroup()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス RepFunc
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-RepFunc::RepFunc() :
-  mFuncNum(0U),
-  mFuncIdList(NULL)
-{
-}
-
-// @brief デストラクタ
-RepFunc::~RepFunc()
-{
-  // mFuncIdList は CellMgr が管理している．
-}
 
 BEGIN_NONAMESPACE
 
@@ -91,11 +45,6 @@ read_map(istream& s,
 }
 
 END_NONAMESPACE
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス CellMgr
-//////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 CellMgr::CellMgr() :
@@ -178,7 +127,8 @@ CellMgr::load_library(istream& s)
   }
   for (ymuint i = 0; i < mFFGroupNum; ++ i) {
     FFGroup& ff_group = mFFGroupArray[i];
-    ff_group.mPosArray = BinIO::read_32(s);
+    ymuint sig = BinIO::read_32(s);
+    ff_group.mPosArray.set_signature(sig);
     load_cellgroup(s, ff_group);
   }
 
