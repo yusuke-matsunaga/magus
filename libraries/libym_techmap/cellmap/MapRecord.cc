@@ -104,6 +104,8 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
 {
   mapgraph.clear();
 
+  mapgraph.set_name(sbjgraph.name());
+
   // 外部入力の生成
   const BdnNodeList& input_list = sbjgraph.input_list();
   for (BdnNodeList::const_iterator p = input_list.begin();
