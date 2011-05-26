@@ -77,6 +77,20 @@ CiPin::function() const
   return LogExpr::make_zero();
 }
 
+// @brief three_state 属性を持っているときに true を返す．
+bool
+CiPin::has_three_state() const
+{
+  return false;
+}
+
+// @brief three_state 論理式を返す．
+LogExpr
+CiPin::three_state() const
+{
+  return LogExpr::make_zero();
+}
+
 // @brief 最大ファンアウト容量を返す．
 CellCapacitance
 CiPin::max_fanout() const
@@ -135,6 +149,14 @@ CiPin::timing(ymuint ipos,
 // @param[in] function 関数を表す論理式
 void
 CiPin::set_function(const LogExpr& function)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
+// @param[in] expr three_state 条件を表す論理式
+void
+CiPin::set_three_state(const LogExpr& expr)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -233,7 +255,7 @@ CiOutputPin::CiOutputPin(const ShString& name,
 			 CellTime max_transition,
 			 CellTime min_transition) :
   CiPin(name),
-  mHasFunction(false),
+  mHasFunction(0U),
   mMaxFanout(max_fanout),
   mMinFanout(min_fanout),
   mMaxCapacitance(max_capacitance),
@@ -259,7 +281,7 @@ CiOutputPin::direction() const
 bool
 CiOutputPin::has_function() const
 {
-  return mHasFunction;
+  return static_cast<bool>(mHasFunction & 1U);
 }
 
 // @brief 機能を表す論理式を返す．
@@ -267,6 +289,20 @@ LogExpr
 CiOutputPin::function() const
 {
   return mFunction;
+}
+
+// @brief three_state 属性を持っているときに true を返す．
+bool
+CiOutputPin::has_three_state() const
+{
+  return static_cast<bool>((mHasFunction >> 1) & 1U);
+}
+
+// @brief three_state 論理式を返す．
+LogExpr
+CiOutputPin::three_state() const
+{
+  return mThreeState;
 }
 
 // @brief 最大ファンアウト容量を返す．
@@ -332,8 +368,16 @@ CiOutputPin::timing(ymuint ipos,
 void
 CiOutputPin::set_function(const LogExpr& function)
 {
-  mHasFunction = true;
+  mHasFunction |= 1U;
   mFunction = function;
+}
+
+// @brief 出力ピンの three_state() 属性を設定する．
+void
+CiOutputPin::set_three_state(const LogExpr& three_state)
+{
+  mHasFunction |= 2U;
+  mThreeState = three_state;
 }
 
 // @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．

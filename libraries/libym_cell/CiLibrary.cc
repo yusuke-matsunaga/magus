@@ -542,4 +542,17 @@ CiLibrary::set_opin_function(CiCell* cell,
   pin->set_function(function);
 }
 
+// @brief 出力ピンの three_state 条件を設定する．
+// @param[in] cell セル
+// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
+// @param[in] expr three_state 条件を表す論理式
+void
+CiLibrary::set_opin_three_state(CiCell* cell,
+				ymuint opin_id,
+				const LogExpr& expr)
+{
+  CiPin* pin = cell->mPinArray[opin_id];
+  pin->set_three_state(expr);
+}
+
 END_NAMESPACE_YM_CELL

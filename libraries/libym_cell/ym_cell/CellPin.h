@@ -91,6 +91,16 @@ public:
   LogExpr
   function() const = 0;
 
+  /// @brief three_state 属性を持っているときに true を返す．
+  virtual
+  bool
+  has_three_state() const = 0;
+
+  /// @brief three_state 論理式を返す．
+  virtual
+  LogExpr
+  three_state() const = 0;
+
   /// @brief 最大ファンアウト容量を返す．
   virtual
   CellCapacitance

@@ -90,6 +90,16 @@ public:
   LogExpr
   function() const;
 
+  /// @brief three_state 属性を持っているときに true を返す．
+  virtual
+  bool
+  has_three_state() const;
+
+  /// @brief three_state 論理式を返す．
+  virtual
+  LogExpr
+  three_state() const;
+
   /// @brief 最大ファンアウト容量を返す．
   virtual
   CellCapacitance
@@ -141,6 +151,12 @@ private:
   virtual
   void
   set_function(const LogExpr& function);
+
+  /// @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
+  /// @param[in] expr three_state 条件を表す論理式
+  virtual
+  void
+  set_three_state(const LogExpr& expr);
 
   /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
   virtual
@@ -305,6 +321,16 @@ public:
   LogExpr
   function() const;
 
+  /// @brief three_state 属性を持っているときに true を返す．
+  virtual
+  bool
+  has_three_state() const;
+
+  /// @brief three_state 論理式を返す．
+  virtual
+  LogExpr
+  three_state() const;
+
   /// @brief 最大ファンアウト容量を返す．
   virtual
   CellCapacitance
@@ -357,6 +383,11 @@ private:
   void
   set_function(const LogExpr& function);
 
+  /// @brief 出力ピンの three_state() 属性を設定する．
+  virtual
+  void
+  set_three_state(const LogExpr& three_state);
+
   /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
   virtual
   void
@@ -383,6 +414,9 @@ private:
 
   // 出力の論理式
   LogExpr mFunction;
+
+  // three_state 属性の論理式
+  LogExpr mThreeState;
 
   // ファンアウトの負荷
   CellCapacitance mFanoutLoad;

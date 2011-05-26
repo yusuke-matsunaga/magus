@@ -294,6 +294,9 @@ display_library(ostream& s,
 	if ( pin->has_function() ) {
 	  s << "    Function         = " << pin->function() << endl;
 	}
+	if ( pin->has_three_state() ) {
+	  s << "    Three State      = " << pin->three_state() << endl;
+	}
 	s << "    Max Fanout       = " << pin->max_fanout() << endl
 	  << "    Min Fanout       = " << pin->min_fanout() << endl
 	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
@@ -311,8 +314,10 @@ display_library(ostream& s,
 	if ( pin->has_function() ) {
 	  s << "    Function         = " << pin->function() << endl;
 	}
-	s << "    Function         = " << pin->function() << endl
-	  << "    Capacitance      = " << pin->capacitance() << endl
+	if ( pin->has_three_state() ) {
+	  s << "    Three State      = " << pin->three_state() << endl;
+	}
+	s << "    Capacitance      = " << pin->capacitance() << endl
 	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
 	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl
 	  << "    Max Fanout       = " << pin->max_fanout() << endl

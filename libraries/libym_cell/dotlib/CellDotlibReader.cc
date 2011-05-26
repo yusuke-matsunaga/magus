@@ -374,6 +374,11 @@ gen_library(const DotlibNode* dt_library)
 	    }
 #endif
 	  }
+	  const DotlibNode* three_state = pin_info.three_state();
+	  if ( three_state ) {
+	    LogExpr expr = dot2expr(three_state, pin_map);
+	    library->set_opin_three_state(cell, i, expr);
+	  }
 	}
 	break;
 
