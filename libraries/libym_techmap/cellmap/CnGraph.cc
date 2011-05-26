@@ -63,11 +63,14 @@ CnNode::id_str() const
 
 // @brief コンストラクタ
 // @param[in] name 名前
-// @param[in] io_node_vec 対応する入出力ノードのベクタ
+// @param[in] bw ビット数
+// @param[in] bit_array 対応する入出力ノードの配列
 CnPort::CnPort(const string& name,
-	       const vector<CnNode*>& io_node_vec) :
+	       ymuint bw,
+	       const CnNode** bit_array) :
   mName(name),
-  mBody(io_node_vec)
+  mBitWidth(bw),
+  mBitArray(bit_array)
 {
 }
 
@@ -359,7 +362,14 @@ void
 CnGraph::add_port(const string& name,
 		  const vector<CnNode*>& io_node_vec)
 {
-  CnPort* port = new CnPort(name, io_node_vec);
+  ymuint bw = io_node_vec.size();
+  void* q = mAlloc.get_memory(sizeof(const CnNode*) * bw);
+  const CnNode** bit_array = new (q) const CnNode*[bw];
+  for (ymuint i = 0; i < bw; ++ i) {
+    bit_array[i] = io_node_vec[i];
+  }
+  void* p = mAlloc.get_memory(sizeof(CnPort));
+  CnPort* port = new (p) CnPort(name, bw, bit_array);
   mPortArray.push_back(port);
   ymuint n = io_node_vec.size();
   for (ymuint i = 0; i < n; ++ i) {

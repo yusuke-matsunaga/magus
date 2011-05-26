@@ -346,9 +346,11 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] io_node_vec 対応する入出力ノードのベクタ
+  /// @param[in] bw ビット数
+  /// @param[in] bit_array 対応する入出力ノードの配列
   CnPort(const string& name,
-	 const vector<CnNode*>& io_node_vec);
+	 ymuint bw,
+	 const CnNode** bit_array);
 
   /// @brief デストラクタ
   ~CnPort();
@@ -381,8 +383,11 @@ private:
   // 名前
   string mName;
 
+  // ビット数
+  ymuint32 mBitWidth;
+
   // 入出力ノードの配列
-  vector<CnNode*> mBody;
+  const CnNode** mBitArray;
 
 };
 
@@ -1065,7 +1070,7 @@ inline
 ymuint
 CnPort::bit_width() const
 {
-  return mBody.size();
+  return mBitWidth;
 }
 
 // @brief pos ビット目の内容を得る．
@@ -1074,7 +1079,7 @@ inline
 const CnNode*
 CnPort::bit(ymuint pos) const
 {
-  return mBody[pos];
+  return mBitArray[pos];
 }
 
 
