@@ -169,6 +169,10 @@ LibDump::gen_pat(const CellLibrary& library)
 	// 論理式を持たないセルも対象外
 	continue;
       }
+      if ( opin->has_three_state() ) {
+	// three_state 属性を持つセルも対象外
+	continue;
+      }
 
       LogExpr expr = opin->function();
       TvFunc tv = expr2tvfunc(expr);
