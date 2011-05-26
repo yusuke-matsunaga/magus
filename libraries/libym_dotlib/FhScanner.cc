@@ -58,6 +58,7 @@ FhScanner::read_token(FileRegion& loc)
     goto ST_ID;
   }
   if ( c == '0' || c == '1' ) {
+    mCurString.put_char(c);
     goto ST_NUM;
   }
 
