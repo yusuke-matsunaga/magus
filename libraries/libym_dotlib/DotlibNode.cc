@@ -554,6 +554,11 @@ DotlibNode::get_pin_info(DotlibPin& pin_info) const
     return false;
   }
 
+  // 'three_state' を取り出す．
+  if ( !pin_info.get_singleton_or_null("three_state", pin_info.mThreeState) ) {
+    return false;
+  }
+
   return true;
 }
 

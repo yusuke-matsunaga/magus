@@ -104,6 +104,10 @@ public:
   const DotlibNode*
   function() const;
 
+  /// @brief "three_state" を返す．
+  const DotlibNode*
+  three_state() const;
+
   /// @brief "internal_node" を返す．
   const DotlibNode*
   internal_node() const;
@@ -157,6 +161,9 @@ private:
 
   // "function"
   const DotlibNode* mFunction;
+
+  // "three_state"
+  const DotlibNode* mThreeState;
 
   // "internal_node"
   const DotlibNode* mInternalNode;

@@ -230,6 +230,12 @@ dotlibparser_test(int argc,
 	      func_node->dump(cout);
 	      cout << endl;
 	    }
+	    const DotlibNode* three_state = pin_info.three_state();
+	    if ( three_state ) {
+	      cout << "        three_state = ";
+	      three_state->dump(cout);
+	      cout << endl;
+	    }
 	  }
 	}
 	for (list<const DotlibNode*>::const_iterator q = dt_bus_list.begin();

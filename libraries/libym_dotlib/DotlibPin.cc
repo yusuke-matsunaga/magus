@@ -34,6 +34,7 @@ DotlibPin::init()
   DotlibAttrMap::init();
 
   mFunction = NULL;
+  mThreeState = NULL;
   mInternalNode = NULL;
   mPinFuncType = NULL;
 
@@ -122,6 +123,13 @@ const DotlibNode*
 DotlibPin::function() const
 {
   return mFunction;
+}
+
+// @brief "three_state" を返す．
+const DotlibNode*
+DotlibPin::three_state() const
+{
+  return mThreeState;
 }
 
 // @brief "internal_node" を返す．

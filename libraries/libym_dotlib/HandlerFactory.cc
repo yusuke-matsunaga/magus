@@ -787,7 +787,7 @@ HandlerFactory::new_pin(GroupHandler* parent)
   handler->reg_handler("slew_control", simple);
   handler->reg_handler("state_function", simple);
   handler->reg_handler("test_output_only", simple);
-  handler->reg_handler("three_state", simple);
+  handler->reg_handler("three_state", new FuncHandler(handler));
   handler->reg_handler("vhdl_name", simple);
   handler->reg_handler("x_function", simple);
 
