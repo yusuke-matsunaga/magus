@@ -38,7 +38,7 @@ bnet2aig_SOURCES = \
 	bnet2aig.cc
 bnet2aig_LDADD = \
 	$(LIBYM_AIG) \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/bnet/libym_bnet.la
 
 genpat_SOURCES = \
 	GpNode.h \
