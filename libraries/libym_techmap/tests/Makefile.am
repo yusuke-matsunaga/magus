@@ -26,7 +26,6 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 LIBYM_TECHMAP = $(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la
-LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
 	cell_mgr_test \
@@ -49,5 +48,4 @@ areacover_test_SOURCES = \
 	areacover_test.cc
 
 areacover_test_LDADD = \
-	$(LIBYM_TECHMAP) \
-	$(LIBYM_BNET)
+	$(LIBYM_TECHMAP)

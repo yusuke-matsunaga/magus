@@ -68,7 +68,7 @@ ym_libym_lexp_enable=1
 ym_libym_bdd_enable=1
 ym_libym_npn_enable=1
 ym_libym_sat_enable=1
-ym_libym_smtlibv2_enable=1
+ym_libym_smtlibv2_enable=0
 ym_libym_blif_enable=1
 ym_libym_iscas89_enable=1
 ym_libym_mislib_enable=1
@@ -166,7 +166,7 @@ YM_BUILD_LIBRARY([libym_gds],
 
 # libym_cec
 YM_BUILD_LIBRARY([libym_cec],
-		 [ym_libym_bnet_enable,
+		 [ym_libym_networks_enable,
 		  ym_libym_sat_enable,
 		  ym_libym_aig_enable])
 
@@ -178,7 +178,7 @@ YM_BUILD_LIBRARY([libym_techmap],
 # libym_seal
 YM_BUILD_LIBRARY([libym_seal],
 		 [ym_libym_bdd_enable,
-		  ym_libym_bnet_enable])
+		  ym_libym_networks_enable])
 
 # libym_tclpp
 YM_BUILD_LIBRARY([libym_tclpp],

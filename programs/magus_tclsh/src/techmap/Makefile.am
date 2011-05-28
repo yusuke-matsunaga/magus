@@ -28,8 +28,7 @@ libmagus_techmap_tcl_la_SOURCES = \
 
 libmagus_techmap_tcl_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_mvnbdnconv/libym_mvnbdnconv.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnetbdnconv/libym_bnetbdnconv.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 

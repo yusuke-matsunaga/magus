@@ -26,9 +26,8 @@ libmagus_lutmap_tcl_la_SOURCES = \
 	WriteVqmCmd.cc
 
 libmagus_lutmap_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lutmap/libym_lutmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_mvnbdnconv/libym_mvnbdnconv.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnetbdnconv/libym_bnetbdnconv.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 

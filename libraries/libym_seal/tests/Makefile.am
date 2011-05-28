@@ -24,7 +24,7 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-#LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
+#LIBYM_NET = $(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
 
 #bin_PROGRAMS = \
 #	makenode \

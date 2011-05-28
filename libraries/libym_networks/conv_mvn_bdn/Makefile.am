@@ -70,6 +70,4 @@ libym_conv_mvn_bdn_la_SOURCES = \
 libym_conv_mvn_bdn_la_LDFLAGS =
 
 libym_conv_mvn_bdn_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/mvn/libym_mvn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/bdn/libym_bdn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

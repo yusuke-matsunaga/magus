@@ -17,8 +17,8 @@ noinst_LTLIBRARIES = libmagus_test.la
 
 libmagus_test_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
-libmagus_test_la_LDFLAGS = 
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+libmagus_test_la_LDFLAGS =
 libmagus_test_la_SOURCES = \
 	TestCmd.h \
 	TestCmd.cc

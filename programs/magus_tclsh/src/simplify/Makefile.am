@@ -22,7 +22,7 @@ libmagus_simplify_la_SOURCES = \
 
 libmagus_simplify_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 libmagus_simplify_la_LDFLAGS =
