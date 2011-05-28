@@ -38,6 +38,10 @@ libym_dotlib_la_SOURCES = \
 	SimpleHandler.cc \
 	ExprHandler.h \
 	ExprHandler.cc \
+	FuncHandler.h \
+	FuncHandler.cc \
+	FhScanner.h \
+	FhScanner.cc \
 	ComplexHandler.h \
 	ComplexHandler.cc \
 	DefineHandler.h \
@@ -50,7 +54,15 @@ libym_dotlib_la_SOURCES = \
 	DotlibMgrImpl.h \
 	DotlibMgrImpl.cc \
 	DotlibNodeImpl.h \
-	DotlibNodeImpl.cc
+	DotlibNodeImpl.cc \
+	DotlibNode.cc \
+	DotlibAttrMap.cc \
+	DotlibLibrary.cc \
+	DotlibCell.cc \
+	DotlibFL.cc \
+	DotlibFF.cc \
+	DotlibLatch.cc \
+	DotlibPin.cc
 
 
 

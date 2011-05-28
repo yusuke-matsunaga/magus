@@ -12,7 +12,7 @@
 
 
 #include "ymtools.h"
-#include "ym_bnet/BNetwork.h"
+#include "ym_networks/BNetwork.h"
 #include "ym_sat/Bool3.h"
 
 

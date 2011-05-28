@@ -1,0 +1,28 @@
+#! /bin/sh
+
+# Copyright (C) 2005-2011 Yusuke Matsunaga
+# All rights reserved
+
+# 概要
+#
+# モジュールの Makefile を更新するスクリプト
+#
+# 使用方法
+#
+# ./update <module-name> ...
+
+case $# in
+    0)
+	echo "Usage: $0 <module-name> ..."
+	exit 255
+	;;
+esac
+
+while [ $# -gt 0 ]
+do
+    for dir in opt debug prof
+    do
+	(cd $dir/$1; make Makefile)
+    done
+    shift
+done

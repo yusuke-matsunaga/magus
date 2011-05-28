@@ -13,8 +13,8 @@
 
 #include "matpg_nsdef.h"
 #include "ym_tclpp/TclCmd.h"
-#include "ym_tgnet/TgNetwork.h"
-#include "ym_tgnet/TgIscas89Reader.h"
+#include "ym_networks/TgNetwork.h"
+#include "ym_networks/TgIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_YM_MATPG

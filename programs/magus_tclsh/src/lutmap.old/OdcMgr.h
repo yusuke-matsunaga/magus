@@ -17,7 +17,7 @@
 
 #include "lutmap.h"
 #include <ym_bdd/Bdd.h>
-#include <ym_bnet/bnet_nsdef.h>
+#include <ym_networks/bnet_nsdef.h>
 #include "CalcOdc.h"
 
 

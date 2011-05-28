@@ -2,16 +2,16 @@
 #define YM_TECHMAP_CNGRAPH_H
 
 /// @file ym_techmap/CnGraph.h
-/// @brief LutNetwork のヘッダファイル
+/// @brief CnGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: LutNetwork.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_techmap/techmap_nsdef.h"
+#include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
 
 #include "ym_utils/Alloc.h"
@@ -19,10 +19,10 @@
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class CnEdge CnGraph.h "CnGraph.h"
+/// @class CnEdge CnGraph.h "ym_techmap/CnGraph.h"
 /// @brief CELLネットワークの枝を表すクラス
 ///
 /// - 入力側のノード
@@ -117,7 +117,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CnNode CnGraph.h "CnGraph.h"
+/// @class CnNode CnGraph.h "ym_techmap/CnGraph.h"
 /// @brief セルネットワークを構成するセルノードを表すクラス
 ///
 /// ノードの種類は
@@ -332,7 +332,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CnPort CnGraph.h "CnGraph.h"
+/// @class CnPort CnGraph.h "ym_techmap/CnGraph.h"
 /// @brief ポートを表すクラス
 //////////////////////////////////////////////////////////////////////
 class CnPort
@@ -346,9 +346,11 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] io_node_vec 対応する入出力ノードのベクタ
+  /// @param[in] bw ビット数
+  /// @param[in] bit_array 対応する入出力ノードの配列
   CnPort(const string& name,
-	 const vector<CnNode*>& io_node_vec);
+	 ymuint bw,
+	 const CnNode** bit_array);
 
   /// @brief デストラクタ
   ~CnPort();
@@ -381,14 +383,17 @@ private:
   // 名前
   string mName;
 
+  // ビット数
+  ymuint32 mBitWidth;
+
   // 入出力ノードの配列
-  vector<CnNode*> mBody;
+  const CnNode** mBitArray;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CnGraph CnGraph.h "CnGraph.h"
+/// @class CnGraph CnGraph.h "ym_techmap/CnGraph.h"
 /// @brief セルネットワークを表すクラス
 ///
 /// 入力ノード，出力ノード，セルノード，DFF ノードを分けてリストで持つ
@@ -1065,7 +1070,7 @@ inline
 ymuint
 CnPort::bit_width() const
 {
-  return mBody.size();
+  return mBitWidth;
 }
 
 // @brief pos ビット目の内容を得る．
@@ -1074,7 +1079,7 @@ inline
 const CnNode*
 CnPort::bit(ymuint pos) const
 {
-  return mBody[pos];
+  return mBitArray[pos];
 }
 
 
@@ -1215,6 +1220,6 @@ CnGraph::dff_list() const
   return mDffList;
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_CELLMAP
 
-#endif // YM_TECHMAP_LUTNETWORK_H
+#endif // YM_TECHMAP_CNGRAPH_H

@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_bnet/BNetwork.h"
-#include "ym_bnet/BNetBlifReader.h"
+#include "ym_networks/BNetwork.h"
+#include "ym_networks/BNetBlifReader.h"
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigHandle.h"
 

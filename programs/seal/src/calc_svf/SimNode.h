@@ -12,7 +12,7 @@
 
 
 #include "seal_utils.h"
-#include <ym_tgnet/TgGateTemplate.h>
+#include <ym_networks/TgGateTemplate.h>
 #include "EqElem.h"
 #include "SimFFR.h"
 

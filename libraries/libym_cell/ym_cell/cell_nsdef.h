@@ -73,6 +73,7 @@ using nsCell::CellLutTemplate;
 using nsCell::CellLut;
 
 using nsCell::CellMislibReader;
+using nsCell::CellDotlibReader;
 
 END_NAMESPACE_YM
 

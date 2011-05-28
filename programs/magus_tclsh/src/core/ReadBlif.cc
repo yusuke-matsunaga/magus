@@ -13,7 +13,7 @@
 
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"
-#include "ym_bdn/BlifBdnConv.h"
+#include "ym_networks/BlifBdnConv.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "TclObjMsgHandler.h"

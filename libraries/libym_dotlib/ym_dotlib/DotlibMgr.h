@@ -10,6 +10,7 @@
 
 
 #include "ym_dotlib/dotlib_nsdef.h"
+#include "ym_utils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -19,6 +20,7 @@ class DotlibMgrImpl;
 //////////////////////////////////////////////////////////////////////
 /// @class DotlibMgr DotlibMgr.h "ym_dotlib/DotlibMgr.h"
 /// @brief DotlibNode を管理するためのクラス
+/// 内容は DotlibParser によってセットされる．
 //////////////////////////////////////////////////////////////////////
 class DotlibMgr
 {

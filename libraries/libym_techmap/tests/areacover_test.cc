@@ -9,10 +9,10 @@
 
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"
-#include "ym_bdn/BdnMgr.h"
-#include "ym_bdn/BlifBdnConv.h"
-#include "ym_bdn/BdnDumper.h"
-#include "ym_techmap/TechMap.h"
+#include "ym_networks/BdnMgr.h"
+#include "ym_networks/BlifBdnConv.h"
+#include "ym_networks/BdnDumper.h"
+#include "ym_techmap/CellMap.h"
 #include "ym_techmap/CnGraph.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -34,13 +34,13 @@ usage()
 END_NONAMESPACE
 
 
-BEGIN_NAMESPACE_YM_TECHMAP
+BEGIN_NAMESPACE_YM_CELLMAP
 
 void
 test(string pat_filename,
      string sbj_filename)
 {
-  TechMap mapper;
+  CellMap mapper;
 
   {
     ifstream ifs;
@@ -94,13 +94,15 @@ test(string pat_filename,
 #endif
 }
 
-END_NAMESPACE_YM_TECHMAP
+END_NAMESPACE_YM_CELLMAP
 
 
 int
 main(int argc,
      char** argv)
 {
+  using nsYm::nsCellmap::test;
+
   argv0 = argv[0];
 
   if ( argc != 3 ) {
@@ -108,7 +110,7 @@ main(int argc,
     return 1;
   }
 
-  nsYm::nsTechmap::test(argv[1], argv[2]);
+  test(argv[1], argv[2]);
 
   return 0;
 }

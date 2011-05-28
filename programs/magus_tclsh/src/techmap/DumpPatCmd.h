@@ -10,6 +10,7 @@
 
 
 #include "TechmapCmd.h"
+#include "ym_tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -38,6 +39,18 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // -mislib オプション
+  TclPoptStr* mMislibOpt;
+
+  // -dotlib オプション
+  TclPoptStr* mDotlibOpt;
 
 };
 

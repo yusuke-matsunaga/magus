@@ -435,6 +435,63 @@ DotlibString::dump(ostream& s,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス DotlibNot
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] opr オペランド
+// @param[in] loc ファイル上の位置
+DotlibNot::DotlibNot(const DotlibNode* opr,
+		     const FileRegion& loc) :
+  DotlibNodeBase(loc),
+  mOpr1(opr)
+{
+}
+
+// @brief デストラクタ
+DotlibNot::~DotlibNot()
+{
+}
+
+// @brief 型を得る．
+DotlibNode::tType
+DotlibNot::type() const
+{
+  return kNot;
+}
+
+// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
+bool
+DotlibNot::is_opr() const
+{
+  return true;
+}
+
+// @brief 第一オペランドを返す．
+// @note type() が演算子の型の時のみ意味を持つ．
+const DotlibNode*
+DotlibNot::opr1() const
+{
+  return mOpr1;
+}
+
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibNot::dump(ostream& s,
+		ymuint indent) const
+{
+  for (ymuint i = 0; i < indent; ++ i) {
+    s << ' ';
+  }
+  s << "!( ";
+  opr1()->dump(s, 0);
+  s << " )";
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス DotlibOpr
 //////////////////////////////////////////////////////////////////////
 
@@ -509,6 +566,9 @@ DotlibOpr::dump(ostream& s,
   case kMinus: s << " - "; break;
   case kMult:  s << " * "; break;
   case kDiv:   s << " / "; break;
+  case kAnd:   s << " & "; break;
+  case kOr:    s << " | "; break;
+  case kXor:   s << " ^ "; break;
   default:
     assert_not_reached(__FILE__, __LINE__);
   }

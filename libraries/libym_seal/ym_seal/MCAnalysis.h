@@ -12,7 +12,7 @@
 
 
 #include "ym_seal/seal_nsdef.h"
-#include "ym_bnet/bnet_nsdef.h"
+#include "ym_networks/bnet_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL

@@ -8,8 +8,8 @@
 
 
 #include "ym_dotlib/DotlibMgr.h"
-
 #include "DotlibMgrImpl.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

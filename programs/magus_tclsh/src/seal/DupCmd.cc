@@ -10,7 +10,7 @@
 
 
 #include "DupCmd.h"
-#include "ym_bnet/BNetManip.h"
+#include "ym_networks/BNetManip.h"
 #include "ym_utils/RandGen.h"
 
 

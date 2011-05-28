@@ -35,11 +35,11 @@ TechmapCmd::~TechmapCmd()
 {
 }
 
-// @brief TechMap を得る．
-TechMap&
+// @brief CellMap を得る．
+CellMap&
 TechmapCmd::techmap()
 {
-  return mData->mTechMap;
+  return mData->mCellMap;
 }
 
 // @brief セルネットワークを得る．

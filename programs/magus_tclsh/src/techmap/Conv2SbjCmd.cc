@@ -10,11 +10,11 @@
 
 
 #include "Conv2SbjCmd.h"
-#include "ym_bnet/BNet2Sbj.h"
-#include "ym_mvn/MvnMgr.h"
-#include "ym_bdn/BdnMgr.h"
-#include "ym_mvnbdnconv/MvnBdnConv.h"
-#include "ym_mvnbdnconv/MvnBdnMap.h"
+#include "ym_networks/BNet2Sbj.h"
+#include "ym_networks/MvnMgr.h"
+#include "ym_networks/BdnMgr.h"
+#include "ym_networks/MvnBdnConv.h"
+#include "ym_networks/MvnBdnMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

@@ -14,6 +14,7 @@
 #include "DefineHandler.h"
 #include "GroupHandler.h"
 #include "ExprHandler.h"
+#include "FuncHandler.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -538,13 +539,14 @@ HandlerFactory::new_ff(GroupHandler* parent)
 
   // simple attributes
   DotlibHandler* simple = new_string_simple(handler);
-  handler->reg_handler("clear", simple);
+  DotlibHandler* fhandler = new FuncHandler(handler);
+  handler->reg_handler("clear", fhandler);
   handler->reg_handler("clear_preset_var1", simple);
   handler->reg_handler("clear_preset_var2", simple);
-  handler->reg_handler("clocked_on", simple);
-  handler->reg_handler("clocked_on_also", simple);
-  handler->reg_handler("next_state", simple);
-  handler->reg_handler("preset", simple);
+  handler->reg_handler("clocked_on", fhandler);
+  handler->reg_handler("clocked_on_also", fhandler);
+  handler->reg_handler("next_state", fhandler);
+  handler->reg_handler("preset", fhandler);
 
   return handler;
 }
@@ -578,13 +580,14 @@ HandlerFactory::new_latch(GroupHandler* parent)
 
   // simple attributes
   DotlibHandler* simple = new_string_simple(handler);
-  handler->reg_handler("clear", simple);
+  DotlibHandler* fhandler = new FuncHandler(handler);
+  handler->reg_handler("clear", fhandler);
   handler->reg_handler("clear_preset_var1", simple);
   handler->reg_handler("clear_preset_var2", simple);
-  handler->reg_handler("data_in", simple);
-  handler->reg_handler("enable", simple);
-  handler->reg_handler("enable_also", simple);
-  handler->reg_handler("preset", simple);
+  handler->reg_handler("data_in", fhandler);
+  handler->reg_handler("enable", fhandler);
+  handler->reg_handler("enable_also", fhandler);
+  handler->reg_handler("preset", fhandler);
 
   return handler;
 }
@@ -693,7 +696,7 @@ HandlerFactory::new_bundle(GroupHandler* parent)
   DotlibHandler* simple = new_simple(handler);
   handler->reg_handler("capacitance", simple);
   handler->reg_handler("direction", simple);
-  handler->reg_handler("function", simple);
+  handler->reg_handler("function", new FuncHandler(handler));
 
   // complex attributes
   DotlibHandler* complex = new_complex(handler);
@@ -746,7 +749,7 @@ HandlerFactory::new_pin(GroupHandler* parent)
   handler->reg_handler("fall_time_before_threshold", simple);
   handler->reg_handler("fanout_load", simple);
   handler->reg_handler("fault_model", simple);
-  handler->reg_handler("function", simple);
+  handler->reg_handler("function", new FuncHandler(handler));
   handler->reg_handler("has_builtin_pad", simple);
   handler->reg_handler("hysteresis", simple);
   handler->reg_handler("input_map", simple);
@@ -784,7 +787,7 @@ HandlerFactory::new_pin(GroupHandler* parent)
   handler->reg_handler("slew_control", simple);
   handler->reg_handler("state_function", simple);
   handler->reg_handler("test_output_only", simple);
-  handler->reg_handler("three_state", simple);
+  handler->reg_handler("three_state", new FuncHandler(handler));
   handler->reg_handler("vhdl_name", simple);
   handler->reg_handler("x_function", simple);
 

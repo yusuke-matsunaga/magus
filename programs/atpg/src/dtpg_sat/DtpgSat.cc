@@ -10,8 +10,8 @@
 
 
 #include "DtpgSat.h"
-#include "ym_tgnet/TgNetwork.h"
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/TgNetwork.h"
+#include "ym_networks/TgNode.h"
 #include "SaFault.h"
 #include "TestVector.h"
 #include "ym_sat/SatSolver.h"

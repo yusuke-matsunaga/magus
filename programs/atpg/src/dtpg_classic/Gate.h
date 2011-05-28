@@ -13,7 +13,7 @@
 
 #include "dtpgcl_nsdef.h"
 #include "Val3.h"
-#include "ym_tgnet/TgGateTemplate.h"
+#include "ym_networks/TgGateTemplate.h"
 #include "LqElem.h"
 
 

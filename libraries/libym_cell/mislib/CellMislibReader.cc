@@ -15,7 +15,7 @@
 #include "ym_mislib/MislibNode.h"
 #include "ym_lexp/LogExpr.h"
 #include "ym_npn/TvFunc.h"
-#include "../ci/CiLibrary.h"
+#include "../CiLibrary.h"
 #include "ym_utils/MsgMgr.h"
 
 BEGIN_NAMESPACE_YM_CELL
@@ -167,7 +167,7 @@ gen_library(const string& lib_name,
     }
 
     ymuint ni = ipin_name_list.size();
-    CiCell* cell = library->new_cell(cell_id, name, area, ni +  1, 0, 0);
+    CiCell* cell = library->new_logic_cell(cell_id, name, area, ni +  1, 0, 0);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];
@@ -176,15 +176,15 @@ gen_library(const string& lib_name,
       library->new_cell_input(cell, i, name, load, load, load);
     }
     // 出力ピンの設定
-    CiOutputPin* opin = library->new_cell_output(cell, ni, opin_name,
-						 CellCapacitance::infty(),
-						 CellCapacitance(0.0),
-						 CellCapacitance::infty(),
-						 CellCapacitance(0.0),
-						 CellTime::infty(),
-						 CellTime(0.0));
+    library->new_cell_output(cell, ni, opin_name,
+			     CellCapacitance::infty(),
+			     CellCapacitance(0.0),
+			     CellCapacitance::infty(),
+			     CellCapacitance(0.0),
+			     CellTime::infty(),
+			     CellTime(0.0));
     LogExpr function = opin_expr->to_expr(ipin_name_map);
-    library->set_opin_function(opin, function);
+    library->set_opin_function(cell, ni, function);
 
     TvFunc tv_function = expr_to_tvfunc(function, ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -259,7 +259,7 @@ gen_library(const string& lib_name,
 					       CellTime(0.0), CellTime(0.0),
 					       r_r, f_r);
       if ( !redundant ) {
-	library->set_opin_timing(opin, i, sense, timing);
+	library->set_opin_timing(cell, ni, i, sense, timing);
       }
     }
   }

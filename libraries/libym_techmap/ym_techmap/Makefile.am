@@ -7,6 +7,12 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	techmap_nsdef.h \
+	cellmap_nsdef.h \
+	lutmap_nsdef.h \
+	sbj_nsdef.h \
+	CellMap.h \
 	CnGraph.h \
-	TechMap.h
+	LnGraph.h \
+	LutMap.h \
+	SbjDumper.h \
+	SbjGraph.h

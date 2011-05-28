@@ -40,6 +40,14 @@ public:
     kMult,
     /// @brief / 演算子
     kDiv,
+    /// @brief NOT 演算子
+    kNot,
+    /// @brief AND 演算子
+    kAnd,
+    /// @brief OR 演算子
+    kOr,
+    /// @brief XOR 演算子
+    kXor,
     /// @brief リスト
     kList,
     /// @brief グループ
@@ -185,6 +193,77 @@ public:
   void
   dump(ostream& s,
        ymuint indent = 0) const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // パーズ用の便利関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ライブラリを表すノードから情報を取り出す．
+  /// @param[out] library_info ライブラリの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_library_info(DotlibLibrary& library_info) const;
+
+  /// @brief セルを表すノードから情報を取り出す．
+  /// @param[out] cell_info セルの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_cell_info(DotlibCell& cell_info) const;
+
+  /// @brief FFを表すノードから情報を取り出す．
+  /// @param[out] ff_info FFの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_ff_info(DotlibFF& ff_info) const;
+
+  /// @brief ラッチを表すノードから情報を取り出す．
+  /// @param[out] latch_info ラッチの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_latch_info(DotlibLatch& latch_info) const;
+
+  /// @brief ピンを表すノードから情報を取り出す．
+  /// @param[out] pin_info ピンの情報を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_pin_info(DotlibPin& pin_info) const;
+
+  /// @brief 1つの文字列からなるリストの場合に文字列を返す．
+  /// @note 仮定が外れたらアボートする．
+  ShString
+  get_string_from_value_list() const;
+
+  /// @brief 2つの文字列からなるリストの内容を取り出す．
+  /// @param[out] str1 1つ目の文字列を格納する変数
+  /// @param[out] str2 2つ目の文字列を格納する変数
+  /// @retval true 正しく読み込めた．
+  /// @retval false エラーが起こった．
+  /// @note エラーは MsgMgr に出力する．
+  bool
+  get_string_pair(ShString& str1,
+		  ShString& str2) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief get_ff_info() と get_latch_info() の共通処理
+  bool
+  get_fl_info(DotlibFL& fl_info) const;
 
 };
 

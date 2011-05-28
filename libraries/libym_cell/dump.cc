@@ -51,6 +51,15 @@ dump_library(ostream& s,
   BinIO::write_32(s, nc);
   for (ymuint i = 0; i < nc; ++ i) {
     const Cell* cell = library.cell(i);
+    ymuint tid = 0;
+    switch ( cell->type() ) {
+    case Cell::kLogic: tid = 0; break;
+    case Cell::kFF:    tid = 1; break;
+    case Cell::kLatch: tid = 2; break;
+    case Cell::kFSM:   tid = 3; break;
+    default: assert_not_reached(__FILE__, __LINE__); break;
+    }
+    BinIO::write_8(s, tid);
     BinIO::write_str(s, cell->name());
     BinIO::write_double(s, cell->area().value());
 
@@ -105,7 +114,7 @@ dump_library(ostream& s,
       switch ( pin->direction() ) {
       case kDirInput:
 	// Input のつもり
-	BinIO::write_32(s, 1);
+	BinIO::write_8(s, 1);
 	BinIO::write_double(s, pin->capacitance().value());
 	BinIO::write_double(s, pin->rise_capacitance().value());
 	BinIO::write_double(s, pin->fall_capacitance().value());
@@ -113,7 +122,7 @@ dump_library(ostream& s,
 
       case kDirOutput:
 	// Output のつもり
-	BinIO::write_32(s, 2);
+	BinIO::write_8(s, 2);
 	BinIO::write_double(s, pin->max_fanout().value());
 	BinIO::write_double(s, pin->min_fanout().value());
 	BinIO::write_double(s, pin->max_capacitance().value());
@@ -125,7 +134,7 @@ dump_library(ostream& s,
 	  if ( timing_p ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_p->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	    BinIO::write_32(s, 1);
+	    BinIO::write_8(s, 1);
 	    BinIO::write_32(s, k);
 	    BinIO::write_32(s, p->second);
 	  }
@@ -133,17 +142,17 @@ dump_library(ostream& s,
 	  if ( timing_n ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
-	    BinIO::write_32(s, 2);
+	    BinIO::write_8(s, 2);
 	    BinIO::write_32(s, k);
 	    BinIO::write_32(s, p->second);
 	  }
 	}
-	BinIO::write_32(s, 0); // timing 情報が終わった印
+	BinIO::write_8(s, 0); // timing 情報が終わった印
 	break;
 
       case kDirInout:
 	// InOut のつもり
-	BinIO::write_32(s, 3);
+	BinIO::write_8(s, 3);
 	BinIO::write_double(s, pin->capacitance().value());
 	BinIO::write_double(s, pin->rise_capacitance().value());
 	BinIO::write_double(s, pin->fall_capacitance().value());
@@ -173,6 +182,10 @@ dump_library(ostream& s,
 	}
 	BinIO::write_32(s, 0); // timing 情報が終わった印
 	break;
+
+      case kDirInternal:
+	// Internal のつもり
+	BinIO::write_8(s, 4);
       }
     }
   }
@@ -220,8 +233,47 @@ display_library(ostream& s,
   ymuint n = library.cell_num();
   for (ymuint i = 0; i < n; ++ i) {
     const Cell* cell = library.cell(i);
-    s << "Cell (" << cell->name() << ")" << endl;
+    s << "Cell#" << cell->id() << " (" << cell->name() << ")" << endl;
     s << "  area = " << cell->area() << endl;
+
+    if ( cell->is_ff() ) {
+      s << "  ff ( " << cell->var1_name()
+	<< ", " << cell->var2_name() << " )" << endl
+	<< "    next_state        = " << cell->next_state() << endl
+	<< "    clocked_on        = " << cell->clocked_on() << endl;
+      if ( !cell->clocked_on_also().is_zero() ) {
+	s << "    clocked_on_also   = " << cell->clocked_on_also() << endl;
+      }
+      if ( !cell->clear().is_zero() ) {
+	s << "    clear             = " << cell->clear() << endl;
+      }
+      if ( !cell->preset().is_zero() ) {
+	s << "    preset            = " << cell->preset() << endl;
+      }
+      if ( !cell->clear().is_zero() && !cell->preset().is_zero() ) {
+	s << "    clear_preset_var1 = " << cell->clear_preset_var1() << endl
+	  << "    clear_preset_var2 = " << cell->clear_preset_var2() << endl;
+      }
+    }
+    else if ( cell->is_latch() ) {
+      s << "  latch ( " << cell->var1_name()
+	<< ", " << cell->var2_name() << " )" << endl
+	<< "    data_in           = " << cell->data_in() << endl
+	<< "    enable            = " << cell->enable() << endl;
+      if ( !cell->enable().is_zero() ) {
+	s << "    enable_also       = " << cell->enable_also() << endl;
+      }
+      if ( !cell->clear().is_zero() ) {
+	s << "    clear             = " << cell->clear() << endl;
+      }
+      if ( !cell->preset().is_zero() ) {
+	s << "    preset            = " << cell->preset() << endl;
+      }
+      if ( !cell->clear().is_zero() && !cell->preset().is_zero() ) {
+	s << "    clear_preset_var1 = " << cell->clear_preset_var1() << endl
+	  << "    clear_preset_var2 = " << cell->clear_preset_var2() << endl;
+      }
+    }
 
     ymuint np = cell->pin_num();
     for (ymuint j = 0; j < np; ++ j) {
@@ -242,6 +294,9 @@ display_library(ostream& s,
 	if ( pin->has_function() ) {
 	  s << "    Function         = " << pin->function() << endl;
 	}
+	if ( pin->has_three_state() ) {
+	  s << "    Three State      = " << pin->three_state() << endl;
+	}
 	s << "    Max Fanout       = " << pin->max_fanout() << endl
 	  << "    Min Fanout       = " << pin->min_fanout() << endl
 	  << "    Max Capacitance  = " << pin->max_capacitance() << endl
@@ -259,8 +314,10 @@ display_library(ostream& s,
 	if ( pin->has_function() ) {
 	  s << "    Function         = " << pin->function() << endl;
 	}
-	s << "    Function         = " << pin->function() << endl
-	  << "    Capacitance      = " << pin->capacitance() << endl
+	if ( pin->has_three_state() ) {
+	  s << "    Three State      = " << pin->three_state() << endl;
+	}
+	s << "    Capacitance      = " << pin->capacitance() << endl
 	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
 	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl
 	  << "    Max Fanout       = " << pin->max_fanout() << endl
@@ -273,6 +330,10 @@ display_library(ostream& s,
 	  display_timing(s, cell, pin, k, kSensePosiUnate);
 	  display_timing(s, cell, pin, k, kSenseNegaUnate);
 	}
+	break;
+
+      case kDirInternal:
+	s << "    Direction        = INTERNAL" << endl;
 	break;
 
       default:

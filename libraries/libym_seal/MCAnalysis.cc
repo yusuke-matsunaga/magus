@@ -10,7 +10,7 @@
 
 
 #include "ym_seal/MCAnalysis.h"
-#include "ym_bnet/BNetwork.h"
+#include "ym_networks/BNetwork.h"
 #include "ym_utils/StopWatch.h"
 #include "Matrix.h"
 #include "SMatrix.h"

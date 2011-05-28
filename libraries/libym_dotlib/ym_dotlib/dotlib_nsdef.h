@@ -33,6 +33,12 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibMgr;
 class DotlibParser;
 class DotlibNode;
+class DotlibLibrary;
+class DotlibCell;
+class DotlibFL;
+class DotlibFF;
+class DotlibLatch;
+class DotlibPin;
 
 END_NAMESPACE_YM_DOTLIB
 
@@ -42,6 +48,11 @@ BEGIN_NAMESPACE_YM
 using nsDotlib::DotlibMgr;
 using nsDotlib::DotlibParser;
 using nsDotlib::DotlibNode;
+using nsDotlib::DotlibLibrary;
+using nsDotlib::DotlibCell;
+using nsDotlib::DotlibFF;
+using nsDotlib::DotlibLatch;
+using nsDotlib::DotlibPin;
 
 END_NAMESPACE_YM
 

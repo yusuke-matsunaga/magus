@@ -16,7 +16,7 @@
 
 #include "ReadBlifCmd.h"
 #include "MatpgMsgHandler.h"
-#include "ym_tgnet/TgNetwork.h"
+#include "ym_networks/TgNetwork.h"
 #include "ym_tclpp/TclPopt.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/StopWatch.h"

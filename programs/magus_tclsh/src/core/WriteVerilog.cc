@@ -11,9 +11,9 @@
 
 #include "WriteVerilog.h"
 
-#include "ym_bnet/BNetVerilogWriter.h"
-#include "ym_bdn/BdnVerilogWriter.h"
-#include "ym_mvn/MvnVerilogWriter.h"
+#include "ym_networks/BNetVerilogWriter.h"
+#include "ym_networks/BdnVerilogWriter.h"
+#include "ym_networks/MvnVerilogWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS

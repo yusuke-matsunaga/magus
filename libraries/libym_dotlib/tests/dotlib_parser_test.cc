@@ -14,7 +14,14 @@
 #include "ym_dotlib/DotlibMgr.h"
 #include "ym_dotlib/DotlibParser.h"
 #include "ym_dotlib/DotlibNode.h"
+#include "ym_dotlib/DotlibLibrary.h"
+#include "ym_dotlib/DotlibCell.h"
+#include "ym_dotlib/DotlibFF.h"
+#include "ym_dotlib/DotlibLatch.h"
+#include "ym_dotlib/DotlibPin.h"
+
 #include "ym_utils/StopWatch.h"
+
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
@@ -39,6 +46,7 @@ dotlibparser_test(int argc,
   bool debug = false;
   bool loop = false;
   bool dump = false;
+  bool parse = false;
   for (int i = 1; i < argc; ++ i) {
     if ( strcmp(argv[i], "-d") == 0 ) {
       debug = true;
@@ -48,6 +56,9 @@ dotlibparser_test(int argc,
     }
     else if ( strcmp(argv[i], "-v") == 0 ) {
       dump = true;
+    }
+    else if ( strcmp(argv[i], "-p") == 0 ) {
+      parse = true;
     }
     else {
       bool stat = parser.read_file(argv[i], mgr, debug);
@@ -61,6 +72,184 @@ dotlibparser_test(int argc,
   if ( dump ) {
     const DotlibNode* library = mgr.root_node();
     library->dump(cout);
+  }
+  if ( parse ) {
+    for ( ; ; ) {
+      // break を使いたいだけの擬似ループ
+      const DotlibNode* dt_library = mgr.root_node();
+      DotlibLibrary library_info;
+      if ( !dt_library->attr_value()->get_library_info(library_info) ) {
+	break;
+      }
+      cout << "library name = " << library_info.name() << endl;
+
+      const list<const DotlibNode*>& cell_list = library_info.cell_list();
+      for (list<const DotlibNode*>::const_iterator p = cell_list.begin();
+	   p != cell_list.end(); ++ p) {
+	const DotlibNode* dt_cell = *p;
+	DotlibCell cell_info;
+	if ( !dt_cell->get_cell_info(cell_info) ) {
+	  continue;
+	}
+	cout << endl
+	     << "  cell name = " << cell_info.name() << endl
+	     << "       area = " << cell_info.area() << endl;
+	const DotlibNode* dt_ff = cell_info.ff();
+	if ( dt_ff ) {
+	  DotlibFF ff_info;
+	  if ( !dt_ff->get_ff_info(ff_info) ) {
+	    continue;
+	  }
+	  cout << "       ff (" << ff_info.var1_name()
+	       << ", " << ff_info.var2_name() << ")" << endl;
+	  const DotlibNode* next_state = ff_info.next_state();
+	  if ( next_state ) {
+	    cout << "          next_state = ";
+	    next_state->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clocked_on = ff_info.clocked_on();
+	  if ( clocked_on ) {
+	    cout << "          clocked_on = ";
+	    clocked_on->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clocked_on_also = ff_info.clocked_on_also();
+	  if ( clocked_on_also ) {
+	    cout << "          clocked_on_also = ";
+	    clocked_on_also->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clear = ff_info.clear();
+	  if ( clear ) {
+	    cout << "          clear = ";
+	    clear->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* preset = ff_info.preset();
+	  if ( preset ) {
+	    cout << "          preset = ";
+	    preset->dump(cout);
+	    cout << endl;
+	  }
+	  cout << "          clear_preset_var1 = "
+	       << ff_info.clear_preset_var1() << endl;
+	  cout << "          clear_preset_var2 = "
+	       << ff_info.clear_preset_var2() << endl;
+	}
+	const DotlibNode* dt_latch = cell_info.latch();
+	if ( dt_latch ) {
+	  DotlibLatch latch_info;
+	  if ( !dt_latch->get_latch_info(latch_info) ) {
+	    continue;
+	  }
+	  cout << "       latch (" << latch_info.var1_name()
+	       << ", " << latch_info.var2_name() << ")" << endl;
+	  const DotlibNode* data_in = latch_info.data_in();
+	  if ( data_in ) {
+	    cout << "          data_in = ";
+	    data_in->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* enable = latch_info.enable();
+	  if ( enable ) {
+	    cout << "          enable = ";
+	    enable->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* enable_also = latch_info.enable_also();
+	  if ( enable_also ) {
+	    cout << "          enable_also = ";
+	    enable_also->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* clear = latch_info.clear();
+	  if ( clear ) {
+	    cout << "          clear = ";
+	    clear->dump(cout);
+	    cout << endl;
+	  }
+	  const DotlibNode* preset = latch_info.preset();
+	  if ( preset ) {
+	    cout << "          preset = ";
+	    preset->dump(cout);
+	    cout << endl;
+	  }
+	  cout << "          clear_preset_var1 = "
+	       << latch_info.clear_preset_var1() << endl;
+	  cout << "          clear_preset_var2 = "
+	       << latch_info.clear_preset_var2() << endl;
+	}
+	const list<const DotlibNode*>& dt_pin_list = cell_info.pin_list();
+	const list<const DotlibNode*>& dt_bus_list = cell_info.bus_list();
+	const list<const DotlibNode*>& dt_bundle_list = cell_info.bundle_list();
+	for (list<const DotlibNode*>::const_iterator q = dt_pin_list.begin();
+	     q != dt_pin_list.end(); ++ q) {
+	  const DotlibNode* dt_pin = *q;
+	  DotlibPin pin_info;
+	  if ( !dt_pin->get_pin_info(pin_info) ) {
+	    continue;
+	  }
+	  cout << "    pin name = " << pin_info.name() << endl
+	       << "        direction = ";
+	  switch ( pin_info.direction() ) {
+	  case DotlibPin::kInput: cout << "input"; break;
+	  case DotlibPin::kOutput: cout << "output"; break;
+	  case DotlibPin::kInout: cout << "inout"; break;
+	  case DotlibPin::kInternal: cout << "internal"; break;
+	  }
+	  cout << endl;
+	  if ( pin_info.direction() == DotlibPin::kInput ||
+	       pin_info.direction() == DotlibPin::kInout ) {
+	    cout << "        capacitance = "
+		 << pin_info.capacitance() << endl
+		 << "        rise capacitance = "
+		 << pin_info.rise_capacitance() << endl
+		 << "        fall capacitance = "
+		 << pin_info.fall_capacitance() << endl;
+	  }
+	  if ( pin_info.direction() == DotlibPin::kOutput ||
+	       pin_info.direction() == DotlibPin::kInout ) {
+	    cout << "        max_fanout = "
+		 << pin_info.max_fanout() << endl
+		 << "        min_fanout = "
+		 << pin_info.min_fanout() << endl
+		 << "        max_capacitance = "
+		 << pin_info.max_capacitance() << endl
+		 << "        min_capacitance = "
+		 << pin_info.min_capacitance() << endl
+		 << "        max_transition = "
+		 << pin_info.max_transition() << endl
+		 << "        min_transition = "
+		 << pin_info.min_transition() << endl;
+	  }
+	  if ( pin_info.direction() == DotlibPin::kOutput ) {
+	    const DotlibNode* func_node = pin_info.function();
+	    if ( func_node ) {
+	      cout << "        function = ";
+	      func_node->dump(cout);
+	      cout << endl;
+	    }
+	    const DotlibNode* three_state = pin_info.three_state();
+	    if ( three_state ) {
+	      cout << "        three_state = ";
+	      three_state->dump(cout);
+	      cout << endl;
+	    }
+	  }
+	}
+	for (list<const DotlibNode*>::const_iterator q = dt_bus_list.begin();
+	     q != dt_bus_list.end(); ++ q) {
+	  const DotlibNode* dt_bus = *q;
+	  dt_bus->dump(cout);
+	}
+	for (list<const DotlibNode*>::const_iterator q = dt_bundle_list.begin();
+	     q != dt_bundle_list.end(); ++ q) {
+	  const DotlibNode* dt_bundle = *q;
+	  dt_bundle->dump(cout);
+	}
+      }
+    }
   }
 
   timer.stop();

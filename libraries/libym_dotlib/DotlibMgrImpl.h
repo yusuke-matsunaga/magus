@@ -84,6 +84,31 @@ public:
   new_div(const DotlibNode* opr1,
 	  const DotlibNode* opr2);
 
+  /// @brief NOT 演算子を表す DotlibNode を生成する．
+  /// @param[in] opr オペランド
+  /// @param[in] loc ファイル上の位置
+  DotlibNodeImpl*
+  new_not(const DotlibNode* opr,
+	  const FileRegion& loc);
+
+  /// @brief AND 演算子を表す DotlibNode を生成する．
+  /// @param[in] opr1, opr2 オペランド
+  DotlibNodeImpl*
+  new_and(const DotlibNode* opr1,
+	  const DotlibNode* opr2);
+
+  /// @brief OR 演算子を表す DotlibNode を生成する．
+  /// @param[in] opr1, opr2 オペランド
+  DotlibNodeImpl*
+  new_or(const DotlibNode* opr1,
+	 const DotlibNode* opr2);
+
+  /// @brief XOR 演算子を表す DotlibNode を生成する．
+  /// @param[in] opr1, opr2 オペランド
+  DotlibNodeImpl*
+  new_xor(const DotlibNode* opr1,
+	  const DotlibNode* opr2);
+
   /// @brief リストを表す DotlibNode を生成する．
   /// @note 空のリストが返される．
   DotlibNodeImpl*
@@ -132,6 +157,7 @@ private:
   ymuint32 mFloatNum;
   ymuint32 mStrNum;
   ymuint32 mOprNum;
+  ymuint32 mNotNum;
   ymuint32 mListNum;
   ymuint32 mGroupNum;
   ymuint32 mAttrNum;

@@ -7,8 +7,8 @@
 
 SUBDIRS = \
 	ym_cell \
-	ci \
 	mislib \
+	dotlib \
 	. \
 	tests
 
@@ -21,7 +21,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_cell.la
 
 libym_cell_la_LIBADD = \
-	ci/libym_cell_ci.la \
+	dotlib/libym_cell_dotlib.la \
 	mislib/libym_cell_mislib.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
@@ -30,4 +30,17 @@ libym_cell_la_LIBADD = \
 libym_cell_la_LDFLAGS =
 
 libym_cell_la_SOURCES = \
-	dump.cc
+	CiBundle.h \
+	CiBundle.cc \
+	CiBus.h \
+	CiBus.cc \
+	CiCell.h \
+	CiCell.cc \
+	CiLibrary.h \
+	CiLibrary.cc \
+	CiPin.h \
+	CiPin.cc \
+	CiTiming.h \
+	CiTiming.cc \
+	dump.cc	\
+	restore.cc

@@ -4,7 +4,9 @@
 
 SUBDIRS = \
 	ym_techmap \
-	patgen \
+	sbjgraph \
+	cellmap \
+	lutmap \
 	. \
 	tests
 
@@ -16,26 +18,12 @@ INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-libym_techmap_la_SOURCES = \
-	AreaCover.h \
-	AreaCover.cc \
-	CnGraph.cc \
-	CnGraph_dump.cc \
-	FuncGroup.h \
-	MapRecord.h \
-	MapRecord.cc \
-	Match.h \
-	Match.cc \
-	PatGraph.h \
-	PatMatcher.h \
-	PatMatcher.cc \
-	PatMgr.h \
-	PatMgr.cc \
-	RepFunc.h \
-	TechMap.cc
+libym_techmap_la_SOURCES =
 
 libym_techmap_la_LIBADD = \
-	patgen/libym_techmap_patgen.la \
+	sbjgraph/libym_techmap_sbj.la \
+	cellmap/libym_techmap_cell.la \
+	lutmap/libym_techmap_lut.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \

@@ -24,7 +24,7 @@
 
 #include "matpg.h"
 #include "gate.h"
-#include <ym_tgnet/tgnet_nsdef.h>
+#include <ym_networks/tgnet_nsdef.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG
