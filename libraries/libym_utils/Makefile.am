@@ -21,6 +21,9 @@ libym_utils_la_SOURCES = \
 	Binder.cc \
 	DlList.cc \
 	File.cc \
+	FileInfo.h \
+	FileInfo.cc \
+	FileInfoMgr.h \
 	FileInfoMgr.cc \
 	FileScanner.cc \
 	FragAlloc.cc \
