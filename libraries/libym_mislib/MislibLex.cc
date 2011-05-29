@@ -10,7 +10,6 @@
 
 
 #include "MislibLex.h"
-#include "ym_utils/FileInfoMgr.h"
 #include "ym_utils/MsgMgr.h"
 
 

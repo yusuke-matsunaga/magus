@@ -9,7 +9,6 @@
 /// All rights reserved.
 
 
-#include "ym_utils/FileInfoMgr.h"
 #include "ym_utils/FileInfo.h"
 #include "ym_utils/FileLoc.h"
 #include "ym_utils/FileRegion.h"
@@ -28,42 +27,52 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス FileInfoMgr
-//////////////////////////////////////////////////////////////////////
-
-// @brief 新しい FileInfo を生成する．
-// @param[in] filename ファイル名
-// @return 生成された FileInfo
-FileInfo
-FileInfoMgr::new_file_info(const char* filename)
-{
-  ymuint id = gTheMgr.new_file_info(filename);
-  return FileInfo(id);
-}
-
-// @brief 新しい FileInfo を生成する．
-// @param[in] filename ファイル名
-// @param[in] parent_loc インクルード元の親ファイルの情報
-// @return 生成された FileInfo
-FileInfo
-FileInfoMgr::new_file_info(const char* filename,
-			   const FileLoc& parent_loc)
-{
-  ymuint id = gTheMgr.new_file_info(filename, parent_loc);
-  return FileInfo(id);
-}
-
-// @brief 生成したすべての FileInfo を削除する．
-void
-FileInfoMgr::clear()
-{
-  gTheMgr.clear();
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス FileInfo
 //////////////////////////////////////////////////////////////////////
+
+// @brief 空のコンストラクタ
+// @note 無効な ID で初期化される．
+FileInfo::FileInfo() :
+  mId(0xFFFF)
+{
+}
+
+// @brief ファイル名を指定したコンストラクタ
+// @param[in] filename ファイル名
+FileInfo::FileInfo(const char* filename)
+{
+  mId = gTheMgr.new_file_info(filename);
+}
+
+// @brief ファイル名を指定したコンストラクタ
+// @param[in] filename ファイル名
+FileInfo::FileInfo(const string& filename)
+{
+  mId = gTheMgr.new_file_info(filename.c_str());
+}
+
+// @brief ファイル名とインクルード元の親ファイルの情報
+// @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
+FileInfo::FileInfo(const char* filename,
+		   const FileLoc& parent_loc)
+{
+  mId = gTheMgr.new_file_info(filename, parent_loc);
+}
+
+// @brief ファイル名とインクルード元の親ファイルの情報
+// @param[in] filename ファイル名
+// @param[in] parent_loc インクルード元の親ファイルの情報
+FileInfo::FileInfo(const string& filename,
+		   const FileLoc& parent_loc)
+{
+  mId = gTheMgr.new_file_info(filename.c_str(), parent_loc);
+}
+
+// @brief デストラクタ
+FileInfo::~FileInfo()
+{
+}
 
 // @brief ファイル名を返す．
 string
@@ -224,7 +233,6 @@ FiMgrImpl::FiMgrImpl()
 // @note このクラスで生成したデータはすべて削除される．
 FiMgrImpl::~FiMgrImpl()
 {
-  clear();
 }
 
 // @brief 新しい _FileInfo を生成する．
@@ -249,13 +257,6 @@ FiMgrImpl::new_file_info(const char* filename,
   ymuint id = mFiArray.size();
   mFiArray.push_back(_FileInfo(filename, parent_loc));
   return id;
-}
-
-// @brief 生成したすべての FileInfo を削除する．
-void
-FiMgrImpl::clear()
-{
-  mFiArray.clear();
 }
 
 END_NAMESPACE_YM

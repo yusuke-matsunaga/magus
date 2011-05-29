@@ -31,13 +31,31 @@ class FileLoc;
 //////////////////////////////////////////////////////////////////////
 class FileInfo
 {
-  friend class FileInfoMgr;
-
 public:
 
   /// @brief 空のコンストラクタ
   /// @note 無効な ID で初期化される．
   FileInfo();
+
+  /// @brief ファイル名を指定したコンストラクタ
+  /// @param[in] filename ファイル名
+  FileInfo(const char* filename);
+
+  /// @brief ファイル名を指定したコンストラクタ
+  /// @param[in] filename ファイル名
+  FileInfo(const string& filename);
+
+  /// @brief ファイル名とインクルード元の親ファイルの情報
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  FileInfo(const char* filename,
+	   const FileLoc& parent_loc);
+
+  /// @brief ファイル名とインクルード元の親ファイルの情報
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  FileInfo(const string& filename,
+	   const FileLoc& parent_loc);
 
   /// @brief デストラクタ
   ~FileInfo();
@@ -71,17 +89,6 @@ public:
   /// @note トップレベルのファイルが先頭になる．
   void
   parent_loc_list(list<FileLoc>& loc_list) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で(FileInfoMgrから)使われる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 値を指定したコンストラクタ
-  /// @param[in] id ID番号
-  explicit
-  FileInfo(ymuint id);
 
 
 private:
@@ -129,28 +136,6 @@ operator<<(ostream& s,
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief 空のコンストラクタ
-// @note 無効な ID で初期化される．
-inline
-FileInfo::FileInfo() :
-  mId(0xFFFF)
-{
-}
-
-// @brief 値を指定したコンストラクタ
-// @param[in] id ID番号
-inline
-FileInfo::FileInfo(ymuint id) :
-  mId(id)
-{
-}
-
-// @brief デストラクタ
-inline
-FileInfo::~FileInfo()
-{
-}
 
 // @brief 有効なデータを持っているときに true を返す．
 inline

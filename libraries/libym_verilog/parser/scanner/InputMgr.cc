@@ -12,7 +12,6 @@
 #include "InputMgr.h"
 #include <fcntl.h>
 
-#include "ym_utils/FileInfoMgr.h"
 #include "ym_utils/FileInfo.h"
 
 
@@ -100,7 +99,7 @@ InputMgr::open_file(const string& filename,
   if ( fd < 0 ) {
     return false;
   }
-  FileInfo file_info = FileInfoMgr::new_file_info(realname, parent_file);
+  FileInfo file_info = FileInfo(realname, parent_file);
   InputFile* new_file = new InputFile(mLex, fd, file_info);
   if ( mCurFile ) {
     mFileStack.push_back(mCurFile);
@@ -133,14 +132,14 @@ InputMgr::set_file_loc(const char* new_filename,
     if ( cur_fi.filename() != new_filename ) {
       // 新しい FileInfo を作る．
       FileLoc flp = cur_fi.parent_loc();
-      cur_fi = FileInfoMgr::new_file_info(new_filename, flp);
+      cur_fi = FileInfo(new_filename, flp);
     }
     break;
 
   case 1: // 新しいインクルードファイル．
     {
       FileLoc parent_loc(cur_fi, cur_file()->cur_line(), 1);
-      cur_fi = FileInfoMgr::new_file_info(new_filename, parent_loc);
+      cur_fi = FileInfo(new_filename, parent_loc);
     }
     break;
 
@@ -149,7 +148,7 @@ InputMgr::set_file_loc(const char* new_filename,
     if ( cur_fi.filename() != new_filename ) {
       // 新しい FileInfo を作る．
       FileLoc flp = cur_fi.parent_loc();
-      cur_fi = FileInfoMgr::new_file_info(new_filename, flp);
+      cur_fi = FileInfo(new_filename, flp);
     }
     break;
   }

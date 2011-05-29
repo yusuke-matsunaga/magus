@@ -54,10 +54,6 @@ public:
   new_file_info(const char* filename,
 		const FileLoc& parent_loc);
 
-  /// @brief 生成したすべての FileInfo を削除する．
-  void
-  clear();
-
 
 public:
   //////////////////////////////////////////////////////////////////////
