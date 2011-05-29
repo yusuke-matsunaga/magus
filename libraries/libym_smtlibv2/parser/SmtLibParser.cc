@@ -158,10 +158,17 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
     type = kListToken;
     break;
 
-  case kRpToken:
+  case kNlToken:
     break;
 
-  case kNlToken:
+  case kRpToken:
+    // kLpToken に対応していない kRpToken はエラー
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    loc,
+		    kMsgError,
+		    "SMTLIB_PARSER",
+		    "Unmatched ')'.");
+    type = kErrorToken;
     break;
 
   default:
