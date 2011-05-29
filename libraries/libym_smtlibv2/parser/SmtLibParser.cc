@@ -10,8 +10,8 @@
 
 
 #include "SmtLibParser.h"
-#include "ym_utils/FileDescMgr.h"
 #include "SmtLibNodeImpl.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2
@@ -22,8 +22,7 @@ BEGIN_NAMESPACE_YM_SMTLIBV2
 
 // コンストラクタ
 SmtLibParser::SmtLibParser() :
-  mAlloc(4096),
-  mLex(mMsgMgr)
+  mAlloc(4096)
 {
 }
 
@@ -40,11 +39,11 @@ SmtLibParser::~SmtLibParser()
 void
 SmtLibParser::read(const string& filename)
 {
-  if ( !mLex.open_file(filename) ) {
+  if ( !mScanner.open_file(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
-    mMsgMgr.put_msg(__FILE__, __LINE__,
+    MsgMgr::put_msg(__FILE__, __LINE__,
 		    FileRegion(),
 		    kMsgFailure,
 		    "SMTLIB_PARSER", buf.str());
@@ -57,7 +56,8 @@ SmtLibParser::read(const string& filename)
 
   for ( ; ; ) {
     SmtLibNode* root = NULL;
-    tTokenType type = read_sexp(root);
+    FileRegion loc;
+    tTokenType type = read_sexp(root, loc);
     if ( type == kEofToken ) {
       break;
     }
@@ -65,8 +65,8 @@ SmtLibParser::read(const string& filename)
       mError = true;
     }
     else if ( type == kRpToken ) {
-      mMsgMgr.put_msg(__FILE__, __LINE__,
-		      mLex.cur_file_region(),
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
 		      kMsgError,
 		      "SMTLIB_PARSER",
 		      "Unexpected ')'.");
@@ -96,60 +96,64 @@ SmtLibParser::clear()
 }
 
 tTokenType
-SmtLibParser::read_sexp(SmtLibNode*& node)
+SmtLibParser::read_sexp(SmtLibNode*& node,
+			FileRegion& loc)
 {
-  tTokenType type = mLex.read_token();
+  tTokenType type = mScanner.read_token(loc);
   if ( type == kEofToken ) {
     return kEofToken;
   }
-  FileRegion loc = mLex.cur_file_region();
 
   node = NULL;
   switch ( type ) {
   case kNumToken:
-    node = new_num(loc, ShString(mLex.cur_string()).id());
+    node = new_num(loc, ShString(mScanner.cur_string()));
     break;
 
   case kDecToken:
-    node = new_dec(loc, ShString(mLex.cur_string()).id());
+    node = new_dec(loc, ShString(mScanner.cur_string()));
     break;
 
   case kHexToken:
-    node = new_hex(loc, ShString(mLex.cur_string()).id());
+    node = new_hex(loc, ShString(mScanner.cur_string()));
     break;
 
   case kBinToken:
-    node = new_bin(loc, ShString(mLex.cur_string()).id());
+    node = new_bin(loc, ShString(mScanner.cur_string()));
     break;
 
   case kStringToken:
-    node = new_string(loc, ShString(mLex.cur_string()).id());
+    node = new_string(loc, ShString(mScanner.cur_string()));
     break;
 
   case kSymbolToken:
-    node = new_symbol(loc, ShString(mLex.cur_string()).id());
+    node = new_symbol(loc, ShString(mScanner.cur_string()));
     break;
 
   case kKeywordToken:
-    node = new_keyword(loc, ShString(mLex.cur_string()).id());
+    node = new_keyword(loc, ShString(mScanner.cur_string()));
     break;
 
   case kLpToken:
     {
       list<SmtLibNode*> child_list;
+      FileRegion last_loc;
       for ( ; ; ) {
 	SmtLibNode* node1;
-	tTokenType type1 = read_sexp(node1);
+	FileRegion loc1;
+	tTokenType type1 = read_sexp(node1, loc1);
 	if ( type1 == kErrorToken ) {
 	  // エラー
 	  return kErrorToken;
 	}
 	else if ( type1 == kRpToken ) {
+	  last_loc = loc1;
 	  break;
 	}
 	child_list.push_back(node1);
+	last_loc = loc1;
       }
-      node = new_list(loc, child_list);
+      node = new_list(FileRegion(loc, last_loc), child_list);
     }
     type = kListToken;
     break;
@@ -171,7 +175,7 @@ SmtLibParser::read_sexp(SmtLibNode*& node)
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_num(const FileRegion& loc,
-		      StrId val)
+		      const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibNumNode));
   return new (p) SmtLibNumNode(loc, val);
@@ -182,7 +186,7 @@ SmtLibParser::new_num(const FileRegion& loc,
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_dec(const FileRegion& loc,
-		      StrId val)
+		      const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibDecNode));
   return new (p) SmtLibDecNode(loc, val);
@@ -193,7 +197,7 @@ SmtLibParser::new_dec(const FileRegion& loc,
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_hex(const FileRegion& loc,
-		      StrId val)
+		      const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibHexNode));
   return new (p) SmtLibHexNode(loc, val);
@@ -204,7 +208,7 @@ SmtLibParser::new_hex(const FileRegion& loc,
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_bin(const FileRegion& loc,
-		      StrId val)
+		      const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibBinNode));
   return new (p) SmtLibBinNode(loc, val);
@@ -215,7 +219,7 @@ SmtLibParser::new_bin(const FileRegion& loc,
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_string(const FileRegion& loc,
-			 StrId val)
+			 const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibStringNode));
   return new (p) SmtLibStringNode(loc, val);
@@ -226,7 +230,7 @@ SmtLibParser::new_string(const FileRegion& loc,
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_symbol(const FileRegion& loc,
-			 StrId val)
+			 const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibSymbolNode));
   return new (p) SmtLibSymbolNode(loc, val);
@@ -237,7 +241,7 @@ SmtLibParser::new_symbol(const FileRegion& loc,
 // @param[in] val 値
 SmtLibNode*
 SmtLibParser::new_keyword(const FileRegion& loc,
-			  StrId val)
+			  const ShString& val)
 {
   void* p = mAlloc.get_memory(sizeof(SmtLibKeywordNode));
   return new (p) SmtLibKeywordNode(loc, val);
@@ -281,8 +285,11 @@ SmtLibParser::error(const FileRegion& loc,
     msg2 = msg;
   }
 
-  msg_mgr().put_msg(__FILE__, __LINE__, loc,
-		    kMsgError, "SMTLIB_PARSER", msg2);
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  loc,
+		  kMsgError,
+		  "SMTLIB_PARSER",
+		  msg2);
   mError = true;
 }
 
