@@ -13,7 +13,7 @@
 #include "Network.h"
 #include "base/TestVector.h"
 #include "base/TvMgr.h"
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/TgNode.h"
 
 //#define DEBUG 1
 

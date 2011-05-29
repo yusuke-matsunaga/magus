@@ -28,9 +28,9 @@
 #include "matpg.h"
 #include "gate.h"
 #include "network.h"
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tgnet/TgNode.h>
-#include <ym_tgnet/TgBlifReader.h>
+#include <ym_networks/TgNetwork.h>
+#include <ym_networks/TgNode.h>
+#include <ym_networks/TgBlifReader.h>
 #include "fault.h"
 #include "testpat.h"
 #include "learn.h"

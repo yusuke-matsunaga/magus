@@ -1,33 +1,29 @@
 %{ // C++ 宣言部
 
-/// @file libym_mislib/mislib_grammer.yy
+/// @file libym_cell/mislib/mislib_grammer.yy
 /// @brief MIS-II/SIS用セルライブラリのパーザ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: mislib_grammer.yy 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_mislib/mislib_nsdef.h>
-  
-#include <ym_utils/ShString.h>
-#include <ym_utils/FileRegion.h>
+#include "ym_mislib/mislib_nsdef.h"
 
+#include "ym_utils/FileRegion.h"
 #include "MislibParserImpl.h"
+#include "MislibMgrImpl.h"
+#include "MislibNodeImpl.h"
 #include "MislibLex.h"
-#include "MislibPt.h"
-  
+
 
 // より詳細なエラー情報を出力させる．
 #define YYERROR_VERBOSE 1
-  
+
 // 解析結果の型
-#define YYSTYPE MislibPt*
+#define YYSTYPE MislibNodeImpl*
 
 // 位置を表す型
 // (yylloc の型)
@@ -36,7 +32,7 @@
 // YYLTYPE を書き換えたので以下のマクロも書き換えが必要
 #define YYLLOC_DEFAULT(Current, Rhs, N) Current = loc_merge(Rhs, N);
 
-  
+
 BEGIN_NAMESPACE_YM_MISLIB
 
 // 字句解析関数の宣言
@@ -44,13 +40,14 @@ int
 yylex(YYSTYPE*,
       YYLTYPE*,
       MislibParserImpl&);
- 
+
 // エラー報告関数の宣言
 int
 yyerror(YYLTYPE*,
 	MislibParserImpl&,
+	MislibMgrImpl*,
 	const char*);
- 
+
 BEGIN_NONAMESPACE
 
 // loc_array 全体のファイル領域を求める．
@@ -76,6 +73,7 @@ END_NONAMESPACE
 
 // yyparse の引数
 %parse-param {MislibParserImpl& parser}
+%parse-param {MislibMgrImpl* mgr}
 
 // yylex の引数
 %lex-param {MislibParserImpl& parser}
@@ -101,7 +99,7 @@ END_NONAMESPACE
 %token ERROR
 
 // 論理式の演算子は優先度に注意
-%left PLUS
+%left PLUS HAT
 %left STAR
 %nonassoc NOT
 
@@ -123,20 +121,21 @@ file
 gate
 : GATE STR NUM STR EQ expr SEMI pin_list
 { // 通常のパタン
-  parser.new_gate1(@$, $2, $3, $4, $6, $8);
+  mgr->new_gate1(@$, $2, $3, $4, $6, $8);
 }
 | GATE STR NUM STR EQ expr SEMI star_pin
 { // ワイルドカード '*' を使ったピン定義
-  parser.new_gate2(@$, $2, $3, $4, $6, $8);
+  mgr->new_gate2(@$, $2, $3, $4, $6, $8);
 }
 | GATE STR NUM STR EQ expr SEMI
 { // 入力ピンのないパタン (定数セル)
-  parser.new_gate3(@$, $2, $3, $4, $6);
+  mgr->new_gate3(@$, $2, $3, $4, $6);
 }
 | GATE error
 {
   yyclearin;
   yyerrok;
+  $$ = NULL;
 }
 ;
 
@@ -152,15 +151,19 @@ expr
 }
 | NOT expr
 {
-  $$ = parser.new_not(@$, $2);
-} 
+  $$ = mgr->new_not(@$, $2);
+}
 | expr STAR expr
 {
-  $$ = parser.new_and(@$, $1, $3);
+  $$ = mgr->new_and(@$, $1, $3);
 }
 | expr PLUS expr
 {
-  $$ = parser.new_or(@$, $1, $3);
+  $$ = mgr->new_or(@$, $1, $3);
+}
+| expr HAT expr
+{
+  $$ = mgr->new_xor(@$, $1, $3);
 }
 | CONST0
 {
@@ -176,7 +179,7 @@ expr
 pin_list
 : pin
 {
-  $$ = parser.new_pinlist();
+  $$ = mgr->new_list();
   $$->push_back($1);
 }
 | pin_list pin
@@ -189,7 +192,7 @@ pin_list
 pin
 : PIN STR phase NUM NUM NUM NUM NUM NUM
 {
-  $$ = parser.new_pin(@$, $2, $3, $4, $5, $6, $7, $8, $9);
+  $$ = mgr->new_pin(@$, $2, $3, $4, $5, $6, $7, $8, $9);
 }
 ;
 
@@ -198,7 +201,7 @@ star_pin
 : PIN STAR phase NUM NUM NUM NUM NUM NUM
 {
   // STAR(*) はワイルドカード
-  $$ = parser.new_pin(@$, NULL, $3, $4, $5, $6, $7, $8, $9);
+  $$ = mgr->new_pin(@$, NULL, $3, $4, $5, $6, $7, $8, $9);
 }
 
 // 極性情報
@@ -234,27 +237,14 @@ yylex(YYSTYPE* lvalp,
   return parser.scan(*lvalp, *llocp);
 }
 
-/// エラー出力関数
+// エラー出力関数
 int
 yyerror(YYLTYPE* llocp,
 	MislibParserImpl& parser,
+	MislibMgrImpl* mgr,
 	const char* msg)
 {
-  string buff;
-  const char* msg2;
-  // 好みの問題だけど "parse error" よりは "syntax error" の方が好き．
-  if ( !strncmp(msg, "parse error", 11) ) {
-    buff ="syntax error";
-    buff += (msg + 11);
-    msg2 = buff.c_str();
-  }
-  else {
-    msg2 = msg;
-  }
-  
-  parser.msg_mgr().put_msg(__FILE__, __LINE__, *llocp,
-			   kMsgError, "MISLIB_PARSER", msg2);
-  
+  parser.error(*llocp, msg);
   return 1;
 }
 

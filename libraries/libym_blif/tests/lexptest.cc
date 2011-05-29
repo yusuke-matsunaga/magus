@@ -5,12 +5,13 @@
 ///
 /// $Id: lexptest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_blif/BlifParser.h"
 #include "ym_blif/BlifHandler.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_lexp/LogExpr.h"
 
@@ -42,7 +43,7 @@ public:
   virtual
   bool
   init();
-  
+
   /// @brief .model 文の処理
   /// @param[in] loc1 .model の位置情報
   /// @param[in] loc2 文字列の位置情報
@@ -156,13 +157,13 @@ private:
 
   size_t mNi;
   int opol;
-  
+
   // cubepat2expr で用いる作業領域
   vector<LogExpr> mChd1;
   vector<LogExpr> mChd2;
 
   list<LogExpr*> mPageList;
-  
+
   size_t mCount;
   LogExpr* mPage;
 };
@@ -193,7 +194,7 @@ TestBlifHandler::init()
 {
   return true;
 }
-  
+
 // @brief .model 文の処理
 // @param[in] loc1 .model の位置情報
 // @param[in] loc2 文字列の位置情報
@@ -290,7 +291,7 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
       expr = LogExpr::make_and(and_expr);
     }
   }
-  
+
   if ( mPage == NULL || mCount >= 1024 ) {
     mPage = new LogExpr[1024];
     mCount = 0;
@@ -298,7 +299,7 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
   }
   mPage[mCount] = expr;
   ++ mCount;
-  
+
   return true;
 }
 
@@ -386,12 +387,12 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " blif-file" << endl;
     return 2;
   }
-  
+
   try {
     cout << "BEFORE LOOP" << endl;
     LogExpr::print_stats(cout);
@@ -402,8 +403,8 @@ main(int argc,
 	TestBlifHandler* handler = new TestBlifHandler;
 	parser.add_handler(handler);
 	StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-	parser.add_msg_handler(msg_handler);
-    
+	MsgMgr::reg_handler(msg_handler);
+
 	if ( !parser.read(filename) ) {
 	  cerr << "Error in reading " << argv[1] << endl;
 	  return 4;

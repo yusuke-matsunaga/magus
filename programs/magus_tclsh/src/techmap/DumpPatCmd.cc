@@ -10,7 +10,8 @@
 #include "DumpPatCmd.h"
 
 #include "ym_cell/CellMislibReader.h"
-#include "ym_techmap/PatMgr.h"
+#include "ym_cell/CellDotlibReader.h"
+#include "ym_techmap/CellMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -20,7 +21,15 @@ DumpPatCmd::DumpPatCmd(MagMgr* mgr,
 		       TechmapData* data) :
   TechmapCmd(mgr, data)
 {
-  set_usage_string("<genlib-file> <pat-file>");
+  mMislibOpt = new TclPoptStr(this, "mislib",
+			      "read 'mislib' library file",
+			      "mislib-filename");
+  mDotlibOpt = new TclPoptStr(this, "dotlib",
+			      "read '.lib' library file",
+			      "dotlib(liberty)-filename");
+  new_popt_group(mMislibOpt, mDotlibOpt);
+
+  set_usage_string("output-filename");
 }
 
 // @brief デストラクタ
@@ -33,45 +42,57 @@ int
 DumpPatCmd::cmd_proc(TclObjVector& objv)
 {
   ymuint objc = objv.size();
-  if ( objc != 3 ) {
+  if ( objc != 2 ) {
     print_usage();
     return TCL_ERROR;
   }
 
-  try {
-    string src_filename;
-    bool stat1 = tilde_subst(objv[1], src_filename);
-    if ( !stat1 ) {
-      return TCL_ERROR;
-    }
+  bool mislib = mMislibOpt->is_specified();
+  bool dotlib = mDotlibOpt->is_specified();
 
-    CellMislibReader reader;
-    const CellLibrary* library = reader.read(src_filename);
-    if ( library == NULL ) {
-      TclObj emsg;
-      emsg << "Error occured in reading " << src_filename;
-      set_result(emsg);
-      return TCL_ERROR;
-    }
-
-    string dst_filename = objv[2];
-    ofstream os;
-    if ( !open_ofile(os, dst_filename, ios::binary) ) {
-      // エラーメッセージは open_ofile() がセットしている．
-      return TCL_ERROR;
-    }
-
-    PatMgr::dump_library(os, *library);
-
-    return TCL_OK;
+  string arg1;
+  if ( mislib ) {
+    arg1 = mMislibOpt->val();
   }
-  catch ( AssertError x ) {
-    cerr << x << endl;
+  else if ( dotlib ) {
+    arg1 = mDotlibOpt->val();
+  }
+  else {
+    print_usage();
+    return TCL_ERROR;
+  }
+
+  string src_filename;
+  bool stat1 = tilde_subst(arg1, src_filename);
+  if ( !stat1 ) {
+    return TCL_ERROR;
+  }
+
+  const CellLibrary* library = NULL;
+  if ( mislib ) {
+    CellMislibReader reader;
+    library = reader.read(src_filename);
+  }
+  else if ( dotlib ) {
+    CellDotlibReader reader;
+    library = reader.read(src_filename);
+  }
+
+  if ( library == NULL ) {
     TclObj emsg;
-    emsg << "Assertion Error";
+    emsg << "Error occured in reading " << src_filename;
     set_result(emsg);
     return TCL_ERROR;
   }
+
+  string dst_filename = objv[1];
+  ofstream os;
+  if ( !open_ofile(os, dst_filename, ios::binary) ) {
+    // エラーメッセージは open_ofile() がセットしている．
+    return TCL_ERROR;
+  }
+
+  techmap().dump_library(os, *library);
 
   return TCL_OK;
 }

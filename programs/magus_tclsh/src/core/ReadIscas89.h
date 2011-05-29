@@ -12,9 +12,8 @@
 
 
 #include "NetCmd.h"
-#include "TclObjMsgHandler.h"
 
-#include "ym_bnet/BNetIscas89Reader.h"
+#include "ym_networks/BNetIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -51,9 +50,6 @@ private:
 
   // iscas89 ファイルを読み込むためのパーサ
   BNetIscas89Reader mReader;
-
-  // メッセージハンドラ
-  TclObjMsgHandler mMsgHandler;
 
 };
 

@@ -22,6 +22,8 @@
 #include "ElbUdp.h"
 #include "ElbExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -57,11 +59,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
   ostringstream buf;
   buf << "instantiating UDP \"" << def_name << "\".";
-  put_msg(__FILE__, __LINE__,
-	  file_region,
-	  kMsgInfo,
-	  "ELAB",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  file_region,
+		  kMsgInfo,
+		  "ELAB",
+		  buf.str());
 
   ymuint io_size = pt_udp->port_num();
 
@@ -115,11 +117,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
     tVpiScalarVal val;
     if ( !evaluate_scalar(NULL, pt_init_value, val, true) ) {
-      put_msg(__FILE__, __LINE__,
-	      ifr,
-	      kMsgError,
-	      "ELAB",
-	      "Only 1-bit constants are allowed here.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      ifr,
+		      kMsgError,
+		      "ELAB",
+		      "Only 1-bit constants are allowed here.");
       return;
     }
     // 初期値を設定する．
@@ -148,11 +150,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
       PtUdpValueArray input_array = pt_udp_entry->input_array();
       if ( input_array.size() != isize ) {
 	// サイズが合わない．
-	put_msg(__FILE__, __LINE__,
-		tfr,
-		kMsgError,
-		"ELAB",
-		"Number of input symbols mimatch.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			tfr,
+			kMsgError,
+			"ELAB",
+			"Number of input symbols mimatch.");
 	return;
       }
 
@@ -166,22 +168,22 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  ostringstream buf;
 	  buf << symbol2string(symbol)
 	      << " : transition symbol for combinational UDP";
-	  put_msg(__FILE__, __LINE__,
-		  pt_v->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_v->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  return;
 	}
 	if ( symbol == kVpiUdpValNC ) {
 	  // NC は状態出力にしか使えない
 	  ostringstream buf;
 	  buf << symbol2string(symbol) << " : illegal symbol for input field.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_v->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_v->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  return;
 	}
 
@@ -190,12 +192,12 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
       { // 現状態
 	if ( pt_udp_entry->current() ) {
-	  put_msg(__FILE__, __LINE__,
-		  pt_udp_entry->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  "Combinational UDP should not have "
-		  "\'current state\' value.");
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_udp_entry->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  "Combinational UDP should not have "
+			  "\'current state\' value.");
 	  return;
 	}
       }
@@ -208,11 +210,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  // 出力には複合値は使えない
 	  ostringstream buf;
 	  buf << symbol2string(symbol) << " : illegal symbol for output field.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_v->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_v->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  return;
 	}
 
@@ -246,11 +248,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
       if ( input_array.size() != isize ) {
 	// サイズが合わない．
-	put_msg(__FILE__, __LINE__,
-		tfr,
-		kMsgError,
-		"ELAB",
-		"Number of input symbols mimatch.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			tfr,
+			kMsgError,
+			"ELAB",
+			"Number of input symbols mimatch.");
 	return;
       }
 
@@ -265,12 +267,12 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	if ( is_edge_symbol(symbol) ) {
 	  ++ nt;
 	  if ( nt > 1 ) {
-	    put_msg(__FILE__, __LINE__,
-		    pt_v->file_region(),
-		    kMsgError,
-		    "ELAB",
-		    "More than one transition symbols "
-		    "in the same row.");
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_v->file_region(),
+			    kMsgError,
+			    "ELAB",
+			    "More than one transition symbols "
+			    "in the same row.");
 	    return;
 	  }
 	}
@@ -282,11 +284,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
       { // 現状態
 	const PtUdpValue* pt_v = pt_udp_entry->current();
 	if ( !pt_v ) {
-	  put_msg(__FILE__, __LINE__,
-		  tfr,
-		  kMsgError,
-		  "ELAB",
-		  "Sequential UDP requires \'current state\' value.");
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  tfr,
+			  kMsgError,
+			  "ELAB",
+			  "Sequential UDP requires \'current state\' value.");
 	  return;
 	}
 
@@ -297,11 +299,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  ostringstream buf;
 	  buf << symbol2string(symbol)
 	      << " : transition symbol for current state field.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_v->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_v->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  return;
 	}
 	if ( symbol == kVpiUdpValNC ) {
@@ -309,11 +311,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  ostringstream buf;
 	  buf << symbol2string(symbol)
 	      << " : illegal symbol for current state field.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_v->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_v->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  return;
 	}
 
@@ -329,11 +331,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  ostringstream buf;
 	  buf << symbol2string(symbol)
 	      << " : transition symbol for output field.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_v->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_v->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  return;
 	}
 	if ( symbol == kVpiUdpValB || symbol == kVpiUdpValQ ) {
@@ -341,11 +343,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	  ostringstream buf;
 	  buf << symbol2string(symbol)
 	      << " : illegal symbol for output field.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_v->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_v->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  return;
 	}
 

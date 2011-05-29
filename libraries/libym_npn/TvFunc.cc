@@ -681,6 +681,51 @@ TvFunc::operator^=(const TvFunc& src1)
   return *this;
 }
 
+// @brief コファクターを計算し自分に代入する．
+// @param[in] pos 変数番号
+// @param[in] pol 極性
+// @return 自身への参照を返す．
+const TvFunc&
+TvFunc::set_cofactor(ymuint pos,
+		     tPol pol)
+{
+  if ( pos < NIPW ) {
+    ymulong mask = c_masks[pos];
+    if ( pol == kPolNega ) {
+      mask = ~mask;
+    }
+    ymulong* endp = mVector + mNblk;
+    int shift = 1 << pos;
+    for (ymulong* bp = mVector; bp != endp; ++ bp) {
+      ymulong pat = *bp & mask;
+      if ( pol == kPolPosi ) {
+	pat |= (pat >> shift);
+      }
+      else {
+	pat |= (pat << shift);
+      }
+      *bp = pat;
+    }
+  }
+  else {
+    pos -= NIPW;
+    ymuint bit = 1U << pos;
+    for (ymuint i = 0; i < mNblk; ++ i) {
+      if ( pol == kPolPosi ) {
+	if ( (i & bit) == 0U ) {
+	  mVector[i] = mVector[i ^ bit];
+	}
+      }
+      else {
+	if ( (i & bit) == bit ) {
+	  mVector[i] = mVector[i ^ bit];
+	}
+      }
+    }
+  }
+  return *this;
+}
+
 BEGIN_NONAMESPACE
 
 // word の中の 1 のビットを数える．
@@ -5425,6 +5470,30 @@ operator<(const TvFunc& func1,
       return false;
     }
     if ( w1 < w2 ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// @relates TvFunc
+// @brief 交差チェック
+bool
+operator&&(const TvFunc& func1,
+	   const TvFunc& func2)
+{
+  if ( func1.mNi != func2.mNi ) {
+    return false;
+  }
+  ymulong* endp = func1.mVector;
+  ymulong* bp1 = func1.mVector + func1.mNblk;
+  ymulong* bp2 = func2.mVector + func1.mNblk;
+  while ( bp1 != endp ) {
+    -- bp1;
+    -- bp2;
+    ymulong w1 = *bp1;
+    ymulong w2 = *bp2;
+    if ( (w1 & w2) != 0U ) {
       return true;
     }
   }

@@ -14,6 +14,8 @@
 #include "PtiFactory.h"
 #include "ym_verilog/pt/PtItem.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -199,11 +201,11 @@ Parser::new_GenFor(const FileRegion& fr,
 	<< ") does not match with Lhs of the initial statement ("
 	<< loop_var
 	<< ")";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "PARSER",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "PARSER",
+		    buf.str());
   }
 }
 

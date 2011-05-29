@@ -18,7 +18,7 @@ Copyright (C) 2005-2010 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-AC_CONFIG_SRCDIR([ym_techmap/techmap_nsdef.h])dnl
+AC_CONFIG_SRCDIR([ym_techmap/cellmap_nsdef.h])dnl
 
 AC_CONFIG_AUX_DIR([config])dnl
 AC_CONFIG_MACRO_DIR([config])dnl
@@ -91,7 +91,10 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_techmap/Makefile])
-AC_CONFIG_FILES([patgen/Makefile])
+AC_CONFIG_FILES([sbjgraph/Makefile])
+AC_CONFIG_FILES([cellmap/Makefile])
+AC_CONFIG_FILES([cellmap/libdump/Makefile])
+AC_CONFIG_FILES([lutmap/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

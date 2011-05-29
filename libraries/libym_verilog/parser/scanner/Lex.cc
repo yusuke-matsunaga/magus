@@ -21,14 +21,10 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージマネージャ
-// @param[in] fd_mgr ファイル記述子を管理するクラス
-Lex::Lex(MsgMgr& msg_mgr,
-	 FileDescMgr& fd_mgr) :
-  RawLex(msg_mgr, fd_mgr)
+Lex::Lex()
 {
   mModuleState = new LexModuleState(*this);
-  
+
   // 生成されたプラグインは Lex の管理下におかれるのでここでポインタを
   // 保持しておく必要はない．
   new LpNetType(*this, "default_nettype", mModuleState);

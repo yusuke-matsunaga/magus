@@ -11,8 +11,8 @@
 
 #include "WriteBlif.h"
 
-#include "ym_bnet/BNetBlifWriter.h"
-#include "ym_bdn/BdnBlifWriter.h"
+#include "ym_networks/BNetBlifWriter.h"
+#include "ym_networks/BdnBlifWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS

@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2010 Yusuke Matsunaga
+Copyright (C) 2005-2011 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 

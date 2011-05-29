@@ -15,7 +15,7 @@
 
 #include "ym_utils/File.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/FileDesc.h"
+#include "ym_utils/FileInfo.h"
 #include "ym_utils/StrBuff.h"
 
 #include "RawLex.h"
@@ -31,7 +31,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// このクラスはファイルを一文字単位で読み出す．\n
 /// ただし, 改行コードの処理系依存部分を吸収して常に '\\n' だけを
 /// 返すようにしている．
-/// @sa FileDesc RawLex
+/// @sa FileInfo RawLex
 //////////////////////////////////////////////////////////////////////
 class InputFile
 {
@@ -42,10 +42,10 @@ private:
   /// @brief コンストラクタ
   /// @param[in] lex 親の Lex
   /// @param[in] fd UNIX のファイル記述子
-  /// @param[in] file_desc ファイル記述子
+  /// @param[in] file_info ファイル情報
   InputFile(RawLex* lex,
 	    int fd,
-	    const FileDesc* file_desc);
+	    FileInfo file_info);
 
   /// @brief デストラクタ
   ~InputFile();
@@ -169,13 +169,9 @@ public:
   int
   get();
 
-  /// @brief ファイル記述子を返す．
-  const FileDesc*
-  file_desc() const;
-
-  /// @brief ファイル名を返す．
-  const char*
-  filename() const;
+  /// @brief ファイル情報を返す．
+  FileInfo
+  file_info() const;
 
   /// @brief 現在の行番号を返す．
   ymuint
@@ -213,36 +209,6 @@ private:
   int
   fill_buff();
 
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const char* msg);
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const string& msg);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -255,8 +221,8 @@ private:
   // UNIX のファイル記述子
   int mFd;
 
-  // ファイル記述子
-  const FileDesc* mFileDesc;
+  // ファイル情報
+  FileInfo mFileInfo;
 
   // バッファ中の読み出し位置
   ymuint32 mReadPos;
@@ -301,28 +267,30 @@ InputFile::read_token(StrBuff& buff,
 
   int id = _read_token(buff);
 
-  token_loc = FileRegion(file_desc(),
+  token_loc = FileRegion(file_info(),
 			 first_line, first_column,
 			 last_line(),last_column());
 
   return id;
 }
 
-// @brief ファイル記述子を返す．
+// @brief ファイル情報を返す．
 inline
-const FileDesc*
-InputFile::file_desc() const
+FileInfo
+InputFile::file_info() const
 {
-  return mFileDesc;
+  return mFileInfo;
 }
 
+#if 0
 // @brief ファイル名を返す．
 inline
 const char*
 InputFile::filename() const
 {
-  return mFileDesc->name();
+  return mFileInfo->name();
 }
+#endif
 
 // @brief 次の一文字を読み出す．
 // @return 読み込んだ文字を返す．
@@ -373,7 +341,7 @@ inline
 FileRegion
 InputFile::cur_file_region() const
 {
-  FileLoc tmp(file_desc(), cur_line(), cur_column());
+  FileLoc tmp(file_info(), cur_line(), cur_column());
   return FileRegion(tmp, tmp);
 }
 
@@ -416,48 +384,6 @@ InputFile::fill_buff()
     mEndPos = 0;
   }
   return mEndPos;
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-InputFile::put_msg(const char* src_file,
-		   int src_line,
-		   const FileRegion& file_loc,
-		   tMsgType type,
-		   const char* label,
-		   const char* msg)
-{
-  mLex->msg_mgr().put_msg(src_file, src_line,
-			  file_loc, type,
-			  label, msg);
-}
-
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
-// @param[in] file_loc ファイル位置
-// @param[in] type メッセージの種類
-// @param[in] label メッセージラベル
-// @param[in] body メッセージ本文
-inline
-void
-InputFile::put_msg(const char* src_file,
-		   int src_line,
-		   const FileRegion& file_loc,
-		   tMsgType type,
-		   const char* label,
-		   const string& msg)
-{
-  mLex->msg_mgr().put_msg(src_file, src_line,
-			  file_loc, type,
-			  label, msg);
 }
 
 END_NAMESPACE_YM_VERILOG

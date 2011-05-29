@@ -5,7 +5,7 @@
 ///
 /// $Id: BlifNetworkReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -43,20 +43,13 @@ BlifNetworkReader::read(const string& filename,
 			BlifNetwork& network)
 {
   mHandler->set_network(&network);
-  
+
   bool stat = mParser.read(filename);
   if ( !stat ) {
     return false;
   }
-  
-  return true;
-}
 
-// @brief メッセージハンドラを付加する．
-void
-BlifNetworkReader::add_msg_handler(MsgHandler* msg_handler)
-{
-  mParser.add_msg_handler(msg_handler);
+  return true;
 }
 
 END_NAMESPACE_YM_BLIF

@@ -10,7 +10,7 @@
 
 
 #include "Gate.h"
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/TgNode.h"
 #include "SearchMgr.h"
 #include "PGraph.h"
 

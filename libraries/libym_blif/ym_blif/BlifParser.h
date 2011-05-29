@@ -7,12 +7,11 @@
 ///
 /// $Id: BlifParser.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_blif/blif_nsdef.h"
-#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -36,7 +35,7 @@ public:
 
 
 public:
-  
+
   /// @brief 読み込みを行う．
   /// @param[in] filename ファイル名
   /// @retval true 読み込みが成功した．
@@ -49,14 +48,8 @@ public:
   /// @note handler はこのインスタンスが破壊される時に同時に破壊される．
   void
   add_handler(BlifHandler* handler);
-  
-  /// @brief メッセージハンドラの登録
-  /// @param[in] handler 登録するハンドラ
-  /// @note handler はこのインスタンスが破壊される時に同時に破壊される．
-  void
-  add_msg_handler(MsgHandler* handler);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ

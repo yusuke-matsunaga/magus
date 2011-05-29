@@ -13,7 +13,6 @@
 
 #include "ym_verilog/pt/PtP.h"
 #include "ym_utils/File.h"
-#include "ym_utils/MsgHandler.h"
 #include "ym_utils/Alloc.h"
 #include "PtiFwd.h"
 #include "PtiFactory.h"
@@ -40,12 +39,10 @@ class Parser
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージマネージャ
   /// @param[in] ptmgr 読んだ結果のパース木を登録するマネージャ
   /// @param[in] alloc メモリアロケータ
   /// @param[in] ptifactory パース木の要素を生成するファクトリクラス
-  Parser(MsgMgr& msg_mgr,
-	 PtMgr& ptmgr,
+  Parser(PtMgr& ptmgr,
 	 AllocBase& alloc,
 	 PtiFactory& ptifactory);
 
@@ -2288,42 +2285,6 @@ public:
 
 
 public:
-  //////////////////////////////////////////////////////////////////////
-  // メッセージ出力用の便利関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const char* msg);
-
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
-  /// @param[in] type メッセージの種類
-  /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
-  void
-  put_msg(const char* src_file,
-	  int src_line,
-	  const FileRegion& file_loc,
-	  tMsgType type,
-	  const char* label,
-	  const string& msg);
-
-
-public:
 
   /// @brief lex オブジェクトの取得
   /// @return lex オブジェクトを返す．
@@ -2380,9 +2341,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メッセージマネージャ
-  MsgMgr& mMsgMgr;
 
   // パース木を保持するクラス
   PtMgr& mPtMgr;

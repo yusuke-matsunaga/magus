@@ -19,6 +19,8 @@
 
 #include "ElbExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -371,11 +373,11 @@ ExprGen::evaluate_int(const VlNamedObj* parent,
   VlValue val = evaluate_expr(parent, pt_expr, put_error);
   if ( !val.is_int_conv() ) {
     if ( put_error ) {
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Integer value required.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_expr->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Integer value required.");
     }
     return false;
   }
@@ -438,11 +440,11 @@ ExprGen::evaluate_bitvector(const VlNamedObj* parent,
   VlValue val = evaluate_expr(parent, pt_expr, put_error);
   if ( !val.is_bitvector_conv() ) {
     if ( put_error ) {
-      put_msg(__FILE__, __LINE__,
-	      pt_expr->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Bit-vector value required.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_expr->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Bit-vector value required.");
     }
     return false;
   }

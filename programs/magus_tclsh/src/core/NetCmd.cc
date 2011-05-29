@@ -86,7 +86,7 @@ NetCmd::before_cmd_proc(TclObjVector& objv)
   // BNetwork を新規作成する時 true とするフラグ
   bool bnet_flag = false;
 
-  // BdNetwork を新規作成する時 true とするフラグ
+  // BdnMgr を新規作成する時 true とするフラグ
   bool bdn_flag = false;
 
   // MvNetwork を新規作成する時 true とするフラグ

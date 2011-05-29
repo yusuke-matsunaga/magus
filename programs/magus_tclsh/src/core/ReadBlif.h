@@ -12,9 +12,8 @@
 
 
 #include "NetCmd.h"
-#include "TclObjMsgHandler.h"
-#include "ym_bnet/BNetBlifReader.h"
-#include "ym_bdn/BlifBdnConv.h"
+#include "ym_networks/BNetBlifReader.h"
+#include "ym_networks/BlifBdnConv.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -54,9 +53,6 @@ private:
 
   // blif から Bdn に変換する関数
   BlifBdnConv mBlifBdnConv;
-
-  // メッセージハンドラ
-  TclObjMsgHandler mMsgHandler;
 
 };
 

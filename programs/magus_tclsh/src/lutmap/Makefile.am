@@ -19,8 +19,6 @@ libmagus_lutmap_tcl_la_SOURCES = \
 	Ln2BNet.cc \
 	LutmapCmd.h \
 	LutmapCmd.cc \
-	Conv2SbjCmd.cc \
-	DumpSbjCmd.cc \
 	AreaMapCmd.cc \
 	DelayMapCmd.cc \
 	DumpLutCmd.cc \
@@ -28,13 +26,8 @@ libmagus_lutmap_tcl_la_SOURCES = \
 	WriteVqmCmd.cc
 
 libmagus_lutmap_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lutmap/libym_lutmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sbj/libym_sbj.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_mvnbdnconv/libym_mvnbdnconv.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_mvn/libym_mvn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bdn/libym_bdn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 

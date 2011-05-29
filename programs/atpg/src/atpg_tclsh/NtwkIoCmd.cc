@@ -13,6 +13,8 @@
 #include "AtpgMsgHandler.h"
 #include "AtpgMgr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_ATPG
 
@@ -22,11 +24,9 @@ BEGIN_NAMESPACE_YM_ATPG
 
 // @brief コンストラクタ
 ReadBlif::ReadBlif(AtpgMgr* mgr) :
-  AtpgCmd(mgr),
-  mMsgHandler(new AtpgMsgHandler)
+  AtpgCmd(mgr)
 {
   set_usage_string("filename");
-  mReader.add_msg_handler(mMsgHandler);
 }
 
 // @brief デストラクタ
@@ -34,7 +34,7 @@ ReadBlif::~ReadBlif()
 {
   // mMsgHandler は BlifParser(TgBlifReader) が責任をもって破壊してくれる．
 }
-  
+
 // コマンド処理関数
 int
 ReadBlif::cmd_proc(TclObjVector& objv)
@@ -56,15 +56,18 @@ ReadBlif::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
+  AtpgMsgHandler mh;
+  MsgMgr::reg_handler(&mh);
+
   bool stat = mReader(ex_filename, _network());
   if ( !stat ) {
-    set_result(mMsgHandler->msg_obj());
+    set_result(mh.msg_obj());
     return TCL_ERROR;
   }
-  
+
   mgr().after_set_network();
   after_set_network();
-  
+
   return TCL_OK;
 }
 
@@ -75,11 +78,9 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 
 // @brief コンストラクタ
 ReadIscas89::ReadIscas89(AtpgMgr* mgr) :
-  AtpgCmd(mgr),
-  mMsgHandler(new AtpgMsgHandler)
+  AtpgCmd(mgr)
 {
   set_usage_string("filename");
-  mReader.add_msg_handler(mMsgHandler);
 }
 
 // @brief デストラクタ
@@ -87,7 +88,7 @@ ReadIscas89::~ReadIscas89()
 {
   // mMsgHandler は Iscas89Parser(TgIscas89Reader) が責任をもって破壊してくれる．
 }
-  
+
 // コマンド処理関数
 int
 ReadIscas89::cmd_proc(TclObjVector& objv)
@@ -109,15 +110,18 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
+  AtpgMsgHandler mh;
+  MsgMgr::reg_handler(&mh);
+
   bool stat = mReader(ex_filename, _network());
   if ( !stat ) {
-    set_result(mMsgHandler->msg_obj());
+    set_result(mh.msg_obj());
     return TCL_ERROR;
   }
 
   mgr().after_set_network();
   after_set_network();
-  
+
   return TCL_OK;
 }
 
@@ -132,7 +136,7 @@ WriteNetwork::WriteNetwork(AtpgMgr* mgr) :
 {
   set_usage_string("?filename?");
 }
-  
+
 // コマンド処理関数
 int
 WriteNetwork::cmd_proc(TclObjVector& objv)

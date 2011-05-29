@@ -10,14 +10,16 @@
 
 
 #if HAVE_CONFIG_H
-#include <ymconfig.h>
+#include "ymconfig.h"
 #endif
 
-#include <ym_utils/StopWatch.h>
+#include "ym_utils/StopWatch.h"
 #include "VlTestLineWatcher.h"
-#include <ym_verilog/VlMgr.h>
+#include "ym_verilog/VlMgr.h"
 #include "VlDumper.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -32,17 +34,16 @@ elaborate_mode(const list<string>& filename_list,
 	       int loop,
 	       bool dump_vpi)
 {
-  MsgMgr msgmgr;
   MsgHandler* tmh = new StreamMsgHandler(&cerr);
   if ( all_msg ) {
-    tmh->set_mask(MsgHandler::kMaskAll);
+    tmh->set_mask(kMaskAll);
   }
   else {
-    tmh->set_mask(MsgHandler::kMaskAll);
+    tmh->set_mask(kMaskAll);
     tmh->delete_mask(kMsgInfo);
     tmh->delete_mask(kMsgDebug);
   }
-  msgmgr.reg_handler(tmh);
+  MsgMgr::reg_handler(tmh);
 
   SearchPathList splist;
   if ( spath ) {
@@ -64,7 +65,7 @@ elaborate_mode(const list<string>& filename_list,
 
       StopWatch timer;
       timer.start();
-      VlMgr vlmgr(msgmgr);
+      VlMgr vlmgr;
       for (list<string>::const_iterator p = filename_list.begin();
 	   p != filename_list.end(); ++ p) {
 	const string& name = *p;
@@ -84,7 +85,7 @@ elaborate_mode(const list<string>& filename_list,
 	cerr << "Parsing time: " << time << endl;
       }
 
-      if ( !msgmgr.error_num() ) {
+      if ( !MsgMgr::error_num() ) {
 	StopWatch timer;
 	timer.start();
 
@@ -101,12 +102,12 @@ elaborate_mode(const list<string>& filename_list,
 	  sleep(20);
 	}
 
-	if ( msgmgr.error_num() == 0 && dump_vpi ) {
+	if ( MsgMgr::error_num() == 0 && dump_vpi ) {
 	  VlDumper dumper(cout);
 	  dumper(vlmgr);
 	}
       }
-      switch ( msgmgr.error_num() ) {
+      switch ( MsgMgr::error_num() ) {
       case 0:
 	cerr << "No errors" << endl;
 	break;
@@ -115,7 +116,7 @@ elaborate_mode(const list<string>& filename_list,
 	break;
 
       default:
-	cerr << "Total " << msgmgr.error_num() << " errors" << endl;
+	cerr << "Total " << MsgMgr::error_num() << " errors" << endl;
 	break;
       }
 

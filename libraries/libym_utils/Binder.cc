@@ -5,7 +5,7 @@
 ///
 /// $Id: Binder.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +19,6 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-//
 // この時点では特定の BindMgr には結び付いていない．
 Binder::Binder()
 {
@@ -27,7 +26,6 @@ Binder::Binder()
 }
 
 // デストラクタ
-//
 // 同時にバインドも削除される．
 Binder::~Binder()
 {
@@ -57,20 +55,14 @@ BindMgr::BindMgr()
 }
 
 // デストラクタ
-//
 // ここに登録されているすべての binder のバインドは削除される．
 // binder のオブジェクトは削除されない．
 BindMgr::~BindMgr()
 {
-  while ( !mList.empty() ) {
-    Binder* binder = mList.front();
-    mList.pop_front();
-    binder->mMgr = NULL;
-  }
+  _unreg_all_binders();
 }
 
 // Binder を登録する．
-//
 // @param[in] binder 登録する binder
 void
 BindMgr::_reg_binder(Binder* binder)
@@ -86,9 +78,7 @@ BindMgr::_reg_binder(Binder* binder)
 }
 
 // @brief binder の登録を削除する．
-//
 // @param[in] binder 登録を削除する対象
-//
 // binder が登録されていない場合には何もしない．
 void
 BindMgr::_unreg_binder(Binder* binder)
@@ -97,6 +87,18 @@ BindMgr::_unreg_binder(Binder* binder)
     mList.erase(binder->mItForList);
     binder->mMgr = NULL;
   }
+}
+
+// @brief 全ての binder の登録の解除
+void
+BindMgr::_unreg_all_binders()
+{
+  for (list<Binder*>::iterator p = mList.begin();
+       p != mList.end(); ++ p) {
+    Binder* binder = *p;
+    binder->mMgr = NULL;
+  }
+  mList.clear();
 }
 
 
@@ -113,7 +115,7 @@ EventBindMgr::EventBindMgr()
 EventBindMgr::~EventBindMgr()
 {
 }
-  
+
 // @brief EventBinder を登録する．
 //
 // @param[in] binder 登録する EventBinder
@@ -132,6 +134,13 @@ void
 EventBindMgr::unreg_binder(EventBinder* binder)
 {
   _unreg_binder(binder);
+}
+
+// @brief 全ての binder の登録の解除
+void
+EventBindMgr::unreg_all_binders()
+{
+  _unreg_all_binders();
 }
 
 // @brief ここに登録されたすべての binder にイベントを伝える．

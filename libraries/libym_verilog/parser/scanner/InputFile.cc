@@ -12,7 +12,8 @@
 #include "InputFile.h"
 #include <fcntl.h>
 
-#include "ym_utils/FileDesc.h"
+#include "ym_utils/FileInfo.h"
+#include "ym_utils/MsgMgr.h"
 
 #include "parser.h"
 
@@ -43,13 +44,13 @@ END_NONAMESPACE
 // @brief コンストラクタ
 // @param[in] lex 親の Lex
 // @param[in] fd UNIX のファイル記述子
-// @param[in] file_desc ファイル記述子
+// @param[in] file_info ファイル情報
 InputFile::InputFile(RawLex* lex,
 		     int fd,
-		     const FileDesc* file_desc) :
+		     FileInfo file_info) :
   mLex(lex),
   mFd(fd),
-  mFileDesc(file_desc),
+  mFileInfo(file_info),
   mReadPos(0),
   mEndPos(0),
   mCurLine(1),
@@ -87,7 +88,7 @@ InputFile::_read_token(StrBuff& buff)
     accept();
     return NL;
   }
-  
+
   _accept();
   if ( c == ' ' || c == '\t' ) {
     read_space();
@@ -98,11 +99,11 @@ InputFile::_read_token(StrBuff& buff)
   case RawLex::kBin:
     // 2進数モード
     return read_bin_str(c, buff);
-      
+
   case RawLex::kOct:
     // 8進数モード
     return read_oct_str(c, buff);
-    
+
   case RawLex::kDec:
     // 10進数モード
     return read_dec_str(c, buff);
@@ -154,7 +155,7 @@ InputFile::_read_token(StrBuff& buff)
   case '?':
     // これらの文字は単独のトークンとなる．
     return c;
-      
+
   case '\'':
     // 定数
     buff.put_char(c);
@@ -179,14 +180,14 @@ InputFile::_read_token(StrBuff& buff)
       ostringstream buf;
       buf << "illegal character \'" << static_cast<char>(c) << "\',"
 	  << "only B|b|O|o|D|d|H|h is allowed here.";
-      put_msg(__FILE__, __LINE__,
-	      cur_file_region(),
-	      kMsgError,
-	      "LEX",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_file_region(),
+		      kMsgError,
+		      "LEX",
+		      buf.str());
     }
     return ERROR;
-      
+
   case '(':
     c = peek();
     if ( c == '*' ) {
@@ -194,7 +195,7 @@ InputFile::_read_token(StrBuff& buff)
       return PRSTAR;
     }
     return '(';
-    
+
   case '+':
     c = peek();
     if ( c == ':' ) {
@@ -202,7 +203,7 @@ InputFile::_read_token(StrBuff& buff)
       return PLUSCOLON;
     }
     return '+';
-      
+
   case '-':
     c = peek();
     if ( c == ':' ) {
@@ -322,7 +323,7 @@ InputFile::_read_token(StrBuff& buff)
       return GTEQ;
     }
     return '>';
-      
+
   case '=':
     c = peek();
     if ( c == '=' ) {
@@ -345,7 +346,7 @@ InputFile::_read_token(StrBuff& buff)
 
   case '\\':
     return read_esc_str(buff);
-    
+
   case '`':
     buff.put_char(c);
     c = get();
@@ -358,21 +359,21 @@ InputFile::_read_token(StrBuff& buff)
       ostringstream buf;
       buf << "illegal charactor \'" << static_cast<char>(c)
 	  << "\' [" << c << " in digit code].";
-      put_msg(__FILE__, __LINE__,
-	      cur_file_region(),
-	      kMsgError,
-	      "LEX",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      cur_file_region(),
+		      kMsgError,
+		      "LEX",
+		      buf.str());
       return ERROR;
     }
-      
+
   case '/':
     return read_comment(buff);
 
   default:
     break;
   }
-  
+
   if ( is_strchar1(c) ) {
     // 通常の識別子
     buff.put_char(c);
@@ -388,21 +389,21 @@ InputFile::_read_token(StrBuff& buff)
     // 取り合えずここでは予約語の検査はせずに IDENTIFIER としておく
     return IDENTIFIER;
   }
-  
+
   if ( isdigit(c) ) {
     // 数字
     buff.put_char(c);
     return read_num(buff);
   }
-  
+
   ostringstream buf;
   buf << "illegal charactor \'" << static_cast<char>(c)
       << "\' [" << c << " in digit code].";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  buf.str());
   return ERROR;
 }
 
@@ -462,11 +463,11 @@ InputFile::read_bin_str(int c,
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'01xXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -490,7 +491,7 @@ is_octchar(int c)
 }
 
 END_NONAMESPACE
-  
+
 // @brief 8進数モードの読み込みを行う．
 // @param[in] c 最初の文字
 // @param[out] buff 結果を格納するバッファ
@@ -522,15 +523,15 @@ InputFile::read_oct_str(int c,
     }
     return UNUMBER;
   }
-  
+
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-7xXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -551,7 +552,7 @@ is_decchar(int c)
 }
 
 END_NONAMESPACE
-  
+
 // @brief 10進数モードの読み込みを行う．
 // @param[in] c 最初の文字
 // @param[out] buff 結果を格納するバッファ
@@ -604,15 +605,15 @@ InputFile::read_dec_str(int c,
     }
     return UNUMBER;
   }
-  
+
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-9xXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -638,7 +639,7 @@ is_hexchar(int c)
 }
 
 END_NONAMESPACE
-  
+
 // @brief 16進数モードの読み込みを行う．
 // @param[in] c 最初の文字
 // @param[out] buff 結果を格納するバッファ
@@ -670,15 +671,15 @@ InputFile::read_hex_str(int c,
     }
     return UNUMBER;
   }
-  
+
   ostringstream msg_buf;
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-9a-ha-HxXzZ?\' are allowed here.";
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  msg_buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  msg_buf.str());
   return ERROR;
 }
 
@@ -702,7 +703,7 @@ InputFile::get_str(StrBuff& buff)
   }
   while ( fill_buff() > 0 );
 }
-  
+
 // @brief 二重引用符用の読み込み
 // @param[out] buf 結果を格納する文字列バッファ
 // @return トークン番号を返す．
@@ -715,7 +716,7 @@ InputFile::read_dq_str(StrBuff& buff)
   // goto 文の嵐だが，全体の構造はいくつかの無限ループのブロック間の
   // 移動に goto 文を用いているだけ．
   // 各々の無限ループを状態ととらえて状態遷移だと思えば良い．
-  
+
   // 8進数モードの値
   int cur_val = 0;
 
@@ -780,7 +781,7 @@ InputFile::read_dq_str(StrBuff& buff)
       goto INIT;
     }
   }
-  
+
  BSLASH1:
   for ( ; ; ) {
     if ( mReadPos >= mEndPos ) {
@@ -818,11 +819,11 @@ InputFile::read_dq_str(StrBuff& buff)
 
  ERR_END:
   // 文字列が終わらないうちに改行が来てしまった．
-  put_msg(__FILE__, __LINE__,
-	  cur_file_region(),
-	  kMsgError,
-	  "LEX",
-	  "new line in quoted string.");
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cur_file_region(),
+		  kMsgError,
+		  "LEX",
+		  "new line in quoted string.");
   return ERROR;
 }
 
@@ -845,14 +846,14 @@ InputFile::read_esc_str(StrBuff& buff)
   }
   if ( !isascii(c) ) {
     // escaped identifier でも非 ascii 文字は違反
-    put_msg(__FILE__, __LINE__,
-	    cur_file_region(),
-	    kMsgError,
-	    "LEX",
-	    "non-ascii character in escaped string.");
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_file_region(),
+		    kMsgError,
+		    "LEX",
+		    "non-ascii character in escaped string.");
     return ERROR;
   }
-      
+
   // escaped identifier モード
   _accept();
   buff.put_char(c);
@@ -878,10 +879,10 @@ InputFile::read_esc_str(StrBuff& buff)
       break;
     }
   }
-  
+
   return IDENTIFIER;
 }
-  
+
 // @brief 数字を読み込む．
 // @param[out] buf 結果を格納する文字列バッファ
 // @return トークン番号を返す．
@@ -972,7 +973,7 @@ InputFile::read_num(StrBuff& buff)
     }
   }
   return RNUMBER;
-  
+
  AFTER_EXP:
   for ( ; ; ) {
     if ( mReadPos >= mEndPos ) {
@@ -1001,7 +1002,7 @@ InputFile::read_num(StrBuff& buff)
     }
   }
   return ERROR;
-  
+
  AFTER_EXP_SIGN:
   for ( ; ; ) {
     if ( mReadPos >= mEndPos ) {
@@ -1024,7 +1025,7 @@ InputFile::read_num(StrBuff& buff)
     }
   }
   return ERROR;
-  
+
  AFTER_EXP_NUM:
   for ( ; ; ) {
     if ( mReadPos >= mEndPos ) {
@@ -1067,7 +1068,7 @@ InputFile::read_space()
     }
   }
 }
-  
+
 // @brief '/' を読んだ直後の処理
 // @param[out] buf コメントを格納する文字列バッファ
 // @return トークン番号を返す．
@@ -1085,7 +1086,7 @@ InputFile::read_comment(StrBuff& buff)
 
     buff.put_char('/');
     buff.put_char('/');
-    
+
     // 意味的には以下のコードと等価な処理を行う．
     // for ( ; ; ) {
     //   int c = peek();
@@ -1117,18 +1118,18 @@ InputFile::read_comment(StrBuff& buff)
 
     buff.put_char('/');
     buff.put_char('*');
-    
+
     // 直前の文字が '*' の時 true となるフラグ
     bool star = false;
     for ( ; ; ) {
       if ( mReadPos >= mEndPos ) {
 	if ( fill_buff() == 0 ) {
 	  // '*/' を読む前に EOF になってしまった．
-	  put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
-		  kMsgError,
-		  "LEX",
-		  "unexpected end-of-file in comment block(/*).");
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  cur_file_region(),
+			  kMsgError,
+			  "LEX",
+			  "unexpected end-of-file in comment block(/*).");
 	  return ERROR;
 	}
       }
@@ -1173,11 +1174,11 @@ InputFile::peek()
       else {
 	// ファイル末尾が NL でなければ NL を挿入する．
 #if ALLOW_EOF_WITHOUT_NL == 0
-	put_msg(__FILE__, __LINE__,
-		cur_file_region(),
-		kMsgWarning,
-		"LEX",
-		"Unexpected EOF, NL is assumed.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			cur_file_region(),
+			kMsgWarning,
+			"LEX",
+			"Unexpected EOF, NL is assumed.");
 #endif
 	return '\n';
       }

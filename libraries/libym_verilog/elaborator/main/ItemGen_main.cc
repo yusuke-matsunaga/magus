@@ -31,6 +31,8 @@
 
 #include "ElbStub.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -156,11 +158,11 @@ ItemGen::defparam_override(const VlModule* module,
     ostringstream buf;
     buf << "\"" << expand_full_name(nb_array, name)
 	<< "\" is not a parameter.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
 
     // もうこれ以降は処理したくないので true を返す．
     return true;
@@ -170,11 +172,11 @@ ItemGen::defparam_override(const VlModule* module,
     ostringstream buf;
     buf << "\"" << param->name()
 	<< "\" is a localparam, which shall not be override.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
 
     // もうこれ以降は処理したくないので true を返す．
     return true;
@@ -186,11 +188,11 @@ ItemGen::defparam_override(const VlModule* module,
   ostringstream buf;
   buf << "instantiating defparam: " << param->full_name()
       << " = " << rhs_expr->decompile() << ".";
-  put_msg(__FILE__, __LINE__,
-	  fr,
-	  kMsgInfo,
-	  "ELAB",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  fr,
+		  kMsgInfo,
+		  "ELAB",
+		  buf.str());
 
   param->set_expr(rhs_expr, rhs_value);
 
@@ -245,11 +247,11 @@ ItemGen::instantiate_cont_assign(const VlNamedObj* parent,
     ostringstream buf;
     buf << "instantiating continuous assign: "
 	<< lhs->decompile() << " = " << rhs->decompile() << ".";
-    put_msg(__FILE__, __LINE__,
-	    pt_elem->file_region(),
-	    kMsgInfo,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    pt_elem->file_region(),
+		    kMsgInfo,
+		    "ELAB",
+		    buf.str());
   }
 }
 
@@ -352,11 +354,11 @@ ItemGen::phase1_gencase(const VlNamedObj* parent,
     }
     if ( match ) {
       if ( found ) {
-	put_msg(__FILE__, __LINE__,
-		pt_gencase->file_region(),
-		kMsgError,
-		"ELAB",
-		"Matches more than one labels.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_gencase->file_region(),
+			kMsgError,
+			"ELAB",
+			"Matches more than one labels.");
 	return;
       }
       found = true;
@@ -383,33 +385,33 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
   if ( !handle ) {
     ostringstream buf;
     buf << pt_genfor->loop_var() << " : Not found.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return;
   }
   ElbGenvar* genvar = handle->genvar();
   if ( !genvar ) {
     ostringstream buf;
     buf << pt_genfor->loop_var() << " : Not a genvar.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return;
   }
   if ( genvar->is_inuse() ) {
     // すでに他の generate-for loop が使用中
     ostringstream buf;
     buf << pt_genfor->loop_var() << " : Already in use.";
-    put_msg(__FILE__, __LINE__,
-	    fr,
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    fr,
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return;
   }
 
@@ -423,11 +425,11 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
       return;
     }
     if ( val < 0 ) {
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgError,
-	      "ELAB",
-	      "genvar should not be negative.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      fr,
+		      kMsgError,
+		      "ELAB",
+		      "genvar should not be negative.");
       return;
     }
     genvar->set_value(val);
@@ -465,11 +467,11 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
 	break;
       }
       if ( val < 0 ) {
-	put_msg(__FILE__, __LINE__,
-		fr,
-		kMsgError,
-		"ELAB",
-		"genvar should not be negative.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			fr,
+			kMsgError,
+			"ELAB",
+			"genvar should not be negative.");
 	break;
       }
       genvar->set_value(val);

@@ -26,28 +26,26 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 LIBYM_TECHMAP = $(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la
-LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 
 bin_PROGRAMS = \
-	patmgr_test \
-	pgfuncmgr_test \
-	areacover_test
+	cell_mgr_test \
+	areacover_test \
+	libdump_test
 
-patmgr_test_SOURCES = \
-	patmgr_test.cc
+cell_mgr_test_SOURCES = \
+	cell_mgr_test.cc
 
-patmgr_test_LDADD = \
+cell_mgr_test_LDADD = \
 	$(LIBYM_TECHMAP)
 
-pgfuncmgr_test_SOURCES = \
-	pgfuncmgr_test.cc
+libdump_test_SOURCES = \
+	libdump_test.cc
 
-pgfuncmgr_test_LDADD = \
+libdump_test_LDADD = \
 	$(LIBYM_TECHMAP)
 
 areacover_test_SOURCES = \
 	areacover_test.cc
 
 areacover_test_LDADD = \
-	$(LIBYM_TECHMAP) \
-	$(LIBYM_BNET)
+	$(LIBYM_TECHMAP)

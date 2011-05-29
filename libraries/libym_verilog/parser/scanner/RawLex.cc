@@ -29,6 +29,8 @@
 #include "print_token.h"
 #include "parser.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -37,12 +39,8 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージマネージャ
-// @param[in] fd_mgr ファイル記述子を管理するクラス
-RawLex::RawLex(MsgMgr& msg_mgr,
-	       FileDescMgr& fd_mgr) :
-  mMsgMgr(msg_mgr),
-  mInputMgr(new InputMgr(this, fd_mgr)),
+RawLex::RawLex() :
+  mInputMgr(new InputMgr(this)),
   mDic(RsrvWordDic::the_dic()),
   mDebug(false)
 {
@@ -130,7 +128,7 @@ RawLex::get_token()
       switch ( id ) {
       case EOF:
 	if ( mDebug ) {
-	  mMsgMgr.put_msg(__FILE__, __LINE__,
+	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  cur_token_loc(),
 			  kMsgDebug,
 			  "LEX",
@@ -152,7 +150,7 @@ RawLex::get_token()
 	  if ( plugin == NULL ) {
 	    ostringstream buf;
 	    buf << "macro `" << macroname << " is not defined.";
-	    mMsgMgr.put_msg(__FILE__, __LINE__,
+	    MsgMgr::put_msg(__FILE__, __LINE__,
 			    cur_token_loc(),
 			    kMsgError,
 			    "LEX",
@@ -213,7 +211,7 @@ RawLex::get_token()
       if ( mDebug ) {
 	ostringstream buf;
 	print_token(buf, id, cur_string());
-	mMsgMgr.put_msg(__FILE__, __LINE__,
+	MsgMgr::put_msg(__FILE__, __LINE__,
 			cur_token_loc(),
 			kMsgDebug,
 			"LEX",
@@ -226,7 +224,7 @@ RawLex::get_token()
       // パーズすればよい
       switch ( id ) {
       case EOF:
-	mMsgMgr.put_msg(__FILE__, __LINE__,
+	MsgMgr::put_msg(__FILE__, __LINE__,
 			cur_token_loc(),
 			kMsgError,
 			"LEX",
@@ -254,7 +252,7 @@ RawLex::get_token()
 
  error:
   if ( mDebug ) {
-    mMsgMgr.put_msg(__FILE__, __LINE__,
+    MsgMgr::put_msg(__FILE__, __LINE__,
 		    cur_token_loc(),
 		    kMsgDebug,
 		    "LEX",
@@ -279,7 +277,7 @@ RawLex::get_raw_token()
 	ostringstream buf;
 	buf << "get_raw_token(from macro) ==> ";
 	print_token(buf, token->id(), mCurString);
-	mMsgMgr.put_msg(__FILE__, __LINE__,
+	MsgMgr::put_msg(__FILE__, __LINE__,
 			cur_token_loc(),
 			kMsgDebug,
 			"LEX",
@@ -344,9 +342,9 @@ RawLex::get_raw_token()
   if ( mDebug ) {
     ostringstream buf;
     buf << "get_raw_token(from "
-	<< input_file->filename() << ") ==> ";
+	<< mInputMgr->cur_filename() << ") ==> ";
     print_token(buf, id, mCurString);
-    mMsgMgr.put_msg(__FILE__, __LINE__,
+    MsgMgr::put_msg(__FILE__, __LINE__,
 		    cur_token_loc(),
 		    kMsgDebug,
 		    "LEX",

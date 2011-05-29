@@ -17,7 +17,7 @@ TESTS_ENVIRONMENT = \
 	top_builddir=$(top_builddir) \
 	top_srcdir=$(top_srcdir)
 
-#TESTS = unit.test
+TESTS =
 
 testsubdir = testSubDir
 
@@ -25,12 +25,12 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 bin_PROGRAMS = \
-	mislib_test
+	mislib_parser_test
 
-mislib_test_SOURCES = \
-	mislib_test.cc
+mislib_parser_test_SOURCES = \
+	mislib_parser_test.cc
 
-mislib_test_LDFLAGS =
+mislib_parser_test_LDFLAGS =
 
-mislib_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libym_mislib/libym_mislib.la
+mislib_parser_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la

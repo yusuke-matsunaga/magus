@@ -9,13 +9,16 @@
 /// All rights reserved.
 
 
-#include "ym_bnet/BNetwork.h"
-#include "ym_bnet/BNetBlifReader.h"
+#include "ym_networks/BNetwork.h"
+#include "ym_networks/BNetBlifReader.h"
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigHandle.h"
 
 #include "ym_aig/AigSatMgr.h"
 #include "ym_sat/SatSolver.h"
+
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -111,10 +114,10 @@ main(int argc,
 
   try {
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
+    MsgMgr::reg_handler(msg_handler);
 
     BNetwork network;
     BNetBlifReader reader;
-    reader.add_msg_handler(msg_handler);
     if ( !reader.read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;

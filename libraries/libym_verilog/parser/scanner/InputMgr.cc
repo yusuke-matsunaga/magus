@@ -12,7 +12,7 @@
 #include "InputMgr.h"
 #include <fcntl.h>
 
-#include "ym_utils/FileDesc.h"
+#include "ym_utils/FileInfo.h"
 
 
 // ファイル末尾に改行がなくても warning としない時に 1
@@ -27,11 +27,8 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 // @param[in] lex 親の Lex
-// @param[in] fd_mgr ファイル記述子を管理するクラス
-InputMgr::InputMgr(RawLex* lex,
-		   FileDescMgr& fd_mgr) :
+InputMgr::InputMgr(RawLex* lex) :
   mLex(lex),
-  mFdMgr(fd_mgr),
   mCurFile(NULL)
 {
 }
@@ -97,30 +94,30 @@ InputMgr::open_file(const string& filename,
   // 本当のパス名
   string realname_string = pathname.str();
   const char* realname = realname_string.c_str();
-  
+
   int fd = open(realname, O_RDONLY);
   if ( fd < 0 ) {
     return false;
   }
-  const FileDesc* file_desc = new_file_desc(realname, parent_file);
-  InputFile* new_file = new InputFile(mLex, fd, file_desc);
+  FileInfo file_info = FileInfo(realname, parent_file);
+  InputFile* new_file = new InputFile(mLex, fd, file_info);
   if ( mCurFile ) {
     mFileStack.push_back(mCurFile);
   }
   mCurFile = new_file;
-  
+
   return true;
 }
 
 // @brief 現在のファイル位置を強制的に書き換える．
-// @param[in] filename 新しいファイル名
+// @param[in] new_filename 新しいファイル名
 // @param[in] line     新しい行番号
 // @param[in] level
 //           - 0 インクルード関係のレベル変化無し
 //           - 1 新しいファイルはインクルードされたファイル
 //           - 2 新しいファイルはインクルードもとのファイル
 void
-InputMgr::set_file_loc(const char* filename,
+InputMgr::set_file_loc(const char* new_filename,
 		       ymuint line,
 		       ymuint level)
 {
@@ -129,41 +126,47 @@ InputMgr::set_file_loc(const char* filename,
     return;
   }
 
-  const FileDesc* cur_fd = mCurFile->mFileDesc;
+  FileInfo cur_fi = mCurFile->mFileInfo;
   switch ( level ) {
   case 0: // レベルの変化無し
-    if ( cur_fd->name() != filename ) {
-      // 新しい FileDesc を作る．
-      const FileLoc* flp = cur_fd->parent_file_loc();
-      if ( flp ) {
-	cur_fd = new_file_desc(filename, *flp);
-      }
-      else {
-	cur_fd = new_file_desc(filename);
-      }
+    if ( cur_fi.filename() != new_filename ) {
+      // 新しい FileInfo を作る．
+      FileLoc flp = cur_fi.parent_loc();
+      cur_fi = FileInfo(new_filename, flp);
     }
     break;
 
   case 1: // 新しいインクルードファイル．
-    cur_fd = new_file_desc(filename,
-			   FileLoc(cur_fd, cur_file()->cur_line(), 1));
+    {
+      FileLoc parent_loc(cur_fi, cur_file()->cur_line(), 1);
+      cur_fi = FileInfo(new_filename, parent_loc);
+    }
     break;
 
   case 2: // インクルードの終り
-    cur_fd = cur_fd->parent_file_loc()->file_desc();
-    if ( cur_fd->name() != filename ) {
-      // 新しい FileDesc を作る．
-      const FileLoc* flp = cur_fd->parent_file_loc();
-      if ( flp ) {
-	cur_fd = new_file_desc(filename, *flp);
-      }
-      else {
-	cur_fd = new_file_desc(filename);
-      }
+    cur_fi = cur_fi.parent_loc().file_info();
+    if ( cur_fi.filename() != new_filename ) {
+      // 新しい FileInfo を作る．
+      FileLoc flp = cur_fi.parent_loc();
+      cur_fi = FileInfo(new_filename, flp);
     }
     break;
   }
-  mCurFile->mFileDesc = cur_fd;
+  mCurFile->mFileInfo = cur_fi;
+}
+
+// @brief 現在のファイルを返す．
+InputFile*
+InputMgr::cur_file() const
+{
+  return mCurFile;
+}
+
+// @brief 現在のファイル名を返す．
+string
+InputMgr::cur_filename() const
+{
+  return mCurFile->file_info().filename();
 }
 
 // @brief 現在の InputFile が EOF を返したときの処理
@@ -188,26 +191,6 @@ InputMgr::wrap_up()
   }
 }
 
-// @brief 新しい FileDesc を作る
-// @param[in] filename ファイル名
-// @return 生成された FileDesc
-const FileDesc*
-InputMgr::new_file_desc(const char* filename)
-{
-  return mFdMgr.new_file_desc(filename);
-}
-
-// @brief 新しい FileDesc を作る
-// @param[in] filename ファイル名
-// @param[in] parent_file_loc インクルード元の親ファイルの情報
-// @return 生成された FileDesc
-const FileDesc*
-InputMgr::new_file_desc(const char* filename,
-			const FileLoc& parent_file_loc)
-{
-  return mFdMgr.new_file_desc(filename, parent_file_loc);
-}
-
 // @brief ファイルのオープン済チェック
 // @param[in] name チェックするファイル名
 // @retval true name という名のファイルがオープンされている．
@@ -215,12 +198,12 @@ InputMgr::new_file_desc(const char* filename,
 bool
 InputMgr::check_file(const char* name) const
 {
-  if ( strcmp(mCurFile->mFileDesc->name(), name) == 0 ) {
+  if ( cur_filename() == name ) {
     return true;
   }
   for (vector<InputFile*>::const_iterator p = mFileStack.begin();
        p != mFileStack.end(); ++ p) {
-    if ( strcmp((*p)->mFileDesc->name(), name) == 0 ) {
+    if ( (*p)->mFileInfo.filename() == name ) {
       return true;
     }
   }

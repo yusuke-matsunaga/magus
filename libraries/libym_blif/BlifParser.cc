@@ -5,7 +5,7 @@
 ///
 /// $Id: BlifParser.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -26,7 +26,7 @@ BlifParser::~BlifParser()
 {
   delete mRep;
 }
-  
+
 // @brief 読み込みを行う．
 bool
 BlifParser::read(const string& filename)
@@ -39,13 +39,6 @@ void
 BlifParser::add_handler(BlifHandler* handler)
 {
   mRep->add_handler(handler);
-}
-
-// @brief メッセージハンドラの登録
-void
-BlifParser::add_msg_handler(MsgHandler* handler)
-{
-  mRep->msg_mgr().reg_handler(handler);
 }
 
 END_NAMESPACE_YM_BLIF

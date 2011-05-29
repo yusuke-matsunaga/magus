@@ -8,8 +8,8 @@
 
 
 #include "BNetHandle.h"
-#include "ym_bnet/BNetwork.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_networks/BNetwork.h"
+#include "ym_networks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -72,6 +72,7 @@ BNetHandle::copy(const NetHandle* src,
     break;
 
   case kMagBdn:
+#warning "TODO: 本当は Bdn から BNetwork に変換する．"
     return false;
 
   case kMagMvn:

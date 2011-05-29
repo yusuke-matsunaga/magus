@@ -18,6 +18,8 @@
 
 #include "ElbStub.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -95,11 +97,11 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
 
   ostringstream buf;
   buf << "instantiating task/func : " << taskfunc->full_name() << ".";
-  put_msg(__FILE__, __LINE__,
-	  pt_item->file_region(),
-	  kMsgInfo,
-	  "ELAB",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  pt_item->file_region(),
+		  kMsgInfo,
+		  "ELAB",
+		  buf.str());
 
   // 本体のステートメント内部のスコープの生成
   const PtStmt* pt_body = pt_item->body();

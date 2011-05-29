@@ -34,7 +34,7 @@ BdnCmd::~BdnCmd()
 
 // @brief カレントネットワークの取得
 // @note カレントネットワークが BNetwork でない場合には NULL を返す．
-BdNetwork*
+BdnMgr*
 BdnCmd::cur_network() const
 {
   return cur_nethandle()->_bdn();
@@ -51,7 +51,7 @@ BdnCmd::before_cmd_proc(TclObjVector& objv)
   if ( NetCmd::before_cmd_proc(objv) == TCL_OK ) {
     if ( cur_nethandle()->type() != NetHandle::kMagBdn ) {
       TclObj emsg;
-      emsg << "Network type mismatch. BdNetwork type assumed.";
+      emsg << "Network type mismatch. BdnMgr type assumed.";
       set_result(emsg);
       return TCL_ERROR;
     }

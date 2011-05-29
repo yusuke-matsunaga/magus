@@ -1,21 +1,21 @@
 
-/// @file libym_techmap/test/patgen_test.cc
+/// @file libym_techmap/test/pgfuncmgr_test.cc
 /// @brief PatGen のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "patgen/patgen_nsdef.h"
-#include "patgen/PgFuncMgr.h"
-#include "patgen/PgFuncRep.h"
-#include "patgen/PgFunc.h"
+#include "cellmap/patgen/patgen_nsdef.h"
+#include "cellmap/patgen/PgFuncMgr.h"
+#include "cellmap/patgen/PgFuncRep.h"
+#include "cellmap/patgen/PgFunc.h"
 #include "ym_lexp/LogExpr.h"
-#include "ym_techmap/PatMgr.h"
+#include "cellmap/PatMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TECHMAP_PATGEN
+BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
 LogExpr
 str_to_expr(char* str,
@@ -96,7 +96,7 @@ test(istream& s)
 
 }
 
-END_NAMESPACE_YM_TECHMAP_PATGEN
+END_NAMESPACE_YM_CELLMAP_PATGEN
 
 
 int
@@ -104,6 +104,7 @@ main(int argc,
      char** argv)
 {
   using namespace std;
+  using nsYm::nsCellmap::nsPatgen::test;
 
   if ( argc == 2 ) {
     ifstream ifs;
@@ -112,10 +113,10 @@ main(int argc,
       cerr << "Error opening " << argv[2] << endl;
       return 1;
     }
-    nsYm::nsTechmap::nsPatgen::test(ifs);
+    test(ifs);
   }
   else {
-    nsYm::nsTechmap::nsPatgen::test(cin);
+    test(cin);
   }
 
   return 0;

@@ -123,18 +123,14 @@ LIBRARIES=\
  libym_mincov \
  libym_blif \
  libym_iscas89 \
+ libym_mislib \
+ libym_dotlib \
  libym_cell \
  libym_verilog \
- libym_bnet \
- libym_bdn \
- libym_mvn \
- libym_mvnbdnconv \
- libym_sbj \
+ libym_networks \
  libym_aig \
- libym_tgnet \
  libym_gds \
  libym_cec \
- libym_lutmap \
  libym_techmap \
  libym_seal \
  libym_tclpp \

@@ -11,30 +11,18 @@ INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-YFLAGS = -d -v
-
-CLEANFILES = \
-	mislib_grammer.cc mislib_grammer.h y.output mislib_grammer.output
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_cell_mislib.la
 
 libym_cell_mislib_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_cell_mislib_la_LDFLAGS =
 
 libym_cell_mislib_la_SOURCES = \
-	mislib_grammer.yy \
-	CellMislibReader.cc \
-	MislibLex.h \
-	MislibLex.cc \
-	MislibParser.h \
-	MislibParser.cc \
-	MislibPt.h \
-	MislibPtImpl1.h \
-	MislibPtImpl1.cc \
-	MislibPtImpl2.h \
-	MislibPtImpl2.cc
+	CellMislibReader.cc

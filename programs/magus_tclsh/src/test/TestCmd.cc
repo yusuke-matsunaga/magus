@@ -10,11 +10,14 @@
 
 
 #include "TestCmd.h"
-#include "ym_bnet/BNetwork.h"
+#include "ym_networks/BNetwork.h"
 #include "ym_blif/BlifNetwork.h"
 #include "ym_blif/BlifNetworkReader.h"
-#include "ym_blifbnetconv/BlifBNetConv.h"
-#include "ym_bnet/BNetVerilogWriter.h"
+#include "ym_networks/BlifBNetConv.h"
+#include "ym_networks/BNetVerilogWriter.h"
+
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -23,7 +26,7 @@ BEGIN_NAMESPACE_MAGUS
 TestCmd::TestCmd(MagMgr* mgr) :
   MagCmd(mgr)
 {
-} 
+}
 
 int
 TestCmd::cmd_proc(TclObjVector& objv)
@@ -45,10 +48,11 @@ TestCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
+  StreamMsgHandler msg_handler(&cerr);
+  MsgMgr::reg_handler(&msg_handler);
+
   BlifNetworkReader reader;
   BlifNetwork blif_network;
-  reader.add_msg_handler(msg_handler);
   if ( !reader.read(ex_file_name, blif_network) ) {
     return TCL_ERROR;
   }
@@ -74,7 +78,7 @@ test_init(Tcl_Interp* interp,
 
   TclCmdBinder1<TestCmd, MagMgr*>::reg(interp, mgr,
 				       "magus::rwtest");
-  
+
   const char* init =
     "namespace eval tclreadline {\n"
     "namespace eval magus {\n"

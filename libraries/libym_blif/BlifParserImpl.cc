@@ -5,13 +5,13 @@
 ///
 /// $Id: BlifParserImpl.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BlifParserImpl.h"
 #include "ym_blif/BlifHandler.h"
-#include "ym_utils/FileDescMgr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -63,26 +63,24 @@ bool
 BlifParserImpl::read(const string& filename)
 {
   // ファイルをオープンする．
-  ifstream input_stream;
-  input_stream.open(filename.c_str());
-  if ( !input_stream ) {
+  if ( !mScanner.open_file(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, FileRegion(),
+    MsgMgr::put_msg(__FILE__, __LINE__, FileRegion(),
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
-  
+
   // 初期化を行う．
-  FileDescMgr fdmgr;
-  const FileDesc* file_desc = fdmgr.new_file_desc(filename);
-  mScanner.init(input_stream, file_desc);
   mIdHash.clear();
+  mUngetToken = kTokenEOF;
 
   // 一つの .inputs/.outputs 文中のトークンの数
-  size_t n_token = 0;
-  
+  ymuint n_token = 0;
+
+  FileRegion error_loc;
+
   bool stat = true;
   for (list<BlifHandler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
@@ -94,23 +92,22 @@ BlifParserImpl::read(const string& filename)
   if ( !stat ) {
     goto ST_ERROR_EXIT;
   }
-  
+
  ST_INIT:
   // 読込開始
   {
-    tToken tk= mScanner.get_token();
+    tToken tk= get_token(mLoc1);
     if ( tk == kTokenNL ) {
       // 読み飛ばす
       goto ST_INIT;
     }
     if ( tk == kTokenMODEL ) {
       // .model 文の開始
-      mLoc1 = mScanner.cur_loc();
       goto ST_MODEL;
     }
     // それ以外はエラー
-    mMsgMgr.put_msg(__FILE__, __LINE__,
-		    mScanner.cur_loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    mLoc1,
 		    kMsgError,
 		    "SYN01",
 		    "No '.model' statement.");
@@ -120,17 +117,17 @@ BlifParserImpl::read(const string& filename)
  ST_MODEL:
   // .model 文の処理
   {
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk != kTokenSTRING ) {
-      mMsgMgr.put_msg(__FILE__, __LINE__,
-		      mScanner.cur_loc(),
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
 		      kMsgError,
 		      "SYN02",
 		      "String expected after '.model'.");
       goto ST_ERROR_EXIT;
     }
-    FileRegion loc = mScanner.cur_loc();
-    const char* name = mScanner.cur_string().c_str();
+    const char* name = mScanner.cur_string();
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
       BlifHandler* handler = *p;
@@ -141,10 +138,10 @@ BlifParserImpl::read(const string& filename)
     if ( !stat ) {
       goto ST_ERROR_EXIT;
     }
-    
-    if ( mScanner.get_token() != kTokenNL ) {
-      mMsgMgr.put_msg(__FILE__, __LINE__,
-		      mScanner.cur_loc(),
+
+    if ( get_token(loc) != kTokenNL ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      loc,
 		      kMsgError,
 		      "SYN03",
 		      "Newline expected.");
@@ -157,27 +154,26 @@ BlifParserImpl::read(const string& filename)
  ST_NEUTRAL:
   // 本体の処理
   {
-    tToken tk= mScanner.get_token();
-    mLoc1 = mScanner.cur_loc();
+    tToken tk= get_token(mLoc1);
     switch (tk) {
     case kTokenNL:
       goto ST_NEUTRAL;
 
     case kTokenEOF:
       goto ST_AFTER_EOF;
-      
+
     case kTokenMODEL:
-      mMsgMgr.put_msg(__FILE__, __LINE__,
+      MsgMgr::put_msg(__FILE__, __LINE__,
 		      mLoc1,
 		      kMsgError,
 		      "SYN04",
 		      "Multiple '.model' statements.");
       goto ST_ERROR_EXIT;
-	
+
     case kTokenINPUTS:
       n_token = 0;
       goto ST_INPUTS;
-      
+
     case kTokenOUTPUTS:
       n_token = 0;
       goto ST_OUTPUTS;
@@ -211,55 +207,56 @@ BlifParserImpl::read(const string& filename)
 
     case kTokenEXDC:
       goto ST_EXDC;
-      
+
     case kTokenWIRE_LOAD_SLOPE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenWIRE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenINPUT_ARRIVAL:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_INPUT_ARRIVAL:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenOUTPUT_REQUIRED:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_OUTPUT_REQUIRED:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenINPUT_DRIVE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_INPUT_DRIVE:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenOUTPUT_LOAD:
       goto ST_DUMMY_READ1;
-      
+
     case kTokenDEFAULT_OUTPUT_LOAD:
       goto ST_DUMMY_READ1;
-      
+
     default:
       break;
     }
+    error_loc = mLoc1;
     goto ST_SYNTAX_ERROR;
   }
 
  ST_INPUTS:
   {
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk == kTokenSTRING ) {
-      FileRegion loc = mScanner.cur_loc();
-      const char* name = mScanner.cur_string().c_str();
+      const char* name = mScanner.cur_string();
       IdCell* cell = mIdHash.find(name, true);
       if ( cell->is_defined() ) {
 	ostringstream buf;
 	buf << name << ": Defined more than once. Previous definition is "
 	    << cell->def_loc() << ".";
-	mMsgMgr.put_msg(__FILE__, __LINE__, loc,
+	MsgMgr::put_msg(__FILE__, __LINE__, loc,
 			kMsgError,
 			"MLTDEF01", buf.str().c_str());
 	goto ST_ERROR_EXIT;
@@ -268,7 +265,7 @@ BlifParserImpl::read(const string& filename)
 	ostringstream buf;
 	buf << name << ": Defined as both input and output."
 	    << " Previous difinition is " << cell->loc() << ".";
-	mMsgMgr.put_msg(__FILE__, __LINE__, loc,
+	MsgMgr::put_msg(__FILE__, __LINE__, loc,
 			kMsgWarning,
 			"MLTDEF02", buf.str().c_str());
       }
@@ -290,27 +287,28 @@ BlifParserImpl::read(const string& filename)
     }
     if ( tk == kTokenNL ) {
       if ( n_token == 0 ) {
-	mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+	MsgMgr::put_msg(__FILE__, __LINE__, loc,
 			kMsgWarning,
 			"SYN07", "Empty '.inputs' statement. Ignored.");
       }
       goto ST_NEUTRAL;
     }
+    error_loc = loc;
     goto ST_SYNTAX_ERROR;
   }
 
  ST_OUTPUTS:
   {
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk == kTokenSTRING ) {
-      FileRegion loc = mScanner.cur_loc();
-      const char* name = mScanner.cur_string().c_str();
+      const char* name = mScanner.cur_string();
       IdCell* cell = mIdHash.find(name, true);
       if ( cell->is_output() ) {
 	ostringstream buf;
 	buf << name << ": Defined more than once. Previous definition is "
 	    << cell->loc();
-	mMsgMgr.put_msg(__FILE__, __LINE__, loc,
+	MsgMgr::put_msg(__FILE__, __LINE__, loc,
 			kMsgError,
 			"MLTDEF03", buf.str().c_str());
 	goto ST_ERROR_EXIT;
@@ -320,7 +318,7 @@ BlifParserImpl::read(const string& filename)
 	buf << name << ": Defined as both input and output. "
 	    << "Previous definition is "
 	    << cell->loc() << ".";
-	mMsgMgr.put_msg(__FILE__, __LINE__, loc,
+	MsgMgr::put_msg(__FILE__, __LINE__, loc,
 			kMsgWarning,
 			"MLTDEF02", buf.str().c_str());
       }
@@ -341,21 +339,22 @@ BlifParserImpl::read(const string& filename)
     }
     if ( tk == kTokenNL ) {
       if ( n_token == 0 ) {
-	mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+	MsgMgr::put_msg(__FILE__, __LINE__, loc,
 			kMsgWarning,
 			"SYN08", "Empty '.outputs' statement. Ignored.");
       }
       goto ST_NEUTRAL;
     }
+    error_loc = loc;
     goto ST_SYNTAX_ERROR;
   }
 
  ST_NAMES:
   { // str* nl
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk == kTokenSTRING ) {
-      FileRegion loc = mScanner.cur_loc();
-      const char* name = mScanner.cur_string().c_str();
+      const char* name = mScanner.cur_string();
       IdCell* cell = mIdHash.find(name, true);
       cell->set_loc(loc);
       mNameArray.push_back(cell);
@@ -365,7 +364,7 @@ BlifParserImpl::read(const string& filename)
       size_t n = mNameArray.size();
       if ( n == 0 ) {
 	// 名前が1つもない場合
-	mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+	MsgMgr::put_msg(__FILE__, __LINE__, loc,
 			kMsgError,
 			"SYN09",
 			"Empty '.names' statement.");
@@ -380,19 +379,19 @@ BlifParserImpl::read(const string& filename)
 	goto ST_NAMES1;
       }
     }
+    error_loc = loc;
     goto ST_SYNTAX_ERROR;
   }
 
  ST_NAMES0:
   { // str nl
-    tToken tk= mScanner.get_token();
-    FileRegion loc1 = mScanner.cur_loc();
+    FileRegion loc1;
+    tToken tk= get_token(loc1);
     if ( tk == kTokenSTRING ) {
       mName1 = mScanner.cur_string();
-      FileRegion loc2 = mScanner.cur_loc();
       char opat = mName1[0];
       if ( opat != '0' && opat != '1' ) {
-	mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
+	MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 			kMsgError,
 			"SYN15",
 			"Illegal character in output cube.");
@@ -402,17 +401,17 @@ BlifParserImpl::read(const string& filename)
 	mOpat = opat;
       }
       else if ( mOpat != opat ) {
-	mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
+	MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 			kMsgError,
 			"SYN10",
 			"Outpat pattern mismatch.");
 	goto ST_ERROR_EXIT;
       }
-      if ( mScanner.get_token() == kTokenNL ) {
+      if ( get_token(loc1) == kTokenNL ) {
 	++ mNc;
 	goto ST_NAMES0;
       }
-      mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
+      MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 		      kMsgError,
 		      "SYN14",
 		      "Newline is expected.");
@@ -423,22 +422,23 @@ BlifParserImpl::read(const string& filename)
       goto ST_NAMES0;
     }
     else {
-      mScanner.unget_token(tk, loc1);
+      unget_token(tk, loc1);
       goto ST_NAMES_END;
     }
   }
-  
+
  ST_NAMES1:
   { // str str nl
-    tToken tk= mScanner.get_token();
-    FileRegion loc1 = mScanner.cur_loc();
+    FileRegion loc1;
+    tToken tk= get_token(loc1);
     if ( tk == kTokenSTRING ) {
       mName1 = mScanner.cur_string();
       if ( mName1.size() != mNameArray.size() - 1 ) {
-	mMsgMgr.put_msg(__FILE__, __LINE__, loc1,
+	MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 			kMsgError,
 			"SYN12",
-			"Input pattern does not fit with the number of fanins.");
+			"Input pattern does not fit "
+			"with the number of fanins.");
 	goto ST_ERROR_EXIT;
       }
       ymuint n = mName1.size();
@@ -455,19 +455,19 @@ BlifParserImpl::read(const string& filename)
 	  mCoverPat.put_char('-');
 	}
 	else {
-	  mMsgMgr.put_msg(__FILE__, __LINE__, loc1,
+	  MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 			  kMsgError,
 			  "SYN11",
 			  "Illegal character in input cube.");
 	  goto ST_ERROR_EXIT;
 	}
       }
-      tk = mScanner.get_token();
+      FileRegion loc2;
+      tk = get_token(loc2);
       if ( tk == kTokenSTRING ) {
-	FileRegion loc2 = mScanner.cur_loc();
 	char opat = mScanner.cur_string()[0];
 	if ( opat != '0' && opat != '1' ) {
-	  mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
+	  MsgMgr::put_msg(__FILE__, __LINE__, loc2,
 			  kMsgError,
 			  "SYN15",
 			  "Illegal character in output cube.");
@@ -477,13 +477,13 @@ BlifParserImpl::read(const string& filename)
 	  mOpat = opat;
 	}
 	else if ( mOpat != opat ) {
-	  mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
+	  MsgMgr::put_msg(__FILE__, __LINE__, loc2,
 			  kMsgError, "SYN10",
 			  "Outpat pattern mismatch.");
 	  goto ST_ERROR_EXIT;
 	}
-	if ( mScanner.get_token() != kTokenNL ) {
-	  mMsgMgr.put_msg(__FILE__, __LINE__, loc2,
+	if ( get_token(loc2) != kTokenNL ) {
+	  MsgMgr::put_msg(__FILE__, __LINE__, loc2,
 			  kMsgError, "SYN14",
 			  "Newline is expected.");
 	  goto ST_ERROR_EXIT;
@@ -491,7 +491,7 @@ BlifParserImpl::read(const string& filename)
 	++ mNc;
 	goto ST_NAMES1;
       }
-      mMsgMgr.put_msg(__FILE__, __LINE__, loc1,
+      MsgMgr::put_msg(__FILE__, __LINE__, loc1,
 		      kMsgError, "SYN13",
 		      "No output cube.");
       goto ST_ERROR_EXIT;
@@ -501,7 +501,7 @@ BlifParserImpl::read(const string& filename)
       goto ST_NAMES1;
     }
     else {
-      mScanner.unget_token(tk, loc1);
+      unget_token(tk, loc1);
       goto ST_NAMES_END;
     }
   }
@@ -515,7 +515,7 @@ BlifParserImpl::read(const string& filename)
       ostringstream buf;
       buf << cell->str() << ": Defined more than once. "
 	  << "Previsous Definition is " << cell->def_loc() << ".";
-      mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+      MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		      kMsgError,
 		      "MLTDEF01", buf.str().c_str());
       goto ST_ERROR_EXIT;
@@ -536,15 +536,16 @@ BlifParserImpl::read(const string& filename)
     }
     goto ST_NEUTRAL;
   }
-  
+
  ST_GATE:
   { // str -> ST_GATE1
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk != kTokenSTRING ) {
+      error_loc = loc;
       goto ST_GATE_SYNERROR;
     }
-    FileRegion loc = mScanner.cur_loc();
-    const char* name = mScanner.cur_string().c_str();
+    const char* name = mScanner.cur_string();
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
       BlifHandler* handler = *p;
@@ -561,24 +562,26 @@ BlifParserImpl::read(const string& filename)
 
  ST_GATE1:
   { // (str '=' str)* nl
-    tToken tk= mScanner.get_token();
+    FileRegion loc1;
+    tToken tk= get_token(loc1);
     if ( tk == kTokenSTRING ) {
-      FileRegion loc1 = mScanner.cur_loc();
       mName1 = mScanner.cur_string();
       const char* name1 = mName1.c_str();
-      tk = mScanner.get_token();
+      FileRegion loc2;
+      tk = get_token(loc2);
       if ( tk != kTokenEQ ) {
+	error_loc = loc2;
 	goto ST_GATE_SYNERROR;
       }
-      tk = mScanner.get_token();
+      tk = get_token(loc2);
       if ( tk != kTokenSTRING ) {
+	error_loc = loc2;
 	goto ST_GATE_SYNERROR;
       }
-      FileRegion loc2 = mScanner.cur_loc();
-      const char* name2 = mScanner.cur_string().c_str();
+      const char* name2 = mScanner.cur_string();
       IdCell* cell = mIdHash.find(name2, true);
       cell->set_loc(loc2);
-      
+
       // 注意! 出力ピン名を 'o' もしくは 'O' と仮定している．
       if ( strcmp(name1, "o") == 0 ||
 	   strcmp(name1, "O") == 0 ) {
@@ -587,14 +590,14 @@ BlifParserImpl::read(const string& filename)
 	  ostringstream buf;
 	  buf << cell->str() << ": Defined more than once. "
 	      << "Previsous Definition is " << cell->def_loc() << ".";
-	  mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
-			  kMsgError, 
+	  MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
+			  kMsgError,
 			  "MLTDEF01", buf.str().c_str());
 	  goto ST_ERROR_EXIT;
 	}
 	cell->set_defined();
       }
-      
+
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	   p != mHandlerList.end(); ++ p) {
 	BlifHandler* handler = *p;
@@ -610,6 +613,7 @@ BlifParserImpl::read(const string& filename)
     }
     else if ( tk == kTokenNL ) {
       if ( n_token == 0 ) {
+	error_loc = loc1;
 	goto ST_GATE_SYNERROR;
       }
       for (list<BlifHandler*>::iterator p = mHandlerList.begin();
@@ -627,56 +631,58 @@ BlifParserImpl::read(const string& filename)
   }
 
  ST_GATE_SYNERROR:
-  mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
-		  kMsgError, 
+  MsgMgr::put_msg(__FILE__, __LINE__, error_loc,
+		  kMsgError,
 		  "SYN16", "Syntax error in '.gate' statement.");
   goto ST_ERROR_EXIT;
-  
+
  ST_LATCH:
   {
-    tToken tk= mScanner.get_token();
+    FileRegion loc2;
+    tToken tk= get_token(loc2);
     if ( tk == kTokenSTRING ) {
-      FileRegion loc2 = mScanner.cur_loc();
-      const char* name1 = mScanner.cur_string().c_str();
+      const char* name1 = mScanner.cur_string();
       IdCell* cell1 = mIdHash.find(name1, true);
       cell1->set_loc(loc2);
-      
-      tk = mScanner.get_token();
+
+      FileRegion loc3;
+      tk = get_token(loc3);
       if ( tk != kTokenSTRING ) {
+	error_loc = loc3;
 	goto ST_LATCH_SYNERROR;
       }
-      FileRegion loc3 = mScanner.cur_loc();
-      const char* name2 = mScanner.cur_string().c_str();
+      const char* name2 = mScanner.cur_string();
       IdCell* cell2 = mIdHash.find(name2, true);
       cell2->set_loc(loc3);
-      
+
       if ( cell2->is_defined() ) {
 	// 二重定義
 	ostringstream buf;
 	buf << cell2->str() << ": Defined more than once. "
 	    << "Previsous Definition is " << cell2->def_loc() << ".";
-	mMsgMgr.put_msg(__FILE__, __LINE__, cell2->loc(),
+	MsgMgr::put_msg(__FILE__, __LINE__, cell2->loc(),
 			kMsgError,
 			"MLTDEF01", buf.str().c_str());
 	goto ST_ERROR_EXIT;
       }
       cell2->set_defined();
-      
-      tk = mScanner.get_token();
+
+      FileRegion loc4;
+      tk = get_token(loc4);
       char rval = ' ';
-      FileRegion loc4 = mScanner.cur_loc();
       if ( tk == kTokenSTRING ) {
 	rval = mScanner.cur_string()[0];
 	if ( rval != '0' && rval != '1' ) {
-	  mMsgMgr.put_msg(__FILE__, __LINE__, loc4,
+	  MsgMgr::put_msg(__FILE__, __LINE__, loc4,
 			  kMsgError,
 			  "SYN18",
 			  "Illegal character for reset value.");
 	  goto ST_ERROR_EXIT;
 	}
-	tk = mScanner.get_token();
+	tk = get_token(loc4);
       }
       if ( tk != kTokenNL ) {
+	error_loc = loc4;
 	goto ST_LATCH_SYNERROR;
       }
 
@@ -694,24 +700,26 @@ BlifParserImpl::read(const string& filename)
       goto ST_NEUTRAL;
     }
     else {
+      error_loc = loc2;
       goto ST_LATCH_SYNERROR;
     }
   }
-  
+
  ST_LATCH_SYNERROR:
-  mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+  MsgMgr::put_msg(__FILE__, __LINE__, error_loc,
 		  kMsgError,
 		  "SYN17", "Syntax error in '.latch' statement.");
   goto ST_ERROR_EXIT;
-  
+
  ST_AFTER_END:
   {
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk == kTokenEOF ) {
       goto ST_NORMAL_EXIT;
     }
     if ( tk != kTokenNL ) {
-      mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+      MsgMgr::put_msg(__FILE__, __LINE__, loc,
 		      kMsgWarning,
 		      "SYN06",
 		      "Statement after '.end' is ignored.");
@@ -721,7 +729,8 @@ BlifParserImpl::read(const string& filename)
 
  ST_EXDC:
   {
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk == kTokenEND ) {
       goto ST_NEUTRAL;
     }
@@ -730,7 +739,8 @@ BlifParserImpl::read(const string& filename)
 
  ST_DUMMY_READ1:
   {
-    tToken tk= mScanner.get_token();
+    FileRegion loc;
+    tToken tk= get_token(loc);
     if ( tk == kTokenNL ) {
       goto ST_NEUTRAL;
     }
@@ -739,15 +749,14 @@ BlifParserImpl::read(const string& filename)
 
  ST_AFTER_EOF:
   {
-    FileRegion loc = mScanner.cur_loc();
-    mMsgMgr.put_msg(__FILE__, __LINE__, loc,
+    MsgMgr::put_msg(__FILE__, __LINE__, mLoc1,
 		    kMsgWarning,
 		    "SYN05",
 		    "unexpected EOF. '.end' is assumed.");
     for (list<BlifHandler*>::iterator p = mHandlerList.begin();
 	 p != mHandlerList.end(); ++ p) {
       BlifHandler* handler = *p;
-      if ( !handler->end(loc) ) {
+      if ( !handler->end(mLoc1) ) {
 	stat = false;
       }
     }
@@ -756,7 +765,7 @@ BlifParserImpl::read(const string& filename)
     }
     goto ST_NORMAL_EXIT;
   }
-  
+
  ST_NORMAL_EXIT:
   {
     size_t n = mIdHash.num();
@@ -765,7 +774,7 @@ BlifParserImpl::read(const string& filename)
       if ( !cell->is_defined() ) {
 	ostringstream buf;
 	buf << cell->str() << ": Undefined.";
-	mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+	MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 			kMsgError,
 			"UNDEF01", buf.str().c_str());
 	goto ST_ERROR_EXIT;
@@ -781,20 +790,20 @@ BlifParserImpl::read(const string& filename)
   return true;
 
  ST_SYNTAX_ERROR:
-  mMsgMgr.put_msg(__FILE__, __LINE__, mScanner.cur_loc(),
+  MsgMgr::put_msg(__FILE__, __LINE__, error_loc,
 		  kMsgError,
 		  "SYN00",
 		  "Syntax error.");
   // わざと次の行につづく
   // goto ST_ERROR_EXIT;
-  
+
  ST_ERROR_EXIT:
   for (list<BlifHandler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
     BlifHandler* handler = *p;
     handler->error_exit();
   }
-  
+
   return false;
 }
 
@@ -804,6 +813,21 @@ BlifParserImpl::add_handler(BlifHandler* handler)
 {
   mHandlerList.push_back(handler);
   handler->mParser = this;
+}
+
+// @brief トークンを一つ読み出す．
+// @param[out] loc トークンの位置を格納する変数
+tToken
+BlifParserImpl::get_token(FileRegion& loc)
+{
+  if ( mUngetToken == kTokenEOF ) {
+    return mScanner.read_token(loc);
+  }
+  // トークンバッファに値がある場合にはそれを返す．
+  tToken tk = mUngetToken;
+  mUngetToken = kTokenEOF;
+  loc = mUngetTokenLoc;
+  return tk;
 }
 
 END_NAMESPACE_YM_BLIF

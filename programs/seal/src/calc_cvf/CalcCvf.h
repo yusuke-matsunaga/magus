@@ -12,8 +12,8 @@
 
 #include "seal_nsdef.h"
 #include "seal_utils.h"
-#include <ym_tgnet/TgGateTemplate.h>
-#include <ym_tgnet/TgNode.h>
+#include <ym_networks/TgGateTemplate.h>
+#include <ym_networks/TgNode.h>
 #include "EventQ.h"
 #include "TestVector.h"
 #include <ym_lexp/LogExpr.h>

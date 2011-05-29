@@ -15,7 +15,7 @@
 #include "backtrace.h"
 #include "TestVector.h"
 #include "TvMgr.h"
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/TgNode.h"
 
 //#define DEBUG 1
 

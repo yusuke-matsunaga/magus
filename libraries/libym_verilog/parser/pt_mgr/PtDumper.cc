@@ -965,14 +965,14 @@ PtDumper::put(const char* label,
 void
 PtDumper::put_parent_file(const FileLoc& file_loc)
 {
-  list<const FileLoc*> file_list;
-  file_loc.parent_file_list(file_list);
-  for (list<const FileLoc*>::const_iterator p = file_list.begin();
+  list<FileLoc> file_list;
+  file_loc.parent_loc_list(file_list);
+  for (list<FileLoc>::const_iterator p = file_list.begin();
        p != file_list.end(); ++ p) {
-    const FileLoc* tmp = *p;
+    const FileLoc& loc = *p;
     PtHeader x(*this, "mParentFile", "IncFile", false);
-    mStream << "name = " << tmp->filename()
-	    << ", line = " << tmp->line();
+    mStream << "name = " << loc.filename()
+	    << ", line = " << loc.line();
   }
 }
 
@@ -1400,7 +1400,7 @@ PtDumper::put(const char* label,
   const FileLoc& first = file_region.start_loc();
   const FileLoc& last = file_region.end_loc();
 
-  if ( first.file_desc() == last.file_desc() ) {
+  if ( first.file_info() == last.file_info() ) {
     if ( first.is_valid() ) {
       // 同じファイル
       put_parent_file(first);

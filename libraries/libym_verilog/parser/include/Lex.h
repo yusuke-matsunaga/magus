@@ -28,12 +28,9 @@ class Lex :
   public RawLex
 {
 public:
-  
+
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージマネージャ
-  /// @param[in] fd_mgr ファイル記述子を管理するクラス
-  Lex(MsgMgr& msg_mgr,
-      FileDescMgr& fd_mgr);
+  Lex();
 
   /// @brief デストラクタ
   ~Lex();
@@ -50,7 +47,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // モジュール関係のLEX状態
   LexModuleState* mModuleState;
 

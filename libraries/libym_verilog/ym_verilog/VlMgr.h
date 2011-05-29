@@ -15,7 +15,6 @@
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/File.h"
-#include "ym_utils/MsgHandler.h"
 #include "ym_utils/Alloc.h"
 
 
@@ -35,8 +34,7 @@ class VlMgr
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] msg_mgr メッセージマネージャ
-  VlMgr(MsgMgr& msg_mgr);
+  VlMgr();
 
   /// @brief デストラクタ
   ~VlMgr();
@@ -272,9 +270,6 @@ private:
 
   // ここで生成するオブジェクト用のアロケータ
   SimpleAlloc mAlloc;
-
-  // メッセージマネージャ
-  MsgMgr& mMsgMgr;
 
   // Pt オブジェクトを管理するクラス
   PtMgr* mPtMgr;

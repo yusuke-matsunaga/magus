@@ -22,6 +22,8 @@
 #include "ElbPrimitive.h"
 #include "ElbExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -72,19 +74,19 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
     switch ( ElbPrimitive::get_port_size(pt_head->prim_type(), port_num,
 					 output_num, inout_num, input_num) ) {
     case -1:
-      put_msg(__FILE__, __LINE__,
-	      pt_inst->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Too few port connections.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_inst->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Too few port connections.");
       continue;
 
     case 1:
-      put_msg(__FILE__, __LINE__,
-	      pt_inst->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Too many port connections.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_inst->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Too many port connections.");
       continue;
     }
 
@@ -115,11 +117,11 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "instantiating primitive array: " << prim_array->full_name();
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgInfo,
-	      "ELAB",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      fr,
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
 
       add_phase3stub(make_stub(this, &ItemGen::link_prim_array,
 			       prim_array, pt_inst));
@@ -139,11 +141,11 @@ ItemGen::instantiate_gateheader(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "instantiating primitive: " << prim->full_name();
-      put_msg(__FILE__, __LINE__,
-	      fr,
-	      kMsgInfo,
-	      "ELAB",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      fr,
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
 
       add_phase3stub(make_stub(this, &ItemGen::link_primitive,
 			       prim, pt_inst));
@@ -178,21 +180,21 @@ ItemGen::instantiate_udpheader(const VlNamedObj* parent,
     const PtInst* pt_inst = pt_head->inst(i);
     if ( pt_inst->port_num() > 0 &&
 	 pt_inst->port(0)->name() != NULL ) {
-      put_msg(__FILE__, __LINE__,
-	      pt_inst->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "UDP instance cannot have named port list.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_inst->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "UDP instance cannot have named port list.");
       continue;
     }
 
     ymuint port_num = pt_inst->port_num();
     if ( udpdefn->port_num() != port_num ) {
-      put_msg(__FILE__, __LINE__,
-	      pt_inst->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Number of ports mismatch.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_inst->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Number of ports mismatch.");
       continue;
     }
 
@@ -300,11 +302,11 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
     const PtExpr* pt_expr = pt_con->expr();
     if ( !pt_expr ) {
       // 空の接続式は許されない．
-      put_msg(__FILE__, __LINE__,
-	      pt_con->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Empty expression in UDP/primitive instance port.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_con->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Empty expression in UDP/primitive instance port.");
       continue;
     }
 
@@ -324,11 +326,11 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 
     tVpiValueType type = tmp->value_type();
     if ( type == kVpiValueReal ) {
-      put_msg(__FILE__, __LINE__,
-	      tmp->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Real expression cannot connect to UDP port.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Real expression cannot connect to UDP port.");
       continue;
     }
     ymuint expr_size = unpack_size(type);
@@ -359,11 +361,11 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
       ostringstream buf;
       buf << (index + 1) << num_suffix(index + 1)
 	  << " port expression has illegal size.";
-      put_msg(__FILE__, __LINE__,
-	      pt_con->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_con->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
     }
   }
 }
@@ -403,11 +405,11 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
 
     tVpiValueType type = tmp->value_type();
     if ( type == kVpiValueReal ) {
-      put_msg(__FILE__, __LINE__,
-	      tmp->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      "Real expression cannot connect to UDP port.");
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      tmp->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      "Real expression cannot connect to UDP port.");
       continue;
     }
     ymuint expr_size = unpack_size(type);
@@ -424,11 +426,11 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
       ostringstream buf;
       buf << (index + 1) << num_suffix(index + 1)
 	  << " port expression has illegal size.";
-      put_msg(__FILE__, __LINE__,
-	      pt_con->file_region(),
-	      kMsgError,
-	      "ELAB",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_con->file_region(),
+		      kMsgError,
+		      "ELAB",
+		      buf.str());
     }
   }
 }

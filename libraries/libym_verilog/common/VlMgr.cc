@@ -28,11 +28,8 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
-// @param[in] msg_mgr メッセージマネージャ
-// @param[in] pt_mgr パース木を保持するクラス
-VlMgr::VlMgr(MsgMgr& msg_mgr) :
+VlMgr::VlMgr() :
   mAlloc(4096),
-  mMsgMgr(msg_mgr),
   mPtMgr(new PtMgr),
   mPtiFactory(new CptFactory(mAlloc)),
   mElbMgr(new ElbMgr(mAlloc)),
@@ -69,7 +66,7 @@ VlMgr::read_file(const string& filename,
 		 const SearchPathList& searchpath,
 		 const list<VlLineWatcher*> watcher_list)
 {
-  Parser parser(mMsgMgr, *mPtMgr, mAlloc, *mPtiFactory);
+  Parser parser(*mPtMgr, mAlloc, *mPtiFactory);
 
   return parser.read_file(filename, searchpath, watcher_list);
 }
@@ -96,7 +93,7 @@ VlMgr::pt_udp_list() const
 ymuint
 VlMgr::elaborate()
 {
-  Elaborator elab(mMsgMgr, *mElbMgr, *mElbFactory);
+  Elaborator elab(*mElbMgr, *mElbFactory);
 
   return elab(*mPtMgr);
 }

@@ -249,7 +249,7 @@ TvFuncTest::check_count_one(const TvFunc& func)
     }
   }
   size_t c1_true = ni_pow - c0_true;
-  
+
   // count_zero() のテスト
   {
     size_t c0 = func.count_zero();
@@ -621,6 +621,55 @@ TvFuncTest::check_walsh_w1(const TvFunc& func,
   }
 }
 
+// @brief cofactor() のテスト
+// @param[in] func 検査対象の論理関数
+// @param[in] pos 入力番号
+// @param[in] pol 極性
+void
+TvFuncTest::check_cofactor(const TvFunc& func,
+			   ymuint pos,
+			   tPol pol)
+{
+  ymuint ni = func.ni();
+  ymuint ni_pow = 1UL << ni;
+
+  TvFunc cfunc = func;
+  cfunc.cofactor(pos, pol);
+
+  ymuint bit = 1U << pos;
+  ymuint mask = (pol == kPolPosi) ? 0U : bit;
+  vector<int> vec(ni_pow);
+  for (ymuint i = 0; i < ni_pow; ++ i) {
+    ymuint idx = i;
+    if ( (i & bit) == mask ) {
+      idx ^= bit;
+    }
+    if ( func.value(idx) ) {
+      vec[i] = 1;
+    }
+    else {
+      vec[i] = 0;
+    }
+  }
+  TvFunc gfunc(ni, vec);
+
+  mOut << "): " << cfunc << endl;
+  if ( cfunc != gfunc ) {
+    mOut << "Error: TvFunc::cofactor" << endl
+	 << "  func: " << func << endl
+	 << "  func.cofactor(" << pos << ", ";
+    if ( pol == kPolPosi ) {
+      mOut << "Posi";
+    }
+    else {
+      mOut << "Nega";
+    }
+    mOut << "): " << cfunc << endl
+	 << "golden: " << gfunc << endl;
+    ++ mNerr;
+  }
+}
+
 // walsh_0 の真値を計算する．
 // 結果は mW0Cache に格納される．
 // func.value() を正しいと仮定している．
@@ -658,7 +707,7 @@ TvFuncTest::walsh_1(const TvFunc& func)
       mW1Cache = new int[ni];
       mW1CacheSize = ni;
     }
-    
+
     for (size_t i = 0; i < ni; ++ i) {
       int w1 = 0;
       for (size_t j = 0; j < ni_pow; ++ j) {
@@ -708,7 +757,7 @@ TvFuncTest::walsh_2(const TvFunc& func)
 	  mW2Cache[i * ni + j] = 0;
 	  continue;
 	}
-	
+
 	int w2 = 0;
 	for (size_t k = 0; k < ni_pow; ++ k) {
 	  int flag = 0;

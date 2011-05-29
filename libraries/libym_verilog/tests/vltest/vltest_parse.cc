@@ -10,13 +10,16 @@
 
 
 #if HAVE_CONFIG_H
-#include <ymconfig.h>
+#include "ymconfig.h"
 #endif
 
-#include <ym_utils/StopWatch.h>
+#include "ym_utils/StopWatch.h"
 #include "VlTestLineWatcher.h"
-#include <ym_verilog/VlMgr.h>
+#include "ym_verilog/VlMgr.h"
 #include "PtDumper.h"
+
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -30,9 +33,8 @@ parse_mode(const list<string>& filename_list,
 	   int loop,
 	   bool dump_pt)
 {
-  MsgMgr msgmgr;
   MsgHandler* tmh = new StreamMsgHandler(&cerr);
-  msgmgr.reg_handler(tmh);
+  MsgMgr::reg_handler(tmh);
 
   SearchPathList splist;
   if ( spath ) {
@@ -50,7 +52,7 @@ parse_mode(const list<string>& filename_list,
     try {
       StopWatch timer;
       timer.start();
-      VlMgr vlmgr(msgmgr);
+      VlMgr vlmgr;
       for (list<string>::const_iterator p = filename_list.begin();
 	   p != filename_list.end(); ++ p) {
 	const string& name = *p;
@@ -77,7 +79,7 @@ parse_mode(const list<string>& filename_list,
 	dp.put(udp_list, module_list);
       }
 
-      switch ( msgmgr.error_num() ) {
+      switch ( MsgMgr::error_num() ) {
       case 0:
 	cerr << "No errors" << endl;
 	break;
@@ -86,7 +88,7 @@ parse_mode(const list<string>& filename_list,
 	break;
 
       default:
-	cerr << "Total " << msgmgr.error_num() << " errors" << endl;
+	cerr << "Total " << MsgMgr::error_num() << " errors" << endl;
 	break;
       }
 

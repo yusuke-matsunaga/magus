@@ -12,13 +12,11 @@
 
 
 #include "AtpgCmd.h"
-#include "ym_tgnet/TgBlifReader.h"
-#include "ym_tgnet/TgIscas89Reader.h"
+#include "ym_networks/TgBlifReader.h"
+#include "ym_networks/TgIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG
-
-class AtpgMsgHandler;
 
 //////////////////////////////////////////////////////////////////////
 // blif 形式のファイルを読み込むコマンド
@@ -37,7 +35,7 @@ public:
 
 
 protected:
-  
+
   // コマンド処理関数
   virtual
   int
@@ -48,13 +46,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // blif パーサ
   TgBlifReader mReader;
-  
-  // メッセージハンドラ
-  AtpgMsgHandler* mMsgHandler;
-  
+
 };
 
 
@@ -75,7 +70,7 @@ public:
 
 
 protected:
-  
+
   // コマンド処理関数
   virtual
   int
@@ -86,13 +81,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // iscas89 パーサ
   TgIscas89Reader mReader;
-  
-  // メッセージハンドラ
-  AtpgMsgHandler* mMsgHandler;
-  
+
 };
 
 
@@ -109,7 +101,7 @@ public:
 
 
 protected:
-  
+
   // コマンド処理関数
   virtual
   int

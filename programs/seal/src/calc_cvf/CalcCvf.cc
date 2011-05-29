@@ -15,8 +15,8 @@
 
 #include "seal_utils.h"
 #include "CalcCvf.h"
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tgnet/TgNode.h>
+#include <ym_networks/TgNetwork.h>
+#include <ym_networks/TgNode.h>
 #include "SimNode.h"
 #include "SimFFR.h"
 #include "PoMark.h"

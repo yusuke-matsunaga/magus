@@ -5,14 +5,21 @@
 ///
 /// $Id: DelayMapCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "DelayMapCmd.h"
 #include "ym_tclpp/TclPopt.h"
 
-#include "ym_utils/StopWatch.h"
+#include "ym_techmap/LutMap.h"
+
+#include "ym_networks/BNetBdnConv.h"
+
+#include "ym_networks/MvnMgr.h"
+#include "ym_networks/BdnMgr.h"
+#include "ym_networks/MvnBdnConv.h"
+#include "ym_networks/MvnBdnMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -84,32 +91,55 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  try {
-    int limit;
-    int code = int_conv(objv[1], limit);
-    if ( code != TCL_OK ) {
-      return code;
+  int limit;
+  int code = int_conv(objv[1], limit);
+  if ( code != TCL_OK ) {
+    return code;
+  }
+
+  LutMap lutmap;
+
+  ymuint lut_num;
+  ymuint depth;
+
+  NetHandle* neth = cur_nethandle();
+  switch ( neth->type() ) {
+  case NetHandle::kMagBNet:
+    {
+      BNetBdnConv conv;
+
+      BdnMgr tmp_network;
+      conv(*neth->bnetwork(), tmp_network);
+      lutmap.delay_map(tmp_network, limit, slack, mode,
+		       lutnetwork(), lut_num, depth);
     }
+    break;
 
-    ymuint lut_num;
-    ymuint depth;
-    delay_map(sbjgraph(), limit, slack, mode, lutnetwork(), lut_num, depth);
+  case NetHandle::kMagBdn:
+    lutmap.delay_map(*neth->bdn(), limit, slack, mode,
+		     lutnetwork(), lut_num, depth);
+    break;
 
-    set_var("::magus::lutmap_stats", "lut_num",
-	    lut_num,
-	    TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
-    set_var("::magus::lutmap_stats", "level",
-	    depth,
-	    TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
-    return TCL_OK;
+  case NetHandle::kMagMvn:
+    {
+      const MvnMgr& mvn = *neth->mvn();
+      MvnBdnConv conv;
+      BdnMgr tmp_network;
+      MvnBdnMap mvnode_map(mvn.max_node_id());
+      conv(mvn, tmp_network, mvnode_map);
+      lutmap.delay_map(tmp_network, limit, slack, mode,
+		       lutnetwork(), lut_num, depth);
+    }
+    break;
   }
-  catch ( AssertError x ) {
-    cerr << x << endl;
-    TclObj emsg;
-    emsg << "Assertion Error";
-    set_result(emsg);
-    return TCL_ERROR;
-  }
+
+  set_var("::magus::lutmap_stats", "lut_num",
+	  lut_num,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var("::magus::lutmap_stats", "level",
+	  depth,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  return TCL_OK;
 
   return TCL_OK;
 }

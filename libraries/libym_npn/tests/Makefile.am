@@ -30,7 +30,7 @@ distclean-local:
 
 YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-YM_TCLPP = $(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la 
+YM_TCLPP = $(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 YM_BDD = $(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la
 
@@ -45,6 +45,7 @@ YM_NPN = $(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la
 noinst_PROGRAMS = \
 	tvfunc_test \
 	tvfunc_test2 \
+	cofactor_test \
 	npn_check3 \
 	$(NPN_CHECK)
 
@@ -63,6 +64,13 @@ tvfunc_test2_LDADD = \
 	$(YM_NPN) \
 	$(YM_BASE) \
 	@POPT_LIBS@
+
+cofactor_test_SOURCES = \
+	cofactor_test.cc \
+	TvFuncTest.h \
+	TvFuncTest.cc
+cofactor_test_LDADD = \
+	$(YM_NPN)
 
 npn_check3_SOURCES = \
 	npn_check3.cc

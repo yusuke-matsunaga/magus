@@ -1,65 +1,47 @@
 
-/// @file libym_mislib/MisLibParser.cc
+/// @file libym_cell/mislib/MislibParser.cc
 /// @brief MislibParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MislibParser.cc 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: MislibParser.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
-#include <ym_mislib/MislibParser.h>
+#include "ym_mislib/MislibParser.h"
+#include "ym_mislib/MislibMgr.h"
 #include "MislibParserImpl.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
 
 //////////////////////////////////////////////////////////////////////
-// MisLibPt オブジェクトを管理するクラス
+// クラス MislibParser
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-MislibParser::MislibParser()
+// コンストラクタ
+MislibParser::MislibParser() :
+  mImpl(new MislibParserImpl)
 {
-  mRep = new MislibParserImpl;
 }
 
-// @brief デストラクタ
+// デストラクタ
 MislibParser::~MislibParser()
 {
-  delete mRep;
+  delete mImpl;
 }
-  
-// @brief mislib ファイルを読み込む
+
+// @brief mislib ファイルを読み込んでライブラリを生成する．
 // @param[in] filename ファイル名
+// @param[in] mgr MislibNode を管理するクラス
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-MislibParser::read(const string& filename)
+MislibParser::read_file(const string& filename,
+			MislibMgr& mgr)
 {
-  return mRep->read(filename);
-}
-
-// @brief イベントハンドラの登録
-// @param[in] handler 登録するハンドラ
-// @note handler はこのインスタンスが破壊される時に同時に破壊される．
-void
-MislibParser::add_handler(MislibHandler* handler)
-{
-  mRep->add_handler(handler);
-}
-  
-// @brief メッセージハンドラの登録
-// @param[in] handler 登録するハンドラ
-// @note handler はこのインスタンスが破壊される時に同時に破壊される．
-void
-MislibParser::add_msg_handler(MsgHandler* handler)
-{
-  mRep->msg_mgr().reg_handler(handler);
+  return mImpl->read_file(filename, mgr.mImpl);
 }
 
 END_NAMESPACE_YM_MISLIB

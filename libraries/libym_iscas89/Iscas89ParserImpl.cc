@@ -11,7 +11,7 @@
 
 #include "Iscas89ParserImpl.h"
 #include "ym_iscas89/Iscas89Handler.h"
-#include "ym_utils/FileDescMgr.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
@@ -43,23 +43,16 @@ bool
 Iscas89ParserImpl::read(const string& filename)
 {
   int yyparse(Iscas89ParserImpl&);
-  
+
   // ファイルをオープンする．
-  ifstream input_stream;
-  input_stream.open(filename.c_str());
-  if ( !input_stream ) {
+  if ( !mScanner.open_file(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
-    mMsgMgr.put_msg(__FILE__, __LINE__, FileRegion(),
+    MsgMgr::put_msg(__FILE__, __LINE__, FileRegion(),
 		    kMsgFailure, "BLIF_PARSER", buf.str());
     return false;
   }
-  
-  // 初期化する．
-  FileDescMgr fdmgr;
-  const FileDesc* file_desc = fdmgr.new_file_desc(filename);
-  mScanner.init(input_stream, file_desc);
 
   for (list<Iscas89Handler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
@@ -100,7 +93,7 @@ Iscas89ParserImpl::add_handler(Iscas89Handler* handler)
   mHandlerList.push_back(handler);
   handler->mParser = this;
 }
-  
+
 // @brief yylex() 用の処理を行う．
 // @param[out] lval トークンの値を格納する変数
 // @param[out] lloc トークンの位置を格納する変数
@@ -109,8 +102,7 @@ int
 Iscas89ParserImpl::scan(ymuint32& lval,
 			FileRegion& lloc)
 {
-  int id = mScanner.get_token();
-  lloc = mScanner.cur_loc();
+  int id = mScanner.read_token(lloc);
   if ( id == NAME ) {
     lval = reg_str(mScanner.cur_string(), lloc);
   }
@@ -130,7 +122,7 @@ Iscas89ParserImpl::read_input(const FileRegion& loc,
     ostringstream buf;
     buf << cell->str() << ": Defined more than once. Previous definition is "
 	<< cell->def_loc();
-    mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		    kMsgError,
 		    "ER_MLTDEF01",
 		    buf.str());
@@ -162,7 +154,7 @@ Iscas89ParserImpl::read_output(const FileRegion& loc,
     buf << cell->str() << ": Defined as both input and output. "
 	<< "Previous definition is "
 	<< cell->def_loc();
-    mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		    kMsgWarning,
 		    "WR_MLTDEF02",
 		    buf.str());
@@ -195,7 +187,7 @@ Iscas89ParserImpl::read_gate(const FileRegion& loc,
     ostringstream buf;
     buf << cell->str() << ": Defined more than once. "
 	<< "Previsous Definition is " << cell->def_loc();
-    mMsgMgr.put_msg(__FILE__, __LINE__, cell->loc(),
+    MsgMgr::put_msg(__FILE__, __LINE__, cell->loc(),
 		    kMsgError,
 		    "ER_MLTDEF01",
 		    buf.str());
@@ -229,10 +221,10 @@ Iscas89ParserImpl::push_str(ymuint32 str_id)
 // @param[in] loc 文字列の位置情報
 // @return 文字列の ID 番号
 ymuint32
-Iscas89ParserImpl::reg_str(const StrBuff& src_str,
+Iscas89ParserImpl::reg_str(const char* src_str,
 			   const FileRegion& loc)
 {
-  IdCell* cell = mIdHash.find(src_str.c_str(), true);
+  IdCell* cell = mIdHash.find(src_str, true);
   cell->set_loc(loc);
   return cell->id();
 }

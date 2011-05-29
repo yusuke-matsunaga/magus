@@ -29,6 +29,8 @@
 #include "ElbRange.h"
 #include "ElbExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -158,11 +160,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	  buf << pt_item->name() << " : has an aux-type declaration"
 	      << ", while it also has another declaration in "
 	      << handle->file_region() << ".";
-	  put_msg(__FILE__, __LINE__,
-		  pt_item->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_item->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  continue;
 	}
 	decl = handle->decl();
@@ -187,11 +189,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	    ostringstream buf;
 	    buf << pt_item->name()
 		<< ": Array object shall not be connected to IO port.";
-	    put_msg(__FILE__, __LINE__,
-		    decl->file_region(),
-		    kMsgError,
-		    "ELAB",
-		    buf.str());
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    decl->file_region(),
+			    kMsgError,
+			    "ELAB",
+			    buf.str());
 	  }
 	  else {
 	    // 不適切な型だった場合．
@@ -203,11 +205,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	      buf << "net, ";
 	    }
 	    buf << "reg or integer/time variable.";
-	    put_msg(__FILE__, __LINE__,
-		    pt_item->file_region(),
-		    kMsgError,
-		    "ELAB",
-		    buf.str());
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_item->file_region(),
+			    kMsgError,
+			    "ELAB",
+			    buf.str());
 	  }
 	  continue;
 	}
@@ -231,11 +233,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	      ostringstream buf;
 	      buf << "Conflictive range declaration of \""
 		  << pt_item->name() << "\".";
-	      put_msg(__FILE__, __LINE__,
-		      pt_item->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
+	      MsgMgr::put_msg(__FILE__, __LINE__,
+			      pt_item->file_region(),
+			      kMsgError,
+			      "ELAB",
+			      buf.str());
 	      continue;
 	    }
 	  }
@@ -244,11 +246,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	    ostringstream buf;
 	    buf << "Conflictive range declaration of \""
 		<< pt_item->name() << "\".";
-	    put_msg(__FILE__, __LINE__,
-		    pt_item->file_region(),
-		    kMsgError,
-		    "ELAB",
-		    buf.str());
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_item->file_region(),
+			    kMsgError,
+			    "ELAB",
+			    buf.str());
 	    cout << "IO range: [" << left_val << ":" << right_val << "]"
 		 << endl
 		 << "Decl range: [" << left_val2 << ":" << right_val2 << "]"
@@ -262,11 +264,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	  ostringstream buf;
 	  buf << "Conflictive range declaration of \""
 	      << pt_item->name() << "\".";
-	  put_msg(__FILE__, __LINE__,
-		  pt_item->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_item->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  continue;
 	}
 	// どちらか一方でも符号付きなら両方符号付きにする．
@@ -286,11 +288,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	      ostringstream buf;
 	      buf << pt_item->name() << " : Implicit declaration is inhibited "
 		  << " because default_nettype = \"none\".";
-	      put_msg(__FILE__, __LINE__,
-		      pt_item->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
+	      MsgMgr::put_msg(__FILE__, __LINE__,
+			      pt_item->file_region(),
+			      kMsgError,
+			      "ELAB",
+			      buf.str());
 	      continue;
 	    }
 	    aux_type = kVpiAuxNet;
@@ -336,11 +338,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	      ostringstream buf;
 	      buf << pt_item->name()
 		  << " : Implicit net declaration cannot have initial value.";
-	      put_msg(__FILE__, __LINE__,
-		      pt_item->file_region(),
-		      kMsgError,
-		      "ELAB",
-		      buf.str());
+	      MsgMgr::put_msg(__FILE__, __LINE__,
+			      pt_item->file_region(),
+			      kMsgError,
+			      "ELAB",
+			      buf.str());
 	      continue;
 	    }
 	    // これは verilog_grammer.yy の list_of_variable_port_identifiers
@@ -381,11 +383,11 @@ DeclGen::instantiate_iodecl(ElbModule* module,
       ostringstream buf;
       buf << "IODecl(" << pt_item->name() << ")@"
 	  << namedobj->full_name() << " created.";
-      put_msg(__FILE__, __LINE__,
-	      pt_head->file_region(),
-	      kMsgInfo,
-	      "ELAB",
-	      buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_head->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
   }
 }
@@ -484,11 +486,11 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
 
     ostringstream buf;
     buf << "Parameter(" << param->full_name() << ") created.";
-    msg_mgr().put_msg(__FILE__, __LINE__,
-		      file_region,
-		      kMsgInfo,
-		      "ELAB",
-		      buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region,
+		    kMsgInfo,
+		    "ELAB",
+		    buf.str());
 
     // 右辺の式は constant expression のはずなので今つくる．
     const PtExpr* pt_init_expr = pt_item->init_value();
@@ -573,11 +575,11 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "NetArray(" << net_array->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
     else {
       // 単一の要素
@@ -600,11 +602,11 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "Net(" << net->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
   }
 }
@@ -703,11 +705,11 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "RegArray(" << reg_array->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
     else {
       // 単独の要素
@@ -732,11 +734,11 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "Reg(" << reg->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
   }
 }
@@ -782,11 +784,11 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "VarArray(" << var_array->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
     else {
       // 単独の変数
@@ -811,11 +813,11 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "Var(" << var->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
   }
 }
@@ -855,11 +857,11 @@ DeclGen::instantiate_event_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "NamedEventArray(" << ne_array->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
     else {
       // 単一の要素
@@ -876,11 +878,11 @@ DeclGen::instantiate_event_head(const VlNamedObj* parent,
 
       ostringstream buf;
       buf << "NamedEvent(" << named_event->full_name() << ") created.";
-      msg_mgr().put_msg(__FILE__, __LINE__,
-			pt_item->file_region(),
-			kMsgInfo,
-			"ELAB",
-			buf.str());
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_item->file_region(),
+		      kMsgInfo,
+		      "ELAB",
+		      buf.str());
     }
   }
 }
@@ -899,11 +901,11 @@ DeclGen::instantiate_genvar_head(const VlNamedObj* parent,
 
     ostringstream buf;
     buf << "Genvar(" << genvar->full_name() << ") created.";
-    msg_mgr().put_msg(__FILE__, __LINE__,
-		      pt_item->file_region(),
-		      kMsgInfo,
-		      "ELAB",
-		      buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    pt_item->file_region(),
+		    kMsgInfo,
+		    "ELAB",
+		    buf.str());
   }
 }
 

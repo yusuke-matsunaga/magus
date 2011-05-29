@@ -45,29 +45,29 @@ public:
   virtual
   bool
   init();
-  
+
   /// @brief p 行の読込み
-  /// @param[in] lineno 行番号
+  /// @param[in] loc ファイル上の位置情報
   /// @param[in] nv 変数の数
   /// @param[in] nc 節の数
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  read_p(int lineno,
-	 size_t nv,
-	 size_t nc);
-  
+  read_p(const FileRegion& loc,
+	 ymuint nv,
+	 ymuint nc);
+
   /// @brief clause 行の読込み
-  /// @param[in] lineno 行番号
+  /// @param[in] loc ファイル上の位置情報
   /// @param[in] lits リテラルの配列．最後の0は含まない
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  read_clause(int lineno,
+  read_clause(const FileRegion& loc,
 	      const vector<int>& lits);
-  
+
   /// @brief 終了処理
   virtual
   bool
@@ -82,7 +82,7 @@ public:
   bool
   verify(const vector<Bool3>& model) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -94,7 +94,7 @@ private:
 
 };
 
-
+#if 0
 //////////////////////////////////////////////////////////////////////
 // ymsat 用の DimacsMsgHandler
 //////////////////////////////////////////////////////////////////////
@@ -130,6 +130,7 @@ public:
 	     const string& label,
 	     const string& body);
 };
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -181,19 +182,19 @@ SatDimacsHandler::init()
 {
   return true;
 }
-  
+
 // @brief p 行の読込み
-// @param[in] lineno 行番号
+// @param[in] loc ファイル上の位置情報
 // @param[in] nv 変数の数
 // @param[in] nc 節の数
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-SatDimacsHandler::read_p(int lineno,
-			 size_t nv,
-			 size_t nc)
+SatDimacsHandler::read_p(const FileRegion& loc,
+			 ymuint nv,
+			 ymuint nc)
 {
-  for (size_t i = 0; i < nv; ++ i) {
+  for (ymuint i = 0; i < nv; ++ i) {
     mSolver->new_var();
   }
 
@@ -201,12 +202,12 @@ SatDimacsHandler::read_p(int lineno,
 }
 
 // @brief clause 行の読込み
-// @param[in] lineno 行番号
+// @param[in] loc ファイル上の位置情報
 // @param[in] lits リテラルの配列．最後の0は含まない
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-SatDimacsHandler::read_clause(int lineno,
+SatDimacsHandler::read_clause(const FileRegion& loc,
 			      const vector<int>& lits)
 {
   vector<Literal> tmp;
@@ -231,7 +232,7 @@ SatDimacsHandler::read_clause(int lineno,
 
   return true;
 }
-  
+
 // @brief 終了処理
 // @param[in] loc 位置情報
 bool
@@ -286,6 +287,7 @@ SatDimacsHandler::verify(const vector<Bool3>& model) const
 }
 
 
+#if 0
 // @brief コンストラクタ
 SatDimacsMsgHandler::SatDimacsMsgHandler()
 {
@@ -311,6 +313,7 @@ SatDimacsMsgHandler::operator()(const char* src_file,
 {
   cerr << "Line " << lineno << ": [" << label << "]: " << body << endl;
 }
+#endif
 
 // @brief コンストラクタ
 YmsatMsgHandler::YmsatMsgHandler(ostream& s) :
@@ -351,34 +354,41 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " cnf-file" << endl;
     return 2;
   }
-  
+
+#if 0
   ifstream s(argv[1]);
   if ( !s.is_open() ) {
     cerr << "Could not open " << argv[1] << endl;
     return 3;
   }
-  
+#endif
   try {
+#if 0
 #if USE_ZSTREAM
     izstream zs(s);
     istream& s1 = zs;
 #else
     istream& s1 = s;
 #endif
+#endif
     SatSolver* solver = SatSolverFactory::gen_solver();
-    
+
     DimacsParser parser;
     SatDimacsHandler handler(solver);
+#if 0
     SatDimacsMsgHandler msg_handler;
+#endif
     parser.add_handler(&handler);
+#if 0
     parser.add_msg_handler(&msg_handler);
-    
-    if ( !parser.read(s1) ) {
+#endif
+
+    if ( !parser.read(argv[1]) ) {
       cerr << "Error in reading " << argv[1] << endl;
       return 4;
     }
@@ -386,7 +396,7 @@ main(int argc,
     YmsatMsgHandler satmsghandler(cout);
     solver->reg_msg_handler(&satmsghandler);
     solver->timer_on(true);
-    
+
     cout << "===================================================================" << endl;
     cout << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl;
     cout << "|           |   Clauses      Lits |     limit   Clauses      Lits |" << endl;
@@ -408,7 +418,7 @@ main(int argc,
 	 << "propagations      : " << stats.mPropagationNum << endl
 	 << "conflict literals : " << stats.mLearntLitNum << endl
 	 << "CPU time          : " << stats.mTime << endl;
-    
+
     if ( ans == kB3True ) {
       handler.verify(model);
     }
@@ -418,7 +428,7 @@ main(int argc,
     case kB3False: cout << "UNSAT" << endl; break;
     case kB3X:     cout << "UNKNOWN" << endl; break;
     }
-    
+
     USTime ust = sw.time();
     cout << ust << endl;
   }
@@ -431,6 +441,6 @@ main(int argc,
     cout << x.mMsg << endl;
   }
 #endif
- 
+
   return 0;
 }

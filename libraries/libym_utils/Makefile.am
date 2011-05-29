@@ -21,7 +21,11 @@ libym_utils_la_SOURCES = \
 	Binder.cc \
 	DlList.cc \
 	File.cc \
-	FileLoc.cc \
+	FileInfo.h \
+	FileInfo.cc \
+	FileInfoMgr.h \
+	FileInfoMgr.cc \
+	FileScanner.cc \
 	FragAlloc.cc \
 	Generator.cc \
 	ItvlCell.h \
@@ -29,6 +33,9 @@ libym_utils_la_SOURCES = \
 	ItvlMgr.cc \
 	MFSet.cc \
 	MsgHandler.cc \
+	MsgMgr.cc \
+	MsgMgrImpl.h \
+	MsgMgrImpl.cc \
 	NameMgr.cc \
 	RandGen.cc \
 	RefCount.cc \

@@ -14,7 +14,7 @@
 #include "fsim_nsdef.h"
 #include "EqElem.h"
 #include "PackedVal.h"
-#include "ym_tgnet/TgGateTemplate.h"
+#include "ym_networks/TgGateTemplate.h"
 #include "ym_lexp/LogExpr.h"
 
 

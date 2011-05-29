@@ -5,12 +5,13 @@
 ///
 /// $Id: parsertest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_blif/BlifParser.h"
 #include "ym_blif/BlifHandler.h"
+#include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_utils/FileRegion.h"
 
@@ -40,7 +41,7 @@ public:
   virtual
   bool
   init();
-  
+
   /// @brief .model 文の処理
   /// @param[in] loc1 .model の位置情報
   /// @param[in] loc2 文字列の位置情報
@@ -174,7 +175,7 @@ TestBlifHandler::init()
 {
   return true;
 }
-  
+
 // @brief .model 文の開始
 bool
 TestBlifHandler::model(const FileRegion& loc1,
@@ -314,7 +315,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " blif-file" << endl;
     return 2;
@@ -326,7 +327,7 @@ main(int argc,
     TestBlifHandler* handler = new TestBlifHandler(&cout);
     parser.add_handler(handler);
     StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    parser.add_msg_handler(msg_handler);
+    MsgMgr::reg_handler(msg_handler);
 
     if ( !parser.read(filename) ) {
       cerr << "Error in reading " << filename << endl;

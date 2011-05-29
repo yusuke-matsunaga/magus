@@ -42,29 +42,28 @@ LoadPatCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  try {
-    string filename = objv[1];
-    ifstream is;
-    is.open(filename.c_str(), ios::binary);
-    if ( !is ) {
-      TclObj emsg;
-      emsg << "Could not open " << filename;
-      set_result(emsg);
-      return TCL_ERROR;
-    }
-    if ( !pat_mgr().load(is) ) {
-      TclObj emsg;
-      emsg << "Error occured in reading " << filename;
-      set_result(emsg);
-      return TCL_ERROR;
-    }
+  // コマンド行の引数からファイル名をとってくる．
+  string filename = objv[1];
 
-    return TCL_OK;
+  // ファイル名の展開を行う．
+  string ex_filename;
+  bool stat = tilde_subst(filename, ex_filename);
+  if ( !stat ) {
+    // ファイル名文字列の中に誤りがあった．
+    return TCL_ERROR;
   }
-  catch ( AssertError x ) {
-    cerr << x << endl;
+
+  ifstream is;
+  is.open(ex_filename.c_str(), ios::binary);
+  if ( !is ) {
     TclObj emsg;
-    emsg << "Assertion Error";
+    emsg << "Could not open " << filename;
+    set_result(emsg);
+    return TCL_ERROR;
+  }
+  if ( !techmap().load_library(is) ) {
+    TclObj emsg;
+    emsg << "Error occured in reading " << filename;
     set_result(emsg);
     return TCL_ERROR;
   }

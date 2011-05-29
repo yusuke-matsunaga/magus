@@ -10,7 +10,7 @@
 
 
 #include "NetHandle.h"
-#include "ym_bdn/BdNetwork.h"
+#include "ym_networks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -40,14 +40,14 @@ public:
   tType
   type() const;
 
-  /// @brief BdNetwork を得る．
+  /// @brief BdnMgr を得る．
   virtual
-  const BdNetwork*
+  const BdnMgr*
   bdn() const;
 
-  /// @brief BdNetwork を得る．
+  /// @brief BdnMgr を得る．
   virtual
-  BdNetwork*
+  BdnMgr*
   _bdn();
 
   /// @brief ネットワークをクリアする．
@@ -71,7 +71,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ネットワークの実体
-  BdNetwork mNetwork;
+  BdnMgr mNetwork;
 
 };
 

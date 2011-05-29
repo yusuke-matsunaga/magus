@@ -11,6 +11,8 @@
 
 #include "ym_iscas89/Iscas89Parser.h"
 #include "ym_iscas89/Iscas89Handler.h"
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -72,7 +74,7 @@ public:
 	    tIscas89GateType type,
 	    ymuint32 oname_id,
 	    const vector<ymuint32>& iname_list);
-  
+
   /// @brief 通常終了時の処理
   virtual
   void
@@ -205,7 +207,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " iscas89-file" << endl;
     return 2;
@@ -218,7 +220,7 @@ main(int argc,
     parser.add_handler(handler);
 
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    parser.add_msg_handler(msg_handler);
+    MsgMgr::reg_handler(msg_handler);
 
     if ( !parser.read(filename) ) {
       cerr << "Error in reading " << filename << endl;

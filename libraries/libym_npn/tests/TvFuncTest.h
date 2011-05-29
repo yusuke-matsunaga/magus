@@ -39,7 +39,8 @@ public:
   /// TvFunc::posi_literal(size_t ni, tVarId pos)
   /// TvFunc::nega_literal(size_t ni, tVarId pos)
   /// のテストを行う．
-  void check0(size_t ni);
+  void
+  check0(size_t ni);
 
   /// @brief 基本的なテスト
   /// @param[in] ni 入力数
@@ -49,8 +50,9 @@ public:
   /// TvFunc::ni()
   /// TvFunc::value(size_t pos)
   /// のテストを行う．
-  void check_base(size_t ni,
-		  const vector<int>& vect);
+  void
+  check_base(size_t ni,
+	     const vector<int>& vect);
 
   /// @brief 基本的なテストその2
   /// @param[in] func 検査対象の論理関数
@@ -59,7 +61,8 @@ public:
   /// TvFunc::operator=(const TvFunc& func)
   /// TvFunc::negate()
   /// のテストを行う．
-  void check_base2(const TvFunc& func);
+  void
+  check_base2(const TvFunc& func);
 
   /// @brief count_one/count_zero のテスト
   /// @param[in] func 検査対象の論理関数
@@ -67,14 +70,16 @@ public:
   /// TvFunc::count_one()
   /// TvFunc::count_zero()
   /// のテストを行う．
-  void check_count_one(const TvFunc& func);
+  void
+  check_count_one(const TvFunc& func);
 
   /// @brief walsh_0 のテスト
   /// @param[in] func 検査対象の論理関数
   ///
   /// TvFunc::walsh_0()
   /// のテストを行う．
-  void check_walsh_0(const TvFunc& func);
+  void
+  check_walsh_0(const TvFunc& func);
 
   /// @brief walsh_1 のテスト
   /// @param[in] func 検査対象の論理関数
@@ -82,8 +87,9 @@ public:
   ///
   /// TvFunc::walsh_1(size_t pos)
   /// のテストを行う．
-  void check_walsh_1(const TvFunc& func,
-		     size_t pos);
+  void
+  check_walsh_1(const TvFunc& func,
+		size_t pos);
 
   /// @brief walsh_2 のテスト
   /// @param[in] func 検査対象の論理関数
@@ -91,23 +97,26 @@ public:
   ///
   /// TvFunc::walsh_2(size_t pos1, size_t pos2)
   /// のテストを行う．
-  void check_walsh_2(const TvFunc& func,
-		     size_t pos1,
-		     size_t pos2);
+  void
+  check_walsh_2(const TvFunc& func,
+		size_t pos1,
+		size_t pos2);
 
   /// @brief walsh_01 のテスト
   /// @param[in] func 検査対象の論理関数
   ///
   /// TvFunc::walsh_01(int w1_vec[])
   /// のテストを行う．
-  void check_walsh_01(const TvFunc& func);
+  void
+  check_walsh_01(const TvFunc& func);
 
   /// @brief walsh_012 のテスト
   /// @param[in] func 検査対象の論理関数
   ///
   /// TvFunc::walsh_01(int w1_vec[], int w2_vec[])
   /// のテストを行う．
-  void check_walsh_012(const TvFunc& func);
+  void
+  check_walsh_012(const TvFunc& func);
 
   /// @brief check_sup のテスト
   /// @param[in] func 検査対象の論理関数
@@ -115,7 +124,8 @@ public:
   ///
   /// TvFunc::check_sup(size_t pos)
   /// のテストを行う．
-  void check_check_sup(const TvFunc& func,
+  void
+  check_check_sup(const TvFunc& func,
 		       size_t pos);
 
   /// @brief check_sym のテスト
@@ -124,9 +134,10 @@ public:
   ///
   /// TvFunc::check_sym(size_t pos1, size_t pos2)
   /// のテストを行う．
-  void check_check_sym(const TvFunc& func,
-		       size_t pos1,
-		       size_t pos2);
+  void
+  check_check_sym(const TvFunc& func,
+		  size_t pos1,
+		  size_t pos2);
 
   /// @brief walsh_w0() のテスト
   /// @param[in] func 検査対象の論理関数
@@ -134,8 +145,9 @@ public:
   ///
   /// TvFunc::walsh_w0(size_t w, tPol opol, size_t ibits)
   /// のテストを行う．
-  void check_walsh_w0(const TvFunc& func,
-		      size_t ibits);
+  void
+  check_walsh_w0(const TvFunc& func,
+		 size_t ibits);
 
   /// @brief walsh_w1() のテスト
   /// @param[in] func 検査対象の論理関数
@@ -144,13 +156,24 @@ public:
   ///
   /// TvFunc::walsh_w1(size_t pos, size_t w, tPol opol, size_t ibits)
   /// のテストを行う．
-  void check_walsh_w1(const TvFunc& func,
-		      size_t pos,
-		      size_t ibits);
+  void
+  check_walsh_w1(const TvFunc& func,
+		 size_t pos,
+		 size_t ibits);
+
+  /// @brief cofactor() のテスト
+  /// @param[in] func 検査対象の論理関数
+  /// @param[in] pos 入力番号
+  /// @param[in] pol 極性
+  void
+  check_cofactor(const TvFunc& func,
+		 ymuint pos,
+		 tPol pol);
 
   /// @brief エラー回数を得る．
   /// @return エラー回数を返す．
-  int nerr() const;
+  int
+  nerr() const;
 
 
 private:
@@ -158,17 +181,20 @@ private:
   // walsh_0 の真値を計算する．
   // 結果は mW0Cache に格納される．
   // func.value() を正しいと仮定している．
-  void walsh_0(const TvFunc& func);
+  void
+  walsh_0(const TvFunc& func);
 
   // walsh_1 の真値を計算する．
   // 結果は mW1Cache に格納される．
   // func.value() を正しいと仮定している．
-  void walsh_1(const TvFunc& func);
+  void
+  walsh_1(const TvFunc& func);
 
   // walsh_2 の真値を計算する．
   // 結果は mW2Cache に格納される．
   // func.value() を正しいと仮定している．
-  void walsh_2(const TvFunc& func);
+  void
+  walsh_2(const TvFunc& func);
 
 
 private:
@@ -187,7 +213,7 @@ private:
 
   // walsh_0 の真値
   int mW0Cache;
-  
+
   // w1_cache 対象の論理関数
   TvFunc mW1Func;
 
@@ -196,7 +222,7 @@ private:
 
   // mW1Cache のサイズ
   size_t mW1CacheSize;
-  
+
   // w2_cache 対象の論理関数
   TvFunc mW2Func;
 
@@ -207,7 +233,6 @@ private:
   size_t mW2CacheSize;
 
 };
-
 
 END_NAMESPACE_YM
 

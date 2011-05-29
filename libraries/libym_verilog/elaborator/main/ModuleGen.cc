@@ -13,8 +13,6 @@
 #include "ElbParamCon.h"
 #include "ElbStub.h"
 
-#include "ym_utils/FileRegion.h"
-
 #include "ym_verilog/pt/PtModule.h"
 #include "ym_verilog/pt/PtPort.h"
 #include "ym_verilog/pt/PtDecl.h"
@@ -28,6 +26,8 @@
 #include "ElbParameter.h"
 #include "ElbParamAssign.h"
 #include "ElbExpr.h"
+
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -64,11 +64,11 @@ ModuleGen::phase1_topmodule(const VlNamedObj* toplevel,
 
   ostringstream buf;
   buf << "instantiating top module \"" << name << "\".";
-  put_msg(__FILE__, __LINE__,
-	  file_region,
-	  kMsgInfo,
-	  "ELAB",
-	  buf.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  file_region,
+		  kMsgInfo,
+		  "ELAB",
+		  buf.str());
 
   // モジュール本体の生成
   ElbModule* module = factory().new_Module(toplevel,
@@ -86,11 +86,11 @@ ModuleGen::phase1_topmodule(const VlNamedObj* toplevel,
 
   ostringstream buf2;
   buf2 << "module \"" << module->full_name() << "\" has been created.";
-  put_msg(__FILE__, __LINE__,
-	  file_region,
-	  kMsgInfo,
-	  "ELAB",
-	  buf2.str());
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  file_region,
+		  kMsgInfo,
+		  "ELAB",
+		  buf2.str());
 
   // 中身のうちスコープに関係する要素の生成
   phase1_module_item(module, pt_module, NULL);
@@ -126,11 +126,11 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	if ( handle == NULL || handle->type() != kVpiParameter ) {
 	  ostringstream buf;
 	  buf << param_con->name(i) << " : No such parameter.";
-	  put_msg(__FILE__, __LINE__,
-		  pt_con->file_region(),
-		  kMsgError,
-		  "ELAB",
-		  buf.str());
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_con->file_region(),
+			  kMsgError,
+			  "ELAB",
+			  buf.str());
 	  continue;
 	}
 	ElbParameter* param = handle->parameter();
@@ -158,11 +158,11 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	}
       }
       if ( paramport_list.size() < n ) {
-	put_msg(__FILE__, __LINE__,
-		param_con->file_region(),
-		kMsgError,
-		"ELAB",
-		"Too many parameters.");
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			param_con->file_region(),
+			kMsgError,
+			"ELAB",
+			"Too many parameters.");
       }
       else {
 	for (ymuint i = 0; i < n; ++ i) {
@@ -275,11 +275,11 @@ ModuleGen::instantiate_portref(ElbModule* module,
     ostringstream buf;
     buf << name
 	<< ": Not found.";
-    put_msg(__FILE__, __LINE__,
-	    pt_portref->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    pt_portref->file_region(),
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return NULL;
   }
 
@@ -287,11 +287,11 @@ ModuleGen::instantiate_portref(ElbModule* module,
     ostringstream buf;
     buf << handle->declarray()->full_name()
 	<< ": Array shall not be connected to a module port.";
-    put_msg(__FILE__, __LINE__,
-	    pt_portref->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    pt_portref->file_region(),
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return NULL;
   }
   ElbDecl* decl = handle->decl();
@@ -299,11 +299,11 @@ ModuleGen::instantiate_portref(ElbModule* module,
     ostringstream buf;
     buf << name
 	<< ": Illegal type for port connection.";
-    put_msg(__FILE__, __LINE__,
-	    pt_portref->file_region(),
-	    kMsgError,
-	    "ELAB",
-	    buf.str());
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    pt_portref->file_region(),
+		    kMsgError,
+		    "ELAB",
+		    buf.str());
     return NULL;
   }
 

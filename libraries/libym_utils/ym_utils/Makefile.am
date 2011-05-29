@@ -12,19 +12,21 @@ noinst_HEADERS = \
 	BinIO.h \
 	DlList.h \
 	File.h \
-	FileDescMgr.h \
-	FileDesc.h \
+	FileInfo.h \
 	FileLoc.h \
 	FileRegion.h \
+	FileScanner.h \
 	Generator.h \
 	HeapTree.h \
 	ItvlMgr.h \
 	MFSet.h \
 	MsgHandler.h \
+	MsgMgr.h \
 	NameMgr.h \
 	RandGen.h \
 	RefCount.h \
 	ShString.h \
 	StopWatch.h \
 	StrBuff.h \
+	msg_type.h \
 	random.h

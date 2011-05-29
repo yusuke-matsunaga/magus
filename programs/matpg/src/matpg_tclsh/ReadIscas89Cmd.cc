@@ -16,9 +16,10 @@
 
 #include "ReadIscas89Cmd.h"
 #include "MatpgMsgHandler.h"
-#include <ym_tgnet/TgNetwork.h>
-#include <ym_tclpp/TclPopt.h>
-#include <ym_utils/StopWatch.h>
+#include "ym_networks/TgNetwork.h"
+#include "ym_tclpp/TclPopt.h"
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/StopWatch.h"
 #include "matpg.h"
 #include "network.h"
 
@@ -33,11 +34,9 @@ MStopWatch sw_timer;
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-ReadIscas89Cmd::ReadIscas89Cmd() :
-  mMsgHandler(new MatpgMsgHandler)
+ReadIscas89Cmd::ReadIscas89Cmd()
 {
   set_usage_string("<ISCAS89(.bench)-filename>");
-  mReader.add_msg_handler(mMsgHandler);
 }
 
 // @brief デストラクタ
@@ -54,9 +53,9 @@ ReadIscas89Cmd::cmd_proc(TclObjVector& objv)
     print_usage();
     return TCL_ERROR;
   }
-  
+
   int old_tm_id = sw_timer.change(TM_READ);
-  
+
   string filename = objv[1];
   // ファイル名の展開を行う．
   string ex_filename;
@@ -65,17 +64,19 @@ ReadIscas89Cmd::cmd_proc(TclObjVector& objv)
     // ファイル名の文字列に誤りがあった．
     return TCL_ERROR;
   }
-  
+
+  MatpgMsgHandler mh;
+  MsgMgr::reg_handler(&mh);
   bool stat = mReader(ex_filename, mNetwork);
   sw_timer.change(old_tm_id);
-  
+
   if ( !stat ) {
-    set_result(mMsgHandler->msg_obj());
+    set_result(mh.msg_obj());
     return TCL_ERROR;
   }
-  
+
   gn_gen(mNetwork);
-  
+
   return TCL_OK;
 }
 

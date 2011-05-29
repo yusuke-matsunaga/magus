@@ -15,7 +15,7 @@
 #include "fsimx_nsdef.h"
 #include "ModBase.h"
 #include "PackedVal.h"
-#include "ym_tgnet/tgnet_nsdef.h"
+#include "ym_networks/tgnet_nsdef.h"
 #include "ym_lexp/LogExpr.h"
 #include "EventQ.h"
 #include "FsimFault.h"

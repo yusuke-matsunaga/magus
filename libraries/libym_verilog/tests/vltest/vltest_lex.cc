@@ -10,12 +10,14 @@
 
 
 #if HAVE_CONFIG_H
-#include <ymconfig.h>
+#include "ymconfig.h"
 #endif
 
-#include <ym_utils/StopWatch.h>
+#include "ym_utils/StopWatch.h"
 #include "VlTestLineWatcher.h"
 
+#include "ym_utils/MsgMgr.h"
+#include "ym_utils/MsgHandler.h"
 
 #include "Lex.h"
 #include "print_token.h"
@@ -34,15 +36,13 @@ lex_mode(const list<string>& filename_list,
 	 int loop,
 	 bool dump_token)
 {
+  MsgHandler* handler = new StreamMsgHandler(&cerr);
+  MsgMgr::reg_handler(handler);
+
   ymuint c = loop + 1;
   for (ymuint i = 0; i < c; ++ i) {
-    MsgMgr msg_mgr;
-    MsgHandler* handler = new StreamMsgHandler(&cerr);
-    msg_mgr.reg_handler(handler);
 
-    FileDescMgr fd_mgr;
-
-    Lex lex(msg_mgr, fd_mgr);
+    Lex lex;
 
     if ( spath ) {
       SearchPathList splist(spath);

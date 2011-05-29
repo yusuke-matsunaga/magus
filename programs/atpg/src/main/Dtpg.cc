@@ -23,7 +23,7 @@
 #include "TvMgr.h"
 #include "TvBuff.h"
 
-#include "ym_tgnet/TgNode.h"
+#include "ym_networks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

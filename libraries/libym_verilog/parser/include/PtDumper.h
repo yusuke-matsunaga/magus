@@ -10,9 +10,9 @@
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
+#include "ym_verilog/pt/PtP.h"
 #include "ym_utils/FileLoc.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_verilog/pt/PtP.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

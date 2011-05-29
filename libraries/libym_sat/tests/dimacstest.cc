@@ -40,39 +40,45 @@ public:
 
   /// @brief 初期化
   virtual
-  bool init();
-  
+  bool
+  init();
+
   /// @brief p 行の読込み
-  /// @param[in] lineno 行番号
+  /// @param[in] loc ファイル上の位置情報
   /// @param[in] nv 変数の数
   /// @param[in] nc 節の数
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
-  bool read_p(int lineno,
-	      size_t nv,
-	      size_t nc);
-  
+  bool
+  read_p(const FileRegion& loc,
+	 ymuint nv,
+	 ymuint nc);
+
   /// @brief clause 行の読込み
-  /// @param[in] lineno 行番号
+  /// @param[in] loc ファイル上の位置情報
   /// @param[in] lits リテラルの配列．最後の0は含まない
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
-  bool read_clause(int lineno,
-		   const vector<int>& lits);
-  
+  bool
+  read_clause(const FileRegion& loc,
+	      const vector<int>& lits);
+
   /// @brief 終了処理
   virtual
-  bool end();
+  bool
+  end();
 
   /// @brief エラー終了時の処理
   virtual
-  void error_exit();
+  void
+  error_exit();
 
 };
 
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // テスト用の DimacsMsgHandler
 //////////////////////////////////////////////////////////////////////
@@ -107,7 +113,7 @@ public:
 		  const string& label,
 		  const string& body);
 };
-
+#endif
 
 // @brief コンストラクタ
 TestDimacsHandler::TestDimacsHandler()
@@ -125,29 +131,29 @@ TestDimacsHandler::init()
 {
   return true;
 }
-  
+
 // @brief p 行の読込み
-// @param[in] lineno 行番号
+// @param[in] loc ファイル上の位置情報
 // @param[in] nv 変数の数
 // @param[in] nc 節の数
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestDimacsHandler::read_p(int lineno,
-			  size_t nv,
-			  size_t nc)
+TestDimacsHandler::read_p(const FileRegion& loc,
+			  ymuint nv,
+			  ymuint nc)
 {
-  cout << "read_p(" << nv << ", " << nc << ")@" << lineno << endl;
+  cout << "read_p(" << nv << ", " << nc << ")@" << loc << endl;
   return true;
 }
 
 // @brief clause 行の読込み
-// @param[in] lineno 行番号
+// @param[in] loc ファイル上の位置情報
 // @param[in] lits リテラルの配列．最後の0は含まない
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestDimacsHandler::read_clause(int lineno,
+TestDimacsHandler::read_clause(const FileRegion& loc,
 			       const vector<int>& lits)
 {
   cout << "read_clause(";
@@ -157,10 +163,10 @@ TestDimacsHandler::read_clause(int lineno,
     cout << comma << *p;
     comma = ", ";
   }
-  cout << ")@" << lineno << endl;
+  cout << ")@" << loc << endl;
   return true;
 }
-  
+
 // @brief 終了処理
 // @param[in] loc 位置情報
 bool
@@ -176,7 +182,7 @@ TestDimacsHandler::error_exit()
 {
 }
 
-
+#if 0
 // @brief コンストラクタ
 TestDimacsMsgHandler::TestDimacsMsgHandler()
 {
@@ -202,6 +208,7 @@ TestDimacsMsgHandler::operator()(const char* src_file,
 {
   cerr << "Line " << lineno << ": [" << label << "]: " << body << endl;
 }
+#endif
 
 END_NONAMESPACE
 END_NAMESPACE_YM
@@ -212,32 +219,40 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " cnf-file" << endl;
     return 2;
   }
-  
+
+#if 0
   ifstream s(argv[1]);
   if ( !s.is_open() ) {
     cerr << "Could not open " << argv[1] << endl;
     return 3;
   }
-  
+#endif
+
   try {
+#if 0
 #if USE_ZSTREAM
     izstream zs(s);
     istream& s1 = zs;
 #else
     istream& s1 = s;
 #endif
+#endif
     DimacsParser parser;
     TestDimacsHandler handler;
+#if 0
     TestDimacsMsgHandler msg_handler;
+#endif
     parser.add_handler(&handler);
+#if 0
     parser.add_msg_handler(&msg_handler);
-    
-    if ( !parser.read(s1) ) {
+#endif
+
+    if ( !parser.read(argv[1]) ) {
       cerr << "Error in reading " << argv[1] << endl;
       return 4;
     }
@@ -251,6 +266,6 @@ main(int argc,
     cout << x.mMsg << endl;
   }
 #endif
- 
+
   return 0;
 }
