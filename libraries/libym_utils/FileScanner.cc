@@ -10,7 +10,6 @@
 
 
 #include "ym_utils/FileScanner.h"
-#include "ym_utils/FileInfoMgr.h"
 #include <fcntl.h>
 
 
@@ -43,7 +42,7 @@ FileScanner::open_file(const string& filename,
   if ( mFd < 0 ) {
     return false;
   }
-  mFileInfo = FileInfoMgr::new_file_info(filename, parent_loc);
+  mFileInfo = FileInfo(filename, parent_loc);
   return true;
 }
 

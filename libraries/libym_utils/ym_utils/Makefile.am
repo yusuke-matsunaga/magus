@@ -13,7 +13,6 @@ noinst_HEADERS = \
 	DlList.h \
 	File.h \
 	FileInfo.h \
-	FileInfoMgr.h \
 	FileLoc.h \
 	FileRegion.h \
 	FileScanner.h \

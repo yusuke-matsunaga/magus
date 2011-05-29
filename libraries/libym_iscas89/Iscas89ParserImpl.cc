@@ -11,7 +11,6 @@
 
 #include "Iscas89ParserImpl.h"
 #include "ym_iscas89/Iscas89Handler.h"
-#include "ym_utils/FileInfoMgr.h"
 #include "ym_utils/MsgMgr.h"
 
 

@@ -1,8 +1,8 @@
-#ifndef LIBYM_UTILS_FIMGRIMPL_H
-#define LIBYM_UTILS_FIMGRIMPL_H
+#ifndef LIBYM_UTILS_FILEINFOMGR_H
+#define LIBYM_UTILS_FILEINFOMGR_H
 
-/// @file libym_utils/FiMgrImpl.h
-/// @brief FiMgrImpl のヘッダファイル
+/// @file libym_utils/FileInfoMgr.h
+/// @brief FileInfoMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: FinleInfoMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
@@ -22,20 +22,20 @@ class FileInfo;
 class FileRegion;
 
 //////////////////////////////////////////////////////////////////////
-/// @class FiMgrImpl FiMgrImpl.h "ym_utils/FiMgrImpl.h"
+/// @class FileInfoMgr FileInfoMgr.h "FileInfoMgr.h"
 /// @brief FileInfoMgr の実際の処理を行うクラス
-/// @sa FileInfoMgr FileInfo FileLoc FileRegion
+/// @sa FileInfo FileLoc FileRegion
 //////////////////////////////////////////////////////////////////////
-class FiMgrImpl
+class FileInfoMgr
 {
 public:
 
   /// @brief コンストラクタ
-  FiMgrImpl();
+  FileInfoMgr();
 
   /// @brief デストラクタ
   /// @note このクラスで生成したデータはすべて削除される．
-  ~FiMgrImpl();
+  ~FileInfoMgr();
 
 
 public:
@@ -53,10 +53,6 @@ public:
   ymuint
   new_file_info(const char* filename,
 		const FileLoc& parent_loc);
-
-  /// @brief 生成したすべての FileInfo を削除する．
-  void
-  clear();
 
 
 public:
@@ -116,69 +112,6 @@ private:
   vector<_FileInfo> mFiArray;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////
-// クラス FiMgrImpl
-//////////////////////////////////////////////////////////////////////
-
-// @brief ファイル名を返す．
-// @param[in] id _FileInfo の ID 番号
-inline
-string
-FiMgrImpl::filename(ymuint id)
-{
-  assert_cond( id < mFiArray.size(), __FILE__, __LINE__);
-  const _FileInfo& fi = mFiArray[id];
-  return fi.mFileName;
-}
-
-// @brief インクルード元のファイル位置を返す．
-// @param[in] id _FileInfo の ID 番号
-// @note インクルードされていないファイルの場合には無効なデータが返される．
-inline
-FileLoc
-FiMgrImpl::parent_loc(ymuint id)
-{
-  assert_cond( id < mFiArray.size(), __FILE__, __LINE__);
-  const _FileInfo& fi = mFiArray[id];
-  return fi.mParentLoc;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス FiMgrImpl::_FileInfo
-//////////////////////////////////////////////////////////////////////
-
-// @brief 空のコンストラクタ
-inline
-FiMgrImpl::_FileInfo::_FileInfo()
-{
-}
-
-// @brief 親のない場合のコンストラクタ
-// @param[in] filename ファイル名
-inline
-FiMgrImpl::_FileInfo::_FileInfo(const char* filename) :
-  mFileName(filename)
-{
-}
-
-// @brief 親のある場合(インクルードされている場合)のコンストラクタ
-// @param[in] filename ファイル名
-// @param[in] file_loc インクルード元のファイル位置
-inline
-FiMgrImpl::_FileInfo::_FileInfo(const char* filename,
-				  const FileLoc& file_loc) :
-  mFileName(filename),
-  mParentLoc(file_loc)
-{
-}
-
 
 END_NAMESPACE_YM
 

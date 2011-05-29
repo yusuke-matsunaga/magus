@@ -11,7 +11,6 @@
 
 #include "BlifParserImpl.h"
 #include "ym_blif/BlifHandler.h"
-#include "ym_utils/FileInfoMgr.h"
 #include "ym_utils/MsgMgr.h"
 
 
