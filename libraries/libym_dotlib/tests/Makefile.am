@@ -6,8 +6,10 @@
 ## $Date: 2005/12/11 17:07:26 $
 
 SUBDIRS = \
-	. \
-	ptview
+	.
+if WITH_QT
+SUBDIRS += ptview
+endif
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \
