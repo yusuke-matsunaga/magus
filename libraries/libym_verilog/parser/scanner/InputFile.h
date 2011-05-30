@@ -64,10 +64,13 @@ public:
   read_token(StrBuff& buff,
 	     FileRegion& token_loc);
 
+
+private:
   /// @brief read_token() の下請け関数
   /// @param[out] buff 結果の文字列を格納するバッファ
   int
   _read_token(StrBuff& buff);
+
 
   /// @brief 2進数モードの読み込みを行う．
   /// @param[in] c 最初の文字
@@ -282,16 +285,6 @@ InputFile::file_info() const
   return mFileInfo;
 }
 
-#if 0
-// @brief ファイル名を返す．
-inline
-const char*
-InputFile::filename() const
-{
-  return mFileInfo->name();
-}
-#endif
-
 // @brief 次の一文字を読み出す．
 // @return 読み込んだ文字を返す．
 inline
@@ -364,7 +357,7 @@ InputFile::nl()
   mNL = true;
   ++ mCurLine;
   mCurColumn = 1;
-  mLex->check_line();
+  mLex->check_line(mCurLine);
 }
 
 // @brief バッファに充填する．

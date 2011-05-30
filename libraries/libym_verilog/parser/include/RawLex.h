@@ -257,8 +257,9 @@ public:
   flip_cond();
 
   /// @brief 改行文字を読み込んだときに呼ばれる関数
+  /// @param[in] line 行番号
   void
-  check_line();
+  check_line(ymuint line);
 
   /// @brief コンテキストを返す．
   tContext

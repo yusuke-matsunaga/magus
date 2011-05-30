@@ -496,9 +496,9 @@ RawLex::push_macro(const char* name,
 
 // @brief 改行文字を読み込んだときに呼ばれる関数
 void
-RawLex::check_line()
+RawLex::check_line(ymuint line)
 {
-  mWatcherMgr.prop_event(mInputMgr->cur_file()->cur_line());
+  mWatcherMgr.prop_event(line);
 }
 
 END_NAMESPACE_YM_VERILOG
