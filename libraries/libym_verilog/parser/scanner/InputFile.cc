@@ -12,7 +12,6 @@
 #include "InputFile.h"
 #include <fcntl.h>
 
-#include "ym_utils/FileInfo.h"
 #include "ym_utils/MsgMgr.h"
 
 #include "parser.h"
@@ -43,33 +42,14 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] lex 親の Lex
-// @param[in] fd UNIX のファイル記述子
-// @param[in] file_info ファイル情報
-InputFile::InputFile(RawLex* lex,
-		     int fd,
-		     FileInfo file_info) :
-  mLex(lex),
-  mFd(fd),
-  mFileInfo(file_info),
-  mReadPos(0),
-  mEndPos(0),
-  mCurLine(1),
-  mCurColumn(1),
-  mNL(false)
+InputFile::InputFile(RawLex* lex) :
+  mLex(lex)
 {
 }
 
 // @brief デストラクタ
 InputFile::~InputFile()
 {
-}
-
-// @brief ファイルをクローズする．
-void
-InputFile::close()
-{
-  ::close(mFd);
-  mFd = -1;
 }
 
 // @brief トークンの読み出しを行う．
@@ -80,16 +60,16 @@ InputFile::_read_token(StrBuff& buff)
 {
   buff.clear();
 
-  int c = peek();
+  int c = get();
+  set_first_loc();
+
   if ( c == EOF ) {
     return EOF;
   }
   if ( c == '\n' || c == '\r' ) {
-    accept();
     return NL;
   }
 
-  _accept();
   if ( c == ' ' || c == '\t' ) {
     read_space();
     return SPACE;
@@ -181,7 +161,7 @@ InputFile::_read_token(StrBuff& buff)
       buf << "illegal character \'" << static_cast<char>(c) << "\',"
 	  << "only B|b|O|o|D|d|H|h is allowed here.";
       MsgMgr::put_msg(__FILE__, __LINE__,
-		      cur_file_region(),
+		      cur_loc(),
 		      kMsgError,
 		      "LEX",
 		      buf.str());
@@ -191,7 +171,7 @@ InputFile::_read_token(StrBuff& buff)
   case '(':
     c = peek();
     if ( c == '*' ) {
-      _accept();
+      accept();
       return PRSTAR;
     }
     return '(';
@@ -199,7 +179,7 @@ InputFile::_read_token(StrBuff& buff)
   case '+':
     c = peek();
     if ( c == ':' ) {
-      _accept();
+      accept();
       return PLUSCOLON;
     }
     return '+';
@@ -207,11 +187,11 @@ InputFile::_read_token(StrBuff& buff)
   case '-':
     c = peek();
     if ( c == ':' ) {
-      _accept();
+      accept();
       return MINUSCOLON;
     }
     if ( c == '>' ) {
-      _accept();
+      accept();
       return MINUSGT;
     }
     return '-';
@@ -219,7 +199,7 @@ InputFile::_read_token(StrBuff& buff)
   case '^':
     c = peek();
     if ( c == '~' ) {
-      _accept();
+      accept();
       return TILDEXOR;
     }
     return '^';
@@ -227,15 +207,15 @@ InputFile::_read_token(StrBuff& buff)
   case '*':
     c = peek();
     if ( c == '>' ) {
-      _accept();
+      accept();
       return STARGT;
     }
     if ( c == '*' ) {
-      _accept();
+      accept();
       return STARSTAR;
     }
     if ( c == ')' ) {
-      _accept();
+      accept();
       return STARPR;
     }
     return '*';
@@ -243,10 +223,10 @@ InputFile::_read_token(StrBuff& buff)
   case '!':
     c = peek();
     if ( c == '=' ) {
-      _accept();
+      accept();
       c = peek();
       if ( c == '=' ) {
-	_accept();
+	accept();
 	return NOTEQEQ;
       }
       return NOTEQ;
@@ -256,10 +236,10 @@ InputFile::_read_token(StrBuff& buff)
   case '&':
     c = peek();
     if ( c == '&' ) {
-      _accept();
+      accept();
       c = peek();
       if ( c == '&' ) {
-	_accept();
+	accept();
 	return ANDANDAND;
       }
       return ANDAND;
@@ -269,7 +249,7 @@ InputFile::_read_token(StrBuff& buff)
   case '|':
     c = peek();
     if ( c == '|' ) {
-      _accept();
+      accept();
       return OROR;
     }
     return '|';
@@ -277,15 +257,15 @@ InputFile::_read_token(StrBuff& buff)
   case '~':
     c = peek();
     if ( c == '&' ) {
-      _accept();
+      accept();
       return TILDEAND;
     }
     if ( c == '|' ) {
-      _accept();
+      accept();
       return TILDEOR;
     }
     if ( c == '^' ) {
-      _accept();
+      accept();
       return TILDEXOR;
     }
     return '~';
@@ -293,16 +273,16 @@ InputFile::_read_token(StrBuff& buff)
   case '<':
     c = peek();
     if ( c == '<' ) {
-      _accept();
+      accept();
       c = peek();
       if ( c == '<' ) {
-	_accept();
+	accept();
 	return LTLTLT;
       }
       return LTLT;
     }
     if ( c == '=' ) {
-      _accept();
+      accept();
       return LTEQ;
     }
     return '<';
@@ -310,16 +290,16 @@ InputFile::_read_token(StrBuff& buff)
   case '>':
     c = peek();
     if ( c == '>' ) {
-      _accept();
+      accept();
       c = peek();
       if ( c == '>' ) {
-	_accept();
+	accept();
 	return GTGTGT;
       }
       return GTGT;
     }
     if ( c == '=' ) {
-      _accept();
+      accept();
       return GTEQ;
     }
     return '>';
@@ -327,16 +307,16 @@ InputFile::_read_token(StrBuff& buff)
   case '=':
     c = peek();
     if ( c == '=' ) {
-      _accept();
+      accept();
       c = peek();
       if ( c == '=' ) {
-	_accept();
+	accept();
 	return EQEQEQ;
       }
       return EQEQ;
     }
     if ( c == '>' ) {
-      _accept();
+      accept();
       return EQGT;
     }
     return '=';
@@ -352,7 +332,7 @@ InputFile::_read_token(StrBuff& buff)
     c = get();
     if ( is_strchar1(c) ) {
       buff.put_char(c);
-      get_str(buff);
+      read_str(buff);
       return CD_SYMBOL;
     }
     else {
@@ -360,7 +340,7 @@ InputFile::_read_token(StrBuff& buff)
       buf << "illegal charactor \'" << static_cast<char>(c)
 	  << "\' [" << c << " in digit code].";
       MsgMgr::put_msg(__FILE__, __LINE__,
-		      cur_file_region(),
+		      cur_loc(),
 		      kMsgError,
 		      "LEX",
 		      buf.str());
@@ -378,7 +358,7 @@ InputFile::_read_token(StrBuff& buff)
     // 通常の識別子
     buff.put_char(c);
     // 文字列要素が表れる限り mStringBuff につむ．
-    get_str(buff);
+    read_str(buff);
 
     // buff の内容をチェックする．
     // 特例: 単独の $
@@ -400,7 +380,7 @@ InputFile::_read_token(StrBuff& buff)
   buf << "illegal charactor \'" << static_cast<char>(c)
       << "\' [" << c << " in digit code].";
   MsgMgr::put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
+		  cur_loc(),
 		  kMsgError,
 		  "LEX",
 		  buf.str());
@@ -439,21 +419,17 @@ InputFile::read_bin_str(int c,
   if ( is_binchar(c) ) {
     buff.put_char(c);
     for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	if ( fill_buff() == 0 ) {
-	  break;
-	}
-      }
-      int c = mBuff[mReadPos];
+      c = peek();
       if ( is_binchar(c) ) {
-	_accept();
+	accept();
 	buff.put_char(c);
       }
       else if ( c == '_' ) {
-	_accept();
+	accept();
 	// ただ読み飛ばす
       }
       else {
+	// c == EOF も含む．
 	break;
       }
     }
@@ -464,7 +440,7 @@ InputFile::read_bin_str(int c,
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'01xXzZ?\' are allowed here.";
   MsgMgr::put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
+		  cur_loc(),
 		  kMsgError,
 		  "LEX",
 		  msg_buf.str());
@@ -503,21 +479,17 @@ InputFile::read_oct_str(int c,
   if ( is_octchar(c) ) {
     buff.put_char(c);
     for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	if ( fill_buff() == 0 ) {
-	  break;
-	}
-      }
-      int c = mBuff[mReadPos];
+      c = peek();
       if ( is_octchar(c) ) {
-	_accept();
+	accept();
 	buff.put_char(c);
       }
       else if ( c == '_' ) {
-	_accept();
+	accept();
 	// ただ読み飛ばす．
       }
       else {
+	// c == EOF も含む．
 	break;
       }
     }
@@ -528,7 +500,7 @@ InputFile::read_oct_str(int c,
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-7xXzZ?\' are allowed here.";
   MsgMgr::put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
+		  cur_loc(),
 		  kMsgError,
 		  "LEX",
 		  msg_buf.str());
@@ -564,21 +536,17 @@ InputFile::read_dec_str(int c,
   if ( is_decchar(c) ) {
     buff.put_char(c);
     for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	if ( fill_buff() == 0 ) {
-	  break;
-	}
-      }
-      int c = mBuff[mReadPos];
+      c = peek();
       if ( is_decchar(c) ) {
-	_accept();
+	accept();
 	buff.put_char(c);
       }
       else if ( c == '_' ) {
-	_accept();
+	accept();
 	// ただ読み飛ばす．
       }
       else {
+	// c == EOF も含む．
 	break;
       }
     }
@@ -588,15 +556,11 @@ InputFile::read_dec_str(int c,
 	    c == 'Z' || c == 'Z' ||
 	    c == '?' ) {
     buff.put_char(c);
+    // xz? と他の数字との混在はない．
     for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	if ( fill_buff() == 0 ) {
-	  break;
-	}
-      }
-      int c = mBuff[mReadPos];
+      c = peek();
       if ( c == '_' ) {
-	_accept();
+	accept();
 	// ただ読み飛ばす．
       }
       else {
@@ -610,7 +574,7 @@ InputFile::read_dec_str(int c,
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-9xXzZ?\' are allowed here.";
   MsgMgr::put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
+		  cur_loc(),
 		  kMsgError,
 		  "LEX",
 		  msg_buf.str());
@@ -651,21 +615,17 @@ InputFile::read_hex_str(int c,
   if ( is_hexchar(c) ) {
     buff.put_char(c);
     for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	if ( fill_buff() == 0 ) {
-	  break;
-	}
-      }
-      int c = mBuff[mReadPos];
+      c = peek();
       if ( is_hexchar(c) ) {
-	_accept();
+	accept();
 	buff.put_char(c);
       }
       else if ( c == '_' ) {
-	_accept();
+	accept();
 	// ただ読み飛ばす．
       }
       else {
+	// c == EOF も含む．
 	break;
       }
     }
@@ -676,7 +636,7 @@ InputFile::read_hex_str(int c,
   msg_buf << "illegal charactor \'" << static_cast<char>(c) << "\',"
 	  << "only \'0-9a-ha-HxXzZ?\' are allowed here.";
   MsgMgr::put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
+		  cur_loc(),
 		  kMsgError,
 		  "LEX",
 		  msg_buf.str());
@@ -686,22 +646,19 @@ InputFile::read_hex_str(int c,
 // @brief 識別子に用いられる文字([a-zA-Z0-9_$])が続く限り読みつづける．
 // @param[out] buf 結果を格納する文字列バッファ
 void
-InputFile::get_str(StrBuff& buff)
+InputFile::read_str(StrBuff& buff)
 {
-  do {
-    while ( mReadPos < mEndPos ) {
-      int c = mBuff[mReadPos];
-      if ( isalnum(c) || c == '_' || c == '$' ) {
-	_accept();
-	buff.put_char(c);
-      }
-      else {
-	// [a-zA-Z0-9_$] でなければ終わり
-	return;
-      }
+  for ( ; ; ) {
+    int c = peek();
+    if ( isalnum(c) || c == '_' || c == '$' ) {
+      accept();
+      buff.put_char(c);
+    }
+    else {
+      // [a-zA-Z0-9_$] でなければ終わり
+      return;
     }
   }
-  while ( fill_buff() > 0 );
 }
 
 // @brief 二重引用符用の読み込み
@@ -722,43 +679,32 @@ InputFile::read_dq_str(StrBuff& buff)
 
  INIT:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	// 文字列が終わらないうちに改行が来てしまった．
-	goto ERR_END;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == '\"' ) {
-      _accept();
+      accept();
       // 終わり
       return STRING;
     }
-    else if ( c == '\n' || c == '\r' ) {
+    else if ( c == '\n' || c == '\r' || c == EOF ) {
       accept();
       // 文字列が終わらないうちに改行が来てしまった．
       goto ERR_END;
     }
     else if ( c == '\\' ) {
-      _accept();
+      accept();
       goto BSLASH;
     }
     else {
-      _accept();
+      accept();
       buff.put_char(c);
     }
   }
 
  BSLASH:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	goto ERR_END;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == 'n' || c == 't' ) {
-      _accept();
+      accept();
       buff.put_char('\\');
       buff.put_char(c);
       goto INIT;
@@ -770,12 +716,15 @@ InputFile::read_dq_str(StrBuff& buff)
       goto INIT;
     }
     else if ( c >= '0' && c <= '7' ) {
-      _accept();
+      accept();
       cur_val = c - '0';
       goto BSLASH1;
     }
+    else if ( c == EOF ) {
+      goto ERR_END;
+    }
     else {
-      _accept();
+      accept();
       // 上記以外の文字ならバックスラッシュの意味はない
       buff.put_char(c);
       goto INIT;
@@ -784,16 +733,14 @@ InputFile::read_dq_str(StrBuff& buff)
 
  BSLASH1:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	goto ERR_END;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c >= '0' && c <= '7' ) {
-      _accept();
+      accept();
       cur_val = cur_val * 8 + (c - '0');
       goto BSLASH2;
+    }
+    else if ( c == EOF ) {
+      goto ERR_END;
     }
     else {
       buff.put_char(static_cast<char>(cur_val));
@@ -803,15 +750,13 @@ InputFile::read_dq_str(StrBuff& buff)
 
  BSLASH2:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	goto ERR_END;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c >= '0' && c <= '7' ) {
-      _accept();
+      accept();
       cur_val = cur_val * 8 + (c - '0');
+    }
+    else if ( c == EOF ) {
+      goto ERR_END;
     }
     buff.put_char(static_cast<char>(cur_val));
     goto INIT;
@@ -820,7 +765,7 @@ InputFile::read_dq_str(StrBuff& buff)
  ERR_END:
   // 文字列が終わらないうちに改行が来てしまった．
   MsgMgr::put_msg(__FILE__, __LINE__,
-		  cur_file_region(),
+		  cur_loc(),
 		  kMsgError,
 		  "LEX",
 		  "new line in quoted string.");
@@ -847,7 +792,7 @@ InputFile::read_esc_str(StrBuff& buff)
   if ( !isascii(c) ) {
     // escaped identifier でも非 ascii 文字は違反
     MsgMgr::put_msg(__FILE__, __LINE__,
-		    cur_file_region(),
+		    cur_loc(),
 		    kMsgError,
 		    "LEX",
 		    "non-ascii character in escaped string.");
@@ -855,21 +800,16 @@ InputFile::read_esc_str(StrBuff& buff)
   }
 
   // escaped identifier モード
-  _accept();
+  accept();
   buff.put_char(c);
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == ' ' || c == '\t' || c == '\n' || c == '\r' ) {
       // 空白改行文字なら終わり
       return IDENTIFIER;
     }
     else if ( isascii(c) ) {
-      _accept();
+      accept();
       buff.put_char(c);
     }
     else {
@@ -894,27 +834,22 @@ int
 InputFile::read_num(StrBuff& buff)
 {
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == '_' ) {
-      _accept();
+      accept();
       // ただ読み飛ばす．
     }
     else if ( isdigit(c) ) {
-      _accept();
+      accept();
       buff.put_char(c);
     }
     else if ( c == '.' ) {
-      _accept();
+      accept();
       buff.put_char(c);
       goto AFTER_DOT;
     }
     else if ( c == 'e' || c == 'E' ) {
-      _accept();
+      accept();
       buff.put_char(c);
       goto AFTER_EXP;
     }
@@ -926,18 +861,13 @@ InputFile::read_num(StrBuff& buff)
 
  AFTER_DOT:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == '_' ) {
-      _accept();
+      accept();
       // ただ読み飛ばす．
     }
     else if ( isdigit(c) ) {
-      _accept();
+      accept();
       buff.put_char(c);
       goto AFTER_DOT_NUM;
     }
@@ -949,23 +879,18 @@ InputFile::read_num(StrBuff& buff)
 
  AFTER_DOT_NUM:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == '_' ) {
-      _accept();
+      accept();
       // ただ読み飛ばす．
     }
     else if ( c == 'e' || c == 'E' ) {
-      _accept();
+      accept();
       buff.put_char(c);
       goto AFTER_EXP;
     }
     else if ( isdigit(c) ) {
-      _accept();
+      accept();
       buff.put_char(c);
     }
     else {
@@ -976,24 +901,19 @@ InputFile::read_num(StrBuff& buff)
 
  AFTER_EXP:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == '_' ) {
-      _accept();
+      accept();
       // ただ読み飛ばす．
     }
     else if ( c == '+' || c == '-' ) {
-      _accept();
+      accept();
       buff.put_char(c);
       goto AFTER_EXP_SIGN;
     }
     else if ( isdigit(c) ) {
       buff.put_char('+');
-      _accept();
+      accept();
       buff.put_char(c);
       goto AFTER_EXP_NUM;
     }
@@ -1005,18 +925,13 @@ InputFile::read_num(StrBuff& buff)
 
  AFTER_EXP_SIGN:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == '_' ) {
-      _accept();
+      accept();
       // ただ読み飛ばす．
     }
     else if ( isdigit(c) ) {
-      _accept();
+      accept();
       buff.put_char(c);
       goto AFTER_EXP_NUM;
     }
@@ -1028,18 +943,13 @@ InputFile::read_num(StrBuff& buff)
 
  AFTER_EXP_NUM:
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == '_' ) {
-      _accept();
+      accept();
       // ただ読み飛ばす．
     }
     else if ( isdigit(c) ) {
-      _accept();
+      accept();
       buff.put_char(c);
     }
     else {
@@ -1054,14 +964,9 @@ void
 InputFile::read_space()
 {
   for ( ; ; ) {
-    if ( mReadPos >= mEndPos ) {
-      if ( fill_buff() == 0 ) {
-	break;
-      }
-    }
-    int c = mBuff[mReadPos];
+    int c = peek();
     if ( c == ' ' || c == '\t' ) {
-      _accept();
+      accept();
     }
     else {
       break;
@@ -1082,7 +987,7 @@ InputFile::read_comment(StrBuff& buff)
 {
   int c = peek();
   if ( c == '/' ) {
-    _accept();
+    accept();
 
     buff.put_char('/');
     buff.put_char('/');
@@ -1096,25 +1001,23 @@ InputFile::read_comment(StrBuff& buff)
     //   }
     // }
     for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	if ( fill_buff() == 0 ) {
-	  // 末尾に NL がなく EOF の場合の処理はこれでいいの？
-	  return COMMENT1;
-	}
-      }
-      int c = mBuff[mReadPos];
+      c = peek();
       if ( c == '\n' || c == '\r' ) {
 	// 末尾の改行は buf に積まない．
 	return COMMENT1;
       }
+      else if ( c == EOF ) {
+	// 末尾に NL がなく EOF の場合の処理はこれでいいの？
+	return COMMENT1;
+      }
       else {
-	_accept();
+	accept();
 	buff.put_char(c);
       }
     }
   }
   else if ( c == '*' ) {
-    _accept();
+    accept();
 
     buff.put_char('/');
     buff.put_char('*');
@@ -1122,35 +1025,33 @@ InputFile::read_comment(StrBuff& buff)
     // 直前の文字が '*' の時 true となるフラグ
     bool star = false;
     for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	if ( fill_buff() == 0 ) {
-	  // '*/' を読む前に EOF になってしまった．
-	  MsgMgr::put_msg(__FILE__, __LINE__,
-			  cur_file_region(),
-			  kMsgError,
-			  "LEX",
-			  "unexpected end-of-file in comment block(/*).");
-	  return ERROR;
-	}
-      }
-      int c = mBuff[mReadPos];
+      c = peek();
       if ( c == '\n' || c == '\r' ) {
 	accept();
 	buff.put_char('\n');
       }
       else if ( c == '*' ) {
-	_accept();
+	accept();
 	buff.put_char(c);
 	star = true;
       }
       else if ( star && c == '/' ) {
-	_accept();
+	accept();
 	buff.put_char(c);
 	// '*/' を読み込んだ
 	return COMMENT2;
       }
+      else if ( c == EOF ) {
+	// '*/' を読む前に EOF になってしまった．
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			cur_loc(),
+			kMsgError,
+			"LEX",
+			"unexpected end-of-file in comment block(/*).");
+	return ERROR;
+      }
       else {
-	_accept();
+	accept();
 	buff.put_char(c);
 	star = false;
       }
@@ -1161,66 +1062,12 @@ InputFile::read_comment(StrBuff& buff)
   }
 }
 
-// @brief 次の一文字を試し読みする．
-// @return 読み込んだ文字を返す．
-int
-InputFile::peek()
-{
-  if ( mReadPos >= mEndPos ) {
-    if ( fill_buff() == 0 ) {
-      if ( mNL ) {
-	return EOF;
-      }
-      else {
-	// ファイル末尾が NL でなければ NL を挿入する．
-#if ALLOW_EOF_WITHOUT_NL == 0
-	MsgMgr::put_msg(__FILE__, __LINE__,
-			cur_file_region(),
-			kMsgWarning,
-			"LEX",
-			"Unexpected EOF, NL is assumed.");
-#endif
-	return '\n';
-      }
-    }
-  }
-  return mBuff[mReadPos];
-}
-
-// @brief 直前の peek() を確定させる．
+// @brief 改行を読み込んだ時に起動する関数
+// @param[in] line 行番号
 void
-InputFile::accept()
+InputFile::check_line(ymuint line)
 {
-  mLastLine = mCurLine;
-  mLastColumn = mCurColumn;
-  switch ( mBuff[mReadPos] ) {
-  case '\n':
-    nl();
-    ++ mReadPos;
-    break;
-
-  case '\r':
-    // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
-    // 強制的に '\n' に書き換えてしまう．
-    // Windows : '\r', '\n'
-    // Mac     : '\r'
-    // UNIX    : '\n'
-    // なので '\r' を読んだら次の文字を調べ，'\n' なら一文字とみなす．
-    nl();
-    ++ mReadPos;
-    if ( mReadPos >= mEndPos ) {
-      fill_buff();
-    }
-    if ( mReadPos < mEndPos && mBuff[mReadPos] == '\n' ) {
-      ++ mReadPos;
-    }
-    break;
-
-  default:
-    ++ mCurColumn;
-    ++ mReadPos;
-    break;
-  }
+  mLex->check_line(line);
 }
 
 END_NAMESPACE_YM_VERILOG

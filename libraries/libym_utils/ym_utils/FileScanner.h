@@ -61,6 +61,17 @@ public:
   void
   close_file();
 
+  /// @brief オープン中のファイル情報を得る．
+  const FileInfo&
+  file_info() const;
+
+  /// @brief 現在のファイル情報を書き換える．
+  /// @param[in] new_info 新しいファイル情報
+  /// @note プリプロセッサのプラグマなどで用いることを想定している．
+  /// @note 通常は使わないこと．
+  void
+  set_file_info(const FileInfo& file_info);
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -89,6 +100,13 @@ protected:
   FileRegion
   cur_loc() const;
 
+  /// @brief 改行を読み込んだ時に起動する関数
+  /// @param[in] line 行番号
+  /// @note デフォルトではなにもしない．
+  virtual
+  void
+  check_line(ymuint line);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -98,6 +116,10 @@ private:
   /// @brief 初期化を行う．
   void
   init();
+
+  /// @brief peek() の下請け関数
+  void
+  update();
 
 
 private:
@@ -153,6 +175,37 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief オープン中のファイル情報を得る．
+inline
+const FileInfo&
+FileScanner::file_info() const
+{
+  return mFileInfo;
+}
+
+// @brief 現在のファイル情報を書き換える．
+// @param[in] new_info 新しいファイル情報
+// @note プリプロセッサのプラグマなどで用いることを想定している．
+// @note 通常は使わないこと．
+inline
+void
+FileScanner::set_file_info(const FileInfo& file_info)
+{
+  mFileInfo = file_info;
+}
+
+// @brief 次の文字を読み出す．
+// @note ファイル位置の情報等は変わらない
+inline
+int
+FileScanner::peek()
+{
+  if ( mNeedUpdate ) {
+    update();
+  }
+  return mNextChar;
+}
 
 // 一文字読み出す．
 inline

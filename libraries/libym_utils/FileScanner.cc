@@ -74,66 +74,62 @@ FileScanner::init()
   mNeedUpdate = true;
 }
 
-// @brief 次の文字を読み出す．
-// @note ファイル位置の情報等は変わらない
-int
-FileScanner::peek()
+// @brief peek() の下請け関数
+void
+FileScanner::update()
 {
-  if ( mNeedUpdate ) {
-    int c = 0;
-    for ( ; ; ) {
-      if ( mReadPos >= mEndPos ) {
-	mReadPos = 0;
-	if ( mFd >= 0 ) {
-	  ssize_t n = read(mFd, mBuff, 4096);
-	  if ( n < 0 ) {
-	    // ファイル読み込みエラー
-	    c = -1;
-	    break;
-	  }
-	  mEndPos = n;
+  int c = 0;
+  for ( ; ; ) {
+    if ( mReadPos >= mEndPos ) {
+      mReadPos = 0;
+      if ( mFd >= 0 ) {
+	ssize_t n = read(mFd, mBuff, 4096);
+	if ( n < 0 ) {
+	  // ファイル読み込みエラー
+	  c = -1;
+	  break;
 	}
-	else {
-	  mEndPos = 0;
-	}
+	mEndPos = n;
       }
-      if ( mEndPos == 0 ) {
-	c = EOF;
-	break;
+      else {
+	mEndPos = 0;
       }
-      c = mBuff[mReadPos];
-      ++ mReadPos;
-
-      // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
-      // 強制的に '\n' に書き換えてしまう．
-      // Windows : '\r', '\n'
-      // Mac     : '\r'
-      // UNIX    : '\n'
-      // なので '\r' を '\n' に書き換えてしまう．
-      // ただし次に本当の '\n' が来たときには無視するために
-      // mCR を true にしておく．
-      if ( c == '\r' ) {
-	mCR = true;
-	c = '\n';
-	break;
-      }
-      if ( c == '\n' ) {
-	if ( mCR ) {
-	  // 直前に '\r' を読んで '\n' を返していたので今の '\n' を
-	  // 無視する．これが唯一ループを回る条件
-	  mCR = false;
-	  continue;
-	}
-	break;
-      }
-      // 普通の文字の時はそのまま返す．
-      mCR = false;
+    }
+    if ( mEndPos == 0 ) {
+      c = EOF;
       break;
     }
-    mNeedUpdate = false;
-    mNextChar = c;
+    c = mBuff[mReadPos];
+    ++ mReadPos;
+
+    // Windows(DOS)/Mac/UNIX の間で改行コードの扱いが異なるのでここで
+    // 強制的に '\n' に書き換えてしまう．
+    // Windows : '\r', '\n'
+    // Mac     : '\r'
+    // UNIX    : '\n'
+    // なので '\r' を '\n' に書き換えてしまう．
+    // ただし次に本当の '\n' が来たときには無視するために
+    // mCR を true にしておく．
+    if ( c == '\r' ) {
+      mCR = true;
+      c = '\n';
+      break;
+    }
+    if ( c == '\n' ) {
+      if ( mCR ) {
+	// 直前に '\r' を読んで '\n' を返していたので今の '\n' を
+	// 無視する．これが唯一ループを回る条件
+	mCR = false;
+	continue;
+      }
+      break;
+    }
+    // 普通の文字の時はそのまま返す．
+    mCR = false;
+    break;
   }
-  return mNextChar;
+  mNeedUpdate = false;
+  mNextChar = c;
 }
 
 // @brief 直前の peek() を確定させる．
@@ -146,6 +142,7 @@ FileScanner::accept()
   mCurColumn = mNextColumn;
   // mNextLine と mNextColumn を先に設定しておく
   if ( mNextChar == '\n' ) {
+    check_line(mCurLine);
     ++ mNextLine;
     mNextColumn = 0;
   }
@@ -158,6 +155,14 @@ FileScanner::set_first_loc()
 {
   mFirstLine = mCurLine;
   mFirstColumn = mCurColumn;
+}
+
+// @brief 改行を読み込んだ時に起動する関数
+// @param[in] line 行番号
+// @note デフォルトではなにもしない．
+void
+FileScanner::check_line(ymuint line)
+{
 }
 
 END_NAMESPACE_YM
