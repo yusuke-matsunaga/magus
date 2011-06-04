@@ -74,7 +74,7 @@ private:
   // ビット幅
   ymuint32 mBitWidth;
 
-  // ノードの配列
+  // 入力ノードの配列
   BdnNode** mInputArray;
 
   // 出力ノードの配列
