@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNVERILOGREADER_H
-#define YM_MVN_MVNVERILOGREADER_H
+#ifndef YM_NETWORKS_MVNVERILOGREADER_H
+#define YM_NETWORKS_MVNVERILOGREADER_H
 
 /// @file ym_networks/MvnVerilogReader.h
 /// @brief MvnVerilogReader のヘッダファイル
@@ -79,4 +79,4 @@ private:
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVNVERILOGREADER_H
+#endif // YM_NETWORKS_MVNVERILOGREADER_H

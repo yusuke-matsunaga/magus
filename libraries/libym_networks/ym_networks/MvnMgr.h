@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNMGR_H
-#define YM_MVN_MVNMGR_H
+#ifndef YM_NETWORKS_MVNMGR_H
+#define YM_NETWORKS_MVNMGR_H
 
 /// @file ym_networks/MvnMgr.h
 /// @brief MvnMgr のヘッダファイル
@@ -704,4 +704,4 @@ dump_node_map(ostream& s,
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVNMGR_H
+#endif // YM_NETWORKS_MVNMGR_H

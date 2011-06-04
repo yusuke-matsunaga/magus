@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNNODE_H
-#define YM_BDN_BDNNODE_H
+#ifndef YM_NETWORKS_BDNNODE_H
+#define YM_NETWORKS_BDNNODE_H
 
 /// @file ym_networks/BdnNode.h
 /// @brief BdnNode のヘッダファイル
@@ -823,4 +823,4 @@ BdnNode::set_output_fanin_inv(bool inv)
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNNODE_H
+#endif // YM_NETWORKS_BDNNODE_H

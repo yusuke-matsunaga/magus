@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNETBLIFWRITER_H
-#define YM_BNET_BNETBLIFWRITER_H
+#ifndef YM_NETWORKS_BNETBLIFWRITER_H
+#define YM_NETWORKS_BNETBLIFWRITER_H
 
 /// @file ym_networks/BNetBlifWriter.h
 /// @brief BNetBlifWriter のヘッダファイル
@@ -44,4 +44,4 @@ public:
 
 END_NAMESPACE_YM_BNET
 
-#endif // YM_BNET_BNETBLIFWRITER_H
+#endif // YM_NETWORKS_BNETBLIFWRITER_H

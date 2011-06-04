@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNETGATEDECOMP_H
-#define YM_BNET_BNETGATEDECOMP_H
+#ifndef YM_NETWORKS_BNETGATEDECOMP_H
+#define YM_NETWORKS_BNETGATEDECOMP_H
 
 /// @file ym_networks/BNetGateDecomp.h
 /// @brief BNetGateDecomp のヘッダファイル
@@ -130,4 +130,4 @@ private:
 
 END_NAMESPACE_YM_BNET
 
-#endif // YM_BNET_BNETDECOMP_H
+#endif // YM_NETWORKS_BNETDECOMP_H

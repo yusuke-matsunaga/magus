@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNETDECOMP_H
-#define YM_BNET_BNETDECOMP_H
+#ifndef YM_NETWORKS_BNETDECOMP_H
+#define YM_NETWORKS_BNETDECOMP_H
 
 /// @file ym_networks/BNetDecomp.h
 /// @brief BNetDecomp のヘッダファイル
@@ -33,20 +33,20 @@ public:
 
   /// @brief コンストラクタ．
   BNetDecomp();
-  
+
   /// @brief デストラクタ
   virtual
   ~BNetDecomp();
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name ネットワークを分解する関数
   /// @{
-  
+
   /// @brief 単純分解を行う．(バランス型: type1)
   /// @param[in] network 操作対象のネットワーク
   /// @param[in] max_fanin ファンインの最大数(0, 1で制限なし)
@@ -58,7 +58,7 @@ public:
   operator()(BNetwork& network,
 	     ymuint max_fanin,
 	     bool no_xor = false);
-  
+
   /// @brief 単純分解を行う．(ランダム型: type2)
   /// @param[in] network 操作対象のネットワーク
   /// @param[in] max_fanin ファンインの最大数(0, 1で制限なし)
@@ -72,15 +72,15 @@ public:
 	     ymuint max_fanin,
 	     RandGen& randgen,
 	     bool no_xor = false);
-  
+
   /// @}
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // decomp_type2_node で用いられるサブルーティン
   // expr を根とする論理式を分解して root_node を根のノード
   // とする木を作る．
@@ -92,7 +92,7 @@ private:
 		   const LogExpr& expr,
 		   BNode* root_node,
 		   bool no_xor);
-  
+
   // decomp_type2_node で用いられるサブルーティン
   // expr を根とする論理式を分解して root_node を根のノード
   // とする木を作る．
@@ -104,7 +104,7 @@ private:
 		   const LogExpr& expr,
 		   BNode* root_node,
 		   bool no_xor);
-  
+
   // tmp_fanins[b: b+ni-1] を入力とする
   // max_fanin 入力ノードの木を network 上のノードとして作る．
   // タイプは type_node の根と同タイプとする．
@@ -119,29 +119,29 @@ private:
 	     const LogExpr& type_node,
 	     BNode* root_node,
 	     bool no_xor);
-  
+
   // depth_map に基づいて node の深さを計算する．
   // node の直接のファンインのノードの深さはすでに計算されているものとする．
   int
   calc_depth(BNode* node);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ネットワークを変更するためのオブジェクト
   BNetManip* mManip;
-  
+
   // type1 で用いる深さ保持用の連想配列
   hash_map<ymuint32, int> mDepthMap;
 
   // type2 で用いる乱数発生器
   RandGen* mRandGen;
-  
+
 };
 
 END_NAMESPACE_YM_BNET
 
-#endif // YM_BNET_BNETDECOMP_H
+#endif // YM_NETWORKS_BNETDECOMP_H

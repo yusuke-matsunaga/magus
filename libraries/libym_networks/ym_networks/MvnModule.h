@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNMODULE_H
-#define YM_MVN_MVNMODULE_H
+#ifndef YM_NETWORKS_MVNMODULE_H
+#define YM_NETWORKS_MVNMODULE_H
 
 /// @file ym_networks/MvnModule.h
 /// @brief MvnModule のヘッダファイル
@@ -278,4 +278,4 @@ MvnModule::nodes_end() const
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVNMODULE_H
+#endif // YM_NETWORKS_MVNMODULE_H

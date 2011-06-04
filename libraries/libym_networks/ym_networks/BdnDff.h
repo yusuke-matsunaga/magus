@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNDFF_H
-#define YM_BDN_BDNDFF_H
+#ifndef YM_NETWORKS_BDNDFF_H
+#define YM_NETWORKS_BDNDFF_H
 
 /// @file ym_networks/BdnDff.h
 /// @brief BdnDff のヘッダファイル
@@ -233,4 +233,4 @@ BdnDff::preset()
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNDFF_H
+#endif // YM_NETWORKS_BDNDFF_H

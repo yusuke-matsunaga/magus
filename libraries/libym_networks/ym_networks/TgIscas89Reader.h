@@ -1,5 +1,5 @@
-#ifndef YM_TGNET_TGISCAS89READER_H
-#define YM_TGNET_TGISCAS89READER_H
+#ifndef YM_NETWORKS_TGISCAS89READER_H
+#define YM_NETWORKS_TGISCAS89READER_H
 
 /// @file ym_networks/TgIscas89Reader.h
 /// @brief TgIscas89Reader のヘッダファイル
@@ -59,4 +59,4 @@ private:
 
 END_NAMESPACE_YM_TGNET
 
-#endif // YM_TGNET_TGISCAS89READER_H
+#endif // YM_NETWORKS_TGISCAS89READER_H

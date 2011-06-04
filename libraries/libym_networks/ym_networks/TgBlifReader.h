@@ -1,5 +1,5 @@
-#ifndef YM_TGNET_TGBLIFREADER_H
-#define YM_TGNET_TGBLIFREADER_H
+#ifndef YM_NETWORKS_TGBLIFREADER_H
+#define YM_NETWORKS_TGBLIFREADER_H
 
 /// @file ym_networks/TgBlifReader.h
 /// @brief TgBlifReader のヘッダファイル
@@ -59,4 +59,4 @@ private:
 
 END_NAMESPACE_YM_TGNET
 
-#endif // YM_TGNET_TGBLIFREADER_H
+#endif // YM_NETWORKS_TGBLIFREADER_H

@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNPORT_H
-#define YM_BDN_BDNPORT_H
+#ifndef YM_NETWORKS_BDNPORT_H
+#define YM_NETWORKS_BDNPORT_H
 
 /// @file ym_networks/BdnPort.h
 /// @brief BdnPort のヘッダファイル
@@ -136,4 +136,4 @@ BdnPort::output(ymuint pos) const
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNPORT_H
+#endif // YM_NETWORKS_BDNPORT_H

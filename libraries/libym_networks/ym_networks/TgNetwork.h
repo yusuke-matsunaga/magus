@@ -1,10 +1,10 @@
-#ifndef YM_TGNET_TGNETWORK_H
-#define YM_TGNET_TGNETWORK_H
+#ifndef YM_NETWORKS_TGNETWORK_H
+#define YM_NETWORKS_TGNETWORK_H
 
 /// @file ym_networks/TgNetwork.h
 /// @brief TgNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: TgNetwork.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -115,17 +115,17 @@ public:
   /// @note 0 <= pos < logic_num()
   const TgNode*
   sorted_logic(ymuint32 pos) const;
-  
+
   /// @brief FF ノード数を得る．
   size_t
   ff_num() const;
-  
+
   /// @brief node の論理式を取り出す．
   /// @note node 対象のノード
   LogExpr
   get_lexp(const TgNode* node) const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数
@@ -195,13 +195,13 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // TgNode の確保用のアロケータ
   UnitAlloc mNodeAlloc;
-  
+
   // TgNode のファンイン配列の確保用アロケータ
   SimpleAlloc mFaninAlloc;
-  
+
   // TgEdge の確保用のアロケータ
   SimpleAlloc mEdgeAlloc;
 
@@ -213,25 +213,25 @@ private:
 
   // FF-out の配列
   vector<TgNode*> mFFOutArray;
-  
+
   // 出力ノードの配列
   vector<TgNode*> mOutputArray;
 
   // FF-in の配列
   vector<TgNode*> mFFInArray;
-  
+
   // logic ノードの配列
   vector<TgNode*> mLogicArray;
-  
+
   // ソートした logic ノードの配列
   vector<TgNode*> mSortedArray;
-  
+
   // 名前をキーにしてノードを格納するハッシュ表
   NameHash* mNameHash;
 
   // 論理式を管理するオブジェクト
   LogicMgr* mLogicMgr;
-  
+
 };
 
 
@@ -355,4 +355,4 @@ TgNetwork::sorted_logic(ymuint32 pos) const
 
 END_NAMESPACE_YM_TGNET
 
-#endif // YM_TGNET_TGNETWORK_H
+#endif // YM_NETWORKS_TGNETWORK_H

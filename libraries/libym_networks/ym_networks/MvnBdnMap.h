@@ -1,5 +1,5 @@
-#ifndef YM_MVNBDNCONV_MVNBDNMAP_H
-#define YM_MVNBDNCONV_MVNBDNMAP_H
+#ifndef YM_NETWORKS_MVNBDNMAP_H
+#define YM_NETWORKS_MVNBDNMAP_H
 
 /// @file ym_networks/MvnBdnMap.h
 /// @brief MvnBdnMap のヘッダファイル
@@ -84,4 +84,4 @@ dump_mvnode_map(ostream& s,
 
 END_NAMESPACE_YM_MVNBDNCONV
 
-#endif // YM_MVNBDNCONV_MVNBDNMAP_H
+#endif // YM_NETWORKS_MVNBDNMAP_H

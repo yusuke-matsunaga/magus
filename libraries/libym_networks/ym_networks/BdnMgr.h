@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNMGR_H
-#define YM_BDN_BDNMGR_H
+#ifndef YM_NETWORKS_BDNMGR_H
+#define YM_NETWORKS_BDNMGR_H
 
 /// @file ym_networks/BdnMgr.h
 /// @brief BdnMgr のヘッダファイル
@@ -577,4 +577,4 @@ BdnMgr::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNMGR_H
+#endif // YM_NETWORKS_BDNMGR_H

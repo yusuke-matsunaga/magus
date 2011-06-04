@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNETEQUWRITER_H
-#define YM_BNET_BNETEQUWRITER_H
+#ifndef YM_NETWORKS_BNETEQUWRITER_H
+#define YM_NETWORKS_BNETEQUWRITER_H
 
 /// @file ym_networks/BNetEquWriter.h
 /// @brief BNetEquWriter のヘッダファイル
@@ -44,4 +44,4 @@ public:
 
 END_NAMESPACE_YM_BNET
 
-#endif // YM_BNET_BNETEQUWRITER_H
+#endif // YM_NETWORKS_BNETEQUWRITER_H

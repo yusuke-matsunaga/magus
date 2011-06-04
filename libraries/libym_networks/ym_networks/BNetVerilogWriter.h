@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNETVERILOGWRITER_H
-#define YM_BNET_BNETVERILOGWRITER_H
+#ifndef YM_NETWORKS_BNETVERILOGWRITER_H
+#define YM_NETWORKS_BNETVERILOGWRITER_H
 
 /// @file ym_networks/BNetVerilogWriter.h
 /// @brief BNetVerilogWriter のヘッダファイル
@@ -44,4 +44,4 @@ public:
 
 END_NAMESPACE_YM_BNET
 
-#endif // YM_BNET_BNETVERILOGWRITER_H
+#endif // YM_NETWORKS_BNETVERILOGWRITER_H

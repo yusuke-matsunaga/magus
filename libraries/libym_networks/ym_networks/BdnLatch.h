@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNLATCH_H
-#define YM_BDN_BDNLATCH_H
+#ifndef YM_NETWORKS_BDNLATCH_H
+#define YM_NETWORKS_BDNLATCH_H
 
 /// @file ym_networks/BdnLatch.h
 /// @brief BdnLatch のヘッダファイル
@@ -188,4 +188,4 @@ BdnLatch::enable()
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNLATCH_H
+#endif // YM_NETWORKS_BDNLATCH_H

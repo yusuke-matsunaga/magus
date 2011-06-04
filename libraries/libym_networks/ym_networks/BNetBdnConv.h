@@ -1,5 +1,5 @@
-#ifndef YM_BNETBDNCONV_BNETBDNCONV_H
-#define YM_BNETBDNCONV_BNETBDNCONV_H
+#ifndef YM_NETWORKS_BNETBDNCONV_H
+#define YM_NETWORKS_BNETBDNCONV_H
 
 /// @file ym_networks/BNetBdnConv.h
 /// @brief BNetBdnConv のヘッダファイル
@@ -83,4 +83,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // YM_BNETBDNCONV_BNETBDNCONV_H
+#endif // YM_NETWORKS_BNETBDNCONV_H
