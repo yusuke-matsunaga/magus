@@ -1,0 +1,115 @@
+#ifndef LIBYM_NETWORKS_CMN_CMNNODELATCHOUT_H
+#define LIBYM_NETWORKS_CMN_CMNNODELATCHOUT_H
+
+/// @file libym_networks/cmn/CmnNodeLatchOut.h
+/// @brief CmnNodeLatchOut のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "CmnNodeInput.h"
+
+
+BEGIN_NAMESPACE_YM_CMN
+
+//////////////////////////////////////////////////////////////////////
+/// @class CmnNodeLatchOut CmnNodeLatchOut.h "CmnNodeLatchOut.h"
+/// @brief ラッチの出力を表す CmnNode の派生クラス
+//////////////////////////////////////////////////////////////////////
+class CmnNodeLatchOut :
+  public CmnNodeInput
+{
+  friend class CmnMgrImpl;
+
+protected:
+
+  /// @brief コンストラクタ
+  CmnNodeLatchOut();
+
+  /// @brief デストラクタ
+  virtual
+  ~CmnNodeLatchOut();
+
+
+public:
+
+  /// @brief 関連するラッチを返す．
+  /// @note ラッチに関連していない場合には NULL を返す．
+  virtual
+  const CmnLatch*
+  latch() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 関連するラッチ
+  const CmnLatch* mLatch;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @calss CmnNodeLatchOut1 CmnNodeLatchOut.h "CmnNodeLatchOut.h"
+/// @brief ラッチの肯定出力を表す CmnNode の派生クラス
+//////////////////////////////////////////////////////////////////////
+class CmnNodeLatchOut1 :
+  public CmnNodeLatchOut
+{
+  friend class CmnMgrImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  CmnNodeLatchOut1();
+
+  /// @brief デストラクタ
+  virtual
+  ~CmnNodeLatchOut1();
+
+
+public:
+
+  /// @brief 入力ノードのサブタイプを得る．
+  virtual
+  tInputType
+  input_type() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @calss CmnNodeLatchOut2 CmnNodeLatchOut.h "CmnNodeLatchOut.h"
+/// @brief ラッチの肯定出力を表す CmnNode の派生クラス
+//////////////////////////////////////////////////////////////////////
+class CmnNodeLatchOut2 :
+  public CmnNodeLatchOut
+{
+  friend class CmnMgrImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  CmnNodeLatchOut2();
+
+  /// @brief デストラクタ
+  virtual
+  ~CmnNodeLatchOut2();
+
+
+public:
+
+  /// @brief 入力ノードのサブタイプを得る．
+  virtual
+  tInputType
+  input_type() const;
+
+};
+
+END_NAMESPACE_YM_CMN
+
+#endif // LIBYM_NETWORKS_CMN_CMNNODELATCHOUT_H

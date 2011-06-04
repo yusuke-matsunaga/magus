@@ -6,6 +6,7 @@ SUBDIRS = \
 	ym_networks \
 	bdn \
 	bnet \
+	cmn \
 	mvn \
 	tgnet \
 	conv_blif_bnet \
