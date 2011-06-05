@@ -201,6 +201,24 @@ CmnMgr::sort(vector<const CmnNode*>& node_list) const
   mImpl->sort(node_list);
 }
 
+// @brief D-FFセルの情報を得る．
+// @param[in] cell 対象のセル
+// @note cell が D-FF でない場合と登録されていない場合には NULL を返す．
+const CmnDffCell*
+CmnMgr::dff_cell(const Cell* cell) const
+{
+  return mImpl->dff_cell(cell);
+}
+
+// @brief ラッチセルの情報を得る．
+// @param[in] cell 対象のセル
+// @note cell がラッチでない場合と登録されていない場合には NULL を返す．
+const CmnLatchCell*
+CmnMgr::latch_cell(const Cell* cell) const
+{
+  return mImpl->latch_cell(cell);
+}
+
 // 空にする．
 void
 CmnMgr::clear()
@@ -281,6 +299,42 @@ CmnMgr::new_logic(const vector<CmnNode*>& inodes,
 		  const Cell* cell)
 {
   return mImpl->new_logic(inodes, cell);
+}
+
+// @brief D-FFセルを登録する．
+// @param[in] cell 対象のセル．
+// @param[in] pos_array ピン情報の配列
+// @return D-FFセルの情報を表すオブジェクトを返す．
+// @note pos_array の意味は以下の通り
+//  - pos_array[0] : データ入力のピン番号     (3bit)
+//  - pos_array[1] : クロック入力のピン番号   (3bit)
+//  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+//  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+//  - pos_array[4] : 肯定出力のピン番号       (3bit)
+//  - pos_array[5] : 否定出力のピン番号       (3bit)
+const CmnDffCell*
+CmnMgr::reg_dff_cell(const Cell* cell,
+		     ymuint pos_array[])
+{
+  return mImpl->reg_dff_cell(cell, pos_array);
+}
+
+// @brief ラッチセルを登録する．
+// @param[in] cell 対象のセル．
+// @param[in] pos_array ピン情報の配列
+// @return ラッチセルの情報を表すオブジェクトを返す．
+// @note pos_array の意味は以下の通り
+//  - pos_array[0] : データ入力のピン番号     (3bit)
+//  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
+//  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+//  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+//  - pos_array[4] : 肯定出力のピン番号       (3bit)
+//  - pos_array[5] : 否定出力のピン番号       (3bit)
+const CmnLatchCell*
+CmnMgr::reg_latch_cell(const Cell* cell,
+		       ymuint pos_array[])
+{
+  return mImpl->reg_latch_cell(cell, pos_array);
 }
 
 END_NAMESPACE_YM_CMN

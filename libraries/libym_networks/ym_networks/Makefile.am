@@ -35,6 +35,7 @@ noinst_HEADERS = \
 	CmnEdge.h \
 	CmnDff.h \
 	CmnDffCell.h \
+	CmnDumper.h \
 	CmnLatch.h \
 	CmnLatchCell.h \
 	CmnMgr.h \

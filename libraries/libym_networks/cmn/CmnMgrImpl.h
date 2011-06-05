@@ -19,6 +19,20 @@
 #include "ym_utils/ItvlMgr.h"
 
 
+BEGIN_NAMESPACE_HASH
+// Cell へのポインタをキーにしたハッシュ関数クラスの定義
+template <>
+struct hash<const nsYm::Cell*>
+{
+  ymuint
+  operator()(const nsYm::Cell* cell) const
+  {
+    return reinterpret_cast<ympuint>(cell)/sizeof(void*);
+  }
+};
+END_NAMESPACE_HASH
+
+
 BEGIN_NAMESPACE_YM_CMN
 
 //////////////////////////////////////////////////////////////////////
@@ -137,6 +151,18 @@ public:
   void
   sort(vector<const CmnNode*>& node_list) const;
 
+  /// @brief D-FFセルの情報を得る．
+  /// @param[in] cell 対象のセル
+  /// @note cell が D-FF でない場合と登録されていない場合には NULL を返す．
+  const CmnDffCell*
+  dff_cell(const Cell* cell) const;
+
+  /// @brief ラッチセルの情報を得る．
+  /// @param[in] cell 対象のセル
+  /// @note cell がラッチでない場合と登録されていない場合には NULL を返す．
+  const CmnLatchCell*
+  latch_cell(const Cell* cell) const;
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -189,6 +215,36 @@ public:
   CmnNode*
   new_logic(const vector<CmnNode*>& inodes,
 	    const Cell* cell);
+
+  /// @brief D-FFセルを登録する．
+  /// @param[in] cell 対象のセル．
+  /// @param[in] pos_array ピン情報の配列
+  /// @return D-FFセルの情報を表すオブジェクトを返す．
+  /// @note pos_array の意味は以下の通り
+  ///  - pos_array[0] : データ入力のピン番号     (3bit)
+  ///  - pos_array[1] : クロック入力のピン番号   (3bit)
+  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
+  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
+  const CmnDffCell*
+  reg_dff_cell(const Cell* cell,
+	       ymuint pos_array[]);
+
+  /// @brief ラッチセルを登録する．
+  /// @param[in] cell 対象のセル．
+  /// @param[in] pos_array ピン情報の配列
+  /// @return ラッチセルの情報を表すオブジェクトを返す．
+  /// @note pos_array の意味は以下の通り
+  ///  - pos_array[0] : データ入力のピン番号     (3bit)
+  ///  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
+  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
+  const CmnLatchCell*
+  reg_latch_cell(const Cell* cell,
+		 ymuint pos_array[]);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -303,6 +359,12 @@ private:
 
   // 論理ノードのリスト
   CmnNodeList mLogicList;
+
+  // cell のアドレスをキーにして CmnDffCell を記憶するハッシュ表
+  hash_map<const Cell*, const CmnDffCell*> mDffCellMap;
+
+  // cell のアドレスをキーにして CmnLatchCell を記憶するハッシュ表
+  hash_map<const Cell*, const CmnLatchCell*> mLatchCellMap;
 
 };
 

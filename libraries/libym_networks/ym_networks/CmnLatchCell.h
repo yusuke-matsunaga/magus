@@ -27,7 +27,16 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] cell セル
-  CmnLatchCell(const Cell* cell);
+  /// @param[in] pos_array ピン情報の配列
+  /// @note pos_array の意味は以下の通り
+  ///  - pos_array[0] : データ入力のピン番号     (3bit)
+  ///  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
+  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
+  CmnLatchCell(const Cell* cell,
+	       ymuint pos_array[]);
 
   /// @brief デストラクタ
   ~CmnLatchCell();

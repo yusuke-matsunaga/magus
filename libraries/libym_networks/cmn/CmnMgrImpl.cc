@@ -281,6 +281,34 @@ CmnMgrImpl::clear()
   mAlloc.destroy();
 }
 
+// @brief D-FFセルの情報を得る．
+// @param[in] cell 対象のセル
+// @note cell が D-FF でない場合と登録されていない場合には NULL を返す．
+const CmnDffCell*
+CmnMgrImpl::dff_cell(const Cell* cell) const
+{
+  hash_map<const Cell*, const CmnDffCell*>::const_iterator p
+    = mDffCellMap.find(cell);
+  if ( p == mDffCellMap.end() ) {
+    return NULL;
+  }
+  return p->second;
+}
+
+// @brief ラッチセルの情報を得る．
+// @param[in] cell 対象のセル
+// @note cell がラッチでない場合と登録されていない場合には NULL を返す．
+const CmnLatchCell*
+CmnMgrImpl::latch_cell(const Cell* cell) const
+{
+  hash_map<const Cell*, const CmnLatchCell*>::const_iterator p
+    = mLatchCellMap.find(cell);
+  if ( p == mLatchCellMap.end() ) {
+    return NULL;
+  }
+  return p->second;
+}
+
 // @brief モジュール名を設定する．
 void
 CmnMgrImpl::set_name(const string& name)
@@ -504,6 +532,54 @@ CmnMgrImpl::new_logic(const vector<CmnNode*>& inodes,
   reg_node(node);
   mLogicList.push_back(node);
   return node;
+}
+
+// @brief D-FFセルを登録する．
+// @param[in] cell 対象のセル．
+// @param[in] pos_array ピン情報の配列
+// @return D-FFセルの情報を表すオブジェクトを返す．
+// @note pos_array の意味は以下の通り
+//  - pos_array[0] : データ入力のピン番号     (3bit)
+//  - pos_array[1] : クロック入力のピン番号   (3bit)
+//  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+//  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+//  - pos_array[4] : 肯定出力のピン番号       (3bit)
+//  - pos_array[5] : 否定出力のピン番号       (3bit)
+const CmnDffCell*
+CmnMgrImpl::reg_dff_cell(const Cell* cell,
+			 ymuint pos_array[])
+{
+  const CmnDffCell* dff_cell = this->dff_cell(cell);
+  if ( dff_cell ) {
+    return dff_cell;
+  }
+  dff_cell = new CmnDffCell(cell, pos_array);
+  mDffCellMap.insert(make_pair(cell, dff_cell));
+  return dff_cell;
+}
+
+// @brief ラッチセルを登録する．
+// @param[in] cell 対象のセル．
+// @param[in] pos_array ピン情報の配列
+// @return ラッチセルの情報を表すオブジェクトを返す．
+// @note pos_array の意味は以下の通り
+//  - pos_array[0] : データ入力のピン番号     (3bit)
+//  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
+//  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+//  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+//  - pos_array[4] : 肯定出力のピン番号       (3bit)
+//  - pos_array[5] : 否定出力のピン番号       (3bit)
+const CmnLatchCell*
+CmnMgrImpl::reg_latch_cell(const Cell* cell,
+			   ymuint pos_array[])
+{
+  const CmnLatchCell* latch_cell = this->latch_cell(cell);
+  if ( latch_cell ) {
+    return latch_cell;
+  }
+  latch_cell = new CmnLatchCell(cell, pos_array);
+  mLatchCellMap.insert(make_pair(cell, latch_cell));
+  return latch_cell;
 }
 
 #if 0

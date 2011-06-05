@@ -22,6 +22,14 @@ const int CLEAR   = 4;
 const int PRESET  = 5;
 
 inline
+ymuint32
+encode(ymuint val,
+       int idx)
+{
+  return val << (5 * idx);
+}
+
+inline
 ymuint
 get_sense(ymuint32 bits,
 	  int idx)
@@ -45,9 +53,25 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] cell セル
-CmnDffCell::CmnDffCell(const Cell* cell) :
-  mCell(cell)
+// @param[in] pos_array ピン情報の配列
+// @note pos_array の意味は以下の通り
+//  - pos_array[0] : データ入力のピン番号     (3bit)
+//  - pos_array[1] : クロック入力のピン番号   (3bit)
+//  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+//  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+//  - pos_array[4] : 肯定出力のピン番号       (3bit)
+//  - pos_array[5] : 否定出力のピン番号       (3bit)
+CmnDffCell::CmnDffCell(const Cell* cell,
+		       ymuint pos_array[]) :
+  mCell(cell),
+  mBits(0U)
 {
+  mBits |= encode(pos_array[0], INPUT);
+  mBits |= encode(pos_array[1], CLOCK);
+  mBits |= encode(pos_array[2], CLEAR);
+  mBits |= encode(pos_array[3], PRESET);
+  mBits |= encode(pos_array[4], OUTPUT1);
+  mBits |= encode(pos_array[5], OUTPUT2);
 }
 
 // @brief デストラクタ
