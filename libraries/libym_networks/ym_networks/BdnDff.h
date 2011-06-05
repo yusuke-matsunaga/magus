@@ -196,7 +196,6 @@ BdnDff::clock()
 }
 
 // @brief クリア信号のノードを返す．
-// @note NULL の場合もある．
 inline
 const BdnNode*
 BdnDff::clear() const
@@ -205,7 +204,6 @@ BdnDff::clear() const
 }
 
 // @brief クリア信号のノードを返す．
-// @note NULL の場合もある．
 inline
 BdnNode*
 BdnDff::clear()
@@ -214,7 +212,6 @@ BdnDff::clear()
 }
 
 // @brief プリセット信号のノードを返す．
-// @note NULL の場合もある．
 inline
 const BdnNode*
 BdnDff::preset() const
@@ -223,7 +220,6 @@ BdnDff::preset() const
 }
 
 // @brief プリセット信号のノードを返す．
-// @note NULL の場合もある．
 inline
 BdnNode*
 BdnDff::preset()

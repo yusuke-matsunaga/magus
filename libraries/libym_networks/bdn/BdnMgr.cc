@@ -73,6 +73,22 @@ BdnMgr::port(ymuint pos) const
   return mImpl->port(pos);
 }
 
+// @brief D-FFのIDの最大値 + 1 の取得
+ymuint
+BdnMgr::max_dff_id() const
+{
+  return mImpl->max_dff_id();
+}
+
+// @brief ID番号から D-FF を得る．
+// @param[in] id ID番号 ( 0 <= id < max_dff_id() )
+// @note 該当するD-FFが無い場合には NULL を返す．
+const BdnDff*
+BdnMgr::dff(ymuint id) const
+{
+  return mImpl->dff(id);
+}
+
 // @brief D-FF 数の取得
 ymuint
 BdnMgr::dff_num() const
@@ -85,6 +101,22 @@ const BdnDffList&
 BdnMgr::dff_list() const
 {
   return mImpl->dff_list();
+}
+
+// @brief ラッチのIDの最大値 + 1 の取得
+ymuint
+BdnMgr::max_latch_id() const
+{
+  return mImpl->max_latch_id();
+}
+
+// @brief ID番号からラッチを得る．
+// @param[in] id ID番号 ( 0 <= id < max_latch_id() )
+// @note 該当するラッチが無い場合には NULL を返す．
+const BdnLatch*
+BdnMgr::latch(ymuint id) const
+{
+  return mImpl->latch(id);
 }
 
 // @brief ラッチ数の取得
@@ -173,6 +205,13 @@ BdnMgr::level() const
   return mImpl->level();
 }
 
+// 空にする．
+void
+BdnMgr::clear()
+{
+  mImpl->clear();
+}
+
 // @brief 名前を設定する．
 // @param[in] name 新しい名前
 void
@@ -181,19 +220,46 @@ BdnMgr::set_name(const string& name)
   mImpl->set_name(name);
 }
 
-// 空にする．
+// @brief どこにもファンアウトしていないノードを削除する．
 void
-BdnMgr::clear()
+BdnMgr::clean_up()
 {
-  mImpl->clear();
+  mImpl->clean_up();
+}
+
+// @brief 入力ポートを作る．
+// @param[in] name 名前
+// @param[in] bit_width ビット幅
+BdnPort*
+BdnMgr::new_input_port(const string& name,
+		       ymuint bit_width)
+{
+  return mImpl->new_port(name, vector<ymuint>(bit_width, 1U));
+}
+
+// @brief 出力ポートを作る．
+// @param[in] name 名前
+// @param[in] bit_width ビット幅
+BdnPort*
+BdnMgr::new_output_port(const string& name,
+			ymuint bit_width)
+{
+  return mImpl->new_port(name, vector<ymuint>(bit_width, 2U));
 }
 
 // @brief ポートを作る．
+// @param[in] name 名前
+// @param[in] iovect ビットごとの方向を指定する配列
+// @note iovect の要素の値の意味は以下の通り
+// - 0 : なし
+// - 1 : 入力のみ
+// - 2 : 出力のみ
+// - 3 : 入力と出力
 BdnPort*
 BdnMgr::new_port(const string& name,
-		 ymuint bit_width)
+		 const vector<ymuint>& iovect)
 {
-  return mImpl->new_port(name, bit_width);
+  return mImpl->new_port(name, iovect);
 }
 
 // @brief D-FF を作る．
@@ -212,34 +278,6 @@ BdnLatch*
 BdnMgr::new_latch(const string& name)
 {
   return mImpl->new_latch(name);
-}
-
-// @brief 外部入力を作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgr::new_port_input(BdnPort* port,
-		       ymuint bitpos)
-{
-  return mImpl->new_port_input(port, bitpos);
-}
-
-// @brief 外部出力ノードを作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgr::new_port_output(BdnPort* port,
-			ymuint bitpos)
-{
-  return mImpl->new_port_output(port, bitpos);
 }
 
 // @brief 出力ノードの内容を変更する

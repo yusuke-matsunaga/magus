@@ -49,6 +49,16 @@ public:
   const BdnPort*
   port(ymuint pos) const;
 
+  /// @brief D-FFのIDの最大値 + 1 の取得
+  ymuint
+  max_dff_id() const;
+
+  /// @brief ID番号から D-FF を得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_dff_id() )
+  /// @note 該当するD-FFが無い場合には NULL を返す．
+  const BdnDff*
+  dff(ymuint id) const;
+
   /// @brief D-FF 数の取得
   ymuint
   dff_num() const;
@@ -56,6 +66,16 @@ public:
   /// @brief D-FF のリストの取得
   const BdnDffList&
   dff_list() const;
+
+  /// @brief ラッチのIDの最大値 + 1 の取得
+  ymuint
+  max_latch_id() const;
+
+  /// @brief ID番号からラッチを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_latch_id() )
+  /// @note 該当するラッチが無い場合には NULL を返す．
+  const BdnLatch*
+  latch(ymuint id) const;
 
   /// @brief ラッチ数の取得
   ymuint
@@ -122,19 +142,14 @@ public:
 
 public:
 
+  /// @brief 空にする．
+  void
+  clear();
+
   /// @brief 名前を設定する．
   /// @param[in] name 新しい名前
   void
   set_name(const string& name);
-
-  /// @brief コピーコンストラクタと代入演算子用のサブルーティン
-  /// @param[in] src コピー元のオブジェクト
-  void
-  copy(const BdnMgr& src);
-
-  /// @brief 空にする．
-  void
-  clear();
 
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
@@ -142,10 +157,15 @@ public:
 
   /// @brief ポートを作る．
   /// @param[in] name 名前
-  /// @param[in] bit_width ビット幅
+  /// @param[in] iovect ビットごとの方向を指定する配列
+  /// @note iovect の要素の値の意味は以下の通り
+  /// - 0 : なし
+  /// - 1 : 入力のみ
+  /// - 2 : 出力のみ
+  /// - 3 : 入力と出力
   BdnPort*
   new_port(const string& name,
-	   ymuint bit_width);
+	   const vector<ymuint>& iovect);
 
   /// @brief D-FF を作る．
   /// @param[in] name 名前
@@ -158,28 +178,6 @@ public:
   /// @return 生成されたラッチを返す．
   BdnLatch*
   new_latch(const string& name = string());
-
-  /// @brief 外部入力を作る．
-  /// @param[in] port ポート
-  /// @param[in] bitpos ビット位置
-  /// @return 作成したノードを返す．
-  /// @note エラー条件は以下の通り
-  ///  - bitpos が port のビット幅を越えている．
-  ///  - port の bitpos にすでにノードがある．
-  BdnNode*
-  new_port_input(BdnPort* port,
-		 ymuint bitpos);
-
-  /// @brief 外部出力ノードを作る．
-  /// @param[in] port ポート
-  /// @param[in] bitpos ビット位置
-  /// @return 作成したノードを返す．
-  /// @note エラー条件は以下の通り
-  ///  - bitpos が port のビット幅を越えている．
-  ///  - port の bitpos にすでにノードがある．
-  BdnNode*
-  new_port_output(BdnPort* port,
-		  ymuint bitpos);
 
 
 public:
@@ -228,6 +226,11 @@ public:
   connect(BdnNode* from,
 	  BdnNode* to,
 	  ymuint pos);
+
+  /// @brief コピーコンストラクタと代入演算子用のサブルーティン
+  /// @param[in] src コピー元のオブジェクト
+  void
+  copy(const BdnMgr& src);
 
   /// @brief D-FF を削除する．
   /// @param[in] dff 削除対象の D-FF
@@ -287,7 +290,7 @@ private:
   // ラッチのリスト
   BdnLatchList mLatchList;
 
-  // ID 番号を管理するためのオブジェクト
+  // ノードの ID 番号を管理するためのオブジェクト
   ItvlMgr mNodeItvlMgr;
 
   // ID 番号をキーにしたノードの配列
@@ -335,14 +338,6 @@ BdnMgrImpl::name() const
   return mName;
 }
 
-// @brief 名前を設定する．
-inline
-void
-BdnMgrImpl::set_name(const string& name)
-{
-  mName = name;
-}
-
 // @brief ポート数の取得
 inline
 ymuint
@@ -360,6 +355,24 @@ BdnMgrImpl::port(ymuint pos) const
   return mPortArray[pos];
 }
 
+// @brief D-FFのIDの最大値 + 1 の取得
+inline
+ymuint
+BdnMgrImpl::max_dff_id() const
+{
+  return mDffArray.size();
+}
+
+// @brief ID番号から D-FF を得る．
+// @param[in] id ID番号 ( 0 <= id < max_dff_id() )
+// @note 該当するD-FFが無い場合には NULL を返す．
+inline
+const BdnDff*
+BdnMgrImpl::dff(ymuint id) const
+{
+  return mDffArray[id];
+}
+
 // @brief D-FF 数の取得
 inline
 ymuint
@@ -374,6 +387,24 @@ const BdnDffList&
 BdnMgrImpl::dff_list() const
 {
   return mDffList;
+}
+
+// @brief ラッチのIDの最大値 + 1 の取得
+inline
+ymuint
+BdnMgrImpl::max_latch_id() const
+{
+  return mLatchArray.size();
+}
+
+// @brief ID番号からラッチを得る．
+// @param[in] id ID番号 ( 0 <= id < max_latch_id() )
+// @note 該当するラッチが無い場合には NULL を返す．
+inline
+const BdnLatch*
+BdnMgrImpl::latch(ymuint id) const
+{
+  return mLatchArray[id];
 }
 
 // @brief ラッチ数の取得

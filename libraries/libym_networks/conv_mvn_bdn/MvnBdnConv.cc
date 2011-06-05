@@ -10,9 +10,10 @@
 #include "ym_networks/MvnBdnConv.h"
 #include "ym_networks/MvnBdnMap.h"
 #include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNodeHandle.h"
+#include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnDff.h"
 #include "ym_networks/BdnLatch.h"
+#include "ym_networks/BdnNodeHandle.h"
 #include "ym_networks/MvnMgr.h"
 #include "ym_networks/MvnModule.h"
 #include "ym_networks/MvnPort.h"
@@ -101,18 +102,18 @@ make_io(BdnMgr& bdnetwork,
 {
   MvnNode::tType type = node->type();
   if ( type == MvnNode::kInput ) {
-    BdnNode* input = bdnetwork.new_port_input(bdnport, dst_bitpos);
+    BdnNode* input = bdnport->input(dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
   }
   else if ( type == MvnNode::kOutput ) {
-    BdnNode* output = bdnetwork.new_port_output(bdnport, dst_bitpos);
+    BdnNode* output = bdnport->output(dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(output, false));
   }
   else if ( type == MvnNode::kInout ) {
-    BdnNode* input = bdnetwork.new_port_input(bdnport, dst_bitpos);
+    BdnNode* input = bdnport->input(dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
-    (void) bdnetwork.new_port_output(bdnport, dst_bitpos);
-    // この出力ノードは input->alt_node() でアクセス可能
+    BdnNode* output = bdnport->output(dst_bitpos);
+    mvnode_map.put(node, src_bitpos, BdnNodeHandle(output, false));
   }
 }
 
@@ -204,11 +205,46 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
   for (ymuint i = 0; i < np; ++ i) {
     const MvnPort* port = module->port(i);
     ymuint nb = port->bit_width();
-    BdnPort* bdnport = bdnetwork.new_port(port->name(), nb);
-    vector<BdnNode*> tmp;
-    tmp.reserve(nb);
+    vector<ymuint> iovect(nb);
     ymuint bitpos = 0;
     ymuint n = port->port_ref_num();
+    for (ymuint j = 0; j < n; ++ j) {
+      const MvnPortRef* port_ref = port->port_ref(j);
+      ymuint nb1 = port_ref->bit_width();
+      const MvnNode* node = port_ref->node();
+      ymuint val = 0U;
+      switch ( node->type() ) {
+      case MvnNode::kInput: val = 1U; break;
+      case MvnNode::kOutput: val = 2U; break;
+      case MvnNode::kInout: val = 3U; break;
+      default: assert_not_reached(__FILE__, __LINE__); break;
+      }
+      if ( port_ref->is_simple() ) {
+	for (ymuint k = 0; k < nb1; ++ k) {
+	  iovect[bitpos] = val;
+	  ++ bitpos;
+	}
+      }
+      else if ( port_ref->has_bitselect() ) {
+	iovect[bitpos] = val;
+	++ bitpos;
+      }
+      else if ( port_ref->has_partselect() ) {
+	ymuint msb = port_ref->msb();
+	ymuint lsb = port_ref->lsb();
+	for (ymuint k = lsb; k <= msb; ++ k) {
+	  iovect[bitpos] = val;
+	  ++ bitpos;
+	}
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+    BdnPort* bdnport = bdnetwork.new_port(port->name(), iovect);
+    vector<BdnNode*> tmp;
+    tmp.reserve(nb);
+    bitpos = 0;
     for (ymuint j = 0; j < n; ++ j) {
       const MvnPortRef* port_ref = port->port_ref(j);
       ymuint nb1 = port_ref->bit_width();

@@ -71,6 +71,26 @@ public:
   BdnNode*
   enable();
 
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  const BdnNode*
+  clear() const;
+
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  BdnNode*
+  clear();
+
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  const BdnNode*
+  preset() const;
+
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  BdnNode*
+  preset();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -108,6 +128,12 @@ private:
 
   // ラッチイネーブルノード
   BdnNode* mEnable;
+
+  // クリア信号ノード
+  BdnNode* mClear;
+
+  // プリセット信号ノード
+  BdnNode* mPreset;
 
   // BdnNode の付加するデータ
   BdnAuxData* mAuxData;
@@ -184,6 +210,38 @@ BdnNode*
 BdnLatch::enable()
 {
   return mEnable;
+}
+
+// @brief クリア信号のノードを返す．
+inline
+const BdnNode*
+BdnLatch::clear() const
+{
+  return mClear;
+}
+
+// @brief クリア信号のノードを返す．
+inline
+BdnNode*
+BdnLatch::clear()
+{
+  return mClear;
+}
+
+// @brief プリセット信号のノードを返す．
+inline
+const BdnNode*
+BdnLatch::preset() const
+{
+  return mPreset;
+}
+
+// @brief プリセット信号のノードを返す．
+inline
+BdnNode*
+BdnLatch::preset()
+{
+  return mPreset;
 }
 
 END_NAMESPACE_YM_BDN

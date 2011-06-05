@@ -12,6 +12,7 @@
 #include "ym_networks/BNetBdnConv.h"
 #include "ym_networks/BNetwork.h"
 #include "ym_networks/BdnMgr.h"
+#include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnNodeHandle.h"
 #include "ym_networks/BdnDff.h"
@@ -52,7 +53,8 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
   for (BNodeList::const_iterator p = bnetwork.inputs_begin();
        p != bnetwork.inputs_end(); ++ p) {
     const BNode* bnode = *p;
-    BdnNode* node = mNetwork->new_port_input(bnode->name());
+    BdnPort* port = mNetwork->new_input_port(bnode->name(), 1);
+    BdnNode* node = port->input(0);
     put_node(bnode, BdnNodeHandle(node, false));
   }
 
@@ -63,7 +65,8 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
   BdnNodeHandle clear_h;
   if ( nff > 0 ) {
     // クロック用の外部入力の生成
-    BdnNode* clock = mNetwork->new_port_input(clock_name);
+    BdnPort* clock_port = mNetwork->new_input_port(clock_name, 1);
+    BdnNode* clock = clock_port->input(0);
     clock_h = BdnNodeHandle(clock, false);
 
     // リセット用の外部入力の生成
@@ -78,7 +81,8 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
       }
     }
     if ( need_clear ) {
-      BdnNode* clear = mNetwork->new_port_input(clear_name);
+      BdnPort* clear_port = mNetwork->new_input_port(clear_name, 1);
+      BdnNode* clear = clear_port->input(0);
       clear_h = BdnNodeHandle(clear, false);
     }
   }
@@ -123,7 +127,8 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
   for (BNodeList::const_iterator p = bnetwork.outputs_begin();
        p != bnetwork.outputs_end(); ++ p) {
     const BNode* bnode = *p;
-    BdnNode* node = mNetwork->new_port_output(bnode->name());
+    BdnPort* port = mNetwork->new_output_port(bnode->name(), 1);
+    BdnNode* node = port->output(0);
     BdnNodeHandle inode_h = make_node(bnode->fanin(0));
     mNetwork->change_output_fanin(node, inode_h);
   }
