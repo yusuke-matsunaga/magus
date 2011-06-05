@@ -1,45 +1,46 @@
-#ifndef YM_BDN_BDNDFF_H
-#define YM_BDN_BDNDFF_H
+#ifndef YM_NETWORKS_CMNDFF_H
+#define YM_NETWORKS_CMNDFF_H
 
-/// @file ym_networks/BdnDff.h
-/// @brief BdnDff のヘッダファイル
+/// @file ym_networks/CmnDff.h
+/// @brief CmnDff のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/cmn_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
-
-class BdnAuxData;
+BEGIN_NAMESPACE_YM_CMN
 
 //////////////////////////////////////////////////////////////////////
-/// @class BdnDff BdnDff.h "ym_networks/BdnDff.h"
+/// @class CmnDff CmnDff.h "ym_networks/CmnDff.h"
 /// @brief D-FFを表すクラス
 //////////////////////////////////////////////////////////////////////
-class BdnDff :
+class CmnDff :
   public DlElem
 {
-  friend class BdnMgrImpl;
+  friend class CmnMgrImpl;
 
 private:
 
   /// @brief コンストラクタ
-  BdnDff();
+  /// @param[in] name 名前
+  /// @param[in] cell セル
+  CmnDff(const string& name,
+	 const CmnDffCell* cell);
 
   /// @brief デストラクタ
-  ~BdnDff();
+  ~CmnDff();
 
 
 public:
 
   /// @brief ID 番号の取得
   /// @return ID 番号を返す．
-  /// @note ID 番号は D-FF の生成時に BdnMgr により自動的に割り振られる．
-  /// @sa BdnMgr
+  /// @note ID 番号は D-FF の生成時に CmnMgr により自動的に割り振られる．
+  /// @sa CmnMgr
   ymuint
   id() const;
 
@@ -47,49 +48,35 @@ public:
   string
   name() const;
 
-  /// @brief データ出力ノードを返す．
-  const BdnNode*
-  output() const;
+  /// @brief 肯定のデータ出力ノードを返す．
+  const CmnNode*
+  output1() const;
 
-  /// @brief データ出力ノードを返す．
-  BdnNode*
-  output();
+  /// @brief 否定のデータ出力ノードを返す．
+  const CmnNode*
+  output2() const;
 
   /// @brief データ入力ノードを返す．
-  const BdnNode*
+  const CmnNode*
   input() const;
 
-  /// @brief データ入力ノードを返す．
-  BdnNode*
-  input();
-
   /// @brief クロックのノードを返す．
-  const BdnNode*
+  const CmnNode*
   clock() const;
 
-  /// @brief クロックのノードを返す．
-  BdnNode*
-  clock();
-
   /// @brief クリア信号のノードを返す．
   /// @note NULL の場合もある．
-  const BdnNode*
+  const CmnNode*
   clear() const;
 
-  /// @brief クリア信号のノードを返す．
-  /// @note NULL の場合もある．
-  BdnNode*
-  clear();
-
   /// @brief プリセット信号のノードを返す．
   /// @note NULL の場合もある．
-  const BdnNode*
+  const CmnNode*
   preset() const;
 
-  /// @brief プリセット信号のノードを返す．
-  /// @note NULL の場合もある．
-  BdnNode*
-  preset();
+  /// @brief 対応するセルを返す．
+  const CmnDffCell*
+  cell() const;
 
 
 private:
@@ -103,23 +90,26 @@ private:
   // 名前
   string mName;
 
-  // データ出力ノード
-  BdnNode* mOutput;
+  // 肯定のデータ出力ノード
+  CmnNode* mOutput1;
+
+  // 否定のデータ出力ノード
+  CmnNode* mOutput2;
 
   // データ入力ノード
-  BdnNode* mInput;
+  CmnNode* mInput;
 
   // クロックノード
-  BdnNode* mClock;
+  CmnNode* mClock;
 
   // クリア信号ノード
-  BdnNode* mClear;
+  CmnNode* mClear;
 
   // プリセット信号ノード
-  BdnNode* mPreset;
+  CmnNode* mPreset;
 
-  // BdnNode に付加するデータ
-  BdnAuxData* mAuxData;
+  // セル
+  const CmnDffCell* mCell;
 
 };
 
@@ -130,11 +120,11 @@ private:
 
 // @brief ID 番号の取得
 // @return ID 番号を返す．
-// @note ID 番号は D-FF の生成時に BdnMgr により自動的に割り振られる．
-// @sa BdnMgr
+// @note ID 番号は D-FF の生成時に CmnMgr により自動的に割り振られる．
+// @sa CmnMgr
 inline
 ymuint
-BdnDff::id() const
+CmnDff::id() const
 {
   return mId;
 }
@@ -142,55 +132,39 @@ BdnDff::id() const
 // @brief 名前を返す．
 inline
 string
-BdnDff::name() const
+CmnDff::name() const
 {
   return mName;
 }
 
-// @brief データ出力ノードを返す．
+// @brief 肯定のデータ出力ノードを返す．
 inline
-const BdnNode*
-BdnDff::output() const
+const CmnNode*
+CmnDff::output1() const
 {
-  return mOutput;
+  return mOutput1;
 }
 
-// @brief データ出力ノードを返す．
+// @brief 否定のデータ出力ノードを返す．
 inline
-BdnNode*
-BdnDff::output()
+const CmnNode*
+CmnDff::output2() const
 {
-  return mOutput;
-}
-
-// @brief データ入力ノードを返す．
-inline
-const BdnNode*
-BdnDff::input() const
-{
-  return mInput;
+  return mOutput2;
 }
 
 // @brief データ入力ノードを返す．
 inline
-BdnNode*
-BdnDff::input()
+const CmnNode*
+CmnDff::input() const
 {
   return mInput;
 }
 
 // @brief クロックのノードを返す．
 inline
-const BdnNode*
-BdnDff::clock() const
-{
-  return mClock;
-}
-
-// @brief クロックのノードを返す．
-inline
-BdnNode*
-BdnDff::clock()
+const CmnNode*
+CmnDff::clock() const
 {
   return mClock;
 }
@@ -198,17 +172,8 @@ BdnDff::clock()
 // @brief クリア信号のノードを返す．
 // @note NULL の場合もある．
 inline
-const BdnNode*
-BdnDff::clear() const
-{
-  return mClear;
-}
-
-// @brief クリア信号のノードを返す．
-// @note NULL の場合もある．
-inline
-BdnNode*
-BdnDff::clear()
+const CmnNode*
+CmnDff::clear() const
 {
   return mClear;
 }
@@ -216,21 +181,20 @@ BdnDff::clear()
 // @brief プリセット信号のノードを返す．
 // @note NULL の場合もある．
 inline
-const BdnNode*
-BdnDff::preset() const
+const CmnNode*
+CmnDff::preset() const
 {
   return mPreset;
 }
 
-// @brief プリセット信号のノードを返す．
-// @note NULL の場合もある．
+// @brief 対応するセルを返す．
 inline
-BdnNode*
-BdnDff::preset()
+const CmnDffCell*
+CmnDff::cell() const
 {
-  return mPreset;
+  return mCell;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_CMN
 
-#endif // YM_BDN_BDNDFF_H
+#endif // YM_NETWORKS_CMNDFF_H

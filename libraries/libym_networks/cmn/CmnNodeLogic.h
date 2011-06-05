@@ -26,7 +26,12 @@ class CmnNodeLogic :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeLogic();
+  /// @param[in] ni 入力数
+  /// @param[in] fanins ファンインの配列
+  /// @param[in] cell セル
+  CmnNodeLogic(ymuint ni,
+	       CmnEdge* fanins,
+	       const Cell* cell);
 
   /// @brief デストラクタ
   virtual

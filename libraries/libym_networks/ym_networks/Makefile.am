@@ -34,7 +34,9 @@ noinst_HEADERS = \
 	BNetIscas89Reader.h \
 	CmnEdge.h \
 	CmnDff.h \
+	CmnDffCell.h \
 	CmnLatch.h \
+	CmnLatchCell.h \
 	CmnMgr.h \
 	CmnNode.h \
 	CmnPort.h \

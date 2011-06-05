@@ -30,7 +30,7 @@ BEGIN_NAMESPACE_YM_CMN
 /// ( @sa input(ymuint id), output(ymuint id) )
 /// セルノードを入力からのトポロジカル順で処理するためには sort()
 /// を用いてソートされたノードのベクタを得る．
-/// @sa CmnEdge CmnNode CmnPort
+/// @sa CmnEdge CmnNode CmnPort CmnDff CmnLatch
 //////////////////////////////////////////////////////////////////////
 class CmnMgr
 {
@@ -55,7 +55,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name 外部インターフェイス情報の取得
+  /// @name 情報の取得
   /// @{
 
   /// @brief モジュール名を得る．
@@ -71,41 +71,41 @@ public:
   const CmnPort*
   port(ymuint pos) const;
 
-  /// @}
-  //////////////////////////////////////////////////////////////////////
+  /// @brief D-FFのIDの最大値 + 1 の取得
+  ymuint
+  max_dff_id() const;
 
+  /// @brief ID番号から D-FF を得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_dff_id() )
+  /// @note 該当するD-FFが無い場合には NULL を返す．
+  const CmnDff*
+  dff(ymuint id) const;
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name 外部インターフェイス情報の設定
-  /// @{
+  /// @brief D-FF数を得る．
+  ymuint
+  dff_num() const;
 
-  /// @brief モジュール名を設定する．
-  void
-  set_name(const string& name);
+  /// @brief D-FFのリストを得る．
+  const CmnDffList&
+  dff_list() const;
 
-  /// @brief ポートを追加する(1ビット版)．
-  /// @param[in] name ポート名
-  /// @param[in] io_node 対応する入出力ノード
-  void
-  add_port(const string& name,
-	   CmnNode* io_node);
+  /// @brief ラッチのIDの最大値 + 1 の取得
+  ymuint
+  max_latch_id() const;
 
-  /// @brief ポートを追加する(ベクタ版)．
-  /// @param[in] name ポート名
-  /// @param[in] io_node_vec 対応する入出力ノードのベクタ
-  void
-  add_port(const string& name,
-	   const vector<CmnNode*>& io_node_vec);
+  /// @brief ID番号からラッチを得る．
+  /// @param[in] id ID番号 ( 0 <= id < max_latch_id() )
+  /// @note 該当するラッチが無い場合には NULL を返す．
+  const CmnLatch*
+  latch(ymuint id) const;
 
-  /// @}
-  //////////////////////////////////////////////////////////////////////
+  /// @brief ラッチ数を得る．
+  ymuint
+  latch_num() const;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name ノード関連の情報の取得
-  /// @{
+  /// @brief ラッチのリストを得る．
+  const CmnLatchList&
+  latch_list() const;
 
   /// @brief ノードIDの最大値 + 1 の取得
   /// @return ノードIDの最大値 + 1 を返す．
@@ -148,23 +148,7 @@ public:
   /// @brief ソートされた論理ノードのリストを得る．
   /// @param[out] node_list
   void
-  sort(vector<CmnNode*>& node_list) const;
-
-  /// @brief DFF数を得る．
-  ymuint
-  dff_num() const;
-
-  /// @brief DFFのリストを得る．
-  const CmnDffList&
-  dff_list() const;
-
-  /// @brief ラッチ数を得る．
-  ymuint
-  latch_num() const;
-
-  /// @brief ラッチのリストを得る．
-  const CmnLatchList&
-  latch_list() const;
+  sort(vector<const CmnNode*>& node_list) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -172,58 +156,58 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name ノードの生成／変更
+  /// @name 情報の設定
   /// @{
 
   /// @brief 空にする．
   void
   clear();
 
+  /// @brief モジュール名を設定する．
+  void
+  set_name(const string& name);
+
+  /// @brief 入力ポートを生成する．
+  /// @param[in] name ポート名
+  /// @param[in] bit_width ビット幅
+  CmnPort*
+  new_input_port(const string& name,
+		 ymuint bit_width);
+
+  /// @brief 出力ポートを生成する．
+  /// @param[in] name ポート名
+  /// @param[in] bit_width ビット幅
+  CmnPort*
+  new_output_port(const string& name,
+		  ymuint bit_width);
+
+  /// @brief ポートを生成する．
+  /// @param[in] name ポート名
+  /// @param[in] iovect ビットごとの方向を指定する配列
+  /// @note iovect の要素の値の意味は以下の通り
+  /// - 0 : なし
+  /// - 1 : 入力のみ
+  /// - 2 : 出力のみ
+  /// - 3 : 入力と出力
+  CmnPort*
+  new_port(const string& name,
+	   const vector<ymuint>& iovect);
+
   /// @brief DFFを作る．
+  /// @param[in] cell セル
+  /// @param[in] name 名前
   /// @return 作成したノードを返す．
   CmnDff*
-  new_dff(const string& name = string());
+  new_dff(const CmnDffCell* cell,
+	  const string& name = string());
 
   /// @brief ラッチを作る．
+  /// @param[in] cell セル
+  /// @param[in] name 名前
   /// @return 作成したノードを返す．
   CmnLatch*
-  new_latch(const string& name = string());
-
-  /// @brief 外部入力を作る．
-  /// @param[in] port ポート
-  /// @param[in] bitpos ビット位置
-  /// @return 作成したノードを返す．
-  /// @note エラー条件は以下の通り
-  ///  - bitpos が port のビット幅を越えている．
-  ///  - port の bitpos にすでにノードがある．
-  CmnNode*
-  new_port_input(CmnPort* port,
-		 ymuint bitpos);
-
-  /// @brief 外部入力とポートを同時に作る．
-  /// @param[in] port_name ポート名
-  /// @return 作成したノードを返す．
-  /// @note ポートのビット幅は1ビットとなる．
-  CmnNode*
-  new_port_input(const string& port_name);
-
-  /// @brief 外部出力ノードを作る．
-  /// @param[in] port ポート
-  /// @param[in] bitpos ビット位置
-  /// @return 作成したノードを返す．
-  /// @note エラー条件は以下の通り
-  ///  - bitpos が port のビット幅を越えている．
-  ///  - port の bitpos にすでにノードがある．
-  CmnNode*
-  new_port_output(CmnPort* port,
-		  ymuint bitpos);
-
-  /// @brief 外部出力ノードとポートを同時にを作る．
-  /// @param[in] port_name ポート名
-  /// @return 作成したノードを返す．
-  /// @note ポートのビット幅は1ビットとなる．
-  CmnNode*
-  new_port_output(const string& port_name);
+  new_latch(const CmnLatchCell* cell,
+	    const string& name = string());
 
   /// @brief 論理ノードを作る．
   /// @param[in] inodes 入力ノードのベクタ
@@ -262,22 +246,6 @@ dump(ostream& s,
 void
 dump_verilog(ostream& s,
 	     const CmnMgr& cngraph);
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief ポートを追加する(1ビット版)．
-// @param[in] name ポート名
-// @param[in] io_node 対応する入出力ノード
-inline
-void
-CmnMgr::add_port(const string& name,
-		 CmnNode* io_node)
-{
-  add_port(name, vector<CmnNode*>(1, io_node));
-}
 
 END_NAMESPACE_YM_CMN
 

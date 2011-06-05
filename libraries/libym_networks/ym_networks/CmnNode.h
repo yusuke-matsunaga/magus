@@ -52,7 +52,7 @@ BEGIN_NAMESPACE_YM_CMN
 class CmnNode :
   public DlElem
 {
-  friend class CmnMgr;
+  friend class CmnMgrImpl;
 
 public:
 
@@ -150,6 +150,35 @@ public:
   bool
   is_logic() const;
 
+  /// @brief ファンイン数を得る．
+  virtual
+  ymuint
+  ni() const;
+
+  /// @brief ファンインのノードを得る．
+  /// @param[in] pos 入力番号
+  /// @return pos 番めのファンインのノード
+  /// @note 該当するファンインがなければ NULL を返す．
+  virtual
+  const CmnNode*
+  fanin(ymuint pos) const;
+
+  /// @brief ファンインの枝を得る．
+  /// @param[in] pos 入力番号
+  /// @return pos 番目の入力の枝
+  /// @note 該当するファンインの枝がなければ NULL を返す．
+  virtual
+  const CmnEdge*
+  fanin_edge(ymuint pos) const;
+
+  /// @brief ファンインの枝を得る．
+  /// @param[in] pos 入力番号
+  /// @return pos 番目の入力の枝
+  /// @note 該当するファンインの枝がなければ NULL を返す．
+  virtual
+  CmnEdge*
+  fanin_edge(ymuint pos);
+
   /// @brief ファンアウト数を得る．
   ymuint
   fanout_num() const;
@@ -209,12 +238,6 @@ public:
   const CmnLatch*
   latch() const;
 
-  /// @brief ファンインのノードを得る．
-  /// @note 出力ノードの場合のみ意味を持つ．
-  virtual
-  const CmnNode*
-  output_fanin() const;
-
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -223,27 +246,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name 論理ノードの情報を取り出す関数
   /// @{
-
-  /// @brief 入力数を得る．
-  virtual
-  ymuint
-  ni() const;
-
-  /// @brief ファンインのノードを得る．
-  /// @param[in] pos 入力番号
-  /// @return pos 番めのファンインのノード
-  /// @note 該当するファンインがなければ NULL を返す．
-  virtual
-  const CmnNode*
-  fanin(ymuint pos) const;
-
-  /// @brief ファンインの枝を得る．
-  /// @param[in] pos 入力番号
-  /// @return pos 番目の入力の枝
-  /// @note 該当するファンインの枝がなければ NULL を返す．
-  virtual
-  const CmnEdge*
-  fanin_edge(ymuint pos) const;
 
   /// @brief セルを得る．
   virtual

@@ -18,6 +18,8 @@ libym_cmn_la_LIBADD = \
 libym_cmn_la_LDFLAGS =
 
 libym_cmn_la_SOURCES = \
+	CmnDffCell.cc \
+	CmnLatchCell.cc \
 	CmnMgr.cc \
 	CmnMgrImpl.h \
 	CmnMgrImpl.cc \

@@ -26,7 +26,8 @@ class CmnNodeLatchOut :
 protected:
 
   /// @brief コンストラクタ
-  CmnNodeLatchOut();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchOut(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual
@@ -65,7 +66,8 @@ class CmnNodeLatchOut1 :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeLatchOut1();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchOut1(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual
@@ -94,7 +96,8 @@ class CmnNodeLatchOut2 :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeLatchOut2();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchOut2(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual

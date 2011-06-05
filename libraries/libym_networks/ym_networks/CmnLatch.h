@@ -1,8 +1,8 @@
-#ifndef YM_BDN_BDNLATCH_H
-#define YM_BDN_BDNLATCH_H
+#ifndef YM_NETWORKS_CMN_CMNLATCH_H
+#define YM_NETWORKS_CMN_CMNLATCH_H
 
-/// @file ym_networks/BdnLatch.h
-/// @brief BdnLatch のヘッダファイル
+/// @file ym_networks/CmnLatch.h
+/// @brief CmnLatch のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -12,34 +12,35 @@
 #include "ym_networks/bdn_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
-
-class BdnAuxData;
+BEGIN_NAMESPACE_YM_CMN
 
 //////////////////////////////////////////////////////////////////////
-/// @class BdnLatch BdnLatch.h "ym_networks/BdnLatch.h"
+/// @class CmnLatch CmnLatch.h "ym_networks/CmnLatch.h"
 /// @brief ラッチを表すクラス
 //////////////////////////////////////////////////////////////////////
-class BdnLatch :
+class CmnLatch :
   public DlElem
 {
-  friend class BdnMgrImpl;
+  friend class CmnMgrImpl;
 
 private:
 
   /// @brief コンストラクタ
-  BdnLatch();
+  /// @param[in] name 名前
+  /// @param[in] cell セル
+  CmnLatch(const string& name,
+	   const CmnLatchCell* cell);
 
   /// @brief デストラクタ
-  ~BdnLatch();
+  ~CmnLatch();
 
 
 public:
 
   /// @brief ID番号の取得
   /// @return ID番号を返す．
-  /// @note ID番号はラッチの生成時に BdnMgr により自動的に割り振られる．
-  /// @sa BdnMgr
+  /// @note ID番号はラッチの生成時に CmnMgr により自動的に割り振られる．
+  /// @sa CmnMgr
   ymuint
   id() const;
 
@@ -47,46 +48,35 @@ public:
   string
   name() const;
 
-  /// @brief データ出力ノードを返す．
-  const BdnNode*
-  output() const;
+  /// @brief 肯定のデータ出力ノードを返す．
+  const CmnNode*
+  output1() const;
 
-  /// @brief データ出力ノードを返す．
-  BdnNode*
-  output();
+  /// @brief 否定のデータ出力ノードを返す．
+  const CmnNode*
+  output2() const;
 
   /// @brief データ入力ノードを返す．
-  const BdnNode*
+  const CmnNode*
   input() const;
 
-  /// @brief データ入力ノードを返す．
-  BdnNode*
-  input();
-
   /// @brief ラッチイネーブルノードを返す．
-  const BdnNode*
+  const CmnNode*
   enable() const;
 
-  /// @brief ラッチイネーブルノードを返す．
-  BdnNode*
-  enable();
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  const CmnNode*
+  clear() const;
 
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  const CmnNode*
+  preset() const;
 
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を変更する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容を設定する．
-  /// @param[in] name 名前
-  /// @param[in] output 出力ノード
-  /// @param[in] input 入力ノード
-  /// @param[in] enable ラッチイネーブルノード
-  void
-  set(const string& name,
-      BdnNode* output,
-      BdnNode* input,
-      BdnNode* enable);
+  /// @brief 対応するセルを返す．
+  const CmnLatchCell*
+  cell() const;
 
 
 private:
@@ -100,17 +90,26 @@ private:
   // 名前
   string mName;
 
-  // データ出力ノード
-  BdnNode* mOutput;
+  // 肯定のデータ出力ノード
+  CmnNode* mOutput1;
+
+  // 否定のデータ出力ノード
+  CmnNode* mOutput2;
 
   // データ入力ノード
-  BdnNode* mInput;
+  CmnNode* mInput;
 
   // ラッチイネーブルノード
-  BdnNode* mEnable;
+  CmnNode* mEnable;
 
-  // BdnNode の付加するデータ
-  BdnAuxData* mAuxData;
+  // クリア信号ノード
+  CmnNode* mClear;
+
+  // プリセット信号ノード
+  CmnNode* mPreset;
+
+  // セル
+  const CmnLatchCell* mCell;
 
 };
 
@@ -121,11 +120,11 @@ private:
 
 // @brief ID番号の取得
 // @return ID番号を返す．
-// @note ID番号はラッチの生成時に BdnMgr により自動的に割り振られる．
-// @sa BdnMgr
+// @note ID番号はラッチの生成時に CmnMgr により自動的に割り振られる．
+// @sa CmnMgr
 inline
 ymuint
-BdnLatch::id() const
+CmnLatch::id() const
 {
   return mId;
 }
@@ -133,59 +132,69 @@ BdnLatch::id() const
 // @brief 名前を返す．
 inline
 string
-BdnLatch::name() const
+CmnLatch::name() const
 {
   return mName;
 }
 
-// @brief データ出力ノードを返す．
+// @brief 肯定のデータ出力ノードを返す．
 inline
-const BdnNode*
-BdnLatch::output() const
+const CmnNode*
+CmnLatch::output1() const
 {
-  return mOutput;
+  return mOutput1;
 }
 
-// @brief データ出力ノードを返す．
+// @brief 否定のデータ出力ノードを返す．
 inline
-BdnNode*
-BdnLatch::output()
+const CmnNode*
+CmnLatch::output2() const
 {
-  return mOutput;
-}
-
-// @brief データ入力ノードを返す．
-inline
-const BdnNode*
-BdnLatch::input() const
-{
-  return mInput;
+  return mOutput2;
 }
 
 // @brief データ入力ノードを返す．
 inline
-BdnNode*
-BdnLatch::input()
+const CmnNode*
+CmnLatch::input() const
 {
   return mInput;
 }
 
 // @brief ラッチイネーブルノードを返す．
 inline
-const BdnNode*
-BdnLatch::enable() const
+const CmnNode*
+CmnLatch::enable() const
 {
   return mEnable;
 }
 
-// @brief ラッチイネーブルノードを返す．
+// @brief クリア信号のノードを返す．
+// @note NULL の場合もある．
 inline
-BdnNode*
-BdnLatch::enable()
+const CmnNode*
+CmnLatch::clear() const
 {
-  return mEnable;
+  return mClear;
 }
 
-END_NAMESPACE_YM_BDN
+// @brief プリセット信号のノードを返す．
+// @note NULL の場合もある．
+inline
+const CmnNode*
+CmnLatch::preset() const
+{
+  return mPreset;
+}
 
-#endif // YM_BDN_BDNLATCH_H
+// @brief 対応するセルを返す．
+inline
+const CmnLatchCell*
+CmnLatch::cell() const
+{
+  return mCell;
+}
+
+END_NAMESPACE_YM_CMN
+
+#endif // YM_NETWORKS_CMN_CMNLATCH_H

@@ -32,7 +32,8 @@ BEGIN_NAMESPACE_YM_CMN
 class CmnEdge :
   public DlElem
 {
-  friend class CmnNode;
+  friend class CmnNodeOutput;
+  friend class CmnNodeLogic;
   friend class CmnMgrImpl;
 
 public:

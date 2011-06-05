@@ -29,8 +29,7 @@ CmnMgr::CmnMgr() :
 CmnMgr::CmnMgr(const CmnMgr& src) :
   mImpl(new CmnMgrImpl)
 {
-  vector<CmnNode*> nodemap;
-  mImpl->copy(*src.mImpl, nodemap);
+  mImpl->copy(*src.mImpl);
 }
 
 // 代入演算子
@@ -39,8 +38,7 @@ CmnMgr::operator=(const CmnMgr& src)
 {
   if ( &src != this ) {
     clear();
-    vector<CmnNode*> nodemap;
-    mImpl->copy(*src.mImpl, nodemap);
+    mImpl->copy(*src.mImpl);
   }
   return *this;
 }
@@ -74,21 +72,64 @@ CmnMgr::port(ymuint pos) const
   return mImpl->port(pos);
 }
 
-// @brief モジュール名を設定する．
-void
-CmnMgr::set_name(const string& name)
+// @brief D-FFのIDの最大値 + 1 の取得
+ymuint
+CmnMgr::max_dff_id() const
 {
-  mImpl->set_name(name);
+  return mImpl->max_dff_id();
 }
 
-// @brief ポートを追加する(ベクタ版)．
-// @param[in] name ポート名
-// @param[in] io_node_vec 対応する入出力ノードのベクタ
-void
-CmnMgr::add_port(const string& name,
-		 const vector<CmnNode*>& io_node_vec)
+// @brief ID番号から D-FF を得る．
+// @param[in] id ID番号 ( 0 <= id < max_dff_id() )
+// @note 該当するD-FFが無い場合には NULL を返す．
+const CmnDff*
+CmnMgr::dff(ymuint id) const
 {
-  mImpl->add_port(name, io_node_vec);
+  return mImpl->dff(id);
+}
+
+// @brief DFF数を得る．
+ymuint
+CmnMgr::dff_num() const
+{
+  return mImpl->dff_num();
+}
+
+// @brief DFFのリストを得る．
+const CmnDffList&
+CmnMgr::dff_list() const
+{
+  return mImpl->dff_list();
+}
+
+// @brief ラッチのIDの最大値 + 1 の取得
+ymuint
+CmnMgr::max_latch_id() const
+{
+  return mImpl->max_latch_id();
+}
+
+// @brief ID番号からラッチを得る．
+// @param[in] id ID番号 ( 0 <= id < max_latch_id() )
+// @note 該当するラッチが無い場合には NULL を返す．
+const CmnLatch*
+CmnMgr::latch(ymuint id) const
+{
+  return mImpl->latch(id);
+}
+
+// @brief ラッチ数を得る．
+ymuint
+CmnMgr::latch_num() const
+{
+  return mImpl->latch_num();
+}
+
+// @brief ラッチのリストを得る．
+const CmnLatchList&
+CmnMgr::latch_list() const
+{
+  return mImpl->latch_list();
 }
 
 // @brief ノードIDの最大値 + 1 の取得
@@ -155,37 +196,9 @@ CmnMgr::logic_list() const
 
 // @brief ソートされたノードのリストを得る．
 void
-CmnMgr::sort(vector<CmnNode*>& node_list) const
+CmnMgr::sort(vector<const CmnNode*>& node_list) const
 {
   mImpl->sort(node_list);
-}
-
-// @brief DFF数を得る．
-ymuint
-CmnMgr::dff_num() const
-{
-  return mImpl->dff_num();
-}
-
-// @brief DFFのリストを得る．
-const CmnDffList&
-CmnMgr::dff_list() const
-{
-  return mImpl->dff_list();
-}
-
-// @brief ラッチ数を得る．
-ymuint
-CmnMgr::latch_num() const
-{
-  return mImpl->latch_num();
-}
-
-// @brief ラッチのリストを得る．
-const CmnLatchList&
-CmnMgr::latch_list() const
-{
-  return mImpl->latch_list();
 }
 
 // 空にする．
@@ -195,68 +208,68 @@ CmnMgr::clear()
   mImpl->clear();
 }
 
+// @brief モジュール名を設定する．
+void
+CmnMgr::set_name(const string& name)
+{
+  mImpl->set_name(name);
+}
+
+// @brief 入力ポートを生成する．
+// @param[in] name ポート名
+// @param[in] bit_width ビット幅
+CmnPort*
+CmnMgr::new_input_port(const string& name,
+		       ymuint bit_width)
+{
+  return mImpl->new_port(name, vector<ymuint>(bit_width, 1));
+}
+
+// @brief 出力ポートを生成する．
+// @param[in] name ポート名
+// @param[in] bit_width ビット幅
+CmnPort*
+CmnMgr::new_output_port(const string& name,
+			ymuint bit_width)
+{
+  return mImpl->new_port(name, vector<ymuint>(bit_width, 2));
+}
+
+// @brief ポートを生成する．
+// @param[in] name ポート名
+// @param[in] iovect ビットごとの方向を指定する配列
+// @note iovect の要素の値の意味は以下の通り
+// - 0 : なし
+// - 1 : 入力のみ
+// - 2 : 出力のみ
+// - 3 : 入力と出力
+CmnPort*
+CmnMgr::new_port(const string& name,
+		 const vector<ymuint>& iovect)
+{
+  return mImpl->new_port(name, iovect);
+}
+
 // @brief DFFを作る．
+// @param[in] cell セル
+// @param[in] name 名前
 // @return 作成したノードを返す．
 CmnDff*
-CmnMgr::new_dff(const string& name)
+CmnMgr::new_dff(const CmnDffCell* cell,
+		const string& name)
 {
-  return mImpl->new_dff(name);
+  return mImpl->new_dff(cell, name);
 }
 
 // @brief ラッチを作る．
+// @param[in] cell セル
+// @param[in] name 名前
 // @return 作成したノードを返す．
 CmnLatch*
-CmnMgr::new_latch(const string& name)
+CmnMgr::new_latch(const CmnLatchCell* cell,
+		  const string& name)
 {
-  return mImpl->new_latch(name);
-}
-
-// @brief 外部入力を作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-CmnNode*
-CmnMgr::new_port_input(CmnPort* port,
-		       ymuint bitpos)
-{
-  return mImpl->new_port_input(port, bitpos);
-}
-
-// @brief 外部入力とポートを同時に作る．
-// @param[in] port_name ポート名
-// @return 作成したノードを返す．
-// @note ポートのビット幅は1ビットとなる．
-CmnNode*
-CmnMgr::new_port_input(const string& port_name)
-{
-  return mImpl->new_port_input(port_name);
-}
-
-// @brief 外部出力ノードを作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-CmnNode*
-CmnMgr::new_port_output(CmnPort* port,
-			ymuint bitpos)
-{
-  return mImpl->new_port_output(port, bitpos);
-}
-
-// @brief 外部出力ノードとポートを同時にを作る．
-// @param[in] port_name ポート名
-// @return 作成したノードを返す．
-// @note ポートのビット幅は1ビットとなる．
-CmnNode*
-CmnMgr::new_port_output(const string& port_name)
-{
-  return mImpl->new_port_output(port_name);
+  return mImpl->new_latch(cell, name);
 }
 
 // @brief 論理ノードを作る．

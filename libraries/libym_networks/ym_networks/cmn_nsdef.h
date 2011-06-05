@@ -90,6 +90,10 @@ class CmnNode;
 
 class CmnEdge;
 
+class CmnDffCell;
+
+class CmnLatchCell;
+
 class CmnDumper;
 class CmnBlifWriter;
 class CmnVerilogWriter;
@@ -140,6 +144,9 @@ using nsCmn::CmnEdge;
 using nsCmn::CmnEdgeList;
 
 using nsCmn::CmnFanoutList;
+
+using nsCmn::CmnDffCell;
+using nsCmn::CmnLatchCell;
 
 using nsCmn::CmnDumper;
 using nsCmn::CmnBlifWriter;

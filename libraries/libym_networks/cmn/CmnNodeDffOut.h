@@ -26,7 +26,8 @@ class CmnNodeDffOut :
 protected:
 
   /// @brief コンストラクタ
-  CmnNodeDffOut();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffOut(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual
@@ -65,7 +66,8 @@ class CmnNodeDffOut1 :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeDffOut1();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffOut1(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual
@@ -94,7 +96,8 @@ class CmnNodeDffOut2 :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeDffOut2();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffOut2(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual

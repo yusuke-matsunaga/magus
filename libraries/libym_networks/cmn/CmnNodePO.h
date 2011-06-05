@@ -26,7 +26,10 @@ class CmnNodePO :
 private:
 
   /// @brief コンストラクタ
-  CmnNodePO();
+  /// @param[in] port 関連するポート
+  /// @param[in] bitpos ポート中の位置
+  CmnNodePO(const CmnPort* port,
+	    ymuint bitpos);
 
   /// @brief デストラクタ
   virtual

@@ -10,6 +10,7 @@
 
 
 #include "ym_networks/CmnNode.h"
+#include "ym_networks/CmnEdge.h"
 
 
 BEGIN_NAMESPACE_YM_CMN
@@ -45,11 +46,34 @@ public:
   bool
   is_output() const;
 
+  /// @brief ファンイン数を得る．
+  virtual
+  ymuint
+  ni() const;
+
   /// @brief ファンインのノードを得る．
-  /// @note 出力ノードの場合のみ意味を持つ．
+  /// @param[in] pos 入力番号
+  /// @return pos 番めのファンインのノード
+  /// @note 該当するファンインがなければ NULL を返す．
   virtual
   const CmnNode*
-  output_fanin() const;
+  fanin(ymuint pos) const;
+
+  /// @brief ファンインの枝を得る．
+  /// @param[in] pos 入力番号
+  /// @return pos 番目の入力の枝
+  /// @note 該当するファンインの枝がなければ NULL を返す．
+  virtual
+  const CmnEdge*
+  fanin_edge(ymuint pos) const;
+
+  /// @brief ファンインの枝を得る．
+  /// @param[in] pos 入力番号
+  /// @return pos 番目の入力の枝
+  /// @note 該当するファンインの枝がなければ NULL を返す．
+  virtual
+  CmnEdge*
+  fanin_edge(ymuint pos);
 
 
 private:
@@ -57,8 +81,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファンインのノード
-  const CmnNode* mFanin;
+  // ファンインの枝
+  CmnEdge mFanin;
 
 };
 

@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_CMN
 //////////////////////////////////////////////////////////////////////
 class CmnPort
 {
-  friend class CmnMgr;
+  friend class CmnMgrImpl;
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -86,10 +86,10 @@ private:
   ymuint32 mBitWidth;
 
   // 入力ノードの配列
-  const CmnNode** mInputArray;
+  CmnNode** mInputArray;
 
   // 出力ノードの配列
-  const CmnNode** mOutputArray;
+  CmnNode** mOutputArray;
 
 };
 

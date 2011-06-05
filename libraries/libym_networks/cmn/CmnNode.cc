@@ -129,6 +129,43 @@ CmnNode::latch() const
   return NULL;
 }
 
+// @brief 入力数を得る．
+ymuint
+CmnNode::ni() const
+{
+  return 0;
+}
+
+// @brief ファンインのノードを得る．
+// @param[in] pos 入力番号
+// @return pos 番めのファンインのノード
+// @note 該当するファンインがなければ NULL を返す．
+const CmnNode*
+CmnNode::fanin(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief ファンインの枝を得る．
+// @param[in] pos 入力番号
+// @return pos 番目の入力の枝
+// @note 該当するファンインの枝がなければ NULL を返す．
+const CmnEdge*
+CmnNode::fanin_edge(ymuint pos) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+// @brief セルを得る．
+const Cell*
+CmnNode::cell() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CmnNodeInput
@@ -164,9 +201,12 @@ CmnNodeInput::is_input() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodePI::CmnNodePI() :
-  mPort(NULL),
-  mBitPos(0),
+// @param[in] port 関連するポート
+// @param[in] bitpos ポート中の位置
+CmnNodePI::CmnNodePI(const CmnPort* port,
+		     ymuint bitpos) :
+  mPort(port),
+  mBitPos(bitpos),
   mAltNode(NULL)
 {
 }
@@ -215,8 +255,9 @@ CmnNodePI::alt_node() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffOut::CmnNodeDffOut() :
-  mDff(NULL)
+// @param[in] dff 親の D-FF
+CmnNodeDffOut::CmnNodeDffOut(CmnDff* dff) :
+  mDff(dff)
 {
 }
 
@@ -239,7 +280,9 @@ CmnNodeDffOut::dff() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffOut1::CmnNodeDffOut1()
+// @param[in] dff 親の D-FF
+CmnNodeDffOut1::CmnNodeDffOut1(CmnDff* dff) :
+  CmnNodeDffOut(dff)
 {
 }
 
@@ -261,7 +304,9 @@ CmnNodeDffOut1::input_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffOut2::CmnNodeDffOut2()
+// @param[in] dff 親の D-FF
+CmnNodeDffOut2::CmnNodeDffOut2(CmnDff* dff) :
+  CmnNodeDffOut(dff)
 {
 }
 
@@ -283,8 +328,9 @@ CmnNodeDffOut2::input_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchOut::CmnNodeLatchOut() :
-  mLatch(NULL)
+// @param[in] latch 親のラッチ
+CmnNodeLatchOut::CmnNodeLatchOut(CmnLatch* latch) :
+  mLatch(latch)
 {
 }
 
@@ -307,7 +353,9 @@ CmnNodeLatchOut::latch() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchOut1::CmnNodeLatchOut1()
+// @param[in] latch 親のラッチ
+CmnNodeLatchOut1::CmnNodeLatchOut1(CmnLatch* latch) :
+  CmnNodeLatchOut(latch)
 {
 }
 
@@ -329,7 +377,9 @@ CmnNodeLatchOut1::input_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchOut2::CmnNodeLatchOut2()
+// @param[in] latch 親のラッチ
+CmnNodeLatchOut2::CmnNodeLatchOut2(CmnLatch* latch) :
+  CmnNodeLatchOut(latch)
 {
 }
 
@@ -351,9 +401,9 @@ CmnNodeLatchOut2::input_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeOutput::CmnNodeOutput() :
-  mFanin(NULL)
+CmnNodeOutput::CmnNodeOutput()
 {
+  mFanin.set_to(this, 0);
 }
 
 // @brief デストラクタ
@@ -375,12 +425,44 @@ CmnNodeOutput::is_output() const
   return true;
 }
 
-// @brief ファンインのノードを得る．
-// @note 出力ノードの場合のみ意味を持つ．
-const CmnNode*
-CmnNodeOutput::output_fanin() const
+// @brief ファンイン数を得る．
+ymuint
+CmnNodeOutput::ni() const
 {
-  return mFanin;
+  return 1;
+}
+
+// @brief ファンインのノードを得る．
+// @param[in] pos 入力番号
+// @return pos 番めのファンインのノード
+// @note 該当するファンインがなければ NULL を返す．
+const CmnNode*
+CmnNodeOutput::fanin(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return mFanin.from();
+}
+
+// @brief ファンインの枝を得る．
+// @param[in] pos 入力番号
+// @return pos 番目の入力の枝
+// @note 該当するファンインの枝がなければ NULL を返す．
+const CmnEdge*
+CmnNodeOutput::fanin_edge(ymuint pos) const
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return &mFanin;
+}
+
+// @brief ファンインの枝を得る．
+// @param[in] pos 入力番号
+// @return pos 番目の入力の枝
+// @note 該当するファンインの枝がなければ NULL を返す．
+CmnEdge*
+CmnNodeOutput::fanin_edge(ymuint pos)
+{
+  assert_cond( pos == 0, __FILE__, __LINE__);
+  return &mFanin;
 }
 
 
@@ -389,9 +471,12 @@ CmnNodeOutput::output_fanin() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodePO::CmnNodePO() :
-  mPort(NULL),
-  mBitPos(0),
+// @param[in] port 関連するポート
+// @param[in] bitpos ポート中の位置
+CmnNodePO::CmnNodePO(const CmnPort* port,
+		     ymuint bitpos) :
+  mPort(port),
+  mBitPos(bitpos),
   mAltNode(NULL)
 {
 }
@@ -440,8 +525,9 @@ CmnNodePO::alt_node() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffIn::CmnNodeDffIn() :
-  mDff(NULL)
+// @param[in] dff 親の D-FF
+CmnNodeDffIn::CmnNodeDffIn(CmnDff* dff) :
+  mDff(dff)
 {
 }
 
@@ -464,7 +550,9 @@ CmnNodeDffIn::dff() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffData::CmnNodeDffData()
+// @param[in] dff 親の D-FF
+CmnNodeDffData::CmnNodeDffData(CmnDff* dff) :
+  CmnNodeDffIn(dff)
 {
 }
 
@@ -486,7 +574,9 @@ CmnNodeDffData::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffClock::CmnNodeDffClock()
+// @param[in] dff 親の D-FF
+CmnNodeDffClock::CmnNodeDffClock(CmnDff* dff) :
+  CmnNodeDffIn(dff)
 {
 }
 
@@ -508,7 +598,9 @@ CmnNodeDffClock::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffClear::CmnNodeDffClear()
+// @param[in] dff 親の D-FF
+CmnNodeDffClear::CmnNodeDffClear(CmnDff* dff) :
+  CmnNodeDffIn(dff)
 {
 }
 
@@ -530,7 +622,9 @@ CmnNodeDffClear::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeDffPreset::CmnNodeDffPreset()
+// @param[in] dff 親の D-FF
+CmnNodeDffPreset::CmnNodeDffPreset(CmnDff* dff) :
+  CmnNodeDffIn(dff)
 {
 }
 
@@ -552,8 +646,9 @@ CmnNodeDffPreset::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchIn::CmnNodeLatchIn() :
-  mLatch(NULL)
+// @param[in] latch 親のラッチ
+CmnNodeLatchIn::CmnNodeLatchIn(CmnLatch* latch) :
+  mLatch(latch)
 {
 }
 
@@ -576,7 +671,9 @@ CmnNodeLatchIn::latch() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchData::CmnNodeLatchData()
+// @param[in] latch 親のラッチ
+CmnNodeLatchData::CmnNodeLatchData(CmnLatch* latch) :
+  CmnNodeLatchIn(latch)
 {
 }
 
@@ -598,7 +695,9 @@ CmnNodeLatchData::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchEnable::CmnNodeLatchEnable()
+// @param[in] latch 親のラッチ
+CmnNodeLatchEnable::CmnNodeLatchEnable(CmnLatch* latch) :
+  CmnNodeLatchIn(latch)
 {
 }
 
@@ -620,7 +719,9 @@ CmnNodeLatchEnable::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchClear::CmnNodeLatchClear()
+// @param[in] latch 親のラッチ
+CmnNodeLatchClear::CmnNodeLatchClear(CmnLatch* latch) :
+  CmnNodeLatchIn(latch)
 {
 }
 
@@ -642,7 +743,9 @@ CmnNodeLatchClear::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLatchPreset::CmnNodeLatchPreset()
+// @param[in] latch 親のラッチ
+CmnNodeLatchPreset::CmnNodeLatchPreset(CmnLatch* latch) :
+  CmnNodeLatchIn(latch)
 {
 }
 
@@ -664,11 +767,16 @@ CmnNodeLatchPreset::output_type() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CmnNodeLogic::CmnNodeLogic() :
-  mNi(0),
-  mFanins(NULL),
-  mCell(NULL)
+CmnNodeLogic::CmnNodeLogic(ymuint ni,
+			   CmnEdge* fanins,
+			   const Cell* cell) :
+  mNi(ni),
+  mFanins(fanins),
+  mCell(cell)
 {
+  for (ymuint i = 0; i < ni; ++ i) {
+    mFanins[i].set_to(this, i);
+  }
 }
 
 // @brief デストラクタ

@@ -26,7 +26,8 @@ class CmnNodeLatchIn :
 protected:
 
   /// @brief コンストラクタ
-  CmnNodeLatchIn();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchIn(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual
@@ -65,7 +66,8 @@ class CmnNodeLatchData :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeLatchData();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchData(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual
@@ -94,7 +96,8 @@ class CmnNodeLatchEnable :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeLatchEnable();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchEnable(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual
@@ -123,7 +126,8 @@ class CmnNodeLatchClear :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeLatchClear();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchClear(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual
@@ -152,7 +156,8 @@ class CmnNodeLatchPreset :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeLatchPreset();
+  /// @param[in] latch 親のラッチ
+  CmnNodeLatchPreset(CmnLatch* latch);
 
   /// @brief デストラクタ
   virtual

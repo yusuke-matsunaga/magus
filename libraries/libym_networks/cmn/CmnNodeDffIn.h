@@ -26,7 +26,8 @@ class CmnNodeDffIn :
 protected:
 
   /// @brief コンストラクタ
-  CmnNodeDffIn();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffIn(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual
@@ -65,7 +66,8 @@ class CmnNodeDffData :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeDffData();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffData(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual
@@ -94,7 +96,8 @@ class CmnNodeDffClock :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeDffClock();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffClock(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual
@@ -123,7 +126,8 @@ class CmnNodeDffClear :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeDffClear();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffClear(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual
@@ -152,7 +156,8 @@ class CmnNodeDffPreset :
 private:
 
   /// @brief コンストラクタ
-  CmnNodeDffPreset();
+  /// @param[in] dff 親の D-FF
+  CmnNodeDffPreset(CmnDff* dff);
 
   /// @brief デストラクタ
   virtual
