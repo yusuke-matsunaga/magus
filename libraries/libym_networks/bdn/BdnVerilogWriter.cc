@@ -104,8 +104,8 @@ dump_port(ostream& s,
   ymuint n = port->bit_width();
   const char* comma = "";
   for (ymuint i = 0; i < n; ++ i) {
-    BdnNode* input = port->input(i);
-    BdnNode* output = port->output(i);
+    const BdnNode* input = port->input(i);
+    const BdnNode* output = port->output(i);
     s << comma;
     comma = ", ";
     if ( input ) {
@@ -144,8 +144,8 @@ BdnVerilogWriter::operator()(ostream& s,
     const BdnPort* port = network.port(i);
     ymuint n = port->bit_width();
     for (ymuint j = 0; j < n; ++ j) {
-      BdnNode* input = port->input(j);
-      BdnNode* output = port->output(j);
+      const BdnNode* input = port->input(j);
+      const BdnNode* output = port->output(j);
       if ( input ) {
 	s << "  input " << node_name(input) << ";" << endl;
       }

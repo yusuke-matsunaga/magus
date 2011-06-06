@@ -54,7 +54,7 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
        p != bnetwork.inputs_end(); ++ p) {
     const BNode* bnode = *p;
     BdnPort* port = mNetwork->new_input_port(bnode->name(), 1);
-    BdnNode* node = port->input(0);
+    BdnNode* node = port->_input(0);
     put_node(bnode, BdnNodeHandle(node, false));
   }
 
@@ -66,7 +66,7 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
   if ( nff > 0 ) {
     // クロック用の外部入力の生成
     BdnPort* clock_port = mNetwork->new_input_port(clock_name, 1);
-    BdnNode* clock = clock_port->input(0);
+    BdnNode* clock = clock_port->_input(0);
     clock_h = BdnNodeHandle(clock, false);
 
     // リセット用の外部入力の生成
@@ -82,7 +82,7 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
     }
     if ( need_clear ) {
       BdnPort* clear_port = mNetwork->new_input_port(clear_name, 1);
-      BdnNode* clear = clear_port->input(0);
+      BdnNode* clear = clear_port->_input(0);
       clear_h = BdnNodeHandle(clear, false);
     }
   }
@@ -105,20 +105,20 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
     dff_array[i] = dff;
 
     // D-FF の出力の登録
-    BdnNode* node = dff->output();
+    BdnNode* node = dff->_output();
     put_node(bnode, BdnNodeHandle(node, false));
 
     // クロック信号の設定
-    BdnNode* dff_clock = dff->clock();
+    BdnNode* dff_clock = dff->_clock();
     mNetwork->change_output_fanin(dff_clock, clock_h);
 
     // リセット(もしくはセット)信号の設定
     if ( has_clear ) {
-      BdnNode* dff_clear = dff->clear();
+      BdnNode* dff_clear = dff->_clear();
       mNetwork->change_output_fanin(dff_clear, clear_h);
     }
     else if ( has_preset ) {
-      BdnNode* dff_preset = dff->preset();
+      BdnNode* dff_preset = dff->_preset();
       mNetwork->change_output_fanin(dff_preset, clear_h);
     }
   }
@@ -128,7 +128,7 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
        p != bnetwork.outputs_end(); ++ p) {
     const BNode* bnode = *p;
     BdnPort* port = mNetwork->new_output_port(bnode->name(), 1);
-    BdnNode* node = port->output(0);
+    BdnNode* node = port->_output(0);
     BdnNodeHandle inode_h = make_node(bnode->fanin(0));
     mNetwork->change_output_fanin(node, inode_h);
   }
@@ -140,7 +140,7 @@ BNetBdnConv::operator()(const BNetwork& bnetwork,
     const BNode* bnode = *p;
     BdnNodeHandle inode_h = make_node(bnode->fanin(0));
     BdnDff* dff = dff_array[i];
-    BdnNode* dff_input = dff->input();
+    BdnNode* dff_input = dff->_input();
     mNetwork->change_output_fanin(dff_input, inode_h);
   }
 

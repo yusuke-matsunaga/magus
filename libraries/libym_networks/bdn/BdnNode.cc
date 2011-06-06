@@ -31,6 +31,31 @@ BdnPort::~BdnPort()
 {
 }
 
+// @brief ビットごとの方向を得る．
+// @param[out] iovect ビットごとの方向を収める配列
+// @note iovect の値の意味は以下の通り
+//  - 0 : なし
+//  - 1 : 入力のみ
+//  - 2 : 出力のみ
+//  - 3 : 入力と出力
+void
+BdnPort::get_iovect(vector<ymuint>& iovect) const
+{
+  ymuint nb = bit_width();
+  iovect.clear();
+  iovect.resize(nb);
+  for (ymuint i = 0; i < nb; ++ i) {
+    ymuint val = 0U;
+    if ( input(i) ) {
+      val |= 1U;
+    }
+    if ( output(i) ) {
+      val |= 2U;
+    }
+    iovect[i] = val;
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス BdnDff

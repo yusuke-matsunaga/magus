@@ -70,6 +70,18 @@ public:
   const CmnNode*
   output(ymuint pos) const;
 
+  /// @brief 入力ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+  /// @note 出力ポートの場合には NULL を返す．
+  CmnNode*
+  _input(ymuint pos);
+
+  /// @brief 出力ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+  /// @note 入力ポートの場合には NULL を返す．
+  CmnNode*
+  _output(ymuint pos);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -128,6 +140,24 @@ CmnPort::input(ymuint pos) const
 // @note 入力ポートの場合には NULL を返す．
 const CmnNode*
 CmnPort::output(ymuint pos) const
+{
+  return mOutputArray[pos];
+}
+
+// @brief 入力ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+// @note 出力ポートの場合には NULL を返す．
+CmnNode*
+CmnPort::_input(ymuint pos)
+{
+  return mInputArray[pos];
+}
+
+// @brief 出力ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+// @note 入力ポートの場合には NULL を返す．
+CmnNode*
+CmnPort::_output(ymuint pos)
 {
   return mOutputArray[pos];
 }

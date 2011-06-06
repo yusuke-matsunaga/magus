@@ -28,10 +28,10 @@ change_test()
   BdnPort* port_c = network.new_input_port("c", 1);
   BdnPort* port_d = network.new_output_port("d", 1);
 
-  BdnNode* a = port_a->input(0);
-  BdnNode* b = port_b->input(0);
-  BdnNode* c = port_c->input(0);
-  BdnNode* d = port_d->output(0);
+  BdnNode* a = port_a->_input(0);
+  BdnNode* b = port_b->_input(0);
+  BdnNode* c = port_c->_input(0);
+  BdnNode* d = port_d->_output(0);
 
   // a & b
   BdnNodeHandle h1 = network.new_and(BdnNodeHandle(a, false),

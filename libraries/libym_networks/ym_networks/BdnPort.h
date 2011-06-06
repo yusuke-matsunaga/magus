@@ -47,17 +47,39 @@ public:
   ymuint
   bit_width() const;
 
+  /// @brief ビットごとの方向を得る．
+  /// @param[out] iovect ビットごとの方向を収める配列
+  /// @note iovect の値の意味は以下の通り
+  ///  - 0 : なし
+  ///  - 1 : 入力のみ
+  ///  - 2 : 出力のみ
+  ///  - 3 : 入力と出力
+  void
+  get_iovect(vector<ymuint>& iovect) const;
+
   /// @brief 入力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
   /// @note 出力ポートの場合には NULL を返す．
-  BdnNode*
+  const BdnNode*
   input(ymuint pos) const;
 
   /// @brief 出力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
   /// @note 入力ポートの場合には NULL を返す．
-  BdnNode*
+  const BdnNode*
   output(ymuint pos) const;
+
+  /// @brief 入力ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+  /// @note 出力ポートの場合には NULL を返す．
+  BdnNode*
+  _input(ymuint pos);
+
+  /// @brief 出力ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+  /// @note 入力ポートの場合には NULL を返す．
+  BdnNode*
+  _output(ymuint pos);
 
 
 private:
@@ -118,7 +140,7 @@ BdnPort::bit_width() const
 // @param[in] pos 位置番号 ( 0 <= pos < bit_width )
 // @note 出力ポートの場合には NULL を返す．
 inline
-BdnNode*
+const BdnNode*
 BdnPort::input(ymuint pos) const
 {
   return mInputArray[pos];
@@ -128,8 +150,28 @@ BdnPort::input(ymuint pos) const
 // @param[in] pos 位置番号 ( 0 <= pos < bit_width )
 // @note 入力ポートの場合には NULL を返す．
 inline
-BdnNode*
+const BdnNode*
 BdnPort::output(ymuint pos) const
+{
+  return mOutputArray[pos];
+}
+
+// @brief 入力ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+// @note 出力ポートの場合には NULL を返す．
+inline
+BdnNode*
+BdnPort::_input(ymuint pos)
+{
+  return mInputArray[pos];
+}
+
+// @brief 出力ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
+// @note 入力ポートの場合には NULL を返す．
+inline
+BdnNode*
+BdnPort::_output(ymuint pos)
 {
   return mOutputArray[pos];
 }

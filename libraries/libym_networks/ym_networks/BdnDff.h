@@ -53,7 +53,7 @@ public:
 
   /// @brief データ出力ノードを返す．
   BdnNode*
-  output();
+  _output();
 
   /// @brief データ入力ノードを返す．
   const BdnNode*
@@ -61,7 +61,7 @@ public:
 
   /// @brief データ入力ノードを返す．
   BdnNode*
-  input();
+  _input();
 
   /// @brief クロックのノードを返す．
   const BdnNode*
@@ -69,7 +69,7 @@ public:
 
   /// @brief クロックのノードを返す．
   BdnNode*
-  clock();
+  _clock();
 
   /// @brief クリア信号のノードを返す．
   /// @note NULL の場合もある．
@@ -79,7 +79,7 @@ public:
   /// @brief クリア信号のノードを返す．
   /// @note NULL の場合もある．
   BdnNode*
-  clear();
+  _clear();
 
   /// @brief プリセット信号のノードを返す．
   /// @note NULL の場合もある．
@@ -89,7 +89,7 @@ public:
   /// @brief プリセット信号のノードを返す．
   /// @note NULL の場合もある．
   BdnNode*
-  preset();
+  _preset();
 
 
 private:
@@ -158,7 +158,7 @@ BdnDff::output() const
 // @brief データ出力ノードを返す．
 inline
 BdnNode*
-BdnDff::output()
+BdnDff::_output()
 {
   return mOutput;
 }
@@ -174,7 +174,7 @@ BdnDff::input() const
 // @brief データ入力ノードを返す．
 inline
 BdnNode*
-BdnDff::input()
+BdnDff::_input()
 {
   return mInput;
 }
@@ -190,7 +190,7 @@ BdnDff::clock() const
 // @brief クロックのノードを返す．
 inline
 BdnNode*
-BdnDff::clock()
+BdnDff::_clock()
 {
   return mClock;
 }
@@ -206,7 +206,7 @@ BdnDff::clear() const
 // @brief クリア信号のノードを返す．
 inline
 BdnNode*
-BdnDff::clear()
+BdnDff::_clear()
 {
   return mClear;
 }
@@ -222,7 +222,7 @@ BdnDff::preset() const
 // @brief プリセット信号のノードを返す．
 inline
 BdnNode*
-BdnDff::preset()
+BdnDff::_preset()
 {
   return mPreset;
 }

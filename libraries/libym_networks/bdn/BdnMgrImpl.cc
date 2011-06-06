@@ -52,27 +52,16 @@ BdnMgrImpl::copy(const BdnMgr& src)
     const BdnPort* src_port = src.port(i);
     ymuint bw = src_port->bit_width();
     vector<ymuint> iovect(bw);
-    for (ymuint j = 0; j < bw; ++ j) {
-      ymuint val = 0U;
-      const BdnNode* src_input = src_port->input(j);
-      if ( src_input ) {
-	val |= 1U;
-      }
-      const BdnNode* src_output = src_port->output(j);
-      if ( src_output ) {
-	val |= 2U;
-      }
-      iovect[j] = val;
-    }
+    src_port->get_iovect(iovect);
     BdnPort* dst_port = new_port(src_port->name(), iovect);
     for (ymuint j = 0; j < bw; ++ j) {
       const BdnNode* src_input = src_port->input(j);
       if ( src_input ) {
-	nodemap[src_input->id()] = dst_port->input(j);
+	nodemap[src_input->id()] = dst_port->_input(j);
       }
       const BdnNode* src_output = src_port->output(j);
       if ( src_output ) {
-	nodemap[src_output->id()] = dst_port->output(j);
+	nodemap[src_output->id()] = dst_port->_output(j);
       }
     }
   }
@@ -85,23 +74,23 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnDff* dst_dff = new_dff(src_dff->name());
 
     const BdnNode* src_output = src_dff->output();
-    BdnNode* dst_output = dst_dff->output();
+    BdnNode* dst_output = dst_dff->_output();
     nodemap[src_output->id()] = dst_output;
 
     const BdnNode* src_input = src_dff->input();
-    BdnNode* dst_input = dst_dff->input();
+    BdnNode* dst_input = dst_dff->_input();
     nodemap[src_input->id()] = dst_input;
 
     const BdnNode* src_clock = src_dff->clock();
-    BdnNode* dst_clock = dst_dff->clock();
+    BdnNode* dst_clock = dst_dff->_clock();
     nodemap[src_clock->id()] = dst_clock;
 
     const BdnNode* src_clear = src_dff->clear();
-    BdnNode* dst_clear = dst_dff->clear();
+    BdnNode* dst_clear = dst_dff->_clear();
     nodemap[src_clear->id()] = dst_clear;
 
     const BdnNode* src_preset = src_dff->preset();
-    BdnNode* dst_preset = dst_dff->preset();
+    BdnNode* dst_preset = dst_dff->_preset();
     nodemap[src_preset->id()] = dst_preset;
   }
 
@@ -113,23 +102,23 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnLatch* dst_latch = new_latch(src_latch->name());
 
     const BdnNode* src_output = src_latch->output();
-    BdnNode* dst_output = dst_latch->output();
+    BdnNode* dst_output = dst_latch->_output();
     nodemap[src_output->id()] = dst_output;
 
     const BdnNode* src_input = src_latch->input();
-    BdnNode* dst_input = dst_latch->input();
+    BdnNode* dst_input = dst_latch->_input();
     nodemap[src_input->id()] = dst_input;
 
     const BdnNode* src_enable = src_latch->enable();
-    BdnNode* dst_enable = dst_latch->enable();
+    BdnNode* dst_enable = dst_latch->_enable();
     nodemap[src_enable->id()] = dst_enable;
 
     const BdnNode* src_clear = src_latch->clear();
-    BdnNode* dst_clear = dst_latch->clear();
+    BdnNode* dst_clear = dst_latch->_clear();
     nodemap[src_clear->id()] = dst_clear;
 
     const BdnNode* src_preset = src_latch->preset();
-    BdnNode* dst_preset = dst_latch->preset();
+    BdnNode* dst_preset = dst_latch->_preset();
     nodemap[src_preset->id()] = dst_preset;
   }
 
@@ -451,11 +440,11 @@ BdnMgrImpl::delete_dff(BdnDff* dff)
 
   mDffList.erase(dff);
 
-  delete_node(dff->output());
-  delete_node(dff->input());
-  delete_node(dff->clock());
-  delete_node(dff->clear());
-  delete_node(dff->preset());
+  delete_node(dff->_output());
+  delete_node(dff->_input());
+  delete_node(dff->_clock());
+  delete_node(dff->_clear());
+  delete_node(dff->_preset());
 }
 
 // @brief ラッチを作る．
@@ -531,11 +520,11 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
 
   mLatchList.erase(latch);
 
-  delete_node(latch->output());
-  delete_node(latch->input());
-  delete_node(latch->enable());
-  delete_node(latch->clear());
-  delete_node(latch->preset());
+  delete_node(latch->_output());
+  delete_node(latch->_input());
+  delete_node(latch->_enable());
+  delete_node(latch->_clear());
+  delete_node(latch->_preset());
 }
 
 // @brief 論理ノードの内容を変更する．

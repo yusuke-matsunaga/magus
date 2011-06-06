@@ -102,17 +102,17 @@ make_io(BdnMgr& bdnetwork,
 {
   MvnNode::tType type = node->type();
   if ( type == MvnNode::kInput ) {
-    BdnNode* input = bdnport->input(dst_bitpos);
+    BdnNode* input = bdnport->_input(dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
   }
   else if ( type == MvnNode::kOutput ) {
-    BdnNode* output = bdnport->output(dst_bitpos);
+    BdnNode* output = bdnport->_output(dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(output, false));
   }
   else if ( type == MvnNode::kInout ) {
-    BdnNode* input = bdnport->input(dst_bitpos);
+    BdnNode* input = bdnport->_input(dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(input, false));
-    BdnNode* output = bdnport->output(dst_bitpos);
+    BdnNode* output = bdnport->_output(dst_bitpos);
     mvnode_map.put(node, src_bitpos, BdnNodeHandle(output, false));
   }
 }
@@ -305,7 +305,7 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       for (ymuint j = 0; j < bw; ++ j) {
 	BdnDff* dff = bdnetwork.new_dff();
 	dff_array[j] = dff;
-	BdnNode* bdnnode = dff->output();
+	BdnNode* bdnnode = dff->_output();
 	mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
       }
       mark[node->id()] = true;
@@ -319,7 +319,7 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       for (ymuint j = 0; j < bw; ++ j) {
 	BdnLatch* latch = bdnetwork.new_latch();
 	latch_array[j] = latch;
-	BdnNode* bdnnode = latch->output();
+	BdnNode* bdnnode = latch->_output();
 	mvnode_map.put(node, j, BdnNodeHandle(bdnnode, false));
       }
       mark[node->id()] = true;
@@ -423,15 +423,15 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       for (ymuint j = 0; j < bw; ++ j) {
 	BdnDff* dff = dff_array[j];
 	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
-	bdnetwork.change_output_fanin(dff->input(), data_ihandle);
-	bdnetwork.change_output_fanin(dff->clock(), clock_ihandle);
+	bdnetwork.change_output_fanin(dff->_input(), data_ihandle);
+	bdnetwork.change_output_fanin(dff->_clock(), clock_ihandle);
 	BdnNodeHandle preset_ihandle = preset_array[j];
 	if ( !preset_ihandle.is_zero() ) {
-	  bdnetwork.change_output_fanin(dff->preset(), preset_ihandle);
+	  bdnetwork.change_output_fanin(dff->_preset(), preset_ihandle);
 	}
 	BdnNodeHandle clear_ihandle = clear_array[j];
 	if ( !clear_ihandle.is_zero() ) {
-	  bdnetwork.change_output_fanin(dff->clear(), clear_ihandle);
+	  bdnetwork.change_output_fanin(dff->_clear(), clear_ihandle);
 	}
       }
     }
@@ -455,8 +455,8 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       for (ymuint j = 0; j < bw; ++ j) {
 	BdnLatch* latch = latch_array[j];
 	BdnNodeHandle data_ihandle = mvnode_map.get(data_src_node, j);
-	bdnetwork.change_output_fanin(latch->input(), data_ihandle);
-	bdnetwork.change_output_fanin(latch->enable(), enable_ihandle);
+	bdnetwork.change_output_fanin(latch->_input(), data_ihandle);
+	bdnetwork.change_output_fanin(latch->_enable(), enable_ihandle);
       }
     }
   }

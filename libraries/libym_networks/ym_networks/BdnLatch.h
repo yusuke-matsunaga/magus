@@ -53,7 +53,7 @@ public:
 
   /// @brief データ出力ノードを返す．
   BdnNode*
-  output();
+  _output();
 
   /// @brief データ入力ノードを返す．
   const BdnNode*
@@ -61,7 +61,7 @@ public:
 
   /// @brief データ入力ノードを返す．
   BdnNode*
-  input();
+  _input();
 
   /// @brief ラッチイネーブルノードを返す．
   const BdnNode*
@@ -69,7 +69,7 @@ public:
 
   /// @brief ラッチイネーブルノードを返す．
   BdnNode*
-  enable();
+  _enable();
 
   /// @brief クリア信号のノードを返す．
   /// @note NULL の場合もある．
@@ -79,7 +79,7 @@ public:
   /// @brief クリア信号のノードを返す．
   /// @note NULL の場合もある．
   BdnNode*
-  clear();
+  _clear();
 
   /// @brief プリセット信号のノードを返す．
   /// @note NULL の場合もある．
@@ -89,7 +89,7 @@ public:
   /// @brief プリセット信号のノードを返す．
   /// @note NULL の場合もある．
   BdnNode*
-  preset();
+  _preset();
 
 
 private:
@@ -175,7 +175,7 @@ BdnLatch::output() const
 // @brief データ出力ノードを返す．
 inline
 BdnNode*
-BdnLatch::output()
+BdnLatch::_output()
 {
   return mOutput;
 }
@@ -191,7 +191,7 @@ BdnLatch::input() const
 // @brief データ入力ノードを返す．
 inline
 BdnNode*
-BdnLatch::input()
+BdnLatch::_input()
 {
   return mInput;
 }
@@ -207,7 +207,7 @@ BdnLatch::enable() const
 // @brief ラッチイネーブルノードを返す．
 inline
 BdnNode*
-BdnLatch::enable()
+BdnLatch::_enable()
 {
   return mEnable;
 }
@@ -223,7 +223,7 @@ BdnLatch::clear() const
 // @brief クリア信号のノードを返す．
 inline
 BdnNode*
-BdnLatch::clear()
+BdnLatch::_clear()
 {
   return mClear;
 }
@@ -239,7 +239,7 @@ BdnLatch::preset() const
 // @brief プリセット信号のノードを返す．
 inline
 BdnNode*
-BdnLatch::preset()
+BdnLatch::_preset()
 {
   return mPreset;
 }

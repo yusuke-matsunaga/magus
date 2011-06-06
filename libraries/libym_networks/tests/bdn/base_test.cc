@@ -40,7 +40,7 @@ base_test()
     return false;
   }
   BdnPort* port0 = network.new_input_port("port0", 1);
-  BdnNode* input0 = port0->input(0);
+  BdnNode* input0 = port0->_input(0);
   if ( network.input_num() != 1 ) {
     cout << "ERROR[new_input_test]: input_num() != 1" << endl;
     return false;
@@ -51,8 +51,8 @@ base_test()
   }
 
   BdnPort* port1 = network.new_input_port("port1", 2);
-  BdnNode* input1_0 = port1->input(0);
-  BdnNode* input1 = port1->input(1);
+  BdnNode* input1_0 = port1->_input(0);
+  BdnNode* input1 = port1->_input(1);
   if ( network.input_num() != 3 ) {
     cout << "ERROR[new_input_test]: input_num() != 3" << endl;
     return false;
