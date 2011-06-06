@@ -8,6 +8,7 @@
 
 
 #include "ym_networks/BdnMgr.h"
+#include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnNodeHandle.h"
 #include "ym_networks/BdnDumper.h"
 
@@ -22,15 +23,15 @@ change_test()
 
   network.set_name("change_test");
 
-  BdnPort* port_a = network.new_port("a", 1);
-  BdnPort* port_b = network.new_port("b", 1);
-  BdnPort* port_c = network.new_port("c", 1);
-  BdnPort* port_d = network.new_port("d", 1);
+  BdnPort* port_a = network.new_input_port("a", 1);
+  BdnPort* port_b = network.new_input_port("b", 1);
+  BdnPort* port_c = network.new_input_port("c", 1);
+  BdnPort* port_d = network.new_output_port("d", 1);
 
-  BdnNode* a = network.new_port_input(port_a, 0);
-  BdnNode* b = network.new_port_input(port_b, 0);
-  BdnNode* c = network.new_port_input(port_c, 0);
-  BdnNode* d = network.new_port_output(port_d, 0);
+  BdnNode* a = port_a->input(0);
+  BdnNode* b = port_b->input(0);
+  BdnNode* c = port_c->input(0);
+  BdnNode* d = port_d->output(0);
 
   // a & b
   BdnNodeHandle h1 = network.new_and(BdnNodeHandle(a, false),
