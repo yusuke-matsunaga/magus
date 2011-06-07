@@ -39,3 +39,6 @@ libym_networks_la_LDFLAGS =
 
 libym_networks_la_SOURCES =
 
+# Dummy C++ source to cause C++ linking.
+nodist_EXTRA_libym_networks_la_SOURCES = dummy.cc
+

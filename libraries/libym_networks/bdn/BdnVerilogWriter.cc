@@ -124,7 +124,7 @@ dump_port(ostream& s,
 END_NONAMESPACE
 
 
-// ブーリアンネットワークをblif形式で表示
+// ブーリアンネットワークを Verilog 形式で表示
 void
 BdnVerilogWriter::operator()(ostream& s,
 			     const BdnMgr& network)
@@ -140,23 +140,31 @@ BdnVerilogWriter::operator()(ostream& s,
   }
   s << ");" << endl;
 
-  for (ymuint i = 0; i < np; ++ i) {
-    const BdnPort* port = network.port(i);
-    ymuint n = port->bit_width();
-    for (ymuint j = 0; j < n; ++ j) {
-      const BdnNode* input = port->input(j);
-      const BdnNode* output = port->output(j);
-      if ( input ) {
-	s << "  input " << node_name(input) << ";" << endl;
-      }
-      else if ( output ) {
-	s << "  output " << node_name(output) << ";" << endl;
-      }
+  const BdnNodeList& input_list = network.input_list();
+  const BdnNodeList& output_list = network.output_list();
+  const BdnDffList& dff_list = network.dff_list();
+  const BdnLatchList& latch_list = network.latch_list();
+  const BdnNodeList& lnode_list = network.lnode_list();
+
+  for (BdnNodeList::const_iterator p = input_list.begin();
+       p != input_list.end(); ++ p) {
+    const BdnNode* node = *p;
+    if ( node->alt_node() ) {
+      s << "  inout";
     }
+    else {
+      s << "  input";
+    }
+    s << " " << node_name(node) << ";" << endl;
   }
 
-  const BdnDffList& dff_list = network.dff_list();
-  const BdnNodeList& lnode_list = network.lnode_list();
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* node = *p;
+    if ( node->alt_node() == NULL ) {
+      s << "  output " << node_name(node) << ";" << endl;
+    }
+  }
 
   for (BdnNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
@@ -227,6 +235,21 @@ BdnVerilogWriter::operator()(ostream& s,
     s << node_name(node) << " <= "
       << inv_to_symbol(i_inv) << node_name(i_node) << ";" << endl
       << "  end" << endl;
+  }
+
+  for (BdnNodeList::const_iterator p = output_list.begin();
+       p != output_list.end(); ++ p) {
+    const BdnNode* node = *p;
+    if ( node->alt_node() ) {
+      node = node->alt_node();
+    }
+    const BdnNode* input = node->fanin0();
+    if ( input ) {
+      string i_str = node_name(input);
+      const char* i_inv = node->fanin0_inv() ? "~" : "";
+      s << "  assign " << node_name(node) << " = "
+	<< i_inv << i_str << ";" << endl;
+    }
   }
 
   for (BdnNodeList::const_iterator p = lnode_list.begin();
