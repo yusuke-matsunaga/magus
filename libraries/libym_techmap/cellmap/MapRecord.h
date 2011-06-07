@@ -13,6 +13,7 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
+#include "ym_networks/cmn_nsdef.h"
 #include "Match.h"
 
 
@@ -45,6 +46,20 @@ public:
   void
   copy(const MapRecord& src);
 
+  /// @brief D-FF のマッチを記録する．
+  /// @param[in] dff D-FF
+  /// @param[in] cell セル
+  void
+  set_dff_match(const BdnDff* dff,
+		const CmnDffCell* cell);
+
+  /// @brief ラッチのマッチを記録する．
+  /// @param[in] latch ラッチ
+  /// @param[in] cell セル
+  void
+  set_latch_match(const BdnLatch* latch,
+		  const CmnLatchCell* cell);
+
   /// @brief マッチを記録する．
   /// @param[in] node 該当のノード
   /// @param[in] inv 極性
@@ -67,12 +82,12 @@ public:
 
   /// @brief マッチを取り出す．
   /// @param[in] node 該当のノード
-  /// @param[in] inv
+  /// @param[in] inv 極性
   const Match&
   get_match(const BdnNode* node,
 	    bool inv);
 
-  /// @brief マッピング結果を CnGraph にセットする．
+  /// @brief マッピング結果を CmnMgr にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] const0_cell 定数0のセル
   /// @param[in] const1_cell 定数1のセル
@@ -81,7 +96,7 @@ public:
   gen_mapgraph(const BdnMgr& sbjgraph,
 	       const Cell* const0_cell,
 	       const Cell* const1_cell,
-	       CnGraph& mapgraph);
+	       CmnMgr& mapgraph);
 
 
 private:
@@ -90,15 +105,48 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 最終結果を作るためのバックトレースを行う．
-  CnNode*
+  CmnNode*
   back_trace(const BdnNode* node,
 	     bool inv,
-	     CnGraph& mapnetwork);
+	     CmnMgr& mapnetwork);
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
 
-  // 内部で使われるデータ構造
+  // D-FF の割り当て情報
+  struct DffInfo
+  {
+    DffInfo()
+    {
+      mCell = NULL;
+    }
+
+    // セル
+    const Cell* mCell;
+
+    // ピンの割り当て情報
+    ymuint mPosArray[6];
+  };
+
+  // ラッチの割り当て情報
+  struct LatchInfo
+  {
+    LatchInfo()
+    {
+      mCell = NULL;
+    }
+
+    // セル
+    const Cell* mCell;
+
+    // ピンの割り当て情報
+    ymuint mPosArray[6];
+  };
+
+  // ノードの割り当て情報
   struct NodeInfo
   {
     NodeInfo()
@@ -114,12 +162,20 @@ private:
     const Cell* mCell;
 
     // マップ結果
-    CnNode* mMapNode;
+    CmnNode* mMapNode;
 
   };
 
 
 private:
+
+  /// @brief D-FF の割り当て情報を取り出す．
+  const CmnDffCell*
+  dff_info(const BdnDff* dff);
+
+  /// @brief ラッチの割り当て情報を取り出す．
+  const CmnLatchCell*
+  latch_info(const BdnLatch* latch);
 
   /// @brief NodeInfo を取り出す．
   NodeInfo&
@@ -132,11 +188,20 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // D-FF の割り当て情報を格納した配列
+  // キーは BdnDff の ID 番号
+  vector<const CmnDffCell*> mDffInfo;
+
+  // ラッチの割り当て情報を格納した配列
+  // キーは BdnLatch の ID 番号
+  vector<const CmnLatchCell*> mLatchInfo;
+
   // 各ノードの極性ごと作業領域を格納した配列
+  // キーは BdnNode の ID 番号
   vector<NodeInfo> mNodeInfo;
 
   // back_trace 中に用いる作業領域
-  vector<CnNode*> mTmpFanins;
+  vector<CmnNode*> mTmpFanins;
 
 };
 

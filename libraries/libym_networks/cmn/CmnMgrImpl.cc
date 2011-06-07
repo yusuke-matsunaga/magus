@@ -352,10 +352,6 @@ CmnMgrImpl::new_port(const string& name,
     }
     port->mInputArray[i] = input;
     port->mOutputArray[i] = output;
-    if ( input && output ) {
-      input->mAltNode = output;
-      output->mAltNode = input;
-    }
   }
   return port;
 }
@@ -531,7 +527,22 @@ CmnMgrImpl::new_logic(const vector<CmnNode*>& inodes,
   CmnNode* node = new (p) CmnNodeLogic(ni, fanins, cell);
   reg_node(node);
   mLogicList.push_back(node);
+
+  for (ymuint i = 0; i < ni; ++ i) {
+    connect(inodes[i], node, i);
+  }
+
   return node;
+}
+
+// @brief 出力ノードのファンインを設定する．
+// @param[in] output 出力ノード
+// @param[in] fanin ファンインのノード
+void
+CmnMgrImpl::set_output_fanin(CmnNode* output,
+			     CmnNode* fanin)
+{
+  connect(fanin, output, 0);
 }
 
 // @brief D-FFセルを登録する．
@@ -642,7 +653,7 @@ CmnMgrImpl::reg_node(CmnNode* node)
   int id = mNodeItvlMgr.avail_num();
   mNodeItvlMgr.erase(id);
   node->mId = id;
-  if ( mNodeArray.size() < node->id() ) {
+  if ( mNodeArray.size() <= node->id() ) {
     mNodeArray.resize(node->id() + 1, NULL);
   }
   mNodeArray[node->id()] = node;
@@ -706,7 +717,7 @@ CmnMgrImpl::connect(CmnNode* from,
 {
   // CmnNode::mFaoutList を変更するのはここだけ
 
-  CmnEdge* edge = to->fanin_edge(pos);
+  CmnEdge* edge = to->_fanin_edge(pos);
   CmnNode* old_from = edge->from();
   if ( old_from ) {
     old_from->mFanoutList.erase(edge);
@@ -715,6 +726,46 @@ CmnMgrImpl::connect(CmnNode* from,
   if ( from ) {
     from->mFanoutList.push_back(edge);
   }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CmnDff
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] cell セル
+CmnDff::CmnDff(const string& name,
+	       const CmnDffCell* cell) :
+  mName(name),
+  mCell(cell)
+{
+}
+
+// @brief デストラクタ
+CmnDff::~CmnDff()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CmnLatch
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] cell セル
+CmnLatch::CmnLatch(const string& name,
+		   const CmnLatchCell* cell) :
+  mName(name),
+  mCell(cell)
+{
+}
+
+// @brief デストラクタ
+CmnLatch::~CmnLatch()
+{
 }
 
 END_NAMESPACE_YM_CMN

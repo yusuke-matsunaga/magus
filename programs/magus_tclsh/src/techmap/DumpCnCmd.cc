@@ -11,6 +11,7 @@
 
 #include "DumpCnCmd.h"
 #include "ym_tclpp/TclPopt.h"
+#include "ym_networks/CmnDumper.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -49,7 +50,9 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
   bool verilog = mPoptVerilog->is_specified();
   bool spice = mPoptSpice->is_specified();
 
+#if 0
   try {
+#endif
     ostream* outp = &cout;
     ofstream ofs;
     if ( objc == 2 ) {
@@ -60,16 +63,19 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
       }
       outp = &ofs;
     }
+#if 0
     if ( verilog ) {
-      dump_verilog(*outp, cngraph());
-    }
-    else if ( spice ) {
-      dump_spice(*outp, cngraph());
+      dump_verilog(*outp, cmnmgr());
     }
     else {
-      dump(*outp, cngraph());
+      dump(*outp, cmnmgr());
     }
+#else
+    CmnDumper dumper;
+    dumper.dump(*outp, cmnmgr());
+#endif
     return TCL_OK;
+#if 0
   }
   catch ( AssertError x ) {
     cerr << x << endl;
@@ -78,6 +84,7 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
+#endif
 
   return TCL_OK;
 }

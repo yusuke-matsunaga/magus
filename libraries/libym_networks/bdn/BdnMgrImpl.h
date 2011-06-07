@@ -182,6 +182,49 @@ public:
 
 public:
 
+  /// @brief AND のバランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  make_and_tree(BdnNode* node,
+		const vector<BdnNodeHandle>& node_list);
+
+  /// @brief OR のバランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  make_or_tree(BdnNode* node,
+	       const vector<BdnNodeHandle>& node_list);
+
+  /// @brief XOR のバランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  BdnNodeHandle
+  make_xor_tree(BdnNode* node,
+		const vector<BdnNodeHandle>& node_list);
+
+  /// @brief バランス木を作る．
+  /// @param[in] node 根のノード
+  /// @param[in] fcode 機能コード
+  /// @param[in] start 開始位置
+  /// @param[in] num 要素数
+  /// @param[in] node_list 入力のノードのリスト
+  /// @note node が NULL の場合，新しいノードを確保する．
+  /// @note fcode の各ビットの意味は以下のとおり，
+  ///  - 0bit: ファンイン0の反転属性
+  ///  - 1bit: ファンイン1の反転属性
+  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
+  ///  - 3bit: 出力の反転属性
+  BdnNodeHandle
+  make_tree(BdnNode* node,
+	    ymuint fcode,
+	    ymuint start,
+	    ymuint num,
+	    const vector<BdnNodeHandle>& node_list);
+
   /// @brief 論理ノードの内容を設定する．
   /// @param[in] node 設定するノード
   /// @param[in] fcode 機能コード
@@ -318,6 +361,64 @@ private:
   // 最大レベル (最下位ビットは valid フラグ)
   mutable
   ymuint32 mLevel;
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // new_logic 用の定数
+  //////////////////////////////////////////////////////////////////////
+
+  static
+  const ymuint I0_BIT  = 1U;
+  static
+  const ymuint I1_BIT  = 2U;
+  static
+  const ymuint AND_BIT = 0U;
+  static
+  const ymuint XOR_BIT = 4U;
+  static
+  const ymuint O_BIT   = 8U;
+
+  static
+  const ymuint AND_00  = AND_BIT;
+  static
+  const ymuint AND_01  = AND_BIT | I0_BIT;
+  static
+  const ymuint AND_10  = AND_BIT | I1_BIT;
+  static
+  const ymuint AND_11  = AND_BIT | I0_BIT | I1_BIT;
+
+  static
+  const ymuint NAND_00 = AND_00 | O_BIT;
+  static
+  const ymuint NAND_01 = AND_01 | O_BIT;
+  static
+  const ymuint NAND_10 = AND_10 | O_BIT;
+  static
+  const ymuint NAND_11 = AND_11 | O_BIT;
+
+  static
+  const ymuint OR_00   = NAND_11;
+  static
+  const ymuint OR_01   = NAND_10;
+  static
+  const ymuint OR_10   = NAND_01;
+  static
+  const ymuint OR_11   = NAND_00;
+
+  static
+  const ymuint NOR_00  = OR_00 | O_BIT;
+  static
+  const ymuint NOR_01  = OR_01 | O_BIT;
+  static
+  const ymuint NOR_10  = OR_10 | O_BIT;
+  static
+  const ymuint NOR_11  = OR_11 | O_BIT;
+
+  static
+  const ymuint XOR     = XOR_BIT;
+
+  static
+  const ymuint XNOR    = XOR_BIT | O_BIT;
 
 };
 
@@ -478,6 +579,42 @@ const BdnNodeList&
 BdnMgrImpl::lnode_list() const
 {
   return mLnodeList;
+}
+
+// @brief AND のバランス木を作る．
+// @param[in] node 根のノード
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+inline
+BdnNodeHandle
+BdnMgrImpl::make_and_tree(BdnNode* node,
+			  const vector<BdnNodeHandle>& node_list)
+{
+  return make_tree(node, AND_00, 0, node_list.size(), node_list);
+}
+
+// @brief OR のバランス木を作る．
+// @param[in] node 根のノード
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+inline
+BdnNodeHandle
+BdnMgrImpl::make_or_tree(BdnNode* node,
+			 const vector<BdnNodeHandle>& node_list)
+{
+  return make_tree(node, OR_00, 0, node_list.size(), node_list);
+}
+
+// @brief XOR のバランス木を作る．
+// @param[in] node 根のノード
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+inline
+BdnNodeHandle
+BdnMgrImpl::make_xor_tree(BdnNode* node,
+			  const vector<BdnNodeHandle>& node_list)
+{
+  return make_tree(node, XOR, 0, node_list.size(), node_list);
 }
 
 END_NAMESPACE_YM_BDN

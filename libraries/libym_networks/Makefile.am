@@ -26,6 +26,7 @@ noinst_LTLIBRARIES = libym_networks.la
 libym_networks_la_LIBADD = \
 	bdn/libym_bdn.la \
 	bnet/libym_bnet.la \
+	cmn/libym_cmn.la \
 	mvn/libym_mvn.la \
 	tgnet/libym_tgnet.la \
 	conv_blif_bnet/libym_conv_blif_bnet.la \

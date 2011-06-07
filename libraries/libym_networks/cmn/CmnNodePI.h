@@ -75,9 +75,6 @@ private:
   // ポート中のビット位置
   ymuint32 mBitPos;
 
-  // 相方のノード
-  const CmnNode* mAltNode;
-
 };
 
 END_NAMESPACE_YM_CMN

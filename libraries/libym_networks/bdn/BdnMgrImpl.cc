@@ -527,6 +527,40 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
   delete_node(latch->_preset());
 }
 
+// @brief バランス木を作る．
+// @param[in] node 根のノード
+// @param[in] fcode 機能コード
+// @param[in] start 開始位置
+// @param[in] num 要素数
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgrImpl::make_tree(BdnNode* node,
+		      ymuint fcode,
+		      ymuint start,
+		      ymuint num,
+		      const vector<BdnNodeHandle>& node_list)
+{
+  switch ( num ) {
+  case 0:
+    assert_not_reached(__FILE__, __LINE__);
+
+  case 1:
+    return node_list[start];
+
+  case 2:
+    return set_logic(node, fcode, node_list[start], node_list[start + 1]);
+
+  default:
+    break;
+  }
+
+  ymuint nh = num / 2;
+  BdnNodeHandle l = make_tree(NULL, fcode, start, nh, node_list);
+  BdnNodeHandle r = make_tree(NULL, fcode, start + nh, num - nh, node_list);
+  return set_logic(node, fcode, l, r);
+}
+
 // @brief 論理ノードの内容を変更する．
 // @param[in] node 変更対象の論理ノード
 // @param[in] new_handle 設定する新しいハンドル

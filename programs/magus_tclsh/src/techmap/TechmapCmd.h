@@ -13,7 +13,7 @@
 
 #include "MagCmd.h"
 #include "ym_techmap/CellMap.h"
-#include "ym_techmap/CnGraph.h"
+#include "ym_networks/CmnMgr.h"
 
 
 /// @brief techmap 用の名前空間の開始
@@ -39,7 +39,7 @@ struct TechmapData
   CellMap mCellMap;
 
   // セルネットワーク
-  CnGraph mCnGraph;
+  CmnMgr mCmnMgr;
 
 };
 
@@ -69,8 +69,8 @@ protected:
   techmap();
 
   /// @brief セルネットワークを得る．
-  CnGraph&
-  cngraph();
+  CmnMgr&
+  cmnmgr();
 
 
 private:

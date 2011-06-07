@@ -48,6 +48,10 @@ public:
   string
   name() const;
 
+  /// @brief 対応するセルを返す．
+  const CmnDffCell*
+  cell() const;
+
   /// @brief 肯定のデータ出力ノードを返す．
   const CmnNode*
   output1() const;
@@ -74,9 +78,31 @@ public:
   const CmnNode*
   preset() const;
 
-  /// @brief 対応するセルを返す．
-  const CmnDffCell*
-  cell() const;
+  /// @brief 肯定のデータ出力ノードを返す．
+  CmnNode*
+  _output1();
+
+  /// @brief 否定のデータ出力ノードを返す．
+  CmnNode*
+  _output2();
+
+  /// @brief データ入力ノードを返す．
+  CmnNode*
+  _input();
+
+  /// @brief クロックのノードを返す．
+  CmnNode*
+  _clock();
+
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  CmnNode*
+  _clear();
+
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  CmnNode*
+  _preset();
 
 
 private:
@@ -89,6 +115,9 @@ private:
 
   // 名前
   string mName;
+
+  // セル
+  const CmnDffCell* mCell;
 
   // 肯定のデータ出力ノード
   CmnNode* mOutput1;
@@ -107,9 +136,6 @@ private:
 
   // プリセット信号ノード
   CmnNode* mPreset;
-
-  // セル
-  const CmnDffCell* mCell;
 
 };
 
@@ -135,6 +161,14 @@ string
 CmnDff::name() const
 {
   return mName;
+}
+
+// @brief 対応するセルを返す．
+inline
+const CmnDffCell*
+CmnDff::cell() const
+{
+  return mCell;
 }
 
 // @brief 肯定のデータ出力ノードを返す．
@@ -187,12 +221,54 @@ CmnDff::preset() const
   return mPreset;
 }
 
-// @brief 対応するセルを返す．
+// @brief 肯定のデータ出力ノードを返す．
 inline
-const CmnDffCell*
-CmnDff::cell() const
+CmnNode*
+CmnDff::_output1()
 {
-  return mCell;
+  return mOutput1;
+}
+
+// @brief 否定のデータ出力ノードを返す．
+inline
+CmnNode*
+CmnDff::_output2()
+{
+  return mOutput2;
+}
+
+// @brief データ入力ノードを返す．
+inline
+CmnNode*
+CmnDff::_input()
+{
+  return mInput;
+}
+
+// @brief クロックのノードを返す．
+inline
+CmnNode*
+CmnDff::_clock()
+{
+  return mClock;
+}
+
+// @brief クリア信号のノードを返す．
+// @note NULL の場合もある．
+inline
+CmnNode*
+CmnDff::_clear()
+{
+  return mClear;
+}
+
+// @brief プリセット信号のノードを返す．
+// @note NULL の場合もある．
+inline
+CmnNode*
+CmnDff::_preset()
+{
+  return mPreset;
 }
 
 END_NAMESPACE_YM_CMN

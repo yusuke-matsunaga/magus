@@ -179,6 +179,7 @@ CmnEdge::to_pos() const
 
 // @brief from ノードをセットする．
 // @param[in] from 入力元のノード
+inline
 void
 CmnEdge::set_from(CmnNode* from)
 {

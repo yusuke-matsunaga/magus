@@ -43,10 +43,10 @@ TechmapCmd::techmap()
 }
 
 // @brief セルネットワークを得る．
-CnGraph&
-TechmapCmd::cngraph()
+CmnMgr&
+TechmapCmd::cmnmgr()
 {
-  return mData->mCnGraph;
+  return mData->mCmnMgr;
 }
 
 END_NAMESPACE_MAGUS_TECHMAP

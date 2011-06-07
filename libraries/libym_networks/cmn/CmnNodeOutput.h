@@ -73,7 +73,7 @@ public:
   /// @note 該当するファンインの枝がなければ NULL を返す．
   virtual
   CmnEdge*
-  fanin_edge(ymuint pos);
+  _fanin_edge(ymuint pos);
 
 
 private:

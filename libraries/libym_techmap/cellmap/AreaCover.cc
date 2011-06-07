@@ -9,7 +9,7 @@
 
 #include "AreaCover.h"
 #include "ym_networks/BdnMgr.h"
-#include "ym_techmap/CnGraph.h"
+#include "ym_networks/CmnMgr.h"
 #include "ym_cell/Cell.h"
 #include "CellMgr.h"
 #include "PatMgr.h"
@@ -39,12 +39,11 @@ AreaCover::~AreaCover()
 // @brief 面積最小化マッピングを行う．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cell_mgr セルを管理するオブジェクト
-// @param[in] pat_mgr パタングラフを管理するオブジェクト
 // @param[out] mapnetwork マッピング結果
 void
 AreaCover::operator()(const BdnMgr& sbjgraph,
 		      const CellMgr& cell_mgr,
-		      CnGraph& mapnetwork)
+		      CmnMgr& mapnetwork)
 {
   MapRecord maprec;
 
@@ -83,11 +82,24 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
+    assert_cond( node->is_input(), __FILE__, __LINE__);
     double& p_cost = cost(node, false);
-    p_cost = 0.0;
     double& n_cost = cost(node, true);
-    n_cost = DBL_MAX;
-    add_inv(node, true, inv_func, maprec);
+    switch ( node->input_type() ) {
+    case BdnNode::kPRIMARY_INPUT:
+      // 外部入力の場合，肯定の極性のみが利用可能
+      p_cost = 0.0;
+      n_cost = DBL_MAX;
+      add_inv(node, true, inv_func, maprec);
+      break;
+
+    case BdnNode::kDFF_OUTPUT:
+    case BdnNode::kLATCH_OUTPUT:
+      // DFFとラッチの場合，肯定，否定のどちらの極性も利用可能
+      p_cost = 0.0;
+      n_cost = 0.0;
+      break;
+    }
   }
 
   // 論理ノードのコストを入力側から計算
@@ -98,7 +110,6 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   for (vector<BdnNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
     const BdnNode* node = *p;
-
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
     p_cost = DBL_MAX;
@@ -140,15 +151,17 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	    mLeafNum[c_match.leaf_node(i)->id()] = -1;
 	  }
 
+	  double leaf_cost = 0.0;
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    const BdnNode* leaf_node = c_match.leaf_node(i);
+	    bool leaf_inv = c_match.leaf_inv(i);
+	    leaf_cost += cost(leaf_node, leaf_inv) * mWeight[i];
+	  }
+
 	  ymuint nc = func.cell_num();
 	  for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
 	    const Cell* cell = func.cell(c_pos);
-	    double cur_cost = cell->area().value();
-	    for (ymuint i = 0; i < ni; ++ i) {
-	      const BdnNode* leaf_node = c_match.leaf_node(i);
-	      bool leaf_inv = c_match.leaf_inv(i);
-	      cur_cost += cost(leaf_node, leaf_inv) * mWeight[i];
-	    }
+	    double cur_cost = cell->area().value() + leaf_cost;
 	    if ( c_cost >= cur_cost ) {
 	      c_cost = cur_cost;
 	      maprec.set_match(node, root_inv, c_match, cell);
@@ -189,16 +202,19 @@ AreaCover::add_inv(const BdnNode* node,
   double alt_cost = cost(node, !inv);
   ymuint nc = inv_func.cell_num();
   const Cell* inv_cell = NULL;
+  double min_cost = DBL_MAX;
   for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
     const Cell* cell = inv_func.cell(c_pos);
     double cost = cell->area().value();
-    cost += alt_cost;
-    if ( cur_cost > cost ) {
-      cur_cost = cost;
+    if ( min_cost > cost ) {
+      min_cost = cost;
       inv_cell = cell;
     }
   }
-  if ( inv_cell ) {
+  assert_cond( inv_cell, __FILE__, __LINE__);
+  min_cost += alt_cost;
+  if ( cur_cost > min_cost ) {
+    cur_cost = min_cost;
     maprec.set_inv_match(node, inv, inv_cell);
   }
 }

@@ -59,7 +59,7 @@ CellMap::dump_library(ostream& s,
 void
 CellMap::area_map(const BdnMgr& sbjgraph,
 		  ymuint mode,
-		  CnGraph& mapnetwork)
+		  CmnMgr& mapnetwork)
 {
   AreaCover area_cover;
 

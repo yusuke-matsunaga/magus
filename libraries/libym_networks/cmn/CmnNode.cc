@@ -10,6 +10,7 @@
 
 
 #include "ym_networks/CmnNode.h"
+#include "ym_networks/CmnPort.h"
 #include "ym_networks/CmnEdge.h"
 
 #include "CmnNodeInput.h"
@@ -158,6 +159,17 @@ CmnNode::fanin_edge(ymuint pos) const
   return NULL;
 }
 
+// @brief ファンインの枝を得る．
+// @param[in] pos 入力番号
+// @return pos 番目の入力の枝
+// @note 該当するファンインの枝がなければ NULL を返す．
+CmnEdge*
+CmnNode::_fanin_edge(ymuint pos)
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
 // @brief セルを得る．
 const Cell*
 CmnNode::cell() const
@@ -206,8 +218,7 @@ CmnNodeInput::is_input() const
 CmnNodePI::CmnNodePI(const CmnPort* port,
 		     ymuint bitpos) :
   mPort(port),
-  mBitPos(bitpos),
-  mAltNode(NULL)
+  mBitPos(bitpos)
 {
 }
 
@@ -246,7 +257,7 @@ CmnNodePI::port_bitpos() const
 const CmnNode*
 CmnNodePI::alt_node() const
 {
-  return mAltNode;
+  return mPort->output(mBitPos);
 }
 
 
@@ -459,7 +470,7 @@ CmnNodeOutput::fanin_edge(ymuint pos) const
 // @return pos 番目の入力の枝
 // @note 該当するファンインの枝がなければ NULL を返す．
 CmnEdge*
-CmnNodeOutput::fanin_edge(ymuint pos)
+CmnNodeOutput::_fanin_edge(ymuint pos)
 {
   assert_cond( pos == 0, __FILE__, __LINE__);
   return &mFanin;
@@ -476,8 +487,7 @@ CmnNodeOutput::fanin_edge(ymuint pos)
 CmnNodePO::CmnNodePO(const CmnPort* port,
 		     ymuint bitpos) :
   mPort(port),
-  mBitPos(bitpos),
-  mAltNode(NULL)
+  mBitPos(bitpos)
 {
 }
 
@@ -516,7 +526,7 @@ CmnNodePO::port_bitpos() const
 const CmnNode*
 CmnNodePO::alt_node() const
 {
-  return mAltNode;
+  return mPort->input(mBitPos);
 }
 
 
@@ -821,6 +831,16 @@ CmnNodeLogic::fanin(ymuint pos) const
 // @note 該当するファンインの枝がなければ NULL を返す．
 const CmnEdge*
 CmnNodeLogic::fanin_edge(ymuint pos) const
+{
+  return &mFanins[pos];
+}
+
+// @brief ファンインの枝を得る．
+// @param[in] pos 入力番号
+// @return pos 番目の入力の枝
+// @note 該当するファンインの枝がなければ NULL を返す．
+CmnEdge*
+CmnNodeLogic::_fanin_edge(ymuint pos)
 {
   return &mFanins[pos];
 }

@@ -11,6 +11,7 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_networks/BdnNode.h"
+#include "ym_networks/cmn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -43,7 +44,7 @@ public:
   void
   operator()(const BdnMgr& sbjgraph,
 	     const CellMgr& cell_mgr,
-	     CnGraph& mapnetwork);
+	     CmnMgr& mapnetwork);
 
 
 private:

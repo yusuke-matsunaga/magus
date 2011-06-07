@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/cmn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CMN
@@ -48,6 +48,10 @@ public:
   string
   name() const;
 
+  /// @brief 対応するセルを返す．
+  const CmnLatchCell*
+  cell() const;
+
   /// @brief 肯定のデータ出力ノードを返す．
   const CmnNode*
   output1() const;
@@ -74,9 +78,31 @@ public:
   const CmnNode*
   preset() const;
 
-  /// @brief 対応するセルを返す．
-  const CmnLatchCell*
-  cell() const;
+  /// @brief 肯定のデータ出力ノードを返す．
+  CmnNode*
+  _output1();
+
+  /// @brief 否定のデータ出力ノードを返す．
+  CmnNode*
+  _output2();
+
+  /// @brief データ入力ノードを返す．
+  CmnNode*
+  _input();
+
+  /// @brief ラッチイネーブルノードを返す．
+  CmnNode*
+  _enable();
+
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  CmnNode*
+  _clear();
+
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  CmnNode*
+  _preset();
 
 
 private:
@@ -137,6 +163,14 @@ CmnLatch::name() const
   return mName;
 }
 
+// @brief 対応するセルを返す．
+inline
+const CmnLatchCell*
+CmnLatch::cell() const
+{
+  return mCell;
+}
+
 // @brief 肯定のデータ出力ノードを返す．
 inline
 const CmnNode*
@@ -187,12 +221,54 @@ CmnLatch::preset() const
   return mPreset;
 }
 
-// @brief 対応するセルを返す．
+// @brief 肯定のデータ出力ノードを返す．
 inline
-const CmnLatchCell*
-CmnLatch::cell() const
+CmnNode*
+CmnLatch::_output1()
 {
-  return mCell;
+  return mOutput1;
+}
+
+// @brief 否定のデータ出力ノードを返す．
+inline
+CmnNode*
+CmnLatch::_output2()
+{
+  return mOutput2;
+}
+
+// @brief データ入力ノードを返す．
+inline
+CmnNode*
+CmnLatch::_input()
+{
+  return mInput;
+}
+
+// @brief ラッチイネーブルノードを返す．
+inline
+CmnNode*
+CmnLatch::_enable()
+{
+  return mEnable;
+}
+
+// @brief クリア信号のノードを返す．
+// @note NULL の場合もある．
+inline
+CmnNode*
+CmnLatch::_clear()
+{
+  return mClear;
+}
+
+// @brief プリセット信号のノードを返す．
+// @note NULL の場合もある．
+inline
+CmnNode*
+CmnLatch::_preset()
+{
+  return mPreset;
 }
 
 END_NAMESPACE_YM_CMN

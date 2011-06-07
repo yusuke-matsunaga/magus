@@ -301,6 +301,16 @@ CmnMgr::new_logic(const vector<CmnNode*>& inodes,
   return mImpl->new_logic(inodes, cell);
 }
 
+// @brief 出力ノードのファンインを設定する．
+// @param[in] output 出力ノード
+// @param[in] fanin ファンインのノード
+void
+CmnMgr::set_output_fanin(CmnNode* output,
+			 CmnNode* fanin)
+{
+  mImpl->set_output_fanin(output, fanin);
+}
+
 // @brief D-FFセルを登録する．
 // @param[in] cell 対象のセル．
 // @param[in] pos_array ピン情報の配列

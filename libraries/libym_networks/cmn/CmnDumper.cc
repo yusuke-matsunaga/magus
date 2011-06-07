@@ -21,6 +21,16 @@
 
 BEGIN_NAMESPACE_YM_CMN
 
+// @brief コンストラクタ
+CmnDumper::CmnDumper()
+{
+}
+
+// @brief デストラクタ
+CmnDumper::~CmnDumper()
+{
+}
+
 void
 CmnDumper::dump(ostream& s,
 		const CmnMgr& network)
@@ -127,6 +137,7 @@ CmnDumper::dump(ostream& s,
   }
 #endif
 
+#if 0
   const CmnNodeList& logic_list = network.logic_list();
   for (CmnNodeList::const_iterator p = logic_list.begin();
        p != logic_list.end(); ++ p) {
@@ -143,6 +154,26 @@ CmnDumper::dump(ostream& s,
     }
     s << ")" << endl;
   }
+#else
+  vector<const CmnNode*> node_list;
+  network.sort(node_list);
+  for (vector<const CmnNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    const CmnNode* node = *p;
+    const Cell* cell = node->cell();
+    s << "CELL(" << node->id_str() << ") = "
+      << cell->name() << "(";
+    const char* comma = "";
+    ymuint ni = node->ni();
+    for (ymuint i = 0; i < ni; ++ i) {
+      const CmnNode* inode = node->fanin(i);
+      s << comma << inode->id_str();
+      comma = ", ";
+    }
+    s << ")" << endl;
+  }
+
+#endif
 }
 
 

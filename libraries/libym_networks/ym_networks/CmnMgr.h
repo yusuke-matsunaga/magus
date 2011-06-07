@@ -179,6 +179,36 @@ public:
   void
   set_name(const string& name);
 
+  /// @brief D-FFセルを登録する．
+  /// @param[in] cell 対象のセル．
+  /// @param[in] pos_array ピン情報の配列
+  /// @return D-FFセルの情報を表すオブジェクトを返す．
+  /// @note pos_array の意味は以下の通り
+  ///  - pos_array[0] : データ入力のピン番号     (3bit)
+  ///  - pos_array[1] : クロック入力のピン番号   (3bit)
+  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
+  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
+  const CmnDffCell*
+  reg_dff_cell(const Cell* cell,
+	       ymuint pos_array[]);
+
+  /// @brief ラッチセルを登録する．
+  /// @param[in] cell 対象のセル．
+  /// @param[in] pos_array ピン情報の配列
+  /// @return ラッチセルの情報を表すオブジェクトを返す．
+  /// @note pos_array の意味は以下の通り
+  ///  - pos_array[0] : データ入力のピン番号     (3bit)
+  ///  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
+  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
+  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
+  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
+  const CmnLatchCell*
+  reg_latch_cell(const Cell* cell,
+		 ymuint pos_array[]);
+
   /// @brief 入力ポートを生成する．
   /// @param[in] name ポート名
   /// @param[in] bit_width ビット幅
@@ -229,35 +259,12 @@ public:
   new_logic(const vector<CmnNode*>& inodes,
 	    const Cell* cell);
 
-  /// @brief D-FFセルを登録する．
-  /// @param[in] cell 対象のセル．
-  /// @param[in] pos_array ピン情報の配列
-  /// @return D-FFセルの情報を表すオブジェクトを返す．
-  /// @note pos_array の意味は以下の通り
-  ///  - pos_array[0] : データ入力のピン番号     (3bit)
-  ///  - pos_array[1] : クロック入力のピン番号   (3bit)
-  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
-  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
-  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
-  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
-  const CmnDffCell*
-  reg_dff_cell(const Cell* cell,
-	       ymuint pos_array[]);
-
-  /// @brief ラッチセルを登録する．
-  /// @param[in] cell 対象のセル．
-  /// @param[in] pos_array ピン情報の配列
-  /// @return ラッチセルの情報を表すオブジェクトを返す．
-  /// @note pos_array の意味は以下の通り
-  ///  - pos_array[0] : データ入力のピン番号     (3bit)
-  ///  - pos_array[1] : イネーブル入力のピン番号 (3bit) | ピン情報 (2bit)
-  ///  - pos_array[2] : クリア入力のピン番号     (3bit) | ピン情報 (2bit)
-  ///  - pos_array[3] : プリセット入力のピン番号 (3bit) | ピン情報 (2bit)
-  ///  - pos_array[4] : 肯定出力のピン番号       (3bit)
-  ///  - pos_array[5] : 否定出力のピン番号       (3bit)
-  const CmnLatchCell*
-  reg_latch_cell(const Cell* cell,
-		 ymuint pos_array[]);
+  /// @brief 出力ノードのファンインを設定する．
+  /// @param[in] output 出力ノード
+  /// @param[in] fanin ファンインのノード
+  void
+  set_output_fanin(CmnNode* output,
+		   CmnNode* fanin);
 
   /// @}
   //////////////////////////////////////////////////////////////////////

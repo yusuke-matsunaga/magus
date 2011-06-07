@@ -423,56 +423,6 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // プライベートメンバ関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief AND のバランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  BdnNodeHandle
-  make_and_tree(BdnNode* node,
-		const vector<BdnNodeHandle>& node_list);
-
-  /// @brief OR のバランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  BdnNodeHandle
-  make_or_tree(BdnNode* node,
-	       const vector<BdnNodeHandle>& node_list);
-
-  /// @brief XOR のバランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  BdnNodeHandle
-  make_xor_tree(BdnNode* node,
-		const vector<BdnNodeHandle>& node_list);
-
-  /// @brief バランス木を作る．
-  /// @param[in] node 根のノード
-  /// @param[in] fcode 機能コード
-  /// @param[in] start 開始位置
-  /// @param[in] num 要素数
-  /// @param[in] node_list 入力のノードのリスト
-  /// @note node が NULL の場合，新しいノードを確保する．
-  /// @note fcode の各ビットの意味は以下のとおり，
-  ///  - 0bit: ファンイン0の反転属性
-  ///  - 1bit: ファンイン1の反転属性
-  ///  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
-  ///  - 3bit: 出力の反転属性
-  BdnNodeHandle
-  make_tree(BdnNode* node,
-	    ymuint fcode,
-	    ymuint start,
-	    ymuint num,
-	    const vector<BdnNodeHandle>& node_list);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -482,77 +432,6 @@ private:
   BdnMgrImpl* mImpl;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief AND ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_and(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return make_and_tree(NULL, inode_handle_list);
-}
-
-// @brief NAND ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nand(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~make_and_tree(NULL, inode_handle_list);
-}
-
-// @brief OR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_or(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return make_or_tree(NULL, inode_handle_list);
-}
-
-// @brief NOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_nor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~make_or_tree(NULL, inode_handle_list);
-}
-
-// @brief XOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_xor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return make_xor_tree(NULL, inode_handle_list);
-}
-
-// @brief XNOR ノードを作る．
-// @param[in] inode_handle_list 入力ノード+極性のリスト
-// @return 作成したノードを返す．
-// @note すでに構造的に同じノードがあればそれを返す．
-inline
-BdnNodeHandle
-BdnMgr::new_xnor(const vector<BdnNodeHandle>& inode_handle_list)
-{
-  return ~make_xor_tree(NULL, inode_handle_list);
-}
 
 END_NAMESPACE_YM_BDN
 
