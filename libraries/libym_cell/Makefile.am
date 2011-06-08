@@ -12,22 +12,23 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_cell.la
 
-libym_cell_la_LIBADD = \
-	dotlib/libym_cell_dotlib.la \
-	mislib/libym_cell_mislib.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_cell_la_LDFLAGS =
+############################################################
+## Variables for building libym_cell.la
+############################################################
+
+libym_cell_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_la_SOURCES = \
 	CiBundle.h \
@@ -44,3 +45,14 @@ libym_cell_la_SOURCES = \
 	CiTiming.cc \
 	dump.cc	\
 	restore.cc
+
+libym_cell_la_LIBADD = \
+	dotlib/libym_cell_dotlib.la \
+	mislib/libym_cell_mislib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+libym_cell_la_LDFLAGS =

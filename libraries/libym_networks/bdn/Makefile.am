@@ -12,9 +12,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bdn.la
 
-libym_bdn_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_bdn_la_LIBADD =
 
 libym_bdn_la_LDFLAGS =
 

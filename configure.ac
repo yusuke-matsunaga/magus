@@ -91,10 +91,6 @@ YM_INIT_LIBRARIES_SUBDIRS
 YM_BUILD_LIBRARY([libym_utils],
 		 [])
 
-# libym_zstream
-YM_BUILD_LIBRARY([libym_zstream],
-		 [ym_have_zlib])
-
 # libym_lexp
 YM_BUILD_LIBRARY([libym_lexp],
 		 [])

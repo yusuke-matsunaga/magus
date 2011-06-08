@@ -3,10 +3,6 @@
 ## $Id: Makefile.am 1978 2009-02-06 12:29:16Z matsunaga $
 
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -26,9 +22,12 @@ distclean-local:
 noinst_PROGRAMS = \
 	zstream_test
 
+zstream_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 zstream_test_SOURCES = \
 	zstream_test.cc
 
 zstream_test_LDADD = \
-	../libym_zstream.la
+	../../libym_utils.la

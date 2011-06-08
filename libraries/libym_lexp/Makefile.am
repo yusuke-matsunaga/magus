@@ -9,15 +9,22 @@ SUBDIRS = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_lexp.la
 
-libym_lexp_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-libym_lexp_la_LDFLAGS = 
+
+############################################################
+## Variables for building libym_lexp.la
+############################################################
+
+libym_lexp_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
 libym_lexp_la_SOURCES = \
 	lexp_types.h \
 	LexpMgr.h \
@@ -31,3 +38,8 @@ libym_lexp_la_SOURCES = \
 	LexpParser.cc \
 	LogExpr.cc \
 	LogExprWriter.cc
+
+libym_lexp_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+libym_lexp_la_LDFLAGS =

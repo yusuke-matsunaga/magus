@@ -7,22 +7,27 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
-CLEANFILES =
-
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_cell_mislib.la
 
-libym_cell_mislib_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_cell_mislib_la_LDFLAGS =
+############################################################
+## Variables for building libym_cell_mislib.la
+############################################################
+
+libym_cell_mislib_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_mislib_la_SOURCES = \
 	CellMislibReader.cc
+
+libym_cell_mislib_la_LIBADD =
+
+libym_cell_mislib_la_LDFLAGS =

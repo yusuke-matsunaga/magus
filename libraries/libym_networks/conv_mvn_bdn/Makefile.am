@@ -12,6 +12,10 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_conv_mvn_bdn.la
 
+libym_conv_mvn_bdn_la_LDFLAGS =
+
+libym_conv_mvn_bdn_la_LIBADD =
+
 libym_conv_mvn_bdn_la_SOURCES = \
 	MvnBdnMap.cc \
 	MvnBdnConv.cc \
@@ -66,8 +70,3 @@ libym_conv_mvn_bdn_la_SOURCES = \
 	ConstBitSelectConv.cc \
 	ConstPartSelectConv.h \
 	ConstPartSelectConv.cc
-
-libym_conv_mvn_bdn_la_LDFLAGS =
-
-libym_conv_mvn_bdn_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

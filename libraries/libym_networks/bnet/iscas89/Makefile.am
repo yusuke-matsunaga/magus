@@ -12,12 +12,12 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bnetiscas89reader.la
 
-libym_bnetiscas89reader_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la
-
-libym_bnetiscas89reader_la_LDFLAGS = 
-
 libym_bnetiscas89reader_la_SOURCES = \
 	BNetIscas89Handler.h \
 	BNetIscas89Handler.cc \
 	BNetIscas89Reader.cc
+
+libym_bnetiscas89reader_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la
+
+libym_bnetiscas89reader_la_LDFLAGS =

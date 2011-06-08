@@ -97,6 +97,34 @@ BdnDumper::operator()(ostream& s,
     s << ")" << endl;
   }
 
+  const BdnLatchList& latch_list = network.latch_list();
+  for (BdnLatchList::const_iterator p = latch_list.begin();
+       p != latch_list.end(); ++ p) {
+    const BdnLatch* latch = *p;
+    const BdnNode* output = latch->output();
+    const BdnNode* input = latch->input();
+    const BdnNode* enable = latch->enable();
+    const BdnNode* clear = latch->clear();
+    const BdnNode* preset = latch->preset();
+    s << "LATCH#" << latch->id() << ": " << latch->name() << " ("
+      << "OUTPUT = " << output->id_str()
+      << ", INPUT = ";
+    dump_output(s, input);
+    if ( enable->output_fanin() ) {
+      s << ", ENABLE = ";
+      dump_output(s, enable);
+    }
+    if ( clear->output_fanin() ) {
+      s << ", CLEAR = ";
+      dump_output(s, clear);
+    }
+    if ( preset->output_fanin() ) {
+      s << ", PRESET = ";
+      dump_output(s, preset);
+    }
+    s << ")" << endl;
+  }
+
   const BdnNodeList& input_list = network.input_list();
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
@@ -178,6 +206,14 @@ BdnDumper::operator()(ostream& s,
 
     case BdnNode::kLATCH_ENABLE:
       s << "ENABLE@LATCH#" << node->latch()->id();
+      break;
+
+    case BdnNode::kLATCH_CLEAR:
+      s << "CLEAR@LATCH#" << node->latch()->id();
+      break;
+
+    case BdnNode::kLATCH_PRESET:
+      s << "PRESET@LATCH#" << node->latch()->id();
       break;
 
     default:

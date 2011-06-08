@@ -26,7 +26,6 @@ libym_vl_parser_pt_mgr_la_SOURCES = \
 	PtiBase.cc \
 	PtDumper.cc
 
-libym_vl_parser_pt_mgr_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_parser_pt_mgr_la_LIBADD =
 
 libym_vl_parser_pt_mgr_la_LDFLAGS =

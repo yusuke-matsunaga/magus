@@ -32,4 +32,3 @@ libym_cec_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
 
 libym_cec_la_LDFLAGS =
-

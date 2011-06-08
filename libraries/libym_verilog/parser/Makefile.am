@@ -13,7 +13,7 @@ SUBDIRS = \
 
 INCLUDES =
 
-CLEANFILES = 
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -31,7 +31,6 @@ libym_vl_parser_la_LIBADD = \
 	scanner/libym_vl_parser_scanner.la \
 	pt_mgr/libym_vl_parser_pt_mgr.la \
 	spt/libym_vl_parser_spt.la \
-	cpt/libym_vl_parser_cpt.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	cpt/libym_vl_parser_cpt.la
 
 libym_vl_parser_la_LDFLAGS =

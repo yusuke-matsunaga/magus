@@ -19,8 +19,6 @@ libym_techmap_sbj_la_SOURCES = \
 	SbjMinDepth.cc \
 	SmdNode.h
 
-libym_techmap_sbj_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_techmap_sbj_la_LIBADD =
 
 libym_techmap_sbj_la_LDFLAGS =

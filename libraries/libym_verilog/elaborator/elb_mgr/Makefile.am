@@ -39,7 +39,6 @@ libym_vl_elab_elb_mgr_la_SOURCES = \
 	VlNamedObj.cc
 
 
-libym_vl_elab_elb_mgr_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_elab_elb_mgr_la_LIBADD =
 
 libym_vl_elab_elb_mgr_la_LDFLAGS =

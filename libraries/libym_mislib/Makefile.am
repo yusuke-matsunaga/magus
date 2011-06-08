@@ -10,10 +10,6 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 YFLAGS = -d -v
 
 CLEANFILES = \
@@ -21,13 +17,21 @@ CLEANFILES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## Variables for building targets
+############################################################
+
 noinst_LTLIBRARIES = libym_mislib.la
 
-libym_mislib_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_mislib_la_LDFLAGS =
+############################################################
+## Variables for building libym_mislib.la
+############################################################
+
+libym_mislib_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_mislib_la_SOURCES = \
 	mislib_grammer.yy \
@@ -59,3 +63,10 @@ libym_mislib_la_SOURCES = \
 	MislibGate.cc \
 	MislibPin.h \
 	MislibPin.cc
+
+libym_mislib_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+libym_mislib_la_LDFLAGS =
+

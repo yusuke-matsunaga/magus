@@ -7,10 +7,6 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 YFLAGS = -d -v
 
 CLEANFILES = \
@@ -18,11 +14,22 @@ CLEANFILES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## Variables for building targets
+############################################################
+
 noinst_LTLIBRARIES = libym_gds.la
 
-libym_gds_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-libym_gds_la_LDFLAGS = 
+
+############################################################
+## Variables for building libym_gds.la
+############################################################
+
+libym_gds_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
 libym_gds_la_SOURCES = \
 	Msg.cc \
 	GdsParser.yy \
@@ -35,5 +42,7 @@ libym_gds_la_SOURCES = \
 	GdsScanner.cc \
 	GdsDumper.cc
 
+libym_gds_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-
+libym_gds_la_LDFLAGS =

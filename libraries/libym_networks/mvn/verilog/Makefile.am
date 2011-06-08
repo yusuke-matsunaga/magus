@@ -12,6 +12,10 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_mvn_verilog.la
 
+libym_mvn_verilog_la_LDFLAGS =
+
+libym_mvn_verilog_la_LIBADD =
+
 libym_mvn_verilog_la_SOURCES = \
 	DeclHash.h \
 	DeclHash.cc \
@@ -28,10 +32,4 @@ libym_mvn_verilog_la_SOURCES = \
 	ReaderImpl_expr.cc \
 	Env.h \
 	Env.cc
-
-libym_mvn_verilog_la_LDFLAGS =
-
-libym_mvn_verilog_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

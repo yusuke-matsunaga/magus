@@ -19,6 +19,8 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bdd.la
 
+libym_bdd_la_SOURCES =
+
 libym_bdd_la_LIBADD = \
 	base/libym_bdd_base.la \
 	bmc/libym_bdd_bmc.la \
@@ -27,7 +29,7 @@ libym_bdd_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_bdd_la_LDFLAGS =
+libym_bdd_la_LDFLAGS = \
+	$(GMP_LIBS)
 
-libym_bdd_la_SOURCES =
-
+nodist_EXTRA_libym_bdd_la_SOURCES = dummy.cc

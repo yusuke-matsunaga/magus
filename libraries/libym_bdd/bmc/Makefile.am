@@ -14,8 +14,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bdd_bmc.la
 
-libym_bdd_bmc_la_LIBADD = \
-	$(GMP_LIBS)
+libym_bdd_bmc_la_LIBADD =
 
 libym_bdd_bmc_la_LDFLAGS =
 

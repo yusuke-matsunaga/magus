@@ -7,10 +7,6 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 YFLAGS =-d -v
 
 CLEANFILES = \
@@ -18,12 +14,21 @@ CLEANFILES = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## Variables for building targets
+############################################################
+
 noinst_LTLIBRARIES = libym_iscas89.la
 
-libym_iscas89_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_iscas89_la_LDFLAGS = 
+############################################################
+## Variables for building libym_iscas89.la
+############################################################
+
+libym_iscas89_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_iscas89_la_SOURCES = \
 	iscas89_grammer.yy \
@@ -35,3 +40,8 @@ libym_iscas89_la_SOURCES = \
 	Iscas89ParserImpl.cc \
 	Iscas89Parser.cc \
 	Iscas89Handler.cc
+
+libym_iscas89_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+libym_iscas89_la_LDFLAGS =

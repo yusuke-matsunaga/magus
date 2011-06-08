@@ -12,13 +12,12 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bnetblifreader.la
 
-libym_bnetblifreader_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la
-
-libym_bnetblifreader_la_LDFLAGS = 
-
 libym_bnetblifreader_la_SOURCES = \
 	BNetBlifHandler.h \
 	BNetBlifHandler.cc \
 	BNetBlifReader.cc
+
+libym_bnetblifreader_la_LIBADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la
+
+libym_bnetblifreader_la_LDFLAGS =

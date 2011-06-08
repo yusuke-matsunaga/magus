@@ -3,7 +3,7 @@
 // zstream のテスト
 
 
-#include "ym_zstream/zstream.h"
+#include "ym_utils/zstream.h"
 
 
 int

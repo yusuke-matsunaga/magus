@@ -14,6 +14,11 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_mvn.la
 
+libym_mvn_la_LDFLAGS =
+
+libym_mvn_la_LIBADD = \
+	verilog/libym_mvn_verilog.la
+
 libym_mvn_la_SOURCES = \
 	MvnConst.h \
 	MvnConst.cc \
@@ -31,10 +36,4 @@ libym_mvn_la_SOURCES = \
 	MvnNodeBase.cc \
 	MvnPort.cc \
 	MvnVerilogWriter.cc
-
-libym_mvn_la_LDFLAGS =
-
-libym_mvn_la_LIBADD = \
-	verilog/libym_mvn_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

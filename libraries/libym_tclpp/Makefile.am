@@ -15,9 +15,11 @@ INCLUDES = $(TCL_INCLUDES) \
 
 noinst_LTLIBRARIES = libym_tclpp.la
 
-libym_tclpp_la_LIBADD = \
+libym_tclpp_la_LIBADD =
+
+libym_tclpp_la_LDFLAGS = \
 	$(TCL_LDADD)
-libym_tclpp_la_LDFLAGS = 
+
 libym_tclpp_la_SOURCES = \
 	StrBuf.h \
 	TclPoptGroup.h \

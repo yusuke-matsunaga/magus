@@ -155,7 +155,7 @@ public:
   enum tInputType {
     /// @brief 外部入力
     kPRIMARY_INPUT  = 0,
-    /// @brief DFFの出力
+    /// @brief D-FFの出力
     kDFF_OUTPUT     = 1,
     /// @brief ラッチの出力
     kLATCH_OUTPUT   = 2
@@ -165,18 +165,22 @@ public:
   enum tOutputType {
     /// @brief 外部出力
     kPRIMARY_OUTPUT = 0,
-    /// @brief DFFのデータ
+    /// @brief D-FFのデータ
     kDFF_DATA       = 1,
-    /// @brief DFFのクロック
+    /// @brief D-FFのクロック
     kDFF_CLOCK      = 2,
-    /// @brief DFFのクリア信号
+    /// @brief D-FFのクリア信号
     kDFF_CLEAR      = 3,
-    /// @brief DFFのプリセット信号
+    /// @brief D-FFのプリセット信号
     kDFF_PRESET     = 4,
     /// @brief ラッチのデータ
     kLATCH_DATA     = 5,
     /// @brief ラッチのイネーブル
-    kLATCH_ENABLE   = 6
+    kLATCH_ENABLE   = 6,
+    /// @brief ラッチのクリア信号
+    kLATCH_CLEAR    = 7,
+    /// @brief ラッチのプリセット信号
+    kLATCH_PRESET   = 8
   };
 
 
@@ -415,7 +419,7 @@ private:
   ymuint32 mId;
 
   // 入力ノード  : タイプ(2bit) + POマーク(1bit) + サブタイプ(2bit)
-  // 出力ノード  :     〃       + 出力極性(1bit) + サブタイプ(3bit)
+  // 出力ノード  :     〃       + 出力極性(1bit) + サブタイプ(4bit)
   // 論理ノード  :     〃       + POマーク(1bit) + 機能コード(3bit)
   ymuint32 mFlags;
 
@@ -458,10 +462,6 @@ private:
   const ymuint32 kPoMask = 1U << kPoShift;
   static
   const ymuint32 kOInvMask = 1U << kOInvShift;
-  static
-  const ymuint32 kIsubMask = 3U << kIsubShift;
-  static
-  const ymuint32 kOsubMask = 7U << kOsubShift;
 
 };
 
@@ -611,7 +611,7 @@ inline
 BdnNode::tOutputType
 BdnNode::output_type() const
 {
-  return static_cast<tOutputType>((mFlags >> kOsubShift) & 7U);
+  return static_cast<tOutputType>((mFlags >> kOsubShift) & 0xFU);
 }
 
 // @brief ファンインのノードを得る．
@@ -648,7 +648,7 @@ inline
 ymuint
 BdnNode::_fcode() const
 {
-  return (mFlags >> kFcodeShift) & 0x7;
+  return (mFlags >> kFcodeShift) & 07U;
 }
 
 // @brief AND タイプのときに true を返す．

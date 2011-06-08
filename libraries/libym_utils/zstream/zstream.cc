@@ -1,15 +1,15 @@
 
-/// @file libym_utils/zstream.cc
-/// @brief zstream 実装ファイル
+/// @file libym_utils/zstream/zstream.cc
+/// @brief zstream の実装ファイル
 /// @author Yusuke Matsunaga
 ///
 /// $Id: zstream.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_zstream/zstream.h"
+#include "ym_utils/zstream.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -25,7 +25,7 @@ zstream_buff::zstream_buff(istream* s,
   mInFlush(Z_NO_FLUSH)
 {
   inflate_init();
-  
+
   set_inbuf(Z_NULL, 0);
 }
 
@@ -40,7 +40,7 @@ zstream_buff::zstream_buff(ostream* s,
   mInFlush(Z_NO_FLUSH)
 {
   deflate_init(Z_DEFAULT_COMPRESSION);
-  
+
   set_outbuf(mBuff, mSize);
 }
 
@@ -62,7 +62,7 @@ zstream_buff::compress(Bytef* buff,
 {
   set_inbuf(buff, size);
   for( ; ; ){
-    int status = deflate(flush); 
+    int status = deflate(flush);
     if ( status == Z_STREAM_END ) {
       // 完了
       write();
@@ -79,7 +79,7 @@ zstream_buff::compress(Bytef* buff,
     }
   }
 }
-  
+
 // @brief データの伸長を行う．
 // @param[in] buff 伸長したデータを格納するバッファ
 // @param[in] バッファ中の空きサイズ(in byte)
@@ -100,7 +100,7 @@ zstream_buff::decompress(Bytef* buff,
 	mInFlush = Z_FINISH;
       }
     }
-    int status = inflate(mInFlush); 
+    int status = inflate(mInFlush);
     if ( status == Z_STREAM_END ) {
       // 完了
       return orig_size - avail_out();
