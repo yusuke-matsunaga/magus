@@ -114,7 +114,6 @@ AUTOGEN_COMMON="./autogen.common"
 #SUBMODULE=`cat $BASEDIR/modules`
 LIBRARIES=\
 "libym_utils \
- libym_zstream \
  libym_lexp \
  libym_bdd \
  libym_npn \
