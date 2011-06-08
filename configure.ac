@@ -205,14 +205,14 @@ YM_BUILD_PROGRAM([magus_tclsh],
 # atpg
 YM_BUILD_PROGRAM([atpg],
 		 [ym_libym_utils_enable,
-		  ym_libym_tgnet_enable,
+		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 # matpg
 YM_BUILD_PROGRAM([matpg],
 		 [ym_libym_utils_enable,
 		  ym_libym_lexp_enable,
-		  ym_libym_tgnet_enable,
+		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS
