@@ -57,6 +57,8 @@ magus_tclsh_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \

@@ -4,16 +4,16 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 
 noinst_LTLIBRARIES = \
 	libmatpg.la
+
+libmatpg_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
 
 libmatpg_la_SOURCES = \
 	backtrace.cc \
@@ -58,5 +58,4 @@ libmatpg_la_SOURCES = \
 	used_gate.h \
 	val.h
 
-libmatpg_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libmatpg_la_LIBADD =

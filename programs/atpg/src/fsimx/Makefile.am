@@ -4,14 +4,14 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libatpg_fsimx.la
+
+libatpg_fsimx_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
 
 libatpg_fsimx_la_SOURCES = \
 	EqElem.h \
@@ -36,9 +36,6 @@ libatpg_fsimx_la_SOURCES = \
 	FsimX.h \
 	FsimX.cc
 
-libatpg_fsimx_la_LDFLAGS =
+libatpg_fsimx_la_LIBADD =
 
-libatpg_fsimx_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libatpg_fsimx_la_LDFLAGS =

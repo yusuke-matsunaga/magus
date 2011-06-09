@@ -36,8 +36,7 @@ libym_ymsh_la_SOURCES = \
 	DirCmd.h \
 	DirCmd.cc
 
-libym_ymsh_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_ymsh_la_LIBADD =
 
 libym_ymsh_la_LDFLAGS = \
 	-lreadline

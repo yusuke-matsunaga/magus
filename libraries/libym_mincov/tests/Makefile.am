@@ -4,11 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)
-
 YFLAGS = -d -v
 
 EXTRA_DIST = local_defs $(TESTS)
@@ -34,7 +29,14 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_MINCOV = $(YMTOOLS_BUILDDIR)/libraries/libym_mincov/libym_mincov.la
+LIBYM_MINCOV = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mincov/libym_mincov.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)
 
 noinst_PROGRAMS = \
 	matrix_test \

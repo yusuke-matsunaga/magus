@@ -30,9 +30,6 @@ libym_techmap_libdump_la_SOURCES = \
 	LibDump.h \
 	LibDump.cc
 
-libym_techmap_libdump_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_techmap_libdump_la_LIBADD =
 
 libym_techmap_libdump_la_LDFLAGS =

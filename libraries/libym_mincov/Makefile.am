@@ -24,7 +24,6 @@ libym_mincov_la_SOURCES = \
 	MaxClique.cc \
 	MincovSolver.cc
 
-libym_mincov_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_mincov_la_LIBADD =
 
 libym_mincov_la_LDFLAGS =
