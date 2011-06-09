@@ -15,17 +15,15 @@ SUBDIRS = \
 	test \
 	.
 
-AM_CXXFLAGS = \
-	-DMAGUS_LIBDIR='"$(MAGUS_LIBDIR)"' \
-	-DMAGUS_DATADIR='"$(MAGUS_DATADIR)"' \
-	-DMAGUS_BINDIR='"$(MAGUS_BINDIR)"'
-
-INCLUDES = \
+AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-DMAGUS_LIBDIR='"$(MAGUS_LIBDIR)"' \
+	-DMAGUS_DATADIR='"$(MAGUS_DATADIR)"' \
+	-DMAGUS_BINDIR='"$(MAGUS_BINDIR)"'
 
 MAINTAINERCLEANFILES = Makefile.in
 
