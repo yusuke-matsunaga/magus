@@ -39,7 +39,7 @@ libym_lexp_la_SOURCES = \
 	LogExpr.cc \
 	LogExprWriter.cc
 
-libym_lexp_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_lexp_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_lexp_la_LDFLAGS =

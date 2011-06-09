@@ -38,4 +38,5 @@ dotlib_parser_test_SOURCES = \
 dotlib_parser_test_LDFLAGS =
 
 dotlib_parser_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

@@ -41,7 +41,7 @@ libym_iscas89_la_SOURCES = \
 	Iscas89Parser.cc \
 	Iscas89Handler.cc
 
-libym_iscas89_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_iscas89_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_iscas89_la_LDFLAGS =

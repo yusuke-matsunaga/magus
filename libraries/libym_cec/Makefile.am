@@ -26,9 +26,9 @@ libym_cec_la_SOURCES = \
 	FraigMgr.cc \
 	check_ceq.cc
 
-libym_cec_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+libym_cec_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
 
 libym_cec_la_LDFLAGS =

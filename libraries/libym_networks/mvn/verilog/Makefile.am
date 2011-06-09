@@ -4,17 +4,13 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_mvn_verilog.la
 
-libym_mvn_verilog_la_LDFLAGS =
-
-libym_mvn_verilog_la_LIBADD =
+libym_mvn_verilog_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_mvn_verilog_la_SOURCES = \
 	DeclHash.h \
@@ -32,4 +28,8 @@ libym_mvn_verilog_la_SOURCES = \
 	ReaderImpl_expr.cc \
 	Env.h \
 	Env.cc
+
+libym_mvn_verilog_la_LIBADD =
+
+libym_mvn_verilog_la_LDFLAGS =
 

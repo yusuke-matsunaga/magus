@@ -4,17 +4,13 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_conv_mvn_bdn.la
 
-libym_conv_mvn_bdn_la_LDFLAGS =
-
-libym_conv_mvn_bdn_la_LIBADD =
+libym_conv_mvn_bdn_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_conv_mvn_bdn_la_SOURCES = \
 	MvnBdnMap.cc \
@@ -70,3 +66,7 @@ libym_conv_mvn_bdn_la_SOURCES = \
 	ConstBitSelectConv.cc \
 	ConstPartSelectConv.h \
 	ConstPartSelectConv.cc
+
+libym_conv_mvn_bdn_la_LIBADD =
+
+libym_conv_mvn_bdn_la_LDFLAGS =

@@ -15,10 +15,6 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_networks.la
@@ -33,12 +29,13 @@ libym_networks_la_LIBADD = \
 	tgnet/libym_tgnet.la \
 	conv_blif_bnet/libym_conv_blif_bnet.la \
 	conv_bnet_bdn/libym_conv_bnet_bdn.la \
-	conv_mvn_bdn/libym_conv_mvn_bdn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	conv_mvn_bdn/libym_conv_mvn_bdn.la
+
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_networks_la_LDFLAGS =
 

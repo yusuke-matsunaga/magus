@@ -64,9 +64,9 @@ libym_mislib_la_SOURCES = \
 	MislibPin.h \
 	MislibPin.cc
 
-libym_mislib_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_mislib_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_mislib_la_LDFLAGS =
 

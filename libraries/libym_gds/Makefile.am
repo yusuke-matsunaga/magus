@@ -42,7 +42,7 @@ libym_gds_la_SOURCES = \
 	GdsScanner.cc \
 	GdsDumper.cc
 
-libym_gds_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_gds_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_gds_la_LDFLAGS =

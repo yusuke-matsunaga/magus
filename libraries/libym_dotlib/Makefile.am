@@ -67,7 +67,7 @@ libym_dotlib_la_SOURCES = \
 	DotlibLatch.cc \
 	DotlibPin.cc
 
-libym_dotlib_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_dotlib_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_dotlib_la_LDFLAGS =

@@ -31,18 +31,20 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(GMP_INCLUDES)
 
-YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-YM_BDD = $(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la
+YM_BDD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_LTLIBRARIES = libymbddtest.la
-libymbddtest_la_LIBADD = \
-	$(YM_BDD)
 
-libymbddtest_la_LDFLAGS =
 libymbddtest_la_SOURCES = \
 	bddtest.h \
 	test_utils.cc
+
+libymbddtest_la_LIBADD =
+
+libymbddtest_la_LDFLAGS =
 
 noinst_PROGRAMS = \
 	mgr_test \
@@ -52,22 +54,28 @@ noinst_PROGRAMS = \
 
 mgr_test_SOURCES = \
 	mgr_test.cc
+
 mgr_test_LDADD = \
-	libymbddtest.la
+	libymbddtest.la \
+	$(YM_BDD)
 
 base_test_SOURCES = \
 	base_test.cc
+
 base_test_LDADD = \
-	libymbddtest.la
+	libymbddtest.la \
+	$(YM_BDD)
 
 fdec_test_SOURCES = \
 	fdec_test.cc
+
 fdec_test_LDADD = \
-	libymbddtest.la
+	libymbddtest.la \
+	$(YM_BDD)
 
 bddsh_SOURCES = \
 	bddsh_parser.yy \
 	bddsh_lex.ll
+
 bddsh_LDADD = \
-	$(YM_BDD) \
-	$(YM_BASE)
+	$(YM_BDD)

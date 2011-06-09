@@ -63,7 +63,6 @@ AC_CONFIG_SUBDIRS([include])
 # ===================================================================
 
 ym_libym_utils_enable=1
-ym_libym_zstream_enable=1
 ym_libym_lexp_enable=1
 ym_libym_bdd_enable=1
 ym_libym_npn_enable=1

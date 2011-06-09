@@ -41,7 +41,7 @@ libym_blif_la_SOURCES = \
 	BlifNetworkHandler.cc \
 	BlifNetworkReader.cc
 
-libym_blif_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_blif_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_blif_la_LDFLAGS =

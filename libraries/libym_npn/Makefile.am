@@ -28,7 +28,7 @@ libym_npn_la_SOURCES = \
 	NpnMgr.cc \
 	NpnMap.cc
 
-libym_npn_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_npn_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_npn_la_LDFLAGS =

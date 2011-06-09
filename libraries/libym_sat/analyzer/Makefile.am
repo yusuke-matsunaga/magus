@@ -2,20 +2,20 @@
 
 ## $Id: Makefile.am 1293 2008-02-21 02:25:52Z matsunaga $
 
-SUBDIRS = 
-
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)
+SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_satanalyzer.la
 
-libym_satanalyzer_la_LIBADD = 
+libym_satanalyzer_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)
 
-libym_satanalyzer_la_LDFLAGS = 
+libym_satanalyzer_la_LIBADD =
+
+libym_satanalyzer_la_LDFLAGS =
 
 libym_satanalyzer_la_SOURCES = \
 	SaBase.h \
