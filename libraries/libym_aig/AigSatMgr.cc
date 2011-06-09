@@ -8,7 +8,7 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
+#if 0
 #include "ym_aig/AigSatMgr.h"
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigNode.h"
@@ -190,3 +190,4 @@ AigSatMgr::sat(const vector<AigHandle>& edge_list,
 }
 
 END_NAMESPACE_YM_AIG
+#endif

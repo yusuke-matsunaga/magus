@@ -32,11 +32,12 @@ libym_aig_la_SOURCES = \
 	AigNode.cc \
 	AigMgr.cc \
 	AigMgrImpl.h \
-	AigMgrImpl.cc \
-	AigSatData.h \
-	AigSatMgr.cc \
-	AigTemplate.h \
-	AigTemplate.cc
+	AigMgrImpl.cc
+
+#	AigSatData.h \
+#	AigSatMgr.cc \
+#	AigTemplate.h \
+#	AigTemplate.cc
 
 libym_aig_la_LIBADD =
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \

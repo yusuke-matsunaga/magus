@@ -12,5 +12,6 @@ noinst_HEADERS = \
 	aig_nsdef.h \
 	AigHandle.h \
 	AigMgr.h \
-	AigNode.h \
-	AigSatMgr.h
+	AigNode.h
+
+#	AigSatMgr.h
