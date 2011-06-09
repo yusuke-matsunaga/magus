@@ -5,15 +5,11 @@
 ///
 /// $Id: BddMgrClassic.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdd/BmcFactory.h>
+#include "ym_bdd/BmcFactory.h"
 
 #include "BddMgrClassic.h"
 #include "BmcCompTbl.h"
@@ -145,7 +141,7 @@ BddMgrClassic::BddMgrClassic(const string& name) :
 
   // 演算結果テーブルの初期化
   mTblTop = NULL;
-  
+
   mAndTable = new CompTbl2(this, "and_table");
   assert_cond(mAndTable, __FILE__, __LINE__);
   mXorTable = new CompTbl2(this, "xor_table");
@@ -457,7 +453,7 @@ BddMgrClassic::varid(tLevel level) const
   // 実は同じ
   return tVarId(level);
 }
-  
+
 // 動的変数順変更を許可する．
 void
 BddMgrClassic::enable_DVO()
@@ -487,7 +483,7 @@ void
 BddMgrClassic::gc(bool shrink_nodetable)
 {
   logstream() << "BddMgrClassic::GC() begin...." << endl;
-  
+
   // 演算結果テーブルをスキャンしておかなければならない．
   for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->mNext) {
     if ( tbl->used_num() > 0 ) tbl->sweep();
@@ -720,7 +716,7 @@ BddMgrClassic::new_node(Var* var,
   if ( check_overflow(e0) || check_overflow(e1) ) {
     return kEdgeInvalid;
   }
-  
+
   // 否定枝に関する正規化ルール
   tPol ans_pol = get_pol(e1);
   e1 = addpol(e1, ans_pol);
@@ -738,7 +734,7 @@ BddMgrClassic::new_node(Var* var,
       goto already_exist;
     }
   }
-  
+
   // 節点テーブルには登録されていなかったので新しい節点を取ってきて
   // 内容を設定する．
   temp = alloc_node();

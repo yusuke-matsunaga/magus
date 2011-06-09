@@ -5,13 +5,9 @@
 ///
 /// $Id: bmc_sup.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "BddMgrClassic.h"
 #include "BmcCompTbl.h"
@@ -132,7 +128,7 @@ BddMgrClassic::SCC(tBddEdge e)
   if ( check_zero(e) ) {
     return kEdge0;
   }
-  
+
   // まずサポートを求める．
   mark_support(e);
   tBddEdge sup = mark_to_bdd();
@@ -141,7 +137,7 @@ BddMgrClassic::SCC(tBddEdge e)
   clear_varmark();
   scc_step(e, sup);
   clear_pnmark(e);
-  
+
   tBddEdge ans = kEdge1;
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
     Var* v = *p;

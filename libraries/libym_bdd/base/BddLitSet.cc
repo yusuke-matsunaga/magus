@@ -5,15 +5,11 @@
 ///
 /// $Id: BddLitSet.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdd/BddLitSet.h>
+#include "ym_bdd/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -32,7 +28,7 @@ BddLitSet::iterator::iterator(const Bdd& bdd) :
   mCur(bdd)
 {
 }
-    
+
 // 現在指している要素を返す．
 // 末尾かどうかのチェックは行わない．
 Literal
@@ -75,7 +71,7 @@ BddLitSet::iterator::operator!=(const iterator& src) const
 {
   return ! operator==(src);
 }
-    
+
 // ひとつ先に進める．
 void
 BddLitSet::iterator::next()

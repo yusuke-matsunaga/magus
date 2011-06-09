@@ -5,15 +5,11 @@
 ///
 /// $Id: BddMgrRef.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 #include "BddMgr.h"
 
@@ -197,7 +193,7 @@ BddMgrRef::tvec_to_bdd(const vector<int>& v,
     tVarId vid = vars[i];
     varbdds[i] = make_posiliteral(vid);
   }
-  
+
   Bdd ans1 = make_zero();
   for (size_t p = 0; p < nv; ++ p) {
     if ( v[p] ) {
@@ -429,7 +425,7 @@ BddMgrRef::varid(tLevel level) const
 {
   return mPtr->varid(level);
 }
-  
+
 // 動的変数順変更を許可する．
 void
 BddMgrRef::enable_DVO()
@@ -461,7 +457,7 @@ BddMgrRef::reg_sweep_binder(EventBinder* binder)
 {
   mPtr->reg_sweep_binder(binder);
 }
-  
+
 // ログ出力用のストリームを設定する．
 void
 BddMgrRef::set_logstream(ostream& s)
@@ -475,7 +471,7 @@ BddMgrRef::unset_logstream()
 {
   mPtr->unset_logstream();
 }
-  
+
 // ログ出力用のストリームを得る．
 ostream&
 BddMgrRef::logstream() const
@@ -490,7 +486,7 @@ BddMgrRef::param(const BddMgrParam& param,
 {
   mPtr->param(param, mask);
 }
-  
+
 // パラメータを取得する．
 void
 BddMgrRef::param(BddMgrParam& param) const
@@ -511,28 +507,28 @@ BddMgrRef::used_mem() const
 {
   return mPtr->used_mem();
 }
-  
+
 // 節点テーブルに登録されているノードの数を得る．
 size_t
 BddMgrRef::node_num() const
 {
   return mPtr->node_num();
 }
-  
+
 // GC で回収される(フリーになる)ノード数を得る．
 size_t
 BddMgrRef::garbage_num() const
 {
   return mPtr->garbage_num();
 }
-  
+
 // 利用可能なフリーノード数を得る．
 size_t
 BddMgrRef::avail_num() const
 {
   return mPtr->avail_num();
 }
-  
+
 // GC の起動された回数を得る．
 size_t
 BddMgrRef::gc_count() const

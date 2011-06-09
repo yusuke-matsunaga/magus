@@ -4,11 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	$(GMP_INCLUDES)
-
 YFLAGS=-d -v
 
 EXTRA_DIST = local_defs $(TESTS)
@@ -30,6 +25,11 @@ testsubdir = testSubDir
 
 distclean-local:
 	-rm -rf $(testsubdir)
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(GMP_INCLUDES)
 
 YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

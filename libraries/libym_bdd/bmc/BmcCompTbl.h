@@ -7,7 +7,7 @@
 ///
 /// $Id: BmcCompTbl.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -24,34 +24,34 @@ class BmcCompTbl
 {
   friend class BddMgrClassic;
 public:
-  
+
   // 使用されているセル数を返す．
   size_t
   used_num() const;
-  
+
   // テーブルサイズを返す．
   size_t
   table_size() const;
-  
+
   // load_limit を設定する．
   void
   load_limit(double load_limit);
-  
+
   // 最大のテーブルサイズを設定する．
   void
   max_size(size_t max_size);
-  
+
 
 protected:
 
   // コンストラクタ
   BmcCompTbl(BddMgrClassic* mgr,
 	     const char* name);
-  
+
   // デストラクタ
   virtual
   ~BmcCompTbl();
-  
+
   // ロックされていないノードに関係したセルをきれいにする．
   virtual
   void
@@ -61,11 +61,11 @@ protected:
   virtual
   void
   clear() = 0;
-  
+
   // next_limitを更新する
   void
   update_next_limit();
-  
+
   // テーブルを拡張すべき時には true を返す．
   bool
   check_tablesize() const;
@@ -73,12 +73,12 @@ protected:
   // BddMgr からメモリを確保する．
   void*
   allocate(size_t size);
-  
+
   // BddMgr にメモリを返す．
   void
   deallocate(void* ptr,
 	     size_t size);
-  
+
   // ログ出力用のストリームを得る．
   ostream&
   logstream() const;
@@ -87,29 +87,29 @@ protected:
   static
   bool
   check_noref(tBddEdge e);
-  
+
 
 protected:
 
   // 使用されているセルの数
   size_t mUsedNum;
-  
+
   // テーブルサイズ
   // セルの個数．バイト数ではないので注意
   size_t mTableSize;
-  
+
   // テーブルサイズ - 1 の値，ハッシュのマスクに用いる．
   size_t mTableSize_1;
-  
+
   // ほとんどデバッグ用の名前
   string mName;
-  
+
   // テーブルの使用率がこの値を越えたらサイズの拡張を行なう．
   double mLoadLimit;
-  
+
   // ただし，テーブルのサイズはこれ以上大きくしない．
   size_t mMaxSize;
-  
+
   // mUsedがこの値を越えたらテーブルを拡張する
   size_t mNextLimit;
 
@@ -137,12 +137,12 @@ class BmcCompTbl2 :
   };
 
 public:
-  
+
   // id1, id2をキーとして検索を行なう
   tBddEdge
   get(tBddEdge id1,
       tBddEdge id2);
-  
+
   // 結果を登録する
   void
   put(tBddEdge id1,
@@ -155,7 +155,7 @@ private:
   // コンストラクタ
   BmcCompTbl2(BddMgrClassic* mgr,
 	      const char* name = 0);
-  
+
   // デストラクタ
   virtual
   ~BmcCompTbl2();
@@ -164,11 +164,11 @@ private:
   size_t
   hash_func(tBddEdge id1,
 	    tBddEdge id2);
-  
+
   // テーブルサイズを変更する．
   void
   resize(size_t new_size);
-  
+
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
   void
@@ -207,11 +207,11 @@ class BmcCompTbl1 :
 
 
 public:
-  
+
   // id1をキーとして検索を行なう
   tBddEdge
   get(tBddEdge id1);
-  
+
   // 結果を登録する
   void
   put(tBddEdge id1,
@@ -223,7 +223,7 @@ private:
   // コンストラクタ
   BmcCompTbl1(BddMgrClassic* mgr,
 	      const char* name = 0);
-  
+
   // デストラクタ
   virtual
   ~BmcCompTbl1();
@@ -231,11 +231,11 @@ private:
   // ハッシュ関数
   size_t
   hash_func(tBddEdge id1);
-  
+
   // テーブルサイズを変更する．
   void
   resize(size_t new_size);
-  
+
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
   void
@@ -245,7 +245,7 @@ private:
   virtual
   void
   clear();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -281,21 +281,21 @@ public:
   get(tBddEdge id1,
       tBddEdge id2,
       LogExpr& ans_cov);
-  
+
   // 結果を登録する
   void
   put(tBddEdge id1,
       tBddEdge id2,
       tBddEdge ans_bdd,
       const LogExpr& ans_cov);
-  
+
 
 private:
 
   // コンストラクタ
   BmcIsopTbl(BddMgrClassic* mgr,
 	     const char* name = 0);
-  
+
   // デストラクタ
   virtual
   ~BmcIsopTbl();
@@ -304,11 +304,11 @@ private:
   size_t
   hash_func(tBddEdge id1,
 	    tBddEdge id2);
-  
+
   // テーブルサイズを変更する．
   void
   resize(size_t new_size);
-  
+
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
   void
@@ -318,7 +318,7 @@ private:
   virtual
   void
   clear();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -349,27 +349,27 @@ class BmcCompTbl3 :
   };
 
 public:
-  
+
   // 検索を行なう．
   tBddEdge
   get(tBddEdge id1,
       tBddEdge id2,
       tBddEdge id3);
-  
+
   // 登録を行なう．
   void
   put(tBddEdge id1,
       tBddEdge id2,
       tBddEdge id3,
       tBddEdge ans);
-  
+
 
 private:
 
   // コンストラクタ
   BmcCompTbl3(BddMgrClassic* mgr,
 	      const char* name = 0);
-  
+
   // デストラクタ
   virtual
   ~BmcCompTbl3();
@@ -379,11 +379,11 @@ private:
   hash_func(tBddEdge id1,
 	    tBddEdge id2,
 	    tBddEdge id3);
-  
+
   // テーブルサイズを変更する．
   void
   resize(size_t new_size);
-  
+
   // ガーベージコレクションが起きた時の処理を行なう．
   virtual
   void
@@ -393,7 +393,7 @@ private:
   virtual
   void
   clear();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

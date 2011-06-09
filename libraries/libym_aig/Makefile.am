@@ -10,13 +10,23 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## Variables for building targets
+############################################################
+
 noinst_LTLIBRARIES = libym_aig.la
+
+
+############################################################
+## Variables for building libym_aig.la
+############################################################
+
+libym_aig_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_aig_la_SOURCES = \
 	AigNode.cc \

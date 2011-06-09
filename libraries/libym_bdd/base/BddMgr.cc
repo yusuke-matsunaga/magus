@@ -5,19 +5,15 @@
 ///
 /// $Id: BddMgr.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_utils/HeapTree.h>
-#include <ym_bdd/Bdd.h>
-#include <ym_bdd/BmcFactory.h>
-
 #include "BddMgr.h"
+
+#include "ym_utils/HeapTree.h"
+#include "ym_bdd/Bdd.h"
+#include "ym_bdd/BmcFactory.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

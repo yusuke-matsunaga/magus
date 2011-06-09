@@ -5,15 +5,11 @@
 ///
 /// $Id: BddMgrModern.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdd/BmmFactory.h>
+#include "ym_bdd/BmmFactory.h"
 
 #include "BddMgrModern.h"
 #include "BmmCompTbl.h"
@@ -149,7 +145,7 @@ BddMgrModern::BddMgrModern(bool reorder,
 
   // 演算結果テーブルの初期化
   mTblTop = NULL;
-  
+
   mAndTable = new CompTbl2(this, "and_table");
   assert_cond(mAndTable, __FILE__, __LINE__);
   mXorTable = new CompTbl2(this, "xor_table");
@@ -470,7 +466,7 @@ BddMgrModern::is_reorderable() const
 {
   return mNodeTable == NULL;
 }
-  
+
 // 動的変数順変更を許可する．
 void
 BddMgrModern::enable_DVO()
@@ -507,7 +503,7 @@ void
 BddMgrModern::gc(bool shrink_nodetable)
 {
   logstream() << "BddMgrModern::GC() begin...." << endl;
-  
+
   // 演算結果テーブルをスキャンしておかなければならない．
   for (CompTbl* tbl = mTblTop; tbl; tbl = tbl->mNext) {
     if ( tbl->used_num() > 0 ) tbl->sweep();
@@ -754,7 +750,7 @@ BddMgrModern::new_node(Var* var,
   if ( check_overflow(e0) || check_overflow(e1) ) {
     return kEdgeInvalid;
   }
-  
+
   // 否定枝に関する正規化ルール
   tPol ans_pol = get_pol(e1);
   e1 = addpol(e1, ans_pol);
@@ -784,7 +780,7 @@ BddMgrModern::new_node(Var* var,
       }
     }
   }
-  
+
   // 節点テーブルには登録されていなかったので新しい節点を取ってきて
   // 内容を設定する．
   temp = alloc_node();

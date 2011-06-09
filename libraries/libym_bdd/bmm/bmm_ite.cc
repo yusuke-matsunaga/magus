@@ -5,13 +5,9 @@
 ///
 /// $Id: bmm_ite.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "BddMgrModern.h"
 #include "BmmCompTbl.h"
@@ -419,7 +415,7 @@ BddMgrModern::cubediv_step(tBddEdge f)
 
       tBddEdge r_0 = cubediv_step(f_0);
       tBddEdge r_1 = cubediv_step(f_1);
-      
+
       result = new_node(f_var, r_0, r_1);
     }
     mCubedivTable->put(f, result);

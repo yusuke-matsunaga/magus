@@ -9,11 +9,22 @@ SUBDIRS = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES = $(TCL_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_tclpp.la
+
+
+############################################################
+## Variables for building libym_tclpp.la
+############################################################
+
+libym_tclpp_la_CPPFLAGS = \
+	$(TCL_INCLUDES) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_tclpp_la_LIBADD =
 

@@ -4,19 +4,25 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
+
+noinst_LTLIBRARIES = libym_bdd_base.la
+
+
+############################################################
+## Variables for building libym_bdd_base.la
+############################################################
+
+libym_bdd_base_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir) \
 	$(GMP_INCLUDES)
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libym_bdd_base.la
-
-libym_bdd_base_la_LIBADD =
-
-libym_bdd_base_la_LDFLAGS =
 
 libym_bdd_base_la_SOURCES = \
 	BddMgr.h \
@@ -29,4 +35,8 @@ libym_bdd_base_la_SOURCES = \
 	BddLitSet.cc \
 	BddVarSet.cc \
 	Dumper.cc
+
+libym_bdd_base_la_LIBADD =
+
+libym_bdd_base_la_LDFLAGS =
 

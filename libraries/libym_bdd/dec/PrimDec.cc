@@ -5,15 +5,11 @@
 ///
 /// $Id: PrimDec.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdd/Dg.h>
+#include "ym_bdd/Dg.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

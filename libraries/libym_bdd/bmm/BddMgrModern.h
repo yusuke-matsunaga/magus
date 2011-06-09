@@ -7,11 +7,11 @@
 ///
 /// $Id: BddMgrModern.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 #include "base/BddMgr.h"
 #include "BmmNode.h"
@@ -46,7 +46,7 @@ public:
   typedef BmmCompTbl2 CompTbl2;
   typedef BmmCompTbl3 CompTbl3;
   typedef BmmIsopTbl IsopTbl;
-  
+
 public:
 
   // コンストラクタ
@@ -72,7 +72,7 @@ public:
   void
   dec_rootref(tBddEdge e);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 変数番号とレベルの対応づけ
   //////////////////////////////////////////////////////////////////////
@@ -98,17 +98,17 @@ public:
   virtual
   tLevel
   level(tVarId varid) const;
-  
+
   // レベルから変数番号を得る．
   virtual
   tVarId
   varid(tLevel level) const;
-  
+
   // 動的変数順変更を許可する．
   virtual
   void
   enable_DVO();
-  
+
   // 動的変数順変更を禁止する．
   virtual
   void
@@ -124,7 +124,7 @@ public:
   tBddEdge
   make_posiliteral(tVarId varid);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
@@ -152,19 +152,19 @@ public:
   tBddEdge
   check_intersect(tBddEdge e1,
 		  tBddEdge e2);
-  
+
   // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
   // 求める処理
   virtual
   tBddEdge
   xor_moment(tBddEdge e,
 	     tVarId idx);
-  
+
   // bdd がキューブの時 true を返す．
   virtual
   bool
   check_cube(tBddEdge e);
-  
+
   // bdd が肯定リテラルのみからなるキューブの時 true を返す．
   virtual
   bool
@@ -197,7 +197,7 @@ public:
   ite_op(tBddEdge e1,
 	 tBddEdge e2,
 	 tBddEdge e3);
-  
+
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
   void
@@ -229,7 +229,7 @@ public:
   tBddEdge
   esmooth(tBddEdge e1,
 	  tBddEdge e2);
-  
+
   // src1 と src2 の論理積を計算して src3 の変数を消去する．
   virtual
   tBddEdge
@@ -257,17 +257,17 @@ public:
   tBddEdge
   minimal_support(tBddEdge l,
 		  tBddEdge u);
-  
+
   // smallest cube containing F 演算
   virtual
   tBddEdge
   SCC(tBddEdge e);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // BDD の構造に関係したメソッド
   //////////////////////////////////////////////////////////////////////
-  
+
   // 根の節点の変数に基づいてShannon展開を行なう．
   // 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
   // 時の cofactor をそれぞれ f0, f1 に入れる．
@@ -278,19 +278,19 @@ public:
   root_decomp(tBddEdge e,
 	      tBddEdge& e0,
 	      tBddEdge& e1);
-  
+
   // 根の変数番号インデックスを取り出す．
   // 定数節点の場合には kVarIdMax を返す．
   virtual
   tVarId
   root_var(tBddEdge e);
-  
+
   // 0枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
   tBddEdge
   edge0(tBddEdge e);
-  
+
   // 1枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
@@ -303,23 +303,23 @@ public:
   bool
   check_noref(tBddEdge e);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 1へ至るパスを求める関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // 1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
   tBddEdge
   onepath(tBddEdge e);
-  
+
   // 最短の1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
   tBddEdge
   shortest_onepath(tBddEdge e);
-  
+
   // 最短の1パスの長さを求める．
   virtual
   tVarSize
@@ -347,14 +347,14 @@ public:
   mpz_class
   minterm_count(tBddEdge e,
 		tVarSize n);
-  
+
   // Walsh 変換の0次の係数を計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
   walsh0(tBddEdge e,
 	 tVarSize n);
-  
+
   // Walsh 変換の1次の係数を計算する．
   // n は論理関数の変数の数
   virtual
@@ -363,7 +363,7 @@ public:
 	 tVarId var,
 	 tVarSize n);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // サポート関係の関数
   //////////////////////////////////////////////////////////////////////
@@ -393,7 +393,7 @@ public:
   tBddEdge
   mark_to_bdd();
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // VarSet の内部で用いられる演算
   //////////////////////////////////////////////////////////////////////
@@ -420,7 +420,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // LitSet の内部で用いられる演算
   //////////////////////////////////////////////////////////////////////
-  
+
   // src1 と src2 がリテラル集合の時に共通部分を求める．
   virtual
   tBddEdge
@@ -478,7 +478,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 内部動作の設定を行う関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // ガーベージコレクションを行なう．
   // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
   virtual
@@ -495,7 +495,7 @@ public:
   void
   param(const BddMgrParam& param,
 	ymuint32 mask);
-  
+
   // パラメータを取得する．
   virtual
   void
@@ -514,30 +514,30 @@ public:
   virtual
   size_t
   used_mem() const;
-  
+
   // 節点テーブルに登録されているノードの数を得る．
   virtual
   size_t
   node_num() const;
-  
+
   // GC で回収される(フリーになる)ノード数を得る．
   virtual
   size_t
   garbage_num() const;
-  
+
   // 利用可能なフリーノード数を得る．
   virtual
   size_t
   avail_num() const;
-  
+
   // GC の起動された回数を得る．
   virtual
   size_t
   gc_count() const;
 
-  
+
   //////////////////////////////////////////////////////////////////////
-  // 
+  //
   //////////////////////////////////////////////////////////////////////
 
   Var*
@@ -550,15 +550,15 @@ public:
 	   tBddEdge l,
 	   tBddEdge h);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 上記の XXX_op() の内部で用いられる再帰関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // compose 演算を行う．
   tBddEdge
   compose_step(tBddEdge f);
-  
+
   // generalized cofactorの内部版．
   tBddEdge
   gcofactor_step(tBddEdge f,
@@ -568,19 +568,19 @@ public:
   tBddEdge
   cube_division(tBddEdge f,
 		tBddEdge c);
-  
+
   // gcofactor の c がキューブの場合の特別版
   tBddEdge
   cubediv_step(tBddEdge f);
-  
+
   // xor cofactor 演算
   tBddEdge
   xcofactor_step(tBddEdge f);
-  
+
   // existential qualification を行う．
   tBddEdge
   esmooth_step(tBddEdge e1);
-  
+
   // and exist 演算を行う．
   tBddEdge
   andexist_step(tBddEdge e1,
@@ -699,7 +699,7 @@ public:
   spl_step(tBddEdge e,
 	   hash_map<tBddEdge, ymint>& assoc);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 内部メンバの管理用関数
   //////////////////////////////////////////////////////////////////////
@@ -724,7 +724,7 @@ public:
   // vp と vp の子孫のノードをロックする
   void
   lockall(Node* vp);
- 
+
   // vp と vp の子孫ノードを(他に参照されていないもののみ)ロックを外す
   void
   unlockall(Node* vp);
@@ -749,7 +749,7 @@ public:
   void
   reg_var(Var* var);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // メモリ管理用の関数
   //////////////////////////////////////////////////////////////////////
@@ -799,7 +799,7 @@ public:
   // このマネージャで使用するメモリ領域を確保する．
   void*
   allocate(size_t size);
-  
+
   // このマネージャで確保したメモリを解放する．
   void
   deallocate(void* ptr,
@@ -814,13 +814,13 @@ public:
   static
   Node*
   get_node(tBddEdge e);
-  
+
   // ノードのポインタと極性から枝の情報を作り出す
   static
   tBddEdge
   combine(Node* n,
 	  tPol p);
-  
+
   // p-mark が付いた節点のマークを消す．
   static
   void
@@ -830,12 +830,12 @@ public:
   static
   void
   clear_nmark(tBddEdge e);
-  
+
   // vdで示された枝の子孫の全てのマークを消す
   static
   void
   clear_pnmark(tBddEdge e);
-  
+
   // vdの指すノードのマークを調べ，マークされていればtrueを返す．
   // 枝に極性がなければマークは1種類でいいが，極性があるので，
   // 肯定の枝から指された場合の p-mark と否定の枝から指された場
@@ -871,7 +871,7 @@ public:
 	tBddEdge& g_0,
 	tBddEdge& g_1);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // デバッグ用の名前
@@ -879,7 +879,7 @@ private:
 
   string mName;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // ユーザーが設定するパラメータ
   // 設定は専用のメソッドを用いる．
@@ -887,7 +887,7 @@ private:
 
   // ガーベージの割合がこの値を越えるとGCを起こす．
   double mGcThreshold;
-  
+
   // ただし，全体のノード数がこの数以下の時はGCは起こさない．
   size_t mGcNodeLimit;
 
@@ -900,7 +900,7 @@ private:
   // 使用メモリ量の上限
   size_t mMemLimit;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // パッケージ内部の情報
   // 読み出しのみ可能
@@ -908,7 +908,7 @@ private:
 
   // 全てのノード数
   size_t mNodeNum;
-  
+
   // ゴミ（誰からも参照されていない）ノード数
   size_t mGarbageNum;
 
@@ -936,7 +936,7 @@ private:
   // 変数番号をキーにして変数のポインタを格納しているハッシュ表
   Var** mVarHashTable;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 節点テーブル関係のメンバ
   //////////////////////////////////////////////////////////////////////
@@ -953,7 +953,7 @@ private:
   // テーブル本体
   Node** mNodeTable;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 演算結果テーブル
   //////////////////////////////////////////////////////////////////////
@@ -982,7 +982,7 @@ private:
   CompTbl3* mCs1Table;
   CompTbl2* mCs2Table;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // メモリブロック管理用のメンバ
   //////////////////////////////////////////////////////////////////////
@@ -1002,21 +1002,21 @@ private:
   // mCurBlk の何番目まで使用しているかを示すインデックス
   size_t mCurIdx;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // garbage collection 用の制御用変数
   //////////////////////////////////////////////////////////////////////
 
   // GCの起動を制御する変数
   int mGcEnable;
-  
+
   // ノード数がこの数を越えたら mGcEnable は常に true だと思う
   size_t mDangerousZone;
-  
+
   // GC 前に sweep 処理を行うオブジェクトを管理するマネージャ
   EventBindMgr mSweepMgr;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 内部的に用いられる作業領域
   //////////////////////////////////////////////////////////////////////

@@ -7,7 +7,7 @@
 ///
 /// $Id: BddVarSet.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -34,22 +34,22 @@ public:
   public:
     // コンストラクタ
     iterator();
-    
+
     // 現在指している要素を返す．
     // 末尾かどうかのチェックは行わない．
     tVarId
     operator*() const;
-    
+
     // ひとつ先に進める．
     // 自分自身を返す．
     iterator&
     operator++();
-    
+
     // ひとつ先に進める．
     // 進める前の値を返す．
     iterator
     operator++(int);
-    
+
     // 等価比較
     bool
     operator==(const iterator& src) const;
@@ -57,7 +57,7 @@ public:
     // == の逆
     bool
     operator!=(const iterator& src) const;
-    
+
 
   private:
 
@@ -79,57 +79,57 @@ public:
   // コンストラクタ
   // 空集合となるが，明示的に使う場合には下の make_empty() を使うべき
   BddVarSet(BddMgrRef mgr);
-  
+
   // コピーコンストラクタ
   BddVarSet(const BddVarSet& src);
-  
+
   // 代入演算子
   const BddVarSet&
   operator=(const BddVarSet& src);
-  
+
   // 変数一つだけを要素とする集合を作るコンストラクタ
   BddVarSet(BddMgrRef mgr,
 	    tVarId varid);
-  
+
   // vector からの変換用コンストラクタ
   BddVarSet(BddMgrRef mgr,
 	    const VarVector& src);
-  
+
   // list からの変換用コンストラクタ
   BddVarSet(BddMgrRef mgr,
 	    const VarList& src);
-  
+
   // 空集合を返すクラスメソッド
   static
   BddVarSet
   make_empty(BddMgrRef mgr);
-  
+
   // 空の時, 真となる．
   bool
   empty() const;
-  
+
   // 要素数を返す．
   size_t
   size() const;
-  
+
   // この変数集合の表す関数を返す．
   Bdd
   function() const;
-  
+
   // 先頭の反復子を返す．
   iterator
   begin() const;
-  
+
   // 末尾の反復子を返す．
   iterator
   end() const;
-  
+
   // 変数番号の vector に変換する．
   // 変数番号の順番は内部の実装に依存する．
   // 集合のサイズを返す．
   size_t
   to_vector(VarVector& dst) const;
-  
+
   // 変数番号のリストに変換する．
   // 変数番号の順番は内部の実装に依存する．
   // 集合のサイズを返す．
@@ -139,7 +139,7 @@ public:
   // 集合和を計算する．
   BddVarSet
   operator+(const BddVarSet& set2) const;
-  
+
   // 集合和を計算して代入する．
   const BddVarSet&
   operator+=(const BddVarSet& set2);
@@ -147,7 +147,7 @@ public:
   // 集合積を計算する．
   BddVarSet
   operator*(const BddVarSet& set2) const;
-  
+
   // 集合積を計算して代入する．
   const BddVarSet&
   operator*=(const BddVarSet& set2);
@@ -182,7 +182,7 @@ private:
   // サイズを無効化する．
   void
   invalidate_size();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ private:
 
   // 本体
   Bdd mBody;
-  
+
   // 要素数を入れておくキャッシュ
   // 最下位1ビットが1の時のみ valid な値を持つ．
   mutable
