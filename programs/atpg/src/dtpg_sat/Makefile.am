@@ -16,8 +16,7 @@ libatpg_dtpg_sat_la_CPPFLAGS = \
 
 libatpg_dtpg_sat_la_SOURCES = \
 	DtpgSat.h \
-	DtpgSat.cc \
-	tgnet2aig.cc
+	DtpgSat.cc
 
 libatpg_dtpg_sat_la_LIBADD =
 
