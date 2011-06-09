@@ -12,10 +12,6 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libmagus_core_tcl.la
 
-libmagus_core_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
-libmagus_core_tcl_la_LDFLAGS =
 libmagus_core_tcl_la_SOURCES = \
 	MagMgr.cc \
 	NetHandle.cc \
@@ -61,3 +57,7 @@ libmagus_core_tcl_la_SOURCES = \
 	WriteVerilog.h \
 	WriteVerilog.cc \
 	core_init.cc
+
+libmagus_core_tcl_la_LIBADD =
+
+libmagus_core_tcl_la_LDFLAGS =

@@ -45,6 +45,20 @@ magus_tclsh_LDADD = \
 	bnet/libmagus_bnet_tcl.la \
 	core/libmagus_core_tcl.la \
 	misc/libmagus_misc_tcl.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_seal/libym_seal.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cec/libym_cec.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)
