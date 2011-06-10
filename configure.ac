@@ -75,7 +75,7 @@ ym_libym_dotlib_enable=1
 ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_networks_enable=1
-ym_libym_aig_enable=1
+ym_libym_aig_enable=0
 ym_libym_gds_enable=1
 ym_libym_cec_enable=1
 ym_libym_techmap_enable=1
@@ -162,8 +162,7 @@ YM_BUILD_LIBRARY([libym_gds],
 # libym_cec
 YM_BUILD_LIBRARY([libym_cec],
 		 [ym_libym_networks_enable,
-		  ym_libym_sat_enable,
-		  ym_libym_aig_enable])
+		  ym_libym_sat_enable])
 
 # libym_techmap
 YM_BUILD_LIBRARY([libym_techmap],
