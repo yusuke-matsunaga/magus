@@ -4,14 +4,14 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libatpg_base.la
+
+libatpg_base_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
 
 libatpg_base_la_SOURCES = \
 	SaFault.cc \
@@ -21,5 +21,4 @@ libatpg_base_la_SOURCES = \
 
 libatpg_base_la_LDFLAGS =
 
-libatpg_base_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tgnet/libym_tgnet.la
+libatpg_base_la_LIBADD =

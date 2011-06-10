@@ -52,7 +52,6 @@ libym_vl_parser_scanner_la_SOURCES = \
 	LexModulePlugin.h \
 	LexModulePlugin.cc
 
-libym_vl_parser_scanner_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_parser_scanner_la_LIBADD =
 
 libym_vl_parser_scanner_la_LDFLAGS =

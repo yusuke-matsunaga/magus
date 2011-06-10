@@ -9,6 +9,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	bdn_nsdef.h \
 	bnet_nsdef.h \
+	cmn_nsdef.h \
 	mvn_nsdef.h \
 	tgnet_nsdef.h \
 	BdnBlifWriter.h \
@@ -31,6 +32,15 @@ noinst_HEADERS = \
 	BNetVerilogWriter.h \
 	BNetBlifReader.h \
 	BNetIscas89Reader.h \
+	CmnEdge.h \
+	CmnDff.h \
+	CmnDffCell.h \
+	CmnDumper.h \
+	CmnLatch.h \
+	CmnLatchCell.h \
+	CmnMgr.h \
+	CmnNode.h \
+	CmnPort.h \
 	MvnDumper.h \
 	MvnInputPin.h \
 	MvnMgr.h \

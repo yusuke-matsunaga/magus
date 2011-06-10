@@ -26,7 +26,6 @@ libym_vl_common_la_SOURCES = \
 	VlMgr.cc \
 	udpval.cc
 
+libym_vl_common_la_LIBADD =
 
-libym_vl_common_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 libym_vl_common_la_LDFLAGS =

@@ -5,17 +5,13 @@
 ///
 /// $Id: Bdd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_bdd/Bdd.h>
-#include <ym_bdd/BddVarSet.h>
-#include <ym_bdd/BddLitSet.h>
+#include "ym_bdd/Bdd.h"
+#include "ym_bdd/BddVarSet.h"
+#include "ym_bdd/BddLitSet.h"
 
 #include "BddMgr.h"
 #include "Dumper.h"
@@ -261,7 +257,7 @@ Bdd::compose(const VarBddMap& comp_map) const
       return Bdd(mMgr, kEdgeOverflow);
     }
   }
-  
+
   mMgr->compose_start();
   for (VarBddMap::const_iterator p = comp_map.begin();
        p != comp_map.end(); ++ p) {
@@ -761,7 +757,7 @@ size(const BddList& array)
   BddMgr* mgr = array.front().mMgr;
   return mgr->size(edge_list);
 }
-  
+
 // @brief 真理値表密度の計算
 // @param[in] n 入力数
 double

@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNETISCAS89READER_H
-#define YM_BNET_BNETISCAS89READER_H
+#ifndef YM_NETWORKS_BNETISCAS89READER_H
+#define YM_NETWORKS_BNETISCAS89READER_H
 
 /// @file ym_networks/BNetIscas89Reader.h
 /// @brief BNetIscas89Reader のヘッダファイル
@@ -70,4 +70,4 @@ using nsBnet::BNetIscas89Reader;
 
 END_NAMESPACE_YM
 
-#endif // YM_BNET_BNETISCAS89READER_H
+#endif // YM_NETWORKS_BNETISCAS89READER_H

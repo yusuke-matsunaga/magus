@@ -4,13 +4,13 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_tgnet.la
+
+libym_tgnet_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_tgnet_la_SOURCES = \
 	NameHash.h \
@@ -25,11 +25,6 @@ libym_tgnet_la_SOURCES = \
 	TgIscas89Handler.cc \
 	TgIscas89Reader.cc
 
+libym_tgnet_la_LIBADD =
+
 libym_tgnet_la_LDFLAGS =
-
-libym_tgnet_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-

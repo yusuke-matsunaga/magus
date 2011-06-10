@@ -1,22 +1,22 @@
-#ifndef YM_BDN_BDNNODEHANDLE_H
-#define YM_BDN_BDNNODEHANDLE_H
+#ifndef YM_NETWORKS_BDNNODEHANDLE_H
+#define YM_NETWORKS_BDNNODEHANDLE_H
 
-/// @file ym_networks/BdnNodeHandle.h 
+/// @file ym_networks/BdnNodeHandle.h
 /// @brief BdnNodeHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BdnNodeHandle.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_networks/bdn_nsdef.h>
+#include "ym_networks/bdn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
 
 //////////////////////////////////////////////////////////////////////
-/// @class BdnNodeHandle BdnNode.h <ym_networks/BdnNode.h>
+/// @class BdnNodeHandle BdnNode.h "ym_networks/BdnNode.h"
 /// @brief BdnNode へのポインタと極性を合わせたデータを表すクラス
 /// @sa BdnNode
 //////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ public:
   void
   set(BdnNode* node,
       bool inv);
-  
+
   /// @brief 定数0を返す．
   static
   BdnNodeHandle
@@ -57,7 +57,7 @@ public:
   BdnNodeHandle
   make_one();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 内部の情報を取り出すメンバ間数
@@ -87,29 +87,29 @@ public:
   /// @brief 定数を指しているとき true を返す．
   bool
   is_const() const;
-  
+
   /// @brief 等価比較演算子
   bool
   operator==(BdnNodeHandle right) const;
 
-  
+
 private:
 
   /// @brief 内容を直接指定したコンストラクタ
   explicit
   BdnNodeHandle(ympuint data);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ポインタ＋極性を収めたデータ本体
   ympuint mData;
-  
+
 };
-  
+
 
 //////////////////////////////////////////////////////////////////////
 // inline 関数の定義
@@ -155,7 +155,7 @@ BdnNodeHandle::set(BdnNode* node,
 {
   mData = reinterpret_cast<ympuint>(node) | inv;
 }
-  
+
 // @brief 定数0を返す．
 inline
 BdnNodeHandle
@@ -211,7 +211,7 @@ bool
 BdnNodeHandle::is_one() const
 {
   return mData == 1UL;
-} 
+}
 
 // @brief 定数を指しているとき true を返す．
 inline
@@ -220,7 +220,7 @@ BdnNodeHandle::is_const() const
 {
   return (mData & ~1UL) == 0UL;
 }
-  
+
 // @brief 等価比較演算子
 inline
 bool
@@ -239,4 +239,4 @@ operator!=(BdnNodeHandle left,
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNNODE_H
+#endif // YM_NETWORKS_BDNNODE_H

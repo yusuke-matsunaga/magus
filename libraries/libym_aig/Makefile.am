@@ -10,27 +10,38 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_aig.la
 
-libym_aig_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_aig_la_LDFLAGS =
+############################################################
+## Variables for building libym_aig.la
+############################################################
+
+libym_aig_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_aig_la_SOURCES = \
 	AigNode.cc \
 	AigMgr.cc \
 	AigMgrImpl.h \
-	AigMgrImpl.cc \
-	AigSatData.h \
-	AigSatMgr.cc \
-	AigTemplate.h \
-	AigTemplate.cc
+	AigMgrImpl.cc
+
+#	AigSatData.h \
+#	AigSatMgr.cc \
+#	AigTemplate.h \
+#	AigTemplate.cc
+
+libym_aig_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+libym_aig_la_LDFLAGS =

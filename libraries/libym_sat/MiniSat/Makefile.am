@@ -4,15 +4,15 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_minisat.la
 
-libym_minisat_la_LIBADD = 
+libym_minisat_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+libym_minisat_la_LIBADD =
 
 libym_minisat_la_LDFLAGS =
 

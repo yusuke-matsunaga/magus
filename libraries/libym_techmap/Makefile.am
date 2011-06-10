@@ -23,10 +23,11 @@ libym_techmap_la_SOURCES =
 libym_techmap_la_LIBADD = \
 	sbjgraph/libym_techmap_sbj.la \
 	cellmap/libym_techmap_cell.la \
-	lutmap/libym_techmap_lut.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	lutmap/libym_techmap_lut.la
+
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_techmap_la_LDFLAGS =

@@ -10,6 +10,7 @@
 
 
 #include "ym_networks/BdnMgr.h"
+#include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnNodeHandle.h"
 
@@ -33,13 +34,13 @@ base_test()
     return false;
   }
 
-  // new_port_input() のテスト
+  // new_input_port() のテスト
   if ( network.input_num() != 0 ) {
     cout << "ERROR[new_input_test]: input_num() != 0" << endl;
     return false;
   }
-  BdnPort* port0 = network.new_port("port0", 1);
-  BdnNode* input0 = network.new_port_input(port0, 0);
+  BdnPort* port0 = network.new_input_port("port0", 1);
+  BdnNode* input0 = port0->_input(0);
   if ( network.input_num() != 1 ) {
     cout << "ERROR[new_input_test]: input_num() != 1" << endl;
     return false;
@@ -49,9 +50,9 @@ base_test()
     return false;
   }
 
-  BdnPort* port1 = network.new_port("port1", 2);
-  BdnNode* input1_0 = network.new_port_input(port1, 0);
-  BdnNode* input1 = network.new_port_input(port1, 1);
+  BdnPort* port1 = network.new_input_port("port1", 2);
+  BdnNode* input1_0 = port1->_input(0);
+  BdnNode* input1 = port1->_input(1);
   if ( network.input_num() != 3 ) {
     cout << "ERROR[new_input_test]: input_num() != 3" << endl;
     return false;

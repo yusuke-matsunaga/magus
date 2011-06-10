@@ -16,14 +16,8 @@ CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
 noinst_LTLIBRARIES = libym_npn.la
 
-libym_npn_la_LIBADD = 
-	$(YM_BASE)
-
-libym_npn_la_LDFLAGS =
 libym_npn_la_SOURCES = \
 	w_table.h \
 	TvFunc.cc \
@@ -33,3 +27,8 @@ libym_npn_la_SOURCES = \
 	NpnConf.cc \
 	NpnMgr.cc \
 	NpnMap.cc
+
+libym_npn_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+libym_npn_la_LDFLAGS =

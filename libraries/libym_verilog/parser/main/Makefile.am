@@ -39,7 +39,6 @@ libym_vl_parser_main_la_SOURCES = \
 	Parser_udp.cc \c
 	PuHierName.h
 
-libym_vl_parser_main_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_parser_main_la_LIBADD =
 
 libym_vl_parser_main_la_LDFLAGS =

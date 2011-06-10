@@ -85,12 +85,12 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
 
       BdnMgr tmp_network;
       conv(*neth->bnetwork(), tmp_network);
-      techmap().area_map(tmp_network, 0, cngraph());
+      techmap().area_map(tmp_network, 0, cmnmgr());
     }
     break;
 
   case NetHandle::kMagBdn:
-    techmap().area_map(*neth->bdn(), 0, cngraph());
+    techmap().area_map(*neth->bdn(), 0, cmnmgr());
     break;
 
   case NetHandle::kMagMvn:
@@ -100,7 +100,7 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
       BdnMgr tmp_network;
       MvnBdnMap mvnode_map(mvn.max_node_id());
       conv(mvn, tmp_network, mvnode_map);
-      techmap().area_map(tmp_network, 0, cngraph());
+      techmap().area_map(tmp_network, 0, cmnmgr());
     }
     break;
   }

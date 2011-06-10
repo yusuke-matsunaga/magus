@@ -4,10 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -23,7 +19,10 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_SAT = $(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la
+LIBYM_SAT = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
 	dimacstest
@@ -32,17 +31,24 @@ bin_PROGRAMS = \
 	ymsat \
 	ymsat2
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
 dimacstest_SOURCES = \
 	dimacstest.cc
+
 dimacstest_LDADD = \
 	$(LIBYM_SAT)
 
 ymsat_SOURCES = \
 	ymsat.cc
+
 ymsat_LDADD = \
 	$(LIBYM_SAT)
 
 ymsat2_SOURCES = \
 	ymsat2.cc
+
 ymsat2_LDADD = \
 	$(LIBYM_SAT)

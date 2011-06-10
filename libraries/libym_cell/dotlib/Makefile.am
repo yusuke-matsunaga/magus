@@ -7,21 +7,27 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
-CLEANFILES =
-
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_cell_dotlib.la
 
-libym_cell_dotlib_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_cell_dotlib_la_LDFLAGS =
+############################################################
+## Variables for building libym_cell_dotlib.la
+############################################################
+
+libym_cell_dotlib_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_dotlib_la_SOURCES = \
 	CellDotlibReader.cc
+
+libym_cell_dotlib_la_LIBADD =
+
+libym_cell_dotlib_la_LDFLAGS =

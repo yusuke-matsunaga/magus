@@ -15,6 +15,8 @@
 #include "ym_sat/SatSolver.h"
 
 
+#error "Who need this?"
+
 BEGIN_NAMESPACE_YM_AIG
 
 //////////////////////////////////////////////////////////////////////

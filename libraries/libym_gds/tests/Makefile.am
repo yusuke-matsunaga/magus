@@ -21,7 +21,9 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_GDS = $(YMTOOLS_BUILDDIR)/libraries/libym_gds/libym_gds.la
+LIBYM_GDS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_gds/libym_gds.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
 	gdsparse \

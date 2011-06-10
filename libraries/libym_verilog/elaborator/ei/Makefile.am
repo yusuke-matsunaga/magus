@@ -102,7 +102,6 @@ libym_vl_elab_ei_la_SOURCES = \
 	EiAttribute.cc
 
 
-libym_vl_elab_ei_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_elab_ei_la_LIBADD =
 
 libym_vl_elab_ei_la_LDFLAGS =

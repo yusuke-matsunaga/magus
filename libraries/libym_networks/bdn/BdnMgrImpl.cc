@@ -51,17 +51,17 @@ BdnMgrImpl::copy(const BdnMgr& src)
   for (ymuint i = 0; i < np; ++ i) {
     const BdnPort* src_port = src.port(i);
     ymuint bw = src_port->bit_width();
-    BdnPort* dst_port = new_port(src_port->name(), bw);
+    vector<ymuint> iovect(bw);
+    src_port->get_iovect(iovect);
+    BdnPort* dst_port = new_port(src_port->name(), iovect);
     for (ymuint j = 0; j < bw; ++ j) {
       const BdnNode* src_input = src_port->input(j);
       if ( src_input ) {
-	BdnNode* dst_input = new_port_input(dst_port, j);
-	nodemap[src_input->id()] = dst_input;
+	nodemap[src_input->id()] = dst_port->_input(j);
       }
       const BdnNode* src_output = src_port->output(j);
       if ( src_output ) {
-	BdnNode* dst_output = new_port_output(dst_port, j);
-	nodemap[src_output->id()] = dst_output;
+	nodemap[src_output->id()] = dst_port->_output(j);
       }
     }
   }
@@ -74,23 +74,23 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnDff* dst_dff = new_dff(src_dff->name());
 
     const BdnNode* src_output = src_dff->output();
-    BdnNode* dst_output = dst_dff->output();
+    BdnNode* dst_output = dst_dff->_output();
     nodemap[src_output->id()] = dst_output;
 
     const BdnNode* src_input = src_dff->input();
-    BdnNode* dst_input = dst_dff->input();
+    BdnNode* dst_input = dst_dff->_input();
     nodemap[src_input->id()] = dst_input;
 
     const BdnNode* src_clock = src_dff->clock();
-    BdnNode* dst_clock = dst_dff->clock();
+    BdnNode* dst_clock = dst_dff->_clock();
     nodemap[src_clock->id()] = dst_clock;
 
     const BdnNode* src_clear = src_dff->clear();
-    BdnNode* dst_clear = dst_dff->clear();
+    BdnNode* dst_clear = dst_dff->_clear();
     nodemap[src_clear->id()] = dst_clear;
 
     const BdnNode* src_preset = src_dff->preset();
-    BdnNode* dst_preset = dst_dff->preset();
+    BdnNode* dst_preset = dst_dff->_preset();
     nodemap[src_preset->id()] = dst_preset;
   }
 
@@ -102,16 +102,24 @@ BdnMgrImpl::copy(const BdnMgr& src)
     BdnLatch* dst_latch = new_latch(src_latch->name());
 
     const BdnNode* src_output = src_latch->output();
-    BdnNode* dst_output = dst_latch->output();
+    BdnNode* dst_output = dst_latch->_output();
     nodemap[src_output->id()] = dst_output;
 
     const BdnNode* src_input = src_latch->input();
-    BdnNode* dst_input = dst_latch->input();
+    BdnNode* dst_input = dst_latch->_input();
     nodemap[src_input->id()] = dst_input;
 
     const BdnNode* src_enable = src_latch->enable();
-    BdnNode* dst_enable = dst_latch->enable();
+    BdnNode* dst_enable = dst_latch->_enable();
     nodemap[src_enable->id()] = dst_enable;
+
+    const BdnNode* src_clear = src_latch->clear();
+    BdnNode* dst_clear = dst_latch->_clear();
+    nodemap[src_clear->id()] = dst_clear;
+
+    const BdnNode* src_preset = src_latch->preset();
+    BdnNode* dst_preset = dst_latch->_preset();
+    nodemap[src_preset->id()] = dst_preset;
   }
 
   // 論理ノードの生成
@@ -285,10 +293,31 @@ BdnMgrImpl::rsort(vector<BdnNode*>& node_list) const
   assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
 }
 
+// @brief 名前を設定する．
+void
+BdnMgrImpl::set_name(const string& name)
+{
+  mName = name;
+}
+
+// @brief どこにもファンアウトしていないノードを削除する．
+void
+BdnMgrImpl::clean_up()
+{
+#warning "TODO: 未完"
+}
+
 // @brief ポートを作る．
+// @param[in] name 名前
+// @param[in] iovect ビットごとの方向を指定する配列
+// @note iovect の要素の値の意味は以下の通り
+// - 0 : なし
+// - 1 : 入力のみ
+// - 2 : 出力のみ
+// - 3 : 入力と出力
 BdnPort*
 BdnMgrImpl::new_port(const string& name,
-		 ymuint bit_width)
+		     const vector<ymuint>& iovect)
 {
   void* p = mAlloc.get_memory(sizeof(BdnPort));
   BdnPort* port = new (p) BdnPort();
@@ -298,6 +327,7 @@ BdnMgrImpl::new_port(const string& name,
 
   port->mName = name;
 
+  ymuint bit_width = iovect.size();
   port->mBitWidth = bit_width;
 
   void* q = mAlloc.get_memory(sizeof(BdnNode*) * bit_width);
@@ -310,10 +340,27 @@ BdnMgrImpl::new_port(const string& name,
   port->mAuxDataArray = new (s) BdnAuxData*[bit_width];
 
   for (ymuint i = 0; i < bit_width; ++ i) {
-    port->mInputArray[i] = NULL;
-    port->mOutputArray[i] = NULL;
     void* t = mAlloc.get_memory(sizeof(BdnPortData));
-    port->mAuxDataArray[i] = new (t) BdnPortData(port, i);
+    BdnPortData* aux_data =  new (t) BdnPortData(port, i);
+    port->mAuxDataArray[i] = aux_data;
+
+    BdnNode* input = NULL;
+    BdnNode* output = NULL;
+    ymuint val = iovect[i];
+    if ( val & 1U ) {
+      input = alloc_node();
+      input->set_input_type(BdnNode::kPRIMARY_INPUT);
+      input->mAuxData = aux_data;
+      mInputList.push_back(input);
+    }
+    if ( val & 2U ) {
+      output = alloc_node();
+      output->set_output_type(BdnNode::kPRIMARY_OUTPUT);
+      output->mAuxData = aux_data;
+      mOutputList.push_back(output);
+    }
+    port->mInputArray[i] = input;
+    port->mOutputArray[i] = output;
   }
 
   return port;
@@ -393,15 +440,11 @@ BdnMgrImpl::delete_dff(BdnDff* dff)
 
   mDffList.erase(dff);
 
-  delete_node(dff->output());
-  delete_node(dff->input());
-  delete_node(dff->clock());
-  if ( dff->clear() ) {
-    delete_node(dff->clear());
-  }
-  if ( dff->preset() ) {
-    delete_node(dff->preset());
-  }
+  delete_node(dff->_output());
+  delete_node(dff->_input());
+  delete_node(dff->_clock());
+  delete_node(dff->_clear());
+  delete_node(dff->_preset());
 }
 
 // @brief ラッチを作る．
@@ -450,6 +493,18 @@ BdnMgrImpl::new_latch(const string& name)
   enable->mAuxData = latch->mAuxData;
   mOutputList.push_back(enable);
 
+  BdnNode* clear = alloc_node();
+  latch->mClear = clear;
+  clear->set_output_type(BdnNode::kDFF_CLEAR);
+  clear->mAuxData = latch->mAuxData;
+  mOutputList.push_back(clear);
+
+  BdnNode* preset = alloc_node();
+  latch->mPreset = preset;
+  preset->set_output_type(BdnNode::kDFF_PRESET);
+  preset->mAuxData = latch->mAuxData;
+  mOutputList.push_back(preset);
+
   mLatchList.push_back(latch);
 
   return latch;
@@ -465,57 +520,45 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
 
   mLatchList.erase(latch);
 
-  delete_node(latch->output());
-  delete_node(latch->input());
-  delete_node(latch->enable());
+  delete_node(latch->_output());
+  delete_node(latch->_input());
+  delete_node(latch->_enable());
+  delete_node(latch->_clear());
+  delete_node(latch->_preset());
 }
 
-// @brief 外部入力を作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgrImpl::new_port_input(BdnPort* port,
-			   ymuint bitpos)
+// @brief バランス木を作る．
+// @param[in] node 根のノード
+// @param[in] fcode 機能コード
+// @param[in] start 開始位置
+// @param[in] num 要素数
+// @param[in] node_list 入力のノードのリスト
+// @note node が NULL の場合，新しいノードを確保する．
+BdnNodeHandle
+BdnMgrImpl::make_tree(BdnNode* node,
+		      ymuint fcode,
+		      ymuint start,
+		      ymuint num,
+		      const vector<BdnNodeHandle>& node_list)
 {
-  assert_cond( bitpos < port->bit_width(), __FILE__, __LINE__);
-  assert_cond( port->mInputArray[bitpos] == NULL, __FILE__, __LINE__);
+  switch ( num ) {
+  case 0:
+    assert_not_reached(__FILE__, __LINE__);
 
-  BdnNode* node = alloc_node();
-  node->set_input_type(BdnNode::kPRIMARY_INPUT);
-  node->mAuxData = port->mAuxDataArray[bitpos];
-  port->mInputArray[bitpos] = node;
+  case 1:
+    return node_list[start];
 
-  mInputList.push_back(node);
+  case 2:
+    return set_logic(node, fcode, node_list[start], node_list[start + 1]);
 
-  return node;
-}
+  default:
+    break;
+  }
 
-// @brief 外部出力ノードを作る．
-// @param[in] port ポート
-// @param[in] bitpos ビット位置
-// @return 作成したノードを返す．
-// @note エラー条件は以下の通り
-//  - bitpos が port のビット幅を越えている．
-//  - port の bitpos にすでにノードがある．
-BdnNode*
-BdnMgrImpl::new_port_output(BdnPort* port,
-			    ymuint bitpos)
-{
-  assert_cond( bitpos < port->bit_width(), __FILE__, __LINE__);
-  assert_cond( port->mOutputArray[bitpos] == NULL, __FILE__, __LINE__);
-
-  BdnNode* node = alloc_node();
-  node->set_output_type(BdnNode::kPRIMARY_OUTPUT);
-  node->mAuxData = port->mAuxDataArray[bitpos];
-  port->mOutputArray[bitpos] = node;
-
-  mOutputList.push_back(node);
-
-  return node;
+  ymuint nh = num / 2;
+  BdnNodeHandle l = make_tree(NULL, fcode, start, nh, node_list);
+  BdnNodeHandle r = make_tree(NULL, fcode, start + nh, num - nh, node_list);
+  return set_logic(node, fcode, l, r);
 }
 
 // @brief 論理ノードの内容を変更する．

@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNLATCH_H
-#define YM_BDN_BDNLATCH_H
+#ifndef YM_NETWORKS_BDNLATCH_H
+#define YM_NETWORKS_BDNLATCH_H
 
 /// @file ym_networks/BdnLatch.h
 /// @brief BdnLatch のヘッダファイル
@@ -53,7 +53,7 @@ public:
 
   /// @brief データ出力ノードを返す．
   BdnNode*
-  output();
+  _output();
 
   /// @brief データ入力ノードを返す．
   const BdnNode*
@@ -61,7 +61,7 @@ public:
 
   /// @brief データ入力ノードを返す．
   BdnNode*
-  input();
+  _input();
 
   /// @brief ラッチイネーブルノードを返す．
   const BdnNode*
@@ -69,7 +69,27 @@ public:
 
   /// @brief ラッチイネーブルノードを返す．
   BdnNode*
-  enable();
+  _enable();
+
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  const BdnNode*
+  clear() const;
+
+  /// @brief クリア信号のノードを返す．
+  /// @note NULL の場合もある．
+  BdnNode*
+  _clear();
+
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  const BdnNode*
+  preset() const;
+
+  /// @brief プリセット信号のノードを返す．
+  /// @note NULL の場合もある．
+  BdnNode*
+  _preset();
 
 
 private:
@@ -108,6 +128,12 @@ private:
 
   // ラッチイネーブルノード
   BdnNode* mEnable;
+
+  // クリア信号ノード
+  BdnNode* mClear;
+
+  // プリセット信号ノード
+  BdnNode* mPreset;
 
   // BdnNode の付加するデータ
   BdnAuxData* mAuxData;
@@ -149,7 +175,7 @@ BdnLatch::output() const
 // @brief データ出力ノードを返す．
 inline
 BdnNode*
-BdnLatch::output()
+BdnLatch::_output()
 {
   return mOutput;
 }
@@ -165,7 +191,7 @@ BdnLatch::input() const
 // @brief データ入力ノードを返す．
 inline
 BdnNode*
-BdnLatch::input()
+BdnLatch::_input()
 {
   return mInput;
 }
@@ -181,11 +207,43 @@ BdnLatch::enable() const
 // @brief ラッチイネーブルノードを返す．
 inline
 BdnNode*
-BdnLatch::enable()
+BdnLatch::_enable()
 {
   return mEnable;
 }
 
+// @brief クリア信号のノードを返す．
+inline
+const BdnNode*
+BdnLatch::clear() const
+{
+  return mClear;
+}
+
+// @brief クリア信号のノードを返す．
+inline
+BdnNode*
+BdnLatch::_clear()
+{
+  return mClear;
+}
+
+// @brief プリセット信号のノードを返す．
+inline
+const BdnNode*
+BdnLatch::preset() const
+{
+  return mPreset;
+}
+
+// @brief プリセット信号のノードを返す．
+inline
+BdnNode*
+BdnLatch::_preset()
+{
+  return mPreset;
+}
+
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNLATCH_H
+#endif // YM_NETWORKS_BDNLATCH_H

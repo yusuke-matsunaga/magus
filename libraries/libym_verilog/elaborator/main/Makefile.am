@@ -56,7 +56,6 @@ libym_vl_elab_main_la_SOURCES = \
 	Elaborator.cc
 
 
-libym_vl_elab_main_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_vl_elab_main_la_LIBADD =
 
 libym_vl_elab_main_la_LDFLAGS =

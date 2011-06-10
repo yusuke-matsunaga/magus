@@ -4,15 +4,26 @@
 
 
 SUBDIRS = \
-	. \
 	ym_utils \
+	$(YM_EXTRA_SUBDIRS) \
+	. \
 	tests
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## Variables for building targets
+############################################################
+
 noinst_LTLIBRARIES = libym_utils.la
 
-INCLUDES = \
+
+############################################################
+## Variables for building libym_utils.la
+############################################################
+
+libym_utils_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
@@ -47,7 +58,8 @@ libym_utils_la_SOURCES = \
 	UnitAlloc.cc \
 	random.cc
 
-libym_utils_la_LIBADD =
+libym_utils_la_LIBADD = \
+	$(YM_EXTRA_LIBADD)
 
 libym_utils_la_LDFLAGS =
 

@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNDUMPER_H
-#define YM_BDN_BDNDUMPER_H
+#ifndef YM_NETWORKS_BDNDUMPER_H
+#define YM_NETWORKS_BDNDUMPER_H
 
 /// @file ym_networks/BdnDumper.h
 /// @brief BdnDumper のヘッダファイル
@@ -42,4 +42,4 @@ public:
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNDUMPER_H
+#endif // YM_NETWORKS_BDNDUMPER_H

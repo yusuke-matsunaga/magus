@@ -7,11 +7,11 @@
 ///
 /// $Id: BddMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -29,7 +29,8 @@ public:
 
   // デフォルトマネージャを返す．
   static
-  BddMgr* default_mgr();
+  BddMgr*
+  default_mgr();
 
   // コンストラクタ
   BddMgr();
@@ -42,7 +43,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 自分自身の参照回数関係
   //////////////////////////////////////////////////////////////////////
-  
+
   // 参照回数を1増やす．
   void
   inc_ref();
@@ -52,7 +53,7 @@ public:
   void
   dec_ref();
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // BDDの根の枝の参照回数関数
   //////////////////////////////////////////////////////////////////////
@@ -67,7 +68,7 @@ public:
   void
   dec_rootref(tBddEdge e) = 0;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 変数番号とレベルの対応づけ
   //////////////////////////////////////////////////////////////////////
@@ -89,23 +90,23 @@ public:
   virtual
   tLevel
   level(tVarId varid) const = 0;
-  
+
   // レベルから変数番号を得る．
   virtual
   tVarId
   varid(tLevel level) const = 0;
-  
+
   // 動的変数順変更を許可する．
   virtual
   void
   enable_DVO() = 0;
-  
+
   // 動的変数順変更を禁止する．
   virtual
   void
   disable_DVO() = 0;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // BDD 生成用関数
   //////////////////////////////////////////////////////////////////////
@@ -123,11 +124,11 @@ public:
   // リテラル関数を表すBDDを作る
   tBddEdge
   make_literal(const Literal& lit);
-  
+
   // 否定のリテラル関数を作る．
   tBddEdge
   make_negaliteral(tVarId varid);
-  
+
   // インデックスと左右の子供を指定してBDDを作る．
   tBddEdge
   make_bdd(tVarId varid,
@@ -148,7 +149,7 @@ public:
   tvec_to_bdd(const vector<int>& v,
 	      const VarVector& vars);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
@@ -188,19 +189,19 @@ public:
   tBddEdge
   check_intersect(tBddEdge e1,
 		  tBddEdge e2) = 0;
-  
+
   // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
   // 求める処理
   virtual
   tBddEdge
   xor_moment(tBddEdge e,
 	     tVarId idx) = 0;
-  
+
   // bdd がキューブの時 true を返す．
   virtual
   bool
   check_cube(tBddEdge e) = 0;
-  
+
   // bdd が肯定リテラルのみからなるキューブの時 true を返す．
   virtual
   bool
@@ -233,7 +234,7 @@ public:
   ite_op(tBddEdge e1,
 	 tBddEdge e2,
 	 tBddEdge e3) = 0;
-  
+
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
   void
@@ -258,7 +259,7 @@ public:
 	    tLevel x_level,
 	    tLevel y_level,
 	    tPol pol = kPolPosi) = 0;
-  
+
   // smoothing(elimination)
   // svars に含まれる変数を消去する．
   virtual
@@ -293,17 +294,17 @@ public:
   tBddEdge
   minimal_support(tBddEdge l,
 		  tBddEdge u) = 0;
-  
+
   // smallest cube containing F 演算
   virtual
   tBddEdge
   SCC(tBddEdge e) = 0;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // BDD の構造に関係したメソッド
   //////////////////////////////////////////////////////////////////////
-  
+
   // 根の節点の変数に基づいてShannon展開を行なう．
   // 戻り値として根の節点の変数番号を返し，その変数を0/1に固定した
   // 時の cofactor をそれぞれ f0, f1 に入れる．
@@ -314,19 +315,19 @@ public:
   root_decomp(tBddEdge e,
 	      tBddEdge& e0,
 	      tBddEdge& e1) = 0;
-  
+
   // 根の変数番号インデックスを取り出す．
   // 定数節点の場合には kVarIdMax を返す．
   virtual
   tVarId
   root_var(tBddEdge e) = 0;
-  
+
   // 0枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
   tBddEdge
   edge0(tBddEdge e) = 0;
-  
+
   // 1枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
@@ -337,24 +338,24 @@ public:
   virtual
   bool
   check_noref(tBddEdge e) = 0;
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   // 1へ至るパスを求める関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // 1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
   tBddEdge
   onepath(tBddEdge e) = 0;
-  
+
   // 最短の1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
   tBddEdge
   shortest_onepath(tBddEdge e) = 0;
-  
+
   // 最短の1パスの長さを求める．
   virtual
   tVarSize
@@ -382,14 +383,14 @@ public:
   mpz_class
   minterm_count(tBddEdge e,
 		tVarSize n) = 0;
-  
+
   // Walsh 変換の0次の係数を計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
   walsh0(tBddEdge e,
 	 tVarSize n) = 0;
-  
+
   // Walsh 変換の1次の係数を計算する．
   // n は論理関数の変数の数
   virtual
@@ -398,7 +399,7 @@ public:
 	 tVarId var,
 	 tVarSize n) = 0;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // サポート関係の関数
   //////////////////////////////////////////////////////////////////////
@@ -428,7 +429,7 @@ public:
   tBddEdge
   mark_to_bdd() = 0;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // VarSet の内部で用いられる演算
   //////////////////////////////////////////////////////////////////////
@@ -455,7 +456,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // LitSet の内部で用いられる演算
   //////////////////////////////////////////////////////////////////////
-  
+
   // src1 と src2 がリテラル集合の時に共通部分を求める．
   virtual
   tBddEdge
@@ -509,11 +510,11 @@ public:
   void
   clear_scanmark(tBddEdge e) = 0;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // 内部動作の設定を行う関数
   //////////////////////////////////////////////////////////////////////
-  
+
   // ガーベージコレクションを行なう．
   // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
   virtual
@@ -530,7 +531,7 @@ public:
   void
   param(const BddMgrParam& param,
 	ymuint32 mask) = 0;
-  
+
   // パラメータを取得する．
   virtual
   void
@@ -545,28 +546,28 @@ public:
   virtual
   size_t
   used_mem() const = 0;
-  
+
   // 節点テーブルに登録されているノードの数を得る．
   virtual
   size_t
   node_num() const = 0;
-  
+
   // GC で回収される(フリーになる)ノード数を得る．
   virtual
   size_t
   garbage_num() const = 0;
-  
+
   // 利用可能なフリーノード数を得る．
   virtual
   size_t
   avail_num() const = 0;
-  
+
   // GC の起動された回数を得る．
   virtual
   size_t
   gc_count() const = 0;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // BDDの管理用関数
   //////////////////////////////////////////////////////////////////////
@@ -582,7 +583,7 @@ public:
   assign(Bdd* bdd_p,
 	 tBddEdge new_e);
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // ログ出力用の関数
   //////////////////////////////////////////////////////////////////////
@@ -594,7 +595,7 @@ public:
   // ログ出力用のストリームを解除する．
   void
   unset_logstream();
-  
+
   // ログ出力用のストリームを得る．
   ostream&
   logstream() const;
@@ -619,7 +620,7 @@ private:
   // 参照回数
   int mRefCount;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // このマネージャに管理されている BDD のリスト
   //////////////////////////////////////////////////////////////////////
@@ -628,7 +629,7 @@ private:
   // BDD としては用いない．
   Bdd* mTopBdd;
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // ログ出力用のメンバ
   //////////////////////////////////////////////////////////////////////

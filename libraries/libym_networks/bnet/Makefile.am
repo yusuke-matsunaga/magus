@@ -6,20 +6,13 @@ SUBDIRS = \
 	$(YM_EXTRA_SUBDIRS) \
 	.
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bnet.la
 
-libym_bnet_la_LIBADD = \
-	$(YM_EXTRA_LIBADD) \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-libym_bnet_la_LDFLAGS =
+libym_bnet_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_bnet_la_SOURCES = \
 	StrBNodeMap.h \
@@ -36,3 +29,8 @@ libym_bnet_la_SOURCES = \
 	BNetBlifWriter.cc \
 	BNetEquWriter.cc \
 	BNetVerilogWriter.cc
+
+libym_bnet_la_LIBADD = \
+	$(YM_EXTRA_LIBADD)
+
+libym_bnet_la_LDFLAGS =

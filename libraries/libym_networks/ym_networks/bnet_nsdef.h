@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNET_NSDEF_H
-#define YM_BNET_BNET_NSDEF_H
+#ifndef YM_NETWORKS_BNET_NSDEF_H
+#define YM_NETWORKS_BNET_NSDEF_H
 
 /// @file ym_networks/bnet_nsdef.h
 /// @brief ym_bnet の共通ヘッダファイル
@@ -115,4 +115,4 @@ using nsBnet::BNodeVector;
 
 END_NAMESPACE_YM
 
-#endif // YM_BNET_BNET_NSDEF_H
+#endif // YM_NETWORKS_BNET_NSDEF_H

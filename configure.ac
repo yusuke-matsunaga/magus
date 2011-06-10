@@ -63,7 +63,6 @@ AC_CONFIG_SUBDIRS([include])
 # ===================================================================
 
 ym_libym_utils_enable=1
-ym_libym_zstream_enable=1
 ym_libym_lexp_enable=1
 ym_libym_bdd_enable=1
 ym_libym_npn_enable=1
@@ -76,7 +75,7 @@ ym_libym_dotlib_enable=1
 ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_networks_enable=1
-ym_libym_aig_enable=1
+ym_libym_aig_enable=0
 ym_libym_gds_enable=1
 ym_libym_cec_enable=1
 ym_libym_techmap_enable=1
@@ -90,10 +89,6 @@ YM_INIT_LIBRARIES_SUBDIRS
 # libym_utils
 YM_BUILD_LIBRARY([libym_utils],
 		 [])
-
-# libym_zstream
-YM_BUILD_LIBRARY([libym_zstream],
-		 [ym_have_zlib])
 
 # libym_lexp
 YM_BUILD_LIBRARY([libym_lexp],
@@ -167,8 +162,7 @@ YM_BUILD_LIBRARY([libym_gds],
 # libym_cec
 YM_BUILD_LIBRARY([libym_cec],
 		 [ym_libym_networks_enable,
-		  ym_libym_sat_enable,
-		  ym_libym_aig_enable])
+		  ym_libym_sat_enable])
 
 # libym_techmap
 YM_BUILD_LIBRARY([libym_techmap],
@@ -209,14 +203,14 @@ YM_BUILD_PROGRAM([magus_tclsh],
 # atpg
 YM_BUILD_PROGRAM([atpg],
 		 [ym_libym_utils_enable,
-		  ym_libym_tgnet_enable,
+		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 # matpg
 YM_BUILD_PROGRAM([matpg],
 		 [ym_libym_utils_enable,
 		  ym_libym_lexp_enable,
-		  ym_libym_tgnet_enable,
+		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS

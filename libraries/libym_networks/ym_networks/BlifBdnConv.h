@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BLIFBDNCONV_H
-#define YM_BDN_BLIFBDNCONV_H
+#ifndef YM_NETWORKS_BLIFBDNCONV_H
+#define YM_NETWORKS_BLIFBDNCONV_H
 
 /// @file ym_networks/BlifBdnConv.h
 /// @brief BlifBdnConv のヘッダファイル
@@ -85,4 +85,4 @@ private:
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BLIFBDNCONV_H
+#endif // YM_NETWORKS_BLIFBDNCONV_H

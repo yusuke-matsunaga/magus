@@ -5,13 +5,9 @@
 ///
 /// $Id: BmmVar.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "BddMgrModern.h"
 
@@ -82,7 +78,7 @@ BmmVar::BmmVar(BddMgrModern* mgr, tVarId id) :
 
   mNodeNum = 0;
 }
-  
+
 // デストラクタ
 BmmVar::~BmmVar()
 {
@@ -187,14 +183,14 @@ BmmVar::resize(size_t new_size)
   }
   return true;
 }
-  
+
 // 次のリミット値を計算する
 void
 BmmVar::set_next_limit_size(double load_limit)
 {
   mNextLimit = size_t(double(mTableSize) * load_limit);
 }
-  
+
 // ログ出力用のストリームを得る．
 ostream&
 BmmVar::logstream() const

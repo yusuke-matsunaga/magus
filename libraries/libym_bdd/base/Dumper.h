@@ -7,7 +7,7 @@
 ///
 /// $Id: Dumper.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -97,7 +97,7 @@ private:
   // display_root の下請関数
   void
   display_step(tBddEdge e);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ public:
   // e の内容を出力する．
   void
   dump_edge(tBddEdge e);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

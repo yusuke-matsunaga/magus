@@ -8,7 +8,7 @@
 ///
 /// $Id: BddLitSet.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -35,34 +35,34 @@ public:
   public:
     // コンストラクタ
     iterator();
-    
+
     // 現在指している要素を返す．
     // 末尾かどうかのチェックは行わない．
     Literal
     operator*() const;
-    
+
     // ひとつ先に進める．
     // 自分自身を返す．
     iterator&
     operator++();
-    
+
     // ひとつ先に進める．
     // 進める前の値を返す．
     iterator
     operator++(int);
-    
+
     // 等価比較
     bool
     operator==(const iterator& src) const;
     bool
     operator!=(const iterator& src) const;
-    
+
 
   private:
 
     // BddLitSet 用のコンストラクタ
     iterator(const Bdd& bdd);
-    
+
     // ひとつ先に進める．
     void
     next();
@@ -77,57 +77,57 @@ public:
     Bdd mCur;
 
   };
-  
+
 
 public:
 
   // コンストラクタ
   // 空集合となるが，明示的に使う場合には下の make_empty() を使うべき
   BddLitSet(BddMgrRef mgr);
-  
+
   // コピーコンストラクタ
   BddLitSet(const BddLitSet& src);
-  
+
   // 代入演算子
   const BddLitSet&
   operator=(const BddLitSet& src);
-  
+
   // リテラル1つだけを要素とする集合を作るコンストラクタ
   BddLitSet(BddMgrRef mgr,
 	    tVarId varid,
 	    tPol pol);
   BddLitSet(BddMgrRef mgr,
 	    const Literal& lit);
-  
+
   // vector からの変換用コンストラクタ
   BddLitSet(BddMgrRef mgr,
 	    const LiteralVector& src);
-  
+
   // list からの変換用コンストラクタ
   BddLitSet(BddMgrRef mgr,
 	    const LiteralList& src);
-  
+
   // 空集合を返すクラスメソッド
   static
   BddLitSet
   make_empty(BddMgrRef mgr);
-  
+
   // 空の時に真となる
   bool
   empty() const;
-  
+
   // 要素数を返す．
   size_t
   size() const;
-  
+
   // リテラル関数を返す．
   Bdd
   function() const;
-  
+
   // 先頭の反復子を返す．
   iterator
   begin() const;
-  
+
   // 末尾の反復子を返す．
   iterator
   end() const;
@@ -137,7 +137,7 @@ public:
   // 集合のサイズを返す．
   size_t
   to_vector(LiteralVector& dst) const;
-  
+
   // リテラルのリストに変換する．
   // 順番は内部の実装に依存する．
   // 集合のサイズを返す．
@@ -155,11 +155,11 @@ public:
   // 空集合となる．
   const BddLitSet&
   operator+=(const BddLitSet& set2);
-  
+
   // 集合積を計算する．
   BddLitSet
   operator*(const BddLitSet& set2) const;
-  
+
   // 集合積を計算して代入する．
   const BddLitSet&
   operator*=(const BddLitSet& set2);
@@ -195,7 +195,7 @@ private:
 
   // リテラル集合を表すBDD
   Bdd mBody;
-  
+
   // 要素数を入れておくキャッシュ
   // 最下位1ビットが1の時のみ valid な値を持つ．
   mutable

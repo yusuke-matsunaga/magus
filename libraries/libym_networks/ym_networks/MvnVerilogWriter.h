@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNVERILOGWRITER_H
-#define YM_MVN_MVNVERILOGWRITER_H
+#ifndef YM_NETWORKS_MVNVERILOGWRITER_H
+#define YM_NETWORKS_MVNVERILOGWRITER_H
 
 /// @file ym_networks/MvnVerilogWriter.h
 /// @brief MvnVerilogWriter のヘッダファイル
@@ -54,4 +54,4 @@ public:
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVNVERILOGWRITER_H
+#endif // YM_NETWORKS_MVNVERILOGWRITER_H

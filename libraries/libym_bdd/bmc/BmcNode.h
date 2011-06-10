@@ -7,11 +7,11 @@
 ///
 /// $Id: BmcNode.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -30,7 +30,7 @@ public:
   {
     return mId;
   }
-  
+
   // レベルを得る．
   tLevel
   level() const
@@ -47,7 +47,7 @@ private:
     mLink(NULL)
   {
   }
-  
+
   // デストラクタ
   ~BmcVar()
   {
@@ -62,7 +62,7 @@ private:
   // 変数番号
   // レベルも同一
   tVarId mId;
-  
+
   // 作業用のマーク
   int mMark;
 
@@ -110,7 +110,7 @@ public:
   const ymuint32 kLMax_1 = kLMax - 1;
   static
   const ymuint32 kLMask = kLMax | kLMax_1;
-  
+
 public:
 
   // 中間ノードの場合に0枝/1枝を得る．
@@ -125,7 +125,7 @@ public:
 
   tBddEdge
   edge1(tPol p) const;
-  
+
   // 変数を得る．
   BmcVar*
   var() const;
@@ -133,7 +133,7 @@ public:
   // 変数インデックス値を得る
   tVarId
   varid() const;
-  
+
   // レベルを得る．
   tLevel
   level() const;
@@ -141,52 +141,52 @@ public:
   // p-mark が付いていたらtrueを返す
   bool
   pmark() const;
-  
+
   // n-mark が付いていたらtrueを返す
   bool
   nmark() const;
-  
+
   // p-mark を付ける
   // val が非0でセット,0でリセット
   void
   pmark(int val);
-  
+
   // n-mark を付ける
   // val が非0でセット,0でリセット
   void
   nmark(int val);
-  
+
   // 両方のマークを消す
   void
   rst_mark();
-  
+
   // リンク数を得る．
   size_t
   refcount() const;
-  
+
   // 参照されていない時にtrueを返す
   bool
   noref() const;
-  
+
 
 private:
 
   // リンク数が最大値を越えている時に0，それ以外には1を返す．
   int
   linkdelta() const;
-  
+
   // リンク数を増やす(オーバーフロー時は何もしない)
   size_t
   linkinc();
-  
+
   // リンク数を減らす(オーバーフロー時は何もしない)
   size_t
   linkdec();
-  
+
   // コンストラクタ
   // BddMgrClassic以外はこのオブジェクトを生成できない．
   BmcNode();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

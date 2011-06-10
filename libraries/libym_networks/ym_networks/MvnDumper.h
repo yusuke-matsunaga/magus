@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNDUMPER_H
-#define YM_MVN_MVNDUMPER_H
+#ifndef YM_NETWORKS_MVNDUMPER_H
+#define YM_NETWORKS_MVNDUMPER_H
 
 /// @file ym_networks/MvnDumper.h
 /// @brief MvnDumper のヘッダファイル
@@ -45,4 +45,4 @@ public:
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVNDUMPER_H
+#endif // YM_NETWORKS_MVNDUMPER_H

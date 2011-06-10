@@ -8,14 +8,14 @@
 ///
 /// $Id: Bdd.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_bdd/bdd_nsdef.h"
 #include "ym_lexp/LogExpr.h"
-#include "gmpxx.h"
 #include "ym_utils/Binder.h"
+#include "gmpxx.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -187,24 +187,24 @@ public:
   /// @brief デフォルトのコンストラクタ
   /// @note デフォルトの BDD マネージャの定数0となる
   Bdd();
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   Bdd(const Bdd& src);
-  
+
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   /// @return 自分自身
   const Bdd&
   operator=(const Bdd& src);
-  
+
   /// @brief デストラクタ
   /// @note 根の枝のリンク数を一つ減らして，0になった時には実際に
   /// ノードの解放を行なう．
   /// @note エラーは起こらない．
   ~Bdd();
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   /// @name 特別な値を持つときのチェック
   /// @{
@@ -244,10 +244,10 @@ public:
   /// のとき true を返す．
   bool
   is_leaf() const;
-  
+
   /// @brief 正リテラルのみのキューブのチェック
   /// @return 表している関数が正リテラルのみのキューブ (積項)
-  /// の場合に true を返す． 
+  /// の場合に true を返す．
   bool
   is_posi_cube() const;
 
@@ -270,11 +270,11 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 論理演算＋代入演算子
   /// @{
-  
+
   /// @brief 否定の論理を計算する
   /// @return 否定した論理
   Bdd
@@ -284,19 +284,19 @@ public:
   /// @return 自分自身
   const Bdd&
   negate();
-  
+
   /// @brief AND 付き代入
   /// @param[in] src オペランド
   /// @return 自分自身
   const Bdd&
   operator&=(const Bdd& src);
-  
+
   /// @brief OR 付き代入
   /// @param[in] src オペランド
   /// @return 自分自身
   const Bdd&
   operator|=(const Bdd& src);
-  
+
   /// @brief XOR 付き代入
   /// @param[in] src オペランド
   /// @return 自分自身
@@ -308,7 +308,7 @@ public:
   /// @return 自分自身
   const Bdd&
   operator/=(const BddLitSet& r);
-  
+
   /// @brief generalized cofactor 付き代入
   /// @param[in] c 制約を表す BDD
   /// @return 自分自身
@@ -323,7 +323,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name BDD の構造に関係したメソッド
   /// @{
-  
+
   /// @brief 根の節点の変数に基づいてShannon展開を行なう．
   /// @param[out] f0 0枝のコファクターを入れる BDD
   /// @param[out] f1 1枝のコファクターを入れる BDD
@@ -339,13 +339,13 @@ public:
   /// @retval kVarIdMax 終端節点の場合
   tVarId
   root_var() const;
-  
+
   /// @brief 0枝の指しているコファクターの取得
   /// @retval 0枝の指しているコファクター 内部節点の場合
   /// @retval 自分自身 終端節点の場合
   Bdd
   edge0() const;
-  
+
   /// @brief 1枝の指しているコファクターの取得
   /// @retval 1枝の指しているコファクター 内部節点の場合
   /// @retval 自分自身 終端節点の場合
@@ -360,11 +360,11 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name その他の演算
   /// @{
-  
+
   /// @brief コファクター演算
   /// @param[in] var 変数番号
   /// @param[in] pol 極性
@@ -378,14 +378,14 @@ public:
   /// @return literal によるコファクターを返す．
   Bdd
   cofactor(const Literal& literal) const;
-  
+
   /// @brief Davio展開のモーメント項の計算
   /// @param[in] idx 変数番号
   /// @return Davio 展開のモーメント項 (\f$f_{\overline{x}} \oplus f_x\f$)
   /// を返す．
   Bdd
   xor_moment(tVarId idx) const;
-  
+
   /// @brief Smallest Cube Containg F を求める．
   /// @return SCC を返す．
   Bdd
@@ -435,7 +435,7 @@ public:
   push_down(tLevel x_level,
 	    tLevel y_level,
 	    tPol pol = kPolPosi) const;
-  
+
   /// @brief BDD の内容を積和形論理式に変換する．
   /// @return 等価な積和形論理式
   LogExpr
@@ -444,7 +444,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name ハッシュ用の関数
   /// @{
@@ -457,23 +457,23 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 表示/ノード数の計数など
   /// @{
-  
+
   /// @brief 内容を書き出す
   /// @param[in] s 出力ストリーム
   /// @return ノード数を返す．
   size_t
   display(ostream& s) const;
-  
+
   /// @brief BDD が表す関数のカルノー図を表示する
   /// @param[in] s 主力ストリーム
   /// @warning ただし4変数以内
   void
   display_map(ostream& s) const;
-  
+
   /// @brief BDD の内容を積和形論理式の形で出力する．
   /// @param[in] s 出力ストリーム
   void
@@ -488,24 +488,24 @@ public:
   /// @return BDD が使っているノード数
   size_t
   size() const;
-  
+
   /// @brief 真理値表密度の計算
   /// @param[in] n 入力数
   double
   density(tVarSize n) const;
-  
+
   /// @brief 最小項の数の計算
   /// @param[in] n 入力数
   /// @return 最小項の数
   mpz_class
   minterm_count(tVarSize n) const;
-  
+
   /// @brief Walsh変換の 0次係数の計算
   /// @param[in] n 入力数
   /// @return Walsh変換の 0次係数
   mpz_class
   walsh0(tVarSize n) const;
-  
+
   /// @brief Walsh変換の 1次係数の計算
   /// @param[in] var 変数番号
   /// @param[in] n 入力数
@@ -513,39 +513,39 @@ public:
   mpz_class
   walsh1(tVarId var,
 	 tVarSize n) const;
-  
+
   /// @brief サポート変数集合の計算 (VarVector)
   /// @param[out] support サポート変数集合を格納するベクタ
   /// @return サポートの要素数
   tVarSize
   support(VarVector& support) const;
-  
+
   /// @brief サポート変数集合の計算 (VarList)
   /// @param[out] support サポート変数集合を格納するリスト
   /// @return サポートの要素数
   tVarSize
   support(VarList& support) const;
-  
+
   /// @brief サポート変数集合の計算 (BddVarSet)
   /// @return サポート変数集合
   BddVarSet
   support() const;
-  
+
   /// @brief サポート変数集合の要素数の計算
   /// @return サポート変数集合の要素数
   tVarSize
   support_size() const;
-  
+
   /// @brief 1パスの探索
   /// @return 1パス ('1' の終端へ至る経路) を表すリテラル集合
   BddLitSet
   onepath() const;
-  
+
   /// @brief 最短の 1パスの探索
   /// @return 最短の 1パス ('1' の終端へ至る経路) を表すリテラル集合
   BddLitSet
   shortest_onepath() const;
-  
+
   /// @brief 最短の 1パスの長さの取得
   /// @return 最短の 1パスの長さ
   tVarSize
@@ -554,11 +554,11 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 比較演算
   /// @{
-  
+
   /// @brief 等価比較演算
   /// @param[in] src2 比較対象の BDD
   /// @retval true 自分自身と src2 が等価な論理関数を表している場合
@@ -572,7 +572,7 @@ public:
   /// @retval false 上記以外
   bool
   operator&&(const Bdd& src2) const;
-  
+
   /// @brief 包含関係のチェック
   /// @param[in] src2 比較対象の BDD
   /// @retval true 自分自身が minterms の集合として src2 を含む時
@@ -583,7 +583,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name リテラル集合関係の関数
   /// @{
@@ -626,7 +626,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   //  friend 関数の宣言
   //////////////////////////////////////////////////////////////////////
@@ -777,7 +777,7 @@ private:
   /// @param[in] e 根の枝
   Bdd(BddMgr* pmgr,
       tBddEdge root);
-  
+
   // 根の枝をとり出す
   tBddEdge
   root() const;
@@ -912,7 +912,7 @@ public:
   /// @brief デストラクタ
   ~BddMgrRef();
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 等価比較演算子
   /// @{
@@ -928,31 +928,31 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name BDD 生成用関数
   /// @{
-  
+
   /// @brief 定数0関数を作る．
   /// @return 生成された BDD
   Bdd
   make_zero();
-  
+
   /// @brief 定数1関数を作る．
   /// @return 生成された BDD
   Bdd
   make_one();
-  
+
   /// @brief オバーフローBDDを明示的に生成する．
   /// @return 生成された BDD
   Bdd
   make_overflow();
-  
+
   /// @brief エラーBDDを明示的に生成する．
   /// @return 生成された BDD
   Bdd
   make_error();
-  
+
   /// @brief リテラル関数を表すBDDを作る
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
@@ -967,19 +967,19 @@ public:
   /// @sa Literal
   Bdd
   make_literal(const Literal& lit);
-  
+
   /// @brief 肯定のリテラル関数を作る
   /// @param[in] varid 変数番号
   /// @return 生成された BDD
   Bdd
   make_posiliteral(tVarId varid);
-  
+
   /// @brief 否定のリテラル関数を作る．
   /// @param[in] varid 変数番号
   /// @return 生成された BDD
   Bdd
   make_negaliteral(tVarId varid);
-  
+
   /// @brief インデックスと左右の子供を指定してBDDを作る．
   /// @param[in] varid 変数番号
   /// @param[in] chd_0 0枝の指す BDD
@@ -1011,7 +1011,7 @@ public:
   Bdd
   tvec_to_bdd(const vector<int>& v,
 	      const VarVector& vars);
-  
+
   /// @brief 論理式からBDDを作る．
   /// @param[in] expr 論理式
   /// @param[in] varmap 変数番号の割当てを表す連想配列
@@ -1033,7 +1033,7 @@ public:
   Bdd
   expr_to_bdd(const LogExpr& expr,
 	      const VarBddMap& varmap);
-  
+
   /// @brief ストリームを論理式と見なしてBDDを作る．
   /// @param[in] in 入力ストリーム
   /// @param[out] err_msg エラーメッセージを格納する文字列
@@ -1043,7 +1043,7 @@ public:
   Bdd
   expr_to_bdd(istream& in,
 	      string& err_msg);
-  
+
   /// @brief 文字列を読んで論理式を作り,そこからBDDを作る．
   /// @param[in] s 論理式を表す文字列
   /// @param[out] err_msg エラーメッセージを格納する文字列
@@ -1053,7 +1053,7 @@ public:
   Bdd
   expr_to_bdd(const char* s,
 	      string& err_msg);
-  
+
   /// @brief 文字列を読んで論理式を作り,そこからBDDを作る．
   /// @param[in] s 論理式を表す文字列
   /// @param[out] err_msg エラーメッセージを格納する文字列
@@ -1063,7 +1063,7 @@ public:
   Bdd
   expr_to_bdd(const string& s,
 	      string& err_msg);
-  
+
   /// @brief しきい値関数を表すBDDを返す．
   /// @param[in] n 入力数
   /// @param[in] th しきい値
@@ -1134,7 +1134,7 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 変数番号とレベルの対応づけ
   /// @{
@@ -1159,19 +1159,19 @@ public:
   /// @note もしもレベルが割り当てられていない場合にはエラーとなる．
   tLevel
   level(tVarId varid) const;
-  
+
   /// @brief レベルから変数番号を得る．
   /// @param[in] level レベル
   /// @return level に対応する変数番号
   tVarId
   varid(tLevel level) const;
-  
+
   /// @brief 動的変数順変更を許可する．
   /// @note BddMgr の実装によっては動的変数順の変更をサポートして
   /// いない場合がある
   void
   enable_DVO();
-  
+
   /// @brief 動的変数順変更を禁止する．
   /// @note BddMgr の実装によっては動的変数順の変更をサポートして
   /// いない場合がある
@@ -1181,11 +1181,11 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-  
+
   //////////////////////////////////////////////////////////////////////
   /// @name 内部動作の設定を行う関数
   /// @{
-  
+
   /// @brief ガーベージコレクションを行なう．
   /// @param[in] shrink_nodetable この値が true の時,
   /// 可能なら節点テーブルのサイズを縮小する．
@@ -1197,7 +1197,7 @@ public:
   /// @sa EventBinder
   void
   reg_sweep_binder(EventBinder* binder);
-  
+
   /// @brief ログ出力用のストリームを設定する．
   /// @param[in] s 出力ストリーム
   void
@@ -1206,7 +1206,7 @@ public:
   /// @brief ログ出力用のストリームを解除する．
   void
   unset_logstream();
-  
+
   /// @brief ログ出力用のストリームを得る．
   /// @return ログ出力用のストリーム
   ostream&
@@ -1220,7 +1220,7 @@ public:
   void
   param(const BddMgrParam& param,
 	ymuint32 mask);
-  
+
   /// @brief パラメータを取得する．
   /// @param[out] param 取得されたパラメータを格納する変数
   void
@@ -1233,19 +1233,19 @@ public:
   /// @brief 使用メモリ量(in bytes)を得る．
   size_t
   used_mem() const;
-  
+
   /// @brief 節点テーブルに登録されているノードの数を得る．
   size_t
   node_num() const;
-  
+
   /// @brief GC で回収される(フリーになる)ノード数を得る．
   size_t
   garbage_num() const;
-  
+
   /// @brief 利用可能なフリーノード数を得る．
   size_t
   avail_num() const;
-  
+
   /// @brief GC の起動された回数を得る．
   size_t
   gc_count() const;

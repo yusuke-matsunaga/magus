@@ -13,7 +13,8 @@
 #include "ym_networks/BlifBdnConv.h"
 #include "ym_networks/BdnDumper.h"
 #include "ym_techmap/CellMap.h"
-#include "ym_techmap/CnGraph.h"
+#include "ym_networks/CmnMgr.h"
+#include "ym_networks/CmnDumper.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
@@ -83,15 +84,12 @@ test(string pat_filename,
   BdnDumper bdn_dumper;
   bdn_dumper(cout, sbjgraph);
 
-  CnGraph mapnetwork;
+  CmnMgr mapnetwork;
 
   mapper.area_map(sbjgraph, 0, mapnetwork);
 
-#if 1
-  dump_verilog(cout, mapnetwork);
-#else
-  dump_spice(cout, mapnetwork);
-#endif
+  CmnDumper dumper;
+  dumper.dump(cout, mapnetwork);
 }
 
 END_NAMESPACE_YM_CELLMAP

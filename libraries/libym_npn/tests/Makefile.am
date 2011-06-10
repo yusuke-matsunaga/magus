@@ -28,13 +28,16 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
 YM_TCLPP = $(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
-YM_BDD = $(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la
+YM_BDD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-YM_NPN = $(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la
+YM_NPN = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 #if BUILD_LIBYM_TCLPP
 #NPN_CHECK = npn_check
@@ -53,31 +56,32 @@ tvfunc_test_SOURCES = \
 	TvFuncTest.h \
 	TvFuncTest.cc \
 	tvfunc_test.cc
+
 tvfunc_test_LDADD = \
 	$(YM_NPN) \
-	$(YM_BASE) \
 	@POPT_LIBS@
 
 tvfunc_test2_SOURCES = \
 	tvfunc_test2.cc
+
 tvfunc_test2_LDADD = \
 	$(YM_NPN) \
-	$(YM_BASE) \
 	@POPT_LIBS@
 
 cofactor_test_SOURCES = \
 	cofactor_test.cc \
 	TvFuncTest.h \
 	TvFuncTest.cc
+
 cofactor_test_LDADD = \
 	$(YM_NPN)
 
 npn_check3_SOURCES = \
 	npn_check3.cc
+
 npn_check3_LDADD = \
 	$(YM_NPN) \
 	$(YM_BDD) \
-	$(YM_BASE) \
 	@POPT_LIBS@
 
 #npn_check_SOURCES = \

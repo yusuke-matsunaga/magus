@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDNBLIFWRITER_H
-#define YM_BDN_BDNBLIFWRITER_H
+#ifndef YM_NETWORKS_BDNBLIFWRITER_H
+#define YM_NETWORKS_BDNBLIFWRITER_H
 
 /// @file ym_networks/BdnBlifWriter.h
 /// @brief BdnBlifWriter のヘッダファイル
@@ -44,4 +44,4 @@ public:
 
 END_NAMESPACE_YM_BDN
 
-#endif // YM_BDN_BDNBLIFWRITER_H
+#endif // YM_NETWORKS_BDNBLIFWRITER_H

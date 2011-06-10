@@ -7,11 +7,11 @@
 ///
 /// $Id: BmmVar.h 33 2006-07-16 14:58:17Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -35,7 +35,7 @@ public:
   {
     return mId;
   }
-  
+
   // レベルを得る．
   tLevel level() const
   {
@@ -45,7 +45,7 @@ public:
 private:
   // コンストラクタ
   BmmVar(BddMgrModern* mgr, tVarId id);
-  
+
   // デストラクタ
   ~BmmVar();
 
@@ -61,10 +61,10 @@ private:
   // 節点テーブルを拡張する
   // メモリアロケーションに失敗したら false を返す．
   bool resize(size_t new_size);
-  
+
   // 次のリミット値を計算する
   void set_next_limit_size(double load_limit);
-  
+
   // ログ出力用のストリームを得る．
   ostream& logstream() const;
 
@@ -88,11 +88,11 @@ private:
   // 変数番号
   // これは不変
   tVarId mId;
-  
+
   // レベル
   // これは可変
   tLevel mLevel;
-  
+
   // 作業用のマーク
   int mMark;
 

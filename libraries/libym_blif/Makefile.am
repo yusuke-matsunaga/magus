@@ -7,18 +7,23 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
 
 noinst_LTLIBRARIES = libym_blif.la
 
-libym_blif_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-libym_blif_la_LDFLAGS = 
+############################################################
+## Variables for building libym_blif.la
+############################################################
+
+libym_blif_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_blif_la_SOURCES = \
 	BlifDic.h \
@@ -35,3 +40,8 @@ libym_blif_la_SOURCES = \
 	BlifNetworkHandler.h \
 	BlifNetworkHandler.cc \
 	BlifNetworkReader.cc
+
+libym_blif_la_LIBADD =
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+libym_blif_la_LDFLAGS =

@@ -7,7 +7,7 @@
 ///
 /// $Id: BmcFactory.h 497 2007-03-26 15:22:14Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -46,7 +46,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   string mName;
-  
+
 };
 
 END_NAMESPACE_YM_BDD

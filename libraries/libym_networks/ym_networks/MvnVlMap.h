@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVVLMAP_H
-#define YM_MVN_MVVLMAP_H
+#ifndef YM_NETWORKS_MVVLMAP_H
+#define YM_NETWORKS_MVVLMAP_H
 
 /// @file ym_networks/MvnVlMap.h
 /// @brief MvnVlMap のヘッダファイル
@@ -139,4 +139,4 @@ private:
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVVLMAP_H
+#endif // YM_NETWORKS_MVVLMAP_H

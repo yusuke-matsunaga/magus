@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVN_NSDEF_H
-#define YM_MVN_MVN_NSDEF_H
+#ifndef YM_NETWORKS_MVN_NSDEF_H
+#define YM_NETWORKS_MVN_NSDEF_H
 
 /// @file ym_networks/mvn_nsdef.h
 /// @brief mvn の名前空間の定義ファイル
@@ -77,4 +77,4 @@ using nsMvn::MvnVerilogWriter;
 
 END_NAMESPACE_YM
 
-#endif // YM_MVN_MVN_NSDEF_H
+#endif // YM_NETWORKS_MVN_NSDEF_H

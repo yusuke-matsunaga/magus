@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNINPUTPIN_H
-#define YM_MVN_MVNINPUTPIN_H
+#ifndef YM_NETWORKS_MVNINPUTPIN_H
+#define YM_NETWORKS_MVNINPUTPIN_H
 
 /// @file ym_networks/MvnInputPin.h
 /// @brief MvnInputPin のヘッダファイル
@@ -138,4 +138,4 @@ MvnInputPin::init(MvnNode* node,
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVNINPUTPIN_H
+#endif // YM_NETWORKS_MVNINPUTPIN_H

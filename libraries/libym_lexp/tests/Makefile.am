@@ -36,4 +36,5 @@ YM_LEXP = $(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la
 #base_test_SOURCES = \
 #	base_test.cc
 
-#base_test_LDADD =
+#base_test_LDADD = \
+#	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la

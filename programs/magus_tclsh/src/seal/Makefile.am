@@ -27,8 +27,6 @@ libmagus_seal_tcl_la_SOURCES = \
 	McaCmd2.cc \
 	seal_init.cc
 
-libmagus_seal_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_seal/libym_seal.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
+libmagus_seal_tcl_la_LIBADD =
 
 libmagus_seal_tcl_la_LDFLAGS =

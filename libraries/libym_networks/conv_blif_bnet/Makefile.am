@@ -4,20 +4,17 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_conv_blif_bnet.la
 
-libym_conv_blif_bnet_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-libym_conv_blif_bnet_la_LDFLAGS =
+libym_conv_blif_bnet_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_conv_blif_bnet_la_SOURCES = \
 	BlifBNetConv.cc
+
+libym_conv_blif_bnet_la_LIBADD =
+
+libym_conv_blif_bnet_la_LDFLAGS =

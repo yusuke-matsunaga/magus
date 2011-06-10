@@ -1,10 +1,10 @@
-#ifndef YM_TGNET_TGNODE_H
-#define YM_TGNET_TGNODE_H
+#ifndef YM_NETWORKS_TGNODE_H
+#define YM_NETWORKS_TGNODE_H
 
 /// @file ym_networks/TgNode.h
 /// @brief TgNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: TgNode.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -29,7 +29,7 @@ class TgEdge
 {
   friend class TgNode;
   friend class TgNetwork;
-  
+
 private:
 
   // コンストラクタ
@@ -54,13 +54,13 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ファンアウト先のゲート
   TgNode* mTo;
 
   // ファンアウト先の入力ピン番号
   size_t mIpos;
-  
+
 };
 
 
@@ -78,13 +78,13 @@ private:
 class TgNode
 {
   friend class TgNetwork;
-  
+
 private:
   // このクラスは TgNetwork 内でしか生成／破壊できない．
-  
+
   // コンストラクタ
   TgNode(ymuint32 gid);
-  
+
   // デストラクタ
   ~TgNode();
 
@@ -111,7 +111,7 @@ public:
   /// @brief 未定義タイプの時 true を返す．
   bool
   is_undef() const;
-  
+
   /// @brief 外部入力タイプの時 true を返す．
   /// @note FF 出力もここに含まれる．
   bool
@@ -121,7 +121,7 @@ public:
   /// @note FF 入力もここに含まれる．
   bool
   is_output() const;
-  
+
   /// @brief logic タイプの時 true を返す．
   bool
   is_logic() const;
@@ -129,11 +129,11 @@ public:
   /// @brief 組み込み型でない logic タイプの時 true を返す．
   bool
   is_cplx_logic() const;
-  
+
   /// @brief ffin タイプの時 true を返す．
   bool
   is_ffin() const;
-  
+
   /// @brief ffout タイプの時 true を返す．
   bool
   is_ffout() const;
@@ -161,19 +161,19 @@ public:
   /// @brief ファンアウト数を得る．
   size_t
   fanout_num() const;
-  
+
   /// @brief ファンアウトの枝を得る．
   const TgEdge*
   fanout_edge(size_t pos) const;
-  
+
   /// @brief ファンアウト先のノードを得る．
   const TgNode*
   fanout(size_t pos) const;
-  
+
   /// @brief ファンアウト先のノードの入力位置を得る．
   size_t
   fanout_ipos(size_t pos) const;
-  
+
   /// @brief ffin/ffout ノードの時に相方のノードを返す．
   TgNode*
   alt_node();
@@ -181,16 +181,16 @@ public:
   /// @brief ffin/ffout ノードの時に相方のノードを返す．
   const TgNode*
   alt_node() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // タイプ id
   TgGateTemplate mTypeId;
-  
+
   // 全体での通し番号
   ymuint32 mGid;
 
@@ -199,7 +199,7 @@ private:
 
   // 名前
   const char* mName;
-  
+
   // ファンインのノードの配列
   TgNode** mFanins;
 
@@ -208,10 +208,10 @@ private:
 
   // ファンアウトの枝の配列
   TgEdge* mFanouts;
-  
+
   // ffin/ffout ノードの時に相方のノードを保持する．
   TgNode* mAltNode;
-  
+
 };
 
 
@@ -373,7 +373,7 @@ TgNode::fanout_edge(size_t pos) const
 {
   return &mFanouts[pos];
 }
-  
+
 // @brief ファンアウト先のノードを得る．
 inline
 const TgNode*
@@ -408,4 +408,4 @@ TgNode::alt_node() const
 
 END_NAMESPACE_YM_TGNET
 
-#endif // YM_TGNET_TGNODE_H
+#endif // YM_NETWORKS_TGNODE_H

@@ -5,13 +5,9 @@
 ///
 /// $Id: bmm_symmetry.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "BddMgrModern.h"
 #include "BmmCompTbl.h"
@@ -58,7 +54,7 @@ BddMgrModern::cs_step2(tBddEdge e)
   }
   return result;
 }
-  
+
 // xを0にしたパスe1と1にしたパスe2をくらべて，それぞれyを1/0にした結果が
 // 同一ならばkEdge1(True)を返す．つまりこのパスに関してはxとyは対称
 tBddEdge

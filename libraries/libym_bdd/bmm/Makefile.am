@@ -4,20 +4,25 @@
 
 SUBDIR =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
+
+noinst_LTLIBRARIES = libym_bdd_bmm.la
+
+
+############################################################
+## Variables for building libym_bdd_bmm.la
+############################################################
+
+libym_bdd_bmm_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir) \
 	$(GMP_INCLUDES)
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libym_bdd_bmm.la
-
-libym_bdd_bmm_la_LIBADD = \
-	$(GMP_LIBS)
-
-libym_bdd_bmm_la_LDFLAGS =
 
 libym_bdd_bmm_la_SOURCES = \
 	BddMgrModern.h \
@@ -36,3 +41,8 @@ libym_bdd_bmm_la_SOURCES = \
 	bmm_symmetry.cc \
 	bmm_vs.cc \
 	bmm_ls.cc
+
+libym_bdd_bmm_la_LIBADD =
+
+libym_bdd_bmm_la_LDFLAGS = \
+	$(GMP_LIBS)

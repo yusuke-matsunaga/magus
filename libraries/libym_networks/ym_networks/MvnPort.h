@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNPORT_H
-#define YM_MVN_MVNPORT_H
+#ifndef YM_NETWORKS_MVNPORT_H
+#define YM_NETWORKS_MVNPORT_H
 
 /// @file ym_networks/MvnPort.h
 /// @brief MvnPort のヘッダファイル
@@ -342,4 +342,4 @@ MvnPort::port_ref(ymuint pos) const
 
 END_NAMESPACE_YM_MVN
 
-#endif // YM_MVN_MVNPORT_H
+#endif // YM_NETWORKS_MVNPORT_H

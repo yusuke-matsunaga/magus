@@ -1,5 +1,5 @@
-#ifndef YM_TGNET_TGNET_NSDEF_H
-#define YM_TGNET_TGNET_NSDEF_H
+#ifndef YM_NETWORKS_TGNET_NSDEF_H
+#define YM_NETWORKS_TGNET_NSDEF_H
 
 /// @file ym_networks/tgnet_nsdef.h
 /// @brief TgNetwork 用の名前空間の定義
@@ -50,4 +50,4 @@ using nsTgnet::TgIscas89Reader;
 
 END_NAMESPACE_YM
 
-#endif // YM_TGNET_TGNET_NSDEF_H
+#endif // YM_NETWORKS_TGNET_NSDEF_H

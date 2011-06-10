@@ -13,9 +13,11 @@ INCLUDES = \
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bdd_npn.la
-libym_bdd_npn_la_LIBADD = \
-	$(top_builddir)/src/libym_base/libym_base.la
+
+libym_bdd_npn_la_LIBADD =
+
 libym_bdd_npn_la_LDFLAGS =
+
 libym_bdd_npn_la_SOURCES = \
 	WalshSig.cc \
 	WalshSig.h \

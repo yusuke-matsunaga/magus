@@ -1,5 +1,5 @@
-#ifndef YM_BDN_BDN_NSDEF_H
-#define YM_BDN_BDN_NSDEF_H
+#ifndef YM_NETWORKS_BDN_NSDEF_H
+#define YM_NETWORKS_BDN_NSDEF_H
 
 /// @file ym_networks/bdn_nsdef.h
 /// @brief ym_bdn の共通ヘッダファイル
@@ -188,4 +188,4 @@ using nsBdn::BlifBdnConv;
 
 END_NAMESPACE_YM
 
-#endif // YM_BDN_BDN_NSDEF_H
+#endif // YM_NETWORKS_BDN_NSDEF_H

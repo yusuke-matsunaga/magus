@@ -46,9 +46,6 @@ libym_techmap_cell_la_SOURCES = \
 	RepFunc.h
 
 libym_techmap_cell_la_LIBADD = \
-	libdump/libym_techmap_libdump.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	libdump/libym_techmap_libdump.la
 
 libym_techmap_cell_la_LDFLAGS =

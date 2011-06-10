@@ -7,10 +7,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -26,7 +22,16 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_AIG = $(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+LIBYM_AIG = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_aig/libym_aig.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_sat/libym_sat.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
 	bnet2aig \
@@ -36,9 +41,10 @@ noinst_PROGRAMS = \
 
 bnet2aig_SOURCES = \
 	bnet2aig.cc
+
 bnet2aig_LDADD = \
-	$(LIBYM_AIG) \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(LIBYM_AIG)
 
 genpat_SOURCES = \
 	GpNode.h \

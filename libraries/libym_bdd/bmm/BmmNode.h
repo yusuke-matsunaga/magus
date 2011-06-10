@@ -7,11 +7,11 @@
 ///
 /// $Id: BmmNode.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_bdd/Bdd.h>
+#include "ym_bdd/Bdd.h"
 
 #include "BmmVar.h"
 
@@ -51,7 +51,7 @@ public:
   const ymuint32 kLMax_1 = kLMax - 1;
   static
   const ymuint32 kLMask = kLMax | kLMax_1;
-  
+
 
 public:
   // 中間ノードの場合に0枝/1枝を得る．
@@ -60,7 +60,7 @@ public:
 
   tBddEdge
   edge1() const;
-  
+
   tBddEdge
   edge0(tPol p) const;
 
@@ -74,7 +74,7 @@ public:
   // 変数インデックス値を得る
   tVarId
   varid() const;
-  
+
   // レベルを得る．
   tLevel
   level() const;
@@ -82,29 +82,29 @@ public:
   // p-mark が付いていたらtrueを返す
   bool
   pmark() const;
-  
+
   // n-mark が付いていたらtrueを返す
   bool
   nmark() const;
-  
+
   // p-mark を付ける
   // val が非0でセット,0でリセット
   void
   pmark(int val);
-  
+
   // n-mark を付ける
   // val が非0でセット,0でリセット
   void
   nmark(int val);
-  
+
   // 両方のマークを消す
   void
   rst_mark();
-  
+
   // リンク数を得る．
   size_t
   refcount() const;
-  
+
   // 参照されていない時にtrueを返す
   bool
   noref() const;
@@ -115,19 +115,19 @@ private:
   // リンク数が最大値を越えている時に0，それ以外には1を返す．
   int
   linkdelta() const;
-  
+
   // リンク数を増やす(オーバーフロー時は何もしない)
   size_t
   linkinc();
-  
+
   // リンク数を減らす(オーバーフロー時は何もしない)
   size_t
   linkdec();
-  
+
   // コンストラクタ
   // BddMgr以外はこのオブジェクトを生成できない．
   BmmNode();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -25,7 +25,18 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_TECHMAP = $(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la
+LIBYM_TECHMAP = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 bin_PROGRAMS = \
 	cell_mgr_test \

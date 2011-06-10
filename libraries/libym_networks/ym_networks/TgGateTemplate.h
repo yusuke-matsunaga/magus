@@ -1,10 +1,10 @@
-#ifndef YM_TGNET_TGGATETEMPLATE_H
-#define YM_TGNET_TGGATETEMPLATE_H
+#ifndef YM_NETWORKS_TGGATETEMPLATE_H
+#define YM_NETWORKS_TGGATETEMPLATE_H
 
 /// @file ym_networks/TgGateTemplate.h
 /// @brief 論理ゲートの種類を定義したファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: TgGateTemplate.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -22,18 +22,18 @@ BEGIN_NAMESPACE_YM_TGNET
 enum tTgGateType {
   /// @brief 未定義
   kTgUndef  = 0,
-  
+
   /// @brief 外部入力
   kTgInput  = 1,
-  
+
   /// @brief 外部出力
   kTgOutput = 2,
-  
+
   /// @brief 定数0
   kTgConst0 = 3,
   /// @brief 定数1
   kTgConst1 = 4,
-  
+
   /// @brief バッファ
   kTgBuff   = 8,
   /// @brief NOT ゲート
@@ -50,7 +50,7 @@ enum tTgGateType {
   kTgXor    = 14,
   /// @brief XNOR ゲート
   kTgXnor   = 15,
-  
+
   /// @brief ユーザー定義型の先頭
   kTgUsrDef = 32
 };
@@ -72,7 +72,7 @@ public:
   TgGateTemplate(tTgGateType type = kTgUndef,
 		 size_t ni = 0);
 
-  
+
 public:
 
   /// @brief 論理関数の型を得る．
@@ -82,16 +82,16 @@ public:
   /// @brief 入力数を得る．
   size_t
   ni() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // データ
   ymuint32 mData;
-  
+
 };
 
 /// @relates TgGateTemplate
@@ -153,4 +153,4 @@ using nsTgnet::kTgUsrDef;
 
 END_NAMESPACE_YM
 
-#endif // YM_TGNET_TGGATETEMPLATE_H
+#endif // YM_NETWORKS_TGGATETEMPLATE_H

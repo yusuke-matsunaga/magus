@@ -4,19 +4,25 @@
 
 SUBDIR =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## Variables for building targets
+############################################################
+
+noinst_LTLIBRARIES = libym_bdd_dec.la
+
+
+############################################################
+## Variables for building libym_bdd_dec.la
+############################################################
+
+libym_bdd_dec_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir) \
 	$(GMP_INCLUDES)
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libym_bdd_dec.la
-
-libym_bdd_dec_la_LIBADD =
-
-libym_bdd_dec_la_LDFLAGS =
 
 libym_bdd_dec_la_SOURCES = \
 	Dg.cc \
@@ -25,4 +31,8 @@ libym_bdd_dec_la_SOURCES = \
 	DgMgr.cc \
 	Bidec.cc \
 	PrimDec.cc
+
+libym_bdd_dec_la_LIBADD =
+
+libym_bdd_dec_la_LDFLAGS =
 

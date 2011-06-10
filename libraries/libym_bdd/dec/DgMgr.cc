@@ -5,26 +5,22 @@
 ///
 /// $Id: DgMgr.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 //#define DG_VERIFY
 
 //#define DG_PROFILE
 
-#include <ym_bdd/Dg.h>
+#include "ym_bdd/Dg.h"
 
 #include "DgNode.h"
 #include "base/BddMgr.h"
 
 #if defined(DG_PROFILE)
 
-#include <ym_utils/StopWatch.h>
+#include "ym_utils/StopWatch.h"
 
 BEGIN_NAMESPACE_YM_BDD
 BEGIN_NONAMESPACE
@@ -45,11 +41,11 @@ class DgBinder :
   // コンストラクタ
   // DgMgr を引数として指定する．
   DgBinder(DgMgr* mgr);
-  
+
  private:
   // GCの時に呼ばれる仮想関数
   virtual void event_proc();
-  
+
  private:
   DgMgr* mMgr;
 };
@@ -382,7 +378,7 @@ DgMgr::decomp(const Bdd& f)
 #endif
 
   tDgEdge root;
-  
+
   // 特別な場合
   if ( f.is_zero() ) {
     root = make_const(0);
@@ -413,7 +409,7 @@ DgMgr::bidecomp(const Bdd& f)
 #endif
 
   tDgEdge root;
-  
+
   // 特別な場合
   if ( f.is_zero() ) {
     root = make_const(0);
@@ -427,7 +423,7 @@ DgMgr::bidecomp(const Bdd& f)
     root = decomp_step(f.root());
     mBidecomp = false;
   }
-  
+
 #if defined(DG_PROFILE)
   mtimer.change(0);
 #endif
@@ -479,7 +475,7 @@ DgMgr::decomp_step(tBddEdge e)
 
     // ハッシュに登録する．
     node_hash.insert(make_pair(e, Dg(result, this)));
-    
+
 #if defined(DG_PROFILE)
     mtimer.change(12);
 #endif
@@ -918,7 +914,7 @@ DgMgr::merge(tVarId varid,
 #if defined(DG_PROFILE)
   mtimer.change(8);
 #endif
-  
+
   // 共通の入力を求める．
   // OR/XOR ノードが部分的に共通な場合に注意．
   vector<DgNode*> inputs;
@@ -1187,7 +1183,7 @@ DgMgr::case2xor(tVarId varid,
   size_t ni = v0->ni();
   tDgEdge tmp;
   if ( ni == 2 ) {
-    int alt_pos = pos ^ 1;  // 0 なら 1，1 なら 0 
+    int alt_pos = pos ^ 1;  // 0 なら 1，1 なら 0
     tmp = v0->input(alt_pos);
     if ( pol0 == 1 ) {
       inv_edge(tmp);
@@ -1723,7 +1719,7 @@ DgMgr::make_cplx(const Bdd& f_orig,
     inputs2[i] = make_edge(inode);
     support += inode->support();
   }
-  
+
   tDgEdge result = new_edge(f, support, Dg::kCplx, inputs2, opol);
   return result;
 }

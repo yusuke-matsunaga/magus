@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2010 Yusuke Matsunaga
+Copyright (C) 2005-2011 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -58,6 +58,9 @@ fi
 AC_CHECK_HEADERS([pwd.h])
 AC_CHECK_HEADERS([sys/param.h])
 
+AC_CHECK_HEADERS([zlib.h], [ym_have_zlib=1])
+
+
 
 # ===================================================================
 # Checks for typedefs, structures, and compiler characteristics
@@ -100,6 +103,17 @@ YMTOOLS_SRCDIR="\$(top_srcdir)/../.."
 YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
+
+YM_EXTRA_SUBDIRS=""
+YM_EXTRA_LIBADD=""
+if test "$ym_have_zlib" = 1; then
+   YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS zstream"
+   YM_EXTRA_LIBADD="$YM_EXTRA_LIBADD zstream/libym_zstream.la"
+   AC_CONFIG_FILES([zstream/Makefile])
+   AC_CONFIG_FILES([tests/zstream/Makefile])
+fi
+AC_SUBST([YM_EXTRA_SUBDIRS])
+AC_SUBST([YM_EXTRA_LIBADD])
 
 
 # ===================================================================

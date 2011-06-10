@@ -2,9 +2,7 @@
 
 ## $Id: Makefile.am 1343 2008-03-25 17:15:35Z matsunaga $
 
-SUBDIRS = 
-
-INCLUDES =
+SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 

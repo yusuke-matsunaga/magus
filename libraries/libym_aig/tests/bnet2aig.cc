@@ -14,8 +14,8 @@
 #include "ym_aig/AigMgr.h"
 #include "ym_aig/AigHandle.h"
 
-#include "ym_aig/AigSatMgr.h"
-#include "ym_sat/SatSolver.h"
+//#include "ym_aig/AigSatMgr.h"
+//#include "ym_sat/SatSolver.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -88,11 +88,13 @@ bnet2aig(const BNetwork& network,
 
   aig_mgr.dump_handles(cout, output_handle_list);
 
+#if 0
   SatSolver* solver = SatSolverFactory::gen_solver();
   AigSatMgr aigsat(aig_mgr, *solver);
   AigHandle root = output_handle_list.front();
   vector<Bool3> model;
   Bool3 stat = aigsat.sat(root, model);
+#endif
 }
 
 END_NAMESPACE_YM

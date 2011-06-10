@@ -26,7 +26,6 @@ libym_smt_parser_la_SOURCES = \
 	SmtLibParser.h \
 	SmtLibParser.cc
 
-libym_smt_parser_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_smt_parser_la_LIBADD =
 
 libym_smt_parser_la_LDFLAGS =

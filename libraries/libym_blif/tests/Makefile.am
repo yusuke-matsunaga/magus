@@ -4,10 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -24,7 +20,10 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-LIBYM_BLIF = $(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la
+LIBYM_BLIF = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
 	parsertest \
@@ -32,19 +31,26 @@ noinst_PROGRAMS = \
 	lexptest \
 	reader_test
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
 parsertest_SOURCES = \
 	parsertest.cc
+
 parsertest_LDADD = $(LIBYM_BLIF)
 
 nullparser_SOURCES = \
 	nullparser.cc
+
 nullparser_LDADD = $(LIBYM_BLIF)
 
 lexptest_SOURCES = \
 	lexptest.cc
-lexptest_LDADD = $(LIBYM_BLIF) \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la
+
+lexptest_LDADD = $(LIBYM_BLIF)
 
 reader_test_SOURCES = \
 	reader_test.cc
+
 reader_test_LDADD = $(LIBYM_BLIF)

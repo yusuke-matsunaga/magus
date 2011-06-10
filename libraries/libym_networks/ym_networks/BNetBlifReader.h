@@ -1,5 +1,5 @@
-#ifndef YM_BNET_BNETBLIFREADER_H
-#define YM_BNET_BNETBLIFREADER_H
+#ifndef YM_NETWORKS_BNETBLIFREADER_H
+#define YM_NETWORKS_BNETBLIFREADER_H
 
 /// @file ym_networks/BNetBlifReader.h
 /// @brief BNetBlifReader のヘッダファイル
@@ -70,4 +70,4 @@ using nsBnet::BNetBlifReader;
 
 END_NAMESPACE_YM
 
-#endif // YM_BNET_BNETBLIFREADER_H
+#endif // YM_NETWORKS_BNETBLIFREADER_H

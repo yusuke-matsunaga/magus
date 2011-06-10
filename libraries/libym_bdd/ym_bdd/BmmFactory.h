@@ -7,7 +7,7 @@
 ///
 /// $Id: BmmFactory.h 497 2007-03-26 15:22:14Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -40,7 +40,7 @@ public:
   virtual
   BddMgr*
   operator()() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -11,6 +11,7 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/cmn_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
 
 
@@ -69,7 +70,7 @@ public:
   void
   area_map(const BdnMgr& sbjgraph,
 	   ymuint mode,
-	   CnGraph& mapnetwork);
+	   CmnMgr& mapnetwork);
 
 #if 0
   /// @brief 段数最小化 DAG covering のヒューリスティック関数

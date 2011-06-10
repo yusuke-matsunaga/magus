@@ -26,10 +26,6 @@ libmagus_techmap_tcl_la_SOURCES = \
 	TechmapCmd.h \
 	TechmapCmd.cc
 
-libmagus_techmap_tcl_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
+libmagus_techmap_tcl_la_LIBADD =
 
 libmagus_techmap_tcl_la_LDFLAGS =

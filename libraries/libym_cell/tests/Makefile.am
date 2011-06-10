@@ -30,13 +30,21 @@ bin_PROGRAMS = \
 	dotlib_reader_test \
 	dump_restore_test
 
+YM_CELL = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
 mislib_reader_test_SOURCES = \
 	mislib_reader_test.cc
 
 mislib_reader_test_LDFLAGS =
 
 mislib_reader_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+	$(YM_CELL)
 
 dotlib_reader_test_SOURCES = \
 	dotlib_reader_test.cc
@@ -44,7 +52,7 @@ dotlib_reader_test_SOURCES = \
 dotlib_reader_test_LDFLAGS =
 
 dotlib_reader_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+	$(YM_CELL)
 
 dump_restore_test_SOURCES = \
 	dump_restore_test.cc
@@ -52,4 +60,4 @@ dump_restore_test_SOURCES = \
 dump_restore_test_LDFLAGS =
 
 dump_restore_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+	$(YM_CELL)
