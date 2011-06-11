@@ -347,7 +347,7 @@ private:
   bool mSane;
 
   // SatClause のメモリ領域確保用のアロケータ
-  SimpleAlloc mAlloc;
+  FragAlloc mAlloc;
 
   // 制約節の配列
   vector<SatClause*> mConstrClause;
