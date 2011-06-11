@@ -10,6 +10,7 @@
 
 
 #include "SatSolverMiniSat.h"
+#include "ym_sat/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -28,7 +29,7 @@ SatSolverMiniSat::SatSolverMiniSat()
 SatSolverMiniSat::~SatSolverMiniSat()
 {
 }
-  
+
 // @brief 正しい状態のときに true を返す．
 bool
 SatSolverMiniSat::sane() const

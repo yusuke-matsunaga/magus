@@ -1,17 +1,17 @@
-#ifndef LIBYM_SAT_SATSOLVERIMPL_H
-#define LIBYM_SAT_SATSOLVERIMPL_H
+#ifndef LIBYM_SAT_YMSAT_YMSAT_H
+#define LIBYM_SAT_YMSAT_YMSAT_H
 
-/// @file libym_sat/SatSolverImpl.h
-/// @brief SatSolverImpl のヘッダファイル
+/// @file libym_sat/YmSat.h
+/// @brief YmSat のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SatSolverImpl.h 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: YmSat.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_sat/SatSolver.h"
+#include "SatSolverImpl.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/StopWatch.h"
@@ -26,8 +26,8 @@ BEGIN_NAMESPACE_YM_SAT
 class SatAnalyzer;
 
 //////////////////////////////////////////////////////////////////////
-/// @class Params SatSolverImpl.h "SatSolverImpl.h"
-/// @brief SatSolverImpl の挙動を制御するパラメータ
+/// @class Params YmSat.h "YmSat.h"
+/// @brief YmSat の挙動を制御するパラメータ
 //////////////////////////////////////////////////////////////////////
 struct Params
 {
@@ -39,7 +39,7 @@ struct Params
 
   /// @brief 学習節の decay 値
   double mClauseDecay;
-  
+
   /// @brief コンストラクタ
   Params() :
     mVarDecay(1.0),
@@ -57,40 +57,40 @@ struct Params
     mClauseDecay(clause_decay)
   {
   }
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatSolverImpl SatSolverImpl.h "SatSolverImpl.h"
+/// @class YmSat YmSat.h "YmSat.h"
 /// @brief SatSolver の実装クラス
 //////////////////////////////////////////////////////////////////////
-class SatSolverImpl :
-  public SatSolver
+class YmSat :
+  public SatSolverImpl
 {
   friend class SatAnalyzer;
-  
+
 public:
 
   /// @brief コンストラクタ
   /// @param[in] analyzer 解析器のポインタ
-  SatSolverImpl(SatAnalyzer* analyzer);
+  YmSat(SatAnalyzer* analyzer);
 
   /// @brief デストラクタ
   virtual
-  ~SatSolverImpl();
+  ~YmSat();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // SatSolver で定義されている仮想関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 正しい状態のときに true を返す．
   virtual
   bool
   sane() const;
-  
+
   /// @brief 変数を追加する．
   /// @return 新しい変数番号を返す．
   /// @note 変数番号は 0 から始まる．
@@ -155,7 +155,7 @@ public:
   void
   timer_on(bool enable);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 実装用のプライベート関数
@@ -168,7 +168,7 @@ private:
   // 割当てキューに基づいて implication を行う．
   SatReason
   implication();
-  
+
   // level までバックトラックする
   void
   backtrack(int level);
@@ -210,20 +210,20 @@ private:
   // 節を削除する．
   void
   delete_clause(SatClause* clause);
-    
+
   // watcher list を得る．
   WatcherList&
   watcher_list(Literal lit);
-  
+
   // Watcher を追加する．
   void
   add_watcher(Literal watch_lit,
 	      SatReason reason);
-  
+
   // 変数の評価を行う．
   Bool3
   eval(tVarId id) const;
-  
+
   // literal の評価を行う．
   Bool3
   eval(Literal l) const;
@@ -239,7 +239,7 @@ private:
   // 変数の割り当て理由を返す．
   SatReason
   reason(tVarId varid) const;
-  
+
   // 学習節が使われているか調べる．
   bool
   is_locked(SatClause* clause) const;
@@ -263,16 +263,16 @@ private:
   // 学習節のアクティビティを定率で減少させる．
   void
   decay_clause_activity();
-  
+
   // 実際に変数に関するデータ構造を生成する．
   void
   alloc_var();
-  
+
   // 変数に関する配列を拡張する．
   void
   expand_var();
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // ヒープ用の関数
@@ -285,22 +285,22 @@ private:
   /// @brief 要素が空の時 true を返す．
   bool
   heap_empty() const;
-  
+
   /// @brief 変数を始めてヒープに追加する．
   /// @param[in] var 追加する変数
   void
   heap_add_var(tVarId var);
-  
+
   /// @brief 変数を再びヒープに追加する．
   /// @param[in] var 追加する変数
   void
   heap_push(tVarId var);
-  
+
   /// @brief アクティビティ最大の変数を取り出す．
   /// @note 該当の変数はヒープから取り除かれる．
   tVarId
   heap_pop_top();
-  
+
   /// @brief 引数の位置にある要素を適当な位置まで沈めてゆく
   void
   heap_move_down(ymuint pos);
@@ -314,7 +314,7 @@ private:
   void
   heap_set(tVarId var,
 	   ymuint pos);
-  
+
   /// @brief 左の子供の位置を計算する
   static
   ymuint
@@ -329,12 +329,12 @@ private:
   static
   ymuint
   heap_parent(ymuint pos);
-  
+
   /// @brief 内容を出力する
   void
   heap_dump(ostream& s) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -349,24 +349,21 @@ private:
   // SatClause のメモリ領域確保用のアロケータ
   SimpleAlloc mAlloc;
 
-  // Watcher 用のアロケータ
-  UnitAlloc mWatcherAlloc;
-
   // 制約節の配列
   vector<SatClause*> mConstrClause;
 
   // 学習節の配列
   vector<SatClause*> mLearntClause;
-  
+
   // 変数の数
   ymuint32 mVarNum;
-  
+
   // 前回の alloc_var で処理した時の変数の数
   ymuint32 mOldVarNum;
-  
+
   // 変数関係の配列のサイズ
   ymuint32 mVarSize;
-  
+
   // 値の配列
   Bool3* mVal;
 
@@ -384,29 +381,29 @@ private:
 
   // watcher list
   WatcherList* mWatcherList;
-  
+
   // ヒープ用の配列
   // サイズは mVarSize
   ymuint32* mHeap;
 
   // ヒープの要素数
   ymuint32 mHeapNum;
-  
+
   // 矛盾の解析時にテンポラリに使用される節
   SatClause* mTmpBinClause;
-  
+
   // search 開始時の decision level
   int mRootLevel;
-  
+
   // 値割り当てを保持するリスト
   AssignList mAssignList;
-      
+
   // 変数のアクティビティの増加量
   double mVarBump;
 
   // 変数のアクティビティの減衰量
   double mVarDecay;
-  
+
   // 学習節のアクティビティの増加量
   double mClauseBump;
 
@@ -427,7 +424,7 @@ private:
 
   // restart 数
   ymuint mRestart;
-  
+
   // 総コンフリクト数
   ymuint64 mConflictNum;
 
@@ -439,13 +436,13 @@ private:
 
   // 二項制約節の数
   ymuint64 mConstrBinNum;
-  
+
   // 制約節の総リテラル数
   ymuint64 mConstrLitNum;
 
   // 二項学習節の数
   ymuint64 mLearntBinNum;
-  
+
   // 学習節の総リテラル数
   ymuint64 mLearntLitNum;
 
@@ -454,13 +451,13 @@ private:
 
   // 学習節の制限
   ymuint64 mLearntLimit;
-  
+
   // mConflistLimit の最大値
   ymuint64 mMaxConflict;
-  
+
   // メッセージハンドラのリスト
   list<SatMsgHandler*> mMsgHandlerList;
-  
+
   // add_clause 用の作業領域
   vector<Literal> mAcTmp;
 
@@ -474,7 +471,7 @@ private:
 // @brief 変数の数を得る．
 inline
 ymuint
-SatSolverImpl::variable_num() const
+YmSat::variable_num() const
 {
   return mVarNum;
 }
@@ -482,7 +479,7 @@ SatSolverImpl::variable_num() const
 // @brief 制約節の数を得る．
 inline
 ymuint
-SatSolverImpl::clause_num() const
+YmSat::clause_num() const
 {
   return mConstrClause.size() + mConstrBinNum;
 }
@@ -490,7 +487,7 @@ SatSolverImpl::clause_num() const
 // @brief 制約節のリテラルの総数を得る．
 inline
 ymuint
-SatSolverImpl::literal_num() const
+YmSat::literal_num() const
 {
   return mConstrLitNum;
 }
@@ -498,7 +495,7 @@ SatSolverImpl::literal_num() const
 // watcher list を得る．
 inline
 WatcherList&
-SatSolverImpl::watcher_list(Literal lit)
+YmSat::watcher_list(Literal lit)
 {
   ymuint index = lit.index();
   return mWatcherList[index];
@@ -507,7 +504,7 @@ SatSolverImpl::watcher_list(Literal lit)
 // 変数の評価を行う．
 inline
 Bool3
-SatSolverImpl::eval(tVarId id) const
+YmSat::eval(tVarId id) const
 {
   return mVal[id];
 }
@@ -515,7 +512,7 @@ SatSolverImpl::eval(tVarId id) const
 // literal の評価を行う．
 inline
 Bool3
-SatSolverImpl::eval(Literal l) const
+YmSat::eval(Literal l) const
 {
   ymuint index = l.index();
   Bool3 val = eval(index / 2);
@@ -527,7 +524,7 @@ SatSolverImpl::eval(Literal l) const
 // 矛盾が起きたら false を返す．
 inline
 bool
-SatSolverImpl::check_and_assign(Literal lit)
+YmSat::check_and_assign(Literal lit)
 {
   Bool3 old_val = eval(lit);
   if ( old_val != kB3X ) {
@@ -540,8 +537,8 @@ SatSolverImpl::check_and_assign(Literal lit)
 // 値の割当てを行う．
 inline
 void
-SatSolverImpl::assign(Literal lit,
-		      SatReason reason)
+YmSat::assign(Literal lit,
+	      SatReason reason)
 {
   tVarId varid = lit.varid();
   mVal[varid] = static_cast<Bool3>(1 - static_cast<int>(lit.pol()) * 2);
@@ -555,7 +552,7 @@ SatSolverImpl::assign(Literal lit,
 // 現在の decision level を返す．
 inline
 int
-SatSolverImpl::decision_level() const
+YmSat::decision_level() const
 {
   return mAssignList.cur_level();
 }
@@ -563,7 +560,7 @@ SatSolverImpl::decision_level() const
 // 変数の decision level を返す．
 inline
 int
-SatSolverImpl::decision_level(tVarId varid) const
+YmSat::decision_level(tVarId varid) const
 {
   return mDecisionLevel[varid];
 }
@@ -571,7 +568,7 @@ SatSolverImpl::decision_level(tVarId varid) const
 // 変数の割り当て理由を返す．
 inline
 SatReason
-SatSolverImpl::reason(tVarId varid) const
+YmSat::reason(tVarId varid) const
 {
   return mReason[varid];
 }
@@ -579,7 +576,7 @@ SatSolverImpl::reason(tVarId varid) const
 // @brief clase が含意の理由になっているか調べる．
 inline
 bool
-SatSolverImpl::is_locked(SatClause* clause) const
+YmSat::is_locked(SatClause* clause) const
 {
   // 直感的には分かりにくいが，SatClause の最初のリテラルは
   // 残りのリテラルによって含意されていることになっている．
@@ -592,7 +589,7 @@ SatSolverImpl::is_locked(SatClause* clause) const
 // @brief 時間計測機能を制御する
 inline
 void
-SatSolverImpl::timer_on(bool enable)
+YmSat::timer_on(bool enable)
 {
   mTimerOn = enable;
 }
@@ -600,7 +597,7 @@ SatSolverImpl::timer_on(bool enable)
 // 実際に変数に関するデータ構造を生成する．
 inline
 void
-SatSolverImpl::alloc_var()
+YmSat::alloc_var()
 {
   if ( mOldVarNum < mVarNum ) {
     if ( mVarSize < mVarNum ) {
@@ -618,24 +615,24 @@ SatSolverImpl::alloc_var()
 // @brief 空にする．
 inline
 void
-SatSolverImpl::heap_clear()
+YmSat::heap_clear()
 {
   mHeapNum = 0;
 }
-  
+
 // @brief 要素が空の時 true を返す．
 inline
 bool
-SatSolverImpl::heap_empty() const
+YmSat::heap_empty() const
 {
   return mHeapNum == 0;
 }
-  
+
 // @brief 変数を始めてヒープに追加する．
 // @param[in] var 追加する変数
 inline
 void
-SatSolverImpl::heap_add_var(tVarId var)
+YmSat::heap_add_var(tVarId var)
 {
   heap_set(var, mHeapNum);
   ++ mHeapNum;
@@ -644,7 +641,7 @@ SatSolverImpl::heap_add_var(tVarId var)
 // @brief 要素を追加する．
 inline
 void
-SatSolverImpl::heap_push(tVarId var)
+YmSat::heap_push(tVarId var)
 {
   if ( mHeapPos[var] == -1 ) {
     ymuint pos = mHeapNum;
@@ -657,7 +654,7 @@ SatSolverImpl::heap_push(tVarId var)
 // @brief もっともアクティビティの高い変数を返す．
 inline
 tVarId
-SatSolverImpl::heap_pop_top()
+YmSat::heap_pop_top()
 {
   // この assert は重いのでコメントアウトしておく
   //assert_cond(mHeapNum > 0, __FILE__, __LINE__);
@@ -675,7 +672,7 @@ SatSolverImpl::heap_pop_top()
 // 引数の位置にある要素を適当な位置まで上げてゆく
 inline
 void
-SatSolverImpl::heap_move_up(ymuint pos)
+YmSat::heap_move_up(ymuint pos)
 {
   tVarId var = mHeap[pos];
   double val = mActivity[var];
@@ -695,17 +692,17 @@ SatSolverImpl::heap_move_up(ymuint pos)
 // 変数を配列にセットする．
 inline
 void
-SatSolverImpl::heap_set(tVarId var,
+YmSat::heap_set(tVarId var,
 			ymuint pos)
 {
   mHeap[pos] = var;
   mHeapPos[var] = pos;
 }
-  
+
 // @brief 左の子供の位置を計算する
 inline
 ymuint
-SatSolverImpl::heap_left(ymuint pos)
+YmSat::heap_left(ymuint pos)
 {
   return pos + pos + 1;
 }
@@ -713,7 +710,7 @@ SatSolverImpl::heap_left(ymuint pos)
 // @brief 右の子供の位置を計算する．
 inline
 ymuint
-SatSolverImpl::heap_right(ymuint pos)
+YmSat::heap_right(ymuint pos)
 {
   return pos + pos + 2;
 }
@@ -721,11 +718,11 @@ SatSolverImpl::heap_right(ymuint pos)
 // @brief 親の位置を計算する．
 inline
 ymuint
-SatSolverImpl::heap_parent(ymuint pos)
+YmSat::heap_parent(ymuint pos)
 {
   return (pos - 1) >> 1;
 }
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SATSOLVERIMPL_H
+#endif // LIBYM_SAT_YMSAT_YMSAT_H

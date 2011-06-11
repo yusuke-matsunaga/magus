@@ -11,6 +11,8 @@
 
 #include "ym_sat/DimacsParser.h"
 #include "ym_sat/SatSolver.h"
+#include "ym_sat/SatMsgHandler.h"
+#include "ym_sat/SatStats.h"
 
 #include "ym_utils/StopWatch.h"
 
@@ -32,7 +34,7 @@ class SatDimacsHandler :
 public:
 
   /// @brief コンストラクタ
-  SatDimacsHandler(SatSolver* solver);
+  SatDimacsHandler(SatSolver& solver);
 
   /// @brief デストラクタ
   virtual
@@ -88,7 +90,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  SatSolver* mSolver;
+  SatSolver& mSolver;
 
   vector<vector<int> > clause_list;
 
@@ -166,7 +168,7 @@ private:
 
 
 // @brief コンストラクタ
-SatDimacsHandler::SatDimacsHandler(SatSolver* solver) :
+SatDimacsHandler::SatDimacsHandler(SatSolver& solver) :
   mSolver(solver)
 {
 }
@@ -195,7 +197,7 @@ SatDimacsHandler::read_p(const FileRegion& loc,
 			 ymuint nc)
 {
   for (ymuint i = 0; i < nv; ++ i) {
-    mSolver->new_var();
+    mSolver.new_var();
   }
 
   return true;
@@ -226,7 +228,7 @@ SatDimacsHandler::read_clause(const FileRegion& loc,
     }
     tmp.push_back(Literal(vid, pol));
   }
-  mSolver->add_clause(tmp);
+  mSolver.add_clause(tmp);
 
   clause_list.push_back(lits);
 
@@ -376,7 +378,7 @@ main(int argc,
     istream& s1 = s;
 #endif
 #endif
-    SatSolver* solver = SatSolverFactory::gen_solver();
+    SatSolver solver;
 
     DimacsParser parser;
     SatDimacsHandler handler(solver);
@@ -394,8 +396,8 @@ main(int argc,
     }
 
     YmsatMsgHandler satmsghandler(cout);
-    solver->reg_msg_handler(&satmsghandler);
-    solver->timer_on(true);
+    solver.reg_msg_handler(&satmsghandler);
+    solver.timer_on(true);
 
     cout << "===================================================================" << endl;
     cout << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl;
@@ -405,11 +407,11 @@ main(int argc,
     StopWatch sw;
     sw.start();
     vector<Bool3> model;
-    Bool3 ans = solver->solve(model);
+    Bool3 ans = solver.solve(model);
     sw.stop();
 
     SatStats stats;
-    solver->get_stats(stats);
+    solver.get_stats(stats);
 
     cout << "===================================================================" << endl;
     cout << "restarts          : " << stats.mRestart << endl

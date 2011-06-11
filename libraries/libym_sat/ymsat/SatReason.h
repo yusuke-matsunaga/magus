@@ -1,13 +1,13 @@
-#ifndef LIBYM_SAT_SATREASON_H
-#define LIBYM_SAT_SATREASON_H
+#ifndef LIBYM_SAT_YMSAT_SATREASON_H
+#define LIBYM_SAT_YMSAT_SATREASON_H
 
-/// @file libym_sat/SatReason.h
+/// @file libym_sat/ymsat/SatReason.h
 /// @brief SatReason のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SatReason.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -88,7 +88,7 @@ private:
 
   // SatClause か Literal を保持する
   ympuint mBody;
-  
+
 };
 
 
@@ -103,7 +103,7 @@ operator==(const SatReason& left,
 bool
 operator!=(const SatReason& left,
 	   const SatReason& right);
-  
+
 /// @relates SatReason
 /// @brief SatReason の内容を出力する
 ostream&
@@ -187,4 +187,4 @@ operator!=(const SatReason& left,
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SATREASON_H
+#endif // LIBYM_SAT_YMSAT_SATREASON_H

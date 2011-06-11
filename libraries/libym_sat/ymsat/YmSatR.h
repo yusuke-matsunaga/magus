@@ -1,39 +1,39 @@
-#ifndef LIBYM_SAT_SATSOLVERIMPLR_H
-#define LIBYM_SAT_SATSOLVERIMPLR_H
+#ifndef LIBYM_SAT_YMSAT_YMSATR_H
+#define LIBYM_SAT_YMSAT_YMSATR_H
 
-/// @file libym_sat/SatSolverImplR.h
-/// @brief SatSolverImplR のヘッダファイル
+/// @file libym_sat/YmSatR.h
+/// @brief YmSatR のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SatSolverImplR.h 2203 2009-04-16 05:04:40Z matsunaga $
+/// $Id: YmSatR.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatSolverImpl.h"
+#include "YmSat.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatSolverImplR SatSolverImplR.h "SatSolverImplR.h"
-/// @brief ログ記録機能付きの SatSolverImpl
+/// @class YmSatR YmSatR.h "YmSatR.h"
+/// @brief ログ記録機能付きの YmSat
 //////////////////////////////////////////////////////////////////////
-class SatSolverImplR :
-  public SatSolverImpl
+class YmSatR :
+  public YmSat
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] out 出力ストリーム
   /// @param[in] analyzer 解析器のポインタ
-  SatSolverImplR(ostream& out,
-		 SatAnalyzer* analyer);
+  YmSatR(ostream& out,
+	 SatAnalyzer* analyer);
 
   /// @brief デストラクタ
   virtual
-  ~SatSolverImplR();
+  ~YmSatR();
 
 
 public:
@@ -74,9 +74,9 @@ private:
 
   // ログの出力先のストリーム
   ostream& mOut;
-  
+
 };
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SATSOLVERIMPLR_H
+#endif // LIBYM_SAT_YMSAT_YMSATR_H

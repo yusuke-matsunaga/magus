@@ -1,17 +1,18 @@
-#ifndef LIBYM_SAT_SATCLAUSE_H
-#define LIBYM_SAT_SATCLAUSE_H
+#ifndef LIBYM_SAT_YMSAT_SATCLAUSE_H
+#define LIBYM_SAT_YMSAT_SATCLAUSE_H
 
-/// @file libym_sat/SatClause.h
+/// @file libym_sat/ymsat/SatClause.h
 /// @brief SatClause のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SatClause.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_sat/SatSolver.h"
+#include "ym_sat/sat_nsdef.h"
+#include "ym_lexp/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -32,12 +33,13 @@ BEGIN_NAMESPACE_YM_SAT
 //////////////////////////////////////////////////////////////////////
 class SatClause
 {
-  friend class SatSolverImpl;
+  friend class YmSat;
+
 private:
 
   /// @brief コンストラクタ
   /// @param[in] lits リテラルのリスト
-  /// @param[in] learnt 学習節の場合 true 
+  /// @param[in] learnt 学習節の場合 true
   explicit
   SatClause(const vector<Literal>& lits,
 	    bool learnt);
@@ -69,7 +71,7 @@ public:
   /// @brief 1番目のリテラルに対するアクセス
   Literal&
   lit1();
-  
+
   /// @brief 学習節の場合 true を返す．
   bool
   is_learnt() const;
@@ -77,7 +79,7 @@ public:
   /// @brief 学習節の場合にアクティビティを返す．
   double
   activity() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -89,11 +91,11 @@ private:
 
   // activity
   double mActivity;
-  
+
   // リテラルの配列
   // 実際にはこの後にリテラル数分の領域を確保する．
   Literal mLits[1];
-  
+
 };
 
 /// @relates SatClause
@@ -165,4 +167,4 @@ SatClause::activity() const
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SATCLAUSE_H
+#endif // LIBYM_SAT_YMSAT_SATCLAUSE_H

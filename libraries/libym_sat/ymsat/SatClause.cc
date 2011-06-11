@@ -1,11 +1,11 @@
 
-/// @file libym_sat/SatClause.cc
+/// @file libym_sat/ymsat/SatClause.cc
 /// @brief SatClause の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SatClause.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -55,7 +55,7 @@ operator<<(ostream& s,
       tmp[i] = c.lit(i);
     }
     sort(tmp.begin() + 1, tmp.end());
-    
+
     s << "(";
     const char* plus = "";
     for (size_t i = 0; i < n; ++ i) {

@@ -1,17 +1,17 @@
 
-/// @file libym_sat/SaBase.cc
+/// @file libym_sat/ymsat/analyzer/SaBase.cc
 /// @brief SaBase の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SaBase.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "SaBase.h"
 #include "SatSolverImpl.h"
-#include "SatClause.h"
+#include "../SatClause.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

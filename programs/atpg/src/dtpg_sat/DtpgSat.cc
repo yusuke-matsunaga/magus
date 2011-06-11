@@ -147,7 +147,7 @@ make_cnf(SatSolver& solver,
       }
     }
     break;
-    
+
   case kTgXnor:
     {
       ymuint ni = inputs.size();
@@ -196,7 +196,7 @@ make_cnf(SatSolver& solver,
     assert_not_reached(__FILE__, __LINE__);
     return;
   }
-  
+
   ymuint nc = lexp.child_num();
   vector<Literal> local_inputs(nc);
   for (ymuint i = 0; i < nc; ++ i) {
@@ -270,20 +270,20 @@ DtpgSat::run(const TgNetwork& network,
   ymuint n = network.node_num();
   ymuint nl = network.logic_num();
   ymuint npo = network.output_num2();
-  
+
   const TgNode* fnode = f->node();
   const TgNode* fsrc = fnode;
   if ( f->is_input_fault() ) {
     ymuint ipos = f->pos();
     fsrc = fnode->fanin(ipos);
   }
-  
+
   mVarMap.clear();
   mVarMap.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mVarMap[i].mMark = kNone;
   }
-  
+
   // まず fnode の TFO にマークをつける．
   // 同時にマークの付いたノードは queue につまれる．
   vector<const TgNode*> queue;
@@ -330,29 +330,26 @@ DtpgSat::run(const TgNetwork& network,
       }
     }
   }
-  
+
   // 以降は kTFO か kTFI マークのついたノードのみを対象とする．
 
-  SatSolver* solver_p = NULL;
+  string type;
   switch ( mMode ) {
   case 0:
-    solver_p = SatSolverFactory::gen_solver();
     break;
 
   case 1:
-    solver_p = SatSolverFactory::gen_recsolver(cout);
     break;
 
   case 2:
-    solver_p = SatSolverFactory::gen_minisat();
+    type = "minista";
     break;
 
   default:
-    solver_p = SatSolverFactory::gen_solver();
     break;
   }
-  SatSolver& solver = *solver_p;
-  
+  SatSolver solver(type);
+
   // 変数の生成 (glit, flit, dlit の3つを作る)
   // ちょっと分かりにくいが fsrc は普通のゲートにも
   // ファンアウトしているので kTFO マークは付かない．
@@ -369,7 +366,7 @@ DtpgSat::run(const TgNetwork& network,
       }
     }
   }
-  
+
   // 正常回路の CNF を生成
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* node = network.sorted_logic(i);
@@ -398,7 +395,7 @@ DtpgSat::run(const TgNetwork& network,
     solver.add_clause(~input,  output);
     solver.add_clause( input, ~output);
   }
-  
+
   // 故障回路の CNF を生成
   if ( f->is_input_fault() ) {
     ymuint ipos = f->pos();
@@ -429,7 +426,7 @@ DtpgSat::run(const TgNetwork& network,
     solver.add_clause( glit, ~output,  dlit);
     solver.add_clause( glit,  output, ~dlit);
   }
-  
+
   // mark の付いていないノードは正常回路，付いているノードは故障回路
   // を用いて CNF を作る．
   vector<Literal> odiff;
@@ -476,7 +473,7 @@ DtpgSat::run(const TgNetwork& network,
     solver.add_clause(dep);
   }
   solver.add_clause(odiff);
-  
+
   vector<Literal> assumptions(2);
   if ( f->val() ) {
     assumptions[0] = Literal(gvar(fsrc), kPolNega);
@@ -486,7 +483,7 @@ DtpgSat::run(const TgNetwork& network,
     assumptions[0] = Literal(gvar(fsrc), kPolPosi);
     assumptions[1] = Literal(fvar(fsrc), kPolNega);
   }
-  
+
   vector<Bool3> model;
   Bool3 stat = solver.solve(assumptions, model);
   tStat ans = kAbort;
@@ -511,10 +508,8 @@ DtpgSat::run(const TgNetwork& network,
     ans = kUntest;
   }
 
-  solver_p->get_stats(mStats);
-  
-  delete solver_p;
-  
+  solver.get_stats(mStats);
+
   return ans;
 }
 
@@ -524,7 +519,7 @@ DtpgSat::stats() const
 {
   return mStats;
 }
-  
+
 // @brief 使用する SAT エンジンを指定する．
 void
 DtpgSat::set_mode(int mode)

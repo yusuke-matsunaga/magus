@@ -91,8 +91,11 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_sat/Makefile])
-AC_CONFIG_FILES([analyzer/Makefile])
+AC_CONFIG_FILES([include/Makefile])
+AC_CONFIG_FILES([ymsat/Makefile])
+AC_CONFIG_FILES([ymsat/analyzer/Makefile])
 AC_CONFIG_FILES([MiniSat/Makefile])
+AC_CONFIG_FILES([dimacs/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

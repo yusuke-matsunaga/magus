@@ -1,17 +1,17 @@
 
-/// @file libym_sat/SaSimple.cc
+/// @file libym_sat/ymsat/analyzer/SaSimple.cc
 /// @brief SaSimple の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SaSimple.cc 1293 2008-02-21 02:25:52Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "SaSimple.h"
 #include "SatSolverImpl.h"
-#include "SatClause.h"
+#include "../SatClause.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

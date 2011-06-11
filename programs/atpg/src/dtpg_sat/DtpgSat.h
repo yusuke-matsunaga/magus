@@ -15,7 +15,7 @@
 #include "dtpgsat_nsdef.h"
 #include "ym_networks/tgnet_nsdef.h"
 #include "ym_networks/TgNode.h"
-#include "ym_sat/SatSolver.h"
+#include "ym_sat/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG
@@ -42,7 +42,7 @@ public:
   /// @brief デストラクタ
   virtual
   ~DtpgSat();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -60,16 +60,16 @@ public:
   run(const TgNetwork& network,
       SaFault* f,
       TestVector* tv);
-  
+
   /// @brief 直前の実行結果を得る．
   const SatStats&
   stats() const;
-  
+
   /// @brief 使用する SAT エンジンを指定する．
   void
   set_mode(int mode);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
@@ -84,7 +84,7 @@ private:
   /// @brief マークを得る．
   Mark&
   mark(const TgNode* node);
-  
+
   /// @brief 正常回路の変数番号を得る．
   ymuint
   gvar(const TgNode* node);
@@ -97,17 +97,17 @@ private:
   ymuint
   dvar(const TgNode* node);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で使うデータ構造
   //////////////////////////////////////////////////////////////////////
-  
+
   struct Var
   {
     // マーク
     Mark mMark;
-    
+
     // 正常回路の変数番号
     ymuint mGid;
 
@@ -123,16 +123,16 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 変数番号の割り当て表
   vector<Var> mVarMap;
-  
+
   // 直前の SAT の実行結果
   SatStats mStats;
-  
+
   // SAT のモード
   int mMode;
-  
+
 };
 
 // @brief マークを得る．
@@ -141,8 +141,8 @@ DtpgSat::Mark&
 DtpgSat::mark(const TgNode* node)
 {
   return mVarMap[node->gid()].mMark;
-}   
-  
+}
+
 // @brief 正常回路の変数番号を得る．
 inline
 ymuint

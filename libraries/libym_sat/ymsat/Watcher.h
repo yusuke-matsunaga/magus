@@ -1,5 +1,5 @@
-#ifndef LIBYM_SAT_WATCHER_H
-#define LIBYM_SAT_WATCHER_H
+#ifndef LIBYM_SAT_YMSAT_WATCHER_H
+#define LIBYM_SAT_YMSAT_WATCHER_H
 
 /// @file libym_sat/Watcher.h
 /// @brief Watcher のヘッダファイル
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_SAT
 /// @brief watch literal に関連付けられた節のリストを表すクラス
 ///
 /// (a1 + a2 + a3 + ... an) という節があるとする．
-/// この時， a1 と a2 が watch literal ならば，~a1 または ~a2 
+/// この時， a1 と a2 が watch literal ならば，~a1 または ~a2
 /// の割り当てが起こったときに，この節の watch literal の更新を行う
 /// 必要がある．
 /// そのような節のリストを作るためのクラス
@@ -39,7 +39,7 @@ public:
   /// @param[in] src もととなる SatReason
   explicit
   Watcher(SatReason src);
-  
+
 };
 
 
@@ -63,7 +63,7 @@ public:
   /// @brief 要素を追加する．
   void
   add(Watcher elem);
-  
+
   /// @brief 要素数を返す．
   ymuint
   num() const;
@@ -71,7 +71,7 @@ public:
   /// @brief pos 番目の要素を返す．
   Watcher
   elem(ymuint pos) const;
-  
+
   /// @brief pos 番目の要素を設定する．
   void
   set_elem(ymuint pos,
@@ -80,12 +80,12 @@ public:
   /// @brief 要素を切り詰める．
   void
   erase(ymuint num);
-  
+
   /// @brief from の内容を移す．
   /// @note from は空になる．
   void
   move(WatcherList& from);
-  
+
 
 private:
 
@@ -93,12 +93,12 @@ private:
   void
   expand(ymuint req_size);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 配列のサイズ
   ymuint32 mSize;
 
@@ -156,7 +156,7 @@ WatcherList::add(Watcher elem)
   set_elem(mNum, elem);
   ++ mNum;
 }
-  
+
 // @brief 要素数を返す．
 inline
 ymuint
@@ -172,7 +172,7 @@ WatcherList::elem(ymuint pos) const
 {
   return mArray[pos];
 }
-  
+
 // @brief pos 番目の要素を設定する．
 inline
 void
@@ -189,7 +189,7 @@ WatcherList::erase(ymuint num)
 {
   mNum = num;
 }
-  
+
 // @brief from の内容を移す．
 // @note from は空になる．
 inline
@@ -228,4 +228,4 @@ WatcherList::expand(ymuint req_size)
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SATREASON_H
+#endif // LIBYM_SAT_YMSAT_SATREASON_H

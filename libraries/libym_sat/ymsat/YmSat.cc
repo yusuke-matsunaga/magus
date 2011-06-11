@@ -1,15 +1,17 @@
 
-/// @file libym_sat/SatSolverImpl.cc
-/// @brief SatSolverImpl の実装ファイル
+/// @file libym_sat/ymsat/YmSat.cc
+/// @brief YmSat の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SatSolverImpl.cc 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: YmSat.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatSolverImpl.h"
+#include "YmSat.h"
+#include "ym_sat/SatStats.h"
+#include "ym_sat/SatMsgHandler.h"
 #include "SatAnalyzer.h"
 #include "SatClause.h"
 
@@ -49,15 +51,14 @@ Params kDefaultParams(0.95, 0.02, 0.999);
 
 
 //////////////////////////////////////////////////////////////////////
-// SatSolverImpl
+// YmSat
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SatSolverImpl::SatSolverImpl(SatAnalyzer* analyzer) :
+YmSat::YmSat(SatAnalyzer* analyzer) :
   mAnalyzer(analyzer),
   mSane(true),
   mAlloc(4096),
-  mWatcherAlloc(sizeof(Watcher), 1024),
   mVarNum(0),
   mOldVarNum(0),
   mVarSize(0),
@@ -89,14 +90,14 @@ SatSolverImpl::SatSolverImpl(SatAnalyzer* analyzer) :
   mAnalyzer->set_solver(this);
 
   mTmpBinClause = new_clause(vector<Literal>(2));
-  
+
   mRestart = 0;
-  
+
   mTimerOn = false;
 }
 
 // @brief デストラクタ
-SatSolverImpl::~SatSolverImpl()
+YmSat::~YmSat()
 {
   delete mAnalyzer;
   delete [] mVal;
@@ -107,10 +108,10 @@ SatSolverImpl::~SatSolverImpl()
   delete [] mWatcherList;
   delete [] mHeap;
 }
-  
+
 // @brief 正しい状態のときに true を返す．
 bool
-SatSolverImpl::sane() const
+YmSat::sane() const
 {
   return mSane;
 }
@@ -119,24 +120,24 @@ SatSolverImpl::sane() const
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 tVarId
-SatSolverImpl::new_var()
+YmSat::new_var()
 {
   if ( decision_level() != 0 ) {
     // エラー
     cout << "Error!: decision_level() != 0" << endl;
     return 0;
   }
-  
+
   // ここではカウンタを増やすだけ
   // 実際の処理は alloc_var() でまとめて行う．
   tVarId n = mVarNum;
   ++ mVarNum;
   return n;
 }
-  
+
 // 変数に関する配列を拡張する．
 void
-SatSolverImpl::expand_var()
+YmSat::expand_var()
 {
   ymuint old_size = mVarSize;
   Bool3* old_val = mVal;
@@ -189,16 +190,16 @@ SatSolverImpl::expand_var()
 // @brief 節を追加する．
 // @param[in] lits リテラルのベクタ
 void
-SatSolverImpl::add_clause(const vector<Literal>& lits)
+YmSat::add_clause(const vector<Literal>& lits)
 {
   if ( decision_level() != 0 ) {
     // エラー
-    cout << "Error![SatSolverImpl]: decision_level() != 0" << endl;
+    cout << "Error![YmSat]: decision_level() != 0" << endl;
     return;
   }
-  
+
   if ( !mSane ) {
-    cout << "Error![SatSolverImpl]: mSane == false" << endl;
+    cout << "Error![YmSat]: mSane == false" << endl;
     return;
   }
 
@@ -207,7 +208,7 @@ SatSolverImpl::add_clause(const vector<Literal>& lits)
   sort(mAcTmp.begin(), mAcTmp.end());
 
   alloc_var();
-  
+
   // - 重複したリテラルの除去
   // - false literal の除去
   // - true literal を持つかどうかのチェック
@@ -230,7 +231,7 @@ SatSolverImpl::add_clause(const vector<Literal>& lits)
     }
     if ( l.varid() >= mVarNum ) {
       // 範囲外
-      cout << "Error![SatSolverImpl]: literal(" << l << "): out of range"
+      cout << "Error![YmSat]: literal(" << l << "): out of range"
 	   << endl;
       return;
     }
@@ -242,7 +243,7 @@ SatSolverImpl::add_clause(const vector<Literal>& lits)
 
   ymuint n = mAcTmp.size();
   mConstrLitNum += n;
-  
+
   if ( n == 0 ) {
     // empty clause があったら unsat
     mSane = false;
@@ -267,9 +268,9 @@ SatSolverImpl::add_clause(const vector<Literal>& lits)
     }
     return;
   }
-  
+
   Literal l1 = mAcTmp[1];
-  
+
   if ( n == 2 ) {
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
@@ -289,7 +290,7 @@ SatSolverImpl::add_clause(const vector<Literal>& lits)
 
 // 学習節を追加する．
 void
-SatSolverImpl::add_learnt_clause(const vector<Literal>& lits)
+YmSat::add_learnt_clause(const vector<Literal>& lits)
 {
   ymuint n = lits.size();
   mLearntLitNum += n;
@@ -334,12 +335,12 @@ SatSolverImpl::add_learnt_clause(const vector<Literal>& lits)
     SatClause* clause = new_clause(lits, true);
     mLearntClause.push_back(clause);
     reason = SatReason(clause);
-    
+
     // watcher-list の設定
     add_watcher(~l0, reason);
     add_watcher(~l1, reason);
   }
-  
+
   // learnt clause の場合には必ず unit clause になっているはず．
   assert_cond(eval(l0) != kB3False, __FILE__, __LINE__);
   if ( debug & debug_assign ) {
@@ -352,8 +353,8 @@ SatSolverImpl::add_learnt_clause(const vector<Literal>& lits)
 
 // Watcher を追加する．
 void
-SatSolverImpl::add_watcher(Literal watch_lit,
-			   SatReason reason)
+YmSat::add_watcher(Literal watch_lit,
+		   SatReason reason)
 {
   watcher_list(watch_lit).add(Watcher(reason));
 }
@@ -367,11 +368,11 @@ SatSolverImpl::add_watcher(Literal watch_lit,
 // @retval kB3X わからなかった．
 // @note i 番めの変数の割り当て結果は model[i] に入る．
 Bool3
-SatSolverImpl::solve(const vector<Literal>& assumptions,
-		     vector<Bool3>& model)
+YmSat::solve(const vector<Literal>& assumptions,
+	     vector<Bool3>& model)
 {
   if ( debug & debug_solve ) {
-    cout << "SatSolverImpl::solve starts" << endl;
+    cout << "YmSat::solve starts" << endl;
     cout << " Assumptions: ";
     const char* and_str = "";
     for (vector<Literal>::const_iterator p = assumptions.begin();
@@ -392,9 +393,9 @@ SatSolverImpl::solve(const vector<Literal>& assumptions,
     mTimer.reset();
     mTimer.start();
   }
-  
+
   alloc_var();
-  
+
   simplifyDB();
   if ( !mSane ) {
     return kB3False;
@@ -497,7 +498,7 @@ SatSolverImpl::solve(const vector<Literal>& assumptions,
 // @param[in] val 設定する値
 // @return 以前の設定値を返す．
 ymuint64
-SatSolverImpl::set_max_conflict(ymuint64 val)
+YmSat::set_max_conflict(ymuint64 val)
 {
   ymuint64 old_val = mMaxConflict;
   mMaxConflict = val;
@@ -507,7 +508,7 @@ SatSolverImpl::set_max_conflict(ymuint64 val)
 // @brief 現在の内部状態を得る．
 // @param[out] stats 状態を格納する構造体
 void
-SatSolverImpl::get_stats(SatStats& stats) const
+YmSat::get_stats(SatStats& stats) const
 {
   stats.mRestart = mRestart;
   stats.mVarNum = mVarNum;
@@ -526,14 +527,14 @@ SatSolverImpl::get_stats(SatStats& stats) const
 // @brief solve() 中のリスタートのたびに呼び出されるメッセージハンドラの登録
 // @param[in] msg_handler 登録するメッセージハンドラ
 void
-SatSolverImpl::reg_msg_handler(SatMsgHandler* msg_handler)
+YmSat::reg_msg_handler(SatMsgHandler* msg_handler)
 {
   mMsgHandlerList.push_back(msg_handler);
 }
 
 // 探索を行う本体の関数
 Bool3
-SatSolverImpl::search()
+YmSat::search()
 {
   // コンフリクトの起こった回数
   ymuint n_confl = 0;
@@ -557,7 +558,7 @@ SatSolverImpl::search()
       // 今の矛盾の解消に必要な条件を「学習」する．
       vector<Literal> learnt;
       int bt_level = mAnalyzer->analyze(conflict, learnt);
-  
+
       if ( debug & debug_analyze ) {
 	cout << endl
 	     << "analyze for " << conflict << endl
@@ -615,13 +616,13 @@ SatSolverImpl::search()
 
 // 割当てキューに基づいて implication を行う．
 SatReason
-SatSolverImpl::implication()
+YmSat::implication()
 {
   SatReason conflict = kNullSatReason;
   while ( mAssignList.has_elem() ) {
     Literal l = mAssignList.get_next();
     ++ mPropagationNum;
-    
+
     if ( debug & debug_implication ) {
       cout << "\tpick up " << l << endl;
     }
@@ -715,7 +716,7 @@ SatSolverImpl::implication()
 	  if ( debug & debug_implication ) {
 	    cout << "\t\tno other watching literals" << endl;
 	  }
-	
+
 	  // 見付からなかったので l0 に従った割り当てを行う．
 	  if ( val0 == kB3X ) {
 	    if ( debug & debug_assign ) {
@@ -747,19 +748,19 @@ SatSolverImpl::implication()
       wlist.erase(wpos);
     }
   }
-  
+
   return conflict;
 }
 
 // level までバックトラックする
 void
-SatSolverImpl::backtrack(int level)
+YmSat::backtrack(int level)
 {
   if ( debug & (debug_assign | debug_decision) ) {
     cout << endl
 	 << "backtrack until @" << level << endl;
   }
-  
+
   if ( level < decision_level() ) {
     mAssignList.backtrack(level);
     while ( mAssignList.has_elem() ) {
@@ -780,7 +781,7 @@ SatSolverImpl::backtrack(int level)
 
 // 次の割り当てを選ぶ
 Literal
-SatSolverImpl::next_decision()
+YmSat::next_decision()
 {
 #if 0
   if ( mRandGen.real1() < mParams.mVarFreq && !heap_empty() ) {
@@ -804,7 +805,7 @@ SatSolverImpl::next_decision()
 
 // CNF を簡単化する．
 void
-SatSolverImpl::simplifyDB()
+YmSat::simplifyDB()
 {
   if ( !mSane ) {
     return;
@@ -834,11 +835,11 @@ END_NONAMESPACE
 
 // 使われていない学習節を削除する．
 void
-SatSolverImpl::reduceDB()
+YmSat::reduceDB()
 {
   ymuint n = mLearntClause.size();
   ymuint n2 = n / 2;
-  
+
   // 足切りのための制限値
   double abs_limit = mClauseBump / n;
 
@@ -873,7 +874,7 @@ SatSolverImpl::reduceDB()
 
 // 新しい節を生成する．
 SatClause*
-SatSolverImpl::new_clause(const vector<Literal>& lits,
+YmSat::new_clause(const vector<Literal>& lits,
 			  bool learnt)
 {
   ymuint n = lits.size();
@@ -884,7 +885,7 @@ SatSolverImpl::new_clause(const vector<Literal>& lits,
 
 // 節を捨てる．
 void
-SatSolverImpl::delete_clause(SatClause* clause)
+YmSat::delete_clause(SatClause* clause)
 {
   // 0 番目と 1 番目のリテラルに関係する watch list を更新
   for (ymuint i = 0; i < 2; ++ i) {
@@ -908,11 +909,14 @@ SatSolverImpl::delete_clause(SatClause* clause)
   else {
     mConstrLitNum -= clause->size();
   }
+
+  ymuint size = sizeof(SatClause) + sizeof(Literal) * (clause->size() - 1);
+  mAlloc.put_memory(size, static_cast<void*>(clause));
 }
 
 // 変数のアクティビティを増加させる．
 void
-SatSolverImpl::bump_var_activity(tVarId varid)
+YmSat::bump_var_activity(tVarId varid)
 {
   double& act = mActivity[varid];
   act += mVarBump;
@@ -930,14 +934,14 @@ SatSolverImpl::bump_var_activity(tVarId varid)
 
 // 変数のアクティビティを定率で減少させる．
 void
-SatSolverImpl::decay_var_activity()
+YmSat::decay_var_activity()
 {
   mVarBump /= mVarDecay;
 }
 
 // リスタート時の変数のアクティビティの低減率
 void
-SatSolverImpl::decay_var_activity2()
+YmSat::decay_var_activity2()
 {
 #if 0
   for (ymuint i = 0; i < mVarNum; ++ i) {
@@ -949,7 +953,7 @@ SatSolverImpl::decay_var_activity2()
 
 // 学習節のアクティビティを増加させる．
 void
-SatSolverImpl::bump_clause_activity(SatClause* clause)
+YmSat::bump_clause_activity(SatClause* clause)
 {
   clause->mActivity += mClauseBump;
   if ( clause->mActivity > 1e+100 ) {
@@ -964,14 +968,14 @@ SatSolverImpl::bump_clause_activity(SatClause* clause)
 
 // 学習節のアクティビティを定率で減少させる．
 void
-SatSolverImpl::decay_clause_activity()
+YmSat::decay_clause_activity()
 {
   mClauseBump /= mClauseDecay;
 }
 
 // 引数の位置にある要素を適当な位置まで沈めてゆく
 void
-SatSolverImpl::heap_move_down(ymuint pos)
+YmSat::heap_move_down(ymuint pos)
 {
   tVarId var_p = mHeap[pos];
   double val_p = mActivity[var_p];
@@ -1007,7 +1011,7 @@ SatSolverImpl::heap_move_down(ymuint pos)
 
 // @brief 内容を出力する
 void
-SatSolverImpl::heap_dump(ostream& s) const
+YmSat::heap_dump(ostream& s) const
 {
   s << "heap num = " << mHeapNum << endl;
   ymuint j = 0;

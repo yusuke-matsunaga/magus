@@ -10,6 +10,8 @@
 
 
 #include "ym_sat/SatSolver.h"
+#include "ym_sat/SatMsgHandler.h"
+#include "ym_sat/SatStats.h"
 
 #include "ym_utils/StopWatch.h"
 
@@ -175,18 +177,18 @@ main(int argc,
     }
   }
   argc = wpos;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " satlog-file" << endl;
     return 2;
   }
-  
+
   ifstream s(argv[1]);
   if ( !s.is_open() ) {
     cerr << "Could not open " << argv[1] << endl;
     return 3;
   }
-  
+
   try {
 #if USE_ZSTREAM
     izstream zs(s);
@@ -194,25 +196,23 @@ main(int argc,
 #else
     istream& s1 = s;
 #endif
-    SatSolver* solver;
+    string type;
     if ( minisat ) {
-      solver = SatSolverFactory::gen_minisat();
+      type = "minisat";
     }
-    else {
-      solver = SatSolverFactory::gen_solver(opt);
-    }
-    
+    SatSolver solver(type, opt);
+
     YmsatMsgHandler satmsghandler(cout);
     if ( verbose > 2 ) {
-      solver->reg_msg_handler(&satmsghandler);
-    
+      solver.reg_msg_handler(&satmsghandler);
+
       cout << "===================================================================" << endl;
       cout << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl;
       cout << "|           |   Clauses      Lits |     limit   Clauses      Lits |" << endl;
       cout << "===================================================================" << endl;
     }
 
-    solver->timer_on(true);
+    solver.timer_on(true);
     StopWatch sw;
     sw.start();
 
@@ -225,7 +225,7 @@ main(int argc,
       }
       if ( c == 'N' ) {
 	skip_until(s1, '\n');
-	solver->new_var();
+	solver.new_var();
       }
       else if ( c == 'A' ) {
 	vector<Literal> lits;
@@ -239,7 +239,7 @@ main(int argc,
 	  }
 	  cout << endl;
 	}
-	solver->add_clause(lits);
+	solver.add_clause(lits);
       }
       else if ( c == 'S' ) {
 	vector<Literal> lits;
@@ -254,10 +254,10 @@ main(int argc,
 	  cout << endl;
 	}
 	vector<Bool3> model;
-	solver->solve(lits, model);
+	solver.solve(lits, model);
 	if ( verbose ) {
 	  SatStats stats;
-	  solver->get_stats(stats);
+	  solver.get_stats(stats);
 	  cout << "===================================================================" << endl;
 	  cout << "restarts          : " << stats.mRestart << endl
 	       << "conflicts         : " << stats.mConflictNum << endl
@@ -273,7 +273,7 @@ main(int argc,
     }
 
     SatStats stats;
-    solver->get_stats(stats);
+    solver.get_stats(stats);
 
     cout << "===================================================================" << endl;
     cout << "restarts          : " << stats.mRestart << endl
@@ -287,7 +287,7 @@ main(int argc,
 	 << "CPU time          : " << stats.mTime << endl;
 
     sw.stop();
-    
+
     USTime ust = sw.time();
     cout << ust << endl;
   }
@@ -300,6 +300,6 @@ main(int argc,
     cout << x.mMsg << endl;
   }
 #endif
- 
+
   return 0;
 }

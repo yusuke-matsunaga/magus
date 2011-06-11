@@ -1,18 +1,18 @@
-#ifndef LIBYM_SAT_SATANALYZER_H
-#define LIBYM_SAT_SATANALYZER_H
+#ifndef LIBYM_SAT_YMSAT_SATANALYZER_H
+#define LIBYM_SAT_YMSAT_SATANALYZER_H
 
-/// @file libym_sat/SatAnalyzer.h
+/// @file libym_sat/ymsat/SatAnalyzer.h
 /// @brief SatAnalyzer のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SatAnalyzer.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_sat/SatSolver.h"
-#include "SatSolverImpl.h"
+#include "YmSat.h"
+#include "SatReason.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -35,8 +35,8 @@ class SatClause;
 //////////////////////////////////////////////////////////////////////
 class SatAnalyzer
 {
-  friend class SatSolverImpl;
-  
+  friend class YmSat;
+
 protected:
 
   /// @brief デストラクタ
@@ -49,8 +49,8 @@ public:
   /// @brief solver をセットする．
   /// @param[in] solver SatSolverImpl のポインタ
   void
-  set_solver(SatSolverImpl* solver);
-  
+  set_solver(YmSat* solver);
+
   /// @brief 解析を行う．
   /// @param[in] creason 矛盾の原因
   /// @param[out] learnt 学習された節を表すリテラルのベクタ
@@ -59,7 +59,7 @@ public:
   int
   analyze(SatReason creason,
 	  vector<Literal>& learnt) = 0;
-  
+
   /// @brief 新しい変数が追加されたときに呼ばれる仮想関数
   virtual
   void
@@ -68,7 +68,7 @@ public:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // 派生クラスに直接 SatSolverImpl をアクセスさせないための代理関数
+  // 派生クラスに直接 YmSat をアクセスさせないための代理関数
   //////////////////////////////////////////////////////////////////////
 
   // 現在の decision level を取り出す．
@@ -82,7 +82,7 @@ protected:
   // 割り当てリストの pos 番めの要素を得る．
   Literal
   get_assign(size_t pos);
-  
+
   // 変数の decision level を得る．
   int
   decision_level(tVarId varid) const;
@@ -94,7 +94,7 @@ protected:
   // 変数のアクティビティを増加させる．
   void
   bump_var_activity(tVarId varid);
-  
+
   // 節のアクティビティを上げる．
   void
   bump_clause_activity(SatClause* clause);
@@ -105,8 +105,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SatSolverImpl へのポインタ
-  SatSolverImpl* mSolver;
+  // YmSat へのポインタ
+  YmSat* mSolver;
 
 };
 
@@ -118,13 +118,13 @@ private:
 class SaFactory
 {
 public:
-  
+
   /// @brief SatAnalyzerの派生クラスを生成する．
   /// @param[in] option どのクラスを生成するかを決めるオプション文字列
   static
   SatAnalyzer*
   gen_analyzer(const string& option = string());
-  
+
 };
 
 
@@ -133,10 +133,10 @@ public:
 //////////////////////////////////////////////////////////////////////
 
 // @brief solver をセットする．
-// @param[in] solver SatSolverImpl のポインタ
+// @param[in] solver YmSat のポインタ
 inline
 void
-SatAnalyzer::set_solver(SatSolverImpl* solver)
+SatAnalyzer::set_solver(YmSat* solver)
 {
   mSolver = solver;
 }
@@ -199,4 +199,4 @@ SatAnalyzer::bump_clause_activity(SatClause* clause)
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SATANALYZER_H
+#endif // LIBYM_SAT_YMSAT_SATANALYZER_H

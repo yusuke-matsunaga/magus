@@ -260,7 +260,7 @@ check_ceq(const BNetwork& src_network1,
     const BdnNode* node = *p;
     map[node->id()] = fraig_mgr.make_input();
   }
-  ymuint no = bdn_mgr.output_num();
+  ymuint no = src_network1.output_num();
   stats.resize(no);
   for (ymuint i = 0; i < no; ++ i) {
     BdnNodeHandle handle1 = comp_pairs[i].first;

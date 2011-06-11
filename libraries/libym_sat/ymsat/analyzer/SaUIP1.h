@@ -1,13 +1,13 @@
-#ifndef LIBYM_SAT_SAUIP1_H
-#define LIBYM_SAT_SAUIP1_H
+#ifndef LIBYM_SAT_YMSAT_ANALYZER_SAUIP1_H
+#define LIBYM_SAT_YMSAT_ANALYZER_SAUIP1_H
 
-/// @file libym_sat/SaUIP1.h
+/// @file libym_sat/ymsat/analyzer/SaUIP1.h
 /// @brief SaUIP1 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SaUIP1.h 1293 2008-02-21 02:25:52Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,14 +27,14 @@ public:
 
   /// @brief コンストラクタ
   SaUIP1();
-  
+
   /// @brief デストラクタ
   virtual
   ~SaUIP1();
 
 
 public:
-  
+
   /// @brief 解析を行う．
   /// @param[in] creason 矛盾を起こした原因
   /// @param[out] learnt 学習された節を表すリテラルのベクタ
@@ -50,9 +50,9 @@ protected:
   void
   capture(SatReason creason,
 	  vector<Literal>& learnt);
-  
+
 };
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SAUIP1_H
+#endif // LIBYM_SAT_YMSAT_ANALYZER_SAUIP1_H

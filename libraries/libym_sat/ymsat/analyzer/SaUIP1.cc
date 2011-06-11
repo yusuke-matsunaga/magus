@@ -1,17 +1,17 @@
 
-/// @file libym_sat/SaUIP1.cc
+/// @file libym_sat/ymsat/analyzer/SaUIP1.cc
 /// @brief SaUIP1 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SaUIP1.cc 1293 2008-02-21 02:25:52Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "SaUIP1.h"
 #include "SatSolverImpl.h"
-#include "SatClause.h"
+#include "../SatClause.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

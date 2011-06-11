@@ -10,7 +10,8 @@ noinst_LTLIBRARIES = libym_minisat.la
 
 libym_minisat_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
 
 libym_minisat_la_LIBADD =
 

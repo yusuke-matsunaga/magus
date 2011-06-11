@@ -1,17 +1,17 @@
-#ifndef LIBYM_SAT_SABASE_H
-#define LIBYM_SAT_SABASE_H
+#ifndef LIBYM_SAT_YMSAT_ANALYZER_SABASE_H
+#define LIBYM_SAT_YMSAT_ANALYZER_SABASE_H
 
-/// @file libym_sat/SaBase.h
+/// @file libym_sat/ymsat/analyzer/SaBase.h
 /// @brief SaBase のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: SaBase.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatAnalyzer.h"
+#include "../SatAnalyzer.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -27,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   SaBase();
-  
+
   /// @brief デストラクタ
   virtual
   ~SaBase();
@@ -46,12 +46,12 @@ protected:
   // learnt を極小セパレータにする．
   void
   simplify(vector<Literal>& learnt);
-  
+
   // decision level の高いリテラルを 2番め (learnt[1] の位置) に持ってくる
   // 2番めのリテラルのレベルを返す．
   int
   reorder(vector<Literal>& learnt);
-  
+
   // mClearQueue につまれた変数のマークを消す．
   void
   clear_marks();
@@ -71,7 +71,7 @@ protected:
 
 
 private:
-  
+
   // simplify のサブルーティン
   bool
   check_recur(tVarId var,
@@ -85,13 +85,13 @@ private:
 
   // var->mMark を消すためのキュー
   vector<tVarId> mClearQueue;
-  
+
   // var->mMark を消すためのキュー(simplify_recur用)
   vector<tVarId> mClearQueue2;
-  
+
   // 変数のマーク
   vector<bool> mMark;
-  
+
 };
 
 
@@ -118,4 +118,4 @@ SaBase::set_mark(tVarId var,
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_SABASE_H
+#endif // LIBYM_SAT_YMSAT_ANALYZER_SABASE_H

@@ -7,9 +7,4 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	sat_nsdef.h \
-	DimacsParser.h \
-	Bool3.h \
-	SatMsgHandler.h \
-	SatStats.h \
-	SatSolver.h
+	SatSolverImpl.h

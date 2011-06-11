@@ -1,17 +1,18 @@
-#ifndef LIBYM_SAT_ASSIGNLIST_H
-#define LIBYM_SAT_ASSIGNLIST_H
+#ifndef LIBYM_SAT_YMSAT_ASSIGNLIST_H
+#define LIBYM_SAT_YMSAT_ASSIGNLIST_H
 
-/// @file libym_sat/AssignList.h
+/// @file libym_sat/ymsat/AssignList.h
 /// @brief AssignList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: AssignList.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_sat/SatSolver.h"
+#include "ym_sat/sat_nsdef.h"
+#include "ym_lexp/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -85,7 +86,7 @@ public:
   /// @brief 記録されている割り当ての要素数を得る．
   ymuint
   size() const;
-  
+
   /// @brief 読み出す要素があるとき true を返す．
   bool
   has_elem() const;
@@ -106,7 +107,7 @@ public:
   /// @note 読み出し位置を書き込み位置にする．
   void
   skip_all();
-  
+
   /// @brief pos 番目の要素を得る．
   Literal
   get(ymuint pos) const;
@@ -120,7 +121,7 @@ public:
   /// @brief 現在のレベルを返す．
   int
   cur_level() const;
-  
+
   /// @brief 現在の位置をマーカーに登録する．
   void
   set_marker();
@@ -140,7 +141,7 @@ private:
 
   // リストの実際の容量
   ymuint32 mSize;
-  
+
   // 値割り当てを保持するリスト(配列)
   Literal* mList;
 
@@ -149,7 +150,7 @@ private:
 
   // 読み出し位置
   ymuint32 mHead;
-  
+
   // 各 decision-level ごとの marker の配列
   ymuint32* mMarker;
 
@@ -246,4 +247,4 @@ AssignList::backtrack(int level)
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_SAT_ASSIGNLIST_H
+#endif // LIBYM_SAT_YMSAT_ASSIGNLIST_H

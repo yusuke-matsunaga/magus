@@ -6,18 +6,18 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_satanalyzer.la
+noinst_LTLIBRARIES = libym_sat_analyzer.la
 
-libym_satanalyzer_la_CPPFLAGS = \
+libym_sat_analyzer_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)
+	-I$(top_srcdir)/include
 
-libym_satanalyzer_la_LIBADD =
+libym_sat_analyzer_la_LIBADD =
 
-libym_satanalyzer_la_LDFLAGS =
+libym_sat_analyzer_la_LDFLAGS =
 
-libym_satanalyzer_la_SOURCES = \
+libym_sat_analyzer_la_SOURCES = \
 	SaBase.h \
 	SaBase.cc \
 	SaUIP1.h \

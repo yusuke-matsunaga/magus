@@ -39,7 +39,6 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_SAT
 
 class SatSolver;
-class SatSolverFactory;
 class SatStats;
 class SatMsgHandler;
 
@@ -51,7 +50,6 @@ END_NAMESPACE_YM_SAT
 BEGIN_NAMESPACE_YM
 
 using nsSat::SatSolver;
-using nsSat::SatSolverFactory;
 using nsSat::SatStats;
 using nsSat::SatMsgHandler;
 

@@ -1,33 +1,33 @@
 
-/// @file libym_sat/SatSolverImplR.cc
-/// @brief SatSolverImplR の実装ファイル
+/// @file libym_sat/YmSatR.cc
+/// @brief YmSatR の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SatSolverImplR.cc 2203 2009-04-16 05:04:40Z matsunaga $
+/// $Id: YmSatR.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatSolverImplR.h"
+#include "YmSatR.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
 
 //////////////////////////////////////////////////////////////////////
-// SatSolverImplR
+// YmSatR
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SatSolverImplR::SatSolverImplR(ostream& out,
-			       SatAnalyzer* analyzer) :
-  SatSolverImpl(analyzer),
+YmSatR::YmSatR(ostream& out,
+	       SatAnalyzer* analyzer) :
+  YmSat(analyzer),
   mOut(out)
 {
 }
 
 // @brief デストラクタ
-SatSolverImplR::~SatSolverImplR()
+YmSatR::~YmSatR()
 {
 }
 
@@ -35,10 +35,10 @@ SatSolverImplR::~SatSolverImplR()
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 tVarId
-SatSolverImplR::new_var()
+YmSatR::new_var()
 {
-  tVarId id = SatSolverImpl::new_var();
-  
+  tVarId id = YmSat::new_var();
+
   mOut << "N" << endl
        << "# varid = " << id << endl;
 
@@ -48,7 +48,7 @@ SatSolverImplR::new_var()
 // @brief 節を追加する．
 // @param[in] lits リテラルのベクタ
 void
-SatSolverImplR::add_clause(const vector<Literal>& lits)
+YmSatR::add_clause(const vector<Literal>& lits)
 {
   mOut << "A";
   for (vector<Literal>::const_iterator p = lits.begin();
@@ -64,7 +64,7 @@ SatSolverImplR::add_clause(const vector<Literal>& lits)
   }
   mOut << endl;
 
-  SatSolverImpl::add_clause(lits);
+  YmSat::add_clause(lits);
 }
 
 // @brief SAT 問題を解く．
@@ -75,7 +75,7 @@ SatSolverImplR::add_clause(const vector<Literal>& lits)
 // @retval kB3X わからなかった．
 // @note i 番めの変数の割り当て結果は model[i] に入る．
 Bool3
-SatSolverImplR::solve(const vector<Literal>& assumptions,
+YmSatR::solve(const vector<Literal>& assumptions,
 		      vector<Bool3>& model)
 {
   mOut << "S";
@@ -92,7 +92,7 @@ SatSolverImplR::solve(const vector<Literal>& assumptions,
   }
   mOut << endl;
 
-  Bool3 ans = SatSolverImpl::solve(assumptions, model);
+  Bool3 ans = YmSat::solve(assumptions, model);
 
   mOut << "# " << ans << endl;
 

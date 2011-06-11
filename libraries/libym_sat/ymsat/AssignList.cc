@@ -1,11 +1,11 @@
 
-/// @file libym_sat/AssignList.cc
+/// @file libym_sat/ymsat/AssignList.cc
 /// @brief AssignList の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: AssignList.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
