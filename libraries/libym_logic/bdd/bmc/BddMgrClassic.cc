@@ -9,8 +9,6 @@
 /// All rights reserved.
 
 
-#include "ym_logic/BmcFactory.h"
-
 #include "BddMgrClassic.h"
 #include "BmcCompTbl.h"
 
@@ -91,8 +89,11 @@ END_NONAMESPACE
 // BddMgrClassic
 //////////////////////////////////////////////////////////////////////
 
-// コンストラクタ
-BddMgrClassic::BddMgrClassic(const string& name) :
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] option オプション
+BddMgrClassic::BddMgrClassic(const string& name,
+			     const string& option) :
   mName(name)
 {
   if ( name == string() ) {

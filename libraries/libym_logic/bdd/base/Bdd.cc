@@ -21,11 +21,12 @@ BEGIN_NAMESPACE_YM_BDD
 
 // @brief mgr, root をセットする時に呼ばれる関数
 void
-Bdd::set(BddMgrImpl* mgr,
+Bdd::set(BddMgr& mgr,
 	 tBddEdge root)
 {
-  mMgr = mgr;
+  mMgr = mgr->mImpl;
   mRoot = root;
+
   mMgr->inc_rootref(mRoot);
 
   // BDD のリストに追加
@@ -42,7 +43,8 @@ Bdd::set(BddMgrImpl* mgr,
 void
 Bdd::reset()
 {
-  mMgr->dec_rootref(mRoot);
+  BddMgrImpl* impl = mMgr->mImpl;
+  impl->dec_rootref(mRoot);
 
   // BDD のリストから削除
   Bdd* p = mPrev;

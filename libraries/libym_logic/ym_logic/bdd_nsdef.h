@@ -49,7 +49,7 @@ BEGIN_NAMESPACE_YM_BDD
 //////////////////////////////////////////////////////////////////////
 
 class Bdd;
-class BddMgrRef;
+class BddMgr;
 class BddMgrImpl;
 class BddVarSet;
 class BddLitSet;
@@ -99,7 +99,7 @@ END_NAMESPACE_YM_BDD
 BEGIN_NAMESPACE_YM
 
 using nsBdd::Bdd;
-using nsBdd::BddMgrRef;
+using nsBdd::BddMgr;
 using nsBdd::BddVarSet;
 using nsBdd::BddLitSet;
 using nsBdd::BddVector;

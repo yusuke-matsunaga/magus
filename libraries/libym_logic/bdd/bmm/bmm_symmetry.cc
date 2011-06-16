@@ -177,8 +177,8 @@ BddMgrModern::check_symmetry(tBddEdge e,
     y_level = tmp;
   }
 
-  y_edge = BddMgr::make_bdd(y, kEdge0, kEdge1);
-  xy_edge = BddMgr::make_bdd(x, kEdge0, addpol(y_edge, pol));
+  y_edge = make_bdd(y, kEdge0, kEdge1);
+  xy_edge = make_bdd(x, kEdge0, addpol(y_edge, pol));
   activate(xy_edge);
   tBddEdge ans = cs_step(e, pol);
   deactivate(xy_edge);

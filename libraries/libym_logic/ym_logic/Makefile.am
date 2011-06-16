@@ -12,8 +12,6 @@ noinst_HEADERS = \
 	Bdd.h \
 	BddLitSet.h \
 	BddVarSet.h \
-	BmcFactory.h \
-	BmmFactory.h \
 	Bool3.h \
 	CvFunc.h \
 	Dg.h \

@@ -76,110 +76,137 @@ public:
 
 public:
 
-  // コンストラクタ
-  // 空集合となるが，明示的に使う場合には下の make_empty() を使うべき
-  BddVarSet(BddMgrRef mgr);
+  /// @brief コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @note 空集合となるが，明示的に使う場合には下の make_empty() を使うべき
+  explicit
+  BddVarSet(BddMgr& mgr);
 
-  // コピーコンストラクタ
+  /// @brief コピーコンストラクタ
   BddVarSet(const BddVarSet& src);
 
-  // 代入演算子
+  /// @brief 代入演算子
   const BddVarSet&
   operator=(const BddVarSet& src);
 
-  // 変数一つだけを要素とする集合を作るコンストラクタ
-  BddVarSet(BddMgrRef mgr,
+  /// @brief 変数一つだけを要素とする集合を作るコンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] varid 変数番号
+  BddVarSet(BddMgr& mgr,
 	    tVarId varid);
 
-  // vector からの変換用コンストラクタ
-  BddVarSet(BddMgrRef mgr,
+  /// @brief vector からの変換用コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] src 変数番号のベクタ
+  BddVarSet(BddMgr& mgr,
 	    const VarVector& src);
 
-  // list からの変換用コンストラクタ
-  BddVarSet(BddMgrRef mgr,
+  /// @brief list からの変換用コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] src 変数番号のリスト
+  BddVarSet(BddMgr& mgr,
 	    const VarList& src);
 
-  // 空集合を返すクラスメソッド
+  /// @brief 空集合を返すクラスメソッド
+  /// @param[in] mgr BddMgr
   static
   BddVarSet
-  make_empty(BddMgrRef mgr);
+  make_empty(BddMgr& mgr);
 
-  // 空の時, 真となる．
+
+public:
+
+  /// @brief 空の時, 真となる．
   bool
   empty() const;
 
-  // 要素数を返す．
-  size_t
+  /// @brief 要素数を返す．
+  ymuint
   size() const;
 
-  // この変数集合の表す関数を返す．
+  /// @brief この変数集合の表す関数を返す．
   Bdd
   function() const;
 
-  // 先頭の反復子を返す．
+  /// @brief 先頭の反復子を返す．
   iterator
   begin() const;
 
-  // 末尾の反復子を返す．
+  /// @brief 末尾の反復子を返す．
   iterator
   end() const;
 
-  // 変数番号の vector に変換する．
-  // 変数番号の順番は内部の実装に依存する．
-  // 集合のサイズを返す．
-  size_t
+  /// @brief 変数番号のベクタに変換する．
+  /// @param[out] dst 結果を格納するベクタ
+  /// @return 集合のサイズを返す．
+  /// @note 変数番号の順番は内部の実装に依存する．
+  ymuint
   to_vector(VarVector& dst) const;
 
-  // 変数番号のリストに変換する．
-  // 変数番号の順番は内部の実装に依存する．
-  // 集合のサイズを返す．
-  size_t
+  /// @brief 変数番号のリストに変換する．
+  /// @param[out] dst 結果を格納するリスト
+  /// @return 集合のサイズを返す．
+  /// @note 変数番号の順番は内部の実装に依存する．
+  ymuint
   to_list(VarList& dst) const;
 
-  // 集合和を計算する．
+  /// @brief 集合和を計算する．
+  /// @param[in] set2 オペランド
   BddVarSet
   operator+(const BddVarSet& set2) const;
 
-  // 集合和を計算して代入する．
+  /// @brief 集合和を計算して代入する．
+  /// @param[in] set2 オペランド
   const BddVarSet&
   operator+=(const BddVarSet& set2);
 
-  // 集合積を計算する．
+  /// @brief 集合積を計算する．
+  /// @param[in] set2 オペランド
   BddVarSet
   operator*(const BddVarSet& set2) const;
 
-  // 集合積を計算して代入する．
+  /// @brief 集合積を計算して代入する．
+  /// @param[in] set2 オペランド
   const BddVarSet&
   operator*=(const BddVarSet& set2);
 
-  // 集合差を計算する．
+  /// @brief 集合差を計算する．
+  /// @param[in] set2 オペランド
   BddVarSet
   operator-(const BddVarSet& set2) const;
 
-  // 集合差を計算して代入する．
+  /// @brief 集合差を計算して代入する．
+  /// @param[in] set2 オペランド
   const BddVarSet&
   operator-=(const BddVarSet& set2);
 
-  // この関数は BddVarSet(const Bdd& bdd) を使う．
+
+public:
+  // これらの関数は BddVarSet(const Bdd& bdd) を使う．
+
   friend
   BddVarSet
   support(const BddVector& bdd_array);
+
   friend
   BddVarSet
   support(const BddList& bdd_array);
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
 
-  // BDD を指定するコンストラクタ
+  /// @brief BDD を指定するコンストラクタ
   explicit
   BddVarSet(const Bdd& bdd);
 
-  // サイズを設定する．
+  /// @brief サイズを設定する．
   void
-  set_size(size_t size) const;
+  set_size(ymuint size) const;
 
-  // サイズを無効化する．
+  /// @brief サイズを無効化する．
   void
   invalidate_size();
 
@@ -195,7 +222,7 @@ private:
   // 要素数を入れておくキャッシュ
   // 最下位1ビットが1の時のみ valid な値を持つ．
   mutable
-  size_t mSize;
+  ymuint32 mSize;
 
 };
 
@@ -204,42 +231,59 @@ private:
 // BddVarSet 関係の non-member 関数の宣言
 //////////////////////////////////////////////////////////////////////
 
-// 等価比較演算子
+/// @relates BddVarSet
+/// @brief 等価比較演算子
+/// @param[in] set1, set2 オペランド
 bool
 operator==(const BddVarSet& set1,
 	   const BddVarSet& set2);
 
-// 非等価比較演算子
+/// @relates BddVarSet
+/// @brief 非等価比較演算子
+/// @param[in] set1, set2 オペランド
 bool
 operator!=(const BddVarSet& set1,
 	   const BddVarSet& set2);
 
-// set1 と set2 が集合として交わっていたら true を返す．
+/// @relates BddVarSet
+/// @brief set1 と set2 が集合として交わっていたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator&&(const BddVarSet& set1,
 	   const BddVarSet& set2);
 
-// set1 が set2 を含んでいたら true を返す．
+/// @relates BddVarSet
+/// @brief set1 が set2 を含んでいたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator>=(const BddVarSet& set1,
 	   const BddVarSet& set2);
 
-// set1 が set2 に含まれていたら true を返す．
+/// @relates BddVarSet
+/// @brief set1 が set2 に含まれていたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator<=(const BddVarSet& set1,
 	   const BddVarSet& set2);
 
-// set1 が真に set2 を含んでいたら true を返す．
+/// @relates BddVarSet
+/// @brief set1 が真に set2 を含んでいたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator>(const BddVarSet& set1,
 	  const BddVarSet& set2);
 
-// set1 が真に set2 に含まれていたら true を返す．
+/// @relates BddVarSet
+/// @brief set1 が真に set2 に含まれていたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator<(const BddVarSet& set1,
 	  const BddVarSet& set2);
 
-// ストリームに出力する．
+/// @relates BddVarSet
+/// @brief ストリームに出力する．
+/// @param[in] s 出力ストリーム
+/// @param[in] varset 対象の変数集合
 ostream&
 operator<<(ostream& s,
 	   const BddVarSet& varset);

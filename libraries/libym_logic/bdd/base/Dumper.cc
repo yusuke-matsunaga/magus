@@ -77,7 +77,8 @@ IdMgr::clear()
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-Displayer::Displayer(BddMgr* mgr, ostream& s) :
+Displayer::Displayer(BddMgrImpl* mgr,
+		     ostream& s) :
   mMgr(mgr),
   mStream(s)
 {
@@ -174,7 +175,8 @@ Displayer::num() const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-Dumper::Dumper(BddMgr* mgr, ostream& s) :
+Dumper::Dumper(BddMgrImpl* mgr,
+	       ostream& s) :
   mMgr(mgr),
   mStream(s)
 {
@@ -237,7 +239,8 @@ Dumper::dump_edge(tBddEdge e)
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-Restorer::Restorer(BddMgr* mgr, istream& s) :
+Restorer::Restorer(BddMgrImpl* mgr,
+		   istream& s) :
   mMgr(mgr),
   mStream(s)
 {

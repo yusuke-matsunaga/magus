@@ -9,8 +9,6 @@
 /// All rights reserved.
 
 
-#include "ym_logic/BmmFactory.h"
-
 #include "BddMgrModern.h"
 #include "BmmCompTbl.h"
 
@@ -91,9 +89,11 @@ END_NONAMESPACE
 // BddMgrModern
 //////////////////////////////////////////////////////////////////////
 
-// コンストラクタ
-BddMgrModern::BddMgrModern(bool reorder,
-			   const string& name) :
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] option オプション
+BddMgrModern::BddMgrModern(const string& name,
+			   const string& option) :
   mName(name)
 {
   if ( mName == string() ) {
@@ -103,6 +103,8 @@ BddMgrModern::BddMgrModern(bool reorder,
     s << "bdd_mgr#" << num ++;
     mName = s.str();
   }
+
+  bool reorder = (option == "reorder");
 
   // ユーザー設定可能パラメータのデフォルト値を設定
   mGcThreshold = DEFAULT_GC_THRESHOLD;

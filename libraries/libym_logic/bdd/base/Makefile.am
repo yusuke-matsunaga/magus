@@ -27,11 +27,9 @@ libym_bdd_base_la_CPPFLAGS = \
 libym_bdd_base_la_SOURCES = \
 	Dumper.h \
 	Bdd.cc \
+	BddMgr.cc \
 	BddMgrImpl.h \
 	BddMgrImpl.cc \
-	BddMgrRef.cc \
-	BmcFactory.cc \
-	BmmFactory.cc \
 	BddLitSet.cc \
 	BddVarSet.cc \
 	Dumper.cc

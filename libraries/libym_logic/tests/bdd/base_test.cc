@@ -9,8 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_logic/BmcFactory.h"
-#include "ym_logic/BmmFactory.h"
+#include "ym_logic/Bdd.h"
 
 #include "bddtest.h"
 
@@ -573,20 +572,18 @@ main(int argc,
 {
   using namespace std;
   using nsYm::AssertError;
-  using nsYm::nsBdd::BddMgrRef;
-  using nsYm::nsBdd::BmmFactory;
-  using nsYm::nsBdd::BmcFactory;
+  using nsYm::BddMgrRef;
 
   try {
-    BddMgrRef mgr1(BmcFactory("classic mgr"));
+    BddMgrRef mgr1("bmc", "classic mgr");
     if ( !test(mgr1) ) {
       return 1;
     }
-    BddMgrRef mgr2(BmmFactory(false, "fixed order mgr"));
+    BddMgrRef mgr2("bmm", "fixed order mgr");
     if ( !test(mgr2) ) {
       return 2;
     }
-    BddMgrRef mgr3(BmmFactory(true, "reorder mgr"));
+    BddMgrRef mgr3("bmm", "reorder mgr", "reorder");
     if ( !test(mgr3) ) {
       return 3;
     }

@@ -16,7 +16,6 @@
 #include "ym_networks/BNetwork.h"
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddVarSet.h"
-#include "ym_logic/BmcFactory.h"
 
 
 BEGIN_NONAMESPACE
@@ -117,7 +116,7 @@ fsm_analysis(const BNetwork& bnetwork,
   StopWatch sw;
   sw.start();
 
-  BddMgrRef mgr(nsBdd::BmcFactory("classic mgr"));
+  BddMgrRef mgr("bmc", "classic mgr");
   nsBdd::BddMgrParam param;
 #if 0
   param.mMemLimit = 1024 * 1024 * 1024;

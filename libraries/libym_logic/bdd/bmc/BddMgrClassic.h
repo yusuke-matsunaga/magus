@@ -49,8 +49,11 @@ public:
 
 public:
 
-  // コンストラクタ
-  BddMgrClassic(const string& name);
+  /// @brief コンストラクタ
+  /// @param[in] name 名前
+  /// @param[in] option オプション
+  BddMgrClassic(const string& name = string(),
+		const string& option = string());
 
   // デストラクタ
   virtual

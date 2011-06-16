@@ -22,25 +22,37 @@ BEGIN_NAMESPACE_YM_BDD
 // クラス BddMgrRef
 //////////////////////////////////////////////////////////////////////
 
+// @brief 空のコンストラクタ
+// @note デフォルトマネージャを作る．
+BddMgrRef::BddMgrRef() :
+  mImpl(BddMgrImpl::default_mgr())
+{
+  mImpl->inc_ref();
+}
+
 // @brief コンストラクタ
 // @param[in] type BddMgr の型を表す文字列
-BddMgrRef::BddMgrRef(const string& type)
+// @param[in] name マネージャの名前
+// @param[in] option オプション文字列
+BddMgrRef::BddMgrRef(const string& type,
+		     const string& name,
+		     const string& option)
 {
   if ( type == "bmc" ) {
-    mImpl = new BddMgrClassic("bmc");
+    mImpl = new BddMgrClassic(name, option);
   }
   else if ( type == "bmm" ) {
-    mImpl = new BddMgrModern("bmm");
+    mImpl = new BddMgrModern(name, option);
   }
   else {
-    mImpl = new BddMgrClassic("bmc");
+    mImpl = new BddMgrClassic(name, option);
   }
   assert_cond(mImpl, __FILE__, __LINE__);
   mImpl->inc_ref();
 }
 
 // BddMgrImpl を指定したコンストラクタ
-BddMgrRef::BddMgrRef(BddMgrImp* ptr) :
+BddMgrRef::BddMgrRef(BddMgrImpl* ptr) :
   mImpl(ptr)
 {
   assert_cond(mImpl, __FILE__, __LINE__);

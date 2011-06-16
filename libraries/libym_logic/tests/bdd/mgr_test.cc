@@ -13,7 +13,7 @@
 // の処理を正しく行っているかのチェック
 
 
-#include "ym_logic/BmmFactory.h"
+#include "ym_logic/Bdd.h"
 
 #include "bddtest.h"
 
@@ -22,14 +22,14 @@ using namespace nsYm::nsBdd;
 
 using nsYm::VarList;
 using nsYm::LogExpr;
-using nsYm::nsBdd::BmmFactory;
 
-BddMgrRef mgr1(BmmFactory(false, "manager 1"));
-BddMgrRef mgr2(BmmFactory(false, "manager 2"));
+BddMgrRef mgr1("bmm", "manager 1");
+BddMgrRef mgr2("bmm", "manager 2");
 
 // error BDD になっているかチェック
 bool
-check_errbdd(const Bdd& bdd, const char* bdd_str)
+check_errbdd(const Bdd& bdd,
+	     const char* bdd_str)
 {
   if ( !bdd.is_error() ) {
     cout << "ERROR[errbdd]: " << bdd_str << endl;
@@ -307,7 +307,7 @@ main(int argc, char** argv)
     }
     Bdd f;
     {
-      BddMgrRef mgr(BmmFactory(true, "temporary manager"));
+      BddMgrRef mgr("bmm", "temporary manager", "reorder");
       mgr.new_var(0);
       mgr.new_var(1);
       mgr.new_var(2);

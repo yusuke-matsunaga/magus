@@ -16,7 +16,7 @@
 #include "ym_logic/Dg.h"
 
 #include "DgNode.h"
-#include "bdd/base/BddMgr.h"
+#include "bdd/base/BddMgrImpl.h"
 
 #if defined(DG_PROFILE)
 
@@ -462,7 +462,7 @@ DgMgr::decomp_step(tBddEdge e)
     // ハッシュに登録されていないので本当に計算する．
     tBddEdge e0;
     tBddEdge e1;
-    tVarId varId = mMgr.mPtr->root_decomp(e, e0, e1);
+    tVarId varId = mMgr.mImpl->root_decomp(e, e0, e1);
     tDgEdge r0 = decomp_step(e0);
     tDgEdge r1 = decomp_step(e1);
 
@@ -988,7 +988,7 @@ DgMgr::sweep()
     hash_map<tBddEdge, Dg>::iterator tmp = p;
     ++ p;
     tBddEdge e = tmp->first;
-    if ( mMgr.mPtr->check_noref(e) ) {
+    if ( mMgr.mImpl->check_noref(e) ) {
       mNodeHash1.erase(tmp);
     }
   }
@@ -998,7 +998,7 @@ DgMgr::sweep()
     hash_map<tBddEdge, Dg>::iterator tmp = p;
     ++ p;
     tBddEdge e = tmp->first;
-    if ( mMgr.mPtr->check_noref(e) ) {
+    if ( mMgr.mImpl->check_noref(e) ) {
       mNodeHash2.erase(tmp);
     }
   }

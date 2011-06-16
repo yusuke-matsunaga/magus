@@ -179,7 +179,7 @@ check_reverse(tBddEdge e1,
 //////////////////////////////////////////////////////////////////////
 class Bdd
 {
-  friend class BddMgrRef;
+  friend class BddMgr;
   friend class DgMgr;
 
 public:
@@ -352,9 +352,9 @@ public:
   Bdd
   edge1() const;
 
-  /// @brief 親の BddMgrRef の取得
-  /// @return 親の BddMgrRef を返す．
-  BddMgrRef
+  /// @brief 親の BddMgr の取得
+  /// @return 親の BddMgr を返す．
+  BddMgr&
   mgr() const;
 
   /// @}
@@ -763,18 +763,21 @@ public:
   static
   void
   change_mgr(Bdd* top_bdd,
-	     BddMgrImpl* new_mgr);
+	     BddMgr& new_mgr);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief BDD マネージャと根の枝を引数とするコンストラクタ
-  /// @param[in] pmgr BDD マネージャ
+  /// @param[in] mgr BDD マネージャ
   /// @param[in] e 根の枝
-  Bdd(BddMgrImpl* pmgr,
+  Bdd(BddMgr& mgr,
       tBddEdge root);
 
   // 根の枝をとり出す
@@ -782,10 +785,10 @@ private:
   root() const;
 
   /// @brief mgr, root をセットする時に呼ばれる関数
-  /// @param[in] pmgr BDD マネージャ
+  /// @param[in] mgr BDD マネージャ
   /// @param[in] root 根の枝
   void
-  set(BddMgrImpl* pmgr,
+  set(BddMgr& mgr,
       tBddEdge root);
 
   /// @brief (mMgr, mRoot) への参照をなくす時に呼ばれる関数
@@ -804,8 +807,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親の BddMgr を指すポインタ
-  BddMgrImpl* mMgr;
+  // 親の BddMgr
+  BddMgr* mMgr;
 
   // 根のノードを指す枝
   tBddEdge mRoot;
@@ -848,14 +851,14 @@ struct BddMgrParam
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddMgrRef Bdd.h "ym_logic/Bdd.h"
+/// @class BddMgr Bdd.h "ym_logic/Bdd.h"
 /// @ingroup Bdd
 /// @brief BDDの動きを管理するクラス．
 ///
 /// 実際には BddMgr へのスマートポインタとなっている．
 /// @sa BddMgr
 //////////////////////////////////////////////////////////////////////
-class BddMgrRef
+class BddMgr
 {
   friend class Bdd;
   friend class BddMgrImpl;
@@ -867,40 +870,24 @@ public:
   // いちおう誰でも生成/破壊ができる．
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief デフォルトマネージャを返す．
+  static
+  BddMgr&
+  default_mgr();
+
   /// @brief コンストラクタ
   /// @param[in] type BddMgr の型を表す文字列
-  BddMgrRef(const string& type = string());
-
-  /// @brief コピーコンストラクタ
-  /// @note 実際には同じ BddMgr を指すだけで BddMgr はコピーしない．
-  /// @note いわゆる shallow copy
-  BddMgrRef(const BddMgrRef& src);
-
-  /// @brief 代入演算子
-  /// @note コピーコンストラクタと同様
-  const BddMgrRef&
-  operator=(const BddMgrRef& src);
+  /// @param[in] name マネージャの名前
+  /// @param[in] option オプション文字列
+  BddMgr(const string& type,
+	 const string& name = string(),
+	 const string& option = string());
 
   /// @brief デストラクタ
-  ~BddMgrRef();
+  ~BddMgr();
 
 
-  //////////////////////////////////////////////////////////////////////
-  /// @name 等価比較演算子
-  /// @{
-
-  /// @brief 2つのマネージャが等価なとき true を返す．
-  bool
-  operator==(const BddMgrRef& src2) const;
-
-  /// @brief 2つのマネージャが等価でないとき true を返す．
-  bool
-  operator!=(const BddMgrRef& src2) const;
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
-
+public:
   //////////////////////////////////////////////////////////////////////
   /// @name BDD 生成用関数
   /// @{
@@ -1224,12 +1211,6 @@ public:
 
   /// @}
   //////////////////////////////////////////////////////////////////////
-
-
-private:
-  // BddMgr を指定したコンストラクタ
-  explicit
-  BddMgrRef(BddMgrImpl* ptr);
 
 
 private:
@@ -1612,10 +1593,10 @@ Bdd::root() const
 // @brief 親の BDD マネージャを返す．
 // @return 親の BDD マネージャ
 inline
-BddMgrRef
+BddMgr&
 Bdd::mgr() const
 {
-  return BddMgrRef(mMgr);
+  return *mMgr;
 }
 
 // @brief 定数0 のチェック

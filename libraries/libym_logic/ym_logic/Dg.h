@@ -357,14 +357,16 @@ public:
     Profile();
 
     /// @brief プロファイル情報を出力する．
-    void display(ostream& s) const;
+    void
+    display(ostream& s) const;
   };
 
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] mgr 親の BddMgr
   explicit
-  DgMgr(BddMgrRef mgr);
+  DgMgr(BddMgr& mgr);
 
   /// @brief デストラクタ
   ~DgMgr();
@@ -653,7 +655,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親の BddMgr
-  BddMgrRef mMgr;
+  BddMgr& mMgr;
 
   // 今の分解が bidecomposition の時に true となるフラグ
   bool mBidecomp;

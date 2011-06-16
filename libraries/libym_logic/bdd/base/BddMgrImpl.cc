@@ -13,6 +13,7 @@
 
 #include "ym_utils/HeapTree.h"
 #include "ym_logic/Bdd.h"
+#include "bmc/BddMgrClassic.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -34,8 +35,7 @@ BddMgrImpl*
 BddMgrImpl::default_mgr()
 {
   if ( !mDefaultMgr ) {
-    BddMgrRef dummy;
-    mDefaultMgr = dummy.mImpl;
+    mDefaultMgr = new BddMgrClassic("default manager");
     assert_cond(mDefaultMgr, __FILE__, __LINE__);
     // 絶対に解放しない
     mDefaultMgr->inc_ref();

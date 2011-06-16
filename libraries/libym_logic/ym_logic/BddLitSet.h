@@ -81,107 +81,134 @@ public:
 
 public:
 
-  // コンストラクタ
-  // 空集合となるが，明示的に使う場合には下の make_empty() を使うべき
-  BddLitSet(BddMgrRef mgr);
+  /// @brief コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @note 空集合となるが，明示的に使う場合には下の make_empty() を使うべき
+  explicit
+  BddLitSet(BddMgr& mgr);
 
-  // コピーコンストラクタ
+  /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
   BddLitSet(const BddLitSet& src);
 
-  // 代入演算子
+  /// @brief 代入演算子
+  /// @param[in] src コピー元のオブジェクト
   const BddLitSet&
   operator=(const BddLitSet& src);
 
-  // リテラル1つだけを要素とする集合を作るコンストラクタ
-  BddLitSet(BddMgrRef mgr,
+  /// @brief リテラル1つだけを要素とする集合を作るコンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] varid 変数番号
+  /// @param[in] pol 極性
+  BddLitSet(BddMgr& mgr,
 	    tVarId varid,
 	    tPol pol);
-  BddLitSet(BddMgrRef mgr,
+
+  /// @brief リテラル1つだけを要素とする集合を作るコンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] lit リテラル
+  BddLitSet(BddMgr& mgr,
 	    const Literal& lit);
 
-  // vector からの変換用コンストラクタ
-  BddLitSet(BddMgrRef mgr,
+  /// @brief ベクタからの変換用コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] src リテラルのベクタ
+  BddLitSet(BddMgr& mgr,
 	    const LiteralVector& src);
 
-  // list からの変換用コンストラクタ
-  BddLitSet(BddMgrRef mgr,
+  /// @brief list からの変換用コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] src リテラルのリスト
+  BddLitSet(BddMgr& mgr,
 	    const LiteralList& src);
 
-  // 空集合を返すクラスメソッド
+  /// @brief 空集合を返すクラスメソッド
+  /// @param[in] mgr BddMgr
   static
   BddLitSet
-  make_empty(BddMgrRef mgr);
+  make_empty(BddMgr& mgr);
 
-  // 空の時に真となる
+
+public:
+
+  /// @brief 空の時に真となる
   bool
   empty() const;
 
-  // 要素数を返す．
-  size_t
+  /// @brief 要素数を返す．
+  ymuint
   size() const;
 
-  // リテラル関数を返す．
+  /// @brief リテラル関数を返す．
   Bdd
   function() const;
 
-  // 先頭の反復子を返す．
+  /// @brief 先頭の反復子を返す．
   iterator
   begin() const;
 
-  // 末尾の反復子を返す．
+  /// @brief 末尾の反復子を返す．
   iterator
   end() const;
 
-  // リテラルの vector に変換する．
-  // 順番は内部の実装に依存する．
-  // 集合のサイズを返す．
-  size_t
+  /// @brief リテラルのベクタに変換する．
+  /// @return 集合のサイズを返す．
+  /// @note 順番は内部の実装に依存する．
+  ymuint
   to_vector(LiteralVector& dst) const;
 
-  // リテラルのリストに変換する．
-  // 順番は内部の実装に依存する．
-  // 集合のサイズを返す．
-  size_t
+  /// @brief リテラルのリストに変換する．
+  /// @return 集合のサイズを返す．
+  /// @note 順番は内部の実装に依存する．
+  ymuint
   to_list(LiteralList& dst) const;
 
-  // 集合和を計算する．
-  // 肯定のリテラルと否定のリテラルが両方含まれていた場合には
-  // 空集合となる．
+  /// @brief 集合和を計算する．
+  /// @param[in] src2 オペランド
+  /// @note 肯定のリテラルと否定のリテラルが両方含まれていた場合には空集合となる．
   BddLitSet
   operator+(const BddLitSet& set2) const;
 
-  // 集合和を計算して代入する．
-  // 肯定のリテラルと否定のリテラルが両方含まれていた場合には
-  // 空集合となる．
+  /// @brief 集合和を計算して代入する．
+  /// @param[in] src2 オペランド
+  /// @note 肯定のリテラルと否定のリテラルが両方含まれていた場合には空集合となる．
   const BddLitSet&
   operator+=(const BddLitSet& set2);
 
-  // 集合積を計算する．
+  /// @brief 集合積を計算する．
+  /// @param[in] src2 オペランド
   BddLitSet
   operator*(const BddLitSet& set2) const;
 
-  // 集合積を計算して代入する．
+  /// @brief 集合積を計算して代入する．
+  /// @param[in] src2 オペランド
   const BddLitSet&
   operator*=(const BddLitSet& set2);
 
-  // 集合差を計算する．
+  /// @brief 集合差を計算する．
+  /// @param[in] src2 オペランド
   BddLitSet
   operator-(const BddLitSet& set2) const;
 
-  // 集合差を計算して代入する．
+  /// @brief 集合差を計算して代入する．
+  /// @param[in] src2 オペランド
   const BddLitSet&
   operator-=(const BddLitSet& set2);
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
 
-  // BDD を指定するコンストラクタ
+  /// @brief BDD を指定するコンストラクタ
+  /// @param[in] bdd 対象のBDD
   explicit
   BddLitSet(const Bdd& bdd);
 
-  // サイズを設定する．
+  /// @brief サイズを設定する．
   void
-  set_size(size_t size) const;
+  set_size(ymuint size) const;
 
   // サイズを無効化する．
   void
@@ -199,7 +226,7 @@ private:
   // 要素数を入れておくキャッシュ
   // 最下位1ビットが1の時のみ valid な値を持つ．
   mutable
-  size_t mSize;
+  ymuint32 mSize;
 
 };
 
@@ -208,42 +235,58 @@ private:
 // BddLitSet 関係の non-member 関数の宣言
 //////////////////////////////////////////////////////////////////////
 
-// 等価比較演算子
+/// @relates BddLitSet
+/// @brief 等価比較演算子
+/// @param[in] set1, set2 オペランド
 bool
 operator==(const BddLitSet& set1,
 	   const BddLitSet& set2);
 
-// 非等価比較演算子
+/// @relates BddLitSet
+/// @brief 非等価比較演算子
+/// @param[in] set1, set2 オペランド
 bool
 operator!=(const BddLitSet& set1,
 	   const BddLitSet& set2);
 
-// set1 と set2 が集合として交わっていたら true を返す．
+/// @relates BddLitSet
+/// @brief set1 と set2 が集合として交わっていたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator&&(const BddLitSet& set1,
 	   const BddLitSet& set2);
 
-// set1 が set2 を含んでいたら true を返す．
+/// @relates BddLitSet
+/// @brief set1 が set2 を含んでいたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator>=(const BddLitSet& set1,
 	   const BddLitSet& set2);
 
-// set1 が set2 に含まれていたら true を返す．
+/// @relates BddLitSet
+/// @brief set1 が set2 に含まれていたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator<=(const BddLitSet& set1,
 	   const BddLitSet& set2);
 
-// set1 が真に set2 を含んでいたら true を返す．
+/// @relates BddLitSet
+/// @brief set1 が真に set2 を含んでいたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator>(const BddLitSet& set1,
 	  const BddLitSet& set2);
 
-// set1 が真に set2 に含まれていたら true を返す．
+/// @param[in] set1, set2 オペランド
+/// @brief set1 が真に set2 に含まれていたら true を返す．
+/// @param[in] set1, set2 オペランド
 bool
 operator<(const BddLitSet& set1,
 	  const BddLitSet& set2);
 
-// ストリームに出力する．
+/// @relates BddLitSet
+/// @brief ストリームに出力する．
+/// @param[in] set1, set2 オペランド
 ostream&
 operator<<(ostream& s,
 	   const BddLitSet& litset);
