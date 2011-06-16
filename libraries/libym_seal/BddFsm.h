@@ -12,8 +12,8 @@
 
 
 #include "ym_seal/seal_nsdef.h"
-#include "ym_bdd/Bdd.h"
-#include "ym_bdd/BddVarSet.h"
+#include "ym_logic/Bdd.h"
+#include "ym_logic/BddVarSet.h"
 #include "ym_seal/MCAnalysis.h"
 
 
@@ -53,7 +53,7 @@ public:
   /// @brief 状態のビット数を返す．
   ymuint
   ff_num() const;
-  
+
   /// @brief 入力の変数番号を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
   ymuint
@@ -63,19 +63,19 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < ff_num() )
   ymuint
   cur_varid(ymuint pos) const;
-  
+
   /// @brief 現状態の変数番号から位置番号に変換する．
   /// @retval true 変換成功
   /// @retval false 変数番号が範囲外だった．
   bool
   cur_varid2pos(ymuint varid,
 		ymuint& pos) const;
-  
+
   /// @brief 次状態の変数番号を返す．
   /// @param[in] pos 位置番号 ( 0<= pos < ff_num() )
   ymuint
   next_varid(ymuint pos) const;
-  
+
   /// @brief 次状態の変数番号から位置番号に変換する．
   /// @retval true 変換成功
   /// @retval false 変数番号が範囲外だった．
@@ -86,13 +86,13 @@ public:
   /// @brief 次状態遷移関係を返す．
   Bdd
   trans_relation() const;
-  
+
   /// @brief 到達可能状態を求める．
   /// @param[in] init_states 初期状態集合
   /// @return 到達可能状態
   Bdd
   enum_reachable_states(const vector<State>& init_states);
-  
+
   /// @brief 状態遷移確率を求める．
   /// @param[in] reachable_states_bdd 到達可能状態を表す BDD
   /// @param[in] reachable_states 到達可能状態を収めたベクタ
@@ -101,25 +101,25 @@ public:
   calc_trans_prob(const Bdd& reachable_states_bdd,
 		  const vector<State>& reachable_states,
 		  vector<list<TransProb> >& trans_map);
-  
+
   /// @brief 現状態を BDD に変換する
   Bdd
   cur_state2bdd(State state);
-  
+
   /// @brief 次状態を BDD に変換する
   Bdd
   next_state2bdd(State state);
-  
+
   /// @brief BDD から現状態の集合に変換する．
   void
   bdd2cur_states(Bdd bdd,
 		 vector<State>& states) const;
-    
+
   /// @brief BDD から次状態の集合に変換する．
   void
   bdd2next_states(Bdd bdd,
 		  vector<State>& states) const;
-  
+
 
 private:
 
@@ -134,20 +134,20 @@ private:
 	 const hash_map<State, ymuint>& state_hash,
 	 vector<ymuint>& st_vec,
 	 vector<list<TransProb> >& trans_map);
-  
+
   /// @brief 次状態集合の BDD を現状態集合の BDD に変換する．
   Bdd
   next_states2cur_states(const Bdd& next_bdd) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // BDD マネージャ
   BddMgrRef mBddMgr;
-  
+
   // 入力変数の配列
   vector<ymuint32> mInputVarIds;
 
@@ -159,22 +159,22 @@ private:
 
   // 次状態遷移関係
   Bdd mTransRel;
-  
+
   // mTransRel から入力変数を消去したもの
   Bdd mTransRel1;
-  
+
   // 外部入力の変数集合
   BddVarSet mInputVars;
 
   // 現状態の変数集合
   BddVarSet mCurStateVars;
-  
+
   // 次状態から現状態を得るための変換マップ
   VarVarMap mNext2CurMap;
-  
+
   // 最小項の重み
   double mWeight;
-  
+
 };
 
 
@@ -241,7 +241,7 @@ BddFsm::next_varid(ymuint pos) const
 {
   return mNextVarIds[pos];
 }
-  
+
 // @brief 次状態の変数番号から位置番号に変換する．
 // @retval true 変換成功
 // @retval false 変数番号が範囲外だった．
@@ -266,7 +266,7 @@ BddFsm::trans_relation() const
 {
   return mTransRel;
 }
-  
+
 // @brief 次状態集合の BDD を現状態集合の BDD に変換する．
 inline
 Bdd

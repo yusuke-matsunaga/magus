@@ -13,7 +13,7 @@
 
 #include "ymtools.h"
 #include "ym_networks/BNetwork.h"
-#include "ym_sat/Bool3.h"
+#include "ym_logic/Bool3.h"
 
 
 // 名前空間の定義
@@ -27,8 +27,8 @@ END_NAMESPACE_YM
 
 
 BEGIN_NAMESPACE_YM_CEC
-  
-/// @brief 組み合わせ回路の等価検証を行う関数 
+
+/// @brief 組み合わせ回路の等価検証を行う関数
 void
 check_ceq(const BNetwork& src_network1,
 	  const BNetwork& src_network2,

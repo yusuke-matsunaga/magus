@@ -16,7 +16,7 @@
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellTiming.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

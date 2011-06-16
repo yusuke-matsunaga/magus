@@ -10,8 +10,7 @@
 
 
 #include "BddFsm.h"
-#include "ym_bdd/Bdd.h"
-#include "ym_bdd/BddLitSet.h"
+#include "ym_logic/BddLitSet.h"
 
 #include "ym_utils/StopWatch.h"
 
@@ -38,7 +37,7 @@ BddFsm::BddFsm(BddMgrRef bdd_mgr,
   for (ymuint i = 0; i < input_num(); ++ i) {
     mInputVarIds[i] = input_vars[i];
   }
-  
+
   // 入力変数の集合を表す BDD を作る．
   mInputVars = BddVarSet(bdd_mgr, mInputVarIds);
 
@@ -52,7 +51,7 @@ BddFsm::BddFsm(BddMgrRef bdd_mgr,
     mNextVarIds[i] = next_id;
     mNext2CurMap.insert(make_pair(next_id, cur_id));
   }
-  
+
   // 現状態変数の集合を表す BDD を作る．
   mCurStateVars = BddVarSet(bdd_mgr, mCurVarIds);
 
@@ -74,7 +73,7 @@ BddFsm::enum_reachable_states(const vector<State>& init_states)
   StopWatch sw;
   sw.reset();
   sw.start();
-  
+
   // State のベクタを BDD に変換する．
   Bdd cur_bdd = mBddMgr.make_zero();
   for (vector<State>::const_iterator p = init_states.begin();
@@ -89,7 +88,7 @@ BddFsm::enum_reachable_states(const vector<State>& init_states)
     cout << *p << endl;
   }
 #endif
-  
+
   Bdd reached_bdd = cur_bdd;
   while ( !cur_bdd.is_zero() ) {
     Bdd next_bdd = (mTransRel1 & cur_bdd).esmooth(mCurStateVars);
@@ -131,7 +130,7 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
   StopWatch sw;
   sw.reset();
   sw.start();
-  
+
   // 状態遷移関係を到達可能状態のみに制約する．
   Bdd trans2 = mTransRel & reachable_states_bdd;
 
@@ -141,15 +140,15 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
   for (ymuint i = 0; i < ns; ++ i) {
     state_hash.insert(make_pair(reachable_states[i], i));
   }
-  
+
   vector<ymuint> st_vec(ff_num() * 2, 0);
 
   trans_map.clear();
   trans_map.resize(ns);
   rs_sub(trans2, state_hash, st_vec, trans_map);
-  
+
   sw.stop();
-  
+
   cout << "BddFsm::calc_trans_prob(): "
        << sw.time() << endl;
 }
@@ -211,7 +210,7 @@ BddFsm::rs_sub(Bdd rel,
 	break;
       }
     }
-    
+
     ymuint dcsize = dcmap.size();
     ymuint dexp = 1U << dcsize;
     for (ymuint p = 0U; p < dexp; ++ p) {

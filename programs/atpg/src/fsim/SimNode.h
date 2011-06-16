@@ -4,7 +4,7 @@
 /// @file fsim/SimNode.h
 /// @brief SimNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: SimNode.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -15,7 +15,7 @@
 #include "EqElem.h"
 #include "PackedVal.h"
 #include "ym_networks/TgGateTemplate.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG_FSIM
@@ -83,7 +83,7 @@ public:
   /// @brief 最初のファンアウト先の入力位置を得る．
   ymuint
   fanout_ipos() const;
-  
+
   /// @brief FFR を得る．
   SimFFR*
   ffr() const;
@@ -105,7 +105,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 故障シミュレーションに関する情報の取得/設定
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 正常値のセットを行う．(2値版)
   /// @param[in] pat 値
   /// @note 通常は外部入力に対して行われる．
@@ -138,11 +138,11 @@ public:
   void
   set_fval(PackedVal pat0,
 	   PackedVal pat1);
-  
+
   /// @brief 故障値のマスクをセットする．
   void
   set_fmask(PackedVal mask);
-  
+
   /// @brief 故障値を得る．(2値版)
   PackedVal
   fval() const;
@@ -166,11 +166,11 @@ public:
   /// @note 結果は mFval にセットされる．
   PackedVal
   calc_fval2(PackedVal mask);
-  
+
   /// @brief ローカルな obs の計算を行う．
   PackedVal
   calc_lobs();
-  
+
   /// @brief lobs が計算済みかチェックする．
   bool
   check_lobs() const;
@@ -183,7 +183,7 @@ public:
   void
   clear_lobs();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 構造に関する情報の設定用関数
@@ -197,12 +197,12 @@ public:
   void
   set_fanout_list(const vector<SimNode*>& fo_list,
 		  ymuint ipos);
-  
+
   /// @brief FFR を設定する．
   void
   set_ffr(SimFFR* ffr);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 派生クラスで実装する仮想関数
@@ -230,12 +230,12 @@ public:
 
 
 protected:
-  
+
   /// @brief レベルを設定する．
   void
   set_level(ymuint level);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -243,19 +243,19 @@ private:
 
   // ID 番号
   ymuint32 mId;
-  
+
   // ファンアウトリストの要素数
   ymuint32 mNfo;
-  
+
   // ファンアウトリスト
   SimNode** mFanouts;
 
   // 最初のファンアウトの入力位置(FFR内のノードのみ意味を持つ)
   ymuint32 mFanoutIpos;
-  
+
   // FFR
   SimFFR* mFFR;
-  
+
   // レベル
   ymuint32 mLevel;
 
@@ -264,10 +264,10 @@ private:
 
   // 故障値
   PackedVal mFval;
-  
+
   // FFR 内のローカルな obs
   PackedVal mLobs;
-  
+
   // 故障値に対するマスク
   PackedVal mFmask;
 
@@ -341,7 +341,7 @@ SimNode::set_output()
 {
   mFanoutIpos |= 1U;
 }
-  
+
 // @brief lobs が計算済みかチェックする．
 inline
 bool
@@ -393,7 +393,7 @@ SimNode::set_fval(PackedVal pat)
 {
   mFval = pat;
 }
-  
+
 // @brief 故障値のマスクをセットする．
 inline
 void
@@ -440,7 +440,7 @@ SimNode::calc_fval2(PackedVal mask)
   mFval ^= diff;
   return diff;
 }
- 
+
 // @brief FFR を設定する．
 inline
 void

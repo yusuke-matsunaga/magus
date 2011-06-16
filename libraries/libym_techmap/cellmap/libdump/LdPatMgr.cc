@@ -11,7 +11,7 @@
 #include "LdPatNode.h"
 #include "LdPatHandle.h"
 #include "../PatMgr.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/Generator.h"
 #include "ym_utils/BinIO.h"
 

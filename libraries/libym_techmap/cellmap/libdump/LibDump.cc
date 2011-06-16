@@ -16,8 +16,8 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/Cell.h"
 #include "ym_cell/CellPin.h"
-#include "ym_lexp/LogExpr.h"
-#include "ym_npn/NpnMap.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_logic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP

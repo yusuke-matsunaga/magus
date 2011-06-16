@@ -13,8 +13,8 @@
 #include "ym_mislib/MislibParser.h"
 #include "ym_mislib/MislibMgr.h"
 #include "ym_mislib/MislibNode.h"
-#include "ym_lexp/LogExpr.h"
-#include "ym_npn/TvFunc.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_logic/TvFunc.h"
 #include "../CiLibrary.h"
 #include "ym_utils/MsgMgr.h"
 

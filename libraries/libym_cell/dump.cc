@@ -11,7 +11,7 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellTiming.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/BinIO.h"
 
 

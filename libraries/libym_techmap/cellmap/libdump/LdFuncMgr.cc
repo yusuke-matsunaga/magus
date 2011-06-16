@@ -10,7 +10,7 @@
 #include "LdFuncMgr.h"
 #include "LdFuncRep.h"
 #include "LdFunc.h"
-#include "ym_npn/NpnMgr.h"
+#include "ym_logic/NpnMgr.h"
 #include "ym_utils/BinIO.h"
 
 

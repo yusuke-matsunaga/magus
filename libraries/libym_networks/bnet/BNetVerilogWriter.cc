@@ -11,7 +11,7 @@
 
 #include "ym_networks/BNetVerilogWriter.h"
 #include "ym_networks/BNetwork.h"
-#include "ym_lexp/LogExprWriter.h"
+#include "ym_logic/LogExprWriter.h"
 
 
 BEGIN_NAMESPACE_YM_BNET

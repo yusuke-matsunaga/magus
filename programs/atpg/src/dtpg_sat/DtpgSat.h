@@ -15,7 +15,7 @@
 #include "dtpgsat_nsdef.h"
 #include "ym_networks/tgnet_nsdef.h"
 #include "ym_networks/TgNode.h"
-#include "ym_sat/SatStats.h"
+#include "ym_logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

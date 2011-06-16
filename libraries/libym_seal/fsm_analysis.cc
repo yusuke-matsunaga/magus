@@ -14,9 +14,9 @@
 #include "IdxMapper.h"
 #include "ym_utils/StopWatch.h"
 #include "ym_networks/BNetwork.h"
-#include "ym_bdd/Bdd.h"
-#include "ym_bdd/BddVarSet.h"
-#include "ym_bdd/BmcFactory.h"
+#include "ym_logic/Bdd.h"
+#include "ym_logic/BddVarSet.h"
+#include "ym_logic/BmcFactory.h"
 
 
 BEGIN_NONAMESPACE
@@ -116,7 +116,7 @@ fsm_analysis(const BNetwork& bnetwork,
 {
   StopWatch sw;
   sw.start();
-  
+
   BddMgrRef mgr(nsBdd::BmcFactory("classic mgr"));
   nsBdd::BddMgrParam param;
 #if 0
@@ -125,14 +125,14 @@ fsm_analysis(const BNetwork& bnetwork,
   param.mMemLimit = 0;
 #endif
   mgr.param(param, nsBdd::BddMgrParam::MEM_LIMIT);
-  
+
   // 外部入力数
   ymuint input_num = bnetwork.input_num();
   // 外部出力数
   ymuint output_num = bnetwork.output_num();
   // FF数
   ymuint ff_num = bnetwork.latch_node_num();
-  
+
   // 外部入力変数番号を納める配列
   vector<ymuint> input_vars(input_num);
   // 外部出力変数番号を納める配列
@@ -141,13 +141,13 @@ fsm_analysis(const BNetwork& bnetwork,
   vector<pair<ymuint, ymuint> > state_vars(ff_num);
   // 正常回路と故障回路の積の状態変数番号を納める配列
   vector<pair<ymuint, ymuint> > state_vars2(ff_num * 2 + 2);
-  
+
   // 変数番号のマップを作るオブジェクト
   IdxMapper idxmap(input_num, output_num, ff_num);
 
   // 論理ノードに対応する global function を納める配列
   vector<Bdd> bdd_array(bnetwork.max_node_id());
-  
+
   // 入力の変数番号配列のセットと入力変数用のBDDの作成
   {
     ymuint var_num = 0;
@@ -159,7 +159,7 @@ fsm_analysis(const BNetwork& bnetwork,
       bdd_array[node->id()] = mgr.make_posiliteral(id);
     }
   }
-  
+
   // 状態の変数番号配列のセットと現状態変数用のBDDの作成
   {
     ymuint var_num = 0;
@@ -188,7 +188,7 @@ fsm_analysis(const BNetwork& bnetwork,
     }
     bdd_array[node->id()] = mgr.expr_to_bdd(expr, fanin_map);
   }
-  
+
   // 出力の変数番号配列のセットと出力関係のBDDの作成
   Bdd output_rel = mgr.make_one();
   {
@@ -219,13 +219,13 @@ fsm_analysis(const BNetwork& bnetwork,
       trans_rel &= ~(ovar ^ ofunc);
     }
   }
-  
+
   // 正常回路の FSM の生成
   BddFsm fsm(mgr, input_vars, state_vars, trans_rel);
-  
+
   // 正常回路の到達可能状態を列挙
   Bdd rs_bdd = fsm.enum_reachable_states(init_states);
-  
+
   // 到達可能状態集合を表す BDD を状態集合に変換する．
   fsm.bdd2cur_states(rs_bdd, reachable_states1);
 
@@ -242,7 +242,7 @@ fsm_analysis(const BNetwork& bnetwork,
     ymuint next_id2 = idxmap.next_error_idx(i);
     c2e_map.insert(make_pair(next_id1, next_id2));
   }
-  
+
   for (ymuint i = 0; i < ff_num; ++ i) {
     ymuint cur_id = idxmap.cur_normal_idx(i);
     ymuint next_id = idxmap.next_normal_idx(i);
@@ -283,7 +283,7 @@ fsm_analysis(const BNetwork& bnetwork,
   cur_ident_state &= mgr.make_posiliteral(idxmap.cur_ident_bit());
   next_ident_state &= mgr.make_negaliteral(idxmap.next_error_bit());
   next_ident_state &= mgr.make_posiliteral(idxmap.next_ident_bit());
-  
+
   // ノーマル状態
   Bdd cur_normal = mgr.make_one();
   cur_normal &= mgr.make_negaliteral(idxmap.cur_error_bit());
@@ -291,7 +291,7 @@ fsm_analysis(const BNetwork& bnetwork,
   Bdd next_normal = mgr.make_one();
   next_normal &= mgr.make_negaliteral(idxmap.next_error_bit());
   next_normal &= mgr.make_negaliteral(idxmap.next_ident_bit());
-  
+
   // エラー回路の出力関係
   Bdd err_output_rel = output_rel.remap_var(c2e_map);
 
@@ -321,26 +321,26 @@ fsm_analysis(const BNetwork& bnetwork,
     }
     ident |= tmp;
   }
-  
+
   if ( report_size ) {
     cout << "trans_rel.size() = " << trans_rel.size() << endl
 	 << "err_trans_rel.size() = " << err_trans_rel.size() << endl
 	 << "eq.size() = " << eq.size() << endl
 	 << "ident.size() = " << ident.size() << endl;
   }
-  
+
   // 回路対の基本の状態遷移関係
   Bdd trans_rel2 = trans_rel & err_trans_rel & cur_normal;
   if ( report_size ) {
     cout << "trans_rel2.size() = " << trans_rel2.size() << endl;
   }
-  
+
   // 回路対の一時状態の状態遷移関係
   Bdd trans_rel3 = eq & ~ident & trans_rel2 & next_normal;
   if ( report_size ) {
     cout << "trans_rel3.size() = " << trans_rel3.size() << endl;
   }
-  
+
   // 次状態を消去するための変数集合
   VarVector tmp(ff_num * 2);
   for (ymuint i = 0; i < ff_num * 2; ++ i) {
@@ -362,20 +362,20 @@ fsm_analysis(const BNetwork& bnetwork,
 
   // エラー状態の遷移
   Bdd trans_rel6 = cur_err_state & next_err_state;
-  
+
   // 同一状態の遷移
   Bdd trans_rel7 = cur_ident_state & next_ident_state;
-  
+
   // 全遷移
   Bdd trans_rel_all = trans_rel3 | trans_rel4 | trans_rel5 |
     trans_rel6 | trans_rel7;
   if ( report_size ) {
     cout << "trans_rel_all.size() = " << trans_rel_all.size() << endl;
   }
-  
+
   // 回路対の FSM の生成
   BddFsm fsm2(mgr, input_vars, state_vars2, trans_rel_all);
-  
+
   // 回路対の初期状態の作成
   vector<State> init_statepairs;
   for(ymuint i = 0; i < reachable_states1.size(); ++ i) {
@@ -398,7 +398,7 @@ fsm_analysis(const BNetwork& bnetwork,
     State state = *p;
     *p = state.substr(0, ff_num * 2);
   }
-  
+
   // 回路対の状態遷移確率を計算
   hash_map<StatePair, double> tmp_map;
   fsm2.calc_trans_prob(rs_bdd2, reachable_states2, tmp_map);
@@ -443,7 +443,7 @@ fsm_analysis(const BNetwork& bnetwork,
   ident_state += "01";
   tmp_states.push_back(error_state);
   tmp_states.push_back(ident_state);
-  
+
   // 回路対の状態遷移確率を計算
   ymuint n = reachable_states2.size();
   ymuint n2 = n + 2;
@@ -469,19 +469,19 @@ fsm_analysis(const BNetwork& bnetwork,
   for (ymuint i = 0; i < n; ++ i) {
     reachable_states2[i] = reachable_states2[i].substr(0, ff_num * 2);
   }
-  
+
 #endif
-  
+
   cout << "Reachable states analysis end" << endl;
   cout << "  " << n << " states" << endl;
-  
+
   ios::fmtflags save = cout.flags();
   cout << "  " << trans_map2.size() << " non-zero entries"
        << "  (" << setprecision(2)
        << static_cast<double>(trans_map2.size()) / (n * n) * 100.0
        << "\%)" << endl;
   cout.flags(save);
-  
+
   sw.stop();
   USTime time = sw.time();
   cout << "  " << time << endl;

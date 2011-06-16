@@ -12,14 +12,14 @@
 
 
 #include "ym_networks/bnet_nsdef.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_BNET
 
 //////////////////////////////////////////////////////////////////////
-/// @class BNetDecomp BNetDecomp.h <ym_networks/BNetDecomp.h>
+/// @class BNetDecomp BNetDecomp.h "ym_networks/BNetDecomp.h"
 /// @ingroup BnetGroup
 /// @brief BNetwork のノードの分解を行うクラス
 /// @sa BNetwork BNetManip

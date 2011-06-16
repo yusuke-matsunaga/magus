@@ -10,7 +10,7 @@
 
 
 #include "LdCellGroup.h"
-#include "ym_npn/NpnMap.h"
+#include "ym_logic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP

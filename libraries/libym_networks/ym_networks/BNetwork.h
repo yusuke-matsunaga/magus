@@ -16,7 +16,7 @@
 #include "ym_utils/ItvlMgr.h"
 #include "ym_utils/NameMgr.h"
 #include "ym_utils/Binder.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 // Glossary
 //   ネットワーク: 複数の入力，複数の出力を持つ論理ネットワーク

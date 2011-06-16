@@ -4,7 +4,7 @@
 /// @file fsim/SimNode.h
 /// @brief SimNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: SimNode.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -15,7 +15,7 @@
 #include "EqElem.h"
 #include "Val3.h"
 #include "ym_networks/TgGateTemplate.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG_FSIM3
@@ -83,7 +83,7 @@ public:
   /// @brief 最初のファンアウト先の入力位置を得る．
   ymuint
   fanout_ipos() const;
-  
+
   /// @brief FFR を得る．
   SimFFR*
   ffr() const;
@@ -141,11 +141,11 @@ public:
   /// @note 結果は mFval にセットされる．
   bool
   calc_fval3();
-  
+
   /// @brief ローカルな obs の計算を行う．
   bool
   calc_lobs();
-  
+
   /// @brief lobs が計算済みかチェックする．
   bool
   check_lobs() const;
@@ -158,7 +158,7 @@ public:
   void
   clear_lobs();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 構造に関する情報の設定用関数
@@ -172,12 +172,12 @@ public:
   void
   set_fanout_list(const vector<SimNode*>& fo_list,
 		  ymuint ipos);
-  
+
   /// @brief FFR を設定する．
   void
   set_ffr(SimFFR* ffr);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 派生クラスで実装する仮想関数
@@ -205,12 +205,12 @@ public:
 
 
 protected:
-  
+
   /// @brief レベルを設定する．
   void
   set_level(ymuint level);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -218,19 +218,19 @@ private:
 
   // ID 番号
   ymuint32 mId;
-  
+
   // ファンアウトリストの要素数
   ymuint32 mNfo;
-  
+
   // ファンアウトリスト
   SimNode** mFanouts;
 
   // 最初のファンアウトの入力位置(FFR内のノードのみ意味を持つ)
   ymuint32 mFanoutIpos;
-  
+
   // FFR
   SimFFR* mFFR;
-  
+
   // レベル
   ymuint32 mLevel;
 
@@ -239,7 +239,7 @@ private:
 
   // 故障値
   Val3 mFval;
-  
+
   // FFR 内のローカルな obs
   bool mLobs;
 
@@ -313,7 +313,7 @@ SimNode::set_output()
 {
   mFanoutIpos |= 1U;
 }
-  
+
 // @brief lobs が計算済みかチェックする．
 inline
 bool
@@ -404,7 +404,7 @@ SimNode::calc_fval3()
   mFval = _calc_fval3();
   return mFval != mGval;
 }
- 
+
 // @brief FFR を設定する．
 inline
 void

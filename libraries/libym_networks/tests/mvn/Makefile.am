@@ -25,7 +25,6 @@ LIBYM_NET = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \

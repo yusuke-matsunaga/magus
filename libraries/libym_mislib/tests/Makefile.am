@@ -34,5 +34,5 @@ mislib_parser_test_LDFLAGS =
 
 mislib_parser_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

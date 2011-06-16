@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2010 Yusuke Matsunaga
+Copyright (C) 2005-2011 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -63,10 +63,7 @@ AC_CONFIG_SUBDIRS([include])
 # ===================================================================
 
 ym_libym_utils_enable=1
-ym_libym_lexp_enable=1
-ym_libym_bdd_enable=1
-ym_libym_npn_enable=1
-ym_libym_sat_enable=1
+ym_libym_logic_enable=1
 ym_libym_smtlibv2_enable=0
 ym_libym_blif_enable=1
 ym_libym_iscas89_enable=1
@@ -75,7 +72,6 @@ ym_libym_dotlib_enable=1
 ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_networks_enable=1
-ym_libym_aig_enable=0
 ym_libym_gds_enable=1
 ym_libym_cec_enable=1
 ym_libym_techmap_enable=1
@@ -90,27 +86,14 @@ YM_INIT_LIBRARIES_SUBDIRS
 YM_BUILD_LIBRARY([libym_utils],
 		 [])
 
-# libym_lexp
-YM_BUILD_LIBRARY([libym_lexp],
-		 [])
-
-# libym_bdd
-YM_BUILD_LIBRARY([libym_bdd],
-		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
-
-# libym_npn
-YM_BUILD_LIBRARY([libym_npn],
-		 [ym_libym_utils_enable])
-
-# libym_sat
-YM_BUILD_LIBRARY([libym_sat],
+# libym_logic
+YM_BUILD_LIBRARY([libym_logic],
 		 [ym_libym_utils_enable])
 
 # libym_smtlibv2
 YM_BUILD_LIBRARY([libym_smtlibv2],
 		 [ym_libym_utils_enable,
-		  ym_libym_sat_enable])
+		  ym_libym_logic_enable])
 
 # libym_mincov
 YM_BUILD_LIBRARY([libym_mincov],
@@ -127,7 +110,7 @@ YM_BUILD_LIBRARY([libym_iscas89],
 # libym_mislib
 YM_BUILD_LIBRARY([libym_mislib],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
+		  ym_libym_logic_enable])
 
 # libym_dotlib
 YM_BUILD_LIBRARY([libym_dotlib],
@@ -136,7 +119,7 @@ YM_BUILD_LIBRARY([libym_dotlib],
 # libym_cell
 YM_BUILD_LIBRARY([libym_cell],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
+		  ym_libym_logic_enable])
 
 # libym_verilog
 YM_BUILD_LIBRARY([libym_verilog],
@@ -145,15 +128,9 @@ YM_BUILD_LIBRARY([libym_verilog],
 # libym_networks
 YM_BUILD_LIBRARY([libym_networks],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable,
+		  ym_libym_logic_enable,
 		  ym_libym_blif_enable,
 		  ym_libym_iscas89_enable])
-
-# libym_aig
-YM_BUILD_LIBRARY([libym_aig],
-		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable,
-		  ym_libym_sat_enable])
 
 # libym_gds
 YM_BUILD_LIBRARY([libym_gds],
@@ -162,16 +139,16 @@ YM_BUILD_LIBRARY([libym_gds],
 # libym_cec
 YM_BUILD_LIBRARY([libym_cec],
 		 [ym_libym_networks_enable,
-		  ym_libym_sat_enable])
+		  ym_libym_logic_enable])
 
 # libym_techmap
 YM_BUILD_LIBRARY([libym_techmap],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable])
+		  ym_libym_logic_enable])
 
 # libym_seal
 YM_BUILD_LIBRARY([libym_seal],
-		 [ym_libym_bdd_enable,
+		 [ym_libym_logic_enable,
 		  ym_libym_networks_enable])
 
 # libym_tclpp
@@ -209,7 +186,7 @@ YM_BUILD_PROGRAM([atpg],
 # matpg
 YM_BUILD_PROGRAM([matpg],
 		 [ym_libym_utils_enable,
-		  ym_libym_lexp_enable,
+		  ym_libym_logic_enable,
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 

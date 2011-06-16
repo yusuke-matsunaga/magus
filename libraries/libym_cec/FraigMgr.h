@@ -4,7 +4,7 @@
 /// @file ym_cec/FraigMgr.h
 /// @brief FraigMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: FraigMgr.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -13,8 +13,8 @@
 
 #include "ym_cec/cec_nsdef.h"
 #include "FraigHandle.h"
-#include "ym_lexp/LogExpr.h"
-#include "ym_sat/Bool3.h"
+#include "ym_logic/LogExpr.h"
+#include "ym_logic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -42,12 +42,12 @@ class FraigMgr
   /// @brief デストラクタ
   ~FraigMgr();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 情報を取得するメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入力ノード数を得る．
   ymuint
   input_num() const;
@@ -66,7 +66,7 @@ public:
   /// @note ANDノードの他に入力ノードも含まれる．
   FraigNode*
   node(ymuint pos) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ public:
   /// @brief 外部入力を作る．
   FraigHandle
   make_input();
-  
+
   /// @brief 2つのノードの AND を取る．
   /// @param[in] edge1, edge2 入力の AIG ハンドル
   FraigHandle
@@ -109,7 +109,7 @@ public:
   FraigHandle
   make_logic(const LogExpr& expr,
 	     const vector<FraigHandle>& inputs);
-  
+
   /// @brief コファクターを計算する．
   /// @param[in] edge 対象の AIG ハンドル
   /// @param[in] id コファクターをとる変数番号
@@ -121,16 +121,16 @@ public:
 
 
 public:
-  
+
   /// @brief 2つのハンドルが等価かどうか調べる．
   Bool3
   check_equiv(FraigHandle aig1,
 	      FraigHandle aig2);
-  
+
   /// @brief ログレベルを設定する．
   void
   set_loglevel(int level);
-  
+
   /// @brief ログ出力用ストリームを設定する．
   void
   set_logstream(ostream* out);
@@ -139,17 +139,17 @@ public:
   /// @param[in] loop_limit 変化のない状態がこの回数連続したら止める．
   void
   set_loop_limit(size_t loop_limit);
-  
+
   /// @brief 内部の統計情報を出力する．
   void
   dump_stats(ostream& s);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 実際の処理を行う実装クラス
   FraigMgrImpl* mImpl;
 

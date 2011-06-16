@@ -12,7 +12,7 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/cell_type.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

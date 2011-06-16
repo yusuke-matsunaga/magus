@@ -56,7 +56,7 @@ matpg_tclsh_LDADD = \
 	libmatpg_tcl.la \
 	$(top_builddir)/src/libmatpg/libmatpg.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YM_LIBS_LIBTCLREADLINE) \

@@ -15,7 +15,7 @@
 
 #include "ym_utils/ShString.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB

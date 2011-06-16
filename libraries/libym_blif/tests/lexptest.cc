@@ -13,7 +13,7 @@
 #include "ym_blif/BlifHandler.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM

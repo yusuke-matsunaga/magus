@@ -13,7 +13,7 @@
 #include "ym_networks/BNetwork.h"
 #include "ym_networks/BNetManip.h"
 #include "ym_blif/BlifNetwork.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM

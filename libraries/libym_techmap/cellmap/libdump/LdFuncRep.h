@@ -10,7 +10,7 @@
 
 
 #include "libdump_nsdef.h"
-#include "ym_npn/TvFunc.h"
+#include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP_LIBDUMP

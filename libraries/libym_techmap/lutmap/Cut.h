@@ -13,7 +13,7 @@
 
 #include "ym_techmap/lutmap_nsdef.h"
 #include "ym_networks/bdn_nsdef.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

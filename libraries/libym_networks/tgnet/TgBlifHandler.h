@@ -13,7 +13,7 @@
 
 #include "ym_networks/tgnet_nsdef.h"
 #include "ym_blif/BlifHandler.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_TGNET
@@ -40,12 +40,12 @@ public:
   /// @brief ネットワークをセットする．
   void
   set_network(TgNetwork& network);
-  
+
   /// @brief 初期化
   virtual
   bool
   init();
-  
+
   /// @brief .model 文の処理
   /// @param[in] loc1 .model の位置情報
   /// @param[in] loc2 文字列の位置情報
@@ -184,7 +184,7 @@ private:
       mPos(pos) { }
   };
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -199,7 +199,7 @@ private:
 
   // 後で接続する要素のリスト
   vector<Connection> mConList;
-  
+
   // .names 文の処理で用いる作業領域
   vector<TgNode*> mCurFanins;
 

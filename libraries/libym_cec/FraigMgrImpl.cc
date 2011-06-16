@@ -13,7 +13,7 @@
 #include "FraigNode.h"
 #include "FraigMgr.h"
 #include "ym_utils/StopWatch.h"
-#include "ym_sat/SatStats.h"
+#include "ym_logic/SatStats.h"
 
 
 #if defined(YM_DEBUG)

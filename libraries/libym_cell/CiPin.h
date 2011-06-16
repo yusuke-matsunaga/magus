@@ -12,7 +12,7 @@
 
 
 #include "ym_cell/CellPin.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
 
 

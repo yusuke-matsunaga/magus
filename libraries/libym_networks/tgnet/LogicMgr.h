@@ -4,7 +4,7 @@
 /// @file libym_networks/LogicMgr.h
 /// @brief LogicMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: LogicMgr.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -13,7 +13,7 @@
 
 #include "ym_networks/tgnet_nsdef.h"
 #include "ym_networks/TgGateTemplate.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_TGNET
@@ -62,11 +62,11 @@ public:
   void
   dump(ostream& s) const;
 
-  
+
 private:
 
   class Cell;
-  
+
   // cell と現在の真理値ベクタが等価かどうか調べる．
   bool
   equiv(Cell* cell,
@@ -75,7 +75,7 @@ private:
   // ハッシュ表を拡大して再ハッシュする．
   void
   expand();
-  
+
   // ハッシュ表用の領域を確保する．
   void
   alloc_table(size_t req_size);
@@ -115,10 +115,10 @@ private:
   // 一般の論理関数のオフセット値
   static
   const ymuint32 kBase = static_cast<ymuint32>(kTgUsrDef);
-  
+
   // Cell の配列
   vector<Cell*> mCellArray;
-  
+
   // ハッシュ表のサイズ
   size_t mHashSize;
 
@@ -127,7 +127,7 @@ private:
 
   // ハッシュ表を拡大する目安
   size_t mNextLimit;
-  
+
 };
 
 END_NAMESPACE_YM_TGNET

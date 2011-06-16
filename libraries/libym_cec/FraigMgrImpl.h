@@ -15,7 +15,7 @@
 #include "FraigHandle.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/RandGen.h"
-#include "ym_sat/SatSolver.h"
+#include "ym_logic/SatSolver.h"
 #include "FraigHash.h"
 
 

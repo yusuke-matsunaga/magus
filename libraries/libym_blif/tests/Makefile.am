@@ -22,7 +22,7 @@ distclean-local:
 
 LIBYM_BLIF = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \

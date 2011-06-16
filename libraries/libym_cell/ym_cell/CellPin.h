@@ -13,7 +13,7 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/cell_type.h"
-#include "ym_lexp/lexp_nsdef.h"
+#include "ym_logic/lexp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

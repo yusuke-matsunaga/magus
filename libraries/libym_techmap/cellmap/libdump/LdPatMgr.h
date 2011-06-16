@@ -10,7 +10,7 @@
 
 
 #include "libdump_nsdef.h"
-#include "ym_lexp/lexp_nsdef.h"
+#include "ym_logic/lexp_nsdef.h"
 #include "ym_utils/Alloc.h"
 
 

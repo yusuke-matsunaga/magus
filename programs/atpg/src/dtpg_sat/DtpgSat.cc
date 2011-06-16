@@ -14,7 +14,7 @@
 #include "ym_networks/TgNode.h"
 #include "SaFault.h"
 #include "TestVector.h"
-#include "ym_sat/SatSolver.h"
+#include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG_DTPGSAT

@@ -25,7 +25,7 @@
 
 #include "ym_networks/tgnet_nsdef.h"
 #include "ym_networks/TgGateTemplate.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_logic/LogExpr.h"
 #include "ym_utils/Alloc.h"
 
 
