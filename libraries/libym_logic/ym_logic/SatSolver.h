@@ -32,16 +32,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] type 実装タイプを表す文字列
   /// @param[in] option オプション文字列
+  /// @param[in] outp ログを記録するストリームへのポインタ
   SatSolver(const string& type = string(),
-	    const string& option = string());
-
-  /// @brief コンストラクタ
-  /// @param[in] out ログを記録するストリーム
-  /// @param[in] type 実装タイプを表す文字列
-  /// @param[in] option オプション文字列
-  SatSolver(ostream& out,
-	    const string& type = string(),
-	    const string& option = string());
+	    const string& option = string(),
+	    ostream* outp = NULL);
 
   /// @brief デストラクタ
   ~SatSolver();

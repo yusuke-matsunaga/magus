@@ -193,7 +193,7 @@ FraigMgrImpl::FraigMgrImpl(ymuint pat_size,
   mPatSize(pat_size * 2),
   mPatInit(pat_size),
   mPatUsed(pat_size),
-  mSolver(sat_type, sat_opt),
+  mSolver(sat_type, sat_opt, sat_log),
   mSimCount(0),
   mSimTime(0.0),
   mOutP(sat_log),
@@ -699,22 +699,22 @@ FraigMgrImpl::check_condition(Literal lit1)
   Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver* solver = SatSolverFactory::gen_minisat();
+  SatSolver solver(NULL, "minisat");
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    tVarId id = solver->new_var();
+    tVarId id = solver.new_var();
     assert_cond(id == node->var_id(), __FILE__, __LINE__);
     if ( node->is_and() ) {
       Literal lito(id, kPolPosi);
       Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
       Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
-      solver->add_clause(~lit1, ~lit2, lito);
-      solver->add_clause( lit1, ~lito);
-      solver->add_clause( lit2, ~lito);
+      solver.add_clause(~lit1, ~lit2, lito);
+      solver.add_clause( lit1, ~lito);
+      solver.add_clause( lit2, ~lito);
     }
   }
-  Bool3 ans2 = solver->solve(assumptions, mModel);
+  Bool3 ans2 = solver.solve(assumptions, mModel);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition(" << lit1 << ")" << endl;
@@ -735,7 +735,6 @@ FraigMgrImpl::check_condition(Literal lit1)
       }
     }
   }
-  delete solver;
 #endif
   return ans1;
 }
@@ -751,22 +750,22 @@ FraigMgrImpl::check_condition(Literal lit1,
   Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver* solver = SatSolverFactory::gen_minisat();
+  SatSolver solver(NULL, "minisat");
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    tVarId id = solver->new_var();
+    tVarId id = solver.new_var();
     assert_cond(id == node->var_id(), __FILE__, __LINE__);
     if ( node->is_and() ) {
       Literal lito(id, kPolPosi);
       Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
       Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
-      solver->add_clause(~lit1, ~lit2, lito);
-      solver->add_clause(lit1, ~lito);
-      solver->add_clause(lit2, ~lito);
+      solver.add_clause(~lit1, ~lit2, lito);
+      solver.add_clause(lit1, ~lito);
+      solver.add_clause(lit2, ~lito);
     }
   }
-  Bool3 ans2 = solver->solve(assumptions, mModel);
+  Bool3 ans2 = solver.solve(assumptions, mModel);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition("
@@ -788,7 +787,6 @@ FraigMgrImpl::check_condition(Literal lit1,
       }
     }
   }
-  delete solver;
 #endif
   return ans1;
 }

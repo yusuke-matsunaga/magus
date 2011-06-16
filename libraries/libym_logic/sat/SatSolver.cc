@@ -26,28 +26,23 @@ BEGIN_NAMESPACE_YM_SAT
 // @brief コンストラクタ
 // @param[in] type 実装タイプを表す文字列
 // @param[in] option オプション文字列
+// @param[in] outp ログを記録するストリームへのポインタ
 SatSolver::SatSolver(const string& type,
-		     const string& option)
+		     const string& option,
+		     ostream* outp)
 {
   if ( type == "minisat" ) {
     mImpl = new SatSolverMiniSat;
   }
   else {
     SatAnalyzer* analyzer = SaFactory::gen_analyzer(option);
-    mImpl = new YmSat(analyzer);
+    if ( outp ) {
+      mImpl = new YmSatR(*outp, analyzer);
+    }
+    else {
+      mImpl = new YmSat(analyzer);
+    }
   }
-}
-
-// @brief コンストラクタ
-// @param[in] out ログを記録するストリーム
-// @param[in] type 実装タイプを表す文字列
-// @param[in] option オプション文字列
-SatSolver::SatSolver(ostream& out,
-		     const string& type,
-		     const string& option)
-{
-  SatAnalyzer* analyzer = SaFactory::gen_analyzer(option);
-  mImpl = new YmSatR(out, analyzer);
 }
 
 // @brief デストラクタ
