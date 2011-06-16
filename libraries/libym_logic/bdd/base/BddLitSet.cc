@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/BddLitSet.h"
+#include "BddMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -92,7 +93,7 @@ BddLitSet::iterator::next()
 //////////////////////////////////////////////////////////////////////
 
 // 空のコンストラクタ
-BddLitSet::BddLitSet(BddMgrRef mgr) :
+BddLitSet::BddLitSet(BddMgr& mgr) :
   mBody(mgr.make_one()),
   mSize(0U)
 {
@@ -123,7 +124,7 @@ BddLitSet::operator=(const BddLitSet& src)
 }
 
 // リテラル1つだけを要素とする集合を作るコンストラクタ
-BddLitSet::BddLitSet(BddMgrRef mgr,
+BddLitSet::BddLitSet(BddMgr& mgr,
 		     tVarId varid,
 		     tPol pol) :
   mBody(mgr.make_literal(varid, pol)),
@@ -132,7 +133,7 @@ BddLitSet::BddLitSet(BddMgrRef mgr,
   set_size(1);
 }
 
-BddLitSet::BddLitSet(BddMgrRef mgr,
+BddLitSet::BddLitSet(BddMgr& mgr,
 		     const Literal& lit) :
   mBody(mgr.make_literal(lit)),
   mSize(0U)
@@ -142,13 +143,13 @@ BddLitSet::BddLitSet(BddMgrRef mgr,
 
 // 空集合を返すクラスメソッド
 BddLitSet
-BddLitSet::make_empty(BddMgrRef mgr)
+BddLitSet::make_empty(BddMgr& mgr)
 {
   return BddLitSet(mgr.make_one());
 }
 
 // vector からの変換用コンストラクタ
-BddLitSet::BddLitSet(BddMgrRef mgr,
+BddLitSet::BddLitSet(BddMgr& mgr,
 		     const LiteralVector& src) :
   mSize(0U)
 {
@@ -161,7 +162,7 @@ BddLitSet::BddLitSet(BddMgrRef mgr,
 }
 
 // list からの変換用コンストラクタ
-BddLitSet::BddLitSet(BddMgrRef mgr,
+BddLitSet::BddLitSet(BddMgr& mgr,
 		     const LiteralList& src) :
   mSize(0U)
 {
@@ -181,7 +182,7 @@ BddLitSet::empty() const
 }
 
 // 要素数を返す．
-size_t
+ymuint
 BddLitSet::size() const
 {
   if ( !static_cast<bool>(mSize & 1U) ) {
@@ -201,7 +202,7 @@ BddLitSet::begin() const
 BddLitSet::iterator
 BddLitSet::end() const
 {
-  return iterator(mBody.mgr().make_one());
+  return iterator(mBody.mMgr->make_one());
 }
 
 // 集合和を計算する．
@@ -264,14 +265,14 @@ BddLitSet::operator-=(const BddLitSet& set2)
 }
 
 // リテラルの vector に変換する．
-size_t
+ymuint
 BddLitSet::to_vector(LiteralVector& dst) const
 {
   return mBody.to_literalvector(dst);
 }
 
 // 変数番号の list に変換する．
-size_t
+ymuint
 BddLitSet::to_list(LiteralList& dst) const
 {
   return mBody.to_literallist(dst);
@@ -279,16 +280,16 @@ BddLitSet::to_list(LiteralList& dst) const
 
 // サイズを設定する．
 void
-BddLitSet::set_size(size_t size) const
+BddLitSet::set_size(ymuint size) const
 {
-  mSize = (size << 1) | static_cast<size_t>(true);
+  mSize = (size << 1) | static_cast<ymuint>(true);
 }
 
 // サイズを無効化する．
 void
 BddLitSet::invalidate_size()
 {
-  mSize = static_cast<size_t>(false);
+  mSize = static_cast<ymuint>(false);
 }
 
 // ostream に対する出力

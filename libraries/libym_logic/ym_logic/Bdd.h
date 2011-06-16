@@ -180,6 +180,7 @@ check_reverse(tBddEdge e1,
 class Bdd
 {
   friend class BddMgr;
+  friend class BddMgrImpl;
   friend class DgMgr;
 
 public:
@@ -352,10 +353,12 @@ public:
   Bdd
   edge1() const;
 
+#if 0
   /// @brief 親の BddMgr の取得
   /// @return 親の BddMgr を返す．
   BddMgr&
   mgr() const;
+#endif
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -465,7 +468,7 @@ public:
   /// @brief 内容を書き出す
   /// @param[in] s 出力ストリーム
   /// @return ノード数を返す．
-  size_t
+  ymuint64
   display(ostream& s) const;
 
   /// @brief BDD が表す関数のカルノー図を表示する
@@ -486,7 +489,7 @@ public:
 
   /// @brief BDD が使っているノード数を数える．
   /// @return BDD が使っているノード数
-  size_t
+  ymuint64
   size() const;
 
   /// @brief 真理値表密度の計算
@@ -616,7 +619,7 @@ public:
 
   /// @brief レベル level のノード数を数える．
   /// @note ただし n-mark が付いていないノードがあったら UINT_MAX を返す．
-  size_t
+  ymuint64
   count_at(tLevel level) const;
 
   /// @brief scan で付けた n-mark を消す．
@@ -659,12 +662,12 @@ public:
 		  const Bdd& upper);
 
   friend
-  size_t
+  ymuint64
   display(const BddVector& array,
 	  ostream& s);
 
   friend
-  size_t
+  ymuint64
   display(const BddList& array,
 	  ostream& s);
 
@@ -679,11 +682,11 @@ public:
        ostream& s);
 
   friend
-  size_t
+  ymuint64
   size(const BddVector& array);
 
   friend
-  size_t
+  ymuint64
   size(const BddList& array);
 
   friend
@@ -752,22 +755,6 @@ public:
   lsintersect(const Bdd& src1,
 	      const Bdd& src2);
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @name static メンバ
-  /// @{
-
-  /// @brief new_mgr に養子縁組を行う
-  /// @param[in] top_bdd BDD リストの先頭
-  /// @param[in] new_mgr 付け替える先の BDD マネージャ
-  static
-  void
-  change_mgr(Bdd* top_bdd,
-	     BddMgr& new_mgr);
-
-  /// @}
-  //////////////////////////////////////////////////////////////////////
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -777,7 +764,7 @@ private:
   /// @brief BDD マネージャと根の枝を引数とするコンストラクタ
   /// @param[in] mgr BDD マネージャ
   /// @param[in] e 根の枝
-  Bdd(BddMgr& mgr,
+  Bdd(BddMgrImpl* mgr,
       tBddEdge root);
 
   // 根の枝をとり出す
@@ -788,7 +775,7 @@ private:
   /// @param[in] mgr BDD マネージャ
   /// @param[in] root 根の枝
   void
-  set(BddMgr& mgr,
+  set(BddMgrImpl* mgr,
       tBddEdge root);
 
   /// @brief (mMgr, mRoot) への参照をなくす時に呼ばれる関数
@@ -808,7 +795,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親の BddMgr
-  BddMgr* mMgr;
+  BddMgrImpl* mMgr;
 
   // 根のノードを指す枝
   tBddEdge mRoot;
@@ -843,10 +830,10 @@ struct BddMgrParam
   const ymuint32 MEM_LIMIT     = 16U;
 
   double mGcThreshold;
-  size_t mGcNodeLimit;
+  ymuint64 mGcNodeLimit;
   double mNtLoadLimit;
   double mRtLoadLimit;
-  size_t mMemLimit;
+  ymuint64 mMemLimit;
 };
 
 
@@ -1190,23 +1177,23 @@ public:
   name() const;
 
   /// @brief 使用メモリ量(in bytes)を得る．
-  size_t
+  ymuint64
   used_mem() const;
 
   /// @brief 節点テーブルに登録されているノードの数を得る．
-  size_t
+  ymuint64
   node_num() const;
 
   /// @brief GC で回収される(フリーになる)ノード数を得る．
-  size_t
+  ymuint64
   garbage_num() const;
 
   /// @brief 利用可能なフリーノード数を得る．
-  size_t
+  ymuint64
   avail_num() const;
 
   /// @brief GC の起動された回数を得る．
-  size_t
+  ymuint64
   gc_count() const;
 
   /// @}
@@ -1334,10 +1321,10 @@ minimal_support(const Bdd& lower,
 
 // BDDの配列の内容を書き出す
 // と同時にノード数を返す．
-size_t
+ymuint64
 display(const BddVector& array,
 	ostream& s);
-size_t
+ymuint64
 display(const BddList& array,
 	ostream& s);
 
@@ -1352,11 +1339,11 @@ dump(const BddList& array,
      ostream& s);
 
 // BDDの配列のノード数を数える
-size_t
+ymuint64
 size(const BddVector& array);
 
 // BDDの配列のノード数を数える
-size_t
+ymuint64
 size(const BddList& array);
 
 // BDD のベクタのサポートを求める．
@@ -1590,6 +1577,7 @@ Bdd::root() const
   return mRoot;
 }
 
+#if 0
 // @brief 親の BDD マネージャを返す．
 // @return 親の BDD マネージャ
 inline
@@ -1598,6 +1586,7 @@ Bdd::mgr() const
 {
   return *mMgr;
 }
+#endif
 
 // @brief 定数0 のチェック
 // @return 定数0の時 true を返す．

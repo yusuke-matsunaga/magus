@@ -69,7 +69,19 @@ BddMgrImpl::~BddMgrImpl()
   // と言っても Bdd のオブジェクトを削除するわけには行かないので
   // デフォルトマネージャのエラーBDDにすり替える．
   if ( mTopBdd ) {
-    Bdd::change_mgr(mTopBdd, mDefaultMgr);
+    Bdd* last = NULL;
+    for (Bdd* bdd = mTopBdd; bdd; bdd = bdd->mNext) {
+      bdd->mRoot = kEdgeError;
+      bdd->mMgr = mDefaultMgr;
+      last = bdd;
+    }
+    Bdd* first = mDefaultMgr->mTopBdd;
+    mDefaultMgr->mTopBdd = mTopBdd;
+    mTopBdd->mPrev = NULL;
+    last->mNext = first;
+    if ( first ) {
+      first->mPrev = last;
+    }
   }
 
   // /dev/null ストリームの破壊

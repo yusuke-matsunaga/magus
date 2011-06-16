@@ -12,6 +12,8 @@
 #include "ym_logic/Bdd.h"
 
 #include "BddMgrImpl.h"
+#include "Dumper.h"
+
 #include "bmc/BddMgrClassic.h"
 #include "bmm/BddMgrModern.h"
 
@@ -19,24 +21,25 @@
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-// クラス BddMgrRef
+// クラス BddMgr
 //////////////////////////////////////////////////////////////////////
-
-// @brief 空のコンストラクタ
-// @note デフォルトマネージャを作る．
-BddMgrRef::BddMgrRef() :
+#if 0
+// @brief デフォルトマネージャを返す．
+BddMgr&
+BddMgr::default_mgr()
   mImpl(BddMgrImpl::default_mgr())
 {
   mImpl->inc_ref();
 }
+#endif
 
 // @brief コンストラクタ
 // @param[in] type BddMgr の型を表す文字列
 // @param[in] name マネージャの名前
 // @param[in] option オプション文字列
-BddMgrRef::BddMgrRef(const string& type,
-		     const string& name,
-		     const string& option)
+BddMgr::BddMgr(const string& type,
+	       const string& name,
+	       const string& option)
 {
   if ( type == "bmc" ) {
     mImpl = new BddMgrClassic(name, option);
@@ -51,90 +54,45 @@ BddMgrRef::BddMgrRef(const string& type,
   mImpl->inc_ref();
 }
 
-// BddMgrImpl を指定したコンストラクタ
-BddMgrRef::BddMgrRef(BddMgrImpl* ptr) :
-  mImpl(ptr)
-{
-  assert_cond(mImpl, __FILE__, __LINE__);
-  mImpl->inc_ref();
-}
-
-// コピーコンストラクタ
-// 実際には同じ BddMgr を指すだけで BddMgr はコピーしない．
-BddMgrRef::BddMgrRef(const BddMgrRef& src) :
-  mImpl(src.mImpl)
-{
-  assert_cond(mImpl, __FILE__, __LINE__);
-  mImpl->inc_ref();
-}
-
-// 代入演算子
-// コピーコンストラクタと同様
-const BddMgrRef&
-BddMgrRef::operator=(const BddMgrRef& src)
-{
-  if ( mImpl != src.mImpl ) {
-    assert_cond(mImpl, __FILE__, __LINE__);
-    mImpl->dec_ref();
-    mImpl = src.mImpl;
-    assert_cond(mImpl, __FILE__, __LINE__);
-    mImpl->inc_ref();
-  }
-  return *this;
-}
-
 // デストラクタ
-BddMgrRef::~BddMgrRef()
+BddMgr::~BddMgr()
 {
   assert_cond(mImpl, __FILE__, __LINE__);
   mImpl->dec_ref();
 }
 
-// 2つのマネージャが等価なとき true を返す．
-bool
-BddMgrRef::operator==(const BddMgrRef& src2) const
-{
-  return mImpl == src2.mImpl;
-}
-
-// 2つのマネージャが等価でないとき true を返す．
-bool
-BddMgrRef::operator!=(const BddMgrRef& src2) const
-{
-  return !operator==(src2);
-}
-
 // 定数0を表すBDDを作る．
 Bdd
-BddMgrRef::make_zero()
+BddMgr::make_zero()
 {
   return Bdd(mImpl, kEdge0);
 }
 
 // 定数1を表すBDDを作る．
 Bdd
-BddMgrRef::make_one()
+BddMgr::make_one()
 {
   return Bdd(mImpl, kEdge1);
 }
 
 // エラーを表すBDDを作る．
 Bdd
-BddMgrRef::make_error()
+BddMgr::make_error()
 {
   return Bdd(mImpl, kEdgeError);
 }
 
 // オーバーフローを表すBDDを作る．
 Bdd
-BddMgrRef::make_overflow()
+BddMgr::make_overflow()
 {
   return Bdd(mImpl, kEdgeOverflow);
 }
 
 // リテラル関数を表すBDDを作る．
 Bdd
-BddMgrRef::make_literal(tVarId index, tPol pol)
+BddMgr::make_literal(tVarId index,
+		     tPol pol)
 {
   tBddEdge ans = mImpl->make_literal(index, pol);
   return Bdd(mImpl, ans);
@@ -142,7 +100,7 @@ BddMgrRef::make_literal(tVarId index, tPol pol)
 
 // リテラル関数を表すBDDを作る
 Bdd
-BddMgrRef::make_literal(const Literal& lit)
+BddMgr::make_literal(const Literal& lit)
 {
   tBddEdge ans = mImpl->make_literal(lit);
   return Bdd(mImpl,ans);
@@ -150,7 +108,7 @@ BddMgrRef::make_literal(const Literal& lit)
 
 // 肯定のリテラル関数を作る
 Bdd
-BddMgrRef::make_posiliteral(tVarId varid)
+BddMgr::make_posiliteral(tVarId varid)
 {
   tBddEdge ans = mImpl->make_posiliteral(varid);
   return Bdd(mImpl, ans);
@@ -158,7 +116,7 @@ BddMgrRef::make_posiliteral(tVarId varid)
 
 // 否定のリテラル関数を作る．
 Bdd
-BddMgrRef::make_negaliteral(tVarId varid)
+BddMgr::make_negaliteral(tVarId varid)
 {
   tBddEdge ans = mImpl->make_negaliteral(varid);
   return Bdd(mImpl, ans);
@@ -168,7 +126,9 @@ BddMgrRef::make_negaliteral(tVarId varid)
 // その左右の子のデフォルトはそれぞれ0と1
 // メモリ不足によってエラーが起きる可能性がある．
 Bdd
-BddMgrRef::make_bdd(tVarId index, const Bdd& chd0, const Bdd& chd1)
+BddMgr::make_bdd(tVarId index,
+		 const Bdd& chd0,
+		 const Bdd& chd1)
 {
   tBddEdge ans = mImpl->make_bdd(index, chd0.root(), chd1.root());
   return Bdd(mImpl, ans);
@@ -179,8 +139,8 @@ BddMgrRef::make_bdd(tVarId index, const Bdd& chd0, const Bdd& chd1)
 // ベクタの値は非ゼロを true とみなす．
 // v の大きさは 2^ni に等しくなければならない．
 Bdd
-BddMgrRef::tvec_to_bdd(const vector<int>& v,
-		       tVarSize ni)
+BddMgr::tvec_to_bdd(const vector<int>& v,
+		    tVarSize ni)
 {
   VarVector vv(ni);
   for (ymuint i = 0; i < ni; ++ i) {
@@ -194,26 +154,26 @@ BddMgrRef::tvec_to_bdd(const vector<int>& v,
 // ベクタの値は非ゼロを true とみなす．
 // v の大きさは 2^(vars.size()) に等しくなければならない．
 Bdd
-BddMgrRef::tvec_to_bdd(const vector<int>& v,
-		       const VarVector& vars)
+BddMgr::tvec_to_bdd(const vector<int>& v,
+		    const VarVector& vars)
 {
   tBddEdge ans = mImpl->tvec_to_bdd(v, vars);
   return Bdd(mImpl, ans);
 #if DEBUG_MAKE_BDD
-  size_t ni = vars.size();
-  size_t nv = (1 << ni);
+  ymuint ni = vars.size();
+  ymuint nv = (1 << ni);
   Bdd ans0(ans, mImpl);
   BddVector varbdds(ni);
-  for (size_t i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < ni; ++ i) {
     tVarId vid = vars[i];
     varbdds[i] = make_posiliteral(vid);
   }
 
   Bdd ans1 = make_zero();
-  for (size_t p = 0; p < nv; ++ p) {
+  for (ymuint p = 0; p < nv; ++ p) {
     if ( v[p] ) {
       Bdd minterm = make_one();
-      for (size_t i = 0; i < ni; ++ i) {
+      for (ymuint i = 0; i < ni; ++ i) {
 	if ( p & (1 << (ni - i - 1)) ) {
 	  minterm &= varbdds[i];
 	}
@@ -233,7 +193,8 @@ BddMgrRef::tvec_to_bdd(const vector<int>& v,
 // 論理式中に現れるリテラルを置き換えるBDDを varmap に入れる．
 // varmap に登録されていないリテラルはそのまま使う．
 Bdd
-BddMgrRef::expr_to_bdd(const LogExpr& expr, const VarBddMap& varmap)
+BddMgr::expr_to_bdd(const LogExpr& expr,
+		    const VarBddMap& varmap)
 {
   hash_map<tVarId, tBddEdge> vemap;
   for (VarBddMap::const_iterator p = varmap.begin();
@@ -256,7 +217,8 @@ BddMgrRef::expr_to_bdd(const LogExpr& expr, const VarBddMap& varmap)
 // 論理式中に現れるリテラルを置き換えるリテラル番号を varmap に入れる．
 // varmap に登録されていないリテラルはそのまま使う．
 Bdd
-BddMgrRef::expr_to_bdd(const LogExpr& expr, const VarVarMap& varmap)
+BddMgr::expr_to_bdd(const LogExpr& expr,
+		    const VarVarMap& varmap)
 {
   hash_map<tVarId, tBddEdge> vemap;
   for (VarVarMap::const_iterator p = varmap.begin();
@@ -273,7 +235,8 @@ BddMgrRef::expr_to_bdd(const LogExpr& expr, const VarVarMap& varmap)
 // ストリームを読んで論理式を作り,そこからBDDを作る．
 // エラーが起きたら err_msg をセットしてエラーBDDを返す．
 Bdd
-BddMgrRef::expr_to_bdd(istream& in, string& err_msg)
+BddMgr::expr_to_bdd(istream& in,
+		    string& err_msg)
 {
   LogExpr expr = LogExpr::stream_to_expr(in, err_msg);
   if ( err_msg == string() ) {
@@ -285,7 +248,8 @@ BddMgrRef::expr_to_bdd(istream& in, string& err_msg)
 // 文字列を読んで論理式を作り,そこからBDDを作る．
 // エラーが起きたら err_msg をセットしてエラーBDDを返す．
 Bdd
-BddMgrRef::expr_to_bdd(const char* s, string& err_msg)
+BddMgr::expr_to_bdd(const char* s,
+		    string& err_msg)
 {
   istringstream in(s);
   return expr_to_bdd(in, err_msg);
@@ -294,7 +258,8 @@ BddMgrRef::expr_to_bdd(const char* s, string& err_msg)
 // 文字列を読んで論理式を作り,そこからBDDを作る．
 // エラーが起きたら err_msg をセットしてエラーBDDを返す．
 Bdd
-BddMgrRef::expr_to_bdd(const string& s, string& err_msg)
+BddMgr::expr_to_bdd(const string& s,
+		    string& err_msg)
 {
   istringstream in(s.c_str());
   return expr_to_bdd(in, err_msg);
@@ -303,8 +268,10 @@ BddMgrRef::expr_to_bdd(const string& s, string& err_msg)
 BEGIN_NONAMESPACE
 // make_thfunc() 中で使われるサブルーティン
 inline
-size_t
-elem(size_t i, size_t j, size_t th)
+ymuint
+elem(ymuint i,
+     ymuint j,
+     ymuint th)
 {
   return i * (th + 1) + j;
 }
@@ -312,8 +279,8 @@ END_NONAMESPACE
 
 // 閾値関数を作る．
 Bdd
-BddMgrRef::make_thfunc(tVarSize n,
-		       tVarSize th)
+BddMgr::make_thfunc(tVarSize n,
+		    tVarSize th)
 {
   vector<tBddEdge> table((n + 1) * (th + 1));
   table[elem(n, 0, th)] = kEdge1;
@@ -343,7 +310,7 @@ BddMgrRef::make_thfunc(tVarSize n,
 
 // 複数のBDDの論理積を求める．
 Bdd
-BddMgrRef::and_op(const BddVector& bdds)
+BddMgr::and_op(const BddVector& bdds)
 {
   list<tBddEdge> edge_list;
   for (BddVector::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
@@ -354,7 +321,7 @@ BddMgrRef::and_op(const BddVector& bdds)
 }
 
 Bdd
-BddMgrRef::and_op(const BddList& bdds)
+BddMgr::and_op(const BddList& bdds)
 {
   list<tBddEdge> edge_list;
   for (BddList::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
@@ -366,7 +333,7 @@ BddMgrRef::and_op(const BddList& bdds)
 
 // 複数のBDDの論理和を求める．
 Bdd
-BddMgrRef::or_op(const BddVector& bdds)
+BddMgr::or_op(const BddVector& bdds)
 {
   list<tBddEdge> edge_list;
   for (BddVector::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
@@ -377,7 +344,7 @@ BddMgrRef::or_op(const BddVector& bdds)
 }
 
 Bdd
-BddMgrRef::or_op(const BddList& bdds)
+BddMgr::or_op(const BddList& bdds)
 {
   list<tBddEdge> edge_list;
   for (BddList::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
@@ -389,7 +356,7 @@ BddMgrRef::or_op(const BddList& bdds)
 
 // 複数のBDDの排他的論理和を求める．
 Bdd
-BddMgrRef::xor_op(const BddVector& bdds)
+BddMgr::xor_op(const BddVector& bdds)
 {
   list<tBddEdge> edge_list;
   for (BddVector::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
@@ -400,7 +367,7 @@ BddMgrRef::xor_op(const BddVector& bdds)
 }
 
 Bdd
-BddMgrRef::xor_op(const BddList& bdds)
+BddMgr::xor_op(const BddList& bdds)
 {
   list<tBddEdge> edge_list;
   for (BddList::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
@@ -414,14 +381,14 @@ BddMgrRef::xor_op(const BddList& bdds)
 // 確保に失敗したら false を返す．
 // 最後の変数の後ろに挿入される．
 bool
-BddMgrRef::new_var(tVarId varid)
+BddMgr::new_var(tVarId varid)
 {
   return mImpl->new_var(varid);
 }
 
 // 現在登録されている変数をそのレベルの昇順で返す．
 tVarSize
-BddMgrRef::var_list(list<tVarId>& vlist) const
+BddMgr::var_list(list<tVarId>& vlist) const
 {
   return mImpl->var_list(vlist);
 }
@@ -429,28 +396,28 @@ BddMgrRef::var_list(list<tVarId>& vlist) const
 // 変数番号からレベルを得る．
 // もしもレベルが割り当てられていない場合にはエラーとなる．
 tLevel
-BddMgrRef::level(tVarId varid) const
+BddMgr::level(tVarId varid) const
 {
   return mImpl->level(varid);
 }
 
 // レベルから変数番号を得る．
 tVarId
-BddMgrRef::varid(tLevel level) const
+BddMgr::varid(tLevel level) const
 {
   return mImpl->varid(level);
 }
 
 // 動的変数順変更を許可する．
 void
-BddMgrRef::enable_DVO()
+BddMgr::enable_DVO()
 {
   mImpl->enable_DVO();
 }
 
 // 動的変数順変更を禁止する．
 void
-BddMgrRef::disable_DVO()
+BddMgr::disable_DVO()
 {
   mImpl->disable_DVO();
 }
@@ -461,94 +428,140 @@ BddMgrRef::disable_DVO()
 // その際，それらのノードに関係した演算結果テーブルの内容はクリアされる．
 // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
 void
-BddMgrRef::gc(bool shrink_nodetable)
+BddMgr::gc(bool shrink_nodetable)
 {
   mImpl->gc(shrink_nodetable);
 }
 
 // GC 前の sweep 処理を行うためのバインダーを登録する．
 void
-BddMgrRef::reg_sweep_binder(EventBinder* binder)
+BddMgr::reg_sweep_binder(EventBinder* binder)
 {
   mImpl->reg_sweep_binder(binder);
 }
 
 // ログ出力用のストリームを設定する．
 void
-BddMgrRef::set_logstream(ostream& s)
+BddMgr::set_logstream(ostream& s)
 {
   mImpl->set_logstream(s);
 }
 
 // ログ出力用のストリームを解除する．
 void
-BddMgrRef::unset_logstream()
+BddMgr::unset_logstream()
 {
   mImpl->unset_logstream();
 }
 
 // ログ出力用のストリームを得る．
 ostream&
-BddMgrRef::logstream() const
+BddMgr::logstream() const
 {
   return mImpl->logstream();
 }
 
 // パラメータを設定する．設定したい項目のマスクビットを1とする．
 void
-BddMgrRef::param(const BddMgrParam& param,
-		 ymuint32 mask)
+BddMgr::param(const BddMgrParam& param,
+	      ymuint32 mask)
 {
   mImpl->param(param, mask);
 }
 
 // パラメータを取得する．
 void
-BddMgrRef::param(BddMgrParam& param) const
+BddMgr::param(BddMgrParam& param) const
 {
   mImpl->param(param);
 }
 
 // 名前を得る．
 const string&
-BddMgrRef::name() const
+BddMgr::name() const
 {
   return mImpl->name();
 }
 
 // 使用メモリ量(in bytes)を得る．
-size_t
-BddMgrRef::used_mem() const
+ymuint64
+BddMgr::used_mem() const
 {
   return mImpl->used_mem();
 }
 
 // 節点テーブルに登録されているノードの数を得る．
-size_t
-BddMgrRef::node_num() const
+ymuint64
+BddMgr::node_num() const
 {
   return mImpl->node_num();
 }
 
 // GC で回収される(フリーになる)ノード数を得る．
-size_t
-BddMgrRef::garbage_num() const
+ymuint64
+BddMgr::garbage_num() const
 {
   return mImpl->garbage_num();
 }
 
 // 利用可能なフリーノード数を得る．
-size_t
-BddMgrRef::avail_num() const
+ymuint64
+BddMgr::avail_num() const
 {
   return mImpl->avail_num();
 }
 
 // GC の起動された回数を得る．
-size_t
-BddMgrRef::gc_count() const
+ymuint64
+BddMgr::gc_count() const
 {
   return mImpl->gc_count();
+}
+
+// @brief ダンプされた情報を BDD を読み込む．
+// @param[in] s 入力ストリーム
+// @return 読み込まれた BDD
+Bdd
+BddMgr::restore(istream& s)
+{
+  Restorer restorer(mImpl, s);
+  ymuint n = restorer.read();
+  if ( n != 1 ) {
+    // エラーもしくは複数の BDD データだった．
+    return Bdd(mImpl, kEdgeError);
+  }
+  else {
+    return Bdd(mImpl, restorer.root(0));
+  }
+}
+
+// @brief ダンプされた情報を BDD ベクタに読み込む．
+// @param[in] s 入力ストリーム
+// @param[in] array 読み込み先の BDD ベクタ
+void
+BddMgr::restore(istream& s,
+		BddVector& array)
+{
+  Restorer restorer(mImpl, s);
+  ymuint n = restorer.read();
+  array.resize(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    array[i] = Bdd(mImpl, restorer.root(i));
+  }
+}
+
+// @brief ダンプされた情報を BDD リストに読み込む．
+// @param[in] s 入力ストリーム
+// @param[in] array 読み込み先の BDD リスト
+void
+BddMgr::restore(istream& s,
+		BddList& array)
+{
+  Restorer restorer(mImpl, s);
+  ymuint n = restorer.read();
+  for (ymuint i = 0; i < n; ++ i) {
+    array.push_back(Bdd(mImpl, restorer.root(i)));
+  }
 }
 
 END_NAMESPACE_YM_BDD

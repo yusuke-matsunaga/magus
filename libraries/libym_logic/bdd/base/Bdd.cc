@@ -21,10 +21,10 @@ BEGIN_NAMESPACE_YM_BDD
 
 // @brief mgr, root をセットする時に呼ばれる関数
 void
-Bdd::set(BddMgr& mgr,
+Bdd::set(BddMgrImpl* mgr,
 	 tBddEdge root)
 {
-  mMgr = mgr->mImpl;
+  mMgr = mgr;
   mRoot = root;
 
   mMgr->inc_rootref(mRoot);
@@ -43,8 +43,7 @@ Bdd::set(BddMgr& mgr,
 void
 Bdd::reset()
 {
-  BddMgrImpl* impl = mMgr->mImpl;
-  impl->dec_rootref(mRoot);
+  mMgr->dec_rootref(mRoot);
 
   // BDD のリストから削除
   Bdd* p = mPrev;
@@ -69,31 +68,10 @@ Bdd::assign(tBddEdge new_e)
   mRoot = new_e;
 }
 
-// @brief default_mgr に養子縁組を行う
-void
-Bdd::change_mgr(Bdd* top_bdd,
-		BddMgrImpl* default_mgr)
-{
-  Bdd* last = NULL;
-  for (Bdd* bdd = top_bdd; bdd; bdd = bdd->mNext) {
-    bdd->mRoot = kEdgeError;
-    bdd->mMgr = default_mgr;
-    last = bdd;
-  }
-  Bdd* first = default_mgr->mTopBdd;
-  default_mgr->mTopBdd = top_bdd;
-  top_bdd->mPrev = NULL;
-  last->mNext = first;
-  if ( first ) {
-    first->mPrev = last;
-  }
-}
-
 // @brief デフォルトのコンストラクタ
 Bdd::Bdd()
 {
-  BddMgrRef defmgr;
-  set(defmgr.mImpl, kEdge0);
+  set(BddMgr::default_mgr().mImpl, kEdge0);
 }
 
 // @brief コピーコンストラクタ
@@ -103,10 +81,10 @@ Bdd::Bdd(const Bdd& src)
 }
 
 // @brief BDD マネージャと根の枝を引数とするコンストラクタ
-Bdd::Bdd(BddMgrImpl* pmgr,
+Bdd::Bdd(BddMgrImpl* mgr,
 	 tBddEdge e)
 {
-  set(pmgr, e);
+  set(mgr, e);
 }
 
 // @brief デストラクタ
@@ -280,7 +258,7 @@ Bdd::remap_var(const VarVarMap& var_map) const
        p != var_map.end(); ++ p) {
     tVarId id = p->first;
     tVarId mid = p->second;
-    Bdd bdd = mgr().make_posiliteral(mid);
+    Bdd bdd(mMgr, mMgr->make_posiliteral(mid));
     mMgr->compose_reg(id, bdd.root());
   }
   tBddEdge ans = mMgr->compose(root());
@@ -555,7 +533,7 @@ Bdd::shortest_onepath_len() const
 }
 
 // @brief BDD の内容を書き出す．
-size_t
+ymuint64
 Bdd::display(ostream& s) const
 {
   Displayer displayer(mMgr, s);
@@ -566,7 +544,7 @@ Bdd::display(ostream& s) const
 // @brief BDD ベクタの内容を書き出す
 // @param[in] array BDD ベクタ
 // @param[in] s 出力ストリーム
-size_t
+ymuint64
 display(const BddVector& array,
 	ostream& s)
 {
@@ -587,7 +565,7 @@ display(const BddVector& array,
 // @brief BDD リストの内容を書き出す
 // @param[in] array BDD リスト
 // @param[in] s 出力ストリーム
-size_t
+ymuint64
 display(const BddList& array,
 	ostream& s)
 {
@@ -667,54 +645,13 @@ dump(const BddList& array,
   }
 }
 
-// @brief ダンプされた情報を BDD を読み込む．
-// @param[in] s 入力ストリーム
-// @return 読み込まれた BDD
-Bdd
-BddMgrRef::restore(istream& s)
-{
-  Restorer restorer(mImpl, s);
-  size_t n = restorer.read();
-  if ( n != 1 ) {
-    // エラーもしくは複数の BDD データだった．
-    return Bdd(mImpl, kEdgeError);
-  }
-  else {
-    return Bdd(mImpl, restorer.root(0));
-  }
-}
 
-// @brief ダンプされた情報を BDD ベクタに読み込む．
-// @param[in] s 入力ストリーム
-// @param[in] array 読み込み先の BDD ベクタ
-void
-BddMgrRef::restore(istream& s,
-		   BddVector& array)
-{
-  Restorer restorer(mImpl, s);
-  size_t n = restorer.read();
-  array.resize(n);
-  for (size_t i = 0; i < n; ++ i) {
-    array[i] = Bdd(mImpl, restorer.root(i));
-  }
-}
-
-// @brief ダンプされた情報を BDD リストに読み込む．
-// @param[in] s 入力ストリーム
-// @param[in] array 読み込み先の BDD リスト
-void
-BddMgrRef::restore(istream& s,
-		   BddList& array)
-{
-  Restorer restorer(mImpl, s);
-  size_t n = restorer.read();
-  for (size_t i = 0; i < n; ++ i) {
-    array.push_back(Bdd(mImpl, restorer.root(i)));
-  }
-}
+//////////////////////////////////////////////////////////////////////
+// クラス BddMgr
+//////////////////////////////////////////////////////////////////////
 
 // @brief BDD が使っているノード数を数える．
-size_t
+ymuint64
 Bdd::size() const
 {
   return mMgr->size(root());
@@ -723,7 +660,7 @@ Bdd::size() const
 // @brief BDD ベクタが使っているノード数を数える．
 // @param[in] array BDD ベクタ
 // @return BDD ベクタが使っているノード数
-size_t
+ymuint64
 size(const BddVector& array)
 {
   if ( array.empty() ) {
@@ -743,7 +680,7 @@ size(const BddVector& array)
 // @brief BDD リストが使っているノード数を数える．
 // @param[in] array BDD リスト
 // @return BDD リストが使っているノード数
-size_t
+ymuint64
 size(const BddList& array)
 {
   if ( array.empty() ) {
@@ -879,8 +816,7 @@ BddVarSet
 support(const BddVector& bdd_array)
 {
   if ( bdd_array.empty() ) {
-    BddMgrRef defmgr;
-    return BddVarSet(defmgr);
+    return BddVarSet(BddMgr::default_mgr());
   }
   list<tBddEdge> edge_list;
   for (BddVector::const_iterator p = bdd_array.begin();
@@ -966,8 +902,7 @@ BddVarSet
 support(const BddList& bdd_array)
 {
   if ( bdd_array.empty() ) {
-    BddMgrRef defmgr;
-    return BddVarSet(defmgr);
+    return BddVarSet(BddMgr::default_mgr());
   }
   list<tBddEdge> edge_list;
   for (BddList::const_iterator p = bdd_array.begin();
