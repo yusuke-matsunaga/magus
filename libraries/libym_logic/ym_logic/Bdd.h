@@ -757,14 +757,13 @@ public:
   /// @name static メンバ
   /// @{
 
-  /// @brief default_mgr に養子縁組を行う
-  ///
+  /// @brief new_mgr に養子縁組を行う
   /// @param[in] top_bdd BDD リストの先頭
-  /// @param[in] default_mgr 付け替える先の BDD マネージャ
+  /// @param[in] new_mgr 付け替える先の BDD マネージャ
   static
   void
   change_mgr(Bdd* top_bdd,
-	     BddMgr* default_mgr);
+	     BddMgrImpl* new_mgr);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -775,7 +774,7 @@ private:
   /// @brief BDD マネージャと根の枝を引数とするコンストラクタ
   /// @param[in] pmgr BDD マネージャ
   /// @param[in] e 根の枝
-  Bdd(BddMgr* pmgr,
+  Bdd(BddMgrImpl* pmgr,
       tBddEdge root);
 
   // 根の枝をとり出す
@@ -783,10 +782,10 @@ private:
   root() const;
 
   /// @brief mgr, root をセットする時に呼ばれる関数
-  /// @param[in] mgr BDD マネージャ
+  /// @param[in] pmgr BDD マネージャ
   /// @param[in] root 根の枝
   void
-  set(BddMgr* mgr,
+  set(BddMgrImpl* pmgr,
       tBddEdge root);
 
   /// @brief (mMgr, mRoot) への参照をなくす時に呼ばれる関数
@@ -806,7 +805,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親の BddMgr を指すポインタ
-  BddMgr* mMgr;
+  BddMgrImpl* mMgr;
 
   // 根のノードを指す枝
   tBddEdge mRoot;
@@ -849,33 +848,7 @@ struct BddMgrParam
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddMgrFactory Bdd.h <ym_bdd/Bdd.h>
-/// @ingroup Bdd
-/// @brief BddMgr(の派生クラス)を生成するファクトリクラス
-///
-/// このクラスの派生クラスの operator() 関数を使って BddMgr を生成する
-/// @sa BddMgr
-//////////////////////////////////////////////////////////////////////
-class BddMgrFactory
-{
-public:
-  /// @brief コンストラクタ
-  BddMgrFactory();
-
-  /// @brief デストラクタ
-  virtual
-  ~BddMgrFactory();
-
-  /// @brief BddMgr のインスタンスを生成する．
-  virtual
-  BddMgr*
-  operator()() const = 0;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class BddMgrRef Bdd.h <ym_bdd/Bdd.h>
+/// @class BddMgrRef Bdd.h "ym_logic/Bdd.h"
 /// @ingroup Bdd
 /// @brief BDDの動きを管理するクラス．
 ///
@@ -885,23 +858,22 @@ public:
 class BddMgrRef
 {
   friend class Bdd;
+  friend class BddMgrImpl;
   friend class DgMgr;
+
 public:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタとデストラクタ
   // いちおう誰でも生成/破壊ができる．
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 空のコンストラクタ
-  /// @note デフォルトのマネージャを取り出す．
-  BddMgrRef();
-
-  /// @brief ファクトリオブジェクトを指定するコンストラクタ
-  /// @note 新しいインスタンスを生成する．
-  BddMgrRef(const BddMgrFactory& factory);
+  /// @brief コンストラクタ
+  /// @param[in] type BddMgr の型を表す文字列
+  BddMgrRef(const string& type = string());
 
   /// @brief コピーコンストラクタ
   /// @note 実際には同じ BddMgr を指すだけで BddMgr はコピーしない．
+  /// @note いわゆる shallow copy
   BddMgrRef(const BddMgrRef& src);
 
   /// @brief 代入演算子
@@ -1257,7 +1229,7 @@ public:
 private:
   // BddMgr を指定したコンストラクタ
   explicit
-  BddMgrRef(BddMgr* ptr);
+  BddMgrRef(BddMgrImpl* ptr);
 
 
 private:
@@ -1266,7 +1238,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際のマネージャを指すポインタ
-  BddMgr* mPtr;
+  BddMgrImpl* mImpl;
 
 };
 

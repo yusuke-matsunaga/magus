@@ -1,6 +1,6 @@
 
-/// @file libym_logic/bdd/base/BddMgr.cc
-/// @brief BddMgr の実装ファイル
+/// @file libym_logic/bdd/base/BddMgrImpl.cc
+/// @brief BddMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BddMgr.cc 2507 2009-10-17 16:24:02Z matsunaga $
@@ -9,11 +9,10 @@
 /// All rights reserved.
 
 
-#include "BddMgr.h"
+#include "BddMgrImpl.h"
 
 #include "ym_utils/HeapTree.h"
 #include "ym_logic/Bdd.h"
-#include "ym_logic/BmcFactory.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -25,31 +24,18 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// BddMgrFactory
+// クラス BddMgrImpl
 //////////////////////////////////////////////////////////////////////
 
-BddMgrFactory::BddMgrFactory()
-{
-}
-
-BddMgrFactory::~BddMgrFactory()
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// BddMgr
-//////////////////////////////////////////////////////////////////////
-
-BddMgr* BddMgr::mDefaultMgr = NULL;
+BddMgrImpl* BddMgrImpl::mDefaultMgr = NULL;
 
 // デフォルトマネージャを返すクラスメソッド
-BddMgr*
-BddMgr::default_mgr()
+BddMgrImpl*
+BddMgrImpl::default_mgr()
 {
   if ( !mDefaultMgr ) {
-    BmcFactory factory("default manager");
-    mDefaultMgr = factory();
+    BddMgrRef dummy;
+    mDefaultMgr = dummy.mImpl;
     assert_cond(mDefaultMgr, __FILE__, __LINE__);
     // 絶対に解放しない
     mDefaultMgr->inc_ref();
@@ -58,7 +44,7 @@ BddMgr::default_mgr()
 }
 
 // コンストラクタ
-BddMgr::BddMgr()
+BddMgrImpl::BddMgrImpl()
 {
   mRefCount = 0;
 
@@ -75,7 +61,7 @@ BddMgr::BddMgr()
 }
 
 // デストラクタ
-BddMgr::~BddMgr()
+BddMgrImpl::~BddMgrImpl()
 {
   assert_cond(this != mDefaultMgr, __FILE__, __LINE__);
 
@@ -92,7 +78,7 @@ BddMgr::~BddMgr()
 
 // 参照回数を1増やす．
 void
-BddMgr::inc_ref()
+BddMgrImpl::inc_ref()
 {
   ++ mRefCount;
 }
@@ -100,7 +86,7 @@ BddMgr::inc_ref()
 // 参照回数を1減らす．
 // 参照回数が0になったら自分自身を破壊する．
 void
-BddMgr::dec_ref()
+BddMgrImpl::dec_ref()
 {
   -- mRefCount;
   if ( mRefCount == 0 ) {
@@ -110,29 +96,29 @@ BddMgr::dec_ref()
 
 // log用ストリームを設定する．
 void
-BddMgr::set_logstream(ostream& s)
+BddMgrImpl::set_logstream(ostream& s)
 {
   mLogFp = &s;
 }
 
 // log用ストリームを解除する．
 void
-BddMgr::unset_logstream()
+BddMgrImpl::unset_logstream()
 {
   mLogFp = mNullStream;
 }
 
 // log用ファイルポインタを読み出す．
 ostream&
-BddMgr::logstream() const
+BddMgrImpl::logstream() const
 {
   return *mLogFp;
 }
 
 // LogExpr から BDD を作るためのサブルーティン
 tBddEdge
-BddMgr::expr_to_bdd(const LogExpr& expr,
-		    const hash_map<tVarId, tBddEdge>& vemap)
+BddMgrImpl::expr_to_bdd(const LogExpr& expr,
+			const hash_map<tVarId, tBddEdge>& vemap)
 {
   // 定数0の場合
   if ( expr.is_zero() ) {
@@ -186,8 +172,8 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
 // ベクタの値は非ゼロを true とみなす．
 // v の大きさは 2^(vars.size()) に等しくなければならない．
 tBddEdge
-BddMgr::tvec_to_bdd(const vector<int>& v,
-		    const VarVector& vars)
+BddMgrImpl::tvec_to_bdd(const vector<int>& v,
+			const VarVector& vars)
 {
   size_t ni = vars.size();
   size_t nv = (1 << ni);
@@ -207,11 +193,11 @@ BddMgr::tvec_to_bdd(const vector<int>& v,
 
 // 真理値表からBDDを作るためのサブルーティン
 tBddEdge
-BddMgr::tvec_sub(const vector<int>& v,
-		 ymuint32 top,
-		 ymuint32 size,
-		 const vector<tBddEdge>& var_vector,
-		 tVarId var_idx)
+BddMgrImpl::tvec_sub(const vector<int>& v,
+		     ymuint32 top,
+		     ymuint32 size,
+		     const vector<tBddEdge>& var_vector,
+		     tVarId var_idx)
 {
   assert_cond(size > 0, __FILE__, __LINE__);
   if ( size == 1 ) {
@@ -232,7 +218,7 @@ BddMgr::tvec_sub(const vector<int>& v,
 
 // edge_list に登録されたBDDのANDを計算する．
 tBddEdge
-BddMgr::and_op(const list<tBddEdge>& edge_list)
+BddMgrImpl::and_op(const list<tBddEdge>& edge_list)
 {
   size_t n = edge_list.size();
   tBddEdge ans;
@@ -268,7 +254,7 @@ BddMgr::and_op(const list<tBddEdge>& edge_list)
 
 // edge_list に登録されたBDDのORを計算する．
 tBddEdge
-BddMgr::or_op(const list<tBddEdge>& edge_list)
+BddMgrImpl::or_op(const list<tBddEdge>& edge_list)
 {
   size_t n = edge_list.size();
   tBddEdge ans;
@@ -304,7 +290,7 @@ BddMgr::or_op(const list<tBddEdge>& edge_list)
 
 // edge_list に登録されたBDDのANDを計算する．
 tBddEdge
-BddMgr::xor_op(const list<tBddEdge>& edge_list)
+BddMgrImpl::xor_op(const list<tBddEdge>& edge_list)
 {
   size_t n = edge_list.size();
   tBddEdge ans;

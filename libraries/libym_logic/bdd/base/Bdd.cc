@@ -13,7 +13,7 @@
 #include "ym_logic/BddVarSet.h"
 #include "ym_logic/BddLitSet.h"
 
-#include "BddMgr.h"
+#include "BddMgrImpl.h"
 #include "Dumper.h"
 
 
@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_BDD
 
 // @brief mgr, root をセットする時に呼ばれる関数
 void
-Bdd::set(BddMgr* mgr,
+Bdd::set(BddMgrImpl* mgr,
 	 tBddEdge root)
 {
   mMgr = mgr;
@@ -70,7 +70,7 @@ Bdd::assign(tBddEdge new_e)
 // @brief default_mgr に養子縁組を行う
 void
 Bdd::change_mgr(Bdd* top_bdd,
-		BddMgr* default_mgr)
+		BddMgrImpl* default_mgr)
 {
   Bdd* last = NULL;
   for (Bdd* bdd = top_bdd; bdd; bdd = bdd->mNext) {
@@ -91,7 +91,7 @@ Bdd::change_mgr(Bdd* top_bdd,
 Bdd::Bdd()
 {
   BddMgrRef defmgr;
-  set(defmgr.mPtr, kEdge0);
+  set(defmgr.mImpl, kEdge0);
 }
 
 // @brief コピーコンストラクタ
@@ -101,7 +101,7 @@ Bdd::Bdd(const Bdd& src)
 }
 
 // @brief BDD マネージャと根の枝を引数とするコンストラクタ
-Bdd::Bdd(BddMgr* pmgr,
+Bdd::Bdd(BddMgrImpl* pmgr,
 	 tBddEdge e)
 {
   set(pmgr, e);
@@ -572,7 +572,7 @@ display(const BddVector& array,
     return 0;
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgr* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = array.front().mMgr;
   Displayer displayer(mgr, s);
   for (BddVector::const_iterator p = array.begin();
        p != array.end(); ++ p) {
@@ -593,7 +593,7 @@ display(const BddList& array,
     return 0;
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgr* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = array.front().mMgr;
   Displayer displayer(mgr, s);
   for (BddList::const_iterator p = array.begin();
        p != array.end(); ++ p) {
@@ -624,7 +624,7 @@ dump(const BddVector& array,
     return;
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgr* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = array.front().mMgr;
   Dumper dumper(mgr, s);
   for (BddVector::const_iterator p = array.begin();
        p != array.end(); ++ p) {
@@ -650,7 +650,7 @@ dump(const BddList& array,
     return;
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgr* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = array.front().mMgr;
   Dumper dumper(mgr, s);
   for (BddList::const_iterator p = array.begin();
        p != array.end(); ++ p) {
@@ -671,14 +671,14 @@ dump(const BddList& array,
 Bdd
 BddMgrRef::restore(istream& s)
 {
-  Restorer restorer(mPtr, s);
+  Restorer restorer(mImpl, s);
   size_t n = restorer.read();
   if ( n != 1 ) {
     // エラーもしくは複数の BDD データだった．
-    return Bdd(mPtr, kEdgeError);
+    return Bdd(mImpl, kEdgeError);
   }
   else {
-    return Bdd(mPtr, restorer.root(0));
+    return Bdd(mImpl, restorer.root(0));
   }
 }
 
@@ -689,11 +689,11 @@ void
 BddMgrRef::restore(istream& s,
 		   BddVector& array)
 {
-  Restorer restorer(mPtr, s);
+  Restorer restorer(mImpl, s);
   size_t n = restorer.read();
   array.resize(n);
   for (size_t i = 0; i < n; ++ i) {
-    array[i] = Bdd(mPtr, restorer.root(i));
+    array[i] = Bdd(mImpl, restorer.root(i));
   }
 }
 
@@ -704,10 +704,10 @@ void
 BddMgrRef::restore(istream& s,
 		   BddList& array)
 {
-  Restorer restorer(mPtr, s);
+  Restorer restorer(mImpl, s);
   size_t n = restorer.read();
   for (size_t i = 0; i < n; ++ i) {
-    array.push_back(Bdd(mPtr, restorer.root(i)));
+    array.push_back(Bdd(mImpl, restorer.root(i)));
   }
 }
 
@@ -734,7 +734,7 @@ size(const BddVector& array)
     edge_list.push_back(bdd.root());
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgr* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = array.front().mMgr;
   return mgr->size(edge_list);
 }
 
@@ -754,7 +754,7 @@ size(const BddList& array)
     edge_list.push_back(bdd.root());
   }
   // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgr* mgr = array.front().mMgr;
+  BddMgrImpl* mgr = array.front().mMgr;
   return mgr->size(edge_list);
 }
 
@@ -842,7 +842,7 @@ support(const BddVector& bdd_array,
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   mgr->mark_support(edge_list);
   return mgr->mark_to_vector(sup);
 }
@@ -865,7 +865,7 @@ support(const BddVector& bdd_array,
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   mgr->mark_support(edge_list);
   return mgr->mark_to_list(sup);
 }
@@ -886,7 +886,7 @@ support(const BddVector& bdd_array)
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   mgr->mark_support(edge_list);
   tBddEdge ans = mgr->mark_to_bdd();
   return BddVarSet(Bdd(mgr, ans));
@@ -907,7 +907,7 @@ support_size(const BddVector& bdd_array)
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   return mgr->mark_support(edge_list);
 }
 
@@ -929,7 +929,7 @@ support(const BddList& bdd_array,
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   mgr->mark_support(edge_list);
   return mgr->mark_to_vector(sup);
 }
@@ -952,7 +952,7 @@ support(const BddList& bdd_array,
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   mgr->mark_support(edge_list);
   return mgr->mark_to_list(sup);
 }
@@ -973,7 +973,7 @@ support(const BddList& bdd_array)
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   mgr->mark_support(edge_list);
   tBddEdge ans = mgr->mark_to_bdd();
   return BddVarSet(Bdd(mgr, ans));
@@ -994,7 +994,7 @@ support_size(const BddList& bdd_array)
     edge_list.push_back((*p).root());
   }
   // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgr* mgr = bdd_array.front().mMgr;
+  BddMgrImpl* mgr = bdd_array.front().mMgr;
   return mgr->mark_support(edge_list);
 }
 

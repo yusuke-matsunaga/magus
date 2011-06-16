@@ -13,7 +13,7 @@
 
 #include "ym_logic/Bdd.h"
 
-#include "base/BddMgr.h"
+#include "base/BddMgrImpl.h"
 #include "BmcNode.h"
 
 
@@ -36,7 +36,7 @@ class BmcIsopTbl;
 // BddMgr に共通な関数を提供するためのベースクラス
 //////////////////////////////////////////////////////////////////////
 class BddMgrClassic :
-  public BddMgr
+  public BddMgrImpl
 {
 public:
   typedef BmcVar Var;

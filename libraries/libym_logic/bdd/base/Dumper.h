@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "BddMgr.h"
+#include "BddMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -69,7 +69,7 @@ class Displayer
 public:
 
   // コンストラクタ
-  Displayer(BddMgr* mgr,
+  Displayer(BddMgrImpl* mgr,
 	    ostream& s);
 
   // デストラクタ
@@ -104,8 +104,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // BddMgr へのポインタ
-  BddMgr* mMgr;
+  // BddMgrImpl へのポインタ
+  BddMgrImpl* mMgr;
 
   // 出力用のストリーム
   ostream& mStream;
@@ -127,7 +127,7 @@ class Dumper
 public:
 
   // コンストラクタ
-  Dumper(BddMgr* mgr,
+  Dumper(BddMgrImpl* mgr,
 	 ostream& s);
 
   // デストラクタ
@@ -147,8 +147,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // BddMgr へのポインタ
-  BddMgr* mMgr;
+  // BddMgrImpl へのポインタ
+  BddMgrImpl* mMgr;
 
   // 出力用のストリーム
   ostream& mStream;
@@ -167,7 +167,7 @@ class Restorer
 public:
 
   // コンストラクタ
-  Restorer(BddMgr* mgr,
+  Restorer(BddMgrImpl* mgr,
 	   istream& s);
 
   // デストラクタ
@@ -197,8 +197,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // BddMgr へのポインタ
-  BddMgr* mMgr;
+  // BddMgrImpl へのポインタ
+  BddMgrImpl* mMgr;
 
   // 入力用のストリーム
   istream& mStream;

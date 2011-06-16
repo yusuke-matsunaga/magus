@@ -25,10 +25,10 @@ libym_bdd_base_la_CPPFLAGS = \
 	$(GMP_INCLUDES)
 
 libym_bdd_base_la_SOURCES = \
-	BddMgr.h \
 	Dumper.h \
 	Bdd.cc \
-	BddMgr.cc \
+	BddMgrImpl.h \
+	BddMgrImpl.cc \
 	BddMgrRef.cc \
 	BmcFactory.cc \
 	BmmFactory.cc \
