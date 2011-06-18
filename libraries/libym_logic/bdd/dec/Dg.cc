@@ -10,11 +10,13 @@
 
 
 #include "ym_logic/Dg.h"
+#include "ym_logic/DgMgr.h"
+#include "ym_logic/BddMgr.h"
 
 #include "DgNode.h"
 
 
-BEGIN_NAMESPACE_YM_BDD
+BEGIN_NAMESPACE_YM_DEC
 
 // @brief 空のコンストラクタ
 // 定数0のノードをセットしておく
@@ -82,7 +84,7 @@ Dg::has_decomp() const
     // 例外: 定数関数は分解を持つと見なす．
     return true;
   }
-  if ( node->type() != Dg::kCplx ) {
+  if ( node->type() != kCplx ) {
     return true;
   }
   if ( !node->is_all_literal() ) {
@@ -101,7 +103,7 @@ Dg::is_CBF() const
     // 例外: 定数関数は分解を持つと見なす．
     return true;
   }
-  if ( node->type() == Dg::kCplx ) {
+  if ( node->type() == kCplx ) {
     return false;
   }
   for (size_t i = 0; i < node->ni(); ++ i) {
@@ -114,7 +116,7 @@ Dg::is_CBF() const
 
 // @brief 根の分解のタイプを返す．
 // @return 根の分解のタイプ
-Dg::tType
+tType
 Dg::type() const
 {
   DgNode* node = edge2node(mRoot);
@@ -210,7 +212,7 @@ Dg::enum_djdec(size_t llimit,
   ed_recur(llimit, ulimit, global_func().support(), dec_list);
 
   // 特例: bound-set が空集合の場合
-  BddMgrRef mgr = global_func().mgr();
+  BddMgr& mgr = mMgr->mMgr;
   BddVarSet fset = support();
   dec_list.push_back(PrimDec(BddVarSet(mgr), support(), mgr.make_zero()));
 }
@@ -240,7 +242,7 @@ Dg::ed_recur(size_t llimit,
       size_t nexp = (1 << ni()) - 1;
       // 0 と (1 << ni) - 1 を含めていないのは
       // 空集合と全集合を除外するため．
-      BddMgrRef mgr = global_func().mgr();
+      BddMgr& mgr = mMgr->mMgr;
       for (size_t p = 1; p < nexp; ++ p) {
 	size_t n = 0;
 	BddVarSet tmp_support(mgr);
@@ -275,7 +277,7 @@ Dg::ed_recur(size_t llimit,
 void
 Dg::display(ostream& s) const
 {
-  nsYm::nsBdd::display(mRoot, s);
+  nsYm::nsDec::display(mRoot, s);
 }
 
-END_NAMESPACE_YM_BDD
+END_NAMESPACE_YM_DEC

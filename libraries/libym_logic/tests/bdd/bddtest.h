@@ -11,9 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddVarSet.h"
-#include "ym_logic/BddLitSet.h"
+#include "ym_logic/bdd_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -22,7 +20,7 @@ BEGIN_NAMESPACE_YM_BDD
 // 基本的には BddMgr::make_bdd() を呼ぶだけだが
 // エラー時に終了するようになっている．
 Bdd
-str2bdd(BddMgrRef mgr,
+str2bdd(BddMgr& bddmgr,
 	const char* expr_str,
 	int exit_code = 1);
 
@@ -30,7 +28,7 @@ str2bdd(BddMgrRef mgr,
 // 文字列は',' で区切られた数字の列
 // エラーが起きたら exit_code で終了する．
 BddVarSet
-str2varset(BddMgrRef mgr,
+str2varset(BddMgr& bddmgr,
 	   const char* vs_str,
 	   int exit_code = 1);
 
@@ -39,7 +37,7 @@ str2varset(BddMgrRef mgr,
 // '~' は否定のリテラルを表す．
 // エラーが起きたら exit_code で終了する．
 BddLitSet
-str2litset(BddMgrRef mgr,
+str2litset(BddMgr& bddmgr,
 	   const char* ls_str,
 	   int exit_code = 1);
 
@@ -50,19 +48,21 @@ str2litset(BddMgrRef mgr,
 // v : 真理値   [01]
 // d の個数を n とすると v は 2^n 個なければならない．
 bool
-check_bddv(const Bdd& bdd,
+check_bddv(BddMgr& bddmgr,
+	   const Bdd& bdd,
 	   const char* bdd_str,
 	   const char* spec);
 
 // bdd が str の論理式と等しいかどうか確かめる．
 bool
-check_bdde(const Bdd& bdd,
+check_bdde(BddMgr& bddmgr,
+	   const Bdd& bdd,
 	   const char* bdd_str,
 	   const char* str);
 
 // ite_op のテスト
 bool
-check_ite(BddMgrRef mgr,
+check_ite(BddMgr& bddmgr,
 	  const char* if_str,
 	  const char* then_str,
 	  const char* else_str);
@@ -71,7 +71,7 @@ check_ite(BddMgrRef mgr,
 // 0 〜 10 までの変数でコファクタリングして2つのコファクターが異なる
 //ものがサポートだと思う．
 bool
-check_support(BddMgrRef mgr,
+check_support(BddMgr& bddmgr,
 	      const char* str);
 
 END_NAMESPACE_YM_BDD

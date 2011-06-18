@@ -1,19 +1,21 @@
 
-/// @file libym_bdd/tests/test_utils.cc
+/// @file libym_logic/tests/bdd/test_utils.cc
 /// @brief BDD パッケージのテスト用の便利関数
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: test_utils.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "bddtest.h"
+
+#include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
+#include "ym_logic/BddVarSet.h"
+#include "ym_logic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -22,12 +24,12 @@ BEGIN_NAMESPACE_YM_BDD
 // 基本的には BddMgr::expr_to_bdd() を呼ぶだけだが
 // エラー時には exit_code で終了するようになっている．
 Bdd
-str2bdd(BddMgrRef mgr,
+str2bdd(BddMgr& bddmgr,
 	const char* expr_str,
 	int exit_code)
 {
   string err_msg;
-  Bdd ans = mgr.expr_to_bdd(expr_str, err_msg);
+  Bdd ans = bddmgr.expr_to_bdd(expr_str, err_msg);
   if ( ans.is_error() ) {
     cerr << "ERROR[str2bdd]: " << err_msg << endl;
     exit(exit_code);
@@ -39,17 +41,17 @@ str2bdd(BddMgrRef mgr,
 // 文字列は',' で区切られた数字の列
 // エラーが起きたら exit_code で終了する．
 BddVarSet
-str2varset(BddMgrRef mgr,
+str2varset(BddMgr& bddmgr,
 	   const char* vs_str,
 	   int exit_code)
 {
-  BddVarSet vs(mgr);
+  BddVarSet vs(bddmgr);
   string buf;
   for (const char* s = vs_str; ; ++ s) {
     char c = *s;
     if ( c == ',' || c == '\0' ) {
       int d = atoi(buf.c_str());
-      vs += BddVarSet(mgr, d);
+      vs += BddVarSet(bddmgr, d);
       if ( c == '\0' ) {
 	return vs;
       }
@@ -73,11 +75,11 @@ str2varset(BddMgrRef mgr,
 // '~' は否定のリテラルを表す．
 // エラーが起きたら exit_code で終了する．
 BddLitSet
-str2litset(BddMgrRef mgr,
+str2litset(BddMgr& bddmgr,
 	   const char* ls_str,
 	   int exit_code)
 {
-  BddLitSet ls(mgr);
+  BddLitSet ls(bddmgr);
   string buf;
   tPol pol = kPolPosi;
   for (const char* s = ls_str; ; ++ s) {
@@ -91,7 +93,7 @@ str2litset(BddMgrRef mgr,
     }
     else if ( c == ',' || c == '\0' ) {
       int d = atoi(buf.c_str());
-      ls += BddLitSet(mgr, d, pol);
+      ls += BddLitSet(bddmgr, d, pol);
       if ( c == '\0' ) {
 	return ls;
       }
@@ -110,7 +112,7 @@ str2litset(BddMgrRef mgr,
     }
   }
 }
-	   
+
 // bdd が spec の文字列で指定された関数と等しいか調べる．
 // spec の仕様は以下の通り
 // "d,d,d,d|vvvvvvvvvv"
@@ -118,7 +120,8 @@ str2litset(BddMgrRef mgr,
 // v : 真理値   [01]
 // d の個数を n とすると v は 2^n 個なければならない．
 bool
-check_bddv(const Bdd& bdd,
+check_bddv(BddMgr& bddmgr,
+	   const Bdd& bdd,
 	   const char* bdd_str,
 	   const char* spec)
 {
@@ -166,8 +169,7 @@ check_bddv(const Bdd& bdd,
     return false;
   }
 
-  BddMgrRef mgr = bdd.mgr();
-  Bdd spec_bdd = mgr.tvec_to_bdd(v, vars);
+  Bdd spec_bdd = bddmgr.tvec_to_bdd(v, vars);
   if ( spec_bdd.is_error() ) {
     cout << "ERROR[check_bddv(d)]: error in tvec_to_bdd(v, vars) with spec \""
 	 << spec << "\"" << endl;
@@ -186,12 +188,12 @@ check_bddv(const Bdd& bdd,
 
 // bdd が str の論理式と等しいかどうか確かめる．
 bool
-check_bdde(const Bdd& bdd,
+check_bdde(BddMgr& bddmgr,
+	   const Bdd& bdd,
 	   const char* bdd_str,
 	   const char* str)
 {
-  BddMgrRef mgr = bdd.mgr();
-  Bdd bdd2 = str2bdd(mgr, str);
+  Bdd bdd2 = str2bdd(bddmgr, str);
   if ( bdd != bdd2 ) {
     bdd.display(cout);
     bdd2.display(cout);
@@ -203,14 +205,14 @@ check_bdde(const Bdd& bdd,
 
 // ite_op のテスト
 bool
-check_ite(BddMgrRef mgr,
+check_ite(BddMgr& bddmgr,
 	  const char* if_str,
 	  const char* then_str,
 	  const char* else_str)
 {
-  Bdd if_bdd = str2bdd(mgr, if_str);
-  Bdd then_bdd = str2bdd(mgr, then_str);
-  Bdd else_bdd = str2bdd(mgr, else_str);
+  Bdd if_bdd = str2bdd(bddmgr, if_str);
+  Bdd then_bdd = str2bdd(bddmgr, then_str);
+  Bdd else_bdd = str2bdd(bddmgr, else_str);
 
   Bdd ans_ref = if_bdd & then_bdd | ~if_bdd & else_bdd;
   Bdd ans = ite_op(if_bdd, then_bdd, else_bdd);
@@ -228,16 +230,16 @@ check_ite(BddMgrRef mgr,
 // 0 〜 10 までの変数でコファクタリングして2つのコファクターが異なる
 //ものがサポートだと思う．
 bool
-check_support(BddMgrRef mgr,
+check_support(BddMgr& bddmgr,
 	      const char* str)
 {
-  Bdd bdd = str2bdd(mgr, str);
-  BddVarSet ref_vs(mgr);
+  Bdd bdd = str2bdd(bddmgr, str);
+  BddVarSet ref_vs(bddmgr);
   for (size_t i = 0; i < 10; ++ i) {
     Bdd bdd0 = bdd.cofactor(i, kPolNega);
     Bdd bdd1 = bdd.cofactor(i, kPolPosi);
     if ( bdd0 != bdd1 ) {
-      ref_vs += BddVarSet(mgr, i);
+      ref_vs += BddVarSet(bddmgr, i);
     }
   }
   BddVarSet vs = bdd.support();

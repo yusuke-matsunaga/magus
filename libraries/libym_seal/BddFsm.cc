@@ -10,6 +10,7 @@
 
 
 #include "BddFsm.h"
+#include "ym_logic/BddMgr.h"
 #include "ym_logic/BddLitSet.h"
 
 #include "ym_utils/StopWatch.h"
@@ -22,7 +23,7 @@ BEGIN_NAMESPACE_YM_SEAL
 // @param[in] input_vars 入力変数番号の配列
 // @param[in] state_vars 状態変数番号の配列(現状態と次状態のペア)
 // @param[in] trans_relation 状態遷移関係
-BddFsm::BddFsm(BddMgrRef bdd_mgr,
+BddFsm::BddFsm(BddMgr& bdd_mgr,
 	       const vector<ymuint>& input_vars,
 	       const vector<pair<ymuint, ymuint> >& state_vars,
 	       const Bdd& trans_relation) :

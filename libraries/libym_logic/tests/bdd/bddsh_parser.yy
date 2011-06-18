@@ -11,12 +11,14 @@
 
 
 #include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
 #include "ym_logic/BddVarSet.h"
 #include "ym_logic/BddLitSet.h"
 
 using namespace std;
 
-extern int yylex();
+extern
+int yylex();
 int yyerror(char*);
 
 extern string cur_text;
@@ -30,7 +32,7 @@ BEGIN_NAMESPACE_YM_BDD
 hash_map<string, Bdd> id_table;
 string lname;
 
-BddMgrRef mgr;
+BddMgr mgr("bmc", "Bdd Manager");
 bool interactive = false;
 
 void prompt();

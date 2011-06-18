@@ -180,8 +180,8 @@ BddMgrClassic::check_symmetry(tBddEdge e,
     y_level = tmp;
   }
 
-  y_edge = make_bdd(y, kEdge0, kEdge1);
-  xy_edge = make_bdd(x, kEdge0, addpol(y_edge, pol));
+  y_edge = make_bddedge(y, kEdge0, kEdge1);
+  xy_edge = make_bddedge(x, kEdge0, addpol(y_edge, pol));
 
   activate(xy_edge);
   tBddEdge ans = cs_step(e, pol);

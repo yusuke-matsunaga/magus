@@ -1170,7 +1170,7 @@ Bdd::scan(hash_map<tVarId, size_t>& node_counts) const
 // @param[in] level 変数のレベル
 // @return level のノード数
 // ただし n-mark が付いていないノードがあったら UINT_MAX を返す．
-size_t
+ymuint64
 Bdd::count_at(tLevel level) const
 {
   return mMgr->count_at(root(), level);

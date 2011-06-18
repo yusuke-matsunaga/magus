@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
 
 #include "BddMgrImpl.h"
 #include "Dumper.h"
@@ -20,18 +20,25 @@
 
 BEGIN_NAMESPACE_YM_BDD
 
+BddMgr BddMgr::theDefaultMgr;
+
 //////////////////////////////////////////////////////////////////////
 // クラス BddMgr
 //////////////////////////////////////////////////////////////////////
-#if 0
+
 // @brief デフォルトマネージャを返す．
 BddMgr&
 BddMgr::default_mgr()
+{
+  return theDefaultMgr;
+}
+
+// @brief デフォルトマネージャを作るためのコンストラクタ
+BddMgr::BddMgr() :
   mImpl(BddMgrImpl::default_mgr())
 {
   mImpl->inc_ref();
 }
-#endif
 
 // @brief コンストラクタ
 // @param[in] type BddMgr の型を表す文字列
@@ -65,28 +72,28 @@ BddMgr::~BddMgr()
 Bdd
 BddMgr::make_zero()
 {
-  return Bdd(mImpl, kEdge0);
+  return mImpl->make_zero();
 }
 
 // 定数1を表すBDDを作る．
 Bdd
 BddMgr::make_one()
 {
-  return Bdd(mImpl, kEdge1);
+  return mImpl->make_one();
 }
 
 // エラーを表すBDDを作る．
 Bdd
 BddMgr::make_error()
 {
-  return Bdd(mImpl, kEdgeError);
+  return mImpl->make_error();
 }
 
 // オーバーフローを表すBDDを作る．
 Bdd
 BddMgr::make_overflow()
 {
-  return Bdd(mImpl, kEdgeOverflow);
+  return mImpl->make_overflow();
 }
 
 // リテラル関数を表すBDDを作る．
@@ -94,32 +101,28 @@ Bdd
 BddMgr::make_literal(tVarId index,
 		     tPol pol)
 {
-  tBddEdge ans = mImpl->make_literal(index, pol);
-  return Bdd(mImpl, ans);
+  return mImpl->make_literal(index, pol);
 }
 
 // リテラル関数を表すBDDを作る
 Bdd
 BddMgr::make_literal(const Literal& lit)
 {
-  tBddEdge ans = mImpl->make_literal(lit);
-  return Bdd(mImpl,ans);
+  return mImpl->make_literal(lit);
 }
 
 // 肯定のリテラル関数を作る
 Bdd
 BddMgr::make_posiliteral(tVarId varid)
 {
-  tBddEdge ans = mImpl->make_posiliteral(varid);
-  return Bdd(mImpl, ans);
+  return Bdd(mImpl, mImpl->make_posiliteral(varid));
 }
 
 // 否定のリテラル関数を作る．
 Bdd
 BddMgr::make_negaliteral(tVarId varid)
 {
-  tBddEdge ans = mImpl->make_negaliteral(varid);
-  return Bdd(mImpl, ans);
+  return mImpl->make_negaliteral(varid);
 }
 
 // 指定されたインデックスを持つ中間ノードを一つ持つBDDを作る
@@ -130,8 +133,7 @@ BddMgr::make_bdd(tVarId index,
 		 const Bdd& chd0,
 		 const Bdd& chd1)
 {
-  tBddEdge ans = mImpl->make_bdd(index, chd0.root(), chd1.root());
-  return Bdd(mImpl, ans);
+  return mImpl->make_bdd(index, chd0.root(), chd1.root());
 }
 
 // ベクタを真理値表と見なしてBDDを作る．
@@ -157,8 +159,7 @@ Bdd
 BddMgr::tvec_to_bdd(const vector<int>& v,
 		    const VarVector& vars)
 {
-  tBddEdge ans = mImpl->tvec_to_bdd(v, vars);
-  return Bdd(mImpl, ans);
+  return mImpl->tvec_to_bdd(v, vars);
 #if DEBUG_MAKE_BDD
   ymuint ni = vars.size();
   ymuint nv = (1 << ni);
@@ -209,8 +210,7 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
     }
     vemap.insert(make_pair(id, bdd.root()));
   }
-  tBddEdge ans = mImpl->expr_to_bdd(expr, vemap);
-  return Bdd(mImpl, ans);
+  return mImpl->expr_to_bdd(expr, vemap);
 }
 
 // LogExpr から対応するBDDを作り出す．
@@ -228,8 +228,7 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
     tBddEdge tmp = mImpl->make_posiliteral(id2);
     vemap.insert(make_pair(id, tmp));
   }
-  tBddEdge ans = mImpl->expr_to_bdd(expr, vemap);
-  return Bdd(mImpl, ans);
+  return mImpl->expr_to_bdd(expr, vemap);
 }
 
 // ストリームを読んで論理式を作り,そこからBDDを作る．
@@ -296,7 +295,7 @@ BddMgr::make_thfunc(tVarSize n,
       else {
 	tBddEdge l = table[elem(i + 1, j, th)];
 	tBddEdge h = table[elem(i + 1, j - 1, th)];
-	tBddEdge tmp = mImpl->make_bdd(i, l, h);
+	tBddEdge tmp = mImpl->make_bddedge(i, l, h);
 	if ( check_overflow(tmp) ) {
 	  return make_overflow();
 	}

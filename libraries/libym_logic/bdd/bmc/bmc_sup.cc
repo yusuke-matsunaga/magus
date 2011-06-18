@@ -142,7 +142,7 @@ BddMgrClassic::SCC(tBddEdge e)
   for (list<Var*>::iterator p = mVarSet.begin(); p != mVarSet.end(); ++ p) {
     Var* v = *p;
     if ( v->mMark == 1 ) {
-      ans = and_op(ans, make_negaliteral(v->varid()));
+      ans = and_op(ans, negate_ifvalid(make_posiliteral(v->varid())));
     }
     else if ( v->mMark == 2 ) {
       ans = and_op(ans, make_posiliteral(v->varid()));

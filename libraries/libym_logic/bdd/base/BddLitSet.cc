@@ -202,7 +202,11 @@ BddLitSet::begin() const
 BddLitSet::iterator
 BddLitSet::end() const
 {
-  return iterator(mBody.mMgr->make_one());
+  // ちょっとトリッキー
+  // やっていることは mBody の BddMgrImpl をコピーしている．
+  Bdd tmp(mBody);
+  tmp.set_one();
+  return iterator(tmp);
 }
 
 // 集合和を計算する．

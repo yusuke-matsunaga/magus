@@ -35,7 +35,7 @@ public:
   /// @param[in] input_vars 入力変数番号の配列
   /// @param[in] state_vars 状態変数番号の配列(現状態と次状態のペア)
   /// @param[in] trans_relation 状態遷移関係
-  BddFsm(BddMgrRef bdd_mgr,
+  BddFsm(BddMgr& bdd_mgr,
 	 const vector<ymuint>& input_vars,
 	 const vector<pair<ymuint, ymuint> >& state_vars,
 	 const Bdd& trans_relation);
@@ -146,7 +146,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // BDD マネージャ
-  BddMgrRef mBddMgr;
+  BddMgr& mBddMgr;
 
   // 入力変数の配列
   vector<ymuint32> mInputVarIds;

@@ -14,7 +14,7 @@
 #include "ym_logic/Dg.h"
 
 
-BEGIN_NAMESPACE_YM_BDD
+BEGIN_NAMESPACE_YM_DEC
 
 // 分解グラフの節点のクラス
 class DgNode;
@@ -35,7 +35,7 @@ class DgNode
 public:
 
   // ノードタイプを得る．
-  Dg::tType
+  tType
   type() const;
 
   // bi-decomposition タイプの時に true を返す．
@@ -123,7 +123,7 @@ private:
   // グローバル関数，サポート，ノードタイプ，入力数を指定する．
   DgNode(const Bdd& f,
 	 const BddVarSet& support,
-	 Dg::tType type,
+	 tType type,
 	 size_t ni);
 
   // デストラクタ
@@ -176,7 +176,7 @@ private:
   int mRefCount;
 
   // ノードタイプ
-  Dg::tType mType;
+  tType mType;
 
   // 入力がすべてリテラルの時に真となる．
   bool mAllLit;
@@ -361,7 +361,7 @@ DgNode::input_flag(size_t pos) const
 
 // ノードタイプを得る．
 inline
-Dg::tType
+tType
 DgNode::type() const
 {
   return mType;
@@ -372,7 +372,7 @@ inline
 bool
 DgNode::is_bidecomp() const
 {
-  return mType == Dg::kOr || mType == Dg::kXor;
+  return mType == kOr || mType == kXor;
 }
 
 // 入力がすべてリテラルの時に真となる．
@@ -468,16 +468,8 @@ inline
 tVarId
 DgNode::literal_var() const
 {
-  assert_cond(mType == Dg::kLitP, __FILE__, __LINE__);
+  assert_cond(mType == kLitP, __FILE__, __LINE__);
   return mTopVarId;
-}
-
-// プロファイル情報を得る．
-inline
-void
-DgMgr::get_profile(Profile& prof) const
-{
-  prof = mProf;
 }
 
 // ポインタ＋極性を枝にする．
@@ -523,28 +515,30 @@ inv_edge(tDgEdge& e,
   e ^= (long)pol;
 }
 
-END_NAMESPACE_YM_BDD
+END_NAMESPACE_YM_DEC
 
 
 BEGIN_NAMESPACE_HASH
 
 // DgNode* をキーとした hash_{set,map}を作るための定義
 template <>
-struct hash<nsYm::nsBdd::DgNode*>
+struct hash<nsYm::nsDec::DgNode*>
 {
-  size_t operator()(nsYm::nsBdd::DgNode* node) const
+  ymuint
+  operator()(nsYm::nsDec::DgNode* node) const
   {
-    return reinterpret_cast<size_t>(node)/sizeof(void*);
+    return reinterpret_cast<ymuint>(node)/sizeof(void*);
   }
 };
 
 // const DgNode* をキーとした hash_{set,map}を作るための定義
 template <>
-struct hash<const nsYm::nsBdd::DgNode*>
+struct hash<const nsYm::nsDec::DgNode*>
 {
-  size_t operator()(const nsYm::nsBdd::DgNode* node) const
+  ymuint
+  operator()(const nsYm::nsDec::DgNode* node) const
   {
-    return reinterpret_cast<size_t>(node)/sizeof(void*);
+    return reinterpret_cast<ymuint>(node)/sizeof(void*);
   }
 };
 

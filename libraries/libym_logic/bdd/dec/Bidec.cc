@@ -11,6 +11,8 @@
 
 #include "ym_utils/MFSet.h"
 #include "ym_logic/Dg.h"
+#include "ym_logic/BddMgr.h"
+
 
 //#define DEBUG_MERGE_BIDEC
 //#define DEBUG_FIND_COMMON_BIDEC
@@ -28,7 +30,7 @@ merge_vargroup(MFSet& mfset,
 {
   if ( !support.empty() ) {
     BddVarSet::iterator p = support.begin();
-    size_t top_id = *p;
+    ymuint top_id = *p;
     while ( ++ p != support.end() ) {
       tVarId vid = *p;
       top_id = mfset.merge(top_id, vid);
@@ -47,16 +49,17 @@ END_NONAMESPACE
 // @param[in] m_bidec 共通な2項分解を格納する変数
 // @return 共通部分をもつとき true を返す．
 bool
-merge_bidec(const VarVector& idx_vector,
+merge_bidec(BddMgr& bddmgr,
+	    const VarVector& idx_vector,
 	    const BidecVector& bidec_vector,
 	    Bidec& m_bidec)
 {
-  size_t n = idx_vector.size();
-  size_t nexp = 1 << n;
+  ymuint n = idx_vector.size();
+  ymuint nexp = 1 << n;
 
 #if defined(DEBUG_MERGE_BIDEC)
   cout << endl << "merge_bidec" << endl;
-  for (size_t i = 0; i < nexp; i ++) {
+  for (ymuint i = 0; i < nexp; i ++) {
     cout << "#" << i << endl;
     bidec_vector[i].display(cout);
   }
@@ -64,7 +67,7 @@ merge_bidec(const VarVector& idx_vector,
 #endif
 
   int com = bidec_vector[0].root_type();
-  for (size_t i = 1; i < nexp; ++ i) {
+  for (ymuint i = 1; i < nexp; ++ i) {
     com &= bidec_vector[i].root_type();
   }
   if ( !com ) {
@@ -84,18 +87,18 @@ merge_bidec(const VarVector& idx_vector,
   else {
     com = Bidec::kXor;
   }
-  BddMgrRef mgr = bidec_vector[0].global_func().mgr();
-  Bdd f = mgr.make_zero();
-  Bdd g0 = mgr.make_zero();
-  Bdd g1 = mgr.make_zero();
-  for (size_t i = 0; i < nexp; ++ i) {
-    Bdd idx = mgr.make_one();
-    for (size_t j = 0; j < n; ++ j) {
+
+  Bdd f = bddmgr.make_zero();
+  Bdd g0 = bddmgr.make_zero();
+  Bdd g1 = bddmgr.make_zero();
+  for (ymuint i = 0; i < nexp; ++ i) {
+    Bdd idx = bddmgr.make_one();
+    for (ymuint j = 0; j < n; ++ j) {
       if ( i & (1 << j) ) {
-	idx &= mgr.make_posiliteral(idx_vector[j]);
+	idx &= bddmgr.make_posiliteral(idx_vector[j]);
       }
       else {
-	idx &= mgr.make_negaliteral(idx_vector[j]);
+	idx &= bddmgr.make_negaliteral(idx_vector[j]);
       }
     }
     f |= idx & bidec_vector[i].global_func();
@@ -103,32 +106,32 @@ merge_bidec(const VarVector& idx_vector,
     Bdd gg1 = bidec_vector[i].input_func(1);
     int t = bidec_vector[i].root_type();
     if ( t & Bidec::kConst0 ) {
-      gg0 = mgr.make_zero();
-      gg1 = mgr.make_zero();
+      gg0 = bddmgr.make_zero();
+      gg1 = bddmgr.make_zero();
     }
     else if ( t & Bidec::kConst1 ) {
-      gg0 = mgr.make_one();
+      gg0 = bddmgr.make_one();
       if ( com == Bidec::kXor ) {
-	gg1 = mgr.make_zero();
+	gg1 = bddmgr.make_zero();
       }
       else {
-	gg1 = mgr.make_one();
+	gg1 = bddmgr.make_one();
       }
     }
     else if ( t & Bidec::kLit0 ) {
       if ( com == Bidec::kAnd ) {
-	gg1 = mgr.make_one();
+	gg1 = bddmgr.make_one();
       }
       else {
-	gg1 = mgr.make_zero();
+	gg1 = bddmgr.make_zero();
       }
     }
     else if ( t & Bidec::kLit1 ) {
       if ( com == Bidec::kAnd ) {
-	gg0 = mgr.make_one();
+	gg0 = bddmgr.make_one();
       }
       else {
-	gg0 = mgr.make_zero();
+	gg0 = bddmgr.make_zero();
       }
     }
     g0 |= idx & gg0;
@@ -150,25 +153,26 @@ merge_bidec(const VarVector& idx_vector,
 // ただし，第一項の入力数は limit1 以下, 第二項の入力数は limit2 以下
 // とする．
 bool
-find_common_bidec(const VarVector& idx,
+find_common_bidec(BddMgr& bddmgr,
+		  const VarVector& idx,
 		  const BddVector& cf,
-		  size_t limit1,
-		  size_t limit2,
+		  ymuint limit1,
+		  ymuint limit2,
 		  Bidec& m_bidec)
 {
 #if defined(DEBUG_FIND_COMMON_BIDEC)
   cout << "find_common_bidec begin" << endl;
 #endif
 
-  size_t n = idx.size();
+  ymuint n = idx.size();
 
   list<BidecVector> bidec_list;
-  enum_common_bidec(cf, limit1 - n, limit2 - n, bidec_list);
+  enum_common_bidec(bddmgr, cf, limit1 - n, limit2 - n, bidec_list);
 
   for (list<BidecVector>::iterator p = bidec_list.begin();
        p != bidec_list.end(); ++ p) {
     BidecVector bidec_vect = *p;
-    if ( merge_bidec(idx, bidec_vect, m_bidec) ) {
+    if ( merge_bidec(bddmgr, idx, bidec_vect, m_bidec) ) {
 #if defined(DEBUG_FIND_COMMON_BIDEC)
       cout << "find_common_bidec end: status -- FOUND" << endl;
 #endif
@@ -185,47 +189,46 @@ find_common_bidec(const VarVector& idx,
 // ただし，第一項の入力数は limit1 以下, 第二項の入力数は limit2 以下
 // とする．
 void
-enum_common_bidec(const BddVector& cf,
-		  size_t limit1,
-		  size_t limit2,
+enum_common_bidec(BddMgr& bddmgr,
+		  const BddVector& cf,
+		  ymuint limit1,
+		  ymuint limit2,
 		  list<BidecVector>& bidec_list)
 {
-  size_t nexp = cf.size();
+  ymuint nexp = cf.size();
 
 #if defined(DEBUG_ENUM_COMMON_BIDEC)
   cout << "enum_common_bidec() begin" << endl;
-  for (size_t i = 0; i < nexp; ++ i) {
+  for (ymuint i = 0; i < nexp; ++ i) {
     cout << "cf[" << i << "]: " << cf[i].sop() << endl;
   }
 #endif
 
   // 個々の関数の二項分解グラフを作り, 共通な変数分割を得る．
-  //DgMgr& dgmgr = DgMgr::get_obj();
-  BddMgrRef bddmgr = cf[0].mgr();
   DgMgr dgmgr(bddmgr);
   BddVarSet all_sup(bddmgr);
   vector<Dg> dg_vector(nexp);
-  for (size_t i = 0; i < nexp; ++ i) {
+  for (ymuint i = 0; i < nexp; ++ i) {
     all_sup += cf[i].support();
     Dg dg = dgmgr.bidecomp(cf[i]);
     dg_vector[i] = dg;
   }
 
-  size_t nsup = all_sup.size();
-  size_t max_id = 0;
+  ymuint nsup = all_sup.size();
+  ymuint max_id = 0;
   for (BddVarSet::iterator p = all_sup.begin(); p != all_sup.end(); ++ p) {
-    size_t id = *p;
+    ymuint id = *p;
     if ( max_id < id ) {
       max_id = id;
     }
   }
   ++ max_id;
   MFSet mfset(max_id);
-  for (size_t i = 0; i < nexp; ++ i) {
+  for (ymuint i = 0; i < nexp; ++ i) {
     const Dg& dg = dg_vector[i];
     if ( dg.is_bidecomp() ) {
-      size_t ni = dg.ni();
-      for (size_t j = 0; j < ni; ++ j) {
+      ymuint ni = dg.ni();
+      for (ymuint j = 0; j < ni; ++ j) {
 	merge_vargroup(mfset, dg.input(j).support());
       }
     }
@@ -235,19 +238,19 @@ enum_common_bidec(const BddVector& cf,
   }
 
   // 変数グループの数を数える．
-  vector<size_t> vargroup(max_id, 0);
-  vector<size_t> replist;
+  vector<ymuint> vargroup(max_id, 0);
+  vector<ymuint> replist;
   replist.reserve(nsup);
   for (BddVarSet::iterator p = all_sup.begin(); p != all_sup.end(); ++ p) {
-    size_t id = *p;
-    size_t rep_id = mfset.find(id);
+    ymuint id = *p;
+    ymuint rep_id = mfset.find(id);
     if ( vargroup[rep_id] == 0 ) {
       replist.push_back(rep_id);
     }
     ++ vargroup[rep_id];
   }
 
-  size_t ng = replist.size();
+  ymuint ng = replist.size();
 
   if ( ng == 1 ) {
 #if defined(DEBUG_ENUM_COMMON_BIDEC)
@@ -257,10 +260,10 @@ enum_common_bidec(const BddVector& cf,
   }
 
   // ここに来たら ng>= 2
-  size_t nend = 1 << ng;
-  for (size_t b = 0; b < nend; ++ b) {
-    size_t n0 = 0;
-    for (size_t i = 0; i < ng; ++ i) {
+  ymuint nend = 1 << ng;
+  for (ymuint b = 0; b < nend; ++ b) {
+    ymuint n0 = 0;
+    for (ymuint i = 0; i < ng; ++ i) {
       if ( b & (1 << i) ) {
 	n0 += vargroup[replist[i]];
       }
@@ -269,16 +272,16 @@ enum_common_bidec(const BddVector& cf,
       // 制約を満たす分解が見つかった．
 
       // 最初の変数グループに含まれる代表の変数番号
-      hash_set<size_t> rep0;
-      for (size_t i = 0; i < ng; ++ i) {
+      hash_set<ymuint> rep0;
+      for (ymuint i = 0; i < ng; ++ i) {
 	if ( b & (1 << i) ) {
 	  rep0.insert(replist[i]);
 	}
       }
       BddVarSet var0(bddmgr);
       for (BddVarSet::iterator p = all_sup.begin(); p != all_sup.end(); ++ p) {
-	size_t id = *p;
-	size_t rep_id = mfset.find(id);
+	ymuint id = *p;
+	ymuint rep_id = mfset.find(id);
 	if ( rep0.count(rep_id) > 0 ) {
 	  var0 += BddVarSet(bddmgr, id);
 	}
@@ -286,13 +289,13 @@ enum_common_bidec(const BddVector& cf,
 
       bidec_list.push_back(BidecVector(nexp));
       BidecVector& tmp = bidec_list.back();
-      for (size_t i = 0; i < nexp; ++ i) {
+      for (ymuint i = 0; i < nexp; ++ i) {
 	const Dg& dg = dg_vector[i];
 	if ( dg.is_bidecomp() ) {
-	  size_t ni = dg.ni();
+	  ymuint ni = dg.ni();
 	  Bdd g1 = bddmgr.make_zero();
 	  Bdd g2 = bddmgr.make_zero();
-	  for (size_t j = 0; j < ni; ++ j) {
+	  for (ymuint j = 0; j < ni; ++ j) {
 	    Bdd& dst = ( dg.input(j).support() && var0 ) ? g1 : g2;
 	    Bdd src = dg.input(j).global_func();
 	    switch ( dg.type() ) {
@@ -317,7 +320,7 @@ enum_common_bidec(const BddVector& cf,
 
 #if defined(DEBUG_ENUM_COMMON_BIDEC)
       cout << "FOUND" << endl;
-      for (size_t i = 0; i < nexp; ++ i) {
+      for (ymuint i = 0; i < nexp; ++ i) {
 	cout << "#" << i << endl;
 	tmp[i].display(cout);
       }
@@ -354,12 +357,14 @@ Bidec::set(const Bdd& f,
   else if ( g0.is_zero() || g0.is_one() ) {
     mType = kLit1 | kAnd | kOr | kXor;
     mInputFunc[1] = f;
-    mInputFunc[0] = f.mgr().make_zero();
+    mInputFunc[0] = f;
+    mInputFunc[0].set_zero();
   }
   else if ( g1.is_zero() || g1.is_one() ) {
     mType = kLit0 | kAnd | kOr | kXor;
     mInputFunc[0] = f;
-    mInputFunc[1] = f.mgr().make_zero();
+    mInputFunc[1] = f;
+    mInputFunc[1].set_zero();
   }
   else {
     int sig = 0;

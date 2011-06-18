@@ -12,7 +12,7 @@
 #include "DgNode.h"
 
 
-BEGIN_NAMESPACE_YM_BDD
+BEGIN_NAMESPACE_YM_DEC
 
 BEGIN_NONAMESPACE
 
@@ -52,27 +52,27 @@ disp_sub(tDgEdge edge,
       s << "-N- ";
     }
     switch ( node->type() ) {
-    case Dg::kC0:
+    case kC0:
       s << "CONST0" << endl;
       break;
-    case Dg::kLitP:
+    case kLitP:
       s << "LITERAL(" << node->literal_var() << ")" << endl;
       break;
-    case Dg::kOr:
+    case kOr:
       s << "OR(" << ni << ")" << endl;
       for (size_t i = 0; i < ni; ++ i) {
 	tDgEdge iedge = node->input(i);
 	disp_sub(iedge, s, col + 4, mark);
       }
       break;
-    case Dg::kXor:
+    case kXor:
       s << "XOR(" << ni << ")" << endl;
       for (size_t i = 0; i < ni; ++ i) {
 	tDgEdge iedge = node->input(i);
 	disp_sub(iedge, s, col + 4, mark);
       }
       break;
-    case Dg::kCplx:
+    case kCplx:
       s << "COMPLEX(" << ni << ")\t" << F.sop() << endl;
       for (size_t i = 0; i < ni; ++ i) {
 	tDgEdge iedge = node->input(i);
@@ -92,7 +92,7 @@ END_NONAMESPACE
 // グローバル関数，サポート関数，ノードタイプ，入力数を指定する．
 DgNode::DgNode(const Bdd& f,
 	       const BddVarSet& sup,
-	       Dg::tType type, size_t ni) :
+	       tType type, size_t ni) :
   mType(type),
   mGlobalFunc(f),
   mSupport(sup),
@@ -120,8 +120,10 @@ DgNode::partial_func(const vector<size_t>& iset) const
   if ( iset.empty() ) {
     return global_func();
   }
-  Bdd ans = global_func().mgr().make_zero();
-  if ( type() == Dg::kOr ) {
+
+  Bdd ans;
+  bool first = true;
+  if ( type() == kOr ) {
     for (vector<size_t>::const_iterator p = iset.begin();
 	 p != iset.end(); ++ p) {
       tDgEdge e = input(*p);
@@ -131,10 +133,16 @@ DgNode::partial_func(const vector<size_t>& iset) const
       if ( pol == kPolNega ) {
 	ifunc.negate();
       }
-      ans |= ifunc;
+      if ( first ) {
+	ans = ifunc;
+	first = false;
+      }
+      else {
+	ans |= ifunc;
+      }
     }
   }
-  else if ( type() == Dg::kXor ) {
+  else if ( type() == kXor ) {
     for (vector<size_t>::const_iterator p = iset.begin();
 	 p != iset.end(); ++ p) {
       tDgEdge e = input(*p);
@@ -144,7 +152,13 @@ DgNode::partial_func(const vector<size_t>& iset) const
       if ( pol == kPolNega ) {
 	ifunc.negate();
       }
-      ans ^= ifunc;
+      if ( first ) {
+	ans = ifunc;
+	first = false;
+      }
+      else {
+	ans ^= ifunc;
+      }
     }
   }
   else {
@@ -214,10 +228,10 @@ DgNode::get_boundary(vector<DgNode*>& or_list,
 	}
       }
       if ( c >= 2 ) {
-	if ( type() == Dg::kOr ) {
+	if ( type() == kOr ) {
 	  or_list.push_back(this);
 	}
-	else if ( type() == Dg::kXor ) {
+	else if ( type() == kXor ) {
 	  xor_list.push_back(this);
 	}
       }
@@ -249,4 +263,4 @@ display(tDgEdge edge,
   disp_sub(edge, s, col, mark);
 }
 
-END_NAMESPACE_YM_BDD
+END_NAMESPACE_YM_DEC

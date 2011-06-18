@@ -15,6 +15,7 @@
 #include "ym_utils/StopWatch.h"
 #include "ym_networks/BNetwork.h"
 #include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
 #include "ym_logic/BddVarSet.h"
 
 
@@ -35,12 +36,12 @@ BEGIN_NAMESPACE_YM_SEAL
 
 void
 dump_trans(ostream& s,
+	   BddMgr& bddmgr,
 	   const Bdd& trans,
 	   const vector<State>& reachable_states,
 	   const vector<ymuint>& input_vars,
 	   const vector<pair<ymuint, ymuint> >& state_vars)
 {
-  BddMgrRef mgr = trans.mgr();
   ymuint ni = input_vars.size();
   ymuint nip = 1U << ni;
   ymuint nff = state_vars.size();
@@ -51,10 +52,10 @@ dump_trans(ostream& s,
     for (ymuint i = 0; i < nff; ++ i) {
       ymuint csidx = state_vars[i].first;
       if ( cspat[i] == '1' ) {
-	tmp &= mgr.make_posiliteral(csidx);
+	tmp &= bddmgr.make_posiliteral(csidx);
       }
       else {
-	tmp &= mgr.make_negaliteral(csidx);
+	tmp &= bddmgr.make_negaliteral(csidx);
       }
     }
     for (ymuint iv = 0; iv < nip; ++ iv) {
@@ -63,11 +64,11 @@ dump_trans(ostream& s,
       for (ymuint i = 0; i < ni; ++ i) {
 	ymuint iidx = input_vars[i];
 	if ( iv & (1U << i) ) {
-	  tmp2 &= mgr.make_posiliteral(iidx);
+	  tmp2 &= bddmgr.make_posiliteral(iidx);
 	  ipat += '1';
 	}
 	else {
-	  tmp2 &= mgr.make_negaliteral(iidx);
+	  tmp2 &= bddmgr.make_negaliteral(iidx);
 	  ipat += '0';
 	}
       }
@@ -79,10 +80,10 @@ dump_trans(ostream& s,
 	for (ymuint i = 0; i < nff; ++ i) {
 	  ymuint nsidx = state_vars[i].second;
 	  if ( nspat[i] == '1' ) {
-	    tmp3 &= mgr.make_posiliteral(nsidx);
+	    tmp3 &= bddmgr.make_posiliteral(nsidx);
 	  }
 	  else {
-	    tmp3 &= mgr.make_negaliteral(nsidx);
+	    tmp3 &= bddmgr.make_negaliteral(nsidx);
 	  }
 	}
 	if ( !tmp3.is_zero() ) {
@@ -116,14 +117,14 @@ fsm_analysis(const BNetwork& bnetwork,
   StopWatch sw;
   sw.start();
 
-  BddMgrRef mgr("bmc", "classic mgr");
+  BddMgr bddmgr("bmc", "classic mgr");
   nsBdd::BddMgrParam param;
 #if 0
   param.mMemLimit = 1024 * 1024 * 1024;
 #else
   param.mMemLimit = 0;
 #endif
-  mgr.param(param, nsBdd::BddMgrParam::MEM_LIMIT);
+  bddmgr.param(param, nsBdd::BddMgrParam::MEM_LIMIT);
 
   // 外部入力数
   ymuint input_num = bnetwork.input_num();
@@ -155,7 +156,7 @@ fsm_analysis(const BNetwork& bnetwork,
       BNode* node = *p;
       ymuint id = idxmap.input_idx(var_num);
       input_vars[var_num] = id;
-      bdd_array[node->id()] = mgr.make_posiliteral(id);
+      bdd_array[node->id()] = bddmgr.make_posiliteral(id);
     }
   }
 
@@ -168,7 +169,7 @@ fsm_analysis(const BNetwork& bnetwork,
       ymuint cur_id  = idxmap.cur_normal_idx(var_num);
       ymuint next_id = idxmap.next_normal_idx(var_num);
       state_vars[var_num] = make_pair(cur_id, next_id);
-      bdd_array[node->id()] = mgr.make_posiliteral(cur_id);
+      bdd_array[node->id()] = bddmgr.make_posiliteral(cur_id);
     }
   }
 
@@ -185,11 +186,11 @@ fsm_analysis(const BNetwork& bnetwork,
       BNode* inode = node->fanin(i);
       fanin_map.insert(make_pair(i, bdd_array[inode->id()]));
     }
-    bdd_array[node->id()] = mgr.expr_to_bdd(expr, fanin_map);
+    bdd_array[node->id()] = bddmgr.expr_to_bdd(expr, fanin_map);
   }
 
   // 出力の変数番号配列のセットと出力関係のBDDの作成
-  Bdd output_rel = mgr.make_one();
+  Bdd output_rel = bddmgr.make_one();
   {
     ymuint var_num = 0;
     for (BNodeList::const_iterator p = bnetwork.outputs_begin();
@@ -199,13 +200,13 @@ fsm_analysis(const BNetwork& bnetwork,
       Bdd ofunc = bdd_array[inode->id()];
       ymuint id = idxmap.output_idx(var_num);
       output_vars[var_num] = id;
-      Bdd ovar = mgr.make_posiliteral(id);
+      Bdd ovar = bddmgr.make_posiliteral(id);
       output_rel &= ~(ovar ^ ofunc);
     }
   }
 
   // 次状態遷移関係のBDDの作成
-  Bdd trans_rel = mgr.make_one();
+  Bdd trans_rel = bddmgr.make_one();
   {
     ymuint var_num = 0;
     for (BNodeList::const_iterator p = bnetwork.latch_nodes_begin();
@@ -214,13 +215,13 @@ fsm_analysis(const BNetwork& bnetwork,
       BNode* inode = node->fanin(0);
       Bdd ofunc = bdd_array[inode->id()];
       ymuint id = idxmap.next_normal_idx(var_num);
-      Bdd ovar = mgr.make_posiliteral(id);
+      Bdd ovar = bddmgr.make_posiliteral(id);
       trans_rel &= ~(ovar ^ ofunc);
     }
   }
 
   // 正常回路の FSM の生成
-  BddFsm fsm(mgr, input_vars, state_vars, trans_rel);
+  BddFsm fsm(bddmgr, input_vars, state_vars, trans_rel);
 
   // 正常回路の到達可能状態を列挙
   Bdd rs_bdd = fsm.enum_reachable_states(init_states);
@@ -259,37 +260,37 @@ fsm_analysis(const BNetwork& bnetwork,
 
   // エラー状態
   // 普通のフリップフロップのビットが0で {cur|next}_err_bit のみが1
-  Bdd cur_err_state = mgr.make_one();
-  Bdd next_err_state = mgr.make_one();
+  Bdd cur_err_state = bddmgr.make_one();
+  Bdd next_err_state = bddmgr.make_one();
   for (ymuint i = 0; i < ff_num * 2; ++ i) {
-    cur_err_state &= mgr.make_negaliteral(state_vars2[i].first);
-    next_err_state &= mgr.make_negaliteral(state_vars2[i].second);
+    cur_err_state &= bddmgr.make_negaliteral(state_vars2[i].first);
+    next_err_state &= bddmgr.make_negaliteral(state_vars2[i].second);
   }
-  cur_err_state &= mgr.make_posiliteral(idxmap.cur_error_bit());
-  cur_err_state &= mgr.make_negaliteral(idxmap.cur_ident_bit());
-  next_err_state &= mgr.make_posiliteral(idxmap.next_error_bit());
-  next_err_state &= mgr.make_negaliteral(idxmap.next_ident_bit());
+  cur_err_state &= bddmgr.make_posiliteral(idxmap.cur_error_bit());
+  cur_err_state &= bddmgr.make_negaliteral(idxmap.cur_ident_bit());
+  next_err_state &= bddmgr.make_posiliteral(idxmap.next_error_bit());
+  next_err_state &= bddmgr.make_negaliteral(idxmap.next_ident_bit());
 
   // 同一状態 (正常状態対)
   // 普通のフリップフロップのビットが0で {cur|next}_ident_bit のみが1
-  Bdd cur_ident_state = mgr.make_one();
-  Bdd next_ident_state = mgr.make_one();
+  Bdd cur_ident_state = bddmgr.make_one();
+  Bdd next_ident_state = bddmgr.make_one();
   for (ymuint i = 0; i < ff_num * 2; ++ i) {
-    cur_ident_state &= mgr.make_negaliteral(state_vars2[i].first);
-    next_ident_state &= mgr.make_negaliteral(state_vars2[i].second);
+    cur_ident_state &= bddmgr.make_negaliteral(state_vars2[i].first);
+    next_ident_state &= bddmgr.make_negaliteral(state_vars2[i].second);
   }
-  cur_ident_state &= mgr.make_negaliteral(idxmap.cur_error_bit());
-  cur_ident_state &= mgr.make_posiliteral(idxmap.cur_ident_bit());
-  next_ident_state &= mgr.make_negaliteral(idxmap.next_error_bit());
-  next_ident_state &= mgr.make_posiliteral(idxmap.next_ident_bit());
+  cur_ident_state &= bddmgr.make_negaliteral(idxmap.cur_error_bit());
+  cur_ident_state &= bddmgr.make_posiliteral(idxmap.cur_ident_bit());
+  next_ident_state &= bddmgr.make_negaliteral(idxmap.next_error_bit());
+  next_ident_state &= bddmgr.make_posiliteral(idxmap.next_ident_bit());
 
   // ノーマル状態
-  Bdd cur_normal = mgr.make_one();
-  cur_normal &= mgr.make_negaliteral(idxmap.cur_error_bit());
-  cur_normal &= mgr.make_negaliteral(idxmap.cur_ident_bit());
-  Bdd next_normal = mgr.make_one();
-  next_normal &= mgr.make_negaliteral(idxmap.next_error_bit());
-  next_normal &= mgr.make_negaliteral(idxmap.next_ident_bit());
+  Bdd cur_normal = bddmgr.make_one();
+  cur_normal &= bddmgr.make_negaliteral(idxmap.cur_error_bit());
+  cur_normal &= bddmgr.make_negaliteral(idxmap.cur_ident_bit());
+  Bdd next_normal = bddmgr.make_one();
+  next_normal &= bddmgr.make_negaliteral(idxmap.next_error_bit());
+  next_normal &= bddmgr.make_negaliteral(idxmap.next_ident_bit());
 
   // エラー回路の出力関係
   Bdd err_output_rel = output_rel.remap_var(c2e_map);
@@ -299,23 +300,23 @@ fsm_analysis(const BNetwork& bnetwork,
 
   // 正常回路と故障回路の出力が同じである条件を作る．
   Bdd eq = output_rel & err_output_rel;
-  eq = eq.esmooth(BddVarSet(mgr, output_vars));
+  eq = eq.esmooth(BddVarSet(bddmgr, output_vars));
 
   // 正常回路と故障回路の次状態が同一である条件を作る．
-  Bdd ident = mgr.make_zero();
+  Bdd ident = bddmgr.make_zero();
   for (ymuint i = 0; i < reachable_states1.size(); ++ i) {
     State state = reachable_states1[i];
-    Bdd tmp = mgr.make_one();
+    Bdd tmp = bddmgr.make_one();
     for (ymuint j = 0; j < ff_num; ++ j) {
       ymuint id1 = idxmap.next_normal_idx(j);
       ymuint id2 = idxmap.next_error_idx(j);
       if ( state[j] == '1' ) {
-	tmp &= mgr.make_posiliteral(id1);
-	tmp &= mgr.make_posiliteral(id2);
+	tmp &= bddmgr.make_posiliteral(id1);
+	tmp &= bddmgr.make_posiliteral(id2);
       }
       else {
-	tmp &= mgr.make_negaliteral(id1);
-	tmp &= mgr.make_negaliteral(id2);
+	tmp &= bddmgr.make_negaliteral(id1);
+	tmp &= bddmgr.make_negaliteral(id2);
       }
     }
     ident |= tmp;
@@ -345,7 +346,7 @@ fsm_analysis(const BNetwork& bnetwork,
   for (ymuint i = 0; i < ff_num * 2; ++ i) {
     tmp[i] = state_vars2[i].second;
   }
-  BddVarSet nvars(mgr, tmp);
+  BddVarSet nvars(bddmgr, tmp);
 
   // 出力にエラーが伝搬する遷移関係
   Bdd trans_rel4 = (~eq & trans_rel2).esmooth(nvars) & next_err_state;
@@ -373,7 +374,7 @@ fsm_analysis(const BNetwork& bnetwork,
   }
 
   // 回路対の FSM の生成
-  BddFsm fsm2(mgr, input_vars, state_vars2, trans_rel_all);
+  BddFsm fsm2(bddmgr, input_vars, state_vars2, trans_rel_all);
 
   // 回路対の初期状態の作成
   vector<State> init_statepairs;

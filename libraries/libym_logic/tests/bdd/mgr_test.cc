@@ -14,6 +14,8 @@
 
 
 #include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
+#include "ym_logic/BddVarSet.h"
 
 #include "bddtest.h"
 
@@ -23,8 +25,8 @@ using namespace nsYm::nsBdd;
 using nsYm::VarList;
 using nsYm::LogExpr;
 
-BddMgrRef mgr1("bmm", "manager 1");
-BddMgrRef mgr2("bmm", "manager 2");
+BddMgr mgr1("bmm", "manager 1");
+BddMgr mgr2("bmm", "manager 2");
 
 // error BDD になっているかチェック
 bool
@@ -92,8 +94,13 @@ test_ite()
     Bdd h = (i & 1) ? bdd2[1] : bdd2[0];
 
     Bdd bdd = ite_op(f, g, h);
-    if ( i == 0 || i == 7 ) {
-      if ( !check_bdde(bdd, "ite_op(0, 1, 2)", "0 & 1 | ~0 & 2") ) {
+    if ( i == 0 ) {
+      if ( !check_bdde(mgr1, bdd, "ite_op(0, 1, 2)", "0 & 1 | ~0 & 2") ) {
+	return false;
+      }
+    }
+    else if ( i == 7 ) {
+      if ( !check_bdde(mgr2, bdd, "ite_op(0, 1, 2)", "0 & 1 | ~0 & 2") ) {
 	return false;
       }
     }
@@ -305,18 +312,22 @@ main(int argc, char** argv)
     if ( !test_isop() ) {
       return 255;
     }
+
+    // マネージャが削除された時の処理
     Bdd f;
     {
-      BddMgrRef mgr("bmm", "temporary manager", "reorder");
+      BddMgr mgr("bmm", "temporary manager", "reorder");
       mgr.new_var(0);
       mgr.new_var(1);
       mgr.new_var(2);
       f = str2bdd(mgr, "0 * 1 + ~0 * 2");
     }
-    BddMgrRef defmgr;
+    // この時点で f はエラーBDDになっているはず．
+
+    BddMgr& defmgr = BddMgr::default_mgr();
     Bdd f2 = defmgr.make_error();
-    if ( f.mgr() != f2.mgr() || f != f2 ) {
-      cout << "ERROR[bddmgr]: f != theMgr().make_zero()" << endl;
+    if ( f != f2 ) {
+      cout << "ERROR[bddmgr]: f != [error-BDD]" << endl;
       return 255;
     }
   }

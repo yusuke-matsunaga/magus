@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/BddVarSet.h"
+#include "BddMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -70,12 +71,12 @@ BddVarSet::iterator::operator!=(const iterator& src) const
 
 
 //////////////////////////////////////////////////////////////////////
-// BddVarSet
+// クラス BddVarSet
 //////////////////////////////////////////////////////////////////////
 
 // 空のコンストラクタ
 // 空集合となるが，明示的に使う場合には下の make_empty() を使うべき
-BddVarSet::BddVarSet(BddMgrRef mgr) :
+BddVarSet::BddVarSet(BddMgr& mgr) :
   mBody(mgr.make_one()),
   mSize(0U)
 {
@@ -106,7 +107,7 @@ BddVarSet::operator=(const BddVarSet& src)
 }
 
 // 変数一つだけを要素とする集合を作るコンストラクタ
-BddVarSet::BddVarSet(BddMgrRef mgr,
+BddVarSet::BddVarSet(BddMgr& mgr,
 		     tVarId varid) :
   mBody(mgr.make_posiliteral(varid)),
   mSize(0U)
@@ -116,13 +117,13 @@ BddVarSet::BddVarSet(BddMgrRef mgr,
 
 // 空集合を返すクラスメソッド
 BddVarSet
-BddVarSet::make_empty(BddMgrRef mgr)
+BddVarSet::make_empty(BddMgr& mgr)
 {
   return BddVarSet(mgr.make_one());
 }
 
 // vector からの変換用コンストラクタ
-BddVarSet::BddVarSet(BddMgrRef mgr,
+BddVarSet::BddVarSet(BddMgr& mgr,
 		     const VarVector& src) :
   mSize(0U)
 {
@@ -135,7 +136,7 @@ BddVarSet::BddVarSet(BddMgrRef mgr,
 }
 
 // list からの変換用コンストラクタ
-BddVarSet::BddVarSet(BddMgrRef mgr,
+BddVarSet::BddVarSet(BddMgr& mgr,
 		     const VarList& src) :
   mSize(0U)
 {
@@ -175,7 +176,11 @@ BddVarSet::begin() const
 BddVarSet::iterator
 BddVarSet::end() const
 {
-  return iterator(mBody.mgr().make_one());
+  // ちょっとトリッキー
+  // やっていることは mBody の BddMgrImpl をコピーしている．
+  Bdd tmp(mBody);
+  tmp.set_one();
+  return iterator(tmp);
 }
 
 // 集合和を計算する．

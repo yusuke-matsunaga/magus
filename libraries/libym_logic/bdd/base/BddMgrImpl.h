@@ -12,6 +12,7 @@
 
 
 #include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -117,41 +118,80 @@ public:
   // BDD 生成用関数
   //////////////////////////////////////////////////////////////////////
 
-  // 肯定のリテラル関数を作る
-  virtual
-  tBddEdge
-  make_posiliteral(tVarId varid) = 0;
+  /// @brief 定数0関数を作る．
+  /// @return 生成された BDD
+  Bdd
+  make_zero();
 
-  // リテラル関数を表すBDDを作る．
-  tBddEdge
+  /// @brief 定数1関数を作る．
+  /// @return 生成された BDD
+  Bdd
+  make_one();
+
+  /// @brief オバーフローBDDを明示的に生成する．
+  /// @return 生成された BDD
+  Bdd
+  make_overflow();
+
+  /// @brief エラーBDDを明示的に生成する．
+  /// @return 生成された BDD
+  Bdd
+  make_error();
+
+  /// @brief リテラル関数を表すBDDを作る．
+  /// @param[in] index 変数番号
+  /// @param[in] pol 極性
+  Bdd
   make_literal(tVarId index,
 	       tPol pol);
 
-  // リテラル関数を表すBDDを作る
-  tBddEdge
+  /// @brief リテラル関数を表すBDDを作る
+  /// @param[in] lit リテラル
+  Bdd
   make_literal(const Literal& lit);
 
-  // 否定のリテラル関数を作る．
-  tBddEdge
+  /// @brief 否定のリテラル関数を作る．
+  /// @param[in] varid 変数番号
+  Bdd
   make_negaliteral(tVarId varid);
 
-  // インデックスと左右の子供を指定してBDDを作る．
-  tBddEdge
+  /// @brief インデックスと左右の子供を指定してBDDを作る．
+  /// @param[in] varid 変数番号
+  /// @param[in] chd_0 0枝の子供
+  /// @param[in] chd_1 1枝の子供
+  Bdd
   make_bdd(tVarId varid,
 	   tBddEdge chd_0,
 	   tBddEdge chd_1);
 
-  // Expr から BDD を作るためのサブルーティン
+  /// @brief インデックスと左右の子供を指定してBDDの枝を作る．
+  /// @param[in] varid 変数番号
+  /// @param[in] chd_0 0枝の子供
+  /// @param[in] chd_1 1枝の子供
   tBddEdge
-  expr_to_bdd(const LogExpr& expr,
-	      const hash_map<tVarId,
-	      tBddEdge>& vemap);
+  make_bddedge(tVarId varid,
+	       tBddEdge chd_0,
+	       tBddEdge chd_1);
 
-  // ベクタを真理値表と見なしてBDDを作る．
-  // 個々の変数を vars で指定する．
-  // ベクタの値は非ゼロを true とみなす．
-  // v の大きさは 2^(vars.size()) に等しくなければならない．
+  /// @brief Expr から BDD を作る
+  /// @param[in] expr 論理式
+  /// @param[in] vemap 論理式の変数番号とBDDの枝の対応関係
+  Bdd
+  expr_to_bdd(const LogExpr& expr,
+	      const hash_map<tVarId, tBddEdge>& vemap);
+
+  /// @brief Expr から BDD の枝を作る
+  /// @param[in] expr 論理式
+  /// @param[in] vemap 論理式の変数番号とBDDの枝の対応関係
   tBddEdge
+  expr_to_bddedge(const LogExpr& expr,
+		  const hash_map<tVarId, tBddEdge>& vemap);
+
+  /// @brief ベクタを真理値表と見なしてBDDを作る．
+  /// @note 個々の変数を vars で指定する．
+  /// @note ベクタの値は非ゼロを true とみなす．
+  /// @note v の大きさは 2^(vars.size()) に等しくなければならない．
+  Bdd
   tvec_to_bdd(const vector<int>& v,
 	      const VarVector& vars);
 
@@ -160,6 +200,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
+
+  // 肯定のリテラル関数を作る
+  virtual
+  tBddEdge
+  make_posiliteral(tVarId varid) = 0;
 
   // src1 & src2 を計算する．
   virtual
@@ -677,19 +722,55 @@ private:
 // インライン関数の実装
 //////////////////////////////////////////////////////////////////////
 
+// @brief 定数0関数を作る．
+// @return 生成された BDD
+inline
+Bdd
+BddMgrImpl::make_zero()
+{
+  return Bdd(this, kEdge0);
+}
+
+// @brief 定数1関数を作る．
+// @return 生成された BDD
+inline
+Bdd
+BddMgrImpl::make_one()
+{
+  return Bdd(this, kEdge1);
+}
+
+// @brief オバーフローBDDを明示的に生成する．
+// @return 生成された BDD
+inline
+Bdd
+BddMgrImpl::make_overflow()
+{
+  return Bdd(this, kEdgeOverflow);
+}
+
+// @brief エラーBDDを明示的に生成する．
+// @return 生成された BDD
+inline
+Bdd
+BddMgrImpl::make_error()
+{
+  return Bdd(this, kEdgeError);
+}
+
 // リテラル関数を表すBDDを作る．
 inline
-tBddEdge
+Bdd
 BddMgrImpl::make_literal(tVarId index,
 			 tPol pol)
 {
   tBddEdge ans = make_posiliteral(index);
-  return addpol(ans, pol);
+  return Bdd(this, addpol(ans, pol));
 }
 
 // リテラル関数を表すBDDを作る
 inline
-tBddEdge
+Bdd
 BddMgrImpl::make_literal(const Literal& lit)
 {
   return make_literal(lit.varid(), lit.pol());
@@ -697,21 +778,45 @@ BddMgrImpl::make_literal(const Literal& lit)
 
 // 否定のリテラル関数を作る．
 inline
-tBddEdge
+Bdd
 BddMgrImpl::make_negaliteral(tVarId varid)
 {
-  return negate_ifvalid(make_posiliteral(varid));
+  return Bdd(this, negate_ifvalid(make_posiliteral(varid)));
 }
 
 // インデックスと左右の子供を指定してBDDを作る．
 inline
-tBddEdge
+Bdd
 BddMgrImpl::make_bdd(tVarId varid,
 		     tBddEdge chd_0,
 		     tBddEdge chd_1)
 {
+  return Bdd(this, make_bddedge(varid, chd_0, chd_1));
+}
+
+// @brief インデックスと左右の子供を指定してBDDの枝を作る．
+// @param[in] varid 変数番号
+// @param[in] chd_0 0枝の子供
+// @param[in] chd_1 1枝の子供
+inline
+tBddEdge
+BddMgrImpl::make_bddedge(tVarId varid,
+			 tBddEdge chd_0,
+			 tBddEdge chd_1)
+{
   tBddEdge tmp = make_posiliteral(varid);
   return ite_op(tmp, chd_1, chd_0);
+}
+
+// @brief Expr から BDD を作る
+// @param[in] expr 論理式
+// @param[in] vemap 論理式の変数番号とBDDの枝の対応関係
+inline
+Bdd
+BddMgrImpl::expr_to_bdd(const LogExpr& expr,
+			const hash_map<tVarId, tBddEdge>& vemap)
+{
+  return Bdd(this, expr_to_bddedge(expr, vemap));
 }
 
 END_NAMESPACE_YM_BDD

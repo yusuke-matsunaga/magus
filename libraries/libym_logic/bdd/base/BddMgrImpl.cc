@@ -127,10 +127,10 @@ BddMgrImpl::logstream() const
   return *mLogFp;
 }
 
-// LogExpr から BDD を作るためのサブルーティン
+// LogExpr から BDD の枝を作る
 tBddEdge
-BddMgrImpl::expr_to_bdd(const LogExpr& expr,
-			const hash_map<tVarId, tBddEdge>& vemap)
+BddMgrImpl::expr_to_bddedge(const LogExpr& expr,
+			    const hash_map<tVarId, tBddEdge>& vemap)
 {
   // 定数0の場合
   if ( expr.is_zero() ) {
@@ -154,16 +154,16 @@ BddMgrImpl::expr_to_bdd(const LogExpr& expr,
       ans = p->second;
     }
     if ( expr.is_negaliteral() ) {
-      return ans = negate(ans);
+      ans = negate(ans);
     }
     return ans;
   }
 
   // ここまで来たら根はAND/OR/XOR演算子
-  size_t n = expr.child_num();
+  ymuint n = expr.child_num();
   list<tBddEdge> edge_list;
-  for (size_t i = 0; i < n; ++ i) {
-    tBddEdge e = expr_to_bdd(expr.child(i), vemap);
+  for (ymuint i = 0; i < n; ++ i) {
+    tBddEdge e = expr_to_bddedge(expr.child(i), vemap);
     edge_list.push_back(e);
   }
   if ( expr.is_and() ) {
@@ -183,14 +183,14 @@ BddMgrImpl::expr_to_bdd(const LogExpr& expr,
 // 個々の変数を vars で指定する．
 // ベクタの値は非ゼロを true とみなす．
 // v の大きさは 2^(vars.size()) に等しくなければならない．
-tBddEdge
+Bdd
 BddMgrImpl::tvec_to_bdd(const vector<int>& v,
 			const VarVector& vars)
 {
-  size_t ni = vars.size();
-  size_t nv = (1 << ni);
+  ymuint ni = vars.size();
+  ymuint nv = (1 << ni);
   if ( nv != v.size() ) {
-    return kEdgeError;
+    return make_error();
   }
 
   // 変数の生成
@@ -199,8 +199,8 @@ BddMgrImpl::tvec_to_bdd(const vector<int>& v,
     tVarId varid = *p;
     var_vector.push_back(make_posiliteral(varid));
   }
-  size_t size = v.size();
-  return tvec_sub(v, 0, size, var_vector, 0);
+  ymuint size = v.size();
+  return Bdd(this, tvec_sub(v, 0, size, var_vector, 0));
 }
 
 // 真理値表からBDDを作るためのサブルーティン

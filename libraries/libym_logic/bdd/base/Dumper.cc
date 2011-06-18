@@ -269,7 +269,7 @@ Restorer::read()
       tBddEdge e0 = find_edge(p);
       p = strtok(NULL, ": \t");
       tBddEdge e1 = find_edge(p);
-      tBddEdge ans = mMgr->make_bdd(vid, e0, e1);
+      tBddEdge ans = mMgr->make_bddedge(vid, e0, e1);
       mEdgeVector.push_back(ans);
     }
     else {

@@ -68,8 +68,8 @@ PrimDec::dump(ostream& s) const
 // @param[out] dec_list 関数分解を格納するリスト
 void
 enum_djdec(const Bdd& f,
-	   size_t llimit,
-	   size_t ulimit,
+	   ymuint llimit,
+	   ymuint ulimit,
 	   PrimDecList& dec_list)
 {
   BddMgrRef mgr = f.mgr();
@@ -96,9 +96,9 @@ enum_djdec(const Bdd& f,
 // @param[out] cap_list 求まった関数分解を納めるリスト
 void
 cd_recur(const vector<PrimDecList >& list_set,
-	 size_t limit,
-	 size_t i,
-	 size_t n,
+	 ymuint limit,
+	 ymuint i,
+	 ymuint n,
 	 const BddVarSet& bset,
 	 const BddVarSet& fset,
 	 BddVector& cur_bfunc,
@@ -134,19 +134,19 @@ cd_recur(const vector<PrimDecList >& list_set,
 // @param[out] cd_list 求まった関数分解を納めるリスト
 void
 common_djdec(const BddVector& cf,
-	     size_t limit,
+	     ymuint limit,
 	     PrimDecList& cd_list)
 {
-  size_t nf = cf.size();
+  ymuint nf = cf.size();
   // disjoint decomposition を求める．
   vector<PrimDecList >dec_list(nf);
-  for (size_t i = 0; i < nf; i ++) {
+  for (ymuint i = 0; i < nf; i ++) {
     enum_djdec(cf[i], 0, limit, dec_list[i]);
   }
 
   // 分割の共通部分を探す．
   // 今は幼稚な n乗のアルゴリズムを使う．
-  size_t n = dec_list.size();
+  ymuint n = dec_list.size();
   cd_list.clear();
   const PrimDecList& list1 = dec_list[0];
   for (PrimDecList::const_iterator it = list1.begin();
