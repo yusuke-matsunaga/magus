@@ -166,7 +166,7 @@ private:
 	    tBddEdge id2);
 
   // テーブルサイズを変更する．
-  void
+  bool
   resize(size_t new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
@@ -233,7 +233,7 @@ private:
   hash_func(tBddEdge id1);
 
   // テーブルサイズを変更する．
-  void
+  bool
   resize(size_t new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
@@ -306,7 +306,7 @@ private:
 	    tBddEdge id2);
 
   // テーブルサイズを変更する．
-  void
+  bool
   resize(size_t new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
@@ -381,7 +381,7 @@ private:
 	    tBddEdge id3);
 
   // テーブルサイズを変更する．
-  void
+  bool
   resize(size_t new_size);
 
   // ガーベージコレクションが起きた時の処理を行なう．
@@ -458,7 +458,9 @@ BmcCompTbl1::put(tBddEdge id1,
     return;
   }
   if ( check_tablesize() ) {
-    resize(mTableSize << 1);
+    if ( !resize(mTableSize << 1) ) {
+      return;
+    }
   }
   Cell* tmp = mTable + hash_func(id1);
   if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;
@@ -502,7 +504,9 @@ BmcCompTbl2::put(tBddEdge id1,
     return;
   }
   if ( check_tablesize() ) {
-    resize(mTableSize << 1);
+    if ( !resize(mTableSize << 1) ) {
+      return;
+    }
   }
   Cell* tmp = mTable + hash_func(id1, id2);
   if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;
@@ -550,7 +554,9 @@ BmcIsopTbl::put(tBddEdge id1,
     return;
   }
   if ( check_tablesize() ) {
-    resize(mTableSize << 1);
+    if ( !resize(mTableSize << 1) ) {
+      return;
+    }
   }
   Cell* tmp = mTable + hash_func(id1, id2);
   if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;
@@ -600,7 +606,9 @@ BmcCompTbl3::put(tBddEdge id1,
     return;
   }
   if ( check_tablesize() ) {
-    resize(mTableSize << 1);
+    if ( !resize(mTableSize << 1) ) {
+      return;
+    }
   }
   Cell* tmp = mTable + hash_func(id1, id2, id3);
   if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;

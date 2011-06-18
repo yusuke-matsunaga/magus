@@ -12,6 +12,7 @@
 #include "BddMgrClassic.h"
 #include "BmcCompTbl.h"
 
+
 #if !defined(__SUNPRO_CC) || __SUNPRO_CC >= 0x500
 #include <exception>
 #include <new>
@@ -29,7 +30,8 @@ typedef xalloc alloc_xcpt;
 
 #endif
 
-#define BDDMGR_USE_MALLOC
+//#define BDDMGR_USE_MALLOC
+#define BDD_DEBUG_MEMALLOC 1
 
 BEGIN_NONAMESPACE
 
@@ -475,6 +477,22 @@ BddMgrClassic::set_next_limit_size()
   mNextLimit = size_t(double(mTableSize) * mNtLoadLimit);
 }
 
+// @brief ガーベージコレクションを許可する．
+void
+BddMgrClassic::enable_gc()
+{
+  if ( mGcEnable > 0 ) {
+    -- mGcEnable;
+  }
+}
+
+// @brief ガーベージコレクションを禁止する．
+void
+BddMgrClassic::disable_gc()
+{
+  ++ mGcEnable;
+}
+
 // ガーベージコレクションを行なう．
 // 具体的には各ノードの参照回数が0のノードをフリーリストに回収し
 // 再利用できるよ うにする．
@@ -724,13 +742,11 @@ BddMgrClassic::new_node(Var* var,
   e0 = addpol(e0, ans_pol);
 
   Node* temp;
-  size_t pos;
   // 節点テーブルを探す．
   tVarId index = var->varid();
-  pos = hash_func3(e0, e1, index);
+  ymuint pos = hash_func3(e0, e1, index);
   for (temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
-    if ( temp->edge0() == e0 && temp->edge1() == e1 &&
-	 temp->var() == var ) {
+    if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->var() == var ) {
       // 同一の節点がすでに登録されている
       goto already_exist;
     }
@@ -751,7 +767,10 @@ BddMgrClassic::new_node(Var* var,
   // 新たなノードを登録する．
   if ( mNodeNum > mNextLimit ) {
     // ノード数が制限値を越えたのでテーブルを2倍に拡張する
-    resize(mTableSize << 1);
+    if ( !resize(mTableSize << 1) ) {
+      // リサイズが失敗した．
+      return kEdgeInvalid;
+    }
   }
   {
     Node*& entry = mNodeTable[pos & mTableSize_1];
@@ -781,7 +800,7 @@ BddMgrClassic::dec_rootref(tBddEdge e)
 
   // ゴミがたまっていたら回収する．
   // ただし頻繁に gc() を呼びたくないので条件をもうけている．
-  if ( (mGcEnable == 0 || mNodeNum > mDangerousZone) &&
+  if ( mGcEnable == 0 &&
        mNodeNum > mGcNodeLimit	&&
        mGarbageNum > size_t(double(mNodeNum) * mGcThreshold)) {
     gc(false);
@@ -996,8 +1015,9 @@ BddMgrClassic::dealloc_nodechunk(Node* chunk)
 void*
 BddMgrClassic::allocate(size_t size)
 {
-  if ( mMemLimit > 0 && mUsedMem + size > mMemLimit ) {
+  if ( mOverflow || mMemLimit > 0 && mUsedMem + size > mMemLimit ) {
     // メモリ制限をオーバーしたので 0 を返す．
+    mOverflow = true;
     return 0;
   }
   mUsedMem += size;
@@ -1014,15 +1034,17 @@ BddMgrClassic::allocate(size_t size)
   }
   catch (alloc_xcpt x) {
     // new が失敗した．
+    mOverflow = true;
     return 0;
   }
 #endif
 
 #if defined(BDD_DEBUG_MEMALLOC)
   {
-    ios::flags save = logstream().flags();
+    ios::fmtflags save = logstream().flags();
     logstream() << "BddMgrClassic::allocate(" << size << ") --> "
-		<< setw(8) << hex << static_cast<ympuint>(ans) << endl;
+		<< setw(8) << hex << reinterpret_cast<ympuint>(ans) << dec
+		<< endl;
     logstream().flags(save);
   }
 #endif
@@ -1036,9 +1058,10 @@ BddMgrClassic::deallocate(void* ptr,
 {
 #if defined(BDD_DEBUG_MEMALLOC)
   {
-    ios::flags save = logstream().flags();
-    logstream() << "BddMgrClassic::deallocate(" << setw(8) << hex
-		<< static_cast<ympuint>(ptr) << ", " << size << ")" << endl;
+    ios::fmtflags save = logstream().flags();
+    logstream() << "BddMgrClassic::deallocate("
+		<< setw(8) << hex << reinterpret_cast<ympuint>(ptr) << dec
+		<< ", " << size << ")" << endl;
     logstream().flags(save);
   }
 #endif

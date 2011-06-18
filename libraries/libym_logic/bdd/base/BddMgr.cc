@@ -421,6 +421,20 @@ BddMgr::disable_DVO()
   mImpl->disable_DVO();
 }
 
+// @brief ガーベージコレクションを許可する．
+void
+BddMgr::enable_gc()
+{
+  mImpl->enable_gc();
+}
+
+// @brief ガーベージコレクションを禁止する．
+void
+BddMgr::disable_gc()
+{
+  mImpl->disable_gc();
+}
+
 // ガーベージコレクションを行なう．
 // 具体的には各ノードの参照回数が0のノードをフリーリストに回収し
 // 再利用できるよ うにする．

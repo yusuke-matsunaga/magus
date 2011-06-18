@@ -171,7 +171,7 @@ check_reverse(tBddEdge e1,
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class Bdd Bdd.h <ym_utils/Bdd.h>
+/// @class Bdd Bdd.h "ym_logic/Bdd.h"
 /// @ingroup Bdd
 /// @brief BDDを表すクラス
 /// @sa BddMgr
@@ -180,7 +180,6 @@ class Bdd
 {
   friend class BddMgr;
   friend class BddMgrImpl;
-  friend class DgMgr;
 
 public:
 
@@ -379,13 +378,6 @@ public:
   /// @retval 自分自身 終端節点の場合
   Bdd
   edge1() const;
-
-#if 0
-  /// @brief 親の BddMgr の取得
-  /// @return 親の BddMgr を返す．
-  BddMgr&
-  mgr() const;
-#endif
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -1206,17 +1198,6 @@ Bdd::root() const
   return mRoot;
 }
 
-#if 0
-// @brief 親の BDD マネージャを返す．
-// @return 親の BDD マネージャ
-inline
-BddMgr&
-Bdd::mgr() const
-{
-  return *mMgr;
-}
-#endif
-
 // @brief 定数0 のチェック
 // @return 定数0の時 true を返す．
 inline
@@ -1405,7 +1386,8 @@ BEGIN_NAMESPACE_HASH
 template <>
 struct hash<nsYm::nsBdd::Bdd>
 {
-  ymuint operator()(const nsYm::nsBdd::Bdd& bdd) const
+  ymuint
+  operator()(const nsYm::nsBdd::Bdd& bdd) const
   {
     return bdd.hash();
   }

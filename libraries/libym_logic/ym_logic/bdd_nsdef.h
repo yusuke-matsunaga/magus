@@ -50,6 +50,7 @@ BEGIN_NAMESPACE_YM_BDD
 
 class Bdd;
 class BddMgr;
+class BddMgrParam;
 class BddMgrImpl;
 class BddVarSet;
 class BddLitSet;
@@ -100,6 +101,7 @@ BEGIN_NAMESPACE_YM
 
 using nsBdd::Bdd;
 using nsBdd::BddMgr;
+using nsBdd::BddMgrParam;
 using nsBdd::BddVarSet;
 using nsBdd::BddLitSet;
 using nsBdd::BddVector;

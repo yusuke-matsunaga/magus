@@ -62,9 +62,11 @@ BddMgrClassic::and_op(tBddEdge f,
     tBddEdge g_0, g_1;
     Var* var = split(f, g, f_0, f_1, g_0, g_1);
     tBddEdge r_0 = and_op(f_0, g_0);
-    tBddEdge r_1 = and_op(f_1, g_1);
-    result = new_node(var, r_0, r_1);
-    mAndTable->put(f, g, result);
+    if ( !check_invalid(r_0) ) {
+      tBddEdge r_1 = and_op(f_1, g_1);
+      result = new_node(var, r_0, r_1);
+      mAndTable->put(f, g, result);
+    }
   }
 
   return result;
@@ -148,9 +150,11 @@ BddMgrClassic::xor_op(tBddEdge f,
     tBddEdge g_0, g_1;
     Var* var = split(f, g, f_0, f_1, g_0, g_1);
     tBddEdge r_0 = xor_op(f_0, g_0);
-    tBddEdge r_1 = xor_op(f_1, g_1);
-    result = new_node(var, r_0, r_1);
-    mXorTable->put(f, g, result);
+    if ( !check_invalid(r_0) ) {
+      tBddEdge r_1 = xor_op(f_1, g_1);
+      result = new_node(var, r_0, r_1);
+      mXorTable->put(f, g, result);
+    }
   }
 
   return addpol(result, ans_pol);

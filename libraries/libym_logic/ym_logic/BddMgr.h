@@ -345,6 +345,14 @@ public:
   /// @name 内部動作の設定を行う関数
   /// @{
 
+  /// @brief ガーベージコレクションを許可する．
+  void
+  enable_gc();
+
+  /// @brief ガーベージコレクションを禁止する．
+  void
+  disable_gc();
+
   /// @brief ガーベージコレクションを行なう．
   /// @param[in] shrink_nodetable この値が true の時,
   /// 可能なら節点テーブルのサイズを縮小する．

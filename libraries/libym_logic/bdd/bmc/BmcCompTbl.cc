@@ -135,19 +135,25 @@ BmcCompTbl1::~BmcCompTbl1()
 }
 
 // テーブルサイズを変更する．
-void
+bool
 BmcCompTbl1::resize(size_t new_size)
 {
   // ログの出力
   logstream() << "BmcCompTbl1[" << mName << "]::resize(" << new_size << ")"
 	      << endl;
 
+  // 新しいメモリ領域を確保する．
+  Cell* new_table = (Cell*)allocate(new_size * sizeof(Cell));
+  if ( new_table == NULL ) {
+    return false;
+  }
+
   // 昔の値を保存する．
   size_t old_size = mTableSize;
   Cell* old_table = mTable;
 
   // 新たなサイズを設定し，テーブルを確保する．
-  mTable = (Cell*)allocate(new_size * sizeof(Cell));
+  mTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   update_next_limit();
@@ -177,6 +183,8 @@ BmcCompTbl1::resize(size_t new_size)
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
+
+  return true;
 }
 
 // BddMgr::GC()に対応する．
@@ -232,19 +240,24 @@ BmcCompTbl2::~BmcCompTbl2()
 }
 
 // テーブルサイズを変更する．
-void
+bool
 BmcCompTbl2::resize(size_t new_size)
 {
   // ログの出力
   logstream() << "BmcCompTbl2[" << mName << "]::resize(" << new_size << ")"
 	      << endl;
 
+  // 新たなサイズを設定し，テーブルを確保する．
+  Cell* new_table = (Cell*)allocate(new_size * sizeof(Cell));
+  if ( new_table == NULL ) {
+    return false;
+  }
+
   // 昔の値を保存する．
   size_t old_size = mTableSize;
   Cell* old_table = mTable;
 
-  // 新たなサイズを設定し，テーブルを確保する．
-  mTable = (Cell*)allocate(new_size * sizeof(Cell));
+  mTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   update_next_limit();
@@ -275,6 +288,8 @@ BmcCompTbl2::resize(size_t new_size)
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
+
+  return true;
 }
 
 // BddMgr::GC()に対応する．
@@ -331,19 +346,25 @@ BmcCompTbl3::~BmcCompTbl3()
 }
 
 // テーブルサイズを変更する．
-void
+bool
 BmcCompTbl3::resize(size_t new_size)
 {
   // ログの出力
   logstream() << "BmcCompTbl3[" << mName << "]::resize(" << new_size << ")"
 	      << endl;
 
+  // 新たなサイズを設定し，テーブルを確保する．
+  Cell* new_table = (Cell*)allocate(new_size * sizeof(Cell));
+  if ( new_table == NULL ) {
+    return false;
+  }
+
   // 昔の値を保存する．
   size_t old_size = mTableSize;
   Cell* old_table = mTable;
 
   // 新たなサイズを設定し，テーブルを確保する．
-  mTable = (Cell*)allocate(new_size * sizeof(Cell));
+  mTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   update_next_limit();
@@ -375,6 +396,8 @@ BmcCompTbl3::resize(size_t new_size)
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
+
+  return true;
 }
 
 // BddMgr::GC()に対応する．
@@ -433,19 +456,25 @@ BmcIsopTbl::~BmcIsopTbl()
 }
 
 // テーブルサイズを変更する．
-void
+bool
 BmcIsopTbl::resize(size_t new_size)
 {
   // ログの出力
   logstream() << "BmcIsopTbl[" << mName << "]::resize(" << new_size << ")"
 	      << endl;
 
+  // 新たなサイズを設定し，テーブルを確保する．
+  Cell* new_table = (Cell*)allocate(new_size * sizeof(Cell));
+  if ( new_table == NULL ) {
+    return false;
+  }
+
   // 昔の値を保存する．
   size_t old_size = mTableSize;
   Cell* old_table = mTable;
 
   // 新たなサイズを設定し，テーブルを確保する．
-  mTable = (Cell*)allocate(new_size * sizeof(Cell));
+  mTable = new_table;
   mTableSize = new_size;
   mTableSize_1 = mTableSize - 1;
   update_next_limit();
@@ -479,6 +508,8 @@ BmcIsopTbl::resize(size_t new_size)
     } while ( top != end );
     deallocate((void*)old_table, old_size * sizeof(Cell));
   }
+
+  return true;
 }
 
 // BddMgr::GC()に対応する．

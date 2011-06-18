@@ -496,6 +496,22 @@ BddMgrModern::set_next_limit_size()
   }
 }
 
+// @brief ガーベージコレクションを許可する．
+void
+BddMgrModern::enable_gc()
+{
+  if ( mGcEnable > 0 ) {
+    -- mGcEnable;
+  }
+}
+
+// @brief ガーベージコレクションを禁止する．
+void
+BddMgrModern::disable_gc()
+{
+  ++ mGcEnable;
+}
+
 // ガーベージコレクションを行なう．
 // 具体的には各ノードの参照回数が0のノードをフリーリストに回収し
 // 再利用できるよ うにする．
@@ -831,7 +847,7 @@ BddMgrModern::dec_rootref(tBddEdge e)
 
   // ゴミがたまっていたら回収する．
   // ただし頻繁に gc() を呼びたくないので条件をもうけている．
-  if ( (mGcEnable == 0 || mNodeNum > mDangerousZone) &&
+  if ( mGcEnable == 0 &&
        mNodeNum > mGcNodeLimit	&&
        mGarbageNum > size_t(double(mNodeNum) * mGcThreshold)) {
     gc(false);

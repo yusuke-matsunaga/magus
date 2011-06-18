@@ -477,6 +477,16 @@ public:
   // 内部動作の設定を行う関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ガーベージコレクションを許可する．
+  virtual
+  void
+  enable_gc();
+
+  /// @brief ガーベージコレクションを禁止する．
+  virtual
+  void
+  disable_gc();
+
   // ガーベージコレクションを行なう．
   // shrink_nodetable = true の時, 可能なら節点テーブルのサイズを縮小する．
   virtual
@@ -920,16 +930,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 全てのノード数
-  size_t mNodeNum;
+  ymuint64 mNodeNum;
 
   // ゴミ（誰からも参照されていない）ノード数
-  size_t mGarbageNum;
+  ymuint64 mGarbageNum;
 
   // 使用メモリ量
-  size_t mUsedMem;
+  ymuint64 mUsedMem;
 
   // GCの起こった回数
-  size_t mGcCount;
+  ymuint64 mGcCount;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -939,7 +949,7 @@ private:
   // mVarTable 用に確保されたサイズ(単位はエントリ数)
   tVarSize mVarTableSize;
 
-  // 確保された変数の数(<= mVarTableCapSize)
+  // 確保された変数の数(<= mVarTableSize)
   tVarSize mVarNum;
 
   // 変数リストの先頭
@@ -954,13 +964,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // テーブルサイズ
-  size_t mTableSize;
+  ymuint64 mTableSize;
 
   // テーブルサイズ - 1
-  size_t mTableSize_1;
+  ymuint64 mTableSize_1;
 
   // ノード数がこの数を越えたらテーブルサイズを拡張する．
-  size_t mNextLimit;
+  ymuint64 mNextLimit;
 
   // テーブル本体
   Node** mNodeTable;
@@ -1006,7 +1016,7 @@ private:
   Node* mFreeTop;
 
   // フリーな節点数
-  size_t mFreeNum;
+  ymuint64 mFreeNum;
 
   // 今までに確保したメモリブロックの先頭
   Node* mTopBlk;
@@ -1015,7 +1025,10 @@ private:
   Node* mCurBlk;
 
   // mCurBlk の何番目まで使用しているかを示すインデックス
-  size_t mCurIdx;
+  ymuint32 mCurIdx;
+
+  // メモリ確保が失敗した時にオンになるフラグ
+  bool mOverflow;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -1026,7 +1039,7 @@ private:
   int mGcEnable;
 
   // ノード数がこの数を越えたら mGcEnable は常に true だと思う
-  size_t mDangerousZone;
+  ymuint64 mDangerousZone;
 
   // GC 前に sweep 処理を行うオブジェクトを管理するマネージャ
   EventBindMgr mSweepMgr;
@@ -1040,7 +1053,7 @@ private:
   list<Var*> mVarSet;
 
   // dump/size で節点数を数えるための作業領域
-  size_t mNum;
+  ymuint64 mNum;
 
   // smooth 用変数の最大レベル
   tLevel mLastLevel;

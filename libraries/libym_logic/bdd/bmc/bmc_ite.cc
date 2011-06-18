@@ -124,9 +124,11 @@ BddMgrClassic::ite_op(tBddEdge f,
       split1(top, g_level, g, g_vp, g_pol, g_0, g_1);
       split1(top, h_level, h, h_vp, h_pol, h_0, h_1);
       tBddEdge r_0 = ite_op(f_0, g_0, h_0);
-      tBddEdge r_1 = ite_op(f_1, g_1, h_1);
-      result = new_node(var, r_0, r_1);
-      mIteTable->put(f, g, h, result);
+      if ( !check_invalid(r_0) ) {
+	tBddEdge r_1 = ite_op(f_1, g_1, h_1);
+	result = new_node(var, r_0, r_1);
+	mIteTable->put(f, g, h, result);
+      }
     }
   }
   return addpol(result, ans_pol);
@@ -195,16 +197,18 @@ BddMgrClassic::compose_step(tBddEdge f)
     tBddEdge f_0 = f_vp->edge0();
     tBddEdge f_1 = f_vp->edge1();
     tBddEdge r_0 = compose_step(f_0);
-    tBddEdge r_1 = compose_step(f_1);
-    tBddEdge tmp;
-    if ( f_var->mMark == 1 ) {
-      tmp = f_var->mCompEdge;
+    if ( !check_invalid(r_0) ) {
+      tBddEdge r_1 = compose_step(f_1);
+      tBddEdge tmp;
+      if ( f_var->mMark == 1 ) {
+	tmp = f_var->mCompEdge;
+      }
+      else {
+	tmp = new_node(f_var, kEdge0, kEdge1);
+      }
+      result = ite_op(tmp, r_1, r_0);
+      mCmpTable->put(f, result);
     }
-    else {
-      tmp = new_node(f_var, kEdge0, kEdge1);
-    }
-    result = ite_op(tmp, r_1, r_0);
-    mCmpTable->put(f, result);
   }
 
   return addpol(result, f_pol);
@@ -267,9 +271,11 @@ BddMgrClassic::pd_step(tBddEdge e,
       tBddEdge e0 = vp->edge0();
       tBddEdge e1 = vp->edge1();
       tBddEdge r0 = pd_step(e0, x_level, y_level, pol);
-      tBddEdge r1 = pd_step(e1, x_level, y_level, pol);
-      result = new_node(vp->var(), r0, r1);
-      mPushDownTable->put(e, xy_edge, result);
+      if ( !check_invalid(r0) ) {
+	tBddEdge r1 = pd_step(e1, x_level, y_level, pol);
+	result = new_node(vp->var(), r0, r1);
+	mPushDownTable->put(e, xy_edge, result);
+      }
     }
   }
   return addpol_ifvalid(result, e_pol);
@@ -296,15 +302,16 @@ BddMgrClassic::pd_step2(tBddEdge e,
     tBddEdge e0 = vp->edge0();
     tBddEdge e1 = vp->edge1();
     tBddEdge r0 = pd_step2(e0, y_level);
-    tBddEdge r1 = pd_step2(e1, y_level);
-
-    tVarId vid = varid(vp->level() - 1);
-    Var* var = var_of(vid);
-    if ( !var ) {
-      var = alloc_var(vid);
+    if ( !check_invalid(r0) ) {
+      tBddEdge r1 = pd_step2(e1, y_level);
+      tVarId vid = varid(vp->level() - 1);
+      Var* var = var_of(vid);
+      if ( !var ) {
+	var = alloc_var(vid);
+      }
+      result = new_node(var, r0, r1);
+      mPushDownTable2->put(e, xy_edge, result);
     }
-    result = new_node(var, r0, r1);
-    mPushDownTable2->put(e, xy_edge, result);
   }
   return addpol_ifvalid(result, e_pol);
 }
@@ -360,15 +367,17 @@ BddMgrClassic::pd_step3(tBddEdge e0,
 	e10 = e11 = e1;
       }
       tBddEdge r0 = pd_step3(e00, e10, y_level, pol);
-      tBddEdge r1 = pd_step3(e01, e11, y_level, pol);
-      tVarId vid = varid(top_level - 1);
-      Var* var = var_of(vid);
-      if ( !var ) {
-	var = alloc_var(vid);
+      if ( !check_invalid(r0) ) {
+	tBddEdge r1 = pd_step3(e01, e11, y_level, pol);
+	tVarId vid = varid(top_level - 1);
+	Var* var = var_of(vid);
+	if ( !var ) {
+	  var = alloc_var(vid);
+	}
+	result = new_node(var, r0, r1);
+	mPushDownTable3->put(e0, e1, xy_edge, result);
       }
-      result = new_node(var, r0, r1);
     }
-    mPushDownTable3->put(e0, e1, xy_edge, result);
   }
   return result;
 }
@@ -438,8 +447,10 @@ BddMgrClassic::gcofactor_step(tBddEdge f,
 
     if ( f_level < c_level ) {
       tBddEdge r0 = gcofactor_step(f_0, c);
-      tBddEdge r1 = gcofactor_step(f_1, c);
-      result = new_node(f_var, r0, r1);
+      if ( !check_invalid(r0) ) {
+	tBddEdge r1 = gcofactor_step(f_1, c);
+	result = new_node(f_var, r0, r1);
+      }
     }
     else {
       tBddEdge c_0 = c_v->edge0(c_p);
@@ -452,8 +463,10 @@ BddMgrClassic::gcofactor_step(tBddEdge f,
       }
       else {
 	tBddEdge r0 = gcofactor_step(f_0, c_0);
-	tBddEdge r1 = gcofactor_step(f_1, c_1);
-	result = new_node(c_var, r0, r1);
+	if ( !check_invalid(r0) ) {
+	  tBddEdge r1 = gcofactor_step(f_1, c_1);
+	  result = new_node(c_var, r0, r1);
+	}
       }
     }
     mCofacTable->put(f, c, result);
@@ -561,9 +574,10 @@ BddMgrClassic::cubediv_step(tBddEdge f)
       tBddEdge f_1 = f_vp->edge1();
 
       tBddEdge r_0 = cubediv_step(f_0);
-      tBddEdge r_1 = cubediv_step(f_1);
-
-      result = new_node(f_var, r_0, r_1);
+      if ( !check_invalid(r_0) ) {
+	tBddEdge r_1 = cubediv_step(f_1);
+	result = new_node(f_var, r_0, r_1);
+      }
     }
     mCubedivTable->put(f, result);
   }
@@ -634,8 +648,10 @@ BddMgrClassic::xcofactor_step(tBddEdge f)
     }
     else { // level < mLastLevel
       tBddEdge r_0 = xcofactor_step(e_0);
-      tBddEdge r_1 = xcofactor_step(e_1);
-      result = new_node(var, r_0, r_1);
+      if ( !check_invalid(r_0) ) {
+	tBddEdge r_1 = xcofactor_step(e_1);
+	result = new_node(var, r_0, r_1);
+      }
     }
     // ハッシュに登録しておく．
     mXcofactorTable->put(f, result);
