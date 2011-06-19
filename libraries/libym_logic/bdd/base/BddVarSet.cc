@@ -156,7 +156,7 @@ BddVarSet::empty() const
 }
 
 // 要素数を返す．
-size_t
+ymuint
 BddVarSet::size() const
 {
   if ( !static_cast<bool>(mSize & 1U) ) {
@@ -237,7 +237,7 @@ BddVarSet::operator-=(const BddVarSet& set2)
 }
 
 // 変数番号の vector に変換する．
-size_t
+ymuint
 BddVarSet::to_vector(VarVector& dst) const
 {
   // 手抜き
@@ -245,7 +245,7 @@ BddVarSet::to_vector(VarVector& dst) const
 }
 
 // 変数番号の list に変換する．
-size_t
+ymuint
 BddVarSet::to_list(VarList& dst) const
 {
   // 手抜き
@@ -254,16 +254,16 @@ BddVarSet::to_list(VarList& dst) const
 
 // サイズを設定する．
 void
-BddVarSet::set_size(size_t size) const
+BddVarSet::set_size(ymuint size) const
 {
-  mSize = (size << 1) | static_cast<size_t>(true);
+  mSize = (size << 1) | static_cast<ymuint>(true);
 }
 
 // サイズを無効化する．
 void
 BddVarSet::invalidate_size()
 {
-  mSize = static_cast<size_t>(false);
+  mSize = static_cast<ymuint>(false);
 }
 
 // ostream に対する出力
