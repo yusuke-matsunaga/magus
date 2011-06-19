@@ -20,32 +20,32 @@ BEGIN_NONAMESPACE
 tLevel x_level;
 tLevel y_level;
 
-tBddEdge xy_edge;
-tBddEdge y_edge;
+BddEdge xy_edge;
+BddEdge y_edge;
 
 END_NONAMESPACE
 
-// xを含まないパスeがyも含まなければkEdge1(Trueのつもり)を返す．
-tBddEdge
-BddMgrClassic::cs_step2(tBddEdge e)
+// xを含まないパスeがyも含まなければBddEdge::make_one()(Trueのつもり)を返す．
+BddEdge
+BddMgrClassic::cs_step2(BddEdge e)
 {
   Node* vp = get_node(e);
   if ( vp == 0 ) {
-    return kEdge1;
+    return BddEdge::make_one();
   }
   tLevel level = vp->level();
   if ( level > y_level ) {
-    return kEdge1;
+    return BddEdge::make_one();
   }
   else if ( level == y_level ) {
-    return kEdge0;
+    return BddEdge::make_zero();
   }
 
-  tBddEdge e2 = combine(vp, kPolPosi);
-  tBddEdge result = mCs2Table->get(e2, y_edge);
-  if ( result == kEdgeInvalid ) {
+  BddEdge e2 = combine(vp, kPolPosi);
+  BddEdge result = mCs2Table->get(e2, y_edge);
+  if ( result.is_error() ) {
     result = cs_step2(vp->edge0());
-    if ( result == kEdge1 ) {
+    if ( result == BddEdge::make_one() ) {
       result = cs_step2(vp->edge1());
     }
     mCs2Table->put(e2, y_edge, result);
@@ -54,10 +54,10 @@ BddMgrClassic::cs_step2(tBddEdge e)
 }
 
 // xを0にしたパスe1と1にしたパスe2をくらべて，それぞれyを1/0にした結果が
-// 同一ならばkEdge1(True)を返す．つまりこのパスに関してはxとyは対称
-tBddEdge
-BddMgrClassic::cs_step1(tBddEdge e1,
-			tBddEdge e2,
+// 同一ならばBddEdge::make_one()(True)を返す．つまりこのパスに関してはxとyは対称
+BddEdge
+BddMgrClassic::cs_step1(BddEdge e1,
+			BddEdge e2,
 			tPol sympol)
 {
   Node* vp1 = get_node(e1);
@@ -72,17 +72,17 @@ BddMgrClassic::cs_step1(tBddEdge e1,
     return cs_step2(e1);
   }
   if ( top_level > y_level ) {
-    return kEdge0;
+    return BddEdge::make_zero();
   }
 
-  tBddEdge result = mCs1Table->get(e1, e2, xy_edge);
-  if ( result == kEdgeInvalid ) {
-    tBddEdge e10;
-    tBddEdge e11;
-    tBddEdge e20;
-    tBddEdge e21;
+  BddEdge result = mCs1Table->get(e1, e2, xy_edge);
+  if ( result.is_error() ) {
+    BddEdge e10;
+    BddEdge e11;
+    BddEdge e20;
+    BddEdge e21;
     if ( level1 == top_level ) {
-      tPol pol1 = get_pol(e1);
+      tPol pol1 = e1.pol();
       e10 = vp1->edge0(pol1);
       e11 = vp1->edge1(pol1);
     }
@@ -90,7 +90,7 @@ BddMgrClassic::cs_step1(tBddEdge e1,
       e10 = e11 = e1;
     }
     if ( level2 == top_level ) {
-      tPol pol2 = get_pol(e2);
+      tPol pol2 = e2.pol();
       e20 = vp2->edge0(pol2);
       e21 = vp2->edge1(pol2);
     }
@@ -99,16 +99,16 @@ BddMgrClassic::cs_step1(tBddEdge e1,
     }
     if ( top_level < y_level ) {
       result = cs_step1(e10, e20, sympol);
-      if ( result == kEdge1 ) {
+      if ( result == BddEdge::make_one() ) {
 	result = cs_step1(e11, e21, sympol);
       }
     }
     else { // top_level == y_level
       if ( sympol == kPolPosi ) {
-	result = (e11 == e20) ? kEdge1 : kEdge0;
+	result = (e11 == e20) ? BddEdge::make_one() : BddEdge::make_zero();
       }
       else {
-	result = (e10 == e21) ? kEdge1 : kEdge0;
+	result = (e10 == e21) ? BddEdge::make_one() : BddEdge::make_zero();
       }
     }
     mCs1Table->put(e1, e2, xy_edge, result);
@@ -116,30 +116,30 @@ BddMgrClassic::cs_step1(tBddEdge e1,
   return result;
 }
 
-tBddEdge
-BddMgrClassic::cs_step(tBddEdge e,
+BddEdge
+BddMgrClassic::cs_step(BddEdge e,
 		       tPol sympol)
 {
   Node* vp = get_node(e);
   if ( vp == 0 ) {
-    return kEdge1;
+    return BddEdge::make_one();
   }
   tLevel level = vp->level();
   if ( level > y_level ) {
-    return kEdge1;
+    return BddEdge::make_one();
   }
   else if ( level == y_level ) {
     // ここまでのパスにxが含まれず，yが含まれているので false
-    return kEdge0;
+    return BddEdge::make_zero();
   }
 
   // 極性は落としてしまう．
   e = combine(vp, kPolPosi);
-  tBddEdge result = mCsTable->get(e, xy_edge);
-  if ( result == kEdgeInvalid ) {
+  BddEdge result = mCsTable->get(e, xy_edge);
+  if ( result.is_error() ) {
     if ( level < x_level ) {
       result = cs_step(vp->edge0(), sympol);
-      if ( result == kEdge1 ) {
+      if ( result == BddEdge::make_one() ) {
 	result = cs_step(vp->edge1(), sympol);
       }
     }
@@ -148,7 +148,7 @@ BddMgrClassic::cs_step(tBddEdge e,
     }
     else {
       result = cs_step2(vp->edge0());
-      if ( result == kEdge1 ) {
+      if ( result == BddEdge::make_one() ) {
 	result = cs_step2(vp->edge1());
       }
     }
@@ -162,7 +162,7 @@ BddMgrClassic::cs_step(tBddEdge e,
 // 演算結果テーブルが拡張される可能性があるのでメモリ不足によって
 // エラーとなる可能性がある．
 bool
-BddMgrClassic::check_symmetry(tBddEdge e,
+BddMgrClassic::check_symmetry(BddEdge e,
 			      tVarId x,
 			      tVarId y,
 			      tPol pol)
@@ -180,14 +180,14 @@ BddMgrClassic::check_symmetry(tBddEdge e,
     y_level = tmp;
   }
 
-  y_edge = make_bddedge(y, kEdge0, kEdge1);
-  xy_edge = make_bddedge(x, kEdge0, addpol(y_edge, pol));
+  y_edge = make_bdd(y, BddEdge::make_zero(), BddEdge::make_one());
+  xy_edge = make_bdd(x, BddEdge::make_zero(), BddEdge(y_edge, pol));
 
   activate(xy_edge);
-  tBddEdge ans = cs_step(e, pol);
+  BddEdge ans = cs_step(e, pol);
   deactivate(xy_edge);
 
-  return ans == kEdge1;
+  return ans == BddEdge::make_one();
 }
 
 END_NAMESPACE_YM_BDD

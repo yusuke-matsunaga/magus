@@ -97,7 +97,7 @@ private:
   int mMark;
 
   // compose用にBDDの枝を入れておくメンバ
-  tBddEdge mCompEdge;
+  BddEdge mCompEdge;
 
   // ハッシュ表中の次の要素を指すポインタ
   BmmVar* mLink;

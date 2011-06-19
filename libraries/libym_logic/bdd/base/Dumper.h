@@ -22,26 +22,30 @@ BEGIN_NAMESPACE_YM_BDD
 class IdMgr
 {
 public:
-  // コンストラクタ
+
+  /// @brief コンストラクタ
   IdMgr();
 
-  // デストラクタ
+  /// @brief デストラクタ
   ~IdMgr();
 
-  // e がすでに ID 番号を持っていたら true を返す．
+
+public:
+
+  /// @brief e がすでに ID 番号を持っていたら true を返す．
   bool
-  has_id(tBddEdge e) const;
+  has_id(BddEdge e) const;
 
-  // e の ID 番号を返す．
-  // 未登録ならば新しい番号を割り振る．
-  size_t
-  id(tBddEdge e);
+  /// @brief e の ID 番号を返す．
+  /// @note未登録ならば新しい番号を割り振る．
+  ymuint
+  id(BddEdge e);
 
-  // 登録された節点数を返す．
-  size_t
+  /// @brief 登録されている節点数を返す．
+  ymuint
   num() const;
 
-  // クリアする．
+  /// @brief クリアする．
   void
   clear();
 
@@ -51,11 +55,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // tBddEdge と ID 番号の対応表
-  hash_map<tBddEdge, size_t> mMap;
+  // BddEdge と ID 番号の対応表
+  hash_map<BddEdge, ymuint> mMap;
 
   // 次に割り当てるID番号
-  size_t mNext;
+  ymuint mNext;
 
 };
 
@@ -68,35 +72,41 @@ class Displayer
 
 public:
 
-  // コンストラクタ
+  /// @brief コンストラクタ
   Displayer(BddMgrImpl* mgr,
 	    ostream& s);
 
-  // デストラクタ
+  /// @brief デストラクタ
   ~Displayer();
 
-  // 登録された節点数を返す．
-  size_t
+
+public:
+
+  /// @brief 登録された節点数を返す．
+  ymuint
   num() const;
 
-  // e を根とするBDDの内容を出力する．
+  /// @brief e を根とするBDDの内容を出力する．
   void
-  display_root(tBddEdge e);
+  display_root(BddEdge e);
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
 
-  // e の ID 番号を出力する．
+  /// @brief e の ID 番号を出力する．
   void
-  display_id(tBddEdge e);
+  display_id(BddEdge e);
 
-  // e の内容を出力する．
+  /// @brief e の内容を出力する．
   void
-  display_name(tBddEdge e);
+  display_name(BddEdge e);
 
-  // display_root の下請関数
+  /// @brief display_root の下請関数
   void
-  display_step(tBddEdge e);
+  display_step(BddEdge e);
 
 
 private:
@@ -110,8 +120,8 @@ private:
   // 出力用のストリーム
   ostream& mStream;
 
-  // 処理済の tBddEdge に印を付けておくためのハッシュ表
-  hash_set<tBddEdge> mMark;
+  // 処理済の BddEdge に印を付けておくためのハッシュ表
+  hash_set<BddEdge> mMark;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;
@@ -126,20 +136,25 @@ class Dumper
 {
 public:
 
-  // コンストラクタ
+  /// @brief コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] s 出力先のストリーム
   Dumper(BddMgrImpl* mgr,
 	 ostream& s);
 
-  // デストラクタ
+  /// @brief デストラクタ
   ~Dumper();
 
-  // e を根とするBDDの内容を出力する．
-  void
-  dump(tBddEdge e);
 
-  // e の内容を出力する．
+public:
+
+  /// @brief e を根とするBDDの内容を出力する．
   void
-  dump_edge(tBddEdge e);
+  dump(BddEdge e);
+
+  /// @brief e の内容を出力する．
+  void
+  dump_edge(BddEdge e);
 
 
 private:
@@ -166,29 +181,38 @@ class Restorer
 {
 public:
 
-  // コンストラクタ
+  /// @brief コンストラクタ
+  /// @param[in] mgr BddMgr
+  /// @param[in] s 入力元のストリーム
   Restorer(BddMgrImpl* mgr,
 	   istream& s);
 
-  // デストラクタ
+  /// @brief デストラクタ
   ~Restorer();
 
-  // 読み込む．
-  // 読み込んだBDDの根の枝の数を返す．
-  // エラーが起きたら 0 を返す．
-  size_t
+
+public:
+
+  /// @brief 読み込む．
+  /// @return 読み込んだBDDの根の枝の数を返す．
+  /// @note エラーが起きたら 0 を返す．
+  ymuint
   read();
 
-  // pos 番目の枝を返す．
-  tBddEdge
-  root(size_t pos);
+  /// @brief pos 番目の枝を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < read() の返り値 )
+  BddEdge
+  root(ymuint pos);
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
 
-  // 内部の枝を指す文字列から枝を得る．
-  // 見つからなければ kEdgeError を返す．
-  tBddEdge
+  /// @brief 内部の枝を指す文字列から枝を得る．
+  /// @return 見つからなければ kEdgeError を返す．
+  BddEdge
   find_edge(const char* str) const;
 
 
@@ -204,10 +228,10 @@ private:
   istream& mStream;
 
   // 根の枝を格納しておくベクタ
-  vector<tBddEdge> mRootVector;
+  vector<BddEdge> mRootVector;
 
   // 内部の枝を格納しておくベクタ
-  vector<tBddEdge> mEdgeVector;
+  vector<BddEdge> mEdgeVector;
 
 };
 

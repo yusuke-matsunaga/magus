@@ -47,6 +47,8 @@ public:
   typedef BmcCompTbl3 CompTbl3;
   typedef BmcIsopTbl IsopTbl;
 
+  friend class BmcCompTbl;
+
 public:
 
   /// @brief コンストラクタ
@@ -67,12 +69,12 @@ public:
   // e の参照回数を増やす．
   virtual
   void
-  inc_rootref(tBddEdge e);
+  inc_rootref(BddEdge e);
 
   // e の参照回数を減らす．
   virtual
   void
-  dec_rootref(tBddEdge e);
+  dec_rootref(BddEdge e);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -119,7 +121,7 @@ public:
 
   // 肯定のリテラル関数を作る
   virtual
-  tBddEdge
+  BddEdge
   make_posiliteral(tVarId varid);
 
 
@@ -129,72 +131,66 @@ public:
 
   // src1 & src2 を計算する．
   virtual
-  tBddEdge
-  and_op(tBddEdge e1,
-	 tBddEdge e2);
-
-  // src1 | src2 を計算する．
-  virtual
-  tBddEdge
-  or_op(tBddEdge e1,
-	tBddEdge e2);
+  BddEdge
+  and_op(BddEdge e1,
+	 BddEdge e2);
 
   // src1 ^ src2 を計算する．
   virtual
-  tBddEdge
-  xor_op(tBddEdge e1,
-	 tBddEdge e2);
+  BddEdge
+  xor_op(BddEdge e1,
+	 BddEdge e2);
 
   // src1 と src2 の共通部分があれば kEdge1 を返す．
   virtual
-  tBddEdge
-  check_intersect(tBddEdge e1,
-		  tBddEdge e2);
+  BddEdge
+  check_intersect(BddEdge e1,
+		  BddEdge e2);
 
   // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
   // 求める処理
   virtual
-  tBddEdge
-  xor_moment(tBddEdge e,
+  BddEdge
+  xor_moment(BddEdge e,
 	     tVarId idx);
 
   // bdd がキューブの時 true を返す．
   virtual
   bool
-  check_cube(tBddEdge e);
+  check_cube(BddEdge e);
 
   // bdd が肯定リテラルのみからなるキューブの時 true を返す．
   virtual
   bool
-  check_posi_cube(tBddEdge e);
+  check_posi_cube(BddEdge e);
 
   // 変数xとyが対称(交換可能)な時にtrueを返す．
   virtual
   bool
-  check_symmetry(tBddEdge e,
+  check_symmetry(BddEdge e,
 		 tVarId x,
 		 tVarId y,
 		 tPol pol);
 
   // 一つの変数に対する cofactor を計算する．
   virtual
-  tBddEdge
-  scofactor(tBddEdge e1,
+  BddEdge
+  scofactor(BddEdge e1,
 	    tVarId id,
 	    tPol pol);
 
   // generalized cofactor を計算する．
   virtual
-  tBddEdge
-  gcofactor(tBddEdge e1,
-	    tBddEdge e2);
+  BddEdge
+  gcofactor(BddEdge e1,
+	    BddEdge e2);
 
   // if-then-else 演算を計算する．
   virtual
-  tBddEdge
-  ite_op(tBddEdge e1,
-	 tBddEdge e2,
-	 tBddEdge e3);
+  BddEdge
+  ite_op(BddEdge e1,
+	 BddEdge e2,
+	 BddEdge e3);
 
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -205,18 +201,18 @@ public:
   virtual
   void
   compose_reg(tVarId id,
-	      tBddEdge e);
+	      BddEdge e);
 
   // multiple compose 演算の本体
   virtual
-  tBddEdge
-  compose(tBddEdge e);
+  BddEdge
+  compose(BddEdge e);
 
   // x_level の変数を y_level まで「押し込む」．
   // pol が kPolNega の時は 0-枝と 1-枝を取り替える．
   virtual
-  tBddEdge
-  push_down(tBddEdge e,
+  BddEdge
+  push_down(BddEdge e,
 	    tLevel x_level,
 	    tLevel y_level,
 	    tPol pol);
@@ -224,42 +220,42 @@ public:
   // smoothing(elimination)
   // svars に含まれる変数を消去する．
   virtual
-  tBddEdge
-  esmooth(tBddEdge e1,
-	  tBddEdge e2);
+  BddEdge
+  esmooth(BddEdge e1,
+	  BddEdge e2);
 
   // src1 と src2 の論理積を計算して src3 の変数を消去する．
   virtual
-  tBddEdge
-  and_exist(tBddEdge e1,
-	    tBddEdge e2,
-	    tBddEdge e3);
+  BddEdge
+  and_exist(BddEdge e1,
+	    BddEdge e2,
+	    BddEdge e3);
 
   // lower と upper で指定された不完全指定論理関数の非冗長積和形を求める．
   virtual
-  tBddEdge
-  isop(tBddEdge l,
-       tBddEdge u,
+  BddEdge
+  isop(BddEdge l,
+       BddEdge u,
        LogExpr& cover);
 
   // lower と upper で指定された不完全指定論理関数の主項カバーを求める．
   virtual
   LogExpr
-  prime_cover(tBddEdge l,
-	      tBddEdge u);
+  prime_cover(BddEdge l,
+	      BddEdge u);
 
   // lower と upper で指定された不完全指定論理関数の極小サポート集合をすべて
   // 列挙する．解は論理関数の形で返される．そのなかの主項がサポート集合に
   // 対応している．
   virtual
-  tBddEdge
-  minimal_support(tBddEdge l,
-		  tBddEdge u);
+  BddEdge
+  minimal_support(BddEdge l,
+		  BddEdge u);
 
   // smallest cube containing F 演算
   virtual
-  tBddEdge
-  SCC(tBddEdge e);
+  BddEdge
+  SCC(BddEdge e);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -273,33 +269,33 @@ public:
   // f0, f1 には自分自身を代入する．
   virtual
   tVarId
-  root_decomp(tBddEdge e,
-	      tBddEdge& e0,
-	      tBddEdge& e1);
+  root_decomp(BddEdge e,
+	      BddEdge& e0,
+	      BddEdge& e1);
 
   // 根の変数番号インデックスを取り出す．
   // 定数節点の場合には kVarIdMax を返す．
   virtual
   tVarId
-  root_var(tBddEdge e);
+  root_var(BddEdge e);
 
   // 0枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
-  tBddEdge
-  edge0(tBddEdge e);
+  BddEdge
+  edge0(BddEdge e);
 
   // 1枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
-  tBddEdge
-  edge1(tBddEdge e);
+  BddEdge
+  edge1(BddEdge e);
 
   // e の指すノードの参照回数が 0 の時 true を返す．
   // e が終端ノードの場合には false を返す．
   virtual
   bool
-  check_noref(tBddEdge e);
+  check_noref(BddEdge e);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -309,19 +305,19 @@ public:
   // 1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
-  tBddEdge
-  onepath(tBddEdge e);
+  BddEdge
+  onepath(BddEdge e);
 
   // 最短の1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
-  tBddEdge
-  shortest_onepath(tBddEdge e);
+  BddEdge
+  shortest_onepath(BddEdge e);
 
   // 最短の1パスの長さを求める．
   virtual
   tVarSize
-  shortest_onepath_len(tBddEdge e);
+  shortest_onepath_len(BddEdge e);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -331,33 +327,33 @@ public:
   // e を根とするBDDのノード数を数える．
   virtual
   size_t
-  size(tBddEdge e);
+  size(BddEdge e);
 
   // edge_list に登録されたBDDのノード数を数える．
   virtual
   size_t
-  size(const list<tBddEdge>& edge_list);
+  size(const list<BddEdge>& edge_list);
 
   // BDD の表す論理関数の minterm の数を返す．
   // 無限長精度の整数(mpz_class)を用いて計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
-  minterm_count(tBddEdge e,
+  minterm_count(BddEdge e,
 		tVarSize n);
 
   // Walsh 変換の0次の係数を計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
-  walsh0(tBddEdge e,
+  walsh0(BddEdge e,
 	 tVarSize n);
 
   // Walsh 変換の1次の係数を計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
-  walsh1(tBddEdge e,
+  walsh1(BddEdge e,
 	 tVarId var,
 	 tVarSize n);
 
@@ -369,12 +365,12 @@ public:
   // e を根とするBDDのサポートに印をつける．
   virtual
   tVarSize
-  mark_support(tBddEdge e);
+  mark_support(BddEdge e);
 
   // edge_list に登録されたBDDのサポートに印をつける．
   virtual
   tVarSize
-  mark_support(const list<tBddEdge>& edge_list);
+  mark_support(const list<BddEdge>& edge_list);
 
   // 印のついた変数をベクタに変換する．
   virtual
@@ -388,7 +384,7 @@ public:
 
   // 印のついた変数をBDD(キューブ)に変換する．
   virtual
-  tBddEdge
+  BddEdge
   mark_to_bdd();
 
 
@@ -398,21 +394,21 @@ public:
 
   // src1 と src2 が変数集合の時に共通部分を求める．
   virtual
-  tBddEdge
-  vscap(tBddEdge e1,
-	tBddEdge e2);
+  BddEdge
+  vscap(BddEdge e1,
+	BddEdge e2);
 
   // src1 と src2 が変数集合の時に集合差を求める．
   virtual
-  tBddEdge
-  vsdiff(tBddEdge e1,
-	 tBddEdge e2);
+  BddEdge
+  vsdiff(BddEdge e1,
+	 BddEdge e2);
 
   // src1 と src2 が変数集合の時のインターセクションチェック
   virtual
   bool
-  vsintersect(tBddEdge e1,
-	      tBddEdge e2);
+  vsintersect(BddEdge e1,
+	      BddEdge e2);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -421,32 +417,32 @@ public:
 
   // src1 と src2 がリテラル集合の時に共通部分を求める．
   virtual
-  tBddEdge
-  lscap(tBddEdge e1,
-	tBddEdge e2);
+  BddEdge
+  lscap(BddEdge e1,
+	BddEdge e2);
 
   // src1 と src2 がリテラル集合の時に集合差を求める．
   virtual
-  tBddEdge
-  lsdiff(tBddEdge e1,
-	 tBddEdge e2);
+  BddEdge
+  lsdiff(BddEdge e1,
+	 BddEdge e2);
 
   // src1 と src2 がリテラル集合の時のインターセクションチェック
   virtual
   bool
-  lsintersect(tBddEdge e1,
-	      tBddEdge e2);
+  lsintersect(BddEdge e1,
+	      BddEdge e2);
 
   // LitSet 用のBDDからリテラルのベクタを作る．
   virtual
   tVarSize
-  to_literalvector(tBddEdge e,
+  to_literalvector(BddEdge e,
 		   LiteralVector& dst);
 
   // LitSet 用のBDDからリテラルのリストを作る．
   virtual
   tVarSize
-  to_literallist(tBddEdge e,
+  to_literallist(BddEdge e,
 		 LiteralList& dst);
 
 
@@ -457,20 +453,20 @@ public:
   // e を根とするBDDの節点に n-mark を付け，各変数ごとのノード数を数える．
   virtual
   void
-  scan(tBddEdge e,
+  scan(BddEdge e,
        hash_map<tVarId, size_t>& node_counts);
 
   // e を根とするBDDのレベル level のノード数を数える．
   // ただし，n-mark の付いていないノードがあったら UINT_MAX を返す．
   virtual
   size_t
-  count_at(tBddEdge e,
+  count_at(BddEdge e,
 	   tLevel level);
 
   // scan で付けた n-mark を消す．
   virtual
   void
-  clear_scanmark(tBddEdge e);
+  clear_scanmark(BddEdge e);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -544,6 +540,7 @@ public:
   gc_count() const;
 
 
+private:
   //////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////
@@ -553,174 +550,179 @@ public:
 
   // 左右の枝が同じ場合にはその枝自身を返し，それ以外の場合には，
   // 与えられた枝とインデックスを持つノードを返す．
-  tBddEdge
+  BddEdge
   new_node(Var* var,
-	   tBddEdge l,
-	   tBddEdge h);
+	   BddEdge l,
+	   BddEdge h);
 
 
   //////////////////////////////////////////////////////////////////////
   // 上記の XXX_op() の内部で用いられる再帰関数
   //////////////////////////////////////////////////////////////////////
 
+  // and_op/or_op の下請け関数
+  BddEdge
+  and_step(BddEdge e1,
+	   BddEdge e2);
+
   // compose 演算を行う．
-  tBddEdge
-  compose_step(tBddEdge f);
+  BddEdge
+  compose_step(BddEdge f);
 
   // push_down のサブルーティン
-  tBddEdge
-  pd_step(tBddEdge e,
+  BddEdge
+  pd_step(BddEdge e,
 	  tLevel x_level,
 	  tLevel y_level,
 	  tPol pol);
-  tBddEdge
-  pd_step2(tBddEdge e,
+  BddEdge
+  pd_step2(BddEdge e,
 	   tLevel y_level);
-  tBddEdge
-  pd_step3(tBddEdge e0,
-	   tBddEdge e1,
+  BddEdge
+  pd_step3(BddEdge e0,
+	   BddEdge e1,
 	   tLevel y_level,
 	   tPol pol);
 
   // generalized cofactorの内部版．
-  tBddEdge
-  gcofactor_step(tBddEdge f,
-		 tBddEdge c);
+  BddEdge
+  gcofactor_step(BddEdge f,
+		 BddEdge c);
 
   // キューブによる割り算．答は一意に決まる．
-  tBddEdge
-  cube_division(tBddEdge f,
-		tBddEdge c);
+  BddEdge
+  cube_division(BddEdge f,
+		BddEdge c);
 
   // gcofactor の c がキューブの場合の特別版
-  tBddEdge
-  cubediv_step(tBddEdge f);
+  BddEdge
+  cubediv_step(BddEdge f);
 
   // xor cofactor 演算
-  tBddEdge
-  xcofactor_step(tBddEdge f);
+  BddEdge
+  xcofactor_step(BddEdge f);
 
   // existential qualification を行う．
-  tBddEdge
-  esmooth_step(tBddEdge e1);
+  BddEdge
+  esmooth_step(BddEdge e1);
 
   // and exist 演算を行う．
-  tBddEdge
-  andexist_step(tBddEdge e1,
-		tBddEdge e2);
+  BddEdge
+  andexist_step(BddEdge e1,
+		BddEdge e2);
 
   // 最短の1パスを求める．
-  tBddEdge
-  sp_step(tBddEdge e,
-	  hash_map<tBddEdge, tBddEdge>& sp_map);
+  BddEdge
+  sp_step(BddEdge e,
+	  hash_map<BddEdge, BddEdge>& sp_map);
 
   // ISOP を求める．
-  tBddEdge
-  isop_step(tBddEdge l,
-	    tBddEdge u,
+  BddEdge
+  isop_step(BddEdge l,
+	    BddEdge u,
 	    LogExpr& cov);
 
   // prime cover を求める．
-  tBddEdge
-  pc_step(tBddEdge l,
-	  tBddEdge u,
+  BddEdge
+  pc_step(BddEdge l,
+	  BddEdge u,
 	  LogExpr& cov);
 
   // minimal support を求める演算
-  tBddEdge
-  ms_step(tBddEdge l,
-	  tBddEdge u);
+  BddEdge
+  ms_step(BddEdge l,
+	  BddEdge u);
 
   // check_symmetry の内部で使われる関数
-  tBddEdge
-  cs_step2(tBddEdge e);
-  tBddEdge
-  cs_step1(tBddEdge e1,
-	   tBddEdge e2,
+  BddEdge
+  cs_step2(BddEdge e);
+  BddEdge
+  cs_step1(BddEdge e1,
+	   BddEdge e2,
 	   tPol sympol);
-  tBddEdge
-  cs_step(tBddEdge e,
+  BddEdge
+  cs_step(BddEdge e,
 	  tPol sympol);
 
   // support 関係の共通処理
   void
-  sup_step(tBddEdge e);
+  sup_step(BddEdge e);
 
   // SCC で用いられる関数
   void
-  scc_step(tBddEdge e,
-	   tBddEdge s);
+  scc_step(BddEdge e,
+	   BddEdge s);
 
   // size() の中で用いられる関数
   void
-  count1(tBddEdge e);
+  count1(BddEdge e);
 
   // density の下請関数
   static
   double
-  dens_step(tBddEdge e,
-	    hash_map<tBddEdge, double>& dens_assoc);
+  dens_step(BddEdge e,
+	    hash_map<BddEdge, double>& dens_assoc);
 
   // mpz_class 版の minterm_count の下請関数
   static
   mpz_class
-  mterm_step(tBddEdge e,
-	     hash_map<tBddEdge, mpz_class>& mc_map);
+  mterm_step(BddEdge e,
+	     hash_map<BddEdge, mpz_class>& mc_map);
 
   // int 版の minterm_count の下請関数
   static
   ymuint
-  mterm_step(tBddEdge e,
-	     hash_map<tBddEdge, ymuint>& mc_map);
+  mterm_step(BddEdge e,
+	     hash_map<BddEdge, ymuint>& mc_map);
 
   // Walsh spectrumの0次の係数を求める処理
   static
   mpz_class
-  wt0_step(tBddEdge e,
+  wt0_step(BddEdge e,
 	   hash_map<Node*, mpz_class>& result_map);
 
   // Walsh spectrumの0次の係数を求める処理
   // こちらは int 版
   static
   ymint
-  wt0_step(tBddEdge e,
+  wt0_step(BddEdge e,
 	   hash_map<Node*, ymint>& result_map);
 
   // Walsh spectrumの1次の係数を求める処理
   static
   mpz_class
-  wt1_step(tBddEdge e,
+  wt1_step(BddEdge e,
 	   hash_map<Node*, mpz_class>& result_map);
 
   // Walsh spectrumの1次の係数を求める処理
   // int 版
   static
   ymint
-  wt1_step(tBddEdge e,
+  wt1_step(BddEdge e,
 	   hash_map<Node*, ymint>& result_map);
 
   // scan の下請関数
   static
   void
-  scan_step(tBddEdge e);
+  scan_step(BddEdge e);
 
   // bdd のレベル level の *** n_mark のついた *** 節点の数を数える．
   // ただし，n_mark の付いていない節点があった場合には UINT_MAX を返す．
   static
   size_t
-  count_at_step(tBddEdge e,
+  count_at_step(BddEdge e,
 		tLevel level);
 
   // sp_step 中で用いられる関数
   static
   ymint
-  sp_len(tBddEdge e);
+  sp_len(BddEdge e);
 
   // shortest_onepath_len() 中で用いられる下請関数
   static
   ymint
-  spl_step(tBddEdge e,
-	   hash_map<tBddEdge, ymint>& assoc);
+  spl_step(BddEdge e,
+	   hash_map<BddEdge, ymint>& assoc);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -738,11 +740,11 @@ public:
 
   // ノードのリンク数を増やし，もしロックされていなければロックする
   void
-  activate(tBddEdge vd);
+  activate(BddEdge vd);
 
   // ノードのリンク数を減らし，他のリンクがなければロックを外す
   void
-  deactivate(tBddEdge vd);
+  deactivate(BddEdge vd);
 
   // vp と vp の子孫のノードをロックする
   void
@@ -830,34 +832,34 @@ public:
 
 
   //////////////////////////////////////////////////////////////////////
-  // tBddEdge を操作するクラスメソッド
+  // BddEdge を操作するクラスメソッド
   //////////////////////////////////////////////////////////////////////
 
   // 枝の値からそれが指しているノードのポインタをとり出す
   static
   Node*
-  get_node(tBddEdge e);
+  get_node(BddEdge e);
 
   // ノードのポインタと極性から枝の情報を作り出す
   static
-  tBddEdge
+  BddEdge
   combine(Node* n,
 	  tPol p);
 
   // p-mark が付いた節点のマークを消す．
   static
   void
-  clear_pmark(tBddEdge e);
+  clear_pmark(BddEdge e);
 
   // n-mark が付いた節点のマークを消す．
   static
   void
-  clear_nmark(tBddEdge e);
+  clear_nmark(BddEdge e);
 
   // vdで示された枝の子孫の全てのマークを消す
   static
   void
-  clear_pnmark(tBddEdge e);
+  clear_pnmark(BddEdge e);
 
   // vdの指すノードのマークを調べ，マークされていればtrueを返す．
   // 枝に極性がなければマークは1種類でいいが，極性があるので，
@@ -865,12 +867,12 @@ public:
   // 合の n-mark の2種類があるので，枝に応じて切替える．
   static
   bool
-  mark(tBddEdge vd);
+  mark(BddEdge vd);
 
   // vdの指すノードにマークをつける
   static
   void
-  setmark(tBddEdge vd);
+  setmark(BddEdge vd);
 
   // idx が top に等しいときには e の子供を e_0, e_1 にセットする．
   // 等しくなければ e をセットする．
@@ -878,21 +880,21 @@ public:
   void
   split1(tLevel top,
 	 tLevel level,
-	 tBddEdge e,
+	 BddEdge e,
 	 const Node* vp,
 	 tPol pol,
-	 tBddEdge& e_0,
-	 tBddEdge& e_1);
+	 BddEdge& e_0,
+	 BddEdge& e_1);
 
   // f と g のノードの子供のノードとレベルを求める．
   static
   Var*
-  split(tBddEdge f,
-	tBddEdge g,
-	tBddEdge& f_0,
-	tBddEdge& f_1,
-	tBddEdge& g_0,
-	tBddEdge& g_1);
+  split(BddEdge f,
+	BddEdge g,
+	BddEdge& f_0,
+	BddEdge& f_1,
+	BddEdge& g_0,
+	BddEdge& g_1);
 
 
 private:
@@ -1069,7 +1071,7 @@ private:
 // 多くの場合, lockall() が呼ばれることが少ないので inline にしている．
 inline
 void
-BddMgrClassic::activate(tBddEdge vd)
+BddMgrClassic::activate(BddEdge vd)
 {
   Node* vp = get_node(vd);
   if ( vp && vp->linkinc() == 1 ) {
@@ -1081,7 +1083,7 @@ BddMgrClassic::activate(tBddEdge vd)
 // 多くの場合, unlockall() が呼ばれることが少ないので inline にしている．
 inline
 void
-BddMgrClassic::deactivate(tBddEdge vd)
+BddMgrClassic::deactivate(BddEdge vd)
 {
   Node* vp = get_node(vd);
   if ( vp && vp->linkdec() == 0 ) {
@@ -1092,18 +1094,18 @@ BddMgrClassic::deactivate(tBddEdge vd)
 // 枝の値からそれが指しているノードのポインタをとり出す
 inline
 BmcNode*
-BddMgrClassic::get_node(tBddEdge e)
+BddMgrClassic::get_node(BddEdge e)
 {
-  return (Node*)(e & ~3);
+  return reinterpret_cast<Node*>(e.get_ptr());
 }
 
 // ノードのポインタと極性から枝の情報を作り出す
 inline
-tBddEdge
+BddEdge
 BddMgrClassic::combine(Node* n,
 		       tPol p)
 {
-  return static_cast<tBddEdge>((unsigned long)(n) | (unsigned long)(p));
+  return BddEdge(n, p);
 }
 
 // vdの指すノードのマークを調べ，マークされていればtrueを返す．
@@ -1112,19 +1114,19 @@ BddMgrClassic::combine(Node* n,
 // 合の n-mark の2種類があるので，枝に応じて切替える．
 inline
 bool
-BddMgrClassic::mark(tBddEdge vd)
+BddMgrClassic::mark(BddEdge vd)
 {
   Node* vp = get_node(vd);
-  return ( get_pol(vd) == kPolPosi ) ? vp->pmark() : vp->nmark();
+  return ( vd.pol() == kPolPosi ) ? vp->pmark() : vp->nmark();
 }
 
 // vdの指すノードにマークをつける
 inline
 void
-BddMgrClassic::setmark(tBddEdge vd)
+BddMgrClassic::setmark(BddEdge vd)
 {
   Node* vp = get_node(vd);
-  if ( get_pol(vd) == kPolPosi ) {
+  if ( vd.pol() == kPolPosi ) {
     vp->pmark(1);
   }
   else {
@@ -1138,11 +1140,11 @@ inline
 void
 BddMgrClassic::split1(tLevel top,
 		      tLevel level,
-		      tBddEdge e,
+		      BddEdge e,
 		      const Node* vp,
 		      tPol pol,
-		      tBddEdge& e_0,
-		      tBddEdge& e_1)
+		      BddEdge& e_0,
+		      BddEdge& e_1)
 {
   if ( level == top ) {
     e_0 = vp->edge0(pol);
@@ -1156,17 +1158,17 @@ BddMgrClassic::split1(tLevel top,
 // f と g のノードの子供のノードとレベルを求める．
 inline
 BmcVar*
-BddMgrClassic::split(tBddEdge f,
-		     tBddEdge g,
-		     tBddEdge& f_0,
-		     tBddEdge& f_1,
-		     tBddEdge& g_0,
-		     tBddEdge& g_1)
+BddMgrClassic::split(BddEdge f,
+		     BddEdge g,
+		     BddEdge& f_0,
+		     BddEdge& f_1,
+		     BddEdge& g_0,
+		     BddEdge& g_1)
 {
   Node* f_vp = get_node(f);
   Node* g_vp = get_node(g);
-  tPol f_pol = get_pol(f);
-  tPol g_pol = get_pol(g);
+  tPol f_pol = f.pol();
+  tPol g_pol = g.pol();
   Var* f_var = f_vp->var();
   Var* g_var = g_vp->var();
   tLevel f_level = f_var->level();

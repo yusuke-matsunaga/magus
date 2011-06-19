@@ -36,18 +36,18 @@ struct LitCompLess
   }
 };
 
-// kEdge0 でない方の枝を選ぶ．
+// BddEdge::make_zero() でない方の枝を選ぶ．
 // 0枝が選ばれた場合には which = 0
 // 1枝が選ばれた場合には which = 1 とする．
 inline
-tBddEdge
+BddEdge
 select_edge(BmcNode* node,
 	    tPol pol,
 	    int& which)
 {
-  tBddEdge e0 = node->edge0(pol);
-  tBddEdge e1 = node->edge1(pol);
-  if ( e0 == kEdge0 ) {
+  BddEdge e0 = node->edge0(pol);
+  BddEdge e1 = node->edge1(pol);
+  if ( e0.is_zero() ) {
     which = 1;
     return e1;
   }
@@ -61,27 +61,27 @@ END_NONAMESPACE
 
 // 2つのリテラル集合の集合積を求める．
 // メモリ不足のためにエラーとなる可能性がある．
-tBddEdge
-BddMgrClassic::lscap(tBddEdge e1,
-		     tBddEdge e2)
+BddEdge
+BddMgrClassic::lscap(BddEdge e1,
+		     BddEdge e2)
 {
-  if ( check_error(e1) || check_error(e2) ) {
-    return kEdgeError;
+  if ( e1.is_error() || e2.is_error() ) {
+    return BddEdge::make_error();
   }
-  if ( check_overflow(e1) || check_overflow(e2) ) {
-    return kEdgeOverflow;
+  if ( e1.is_overflow() || e2.is_overflow() ) {
+    return BddEdge::make_overflow();
   }
-  if ( check_zero(e1) || check_zero(e2) ) {
-    return kEdgeError;
+  if ( e1.is_zero() || e2.is_zero() ) {
+    return BddEdge::make_error();
   }
-  if ( check_one(e1) || check_one(e2) ) {
-    return kEdge1;
+  if ( e1.is_one() || e2.is_one() ) {
+    return BddEdge::make_one();
   }
 
   Node* node1 = get_node(e1);
   Node* node2 = get_node(e2);
-  tPol pol1 = get_pol(e1);
-  tPol pol2 = get_pol(e2);
+  tPol pol1 = e1.pol();
+  tPol pol2 = e2.pol();
   Var* var1 = node1->var();
   Var* var2 = node2->var();
   tLevel level1 = var1->level();
@@ -93,21 +93,21 @@ BddMgrClassic::lscap(tBddEdge e1,
       int which2;
       e2 = select_edge(node2, pol2, which2);
       if ( which1 == which2 ) {
-	tBddEdge tmp = lscap(e1, e2);
+	BddEdge tmp = lscap(e1, e2);
 	if ( which1 == 0 ) {
-	  return new_node(var1, tmp, kEdge0);
+	  return new_node(var1, tmp, BddEdge::make_zero());
 	}
 	else {
-	  return new_node(var1, kEdge0, tmp);
+	  return new_node(var1, BddEdge::make_zero(), tmp);
 	}
       }
-      if ( check_one(e1) || check_one(e2) ) {
-	return kEdge1;
+      if ( e1.is_one() || e2.is_one() ) {
+	return BddEdge::make_one();
       }
       node1 = get_node(e1);
       node2 = get_node(e2);
-      pol1 = get_pol(e1);
-      pol2 = get_pol(e2);
+      pol1 = e1.pol();
+      pol2 = e2.pol();
       var1 = node1->var();
       var2 = node2->var();
       level1 = var1->level();
@@ -116,22 +116,22 @@ BddMgrClassic::lscap(tBddEdge e1,
     else if ( level1 < level2 ) {
       int which1;
       e1 = select_edge(node1, pol1, which1);
-      if ( check_one(e1) ) {
-	return kEdge1;
+      if ( e1.is_one() ) {
+	return BddEdge::make_one();
       }
       node1 = get_node(e1);
-      pol1 = get_pol(e1);
+      pol1 = e1.pol();
       var1 = node1->var();
       level1 = var1->level();
     }
     else { // level1 > level2
       int which2;
       e2 = select_edge(node2, pol2, which2);
-      if ( check_one(e2) ) {
-	return kEdge1;
+      if ( e2.is_one() ) {
+	return BddEdge::make_one();
       }
       node2 = get_node(e2);
-      pol2 = get_pol(e2);
+      pol2 = e2.pol();
       var2 = node2->var();
       level2 = var2->level();
     }
@@ -141,27 +141,27 @@ BddMgrClassic::lscap(tBddEdge e1,
 // e1 のリテラル集合から e2 のリテラル集合を引く．(集合差演算)
 // 同じ変数番号であっても極性が異なれば異なる要素とみなす．
 // lsdiff() のためのサブルーティン
-tBddEdge
-BddMgrClassic::lsdiff(tBddEdge e1,
-		      tBddEdge e2)
+BddEdge
+BddMgrClassic::lsdiff(BddEdge e1,
+		      BddEdge e2)
 {
-  if ( check_error(e1) || check_error(e2) ) {
-    return kEdgeError;
+  if ( e1.is_error() || e2.is_error() ) {
+    return BddEdge::make_error();
   }
-  if ( check_overflow(e1) || check_overflow(e2) ) {
-    return kEdgeOverflow;
+  if ( e1.is_overflow() || e2.is_overflow() ) {
+    return BddEdge::make_overflow();
   }
-  if ( check_zero(e1) || check_zero(e2) ) {
-    return kEdgeError;
+  if ( e1.is_zero() || e2.is_zero() ) {
+    return BddEdge::make_error();
   }
-  if ( check_one(e1) || check_one(e2) ) {
+  if ( e1.is_one() || e2.is_one() ) {
     return e1;
   }
 
   Node* node1 = get_node(e1);
   Node* node2 = get_node(e2);
-  tPol pol1 = get_pol(e1);
-  tPol pol2 = get_pol(e2);
+  tPol pol1 = e1.pol();
+  tPol pol2 = e2.pol();
   Var* var1 = node1->var();
   Var* var2 = node2->var();
   tLevel level1 = var1->level();
@@ -170,22 +170,22 @@ BddMgrClassic::lsdiff(tBddEdge e1,
     if ( level1 < level2 ) {
       int which1;
       e1 = select_edge(node1, pol1, which1);
-      tBddEdge tmp = lsdiff(e1, e2);
+      BddEdge tmp = lsdiff(e1, e2);
       if ( which1 == 0 ) {
-	return new_node(var1, tmp, kEdge0);
+	return new_node(var1, tmp, BddEdge::make_zero());
       }
       else {
-	return new_node(var1, kEdge0, tmp);
+	return new_node(var1, BddEdge::make_zero(), tmp);
       }
     }
     if ( level1 > level2 ) {
       int which2;
       e2 = select_edge(node2, pol2, which2);
-      if ( check_one(e2) ) {
+      if ( e2.is_one() ) {
 	return e1;
       }
       node2 = get_node(e2);
-      pol2 = get_pol(e2);
+      pol2 = e2.pol();
       var2 = node2->var();
       level2 = var2->varid();
     }
@@ -195,21 +195,21 @@ BddMgrClassic::lsdiff(tBddEdge e1,
       int which2;
       e2 = select_edge(node2, pol2, which2);
       if ( which1 != which2 ) {
-	tBddEdge tmp = lsdiff(e1, e2);
+	BddEdge tmp = lsdiff(e1, e2);
 	if ( which1 == 0 ) {
-	  return new_node(var1, tmp, kEdge0);
+	  return new_node(var1, tmp, BddEdge::make_zero());
 	}
 	else {
-	  return new_node(var1, kEdge0, tmp);
+	  return new_node(var1, BddEdge::make_zero(), tmp);
 	}
       }
-      if ( check_one(e1) || check_one(e2) ) {
+      if ( e1.is_one() || e2.is_one() ) {
 	return e1;
       }
       node1 = get_node(e1);
       node2 = get_node(e2);
-      pol1 = get_pol(e1);
-      pol2 = get_pol(e2);
+      pol1 = e1.pol();
+      pol2 = e2.pol();
       var1 = node1->var();
       var2 = node2->var();
       level1 = var1->level();
@@ -220,26 +220,23 @@ BddMgrClassic::lsdiff(tBddEdge e1,
 
 // e1 の変数集合と e2 の変数集合が共通部分を持っていたら true を返す．
 bool
-BddMgrClassic::lsintersect(tBddEdge e1,
-			   tBddEdge e2)
+BddMgrClassic::lsintersect(BddEdge e1,
+			   BddEdge e2)
 {
-  if ( check_error(e1) || check_error(e2) ) {
+  if ( e1.is_invalid() || e2.is_invalid() ) {
     return false;
   }
-  if ( check_overflow(e1) || check_overflow(e2) ) {
+  if ( e1.is_zero() || e2.is_zero() ) {
     return false;
   }
-  if ( check_zero(e1) || check_zero(e2) ) {
-    return false;
-  }
-  if ( check_one(e1) || check_one(e2) ) {
+  if ( e1.is_one() || e2.is_one() ) {
     return false;
   }
 
   Node* node1 = get_node(e1);
   Node* node2 = get_node(e2);
-  tPol pol1 = get_pol(e1);
-  tPol pol2 = get_pol(e2);
+  tPol pol1 = e1.pol();
+  tPol pol2 = e2.pol();
   tLevel level1 = node1->level();
   tLevel level2 = node2->level();
   for ( ; ; ) {
@@ -251,34 +248,34 @@ BddMgrClassic::lsintersect(tBddEdge e1,
       if ( which1 == which2 ) {
 	return true;
       }
-      if ( check_one(e1) || check_one(e2) ) {
+      if ( e1.is_one() || e2.is_one() ) {
 	return false;
       }
       node1 = get_node(e1);
       node2 = get_node(e2);
-      pol1 = get_pol(e1);
-      pol2 = get_pol(e2);
+      pol1 = e1.pol();
+      pol2 = e2.pol();
       level1 = node1->level();
       level2 = node2->level();
     }
     else if ( level1 < level2 ) {
       int which1;
       e1 = select_edge(node1, pol1, which1);
-      if ( check_one(e1) ) {
+      if ( e1.is_one() ) {
 	return false;
       }
       node1 = get_node(e1);
-      pol1 = get_pol(e1);
+      pol1 = e1.pol();
       level1 = node1->level();
     }
     else {
       int which2;
       e2 = select_edge(node2, pol2, which2);
-      if ( check_one(e2) ) {
+      if ( e2.is_one() ) {
 	return false;
       }
       node2 = get_node(e2);
-      pol2 = get_pol(e2);
+      pol2 = e2.pol();
       level2 = node2->level();
     }
   }
@@ -286,12 +283,12 @@ BddMgrClassic::lsintersect(tBddEdge e1,
 
 // リテラルの vector に変換する．
 tVarSize
-BddMgrClassic::to_literalvector(tBddEdge e,
+BddMgrClassic::to_literalvector(BddEdge e,
 				LiteralVector& dst)
 {
   dst.clear();
 
-  if ( check_invalid(e) ) {
+  if ( e.is_invalid() ) {
     return 0;
   }
 
@@ -299,20 +296,20 @@ BddMgrClassic::to_literalvector(tBddEdge e,
   dst.reserve(n);
 
   Node* vp = get_node(e);
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   while ( vp ) {
     tVarId varid = vp->varid();
-    tBddEdge e0 = vp->edge0(pol);
-    tBddEdge e1 = vp->edge1(pol);
-    if ( e0 == kEdge0 ) {
+    BddEdge e0 = vp->edge0(pol);
+    BddEdge e1 = vp->edge1(pol);
+    if ( e0 == BddEdge::make_zero() ) {
       dst.push_back(Literal(varid, kPolPosi));
       vp = get_node(e1);
-      pol = get_pol(e1);
+      pol = e1.pol();
     }
     else {
       dst.push_back(Literal(varid, kPolNega));
       vp = get_node(e0);
-      pol = get_pol(e0);
+      pol = e0.pol();
     }
   }
   sort(dst.begin(), dst.begin(), LitCompLess());
@@ -322,30 +319,30 @@ BddMgrClassic::to_literalvector(tBddEdge e,
 
 // リテラルの list に変換する．
 tVarSize
-BddMgrClassic::to_literallist(tBddEdge e,
+BddMgrClassic::to_literallist(BddEdge e,
 			      LiteralList& dst)
 {
   dst.clear();
 
-  if ( check_invalid(e) ) {
+  if ( e.is_invalid() ) {
     return 0;
   }
 
   Node* vp = get_node(e);
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   while ( vp ) {
     tVarId varid = vp->varid();
-    tBddEdge e0 = vp->edge0(pol);
-    tBddEdge e1 = vp->edge1(pol);
-    if ( e0 == kEdge0 ) {
+    BddEdge e0 = vp->edge0(pol);
+    BddEdge e1 = vp->edge1(pol);
+    if ( e0 == BddEdge::make_zero() ) {
       dst.push_back(Literal(varid, kPolPosi));
       vp = get_node(e1);
-      pol = get_pol(e1);
+      pol = e1.pol();
     }
     else {
       dst.push_back(Literal(varid, kPolNega));
       vp = get_node(e0);
-      pol = get_pol(e0);
+      pol = e0.pol();
     }
   }
   dst.sort(LitCompLess());

@@ -25,7 +25,7 @@ END_NONAMESPACE
 
 // e を根とするBDDの節点数を数える．
 size_t
-BddMgrModern::size(tBddEdge e)
+BddMgrModern::size(BddEdge e)
 {
   mNum = 0;
   count1(e);
@@ -35,14 +35,14 @@ BddMgrModern::size(tBddEdge e)
 
 // edge list に登録されたBDDの節点数を数える．
 size_t
-BddMgrModern::size(const list<tBddEdge>& edge_list)
+BddMgrModern::size(const list<BddEdge>& edge_list)
 {
   mNum = 0;
-  for (list<tBddEdge>::const_iterator p = edge_list.begin();
+  for (list<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     count1(*p);
   }
-  for (list<tBddEdge>::const_iterator p = edge_list.begin();
+  for (list<BddEdge>::const_iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
     clear_pnmark(*p);
   }
@@ -50,7 +50,7 @@ BddMgrModern::size(const list<tBddEdge>& edge_list)
 }
 
 void
-BddMgrModern::count1(tBddEdge e)
+BddMgrModern::count1(BddEdge e)
 {
   for ( ; ; ) {
     Node* vp = get_node(e);
@@ -68,13 +68,13 @@ BddMgrModern::count1(tBddEdge e)
 // 無限長精度の整数(mpz_class)を用いて計算する．
 // 論理関数の変数の数を指定するバージョン
 mpz_class
-BddMgrModern::minterm_count(tBddEdge e,
+BddMgrModern::minterm_count(BddEdge e,
 			    tVarSize n)
 {
-  if ( check_overflow(e) ) {
+  if ( e.is_overflow() ) {
     return 0;
   }
-  if ( check_error(e) ) {
+  if ( e.is_error() ) {
     return 0;
   }
 
@@ -85,7 +85,7 @@ BddMgrModern::minterm_count(tBddEdge e,
     // 全入力ベクトルの数の計算
     n_invect_int = 1U << n;
 
-    hash_map<tBddEdge, ymuint> mc_map;
+    hash_map<BddEdge, ymuint> mc_map;
     ymuint ans = mterm_step(e, mc_map);
 
     return mpz_class(ans);
@@ -94,7 +94,7 @@ BddMgrModern::minterm_count(tBddEdge e,
     // 全入力ベクトルの数の計算
     n_invect = mpz_class(1U) << n;
 
-    hash_map<tBddEdge, mpz_class> mc_map;
+    hash_map<BddEdge, mpz_class> mc_map;
     mpz_class ans = mterm_step(e, mc_map);
 
     return ans;
@@ -102,21 +102,21 @@ BddMgrModern::minterm_count(tBddEdge e,
 }
 
 mpz_class
-BddMgrModern::mterm_step(tBddEdge e,
-			 hash_map<tBddEdge, mpz_class>& mc_map)
+BddMgrModern::mterm_step(BddEdge e,
+			 hash_map<BddEdge, mpz_class>& mc_map)
 {
-  if ( check_one(e) ) {
+  if ( e.is_one() ) {
     return n_invect;
   }
-  if ( check_zero(e) ) {
+  if ( e.is_zero() ) {
     return 0;
   }
 
   Node* vp = get_node(e);
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
-    hash_map<tBddEdge, mpz_class>::iterator p = mc_map.find(e);
+    hash_map<BddEdge, mpz_class>::iterator p = mc_map.find(e);
     if ( p != mc_map.end() ) {
       return p->second;
     }
@@ -138,21 +138,21 @@ BddMgrModern::mterm_step(tBddEdge e,
 }
 
 ymuint
-BddMgrModern::mterm_step(tBddEdge e,
-			 hash_map<tBddEdge, ymuint>& mc_map)
+BddMgrModern::mterm_step(BddEdge e,
+			 hash_map<BddEdge, ymuint>& mc_map)
 {
-  if ( check_one(e) ) {
+  if ( e.is_one() ) {
     return n_invect_int;
   }
-  if ( check_zero(e) ) {
+  if ( e.is_zero() ) {
     return 0;
   }
 
   Node* vp = get_node(e);
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
-    hash_map<tBddEdge, ymuint>::iterator p = mc_map.find(e);
+    hash_map<BddEdge, ymuint>::iterator p = mc_map.find(e);
     if ( p != mc_map.end() ) {
       return p->second;
     }
@@ -177,13 +177,13 @@ BddMgrModern::mterm_step(tBddEdge e,
 // Walsh変換を行なう．ただし，0次の係数しか求めない．
 // n は全入力数
 mpz_class
-BddMgrModern::walsh0(tBddEdge e,
+BddMgrModern::walsh0(BddEdge e,
 		     tVarSize n)
 {
-  if ( check_overflow(e) ) {
+  if ( e.is_overflow() ) {
     return 0;
   }
-  if ( check_error(e) ) {
+  if ( e.is_error() ) {
     return 0;
   }
 
@@ -209,19 +209,19 @@ BddMgrModern::walsh0(tBddEdge e,
 
 // Walsh spectrumの0次の係数を求める処理
 mpz_class
-BddMgrModern::wt0_step(tBddEdge e,
+BddMgrModern::wt0_step(BddEdge e,
 		       hash_map<Node*, mpz_class>& result_map)
 {
-  if ( check_zero(e) ) {
+  if ( e.is_zero() ) {
     return n_invect;
   }
-  if ( check_one(e) ) {
+  if ( e.is_one() ) {
     return -n_invect;
   }
 
   // まずハッシュ表を探す．
   Node* vp = get_node(e);
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
     hash_map<Node*, mpz_class>::iterator p = result_map.find(vp);
@@ -255,19 +255,19 @@ BddMgrModern::wt0_step(tBddEdge e,
 // Walsh spectrumの0次の係数を求める処理
 // こちらは int 版
 ymint
-BddMgrModern::wt0_step(tBddEdge e,
+BddMgrModern::wt0_step(BddEdge e,
 		       hash_map<Node*, ymint>& result_map)
 {
-  if ( check_zero(e) ) {
+  if ( e.is_zero() ) {
     return static_cast<ymint>(n_invect_int);
   }
-  if ( check_one(e) ) {
+  if ( e.is_one() ) {
     return -static_cast<ymint>(n_invect_int);
   }
 
   // まずハッシュ表を探す．
   Node* vp = get_node(e);
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
     hash_map<Node*, ymint>::iterator p = result_map.find(vp);
@@ -301,11 +301,11 @@ BddMgrModern::wt0_step(tBddEdge e,
 // Walsh変換を行なう．ただし，1次の係数しか求めない．
 // n は全入力数
 mpz_class
-BddMgrModern::walsh1(tBddEdge e,
+BddMgrModern::walsh1(BddEdge e,
 		     tVarId var,
 		     tVarSize n)
 {
-  if ( check_overflow(e) || check_error(e) ) {
+  if ( e.is_overflow() || e.is_error() ) {
     return 0;
   }
 
@@ -334,10 +334,10 @@ BddMgrModern::walsh1(tBddEdge e,
 
 // Walsh spectrumの1次の係数を求める処理
 mpz_class
-BddMgrModern::wt1_step(tBddEdge e,
+BddMgrModern::wt1_step(BddEdge e,
 		       hash_map<Node*, mpz_class>& result_map)
 {
-  if ( check_zero(e) || check_one(e) ) {
+  if ( e.is_zero() || e.is_one() ) {
     return 0;
   }
 
@@ -348,7 +348,7 @@ BddMgrModern::wt1_step(tBddEdge e,
   }
 
   // まずハッシュ表を探す．
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
     hash_map<Node*, mpz_class>::iterator p = result_map.find(vp);
@@ -390,10 +390,10 @@ BddMgrModern::wt1_step(tBddEdge e,
 // Walsh spectrumの1次の係数を求める処理
 // int 版
 ymint
-BddMgrModern::wt1_step(tBddEdge e,
+BddMgrModern::wt1_step(BddEdge e,
 		       hash_map<Node*, ymint>& result_map)
 {
-  if ( check_zero(e) || check_one(e) ) {
+  if ( e.is_zero() || e.is_one() ) {
     return 0;
   }
 
@@ -404,7 +404,7 @@ BddMgrModern::wt1_step(tBddEdge e,
   }
 
   // まずハッシュ表を探す．
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   ymuint ref = vp->refcount();
   if ( ref != 1 ) {
     hash_map<Node*, int>::iterator p = result_map.find(vp);
@@ -445,7 +445,7 @@ BddMgrModern::wt1_step(tBddEdge e,
 
 // e を根とするBDDの節点に n-mark を付け，各変数ごとのノード数を数える．
 void
-BddMgrModern::scan(tBddEdge e,
+BddMgrModern::scan(BddEdge e,
 		   hash_map<tVarId, size_t>& node_counts)
 {
   for (ymuint i = 0; i < mVarNum; ++ i) {
@@ -462,7 +462,7 @@ BddMgrModern::scan(tBddEdge e,
 
 // scan の下請関数
 void
-BddMgrModern::scan_step(tBddEdge e)
+BddMgrModern::scan_step(BddEdge e)
 {
   for ( ; ; ) {
     Node* vp = get_node(e);
@@ -481,7 +481,7 @@ BddMgrModern::scan_step(tBddEdge e)
 // e を根とするBDDのレベル level のノード数を数える．
 // ただし，n-mark の付いていないノードがあったら UINT_MAX を返す．
 size_t
-BddMgrModern::count_at(tBddEdge e,
+BddMgrModern::count_at(BddEdge e,
 		       tLevel level)
 {
   size_t ans = count_at_step(e, level);
@@ -492,7 +492,7 @@ BddMgrModern::count_at(tBddEdge e,
 // bdd のレベル level の *** n_mark のついた *** 節点の数を数える．
 // ただし，n_mark の付いていない節点があった場合には ULONG_MAX を返す．
 size_t
-BddMgrModern::count_at_step(tBddEdge e,
+BddMgrModern::count_at_step(BddEdge e,
 			    tLevel level)
 {
   // tail recursion elimination を行なっているのでコードが
@@ -532,7 +532,7 @@ BddMgrModern::count_at_step(tBddEdge e,
 
 // scan で付けた n-mark を消す．
 void
-BddMgrModern::clear_scanmark(tBddEdge e)
+BddMgrModern::clear_scanmark(BddEdge e)
 {
   clear_nmark(e);
 }

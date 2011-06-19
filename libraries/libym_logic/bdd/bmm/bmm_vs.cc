@@ -16,21 +16,21 @@ BEGIN_NAMESPACE_YM_BDD
 
 // 2つの変数集合の集合積を求める．
 // メモリ不足のためにエラーとなる可能性がある．
-tBddEdge
-BddMgrModern::vscap(tBddEdge e1,
-		    tBddEdge e2)
+BddEdge
+BddMgrModern::vscap(BddEdge e1,
+		    BddEdge e2)
 {
-  if ( check_error(e1) || check_error(e2) ) {
-    return kEdgeError;
+  if ( e1.is_error() || e2.is_error() ) {
+    return BddEdge::make_error();
   }
-  if ( check_overflow(e1) || check_overflow(e2) ) {
-    return kEdgeOverflow;
+  if ( e1.is_overflow() || e2.is_overflow() ) {
+    return BddEdge::make_overflow();
   }
-  if ( check_one(e1) || check_one(e2) ) {
-    return kEdge1;
+  if ( e1.is_one() || e2.is_one() ) {
+    return BddEdge::make_one();
   }
-  if ( check_zero(e1) || check_zero(e2) ) {
-    return kEdgeError;
+  if ( e1.is_zero() || e2.is_zero() ) {
+    return BddEdge::make_error();
   }
 
   Node* node1 = get_node(e1);
@@ -41,13 +41,13 @@ BddMgrModern::vscap(tBddEdge e1,
   tLevel level2 = var2->level();
   for ( ; ; ) {
     if ( level1 == level2 ) {
-      tBddEdge tmp = vscap(node1->edge1(), node2->edge1());
-      return new_node(var1, kEdge0, tmp);
+      BddEdge tmp = vscap(node1->edge1(), node2->edge1());
+      return new_node(var1, BddEdge::make_zero(), tmp);
     }
     else if ( level1 < level2 ) {
       e1 = node1->edge1();
-      if ( check_one(e1) ) {
-	return kEdge1;
+      if ( e1.is_one() ) {
+	return BddEdge::make_one();
       }
       node1 = get_node(e1);
       var1 = node1->var();
@@ -55,8 +55,8 @@ BddMgrModern::vscap(tBddEdge e1,
     }
     else { // level1 > level2
       e2 = node2->edge1();
-      if ( check_one(e2) ) {
-	return kEdge1;
+      if ( e2.is_one() ) {
+	return BddEdge::make_one();
       }
       node2 = get_node(e2);
       var2 = node2->var();
@@ -66,23 +66,23 @@ BddMgrModern::vscap(tBddEdge e1,
 }
 
 // e1 の変数集合から e2 の変数集合を引く．(集合差演算)
-tBddEdge
-BddMgrModern::vsdiff(tBddEdge e1,
-		     tBddEdge e2)
+BddEdge
+BddMgrModern::vsdiff(BddEdge e1,
+		     BddEdge e2)
 {
-  if ( check_error(e1) || check_error(e2) ) {
-    return kEdgeError;
+  if ( e1.is_error() || e2.is_error() ) {
+    return BddEdge::make_error();
   }
-  if ( check_overflow(e1) || check_overflow(e2) ) {
-    return kEdgeOverflow;
+  if ( e1.is_overflow() || e2.is_overflow() ) {
+    return BddEdge::make_overflow();
   }
-  if ( check_zero(e1) || check_zero(e2) ) {
-    return kEdgeError;
+  if ( e1.is_zero() || e2.is_zero() ) {
+    return BddEdge::make_error();
   }
-  if ( check_one(e1) ) {
-    return kEdge1;
+  if ( e1.is_one() ) {
+    return BddEdge::make_one();
   }
-  if ( check_one(e2) ) {
+  if ( e2.is_one() ) {
     return e1;
   }
 
@@ -94,12 +94,12 @@ BddMgrModern::vsdiff(tBddEdge e1,
   tLevel level2 = var2->level();
   for ( ; ; ) {
     if ( level1 < level2 ) {
-      tBddEdge tmp = vsdiff(node1->edge1(), e2);
-      return new_node(var1, kEdge0, tmp);
+      BddEdge tmp = vsdiff(node1->edge1(), e2);
+      return new_node(var1, BddEdge::make_zero(), tmp);
     }
     if ( level1 > level2 ) {
       e2 = node2->edge1();
-      if ( e2 == kEdge1 ) {
+      if ( e2 == BddEdge::make_one() ) {
 	return e1;
       }
       node2 = get_node(e2);
@@ -109,10 +109,10 @@ BddMgrModern::vsdiff(tBddEdge e1,
     else {
       e1 = node1->edge1();
       e2 = node2->edge1();
-      if ( check_one(e1) ) {
-	return kEdge1;
+      if ( e1.is_one() ) {
+	return BddEdge::make_one();
       }
-      if ( check_one(e2) ) {
+      if ( e2.is_one() ) {
 	return e1;
       }
       node1 = get_node(e1);
@@ -127,19 +127,19 @@ BddMgrModern::vsdiff(tBddEdge e1,
 
 // e1 の変数集合と e2 の変数集合が共通部分を持っていたら true を返す．
 bool
-BddMgrModern::vsintersect(tBddEdge e1,
-			  tBddEdge e2)
+BddMgrModern::vsintersect(BddEdge e1,
+			  BddEdge e2)
 {
-  if ( check_error(e1) || check_error(e2) ) {
+  if ( e1.is_error() || e2.is_error() ) {
     return false;
   }
-  if ( check_overflow(e1) || check_overflow(e2) ) {
+  if ( e1.is_overflow() || e2.is_overflow() ) {
     return false;
   }
-  if ( check_zero(e1) || check_zero(e2) ) {
+  if ( e1.is_zero() || e2.is_zero() ) {
     return false;
   }
-  if ( check_one(e1) || check_one(e2) ) {
+  if ( e1.is_one() || e2.is_one() ) {
     return false;
   }
 
@@ -153,7 +153,7 @@ BddMgrModern::vsintersect(tBddEdge e1,
     }
     if ( level1 < level2 ) {
       e1 = node1->edge1();
-      if ( check_one(e1) ) {
+      if ( e1.is_one() ) {
 	return false;
       }
       node1 = get_node(e1);
@@ -161,7 +161,7 @@ BddMgrModern::vsintersect(tBddEdge e1,
     }
     else {
       e2 = node2->edge1();
-      if ( check_one(e2) ) {
+      if ( e2.is_one() ) {
 	return false;
       }
       node2 = get_node(e2);

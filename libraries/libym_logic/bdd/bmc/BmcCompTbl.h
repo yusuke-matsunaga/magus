@@ -86,7 +86,7 @@ protected:
   // e の参照回数が0なら true を返す．
   static
   bool
-  check_noref(tBddEdge e);
+  check_noref(BddEdge e);
 
 
 protected:
@@ -131,23 +131,23 @@ class BmcCompTbl2 :
 
   // キーが2つのセル
   struct Cell {
-    tBddEdge mKey1;
-    tBddEdge mKey2;
-    tBddEdge mAns;
+    BddEdge mKey1;
+    BddEdge mKey2;
+    BddEdge mAns;
   };
 
 public:
 
   // id1, id2をキーとして検索を行なう
-  tBddEdge
-  get(tBddEdge id1,
-      tBddEdge id2);
+  BddEdge
+  get(BddEdge id1,
+      BddEdge id2);
 
   // 結果を登録する
   void
-  put(tBddEdge id1,
-      tBddEdge id2,
-      tBddEdge ans);
+  put(BddEdge id1,
+      BddEdge id2,
+      BddEdge ans);
 
 
 private:
@@ -162,8 +162,8 @@ private:
 
   // ハッシュ関数
   size_t
-  hash_func(tBddEdge id1,
-	    tBddEdge id2);
+  hash_func(BddEdge id1,
+	    BddEdge id2);
 
   // テーブルサイズを変更する．
   bool
@@ -201,21 +201,21 @@ class BmcCompTbl1 :
   // キーが1つのセル
   struct Cell
   {
-    tBddEdge mKey1;
-    tBddEdge mAns;
+    BddEdge mKey1;
+    BddEdge mAns;
   };
 
 
 public:
 
   // id1をキーとして検索を行なう
-  tBddEdge
-  get(tBddEdge id1);
+  BddEdge
+  get(BddEdge id1);
 
   // 結果を登録する
   void
-  put(tBddEdge id1,
-      tBddEdge ans);
+  put(BddEdge id1,
+      BddEdge ans);
 
 
 private:
@@ -230,7 +230,7 @@ private:
 
   // ハッシュ関数
   size_t
-  hash_func(tBddEdge id1);
+  hash_func(BddEdge id1);
 
   // テーブルサイズを変更する．
   bool
@@ -268,25 +268,25 @@ class BmcIsopTbl :
 
   struct Cell
   {
-    tBddEdge mKey1;
-    tBddEdge mKey2;
-    tBddEdge mAnsBdd;
+    BddEdge mKey1;
+    BddEdge mKey2;
+    BddEdge mAnsBdd;
     LogExpr* mAnsCov;
   };
 
 public:
 
   // id1, id2をキーとして検索を行なう
-  tBddEdge
-  get(tBddEdge id1,
-      tBddEdge id2,
+  BddEdge
+  get(BddEdge id1,
+      BddEdge id2,
       LogExpr& ans_cov);
 
   // 結果を登録する
   void
-  put(tBddEdge id1,
-      tBddEdge id2,
-      tBddEdge ans_bdd,
+  put(BddEdge id1,
+      BddEdge id2,
+      BddEdge ans_bdd,
       const LogExpr& ans_cov);
 
 
@@ -302,8 +302,8 @@ private:
 
   // ハッシュ関数
   size_t
-  hash_func(tBddEdge id1,
-	    tBddEdge id2);
+  hash_func(BddEdge id1,
+	    BddEdge id2);
 
   // テーブルサイズを変更する．
   bool
@@ -342,26 +342,26 @@ class BmcCompTbl3 :
   // キーが3つのセル
   struct Cell
   {
-    tBddEdge mKey1;
-    tBddEdge mKey2;
-    tBddEdge mKey3;
-    tBddEdge mAns;
+    BddEdge mKey1;
+    BddEdge mKey2;
+    BddEdge mKey3;
+    BddEdge mAns;
   };
 
 public:
 
   // 検索を行なう．
-  tBddEdge
-  get(tBddEdge id1,
-      tBddEdge id2,
-      tBddEdge id3);
+  BddEdge
+  get(BddEdge id1,
+      BddEdge id2,
+      BddEdge id3);
 
   // 登録を行なう．
   void
-  put(tBddEdge id1,
-      tBddEdge id2,
-      tBddEdge id3,
-      tBddEdge ans);
+  put(BddEdge id1,
+      BddEdge id2,
+      BddEdge id3,
+      BddEdge ans);
 
 
 private:
@@ -376,9 +376,9 @@ private:
 
   // ハッシュ関数
   size_t
-  hash_func(tBddEdge id1,
-	    tBddEdge id2,
-	    tBddEdge id3);
+  hash_func(BddEdge id1,
+	    BddEdge id2,
+	    BddEdge id3);
 
   // テーブルサイズを変更する．
   bool
@@ -420,7 +420,7 @@ BmcCompTbl::check_tablesize() const
 // e の参照回数が0なら true を返す．
 inline
 bool
-BmcCompTbl::check_noref(tBddEdge e)
+BmcCompTbl::check_noref(BddEdge e)
 {
   BmcNode* vp = BddMgrClassic::get_node(e);
   return vp && vp->noref();
@@ -429,19 +429,19 @@ BmcCompTbl::check_noref(tBddEdge e)
 // ハッシュ関数
 inline
 size_t
-BmcCompTbl1::hash_func(tBddEdge id1)
+BmcCompTbl1::hash_func(BddEdge id1)
 {
-  return size_t((id1 * id1) >> 8) & mTableSize_1;
+  return size_t((id1.hash() * id1.hash()) >> 8) & mTableSize_1;
 }
 
 // id1をキーとして検索を行なう
 inline
-tBddEdge
-BmcCompTbl1::get(tBddEdge id1)
+BddEdge
+BmcCompTbl1::get(BddEdge id1)
 {
   Cell* tmp = mTable + hash_func(id1);
   if ( tmp->mKey1 != id1 ) {
-    return kEdgeInvalid;
+    return BddEdge::make_error();
   }
   else {
     return tmp->mAns;
@@ -451,10 +451,10 @@ BmcCompTbl1::get(tBddEdge id1)
 // 結果を登録する
 inline
 void
-BmcCompTbl1::put(tBddEdge id1,
-		 tBddEdge ans)
+BmcCompTbl1::put(BddEdge id1,
+		 BddEdge ans)
 {
-  if ( check_invalid(ans) ) {
+  if ( id1.is_invalid() || ans.is_invalid() ) {
     return;
   }
   if ( check_tablesize() ) {
@@ -463,7 +463,7 @@ BmcCompTbl1::put(tBddEdge id1,
     }
   }
   Cell* tmp = mTable + hash_func(id1);
-  if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) mUsedNum ++;
   tmp->mKey1 = id1;
   tmp->mAns = ans;
 }
@@ -471,22 +471,24 @@ BmcCompTbl1::put(tBddEdge id1,
 // ハッシュ関数
 inline
 size_t
-BmcCompTbl2::hash_func(tBddEdge id1,
-		       tBddEdge id2)
+BmcCompTbl2::hash_func(BddEdge id1,
+		       BddEdge id2)
 {
-  return size_t(id1 + id2 + id2 + (id1 >> 2) + (id2 >> 4)) & mTableSize_1;
+  ymuint v1 = id1.hash();
+  ymuint v2 = id2.hash();
+  return size_t(v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
 // id1, id2をキーとして検索を行なう
 inline
-tBddEdge
-BmcCompTbl2::get(tBddEdge id1,
-		 tBddEdge id2)
+BddEdge
+BmcCompTbl2::get(BddEdge id1,
+		 BddEdge id2)
 {
   Cell* tmp = mTable + hash_func(id1, id2);
   if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 ) {
-    return kEdgeInvalid;
+    return BddEdge::make_error();
   }
   else {
     return tmp->mAns;
@@ -496,11 +498,11 @@ BmcCompTbl2::get(tBddEdge id1,
 // 結果を登録する
 inline
 void
-BmcCompTbl2::put(tBddEdge id1,
-		 tBddEdge id2,
-		 tBddEdge ans)
+BmcCompTbl2::put(BddEdge id1,
+		 BddEdge id2,
+		 BddEdge ans)
 {
-  if ( check_invalid(ans) ) {
+  if ( id1.is_invalid() || id2.is_invalid() || ans.is_invalid() ) {
     return;
   }
   if ( check_tablesize() ) {
@@ -509,7 +511,7 @@ BmcCompTbl2::put(tBddEdge id1,
     }
   }
   Cell* tmp = mTable + hash_func(id1, id2);
-  if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) mUsedNum ++;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
   tmp->mAns = ans;
@@ -518,23 +520,25 @@ BmcCompTbl2::put(tBddEdge id1,
 // ハッシュ関数
 inline
 size_t
-BmcIsopTbl::hash_func(tBddEdge id1,
-		      tBddEdge id2)
+BmcIsopTbl::hash_func(BddEdge id1,
+		      BddEdge id2)
 {
-  return size_t(id1 + id2 + id2 + (id1 >> 2) + (id2 >> 4)) & mTableSize_1;
+  ymuint v1 = id1.hash();
+  ymuint v2 = id2.hash();
+  return size_t(v1 + v2 + v2 + (v1 >> 2) + (v2 >> 4)) & mTableSize_1;
   //    return size_t((id1 * (id2 + 2)) >> 2) & mTableSize_1;
 }
 
 // id1, id2をキーとして検索を行なう
 inline
-tBddEdge
-BmcIsopTbl::get(tBddEdge id1,
-		tBddEdge id2,
+BddEdge
+BmcIsopTbl::get(BddEdge id1,
+		BddEdge id2,
 		LogExpr& ans_cov)
 {
   Cell* tmp = mTable + hash_func(id1, id2);
   if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 ) {
-    return kEdgeInvalid;
+    return BddEdge::make_error();
   }
   else {
     ans_cov = *(tmp->mAnsCov);
@@ -545,12 +549,12 @@ BmcIsopTbl::get(tBddEdge id1,
 // 結果を登録する
 inline
 void
-BmcIsopTbl::put(tBddEdge id1,
-		tBddEdge id2,
-		tBddEdge ans_bdd,
+BmcIsopTbl::put(BddEdge id1,
+		BddEdge id2,
+		BddEdge ans_bdd,
 		const LogExpr& ans_cov)
 {
-  if ( check_invalid(ans_bdd) ) {
+  if ( id1.is_invalid() || id2.is_invalid() || ans_bdd.is_invalid() ) {
     return;
   }
   if ( check_tablesize() ) {
@@ -559,7 +563,7 @@ BmcIsopTbl::put(tBddEdge id1,
     }
   }
   Cell* tmp = mTable + hash_func(id1, id2);
-  if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) mUsedNum ++;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
   tmp->mAnsBdd = ans_bdd;
@@ -570,24 +574,27 @@ BmcIsopTbl::put(tBddEdge id1,
 // ハッシュ関数
 inline
 size_t
-BmcCompTbl3::hash_func(tBddEdge id1,
-		       tBddEdge id2,
-		       tBddEdge id3)
+BmcCompTbl3::hash_func(BddEdge id1,
+		       BddEdge id2,
+		       BddEdge id3)
 {
-  return size_t(id1 + id2 + id3 + (id1 >> 2) + (id2 >> 4) + (id3 >> 6))
+  ymuint v1 = id1.hash();
+  ymuint v2 = id2.hash();
+  ymuint v3 = id3.hash();
+  return size_t(v1 + v2 + v3 + (v1 >> 2) + (v2 >> 4) + (v3 >> 6))
     & mTableSize_1;
 }
 
 // 検索を行なう．
 inline
-tBddEdge
-BmcCompTbl3::get(tBddEdge id1,
-		 tBddEdge id2,
-		 tBddEdge id3)
+BddEdge
+BmcCompTbl3::get(BddEdge id1,
+		 BddEdge id2,
+		 BddEdge id3)
 {
   Cell* tmp = mTable + hash_func(id1, id2, id3);
   if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 || tmp->mKey3 != id3 ) {
-    return kEdgeInvalid;
+    return BddEdge::make_error();
   }
   else {
     return tmp->mAns;
@@ -597,12 +604,15 @@ BmcCompTbl3::get(tBddEdge id1,
 // 登録を行なう．
 inline
 void
-BmcCompTbl3::put(tBddEdge id1,
-		 tBddEdge id2,
-		 tBddEdge id3,
-		 tBddEdge ans)
+BmcCompTbl3::put(BddEdge id1,
+		 BddEdge id2,
+		 BddEdge id3,
+		 BddEdge ans)
 {
-  if ( check_invalid(ans) ) {
+  if ( id1.is_invalid() ||
+       id2.is_invalid() ||
+       id3.is_invalid() ||
+       ans.is_invalid() ) {
     return;
   }
   if ( check_tablesize() ) {
@@ -611,7 +621,7 @@ BmcCompTbl3::put(tBddEdge id1,
     }
   }
   Cell* tmp = mTable + hash_func(id1, id2, id3);
-  if ( tmp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+  if ( tmp->mKey1.is_error() ) mUsedNum ++;
   tmp->mKey1 = id1;
   tmp->mKey2 = id2;
   tmp->mKey3 = id3;

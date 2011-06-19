@@ -67,7 +67,7 @@ private:
   int mMark;
 
   // compose用にBDDの枝を入れておくメンバ
-  tBddEdge mCompEdge;
+  BddEdge mCompEdge;
 
   // 変数リスト中の次の要素を指すポインタ
   BmcVar* mNext;
@@ -114,16 +114,16 @@ public:
 public:
 
   // 中間ノードの場合に0枝/1枝を得る．
-  tBddEdge
+  BddEdge
   edge0() const;
 
-  tBddEdge
+  BddEdge
   edge1() const;
 
-  tBddEdge
+  BddEdge
   edge0(tPol p) const;
 
-  tBddEdge
+  BddEdge
   edge1(tPol p) const;
 
   // 変数を得る．
@@ -194,10 +194,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 0枝
-  tBddEdge mEdge0;
+  BddEdge mEdge0;
 
   // 1枝
-  tBddEdge mEdge1;
+  BddEdge mEdge1;
 
   // 変数へのポインタ
   BmcVar* mVar;
@@ -217,28 +217,28 @@ private:
 
 // 中間ノードの場合に左右の子供への枝を得る．
 inline
-tBddEdge
+BddEdge
 BmcNode::edge0() const
 {
   return mEdge0;
 }
 inline
-tBddEdge
+BddEdge
 BmcNode::edge1() const
 {
   return mEdge1;
 }
 inline
-tBddEdge
+BddEdge
 BmcNode::edge0(tPol p) const
 {
-  return addpol(mEdge0, p);
+  return BddEdge(mEdge0, p);
 }
 inline
-tBddEdge
+BddEdge
 BmcNode::edge1(tPol p) const
 {
-  return addpol(mEdge1, p);
+  return BddEdge(mEdge1, p);
 }
 
 // 変数を得る．

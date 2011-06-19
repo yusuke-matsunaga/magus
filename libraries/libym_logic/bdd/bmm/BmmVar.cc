@@ -40,18 +40,25 @@ const size_t VARTABLE_INIT_SIZE = 1 * K_unit;
 
 // 節点テーブルのハッシュ関数
 inline
-size_t
-hash_func2(int id1, int id2)
+ymuint
+hash_func2(BddEdge id1,
+	   BddEdge id2)
 {
-  return size_t(id1 + (id2 >> 2));
+  ymuint v1 = id1.hash();
+  ymuint v2 = id2.hash();
+  return v1 + (v2 >> 2);
 }
 
 // 節点テーブルのハッシュ関数
 inline
-size_t
-hash_func3(int id1, int id2, int id3)
+ymuint
+hash_func3(BddEdge id1,
+	   BddEdge id2,
+	   ymuint id3)
 {
-  return size_t(id1 + (id2 >> 2) + (id3 << 3) - id3);
+  ymuint v1 = id1.hash();
+  ymuint v2 = id2.hash();
+  return v1 + (v2 >> 2) + (id3 << 3) - id3;
 }
 
 END_NONAMESPACE
@@ -61,7 +68,8 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-BmmVar::BmmVar(BddMgrModern* mgr, tVarId id) :
+BmmVar::BmmVar(BddMgrModern* mgr,
+	       tVarId id) :
   mMgr(mgr),
   mId(id)
 {
@@ -88,7 +96,8 @@ BmmVar::~BmmVar()
 
 // ノードを登録する．
 void
-BmmVar::reg_node(size_t pos, Node* node)
+BmmVar::reg_node(size_t pos,
+		 Node* node)
 {
   ++ mNodeNum;
   if ( mNodeNum > mNextLimit ) {

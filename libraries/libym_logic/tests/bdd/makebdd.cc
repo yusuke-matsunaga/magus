@@ -86,8 +86,10 @@ makebdd(const string& filename)
       if ( node->fanin1_inv() ) {
 	bdd1 = ~bdd1;
       }
+#if 0
       cout << " " << bdd0.size() << " x " << bdd1.size();
       cout.flush();
+#endif
       if ( node->is_and() ) {
 	Bdd bdd = bdd0 & bdd1;
 	bddmap[node->id()] = bdd;
@@ -99,7 +101,10 @@ makebdd(const string& filename)
       else {
 	assert_not_reached(__FILE__, __LINE__);
       }
-      cout << " = " << bddmap[node->id()].size() << endl;
+#if 0
+      cout << " = " << bddmap[node->id()].size();
+#endif
+      cout << endl;
     }
 
     bddmgr.disable_gc();

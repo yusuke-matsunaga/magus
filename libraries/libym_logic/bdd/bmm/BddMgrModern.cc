@@ -57,26 +57,30 @@ const size_t VARTABLE_INIT_SIZE = 1 * K_unit;
 
 // 節点テーブルのハッシュ関数
 inline
-size_t
-hash_func2(int id1,
-	   int id2)
+ymuint
+hash_func2(BddEdge id1,
+	   BddEdge id2)
 {
-  return size_t(id1 + (id2 >> 2));
+  ymuint v1 = id1.hash();
+  ymuint v2 = id2.hash();
+  return v1 + (v2 >> 2);
 }
 
 // 節点テーブルのハッシュ関数
 inline
-size_t
-hash_func3(int id1,
-	   int id2,
-	   int id3)
+ymuint
+hash_func3(BddEdge id1,
+	   BddEdge id2,
+	   ymuint id3)
 {
-  return size_t(id1 + (id2 >> 2) + (id3 << 3) - id3);
+  ymuint v1 = id1.hash();
+  ymuint v2 = id2.hash();
+  return v1 + (v2 >> 2) + (id3 << 3) - id3;
 }
 
 // VarId 用のハッシュ関数
 inline
-size_t
+ymuint
 var_hash(tVarId key)
 {
   return ((key * key) >> 8) + key;
@@ -223,47 +227,47 @@ BddMgrModern::~BddMgrModern()
 }
 
 // 肯定のリテラル関数を作る
-tBddEdge
+BddEdge
 BddMgrModern::make_posiliteral(tVarId varid)
 {
   Var* var = var_of(varid);
   if ( !var ) {
     var = alloc_var(varid);
     if ( !var ) {
-      return kEdgeOverflow;
+      return BddEdge::make_overflow();
     }
   }
-  return new_node(var, kEdge0, kEdge1);
+  return new_node(var, BddEdge::make_zero(), BddEdge::make_one());
 }
 
 // bdd が正リテラルのみのキューブの時，真となる．
 bool
-BddMgrModern::check_posi_cube(tBddEdge e)
+BddMgrModern::check_posi_cube(BddEdge e)
 {
   // エラーやオーバーフローの時は false を返す．
-  if ( check_invalid(e) ) {
+  if ( e.is_invalid() ) {
     return false;
   }
 
   // 定数0の場合も false かな？
-  if ( check_zero(e) ) {
+  if ( e.is_zero() ) {
     return false;
   }
 
   // 定数1の場合は true
-  if ( check_one(e) ) {
+  if ( e.is_one() ) {
     return true;
   }
 
   for ( ; ; ) {
     Node* vp = get_node(e);
-    tPol pol = get_pol(e);
-    tBddEdge e0 = vp->edge0(pol);
-    tBddEdge e1 = vp->edge1(pol);
-    if ( !check_zero(e0) || check_zero(e1) ) {
+    tPol pol = e.pol();
+    BddEdge e0 = vp->edge0(pol);
+    BddEdge e1 = vp->edge1(pol);
+    if ( !e0.is_zero() || e1.is_zero() ) {
       return false;
     }
-    if ( check_one(e1) ) {
+    if ( e1.is_one() ) {
       return true;
     }
     e = e1;
@@ -272,38 +276,38 @@ BddMgrModern::check_posi_cube(tBddEdge e)
 
 // bdd がキューブの時, true となる．
 bool
-BddMgrModern::check_cube(tBddEdge e)
+BddMgrModern::check_cube(BddEdge e)
 {
   // エラーやオーバーフローの時は false を返す．
-  if ( check_invalid(e) ) {
+  if ( e.is_invalid() ) {
     return false;
   }
 
   // 定数0の場合も false かな？
-  if ( check_zero(e) ) {
+  if ( e.is_zero() ) {
     return false;
   }
 
   // 定数1の場合は true
-  if ( check_one(e) ) {
+  if ( e.is_one() ) {
     return true;
   }
 
   for ( ; ; ) {
     Node* vp = get_node(e);
-    tPol pol = get_pol(e);
-    tBddEdge e0 = vp->edge0(pol);
-    tBddEdge e1 = vp->edge1(pol);
-    if ( check_zero(e0) ) {
+    tPol pol = e.pol();
+    BddEdge e0 = vp->edge0(pol);
+    BddEdge e1 = vp->edge1(pol);
+    if ( e0.is_zero() ) {
       e = e1;
     }
-    else if ( check_zero(e1) ) {
+    else if ( e1.is_zero() ) {
       e = e0;
     }
     else {
       return false;
     }
-    if ( check_one(e) ) {
+    if ( e.is_one() ) {
       return true;
     }
   }
@@ -312,11 +316,11 @@ BddMgrModern::check_cube(tBddEdge e)
 // Shannon 展開を行なう．
 // エラーは起きないはず．
 tVarId
-BddMgrModern::root_decomp(tBddEdge e,
-			  tBddEdge& e0,
-			  tBddEdge& e1)
+BddMgrModern::root_decomp(BddEdge e,
+			  BddEdge& e0,
+			  BddEdge& e1)
 {
-  tPol pol = get_pol(e);
+  tPol pol = e.pol();
   Node* vp = get_node(e);
   if ( vp ) {
     e0 = vp->edge0(pol);
@@ -334,7 +338,7 @@ BddMgrModern::root_decomp(tBddEdge e,
 
 // 根の変数番号を取り出す．
 tVarId
-BddMgrModern::root_var(tBddEdge e)
+BddMgrModern::root_var(BddEdge e)
 {
   Node* vp = get_node(e);
   if ( vp ) {
@@ -348,12 +352,12 @@ BddMgrModern::root_var(tBddEdge e)
 
 // 0枝の指している cofactor を返す．
 // 定数節点の場合には自分自身を返す．
-tBddEdge
-BddMgrModern::edge0(tBddEdge e)
+BddEdge
+BddMgrModern::edge0(BddEdge e)
 {
   Node* vp = get_node(e);
   if ( vp ) {
-    tPol pol = get_pol(e);
+    tPol pol = e.pol();
     return vp->edge0(pol);
   }
   else {
@@ -364,12 +368,12 @@ BddMgrModern::edge0(tBddEdge e)
 
 // 1枝の指している cofactor を返す．
 // 定数節点の場合には自分自身を返す．
-tBddEdge
-BddMgrModern::edge1(tBddEdge e)
+BddEdge
+BddMgrModern::edge1(BddEdge e)
 {
   Node* vp = get_node(e);
   if ( vp ) {
-    tPol pol = get_pol(e);
+    tPol pol = e.pol();
     return vp->edge1(pol);
   }
   else {
@@ -381,7 +385,7 @@ BddMgrModern::edge1(tBddEdge e)
 // e の指すノードの参照回数が 0 の時 true を返す．
 // e が終端ノードの場合には false を返す．
 bool
-BddMgrModern::check_noref(tBddEdge e)
+BddMgrModern::check_noref(BddEdge e)
 {
   Node* vp = get_node(e);
   return vp && vp->noref();
@@ -753,26 +757,26 @@ BddMgrModern::gc_count() const
 
 // 同一の節点が存在するか調べ，ない時にのみ新たなノードを確保する
 // 使用メモリ量が上限を越えたら kEdgeInvalid を返す．
-tBddEdge
+BddEdge
 BddMgrModern::new_node(Var* var,
-		       tBddEdge e0,
-		       tBddEdge e1)
+		       BddEdge e0,
+		       BddEdge e1)
 {
   if ( e0 == e1 ) {
     return e0;
   }
 
-  if ( check_error(e0) || check_error(e1) ) {
-    return kEdgeError;
+  if ( e0.is_error() || e1.is_error() ) {
+    return BddEdge::make_error();
   }
-  if ( check_overflow(e0) || check_overflow(e1) ) {
-    return kEdgeInvalid;
+  if ( e0.is_overflow() || e1.is_overflow() ) {
+    return BddEdge::make_overflow();
   }
 
   // 否定枝に関する正規化ルール
-  tPol ans_pol = get_pol(e1);
-  e1 = addpol(e1, ans_pol);
-  e0 = addpol(e0, ans_pol);
+  tPol ans_pol = e1.pol();
+  e1.addpol(ans_pol);
+  e0.addpol(ans_pol);
 
   Node* temp;
   size_t pos;
@@ -804,7 +808,7 @@ BddMgrModern::new_node(Var* var,
   temp = alloc_node();
   if ( !temp ) {
     // メモリアロケーションに失敗した
-    return kEdgeInvalid;
+    return BddEdge::make_overflow();
   }
   temp->mEdge0 = e0;
   temp->mEdge1 = e1;
@@ -827,21 +831,21 @@ BddMgrModern::new_node(Var* var,
 
  already_exist:
 
-  tBddEdge ans = combine(temp, ans_pol);
+  BddEdge ans = combine(temp, ans_pol);
 
   return ans;
 }
 
 // e の参照回数を増やす．
 void
-BddMgrModern::inc_rootref(tBddEdge e)
+BddMgrModern::inc_rootref(BddEdge e)
 {
   activate(e);
 }
 
 // e の参照回数を減らす．
 void
-BddMgrModern::dec_rootref(tBddEdge e)
+BddMgrModern::dec_rootref(BddEdge e)
 {
   deactivate(e);
 
@@ -1122,7 +1126,7 @@ BddMgrModern::deallocate(void* ptr,
 
 // p_mark が付いた節点のマークを消す．
 void
-BddMgrModern::clear_pmark(tBddEdge e)
+BddMgrModern::clear_pmark(BddEdge e)
 {
   for ( ; ; ) {
     Node* vp = get_node(e);
@@ -1137,7 +1141,7 @@ BddMgrModern::clear_pmark(tBddEdge e)
 
 // n_mark が付いた節点のマークを消す．
 void
-BddMgrModern::clear_nmark(tBddEdge e)
+BddMgrModern::clear_nmark(BddEdge e)
 {
   for ( ; ; ) {
     Node* vp = get_node(e);
@@ -1152,7 +1156,7 @@ BddMgrModern::clear_nmark(tBddEdge e)
 
 // 各ノードについたマークを再帰的にクリアする
 void
-BddMgrModern::clear_pnmark(tBddEdge e)
+BddMgrModern::clear_pnmark(BddEdge e)
 {
   for ( ; ; ) {
     Node* vp = get_node(e);

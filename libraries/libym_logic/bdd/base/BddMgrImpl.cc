@@ -11,17 +11,11 @@
 
 #include "BddMgrImpl.h"
 
-#include "ym_utils/HeapTree.h"
 #include "ym_logic/Bdd.h"
 #include "bmc/BddMgrClassic.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
-
-BEGIN_NONAMESPACE
-// 入力数がこの値よりも小さかったらヒープ木は使わない．
-const size_t kNiLimit = 8;
-END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
@@ -37,8 +31,6 @@ BddMgrImpl::default_mgr()
   if ( !mDefaultMgr ) {
     mDefaultMgr = new BddMgrClassic("default manager");
     assert_cond(mDefaultMgr, __FILE__, __LINE__);
-    // 絶対に解放しない
-    mDefaultMgr->inc_ref();
   }
   return mDefaultMgr;
 }
@@ -71,7 +63,7 @@ BddMgrImpl::~BddMgrImpl()
   if ( mTopBdd ) {
     Bdd* last = NULL;
     for (Bdd* bdd = mTopBdd; bdd; bdd = bdd->mNext) {
-      bdd->mRoot = kEdgeError;
+      bdd->mRoot = BddEdge::make_error();
       bdd->mMgr = mDefaultMgr;
       last = bdd;
     }
@@ -86,24 +78,6 @@ BddMgrImpl::~BddMgrImpl()
 
   // /dev/null ストリームの破壊
   delete mNullStream;
-}
-
-// 参照回数を1増やす．
-void
-BddMgrImpl::inc_ref()
-{
-  ++ mRefCount;
-}
-
-// 参照回数を1減らす．
-// 参照回数が0になったら自分自身を破壊する．
-void
-BddMgrImpl::dec_ref()
-{
-  -- mRefCount;
-  if ( mRefCount == 0 ) {
-    delete this;
-  }
 }
 
 // log用ストリームを設定する．
@@ -127,213 +101,53 @@ BddMgrImpl::logstream() const
   return *mLogFp;
 }
 
-// LogExpr から BDD の枝を作る
-tBddEdge
-BddMgrImpl::expr_to_bddedge(const LogExpr& expr,
-			    const hash_map<tVarId, tBddEdge>& vemap)
-{
-  // 定数0の場合
-  if ( expr.is_zero() ) {
-    return kEdge0;
-  }
-
-  // 定数1の場合
-  if ( expr.is_one() ) {
-    return kEdge1;
-  }
-
-  // リテラルの場合
-  if ( expr.is_literal() ) {
-    tVarId pos = expr.varid();
-    hash_map<tVarId, tBddEdge>::const_iterator p = vemap.find(pos);
-    tBddEdge ans;
-    if ( p == vemap.end() ) {
-      ans = make_posiliteral(pos);
-    }
-    else {
-      ans = p->second;
-    }
-    if ( expr.is_negaliteral() ) {
-      ans = negate(ans);
-    }
-    return ans;
-  }
-
-  // ここまで来たら根はAND/OR/XOR演算子
-  ymuint n = expr.child_num();
-  list<tBddEdge> edge_list;
-  for (ymuint i = 0; i < n; ++ i) {
-    tBddEdge e = expr_to_bddedge(expr.child(i), vemap);
-    edge_list.push_back(e);
-  }
-  if ( expr.is_and() ) {
-    return and_op(edge_list);
-  }
-  if ( expr.is_or() ) {
-    return or_op(edge_list);
-  }
-  if ( expr.is_xor() ) {
-    return xor_op(edge_list);
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return kEdgeError;
-}
-
 // ベクタを真理値表と見なしてBDDを作る．
 // 個々の変数を vars で指定する．
 // ベクタの値は非ゼロを true とみなす．
 // v の大きさは 2^(vars.size()) に等しくなければならない．
-Bdd
+BddEdge
 BddMgrImpl::tvec_to_bdd(const vector<int>& v,
 			const VarVector& vars)
 {
   ymuint ni = vars.size();
   ymuint nv = (1 << ni);
   if ( nv != v.size() ) {
-    return make_error();
+    return BddEdge::make_error();
   }
 
   // 変数の生成
-  vector<tBddEdge> var_vector;
+  vector<BddEdge> var_vector;
   for (VarVector::const_iterator p = vars.begin(); p != vars.end(); ++ p) {
     tVarId varid = *p;
     var_vector.push_back(make_posiliteral(varid));
   }
   ymuint size = v.size();
-  return Bdd(this, tvec_sub(v, 0, size, var_vector, 0));
+  return tvec_sub(v, 0, size, var_vector, 0);
 }
 
 // 真理値表からBDDを作るためのサブルーティン
-tBddEdge
+BddEdge
 BddMgrImpl::tvec_sub(const vector<int>& v,
 		     ymuint32 top,
 		     ymuint32 size,
-		     const vector<tBddEdge>& var_vector,
+		     const vector<BddEdge>& var_vector,
 		     tVarId var_idx)
 {
   assert_cond(size > 0, __FILE__, __LINE__);
   if ( size == 1 ) {
     if ( v[top] ) {
-      return kEdge1;
+      return BddEdge::make_one();
     }
     else {
-      return kEdge0;
+      return BddEdge::make_zero();
     }
   }
   else {
     size_t size1 = size >> 1;
-    tBddEdge l = tvec_sub(v, top, size1, var_vector, var_idx + 1);
-    tBddEdge h = tvec_sub(v, top + size1, size1, var_vector, var_idx + 1);
+    BddEdge l = tvec_sub(v, top, size1, var_vector, var_idx + 1);
+    BddEdge h = tvec_sub(v, top + size1, size1, var_vector, var_idx + 1);
     return ite_op(var_vector[var_idx], h, l);
   }
-}
-
-// edge_list に登録されたBDDのANDを計算する．
-tBddEdge
-BddMgrImpl::and_op(const list<tBddEdge>& edge_list)
-{
-  size_t n = edge_list.size();
-  tBddEdge ans;
-  if ( n == 0 ) {
-    ans = kEdge1;
-  }
-  else if ( n == 1 ) {
-    ans = edge_list.front();
-  }
-  else if ( n < kNiLimit ) {
-    list<tBddEdge>::const_iterator p = edge_list.begin();
-    ans = *p;
-    for (++ p; p != edge_list.end(); ++ p) {
-      ans = and_op(ans, *p);
-    }
-  }
-  else {
-    SimpleHeapTree<tBddEdge> work;
-    for (list<tBddEdge>::const_iterator p = edge_list.begin();
-	 p != edge_list.end(); ++p) {
-      tBddEdge e = *p;
-      work.put(e, size(e));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans = and_op(ans, work.getmin());
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
-}
-
-// edge_list に登録されたBDDのORを計算する．
-tBddEdge
-BddMgrImpl::or_op(const list<tBddEdge>& edge_list)
-{
-  size_t n = edge_list.size();
-  tBddEdge ans;
-  if ( n == 0 ) {
-    ans = kEdge0;
-  }
-  else if ( n == 1 ) {
-    ans = edge_list.front();
-  }
-  else if ( n < kNiLimit ) {
-    list<tBddEdge>::const_iterator p = edge_list.begin();
-    ans = *p;
-    for (++ p; p != edge_list.end(); ++ p) {
-      ans = or_op(ans, *p);
-    }
-  }
-  else {
-    SimpleHeapTree<tBddEdge> work;
-    for (list<tBddEdge>::const_iterator p = edge_list.begin();
-	 p != edge_list.end(); ++p) {
-      tBddEdge e = *p;
-      work.put(e, size(e));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans = or_op(ans, work.getmin());
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
-}
-
-// edge_list に登録されたBDDのANDを計算する．
-tBddEdge
-BddMgrImpl::xor_op(const list<tBddEdge>& edge_list)
-{
-  size_t n = edge_list.size();
-  tBddEdge ans;
-  if ( n == 0 ) {
-    ans = kEdge0;
-  }
-  else if ( n == 1 ) {
-    ans = edge_list.front();
-  }
-  else if ( n < kNiLimit ) {
-    list<tBddEdge>::const_iterator p = edge_list.begin();
-    ans = *p;
-    for (++ p; p != edge_list.end(); ++ p) {
-      ans = xor_op(ans, *p);
-    }
-  }
-  else {
-    SimpleHeapTree<tBddEdge> work;
-    for (list<tBddEdge>::const_iterator p = edge_list.begin();
-	 p != edge_list.end(); ++p) {
-      tBddEdge e = *p;
-      work.put(e, size(e));
-    }
-    ans = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans = xor_op(ans, work.getmin());
-      ans = work.xchgmin(ans, size(ans));
-    }
-  }
-  return ans;
 }
 
 END_NAMESPACE_YM_BDD

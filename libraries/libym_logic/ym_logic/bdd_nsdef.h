@@ -52,6 +52,7 @@ class Bdd;
 class BddMgr;
 class BddMgrParam;
 class BddMgrImpl;
+class BddEdge;
 class BddVarSet;
 class BddLitSet;
 
@@ -60,9 +61,11 @@ class BddLitSet;
 /// @name 型名の定義
 /// @{
 
+#if 0
 /// @brief BDD の節点を指す枝のタイプ
 /// @ingroup Bdd
 typedef ympuint tBddEdge;
+#endif
 
 /// @brief BDD の変数番号
 /// @ingroup Bdd
@@ -107,7 +110,6 @@ using nsBdd::BddLitSet;
 using nsBdd::BddVector;
 using nsBdd::BddList;
 using nsBdd::VarBddMap;
-using nsBdd::tBddEdge;
 
 END_NAMESPACE_YM
 

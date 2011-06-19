@@ -153,7 +153,7 @@ BmmCompTbl1::resize(size_t new_size)
   Cell* top = mTable;
   Cell* end = top + mTableSize;
   do {
-    top->mKey1 = kEdgeInvalid;
+    top->mKey1 = BddEdge::make_error();
     top ++;
   } while ( top != end );
 
@@ -163,10 +163,10 @@ BmmCompTbl1::resize(size_t new_size)
     Cell* top = old_table;
     Cell* end = top + old_size;
     do {
-      if ( top->mKey1 != kEdgeInvalid ) {
+      if ( !top->mKey1.is_error() ) {
 	size_t pos = hash_func(top->mKey1);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) mUsedNum ++;
 	temp->mKey1 = top->mKey1;
 	temp->mAns = top->mAns;
       }
@@ -188,10 +188,10 @@ BmmCompTbl1::sweep()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    if ( cell->mKey1 != kEdgeInvalid &&
+    if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mAns)) ) {
-      cell->mKey1 = kEdgeInvalid;
+      cell->mKey1 = BddEdge::make_error();
       mUsedNum --;
     }
   }
@@ -204,7 +204,7 @@ BmmCompTbl1::clear()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    cell->mKey1 = kEdgeInvalid;
+    cell->mKey1 = BddEdge::make_error();
     mUsedNum --;
   }
 }
@@ -250,7 +250,7 @@ BmmCompTbl2::resize(size_t new_size)
   Cell* top = mTable;
   Cell* end = top + mTableSize;
   do {
-    top->mKey1 = kEdgeInvalid;
+    top->mKey1 = BddEdge::make_error();
     top ++;
   } while ( top != end );
 
@@ -260,10 +260,10 @@ BmmCompTbl2::resize(size_t new_size)
     Cell* top = old_table;
     Cell* end = top + old_size;
     do {
-      if ( top->mKey1 != kEdgeInvalid ) {
+      if ( !top->mKey1.is_error() ) {
 	size_t pos = hash_func(top->mKey1, top->mKey2);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) mUsedNum ++;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mAns = top->mAns;
@@ -286,11 +286,11 @@ BmmCompTbl2::sweep()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    if ( cell->mKey1 != kEdgeInvalid &&
+    if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mKey2) ||
 	  check_noref(cell->mAns)) ) {
-      cell->mKey1 = kEdgeInvalid;
+      cell->mKey1 = BddEdge::make_error();
       mUsedNum --;
     }
   }
@@ -303,7 +303,7 @@ BmmCompTbl2::clear()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    cell->mKey1 = kEdgeInvalid;
+    cell->mKey1 = BddEdge::make_error();
     mUsedNum --;
   }
 }
@@ -349,7 +349,7 @@ BmmCompTbl3::resize(size_t new_size)
   Cell* top = mTable;
   Cell* end = top + mTableSize;
   do {
-    top->mKey1 = kEdgeInvalid;
+    top->mKey1 = BddEdge::make_error();
     top ++;
   } while ( top != end );
 
@@ -359,10 +359,10 @@ BmmCompTbl3::resize(size_t new_size)
     Cell* top = old_table;
     Cell* end = top + old_size;
     do {
-      if ( top->mKey1 != kEdgeInvalid ) {
+      if ( !top->mKey1.is_error() ) {
 	size_t pos = hash_func(top->mKey1, top->mKey2, top->mKey3);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) mUsedNum ++;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mKey3 = top->mKey3;
@@ -386,12 +386,12 @@ BmmCompTbl3::sweep()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    if ( cell->mKey1 != kEdgeInvalid &&
+    if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mKey2) ||
 	  check_noref(cell->mKey3) ||
 	  check_noref(cell->mAns)) ) {
-      cell->mKey1 = kEdgeInvalid;
+      cell->mKey1 = BddEdge::make_error();
       mUsedNum --;
     }
   }
@@ -404,7 +404,7 @@ BmmCompTbl3::clear()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    cell->mKey1 = kEdgeInvalid;
+    cell->mKey1 = BddEdge::make_error();
     mUsedNum --;
   }
 }
@@ -451,7 +451,7 @@ BmmIsopTbl::resize(size_t new_size)
   Cell* top = mTable;
   Cell* end = top + mTableSize;
   do {
-    top->mKey1 = kEdgeInvalid;
+    top->mKey1 = BddEdge::make_error();
     top->mAnsCov = 0;
     top ++;
   } while ( top != end );
@@ -462,10 +462,10 @@ BmmIsopTbl::resize(size_t new_size)
     Cell* top = old_table;
     Cell* end = top + old_size;
     do {
-      if ( top->mKey1 != kEdgeInvalid ) {
+      if ( !top->mKey1.is_error() ) {
 	size_t pos = hash_func(top->mKey1, top->mKey2);
 	Cell* temp = mTable + pos;
-	if ( temp->mKey1 == kEdgeInvalid ) mUsedNum ++;
+	if ( temp->mKey1.is_error() ) mUsedNum ++;
 	temp->mKey1 = top->mKey1;
 	temp->mKey2 = top->mKey2;
 	temp->mAnsBdd = top->mAnsBdd;
@@ -490,11 +490,11 @@ BmmIsopTbl::sweep()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    if ( cell->mKey1 != kEdgeInvalid &&
+    if ( !cell->mKey1.is_error() &&
 	 (check_noref(cell->mKey1) ||
 	  check_noref(cell->mKey2) ||
 	  check_noref(cell->mAnsBdd)) ) {
-      cell->mKey1 = kEdgeInvalid;
+      cell->mKey1 = BddEdge::make_error();
       delete cell->mAnsCov;
       cell->mAnsCov = 0;
       mUsedNum --;
@@ -509,7 +509,7 @@ BmmIsopTbl::clear()
   Cell* cell = mTable;
   Cell* end = cell + mTableSize;
   for ( ; cell != end; cell ++) {
-    cell->mKey1 = kEdgeInvalid;
+    cell->mKey1 = BddEdge::make_error();
     delete cell->mAnsCov;
     cell->mAnsCov = 0;
     mUsedNum --;

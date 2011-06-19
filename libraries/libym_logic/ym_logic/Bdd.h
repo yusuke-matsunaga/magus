@@ -2,7 +2,7 @@
 #define YM_LOGIC_BDD_H
 
 /// @file ym_logic/Bdd.h
-/// @brief BDD に共通な定義ファイル
+/// @brief Bdd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -13,6 +13,7 @@
 
 
 #include "ym_logic/bdd_nsdef.h"
+#include "ym_logic/BddEdge.h"
 #include "ym_logic/LogExpr.h"
 #include "gmpxx.h"
 
@@ -26,145 +27,6 @@ BEGIN_NAMESPACE_YM_BDD
 /// @brief 葉のノードの仮想的なレベル
 /// @ingroup Bdd
 const tLevel kLevelMax = 0xFFFFFFFF;
-
-/// @brief 終端の0を指す枝
-/// @ingroup Bdd
-const tBddEdge kEdge0 = 1UL;
-
-/// @brief 終端の1を指す枝
-/// @ingroup Bdd
-const tBddEdge kEdge1 = 0UL;
-
-/// @brief 不正な値を表す枝
-/// @ingroup Bdd
-const tBddEdge kEdgeInvalid = 2UL;
-
-/// @brief オーバーフローを表す枝(invalidと同値)
-/// @ingroup Bdd
-const tBddEdge kEdgeOverflow = 2UL;
-
-/// @brief エラーを表す枝
-/// @ingroup Bdd
-const tBddEdge kEdgeError = 3UL;
-
-/// @}
-//////////////////////////////////////////////////////////////////////
-
-
-//////////////////////////////////////////////////////////////////////
-/// @name tBddEdge に関係する関数の宣言
-/// @{
-
-/// @brief 枝に極性を付加する
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @param[in] p 極性
-/// @return e に極性 p を付加したもの
-tBddEdge
-addpol(tBddEdge e,
-       tPol p);
-
-/// @brief e が不正な値でなければ枝に極性を付加する
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @param[in] p 極性
-/// @return e に極性 p を付加したもの
-tBddEdge
-addpol_ifvalid(tBddEdge e,
-	       tPol p);
-
-/// @brief 枝の極性を反転させる
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @return e の極性を反転させたもの
-tBddEdge
-negate(tBddEdge e);
-
-/// @brief e が不正な値でなければ枝の極性を反転させる
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @return e の極性を反転させたもの
-tBddEdge
-negate_ifvalid(tBddEdge e);
-
-/// @brief 正極性の枝に変換する．
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @return e の極性を正極性にしたもの
-tBddEdge
-normalize(tBddEdge e);
-
-/// @brief 枝の極性をとり出す
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @return e の極性
-tPol
-get_pol(tBddEdge e);
-
-/// @brief 0の終端ノードのチェック
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @retval true e が0の終端ノードを指していた
-/// @retval false 上記以外
-bool
-check_zero(tBddEdge e);
-
-/// @brief 1の終端ノードを指す枝の時，trueを返す．
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @retval true e が1の終端ノードを指していた
-/// @retval false 上記以外
-bool
-check_one(tBddEdge e);
-
-/// @brief 定数ノード(0か1)の時, true を返す．
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @retval true e が0か1の終端ノードを指していた
-/// @retval false 上記以外
-bool
-check_const(tBddEdge e);
-
-/// @brief エラーを表す枝の時,true を返す．
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @retval true e がエラーを表す枝の場合
-/// @retval false 上記以外
-bool
-check_error(tBddEdge e);
-
-/// @brief オーバーフローを表す枝の時, true を返す．
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @retval true e がオーバーフローを表す枝の場合
-/// @retval false 上記以外
-bool
-check_overflow(tBddEdge e);
-
-/// @brief エラーかオーバーフローを表す枝の時, true を返す．
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @retval true e がエラーかオーバーフローを表す枝の場合
-/// @retval false 上記以外
-bool
-check_invalid(tBddEdge e);
-
-/// @brief 終端ノードを指す枝の時，true を返す．
-/// @ingroup Bdd
-/// @param[in] e 操作対象の枝
-/// @retval true e が終端ノードを指していた
-/// @retval false 上記以外
-bool
-check_leaf(tBddEdge e);
-
-/// @brief 2つの枝が極性違いの時にtrueを返す．
-/// @ingroup Bdd
-/// @param[in] e1, e2 操作対象の枝
-/// @retval true e1 と e2 が極性違いで同じノードを指している場合
-/// @retval false 上記以外
-bool
-check_reverse(tBddEdge e1,
-	      tBddEdge e2);
 
 /// @}
 //////////////////////////////////////////////////////////////////////
@@ -790,10 +652,10 @@ private:
   /// @param[in] mgr BDD マネージャ
   /// @param[in] e 根の枝
   Bdd(BddMgrImpl* mgr,
-      tBddEdge root);
+      BddEdge root);
 
   // 根の枝をとり出す
-  tBddEdge
+  BddEdge
   root() const;
 
   /// @brief mgr, root をセットする時に呼ばれる関数
@@ -801,7 +663,7 @@ private:
   /// @param[in] root 根の枝
   void
   set(BddMgrImpl* mgr,
-      tBddEdge root);
+      BddEdge root);
 
   /// @brief (mMgr, mRoot) への参照をなくす時に呼ばれる関数
   void
@@ -811,7 +673,7 @@ private:
   /// @param[in] new_e 新しい枝
   /// @warning new_e も同一の BddMgr に属していると仮定する．
   void
-  assign(tBddEdge new_e);
+  assign(BddEdge new_e);
 
 
 private:
@@ -823,7 +685,7 @@ private:
   BddMgrImpl* mMgr;
 
   // 根のノードを指す枝
-  tBddEdge mRoot;
+  BddEdge mRoot;
 
   // おなじ BddMgr の BDD をつなぐためのリンクポインタ
   Bdd* mPrev;
@@ -1041,158 +903,10 @@ lsintersect(const Bdd& src1,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 枝に極性を付加する
-// @param e 枝
-// @param p 極性
-// @return e に極性 p を加えたもの
-inline
-tBddEdge
-addpol(tBddEdge e,
-       tPol p)
-{
-  return e ^ static_cast<tBddEdge>(p);
-}
-
-// @brief e が不正な値でなければ枝に極性を付加する
-// @param e 枝
-// @param p 極性
-// @return e に極性 p を加えたもの
-inline
-tBddEdge
-addpol_ifvalid(tBddEdge e,
-	       tPol p)
-{
-  return (e & kEdgeInvalid) ? e : e ^ static_cast<tBddEdge>(p);
-}
-
-// @brief 枝の極性を反転させる
-// @param e 枝
-// @return 反転した枝
-inline
-tBddEdge
-negate(tBddEdge e)
-{
-  return e ^ static_cast<tBddEdge>(kPolNega);
-}
-
-// @brief e が不正な値でなければ枝の極性を反転させる
-// @param e 枝
-// @return 反転した枝
-inline
-tBddEdge
-negate_ifvalid(tBddEdge e)
-{
-  return (e & kEdgeInvalid) ? e : e ^ long(kPolNega);
-}
-
-// @brief 正極性の枝に変換する．
-// @param e 枝
-// @return 枝の極性を正極性に正規化したもの
-inline
-tBddEdge
-normalize(tBddEdge e)
-{
-  return e & ~1UL;
-}
-
-// @brief 枝の極性をとり出す
-// @param e 枝
-// @return e の極性
-inline
-tPol
-get_pol(tBddEdge e)
-{
-  return static_cast<tPol>(e & 1UL);
-}
-
-// @brief 定数 0 の終端ノードのチェック
-// @param e 枝
-// @return e が定数 0 の終端ノードを指す枝の時，true を返す．
-inline
-bool
-check_zero(tBddEdge e)
-{
-  return (e == kEdge0);
-}
-
-// @brief 定数 1 の終端ノードのチェック
-// @param e 枝
-// @return e が定数 1 の終端ノードを指す枝の時，true を返す．
-inline
-bool
-check_one(tBddEdge e)
-{
-  return (e == kEdge1);
-}
-
-// @brief 定数ノードのチェック
-// @param e 枝
-// @return e が定数ノード ( 0 か 1 ) の時, true を返す．
-inline
-bool
-check_const(tBddEdge e)
-{
-  // ちょっとキタナイことをやっている．
-  return ((e & ~1) == kEdge1);
-}
-
-// @brief エラーを表す枝のチェック
-// @param e 枝
-// @return e がエラーを表す枝の時，true を返す．
-inline
-bool
-check_error(tBddEdge e)
-{
-  return (e == kEdgeError);
-}
-
-// @brief オーバーフローを表す枝のチェック
-// @param e 枝
-// @return e がオーバーフローを表す枝の時，true を返す．
-inline
-bool
-check_overflow(tBddEdge e)
-{
-  return (e == kEdgeOverflow);
-}
-
-// @brief 不正な枝のチェック
-// @param e 枝
-// @return e が不正な枝 (エラーかオーバーフロー)を表す枝の時，true を返す．
-inline
-bool
-check_invalid(tBddEdge e)
-{
-  return ((e & ~1UL) == kEdgeInvalid);
-}
-
-// @brief 終端ノードを指す枝のチェック
-// @param e 枝
-// @return e が終端ノードを指す枝 (定数かエラーかオーバーフロー) の時，
-// true を返す．
-inline
-bool
-check_leaf(tBddEdge e)
-{
-  return !(e & ~3UL);
-}
-
-// @brief 2つの枝が極性違いの時に true を返す．
-// @param e1 1 つめの枝
-// @param e2 2 つめの枝
-// @return 2つの枝が極性違いの時に true を返す．
-inline
-bool
-check_reverse(tBddEdge e1,
-	      tBddEdge e2)
-{
-  return ((e1 ^ e2) == kPolNega);
-}
-
 // @brief 根の枝をとり出す
 // @return 根の枝
 inline
-tBddEdge
+BddEdge
 Bdd::root() const
 {
   return mRoot;
@@ -1204,7 +918,7 @@ inline
 bool
 Bdd::is_zero() const
 {
-  return check_zero(root());
+  return mRoot.is_zero();
 }
 
 // @brief 定数1 のチェック
@@ -1213,7 +927,7 @@ inline
 bool
 Bdd::is_one() const
 {
-  return check_one(root());
+  return mRoot.is_one();
 }
 
 // @brief 定数のチェック
@@ -1222,7 +936,7 @@ inline
 bool
 Bdd::is_const() const
 {
-  return check_const(root());
+  return mRoot.is_const();
 }
 
 // @brief オーバーフローのチェック
@@ -1231,7 +945,7 @@ inline
 bool
 Bdd::is_overflow() const
 {
-  return check_overflow(root());
+  return mRoot.is_overflow();
 }
 
 // @brief エラーのチェック
@@ -1240,7 +954,7 @@ inline
 bool
 Bdd::is_error() const
 {
-  return check_error(root());
+  return mRoot.is_error();
 }
 
 // @brief オーバーフローとエラーのチェック
@@ -1249,7 +963,7 @@ inline
 bool
 Bdd::is_invalid() const
 {
-  return check_invalid(root());
+  return mRoot.is_invalid();
 }
 
 // @brief 終端ノードのチェック
@@ -1258,7 +972,7 @@ inline
 bool
 Bdd::is_leaf() const
 {
-  return check_leaf(root());
+  return mRoot.is_leaf();
 }
 
 // @brief 定数0に設定する．
@@ -1266,7 +980,7 @@ inline
 void
 Bdd::set_zero()
 {
-  set(mMgr, kEdge0);
+  set(mMgr, BddEdge::make_zero());
 }
 
 // @brief 定数1に設定する．
@@ -1274,7 +988,7 @@ inline
 void
 Bdd::set_one()
 {
-  set(mMgr, kEdge1);
+  set(mMgr, BddEdge::make_one());
 }
 
 // @brief エラー値に設定する．
@@ -1282,7 +996,7 @@ inline
 void
 Bdd::set_error()
 {
-  set(mMgr, kEdgeError);
+  set(mMgr, BddEdge::make_error());
 }
 
 // @brief オーバーフロー値に設定する．
@@ -1290,7 +1004,7 @@ inline
 void
 Bdd::set_overflow()
 {
-  set(mMgr, kEdgeOverflow);
+  set(mMgr, BddEdge::make_overflow());
 }
 
 // @brief 等価比較
@@ -1364,7 +1078,7 @@ inline
 ymuint
 Bdd::hash() const
 {
-  tBddEdge r = root();
+  ympuint r = mRoot.mBody;
   return (r * r) >> 8;
 }
 

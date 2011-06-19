@@ -45,33 +45,18 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 自分自身の参照回数関係
-  //////////////////////////////////////////////////////////////////////
-
-  // 参照回数を1増やす．
-  void
-  inc_ref();
-
-  // 参照回数を1減らす．
-  // 参照回数が0になったら自分自身を破壊する．
-  void
-  dec_ref();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // BDDの根の枝の参照回数関数
   //////////////////////////////////////////////////////////////////////
 
   // e の参照回数を増やす．
   virtual
   void
-  inc_rootref(tBddEdge e) = 0;
+  inc_rootref(BddEdge e) = 0;
 
   // e の参照回数を減らす．
   virtual
   void
-  dec_rootref(tBddEdge e) = 0;
+  dec_rootref(BddEdge e) = 0;
 
 
 public:
@@ -118,80 +103,30 @@ public:
   // BDD 生成用関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 定数0関数を作る．
-  /// @return 生成された BDD
-  Bdd
-  make_zero();
-
-  /// @brief 定数1関数を作る．
-  /// @return 生成された BDD
-  Bdd
-  make_one();
-
-  /// @brief オバーフローBDDを明示的に生成する．
-  /// @return 生成された BDD
-  Bdd
-  make_overflow();
-
-  /// @brief エラーBDDを明示的に生成する．
-  /// @return 生成された BDD
-  Bdd
-  make_error();
-
-  /// @brief リテラル関数を表すBDDを作る．
-  /// @param[in] index 変数番号
-  /// @param[in] pol 極性
-  Bdd
-  make_literal(tVarId index,
-	       tPol pol);
-
-  /// @brief リテラル関数を表すBDDを作る
-  /// @param[in] lit リテラル
-  Bdd
-  make_literal(const Literal& lit);
+  // 肯定のリテラル関数を作る
+  virtual
+  BddEdge
+  make_posiliteral(tVarId varid) = 0;
 
   /// @brief 否定のリテラル関数を作る．
   /// @param[in] varid 変数番号
-  Bdd
+  BddEdge
   make_negaliteral(tVarId varid);
 
   /// @brief インデックスと左右の子供を指定してBDDを作る．
   /// @param[in] varid 変数番号
   /// @param[in] chd_0 0枝の子供
   /// @param[in] chd_1 1枝の子供
-  Bdd
+  BddEdge
   make_bdd(tVarId varid,
-	   tBddEdge chd_0,
-	   tBddEdge chd_1);
-
-  /// @brief インデックスと左右の子供を指定してBDDの枝を作る．
-  /// @param[in] varid 変数番号
-  /// @param[in] chd_0 0枝の子供
-  /// @param[in] chd_1 1枝の子供
-  tBddEdge
-  make_bddedge(tVarId varid,
-	       tBddEdge chd_0,
-	       tBddEdge chd_1);
-
-  /// @brief Expr から BDD を作る
-  /// @param[in] expr 論理式
-  /// @param[in] vemap 論理式の変数番号とBDDの枝の対応関係
-  Bdd
-  expr_to_bdd(const LogExpr& expr,
-	      const hash_map<tVarId, tBddEdge>& vemap);
-
-  /// @brief Expr から BDD の枝を作る
-  /// @param[in] expr 論理式
-  /// @param[in] vemap 論理式の変数番号とBDDの枝の対応関係
-  tBddEdge
-  expr_to_bddedge(const LogExpr& expr,
-		  const hash_map<tVarId, tBddEdge>& vemap);
+	   BddEdge chd_0,
+	   BddEdge chd_1);
 
   /// @brief ベクタを真理値表と見なしてBDDを作る．
   /// @note 個々の変数を vars で指定する．
   /// @note ベクタの値は非ゼロを true とみなす．
   /// @note v の大きさは 2^(vars.size()) に等しくなければならない．
-  Bdd
+  BddEdge
   tvec_to_bdd(const vector<int>& v,
 	      const VarVector& vars);
 
@@ -201,91 +136,91 @@ public:
   // built-in タイプの論理演算
   //////////////////////////////////////////////////////////////////////
 
-  // 肯定のリテラル関数を作る
+  // e1 & e2 を計算する．
   virtual
-  tBddEdge
-  make_posiliteral(tVarId varid) = 0;
+  BddEdge
+  and_op(BddEdge e1,
+	 BddEdge e2) = 0;
 
-  // src1 & src2 を計算する．
-  virtual
-  tBddEdge
-  and_op(tBddEdge e1,
-	 tBddEdge e2) = 0;
+  // e1 & e2 & e3 を計算する．
+  BddEdge
+  and_op(BddEdge e1,
+	 BddEdge e2,
+	 BddEdge e3);
 
-  // src1 | src2 を計算する．
-  virtual
-  tBddEdge
-  or_op(tBddEdge e1,
-	tBddEdge e2) = 0;
+  // e1 | e2 を計算する．
+  BddEdge
+  or_op(BddEdge e1,
+	BddEdge e2);
+
+  // e1 | e2 | e3 を計算する．
+  BddEdge
+  or_op(BddEdge e1,
+	BddEdge e2,
+	BddEdge e3);
 
   // src1 ^ src2 を計算する．
   virtual
-  tBddEdge
-  xor_op(tBddEdge e1,
-	 tBddEdge e2) = 0;
+  BddEdge
+  xor_op(BddEdge e1,
+	 BddEdge e2) = 0;
 
-  // edge_list に登録されたBDDのANDを計算する．
-  tBddEdge
-  and_op(const list<tBddEdge>& edge_list);
-
-  // edge_list に登録されたBDDのORを計算する．
-  tBddEdge
-  or_op(const list<tBddEdge>& edge_list);
-
-  // edge_list に登録されたBDDのXORを計算する．
-  tBddEdge
-  xor_op(const list<tBddEdge>& edge_list);
+  // e1 ^ e2 ^ e3 を計算する．
+  BddEdge
+  xor_op(BddEdge e1,
+	 BddEdge e2,
+	 BddEdge e3);
 
   // src1 と src2 の共通部分があれば kEdge1 を返す．
   virtual
-  tBddEdge
-  check_intersect(tBddEdge e1,
-		  tBddEdge e2) = 0;
+  BddEdge
+  check_intersect(BddEdge e1,
+		  BddEdge e2) = 0;
 
   // Davio展開のモーメント項($f_{\overline{x}} \oplus f_x$)を
   // 求める処理
   virtual
-  tBddEdge
-  xor_moment(tBddEdge e,
+  BddEdge
+  xor_moment(BddEdge e,
 	     tVarId idx) = 0;
 
   // bdd がキューブの時 true を返す．
   virtual
   bool
-  check_cube(tBddEdge e) = 0;
+  check_cube(BddEdge e) = 0;
 
   // bdd が肯定リテラルのみからなるキューブの時 true を返す．
   virtual
   bool
-  check_posi_cube(tBddEdge e) = 0;
+  check_posi_cube(BddEdge e) = 0;
 
   // 変数xとyが対称(交換可能)な時にtrueを返す．
   virtual
   bool
-  check_symmetry(tBddEdge e,
+  check_symmetry(BddEdge e,
 		 tVarId x,
 		 tVarId y,
 		 tPol pol) = 0;
 
   // 一つの変数に対する cofactor を計算する．
   virtual
-  tBddEdge
-  scofactor(tBddEdge e1,
+  BddEdge
+  scofactor(BddEdge e1,
 	    tVarId id,
 	    tPol pol) = 0;
 
   // generalized cofactor を計算する．
   virtual
-  tBddEdge
-  gcofactor(tBddEdge e1,
-	    tBddEdge e2) = 0;
+  BddEdge
+  gcofactor(BddEdge e1,
+	    BddEdge e2) = 0;
 
   // if-then-else 演算を計算する．
   virtual
-  tBddEdge
-  ite_op(tBddEdge e1,
-	 tBddEdge e2,
-	 tBddEdge e3) = 0;
+  BddEdge
+  ite_op(BddEdge e1,
+	 BddEdge e2,
+	 BddEdge e3) = 0;
 
   // multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -296,18 +231,18 @@ public:
   virtual
   void
   compose_reg(tVarId id,
-	      tBddEdge e) = 0;
+	      BddEdge e) = 0;
 
   // multiple compose 演算の本体
   virtual
-  tBddEdge
-  compose(tBddEdge e) = 0;
+  BddEdge
+  compose(BddEdge e) = 0;
 
   // x_level の変数を y_level まで「押し込む」．
   // pol が kPolNega の時は 0-枝と 1-枝を取り替える．
   virtual
-  tBddEdge
-  push_down(tBddEdge e,
+  BddEdge
+  push_down(BddEdge e,
 	    tLevel x_level,
 	    tLevel y_level,
 	    tPol pol = kPolPosi) = 0;
@@ -315,42 +250,42 @@ public:
   // smoothing(elimination)
   // svars に含まれる変数を消去する．
   virtual
-  tBddEdge
-  esmooth(tBddEdge e1,
-	  tBddEdge e2) = 0;
+  BddEdge
+  esmooth(BddEdge e1,
+	  BddEdge e2) = 0;
 
   // src1 と src2 の論理積を計算して src3 の変数を消去する．
   virtual
-  tBddEdge
-  and_exist(tBddEdge e1,
-	    tBddEdge e2,
-	    tBddEdge e3) = 0;
+  BddEdge
+  and_exist(BddEdge e1,
+	    BddEdge e2,
+	    BddEdge e3) = 0;
 
   // lower と upper で指定された不完全指定論理関数の非冗長積和形を求める．
   virtual
-  tBddEdge
-  isop(tBddEdge l,
-       tBddEdge u,
+  BddEdge
+  isop(BddEdge l,
+       BddEdge u,
        LogExpr& cover) = 0;
 
   // lower と upper で指定された不完全指定論理関数の主項カバーを求める．
   virtual
   LogExpr
-  prime_cover(tBddEdge l,
-	      tBddEdge u) = 0;
+  prime_cover(BddEdge l,
+	      BddEdge u) = 0;
 
   // lower と upper で指定された不完全指定論理関数の極小サポート集合をすべて
   // 列挙する．解は論理関数の形で返される．そのなかの主項がサポート集合に
   // 対応している．
   virtual
-  tBddEdge
-  minimal_support(tBddEdge l,
-		  tBddEdge u) = 0;
+  BddEdge
+  minimal_support(BddEdge l,
+		  BddEdge u) = 0;
 
   // smallest cube containing F 演算
   virtual
-  tBddEdge
-  SCC(tBddEdge e) = 0;
+  BddEdge
+  SCC(BddEdge e) = 0;
 
 
 public:
@@ -365,32 +300,32 @@ public:
   // f0, f1 には自分自身を代入する．
   virtual
   tVarId
-  root_decomp(tBddEdge e,
-	      tBddEdge& e0,
-	      tBddEdge& e1) = 0;
+  root_decomp(BddEdge e,
+	      BddEdge& e0,
+	      BddEdge& e1) = 0;
 
   // 根の変数番号インデックスを取り出す．
   // 定数節点の場合には kVarIdMax を返す．
   virtual
   tVarId
-  root_var(tBddEdge e) = 0;
+  root_var(BddEdge e) = 0;
 
   // 0枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
-  tBddEdge
-  edge0(tBddEdge e) = 0;
+  BddEdge
+  edge0(BddEdge e) = 0;
 
   // 1枝の指している cofactor を返す．
   // 定数節点の場合には自分自身を返す．
   virtual
-  tBddEdge
-  edge1(tBddEdge e) = 0;
+  BddEdge
+  edge1(BddEdge e) = 0;
 
   // e の参照回数が0なら true を返す．
   virtual
   bool
-  check_noref(tBddEdge e) = 0;
+  check_noref(BddEdge e) = 0;
 
 
 public:
@@ -401,19 +336,19 @@ public:
   // 1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
-  tBddEdge
-  onepath(tBddEdge e) = 0;
+  BddEdge
+  onepath(BddEdge e) = 0;
 
   // 最短の1パスを求める．
   // 結果はその経路のみのBDDとなる．
   virtual
-  tBddEdge
-  shortest_onepath(tBddEdge e) = 0;
+  BddEdge
+  shortest_onepath(BddEdge e) = 0;
 
   // 最短の1パスの長さを求める．
   virtual
   tVarSize
-  shortest_onepath_len(tBddEdge e) = 0;
+  shortest_onepath_len(BddEdge e) = 0;
 
 
 public:
@@ -424,33 +359,33 @@ public:
   // e を根とするBDDのノード数を数える．
   virtual
   size_t
-  size(tBddEdge e) = 0;
+  size(BddEdge e) = 0;
 
   // edge_list に登録されたBDDのノード数を数える．
   virtual
   size_t
-  size(const list<tBddEdge>& edge_list) = 0;
+  size(const list<BddEdge>& edge_list) = 0;
 
   // BDD の表す論理関数の minterm の数を返す．
   // 無限長精度の整数(mpz_class)を用いて計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
-  minterm_count(tBddEdge e,
+  minterm_count(BddEdge e,
 		tVarSize n) = 0;
 
   // Walsh 変換の0次の係数を計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
-  walsh0(tBddEdge e,
+  walsh0(BddEdge e,
 	 tVarSize n) = 0;
 
   // Walsh 変換の1次の係数を計算する．
   // n は論理関数の変数の数
   virtual
   mpz_class
-  walsh1(tBddEdge e,
+  walsh1(BddEdge e,
 	 tVarId var,
 	 tVarSize n) = 0;
 
@@ -463,12 +398,12 @@ public:
   // e を根とするBDDのサポートに印をつける．
   virtual
   tVarSize
-  mark_support(tBddEdge e) = 0;
+  mark_support(BddEdge e) = 0;
 
   // edge_list に登録されたBDDのサポートに印をつける．
   virtual
   tVarSize
-  mark_support(const list<tBddEdge>& edge_list) = 0;
+  mark_support(const list<BddEdge>& edge_list) = 0;
 
   // 印のついた変数をベクタに変換する．
   virtual
@@ -482,7 +417,7 @@ public:
 
   // 印のついた変数をBDD(キューブ)に変換する．
   virtual
-  tBddEdge
+  BddEdge
   mark_to_bdd() = 0;
 
 
@@ -493,21 +428,21 @@ public:
 
   // src1 と src2 が変数集合の時に共通部分を求める．
   virtual
-  tBddEdge
-  vscap(tBddEdge e1,
-	tBddEdge e2) = 0;
+  BddEdge
+  vscap(BddEdge e1,
+	BddEdge e2) = 0;
 
   // src1 と src2 が変数集合の時に集合差を求める．
   virtual
-  tBddEdge
-  vsdiff(tBddEdge e1,
-	 tBddEdge e2) = 0;
+  BddEdge
+  vsdiff(BddEdge e1,
+	 BddEdge e2) = 0;
 
   // src1 と src2 が変数集合の時のインターセクションチェック
   virtual
   bool
-  vsintersect(tBddEdge e1,
-	      tBddEdge e2) = 0;
+  vsintersect(BddEdge e1,
+	      BddEdge e2) = 0;
 
 
 public:
@@ -517,32 +452,32 @@ public:
 
   // src1 と src2 がリテラル集合の時に共通部分を求める．
   virtual
-  tBddEdge
-  lscap(tBddEdge e1,
-	tBddEdge e2) = 0;
+  BddEdge
+  lscap(BddEdge e1,
+	BddEdge e2) = 0;
 
   // src1 と src2 がリテラル集合の時に集合差を求める．
   virtual
-  tBddEdge
-  lsdiff(tBddEdge e1,
-	 tBddEdge e2) = 0;
+  BddEdge
+  lsdiff(BddEdge e1,
+	 BddEdge e2) = 0;
 
   // src1 と src2 がリテラル集合の時のインターセクションチェック
   virtual
   bool
-  lsintersect(tBddEdge e1,
-	      tBddEdge e2) = 0;
+  lsintersect(BddEdge e1,
+	      BddEdge e2) = 0;
 
   // LitSet 用のBDDからリテラルのベクタを作る．
   virtual
   tVarSize
-  to_literalvector(tBddEdge e,
+  to_literalvector(BddEdge e,
 		   LiteralVector& dst) = 0;
 
   // LitSet 用のBDDからリテラルのリストを作る．
   virtual
   tVarSize
-  to_literallist(tBddEdge e,
+  to_literallist(BddEdge e,
 		 LiteralList& dst) = 0;
 
 
@@ -554,20 +489,20 @@ public:
   // e を根とするBDDの節点に n-mark を付け，各変数ごとのノード数を数える．
   virtual
   void
-  scan(tBddEdge e,
+  scan(BddEdge e,
        hash_map<tVarId, size_t>& node_counts) = 0;
 
   // e を根とするBDDのレベル level のノード数を数える．
   // ただし，n-mark の付いていないノードがあったら UINT_MAX を返す．
   virtual
   size_t
-  count_at(tBddEdge e,
+  count_at(BddEdge e,
 	   tLevel level) = 0;
 
   // scan で付けた n-mark を消す．
   virtual
   void
-  clear_scanmark(tBddEdge e) = 0;
+  clear_scanmark(BddEdge e) = 0;
 
 
 public:
@@ -646,13 +581,13 @@ public:
   // Bdd の根の枝をセットする時の関数
   void
   set_bdd(Bdd* bdd_p,
-	  tBddEdge e);
+	  BddEdge e);
 
   // bdd の根の枝を new_e に変更する．
   // new_e も同一の BddMgr に属していると仮定する．
   void
   assign(Bdd* bdd_p,
-	 tBddEdge new_e);
+	 BddEdge new_e);
 
 
 public:
@@ -679,11 +614,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 真理値表からBDDを作るためのサブルーティン
-  tBddEdge
+  BddEdge
   tvec_sub(const vector<int>& v,
 	   ymuint32 top,
 	   ymuint32 size,
-	   const vector<tBddEdge>& var_vector,
+	   const vector<BddEdge>& var_vector,
 	   tVarId var_idx);
 
 
@@ -732,76 +667,55 @@ private:
 // インライン関数の実装
 //////////////////////////////////////////////////////////////////////
 
-// @brief 定数0関数を作る．
-// @return 生成された BDD
-inline
-Bdd
-BddMgrImpl::make_zero()
-{
-  return Bdd(this, kEdge0);
-}
-
-// @brief 定数1関数を作る．
-// @return 生成された BDD
-inline
-Bdd
-BddMgrImpl::make_one()
-{
-  return Bdd(this, kEdge1);
-}
-
-// @brief オバーフローBDDを明示的に生成する．
-// @return 生成された BDD
-inline
-Bdd
-BddMgrImpl::make_overflow()
-{
-  return Bdd(this, kEdgeOverflow);
-}
-
-// @brief エラーBDDを明示的に生成する．
-// @return 生成された BDD
-inline
-Bdd
-BddMgrImpl::make_error()
-{
-  return Bdd(this, kEdgeError);
-}
-
-// リテラル関数を表すBDDを作る．
-inline
-Bdd
-BddMgrImpl::make_literal(tVarId index,
-			 tPol pol)
-{
-  tBddEdge ans = make_posiliteral(index);
-  return Bdd(this, addpol(ans, pol));
-}
-
-// リテラル関数を表すBDDを作る
-inline
-Bdd
-BddMgrImpl::make_literal(const Literal& lit)
-{
-  return make_literal(lit.varid(), lit.pol());
-}
-
 // 否定のリテラル関数を作る．
 inline
-Bdd
+BddEdge
 BddMgrImpl::make_negaliteral(tVarId varid)
 {
-  return Bdd(this, negate_ifvalid(make_posiliteral(varid)));
+  BddEdge ans = make_posiliteral(varid);
+  return ~ans;
 }
 
-// インデックスと左右の子供を指定してBDDを作る．
+// e1 & e2 & e3 を計算する．
 inline
-Bdd
-BddMgrImpl::make_bdd(tVarId varid,
-		     tBddEdge chd_0,
-		     tBddEdge chd_1)
+BddEdge
+BddMgrImpl::and_op(BddEdge e1,
+		   BddEdge e2,
+		   BddEdge e3)
 {
-  return Bdd(this, make_bddedge(varid, chd_0, chd_1));
+  BddEdge tmp = and_op(e1, e2);
+  return and_op(tmp, e3);
+}
+
+// src1 | src2 を計算する．
+inline
+BddEdge
+BddMgrImpl::or_op(BddEdge e1,
+		  BddEdge e2)
+{
+  return ~and_op(~e1, ~e2);
+}
+
+// e1 | e2 | e3 を計算する．
+inline
+BddEdge
+BddMgrImpl::or_op(BddEdge e1,
+		  BddEdge e2,
+		  BddEdge e3)
+{
+  BddEdge tmp = and_op(~e1, ~e2);
+  return ~and_op(tmp, ~e3);
+}
+
+// e1 ^ e2 ^ e3 を計算する．
+inline
+BddEdge
+BddMgrImpl::xor_op(BddEdge e1,
+		   BddEdge e2,
+		   BddEdge e3)
+{
+  BddEdge tmp = xor_op(e1, e2);
+  return xor_op(tmp, e3);
 }
 
 // @brief インデックスと左右の子供を指定してBDDの枝を作る．
@@ -809,24 +723,13 @@ BddMgrImpl::make_bdd(tVarId varid,
 // @param[in] chd_0 0枝の子供
 // @param[in] chd_1 1枝の子供
 inline
-tBddEdge
-BddMgrImpl::make_bddedge(tVarId varid,
-			 tBddEdge chd_0,
-			 tBddEdge chd_1)
+BddEdge
+BddMgrImpl::make_bdd(tVarId varid,
+		     BddEdge chd_0,
+		     BddEdge chd_1)
 {
-  tBddEdge tmp = make_posiliteral(varid);
+  BddEdge tmp = make_posiliteral(varid);
   return ite_op(tmp, chd_1, chd_0);
-}
-
-// @brief Expr から BDD を作る
-// @param[in] expr 論理式
-// @param[in] vemap 論理式の変数番号とBDDの枝の対応関係
-inline
-Bdd
-BddMgrImpl::expr_to_bdd(const LogExpr& expr,
-			const hash_map<tVarId, tBddEdge>& vemap)
-{
-  return Bdd(this, expr_to_bddedge(expr, vemap));
 }
 
 END_NAMESPACE_YM_BDD

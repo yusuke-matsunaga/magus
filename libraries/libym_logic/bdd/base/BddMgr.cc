@@ -17,10 +17,19 @@
 #include "bmc/BddMgrClassic.h"
 #include "bmm/BddMgrModern.h"
 
+#include "ym_utils/HeapTree.h"
+
 
 BEGIN_NAMESPACE_YM_BDD
 
 BddMgr BddMgr::theDefaultMgr;
+
+BEGIN_NONAMESPACE
+
+// 入力数がこの値よりも小さかったらヒープ木は使わない．
+const ymuint kNiLimit = 8;
+
+END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス BddMgr
@@ -37,7 +46,6 @@ BddMgr::default_mgr()
 BddMgr::BddMgr() :
   mImpl(BddMgrImpl::default_mgr())
 {
-  mImpl->inc_ref();
 }
 
 // @brief コンストラクタ
@@ -58,42 +66,43 @@ BddMgr::BddMgr(const string& type,
     mImpl = new BddMgrClassic(name, option);
   }
   assert_cond(mImpl, __FILE__, __LINE__);
-  mImpl->inc_ref();
 }
 
 // デストラクタ
 BddMgr::~BddMgr()
 {
-  assert_cond(mImpl, __FILE__, __LINE__);
-  mImpl->dec_ref();
+  if ( mImpl != BddMgrImpl::default_mgr() ) {
+    // デフォルトマネージャは削除しない．
+    delete mImpl;
+  }
 }
 
 // 定数0を表すBDDを作る．
 Bdd
 BddMgr::make_zero()
 {
-  return mImpl->make_zero();
+  return Bdd(mImpl, BddEdge::make_zero());
 }
 
 // 定数1を表すBDDを作る．
 Bdd
 BddMgr::make_one()
 {
-  return mImpl->make_one();
+  return Bdd(mImpl, BddEdge::make_one());
 }
 
 // エラーを表すBDDを作る．
 Bdd
 BddMgr::make_error()
 {
-  return mImpl->make_error();
+  return Bdd(mImpl, BddEdge::make_error());
 }
 
 // オーバーフローを表すBDDを作る．
 Bdd
 BddMgr::make_overflow()
 {
-  return mImpl->make_overflow();
+  return Bdd(mImpl, BddEdge::make_overflow());
 }
 
 // リテラル関数を表すBDDを作る．
@@ -101,14 +110,16 @@ Bdd
 BddMgr::make_literal(tVarId index,
 		     tPol pol)
 {
-  return mImpl->make_literal(index, pol);
+  BddEdge ans = mImpl->make_posiliteral(index);
+  ans.addpol(pol);
+  return Bdd(mImpl, ans);
 }
 
 // リテラル関数を表すBDDを作る
 Bdd
 BddMgr::make_literal(const Literal& lit)
 {
-  return mImpl->make_literal(lit);
+  return make_literal(lit.varid(), lit.pol());
 }
 
 // 肯定のリテラル関数を作る
@@ -122,7 +133,7 @@ BddMgr::make_posiliteral(tVarId varid)
 Bdd
 BddMgr::make_negaliteral(tVarId varid)
 {
-  return mImpl->make_negaliteral(varid);
+  return Bdd(mImpl, mImpl->make_negaliteral(varid));
 }
 
 // 指定されたインデックスを持つ中間ノードを一つ持つBDDを作る
@@ -133,7 +144,7 @@ BddMgr::make_bdd(tVarId index,
 		 const Bdd& chd0,
 		 const Bdd& chd1)
 {
-  return mImpl->make_bdd(index, chd0.root(), chd1.root());
+  return Bdd(mImpl, mImpl->make_bdd(index, chd0.root(), chd1.root()));
 }
 
 // ベクタを真理値表と見なしてBDDを作る．
@@ -159,7 +170,7 @@ Bdd
 BddMgr::tvec_to_bdd(const vector<int>& v,
 		    const VarVector& vars)
 {
-  return mImpl->tvec_to_bdd(v, vars);
+  return Bdd(mImpl, mImpl->tvec_to_bdd(v, vars));
 #if DEBUG_MAKE_BDD
   ymuint ni = vars.size();
   ymuint nv = (1 << ni);
@@ -197,20 +208,51 @@ Bdd
 BddMgr::expr_to_bdd(const LogExpr& expr,
 		    const VarBddMap& varmap)
 {
-  hash_map<tVarId, tBddEdge> vemap;
-  for (VarBddMap::const_iterator p = varmap.begin();
-       p != varmap.end(); ++ p) {
-    tVarId id = p->first;
-    Bdd bdd = p->second;
-    if ( mImpl != bdd.mMgr || bdd.is_error() ) {
-      return make_error();
-    }
-    if ( bdd.is_overflow() ) {
-      return make_overflow();
-    }
-    vemap.insert(make_pair(id, bdd.root()));
+  // 定数0の場合
+  if ( expr.is_zero() ) {
+    return make_zero();
   }
-  return mImpl->expr_to_bdd(expr, vemap);
+
+  // 定数1の場合
+  if ( expr.is_one() ) {
+    return make_one();
+  }
+
+  // リテラルの場合
+  if ( expr.is_literal() ) {
+    tVarId pos = expr.varid();
+    VarBddMap::const_iterator p = varmap.find(pos);
+    Bdd ans;
+    if ( p == varmap.end() ) {
+      ans = make_posiliteral(pos);
+    }
+    else {
+      ans = p->second;
+    }
+    if ( expr.is_negaliteral() ) {
+      ans.negate();
+    }
+    return ans;
+  }
+
+  // ここまで来たら根はAND/OR/XOR演算子
+  ymuint n = expr.child_num();
+  vector<Bdd> bdd_list(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    Bdd bdd = expr_to_bdd(expr.child(i), varmap);
+    bdd_list[i] = bdd;
+  }
+  if ( expr.is_and() ) {
+    return and_op(bdd_list);
+  }
+  if ( expr.is_or() ) {
+    return or_op(bdd_list);
+  }
+  if ( expr.is_xor() ) {
+    return xor_op(bdd_list);
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return make_error();
 }
 
 // LogExpr から対応するBDDを作り出す．
@@ -220,15 +262,15 @@ Bdd
 BddMgr::expr_to_bdd(const LogExpr& expr,
 		    const VarVarMap& varmap)
 {
-  hash_map<tVarId, tBddEdge> vemap;
+  VarBddMap vbmap;
   for (VarVarMap::const_iterator p = varmap.begin();
        p != varmap.end(); ++ p) {
     tVarId id = p->first;
     tVarId id2 = p->second;
-    tBddEdge tmp = mImpl->make_posiliteral(id2);
-    vemap.insert(make_pair(id, tmp));
+    Bdd bdd = make_posiliteral(id2);
+    vbmap.insert(make_pair(id, bdd));
   }
-  return mImpl->expr_to_bdd(expr, vemap);
+  return expr_to_bdd(expr, vbmap);
 }
 
 // ストリームを読んで論理式を作り,そこからBDDを作る．
@@ -281,29 +323,29 @@ Bdd
 BddMgr::make_thfunc(tVarSize n,
 		    tVarSize th)
 {
-  vector<tBddEdge> table((n + 1) * (th + 1));
-  table[elem(n, 0, th)] = kEdge1;
+  vector<BddEdge> table((n + 1) * (th + 1));
+  table[elem(n, 0, th)] = BddEdge::make_one();
   for (ymuint i = 1; i <= th; i ++) {
-    table[elem(n, i, th)] = kEdge0;
+    table[elem(n, i, th)] = BddEdge::make_zero();
   }
   for (ymuint i = n; i -- > 0; ) {
-    table[elem(i, 0, th)] = kEdge1;
+    table[elem(i, 0, th)] = BddEdge::make_one();
     for (ymuint j = 1; j <= th; j ++) {
       if ( j > n - i ) {
-	table[elem(i, j, th)] = kEdge0;
+	table[elem(i, j, th)] = BddEdge::make_zero();
       }
       else {
-	tBddEdge l = table[elem(i + 1, j, th)];
-	tBddEdge h = table[elem(i + 1, j - 1, th)];
-	tBddEdge tmp = mImpl->make_bddedge(i, l, h);
-	if ( check_overflow(tmp) ) {
+	BddEdge l = table[elem(i + 1, j, th)];
+	BddEdge h = table[elem(i + 1, j - 1, th)];
+	BddEdge tmp = mImpl->make_bdd(i, l, h);
+	if ( tmp.is_overflow() ) {
 	  return make_overflow();
 	}
 	table[elem(i, j, th)] = tmp;
       }
     }
   }
-  tBddEdge ans = table[elem(0, th, th)];
+  BddEdge ans = table[elem(0, th, th)];
   return Bdd(mImpl, ans);
 }
 
@@ -311,69 +353,285 @@ BddMgr::make_thfunc(tVarSize n,
 Bdd
 BddMgr::and_op(const BddVector& bdds)
 {
-  list<tBddEdge> edge_list;
-  for (BddVector::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
-    edge_list.push_back((*p).root());
+  ymuint n = bdds.size();
+  if ( n == 0 ) {
+    return make_one();
   }
-  tBddEdge ans = mImpl->and_op(edge_list);
-  return Bdd(mImpl, ans);
+  if ( n == 1 ) {
+    return bdds[0];
+  }
+  if ( n == 2 ) {
+    return bdds[0] & bdds[1];
+  }
+
+  BddEdge ans_e;
+  if ( n == 3 ) {
+    ans_e = mImpl->and_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
+  }
+  else if ( n < kNiLimit ) {
+    BddVector::const_iterator p = bdds.begin();
+    ans_e = p->root();
+    for (++ p; p != bdds.end(); ++ p) {
+      ans_e = mImpl->and_op(ans_e, p->root());
+    }
+  }
+  else {
+    SimpleHeapTree<BddEdge> work;
+    for (BddVector::const_iterator p = bdds.begin();
+	 p != bdds.end(); ++p) {
+      BddEdge e = p->root();
+      work.put(e, mImpl->size(e));
+    }
+    ans_e = work.getmin();
+    work.popmin();
+    while ( !work.empty() ) {
+      ans_e = mImpl->and_op(ans_e, work.getmin());
+      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+    }
+  }
+  return Bdd(mImpl, ans_e);
 }
 
 Bdd
 BddMgr::and_op(const BddList& bdds)
 {
-  list<tBddEdge> edge_list;
-  for (BddList::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
-    edge_list.push_back((*p).root());
+  ymuint n = bdds.size();
+  if ( n == 0 ) {
+    return make_one();
   }
-  tBddEdge ans = mImpl->and_op(edge_list);
-  return Bdd(mImpl, ans);
+  if ( n == 1 ) {
+    return bdds.front();
+  }
+  if ( n == 2 ) {
+    BddList::const_iterator p = bdds.begin();
+    Bdd bdd0 = *p;
+    ++ p;
+    Bdd bdd1 = *p;
+    return bdd0 & bdd1;
+  }
+
+  BddEdge ans_e;
+  if ( n == 3 ) {
+    BddList::const_iterator p = bdds.begin();
+    BddEdge e0 = p->root();
+    ++ p;
+    BddEdge e1 = p->root();
+    ++ p;
+    BddEdge e2 = p->root();
+    ans_e = mImpl->and_op(e0, e1, e2);
+  }
+  else if ( n < kNiLimit ) {
+    BddList::const_iterator p = bdds.begin();
+    ans_e = p->root();
+    for (++ p; p != bdds.end(); ++ p) {
+      ans_e = mImpl->and_op(ans_e, p->root());
+    }
+  }
+  else {
+    SimpleHeapTree<BddEdge> work;
+    for (BddList::const_iterator p = bdds.begin();
+	 p != bdds.end(); ++p) {
+      BddEdge e = p->root();
+      work.put(e, mImpl->size(e));
+    }
+    ans_e = work.getmin();
+    work.popmin();
+    while ( !work.empty() ) {
+      ans_e = mImpl->and_op(ans_e, work.getmin());
+      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+    }
+  }
+  return Bdd(mImpl, ans_e);
 }
 
 // 複数のBDDの論理和を求める．
 Bdd
 BddMgr::or_op(const BddVector& bdds)
 {
-  list<tBddEdge> edge_list;
-  for (BddVector::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
-    edge_list.push_back((*p).root());
+  ymuint n = bdds.size();
+  if ( n == 0 ) {
+    return make_zero();
   }
-  tBddEdge ans = mImpl->or_op(edge_list);
-  return Bdd(mImpl, ans);
+  if ( n == 1 ) {
+    return bdds[0];
+  }
+  if ( n == 2 ) {
+    return bdds[0] | bdds[1];
+  }
+
+  BddEdge ans_e;
+  if ( n == 3 ) {
+    ans_e = mImpl->or_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
+  }
+  else if ( n < kNiLimit ) {
+    BddVector::const_iterator p = bdds.begin();
+    ans_e = p->root();
+    for (++ p; p != bdds.end(); ++ p) {
+      ans_e = mImpl->or_op(ans_e, p->root());
+    }
+  }
+  else {
+    SimpleHeapTree<BddEdge> work;
+    for (BddVector::const_iterator p = bdds.begin();
+	 p != bdds.end(); ++p) {
+      BddEdge e = p->root();
+      work.put(e, mImpl->size(e));
+    }
+    ans_e = work.getmin();
+    work.popmin();
+    while ( !work.empty() ) {
+      ans_e = mImpl->or_op(ans_e, work.getmin());
+      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+    }
+  }
+  return Bdd(mImpl, ans_e);
 }
 
 Bdd
 BddMgr::or_op(const BddList& bdds)
 {
-  list<tBddEdge> edge_list;
-  for (BddList::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
-    edge_list.push_back((*p).root());
+  ymuint n = bdds.size();
+  if ( n == 0 ) {
+    return make_zero();
   }
-  tBddEdge ans = mImpl->or_op(edge_list);
-  return Bdd(mImpl, ans);
+  if ( n == 1 ) {
+    return bdds.front();
+  }
+  if ( n == 2 ) {
+    BddList::const_iterator p = bdds.begin();
+    Bdd bdd0 = *p;
+    ++ p;
+    Bdd bdd1 = *p;
+    return bdd0 | bdd1;
+  }
+
+  BddEdge ans_e;
+  if ( n == 3 ) {
+    BddList::const_iterator p = bdds.begin();
+    BddEdge e0 = p->root();
+    ++ p;
+    BddEdge e1 = p->root();
+    ++ p;
+    BddEdge e2 = p->root();
+    ans_e = mImpl->or_op(e0, e1, e2);
+  }
+  else if ( n < kNiLimit ) {
+    BddList::const_iterator p = bdds.begin();
+    ans_e = p->root();
+    for (++ p; p != bdds.end(); ++ p) {
+      ans_e = mImpl->or_op(ans_e, p->root());
+    }
+  }
+  else {
+    SimpleHeapTree<BddEdge> work;
+    for (BddList::const_iterator p = bdds.begin();
+	 p != bdds.end(); ++p) {
+      BddEdge e = p->root();
+      work.put(e, mImpl->size(e));
+    }
+    ans_e = work.getmin();
+    work.popmin();
+    while ( !work.empty() ) {
+      ans_e = mImpl->or_op(ans_e, work.getmin());
+      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+    }
+  }
+  return Bdd(mImpl, ans_e);
 }
 
 // 複数のBDDの排他的論理和を求める．
 Bdd
 BddMgr::xor_op(const BddVector& bdds)
 {
-  list<tBddEdge> edge_list;
-  for (BddVector::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
-    edge_list.push_back((*p).root());
+  ymuint n = bdds.size();
+  if ( n == 0 ) {
+    return make_zero();
   }
-  tBddEdge ans = mImpl->xor_op(edge_list);
-  return Bdd(mImpl, ans);
+  if ( n == 1 ) {
+    return bdds[0];
+  }
+  if ( n == 2 ) {
+    return bdds[0] ^ bdds[1];
+  }
+
+  BddEdge ans_e;
+  if ( n == 3 ) {
+    ans_e = mImpl->xor_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
+  }
+  else if ( n < kNiLimit ) {
+    BddVector::const_iterator p = bdds.begin();
+    ans_e = p->root();
+    for (++ p; p != bdds.end(); ++ p) {
+      ans_e = mImpl->xor_op(ans_e, p->root());
+    }
+  }
+  else {
+    SimpleHeapTree<BddEdge> work;
+    for (BddVector::const_iterator p = bdds.begin();
+	 p != bdds.end(); ++p) {
+      BddEdge e = p->root();
+      work.put(e, mImpl->size(e));
+    }
+    ans_e = work.getmin();
+    work.popmin();
+    while ( !work.empty() ) {
+      ans_e = mImpl->xor_op(ans_e, work.getmin());
+      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+    }
+  }
+  return Bdd(mImpl, ans_e);
 }
 
 Bdd
 BddMgr::xor_op(const BddList& bdds)
 {
-  list<tBddEdge> edge_list;
-  for (BddList::const_iterator p = bdds.begin(); p != bdds.end(); ++p) {
-    edge_list.push_back((*p).root());
+  ymuint n = bdds.size();
+  if ( n == 0 ) {
+    return make_zero();
   }
-  tBddEdge ans = mImpl->xor_op(edge_list);
-  return Bdd(mImpl, ans);
+  if ( n == 1 ) {
+    return bdds.front();
+  }
+  if ( n == 2 ) {
+    BddList::const_iterator p = bdds.begin();
+    Bdd bdd0 = *p;
+    ++ p;
+    Bdd bdd1 = *p;
+    return bdd0 ^ bdd1;
+  }
+
+  BddEdge ans_e;
+  if ( n == 3 ) {
+    BddList::const_iterator p = bdds.begin();
+    BddEdge e0 = p->root();
+    ++ p;
+    BddEdge e1 = p->root();
+    ++ p;
+    BddEdge e2 = p->root();
+    ans_e = mImpl->xor_op(e0, e1, e2);
+  }
+  else if ( n < kNiLimit ) {
+    BddList::const_iterator p = bdds.begin();
+    ans_e = p->root();
+    for (++ p; p != bdds.end(); ++ p) {
+      ans_e = mImpl->xor_op(ans_e, p->root());
+    }
+  }
+  else {
+    SimpleHeapTree<BddEdge> work;
+    for (BddList::const_iterator p = bdds.begin();
+	 p != bdds.end(); ++p) {
+      BddEdge e = p->root();
+      work.put(e, mImpl->size(e));
+    }
+    ans_e = work.getmin();
+    work.popmin();
+    while ( !work.empty() ) {
+      ans_e = mImpl->xor_op(ans_e, work.getmin());
+      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
+    }
+  }
+  return Bdd(mImpl, ans_e);
 }
 
 // 変数を確保する．
@@ -541,7 +799,7 @@ BddMgr::restore(istream& s)
   ymuint n = restorer.read();
   if ( n != 1 ) {
     // エラーもしくは複数の BDD データだった．
-    return Bdd(mImpl, kEdgeError);
+    return make_error();
   }
   else {
     return Bdd(mImpl, restorer.root(0));
