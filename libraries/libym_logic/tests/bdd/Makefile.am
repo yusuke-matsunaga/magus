@@ -49,7 +49,6 @@ noinst_PROGRAMS = \
 	mgr_test \
 	base_test \
 	fdec_test \
-	makebdd \
 	bddsh
 
 mgr_test_SOURCES = \

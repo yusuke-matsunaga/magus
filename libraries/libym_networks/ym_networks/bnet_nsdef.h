@@ -62,6 +62,8 @@ class BNetworkTrace;
 
 class BNodeList;
 
+class BNetBlifReader;
+
 class BNetBlifWriter;
 class BNetEquWriter;
 class BNetVerilogWriter;
@@ -102,6 +104,8 @@ using nsBnet::BNodeFoList;
 
 using nsBnet::BNetChg;
 using nsBnet::BNetworkTrace;
+
+using nsBnet::BNetBlifReader;
 
 using nsBnet::BNetBlifWriter;
 using nsBnet::BNetEquWriter;

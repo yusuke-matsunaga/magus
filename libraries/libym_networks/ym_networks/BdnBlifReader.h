@@ -1,39 +1,39 @@
-#ifndef YM_NETWORKS_BNETBLIFREADER_H
-#define YM_NETWORKS_BNETBLIFREADER_H
+#ifndef YM_NETWORKS_BDNBLIFREADER_H
+#define YM_NETWORKS_BDNBLIFREADER_H
 
-/// @file ym_networks/BNetBlifReader.h
-/// @brief BNetBlifReader のヘッダファイル
+/// @file ym_networks/BdnBlifReader.h
+/// @brief BdnBlifReader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetBlifReader.h 1978 2009-02-06 12:29:16Z matsunaga $
+/// $Id: BlifBdnConv.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
-#include "BlifParser.h"
+#include "ym_networks/bdn_nsdef.h"
+#include "ym_blif/blif_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_BDN
 
-class BNetBlifHandler;
+class BdnBlifHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BNetBlifReader BNetBlifReader.h "ym_networks/BNetBlifReader.h"
-/// @ingroup BnetGroup
-/// @brief blif 形式のファイルを読み込んで BNetwork に設定するクラス
-/// @sa BNetwork nsYm::nsBlif::BlifParser
+/// @class BdnBlifReader BdnBlifReader.h "ym_networks/BdnBlifReader.h"
+/// @ingroup BdnGroup
+/// @brief blif 形式のファイルを読み込んで BDN に設定するクラス
+/// @sa BdnMgr nsYm::nsBlif::BlifParser
 //////////////////////////////////////////////////////////////////////
-class BNetBlifReader
+class BdnBlifReader
 {
 public:
 
   /// @brief コンストラクタ
-  BNetBlifReader();
+  BdnBlifReader();
 
   /// @brief デストラクタ
-  ~BNetBlifReader();
+  ~BdnBlifReader();
 
 
 public:
@@ -45,7 +45,7 @@ public:
   /// @retval false 読み込み中にエラーが起こった．
   bool
   read(const string& filename,
-       BNetwork& network);
+       BdnMgr& network);
 
 
 private:
@@ -57,10 +57,10 @@ private:
   BlifParser mParser;
 
   // ハンドラ
-  BNetBlifHandler* mHandler;
+  BdnBlifHandler* mHandler;
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_BDN
 
-#endif // YM_NETWORKS_BNETBLIFREADER_H
+#endif // YM_NETWORKS_BDNBLIFREADER_H

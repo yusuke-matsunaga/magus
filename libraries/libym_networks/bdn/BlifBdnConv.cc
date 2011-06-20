@@ -15,7 +15,7 @@
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnNodeHandle.h"
 #include "ym_networks/BdnDff.h"
-#include "ym_blif/BlifNetwork.h"
+#include "blif/BlifNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_BDN
