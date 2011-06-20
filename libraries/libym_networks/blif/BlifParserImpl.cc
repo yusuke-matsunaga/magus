@@ -10,7 +10,7 @@
 
 
 #include "BlifParserImpl.h"
-#include "ym_blif/BlifHandler.h"
+#include "BlifHandler.h"
 #include "ym_utils/MsgMgr.h"
 
 

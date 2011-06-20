@@ -65,8 +65,6 @@ AC_CONFIG_SUBDIRS([include])
 ym_libym_utils_enable=1
 ym_libym_logic_enable=1
 ym_libym_smtlibv2_enable=0
-ym_libym_blif_enable=1
-ym_libym_iscas89_enable=1
 ym_libym_cell_enable=1
 ym_libym_verilog_enable=1
 ym_libym_networks_enable=1
@@ -97,14 +95,6 @@ YM_BUILD_LIBRARY([libym_smtlibv2],
 YM_BUILD_LIBRARY([libym_mincov],
 		 [ym_libym_utils_enable])
 
-# libym_blif
-YM_BUILD_LIBRARY([libym_blif],
-		 [ym_libym_utils_enable])
-
-# libym_iscas89
-YM_BUILD_LIBRARY([libym_iscas89],
-		 [ym_libym_utils_enable])
-
 # libym_cell
 YM_BUILD_LIBRARY([libym_cell],
 		 [ym_libym_utils_enable,
@@ -118,8 +108,7 @@ YM_BUILD_LIBRARY([libym_verilog],
 YM_BUILD_LIBRARY([libym_networks],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
-		  ym_libym_blif_enable,
-		  ym_libym_iscas89_enable])
+		  ym_libym_verilog_enable])
 
 # libym_gds
 YM_BUILD_LIBRARY([libym_gds],

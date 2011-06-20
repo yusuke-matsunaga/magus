@@ -5,11 +5,11 @@
 ///
 /// $Id: BlifNetworkReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_blif/BlifNetwork.h"
+#include "BlifNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -62,7 +62,7 @@ BlifNetwork::clear()
   mFFArray.clear();
   mLogicArray.clear();
 }
-  
+
 // @brief ノードを取り出す．
 // @param[in] id ID 番号
 // @note なければ作成する．
@@ -74,7 +74,7 @@ BlifNetwork::get_node(ymuint32 id)
     mNodeArray.push_back(NULL);
     ++ n;
   }
-  
+
   BlifNode* node = mNodeArray[id];
   if ( node == NULL ) {
     void* p = mAlloc.get_memory(sizeof(BlifNode));
@@ -83,7 +83,7 @@ BlifNetwork::get_node(ymuint32 id)
   }
   return node;
 }
-  
+
 // @brief ノード名を設定する．
 // @param[in] node 対象のノード
 // @param[in] name 名前
@@ -130,7 +130,7 @@ BlifNetwork::set_logic_type(BlifNode* node,
   node->mType = BlifNode::kLogic;
   alloc_fanin(node, ni);
   node->mNc = nc;
-  
+
   if ( ni > 0 ) {
     ymuint32 size = nc * ni;
     void* p = mAlloc.get_memory(size);
@@ -144,7 +144,7 @@ BlifNetwork::set_logic_type(BlifNode* node,
     node->mCover = NULL;
   }
   node->mOpat = opat;
-  
+
   mLogicArray.push_back(node);
   return true;
 }
@@ -163,7 +163,7 @@ BlifNetwork::set_latch_type(BlifNode* node,
   alloc_fanin(node, 1);
 
   node->mOpat = rval;
-  
+
   mFFArray.push_back(node);
   return true;
 }

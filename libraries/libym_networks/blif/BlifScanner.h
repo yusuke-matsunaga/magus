@@ -7,11 +7,11 @@
 ///
 /// $Id: BlifScanner.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_blif/blif_nsdef.h"
+#include "blif_nsdef.h"
 #include "ym_utils/FileScanner.h"
 #include "ym_utils/StrBuff.h"
 #include "BlifDic.h"

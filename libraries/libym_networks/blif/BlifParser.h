@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_blif/blif_nsdef.h"
+#include "blif_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF

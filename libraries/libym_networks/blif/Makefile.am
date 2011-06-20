@@ -2,10 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = \
-	ym_blif \
-	. \
-	tests
+SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -26,22 +23,26 @@ libym_blif_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_blif_la_SOURCES = \
+	blif_nsdef.h \
 	BlifDic.h \
 	BlifDic.cc \
 	BlifScanner.h \
 	BlifScanner.cc \
 	IdHash.h \
 	IdHash.cc \
+	BlifParser.h \
+	BlifParser.cc \
 	BlifParserImpl.h \
 	BlifParserImpl.cc \
+	BlifHandler.h \
 	BlifHandler.cc \
-	BlifParser.cc \
+	BlifNetwork.h \
 	BlifNetwork.cc \
 	BlifNetworkHandler.h \
 	BlifNetworkHandler.cc \
+	BlifNetworkReader.h \
 	BlifNetworkReader.cc
 
 libym_blif_la_LIBADD =
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_blif_la_LDFLAGS =

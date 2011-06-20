@@ -11,13 +11,13 @@
 /// All rights reserved.
 
 
-#include "ym_iscas89/iscas89_nsdef.h"
+#include "iscas89_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
 
 //////////////////////////////////////////////////////////////////////
-/// @class Iscas89Parser Iscas89Parser.h <ym_iscas89/Iscas89Parser.h>
+/// @class Iscas89Parser Iscas89Parser.h "Iscas89Parser.h"
 /// @ingroup Iscas89Group
 /// @brief ISCAS89(.bench) 形式のファイルを読み込むパーサークラス
 /// @sa Iscas89Handler

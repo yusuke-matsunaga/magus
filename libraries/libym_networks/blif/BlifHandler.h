@@ -11,14 +11,14 @@
 /// All rights reserved.
 
 
-#include "ym_blif/blif_nsdef.h"
+#include "blif_nsdef.h"
 #include "ym_utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifHandler BlifHandler.h <ym_blif/BlifHandler.h>
+/// @class BlifHandler BlifHandler.h "BlifHandler.h"
 /// @ingroup BlifGroup
 /// @brief blif パーサーのイベントハンドラの基底クラス
 /// 純粋仮想関数を持っているので，このクラスを継承し，仮想関数を上書き

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_blif/BlifNetworkReader.h"
+#include "BlifNetworkReader.h"
 #include "BlifNetworkHandler.h"
 
 

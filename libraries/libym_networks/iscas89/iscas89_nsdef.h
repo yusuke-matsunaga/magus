@@ -7,7 +7,7 @@
 ///
 /// $Id: iscas89_nsdef.h 2043 2009-02-21 07:08:48Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup Iscas89Group ISCAS89フォーマットパーサ
@@ -43,12 +43,5 @@ class Iscas89Parser;
 class Iscas89ParserImpl;
 
 END_NAMESPACE_YM_ISCAS89
-
-BEGIN_NAMESPACE_YM
-
-using nsIscas89::Iscas89Handler;
-using nsIscas89::Iscas89Parser;
-
-END_NAMESPACE_YM
 
 #endif // YM_ISCAS89_ISCAS89_NSDEF_H

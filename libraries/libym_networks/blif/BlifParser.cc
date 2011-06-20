@@ -10,7 +10,7 @@
 
 
 #include "BlifParserImpl.h"
-#include "ym_blif/BlifParser.h"
+#include "BlifParser.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF

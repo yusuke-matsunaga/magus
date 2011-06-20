@@ -5,7 +5,7 @@
 ///
 /// $Id: IdHash.cc 1921 2008-12-21 13:55:05Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -102,7 +102,7 @@ IdHash::find(const char* str,
   if ( !create ) {
     return NULL;
   }
-  
+
   if ( mCellArray.size() >= mNextLimit ) {
     // テーブルを拡張する．
     IdCell** old_table = mTable;
@@ -118,14 +118,14 @@ IdHash::find(const char* str,
       }
     }
   }
-  
+
   // 新しいセルを確保する．
   size_t l = strlen(str);
   size_t reqsize = sizeof(IdCell) + l;
   void* p = mAlloc.get_memory(reqsize);
   IdCell* cell = new (p) IdCell(mCellArray.size(), str);
   mCellArray.push_back(cell);
-  
+
   // テーブルに追加する．
   pos = pos0 % mTableSize;
   cell->mLink = mTable[pos];

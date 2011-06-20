@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_blif/BlifHandler.h"
+#include "BlifHandler.h"
 #include "BlifParserImpl.h"
 
 

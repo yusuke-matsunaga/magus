@@ -1,6 +1,6 @@
 %{
 
-/// @file trans.y
+/// @file iscas89_grammer.yy
 /// @brief .bench(iscas89) フォーマット用の YACC ソース
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,8 +10,8 @@
 /// All rights reserved.
 
 
-#include "ym_iscas89/iscas89_nsdef.h"
-#include "ym_iscas89/Iscas89Handler.h"
+#include "iscas89_nsdef.h"
+#include "Iscas89Handler.h"
 #include "ym_utils/MsgMgr.h"
 
 #include "Iscas89ParserImpl.h"

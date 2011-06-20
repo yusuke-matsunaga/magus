@@ -7,7 +7,7 @@
 ///
 /// $Id: blif_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup BlifGroup BLIF パーサ
@@ -46,15 +46,5 @@ class BlifNode;
 class BlifNetworkReader;
 
 END_NAMESPACE_YM_BLIF
-
-BEGIN_NAMESPACE_YM
-
-using nsBlif::BlifHandler;
-using nsBlif::BlifParser;
-using nsBlif::BlifNetwork;
-using nsBlif::BlifNode;
-using nsBlif::BlifNetworkReader;
-
-END_NAMESPACE_YM
 
 #endif // YM_BLIF_BLIF_NSDEF_H

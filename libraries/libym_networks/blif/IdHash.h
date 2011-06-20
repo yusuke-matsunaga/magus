@@ -7,11 +7,11 @@
 ///
 /// $Id: IdHash.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_blif/blif_nsdef.h"
+#include "blif_nsdef.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/Alloc.h"
 
@@ -45,38 +45,38 @@ public:
   /// @brief 文字列を返す．
   const char*
   str() const;
-  
+
   /// @brief 位置情報を返す．
   const FileRegion&
   loc() const;
-  
+
   /// @brief この識別子を定義している位置情報を返す．
   const FileRegion&
   def_loc() const;
-  
+
   /// @brief 定義されているか調べる．
   /// @retval true 定義済み
   /// @retval false 未定義
   bool
   is_defined() const;
-  
+
   /// @brief 外部入力かどうか調べる．
   /// @return 外部入力なら true を返す．
   bool
   is_input() const;
-  
+
   /// @brief 外部出力かどうか調べる．
   /// @return 外部出力なら true を返す．
   bool
   is_output() const;
-  
+
 
 public:
-  
+
   /// @brief 位置情報を設定する．
   void
   set_loc(const FileRegion& loc);
-  
+
   /// @brief 定義済みの印をつける．
   void
   set_defined();
@@ -89,7 +89,7 @@ public:
   void
   set_output();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -97,13 +97,13 @@ private:
 
   // ID 番号
   ymuint32 mId;
-  
+
   // 位置情報
   FileRegion mLoc;
-  
+
   // 位置情報その2
   FileRegion mLoc2;
-  
+
   // いくつかのフラグ
   ymuint32 mFlags;
 
@@ -112,13 +112,13 @@ private:
 
   // 文字列領域(ダミー)
   char mStr[1];
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 定数
   //////////////////////////////////////////////////////////////////////
-  
+
   // defined マークのシフト量
   static
   const int kDefSft = 0;
@@ -162,7 +162,7 @@ public:
   IdCell*
   find(const char* str,
        bool create);
-  
+
   /// @brief 登録されている要素数を返す．(= ID番号の最大値 + 1)
   size_t
   num() const;
@@ -170,7 +170,7 @@ public:
   /// @brief ID 番号に対応する IdCell を得る．
   IdCell*
   cell(ymuint32 id) const;
-	  
+
   /// @brief ID 番号から文字列を得る．
   const char*
   str(ymuint32 id) const;
@@ -183,7 +183,7 @@ public:
   const FileRegion&
   def_loc(ymuint32 id) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -198,7 +198,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // IdCell用のアロケータ
   SimpleAlloc mAlloc;
 
@@ -210,10 +210,10 @@ private:
 
   // IDをキーにして IdCell を格納する配列
   vector<IdCell*> mCellArray;
-  
+
   // ハッシュ表を拡張する目安
   size_t mNextLimit;
-  
+
 };
 
 
@@ -280,7 +280,7 @@ IdCell::is_output() const
 {
   return static_cast<bool>((mFlags >> kOutSft) & 1U);
 }
-  
+
 // @brief 位置情報を設定する．
 inline
 void
@@ -313,7 +313,7 @@ IdCell::set_output()
 {
   mFlags |= (1U << kOutSft);
 }
-  
+
 // @brief 登録されている要素数を返す．(= ID番号の最大値 + 1)
 inline
 size_t
@@ -329,7 +329,7 @@ IdHash::cell(ymuint32 id) const
 {
   return mCellArray[id];
 }
-  
+
 // @brief ID 番号から文字列を得る．
 inline
 const char*

@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_iscas89/iscas89_nsdef.h"
+#include "iscas89_nsdef.h"
 #include "ym_utils/FileRegion.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_ISCAS89
 
 /// @brief ゲートの型
 /// @ingroup Iscas89Group
@@ -31,13 +31,9 @@ enum tIscas89GateType {
   kGt89DFF
 };
 
-END_NAMESPACE_YM
-
-
-BEGIN_NAMESPACE_YM_ISCAS89
 
 //////////////////////////////////////////////////////////////////////
-/// @class Iscas89Handler Iscas89Handler.h <ym_iscas89/Iscas89Handler.h>
+/// @class Iscas89Handler Iscas89Handler.h "Iscas89Handler.h"
 /// @ingroup Iscas89Group
 /// @brief iscas89 パーサーのイベントハンドラの基底クラス
 /// @sa Iscas89Parser

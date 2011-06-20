@@ -7,11 +7,11 @@
 ///
 /// $Id: BlifDic.h 958 2007-08-28 05:38:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_blif/blif_nsdef.h"
+#include "blif_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -101,7 +101,7 @@ private:
     Cell* mLink;
 
   };
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

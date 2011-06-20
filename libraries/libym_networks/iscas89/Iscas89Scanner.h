@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_iscas89/iscas89_nsdef.h"
+#include "iscas89_nsdef.h"
 #include "ym_utils/FileScanner.h"
 #include "ym_utils/StrBuff.h"
 

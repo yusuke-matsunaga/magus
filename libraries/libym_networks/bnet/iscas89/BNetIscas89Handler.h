@@ -12,7 +12,7 @@
 
 
 #include "ym_networks/bnet_nsdef.h"
-#include "ym_iscas89/Iscas89Handler.h"
+#include "iscas89/Iscas89Handler.h"
 
 
 BEGIN_NAMESPACE_YM_BNET
@@ -88,30 +88,30 @@ public:
   virtual
   void
   error_exit();
-  
+
 
 private:
 
   struct NodeInfo
   {
     NodeInfo(ymuint32 id) : mId(id), mNode(NULL) { }
-    
+
     ymuint32 mId;
     BNode* mNode;
   };
 
 
 private:
-  
+
   /// @brief ノードの取得 & 生成
   BNode*
   get_node(ymuint32 id);
-  
+
   /// @brief mNodeArray を確保する．
   void
   resize(ymuint32 id);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -122,10 +122,10 @@ private:
 
   // ネットワークを操作するクラス
   BNetManip* mManip;
-  
+
   // ゲート文のファンインの配列
   vector<BNode*> mCurFanins;
-  
+
   // ID番号をキーにして NodeInfo を納めた配列
   vector<NodeInfo> mNodeArray;
 

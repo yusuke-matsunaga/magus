@@ -4,6 +4,8 @@
 
 SUBDIRS = \
 	ym_networks \
+	blif \
+	iscas89 \
 	bdn \
 	bnet \
 	cmn \
@@ -22,6 +24,8 @@ noinst_LTLIBRARIES = libym_networks.la
 libym_networks_la_SOURCES =
 
 libym_networks_la_LIBADD = \
+	blif/libym_blif.la \
+	iscas89/libym_iscas89.la \
 	bdn/libym_bdn.la \
 	bnet/libym_bnet.la \
 	cmn/libym_cmn.la \
@@ -30,12 +34,6 @@ libym_networks_la_LIBADD = \
 	conv_blif_bnet/libym_conv_blif_bnet.la \
 	conv_bnet_bdn/libym_conv_bnet_bdn.la \
 	conv_mvn_bdn/libym_conv_mvn_bdn.la
-
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_networks_la_LDFLAGS =
 

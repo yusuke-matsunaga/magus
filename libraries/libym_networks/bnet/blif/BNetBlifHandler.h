@@ -12,7 +12,7 @@
 
 
 #include "ym_networks/bnet_nsdef.h"
-#include "ym_blif/BlifHandler.h"
+#include "BlifHandler.h"
 
 
 BEGIN_NAMESPACE_YM_BNET
@@ -46,7 +46,7 @@ public:
   virtual
   bool
   init();
-  
+
   /// @brief .model 文の処理
   /// @param[in] loc1 .model の位置情報
   /// @param[in] loc2 文字列の位置情報
@@ -170,7 +170,7 @@ private:
   void
   resize(ymuint32 id);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -184,7 +184,7 @@ private:
 
   // ID番号をキーにした BNode を納めた配列
   vector<BNode*> mNodeArray;
-  
+
 };
 
 END_NAMESPACE_YM_BNET

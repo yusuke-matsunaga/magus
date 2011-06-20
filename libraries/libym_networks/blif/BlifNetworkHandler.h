@@ -7,11 +7,11 @@
 ///
 /// $Id: BlifNetworkReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_blif/BlifHandler.h"
+#include "BlifHandler.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -151,7 +151,7 @@ public:
   void
   error_exit();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -159,7 +159,7 @@ private:
 
   // 対象のネットワーク
   BlifNetwork* mNetwork;
-  
+
 };
 
 END_NAMESPACE_YM_BLIF

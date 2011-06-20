@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include "ym_blif/blif_nsdef.h"
-#include "ym_blif/BlifParser.h"
+#include "blif_nsdef.h"
+#include "BlifParser.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_BLIF
 class BlifNetworkHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifNetworkReader BlifNetwork.h <ym_blif/BlifNetwork.h>
+/// @class BlifNetworkReader BlifNetwork.h "BlifNetwork.h"
 /// @ingroup BlifGroup
 /// @brief blif 形式のファイルを読み込んで BlifNetwork に設定するクラス
 /// @sa BlifNetwork

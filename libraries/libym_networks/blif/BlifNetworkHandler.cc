@@ -5,12 +5,12 @@
 ///
 /// $Id: BlifNetworkReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BlifNetworkHandler.h"
-#include "ym_blif/BlifNetwork.h"
+#include "BlifNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_BLIF
@@ -40,7 +40,7 @@ BlifNetworkHandler::init()
   mNetwork->clear();
   return true;
 }
-  
+
 // @brief .model 文の読み込み
 // @param[in] loc 位置情報
 // @param[in] name model名
@@ -52,7 +52,7 @@ BlifNetworkHandler::model(const FileRegion& loc1,
   mNetwork->mName = name;
   return true;
 }
-  
+
 // @brief .input 文の読み込み
 // @param[in] loc 位置情報
 // @param[in] name 入力ノード名
@@ -65,7 +65,7 @@ BlifNetworkHandler::inputs_elem(ymuint32 name_id)
   }
   return true;
 }
-  
+
 // @brief .output 文の読み込み
 // @param[in] loc 位置情報
 // @param[in] name 出力ノード名
@@ -96,7 +96,7 @@ BlifNetworkHandler::names(const vector<ymuint32>& name_id_array,
     BlifNode* inode = mNetwork->get_node(id);
     node->mFanins[i] = inode;
   }
-  
+
   return true;
 }
 
@@ -136,7 +136,7 @@ BlifNetworkHandler::gate_end()
 {
   return true;
 }
-  
+
 // @brief .latch 文の読み込み
 bool
 BlifNetworkHandler::latch(ymuint32 name1_id,
@@ -150,10 +150,10 @@ BlifNetworkHandler::latch(ymuint32 name1_id,
   }
   BlifNode* node1 = mNetwork->get_node(name1_id);
   node2->mFanins[0] = node1;
-  
+
   return true;
 }
-  
+
 // @brief 終了処理
 // @param[in] loc 位置情報
 bool
