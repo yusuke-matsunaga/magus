@@ -71,6 +71,23 @@ AC_TYPE_SIZE_T
 
 
 # ===================================================================
+# Check for QT
+# It's a kind of magic!
+# ===================================================================
+AC_ARG_ENABLE([qt],
+[  --enable-qt    Turn on QT],
+[case "${enableval}" in
+ yes) qt=true ;;
+ no)  qt=false ;;
+ *) AC_MSG_ERROR([bad value ${enableval} for --enable-qt]) ;;
+ esac],[qt=false])
+AM_CONDITIONAL([WITH_QT], [test x$qt = xtrue])
+if test x$qt = xtrue; then
+  AT_WITH_QT
+fi
+
+
+# ===================================================================
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
@@ -94,6 +111,7 @@ AC_CONFIG_FILES([ym_cell/Makefile])
 AC_CONFIG_FILES([mislib/Makefile])
 AC_CONFIG_FILES([dotlib/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
+AC_CONFIG_FILES([tests/dotlib_ptview/Makefile])
 
 
 # ===================================================================

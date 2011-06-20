@@ -5,7 +5,13 @@
 ## $Revision: 1.1.1.1 $
 ## $Date: 2005/12/11 17:07:26 $
 
-INCLUDES = \
+SUBDIRS = .
+
+if WITH_QT
+SUBDIRS += dotlib_ptview
+endif
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell
@@ -25,17 +31,27 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
-bin_PROGRAMS = \
-	mislib_reader_test \
-	dotlib_reader_test \
-	dump_restore_test
-
 YM_CELL = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+bin_PROGRAMS = \
+	mislib_parser_test \
+	mislib_reader_test \
+	dotlib_parser_test \
+	dotlib_reader_test \
+	dump_restore_test
+
+mislib_parser_test_SOURCES = \
+	mislib_parser_test.cc
+
+mislib_parser_test_LDFLAGS =
+
+mislib_parser_test_LDADD = \
+	$(YM_CELL)
+
 
 mislib_reader_test_SOURCES = \
 	mislib_reader_test.cc
@@ -45,6 +61,7 @@ mislib_reader_test_LDFLAGS =
 mislib_reader_test_LDADD = \
 	$(YM_CELL)
 
+
 dotlib_reader_test_SOURCES = \
 	dotlib_reader_test.cc
 
@@ -52,6 +69,16 @@ dotlib_reader_test_LDFLAGS =
 
 dotlib_reader_test_LDADD = \
 	$(YM_CELL)
+
+
+dotlib_parser_test_SOURCES = \
+	dotlib_parser_test.cc
+
+dotlib_parser_test_LDFLAGS =
+
+dotlib_parser_test_LDADD = \
+	$(YM_CELL)
+
 
 dump_restore_test_SOURCES = \
 	dump_restore_test.cc

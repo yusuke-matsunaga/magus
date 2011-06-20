@@ -31,6 +31,8 @@ libym_cell_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_la_SOURCES = \
+	CellDotlibReader.cc \
+	CellMislibReader.cc \
 	CiBundle.h \
 	CiBundle.cc \
 	CiBus.h \
@@ -49,11 +51,5 @@ libym_cell_la_SOURCES = \
 libym_cell_la_LIBADD = \
 	dotlib/libym_cell_dotlib.la \
 	mislib/libym_cell_mislib.la
-
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_dotlib/libym_dotlib.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_mislib/libym_mislib.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_npn/libym_npn.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_cell_la_LDFLAGS =

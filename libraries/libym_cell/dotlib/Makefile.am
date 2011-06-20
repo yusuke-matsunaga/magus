@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_cell/Makefile.am,v $
-## $Author: matsunaga $
-## $Revision: 1.1.1.1 $
-## $Date: 2005/12/11 17:07:26 $
+## $Source:$
+## $Author:$
+## $Revision:$
+## $Date:$
 
 SUBDIRS =
 
@@ -26,8 +26,55 @@ libym_cell_dotlib_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_dotlib_la_SOURCES = \
-	CellDotlibReader.cc
-
-libym_cell_dotlib_la_LIBADD =
+	dotlib_nsdef.h \
+	dotlib_int.h \
+	DotlibParser.h \
+	DotlibParser.cc \
+	DotlibParserImpl.h \
+	DotlibParserImpl.cc \
+	DotlibScanner.h \
+	DotlibScanner.cc \
+	DotlibHandler.h \
+	DotlibHandler.cc \
+	SimpleHandler.h \
+	SimpleHandler.cc \
+	ExprHandler.h \
+	ExprHandler.cc \
+	FuncHandler.h \
+	FuncHandler.cc \
+	FhScanner.h \
+	FhScanner.cc \
+	ComplexHandler.h \
+	ComplexHandler.cc \
+	DefineHandler.h \
+	DefineHandler.cc \
+	GroupHandler.h \
+	GroupHandler.cc \
+	HandlerFactory.h \
+	HandlerFactory.cc \
+	DotlibMgr.h \
+	DotlibMgr.cc \
+	DotlibMgrImpl.h \
+	DotlibMgrImpl.cc \
+	DotlibNode.h \
+	DotlibNodeImpl.h \
+	DotlibNodeImpl.cc \
+	DotlibNode.cc \
+	DotlibAttrMap.h \
+	DotlibAttrMap.cc \
+	DotlibLibrary.h \
+	DotlibLibrary.cc \
+	DotlibCell.h \
+	DotlibCell.cc \
+	DotlibFL.h \
+	DotlibFL.cc \
+	DotlibFF.h \
+	DotlibFF.cc \
+	DotlibLatch.h \
+	DotlibLatch.cc \
+	DotlibPin.h \
+	DotlibPin.cc
 
 libym_cell_dotlib_la_LDFLAGS =
+
+libym_cell_dotlib_la_LIBADD =
