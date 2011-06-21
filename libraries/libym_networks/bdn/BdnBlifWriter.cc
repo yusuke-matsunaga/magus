@@ -16,7 +16,7 @@
 #include "ym_utils/NameMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 
 // @brief コンストラクタ
@@ -177,4 +177,4 @@ BdnBlifWriter::operator()(ostream& s,
   s << ".end" << endl;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

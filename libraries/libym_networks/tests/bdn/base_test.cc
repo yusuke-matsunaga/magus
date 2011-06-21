@@ -15,7 +15,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 bool
 base_test()
@@ -236,7 +236,7 @@ base_test()
   return true;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 int
 main(int argc,

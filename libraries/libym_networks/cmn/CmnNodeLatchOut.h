@@ -12,7 +12,7 @@
 #include "CmnNodeInput.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeLatchOut CmnNodeLatchOut.h "CmnNodeLatchOut.h"
@@ -113,6 +113,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // LIBYM_NETWORKS_CMN_CMNNODELATCHOUT_H

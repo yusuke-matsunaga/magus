@@ -14,7 +14,7 @@
 #include "ym_networks/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 MvnBdnMap::MvnBdnMap(ymuint n) :
@@ -130,4 +130,4 @@ dump_mvnode_map(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

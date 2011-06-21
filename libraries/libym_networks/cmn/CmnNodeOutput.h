@@ -13,7 +13,7 @@
 #include "ym_networks/CmnEdge.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeOutput CmnNodeOutput.h "CmnNodeOutput.h"
@@ -86,7 +86,7 @@ private:
 
 };
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 
 #endif // LIBYM_NETWORKS_CMN_CMNNODEOUTPUT_H

@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 #include "ym_blif/blif_nsdef.h"
 
 

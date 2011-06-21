@@ -12,7 +12,7 @@
 #include "LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 LogicMgr::LogicMgr()
@@ -382,4 +382,4 @@ operator<<(ostream& s,
   return s;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS

@@ -11,7 +11,7 @@
 #include "ym_networks/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
@@ -70,4 +70,4 @@ MvnMgr::new_constpartselect(MvnModule* module,
   return node;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS

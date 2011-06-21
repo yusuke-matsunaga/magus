@@ -23,13 +23,13 @@
 /// TgNode のファンアウト先のノードとその入力ピンの情報を TgEdge で表す．
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class NameHash;
 class LogicMgr;
@@ -353,6 +353,6 @@ TgNetwork::sorted_logic(ymuint32 pos) const
   return mSortedArray[pos];
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_TGNETWORK_H

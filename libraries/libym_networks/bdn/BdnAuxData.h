@@ -1,5 +1,5 @@
-#ifndef LIBYM_BDN_BDNAUXDATA_H
-#define LIBYM_BDN_BDNAUXDATA_H
+#ifndef LIBYM_NETWORKS_BDNAUXDATA_H
+#define LIBYM_NETWORKS_BDNAUXDATA_H
 
 /// @file libym_networks/BdnAuxData.h
 /// @brief BdnAuxData のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnAuxData BdnAuxData.h "BdnAuxData.h"
@@ -204,6 +204,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_BDN_BDNAUXDATA_H
+#endif // LIBYM_NETWORKS_BDNAUXDATA_H

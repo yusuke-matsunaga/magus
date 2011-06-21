@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVNBDNCONV_MULTCONV_H
-#define LIBYM_MVNBDNCONV_MULTCONV_H
+#ifndef LIBYM_NETWORKSBDNCONV_MULTCONV_H
+#define LIBYM_NETWORKSBDNCONV_MULTCONV_H
 
 /// @file libym_networks/MultConv.h
 /// @brief MultConv のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class MultConv MultConv.h "MultConv.h"
@@ -50,6 +50,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_MULTCONV_H
+#endif // LIBYM_NETWORKSBDNCONV_MULTCONV_H

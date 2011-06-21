@@ -10,7 +10,7 @@
 #include "ym_networks/CmnLatchCell.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -181,4 +181,4 @@ CmnLatchCell::iq_pos() const
   return get_pos(mBits, OUTPUT2);
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS

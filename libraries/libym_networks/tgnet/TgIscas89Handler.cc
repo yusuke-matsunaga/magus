@@ -16,7 +16,7 @@
 #include "LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 TgIscas89Handler::TgIscas89Handler()
@@ -238,4 +238,4 @@ TgIscas89Handler::connect(TgNode* from,
   }
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS

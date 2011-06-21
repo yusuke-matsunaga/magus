@@ -8,10 +8,10 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class BdnAuxData;
 
@@ -821,6 +821,6 @@ BdnNode::set_output_fanin_inv(bool inv)
   }
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BDNNODE_H

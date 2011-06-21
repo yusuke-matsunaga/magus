@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_MVNCONSTBITSELECT_H
-#define LIBYM_MVN_MVNCONSTBITSELECT_H
+#ifndef LIBYM_NETWORKS_MVNCONSTBITSELECT_H
+#define LIBYM_NETWORKS_MVNCONSTBITSELECT_H
 
 /// @file libym_networks/MvnConstBitSelect.h
 /// @brief MvnConstBitSelect のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnNodeBase.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnConstBitSelect MvnConstBitSelect.h "MvnConstBitSelect.h"
@@ -61,6 +61,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_MVN_MVNCONSTBITSELECT_H
+#endif // LIBYM_NETWORKS_MVNCONSTBITSELECT_H

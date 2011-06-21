@@ -26,7 +26,7 @@
 #include "CmnNodeLogic.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 ///////////////////////////////////////////////////////////////////////
 // クラス CmnNode
@@ -852,4 +852,4 @@ CmnNodeLogic::cell() const
   return mCell;
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS

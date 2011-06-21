@@ -48,7 +48,7 @@
 #include "ConstPartSelectConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 // @brief コンストラクタ
 MvnBdnConv::MvnBdnConv()
@@ -503,4 +503,4 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
   }
 }
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV

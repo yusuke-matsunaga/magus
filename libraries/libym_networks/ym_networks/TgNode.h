@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_networks/TgGateTemplate.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgEdge TgEdge.h <ym_networks/TgNode.h>
@@ -406,6 +406,6 @@ TgNode::alt_node() const
   return mAltNode;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_TGNODE_H

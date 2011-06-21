@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVNBDNCONV_ORCONV_H
-#define LIBYM_MVNBDNCONV_ORCONV_H
+#ifndef LIBYM_NETWORKSBDNCONV_ORCONV_H
+#define LIBYM_NETWORKSBDNCONV_ORCONV_H
 
 /// @file libym_networks/OrConv.h
 /// @brief OrConv のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class OrConv OrConv.h "OrConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_ORCONV_H
+#endif // LIBYM_NETWORKSBDNCONV_ORCONV_H

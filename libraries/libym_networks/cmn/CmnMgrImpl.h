@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 #include "ym_cell/cell_nsdef.h"
 
 #include "ym_utils/Alloc.h"
@@ -33,7 +33,7 @@ struct hash<const nsYm::Cell*>
 END_NAMESPACE_HASH
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnMgrImpl CmnMgrImpl.h "CmnMgrImpl.h"
@@ -536,6 +536,6 @@ CmnMgrImpl::logic_list() const
   return mLogicList;
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_CMNMGR_H

@@ -1,5 +1,5 @@
-#ifndef YM_MVN_MVNNODEBASE_H
-#define YM_MVN_MVNNODEBASE_H
+#ifndef YM_NETWORKS_MVNNODEBASE_H
+#define YM_NETWORKS_MVNNODEBASE_H
 
 /// @file libym_networks/MvnNodeBase.h
 /// @brief MvnNodeBase のヘッダファイル
@@ -12,7 +12,7 @@
 #include "ym_networks/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnNodeBase MvnNodeBase.h "MvnNodeBase.h"
@@ -113,6 +113,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
-#endif // YM_MVN_MVNNODEBASE_H
+#endif // YM_NETWORKS_MVNNODEBASE_H

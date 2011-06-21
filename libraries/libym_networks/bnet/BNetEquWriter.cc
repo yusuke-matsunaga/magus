@@ -14,7 +14,7 @@
 #include "ym_logic/LogExprWriter.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -119,4 +119,4 @@ BNetEquWriter::dump(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

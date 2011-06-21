@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnDffCell CmnDffCell.h "ym_networks/CmnDffCell.h"
@@ -116,7 +116,7 @@ private:
 
 };
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 
 #endif // YM_NETWORKS_CMN_CMNDFFCELL_H

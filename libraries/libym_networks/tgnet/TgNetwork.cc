@@ -15,7 +15,7 @@
 #include "LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // クラス TgNetwork
@@ -413,4 +413,4 @@ TgNode::set_type(ymuint32 lid,
   mFanoutNum = 0;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS

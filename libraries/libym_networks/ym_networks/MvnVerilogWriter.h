@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnVerilogWriter MvnVerilogWriter.h "ym_networks/MvnVerilogWriter.h"
@@ -52,6 +52,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_MVNVERILOGWRITER_H

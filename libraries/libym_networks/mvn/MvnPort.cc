@@ -11,7 +11,7 @@
 #include "ym_networks/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnPortRef
@@ -78,4 +78,4 @@ MvnPort::bit_width() const
   return ans;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS

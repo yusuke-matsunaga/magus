@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetEquWriter BNetEquWriter.h <ym_networks/BNetEquWriter.h>
@@ -42,6 +42,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BNETEQUWRITER_H

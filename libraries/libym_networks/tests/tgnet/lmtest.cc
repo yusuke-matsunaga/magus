@@ -12,7 +12,7 @@
 #include "LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 void
 test1(const LogExpr& expr,
@@ -23,7 +23,7 @@ test1(const LogExpr& expr,
   cout << "  ID = " << id << endl;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
 
 ///////////////////////////////////////////////////////////////////////////////

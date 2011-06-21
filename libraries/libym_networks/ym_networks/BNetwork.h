@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 #include "ym_utils/NameMgr.h"
@@ -29,7 +29,7 @@
 //   記憶ノード:   記憶素子を表すノード latch ノードと呼ぶことにする．
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class StrBNodeMap;
 
@@ -1934,7 +1934,7 @@ BNetworkTrace::network() const
   return mNetwork;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
 BEGIN_NAMESPACE_HASH
 // BNode へのポインタをキーにしたハッシュ関数クラスの定義

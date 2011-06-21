@@ -10,10 +10,11 @@
 
 
 #include "ym_networks/BNetBlifReader.h"
+#include "blif/BlifParser.h"
 #include "BNetBlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // BNetBlifReader
@@ -21,14 +22,16 @@ BEGIN_NAMESPACE_YM_BNET
 
 // @brief コンストラクタ
 BNetBlifReader::BNetBlifReader() :
+  mParser(new BlifParser),
   mHandler(new BNetBlifHandler)
 {
-  mParser.add_handler(mHandler);
+  mParser->add_handler(mHandler);
 }
 
 // @brief デストラクタ
 BNetBlifReader::~BNetBlifReader()
 {
+  delete mParser;
   // mHandler は BlifParser が責任を持って破壊してくれる．
 }
 
@@ -43,7 +46,7 @@ BNetBlifReader::read(const string& filename,
 {
   mHandler->set_network(&network);
 
-  bool stat = mParser.read(filename);
+  bool stat = mParser->read(filename);
   if ( !stat ) {
     return false;
   }
@@ -51,4 +54,4 @@ BNetBlifReader::read(const string& filename,
   return true;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

@@ -13,7 +13,7 @@
 #include "CmnMgrImpl.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 ///////////////////////////////////////////////////////////////////////
 // クラス CmnMgr
@@ -347,4 +347,4 @@ CmnMgr::reg_latch_cell(const Cell* cell,
   return mImpl->reg_latch_cell(cell, pos_array);
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS

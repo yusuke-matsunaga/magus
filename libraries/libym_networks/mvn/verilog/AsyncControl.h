@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_VERILOG_ASYNCCONTROL_H
-#define LIBYM_MVN_VERILOG_ASYNCCONTROL_H
+#ifndef LIBYM_NETWORKS_VERILOG_ASYNCCONTROL_H
+#define LIBYM_NETWORKS_VERILOG_ASYNCCONTROL_H
 
 /// @file libym_networks/verilog/AsyncControl.h
 /// @brief AsyncControl のヘッダファイル
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class AsyncControl AsyncControl.h "AsyncControl.h"
@@ -38,6 +38,6 @@ struct AsyncControl
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_ASYNCCONTROL_H
+#endif // LIBYM_NETWORKS_VERILOG_ASYNCCONTROL_H

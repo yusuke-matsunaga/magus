@@ -13,7 +13,7 @@
 #include "ym_verilog/vl/VlRange.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 // @brief コンストラクタ
 // @param[in] decl_hash VlDecl 用のハッシュ表
@@ -305,4 +305,4 @@ AsyncControl::AsyncControl(const Env& global_env) :
 {
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG

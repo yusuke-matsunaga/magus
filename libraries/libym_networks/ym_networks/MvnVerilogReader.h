@@ -9,21 +9,21 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/File.h"
 #include "ym_utils/MsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 class ReaderImpl;
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnVerilogReader MvnVerilogReader.h "ym_networks/MvnVerilogReader.h"
@@ -77,6 +77,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_MVNVERILOGREADER_H

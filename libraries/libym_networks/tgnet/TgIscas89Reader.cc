@@ -13,7 +13,7 @@
 #include "TgIscas89Handler.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // ISCAS89 形式のファイルを読み込むためのクラス
@@ -42,4 +42,4 @@ TgIscas89Reader::operator()(const string& filename,
   return stat;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS

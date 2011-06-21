@@ -12,7 +12,7 @@
 #include "StrBNodeMap.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -163,4 +163,4 @@ StrBNodeMap::free_cell(Cell* cell)
   mAvail = cell;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

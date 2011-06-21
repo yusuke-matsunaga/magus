@@ -12,7 +12,7 @@
 #include "CmnNodeInput.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeDffOut CmnNodeDffOut.h "CmnNodeDffOut.h"
@@ -113,6 +113,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // LIBYM_NETWORKS_CMN_CMNNODEDFFOUT_H

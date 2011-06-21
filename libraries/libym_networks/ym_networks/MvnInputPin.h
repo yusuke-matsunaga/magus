@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnInputPin MvPin.h "ym_networks/MvPin.h"
@@ -136,6 +136,6 @@ MvnInputPin::init(MvnNode* node,
   mSrcPin = NULL;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_MVNINPUTPIN_H

@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_VERILOG_ENV_H
-#define LIBYM_MVN_VERILOG_ENV_H
+#ifndef LIBYM_NETWORKS_VERILOG_ENV_H
+#define LIBYM_NETWORKS_VERILOG_ENV_H
 
 /// @file libym_networks/verilog/Env.h
 /// @brief Env のヘッダファイル
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "DeclHash.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class AssignInfo Env.h "Env.h"
@@ -265,6 +265,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_ENV_H
+#endif // LIBYM_NETWORKS_VERILOG_ENV_H

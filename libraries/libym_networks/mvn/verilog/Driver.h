@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_VERILOG_DRIVER_H
-#define LIBYM_MVN_VERILOG_DRIVER_H
+#ifndef LIBYM_NETWORKS_VERILOG_DRIVER_H
+#define LIBYM_NETWORKS_VERILOG_DRIVER_H
 
 /// @file libym_networks/verilog/Driver.h
 /// @brief Driver のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class Driver Driver.h "Driver.h"
@@ -256,6 +256,6 @@ operator!=(const Driver& lhs,
   return !(lhs == rhs);
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_DRIVER_H
+#endif // LIBYM_NETWORKS_VERILOG_DRIVER_H

@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnDff CmnDff.h "ym_networks/CmnDff.h"
@@ -271,6 +271,6 @@ CmnDff::_preset()
   return mPreset;
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_CMNDFF_H

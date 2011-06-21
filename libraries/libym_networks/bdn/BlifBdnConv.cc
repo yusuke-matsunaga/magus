@@ -18,7 +18,7 @@
 #include "blif/BlifNetwork.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 BlifBdnConv::BlifBdnConv()
@@ -237,4 +237,4 @@ BlifBdnConv::put_node(const BlifNode* blif_node,
   mNodeFlag[id] = true;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

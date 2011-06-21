@@ -12,7 +12,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 ///////////////////////////////////////////////////////////////////////
 // クラス BdnMgr
@@ -573,4 +573,4 @@ BdnMgr::change_xnor(BdnNode* node,
   mImpl->change_logic(node, ~new_handle);
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

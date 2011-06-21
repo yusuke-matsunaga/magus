@@ -12,7 +12,7 @@
 #include "CmnNodeOutput.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeLatchIn CmnNodeLatchIn.h "CmnNodeLatchIn.h"
@@ -173,6 +173,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // LIBYM_NETWORKS_CMN_CMNNODELATCHIN_H

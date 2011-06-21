@@ -1,11 +1,11 @@
-#ifndef YM_NETWORKS_CMN_NSDEF_H
-#define YM_NETWORKS_CMN_NSDEF_H
+#ifndef YM_NETWORKS_CMN_H
+#define YM_NETWORKS_CMN_H
 
-/// @file ym_networks/cmn_nsdef.h
+/// @file ym_networks/cmn.h
 /// @brief Cell Mapped Networks の共通ヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bdn_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: bdn.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -54,27 +54,11 @@
 /// 削除された場合には歯抜けの状態になる．
 
 
-#include "ymtools.h"
+#include "ym_networks/networks_nsdef.h"
 #include "ym_utils/DlList.h"
 
 
-/// @brief CMN 用の名前空間の開始
-#define BEGIN_NAMESPACE_YM_CMN \
-BEGIN_NAMESPACE_YM \
-BEGIN_NAMESPACE(nsCmn)
-
-/// @brief CMN 用の名前空間の終了
-#define END_NAMESPACE_YM_CMN \
-END_NAMESPACE(nsCmn) \
-END_NAMESPACE_YM
-
-/// @namespace nsYm::nsCmn
-/// @brief CMN 関係のクラスが属する名前空間
-///
-/// ただし，主要なものは nsYm にインポートされている．
-/// 実装用のローカルな要素だけがこの名前空間に存在する．
-
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class CmnMgr;
 
@@ -122,36 +106,36 @@ typedef DlList<CmnDff> CmnDffList;
 /// @ingroup CmnGroup
 typedef DlList<CmnLatch> CmnLatchList;
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 BEGIN_NAMESPACE_YM
 
-using nsCmn::CmnMgr;
+using nsNetworks::CmnMgr;
 
-using nsCmn::CmnPort;
+using nsNetworks::CmnPort;
 
-using nsCmn::CmnDff;
-using nsCmn::CmnDffList;
+using nsNetworks::CmnDff;
+using nsNetworks::CmnDffList;
 
-using nsCmn::CmnLatch;
-using nsCmn::CmnLatchList;
+using nsNetworks::CmnLatch;
+using nsNetworks::CmnLatchList;
 
-using nsCmn::CmnNode;
-using nsCmn::CmnNodeVector;
-using nsCmn::CmnNodeList;
+using nsNetworks::CmnNode;
+using nsNetworks::CmnNodeVector;
+using nsNetworks::CmnNodeList;
 
-using nsCmn::CmnEdge;
-using nsCmn::CmnEdgeList;
+using nsNetworks::CmnEdge;
+using nsNetworks::CmnEdgeList;
 
-using nsCmn::CmnFanoutList;
+using nsNetworks::CmnFanoutList;
 
-using nsCmn::CmnDffCell;
-using nsCmn::CmnLatchCell;
+using nsNetworks::CmnDffCell;
+using nsNetworks::CmnLatchCell;
 
-using nsCmn::CmnDumper;
-using nsCmn::CmnBlifWriter;
-using nsCmn::CmnVerilogWriter;
+using nsNetworks::CmnDumper;
+using nsNetworks::CmnBlifWriter;
+using nsNetworks::CmnVerilogWriter;
 
 END_NAMESPACE_YM
 
-#endif // YM_NETWORKS_CMN_NSDEF_H
+#endif // YM_NETWORKS_CMN_H

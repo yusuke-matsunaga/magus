@@ -1,5 +1,5 @@
-#ifndef LIBYM_TGNET_TGISCAS89HANDLER_H
-#define LIBYM_TGNET_TGISCAS89HANDLER_H
+#ifndef LIBYM_NETWORKS_TGISCAS89HANDLER_H
+#define LIBYM_NETWORKS_TGISCAS89HANDLER_H
 
 /// @file libym_networks/TgIscas89Handler.h
 /// @brief TgIscas89Handler のヘッダファイル
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_iscas89/Iscas89Handler.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgIscas89Handler TgIscas89Handler.h
@@ -133,6 +133,6 @@ private:
   
 };
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_TGNET_TGISCAS89HANDLER_H
+#endif // LIBYM_NETWORKS_TGISCAS89HANDLER_H

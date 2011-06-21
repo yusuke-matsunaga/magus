@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnModule MvnModule.h "ym_networks/MvnModule.h"
@@ -276,6 +276,6 @@ MvnModule::nodes_end() const
   return mNodeList.end();
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_MVNMODULE_H

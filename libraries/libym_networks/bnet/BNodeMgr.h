@@ -1,5 +1,5 @@
-#ifndef LIBYM_BNET_BNODEMGR_H
-#define LIBYM_BNET_BNODEMGR_H
+#ifndef LIBYM_NETWORKS_BNODEMGR_H
+#define LIBYM_NETWORKS_BNODEMGR_H
 
 /// @file libym_networks/BNodeMgr.h
 /// @brief BNodeMgr のヘッダファイル
@@ -15,7 +15,7 @@
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNodeMgr BNodeMgr.h "BNodeMgr.h"
@@ -84,6 +84,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_BNET_BNODEMGR_H
+#endif // LIBYM_NETWORKS_BNODEMGR_H

@@ -10,10 +10,10 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnNodeHandle BdnNode.h "ym_networks/BdnNode.h"
@@ -237,6 +237,6 @@ operator!=(BdnNodeHandle left,
   return !left.operator==(right);
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BDNNODE_H

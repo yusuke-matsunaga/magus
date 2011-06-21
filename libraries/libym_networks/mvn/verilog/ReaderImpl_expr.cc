@@ -23,7 +23,7 @@
 #include "ym_utils/MsgMgr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 using namespace nsYm::nsVerilog;
 
@@ -570,4 +570,4 @@ ReaderImpl::gen_primary(const VlExpr* expr,
   return NULL;
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG

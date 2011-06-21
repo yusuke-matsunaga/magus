@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bnet.h"
+#include "ym_networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM

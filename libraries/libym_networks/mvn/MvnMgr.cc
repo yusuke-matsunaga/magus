@@ -13,7 +13,7 @@
 #include "ym_networks/MvnPort.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnMgr
@@ -631,4 +631,4 @@ MvnOutputPin::~MvnOutputPin()
 {
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS

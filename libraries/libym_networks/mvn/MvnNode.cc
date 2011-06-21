@@ -10,7 +10,7 @@
 #include "ym_networks/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
@@ -83,4 +83,4 @@ MvnNode::const_value(vector<ymuint32>& val) const
 {
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS

@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class BdnAuxData;
 
@@ -227,6 +227,6 @@ BdnDff::_preset()
   return mPreset;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BDNDFF_H

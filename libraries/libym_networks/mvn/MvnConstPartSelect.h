@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_MVNCONSTPARTSELECT_H
-#define LIBYM_MVN_MVNCONSTPARTSELECT_H
+#ifndef LIBYM_NETWORKS_MVNCONSTPARTSELECT_H
+#define LIBYM_NETWORKS_MVNCONSTPARTSELECT_H
 
 /// @file libym_networks/MvnConstPartSelect.h
 /// @brief MvnConstPartSelect のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnNodeBase.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnConstPartSelect MvnConstPartSelect.h "MvnConstPartSelect.h"
@@ -73,6 +73,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_MVN_MVNCONSTPARTSELECT_H
+#endif // LIBYM_NETWORKS_MVNCONSTPARTSELECT_H

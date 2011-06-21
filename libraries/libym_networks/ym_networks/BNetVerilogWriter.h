@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetVerilogWriter BNetVerilogWriter.h <ym_networks/BNetVerilogWriter.h>
@@ -42,6 +42,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BNETVERILOGWRITER_H

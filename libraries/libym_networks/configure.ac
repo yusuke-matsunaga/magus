@@ -18,7 +18,7 @@ Copyright (C) 2005-2011 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-AC_CONFIG_SRCDIR([ym_networks/bdn_nsdef.h])dnl
+AC_CONFIG_SRCDIR([ym_networks/networks_nsdef.h])dnl
 
 AC_CONFIG_AUX_DIR([config])dnl
 AC_CONFIG_MACRO_DIR([config])dnl

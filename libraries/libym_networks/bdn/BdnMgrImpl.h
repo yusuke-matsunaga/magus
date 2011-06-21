@@ -1,5 +1,5 @@
-#ifndef LIBYM_BDN_BDNMGRIMPL_H
-#define LIBYM_BDN_BDNMGRIMPL_H
+#ifndef LIBYM_NETWORKS_BDNMGRIMPL_H
+#define LIBYM_NETWORKS_BDNMGRIMPL_H
 
 /// @file libym_networks/BdnMgrImpl.h
 /// @brief BdnMgrImpl のヘッダファイル
@@ -16,7 +16,7 @@
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnMgrImpl BdnMgrImpl.h BdnMgrImp.h
@@ -617,6 +617,6 @@ BdnMgrImpl::make_xor_tree(BdnNode* node,
   return make_tree(node, XOR, 0, node_list.size(), node_list);
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_BDN_BDNMGRIMPL_H
+#endif // LIBYM_NETWORKS_BDNMGRIMPL_H

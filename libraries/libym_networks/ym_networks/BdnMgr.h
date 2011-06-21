@@ -10,11 +10,11 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnMgr BdnMgr.h "ym_networks/BdnMgr.h"
@@ -433,6 +433,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BDNMGR_H

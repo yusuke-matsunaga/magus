@@ -19,7 +19,7 @@
 #include "ym_cell/CellPin.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 CmnDumper::CmnDumper()
@@ -288,4 +288,4 @@ CmnDumper::dump_verilog(ostream& s,
 }
 #endif
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS

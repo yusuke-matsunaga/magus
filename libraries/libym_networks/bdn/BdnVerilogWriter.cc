@@ -17,7 +17,7 @@
 #include "ym_utils/NameMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 
 // @brief コンストラクタ
@@ -270,4 +270,4 @@ BdnVerilogWriter::operator()(ostream& s,
   s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

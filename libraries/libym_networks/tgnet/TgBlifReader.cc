@@ -13,7 +13,7 @@
 #include "TgBlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // blif 形式のファイルを読み込むためのクラス
@@ -42,4 +42,4 @@ TgBlifReader::operator()(const string& filename,
   return stat;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS

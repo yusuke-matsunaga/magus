@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVNBDNCONV_CONSTPARTSELECTCONV_H
-#define LIBYM_MVNBDNCONV_CONSTPARTSELECTCONV_H
+#ifndef LIBYM_NETWORKSBDNCONV_CONSTPARTSELECTCONV_H
+#define LIBYM_NETWORKSBDNCONV_CONSTPARTSELECTCONV_H
 
 /// @file libym_networks/ConstPartSelectConv.h
 /// @brief ConstPartSelectConv のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class ConstPartSelectConv ConstPartSelectConv.h "ConstPartSelectConv.h"
@@ -50,6 +50,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_CONSTPARTSELECTCONV_H
+#endif // LIBYM_NETWORKSBDNCONV_CONSTPARTSELECTCONV_H

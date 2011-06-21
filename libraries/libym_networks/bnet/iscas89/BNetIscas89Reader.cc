@@ -13,7 +13,7 @@
 #include "BNetIscas89Handler.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // BNetIscas89Reader
@@ -51,4 +51,4 @@ BNetIscas89Reader::read(const string& filename,
   return true;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

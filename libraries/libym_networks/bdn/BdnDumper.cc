@@ -17,7 +17,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -226,4 +226,4 @@ BdnDumper::operator()(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

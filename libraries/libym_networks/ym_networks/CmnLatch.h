@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnLatch CmnLatch.h "ym_networks/CmnLatch.h"
@@ -271,6 +271,6 @@ CmnLatch::_preset()
   return mPreset;
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_CMN_CMNLATCH_H

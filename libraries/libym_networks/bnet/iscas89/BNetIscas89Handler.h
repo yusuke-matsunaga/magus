@@ -1,5 +1,5 @@
-#ifndef LIBYM_BNETISCAS89READER_BNETISCAS89HANDLER_H
-#define LIBYM_BNETISCAS89READER_BNETISCAS89HANDLER_H
+#ifndef LIBYM_NETWORKSISCAS89READER_BNETISCAS89HANDLER_H
+#define LIBYM_NETWORKSISCAS89READER_BNETISCAS89HANDLER_H
 
 /// @file libym_bnetiscas89reader/BNetIscas89Handler.h
 /// @brief BNetIscas89Handler のヘッダファイル
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 #include "iscas89/Iscas89Handler.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetIscas89Handler read_blif.cc
@@ -131,6 +131,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_BNETISCAS89READER_BNETISCAS89HANDLER_H
+#endif // LIBYM_NETWORKSISCAS89READER_BNETISCAS89HANDLER_H

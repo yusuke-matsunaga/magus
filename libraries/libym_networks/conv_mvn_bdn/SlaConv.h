@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVNBDNCONV_SLACONV_H
-#define LIBYM_MVNBDnCONV_SLACONV_H
+#ifndef LIBYM_NETWORKSBDNCONV_SLACONV_H
+#define LIBYM_NETWORKSBDnCONV_SLACONV_H
 
 /// @file libym_networks/SlaConv.h
 /// @brief SlaConv のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class SlaConv SlaConv.h "SlaConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_SLACONV_H
+#endif // LIBYM_NETWORKSBDNCONV_SLACONV_H

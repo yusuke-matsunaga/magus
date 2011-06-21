@@ -11,11 +11,14 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
-#include "BlifParser.h"
+#include "ym_networks/bnet.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
+
+namespace nsBlif {
+  class BlifParser;
+}
 
 class BNetBlifHandler;
 
@@ -54,13 +57,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // blif パーサー
-  BlifParser mParser;
+  nsBlif::BlifParser* mParser;
 
   // ハンドラ
   BNetBlifHandler* mHandler;
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BNETBLIFREADER_H

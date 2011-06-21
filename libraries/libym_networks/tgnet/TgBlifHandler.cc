@@ -17,7 +17,7 @@
 #include "ym_utils/MsgMgr.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 TgBlifHandler::TgBlifHandler()
@@ -282,4 +282,4 @@ TgBlifHandler::connect(TgNode* from,
   }
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS

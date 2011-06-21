@@ -1,11 +1,11 @@
-#ifndef YM_NETWORKS_BDN_NSDEF_H
-#define YM_NETWORKS_BDN_NSDEF_H
+#ifndef YM_NETWORKS_BDN_H
+#define YM_NETWORKS_BDN_H
 
-/// @file ym_networks/bdn_nsdef.h
-/// @brief ym_bdn の共通ヘッダファイル
+/// @file ym_networks/bdn.h
+/// @brief BDN の共通ヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bdn_nsdef.h 2507 2009-10-17 16:24:02Z matsunaga $
+/// $Id: bdn.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -89,27 +89,11 @@
 ///   反転属性なしで 0，反転属性ありで 1 を表す．
 
 
-#include "ymtools.h"
+#include "ym_networks/networks_nsdef.h"
 #include "ym_utils/DlList.h"
 
 
-/// @brief ym_bdn 用の名前空間の開始
-#define BEGIN_NAMESPACE_YM_BDN \
-BEGIN_NAMESPACE_YM \
-BEGIN_NAMESPACE(nsBdn)
-
-/// @brief ym_bdn 用の名前空間の終了
-#define END_NAMESPACE_YM_BDN \
-END_NAMESPACE(nsBdn) \
-END_NAMESPACE_YM
-
-/// @namespace nsYm::nsBdn
-/// @brief Bdn 関係のクラスが属する名前空間
-///
-/// ただし，主要なものは nsYm にインポートされている．
-/// 実装用のローカルな要素だけがこの名前空間に存在する．
-
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class BdnMgr;
 
@@ -156,36 +140,36 @@ typedef DlList<BdnDff> BdnDffList;
 /// @ingroup BdnGroup
 typedef DlList<BdnLatch> BdnLatchList;
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 BEGIN_NAMESPACE_YM
 
-using nsBdn::BdnMgr;
+using nsNetworks::BdnMgr;
 
-using nsBdn::BdnPort;
+using nsNetworks::BdnPort;
 
-using nsBdn::BdnDff;
-using nsBdn::BdnDffList;
+using nsNetworks::BdnDff;
+using nsNetworks::BdnDffList;
 
-using nsBdn::BdnLatch;
-using nsBdn::BdnLatchList;
+using nsNetworks::BdnLatch;
+using nsNetworks::BdnLatchList;
 
-using nsBdn::BdnNode;
-using nsBdn::BdnNodeHandle;
-using nsBdn::BdnNodeVector;
-using nsBdn::BdnNodeList;
+using nsNetworks::BdnNode;
+using nsNetworks::BdnNodeHandle;
+using nsNetworks::BdnNodeVector;
+using nsNetworks::BdnNodeList;
 
-using nsBdn::BdnEdge;
-using nsBdn::BdnEdgeList;
+using nsNetworks::BdnEdge;
+using nsNetworks::BdnEdgeList;
 
-using nsBdn::BdnFanoutList;
+using nsNetworks::BdnFanoutList;
 
-using nsBdn::BdnDumper;
-using nsBdn::BdnBlifWriter;
-using nsBdn::BdnVerilogWriter;
+using nsNetworks::BdnDumper;
+using nsNetworks::BdnBlifWriter;
+using nsNetworks::BdnVerilogWriter;
 
-using nsBdn::BlifBdnConv;
+using nsNetworks::BlifBdnConv;
 
 END_NAMESPACE_YM
 
-#endif // YM_NETWORKS_BDN_NSDEF_H
+#endif // YM_NETWORKS_BDN_H

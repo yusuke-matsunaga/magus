@@ -1,5 +1,5 @@
-#ifndef LIBYM_TGNET_NAMEHASH_H
-#define LIBYM_TGNET_NAMEHASH_H
+#ifndef LIBYM_NETWORKS_NAMEHASH_H
+#define LIBYM_NETWORKS_NAMEHASH_H
 
 /// @file libym_networks/NameHash.h
 /// @brief NameHash のヘッダファイル
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class NameHash NameHash.h "NameHash.h"
@@ -110,6 +110,6 @@ private:
   
 };
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_TGNET_NAMEHASH_H
+#endif // LIBYM_NETWORKS_NAMEHASH_H

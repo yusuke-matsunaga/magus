@@ -8,13 +8,13 @@
 
 
 #include "DeclHash.h"
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 //#include "ym_networks/MvnNode.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 // @brief コンストラクタ
 DeclHash::DeclHash() :
@@ -156,4 +156,4 @@ DeclHash::hash_func(const VlObj* decl) const
   return ((tmp * tmp) >> 10) % mSize;
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG

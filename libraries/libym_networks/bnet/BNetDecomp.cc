@@ -14,7 +14,7 @@
 #include "ym_utils/HeapTree.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -429,4 +429,4 @@ BNetDecomp::calc_depth(BNode* node)
   return d;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

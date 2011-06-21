@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_iscas89/Iscas89Parser.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class TgIscas89Handler;
 
@@ -57,6 +57,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_TGISCAS89READER_H

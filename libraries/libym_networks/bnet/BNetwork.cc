@@ -15,7 +15,7 @@
 #include "BNodeMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // コンストラクタ
 BNetwork::BNetwork() :
@@ -1000,4 +1000,4 @@ BNetworkTrace::~BNetworkTrace()
   unbind();
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

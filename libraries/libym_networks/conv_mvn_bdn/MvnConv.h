@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVNBDNCONV_MVNCONV_H
-#define LIBYM_MVNBDNCONV_MVNCONV_H
+#ifndef LIBYM_NETWORKSBDNCONV_MVNCONV_H
+#define LIBYM_NETWORKSBDNCONV_MVNCONV_H
 
 /// @file libym_networks/MvnConv.h
 /// @brief MvnConv のヘッダファイル
@@ -10,11 +10,11 @@
 
 
 #include "ym_networks/mvnbdnconv_nsdef.h"
-#include "ym_networks/mvn_nsdef.h"
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/mvn.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnConv MvnConv.h "MvnConv.h"
@@ -48,6 +48,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_MVNCONV_H
+#endif // LIBYM_NETWORKSBDNCONV_MVNCONV_H

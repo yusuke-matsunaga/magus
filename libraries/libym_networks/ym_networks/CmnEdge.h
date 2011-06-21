@@ -11,13 +11,13 @@
 /// All rights reserved.
 
 
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 #include "ym_cell/cell_nsdef.h"
 
 #include "ym_utils/DlList.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnEdge CmnEdge.h "ym_networks/CmnEdge.h"
@@ -198,6 +198,6 @@ CmnEdge::set_to(CmnNode* to,
   mToPos = pos;
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_CMNEDGE_H

@@ -14,7 +14,7 @@
 #include "BdnAuxData.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 
 //////////////////////////////////////////////////////////////////////
@@ -319,4 +319,4 @@ BdnLatchData::latch() const
   return mLatch;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

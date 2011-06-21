@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_utils/ItvlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnMgr MvnMgr.h "ym_networks/MvnMgr.h"
@@ -702,6 +702,6 @@ dump_node_map(ostream& s,
 	      const MvnMgr& mgr,
 	      const MvnVlMap& node_map);
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_MVNMGR_H

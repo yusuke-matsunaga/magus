@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_VERILOG_READERIMPL_H
-#define LIBYM_MVN_VERILOG_READERIMPL_H
+#ifndef LIBYM_NETWORKS_VERILOG_READERIMPL_H
+#define LIBYM_NETWORKS_VERILOG_READERIMPL_H
 
 /// @file libym_networks/verilog/ReaderImpl.h
 /// @brief ReaderImpl のヘッダファイル
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_networks/MvnVlMap.h"
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
@@ -19,7 +19,7 @@
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class ReaderImpl ReaderImpl.h "ReaderImpl.h"
@@ -329,6 +329,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_READERIMPL_H
+#endif // LIBYM_NETWORKS_VERILOG_READERIMPL_H

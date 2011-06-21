@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVNBDNCONV_EQCONV_H
-#define LIBYM_MVNBDNCONV_EQCONV_H
+#ifndef LIBYM_NETWORKSBDNCONV_EQCONV_H
+#define LIBYM_NETWORKSBDNCONV_EQCONV_H
 
 /// @file libym_networks/EqConv.h
 /// @brief EqConv のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class EqConv EqConv.h "EqConv.h"
@@ -50,6 +50,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_EQCONV_H
+#endif // LIBYM_NETWORKSBDNCONV_EQCONV_H

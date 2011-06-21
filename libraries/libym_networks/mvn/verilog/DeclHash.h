@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_VERILOG_DECLHASH_H
-#define LIBYM_MVN_VERILOG_DECLHASH_H
+#ifndef LIBYM_NETWORKS_VERILOG_DECLHASH_H
+#define LIBYM_NETWORKS_VERILOG_DECLHASH_H
 
 /// @file libym_networks/verilog/DeclHash.h
 /// @brief DeclHash のヘッダファイル
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class DeclHash DeclHash.h "DeclHash.h"
@@ -126,6 +126,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG
 
-#endif // LIBYM_MVN_VERILOG_DECLHASH_H
+#endif // LIBYM_NETWORKS_VERILOG_DECLHASH_H

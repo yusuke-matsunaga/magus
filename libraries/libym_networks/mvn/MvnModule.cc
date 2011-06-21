@@ -10,7 +10,7 @@
 #include "ym_networks/MvnModule.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 // @param[in] name 名前
@@ -37,4 +37,4 @@ MvnModule::~MvnModule()
 {
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS

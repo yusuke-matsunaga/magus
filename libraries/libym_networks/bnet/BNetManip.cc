@@ -13,7 +13,7 @@
 #include "BNodeMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ．
 // @param[in] network 操作対象のネットワーク
@@ -904,4 +904,4 @@ BNetManip::make_xnor(const BNodeVector& fanins,
   return node;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

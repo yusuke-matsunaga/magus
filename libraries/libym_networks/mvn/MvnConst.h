@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_MVNCONST_H
-#define LIBYM_MVN_MVNCONST_H
+#ifndef LIBYM_NETWORKS_MVNCONST_H
+#define LIBYM_NETWORKS_MVNCONST_H
 
 /// @file libym_networks/MvnConst.h
 /// @brief MvnConst のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnNodeBase.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnConst MvnConst.h "MvnConst.h"
@@ -62,6 +62,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_MVN_MVNCONST_H
+#endif // LIBYM_NETWORKS_MVNCONST_H

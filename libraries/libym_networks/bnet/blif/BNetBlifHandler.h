@@ -1,5 +1,5 @@
-#ifndef LIBYM_BNETBLIFREADER_BNETBLIFHANDLER_H
-#define LIBYM_BNETBLIFREADER_BNETBLIFHANDLER_H
+#ifndef LIBYM_NETWORKSBLIFREADER_BNETBLIFHANDLER_H
+#define LIBYM_NETWORKSBLIFREADER_BNETBLIFHANDLER_H
 
 /// @file libym_bnetblifreader/BNetBlifHandler.h
 /// @brief BNetBlifHandler のヘッダファイル
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 #include "BlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetBlifHandler read_blif.cc
@@ -187,6 +187,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_BNETBLIFREADER_BNETBLIFHANDLER_H
+#endif // LIBYM_NETWORKSBLIFREADER_BNETBLIFHANDLER_H

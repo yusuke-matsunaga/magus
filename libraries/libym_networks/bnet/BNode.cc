@@ -12,7 +12,7 @@
 #include "ym_networks/BNetwork.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // ノードを表すクラス BNode
@@ -111,4 +111,4 @@ BNode::value() const
   }
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

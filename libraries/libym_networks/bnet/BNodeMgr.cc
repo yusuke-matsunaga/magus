@@ -12,7 +12,7 @@
 #include "BNodeMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 
 // 唯一のオブジェクトを返す．
@@ -92,4 +92,4 @@ BNodeMgr::free_edgearray(size_t n,
   mEdgeAlloc.put_memory(sizeof(BNodeEdge) * n, array);
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

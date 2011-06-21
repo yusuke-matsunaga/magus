@@ -7,11 +7,12 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
-	bdn_nsdef.h \
-	bnet_nsdef.h \
-	cmn_nsdef.h \
-	mvn_nsdef.h \
-	tgnet_nsdef.h \
+	networks_nsdef.h \
+	bdn.h \
+	bnet.h \
+	cmn.h \
+	mvn.h \
+	tgnet.h \
 	BdnBlifWriter.h \
 	BdnDff.h \
 	BdnDumper.h \

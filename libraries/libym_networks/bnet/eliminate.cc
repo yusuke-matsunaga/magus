@@ -15,7 +15,7 @@
 #include "ym_networks/BNetManip.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 
 BEGIN_NONAMESPACE
@@ -236,4 +236,4 @@ BNetwork::eliminate(int threshold,
   } while ( eliminated );
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

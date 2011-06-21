@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 #include "ym_networks/MvnInputPin.h"
 #include "ym_networks/MvnOutputPin.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnNode MvnNode.h "ym_networks/MvnNode.h"
@@ -283,6 +283,6 @@ MvnNode::parent() const
   return mParent;
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_MVNNODE_H

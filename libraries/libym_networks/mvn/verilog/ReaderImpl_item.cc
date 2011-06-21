@@ -26,7 +26,7 @@
 #include "ym_verilog/vl/VlExpr.h"
 
 
-BEGIN_NAMESPACE_YM_MVN_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 using namespace nsYm::nsVerilog;
 
@@ -562,4 +562,4 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
   }
 }
 
-END_NAMESPACE_YM_MVN_VERILOG
+END_NAMESPACE_YM_NETWORKS_VERILOG

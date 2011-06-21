@@ -10,7 +10,7 @@
 #include "ym_networks/CmnDffCell.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -173,4 +173,4 @@ CmnDffCell::iq_pos() const
   return get_pos(mBits, OUTPUT2);
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS

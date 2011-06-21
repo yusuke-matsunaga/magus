@@ -1,5 +1,5 @@
-#ifndef LIBYM_BNET_STRBNODEMAP_H
-#define LIBYM_BNET_STRBNODEMAP_H
+#ifndef LIBYM_NETWORKS_STRBNODEMAP_H
+#define LIBYM_NETWORKS_STRBNODEMAP_H
 
 /// @file libym_networks/StrBNodeMap.h
 /// @brief StrBNodeMap のヘッダファイル
@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 #include "ym_networks/BNetwork.h"
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class StrBNodeMap StrBNodeMap.h "StrBNodeMap.h"
@@ -132,6 +132,6 @@ StrBNodeMap::check_name(Cell* cell,
   return name[0] == name1[0] && strcmp(name1, name) == 0;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_BNET_STRBNODEMAP_H
+#endif // LIBYM_NETWORKS_STRBNODEMAP_H

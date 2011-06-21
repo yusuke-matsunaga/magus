@@ -15,7 +15,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // BNetwork を BdnGraph に変換する．
 // network はすでに 2-feasible ネットワークに分解されているとする．
@@ -149,4 +149,4 @@ bnet2bdn(const BNetwork& network,
   return true;
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

@@ -14,7 +14,7 @@
 #include "ym_networks/BNetSopDecomp.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -225,4 +225,4 @@ BNetBlifWriter::dump(ostream& s,
   s << ".end" << endl;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

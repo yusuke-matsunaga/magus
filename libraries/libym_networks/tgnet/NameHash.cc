@@ -13,7 +13,7 @@
 #include "ym_networks/TgNode.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // クラス NameHash
@@ -134,4 +134,4 @@ NameHash::StrIdCell::StrIdCell(TgNode* node,
   while ( (*d ++ = *s ++) ) ;
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS

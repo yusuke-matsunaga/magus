@@ -12,7 +12,7 @@
 #include "ym_networks/CmnNode.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeInput CmnNodeInput.h "CmnNodeInput.h"
@@ -47,7 +47,7 @@ public:
 
 };
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 
 #endif // LIBYM_NETWORKS_CMN_CMNNODEINPUT_H

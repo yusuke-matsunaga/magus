@@ -1,12 +1,12 @@
 #ifndef YM_NETWORKS_TGNET_NSDEF_H
 #define YM_NETWORKS_TGNET_NSDEF_H
 
-/// @file ym_networks/tgnet_nsdef.h
+/// @file ym_networks/tgnet.h
 /// @brief TgNetwork 用の名前空間の定義
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: tgnet_nsdef.h 1920 2008-12-20 15:52:42Z matsunaga $
+/// $Id: tgnet.h 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -19,16 +19,16 @@
 
 #include "ymtools.h"
 
-#define BEGIN_NAMESPACE_YM_TGNET \
+#define BEGIN_NAMESPACE_YM_NETWORKS \
 BEGIN_NAMESPACE_YM \
 BEGIN_NAMESPACE(nsTgnet)
 
-#define END_NAMESPACE_YM_TGNET \
+#define END_NAMESPACE_YM_NETWORKS \
 END_NAMESPACE(nsTgnet) \
 END_NAMESPACE_YM
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 class TgGateTemplate;
 class TgEdge;
@@ -37,7 +37,7 @@ class TgNetwork;
 class TgBlifReader;
 class TgIscas89Reader;
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
 BEGIN_NAMESPACE_YM
 

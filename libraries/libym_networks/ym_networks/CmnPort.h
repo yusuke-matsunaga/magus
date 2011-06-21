@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnPort CmnPort.h "ym_networks/CmnPort.h"
@@ -174,6 +174,6 @@ CmnPort::_output(ymuint pos)
   return mOutputArray[pos];
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_CMNPORT_H

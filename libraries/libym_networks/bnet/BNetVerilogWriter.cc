@@ -14,7 +14,7 @@
 #include "ym_logic/LogExprWriter.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -160,4 +160,4 @@ BNetVerilogWriter::dump(ostream& s,
   s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

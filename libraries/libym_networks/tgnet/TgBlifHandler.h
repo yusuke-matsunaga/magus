@@ -1,5 +1,5 @@
-#ifndef LIBYM_TGNET_TGBLIFHANDLER_H
-#define LIBYM_TGNET_TGBLIFHANDLER_H
+#ifndef LIBYM_NETWORKS_TGBLIFHANDLER_H
+#define LIBYM_NETWORKS_TGBLIFHANDLER_H
 
 /// @file libym_networks/TgBlifHandler.h
 /// @brief TgBlifHandler のヘッダファイル
@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_blif/BlifHandler.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgBlifHandler TgBlifHandler.h
@@ -205,6 +205,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_TGNET_TGBLIFHANDLER_H
+#endif // LIBYM_NETWORKS_TGBLIFHANDLER_H

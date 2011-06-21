@@ -11,13 +11,13 @@
 /// All rights reserved.
 
 
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 #include "ym_cell/cell_nsdef.h"
 
 #include "ym_utils/DlList.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNode CmnNode.h "ym_networks/CmnNode.h"
@@ -442,6 +442,6 @@ CmnNode::cell() const
   return mCell;
 }
 #endif
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_CMNNODE_H

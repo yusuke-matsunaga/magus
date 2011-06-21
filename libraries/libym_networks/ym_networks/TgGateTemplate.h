@@ -11,10 +11,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @brief 組み込み型のゲートの種類を表す列挙型
@@ -131,7 +131,7 @@ TgGateTemplate::ni() const
   return static_cast<size_t>(mData & 0xFFF);
 }
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
 BEGIN_NAMESPACE_YM
 

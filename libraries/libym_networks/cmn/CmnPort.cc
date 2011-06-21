@@ -12,7 +12,7 @@
 #include "ym_networks/CmnPort.h"
 
 
-BEGIN_NAMESPACE_YM_CMN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 // クラス CmnPort
@@ -34,4 +34,4 @@ CmnPort::~CmnPort()
 {
 }
 
-END_NAMESPACE_YM_CMN
+END_NAMESPACE_YM_NETWORKS

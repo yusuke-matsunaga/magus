@@ -13,7 +13,7 @@
 #include "ym_networks/BdnDumper.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 void
 change_test()
@@ -70,7 +70,7 @@ change_test()
 
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 
 int

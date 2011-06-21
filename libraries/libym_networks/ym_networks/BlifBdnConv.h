@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 #include "ym_blif/blif_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BlifBdnConv BlifBdnConv.h "ym_networks/BlifBdnConv.h"
@@ -83,6 +83,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BLIFBDNCONV_H

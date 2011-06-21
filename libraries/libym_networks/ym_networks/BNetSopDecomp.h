@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bnet_nsdef.h"
+#include "ym_networks/bnet.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetSopDecomp BNetSopDecomp.h <ym_networks/BNetSopDecomp.h>
@@ -91,6 +91,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS
 
 #endif // YM_NETWORKS_BNETSOPDECOMP_H

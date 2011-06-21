@@ -14,7 +14,7 @@
 #include "ym_networks/BNetDecomp.h"
 
 
-BEGIN_NAMESPACE_YM_BNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ．
 BNetGateDecomp::BNetGateDecomp()
@@ -371,4 +371,4 @@ BNetGateDecomp::node_map(BNode* node,
   return mNodeMap[node->id() * 2 + offset];
 }
 
-END_NAMESPACE_YM_BNET
+END_NAMESPACE_YM_NETWORKS

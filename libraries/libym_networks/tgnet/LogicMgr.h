@@ -1,5 +1,5 @@
-#ifndef LIBYM_TGNET_LOGICMGR_H
-#define LIBYM_TGNET_LOGICMGR_H
+#ifndef LIBYM_NETWORKS_LOGICMGR_H
+#define LIBYM_NETWORKS_LOGICMGR_H
 
 /// @file libym_networks/LogicMgr.h
 /// @brief LogicMgr のヘッダファイル
@@ -11,12 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_networks/TgGateTemplate.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_TGNET
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class LogicMgr LogicMgr.h "LogicMgr.h"
@@ -130,6 +130,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_TGNET
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_TGNET_LOGICMGR_H
+#endif // LIBYM_NETWORKS_LOGICMGR_H

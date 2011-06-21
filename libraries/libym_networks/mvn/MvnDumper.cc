@@ -24,7 +24,7 @@
 #include "ym_verilog/vl/VlRange.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
@@ -232,4 +232,4 @@ MvnDumper::operator()(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS

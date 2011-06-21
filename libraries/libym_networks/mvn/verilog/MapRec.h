@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVN_VERILOG_MAPREC_H
-#define LIBYM_MVN_VERILOG_MAPREC_H
+#ifndef LIBYM_NETWORKS_VERILOG_MAPREC_H
+#define LIBYM_NETWORKS_VERILOG_MAPREC_H
 
 /// @file libym_networks/verilog/MapRec.h
 /// @brief MapRec のヘッダファイル
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_MVN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapRec MapRec.h "MapRec.h"
@@ -189,6 +189,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVN
+END_NAMESPACE_YM_NETWORKS
 
-#endif // LIBYM_MVN_VERILOG_MAPREC_H
+#endif // LIBYM_NETWORKS_VERILOG_MAPREC_H

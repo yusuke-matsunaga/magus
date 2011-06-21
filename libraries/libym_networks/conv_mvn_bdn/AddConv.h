@@ -1,5 +1,5 @@
-#ifndef LIBYM_MVNBDNCONV_ADDCONV_H
-#define LIBYM_MVNBDNCONV_ADDCONV_H
+#ifndef LIBYM_NETWORKSBDNCONV_ADDCONV_H
+#define LIBYM_NETWORKSBDNCONV_ADDCONV_H
 
 /// @file libym_bdn_mvnconv/AddConv.h
 /// @brief AddConv のヘッダファイル
@@ -12,7 +12,7 @@
 #include "MvnConv.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 //////////////////////////////////////////////////////////////////////
 /// @class AddConv AddConv.h "AddConv.h"
@@ -51,6 +51,6 @@ public:
 };
 
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_MVNBDNCONV_ADDCONV_H
+#endif // LIBYM_NETWORKSBDNCONV_ADDCONV_H

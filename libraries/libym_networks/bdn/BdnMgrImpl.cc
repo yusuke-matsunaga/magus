@@ -16,7 +16,7 @@
 #include "BdnAuxData.h"
 
 
-BEGIN_NAMESPACE_YM_BDN
+BEGIN_NAMESPACE_YM_NETWORKS
 
 ///////////////////////////////////////////////////////////////////////
 // クラス BdnMgrImpl
@@ -944,4 +944,4 @@ BdnMgrImpl::alloc_table(ymuint req_size)
   mNextLimit = static_cast<ymuint32>(mHashSize * 1.8);
 }
 
-END_NAMESPACE_YM_BDN
+END_NAMESPACE_YM_NETWORKS

@@ -10,11 +10,11 @@
 
 
 #include "ym_networks/mvnbdnconv_nsdef.h"
-#include "ym_networks/mvn_nsdef.h"
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/mvn.h"
+#include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_MVNBDNCONV
+BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
 class MvnConv;
 
@@ -58,6 +58,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_MVNBDNCONV
+END_NAMESPACE_YM_NETWORKSBDNCONV
 
 #endif // YM_NETWORKS_MVNBDNCONV_H
