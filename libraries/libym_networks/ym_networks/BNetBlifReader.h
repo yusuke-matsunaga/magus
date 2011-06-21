@@ -18,15 +18,15 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 namespace nsBlif {
   class BlifParser;
+  class BNetBlifHandler;
 }
 
-class BNetBlifHandler;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetBlifReader BNetBlifReader.h "ym_networks/BNetBlifReader.h"
 /// @ingroup BnetGroup
 /// @brief blif 形式のファイルを読み込んで BNetwork に設定するクラス
-/// @sa BNetwork nsYm::nsBlif::BlifParser
+/// @sa BNetwork
 //////////////////////////////////////////////////////////////////////
 class BNetBlifReader
 {
@@ -60,7 +60,7 @@ private:
   nsBlif::BlifParser* mParser;
 
   // ハンドラ
-  BNetBlifHandler* mHandler;
+  nsBlif::BNetBlifHandler* mHandler;
 
 };
 

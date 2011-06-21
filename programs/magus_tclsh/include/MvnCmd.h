@@ -13,7 +13,7 @@
 
 
 #include "NetCmd.h"
-#include "ym_networks/mvn_nsdef.h"
+#include "ym_networks/mvn.h"
 
 
 BEGIN_NAMESPACE_MAGUS

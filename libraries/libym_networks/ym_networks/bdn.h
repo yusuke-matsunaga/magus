@@ -110,11 +110,11 @@ class BdnNodeHandle;
 
 class BdnEdge;
 
+class BdnBlifReader;
+
 class BdnDumper;
 class BdnBlifWriter;
 class BdnVerilogWriter;
-
-class BlifBdnConv;
 
 /// @brief 枝のリスト
 /// @ingroup BdnGroup
@@ -164,11 +164,11 @@ using nsNetworks::BdnEdgeList;
 
 using nsNetworks::BdnFanoutList;
 
+using nsNetworks::BdnBlifReader;
+
 using nsNetworks::BdnDumper;
 using nsNetworks::BdnBlifWriter;
 using nsNetworks::BdnVerilogWriter;
-
-using nsNetworks::BlifBdnConv;
 
 END_NAMESPACE_YM
 

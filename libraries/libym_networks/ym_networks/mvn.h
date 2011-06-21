@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/networks.h"
+#include "ym_networks/networks_nsdef.h"
 #include "ym_utils/DlList.h"
 
 

@@ -244,7 +244,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using namespace nsYm::nsBdn;
+  using namespace nsYm::nsNetworks;
 
   if ( !base_test() ) {
     return 255;

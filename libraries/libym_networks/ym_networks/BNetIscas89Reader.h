@@ -12,18 +12,21 @@
 
 
 #include "ym_networks/bnet.h"
-#include "ym_iscas89/Iscas89Parser.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class BNetIscas89Handler;
+namespace nsIscas89 {
+  class Iscas89Parser;
+  class BNetIscas89Handler;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetIscas89Reader BNetIscas89Reader.h "ym_networks/BNetIscas89Reader.h"
 /// @ingroup BnetGroup
 /// @brief iscas89 形式のファイルを読み込んで BNetwork に設定するクラス
-/// @sa BNetwork nsYm::nsIscas89::Iscas89Parser
+/// @sa BNetwork
 //////////////////////////////////////////////////////////////////////
 class BNetIscas89Reader
 {
@@ -54,20 +57,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // iscas89 パーサー
-  Iscas89Parser mParser;
+  nsIscas89::Iscas89Parser* mParser;
 
   // ハンドラ
-  BNetIscas89Handler* mHandler;
+  nsIscas89::BNetIscas89Handler* mHandler;
 
 };
 
 END_NAMESPACE_YM_NETWORKS
-
-BEGIN_NAMESPACE_YM
-
-// クラス名をインポートしておく
-using nsBnet::BNetIscas89Reader;
-
-END_NAMESPACE_YM
 
 #endif // YM_NETWORKS_BNETISCAS89READER_H

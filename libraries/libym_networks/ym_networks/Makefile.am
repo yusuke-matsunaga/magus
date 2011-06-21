@@ -22,7 +22,6 @@ noinst_HEADERS = \
 	BdnNodeHandle.h \
 	BdnPort.h \
 	BdnVerilogWriter.h \
-	BlifBdnConv.h \
 	BNetwork.h \
 	BNetManip.h \
 	BNetDecomp.h \

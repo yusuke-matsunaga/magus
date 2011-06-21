@@ -1,11 +1,11 @@
 
-/// @file libym_bnetblifreader/BNetBlifHandler.cc
+/// @file libym_networks/bnet/blif/BNetBlifHandler.cc
 /// @brief BNetBlifHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BNetBlifReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +14,7 @@
 #include "ym_networks/BNetManip.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_BLIF
 
 // @brief コンストラクタ
 BNetBlifHandler::BNetBlifHandler() :
@@ -283,4 +283,4 @@ BNetBlifHandler::resize(ymuint32 id)
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_BLIF

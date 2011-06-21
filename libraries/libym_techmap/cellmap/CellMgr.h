@@ -10,7 +10,7 @@
 
 
 #include "ym_techmap/cellmap_nsdef.h"
-#include "ym_networks/bdn_nsdef.h"
+#include "ym_networks/bdn.h"
 #include "ym_cell/cell_nsdef.h"
 #include "PatMgr.h"
 #include "ym_utils/Alloc.h"

@@ -1,5 +1,5 @@
-#ifndef YM_ISCAS89_ISCAS89_NSDEF_H
-#define YM_ISCAS89_ISCAS89_NSDEF_H
+#ifndef LIBYM_NETWORKS_ISCAS89_ISCAS89_NSDEF_H
+#define LIBYM_NETWORKS_ISCAS89_ISCAS89_NSDEF_H
 
 /// @file ym_iscas89/iscas89_nsdef.h
 /// @brief nsIscas89 の名前空間の定義
@@ -15,24 +15,18 @@
 /// ISCAS89 ベンチマーク回路フォーマット用パーサ
 
 
-#include "ymtools.h"
+#include "ym_networks/networks_nsdef.h"
 
 
 /// @brief ym_iscas89 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_ISCAS89 \
-BEGIN_NAMESPACE_YM \
+BEGIN_NAMESPACE_YM_NETWORKS \
 BEGIN_NAMESPACE(nsIscas89)
 
 /// @brief ym_iscas89 用の名前空間の終了
 #define END_NAMESPACE_YM_ISCAS89 \
 END_NAMESPACE(nsIscas89) \
-END_NAMESPACE_YM
-
-/// @namespace nsYm::nsIscas89
-/// @brief Iscas89Parser 関係のクラスが属する名前空間
-///
-/// ただし，主要なものは nsYm にインポートされている．
-/// 実装用のローカルな要素だけがこの名前空間に存在する．
+END_NAMESPACE_YM_NETWORKS
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
@@ -44,4 +38,4 @@ class Iscas89ParserImpl;
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // YM_ISCAS89_ISCAS89_NSDEF_H
+#endif // LIBYM_NETWORKS_ISCAS89_ISCAS89_NSDEF_H

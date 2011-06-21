@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BlifBdnConv.cc
+/// @file libym_networks/bdn/blif/BlifBdnConv.cc
 /// @brief BlifBdnConv の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,16 +9,17 @@
 /// All rights reserved.
 
 
-#include "ym_networks/BlifBdnConv.h"
+#include "BlifBdnConv.h"
+
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnNodeHandle.h"
 #include "ym_networks/BdnDff.h"
-#include "blif/BlifNetwork.h"
+#include "BlifNetwork.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_BLIF
 
 // @brief コンストラクタ
 BlifBdnConv::BlifBdnConv()
@@ -237,4 +238,4 @@ BlifBdnConv::put_node(const BlifNode* blif_node,
   mNodeFlag[id] = true;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_BLIF

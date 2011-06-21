@@ -11,7 +11,6 @@ SUBDIRS = \
 	cmn \
 	mvn \
 	tgnet \
-	conv_blif_bnet \
 	conv_bnet_bdn \
 	conv_mvn_bdn \
 	. \
@@ -31,7 +30,6 @@ libym_networks_la_LIBADD = \
 	cmn/libym_cmn.la \
 	mvn/libym_mvn.la \
 	tgnet/libym_tgnet.la \
-	conv_blif_bnet/libym_conv_blif_bnet.la \
 	conv_bnet_bdn/libym_conv_bnet_bdn.la \
 	conv_mvn_bdn/libym_conv_mvn_bdn.la
 

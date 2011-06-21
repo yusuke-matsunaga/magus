@@ -14,14 +14,7 @@
 #include "ym_networks/bdn.h"
 
 
-namespace nsYm::nsBlif {
-  class BlifParser;
-}
-
-
 BEGIN_NAMESPACE_YM_NETWORKS
-
-class BdnBlifHandler;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnBlifReader BdnBlifReader.h "ym_networks/BdnBlifReader.h"
@@ -56,12 +49,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // blif パーサー
-  BlifParser* mParser;
-
-  // ハンドラ
-  BdnBlifHandler* mHandler;
 
 };
 

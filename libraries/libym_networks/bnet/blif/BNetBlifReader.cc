@@ -10,7 +10,7 @@
 
 
 #include "ym_networks/BNetBlifReader.h"
-#include "blif/BlifParser.h"
+#include "BlifParser.h"
 #include "BNetBlifHandler.h"
 
 
@@ -22,8 +22,8 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 BNetBlifReader::BNetBlifReader() :
-  mParser(new BlifParser),
-  mHandler(new BNetBlifHandler)
+  mParser(new nsBlif::BlifParser),
+  mHandler(new nsBlif::BNetBlifHandler)
 {
   mParser->add_handler(mHandler);
 }

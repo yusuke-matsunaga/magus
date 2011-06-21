@@ -1,15 +1,16 @@
 
-/// @file libym_networks/TgIscas89Reader
+/// @file libym_networks/tgnet/iscas89/TgIscas89Reader
 /// @brief TgIscas89Reaer の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: TgIscas89Reader.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/TgIscas89Reader.h"
+#include "Iscas89Parser.h"
 #include "TgIscas89Handler.h"
 
 
@@ -21,14 +22,16 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 TgIscas89Reader::TgIscas89Reader() :
-  mHandler(new TgIscas89Handler)
+  mParser(new nsIscas89::Iscas89Parser),
+  mHandler(new nsIscas89::TgIscas89Handler)
 {
-  mParser.add_handler(mHandler);
+  mParser->add_handler(mHandler);
 }
 
 // @brief デストラクタ
 TgIscas89Reader::~TgIscas89Reader()
 {
+  delete mParser;
   // mHandler は Iscas89Reader が責任をもって破壊してくれる．
 }
 
@@ -38,7 +41,7 @@ TgIscas89Reader::operator()(const string& filename,
 			    TgNetwork& network)
 {
   mHandler->set_network(network);
-  bool stat = mParser.read(filename);
+  bool stat = mParser->read(filename);
   return stat;
 }
 

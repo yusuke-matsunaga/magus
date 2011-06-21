@@ -7,7 +7,6 @@ SUBDIRS = \
 	bnet \
 	mvn \
 	tgnet \
-	conv_blif_bnet \
 	conv_bnet_bdn \
 	conv_mvn_bdn
 

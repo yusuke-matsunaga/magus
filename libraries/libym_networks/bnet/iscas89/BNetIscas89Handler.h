@@ -1,24 +1,24 @@
-#ifndef LIBYM_NETWORKSISCAS89READER_BNETISCAS89HANDLER_H
-#define LIBYM_NETWORKSISCAS89READER_BNETISCAS89HANDLER_H
+#ifndef LIBYM_NETWORKS_BNET_ISCAS89_BNETISCAS89HANDLER_H
+#define LIBYM_NETWORKS_BNET_ISCAS89_BNETISCAS89HANDLER_H
 
-/// @file libym_bnetiscas89reader/BNetIscas89Handler.h
+/// @file libym_networks/bnet/iscas89/BNetIscas89Handler.h
 /// @brief BNetIscas89Handler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BNetIscas89Reader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/bnet.h"
-#include "iscas89/Iscas89Handler.h"
+#include "Iscas89Handler.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_ISCAS89
 
 //////////////////////////////////////////////////////////////////////
-/// @class BNetIscas89Handler read_blif.cc
+/// @class BNetIscas89Handler BNetIscas89Handler.h "BNetIscas89Handler.h"
 /// @brief BNetwork 用の Iscas89Handler
 //////////////////////////////////////////////////////////////////////
 class BNetIscas89Handler :
@@ -131,6 +131,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_NETWORKSISCAS89READER_BNETISCAS89HANDLER_H
+#endif // LIBYM_NETWORKS_BNET_ISCAS89_BNETISCAS89HANDLER_H

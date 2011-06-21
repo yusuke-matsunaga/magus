@@ -7,20 +7,23 @@
 ///
 /// $Id: TgBlifReader.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/tgnet.h"
-#include "ym_blif/BlifParser.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class TgBlifHandler;
+namespace nsBlif {
+  class BlifParser;
+  class TgBlifHandler;
+}
+
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgBlifReader TgBlifReader.h <ym_networks/TgBlifReader.h>
+/// @class TgBlifReader TgBlifReader.h "ym_networks/TgBlifReader.h"
 /// @brief blif 形式のファイルを読み込むためのクラス
 //////////////////////////////////////////////////////////////////////
 class TgBlifReader
@@ -50,10 +53,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // Blif ファイルを読み込むためのパーサ
-  BlifParser mParser;
+  nsBlif::BlifParser* mParser;
 
   // Blif ファイルを TgNetwork に変換するためのハンドラ
-  TgBlifHandler* mHandler;
+  nsBlif::TgBlifHandler* mHandler;
 
 };
 

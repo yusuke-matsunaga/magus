@@ -1,15 +1,16 @@
 
-/// @file libym_networks/TgBlifReader.cc
+/// @file libym_networks/tgnet/blif/TgBlifReader.cc
 /// @brief TgBlifReader の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: TgBlifReader.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/TgBlifReader.h"
+#include "BlifParser.h"
 #include "TgBlifHandler.h"
 
 
@@ -21,14 +22,16 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 TgBlifReader::TgBlifReader() :
-  mHandler(new TgBlifHandler)
+  mParser(new nsBlif::BlifParser),
+  mHandler(new nsBlif::TgBlifHandler)
 {
-  mParser.add_handler(mHandler);
+  mParser->add_handler(mHandler);
 }
 
 // @brief デストラクタ
 TgBlifReader::~TgBlifReader()
 {
+  delete mParser;
   // mHandler は BlifParser が責任をもって破壊してくれる．
 }
 
@@ -38,7 +41,7 @@ TgBlifReader::operator()(const string& filename,
 			 TgNetwork& network)
 {
   mHandler->set_network(network);
-  bool stat = mParser.read(filename);
+  bool stat = mParser->read(filename);
   return stat;
 }
 

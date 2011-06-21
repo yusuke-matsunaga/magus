@@ -1,15 +1,16 @@
 
-/// @file libym_bnetiscas89reader/BNetIscas89Reader.cc
+/// @file libym_networks/bnet/iscas89/BNetIscas89Reader.cc
 /// @brief BNetIscas89Reader の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: BNetIscas89Reader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/BNetIscas89Reader.h"
+#include "Iscas89Parser.h"
 #include "BNetIscas89Handler.h"
 
 
@@ -21,14 +22,16 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 // @brief コンストラクタ
 BNetIscas89Reader::BNetIscas89Reader() :
-  mHandler(new BNetIscas89Handler)
+  mParser(new nsIscas89::Iscas89Parser),
+  mHandler(new nsIscas89::BNetIscas89Handler)
 {
-  mParser.add_handler(mHandler);
+  mParser->add_handler(mHandler);
 }
 
 // @brief デストラクタ
 BNetIscas89Reader::~BNetIscas89Reader()
 {
+  delete mParser;
   // mHandler は Iscas89Parser が責任を持って破壊してくれる．
 }
 
@@ -43,7 +46,7 @@ BNetIscas89Reader::read(const string& filename,
 {
   mHandler->set_network(&network);
 
-  bool stat = mParser.read(filename);
+  bool stat = mParser->read(filename);
   if ( !stat ) {
     return false;
   }

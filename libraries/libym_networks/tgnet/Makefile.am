@@ -2,7 +2,10 @@
 
 ## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = \
+	blif \
+	iscas89 \
+	.
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -17,14 +20,10 @@ libym_tgnet_la_SOURCES = \
 	NameHash.cc \
 	LogicMgr.h \
 	LogicMgr.cc \
-	TgNetwork.cc \
-	TgBlifHandler.h \
-	TgBlifHandler.cc \
-	TgBlifReader.cc \
-	TgIscas89Handler.h \
-	TgIscas89Handler.cc \
-	TgIscas89Reader.cc
+	TgNetwork.cc
 
-libym_tgnet_la_LIBADD =
+libym_tgnet_la_LIBADD = \
+	blif/libym_tgblifreader.la \
+	iscas89/libym_tgiscas89reader.la
 
 libym_tgnet_la_LDFLAGS =

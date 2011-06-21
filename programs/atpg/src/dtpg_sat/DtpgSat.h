@@ -13,7 +13,7 @@
 
 
 #include "dtpgsat_nsdef.h"
-#include "ym_networks/tgnet_nsdef.h"
+#include "ym_networks/tgnet.h"
 #include "ym_networks/TgNode.h"
 #include "ym_logic/SatStats.h"
 

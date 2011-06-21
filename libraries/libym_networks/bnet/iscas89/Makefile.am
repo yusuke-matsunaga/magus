@@ -10,14 +10,14 @@ noinst_LTLIBRARIES = libym_bnetiscas89reader.la
 
 libym_bnetiscas89reader_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/iscas89
 
 libym_bnetiscas89reader_la_SOURCES = \
 	BNetIscas89Handler.h \
 	BNetIscas89Handler.cc \
 	BNetIscas89Reader.cc
 
-libym_bnetiscas89reader_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la
+libym_bnetiscas89reader_la_LIBADD =
 
 libym_bnetiscas89reader_la_LDFLAGS =

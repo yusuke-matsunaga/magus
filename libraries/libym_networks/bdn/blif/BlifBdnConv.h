@@ -1,7 +1,7 @@
-#ifndef YM_NETWORKS_BLIFBDNCONV_H
-#define YM_NETWORKS_BLIFBDNCONV_H
+#ifndef LIBYM_NETWORKS_BDN_BLIF_BLIFBDNCONV_H
+#define LIBYM_NETWORKS_BDN_BLIF_BLIFBDNCONV_H
 
-/// @file ym_networks/BlifBdnConv.h
+/// @file libym_networks/bdn/blif/BlifBdnConv.h
 /// @brief BlifBdnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,16 +12,16 @@
 
 
 #include "ym_networks/bdn.h"
-#include "ym_blif/blif_nsdef.h"
+#include "blif_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_BLIF
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifBdnConv BlifBdnConv.h "ym_networks/BlifBdnConv.h"
+/// @class BlifBdnConv BlifBdnConv.h "BlifBdnConv.h"
 /// @ingroup BdnGroup
 /// @brief BlifNetwork を BdnMgr に変換するクラス
-/// @sa BdnMgr nsYm::nsBlif::BlifNetwork
+/// @sa BdnMgr BlifNetwork
 //////////////////////////////////////////////////////////////////////
 class BlifBdnConv
 {
@@ -83,6 +83,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_BLIF
 
-#endif // YM_NETWORKS_BLIFBDNCONV_H
+#endif // LIBYM_NETWORKS_BDN_BLIF_BLIFBDNCONV_H

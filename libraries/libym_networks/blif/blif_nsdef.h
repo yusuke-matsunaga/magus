@@ -1,7 +1,7 @@
-#ifndef YM_BLIF_BLIF_NSDEF_H
-#define YM_BLIF_BLIF_NSDEF_H
+#ifndef LIBYM_NETWORKS_BLIF_BLIF_NSDEF_H
+#define LIBYM_NETWORKS_BLIF_BLIF_NSDEF_H
 
-/// @file ym_blif/blif_nsdef.h
+/// @file libym_networks/blif/blif_nsdef.h
 /// @brief nsBlif の名前空間の定義
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -16,24 +16,18 @@
 /// BLIF(Berkeley Logic Interchange Format) 用のパーサ
 
 
-#include "ymtools.h"
+#include "ym_networks/networks_nsdef.h"
 
 
-/// @brief ym_bli 用の名前空間の開始
+/// @brief blif 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_BLIF \
-BEGIN_NAMESPACE_YM \
+BEGIN_NAMESPACE_YM_NETWORKS \
 BEGIN_NAMESPACE(nsBlif)
 
-/// @brief ym_blif 用の名前空間の終了
+/// @brief blif 用の名前空間の終了
 #define END_NAMESPACE_YM_BLIF \
 END_NAMESPACE(nsBlif) \
-END_NAMESPACE_YM
-
-/// @namespace nsYm::nsBlif
-/// @brief BlifParser 関係のクラスが属する名前空間
-///
-/// ただし，主要なものは nsYm にインポートされている．
-/// 実装用のローカルな要素だけがこの名前空間に存在する．
+END_NAMESPACE_YM_NETWORKS
 
 BEGIN_NAMESPACE_YM_BLIF
 
@@ -47,4 +41,4 @@ class BlifNetworkReader;
 
 END_NAMESPACE_YM_BLIF
 
-#endif // YM_BLIF_BLIF_NSDEF_H
+#endif // LIBYM_NETWORKS_BLIF_BLIF_NSDEF_H

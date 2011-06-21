@@ -1939,10 +1939,10 @@ END_NAMESPACE_YM_NETWORKS
 BEGIN_NAMESPACE_HASH
 // BNode へのポインタをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsBnet::BNode*>
+struct hash<nsYm::nsNetworks::BNode*>
 {
   ymuint
-  operator()(nsYm::nsBnet::BNode* node) const
+  operator()(nsYm::nsNetworks::BNode* node) const
   {
     return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }

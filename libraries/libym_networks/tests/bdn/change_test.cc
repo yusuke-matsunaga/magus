@@ -79,7 +79,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using nsYm::nsBdn::change_test;
+  using nsYm::nsNetworks::change_test;
 
   change_test();
 

@@ -3,7 +3,8 @@
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
 SUBDIRS = \
-	$(YM_EXTRA_SUBDIRS) \
+	blif \
+	iscas89 \
 	.
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -31,6 +32,7 @@ libym_bnet_la_SOURCES = \
 	BNetVerilogWriter.cc
 
 libym_bnet_la_LIBADD = \
-	$(YM_EXTRA_LIBADD)
+	blif/libym_bnetblifreader.la \
+	iscas89/libym_bnetiscas89reader.la
 
 libym_bnet_la_LDFLAGS =

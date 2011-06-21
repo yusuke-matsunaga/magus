@@ -1,5 +1,5 @@
-#ifndef LIBYM_NETWORKS_TGISCAS89HANDLER_H
-#define LIBYM_NETWORKS_TGISCAS89HANDLER_H
+#ifndef LIBYM_NETWORKS_TGNET_ISCAS89_TGISCAS89HANDLER_H
+#define LIBYM_NETWORKS_TGNET_ISCAS89_TGISCAS89HANDLER_H
 
 /// @file libym_networks/TgIscas89Handler.h
 /// @brief TgIscas89Handler のヘッダファイル
@@ -11,11 +11,11 @@
 /// All rights reserved.
 
 
+#include "Iscas89Handler.h"
 #include "ym_networks/tgnet.h"
-#include "ym_iscas89/Iscas89Handler.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_ISCAS89
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgIscas89Handler TgIscas89Handler.h
@@ -119,7 +119,7 @@ private:
       mPos(pos) { }
   };
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -130,9 +130,9 @@ private:
 
   // 後で接続する要素のリスト
   vector<Connection> mConList;
-  
+
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_NETWORKS_TGISCAS89HANDLER_H
+#endif // LIBYM_NETWORKS_TGNET_ISCAS89_TGISCAS89HANDLER_H

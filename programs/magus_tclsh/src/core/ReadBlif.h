@@ -13,7 +13,7 @@
 
 #include "NetCmd.h"
 #include "ym_networks/BNetBlifReader.h"
-#include "ym_networks/BlifBdnConv.h"
+#include "ym_networks/BdnBlifReader.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -48,11 +48,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // Blif ファイルを読み込むためのパーサ
-  BNetBlifReader mReader;
+  // BNet 用のリーダー
+  BNetBlifReader mBnetReader;
 
-  // blif から Bdn に変換する関数
-  BlifBdnConv mBlifBdnConv;
+  // Bdn 用のリーダー
+  BdnBlifReader mBdnReader;
 
 };
 

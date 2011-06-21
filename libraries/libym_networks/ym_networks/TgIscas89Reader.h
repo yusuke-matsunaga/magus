@@ -7,20 +7,22 @@
 ///
 /// $Id: TgIscas89Reader.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/tgnet.h"
-#include "ym_iscas89/Iscas89Parser.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-class TgIscas89Handler;
+namespace nsIscas89 {
+  class Iscas89Parser;
+  class TgIscas89Handler;
+}
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgIscas89Reader TgIscas89Reader.h <ym_networks/TgIscas89Reader.h>
+/// @class TgIscas89Reader TgIscas89Reader.h "ym_networks/TgIscas89Reader.h"
 /// @brief iscas89 形式のファイルを読み込むためのクラス
 //////////////////////////////////////////////////////////////////////
 class TgIscas89Reader
@@ -50,10 +52,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ISCAS89 ファイルを読み込むためのパーサ
-  Iscas89Parser mParser;
+  nsIscas89::Iscas89Parser* mParser;
 
   // ISCAS89 ファイルを TgNetwork に変換するためのハンドラ
-  TgIscas89Handler* mHandler;
+  nsIscas89::TgIscas89Handler* mHandler;
 
 };
 

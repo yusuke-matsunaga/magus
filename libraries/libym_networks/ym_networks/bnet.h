@@ -46,6 +46,7 @@ class BNetworkTrace;
 class BNodeList;
 
 class BNetBlifReader;
+class BNetIscas89Reader;
 
 class BNetBlifWriter;
 class BNetEquWriter;
@@ -66,7 +67,7 @@ typedef DlList<BNodeEdge> BNodeFoList;
 /// @ingroup BnetGroup
 typedef vector<BNode*> BNodeVector;
 
-END_NAMESPACE_YM_NETWROKS
+END_NAMESPACE_YM_NETWORKS
 
 BEGIN_NAMESPACE_YM
 
@@ -89,6 +90,7 @@ using nsNetworks::BNetChg;
 using nsNetworks::BNetworkTrace;
 
 using nsNetworks::BNetBlifReader;
+using nsNetworks::BNetIscas89Reader;
 
 using nsNetworks::BNetBlifWriter;
 using nsNetworks::BNetEquWriter;

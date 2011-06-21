@@ -7,10 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
 #include "ym_networks/BdnMgr.h"
-#include "ym_networks/BlifBdnConv.h"
+#include "ym_networks/BdnBlifReader.h"
 #include "ym_networks/BdnDumper.h"
 #include "ym_techmap/CellMap.h"
 #include "ym_networks/CmnMgr.h"
@@ -64,19 +62,10 @@ test(string pat_filename,
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
 
-    BlifNetworkReader reader;
+    BdnBlifReader reader;
 
-    BlifNetwork blif_network;
-
-    if ( !reader.read(sbj_filename, blif_network) ) {
+    if ( !reader.read(sbj_filename, sbjgraph) ) {
       cerr << "Error in reading " << sbj_filename << endl;
-      return;
-    }
-
-    BlifBdnConv conv;
-    bool stat = conv(blif_network, sbjgraph);
-    if ( !stat ) {
-      cerr << "Error in converting form BlifNetwork to BdnMgr" << endl;
       return;
     }
   }

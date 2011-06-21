@@ -1,22 +1,22 @@
-#ifndef LIBYM_NETWORKS_TGBLIFHANDLER_H
-#define LIBYM_NETWORKS_TGBLIFHANDLER_H
+#ifndef LIBYM_NETWORKS_TGNET_BLIF_TGBLIFHANDLER_H
+#define LIBYM_NETWORKS_TGNET_BLIF_TGBLIFHANDLER_H
 
-/// @file libym_networks/TgBlifHandler.h
+/// @file libym_networks/tgnet/blif/TgBlifHandler.h
 /// @brief TgBlifHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: TgBlifHandler.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/tgnet.h"
-#include "ym_blif/BlifHandler.h"
+#include "BlifHandler.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgBlifHandler TgBlifHandler.h
@@ -205,6 +205,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_NETWORKS_TGBLIFHANDLER_H
+#endif // LIBYM_NETWORKS_TGNET_BLIF_TGBLIFHANDLER_H

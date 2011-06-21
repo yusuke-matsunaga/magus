@@ -1,11 +1,11 @@
 
-/// @file libym_networks/TgIscas89Handler.cc
+/// @file libym_networks/tgnet/iscas89/TgIscas89Handler.cc
 /// @brief TgIscas89Handler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: TgIscas89Handler.cc 2043 2009-02-21 07:08:48Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,10 +13,10 @@
 #include "ym_networks/TgNetwork.h"
 #include "ym_networks/TgNode.h"
 #include "ym_networks/TgGateTemplate.h"
-#include "LogicMgr.h"
+#include "../LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_ISCAS89
 
 // @brief コンストラクタ
 TgIscas89Handler::TgIscas89Handler()
@@ -109,7 +109,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
       node = ffin;
     }
     break;
-    
+
   case kGt89BUFF:
     assert_cond(ni == 1, __FILE__, __LINE__);
     mNetwork->set_to_logic(node, TgGateTemplate(kTgBuff, 1));
@@ -201,7 +201,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
 
   return true;
 }
-  
+
 // @brief 終了処理
 void
 TgIscas89Handler::normal_exit()
@@ -238,4 +238,4 @@ TgIscas89Handler::connect(TgNode* from,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_ISCAS89

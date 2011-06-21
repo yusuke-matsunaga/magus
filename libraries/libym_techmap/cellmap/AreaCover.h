@@ -11,7 +11,7 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_networks/BdnNode.h"
-#include "ym_networks/cmn_nsdef.h"
+#include "ym_networks/cmn.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP

@@ -36,7 +36,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using namespace nsYm::nsTgnet;
+  using namespace nsYm::nsNetworks;
 
   try {
     LogExpr v0 = LogExpr::make_posiliteral(0);
