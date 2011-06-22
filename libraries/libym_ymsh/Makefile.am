@@ -7,8 +7,7 @@
 
 SUBDIRS = \
 	ym_ymsh \
-	. \
-	tests
+	.
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \

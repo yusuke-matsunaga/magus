@@ -49,7 +49,8 @@ noinst_PROGRAMS = \
 	mgr_test \
 	base_test \
 	fdec_test \
-	bddsh
+	bddsh \
+	makebdd
 
 mgr_test_SOURCES = \
 	mgr_test.cc
@@ -77,7 +78,6 @@ makebdd_SOURCES = \
 
 makebdd_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
 	$(YM_BDD)
 
 bddsh_SOURCES = \

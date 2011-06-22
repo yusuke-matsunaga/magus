@@ -4,8 +4,7 @@
 
 SUBDIRS = \
 	ym_tclpp \
-	. \
-	examples
+	.
 
 MAINTAINERCLEANFILES = Makefile.in
 

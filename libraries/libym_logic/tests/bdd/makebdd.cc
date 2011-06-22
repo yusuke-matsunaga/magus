@@ -9,10 +9,8 @@
 
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
-#include "ym_blif/BlifNetwork.h"
-#include "ym_blif/BlifNetworkReader.h"
 #include "ym_networks/BdnMgr.h"
-#include "ym_networks/BlifBdnConv.h"
+#include "ym_networks/BdnBlifReader.h"
 #include "ym_networks/BdnNode.h"
 
 #include "ym_utils/MsgMgr.h"
@@ -29,20 +27,11 @@ makebdd(const string& filename)
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
 
-  BlifNetworkReader reader;
-
-  BlifNetwork blif_network;
-
-  if ( !reader.read(filename, blif_network) ) {
-    cerr << "Error in reading " << filename << endl;
-    return false;
-  }
-
+  BdnBlifReader reader;
   BdnMgr network;
-  BlifBdnConv conv;
-  bool stat = conv(blif_network, network);
-  if ( !stat ) {
-    cerr << "Error in converting from BlifNetwork to BdnMgr" << endl;
+
+  if ( !reader.read(filename, network) ) {
+    cerr << "Error in reading " << filename << endl;
     return false;
   }
 

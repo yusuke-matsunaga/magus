@@ -4,8 +4,7 @@
 
 SUBDIRS = \
 	ym_cec \
-	. \
-	tests
+	.
 
 MAINTAINERCLEANFILES = Makefile.in
 

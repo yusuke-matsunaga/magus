@@ -8,8 +8,7 @@ SUBDIRS = \
 	npn \
 	bdd \
 	sat \
-	. \
-	tests
+	.
 
 MAINTAINERCLEANFILES = Makefile.in
 

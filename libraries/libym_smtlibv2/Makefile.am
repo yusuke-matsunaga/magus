@@ -5,8 +5,7 @@
 SUBDIRS = \
 	ym_smtlibv2 \
 	parser \
-	. \
-	tests
+	.
 
 CLEANFILES =
 

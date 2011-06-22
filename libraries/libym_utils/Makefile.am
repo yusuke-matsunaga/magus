@@ -6,8 +6,7 @@
 SUBDIRS = \
 	ym_utils \
 	$(YM_EXTRA_SUBDIRS) \
-	. \
-	tests
+	.
 
 MAINTAINERCLEANFILES = Makefile.in
 

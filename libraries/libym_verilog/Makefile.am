@@ -7,8 +7,7 @@ SUBDIRS = \
 	common \
 	parser \
 	elaborator \
-	. \
-	tests
+	.
 
 CLEANFILES =
 

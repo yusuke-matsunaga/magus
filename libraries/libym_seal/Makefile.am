@@ -4,8 +4,7 @@
 
 SUBDIRS = \
 	ym_seal \
-	. \
-	tests
+	.
 
 INCLUDES = \
 	$(GMP_INCLUDES) \

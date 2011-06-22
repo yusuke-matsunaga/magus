@@ -4,8 +4,7 @@
 
 SUBDIRS = \
 	ym_gds \
-	. \
-	tests
+	.
 
 YFLAGS = -d -v
 
