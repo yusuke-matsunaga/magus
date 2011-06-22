@@ -9,7 +9,8 @@ SUBDIRS = \
 	ym_cell \
 	mislib \
 	dotlib \
-	.
+	. \
+	tests
 
 MAINTAINERCLEANFILES = Makefile.in
 

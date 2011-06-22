@@ -56,6 +56,7 @@ AC_CONFIG_FILES([programs/Makefile])
 AC_CONFIG_FILES([Doxyfile])
 
 AC_CONFIG_SUBDIRS([include])
+AC_CONFIG_SUBDIRS([tests])
 
 
 # ===================================================================

@@ -4,7 +4,8 @@
 
 SUBDIRS = \
 	ym_mincov \
-	.
+	. \
+	tests
 
 INCLUDES = \
 	-I$(YMTOOLS_SRCDIR)/include \

@@ -112,29 +112,28 @@ AUTOGEN_COMMON="./autogen.common"
 
 # サブモジュールのディレクトリ名
 #SUBMODULE=`cat $BASEDIR/modules`
-LIBRARIES=\
-"libym_utils \
- libym_logic \
- libym_smtlibv2 \
- libym_mincov \
- libym_blif \
- libym_iscas89 \
- libym_cell \
- libym_verilog \
- libym_networks \
- libym_aig \
- libym_gds \
- libym_cec \
- libym_techmap \
- libym_seal \
- libym_tclpp \
- libym_ymsh"
-
-PROGRAMS=\
-"magus_tclsh \
- matpg \
- atpg \
- seal"
+SUBMODULE=\
+"libraries/libym_utils \
+ libraries/libraries/libym_logic \
+ libraries/libym_smtlibv2 \
+ libraries/libym_mincov \
+ libraries/libym_blif \
+ libraries/libym_iscas89 \
+ libraries/libym_cell \
+ libraries/libym_verilog \
+ libraries/libym_networks \
+ libraries/libym_aig \
+ libraries/libym_gds \
+ libraries/libym_cec \
+ libraries/libym_techmap \
+ libraries/libym_seal \
+ libraries/libym_tclpp \
+ libraries/libym_ymsh \
+ tests \
+ programs/magus_tclsh \
+ programs/atpg \
+ programs/matpg \
+ programs/seal"
 
 # 第1引数に応じた処理を行う．
 case "$1" in
@@ -144,21 +143,14 @@ case "$1" in
 	clean_config $BASEDIR/config
 	clean $BASEDIR
 	clean $BASEDIR/include
-	for lib in $LIBRARIES; do
-	    clean_config $BASEDIR/libraries/$lib
-	    clean $BASEDIR/libraries/$lib
-	done
-	for prog in $PROGRAMS; do
-	    clean_config $BASEDIR/programs/$prog
-	    clean $BASEDIR/programs/$prog
+	for module in $SUBMODULE; do
+	    clean_config $BASEDIR/$module
+	    clean $BASEDIR/$module
 	done
         boot $BASEDIR
 	boot $BASEDIR/include
-	for lib in $LIBRARIES; do
-	    boot $BASEDIR/libraries/$lib
-	done
-	for prog in $PROGRAMS; do
-	    boot $BASEDIR/programs/$prog
+	for module in $SUBMODULE; do
+	    boot $BASEDIR/$module
 	done
         ;;
       2)
@@ -175,13 +167,9 @@ case "$1" in
         clean_config $BASEDIR/config
 	clean $BASEDIR
 	clean $BASEDIR/include
-	for lib in $LIBRARIES; do
-	    clean_config $BASEDIR/libraries/$lib
-	    clean $BASEDIR/libraries/$lib
-	done
-	for prog in $PROGRAMS; do
-	    clean_config $BASEDIR/programs/$prog
-	    clean $BASEDIR/programs/$prog
+	for module in $SUBMODULE; do
+	    clean_config $BASEDIR/$module
+	    clean $BASEDIR/$module
 	done
 	;;
       2)

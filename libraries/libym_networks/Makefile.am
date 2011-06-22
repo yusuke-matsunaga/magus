@@ -13,7 +13,8 @@ SUBDIRS = \
 	tgnet \
 	conv_bnet_bdn \
 	conv_mvn_bdn \
-	.
+	. \
+	tests
 
 MAINTAINERCLEANFILES = Makefile.in
 

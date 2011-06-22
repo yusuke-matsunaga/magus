@@ -7,7 +7,8 @@ SUBDIRS = \
 	sbjgraph \
 	cellmap \
 	lutmap \
-	.
+	. \
+	tests
 
 MAINTAINERCLEANFILES = Makefile.in
 
