@@ -22,8 +22,6 @@ libym_techmap_cell_la_SOURCES = \
 	CellMap.cc \
 	CellMgr.h \
 	CellMgr.cc \
-	CnGraph.cc \
-	CnGraph_dump.cc \
 	FFClass.h \
 	FFClass.cc \
 	FFGroup.h \

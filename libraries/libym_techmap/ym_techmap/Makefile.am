@@ -11,7 +11,6 @@ noinst_HEADERS = \
 	lutmap_nsdef.h \
 	sbj_nsdef.h \
 	CellMap.h \
-	CnGraph.h \
 	LnGraph.h \
 	LutMap.h \
 	SbjDumper.h \
