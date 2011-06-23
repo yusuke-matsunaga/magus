@@ -75,6 +75,81 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 
   maprec.init(sbjgraph);
 
+  // FF のマッピングを行う．
+  CmnDffCell* dffcells[18];
+  ymuint ffc_num = cell_mgr.ff_class_num();
+  const BdnDffList& dff_list = sbjgraph.dff_list();
+  for (BdnDffList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const BdnDff* dff = *p;
+    const BdnNode* clock = dff->clock();
+    ymuint clock_sense = 0U;
+    if ( clock->output_fanin_inv() ) {
+      clock_sense = 2U;
+    }
+    else {
+      clock_sense = 1U;
+    }
+    const BdnNode* clear = dff->clear();
+    ymuint clear_sense = 0U;
+    if ( clear->output_fanin() ) {
+      if ( clear->output_fanin_inv() ) {
+	clear_sense = 2U;
+      }
+      else {
+	clear_sense = 1U;
+      }
+    }
+    const BdnNode* preset = dff->preset();
+    ymuint preset_sense = 0U;
+    if ( preset->output_fanin() ) {
+      if ( preset->output_fanin_inv() ) {
+	preset_sense = 2U;
+      }
+      else {
+	preset_sense = 1U;
+      }
+    }
+    ymuint type = (clock_sense - 1) + (clear_sense * 2) + (preset_sense) * 6;
+    if ( dffcells[type] == NULL ) {
+      for (ymuint i = 0; i < ffc_num; ++ i) {
+	const FFClass& ffc = cell_mgr.ff_class(i);
+	if ( ffc.clock_sense() == clock_sense &&
+	     ffc.clear_sense() == clear_sense &&
+	     ffc.preset_sense() == preset_sense ) {
+	  ymuint ng = ffc.group_num();
+	  ymuint min_grp = 0;
+	  const Cell* min_cell = NULL;
+	  double min_area = DBL_MAX;
+	  for (ymuint j = 0; j < ng; ++ j) {
+	    const FFGroup& ffg = ffc.group(j);
+	    ymuint nc = ffg.cell_num();
+	    for (ymuint k = 0; k < nc; ++ k) {
+	      const Cell* cell = ffg.cell(j);
+	      double area = cell->area();
+	      if ( min_area > area ) {
+		min_area = area;
+		min_cell = cell;
+		min_grp = j;
+	      }
+	    }
+	  }
+	  assert_cond( min_cell != NULL, __FILE__, __LINE__);
+	  ymuint pos_array[6];
+	  const FFGroup& ffg = ffc.group(min_grp);
+	  pos_array[0] = ffg.data_pos();
+	  pos_array[1] = ffg.clock_pos();
+	  pos_array[2] = ffg.clear_pos();
+	  pos_array[3] = ffg.preset_pos();
+	  pos_array[4] = ffg.q_pos();
+	  pos_array[5] = ffg.iq_pos();
+	  dffcells[type] = maprec.set_dff_match(
+	}
+      }
+    }
+    maprec.set_dff_match(dff, dffcells[type]);
+  }
+
   const FuncGroup& inv_func = cell_mgr.inv_func();
 
   // 入力のコストを設定

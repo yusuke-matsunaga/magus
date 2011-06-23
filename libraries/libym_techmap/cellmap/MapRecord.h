@@ -13,7 +13,6 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
-#include "ym_networks/cmn.h"
 #include "Match.h"
 
 
@@ -49,16 +48,20 @@ public:
   /// @brief D-FF のマッチを記録する．
   /// @param[in] dff D-FF
   /// @param[in] cell セル
+  /// @param[in] pos_array ピン情報の配列
   void
   set_dff_match(const BdnDff* dff,
-		const CmnDffCell* cell);
+		const Cell* cell,
+		FFPosArray pos_array);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
   /// @param[in] cell セル
+  /// @param[in] pos_array ピン情報の配列
   void
   set_latch_match(const BdnLatch* latch,
-		  const CmnLatchCell* cell);
+		  const Cell* cell,
+		  FFPosArray pos_array);
 
   /// @brief マッチを記録する．
   /// @param[in] node 該当のノード
@@ -128,7 +131,7 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    ymuint mPosArray[6];
+    FFPosArray mPosArray;
   };
 
   // ラッチの割り当て情報
@@ -143,7 +146,7 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    ymuint mPosArray[6];
+    FFPosArray mPosArray;
   };
 
   // ノードの割り当て情報
@@ -170,11 +173,11 @@ private:
 private:
 
   /// @brief D-FF の割り当て情報を取り出す．
-  const CmnDffCell*
+  DffInfo&
   dff_info(const BdnDff* dff);
 
   /// @brief ラッチの割り当て情報を取り出す．
-  const CmnLatchCell*
+  LatchInfo&
   latch_info(const BdnLatch* latch);
 
   /// @brief NodeInfo を取り出す．
@@ -190,11 +193,11 @@ private:
 
   // D-FF の割り当て情報を格納した配列
   // キーは BdnDff の ID 番号
-  vector<const CmnDffCell*> mDffInfo;
+  vector<DffInfo> mDffInfo;
 
   // ラッチの割り当て情報を格納した配列
   // キーは BdnLatch の ID 番号
-  vector<const CmnLatchCell*> mLatchInfo;
+  vector<LatchInfo> mLatchInfo;
 
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは BdnNode の ID 番号
