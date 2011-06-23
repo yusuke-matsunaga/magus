@@ -114,7 +114,7 @@ AUTOGEN_COMMON="./autogen.common"
 #SUBMODULE=`cat $BASEDIR/modules`
 SUBMODULE=\
 "libraries/libym_utils \
- libraries/libraries/libym_logic \
+ libraries/libym_logic \
  libraries/libym_smtlibv2 \
  libraries/libym_mincov \
  libraries/libym_blif \
