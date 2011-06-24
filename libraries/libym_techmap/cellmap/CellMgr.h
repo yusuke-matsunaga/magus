@@ -196,10 +196,10 @@ private:
   // FFグループの(実体の)配列
   FFGroup* mFFGroupArray;
 
-  // FFクラス数
+  // FFクラスの数
   ymuint32 mFFClassNum;
 
-  // FFクラスの(実体の)配列
+  // FFクラスの配列
   FFClass* mFFClassArray;
 
   // ラッチクラスの数

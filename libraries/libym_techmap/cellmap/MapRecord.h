@@ -13,7 +13,10 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
+#include "ym_networks/cmn.h"
 #include "Match.h"
+#include "FFPosArray.h"
+#include "LatchPosArray.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -61,7 +64,7 @@ public:
   void
   set_latch_match(const BdnLatch* latch,
 		  const Cell* cell,
-		  FFPosArray pos_array);
+		  LatchPosArray pos_array);
 
   /// @brief マッチを記録する．
   /// @param[in] node 該当のノード
@@ -146,7 +149,7 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    FFPosArray mPosArray;
+    LatchPosArray mPosArray;
   };
 
   // ノードの割り当て情報
@@ -174,16 +177,16 @@ private:
 
   /// @brief D-FF の割り当て情報を取り出す．
   DffInfo&
-  dff_info(const BdnDff* dff);
+  get_dff_info(const BdnDff* dff);
 
   /// @brief ラッチの割り当て情報を取り出す．
   LatchInfo&
-  latch_info(const BdnLatch* latch);
+  get_latch_info(const BdnLatch* latch);
 
   /// @brief NodeInfo を取り出す．
   NodeInfo&
-  node_info(const BdnNode* node,
-	    bool inv);
+  get_node_info(const BdnNode* node,
+		bool inv);
 
 
 private:

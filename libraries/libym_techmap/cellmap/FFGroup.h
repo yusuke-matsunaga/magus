@@ -38,31 +38,9 @@ public:
   // 内容を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief データ入力のピン番号を返す．
-  ymuint
-  data_pos() const;
-
-  /// @brief クロック入力のピン番号を返す．
-  ymuint
-  clock_pos() const;
-
-  /// @brief クリア入力のピン番号を返す．
-  /// @note クリア入力がない場合の値は不定
-  ymuint
-  clear_pos() const;
-
-  /// @brief プリセット入力のピン番号を返す．
-  /// @note プリセット入力がない場合の値は不定
-  ymuint
-  preset_pos() const;
-
-  /// @brief 肯定出力のピン番号を返す．
-  ymuint
-  q_pos() const;
-
-  /// @brief 否定出力のピン番号を返す．
-  ymuint
-  iq_pos() const;
+  /// @brief ピンの割り当て情報を返す．
+  const FFPosArray&
+  pos_array() const;
 
   /// @brief セル数を返す．
   ymuint
@@ -104,54 +82,12 @@ FFGroup::~FFGroup()
 {
 }
 
-// @brief データ入力のピン番号を返す．
+// @brief ピンの割り当て情報を返す．
 inline
-ymuint
-FFGroup::data_pos() const
+const FFPosArray&
+FFGroup::pos_array() const
 {
-  return mPosArray.data_pos();
-}
-
-// @brief クロック入力のピン番号を返す．
-inline
-ymuint
-FFGroup::clock_pos() const
-{
-  return mPosArray.clock_pos();
-}
-
-// @brief クリア入力のピン番号を返す．
-// @note クリア入力がない場合の値は不定
-inline
-ymuint
-FFGroup::clear_pos() const
-{
-  return mPosArray.clear_pos();
-}
-
-// @brief プリセット入力のピン番号を返す．
-// @note プリセット入力がない場合の値は不定
-inline
-ymuint
-FFGroup::preset_pos() const
-{
-  return mPosArray.preset_pos();
-}
-
-// @brief 肯定出力のピン番号を返す．
-inline
-ymuint
-FFGroup::q_pos() const
-{
-  return mPosArray.q_pos();
-}
-
-// @brief 否定出力のピン番号を返す．
-inline
-ymuint
-FFGroup::iq_pos() const
-{
-  return mPosArray.iq_pos();
+  return mPosArray;
 }
 
 // @brief セル数を返す．

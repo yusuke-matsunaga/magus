@@ -9,6 +9,7 @@
 
 #include "AreaCover.h"
 #include "ym_networks/BdnMgr.h"
+#include "ym_networks/BdnDff.h"
 #include "ym_networks/CmnMgr.h"
 #include "ym_cell/Cell.h"
 #include "CellMgr.h"
@@ -17,6 +18,8 @@
 #include "PatGraph.h"
 #include "RepFunc.h"
 #include "FuncGroup.h"
+#include "FFClass.h"
+#include "FFGroup.h"
 #include "MapRecord.h"
 
 
@@ -47,6 +50,11 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
 {
   MapRecord maprec;
 
+  maprec.init(sbjgraph);
+
+  // FF のマッピングを行う．
+  ff_map(sbjgraph, cell_mgr, maprec);
+
   // マッピング結果を maprec に記録する．
   record_cuts(sbjgraph, cell_mgr, maprec);
 
@@ -56,27 +64,15 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
   maprec.gen_mapgraph(sbjgraph, c0_cell, c1_cell, mapnetwork);
 }
 
-// @brief best cut の記録を行う．
+// @brief FF のマッピングを行う．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cell_mgr セルを管理するオブジェクト
-// @param[out] maprec マッピング結果を記録するオブジェクト
+// @param[in] maprec マッピング結果を保持するオブジェクト
 void
-AreaCover::record_cuts(const BdnMgr& sbjgraph,
-		       const CellMgr& cell_mgr,
-		       MapRecord& maprec)
+AreaCover::ff_map(const BdnMgr& sbjgraph,
+		  const CellMgr& cell_mgr,
+		  MapRecord& maprec)
 {
-  const PatMgr& pat_mgr = cell_mgr.pat_mgr();
-  ymuint n = sbjgraph.max_node_id();
-  mCostArray.resize(n * 2);
-  ymuint max_input = pat_mgr.max_input();
-  mWeight.resize(max_input);
-  mLeafNum.clear();
-  mLeafNum.resize(n, -1);
-
-  maprec.init(sbjgraph);
-
-  // FF のマッピングを行う．
-  CmnDffCell* dffcells[18];
   ymuint ffc_num = cell_mgr.ff_class_num();
   const BdnDffList& dff_list = sbjgraph.dff_list();
   for (BdnDffList::const_iterator p = dff_list.begin();
@@ -110,45 +106,83 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	preset_sense = 1U;
       }
     }
-    ymuint type = (clock_sense - 1) + (clear_sense * 2) + (preset_sense) * 6;
-    if ( dffcells[type] == NULL ) {
+    ymuint sig = (clock_sense - 1) + (clear_sense * 2) + (preset_sense) * 6;
+    FFInfo& ff_info = mFFInfo[sig];
+    if ( ff_info.mCell == NULL ) {
+      ymuint min_diff = 7;
+      const Cell* min_cell = NULL;
+      FFPosArray min_pos_array;
+      CellArea min_area = CellArea::infty();
       for (ymuint i = 0; i < ffc_num; ++ i) {
 	const FFClass& ffc = cell_mgr.ff_class(i);
-	if ( ffc.clock_sense() == clock_sense &&
-	     ffc.clear_sense() == clear_sense &&
-	     ffc.preset_sense() == preset_sense ) {
-	  ymuint ng = ffc.group_num();
-	  ymuint min_grp = 0;
-	  const Cell* min_cell = NULL;
-	  double min_area = DBL_MAX;
-	  for (ymuint j = 0; j < ng; ++ j) {
-	    const FFGroup& ffg = ffc.group(j);
-	    ymuint nc = ffg.cell_num();
-	    for (ymuint k = 0; k < nc; ++ k) {
-	      const Cell* cell = ffg.cell(j);
-	      double area = cell->area();
-	      if ( min_area > area ) {
-		min_area = area;
-		min_cell = cell;
-		min_grp = j;
-	      }
+	// クロックおよび制御ピンの極性の差を数値化したもの
+	ymuint diff = 0;
+	if ( ffc.clock_sense() != clock_sense ) {
+	  diff += 4;
+	}
+	if ( clear_sense != 0U ) {
+	  if ( ffc.clear_sense() == 0 ) {
+	    continue;
+	  }
+	  if ( ffc.clear_sense() != clear_sense ) {
+	    diff += 1;
+	  }
+	}
+	if ( preset_sense != 0U ) {
+	  if ( ffc.preset_sense() == 0 ) {
+	    continue;
+	  }
+	  if ( ffc.preset_sense() != preset_sense ) {
+	    diff += 1;
+	  }
+	}
+	if ( min_diff < diff ) {
+	  continue;
+	}
+	if ( min_diff > diff ) {
+	  min_diff = diff;
+	  min_cell = NULL;
+	  min_area = CellArea::infty();
+	}
+	ymuint ng = ffc.group_num();
+	for (ymuint j = 0; j < ng; ++ j) {
+	  const FFGroup& ffg = ffc.group(j);
+	  ymuint nc = ffg.cell_num();
+	  for (ymuint k = 0; k < nc; ++ k) {
+	    const Cell* cell = ffg.cell(j);
+	    CellArea area = cell->area();
+	    if ( min_area > area ) {
+	      min_area = area;
+	      min_cell = cell;
+	      min_pos_array = ffg.pos_array();
 	    }
 	  }
-	  assert_cond( min_cell != NULL, __FILE__, __LINE__);
-	  ymuint pos_array[6];
-	  const FFGroup& ffg = ffc.group(min_grp);
-	  pos_array[0] = ffg.data_pos();
-	  pos_array[1] = ffg.clock_pos();
-	  pos_array[2] = ffg.clear_pos();
-	  pos_array[3] = ffg.preset_pos();
-	  pos_array[4] = ffg.q_pos();
-	  pos_array[5] = ffg.iq_pos();
-	  dffcells[type] = maprec.set_dff_match(
 	}
       }
+      assert_cond( min_cell != NULL, __FILE__, __LINE__);
+      ff_info.mCell = min_cell;
+      ff_info.mPosArray = min_pos_array;
     }
-    maprec.set_dff_match(dff, dffcells[type]);
+    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray);
   }
+}
+
+// @brief best cut の記録を行う．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] cell_mgr セルを管理するオブジェクト
+// @param[out] maprec マッピング結果を記録するオブジェクト
+void
+AreaCover::record_cuts(const BdnMgr& sbjgraph,
+		       const CellMgr& cell_mgr,
+		       MapRecord& maprec)
+{
+  const PatMgr& pat_mgr = cell_mgr.pat_mgr();
+  ymuint n = sbjgraph.max_node_id();
+  mCostArray.resize(n * 2);
+  ymuint max_input = pat_mgr.max_input();
+  mWeight.resize(max_input);
+  mLeafNum.clear();
+  mLeafNum.resize(n, -1);
 
   const FuncGroup& inv_func = cell_mgr.inv_func();
 

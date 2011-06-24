@@ -40,6 +40,10 @@ MapRecord::~MapRecord()
 void
 MapRecord::init(const BdnMgr& sbjgraph)
 {
+  mDffInfo.clear();
+  mDffInfo.resize(sbjgraph.max_dff_id());
+  mLatchInfo.clear();
+  mLatchInfo.resize(sbjgraph.max_latch_id());
   mNodeInfo.clear();
   mNodeInfo.resize(sbjgraph.max_node_id() * 2);
 }
@@ -59,21 +63,29 @@ MapRecord::copy(const MapRecord& src)
 // @brief D-FF のマッチを記録する．
 // @param[in] dff D-FF
 // @param[in] cell セル
+// @param[in] pos_array ピン情報の配列
 void
 MapRecord::set_dff_match(const BdnDff* dff,
-			 const CmnDffCell* cell)
+			 const Cell* cell,
+			 FFPosArray pos_array)
 {
-  mDffInfo[dff->id()] = cell;
+  DffInfo& dffinfo = mDffInfo[dff->id()];
+  dffinfo.mCell = cell;
+  dffinfo.mPosArray = pos_array;
 }
 
 // @brief ラッチのマッチを記録する．
 // @param[in] latch ラッチ
 // @param[in] cell セル
+// @param[in] pos_array ピン情報の配列
 void
 MapRecord::set_latch_match(const BdnLatch* latch,
-			   const CmnLatchCell* cell)
+			   const Cell* cell,
+			   LatchPosArray pos_array)
 {
-  mLatchInfo[latch->id()] = cell;
+  LatchInfo& latchinfo = mLatchInfo[latch->id()];
+  latchinfo.mCell = cell;
+  latchinfo.mPosArray = pos_array;
 }
 
 // @brief マッチを記録する．
@@ -87,9 +99,9 @@ MapRecord::set_match(const BdnNode* node,
 		     const Match& match,
 		     const Cell* cell)
 {
-  NodeInfo& ni = node_info(node, inv);
-  ni.mMatch = match;
-  ni.mCell = cell;
+  NodeInfo& node_info = get_node_info(node, inv);
+  node_info.mMatch = match;
+  node_info.mCell = cell;
 }
 
 // @brief インバータのマッチを記録する．
@@ -101,10 +113,10 @@ MapRecord::set_inv_match(const BdnNode* node,
 			 bool inv,
 			 const Cell* cell)
 {
-  NodeInfo& ni = node_info(node, inv);
-  ni.mMatch.resize(1);
-  ni.mMatch.set_leaf(0, node, !inv);
-  ni.mCell = cell;
+  NodeInfo& node_info = get_node_info(node, inv);
+  node_info.mMatch.resize(1);
+  node_info.mMatch.set_leaf(0, node, !inv);
+  node_info.mCell = cell;
 }
 
 // @brief マッチを取り出す．
@@ -114,7 +126,7 @@ const Match&
 MapRecord::get_match(const BdnNode* node,
 		     bool inv)
 {
-  return node_info(node, inv).mMatch;
+  return get_node_info(node, inv).mMatch;
 }
 
 // @brief マッピング結果を CmnMgr にセットする．
@@ -145,13 +157,13 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
       if ( sbj_input ) {
 	CmnNode* input = dst_port->_input(j);
 	assert_cond( input != NULL, __FILE__, __LINE__);
-	node_info(sbj_input, false).mMapNode = input;
+	get_node_info(sbj_input, false).mMapNode = input;
       }
       const BdnNode* sbj_output = sbjport->output(j);
       if ( sbj_output ) {
 	CmnNode* output = dst_port->_output(j);
 	assert_cond( output != NULL, __FILE__, __LINE__);
-	node_info(sbj_output, false).mMapNode = output;
+	get_node_info(sbj_output, false).mMapNode = output;
       }
     }
   }
@@ -161,35 +173,36 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
   for (BdnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const BdnDff* sbj_dff = *p;
-    const CmnDffCell* dff_cell = dff_info(sbj_dff);
+    DffInfo& dff_info = get_dff_info(sbj_dff);
+    const CmnDffCell* dff_cell = NULL;
     CmnDff* dff = mapgraph.new_dff(dff_cell, sbj_dff->name());
 
     const BdnNode* sbj_output = sbj_dff->output();
     CmnNode* output1 = dff->_output1();
-    node_info(sbj_output, false).mMapNode = output1;
+    get_node_info(sbj_output, false).mMapNode = output1;
     CmnNode* output2 = dff->_output2();
-    node_info(sbj_output, true).mMapNode = output2;
+    get_node_info(sbj_output, true).mMapNode = output2;
 
     const BdnNode* sbj_input = sbj_dff->input();
     CmnNode* input = dff->_input();
-    node_info(sbj_input, false).mMapNode = input;
+    get_node_info(sbj_input, false).mMapNode = input;
 
     const BdnNode* sbj_clock = sbj_dff->clock();
     CmnNode* clock = dff->_clock();
-    node_info(sbj_clock, false).mMapNode = clock;
+    get_node_info(sbj_clock, false).mMapNode = clock;
 
     const BdnNode* sbj_clear = sbj_dff->clear();
     if ( sbj_clear ) {
       CmnNode* clear = dff->_clear();
       assert_cond( clear != NULL, __FILE__, __LINE__);
-      node_info(sbj_clear, false).mMapNode = clear;
+      get_node_info(sbj_clear, false).mMapNode = clear;
     }
 
     const BdnNode* sbj_preset = sbj_dff->preset();
     if ( sbj_preset ) {
       CmnNode* preset = dff->_preset();
       assert_cond( preset != NULL, __FILE__, __LINE__);
-      node_info(sbj_preset, false).mMapNode = preset;
+      get_node_info(sbj_preset, false).mMapNode = preset;
     }
   }
 
@@ -207,7 +220,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
     CmnNode* mapnode = mapgraph.new_input();
-    NodeInfo& node_info = this->node_info(node, false);
+    NodeInfo& node_info = get_node_info(node, false);
     node_info.mMapNode = mapnode;
   }
 #endif
@@ -233,7 +246,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
 	mapnode = mapgraph.new_logic(vector<CmnNode*>(0), const0_cell);
       }
     }
-    CmnNode* omapnode = node_info(onode, false).mMapNode;
+    CmnNode* omapnode = get_node_info(onode, false).mMapNode;
     mapgraph.set_output_fanin(omapnode, mapnode);
   }
 
@@ -301,7 +314,7 @@ MapRecord::back_trace(const BdnNode* node,
 		      bool inv,
 		      CmnMgr& mapnetwork)
 {
-  NodeInfo& node_info = this->node_info(node, inv);
+  NodeInfo& node_info = get_node_info(node, inv);
   CmnNode* mapnode = node_info.mMapNode;
   if ( mapnode ) {
     // すでに生成済みならそのノードを返す．
@@ -324,7 +337,7 @@ MapRecord::back_trace(const BdnNode* node,
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);
-    NodeInfo& inode_info = this->node_info(inode, iinv);
+    NodeInfo& inode_info = get_node_info(inode, iinv);
     CmnNode* imapnode = inode_info.mMapNode;
     mTmpFanins[i] = imapnode;
   }
@@ -338,23 +351,23 @@ MapRecord::back_trace(const BdnNode* node,
 }
 
 // @brief D-FF の割り当て情報を取り出す．
-const CmnDffCell*
-MapRecord::dff_info(const BdnDff* dff)
+MapRecord::DffInfo&
+MapRecord::get_dff_info(const BdnDff* dff)
 {
   return mDffInfo[dff->id()];
 }
 
 // @brief ラッチの割り当て情報を取り出す．
-const CmnLatchCell*
-MapRecord::latch_info(const BdnLatch* latch)
+MapRecord::LatchInfo&
+MapRecord::get_latch_info(const BdnLatch* latch)
 {
   return mLatchInfo[latch->id()];
 }
 
 // @brief NodeInfo を取り出す．
 MapRecord::NodeInfo&
-MapRecord::node_info(const BdnNode* node,
-		     bool inv)
+MapRecord::get_node_info(const BdnNode* node,
+			 bool inv)
 {
   return mNodeInfo[node->id() * 2 + static_cast<ymuint>(inv)];
 }

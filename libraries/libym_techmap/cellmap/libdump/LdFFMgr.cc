@@ -122,7 +122,11 @@ LdFFMgr::find_group(ymuint clock_sense,
   }
 
   FFPosArray sig2;
-  sig2.set(data_pos, clock_pos, clear_pos, preset_pos, q_pos, iq_pos);
+  sig2.set(data_pos,
+	   clock_pos, clock_sense,
+	   clear_pos, clear_sense,
+	   preset_pos, preset_sense,
+	   q_pos, iq_pos);
 
   LdFFGroup* ff_group = NULL;
   for (vector<LdFFGroup*>::iterator p = ff_class->mGroupList.begin();

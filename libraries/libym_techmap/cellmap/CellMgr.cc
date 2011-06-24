@@ -133,7 +133,7 @@ CellMgr::load_library(istream& s)
   }
 
   // FFクラスの情報を読み込む．
-  mFFClassNum = BinIO::read_32(s);
+  ymuint mFFClassNum = BinIO::read_32(s);
   {
     void* p = mAlloc.get_memory(sizeof(FFClass) * mFFClassNum);
     mFFClassArray = new (p) FFClass[mFFClassNum];
@@ -409,28 +409,29 @@ dump(ostream& s,
     ymuint ng = ff_class.group_num();
     for (ymuint j = 0; j < ng; ++ j) {
       const FFGroup& ff_group = ff_class.group(j);
+      const FFPosArray pos_array = ff_group.pos_array();
       s << "    FF-Group:" << endl
-	<< "      DATA   = Pin#" << ff_group.data_pos() << endl;
+	<< "      DATA   = Pin#" << pos_array.data_pos() << endl;
       s << "      CLOCK  = ";
-      if ( ff_class.clock_sense() == 2 ) {
+      if ( pos_array.clock_sense() == 2 ) {
 	s << "!";
       }
-      s << "Pin#" << ff_group.clock_pos() << endl
-	<< "      Q      = Pin#" << ff_group.q_pos() << endl
-	<< "      IQ     = Pin#" << ff_group.iq_pos() << endl;
-      if ( ff_class.has_clear() ) {
+      s << "Pin#" << pos_array.clock_pos() << endl
+	<< "      Q      = Pin#" << pos_array.q_pos() << endl
+	<< "      IQ     = Pin#" << pos_array.iq_pos() << endl;
+      if ( pos_array.has_clear() ) {
 	s << "      CLEAR  = ";
-	if ( ff_class.clear_sense() == 2 ) {
+	if ( pos_array.clear_sense() == 2 ) {
 	  s << "!";
 	}
-	s << "Pin#" << ff_group.clear_pos() << endl;
+	s << "Pin#" << pos_array.clear_pos() << endl;
       }
-      if ( ff_class.has_preset() ) {
+      if ( pos_array.has_preset() ) {
 	s << "      PRESET = ";
-	if ( ff_class.preset_sense() == 2 ) {
+	if ( pos_array.preset_sense() == 2 ) {
 	  s << "!";
 	}
-	s << "Pin#" << ff_group.preset_pos() << endl;
+	s << "Pin#" << pos_array.preset_pos() << endl;
       }
       s << "      CELLS  =";
       ymuint nc = ff_group.cell_num();

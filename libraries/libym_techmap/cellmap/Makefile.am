@@ -31,7 +31,8 @@ libym_techmap_cell_la_SOURCES = \
 	LatchClass.h \
 	LatchClass.cc \
 	LatchGroup.h \
-	LatchGroup.cc \
+	LatchPosArray.h \
+	LatchPosArray.cc \
 	MapRecord.h \
 	MapRecord.cc \
 	Match.h \

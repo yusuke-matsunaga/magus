@@ -10,8 +10,10 @@
 
 
 #include "ym_techmap/cellmap_nsdef.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/cmn.h"
+#include "FFPosArray.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -52,6 +54,15 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief FF のマッピングを行う．
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] cell_mgr セルを管理するオブジェクト
+  /// @param[in] maprec マッピング結果を保持するオブジェクト
+  void
+  ff_map(const BdnMgr& sbjgraph,
+	 const CellMgr& cell_mgr,
+	 MapRecord& maprec);
+
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cell_mgr セルを管理するオブジェクト
@@ -87,8 +98,28 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  struct FFInfo
+  {
+    FFInfo() :
+      mCell(NULL)
+    {
+    }
+
+    const Cell* mCell;
+    FFPosArray mPosArray;
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // シグネチャをキーにして FFInfo を保持する配列
+  FFInfo mFFInfo[18];
 
   // 各ノードのコストを保持する配列
   vector<double> mCostArray;

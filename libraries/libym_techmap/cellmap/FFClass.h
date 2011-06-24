@@ -38,6 +38,10 @@ public:
   // 内容を取得する関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief シグネチャを返す．
+  ymuint
+  signature() const;
+
   /// @brief クロック入力のタイプを返す．
   /// @retval 1 positive edge
   /// @retval 2 negative edge

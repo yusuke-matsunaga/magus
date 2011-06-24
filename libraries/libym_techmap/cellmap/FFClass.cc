@@ -47,6 +47,13 @@ FFClass::~FFClass()
 {
 }
 
+// @brief シグネチャを返す．
+ymuint
+FFClass::signature() const
+{
+  return mBits;
+}
+
 // @brief クロック入力のタイプを返す．
 // @retval 1 positive edge
 // @retval 2 negative edge

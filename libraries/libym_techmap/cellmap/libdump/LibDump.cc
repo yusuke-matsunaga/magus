@@ -151,7 +151,7 @@ LibDump::gen_pat(const CellLibrary& library)
       ymuint ni = 0;
       for (ymuint j = 0; j < np; ++ j) {
 	const CellPin* pin = cell->pin(j);
-	if ( pin->direction() == nsCell::kDirOutput ) {
+	if ( pin->is_output() ) {
 	  if ( opin != NULL ) {
 	    // 出力ピンが複数あるセルは対象外
 	    opin = NULL;
@@ -159,8 +159,13 @@ LibDump::gen_pat(const CellLibrary& library)
 	  }
 	  opin = pin;
 	}
-	else if ( pin->direction() == nsCell::kDirInput ) {
+	else if ( pin->is_input() ) {
 	  ++ ni;
+	}
+	else if ( pin->is_inout() ) {
+	  // 入出力ピンを持つセルも対象外
+	  opin = NULL;
+	  break;
 	}
       }
       if ( opin == NULL ) continue;
@@ -227,7 +232,7 @@ LibDump::gen_pat(const CellLibrary& library)
       const CellPin* iq_pin = NULL;
       for (ymuint j = 0; j < np; ++ j) {
 	const CellPin* pin = cell->pin(j);
-	if ( pin->direction() == nsCell::kDirOutput ) {
+	if ( pin->is_output() ) {
 	  if ( !pin->has_function() ) {
 	    continue;
 	  }
