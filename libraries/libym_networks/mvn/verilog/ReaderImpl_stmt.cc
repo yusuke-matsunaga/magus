@@ -201,16 +201,19 @@ ReaderImpl::gen_assign(MvnModule* module,
       assert_not_reached(__FILE__, __LINE__);
     }
 
-    MvnNode* src_node = gen_rhs(module, node, offset, bw);
     MvnNode* dst_node = NULL;
     if ( lhs1->is_primary() ) {
+      cout << "lhs1->is_primary()" << endl;
+      MvnNode* src_node = gen_rhs(module, node, offset, bw);
       dst_node = mMvnMgr->new_through(module, bw);
       mMvnMgr->connect(src_node, 0, dst_node, 0);
     }
     else if ( lhs1->is_bitselect() ) {
+      cout << "lhs1->is_bitselect()" << endl;
 #if 0
       assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
 #warning "TODO: reg 型なら可変ビットセレクトもあり"
+      MvnNode* src_node = gen_rhs(module, node, offset, 0);
       ymuint index = lhs_declbase->bit_offset(lhs1->index_val());
       vector<ymuint> bw_array;
       bw_array.reserve(3);
@@ -222,12 +225,13 @@ ReaderImpl::gen_assign(MvnModule* module,
 	bw_array.push_back(index);
       }
       dst_node = mMvnMgr->new_concat(module, bw_array);
+      cout << "dst_node = mMvnMgr->new_concat" << endl;
       ymuint pos = 0;
       if ( index < bw - 1 ) {
 	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-						       bw - 1,
-						       index + 1,
-						       bw);
+							 bw - 1,
+							 index + 1,
+							 bw);
 	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	++ pos;
@@ -236,20 +240,23 @@ ReaderImpl::gen_assign(MvnModule* module,
       ++ pos;
       if ( index > 0 ) {
 	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-						       index - 1,
-						       0,
-						       bw);
+							 index - 1,
+							 0,
+							 bw);
 	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
       }
 #endif
     }
     else if ( lhs1->is_partselect() ) {
+      cout << "lhs1->is_partselect()" << endl;
 #if 0
       assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
 #warning "TODO: reg 型なら可変範囲セレクトもあり"
       ymuint msb = lhs_declbase->bit_offset(lhs1->left_range_val());
       ymuint lsb = lhs_declbase->bit_offset(lhs1->right_range_val());
+      ymuint lbw = msb - lsb + 1;
+      MvnNode* src_node = gen_rhs(module, node, offset, lbw);
       vector<ymuint> bw_array;
       bw_array.reserve(3);
       if ( msb < bw - 1 ) {
@@ -263,9 +270,9 @@ ReaderImpl::gen_assign(MvnModule* module,
       ymuint pos = 0;
       if ( msb < bw - 1 ) {
 	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-						       bw - 1,
-						       msb + 1,
-						       bw);
+							 bw - 1,
+							 msb + 1,
+							 bw);
 	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	++ pos;
@@ -274,9 +281,9 @@ ReaderImpl::gen_assign(MvnModule* module,
       ++ pos;
       if ( lsb > 0 ) {
 	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-						       lsb - 1,
-						       0,
-						       bw);
+							 lsb - 1,
+							 0,
+							 bw);
 	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
       }

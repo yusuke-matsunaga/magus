@@ -73,14 +73,14 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       ymuint n1 = n - 1;
       vector<ymuint> bw_array(n * r);
       for (ymint j = 0; j < r; ++ j) {
-	ymuint base = j * r;
+	ymuint base = j * n1;
 	for (ymuint i = 0; i < n1; ++ i) {
 	  bw_array[base + i] = inputs[i + 1]->output(0)->bit_width();
 	}
       }
       MvnNode* node = mMvnMgr->new_concat(parent_module, bw_array);
       for (ymint j = 0; j < r; ++ j) {
-	ymuint base = j * r;
+	ymuint base = j * n1;
 	for (ymuint i = 0; i < n1; ++ i) {
 	  mMvnMgr->connect(inputs[i + 1], 0, node, base + i);
 	}
