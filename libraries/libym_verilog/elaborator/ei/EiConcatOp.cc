@@ -39,19 +39,19 @@ EiFactory::new_ConcatOp(const PtExpr* pt_expr,
 
 // @brief 反復連結演算子を生成する．
 // @param[in] pt_expr パース木の定義要素
-// @param[in] rep_expr 繰り返し数を表す式
 // @param[in] rep_num 繰り返し数
+// @param[in] rep_expr 繰り返し数を表す式
 // @param[in] opr_num オペランド数
 // @param[in] opr_list オペランドのリスト
 ElbExpr*
 EiFactory::new_MultiConcatOp(const PtExpr* pt_expr,
-			     const PtExpr* rep_expr,
 			     int rep_num,
+			     ElbExpr* rep_expr,
 			     ymuint opr_size,
 			     ElbExpr** opr_list)
 {
   void* p = mAlloc.get_memory(sizeof(EiMultiConcatOp));
-  EiMultiConcatOp* op = new (p) EiMultiConcatOp(pt_expr, rep_expr, rep_num,
+  EiMultiConcatOp* op = new (p) EiMultiConcatOp(pt_expr, rep_num, rep_expr,
 						opr_size, opr_list);
 
   return op;
@@ -143,18 +143,18 @@ EiConcatOp::_operand(ymuint pos) const
 
 // @brief コンストラクタ
 // @param[in] pt_expr パース木の定義要素
-// @param[in] rep_expr 繰り返し数を表す式
 // @param[in] rep_num 繰り返し数
+// @param[in] rep_expr 繰り返し数を表す式
 // @param[in] opr_size オペランド数
 // @param[in] opr_array オペランドを格納する配列
 EiMultiConcatOp::EiMultiConcatOp(const PtExpr* pt_expr,
-				 const PtExpr* rep_expr,
 				 int rep_num,
+				 ElbExpr* rep_expr,
 				 ymuint opr_size,
 				 ElbExpr** opr_array) :
   EiConcatOp(pt_expr, opr_size, opr_array),
-  mRepExpr(rep_expr),
-  mRepNum(rep_num)
+  mRepNum(rep_num),
+  mRepExpr(rep_expr)
 {
 }
 
@@ -191,8 +191,7 @@ ElbExpr*
 EiMultiConcatOp::_operand(ymuint pos) const
 {
   if ( pos == 0 ) {
-#warning "TODO: なんとかする．"
-    return NULL;
+    return mRepExpr;
   }
   return EiConcatOp::_operand(pos - 1);
 }

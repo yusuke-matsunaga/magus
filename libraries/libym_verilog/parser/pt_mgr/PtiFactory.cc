@@ -10,11 +10,25 @@
 
 
 #include "PtiFactory.h"
-
 #include "ym_verilog/pt/PtArray.h"
+#include "CptFactory.h"
+#include "SptFactory.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
+
+// @brief PtiFactory の実装クラスのオブジェクトを作る関数
+// @param[in] type 実装クラスを指定する文字列
+// @param[in] alloc メモリアロケータ
+PtiFactory*
+PtiFactory::make_obj(const string& type,
+		     AllocBase& alloc)
+{
+  if ( type == "spt" ) {
+    return new SptFactory(alloc);
+  }
+  return new CptFactory(alloc);
+}
 
 // @brief コンストラクタ
 // @param[in] alloc メモリアロケータ

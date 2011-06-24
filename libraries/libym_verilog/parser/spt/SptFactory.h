@@ -218,7 +218,7 @@ public:
   PtiIOHead*
   new_IOHead(const FileRegion& file_region,
 	     tPtIOType type,
-	     bool sign) = 0;
+	     bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (reg 型)
   /// @param[in] file_region ファイル位置の情報
@@ -229,7 +229,7 @@ public:
   PtiIOHead*
   new_RegIOHead(const FileRegion& file_region,
 		tPtIOType type,
-		bool sign) = 0;
+		bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (ネット型)
   /// @param[in] file_region ファイル位置の情報
@@ -242,7 +242,7 @@ public:
   new_NetIOHead(const FileRegion& file_region,
 		tPtIOType type,
 		tVpiNetType net_type,
-		bool sign) = 0;
+		bool sign);
 
   /// @brief IO 宣言のヘッダの生成 (変数型)
   /// @param[in] file_region ファイル位置の情報

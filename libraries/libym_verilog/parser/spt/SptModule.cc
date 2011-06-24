@@ -403,6 +403,13 @@ SptPort::ext_name() const
   return mExtName;
 }
 
+// @brief 内側のポート結線を表す式の取得
+const PtExpr*
+SptPort::portref() const
+{
+  return mPortRef;
+}
+
 // 内部のポート結線リストのサイズの取得
 // @return 内部のポート結線リストのサイズ
 ymuint

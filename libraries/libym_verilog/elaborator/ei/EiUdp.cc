@@ -170,7 +170,12 @@ EiUdpDefn::init_val() const
 string
 EiUdpDefn::init_val_string() const
 {
-  return mInitExpr->decompile();
+  if ( mInitExpr ) {
+    return mInitExpr->decompile();
+  }
+  else {
+    return string();
+  }
 }
 
 // @brief table entry の行数を返す．

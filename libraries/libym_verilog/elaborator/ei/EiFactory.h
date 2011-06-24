@@ -869,8 +869,8 @@ public:
   virtual
   ElbExpr*
   new_MultiConcatOp(const PtExpr* pt_expr,
-		    const PtExpr* rep_expr,
 		    int rep_num,
+		    ElbExpr* rep_expr,
 		    ymuint opr_size,
 		    ElbExpr** opr_list);
 

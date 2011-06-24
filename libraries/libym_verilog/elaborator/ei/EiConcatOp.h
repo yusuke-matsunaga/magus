@@ -126,14 +126,14 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] pt_expr パース木の定義要素
-  /// @param[in] rep_expr 繰り返し数を表す式
   /// @param[in] rep_num 繰り返し数
+  /// @param[in] rep_expr 繰り返し数を表す式
   /// @param[in] opr_size オペランド数
   /// @param[in] opr_array オペランドを格納する配列
   /// @note は opr_size は繰り返し数のオペランドは含まない．
   EiMultiConcatOp(const PtExpr* pt_expr,
-		  const PtExpr* rep_expr,
 		  int rep_num,
+		  ElbExpr* rep_expr,
 		  ymuint opr_size,
 		  ElbExpr** opr_array);
 
@@ -181,11 +181,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 繰り返し数を表す式
-  const PtExpr* mRepExpr;
-
   // 繰り返し数
   int mRepNum;
+
+  // 繰り返し数を表す式
+  ElbExpr* mRepExpr;
 
 };
 

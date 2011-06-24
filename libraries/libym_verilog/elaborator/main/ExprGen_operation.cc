@@ -150,6 +150,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
       if ( !stat ) {
 	return NULL;
       }
+      ElbExpr* rep_expr = instantiate_expr(parent, env, pt_expr0);
       ElbExpr** opr_list = factory().new_ExprList(opr_size - 1);
       for (ymuint i = 1; i < opr_size; ++ i) {
 	const PtExpr* pt_expr1 = pt_expr->operand(i);
@@ -163,7 +164,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	}
 	opr_list[i - 1] = expr1;
       }
-      expr = factory().new_MultiConcatOp(pt_expr, pt_expr0, rep_num,
+      expr = factory().new_MultiConcatOp(pt_expr, rep_num, rep_expr,
 					 opr_size - 1, opr_list);
       expr->set_selfsize();
     }

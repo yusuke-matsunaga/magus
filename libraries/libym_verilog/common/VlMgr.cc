@@ -13,6 +13,7 @@
 
 #include "Parser.h"
 #include "PtMgr.h"
+#include "PtiFactory.h"
 
 #include "Elaborator.h"
 
@@ -21,7 +22,6 @@
 #include "ElbUserSystf.h"
 #include "ElbAttribute.h"
 
-#include "CptFactory.h"
 #include "EiFactory.h"
 
 
@@ -31,7 +31,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 VlMgr::VlMgr() :
   mAlloc(4096),
   mPtMgr(new PtMgr),
-  mPtiFactory(new CptFactory(mAlloc)),
+  mPtiFactory(PtiFactory::make_obj("cpt", mAlloc)),
   mElbMgr(new ElbMgr(mAlloc)),
   mElbFactory(new EiFactory(mAlloc))
 {

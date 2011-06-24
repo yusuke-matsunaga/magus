@@ -29,6 +29,14 @@ class PtiFactory
 {
 public:
 
+  /// @brief PtiFactory の実装クラスのオブジェクトを作る関数
+  /// @param[in] type 実装クラスを指定する文字列
+  /// @param[in] alloc メモリアロケータ
+  static
+  PtiFactory*
+  make_obj(const string& type,
+	   AllocBase& alloc);
+
   /// @brief コンストラクタ
   /// @param[in] alloc メモリアロケータ
   PtiFactory(AllocBase& alloc);

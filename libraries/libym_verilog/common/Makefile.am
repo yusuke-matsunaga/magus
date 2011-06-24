@@ -9,8 +9,6 @@ INCLUDES = \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/spt \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/cpt \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/ei
 
 CLEANFILES =
