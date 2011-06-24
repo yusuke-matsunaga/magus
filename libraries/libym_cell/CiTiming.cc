@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_CELL
 // @param[in] id ID番号
 // @param[in] type タイミング条件の型
 CiTiming::CiTiming(ymuint id,
-		   tCellTimingType type) :
+		   tType type) :
   mId(id),
   mType(type)
 {
@@ -39,7 +39,7 @@ CiTiming::id() const
 }
 
 // @brief 型の取得
-tCellTimingType
+CellTiming::tType
 CiTiming::type() const
 {
   return mType;
@@ -170,7 +170,7 @@ CiTiming::cell_fall() const
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
 CiTimingGP::CiTimingGP(ymuint id,
-		       tCellTimingType timing_type,
+		       tType timing_type,
 		       CellTime intrinsic_rise,
 		       CellTime intrinsic_fall,
 		       CellTime slope_rise,
@@ -231,7 +231,7 @@ CiTimingGP::slope_fall() const
 // @param[in] rise_resistance 立ち上がり遷移遅延パラメータ
 // @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
 CiTimingGeneric::CiTimingGeneric(ymuint id,
-				 tCellTimingType timing_type,
+				 tType timing_type,
 				 CellTime intrinsic_rise,
 				 CellTime intrinsic_fall,
 				 CellTime slope_rise,
@@ -279,7 +279,7 @@ CiTimingGeneric::fall_resistance() const
 // @param[in] slope_rise 立ち上がりスロープ遅延
 // @param[in] slope_fall 立ち下がりスロープ遅延
 CiTimingPiecewise::CiTimingPiecewise(ymuint id,
-				     tCellTimingType timing_type,
+				     tType timing_type,
 				     CellTime intrinsic_rise,
 				     CellTime intrinsic_fall,
 				     CellTime slope_rise,
@@ -340,7 +340,7 @@ CiTimingPiecewise::fall_delay_intercept() const
 // @param[in] cell_rise 立ち上がりセル遅延テーブル
 // @param[in] cell_fall 立ち下がりセル遅延テーブル
 CiTimingNonlinear1::CiTimingNonlinear1(ymuint id,
-				       tCellTimingType timing_type,
+				       tType timing_type,
 				       CellLut* cell_rise,
 				       CellLut* cell_fall) :
   CiTiming(id, timing_type),
@@ -381,7 +381,7 @@ CiTimingNonlinear1::cell_fall() const
 // @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
 CiTimingNonlinear2::CiTimingNonlinear2(ymuint id,
-				       tCellTimingType timing_type,
+				       tType timing_type,
 				       CellLut* rise_transition,
 				       CellLut* fall_transition,
 				       CellLut* rise_propagation,

@@ -12,6 +12,8 @@
 
 
 #include "ym_cell/CellTiming.h"
+#include "ym_cell/CellTime.h"
+#include "ym_cell/CellResistance.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -29,7 +31,7 @@ protected:
   /// @param[in] id ID番号
   /// @param[in] type タイミング条件の型
   CiTiming(ymuint id,
-	   tCellTimingType type);
+	   tType type);
 
   /// @brief デストラクタ
   ~CiTiming();
@@ -47,7 +49,7 @@ public:
 
   /// @brief 型の取得
   virtual
-  tCellTimingType
+  tType
   type() const;
 
 
@@ -164,7 +166,7 @@ private:
   ymuint32 mId;
 
   // 型
-  tCellTimingType mType;
+  tType mType;
 
 };
 
@@ -186,7 +188,7 @@ protected:
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   CiTimingGP(ymuint id,
-	     tCellTimingType timing_type,
+	     tType timing_type,
 	     CellTime intrinsic_rise,
 	     CellTime intrinsic_fall,
 	     CellTime slope_rise,
@@ -264,7 +266,7 @@ private:
   /// @param[in] rise_resistance 立ち上がり遷移遅延パラメータ
   /// @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
   CiTimingGeneric(ymuint id,
-		  tCellTimingType timing_type,
+		  tType timing_type,
 		  CellTime intrinsic_rise,
 		  CellTime intrinsic_fall,
 		  CellTime slope_rise,
@@ -326,7 +328,7 @@ private:
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   CiTimingPiecewise(ymuint id,
-		    tCellTimingType timing_type,
+		    tType timing_type,
 		    CellTime intrinsic_rise,
 		    CellTime intrinsic_fall,
 		    CellTime slope_rise,
@@ -396,7 +398,7 @@ private:
   /// @param[in] cell_rise 立ち上がりセル遅延テーブル
   /// @param[in] cell_fall 立ち下がりセル遅延テーブル
   CiTimingNonlinear1(ymuint id,
-		     tCellTimingType timing_type,
+		     tType timing_type,
 		     CellLut* cell_rise,
 		     CellLut* cell_fall);
 
@@ -455,7 +457,7 @@ private:
   /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
   CiTimingNonlinear2(ymuint id,
-		     tCellTimingType timing_type,
+		     tType timing_type,
 		     CellLut* rise_transition,
 		     CellLut* fall_transition,
 		     CellLut* rise_propagation,

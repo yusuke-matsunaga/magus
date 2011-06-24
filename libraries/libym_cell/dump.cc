@@ -11,6 +11,7 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellPin.h"
 #include "ym_cell/CellTiming.h"
+
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/BinIO.h"
 
@@ -78,12 +79,11 @@ dump_library(ostream& s,
     vector<const CellTiming*> timing_list;
     for (ymuint j = 0; j < np; ++ j) {
       const CellPin* pin = cell->pin(j);
-      if ( pin->direction() != kDirOutput &&
-	   pin->direction() != kDirInout ) {
+      if ( !pin->is_output() && !pin->is_inout() ) {
 	continue;
       }
       for (ymuint k = 0; k < np; ++ k) {
-	const CellTiming* timing_p = pin->timing(k, kSensePosiUnate);
+	const CellTiming* timing_p = pin->timing(k, CellPin::kSensePosiUnate);
 	if ( timing_p ) {
 	  if ( timing_map.count(timing_p->id()) == 0 ) {
 	    ymuint pos = timing_list.size();
@@ -91,7 +91,7 @@ dump_library(ostream& s,
 	    timing_list.push_back(timing_p);
 	  }
 	}
-	const CellTiming* timing_n = pin->timing(k, kSenseNegaUnate);
+	const CellTiming* timing_n = pin->timing(k, CellPin::kSenseNegaUnate);
 	if ( timing_n ) {
 	  if ( timing_map.count(timing_n->id()) == 0 ) {
 	    ymuint pos = timing_list.size();
@@ -112,7 +112,7 @@ dump_library(ostream& s,
       const CellPin* pin = cell->pin(j);
       BinIO::write_str(s, pin->name());
       switch ( pin->direction() ) {
-      case kDirInput:
+      case CellPin::kDirInput:
 	// Input のつもり
 	BinIO::write_8(s, 1);
 	BinIO::write_double(s, pin->capacitance().value());
@@ -120,7 +120,7 @@ dump_library(ostream& s,
 	BinIO::write_double(s, pin->fall_capacitance().value());
 	break;
 
-      case kDirOutput:
+      case CellPin::kDirOutput:
 	// Output のつもり
 	BinIO::write_8(s, 2);
 	BinIO::write_double(s, pin->max_fanout().value());
@@ -130,7 +130,7 @@ dump_library(ostream& s,
 	BinIO::write_double(s, pin->max_transition().value());
 	BinIO::write_double(s, pin->min_transition().value());
 	for (ymuint k = 0; k < np; ++ k) {
-	  const CellTiming* timing_p = pin->timing(k, kSensePosiUnate);
+	  const CellTiming* timing_p = pin->timing(k, CellPin::kSensePosiUnate);
 	  if ( timing_p ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_p->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
@@ -138,7 +138,7 @@ dump_library(ostream& s,
 	    BinIO::write_32(s, k);
 	    BinIO::write_32(s, p->second);
 	  }
-	  const CellTiming* timing_n = pin->timing(k, kSenseNegaUnate);
+	  const CellTiming* timing_n = pin->timing(k, CellPin::kSenseNegaUnate);
 	  if ( timing_n ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
@@ -150,7 +150,7 @@ dump_library(ostream& s,
 	BinIO::write_8(s, 0); // timing 情報が終わった印
 	break;
 
-      case kDirInout:
+      case CellPin::kDirInout:
 	// InOut のつもり
 	BinIO::write_8(s, 3);
 	BinIO::write_double(s, pin->capacitance().value());
@@ -163,7 +163,7 @@ dump_library(ostream& s,
 	BinIO::write_double(s, pin->max_transition().value());
 	BinIO::write_double(s, pin->min_transition().value());
 	for (ymuint k = 0; k < np; ++ k) {
-	  const CellTiming* timing_p = pin->timing(k, kSensePosiUnate);
+	  const CellTiming* timing_p = pin->timing(k, CellPin::kSensePosiUnate);
 	  if ( timing_p ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_p->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
@@ -171,7 +171,7 @@ dump_library(ostream& s,
 	    BinIO::write_32(s, k);
 	    BinIO::write_32(s, p->second);
 	  }
-	  const CellTiming* timing_n = pin->timing(k, kSenseNegaUnate);
+	  const CellTiming* timing_n = pin->timing(k, CellPin::kSenseNegaUnate);
 	  if ( timing_n ) {
 	    hash_map<ymuint, ymuint>::iterator p = timing_map.find(timing_n->id());
 	    assert_cond( p != timing_map.end(), __FILE__, __LINE__);
@@ -183,7 +183,7 @@ dump_library(ostream& s,
 	BinIO::write_32(s, 0); // timing 情報が終わった印
 	break;
 
-      case kDirInternal:
+      case CellPin::kDirInternal:
 	// Internal のつもり
 	BinIO::write_8(s, 4);
       }
@@ -200,17 +200,17 @@ display_timing(ostream& s,
 	       const Cell* cell,
 	       const CellPin* opin,
 	       ymuint rpin_id,
-	       tCellTimingSense sense)
+	       CellPin::tTimingSense sense)
 {
   const CellTiming* timing = opin->timing(rpin_id, sense);
   if ( timing ) {
     s << "    Timing:" << endl
       << "      Related Pin     = " << cell->pin(rpin_id)->name() << endl
       << "      Sense           = ";
-    if ( sense == kSensePosiUnate ) {
+    if ( sense == CellPin::kSensePosiUnate ) {
       s << "positive unate";
     }
-    else if ( sense == kSenseNegaUnate ) {
+    else if ( sense == CellPin::kSenseNegaUnate ) {
       s << "negative unate";
     }
     else {
@@ -282,14 +282,14 @@ display_library(ostream& s,
 	<< "    Name             = " << pin->name() << endl;
 
       switch ( pin->direction() ) {
-      case kDirInput:
+      case CellPin::kDirInput:
 	s << "    Direction        = INPUT" << endl
 	  << "    Capacitance      = " << pin->capacitance() << endl
 	  << "    Rise Capacitance = " << pin->rise_capacitance() << endl
 	  << "    Fall Capacitance = " << pin->fall_capacitance() << endl;
 	break;
 
-      case kDirOutput:
+      case CellPin::kDirOutput:
 	s << "    Direction        = OUTPUT" << endl;
 	if ( pin->has_function() ) {
 	  s << "    Function         = " << pin->function() << endl;
@@ -304,12 +304,12 @@ display_library(ostream& s,
 	  << "    Max Transition   = " << pin->max_transition() << endl
 	  << "    Min Transition   = " << pin->min_transition() << endl;
 	for (ymuint k = 0; k < np; ++ k) {
-	  display_timing(s, cell, pin, k, kSensePosiUnate);
-	  display_timing(s, cell, pin, k, kSenseNegaUnate);
+	  display_timing(s, cell, pin, k, CellPin::kSensePosiUnate);
+	  display_timing(s, cell, pin, k, CellPin::kSenseNegaUnate);
 	}
 	break;
 
-      case kDirInout:
+      case CellPin::kDirInout:
 	s << "    Direction        = INOUT" << endl;
 	if ( pin->has_function() ) {
 	  s << "    Function         = " << pin->function() << endl;
@@ -327,12 +327,12 @@ display_library(ostream& s,
 	  << "    Max Transition   = " << pin->max_transition() << endl
 	  << "    Min Transition   = " << pin->min_transition() << endl;
 	for (ymuint k = 0; k < np; ++ k) {
-	  display_timing(s, cell, pin, k, kSensePosiUnate);
-	  display_timing(s, cell, pin, k, kSenseNegaUnate);
+	  display_timing(s, cell, pin, k, CellPin::kSensePosiUnate);
+	  display_timing(s, cell, pin, k, CellPin::kSenseNegaUnate);
 	}
 	break;
 
-      case kDirInternal:
+      case CellPin::kDirInternal:
 	s << "    Direction        = INTERNAL" << endl;
 	break;
 

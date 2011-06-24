@@ -41,7 +41,7 @@ CiLibrary::name() const
 
 // @brief テクノロジの取得
 // このクラスは常に kTechAsic を返す．
-tCellTechnology
+CellLibrary::tTechnology
 CiLibrary::technology() const
 {
   return kTechAsic;
@@ -53,7 +53,7 @@ CiLibrary::technology() const
 // - kDelayPiecewise
 // - kDelayNonlinear
 // のいずれか
-tCellDelayModel
+CellLibrary::tDelayModel
 CiLibrary::delay_model() const
 {
   return kDelayGeneric;
@@ -492,7 +492,7 @@ CiLibrary::set_timing_array(CiPin* pin,
 // @param[in] fall_resistance 立ち下がり負荷依存係数
 CellTiming*
 CiLibrary::new_timing(ymuint id,
-		      tCellTimingType type,
+		      CellTiming::tType type,
 		      CellTime intrinsic_rise,
 		      CellTime intrinsic_fall,
 		      CellTime slope_rise,
@@ -521,7 +521,7 @@ void
 CiLibrary::set_opin_timing(CiCell* cell,
 			   ymuint opin_id,
 			   ymuint ipin_id,
-			   tCellTimingSense sense,
+			   CellPin::tTimingSense sense,
 			   const CellTiming* timing)
 {
   CiPin* pin = cell->mPinArray[opin_id];

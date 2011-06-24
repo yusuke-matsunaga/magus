@@ -12,6 +12,8 @@
 
 
 #include "ym_cell/CellPin.h"
+#include "ym_cell/CellTime.h"
+#include "ym_cell/CellCapacitance.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/ShString.h"
 
@@ -52,6 +54,26 @@ public:
   virtual
   string
   name() const;
+
+  /// @brief 入力ピンの時に true を返す．
+  virtual
+  bool
+  is_input() const;
+
+  /// @brief 出力ピンの時に true を返す．
+  virtual
+  bool
+  is_output() const;
+
+  /// @brief 入出力ピンの時に true を返す．
+  virtual
+  bool
+  is_inout() const;
+
+  /// @brief 内部ピンの時に true を返す．
+  virtual
+  bool
+  is_internal() const;
 
 
 public:
@@ -138,7 +160,7 @@ public:
   virtual
   const CellTiming*
   timing(ymuint ipos,
-	 tCellTimingSense sense) const;
+	 tTimingSense sense) const;
 
 
 private:
@@ -170,7 +192,7 @@ private:
   virtual
   void
   set_timing(ymuint pin_id,
-	     tCellTimingSense sense,
+	     tTimingSense sense,
 	     const CellTiming* timing);
 
 
@@ -221,8 +243,13 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tCellDirection
+  tDirection
   direction() const;
+
+  /// @brief 入力ピンの時に true を返す．
+  virtual
+  bool
+  is_input() const;
 
 
 public:
@@ -265,9 +292,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class CiOutputPin CiPin.h "CiPin.h"
-/// @brief セルの出力ピンを表すクラス
+/// @brief セルの出力ピンと入出力ピンの基底クラス
 //////////////////////////////////////////////////////////////////////
-class CiOutputPin :
+class CiOutputPinBase :
   public CiPin
 {
   friend class CiLibrary;
@@ -282,28 +309,17 @@ protected:
   /// @param[in] min_capacitance 最小負荷容量
   /// @param[in] max_transition 最大遷移時間
   /// @param[in] min_transition 最小遷移時間
-  CiOutputPin(const ShString& name,
-	      CellCapacitance max_fanout,
-	      CellCapacitance min_fanout,
-	      CellCapacitance max_capacitance,
-	      CellCapacitance min_capacitance,
-	      CellTime max_transition,
-	      CellTime min_transition);
+  CiOutputPinBase(const ShString& name,
+		  CellCapacitance max_fanout,
+		  CellCapacitance min_fanout,
+		  CellCapacitance max_capacitance,
+		  CellCapacitance min_capacitance,
+		  CellTime max_transition,
+		  CellTime min_transition);
 
   /// @brief デストラクタ
   virtual
-  ~CiOutputPin();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 共通属性
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 方向を返す．
-  virtual
-  tCellDirection
-  direction() const;
+  ~CiOutputPinBase();
 
 
 public:
@@ -369,7 +385,7 @@ public:
   virtual
   const CellTiming*
   timing(ymuint ipos,
-	 tCellTimingSense sense) const;
+	 tTimingSense sense) const;
 
 
 private:
@@ -400,7 +416,7 @@ private:
   virtual
   void
   set_timing(ymuint pin_id,
-	     tCellTimingSense sense,
+	     tTimingSense sense,
 	     const CellTiming* timing);
 
 
@@ -447,12 +463,62 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class CiOutputPin CiPin.h "CiPin.h"
+/// @brief セルの出力ピンを表すクラス
+//////////////////////////////////////////////////////////////////////
+class CiOutputPin :
+  public CiOutputPinBase
+{
+  friend class CiLibrary;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] name ピン名
+  /// @param[in] max_fanout 最大ファンアウト容量
+  /// @param[in] min_fanout 最小ファンアウト容量
+  /// @param[in] max_capacitance 最大負荷容量
+  /// @param[in] min_capacitance 最小負荷容量
+  /// @param[in] max_transition 最大遷移時間
+  /// @param[in] min_transition 最小遷移時間
+  CiOutputPin(const ShString& name,
+	      CellCapacitance max_fanout,
+	      CellCapacitance min_fanout,
+	      CellCapacitance max_capacitance,
+	      CellCapacitance min_capacitance,
+	      CellTime max_transition,
+	      CellTime min_transition);
+
+  /// @brief デストラクタ
+  virtual
+  ~CiOutputPin();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 共通属性
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 方向を返す．
+  virtual
+  tDirection
+  direction() const;
+
+  /// @brief 出力ピンの時に true を返す．
+  virtual
+  bool
+  is_output() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class CiInoutPin CiPin.h "CiPin.h"
 /// @brief セルの入出力ピンを表すクラス
 /// @note 多重継承はオーバーヘッドがかかるので愚直な実装を用いている．
 //////////////////////////////////////////////////////////////////////
 class CiInoutPin :
-  public CiOutputPin
+  public CiOutputPinBase
 {
   friend class CiLibrary;
 
@@ -492,8 +558,13 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tCellDirection
+  tDirection
   direction() const;
+
+  /// @brief 入出力ピンの時に true を返す．
+  virtual
+  bool
+  is_inout() const;
 
 
 public:
@@ -561,8 +632,13 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tCellDirection
+  tDirection
   direction() const;
+
+  /// @brief 内部ピンの時に true を返す．
+  virtual
+  bool
+  is_internal() const;
 
 };
 

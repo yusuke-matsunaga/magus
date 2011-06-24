@@ -11,7 +11,6 @@
 /// All rights reserved.
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/cell_type.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

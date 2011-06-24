@@ -10,6 +10,12 @@
 
 
 #include "ym_cell/CellLibrary.h"
+#include "ym_cell/CellArea.h"
+#include "ym_cell/CellTime.h"
+#include "ym_cell/CellCapacitance.h"
+#include "ym_cell/CellResistance.h"
+#include "ym_cell/CellTiming.h"
+#include "ym_cell/CellPin.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ShString.h"
 #include "ym_logic/LogExpr.h"
@@ -51,7 +57,7 @@ public:
   /// @brief テクノロジの取得
   /// このクラスは常に kTechAsic を返す．
   virtual
-  tCellTechnology
+  tTechnology
   technology() const;
 
   /// @brief 遅延モデルの取得
@@ -61,7 +67,7 @@ public:
   /// - kDelayNonlinear
   /// のいずれか
   virtual
-  tCellDelayModel
+  tDelayModel
   delay_model() const;
 
   /// @brief バス命名規則の取得
@@ -333,7 +339,7 @@ public:
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
   CellTiming*
   new_timing(ymuint id,
-	     tCellTimingType type,
+	     CellTiming::tType type,
 	     CellTime intrinsic_rise,
 	     CellTime intrinsic_fall,
 	     CellTime slope_rise,
@@ -351,7 +357,7 @@ public:
   set_opin_timing(CiCell* cell,
 		  ymuint opin_id,
 		  ymuint ipin_id,
-		  tCellTimingSense sense,
+		  CellPin::tTimingSense sense,
 		  const CellTiming* timing);
 
   /// @brief 出力ピンの機能を設定する．

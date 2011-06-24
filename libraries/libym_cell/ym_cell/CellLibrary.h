@@ -12,7 +12,6 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/cell_type.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -23,6 +22,24 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellLibrary
 {
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @brief テクノロジを表す列挙型
+  //////////////////////////////////////////////////////////////////////
+  enum tTechnology {
+    kTechAsic,
+    kTechFpga
+  };
+
+  //////////////////////////////////////////////////////////////////////
+  /// @brief 遅延モデルを表す列挙型
+  //////////////////////////////////////////////////////////////////////
+  enum tDelayModel {
+    kDelayGeneric,
+    kDelayPiecewise,
+    kDelayNonlinear
+  };
+
 public:
 
   /// @brief コンストラクタ
@@ -49,7 +66,7 @@ public:
   /// - kTechFpga
   /// のどちらか
   virtual
-  tCellTechnology
+  tTechnology
   technology() const = 0;
 
   /// @brief 遅延モデルの取得
@@ -59,7 +76,7 @@ public:
   /// - kDelayNonlinear
   /// のいずれか
   virtual
-  tCellDelayModel
+  tDelayModel
   delay_model() const = 0;
 
   /// @brief バス命名規則の取得

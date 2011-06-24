@@ -45,6 +45,11 @@ BEGIN_NAMESPACE_YM_CELL
 // クラスの前方参照
 //////////////////////////////////////////////////////////////////////
 
+class CellArea;
+class CellTime;
+class CellCapaciance;
+class CellResistance;
+
 class CellLibrary;
 class Cell;
 class CellPin;
@@ -61,6 +66,11 @@ class CellDotlibReader;
 END_NAMESPACE_YM_CELL
 
 BEGIN_NAMESPACE_YM
+
+using nsCell::CellArea;
+using nsCell::CellTime;
+using nsCell::CellCapaciance;
+using nsCell::CellResistance;
 
 using nsCell::CellLibrary;
 using nsCell::Cell;

@@ -95,7 +95,7 @@ restore_library(istream& s)
       CellTime s_f( BinIO::read_double(s) );
       CellResistance r_r( BinIO::read_double(s) );
       CellResistance f_r( BinIO::read_double(s) );
-      timing_list[j] = library->new_timing(j, kTimingCombinational,
+      timing_list[j] = library->new_timing(j, CellTiming::kTimingCombinational,
 					   i_r, i_f, s_r, s_f, r_r, f_r);
     }
 
@@ -131,13 +131,15 @@ restore_library(istream& s)
 	      ymuint pin_id = BinIO::read_32(s);
 	      ymuint timing_id = BinIO::read_32(s);
 	      const CellTiming* timing = timing_list[timing_id];
-	      library->set_opin_timing(cell, j, pin_id, kSensePosiUnate, timing);
+	      library->set_opin_timing(cell, j, pin_id,
+				       CellPin::kSensePosiUnate, timing);
 	    }
 	    else if ( unate == 2 ) {
 	      ymuint pin_id = BinIO::read_32(s);
 	      ymuint timing_id = BinIO::read_32(s);
 	      const CellTiming* timing = timing_list[timing_id];
-	      library->set_opin_timing(cell, j, pin_id, kSenseNegaUnate, timing);
+	      library->set_opin_timing(cell, j, pin_id,
+				       CellPin::kSenseNegaUnate, timing);
 	    }
 	  }
 	}
@@ -166,13 +168,15 @@ restore_library(istream& s)
 	      ymuint pin_id = BinIO::read_32(s);
 	      ymuint timing_id = BinIO::read_32(s);
 	      const CellTiming* timing = timing_list[timing_id];
-	      library->set_opin_timing(cell, j, pin_id, kSensePosiUnate, timing);
+	      library->set_opin_timing(cell, j, pin_id,
+				       CellPin::kSensePosiUnate, timing);
 	    }
 	    else if ( unate == 2 ) {
 	      ymuint pin_id = BinIO::read_32(s);
 	      ymuint timing_id = BinIO::read_32(s);
 	      const CellTiming* timing = timing_list[timing_id];
-	      library->set_opin_timing(cell, j, pin_id, kSenseNegaUnate, timing);
+	      library->set_opin_timing(cell, j, pin_id,
+				       CellPin::kSenseNegaUnate, timing);
 	    }
 	  }
 	}

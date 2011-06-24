@@ -195,19 +195,19 @@ gen_library(const string& lib_name,
       const MislibNode* pt_pin = ipin_array[i];
       TvFunc p_func = tv_function.cofactor(i, kPolPosi);
       TvFunc n_func = tv_function.cofactor(i, kPolNega);
-      tCellTimingSense sense_real = kSenseNonUnate;
+      CellPin::tTimingSense sense_real = CellPin::kSenseNonUnate;
       bool redundant = false;
       if ( ~p_func && n_func ) {
 	if ( ~n_func && p_func ) {
-	  sense_real = kSenseNonUnate;
+	  sense_real = CellPin::kSenseNonUnate;
 	}
 	else {
-	  sense_real = kSenseNegaUnate;
+	  sense_real = CellPin::kSenseNegaUnate;
 	}
       }
       else {
 	if ( ~n_func && p_func ) {
-	  sense_real = kSensePosiUnate;
+	  sense_real = CellPin::kSensePosiUnate;
 	}
 	else {
 	  // つまり p_func == n_func ということ．
@@ -224,18 +224,18 @@ gen_library(const string& lib_name,
 	}
       }
 
-      tCellTimingSense sense = kSenseNonUnate;
+      CellPin::tTimingSense sense = CellPin::kSenseNonUnate;
       switch ( pt_pin->phase()->type() ) {
       case MislibNode::kNoninv:
-	sense = kSensePosiUnate;
+	sense = CellPin::kSensePosiUnate;
 	break;
 
       case MislibNode::kInv:
-	sense = kSenseNegaUnate;
+	sense = CellPin::kSenseNegaUnate;
 	break;
 
       case MislibNode::kUnknown:
-	sense = kSenseNonUnate;
+	sense = CellPin::kSenseNonUnate;
 	break;
 
       default:
@@ -257,7 +257,8 @@ gen_library(const string& lib_name,
       CellResistance r_r(pt_pin->rise_fanout_delay()->num());
       CellTime f_i(pt_pin->fall_block_delay()->num());
       CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-      CellTiming* timing = library->new_timing(i, kTimingCombinational,
+      CellTiming* timing = library->new_timing(i,
+					       CellTiming::kTimingCombinational,
 					       r_i, f_i,
 					       CellTime(0.0), CellTime(0.0),
 					       r_r, f_r);
