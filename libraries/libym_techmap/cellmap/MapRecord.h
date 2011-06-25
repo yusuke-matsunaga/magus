@@ -52,10 +52,12 @@ public:
   /// @param[in] dff D-FF
   /// @param[in] cell セル
   /// @param[in] pos_array ピン情報の配列
+  /// @param[in] phase 入力ピンの極性情報
   void
   set_dff_match(const BdnDff* dff,
 		const Cell* cell,
-		FFPosArray pos_array);
+		FFPosArray pos_array,
+		ymuint phase);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
@@ -135,6 +137,10 @@ private:
 
     // ピンの割り当て情報
     FFPosArray mPosArray;
+
+    // ピンの極性情報
+    ymuint32 mPhase;
+
   };
 
   // ラッチの割り当て情報

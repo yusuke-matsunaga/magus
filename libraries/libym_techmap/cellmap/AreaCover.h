@@ -110,6 +110,7 @@ private:
 
     const Cell* mCell;
     FFPosArray mPosArray;
+    ymuint32 mPhase;
   };
 
 

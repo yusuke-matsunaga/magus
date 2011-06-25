@@ -42,15 +42,6 @@ public:
   const FFPosArray&
   pos_array() const;
 
-  /// @brief セル数を返す．
-  ymuint
-  cell_num() const;
-
-  /// @brief セルを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
-  const Cell*
-  cell(ymuint pos) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -59,9 +50,6 @@ private:
 
   // ピン番号の情報
   FFPosArray mPosArray;
-
-  // セルのリスト
-  vector<const Cell*> mCellList;
 
 };
 
@@ -88,23 +76,6 @@ const FFPosArray&
 FFGroup::pos_array() const
 {
   return mPosArray;
-}
-
-// @brief セル数を返す．
-inline
-ymuint
-FFGroup::cell_num() const
-{
-  return mCellList.size();
-}
-
-// @brief セルを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
-inline
-const Cell*
-FFGroup::cell(ymuint pos) const
-{
-  return mCellList[pos];
 }
 
 END_NAMESPACE_YM_CELLMAP

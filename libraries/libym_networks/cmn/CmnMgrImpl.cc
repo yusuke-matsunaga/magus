@@ -373,7 +373,7 @@ CmnMgrImpl::new_dff(const CmnDffCell* cell,
   mDffItvlMgr.erase(id);
   ymuint uid = static_cast<ymuint>(id);
   dff->mId = uid;
-  if ( mDffArray.size() < uid ) {
+  if ( mDffArray.size() <= uid ) {
     mDffArray.resize(uid + 1, NULL);
   }
   mDffArray[uid] = dff;

@@ -113,11 +113,14 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       const Cell* min_cell = NULL;
       FFPosArray min_pos_array;
       CellArea min_area = CellArea::infty();
+      ymuint min_phase = 0U;
       for (ymuint i = 0; i < ffc_num; ++ i) {
 	const FFClass& ffc = cell_mgr.ff_class(i);
+	ymuint phase = 0U;
 	// クロックおよび制御ピンの極性の差を数値化したもの
 	ymuint diff = 0;
 	if ( ffc.clock_sense() != clock_sense ) {
+	  phase |= 1U;
 	  diff += 4;
 	}
 	if ( clear_sense != 0U ) {
@@ -125,6 +128,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 	    continue;
 	  }
 	  if ( ffc.clear_sense() != clear_sense ) {
+	    phase |= 2U;
 	    diff += 1;
 	  }
 	}
@@ -133,6 +137,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 	    continue;
 	  }
 	  if ( ffc.preset_sense() != preset_sense ) {
+	    phase |= 4U;
 	    diff += 1;
 	  }
 	}
@@ -155,6 +160,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 	      min_area = area;
 	      min_cell = cell;
 	      min_pos_array = ffg.pos_array();
+	      min_phase = phase;
 	    }
 	  }
 	}
@@ -162,8 +168,9 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       assert_cond( min_cell != NULL, __FILE__, __LINE__);
       ff_info.mCell = min_cell;
       ff_info.mPosArray = min_pos_array;
+      ff_info.mPhase = min_phase;
     }
-    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray);
+    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray, ff_info.mPhase);
   }
 }
 

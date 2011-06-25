@@ -46,27 +46,28 @@ CmnDumper::dump(ostream& s,
       const CmnNode* input = port->input(0);
       const CmnNode* output = port->output(0);
       if ( input ) {
-	s << " I:" << input->id_str();
+	s << " INPUT(" << input->id_str() << ")";
       }
       if ( output ) {
-	s << " O:" << output->id_str();
+	s << " OUTPUT(" << output->id_str() << ") = "
+	  << output->fanin(0)->id_str();
       }
     }
     else {
-      s << "{";
-      const char* comma = "";
+      s << "{" << endl;
       for (ymuint j = 0; j < nb; ++ j) {
 	ymuint idx = nb - j - 1;
 	const CmnNode* input = port->input(idx);
 	const CmnNode* output = port->output(idx);
-	s << comma;
-	comma = ", ";
+	s << "    ";
 	if ( input ) {
-	  s << " I:" << input->id_str();
+	  s << " INPUT(" << input->id_str() << ")";
 	}
 	if ( output ) {
-	  s << " O:" << output->id_str();
+	  s << " OUTPUT(" << output->id_str() << ") = "
+	    << output->fanin(0)->id_str();
 	}
+	s << endl;
       }
       s << "}";
     }
@@ -81,13 +82,17 @@ CmnDumper::dump(ostream& s,
       << "  Cell:   " << dff->cell()->cell()->name() << endl
       << "  Q:      " << dff->output1()->id_str() << endl
       << "  IQ:     " << dff->output2()->id_str() << endl
-      << "  DATA:   " << dff->input()->id_str() << endl
-      << "  CLOCK:  " << dff->clock()->id_str() << endl;
+      << "  DATA(" << dff->input()->id_str() << ") = "
+      << dff->input()->fanin(0)->id_str() << endl
+      << "  CLOCK(" << dff->clock()->id_str() << ") = "
+      << dff->clock()->fanin(0)->id_str() << endl;
     if ( dff->clear() ) {
-      s << "  CLEAR: " << dff->clear()->id_str() << endl;
+      s << "  CLEAR(" << dff->clear()->id_str() << ") = "
+	<< dff->clear()->fanin(0)->id_str() << endl;
     }
     if ( dff->preset() ) {
-      s << "  PRESET: " << dff->preset()->id_str() << endl;
+      s << "  PRESET(" << dff->preset()->id_str() << ") = "
+	<< dff->preset()->fanin(0)->id_str() << endl;
     }
     s << endl;
   }
@@ -113,31 +118,6 @@ CmnDumper::dump(ostream& s,
     s << endl;
   }
 
-#if 0
-  const CmnNodeList& input_list = network.input_list();
-  for (CmnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const CmnNode* node = *p;
-    s << "INPUT#" << node->subid() << "(" << node->id_str() << ")"
-      << " : " << network.port(node)->name()
-      << "[" << network.port_pos(node) << "]"
-      << endl;
-  }
-
-  const CmnNodeList& output_list = network.output_list();
-  for (CmnNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const CmnNode* node = *p;
-    const CmnEdge* e = node->fanin_edge(0);
-    const CmnNode* inode = e->from();
-    s << "OUTPUT#" << node->subid() << "(" << node->id_str() << ")"
-      << " : " << network.port(node)->name()
-      << "[" << network.port_pos(node) << "]"
-      << " = " << inode->id_str() << endl;
-  }
-#endif
-
-#if 0
   const CmnNodeList& logic_list = network.logic_list();
   for (CmnNodeList::const_iterator p = logic_list.begin();
        p != logic_list.end(); ++ p) {
@@ -154,26 +134,6 @@ CmnDumper::dump(ostream& s,
     }
     s << ")" << endl;
   }
-#else
-  vector<const CmnNode*> node_list;
-  network.sort(node_list);
-  for (vector<const CmnNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    const CmnNode* node = *p;
-    const Cell* cell = node->cell();
-    s << "CELL(" << node->id_str() << ") = "
-      << cell->name() << "(";
-    const char* comma = "";
-    ymuint ni = node->ni();
-    for (ymuint i = 0; i < ni; ++ i) {
-      const CmnNode* inode = node->fanin(i);
-      s << comma << inode->id_str();
-      comma = ", ";
-    }
-    s << ")" << endl;
-  }
-
-#endif
 }
 
 

@@ -133,7 +133,7 @@ CellMgr::load_library(istream& s)
   }
 
   // FFクラスの情報を読み込む．
-  ymuint mFFClassNum = BinIO::read_32(s);
+  mFFClassNum = BinIO::read_32(s);
   {
     void* p = mAlloc.get_memory(sizeof(FFClass) * mFFClassNum);
     mFFClassArray = new (p) FFClass[mFFClassNum];
@@ -152,6 +152,8 @@ CellMgr::load_library(istream& s)
       ff_class.mGroupList[j] = &mFFGroupArray[id];
     }
   }
+
+  //dump(cout, *this);
 
   return true;
 }
