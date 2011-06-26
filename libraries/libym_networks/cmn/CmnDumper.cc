@@ -148,7 +148,7 @@ node_name(const CmnNode* node)
 
 END_NONAMESPACE
 
-#if 0
+
 // 内容を Verilog-HDL 形式で s に出力する．
 void
 CmnDumper::dump_verilog(ostream& s,
@@ -170,7 +170,7 @@ CmnDumper::dump_verilog(ostream& s,
     assert_cond( nb > 0, __FILE__, __LINE__);
     if ( nb == 1 ) {
       const CmnNode* input = port->input(0);
-      s << node_name(node);
+      s << node_name(input);
     }
     else {
       s << "{";
@@ -178,7 +178,7 @@ CmnDumper::dump_verilog(ostream& s,
       for (ymuint j = 0; j < nb; ++ j) {
 	ymuint idx = nb - j - 1;
 	const CmnNode* input = port->input(idx);
-	s << comma << node_name(node);
+	s << comma << node_name(input);
 	comma = ", ";
       }
       s << "}";
@@ -200,12 +200,12 @@ CmnDumper::dump_verilog(ostream& s,
     s << "  output " << node_name(node) << ";" << endl;
   }
 
-  for (CmnNodeList::const_iterator p = dff_list.begin();
+  for (CmnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
   }
 
-  for (CmnNodeList::const_iterator p = cellnode_list.begin();
-       p != cellnode_list.end(); ++ p) {
+  for (CmnNodeList::const_iterator p = logic_list.begin();
+       p != logic_list.end(); ++ p) {
     const CmnNode* node = *p;
     s << "  wire   " << node_name(node) << ";" << endl;
   }
@@ -213,15 +213,14 @@ CmnDumper::dump_verilog(ostream& s,
   for (CmnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const CmnNode* node = *p;
-    const CmnEdge* e = node->fanin_edge(0);
-    const CmnNode* inode = e->from();
+    const CmnNode* inode = node->fanin(0);
     assert_cond( inode != NULL, __FILE__, __LINE__);
     s << "  assign " << node_name(node)
       << " = " << node_name(inode) << ";" << endl;
   }
 
-  for (CmnNodeList::const_iterator p = cellnode_list.begin();
-       p != cellnode_list.end(); ++ p) {
+  for (CmnNodeList::const_iterator p = logic_list.begin();
+       p != logic_list.end(); ++ p) {
     const CmnNode* node = *p;
     const Cell* cell = node->cell();
     assert_cond( cell != NULL, __FILE__, __LINE__);
@@ -232,11 +231,11 @@ CmnDumper::dump_verilog(ostream& s,
     for (ymuint i = 0; i < np; ++ i) {
       const CellPin* pin = cell->pin(i);
       const CmnNode* node1 = NULL;
-      if ( pin->direction() == nsCell::kDirInput ) {
+      if ( pin->is_input() ) {
 	node1 = node->fanin(ipos);
 	++ ipos;
       }
-      else if ( pin->direction() == nsCell::kDirOutput ) {
+      else if ( pin->is_output() ) {
 	node1 = node;
       }
       s << comma << "." << pin->name() << "(" << node_name(node1) << ")";
@@ -246,6 +245,6 @@ CmnDumper::dump_verilog(ostream& s,
   }
   s << "endmodule" << endl;
 }
-#endif
+
 
 END_NAMESPACE_YM_NETWORKS
