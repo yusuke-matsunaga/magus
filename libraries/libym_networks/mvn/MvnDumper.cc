@@ -31,15 +31,27 @@ BEGIN_NONAMESPACE
 // MvnInputPin の内容を出力する．
 void
 dump_inputpin(ostream& s,
-	      const MvnInputPin* pin)
+	      const MvnInputPin* pin,
+	      const string& pin_name)
 {
-  s << "  InputPin#" << pin->pos()
+  s << "  " << pin_name
     << "(" << pin->bit_width() << ")" << endl;
   const MvnOutputPin* opin = pin->src_pin();
   if ( opin ) {
     s << "    <== OutputPin#" << opin->pos()
       << "@node#" << opin->node()->id() << endl;
   }
+}
+
+// MvnInputPin の内容を出力する．
+void
+dump_inputpin(ostream& s,
+	      const MvnInputPin* pin)
+{
+  ostringstream buf;
+  buf << "InputPin#" << pin->pos();
+  string pin_name = buf.str();
+  dump_inputpin(s, pin, pin_name);
 }
 
 // MvnOutputPin の内容を出力する．
@@ -126,21 +138,29 @@ dump_node(ostream& s,
     assert_not_reached(__FILE__, __LINE__);
   }
   s << endl;
-  ymuint ni = node->input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const MvnInputPin* pin = node->input(i);
-    dump_inputpin(s, pin);
-  }
-  ymuint no = node->output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    const MvnOutputPin* pin = node->output(i);
-    dump_outputpin(s, pin);
-  }
+
   if ( node->type() == MvnNode::kDff ) {
+    const MvnInputPin* input = node->input(0);
+    dump_inputpin(s, input, "DataInput");
+    const MvnInputPin* clock = node->input(1);
+    dump_inputpin(s, clock, "Clock");
+    s << "    ";
+    if ( node->clock_pol() ) {
+      s << "posedge";
+    }
+    else {
+      s << "negedge";
+    }
+    s << endl;
+    ymuint ni = node->input_num();
     ymuint nc = (ni - 2) / 2;
     for (ymuint i = 0; i < nc; ++ i) {
-      s << "  Control#" << i << "(InputPin#" << (i * 2) + 2 << ")" << endl
-	<< "    ";
+      const MvnInputPin* cpin = node->input((i * 2) + 2);
+      ostringstream buf;
+      buf << "Control#" << i;
+      string pin_name = buf.str();
+      dump_inputpin(s, cpin, pin_name);
+      s << "    ";
       if ( node->control_pol(i) ) {
 	s << "posedge";
       }
@@ -148,6 +168,25 @@ dump_node(ostream& s,
 	s << "negedge";
       }
       s << endl;
+      const MvnInputPin* dpin = node->input((i * 2) + 3);
+      ostringstream buf2;
+      buf2 << "Data#" << i;
+      string pin_name2 = buf2.str();
+      dump_inputpin(s, dpin, pin_name2);
+    }
+  }
+  else if ( node->type() == MvnNode::kLatch ) {
+  }
+  else {
+    ymuint ni = node->input_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      const MvnInputPin* pin = node->input(i);
+      dump_inputpin(s, pin);
+    }
+    ymuint no = node->output_num();
+    for (ymuint i = 0; i < no; ++ i) {
+      const MvnOutputPin* pin = node->output(i);
+      dump_outputpin(s, pin);
     }
   }
   s << endl;

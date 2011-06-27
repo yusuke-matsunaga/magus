@@ -34,7 +34,7 @@ ymuint
 get_sense(ymuint32 bits,
 	  int idx)
 {
-  return (bits >> (5 * idx + 2)) & 3U;
+  return (bits >> (5 * idx + 3)) & 3U;
 }
 
 inline

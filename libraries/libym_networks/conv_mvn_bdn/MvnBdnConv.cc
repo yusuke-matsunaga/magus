@@ -14,6 +14,7 @@
 #include "ym_networks/BdnDff.h"
 #include "ym_networks/BdnLatch.h"
 #include "ym_networks/BdnNodeHandle.h"
+#include "ym_networks/BdnNode.h"
 #include "ym_networks/MvnMgr.h"
 #include "ym_networks/MvnModule.h"
 #include "ym_networks/MvnPort.h"
@@ -49,6 +50,24 @@
 
 
 BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
+
+void
+dump_nodehandle(ostream& s,
+		BdnNodeHandle h)
+{
+  if ( h.is_zero() ) {
+    s <<"ZERO";
+  }
+  else if ( h.is_one() ) {
+    s << "ONE";
+  }
+  else {
+    if ( h.inv() ) {
+      s << "~";
+    }
+    s << "Node#" << h.node()->id();
+  }
+}
 
 // @brief コンストラクタ
 MvnBdnConv::MvnBdnConv()
@@ -394,6 +413,9 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       assert_cond( clock_opin->bit_width() == 1, __FILE__, __LINE__);
       const MvnNode* clock_src_node = clock_opin->node();
       BdnNodeHandle clock_ihandle = mvnode_map.get(clock_src_node);
+      if ( node->clock_pol() == 0 ) {
+	clock_ihandle = ~clock_ihandle;
+      }
 
       // 非同期セット/非同期リセット
       vector<BdnNodeHandle> preset_array(bw, BdnNodeHandle::make_zero());
@@ -405,6 +427,9 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
 	const MvnOutputPin* ctrl_opin = ctrl_ipin->src_pin();
 	const MvnNode* ctrl_src_node = ctrl_opin->node();
 	BdnNodeHandle ctrl_dst_ihandle = mvnode_map.get(ctrl_src_node);
+	if ( node->control_pol(k) == 0 ) {
+	  ctrl_dst_ihandle = ~ctrl_dst_ihandle;
+	}
 	const MvnInputPin* val_ipin = node->input(k * 2 + 3);
 	const MvnOutputPin* val_opin = val_ipin->src_pin();
 	const MvnNode* val_src_node = val_opin->node();
