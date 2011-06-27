@@ -299,7 +299,8 @@ BdnNodeHandle
 BdnMgr::new_and(BdnNodeHandle inode1_handle,
 		BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, BdnMgrImpl::AND_00, inode1_handle, inode2_handle);
+  return mImpl->set_logic(NULL, BdnMgrImpl::AND,
+			  inode1_handle, inode2_handle);
 }
 
 // @brief AND ノードを作る．
@@ -322,7 +323,8 @@ BdnNodeHandle
 BdnMgr::new_nand(BdnNodeHandle inode1_handle,
 		 BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, BdnMgrImpl::NAND_00, inode1_handle, inode2_handle);
+  return ~mImpl->set_logic(NULL, BdnMgrImpl::AND,
+			   inode1_handle, inode2_handle);
 }
 
 // @brief NAND ノードを作る．
@@ -344,7 +346,8 @@ BdnNodeHandle
 BdnMgr::new_or(BdnNodeHandle inode1_handle,
 	       BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, BdnMgrImpl::OR_00, inode1_handle, inode2_handle);
+  return ~mImpl->set_logic(NULL, BdnMgrImpl::AND,
+			   ~inode1_handle, ~inode2_handle);
 }
 
 // @brief OR ノードを作る．
@@ -366,7 +369,8 @@ BdnNodeHandle
 BdnMgr::new_nor(BdnNodeHandle inode1_handle,
 		BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, BdnMgrImpl::NOR_00, inode1_handle, inode2_handle);
+  return mImpl->set_logic(NULL, BdnMgrImpl::AND,
+			  ~inode1_handle, ~inode2_handle);
 }
 
 // @brief NOR ノードを作る．
@@ -410,7 +414,7 @@ BdnNodeHandle
 BdnMgr::new_xnor(BdnNodeHandle inode1_handle,
 		 BdnNodeHandle inode2_handle)
 {
-  return mImpl->set_logic(NULL, BdnMgrImpl::XNOR, inode1_handle, inode2_handle);
+  return ~mImpl->set_logic(NULL, BdnMgrImpl::XOR, inode1_handle, inode2_handle);
 }
 
 // @brief XNOR ノードを作る．
@@ -432,7 +436,7 @@ BdnMgr::change_and(BdnNode* node,
 		   BdnNodeHandle inode1_handle,
 		   BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::AND_00,
+  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::AND,
 					      inode1_handle, inode2_handle);
   mImpl->change_logic(node, new_handle);
 }
@@ -457,9 +461,9 @@ BdnMgr::change_nand(BdnNode* node,
 		    BdnNodeHandle inode1_handle,
 		    BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::NAND_00,
+  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::AND,
 					      inode1_handle, inode2_handle);
-  mImpl->change_logic(node, new_handle);
+  mImpl->change_logic(node, ~new_handle);
 }
 
 // @brief NAND タイプに変更する．
@@ -482,9 +486,9 @@ BdnMgr::change_or(BdnNode* node,
 		  BdnNodeHandle inode1_handle,
 		  BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::OR_00,
-					      inode1_handle, inode2_handle);
-  mImpl->change_logic(node, new_handle);
+  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::AND,
+					      ~inode1_handle, ~inode2_handle);
+  mImpl->change_logic(node, ~new_handle);
 }
 
 // @brief OR タイプに変更する．
@@ -507,8 +511,8 @@ BdnMgr::change_nor(BdnNode* node,
 		   BdnNodeHandle inode1_handle,
 		   BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::NOR_00,
-					      inode1_handle, inode2_handle);
+  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::AND,
+					      ~inode1_handle, ~inode2_handle);
   mImpl->change_logic(node, new_handle);
 }
 
@@ -557,9 +561,9 @@ BdnMgr::change_xnor(BdnNode* node,
 		    BdnNodeHandle inode1_handle,
 		    BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::XNOR,
+  BdnNodeHandle new_handle = mImpl->set_logic(node, BdnMgrImpl::XOR,
 					      inode1_handle, inode2_handle);
-  mImpl->change_logic(node, new_handle);
+  mImpl->change_logic(node, ~new_handle);
 }
 
 // @brief XNOR タイプに変更する．

@@ -530,6 +530,7 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
 // @brief バランス木を作る．
 // @param[in] node 根のノード
 // @param[in] fcode 機能コード
+// @param[in] iinv 入力の反転属性
 // @param[in] start 開始位置
 // @param[in] num 要素数
 // @param[in] node_list 入力のノードのリスト
@@ -537,6 +538,7 @@ BdnMgrImpl::delete_latch(BdnLatch* latch)
 BdnNodeHandle
 BdnMgrImpl::make_tree(BdnNode* node,
 		      ymuint fcode,
+		      bool iinv,
 		      ymuint start,
 		      ymuint num,
 		      const vector<BdnNodeHandle>& node_list)
@@ -546,18 +548,28 @@ BdnMgrImpl::make_tree(BdnNode* node,
     assert_not_reached(__FILE__, __LINE__);
 
   case 1:
-    return node_list[start];
+    if ( iinv ) {
+      return ~node_list[start];
+    }
+    else {
+      return node_list[start];
+    }
 
   case 2:
-    return set_logic(node, fcode, node_list[start], node_list[start + 1]);
+    if ( iinv ) {
+      return set_logic(node, fcode, ~node_list[start], ~node_list[start + 1]);
+    }
+    else {
+      return set_logic(node, fcode, node_list[start], node_list[start + 1]);
+    }
 
   default:
     break;
   }
 
   ymuint nh = num / 2;
-  BdnNodeHandle l = make_tree(NULL, fcode, start, nh, node_list);
-  BdnNodeHandle r = make_tree(NULL, fcode, start + nh, num - nh, node_list);
+  BdnNodeHandle l = make_tree(NULL, fcode, iinv, start, nh, node_list);
+  BdnNodeHandle r = make_tree(NULL, fcode, iinv, start + nh, num - nh, node_list);
   return set_logic(node, fcode, l, r);
 }
 
@@ -684,19 +696,19 @@ BdnMgrImpl::set_logic(BdnNode* node,
   }
   else {
     // AND の場合
-    if ( inode0_handle.is_zero() ) {
+    if ( inode0_handle.is_one() ) {
       // 入力0が定数1だった．
       return inode1_handle;
     }
-    else if ( inode0_handle.is_one() ) {
+    else if ( inode0_handle.is_zero() ) {
       // 入力0が定数0だった．
       return BdnNodeHandle::make_zero();
     }
-    else if ( inode1_handle.is_zero() ) {
+    else if ( inode1_handle.is_one() ) {
       // 入力1が定数1だった．
       return inode0_handle;
     }
-    else if ( inode1_handle.is_one() ) {
+    else if ( inode1_handle.is_zero() ) {
       // 入力1が定数0だった．
       return BdnNodeHandle::make_zero();
     }
@@ -711,8 +723,8 @@ BdnMgrImpl::set_logic(BdnNode* node,
   }
 
   // 入力の反転属性
-  bool inv0 = inode0_handle.inv() ^ static_cast<bool>(fcode & 1U);
-  bool inv1 = inode1_handle.inv() ^ static_cast<bool>((fcode >> 1) & 1U);
+  bool inv0 = inode0_handle.inv();
+  bool inv1 = inode1_handle.inv();
 
   // 入力のノード
   BdnNode* inode0 = inode0_handle.node();
@@ -729,13 +741,13 @@ BdnMgrImpl::set_logic(BdnNode* node,
   }
 
   // 出力の反転属性
-  bool oinv = static_cast<bool>((fcode >> 3) & 1U);
+  bool oinv = false;
 
   // fcode の正規化
-  if ( fcode & 4U ) {
+  if ( fcode & XOR_BIT ) {
     // XOR の場合には入力に反転属性はつかない．
     oinv = inv0 ^ inv1;
-    fcode = 4U;
+    fcode = XOR;
   }
   else {
     fcode = static_cast<ymuint>(inv0) | (static_cast<ymuint>(inv1) << 1);
