@@ -22,6 +22,8 @@
 #include "FFGroup.h"
 #include "MapRecord.h"
 
+#include "ym_networks/BdnVerilogWriter.h"
+
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
@@ -107,6 +109,9 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       }
     }
     ymuint sig = (clock_sense - 1) + (clear_sense * 2) + (preset_sense) * 6;
+    cout << "clock_sense = " << clock_sense << endl
+	 << "clear_sense = " << clear_sense << endl
+	 << "preset_sense = " << preset_sense << endl;
     FFInfo& ff_info = mFFInfo[sig];
     if ( ff_info.mCell == NULL ) {
       ymuint min_diff = 7;
@@ -171,6 +176,11 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       ff_info.mPhase = min_phase;
     }
     maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray, ff_info.mPhase);
+    cout << "cell = " << ff_info.mCell->name() << endl
+	 << "  clock_sense = " << ff_info.mPosArray.clock_sense() << endl
+	 << "  clear_sense = " << ff_info.mPosArray.clear_sense() << endl
+	 << "  preset_sense = " << ff_info.mPosArray.preset_sense() << endl
+	 << endl;
   }
 }
 

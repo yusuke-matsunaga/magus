@@ -21,6 +21,7 @@
 #include "ym_networks/CmnLatch.h"
 
 #include "Match.h"
+#include "ym_networks/CmnDffCell.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -183,12 +184,13 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
       ymuint pos_array[6];
       const FFPosArray& pos_array_src = dff_info.mPosArray;
       pos_array[0] = pos_array_src.data_pos();
-      pos_array[1] = pos_array_src.clock_pos();
-      pos_array[2] = pos_array_src.clear_pos();
-      pos_array[3] = pos_array_src.preset_pos();
+      pos_array[1] = pos_array_src.clock_pos() | (pos_array_src.clock_sense() << 3);
+      pos_array[2] = pos_array_src.clear_pos() | (pos_array_src.clear_sense() << 3);
+      pos_array[3] = pos_array_src.preset_pos() | (pos_array_src.preset_sense() << 3);
       pos_array[4] = pos_array_src.q_pos();
       pos_array[5] = pos_array_src.iq_pos();
       dff_cell = mapgraph.reg_dff_cell(cell, pos_array);
+
     }
     CmnDff* dff = mapgraph.new_dff(dff_cell, sbj_dff->name());
 
