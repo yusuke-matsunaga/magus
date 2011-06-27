@@ -146,6 +146,15 @@ node_name(const CmnNode* node)
   return "n" + node->id_str();
 }
 
+// DFF の入力のノード名を返す．
+string
+dff_node_name(const CmnNode* node)
+{
+  const CmnNode* inode = node->fanin(0);
+  assert_cond( inode != NULL, __FILE__, __LINE__);
+  return node_name(inode);
+}
+
 END_NONAMESPACE
 
 
@@ -170,7 +179,13 @@ CmnDumper::dump_verilog(ostream& s,
     assert_cond( nb > 0, __FILE__, __LINE__);
     if ( nb == 1 ) {
       const CmnNode* input = port->input(0);
-      s << node_name(input);
+      const CmnNode* output = port->output(0);
+      if ( input ) {
+	s << node_name(input);
+      }
+      else if ( output ) {
+	s << node_name(output);
+      }
     }
     else {
       s << "{";
@@ -178,8 +193,15 @@ CmnDumper::dump_verilog(ostream& s,
       for (ymuint j = 0; j < nb; ++ j) {
 	ymuint idx = nb - j - 1;
 	const CmnNode* input = port->input(idx);
-	s << comma << node_name(input);
+	const CmnNode* output = port->output(idx);
+	s << comma;
 	comma = ", ";
+	if ( input ) {
+	  s << node_name(input);
+	}
+	else if ( output ) {
+	  s << node_name(output);
+	}
       }
       s << "}";
     }
@@ -191,17 +213,27 @@ CmnDumper::dump_verilog(ostream& s,
   for (CmnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const CmnNode* node = *p;
-    s << "  input  " << node_name(node) << ";" << endl;
+    if ( node->input_type() != CmnNode::kPRIMARY_INPUT ) {
+      continue;
+    }
+    if ( node->alt_node() ) {
+      s << "  inout  ";
+    }
+    else {
+      s << "  input  ";
+    }
+    s << node_name(node) << ";" << endl;
   }
 
   for (CmnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const CmnNode* node = *p;
-    s << "  output " << node_name(node) << ";" << endl;
-  }
-
-  for (CmnDffList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
+    if ( node->output_type() != CmnNode::kPRIMARY_OUTPUT ) {
+      continue;
+    }
+    if ( node->alt_node() == NULL ) {
+      s << "  output " << node_name(node) << ";" << endl;
+    }
   }
 
   for (CmnNodeList::const_iterator p = logic_list.begin();
@@ -210,13 +242,35 @@ CmnDumper::dump_verilog(ostream& s,
     s << "  wire   " << node_name(node) << ";" << endl;
   }
 
+  for (CmnDffList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const CmnDff* dff = *p;
+    const CmnNode* q = dff->output1();
+    const CmnNode* iq = dff->output2();
+    if ( q->fanout_num() > 0 ) {
+      s << "  wire    " << node_name(q) << ";" << endl;
+    }
+    if ( iq->fanout_num() > 0 ) {
+      s << "  wire    " << node_name(iq) << ";" << endl;
+    }
+  }
+
   for (CmnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const CmnNode* node = *p;
+    if ( node->output_type() != CmnNode::kPRIMARY_OUTPUT ) {
+      continue;
+    }
     const CmnNode* inode = node->fanin(0);
     assert_cond( inode != NULL, __FILE__, __LINE__);
-    s << "  assign " << node_name(node)
-      << " = " << node_name(inode) << ";" << endl;
+    s << "  assign ";
+    if ( node->alt_node() ) {
+      s << node_name(node->alt_node());
+    }
+    else {
+      s << node_name(node);
+    }
+    s << " = " << node_name(inode) << ";" << endl;
   }
 
   for (CmnNodeList::const_iterator p = logic_list.begin();
@@ -243,6 +297,43 @@ CmnDumper::dump_verilog(ostream& s,
     }
     s << ");" << endl;
   }
+
+  for (CmnDffList::const_iterator p = dff_list.begin();
+       p != dff_list.end(); ++ p) {
+    const CmnDff* dff = *p;
+    const CmnDffCell* dffcell = dff->cell();
+    const Cell* cell = dffcell->cell();
+    const CmnNode* onode1 = dff->output1();
+    s << "  " << cell->name() << " U" << onode1->id() << " (";
+    // データ入力
+    const CellPin* ipin = cell->pin(dffcell->data_pos());
+    s << "." << ipin->name() << "(" << dff_node_name(dff->input()) << ")";
+    // クロック入力
+    const CellPin* cpin = cell->pin(dffcell->clock_pos());
+    s << ", ." << cpin->name() << "(" << dff_node_name(dff->clock()) << ")";
+    // クリア入力
+    if ( dffcell->has_clear() ) {
+      const CellPin* rpin = cell->pin(dffcell->clear_pos());
+      s << ", ." << rpin->name() << "(" << dff_node_name(dff->clear()) << ")";
+    }
+    // プリセット入力
+    if ( dffcell->has_preset() ) {
+      const CellPin* ppin = cell->pin(dffcell->preset_pos());
+      s << ", ." << ppin->name() << "(" << dff_node_name(dff->preset()) << ")";
+    }
+    // 肯定出力
+    if ( dff->output1()->fanout_num() > 0 ) {
+      const CellPin* opin1 = cell->pin(dffcell->q_pos());
+      s << ", ." << opin1->name() << "(" << node_name(dff->output1()) << ")";
+    }
+    // 否定出力
+    if ( dff->output2()->fanout_num() > 0 ) {
+      const CellPin* opin2 = cell->pin(dffcell->iq_pos());
+      s << ", ." << opin2->name() << "(" << node_name(dff->output2()) << ")";
+    }
+    s << ");" << endl;
+  }
+
   s << "endmodule" << endl;
 }
 

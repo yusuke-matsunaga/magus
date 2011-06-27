@@ -63,17 +63,13 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
       }
       outp = &ofs;
     }
-#if 0
+    CmnDumper dumper;
     if ( verilog ) {
-      dump_verilog(*outp, cmnmgr());
+      dumper.dump_verilog(*outp, cmnmgr());
     }
     else {
-      dump(*outp, cmnmgr());
+      dumper.dump(*outp, cmnmgr());
     }
-#else
-    CmnDumper dumper;
-    dumper.dump(*outp, cmnmgr());
-#endif
     return TCL_OK;
 #if 0
   }
