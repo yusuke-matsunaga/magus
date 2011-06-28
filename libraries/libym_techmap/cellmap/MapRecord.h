@@ -52,12 +52,10 @@ public:
   /// @param[in] dff D-FF
   /// @param[in] cell セル
   /// @param[in] pos_array ピン情報の配列
-  /// @param[in] phase 入力ピンの極性情報
   void
   set_dff_match(const BdnDff* dff,
 		const Cell* cell,
-		FFPosArray pos_array,
-		ymuint phase);
+		FFPosArray pos_array);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
@@ -112,11 +110,15 @@ private:
   // 内部でのみ用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  // 出力ノードに接続したTFIコーンの生成を行う．
+  void
+  gen_tfi(const BdnNode* onode,
+	  bool ext_inv = false);
+
   // 最終結果を作るためのバックトレースを行う．
   CmnNode*
   back_trace(const BdnNode* node,
-	     bool inv,
-	     CmnMgr& mapnetwork);
+	     bool inv);
 
 
 private:
@@ -137,9 +139,6 @@ private:
 
     // ピンの割り当て情報
     FFPosArray mPosArray;
-
-    // ピンの極性情報
-    ymuint32 mPhase;
 
   };
 
@@ -199,6 +198,15 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 対象の CMN
+  CmnMgr* mMapGraph;
+
+  // 定数0セル
+  const Cell* mConst0;
+
+  // 定数1セル
+  const Cell* mConst1;
 
   // D-FF の割り当て情報を格納した配列
   // キーは BdnDff の ID 番号

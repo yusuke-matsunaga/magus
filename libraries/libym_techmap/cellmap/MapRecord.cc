@@ -69,13 +69,11 @@ MapRecord::copy(const MapRecord& src)
 void
 MapRecord::set_dff_match(const BdnDff* dff,
 			 const Cell* cell,
-			 FFPosArray pos_array,
-			 ymuint phase)
+			 FFPosArray pos_array)
 {
   DffInfo& dffinfo = mDffInfo[dff->id()];
   dffinfo.mCell = cell;
   dffinfo.mPosArray = pos_array;
-  dffinfo.mPhase = phase;
 }
 
 // @brief ラッチのマッチを記録する．
@@ -148,6 +146,10 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
 
   mapgraph.set_name(sbjgraph.name());
 
+  mMapGraph = &mapgraph;
+  mConst0 = const0_cell;
+  mConst1 = const1_cell;
+
   // ポートの生成
   ymuint np = sbjgraph.port_num();
   for (ymuint i = 0; i < np; ++ i) {
@@ -207,12 +209,16 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     const BdnNode* sbj_clock = sbj_dff->clock();
     CmnNode* clock = dff->_clock();
     get_node_info(sbj_clock, false).mMapNode = clock;
+    bool clock_inv = (dff_cell->clock_sense() == 2);
+    gen_tfi(sbj_clock, clock_inv);
 
     const BdnNode* sbj_clear = sbj_dff->clear();
     if ( sbj_clear->output_fanin() ) {
       CmnNode* clear = dff->_clear();
       assert_cond( clear != NULL, __FILE__, __LINE__);
       get_node_info(sbj_clear, false).mMapNode = clear;
+      bool clear_inv = (dff_cell->clear_sense() == 2);
+      gen_tfi(sbj_clear, clear_inv);
     }
 
     const BdnNode* sbj_preset = sbj_dff->preset();
@@ -220,6 +226,8 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
       CmnNode* preset = dff->_preset();
       assert_cond( preset != NULL, __FILE__, __LINE__);
       get_node_info(sbj_preset, false).mMapNode = preset;
+      bool preset_inv = (dff_cell->preset_sense() == 2);
+      gen_tfi(sbj_preset, preset_inv);
     }
   }
 
@@ -235,39 +243,45 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const BdnNode* onode = *p;
-    const BdnNode* node = onode->fanin(0);
-    if ( onode->output_type() == BdnNode::kDFF_CLEAR ||
+    if ( onode->output_type() == BdnNode::kDFF_CLOCK ||
+	 onode->output_type() == BdnNode::kDFF_CLEAR ||
 	 onode->output_type() == BdnNode::kDFF_PRESET ) {
-      if ( node == NULL ) {
-	continue;
-      }
+      continue;
     }
-    bool inv = onode->output_fanin_inv();
-    CmnNode* mapnode = NULL;
-    if ( node ) {
-      mapnode = back_trace(node, inv, mapgraph);
+    gen_tfi(onode, false);
+  }
+}
+
+// 出力ノードに接続したTFIコーンの生成を行う．
+void
+MapRecord::gen_tfi(const BdnNode* onode,
+		   bool ext_inv)
+{
+  const BdnNode* node = onode->fanin(0);
+  bool inv = onode->output_fanin_inv() ^ ext_inv;
+  CmnNode* mapnode = NULL;
+  if ( node ) {
+    mapnode = back_trace(node, inv);
+  }
+  else {
+    if ( inv ) {
+      // 定数1ノードを作る．
+      mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), mConst1);
     }
     else {
-      if ( inv ) {
-	// 定数1ノードを作る．
-	mapnode = mapgraph.new_logic(vector<CmnNode*>(0), const1_cell);
-      }
-      else {
-	// 定数0ノードを作る．
-	mapnode = mapgraph.new_logic(vector<CmnNode*>(0), const0_cell);
-      }
+      // 定数0ノードを作る．
+      mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), mConst0);
     }
-    CmnNode* omapnode = get_node_info(onode, false).mMapNode;
-    mapgraph.set_output_fanin(omapnode, mapnode);
   }
+  CmnNode* omapnode = get_node_info(onode, false).mMapNode;
+  mMapGraph->set_output_fanin(omapnode, mapnode);
 }
 
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
 CmnNode*
 MapRecord::back_trace(const BdnNode* node,
-		      bool inv,
-		      CmnMgr& mapnetwork)
+		      bool inv)
 {
   NodeInfo& node_info = get_node_info(node, inv);
   CmnNode* mapnode = node_info.mMapNode;
@@ -284,7 +298,7 @@ MapRecord::back_trace(const BdnNode* node,
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);
-    back_trace(inode, iinv, mapnetwork);
+    back_trace(inode, iinv);
   }
 
   mTmpFanins.clear();
@@ -299,7 +313,7 @@ MapRecord::back_trace(const BdnNode* node,
 
   // 新しいノードを作り mNodeMap に登録する．
   assert_cond( node_info.mCell != NULL, __FILE__, __LINE__);
-  mapnode = mapnetwork.new_logic(mTmpFanins, node_info.mCell);
+  mapnode = mMapGraph->new_logic(mTmpFanins, node_info.mCell);
   node_info.mMapNode = mapnode;
 
   return mapnode;

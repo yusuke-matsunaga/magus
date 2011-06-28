@@ -23,6 +23,7 @@
 #include "MapRecord.h"
 
 #include "ym_networks/BdnVerilogWriter.h"
+#include "ym_networks/BdnDumper.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -50,6 +51,15 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
 		      const CellMgr& cell_mgr,
 		      CmnMgr& mapnetwork)
 {
+#if 0
+  BdnDumper dumper;
+  dumper(cout, sbjgraph);
+#endif
+#if 0
+  BdnVerilogWriter dumper;
+  dumper(cout, sbjgraph);
+#endif
+
   MapRecord maprec;
 
   maprec.init(sbjgraph);
@@ -81,78 +91,27 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
        p != dff_list.end(); ++ p) {
     const BdnDff* dff = *p;
     const BdnNode* clock = dff->clock();
-    ymuint clock_sense = 0U;
-    if ( clock->output_fanin_inv() ) {
-      clock_sense = 2U;
-    }
-    else {
-      clock_sense = 1U;
-    }
     const BdnNode* clear = dff->clear();
-    ymuint clear_sense = 0U;
-    if ( clear->output_fanin() ) {
-      if ( clear->output_fanin_inv() ) {
-	clear_sense = 2U;
-      }
-      else {
-	clear_sense = 1U;
-      }
-    }
     const BdnNode* preset = dff->preset();
-    ymuint preset_sense = 0U;
-    if ( preset->output_fanin() ) {
-      if ( preset->output_fanin_inv() ) {
-	preset_sense = 2U;
-      }
-      else {
-	preset_sense = 1U;
-      }
+    ymuint sig = 0U;
+    if ( clear->output_fanin() ) {
+      sig |= 1U;
     }
-    ymuint sig = (clock_sense - 1) + (clear_sense * 2) + (preset_sense) * 6;
-    cout << "clock_sense = " << clock_sense << endl
-	 << "clear_sense = " << clear_sense << endl
-	 << "preset_sense = " << preset_sense << endl;
+    if ( preset->output_fanin() ) {
+      sig |= 2U;
+    }
     FFInfo& ff_info = mFFInfo[sig];
     if ( ff_info.mCell == NULL ) {
-      ymuint min_diff = 7;
       const Cell* min_cell = NULL;
       FFPosArray min_pos_array;
       CellArea min_area = CellArea::infty();
-      ymuint min_phase = 0U;
       for (ymuint i = 0; i < ffc_num; ++ i) {
 	const FFClass& ffc = cell_mgr.ff_class(i);
-	ymuint phase = 0U;
-	// クロックおよび制御ピンの極性の差を数値化したもの
-	ymuint diff = 0;
-	if ( ffc.clock_sense() != clock_sense ) {
-	  phase |= 1U;
-	  diff += 4;
-	}
-	if ( clear_sense != 0U ) {
-	  if ( ffc.clear_sense() == 0 ) {
-	    continue;
-	  }
-	  if ( ffc.clear_sense() != clear_sense ) {
-	    phase |= 2U;
-	    diff += 1;
-	  }
-	}
-	if ( preset_sense != 0U ) {
-	  if ( ffc.preset_sense() == 0 ) {
-	    continue;
-	  }
-	  if ( ffc.preset_sense() != preset_sense ) {
-	    phase |= 4U;
-	    diff += 1;
-	  }
-	}
-	if ( min_diff < diff ) {
+	if ( (sig & 1U) && ffc.clear_sense() == 0 ) {
 	  continue;
 	}
-	if ( min_diff > diff ) {
-	  min_diff = diff;
-	  min_cell = NULL;
-	  min_area = CellArea::infty();
+	if ( (sig & 2U) && ffc.preset_sense() == 0 ) {
+	  continue;
 	}
 	ymuint ng = ffc.group_num();
 	for (ymuint j = 0; j < ng; ++ j) {
@@ -165,7 +124,6 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 	      min_area = area;
 	      min_cell = cell;
 	      min_pos_array = ffg.pos_array();
-	      min_phase = phase;
 	    }
 	  }
 	}
@@ -173,14 +131,8 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       assert_cond( min_cell != NULL, __FILE__, __LINE__);
       ff_info.mCell = min_cell;
       ff_info.mPosArray = min_pos_array;
-      ff_info.mPhase = min_phase;
     }
-    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray, ff_info.mPhase);
-    cout << "cell = " << ff_info.mCell->name() << endl
-	 << "  clock_sense = " << ff_info.mPosArray.clock_sense() << endl
-	 << "  clear_sense = " << ff_info.mPosArray.clear_sense() << endl
-	 << "  preset_sense = " << ff_info.mPosArray.preset_sense() << endl
-	 << endl;
+    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray);
   }
 }
 

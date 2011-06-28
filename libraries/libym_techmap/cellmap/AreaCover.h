@@ -110,7 +110,6 @@ private:
 
     const Cell* mCell;
     FFPosArray mPosArray;
-    ymuint32 mPhase;
   };
 
 
@@ -120,7 +119,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // シグネチャをキーにして FFInfo を保持する配列
-  FFInfo mFFInfo[18];
+  FFInfo mFFInfo[4];
 
   // 各ノードのコストを保持する配列
   vector<double> mCostArray;

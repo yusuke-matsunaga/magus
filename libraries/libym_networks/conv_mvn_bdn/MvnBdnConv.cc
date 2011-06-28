@@ -51,6 +51,7 @@
 
 BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
 
+#if 0
 void
 dump_nodehandle(ostream& s,
 		BdnNodeHandle h)
@@ -68,6 +69,7 @@ dump_nodehandle(ostream& s,
     s << "Node#" << h.node()->id();
   }
 }
+#endif
 
 // @brief コンストラクタ
 MvnBdnConv::MvnBdnConv()
@@ -421,7 +423,6 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       vector<BdnNodeHandle> preset_array(bw, BdnNodeHandle::make_zero());
       vector<BdnNodeHandle> clear_array(bw, BdnNodeHandle::make_zero());
       ymuint nc = (node->input_num() - 2) / 2;
-      BdnNodeHandle mask = BdnNodeHandle::make_one();
       for (ymuint k = 0; k < nc; ++ k) {
 	const MvnInputPin* ctrl_ipin = node->input(k * 2 + 2);
 	const MvnOutputPin* ctrl_opin = ctrl_ipin->src_pin();
@@ -433,8 +434,7 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
 	const MvnInputPin* val_ipin = node->input(k * 2 + 3);
 	const MvnOutputPin* val_opin = val_ipin->src_pin();
 	const MvnNode* val_src_node = val_opin->node();
-	BdnNodeHandle cond = bdnetwork.new_and(mask, ctrl_dst_ihandle);
-	mask = bdnetwork.new_and(mask, ~ctrl_dst_ihandle);
+	BdnNodeHandle cond = ctrl_dst_ihandle;
 	for (ymuint j = 0; j < bw; ++ j) {
 	  BdnNodeHandle val_dst_ihandle = mvnode_map.get(val_src_node, j);
 	  BdnNodeHandle new_preset = bdnetwork.new_and(cond, val_dst_ihandle);

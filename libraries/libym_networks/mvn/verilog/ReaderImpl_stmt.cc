@@ -203,13 +203,11 @@ ReaderImpl::gen_assign(MvnModule* module,
 
     MvnNode* dst_node = NULL;
     if ( lhs1->is_primary() ) {
-      cout << "lhs1->is_primary()" << endl;
       MvnNode* src_node = gen_rhs(module, node, offset, bw);
       dst_node = mMvnMgr->new_through(module, bw);
       mMvnMgr->connect(src_node, 0, dst_node, 0);
     }
     else if ( lhs1->is_bitselect() ) {
-      cout << "lhs1->is_bitselect()" << endl;
 #if 0
       assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
 #warning "TODO: reg 型なら可変ビットセレクトもあり"
@@ -225,7 +223,6 @@ ReaderImpl::gen_assign(MvnModule* module,
 	bw_array.push_back(index);
       }
       dst_node = mMvnMgr->new_concat(module, bw_array);
-      cout << "dst_node = mMvnMgr->new_concat" << endl;
       ymuint pos = 0;
       if ( index < bw - 1 ) {
 	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
@@ -249,7 +246,6 @@ ReaderImpl::gen_assign(MvnModule* module,
 #endif
     }
     else if ( lhs1->is_partselect() ) {
-      cout << "lhs1->is_partselect()" << endl;
 #if 0
       assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
 #warning "TODO: reg 型なら可変範囲セレクトもあり"
