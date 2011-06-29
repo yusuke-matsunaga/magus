@@ -322,6 +322,14 @@ ModuleGen::instantiate_portref(ElbModule* module,
     if ( !stat ) {
       return NULL;
     }
+    if ( decl->bit_offset(index_val) == -1 ) {
+      // 添字が範囲外
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_index->file_region(),
+		      kMsgWarning,
+		      "ELAB",
+		      "Index is out of range.");
+    }
     return factory().new_BitSelect(pt_portref, primary, pt_index, index_val);
   }
   if ( pt_left && pt_right ) {
@@ -329,6 +337,22 @@ ModuleGen::instantiate_portref(ElbModule* module,
     int right_val = 0;
     if ( !evaluate_range(module, pt_left, pt_right, left_val, right_val) ) {
       return NULL;
+    }
+    if ( decl->bit_offset(left_val) == -1 ) {
+      // 左の添字が範囲外
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_left->file_region(),
+		      kMsgWarning,
+		      "ELAB",
+		      "Left index is out of range.");
+    }
+    if ( decl->bit_offset(right_val) == -1 ) {
+      // 右の添字が範囲外
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      pt_right->file_region(),
+		      kMsgWarning,
+		      "ELAB",
+		      "Right index is out of range.");
     }
     return factory().new_PartSelect(pt_portref, primary,
 				    pt_left, pt_right,

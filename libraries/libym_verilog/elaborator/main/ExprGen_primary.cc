@@ -26,6 +26,8 @@
 #include "ElbExpr.h"
 #include "ElbGenvar.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -204,6 +206,15 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     bool stat1 = evaluate_int(parent, pt_expr1, index_val, false);
     if ( stat1 ) {
       // 固定インデックスだった．
+      if ( decl_base->bit_offset(index_val) == -1 ) {
+	// インデックスが範囲外
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			pt_expr1->file_region(),
+			kMsgWarning,
+			"ELAB",
+			"Bit-Select index is out of range.");
+	// ただ値が X になるだけでエラーにはならないそうだ．
+      }
       return factory().new_BitSelect(pt_expr, primary, pt_expr1, index_val);
     }
     ElbExpr* index = instantiate_expr(parent, index_env, pt_expr1);
@@ -231,6 +242,24 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	  // 範囲の順番が逆
 	  error_range_order(pt_expr);
 	  return NULL;
+	}
+	if ( decl_base->bit_offset(index1_val) == -1 ) {
+	  // 左のインデックスが範囲外
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_left->file_region(),
+			  kMsgWarning,
+			  "ELAB",
+			  "Left index is out of range.");
+	  // ただ値が X になるだけでエラーにはならないそうだ．
+	}
+	if ( decl_base->bit_offset(index2_val) == -1 ) {
+	  // 右のインデックスが範囲外
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  pt_right->file_region(),
+			  kMsgWarning,
+			  "ELAB",
+			  "Right index is out of range.");
+	  // ただ値が X になるだけでエラーにはならないそうだ．
 	}
 	return factory().new_PartSelect(pt_expr, primary,
 					pt_left, pt_right,
@@ -260,6 +289,16 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	  else {
 	    index1_val = base_val;
 	    index2_val = base_val + range_val - 1;
+	  }
+	  if ( decl_base->bit_offset(index1_val) == -1 ||
+	       decl_base->bit_offset(index2_val) == -1 ) {
+	    // 左か右のインデックスが範囲外
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_expr->file_region(),
+			    kMsgWarning,
+			    "ELAB",
+			    "Index is out of range.");
+	    // ただ値が X になるだけでエラーにはならないそうだ．
 	  }
 	  return factory().new_PartSelect(pt_expr, primary,
 					  pt_base, pt_range,
@@ -298,6 +337,16 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	  else {
 	    index1_val = base_val - range_val + 1;
 	    index2_val = base_val;
+	  }
+	  if ( decl_base->bit_offset(index1_val) == -1 ||
+	       decl_base->bit_offset(index2_val) == -1 ) {
+	    // 左か右のインデックスが範囲外
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    pt_expr->file_region(),
+			    kMsgWarning,
+			    "ELAB",
+			    "Index is out of range.");
+	    // ただ値が X になるだけでエラーにはならないそうだ．
 	  }
 	  return factory().new_PartSelect(pt_expr, primary,
 					  pt_base, pt_range,
