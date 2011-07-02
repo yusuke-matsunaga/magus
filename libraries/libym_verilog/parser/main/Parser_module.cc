@@ -243,6 +243,10 @@ Parser::new_Module2001(const FileRegion& file_region,
   string library; // ?
   string cell;    // ?
 
+  if ( !check_PortArray(iohead_array) ) {
+    return;
+  }
+
   // iohead_array からポートの配列を作る．
   PtiPortArray port_array = new_PortArray(iohead_array);
 

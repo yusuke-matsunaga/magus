@@ -162,6 +162,10 @@ public:
   // ポート関連の要素の生成関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 入出力宣言中の重複チェックを行う．
+  bool
+  check_PortArray(PtIOHeadArray iohead_array);
+
   /// @brief 入出力宣言からポートを作る．
   PtiPortArray
   new_PortArray(PtIOHeadArray iohead_array);

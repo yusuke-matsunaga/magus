@@ -13,6 +13,8 @@
 	IO の二重定義のチェックをしていない．
 	TODO:2011-02-15-01
 
+	* 2011/07/02 対応済み
+
 2011-02-14  Yusuke Matsunaga  <yusuke_matsunaga@ieee.org>
 
 	* elaborator/ei/EiParameter.cc (set_expr):

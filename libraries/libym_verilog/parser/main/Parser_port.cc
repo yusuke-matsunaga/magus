@@ -12,6 +12,8 @@
 #include "PtiDecl.h"
 #include "PtiExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -90,6 +92,32 @@ Parser::add_port(PtiPort* port)
 //////////////////////////////////////////////////////////////////////
 // PtiPortArray の生成
 //////////////////////////////////////////////////////////////////////
+
+// @brief 入出力宣言中の重複チェックを行う．
+bool
+Parser::check_PortArray(PtIOHeadArray iohead_array)
+{
+  hash_set<string> portref_dic;
+  for (ymuint i = 0; i < iohead_array.size(); ++ i) {
+    const PtIOHead* head = iohead_array[i];
+    for (ymuint j = 0; j < head->item_num(); ++ j) {
+      const PtIOItem* elem = head->item(j);
+      string name = elem->name();
+      if ( portref_dic.count(name) > 0 ) {
+	ostringstream buf;
+	buf << "\"" << name << "\" is redefined.";
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			elem->file_region(),
+			kMsgError,
+			"ELAB",
+			buf.str());
+	return false;
+      }
+      portref_dic.insert(name);
+    }
+  }
+  return true;
+}
 
 // @brief 入出力宣言からポートを作る．
 PtiPortArray
