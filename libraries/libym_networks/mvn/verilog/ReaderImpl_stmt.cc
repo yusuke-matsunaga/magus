@@ -171,7 +171,13 @@ ReaderImpl::gen_assign(MvnModule* module,
 {
   const VlExpr* rhs = stmt->rhs();
   const VlExpr* lhs = stmt->lhs();
-  MvnNode* node = gen_expr(module, rhs, env);
+
+  MvnNode* node_orig = gen_expr(module, rhs, env);
+
+  ymuint lhs_bw = lhs->bit_size();
+  bool lhs_signed = is_signed_type(lhs->value_type());
+  MvnNode* node = coerce_rhs(module, lhs_bw, lhs_signed, node_orig);
+
   ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
   for (ymuint i = 0; i < n; ++ i) {

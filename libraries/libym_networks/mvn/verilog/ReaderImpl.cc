@@ -3,7 +3,7 @@
 /// @brief ReaderImpl の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -40,7 +40,7 @@ using namespace nsYm::nsVerilog;
 BEGIN_NONAMESPACE
 
 const
-bool debug_driver = true;
+bool debug_driver = false;
 
 END_NONAMESPACE
 
@@ -121,7 +121,12 @@ ReaderImpl::gen_network(MvnMgr& mgr,
       module0 = module;
     }
     else {
-      cerr << "more than one top modules" << endl;
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      vl_module->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "More than one top modules.");
+      return false;
     }
   }
 
@@ -167,14 +172,15 @@ ReaderImpl::gen_network(MvnMgr& mgr,
     // 明示的なドライバがない場合の処理
     for (ymuint i = 0; i < bw; ++ i) {
       if ( tmp[i].rhs_node() == NULL ) {
+	//MsgMgr::put_msg(__FILE__, __LINE__,
 #warning "TODO: warning メッセージを出すようにする．"
 	vector<ymuint32> val(1, 0);
 	MvnNode* ud_node = mMvnMgr->new_const(module0, 1, val);
 	if ( bw == 1 ) {
-	  tmp[i] = Driver(ud_node);
+	  tmp[i] = Driver(FileRegion(), ud_node);
 	}
 	else {
-	  tmp[i] = Driver(ud_node, i);
+	  tmp[i] = Driver(FileRegion(), ud_node, i);
 	}
       }
     }
@@ -265,7 +271,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      io->file_region(),
 		      kMsgError,
-		      "MVN_VL01",
+		      "MVN_VL",
 		      "Only Input/Output/Inout types are supported");
       return NULL;
     }
@@ -287,7 +293,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   }
 
   MvnModule* module = mMvnMgr->new_module(vl_module->name(), np,
-					ibw_array, obw_array, iobw_array);
+					  ibw_array, obw_array, iobw_array);
 
   // 入出力ノードの対応表を作る．
   ymuint i1 = 0;
@@ -317,7 +323,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       assert_not_reached(__FILE__, __LINE__);
       break;
     }
-    reg_ionode(decl, node);
+    mIODeclMap.add(decl, node);
   }
 
   // 宣言要素を生成する．
@@ -407,12 +413,20 @@ ReaderImpl::gen_decl(MvnModule* module,
       for (vector<const VlDecl*>::iterator p = net_list.begin();
 	   p != net_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
-	// IO に接続している要素は生成済みなので除外する．
-	if ( mGlobalEnv.get(vl_decl) == NULL ) {
-	  // 仮の through ノードに対応させる．
-	  ymuint bw = vl_decl->bit_size();
-	  MvnNode* node = mMvnMgr->new_through(module, bw);
-	  reg_node(vl_decl, node);
+	// 仮の through ノードに対応させる．
+	ymuint bw = vl_decl->bit_size();
+	MvnNode* node = mMvnMgr->new_through(module, bw);
+	reg_node(vl_decl, node);
+
+	// IO に接続している要素の場合，IOノード接続する．
+	MvnNode* io_node = mIODeclMap.get(vl_decl);
+	if ( io_node ) {
+	  if ( io_node->type() == MvnNode::kInput ) {
+	    reg_driver(node, Driver(vl_decl->file_region(), io_node));
+	  }
+	  else if ( io_node->type() == MvnNode::kOutput ) {
+	    reg_driver(io_node, Driver(vl_decl->file_region(), node));
+	  }
 	}
       }
     }
@@ -443,13 +457,22 @@ ReaderImpl::gen_decl(MvnModule* module,
       for (vector<const VlDecl*>::iterator p = reg_list.begin();
 	   p != reg_list.end(); ++ p) {
 	const VlDecl* vl_decl = *p;
-	// IO に接続している要素は生成済みなので除外する．
-	if ( mGlobalEnv.get(vl_decl) == NULL ) {
-	  // 仮の through ノードに対応させる．
-	  ymuint bw = vl_decl->bit_size();
-	  MvnNode* node = mMvnMgr->new_through(module, bw);
-	  reg_node(vl_decl, node);
-	  (void) mDeclHash.get_id(vl_decl);
+
+	// 仮の through ノードに対応させる．
+	ymuint bw = vl_decl->bit_size();
+	MvnNode* node = mMvnMgr->new_through(module, bw);
+	reg_node(vl_decl, node);
+	(void) mDeclHash.get_id(vl_decl);
+
+	// IO に接続している要素の場合，IOノード接続する．
+	MvnNode* io_node = mIODeclMap.get(vl_decl);
+	if ( io_node ) {
+	  if ( io_node->type() == MvnNode::kInput ) {
+	    mMvnMgr->connect(io_node, 0, node, 0);
+	  }
+	  else if ( io_node->type() == MvnNode::kOutput ) {
+	    mMvnMgr->connect(node, 0, io_node, 0);
+	  }
 	}
       }
     }
@@ -510,9 +533,15 @@ ReaderImpl::gen_portref(const VlExpr* expr,
   assert_cond( decl != NULL, __FILE__, __LINE__);
   node = mIODeclMap.get(decl);
   if ( node == NULL ) {
-    cerr << decl->full_name() << " is not found in mIODeclMap" << endl;
+    ostringstream buf;
+    buf << decl->full_name() << ": Not found.";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    decl->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    buf.str());
+    return 0;
   }
-  assert_cond( node != NULL, __FILE__, __LINE__);
 
   if ( expr->is_bitselect() ) {
     assert_cond( node != NULL, __FILE__, __LINE__);
@@ -539,27 +568,52 @@ ReaderImpl::gen_portref(const VlExpr* expr,
 void
 ReaderImpl::connect_lhs(MvnNode* dst_node,
 			const VlExpr* expr,
-			MvnNode* src_node)
+			MvnNode* src_node,
+			const FileRegion& src_loc)
 {
   if ( expr->is_primary() ) {
-    reg_driver(dst_node, Driver(src_node));
+    reg_driver(dst_node, Driver(src_loc, src_node));
   }
   else if ( expr->is_bitselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     const VlDeclBase* decl = expr->decl_base();
     assert_cond( decl != NULL, __FILE__, __LINE__);
-    ymuint index = decl->bit_offset(expr->index_val());
-    reg_driver(dst_node, Driver(src_node, index));
+    ymuint offset;
+    if ( !decl->calc_bit_offset(expr->index_val(), offset) ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      expr->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "Index is out of range.");
+      return;
+    }
+    reg_driver(dst_node, Driver(src_loc, src_node, offset));
   }
   else if ( expr->is_partselect() ) {
     assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
     const VlDeclBase* decl = expr->decl_base();
     assert_cond( decl != NULL, __FILE__, __LINE__);
-    ymuint msb = decl->bit_offset(expr->left_range_val());
-    ymuint lsb = decl->bit_offset(expr->right_range_val());
+    ymuint msb;
+    if ( !decl->calc_bit_offset(expr->left_range_val(), msb) ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      expr->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "Left index is out of range.");
+      return;
+    }
+    ymuint lsb;
+    if ( !decl->calc_bit_offset(expr->right_range_val(), lsb) ) {
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      expr->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "Right index is out of range.");
+      return;
+    }
     assert_cond( src_node->output(0)->bit_width() == msb - lsb + 1,
 		 __FILE__, __LINE__);
-    reg_driver(dst_node, Driver(src_node, msb, lsb));
+    reg_driver(dst_node, Driver(src_loc, src_node, msb, lsb));
   }
 }
 
@@ -578,10 +632,8 @@ ReaderImpl::gen_rhs(MvnModule* parent_module,
 		    ymuint bit_width)
 {
   ymuint src_bw = node->output(0)->bit_width();
-  if ( offset + bit_width > src_bw ) {
-    cerr << "bit width mismatch" << endl;
-    assert_not_reached(__FILE__, __LINE__);
-  }
+  assert_cond( offset + bit_width <= src_bw, __FILE__, __LINE__);
+
   MvnNode* src_node = NULL;
   if ( offset == 0 && bit_width == src_bw ) {
     // 全範囲の選択
@@ -601,6 +653,60 @@ ReaderImpl::gen_rhs(MvnModule* parent_module,
     mMvnMgr->connect(node, 0, src_node, 0);
   }
   return src_node;
+}
+
+// @brief 代入文の左辺と右辺の幅が異なる場合の補正を行う．
+MvnNode*
+ReaderImpl::coerce_rhs(MvnModule* module,
+		       ymuint lhs_bw,
+		       bool lhs_signed,
+		       MvnNode* rhs_node)
+{
+  ymuint src_bw = rhs_node->output(0)->bit_width();
+  MvnNode* node = rhs_node;
+  if ( lhs_bw > src_bw ) {
+    // 左辺のビット幅が大きいとき
+    // 上位ビットをパディングする．
+    ymuint np = lhs_bw - src_bw;
+    if ( lhs_signed ) {
+      // 符号付きの場合は再上位ビットをコピーする．
+      vector<ymuint> ibw_array(np + 1);
+      for (ymuint i = 0; i < np; ++ i) {
+	ibw_array[i] = 1;
+      }
+      ibw_array[np] = src_bw;
+      node = mMvnMgr->new_concat(module, ibw_array);
+      MvnNode* msb_node = mMvnMgr->new_constbitselect(module, src_bw - 1, src_bw);
+      mMvnMgr->connect(rhs_node, 0, msb_node, 0);
+      for (ymuint i = 0; i < np; ++ i) {
+	mMvnMgr->connect(msb_node, 0, node, i);
+      }
+      mMvnMgr->connect(rhs_node, 0, node, np);
+    }
+    else {
+      // 符号なしの場合は0を入れる．
+      vector<ymuint> ibw_array(2);
+      ibw_array[0] = np;
+      ibw_array[1] = src_bw;
+      node = mMvnMgr->new_concat(module, ibw_array);
+      ymuint nblk = (np + 31) / 32;
+      vector<ymuint32> val(nblk);
+      for (ymuint i = 0; i < nblk; ++ i) {
+	val[i] = 0U;
+      }
+      MvnNode* zero = mMvnMgr->new_const(module, np, val);
+      mMvnMgr->connect(zero, 0, node, 0);
+      mMvnMgr->connect(rhs_node, 0, node, 1);
+    }
+  }
+  else if ( lhs_bw < src_bw ) {
+    // 左辺のビット幅が小さいとき
+    // ただ単に下位ビットを取り出す．
+    node = mMvnMgr->new_constpartselect(module, lhs_bw - 1, 0, src_bw);
+    mMvnMgr->connect(rhs_node, 0, node, 0);
+  }
+  assert_cond( node != NULL, __FILE__, __LINE__);
+  return node;
 }
 
 // @brief 宣言要素に対応するノードを登録する．
@@ -655,7 +761,9 @@ ReaderImpl::reg_driver(MvnNode* node,
     else if ( driver.has_partselect() ) {
       cerr << "[" << driver.msb() << ":" << driver.lsb() << "]";
     }
-    cerr << ")" << endl;
+    cerr << ")"
+	 << driver.loc()
+	 << endl;
   }
   driver_list(node).push_back(driver);
 }
@@ -680,30 +788,14 @@ ReaderImpl::error_drivers(MvnNode* node,
 			  const Driver& driver1,
 			  const Driver& driver2)
 {
-  cerr << "more than one drivers for "
-       << node->id()
-       << endl;
-  cerr << "previous driver: "
-       << driver1.rhs_node()->id();
-  if ( driver1.has_bitselect() ) {
-    cerr << "[" << driver1.index() << "]";
-  }
-  else if ( driver1.has_partselect() ) {
-    cerr << "[" << driver1.msb() << ":" << driver1.lsb()
-	 << "]";
-  }
-  cerr << endl;
-  cerr << "current driver: "
-       << driver2.rhs_node()->id();
-  if ( driver2.has_bitselect() ) {
-    cerr << "[" << driver2.index() << "]";
-  }
-  else if ( driver2.has_partselect() ) {
-    cerr << "[" << driver2.msb() << ":" << driver2.lsb()
-	 << "]";
-  }
-  cerr << endl;
-  abort();
+  ostringstream buf;
+  buf << "More than one drivers. "
+      << "Previous driver is " << driver1.loc();
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  driver2.loc(),
+		  kMsgError,
+		  "MVN_VL",
+		  buf.str());
 }
 
 END_NAMESPACE_YM_NETWORKS_VERILOG

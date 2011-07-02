@@ -481,9 +481,9 @@ public:
 
   /// @brief part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
-  /// @param[in] bit_width ビット幅
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
+  /// @param[in] bit_width ビット幅
   /// @return 生成したノードを返す．
   MvnNode*
   new_constpartselect(MvnModule* module,

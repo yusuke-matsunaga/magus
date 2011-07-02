@@ -339,60 +339,74 @@ EiDeclHeadPt::bit_size() const
   return 0;
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDeclHeadPt::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclHeadPt::calc_bit_offset(int index,
+			      ymuint& offset) const
 {
- switch ( mPtHead->type() ) {
+  switch ( mPtHead->type() ) {
   case kPtDecl_Reg:
   case kPtDecl_Net:
     // この型は範囲指定を含まないので 1ビットとなる．
     if ( index == 0 ) {
-      return 0;
+      offset = 0;
+      return true;
     }
-    return -1;
+    // 0 以外のインデックスは無効
+    return false;
 
   case kPtDecl_Param:
   case kPtDecl_LocalParam:
   case kPtDecl_Var:
     switch ( mPtHead->data_type() ) {
     case kVpiVarReal:
-      return -1;
+      // 実数タイプの部分ビット指定は無効
+      return false;
 
     case kVpiVarTime:
       if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
-	return index;
+	offset = index;
+	return true;
       }
-      return -1;
+      // 範囲外は無効
+      return false;
 
     case kVpiVarInteger:
     default:
       // int とみなす．
       if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
-	return index;
+	offset = index;
+	return true;
       }
-      return -1;
+      // 範囲外は無効
+      return false;
     }
     break;
 
   case kPtDecl_Event:
-    return -1;
+    // イベントオブジェクトは部分指定できない．
+    // というかたぶん，ここには来ないはず．
+    assert_not_reached(__FILE__, __LINE__);
+    return false;
 
   case kPtDecl_SpecParam:
     // int とみなす．
     if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
-      return index;
+      offset = index;
+      return true;
     }
-    return -1;
+    // 範囲外は無効
+    return false;
 
   default:
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
-  return 0;
+  return false;
 }
 
 // @brief データ型の取得
@@ -588,14 +602,16 @@ EiDeclHeadPtV::bit_size() const
   return mRange.size();
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDeclHeadPtV::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclHeadPtV::calc_bit_offset(int index,
+			       ymuint& offset) const
 {
-  return mRange.offset(index);
+  return mRange.calc_offset(index, offset);
 }
 
 
@@ -773,37 +789,46 @@ EiDeclHeadPt2::bit_size() const
   return 0;
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDeclHeadPt2::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclHeadPt2::calc_bit_offset(int index,
+			       ymuint& offset) const
 {
   switch ( mAuxType ) {
   case kVpiAuxNet:
   case kVpiAuxReg:
+    // 範囲指定なしは1ビットとみなす．
     if ( index == 0 ) {
-      return 0;
+      offset = 0;
+      return true;
     }
-    return -1;
+    // 0 以外は無効
+    return false;
 
   case kVpiAuxVar:
     switch ( mPtHead->var_type() ) {
     case kVpiVarInteger:
       if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
-	return index;
+	offset = index;
+	return true;
       }
-      return -1;
+      // 範囲外は無効
+      return false;
 
     case kVpiVarReal:
-      return -1;
+      // 実数の部分指定は無効
+      return false;
 
     case kVpiVarTime:
       if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
 	return index;
       }
-      return -1;
+      // 範囲外は無効
+      return false;
 
     default:
       break;
@@ -814,7 +839,7 @@ EiDeclHeadPt2::bit_offset(int index) const
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
-  return 0;
+  return false;
 }
 
 // @brief データ型の取得
@@ -925,14 +950,16 @@ EiDeclHeadPt2V::bit_size() const
   return mRange.size();
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDeclHeadPt2V::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclHeadPt2V::calc_bit_offset(int index,
+				ymuint& offset) const
 {
-  return mRange.offset(index);
+  return mRange.calc_offset(index, offset);
 }
 
 
@@ -1050,40 +1077,49 @@ EiDeclHeadPt3::bit_size() const
   return 0;
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDeclHeadPt3::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclHeadPt3::calc_bit_offset(int index,
+			       ymuint& offset) const
 {
   switch ( data_type() ) {
   case kVpiVarNone:
+    // 指定なしは1ビットとみなす．
     if ( index == 0 ) {
-      return 0;
+      offset = 0;
+      return true;
     }
-    return -1;
+    return false;
 
   case kVpiVarInteger:
-      if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
-	return index;
-      }
-      return -1;
+    if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
+      offset = index;
+      return true;
+    }
+    // 範囲外は無効
+    return false;
 
   case kVpiVarReal:
-    return -1;
+    // 実数の部分指定は無効
+    return false;
 
   case kVpiVarTime:
-      if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
-	return index;
-      }
-      return -1;
+    if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
+      offset = index;
+      return true;
+    }
+    // 範囲外は無効
+    return false;
 
   default:
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
-  return 0;
+  return false;
 }
 
 // @brief データ型の取得
@@ -1192,14 +1228,16 @@ EiDeclHeadPt3V::bit_size() const
   return mRange.size();
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiDeclHeadPt3V::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclHeadPt3V::calc_bit_offset(int index,
+				ymuint& offset) const
 {
-  return mRange.offset(index);
+  return mRange.calc_offset(index, offset);
 }
 
 END_NAMESPACE_YM_VERILOG

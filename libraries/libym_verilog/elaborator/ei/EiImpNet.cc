@@ -161,18 +161,21 @@ EiImpNet::bit_size() const
   return 1;
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiImpNet::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiImpNet::calc_bit_offset(int index,
+			  ymuint& offset) const
 {
   if ( index == 0 ) {
-    return 0;
+    offset = 0;
+    return true;
   }
   else {
-    return -1;
+    return false;
   }
 }
 

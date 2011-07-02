@@ -206,7 +206,9 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
     bool stat1 = evaluate_int(parent, pt_expr1, index_val, false);
     if ( stat1 ) {
       // 固定インデックスだった．
-      if ( decl_base->bit_offset(index_val) == -1 ) {
+      ymuint offset;
+      bool stat2 = decl_base->calc_bit_offset(index_val, offset);
+      if ( !stat2 ) {
 	// インデックスが範囲外
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			pt_expr1->file_region(),
@@ -243,7 +245,9 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	  error_range_order(pt_expr);
 	  return NULL;
 	}
-	if ( decl_base->bit_offset(index1_val) == -1 ) {
+	ymuint offset;
+	bool stat3 = decl_base->calc_bit_offset(index1_val, offset);
+	if ( !stat3 ) {
 	  // 左のインデックスが範囲外
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_left->file_region(),
@@ -252,7 +256,8 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 			  "Left index is out of range.");
 	  // ただ値が X になるだけでエラーにはならないそうだ．
 	}
-	if ( decl_base->bit_offset(index2_val) == -1 ) {
+	bool stat4 = decl_base->calc_bit_offset(index2_val, offset);
+	if ( !stat4 ) {
 	  // 右のインデックスが範囲外
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  pt_right->file_region(),
@@ -290,8 +295,10 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	    index1_val = base_val;
 	    index2_val = base_val + range_val - 1;
 	  }
-	  if ( decl_base->bit_offset(index1_val) == -1 ||
-	       decl_base->bit_offset(index2_val) == -1 ) {
+	  ymuint offset;
+	  bool stat3 = decl_base->calc_bit_offset(index1_val, offset);
+	  bool stat4 = decl_base->calc_bit_offset(index2_val, offset);
+	  if ( !stat3 || !stat4 ) {
 	    // 左か右のインデックスが範囲外
 	    MsgMgr::put_msg(__FILE__, __LINE__,
 			    pt_expr->file_region(),
@@ -338,8 +345,10 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	    index1_val = base_val - range_val + 1;
 	    index2_val = base_val;
 	  }
-	  if ( decl_base->bit_offset(index1_val) == -1 ||
-	       decl_base->bit_offset(index2_val) == -1 ) {
+	  ymuint offset;
+	  bool stat3 = decl_base->calc_bit_offset(index1_val, offset);
+	  bool stat4 = decl_base->calc_bit_offset(index2_val, offset);
+	  if ( !stat3 || !stat4 ) {
 	    // 左か右のインデックスが範囲外
 	    MsgMgr::put_msg(__FILE__, __LINE__,
 			    pt_expr->file_region(),
@@ -830,7 +839,12 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	}
 	return VlValue();
       }
-      int offset = param->bit_offset(index1);
+      ymuint offset;
+      if ( !param->calc_bit_offset(index1, offset) ) {
+	// インデックスが範囲外だった．
+	// エラーではなく X になる．
+	return VlValue(kVpiScalarX);
+      }
       return VlValue(val.bitvector_value().bit_select(offset));
     }
     else if ( has_range_select ) {
@@ -880,9 +894,15 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	assert_not_reached(__FILE__, __LINE__);
 	break;
       }
-      int msb_offset = param->bit_offset(index1);
-      int lsb_offset = param->bit_offset(index2);
-      return VlValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
+      ymuint msb_offset;
+      bool stat1 = param->calc_bit_offset(index1, msb_offset);
+      ymuint lsb_offset;
+      bool stat2 = param->calc_bit_offset(index2, lsb_offset);
+      if ( stat1 && stat2 ) {
+	return VlValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
+      }
+#warning "TODO:2011-07-01-01";
+      return VlValue(kVpiScalarX);
     }
   }
 

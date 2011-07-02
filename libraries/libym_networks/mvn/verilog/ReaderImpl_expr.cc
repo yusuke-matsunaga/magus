@@ -97,12 +97,19 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
   if ( expr->is_bitselect() ) {
     if ( expr->is_constant_select() ) {
       const VlDeclBase* decl = expr->decl_base();
-      ymuint bitpos = decl->bit_offset(expr->index_val());
+      ymuint bitpos;
+      if ( !decl->calc_bit_offset(expr->index_val(), bitpos) ) {
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			expr->file_region(),
+			kMsgError,
+			"MVN_VL",
+			"Index is out of range.");
+	return NULL;
+      }
       const MvnOutputPin* pin = node->output(0);
       MvnNode* node1 = mMvnMgr->new_constbitselect(parent_module,
 						   bitpos,
 						   pin->bit_width());
-      assert_cond( node, __FILE__, __LINE__);
       mMvnMgr->connect(node, 0, node1, 0);
       return node1;
     }
@@ -122,8 +129,24 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
   if ( expr->is_partselect() ) {
     if ( expr->is_constant_select() ) {
       const VlDeclBase* decl = expr->decl_base();
-      ymuint msb = decl->bit_offset(expr->left_range_val());
-      ymuint lsb = decl->bit_offset(expr->right_range_val());
+      ymuint msb;
+      if ( !decl->calc_bit_offset(expr->left_range_val(), msb) ) {
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			expr->left_range()->file_region(),
+			kMsgError,
+			"MVN_VL",
+			"Left range is out of range");
+	return NULL;
+      }
+      ymuint lsb;
+      if ( !decl->calc_bit_offset(expr->right_range_val(), lsb) ) {
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			expr->right_range()->file_region(),
+			kMsgError,
+			"MVN_VL",
+			"Right range is out of range");
+	return NULL;
+      }
       const MvnOutputPin* pin = node->output(0);
       MvnNode* node1 = mMvnMgr->new_constpartselect(parent_module,
 						    msb, lsb,

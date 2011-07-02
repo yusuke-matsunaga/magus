@@ -170,6 +170,13 @@ private:
 	     const VlStmt* stmt,
 	     ProcEnv& env);
 
+  /// @brief 代入文の左辺と右辺の幅が異なる場合の補正を行う．
+  MvnNode*
+  coerce_rhs(MvnModule* module,
+	     ymuint lhs_bw,
+	     bool lhs_signed,
+	     MvnNode* rhs_node);
+
   /// @brief 環境をマージする．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] env 対象の環境
@@ -253,10 +260,12 @@ private:
   /// @param[in] dst_node 左辺に対応するノード
   /// @param[in] expr 左辺式
   /// @param[in] src_node 右辺に対応するノード
+  /// @param[in] src_loc 右辺のファイル位置
   void
   connect_lhs(MvnNode* dst_node,
 	      const VlExpr* expr,
-	      MvnNode* src_node);
+	      MvnNode* src_node,
+	      const FileRegion& src_loc);
 
   /// @brief 宣言要素に対応するノードを登録する．
   /// @param[in] decl 宣言要素

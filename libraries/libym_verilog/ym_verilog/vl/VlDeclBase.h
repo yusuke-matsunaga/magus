@@ -95,11 +95,13 @@ public:
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index に対するオフセット値 index が範囲内に入っている時．
-  /// @retval -1 index が範囲外の時
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const = 0;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const = 0;
 
   /// @brief データ型の取得
   /// @retval kVpiVarInteger 整数型

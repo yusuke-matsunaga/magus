@@ -142,11 +142,13 @@ public:
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index に対するオフセット値 index が範囲内に入っている時．
-  /// @retval -1 index が範囲外の時
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -226,19 +228,23 @@ public:
 
   /// @brief 1次元配列の場合にインデックスからオフセットを計算する．
   /// @param[in] index インデックス
-  /// @return index に対するオフセット値を返す．
-  /// @note index が範囲外の場合には -1 を返す．
+  /// @param[out] offset index に対するオフセット値
+  /// @retval true index が範囲内だった．
+  /// @retval false index が範囲外だった．
   virtual
-  int
-  array_offset(int index) const;
+  bool
+  calc_array_offset(int index,
+		    ymuint& offset) const;
 
   /// @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
   /// @param[in] index_list インデックスのリスト
-  /// @return index_list に対するオフセット値を返す．
-  /// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
+  /// @param[out] offset index_list に対するオフセット値
+  /// @retval true オフセットが正しく計算できた．
+  /// @retval false index_list のいずれかの値が範囲外だった．
   virtual
-  int
-  array_offset(const vector<int>& index_list) const;
+  bool
+  calc_array_offset(const vector<int>& index_list,
+		    ymuint& offset) const;
 
 
 protected:

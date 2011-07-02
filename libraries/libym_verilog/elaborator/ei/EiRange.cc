@@ -5,7 +5,7 @@
 ///
 /// $Id: EiRange.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -124,22 +124,26 @@ EiRange::is_in(int index) const
 
 // @brief LSB からのオフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiRange::offset(int index) const
+// @param[out] offset index の LSB からのオフセット
+// @retval true index が範囲内に入っている．
+// @retval false index が範囲外
+bool
+EiRange::calc_offset(int index,
+		     ymuint& offset) const
 {
-  return offset(mLeftVal, mRightVal, index);
+  return calc_offset(mLeftVal, mRightVal, index, offset);
 }
 
 // @brief MSB からのオフセット値の取得
 // @param[in] index インデックス
-// @retval index の MSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiRange::roffset(int index) const
+// @param[out] offset index の MSB からのオフセット
+// @retval true index が範囲内に入っている．
+// @retval false index が範囲外
+bool
+EiRange::calc_roffset(int index,
+		      ymuint& offset) const
 {
-  return roffset(mLeftVal, mRightVal, index);
+  return calc_roffset(mLeftVal, mRightVal, index, offset);
 }
 
 // @brief offset の逆関数
@@ -235,20 +239,28 @@ EiRangeImpl::is_in(int index) const
   return EiRange::is_in(mLeftVal, mRightVal, index);
 }
 
-// index のLSBからのオフセットを返す．
-// 範囲外の時は -1 を返す。
-int
-EiRangeImpl::offset(int index) const
+// @brief LSB からのオフセット値の取得
+// @param[in] index インデックス
+// @param[out] offset index の LSB からのオフセット
+// @retval true index が範囲内に入っている．
+// @retval false index が範囲外
+bool
+EiRangeImpl::calc_offset(int index,
+			 ymuint& offset) const
 {
-  return EiRange::offset(mLeftVal, mRightVal, index);
+  return EiRange::calc_offset(mLeftVal, mRightVal, index, offset);
 }
 
-// index のMSBからのオフセットを返す．
-// 範囲外の時は -1 を返す。
-int
-EiRangeImpl::roffset(int index) const
+// @brief MSB からのオフセット値の取得
+// @param[in] index インデックス
+// @param[out] offset index の MSB からのオフセット
+// @retval true index が範囲内に入っている．
+// @retval false index が範囲外
+bool
+EiRangeImpl::calc_roffset(int index,
+			  ymuint& offset) const
 {
-  return EiRange::roffset(mLeftVal, mRightVal, index);
+  return EiRange::calc_roffset(mLeftVal, mRightVal, index, offset);
 }
 
 // offset の逆関数
@@ -309,25 +321,34 @@ EiRangeArray::index(ymuint offset,
 
 // @brief インデックスのリストからオフセットを得る．
 // @param[in] index_list インデックスのリスト
-// @return index_list の値に対応したオフセット値
-// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
-int
-EiRangeArray::offset(const vector<int>& index_list) const
+// @param[out] offset index_list の値に対応したオフセット値
+// @retval true オフセットの計算が正しく行えた．
+// @retval false index_list のいずれかの値が範囲外だった．
+bool
+EiRangeArray::calc_offset(const vector<int>& index_list,
+			  ymuint& offset) const
 {
   ymuint n = size();
   if ( index_list.size() != n ) {
-    return -1;
+    // そもそもインデックス配列のサイズが違う．
+    return false;
   }
 
-  int offset = 0;
+  offset = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const EiRange* r = range(i);
     int k = r->size();
     offset *= k;
-    int offset1 = r->roffset(index_list[i]);
-    offset += offset1;
+    ymuint offset1;
+    if ( r->calc_roffset(index_list[i], offset1) ) {
+      offset += offset1;
+    }
+    else {
+      // インデックスが範囲外だった．
+      return false;
+    }
   }
-  return offset;
+  return true;
 }
 
 END_NAMESPACE_YM_VERILOG

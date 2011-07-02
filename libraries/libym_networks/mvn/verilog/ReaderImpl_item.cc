@@ -25,6 +25,8 @@
 #include "ym_verilog/vl/VlControl.h"
 #include "ym_verilog/vl/VlExpr.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
@@ -528,7 +530,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
     ++ pos;
     const VlExpr* expr = term->expr();
     MvnNode* dst_node = gen_primary(expr, mGlobalEnv);
-    connect_lhs(dst_node, expr, outputs[i]);
+    connect_lhs(dst_node, expr, outputs[i], prim->file_region());
   }
   for (ymuint i = 0; i < ni; ++ i) {
     const VlPrimTerm* term = prim->prim_term(pos);
@@ -549,7 +551,12 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
 			    const VlExpr* lhs,
 			    const VlExpr* rhs)
 {
-  MvnNode* node = gen_expr(parent_module, rhs, mGlobalEnv);
+  MvnNode* node_orig = gen_expr(parent_module, rhs, mGlobalEnv);
+
+  ymuint lhs_bw = lhs->bit_size();
+  bool lhs_signed = is_signed_type(lhs->value_type());
+  MvnNode* node = coerce_rhs(parent_module, lhs_bw, lhs_signed, node_orig);
+
   ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
   for (ymuint i = 0; i < n; i ++ ) {
@@ -557,7 +564,7 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
     MvnNode* dst_node = gen_primary(lhs_elem, mGlobalEnv);
     ymuint dst_bw = lhs_elem->bit_size();
     MvnNode* src_node = gen_rhs(parent_module, node, offset, dst_bw);
-    connect_lhs(dst_node, lhs_elem, src_node);
+    connect_lhs(dst_node, lhs_elem, src_node, rhs->file_region());
     offset += dst_bw;
   }
 }

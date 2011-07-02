@@ -236,32 +236,36 @@ EiParamHead::bit_size() const
   return kVpiSizeInteger;
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiParamHead::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiParamHead::calc_bit_offset(int index,
+			     ymuint& offset) const
 {
   switch ( mPtHead->data_type() ) {
   case kVpiVarReal:
-    return -1;
+    return false;
 
   case kVpiVarTime:
     if ( index >= 0 && index < static_cast<int>(kVpiSizeTime) ) {
-      return index;
+      offset = index;
+      return true;
     }
-    return -1;
+    return false;
 
   case kVpiVarInteger:
   default:
     // int とみなす．
     if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
-      return index;
+      offset = index;
+      return true;
     }
-    return -1;
+    return false;
   }
-  return -1;
+  return false;
 }
 
 // @breif 値の型を返す．
@@ -383,14 +387,16 @@ EiParamHeadV::bit_size() const
   return mRange.size();
 }
 
-// @brief LSB からのオフセット値の取得
+// @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index の LSB からのオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiParamHeadV::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiParamHeadV::calc_bit_offset(int index,
+			      ymuint& offset) const
 {
-  return mRange.offset(index);
+  return mRange.calc_offset(index, offset);
 }
 
 // @breif 値の型を返す．
@@ -568,12 +574,14 @@ EiParameter::bit_size() const
 
 // @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index のオフセット index が範囲内に入っている．
-// @retval -1 index が範囲外
-int
-EiParameter::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiParameter::calc_bit_offset(int index,
+			     ymuint& offset) const
 {
-  return mHead->bit_offset(index);
+  return mHead->calc_bit_offset(index, offset);
 }
 
 // @brief データ型の取得

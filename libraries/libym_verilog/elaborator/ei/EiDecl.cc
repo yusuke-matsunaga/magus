@@ -253,12 +253,14 @@ EiDecl::bit_size() const
 
 // @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index に対するオフセット値 index が範囲内に入っている時．
-// @retval -1 index が範囲外の時
-int
-EiDecl::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDecl::calc_bit_offset(int index,
+			ymuint& offset) const
 {
-  return mHead->bit_offset(index);
+  return mHead->calc_bit_offset(index, offset);
 }
 
 // @brief データ型の取得
@@ -532,8 +534,9 @@ EiDeclS::set_bitvector(const BitVector& val)
 tVpiScalarVal
 EiDeclS::get_bitselect(int index) const
 {
-  int bpos = bit_offset(index);
-  if ( bpos == 0 ) {
+  ymuint offset;
+  if ( calc_bit_offset(index, offset) ) {
+    // offset == 0 のはず．
     return mVal;
   }
   else {
@@ -549,8 +552,9 @@ void
 EiDeclS::set_bitselect(int index,
 		       tVpiScalarVal val)
 {
-  int bpos = bit_offset(index);
-  if ( bpos == 0 ) {
+  ymuint offset;
+  if ( calc_bit_offset(index, offset) ) {
+    // offset == 0 のはず．
     mVal = val;
   }
 }
@@ -564,9 +568,10 @@ EiDeclS::get_partselect(int left,
 			int right,
 			BitVector& val) const
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 == 0 && bpos2 == 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     val = mVal;
   }
 }
@@ -580,9 +585,10 @@ EiDeclS::set_partselect(int left,
 			int right,
 			const BitVector& val)
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 == 0 && bpos2 == 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     mVal = val.to_scalar();
   }
 }
@@ -776,8 +782,8 @@ EiDeclV::set_bitvector(const BitVector& val)
 tVpiScalarVal
 EiDeclV::get_bitselect(int index) const
 {
-  int bpos = bit_offset(index);
-  if ( bpos >= 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
     return mVal.bit_select(bpos);
   }
   else {
@@ -792,8 +798,8 @@ void
 EiDeclV::set_bitselect(int index,
 		       tVpiScalarVal val)
 {
-  int bpos = bit_offset(index);
-  if ( bpos >= 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
     mVal.bit_select(bpos, val);
   }
 }
@@ -807,9 +813,10 @@ EiDeclV::get_partselect(int left,
 			int right,
 			BitVector& val) const
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 >= 0 && bpos2 >= 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     val = mVal.part_select(bpos1, bpos2);
   }
   else {
@@ -833,9 +840,10 @@ EiDeclV::set_partselect(int left,
 			int right,
 			const BitVector& val)
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 >= 0 && bpos2 >= 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     mVal.part_select(bpos1, bpos2, val);
   }
 }

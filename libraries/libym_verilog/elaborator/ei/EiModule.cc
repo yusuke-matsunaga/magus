@@ -765,8 +765,15 @@ EiModuleArray::elem_by_offset(ymuint offset) const
 const VlModule*
 EiModuleArray::elem_by_index(int index) const
 {
-  ymuint offset = mRange.offset(index);
-  return &mArray[offset];
+  ymuint offset;
+  if ( mRange.calc_offset(index, offset) ) {
+    return &mArray[offset];
+  }
+  else {
+    // index が範囲外だった．
+    assert_not_reached(__FILE__, __LINE__);
+    return NULL;
+  }
 }
 
 // @brief ヘッダ情報を返す．

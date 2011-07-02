@@ -140,13 +140,15 @@ public:
   ymuint32
   bit_size() const;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -341,11 +343,13 @@ public:
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index のオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
 
 protected:
@@ -510,13 +514,15 @@ public:
   ymuint32
   bit_size() const;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -628,13 +634,15 @@ public:
   ymuint32
   bit_size() const;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
 
 private:
@@ -732,13 +740,15 @@ public:
   ymuint32
   bit_size() const;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
   /// @brief データ型の取得
   /// @retval データ型 kParam, kLocalParam, kVar の場合
@@ -846,13 +856,15 @@ public:
   ymuint32
   bit_size() const;
 
-  /// @brief LSB からのオフセット値の取得
+  /// @brief オフセット値の取得
   /// @param[in] index インデックス
-  /// @retval index の LSB からのオフセット index が範囲内に入っている．
-  /// @retval -1 index が範囲外
+  /// @param[out] offset インデックスに対するオフセット値
+  /// @retval true インデックスが範囲内に入っている時
+  /// @retval false インデックスが範囲外の時
   virtual
-  int
-  bit_offset(int index) const;
+  bool
+  calc_bit_offset(int index,
+		  ymuint& offset) const;
 
 
 private:

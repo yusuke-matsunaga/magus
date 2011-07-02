@@ -502,8 +502,15 @@ EiPrimArray::elem_by_offset(ymuint offset) const
 const VlPrimitive*
 EiPrimArray::elem_by_index(int index) const
 {
-  ymuint offset = mRange.offset(index);
-  return &mArray[offset];
+  ymuint offset;
+  if ( mRange.calc_offset(index, offset) ) {
+    return &mArray[offset];
+  }
+  else {
+    // 範囲外
+    assert_not_reached(__FILE__, __LINE__);
+    return NULL;
+  }
 }
 
 // @brief 要素のプリミティブを取り出す．
@@ -517,8 +524,15 @@ EiPrimArray::_primitive_by_offset(ymuint offset) const
 ElbPrimitive*
 EiPrimArray::_primitive_by_index(int index) const
 {
-  ymuint offset = mRange.offset(index);
-  return &mArray[offset];
+  ymuint offset;
+  if ( mRange.calc_offset(index, offset) ) {
+    return &mArray[offset];
+  }
+  else {
+    // 範囲外
+    assert_not_reached(__FILE__, __LINE__);
+    return NULL;
+  }
 }
 
 // @brief ヘッダを得る．

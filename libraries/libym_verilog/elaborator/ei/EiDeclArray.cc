@@ -247,12 +247,14 @@ EiDeclArray::bit_size() const
 
 // @brief オフセット値の取得
 // @param[in] index インデックス
-// @retval index に対するオフセット値 index が範囲内に入っている時．
-// @retval -1 index が範囲外の時
-int
-EiDeclArray::bit_offset(int index) const
+// @param[out] offset インデックスに対するオフセット値
+// @retval true インデックスが範囲内に入っている時
+// @retval false インデックスが範囲外の時
+bool
+EiDeclArray::calc_bit_offset(int index,
+			     ymuint& offset) const
 {
-  return mHead->bit_offset(index);
+  return mHead->calc_bit_offset(index, offset);
 }
 
 // @brief データ型の取得
@@ -357,25 +359,29 @@ EiDeclArray::array_size() const
 
 // @brief 1次元配列の場合にインデックスからオフセットを計算する．
 // @param[in] index インデックス
-// @return index に対するオフセット値を返す．
-// @note index が範囲外の場合には -1 を返す．
-int
-EiDeclArray::array_offset(int index) const
+// @param[out] offset index に対するオフセット値
+// @retval true index が範囲内だった．
+// @retval false index が範囲外だった．
+bool
+EiDeclArray::calc_array_offset(int index,
+			       ymuint& offset) const
 {
   if ( mRangeList.size() == 1 ) {
-    return mRangeList.range(0)->offset(index);
+    return mRangeList.range(0)->calc_offset(index, offset);
   }
-  return -1;
+  return false;
 }
 
 // @brief 他次元配列の場合にインデックスのリストからオフセットを計算する．
 // @param[in] index_list インデックスのリスト
-// @return index_list に対するオフセット値を返す．
-// @note index_list のいずれかの値が範囲外の場合には -1 を返す．
-int
-EiDeclArray::array_offset(const vector<int>& index_list) const
+// @param[out] offset index_list に対するオフセット値
+// @retval true オフセットが正しく計算できた．
+// @retval false index_list のいずれかの値が範囲外だった．
+bool
+EiDeclArray::calc_array_offset(const vector<int>& index_list,
+			       ymuint& offset) const
 {
-  return mRangeList.offset(index_list);
+  return mRangeList.calc_offset(index_list, offset);
 }
 
 
@@ -619,8 +625,9 @@ tVpiScalarVal
 EiDeclArrayS::get_bitselect(ymuint offset,
 			    int index) const
 {
-  int bpos = bit_offset(index);
-  if ( bpos == 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
+    // bpos == 0 のはず
     return mValArray[offset];
   }
   else {
@@ -638,8 +645,9 @@ EiDeclArrayS::set_bitselect(ymuint offset,
 			    int index,
 			    tVpiScalarVal val)
 {
-  int bpos = bit_offset(index);
-  if ( bpos == 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
+    // bpos == 0 のはず．
     mValArray[offset] = val;
   }
 }
@@ -655,9 +663,11 @@ EiDeclArrayS::get_partselect(ymuint offset,
 			     int right,
 			     BitVector& val) const
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 == 0 && bpos2 == 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
+    // bpos1 == bpos2 == 0 のはず
     val = mValArray[offset];
   }
 }
@@ -673,9 +683,11 @@ EiDeclArrayS::set_partselect(ymuint offset,
 			     int right,
 			     const BitVector& val)
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 == 0 && bpos2 == 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
+    // bpos1 == bpos2 == 0 のはず
     mValArray[offset] = val.to_scalar();
   }
 }
@@ -921,8 +933,8 @@ tVpiScalarVal
 EiDeclArrayV::get_bitselect(ymuint offset,
 			    int index) const
 {
-  int bpos = bit_offset(index);
-  if ( bpos >= 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
     return mValArray[offset].bit_select(bpos);
   }
   else {
@@ -939,8 +951,8 @@ EiDeclArrayV::set_bitselect(ymuint offset,
 			    int index,
 			    tVpiScalarVal val)
 {
-  int bpos = bit_offset(index);
-  if ( bpos >= 0 ) {
+  ymuint bpos;
+  if ( calc_bit_offset(index, bpos) ) {
     mValArray[offset].bit_select(bpos, val);
   }
 }
@@ -956,9 +968,10 @@ EiDeclArrayV::get_partselect(ymuint offset,
 			     int right,
 			     BitVector& val) const
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 >= 0 && bpos2 >= 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     val = mValArray[offset].part_select(bpos1, bpos2);
   }
   else {
@@ -984,9 +997,10 @@ EiDeclArrayV::set_partselect(ymuint offset,
 			     int right,
 			     const BitVector& val)
 {
-  int bpos1 = bit_offset(left);
-  int bpos2 = bit_offset(right);
-  if ( bpos1 >= 0 && bpos2 >= 0 ) {
+  ymuint bpos1;
+  ymuint bpos2;
+  if ( calc_bit_offset(left, bpos1) &&
+       calc_bit_offset(right, bpos2) ) {
     mValArray[offset].part_select(bpos1, bpos2, val);
   }
 }
