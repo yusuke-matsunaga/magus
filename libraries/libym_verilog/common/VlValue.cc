@@ -77,6 +77,32 @@ VlValue::VlValue(const BitVector& val) :
 {
 }
 
+// @brief 型変換を伴うコンストラクタ
+VlValue::VlValue(const VlValue& src,
+		 tVpiValueType value_type)
+{
+  if ( value_type == kVpiValueInteger ) {
+    mRep = new VlValueInt(src.int_value());
+  }
+  else if ( value_type == kVpiValueReal ) {
+    mRep = new VlValueReal(src.real_value());
+  }
+  else if ( value_type == kVpiValueTime ) {
+    mRep = new VlValueTime(src.time_value());
+  }
+  else if ( ::nsYm::nsVerilog::is_bitvector_type(value_type) ) {
+    const BitVector& src_bv = src.bitvector_value();
+    mRep = new VlValueBitVector(BitVector(src_bv,
+					  unpack_size(value_type),
+					  is_sized_type(value_type),
+					  is_signed_type(value_type),
+					  src_bv.base()));
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+}
+
 // @brief デストラクタ
 VlValue::~VlValue()
 {

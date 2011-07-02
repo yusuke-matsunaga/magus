@@ -463,16 +463,38 @@ EiParameter::name() const
 tVpiValueType
 EiParameter::value_type() const
 {
-#if 0 // 自身に型の指定がない parameter の value_type() は値の型を用いるべき？
+  // (1) with no type or range specification の場合，そのパラメータに
+  //     割り当てられる最終的な値の type と range を持つ．
+  //
+  // (2) with a range, but with no type の場合，その range を持つ
+  //     unsigned 型と定義される．
+  //     初期値および override された値はこの型に変換される．
+  //
+  // (3) with a type specification, but with no range specification の場合，
+  //     その型に定義される．range は最終的な値の range をとる．
+  //
+  // (4) a signed parameter (signed but with no range のこと？) は最終的な値の
+  //     範囲を持つ．
+  //
+  // (5) with a signed type specification and with a range specification
+  //     の場合，そのままの型を持つ．値はこの型に変換される．
+  //
+  // (6) with no range specification, and with either a signed type
+  //     specification or no type specification は lsb = 0, msb = size -1
+  //     という implied range を持つ．
+  //     ただし，最終的な値も unsized の場合，lsb = 0, msb は最低31以上の
+  //     実装依存の値をとる．
+
   tVpiValueType vt = mHead->value_type();
   if ( vt == kVpiValueNone ) {
-    if ( mValue.is_int() ) {
+    // (1)
+    if ( mValue.is_int_type() ) {
       return kVpiValueInteger;
     }
-    if ( mValue.is_scalar() ) {
+    if ( mValue.is_scalar_type() ) {
       return pack(kVpiValueUS, 1);
     }
-    if ( mValue.is_bitvector() ) {
+    if ( mValue.is_bitvector_type() ) {
       const BitVector& bv = mValue.bitvector_value();
       ymuint size = bv.size();
       if ( bv.is_signed() ) {
@@ -492,15 +514,40 @@ EiParameter::value_type() const
 	}
       }
     }
-    if ( mValue.is_real() ) {
+    if ( mValue.is_real_type() ) {
       return kVpiValueReal;
     }
     return kVpiValueNone;
   }
+  if ( is_bitvector_type(vt) ) {
+    if ( is_sized_type(vt) ) {
+      // (2)
+      return vt;
+    }
+    else {
+      // (3), (4) ?
+      const BitVector& bv = mValue.bitvector_value();
+      ymuint size = bv.size();
+      if ( is_signed_type(vt) ) {
+	if ( bv.is_sized() ) {
+	  return pack(kVpiValueSS, size);
+	}
+	else {
+	  return pack(kVpiValueSU, size);
+	}
+      }
+      else {
+	if ( bv.is_sized() ) {
+	  return pack(kVpiValueUS, size);
+	}
+	else {
+	  return pack(kVpiValueUU, size);
+	}
+      }
+    }
+  }
+  // (5)
   return vt;
-#else
-  return mHead->value_type();
-#endif
 }
 
 // @brief 符号の取得
@@ -616,8 +663,7 @@ EiParameter::set_expr(const PtExpr* expr,
 		      const VlValue& value)
 {
   mExpr = expr;
-  mValue = value;
-#warning "TODO:2011-02-14-01"
+  mValue = VlValue(value, mHead->value_type());
 }
 
 

@@ -901,8 +901,14 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
       if ( stat1 && stat2 ) {
 	return VlValue(val.bitvector_value().part_select(msb_offset, lsb_offset));
       }
-#warning "TODO:2011-07-01-01";
-      return VlValue(kVpiScalarX);
+      ymuint bw;
+      if ( index1 < index2 ) {
+	bw = index2 - index1 + 1;
+      }
+      else {
+	bw = index1 - index2 + 1;
+      }
+      return VlValue(BitVector(kVpiScalarX, bw));
     }
   }
 

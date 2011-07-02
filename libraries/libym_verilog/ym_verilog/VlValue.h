@@ -77,6 +77,10 @@ public:
   explicit
   VlValue(const BitVector& val);
 
+  /// @brief 型変換を伴うコンストラクタ
+  VlValue(const VlValue& src,
+	  tVpiValueType value_type);
+
   /// @brief デストラクタ
   ~VlValue();
 
