@@ -141,6 +141,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 AC_CONFIG_FILES([
 	Makefile
 	makebdd/Makefile
+	lsim/Makefile
 	])
 
 
