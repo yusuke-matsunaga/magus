@@ -106,7 +106,10 @@ LsimNaive::eval(const vector<ymuint32>& iv,
   for (ymuint i = 0; i < no; ++ i) {
     const BdnNode* node = mOutputList[i];
     const BdnNode* inode = node->output_fanin();
-    ymuint32 val = mValArray[inode->id()];
+    ymuint32 val = 0U;
+    if ( inode ) {
+      val = mValArray[inode->id()];
+    }
     if ( node->output_fanin_inv() ) {
       val = ~val;
     }

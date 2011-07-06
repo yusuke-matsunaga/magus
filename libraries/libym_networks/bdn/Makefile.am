@@ -4,6 +4,7 @@
 
 SUBDIRS = \
 	blif \
+	iscas89 \
 	.
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -26,7 +27,8 @@ libym_bdn_la_SOURCES = \
 	BdnVerilogWriter.cc
 
 libym_bdn_la_LIBADD = \
-	blif/libym_bdn_blifreader.la
+	blif/libym_bdn_blifreader.la \
+	iscas89/libym_bdn_iscas89reader.la
 
 libym_bdn_la_LDFLAGS =
 

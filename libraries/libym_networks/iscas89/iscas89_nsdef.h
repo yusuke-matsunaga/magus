@@ -35,6 +35,23 @@ BEGIN_NAMESPACE_YM_ISCAS89
 class Iscas89Handler;
 class Iscas89Parser;
 class Iscas89ParserImpl;
+class Iscas89Network;
+class Iscas89Node;
+class Iscas89NetworkReader;
+
+/// @brief ゲートの型
+/// @ingroup Iscas89Group
+enum tIscas89GateType {
+  kGt89BUFF,
+  kGt89NOT,
+  kGt89AND,
+  kGt89NAND,
+  kGt89OR,
+  kGt89NOR,
+  kGt89XOR,
+  kGt89XNOR,
+  kGt89DFF
+};
 
 END_NAMESPACE_YM_ISCAS89
 

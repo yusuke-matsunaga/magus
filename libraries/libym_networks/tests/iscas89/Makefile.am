@@ -4,9 +4,10 @@
 
 SUBDIRS =
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/iscas89
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -25,11 +26,21 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 noinst_PROGRAMS = \
-	parsertest
+	parsertest \
+	reader_test
 
 parsertest_SOURCES = \
 	parsertest.cc
 
 parsertest_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_iscas89/libym_iscas89.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+reader_test_SOURCES = \
+	reader_test.cc
+
+reader_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

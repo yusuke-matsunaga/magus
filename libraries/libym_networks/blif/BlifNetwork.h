@@ -1,5 +1,5 @@
-#ifndef YM_BLIF_BLIFNETWORK_H
-#define YM_BLIF_BLIFNETWORK_H
+#ifndef LIBYM_NETWORKS_BLIF_BLIFNETWORK_H
+#define LIBYM_NETWORKS_BLIF_BLIFNETWORK_H
 
 /// @file ym_blif/BlifNetwork.h
 /// @brief BlifNetwork のヘッダファイル
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_BLIF
 class BlifNetworkHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifNode BlifNetwork.h <ym_blif/BlifNetwork.h>
+/// @class BlifNode BlifNetwork.h "BlifNetwork.h"
 /// @ingroup BlifGroup
 /// @brief blif ファイルの表すネットワークのノード
 /// @sa BlifParser
@@ -131,7 +131,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifNetwork BlifNetwork.h <ym_blif/BlifNetwork.h>
+/// @class BlifNetwork BlifNetwork.h "BlifNetwork.h"
 /// @ingroup BlifGroup
 /// @brief blif ファイルの表しているネットワーク
 /// @sa BlifNetworkReader
@@ -160,7 +160,7 @@ public:
   max_node_id() const;
 
   /// @brief ID 番号からノードを得る．
-  /// @param[in] id ID 番号
+  /// @param[in] id ID 番号 ( 0 <= id < max_node_id() )
   /// @note 使われていない ID の場合には NULL が返される．
   const BlifNode*
   node(ymuint32 id) const;
@@ -230,11 +230,13 @@ private:
 		const char* name);
 
   /// @brief ノードを外部入力に設定する．
+  /// @param[in] node 対象のノード
   /// @note 既に他の型に設定されていたら false を返す．
   bool
   set_input_type(BlifNode* node);
 
   /// @brief ノードを論理ノードに設定する．
+  /// @param[in] node 対象のノード
   /// @param[in] ni ファンイン数
   /// @param[in] nc キューブ数
   /// @param[in] cover_pat 全キューブのパタンをつなげたもの
@@ -248,6 +250,7 @@ private:
 		 char opat);
 
   /// @brief ノードをラッチノードに設定する．
+  /// @param[in] node 対象のノード
   /// @param[in] rval リセット値 ( '0', '1', ' ' のいづれか )
   /// @note 既に他の型に設定されていたら false を返す．
   bool
@@ -466,4 +469,4 @@ BlifNetwork::logic(ymuint32 pos) const
 
 END_NAMESPACE_YM_BLIF
 
-#endif // YM_BLIF_BLIFNETWORK_H
+#endif // LIBYM_NETWORKS_BLIF_BLIFNETWORK_H

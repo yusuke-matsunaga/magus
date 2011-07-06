@@ -1,21 +1,21 @@
 
-/// @file libym_iscas89/tests/parsertest.cc
+/// @file libym_networks/tests/iscas89/parsertest.cc
 /// @brief iscas89 ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: parsertest.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_iscas89/Iscas89Parser.h"
-#include "ym_iscas89/Iscas89Handler.h"
+#include "Iscas89Parser.h"
+#include "Iscas89Handler.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_ISCAS89
 
 //////////////////////////////////////////////////////////////////////
 /// @class TestIscas89Handler parsertest.cc
@@ -198,7 +198,7 @@ TestIscas89Handler::error_exit()
   (*mStreamPtr) << "TestIscas89Handler::error_exit()" << endl;
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_ISCAS89
 
 
 int
@@ -207,6 +207,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
+  using namespace nsYm::nsNetworks::nsIscas89;
 
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " iscas89-file" << endl;

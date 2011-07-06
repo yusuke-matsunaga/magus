@@ -44,7 +44,9 @@ BlifBdnConv::operator()(const BlifNetwork& blif_network,
 {
   mNetwork = &network;
   ymuint n = blif_network.max_node_id();
+  mNodeMap.clear();
   mNodeMap.resize(n);
+  mNodeFlag.clear();
   mNodeFlag.resize(n, false);
 
   // モデル名の設定

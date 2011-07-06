@@ -39,7 +39,13 @@ libym_iscas89_la_SOURCES = \
 	Iscas89ParserImpl.h \
 	Iscas89ParserImpl.cc \
 	Iscas89Handler.h \
-	Iscas89Handler.cc
+	Iscas89Handler.cc \
+	Iscas89Network.h \
+	Iscas89Network.cc \
+	Iscas89NetworkHandler.h \
+	Iscas89NetworkHandler.cc \
+	Iscas89NetworkReader.h \
+	Iscas89NetworkReader.cc
 
 libym_iscas89_la_LIBADD =
 

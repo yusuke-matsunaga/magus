@@ -1,16 +1,14 @@
 
-/// @file libym_networks/tests/blif/reader_test.cc
-/// @brief BlifNetworkReader のテスト
+/// @file libym_networks/tests/iscas89/reader_test.cc
+/// @brief Iscas89NetworkReader のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: reader_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BlifNetwork.h"
-#include "BlifNetworkReader.h"
+#include "Iscas89Network.h"
+#include "Iscas89NetworkReader.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
@@ -21,10 +19,10 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using namespace nsYm::nsNetworks::nsBlif;
+  using namespace nsYm::nsNetworks::nsIscas89;
 
   if ( argc != 2 ) {
-    cerr << "USAGE : " << argv[0] << " blif-file" << endl;
+    cerr << "USAGE : " << argv[0] << " iscas89-file" << endl;
     return 2;
   }
   string filename = argv[1];
@@ -32,16 +30,16 @@ main(int argc,
   try {
     StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
-    BlifNetworkReader reader;
+    Iscas89NetworkReader reader;
 
-    BlifNetwork network;
+    Iscas89Network network;
 
     if ( !reader.read(filename, network) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }
 
-    network.write_blif(cout);
+    network.write_iscas89(cout);
 
   }
   catch ( const AssertError& x) {

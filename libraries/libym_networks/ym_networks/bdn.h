@@ -111,6 +111,7 @@ class BdnNodeHandle;
 class BdnEdge;
 
 class BdnBlifReader;
+class BdnIscas89Reader;
 
 class BdnDumper;
 class BdnBlifWriter;
@@ -165,6 +166,7 @@ using nsNetworks::BdnEdgeList;
 using nsNetworks::BdnFanoutList;
 
 using nsNetworks::BdnBlifReader;
+using nsNetworks::BdnIscas89Reader;
 
 using nsNetworks::BdnDumper;
 using nsNetworks::BdnBlifWriter;

@@ -21,7 +21,7 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 LIBYM_BLIF = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
@@ -33,7 +33,8 @@ noinst_PROGRAMS = \
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/blif
 
 parsertest_SOURCES = \
 	parsertest.cc

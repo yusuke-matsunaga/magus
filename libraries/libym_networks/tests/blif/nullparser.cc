@@ -1,19 +1,19 @@
 
-/// @file libym_blif/tests/nullparser.cc
+/// @file libym_networks/tests/blif/nullparser.cc
 /// @brief blif ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// $Id: nullparser.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_blif/BlifParser.h"
-#include "ym_blif/BlifHandler.h"
+#include "BlifParser.h"
+#include "BlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class NullBlifHandler parsertest.cc
@@ -30,17 +30,17 @@ public:
   /// @brief デストラクタ
   virtual
   ~NullBlifHandler();
-  
+
 
 public:
-  
+
   /// @brief 初期化
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
   init();
-  
+
   /// @brief .model 文の処理
   /// @param[in] loc1 .model の位置情報
   /// @param[in] loc2 文字列の位置情報
@@ -148,7 +148,7 @@ public:
   virtual
   void
   error_exit();
-  
+
 };
 
 
@@ -161,7 +161,7 @@ NullBlifHandler::NullBlifHandler()
 NullBlifHandler::~NullBlifHandler()
 {
 }
-  
+
 // @brief 初期化
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
@@ -170,7 +170,7 @@ NullBlifHandler::init()
 {
   return true;
 }
-  
+
 // @brief .model 文の処理
 // @param[in] loc1 .model の位置情報
 // @param[in] loc2 文字列の位置情報
@@ -299,7 +299,7 @@ NullBlifHandler::error_exit()
 {
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_BLIF
 
 
 int
@@ -308,19 +308,20 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+  using namespace nsYm::nsNetworks::nsBlif;
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " blif-file" << endl;
     return 2;
   }
 
   string filename = argv[1];
-  
+
   try {
     BlifParser parser;
     NullBlifHandler* handler = new NullBlifHandler;
     parser.add_handler(handler);
-    
+
     if ( !parser.read(filename) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;

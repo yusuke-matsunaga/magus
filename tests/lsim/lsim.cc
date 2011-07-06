@@ -9,7 +9,7 @@
 
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnBlifReader.h"
-//#include "ym_networks/BdnNode.h"
+#include "ym_networks/BdnIscas89Reader.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -24,17 +24,28 @@
 BEGIN_NAMESPACE_YM
 
 void
-lsim(const string& filename)
+lsim(const string& filename,
+     bool blif,
+     bool iscas89)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
 
-  BdnBlifReader reader;
   BdnMgr network;
 
-  if ( !reader.read(filename, network) ) {
-    cerr << "Error in reading " << filename << endl;
-    return;
+  if ( blif ) {
+    BdnBlifReader reader;
+    if ( !reader.read(filename, network) ) {
+      cerr << "Error in reading " << filename << endl;
+      return;
+    }
+  }
+  else {
+    BdnIscas89Reader reader;
+    if ( !reader.read(filename, network) ) {
+      cerr << "Error in reading " << filename << endl;
+      return;
+    }
   }
 
   RandGen rg;
@@ -43,7 +54,7 @@ lsim(const string& filename)
 
   lsim.set_network(network);
 
-  ymuint nloop = 2000;
+  ymuint nloop = 20000;
   ymuint ni = network.input_num();
   ymuint no = network.output_num();
   vector<ymuint32> iv(ni);
@@ -66,15 +77,39 @@ main(int argc,
   using namespace std;
   using namespace nsYm;
 
-  if ( argc != 2 ) {
-    cerr << "USAGE : " << argv[0] << " blif-file" << endl;
+  bool blif = false;
+  bool iscas = false;
+
+  int i = 1;
+  for ( ; i < argc; ++ i) {
+    if ( argv[i][0] != '-' ) {
+      break;
+    }
+    if ( strcmp(argv[i], "-blif") == 0 ) {
+      blif = true;
+      iscas = false;
+    }
+    else if ( strcmp(argv[i], "-iscas89") == 0 ) {
+      blif = false;
+      iscas = true;
+    }
+    else {
+      break;
+    }
+  }
+  if ( blif == false && iscas == false ) {
+    blif = true;
+  }
+
+  if ( i + 1 != argc ) {
+    cerr << "USAGE : " << argv[0] << " [-blif|-iscas89] file-name" << endl;
     return 2;
   }
 
   StopWatch sw;
   sw.start();
 
-  lsim(argv[1]);
+  lsim(argv[i], blif, iscas);
 
   sw.stop();
 

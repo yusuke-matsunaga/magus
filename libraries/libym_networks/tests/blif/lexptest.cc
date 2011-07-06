@@ -1,5 +1,5 @@
 
-/// @file libym_blif/tests/lexptest.cc
+/// @file libym_networks/tests/blif/lexptest.cc
 /// @brief blif ファイルの読み込みに置ける LogExpr の性能テスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,14 +9,14 @@
 /// All rights reserved.
 
 
-#include "ym_blif/BlifParser.h"
-#include "ym_blif/BlifHandler.h"
+#include "BlifParser.h"
+#include "BlifHandler.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class TestBlifHandler parsertest.cc
@@ -378,7 +378,7 @@ TestBlifHandler::error_exit()
 {
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_BLIF
 
 
 int
@@ -387,6 +387,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
+  using namespace nsYm::nsNetworks::nsBlif;
 
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " blif-file" << endl;

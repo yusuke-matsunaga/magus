@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_BLIF
 class BlifNetwork;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifNetworkHandler BlifNetworkReader.cc
+/// @class BlifNetworkHandler BlifNetworkHandler.h
 /// @brief BlifNetwork 用の BlifHandler
 //////////////////////////////////////////////////////////////////////
 class BlifNetworkHandler :

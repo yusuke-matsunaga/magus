@@ -1,51 +1,45 @@
-#ifndef YM_ISCAS89_ISCAS89HANDLER_H
-#define YM_ISCAS89_ISCAS89HANDLER_H
+#ifndef LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORKHANDLER_H
+#define LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORKHANDLER_H
 
-/// @file ym_iscas89/Iscas89Handler.h
-/// @brief Iscas89Handler のヘッダファイル
+/// @file libym_networks/iscas89/Iscas89NetworkHandler.h
+/// @brief Iscas89NetworkHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89Handler.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "iscas89_nsdef.h"
-#include "ym_utils/FileRegion.h"
+#include "Iscas89Handler.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
 
-//////////////////////////////////////////////////////////////////////
-/// @class Iscas89Handler Iscas89Handler.h "Iscas89Handler.h"
-/// @ingroup Iscas89Group
-/// @brief iscas89 パーサーのイベントハンドラの基底クラス
-/// @sa Iscas89Parser
-//////////////////////////////////////////////////////////////////////
-class Iscas89Handler
-{
-  friend class Iscas89ParserImpl;
+class Iscas89Network;
 
-protected:
+//////////////////////////////////////////////////////////////////////
+/// @class Iscas89NetworkHandler Iscas89NetworkHandler.h
+/// @brief Iscas89Network 用の Iscas89Handler
+//////////////////////////////////////////////////////////////////////
+class Iscas89NetworkHandler :
+  public Iscas89Handler
+{
+public:
 
   /// @brief コンストラクタ
-  Iscas89Handler();
+  Iscas89NetworkHandler();
 
   /// @brief デストラクタ
   virtual
-  ~Iscas89Handler();
+  ~Iscas89NetworkHandler();
 
 
 public:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスは必要に応じて下記の仮想関数を上書きすること
-  // デフォルトの実装はなにもしない．
-  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 読み込む対象のネットワークを設定する．
+  void
+  set_network(Iscas89Network* network);
 
   /// @brief 初期化
-  /// @retval true 処理が成功した．
-  /// @retval false エラーが起こった．
   virtual
   bool
   init();
@@ -95,30 +89,16 @@ public:
   error_exit();
 
 
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスが利用することのできる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ID 番号から文字列を得る．
-  const char*
-  id2str(ymuint32 id) const;
-
-  /// @brief ID 番号から位置情報を得る．
-  FileRegion
-  id2loc(ymuint32 id) const;
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // パーサー本体
-  Iscas89ParserImpl* mParser;
+  // 対象のネットワーク
+  Iscas89Network* mNetwork;
 
 };
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // YM_ISCAS89_ISCAS89HANDLER_H
+#endif // LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORKHANDLER_H
