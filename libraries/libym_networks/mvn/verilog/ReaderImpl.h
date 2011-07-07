@@ -1,11 +1,11 @@
-#ifndef LIBYM_NETWORKS_VERILOG_READERIMPL_H
-#define LIBYM_NETWORKS_VERILOG_READERIMPL_H
+#ifndef LIBYM_NETWORKS_MVN_VERILOG_READERIMPL_H
+#define LIBYM_NETWORKS_MVN_VERILOG_READERIMPL_H
 
-/// @file libym_networks/verilog/ReaderImpl.h
+/// @file libym_networks/mvn/verilog/ReaderImpl.h
 /// @brief ReaderImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -208,6 +208,44 @@ private:
 	     MvnNode* then_cond,
 	     MvnNode* else_cond);
 
+  /// @brief 条件式からノードを生成する．
+  /// @param[in] cond 条件式
+  /// @param[in] env 環境
+  /// @param[out] node 対応するノード
+  /// @param[out] pol 極性(1 が正極性，0　が負極性)
+  /// パタンは
+  /// (1) 識別子
+  /// (2) ~識別子
+  /// (3) !識別子
+  /// (4) 識別子 == 定数
+  /// (5) 識別子 != 定数
+  /// (6) 定数 == 識別子
+  /// (7) 定数 != 識別子
+  /// 識別子は1ビットの reg か net
+  /// 定数は 0 か 1 (最下位ビットのみが意味を持つ)
+  bool
+  parse_cond(const VlExpr* cond,
+	     const Env& env,
+	     MvnNode*& node,
+	     ymuint& pol);
+
+  /// @brief parse_cond() の下請け関数
+  /// @param[in] opr_primary 識別子を表す式
+  /// @param[in] opr_const 定数を表す式
+  /// @param[in] env 環境
+  /// @param[in] pol0 値が0の時の極性値
+  /// @param[in] pol1 値が1の時の極性値
+  /// @param[out] node 対応するノード
+  /// @param[out] pol 極性(1 が正極性，0　が負極性)
+  bool
+  parse_cond_sub(const VlExpr* opr_primary,
+		 const VlExpr* opr_const,
+		 const Env& env,
+		 ymuint pol0,
+		 ymuint pol1,
+		 MvnNode*& node,
+		 ymuint& pol);
+
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式
@@ -344,4 +382,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_VERILOG
 
-#endif // LIBYM_NETWORKS_VERILOG_READERIMPL_H
+#endif // LIBYM_NETWORKS_MVN_VERILOG_READERIMPL_H

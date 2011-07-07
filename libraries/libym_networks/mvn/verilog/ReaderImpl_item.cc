@@ -15,6 +15,7 @@
 #include "ym_networks/MvnMgr.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_verilog/BitVector.h"
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -236,19 +237,16 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       if ( stmt1->type() != kVpiIf && stmt1->type() != kVpiIfElse ) {
 	break;
       }
+
+      // リセット条件を表す条件式
       const VlExpr* cond = stmt1->expr();
+      // 極性(1 が正極性，0 が負極性)
       ymuint pol = 1;
+      // 対象のノード
       MvnNode* node = NULL;
-      if ( cond->type() == kVpiOperation &&
-	   (cond->op_type() == kVpiNotOp  ||
-	    cond->op_type() == kVpiBitNegOp) ) {
-	pol = 0;
-	node = gen_primary(cond->operand(0), mGlobalEnv);
+      if ( !parse_cond(cond, mGlobalEnv, node, pol) ) {
+	return false;
       }
-      else {
-	node = gen_primary(cond, mGlobalEnv);
-      }
-      assert_cond( node != NULL, __FILE__, __LINE__);
 
       bool found = false;
       for (ymuint i = 0; i < ev_num; ++ i) {
@@ -365,6 +363,126 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     }
   }
 
+  return true;
+}
+
+// @brief 条件式からノードを生成する．
+// @param[in] cond 条件式
+// @param[in] env 環境
+// @param[out] node 対応するノード
+// @param[out] pol 極性(1 が正極性，0　が負極性)
+// パタンは
+// (1) 識別子
+// (2) ~識別子
+// (3) !識別子
+// (4) 識別子 == 定数
+// (5) 識別子 != 定数
+// (6) 定数 == 識別子
+// (7) 定数 != 識別子
+// 識別子は1ビットの reg か net
+// 定数は 0 か 1 (最下位ビットのみが意味を持つ)
+bool
+ReaderImpl::parse_cond(const VlExpr* cond,
+		       const Env& env,
+		       MvnNode*& node,
+		       ymuint& pol)
+{
+  if ( cond->is_primary() ) {
+    // (1)
+    node = gen_primary(cond, env);
+    pol = 1;
+    return true;
+  }
+
+  if ( cond->is_operation() ) {
+    if ( cond->op_type() == kVpiNotOp ||
+	 cond->op_type() == kVpiBitNegOp ) {
+      const VlExpr* opr1 = cond->operand(0);
+      if ( !opr1->is_primary() ) {
+	// プライマリ以外はエラー
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			opr1->file_region(),
+			kMsgError,
+			"MVN_VL",
+			"Primary expression is expected.");
+	return false;
+      }
+      // (2)(3)
+      node = gen_primary(opr1, env);
+      pol = 0;
+      return true;
+    }
+
+    if ( cond->op_type() == kVpiEqOp ) {
+      const VlExpr* opr1 = cond->operand(0);
+      const VlExpr* opr2 = cond->operand(1);
+      if ( opr1->is_primary() && opr2->is_const() ) {
+	// (4)
+	return parse_cond_sub(opr1, opr2, env, 0, 1, node, pol);
+      }
+      if ( opr1->is_const() && opr2->is_primary() ) {
+	// (6)
+	return parse_cond_sub(opr2, opr1, env, 0, 1, node, pol);
+      }
+    }
+
+    if ( cond->op_type() == kVpiNeqOp ) {
+      const VlExpr* opr1 = cond->operand(0);
+      const VlExpr* opr2 = cond->operand(1);
+      if ( opr1->is_primary() && opr2->is_const() ) {
+	// (5)
+	return parse_cond_sub(opr1, opr2, env, 1, 0, node, pol);
+      }
+      if ( opr1->is_const() && opr2->is_primary() ) {
+	// (7)
+	return parse_cond_sub(opr2, opr1, env, 1, 0, node, pol);
+      }
+    }
+  }
+
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  cond->file_region(),
+		  kMsgError,
+		  "MVN_VL",
+		  "Illegal expression.");
+  return false;
+}
+
+// @brief parse_cond() の下請け関数
+// @param[in] opr_primary 識別子を表す式
+// @param[in] opr_const 定数を表す式
+// @param[in] env 環境
+// @param[in] pol0 値が0の時の極性値
+// @param[in] pol1 値が1の時の極性値
+// @param[out] node 対応するノード
+// @param[out] pol 極性(1 が正極性，0　が負極性)
+bool
+ReaderImpl::parse_cond_sub(const VlExpr* opr_primary,
+			   const VlExpr* opr_const,
+			   const Env& env,
+			   ymuint pol0,
+			   ymuint pol1,
+			   MvnNode*& node,
+			   ymuint& pol)
+{
+  node = gen_primary(opr_primary, env);
+  VlValue val = opr_const->constant_value();
+  tVpiScalarVal v = val.scalar_value();
+  if ( v == kVpiScalar0 ) {
+    pol = pol0;
+  }
+  else if ( v == kVpiScalar1 ) {
+    pol = pol1;
+  }
+  else {
+    // 値がエラー
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    opr_const->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Illegal value.");
+    return false;
+  }
   return true;
 }
 

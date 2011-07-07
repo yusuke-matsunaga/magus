@@ -616,7 +616,11 @@ EiParameter::is_little_endian() const
 ymuint
 EiParameter::bit_size() const
 {
+#if 1
   return mHead->bit_size();
+#else
+  return unpack_size(value_type());
+#endif
 }
 
 // @brief オフセット値の取得
@@ -692,6 +696,5 @@ EiLocalParam::is_local_param() const
 {
   return true;
 }
-
 
 END_NAMESPACE_YM_VERILOG

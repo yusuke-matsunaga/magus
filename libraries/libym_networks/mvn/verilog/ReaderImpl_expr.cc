@@ -87,6 +87,8 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       }
       return node;
     }
+    cout << "gen_opr: " << expr->decompile() << ", " << expr->file_region()
+	 << endl;
     return gen_opr(parent_module, expr->op_type(), inputs, expr->bit_size());
   }
 
@@ -438,6 +440,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVpiEqOp:
     {
       ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw1 = operand_array[1]->output(0)->bit_width();
+      cout << "bw = " << bw << ", bw1 = " << bw1 << endl;
       MvnNode* node = mMvnMgr->new_equal(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
@@ -595,6 +599,7 @@ ReaderImpl::gen_primary(const VlExpr* expr,
   }
 #if defined(YM_DEBUG)
   cerr << "Error in " << expr->decompile() << endl;
+  cerr << "  " << expr->file_region() << endl;
 #endif
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
