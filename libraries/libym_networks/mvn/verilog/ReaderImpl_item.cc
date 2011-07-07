@@ -3,7 +3,7 @@
 /// @brief ReaderImpl の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -150,14 +150,22 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 {
   if ( process->type() != kVpiAlways ) {
     // always 文以外(initial文)はダメ
-    cerr << "initial should not be used." << endl;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    process->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "'initial' should not be used.");
     return false;
   }
 
   const VlStmt* stmt = process->stmt();
   if ( stmt->type() != kVpiEventControl ) {
     // always の直後は '@' でなければダメ
-    cerr << "only '@' is allowed here." << endl;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    stmt->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "only '@' is allowed here.");
     return false;
   }
 
@@ -174,7 +182,11 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	has_edge_event = true;
       }
       else {
-	cerr << "only edge descriptor should be used." << endl;
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			expr->file_region(),
+			kMsgError,
+			"MVN_VL",
+			"only edge descriptor should be used.");
 	return false;
       }
     }
@@ -182,7 +194,11 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       has_normal_event = true;
     }
     else {
-      cerr << "illegal type" << endl;
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      expr->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "Illegal expression type.");
       return false;
     }
   }
@@ -190,8 +206,12 @@ ReaderImpl::gen_process(MvnModule* parent_module,
   if ( has_edge_event ) {
     // edge 記述があったらすべて edge 記述でなければならない．
     if ( has_normal_event ) {
-      cerr << "edge-type events and normal events are "
-	   << "mutual exclusive." << endl;
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      control->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "edge-type events and normal events are "
+		      "mutual exclusive.");
       return false;
     }
 
@@ -235,7 +255,11 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	MvnNode* node1 = event_node_array[i].first;
 	if ( node == node1 ) {
 	  if ( pol != event_node_array[i].second ) {
-	    cerr << "Polarity mismatch." << endl;
+	    MsgMgr::put_msg(__FILE__, __LINE__,
+			    cond->file_region(),
+			    kMsgError,
+			    "MVN_VL",
+			    "Polarity mismatch.");
 	    return false;
 	  }
 	  found = true;
@@ -252,7 +276,11 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       stmt1 = stmt1->else_stmt();
     }
     if ( event_list.size() != ev_num - 1 ) {
-      cerr << "Too few if branch against the event list" << endl;
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      stmt->body_stmt()->file_region(),
+		      kMsgError,
+		      "MVN_VL",
+		      "Too few 'if' branch against the event list.");
       return false;
     }
 
@@ -506,22 +534,28 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
     break;
 
   case kVpiCombPrim:
-    {
-#warning "TODO: エラーメッセージを出力する．"
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    break;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    prim->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Combinational UDP should not be used.");
+    return;
 
   case kVpiSeqPrim:
-    {
-#warning "TODO: エラーメッセージを出力する．"
-      assert_not_reached(__FILE__, __LINE__);
-    }
-    break;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    prim->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Sequential UDP should not be used.");
+    return;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    prim->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Illegal primitive type.");
+    return;
   }
 
   ymuint pos = 0;

@@ -114,7 +114,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       return node1;
     }
     else {
-#warning "TODO: [msb:lsb] のオフセット変換をしていない"
+#warning "TODO-2011-07-07-01: [msb:lsb] のオフセット変換をしていない"
       MvnNode* node1 = gen_expr(parent_module, expr->index(), env);
       const MvnOutputPin* pin0 = node->output(0);
       const MvnOutputPin* pin1 = node1->output(0);
@@ -155,7 +155,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       return node1;
     }
     else {
-#warning "TODO: [msb:lsb] のオフセット変換をしていない"
+#warning "TODO-2011-07-07-02: [msb:lsb] のオフセット変換をしていない"
       // まだできてない．
       // というか可変 part_select は VPI がおかしいと思う．
       assert_not_reached(__FILE__, __LINE__);
@@ -544,9 +544,11 @@ ReaderImpl::gen_primary(const VlExpr* expr,
   if ( decl ) {
     assert_cond(expr->declarray_dimension() == 0, __FILE__, __LINE__);
     MvnNode* node = env.get(decl);
+#if defined(YM_DEBUG)
     if ( node == NULL ) {
       cerr << decl->name() << " is not found in mGlobalEnv" << endl;
     }
+#endif
     assert_cond( node != NULL, __FILE__, __LINE__);
     return node;
   }
@@ -555,9 +557,11 @@ ReaderImpl::gen_primary(const VlExpr* expr,
       // インデックス固定の配列要素
       ymuint offset = expr->declarray_offset();
       MvnNode* node = env.get(declarray, offset);
+#if defined(YM_DEBUG)
       if ( node == NULL ) {
 	cerr << decl->name() << " is not found in mGlobalEnv" << endl;
       }
+#endif
       assert_cond( node != NULL, __FILE__, __LINE__);
       return node;
     }
@@ -583,12 +587,15 @@ ReaderImpl::gen_primary(const VlExpr* expr,
       assert_cond( node != NULL, __FILE__, __LINE__);
       return node;
 #else
+#warning "TODO-2011-07-07-03: 可変インデックスの配列要素"
       assert_not_reached(__FILE__, __LINE__);
       return NULL;
 #endif
     }
   }
-  cout << "Error in " << expr->decompile() << endl;
+#if defined(YM_DEBUG)
+  cerr << "Error in " << expr->decompile() << endl;
+#endif
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }

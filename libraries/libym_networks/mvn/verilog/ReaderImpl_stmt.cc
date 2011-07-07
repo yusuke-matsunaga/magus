@@ -19,12 +19,14 @@
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlRange.h"
 
+#include "ym_utils/MsgMgr.h"
+
 
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 using namespace nsYm::nsVerilog;
 
-// @brief ステートメントの中身を生成する．
+// @brief ステートメントの中身を生成する(combinational always用)．
 // @param[in] module 親のモジュール
 // @param[in] stmt 本体のステートメント
 // @param[in] env 環境
@@ -92,7 +94,7 @@ ReaderImpl::gen_stmt1(MvnModule* module,
   return true;
 }
 
-// @brief ステートメントの中身を生成する．
+// @brief ステートメントの中身を生成する(sequential always用)．
 // @param[in] module 親のモジュール
 // @param[in] stmt 本体のステートメント
 // @param[in] env 環境
@@ -214,80 +216,115 @@ ReaderImpl::gen_assign(MvnModule* module,
       mMvnMgr->connect(src_node, 0, dst_node, 0);
     }
     else if ( lhs1->is_bitselect() ) {
-#if 0
-      assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-#warning "TODO: reg 型なら可変ビットセレクトもあり"
-      MvnNode* src_node = gen_rhs(module, node, offset, 0);
-      ymuint index = lhs_declbase->bit_offset(lhs1->index_val());
-      vector<ymuint> bw_array;
-      bw_array.reserve(3);
-      if ( index < bw - 1 ) {
-	bw_array.push_back(bw - index - 1);
-      }
-      bw_array.push_back(1);
-      if ( index > 0 ) {
-	bw_array.push_back(index);
-      }
-      dst_node = mMvnMgr->new_concat(module, bw_array);
-      ymuint pos = 0;
-      if ( index < bw - 1 ) {
-	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							 bw - 1,
-							 index + 1,
-							 bw);
-	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+#if 1
+#warning "未完"
+#else
+      if ( lhs1->is_constant_select() ) {
+	// 固定インデックス
+	MvnNode* src_node = gen_rhs(module, node, offset, 0);
+	ymuint offset;
+	if ( !lhs_declbase->calc_bit_offset(lhs1->index_val(), offset) ) {
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  lhs1->file_region(),
+			  kMsgError,
+			  "MVN_VL",
+			  "Index is out of range");
+	  return;
+	}
+	vector<ymuint> bw_array;
+	bw_array.reserve(3);
+	if ( offset < bw - 1 ) {
+	  bw_array.push_back(bw - offset - 1);
+	}
+	bw_array.push_back(1);
+	if ( offset > 0 ) {
+	  bw_array.push_back(offset);
+	}
+	dst_node = mMvnMgr->new_concat(module, bw_array);
+	ymuint pos = 0;
+	if ( offset < bw - 1 ) {
+	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
+							   bw - 1,
+							   offset + 1,
+							   bw);
+	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+	  ++ pos;
+	}
+	mMvnMgr->connect(src_node, 0, dst_node, pos);
 	++ pos;
+	if ( offset > 0 ) {
+	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
+							   offset - 1,
+							   0,
+							   bw);
+	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+	}
       }
-      mMvnMgr->connect(src_node, 0, dst_node, pos);
-      ++ pos;
-      if ( index > 0 ) {
-	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							 index - 1,
-							 0,
-							 bw);
-	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+      else {
+	// 可変インデックス
       }
 #endif
     }
     else if ( lhs1->is_partselect() ) {
-#if 0
-      assert_cond( lhs1->is_constant_select(), __FILE__, __LINE__);
-#warning "TODO: reg 型なら可変範囲セレクトもあり"
-      ymuint msb = lhs_declbase->bit_offset(lhs1->left_range_val());
-      ymuint lsb = lhs_declbase->bit_offset(lhs1->right_range_val());
-      ymuint lbw = msb - lsb + 1;
-      MvnNode* src_node = gen_rhs(module, node, offset, lbw);
-      vector<ymuint> bw_array;
-      bw_array.reserve(3);
-      if ( msb < bw - 1 ) {
-	bw_array.push_back(bw - msb - 1);
-      }
-      bw_array.push_back(msb - lsb + 1);
-      if ( lsb > 0 ) {
-	bw_array.push_back(lsb);
-      }
-      dst_node = mMvnMgr->new_concat(module, bw_array);
-      ymuint pos = 0;
-      if ( msb < bw - 1 ) {
-	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							 bw - 1,
-							 msb + 1,
-							 bw);
-	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+#if 1
+#warning "未完"
+#else
+      if ( lhs1->is_constant_select() ) {
+	ymuint msb;
+	if ( !lhs_declbase->calc_bit_offset(lhs1->left_range_val(), msb) ) {
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  lhs1->file_region(),
+			  kMsgError,
+			  "MVN_VL",
+			  "Left index is out of range");
+	  return;
+	}
+	ymuint lsb;
+	if ( !lhs_declbase->calc_bit_offset(lhs1->right_range_val(), lsb) ) {
+	  MsgMgr::put_msg(__FILE__, __LINE__,
+			  lhs1->file_region(),
+			  kMsgError,
+			  "MVN_VL",
+			  "Right index is out of range");
+	  return;
+	}
+	ymuint lbw = msb - lsb + 1;
+	MvnNode* src_node = gen_rhs(module, node, offset, lbw);
+	vector<ymuint> bw_array;
+	bw_array.reserve(3);
+	if ( msb < bw - 1 ) {
+	  bw_array.push_back(bw - msb - 1);
+	}
+	bw_array.push_back(msb - lsb + 1);
+	if ( lsb > 0 ) {
+	  bw_array.push_back(lsb);
+	}
+	dst_node = mMvnMgr->new_concat(module, bw_array);
+	ymuint pos = 0;
+	if ( msb < bw - 1 ) {
+	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
+							   bw - 1,
+							   msb + 1,
+							   bw);
+	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+	  ++ pos;
+	}
+	mMvnMgr->connect(src_node, 0, dst_node, pos);
 	++ pos;
+	if ( lsb > 0 ) {
+	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
+							   lsb - 1,
+							   0,
+							   bw);
+	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
+	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+	}
       }
-      mMvnMgr->connect(src_node, 0, dst_node, pos);
-      ++ pos;
-      if ( lsb > 0 ) {
-	MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							 lsb - 1,
-							 0,
-							 bw);
-	mMvnMgr->connect(old_dst, 0, tmp_node, 0);
-	mMvnMgr->connect(tmp_node, 0, dst_node, pos);
+      else {
+	// 可変インデックス
       }
 #endif
     }
@@ -317,12 +354,10 @@ ReaderImpl::merge_env1(MvnModule* parent_module,
 {
   ymuint n = env.max_id();
   for (ymuint i = 0; i < n; ++ i) {
-    AssignInfo info0 = env.get_from_id(i);
-    MvnNode* node0 = info0.mRhs;
-    MvnNode* cond0 = info0.mCond;
     AssignInfo info1 = then_env.get_from_id(i);
     MvnNode* node1 = info1.mRhs;
     MvnNode* cond1 = info1.mCond;
+
     AssignInfo info2 = else_env.get_from_id(i);
     MvnNode* node2 = info2.mRhs;
     MvnNode* cond2 = info2.mCond;
