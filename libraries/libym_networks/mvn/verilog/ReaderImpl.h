@@ -242,19 +242,19 @@ private:
   gen_primary(const VlExpr* expr,
 	      const Env& env);
 
-  /// @brief 右辺式に対応するノードを返す．
+  /// @brief 右辺式から該当する部分を切り出す．
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] node 右辺式のノード
+  /// @param[in] rhs_node 右辺式のノード
   /// @param[in] offset オフセット
   /// @param[in] bit_width ビット幅
-  /// @note node から [offset: offset + bit_width - 1] の選択するノードを返す．
-  /// @note 全範囲を選択する場合には node を返す．
+  /// @note rhs_node から [offset: offset + bit_width - 1] の選択するノードを返す．
+  /// @note 全範囲を選択する場合には rhs_node を返す．
   /// @note 範囲が合わなかったら NULL を返す．
   MvnNode*
-  gen_rhs(MvnModule* parent_module,
-	  MvnNode* node,
-	  ymuint offset,
-	  ymuint bit_width);
+  splice_rhs(MvnModule* parent_module,
+	     MvnNode* rhs_node,
+	     ymuint offset,
+	     ymuint bit_width);
 
   /// @brief 左辺式に接続する．
   /// @param[in] dst_node 左辺に対応するノード

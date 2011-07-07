@@ -617,40 +617,40 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
   }
 }
 
-// @brief 右辺式に対応するノードを返す．
+// @brief 右辺式から該当する部分を切り出す．
 // @param[in] parent_module 親のモジュール
-// @param[in] node 右辺式のノード
+// @param[in] rhs_node 右辺式のノード
 // @param[in] offset オフセット
 // @param[in] bit_width ビット幅
-// @note node から [offset: offset + bit_width - 1] の選択するノードを返す．
+// @note rhs_node から [offset: offset + bit_width - 1] の選択するノードを返す．
 // @note 全範囲を選択する場合には node を返す．
 // @note 範囲が合わなかったら NULL を返す．
 MvnNode*
-ReaderImpl::gen_rhs(MvnModule* parent_module,
-		    MvnNode* node,
-		    ymuint offset,
-		    ymuint bit_width)
+ReaderImpl::splice_rhs(MvnModule* parent_module,
+		       MvnNode* rhs_node,
+		       ymuint offset,
+		       ymuint bit_width)
 {
-  ymuint src_bw = node->output(0)->bit_width();
+  ymuint src_bw = rhs_node->output(0)->bit_width();
   assert_cond( offset + bit_width <= src_bw, __FILE__, __LINE__);
 
   MvnNode* src_node = NULL;
   if ( offset == 0 && bit_width == src_bw ) {
     // 全範囲の選択
-    src_node = node;
+    src_node = rhs_node;
   }
   else if ( bit_width == 1 ) {
     src_node = mMvnMgr->new_constbitselect(parent_module,
-					  offset,
-					  src_bw);
-    mMvnMgr->connect(node, 0, src_node, 0);
+					   offset,
+					   src_bw);
+    mMvnMgr->connect(rhs_node, 0, src_node, 0);
   }
   else {
     src_node = mMvnMgr->new_constpartselect(parent_module,
-					   offset,
-					   offset + bit_width - 1,
-					   src_bw);
-    mMvnMgr->connect(node, 0, src_node, 0);
+					    offset,
+					    offset + bit_width - 1,
+					    src_bw);
+    mMvnMgr->connect(rhs_node, 0, src_node, 0);
   }
   return src_node;
 }
