@@ -90,6 +90,9 @@ VlValue::VlValue(const VlValue& src,
   else if ( value_type == kVpiValueTime ) {
     mRep = new VlValueTime(src.time_value());
   }
+  else if ( value_type == kVpiValueNone ) {
+    mRep = src.mRep;
+  }
   else if ( ::nsYm::nsVerilog::is_bitvector_type(value_type) ) {
     const BitVector& src_bv = src.bitvector_value();
     mRep = new VlValueBitVector(BitVector(src_bv,
