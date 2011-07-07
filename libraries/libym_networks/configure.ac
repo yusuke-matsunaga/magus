@@ -114,7 +114,6 @@ AC_CONFIG_FILES([tests/bdn/Makefile])
 AC_CONFIG_FILES([tests/bnet/Makefile])
 AC_CONFIG_FILES([tests/mvn/Makefile])
 AC_CONFIG_FILES([tests/tgnet/Makefile])
-AC_CONFIG_FILES([tests/conv_blif_bnet/Makefile])
 AC_CONFIG_FILES([tests/conv_bnet_bdn/Makefile])
 AC_CONFIG_FILES([tests/conv_mvn_bdn/Makefile])
 

@@ -26,8 +26,7 @@ LIBYM_BLIF = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 noinst_PROGRAMS = \
-	parsertest \
-	nullparser \
+	parser_test \
 	lexptest \
 	reader_test
 
@@ -36,20 +35,21 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/blif
 
-parsertest_SOURCES = \
-	parsertest.cc
+parser_test_SOURCES = \
+	parser_test.cc \
+	TestBlifHandler.h \
+	TestBlifHandler.cc \
+	NullBlifHandler.h \
+	NullBlifHandler.cc
 
-parsertest_LDADD = $(LIBYM_BLIF)
+parser_test_LDADD = $(LIBYM_BLIF)
 
-nullparser_SOURCES = \
-	nullparser.cc
-
-nullparser_LDADD = $(LIBYM_BLIF)
 
 lexptest_SOURCES = \
 	lexptest.cc
 
 lexptest_LDADD = $(LIBYM_BLIF)
+
 
 reader_test_SOURCES = \
 	reader_test.cc

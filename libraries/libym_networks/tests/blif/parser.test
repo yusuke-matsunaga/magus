@@ -25,7 +25,7 @@ do
 
   echo -n "reading $file ..."
 
-  ${TEST_PATH}/parsertest ${TEST_SRC}/$file 2> err-tmp | sed -e "s|${TEST_SRC}/||g" > out
+  ${TEST_PATH}/parser_test ${TEST_SRC}/$file 2> err-tmp | sed -e "s|${TEST_SRC}/||g" > out
   sed -e "s|${TEST_SRC}/||g" < err-tmp > err
   rm -f err-tmp
 
