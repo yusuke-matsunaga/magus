@@ -139,7 +139,16 @@ Parser::new_PortArray(PtIOHeadArray iohead_array)
       const PtIOItem* elem = head->item(j);
       const char* name = elem->name();
       const PtExpr* portref = mFactory.new_Primary(elem->file_region(), name);
-      array[n] = mFactory.new_Port(elem->file_region(), portref, name);
+      PtiPort* port = mFactory.new_Port(elem->file_region(), portref, name);
+      tVpiDirection dir;
+      switch ( head->type() ) {
+      case kPtIO_Input:  dir = kVpiInput; break;
+      case kPtIO_Output: dir = kVpiOutput; break;
+      case kPtIO_Inout:  dir = kVpiInout; break;
+      default: assert_not_reached(__FILE__, __LINE__);
+      }
+      port->_set_portref_dir(0, dir);
+      array[n] = port;
       ++ n;
     }
   }
