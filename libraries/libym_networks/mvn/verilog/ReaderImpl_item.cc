@@ -585,11 +585,7 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
 			    const VlExpr* lhs,
 			    const VlExpr* rhs)
 {
-  MvnNode* node_orig = gen_expr(parent_module, rhs, mGlobalEnv);
-
-  ymuint lhs_bw = lhs->bit_size();
-  bool lhs_signed = is_signed_type(lhs->value_type());
-  MvnNode* node = coerce_rhs(parent_module, lhs_bw, lhs_signed, node_orig);
+  MvnNode* rhs_node = gen_rhs(parent_module, lhs, rhs, mGlobalEnv);
 
   ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
@@ -597,7 +593,7 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
     const VlExpr* lhs_elem = lhs->lhs_elem(i);
     MvnNode* dst_node = gen_primary(lhs_elem, mGlobalEnv);
     ymuint dst_bw = lhs_elem->bit_size();
-    MvnNode* src_node = splice_rhs(parent_module, node, offset, dst_bw);
+    MvnNode* src_node = splice_rhs(parent_module, rhs_node, offset, dst_bw);
     connect_lhs(dst_node, lhs_elem, src_node, rhs->file_region());
     offset += dst_bw;
   }

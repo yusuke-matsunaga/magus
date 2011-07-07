@@ -174,11 +174,7 @@ ReaderImpl::gen_assign(MvnModule* module,
   const VlExpr* rhs = stmt->rhs();
   const VlExpr* lhs = stmt->lhs();
 
-  MvnNode* node_orig = gen_expr(module, rhs, env);
-
-  ymuint lhs_bw = lhs->bit_size();
-  bool lhs_signed = is_signed_type(lhs->value_type());
-  MvnNode* node = coerce_rhs(module, lhs_bw, lhs_signed, node_orig);
+  MvnNode* rhs_node = gen_rhs(module, lhs, rhs, env);
 
   ymuint n = lhs->lhs_elem_num();
   ymuint offset = 0;
@@ -211,7 +207,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 
     MvnNode* dst_node = NULL;
     if ( lhs1->is_primary() ) {
-      MvnNode* src_node = splice_rhs(module, node, offset, bw);
+      MvnNode* src_node = splice_rhs(module, rhs_node, offset, bw);
       dst_node = mMvnMgr->new_through(module, bw);
       mMvnMgr->connect(src_node, 0, dst_node, 0);
     }
@@ -221,7 +217,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 #else
       if ( lhs1->is_constant_select() ) {
 	// 固定インデックス
-	MvnNode* src_node = splice_rhs(module, node, offset, 0);
+	MvnNode* src_node = splice_rhs(module, rhs_node, offset, 0);
 	ymuint offset;
 	if ( !lhs_declbase->calc_bit_offset(lhs1->index_val(), offset) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
@@ -291,7 +287,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 	  return;
 	}
 	ymuint lbw = msb - lsb + 1;
-	MvnNode* src_node = splice_rhs(module, node, offset, lbw);
+	MvnNode* src_node = splice_rhs(module, rhs_node, offset, lbw);
 	vector<ymuint> bw_array;
 	bw_array.reserve(3);
 	if ( msb < bw - 1 ) {

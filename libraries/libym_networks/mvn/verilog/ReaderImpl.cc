@@ -617,6 +617,70 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
   }
 }
 
+// @bief 右辺式に対応するノードを作る．
+// @param[in] parent_module 親のモジュール
+// @param[in] lhs 左辺式
+// @param[in] rhs 右辺式
+// @param[in] env 環境
+MvnNode*
+ReaderImpl::gen_rhs(MvnModule* parent_module,
+		    const VlExpr* lhs,
+		    const VlExpr* rhs,
+		    const Env& env)
+{
+  MvnNode* node_orig = gen_expr(parent_module, rhs, env);
+
+  ymuint lhs_bw = lhs->bit_size();
+  bool lhs_signed = is_signed_type(lhs->value_type());
+
+  ymuint src_bw = node_orig->output(0)->bit_width();
+  MvnNode* node = node_orig;
+  if ( lhs_bw > src_bw ) {
+    // 左辺のビット幅が大きいとき
+    // 上位ビットをパディングする．
+    ymuint np = lhs_bw - src_bw;
+    if ( lhs_signed ) {
+      // 符号付きの場合は再上位ビットをコピーする．
+      vector<ymuint> ibw_array(np + 1);
+      for (ymuint i = 0; i < np; ++ i) {
+	ibw_array[i] = 1;
+      }
+      ibw_array[np] = src_bw;
+      node = mMvnMgr->new_concat(parent_module, ibw_array);
+      MvnNode* msb_node = mMvnMgr->new_constbitselect(parent_module,
+						      src_bw - 1, src_bw);
+      mMvnMgr->connect(node_orig, 0, msb_node, 0);
+      for (ymuint i = 0; i < np; ++ i) {
+	mMvnMgr->connect(msb_node, 0, node, i);
+      }
+      mMvnMgr->connect(node_orig, 0, node, np);
+    }
+    else {
+      // 符号なしの場合は0を入れる．
+      vector<ymuint> ibw_array(2);
+      ibw_array[0] = np;
+      ibw_array[1] = src_bw;
+      node = mMvnMgr->new_concat(parent_module, ibw_array);
+      ymuint nblk = (np + 31) / 32;
+      vector<ymuint32> val(nblk);
+      for (ymuint i = 0; i < nblk; ++ i) {
+	val[i] = 0U;
+      }
+      MvnNode* zero = mMvnMgr->new_const(parent_module, np, val);
+      mMvnMgr->connect(zero, 0, node, 0);
+      mMvnMgr->connect(node_orig, 0, node, 1);
+    }
+  }
+  else if ( lhs_bw < src_bw ) {
+    // 左辺のビット幅が小さいとき
+    // ただ単に下位ビットを取り出す．
+    node = mMvnMgr->new_constpartselect(parent_module, lhs_bw - 1, 0, src_bw);
+    mMvnMgr->connect(node_orig, 0, node, 0);
+  }
+  assert_cond( node != NULL, __FILE__, __LINE__);
+  return node;
+}
+
 // @brief 右辺式から該当する部分を切り出す．
 // @param[in] parent_module 親のモジュール
 // @param[in] rhs_node 右辺式のノード
@@ -653,60 +717,6 @@ ReaderImpl::splice_rhs(MvnModule* parent_module,
     mMvnMgr->connect(rhs_node, 0, src_node, 0);
   }
   return src_node;
-}
-
-// @brief 代入文の左辺と右辺の幅が異なる場合の補正を行う．
-MvnNode*
-ReaderImpl::coerce_rhs(MvnModule* module,
-		       ymuint lhs_bw,
-		       bool lhs_signed,
-		       MvnNode* rhs_node)
-{
-  ymuint src_bw = rhs_node->output(0)->bit_width();
-  MvnNode* node = rhs_node;
-  if ( lhs_bw > src_bw ) {
-    // 左辺のビット幅が大きいとき
-    // 上位ビットをパディングする．
-    ymuint np = lhs_bw - src_bw;
-    if ( lhs_signed ) {
-      // 符号付きの場合は再上位ビットをコピーする．
-      vector<ymuint> ibw_array(np + 1);
-      for (ymuint i = 0; i < np; ++ i) {
-	ibw_array[i] = 1;
-      }
-      ibw_array[np] = src_bw;
-      node = mMvnMgr->new_concat(module, ibw_array);
-      MvnNode* msb_node = mMvnMgr->new_constbitselect(module, src_bw - 1, src_bw);
-      mMvnMgr->connect(rhs_node, 0, msb_node, 0);
-      for (ymuint i = 0; i < np; ++ i) {
-	mMvnMgr->connect(msb_node, 0, node, i);
-      }
-      mMvnMgr->connect(rhs_node, 0, node, np);
-    }
-    else {
-      // 符号なしの場合は0を入れる．
-      vector<ymuint> ibw_array(2);
-      ibw_array[0] = np;
-      ibw_array[1] = src_bw;
-      node = mMvnMgr->new_concat(module, ibw_array);
-      ymuint nblk = (np + 31) / 32;
-      vector<ymuint32> val(nblk);
-      for (ymuint i = 0; i < nblk; ++ i) {
-	val[i] = 0U;
-      }
-      MvnNode* zero = mMvnMgr->new_const(module, np, val);
-      mMvnMgr->connect(zero, 0, node, 0);
-      mMvnMgr->connect(rhs_node, 0, node, 1);
-    }
-  }
-  else if ( lhs_bw < src_bw ) {
-    // 左辺のビット幅が小さいとき
-    // ただ単に下位ビットを取り出す．
-    node = mMvnMgr->new_constpartselect(module, lhs_bw - 1, 0, src_bw);
-    mMvnMgr->connect(rhs_node, 0, node, 0);
-  }
-  assert_cond( node != NULL, __FILE__, __LINE__);
-  return node;
 }
 
 // @brief 宣言要素に対応するノードを登録する．

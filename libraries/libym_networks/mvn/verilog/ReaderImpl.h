@@ -170,13 +170,6 @@ private:
 	     const VlStmt* stmt,
 	     ProcEnv& env);
 
-  /// @brief 代入文の左辺と右辺の幅が異なる場合の補正を行う．
-  MvnNode*
-  coerce_rhs(MvnModule* module,
-	     ymuint lhs_bw,
-	     bool lhs_signed,
-	     MvnNode* rhs_node);
-
   /// @brief 環境をマージする．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] env 対象の環境
@@ -241,6 +234,17 @@ private:
   MvnNode*
   gen_primary(const VlExpr* expr,
 	      const Env& env);
+
+  /// @bief 右辺式に対応するノードを作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] lhs 左辺式
+  /// @param[in] rhs 右辺式
+  /// @param[in] env 環境
+  MvnNode*
+  gen_rhs(MvnModule* parent_module,
+	  const VlExpr* lhs,
+	  const VlExpr* rhs,
+	  const Env& env);
 
   /// @brief 右辺式から該当する部分を切り出す．
   /// @param[in] parent_module 親のモジュール
