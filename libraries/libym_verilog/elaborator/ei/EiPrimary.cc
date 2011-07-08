@@ -15,6 +15,7 @@
 #include "ElbParameter.h"
 #include "ElbPrimitive.h"
 
+#include "ym_verilog/VlValue.h"
 #include "ym_verilog/pt/PtDecl.h"
 
 
@@ -392,6 +393,15 @@ bool
 EiParamPrimary::is_const() const
 {
   return true;
+}
+
+// @brief 定数値を返す．
+// @note kVpiConstant の時，意味を持つ．
+// @note それ以外では動作は不定
+VlValue
+EiParamPrimary::constant_value() const
+{
+  return mObj->get_value();
 }
 
 // @brief 宣言要素もしくは配列型宣言要素への参照を返す．

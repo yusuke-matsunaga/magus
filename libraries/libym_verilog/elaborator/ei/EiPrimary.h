@@ -337,10 +337,17 @@ public:
   value_type() const;
 
   /// @brief 定数の時 true を返す．
-  /// @note 参照している要素の型によって決まる．
+  /// @note このクラスでは true を返す．
   virtual
   bool
   is_const() const;
+
+  /// @brief 定数値を返す．
+  /// @note kVpiConstant の時，意味を持つ．
+  /// @note それ以外では動作は不定
+  virtual
+  VlValue
+  constant_value() const;
 
   /// @brief 宣言要素もしくは配列型宣言要素への参照を返す．
   /// @note それ以外では NULL を返す．
