@@ -142,6 +142,7 @@ decompile_opr(const PtExpr* expr,
   switch ( optype ) {
     // 空
   case kVpiNullOp:
+    ans += decompile_impl(expr->operand(0), 0);
     break;
 
     // 単項演算子
