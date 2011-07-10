@@ -140,12 +140,19 @@ EiParamHead::parent() const
 }
 
 // @brief 符号の取得
+// @param[in] val 値
 // @retval true 符号つき
 // @retval false 符号なし
+// @note ヘッダに型指定がない時は値から情報を得る．
 bool
-EiParamHead::is_signed() const
+EiParamHead::is_signed(const VlValue& val) const
 {
-  return mPtHead->is_signed();
+  if ( mPtHead->data_type() == kVpiVarNone ) {
+    return val.is_signed();
+  }
+  else {
+    return mPtHead->is_signed();
+  }
 }
 
 // @brief 範囲指定を持つとき true を返す．
@@ -165,6 +172,7 @@ EiParamHead::left_range_val() const
     return kVpiSizeInteger - 1;
 
   case kVpiVarReal:
+  case kVpiVarRealtime:
     return 0;
 
   case kVpiVarTime:
@@ -212,41 +220,51 @@ EiParamHead::is_big_endian() const
 bool
 EiParamHead::is_little_endian() const
 {
-  return true;
+  return false;
 }
 
 // @brief ビット幅を返す．
+// @param[in] val 値
+// @note ヘッダに型指定がない時は値から情報を得る．
 ymuint
-EiParamHead::bit_size() const
+EiParamHead::bit_size(const VlValue& val) const
 {
   switch ( mPtHead->data_type() ) {
   case kVpiVarInteger:
     return kVpiSizeInteger;
 
   case kVpiVarReal:
+  case kVpiVarRealtime:
     return kVpiSizeReal;
 
   case kVpiVarTime:
     return kVpiSizeTime;
 
+  case kVpiVarNone:
+    return val.bit_size();
+
   default:
     break;
   }
-  // int とみなす．
+  assert_not_reached(__FILE__, __LINE__);
   return kVpiSizeInteger;
 }
 
 // @brief オフセット値の取得
 // @param[in] index インデックス
 // @param[out] offset インデックスに対するオフセット値
+// @param[in] val 値
 // @retval true インデックスが範囲内に入っている時
 // @retval false インデックスが範囲外の時
+// @note ヘッダに型指定がない時は値から情報を得る．
 bool
 EiParamHead::calc_bit_offset(int index,
-			     ymuint& offset) const
+			     ymuint& offset,
+			     const VlValue& val) const
 {
   switch ( mPtHead->data_type() ) {
   case kVpiVarReal:
+  case kVpiVarRealtime:
     return false;
 
   case kVpiVarTime:
@@ -257,21 +275,31 @@ EiParamHead::calc_bit_offset(int index,
     return false;
 
   case kVpiVarInteger:
-  default:
-    // int とみなす．
     if ( index >= 0 && index < static_cast<int>(kVpiSizeInteger) ) {
       offset = index;
       return true;
     }
     return false;
+
+  case kVpiVarNone:
+    if ( index >= 0 && index < static_cast<int>(val.bit_size()) ) {
+      offset = index;
+      return true;
+    }
+    return false;
+
+  default:
+    break;
   }
+  assert_not_reached(__FILE__, __LINE__);
   return false;
 }
 
 // @breif 値の型を返す．
-// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+// @param[in] val 値
+// @note ヘッダに型指定がない時は値から情報を得る．
 tVpiValueType
-EiParamHead::value_type() const
+EiParamHead::value_type(const VlValue& val) const
 {
   switch ( mPtHead->data_type() ) {
   case kVpiVarReal:
@@ -285,8 +313,10 @@ EiParamHead::value_type() const
     return kVpiValueInteger;
 
   case kVpiVarNone:
-    // この場合，式の値で決まる．
-    return kVpiValueNone;
+    return val.value_type();
+
+  default:
+    break;
   }
   assert_not_reached(__FILE__, __LINE__);
   return kVpiValueNone;
@@ -297,6 +327,13 @@ tVpiVarType
 EiParamHead::data_type() const
 {
   return mPtHead->data_type();
+}
+
+// @brief パース木の宣言ヘッダを返す．
+const PtDeclHead*
+EiParamHead::pt_head() const
+{
+  return mPtHead;
 }
 
 
@@ -325,6 +362,17 @@ EiParamHeadV::EiParamHeadV(const VlNamedObj* parent,
 // @brief デストラクタ
 EiParamHeadV::~EiParamHeadV()
 {
+}
+
+// @brief 符号の取得
+// @param[in] val 値
+// @retval true 符号つき
+// @retval false 符号なし
+// @note ヘッダに型指定がない時は値から情報を得る．
+bool
+EiParamHeadV::is_signed(const VlValue& val) const
+{
+  return pt_head()->is_signed();
 }
 
 // @brief 範囲指定を持つとき true を返す．
@@ -381,8 +429,10 @@ EiParamHeadV::is_little_endian() const
 }
 
 // @brief ビット幅を返す．
+// @param[in] val 値
+// @note ヘッダに型指定がない時は値から情報を得る．
 ymuint
-EiParamHeadV::bit_size() const
+EiParamHeadV::bit_size(const VlValue& val) const
 {
   return mRange.size();
 }
@@ -390,22 +440,26 @@ EiParamHeadV::bit_size() const
 // @brief オフセット値の取得
 // @param[in] index インデックス
 // @param[out] offset インデックスに対するオフセット値
+// @param[in] val 値
 // @retval true インデックスが範囲内に入っている時
 // @retval false インデックスが範囲外の時
+// @note ヘッダに型指定がない時は値から情報を得る．
 bool
 EiParamHeadV::calc_bit_offset(int index,
-			      ymuint& offset) const
+			      ymuint& offset,
+			      const VlValue& val) const
 {
   return mRange.calc_offset(index, offset);
 }
 
 // @breif 値の型を返す．
-// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+// @param[in] val 値
+// @note ヘッダに型指定がない時は値から情報を得る．
 tVpiValueType
-EiParamHeadV::value_type() const
+EiParamHeadV::value_type(const VlValue& val) const
 {
-  tVpiValueType type = is_signed() ? kVpiValueSS : kVpiValueUS;
-  return pack(type, bit_size());
+  tVpiValueType type = pt_head()->is_signed() ? kVpiValueSS : kVpiValueUS;
+  return pack(type, mRange.size());
 }
 
 
@@ -485,69 +539,7 @@ EiParameter::value_type() const
   //     ただし，最終的な値も unsized の場合，lsb = 0, msb は最低31以上の
   //     実装依存の値をとる．
 
-  tVpiValueType vt = mHead->value_type();
-  if ( vt == kVpiValueNone ) {
-    // (1)
-    if ( mValue.is_int_type() ) {
-      return kVpiValueInteger;
-    }
-    if ( mValue.is_scalar_type() ) {
-      return pack(kVpiValueUS, 1);
-    }
-    if ( mValue.is_bitvector_type() ) {
-      const BitVector& bv = mValue.bitvector_value();
-      ymuint size = bv.size();
-      if ( bv.is_signed() ) {
-	if ( bv.is_sized() ) {
-	  return pack(kVpiValueSS, size);
-	}
-	else {
-	  return pack(kVpiValueSU, size);
-	}
-      }
-      else {
-	if ( bv.is_sized() ) {
-	  return pack(kVpiValueUS, size);
-	}
-	else {
-	  return pack(kVpiValueUU, size);
-	}
-      }
-    }
-    if ( mValue.is_real_type() ) {
-      return kVpiValueReal;
-    }
-    return kVpiValueNone;
-  }
-  if ( is_bitvector_type(vt) ) {
-    if ( is_sized_type(vt) ) {
-      // (2)
-      return vt;
-    }
-    else {
-      // (3), (4) ?
-      const BitVector& bv = mValue.bitvector_value();
-      ymuint size = bv.size();
-      if ( is_signed_type(vt) ) {
-	if ( bv.is_sized() ) {
-	  return pack(kVpiValueSS, size);
-	}
-	else {
-	  return pack(kVpiValueSU, size);
-	}
-      }
-      else {
-	if ( bv.is_sized() ) {
-	  return pack(kVpiValueUS, size);
-	}
-	else {
-	  return pack(kVpiValueUU, size);
-	}
-      }
-    }
-  }
-  // (5)
-  return vt;
+  return mHead->value_type(mValue);
 }
 
 // @brief 符号の取得
@@ -556,7 +548,7 @@ EiParameter::value_type() const
 bool
 EiParameter::is_signed() const
 {
-  return mHead->is_signed();
+  return mHead->is_signed(mValue);
 }
 
 // @brief 範囲指定を持つとき true を返す．
@@ -616,11 +608,7 @@ EiParameter::is_little_endian() const
 ymuint
 EiParameter::bit_size() const
 {
-#if 1
-  return mHead->bit_size();
-#else
-  return unpack_size(value_type());
-#endif
+  return mHead->bit_size(mValue);
 }
 
 // @brief オフセット値の取得
@@ -632,7 +620,7 @@ bool
 EiParameter::calc_bit_offset(int index,
 			     ymuint& offset) const
 {
-  return mHead->calc_bit_offset(index, offset);
+  return mHead->calc_bit_offset(index, offset, mValue);
 }
 
 // @brief データ型の取得
@@ -667,7 +655,7 @@ EiParameter::set_expr(const PtExpr* expr,
 		      const VlValue& value)
 {
   mExpr = expr;
-  mValue = VlValue(value, mHead->value_type());
+  mValue = VlValue(value, mHead->value_type(value));
 }
 
 

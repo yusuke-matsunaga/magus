@@ -172,6 +172,18 @@ public:
   bool
   is_bitvector_conv() const;
 
+  /// @brief 符号付きの型の時に true を返す．
+  bool
+  is_signed() const;
+
+  /// @brief ビットサイズを返す．
+  ymuint
+  bit_size() const;
+
+  /// @brief 値の型を返す．
+  tVpiValueType
+  value_type() const;
+
   /// @brief 整数型の値を返す．
   /// @note 値が整数型に変換できない時の値は不定
   int
@@ -963,6 +975,110 @@ bool
 VlValue::is_bitvector_conv() const
 {
   return mRep->is_bitvector_conv();
+}
+
+// @brief 符号付きの型の時に true を返す．
+inline
+bool
+VlValue::is_signed() const
+{
+  switch ( type() ) {
+  case kIntType:
+  case kRealType:
+    return true;
+
+  case kUintType:
+  case kScalarType:
+  case kTimeType:
+  case kErrorType:
+    return false;
+
+  case kBitVectorType:
+    return bitvector_value().is_signed();
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
+}
+
+// @brief ビットサイズを返す．
+inline
+ymuint
+VlValue::bit_size() const
+{
+  switch ( type() ) {
+  case kIntType:
+  case kUintType:
+    return kVpiSizeInteger;
+
+  case kRealType:
+    return kVpiSizeReal;
+
+  case kScalarType:
+    return 1;
+
+  case kTimeType:
+    return kVpiSizeTime;
+
+  case kBitVectorType:
+    return bitvector_value().size();
+
+  case kErrorType:
+    return 0;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief 値の型を返す．
+inline
+tVpiValueType
+VlValue::value_type() const
+{
+  switch ( type() ) {
+  case kIntType:
+    return kVpiValueInteger;
+
+  case kUintType:
+    return pack(kVpiValueUS, kVpiSizeInteger);
+
+  case kRealType:
+    return kVpiValueReal;
+
+  case kScalarType:
+    return pack(kVpiValueUS, 1);
+
+  case kTimeType:
+    return kVpiValueTime;
+
+  case kBitVectorType:
+    {
+      const BitVector& bv = bitvector_value();
+      ymuint size = bv.size();
+      tVpiValueType type;
+      if ( bv.is_signed() ) {
+	if ( bv.is_sized() ) {
+	  type = kVpiValueSS;
+	}
+	else {
+	  type = kVpiValueSU;
+	}
+      }
+      else {
+	if ( bv.is_sized() ) {
+	  type = kVpiValueUS;
+	}
+	else {
+	  type = kVpiValueUU;
+	}
+      }
+      return pack(type, size);
+    }
+
+  case kErrorType:
+    return kVpiValueNone;
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return kVpiValueNone;
 }
 
 // @brief 整数型の値を返す．

@@ -50,11 +50,13 @@ public:
   parent() const = 0;
 
   /// @brief 符号の取得
+  /// @param[in] val 値
   /// @retval true 符号つき
   /// @retval false 符号なし
+  /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
   bool
-  is_signed() const = 0;
+  is_signed(const VlValue& val) const = 0;
 
   /// @brief 範囲指定を持つとき true を返す．
   virtual
@@ -96,26 +98,31 @@ public:
   is_little_endian() const = 0;
 
   /// @brief ビット幅を返す．
-  /// @note このクラスでは 1 を返す．
+  /// @param[in] val 値
+  /// @note ヘッダが型指定を持たない時には値から情報を得る．
   virtual
   ymuint
-  bit_size() const = 0;
+  bit_size(const VlValue& val) const = 0;
 
   /// @brief オフセット値の取得
   /// @param[in] index インデックス
   /// @param[out] offset インデックスに対するオフセット値
+  /// @param[in] val 値
   /// @retval true インデックスが範囲内に入っている時
   /// @retval false インデックスが範囲外の時
+  /// @note ヘッダが型指定を持たない時には値から情報を得る．
   virtual
   bool
   calc_bit_offset(int index,
-		  ymuint& offset) const = 0;
+		  ymuint& offset,
+		  const VlValue& val) const = 0;
 
   /// @breif 値の型を返す．
-  /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
+  /// @param[in] val 値
+  /// @note ヘッダが型指定を持たない時には値から情報を得る．
   virtual
   tVpiValueType
-  value_type() const = 0;
+  value_type(const VlValue& val) const = 0;
 
   /// @brief データ型の取得
   virtual
