@@ -263,7 +263,7 @@ private:
   MvnNode*
   gen_opr(MvnModule* parent_module,
 	  nsYm::nsVerilog::tVpiOpType op_type,
-	  const vector<MvnNode*>& operand_array,
+	  const vector<MvnNode*>& operand_arry,
 	  ymuint out_bw);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
@@ -283,6 +283,17 @@ private:
 	  const VlExpr* lhs,
 	  const VlExpr* rhs,
 	  const Env& env);
+
+  /// @brief 式の型を補正する．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] src_node 元のノード
+  /// @param[in] bit_width 要求されるビット幅
+  /// @param[in] sign 符号の有無
+  MvnNode*
+  coerce_expr(MvnModule* parent_module,
+	      MvnNode* src_node,
+	      ymuint bit_width,
+	      bool sign);
 
   /// @brief 右辺式から該当する部分を切り出す．
   /// @param[in] parent_module 親のモジュール

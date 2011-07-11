@@ -127,7 +127,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiConditionOp EiBinaryOp.h "EiBinaryOp.h"
+/// @class EiConditionOp EiTernaryOp.h "EiTernaryOp.h"
 /// @brief 条件演算子
 //////////////////////////////////////////////////////////////////////
 class EiConditionOp :
@@ -162,6 +162,16 @@ public:
   tVpiValueType
   value_type() const;
 
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -188,8 +198,8 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiMinTypMaxOp EiBinaryOp.h "EiBinaryOp.h"
-/// @brief 条件演算子
+/// @class EiMinTypMaxOp EiTernaryOp.h "EiTernaryOp.h"
+/// @brief min-typ-max 演算子
 //////////////////////////////////////////////////////////////////////
 class EiMinTypMaxOp :
   public EiTernaryOp
@@ -222,6 +232,16 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
 
 
 public:

@@ -158,6 +158,16 @@ public:
   tVpiValueType
   value_type() const;
 
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -170,16 +180,6 @@ public:
   virtual
   void
   set_reqsize(tVpiValueType type);
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // EiCompareOp の派生クラスのみに公開する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief オペランドを評価するときの型を返す．
-  tVpiValueType
-  opr_type() const { return mOprType; }
 
 
 private:
@@ -226,6 +226,16 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
 
 
 public:
@@ -276,6 +286,16 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
 
 
 public:
@@ -336,6 +356,16 @@ public:
   tVpiValueType
   value_type() const;
 
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -395,6 +425,16 @@ public:
   tVpiValueType
   value_type() const;
 
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -453,6 +493,16 @@ public:
   virtual
   tVpiValueType
   value_type() const;
+
+  /// @brief オペランドに要求されるデータ型を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+  /// @note kVpiOperation の時，意味を持つ．
+  /// @note それ以外では kVpiValueNone を返す．
+  /// 通常はオペランドの式の value_type() に一致するが，
+  /// その式が self-typed の場合には異なることもある．
+  virtual
+  tVpiValueType
+  operand_type(ymuint pos) const;
 
 
 public:

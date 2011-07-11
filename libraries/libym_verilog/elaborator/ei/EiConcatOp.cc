@@ -128,6 +128,18 @@ EiConcatOp::operand_num() const
   return mOprNum;
 }
 
+// @brief オペランドに要求されるデータ型を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+// @note kVpiOperation の時，意味を持つ．
+// @note それ以外では kVpiValueNone を返す．
+// 通常はオペランドの式の value_type() に一致するが，
+// その式が self-typed の場合には異なることもある．
+tVpiValueType
+EiConcatOp::operand_type(ymuint pos) const
+{
+  return _operand(pos)->value_type();
+}
+
 // @brief オペランドを返す．
 // @param[in] pos 位置番号
 ElbExpr*
@@ -183,6 +195,18 @@ ymuint
 EiMultiConcatOp::rep_num() const
 {
   return mRepNum;
+}
+
+// @brief オペランドに要求されるデータ型を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
+// @note kVpiOperation の時，意味を持つ．
+// @note それ以外では kVpiValueNone を返す．
+// 通常はオペランドの式の value_type() に一致するが，
+// その式が self-typed の場合には異なることもある．
+tVpiValueType
+EiMultiConcatOp::operand_type(ymuint pos) const
+{
+  return _operand(pos)->value_type();
 }
 
 // @brief オペランドを返す．
