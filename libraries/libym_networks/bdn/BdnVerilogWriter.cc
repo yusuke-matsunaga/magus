@@ -149,20 +149,24 @@ BdnVerilogWriter::operator()(ostream& s,
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
-    if ( node->alt_node() ) {
-      s << "  inout";
+    if ( node->input_type() == BdnNode::kPRIMARY_INPUT ) {
+      if ( node->alt_node() ) {
+	s << "  inout";
+      }
+      else {
+	s << "  input";
+      }
+      s << " " << node_name(node) << ";" << endl;
     }
-    else {
-      s << "  input";
-    }
-    s << " " << node_name(node) << ";" << endl;
   }
 
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;
-    if ( node->alt_node() == NULL ) {
-      s << "  output " << node_name(node) << ";" << endl;
+    if ( node->output_type() == BdnNode::kPRIMARY_OUTPUT ) {
+      if ( node->alt_node() == NULL ) {
+	s << "  output " << node_name(node) << ";" << endl;
+      }
     }
   }
 
@@ -240,6 +244,9 @@ BdnVerilogWriter::operator()(ostream& s,
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;
+    if ( node->output_type() != BdnNode::kPRIMARY_OUTPUT ) {
+      continue;
+    }
     if ( node->alt_node() ) {
       node = node->alt_node();
     }
