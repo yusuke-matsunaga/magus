@@ -22,6 +22,10 @@
 #include "ym_utils/MsgMgr.h"
 
 
+BEGIN_NONAMESPACE
+bool debug = false;
+END_NONAMESPACE
+
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 using namespace nsYm::nsVerilog;
@@ -35,6 +39,10 @@ ReaderImpl::gen_stmt1(MvnModule* module,
 		      const VlStmt* stmt,
 		      ProcEnv& env)
 {
+  if ( debug ) {
+    cout << "gen_stmt1 " << stmt->file_region() << endl;
+  }
+
   switch ( stmt->type() ) {
   case kVpiAssignment:
     gen_assign(module, stmt, env);
@@ -103,6 +111,10 @@ ReaderImpl::gen_stmt2(MvnModule* module,
 		      const VlStmt* stmt,
 		      ProcEnv& env)
 {
+  if ( debug ) {
+    cout << "gen_stmt2 " << stmt->file_region() << endl;
+  }
+
   switch ( stmt->type() ) {
   case kVpiAssignment:
     gen_assign(module, stmt, env);
@@ -477,8 +489,10 @@ ReaderImpl::merge_env2(MvnModule* parent_module,
     }
     else if ( node1 == NULL ) {
       // node1 が NULL
-      assert_cond( node0 != NULL, __FILE__, __LINE__);
       assert_cond( node2 != NULL, __FILE__, __LINE__);
+      if ( node0 == NULL ) {
+	node0 = mGlobalEnv.get_from_id(i);
+      }
       ymuint bw = node0->output(0)->bit_width();
       if ( node2->output(0)->bit_width() != bw ) {
 	// ビット幅が異なる．
@@ -492,8 +506,10 @@ ReaderImpl::merge_env2(MvnModule* parent_module,
     }
     else if ( node2 == NULL ) {
       // node2 が NULL
-      assert_cond( node0 != NULL, __FILE__, __LINE__);
       assert_cond( node1 != NULL, __FILE__, __LINE__);
+      if ( node0 == NULL ) {
+	node0 = mGlobalEnv.get_from_id(i);
+      }
       ymuint bw = node0->output(0)->bit_width();
       if ( node1->output(0)->bit_width() != bw ) {
 	// ビット幅が異なる．

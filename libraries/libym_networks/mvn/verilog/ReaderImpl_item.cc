@@ -29,6 +29,10 @@
 #include "ym_utils/MsgMgr.h"
 
 
+BEGIN_NONAMESPACE
+bool debug = false;
+END_NONAMESPACE
+
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
 using namespace nsYm::nsVerilog;
@@ -149,6 +153,10 @@ bool
 ReaderImpl::gen_process(MvnModule* parent_module,
 			const VlProcess* process)
 {
+  if ( debug ) {
+    cout << "gen_process " << process->file_region() << endl;
+  }
+
   if ( process->type() != kVpiAlways ) {
     // always 文以外(initial文)はダメ
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -245,7 +253,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       // 対象のノード
       MvnNode* node = NULL;
       if ( !parse_cond(cond, mGlobalEnv, node, pol) ) {
-	return false;
+	break;
       }
 
       bool found = false;
@@ -270,7 +278,9 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	  break;
 	}
       }
-      assert_cond( found , __FILE__, __LINE__);
+      if ( !found ) {
+	break;
+      }
       stmt1 = stmt1->else_stmt();
     }
     if ( event_list.size() != ev_num - 1 ) {
@@ -399,12 +409,6 @@ ReaderImpl::parse_cond(const VlExpr* cond,
 	 cond->op_type() == kVpiBitNegOp ) {
       const VlExpr* opr1 = cond->operand(0);
       if ( !opr1->is_primary() ) {
-	// プライマリ以外はエラー
-	MsgMgr::put_msg(__FILE__, __LINE__,
-			opr1->file_region(),
-			kMsgError,
-			"MVN_VL",
-			"Primary expression is expected.");
 	return false;
       }
       // (2)(3)
@@ -439,12 +443,6 @@ ReaderImpl::parse_cond(const VlExpr* cond,
       }
     }
   }
-
-  MsgMgr::put_msg(__FILE__, __LINE__,
-		  cond->file_region(),
-		  kMsgError,
-		  "MVN_VL",
-		  "Illegal expression.");
   return false;
 }
 
@@ -475,12 +473,6 @@ ReaderImpl::parse_cond_sub(const VlExpr* opr_primary,
     pol = pol1;
   }
   else {
-    // 値がエラー
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    opr_const->file_region(),
-		    kMsgError,
-		    "MVN_VL",
-		    "Illegal value.");
     return false;
   }
   return true;
