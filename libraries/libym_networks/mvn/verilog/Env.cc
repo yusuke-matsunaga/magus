@@ -9,8 +9,6 @@
 
 #include "Env.h"
 #include "AsyncControl.h"
-#include "ym_verilog/vl/VlDecl.h"
-#include "ym_verilog/vl/VlRange.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
