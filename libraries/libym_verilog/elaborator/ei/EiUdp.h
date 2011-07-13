@@ -49,7 +49,7 @@ private:
 	    EiUdpIO* io_array,
 	    ymuint table_num,
 	    EiTableEntry* table,
-	    tVpiUdpVal* val_array);
+	    VlUdpVal* val_array);
 
   /// @brief デストラクタ
   virtual
@@ -160,7 +160,7 @@ public:
   void
   set_tableentry(ymuint pos,
 		 const PtUdpEntry* pt_udp_entry,
-		 const vector<tVpiUdpVal>& vals);
+		 const vector<VlUdpVal>& vals);
 
 
 private:
@@ -193,7 +193,7 @@ private:
   EiTableEntry* mTableEntryList;
 
   // table entry の値の配列
-  tVpiUdpVal* mValArray;
+  VlUdpVal* mValArray;
 
 };
 
@@ -398,7 +398,7 @@ public:
 
   /// @brief pos 番目の位置の値を返す．
   virtual
-  tVpiUdpVal
+  VlUdpVal
   val(ymuint pos) const;
 
   /// @brief 一行文の内容を表す文字列をつくる．
@@ -415,7 +415,7 @@ public:
   /// @brief 設定する．
   void
   set(const PtUdpEntry* pt_entry,
-      const vector<tVpiUdpVal>& vals);
+      const vector<VlUdpVal>& vals);
 
 
 private:
@@ -430,7 +430,7 @@ private:
   const PtUdpEntry* mPtUdpEntry;
 
   // 値の配列 (実体は EiUdpDefn が持っている)
-  tVpiUdpVal* mValArray;
+  VlUdpVal* mValArray;
 
 };
 

@@ -42,6 +42,7 @@ class BitVector;
 class VlLineWatcher;
 class VlMgr;
 class VlTime;
+class VlUdpVal;
 class VlValue;
 class VlValueType;
 
@@ -594,83 +595,6 @@ enum tVpiSpecPathType {
   kVpiSpecPathIfnone = 2
 };
 
-
-//////////////////////////////////////////////////////////////////////
-/// @brief UDP のテーブルで使われる値
-//////////////////////////////////////////////////////////////////////
-enum tVpiUdpVal {
-  kVpiUdpVal0  = 1 << 0,
-  kVpiUdpVal1  = 1 << 1,
-  kVpiUdpValX  = 1 << 2,
-  kVpiUdpValB  = kVpiUdpVal0 | kVpiUdpVal1,
-  kVpiUdpValQ  = kVpiUdpValB | kVpiUdpValX,
-
-  kVpiUdpVal00 = kVpiUdpVal0 << 3,
-  kVpiUdpVal01 = kVpiUdpVal1 << 3,
-  kVpiUdpVal0X = kVpiUdpValX << 3,
-  kVpiUdpVal0B = kVpiUdpVal00 | kVpiUdpVal01,
-  kVpiUdpVal0Q = kVpiUdpVal0B | kVpiUdpVal0X,
-
-  kVpiUdpVal10 = kVpiUdpVal0 << 6,
-  kVpiUdpVal11 = kVpiUdpVal1 << 6,
-  kVpiUdpVal1X = kVpiUdpValX << 6,
-  kVpiUdpVal1B = kVpiUdpVal10 | kVpiUdpVal11,
-  kVpiUdpVal1Q = kVpiUdpVal1B | kVpiUdpVal1X,
-
-  kVpiUdpValX0 = kVpiUdpVal0 << 9,
-  kVpiUdpValX1 = kVpiUdpVal1 << 9,
-  kVpiUdpValXX = kVpiUdpValX << 9,
-  kVpiUdpValXB = kVpiUdpValX0 | kVpiUdpValX1,
-  kVpiUdpValXQ = kVpiUdpValXB | kVpiUdpValXX,
-
-  kVpiUdpValB0 = kVpiUdpVal00 | kVpiUdpVal10,
-  kVpiUdpValB1 = kVpiUdpVal01 | kVpiUdpVal11,
-  kVpiUdpValBX = kVpiUdpVal0X | kVpiUdpVal1X,
-  kVpiUdpValBB = kVpiUdpValB0 | kVpiUdpValB1,
-  kVpiUdpValBQ = kVpiUdpValBB | kVpiUdpValBX,
-
-  kVpiUdpValQ0 = kVpiUdpValB0 | kVpiUdpValX0,
-  kVpiUdpValQ1 = kVpiUdpValB1 | kVpiUdpValX1,
-  kVpiUdpValQX = kVpiUdpValBX | kVpiUdpValXX,
-  kVpiUdpValQB = kVpiUdpValQ0 | kVpiUdpValQ1,
-  kVpiUdpValQQ = kVpiUdpValQB | kVpiUdpValQX,
-
-  kVpiUdpValP  = kVpiUdpVal01 | kVpiUdpVal0X | kVpiUdpValX1,
-  kVpiUdpValN  = kVpiUdpVal10 | kVpiUdpVal1X | kVpiUdpValX0,
-
-  kVpiUdpValR  = kVpiUdpVal01,
-  kVpiUdpValF  = kVpiUdpVal10,
-
-  kVpiUdpValNC = 0
-};
-
-/// @brief 遷移シンボル (エッジシンボル) のチェック
-/// @param[in] val UDP テーブル中のシンボル値
-/// @return val が遷移シンボル(エッジシンボル)なら true を返す．
-bool
-is_edge_symbol(tVpiUdpVal val);
-
-/// @brief UDP テーブルのシンボルを表す文字列を得る．
-/// @param[in] val UDP テーブル中のシンボル値
-/// @return val を表す文字列
-string
-symbol2string(tVpiUdpVal val);
-
-// @brief UDP テーブルのシンボルを 2バイトの文字にする．
-// @param[in] val UDP テーブルのシンボル値
-// @return val を表す2バイトの文字
-int
-symbol2dbyte(tVpiUdpVal val);
-
-/// @brief シンボルのマージ
-/// @param[in] symbol1 シンボル1
-/// @param[in] symbol2 シンボル2
-/// @return symbol1 と symbol2 をあわせたシンボルを返す．
-/// @note symbol1, symbol2 ともにレベルシンボルでなければならない．
-tVpiUdpVal
-merge_udp_value(tVpiUdpVal symbol1,
-		tVpiUdpVal symbol2);
-
 /// @}
 
 
@@ -847,16 +771,6 @@ neq(tVpiScalarVal src1,
   return kVpiScalar0;
 }
 
-/// @brief 遷移シンボル (エッジシンボル) のチェック
-/// @param[in] val
-/// @return val が遷移シンボル(エッジシンボル)なら true を返す．
-inline
-bool
-is_edge_symbol(tVpiUdpVal val)
-{
-  return (val >= 8);
-}
-
 END_NAMESPACE_YM_VERILOG
 
 BEGIN_NAMESPACE_YM
@@ -865,6 +779,7 @@ using nsVerilog::BitVector;
 using nsVerilog::VlLineWatcher;
 using nsVerilog::VlMgr;
 using nsVerilog::VlTime;
+using nsVerilog::VlUdpVal;
 using nsVerilog::VlValueType;
 using nsVerilog::VlValue;
 

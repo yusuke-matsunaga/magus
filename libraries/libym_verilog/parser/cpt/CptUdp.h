@@ -14,7 +14,7 @@
 #include "ym_verilog/pt/PtUdp.h"
 #include "ym_verilog/pt/PtArray.h"
 #include "ym_verilog/pt/PtP.h"
-
+#include "ym_verilog/VlUdpVal.h"
 #include "ym_utils/FileRegion.h"
 
 #include "PtiFwd.h"
@@ -240,7 +240,12 @@ private:
 
   /// @brief コンストラクタ
   CptUdpValue(const FileRegion& file_region,
-	      tVpiUdpVal symbol);
+	      char symbol);
+
+  /// @brief コンストラクタ
+  CptUdpValue(const FileRegion& file_region,
+	      char symbol1,
+	      char symbol2);
 
   /// @brief デストラクタ
   virtual
@@ -259,7 +264,7 @@ public:
 
   /// @brief シンボルを取り出す．
   virtual
-  tVpiUdpVal
+  VlUdpVal
   symbol() const;
 
 
@@ -272,7 +277,7 @@ private:
   FileRegion mFileRegion;
 
   // シンボル
-  tVpiUdpVal mSymbol;
+  VlUdpVal mSymbol;
 
 };
 

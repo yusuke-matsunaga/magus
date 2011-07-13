@@ -15,4 +15,4 @@ noinst_HEADERS = \
 	VlMgr.h \
 	VlTime.h \
 	VlValue.h \
-	VlValueTime.h
+	VlValueType.h

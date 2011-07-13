@@ -111,7 +111,7 @@ fr_merge(const FileRegion fr_array[],
   tVpiStrength strengthtype;
   tVpiRangeMode rangemode;
   tVpiVsType vstype;
-  tVpiUdpVal udpsymbol;
+  char udpsymbol;
 
   PuHierName* hiername;
 
@@ -4297,7 +4297,7 @@ seq_input_list
 edge_indicator
 : '(' level_symbol level_symbol ')'
 {
-  parser.new_UdpValue(@$, merge_udp_value($2, $3));
+  parser.new_UdpValue(@$, $2, $3);
 }
 | edge_symbol
 {
@@ -4321,7 +4321,7 @@ next_state
 }
 | '-'
 {
-  $$ = kVpiUdpValNC;
+  $$ = '-';
 }
 ;
 
@@ -4329,15 +4329,15 @@ next_state
 output_symbol
 : '0'
 {
-  $$ = kVpiUdpVal0;
+  $$ = '0';
 }
 | '1'
 {
-  $$ = kVpiUdpVal1;
+  $$ = '1';
 }
 | 'x'
 {
-  $$ = kVpiUdpValX;
+  $$ = 'x';
 }
 ;
 
@@ -4349,11 +4349,11 @@ level_symbol
 }
 | '?'
 {
-  $$ = kVpiUdpValQ;
+  $$ = '?';
 }
 | 'b'
 {
-  $$ = kVpiUdpValB;
+  $$ = 'b';
 }
 ;
 
@@ -4361,23 +4361,23 @@ level_symbol
 edge_symbol
 : 'r'
 {
-  $$ = kVpiUdpValR;
+  $$ = 'r';
 }
 | 'f'
 {
-  $$ = kVpiUdpValF;
+  $$ = 'f';
 }
 | 'p'
 {
-  $$ = kVpiUdpValP;
+  $$ = 'p';
 }
 | 'n'
 {
-  $$ = kVpiUdpValN;
+  $$ = 'n';
 }
 | '*'
 {
-  $$ = kVpiUdpValQQ;
+  $$ = '*';
 }
 ;
 

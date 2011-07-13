@@ -20,8 +20,9 @@
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 #include "ym_verilog/pt/PtArray.h"
+#include "ym_verilog/VlUdpVal.h"
 
-#include <ym_utils/StrBuff.h>
+#include "ym_utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -176,7 +177,7 @@ PtDumper::put(const char* label,
   PtHeader x(*this, label, "UdpValue");
 
   put("mFileRegion", v->file_region());
-  put("mSymbol", symbol2string(v->symbol()).c_str());
+  put("mSymbol", v->symbol().to_string());
 }
 
 BEGIN_NONAMESPACE

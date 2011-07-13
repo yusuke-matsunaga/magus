@@ -80,7 +80,17 @@ public:
   virtual
   const PtUdpValue*
   new_UdpValue(const FileRegion& fr,
-	       tVpiUdpVal symbol);
+	       char symbol);
+
+  /// @brief UDP のテーブルエントリの要素の値の生成
+  /// @param[in] fr ファイル位置の情報
+  /// @param[in] symbol1, symbol2 シンボル
+  /// @return 生成された値
+  virtual
+  const PtUdpValue*
+  new_UdpValue(const FileRegion& fr,
+	       char symbol1,
+	       char symbol2);
 
 
   //////////////////////////////////////////////////////////////////////

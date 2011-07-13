@@ -15,6 +15,7 @@
 #include "PtNode_expr.h"
 #include "PtNode_misc.h"
 #include "ym_verilog/pt/PtUdp.h"
+#include "ym_verilog/VlUdpVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -280,7 +281,7 @@ UdpValNode::data(int column,
       return mLabel;
     }
     else if ( column == 1 ) {
-      return symbol2string(mVal->symbol()).c_str();
+      return mVal->symbol().to_string().c_str();
     }
   }
   return QVariant();

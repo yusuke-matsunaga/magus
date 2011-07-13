@@ -19,10 +19,10 @@ noinst_LTLIBRARIES = libym_vl_common.la
 
 libym_vl_common_la_SOURCES = \
 	BitVector.cc \
+	VlMgr.cc \
 	VlValueRep.h \
 	VlValue.cc \
-	VlMgr.cc \
-	udpval.cc
+	VlUdpVal.cc
 
 libym_vl_common_la_LIBADD =
 

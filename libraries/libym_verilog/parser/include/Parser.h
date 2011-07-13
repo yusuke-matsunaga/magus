@@ -97,7 +97,7 @@ public:
   void
   new_UdpEntry(const FileRegion& fr,
 	       const FileRegion& output_loc,
-	       tVpiUdpVal output_symbol);
+	       char output_symbol);
 
   /// @brief sequential UDP 用のテーブルエントリの生成
   /// @param[in] fr ファイル位置の情報
@@ -108,9 +108,9 @@ public:
   void
   new_UdpEntry(const FileRegion& fr,
 	       const FileRegion& current_loc,
-	       tVpiUdpVal current_symbol,
+	       char current_symbol,
 	       const FileRegion& output_loc,
-	       tVpiUdpVal output_symbol);
+	       char output_symbol);
 
   /// @brief UDP のテーブルエントリの要素の値の生成
   /// @param[in] fr ファイル位置の情報
@@ -118,7 +118,16 @@ public:
   /// @return 生成された値
   void
   new_UdpValue(const FileRegion& fr,
-	       tVpiUdpVal symbol);
+	       char symbol);
+
+  /// @brief UDP のテーブルエントリの要素の値の生成
+  /// @param[in] fr ファイル位置の情報
+  /// @param[in] symbol1, symbol2 シンボル
+  /// @return 生成された値
+  void
+  new_UdpValue(const FileRegion& fr,
+	       char symbol1,
+	       char symbol2);
 
 
 private:

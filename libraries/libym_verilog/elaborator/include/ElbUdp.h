@@ -66,7 +66,7 @@ public:
   void
   set_tableentry(ymuint pos,
 		 const PtUdpEntry* pt_udp_entry,
-		 const vector<tVpiUdpVal>& vals) = 0;
+		 const vector<VlUdpVal>& vals) = 0;
 
 };
 
@@ -96,7 +96,7 @@ public:
   virtual
   void
   set(const PtUdpEntry* pt_entry,
-      const vector<tVpiUdpVal>& vals) = 0;
+      const vector<VlUdpVal>& vals) = 0;
 
 };
 

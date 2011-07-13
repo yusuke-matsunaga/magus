@@ -45,8 +45,8 @@ EiFactory::new_UdpDefn(const PtUdp* pt_udp,
     ++ row_size;
   }
   ymuint vsize = row_size * table_size;
-  void* s = mAlloc.get_memory(sizeof(tVpiUdpVal) * vsize);
-  tVpiUdpVal* val_array = new (s) tVpiUdpVal[vsize];
+  void* s = mAlloc.get_memory(sizeof(VlUdpVal) * vsize);
+  VlUdpVal* val_array = new (s) VlUdpVal[vsize];
 
   void* p = mAlloc.get_memory(sizeof(EiUdpDefn));
   EiUdpDefn* udp = new (p) EiUdpDefn(pt_udp, is_protected,
@@ -83,7 +83,7 @@ EiUdpDefn::EiUdpDefn(const PtUdp* pt_udp,
 		     EiUdpIO* io_array,
 		     ymuint table_num,
 		     EiTableEntry* table,
-		     tVpiUdpVal* val_array) :
+		     VlUdpVal* val_array) :
   mPtUdp(pt_udp),
   mPortNum(io_num),
   mProtected(is_protected),
@@ -224,7 +224,7 @@ EiUdpDefn::set_initial(const PtExpr* init_expr,
 void
 EiUdpDefn::set_tableentry(ymuint pos,
 			  const PtUdpEntry* pt_udp_entry,
-			  const vector<tVpiUdpVal>& vals)
+			  const vector<VlUdpVal>& vals)
 {
   mTableEntryList[pos].set(pt_udp_entry, vals);
 }
@@ -425,7 +425,7 @@ EiTableEntry::size() const
 }
 
 // @brief pos 番目の位置の値を返す．
-tVpiUdpVal
+VlUdpVal
 EiTableEntry::val(ymuint pos) const
 {
   return mValArray[pos];
@@ -444,7 +444,7 @@ EiTableEntry::str() const
   ymuint n1 = n - 1;
   string s;
   for (ymuint pos = 0; pos < n; ++ pos) {
-    s += symbol2string(val(pos));
+    s += val(pos).to_string();
     if ( pos < in1 ) {
       s += " ";
     }
@@ -458,7 +458,7 @@ EiTableEntry::str() const
 // @brief 設定する．
 void
 EiTableEntry::set(const PtUdpEntry* pt_entry,
-		  const vector<tVpiUdpVal>& vals)
+		  const vector<VlUdpVal>& vals)
 {
   mPtUdpEntry = pt_entry;
   ymuint n = size();

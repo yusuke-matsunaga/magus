@@ -13,6 +13,7 @@
 
 #include "ym_verilog/vl/VlObj.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_verilog/VlUdpVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -118,7 +119,7 @@ public:
 
   /// @brief pos 番目の位置の値を返す．
   virtual
-  tVpiUdpVal
+  VlUdpVal
   val(ymuint pos) const = 0;
 
   /// @brief 一行文の内容を表す文字列をつくる．
