@@ -104,7 +104,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 };
 
@@ -198,7 +198,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -301,7 +301,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -404,7 +404,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -507,7 +507,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -610,7 +610,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:
@@ -713,7 +713,7 @@ private:
   /// @param[in] req_type 要求されるデータの型
   virtual
   BitVector
-  bitvector_value(tVpiValueType req_type) const;
+  bitvector_value(const VlValueType& req_type) const;
 
 
 private:

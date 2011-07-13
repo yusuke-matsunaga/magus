@@ -381,8 +381,8 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 	continue;
       }
 
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,
@@ -390,10 +390,10 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 			"Real expression cannot connect to module port.");
 	continue;
       }
-      ymuint expr_size = unpack_size(type);
+      ymuint expr_size = type.size();
       if ( expr_size == 0 ) {
 	// もともとサイズがなければ port_size に合わせる．
-	tmp->set_reqsize(pack(kVpiValueUS, port_size));
+	tmp->set_reqsize(VlValueType(false, true, port_size));
 	expr_size = port_size;
       }
 
@@ -437,8 +437,8 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     else {
       // それ以外の場合には左辺式のみが接続できる．
       ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,
@@ -446,7 +446,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 			"Real expression cannot connect to module port.");
 	continue;
       }
-      ymuint expr_size = unpack_size(type);
+      ymuint expr_size = type.size();
       if ( expr_size == port_size ) {
 	// 式のサイズとポートサイズが等しければ全部のモジュールに
 	// 同一の式を接続する．
@@ -598,8 +598,8 @@ ItemGen::link_module(ElbModule* module,
 	continue;
       }
 
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,
@@ -607,7 +607,7 @@ ItemGen::link_module(ElbModule* module,
 			"Real expression cannot connect to module port.");
 	continue;
       }
-      ymuint expr_size = unpack_size(type);
+      ymuint expr_size = type.size();
 
       // 単独のインスタンスの場合 expr のサイズは補正される．
       // ... でいいんだよね．
@@ -631,15 +631,15 @@ ItemGen::link_module(ElbModule* module,
 			  "ELAB",
 			  buf2.str());
 	}
-	tmp->set_reqsize(pack(kVpiValueUS, port_size));
+	tmp->set_reqsize(VlValueType(false, true, port_size));
       }
       module->set_port_high_conn(index, tmp, conn_by_name);
     }
     else {
       // それ以外のポートに接続できるのは左辺式だけ．
       ElbExpr* tmp = instantiate_lhs(parent, env, pt_expr);
-      tVpiValueType type = tmp->value_type();
-      if ( type == kVpiValueReal ) {
+      VlValueType type = tmp->value_type();
+      if ( type.is_real_type() ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			tmp->file_region(),
 			kMsgError,

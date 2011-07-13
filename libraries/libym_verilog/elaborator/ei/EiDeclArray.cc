@@ -170,10 +170,10 @@ EiDeclArray::name() const
 
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
+VlValueType
 EiDeclArray::value_type() const
 {
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 符号の取得
@@ -460,7 +460,7 @@ EiDeclArrayN::set_real(ymuint offset,
 void
 EiDeclArrayN::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -602,7 +602,7 @@ EiDeclArrayS::set_real(ymuint offset,
 void
 EiDeclArrayS::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   bitvector = mValArray[offset];
   bitvector.coerce(req_type);
@@ -768,7 +768,7 @@ EiDeclArrayR::set_real(ymuint offset,
 void
 EiDeclArrayR::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   bitvector = mValArray[offset];
 }
@@ -910,7 +910,7 @@ EiDeclArrayV::set_real(ymuint offset,
 void
 EiDeclArrayV::get_bitvector(ymuint offset,
 			    BitVector& bitvector,
-			    tVpiValueType req_type) const
+			    const VlValueType& req_type) const
 {
   bitvector = mValArray[offset];
   bitvector.coerce(req_type);

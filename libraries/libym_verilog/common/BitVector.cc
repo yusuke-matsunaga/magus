@@ -5,7 +5,7 @@
 ///
 /// $Id: BitVector.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -762,12 +762,12 @@ BitVector::set_from_verilog_string(const string& str)
 // @param[in] type 要求される型(サイズも含む)
 // @return 自分自身への参照を返す．
 const BitVector&
-BitVector::coerce(tVpiValueType type)
+BitVector::coerce(const VlValueType& type)
 {
-  if ( type != kVpiValueNone ) {
-    bool is_signed = is_signed_type(type);
-    bool is_sized = is_sized_type(type);
-    ymuint32 req_size = unpack_size(type);
+  if ( !type.is_no_type() ) {
+    bool is_signed = type.is_signed();
+    bool is_sized = type.is_sized();
+    ymuint32 req_size = type.size();
 
     if ( size() == req_size ) {
       set_type(is_sized, is_signed, base());

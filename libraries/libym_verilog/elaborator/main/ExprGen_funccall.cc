@@ -38,28 +38,28 @@ BEGIN_NONAMESPACE
 
 void
 put_value_type(ostream& s,
-	       tVpiValueType type)
+	       const VlValueType& type)
 {
-  if ( type == kVpiValueInteger ) {
+  if ( type.is_int_type() ) {
     s << "integer type";
   }
-  else if ( type == kVpiValueReal ) {
+  else if ( type.is_real_type() ) {
     s << "real type";
   }
-  else if ( type == kVpiValueTime ) {
+  else if ( type.is_time_type() ) {
     s << "time type";
   }
   else {
     s << "bitvector type: ";
-    if ( is_signed_type(type) ) {
+    if ( type.is_signed() ) {
       s << "signed";
     }
     else {
       s << "unsigned";
     }
     s << " , ";
-    if ( is_sized_type(type) ) {
-      s << unpack_size(type) << " bits";
+    if ( type.is_sized() ) {
+      s << type.size() << " bits";
     }
     else {
       s << "unsized";
@@ -302,8 +302,8 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
     }
     ElbIODecl* io_decl = child_func->_io(i);
     ElbDecl* decl = io_decl->_decl();
-    tVpiValueType decl_type = decl->value_type();
-    if ( decl_type == kVpiValueReal ) {
+    VlValueType decl_type = decl->value_type();
+    if ( decl_type.is_real_type() ) {
       if ( !val1.is_real_conv() ) {
 	// 型が異なる．
 	if ( put_error ) {
@@ -312,7 +312,7 @@ ExprGen::evaluate_funccall(const VlNamedObj* parent,
 	return VlValue();
       }
     }
-    else if ( is_bitvector_type(decl_type) ) {
+    else if ( decl_type.is_bitvector_type() ) {
       if ( !val1.is_bitvector_conv() ) {
 	// 型が異なる．
 	if ( put_error ) {

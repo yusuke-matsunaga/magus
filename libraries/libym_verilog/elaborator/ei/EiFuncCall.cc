@@ -99,7 +99,7 @@ EiFcBase::argument(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiFcBase::set_reqsize(tVpiValueType type)
+EiFcBase::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -146,29 +146,29 @@ EiFuncCall::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiFuncCall::value_type() const
 {
   switch ( mFunc->func_type() ) {
   case kVpiIntFunc:
-    return kVpiValueInteger;
+    return VlValueType::int_type();
 
   case kVpiRealFunc:
-    return kVpiValueReal;
+    return VlValueType::real_type();
 
   case kVpiTimeFunc:
-    return kVpiValueTime;
+    return VlValueType::time_type();
 
   case kVpiSizedFunc:
-    return pack(kVpiValueUS, mFunc->bit_size());
+    return VlValueType(false, true, mFunc->bit_size());
 
   case kVpiSizedSignedFunc:
-    return pack(kVpiValueSS, mFunc->bit_size());
+    return VlValueType(true, true, mFunc->bit_size());
 
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 定数の時 true を返す．
@@ -234,36 +234,31 @@ EiSysFuncCall::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiSysFuncCall::value_type() const
 {
-  assert_cond(mUserSystf->system_function(), __FILE__, __LINE__);
+  assert_cond( mUserSystf->system_function(), __FILE__, __LINE__);
 
   switch ( mUserSystf->function_type() ) {
   case vpiIntFunc:
-    return kVpiValueInteger;
-    break;
+    return VlValueType::int_type();
 
   case vpiRealFunc:
-    return kVpiValueReal;
-    break;
+    return VlValueType::real_type();
 
   case vpiTimeFunc:
-    return kVpiValueTime;
-    break;
+    return VlValueType::time_type();
 
   case vpiSizedFunc:
-    return pack(kVpiValueUS, mUserSystf->size());
-    break;
+    return VlValueType(false, true, mUserSystf->size());
 
   case vpiSizedSignedFunc:
-    return pack(kVpiValueSS, mUserSystf->size());
-    break;
+    return VlValueType(true, true, mUserSystf->size());
 
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 定数の時 true を返す．

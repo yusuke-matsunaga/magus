@@ -145,27 +145,22 @@ EiDecl::name() const
 
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
+VlValueType
 EiDecl::value_type() const
 {
   switch ( type() ) {
   case kVpiNet:
   case kVpiReg:
-    if ( is_signed() ) {
-      return pack(kVpiValueSS, bit_size());
-    }
-    else {
-      return pack(kVpiValueUS, bit_size());
-    }
+    return VlValueType(is_signed(), true, bit_size());
 
   case kVpiIntegerVar:
-    return kVpiValueInteger;
+    return VlValueType::int_type();
 
   case kVpiRealVar:
-    return kVpiValueReal;
+    return VlValueType::real_type();
 
   case kVpiTimeVar:
-    return kVpiValueTime;
+    return VlValueType::time_type();
 
   case kVpiParameter:
   case kVpiSpecParam:
@@ -179,7 +174,7 @@ EiDecl::value_type() const
     break;
   }
 
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 符号の取得
@@ -403,7 +398,7 @@ EiDeclN::set_real(double val)
 // @brief bitvector 型の値を返す．
 void
 EiDeclN::get_bitvector(BitVector& bitvector,
-		       tVpiValueType req_type) const
+		       const VlValueType& req_type) const
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -516,7 +511,7 @@ EiDeclS::set_real(double val)
 // @brief bitvector 型の値を返す．
 void
 EiDeclS::get_bitvector(BitVector& val,
-		       tVpiValueType req_type) const
+		       const VlValueType& req_type) const
 {
   val = mVal;
   val.coerce(req_type);
@@ -651,7 +646,7 @@ EiDeclR::set_real(double val)
 // @brief bitvector 型の値を返す．
 void
 EiDeclR::get_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
+		       const VlValueType& req_type) const
 {
   bitvector = mVal;
   bitvector.coerce(req_type);
@@ -764,7 +759,7 @@ EiDeclV::set_real(double val)
 // @brief bitvector 型の値を返す．
 void
 EiDeclV::get_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
+		       const VlValueType& req_type) const
 {
   bitvector = mVal;
   bitvector.coerce(req_type);

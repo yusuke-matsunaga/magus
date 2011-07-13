@@ -127,7 +127,7 @@ public:
   /// @param[in] val 値
   /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
-  tVpiValueType
+  VlValueType
   value_type(const VlValue& val) const;
 
   /// @brief データ型の取得
@@ -266,7 +266,7 @@ public:
   /// @param[in] val 値
   /// @note ヘッダに型指定がない時は値から情報を得る．
   virtual
-  tVpiValueType
+  VlValueType
   value_type(const VlValue& val) const;
 
 
@@ -343,7 +343,7 @@ public:
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 符号の取得

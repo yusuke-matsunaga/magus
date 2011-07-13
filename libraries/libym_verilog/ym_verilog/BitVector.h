@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/verilog.h"
+#include "ym_verilog/VlValueType.h"
 #include "ym_verilog/VlTime.h"
 
 
@@ -262,7 +263,7 @@ public:
   /// @param[in] type 要求される型(サイズも含む)
   /// @return 自分自身への参照を返す．
   const BitVector&
-  coerce(tVpiValueType type);
+  coerce(const VlValueType& type);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -589,9 +590,9 @@ public:
   /// @name その他のメンバ関数
   /// @{
 
-  /// @brief 型を返す．
-  tVpiValueType
-  type() const;
+  /// @brief 値の型を返す．
+  VlValueType
+  value_type() const;
 
   /// @brief srcの値をビットごとにマージする．
   /// @param[in] src オペランド
@@ -1726,25 +1727,10 @@ arshift(const BitVector& src1,
 
 // @brief 型を返す．
 inline
-tVpiValueType
-BitVector::type() const
+VlValueType
+BitVector::value_type() const
 {
-  if ( is_signed() ) {
-    if ( is_sized() ) {
-      return pack(kVpiValueSS, size());
-    }
-    else {
-      return pack(kVpiValueSU, size());
-    }
-  }
-  else {
-    if ( is_sized() ) {
-      return pack(kVpiValueUS, size());
-    }
-    else {
-      return pack(kVpiValueUU, size());
-    }
-  }
+  return VlValueType(is_signed(), is_sized(), size());
 }
 
 // サイズを返す．

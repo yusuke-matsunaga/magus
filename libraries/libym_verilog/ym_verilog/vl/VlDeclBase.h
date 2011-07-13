@@ -39,7 +39,7 @@ public:
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const = 0;
 
   /// @brief 符号の取得

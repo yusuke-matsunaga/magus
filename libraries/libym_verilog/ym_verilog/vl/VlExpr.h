@@ -38,7 +38,7 @@ public:
 
   /// @brief 式の値のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const = 0;
 
   /// @brief Verilog-HDL の文字列を得る．
@@ -243,7 +243,7 @@ public:
   /// 通常はオペランドの式の value_type() に一致するが，
   /// その式が self-typed の場合には異なることもある．
   virtual
-  tVpiValueType
+  VlValueType
   operand_type(ymuint pos) const = 0;
 
   /// @brief 繰り返し数を返す．

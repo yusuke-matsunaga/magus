@@ -324,8 +324,8 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
       continue;
     }
 
-    tVpiValueType type = tmp->value_type();
-    if ( type == kVpiValueReal ) {
+    VlValueType type = tmp->value_type();
+    if ( type.is_real_type() ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      tmp->file_region(),
 		      kMsgError,
@@ -333,7 +333,7 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 		      "Real expression cannot connect to UDP port.");
       continue;
     }
-    ymuint expr_size = unpack_size(type);
+    ymuint expr_size = type.size();
     if ( expr_size == 1 ) {
       // サイズが等しければそのまま接続する．
       for (ymuint i = 0; i < arraysize; ++ i) {
@@ -343,7 +343,7 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
     }
     else if ( expr_size == 0 ) {
       // サイズがなければ1ビットに直してから接続する．
-      tmp->set_reqsize(pack(kVpiValueUS, 1));
+      tmp->set_reqsize(VlValueType(false, true, 1));
       for (ymuint i = 0; i < arraysize; ++ i) {
 	ElbPrimitive* prim = prim_array->_primitive_by_offset(i);
 	prim->connect(index, tmp);
@@ -403,8 +403,8 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
       continue;
     }
 
-    tVpiValueType type = tmp->value_type();
-    if ( type == kVpiValueReal ) {
+    VlValueType type = tmp->value_type();
+    if ( type.is_real_type() ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      tmp->file_region(),
 		      kMsgError,
@@ -412,14 +412,14 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
 		      "Real expression cannot connect to UDP port.");
       continue;
     }
-    ymuint expr_size = unpack_size(type);
+    ymuint expr_size = type.size();
     if ( expr_size == 1 ) {
       // サイズが等しければそのまま接続する．
       primitive->connect(index, tmp);
     }
     else if ( expr_size == 0 ) {
       // サイズがなければ1ビットに直してから接続する．
-      tmp->set_reqsize(pack(kVpiValueUS, 1));
+      tmp->set_reqsize(VlValueType(false, true, 1));
       primitive->connect(index, tmp);
     }
     else {

@@ -60,7 +60,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
     if ( !opr0 ) {
       return NULL;
     }
-    if ( real_check && opr0->value_type() == kVpiValueReal ) {
+    if ( real_check && opr0->value_type().is_real_type() ) {
       error_illegal_real_type(pt_expr->operand(0));
       return NULL;
     }
@@ -97,11 +97,11 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
       return NULL;
     }
     if ( real_check ) {
-      if ( opr0->value_type() == kVpiValueReal ) {
+      if ( opr0->value_type().is_real_type() ) {
 	error_illegal_real_type(pt_expr->operand(0));
 	return NULL;
       }
-      if ( opr1->value_type() == kVpiValueReal ) {
+      if ( opr1->value_type().is_real_type() ) {
 	error_illegal_real_type(pt_expr->operand(1));
 	return NULL;
       }
@@ -130,7 +130,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	if ( !expr1 ) {
 	  return NULL;
 	}
-	if ( expr1->value_type() == kVpiValueReal ) {
+	if ( expr1->value_type().is_real_type() ) {
 	  error_illegal_real_type(pt_expr1);
 	  return NULL;
 	}
@@ -158,7 +158,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 	if ( !expr1 ) {
 	  return NULL;
 	}
-	if ( expr1->value_type() == kVpiValueReal ) {
+	if ( expr1->value_type().is_real_type() ) {
 	  error_illegal_real_type(pt_expr1);
 	  return NULL;
 	}

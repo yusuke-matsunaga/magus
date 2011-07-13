@@ -99,10 +99,10 @@ EiBitSelect::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBitSelect::value_type() const
 {
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 定数の時 true を返す．
@@ -193,7 +193,7 @@ EiBitSelect::lhs_elem(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBitSelect::set_reqsize(tVpiValueType type)
+EiBitSelect::set_reqsize(const VlValueType& type)
 {
 }
 

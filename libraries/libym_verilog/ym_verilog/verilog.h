@@ -7,7 +7,7 @@
 ///
 /// $Id: verilog.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @namespace nsYm::nsVerilog
@@ -38,11 +38,12 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+class BitVector;
 class VlLineWatcher;
 class VlMgr;
-class BitVector;
 class VlTime;
 class VlValue;
+class VlValueType;
 
 
 /// @defgroup VlCommon Verilog 用基本ユーティリティ
@@ -531,97 +532,6 @@ enum tVpiVarType {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @brief 式の型
-/// @note ちょっと紛らわしいのはサイズなしの情報とサイズ込みの情報
-/// をともに tVpiValueType と言っている．
-//////////////////////////////////////////////////////////////////////
-enum tVpiValueType {
-  /// @brief 型無し(エラー値)
-  kVpiValueNone      = 0,
-
-  /// @brief 符号つき型のビット
-  kVpiValueSigned    = 1,
-  /// @brief サイズつき型のビット
-  kVpiValueSized     = 2,
-  /// @brief ビットベクタ型のビット
-  kVpiValueBitVector = 4,
-  /// @brief 実数型のビット
-  kVpiValueRealBit   = 8,
-
-  /// @brief 符号無し，サイズ無しのビットベクタ
-  kVpiValueUU        = kVpiValueBitVector,
-  /// @brief 符号無し，サイズありのビットベクタ
-  kVpiValueUS        = kVpiValueBitVector | kVpiValueSized,
-  /// @brief 符号つき，サイズ無しのビットベクタ
-  kVpiValueSU        = kVpiValueBitVector | kVpiValueSigned,
-  /// @brief 符号つき，サイズありのビットベクタ
-  kVpiValueSS        = kVpiValueBitVector | kVpiValueSigned | kVpiValueSized,
-
-  /// @brief 実数型
-  kVpiValueRealType  = kVpiValueRealBit | kVpiValueSigned | kVpiValueSized
-};
-
-/// @brief ビットベクタ型を作る．
-/// @param[in] type 元となるタイプ
-/// @param[in] size サイズ
-tVpiValueType
-pack(tVpiValueType type,
-     ymuint size);
-
-/// @brief 2つの型をマージする．
-/// @param[in] vtype1, vtype2 型
-tVpiValueType
-merge(tVpiValueType vtype1,
-      tVpiValueType vtype2);
-
-/// @brief 型を取り出す．
-/// @param[in] packed_type 型とサイズをパックしたもの．
-tVpiValueType
-unpack_type(tVpiValueType packed_type);
-
-/// @brief サイズを取り出す．
-/// @param[in] packed_type 型とサイズをパックしたもの．
-ymuint
-unpack_size(tVpiValueType type);
-
-/// @brief 符号つきの型かどうかのチェック
-/// @param[in] type 型
-/// @return 符号つきの型の時 true を返す．
-bool
-is_signed_type(tVpiValueType type);
-
-/// @brief サイズつきの型かどうかのチェック
-/// @param[in] type 型
-/// @return サイズつきの型の時 true を返す．
-bool
-is_sized_type(tVpiValueType type);
-
-/// @brief ビットベクタ型かどうかのチェック
-/// @param[in] type 型
-/// @return ビットベクタ型の時 true を返す．
-bool
-is_bitvector_type(tVpiValueType type);
-
-/// @brief integer 型のサイズ
-const ymuint32 kVpiSizeInteger = 32U;
-
-/// @brief real 型のサイズ
-const ymuint32 kVpiSizeReal = 64U;
-
-/// @brief time 型のサイズ
-const ymuint32 kVpiSizeTime = 64U;
-
-/// @brief integer 型
-const tVpiValueType kVpiValueInteger = pack(kVpiValueSS, kVpiSizeInteger);
-
-/// @brief real 型
-const tVpiValueType kVpiValueReal = pack(kVpiValueRealType, kVpiSizeReal);
-
-/// @brief time 型
-const tVpiValueType kVpiValueTime = pack(kVpiValueUS, kVpiSizeTime);
-
-
-//////////////////////////////////////////////////////////////////////
 /// @brief 範囲指定のモード
 //////////////////////////////////////////////////////////////////////
 enum tVpiRangeMode {
@@ -937,71 +847,6 @@ neq(tVpiScalarVal src1,
   return kVpiScalar0;
 }
 
-// @brief ビットベクタ型を作る．
-inline
-tVpiValueType
-pack(tVpiValueType type,
-     ymuint size)
-{
-  ymuint tmp = type | (size << 4);
-  return static_cast<tVpiValueType>(tmp);
-}
-
-// @brief 2つの型をマージする．
-inline
-tVpiValueType
-merge(tVpiValueType vtype1,
-      tVpiValueType vtype2)
-{
-  ymuint tmp
-    = static_cast<ymuint>(vtype1) | static_cast<ymuint>(vtype2);
-  return static_cast<tVpiValueType>(tmp);
-}
-
-// @brief 型を取り出す．
-inline
-tVpiValueType
-unpack_type(tVpiValueType packed_type)
-{
-  ymuint tmp = static_cast<ymuint>(packed_type) & 0xF;
-  return static_cast<tVpiValueType>(tmp);
-}
-
-// @brief サイズを取り出す．
-inline
-ymuint
-unpack_size(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) >> 4);
-}
-
-// @brief 符号つきの型かどうかのチェック
-// @return 符号つきの型の時 true を返す．
-inline
-bool
-is_signed_type(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) & kVpiValueSigned) == kVpiValueSigned;
-}
-
-// @brief サイズつきの型かどうかのチェック
-// @return サイズつきの型の時 true を返す．
-inline
-bool
-is_sized_type(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) & kVpiValueSized) == kVpiValueSized;
-}
-
-// @brief ビットベクタ型かどうかのチェック
-// @return ビットベクタ型の時 true を返す．
-inline
-bool
-is_bitvector_type(tVpiValueType type)
-{
-  return (static_cast<ymuint>(type) & kVpiValueBitVector) == kVpiValueBitVector;
-}
-
 /// @brief 遷移シンボル (エッジシンボル) のチェック
 /// @param[in] val
 /// @return val が遷移シンボル(エッジシンボル)なら true を返す．
@@ -1016,10 +861,11 @@ END_NAMESPACE_YM_VERILOG
 
 BEGIN_NAMESPACE_YM
 
+using nsVerilog::BitVector;
 using nsVerilog::VlLineWatcher;
 using nsVerilog::VlMgr;
 using nsVerilog::VlTime;
-using nsVerilog::BitVector;
+using nsVerilog::VlValueType;
 using nsVerilog::VlValue;
 
 END_NAMESPACE_YM

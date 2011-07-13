@@ -85,10 +85,10 @@ EiImpNet::name() const
 
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
+VlValueType
 EiImpNet::value_type() const
 {
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 符号の取得
@@ -297,7 +297,7 @@ EiImpNet::set_real(double val)
 // @brief bitvector 型の値を返す．
 void
 EiImpNet::get_bitvector(BitVector& bitvector,
-			tVpiValueType req_type) const
+			const VlValueType& req_type) const
 {
   bitvector = mVal;
   bitvector.coerce(req_type);

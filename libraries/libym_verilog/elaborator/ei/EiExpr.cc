@@ -45,7 +45,7 @@ EiExpr::file_region() const
 ymuint
 EiExpr::bit_size() const
 {
-  return unpack_size(value_type());
+  return value_type().size();
 }
 
 // @brief 定数の時 true を返す．
@@ -293,10 +293,10 @@ EiExpr::operand(ymuint pos) const
 // @brief オペランドに要求されるデータ型を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
 // @note このクラスでは kVpiValueNone を返す．
-tVpiValueType
+VlValueType
 EiExpr::operand_type(ymuint pos) const
 {
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 繰り返し数を返す．

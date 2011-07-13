@@ -217,7 +217,7 @@ EiPartSelect::lhs_elem(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiPartSelect::set_reqsize(tVpiValueType type)
+EiPartSelect::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -262,7 +262,7 @@ EiConstPartSelect::~EiConstPartSelect()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiConstPartSelect::value_type() const
 {
   int w = 0;
@@ -272,7 +272,7 @@ EiConstPartSelect::value_type() const
   else {
     w = mRightVal - mLeftVal + 1;
   }
-  return pack(kVpiValueUS, w);
+  return VlValueType(false, true, w);
 }
 
 // @brief 固定選択子の時 true を返す．
@@ -351,10 +351,10 @@ EiVarPartSelect::~EiVarPartSelect()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiVarPartSelect::value_type() const
 {
-  return pack(kVpiValueUS, mRangeVal);
+  return VlValueType(false, true, mRangeVal);
 }
 
 // @brief 固定選択子の時 true を返す．

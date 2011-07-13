@@ -47,7 +47,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -68,7 +68,7 @@ public:
   /// 通常はオペランドの式の value_type() に一致するが，
   /// その式が self-typed の場合には異なることもある．
   virtual
-  tVpiValueType
+  VlValueType
   operand_type(ymuint pos) const;
 
 
@@ -82,7 +82,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  set_reqsize(const VlValueType& type);
 
 
 public:
@@ -159,7 +159,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief オペランド数を返す．
@@ -174,7 +174,7 @@ public:
   /// 通常はオペランドの式の value_type() に一致するが，
   /// その式が self-typed の場合には異なることもある．
   virtual
-  tVpiValueType
+  VlValueType
   operand_type(ymuint pos) const;
 
   /// @brief 繰り返し数を返す．

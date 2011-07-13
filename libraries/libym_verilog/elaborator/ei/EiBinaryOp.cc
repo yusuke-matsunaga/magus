@@ -151,8 +151,8 @@ EiCompareOp::EiCompareOp(const PtExpr* pt_expr,
   EiBinaryOp(pt_expr, opr1, opr2)
 {
   // 比較演算は大きい方の型を用いる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
 
   mOprType = calc_type(type1, type2);
 
@@ -166,11 +166,11 @@ EiCompareOp::~EiCompareOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiCompareOp::value_type() const
 {
   // 常に1ビット符号なし
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief オペランドに要求されるデータ型を返す．
@@ -179,7 +179,7 @@ EiCompareOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiCompareOp::operand_type(ymuint pos) const
 {
   return mOprType;
@@ -189,7 +189,7 @@ EiCompareOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiCompareOp::set_reqsize(tVpiValueType type)
+EiCompareOp::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -223,11 +223,11 @@ EiBinaryLogOp::~EiBinaryLogOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBinaryLogOp::value_type() const
 {
   // 常に1ビット符号なし
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief オペランドに要求されるデータ型を返す．
@@ -236,18 +236,18 @@ EiBinaryLogOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiBinaryLogOp::operand_type(ymuint pos) const
 {
   // 常に1ビット符号なし
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBinaryLogOp::set_reqsize(tVpiValueType type)
+EiBinaryLogOp::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -267,12 +267,12 @@ EiBinaryBitOp::EiBinaryBitOp(const PtExpr* pt_expr,
   EiBinaryOp(pt_expr, opr1, opr2)
 {
   // オペランドのサイズの大きい方で決まる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
 
   mType = calc_type(type1, type2);
 
-  assert_cond(mType != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -281,7 +281,7 @@ EiBinaryBitOp::~EiBinaryBitOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBinaryBitOp::value_type() const
 {
   return mType;
@@ -293,7 +293,7 @@ EiBinaryBitOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiBinaryBitOp::operand_type(ymuint pos) const
 {
   return mType;
@@ -303,7 +303,7 @@ EiBinaryBitOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBinaryBitOp::set_reqsize(tVpiValueType type)
+EiBinaryBitOp::set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
   operand1()->set_reqsize(mType);
@@ -325,8 +325,8 @@ EiBinaryArithOp::EiBinaryArithOp(const PtExpr* pt_expr,
   EiBinaryOp(pt_expr, opr1, opr2)
 {
   // オペランドのサイズの大きい方で決まる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
 
   mType = calc_type(type1, type2);
 }
@@ -337,7 +337,7 @@ EiBinaryArithOp::~EiBinaryArithOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBinaryArithOp::value_type() const
 {
   return mType;
@@ -349,7 +349,7 @@ EiBinaryArithOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiBinaryArithOp::operand_type(ymuint pos) const
 {
   return mType;
@@ -359,7 +359,7 @@ EiBinaryArithOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBinaryArithOp::set_reqsize(tVpiValueType type)
+EiBinaryArithOp::set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
   operand1()->set_reqsize(mType);
@@ -382,8 +382,8 @@ EiPowerOp::EiPowerOp(const PtExpr* pt_expr,
 {
   // 巾乗演算の場合, どちらかのオペランドが real, integer, signed
   // なら結果は real, どちらも unsigned の時のみ unsigned となる．
-  tVpiValueType type1 = operand1()->value_type();
-  tVpiValueType type2 = operand2()->value_type();
+  VlValueType type1 = operand1()->value_type();
+  VlValueType type2 = operand2()->value_type();
   mType = calc_type2(type1, type2);
 
   // ただし opr2 は self-determined
@@ -396,7 +396,7 @@ EiPowerOp::~EiPowerOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiPowerOp::value_type() const
 {
   return mType;
@@ -408,7 +408,7 @@ EiPowerOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiPowerOp::operand_type(ymuint pos) const
 {
   if ( pos == 0 ) {
@@ -423,7 +423,7 @@ EiPowerOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiPowerOp::set_reqsize(tVpiValueType type)
+EiPowerOp::set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 
@@ -449,10 +449,9 @@ EiShiftOp::EiShiftOp(const PtExpr* pt_expr,
 {
   // シフト演算子は第1オペランドの型とサイズをそのまま引き継ぐ
   mType = opr1->value_type();
-  assert_cond(mType != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
 
-  tVpiValueType type2 = opr2->value_type();
-  assert_cond(type2 != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !opr2->value_type().is_real_type(), __FILE__, __LINE__);
 
   // 第2オペランドのサイズは self determined
   opr2->set_selfsize();
@@ -464,7 +463,7 @@ EiShiftOp::~EiShiftOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiShiftOp::value_type() const
 {
   return mType;
@@ -476,7 +475,7 @@ EiShiftOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiShiftOp::operand_type(ymuint pos) const
 {
   if ( pos == 0 ) {
@@ -491,7 +490,7 @@ EiShiftOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiShiftOp::set_reqsize(tVpiValueType type)
+EiShiftOp::set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 

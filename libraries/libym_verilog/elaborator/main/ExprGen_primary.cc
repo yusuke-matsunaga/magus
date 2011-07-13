@@ -543,7 +543,7 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
   ElbParameter* param = handle->parameter();
   ElbDecl* decl = handle->decl();
   ElbDeclArray* declarray = handle->declarray();
-  tVpiValueType value_type;
+  VlValueType value_type;
   if ( param != NULL ) {
     primary = factory().new_Primary(pt_expr, param);
     is_array = false;
@@ -624,7 +624,7 @@ ExprGen::instantiate_primary_sub(ElbObjHandle* handle,
   }
 
   if ( has_range_select || has_bit_select ) {
-    if ( value_type == kVpiValueReal ) {
+    if ( value_type.is_real_type() ) {
       error_select_for_real(pt_expr);
       return NULL;
     }
@@ -822,7 +822,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
     return VlValue();
   }
   VlValue val = param->get_value();
-  if ( param->value_type() == kVpiValueReal ) {
+  if ( param->value_type().is_real_type() ) {
     if ( has_bit_select || has_range_select ) {
       if ( put_error ) {
 	error_illegal_real_type(pt_expr);

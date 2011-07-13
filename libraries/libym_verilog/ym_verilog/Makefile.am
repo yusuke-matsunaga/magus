@@ -10,8 +10,9 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	verilog.h \
-	VlTime.h \
 	BitVector.h \
 	VlLineWatcher.h \
 	VlMgr.h \
-	VlValue.h
+	VlTime.h \
+	VlValue.h \
+	VlValueTime.h

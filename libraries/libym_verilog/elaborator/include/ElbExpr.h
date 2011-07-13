@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/vl/VlExpr.h"
+#include "ym_verilog/VlValueType.h"
 #include "ElbFwd.h"
 
 
@@ -44,7 +45,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type) = 0;
+  set_reqsize(const VlValueType& type) = 0;
 
   /// @brief 要求される式のサイズを自分で決めてセットする．
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
@@ -66,22 +67,22 @@ public:
 
   // 二項演算のタイプとサイズを決める．
   static
-  tVpiValueType
-  calc_type(tVpiValueType type0,
-	    tVpiValueType type1);
+  VlValueType
+  calc_type(const VlValueType& type0,
+	    const VlValueType& type1);
 
 
   // 巾乗演算のタイプとサイズを決める．
   static
-  tVpiValueType
-  calc_type2(tVpiValueType type0,
-	     tVpiValueType type1);
+  VlValueType
+  calc_type2(const VlValueType& type0,
+	     const VlValueType& type1);
 
   // 出力に要求されているサイズから自分のサイズを決める．
   static
-  tVpiValueType
-  update_size(tVpiValueType type,
-	      tVpiValueType req_type);
+  VlValueType
+  update_size(const VlValueType& type,
+	      const VlValueType& req_type);
 
 };
 

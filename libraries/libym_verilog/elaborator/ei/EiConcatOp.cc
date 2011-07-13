@@ -77,9 +77,9 @@ EiConcatOp::EiConcatOp(const PtExpr* pt_expr,
   mSize = 0;
   for (ymuint i = 0; i < n; ++ i) {
     ElbExpr* expr = _operand(i);
-    tVpiValueType type1 = expr->value_type();
-    assert_cond(type1 != kVpiValueReal, __FILE__, __LINE__);
-    ymuint size1 = unpack_size(type1);
+    VlValueType type1 = expr->value_type();
+    assert_cond( !type1.is_real_type(), __FILE__, __LINE__);
+    ymuint size1 = type1.size();
     mSize += size1;
 
     // オペランドのサイズは self determined
@@ -93,10 +93,10 @@ EiConcatOp::~EiConcatOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiConcatOp::value_type() const
 {
-  return pack(kVpiValueUS, mSize);
+  return VlValueType(false, true, mSize);
 }
 
 // @brief 定数の時 true を返す．
@@ -116,7 +116,7 @@ EiConcatOp::is_const() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiConcatOp::set_reqsize(tVpiValueType type)
+EiConcatOp::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -134,7 +134,7 @@ EiConcatOp::operand_num() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiConcatOp::operand_type(ymuint pos) const
 {
   return _operand(pos)->value_type();
@@ -176,10 +176,10 @@ EiMultiConcatOp::~EiMultiConcatOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiMultiConcatOp::value_type() const
 {
-  return pack(kVpiValueUS, bit_size() * mRepNum);
+  return VlValueType(false, true, bit_size() * mRepNum);
 }
 
 // @brief オペランド数を返す．
@@ -203,7 +203,7 @@ EiMultiConcatOp::rep_num() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiMultiConcatOp::operand_type(ymuint pos) const
 {
   return _operand(pos)->value_type();

@@ -121,7 +121,7 @@ public:
   /// @param[in] val 値
   /// @note ヘッダが型指定を持たない時には値から情報を得る．
   virtual
-  tVpiValueType
+  VlValueType
   value_type(const VlValue& val) const = 0;
 
   /// @brief データ型の取得

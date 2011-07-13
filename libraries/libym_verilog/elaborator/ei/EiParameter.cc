@@ -298,19 +298,19 @@ EiParamHead::calc_bit_offset(int index,
 // @breif 値の型を返す．
 // @param[in] val 値
 // @note ヘッダに型指定がない時は値から情報を得る．
-tVpiValueType
+VlValueType
 EiParamHead::value_type(const VlValue& val) const
 {
   switch ( mPtHead->data_type() ) {
   case kVpiVarReal:
   case kVpiVarRealtime:
-    return kVpiValueReal;
+    return VlValueType::real_type();
 
   case kVpiVarTime:
-    return kVpiValueTime;
+    return VlValueType::time_type();
 
   case kVpiVarInteger:
-    return kVpiValueInteger;
+    return VlValueType::int_type();
 
   case kVpiVarNone:
     return val.value_type();
@@ -319,7 +319,7 @@ EiParamHead::value_type(const VlValue& val) const
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief データ型の取得
@@ -455,11 +455,10 @@ EiParamHeadV::calc_bit_offset(int index,
 // @breif 値の型を返す．
 // @param[in] val 値
 // @note ヘッダに型指定がない時は値から情報を得る．
-tVpiValueType
+VlValueType
 EiParamHeadV::value_type(const VlValue& val) const
 {
-  tVpiValueType type = pt_head()->is_signed() ? kVpiValueSS : kVpiValueUS;
-  return pack(type, mRange.size());
+  return VlValueType(pt_head()->is_signed(), true, mRange.size());
 }
 
 
@@ -514,7 +513,7 @@ EiParameter::name() const
 
 // @breif 値の型を返す．
 // @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
-tVpiValueType
+VlValueType
 EiParameter::value_type() const
 {
   // (1) with no type or range specification の場合，そのパラメータに

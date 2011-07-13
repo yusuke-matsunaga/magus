@@ -38,7 +38,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 {
   if ( expr->is_const() ) {
     VlValue value = expr->constant_value();
-    assert_cond( is_bitvector_type(expr->value_type()), __FILE__, __LINE__);
+    assert_cond( expr->value_type().is_bitvector_type(), __FILE__, __LINE__);
     BitVector bv = value.bitvector_value();
     ymuint bit_size = bv.size();
     ymuint n = (bit_size + 31) / 32;
@@ -66,9 +66,9 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
     vector<MvnNode*> inputs(n);
     for (ymuint i = 0; i < n; ++ i) {
       MvnNode* node1 = gen_expr(parent_module, expr->operand(i), env);
-      tVpiValueType opr_type = expr->operand_type(i);
-      ymuint bw = unpack_size(opr_type);
-      bool sign = is_signed_type(opr_type);
+      VlValueType opr_type = expr->operand_type(i);
+      ymuint bw = opr_type.size();
+      bool sign = opr_type.is_signed();
       inputs[i] = coerce_expr(parent_module, node1, bw, sign);
     }
 
@@ -667,7 +667,7 @@ ReaderImpl::gen_rhs(MvnModule* parent_module,
   MvnNode* node_orig = gen_expr(parent_module, rhs, env);
 
   ymuint lhs_bw = lhs->bit_size();
-  bool lhs_signed = is_signed_type(lhs->value_type());
+  bool lhs_signed = lhs->value_type().is_signed();
 
   return coerce_expr(parent_module, node_orig, lhs_bw, lhs_signed);
 }

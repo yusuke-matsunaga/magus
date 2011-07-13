@@ -159,7 +159,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief オペランドに要求されるデータ型を返す．
@@ -169,7 +169,7 @@ public:
   /// 通常はオペランドの式の value_type() に一致するが，
   /// その式が self-typed の場合には異なることもある．
   virtual
-  tVpiValueType
+  VlValueType
   operand_type(ymuint pos) const;
 
 
@@ -183,7 +183,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  set_reqsize(const VlValueType& type);
 
 
 private:
@@ -192,7 +192,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 式の型
-  tVpiValueType mType;
+  VlValueType mType;
 
 };
 
@@ -230,7 +230,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief オペランドに要求されるデータ型を返す．
@@ -240,7 +240,7 @@ public:
   /// 通常はオペランドの式の value_type() に一致するが，
   /// その式が self-typed の場合には異なることもある．
   virtual
-  tVpiValueType
+  VlValueType
   operand_type(ymuint pos) const;
 
 
@@ -254,7 +254,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  set_reqsize(const VlValueType& type);
 
 
 private:
@@ -263,7 +263,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 式の型
-  tVpiValueType mType;
+  VlValueType mType;
 
 };
 

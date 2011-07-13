@@ -5,7 +5,7 @@
 ///
 /// $Id: ElbExpr.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -32,90 +32,87 @@ ElbExpr::~ElbExpr()
 }
 
 // 二項演算のタイプとサイズを決める．
-tVpiValueType
-ElbExpr::calc_type(tVpiValueType type0,
-		   tVpiValueType type1)
+VlValueType
+ElbExpr::calc_type(const VlValueType& type0,
+		   const VlValueType& type1)
 {
   // どちらか一方でも real なら答は real
-  if ( type0 == kVpiValueReal || type1 == kVpiValueReal ) {
-    return kVpiValueReal;
+  if ( type0.is_real_type() || type1.is_real_type() ) {
+    return VlValueType::real_type();
   }
 
   bool is_sized = false;
   bool is_signed = false;
 
   // 両方が signed の場合にのみ signed
-  if ( is_signed_type(type0) && is_signed_type(type1) ) {
+  if ( type0.is_signed() && type1.is_signed() ) {
     is_signed = true;
   }
 
   // どちらか一方が sized なら結果も sized
-  if ( is_sized_type(type0) || is_sized_type(type1) ) {
+  ymuint ans_size = 0;
+  if ( type0.is_sized() ) {
     is_sized = true;
+    ans_size = type0.size();
+  }
+  if ( type1.is_sized() ) {
+    is_sized = true;
+    if ( ans_size < type1.size() ) {
+      ans_size = type1.size();
+    }
   }
 
-  if ( is_sized ) {
-    ymuint size0 = unpack_size(type0);
-    ymuint size1 = unpack_size(type1);
-    ymuint ans_size = ( size0 > size1 ) ? size0 : size1;
-    if ( is_signed ) {
-      return pack(kVpiValueSS, ans_size);
-    }
-    else {
-      return pack(kVpiValueUS, ans_size);
-    }
-  }
-  else {
-    if ( is_signed ) {
-      return pack(kVpiValueSU, 0);
-    }
-    else {
-      return pack(kVpiValueUU, 0);
-    }
-  }
+  return VlValueType(is_signed, is_sized, ans_size);
 }
 
 // 巾乗演算のタイプとサイズを決める．
-tVpiValueType
-ElbExpr::calc_type2(tVpiValueType type0,
-		    tVpiValueType type1)
+VlValueType
+ElbExpr::calc_type2(const VlValueType& type0,
+		    const VlValueType& type1)
 {
   // 両方が unsigned でなければ結果は real
-  if ( is_signed_type(type0) || is_signed_type(type1) ) {
-    return kVpiValueReal;
+  // どちらかが signed なら結果は real
+  if ( type0.is_signed() || type1.is_signed() ) {
+    return VlValueType::real_type();
   }
 
   // どちらか一方が sized なら結果も sized
-  if ( is_sized_type(type0) || is_sized_type(type1) ) {
-    ymuint size0 = unpack_size(type0);
-    ymuint size1 = unpack_size(type1);
-    ymuint ans_size = ( size0 > size1 ) ? size0 : size1;
-    return pack(kVpiValueUS, ans_size);
+  bool is_sized = false;
+  ymuint ans_size = 0;
+  if ( type0.is_sized() ) {
+    is_sized = true;
+    ans_size = type0.size();
   }
-  else {
-    return pack(kVpiValueUU, 0);
+  if ( type1.is_sized() ) {
+    is_sized = true;
+    if ( ans_size < type1.size() ) {
+      ans_size = type1.size();
+    }
   }
+
+  return VlValueType(false, is_sized, ans_size);
 }
 
 // 出力に要求されているサイズから自分のサイズを決める．
-tVpiValueType
-ElbExpr::update_size(tVpiValueType type,
-		     tVpiValueType req_type)
+VlValueType
+ElbExpr::update_size(const VlValueType& type,
+		     const VlValueType& req_type)
 {
-  if ( req_type == kVpiValueReal ) {
+  if ( req_type.is_real_type() ) {
     // real は伝播しない．
     return type;
   }
-  if ( type == kVpiValueReal ) {
+  if ( type.is_real_type() ) {
     // 自分が real でも伝播しない．
     return type;
   }
-  ymuint req_size = unpack_size(req_type);
-  ymuint size = unpack_size(type);
+
+  ymuint req_size = req_type.size();
+  ymuint size = type.size();
   if ( req_size <= size ) {
     return type;
   }
-  return pack(unpack_type(type), req_size);
+  return VlValueType(type.is_signed(), type.is_sized(), req_size);
 }
 
 END_NAMESPACE_YM_VERILOG

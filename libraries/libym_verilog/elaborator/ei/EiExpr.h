@@ -240,7 +240,7 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
   /// @note このクラスでは kVpiValueNone を返す．
   virtual
-  tVpiValueType
+  VlValueType
   operand_type(ymuint pos) const;
 
   /// @brief 繰り返し数を返す．

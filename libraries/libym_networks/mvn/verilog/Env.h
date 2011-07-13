@@ -234,7 +234,7 @@ public:
   /// オフセットが範囲外の場合には NULL を返す．
   AssignInfo
   get_info(const VlDeclArray* decl,
-      ymuint offset) const;
+	   ymuint offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
   /// @param[in] id ID番号

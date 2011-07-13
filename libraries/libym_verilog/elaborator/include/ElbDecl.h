@@ -11,6 +11,7 @@
 /// All rights reserved.
 
 
+#include "ym_verilog/VlValueType.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
 #include "ElbFwd.h"
@@ -339,7 +340,7 @@ public:
   void
   get_bitvector(ymuint offset,
 		BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const = 0;
+		const VlValueType& req_type = VlValueType()) const = 0;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] offset 要素のオフセット

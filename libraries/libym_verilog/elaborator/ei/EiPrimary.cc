@@ -140,7 +140,7 @@ EiPrimaryBase::is_primary() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiPrimaryBase::set_reqsize(tVpiValueType type)
+EiPrimaryBase::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -183,7 +183,7 @@ EiPrimary::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiPrimary::value_type() const
 {
   return mObj->value_type();
@@ -262,7 +262,7 @@ EiDeclPrimary::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiDeclPrimary::value_type() const
 {
   return mObj->value_type();
@@ -331,7 +331,7 @@ EiDeclPrimary::lhs_elem(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiDeclPrimary::set_reqsize(tVpiValueType type)
+EiDeclPrimary::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -381,7 +381,7 @@ EiParamPrimary::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiParamPrimary::value_type() const
 {
   return mObj->value_type();
@@ -454,7 +454,7 @@ EiArrayElemPrimary::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiArrayElemPrimary::value_type() const
 {
   return mObj->value_type();
@@ -554,7 +554,7 @@ EiConstArrayElemPrimary::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiConstArrayElemPrimary::value_type() const
 {
   return mObj->value_type();
@@ -660,10 +660,10 @@ EiScopePrimary::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiScopePrimary::value_type() const
 {
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 定数の時 true を返す．
@@ -709,10 +709,10 @@ EiPrimitivePrimary::type() const
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiPrimitivePrimary::value_type() const
 {
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 定数の時 true を返す．

@@ -173,26 +173,26 @@ type2str(tVpiObjType type)
 
 // 式の値の型を表す文字列を返す．
 QString
-value_type2str(tVpiValueType value_type)
+value_type2str(const VlValueType& value_type)
 {
-  if ( value_type == kVpiValueInteger ) {
+  if ( value_type.is_int_type() ) {
     return "integer";
   }
-  if ( value_type == kVpiValueReal ) {
+  if ( value_type.is_real_type() ) {
     return "real";
   }
-  if ( value_type == kVpiValueTime ) {
+  if ( value_type.is_time_type() ) {
     return "time";
   }
-  ymuint s = unpack_size(value_type);
+  ymuint s = value_type.size();
   ostringstream buf;
-  if ( is_signed_type(value_type) ) {
+  if ( value_type.is_signed() ) {
     buf << "signed ";
   }
   else {
     buf << "unsigned ";
   }
-  if ( is_sized_type(value_type) ) {
+  if ( value_type.is_sized() ) {
     buf << "sized ";
   }
   else {

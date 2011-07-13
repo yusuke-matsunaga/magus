@@ -126,8 +126,8 @@ EiConditionOp::EiConditionOp(const PtExpr* pt_expr,
 
   operand1()->set_selfsize();
 
-  tVpiValueType type2 = operand2()->value_type();
-  tVpiValueType type3 = operand3()->value_type();
+  VlValueType type2 = operand2()->value_type();
+  VlValueType type3 = operand3()->value_type();
   mType = calc_type(type2, type3);
 }
 
@@ -137,7 +137,7 @@ EiConditionOp::~EiConditionOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiConditionOp::value_type() const
 {
   return mType;
@@ -149,7 +149,7 @@ EiConditionOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiConditionOp::operand_type(ymuint pos) const
 {
   if ( pos == 0 ) {
@@ -164,7 +164,7 @@ EiConditionOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiConditionOp::set_reqsize(tVpiValueType type)
+EiConditionOp::set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 
@@ -201,7 +201,7 @@ EiMinTypMaxOp::~EiMinTypMaxOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiMinTypMaxOp::value_type() const
 {
   return mType;
@@ -213,7 +213,7 @@ EiMinTypMaxOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiMinTypMaxOp::operand_type(ymuint pos) const
 {
   return operand(pos)->value_type();
@@ -223,7 +223,7 @@ EiMinTypMaxOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiMinTypMaxOp::set_reqsize(tVpiValueType type)
+EiMinTypMaxOp::set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 

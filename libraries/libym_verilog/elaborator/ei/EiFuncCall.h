@@ -67,7 +67,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(tVpiValueType type);
+  set_reqsize(const VlValueType& type);
 
   /// @brief オペランドを返す．
   /// @param[in] pos 位置番号
@@ -136,7 +136,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．
@@ -211,7 +211,7 @@ public:
 
   /// @brief 式のタイプを返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 定数の時 true を返す．

@@ -79,7 +79,7 @@ public:
   /// @breif 値の型を返す．
   /// @note 値を持たないオブジェクトの場合には kVpiValueNone を返す．
   virtual
-  tVpiValueType
+  VlValueType
   value_type() const;
 
   /// @brief 符号の取得
@@ -253,7 +253,7 @@ public:
   virtual
   void
   get_bitvector(BitVector& val,
-		tVpiValueType req_type = kVpiValueNone) const;
+		const VlValueType& req_type = VlValueType()) const;
 
   /// @brief bitvector 型の値を設定する．
   /// @param[in] val 値

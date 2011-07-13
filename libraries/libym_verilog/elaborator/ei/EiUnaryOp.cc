@@ -137,11 +137,11 @@ EiNotOp::~EiNotOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiNotOp::value_type() const
 {
   // 結果は常に符号無し1ビット
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief オペランドに要求されるデータ型を返す．
@@ -150,18 +150,18 @@ EiNotOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiNotOp::operand_type(ymuint pos) const
 {
   // 結果は常に符号なし1ビット
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiNotOp::set_reqsize(tVpiValueType type)
+EiNotOp::set_reqsize(const VlValueType& type)
 {
   // この演算子は型が固定なので何もしない．
 }
@@ -181,7 +181,7 @@ EiBitNegOp::EiBitNegOp(const PtExpr* pt_expr,
   // オペランドの型とサイズをそのまま使う．
   mType = opr1->value_type();
 
-  assert_cond(mType != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
 }
 
 // @brief デストラクタ
@@ -190,7 +190,7 @@ EiBitNegOp::~EiBitNegOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiBitNegOp::value_type() const
 {
   return mType;
@@ -202,7 +202,7 @@ EiBitNegOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiBitNegOp::operand_type(ymuint pos) const
 {
   return mType;
@@ -212,7 +212,7 @@ EiBitNegOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBitNegOp::set_reqsize(tVpiValueType type)
+EiBitNegOp::set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
   operand1()->set_reqsize(mType);
@@ -230,8 +230,7 @@ EiReductionOp::EiReductionOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1) :
   EiUnaryOp(pt_expr, opr1)
 {
-  tVpiValueType type = opr1->value_type();
-  assert_cond(type != kVpiValueReal, __FILE__, __LINE__);
+  assert_cond( !opr1->value_type().is_real_type(), __FILE__, __LINE__);
 
   // オペランドのサイズは self determined
   opr1->set_selfsize();
@@ -243,11 +242,11 @@ EiReductionOp::~EiReductionOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiReductionOp::value_type() const
 {
   // 結果は常に符号無し1ビット
-  return pack(kVpiValueUS, 1);
+  return VlValueType(false, true, 1);
 }
 
 // @brief オペランドに要求されるデータ型を返す．
@@ -256,7 +255,7 @@ EiReductionOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiReductionOp::operand_type(ymuint pos) const
 {
   return operand1()->value_type();
@@ -266,7 +265,7 @@ EiReductionOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiReductionOp::set_reqsize(tVpiValueType type)
+EiReductionOp::set_reqsize(const VlValueType& type)
 {
   // この演算子は型が固定なので何もしない．
 }
@@ -291,12 +290,11 @@ EiUnaryArithOp::~EiUnaryArithOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiUnaryArithOp::value_type() const
 {
   // オペランドの型とサイズをそのまま使う．
-  tVpiValueType type = operand1()->value_type();
-  return type;
+  return operand1()->value_type();
 }
 
 // @brief オペランドに要求されるデータ型を返す．
@@ -305,7 +303,7 @@ EiUnaryArithOp::value_type() const
 // @note それ以外では kVpiValueNone を返す．
 // 通常はオペランドの式の value_type() に一致するが，
 // その式が self-typed の場合には異なることもある．
-tVpiValueType
+VlValueType
 EiUnaryArithOp::operand_type(ymuint pos) const
 {
   return operand1()->value_type();
@@ -315,7 +313,7 @@ EiUnaryArithOp::operand_type(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiUnaryArithOp::set_reqsize(tVpiValueType type)
+EiUnaryArithOp::set_reqsize(const VlValueType& type)
 {
   operand1()->set_reqsize(type);
 }
@@ -340,17 +338,17 @@ EiEventEdgeOp::~EiEventEdgeOp()
 }
 
 // @brief 式のタイプを返す．
-tVpiValueType
+VlValueType
 EiEventEdgeOp::value_type() const
 {
-  return kVpiValueNone;
+  return VlValueType();
 }
 
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiEventEdgeOp::set_reqsize(tVpiValueType type)
+EiEventEdgeOp::set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
