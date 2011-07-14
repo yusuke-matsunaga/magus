@@ -16,6 +16,7 @@
 
 #include "ElbUdp.h"
 #include "ElbIODecl.h"
+#include "ym_verilog/VlScalarVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -111,7 +112,7 @@ public:
   /// @brief 初期値を返す．
   /// @return 0/1/X を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   init_val() const;
 
   /// @brief 初期値を表す文字列を返す．
@@ -151,7 +152,7 @@ public:
   /// @param[in] init_val 初期値
   void
   set_initial(const PtExpr* init_expr,
-	      tVpiScalarVal init_val);
+	      const VlScalarVal& init_val);
 
   /// @brief table entry の内容を設定する．
   /// @param[in] pos 行番号
@@ -184,7 +185,7 @@ private:
   const PtExpr* mInitExpr;
 
   // 初期値
-  tVpiScalarVal mInitVal;
+  VlScalarVal mInitVal;
 
   // table entry のサイズ
   ymuint32 mTableEntrySize;

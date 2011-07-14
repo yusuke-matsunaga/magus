@@ -41,6 +41,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class BitVector;
 class VlLineWatcher;
 class VlMgr;
+class VlScalarVal;
 class VlTime;
 class VlUdpVal;
 class VlValue;
@@ -50,80 +51,6 @@ class VlValueType;
 /// @defgroup VlCommon Verilog 用基本ユーティリティ
 /// @ingroup VlGroup
 /// @{
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 1ビットの値
-//////////////////////////////////////////////////////////////////////
-enum tVpiScalarVal {
-  /// @brief 00: high-impedance
-  kVpiScalarZ = 0,
-  /// @brief 01: 普通の 0
-  kVpiScalar0 = 1,
-  /// @brief 10: 普通の 1
-  kVpiScalar1 = 2,
-  /// @brief 11: 0 か 1 か不明
-  kVpiScalarX = 3
-};
-
-/// @brief tVpiScalarVal から bool への変換
-bool
-conv_to_bool(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal から論理値への変換
-/// @note kVpiScalarZ -> kVpiScalarX をやっている
-tVpiScalarVal
-conv_to_logic(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal から int への変換
-/// @note kVpiScalar1 以外はすべての 0 にマッピングする．
-int
-conv_to_int(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal から実数値への変換
-/// @note kVpiScalar1 を 1.0 に，それい以外はすべての 0.0 にマッピングする．
-double
-conv_to_real(tVpiScalarVal src);
-
-/// @brief int から tVpiScalarVal への変換
-/// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-tVpiScalarVal
-conv_to_scalar(int src);
-
-/// @brief ymuint から tVpiScalarVal への変換
-/// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-tVpiScalarVal
-conv_to_scalar(ymuint src);
-
-/// @brief 実数値から tVpiScalarVal への変換
-/// @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-tVpiScalarVal
-conv_to_scalar(double src);
-
-/// @brief tVpiScalarVal の否定
-/// @note kVpiScalarZ は kVpiScalarX と同様に扱われる．
-tVpiScalarVal
-operator!(tVpiScalarVal src);
-
-/// @brief tVpiScalarVal の AND
-tVpiScalarVal
-operator&&(tVpiScalarVal src1,
-	   tVpiScalarVal src2);
-
-/// @brief tVpiScalarVal の OR
-tVpiScalarVal
-operator||(tVpiScalarVal src1,
-	   tVpiScalarVal src2);
-
-/// @brief tVpiScalarVal の等価比較
-tVpiScalarVal
-eq(tVpiScalarVal src1,
-   tVpiScalarVal src2);
-
-/// @brief tVpiScalarVal の等価比較
-tVpiScalarVal
-neq(tVpiScalarVal src1,
-    tVpiScalarVal src2);
-
 
 //////////////////////////////////////////////////////////////////////
 // 列挙型の定義
@@ -597,180 +524,6 @@ enum tVpiSpecPathType {
 
 /// @}
 
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief tVpiScalarVal から bool への変換
-inline
-bool
-conv_to_bool(tVpiScalarVal src)
-{
-  return src == kVpiScalar1;
-}
-
-// @brief tVpiScalarVal から論理値への変換
-// @note kVpiScalarZ -> kVpiScalarX をやっている
-inline
-tVpiScalarVal
-conv_to_logic(tVpiScalarVal src)
-{
-  switch ( src ) {
-  case kVpiScalar0: return kVpiScalar0;
-  case kVpiScalar1: return kVpiScalar1;
-  case kVpiScalarX:
-  case kVpiScalarZ: return kVpiScalarX;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  // ダミー
-  return kVpiScalarX;
-}
-
-// @brief tVpiScalarVal から int への変換
-// @note kVpiScalar1 以外はすべての 0 にマッピングする．
-inline
-int
-conv_to_int(tVpiScalarVal src)
-{
-  if ( src == kVpiScalar1 ) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
-}
-
-// @brief tVpiScalarVal から実数値への変換
-// @note kVpiScalar1 を 1.0 に，それい以外はすべての 0.0 にマッピングする．
-inline
-double
-conv_to_real(tVpiScalarVal src)
-{
-  if ( src == kVpiScalar1 ) {
-    return 1.0;
-  }
-  else {
-    return 0.0;
-  }
-}
-
-// @brief int から tVpiScalarVal への変換
-// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
-tVpiScalarVal
-conv_to_scalar(int src)
-{
-  if ( src == 0 ) {
-    return kVpiScalar0;
-  }
-  else {
-    return kVpiScalar1;
-  }
-}
-
-// @brief ymuint から tVpiScalarVal への変換
-// @note 0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
-tVpiScalarVal
-conv_to_scalar(ymuint src)
-{
-  return conv_to_scalar(static_cast<int>(src));
-}
-
-// @brief 実数値から tVpiScalarVal への変換
-// @note 0.0 なら kVpiScalar0 に，それ以外は kVpiScalar1 にマッピングする．
-inline
-tVpiScalarVal
-conv_to_scalar(double src)
-{
-  if ( src == 0.0 ) {
-    return kVpiScalar0;
-  }
-  else {
-    return kVpiScalar1;
-  }
-}
-
-// @brief tVpiScalarVal の否定
-// @note kVpiScalarZ は kVpiScalarX と同様に扱われる．
-inline
-tVpiScalarVal
-operator!(tVpiScalarVal src)
-{
-  switch ( src ) {
-  case kVpiScalar0: return kVpiScalar1;
-  case kVpiScalar1: return kVpiScalar0;
-  case kVpiScalarX:
-  case kVpiScalarZ: return kVpiScalarX;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  // ダミー
-  return kVpiScalarX;
-}
-
-// @brief tVpiScalarVal の AND
-inline
-tVpiScalarVal
-operator&&(tVpiScalarVal src1,
-	   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalar0 || src2 == kVpiScalar0 ) {
-    return kVpiScalar0;
-  }
-  if ( src1 == kVpiScalar1 && src2 == kVpiScalar1 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalarX;
-}
-
-// @brief tVpiScalarVal の OR
-inline
-tVpiScalarVal
-operator||(tVpiScalarVal src1,
-	   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalar1 || src2 == kVpiScalar1 ) {
-    return kVpiScalar1;
-  }
-  if ( src1 == kVpiScalar0 && src2 == kVpiScalar0 ) {
-    return kVpiScalar0;
-  }
-  return kVpiScalarX;
-}
-
-// @brief tVpiScalarVal の等価比較
-inline
-tVpiScalarVal
-eq(tVpiScalarVal src1,
-   tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
-       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
-    return kVpiScalarX;
-  }
-  if ( src1 == src2 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalar0;
-}
-
-// @brief tVpiScalarVal の等価比較
-inline
-tVpiScalarVal
-neq(tVpiScalarVal src1,
-    tVpiScalarVal src2)
-{
-  if ( src1 == kVpiScalarX || src1 == kVpiScalarZ ||
-       src2 == kVpiScalarX || src2 == kVpiScalarZ ) {
-    return kVpiScalarX;
-  }
-  if ( src1 != src2 ) {
-    return kVpiScalar1;
-  }
-  return kVpiScalar0;
-}
-
 END_NAMESPACE_YM_VERILOG
 
 BEGIN_NAMESPACE_YM
@@ -778,6 +531,7 @@ BEGIN_NAMESPACE_YM
 using nsVerilog::BitVector;
 using nsVerilog::VlLineWatcher;
 using nsVerilog::VlMgr;
+using nsVerilog::VlScalarVal;
 using nsVerilog::VlTime;
 using nsVerilog::VlUdpVal;
 using nsVerilog::VlValueType;

@@ -12,6 +12,7 @@
 
 
 #include "ElbDecl.h"
+#include "ym_verilog/VlScalarVal.h"
 #include "ym_verilog/pt/PtP.h"
 
 
@@ -222,18 +223,18 @@ public:
 
   /// @brief スカラー値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar() const;
 
   /// @brief スカラー値を設定する．
   /// @param[in] val 値
   virtual
   void
-  set_scalar(tVpiScalarVal val);
+  set_scalar(const VlScalarVal& val);
 
   /// @brief 論理値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic() const;
 
   /// @brief real 型の値を返す．
@@ -264,7 +265,7 @@ public:
   /// @brief ビット選択値を返す．
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(int index) const;
 
   /// @brief ビット値を設定する．
@@ -273,7 +274,7 @@ public:
   virtual
   void
   set_bitselect(int index,
-		tVpiScalarVal val);
+		const VlScalarVal& val);
 
   /// @brief 範囲選択値を返す．
   /// @param[in] left 範囲の MSB
@@ -311,7 +312,7 @@ private:
   tVpiNetType mNetType;
 
   // 値
-  tVpiScalarVal mVal;
+  VlScalarVal mVal;
 
 };
 

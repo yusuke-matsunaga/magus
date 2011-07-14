@@ -56,7 +56,7 @@ public:
   virtual
   void
   set_initial(const PtExpr* init_expr,
-	      tVpiScalarVal init_val) = 0;
+	      const VlScalarVal& init_val) = 0;
 
   /// @brief table entry の内容を設定する．
   /// @param[in] pos 行番号

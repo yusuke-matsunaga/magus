@@ -63,7 +63,7 @@ public:
 
   /// @brief スカラー値からのコンストラクタ
   explicit
-  VlValue(tVpiScalarVal val);
+  VlValue(const VlScalarVal& val);
 
   /// @brief time からのコンストラクタ
   explicit
@@ -100,7 +100,7 @@ public:
 
   /// @brief スカラー値をセットする．
   void
-  set(tVpiScalarVal val);
+  set(const VlScalarVal& val);
 
   /// @brief time の値をセットする．
   void
@@ -196,12 +196,12 @@ public:
 
   /// @brief スカラー型の値を返す．
   /// @note スカラー型には常に変換可能
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -731,7 +731,7 @@ ite(const VlValue& src1,
 /// @param[in] src3 src1 が偽の時に選ばれる値
 /// @return 演算結果
 VlValue
-ite(tVpiScalarVal src1,
+ite(const VlScalarVal& src1,
     const VlValue& src2,
     const VlValue& src3);
 
@@ -841,12 +841,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const = 0;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const = 0;
 
   /// @brief 実数型の値を返す．
@@ -1081,7 +1081,7 @@ VlValue::uint_value() const
 // @brief スカラー型の値を返す．
 // @note スカラー型には常に変換可能
 inline
-tVpiScalarVal
+VlScalarVal
 VlValue::scalar_value() const
 {
   return mRep->scalar_value();
@@ -1089,7 +1089,7 @@ VlValue::scalar_value() const
 
 // @brief 論理型の値を返す．
 inline
-tVpiScalarVal
+VlScalarVal
 VlValue::logic_value() const
 {
   return mRep->logic_value();

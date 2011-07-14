@@ -430,7 +430,7 @@ public:
   /// @param[in] val スカラー値
   void
   put(const char* label,
-      tVpiScalarVal val);
+      const VlScalarVal& val);
 
   /// @brief time値の出力
   /// @param[in] label ラベル

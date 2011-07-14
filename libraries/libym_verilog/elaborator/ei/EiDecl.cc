@@ -358,26 +358,26 @@ EiDeclN::~EiDeclN()
 }
 
 // @brief スカラー値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclN::get_scalar() const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief スカラー値を設定する．
 void
-EiDeclN::set_scalar(tVpiScalarVal val)
+EiDeclN::set_scalar(const VlScalarVal& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief 論理値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclN::get_logic() const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief real 型の値を返す．
@@ -412,11 +412,11 @@ EiDeclN::set_bitvector(const BitVector& val)
 
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclN::get_bitselect(int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief ビット値を設定する．
@@ -424,7 +424,7 @@ EiDeclN::get_bitselect(int index) const
 // @param[in] val 値
 void
 EiDeclN::set_bitselect(int index,
-		       tVpiScalarVal val)
+		       const VlScalarVal& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -464,7 +464,7 @@ EiDeclN::set_partselect(int left,
 EiDeclS::EiDeclS(ElbDeclHead* head,
 		   const PtNamedBase* pt_item) :
   EiDecl(head, pt_item),
-  mVal(kVpiScalarX)
+  mVal(VlScalarVal::x())
 {
 }
 
@@ -474,7 +474,7 @@ EiDeclS::~EiDeclS()
 }
 
 // @brief スカラー値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclS::get_scalar() const
 {
   return mVal;
@@ -482,30 +482,30 @@ EiDeclS::get_scalar() const
 
 // @brief スカラー値を設定する．
 void
-EiDeclS::set_scalar(tVpiScalarVal val)
+EiDeclS::set_scalar(const VlScalarVal& val)
 {
   mVal = val;
 }
 
 // @brief 論理値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclS::get_logic() const
 {
-  return conv_to_logic(mVal);
+  return mVal.to_logic();
 }
 
 // @brief real 型の値を返す．
 double
 EiDeclS::get_real() const
 {
-  return conv_to_real(mVal);
+  return mVal.to_real();
 }
 
 // @brief real 型の値を設定する．
 void
 EiDeclS::set_real(double val)
 {
-  mVal = conv_to_scalar(val);
+  mVal = VlScalarVal(val);
 }
 
 // @brief bitvector 型の値を返す．
@@ -526,7 +526,7 @@ EiDeclS::set_bitvector(const BitVector& val)
 
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclS::get_bitselect(int index) const
 {
   ymuint offset;
@@ -536,7 +536,7 @@ EiDeclS::get_bitselect(int index) const
   }
   else {
     // 範囲外は X
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 }
 
@@ -545,7 +545,7 @@ EiDeclS::get_bitselect(int index) const
 // @param[in] val 値
 void
 EiDeclS::set_bitselect(int index,
-		       tVpiScalarVal val)
+		       const VlScalarVal& val)
 {
   ymuint offset;
   if ( calc_bit_offset(index, offset) ) {
@@ -597,7 +597,7 @@ EiDeclS::set_partselect(int left,
 // @param[in] head ヘッダ
 // @param[in] pt_item パース木の宣言要素
 EiDeclR::EiDeclR(ElbDeclHead* head,
-		   const PtNamedBase* pt_item) :
+		 const PtNamedBase* pt_item) :
   EiDecl(head, pt_item),
   mVal(0.0)
 {
@@ -609,24 +609,24 @@ EiDeclR::~EiDeclR()
 }
 
 // @brief スカラー値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclR::get_scalar() const
 {
-  return conv_to_scalar(mVal);
+  return VlScalarVal(mVal);
 }
 
 // @brief スカラー値を設定する．
 void
-EiDeclR::set_scalar(tVpiScalarVal val)
+EiDeclR::set_scalar(const VlScalarVal& val)
 {
-  mVal = conv_to_real(val);
+  mVal = val.to_real();
 }
 
 // @brief 論理値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclR::get_logic() const
 {
-  return conv_to_scalar(get_real());
+  return VlScalarVal(get_real());
 }
 
 // @brief real 型の値を返す．
@@ -661,11 +661,11 @@ EiDeclR::set_bitvector(const BitVector& val)
 
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclR::get_bitselect(int index) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief ビット値を設定する．
@@ -673,7 +673,7 @@ EiDeclR::get_bitselect(int index) const
 // @param[in] val 値
 void
 EiDeclR::set_bitselect(int index,
-		       tVpiScalarVal val)
+		       const VlScalarVal& val)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -722,7 +722,7 @@ EiDeclV::~EiDeclV()
 }
 
 // @brief スカラー値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclV::get_scalar() const
 {
   return mVal.to_scalar();
@@ -730,13 +730,13 @@ EiDeclV::get_scalar() const
 
 // @brief スカラー値を設定する．
 void
-EiDeclV::set_scalar(tVpiScalarVal val)
+EiDeclV::set_scalar(const VlScalarVal& val)
 {
   mVal = val;
 }
 
 // @brief 論理値を返す．
-tVpiScalarVal
+VlScalarVal
 EiDeclV::get_logic() const
 {
   return mVal.to_logic();
@@ -774,7 +774,7 @@ EiDeclV::set_bitvector(const BitVector& val)
 
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiDeclV::get_bitselect(int index) const
 {
   ymuint bpos;
@@ -782,7 +782,7 @@ EiDeclV::get_bitselect(int index) const
     return mVal.bit_select(bpos);
   }
   else {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 }
 
@@ -791,7 +791,7 @@ EiDeclV::get_bitselect(int index) const
 // @param[in] val 値
 void
 EiDeclV::set_bitselect(int index,
-		       tVpiScalarVal val)
+		       const VlScalarVal& val)
 {
   ymuint bpos;
   if ( calc_bit_offset(index, bpos) ) {
@@ -822,7 +822,7 @@ EiDeclV::get_partselect(int left,
     else {
       w = right - left + 1;
     }
-    val = BitVector(kVpiScalarX, w);
+    val = BitVector(VlScalarVal::x(), w);
   }
 }
 

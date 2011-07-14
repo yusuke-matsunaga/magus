@@ -301,7 +301,7 @@ public:
   /// @brief スカラー値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_scalar(ymuint offset) const = 0;
 
   /// @brief スカラー値を設定する．
@@ -310,12 +310,12 @@ public:
   virtual
   void
   set_scalar(ymuint offset,
-	     tVpiScalarVal val) = 0;
+	     const VlScalarVal& val) = 0;
 
   /// @brief 論理値を返す．
   /// @param[in] offset 要素のオフセット
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_logic(ymuint offset) const = 0;
 
   /// @brief real 型の値を返す．
@@ -354,7 +354,7 @@ public:
   /// @param[in] offset 要素のオフセット
   /// @param[in] index ビット位置
   virtual
-  tVpiScalarVal
+  VlScalarVal
   get_bitselect(ymuint offset,
 		int index) const = 0;
 
@@ -366,7 +366,7 @@ public:
   void
   set_bitselect(ymuint offset,
 		int index,
-		tVpiScalarVal val) = 0;
+		const VlScalarVal& val) = 0;
 
   /// @brief 範囲選択値を返す．
   /// @param[in] offset 要素のオフセット

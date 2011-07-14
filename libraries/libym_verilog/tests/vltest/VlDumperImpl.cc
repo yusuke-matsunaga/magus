@@ -681,14 +681,23 @@ VlDumperImpl::put(const char* label,
 // @param[in] val スカラー値
 void
 VlDumperImpl::put(const char* label,
-		  tVpiScalarVal val)
+		  const VlScalarVal& val)
 {
   VlDumpHeader x(this, label, "scalar", false);
-  switch ( val ) {
-  case kVpiScalarZ: mStream << "Z"; break;
-  case kVpiScalar0: mStream << "0"; break;
-  case kVpiScalar1: mStream << "1"; break;
-  case kVpiScalarX: mStream << "X"; break;
+  if ( val.is_z() ) {
+    mStream << "Z";
+  }
+  else if ( val.is_zero() ) {
+    mStream << "0";
+  }
+  else if ( val.is_one() ) {
+    mStream << "1";
+  }
+  else if ( val.is_x() ) {
+    mStream << "X";
+  }
+  else {
+    mStream << "Unexpected Value";
   }
 }
 

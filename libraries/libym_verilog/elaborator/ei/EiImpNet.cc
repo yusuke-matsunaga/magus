@@ -260,7 +260,7 @@ EiImpNet::set_signed()
 }
 
 // @brief スカラー値を返す．
-tVpiScalarVal
+VlScalarVal
 EiImpNet::get_scalar() const
 {
   return mVal;
@@ -268,30 +268,30 @@ EiImpNet::get_scalar() const
 
 // @brief スカラー値を設定する．
 void
-EiImpNet::set_scalar(tVpiScalarVal val)
+EiImpNet::set_scalar(const VlScalarVal& val)
 {
   mVal = val;
 }
 
 // @brief 論理値を返す．
-tVpiScalarVal
+VlScalarVal
 EiImpNet::get_logic() const
 {
-  return conv_to_logic(mVal);
+  return mVal.to_logic();
 }
 
 // @brief real 型の値を返す．
 double
 EiImpNet::get_real() const
 {
-  return conv_to_real(mVal);
+  return mVal.to_real();
 }
 
 // @brief real 型の値を設定する．
 void
 EiImpNet::set_real(double val)
 {
-  mVal = conv_to_scalar(val);
+  mVal = VlScalarVal(val);
 }
 
 // @brief bitvector 型の値を返す．
@@ -312,14 +312,14 @@ EiImpNet::set_bitvector(const BitVector& val)
 
 // @brief ビット選択値を返す．
 // @param[in] index ビット位置
-tVpiScalarVal
+VlScalarVal
 EiImpNet::get_bitselect(int index) const
 {
   if ( index == 0 ) {
     return mVal;
   }
   else {
-    return kVpiScalarX;
+    return VlScalarVal::x();
   }
 }
 
@@ -328,7 +328,7 @@ EiImpNet::get_bitselect(int index) const
 // @param[in] val 値
 void
 EiImpNet::set_bitselect(int index,
-			tVpiScalarVal val)
+			const VlScalarVal& val)
 {
   if ( index == 0 ) {
     mVal = val;

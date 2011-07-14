@@ -324,7 +324,7 @@ ElbProxy::evaluate_int(const VlNamedObj* parent,
 bool
 ElbProxy::evaluate_scalar(const VlNamedObj* parent,
 			  const PtExpr* pt_expr,
-			  tVpiScalarVal& value,
+			  VlScalarVal& value,
 			  bool put_error)
 {
   return mExprGen->evaluate_scalar(parent, pt_expr, value, put_error);

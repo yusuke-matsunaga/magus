@@ -89,7 +89,7 @@ EiUdpDefn::EiUdpDefn(const PtUdp* pt_udp,
   mProtected(is_protected),
   mIODeclList(io_array),
   mInitExpr(NULL),
-  mInitVal(kVpiScalarX),
+  mInitVal(VlScalarVal::x()),
   mTableEntrySize(table_num),
   mTableEntryList(table),
   mValArray(val_array)
@@ -160,7 +160,7 @@ EiUdpDefn::is_protected() const
 
 // @brief 初期値を返す．
 // @return 0/1/X を返す．
-tVpiScalarVal
+VlScalarVal
 EiUdpDefn::init_val() const
 {
   return mInitVal;
@@ -211,7 +211,7 @@ EiUdpDefn::set_io(ymuint pos,
 // @param[in] init_val 初期値
 void
 EiUdpDefn::set_initial(const PtExpr* init_expr,
-		       tVpiScalarVal init_val)
+		       const VlScalarVal& init_val)
 {
   mInitExpr = init_expr;
   mInitVal = init_val;

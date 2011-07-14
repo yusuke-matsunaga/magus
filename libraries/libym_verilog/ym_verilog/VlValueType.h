@@ -208,6 +208,7 @@ VlValueType::VlValueType(bool has_sign,
 			 ymuint size) :
   mData(kSignMask * has_sign |
 	kSizeMask * has_size |
+	kBvMask |
 	(size << kSizeShift))
 {
 }

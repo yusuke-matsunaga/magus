@@ -46,17 +46,20 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
     for (ymuint i = 0; i < bit_size; ++ i) {
       ymuint blk = i / 32;
       ymuint pos = i % 32;
-      switch ( bv.value(i) ) {
-      case kVpiScalar1: tmp[blk] |= (1 << pos); break;
-      case kVpiScalar0: break;
-      case kVpiScalarX:
-      case kVpiScalarZ:
+      VlScalarVal v = bv.value(i);
+      if ( v.is_one() ) {
+	tmp[blk] |= (1 << pos);
+      }
+      else if ( v.is_zero() ) {
+	; // なにもしない．
+      }
+      else {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			expr->file_region(),
 			kMsgError,
 			"MVN_VLXXX",
 			"'X' or 'Z' in constant expression");
-	break;
+	return NULL;
       }
     }
     return mMvnMgr->new_const(parent_module, bit_size, tmp);

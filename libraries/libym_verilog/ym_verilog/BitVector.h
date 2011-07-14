@@ -13,6 +13,7 @@
 
 #include "ym_verilog/verilog.h"
 #include "ym_verilog/VlValueType.h"
+#include "ym_verilog/VlScalarVal.h"
 #include "ym_verilog/VlTime.h"
 
 
@@ -86,7 +87,7 @@ public:
   /// - 符号なし
   /// - 基数は2
   explicit
-  BitVector(tVpiScalarVal value,
+  BitVector(const VlScalarVal& value,
 	    ymuint32 size = 1);
 
   /// @brief C文字列からの変換用コンストラクタ
@@ -211,7 +212,7 @@ public:
   /// - 符号なし
   /// - 基数は2
   const BitVector&
-  operator=(tVpiScalarVal value);
+  operator=(const VlScalarVal& value);
 
   /// @brief C文字列からの代入演算子
   /// @param[in] str 文字列 (C文字列)
@@ -271,7 +272,7 @@ public:
 
   //////////////////////////////////////////////////////////////////////
   /// @name スカラ値の繰り返しを作るクラスメソッド
-  /// 上のコンストラクタを使うためには tVpiScalarVal の値を指定しなければならず
+  /// 上のコンストラクタを使うためには VlScalarVal の値を指定しなければならず
   /// かっこ悪いので
   /// @{
 
@@ -433,37 +434,37 @@ public:
   /// @brief リダクションAND
   /// @return 演算結果を返す．
   /// @note すべてのビットの AND を計算する
-  tVpiScalarVal
+  VlScalarVal
   reduction_and() const;
 
   /// @brief リダクションOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの OR を計算する
-  tVpiScalarVal
+  VlScalarVal
   reduction_or() const;
 
   /// @brief リダクションXOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの XOR を計算する
-  tVpiScalarVal
+  VlScalarVal
   reduction_xor() const;
 
   /// @brief リダクションNAND
   /// @return 演算結果を返す．
   /// @note すべてのビットの NAND を計算する
-  tVpiScalarVal
+  VlScalarVal
   reduction_nand() const;
 
   /// @brief リダクションNOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの NOR を計算する
-  tVpiScalarVal
+  VlScalarVal
   reduction_nor() const;
 
   /// @brief リダクションXNOR
   /// @return 演算結果を返す．
   /// @note すべてのビットの XNOR を計算する
-  tVpiScalarVal
+  VlScalarVal
   reduction_xnor() const;
 
   /// @}
@@ -570,7 +571,7 @@ public:
   /// @brief bit-select 演算子
   /// @param[in] bpos 選択するビット位置
   /// @return bpos で指定された位置の値
-  tVpiScalarVal
+  VlScalarVal
   bit_select(int bpos) const;
 
   /// @brief bit-select 書き込み
@@ -580,7 +581,7 @@ public:
   /// @note 範囲外ならないもしない．
   void
   bit_select(int bpos,
-	     tVpiScalarVal val);
+	     const VlScalarVal& val);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -621,7 +622,7 @@ public:
   /// @param[in] pos 取得するビット位置
   /// @return pos ビット目の値を返す．
   /// @return pos が範囲を越えていたら kVpiScalarX を返す．
-  tVpiScalarVal
+  VlScalarVal
   value(int pos) const;
 
   /// @brief pos ビット目の値をセットする．
@@ -630,7 +631,7 @@ public:
   /// @note pos が範囲を越えていたら何もしない
   void
   set_value(int pos,
-	    tVpiScalarVal val);
+	    const VlScalarVal& val);
 
   /// @brief 符号付きかつ負数の時に true を返す
   bool
@@ -692,14 +693,14 @@ public:
 
   /// @brief 1ビットのスカラー値に変換する．
   /// @note 実際には LSB を返すだけ．
-  tVpiScalarVal
+  VlScalarVal
   to_scalar() const;
 
   /// @brief 論理値として評価する．
   /// @retval kVpiScalar0 0 の時
   /// @retval kVpiScalar1 0 以外の確定値の時
   /// @retval kVpiScalarX 不定値を1ビットでも含む場合
-  tVpiScalarVal
+  VlScalarVal
   to_logic() const;
 
   /// @brief 内容をブール値に変換する．
@@ -1031,7 +1032,7 @@ power(const BitVector& src1,
 /// @retval kVpiScalar1 src1 < src2 の時
 /// @retval kVpiScalar0 src1 >= src2 の時
 /// @retval kVpiScalarX 比較不能の時
-tVpiScalarVal
+VlScalarVal
 lt(const BitVector& src1,
    const BitVector& src2);
 
@@ -1049,7 +1050,7 @@ operator<(const BitVector& src1,
 /// @retval kVpiScalar1 src1 > src2 の時
 /// @retval kVpiScalar0 src1 <= src2 の時
 /// @retval kVpiScalarX 比較不能の時
-tVpiScalarVal
+VlScalarVal
 gt(const BitVector& src1,
    const BitVector& src2);
 
@@ -1067,7 +1068,7 @@ operator>(const BitVector& src1,
 /// @retval kVpiScalar1 src1 <= src2 の時
 /// @retval kVpiScalar0 src1 > src2 の時
 /// @retval kVpiScalarX 比較不能の時
-tVpiScalarVal
+VlScalarVal
 le(const BitVector& src1,
    const BitVector& src2);
 
@@ -1085,7 +1086,7 @@ operator<=(const BitVector& src1,
 /// @retval kVpiScalar1 src1 >= src2 の時
 /// @retval kVpiScalar0 src1 < src2 の時
 /// @retval kVpiscalarX 比較不能の時
-tVpiScalarVal
+VlScalarVal
 ge(const BitVector& src1,
    const BitVector& src2);
 
@@ -1119,7 +1120,7 @@ operator>=(const BitVector& src1,
 /// @retval kVpiScalar1 src1 == src2 の時
 /// @retval kVpiScalar0 src1 != src2 の時
 /// @retval kVpiScalarX 比較不能の時
-tVpiScalarVal
+VlScalarVal
 eq(const BitVector& src1,
    const BitVector& src2);
 
@@ -1153,7 +1154,7 @@ operator==(const BitVector& src1,
 /// @retval kVpiScalar1 src1 != src2 の時
 /// @retval kVpiScalar0 src1 == src2 の時
 /// @retval kVpiScalarX 比較不能の時
-tVpiScalarVal
+VlScalarVal
 ne(const BitVector& src1,
    const BitVector& src2);
 
@@ -1188,7 +1189,7 @@ operator!=(const BitVector& src1,
 /// @retval kVpiScalar0 src が真の時
 /// @retval kVpiScalar1 src が偽の時
 /// @retval kVpiScalarX 計算不能の時
-tVpiScalarVal
+VlScalarVal
 operator!(const BitVector& src);
 
 /// @relates BitVector
@@ -1197,7 +1198,7 @@ operator!(const BitVector& src);
 /// @retval kVpiScalar0 src1 と src2 のどちらか一方が偽の時
 /// @retval kVpiScalar1 src1 と src2 がともに真の時
 /// @retval kVpiScalarX 計算不能の時
-tVpiScalarVal
+VlScalarVal
 operator&&(const BitVector& src1,
 	   const BitVector& src2);
 
@@ -1207,7 +1208,7 @@ operator&&(const BitVector& src1,
 /// @retval kVpiScalar0 src1 と src2 がともに偽の時
 /// @retval kVpiScalar1 src1 と src2 のどちらか一方が真の時
 /// @retval kVpiScalarX 計算不能の時
-tVpiScalarVal
+VlScalarVal
 operator||(const BitVector& src1,
 	   const BitVector& src2);
 
@@ -1388,7 +1389,7 @@ ite(const BitVector& src1,
 /// @param[in] src3 src1 が偽の時に選ばれる値
 /// @return 演算結果
 BitVector
-ite(tVpiScalarVal src1,
+ite(const VlScalarVal& src1,
     const BitVector& src2,
     const BitVector& src3);
 
@@ -1527,7 +1528,7 @@ power(const BitVector& src1,
 
 // greater than 比較演算
 inline
-tVpiScalarVal
+VlScalarVal
 gt(const BitVector& src1,
    const BitVector& src2)
 {
@@ -1545,7 +1546,7 @@ operator>(const BitVector& src1,
 
 // less than or equal 比較演算
 inline
-tVpiScalarVal
+VlScalarVal
 le(const BitVector& src1,
    const BitVector& src2)
 {
@@ -1563,7 +1564,7 @@ operator<=(const BitVector& src1,
 
 // greater than or equal 比較演算
 inline
-tVpiScalarVal
+VlScalarVal
 ge(const BitVector& src1,
    const BitVector& src2)
 {
@@ -1581,7 +1582,7 @@ operator>=(const BitVector& src1,
 
 // 非等価比較演算子
 inline
-tVpiScalarVal
+VlScalarVal
 ne(const BitVector& src1,
    const BitVector& src2)
 {
@@ -1770,7 +1771,7 @@ inline
 bool
 BitVector::is_negative() const
 {
-  return is_signed() && value(size() - 1) == kVpiScalar1;
+  return is_signed() && value(size() - 1).is_one();
 }
 
 // 32ビットの符合なし数に変換可能なら true を返す．
@@ -1814,7 +1815,7 @@ BitVector::to_int() const
 // 1ビットのスカラー値に変換する．
 // 実際には LSB を返すだけ．
 inline
-tVpiScalarVal
+VlScalarVal
 BitVector::to_scalar() const
 {
   return value(0);
@@ -1825,7 +1826,7 @@ inline
 bool
 BitVector::to_bool() const
 {
-  return to_logic() == kVpiScalar1;
+  return to_logic().is_one();
 }
 
 // time 型に変換可能なら true を返す．
@@ -1849,7 +1850,7 @@ BitVector::to_time() const
 
 // bit-select 演算子
 inline
-tVpiScalarVal
+VlScalarVal
 BitVector::bit_select(int bpos) const
 {
   // 範囲外のチェックは value() でやっている．

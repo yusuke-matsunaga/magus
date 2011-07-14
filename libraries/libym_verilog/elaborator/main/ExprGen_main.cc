@@ -395,7 +395,7 @@ ExprGen::evaluate_int(const VlNamedObj* parent,
 bool
 ExprGen::evaluate_scalar(const VlNamedObj* parent,
 			 const PtExpr* pt_expr,
-			 tVpiScalarVal& value,
+			 VlScalarVal& value,
 			 bool put_error)
 {
   VlValue val = evaluate_expr(parent, pt_expr, put_error);
@@ -416,12 +416,7 @@ ExprGen::evaluate_bool(const VlNamedObj* parent,
 		       bool put_error)
 {
   VlValue val = evaluate_expr(parent, pt_expr, put_error);
-  if ( val.logic_value() == kVpiScalar1 ) {
-    value = true;
-  }
-  else {
-    value = false;
-  }
+  value = val.logic_value().to_bool();
   return true;
 }
 

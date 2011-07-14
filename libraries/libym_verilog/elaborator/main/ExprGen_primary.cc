@@ -843,7 +843,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
       if ( !param->calc_bit_offset(index1, offset) ) {
 	// インデックスが範囲外だった．
 	// エラーではなく X になる．
-	return VlValue(kVpiScalarX);
+	return VlValue(VlScalarVal::x());
       }
       return VlValue(val.bitvector_value().bit_select(offset));
     }
@@ -908,7 +908,7 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
       else {
 	bw = index1 - index2 + 1;
       }
-      return VlValue(BitVector(kVpiScalarX, bw));
+      return VlValue(BitVector(VlScalarVal::x(), bw));
     }
   }
 

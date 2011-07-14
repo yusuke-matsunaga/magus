@@ -81,12 +81,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -175,12 +175,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -278,12 +278,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -325,7 +325,7 @@ class VlValueScalar :
 public:
 
   /// @brief コンストラクタ
-  VlValueScalar(tVpiScalarVal val);
+  VlValueScalar(const VlScalarVal& val);
 
   /// @brief デストラクタ
   virtual
@@ -381,12 +381,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -413,7 +413,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  tVpiScalarVal mVal;
+  VlScalarVal mVal;
 
 };
 
@@ -484,12 +484,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -587,12 +587,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．
@@ -690,12 +690,12 @@ private:
 
   /// @brief スカラー型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   scalar_value() const;
 
   /// @brief 論理型の値を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   logic_value() const;
 
   /// @brief 実数型の値を返す．

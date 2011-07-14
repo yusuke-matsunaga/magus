@@ -12,6 +12,7 @@
 
 
 #include "ym_verilog/verilog.h"
+#include "ym_verilog/VlScalarVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -106,7 +107,7 @@ public:
   /// @brief 論理値への変換
   /// @retval kVpiScalar0 値が 0
   /// @retval kVpiScalar1 値が 0 以外
-  tVpiScalarVal
+  VlScalarVal
   to_logic() const;
 
   /// @brief double への変換
@@ -329,14 +330,14 @@ VlTime::to_uint() const
 // @retval kVpiScalar0 値が 0
 // @retval kVpiScalar1 値が 0 以外
 inline
-tVpiScalarVal
+VlScalarVal
 VlTime::to_logic() const
 {
   if ( mValue != 0UL ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
   else {
-    return kVpiScalar0;
+    return VlScalarVal::zero();
   }
 }
 

@@ -54,7 +54,7 @@ VlValue::VlValue(ymuint val) :
 }
 
 // @brief スカラー値からのコンストラクタ
-VlValue::VlValue(tVpiScalarVal val) :
+VlValue::VlValue(const VlScalarVal& val) :
   mRep(new VlValueScalar(val))
 {
 }
@@ -128,7 +128,7 @@ VlValue::set(ymuint val)
 
 // @brief スカラー値をセットする．
 void
-VlValue::set(tVpiScalarVal val)
+VlValue::set(const VlScalarVal& val)
 {
   mRep = new VlValueScalar(val);
 }
@@ -356,7 +356,7 @@ power(const VlValue& src1,
     double v1 = src1.real_value();
     double v2 = src2.real_value();
     if ( (v1 == 0.0 && v2 <= 0.0) || (v1 < 0.0 && rint(v2) != v2) ) {
-      return VlValue(kVpiScalarX);
+      return VlValue(VlScalarVal::x());
     }
     return VlValue( pow(v1, v2) );
   }
@@ -366,9 +366,9 @@ power(const VlValue& src1,
 // @relates VlValue
 // @brief less than 比較演算
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar1 src1 < src2 の時
-// @retval kVpiScalar0 src1 >= src2 の時
-// @retval kVpiScalarX 比較不能の時
+// @retval VlScalarVal::one() src1 < src2 の時
+// @retval VlScalarVal::zero() src1 >= src2 の時
+// @retval VlScalarVal::x() 比較不能の時
 VlValue
 lt(const VlValue& src1,
    const VlValue& src2)
@@ -379,37 +379,37 @@ lt(const VlValue& src1,
   if ( src1.is_int_type() ) {
     if ( src2.is_int_type() || src2.is_uint_type() ) {
       if ( src1.int_value() < src2.int_value() ) {
-	return VlValue(kVpiScalar1);
+	return VlValue(VlScalarVal::one());
       }
       else {
-	return VlValue(kVpiScalar0);
+	return VlValue(VlScalarVal::zero());
       }
     }
   }
   else if ( src1.is_uint_type() ) {
     if ( src2.is_int_type() ) {
       if ( src1.int_value() < src2.int_value() ) {
-	return VlValue(kVpiScalar1);
+	return VlValue(VlScalarVal::one());
       }
       else {
-	return VlValue(kVpiScalar0);
+	return VlValue(VlScalarVal::zero());
       }
     }
     else if ( src2.is_uint_type() ) {
       if ( src1.uint_value() < src2.uint_value() ) {
-	return VlValue(kVpiScalar1);
+	return VlValue(VlScalarVal::one());
       }
       else {
-	return VlValue(kVpiScalar0);
+	return VlValue(VlScalarVal::zero());
       }
     }
   }
   else if ( src1.is_real_type() || src2.is_real_type() ) {
     if ( src1.real_value() < src2.real_value() ) {
-      return VlValue(kVpiScalar1);
+      return VlValue(VlScalarVal::one());
     }
     else {
-      return VlValue(kVpiScalar0);
+      return VlValue(VlScalarVal::zero());
     }
   }
   return VlValue( lt(src1.bitvector_value(), src2.bitvector_value()) );
@@ -418,9 +418,9 @@ lt(const VlValue& src1,
 // @relates VlValue
 // @brief greater than 比較演算
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar1 src1 > src2 の時
-// @retval kVpiScalar0 src1 <= src2 の時
-// @retval kVpiScalarX 比較不能の時
+// @retval VlScalarVal::one() src1 > src2 の時
+// @retval VlScalarVal::zero() src1 <= src2 の時
+// @retval VlScalarVal::x() 比較不能の時
 VlValue
 gt(const VlValue& src1,
    const VlValue& src2)
@@ -431,9 +431,9 @@ gt(const VlValue& src1,
 // @relates VlValue
 // @brief less than or equal 比較演算
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar1 src1 <= src2 の時
-// @retval kVpiScalar0 src1 > src2 の時
-// @retval kVpiScalarX 比較不能の時
+// @retval VlScalarVal::one() src1 <= src2 の時
+// @retval VlScalarVal::zero() src1 > src2 の時
+// @retval VlScalarVal::x() 比較不能の時
 VlValue
 le(const VlValue& src1,
    const VlValue& src2)
@@ -444,8 +444,8 @@ le(const VlValue& src1,
 // @relates VlValue
 // @brief greater than or equal 比較演算
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar1 src1 >= src2 の時
-// @retval kVpiScalar0 src1 < src2 の時
+// @retval VlScalarVal::one() src1 >= src2 の時
+// @retval VlScalarVal::zero() src1 < src2 の時
 // @retval kVpiscalarX 比較不能の時
 VlValue
 ge(const VlValue& src1,
@@ -457,9 +457,9 @@ ge(const VlValue& src1,
 // @relates VlValue
 // @brief 等価比較演算子
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar1 src1 == src2 の時
-// @retval kVpiScalar0 src1 != src2 の時
-// @retval kVpiScalarX 比較不能の時
+// @retval VlScalarVal::one() src1 == src2 の時
+// @retval VlScalarVal::zero() src1 != src2 の時
+// @retval VlScalarVal::x() 比較不能の時
 VlValue
 eq(const VlValue& src1,
    const VlValue& src2)
@@ -470,18 +470,18 @@ eq(const VlValue& src1,
   if ( (src1.is_int_type() || src1.is_uint_type()) &&
        (src2.is_int_type() || src2.is_uint_type()) ) {
     if ( src1.int_value() == src2.int_value() ) {
-      return VlValue(kVpiScalar1);
+      return VlValue(VlScalarVal::one());
     }
     else {
-      return VlValue(kVpiScalar0);
+      return VlValue(VlScalarVal::zero());
     }
   }
   if ( src1.is_real_type() || src2.is_real_type() ) {
     if ( src1.real_value() == src2.real_value() ) {
-      return VlValue(kVpiScalar1);
+      return VlValue(VlScalarVal::one());
     }
     else {
-      return VlValue(kVpiScalar0);
+      return VlValue(VlScalarVal::zero());
     }
   }
   return VlValue( eq(src1.bitvector_value(), src2.bitvector_value()) );
@@ -501,18 +501,18 @@ eq_with_x(const VlValue& src1,
   if ( (src1.is_int_type() || src1.is_uint_type()) &&
        (src2.is_int_type() || src2.is_uint_type()) ) {
     if ( src1.int_value() == src2.int_value() ) {
-      return VlValue(kVpiScalar1);
+      return VlValue(VlScalarVal::one());
     }
     else {
-      return VlValue(kVpiScalar0);
+      return VlValue(VlScalarVal::zero());
     }
   }
   if ( src1.is_real_type() || src2.is_real_type() ) {
     if ( src1.real_value() == src2.real_value() ) {
-      return VlValue(kVpiScalar1);
+      return VlValue(VlScalarVal::one());
     }
     else {
-      return VlValue(kVpiScalar0);
+      return VlValue(VlScalarVal::zero());
     }
   }
   return VlValue( eq_with_x(src1.bitvector_value(), src2.bitvector_value()) );
@@ -532,18 +532,18 @@ eq_with_xz(const VlValue& src1,
   if ( (src1.is_int_type() || src1.is_uint_type()) &&
        (src2.is_int_type() || src2.is_uint_type()) ) {
     if ( src1.int_value() == src2.int_value() ) {
-      return VlValue(kVpiScalar1);
+      return VlValue(VlScalarVal::one());
     }
     else {
-      return VlValue(kVpiScalar0);
+      return VlValue(VlScalarVal::zero());
     }
   }
   if ( src1.is_real_type() || src2.is_real_type() ) {
     if ( src1.real_value() == src2.real_value() ) {
-      return VlValue(kVpiScalar1);
+      return VlValue(VlScalarVal::one());
     }
     else {
-      return VlValue(kVpiScalar0);
+      return VlValue(VlScalarVal::zero());
     }
   }
   return VlValue( eq_with_xz(src1.bitvector_value(), src2.bitvector_value()) );
@@ -552,9 +552,9 @@ eq_with_xz(const VlValue& src1,
 // @relates VlValue
 // @brief 非等価比較演算子
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar1 src1 != src2 の時
-// @retval kVpiScalar0 src1 == src2 の時
-// @retval kVpiScalarX 比較不能の時
+// @retval VlScalarVal::one() src1 != src2 の時
+// @retval VlScalarVal::zero() src1 == src2 の時
+// @retval VlScalarVal::x() 比較不能の時
 VlValue
 ne(const VlValue& src1,
    const VlValue& src2)
@@ -565,9 +565,9 @@ ne(const VlValue& src1,
 // @relates VlValue
 // @brief NOT演算
 // @param[in] src オペランド
-// @retval kVpiScalar0 src が真の時
-// @retval kVpiScalar1 src が偽の時
-// @retval kVpiScalarX 計算不能の時
+// @retval VlScalarVal::zero() src が真の時
+// @retval VlScalarVal::one() src が偽の時
+// @retval VlScalarVal::x() 計算不能の時
 VlValue
 log_not(const VlValue& src)
 {
@@ -580,9 +580,9 @@ log_not(const VlValue& src)
 // @relates VlValue
 // @brief AND演算
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar0 src1 と src2 のどちらか一方が偽の時
-// @retval kVpiScalar1 src1 と src2 がともに真の時
-// @retval kVpiScalarX 計算不能の時
+// @retval VlScalarVal::zero() src1 と src2 のどちらか一方が偽の時
+// @retval VlScalarVal::one() src1 と src2 がともに真の時
+// @retval VlScalarVal::x() 計算不能の時
 VlValue
 log_and(const VlValue& src1,
 	const VlValue& src2)
@@ -596,9 +596,9 @@ log_and(const VlValue& src1,
 // @relates VlValue
 // @brief OR演算
 // @param[in] src1, src2 オペランド
-// @retval kVpiScalar0 src1 と src2 がともに偽の時
-// @retval kVpiScalar1 src1 と src2 のどちらか一方が真の時
-// @retval kVpiScalarX 計算不能の時
+// @retval VlScalarVal::zero() src1 と src2 がともに偽の時
+// @retval VlScalarVal::one() src1 と src2 のどちらか一方が真の時
+// @retval VlScalarVal::x() 計算不能の時
 VlValue
 log_or(const VlValue& src1,
        const VlValue& src2)
@@ -939,7 +939,7 @@ ite(const VlValue& src1,
     const VlValue& src2,
     const VlValue& src3)
 {
-  if ( src1.logic_value() ) {
+  if ( src1.logic_value().to_bool() ) {
     return src2;
   }
   else {
@@ -954,11 +954,11 @@ ite(const VlValue& src1,
 // @param[in] src3 src1 が偽の時に選ばれる値
 // @return 演算結果
 VlValue
-ite(tVpiScalarVal src1,
+ite(const VlScalarVal& src1,
     const VlValue& src2,
     const VlValue& src3)
 {
-  if ( src1 == kVpiScalar1 ) {
+  if ( src1.to_bool() ) {
     return src2;
   }
   else {
@@ -1129,17 +1129,17 @@ VlValueError::uint_value() const
 }
 
 // @brief スカラー型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueError::scalar_value() const
 {
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief 論理型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueError::logic_value() const
 {
-  return kVpiScalarX;
+  return VlScalarVal::x();
 }
 
 // @brief 実数型の値を返す．
@@ -1240,20 +1240,20 @@ VlValueInt::uint_value() const
 }
 
 // @brief スカラー型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueInt::scalar_value() const
 {
-  return conv_to_scalar(mVal);
+  return VlScalarVal(mVal);
 }
 
 // @brief 論理型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueInt::logic_value() const
 {
   if ( mVal != 0 ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // @brief 実数型の値を返す．
@@ -1354,20 +1354,20 @@ VlValueUint::uint_value() const
 }
 
 // @brief スカラー型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueUint::scalar_value() const
 {
-  return conv_to_scalar(mVal);
+  return VlScalarVal(mVal);
 }
 
 // @brief 論理型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueUint::logic_value() const
 {
   if ( mVal != 0 ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // @brief 実数型の値を返す．
@@ -1399,7 +1399,7 @@ VlValueUint::bitvector_value(const VlValueType& req_type) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-VlValueScalar::VlValueScalar(tVpiScalarVal val) :
+VlValueScalar::VlValueScalar(const VlScalarVal& val) :
   mVal(val)
 {
 }
@@ -1420,7 +1420,7 @@ VlValueScalar::type() const
 bool
 VlValueScalar::is_int_conv() const
 {
-  return mVal == kVpiScalar0 || mVal == kVpiScalar1;
+  return !mVal.is_xz();
 }
 
 // @brief ymuint 型に変換可能な時に true を返す．
@@ -1456,10 +1456,7 @@ VlValueScalar::is_bitvector_conv() const
 int
 VlValueScalar::int_value() const
 {
-  if ( mVal == kVpiScalar1 ) {
-    return 1;
-  }
-  return 0;
+  return mVal.to_int();
 }
 
 // @brief ymuint 型の値を返す．
@@ -1471,23 +1468,20 @@ VlValueScalar::uint_value() const
 }
 
 // @brief スカラー型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueScalar::scalar_value() const
 {
   return mVal;
 }
 
 // @brief 論理型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueScalar::logic_value() const
 {
-  switch ( mVal ) {
-  case kVpiScalar0: return kVpiScalar0;
-  case kVpiScalar1: return kVpiScalar1;
-  case kVpiScalarX: return kVpiScalarX;
-  case kVpiScalarZ: return kVpiScalarX;
+  if ( mVal.is_z() ) {
+    return VlScalarVal::x();
   }
-  return kVpiScalarX;
+  return mVal;
 }
 
 // @brief 実数型の値を返す．
@@ -1588,20 +1582,20 @@ VlValueReal::uint_value() const
 }
 
 // @brief スカラー型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueReal::scalar_value() const
 {
-  return conv_to_scalar(mVal);
+  return VlScalarVal(mVal);
 }
 
 // @brief 論理型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueReal::logic_value() const
 {
   if ( mVal != 0.0 ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // @brief 実数型の値を返す．
@@ -1702,20 +1696,20 @@ VlValueTime::uint_value() const
 }
 
 // @brief スカラー型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueTime::scalar_value() const
 {
-  return conv_to_scalar(mVal.low());
+  return VlScalarVal(mVal.low());
 }
 
 // @brief 論理型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueTime::logic_value() const
 {
   if ( mVal.value() != 0UL ) {
-    return kVpiScalar1;
+    return VlScalarVal::one();
   }
-  return kVpiScalar0;
+  return VlScalarVal::zero();
 }
 
 // @brief 実数型の値を返す．
@@ -1816,14 +1810,14 @@ VlValueBitVector::uint_value() const
 }
 
 // @brief スカラー型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueBitVector::scalar_value() const
 {
   return mVal.to_scalar();
 }
 
 // @brief 論理型の値を返す．
-tVpiScalarVal
+VlScalarVal
 VlValueBitVector::logic_value() const
 {
   return mVal.to_logic();

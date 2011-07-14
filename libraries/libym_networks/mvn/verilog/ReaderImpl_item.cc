@@ -465,11 +465,11 @@ ReaderImpl::parse_cond_sub(const VlExpr* opr_primary,
 {
   node = gen_primary(opr_primary, env);
   VlValue val = opr_const->constant_value();
-  tVpiScalarVal v = val.scalar_value();
-  if ( v == kVpiScalar0 ) {
+  VlScalarVal v = val.scalar_value();
+  if ( v.is_zero() ) {
     pol = pol0;
   }
-  else if ( v == kVpiScalar1 ) {
+  else if ( v.is_one() ) {
     pol = pol1;
   }
   else {

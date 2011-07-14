@@ -565,7 +565,7 @@ protected:
   bool
   evaluate_scalar(const VlNamedObj* parent,
 		  const PtExpr* pt_expr,
-		  tVpiScalarVal& value,
+		  VlScalarVal& value,
 		  bool put_error);
 
   /// @brief PtExpr を評価し bool 値を返す．

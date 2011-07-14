@@ -13,6 +13,8 @@ noinst_HEADERS = \
 	BitVector.h \
 	VlLineWatcher.h \
 	VlMgr.h \
+	VlScalarVal.h \
 	VlTime.h \
+	VlUdpVal.h \
 	VlValue.h \
 	VlValueType.h

@@ -72,7 +72,7 @@ public:
   /// @brief 初期値を返す．
   /// @return 0/1/X を返す．
   virtual
-  tVpiScalarVal
+  VlScalarVal
   init_val() const = 0;
 
   /// @brief 初期値を表す文字列を返す．

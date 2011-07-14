@@ -115,7 +115,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 
     const FileRegion& ifr = pt_init_value->file_region();
 
-    tVpiScalarVal val;
+    VlScalarVal val;
     if ( !evaluate_scalar(NULL, pt_init_value, val, true) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      ifr,
