@@ -2,7 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = . vltest 
+SUBDIRS = . vltest
 if WITH_QT
 SUBDIRS += ptview vlview
 endif
@@ -35,7 +35,8 @@ bin_PROGRAMS = \
 	bvcalc
 
 noinst_PROGRAMS = \
-	testgen
+	testgen \
+	valuetype_test
 
 
 #############################################################
@@ -59,3 +60,15 @@ testgen_SOURCES = \
 	testgen.cc
 
 testgen_LDADD =
+
+
+#############################################################
+# valuetype_test
+#############################################################
+
+valuetype_test_SOURCES = \
+	valuetype_test.cc
+
+valuetype_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

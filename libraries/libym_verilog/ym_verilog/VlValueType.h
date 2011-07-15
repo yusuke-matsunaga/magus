@@ -185,6 +185,14 @@ private:
 
 };
 
+/// @brief 型の内容をストリーム出力する関数
+/// @relates VlValueType
+/// @param[in] s 出力先のストリーム
+/// @param[in] type 型
+ostream&
+operator<<(ostream& s,
+	   const VlValueType& type);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
@@ -330,6 +338,46 @@ bool
 VlValueType::operator!=(const VlValueType& right) const
 {
   return mData != right.mData;
+}
+
+// @brief 型の内容をストリーム出力する関数
+// @relates VlValueType
+// @param[in] s 出力先のストリーム
+// @param[in] type 型
+inline
+ostream&
+operator<<(ostream& s,
+	   const VlValueType& type)
+{
+  if ( type.is_no_type() ) {
+    s << "NO TYPE";
+  }
+  else if ( type.is_int_type() ) {
+    s << "INT TYPE";
+  }
+  else if ( type.is_real_type() ) {
+    s << "REAL TYPE";
+  }
+  else if ( type.is_time_type() ) {
+    s << "TIME TYPE";
+  }
+  else if ( type.is_bitvector_type() ) {
+    if ( type.is_signed() ) {
+      s << "SIGNED ";
+    }
+    else {
+      s << "UNSIGNED ";
+    }
+    if ( type.is_sized() ) {
+      s << "SIZED ";
+    }
+    else {
+      s << "UNSIZED ";
+    }
+    s << type.size() << " BITS TYPE";
+  }
+
+  return s;
 }
 
 END_NAMESPACE_YM_VERILOG
