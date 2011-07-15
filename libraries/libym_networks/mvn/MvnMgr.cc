@@ -351,12 +351,25 @@ MvnMgr::sweep()
   }
 
   // どこにも出力していないノードを削除する．
+  vector<bool> marks(n, false);
+  for (ymuint i = 0; i < n; ++ i) {
+    MvnNode* node = _node(i);
+    if ( node->type() == MvnNode::kDff ) {
+      ymuint nc = node->input_num() - 2;
+      for (ymuint j = 0; j < nc; ++ j) {
+	const MvnNode* node1 = node->control_val(j);
+	marks[node1->id()] = true;
+      }
+    }
+  }
   list<MvnNode*> node_queue;
   for (ymuint i = 0; i < n; ++ i) {
     MvnNode* node = _node(i);
     if ( node == NULL ) continue;
-    if ( node->type() == MvnNode::kOutput ||
+    if ( node->type() == MvnNode::kInput ||
+	 node->type() == MvnNode::kOutput ||
 	 node->type() == MvnNode::kInout ) continue;
+    if ( marks[node->id()] ) continue;
     if ( no_fanouts(node) ) {
       node_queue.push_back(node);
     }

@@ -221,13 +221,15 @@ public:
   /// @brief フリップフロップノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] clock_pol クロックの極性
-  /// @param[in] control_array 非同期セットの極性を入れた配列
+  /// @param[in] pol_array 非同期セット信号の極性情報を入れた配列
+  /// @param[in] val_array 非同期セットの値を入れた配列
   /// @param[in] bit_width ビット幅
-  /// @note control_array の要素数が非同期セット信号数となる．
+  /// @note pol_array の要素数が非同期セット信号数となる．
   MvnNode*
   new_dff(MvnModule* module,
 	  ymuint clock_pol,
-	  const vector<ymuint>& control_array,
+	  const vector<ymuint>& pol_array,
+	  const vector<MvnNode*>& val_array,
 	  ymuint bit_width = 1);
 
   /// @brief ラッチノードを生成する．

@@ -47,6 +47,15 @@ MvnNode::control_pol(ymuint pos) const
   return 0;
 }
 
+// @brief 非同期セットの値を表す定数ノードを得る．
+// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+// @note デフォルトの実装では NULL を返す．
+const MvnNode*
+MvnNode::control_val(ymuint pos) const
+{
+  return NULL;
+}
+
 // @brief ビット位置を得る．
 // @note type() が kConstBitSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．

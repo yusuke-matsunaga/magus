@@ -153,9 +153,9 @@ dump_node(ostream& s,
     }
     s << endl;
     ymuint ni = node->input_num();
-    ymuint nc = (ni - 2) / 2;
+    ymuint nc = ni - 2;
     for (ymuint i = 0; i < nc; ++ i) {
-      const MvnInputPin* cpin = node->input((i * 2) + 2);
+      const MvnInputPin* cpin = node->input(i + 2);
       ostringstream buf;
       buf << "Control#" << i;
       string pin_name = buf.str();
@@ -168,11 +168,8 @@ dump_node(ostream& s,
 	s << "negedge";
       }
       s << endl;
-      const MvnInputPin* dpin = node->input((i * 2) + 3);
-      ostringstream buf2;
-      buf2 << "Data#" << i;
-      string pin_name2 = buf2.str();
-      dump_inputpin(s, dpin, pin_name2);
+      const MvnNode* dnode = node->control_val(i);
+      s << "  Data#" << i << " <== node#" << dnode->id() << endl;
     }
   }
   else if ( node->type() == MvnNode::kLatch ) {

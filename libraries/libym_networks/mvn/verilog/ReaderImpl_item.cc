@@ -318,29 +318,29 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       MvnNode* node0 = mGlobalEnv.get_from_id(i);
       // FF を挿入
       // このノードに関係しているコントロールを調べる．
-      vector<ymuint32> pol_array;
+      vector<ymuint> pol_array;
+      vector<MvnNode*> val_array;
       vector<MvnNode*> control_array;
-      vector<MvnNode*> rhs_array;
-      pol_array.reserve(ev_num);
-      control_array.reserve(ev_num);
-      rhs_array.reserve(ev_num);
+      pol_array.reserve(ev_num - 1);
+      val_array.reserve(ev_num - 1);
+      control_array.reserve(ev_num - 1);
       for (ymuint j = 0; j < ev_num - 1; ++ j) {
 	AsyncControl* control = event_list[j];
 	MvnNode* rhs1 = control->mEnv.get_from_id(i).mRhs;
 	if ( rhs1 ) {
 	  pol_array.push_back(control->mPol);
+	  val_array.push_back(rhs1);
 	  control_array.push_back(control->mNode);
-	  rhs_array.push_back(rhs1);
 	}
       }
-      ymuint n = pol_array.size();
+      ymuint n = val_array.size();
       ymuint bw = node0->output(0)->bit_width();
-      MvnNode* ff = mMvnMgr->new_dff(parent_module, clock_pol, pol_array, bw);
+      MvnNode* ff = mMvnMgr->new_dff(parent_module, clock_pol, pol_array,
+				     val_array, bw);
       mMvnMgr->connect(rhs, 0, ff, 0);
       mMvnMgr->connect(clock_node, 0, ff, 1);
       for (ymuint j = 0; j < n; ++ j) {
-	mMvnMgr->connect(control_array[j], 0, ff, (j * 2) + 2);
-	mMvnMgr->connect(rhs_array[j], 0, ff, (j * 2) + 3);
+	mMvnMgr->connect(control_array[j], 0, ff, j + 2);
       }
       mMvnMgr->connect(ff, 0, node0, 0);
     }

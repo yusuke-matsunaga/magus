@@ -38,7 +38,7 @@ public:
     kInout,
 
     /// @brief フリップフロップ
-    /// (クロック，データ入力，非同期セット(コントロールとデータ))
+    /// (クロック，データ入力，非同期セット入力，データ出力)
     /// 非同期セットは複数ある場合もある．
     kDff,
 
@@ -197,6 +197,13 @@ public:
   virtual
   ymuint
   control_pol(ymuint pos) const;
+
+  /// @brief 非同期セットの値を表す定数ノードを得る．
+  /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+  /// @note デフォルトの実装では NULL を返す．
+  virtual
+  const MvnNode*
+  control_val(ymuint pos) const;
 
   /// @brief ビット位置を得る．
   /// @note type() が kConstBitSelect の時のみ意味を持つ．

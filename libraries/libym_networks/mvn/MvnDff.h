@@ -10,6 +10,7 @@
 
 
 #include "MvnNodeBase.h"
+#include "ym_networks/MvnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -31,13 +32,15 @@ private:
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
   /// @param[in] clock_pol クロックの極性
-  /// @param[in] control_array 非同期セットの極性を入れた配列
+  /// @param[in] pol_array 非同期セット信号の極性情報を入れた配列
+  /// @param[in] val_array 非同期セットの値を入れた配列
   /// @note 極性値は以下のとおり
   ///  - 1 : 正極性(posedge)
   ///  - 0 : 負極性(negedge)
   MvnDff(MvnModule* module,
 	 ymuint clock_pol,
-	 const vector<ymuint>& control_array);
+	 const vector<ymuint>& pol_array,
+	 const vector<MvnNode*>& val_array);
 
   /// @brief デストラクタ
   ~MvnDff();
@@ -67,6 +70,13 @@ public:
   ymuint
   control_pol(ymuint pos) const;
 
+  /// @brief 非同期セットの値を表す定数ノードを得る．
+  /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+  /// @note デフォルトの実装では NULL を返す．
+  virtual
+  const MvnNode*
+  control_val(ymuint pos) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -75,6 +85,9 @@ private:
 
   // クロックと非同期セット入力の極性の配列
   ymuint32* mPolArray;
+
+  // 非同期セットの値を表すノードの配列
+  MvnNode** mValArray;
 
 };
 

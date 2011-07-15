@@ -422,18 +422,16 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       // 非同期セット/非同期リセット
       vector<BdnNodeHandle> preset_array(bw, BdnNodeHandle::make_zero());
       vector<BdnNodeHandle> clear_array(bw, BdnNodeHandle::make_zero());
-      ymuint nc = (node->input_num() - 2) / 2;
+      ymuint nc = node->input_num() - 2;
       for (ymuint k = 0; k < nc; ++ k) {
-	const MvnInputPin* ctrl_ipin = node->input(k * 2 + 2);
+	const MvnInputPin* ctrl_ipin = node->input(k + 2);
 	const MvnOutputPin* ctrl_opin = ctrl_ipin->src_pin();
 	const MvnNode* ctrl_src_node = ctrl_opin->node();
 	BdnNodeHandle ctrl_dst_ihandle = mvnode_map.get(ctrl_src_node);
 	if ( node->control_pol(k) == 0 ) {
 	  ctrl_dst_ihandle = ~ctrl_dst_ihandle;
 	}
-	const MvnInputPin* val_ipin = node->input(k * 2 + 3);
-	const MvnOutputPin* val_opin = val_ipin->src_pin();
-	const MvnNode* val_src_node = val_opin->node();
+	const MvnNode* val_src_node = node->control_val(k);
 	BdnNodeHandle cond = ctrl_dst_ihandle;
 	for (ymuint j = 0; j < bw; ++ j) {
 	  BdnNodeHandle val_dst_ihandle = mvnode_map.get(val_src_node, j);

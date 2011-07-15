@@ -144,10 +144,9 @@ dump_node(ostream& s,
 	s << "negedge";
       }
       s << " " << node_name(src_node1);
-      ymuint nc = (ni - 2) / 2;
+      ymuint nc = ni - 2;
       for (ymuint i = 0; i < nc; ++ i) {
-	ymuint base = (i * 2) + 2;
-	const MvnInputPin* ipin2 = node->input(base);
+	const MvnInputPin* ipin2 = node->input(i + 2);
 	const MvnOutputPin* src_pin2 = ipin2->src_pin();
 	const MvnNode* src_node2 = src_pin2->node();
 	const char* polstr = node->control_pol(i) ? "posedge" : "negedge";
@@ -156,17 +155,14 @@ dump_node(ostream& s,
       s << " )" << endl;
       const char* elif = "if";
       for (ymuint i = 0; i < nc; ++ i) {
-	ymuint base = (i * 2) + 2;
 	const char* not_str = "";
 	if ( node->control_pol(i) == 0 ) {
 	  not_str = "!";
 	}
-	const MvnInputPin* ipin2 = node->input(base);
+	const MvnInputPin* ipin2 = node->input(i + 2);
 	const MvnOutputPin* src_pin2 = ipin2->src_pin();
 	const MvnNode* src_node2 = src_pin2->node();
-	const MvnInputPin* ipin3 = node->input(base + 1);
-	const MvnOutputPin* src_pin3 = ipin3->src_pin();
-	const MvnNode* src_node3 = src_pin3->node();
+	const MvnNode* src_node3 = node->control_val(i);
 	s << "    " << elif << " ( "
 	  << not_str << node_name(src_node2) << " )" << endl
 	  << "      " << node_name(node) << " <= "
