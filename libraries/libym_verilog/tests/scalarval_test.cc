@@ -23,6 +23,7 @@ bool_str(bool val)
   }
 }
 
+#if 0
 int
 val2int(const VlScalarVal& val)
 {
@@ -48,6 +49,7 @@ equal(const VlScalarVal& left,
 {
   return val2int(left) == val2int(right);
 }
+#endif
 
 bool
 check_val(const char* prefix,
@@ -89,6 +91,90 @@ check_val(const char* prefix,
 }
 
 bool
+check_bool(const char* prefix,
+	   VlScalarVal val_table[],
+	   bool bool_table[])
+{
+  bool stat = true;
+  for (ymuint i = 0; i < 4; ++ i) {
+    VlScalarVal in = val_table[i];
+    bool result = in.to_bool();
+    bool out = bool_table[i];
+    cout << prefix << " : " << in << ".to_bool() = "
+	 << result;
+    if ( result != out ) {
+      cout << ", ERROR, expected value is " << out;
+      stat = false;
+    }
+    cout << endl;
+  }
+  return stat;
+}
+
+bool
+check_logic(const char* prefix,
+	    VlScalarVal val_table[],
+	    VlScalarVal out_table[])
+{
+  bool stat = true;
+  for (ymuint i = 0; i < 4; ++ i) {
+    VlScalarVal in = val_table[i];
+    VlScalarVal result = in.to_logic();
+    VlScalarVal out = out_table[i];
+    cout << prefix << " : " << in << ".to_logic() = "
+	 << result;
+    if ( result != out ) {
+      cout << ", ERROR, expected value is " << out;
+      stat = false;
+    }
+    cout << endl;
+  }
+  return stat;
+}
+
+bool
+check_int(const char* prefix,
+	  VlScalarVal val_table[],
+	  int out_table[])
+{
+  bool stat = true;
+  for (ymuint i = 0; i < 4; ++ i) {
+    VlScalarVal in = val_table[i];
+    int result = in.to_int();
+    int out = out_table[i];
+    cout << prefix << " : " << in << ".to_int() = "
+	 << result;
+    if ( result != out ) {
+      cout << ", ERROR, expected value is " << out;
+      stat = false;
+    }
+    cout << endl;
+  }
+  return stat;
+}
+
+bool
+check_real(const char* prefix,
+	   VlScalarVal val_table[],
+	   double out_table[])
+{
+  bool stat = true;
+  for (ymuint i = 0; i < 4; ++ i) {
+    VlScalarVal in = val_table[i];
+    double result = in.to_real();
+    double out = out_table[i];
+    cout << prefix << " : " << in << ".to_real() = "
+	 << result;
+    if ( result != out ) {
+      cout << ", ERROR, expected value is " << out;
+      stat = false;
+    }
+    cout << endl;
+  }
+  return stat;
+}
+
+bool
 check_not(const char* prefix,
 	  VlScalarVal val_table[],
 	  VlScalarVal out_table[])
@@ -100,7 +186,7 @@ check_not(const char* prefix,
     VlScalarVal out = out_table[i];
     cout << prefix << " : !" << in
 	 << " =" << result;
-    if ( !equal(result, out) ) {
+    if ( result != out ) {
       cout << ", ERROR, expected value is " << out;
       stat = false;
     }
@@ -119,12 +205,12 @@ check_eq(const char* prefix,
     VlScalarVal in0 = val_table[i];
     for (ymuint j = 0; j < 4; ++ j ) {
       VlScalarVal in1 = val_table[j];
-      VlScalarVal result = in0 == in1;
+      VlScalarVal result = eq(in0, in1);
       VlScalarVal out = out_table[i * 4 + j];
       cout << prefix << " : "
 	   << in0 << " == " << in1
 	   << " = " << result;
-      if ( !equal(result, out) ) {
+      if ( result != out ) {
 	cout << ", ERROR, expected value is " << out;
 	stat = false;
       }
@@ -144,12 +230,12 @@ check_neq(const char* prefix,
     VlScalarVal in0 = val_table[i];
     for (ymuint j = 0; j < 4; ++ j ) {
       VlScalarVal in1 = val_table[j];
-      VlScalarVal result = in0 != in1;
+      VlScalarVal result = neq(in0, in1);
       VlScalarVal out = out_table[i * 4 + j];
       cout << prefix << " : "
 	   << in0 << " != " << in1
 	   << " = " << result;
-      if ( !equal(result, out) ) {
+      if ( result != out ) {
 	cout << ", ERROR, expected value is " << out;
 	stat = false;
       }
@@ -174,7 +260,7 @@ check_and(const char* prefix,
       cout << prefix << " : "
 	   << in0 << " && " << in1
 	   << " = " << result;
-      if ( !equal(result, out) ) {
+      if ( result != out ) {
 	cout << ", ERROR, expected value is " << out;
 	stat = false;
       }
@@ -199,7 +285,7 @@ check_or(const char* prefix,
       cout << prefix << " : "
 	   << in0 << " || " << in1
 	   << " = " << result;
-      if ( !equal(result, out) ) {
+      if ( result != out ) {
 	cout << ", ERROR, expected value is " << out;
 	stat = false;
       }
@@ -213,6 +299,11 @@ void
 scalarval_test()
 {
   bool stat = true;
+
+  VlScalarVal val_0 = VlScalarVal::zero();
+  VlScalarVal val_1 = VlScalarVal::one();
+  VlScalarVal val_x = VlScalarVal::x();
+  VlScalarVal val_z = VlScalarVal::z();
 
   // 空のコンストラクタのテスト
   if ( !check_val("test0",
@@ -228,7 +319,7 @@ scalarval_test()
   // zero() 関数のテスト
   if ( !check_val("test1",
 		  "VlScalarVal::zero()",
-		  VlScalarVal::zero(),
+		  val_0,
 		  true,
 		  false,
 		  false,
@@ -239,7 +330,7 @@ scalarval_test()
   // one() 関数のテスト
   if ( !check_val("test2",
 		  "VlScalarVal::one()",
-		  VlScalarVal::one(),
+		  val_1,
 		  false,
 		  true,
 		  false,
@@ -250,7 +341,7 @@ scalarval_test()
   // x() 関数のテスト
   if ( !check_val("test3",
 		  "VlScalarVal::x()",
-		  VlScalarVal::x(),
+		  val_x,
 		  false,
 		  false,
 		  true,
@@ -261,7 +352,7 @@ scalarval_test()
   // z() 関数のテスト
   if ( !check_val("test4",
 		  "VlScalarVal::z()",
-		  VlScalarVal::z(),
+		  val_z,
 		  false,
 		  false,
 		  false,
@@ -376,16 +467,59 @@ scalarval_test()
     stat = false;
   }
 
-  VlScalarVal val_0 = VlScalarVal::zero();
-  VlScalarVal val_1 = VlScalarVal::one();
-  VlScalarVal val_x = VlScalarVal::x();
-  VlScalarVal val_z = VlScalarVal::z();
-
   VlScalarVal val_table[4];
   val_table[0] = val_0;
   val_table[1] = val_1;
   val_table[2] = val_x;
   val_table[3] = val_z;
+
+  // ブール値への変換テスト
+  bool bool_table[4];
+  bool_table[0] = false;
+  bool_table[1] = true;
+  bool_table[2] = false;
+  bool_table[3] = false;
+  if ( !check_bool("bool_test",
+		   val_table,
+		   bool_table) ) {
+    stat = false;
+  }
+
+  // 論理値への変換テスト
+  VlScalarVal logic_table[4];
+  logic_table[0] = val_0;
+  logic_table[1] = val_1;
+  logic_table[2] = val_x;
+  logic_table[3] = val_x;
+  if ( !check_logic("logic_test",
+		    val_table,
+		    logic_table) ) {
+    stat = false;
+  }
+
+  // 整数値への変換テスト
+  int int_table[4];
+  int_table[0] = 0;
+  int_table[1] = 1;
+  int_table[2] = 0;
+  int_table[3] = 0;
+  if ( !check_int("int_test",
+		  val_table,
+		  int_table) ) {
+    stat = false;
+  }
+
+  // 実数値への変換テスト
+  double real_table[4];
+  real_table[0] = 0.0;
+  real_table[1] = 1.0;
+  real_table[2] = 0.0;
+  real_table[3] = 0.0;
+  if ( !check_real("real_test",
+		   val_table,
+		   real_table) ) {
+    stat = false;
+  }
 
   VlScalarVal not_table[4];
   not_table[0] = val_1;

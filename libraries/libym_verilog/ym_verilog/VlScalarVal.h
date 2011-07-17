@@ -151,26 +151,51 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 否定
+  /// @param[in] right オペランド
   VlScalarVal
   operator!() const;
 
   /// @brief 選言(Conjunction)
+  /// @param[in] right オペランド
   VlScalarVal
   operator&&(const VlScalarVal& right) const;
 
   /// @brief 連言(Disjunction)
+  /// @param[in] right オペランド
   VlScalarVal
   operator||(const VlScalarVal& right) const;
 
-  /// @brief 等価比較
-  /// @note どちらか一方に X/Z を含む時，答も X になる．
-  VlScalarVal
+  /// @brief 値が等しいときに true を返す．
+  /// @param[in] right オペランド
+  bool
   operator==(const VlScalarVal& right) const;
 
-  /// @brief  非等価比較
-  /// @note どちらか一方に X/Z を含む時，答も X になる．
-  VlScalarVal
+  /// @brief 値が等しくないときに true を返す．
+  /// @param[in] right オペランド
+  bool
   operator!=(const VlScalarVal& right) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // フレンド関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 等価比較
+  /// @param[in] left, right オペランド
+  /// @note どちらか一方に X/Z を含む時，答も X になる．
+  friend
+  VlScalarVal
+  eq(const VlScalarVal& left,
+     const VlScalarVal& right);
+
+  /// @brief  非等価比較
+  /// @param[in] left, right オペランド
+  /// @note どちらか一方に X/Z を含む時，答も X になる．
+  friend
+  VlScalarVal
+  neq(const VlScalarVal& left,
+      const VlScalarVal& right);
 
 
 private:
@@ -480,16 +505,35 @@ VlScalarVal::operator||(const VlScalarVal& right) const
   return VlScalarVal::x();
 }
 
+// @brief 値が等しいときに true を返す．
+// @param[in] right オペランド
+inline
+bool
+VlScalarVal::operator==(const VlScalarVal& right) const
+{
+  return mData == right.mData;
+}
+
+// @brief 値が等しくないときに true を返す．
+// @param[in] right オペランド
+inline
+bool
+VlScalarVal::operator!=(const VlScalarVal& right) const
+{
+  return mData != right.mData;
+}
+
 // @brief 等価比較
 // @note どちらか一方に X/Z を含む時，答も X になる．
 inline
 VlScalarVal
-VlScalarVal::operator==(const VlScalarVal& right) const
+eq(const VlScalarVal& left,
+   const VlScalarVal& right)
 {
-  if ( is_xz() || right.is_xz() ) {
+  if ( left.is_xz() || right.is_xz() ) {
     return VlScalarVal::x();
   }
-  if ( mData == right.mData ) {
+  if ( left.mData == right.mData ) {
     return VlScalarVal::one();
   }
   return VlScalarVal::zero();
@@ -499,12 +543,13 @@ VlScalarVal::operator==(const VlScalarVal& right) const
 // @note どちらか一方に X/Z を含む時，答も X になる．
 inline
 VlScalarVal
-VlScalarVal::operator!=(const VlScalarVal& right) const
+neq(const VlScalarVal& left,
+    const VlScalarVal& right)
 {
-  if ( is_xz() || right.is_xz() ) {
+  if ( left.is_xz() || right.is_xz() ) {
     return VlScalarVal::x();
   }
-  if ( mData != right.mData ) {
+  if ( left.mData != right.mData ) {
     return VlScalarVal::one();
   }
   return VlScalarVal::zero();
