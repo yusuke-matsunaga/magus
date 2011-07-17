@@ -36,8 +36,9 @@ bin_PROGRAMS = \
 
 noinst_PROGRAMS = \
 	testgen \
-	valuetype_test \
-	scalarval_test
+	scalarval_test \
+	udpval_test \
+	valuetype_test
 
 
 #############################################################
@@ -64,18 +65,6 @@ testgen_LDADD =
 
 
 #############################################################
-# valuetype_test
-#############################################################
-
-valuetype_test_SOURCES = \
-	valuetype_test.cc
-
-valuetype_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-
-#############################################################
 # scalarval_test
 #############################################################
 
@@ -83,5 +72,29 @@ scalarval_test_SOURCES = \
 	scalarval_test.cc
 
 scalarval_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+
+#############################################################
+# udpval_test
+#############################################################
+
+udpval_test_SOURCES = \
+	udpval_test.cc
+
+udpval_test_LDADD = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+
+#############################################################
+# valuetype_test
+#############################################################
+
+valuetype_test_SOURCES = \
+	valuetype_test.cc
+
+valuetype_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

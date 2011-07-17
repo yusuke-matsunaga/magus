@@ -20,41 +20,45 @@ BEGIN_NONAMESPACE
 /// @brief VlUdpVal の mData の符号化のための値
 //////////////////////////////////////////////////////////////////////
 enum tVpiUdpVal {
-  kVpiUdpVal0  = 1 << 0,
-  kVpiUdpVal1  = 1 << 1,
-  kVpiUdpValX  = 1 << 2,
-  kVpiUdpValB  = kVpiUdpVal0 | kVpiUdpVal1,
-  kVpiUdpValQ  = kVpiUdpVal0 | kVpiUdpVal1 | kVpiUdpValX,
+  // レベルシンボル
+  kVpiUdpVal0 = 1 << 0,
+  kVpiUdpVal1 = 1 << 1,
+  kVpiUdpValX = 1 << 2,
 
-  kVpiUdpVal00 = kVpiUdpVal0 << 3,
-  kVpiUdpVal01 = kVpiUdpVal1 << 3,
-  kVpiUdpVal0X = kVpiUdpValX << 3,
+  kVpiUdpValB = kVpiUdpVal0 | kVpiUdpVal1,
+  kVpiUdpValQ = kVpiUdpVal0 | kVpiUdpVal1 | kVpiUdpValX,
+
+  // 遷移シンボル
+  kVpiUdpVal00 = 1 << 3,
+  kVpiUdpVal01 = 1 << 4,
+  kVpiUdpVal0X = 1 << 5,
+  kVpiUdpVal10 = 1 << 6,
+  kVpiUdpVal11 = 1 << 7,
+  kVpiUdpVal1X = 1 << 8,
+  kVpiUdpValX0 = 1 << 9,
+  kVpiUdpValX1 = 1 << 10,
+  kVpiUdpValXX = 1 << 11,
+
   kVpiUdpVal0B = kVpiUdpVal00 | kVpiUdpVal01,
   kVpiUdpVal0Q = kVpiUdpVal00 | kVpiUdpVal01 | kVpiUdpVal0X,
 
-  kVpiUdpVal10 = kVpiUdpVal0 << 6,
-  kVpiUdpVal11 = kVpiUdpVal1 << 6,
-  kVpiUdpVal1X = kVpiUdpValX << 6,
   kVpiUdpVal1B = kVpiUdpVal10 | kVpiUdpVal11,
   kVpiUdpVal1Q = kVpiUdpVal10 | kVpiUdpVal11 | kVpiUdpVal1X,
 
-  kVpiUdpValX0 = kVpiUdpVal0 << 9,
-  kVpiUdpValX1 = kVpiUdpVal1 << 9,
-  kVpiUdpValXX = kVpiUdpValX << 9,
   kVpiUdpValXB = kVpiUdpValX0 | kVpiUdpValX1,
   kVpiUdpValXQ = kVpiUdpValX0 | kVpiUdpValX1 | kVpiUdpValXX,
 
   kVpiUdpValB0 = kVpiUdpVal00 | kVpiUdpVal10,
   kVpiUdpValB1 = kVpiUdpVal01 | kVpiUdpVal11,
   kVpiUdpValBX = kVpiUdpVal0X | kVpiUdpVal1X,
-  kVpiUdpValBB = kVpiUdpValB0 | kVpiUdpValB1,
-  kVpiUdpValBQ = kVpiUdpValBB | kVpiUdpValBX,
+  kVpiUdpValBB = kVpiUdpVal0B | kVpiUdpVal1B,
+  kVpiUdpValBQ = kVpiUdpVal0Q | kVpiUdpVal1Q,
 
-  kVpiUdpValQ0 = kVpiUdpValB0 | kVpiUdpValX0,
-  kVpiUdpValQ1 = kVpiUdpValB1 | kVpiUdpValX1,
-  kVpiUdpValQX = kVpiUdpValBX | kVpiUdpValXX,
-  kVpiUdpValQB = kVpiUdpValQ0 | kVpiUdpValQ1,
-  kVpiUdpValQQ = kVpiUdpValQB | kVpiUdpValQX,
+  kVpiUdpValQ0 = kVpiUdpVal00 | kVpiUdpVal10 | kVpiUdpValX0,
+  kVpiUdpValQ1 = kVpiUdpVal01 | kVpiUdpVal11 | kVpiUdpValX1,
+  kVpiUdpValQX = kVpiUdpVal0X | kVpiUdpVal1X | kVpiUdpValXX,
+  kVpiUdpValQB = kVpiUdpVal0B | kVpiUdpVal1B | kVpiUdpValXB,
+  kVpiUdpValQQ = kVpiUdpVal0Q | kVpiUdpVal1Q | kVpiUdpValXQ,
 
   kVpiUdpValP  = kVpiUdpVal01 | kVpiUdpVal0X | kVpiUdpValX1,
   kVpiUdpValN  = kVpiUdpVal10 | kVpiUdpVal1X | kVpiUdpValX0,
@@ -100,54 +104,128 @@ END_NONAMESPACE
 // @brief 値を表す文字からのコンストラクタ
 VlUdpVal::VlUdpVal(char symbol)
 {
-  mData = conv(symbol);
+  mData = kVpiUdpValNC;
+
+  switch ( symbol ) {
+  case '-': mData = kVpiUdpValNC; break;
+  case '0': mData = kVpiUdpVal0; break;
+  case '1': mData = kVpiUdpVal1; break;
+  case 'X':
+  case 'x': mData = kVpiUdpValX; break;
+  case 'B':
+  case 'b': mData = kVpiUdpValB; break;
+  case '?': mData = kVpiUdpValQ; break;
+  case 'R':
+  case 'r': mData = kVpiUdpValR; break;
+  case 'F':
+  case 'f': mData = kVpiUdpValF; break;
+  case 'P':
+  case 'p': mData = kVpiUdpValP; break;
+  case 'N':
+  case 'n': mData = kVpiUdpValN; break;
+  case '*': mData = kVpiUdpValQQ; break;
+
+  default:
+    cerr << "Illegal symbol char: " << symbol
+	 << " (" << static_cast<ymuint>(symbol) << ")" << endl;
+    assert_not_reached(__FILE__, __LINE__);
+  }
 }
 
 // @brief 値を表す2つの文字からのコンストラクタ
 VlUdpVal::VlUdpVal(char symbol1,
 		   char symbol2)
 {
-  ymuint val1 = conv(symbol1);
-  ymuint val2 = conv(symbol2);
-  assert_cond( val1 > 0 && val1 < 8, __FILE__, __LINE__);
-  assert_cond( val2 > 0 && val2 < 8, __FILE__, __LINE__);
+  mData = kVpiUdpValNC;
 
-  ymuint new_val = 0U;
-  if ( val1 & kVpiUdpVal0 ) {
-    if ( val2 & kVpiUdpVal0 ) {
-      new_val |= kVpiUdpVal00;
+  switch ( symbol1 ) {
+  case '0':
+    switch ( symbol2 ) {
+    case '0': mData = kVpiUdpVal00; break;
+    case '1': mData = kVpiUdpVal01; break;
+    case 'X':
+    case 'x': mData = kVpiUdpVal0X; break;
+    case 'B':
+    case 'b': mData = kVpiUdpVal0B; break;
+    case '?': mData = kVpiUdpVal0Q; break;
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
     }
-    if ( val2 & kVpiUdpVal1 ) {
-      new_val |= kVpiUdpVal01;
-    }
-    if ( val2 & kVpiUdpValX ) {
-      new_val |= kVpiUdpVal0X;
-    }
-  }
-  if ( val1 & kVpiUdpVal1 ) {
-    if ( val2 & kVpiUdpVal0 ) {
-      new_val |= kVpiUdpVal10;
-    }
-    if ( val2 & kVpiUdpVal1 ) {
-      new_val |= kVpiUdpVal11;
-    }
-    if ( val2 & kVpiUdpValX ) {
-      new_val |= kVpiUdpVal1X;
-    }
-  }
-  if ( val1 & kVpiUdpValX ) {
-    if ( val2 & kVpiUdpVal0 ) {
-      new_val |= kVpiUdpValX0;
-    }
-    if ( val2 & kVpiUdpVal1 ) {
-      new_val |= kVpiUdpValX1;
-    }
-    if ( val2 & kVpiUdpValX ) {
-      new_val |= kVpiUdpValXX;
-    }
-  }
+    break;
 
-  mData = new_val;
+  case '1':
+    switch ( symbol2 ) {
+    case '0': mData = kVpiUdpVal10; break;
+    case '1': mData = kVpiUdpVal11; break;
+    case 'X':
+    case 'x': mData = kVpiUdpVal1X; break;
+    case 'B':
+    case 'b': mData = kVpiUdpVal1B; break;
+    case '?': mData = kVpiUdpVal1Q; break;
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+    break;
+
+  case 'X':
+  case 'x':
+    switch ( symbol2 ) {
+    case '0': mData = kVpiUdpValX0; break;
+    case '1': mData = kVpiUdpValX1; break;
+    case 'X':
+    case 'x': mData = kVpiUdpValXX; break;
+    case 'B':
+    case 'b': mData = kVpiUdpValXB; break;
+    case '?': mData = kVpiUdpValXQ; break;
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+    break;
+
+  case 'B':
+  case 'b':
+    switch ( symbol2 ) {
+    case '0': mData = kVpiUdpValB0; break;
+    case '1': mData = kVpiUdpValB1; break;
+    case 'X':
+    case 'x': mData = kVpiUdpValBX; break;
+    case 'B':
+    case 'b': mData = kVpiUdpValBB; break;
+    case '?': mData = kVpiUdpValBQ; break;
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+    break;
+
+  case '?':
+    switch ( symbol2 ) {
+    case '0': mData = kVpiUdpValQ0; break;
+    case '1': mData = kVpiUdpValQ1; break;
+    case 'X':
+    case 'x': mData = kVpiUdpValQX; break;
+    case 'B':
+    case 'b': mData = kVpiUdpValQB; break;
+    case '?': mData = kVpiUdpValQQ; break;
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+}
+
+// @brief 値を直接指定するコンストラクタ
+VlUdpVal::VlUdpVal(ymuint16 val) :
+  mData(val)
+{
 }
 
 // @brief デストラクタ
@@ -180,7 +258,7 @@ VlUdpVal::is_nc_symbol() const
 bool
 VlUdpVal::is_composite_symbol() const
 {
-  return (mData & kVpiUdpValB) != 0U;
+  return (mData & kVpiUdpValB) == kVpiUdpValB;
 }
 
 // @brief 文字列を返す．
