@@ -12,6 +12,150 @@
 
 BEGIN_NAMESPACE_YM
 
+struct BinScalarOp
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  VlScalarVal
+  operator()(const VlScalarVal& left,
+	     const VlScalarVal& right) const = 0;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const = 0;
+
+};
+
+struct EqOp :
+  public BinScalarOp
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  VlScalarVal
+  operator()(const VlScalarVal& left,
+	     const VlScalarVal& right) const;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const;
+
+};
+
+struct NeqOp :
+  public BinScalarOp
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  VlScalarVal
+  operator()(const VlScalarVal& left,
+	     const VlScalarVal& right) const;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const;
+
+};
+
+struct AndOp :
+  public BinScalarOp
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  VlScalarVal
+  operator()(const VlScalarVal& left,
+	     const VlScalarVal& right) const;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const;
+
+};
+
+struct OrOp :
+  public BinScalarOp
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  VlScalarVal
+  operator()(const VlScalarVal& left,
+	     const VlScalarVal& right) const;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const;
+
+};
+
+// @brief 演算を実行する仮想関数
+VlScalarVal
+EqOp::operator()(const VlScalarVal& left,
+		 const VlScalarVal& right) const
+{
+  return eq(left, right);
+}
+
+// @brief 演算を表す文字列
+const char*
+EqOp::opr_str() const
+{
+  return " == ";
+}
+
+// @brief 演算を実行する仮想関数
+VlScalarVal
+NeqOp::operator()(const VlScalarVal& left,
+		  const VlScalarVal& right) const
+{
+  return neq(left, right);
+}
+
+// @brief 演算を表す文字列
+const char*
+NeqOp::opr_str() const
+{
+  return " != ";
+}
+
+// @brief 演算を実行する仮想関数
+VlScalarVal
+AndOp::operator()(const VlScalarVal& left,
+		  const VlScalarVal& right) const
+{
+  return left && right;
+}
+
+// @brief 演算を表す文字列
+const char*
+AndOp::opr_str() const
+{
+  return " && ";
+}
+
+// @brief 演算を実行する仮想関数
+VlScalarVal
+OrOp::operator()(const VlScalarVal& left,
+		 const VlScalarVal& right) const
+{
+  return left || right;
+}
+
+// @brief 演算を表す文字列
+const char*
+OrOp::opr_str() const
+{
+  return " || ";
+}
+
 const char*
 bool_str(bool val)
 {
@@ -168,94 +312,20 @@ check_not(const char* prefix,
 }
 
 bool
-check_eq(const char* prefix,
-	 VlScalarVal val_table[],
-	 VlScalarVal out_table[])
+check_binscalarop(const char* prefix,
+		  const BinScalarOp& op,
+		  VlScalarVal val_table[],
+		  VlScalarVal out_table[])
 {
   bool stat = true;
   for (ymuint i = 0; i < 4; ++ i ) {
     VlScalarVal in0 = val_table[i];
     for (ymuint j = 0; j < 4; ++ j ) {
       VlScalarVal in1 = val_table[j];
-      VlScalarVal result = eq(in0, in1);
+      VlScalarVal result = op(in0, in1);
       VlScalarVal out = out_table[i * 4 + j];
       cout << prefix << " : "
-	   << in0 << " == " << in1
-	   << " = " << result;
-      if ( result != out ) {
-	cout << ", ERROR, expected value is " << out;
-	stat = false;
-      }
-      cout << endl;
-    }
-  }
-  return stat;
-}
-
-bool
-check_neq(const char* prefix,
-	 VlScalarVal val_table[],
-	 VlScalarVal out_table[])
-{
-  bool stat = true;
-  for (ymuint i = 0; i < 4; ++ i ) {
-    VlScalarVal in0 = val_table[i];
-    for (ymuint j = 0; j < 4; ++ j ) {
-      VlScalarVal in1 = val_table[j];
-      VlScalarVal result = neq(in0, in1);
-      VlScalarVal out = out_table[i * 4 + j];
-      cout << prefix << " : "
-	   << in0 << " != " << in1
-	   << " = " << result;
-      if ( result != out ) {
-	cout << ", ERROR, expected value is " << out;
-	stat = false;
-      }
-      cout << endl;
-    }
-  }
-  return stat;
-}
-
-bool
-check_and(const char* prefix,
-	  VlScalarVal val_table[],
-	  VlScalarVal out_table[])
-{
-  bool stat = true;
-  for (ymuint i = 0; i < 4; ++ i ) {
-    VlScalarVal in0 = val_table[i];
-    for (ymuint j = 0; j < 4; ++ j ) {
-      VlScalarVal in1 = val_table[j];
-      VlScalarVal result = in0 && in1;
-      VlScalarVal out = out_table[i * 4 + j];
-      cout << prefix << " : "
-	   << in0 << " && " << in1
-	   << " = " << result;
-      if ( result != out ) {
-	cout << ", ERROR, expected value is " << out;
-	stat = false;
-      }
-      cout << endl;
-    }
-  }
-  return stat;
-}
-
-bool
-check_or(const char* prefix,
-	 VlScalarVal val_table[],
-	 VlScalarVal out_table[])
-{
-  bool stat = true;
-  for (ymuint i = 0; i < 4; ++ i ) {
-    VlScalarVal in0 = val_table[i];
-    for (ymuint j = 0; j < 4; ++ j ) {
-      VlScalarVal in1 = val_table[j];
-      VlScalarVal result = in0 || in1;
-      VlScalarVal out = out_table[i * 4 + j];
-      cout << prefix << " : "
-	   << in0 << " || " << in1
+	   << in0 << op.opr_str() << in1
 	   << " = " << result;
       if ( result != out ) {
 	cout << ", ERROR, expected value is " << out;
@@ -523,9 +593,10 @@ scalarval_test()
   and_table[3 * 4 + 2] = val_x;
   and_table[3 * 4 + 3] = val_x;
 
-  if ( !check_and("test_and",
-		  val_table,
-		  and_table) ) {
+  if ( !check_binscalarop("test_and",
+			  AndOp(),
+			  val_table,
+			  and_table) ) {
     stat = false;
   }
 
@@ -547,9 +618,10 @@ scalarval_test()
   or_table[3 * 4 + 2] = val_x;
   or_table[3 * 4 + 3] = val_x;
 
-  if ( !check_or("test_or",
-		 val_table,
-		 or_table) ) {
+  if ( !check_binscalarop("test_or",
+			  OrOp(),
+			  val_table,
+			  or_table) ) {
     stat = false;
   }
 
@@ -571,9 +643,10 @@ scalarval_test()
   eq_table[3 * 4 + 2] = val_x;
   eq_table[3 * 4 + 3] = val_x;
 
-  if ( !check_eq("test_eq",
-		 val_table,
-		 eq_table) ) {
+  if ( !check_binscalarop("test_eq",
+			  EqOp(),
+			  val_table,
+			  eq_table) ) {
     stat = false;
   }
 
@@ -595,9 +668,10 @@ scalarval_test()
   neq_table[3 * 4 + 2] = val_x;
   neq_table[3 * 4 + 3] = val_x;
 
-  if ( !check_neq("test_neq",
-		  val_table,
-		  neq_table) ) {
+  if ( !check_binscalarop("test_neq",
+			  NeqOp(),
+			  val_table,
+			  neq_table) ) {
     stat = false;
   }
 
