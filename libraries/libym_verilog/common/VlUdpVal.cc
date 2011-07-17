@@ -66,7 +66,7 @@ enum tVpiUdpVal {
   kVpiUdpValR  = kVpiUdpVal01,
   kVpiUdpValF  = kVpiUdpVal10,
 
-  kVpiUdpValNC = 0
+  kVpiUdpValNC = 1 << 12
 };
 
 // シンボルを表す文字から値に変換する
@@ -259,6 +259,18 @@ bool
 VlUdpVal::is_composite_symbol() const
 {
   return (mData & kVpiUdpValB) == kVpiUdpValB;
+}
+
+// @brief ストリーム出力
+// @relates VlUdpVal
+// @param[in] s 出力先のストリーム
+// @param[in] val 値
+ostream&
+operator<<(ostream& s,
+	   const VlUdpVal& val)
+{
+  s << val.to_string();
+  return s;
 }
 
 // @brief 文字列を返す．

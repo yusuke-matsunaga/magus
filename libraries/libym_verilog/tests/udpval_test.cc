@@ -12,6 +12,86 @@
 
 BEGIN_NAMESPACE_YM
 
+struct Operation
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  bool
+  operator()(const VlUdpVal& left,
+	     const VlUdpVal& right) const = 0;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const = 0;
+
+};
+
+struct LeOp :
+  public Operation
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  bool
+  operator()(const VlUdpVal& left,
+	     const VlUdpVal& right) const;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const;
+
+};
+
+struct GeOp :
+  public Operation
+{
+
+  /// @brief 演算を実行する仮想関数
+  virtual
+  bool
+  operator()(const VlUdpVal& left,
+	     const VlUdpVal& right) const;
+
+  /// @brief 演算を表す文字列
+  virtual
+  const char*
+  opr_str() const;
+
+};
+
+// @brief 演算を実行する仮想関数
+bool
+LeOp::operator()(const VlUdpVal& left,
+		 const VlUdpVal& right) const
+{
+  return left <= right;
+}
+
+// @brief 演算を表す文字列
+const char*
+LeOp::opr_str() const
+{
+  return " <= ";
+}
+
+// @brief 演算を実行する仮想関数
+bool
+GeOp::operator()(const VlUdpVal& left,
+		 const VlUdpVal& right) const
+{
+  return left >= right;
+}
+
+// @brief 演算を表す文字列
+const char*
+GeOp::opr_str() const
+{
+  return " >= ";
+}
+
 const char*
 bool_str(bool val)
 {
@@ -69,6 +149,83 @@ check_val(const char* prefix,
   return stat;
 }
 
+
+bool
+check_opr(const char* prefix,
+	  const Operation& opr,
+	  const vector<VlUdpVal>& val_table,
+	  const vector<bool>& out_table)
+{
+  bool stat = true;
+  ymuint n = val_table.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    VlUdpVal in1 = val_table[i];
+    for (ymuint j = 0; j < n; ++ j) {
+      VlUdpVal in2 = val_table[j];
+      bool result = opr(in1, in2);
+      bool out = out_table[i * n + j];
+      cout << prefix << " : "
+	   << in1 << opr.opr_str() << in2
+	   << " = " << result;
+      if ( result != out ) {
+	cout << ", ERROR, expected value is " << out;
+	stat = false;
+      }
+      cout << endl;
+    }
+  }
+  return stat;
+}
+
+bool
+check_le(ymuint i,
+	 ymuint j)
+{
+  switch ( i ) {
+  case 0:
+    switch ( j ) {
+    case 0:
+    case 3:
+    case 4:
+      return true;
+    }
+    break;
+
+  case 1:
+    switch ( j ) {
+    case 1:
+    case 3:
+    case 4:
+      return true;
+    }
+    break;
+
+  case 2:
+    switch ( j ) {
+    case 2:
+    case 4:
+      return true;
+    }
+    break;
+
+  case 3:
+    switch ( j ) {
+    case 3:
+    case 4:
+      return true;
+    }
+    break;
+
+  case 4:
+    switch ( j ) {
+    case 4:
+      return true;
+    }
+    break;
+  }
+  return false;
+}
+
 void
 udpval_test()
 {
@@ -79,8 +236,8 @@ udpval_test()
 		  "VlUdpVal()",
 		  VlUdpVal(),
 		  "-",
-		  true,
 		  false,
+		  true,
 		  true,
 		  false) ) {
     stat = false;
@@ -206,6 +363,18 @@ udpval_test()
     stat = false;
   }
 
+  // -
+  if ( !check_val("test_nc",
+		  "VlUdpVal('-')",
+		  VlUdpVal('-'),
+		  "-",
+		  false,
+		  true,
+		  true,
+		  false) ) {
+    stat = false;
+  }
+
   // 00
   if ( !check_val("test_00",
 		  "VlUdpVal('0', '0')",
@@ -215,6 +384,409 @@ udpval_test()
 		  true,
 		  false,
 		  false) ) {
+    stat = false;
+  }
+
+  // 01
+  if ( !check_val("test_01",
+		  "VlUdpVal('0', '1')",
+		  VlUdpVal('0', '1'),
+		  "01",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 0X
+  if ( !check_val("test_0X",
+		  "VlUdpVal('0', 'x')",
+		  VlUdpVal('0', 'x'),
+		  "0x",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 0B
+  if ( !check_val("test_0B",
+		  "VlUdpVal('0', 'b')",
+		  VlUdpVal('0', 'b'),
+		  "0b",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 0Q
+  if ( !check_val("test_0Q",
+		  "VlUdpVal('0', '?')",
+		  VlUdpVal('0', '?'),
+		  "0?",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 10
+  if ( !check_val("test_10",
+		  "VlUdpVal('1', '0')",
+		  VlUdpVal('1', '0'),
+		  "10",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 11
+  if ( !check_val("test_11",
+		  "VlUdpVal('1', '1')",
+		  VlUdpVal('1', '1'),
+		  "11",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 1X
+  if ( !check_val("test_1X",
+		  "VlUdpVal('1', 'x')",
+		  VlUdpVal('1', 'x'),
+		  "1x",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 1B
+  if ( !check_val("test_1B",
+		  "VlUdpVal('1', 'b')",
+		  VlUdpVal('1', 'b'),
+		  "1b",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // 1Q
+  if ( !check_val("test_1Q",
+		  "VlUdpVal('1', '?')",
+		  VlUdpVal('1', '?'),
+		  "1?",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // X0
+  if ( !check_val("test_X0",
+		  "VlUdpVal('x', '0')",
+		  VlUdpVal('x', '0'),
+		  "x0",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // X1
+  if ( !check_val("test_X1",
+		  "VlUdpVal('x', '1')",
+		  VlUdpVal('x', '1'),
+		  "x1",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // XX
+  if ( !check_val("test_XX",
+		  "VlUdpVal('x', 'x')",
+		  VlUdpVal('x', 'x'),
+		  "xx",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // XB
+  if ( !check_val("test_XB",
+		  "VlUdpVal('x', 'b')",
+		  VlUdpVal('x', 'b'),
+		  "xb",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // XQ
+  if ( !check_val("test_XQ",
+		  "VlUdpVal('x', '?')",
+		  VlUdpVal('x', '?'),
+		  "x?",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // B0
+  if ( !check_val("test_B0",
+		  "VlUdpVal('b', '0')",
+		  VlUdpVal('b', '0'),
+		  "b0",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // B1
+  if ( !check_val("test_B1",
+		  "VlUdpVal('b', '1')",
+		  VlUdpVal('b', '1'),
+		  "b1",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // BX
+  if ( !check_val("test_BX",
+		  "VlUdpVal('b', 'x')",
+		  VlUdpVal('b', 'x'),
+		  "bx",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // BB
+  if ( !check_val("test_BB",
+		  "VlUdpVal('b', 'b')",
+		  VlUdpVal('b', 'b'),
+		  "bb",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // BQ
+  if ( !check_val("test_BQ",
+		  "VlUdpVal('b', '?')",
+		  VlUdpVal('b', '?'),
+		  "b?",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // Q0
+  if ( !check_val("test_Q0",
+		  "VlUdpVal('?', '0')",
+		  VlUdpVal('?', '0'),
+		  "?0",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // Q1
+  if ( !check_val("test_Q1",
+		  "VlUdpVal('?', '1')",
+		  VlUdpVal('?', '1'),
+		  "?1",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // QX
+  if ( !check_val("test_QX",
+		  "VlUdpVal('?', 'x')",
+		  VlUdpVal('?', 'x'),
+		  "?x",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // QB
+  if ( !check_val("test_QB",
+		  "VlUdpVal('?', 'b')",
+		  VlUdpVal('?', 'b'),
+		  "?b",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  // QQ
+  if ( !check_val("test_QQ",
+		  "VlUdpVal('?', '?')",
+		  VlUdpVal('?', '?'),
+		  "??",
+		  false,
+		  true,
+		  false,
+		  false) ) {
+    stat = false;
+  }
+
+  vector<VlUdpVal> val_table;
+  val_table.push_back(VlUdpVal('-'));
+  val_table.push_back(VlUdpVal('0'));
+  val_table.push_back(VlUdpVal('1'));
+  val_table.push_back(VlUdpVal('x'));
+  val_table.push_back(VlUdpVal('b'));
+  val_table.push_back(VlUdpVal('?'));
+  val_table.push_back(VlUdpVal('p'));
+  val_table.push_back(VlUdpVal('n'));
+  val_table.push_back(VlUdpVal('0', '0'));
+  val_table.push_back(VlUdpVal('0', '1'));
+  val_table.push_back(VlUdpVal('0', 'x'));
+  val_table.push_back(VlUdpVal('0', 'b'));
+  val_table.push_back(VlUdpVal('0', '?'));
+  val_table.push_back(VlUdpVal('1', '0'));
+  val_table.push_back(VlUdpVal('1', '1'));
+  val_table.push_back(VlUdpVal('1', 'x'));
+  val_table.push_back(VlUdpVal('1', 'b'));
+  val_table.push_back(VlUdpVal('1', '?'));
+  val_table.push_back(VlUdpVal('x', '0'));
+  val_table.push_back(VlUdpVal('x', '1'));
+  val_table.push_back(VlUdpVal('x', 'x'));
+  val_table.push_back(VlUdpVal('x', 'b'));
+  val_table.push_back(VlUdpVal('x', '?'));
+  val_table.push_back(VlUdpVal('b', '0'));
+  val_table.push_back(VlUdpVal('b', '1'));
+  val_table.push_back(VlUdpVal('b', 'x'));
+  val_table.push_back(VlUdpVal('b', 'b'));
+  val_table.push_back(VlUdpVal('b', '?'));
+  val_table.push_back(VlUdpVal('?', '0'));
+  val_table.push_back(VlUdpVal('?', '1'));
+  val_table.push_back(VlUdpVal('?', 'x'));
+  val_table.push_back(VlUdpVal('?', 'b'));
+  val_table.push_back(VlUdpVal('?', '?'));
+
+  vector<bool> le_table(33 * 33, false);
+  le_table[0 * 33 + 0] = true;
+  for (ymuint i = 0; i < 5; ++ i) {
+    ymuint p = i + 1;
+    for (ymuint j = 0; j < 5; ++ j) {
+      ymuint q = j + 1;
+      if ( check_le(i, j) ) {
+	le_table[p * 33 + q] = true;
+      }
+    }
+  }
+  for (ymuint i = 0; i < 5; ++ i) {
+    for (ymuint j = 0; j < 5; ++ j) {
+      ymuint p = i * 5 + j + 8;
+      for (ymuint k = 0; k < 5; ++ k) {
+	for (ymuint l = 0; l < 5; ++ l) {
+	  ymuint q = k * 5 + l + 8;
+	  if ( check_le(i, k) && check_le(j, l) ) {
+	    le_table[p * 33 + q] = true;
+	  }
+	}
+      }
+    }
+  }
+  // p
+  le_table[6 * 33 + 6] = true;
+  le_table[6 * 33 + 32] = true;
+  for (ymuint i = 0; i < 5; ++ i) {
+    for (ymuint j = 0; j < 5; ++ j) {
+      ymuint p = i * 5 + j + 8;
+      bool stat = false;
+      // vs 01
+      if ( check_le(i, 0) && check_le(j, 1) ) {
+	stat = true;
+      }
+      // vs 0x
+      if ( check_le(i, 0) && check_le(j, 2) ) {
+	stat = true;
+      }
+      // vs x1
+      if ( check_le(i, 2) && check_le(j, 1) ) {
+	stat = true;
+      }
+      if ( stat ) {
+	le_table[p * 33 + 6] = true;
+      }
+    }
+  }
+  // n
+  le_table[7 * 33 + 7] = true;
+  le_table[7 * 33 + 32] = true;
+  for (ymuint i = 0; i < 5; ++ i) {
+    for (ymuint j = 0; j < 5; ++ j) {
+      ymuint p = i * 5 + j + 8;
+      bool stat = false;
+      // vs 10
+      if ( check_le(i, 1) && check_le(j, 0) ) {
+	stat = true;
+      }
+      // vs 1x
+      if ( check_le(i, 1) && check_le(j, 2) ) {
+	stat = true;
+      }
+      // vs x0
+      if ( check_le(i, 2) && check_le(j, 0) ) {
+	stat = true;
+      }
+      if ( stat ) {
+	le_table[p * 33 + 7] = true;
+      }
+    }
+  }
+
+  if ( !check_opr("test_le",
+		  LeOp(),
+		  val_table,
+		  le_table) ) {
     stat = false;
   }
 

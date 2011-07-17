@@ -110,6 +110,14 @@ private:
 
 };
 
+/// @brief ストリーム出力
+/// @relates VlUdpVal
+/// @param[in] s 出力先のストリーム
+/// @param[in] val 値
+ostream&
+operator<<(ostream& s,
+	   const VlUdpVal& val);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
