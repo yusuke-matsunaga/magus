@@ -23,34 +23,6 @@ bool_str(bool val)
   }
 }
 
-#if 0
-int
-val2int(const VlScalarVal& val)
-{
-  if ( val.is_zero() ) {
-    return 0;
-  }
-  if ( val.is_one() ) {
-    return 1;
-  }
-  if ( val.is_x() ) {
-    return 2;
-  }
-  if ( val.is_z() ) {
-    return 3;
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return 255;
-}
-
-bool
-equal(const VlScalarVal& left,
-      const VlScalarVal& right)
-{
-  return val2int(left) == val2int(right);
-}
-#endif
-
 bool
 check_val(const char* prefix,
 	  const char* lhs,
