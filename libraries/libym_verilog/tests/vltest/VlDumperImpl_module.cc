@@ -5,19 +5,15 @@
 ///
 /// $Id: VlDumperImpl_module.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include "VlDumperImpl.h"
 
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlModule.h>
-#include <ym_verilog/vl/VlPort.h>
+#include "ym_verilog/VlMgr.h"
+#include "ym_verilog/vl/VlModule.h"
+#include "ym_verilog/vl/VlPort.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -215,7 +211,7 @@ VlDumperImpl::put_port_bit(const char* label,
 
   put("vpiConnByName", handle.get_bool(vpiConnByName));
   put("vpiDirection",
-      static_cast<tVpiDirection>(handle.get_int(vpiDirection)));
+      static_cast<tVlDirection>(handle.get_int(vpiDirection)));
   put("vpiExplicitName", handle.get_bool(vpiExplicitName));
   put("vpiScalar", handle.get_bool(vpiScalar));
   put("vpiVector", handle.get_bool(vpiVector));

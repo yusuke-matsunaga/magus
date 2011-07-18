@@ -105,7 +105,7 @@ protected:
   /// @brief dir 型のノードを追加する．
   /// @param[in] value 値
   void
-  add_dir(tVpiDirection dir) const;
+  add_dir(tVlDirection dir) const;
 
   /// @brief 文字列型のノードを追加する．
   /// @param[in] label ラベル

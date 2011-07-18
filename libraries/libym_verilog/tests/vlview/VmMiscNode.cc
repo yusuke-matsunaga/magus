@@ -38,7 +38,7 @@ VmNode::add_delay(const VlDelay* value) const
 // @brief dir 型のノードを追加する．
 // @param[in] value 値
 void
-VmNode::add_dir(tVpiDirection dir) const
+VmNode::add_dir(tVlDirection dir) const
 {
   add_child( new VmDirNode(dir) );
 }
@@ -122,7 +122,7 @@ VmDelayNode::~VmDelayNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmDelayNode::data(int column,
 		  int role) const
@@ -138,7 +138,7 @@ VmDelayNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmDelayNode::loc() const
@@ -204,7 +204,7 @@ VmStrNode::~VmStrNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmStrNode::data(int column,
 		int role) const
@@ -245,7 +245,7 @@ VmAuxTypeNode::~VmAuxTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmAuxTypeNode::data(int column,
 		    int role) const
@@ -309,7 +309,7 @@ VmNetTypeNode::~VmNetTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmNetTypeNode::data(int column,
 		    int role) const
@@ -357,7 +357,7 @@ VmVarTypeNode::~VmVarTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmVarTypeNode::data(int column,
 		    int role) const
@@ -386,7 +386,7 @@ VmVarTypeNode::data(int column,
 
 // @brief コンストラクタ
 // @param[in] dir 入出力の方向
-VmDirNode::VmDirNode(tVpiDirection dir) :
+VmDirNode::VmDirNode(tVlDirection dir) :
   mDir(dir)
 {
 }
@@ -398,7 +398,7 @@ VmDirNode::~VmDirNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmDirNode::data(int column,
 		int role) const
@@ -409,11 +409,11 @@ VmDirNode::data(int column,
     }
     else if ( column == 1 ) {
       switch ( mDir ) {
-      case kVpiInput:       return "Input";
-      case kVpiOutput:      return "Output";
-      case kVpiInout:       return "Inout";
-      case kVpiMixedIO:     return "Mixed IO";
-      case kVpiNoDirection: return "No Direction";
+      case kVlInput:       return "Input";
+      case kVlOutput:      return "Output";
+      case kVlInout:       return "Inout";
+      case kVlMixedIO:     return "Mixed IO";
+      case kVlNoDirection: return "No Direction";
       }
     }
   }
@@ -439,7 +439,7 @@ VmUdNode::~VmUdNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmUdNode::data(int column,
 	       int role) const
@@ -478,7 +478,7 @@ VmDelayModeNode::~VmDelayModeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmDelayModeNode::data(int column,
 		      int role) const
@@ -520,7 +520,7 @@ VmPrimTypeNode::~VmPrimTypeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPrimTypeNode::data(int column,
 		     int role) const
@@ -584,7 +584,7 @@ VmRangeModeNode::~VmRangeModeNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmRangeModeNode::data(int column,
 		      int role) const
@@ -627,7 +627,7 @@ VmStrengthValNode::~VmStrengthValNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmStrengthValNode::data(int column,
 			int role) const
@@ -672,7 +672,7 @@ VmVsNode::~VmVsNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmVsNode::data(int column,
 	       int role) const
@@ -714,7 +714,7 @@ VmBoolNode::~VmBoolNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmBoolNode::data(int column,
 		 int role) const
@@ -757,7 +757,7 @@ VmIntNode::~VmIntNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmIntNode::data(int column,
 		int role) const

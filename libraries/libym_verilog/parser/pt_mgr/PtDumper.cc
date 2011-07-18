@@ -20,7 +20,6 @@
 #include "ym_verilog/pt/PtExpr.h"
 #include "ym_verilog/pt/PtMisc.h"
 #include "ym_verilog/pt/PtArray.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/VlUdpVal.h"
 
 #include "ym_utils/StrBuff.h"
@@ -883,7 +882,7 @@ PtDumper::put(const char* label,
 
   switch ( expr->type() ) {
   case kPtOprExpr:
-    if ( expr->op_type().val() == vpiNullOp ) {
+    if ( expr->op_type() == kVlNullOp ) {
       // '(' expression ')' なので無視
       return put(label, expr->operand(0));
     }
@@ -1161,17 +1160,10 @@ PtDumper::put(const char* label,
 // @param[in] direction 方向
 void
 PtDumper::put(const char* label,
-	      tVpiDirection direction)
+	      tVlDirection direction)
 {
   PtHeader x(*this, label, "direction", false);
-  switch ( direction ) {
-  case kVpiInput:       mStream << "input"; break;
-  case kVpiOutput:      mStream << "output"; break;
-  case kVpiInout:       mStream << "inout"; break;
-  case kVpiMixedIO:     mStream << "mixed IO"; break;
-  case kVpiNoDirection: mStream << "no direction"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
-  }
+  mStream << direction;
 }
 
 // @brief unconnected drive の出力
@@ -1255,53 +1247,53 @@ PtDumper::put(const char* label,
 // @param[in] op_type 演算子型
 void
 PtDumper::put(const char* label,
-	      const VlOpType& op_type)
+	      tVlOpType op_type)
 {
   PtHeader x(*this, label, "op_type", false);
-  switch ( op_type.val() ) {
-  case vpiMinusOp:       mStream << "minus"; break;
-  case vpiPlusOp:        mStream << "plus"; break;
-  case vpiNotOp:         mStream << "not"; break;
-  case vpiBitNegOp:      mStream << "bitneg"; break;
-  case vpiUnaryAndOp:    mStream << "unary and"; break;
-  case vpiUnaryNandOp:   mStream << "unary nand"; break;
-  case vpiUnaryOrOp:     mStream << "unary or"; break;
-  case vpiUnaryNorOp:    mStream << "unary nor"; break;
-  case vpiUnaryXorOp:    mStream << "unary xor"; break;
-  case vpiUnaryXNorOp:   mStream << "unary xnor"; break;
-  case vpiSubOp:         mStream << "sub"; break;
-  case vpiDivOp:         mStream << "div"; break;
-  case vpiModOp:         mStream << "mod"; break;
-  case vpiEqOp:          mStream << "eq"; break;
-  case vpiNeqOp:         mStream << "neq"; break;
-  case vpiCaseEqOp:      mStream << "caseeq"; break;
-  case vpiCaseNeqOp:     mStream << "caseneq"; break;
-  case vpiGtOp:          mStream << "gt"; break;
-  case vpiGeOp:          mStream << "ge"; break;
-  case vpiLtOp:          mStream << "lt"; break;
-  case vpiLeOp:          mStream << "le"; break;
-  case vpiLShiftOp:      mStream << "left shift"; break;
-  case vpiRShiftOp:      mStream << "right shift"; break;
-  case vpiAddOp:         mStream << "add"; break;
-  case vpiMultOp:        mStream << "mult"; break;
-  case vpiLogAndOp:      mStream << "logical and"; break;
-  case vpiLogOrOp:       mStream << "logical or"; break;
-  case vpiBitAndOp:      mStream << "bit and"; break;
-  case vpiBitOrOp:       mStream << "bit or"; break;
-  case vpiBitXorOp:      mStream << "bit xor"; break;
-  case vpiBitXNorOp:     mStream << "bit xnor"; break;
-  case vpiConditionOp:   mStream << "conditional"; break;
-  case vpiConcatOp:      mStream << "concat"; break;
-  case vpiMultiConcatOp: mStream << "multi concat"; break;
-  case vpiEventOrOp:     mStream << "event or"; break;
-  case vpiNullOp:        mStream << "null"; break;
-  case vpiListOp:        mStream << "list"; break;
-  case vpiMinTypMaxOp:   mStream << "min-typ-max"; break;
-  case vpiPosedgeOp:     mStream << "posedge"; break;
-  case vpiNegedgeOp:     mStream << "negedge"; break;
-  case vpiArithLShiftOp: mStream << "arithmetic left shift"; break;
-  case vpiArithRShiftOp: mStream << "arithmetic right shift"; break;
-  case vpiPowerOp:       mStream << "power"; break;
+  switch ( op_type ) {
+  case kVlMinusOp:       mStream << "minus"; break;
+  case kVlPlusOp:        mStream << "plus"; break;
+  case kVlNotOp:         mStream << "not"; break;
+  case kVlBitNegOp:      mStream << "bitneg"; break;
+  case kVlUnaryAndOp:    mStream << "unary and"; break;
+  case kVlUnaryNandOp:   mStream << "unary nand"; break;
+  case kVlUnaryOrOp:     mStream << "unary or"; break;
+  case kVlUnaryNorOp:    mStream << "unary nor"; break;
+  case kVlUnaryXorOp:    mStream << "unary xor"; break;
+  case kVlUnaryXNorOp:   mStream << "unary xnor"; break;
+  case kVlSubOp:         mStream << "sub"; break;
+  case kVlDivOp:         mStream << "div"; break;
+  case kVlModOp:         mStream << "mod"; break;
+  case kVlEqOp:          mStream << "eq"; break;
+  case kVlNeqOp:         mStream << "neq"; break;
+  case kVlCaseEqOp:      mStream << "caseeq"; break;
+  case kVlCaseNeqOp:     mStream << "caseneq"; break;
+  case kVlGtOp:          mStream << "gt"; break;
+  case kVlGeOp:          mStream << "ge"; break;
+  case kVlLtOp:          mStream << "lt"; break;
+  case kVlLeOp:          mStream << "le"; break;
+  case kVlLShiftOp:      mStream << "left shift"; break;
+  case kVlRShiftOp:      mStream << "right shift"; break;
+  case kVlAddOp:         mStream << "add"; break;
+  case kVlMultOp:        mStream << "mult"; break;
+  case kVlLogAndOp:      mStream << "logical and"; break;
+  case kVlLogOrOp:       mStream << "logical or"; break;
+  case kVlBitAndOp:      mStream << "bit and"; break;
+  case kVlBitOrOp:       mStream << "bit or"; break;
+  case kVlBitXorOp:      mStream << "bit xor"; break;
+  case kVlBitXNorOp:     mStream << "bit xnor"; break;
+  case kVlConditionOp:   mStream << "conditional"; break;
+  case kVlConcatOp:      mStream << "concat"; break;
+  case kVlMultiConcatOp: mStream << "multi concat"; break;
+  case kVlEventOrOp:     mStream << "event or"; break;
+  case kVlNullOp:        mStream << "null"; break;
+  case kVlListOp:        mStream << "list"; break;
+  case kVlMinTypMaxOp:   mStream << "min-typ-max"; break;
+  case kVlPosedgeOp:     mStream << "posedge"; break;
+  case kVlNegedgeOp:     mStream << "negedge"; break;
+  case kVlArithLShiftOp: mStream << "arithmetic left shift"; break;
+  case kVlArithRShiftOp: mStream << "arithmetic right shift"; break;
+  case kVlPowerOp:       mStream << "power"; break;
   default: assert_not_reached(__FILE__, __LINE__); break;
   }
 }

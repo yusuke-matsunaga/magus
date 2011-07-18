@@ -5,13 +5,9 @@
 ///
 /// $Id: VlDumperImpl_decl.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "VlDumperImpl.h"
 
@@ -44,9 +40,9 @@ VlDumperImpl::put_iodecl(const char* label,
 
   const char* nm = NULL;
   switch ( iodecl->direction() ) {
-  case kVpiInput:  nm = "Input"; break;
-  case kVpiOutput: nm = "Output"; break;
-  case kVpiInout:  nm = "Inout"; break;
+  case kVlInput:  nm = "Input"; break;
+  case kVlOutput: nm = "Output"; break;
+  case kVlInout:  nm = "Inout"; break;
   default: assert_not_reached(__FILE__, __LINE__);
   }
   VlDumpHeader x(this, label, nm);

@@ -12,7 +12,6 @@
 #include "VlDumperImpl.h"
 
 #include "ym_verilog/VlMgr.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/vl/VlRange.h"
 #include "ym_verilog/vl/VlDelay.h"
 #include "ym_verilog/vl/VlExpr.h"

@@ -14,7 +14,6 @@
 #include "ym_utils/FileRegion.h"
 #include "ym_verilog/VlMgr.h"
 #include "ym_verilog/VlValue.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlUdp.h"
 
@@ -403,17 +402,10 @@ VlDumperImpl::put_parent_file(const FileLoc& file_loc)
 // @param[in] direction 向き
 void
 VlDumperImpl::put(const char* label,
-		  tVpiDirection direction)
+		  tVlDirection direction)
 {
   VlDumpHeader x(this, label, "vpiDirection", false);
-  switch ( direction ) {
-  case kVpiInput:       mStream << "vpiInput"; break;
-  case kVpiOutput:      mStream << "vpiOutput"; break;
-  case kVpiInout:       mStream << "vpiInout"; break;
-  case kVpiMixedIO:     mStream << "vpiMixedIO"; break;
-  case kVpiNoDirection: mStream << "vpiNoDirection"; break;
-  default: mStream << "illegal value: " << direction;
-  }
+  mStream << direction;
 }
 
 // @brief const type を出力する関数
@@ -500,54 +492,54 @@ VlDumperImpl::put(const char* label,
 // @param[in] op_type 演算子の種類
 void
 VlDumperImpl::put(const char* label,
-		  const VlOpType& op_type)
+		  tVlOpType op_type)
 {
   VlDumpHeader x(this, label, "vpiOpType", false);
-  switch ( op_type.val() ) {
-  case vpiMinusOp:       mStream << "vpiMinusOp"; break;
-  case vpiPlusOp:        mStream << "vpiPlusOp"; break;
-  case vpiNotOp:         mStream << "vpiNotOp"; break;
-  case vpiBitNegOp:      mStream << "vpiBitNegOp"; break;
-  case vpiUnaryAndOp:    mStream << "vpiUnaryAndOp"; break;
-  case vpiUnaryNandOp:   mStream << "vpiUnaryNandOp"; break;
-  case vpiUnaryOrOp:     mStream << "vpiUnaryOrOp"; break;
-  case vpiUnaryNorOp:    mStream << "vpiUnaryNorOp"; break;
-  case vpiUnaryXorOp:    mStream << "vpiUnaryXorOp"; break;
-  case vpiUnaryXNorOp:   mStream << "vpiUnaryXNorOp"; break;
-  case vpiSubOp:         mStream << "vpiSubOp"; break;
-  case vpiDivOp:         mStream << "vpiDivOp"; break;
-  case vpiModOp:         mStream << "vpiModOp"; break;
-  case vpiEqOp:          mStream << "vpiEqOp"; break;
-  case vpiNeqOp:         mStream << "vpiNeqOp"; break;
-  case vpiCaseEqOp:      mStream << "vpiCaseEqOp"; break;
-  case vpiCaseNeqOp:     mStream << "vpiCaseNeqOp"; break;
-  case vpiGtOp:          mStream << "vpiGtOp"; break;
-  case vpiGeOp:          mStream << "vpiGeOp"; break;
-  case vpiLtOp:          mStream << "vpiLtOp"; break;
-  case vpiLeOp:          mStream << "vpiLeOp"; break;
-  case vpiLShiftOp:      mStream << "vpiLShiftOp"; break;
-  case vpiRShiftOp:      mStream << "vpiRShiftOp"; break;
-  case vpiAddOp:         mStream << "vpiAddOp"; break;
-  case vpiMultOp:        mStream << "vpiMultOp"; break;
-  case vpiLogAndOp:      mStream << "vpiLogAndOp"; break;
-  case vpiLogOrOp:       mStream << "vpiLogOrOp"; break;
-  case vpiBitAndOp:      mStream << "vpiBitAndOp"; break;
-  case vpiBitOrOp:       mStream << "vpiBitOrOp"; break;
-  case vpiBitXorOp:      mStream << "vpiBitXorOp"; break;
-  case vpiBitXNorOp:     mStream << "vpiBitXNorOp"; break;
-  case vpiConditionOp:   mStream << "vpiConditionOp"; break;
-  case vpiConcatOp:      mStream << "vpiConcatOp"; break;
-  case vpiMultiConcatOp: mStream << "vpiMultiConcatOp"; break;
-  case vpiEventOrOp:     mStream << "vpiEventOrOp"; break;
-  case vpiNullOp:        mStream << "vpiNullOp"; break;
-  case vpiListOp:        mStream << "vpiListOp"; break;
-  case vpiMinTypMaxOp:   mStream << "vpiMinTypMaxOp"; break;
-  case vpiPosedgeOp:     mStream << "vpiPosedgeOp"; break;
-  case vpiNegedgeOp:     mStream << "vpiNegedgeOp"; break;
-  case vpiArithLShiftOp: mStream << "vpiArithLShiftOp"; break;
-  case vpiArithRShiftOp: mStream << "vpiArithRShiftOp"; break;
-  case vpiPowerOp:       mStream << "vpiPowerOp"; break;
-  default: mStream << "illegal value: " << op_type.val();
+  switch ( op_type ) {
+  case kVlMinusOp:       mStream << "vpiMinusOp"; break;
+  case kVlPlusOp:        mStream << "vpiPlusOp"; break;
+  case kVlNotOp:         mStream << "vpiNotOp"; break;
+  case kVlBitNegOp:      mStream << "vpiBitNegOp"; break;
+  case kVlUnaryAndOp:    mStream << "vpiUnaryAndOp"; break;
+  case kVlUnaryNandOp:   mStream << "vpiUnaryNandOp"; break;
+  case kVlUnaryOrOp:     mStream << "vpiUnaryOrOp"; break;
+  case kVlUnaryNorOp:    mStream << "vpiUnaryNorOp"; break;
+  case kVlUnaryXorOp:    mStream << "vpiUnaryXorOp"; break;
+  case kVlUnaryXNorOp:   mStream << "vpiUnaryXNorOp"; break;
+  case kVlSubOp:         mStream << "vpiSubOp"; break;
+  case kVlDivOp:         mStream << "vpiDivOp"; break;
+  case kVlModOp:         mStream << "vpiModOp"; break;
+  case kVlEqOp:          mStream << "vpiEqOp"; break;
+  case kVlNeqOp:         mStream << "vpiNeqOp"; break;
+  case kVlCaseEqOp:      mStream << "vpiCaseEqOp"; break;
+  case kVlCaseNeqOp:     mStream << "vpiCaseNeqOp"; break;
+  case kVlGtOp:          mStream << "vpiGtOp"; break;
+  case kVlGeOp:          mStream << "vpiGeOp"; break;
+  case kVlLtOp:          mStream << "vpiLtOp"; break;
+  case kVlLeOp:          mStream << "vpiLeOp"; break;
+  case kVlLShiftOp:      mStream << "vpiLShiftOp"; break;
+  case kVlRShiftOp:      mStream << "vpiRShiftOp"; break;
+  case kVlAddOp:         mStream << "vpiAddOp"; break;
+  case kVlMultOp:        mStream << "vpiMultOp"; break;
+  case kVlLogAndOp:      mStream << "vpiLogAndOp"; break;
+  case kVlLogOrOp:       mStream << "vpiLogOrOp"; break;
+  case kVlBitAndOp:      mStream << "vpiBitAndOp"; break;
+  case kVlBitOrOp:       mStream << "vpiBitOrOp"; break;
+  case kVlBitXorOp:      mStream << "vpiBitXorOp"; break;
+  case kVlBitXNorOp:     mStream << "vpiBitXNorOp"; break;
+  case kVlConditionOp:   mStream << "vpiConditionOp"; break;
+  case kVlConcatOp:      mStream << "vpiConcatOp"; break;
+  case kVlMultiConcatOp: mStream << "vpiMultiConcatOp"; break;
+  case kVlEventOrOp:     mStream << "vpiEventOrOp"; break;
+  case kVlNullOp:        mStream << "vpiNullOp"; break;
+  case kVlListOp:        mStream << "vpiListOp"; break;
+  case kVlMinTypMaxOp:   mStream << "vpiMinTypMaxOp"; break;
+  case kVlPosedgeOp:     mStream << "vpiPosedgeOp"; break;
+  case kVlNegedgeOp:     mStream << "vpiNegedgeOp"; break;
+  case kVlArithLShiftOp: mStream << "vpiArithLShiftOp"; break;
+  case kVlArithRShiftOp: mStream << "vpiArithRShiftOp"; break;
+  case kVlPowerOp:       mStream << "vpiPowerOp"; break;
+  default: mStream << "illegal value: " << op_type; break;
   }
 }
 

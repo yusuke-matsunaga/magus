@@ -15,7 +15,6 @@
 #include "ym_networks/MvnModule.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_verilog/BitVector.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -263,9 +262,9 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   for (ymuint i = 0; i < nio_all; ++ i) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
-    case kVpiInput:  ++ ni; break;
-    case kVpiOutput: ++ no; break;
-    case kVpiInout:  ++ nio; break;
+    case kVlInput:  ++ ni; break;
+    case kVlOutput: ++ no; break;
+    case kVlInout:  ++ nio; break;
     default:
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      io->file_region(),
@@ -284,9 +283,9 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   for (ymuint i = 0; i < nio_all; ++ i) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
-    case kVpiInput:  ibw_array[ni] = io->bit_size(); ++ ni; break;
-    case kVpiOutput: obw_array[no] = io->bit_size(); ++ no; break;
-    case kVpiInout:  iobw_array[nio] = io->bit_size(); ++ nio; break;
+    case kVlInput:  ibw_array[ni] = io->bit_size(); ++ ni; break;
+    case kVlOutput: obw_array[no] = io->bit_size(); ++ no; break;
+    case kVlInout:  iobw_array[nio] = io->bit_size(); ++ nio; break;
     default: break;
     }
   }
@@ -303,17 +302,17 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     const VlDecl* decl = io->decl();
     MvnNode* node = NULL;
     switch ( io->direction() ) {
-    case kVpiInput:
+    case kVlInput:
       node = module->input(i1);
       ++ i1;
       break;
 
-    case kVpiOutput:
+    case kVlOutput:
       node = module->output(i2);
       ++ i2;
       break;
 
-    case kVpiInout:
+    case kVlInout:
       node = module->inout(i3);
       ++ i3;
       break;
@@ -342,7 +341,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     const VlPort* port = vl_module->port(i);
     const VlExpr* expr = port->low_conn();
     if ( expr->is_operation() ) {
-      assert_cond( expr->op_type().val() == vpiConcatOp, __FILE__, __LINE__);
+      assert_cond( expr->op_type() == kVlConcatOp, __FILE__, __LINE__);
       ymuint n = expr->operand_num();
       mMvnMgr->init_port(module, i, port->name(), n);
       for (ymuint j = 0; j < n; ++ j) {

@@ -12,7 +12,6 @@
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtStmt.h"
@@ -2044,7 +2043,7 @@ delay_value
 }
 | '(' expression ')'
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiNullOp), $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNullOp, $2, NULL);
 }
 ;
 /*
@@ -4974,11 +4973,11 @@ event_primary
 }
 | POSEDGE expression
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiPosedgeOp), $2, NULL);
+  $$ = parser.new_Opr(@$, kVlPosedgeOp, $2, NULL);
 }
 | NEGEDGE expression
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiNegedgeOp), $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNegedgeOp, $2, NULL);
 }
 ;
 
@@ -6188,7 +6187,7 @@ expression
 }
 | expr1 '?' ai_list expr1 ':' expression %prec COND
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiConditionOp), $1, $4, $6, $3);
+  $$ = parser.new_Opr(@$, kVlConditionOp, $1, $4, $6, $3);
 }
 ;
 
@@ -6199,139 +6198,139 @@ expr1
 }
 | '+' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiPlusOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlPlusOp, $3, $2);
 }
 | '-' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiMinusOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlMinusOp, $3, $2);
 }
 | '!' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiNotOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlNotOp, $3, $2);
 }
 | '~' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiBitNegOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlBitNegOp, $3, $2);
 }
 | '&' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryAndOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryAndOp, $3, $2);
 }
 | '|' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryOrOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryOrOp, $3, $2);
 }
 | '^' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryXorOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryXorOp, $3, $2);
 }
 | TILDEAND ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryNandOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryNandOp, $3, $2);
 }
 | TILDEOR ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryNorOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryNorOp, $3, $2);
 }
 | TILDEXOR ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryXNorOp), $3, $2);
+  $$ = parser.new_Opr(@$, kVlUnaryXNorOp, $3, $2);
 }
 | expr1 STARSTAR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiPowerOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlPowerOp, $1, $4, $3);
 }
 | expr1 '+' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiAddOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlAddOp, $1, $4, $3);
 }
 | expr1 '-' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiSubOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlSubOp, $1, $4, $3);
 }
 | expr1 '*' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiMultOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlMultOp, $1, $4, $3);
 }
 | expr1 '/' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiDivOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlDivOp, $1, $4, $3);
 }
 | expr1 '%' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiModOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlModOp, $1, $4, $3);
 }
 | expr1 EQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiEqOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlEqOp, $1, $4, $3);
 }
 | expr1 NOTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiNeqOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlNeqOp, $1, $4, $3);
 }
 | expr1 EQEQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiCaseEqOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlCaseEqOp, $1, $4, $3);
 }
 | expr1 NOTEQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiCaseNeqOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlCaseNeqOp, $1, $4, $3);
 }
 | expr1 ANDAND ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiLogAndOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLogAndOp, $1, $4, $3);
 }
 | expr1 OROR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiLogOrOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLogOrOp, $1, $4, $3);
 }
 | expr1 '<' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiLtOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLtOp, $1, $4, $3);
 }
 | expr1 '>' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiGtOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlGtOp, $1, $4, $3);
 }
 | expr1 LTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiLeOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLeOp, $1, $4, $3);
 }
 | expr1 GTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiGeOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlGeOp, $1, $4, $3);
 }
 | expr1 '&' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiBitAndOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitAndOp, $1, $4, $3);
 }
 | expr1 '|' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiBitOrOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitOrOp, $1, $4, $3);
 }
 | expr1 '^' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiBitXorOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitXorOp, $1, $4, $3);
 }
 | expr1 TILDEXOR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiBitXNorOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlBitXNorOp, $1, $4, $3);
 }
 | expr1 LTLT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiLShiftOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlLShiftOp, $1, $4, $3);
 }
 | expr1 GTGT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiRShiftOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlRShiftOp, $1, $4, $3);
 }
 | expr1 LTLTLT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiArithLShiftOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlArithLShiftOp, $1, $4, $3);
 }
 | expr1 GTGTGT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, VlOpType(vpiArithRShiftOp), $1, $4, $3);
+  $$ = parser.new_Opr(@$, kVlArithRShiftOp, $1, $4, $3);
 }
 | STRING
 {
@@ -6514,12 +6513,12 @@ primary
 | '(' expression ')'
 {
   // 括弧の位置を保持するためのトリック
-  $$ = parser.new_Opr(@$, VlOpType(vpiNullOp), $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNullOp, $2, NULL);
 }
 | '(' mintypmax_expression ')'
 {
   // 括弧の位置を保持するためのトリック
-  $$ = parser.new_Opr(@$, VlOpType(vpiNullOp), $2, NULL);
+  $$ = parser.new_Opr(@$, kVlNullOp, $2, NULL);
 }
 ;
 

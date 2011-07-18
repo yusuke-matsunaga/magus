@@ -266,16 +266,16 @@ EiUdpIO::name() const
 }
 
 // @brief 方向を返す．
-tVpiDirection
+tVlDirection
 EiUdpIO::direction() const
 {
   switch ( mPtHeader->type() ) {
-  case kPtIO_Input:  return kVpiInput;
-  case kPtIO_Output: return kVpiOutput;
+  case kPtIO_Input:  return kVlInput;
+  case kPtIO_Output: return kVlOutput;
   default: assert_not_reached(__FILE__, __LINE__);
   }
   // ダミー
-  return kVpiNoDirection;
+  return kVlNoDirection;
 }
 
 // @brief 符号の属性の取得

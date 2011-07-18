@@ -374,7 +374,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     }
 
     ymuint port_size = port->bit_size();
-    if ( port->direction() == kVpiInput ) {
+    if ( port->direction() == kVlInput ) {
       // 入力ポートには任意の式を接続できる．
       ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
       if ( !tmp ) {
@@ -591,7 +591,7 @@ ItemGen::link_module(ElbModule* module,
 
     ymuint port_size = port->bit_size();
 
-    if ( port->direction() == kVpiInput ) {
+    if ( port->direction() == kVlInput ) {
       // 入力ポートには任意の式を接続できる．
       ElbExpr* tmp = instantiate_expr(parent, env, pt_expr);
       if ( !tmp ) {

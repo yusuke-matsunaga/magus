@@ -5,14 +5,13 @@
 ///
 /// $Id: EiExpr.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "EiExpr.h"
 #include "EiOperation.h"
 
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/VlTime.h"
 #include "ym_verilog/VlValue.h"
@@ -266,11 +265,11 @@ EiExpr::parent_expr() const
 
 // @brief 演算子のタイプを返す．
 // @note 演算子の時，意味を持つ．
-// @note このクラスでは vpiNullOp を返す．
-VlOpType
+// @note このクラスでは kVlNullOp を返す．
+tVlOpType
 EiExpr::op_type() const
 {
-  return VlOpType(vpiNullOp);
+  return kVlNullOp;
 }
 
 // @brief オペランド数を返す．
@@ -447,7 +446,7 @@ EiOperation::is_operation() const
 }
 
 // @brief 演算子のタイプを返す．
-VlOpType
+tVlOpType
 EiOperation::op_type() const
 {
   return pt_expr()->op_type();

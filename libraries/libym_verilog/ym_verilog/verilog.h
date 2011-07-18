@@ -41,13 +41,15 @@ BEGIN_NAMESPACE_YM_VERILOG
 class BitVector;
 class VlLineWatcher;
 class VlMgr;
-class VlOpType;
 class VlScalarVal;
 class VlTime;
 class VlUdpVal;
 class VlValue;
 class VlValueType;
 
+END_NAMESPACE_YM_VERILOG
+
+BEGIN_NAMESPACE_YM
 
 /// @defgroup VlCommon Verilog 用基本ユーティリティ
 /// @ingroup VlGroup
@@ -185,13 +187,18 @@ enum tVpiDefDelayMode {
 /// @note この列挙型の値を強制的に int にキャストしても
 /// vpi_user.h の定義値として使える．
 //////////////////////////////////////////////////////////////////////
-enum tVpiDirection {
-  kVpiInput       = vpiInput,
-  kVpiOutput      = vpiOutput,
-  kVpiInout       = vpiInout,
-  kVpiMixedIO     = vpiMixedIO,
-  kVpiNoDirection = vpiNoDirection
+enum tVlDirection {
+  kVlInput       = vpiInput,
+  kVlOutput      = vpiOutput,
+  kVlInout       = vpiInout,
+  kVlMixedIO     = vpiMixedIO,
+  kVlNoDirection = vpiNoDirection
 };
+
+/// @brief tVlDirection のストリーム出力
+ostream&
+operator<<(ostream& s,
+	   tVlDirection dir);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -312,6 +319,58 @@ enum tVpiTchkType {
   kVpiRecrem     = vpiRecrem,
   kVpiRemoval    = vpiRemoval,
   kVpiTimeskew   = vpiTimeskew
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief operation の型
+/// @note この列挙型の値を強制的に int にキャストしても
+/// vpi_user.h の定義値として使える．
+//////////////////////////////////////////////////////////////////////
+enum tVlOpType {
+  kVlMinusOp        = vpiMinusOp,
+  kVlPlusOp         = vpiPlusOp,
+  kVlNotOp          = vpiNotOp,
+  kVlBitNegOp       = vpiBitNegOp,
+  kVlUnaryAndOp     = vpiUnaryAndOp,
+  kVlUnaryNandOp    = vpiUnaryNandOp,
+  kVlUnaryOrOp      = vpiUnaryOrOp,
+  kVlUnaryNorOp     = vpiUnaryNorOp,
+  kVlUnaryXorOp     = vpiUnaryXorOp,
+  kVlUnaryXNorOp    = vpiUnaryXNorOp,
+  kVlSubOp          = vpiSubOp,
+  kVlDivOp          = vpiDivOp,
+  kVlModOp          = vpiModOp,
+  kVlEqOp           = vpiEqOp,
+  kVlNeqOp          = vpiNeqOp,
+  kVlCaseEqOp       = vpiCaseEqOp,
+  kVlCaseNeqOp      = vpiCaseNeqOp,
+  kVlGtOp           = vpiGtOp,
+  kVlGeOp           = vpiGeOp,
+  kVlLtOp           = vpiLtOp,
+  kVlLeOp           = vpiLeOp,
+  kVlLShiftOp       = vpiLShiftOp,
+  kVlRShiftOp       = vpiRShiftOp,
+  kVlAddOp          = vpiAddOp,
+  kVlMultOp         = vpiMultOp,
+  kVlLogAndOp       = vpiLogAndOp,
+  kVlLogOrOp        = vpiLogOrOp,
+  kVlBitAndOp       = vpiBitAndOp,
+  kVlBitOrOp        = vpiBitOrOp,
+  kVlBitXorOp       = vpiBitXorOp,
+  kVlBitXNorOp      = vpiBitXNorOp,
+  kVlConditionOp    = vpiConditionOp,
+  kVlConcatOp       = vpiConcatOp,
+  kVlMultiConcatOp  = vpiMultiConcatOp,
+  kVlEventOrOp      = vpiEventOrOp,
+  kVlNullOp         = vpiNullOp,
+  kVlListOp         = vpiListOp,
+  kVlMinTypMaxOp    = vpiMinTypMaxOp,
+  kVlPosedgeOp      = vpiPosedgeOp,
+  kVlNegedgeOp      = vpiNegedgeOp,
+  kVlArithLShiftOp  = vpiArithLShiftOp,
+  kVlArithRShiftOp  = vpiArithRShiftOp,
+  kVlPowerOp        = vpiPowerOp
 };
 
 
@@ -473,14 +532,30 @@ enum tVpiSpecPathType {
 
 /// @}
 
-END_NAMESPACE_YM_VERILOG
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
 
-BEGIN_NAMESPACE_YM
+// @brief tVlDirection のストリーム出力
+inline
+ostream&
+operator<<(ostream& s,
+	   tVlDirection dir)
+{
+  switch ( dir ) {
+  case kVlInput:       s << "Input"; break;
+  case kVlOutput:      s << "Output"; break;
+  case kVlInout:       s << "Inout"; break;
+  case kVlMixedIO:     s << "Mixed IO"; break;
+  case kVlNoDirection: s << "No Direction"; break;
+  }
+  return s;
+}
+
 
 using nsVerilog::BitVector;
 using nsVerilog::VlLineWatcher;
 using nsVerilog::VlMgr;
-using nsVerilog::VlOpType;
 using nsVerilog::VlScalarVal;
 using nsVerilog::VlTime;
 using nsVerilog::VlUdpVal;

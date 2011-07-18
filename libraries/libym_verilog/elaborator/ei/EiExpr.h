@@ -216,9 +216,9 @@ public:
 
   /// @brief 演算子のタイプを返す．
   /// @note 演算子の時，意味を持つ．
-  /// @note このクラスでは vpiNullOp を返す．
+  /// @note このクラスでは kVlNullOp を返す．
   virtual
-  VlOpType
+  tVlOpType
   op_type() const;
 
   /// @brief オペランド数を返す．

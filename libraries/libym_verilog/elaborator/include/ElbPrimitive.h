@@ -254,7 +254,7 @@ public:
   void
   set(ElbPrimitive* primitive,
       ymuint index,
-      tVpiDirection dir) = 0;
+      tVlDirection dir) = 0;
 
 };
 

@@ -12,7 +12,6 @@
 #include "EiFactory.h"
 #include "EiBinaryOp.h"
 
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/BitVector.h"
 
 
@@ -29,57 +28,57 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr1 オペランド
 ElbExpr*
 EiFactory::new_BinaryOp(const PtExpr* pt_expr,
-			const VlOpType& op_type,
+			tVlOpType op_type,
 			ElbExpr* opr0,
 			ElbExpr* opr1)
 {
   ElbExpr* expr = NULL;
   void* p;
-  switch( op_type.val() ) {
-  case vpiBitAndOp:
-  case vpiBitOrOp:
-  case vpiBitXNorOp:
-  case vpiBitXorOp:
+  switch( op_type ) {
+  case kVlBitAndOp:
+  case kVlBitOrOp:
+  case kVlBitXNorOp:
+  case kVlBitXorOp:
     p = mAlloc.get_memory(sizeof(EiBinaryBitOp));
     expr = new (p) EiBinaryBitOp(pt_expr, opr0, opr1);
     break;
 
-  case vpiAddOp:
-  case vpiSubOp:
-  case vpiMultOp:
-  case vpiDivOp:
-  case vpiModOp:
+  case kVlAddOp:
+  case kVlSubOp:
+  case kVlMultOp:
+  case kVlDivOp:
+  case kVlModOp:
     p = mAlloc.get_memory(sizeof(EiBinaryArithOp));
     expr = new (p) EiBinaryArithOp(pt_expr, opr0, opr1);
     break;
 
-  case vpiPowerOp:
+  case kVlPowerOp:
     p = mAlloc.get_memory(sizeof(EiPowerOp));
     expr = new (p) EiPowerOp(pt_expr, opr0, opr1);
     break;
 
-  case vpiLShiftOp:
-  case vpiRShiftOp:
-  case vpiArithLShiftOp:
-  case vpiArithRShiftOp:
+  case kVlLShiftOp:
+  case kVlRShiftOp:
+  case kVlArithLShiftOp:
+  case kVlArithRShiftOp:
     p = mAlloc.get_memory(sizeof(EiShiftOp));
     expr = new (p) EiShiftOp(pt_expr, opr0, opr1);
     break;
 
-  case vpiLogAndOp:
-  case vpiLogOrOp:
+  case kVlLogAndOp:
+  case kVlLogOrOp:
     p = mAlloc.get_memory(sizeof(EiBinaryLogOp));
     expr = new (p) EiBinaryLogOp(pt_expr, opr0, opr1);
     break;
 
-  case vpiCaseEqOp:
-  case vpiCaseNeqOp:
-  case vpiEqOp:
-  case vpiNeqOp:
-  case vpiGeOp:
-  case vpiGtOp:
-  case vpiLeOp:
-  case vpiLtOp:
+  case kVlCaseEqOp:
+  case kVlCaseNeqOp:
+  case kVlEqOp:
+  case kVlNeqOp:
+  case kVlGeOp:
+  case kVlGtOp:
+  case kVlLeOp:
+  case kVlLtOp:
     p = mAlloc.get_memory(sizeof(EiCompareOp));
     expr = new (p) EiCompareOp(pt_expr, opr0, opr1);
     break;

@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class ElbIOHead
 {
 protected:
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbIOHead() { }
@@ -36,7 +36,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const = 0;
 
   /// @brief 親のモジュールの取得

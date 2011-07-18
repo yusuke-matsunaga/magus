@@ -312,7 +312,7 @@ ItemGen::link_prim_array(ElbPrimArray* prim_array,
 
     const VlPrimTerm* term = prim->prim_term(index);
     ElbExpr* tmp = NULL;
-    if ( term->direction() == kVpiInput ) {
+    if ( term->direction() == kVlInput ) {
       // 入力に接続するのは通常の右辺式
       tmp = instantiate_expr(parent, env1, pt_expr);
     }
@@ -391,7 +391,7 @@ ItemGen::link_primitive(ElbPrimitive* primitive,
 
     const VlPrimTerm* term = primitive->prim_term(index);
     ElbExpr* tmp = NULL;
-    if ( term->direction() == kVpiInput ) {
+    if ( term->direction() == kVlInput ) {
       // 入力に接続するのは通常の右辺式
       tmp = instantiate_expr(parent, env1, pt_expr);
     }

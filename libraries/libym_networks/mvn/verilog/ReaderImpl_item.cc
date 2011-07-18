@@ -16,7 +16,6 @@
 #include "ym_networks/MvnNode.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/VlValue.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -185,8 +184,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
   for (ymuint i = 0; i < ev_num; ++ i) {
     const VlExpr* expr = control->event(i);
     if ( expr->type() == kVpiOperation ) {
-      if ( expr->op_type().val() == vpiPosedgeOp ||
-	   expr->op_type().val() == vpiNegedgeOp ) {
+      if ( expr->op_type() == kVlPosedgeOp ||
+	   expr->op_type() == kVlNegedgeOp ) {
 	has_edge_event = true;
       }
       else {
@@ -229,7 +228,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       const VlExpr* expr = control->event(i);
       const VlExpr* opr1 = expr->operand(0);
       MvnNode* node1 = gen_primary(opr1, mGlobalEnv);
-      ymuint pol = (expr->op_type().val() == vpiPosedgeOp) ? 1 : 0;
+      ymuint pol = (expr->op_type() == kVlPosedgeOp) ? 1 : 0;
       event_node_array[i] = make_pair(node1, pol);
     }
     vector<bool> event_map(ev_num, false);
@@ -404,8 +403,8 @@ ReaderImpl::parse_cond(const VlExpr* cond,
   }
 
   if ( cond->is_operation() ) {
-    if ( cond->op_type().val() == vpiNotOp ||
-	 cond->op_type().val() == vpiBitNegOp ) {
+    if ( cond->op_type() == kVlNotOp ||
+	 cond->op_type() == kVlBitNegOp ) {
       const VlExpr* opr1 = cond->operand(0);
       if ( !opr1->is_primary() ) {
 	return false;
@@ -416,8 +415,8 @@ ReaderImpl::parse_cond(const VlExpr* cond,
       return true;
     }
 
-    switch ( cond->op_type().val() ) {
-    case vpiEqOp:
+    switch ( cond->op_type() ) {
+    case kVlEqOp:
       {
 	const VlExpr* opr1 = cond->operand(0);
 	const VlExpr* opr2 = cond->operand(1);
@@ -432,7 +431,7 @@ ReaderImpl::parse_cond(const VlExpr* cond,
       }
       break;
 
-    case vpiNeqOp:
+    case kVlNeqOp:
       {
 	const VlExpr* opr1 = cond->operand(0);
 	const VlExpr* opr2 = cond->operand(1);
@@ -445,6 +444,9 @@ ReaderImpl::parse_cond(const VlExpr* cond,
 	  return parse_cond_sub(opr2, opr1, env, 1, 0, node, pol);
 	}
       }
+
+    default:
+      break;
     }
   }
   return false;
@@ -510,23 +512,23 @@ ReaderImpl::gen_moduleinst(MvnModule* parent_module,
     if ( hi == NULL ) continue;
     const VlExpr* lo = vl_port->low_conn();
     switch ( vl_port->direction() ) {
-    case kVpiInput:
+    case kVlInput:
       // hi は右辺式
       // lo は左辺式
       gen_cont_assign(parent_module, lo, hi);
       break;
 
-    case kVpiOutput:
+    case kVlOutput:
       // hi は左辺式
       // lo は右辺式
       gen_cont_assign(parent_module, hi, lo);
       break;
 
-    case kVpiInout:
+    case kVlInout:
       // hi は単純な参照か連結のみ
       break;
 
-    case kVpiMixedIO:
+    case kVlMixedIO:
       // hi は単純な参照か連結のみ
       //connect_port2(port, hi);
       // TODO: connect_port2 を作る

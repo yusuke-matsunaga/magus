@@ -246,7 +246,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 符号の属性の取得

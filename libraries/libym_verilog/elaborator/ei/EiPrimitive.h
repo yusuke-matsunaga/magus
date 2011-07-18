@@ -775,7 +775,7 @@ public:
 
   /// @brief 入出力の種類を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 端子番号を返す．
@@ -798,7 +798,7 @@ public:
   void
   set(ElbPrimitive* primitive,
       ymuint index,
-      tVpiDirection dir);
+      tVlDirection dir);
 
 
 private:

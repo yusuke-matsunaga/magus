@@ -53,10 +53,10 @@ SptExpr::type() const
 // @brief 演算子の種類の取得
 // @return 演算子の種類
 // このクラスでは vpiNullOp を返す．
-VlOpType
+tVlOpType
 SptExpr::op_type() const
 {
-  return VlOpType(vpiNullOp);
+  return kVlNullOp;
 }
 
 // @brief 階層ブランチの取得
@@ -238,7 +238,7 @@ SptExpr::is_simple() const
 // @param[in] op_type 演算子の種類
 // @param[in] opr_list　オペランドのリスト
 SptOpr1::SptOpr1(const FileRegion& file_region,
-		 const VlOpType& op_type,
+		 tVlOpType op_type,
 		 const PtExpr* opr1,
 		 const PtExpr* opr2,
 		 const PtExpr* opr3) :
@@ -266,7 +266,7 @@ SptOpr1::~SptOpr1()
 
 // @brief 演算子の種類の取得
 // @return 演算子の種類
-VlOpType
+tVlOpType
 SptOpr1::op_type() const
 {
   return mOpType;
@@ -279,7 +279,7 @@ bool
 SptOpr1::is_index_expr() const
 {
   // 算術演算なら本当はOKだけどめんどくさいので単項のマイナスのみOKとする．
-  if ( mOpType.val() == vpiMinusOp || mOpType.val() == vpiNullOp ) {
+  if ( mOpType == kVlMinusOp || mOpType == kVlNullOp ) {
     return operand(0)->is_index_expr();
   }
   else {
@@ -292,12 +292,15 @@ SptOpr1::is_index_expr() const
 int
 SptOpr1::index_value() const
 {
-  switch ( mOpType.val() ) {
-  case vpiNullOp:
+  switch ( mOpType ) {
+  case kVlNullOp:
     return operand(0)->index_value();
 
-  case vpiMinusOp:
+  case kVlMinusOp:
     return - operand(0)->index_value();
+
+  default:
+    break;
   }
   return 0;
 }
@@ -329,7 +332,7 @@ SptOpr1::operand(ymuint pos) const
 // @param[in] op_type 演算子の種類
 // @param[in] opr_array　オペランドのリスト
 SptOpr2::SptOpr2(const FileRegion& file_region,
-		 const VlOpType& op_type,
+		 tVlOpType op_type,
 		 PtExprArray opr_array) :
   SptExpr(file_region, kPtOprExpr),
   mOpType(op_type),
@@ -344,7 +347,7 @@ SptOpr2::~SptOpr2()
 
 // @brief 演算子の種類の取得
 // @return 演算子の種類
-VlOpType
+tVlOpType
 SptOpr2::op_type() const
 {
   return mOpType;
@@ -641,7 +644,7 @@ SptConstant::const_type() const
 // @return 生成された演算子
 const PtExpr*
 SptFactory::new_Opr(const FileRegion& file_region,
-		    const VlOpType& type,
+		    tVlOpType type,
 		    const PtExpr* opr)
 {
   void* p = alloc().get_memory(sizeof(SptOpr1));
@@ -657,7 +660,7 @@ SptFactory::new_Opr(const FileRegion& file_region,
 // @return 生成された演算子
 const PtExpr*
 SptFactory::new_Opr(const FileRegion& file_region,
-		    const VlOpType& type,
+		    tVlOpType type,
 		    const PtExpr* opr1,
 		    const PtExpr* opr2)
 {
@@ -675,7 +678,7 @@ SptFactory::new_Opr(const FileRegion& file_region,
 // @return 生成された演算子
 const PtExpr*
 SptFactory::new_Opr(const FileRegion& file_region,
-		    const VlOpType& type,
+		    tVlOpType type,
 		    const PtExpr* opr1,
 		    const PtExpr* opr2,
 		    const PtExpr* opr3)
@@ -694,7 +697,7 @@ SptFactory::new_Concat(const FileRegion& file_region,
 		       PtExprArray expr_array)
 {
   void* p = alloc().get_memory(sizeof(SptOpr2));
-  return new (p) SptOpr2(file_region, VlOpType(vpiConcatOp), expr_array);
+  return new (p) SptOpr2(file_region, kVlConcatOp, expr_array);
 }
 
 // @brief multi-concatination 演算子の生成
@@ -706,7 +709,7 @@ SptFactory::new_MultiConcat(const FileRegion& file_region,
 			    PtExprArray expr_array)
 {
   void* p = alloc().get_memory(sizeof(SptOpr2));
-  return new (p) SptOpr2(file_region, VlOpType(vpiMultiConcatOp), expr_array);
+  return new (p) SptOpr2(file_region, kVlMultiConcatOp, expr_array);
 }
 
 // @brief min/typ/max delay 演算子の生成
@@ -722,7 +725,7 @@ SptFactory::new_MinTypMax(const FileRegion& file_region,
 			  const PtExpr* val2)
 {
   void* p = alloc().get_memory(sizeof(SptOpr1));
-  return new (p) SptOpr1(file_region, VlOpType(vpiMinTypMaxOp),
+  return new (p) SptOpr1(file_region, kVlMinTypMaxOp,
 			 val0, val1, val2);
 }
 

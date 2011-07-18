@@ -344,7 +344,7 @@ public:
   init_port(ymuint index,
 	    const PtPort* pt_port,
 	    ElbExpr* low_conn,
-	    tVpiDirection dir);
+	    tVlDirection dir);
 
   /// @brief ポートの high_conn を接続する．
   /// @param[in] index ポート番号

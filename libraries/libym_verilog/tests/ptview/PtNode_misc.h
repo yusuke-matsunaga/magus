@@ -13,7 +13,6 @@
 
 #include "PtNode.h"
 #include "ym_verilog/verilog.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/pt/PtArray.h"
 
@@ -577,7 +576,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] dir 入出力の方向
-  DirNode(tVpiDirection dir);
+  DirNode(tVlDirection dir);
 
   /// @brief デストラクタ
   virtual
@@ -601,7 +600,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入出力の方向
-  tVpiDirection mDir;
+  tVlDirection mDir;
 
 };
 
@@ -738,7 +737,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] op_type 演算子の型
-  OpTypeNode(const VlOpType& op_type);
+  OpTypeNode(tVlOpType op_type);
 
   /// @brief デストラクタ
   virtual
@@ -762,7 +761,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の型
-  VlOpType mOpType;
+  tVlOpType mOpType;
 
 };
 

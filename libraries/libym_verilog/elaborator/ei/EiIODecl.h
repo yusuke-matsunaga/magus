@@ -42,7 +42,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 親のモジュールの取得
@@ -251,7 +251,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief 符号の取得

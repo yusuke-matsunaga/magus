@@ -42,11 +42,11 @@ public:
   name() const = 0;
 
   /// @brief 方向を返す．
-  /// @retval kVpiInput 入力
-  /// @retval kVpiOutput 出力
-  /// @retval kVpiInout 入出力
+  /// @retval kVlInput 入力
+  /// @retval kVlOutput 出力
+  /// @retval kVlInout 入出力
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const = 0;
 
   /// @brief 符号の取得

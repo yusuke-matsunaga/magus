@@ -12,7 +12,6 @@
 #include "EiFactory.h"
 #include "EiTernaryOp.h"
 
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/BitVector.h"
 
 
@@ -30,20 +29,20 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr2 オペランド
 ElbExpr*
 EiFactory::new_TernaryOp(const PtExpr* pt_expr,
-			 const VlOpType& op_type,
+			 tVlOpType op_type,
 			 ElbExpr* opr0,
 			 ElbExpr* opr1,
 			 ElbExpr* opr2)
 {
   ElbExpr* expr = NULL;
   void* p;
-  switch ( op_type.val() ) {
-  case vpiConditionOp:
+  switch ( op_type ) {
+  case kVlConditionOp:
     p = mAlloc.get_memory(sizeof(EiConditionOp));
     expr = new (p) EiConditionOp(pt_expr, opr0, opr1, opr2);
     break;
 
-  case vpiMinTypMaxOp:
+  case kVlMinTypMaxOp:
     p = mAlloc.get_memory(sizeof(EiMinTypMaxOp));
     expr = new (p) EiMinTypMaxOp(pt_expr, opr0, opr1, opr2);
     break;

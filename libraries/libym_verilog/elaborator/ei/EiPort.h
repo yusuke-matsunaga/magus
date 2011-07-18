@@ -59,7 +59,7 @@ public:
 
   /// @brief 入出力の区別を得る．
   virtual
-  tVpiDirection
+  tVlDirection
   direction() const;
 
   /// @brief ビット幅を返す．
@@ -120,7 +120,7 @@ public:
        const PtPort* pt_port,
        ymuint index,
        ElbExpr* low_conn,
-       tVpiDirection dir);
+       tVlDirection dir);
 
   /// @brief high_conn を接続する．
   virtual
@@ -150,7 +150,7 @@ private:
   ElbExpr* mLowConn;
 
   // 向き
-  tVpiDirection mDirection;
+  tVlDirection mDirection;
 
   // 名前による結合の時 true となるフラグ
   bool mConnByName;

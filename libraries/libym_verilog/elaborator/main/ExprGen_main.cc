@@ -12,7 +12,6 @@
 #include "ExprGen.h"
 #include "ElbEnv.h"
 
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtExpr.h"
@@ -58,7 +57,7 @@ ExprGen::instantiate_expr(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->op_type().val() == vpiNullOp ) {
+	  pt_expr->op_type() == kVlNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 
@@ -118,15 +117,15 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->op_type().val() == vpiNullOp ) {
+	  pt_expr->op_type() == kVlNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
-    switch ( pt_expr->op_type().val() ) {
-    case vpiPosedgeOp:
-    case vpiNegedgeOp:
+    switch ( pt_expr->op_type() ) {
+    case kVlPosedgeOp:
+    case kVlNegedgeOp:
       { // これのみがイベント式の特徴
 	assert_cond(pt_expr->operand_num() == 1, __FILE__, __LINE__);
 	ElbExpr* opr0 = instantiate_expr(parent, env, pt_expr->operand(0));
@@ -196,7 +195,7 @@ ExprGen::instantiate_arg(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->op_type().val() == vpiNullOp ) {
+	  pt_expr->op_type() == kVlNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 
@@ -222,7 +221,7 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
     // 左辺では concatination しか適当でない．
-    if ( pt_expr->op_type().val() == vpiConcatOp ) {
+    if ( pt_expr->op_type() == kVlConcatOp ) {
       vector<ElbExpr*> elem_array;
       ymuint opr_size = pt_expr->operand_num();
       ElbExpr** opr_list = factory().new_ExprList(opr_size);
@@ -300,7 +299,7 @@ ExprGen::instantiate_lhs_sub(const VlNamedObj* parent,
   switch ( pt_expr->type() ) {
   case kPtOprExpr:
     // 左辺では concatination しか適当でない．
-    if ( pt_expr->op_type().val() == vpiConcatOp ) {
+    if ( pt_expr->op_type() == kVlConcatOp ) {
       ymuint opr_size = pt_expr->operand_num();
       ElbExpr** opr_list = factory().new_ExprList(opr_size);
       for (ymuint i = 0; i < opr_size; ++ i) {
@@ -460,7 +459,7 @@ ExprGen::evaluate_expr(const VlNamedObj* parent,
 {
   // '(' expression ')' の時の対応
   while ( pt_expr->type() == kPtOprExpr &&
-	  pt_expr->op_type().val() == vpiNullOp ) {
+	  pt_expr->op_type() == kVlNullOp ) {
     pt_expr = pt_expr->operand(0);
   }
 

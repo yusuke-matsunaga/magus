@@ -12,7 +12,6 @@
 
 
 #include "PtiExpr.h"
-#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/pt/PtArray.h"
 
 #include "ym_utils/FileRegion.h"
@@ -45,7 +44,7 @@ public:
   /// @return 演算子の種類
   /// @note このクラスでは vpiNullOp を返す．
   virtual
-  VlOpType
+  tVlOpType
   op_type() const;
 
   /// @brief 階層ブランチの取得
@@ -187,7 +186,7 @@ class CptOpr :
 protected:
 
   // コンストラクタ
-  CptOpr(const VlOpType& op_type);
+  CptOpr(tVlOpType op_type);
 
   // デストラクタ
   virtual
@@ -207,7 +206,7 @@ public:
 
   // 演算子のトークン番号を得る．
   virtual
-  VlOpType
+  tVlOpType
   op_type() const;
 
 
@@ -217,7 +216,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子を表すトークン番号
-  VlOpType mOpType;
+  tVlOpType mOpType;
 
 };
 
@@ -234,7 +233,7 @@ protected:
 
   // コンストラクタ
   CptOpr1(const FileRegion& file_region,
-	  const VlOpType& op_type,
+	  tVlOpType op_type,
 	  const PtExpr* opr);
 
   // デストラクタ
@@ -301,7 +300,7 @@ class CptOpr2 :
 protected:
 
   // コンストラクタ
-  CptOpr2(const VlOpType& op_type,
+  CptOpr2(tVlOpType op_type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2);
 
@@ -356,7 +355,7 @@ class CptOpr3 :
 protected:
 
   // コンストラクタ
-  CptOpr3(const VlOpType& op_type,
+  CptOpr3(tVlOpType op_type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2,
 	  const PtExpr* opr3);
@@ -436,7 +435,7 @@ public:
 
   ///演算子の種類の取得
   virtual
-  VlOpType
+  tVlOpType
   op_type() const;
 
   /// @brief オペランドの数の取得
@@ -492,7 +491,7 @@ public:
 
   ///演算子の種類の取得
   virtual
-  VlOpType
+  tVlOpType
   op_type() const;
 
 };
@@ -535,7 +534,7 @@ public:
 
   ///演算子の種類の取得
   virtual
-  VlOpType
+  tVlOpType
   op_type() const;
 
   /// @brief オペランドの数の取得

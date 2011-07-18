@@ -427,7 +427,7 @@ SptPort::portref_elem(ymuint pos) const
 }
 
 // @brief 内部のポート結線の報告の取得
-tVpiDirection
+tVlDirection
 SptPort::portref_dir(ymuint pos) const
 {
   return mDirArray[pos];
@@ -438,7 +438,7 @@ SptPort::portref_dir(ymuint pos) const
 // @param[in] dir 方向
 void
 SptPort::_set_portref_dir(ymuint pos,
-			  tVpiDirection dir)
+			  tVlDirection dir)
 {
   mDirArray[pos] = dir;
 }

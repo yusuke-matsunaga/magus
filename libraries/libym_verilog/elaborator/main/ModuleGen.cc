@@ -227,7 +227,7 @@ ModuleGen::instantiate_port(ElbModule* module,
     ymuint n = pt_port->portref_size();
 
     ElbExpr* low_conn = NULL;
-    tVpiDirection dir = kVpiNoDirection;
+    tVlDirection dir = kVlNoDirection;
 
     const PtExpr* pt_portref = pt_port->portref();
     if ( n == 1 ) {
@@ -249,12 +249,12 @@ ModuleGen::instantiate_port(ElbModule* module,
 	expr_list[i] = portexpr;
 	lhs_elem_array[n - i - 1] = portexpr;
 
-	tVpiDirection dir1 = pt_port->portref_dir(i);
-	if ( dir == kVpiNoDirection ) {
+	tVlDirection dir1 = pt_port->portref_dir(i);
+	if ( dir == kVlNoDirection ) {
 	  dir = dir1;
 	}
 	else if ( dir != dir1 ) {
-	  dir = kVpiMixedIO;
+	  dir = kVlMixedIO;
 	}
       }
 

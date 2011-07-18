@@ -665,13 +665,13 @@ EiPrimitive::init_port(EiPrimTerm* term_array)
 
   ymuint index = 0;
   for (ymuint i = 0; i < output_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVpiOutput);
+    mPortArray[index].set(this, index, kVlOutput);
   }
   for (ymuint i = 0; i < inout_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVpiInout);
+    mPortArray[index].set(this, index, kVlInout);
   }
   for (ymuint i = 0; i < input_num; ++ i, ++ index) {
-    mPortArray[index].set(this, index, kVpiInput);
+    mPortArray[index].set(this, index, kVlInput);
   }
 }
 
@@ -822,14 +822,14 @@ EiPrimTerm::primitive() const
 }
 
 // @brief 入出力の種類を返す．
-tVpiDirection
+tVlDirection
 EiPrimTerm::direction() const
 {
   if ( mIndexDir & 1U ) {
-    return kVpiOutput;
+    return kVlOutput;
   }
   else {
-    return kVpiInput;
+    return kVlInput;
   }
 }
 
@@ -851,11 +851,11 @@ EiPrimTerm::expr() const
 void
 EiPrimTerm::set(ElbPrimitive* primitive,
 		ymuint index,
-		tVpiDirection dir)
+		tVlDirection dir)
 {
   mPrimitive = primitive;
   mIndexDir = (index << 1);
-  if ( dir == kVpiOutput ) {
+  if ( dir == kVlOutput ) {
     mIndexDir |= 1U;
   }
 }

@@ -44,7 +44,7 @@ EiPort::init(ElbModule* module,
 	     const PtPort* pt_port,
 	     ymuint index,
 	     ElbExpr* low_conn,
-	     tVpiDirection dir)
+	     tVlDirection dir)
 {
   mModule = module;
   mPtPort = pt_port;
@@ -79,7 +79,7 @@ EiPort::file_region() const
 }
 
 // @brief 入出力の区別を得る．
-tVpiDirection
+tVlDirection
 EiPort::direction() const
 {
   return mDirection;

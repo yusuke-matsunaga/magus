@@ -636,7 +636,7 @@ VarTypeNode::data(int column,
 
 // @brief コンストラクタ
 // @param[in] dir 入出力の方向
-DirNode::DirNode(tVpiDirection dir) :
+DirNode::DirNode(tVlDirection dir) :
   mDir(dir)
 {
 }
@@ -659,11 +659,11 @@ DirNode::data(int column,
     }
     else if ( column == 1 ) {
       switch ( mDir ) {
-      case kVpiInput:       return "Input";
-      case kVpiOutput:      return "Output";
-      case kVpiInout:       return "Inout";
-      case kVpiMixedIO:     return "Mixed IO";
-      case kVpiNoDirection: return "No Direction";
+      case kVlInput:       return "Input";
+      case kVlOutput:      return "Output";
+      case kVlInout:       return "Inout";
+      case kVlMixedIO:     return "Mixed IO";
+      case kVlNoDirection: return "No Direction";
       }
     }
   }
@@ -822,7 +822,7 @@ PrimTypeNode::data(int column,
 
 // @brief コンストラクタ
 // @param[in] op_type 演算子のタイプ
-OpTypeNode::OpTypeNode(const VlOpType& op_type) :
+OpTypeNode::OpTypeNode(tVlOpType op_type) :
   mOpType(op_type)
 {
 }
@@ -844,50 +844,50 @@ OpTypeNode::data(int column,
       return "OpType";
     }
     else if ( column == 1 ) {
-      switch ( mOpType.val() ) {
-      case vpiMinusOp:       return "minus";
-      case vpiPlusOp:        return "plus";
-      case vpiNotOp:         return "not";
-      case vpiBitNegOp:      return "bitneg";
-      case vpiUnaryAndOp:    return "unary and";
-      case vpiUnaryNandOp:   return "unary nand";
-      case vpiUnaryOrOp:     return "unary or";
-      case vpiUnaryNorOp:    return "unary nor";
-      case vpiUnaryXorOp:    return "unary xor";
-      case vpiUnaryXNorOp:   return "unary xnor";
-      case vpiSubOp:         return "sub";
-      case vpiDivOp:         return "div";
-      case vpiModOp:         return "mod";
-      case vpiEqOp:          return "eq";
-      case vpiNeqOp:         return "neq";
-      case vpiCaseEqOp:      return "caseeq";
-      case vpiCaseNeqOp:     return "caseneq";
-      case vpiGtOp:          return "gt";
-      case vpiGeOp:          return "ge";
-      case vpiLtOp:          return "lt";
-      case vpiLeOp:          return "le";
-      case vpiLShiftOp:      return "left shift";
-      case vpiRShiftOp:      return "right shift";
-      case vpiAddOp:         return "add";
-      case vpiMultOp:        return "mult";
-      case vpiLogAndOp:      return "logical and";
-      case vpiLogOrOp:       return "logical or";
-      case vpiBitAndOp:      return "bit and";
-      case vpiBitOrOp:       return "bit or";
-      case vpiBitXorOp:      return "bit xor";
-      case vpiBitXNorOp:     return "bit xnor";
-      case vpiConditionOp:   return "conditional";
-      case vpiConcatOp:      return "concat";
-      case vpiMultiConcatOp: return "multi concat";
-      case vpiEventOrOp:     return "event or";
-      case vpiNullOp:        return "null";
-      case vpiListOp:        return "list";
-      case vpiMinTypMaxOp:   return "min-typ-max";
-      case vpiPosedgeOp:     return "posedge";
-      case vpiNegedgeOp:     return "negedge";
-      case vpiArithLShiftOp: return "arithmetic left shift";
-      case vpiArithRShiftOp: return "arithmetic right shift";
-      case vpiPowerOp:       return "power";
+      switch ( mOpType ) {
+      case kVlMinusOp:       return "minus";
+      case kVlPlusOp:        return "plus";
+      case kVlNotOp:         return "not";
+      case kVlBitNegOp:      return "bitneg";
+      case kVlUnaryAndOp:    return "unary and";
+      case kVlUnaryNandOp:   return "unary nand";
+      case kVlUnaryOrOp:     return "unary or";
+      case kVlUnaryNorOp:    return "unary nor";
+      case kVlUnaryXorOp:    return "unary xor";
+      case kVlUnaryXNorOp:   return "unary xnor";
+      case kVlSubOp:         return "sub";
+      case kVlDivOp:         return "div";
+      case kVlModOp:         return "mod";
+      case kVlEqOp:          return "eq";
+      case kVlNeqOp:         return "neq";
+      case kVlCaseEqOp:      return "caseeq";
+      case kVlCaseNeqOp:     return "caseneq";
+      case kVlGtOp:          return "gt";
+      case kVlGeOp:          return "ge";
+      case kVlLtOp:          return "lt";
+      case kVlLeOp:          return "le";
+      case kVlLShiftOp:      return "left shift";
+      case kVlRShiftOp:      return "right shift";
+      case kVlAddOp:         return "add";
+      case kVlMultOp:        return "mult";
+      case kVlLogAndOp:      return "logical and";
+      case kVlLogOrOp:       return "logical or";
+      case kVlBitAndOp:      return "bit and";
+      case kVlBitOrOp:       return "bit or";
+      case kVlBitXorOp:      return "bit xor";
+      case kVlBitXNorOp:     return "bit xnor";
+      case kVlConditionOp:   return "conditional";
+      case kVlConcatOp:      return "concat";
+      case kVlMultiConcatOp: return "multi concat";
+      case kVlEventOrOp:     return "event or";
+      case kVlNullOp:        return "null";
+      case kVlListOp:        return "list";
+      case kVlMinTypMaxOp:   return "min-typ-max";
+      case kVlPosedgeOp:     return "posedge";
+      case kVlNegedgeOp:     return "negedge";
+      case kVlArithLShiftOp: return "arithmetic left shift";
+      case kVlArithRShiftOp: return "arithmetic right shift";
+      case kVlPowerOp:       return "power";
       }
     }
   }

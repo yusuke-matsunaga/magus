@@ -329,7 +329,7 @@ public:
 
   /// @brief 内部のポート結線の報告の取得
   virtual
-  tVpiDirection
+  tVlDirection
   portref_dir(ymuint pos) const;
 
 
@@ -344,7 +344,7 @@ public:
   virtual
   void
   _set_portref_dir(ymuint pos,
-		   tVpiDirection dir);
+		   tVlDirection dir);
 
 
 private:
@@ -365,7 +365,7 @@ private:
   PtExprArray mPortRefArray;
 
   // portref の方向の配列
-  tVpiDirection* mDirArray;
+  tVlDirection* mDirArray;
 
 };
 

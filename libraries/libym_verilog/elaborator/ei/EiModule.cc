@@ -494,7 +494,7 @@ void
 EiModule::init_port(ymuint index,
 		    const PtPort* pt_port,
 		    ElbExpr* low_conn,
-		    tVpiDirection dir)
+		    tVlDirection dir)
 {
   mPortList[index].init(this, pt_port, index, low_conn, dir);
 }

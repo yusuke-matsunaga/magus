@@ -38,12 +38,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -57,7 +57,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -65,7 +65,7 @@ private:
 
   // 遅延情報
   const VlDelay* mDelay;
-  
+
 };
 
 
@@ -87,7 +87,7 @@ public:
 
 
 public:
-    
+
   /// @brief 対象のファイル上での位置を返す．
   /// @note このクラスでは空の FileRegion を返す．
   virtual
@@ -102,7 +102,7 @@ private:
   virtual
   void
   expand() const;
-  
+
 };
 
 
@@ -113,9 +113,9 @@ private:
 class VmStrNode :
   public VmScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] str 文字列
@@ -131,24 +131,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // 文字列
   QString mStr;
-  
+
 };
 
 
@@ -178,13 +178,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -198,7 +198,7 @@ private:
 
   // 変数の型
   tVpiVarType mVarType;
-  
+
 };
 
 
@@ -216,7 +216,7 @@ public:
   /// @param[in] net_type ネットの型
   VmNetTypeNode(const QString& label,
 		tVpiNetType net_type);
-  
+
   /// @brief デストラクタ
   virtual
   ~VmNetTypeNode();
@@ -226,24 +226,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // ネットの型
   tVpiNetType mNetType;
-  
+
 };
 
 
@@ -269,13 +269,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -283,7 +283,7 @@ private:
 
   // 変数の型
   tVpiVarType mVarType;
-  
+
 };
 
 
@@ -294,12 +294,12 @@ private:
 class VmDirNode :
   public VmScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] dir 入出力の方向
-  VmDirNode(tVpiDirection dir);
+  VmDirNode(tVlDirection dir);
 
   /// @brief デストラクタ
   virtual
@@ -310,21 +310,21 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 入出力の方向
-  tVpiDirection mDir;
-  
+  tVlDirection mDir;
+
 };
 
 
@@ -350,13 +350,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -364,7 +364,7 @@ private:
 
   // unconnected drive の型
   tVpiUnconnDrive mUd;
-  
+
 };
 
 
@@ -390,13 +390,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -404,7 +404,7 @@ private:
 
   // delay mode の型
   tVpiDefDelayMode mDelayMode;
-  
+
 };
 
 
@@ -430,13 +430,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -444,7 +444,7 @@ private:
 
   // primitive の型
   tVpiPrimType mPrimType;
-  
+
 };
 
 
@@ -455,9 +455,9 @@ private:
 class VmRangeModeNode :
   public VmScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] range_mode 範囲指定の型
   VmRangeModeNode(tVpiRangeMode range_mode);
@@ -471,13 +471,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -485,7 +485,7 @@ private:
 
   // 範囲指定の型
   tVpiRangeMode mRangeMode;
-  
+
 };
 
 
@@ -512,24 +512,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // strength 情報
   tVpiStrength mStrength;
-  
+
 };
 
 
@@ -540,9 +540,9 @@ private:
 class VmVsNode :
   public VmScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] vs vectored/scalared 情報
   VmVsNode(tVpiVsType vs);
@@ -556,13 +556,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -570,7 +570,7 @@ private:
 
   // vectored/scalared 情報
   tVpiVsType mVs;
-  
+
 };
 
 
@@ -581,9 +581,9 @@ private:
 class VmBoolNode :
   public VmScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] val 真理値
@@ -599,24 +599,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // 真理値
   bool mVal;
-  
+
 };
 
 
@@ -627,9 +627,9 @@ private:
 class VmIntNode :
   public VmScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] val 値
@@ -645,24 +645,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // 値
   int mVal;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

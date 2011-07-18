@@ -382,11 +382,11 @@ CptPort::portref_elem(ymuint pos) const
 
 //@brief 内部ポート結線の方向の取得
 // @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
-tVpiDirection
+tVlDirection
 CptPort::portref_dir(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return kVpiNoDirection;
+  return kVlNoDirection;
 }
 
 // @brief portref の方向を設定する．
@@ -394,7 +394,7 @@ CptPort::portref_dir(ymuint pos) const
 // @param[in] dir 方向
 void
 CptPort::_set_portref_dir(ymuint pos,
-			  tVpiDirection dir)
+			  tVlDirection dir)
 {
   assert_not_reached(__FILE__, __LINE__);
 }
@@ -443,7 +443,7 @@ CptPort1::portref_elem(ymuint pos) const
 
 // @brief 内部ポート結線の方向の取得
 // @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
-tVpiDirection
+tVlDirection
 CptPort1::portref_dir(ymuint pos) const
 {
   return mDir;
@@ -454,7 +454,7 @@ CptPort1::portref_dir(ymuint pos) const
 // @param[in] dir 方向
 void
 CptPort1::_set_portref_dir(ymuint pos,
-			   tVpiDirection dir)
+			   tVlDirection dir)
 {
   assert_cond( pos == 0, __FILE__, __LINE__);
   mDir = dir;
@@ -469,7 +469,7 @@ CptPort1::_set_portref_dir(ymuint pos,
 CptPort2::CptPort2(const FileRegion& file_region,
 		   const PtExpr* portref,
 		   PtExprArray portref_array,
-		   tVpiDirection* dir_array,
+		   tVlDirection* dir_array,
 		   const char* ext_name) :
   CptPort1(file_region, portref, ext_name),
   mPortRefArray(portref_array),
@@ -499,7 +499,7 @@ CptPort2::portref_elem(ymuint pos) const
 
 // @brief 内部ポート結線の方向の取得
 // @param[in] pos 位置番号 ( 0 <= pos < portref_num() )
-tVpiDirection
+tVlDirection
 CptPort2::portref_dir(ymuint pos) const
 {
   return mDirArray[pos];
@@ -510,7 +510,7 @@ CptPort2::portref_dir(ymuint pos) const
 // @param[in] dir 方向
 void
 CptPort2::_set_portref_dir(ymuint pos,
-			   tVpiDirection dir)
+			   tVlDirection dir)
 {
   mDirArray[pos] = dir;
 }
@@ -637,7 +637,7 @@ CptFactory::new_Port(const FileRegion& file_region,
 {
   ++ mNumPort;
   ymuint n = portref_array.size();
-  tVpiDirection* dir_array = alloc_array<tVpiDirection>(n);
+  tVlDirection* dir_array = alloc_array<tVlDirection>(n);
   void* p = alloc().get_memory(sizeof(CptPort2));
   return new (p) CptPort2(file_region, portref,
 			  portref_array, dir_array, ext_name);
