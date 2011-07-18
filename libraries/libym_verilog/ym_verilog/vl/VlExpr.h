@@ -218,7 +218,7 @@ public:
   /// @note kVpiOperation の時，意味を持つ．
   /// @note それ以外では動作は不定
   virtual
-  tVpiOpType
+  VlOpType
   op_type() const = 0;
 
   /// @brief オペランド数を返す．

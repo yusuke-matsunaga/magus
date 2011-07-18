@@ -16,6 +16,7 @@
 #include "ym_networks/MvnNode.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/VlValue.h"
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -34,8 +35,6 @@ bool debug = false;
 END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
-
-using namespace nsYm::nsVerilog;
 
 // @brief 要素を生成する．
 // @param[in] module モジュール
@@ -186,8 +185,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
   for (ymuint i = 0; i < ev_num; ++ i) {
     const VlExpr* expr = control->event(i);
     if ( expr->type() == kVpiOperation ) {
-      if ( expr->op_type() == kVpiPosedgeOp ||
-	   expr->op_type() == kVpiNegedgeOp ) {
+      if ( expr->op_type().val() == vpiPosedgeOp ||
+	   expr->op_type().val() == vpiNegedgeOp ) {
 	has_edge_event = true;
       }
       else {
@@ -230,7 +229,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       const VlExpr* expr = control->event(i);
       const VlExpr* opr1 = expr->operand(0);
       MvnNode* node1 = gen_primary(opr1, mGlobalEnv);
-      ymuint pol = (expr->op_type() == kVpiPosedgeOp) ? 1 : 0;
+      ymuint pol = (expr->op_type().val() == vpiPosedgeOp) ? 1 : 0;
       event_node_array[i] = make_pair(node1, pol);
     }
     vector<bool> event_map(ev_num, false);
@@ -405,8 +404,8 @@ ReaderImpl::parse_cond(const VlExpr* cond,
   }
 
   if ( cond->is_operation() ) {
-    if ( cond->op_type() == kVpiNotOp ||
-	 cond->op_type() == kVpiBitNegOp ) {
+    if ( cond->op_type().val() == vpiNotOp ||
+	 cond->op_type().val() == vpiBitNegOp ) {
       const VlExpr* opr1 = cond->operand(0);
       if ( !opr1->is_primary() ) {
 	return false;
@@ -417,29 +416,34 @@ ReaderImpl::parse_cond(const VlExpr* cond,
       return true;
     }
 
-    if ( cond->op_type() == kVpiEqOp ) {
-      const VlExpr* opr1 = cond->operand(0);
-      const VlExpr* opr2 = cond->operand(1);
-      if ( opr1->is_primary() && opr2->is_const() ) {
-	// (4)
-	return parse_cond_sub(opr1, opr2, env, 0, 1, node, pol);
+    switch ( cond->op_type().val() ) {
+    case vpiEqOp:
+      {
+	const VlExpr* opr1 = cond->operand(0);
+	const VlExpr* opr2 = cond->operand(1);
+	if ( opr1->is_primary() && opr2->is_const() ) {
+	  // (4)
+	  return parse_cond_sub(opr1, opr2, env, 0, 1, node, pol);
+	}
+	if ( opr1->is_const() && opr2->is_primary() ) {
+	  // (6)
+	  return parse_cond_sub(opr2, opr1, env, 0, 1, node, pol);
+	}
       }
-      if ( opr1->is_const() && opr2->is_primary() ) {
-	// (6)
-	return parse_cond_sub(opr2, opr1, env, 0, 1, node, pol);
-      }
-    }
+      break;
 
-    if ( cond->op_type() == kVpiNeqOp ) {
-      const VlExpr* opr1 = cond->operand(0);
-      const VlExpr* opr2 = cond->operand(1);
-      if ( opr1->is_primary() && opr2->is_const() ) {
-	// (5)
-	return parse_cond_sub(opr1, opr2, env, 1, 0, node, pol);
-      }
-      if ( opr1->is_const() && opr2->is_primary() ) {
-	// (7)
-	return parse_cond_sub(opr2, opr1, env, 1, 0, node, pol);
+    case vpiNeqOp:
+      {
+	const VlExpr* opr1 = cond->operand(0);
+	const VlExpr* opr2 = cond->operand(1);
+	if ( opr1->is_primary() && opr2->is_const() ) {
+	  // (5)
+	  return parse_cond_sub(opr1, opr2, env, 1, 0, node, pol);
+	}
+	if ( opr1->is_const() && opr2->is_primary() ) {
+	  // (7)
+	  return parse_cond_sub(opr2, opr1, env, 1, 0, node, pol);
+	}
       }
     }
   }

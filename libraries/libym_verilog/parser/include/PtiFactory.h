@@ -1755,7 +1755,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  const VlOpType& type,
 	  const PtExpr* opr) = 0;
 
   /// @brief 二項演算子の生成
@@ -1767,7 +1767,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  const VlOpType& type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2) = 0;
 
@@ -1781,7 +1781,7 @@ public:
   virtual
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  const VlOpType& type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2,
 	  const PtExpr* opr3) = 0;

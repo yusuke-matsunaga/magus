@@ -28,8 +28,6 @@ END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
-using namespace nsYm::nsVerilog;
-
 // @brief ステートメントの中身を生成する(combinational always用)．
 // @param[in] module 親のモジュール
 // @param[in] stmt 本体のステートメント

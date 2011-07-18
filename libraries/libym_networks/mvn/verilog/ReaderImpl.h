@@ -255,16 +255,21 @@ private:
 	   const VlExpr* expr,
 	   const Env& env);
 
+  /// @brief 定数値に対応したノードを作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 式
+  MvnNode*
+  gen_const(MvnModule* parent_module,
+	    const VlExpr* expr);
+
   /// @brief 演算に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
-  /// @param[in] op_type 演算の種類
-  /// @param[in] operand_array オペランドに対応するノードの配列
-  /// @param[in] out_bw 出力のビット幅
+  /// @param[in] expr 式
+  /// @param[in] env 環境
   MvnNode*
   gen_opr(MvnModule* parent_module,
-	  nsYm::nsVerilog::tVpiOpType op_type,
-	  const vector<MvnNode*>& operand_arry,
-	  ymuint out_bw);
+	  const VlExpr* expr,
+	  const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式

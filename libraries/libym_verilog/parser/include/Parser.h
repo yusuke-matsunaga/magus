@@ -1497,7 +1497,7 @@ public:
   /// @return 生成された演算子
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  const VlOpType& type,
 	  const PtExpr* opr,
 	  PtrList<const PtAttrInst>* ai_list);
 
@@ -1509,7 +1509,7 @@ public:
   /// @return 生成された演算子
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  const VlOpType& type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2,
 	  PtrList<const PtAttrInst>* ai_list);
@@ -1523,7 +1523,7 @@ public:
   /// @return 生成された演算子
   const PtExpr*
   new_Opr(const FileRegion& fr,
-	  tVpiOpType type,
+	  const VlOpType& type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2,
 	  const PtExpr* opr3,

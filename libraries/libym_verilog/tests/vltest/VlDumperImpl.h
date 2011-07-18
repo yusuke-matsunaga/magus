@@ -372,7 +372,7 @@ public:
   /// @param[in] op_type 演算子の種類
   void
   put(const char* label,
-      tVpiOpType op_type);
+      const VlOpType& op_type);
 
   /// @brief strength を出力する関数
   /// @param[in] label ラベル

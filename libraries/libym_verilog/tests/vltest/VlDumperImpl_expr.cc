@@ -9,21 +9,18 @@
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include "VlDumperImpl.h"
 
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlRange.h>
-#include <ym_verilog/vl/VlDelay.h>
-#include <ym_verilog/vl/VlExpr.h>
-#include <ym_verilog/vl/VlTaskFunc.h>
-#include <ym_verilog/vl/VlUserSystf.h>
-#include <ym_verilog/vl/VlDecl.h>
-#include <ym_verilog/vl/VlDeclArray.h>
-#include <ym_verilog/vl/VlPrimitive.h>
+#include "ym_verilog/VlMgr.h"
+#include "ym_verilog/VlOpType.h"
+#include "ym_verilog/vl/VlRange.h"
+#include "ym_verilog/vl/VlDelay.h"
+#include "ym_verilog/vl/VlExpr.h"
+#include "ym_verilog/vl/VlTaskFunc.h"
+#include "ym_verilog/vl/VlUserSystf.h"
+#include "ym_verilog/vl/VlDecl.h"
+#include "ym_verilog/vl/VlDeclArray.h"
+#include "ym_verilog/vl/VlPrimitive.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

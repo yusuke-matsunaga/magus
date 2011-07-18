@@ -15,6 +15,7 @@
 #include "ym_networks/MvnModule.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_verilog/BitVector.h"
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/vl/VlModule.h"
 #include "ym_verilog/vl/VlPrimitive.h"
 #include "ym_verilog/vl/VlUdp.h"
@@ -33,8 +34,6 @@
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
-
-using namespace nsYm::nsVerilog;
 
 
 BEGIN_NONAMESPACE
@@ -343,7 +342,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     const VlPort* port = vl_module->port(i);
     const VlExpr* expr = port->low_conn();
     if ( expr->is_operation() ) {
-      assert_cond( expr->op_type() == kVpiConcatOp, __FILE__, __LINE__);
+      assert_cond( expr->op_type().val() == vpiConcatOp, __FILE__, __LINE__);
       ymuint n = expr->operand_num();
       mMvnMgr->init_port(module, i, port->name(), n);
       for (ymuint j = 0; j < n; ++ j) {

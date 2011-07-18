@@ -41,6 +41,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class BitVector;
 class VlLineWatcher;
 class VlMgr;
+class VlOpType;
 class VlScalarVal;
 class VlTime;
 class VlUdpVal;
@@ -315,58 +316,6 @@ enum tVpiTchkType {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @brief operation の型
-/// @note この列挙型の値を強制的に int にキャストしても
-/// vpi_user.h の定義値として使える．
-//////////////////////////////////////////////////////////////////////
-enum tVpiOpType {
-  kVpiMinusOp        = vpiMinusOp,
-  kVpiPlusOp         = vpiPlusOp,
-  kVpiNotOp          = vpiNotOp,
-  kVpiBitNegOp       = vpiBitNegOp,
-  kVpiUnaryAndOp     = vpiUnaryAndOp,
-  kVpiUnaryNandOp    = vpiUnaryNandOp,
-  kVpiUnaryOrOp      = vpiUnaryOrOp,
-  kVpiUnaryNorOp     = vpiUnaryNorOp,
-  kVpiUnaryXorOp     = vpiUnaryXorOp,
-  kVpiUnaryXNorOp    = vpiUnaryXNorOp,
-  kVpiSubOp          = vpiSubOp,
-  kVpiDivOp          = vpiDivOp,
-  kVpiModOp          = vpiModOp,
-  kVpiEqOp           = vpiEqOp,
-  kVpiNeqOp          = vpiNeqOp,
-  kVpiCaseEqOp       = vpiCaseEqOp,
-  kVpiCaseNeqOp      = vpiCaseNeqOp,
-  kVpiGtOp           = vpiGtOp,
-  kVpiGeOp           = vpiGeOp,
-  kVpiLtOp           = vpiLtOp,
-  kVpiLeOp           = vpiLeOp,
-  kVpiLShiftOp       = vpiLShiftOp,
-  kVpiRShiftOp       = vpiRShiftOp,
-  kVpiAddOp          = vpiAddOp,
-  kVpiMultOp         = vpiMultOp,
-  kVpiLogAndOp       = vpiLogAndOp,
-  kVpiLogOrOp        = vpiLogOrOp,
-  kVpiBitAndOp       = vpiBitAndOp,
-  kVpiBitOrOp        = vpiBitOrOp,
-  kVpiBitXorOp       = vpiBitXorOp,
-  kVpiBitXNorOp      = vpiBitXNorOp,
-  kVpiConditionOp    = vpiConditionOp,
-  kVpiConcatOp       = vpiConcatOp,
-  kVpiMultiConcatOp  = vpiMultiConcatOp,
-  kVpiEventOrOp      = vpiEventOrOp,
-  kVpiNullOp         = vpiNullOp,
-  kVpiListOp         = vpiListOp,
-  kVpiMinTypMaxOp    = vpiMinTypMaxOp,
-  kVpiPosedgeOp      = vpiPosedgeOp,
-  kVpiNegedgeOp      = vpiNegedgeOp,
-  kVpiArithLShiftOp  = vpiArithLShiftOp,
-  kVpiArithRShiftOp  = vpiArithRShiftOp,
-  kVpiPowerOp        = vpiPowerOp
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @brief constant の型
 /// @note この列挙型の値を強制的に int にキャストしても
 /// vpi_user.h の定義値として使える．
@@ -531,6 +480,7 @@ BEGIN_NAMESPACE_YM
 using nsVerilog::BitVector;
 using nsVerilog::VlLineWatcher;
 using nsVerilog::VlMgr;
+using nsVerilog::VlOpType;
 using nsVerilog::VlScalarVal;
 using nsVerilog::VlTime;
 using nsVerilog::VlUdpVal;

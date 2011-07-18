@@ -57,7 +57,7 @@ public:
 
   /// @brief 演算子のタイプを返す．
   virtual
-  tVpiOpType
+  VlOpType
   op_type() const;
 
 };

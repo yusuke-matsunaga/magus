@@ -229,7 +229,7 @@ private:
   /// @param[in] op_type 演算子型
   void
   put(const char* label,
-      tVpiOpType op_type);
+      const VlOpType& op_type);
 
   /// @brief 定数型の出力
   /// @param[in] label ラベル

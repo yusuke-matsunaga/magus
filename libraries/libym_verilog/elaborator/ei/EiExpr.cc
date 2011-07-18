@@ -12,6 +12,7 @@
 #include "EiExpr.h"
 #include "EiOperation.h"
 
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/BitVector.h"
 #include "ym_verilog/VlTime.h"
 #include "ym_verilog/VlValue.h"
@@ -265,11 +266,11 @@ EiExpr::parent_expr() const
 
 // @brief 演算子のタイプを返す．
 // @note 演算子の時，意味を持つ．
-// @note このクラスでは kVpiNullOp を返す．
-tVpiOpType
+// @note このクラスでは vpiNullOp を返す．
+VlOpType
 EiExpr::op_type() const
 {
-  return kVpiNullOp;
+  return VlOpType(vpiNullOp);
 }
 
 // @brief オペランド数を返す．
@@ -446,7 +447,7 @@ EiOperation::is_operation() const
 }
 
 // @brief 演算子のタイプを返す．
-tVpiOpType
+VlOpType
 EiOperation::op_type() const
 {
   return pt_expr()->op_type();

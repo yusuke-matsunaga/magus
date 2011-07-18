@@ -14,6 +14,7 @@
 #include "ym_utils/FileRegion.h"
 
 #include "PtiExpr.h"
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/pt/PtArray.h"
 
 
@@ -55,9 +56,9 @@ public:
 
   /// @brief 演算子の種類の取得
   /// @return 演算子の種類
-  /// @note このクラスでは kVpiNullOp を返す．
+  /// @note このクラスでは vpiNullOp を返す．
   virtual
-  tVpiOpType
+  VlOpType
   op_type() const;
 
   /// @brief 階層ブランチの取得
@@ -215,7 +216,7 @@ private:
 
   /// コンストラクタ
   SptOpr1(const FileRegion& file_region,
-	  tVpiOpType op_type,
+	  const VlOpType& op_type,
 	  const PtExpr* opr1,
 	  const PtExpr* opr2 = NULL,
 	  const PtExpr* opr3 = NULL);
@@ -242,7 +243,7 @@ public:
 
   /// 演算子の種類の取得
   virtual
-  tVpiOpType
+  VlOpType
   op_type() const;
 
   /// @brief オペランドの数の取得
@@ -263,7 +264,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の種類
-  tVpiOpType mOpType;
+  VlOpType mOpType;
 
   // オペランド数
   ymuint32 mSize;
@@ -286,7 +287,7 @@ private:
 
   /// コンストラクタ
   SptOpr2(const FileRegion& file_region,
-	  tVpiOpType op_type,
+	  const VlOpType& op_type,
 	  PtExprArray opr_array);
 
   /// デストラクタ
@@ -311,7 +312,7 @@ public:
 
   /// 演算子の種類の取得
   virtual
-  tVpiOpType
+  VlOpType
   op_type() const;
 
   /// @brief オペランドの数の取得
@@ -332,7 +333,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の種類
-  tVpiOpType mOpType;
+  VlOpType mOpType;
 
   // オペランドのリスト
   PtExprArray mExprArray;

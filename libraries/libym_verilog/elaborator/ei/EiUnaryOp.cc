@@ -12,6 +12,7 @@
 #include "EiFactory.h"
 #include "EiUnaryOp.h"
 
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/BitVector.h"
 
 
@@ -27,40 +28,40 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] opr1 オペランド
 ElbExpr*
 EiFactory::new_UnaryOp(const PtExpr* pt_expr,
-		       tVpiOpType op_type,
+		       const VlOpType& op_type,
 		       ElbExpr* opr1)
 {
   ElbExpr* expr = NULL;
   void* p;
-  switch ( op_type ) {
-  case kVpiPosedgeOp:
-  case kVpiNegedgeOp:
+  switch ( op_type.val() ) {
+  case vpiPosedgeOp:
+  case vpiNegedgeOp:
     p = mAlloc.get_memory(sizeof(EiEventEdgeOp));
     expr = new (p) EiEventEdgeOp(pt_expr, opr1);
     break;
 
-  case kVpiBitNegOp:
+  case vpiBitNegOp:
     p = mAlloc.get_memory(sizeof(EiBitNegOp));
     expr = new (p) EiBitNegOp(pt_expr, opr1);
     break;
 
-  case kVpiPlusOp:
-  case kVpiMinusOp:
+  case vpiPlusOp:
+  case vpiMinusOp:
     p = mAlloc.get_memory(sizeof(EiUnaryArithOp));
     expr = new (p) EiUnaryArithOp(pt_expr, opr1);
     break;
 
-  case kVpiUnaryAndOp:
-  case kVpiUnaryNandOp:
-  case kVpiUnaryOrOp:
-  case kVpiUnaryNorOp:
-  case kVpiUnaryXorOp:
-  case kVpiUnaryXNorOp:
+  case vpiUnaryAndOp:
+  case vpiUnaryNandOp:
+  case vpiUnaryOrOp:
+  case vpiUnaryNorOp:
+  case vpiUnaryXorOp:
+  case vpiUnaryXNorOp:
     p = mAlloc.get_memory(sizeof(EiReductionOp));
     expr = new (p) EiReductionOp(pt_expr, opr1);
     break;
 
-  case kVpiNotOp:
+  case vpiNotOp:
     p = mAlloc.get_memory(sizeof(EiNotOp));
     expr = new (p) EiNotOp(pt_expr, opr1);
     break;

@@ -7,7 +7,7 @@
 ///
 /// $Id: VlTime.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlTime VlTime.h <ym_verilog/VlTime.h>
+/// @class VlTime VlTime.h "ym_verilog/VlTime.h"
 /// @brief シミュレーション時刻を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlTime
@@ -36,10 +36,10 @@ public:
   VlTime(PLI_UINT32 l,
 	 PLI_UINT32 h);
 
-  /// @brief unsigned int からの変換コンストラクタ
+  /// @brief 符号なし整数からの変換コンストラクタ
   /// @param[in] val 値
   explicit
-  VlTime(unsigned int val);
+  VlTime(ymuint val);
 
   /// @brief double からの変換コンストラクタ
   /// @param[in] val 値
@@ -73,9 +73,9 @@ public:
   set(PLI_UINT32 l,
       PLI_UINT32 h);
 
-  /// @brief unsigned int の値を設定する．
+  /// @brief 符号なし整数の値を設定する．
   void
-  set(unsigned int val);
+  set(ymuint val);
 
   /// @brief double の値を設定する．
   void
@@ -99,9 +99,9 @@ public:
   PLI_UINT32
   high() const;
 
-  /// @brief unsigned int への変換
-  /// @note unsigned int に入りきらない値の時はおかしな値になる．
-  unsigned int
+  /// @brief 符号なし整数への変換
+  /// @note 符号なし整数に入りきらない値の時はおかしな値になる．
+  ymuint
   to_uint() const;
 
   /// @brief 論理値への変換
@@ -209,9 +209,9 @@ VlTime::VlTime(PLI_UINT32 l,
   mValue = (tmp << 32) | l;
 }
 
-// @brief unsigned int からの変換コンストラクタ
+// @brief 符号なし整数からの変換コンストラクタ
 inline
-VlTime::VlTime(unsigned int val) :
+VlTime::VlTime(ymuint val) :
   mValue(val)
 {
 }
@@ -257,10 +257,10 @@ VlTime::set(PLI_UINT32 l,
   mValue = (tmp << 32) | l;
 }
 
-// @brief unsigned int の値を設定する．
+// @brief 符号なし整数の値を設定する．
 inline
 void
-VlTime::set(unsigned int val)
+VlTime::set(ymuint val)
 {
   mValue = val;
 }
@@ -271,26 +271,12 @@ void
 VlTime::set(double val)
 {
   if ( val < 0.0 ) {
+    // 負数は0にする．
     mValue = 0UL;
     return;
   }
-
-#if 0
-  double hd = rint(val / 4294967296.0);
-  if ( hd >= 4294967296.0 ) {
-    // オーバーフロー
-    mLow = 0;
-    mHigh = 0;
-    return;
-  }
-
-  mHigh = static_cast<PLI_UINT32>(hd);
-  val -= hd;
-  mLow = static_cast<PLI_UINT32>(rint(val));
-#else
   double val1 = rint(val);
   mValue = static_cast<ymuint64>(val1);
-#endif
 }
 
 // @brief 64ビットの値を取り出す．
@@ -317,10 +303,10 @@ VlTime::high() const
   return (mValue >> 32);
 }
 
-// @brief unsigned int への変換
-// @note unsigned int に入りきらない値の時はおかしな値になる．
+// @brief 符号なし整数への変換
+// @note 符号なし整数に入りきらない値の時はおかしな値になる．
 inline
-unsigned int
+ymuint
 VlTime::to_uint() const
 {
   return static_cast<ymuint32>(mValue);

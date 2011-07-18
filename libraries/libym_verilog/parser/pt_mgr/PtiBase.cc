@@ -11,6 +11,7 @@
 
 #include "PtiDecl.h"
 #include "PtiExpr.h"
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/pt/PtMisc.h"
 
 
@@ -130,80 +131,80 @@ decompile_opr(const PtExpr* expr,
 
   string ans;
 
-  tVpiOpType optype = expr->op_type();
+  VlOpType optype = expr->op_type();
   // parent_optype の優先順位が自分の優先順位よりも高ければ括弧が必要
   bool need_par = false;
-  int pri = pri_table[optype];
+  int pri = pri_table[optype.val()];
   if ( ppri > pri ) {
     need_par = true;
     ans += "(";
   }
 
-  switch ( optype ) {
+  switch ( optype.val() ) {
     // 空
-  case kVpiNullOp:
+  case vpiNullOp:
     ans += decompile_impl(expr->operand(0), 0);
     break;
 
     // 単項演算子
-  case kVpiMinusOp:
-  case kVpiNotOp:
-  case kVpiBitNegOp:
-  case kVpiPlusOp:
-  case kVpiUnaryAndOp:
-  case kVpiUnaryNandOp:
-  case kVpiUnaryNorOp:
-  case kVpiUnaryOrOp:
-  case kVpiUnaryXNorOp:
-  case kVpiUnaryXorOp:
-  case kVpiPosedgeOp:
-  case kVpiNegedgeOp:
-    ans += sym_table[optype] + decompile_impl(expr->operand(0), pri);
+  case vpiMinusOp:
+  case vpiNotOp:
+  case vpiBitNegOp:
+  case vpiPlusOp:
+  case vpiUnaryAndOp:
+  case vpiUnaryNandOp:
+  case vpiUnaryNorOp:
+  case vpiUnaryOrOp:
+  case vpiUnaryXNorOp:
+  case vpiUnaryXorOp:
+  case vpiPosedgeOp:
+  case vpiNegedgeOp:
+    ans += sym_table[optype.val()] + decompile_impl(expr->operand(0), pri);
     break;
 
     // 二項演算子
-  case kVpiAddOp:
-  case kVpiArithLShiftOp:
-  case kVpiArithRShiftOp:
-  case kVpiBitAndOp:
-  case kVpiBitOrOp:
-  case kVpiBitXNorOp:
-  case kVpiBitXorOp:
-  case kVpiCaseEqOp:
-  case kVpiCaseNeqOp:
-  case kVpiDivOp:
-  case kVpiEqOp:
-  case kVpiGeOp:
-  case kVpiGtOp:
-  case kVpiLShiftOp:
-  case kVpiLeOp:
-  case kVpiLogAndOp:
-  case kVpiLogOrOp:
-  case kVpiLtOp:
-  case kVpiModOp:
-  case kVpiMultOp:
-  case kVpiNeqOp:
-  case kVpiPowerOp:
-  case kVpiRShiftOp:
-  case kVpiSubOp:
-    ans += decompile_impl(expr->operand(0), pri) + sym_table[optype] +
+  case vpiAddOp:
+  case vpiArithLShiftOp:
+  case vpiArithRShiftOp:
+  case vpiBitAndOp:
+  case vpiBitOrOp:
+  case vpiBitXNorOp:
+  case vpiBitXorOp:
+  case vpiCaseEqOp:
+  case vpiCaseNeqOp:
+  case vpiDivOp:
+  case vpiEqOp:
+  case vpiGeOp:
+  case vpiGtOp:
+  case vpiLShiftOp:
+  case vpiLeOp:
+  case vpiLogAndOp:
+  case vpiLogOrOp:
+  case vpiLtOp:
+  case vpiModOp:
+  case vpiMultOp:
+  case vpiNeqOp:
+  case vpiPowerOp:
+  case vpiRShiftOp:
+  case vpiSubOp:
+    ans += decompile_impl(expr->operand(0), pri) + sym_table[optype.val()] +
       decompile_impl(expr->operand(1), pri);
     break;
 
     // 三項演算子
-  case kVpiConditionOp:
+  case vpiConditionOp:
     ans += decompile_impl(expr->operand(0), pri) + "?" +
       decompile_impl(expr->operand(1), pri) + ":" +
       decompile_impl(expr->operand(2), pri);
     break;
 
-  case kVpiMinTypMaxOp:
+  case vpiMinTypMaxOp:
     ans += decompile_impl(expr->operand(0), pri) + ":" +
       decompile_impl(expr->operand(1), pri) + ":" +
       decompile_impl(expr->operand(2), pri);
     break;
 
-  case kVpiConcatOp:
+  case vpiConcatOp:
     {
       ans += "{";
       const char* delim = "";
@@ -216,7 +217,7 @@ decompile_opr(const PtExpr* expr,
     }
     break;
 
-  case kVpiMultiConcatOp:
+  case vpiMultiConcatOp:
     {
       ans = "{";
       ans += expr->operand(0)->decompile() + "{";

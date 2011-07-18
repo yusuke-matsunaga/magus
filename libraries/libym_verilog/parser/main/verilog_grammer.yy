@@ -12,6 +12,7 @@
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/pt/PtP.h"
 #include "ym_verilog/pt/PtItem.h"
 #include "ym_verilog/pt/PtStmt.h"
@@ -106,7 +107,6 @@ fr_merge(const FileRegion fr_array[],
   tVpiVarType vartype;
   tVpiNetType nettype;
   tVpiPrimType primtype;
-  tVpiOpType optype;
   tVpiConstType consttype;
   tVpiStrength strengthtype;
   tVpiRangeMode rangemode;
@@ -2044,7 +2044,7 @@ delay_value
 }
 | '(' expression ')'
 {
-  $$ = parser.new_Opr(@$, kVpiNullOp, $2, NULL);
+  $$ = parser.new_Opr(@$, VlOpType(vpiNullOp), $2, NULL);
 }
 ;
 /*
@@ -4974,11 +4974,11 @@ event_primary
 }
 | POSEDGE expression
 {
-  $$ = parser.new_Opr(@$, kVpiPosedgeOp, $2, NULL);
+  $$ = parser.new_Opr(@$, VlOpType(vpiPosedgeOp), $2, NULL);
 }
 | NEGEDGE expression
 {
-  $$ = parser.new_Opr(@$, kVpiNegedgeOp, $2, NULL);
+  $$ = parser.new_Opr(@$, VlOpType(vpiNegedgeOp), $2, NULL);
 }
 ;
 
@@ -5696,11 +5696,11 @@ pol_colon
 edge
 : POSEDGE
 {
-  $$ = kVpiPosedgeOp;
+  $$ = vpiPosedgeOp;
 }
 | NEGEDGE
 {
-  $$ = kVpiNegedgeOp;
+  $$ = vpiNegedgeOp;
 }
 ;
 
@@ -6188,7 +6188,7 @@ expression
 }
 | expr1 '?' ai_list expr1 ':' expression %prec COND
 {
-  $$ = parser.new_Opr(@$, kVpiConditionOp, $1, $4, $6, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiConditionOp), $1, $4, $6, $3);
 }
 ;
 
@@ -6199,139 +6199,139 @@ expr1
 }
 | '+' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiPlusOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiPlusOp), $3, $2);
 }
 | '-' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiMinusOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiMinusOp), $3, $2);
 }
 | '!' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiNotOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiNotOp), $3, $2);
 }
 | '~' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiBitNegOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiBitNegOp), $3, $2);
 }
 | '&' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryAndOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryAndOp), $3, $2);
 }
 | '|' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryOrOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryOrOp), $3, $2);
 }
 | '^' ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryXorOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryXorOp), $3, $2);
 }
 | TILDEAND ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryNandOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryNandOp), $3, $2);
 }
 | TILDEOR ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryNorOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryNorOp), $3, $2);
 }
 | TILDEXOR ai_list primary %prec UOP
 {
-  $$ = parser.new_Opr(@$, kVpiUnaryXNorOp, $3, $2);
+  $$ = parser.new_Opr(@$, VlOpType(vpiUnaryXNorOp), $3, $2);
 }
 | expr1 STARSTAR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiPowerOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiPowerOp), $1, $4, $3);
 }
 | expr1 '+' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiAddOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiAddOp), $1, $4, $3);
 }
 | expr1 '-' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiSubOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiSubOp), $1, $4, $3);
 }
 | expr1 '*' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiMultOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiMultOp), $1, $4, $3);
 }
 | expr1 '/' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiDivOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiDivOp), $1, $4, $3);
 }
 | expr1 '%' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiModOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiModOp), $1, $4, $3);
 }
 | expr1 EQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiEqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiEqOp), $1, $4, $3);
 }
 | expr1 NOTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiNeqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiNeqOp), $1, $4, $3);
 }
 | expr1 EQEQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiCaseEqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiCaseEqOp), $1, $4, $3);
 }
 | expr1 NOTEQEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiCaseNeqOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiCaseNeqOp), $1, $4, $3);
 }
 | expr1 ANDAND ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLogAndOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiLogAndOp), $1, $4, $3);
 }
 | expr1 OROR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLogOrOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiLogOrOp), $1, $4, $3);
 }
 | expr1 '<' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLtOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiLtOp), $1, $4, $3);
 }
 | expr1 '>' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiGtOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiGtOp), $1, $4, $3);
 }
 | expr1 LTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLeOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiLeOp), $1, $4, $3);
 }
 | expr1 GTEQ ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiGeOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiGeOp), $1, $4, $3);
 }
 | expr1 '&' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitAndOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiBitAndOp), $1, $4, $3);
 }
 | expr1 '|' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitOrOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiBitOrOp), $1, $4, $3);
 }
 | expr1 '^' ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitXorOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiBitXorOp), $1, $4, $3);
 }
 | expr1 TILDEXOR ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiBitXNorOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiBitXNorOp), $1, $4, $3);
 }
 | expr1 LTLT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiLShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiLShiftOp), $1, $4, $3);
 }
 | expr1 GTGT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiRShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiRShiftOp), $1, $4, $3);
 }
 | expr1 LTLTLT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiArithLShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiArithLShiftOp), $1, $4, $3);
 }
 | expr1 GTGTGT ai_list expr1
 {
-  $$ = parser.new_Opr(@$, kVpiArithRShiftOp, $1, $4, $3);
+  $$ = parser.new_Opr(@$, VlOpType(vpiArithRShiftOp), $1, $4, $3);
 }
 | STRING
 {
@@ -6514,12 +6514,12 @@ primary
 | '(' expression ')'
 {
   // 括弧の位置を保持するためのトリック
-  $$ = parser.new_Opr(@$, kVpiNullOp, $2, NULL);
+  $$ = parser.new_Opr(@$, VlOpType(vpiNullOp), $2, NULL);
 }
 | '(' mintypmax_expression ')'
 {
   // 括弧の位置を保持するためのトリック
-  $$ = parser.new_Opr(@$, kVpiNullOp, $2, NULL);
+  $$ = parser.new_Opr(@$, VlOpType(vpiNullOp), $2, NULL);
 }
 ;
 

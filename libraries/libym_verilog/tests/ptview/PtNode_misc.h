@@ -7,14 +7,15 @@
 ///
 /// $Id: PtNode_misc.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PtNode.h"
-#include <ym_verilog/verilog.h>
-#include <ym_verilog/pt/PtP.h>
-#include <ym_verilog/pt/PtArray.h>
+#include "ym_verilog/verilog.h"
+#include "ym_verilog/VlOpType.h"
+#include "ym_verilog/pt/PtP.h"
+#include "ym_verilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -40,12 +41,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -59,7 +60,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -67,7 +68,7 @@ private:
 
   // コントロールを表すパース木
   const PtControl* mControl;
-  
+
 };
 
 
@@ -92,12 +93,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -111,7 +112,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -119,7 +120,7 @@ private:
 
   // 接続のリスト
   PtConnectionArray mConArray;
-  
+
 };
 
 
@@ -144,12 +145,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -163,7 +164,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -171,7 +172,7 @@ private:
 
   // 接続を表すパース木
   const PtConnection* mCon;
-  
+
 };
 
 
@@ -196,12 +197,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -215,7 +216,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -223,7 +224,7 @@ private:
 
   // strength 情報
   const PtStrength* mStrength;
-  
+
 };
 
 
@@ -248,12 +249,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -267,7 +268,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -275,7 +276,7 @@ private:
 
   // 遅延情報
   const PtDelay* mDelay;
-  
+
 };
 
 
@@ -300,12 +301,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -319,7 +320,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -327,7 +328,7 @@ private:
 
   // 階層名の配列
   PtNameBranchArray mNameBranchArray;
-  
+
 };
 
 
@@ -352,12 +353,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -371,7 +372,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -379,7 +380,7 @@ private:
 
   // 階層名のデータ
   const PtNameBranch* mNameBranch;
-  
+
 };
 
 
@@ -390,9 +391,9 @@ private:
 class StrNode :
   public PtScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] str 文字列
@@ -408,24 +409,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // 文字列
   QString mStr;
-  
+
 };
 
 
@@ -455,13 +456,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -475,7 +476,7 @@ private:
 
   // 変数の型
   tVpiVarType mVarType;
-  
+
 };
 
 
@@ -503,24 +504,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // ネットの型
   tVpiNetType mNetType;
-  
+
 };
 
 
@@ -546,13 +547,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -560,7 +561,7 @@ private:
 
   // 変数の型
   tVpiVarType mVarType;
-  
+
 };
 
 
@@ -571,9 +572,9 @@ private:
 class DirNode :
   public PtScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] dir 入出力の方向
   DirNode(tVpiDirection dir);
@@ -587,13 +588,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -601,7 +602,7 @@ private:
 
   // 入出力の方向
   tVpiDirection mDir;
-  
+
 };
 
 
@@ -627,13 +628,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -641,7 +642,7 @@ private:
 
   // unconnected drive の型
   tVpiUnconnDrive mUd;
-  
+
 };
 
 
@@ -667,13 +668,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -681,7 +682,7 @@ private:
 
   // delay mode の型
   tVpiDefDelayMode mDelayMode;
-  
+
 };
 
 
@@ -707,13 +708,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -721,7 +722,7 @@ private:
 
   // primitive の型
   tVpiPrimType mPrimType;
-  
+
 };
 
 
@@ -732,12 +733,12 @@ private:
 class OpTypeNode :
   public PtScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] op_type 演算子の型
-  OpTypeNode(tVpiOpType op_type);
+  OpTypeNode(const VlOpType& op_type);
 
   /// @brief デストラクタ
   virtual
@@ -748,21 +749,21 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 演算子の型
-  tVpiOpType mOpType;
-  
+  VlOpType mOpType;
+
 };
 
 
@@ -773,9 +774,9 @@ private:
 class ConstTypeNode :
   public PtScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] const_type 定数の型
   ConstTypeNode(tVpiConstType const_type);
@@ -789,13 +790,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -803,7 +804,7 @@ private:
 
   // 定数の型
   tVpiConstType mConstType;
-  
+
 };
 
 
@@ -814,9 +815,9 @@ private:
 class RangeModeNode :
   public PtScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] range_mode 範囲指定の型
   RangeModeNode(tVpiRangeMode range_mode);
@@ -830,13 +831,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -844,7 +845,7 @@ private:
 
   // 範囲指定の型
   tVpiRangeMode mRangeMode;
-  
+
 };
 
 
@@ -871,24 +872,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // strength 情報
   tVpiStrength mStrength;
-  
+
 };
 
 
@@ -899,9 +900,9 @@ private:
 class VsNode :
   public PtScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] vs vectored/scalared 情報
   VsNode(tVpiVsType vs);
@@ -915,13 +916,13 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -929,7 +930,7 @@ private:
 
   // vectored/scalared 情報
   tVpiVsType mVs;
-  
+
 };
 
 
@@ -940,9 +941,9 @@ private:
 class BoolNode :
   public PtScalarNode
 {
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] label ラベル
   /// @param[in] val 真理値
@@ -958,24 +959,24 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // 真理値
   bool mVal;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

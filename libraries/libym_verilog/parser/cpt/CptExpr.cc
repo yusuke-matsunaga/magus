@@ -31,11 +31,11 @@ CptExpr::~CptExpr()
 
 // @brief 演算子の種類の取得
 // @return 演算子の種類
-// このクラスでは kVpiNullOp を返す．
-tVpiOpType
+// このクラスでは vpiNullOp を返す．
+VlOpType
 CptExpr::op_type() const
 {
-  return kVpiNullOp;
+  return VlOpType(vpiNullOp);
 }
 
 // @brief 階層ブランチの取得
@@ -206,7 +206,7 @@ CptExpr::is_simple() const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CptOpr::CptOpr(tVpiOpType op_type) :
+CptOpr::CptOpr(const VlOpType& op_type) :
   mOpType(op_type)
 {
 }
@@ -224,7 +224,7 @@ CptOpr::type() const
 }
 
 // 演算子のトークン番号を得る．
-tVpiOpType
+VlOpType
 CptOpr::op_type() const
 {
   return mOpType;
@@ -237,7 +237,7 @@ CptOpr::op_type() const
 
 // コンストラクタ
 CptOpr1::CptOpr1(const FileRegion& file_region,
-		 tVpiOpType op_type,
+		 const VlOpType& op_type,
 		 const PtExpr* opr) :
   CptOpr(op_type),
   mFileRegion(file_region),
@@ -263,7 +263,7 @@ bool
 CptOpr1::is_index_expr() const
 {
   // 算術演算はOKだけどめんどくさいので単項のマイナスのみOKとする．
-  if ( op_type() == 0 || op_type() == vpiMinusOp ) {
+  if ( op_type().val() == vpiNullOp || op_type().val() == vpiMinusOp ) {
     return operand(0)->is_index_expr();
   }
   else {
@@ -275,10 +275,11 @@ CptOpr1::is_index_expr() const
 int
 CptOpr1::index_value() const
 {
-  if ( op_type() == 0 ) {
+  switch ( op_type().val() ) {
+  case vpiNullOp:
     return operand(0)->index_value();
-  }
-  if ( op_type() == vpiMinusOp ) {
+
+  case vpiMinusOp:
     return - operand(0)->index_value();
   }
   return 0;
@@ -312,7 +313,7 @@ CptOpr1::operand(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CptOpr2::CptOpr2(tVpiOpType op_type,
+CptOpr2::CptOpr2(const VlOpType& op_type,
 		 const PtExpr* opr1,
 		 const PtExpr* opr2) :
   CptOpr(op_type)
@@ -363,7 +364,7 @@ CptOpr2::operand(ymuint pos) const
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CptOpr3::CptOpr3(tVpiOpType op_type,
+CptOpr3::CptOpr3(const VlOpType& op_type,
 		 const PtExpr* opr1,
 		 const PtExpr* opr2,
 		 const PtExpr* opr3) :
@@ -444,10 +445,10 @@ CptConcat::type() const
 }
 
 ///演算子の種類の取得
-tVpiOpType
+VlOpType
 CptConcat::op_type() const
 {
-  return kVpiConcatOp;
+  return VlOpType(vpiConcatOp);
 }
 
 // @brief オペランドの数の取得
@@ -485,10 +486,10 @@ CptMultiConcat::~CptMultiConcat()
 }
 
 // 演算子の種類の取得
-tVpiOpType
+VlOpType
 CptMultiConcat::op_type() const
 {
-  return kVpiMultiConcatOp;
+  return VlOpType(vpiMultiConcatOp);
 }
 
 
@@ -529,10 +530,10 @@ CptMinTypMax::type() const
 }
 
 // 演算子の種類の取得
-tVpiOpType
+VlOpType
 CptMinTypMax::op_type() const
 {
-  return kVpiMinTypMaxOp;
+  return VlOpType(vpiMinTypMaxOp);
 }
 
 // 子供の数の取得
@@ -903,7 +904,7 @@ CptStringConstant::const_str() const
 // 演算子を生成する．
 const PtExpr*
 CptFactory::new_Opr(const FileRegion& file_region,
-		    tVpiOpType type,
+		    const VlOpType& type,
 		    const PtExpr* opr)
 {
   ++ mNumOpr1;
@@ -913,7 +914,7 @@ CptFactory::new_Opr(const FileRegion& file_region,
 
 const PtExpr*
 CptFactory::new_Opr(const FileRegion& file_region,
-		    tVpiOpType type,
+		    const VlOpType& type,
 		    const PtExpr* opr1,
 		    const PtExpr* opr2)
 {
@@ -925,7 +926,7 @@ CptFactory::new_Opr(const FileRegion& file_region,
 
 const PtExpr*
 CptFactory::new_Opr(const FileRegion& file_region,
-		    tVpiOpType type,
+		    const VlOpType& type,
 		    const PtExpr* opr1,
 		    const PtExpr* opr2,
 		    const PtExpr* opr3)

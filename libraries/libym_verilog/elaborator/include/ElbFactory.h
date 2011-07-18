@@ -820,7 +820,7 @@ public:
   virtual
   ElbExpr*
   new_UnaryOp(const PtExpr* pt_expr,
-	      tVpiOpType op_type,
+	      const VlOpType& op_type,
 	      ElbExpr* opr1) = 0;
 
   /// @brief 2項演算子を生成する．
@@ -831,7 +831,7 @@ public:
   virtual
   ElbExpr*
   new_BinaryOp(const PtExpr* pt_expr,
-	       tVpiOpType op_type,
+	       const VlOpType& op_type,
 	       ElbExpr* opr1,
 	       ElbExpr* opr2) = 0;
 
@@ -844,7 +844,7 @@ public:
   virtual
   ElbExpr*
   new_TernaryOp(const PtExpr* pt_expr,
-		tVpiOpType op_type,
+		const VlOpType& op_type,
 		ElbExpr* opr1,
 		ElbExpr* opr2,
 		ElbExpr* opr3) = 0;

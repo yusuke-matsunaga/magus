@@ -11,6 +11,7 @@
 
 #include "VmExprNode.h"
 #include "ym_verilog/VlValue.h"
+#include "ym_verilog/VlOpType.h"
 #include "ym_verilog/vl/VlExpr.h"
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlTaskFunc.h"
@@ -207,52 +208,52 @@ value_type2str(const VlValueType& value_type)
 
 // 演算子の型を表す文字列を返す．
 QString
-op_type_str(tVpiOpType type)
+op_type_str(const VlOpType& type)
 {
-  switch ( type ) {
-  case kVpiMinusOp:       return "minus";
-  case kVpiPlusOp:        return "plus";
-  case kVpiNotOp:         return "not";
-  case kVpiBitNegOp:      return "bitneg";
-  case kVpiUnaryAndOp:    return "unary and";
-  case kVpiUnaryNandOp:   return "unary nand";
-  case kVpiUnaryOrOp:     return "unary or";
-  case kVpiUnaryNorOp:    return "unary nor";
-  case kVpiUnaryXorOp:    return "unary xor";
-  case kVpiUnaryXNorOp:   return "unary xnor";
-  case kVpiSubOp:         return "sub";
-  case kVpiDivOp:         return "div";
-  case kVpiModOp:         return "mod";
-  case kVpiEqOp:          return "equal";
-  case kVpiNeqOp:         return "not equal";
-  case kVpiCaseEqOp:      return "case equal";
-  case kVpiCaseNeqOp:     return "case not equal";
-  case kVpiGtOp:          return "greater than";
-  case kVpiGeOp:          return "greater than or equal";
-  case kVpiLtOp:          return "less than";
-  case kVpiLeOp:          return "leess than or equal";
-  case kVpiLShiftOp:      return "left shift";
-  case kVpiRShiftOp:      return "right shift";
-  case kVpiAddOp:         return "add";
-  case kVpiMultOp:        return "mult";
-  case kVpiLogAndOp:      return "logical and";
-  case kVpiLogOrOp:       return "logical or";
-  case kVpiBitAndOp:      return "bitwise and";
-  case kVpiBitOrOp:       return "bitwise or";
-  case kVpiBitXorOp:      return "bitwise xor";
-  case kVpiBitXNorOp:     return "bitwise xnor";
-  case kVpiConditionOp:   return "conditional";
-  case kVpiConcatOp:      return "concat";
-  case kVpiMultiConcatOp: return "multi concat";
-  case kVpiEventOrOp:     return "event or";
-  case kVpiNullOp:        return "null";
-  case kVpiListOp:        return "list";
-  case kVpiMinTypMaxOp:   return "min-typ-max";
-  case kVpiPosedgeOp:     return "positive edge";
-  case kVpiNegedgeOp:     return "negative edge";
-  case kVpiArithLShiftOp: return "arithmetic left shift";
-  case kVpiArithRShiftOp: return "arithmetic right shift";
-  case kVpiPowerOp:       return "power";
+  switch ( type.val() ) {
+  case vpiMinusOp:       return "minus";
+  case vpiPlusOp:        return "plus";
+  case vpiNotOp:         return "not";
+  case vpiBitNegOp:      return "bitneg";
+  case vpiUnaryAndOp:    return "unary and";
+  case vpiUnaryNandOp:   return "unary nand";
+  case vpiUnaryOrOp:     return "unary or";
+  case vpiUnaryNorOp:    return "unary nor";
+  case vpiUnaryXorOp:    return "unary xor";
+  case vpiUnaryXNorOp:   return "unary xnor";
+  case vpiSubOp:         return "sub";
+  case vpiDivOp:         return "div";
+  case vpiModOp:         return "mod";
+  case vpiEqOp:          return "equal";
+  case vpiNeqOp:         return "not equal";
+  case vpiCaseEqOp:      return "case equal";
+  case vpiCaseNeqOp:     return "case not equal";
+  case vpiGtOp:          return "greater than";
+  case vpiGeOp:          return "greater than or equal";
+  case vpiLtOp:          return "less than";
+  case vpiLeOp:          return "leess than or equal";
+  case vpiLShiftOp:      return "left shift";
+  case vpiRShiftOp:      return "right shift";
+  case vpiAddOp:         return "add";
+  case vpiMultOp:        return "mult";
+  case vpiLogAndOp:      return "logical and";
+  case vpiLogOrOp:       return "logical or";
+  case vpiBitAndOp:      return "bitwise and";
+  case vpiBitOrOp:       return "bitwise or";
+  case vpiBitXorOp:      return "bitwise xor";
+  case vpiBitXNorOp:     return "bitwise xnor";
+  case vpiConditionOp:   return "conditional";
+  case vpiConcatOp:      return "concat";
+  case vpiMultiConcatOp: return "multi concat";
+  case vpiEventOrOp:     return "event or";
+  case vpiNullOp:        return "null";
+  case vpiListOp:        return "list";
+  case vpiMinTypMaxOp:   return "min-typ-max";
+  case vpiPosedgeOp:     return "positive edge";
+  case vpiNegedgeOp:     return "negative edge";
+  case vpiArithLShiftOp: return "arithmetic left shift";
+  case vpiArithRShiftOp: return "arithmetic right shift";
+  case vpiPowerOp:       return "power";
   default: assert_not_reached(__FILE__, __LINE__);
   }
   return "";

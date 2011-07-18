@@ -92,6 +92,7 @@ BEGIN_NAMESPACE_YM
 
 using nsVerilog::VlObj;
 using nsVerilog::VlNamedObj;
+using nsVerilog::VlDeclBase;
 using nsVerilog::VlDecl;
 using nsVerilog::VlDeclArray;
 using nsVerilog::VlModule;
