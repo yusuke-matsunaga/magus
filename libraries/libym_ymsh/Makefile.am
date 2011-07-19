@@ -39,4 +39,4 @@ libym_ymsh_la_SOURCES = \
 libym_ymsh_la_LIBADD =
 
 libym_ymsh_la_LDFLAGS = \
-	-lreadline
+	-lreadline -lncurses
