@@ -104,10 +104,16 @@ dump_port(ostream& s,
 {
   s << "." << verilog_name(port->name()) << "(";
   ymuint n = port->bit_width();
+  const char* rcb = "";
+  if ( n > 1 ) {
+    s << "{";
+    rcb = "}";
+  }
   const char* comma = "";
   for (ymuint i = 0; i < n; ++ i) {
-    const BdnNode* input = port->input(i);
-    const BdnNode* output = port->output(i);
+    ymuint pos = n - i - 1;
+    const BdnNode* input = port->input(pos);
+    const BdnNode* output = port->output(pos);
     s << comma;
     comma = ", ";
     if ( input ) {
@@ -120,7 +126,7 @@ dump_port(ostream& s,
       assert_not_reached(__FILE__, __LINE__);
     }
   }
-  s << ")";
+  s << rcb << ")";
 }
 
 END_NONAMESPACE
