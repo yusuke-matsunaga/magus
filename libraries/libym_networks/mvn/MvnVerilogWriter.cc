@@ -166,7 +166,7 @@ dump_node(ostream& s,
 	s << "    " << elif << " ( "
 	  << not_str << node_name(src_node2) << " )" << endl
 	  << "      " << node_name(node) << " <= "
-	  << node_name(src_node3) << endl;
+	  << node_name(src_node3) << ";" << endl;
 	elif = "else if";
       }
       if ( nc > 0 ) {
