@@ -18,6 +18,10 @@ libym_mvn_verilog_la_SOURCES = \
 	DeclMap.h \
 	DeclMap.cc \
 	Driver.h \
+	Env.h \
+	Env.cc \
+	EnvMerger.h \
+	EnvMerger.cc \
 	MapRec.h \
 	MvnVerilogReader.cc \
 	MvnVlMap.cc \
@@ -25,9 +29,7 @@ libym_mvn_verilog_la_SOURCES = \
 	ReaderImpl.cc \
 	ReaderImpl_item.cc \
 	ReaderImpl_stmt.cc \
-	ReaderImpl_expr.cc \
-	Env.h \
-	Env.cc
+	ReaderImpl_expr.cc
 
 libym_mvn_verilog_la_LIBADD =
 

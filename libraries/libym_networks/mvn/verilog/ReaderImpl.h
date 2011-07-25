@@ -21,6 +21,8 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
 
+class EnvMerger;
+
 //////////////////////////////////////////////////////////////////////
 /// @class ReaderImpl ReaderImpl.h "ReaderImpl.h"
 /// @brief 合成可能な Verilog 記述を読み込んで MVN に設定するクラス
@@ -147,19 +149,12 @@ private:
   /// @param[in] module 親のモジュール
   /// @param[in] stmt 本体のステートメント
   /// @param[in] env 環境
+  /// @param[in] merge 環境をマージするオブジェクト
   bool
-  gen_stmt1(MvnModule* module,
-	    const VlStmt* stmt,
-	    ProcEnv& env);
-
-  /// @brief ステートメントの中身を生成する(sequential always用)．
-  /// @param[in] module 親のモジュール
-  /// @param[in] stmt 本体のステートメント
-  /// @param[in] env 環境
-  bool
-  gen_stmt2(MvnModule* module,
-	    const VlStmt* stmt,
-	    ProcEnv& env);
+  gen_stmt(MvnModule* module,
+	   const VlStmt* stmt,
+	   ProcEnv& env,
+	   EnvMerger& merge);
 
   /// @brief 代入文を生成する．
   /// @param[in] module 親のモジュール
@@ -169,44 +164,6 @@ private:
   gen_assign(MvnModule* module,
 	     const VlStmt* stmt,
 	     ProcEnv& env);
-
-  /// @brief 環境をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] env 対象の環境
-  /// @param[in] cond 条件を表すノード
-  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
-  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
-  void
-  merge_env1(MvnModule* parent_module,
-	     ProcEnv& env,
-	     MvnNode* cond,
-	     const ProcEnv& then_env,
-	     const ProcEnv& else_env);
-
-  /// @brief 環境をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] env 対象の環境
-  /// @param[in] cond 条件を表すノード
-  /// @param[in] then_env 条件が成り立ったときに通るパスの環境
-  /// @param[in] else_env 条件が成り立たなかったときに通るパスの環境
-  void
-  merge_env2(MvnModule* parent_module,
-	     ProcEnv& env,
-	     MvnNode* cond,
-	     const ProcEnv& then_env,
-	     const ProcEnv& else_env);
-
-  /// @brief 代入条件をマージする．
-  /// @param[in] parent_module 親のモジュール
-  /// @param[in] cond 切り替え条件
-  /// @param[in] then_cond cond が成り立ったときの代入条件
-  /// @param[in] else_cond cond が成り立たなかったときの代入条件
-  /// @note 基本的には ITE(cond, then_cond, else_cond) だが，NULL の場合がある．
-  MvnNode*
-  merge_cond(MvnModule* parent_module,
-	     MvnNode* cond,
-	     MvnNode* then_cond,
-	     MvnNode* else_cond);
 
   /// @brief 条件式からノードを生成する．
   /// @param[in] cond 条件式

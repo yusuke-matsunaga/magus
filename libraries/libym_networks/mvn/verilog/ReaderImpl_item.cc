@@ -11,6 +11,7 @@
 #include "DeclMap.h"
 #include "Driver.h"
 #include "Env.h"
+#include "EnvMerger.h"
 #include "AsyncControl.h"
 #include "ym_networks/MvnMgr.h"
 #include "ym_networks/MvnNode.h"
@@ -270,7 +271,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	  AsyncControl* ctrl = new AsyncControl(mGlobalEnv);
 	  ctrl->mNode = node;
 	  ctrl->mPol = pol;
-	  gen_stmt2(parent_module, stmt1->body_stmt(), ctrl->mEnv);
+	  EnvMerger2 merger(mMvnMgr, mGlobalEnv);
+	  gen_stmt(parent_module, stmt1->body_stmt(), ctrl->mEnv, merger);
 	  event_list.push_back(ctrl);
 	  event_map[i] = true;
 	  break;
@@ -303,7 +305,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     assert_cond( clock_node != NULL, __FILE__, __LINE__);
 
     ProcEnv top_env(mGlobalEnv);
-    gen_stmt2(parent_module, stmt1, top_env);
+    EnvMerger2 merger(mMvnMgr, mGlobalEnv);
+    gen_stmt(parent_module, stmt1, top_env, merger);
 
     ymuint n = mGlobalEnv.max_id();
     for (ymuint i = 0; i < n; ++ i) {
@@ -345,7 +348,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
   }
   else {
     ProcEnv top_env(mGlobalEnv);
-    gen_stmt1(parent_module, stmt->body_stmt(), top_env);
+    EnvMerger1 merger(mMvnMgr);
+    gen_stmt(parent_module, stmt->body_stmt(), top_env, merger);
 
     ymuint n = mGlobalEnv.max_id();
     for (ymuint i = 0; i < n; ++ i) {
