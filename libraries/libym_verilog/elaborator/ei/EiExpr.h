@@ -50,11 +50,6 @@ public:
   // VlExpr の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 式のビット幅を返す．
-  virtual
-  ymuint
-  bit_size() const;
-
   /// @brief 定数の時 true を返す．
   /// @note このクラスは false を返す．
   virtual

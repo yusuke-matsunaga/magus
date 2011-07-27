@@ -84,12 +84,10 @@ ReaderImpl::gen_stmt(MvnModule* module,
     break;
 
   case kVpiCase:
-#if 0
     {
       const VlExpr* expr = stmt->expr();
       vector<bool> xmask;
-      MvnNode* expr_node = gen_case_expr(module, expr, stmt->case_type(),
-					 env, xmask);
+      MvnNode* expr_node = gen_expr(module, expr, stmt->case_type(), env, xmask);
       if ( expr_node == NULL ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			expr->file_region(),
@@ -104,14 +102,14 @@ ReaderImpl::gen_stmt(MvnModule* module,
 	}
       }
     }
-#else
-#warning "TODO: case 文"
-#endif
     break;
 
   default:
-#warning "エラーメッセージをまともにする．"
-    cerr << "can not synthesized" << endl;
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    stmt->file_region(),
+		    kMsgError,
+		    "MVN_VL",
+		    "Unsupported statement for synthesis.");
     return false;
   }
 
@@ -147,14 +145,14 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   for (ymuint i = 0; i < ne; ++ i) {
     const VlExpr* label_expr = caseitem->expr(i);
     vector<bool> label_xmask;
-    MvnNode* label = gen_case_expr(module, label_expr, case_type,
-				   env, label_xmask);
+    MvnNode* label = gen_expr(module, label_expr, case_type,
+			      env, label_xmask);
     if ( label == NULL ) {
       ostringstream buf;
-      buf << "Expression '" << expr->decompile()
+      buf << "Expression '" << label_expr->decompile()
 	  << "' contains 'x' or 'z', which is never match.";
       MsgMgr::put_msg(__FILE__, __LINE__,
-		      expr->file_region(),
+		      label_expr->file_region(),
 		      kMsgWarning,
 		      "MVN_VL",
 		      buf.str());
@@ -175,7 +173,6 @@ ReaderImpl::gen_caseitem(MvnModule* module,
       and_list.reserve(bw1);
       for (ymuint i = 0; i < bw1; ++ i) {
 	if ( label_xmask[i] ) continue;
-	MvnNode* lbit = mMvnMgr->new_constbitselect(module, i,
       }
     }
   }

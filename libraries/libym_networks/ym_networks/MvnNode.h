@@ -67,6 +67,8 @@ public:
 
     /// @brief equal ( 2入力, 1出力 )
     kEq,
+    /// @brief equal ( 2入力, 1出力 )
+    kEqX,
     /// @brief less than ( 2入力, 1出力 )
     kLt,
 
@@ -233,6 +235,14 @@ public:
   virtual
   void
   const_value(vector<ymuint32>& val) const;
+
+  /// @brief Xマスクを得る．
+  /// @param[out] val 値を格納するベクタ
+  /// @note type() が kEqX の時のみ意味を持つ．
+  /// @note デフォルトの実装ではなにもしない．
+  virtual
+  void
+  xmask(vector<ymuint32>& val) const;
 
 
 protected:

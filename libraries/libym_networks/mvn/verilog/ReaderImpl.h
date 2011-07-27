@@ -236,27 +236,35 @@ private:
   /// @param[in] env 環境
   /// @param[out] xmask Xマスク
   MvnNode*
-  gen_case_expr(MvnModule* parent_module,
-		const VlExpr* expr,
-		tVpiCaseType case_type,
-		const Env& env,
-		vector<bool>& xmask);
+  gen_expr(MvnModule* parent_module,
+	   const VlExpr* expr,
+	   tVpiCaseType case_type,
+	   const Env& env,
+	   vector<bool>& xmask);
 
   /// @brief 定数値に対応したノードを作る．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式
+  /// @param[in] case_type case 文の種類
+  /// @param[out] xmask Xマスク
   MvnNode*
   gen_const(MvnModule* parent_module,
-	    const VlExpr* expr);
+	    const VlExpr* expr,
+	    tVpiCaseType case_type,
+	    vector<bool>& xmask);
 
   /// @brief 演算に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] expr 式
+  /// @param[in] case_type case 文の種類
   /// @param[in] env 環境
+  /// @param[out] xmask Xマスク
   MvnNode*
   gen_opr(MvnModule* parent_module,
 	  const VlExpr* expr,
-	  const Env& env);
+	  tVpiCaseType case_type,
+	  const Env& env,
+	  vector<bool>& xmask);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
@@ -279,13 +287,11 @@ private:
   /// @brief 式の型を補正する．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] src_node 元のノード
-  /// @param[in] bit_width 要求されるビット幅
-  /// @param[in] sign 符号の有無
+  /// @param[in] value_type 要求されるデータ型
   MvnNode*
   coerce_expr(MvnModule* parent_module,
 	      MvnNode* src_node,
-	      ymuint bit_width,
-	      bool sign);
+	      VlValueType value_type);
 
   /// @brief 右辺式から該当する部分を切り出す．
   /// @param[in] parent_module 親のモジュール

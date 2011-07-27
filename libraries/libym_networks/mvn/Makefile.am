@@ -29,6 +29,8 @@ libym_mvn_la_SOURCES = \
 	MvnDff.h \
 	MvnDff.cc \
 	MvnDumper.cc \
+	MvnEqX.h \
+	MvnEqX.cc \
 	MvnMgr.cc \
 	MvnModule.cc \
 	MvnNode.cc \

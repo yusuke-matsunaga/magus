@@ -317,6 +317,16 @@ public:
   new_equal(MvnModule* module,
 	    ymuint bit_width);
 
+  /// @brief Xマスク付きの equal ノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] bit_width ビット幅
+  /// @param[in] val 値
+  /// @return 生成したノードを返す．
+  MvnNode*
+  new_equalx(MvnModule* module,
+	     ymuint bit_width,
+	     const vector<ymuint32>& val);
+
   /// @brief less than ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅

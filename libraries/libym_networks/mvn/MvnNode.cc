@@ -92,4 +92,13 @@ MvnNode::const_value(vector<ymuint32>& val) const
 {
 }
 
+// @brief Xマスクを得る．
+// @param[out] val 値を格納するベクタ
+// @note type() が kEqX の時のみ意味を持つ．
+// @note デフォルトの実装ではなにもしない．
+void
+MvnNode::xmask(vector<ymuint32>& val) const
+{
+}
+
 END_NAMESPACE_YM_NETWORKS

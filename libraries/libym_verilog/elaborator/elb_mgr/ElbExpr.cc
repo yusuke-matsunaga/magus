@@ -31,6 +31,13 @@ ElbExpr::~ElbExpr()
 {
 }
 
+// @brief 式のビット幅を返す．
+ymuint
+ElbExpr::bit_size() const
+{
+  return value_type().size();
+}
+
 // 二項演算のタイプとサイズを決める．
 VlValueType
 ElbExpr::calc_type(const VlValueType& type0,

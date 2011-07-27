@@ -41,13 +41,6 @@ EiExpr::file_region() const
   return pt_obj()->file_region();
 }
 
-// @brief 式のビット幅を返す．
-ymuint
-EiExpr::bit_size() const
-{
-  return value_type().size();
-}
-
 // @brief 定数の時 true を返す．
 // @note このクラスは false を返す．
 bool
