@@ -145,7 +145,7 @@ private:
 		  const VlExpr* lhs,
 		  const VlExpr* rhs);
 
-  /// @brief ステートメントの中身を生成する(combinational always用)．
+  /// @brief ステートメントの中身を生成する．
   /// @param[in] module 親のモジュール
   /// @param[in] stmt 本体のステートメント
   /// @param[in] env 環境
@@ -155,6 +155,23 @@ private:
 	   const VlStmt* stmt,
 	   ProcEnv& env,
 	   EnvMerger& merge);
+
+  /// @brief case 文の本体を生成する．
+  /// @param[in] module 親のモジュール
+  /// @param[in] stmt case 文のステートメント
+  /// @param[in] expr case 文の式を表すノード
+  /// @param[in] xmask case 文の式の Xマスク
+  /// @param[in] pos caseitem の位置番号
+  /// @param[in] env 環境
+  /// @param[in] merge 環境をマージするオブジェクト
+  bool
+  gen_caseitem(MvnModule* module,
+	       const VlStmt* stmt,
+	       MvnNode* expr,
+	       const vector<bool>& xmask,
+	       ymuint pos,
+	       ProcEnv& env,
+	       EnvMerger& merge);
 
   /// @brief 代入文を生成する．
   /// @param[in] module 親のモジュール
@@ -211,6 +228,19 @@ private:
   gen_expr(MvnModule* parent_module,
 	   const VlExpr* expr,
 	   const Env& env);
+
+  /// @brief case 文用の式に対応したノードの木を作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 式
+  /// @param[in] case_type case 文の種類
+  /// @param[in] env 環境
+  /// @param[out] xmask Xマスク
+  MvnNode*
+  gen_case_expr(MvnModule* parent_module,
+		const VlExpr* expr,
+		tVpiCaseType case_type,
+		const Env& env,
+		vector<bool>& xmask);
 
   /// @brief 定数値に対応したノードを作る．
   /// @param[in] parent_module 親のモジュール

@@ -86,9 +86,23 @@ ReaderImpl::gen_stmt(MvnModule* module,
   case kVpiCase:
 #if 0
     {
-      const VlExpr* cond = stmt->expr();
-      MvnNode* cond_node = gen_expr(module, cond, env);
-
+      const VlExpr* expr = stmt->expr();
+      vector<bool> xmask;
+      MvnNode* expr_node = gen_case_expr(module, expr, stmt->case_type(),
+					 env, xmask);
+      if ( expr_node == NULL ) {
+	MsgMgr::put_msg(__FILE__, __LINE__,
+			expr->file_region(),
+			kMsgWarning,
+			"MVN_VL",
+			"Case expression contains 'x' or 'z', "
+			"which is never match.");
+      }
+      else {
+	if ( !gen_caseitem(module, stmt, expr_node, xmask, 0, env, merge) ) {
+	  return false;
+	}
+      }
     }
 #else
 #warning "TODO: case 文"
@@ -102,6 +116,69 @@ ReaderImpl::gen_stmt(MvnModule* module,
   }
 
   return true;
+}
+
+// @brief case 文の本体を生成する．
+// @param[in] module 親のモジュール
+// @param[in] stmt case 文のステートメント
+// @param[in] expr case 文の式を表すノード
+// @param[in] xmask case 文の式の Xマスク
+// @param[in] pos caseitem の位置番号
+// @param[in] env 環境
+// @param[in] merge 環境をマージするオブジェクト
+bool
+ReaderImpl::gen_caseitem(MvnModule* module,
+			 const VlStmt* stmt,
+			 MvnNode* expr,
+			 const vector<bool>& xmask,
+			 ymuint pos,
+			 ProcEnv& env,
+			 EnvMerger& merge)
+{
+  ymuint n = stmt->caseitem_num();
+  if ( pos == n ) {
+    return true;
+  }
+  tVpiCaseType case_type = stmt->case_type();
+  const VlCaseItem* caseitem = stmt->caseitem(pos);
+  ymuint ne = caseitem->expr_num();
+  vector<MvnNode*> cond_list;
+  cond_list.reserve(ne);
+  for (ymuint i = 0; i < ne; ++ i) {
+    const VlExpr* label_expr = caseitem->expr(i);
+    vector<bool> label_xmask;
+    MvnNode* label = gen_case_expr(module, label_expr, case_type,
+				   env, label_xmask);
+    if ( label == NULL ) {
+      ostringstream buf;
+      buf << "Expression '" << expr->decompile()
+	  << "' contains 'x' or 'z', which is never match.";
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      expr->file_region(),
+		      kMsgWarning,
+		      "MVN_VL",
+		      buf.str());
+    }
+    else {
+      ymuint bw = xmask.size();
+      ymuint label_bw = label_xmask.size();
+      ymuint bw1 = bw >= label_bw ? bw : label_bw;
+      if ( label_bw < bw1 ) {
+	label_xmask.resize(bw1, false);
+      }
+      for (ymuint i = 0; i < bw; ++ i) {
+	if ( xmask[i] ) {
+	  label_xmask[i] = true;
+	}
+      }
+      vector<MvnNode*> and_list;
+      and_list.reserve(bw1);
+      for (ymuint i = 0; i < bw1; ++ i) {
+	if ( label_xmask[i] ) continue;
+	MvnNode* lbit = mMvnMgr->new_constbitselect(module, i,
+      }
+    }
+  }
 }
 
 // @brief 代入文を生成する．
