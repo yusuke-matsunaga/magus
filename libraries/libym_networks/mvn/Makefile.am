@@ -20,6 +20,8 @@ libym_mvn_la_LIBADD = \
 	verilog/libym_mvn_verilog.la
 
 libym_mvn_la_SOURCES = \
+	MvnCaseEq.h \
+	MvnCaseEq.cc \
 	MvnConst.h \
 	MvnConst.cc \
 	MvnConstBitSelect.h \
@@ -29,8 +31,6 @@ libym_mvn_la_SOURCES = \
 	MvnDff.h \
 	MvnDff.cc \
 	MvnDumper.cc \
-	MvnEqX.h \
-	MvnEqX.cc \
 	MvnMgr.cc \
 	MvnModule.cc \
 	MvnNode.cc \

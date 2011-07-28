@@ -1,8 +1,8 @@
-#ifndef LIBYM_NETWORKS_MVNEQX_H
-#define LIBYM_NETWORKS_MVNEQX_H
+#ifndef LIBYM_NETWORKS_MVNCASEEQ_H
+#define LIBYM_NETWORKS_MVNCASEEQ_H
 
-/// @file libym_networks/MvnEqX.h
-/// @brief MvnConst のヘッダファイル
+/// @file libym_networks/MvnCaseEq.h
+/// @brief MvnCaseEq のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
-/// @class MvnEqX MvnEqX.h "MvnEqX.h"
+/// @class MvnCaseEq MvnCaseEq.h "MvnCaseEq.h"
 /// @brief Xマスク付きの等価比較ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvnEqX :
+class MvnCaseEq :
   public MvnNodeBase
 {
   friend class MvnMgr;
@@ -30,12 +30,14 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] val 値
-  MvnEqX(MvnModule* module,
-	 const vector<ymuint32>& val);
+  MvnCaseEq(MvnModule* module,
+	    ymuint input_num,
+	    const vector<ymuint32>& val);
 
   /// @brief デストラクタ
-  ~MvnEqX();
+  ~MvnCaseEq();
 
 
 public:

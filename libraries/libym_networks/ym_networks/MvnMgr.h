@@ -317,15 +317,19 @@ public:
   new_equal(MvnModule* module,
 	    ymuint bit_width);
 
-  /// @brief Xマスク付きの equal ノードを生成する．
+  /// @brief case 文用の equal ノードを生成する．
   /// @param[in] module ノードが属するモジュール
+  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
-  /// @param[in] val 値
+  /// @param[in] xmask Xマスク値
   /// @return 生成したノードを返す．
+  /// @note 最初の入力が case expression
+  /// @note 残りの入力は caseitem expression
   MvnNode*
-  new_equalx(MvnModule* module,
+  new_caseeq(MvnModule* module,
+	     ymuint input_num,
 	     ymuint bit_width,
-	     const vector<ymuint32>& val);
+	     const vector<ymuint32>& xmask);
 
   /// @brief less than ノードを生成する．
   /// @param[in] module ノードが属するモジュール

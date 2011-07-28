@@ -67,10 +67,10 @@ public:
 
     /// @brief equal ( 2入力, 1出力 )
     kEq,
-    /// @brief equal ( 2入力, 1出力 )
-    kEqX,
     /// @brief less than ( 2入力, 1出力 )
     kLt,
+    /// @brief equal ( n入力, 1出力 )
+    kCaseEq,
 
     /// @brief shift left logical ( 2入力, 1出力 )
     kSll,

@@ -168,7 +168,7 @@ private:
   gen_caseitem(MvnModule* module,
 	       const VlStmt* stmt,
 	       MvnNode* expr,
-	       const vector<bool>& xmask,
+	       const vector<ymuint32>& xmask,
 	       ymuint pos,
 	       ProcEnv& env,
 	       EnvMerger& merge);
@@ -240,7 +240,7 @@ private:
 	   const VlExpr* expr,
 	   tVpiCaseType case_type,
 	   const Env& env,
-	   vector<bool>& xmask);
+	   vector<ymuint32>& xmask);
 
   /// @brief 定数値に対応したノードを作る．
   /// @param[in] parent_module 親のモジュール
@@ -251,7 +251,7 @@ private:
   gen_const(MvnModule* parent_module,
 	    const VlExpr* expr,
 	    tVpiCaseType case_type,
-	    vector<bool>& xmask);
+	    vector<ymuint32>& xmask);
 
   /// @brief 演算に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -264,7 +264,7 @@ private:
 	  const VlExpr* expr,
 	  tVpiCaseType case_type,
 	  const Env& env,
-	  vector<bool>& xmask);
+	  vector<ymuint32>& xmask);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式

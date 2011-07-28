@@ -56,7 +56,10 @@ ReaderImpl::gen_stmt(MvnModule* module,
       ymuint n = stmt->child_stmt_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const VlStmt* stmt1 = stmt->child_stmt(i);
-	gen_stmt(module, stmt1, env, merge);
+	bool stat = gen_stmt(module, stmt1, env, merge);
+	if ( !stat ) {
+	  return false;
+	}
       }
     }
     break;
@@ -66,7 +69,10 @@ ReaderImpl::gen_stmt(MvnModule* module,
       const VlExpr* cond = stmt->expr();
       MvnNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
-      gen_stmt(module, stmt->body_stmt(), then_env, merge);
+      bool stat = gen_stmt(module, stmt->body_stmt(), then_env, merge);
+      if ( !stat ) {
+	return false;
+      }
       merge(module, env, cond_node, then_env, env);
     }
     break;
@@ -76,9 +82,15 @@ ReaderImpl::gen_stmt(MvnModule* module,
       const VlExpr* cond = stmt->expr();
       MvnNode* cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
-      gen_stmt(module, stmt->body_stmt(), then_env, merge);
+      bool stat1 = gen_stmt(module, stmt->body_stmt(), then_env, merge);
+      if ( !stat1 ) {
+	return false;
+      }
       ProcEnv else_env(env);
-      gen_stmt(module, stmt->else_stmt(), else_env, merge);
+      bool stat2 = gen_stmt(module, stmt->else_stmt(), else_env, merge);
+      if ( !stat2 ) {
+	return false;
+      }
       merge(module, env, cond_node, then_env, else_env);
     }
     break;
@@ -86,7 +98,7 @@ ReaderImpl::gen_stmt(MvnModule* module,
   case kVpiCase:
     {
       const VlExpr* expr = stmt->expr();
-      vector<bool> xmask;
+      vector<ymuint32> xmask;
       MvnNode* expr_node = gen_expr(module, expr, stmt->case_type(), env, xmask);
       if ( expr_node == NULL ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
@@ -97,7 +109,8 @@ ReaderImpl::gen_stmt(MvnModule* module,
 			"which is never match.");
       }
       else {
-	if ( !gen_caseitem(module, stmt, expr_node, xmask, 0, env, merge) ) {
+	bool stat = gen_caseitem(module, stmt, expr_node, xmask, 0, env, merge);
+	if ( !stat ) {
 	  return false;
 	}
       }
@@ -128,7 +141,7 @@ bool
 ReaderImpl::gen_caseitem(MvnModule* module,
 			 const VlStmt* stmt,
 			 MvnNode* expr,
-			 const vector<bool>& xmask,
+			 const vector<ymuint32>& xmask,
 			 ymuint pos,
 			 ProcEnv& env,
 			 EnvMerger& merge)
@@ -137,14 +150,18 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   if ( pos == n ) {
     return true;
   }
+
+  // pos 番めの条件を作る．
   tVpiCaseType case_type = stmt->case_type();
   const VlCaseItem* caseitem = stmt->caseitem(pos);
   ymuint ne = caseitem->expr_num();
-  vector<MvnNode*> cond_list;
-  cond_list.reserve(ne);
+  ymuint bw = xmask.size();
+  vector<MvnNode*> label_list;
+  label_list.reserve(ne);
+  vector<ymuint32> xmask1(xmask);
   for (ymuint i = 0; i < ne; ++ i) {
     const VlExpr* label_expr = caseitem->expr(i);
-    vector<bool> label_xmask;
+    vector<ymuint32> label_xmask;
     MvnNode* label = gen_expr(module, label_expr, case_type,
 			      env, label_xmask);
     if ( label == NULL ) {
@@ -158,24 +175,27 @@ ReaderImpl::gen_caseitem(MvnModule* module,
 		      buf.str());
     }
     else {
-      ymuint bw = xmask.size();
+      label_list.push_back(label);
       ymuint label_bw = label_xmask.size();
-      ymuint bw1 = bw >= label_bw ? bw : label_bw;
-      if ( label_bw < bw1 ) {
-	label_xmask.resize(bw1, false);
-      }
+      assert_cond( label_bw == bw, __FILE__, __LINE__);
       for (ymuint i = 0; i < bw; ++ i) {
-	if ( xmask[i] ) {
-	  label_xmask[i] = true;
-	}
-      }
-      vector<MvnNode*> and_list;
-      and_list.reserve(bw1);
-      for (ymuint i = 0; i < bw1; ++ i) {
-	if ( label_xmask[i] ) continue;
+	xmask1[i] |= label_xmask[i];
       }
     }
   }
+  ymuint ni = label_list.size() + 1;
+  MvnNode* cond_node = mMvnMgr->new_caseeq(module, ni, bw, xmask1);
+  mMvnMgr->connect(expr, 0, cond_node, 0);
+  for (ymuint i = 1; i < ni; ++ i) {
+    mMvnMgr->connect(label_list[i - 1], 0, cond_node, i);
+  }
+
+  ProcEnv then_env(env);
+  gen_stmt(module, caseitem->body_stmt(), then_env, merge);
+  ProcEnv else_env(env);
+  gen_caseitem(module, stmt, expr, xmask, pos + 1, else_env, merge);
+  merge(module, env, cond_node, then_env, else_env);
+  return true;
 }
 
 // @brief 代入文を生成する．

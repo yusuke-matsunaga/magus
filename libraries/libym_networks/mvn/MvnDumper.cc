@@ -93,6 +93,7 @@ dump_node(ostream& s,
   case MvnNode::kRxor:       s << "Rxor"; break;
   case MvnNode::kEq:         s << "Eq"; break;
   case MvnNode::kLt:         s << "Lt"; break;
+  case MvnNode::kCaseEq:     s << "CaseEq"; break;
   case MvnNode::kSll:        s << "Sll"; break;
   case MvnNode::kSrl:        s << "Srl"; break;
   case MvnNode::kSla:        s << "Sla"; break;

@@ -34,7 +34,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 		     const VlExpr* expr,
 		     const Env& env)
 {
-  vector<bool> dummy;
+  vector<ymuint32> dummy;
   MvnNode* node = gen_expr(parent_module, expr, kVpiCaseExact, env, dummy);
   if ( node == NULL ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -57,7 +57,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 		     const VlExpr* expr,
 		     tVpiCaseType case_type,
 		     const Env& env,
-		     vector<bool>& xmask)
+		     vector<ymuint32>& xmask)
 {
   MvnNode* node = NULL;
   if ( expr->is_const() ) {
@@ -157,28 +157,29 @@ MvnNode*
 ReaderImpl::gen_const(MvnModule* parent_module,
 		      const VlExpr* expr,
 		      tVpiCaseType case_type,
-		      vector<bool>& xmask)
+		      vector<ymuint32>& xmask)
 {
   VlValue value = expr->constant_value();
   assert_cond( expr->value_type().is_bitvector_type(), __FILE__, __LINE__);
   BitVector bv = value.bitvector_value();
   ymuint bit_size = bv.size();
-  ymuint n = (bit_size + 31) / 32;
-  vector<ymuint32> tmp(n);
-  xmask.resize(bit_size, false);
+  ymuint blk_size = (bit_size + 31) / 32;
+  vector<ymuint32> tmp(blk_size, 0U);
+  xmask.resize(blk_size, 0U);
   for (ymuint i = 0; i < bit_size; ++ i) {
     ymuint blk = i / 32;
     ymuint pos = i % 32;
+    ymuint32 bit = (1U << pos);
     VlScalarVal v = bv.value(i);
     if ( v.is_one() ) {
-      tmp[blk] |= (1 << pos);
+      tmp[blk] |= bit;
     }
     else if ( v.is_zero() ) {
       ; // なにもしない．
     }
     else if ( v.is_x() ) {
       if ( case_type == kVpiCaseX ) {
-	xmask[i] = true;
+	xmask[blk] |= bit;
       }
       else {
 	return NULL;
@@ -186,7 +187,7 @@ ReaderImpl::gen_const(MvnModule* parent_module,
     }
     else if ( v.is_z() ) {
       if ( case_type == kVpiCaseX || case_type == kVpiCaseZ ) {
-	xmask[i] = true;
+	xmask[blk] |= bit;
       }
       else {
 	return NULL;
@@ -204,55 +205,57 @@ BEGIN_NONAMESPACE
 
 // xmask の各ビットの OR を返す．
 bool
-or_xmask(ymuint bw,
-	 const vector<bool>& xmask)
+or_xmask(ymuint blk_size,
+	 const vector<ymuint32>& xmask)
 {
-  bool ans = xmask[0];
-  for (ymuint i = 1; i < bw; ++ i) {
-    ans |= xmask[i];
+  for (ymuint i = 0; i < blk_size; ++ i) {
+    if ( xmask[i] != 0U ) {
+      return true;
+    }
   }
-  return ans;
+  return false;
 }
 
 // xmask の各ビットに val を書き込む．
 void
-fill_xmask(ymuint bw,
+fill_xmask(ymuint blk_size,
 	   bool val,
-	   vector<bool>& xmask)
+	   vector<ymuint32>& xmask)
 {
-  for (ymuint i = 0; i < bw; ++ i) {
-    xmask[i] = val;
+  ymuint32 v = val ? 0xFFFFFFFF : 0x0;
+  for (ymuint i = 0; i < blk_size; ++ i) {
+    xmask[i] = v;
   }
 }
 
 // xmask_array[0] を xmask にコピーする．
 void
-copy_xmask1(ymuint bw,
-	    const vector<vector<bool> >& xmask_array,
-	    vector<bool>& xmask)
+copy_xmask1(ymuint blk_size,
+	    const vector<vector<ymuint32> >& xmask_array,
+	    vector<ymuint32>& xmask)
 {
-  for (ymuint i = 0; i < bw; ++ i) {
+  for (ymuint i = 0; i < blk_size; ++ i) {
     xmask[i] = xmask_array[0][i];
   }
 }
 
 // xmask_array[0] | xmask_array[1] を xmask にコピーする．
 void
-copy_xmask2(ymuint bw,
-	    const vector<vector<bool> >& xmask_array,
-	    vector<bool>& xmask)
+copy_xmask2(ymuint blk_size,
+	    const vector<vector<ymuint32> >& xmask_array,
+	    vector<ymuint32>& xmask)
 {
-  for (ymuint i = 0; i < bw; ++ i) {
+  for (ymuint i = 0; i < blk_size; ++ i) {
     xmask[i] = xmask_array[0][i] | xmask_array[1][i];
   }
 }
 
 void
-copy_xmask3(ymuint bw,
-	    const vector<vector<bool> >& xmask_array,
-	    vector<bool>& xmask)
+copy_xmask3(ymuint blk_size,
+	    const vector<vector<ymuint32> >& xmask_array,
+	    vector<ymuint32>& xmask)
 {
-  for (ymuint i = 0; i < bw; ++ i) {
+  for (ymuint i = 0; i < blk_size; ++ i) {
     xmask[i] = xmask_array[0][i] | xmask_array[1][i] | xmask_array[2][i];
   }
 }
@@ -270,15 +273,16 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 		    const VlExpr* expr,
 		    tVpiCaseType case_type,
 		    const Env& env,
-		    vector<bool>& xmask)
+		    vector<ymuint32>& xmask)
 {
   ymuint out_bw = expr->bit_size();
-  xmask.resize(out_bw, false);
+  ymuint blk_size = (out_bw + 31) / 32;
+  xmask.resize(blk_size, 0U);
 
   tVlOpType op_type = expr->op_type();
   ymuint n = expr->operand_num();
   vector<MvnNode*> operand_array(n);
-  vector<vector<bool> > xmask_array(n);
+  vector<vector<ymuint32> > xmask_array(n);
   for (ymuint i = 0; i < n; ++ i) {
     MvnNode* node1 = gen_expr(parent_module, expr->operand(i), case_type,
 			      env, xmask_array[i]);
@@ -288,7 +292,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   switch ( op_type ) {
   case kVlNullOp:
-    copy_xmask1(out_bw, xmask_array, xmask);
+    copy_xmask1(blk_size, xmask_array, xmask);
     return operand_array[0];
 
   case kVlMinusOp:
@@ -298,8 +302,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node = mMvnMgr->new_cmpl(parent_module, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val = or_xmask(out_bw, xmask_array[0]);
-      fill_xmask(out_bw, val, xmask);
+      bool val = or_xmask(blk_size, xmask_array[0]);
+      fill_xmask(blk_size, val, xmask);
       return node;
     }
 
@@ -321,7 +325,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node = mMvnMgr->new_not(parent_module, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       // ビットごとにコピーする．
-      copy_xmask1(out_bw, xmask_array, xmask);
+      copy_xmask1(blk_size, xmask_array, xmask);
       return node;
     }
 
@@ -330,8 +334,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       ymuint bw = operand_array[0]->output(0)->bit_width();
       assert_cond( bw == out_bw, __FILE__, __LINE__);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val = or_xmask(out_bw, xmask_array[0]);
-      fill_xmask(out_bw, val, xmask);
+      bool val = or_xmask(blk_size, xmask_array[0]);
+      fill_xmask(blk_size, val, xmask);
       return operand_array[0];
     }
 
@@ -342,7 +346,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node = mMvnMgr->new_rand(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       // ビットごとにコピーする．
-      copy_xmask1(out_bw, xmask_array, xmask);
+      copy_xmask1(blk_size, xmask_array, xmask);
       return node;
     }
 
@@ -355,7 +359,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       // ビットごとにコピーする．
-      copy_xmask1(out_bw, xmask_array, xmask);
+      copy_xmask1(blk_size, xmask_array, xmask);
       return node1;
     }
 
@@ -366,7 +370,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node = mMvnMgr->new_ror(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       // ビットごとにコピーする．
-      copy_xmask1(out_bw, xmask_array, xmask);
+      copy_xmask1(blk_size, xmask_array, xmask);
       return node;
     }
 
@@ -379,7 +383,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       // ビットごとにコピーする．
-      copy_xmask1(out_bw, xmask_array, xmask);
+      copy_xmask1(blk_size, xmask_array, xmask);
       return node1;
     }
 
@@ -390,7 +394,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node = mMvnMgr->new_rxor(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       // ビットごとにコピーする．
-      copy_xmask1(out_bw, xmask_array, xmask);
+      copy_xmask1(blk_size, xmask_array, xmask);
       return node;
     }
 
@@ -403,7 +407,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       // ビットごとにコピーする．
-      copy_xmask1(out_bw, xmask_array, xmask);
+      copy_xmask1(blk_size, xmask_array, xmask);
       return node1;
     }
 
@@ -422,9 +426,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -438,9 +442,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -454,9 +458,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -470,9 +474,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -486,9 +490,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -501,9 +505,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -516,9 +520,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -531,9 +535,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -546,9 +550,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -561,9 +565,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      fill_xmask(out_bw, val1 | val2, xmask);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      fill_xmask(blk_size, val1 | val2, xmask);
       return node;
     }
 
@@ -577,7 +581,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // ビットごとにコピーする．
-      copy_xmask2(out_bw, xmask_array, xmask);
+      copy_xmask2(blk_size, xmask_array, xmask);
       return node;
     }
 
@@ -591,7 +595,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // ビットごとにコピーする．
-      copy_xmask2(out_bw, xmask_array, xmask);
+      copy_xmask2(blk_size, xmask_array, xmask);
       return node;
     }
 
@@ -607,7 +611,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node1 = mMvnMgr->new_not(parent_module, out_bw);
       mMvnMgr->connect(node, 0, node1, 0);
       // ビットごとにコピーする．
-      copy_xmask2(out_bw, xmask_array, xmask);
+      copy_xmask2(blk_size, xmask_array, xmask);
       return node1;
     }
 
@@ -621,7 +625,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // ビットごとにコピーする．
-      copy_xmask2(out_bw, xmask_array, xmask);
+      copy_xmask2(blk_size, xmask_array, xmask);
       return node;
     }
 
@@ -659,8 +663,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
       fill_xmask(1, val1 | val2, xmask);
       return node;
     }
@@ -676,8 +680,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
       fill_xmask(1, val1 | val2, xmask);
       return node1;
     }
@@ -691,8 +695,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
       fill_xmask(1, val1 | val2, xmask);
       return node;
     }
@@ -708,8 +712,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
       fill_xmask(1, val1 | val2, xmask);
       return node1;
     }
@@ -723,8 +727,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[1], 0, node, 0);
       mMvnMgr->connect(operand_array[0], 0, node, 1);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
       fill_xmask(1, val1 | val2, xmask);
       return node;
     }
@@ -740,8 +744,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
-      bool val1 = or_xmask(out_bw, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
+      bool val1 = or_xmask(blk_size, xmask_array[0]);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
       fill_xmask(1, val1 | val2, xmask);
       return node1;
     }
@@ -758,9 +762,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       mMvnMgr->connect(operand_array[2], 0, node, 2);
       // 算術演算の場合は1ビットでも X があれば全部 X になる．
       bool val1 = or_xmask(1, xmask_array[0]);
-      bool val2 = or_xmask(out_bw, xmask_array[1]);
-      bool val3 = or_xmask(out_bw, xmask_array[2]);
-      fill_xmask(out_bw, val1 | val2 | val3, xmask);
+      bool val2 = or_xmask(blk_size, xmask_array[1]);
+      bool val3 = or_xmask(blk_size, xmask_array[2]);
+      fill_xmask(blk_size, val1 | val2 | val3, xmask);
       return node;
     }
 

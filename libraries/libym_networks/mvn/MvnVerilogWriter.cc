@@ -398,6 +398,27 @@ dump_node(ostream& s,
     }
     break;
 
+  case MvnNode::kCaseEq:
+    {
+      ymuint ni = node->input_num();
+      ymuint no = node->output_num();
+      assert_cond( no == 1, __FILE__, __LINE__);
+
+      const MvnInputPin* ipin0 = node->input(0);
+      const MvnOutputPin* src_pin0 = ipin0->src_pin();
+      const MvnNode* src_node0 = src_pin0->node();
+
+      const MvnInputPin* ipin1 = node->input(1);
+      const MvnOutputPin* src_pin1 = ipin1->src_pin();
+      const MvnNode* src_node1 = src_pin1->node();
+
+      s << "  assign " << node_name(node)
+	<< " = (" << node_name(src_node0)
+	<< " == " << node_name(src_node1)
+	<< ");" << endl;
+    }
+    break;
+
   case MvnNode::kSll:
     {
       ymuint ni = node->input_num();
