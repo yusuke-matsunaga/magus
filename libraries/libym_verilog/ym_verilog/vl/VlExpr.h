@@ -7,7 +7,7 @@
 ///
 /// $Id: VlExpr.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlExpr VlExpr.h <ym_verilog/vl/VlExpr.h>
+/// @class VlExpr VlExpr.h "ym_verilog/vl/VlExpr.h"
 /// @brief エラボレーション中の expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class VlExpr :
@@ -41,12 +41,18 @@ public:
   VlValueType
   value_type() const = 0;
 
+  /// @brief 要求された値のタイプを返す．
+  virtual
+  VlValueType
+  req_type() const = 0;
+
   /// @brief Verilog-HDL の文字列を得る．
   virtual
   string
   decompile() const = 0;
 
   /// @brief 式のビット幅を返す．
+  /// @note value_type().size() を同じ
   virtual
   ymuint
   bit_size() const = 0;
@@ -236,6 +242,7 @@ public:
   const VlExpr*
   operand(ymuint pos) const = 0;
 
+#if 0
   /// @brief オペランドに要求されるデータ型を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
   /// @note kVpiOperation の時，意味を持つ．
@@ -245,6 +252,7 @@ public:
   virtual
   VlValueType
   operand_type(ymuint pos) const = 0;
+#endif
 
   /// @brief 繰り返し数を返す．
   /// @note multiple concatenation の時のみ意味を持つ．

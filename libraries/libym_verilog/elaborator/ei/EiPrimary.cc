@@ -140,7 +140,7 @@ EiPrimaryBase::is_primary() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiPrimaryBase::set_reqsize(const VlValueType& type)
+EiPrimaryBase::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
@@ -331,7 +331,7 @@ EiDeclPrimary::lhs_elem(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiDeclPrimary::set_reqsize(const VlValueType& type)
+EiDeclPrimary::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }

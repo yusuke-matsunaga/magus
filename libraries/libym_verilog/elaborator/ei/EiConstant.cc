@@ -134,7 +134,7 @@ EiConstant::is_const() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiConstant::set_reqsize(const VlValueType& type)
+EiConstant::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }

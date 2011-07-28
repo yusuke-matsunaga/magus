@@ -99,7 +99,7 @@ EiFcBase::argument(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiFcBase::set_reqsize(const VlValueType& type)
+EiFcBase::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }

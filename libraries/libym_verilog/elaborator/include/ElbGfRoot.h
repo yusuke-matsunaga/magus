@@ -7,7 +7,7 @@
 ///
 /// $Id: ElbGfRoot.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -28,11 +28,11 @@ protected:
 
   /// @brief コンストラクタ
   ElbGfRoot() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbGfRoot() { }
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ public:
   virtual
   const VlNamedObj*
   elem_by_index(int index) = 0;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

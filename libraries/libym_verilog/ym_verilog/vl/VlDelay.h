@@ -7,7 +7,7 @@
 ///
 /// $Id: VlDelay.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class VlExpr;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlDelay VlDelay.h <ym_verilog/vl/VlDelay.h>
+/// @class VlDelay VlDelay.h "ym_verilog/vl/VlDelay.h"
 /// @brief 遅延式を表す基底クラス
 /// 基本的には VlExpr の配列だが要素数は3以下である．
 //////////////////////////////////////////////////////////////////////

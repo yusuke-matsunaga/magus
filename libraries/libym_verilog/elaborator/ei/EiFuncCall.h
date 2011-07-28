@@ -67,7 +67,7 @@ public:
   /// @note 必要であればオペランドに対して再帰的に処理を行なう．
   virtual
   void
-  set_reqsize(const VlValueType& type);
+  _set_reqsize(const VlValueType& type);
 
   /// @brief オペランドを返す．
   /// @param[in] pos 位置番号

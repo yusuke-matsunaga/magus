@@ -7,7 +7,7 @@
 ///
 /// $Id: VlStmt.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlStmt VlStmt.h "VlStmt.h"
+/// @class VlStmt VlStmt.h "ym_verilog/vl/VlStmt.h"
 /// @brief エラボレーション中の statement を表す基底クラス
 /// IEEE Std 1364-2001 26.6.27 Process, block, statement, event statement
 /// IEEE Std 1364-2001 26.6.28 Assignment
@@ -239,7 +239,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlCaseItem VlStmt.h "VlStmt.h"
+/// @class VlCaseItem VlStmt.h "ym_verilog/vl/VlStmt.h"
 /// @brief caes item を表すクラス
 /// IEEE Std 1364-2001 26.6.36 Case
 //////////////////////////////////////////////////////////////////////

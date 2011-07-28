@@ -31,6 +31,13 @@ ElbExpr::~ElbExpr()
 {
 }
 
+// @brief 要求された値のタイプを返す．
+VlValueType
+ElbExpr::req_type() const
+{
+  return mReqType;
+}
+
 // @brief 式のビット幅を返す．
 ymuint
 ElbExpr::bit_size() const

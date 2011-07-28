@@ -143,28 +143,11 @@ EiConditionOp::value_type() const
   return mType;
 }
 
-// @brief オペランドに要求されるデータ型を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-// @note kVpiOperation の時，意味を持つ．
-// @note それ以外では kVpiValueNone を返す．
-// 通常はオペランドの式の value_type() に一致するが，
-// その式が self-typed の場合には異なることもある．
-VlValueType
-EiConditionOp::operand_type(ymuint pos) const
-{
-  if ( pos == 0 ) {
-    return operand1()->value_type();
-  }
-  else {
-    return mType;
-  }
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiConditionOp::set_reqsize(const VlValueType& type)
+EiConditionOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 
@@ -207,23 +190,11 @@ EiMinTypMaxOp::value_type() const
   return mType;
 }
 
-// @brief オペランドに要求されるデータ型を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-// @note kVpiOperation の時，意味を持つ．
-// @note それ以外では kVpiValueNone を返す．
-// 通常はオペランドの式の value_type() に一致するが，
-// その式が self-typed の場合には異なることもある．
-VlValueType
-EiMinTypMaxOp::operand_type(ymuint pos) const
-{
-  return operand(pos)->value_type();
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiMinTypMaxOp::set_reqsize(const VlValueType& type)
+EiMinTypMaxOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
 

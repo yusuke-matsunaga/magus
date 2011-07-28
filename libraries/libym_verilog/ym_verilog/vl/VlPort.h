@@ -7,7 +7,7 @@
 ///
 /// $Id: VlPort.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPort VlPort.h <ym_verilog/vl/VlPort.h>
+/// @class VlPort VlPort.h "ym_verilog/vl/VlPort.h"
 /// @brief ポートを表すクラス
 /// IEEE Std 1364-2001 26.6.5 Ports
 //////////////////////////////////////////////////////////////////////

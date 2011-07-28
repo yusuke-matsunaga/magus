@@ -7,7 +7,7 @@
 ///
 /// $Id: ElbControl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // IEEE Std 1364-2001 26.6.29 Delay control
@@ -34,10 +34,10 @@ class ElbControl :
   public VlControl
 {
 protected:
-  
+
   /// @brief コンストラクタ
   ElbControl() { }
-  
+
   /// @brief デストラクタ
   virtual
   ~ElbControl() { }

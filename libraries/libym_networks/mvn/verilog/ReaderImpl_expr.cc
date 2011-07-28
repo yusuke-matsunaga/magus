@@ -145,7 +145,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
   }
   assert_cond( node != NULL, __FILE__, __LINE__);
 
-  return coerce_expr(parent_module, node, expr->value_type());
+  return coerce_expr(parent_module, node, expr->req_type());
 }
 
 // @brief 定数値に対応したノードを作る．
@@ -286,8 +286,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   for (ymuint i = 0; i < n; ++ i) {
     MvnNode* node1 = gen_expr(parent_module, expr->operand(i), case_type,
 			      env, xmask_array[i]);
-    VlValueType opr_type = expr->operand_type(i);
-    operand_array[i] = coerce_expr(parent_module, node1, opr_type);
+    operand_array[i] = node1;
   }
 
   switch ( op_type ) {

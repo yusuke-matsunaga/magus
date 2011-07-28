@@ -144,24 +144,11 @@ EiNotOp::value_type() const
   return VlValueType(false, true, 1);
 }
 
-// @brief オペランドに要求されるデータ型を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-// @note kVpiOperation の時，意味を持つ．
-// @note それ以外では kVpiValueNone を返す．
-// 通常はオペランドの式の value_type() に一致するが，
-// その式が self-typed の場合には異なることもある．
-VlValueType
-EiNotOp::operand_type(ymuint pos) const
-{
-  // 結果は常に符号なし1ビット
-  return VlValueType(false, true, 1);
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiNotOp::set_reqsize(const VlValueType& type)
+EiNotOp::_set_reqsize(const VlValueType& type)
 {
   // この演算子は型が固定なので何もしない．
 }
@@ -196,23 +183,11 @@ EiBitNegOp::value_type() const
   return mType;
 }
 
-// @brief オペランドに要求されるデータ型を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-// @note kVpiOperation の時，意味を持つ．
-// @note それ以外では kVpiValueNone を返す．
-// 通常はオペランドの式の value_type() に一致するが，
-// その式が self-typed の場合には異なることもある．
-VlValueType
-EiBitNegOp::operand_type(ymuint pos) const
-{
-  return mType;
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBitNegOp::set_reqsize(const VlValueType& type)
+EiBitNegOp::_set_reqsize(const VlValueType& type)
 {
   mType = update_size(mType, type);
   operand1()->set_reqsize(mType);
@@ -249,23 +224,11 @@ EiReductionOp::value_type() const
   return VlValueType(false, true, 1);
 }
 
-// @brief オペランドに要求されるデータ型を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-// @note kVpiOperation の時，意味を持つ．
-// @note それ以外では kVpiValueNone を返す．
-// 通常はオペランドの式の value_type() に一致するが，
-// その式が self-typed の場合には異なることもある．
-VlValueType
-EiReductionOp::operand_type(ymuint pos) const
-{
-  return operand1()->value_type();
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiReductionOp::set_reqsize(const VlValueType& type)
+EiReductionOp::_set_reqsize(const VlValueType& type)
 {
   // この演算子は型が固定なので何もしない．
 }
@@ -297,23 +260,11 @@ EiUnaryArithOp::value_type() const
   return operand1()->value_type();
 }
 
-// @brief オペランドに要求されるデータ型を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-// @note kVpiOperation の時，意味を持つ．
-// @note それ以外では kVpiValueNone を返す．
-// 通常はオペランドの式の value_type() に一致するが，
-// その式が self-typed の場合には異なることもある．
-VlValueType
-EiUnaryArithOp::operand_type(ymuint pos) const
-{
-  return operand1()->value_type();
-}
-
 // @brief 要求される式の型を計算してセットする．
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiUnaryArithOp::set_reqsize(const VlValueType& type)
+EiUnaryArithOp::_set_reqsize(const VlValueType& type)
 {
   operand1()->set_reqsize(type);
 }
@@ -348,7 +299,7 @@ EiEventEdgeOp::value_type() const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiEventEdgeOp::set_reqsize(const VlValueType& type)
+EiEventEdgeOp::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }

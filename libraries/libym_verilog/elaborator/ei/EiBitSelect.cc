@@ -193,7 +193,7 @@ EiBitSelect::lhs_elem(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiBitSelect::set_reqsize(const VlValueType& type)
+EiBitSelect::_set_reqsize(const VlValueType& type)
 {
 }
 

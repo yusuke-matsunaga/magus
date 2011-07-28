@@ -231,13 +231,6 @@ public:
   const VlExpr*
   operand(ymuint pos) const;
 
-  /// @brief オペランドに要求されるデータ型を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-  /// @note このクラスでは kVpiValueNone を返す．
-  virtual
-  VlValueType
-  operand_type(ymuint pos) const;
-
   /// @brief 繰り返し数を返す．
   /// @note multiple concatenation の時のみ意味を持つ．
   virtual

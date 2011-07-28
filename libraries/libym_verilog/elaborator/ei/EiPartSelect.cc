@@ -217,7 +217,7 @@ EiPartSelect::lhs_elem(ymuint pos) const
 // @param[in] type 要求される式の型
 // @note 必要であればオペランドに対して再帰的に処理を行なう．
 void
-EiPartSelect::set_reqsize(const VlValueType& type)
+EiPartSelect::_set_reqsize(const VlValueType& type)
 {
   // なにもしない．
 }
