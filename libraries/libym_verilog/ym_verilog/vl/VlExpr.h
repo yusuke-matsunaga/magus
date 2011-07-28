@@ -37,11 +37,14 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 式の値のタイプを返す．
+  /// @note このタイプで評価する．
   virtual
   VlValueType
   value_type() const = 0;
 
   /// @brief 要求された値のタイプを返す．
+  /// @note こちらは上位の式あるいは左辺の式から決まるタイプ
+  /// @note 評価後にこのタイプに変換する．
   virtual
   VlValueType
   req_type() const = 0;
@@ -242,20 +245,9 @@ public:
   const VlExpr*
   operand(ymuint pos) const = 0;
 
-#if 0
-  /// @brief オペランドに要求されるデータ型を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < operand_num() )
-  /// @note kVpiOperation の時，意味を持つ．
-  /// @note それ以外では kVpiValueNone を返す．
-  /// 通常はオペランドの式の value_type() に一致するが，
-  /// その式が self-typed の場合には異なることもある．
-  virtual
-  VlValueType
-  operand_type(ymuint pos) const = 0;
-#endif
-
   /// @brief 繰り返し数を返す．
   /// @note multiple concatenation の時のみ意味を持つ．
+  /// @note multiple concatenation の時は operand(0) と等しい．
   virtual
   ymuint
   rep_num() const = 0;
