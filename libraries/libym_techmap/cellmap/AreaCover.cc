@@ -28,6 +28,11 @@
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
+BEGIN_NONAMESPACE
+// デバッグする時に true にするフラグ
+const bool debug = true;
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス AreaCover
 //////////////////////////////////////////////////////////////////////
@@ -51,14 +56,10 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
 		      const CellMgr& cell_mgr,
 		      CmnMgr& mapnetwork)
 {
-#if 0
-  BdnDumper dumper;
-  dumper(cout, sbjgraph);
-#endif
-#if 0
-  BdnVerilogWriter dumper;
-  dumper(cout, sbjgraph);
-#endif
+  if ( debug ) {
+    BdnDumper dump;
+    dump(cout, sbjgraph);
+  }
 
   MapRecord maprec;
 
@@ -90,7 +91,6 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
   for (BdnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const BdnDff* dff = *p;
-    const BdnNode* clock = dff->clock();
     const BdnNode* clear = dff->clear();
     const BdnNode* preset = dff->preset();
     ymuint sig = 0U;
@@ -188,6 +188,10 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   for (vector<BdnNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
     const BdnNode* node = *p;
+    if ( debug ) {
+      cout << endl
+	   << "Processing Node#" << node->id() << endl;
+    }
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
     p_cost = DBL_MAX;
@@ -197,6 +201,10 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
       ymuint ni = pat.input_num();
       if ( pat_match(node, pat) ) {
 	ymuint rep_id = pat.rep_id();
+	if ( debug ) {
+	  cout << "Match with Pat#" << pat_id
+	       << ", Rep#" << rep_id << endl;
+	}
 	const RepFunc& rep = cell_mgr.rep(rep_id);
 	ymuint nf = rep.func_num();
 	for (ymuint f_pos = 0; f_pos < nf; ++ f_pos) {
@@ -219,6 +227,18 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	  if ( npn_map.opol() == kPolNega ) {
 	    root_inv = !root_inv;
 	  }
+	  if ( debug ) {
+	    cout << "  FuncId#" << func_id << endl
+		 << "    Root_inv = " << root_inv << endl;
+	    for (ymuint i = 0; i < ni; ++ i) {
+	      cout << "    Leaf#" << i << ": ";
+	      if ( c_match.leaf_inv(i) ) {
+		cout << "~";
+	      }
+	      cout << "Node#" << c_match.leaf_node(i)->id() << endl;
+	    }
+	  }
+
 	  double& c_cost = root_inv ? n_cost : p_cost;
 
 	  for (ymuint i = 0; i < ni; ++ i) {
@@ -240,11 +260,18 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	  for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
 	    const Cell* cell = func.cell(c_pos);
 	    double cur_cost = cell->area().value() + leaf_cost;
+	    if ( debug ) {
+	      cout << "      Cell = " << cell->name()
+		   << ", cost = " << cur_cost << endl;
+	    }
 	    if ( c_cost >= cur_cost ) {
 	      c_cost = cur_cost;
 	      maprec.set_match(node, root_inv, c_match, cell);
 	    }
 	  }
+	}
+	if ( debug ) {
+	  cout << endl;
 	}
       }
     }
