@@ -30,10 +30,8 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
-  /// @param[in] input_num 入力数
   /// @param[in] val 値
   MvnCaseEq(MvnModule* module,
-	    ymuint input_num,
 	    const vector<ymuint32>& val);
 
   /// @brief デストラクタ

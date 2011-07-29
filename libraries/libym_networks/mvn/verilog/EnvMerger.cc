@@ -49,7 +49,7 @@ EnvMerger::merge_cond(MvnModule* parent_module,
   }
   else if ( then_cond == NULL ) {
     // 代入条件は cond | else_cond
-    new_cond = mMvnMgr->new_or(parent_module, 1);
+    new_cond = mMvnMgr->new_or(parent_module, 2);
     mMvnMgr->connect(cond, 0, new_cond, 0);
     mMvnMgr->connect(else_cond, 0, new_cond, 1);
   }
@@ -57,7 +57,7 @@ EnvMerger::merge_cond(MvnModule* parent_module,
     // 代入条件は ~cond | then_cond
     MvnNode* cond_bar = mMvnMgr->new_not(parent_module, 1);
     mMvnMgr->connect(cond, 0, cond_bar, 0);
-    new_cond = mMvnMgr->new_or(parent_module, 1);
+    new_cond = mMvnMgr->new_or(parent_module, 2);
     mMvnMgr->connect(cond_bar, 0, new_cond, 0);
     mMvnMgr->connect(then_cond, 0, new_cond, 1);
   }

@@ -11,6 +11,7 @@
 #include "DeclMap.h"
 #include "Env.h"
 #include "EnvMerger.h"
+#include "Xmask.h"
 
 #include "ym_networks/MvnMgr.h"
 #include "ym_networks/MvnNode.h"
@@ -98,7 +99,7 @@ ReaderImpl::gen_stmt(MvnModule* module,
   case kVpiCase:
     {
       const VlExpr* expr = stmt->expr();
-      vector<ymuint32> xmask;
+      Xmask xmask;
       MvnNode* expr_node = gen_expr(module, expr, stmt->case_type(), env, xmask);
       if ( expr_node == NULL ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
@@ -141,7 +142,7 @@ bool
 ReaderImpl::gen_caseitem(MvnModule* module,
 			 const VlStmt* stmt,
 			 MvnNode* expr,
-			 const vector<ymuint32>& xmask,
+			 const Xmask& xmask,
 			 ymuint pos,
 			 ProcEnv& env,
 			 EnvMerger& merge)
@@ -155,13 +156,12 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   tVpiCaseType case_type = stmt->case_type();
   const VlCaseItem* caseitem = stmt->caseitem(pos);
   ymuint ne = caseitem->expr_num();
-  ymuint bw = xmask.size();
-  vector<MvnNode*> label_list;
-  label_list.reserve(ne);
-  vector<ymuint32> xmask1(xmask);
+  vector<MvnNode*> cond_list;
+  cond_list.reserve(ne);
   for (ymuint i = 0; i < ne; ++ i) {
     const VlExpr* label_expr = caseitem->expr(i);
-    vector<ymuint32> label_xmask;
+    ymuint bw = label_expr->bit_size();
+    Xmask label_xmask;
     MvnNode* label = gen_expr(module, label_expr, case_type,
 			      env, label_xmask);
     if ( label == NULL ) {
@@ -175,26 +175,39 @@ ReaderImpl::gen_caseitem(MvnModule* module,
 		      buf.str());
     }
     else {
-      label_list.push_back(label);
-      ymuint label_bw = label_xmask.size();
-      assert_cond( label_bw == bw, __FILE__, __LINE__);
-      for (ymuint i = 0; i < bw; ++ i) {
-	xmask1[i] |= label_xmask[i];
-      }
+      Xmask xmask1 = xmask | label_xmask;
+      vector<ymuint32> xmask_vect;
+      xmask.to_vector(xmask_vect);
+      MvnNode* cond = mMvnMgr->new_caseeq(module, bw, xmask_vect);
+      mMvnMgr->connect(expr, 0, cond, 0);
+      mMvnMgr->connect(label, 0, cond, 1);
+      cond_list.push_back(cond);
     }
   }
-  ymuint ni = label_list.size() + 1;
-  MvnNode* cond_node = mMvnMgr->new_caseeq(module, ni, bw, xmask1);
-  mMvnMgr->connect(expr, 0, cond_node, 0);
-  for (ymuint i = 1; i < ni; ++ i) {
-    mMvnMgr->connect(label_list[i - 1], 0, cond_node, i);
+  ymuint ni = cond_list.size();
+  if ( ni == 0 ) {
+    // この caseitem に合致する条件はない．
+    gen_caseitem(module, stmt, expr, xmask, pos + 1, env, merge);
+    return true;
   }
+
+  MvnNode* all_cond = NULL;
+  if ( ni == 1 ) {
+    all_cond = cond_list[0];
+  }
+  else {
+    all_cond = mMvnMgr->new_or(module, ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      mMvnMgr->connect(cond_list[i], 0, all_cond, i);
+    }
+  }
+  assert_cond( all_cond != NULL, __FILE__, __LINE__);
 
   ProcEnv then_env(env);
   gen_stmt(module, caseitem->body_stmt(), then_env, merge);
   ProcEnv else_env(env);
   gen_caseitem(module, stmt, expr, xmask, pos + 1, else_env, merge);
-  merge(module, env, cond_node, then_env, else_env);
+  merge(module, env, all_cond, then_env, else_env);
   return true;
 }
 

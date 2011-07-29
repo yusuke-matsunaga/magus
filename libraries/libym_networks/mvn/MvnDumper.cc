@@ -93,7 +93,26 @@ dump_node(ostream& s,
   case MvnNode::kRxor:       s << "Rxor"; break;
   case MvnNode::kEq:         s << "Eq"; break;
   case MvnNode::kLt:         s << "Lt"; break;
-  case MvnNode::kCaseEq:     s << "CaseEq"; break;
+  case MvnNode::kCaseEq:
+    {
+      s << "CaseEq[";
+      vector<ymuint32> xmask;
+      node->xmask(xmask);
+      ymuint bw = node->input(0)->bit_width();
+      for (ymuint i = 0; i < bw; ++ i) {
+	ymuint bitpos = bw - i - 1;
+	ymuint blk = bitpos / 32;
+	ymuint sft = bitpos % 32;
+	if ( xmask[blk] & (1U << sft) ) {
+	  s << "1";
+	}
+	else {
+	  s << "0";
+	}
+      }
+      s << "]";
+    }
+    break;
   case MvnNode::kSll:        s << "Sll"; break;
   case MvnNode::kSrl:        s << "Srl"; break;
   case MvnNode::kSla:        s << "Sla"; break;
@@ -174,6 +193,7 @@ dump_node(ostream& s,
     }
   }
   else if ( node->type() == MvnNode::kLatch ) {
+    #warning "TODO: 未完"
   }
   else {
     ymuint ni = node->input_num();

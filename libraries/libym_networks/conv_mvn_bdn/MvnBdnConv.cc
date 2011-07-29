@@ -43,6 +43,7 @@
 #include "SraConv.h"
 #include "EqConv.h"
 #include "LtConv.h"
+#include "CaseEqConv.h"
 #include "IteConv.h"
 #include "ConcatConv.h"
 #include "ConstBitSelectConv.h"
@@ -95,6 +96,7 @@ MvnBdnConv::MvnBdnConv()
   mConvList.push_back(new SraConv);
   mConvList.push_back(new EqConv);
   mConvList.push_back(new LtConv);
+  mConvList.push_back(new CaseEqConv);
   mConvList.push_back(new IteConv);
   mConvList.push_back(new ConcatConv);
   mConvList.push_back(new ConstBitSelectConv);

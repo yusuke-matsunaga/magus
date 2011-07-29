@@ -18,9 +18,8 @@ BEGIN_NAMESPACE_YM_NETWORKS
 // @param[in] input_num 入力数
 // @param[in] val 値
 MvnCaseEq::MvnCaseEq(MvnModule* module,
-		     ymuint input_num,
 		     const vector<ymuint32>& val) :
-  MvnNodeBase(module, MvnNode::kCaseEq, input_num, 1),
+  MvnNodeBase(module, MvnNode::kCaseEq, 2, 1),
   mVal(val)
 {
 }
@@ -41,24 +40,34 @@ MvnCaseEq::xmask(vector<ymuint32>& val) const
 
 // @brief eqx ノードを生成する．
 // @param[in] module ノードが属するモジュール
-// @param[in] input_num 入力数
 // @param[in] bit_width ビット幅
 // @param[in] xmask Xマスク値
 MvnNode*
 MvnMgr::new_caseeq(MvnModule* module,
-		   ymuint input_num,
 		   ymuint bit_width,
 		   const vector<ymuint32>& xmask)
 {
-  MvnNode* node = new MvnCaseEq(module, input_num, xmask);
-  reg_node(node);
-
-  for (ymuint i = 0; i < input_num; ++ i) {
-    node->_input(i)->mBitWidth = bit_width;
+  bool has_x = false;
+  for (vector<ymuint32>::const_iterator p = xmask.begin();
+       p != xmask.end(); ++ p) {
+    if ( *p ) {
+      has_x = true;
+      break;
+    }
   }
-  node->_output(0)->mBitWidth = 1;
+  if ( has_x ) {
+    MvnNode* node = new MvnCaseEq(module, xmask);
+    reg_node(node);
 
-  return node;
+    node->_input(0)->mBitWidth = bit_width;
+    node->_input(1)->mBitWidth = bit_width;
+    node->_output(0)->mBitWidth = 1;
+
+    return node;
+  }
+  else {
+    return new_equal(module, bit_width);
+  }
 }
 
 END_NAMESPACE_YM_NETWORKS

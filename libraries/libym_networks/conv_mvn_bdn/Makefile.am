@@ -58,6 +58,8 @@ libym_conv_mvn_bdn_la_SOURCES = \
 	EqConv.cc \
 	LtConv.h \
 	LtConv.cc \
+	CaseEqConv.h \
+	CaseEqConv.cc \
 	IteConv.h \
 	IteConv.cc \
 	ConcatConv.h \

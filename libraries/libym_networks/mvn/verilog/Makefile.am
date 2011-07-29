@@ -29,7 +29,9 @@ libym_mvn_verilog_la_SOURCES = \
 	ReaderImpl.cc \
 	ReaderImpl_item.cc \
 	ReaderImpl_stmt.cc \
-	ReaderImpl_expr.cc
+	ReaderImpl_expr.cc \
+	Xmask.h \
+	Xmask.cc
 
 libym_mvn_verilog_la_LIBADD =
 

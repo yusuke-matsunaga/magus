@@ -69,7 +69,7 @@ public:
     kEq,
     /// @brief less than ( 2入力, 1出力 )
     kLt,
-    /// @brief equal ( n入力, 1出力 )
+    /// @brief case-equal ( 2入力, 1出力 )
     kCaseEq,
 
     /// @brief shift left logical ( 2入力, 1出力 )
@@ -238,7 +238,7 @@ public:
 
   /// @brief Xマスクを得る．
   /// @param[out] val 値を格納するベクタ
-  /// @note type() が kEqX の時のみ意味を持つ．
+  /// @note type() が kCaseEq の時のみ意味を持つ．
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void

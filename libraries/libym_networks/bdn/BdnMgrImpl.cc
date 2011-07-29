@@ -495,13 +495,13 @@ BdnMgrImpl::new_latch(const string& name)
 
   BdnNode* clear = alloc_node();
   latch->mClear = clear;
-  clear->set_output_type(BdnNode::kDFF_CLEAR);
+  clear->set_output_type(BdnNode::kLATCH_CLEAR);
   clear->mAuxData = latch->mAuxData;
   mOutputList.push_back(clear);
 
   BdnNode* preset = alloc_node();
   latch->mPreset = preset;
-  preset->set_output_type(BdnNode::kDFF_PRESET);
+  preset->set_output_type(BdnNode::kLATCH_PRESET);
   preset->mAuxData = latch->mAuxData;
   mOutputList.push_back(preset);
 

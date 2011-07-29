@@ -319,7 +319,6 @@ public:
 
   /// @brief case 文用の equal ノードを生成する．
   /// @param[in] module ノードが属するモジュール
-  /// @param[in] input_num 入力数
   /// @param[in] bit_width ビット幅
   /// @param[in] xmask Xマスク値
   /// @return 生成したノードを返す．
@@ -327,7 +326,6 @@ public:
   /// @note 残りの入力は caseitem expression
   MvnNode*
   new_caseeq(MvnModule* module,
-	     ymuint input_num,
 	     ymuint bit_width,
 	     const vector<ymuint32>& xmask);
 

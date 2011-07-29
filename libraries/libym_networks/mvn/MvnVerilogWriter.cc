@@ -401,6 +401,7 @@ dump_node(ostream& s,
   case MvnNode::kCaseEq:
     {
       ymuint ni = node->input_num();
+      assert_cond( ni == 2, __FILE__, __LINE__);
       ymuint no = node->output_num();
       assert_cond( no == 1, __FILE__, __LINE__);
 
@@ -412,9 +413,25 @@ dump_node(ostream& s,
       const MvnOutputPin* src_pin1 = ipin1->src_pin();
       const MvnNode* src_node1 = src_pin1->node();
 
+      vector<ymuint32> xmask;
+      node->xmask(xmask);
+      ymuint bw = ipin0->bit_width();
+      string mask_str;
+      for (ymuint i = 0; i < bw; ++ i) {
+	ymuint bitpos = bw - i - 1;
+	ymuint blk = bitpos / 32;
+	ymuint sft = bitpos % 32;
+	if ( xmask[blk] & (1U << sft) ) {
+	  mask_str += "?";
+	}
+	else {
+	  mask_str += "0";
+	}
+      }
       s << "  assign " << node_name(node)
 	<< " = (" << node_name(src_node0)
-	<< " == " << node_name(src_node1)
+	<< " === " << node_name(src_node1)
+	<< " ^ " << bw << "'b" << mask_str
 	<< ");" << endl;
     }
     break;
