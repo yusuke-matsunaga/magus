@@ -35,7 +35,12 @@ ElbExpr::~ElbExpr()
 VlValueType
 ElbExpr::req_type() const
 {
-  return mReqType;
+  if ( mReqType.is_no_type() ) {
+    return value_type();
+  }
+  else {
+    return mReqType;
+  }
 }
 
 // @brief 式のビット幅を返す．
