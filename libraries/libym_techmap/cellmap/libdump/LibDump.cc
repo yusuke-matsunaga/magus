@@ -104,7 +104,7 @@ xform_expr(const LogExpr& expr,
   if ( map.opol() == kPolNega ) {
     cexpr = ~cexpr;
   }
-  return expr;
+  return cexpr;
 }
 
 END_NONAMESPACE
