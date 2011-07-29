@@ -131,6 +131,18 @@ MapRecord::get_match(const BdnNode* node,
   return get_node_info(node, inv).mMatch;
 }
 
+BEGIN_NONAMESPACE
+
+inline
+ymuint
+encode(ymuint pos,
+       ymuint sense)
+{
+  return pos | (sense << 3);
+}
+
+END_NONAMESPACE
+
 // @brief マッピング結果を CmnMgr にセットする．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] const0_cell 定数0のセル
@@ -186,9 +198,12 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
       ymuint pos_array[6];
       const FFPosArray& pos_array_src = dff_info.mPosArray;
       pos_array[0] = pos_array_src.data_pos();
-      pos_array[1] = pos_array_src.clock_pos() | (pos_array_src.clock_sense() << 3);
-      pos_array[2] = pos_array_src.clear_pos() | (pos_array_src.clear_sense() << 3);
-      pos_array[3] = pos_array_src.preset_pos() | (pos_array_src.preset_sense() << 3);
+      pos_array[1] = encode(pos_array_src.clock_pos(),
+			    pos_array_src.clock_sense());
+      pos_array[2] = encode(pos_array_src.clear_pos(),
+			    pos_array_src.clear_sense());
+      pos_array[3] = encode(pos_array_src.preset_pos(),
+			    pos_array_src.preset_sense());
       pos_array[4] = pos_array_src.q_pos();
       pos_array[5] = pos_array_src.iq_pos();
       dff_cell = mapgraph.reg_dff_cell(cell, pos_array);
