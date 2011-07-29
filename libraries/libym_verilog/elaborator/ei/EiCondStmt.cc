@@ -624,7 +624,7 @@ EiCaseStmt::expr() const
 
 // @brief case item のリストの要素数を返す．
 ymuint
-EiCaseStmt::case_item_num() const
+EiCaseStmt::caseitem_num() const
 {
   return mCaseItemNum;
 }
@@ -632,7 +632,7 @@ EiCaseStmt::case_item_num() const
 // @brief case item を返す．
 // @param[in] pos 位置番号
 const VlCaseItem*
-EiCaseStmt::case_item(ymuint pos) const
+EiCaseStmt::caseitem(ymuint pos) const
 {
   return &mCaseItemList[pos];
 }

@@ -633,13 +633,13 @@ public:
   /// @brief case item のリストの要素数を返す．
   virtual
   ymuint
-  case_item_num() const;
+  caseitem_num() const;
 
   /// @brief case item を返す．
   /// @param[in] pos 位置番号
   virtual
   const VlCaseItem*
-  case_item(ymuint pos) const;
+  caseitem(ymuint pos) const;
 
 
 public:
