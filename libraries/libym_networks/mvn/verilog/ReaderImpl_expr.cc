@@ -147,9 +147,12 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
       assert_not_reached(__FILE__, __LINE__);
     }
   }
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  if ( node == NULL ) {
+    return NULL;
+  }
 
-  return coerce_expr(parent_module, node, expr->req_type());
+  MvnNode* node1 = coerce_expr(parent_module, node, expr->req_type());
+  return node1;
 }
 
 // @brief 定数値に対応したノードを作る．

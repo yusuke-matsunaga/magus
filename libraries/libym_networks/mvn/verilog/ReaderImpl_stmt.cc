@@ -183,9 +183,15 @@ ReaderImpl::gen_caseitem(MvnModule* module,
     }
     else {
       Xmask xmask1 = xmask | label_xmask;
-      vector<ymuint32> xmask_vect;
-      xmask.to_vector(xmask_vect);
-      MvnNode* cond = mMvnMgr->new_caseeq(module, bw, xmask_vect);
+      MvnNode* cond = NULL;
+      if ( xmask1.has_x() ) {
+	vector<ymuint32> xmask_vect;
+	xmask1.to_vector(xmask_vect);
+	cond = mMvnMgr->new_caseeq(module, bw, xmask_vect);
+      }
+      else {
+	cond = mMvnMgr->new_equal(module, bw);
+      }
       mMvnMgr->connect(expr, 0, cond, 0);
       mMvnMgr->connect(label, 0, cond, 1);
       cond_list.push_back(cond);

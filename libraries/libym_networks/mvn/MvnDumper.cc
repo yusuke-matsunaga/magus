@@ -104,10 +104,10 @@ dump_node(ostream& s,
 	ymuint blk = bitpos / 32;
 	ymuint sft = bitpos % 32;
 	if ( xmask[blk] & (1U << sft) ) {
-	  s << "1";
+	  s << "-";
 	}
 	else {
-	  s << "0";
+	  s << "1";
 	}
       }
       s << "]";
