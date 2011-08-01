@@ -30,7 +30,7 @@ BEGIN_NAMESPACE_YM_CELLMAP
 
 BEGIN_NONAMESPACE
 // デバッグする時に true にするフラグ
-const bool debug = true;
+const bool debug = false;
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
