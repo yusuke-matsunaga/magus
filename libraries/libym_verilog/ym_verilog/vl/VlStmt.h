@@ -193,9 +193,10 @@ public:
   caseitem_num() const = 0;
 
   /// @brief case item の取得
-  /// @param[in] pos 位置番号 (0 <= pos < caseitem_num())
+  /// @param[in] pos 位置番号 ( 0 <= pos < caseitem_num() )
   /// @note この関数が意味を持つオブジェクトの型
   ///  - kVpiCase
+  /// @note default caseitem がある場合には常に最後の要素となる．
   virtual
   const VlCaseItem*
   caseitem(ymuint pos) const = 0;
@@ -258,12 +259,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 条件式のリストの要素数を返す．
+  /// @note 通常は1以上だが default caseitem の場合は0を返す．
   virtual
   ymuint
   expr_num() const = 0;
 
   /// @brief 条件式を返す．
-  /// @param[in] pos 位置番号
+  /// @param[in] pos 位置番号 ( 0 <= pos < expr_num() )
   virtual
   const VlExpr*
   expr(ymuint pos) const = 0;

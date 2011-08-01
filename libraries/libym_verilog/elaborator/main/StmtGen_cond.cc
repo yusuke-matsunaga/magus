@@ -95,9 +95,25 @@ StmtGen::instantiate_case(const VlNamedObj* parent,
   }
   expr_list.reserve(ne);
 
-  // case-item の生成
-  for (ymuint i = 0; i < pt_stmt->caseitem_num(); ++ i) {
+  // default caseitem を末尾にするために順序づけを行う．
+  // Parser::check_default_label() で default が高々1個しかないことは確認済み．
+  ymuint nc = pt_stmt->caseitem_num();
+  vector<const PtCaseItem*> caseitem_list(nc);
+  ymuint wpos = 0;
+  for (ymuint i = 0; i < nc; ++ i) {
     const PtCaseItem* pt_item = pt_stmt->caseitem(i);
+    if ( pt_item->label_num() > 0 ) {
+      caseitem_list[wpos] = pt_item;
+      ++ wpos;
+    }
+    else {
+      caseitem_list[nc - 1] = pt_item;
+    }
+  }
+
+  // case-item の生成
+  for (ymuint i = 0; i < nc; ++ i) {
+    const PtCaseItem* pt_item = caseitem_list[i];
     ElbStmt* body = NULL;
     if ( pt_item->body() ) {
       body = instantiate_stmt(parent, process, env, pt_item->body());
