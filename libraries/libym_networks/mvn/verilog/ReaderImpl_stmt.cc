@@ -156,6 +156,13 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   tVpiCaseType case_type = stmt->case_type();
   const VlCaseItem* caseitem = stmt->caseitem(pos);
   ymuint ne = caseitem->expr_num();
+  if ( ne == 0 ) {
+    // default caseitem
+    assert_cond( pos == n - 1, __FILE__, __LINE__);
+
+    return gen_stmt(module, caseitem->body_stmt(), env, merge);
+  }
+
   vector<MvnNode*> cond_list;
   cond_list.reserve(ne);
   for (ymuint i = 0; i < ne; ++ i) {
