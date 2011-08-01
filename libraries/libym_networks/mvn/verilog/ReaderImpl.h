@@ -259,13 +259,11 @@ private:
   /// @param[in] expr 式
   /// @param[in] case_type case 文の種類
   /// @param[in] env 環境
-  /// @param[out] xmask Xマスク
   MvnNode*
   gen_opr(MvnModule* parent_module,
 	  const VlExpr* expr,
 	  tVpiCaseType case_type,
-	  const Env& env,
-	  Xmask& xmask);
+	  const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．
   /// @param[in] expr 式
