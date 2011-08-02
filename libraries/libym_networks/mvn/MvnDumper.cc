@@ -28,6 +28,15 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
+// ノードを表す文字列を返す．
+string
+node_idstr(const MvnNode* node)
+{
+  ostringstream buf;
+  buf << "Node[" << node->id() << "]";
+  return buf.str();
+}
+
 // MvnInputPin の内容を出力する．
 void
 dump_inputpin(ostream& s,
@@ -39,7 +48,7 @@ dump_inputpin(ostream& s,
   const MvnOutputPin* opin = pin->src_pin();
   if ( opin ) {
     s << "    <== OutputPin#" << opin->pos()
-      << "@node#" << opin->node()->id() << endl;
+      << "@" << node_idstr(opin->node()) << endl;
   }
 }
 
@@ -66,7 +75,7 @@ dump_outputpin(ostream& s,
        p != fo_list.end(); ++ p) {
     const MvnInputPin* ipin = *p;
     s << "    ==> InputPin#" << ipin->pos()
-      << "@node#" << ipin->node()->id() << endl;
+      << "@" << node_idstr(ipin->node()) << endl;
   }
 }
 
@@ -75,8 +84,7 @@ void
 dump_node(ostream& s,
 	  const MvnNode* node)
 {
-  s << "Node#" << node->id()
-    << ":";
+  s << node_idstr(node) << " : ";
   switch ( node->type() ) {
   case MvnNode::kInput:      s << "Input"; break;
   case MvnNode::kInout:      s << "Inout"; break;
@@ -189,7 +197,7 @@ dump_node(ostream& s,
       }
       s << endl;
       const MvnNode* dnode = node->control_val(i);
-      s << "  Data#" << i << " <== node#" << dnode->id() << endl;
+      s << "  Data#" << i << " <== " << node_idstr(dnode) << endl;
     }
   }
   else if ( node->type() == MvnNode::kLatch ) {
@@ -243,7 +251,7 @@ MvnDumper::operator()(ostream& s,
     const MvnNode* pnode = module->parent();
     if ( pnode ) {
       s << "  parent node: Module#" << pnode->parent()->id()
-	<< ":" << pnode->id() << endl;
+	<< ":" << node_idstr(pnode) << endl;
     }
     else {
       s << "  toplevel module" << endl;
@@ -256,7 +264,7 @@ MvnDumper::operator()(ostream& s,
       ymuint n = port->port_ref_num();
       for (ymuint k = 0; k < n; ++ k) {
 	const MvnPortRef* port_ref = port->port_ref(k);
-	s << "    node#" << port_ref->node()->id();
+	s << "    " << node_idstr(port_ref->node());
 	if ( port_ref->has_bitselect() ) {
 	  s << "[" << port_ref->bitpos() << "]";
 	}
