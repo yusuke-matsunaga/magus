@@ -38,7 +38,7 @@ operator<<(ostream& s,
     if ( inv ) {
       s << "~";
     }
-    s << node->id_str();
+    s << "Node[" << node->id() << "]";
   }
   return s;
 }

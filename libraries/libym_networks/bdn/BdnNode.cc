@@ -121,26 +121,6 @@ BdnNode::scan_po()
   }
 }
 
-// @brief ID を表す文字列の取得
-string
-BdnNode::id_str() const
-{
-  ostringstream buf;
-  if ( is_input() ) {
-    buf << "I" << id();
-  }
-  else if ( is_logic() ) {
-    buf << "L" << id();
-  }
-  else if ( is_output() ) {
-    buf << "O" << id();
-  }
-  else {
-    buf << "X" << id();
-  }
-  return buf.str();
-}
-
 // @brief 関連するポートを返す．
 // @note kINPUT および kOUTPUT の時に意味を持つ．
 // @note それ以外では NULL を返す．

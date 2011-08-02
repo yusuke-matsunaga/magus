@@ -94,11 +94,11 @@ Cut::dump(ostream& s) const
     s << "null cut" << endl;
   }
   else {
-    s << root()->id_str() << " : ";
+    s << "Node[" << root()->id() << "] : ";
     string comma = "";
     for (ymuint i = 0; i < ni(); i ++) {
       const BdnNode* node = mInputs[i];
-      s << comma << node->id_str();
+      s << comma << "Node[" << node->id() << "]";
       comma = ", ";
     }
     s << " : ";

@@ -96,7 +96,7 @@ dump_nodehandle(ostream& s,
     if ( h.inv() ) {
       s << "~";
     }
-    s << h.node()->id_str();
+    s << "Node[" << h.node()->id() << "]";
   }
 }
 
@@ -123,7 +123,7 @@ dump_mvnode_map(ostream& s,
       for (ymuint i = 0; i < bw; ++ i) {
 	BdnNodeHandle nodehandle = mvnode_map.get(node, i);
 	s << "// node" << node->id() << " [" << i << "] : ";
-	//dump_bdnhandle(s, nodehandle);
+	dump_nodehandle(s, nodehandle);
 	s << endl;
       }
     }

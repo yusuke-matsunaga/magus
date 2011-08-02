@@ -205,11 +205,6 @@ public:
   ymuint
   id() const;
 
-  /// @brief ID を表す文字列の取得
-  /// @note デバッグ時にしか意味を持たない
-  string
-  id_str() const;
-
   /// @brief タイプを得る．
   tType
   type() const;

@@ -21,6 +21,54 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
+// ポートの名前を返す．
+string
+port_idstr(const BdnPort* port)
+{
+  ostringstream buf;
+  buf << "PORT[" << port->id() << "]";
+  return buf.str();
+}
+
+// D-FF の名前を返す．
+string
+dff_idstr(const BdnDff* dff)
+{
+  ostringstream buf;
+  buf << "DFF[" << dff->id() << "]";
+  return buf.str();
+}
+
+// ラッチの名前を返す．
+string
+latch_idstr(const BdnLatch* latch)
+{
+  ostringstream buf;
+  buf << "LATCH[" << latch->id() << "]";
+  return buf.str();
+}
+
+// ノードの名前を返す．
+string
+node_idstr(const BdnNode* node)
+{
+  ostringstream buf;
+  if ( node->is_input() ) {
+    buf << 'I';
+  }
+  else if ( node->is_logic() ) {
+    buf << 'L';
+  }
+  else if ( node->is_output() ) {
+    buf << 'O';
+  }
+  else {
+    buf << 'X';
+  }
+  buf << "[" << node->id() << "]";
+  return buf.str();
+}
+
 // 出力ノードの内容を出力する．
 void
 dump_output(ostream& s,
@@ -33,7 +81,7 @@ dump_output(ostream& s,
     if ( oinv ) {
       s << "~";
     }
-    s << inode->id_str();
+    s << node_idstr(inode);
   }
   else {
     // 定数ノードの場合
@@ -68,7 +116,7 @@ BdnDumper::operator()(ostream& s,
   ymuint np = network.port_num();
   for (ymuint i = 0; i < np; ++ i) {
     const BdnPort* port = network.port(i);
-    s << "Port#" << port->id() << ": " << port->name() << endl;
+    s << port_idstr(port) << " : " << port->name() << endl;
   }
 
   const BdnDffList& dff_list = network.dff_list();
@@ -80,8 +128,8 @@ BdnDumper::operator()(ostream& s,
     const BdnNode* clock = dff->clock();
     const BdnNode* clear = dff->clear();
     const BdnNode* preset = dff->preset();
-    s << "DFF#" << dff->id() << ": " << dff->name() << " ("
-      << "OUTPUT=" << output->id_str()
+    s << dff_idstr(dff) << " : " << dff->name() << " ("
+      << "OUTPUT=" << node_idstr(output)
       << ", INPUT=";
     dump_output(s, input);
     s << ", CLOCK=";
@@ -106,8 +154,8 @@ BdnDumper::operator()(ostream& s,
     const BdnNode* enable = latch->enable();
     const BdnNode* clear = latch->clear();
     const BdnNode* preset = latch->preset();
-    s << "LATCH#" << latch->id() << ": " << latch->name() << " ("
-      << "OUTPUT = " << output->id_str()
+    s << latch_idstr(latch) << " : " << latch->name() << " ("
+      << "OUTPUT = " << node_idstr(output)
       << ", INPUT = ";
     dump_output(s, input);
     if ( enable->output_fanin() ) {
@@ -130,21 +178,21 @@ BdnDumper::operator()(ostream& s,
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
     assert_cond( node->is_input(), __FILE__, __LINE__);
-    s << node->id_str() << ": ";
+    s << node_idstr(node) << ": ";
     switch ( node->input_type() ) {
     case BdnNode::kPRIMARY_INPUT:
-      s << " PORT#" << node->port()->id();
+      s << " " << port_idstr(node->port());
       if ( node->port()->bit_width() > 1 ) {
 	s << "[" << node->port_bitpos() << "]";
       }
       break;
 
     case BdnNode::kDFF_OUTPUT:
-      s << " OUTPUT@DFF#" << node->dff()->id();
+      s << " OUTPUT@" << dff_idstr(node->dff());
       break;
 
     case BdnNode::kLATCH_OUTPUT:
-      s << " OUTPUT@LATCH#" << node->latch()->id();
+      s << " OUTPUT@" << latch_idstr(node->latch());
       break;
 
     default:
@@ -159,15 +207,15 @@ BdnDumper::operator()(ostream& s,
        p != lnode_list.end(); ++ p) {
     const BdnNode* node = *p;
     assert_cond( node->is_logic(), __FILE__, __LINE__);
-    s << node->id_str();
-    s << " :  = LOGIC[";
+    s << node_idstr(node);
+    s << " :  = LOGIC( ";
     const char* f0 = node->fanin0_inv() ? "~" : "";
     const char* f1 = node->fanin1_inv() ? "~" : "";
     const char* op = node->is_xor() ? "^" : "&";
-    s << f0 << node->fanin0()->id_str()
+    s << f0 << node_idstr(node->fanin0())
       << " " << op << " "
-      << f1 << node->fanin1()->id_str()
-      << "]" << endl;
+      << f1 << node_idstr(node->fanin1())
+      << " )" << endl;
   }
 
   const BdnNodeList& output_list = network.output_list();
@@ -175,7 +223,7 @@ BdnDumper::operator()(ostream& s,
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;
     assert_cond( node->is_output(), __FILE__, __LINE__);
-    s << node->id_str() << ": ";
+    s << node_idstr(node) << ": ";
     switch ( node->output_type() ) {
     case BdnNode::kPRIMARY_OUTPUT:
       s << "PORT#" << node->port()->id();
@@ -185,35 +233,35 @@ BdnDumper::operator()(ostream& s,
       break;
 
     case BdnNode::kDFF_DATA:
-      s << "DATA@DFF#" << node->dff()->id();
+      s << "DATA@" << dff_idstr(node->dff());
       break;
 
     case BdnNode::kDFF_CLOCK:
-      s << "CLOCK@DFF#" << node->dff()->id();
+      s << "CLOCK@" << dff_idstr(node->dff());
       break;
 
     case BdnNode::kDFF_CLEAR:
-      s << "CLEAR@DFF#" << node->dff()->id();
+      s << "CLEAR@" << dff_idstr(node->dff());
       break;
 
     case BdnNode::kDFF_PRESET:
-      s << "PRESET@DFF#" << node->dff()->id();
+      s << "PRESET@" << dff_idstr(node->dff());
       break;
 
     case BdnNode::kLATCH_DATA:
-      s << "DATA@LATCH#" << node->latch()->id();
+      s << "DATA@" << latch_idstr(node->latch());
       break;
 
     case BdnNode::kLATCH_ENABLE:
-      s << "ENABLE@LATCH#" << node->latch()->id();
+      s << "ENABLE@" << latch_idstr(node->latch());
       break;
 
     case BdnNode::kLATCH_CLEAR:
-      s << "CLEAR@LATCH#" << node->latch()->id();
+      s << "CLEAR@" << latch_idstr(node->latch());
       break;
 
     case BdnNode::kLATCH_PRESET:
-      s << "PRESET@LATCH#" << node->latch()->id();
+      s << "PRESET@" << latch_idstr(node->latch());
       break;
 
     default:
