@@ -38,13 +38,6 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 {
   Xmask dummy;
   MvnNode* node = gen_expr(parent_module, expr, kVpiCaseExact, env, dummy);
-  if ( node == NULL ) {
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    expr->file_region(),
-		    kMsgError,
-		    "MVN_VLXXX",
-		    "'X' or 'Z' in constant expression");
-  }
   return node;
 }
 
@@ -229,6 +222,11 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 			      env, xmask1);
     if ( xmask1.has_x() ) {
       // X を含む値との演算は合成不可
+      MsgMgr::put_msg(__FILE__, __LINE__,
+		      expr->file_region(),
+		      kMsgError,
+		      "MVN_VLXXX",
+		      "'X' or 'Z' value in the operands");
       return NULL;
     }
     operand_array[i] = node1;
