@@ -227,21 +227,25 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     bool clock_inv = (dff_cell->clock_sense() == 2);
     gen_tfi(sbj_clock, clock_inv);
 
-    const BdnNode* sbj_clear = sbj_dff->clear();
-    if ( sbj_clear->output_fanin() ) {
+    ymuint clear_sense = dff_cell->clear_sense();
+    if ( clear_sense != 0 ) {
+      const BdnNode* sbj_clear = sbj_dff->clear();
       CmnNode* clear = dff->_clear();
       assert_cond( clear != NULL, __FILE__, __LINE__);
       get_node_info(sbj_clear, false).mMapNode = clear;
-      bool clear_inv = (dff_cell->clear_sense() == 2);
+      bool clear_inv = (clear_sense == 2);
+      // sbj_clear->output_fanin() == NULL の時もうまくいく．
       gen_tfi(sbj_clear, clear_inv);
     }
 
-    const BdnNode* sbj_preset = sbj_dff->preset();
-    if ( sbj_preset->output_fanin() ) {
+    ymuint preset_sense = dff_cell->preset_sense();
+    if ( preset_sense != 0 ) {
+      const BdnNode* sbj_preset = sbj_dff->preset();
       CmnNode* preset = dff->_preset();
       assert_cond( preset != NULL, __FILE__, __LINE__);
       get_node_info(sbj_preset, false).mMapNode = preset;
-      bool preset_inv = (dff_cell->preset_sense() == 2);
+      bool preset_inv = (preset_sense == 2);
+      // sbj_preset->output_fanin() == NULL の時もうまくいく．
       gen_tfi(sbj_preset, preset_inv);
     }
   }
@@ -281,11 +285,11 @@ MapRecord::gen_tfi(const BdnNode* onode,
   else {
     if ( inv ) {
       // 定数1ノードを作る．
-      mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), mConst1);
+      mapnode = gen_const1();
     }
     else {
       // 定数0ノードを作る．
-      mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), mConst0);
+      mapnode = gen_const0();
     }
   }
   CmnNode* omapnode = get_node_info(onode, false).mMapNode;
@@ -333,6 +337,20 @@ MapRecord::back_trace(const BdnNode* node,
 
   return mapnode;
 }
+
+// 定数0ノードを作る．
+CmnNode*
+MapRecord::gen_const0()
+{
+  return mMapGraph->new_logic(vector<CmnNode*>(0), mConst0);
+}
+
+// 定数1ノードを作る．
+CmnNode*
+MapRecord::gen_const1()
+{
+  return mMapGraph->new_logic(vector<CmnNode*>(0), mConst1);
+ }
 
 // @brief D-FF の割り当て情報を取り出す．
 MapRecord::DffInfo&

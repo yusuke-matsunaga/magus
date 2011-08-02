@@ -120,6 +120,14 @@ private:
   back_trace(const BdnNode* node,
 	     bool inv);
 
+  // 定数0ノードを作る．
+  CmnNode*
+  gen_const0();
+
+  // 定数1ノードを作る．
+  CmnNode*
+  gen_const1();
+
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -132,6 +132,18 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       ff_info.mCell = min_cell;
       ff_info.mPosArray = min_pos_array;
     }
+
+    if ( debug ) {
+      cout << endl
+	   << "Processing Dff#" << dff->id() << endl;
+      if ( clear->output_fanin() ) {
+	cout << "  Has clear" << endl;
+      }
+      if ( preset->output_fanin() ) {
+	cout << "  Has preset" << endl;
+      }
+      cout << "  Cell = " << ff_info.mCell->name() << endl;
+    }
     maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray);
   }
 }
