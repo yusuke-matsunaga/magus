@@ -105,14 +105,37 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       const Cell* min_cell = NULL;
       FFPosArray min_pos_array;
       CellArea min_area = CellArea::infty();
+      bool min_inv = false;
       for (ymuint i = 0; i < ffc_num; ++ i) {
 	const FFClass& ffc = cell_mgr.ff_class(i);
-	if ( (sig & 1U) && ffc.clear_sense() == 0 ) {
+	bool pmatch = true;
+	bool nmatch = true;
+	if ( ffc.clear_sense() == 0 ) {
+	  // このセルはクリア端子を持たない．
+	  if ( sig & 1U ) {
+	    // 正極性ではマッチしない．
+	    pmatch = false;
+	  }
+	  if ( sig & 2U ) {
+	    // 不極性ではマッチしない．
+	    nmatch = false;
+	  }
+	}
+	if ( ffc.preset_sense() == 0 ) {
+	  // このセルはプリセット端子を持たない．
+	  if ( sig & 1U ) {
+	    // 不極性ではマッチしない．
+	    nmatch = false;
+	  }
+	  if ( sig & 2U ) {
+	    // 正極性ではマッチしない．
+	    pmatch = false;
+	  }
+	}
+	if ( !pmatch && !nmatch ) {
 	  continue;
 	}
-	if ( (sig & 2U) && ffc.preset_sense() == 0 ) {
-	  continue;
-	}
+
 	ymuint ng = ffc.group_num();
 	for (ymuint j = 0; j < ng; ++ j) {
 	  const FFGroup& ffg = ffc.group(j);
@@ -124,6 +147,10 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 	      min_area = area;
 	      min_cell = cell;
 	      min_pos_array = ffg.pos_array();
+	      // ちょっとトリッキーなコード
+	      // pmatch == false ということは nmatch == true だが
+	      // pmatch == true && nmatch == true もありうるので下のようになる．
+	      min_inv = !pmatch;
 	    }
 	  }
 	}
@@ -131,6 +158,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       assert_cond( min_cell != NULL, __FILE__, __LINE__);
       ff_info.mCell = min_cell;
       ff_info.mPosArray = min_pos_array;
+      ff_info.mInv = min_inv;
     }
 
     if ( debug ) {
@@ -142,9 +170,17 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       if ( preset->output_fanin() ) {
 	cout << "  Has preset" << endl;
       }
-      cout << "  Cell = " << ff_info.mCell->name() << endl;
+      cout << "  Cell = ";
+      if ( ff_info.mInv ) {
+	cout << "~(";
+      }
+      cout << ff_info.mCell->name();
+      if ( ff_info.mInv ) {
+	cout << ")";
+      }
+      cout << endl;
     }
-    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray);
+    maprec.set_dff_match(dff, ff_info.mCell, ff_info.mPosArray, ff_info.mInv);
   }
 }
 
@@ -202,7 +238,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
     const BdnNode* node = *p;
     if ( debug ) {
       cout << endl
-	   << "Processing Node#" << node->id() << endl;
+	   << "Processing Node[" << node->id() << "]" << endl;
     }
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
@@ -247,7 +283,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	      if ( c_match.leaf_inv(i) ) {
 		cout << "~";
 	      }
-	      cout << "Node#" << c_match.leaf_node(i)->id() << endl;
+	      cout << "Node[" << c_match.leaf_node(i)->id() << "]" << endl;
 	    }
 	  }
 
@@ -278,7 +314,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	    }
 	    if ( c_cost >= cur_cost ) {
 	      c_cost = cur_cost;
-	      maprec.set_match(node, root_inv, c_match, cell);
+	      maprec.set_logic_match(node, root_inv, c_match, cell);
 	    }
 	  }
 	}

@@ -52,10 +52,12 @@ public:
   /// @param[in] dff D-FF
   /// @param[in] cell セル
   /// @param[in] pos_array ピン情報の配列
+  /// @param[in] inv 極性
   void
   set_dff_match(const BdnDff* dff,
 		const Cell* cell,
-		FFPosArray pos_array);
+		FFPosArray pos_array,
+		bool inv);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
@@ -66,16 +68,16 @@ public:
 		  const Cell* cell,
 		  LatchPosArray pos_array);
 
-  /// @brief マッチを記録する．
+  /// @brief 論理ゲートのマッチを記録する．
   /// @param[in] node 該当のノード
   /// @param[in] inv 極性
   /// @param[in] match 対応するマッチ
   /// @param[in] cell セル
   void
-  set_match(const BdnNode* node,
-	    bool inv,
-	    const Match& match,
-	    const Cell* cell);
+  set_logic_match(const BdnNode* node,
+		  bool inv,
+		  const Match& match,
+		  const Cell* cell);
 
   /// @brief インバータのマッチを記録する．
   /// @param[in] node 該当のノード
@@ -107,39 +109,16 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部でのみ用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  // 出力ノードに接続したTFIコーンの生成を行う．
-  void
-  gen_tfi(const BdnNode* onode,
-	  bool ext_inv = false);
-
-  // 最終結果を作るためのバックトレースを行う．
-  CmnNode*
-  back_trace(const BdnNode* node,
-	     bool inv);
-
-  // 定数0ノードを作る．
-  CmnNode*
-  gen_const0();
-
-  // 定数1ノードを作る．
-  CmnNode*
-  gen_const1();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
   // D-FF の割り当て情報
   struct DffInfo
   {
-    DffInfo()
+    DffInfo() :
+      mCell(NULL),
+      mInv(false)
     {
-      mCell = NULL;
     }
 
     // セル
@@ -147,6 +126,9 @@ private:
 
     // ピンの割り当て情報
     FFPosArray mPosArray;
+
+    // 極性情報
+    bool mInv;
 
   };
 
@@ -185,8 +167,54 @@ private:
 
   };
 
+  // マッピング要求情報
+  struct MapReq
+  {
+    // コンストラクタ
+    MapReq(const BdnNode* node = NULL,
+	   bool inv = false) :
+      mNode(node),
+      mInv(inv)
+    {
+    }
+
+    // ノード
+    const BdnNode* mNode;
+
+    // 極性
+    bool mInv;
+
+  };
+
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部でのみ用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ポートの生成を行う．
+  void
+  gen_port(const BdnPort* sbj_port);
+
+  /// @brief D-FF の生成を行う．
+  void
+  gen_dff(const BdnDff* sbj_dff);
+
+  /// @brief ラッチの生成を行う．
+  void
+  gen_latch(const BdnLatch* sbj_latch);
+
+  /// @brief マッピング要求を追加する．
+  void
+  add_mapreq(const BdnNode* node,
+	     bool inv);
+
+  /// @brief 最終結果を作るためのバックトレースを行う．
+  /// @param[in] node 対象のノード
+  /// @param[in] inv 極性
+  CmnNode*
+  back_trace(const BdnNode* node,
+	     bool inv);
 
   /// @brief D-FF の割り当て情報を取り出す．
   DffInfo&
@@ -210,12 +238,6 @@ private:
   // 対象の CMN
   CmnMgr* mMapGraph;
 
-  // 定数0セル
-  const Cell* mConst0;
-
-  // 定数1セル
-  const Cell* mConst1;
-
   // D-FF の割り当て情報を格納した配列
   // キーは BdnDff の ID 番号
   vector<DffInfo> mDffInfo;
@@ -227,6 +249,9 @@ private:
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは BdnNode の ID 番号
   vector<NodeInfo> mNodeInfo;
+
+  // マッピング要求リスト
+  vector<MapReq> mMapReqList;
 
   // back_trace 中に用いる作業領域
   vector<CmnNode*> mTmpFanins;

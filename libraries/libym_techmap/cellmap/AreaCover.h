@@ -104,12 +104,14 @@ private:
   struct FFInfo
   {
     FFInfo() :
-      mCell(NULL)
+      mCell(NULL),
+      mInv(false)
     {
     }
 
     const Cell* mCell;
     FFPosArray mPosArray;
+    bool mInv;
   };
 
 
