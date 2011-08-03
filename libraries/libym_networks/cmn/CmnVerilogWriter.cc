@@ -167,31 +167,6 @@ CmnVerilogWriter::operator()(ostream& s,
     s << " = " << node_name(inode) << ";" << endl;
   }
 
-  for (CmnNodeList::const_iterator p = logic_list.begin();
-       p != logic_list.end(); ++ p) {
-    const CmnNode* node = *p;
-    const Cell* cell = node->cell();
-    assert_cond( cell != NULL, __FILE__, __LINE__);
-    ymuint np = cell->pin_num();
-    s << "  " << cell->name() << " U" << node->id() << " (";
-    ymuint ipos = 0;
-    const char* comma = "";
-    for (ymuint i = 0; i < np; ++ i) {
-      const CellPin* pin = cell->pin(i);
-      const CmnNode* node1 = NULL;
-      if ( pin->is_input() ) {
-	node1 = node->fanin(ipos);
-	++ ipos;
-      }
-      else if ( pin->is_output() ) {
-	node1 = node;
-      }
-      s << comma << "." << pin->name() << "(" << node_name(node1) << ")";
-      comma = ", ";
-    }
-    s << ");" << endl;
-  }
-
   for (CmnDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
     const CmnDff* dff = *p;
@@ -224,6 +199,69 @@ CmnVerilogWriter::operator()(ostream& s,
     if ( dff->output2()->fanout_num() > 0 ) {
       const CellPin* opin2 = cell->pin(dffcell->iq_pos());
       s << ", ." << opin2->name() << "(" << node_name(dff->output2()) << ")";
+    }
+    s << ");" << endl;
+  }
+
+  for (CmnLatchList::const_iterator p = latch_list.begin();
+       p != latch_list.end(); ++ p) {
+    const CmnLatch* latch = *p;
+    const CmnLatchCell* latchcell = latch->cell();
+    const Cell* cell = latchcell->cell();
+    const CmnNode* onode1 = latch->output1();
+    s << "  " << cell->name() << " U" << onode1->id() << " (";
+    // データ入力
+    const CellPin* ipin = cell->pin(latchcell->data_pos());
+    s << "." << ipin->name() << "(" << dff_node_name(latch->input()) << ")";
+    // イネーブル入力
+    if ( latchcell->has_enable() ) {
+      const CellPin* epin = cell->pin(latchcell->enable_pos());
+      s << ", ." << epin->name() << "(" << dff_node_name(latch->enable()) << ")";
+    }
+    // クリア入力
+    if ( latchcell->has_clear() ) {
+      const CellPin* rpin = cell->pin(latchcell->clear_pos());
+      s << ", ." << rpin->name() << "(" << dff_node_name(latch->clear()) << ")";
+    }
+    // プリセット入力
+    if ( latchcell->has_preset() ) {
+      const CellPin* ppin = cell->pin(latchcell->preset_pos());
+      s << ", ." << ppin->name() << "(" << dff_node_name(latch->preset()) << ")";
+    }
+    // 肯定出力
+    if ( latch->output1()->fanout_num() > 0 ) {
+      const CellPin* opin1 = cell->pin(latchcell->q_pos());
+      s << ", ." << opin1->name() << "(" << node_name(latch->output1()) << ")";
+    }
+    // 否定出力
+    if ( latch->output2()->fanout_num() > 0 ) {
+      const CellPin* opin2 = cell->pin(latchcell->iq_pos());
+      s << ", ." << opin2->name() << "(" << node_name(latch->output2()) << ")";
+    }
+    s << ");" << endl;
+  }
+
+  for (CmnNodeList::const_iterator p = logic_list.begin();
+       p != logic_list.end(); ++ p) {
+    const CmnNode* node = *p;
+    const Cell* cell = node->cell();
+    assert_cond( cell != NULL, __FILE__, __LINE__);
+    ymuint np = cell->pin_num();
+    s << "  " << cell->name() << " U" << node->id() << " (";
+    ymuint ipos = 0;
+    const char* comma = "";
+    for (ymuint i = 0; i < np; ++ i) {
+      const CellPin* pin = cell->pin(i);
+      const CmnNode* node1 = NULL;
+      if ( pin->is_input() ) {
+	node1 = node->fanin(ipos);
+	++ ipos;
+      }
+      else if ( pin->is_output() ) {
+	node1 = node;
+      }
+      s << comma << "." << pin->name() << "(" << node_name(node1) << ")";
+      comma = ", ";
     }
     s << ");" << endl;
   }
