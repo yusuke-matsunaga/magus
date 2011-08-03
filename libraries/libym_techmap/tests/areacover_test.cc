@@ -77,8 +77,8 @@ test(string pat_filename,
 
   mapper.area_map(sbjgraph, 0, mapnetwork);
 
-  CmnDumper dumper;
-  dumper.dump(cout, mapnetwork);
+  CmnDumper dump;
+  dump(cout, mapnetwork);
 }
 
 END_NAMESPACE_YM_CELLMAP

@@ -35,16 +35,8 @@ public:
   /// @param[in] s 出力先のストリーム
   /// @param[in] lngraph 対象のネットワーク
   void
-  dump(ostream& s,
-       const CmnMgr& lngraph);
-
-  /// @relates CmnMgr
-  /// @brief 内容をシミュレーション可能な Verilog-HDL 形式で出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] cngraph 対象のネットワーク
-  void
-  dump_verilog(ostream& s,
-	       const CmnMgr& cngraph);
+  operator()(ostream& s,
+	     const CmnMgr& lngraph);
 
 };
 

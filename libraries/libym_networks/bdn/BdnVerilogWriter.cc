@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnVerilogWriter.cc
+/// @file libym_networks/bdn/BdnVerilogWriter.cc
 /// @brief ブーリアンネットワークの内容を出力する関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,6 +10,7 @@
 
 
 #include "ym_networks/BdnVerilogWriter.h"
+
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnPort.h"
 #include "ym_networks/BdnNode.h"

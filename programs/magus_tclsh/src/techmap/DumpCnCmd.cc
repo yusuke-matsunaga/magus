@@ -12,6 +12,7 @@
 #include "DumpCnCmd.h"
 #include "ym_tclpp/TclPopt.h"
 #include "ym_networks/CmnDumper.h"
+#include "ym_networks/CmnVerilogWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -63,12 +64,13 @@ DumpCnCmd::cmd_proc(TclObjVector& objv)
       }
       outp = &ofs;
     }
-    CmnDumper dumper;
     if ( verilog ) {
-      dumper.dump_verilog(*outp, cmnmgr());
+      CmnVerilogWriter dump;
+      dump(*outp, cmnmgr());
     }
     else {
-      dumper.dump(*outp, cmnmgr());
+      CmnDumper dump;
+      dump(*outp, cmnmgr());
     }
     return TCL_OK;
 #if 0

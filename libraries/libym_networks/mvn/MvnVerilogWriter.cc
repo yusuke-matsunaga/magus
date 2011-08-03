@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnVerilogWriter.cc
+/// @file libym_networks/mvn/MvnVerilogWriter.cc
 /// @brief MvnVerilogWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

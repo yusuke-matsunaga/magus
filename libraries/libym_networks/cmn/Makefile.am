@@ -29,7 +29,8 @@ libym_cmn_la_SOURCES = \
 	CmnNodeOutput.h \
 	CmnNodePI.h \
 	CmnNodePO.h \
-	CmnPort.cc
+	CmnPort.cc \
+	CmnVerilogWriter.cc
 
 libym_cmn_la_LIBADD =
 
