@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBCONTROL_H
-#define LIBYM_VERILOG_ELB_ELBCONTROL_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBCONTROL_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBCONTROL_H
 
 /// @file libym_verilog/elaborator/include/ElbControl.h
 /// @brief コントロールを表すクラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbControl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -46,4 +44,4 @@ protected:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBCONTROL_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBCONTROL_H

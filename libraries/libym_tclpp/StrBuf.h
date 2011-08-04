@@ -5,9 +5,7 @@
 /// @brief StrBuf のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: StrBuf.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -35,30 +33,30 @@ public:
   ///
   /// 中身は NULL となる．
   StrBuf();
-  
+
   /// @brief const char* を引数としたコンストラクタ
   StrBuf(const char* src);
-  
+
   /// @brief const string& を引数としたコンストラクタ
   StrBuf(const string& src);
-  
+
   /// @brief const char* からの代入演算子
   const StrBuf&
   operator=(const char* src);
-  
+
   /// @brief const string& からの代入演算子
   const StrBuf&
   operator=(const string& src);
-  
+
   /// @brief デストラクタ
   ~StrBuf();
-  
+
   /// @brief char* へのキャスト演算子
   operator char*();
-  
+
   /// @brief const char* へのキャスト演算子
   operator const char*() const;
-  
+
 
 private:
 

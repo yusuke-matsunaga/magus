@@ -5,9 +5,7 @@
 /// @brief EiDeclArray のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiDeclArray.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -20,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArray EiDecl.h "EiDecl.h"
+/// @class EiDeclArray EiDeclArray.h "EiDeclArray.h"
 /// @brief 配列型の ElbDecl
 //////////////////////////////////////////////////////////////////////
 class EiDeclArray :
@@ -281,7 +279,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayN EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayN EiDeclArray.h "EiDeclArray.h"
 /// @brief 値を持たない EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayN :
@@ -410,7 +408,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayS EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayS EiDeclArray.h "EiDeclArray.h"
 /// @brief スカラー値を持つ EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayS :
@@ -550,7 +548,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayR EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayR EiDeclArray.h "EiDeclArray.h"
 /// @brief 実数値を持つ EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayR :
@@ -690,7 +688,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EiDeclArrayV EiDecl.h "EiDecl.h"
+/// @class EiDeclArrayV EiDeclArray.h "EiDeclArray.h"
 /// @brief ビットベクタ値を持つ EiDeclArray
 //////////////////////////////////////////////////////////////////////
 class EiDeclArrayV :

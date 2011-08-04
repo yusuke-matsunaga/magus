@@ -3,9 +3,7 @@
 /// @brief RandCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: RandCmd.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // 乱数を発生させるコマンドクラス
@@ -48,7 +46,7 @@ RandInitCmd::cmd_proc(TclObjVector& objv)
     return stat;
   }
   init_random_seed(seed);
-  
+
   reset_result();
 
   return TCL_OK;
@@ -90,7 +88,7 @@ RandCmd::cmd_proc(TclObjVector& objv)
   if ( limit ) {
     rand = rand % limit;
   }
-  
+
   set_result(rand);
 
   return TCL_OK;

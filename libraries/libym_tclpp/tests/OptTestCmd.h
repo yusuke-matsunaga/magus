@@ -5,9 +5,7 @@
 /// @brief OptTestCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: OptTestCmd.h 1417 2008-05-06 18:12:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // コマンドの製作例
@@ -33,9 +31,9 @@ public:
   virtual
   ~OptTestCmd();
 
-  
+
 protected:
-  
+
   // コマンド処理関数
   virtual
   int
@@ -48,11 +46,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   TclPopt* mOptSwitch1;
-  
+
   TclPoptStr* mOptStr1;
 
   TclPoptBool* mOptBool1;
-  
+
   TclPoptInt* mOptInt1;
 
   TclPoptDouble* mOptDouble1;
@@ -62,7 +60,7 @@ private:
   TclPopt* mOptB;
 
   TclPopt* mOptC;
-  
+
 };
 
 END_NAMESPACE_YM_TCLPP

@@ -5,8 +5,6 @@
 /// @brief libym_lexp で内部的に用いる型定義
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: lexp_types.h 958 2007-08-28 05:38:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

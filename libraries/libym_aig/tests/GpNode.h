@@ -2,9 +2,7 @@
 /// @brief GpNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GpNode.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,7 +21,7 @@ class GpNode;
 class GpHandle
 {
   friend class GpMgr;
-  
+
 public:
 
   /// @brief 空のコンストラクタ
@@ -49,7 +47,7 @@ public:
   /// @brief 否定属性を取り出す．
   bool
   inv() const;
-  
+
   /// @brief 定数0を表しているとき true を返す．
   bool
   is_const0() const;
@@ -57,11 +55,11 @@ public:
   /// @brief 定数1を表しているとき true を返す．
   bool
   is_const1() const;
-  
+
   /// @brief 等価比較演算子
   bool
   operator==(const GpHandle right) const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -71,7 +69,7 @@ public:
   /// @brief 極性を入れ替える．
   GpHandle
   operator~() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -81,7 +79,7 @@ private:
   /// @brief 内容を直接指定したコンストラクタ
   GpHandle(ympuint data);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -89,7 +87,7 @@ private:
 
   // ノードのポインタ + 否定属性
   ympuint mNodePol;
-  
+
 };
 
 
@@ -109,7 +107,7 @@ private:
   /// @brief デストラクタ
   ~GpNode();
 
-  
+
 public:
 
   /// @brief ID 番号を返す．
@@ -124,11 +122,11 @@ public:
   /// @note DAG の場合にはレベルより少ない数となる．
   ymuint32
   size() const;
-  
+
   /// @brief このパタンが表している関数のパタンを返す．
   ymuint32
   pat() const;
-  
+
   /// @brief 入力ノードの時 true を返す．
   bool
   is_input() const;
@@ -140,47 +138,47 @@ public:
   /// @brief 入力番号を返す．
   ymuint32
   input_id() const;
-  
+
   /// @brief ファンインのハンドルを返す．
   /// @param[in] pos ファンイン位置番号 (0 or 1)
   GpHandle
   fanin_handle(ymuint pos) const;
-  
+
   /// @brief ファンインを返す．
   /// @param[in] pos ファンイン位置番号 (0 or 1)
   GpNode*
   fanin(ymuint pos) const;
-  
+
   /// @brief ファンインの否定属性を返す．
   /// @param[in] pos ファンイン位置番号 (0 or 1)
   bool
   inv(ymuint pos) const;
-  
+
   /// @brief ファンイン0のハンドルを返す．
   GpHandle
   fanin0_handle() const;
-  
+
   /// @brief ファンイン0を返す．
   GpNode*
   fanin0() const;
-  
+
   /// @brief ファンイン0の否定属性を返す．
   bool
   inv0() const;
-  
+
   /// @brief ファンイン1のハンドルを返す．
   GpHandle
   fanin1_handle() const;
-  
+
   /// @brief ファンイン1を返す．
   GpNode*
   fanin1() const;
-  
+
   /// @brief ファンイン1の否定属性を返す．
   bool
   inv1() const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -188,13 +186,13 @@ private:
 
   // ID番号
   ymuint32 mId;
-  
+
   // レベル
   ymuint32 mLevel;
 
   // ノード数
   ymuint32 mSize;
-  
+
   // このパタンが表している関数のパタン
   ymuint32 mPat;
 
@@ -203,10 +201,10 @@ private:
 
   // ファンイン
   GpHandle mFanin[2];
-  
+
   // 構造ハッシュ用のリンク
   GpNode* mSlink;
-  
+
 };
 
 
@@ -223,10 +221,10 @@ public:
 
   /// @brief デストラクタ
   ~GpMgr();
-  
-  
+
+
 public:
-  
+
   /// @brief 定数0ノードを生成する．
   GpHandle
   make_const0();
@@ -234,7 +232,7 @@ public:
   /// @brief 定数1ノードを生成する．
   GpHandle
   make_const1();
-  
+
   /// @brief 入力ノードを生成する．
   /// @param[in] input_id 入力番号
   /// @note すでに同じ入力番号のノードが存在していたらそれを返す．
@@ -251,39 +249,39 @@ public:
   make_and(GpHandle fanin0,
 	   GpHandle fanin1,
 	   ymuint32 fv);
-  
+
 
 private:
 
   /// @brief ノードを生成する下請け関数
   GpNode*
   new_node();
-  
+
   /// @brief node を根とするパタンのノード数を数える．
   ymuint32
   count_size(GpNode* node);
-  
+
   /// @brief ハッシュ関数
   ymuint32
   hash_func(GpHandle fanin0,
 	    GpHandle fanin1);
-  
+
   /// @brief ハッシュテーブルを拡大する．
   void
   alloc_table(ymuint req_size);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // メモリアロケータ
   SimpleAlloc mAlloc;
-  
+
   // 全ノードのリスト
   vector<GpNode*> mNodeList;
-  
+
   // 入力ノードのリスト
   vector<GpNode*> mInputList;
 
@@ -298,7 +296,7 @@ private:
 
   // テーブルを拡大する目安
   ymuint32 mNextLimit;
-  
+
 };
 
 
@@ -349,7 +347,7 @@ GpHandle::inv() const
 {
   return static_cast<bool>(mNodePol & 1UL);
 }
-  
+
 // @brief 定数0を表しているとき true を返す．
 inline
 bool
@@ -410,7 +408,7 @@ GpNode::size() const
 {
   return mSize;
 }
-  
+
 // このパタンが表している関数のパタンを返す．
 inline
 ymuint32
@@ -418,14 +416,14 @@ GpNode::pat() const
 {
   return mPat;
 }
-  
+
 // 入力ノードの時 true を返す．
 inline
 bool
 GpNode::is_input() const
 {
   return static_cast<bool>((mInputId & 3U) == 2U);
-} 
+}
 
 // AND ノードの時 true を返す．
 inline
@@ -442,7 +440,7 @@ GpNode::input_id() const
 {
   return (mInputId >> 4);
 }
-  
+
 // @brief ファンインのハンドルを返す．
 // @param[in] pos ファンイン位置番号 (0 or 1)
 inline
@@ -451,7 +449,7 @@ GpNode::fanin_handle(ymuint pos) const
 {
   return mFanin[pos];
 }
-  
+
 // ファンインを返す．
 inline
 GpNode*
@@ -459,7 +457,7 @@ GpNode::fanin(ymuint pos) const
 {
   return fanin_handle(pos).node();
 }
-  
+
 // ファンインの否定属性を返す．
 inline
 bool

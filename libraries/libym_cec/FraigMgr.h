@@ -5,9 +5,7 @@
 /// @brief FraigMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: FraigMgr.h 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -22,7 +20,7 @@ BEGIN_NAMESPACE_YM_CEC
 class FraigMgrImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class FraigMgr FraigMgr.h <ym_aig/FraigMgr.h>
+/// @class FraigMgr FraigMgr.h "ym_cec/FraigMgr.h"
 /// @brief Functionary Reduced AND-INVERTOR Graph を管理するクラス
 //////////////////////////////////////////////////////////////////////
 class FraigMgr

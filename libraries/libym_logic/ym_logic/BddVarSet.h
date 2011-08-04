@@ -5,8 +5,6 @@
 /// @brief BddVarSet のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BddVarSet.h 693 2007-05-28 09:13:57Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddVarSet BddVarSet.h <ym_bdd/BddVarSet.h>
+/// @class BddVarSet BddVarSet.h "ym_logic/BddVarSet.h"
 /// @ingroup YmBdds
 /// @brief 変数集合を表すクラス
 ///

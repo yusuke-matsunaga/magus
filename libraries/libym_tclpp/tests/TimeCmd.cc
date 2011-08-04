@@ -3,9 +3,7 @@
 /// @brief TimeCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TimeCmd.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // 時間計測を行うパッケージ

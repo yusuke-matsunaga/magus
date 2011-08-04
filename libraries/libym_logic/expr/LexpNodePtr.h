@@ -5,8 +5,6 @@
 /// @brief LexpNodePtr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LexpNodePtr.h 958 2007-08-28 05:38:02Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 

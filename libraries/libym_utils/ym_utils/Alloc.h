@@ -5,9 +5,7 @@
 /// @brief Alloc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Alloc.h 1052 2007-10-24 11:08:51Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class AllocBase Alloc.h <ym_utils/Alloc.h>
+/// @class AllocBase Alloc.h "ym_utils/Alloc.h"
 /// @brief メモリの管理を行うクラスの基底クラス
 //////////////////////////////////////////////////////////////////////
 class AllocBase
@@ -81,7 +79,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SimpleAlloc Alloc.h <ym_utils/Alloc.h>
+/// @class SimpleAlloc Alloc.h "ym_utils/Alloc.h"
 /// @brief 単純なメモリ管理
 //////////////////////////////////////////////////////////////////////
 class SimpleAlloc :
@@ -182,10 +180,10 @@ private:
 
   // 使用中のメモリサイズ
   size_t mUsedSize;
-  
+
   // 使用した最大のメモリサイズ
   size_t mMaxUsedSize;
-  
+
   // 確保したメモリサイズ
   size_t mAllocSize;
 
@@ -196,7 +194,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class FragAlloc Alloc.h <ym_utils/Alloc.h>
+/// @class FragAlloc Alloc.h "ym_utils/Alloc.h"
 /// @brief 2の巾乗の単位で管理する
 //////////////////////////////////////////////////////////////////////
 class FragAlloc :
@@ -300,7 +298,7 @@ private:
 
   // mMinSize の log
   size_t mMinLogSize;
-  
+
   // コンストラクタの引数
   size_t mMaxSize;
 
@@ -319,10 +317,10 @@ private:
 
   // 使用中のメモリサイズ
   size_t mUsedSize;
-  
+
   // 使用した最大のメモリサイズ
   size_t mMaxUsedSize;
-  
+
   // 確保したメモリサイズ
   size_t mAllocSize;
 
@@ -333,7 +331,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class UnitAlloc Alloc.h <ym_utils/Alloc.h>
+/// @class UnitAlloc Alloc.h "ym_utils/Alloc.h"
 /// @brief 単一サイズのメモリ領域の管理を行うクラス
 //////////////////////////////////////////////////////////////////////
 class UnitAlloc :
@@ -445,10 +443,10 @@ private:
 
   // 使用中のメモリサイズ
   size_t mUsedSize;
-  
+
   // 使用した最大のメモリサイズ
   size_t mMaxUsedSize;
-  
+
   // 確保したメモリサイズ
   size_t mAllocSize;
 

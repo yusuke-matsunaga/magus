@@ -5,8 +5,6 @@
 /// @brief FuncCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: FuncCmd.h 33 2006-07-16 14:58:17Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

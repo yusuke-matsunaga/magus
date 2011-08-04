@@ -5,9 +5,7 @@
 /// @brief RefCount のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: RefCount.h 1143 2008-01-04 07:27:17Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class RefCount RefCount.h <ym_utils/RefCount>
+/// @class RefCount RefCount.h "ym_utils/RefCount"
 /// @ingroup YmUtils
 /// @brief 参照回数を持つオブジェクトの基底クラス
 /// @note
@@ -34,46 +32,46 @@ public:
 
   /// @brief 空のコンストラクタ
   RefCount();
-  
+
   /// @brief コピーコンストラクタ
   /// @note とはいってもやることは上と同じ．
   /// 参照回数はコピーしないことに注意
   RefCount(const RefCount&);
-  
+
   /// @brief デストラクタ
   /// @note このクラスは継承されることを前提としているので
   /// 必ず仮想関数にしておかなければならない．
   virtual
   ~RefCount();
-  
+
   /// @brief 参照回数を得る．
   /// @return 参照回数
   int
   refcount() const;
-  
+
 
 protected:
-  
+
   /// @brief 参照回数が 0 になったときの処理関数
   /// @note デフォルトでは delete this;
   virtual
   void
   suicide();
-  
+
   /// @brief 参照回数を増やす．
   void
   inc();
-  
+
   /// @brief 参照回数を減らす．0になったら削除する．
   void
   dec();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 参照回数
   int mCount;
 
@@ -81,7 +79,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SmartPtr RefCount.h <ym_utils/RefCount.h>
+/// @class SmartPtr RefCount.h "ym_utils/RefCount.h"
 /// @ingroup YmUtils
 /// @brief RefCountから派生したクラスのオブジェクトを指す
 /// スマートポインタクラスのテンプレート定義
@@ -97,25 +95,25 @@ public:
   /// @param[in] ptr ポインタ
   /// @note と同時にキャスト演算子でもある．
   SmartPtr(T* ptr = 0);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   SmartPtr(const SmartPtr& src);
-  
+
   /// @brief デストラクタ
   ~SmartPtr();
-  
+
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   /// @return 自分自身
   const SmartPtr&
   operator=(const SmartPtr& src);
-  
+
   /// @brief NULL ポインタとの比較
   /// @return NULL ポインタと等しい時に true を返す．
   bool
   null() const;
-  
+
   /// @brief null() と同義の演算子
   /// @return NULL ポインタと等しい時に true を返す．
   bool
@@ -131,12 +129,12 @@ public:
 
 
 private:
-  
+
   // ポインタをセットする．
   // オブジェクトの参照回数を増やす．
   void
   set(T* ptr);
-  
+
   // 今までのポインタを外す．
   // オブジェクトの参照回数が0になったら削除する．
   void
@@ -164,14 +162,14 @@ RefCount::RefCount() :
   mCount(0)
 {
 }
-  
+
 // コピーコンストラクタ
 inline
 RefCount::RefCount(const RefCount&) :
   mCount(0)
 {
 }
-  
+
 // 参照回数を得る．
 inline
 int
@@ -179,7 +177,7 @@ RefCount::refcount() const
 {
   return mCount;
 }
-  
+
 // 参照回数を増やす．
 inline
 void
@@ -187,7 +185,7 @@ RefCount::inc()
 {
   ++ mCount;
 }
-  
+
 // 参照回数を減らす．0になったら削除する．
 inline
 void
@@ -206,7 +204,7 @@ SmartPtr<T>::SmartPtr(T* ptr)
 {
   set(ptr);
 }
-  
+
 // @brief コピーコンストラクタ
 // @param[in] src コピー元のオブジェクト
 template<typename T>
@@ -215,7 +213,7 @@ SmartPtr<T>::SmartPtr(const SmartPtr& src)
 {
   set(src.mPtr);
 }
-  
+
 // @brief デストラクタ
 template<typename T>
 inline
@@ -223,7 +221,7 @@ SmartPtr<T>::~SmartPtr()
 {
   unset();
 }
-  
+
 // @brief 代入演算子
 // @param[in] src コピー元のオブジェクト
 // @return 自分自身
@@ -242,7 +240,7 @@ SmartPtr<T>::operator=(const SmartPtr& src)
   mPtr = src.mPtr;
   return *this;
 }
-  
+
 // @brief NULL ポインタとの比較
 // @return NULL ポインタと等しい時に true を返す．
 template<typename T>
@@ -252,7 +250,7 @@ SmartPtr<T>::null() const
 {
   return mPtr == 0;
 }
-  
+
 // @brief null() と同義の演算子
 // @return NULL ポインタと等しい時に true を返す．
 template<typename T>
@@ -279,7 +277,7 @@ SmartPtr<T>::operator->() const
 {
   return mPtr;
 }
-  
+
 // ポインタをセットする．
 // オブジェクトの参照回数を増やす．
 template<typename T>
@@ -292,7 +290,7 @@ SmartPtr<T>::set(T* ptr)
     mPtr->inc();
   }
 }
-  
+
 // 今までのポインタを外す．
 // オブジェクトの参照回数が0になったら削除する．
 template<typename T>

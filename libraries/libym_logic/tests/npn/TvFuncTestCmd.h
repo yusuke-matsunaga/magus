@@ -5,8 +5,6 @@
 /// @brief TvFuncTestCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TvFuncTestCmd.h 84 2006-08-03 06:20:07Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -39,7 +37,7 @@ protected:
   /// @brief usage を出力する関数
   virtual
   void usage();
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int cmd_proc(TclObjVector& objv);

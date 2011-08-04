@@ -5,9 +5,7 @@
 /// @brief zlib を使った圧縮/伸長機能つきストリーム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: zstream.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,7 +21,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class zlib_error zstream.h <ym_utils/zstream.h>
+/// @class zlib_error zstream.h "ym_utils/zstream.h"
 /// @brief zlib 関係のエラーオブジェクト
 //////////////////////////////////////////////////////////////////////
 struct zlib_error
@@ -44,7 +42,7 @@ struct zlib_error
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class zstream zstream.h <ym_utils/zstream.h>
+/// @class zstream zstream.h "ym_utils/zstream.h"
 /// @brief z_stream の C++ 的に進化したもの
 //////////////////////////////////////////////////////////////////////
 class zstream
@@ -68,7 +66,7 @@ public:
   /// @brief 代入演算子
   const zstream&
   operator=(const zstream& src);
-  
+
   /// @brief デストラクタ
   ~zstream();
 
@@ -78,7 +76,7 @@ public:
   /// @brief deflate 用の初期化を行う．
   int
   deflate_init(int level);
-  
+
   /// @brief データを圧縮する．
   int
   deflate(int flush);
@@ -86,15 +84,15 @@ public:
   /// @brief deflate 用に確保された領域の解放を行う．
   int
   deflate_end();
-  
+
   /// @brief inflate 用の初期化を行う．
   int
   inflate_init();
-  
+
   /// @brief データを伸長する．
   int
   inflate(int flush);
-  
+
   /// @brief inflate 用に確保された領域の解放を行う．
   int
   inflate_end();
@@ -103,7 +101,7 @@ public:
   int
   end();
 
-  
+
 public:
 
   /// @brief zalloc, zfree, opaque を設定する．
@@ -129,12 +127,12 @@ public:
   /// @brief avail_out の取得
   uInt
   avail_out() const;
-  
+
   /// @brief msg を得る．
   const char*
   msg() const;
 
-  
+
 public:
 
   /// @brief 詳細な設定を行う deflate 用の初期化
@@ -213,7 +211,7 @@ public:
   inflate_get_header(gz_headerp head);
 #endif
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -229,7 +227,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class zstream_buff zstream.h <ym_utils/zstream.h>
+/// @class zstream_buff zstream.h "ym_utils/zstream.h"
 /// @brief バッファ付きの zstream クラス
 //////////////////////////////////////////////////////////////////////
 class zstream_buff :
@@ -275,7 +273,7 @@ public:
   int
   decompress(Bytef* buff,
 	     int size);
-  
+
   /// @brief 入力ストリームを取り出す．
   istream*
   in();
@@ -284,14 +282,14 @@ public:
   ostream*
   out();
 
-  
+
 private:
 
   // バッファの内容を書き出す．
   void
   write();
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 定数
@@ -320,12 +318,12 @@ private:
 
   // 伸長モードの時のフラッシュフラグ
   int mInFlush;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class basic_zlib_streambuf zstream.h <ym_utils/zstream.h>
+/// @class basic_zlib_streambuf zstream.h "ym_utils/zstream.h"
 /// @brief zlib を使ったストリームバッファのテンプレート
 //////////////////////////////////////////////////////////////////////
 template <typename _CharT,
@@ -417,7 +415,7 @@ protected:
     // バッファに溜っているデータを圧縮する．
     mZbuf.compress(byte_buff(), byte_size(this->pptr() - mBuff), mOutFlush);
     setp(mBuff, mBuff + mSize);
-    
+
     if ( c == traits_type::eof() ) {
       return c;
     }
@@ -466,7 +464,7 @@ protected:
   {
     return reinterpret_cast<Bytef*>(mBuff);
   }
-  
+
   // char_type 単位のサイズを Bytef 単位のサイズに変換する
   int
   byte_size(int size)
@@ -480,8 +478,8 @@ protected:
   {
     return size * sizeof(Bytef) / sizeof(char_type);
   }
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 定数
@@ -515,7 +513,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class basic_izstream zstream.h <ym_utils/zstream.h>
+/// @class basic_izstream zstream.h "ym_utils/zstream.h"
 /// @brief zlib を使った入力ストリームのテンプレート
 //////////////////////////////////////////////////////////////////////
 template <typename _CharT,
@@ -526,7 +524,7 @@ class basic_izstream :
 public:
   typedef _CharT char_type;
   typedef _Traits traits_type;
-  
+
   typedef std::basic_istream<char_type, traits_type> istream_type;
 public:
 
@@ -547,7 +545,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class basic_ozstream zstream.h <ym_utils/zstream.h>
+/// @class basic_ozstream zstream.h "ym_utils/zstream.h"
 /// @brief zlib を使った出力ストリームのテンプレート
 //////////////////////////////////////////////////////////////////////
 template <typename _CharT,
@@ -637,7 +635,7 @@ zstream::operator=(const zstream& src)
   }
   return *this;
 }
-  
+
 // @brief デストラクタ
 inline
 zstream::~zstream()
@@ -657,7 +655,7 @@ zstream::deflate_init(int level)
   }
   return status;
 }
-  
+
 // @brief データを圧縮する．
 inline
 int
@@ -682,7 +680,7 @@ zstream::deflate_end()
   }
   return status;
 }
-  
+
 // @brief inflate 用の初期化を行う．
 inline
 int
@@ -695,7 +693,7 @@ zstream::inflate_init()
   }
   return status;
 }
-  
+
 // @brief データを伸長する．
 inline
 int
@@ -707,7 +705,7 @@ zstream::inflate(int flush)
   }
   return status;
 }
-  
+
 // @brief inflate 用に確保された領域の解放を行う．
 inline
 int
@@ -820,7 +818,7 @@ zstream::deflate_set_dictionary(const Bytef* dictionary,
     throw zlib_error("deflateInit2", status, msg());
   }
   return status;
-  
+
 }
 
 // @brief deflate の状態をリセットする．

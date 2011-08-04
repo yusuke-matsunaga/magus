@@ -5,9 +5,7 @@
 /// @brief seal パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: seal.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

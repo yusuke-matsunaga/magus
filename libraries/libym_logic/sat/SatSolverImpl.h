@@ -1,11 +1,9 @@
 #ifndef LIBYM_LOGIC_SAT_INCLUDE_SATSOLVERIMPL_H
 #define LIBYM_LOGIC_SAT_INCLUDE_SATSOLVERIMPL_H
 
-/// @file libym_logic/sat/include/SatSolverImpl.h
+/// @file libym_logic/sat/SatSolverImpl.h
 /// @brief SatSolverImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: SatSolverImpl.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

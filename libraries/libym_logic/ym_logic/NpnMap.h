@@ -5,8 +5,6 @@
 /// @brief NpnMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NpnMap.h 1594 2008-07-18 10:26:12Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -35,7 +33,7 @@ const tNpnImap kImapBad = 0xffffffff;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class NpnMap NpnMap.h <ym_npn/NpnMap.h>
+/// @class NpnMap NpnMap.h "ym_logic/NpnMap.h"
 /// @ingroup NpnGroup
 /// @brief NPN変換の情報を入れるクラス
 ///

@@ -5,9 +5,7 @@
 /// @brief TclCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TclCmd.h 1417 2008-05-06 18:12:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +17,7 @@
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmd TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmd TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief Tclコマンドと結びつけられているオブジェクトの基底クラス
 ///
@@ -279,9 +277,8 @@ public:
 };
 
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmdBinder TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmdBinder TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief コマンドオブジェクトを生成して登録するための
 /// テンプレートクラス
@@ -312,9 +309,8 @@ public:
 };
 
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmdBinder1 TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmdBinder1 TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief コマンドオブジェクトを生成して登録するための
 /// テンプレートクラス
@@ -350,9 +346,8 @@ public:
 };
 
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmdBinder2 TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmdBinder2 TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief コマンドオブジェクトを生成して登録するための
 /// テンプレートクラス
@@ -395,9 +390,8 @@ public:
 };
 
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmdBinder3 TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmdBinder3 TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief コマンドオブジェクトを生成して登録するための
 /// テンプレートクラス
@@ -446,9 +440,8 @@ public:
 };
 
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmdBinder4 TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmdBinder4 TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief コマンドオブジェクトを生成して登録するための
 /// テンプレートクラス
@@ -504,9 +497,8 @@ public:
 };
 
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmdBinder5 TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmdBinder5 TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief コマンドオブジェクトを生成して登録するための
 /// テンプレートクラス
@@ -568,9 +560,8 @@ public:
 };
 
 
-
 //////////////////////////////////////////////////////////////////////
-/// @class TclCmdBinder6 TclCmd.h <ym_tclpp/TclCmd.h>
+/// @class TclCmdBinder6 TclCmd.h "ym_tclpp/TclCmd.h"
 /// @ingroup Tclpp
 /// @brief コマンドオブジェクトを生成して登録するための
 /// テンプレートクラス

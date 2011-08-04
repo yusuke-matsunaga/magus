@@ -5,8 +5,6 @@
 /// @brief TvFuncTest のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TvFuncTest.h 1594 2008-07-18 10:26:12Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

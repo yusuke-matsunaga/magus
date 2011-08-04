@@ -5,9 +5,7 @@
 /// @brief 組み合わせ生成器と順列生成器のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Generator.h 693 2007-05-28 09:13:57Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup GeneratorGroup 組み合わせ生成器と順列生成器
@@ -32,7 +30,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GenBase Generator.h <ym_utils/Generator.h>
+/// @class GenBase Generator.h "ym_utils/Generator.h"
 /// @ingroup GeneratorGroup
 /// @brief CombiGen と PermGen に共通な属性を表す基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -110,7 +108,7 @@ public:
   /// @param[in] k 選び出す要素数
   GenBase(size_t n,
 	  size_t k);
-  
+
   /// @brief デストラクタ
   ~GenBase();
 
@@ -140,7 +138,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CombiGen Generator.h <ym_utils/Generator.h>
+/// @class CombiGen Generator.h "ym_utils/Generator.h"
 /// @ingroup GeneratorGroup
 /// @brief 組み合わせ生成器を表すクラス
 //////////////////////////////////////////////////////////////////////
@@ -157,7 +155,7 @@ public:
   public:
     /// @brief 空のコンストラクタ
     iterator();
-    
+
     /// @brief コピーコンストラクタ
     /// @param[in] src コピー元のオブジェクト
     /// @return 自分自身
@@ -200,10 +198,10 @@ public:
   /// @param[in] k 選び出す要素数
   CombiGen(size_t n,
 	   size_t k);
-  
+
   /// @brief デストラクタ
   ~CombiGen();
-  
+
   /// @brief 最初の組み合わせを取り出す．
   iterator
   begin();
@@ -212,7 +210,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PermGen Generator.h <ym_utils/Generator.h>
+/// @class PermGen Generator.h "ym_utils/Generator.h"
 /// @ingroup GeneratorGroup
 /// @brief 順列生成器を表すクラス
 //////////////////////////////////////////////////////////////////////
@@ -233,7 +231,7 @@ public:
     /// @brief コピーコンストラクタ
     /// @param[in] src コピー元のオブジェクト
     iterator(const iterator& src);
-    
+
     /// @brief 代入演算子
     /// @param[in] src コピー元のオブジェクト
     /// @return 自分自身
@@ -268,10 +266,10 @@ public:
   /// @param[in] k 選択する要素数
   PermGen(size_t n,
 	  size_t k);
-  
+
   /// @brief デストラクタ
   ~PermGen();
-  
+
   /// @brief 最初の順列を取り出す．
   iterator
   begin();
@@ -280,7 +278,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MultiGenBase Generator.h <ym_utils/Generator.h>
+/// @class MultiGenBase Generator.h "ym_utils/Generator.h"
 /// @ingroup GeneratorGroup
 /// @brief MultiCombiGen/MultiPermGen に共通な属性を表す基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -318,7 +316,7 @@ public:
     /// @param[in] src コピー元のオブジェクト
     void
     copy(const iterator& src);
-    
+
     /// @brief グループ数を得る．
     /// @return グループ数
     size_t
@@ -341,7 +339,7 @@ public:
     /// @return grp 番目のグループの選択する要素数
     size_t
     k(size_t grp) const;
-    
+
     /// @brief 要素配列の取得
     /// @param[in] grp グループ番号
     /// @return grp 番目のグループの要素配列
@@ -382,7 +380,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
   MultiGenBase(const vector<pair<size_t, size_t> >& nk_array);
-  
+
   /// @brief デストラクタ
   ~MultiGenBase();
 
@@ -416,7 +414,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MultiCombiGen Generator.h <ym_utils/Generator.h>
+/// @class MultiCombiGen Generator.h "ym_utils/Generator.h"
 /// @ingroup GeneratorGroup
 /// @brief 複数の要素のグループの組み合わせを生成するクラス
 //////////////////////////////////////////////////////////////////////
@@ -479,10 +477,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
   MultiCombiGen(const vector<pair<size_t, size_t> >& nk_array);
-  
+
   /// @brief デストラクタ
   ~MultiCombiGen();
-  
+
   /// @brief 最初の組み合わせを取り出す．
   iterator
   begin();
@@ -491,7 +489,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MultiPermGen Generator.h <ym_utils/Generator.h>
+/// @class MultiPermGen Generator.h "ym_utils/Generator.h"
 /// @ingroup GeneratorGroup
 /// @brief 複数の要素のグループの順列を生成するクラス
 //////////////////////////////////////////////////////////////////////
@@ -552,10 +550,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] nk_array 全要素数 n と選択する要素数 k のベクタ
   MultiPermGen(const vector<pair<size_t, size_t> >& nk_array);
-  
+
   /// @brief デストラクタ
   ~MultiPermGen();
-  
+
   /// @brief 最初の順列を取り出す．
   iterator
   begin();

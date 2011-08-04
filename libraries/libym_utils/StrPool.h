@@ -5,9 +5,7 @@
 /// @brief StrPool のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: StrPool.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class StrPool StrPool.h <ym_utils/StrPool.h>
+/// @class StrPool StrPool.h "StrPool.h"
 /// @ingroup YmUtils
 /// @brief 文字列を共有するためのプール
 ///
@@ -58,12 +56,12 @@ private:
   static
   ymuint32
   hash_func(const char* str);
-  
+
   /// @brief テーブルを確保して初期化する．
   /// @param[in] new_size 新しいテーブルサイズ
   void
   alloc_table(ymuint32 new_size);
-  
+
 
 private:
 
@@ -76,12 +74,12 @@ private:
 
     // 文字数 (末尾の \0 を含む)
     ymuint32 mSize;
-    
+
     // 文字列領域の先頭を指すダミー
     // 実際には必要なサイズの領域を確保する．
     char mStr[1];
   };
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -93,7 +91,7 @@ private:
 
   // ハッシュ表のサイズ
   ymuint32 mTableSize;
-  
+
   // ハッシュ表の実効サイズ
   ymuint32 mHashMask;
 
@@ -105,7 +103,7 @@ private:
 
   // Cell を確保するためのアロケータ
   SimpleAlloc mCellAlloc;
-  
+
 };
 
 END_NAMESPACE_YM

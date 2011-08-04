@@ -5,9 +5,7 @@
 /// @brief CutSweep のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CutSweep.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -44,18 +42,18 @@ public:
   found(AigNode* root,
 	size_t ni,
 	AigNode* inputs[]);
-  
+
   /// @brief node のカット集合のフットプリントを得る．
   virtual
   vector<AigNode*>&
   cnode_list(AigNode* node);
 
-  
+
 private:
-  
+
   ymulong
   calc_vect(AigNode* node);
-  
+
   void
   clear_vect(AigNode* node);
 
@@ -67,13 +65,13 @@ private:
 
   // ローカル関数計算用の作業領域
   vector<ymulong> mTmpVect;
-  
+
   // mTmpVect に有効な値が設定されているとき true
   vector<bool> mValid;
 
   // cnode_list の配列
   vector<vector<AigNode*> > mCnodeListArray;
-  
+
 };
 
 END_NAMESPACE_YM_AIG

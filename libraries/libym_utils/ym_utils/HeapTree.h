@@ -5,9 +5,7 @@
 /// @brief HeapTree のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: HeapTree.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class HeapTree HeapTree.h <ym_utils/HeapTree.h>
+/// @class HeapTree HeapTree.h "ym_utils/HeapTree.h"
 /// @ingroup YmUtils
 /// @brief ベーシックなヒープ木のテンプレートクラス
 /// @note テンプレート引数で要素の型と要素の比較関数の型を指定する．
@@ -39,27 +37,27 @@ public:
     mArray(new Node[size])
   {
   }
-  
+
   /// @brief デストラクタ
   ~HeapTree()
   {
     delete [] mArray;
   }
-  
+
   /// @brief 空にする．
   void
   clear()
   {
     mNum = 0;
   }
-  
+
   /// @brief 要素が空の時 true を返す．
   bool
   empty() const
   {
     return mNum == 0;
   }
-  
+
   /// @brief 要素を追加する．
   void
   put(Node t)
@@ -81,14 +79,14 @@ public:
       }
     }
   }
-  
+
   /// @brief 最小要素を返す．
   Node
   getmin() const
   {
     return mArray[0];
   }
-  
+
   /// @brief 最小要素をとりのぞく．
   void
   popmin()
@@ -103,7 +101,7 @@ public:
       mNum = 0;
     }
   }
-  
+
   /// @brief 最小要素の代わりに src を追加する．
   /// @return 新しい最小要素を返す．
   Node
@@ -117,7 +115,7 @@ public:
     pushdown(0);
     return ans;
   }
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -141,7 +139,7 @@ private:
     mArray[mNum] = t;
     ++ mNum;
   }
-  
+
   // 引数の要素を適当な位置まで沈めてゆく再帰的関数
   void
   pushdown(size_t first)
@@ -180,7 +178,7 @@ private:
 	else if ( mCompFunc(val_p, val_r) > 0 &&
 		  mCompFunc(val_r, val_l) < 0 ) {
 	  // 右の子どもと取り替える．次は右の子で同じ処理をする
-	  Node tmp = val_p;	
+	  Node tmp = val_p;
 	  val_p = val_r;
 	  val_r = tmp;
 	  parent = right;
@@ -214,7 +212,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SimpleHeapTree HeapTree.h <ym_utils/HeapTree.h>
+/// @class SimpleHeapTree HeapTree.h "ym_utils/HeapTree.h"
 /// @ingroup YmUtils
 /// @brief 簡単に使えるヒープ木のテンプレートクラス
 /// @note ヒープ木に要素と比較用の値を保持する．
@@ -229,7 +227,7 @@ private:
   {
     T mBody;
     int mVal;
-    
+
     Node() { }
     Node(T t,
 	 int val) :
@@ -247,7 +245,7 @@ private:
       return n1.mVal - n2.mVal;
     }
   };
-  
+
 
 public:
 
@@ -258,26 +256,26 @@ public:
     mBody(size)
   {
   }
-  
+
   /// @brief デストラクタ
   ~SimpleHeapTree()
   {
   }
-  
+
   /// @brief 空にする．
   void
   clear()
   {
     mBody.clear();
   }
-  
+
   /// @brief 要素が空の時 true を返す．
   bool
   empty() const
   {
     return mBody.empty();
   }
-  
+
   /// @brief 要素を追加する．
   void
   put(T t,
@@ -285,21 +283,21 @@ public:
   {
     mBody.put(Node(t, val));
   }
-  
+
   /// @brief 最小要素を返す．
   T
   getmin() const
   {
     return mBody.getmin().mBody;
   }
-  
+
   /// @brief 最小要素をとりのぞく．
   void
   popmin()
   {
     mBody.popmin();
   }
-  
+
   /// @brief 最小要素の代わりに src を追加する．
   /// @return 新しい最小要素を返す．
   T

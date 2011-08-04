@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBRANGE_H
-#define LIBYM_VERILOG_ELB_ELBRANGE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBRANGE_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBRANGE_H
 
 /// @file libym_verilog/elaborator/include/ElbRange.h
 /// @brief ElbRange のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbRange.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -182,4 +180,4 @@ ElbRangeSrc::right_range_val() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBRANGE_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBRANGE_H

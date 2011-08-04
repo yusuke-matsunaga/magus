@@ -6,8 +6,6 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Bdd.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -21,7 +19,7 @@
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddMgrParam Bdd.h <ym_bdd/Bdd.h>
+/// @class BddMgrParam BddMgr.h "ym_logic/BddMgr.h"
 /// @ingroup Bdd
 /// @brief BddMgrにパラメータをセットするための構造体．
 ///
@@ -51,7 +49,7 @@ struct BddMgrParam
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddMgr Bdd.h "ym_logic/Bdd.h"
+/// @class BddMgr BddMgr.h "ym_logic/BddMgr.h"
 /// @ingroup Bdd
 /// @brief BDDの動きを管理するクラス．
 ///

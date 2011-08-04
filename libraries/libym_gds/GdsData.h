@@ -5,9 +5,7 @@
 /// @brief GDS-II の基本データ型
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsData.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -284,7 +282,7 @@ private:
 
   // property のリスト
   list<Property*> mPropertyList;
-  
+
 };
 
 
@@ -295,7 +293,7 @@ class Boundary :
   public Element
 {
 public:
-  
+
   // コンストラクタ
   Boundary();
 
@@ -343,7 +341,7 @@ class Path :
   public Element
 {
 public:
-  
+
   // コンストラクタ
   Path();
 
@@ -377,7 +375,7 @@ public:
   // ENDEXTN を返す．
   int
   end_extn() const;
-  
+
   // 座標のリストを返す．
   const vector<XY>&
   xy_list() const;
@@ -405,7 +403,7 @@ private:
 
   // ENDEXTN
   int mEndExtn;
-  
+
   // 座標のリスト
   vector<XY> mXYList;
 
@@ -419,7 +417,7 @@ class RefBase :
   public Element
 {
 public:
-  
+
   // コンストラクタ
   RefBase();
 
@@ -453,7 +451,7 @@ public:
   // angular rotation factor を返す．
   double
   angle() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -471,7 +469,7 @@ private:
 
   // angular rotation factor
   double mAngle;
-  
+
 };
 
 
@@ -534,7 +532,7 @@ public:
   // row 数を返す．
   int
   row() const;
-  
+
   // 基準(左下)の XY 座標を返す．
   XY
   xy1() const;
@@ -558,7 +556,7 @@ private:
 
   // row 数
   int mRow;
-  
+
   // XY座標
   XY mXY[3];
 
@@ -672,7 +670,7 @@ class Node :
   public Element
 {
 public:
-  
+
   // コンストラクタ
   Node();
 
@@ -720,7 +718,7 @@ class Box :
   public Element
 {
 public:
-  
+
   // コンストラクタ
   Box();
 
@@ -742,7 +740,7 @@ public:
   // 座標を返す．
   XY
   xy1() const;
-  
+
   XY
   xy2() const;
 
@@ -751,7 +749,7 @@ public:
 
   XY
   xy4() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

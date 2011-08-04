@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBGFROOT_H
-#define LIBYM_VERILOG_ELB_ELBGFROOT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBGFROOT_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBGFROOT_H
 
 /// @file libym_verilog/elaborator/include/ElbGfRoot.h
 /// @brief ElbGfRoot のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbGfRoot.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -54,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LiBYM_VERILOG_ELB_ELBGFROOT_H
+#endif // LiBYM_VERILOG_ELABORATOR_INCLUDE_ELBGFROOT_H

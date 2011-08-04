@@ -5,14 +5,11 @@
 /// @brief Msg のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Msg.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-// メッセージを表すクラス
 
-#include <ym_gds/gds_nsdef.h>
+#include "ym_gds/gds_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_GDS
@@ -20,7 +17,8 @@ BEGIN_NAMESPACE_YM_GDS
 class MsgHelper;
 
 //////////////////////////////////////////////////////////////////////
-// メッセージを表す基底クラス
+/// @class Msg Msg.h "ym_gds/Msg.h"
+/// @brief メッセージを表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class Msg
 {
@@ -38,7 +36,7 @@ public:
 
 
 private:
-  
+
   // コンストラクタ
   Msg(const char* src_file,
       int src_line,
@@ -89,7 +87,7 @@ private:
 
   // メッセージの生成場所の行番号
   int mSrcLine;
-  
+
   // ファイル位置情報
   size_t mOffset;
 
@@ -190,7 +188,7 @@ class MsgHandler
   // マスクを設定する．
   void
   set_mask(size_t new_mask) { mMask = new_mask; }
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -199,7 +197,7 @@ private:
 
   // マスク
   size_t mMask;
-  
+
 };
 
 
@@ -212,7 +210,7 @@ public:
 
   // 唯一のインスタンスを得るための関数
   static MsgMgr& the_mgr();
-  
+
 
 private:
 
@@ -237,7 +235,7 @@ public:
 	       const string& label,
 	       size_t offset,
 	       const string& body);
-  
+
   // 警告メッセージ用のヘッダ(ファイル情報)を出力する
   // メッセージはこの関数の返り値に '<<' 演算子で書き込む．
   friend
@@ -247,7 +245,7 @@ public:
 		 const string& label,
 		 size_t offset,
 		 const string& body);
-  
+
   // 情報メッセージ用のヘッダ(ファイル情報)を出力する
   // メッセージはこの関数の返り値に '<<' 演算子で書き込む．
   friend
@@ -257,7 +255,7 @@ public:
 	      const string& label,
 	      size_t offset,
 	      const string& body);
-  
+
   // 失敗メッセージ用のヘッダ(ファイル情報)を出力する
   // メッセージはこの関数の返り値に '<<' 演算子で書き込む．
   friend
@@ -267,7 +265,7 @@ public:
 	      const string& label,
 	      size_t offset,
 	      const string& body);
-  
+
   // デバッグメッセージ用のヘッダを出力する
   // メッセージはこの関数の返り値に '<<' 演算子で書き込む．
   friend
@@ -282,8 +280,8 @@ public:
   friend
   void
   msg_end();
-  
-  
+
+
   //////////////////////////////////////////////////////////////////////
   // メンバ関数
   //////////////////////////////////////////////////////////////////////
@@ -335,7 +333,7 @@ private:
   // msg_end() 中で呼ばれる関数
   void
   put_msg();
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -365,7 +363,7 @@ private:
 
   // メッセージハンドラのリスト
   list<MsgHandler*> mHandlerList;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -385,7 +383,7 @@ class TestMsgHandler :
   public MsgHandler
 {
  public:
-  
+
   // コンストラクタ
   explicit
   TestMsgHandler(size_t mask = kMsgMaskAll);
@@ -398,7 +396,7 @@ class TestMsgHandler :
   virtual
   void
   operator()(const Msg* msg);
-  
+
 };
 
 
@@ -419,7 +417,7 @@ warning_header(const char* src_file,
 	       const string& label,
 	       size_t offset,
 	       const string& body = string());
-  
+
 // 情報メッセージ用のヘッダ(ファイル情報)を出力する
 // メッセージはこの関数の返り値に '<<' 演算子で書き込む．
 ostream&
@@ -428,7 +426,7 @@ info_header(const char* src_file,
 	    const string& label,
 	    size_t offset,
 	    const string& body = string());
-  
+
 // 失敗メッセージ用のヘッダ(ファイル情報)を出力する
 // メッセージはこの関数の返り値に '<<' 演算子で書き込む．
 ostream&
@@ -437,7 +435,7 @@ fail_header(const char* src_file,
 	    const string& label,
 	    size_t offset,
 	    const string& body = string());
-  
+
 // デバッグメッセージ用のヘッダを出力する
 // メッセージはこの関数の返り値に '<<' 演算子で書き込む．
 ostream&

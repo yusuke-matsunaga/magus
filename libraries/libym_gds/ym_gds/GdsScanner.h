@@ -5,19 +5,17 @@
 /// @brief GDS-II ファイルの読み込みを行うクラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsScanner.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_gds/gds_nsdef.h>
+#include "ym_gds/gds_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_GDS
 
 //////////////////////////////////////////////////////////////////////
-/// @class GdsScanner GdsScanner.h "GdsScanner.h"
+/// @class GdsScanner GdsScanner.h "ym_gds/GdsScanner.h"
 /// @brief GDS-II の読み込みを行うクラス
 //////////////////////////////////////////////////////////////////////
 class GdsScanner
@@ -71,7 +69,7 @@ private:
 
   // GdsRecord の管理用オブジェクト
   GdsRecMgr& mMgr;
-  
+
 };
 
 END_NAMESPACE_YM_GDS

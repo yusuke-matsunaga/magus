@@ -5,9 +5,7 @@
 /// @brief RandCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: RandCmd.h 997 2007-09-07 09:58:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // 乱数を発生させるコマンドクラス
@@ -30,7 +28,7 @@ protected:
   virtual
   void
   usage();
-  
+
   // コマンド処理関数
   virtual
   int
@@ -51,7 +49,7 @@ protected:
   virtual
   void
   usage();
-  
+
   // コマンド処理関数
   virtual
   int

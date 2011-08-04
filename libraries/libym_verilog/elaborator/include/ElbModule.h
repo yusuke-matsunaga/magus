@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBMODULE_H
-#define LIBYM_VERILOG_ELB_ELBMODULE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBMODULE_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBMODULE_H
 
 /// @file libym_verilog/elaborator/include/ElbModule.h
 /// @brief ElbModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbModule.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -197,4 +195,4 @@ ElbModule::next() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBMODULE_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBMODULE_H

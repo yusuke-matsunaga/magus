@@ -5,13 +5,11 @@
 /// @brief GdsRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsRecord.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_gds/gds_nsdef.h>
+#include "ym_gds/gds_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_GDS
@@ -24,7 +22,7 @@ class GdsRecord
 {
   friend class GdsRecMgr;
   friend class GdsScanner;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -71,7 +69,7 @@ public:
   /// @brief pos 番目のバイトデータを返す．
   tGdsByte
   conv_1byte(size_t pos) const;
-  
+
   /// @brief pos 番目の 2バイトのデータを符号つき数(2の補数表現)に変換する．
   /// @note kGds2Int 用の変換関数
   int

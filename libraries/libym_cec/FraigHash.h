@@ -4,10 +4,8 @@
 /// @file libym_cec/FraigHash.h
 /// @brief FraigHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: FraigHash.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -31,10 +29,10 @@ public:
 
   /// @brief デストラクタ
   ~FraigHash();
-  
+
 
 public:
-  
+
   /// @brief 要素数を得る．
   ymuint
   num() const;
@@ -46,57 +44,57 @@ public:
   /// @brief 先頭の要素を得る．
   FraigNode*
   elem(ymuint hash_val) const;
-  
+
   /// @brief 拡張が必要か調べる．
   bool
   need_expand();
-  
+
   /// @brief 内容を空にする．
   /// @note テーブルサイズはそのまま
   void
   clear();
-  
+
   /// @brief 要素を追加する．
   void
   add_elem(ymuint hash_val,
 	   FraigNode* node,
 	   FraigNode*& link);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるメンバ関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ハッシュ表を確保する．
   void
   alloc_table(ymuint req_size);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 要素数
   ymuint32 mNum;
-  
+
   // mHashTable のサイズ
   ymuint32 mHashSize;
-  
+
   // ハッシュ表を拡大する目安
   ymuint32 mNextLimit;
-  
+
   // ハッシュ表
   FraigNode** mHashTable;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 要素数を得る．
 inline
 ymuint
@@ -120,7 +118,7 @@ FraigHash::elem(ymuint hash_val) const
 {
   return mHashTable[hash_val % mHashSize];
 }
-  
+
 // @brief 拡張が必要か調べる．
 inline
 bool
@@ -132,7 +130,7 @@ FraigHash::need_expand()
   }
   return false;
 }
-  
+
 // @brief 内容を空にする．
 // @note テーブルサイズはそのまま
 inline

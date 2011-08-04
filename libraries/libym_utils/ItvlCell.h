@@ -5,9 +5,7 @@
 /// @brief ItvlCell のヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: ItvlCell.h 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -29,7 +27,7 @@ private:
   // 開始点と終了点を指定したコンストラクタ
   ItvlCell(int start,
 	   int end);
-  
+
   // デストラクタ
   // 子供も削除する．
   ~ItvlCell();
@@ -207,7 +205,7 @@ private:
 
   static
   UnitAlloc mCellAlloc;
-  
+
 };
 
 END_NAMESPACE_YM

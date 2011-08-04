@@ -1,13 +1,11 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_ATTRGEN_H
-#define LIBYM_VERILOG_ELABORATOR_ATTRGEN_H
+#ifndef LIBYM_VERILOG_ELABORATOR_MAIN_ATTRGEN_H
+#define LIBYM_VERILOG_ELABORATOR_MAIN_ATTRGEN_H
 
-/// @file libym_verilog/elaborator/AttrGen.h
+/// @file libym_verilog/elaborator/main/AttrGen.h
 /// @brief AttrGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AttrGen.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -52,9 +50,9 @@ public:
   instantiate_attribute(PtAttrInstArray pt_attr_array,
 			bool def,
 			const VlObj* obj);
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_ATTRGEN_H
+#endif // LIBYM_VERILOG_ELABORATOR_MAIN_ATTRGEN_H

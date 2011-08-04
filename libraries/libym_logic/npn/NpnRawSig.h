@@ -5,8 +5,6 @@
 /// @brief NpnRawSig のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NpnRawSig.h 1508 2008-06-30 04:55:42Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 

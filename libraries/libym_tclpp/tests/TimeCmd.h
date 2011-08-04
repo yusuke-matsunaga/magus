@@ -5,9 +5,7 @@
 /// @brief TimeCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TimeCmd.h 997 2007-09-07 09:58:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 // 時間計測を行うパッケージ
@@ -41,12 +39,12 @@ protected:
   virtual
   void
   usage();
-  
+
   // コマンドを実行する仮想関数
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -97,7 +95,7 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -5,9 +5,7 @@
 /// @brief MFSet のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MFSet.h 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -22,7 +20,7 @@ class MFSetCell;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MFSet MFSet.h <ym_utils/MFSet.h>
+/// @class MFSet MFSet.h "ym_utils/MFSet.h"
 /// @ingroup YmUtils
 /// @brief Merge/Find set を実装したクラス
 ///
@@ -39,10 +37,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] n 確保したい要素の数．
   MFSet(size_t n);
-  
+
   /// @brief デストラクタ
   ~MFSet();
-  
+
   /// @brief 代表元の検索 (Find)
   /// @param[in] x 要素番号
   /// @retval 要素 x の属する集合の代表元
@@ -61,15 +59,15 @@ public:
   id_type
   merge(id_type x,
 	id_type y);
-  
+
 
 private:
-  
+
   /// @brief 番号 x の要素セルを取ってくる．
   /// そのような要素がない場合にはNULLを返す．
   MFSetCell*
   get(id_type x);
-  
+
 
 private:
 

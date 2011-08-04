@@ -5,8 +5,6 @@
 /// @brief TvFuncTimeCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TvFuncTimeCmd.h 1508 2008-06-30 04:55:42Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -41,7 +39,7 @@ protected:
   virtual
   void
   usage();
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -89,7 +87,7 @@ public:
 
 
 protected:
-  
+
   /// @brief コマンドを実行する仮想関数
   virtual
   int
@@ -105,10 +103,10 @@ private:
 
 
 private:
-  
+
   // -mag オプション解析用のオブジェクト
   TclPoptInt* mMagOpt;
-  
+
   // NPN 代表関数を保持しておくハッシュ表
   hash_set<TvFunc> mRepFuncSet;
 

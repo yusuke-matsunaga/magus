@@ -5,8 +5,6 @@
 /// @brief TvFunc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TvFunc.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

@@ -5,8 +5,6 @@
 /// @brief CvFunc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CvFunc.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -18,7 +16,7 @@
 BEGIN_NAMESPACE_YM_NPN
 
 //////////////////////////////////////////////////////////////////////
-/// @class CvFunc CvFunc.h <ym_npn/CvFunc.h>
+/// @class CvFunc CvFunc.h "ym_logic/CvFunc.h"
 /// @ingroup NpnGroup
 /// @brief カバー形式で論理関数を表すクラス
 //////////////////////////////////////////////////////////////////////
@@ -48,7 +46,7 @@ public:
   /// @return 自分自身への参照を返す．
   const CvFunc&
   operator=(const CvFunc& src);
-  
+
   /// @brief デストラクタ
   ~CvFunc();
 
@@ -64,7 +62,7 @@ public:
   static
   CvFunc
   const_zero(size_t ni);
-  
+
   /// @brief 恒真関数を作る．
   /// @param[in] ni 入力数
   /// @return 生成された CvFunc を返す．
@@ -110,7 +108,7 @@ public:
   const CvFunc& operator^=(const CvFunc& src1);
 #endif
 
-  
+
 public:
 
   /// @brief 入力数を得る．
@@ -163,10 +161,10 @@ public:
 	       size_t w,
 	       tPol opol,
 	       size_t ibits) const;
-  
+
   // i 番目の変数がサポートの時 true を返す．
   bool check_sup(tVarId i) const;
-  
+
   // i 番目と j 番目の変数が対称のとき true を返す．
   bool check_sym(tVarId i,
 		 tVarId j,
@@ -206,7 +204,7 @@ public:
   size_t
   nblk() const;
 
-  
+
 private:
 
   // リテラルを作るコンストラクタ
@@ -243,7 +241,7 @@ private:
   size_t
   w01_sub(int vec[]) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -257,7 +255,7 @@ private:
 
   // 1行当たりのブロック数
   size_t mNbpc;
-  
+
   // ブロック数
   size_t mNblk;
 

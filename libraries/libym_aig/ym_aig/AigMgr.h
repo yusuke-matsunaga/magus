@@ -5,8 +5,6 @@
 /// @brief AigMgrのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AigMgr.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

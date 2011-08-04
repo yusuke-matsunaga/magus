@@ -3,9 +3,7 @@
 /// @brief ItvlCell の実装ファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: ItvlCell.cc 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

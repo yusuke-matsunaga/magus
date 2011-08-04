@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBPAREMETER_H
-#define LIBYM_VERILOG_ELB_ELBPARAMETER_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPAREMETER_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPARAMETER_H
 
 /// @file libym_verilog/elaborator/include/ElbParameter.h
 /// @brief ElbParameter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbParameter.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -293,4 +291,4 @@ ElbParameter::next() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBPARAMETER_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPARAMETER_H

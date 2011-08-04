@@ -5,14 +5,12 @@
 /// @brief GDS-II ファイルの内容をダンプするためのクラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsDumper.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_gds/gds_nsdef.h>
-#include <ym_gds/GdsRecord.h>
+#include "ym_gds/gds_nsdef.h"
+#include "ym_gds/GdsRecord.h"
 
 
 BEGIN_NAMESPACE_YM_GDS
@@ -29,7 +27,7 @@ public:
   /// @param[in] os 出力先のストリーム
   explicit
   GdsDumper(ostream& os);
-  
+
   /// @brief デストラクタ
   ~GdsDumper();
 

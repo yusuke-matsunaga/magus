@@ -5,8 +5,6 @@
 /// @brief SaUIP1 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SaUIP1.h 1293 2008-02-21 02:25:52Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

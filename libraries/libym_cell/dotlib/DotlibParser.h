@@ -1,11 +1,9 @@
-#ifndef YM_DOTLIB_DOTLIBPARSER_H
-#define YM_DOTLIB_DOTLIBPARSER_H
+#ifndef DOTLIBPARSER_H
+#define DOTLIBPARSER_H
 
 /// @file ym_dotlib/DotlibParser.h
 /// @brief DotlibParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: DotlibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -19,7 +17,8 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibParserImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// Dotlib 用のパーサークラス
+/// @class DotlibParser DotlibParser.h "DotlibParser.h"
+/// @brief Dotlib 用のパーサークラス
 //////////////////////////////////////////////////////////////////////
 class DotlibParser
 {
@@ -61,4 +60,4 @@ private:
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // YM_DOTLIB_DOTLIBPARSER_H
+#endif // DOTLIBPARSER_H

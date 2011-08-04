@@ -4,10 +4,8 @@
 /// @file ymassert.h
 /// @brief assertion 関係のクラス
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: ymassert.h 693 2007-05-28 09:13:57Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 #include <ymnsdef.h>
@@ -27,14 +25,14 @@ const bool ymtools_check = true;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AssertError ymtools.h <ymtools.h>
+/// @class AssertError ymtools.h "ymassert.h"
 /// @brief assert 違反用の例外の基底クラス
 //////////////////////////////////////////////////////////////////////
 class AssertError :
   public exception
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] file ファイル名
   /// @param[in] line 行番号
@@ -76,7 +74,7 @@ operator<<(ostream& s,
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AssertNotReached ymtools.h <ymtools/ymtools.h>
+/// @class AssertNotReached ymtools.h "ymassert.h"
 /// @brief 到達してはいけない部分に達したときの例外
 //////////////////////////////////////////////////////////////////////
 class AssertNotReached :

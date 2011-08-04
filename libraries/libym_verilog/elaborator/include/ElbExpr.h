@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBEXPR_H
-#define LIBYM_VERILOG_ELB_ELBEXPR_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBEXPR_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBEXPR_H
 
 /// @file libym_verilog/elaborator/include/ElbExpr.h
 /// @brief ElbExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbExpr.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -144,4 +142,4 @@ ElbExpr::set_selfsize()
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBEXPR_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBEXPR_H

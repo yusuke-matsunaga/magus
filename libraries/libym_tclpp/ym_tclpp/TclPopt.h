@@ -5,9 +5,7 @@
 /// @brief TclPopt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TclPopt.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -32,7 +30,7 @@ enum tTclPoptStat {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPopt TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPopt TclPopt.h "ym_tclpp/TclPopt.h"
 /// @ingroup Tclpp
 /// @brief Tcl コマンドのオプション解析時のアクション定義用基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -52,7 +50,7 @@ public:
 	  const string& opt_desc,
 	  const string& arg_desc = string(),
 	  bool allow_override = false);
-  
+
   /// @brief デストラクタ
   virtual
   ~TclPopt();
@@ -79,19 +77,19 @@ public:
   /// @brief このオブジェクトが解析中に呼ばれていたら true を返す．
   bool
   is_specified() const;
-  
+
   /// @brief このオブジェクトが解析中に呼ばれた回数を返す．
   int
   count() const;
 
 
 public:
-  
+
   /// @brief 解析を始める前に呼ばれる初期化
   /// @note mCount を 0 に初期化してから init() を呼び出している．
   void
   _init();
-  
+
   /// @brief オプション文字列がマッチしたときの処理
   /// @param[in] opt_str オプション文字列
   /// @param[inout] rpos コマンド行引数の次の位置
@@ -113,7 +111,7 @@ private:
   virtual
   void
   init();
-  
+
   /// @brief オプション文字列がマッチしたときの処理
   /// @param[in] opt_str オプション文字列
   /// @param[inout] rpos コマンド行引数の次の位置
@@ -165,12 +163,12 @@ private:
 
   // このオプションが現れた回数
   int mCount;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptObj TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptObj TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <任意の引数>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptObj :
@@ -196,7 +194,7 @@ public:
 
 
 public:
-  
+
   /// @brief オプション引数の値を返す．
   TclObj
   val() const;
@@ -218,7 +216,7 @@ public:
   action(const string& opt_str,
 	 TclObjVector::iterator& rpos,
 	 const TclObjVector::iterator& end);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -238,15 +236,15 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パーズ結果を格納する変数
   TclObj mVal;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptStr TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptStr TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <引数文字列>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptStr :
@@ -314,15 +312,15 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パーズ結果を格納する変数
   string mVal;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptBool TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptBool TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <論理値>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptBool :
@@ -348,7 +346,7 @@ public:
 
 
 public:
-  
+
   /// @brief オプション引数の値を返す．
   bool
   val() const;
@@ -370,7 +368,7 @@ public:
   action(const string& opt_str,
 	 TclObjVector::iterator& rpos,
 	 const TclObjVector::iterator& end);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -390,15 +388,15 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パーズ結果を格納する変数
   bool mVal;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptInt TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptInt TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <整数>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptInt :
@@ -469,12 +467,12 @@ private:
 
   // パーズ結果を格納する変数
   ymint mVal;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptUint TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptUint TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <符号なし整数>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptUint :
@@ -545,12 +543,12 @@ private:
 
   // パーズ結果を格納する変数
   ymuint mVal;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptLong TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptLong TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <long整数>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptLong :
@@ -621,12 +619,12 @@ private:
 
   // パーズ結果を格納する変数
   ymlong mVal;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptUlong TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptUlong TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <ulong整数>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptUlong :
@@ -697,12 +695,12 @@ private:
 
   // パーズ結果を格納する変数
   ymulong mVal;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptDouble TclPopt.h <ym_tclpp/TclPopt.h>
+/// @class TclPoptDouble TclPopt.h "ym_tclpp/TclPopt.h"
 /// @brief <-オプション文字列> <double>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptDouble :
@@ -774,7 +772,7 @@ private:
 
   // パーズ結果を格納する変数
   double mVal;
-  
+
 };
 
 END_NAMESPACE_YM_TCLPP

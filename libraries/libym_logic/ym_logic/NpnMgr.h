@@ -5,8 +5,6 @@
 /// @brief NpnMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NpnMgr.h 1508 2008-06-30 04:55:42Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -19,7 +17,7 @@ BEGIN_NAMESPACE_YM_NPN
 class NpnConf;
 
 //////////////////////////////////////////////////////////////////////
-/// @class NpnMgr NpnMgr.h <ym_npn/NpnMgr.h>
+/// @class NpnMgr NpnMgr.h "ym_logic/NpnMgr.h"
 /// @brief NPN同値類の正規形を求めるためのクラス
 //////////////////////////////////////////////////////////////////////
 class NpnMgr

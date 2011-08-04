@@ -5,8 +5,6 @@
 /// @brief Bool3 の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Bool3.h 2203 2009-04-16 05:04:40Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

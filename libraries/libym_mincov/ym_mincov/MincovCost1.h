@@ -4,10 +4,8 @@
 /// @file ym_mincov/MincovCost.h
 /// @brief MincovCost のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MincovCost1.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovCost MincovCost1.h <ym_mincov/MincovCost1.h>
+/// @class MincovCost MincovCost1.h "ym_mincov/MincovCost1.h"
 /// @brief Mincov 用のコストを表すクラス(2次元バージョン)
 //////////////////////////////////////////////////////////////////////
 class MincovCost
@@ -27,7 +25,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] value1 1次コスト
   MincovCost(double value1 = 1.0);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   MincovCost(const MincovCost& src);
@@ -36,18 +34,18 @@ public:
   /// @param[in] src コピー元のオブジェクト
   const MincovCost&
   operator=(const MincovCost& src);
-  
+
   /// @brief ゼロを作るクラスメソッド
   static
   MincovCost
   zero();
-  
+
   /// @brief デストラクタ
   ~MincovCost();
 
-  
+
 public:
-  
+
   /// @brief 値を返す．
   double
   value() const;
@@ -55,7 +53,7 @@ public:
   /// @brief 値への参照を返す．
   double&
   value();
-  
+
 
 public:
 
@@ -63,7 +61,7 @@ public:
   /// @param[in] right 右のオペランド
   const MincovCost&
   operator+=(const MincovCost& right);
-  
+
   /// @brief 減算付き代入演算子
   /// @param[in] right 右のオペランド
   const MincovCost&
@@ -91,16 +89,16 @@ public:
   /// @param[in] right 右のオペランド
   bool
   operator<(const MincovCost& right) const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // コスト本体
   double mValue;
-  
+
 };
 
 
@@ -176,7 +174,7 @@ MincovCost::MincovCost(double value1) :
   mValue(value1)
 {
 }
-  
+
 // @brief コピーコンストラクタ
 // @param[in] src コピー元のオブジェクト
 inline
@@ -204,7 +202,7 @@ MincovCost::zero()
 {
   return MincovCost(0.0);
 }
-  
+
 // @brief デストラクタ
 inline
 MincovCost::~MincovCost()
@@ -220,7 +218,7 @@ MincovCost::operator+=(const MincovCost& right)
   mValue += right.mValue;
   return *this;
 }
-  
+
 // @brief 減算付き代入演算子
 // @param[in] right 右のオペランド
 inline

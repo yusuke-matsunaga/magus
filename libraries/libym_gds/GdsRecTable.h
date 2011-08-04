@@ -5,9 +5,7 @@
 /// @brief GDS-II の予約語の変換テーブル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsRecTable.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,7 +21,7 @@ class GdsRecTable
 {
 private:
   // singleton パターンなので勝手に生成/破壊させない．
-  
+
   // コンストラクタ
   GdsRecTable();
 

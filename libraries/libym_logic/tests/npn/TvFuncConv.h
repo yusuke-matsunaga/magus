@@ -5,8 +5,6 @@
 /// @brief TvFuncConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TvFuncConv.h 37 2006-07-17 07:04:25Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

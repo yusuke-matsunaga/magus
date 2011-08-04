@@ -5,8 +5,6 @@
 /// @brief ShString のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ShString.h 1052 2007-10-24 11:08:51Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class ShString ShString.h <ym_utils/ShString.h>
+/// @class ShString ShString.h "ym_utils/ShString.h"
 /// @ingroup ShStringGroup
 /// @brief StrPool で共有された文字列へのオートポインタ
 /// @sa StrPool

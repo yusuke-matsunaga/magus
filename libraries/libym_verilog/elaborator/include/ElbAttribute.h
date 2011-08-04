@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBATTRIBUTE_H
-#define LIBYM_VERILOG_ELB_ELBATTRIBUTE_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBATTRIBUTE_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBATTRIBUTE_H
 
 /// @file libym_verilog/elaborator/include/ElbAttribute.h
 /// @brief ElbAttribute のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbAttribute.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -72,4 +70,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBATTRIBUTE_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBATTRIBUTE_H

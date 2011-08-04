@@ -5,9 +5,7 @@
 /// @brief NameMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NameMgr.h 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +17,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class NameMgr NameMgr.h <ym_utils/NameMgr.h>
+/// @class NameMgr NameMgr.h "ym_utils/NameMgr.h"
 /// @ingroup YmUtils
 /// @brief \<prefix\>ddd\<suffix\> という形の名前で使用可能なものを
 /// 表すためのクラス
@@ -33,7 +31,7 @@ public:
   /// @param[in] suffix 接尾語
   NameMgr(const char* prefix,
 	  const char* suffix);
-  
+
   /// @brief デストラクタ
   ~NameMgr();
 
@@ -48,15 +46,15 @@ public:
   /// @brief 登録している名前を全てクリアする．
   void
   clear();
-  
+
   /// @brief 接頭語を返す．
   string
   prefix() const;
-  
+
   /// @brief 接尾語を返す．
   string
   suffix() const;
-  
+
   /// @brief 次に使用可能な名前を接頭語，接尾語を連結して返す．
   /// @param[in] add_name true の時，名前の登録も行う．
   const StrBuff&
@@ -73,13 +71,13 @@ public:
   /// @note 名前が \<prefix\>ddd\<suffix\> の形でない場合には何もしない．
   void
   erase(const char* name);
-  
+
   /// @brief 内容を表示する．
   /// @param[in] s 出力先のストリーム
   /// @note 主にデバッグ用
   void
   dump(ostream& s) const;
-  
+
 
 private:
 
@@ -118,7 +116,7 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // 接頭語を返す．
 inline
 string

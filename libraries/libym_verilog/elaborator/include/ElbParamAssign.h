@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBPARAMASSIGN_H
-#define LIBYM_VERILOG_ELB_ELBPARAMASSIGN_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPARAMASSIGN_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPARAMASSIGN_H
 
 /// @file libym_verilog/elaborator/include/ElbParamAssign.h
 /// @brief ElbParamAssign のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbParamAssign.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -120,4 +118,4 @@ ElbDefParam::next() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBPARAMASSIGN_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBPARAMASSIGN_H

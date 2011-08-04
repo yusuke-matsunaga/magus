@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiGenBlock.cc
+/// @file libym_verilog/elaborator/ei/EiGenBlock.cc
 /// @brief EiGenBlock の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiGenBlock.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,7 +17,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 // EiFactory の生成関数
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief generate block を生成する．
 // @param[in] parent 親のスコープ環境
 // @param[in] pt_item 対応するパース木の要素
@@ -43,7 +41,7 @@ EiFactory::new_GfRoot(const VlNamedObj* parent,
 
   return gfroot;
 }
-  
+
 // @brief generate for block を生成する．
 // @param[in] parent 親のスコープ環境
 // @param[in] pt_item 対応するパース木の要素
@@ -99,7 +97,7 @@ EiGenBlock::parent() const
 {
   return mParent;
 }
-  
+
 // @brief 名前の取得
 const char*
 EiGenBlock::name() const
@@ -147,7 +145,7 @@ EiGfRoot::parent() const
 {
   return mParent;
 }
-  
+
 // @brief 名前の取得
 const char*
 EiGfRoot::name() const
@@ -191,7 +189,7 @@ EiGfBlock::EiGfBlock(const VlNamedObj* parent,
 {
   ostringstream buf;
   buf << pt_item->name() << "[" << index << "]";
-  
+
   mName = buf.str();
 }
 
@@ -199,7 +197,7 @@ EiGfBlock::EiGfBlock(const VlNamedObj* parent,
 EiGfBlock::~EiGfBlock()
 {
 }
-  
+
 // @brief 名前の取得
 const char*
 EiGfBlock::name() const

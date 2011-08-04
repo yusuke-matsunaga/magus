@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiImpNet.cc
+/// @file libym_verilog/elaborator/ei/EiImpNet.cc
 /// @brief EiNet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiImpNet.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

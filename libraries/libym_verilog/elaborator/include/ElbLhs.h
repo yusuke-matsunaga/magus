@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBLHS_H
-#define LIBYM_VERILOG_ELB_ELBLHS_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBLHS_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBLHS_H
 
 /// @file libym_verilog/elaborator/include/ElbLhs.h
 /// @brief ElbLhs のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbLhs.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -90,4 +88,4 @@ ElbLhs::_expr() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBLHS_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBLHS_H

@@ -5,9 +5,7 @@
 /// @brief TestMatrix のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TestMatrix.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,7 +21,7 @@ BEGIN_NAMESPACE_YM_MINCOV
 class TestMatrix
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] row_size 行数
   /// @param[in] col_size 列数
@@ -31,7 +29,7 @@ public:
   TestMatrix(ymuint32 row_size,
 	     ymuint32 col_size,
 	     ymuint32 cost_size);
-  
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元の行列
   TestMatrix(const TestMatrix& src);
@@ -40,7 +38,7 @@ public:
   /// @param[in] src コピー元の行列
   const TestMatrix&
   operator=(const TestMatrix& src);
-  
+
   /// @brief デストラクタ
   ~TestMatrix();
 
@@ -54,7 +52,7 @@ public:
   /// @brief 列数を得る．
   ymuint32
   col_size() const;
-  
+
   /// @brief コストの次元を返す．
   ymuint32
   cost_size() const;
@@ -70,14 +68,14 @@ public:
   void
   display(ostream& s) const;
 
-  
+
 public:
-  
+
   /// @brief 内容をクリアする．
   /// @note 行/列のサイズは不変
   void
   clear();
-  
+
   /// @brief サイズを変更する．
   /// @param[in] row_size 行数
   /// @param[in] col_size 列数
@@ -87,7 +85,7 @@ public:
   resize(ymuint32 row_size,
 	 ymuint32 col_size,
 	 ymuint32 cost_size);
-  
+
   /// @brief 要素を追加する．
   /// @param[in] row_pos 追加する要素の行番号
   /// @param[in] col_pos 追加する要素の列番号
@@ -103,20 +101,20 @@ public:
   set_cost(ymuint32 col_pos,
 	   ymuint32 val_pos,
 	   double value);
-  
+
   /// @brief 列を選択し，被覆される行を削除する．
   /// @param[in] col_pos 選択した列
   void
   select_col(ymuint32 col_pos);
-  
+
   /// @brief 行を削除する．
   void
   delete_row(ymuint32 row_pos);
-  
+
   /// @brief 列を削除する．
   void
   delete_col(ymuint32 col_pos);
-  
+
   /// @brief 削除スタックにマーカーを書き込む．
   void
   backup();
@@ -124,14 +122,14 @@ public:
   /// @brief 直前のマーカーまで処理を戻す．
   void
   restore();
-  
+
 
 private:
-  
+
   /// @brief 一貫性のチェックを行う．
   bool
   sanity_check();
-  
+
   /// @brief 指定された行の非ゼロ要素の列番号を得る．
   /// @param[in] row_pos 行番号 ( 0 <= row_pos < row_size() )
   /// @param[out] cols 列番号を納めるベクタ
@@ -153,8 +151,8 @@ private:
   set_elem(ymuint32 row_pos,
 	   ymuint32 col_pos,
 	   int val);
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -165,19 +163,19 @@ private:
 
   // 列数
   ymuint32 mColSize;
-  
+
   // コストの次元
   ymuint32 mCostSize;
-  
+
   // 要素の配列 (サイズは mRowSize * mColSize)
   vector<int> mBody;
 
   // backup/restore 用のスタック
   vector<TestMatrix*> mStack;
-  
+
   // 本当の行列
   MincovMatrix mMatrix;
-  
+
 };
 
 
@@ -200,7 +198,7 @@ TestMatrix::col_size() const
 {
   return mColSize;
 }
-  
+
 // @brief コストの次元を返す．
 inline
 ymuint32

@@ -5,9 +5,7 @@
 /// @brief fsm_analysis の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: fsm_analysis.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,13 +14,13 @@
 BEGIN_NAMESPACE_YM_SEAL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IdxMapper
+/// @class IdxMapper IdxMapper.h "IdxMapper.h"
 /// @brief BDD用の変数インデックスを計算するクラス
 //////////////////////////////////////////////////////////////////////
 class IdxMapper
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] input_num 外部入力数
   /// @param[in] output_num 外部出力数
@@ -34,7 +32,7 @@ public:
   /// @brief デストラクタ
   ~IdxMapper();
 
-  
+
 public:
 
   /// @brief 外部入力の変数インデックスを得る．
@@ -44,7 +42,7 @@ public:
   /// @brief 外部出力の変数インデックスを得る．
   ymuint
   output_idx(ymuint pos) const;
-  
+
   /// @brief 正常回路の現状態の変数インデックスを得る．
   ymuint
   cur_normal_idx(ymuint pos) const;
@@ -60,7 +58,7 @@ public:
   /// @brief 故障回路の次状態の変数インデックスを得る．
   ymuint
   next_error_idx(ymuint pos) const;
-  
+
   /// @brief 現状態のエラービット
   ymuint
   cur_error_bit() const;
@@ -76,30 +74,30 @@ public:
   /// @brief 次状態の等価状態ビット
   ymuint
   next_ident_bit() const;
-  
+
   /// @brief 状態からエラーを含んだ状態対を作る．
   State
   make_error_state(State normal_state,
 		   ymuint error_pos) const;
-  
-  
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 外部入力数
   ymuint32 mInputNum;
-  
+
   // 外部出力数
   ymuint32 mOutputNum;
 
   // FF数
   ymuint32 mFFNum;
-  
+
 };
 
-  
+
 // @brief コンストラクタ
 // @param[in] input_num 外部入力数
 // @param[in] output_num 外部出力数
@@ -135,7 +133,7 @@ IdxMapper::output_idx(ymuint pos) const
 {
   return pos;
 }
-  
+
 // @brief 正常回路の現状態の変数インデックスを得る．
 inline
 ymuint
@@ -167,7 +165,7 @@ IdxMapper::next_error_idx(ymuint pos) const
 {
   return mOutputNum + mFFNum * 2 + pos * 2 + 1;
 }
-  
+
 // @brief 現状態のエラービット
 inline
 ymuint
@@ -199,7 +197,7 @@ IdxMapper::next_ident_bit() const
 {
   return mOutputNum + mFFNum * 4 + 3;
 }
-  
+
 // @brief 状態からエラーを含んだ状態対を作る．
 inline
 State

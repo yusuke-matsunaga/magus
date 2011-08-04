@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_MODULEHASH_H
-#define LIBYM_VERILOG_ELB_MODULEHASH_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_MODULEHASH_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_MODULEHASH_H
 
 /// @file libym_verilog/elaborator/include/ModuleHash.h
 /// @brief ModuleHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ModuleHash.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -124,4 +122,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_MODULEHASH_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_MODULEHASH_H

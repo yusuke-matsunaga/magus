@@ -5,9 +5,7 @@
 /// @brief AigTemplate のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AigTemplate.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -39,7 +37,7 @@ struct AtNode
 {
   // mNodes 中の位置
   size_t mPos;
-  
+
   // 型
   tAtType mType;
 
@@ -48,16 +46,16 @@ struct AtNode
 
   // AND の時のファンインノード
   AtNode* mInputs[2];
-  
+
   // 極性1
   bool mInv1;
 
   // 極性2
   bool mInv2;
-  
+
   // eval 用の作業領域
   ymulong mVal;
-  
+
 };
 
 
@@ -67,13 +65,13 @@ struct AtNode
 class AigTemplate
 {
 public:
-  
+
   // コンストラクタ
   AigTemplate();
-  
+
   // コピーコンストラクタ
   AigTemplate(const AigTemplate& src);
-  
+
   // コピーコンストラクタ
   AigTemplate(const AigTemplate& src,
 	      const hash_map<size_t, size_t>& vmap);
@@ -81,10 +79,10 @@ public:
   // 代入演算子
   const AigTemplate&
   operator=(const AigTemplate& src);
-  
+
   // デストラクタ
   ~AigTemplate();
-  
+
 
 public:
 
@@ -92,15 +90,15 @@ public:
   AigHandle
   make_aig(AigMgr& mgr,
 	   const vector<AigHandle>& inputs);
-  
+
   // 内容がセットされていたら true を返す．
   bool
   set() const;
-  
+
   // コストを返す．
   int
   cost() const;
-  
+
   // 値の評価を行う．
   ymulong
   eval(const vector<ymulong>& ivals) const;
@@ -109,18 +107,18 @@ public:
   void
   dump_code(ostream& s,
 	    const string& target) const;
-  
+
   // 内容をダンプする．
   void
   dump(ostream& s) const;
 
-  
+
 public:
-  
+
   // 内容を空にする．
   void
   clear();
-  
+
   // 定数0にセットする．
   void
   set_const0();
@@ -133,7 +131,7 @@ public:
   void
   set_literal(tVarId id,
 	      bool inv);
-  
+
   // and にセットする．
   void
   set_and(const AigTemplate& input0,
@@ -164,53 +162,53 @@ public:
   void
   set_copy(const AigTemplate& src,
 	   const NpnMap& vmap);
-  
+
   // 双対形をセットする．
   void
   set_dual(const AigTemplate& src);
-  
+
   // compose を行う．
   void
   set_compose(const AigTemplate& src1,
 	      const vector<AigTemplate>& tmap);
 
-  
+
 private:
-  
+
   // make_aig() の下請け関数
   AigHandle
   make_aig_sub(AtNode* node,
 	       AigMgr& mgr,
 	       const vector<AigHandle>& inputs);
-  
+
   // src の複製を作る．
   AtNode*
   dup_node(const AigTemplate& src,
 	   const hash_map<size_t, size_t>& vmap);
- 
+
   // dup_node の下請け関数
   AtNode*
   dup_node_sub(AtNode* node,
 	       const hash_map<size_t, size_t>& vmap);
- 
+
   // set_copy の下請け関数
   AtNode*
   set_copy_sub(AtNode* node,
 	       const NpnMap& vmap);
-  
+
   // set_dual の下請け関数
   AtNode*
   set_dual_sub(AtNode* node);
-  
+
   // set_compose の下請け関数
   AtNode*
   set_compose_sub(AtNode* node,
 		  const vector<AtNode*>& nmap);
-  
+
   // 定数ノードを作る．
   AtNode*
   get_cnode(tAtType type);
-  
+
   // リテラルノードを作る．
   AtNode*
   get_lnode(ymuint32 id,
@@ -224,18 +222,18 @@ private:
 	    AtNode* input1,
 	    bool inv1);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 根のノード
   AtNode* mRoot;
 
   // 全ノードの配列
   vector<AtNode*> mNodes;
-  
+
 };
 
 END_NAMESPACE_YM

@@ -5,8 +5,6 @@
 /// @brief DimacsParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DimacsParser.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -21,7 +19,7 @@ BEGIN_NAMESPACE_YM_SAT
 class DimacsParserImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class DimacsHandler DimacsParser.h "ym_sat/DimacsParser.h"
+/// @class DimacsHandler DimacsParser.h "ym_logic/DimacsParser.h"
 /// @ingroup SatGroup
 /// @brief DIMACS パーサーのイベントハンドラの基底クラス
 /// @sa DimacsParser
@@ -89,7 +87,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DimacsParser DimacsParser.h "ym_sat/DimacsParser.h"
+/// @class DimacsParser DimacsParser.h "ym_logic/DimacsParser.h"
 /// @ingroup SatGroup
 /// @brief DIMACS形式の CNFファイルを読み込むパーサークラス
 /// @sa DimacsHandler

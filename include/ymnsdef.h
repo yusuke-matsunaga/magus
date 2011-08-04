@@ -4,10 +4,8 @@
 /// @file ymnsdef.h
 /// @brief 名前空間の定義に関するヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: ymnsdef.h 1669 2008-08-04 13:06:17Z matsunaga $
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

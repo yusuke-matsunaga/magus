@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_CFDICT_H
-#define LIBYM_VERILOG_ELABORATOR_CFDICT_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_CFDICT_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_CFDICT_H
 
-/// @file libym_verilog/elaborator/CfDict.h
+/// @file libym_verilog/elaborator/include/CfDict.h
 /// @brief CfDict のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: CfDict.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -126,4 +124,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_CFDICT_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_CFDICT_H

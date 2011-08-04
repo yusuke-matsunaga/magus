@@ -5,8 +5,6 @@
 /// @brief LogExprWriter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LogExprWriter.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -21,7 +19,7 @@ class LogExpr;
 class LexpNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LogExprWriter LogExprWriter.h <ym_lexp/LogExprWriter.h>
+/// @class LogExprWriter LogExprWriter.h "ym_logic/LogExprWriter.h"
 /// @ingroup LexpGroup
 /// @brief LogExpr を出力するためのクラス
 /// @sa LogExpr

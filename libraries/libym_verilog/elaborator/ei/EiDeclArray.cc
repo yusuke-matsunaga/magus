@@ -1,9 +1,7 @@
 
-/// @file libym_verilog/elb_impl/EiDeclArray.cc
+/// @file libym_verilog/elaborator/ei/EiDeclArray.cc
 /// @brief EiDeclArray の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: EiDeclArray.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.

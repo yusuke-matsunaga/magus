@@ -4,10 +4,8 @@
 /// @file libym_cec/FraigNode.h
 /// @brief FraigNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: FraigNode.h 2203 2009-04-16 05:04:40Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -25,31 +23,31 @@ BEGIN_NAMESPACE_YM_CEC
 class FraigNode
 {
   friend class FraigMgrImpl;
-  
+
 public:
 
   /// @brief コンストラクタ
   FraigNode();
-  
+
   /// @brief デストラクタ
   ~FraigNode();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ID 番号に関するアクセス関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief CNF 上の変数番号を返す．
   ymuint
   var_id() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 入力ノードの時のアクセス関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入力ノードの時に true を返す．
   bool
   is_input() const;
@@ -57,21 +55,21 @@ public:
   /// @brief 入力番号を返す．
   ymuint
   input_id() const;
-  
+
   /// @brief 入力番号をセットする．
   void
   set_input(ymuint id);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // AND ノードの時のアクセス関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief AND の時に true を返す．
   bool
   is_and() const;
-  
+
   /// @brief ファンインを得る．
   FraigNode*
   fanin(ymuint pos) const;
@@ -83,7 +81,7 @@ public:
   /// @brief 2番めのファンインを得る．
   FraigNode*
   fanin1() const;
-  
+
   /// @brief ファンインの極性を得る．
   bool
   fanin_inv(ymuint pos) const;
@@ -95,7 +93,7 @@ public:
   /// @brief 2番めのファンインの極性を得る．
   bool
   fanin1_inv() const;
-  
+
   /// @brief ファンインのハンドルを得る．
   FraigHandle
   fanin_handle(ymuint pos) const;
@@ -107,18 +105,18 @@ public:
   /// @brief 2番めのファンインのハンドルを得る．
   FraigHandle
   fanin1_handle() const;
-  
+
   /// @brief ファンインをセットする．
   void
   set_fanin(FraigHandle handle1,
 	    FraigHandle handle2);
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // シミュレーション・パタンに関するアクセス関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief パタンをセットする．
   /// @param[in] start 開始位置
   /// @param[in] end 終了位置
@@ -127,7 +125,7 @@ public:
   set_pat(ymuint start,
 	  ymuint end,
 	  const vector<ymuint32>& pat);
-  
+
   /// @brief パタンを計算する．
   /// @param[in] start 開始位置
   /// @param[in] end 終了位置
@@ -143,16 +141,16 @@ public:
   /// @brief 1 の値を取るとき true を返す．
   bool
   check_1mark() const;
-  
+
   /// @brief パタンのハッシュ値を返す．
   ymuint32
   pat_hash() const;
-  
+
   /// @brief ハッシュ値の極性を返す．
   bool
   pat_hash_inv() const;
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 等価グループに関するアクセス関数
@@ -161,7 +159,7 @@ public:
   /// @brief 削除済みのとき true を返す．
   bool
   check_dmark() const;
-  
+
   /// @brief 要素数が2以上の等価候補グループの代表なら true を返す．
   bool
   check_rep() const;
@@ -169,7 +167,7 @@ public:
   /// @brief 代表ノードを返す．
   FraigNode*
   rep_node() const;
- 
+
   /// @brief 代表ノードに対する極性を返す．
   bool
   rep_inv() const;
@@ -177,41 +175,41 @@ public:
   /// @brief 代表ノードを返す．
   FraigHandle
   rep_handle() const;
-  
+
   /// @brief 次の等価候補ノードを得る．
   FraigNode*
   next_eqnode();
-  
+
   /// @brief 等価候補の代表にする．
   void
   set_rep(FraigNode* rep_node,
 	  bool inv);
-  
+
   /// @brief 極性反転の印をつける．
   void
   set_rep_inv();
-  
+
   /// @brief 等価候補ノードを追加する．
   void
   add_eqnode(FraigNode* node);
-  
+
   /// @brief 削除済みの印をつける．
   void
   set_dmark();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief ハッシュ値を計算する．
   /// @param[in] start 開始位置
   /// @param[in] end 終了位置
   void
   calc_hash(ymuint start,
 	    ymuint end);
-  
+
   /// @brief 0 の値を取ったことを記録する．
   void
   set_0mark();
@@ -220,7 +218,7 @@ private:
   void
   set_1mark();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -234,38 +232,38 @@ private:
 
   // 0/1マーク，極性などの情報をパックしたもの
   ymuint32 mFlags;
-  
+
   // シミュレーションパタン
   ymuint32* mPat;
-  
+
   // mPat のハッシュ値
   ymuint32 mHash;
-  
+
   // 構造ハッシュ用のリンクポインタ
   FraigNode* mLink1;
-  
+
   // シグネチャハッシュ用のリンクポインタ
   FraigNode* mLink2;
-  
+
   // 代表ノード情報
   FraigNode* mRepNode;
-  
+
   // 次の等価候補ノード
   FraigNode* mEqLink;
-  
+
   // 等価候補リストの末尾のノード
   FraigNode* mEqTail;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // クラスメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ハッシュ用の素数配列
   static
   ymuint32 mPrimes[];
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -275,7 +273,7 @@ private:
   // 入力フラグ
   static
   const int kSftI  = 0;
-  
+
   // ファンイン0 の極性
   static
   const int kSftP0 = 1;
@@ -283,7 +281,7 @@ private:
   // ファンイン1 の極性
   static
   const int kSftP1 = 2;
-  
+
   // 0 になったことがあるかどうか
   static
   const int kSft0  = 3;
@@ -291,26 +289,26 @@ private:
   // 1 になったことがあるかどうか
   static
   const int kSft1  = 4;
-  
+
   // ハッシュパタンの極性
   static
   const int kSftH  = 5;
-  
+
   // 等価グループ中の極性
   static
   const int kSftP  = 6;
-  
+
   // 削除マーク
   static
   const int kSftD  = 7;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief CNF 上の変数番号を返す．
 inline
 ymuint
@@ -343,7 +341,7 @@ FraigNode::set_input(ymuint id)
   mFlags |= (1U << kSftI);
   mFanins[0] = reinterpret_cast<FraigNode*>(id);
 }
-  
+
 // @brief AND の時に true を返す．
 inline
 bool
@@ -399,7 +397,7 @@ FraigNode::fanin1_inv() const
 {
   return static_cast<bool>((mFlags >> kSftP1) & 1U);
 }
-  
+
 // @brief ファンインのハンドルを得る．
 inline
 FraigHandle
@@ -439,7 +437,7 @@ FraigNode::check_1mark() const
 {
   return static_cast<bool>((mFlags >> kSft1) & 1U);
 }
-  
+
 // @brief パタンのハッシュ値を返す．
 inline
 ymuint32
@@ -447,7 +445,7 @@ FraigNode::pat_hash() const
 {
   return mHash;
 }
-  
+
 // @brief ハッシュ値の極性を返す．
 inline
 bool
@@ -463,7 +461,7 @@ FraigNode::check_dmark() const
 {
   return static_cast<bool>((mFlags >> kSftD) & 1U);
 }
-  
+
 // @brief 要素数が2以上の等価候補グループの代表なら true を返す．
 inline
 bool
@@ -471,7 +469,7 @@ FraigNode::check_rep() const
 {
   return mRepNode == this && mEqLink != NULL;
 }
-  
+
 // @brief 代表ノードを返す．
 inline
 FraigNode*
@@ -542,7 +540,7 @@ FraigNode::set_1mark()
 {
   mFlags |= (1U << kSft1);
 }
-  
+
 // @brief 極性反転の印をつける．
 inline
 void
@@ -558,7 +556,7 @@ FraigNode::set_dmark()
 {
   mFlags |= (1U << kSftD);
 }
-  
+
 // @brief パタンを計算する．
 inline
 void

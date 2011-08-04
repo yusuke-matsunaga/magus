@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/elb_impl/EiBlockScope.cc
+/// @file libym_verilog/elaborator/ei/EiBlockScope.cc
 /// @brief EiBlockScope の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EiBlockScope.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -80,7 +78,7 @@ EiBlockScope::parent() const
 {
   return mParent;
 }
-  
+
 // @brief 名前の取得
 const char*
 EiBlockScope::name() const

@@ -4,10 +4,8 @@
 /// @file libym_aig/LrMgr.h
 /// @brief LrMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: LrMgr.h 1594 2008-07-18 10:26:12Z matsunaga $
 ///
-/// Copyright (C) 2005-2007 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -30,7 +28,7 @@ public:
 
   /// @brief デストラクタ
   ~LrMgr();
-  
+
 
 public:
 
@@ -38,18 +36,18 @@ public:
   /// @param[in] aig_mgr 対象のネットワーク
   void
   local_rewrite(AigMgr& aig_mgr);
-  
+
   /// @brief ログレベルを設定する．
   void
   set_loglevel(int level);
-  
+
   /// @brief ログ出力用ストリームを設定する．
   void
   set_logstream(ostream* out);
-  
-  
+
+
 private:
-  
+
   // 与えられた関数に対する AigTemplate を求める．
   bool
   find_aig(size_t ni,
@@ -60,7 +58,7 @@ private:
   void
   init_table();
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -80,13 +78,13 @@ private:
 
   // NPN同値類の代表関数のパタンから aig4table の番号を得るためのハッシュ表
   hash_map<ymuint32, size_t> npn4map;
-  
+
   // ログレベル
   int mLogLevel;
 
   // ログ出力用のストリーム
   ostream* mLogStream;
-  
+
 };
 
 END_NAMESPACE_YM_AIG

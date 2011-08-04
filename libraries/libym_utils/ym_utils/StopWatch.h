@@ -5,9 +5,7 @@
 /// @brief 時間計測用のクラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: StopWatch.h 400 2007-03-06 17:58:07Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class USTime StopWatch.h <ym_utils/StopWatch.h>
+/// @class USTime StopWatch.h "ym_utils/StopWatch.h"
 /// @ingroup YmUtils
 /// @brief ユーザー時間とシステム時間および実時間をもつクラス
 /// @sa StopWatch, MStopWatch
@@ -36,9 +34,9 @@ public:
   USTime(double u,
 	 double s,
 	 double r);
-  
+
   // コピーコンストラクタと代入はデフォルトで大丈夫
-  
+
   /// @brief 設定用関数
   /// @param[in] u ユーザー時間(usec)
   /// @param[in] s システム時間(usec)
@@ -47,7 +45,7 @@ public:
   set(double u,
       double s,
       double r);
-  
+
   /// @brief ユーザー時間の取得
   /// @return ユーザー時間(usec)
   /// @sa sys_time(), real_time()
@@ -65,7 +63,7 @@ public:
   /// @sa usr_time(), sys_time()
   double
   real_time_usec() const;
-  
+
   /// @brief ユーザー時間の取得
   /// @return ユーザー時間(sec)
   /// @sa sys_time(), real_time()
@@ -83,7 +81,7 @@ public:
   /// @sa usr_time(), sys_time()
   double
   real_time() const;
-  
+
 
   /// @brief 加算付き代入文
   /// @param[in] a 第一引数
@@ -91,7 +89,7 @@ public:
   /// @sa operator+(const USTime& a, const USTime& b);
   const USTime&
   operator+=(const USTime& a);
-  
+
   /// @brief 減算付き代入文
   /// @param[in] a 第一引数
   /// @return 自分自身から a を引いたもの
@@ -130,7 +128,7 @@ private:
 USTime
 operator+(const USTime& a,
 	  const USTime& b);
-  
+
 /// @relates USTime
 /// @ingroup YmUtils
 /// @brief 減算
@@ -156,7 +154,7 @@ operator<<(ostream& s,
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class StopWatch StopWatch.h <ym_utils/StopWatch.h>
+/// @class StopWatch StopWatch.h "ym_utils/StopWatch.h"
 /// @ingroup YmUtils
 /// @brief ストップウォッチのクラス
 /// @note
@@ -167,7 +165,7 @@ operator<<(ostream& s,
 class StopWatch
 {
   friend class MStopWatch;
-  
+
 public:
 
   /// @brief コンストラクタ．
@@ -176,7 +174,7 @@ public:
   /// - 累積時間は 0
   /// の状態で初期化される．
   StopWatch();
-  
+
   /// @brief "リセット" する.
   /// @note
   /// - 停止中
@@ -184,12 +182,12 @@ public:
   /// の状態にリセットする．計測途中の場合には今までの累積値は捨てられる．
   void
   reset();
-  
+
   /// @brief 計測開始.
   /// @note すでに計時中だったらなにもしない．
   void
   start();
-  
+
   /// @brief 計測を止める.
   /// @note
   /// - すでに停止状態だったらなにもしない．
@@ -203,7 +201,7 @@ public:
   /// @retval 経過累積時間 停止状態
   USTime
   time() const;
-  
+
 
 private:
 
@@ -211,7 +209,7 @@ private:
   static
   USTime
   cur_time();
-  
+
   // timeval構造体をdoubleに変換する関数
   static
   double
@@ -241,7 +239,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MStopWatch StopWatch.h <ym_utils/StopWatch.h>
+/// @class MStopWatch StopWatch.h "ym_utils/StopWatch.h"
 /// @ingroup YmUtils
 /// @brief 複数のストップウォッチを切替えるためのクラス
 /// @sa USTime, StopWatch
@@ -255,24 +253,24 @@ public:
   /// @param[in] id 最初にアクティブな時計番号
   MStopWatch(size_t n,
 	     size_t id = 0);
-  
+
   /// @brief アクティブな時計を切替える.
   /// @param[in] new_id アクティブにする時計番号
   /// @return 昔の時計番号を返す
   size_t
   change(size_t new_id);
-  
+
   /// @brief 現在アクティブな時計番号を返す.
   /// @return 現在アクティブな時計番号を返す.
   size_t
   cur_id() const;
-  
+
   /// @brief 経過時間の取得
   /// @param[in] id 対象の時計番号
   /// @return id で指定された時計の経過時間
   USTime
   time(size_t id) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -391,7 +389,7 @@ USTime::operator+=(const USTime& a)
   mRtime += a.mRtime;
   return *this;
 }
- 
+
 // 減算
 inline
 USTime

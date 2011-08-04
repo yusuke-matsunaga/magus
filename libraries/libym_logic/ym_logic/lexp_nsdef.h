@@ -1,13 +1,11 @@
 #ifndef YM_LOGIC_LEXP_NSDEF_H
 #define YM_LOGIC_LEXP_NSDEF_H
 
-/// @file ym_lexp/lexp.h
+/// @file ym_lexp/lexp_nsdef.h
 /// @brief ym_lexp パッケージの基本ヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: lexp.h 1920 2008-12-20 15:52:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup LexpGroup 論理式を扱うクラス

@@ -1,13 +1,11 @@
 #ifndef YM_CEC_CEC_NSDEF
 #define YM_CEC_CEC_NSDEF
 
-/// @file magus/equiv/equiv_nsdef.h
-/// @brief equiv2 の名前空間の定義ファイル
+/// @file ym_cec/cec_nsdef.h
+/// @brief cec の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: equiv_nsdef.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

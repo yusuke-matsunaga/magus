@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBCONTASSIGN_H
-#define LIBYM_VERILOG_ELB_ELBCONTASSIGN_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBCONTASSIGN_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBCONTASSIGN_H
 
 /// @file libym_verilog/elaborator/include/ElbContAssign.h
 /// @brief ElbContAssign のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbContAssign.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -116,4 +114,4 @@ ElbContAssign::next() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_ELBCONTASSIGN_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBCONTASSIGN_H

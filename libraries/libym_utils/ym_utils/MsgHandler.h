@@ -5,8 +5,6 @@
 /// @brief MsgHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MsgHandler.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -21,7 +19,7 @@ BEGIN_NAMESPACE_YM
 class FileRegion;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MsgHandler MsgHandler.h <ym_utils/MsgHandler.h>
+/// @class MsgHandler MsgHandler.h "ym_utils/MsgHandler.h"
 /// @ingroup YmUtils
 /// @brief メッセージハンドラを表す基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -132,7 +130,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class StreamMsgHandler MsgHandler.h <ym_utils/MsgHandler.h>
+/// @class StreamMsgHandler MsgHandler.h "ym_utils/MsgHandler.h"
 /// @ingroup YmUtils
 /// @brief ストリーム出力する MsgHandler の実装
 //////////////////////////////////////////////////////////////////////

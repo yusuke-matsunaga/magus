@@ -5,8 +5,6 @@
 /// @brief Binder 関連クラスのヘッダファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: Binder.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -76,7 +74,7 @@ class T6BindMgr;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class Binder Binder.h <ym_utils/Binder.h>
+/// @class Binder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 他のオブジェクトの動作に関連づけるための基底クラス
 /// @sa BindMgr
@@ -117,7 +115,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class BindMgr Binder.h <ym_utils/Binder.h>
+/// @class BindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief Binder を起動するクラスの基底クラス
 /// @sa Binder
@@ -168,7 +166,7 @@ protected:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EventBinder Binder.h <ym_utils/Binder.h>
+/// @class EventBinder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 引数なしのイベントを伝播するためのクラス
 /// @note 引数がある場合には下の TBinder を使うこと.
@@ -194,7 +192,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EventBindMgr Binder.h <ym_utils/Binder.h>
+/// @class EventBindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief EventBinder の継承クラスを起動するクラス
 /// @note reg_binder() でバインダーオブジェクトを登録して
@@ -236,7 +234,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T1Binder Binder.h <ym_utils/Binder.h>
+/// @class T1Binder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 引数を1つ持つ Binder
 /// @sa T1BindMgr
@@ -258,7 +256,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T1BindMgr Binder.h <ym_utils/Binder.h>
+/// @class T1BindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief T1Binder を起動するクラス
 /// @sa T1Binder
@@ -310,7 +308,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T2Binder Binder.h <ym_utils/Binder.h>
+/// @class T2Binder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 引数を2つ持つ Binder
 /// @sa T2BindMgr
@@ -334,7 +332,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T2BindMgr Binder.h <ym_utils/Binder.h>
+/// @class T2BindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief T2Binder を起動するクラス
 /// @sa T2Binder
@@ -389,7 +387,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T3Binder Binder.h <ym_utils/Binder.h>
+/// @class T3Binder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 引数を3つ持つ Binder
 /// @sa T3BindMgr
@@ -415,7 +413,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T3BindMgr Binder.h <ym_utils/Binder.h>
+/// @class T3BindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief T3Binder を起動するクラス
 /// @sa T3Binder
@@ -473,7 +471,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T4Binder Binder.h <ym_utils/Binder.h>
+/// @class T4Binder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 引数を4つ持つ Binder
 /// @sa TBindMgr
@@ -502,7 +500,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T4BindMgr Binder.h <ym_utils/Binder.h>
+/// @class T4BindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief T4Binder を起動するクラス
 /// @sa T4Binder
@@ -562,7 +560,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T5Binder Binder.h <ym_utils/Binder.h>
+/// @class T5Binder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 引数を5つ持つ Binder
 /// @sa T5BindMgr
@@ -593,7 +591,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T5BindMgr Binder.h <ym_utils/Binder.h>
+/// @class T5BindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief T5Binder を起動するクラス
 /// @sa T5Binder
@@ -655,7 +653,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T6Binder Binder.h <ym_utils/Binder.h>
+/// @class T6Binder Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief 引数を6つ持つ Binder
 /// @sa T6BindMgr
@@ -688,7 +686,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class T6BindMgr Binder.h <ym_utils/Binder.h>
+/// @class T6BindMgr Binder.h "ym_utils/Binder.h"
 /// @ingroup BinderGroup
 /// @brief T6Binder を起動するクラス
 /// @sa T6Binder

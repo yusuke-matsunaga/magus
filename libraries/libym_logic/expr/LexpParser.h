@@ -5,8 +5,6 @@
 /// @brief LexpParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LexpParser.h 693 2007-05-28 09:13:57Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 

@@ -6,8 +6,6 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BddLitSet.h 693 2007-05-28 09:13:57Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -18,7 +16,7 @@
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
-/// @class BddLitSet BddLitSet.h <ym_bdd/BddLitSet.h>
+/// @class BddLitSet BddLitSet.h "ym_logic/BddLitSet.h"
 /// @ingroup YmBdds
 /// @brief リテラル集合( = cube)を表すクラス
 ///

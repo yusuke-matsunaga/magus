@@ -5,9 +5,7 @@
 /// @brief AigTemplate のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AigTemplate.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -26,19 +24,19 @@ BEGIN_NAMESPACE_YM_AIG
 class AigTemplate
 {
 public:
-  
+
   /// @brief コンストラクタ
   AigTemplate();
-  
+
   /// @brief デストラクタ
   ~AigTemplate();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 入力数を返す．
   ymuint
   leaf_num() const;
@@ -84,26 +82,26 @@ public:
   /// @note AND ノード以外の場合には 0 を返す．
   ymuint
   fanin1_pol(ymuint pos) const;
-  
+
   /// @brief 出力の極性を返す．
   /// @retval 0 肯定
   /// @retval 1 否定
   ymuint
   opol() const;
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 初期化する．
   /// @param[in] leaf_num 入力数
   /// @param[in] and_num AND ノード数
   void
   init(ymuint leaf_num,
        ymuint and_num);
-  
+
   /// @brief AND ノードの内容をセットする．
   /// @param[in] pos ノード番号
   /// @param[in] fanin0 ファンイン0の情報
@@ -112,12 +110,12 @@ public:
   set_and(ymuint pos,
 	  ymuint fanin0,
 	  ymuint fanin1);
-  
+
   /// @brief 出力の極性をセットする．
   void
   set_opol(ymuint pol);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -132,7 +130,7 @@ private:
   // AND ノードの情報を収めた配列
   // サイズは mAndNum * 2
   ymuint8* mNodeArray;
-  
+
 };
 
 
@@ -227,7 +225,7 @@ AigTemplate::fanin1_pol(ymuint pos) const
 {
   return (fanin1(pos) & 1U);
 }
-  
+
 // @brief 出力の極性を返す．
 // @retval 0 肯定
 // @retval 1 否定

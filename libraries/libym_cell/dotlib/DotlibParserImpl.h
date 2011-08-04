@@ -1,11 +1,9 @@
-#ifndef LIBYM_DOTLIB_DOTLIBPARSERIMPL_H
-#define LIBYM_DOTLIB_DOTLIBPARSERIMPL_H
+#ifndef DOTLIBPARSERIMPL_H
+#define DOTLIBPARSERIMPL_H
 
-/// @file libym_dotlib/DotlibParserImpl.h
+/// @file DotlibParserImpl.h
 /// @brief DotlibParserImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: DotlibParser.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -168,4 +166,4 @@ DotlibParserImpl::mgr()
 
 END_NAMESPACE_YM_DOTLIB
 
-#endif // LIBYM_DOTLIB_DOTLIBPARSERIMPL_H
+#endif // DOTLIBPARSERIMPL_H

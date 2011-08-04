@@ -5,14 +5,12 @@
 /// @brief GdsRecMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsRecMgr.h 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_gds/gds_nsdef.h>
-#include <ym_utils/Alloc.h>
+#include "ym_gds/gds_nsdef.h"
+#include "ym_utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_GDS

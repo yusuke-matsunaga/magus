@@ -1,11 +1,9 @@
-#ifndef LIBYM_VERILOG_ELB_ELBFWD_H
-#define LIBYM_VERILOG_ELB_ELBFWD_H
+#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBFWD_H
+#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBFWD_H
 
 /// @file libym_verilog/elaborator/include/ElbFwd.h
 /// @brief ElbObj の派生クラスの前方宣言ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: ElbFwd.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -99,4 +97,4 @@ class ElbAttrIter;
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // YM_VERILOG_ELB_ELBFWD_H
+#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBFWD_H
