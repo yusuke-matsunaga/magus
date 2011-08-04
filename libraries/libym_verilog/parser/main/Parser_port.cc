@@ -46,7 +46,7 @@ Parser::new_Port1(const FileRegion& file_region)
     add_port( mFactory.new_Port(file_region, portref, name) );
   }
   else {
-    PtExprArray portref_array = to_array(&mPortRefList);
+    PtExprArray portref_array = mPortRefList.to_array(mAlloc);
     const PtExpr* portref = mFactory.new_Concat(file_region, portref_array);
     add_port( mFactory.new_Port(file_region, portref, portref_array, NULL) );
   }
@@ -74,7 +74,7 @@ Parser::new_Port3(const FileRegion& file_region,
     mPortRefList.clear();
   }
   else {
-    PtExprArray portref_array = to_array(&mPortRefList);
+    PtExprArray portref_array = mPortRefList.to_array(mAlloc);
     const PtExpr* portref = mFactory.new_Concat(file_region, portref_array);
     add_port( mFactory.new_Port(file_region, portref, portref_array, name) );
   }
