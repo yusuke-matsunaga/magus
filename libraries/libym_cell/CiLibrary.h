@@ -5,7 +5,7 @@
 /// @brief CiLibrary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,7 +27,7 @@ class CiCell;
 class CiPin;
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiLibrary CiLibrary.h "ci/CiLibrary.h"
+/// @class CiLibrary CiLibrary.h "CiLibrary.h"
 /// @brief CellLibrary の実装クラス
 //////////////////////////////////////////////////////////////////////
 class CiLibrary :

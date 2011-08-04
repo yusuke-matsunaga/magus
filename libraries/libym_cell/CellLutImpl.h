@@ -5,9 +5,7 @@
 /// @brief CellLutTemplate/CellLut のの実装クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CellLutImpl.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -33,16 +31,16 @@ protected:
   virtual
   ~CellLutTemplateBase();
 
-  
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
   const char*
   name() const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -51,7 +49,7 @@ private:
 
   // 名前
   ShString mName;
-  
+
 };
 
 
@@ -63,7 +61,7 @@ class CellLutTemplate1D :
   public CellLutTemplateBase
 {
   friend class CellManip;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -88,7 +86,7 @@ public:
   virtual
   tCellVarType
   variable_type(ymuint32 var) const;
-  
+
   /// @brief インデックス数の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   virtual
@@ -102,7 +100,7 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -114,7 +112,7 @@ private:
 
   // デフォルトインデックス値の配列
   vector<double> mIndexArray;
-  
+
 };
 
 
@@ -126,7 +124,7 @@ class CellLutTemplate2D :
   public CellLutTemplateBase
 {
   friend class CellManip;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -153,7 +151,7 @@ public:
   virtual
   tCellVarType
   variable_type(ymuint32 var) const;
-  
+
   /// @brief インデックス数の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   virtual
@@ -167,7 +165,7 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -179,7 +177,7 @@ private:
 
   // デフォルトインデックス値の配列
   vector<double> mIndexArray[2];
-  
+
 };
 
 
@@ -191,7 +189,7 @@ class CellLutTemplate3D :
   public CellLutTemplateBase
 {
   friend class CellManip;
-  
+
 private:
 
   /// @brief コンストラクタ
@@ -220,7 +218,7 @@ public:
   virtual
   tCellVarType
   variable_type(ymuint32 var) const;
-  
+
   /// @brief インデックス数の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   virtual
@@ -234,7 +232,7 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -246,7 +244,7 @@ private:
 
   // デフォルトインデックス値の配列
   vector<double> mIndexArray[3];
-  
+
 };
 
 
@@ -266,8 +264,8 @@ public:
   /// @brief デストラクタ
   virtual
   ~CellLut1D();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
@@ -285,7 +283,7 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -297,7 +295,7 @@ private:
 
   // インデックスの配列の配列
   vector<double> mIndexArray;
-  
+
 };
 
 
@@ -318,8 +316,8 @@ public:
   /// @brief デストラクタ
   virtual
   ~CellLut2D();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
@@ -337,7 +335,7 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -349,7 +347,7 @@ private:
 
   // インデックスの配列の配列
   vector<double> mIndexArray[2];
-  
+
 };
 
 
@@ -371,8 +369,8 @@ public:
   /// @brief デストラクタ
   virtual
   ~CellLut3D();
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
@@ -390,7 +388,7 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -402,7 +400,7 @@ private:
 
   // インデックスの配列の配列
   vector<double> mIndexArray[3];
-  
+
 };
 
 END_NAMESPACE_YM_CELL

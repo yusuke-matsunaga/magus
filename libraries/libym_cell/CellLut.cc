@@ -3,9 +3,7 @@
 /// @brief CellLut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CellLut.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -28,7 +26,7 @@ CellLutTemplateBase::CellLutTemplateBase(ShString name) :
 CellLutTemplateBase::~CellLutTemplateBase()
 {
 }
-  
+
 // @brief 名前の取得
 const char*
 CellLutTemplateBase::name() const
@@ -75,7 +73,7 @@ CellLutTemplate1D::variable_type(ymuint32 var) const
   assert_cond( var == 0, __FILE__, __LINE__);
   return mVarType;
 }
-  
+
 // @brief インデックス数の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 ymuint32
@@ -116,7 +114,7 @@ CellLutTemplate2D::CellLutTemplate2D(ShString name,
   for (ymuint32 i = 0; i < n1; ++ i) {
     mIndexArray[0][i] = index_array1[i];
   }
-  
+
   mVarType[1] = var2;
   ymuint32 n2 = index_array2.size();
   mIndexArray[1].resize(n2);
@@ -145,7 +143,7 @@ CellLutTemplate2D::variable_type(ymuint32 var) const
   assert_cond( var < 2 , __FILE__, __LINE__);
   return mVarType[var];
 }
-  
+
 // @brief インデックス数の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 ymuint32
@@ -188,14 +186,14 @@ CellLutTemplate3D::CellLutTemplate3D(ShString name,
   for (ymuint32 i = 0; i < n1; ++ i) {
     mIndexArray[0][i] = index_array1[i];
   }
-  
+
   mVarType[1] = var2;
   ymuint32 n2 = index_array2.size();
   mIndexArray[1].resize(n2);
   for (ymuint32 i = 0; i < n2; ++ i) {
     mIndexArray[1][i] = index_array2[i];
   }
-  
+
   mVarType[2] = var3;
   ymuint32 n3 = index_array3.size();
   mIndexArray[2].resize(n3);
@@ -224,7 +222,7 @@ CellLutTemplate3D::variable_type(ymuint32 var) const
   assert_cond( var < 3 , __FILE__, __LINE__);
   return mVarType[var];
 }
-  
+
 // @brief インデックス数の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 ymuint32

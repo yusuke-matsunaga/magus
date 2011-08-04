@@ -5,7 +5,7 @@
 /// @brief CiBundle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiBundle CiBundle.h "ci/CiBundle.h"
+/// @class CiBundle CiBundle.h "CiBundle.h"
 /// @brief CellBundle の実装クラス
 //////////////////////////////////////////////////////////////////////
 class CiBundle :

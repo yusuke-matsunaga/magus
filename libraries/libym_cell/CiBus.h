@@ -5,7 +5,7 @@
 /// @brief CiBus のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiBusType CiBus.h "ci/CiBus.h"
+/// @class CiBusType CiBus.h "CiBus.h"
 /// @brief CellBusType の実装クラス
 //////////////////////////////////////////////////////////////////////
 class CiBusType :
@@ -105,7 +105,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiBus CiBus.h "ci/CiBus.h"
+/// @class CiBus CiBus.h "CiBus.h"
 /// @brief CellBus の実装クラス
 //////////////////////////////////////////////////////////////////////
 class CiBus :

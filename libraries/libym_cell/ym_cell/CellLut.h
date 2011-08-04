@@ -5,9 +5,7 @@
 /// @brief CellLut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CellLut.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -40,7 +38,7 @@ enum tCellVarType {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLutTemplate CellLut.h <ym_cell/CellLut.h>
+/// @class CellLutTemplate CellLut.h "ym_cell/CellLut.h"
 /// @brief ルックアップテーブルのテンプレートを表すクラス
 //////////////////////////////////////////////////////////////////////
 class CellLutTemplate
@@ -50,13 +48,13 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CellLutTemplate() { }
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 名前の取得
   virtual
   const char*
@@ -72,7 +70,7 @@ public:
   virtual
   tCellVarType
   variable_type(ymuint32 var) const = 0;
-  
+
   /// @brief インデックス数の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   virtual
@@ -86,12 +84,12 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const = 0;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLut CellLut.h <ym_cell/CellLut.h>
+/// @class CellLut CellLut.h "ym_cell/CellLut.h"
 /// @brief ルックアップテーブルを表すクラス
 //////////////////////////////////////////////////////////////////////
 class CellLut
@@ -101,8 +99,8 @@ protected:
   /// @brief デストラクタ
   virtual
   ~CellLut() { }
-  
-  
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 属性の取得
@@ -112,7 +110,7 @@ public:
   virtual
   const CellLutTemplate*
   lut_template() const = 0;
-  
+
   /// @brief 名前の取得
   const char*
   name() const;
@@ -125,7 +123,7 @@ public:
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   tCellVarType
   variable_type(ymuint32 var) const;
-  
+
   /// @brief インデックス数の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   ymuint32
@@ -138,7 +136,7 @@ public:
   double
   index(ymuint32 var,
 	ymuint32 pos) const = 0;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -147,14 +145,14 @@ private:
 
   // テンプレート
   const CellLutTemplate* mTemplate;
-  
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief 名前の取得
 inline
 const char*
@@ -179,7 +177,7 @@ CellLut::variable_type(ymuint32 var) const
 {
   return lut_template()->variable_type(var);
 }
-  
+
 // @brief インデックス数の取得
 // @param[in] var 変数番号 ( 0 <= var < dimension() )
 inline

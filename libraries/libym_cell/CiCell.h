@@ -5,7 +5,7 @@
 /// @brief CiCell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,7 +23,7 @@ class CiBus;
 class CiBundle;
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiCell CiCell.h "ci/CiCell.h"
+/// @class CiCell CiCell.h "CiCell.h"
 /// @brief Cell の実装クラス
 //////////////////////////////////////////////////////////////////////
 class CiCell :

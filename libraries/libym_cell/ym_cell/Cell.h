@@ -5,9 +5,7 @@
 /// @brief Cell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Cell.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "ym_cell/cell_nsdef.h"
@@ -18,7 +16,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class Cell Cell.h <ym_cell/Cell.h>
+/// @class Cell Cell.h "ym_cell/Cell.h"
 /// @brief セル本体のクラス
 //////////////////////////////////////////////////////////////////////
 class Cell
@@ -27,7 +25,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 列挙型の定義
   //////////////////////////////////////////////////////////////////////
-
 
   /// @brief セルの種類を表す型
   enum tType {
