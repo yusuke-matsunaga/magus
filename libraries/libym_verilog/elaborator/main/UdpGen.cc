@@ -326,7 +326,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
 	const PtUdpValue* pt_v = pt_udp_entry->output();
 	VlUdpVal symbol = pt_v->symbol();
 
-	if ( symbol.is_edge_symbol() ) {
+	if ( !symbol.is_nc_symbol() && symbol.is_edge_symbol() ) {
 	  // エッジタイプの値は使えない．
 	  ostringstream buf;
 	  buf << symbol.to_string()
