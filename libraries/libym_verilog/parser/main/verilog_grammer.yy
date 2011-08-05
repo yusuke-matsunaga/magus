@@ -5920,7 +5920,7 @@ opt_timing_check_condition
   $$ = 0; // ダミー
   @$ = FileRegion();
 }
-| timing_check_condition
+| ANDANDAND timing_check_condition
 {
   $$ = 0; // ダミー
 }
