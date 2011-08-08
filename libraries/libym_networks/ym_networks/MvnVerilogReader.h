@@ -5,7 +5,7 @@
 /// @brief MvnVerilogReader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,16 +14,17 @@
 #include "ym_verilog/vl/VlFwd.h"
 #include "ym_utils/File.h"
 #include "ym_utils/MsgHandler.h"
+#include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 class ReaderImpl;
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnVerilogReader MvnVerilogReader.h "ym_networks/MvnVerilogReader.h"
@@ -66,6 +67,17 @@ public:
   gen_network(MvnMgr& mgr,
 	      MvnVlMap& node_map);
 
+  /// @brief 今まで読み込んだ情報からネットワークを生成する．
+  /// @param[in] mgr ネットワーク生成用のマネージャ
+  /// @param[in] library セルライブラリ
+  /// @param[out] node_map MvNode と宣言要素の対応付けを保持する配列
+  /// @retval true 正常に処理を行った．
+  /// @retval false 生成中にエラーが起こった．
+  bool
+  gen_network(MvnMgr& mgr,
+	      const CellLibrary& library,
+	      MvnVlMap& node_map);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -77,6 +89,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // YM_NETWORKS_MVNVERILOGREADER_H

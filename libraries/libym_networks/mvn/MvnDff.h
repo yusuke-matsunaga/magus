@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVNDFF_H
-#define LIBYM_NETWORKS_MVNDFF_H
+#ifndef LIBYM_NETWORKS_MVN_MVNDFF_H
+#define LIBYM_NETWORKS_MVN_MVNDFF_H
 
-/// @file libym_networks/MvnDff.h
+/// @file libym_networks/mvn/MvnDff.h
 /// @brief MvnDff のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -13,7 +13,7 @@
 #include "ym_networks/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnDff MvnDff.h "MvnDff.h"
@@ -43,6 +43,7 @@ private:
 	 const vector<MvnNode*>& val_array);
 
   /// @brief デストラクタ
+  virtual
   ~MvnDff();
 
 
@@ -91,6 +92,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_MVNDFF_H
+#endif // LIBYM_NETWORKS_MVN_MVNDFF_H

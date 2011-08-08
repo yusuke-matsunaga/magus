@@ -10,7 +10,7 @@
 #include "ym_networks/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
@@ -101,4 +101,13 @@ MvnNode::xmask(vector<ymuint32>& val) const
 {
 }
 
-END_NAMESPACE_YM_NETWORKS
+// @brief セルを得る．
+// @note type() が kCell の時のみ意味をモツ．
+// @note デフォルトの実装では NULL を返す．
+const Cell*
+MvnNode::cell() const
+{
+  return NULL;
+}
+
+END_NAMESPACE_YM_NETWORKS_MVN

@@ -13,7 +13,7 @@
 #include "ym_networks/MvnPort.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnMgr
@@ -99,29 +99,6 @@ MvnNode*
 MvnMgr::_node(ymuint id)
 {
   return mNodeArray[id];
-}
-
-// @brief ネットの ID番号の最大値 + 1 を返す．
-ymuint
-MvnMgr::max_net_id() const
-{
-  return mNetArray.size();
-}
-
-// @brief ネットを得る．
-// @param[in] id ID番号 ( 0 <= id < max_net_id() )
-const MvnNet*
-MvnMgr::net(ymuint id) const
-{
-  return mNetArray[id];
-}
-
-// @brief ネットを得る．
-// @param[in] id ID番号 ( 0 <= id < max_net_id() )
-MvnNet*
-MvnMgr::_net(ymuint id)
-{
-  return mNetArray[id];
 }
 
 // @brief モジュールを生成する．
@@ -599,6 +576,7 @@ MvnMgr::unreg_node(MvnNode* node)
 {
   mNodeItvlMgr.add(node->id());
   mNodeArray[node->id()] = NULL;
+
   if ( node->type() != MvnNode::kInput &&
        node->type() != MvnNode::kOutput &&
        node->type() != MvnNode::kInout ) {
@@ -644,4 +622,4 @@ MvnOutputPin::~MvnOutputPin()
 {
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN

@@ -12,7 +12,7 @@
 #include "MvnNodeBase.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnConstPartSelect MvnConstPartSelect.h "MvnConstPartSelect.h"
@@ -73,6 +73,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // LIBYM_NETWORKS_MVNCONSTPARTSELECT_H

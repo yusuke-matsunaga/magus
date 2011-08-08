@@ -14,7 +14,7 @@
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class AsyncControl AsyncControl.h "AsyncControl.h"
@@ -38,6 +38,6 @@ struct AsyncControl
 
 };
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 #endif // LIBYM_NETWORKS_VERILOG_ASYNCCONTROL_H

@@ -12,9 +12,10 @@
 #include "ym_networks/mvn.h"
 #include "ym_networks/MvnInputPin.h"
 #include "ym_networks/MvnOutputPin.h"
+#include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnNode MvnNode.h "ym_networks/MvnNode.h"
@@ -122,7 +123,10 @@ public:
     kSeqUdp,
 
     /// @brief constant ( 0入力, 1出力 )
-    kConst
+    kConst,
+
+    /// @brief cell ( n入力，n出力 )
+    kCell
 
   };
 
@@ -244,6 +248,13 @@ public:
   void
   xmask(vector<ymuint32>& val) const;
 
+  /// @brief セルを得る．
+  /// @note type() が kCell の時のみ意味をモツ．
+  /// @note デフォルトの実装では NULL を返す．
+  virtual
+  const Cell*
+  cell() const;
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -300,6 +311,6 @@ MvnNode::parent() const
   return mParent;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // YM_NETWORKS_MVNNODE_H

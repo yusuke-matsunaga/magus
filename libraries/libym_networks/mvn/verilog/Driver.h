@@ -5,7 +5,7 @@
 /// @brief Driver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +13,7 @@
 #include "ym_utils/FileRegion.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class Driver Driver.h "Driver.h"
@@ -289,6 +289,6 @@ operator!=(const Driver& lhs,
   return !(lhs == rhs);
 }
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 #endif // LIBYM_NETWORKS_VERILOG_DRIVER_H

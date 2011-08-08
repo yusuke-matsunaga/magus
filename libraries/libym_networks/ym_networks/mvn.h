@@ -13,18 +13,28 @@
 #include "ym_utils/DlList.h"
 
 
-/// @brief verilog reader 用の名前空間の開始
-#define BEGIN_NAMESPACE_YM_NETWORKS_VERILOG		\
+/// @brief mvn 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_NETWORKS_MVN		\
   BEGIN_NAMESPACE_YM_NETWORKS			\
-  BEGIN_NAMESPACE(nsVerilog)
+  BEGIN_NAMESPACE(nsMvn)
 
-/// @brief verilog reader 用の名前空間の終了
-#define END_NAMESPACE_YM_NETWORKS_VERILOG		\
-  END_NAMESPACE(nsVerilog)			\
+/// @brief mvn 用の名前空間の終了
+#define END_NAMESPACE_YM_NETWORKS_MVN		\
+  END_NAMESPACE(nsMvn)				\
   END_NAMESPACE_YM_NETWORKS
 
+/// @brief MvnVerilogReader 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG	\
+  BEGIN_NAMESPACE_YM_NETWORKS_MVN		\
+  BEGIN_NAMESPACE(nsVerilog)
 
-BEGIN_NAMESPACE_YM_NETWORKS
+/// @brief MvnVerilogReader 用の名前空間の終了
+#define END_NAMESPACE_YM_NETWORKS_MVN_VERILOG	\
+  END_NAMESPACE(nsVerilog)			\
+  END_NAMESPACE_YM_NETWORKS_MVN
+
+
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 // クラス名の先行宣言
 
@@ -35,7 +45,6 @@ class MvnPortRef;
 class MvnNode;
 class MvnInputPin;
 class MvnOutputPin;
-class MvnNet;
 
 typedef DlList<MvnInputPin> MvnInputPinList;
 
@@ -45,25 +54,24 @@ class MvnVlMap;
 class MvnDumper;
 class MvnVerilogWriter;
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 BEGIN_NAMESPACE_YM
 
-using nsNetworks::MvnMgr;
-using nsNetworks::MvnModule;
-using nsNetworks::MvnPort;
-using nsNetworks::MvnPortRef;
-using nsNetworks::MvnNode;
-using nsNetworks::MvnInputPin;
-using nsNetworks::MvnInputPinList;
-using nsNetworks::MvnOutputPin;
-using nsNetworks::MvnNet;
+using nsNetworks::nsMvn::MvnMgr;
+using nsNetworks::nsMvn::MvnModule;
+using nsNetworks::nsMvn::MvnPort;
+using nsNetworks::nsMvn::MvnPortRef;
+using nsNetworks::nsMvn::MvnNode;
+using nsNetworks::nsMvn::MvnInputPin;
+using nsNetworks::nsMvn::MvnInputPinList;
+using nsNetworks::nsMvn::MvnOutputPin;
 
-using nsNetworks::MvnVerilogReader;
-using nsNetworks::MvnVlMap;
+using nsNetworks::nsMvn::MvnVerilogReader;
+using nsNetworks::nsMvn::MvnVlMap;
 
-using nsNetworks::MvnDumper;
-using nsNetworks::MvnVerilogWriter;
+using nsNetworks::nsMvn::MvnDumper;
+using nsNetworks::nsMvn::MvnVerilogWriter;
 
 END_NAMESPACE_YM
 

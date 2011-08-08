@@ -14,9 +14,9 @@
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-using nsYm::nsVerilog::VlDecl;
+//using nsYm::nsVerilog::VlDecl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DeclMap DeclMap.h "DeclMap.h"
@@ -144,6 +144,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 #endif // LIBYM_NETWORKS_VERILOG_DECLMAP_H

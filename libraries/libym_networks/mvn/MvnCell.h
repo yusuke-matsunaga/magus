@@ -1,8 +1,8 @@
-#ifndef LIBYM_NETWORKS_MVNCONSTBITSELECT_H
-#define LIBYM_NETWORKS_MVNCONSTBITSELECT_H
+#ifndef LIBYM_NETWORKS_MVN_MVNCELL_H
+#define LIBYM_NETWORKS_MVN_MVNCELL_H
 
-/// @file libym_networks/MvnConstBitSelect.h
-/// @brief MvnConstBitSelect のヘッダファイル
+/// @file libym_networks/mvn/MvnCell.h
+/// @brief MvnCell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
-/// @class MvnConstBitSelect MvnConstBitSelect.h "MvnConstBitSelect.h"
-/// @brief 定数ビット指定を表すノード
+/// @calss MvnCell MvnCell.h "MvnCell.h"
+/// @brief セルインスタンスを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvnConstBitSelect :
+class MvnCell :
   public MvnNodeBase
 {
   friend class MvnMgr;
@@ -30,12 +30,19 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
-  /// @param[in] bitpos ビット位置
-  MvnConstBitSelect(MvnModule* module,
-		    ymuint bitpos);
+  /// @param[in] cell セル
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] pin_pos ピン位置を収めた配列
+  MvnCell(MvnModule* module,
+	  const Cell* cell,
+	  ymuint ni,
+	  ymuint no,
+	  const vector<ymuint32>& pin_pos);
 
   /// @brief デストラクタ
-  ~MvnConstBitSelect();
+  virtual
+  ~MvnCell();
 
 
 public:
@@ -43,12 +50,11 @@ public:
   // 情報を参照するための関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ビット位置を得る．
-  /// @note type() が kConstBitSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
+  /// @brief セルを得る．
+  /// @note type() が kCell の時のみ意味をモツ．
   virtual
-  ymuint
-  bitpos() const;
+  const Cell*
+  cell() const;
 
 
 private:
@@ -56,11 +62,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ビット位置
-  ymuint32 mBitPos;
+  // セル
+  const Cell* mCell;
 
 };
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_MVNCONSTBITSELECT_H
+#endif // LIBYM_NETWORKS_MVN_MVNCELL_H

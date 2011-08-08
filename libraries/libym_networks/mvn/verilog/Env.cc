@@ -11,7 +11,7 @@
 #include "AsyncControl.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 // @brief コンストラクタ
 // @param[in] decl_hash VlDecl 用のハッシュ表
@@ -303,4 +303,4 @@ AsyncControl::AsyncControl(const Env& global_env) :
 {
 }
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG

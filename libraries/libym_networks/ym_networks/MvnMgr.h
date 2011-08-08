@@ -13,9 +13,10 @@
 #include "ym_networks/MvnNode.h"
 #include "ym_utils/ItvlMgr.h"
 #include "ym_verilog/vl/VlFwd.h"
+#include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnMgr MvnMgr.h "ym_networks/MvnMgr.h"
@@ -81,20 +82,6 @@ public:
   /// @note NULL が還されることもある．
   MvnNode*
   _node(ymuint id);
-
-  /// @brief ネットの ID番号の最大値 + 1 を返す．
-  ymuint
-  max_net_id() const;
-
-  /// @brief ネットを得る．
-  /// @param[in] id ID番号 ( 0 <= id < max_net_id() )
-  const MvnNet*
-  net(ymuint id) const;
-
-  /// @brief ネットを得る．
-  /// @param[in] id ID番号 ( 0 <= id < max_net_id() )
-  MvnNet*
-  _net(ymuint id);
 
 
 public:
@@ -536,6 +523,13 @@ public:
 	    ymuint bit_width,
 	    const vector<ymuint32>& val);
 
+  /// @brief セルノードを生成する．
+  /// @param[in] module ノードが属するモジュール
+  /// @param[in] cell セル
+  MvnNode*
+  new_cell(MvnModule* module,
+	   const Cell* cell);
+
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード
   /// @note 入力ノード, 出力ノードは削除できない
@@ -701,12 +695,6 @@ private:
   // ノードのID番号を管理するためのオブジェクト
   ItvlMgr mNodeItvlMgr;
 
-  // 全ネットを ID 番号をキーにして格納する配列
-  vector<MvnNet*> mNetArray;
-
-  // ネットの ID番号を管理するためのオブジェクト
-  ItvlMgr mNetItvlMgr;
-
 };
 
 
@@ -716,6 +704,6 @@ dump_node_map(ostream& s,
 	      const MvnMgr& mgr,
 	      const MvnVlMap& node_map);
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // YM_NETWORKS_MVNMGR_H

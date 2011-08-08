@@ -13,7 +13,7 @@
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class EnvMerger EnvMerger.h "EnvMerger.h"
@@ -189,6 +189,6 @@ EnvMerger::mgr() const
 }
 
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 #endif // LIBYM_NETWORKS_MVN_VERILOG_ENVMERGER_H

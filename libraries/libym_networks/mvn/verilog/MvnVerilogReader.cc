@@ -11,7 +11,7 @@
 #include "ReaderImpl.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 // @brief コンストラクタ
 MvnVerilogReader::MvnVerilogReader() :
@@ -57,4 +57,4 @@ MvnVerilogReader::gen_network(MvnMgr& mgr,
   return mImpl->gen_network(mgr, node_map);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN

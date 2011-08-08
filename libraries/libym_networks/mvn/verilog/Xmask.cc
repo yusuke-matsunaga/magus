@@ -10,7 +10,7 @@
 #include "Xmask.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 // クラス Xmask
@@ -171,5 +171,4 @@ Xmask::free()
   mBits = NULL;
 }
 
-
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG

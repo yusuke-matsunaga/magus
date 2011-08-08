@@ -11,7 +11,7 @@
 #include "MapRec.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnVlMap
@@ -314,4 +314,4 @@ ArrayMapRec::get_array_offset() const
   return mOffset;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN

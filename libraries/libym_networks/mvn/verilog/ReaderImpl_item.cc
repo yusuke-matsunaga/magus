@@ -34,7 +34,7 @@ BEGIN_NONAMESPACE
 bool debug = false;
 END_NONAMESPACE
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 // @brief 要素を生成する．
 // @param[in] module モジュール
@@ -719,4 +719,4 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG

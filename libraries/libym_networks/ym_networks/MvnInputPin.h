@@ -12,7 +12,7 @@
 #include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnInputPin MvPin.h "ym_networks/MvPin.h"
@@ -136,6 +136,6 @@ MvnInputPin::init(MvnNode* node,
   mSrcPin = NULL;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // YM_NETWORKS_MVNINPUTPIN_H

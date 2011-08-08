@@ -14,7 +14,7 @@
 #include "DeclHash.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_VERILOG
+BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class AssignInfo Env.h "Env.h"
@@ -265,6 +265,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS_VERILOG
+END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
 #endif // LIBYM_NETWORKS_VERILOG_ENV_H

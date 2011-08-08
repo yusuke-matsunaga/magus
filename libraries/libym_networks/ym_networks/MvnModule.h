@@ -13,7 +13,7 @@
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnModule MvnModule.h "ym_networks/MvnModule.h"
@@ -276,6 +276,6 @@ MvnModule::nodes_end() const
   return mNodeList.end();
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // YM_NETWORKS_MVNMODULE_H

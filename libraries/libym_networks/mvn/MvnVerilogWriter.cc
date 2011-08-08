@@ -6,6 +6,15 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
+/*
+ * アルゴリズム
+ *
+ * - MvnNode の出力ピンをネットに対応させる．
+ * - ほとんどのノードはただ一つの出力を持つが，セルの場合は複数出力の場合がありうる．
+ * - 今は使っていないが module instance も複数出力がありうる．
+ * - 組み合わせ回路に対応するノードの場合，assign 文に対応させる．
+ * - D-FF とラッチは always 文に対応させる．
+ */
 
 #include "ym_networks/MvnVerilogWriter.h"
 
@@ -18,12 +27,14 @@
 
 #include "ym_networks/MvnVlMap.h"
 
+#include "ym_cell/Cell.h"
+
 #include "ym_verilog/vl/VlDecl.h"
 #include "ym_verilog/vl/VlDeclArray.h"
 #include "ym_verilog/vl/VlRange.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 BEGIN_NONAMESPACE
 
@@ -70,6 +81,81 @@ dump_port(ostream& s,
     s << "}";
   }
   s << ")";
+}
+
+void
+dump_uop(ostream& s,
+	 const MvnNode* node,
+	 const char* opr_str)
+{
+  ymuint ni = node->input_num();
+  assert_cond( ni == 1, __FILE__, __LINE__);
+  ymuint no = node->output_num();
+  assert_cond( no == 1, __FILE__, __LINE__);
+
+  const MvnInputPin* ipin = node->input(0);
+  const MvnOutputPin* src_pin = ipin->src_pin();
+  const MvnNode* src_node = src_pin->node();
+  s << "  assign " << node_name(node)
+    << " = " << opr_str << node_name(src_node)
+    << ";" << endl;
+}
+
+void
+dump_binop(ostream& s,
+	   const MvnNode* node,
+	   const char* opr_str,
+	   bool need_paren = false)
+{
+  ymuint ni = node->input_num();
+  assert_cond( ni == 2, __FILE__, __LINE__);
+  ymuint no = node->output_num();
+  assert_cond( no == 1, __FILE__, __LINE__);
+
+  const MvnInputPin* ipin0 = node->input(0);
+  const MvnOutputPin* src_pin0 = ipin0->src_pin();
+  const MvnNode* src_node0 = src_pin0->node();
+
+  const MvnInputPin* ipin1 = node->input(1);
+  const MvnOutputPin* src_pin1 = ipin1->src_pin();
+  const MvnNode* src_node1 = src_pin1->node();
+
+  const char* lp = "";
+  const char* rp = "";
+  if ( need_paren ) {
+    lp = "(";
+    rp = ")";
+  }
+
+  s << "  assign " << node_name(node) << " = "
+    << lp << node_name(src_node0)
+    << " " << opr_str << " " << node_name(src_node1)
+    << rp << ";" << endl;
+}
+
+void
+dump_nop(ostream& s,
+	 const MvnNode* node,
+	 const char* opr_str)
+{
+  ymuint ni = node->input_num();
+  assert_cond( ni >= 2, __FILE__, __LINE__);
+  ymuint no = node->output_num();
+  assert_cond( no == 1, __FILE__, __LINE__);
+
+  const MvnInputPin* ipin0 = node->input(0);
+  const MvnOutputPin* src_pin0 = ipin0->src_pin();
+  const MvnNode* src_node0 = src_pin0->node();
+
+  s << "  assign " << node_name(node)
+    << " = " << node_name(src_node0);
+  for (ymuint i = 1; i < ni; ++ i) {
+    const MvnInputPin* ipin1 = node->input(i);
+    const MvnOutputPin* src_pin1 = ipin1->src_pin();
+    const MvnNode* src_node1 = src_pin1->node();
+    s << " " << opr_str << " " << node_name(src_node1);
+  }
+  s << ";" << endl;
 }
 
 void
@@ -204,198 +290,43 @@ dump_node(ostream& s,
     break;
 
   case MvnNode::kThrough:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin = node->input(0);
-      const MvnOutputPin* src_pin = ipin->src_pin();
-      if ( src_pin ) {
-	const MvnNode* src_node = src_pin->node();
-	s << "  assign " << node_name(node)
-	  << " = " << node_name(src_node)
-	  << ";" << endl;
-      }
-    }
+    dump_uop(s, node, "");
     break;
 
   case MvnNode::kNot:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin = node->input(0);
-      const MvnOutputPin* src_pin = ipin->src_pin();
-      const MvnNode* src_node = src_pin->node();
-      s << "  assign " << node_name(node)
-	<< " = ~" << node_name(src_node)
-	<< ";" << endl;
-    }
+    dump_uop(s, node, "~");
     break;
 
   case MvnNode::kAnd:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni >= 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0);
-      for (ymuint i = 1; i < ni; ++ i) {
-	const MvnInputPin* ipin1 = node->input(i);
-	const MvnOutputPin* src_pin1 = ipin1->src_pin();
-	const MvnNode* src_node1 = src_pin1->node();
-	s << " & " << node_name(src_node1);
-      }
-      s << ";" << endl;
-    }
+    dump_nop(s, node, "&");
     break;
 
   case MvnNode::kOr:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni >= 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0);
-      for (ymuint i = 1; i < ni; ++ i) {
-	const MvnInputPin* ipin1 = node->input(i);
-	const MvnOutputPin* src_pin1 = ipin1->src_pin();
-	const MvnNode* src_node1 = src_pin1->node();
-	s << " | " << node_name(src_node1);
-      }
-      s << ";" << endl;
-    }
+    dump_nop(s, node, "|");
     break;
 
   case MvnNode::kXor:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni >= 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0);
-      for (ymuint i = 1; i < ni; ++ i) {
-	const MvnInputPin* ipin1 = node->input(i);
-	const MvnOutputPin* src_pin1 = ipin1->src_pin();
-	const MvnNode* src_node1 = src_pin1->node();
-	s << " ^ " << node_name(src_node1);
-      }
-      s << ";" << endl;
-    }
+    dump_nop(s, node, "^");
     break;
 
   case MvnNode::kRand:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin = node->input(0);
-      const MvnOutputPin* src_pin = ipin->src_pin();
-      const MvnNode* src_node = src_pin->node();
-      s << "  assign " << node_name(node)
-	<< " = &" << node_name(src_node)
-	<< ";" << endl;
-    }
+    dump_uop(s, node, "&");
     break;
 
   case MvnNode::kRor:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin = node->input(0);
-      const MvnOutputPin* src_pin = ipin->src_pin();
-      const MvnNode* src_node = src_pin->node();
-      s << "  assign " << node_name(node)
-	<< " = |" << node_name(src_node)
-	<< ";" << endl;
-    }
+    dump_uop(s, node, "|");
     break;
 
   case MvnNode::kRxor:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin = node->input(0);
-      const MvnOutputPin* src_pin = ipin->src_pin();
-      const MvnNode* src_node = src_pin->node();
-      s << "  assign " << node_name(node)
-	<< " = ^" << node_name(src_node)
-	<< ";" << endl;
-    }
+    dump_uop(s, node, "^");
     break;
 
   case MvnNode::kEq:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = (" << node_name(src_node0)
-	<< " == " << node_name(src_node1)
-	<< ");" << endl;
-    }
+    dump_binop(s, node, "==", true);
     break;
 
   case MvnNode::kLt:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = (" << node_name(src_node0)
-	<< " < " << node_name(src_node1)
-	<< ");" << endl;
-    }
+    dump_binop(s, node, "<", true);
     break;
 
   case MvnNode::kCaseEq:
@@ -437,223 +368,43 @@ dump_node(ostream& s,
     break;
 
   case MvnNode::kSll:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " << " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "<<");
     break;
 
   case MvnNode::kSrl:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " >> " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, ">>");
     break;
 
   case MvnNode::kSla:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " <<< " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "<<<");
     break;
 
   case MvnNode::kSra:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " >>> " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, ">>>");
     break;
 
   case MvnNode::kAdd:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " + " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "+");
     break;
 
   case MvnNode::kSub:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " - " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "-");
     break;
 
   case MvnNode::kMult:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " * " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "*");
     break;
 
   case MvnNode::kDiv:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " / " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "/");
     break;
 
   case MvnNode::kMod:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " % " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "%");
     break;
 
   case MvnNode::kPow:
-    {
-      ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
-      ymuint no = node->output_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-
-      const MvnInputPin* ipin0 = node->input(0);
-      const MvnOutputPin* src_pin0 = ipin0->src_pin();
-      const MvnNode* src_node0 = src_pin0->node();
-
-      const MvnInputPin* ipin1 = node->input(1);
-      const MvnOutputPin* src_pin1 = ipin1->src_pin();
-      const MvnNode* src_node1 = src_pin1->node();
-
-      s << "  assign " << node_name(node)
-	<< " = " << node_name(src_node0)
-	<< " ** " << node_name(src_node1)
-	<< ";" << endl;
-    }
+    dump_binop(s, node, "**");
     break;
 
   case MvnNode::kIte:
@@ -809,6 +560,28 @@ dump_node(ostream& s,
 	}
       }
       s << ";" << endl;
+    }
+    break;
+
+  case MvnNode::kCell:
+    {
+#if 0
+      const Cell* cell = node->cell();
+      ymuint np = cell->pin_num();
+      for (ymuint i = 0; i < np; ++ i) {
+	const CellPin* pin = cell->pin(i);
+	ymuint pp = node->cell_pin_pos(i);
+	ymuint pos = po >> 1;
+	if ( pp & 1U ) {
+	  const MvnOutputPin* opin = node->output(pos);
+	}
+	else {
+	  const MvnInputPin* ipin = node->input(pos);
+	  const MvnOutputPin* opin = ipin->src_pin();
+	  const MvnNode* src_node = opin->node();
+	}
+      }
+#endif
     }
     break;
 
@@ -1005,4 +778,4 @@ MvnVerilogWriter::operator()(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN

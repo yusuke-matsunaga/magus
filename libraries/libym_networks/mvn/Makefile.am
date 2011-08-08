@@ -22,6 +22,8 @@ libym_mvn_la_LIBADD = \
 libym_mvn_la_SOURCES = \
 	MvnCaseEq.h \
 	MvnCaseEq.cc \
+	MvnCell.h \
+	MvnCell.cc \
 	MvnConst.h \
 	MvnConst.cc \
 	MvnConstBitSelect.h \

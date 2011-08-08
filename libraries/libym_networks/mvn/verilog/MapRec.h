@@ -12,7 +12,7 @@
 #include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapRec MapRec.h "MapRec.h"
@@ -189,6 +189,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // LIBYM_NETWORKS_VERILOG_MAPREC_H

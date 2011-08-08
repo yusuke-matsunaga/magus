@@ -12,7 +12,7 @@
 #include "ym_networks/mvn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnDumper MvnDumper.h "ym_networks/MvnDumper.h"
@@ -43,6 +43,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_MVN
 
 #endif // YM_NETWORKS_MVNDUMPER_H
