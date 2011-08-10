@@ -54,65 +54,79 @@ VerilogWriterImpl::dump(ostream& s,
   const char* sep = "";
   for (ymuint i = 0; i < np; ++ i) {
     const CmnPort* port = network.port(i);
-    s << sep << "." << port->name() << "(";
+    s << sep << port->name();
+    sep = ", ";
+
     ymuint nb = port->bit_width();
     assert_cond( nb > 0, __FILE__, __LINE__);
     if ( nb == 1 ) {
       const CmnNode* input = port->input(0);
       const CmnNode* output = port->output(0);
       if ( input ) {
-	s << node_name(input);
+	set_node_name(input, port->name());
       }
       else if ( output ) {
-	s << node_name(output);
+	set_node_name(output, port->name());
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
+      }
+    }
+  }
+
+  for (ymuint i = 0; i < np; ++ i) {
+    const CmnPort* port = network.port(i);
+    string port_name = port->name();
+    ymuint nb = port->bit_width();
+    assert_cond( nb > 0, __FILE__, __LINE__);
+    if ( nb == 1 ) {
+      const CmnNode* input = port->input(0);
+      const CmnNode* output = port->output(0);
+      if ( input ) {
+	set_node_name(input, port_name);
+	if ( input->alt_node() ) {
+	  s << "  inout  ";
+	}
+	else {
+	  s << "  input  ";
+	}
+	s << port_name << ";" << endl;
+      }
+      else if ( output ) {
+	set_node_name(output, port_name);
+	s << "  output  " << port_name << ";" << endl;
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
       }
     }
     else {
-      s << "{";
-      const char* comma = "";
+      bool has_input = false;
+      bool has_output = false;
       for (ymuint j = 0; j < nb; ++ j) {
-	ymuint idx = nb - j - 1;
-	const CmnNode* input = port->input(idx);
-	const CmnNode* output = port->output(idx);
-	s << comma;
-	comma = ", ";
-	if ( input ) {
-	  s << node_name(input);
+	const CmnNode* input = port->input(j);
+	const CmnNode* output = port->output(j);
+	ostringstream buf;
+	buf << port_name << "[" << j << "]";
+	if ( input != NULL ) {
+	  has_input = true;
+	  set_node_name(input, buf.str());
 	}
-	else if ( output ) {
-	  s << node_name(output);
+	if ( output != NULL ) {
+	  has_output = true;
+	  set_node_name(output, buf.str());
 	}
       }
-      s << "}";
-    }
-    s << ")";
-    sep = ", ";
-  }
-  s << ");" << endl;
-
-  for (CmnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const CmnNode* node = *p;
-    if ( node->input_type() != CmnNode::kPRIMARY_INPUT ) {
-      continue;
-    }
-    if ( node->alt_node() ) {
-      s << "  inout  ";
-    }
-    else {
-      s << "  input  ";
-    }
-    s << node_name(node) << ";" << endl;
-  }
-
-  for (CmnNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const CmnNode* node = *p;
-    if ( node->output_type() != CmnNode::kPRIMARY_OUTPUT ) {
-      continue;
-    }
-    if ( node->alt_node() == NULL ) {
-      s << "  output " << node_name(node) << ";" << endl;
+      if ( !has_output ) {
+	s << "  input";
+      }
+      else if ( !has_input ) {
+	s << "  output";
+      }
+      else {
+	s << "  inout";
+      }
+      s << " [" << nb - 1 << ":" << 0 << "]  " << port_name << ";" << endl;
     }
   }
 
@@ -253,6 +267,14 @@ VerilogWriterImpl::dump(ostream& s,
   }
 
   s << "endmodule" << endl;
+}
+
+// @brief ノード名を設定する．
+void
+VerilogWriterImpl::set_node_name(const CmnNode* node,
+				 const string& name)
+{
+  mNameArray[node->id()] = name;
 }
 
 // @brief ノード名を返す．

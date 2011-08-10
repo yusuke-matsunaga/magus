@@ -47,6 +47,11 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ノード名を設定する．
+  void
+  set_node_name(const CmnNode* node,
+		const string& name);
+
   /// @brief ノード名を返す．
   string
   node_name(const CmnNode* node) const;
