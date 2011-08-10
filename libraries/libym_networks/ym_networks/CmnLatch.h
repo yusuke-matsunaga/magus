@@ -12,7 +12,7 @@
 #include "ym_networks/cmn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnLatch CmnLatch.h "ym_networks/CmnLatch.h"
@@ -271,6 +271,6 @@ CmnLatch::_preset()
   return mPreset;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMN_CMNLATCH_H

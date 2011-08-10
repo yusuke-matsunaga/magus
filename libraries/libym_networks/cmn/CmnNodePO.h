@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_CMN_CMNNODEPO_H
-#define LIBYM_NETWORKS_CMN_CMNNODEPO_H
+#ifndef CMNNODEPO_H
+#define CMNNODEPO_H
 
-/// @file libym_networks/cmn/CmnNodePO.h
+/// @file CmnNodePO.h
 /// @brief CmnNodePO のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "CmnNodeOutput.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodePO CmnNodePO.h "CmnNodePO.h"
@@ -77,6 +77,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
-#endif // LIBYM_NETWORKS_CMN_CMNNODEPO_H
+#endif // CMNNODEPO_H

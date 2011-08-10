@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_CMN_CMNNODEDFFIN_H
-#define LIBYM_NETWORKS_CMN_CMNNODEDFFIN_H
+#ifndef CMNNODEDFFIN_H
+#define CMNNODEDFFIN_H
 
-/// @file libym_networks/cmn/CmnNodeDffIn.h
+/// @file CmnNodeDffIn.h
 /// @brief CmnNodeDffIn のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "CmnNodeOutput.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeDffIn CmnNodeDffIn.h "CmnNodeDffIn.h"
@@ -173,6 +173,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
-#endif // LIBYM_NETWORKS_CMN_CMNNODEDFFIN_H
+#endif // CMNNODEDFFIN_H

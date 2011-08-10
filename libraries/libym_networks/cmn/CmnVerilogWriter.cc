@@ -1,5 +1,5 @@
 
-/// @file libym_networks/cmn/CmnVerilogWriter.cc
+/// @file CmnVerilogWriter.cc
 /// @brief CmnVerilogWriter 実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -19,7 +19,7 @@
 #include "ym_cell/CellPin.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 // @brief コンストラクタ
 CmnVerilogWriter::CmnVerilogWriter()
@@ -269,4 +269,4 @@ CmnVerilogWriter::operator()(ostream& s,
   s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN

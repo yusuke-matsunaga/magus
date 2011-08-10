@@ -1,11 +1,9 @@
 
-/// @file libym_networks/cmn/CmnMgr.cc
+/// @file CmnMgr.cc
 /// @brief CmnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LutNetwork.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +11,7 @@
 #include "CmnMgrImpl.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 ///////////////////////////////////////////////////////////////////////
 // クラス CmnMgr
@@ -347,4 +345,4 @@ CmnMgr::reg_latch_cell(const Cell* cell,
   return mImpl->reg_latch_cell(cell, pos_array);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN

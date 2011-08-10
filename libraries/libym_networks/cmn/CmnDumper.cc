@@ -1,5 +1,5 @@
 
-/// @file libym_networks/cmn/CmnDumper.cc
+/// @file CmnDumper.cc
 /// @brief CmnDumper 実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -19,7 +19,7 @@
 #include "ym_cell/CellPin.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 // @brief コンストラクタ
 CmnDumper::CmnDumper()
@@ -136,4 +136,4 @@ CmnDumper::operator()(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN

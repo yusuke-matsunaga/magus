@@ -5,19 +5,17 @@
 /// @brief BdnBlifWriter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BdnBlifWriter.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_networks/bdn.h>
+#include "ym_networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
 //////////////////////////////////////////////////////////////////////
-/// @class BdnBlifWriter BdnBlifWriter.h <ym_networks/BdnBlifWriter.h>
+/// @class BdnBlifWriter BdnBlifWriter.h "ym_networks/BdnBlifWriter.h"
 /// @ingroup BnetGroup
 /// @brief BdnMgr の内容を blif 形式で出力するクラス
 /// @sa Bdnwork

@@ -12,7 +12,9 @@
 #include "ym_networks/cmn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
+
+class VerilogWriterImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnVerilogWriter CmnVerilogWriter.h "ym_networks/CmnVerilogWriter.h"
@@ -39,8 +41,17 @@ public:
   operator()(ostream& s,
 	     const CmnMgr& cngraph);
 
+#if 0
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 実際の処理を行うクラス
+  VeriloWriterImpl* mImpl;
+#endif
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMNVERILOGWRITER_H

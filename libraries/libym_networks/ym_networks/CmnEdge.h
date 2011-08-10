@@ -5,8 +5,6 @@
 /// @brief CmnEdge のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LutNetwork.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -17,7 +15,7 @@
 #include "ym_utils/DlList.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnEdge CmnEdge.h "ym_networks/CmnEdge.h"
@@ -198,6 +196,6 @@ CmnEdge::set_to(CmnNode* to,
   mToPos = pos;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMNEDGE_H

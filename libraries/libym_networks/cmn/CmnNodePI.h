@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_CMN_CMNNODEPI_H
-#define LIBYM_NETWORKS_CMN_CMNNODEPI_H
+#ifndef CMNNODEPI_H
+#define CMNNODEPI_H
 
-/// @file libym_networks/cmn/CmnNodePI.h
+/// @file CmnNodePI.h
 /// @brief CmnNodePI のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "CmnNodeInput.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodePI CmnNodePI.h "CmnNodePI.h"
@@ -77,6 +77,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
-#endif // LIBYM_NETWORKS_CMN_CMNNODEPI_H
+#endif // CMNNODEPI_H

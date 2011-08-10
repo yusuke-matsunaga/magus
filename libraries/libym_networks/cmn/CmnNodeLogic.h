@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_CMN_CMNNODELOGIC_H
-#define LIBYM_NETWORKS_CMN_CMNNODELOGIC_H
+#ifndef CMNNODELOGIC_H
+#define CMNNODELOGIC_H
 
-/// @file libym_netwroks/cmn/CmnNodeLogic.h
+/// @file CmnNodeLogic.h
 /// @brief CmnNodeLogic のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "ym_networks/CmnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeLogic CmnNodeLogic.h "CmnNodeLogic.h"
@@ -101,6 +101,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
-#endif // LIBYM_NETWORKS_CMN_CMNNODELOGIC_H
+#endif // CMNNODELOGIC_H

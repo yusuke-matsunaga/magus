@@ -13,7 +13,7 @@
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnDffCell CmnDffCell.h "ym_networks/CmnDffCell.h"
@@ -116,7 +116,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
-
+END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMN_CMNDFFCELL_H

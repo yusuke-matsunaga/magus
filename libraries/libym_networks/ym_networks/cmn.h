@@ -5,8 +5,6 @@
 /// @brief Cell Mapped Networks の共通ヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bdn.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -58,7 +56,18 @@
 #include "ym_utils/DlList.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+/// @brief cmn 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_NETWORKS_CMN		\
+  BEGIN_NAMESPACE_YM_NETWORKS			\
+  BEGIN_NAMESPACE(nsCmn)
+
+/// @brief cmn 用の名前空間の終了
+#define END_NAMESPACE_YM_NETWORKS_CMN		\
+  END_NAMESPACE(nsCmn)				\
+  END_NAMESPACE_YM_NETWORKS
+
+
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 class CmnMgr;
 
@@ -106,35 +115,35 @@ typedef DlList<CmnDff> CmnDffList;
 /// @ingroup CmnGroup
 typedef DlList<CmnLatch> CmnLatchList;
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
 BEGIN_NAMESPACE_YM
 
-using nsNetworks::CmnMgr;
+using nsNetworks::nsCmn::CmnMgr;
 
-using nsNetworks::CmnPort;
+using nsNetworks::nsCmn::CmnPort;
 
-using nsNetworks::CmnDff;
-using nsNetworks::CmnDffList;
+using nsNetworks::nsCmn::CmnDff;
+using nsNetworks::nsCmn::CmnDffList;
 
-using nsNetworks::CmnLatch;
-using nsNetworks::CmnLatchList;
+using nsNetworks::nsCmn::CmnLatch;
+using nsNetworks::nsCmn::CmnLatchList;
 
-using nsNetworks::CmnNode;
-using nsNetworks::CmnNodeVector;
-using nsNetworks::CmnNodeList;
+using nsNetworks::nsCmn::CmnNode;
+using nsNetworks::nsCmn::CmnNodeVector;
+using nsNetworks::nsCmn::CmnNodeList;
 
-using nsNetworks::CmnEdge;
-using nsNetworks::CmnEdgeList;
+using nsNetworks::nsCmn::CmnEdge;
+using nsNetworks::nsCmn::CmnEdgeList;
 
-using nsNetworks::CmnFanoutList;
+using nsNetworks::nsCmn::CmnFanoutList;
 
-using nsNetworks::CmnDffCell;
-using nsNetworks::CmnLatchCell;
+using nsNetworks::nsCmn::CmnDffCell;
+using nsNetworks::nsCmn::CmnLatchCell;
 
-using nsNetworks::CmnDumper;
-using nsNetworks::CmnBlifWriter;
-using nsNetworks::CmnVerilogWriter;
+using nsNetworks::nsCmn::CmnDumper;
+using nsNetworks::nsCmn::CmnBlifWriter;
+using nsNetworks::nsCmn::CmnVerilogWriter;
 
 END_NAMESPACE_YM
 

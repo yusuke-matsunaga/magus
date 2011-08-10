@@ -5,8 +5,6 @@
 /// @brief CmnPort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LutNetwork.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -15,7 +13,7 @@
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnPort CmnPort.h "ym_networks/CmnPort.h"
@@ -174,6 +172,6 @@ CmnPort::_output(ymuint pos)
   return mOutputArray[pos];
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMNPORT_H

@@ -5,9 +5,7 @@
 /// @brief BNetIscas89Reader のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIscas89Reader.h 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

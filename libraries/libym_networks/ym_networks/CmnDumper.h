@@ -12,7 +12,7 @@
 #include "ym_networks/cmn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnDumper CmnDumper.h "ym_networks/CmnDumper.h"
@@ -40,6 +40,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMNDUMPER_H

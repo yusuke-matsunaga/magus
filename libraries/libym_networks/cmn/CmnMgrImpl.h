@@ -1,11 +1,9 @@
-#ifndef LIBYM_NETWORKS_CMN_CMNMGR_H
-#define LIBYM_NETWORKS_CMN_CMNMGR_H
+#ifndef CMNMGRIMPL_H
+#define CMNMGRIMPL_H
 
-/// @file libym_networks/cmn/CmnMgrImpl.h
+/// @file CmnMgrImpl.h
 /// @brief CmnMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: LutNetwork.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -33,7 +31,7 @@ struct hash<const nsYm::Cell*>
 END_NAMESPACE_HASH
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnMgrImpl CmnMgrImpl.h "CmnMgrImpl.h"
@@ -536,6 +534,6 @@ CmnMgrImpl::logic_list() const
   return mLogicList;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
-#endif // YM_NETWORKS_CMNMGR_H
+#endif // CMNMGRIMPL_H

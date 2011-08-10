@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_CMN_CMNNODELATCHIN_H
-#define LIBYM_NETWORKS_CMN_CMNNODELATCHIN_H
+#ifndef CMNNODELATCHIN_H
+#define CMNNODELATCHIN_H
 
-/// @file libym_networks/cmn/CmnNodeLatchIn.h
+/// @file CmnNodeLatchIn.h
 /// @brief CmnNodeLatchIn のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "CmnNodeOutput.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeLatchIn CmnNodeLatchIn.h "CmnNodeLatchIn.h"
@@ -173,6 +173,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
-#endif // LIBYM_NETWORKS_CMN_CMNNODELATCHIN_H
+#endif // CMNNODELATCHIN_H

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/cmn/CmnLatchCell.cc
+/// @file CmnLatchCell.cc
 /// @brief CmnLatchCell の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,7 +10,7 @@
 #include "ym_networks/CmnLatchCell.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 BEGIN_NONAMESPACE
 
@@ -181,4 +181,4 @@ CmnLatchCell::iq_pos() const
   return get_pos(mBits, OUTPUT2);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN

@@ -5,8 +5,6 @@
 /// @brief CmnNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LutNetwork.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -17,7 +15,7 @@
 #include "ym_utils/DlList.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNode CmnNode.h "ym_networks/CmnNode.h"
@@ -442,6 +440,6 @@ CmnNode::cell() const
   return mCell;
 }
 #endif
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMNNODE_H

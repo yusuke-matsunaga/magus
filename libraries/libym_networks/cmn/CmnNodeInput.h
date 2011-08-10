@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_CMN_CMNNODEINPUT_H
-#define LIBYM_NETWORKS_CMN_CMNNODEINPUT_H
+#ifndef CMNNODEINPUT_H
+#define CMNNODEINPUT_H
 
-/// @file libym_networks/cmn/CmnNodeInput.h
+/// @file CmnNodeInput.h
 /// @brief CmnNodeInput のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "ym_networks/CmnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_CMN
 
 //////////////////////////////////////////////////////////////////////
 /// @class CmnNodeInput CmnNodeInput.h "CmnNodeInput.h"
@@ -47,7 +47,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_CMN
 
-
-#endif // LIBYM_NETWORKS_CMN_CMNNODEINPUT_H
+#endif // CMNNODEINPUT_H
