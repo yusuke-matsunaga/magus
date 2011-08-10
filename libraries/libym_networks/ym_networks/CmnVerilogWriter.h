@@ -36,20 +36,20 @@ public:
   /// @relates CmnMgr
   /// @brief 内容をシミュレーション可能な Verilog-HDL 形式で出力する．
   /// @param[in] s 出力先のストリーム
-  /// @param[in] cngraph 対象のネットワーク
+  /// @param[in] mgr 対象のネットワーク
   void
   operator()(ostream& s,
-	     const CmnMgr& cngraph);
+	     const CmnMgr& mgr);
 
-#if 0
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 実際の処理を行うクラス
-  VeriloWriterImpl* mImpl;
-#endif
+  VerilogWriterImpl* mImpl;
+
 };
 
 END_NAMESPACE_YM_NETWORKS_CMN

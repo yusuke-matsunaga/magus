@@ -253,26 +253,6 @@ public:
   /// @}
   //////////////////////////////////////////////////////////////////////
 
-#if 0
-private:
-  //////////////////////////////////////////////////////////////////////
-  // プライベートメンバ関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入力タイプを設定する．
-  /// @note 副作用で入力ノードタイプに設定される．
-  void
-  set_input_type(tInputType type);
-
-  /// @brief 出力タイプを設定する．
-  /// @note 副作用で出力ノードタイプに設定される．
-  void
-  set_output_type(tOutputType type);
-
-  /// @brief セルを設定する．
-  void
-  set_cell(const Cell* cell);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -282,44 +262,9 @@ private:
   // ID 番号
   ymuint32 mId;
 
-#if 0
-  // タイプなどの情報をパックしたもの
-  // 入力： type(2bit) + sub-type(4bit)
-  // 出力： type(2bit) + sub-type(4bit)
-  // 論理： type(2bit)
-  ymuint32 mFlags;
-
-  // 入力数
-  ymuint32 mNi;
-
-  // ファンインの枝(そのもの)の配列
-  CmnEdge* mFanins;
-#endif
-
   // ファンアウトの枝のリスト
   CmnFanoutList mFanoutList;
 
-#if 0
-  // セル
-  const Cell* mCell;
-#endif
-
-#if 0
-private:
-  //////////////////////////////////////////////////////////////////////
-  // mFlags 用の定数
-  //////////////////////////////////////////////////////////////////////
-
-  static
-  const int kTypeShift  = 0;
-  static
-  const int kSubTypeShift = 2;
-
-  static
-  const ymuint32 kTypeMask    = 3U << kTypeShift;
-  static
-  const ymuint32 kSubTypeMask = 15U << kSubTypeShift;
-#endif
 };
 
 
@@ -339,40 +284,6 @@ CmnNode::id() const
   return mId;
 }
 
-#if 0
-// タイプを得る．
-inline
-CmnNode::tType
-CmnNode::type() const
-{
-  return static_cast<tType>((mFlags & kTypeMask) >> kTypeShift);
-}
-
-// 入力ノードの時に true を返す．
-inline
-bool
-CmnNode::is_input() const
-{
-  return type() == kINPUT;
-}
-
-// 出力ノードの時に true を返す．
-inline
-bool
-CmnNode::is_output() const
-{
-  return type() == kOUTPUT;
-}
-
-// セルノードの時に true を返す．
-inline
-bool
-CmnNode::is_logic() const
-{
-  return type() == kLOGIC;
-}
-#endif
-
 // ファンアウト数を得る．
 inline
 ymuint
@@ -389,57 +300,6 @@ CmnNode::fanout_list() const
   return mFanoutList;
 }
 
-#if 0
-// @brief 入力ノードのサブタイプを得る．
-inline
-CmnNode::tInputType
-CmnNode::input_type() const
-{
-  return static_cast<tInputType>((mFlags >> kSubTypeShift) & 7U);
-}
-
-// @brief 出力ノードのサブタイプを得る．
-inline
-CmnNode::tOutputType
-CmnNode::output_type() const
-{
-  return static_cast<tOutputType>((mFlags >> kSubTypeShift) & 15U);
-}
-
-// @brief 入力数を得る．
-inline
-ymuint
-CmnNode::ni() const
-{
-  return mNi;
-}
-
-// @brief ファンインのノードを得る．
-inline
-const CmnNode*
-CmnNode::fanin(ymuint pos) const
-{
-  // pos の範囲チェックはしていない！！！
-  return mFanins[pos].from();
-}
-
-// ファンインの枝を得る．
-inline
-const CmnEdge*
-CmnNode::fanin_edge(ymuint pos) const
-{
-  // pos の範囲チェックはしていない！！！
-  return &mFanins[pos];
-}
-
-// @brief セルを得る．
-inline
-const Cell*
-CmnNode::cell() const
-{
-  return mCell;
-}
-#endif
 END_NAMESPACE_YM_NETWORKS_CMN
 
 #endif // YM_NETWORKS_CMNNODE_H
