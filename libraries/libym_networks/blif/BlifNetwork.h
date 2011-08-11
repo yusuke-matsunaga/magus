@@ -1,11 +1,9 @@
-#ifndef LIBYM_NETWORKS_BLIF_BLIFNETWORK_H
-#define LIBYM_NETWORKS_BLIF_BLIFNETWORK_H
+#ifndef BLIFNETWORK_H
+#define BLIFNETWORK_H
 
-/// @file ym_blif/BlifNetwork.h
+/// @file BlifNetwork.h
 /// @brief BlifNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifNetwork.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -469,4 +467,4 @@ BlifNetwork::logic(ymuint32 pos) const
 
 END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_NETWORKS_BLIF_BLIFNETWORK_H
+#endif // BLIFNETWORK_H

@@ -1,11 +1,9 @@
-#ifndef LIBYM_BLIF_BLIFPARSERIMPL_H
-#define LIBYM_BLIF_BLIFPARSERIMPL_H
+#ifndef BLIFPARSERIMPL_H
+#define BLIFPARSERIMPL_H
 
-/// @file libym_blif/BlifParserImpl.h
+/// @file BlifParserImpl.h
 /// @brief BlifParserImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifParserImpl.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -168,4 +166,4 @@ BlifParserImpl::unget_token(tToken token,
 
 END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_BLIF_BLIFPARSERIMPL_H
+#endif // BLIFPARSERIMPL_H

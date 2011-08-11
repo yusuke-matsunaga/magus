@@ -1,11 +1,9 @@
-#ifndef LIBYM_BLIF_BLIFNETWORKHANDLER_H
-#define LIBYM_BLIF_BLIFNETWORKHANDLER_H
+#ifndef BLIFNETWORKHANDLER_H
+#define BLIFNETWORKHANDLER_H
 
-/// @file libym_blif/BlifNetworkHandler.h
+/// @file BlifNetworkHandler.h
 /// @brief BlifNetworkHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifNetworkReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -164,4 +162,4 @@ private:
 
 END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_BLIF_BLIFNETWORKHANDLER_H
+#endif // BLIFNETWORKHANDLER_H

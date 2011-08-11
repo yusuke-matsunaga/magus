@@ -1,11 +1,9 @@
-#ifndef LIBYM_BLIF_BLIFDIC_H
-#define LIBYM_BLIF_BLIFDIC_H
+#ifndef BLIFDIC_H
+#define BLIFDIC_H
 
-/// @file libym_blif/BlifDic.h
+/// @file BlifDic.h
 /// @brief BlibDic のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifDic.h 958 2007-08-28 05:38:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -109,7 +107,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ハッシュ表のサイズ
-  size_t mTableSize;
+  ymuint32 mTableSize;
 
   // ハッシュ表
   Cell** mHashTable;
@@ -119,7 +117,10 @@ private:
 
 };
 
+/// @relates tToken
 /// @brief トークンを出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] token トークン
 ostream&
 operator<<(ostream& s,
 	   tToken token);

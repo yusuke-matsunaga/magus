@@ -1,11 +1,9 @@
-#ifndef YM_BLIF_BLIFHANDLER_H
-#define YM_BLIF_BLIFHANDLER_H
+#ifndef BLIFHANDLER_H
+#define BLIFHANDLER_H
 
-/// @file ym_blif/BlifHandler.h
+/// @file BlifHandler.h
 /// @brief BlifHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifHandler.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

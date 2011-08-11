@@ -1,11 +1,9 @@
-#ifndef YM_BLIF_BLIFPARSER_H
-#define YM_BLIF_BLIFPARSER_H
+#ifndef BLIFPARSER_H
+#define BLIFPARSER_H
 
-/// @file ym_blif/BlifParser.h
+/// @file BlifParser.h
 /// @brief BlifParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifParser.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -62,4 +60,4 @@ private:
 
 END_NAMESPACE_YM_BLIF
 
-#endif // YM_BLIF_BLIFPARSER_H
+#endif // BLIFPARSER_H

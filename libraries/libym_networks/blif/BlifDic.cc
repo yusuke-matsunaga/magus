@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BlifDic.cc
+/// @file BlifDic.cc
 /// @brief BlibDic の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BlifDic.cc 1293 2008-02-21 02:25:52Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,12 +14,12 @@ BEGIN_NAMESPACE_YM_BLIF
 
 BEGIN_NONAMESPACE
 
-size_t
+ymuint
 hash_func(const char* str)
 {
-  size_t h = 0;
-  size_t c;
-  for ( ; (c = static_cast<size_t>(*str)); ++ str) {
+  ymuint h = 0;
+  ymuint c;
+  for ( ; (c = static_cast<ymuint>(*str)); ++ str) {
     h = h * 37 + c;
   }
   return h;
@@ -78,18 +76,18 @@ BlifDic::BlifDic()
     {"default_output_load", kTokenDEFAULT_OUTPUT_LOAD}
   };
 
-  size_t n = sizeof(init_data) / sizeof(Cell);
+  ymuint n = sizeof(init_data) / sizeof(Cell);
   mTableSize = n;
   mHashTable = new Cell*[mTableSize];
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     mHashTable[i] = NULL;
   }
   mCellBlock = new Cell[n];
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     Cell* cell = &mCellBlock[i];
     cell->mStr = init_data[i].mKey;
     cell->mToken = init_data[i].mVal;
-    size_t pos = hash_func(cell->mStr) % mTableSize;
+    ymuint pos = hash_func(cell->mStr) % mTableSize;
     cell->mLink = mHashTable[pos];
     mHashTable[pos] = cell;
   }
@@ -106,7 +104,7 @@ BlifDic::~BlifDic()
 tToken
 BlifDic::get_token(const char* str)
 {
-  size_t pos = hash_func(str) % mTableSize;
+  ymuint pos = hash_func(str) % mTableSize;
   for (Cell* cell = mHashTable[pos]; cell; cell = cell->mLink) {
     if ( strcmp(cell->mStr, str) == 0 ) {
       return cell->mToken;

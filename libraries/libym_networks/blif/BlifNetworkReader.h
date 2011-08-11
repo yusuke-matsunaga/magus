@@ -1,11 +1,9 @@
-#ifndef YM_BLIF_BLIFNETWORKREADER_H
-#define YM_BLIF_BLIFNETWORKREADER_H
+#ifndef BLIFNETWORKREADER_H
+#define BLIFNETWORKREADER_H
 
-/// @file ym_blif/BlifNetwork.h
+/// @file BlifNetwork.h
 /// @brief BlifNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifNetworkReader.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -63,4 +61,4 @@ private:
 
 END_NAMESPACE_YM_BLIF
 
-#endif // YM_BLIF_BLIFNETWORKREADER_H
+#endif // BLIFNETWORKREADER_H

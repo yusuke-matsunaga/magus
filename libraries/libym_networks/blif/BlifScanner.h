@@ -1,11 +1,9 @@
-#ifndef LIBYM_BLIF_BLIFSCANNER_H
-#define LIBYM_BLIF_BLIFSCANNER_H
+#ifndef BLIFSCANNER_H
+#define BLIFSCANNER_H
 
-/// @file libym_blif/BlifScanner.h
+/// @file BlifScanner.h
 /// @brief BlibScanner のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifScanner.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -92,4 +90,4 @@ BlifScanner::cur_string()
 
 END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_BLIF_BLIFSCANNER_H
+#endif // BLIFSCANNER_H
