@@ -37,5 +37,7 @@ libym_mvn_la_SOURCES = \
 	MvnNodeBase.h \
 	MvnNodeBase.cc \
 	MvnPort.cc \
-	MvnVerilogWriter.cc
+	MvnVerilogWriter.cc \
+	VerilogWriterImpl.h \
+	VerilogWriterImpl.cc
 

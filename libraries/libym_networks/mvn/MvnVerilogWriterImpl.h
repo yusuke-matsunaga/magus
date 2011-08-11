@@ -1,8 +1,8 @@
-#ifndef MVNVERILOGWRITERIMPL_H
-#define MVNVERILOGWRITERIMPL_H
+#ifndef VERILOGWRITERIMPL_H
+#define VERILOGWRITERIMPL_H
 
-/// @file MvnVerilogWriterImpl.h
-/// @brief MvnVerilogWriterImpl のヘッダファイル
+/// @file VerilogWriterImpl.h
+/// @brief VerilogWriterImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -16,18 +16,18 @@ BEGIN_NAMESPACE_YM_NETWORKS_MVN
 class NodeDumper;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MvnVerilogWriterImpl MvnVerilogWriter.h
+/// @class VerilogWriterImpl VerilogWriterImpl.h
 /// @brief MvnVerilogWriter の実際の処理を行う実装クラス
 //////////////////////////////////////////////////////////////////////
-class MvnVerilogWriterImpl
+class VerilogWriterImpl
 {
 public:
 
   /// @brief コンストラクタ
-  MvnVerilogWriterImpl();
+  VerilogWriterImpl();
 
   /// @brief デストラクタ
-  ~MvnVerilogWriterImpl();
+  ~VerilogWriterImpl();
 
 
 public:
@@ -131,3 +131,5 @@ private:
 };
 
 END_NAMESPACE_YM_NETWORKS_MVN
+
+#endif // VERILOGWRITERIMPL_H

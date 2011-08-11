@@ -14,7 +14,7 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
-class MvnVerilogWriterImpl;
+class VerilogWriterImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnVerilogWriter MvnVerilogWriter.h "ym_networks/MvnVerilogWriter.h"
@@ -59,7 +59,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際に処理を行う実装クラス
-  MvnVerilogWriterImpl* mImpl;
+  VerilogWriterImpl* mImpl;
 
 };
 
