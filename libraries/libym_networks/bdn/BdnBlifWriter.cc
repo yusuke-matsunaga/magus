@@ -1,9 +1,7 @@
 
-/// @file libym_networks/BdnBlifWriter.cc
-/// @brief ブーリアンネットワークの内容を出力する関数の実装ファイル
+/// @file BdnBlifWriter.cc
+/// @brief BdnBlifWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BdnBlifWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -16,8 +14,7 @@
 #include "ym_utils/NameMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
-
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 // @brief コンストラクタ
 BdnBlifWriter::BdnBlifWriter()
@@ -177,4 +174,4 @@ BdnBlifWriter::operator()(ostream& s,
   s << ".end" << endl;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN

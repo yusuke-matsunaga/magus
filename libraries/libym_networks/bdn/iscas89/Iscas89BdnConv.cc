@@ -1,5 +1,5 @@
 
-/// @file libym_networks/bdn/iscas89/Iscas89BdnConv
+/// @file Iscas89BdnConv
 /// @brief Iscas89BdnConv の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

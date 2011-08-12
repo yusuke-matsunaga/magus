@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_BDN_ISCAS89_ISCAS89BDNCONV_H
-#define LIBYM_NETWORKS_BDN_ISCAS89_ISCAS89BDNCONV_H
+#ifndef ISCAS89BDNCONV_H
+#define ISCAS89BDNCONV_H
 
-/// @file libym_networks/bdn/iscas89/Iscas89BdnConv.h
+/// @file Iscas89BdnConv.h
 /// @brief Iscas89BdnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -83,4 +83,4 @@ private:
 END_NAMESPACE_YM_ISCAS89
 
 
-#endif // LIBYM_NETWORKS_BDN_ISCAS89_ISCAS89BDNCONV_H
+#endif // ISCAS89BDNCONV_H

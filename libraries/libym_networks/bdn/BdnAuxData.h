@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_BDNAUXDATA_H
-#define LIBYM_NETWORKS_BDNAUXDATA_H
+#ifndef BDNAUXDATA_H
+#define BDNAUXDATA_H
 
-/// @file libym_networks/BdnAuxData.h
+/// @file BdnAuxData.h
 /// @brief BdnAuxData のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnAuxData BdnAuxData.h "BdnAuxData.h"
@@ -204,6 +204,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
-#endif // LIBYM_NETWORKS_BDNAUXDATA_H
+#endif // BDNAUXDATA_H

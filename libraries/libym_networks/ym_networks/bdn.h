@@ -91,7 +91,18 @@
 #include "ym_utils/DlList.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+/// @brief bdn 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_NETWORKS_BDN		\
+  BEGIN_NAMESPACE_YM_NETWORKS			\
+  BEGIN_NAMESPACE(nsBdn)
+
+/// @brief bdn 用の名前空間の終了
+#define END_NAMESPACE_YM_NETWORKS_BDN		\
+  END_NAMESPACE(nsBdn)				\
+  END_NAMESPACE_YM_NETWORKS
+
+
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 class BdnMgr;
 
@@ -139,36 +150,36 @@ typedef DlList<BdnDff> BdnDffList;
 /// @ingroup BdnGroup
 typedef DlList<BdnLatch> BdnLatchList;
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
 BEGIN_NAMESPACE_YM
 
-using nsNetworks::BdnMgr;
+using nsNetworks::nsBdn::BdnMgr;
 
-using nsNetworks::BdnPort;
+using nsNetworks::nsBdn::BdnPort;
 
-using nsNetworks::BdnDff;
-using nsNetworks::BdnDffList;
+using nsNetworks::nsBdn::BdnDff;
+using nsNetworks::nsBdn::BdnDffList;
 
-using nsNetworks::BdnLatch;
-using nsNetworks::BdnLatchList;
+using nsNetworks::nsBdn::BdnLatch;
+using nsNetworks::nsBdn::BdnLatchList;
 
-using nsNetworks::BdnNode;
-using nsNetworks::BdnNodeHandle;
-using nsNetworks::BdnNodeVector;
-using nsNetworks::BdnNodeList;
+using nsNetworks::nsBdn::BdnNode;
+using nsNetworks::nsBdn::BdnNodeHandle;
+using nsNetworks::nsBdn::BdnNodeVector;
+using nsNetworks::nsBdn::BdnNodeList;
 
-using nsNetworks::BdnEdge;
-using nsNetworks::BdnEdgeList;
+using nsNetworks::nsBdn::BdnEdge;
+using nsNetworks::nsBdn::BdnEdgeList;
 
-using nsNetworks::BdnFanoutList;
+using nsNetworks::nsBdn::BdnFanoutList;
 
-using nsNetworks::BdnBlifReader;
-using nsNetworks::BdnIscas89Reader;
+using nsNetworks::nsBdn::BdnBlifReader;
+using nsNetworks::nsBdn::BdnIscas89Reader;
 
-using nsNetworks::BdnDumper;
-using nsNetworks::BdnBlifWriter;
-using nsNetworks::BdnVerilogWriter;
+using nsNetworks::nsBdn::BdnDumper;
+using nsNetworks::nsBdn::BdnBlifWriter;
+using nsNetworks::nsBdn::BdnVerilogWriter;
 
 END_NAMESPACE_YM
 

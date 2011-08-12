@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnNode.cc
+/// @file BdnNode.cc
 /// @brief BdnNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -14,8 +14,7 @@
 #include "BdnAuxData.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
-
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 // クラス BdnPort
@@ -299,4 +298,4 @@ BdnLatchData::latch() const
   return mLatch;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN

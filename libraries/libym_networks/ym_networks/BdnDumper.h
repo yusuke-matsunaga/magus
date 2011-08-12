@@ -12,7 +12,7 @@
 #include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnDumper BdnDumper.h "ym_networks/BdnDumper.h"
@@ -40,6 +40,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
 #endif // YM_NETWORKS_BDNDUMPER_H

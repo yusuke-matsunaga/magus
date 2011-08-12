@@ -1,11 +1,9 @@
-#ifndef LIBYM_NETWORKS_BDN_BLIF_BLIFBDNCONV_H
-#define LIBYM_NETWORKS_BDN_BLIF_BLIFBDNCONV_H
+#ifndef BLIFBDNCONV_H
+#define BLIFBDNCONV_H
 
-/// @file libym_networks/bdn/blif/BlifBdnConv.h
+/// @file BlifBdnConv.h
 /// @brief BlifBdnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BlifBdnConv.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -85,4 +83,4 @@ private:
 
 END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_NETWORKS_BDN_BLIF_BLIFBDNCONV_H
+#endif // BLIFBDNCONV_H

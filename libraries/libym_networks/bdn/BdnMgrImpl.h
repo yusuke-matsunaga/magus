@@ -1,11 +1,9 @@
-#ifndef LIBYM_NETWORKS_BDNMGRIMPL_H
-#define LIBYM_NETWORKS_BDNMGRIMPL_H
+#ifndef BDNMGRIMPL_H
+#define BDNMGRIMPL_H
 
-/// @file libym_networks/BdnMgrImpl.h
+/// @file BdnMgrImpl.h
 /// @brief BdnMgrImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BdnMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -16,7 +14,7 @@
 #include "ym_utils/ItvlMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnMgrImpl BdnMgrImpl.h BdnMgrImp.h
@@ -578,6 +576,6 @@ BdnMgrImpl::make_xor_tree(BdnNode* node,
   return make_tree(node, XOR, false, 0, node_list.size(), node_list);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
-#endif // LIBYM_NETWORKS_BDNMGRIMPL_H
+#endif // BDNMGRIMPL_H

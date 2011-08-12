@@ -1,9 +1,7 @@
 
-/// @file libym_networks/bdn/BdnVerilogWriter.cc
-/// @brief ブーリアンネットワークの内容を出力する関数の実装ファイル
+/// @file BdnVerilogWriter.cc
+/// @brief BdnVerilogWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BdnVerilogWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -18,7 +16,7 @@
 #include "ym_utils/NameMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 
 // @brief コンストラクタ
@@ -281,4 +279,4 @@ BdnVerilogWriter::operator()(ostream& s,
   s << "endmodule" << endl;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN

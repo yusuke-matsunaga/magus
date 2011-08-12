@@ -12,7 +12,7 @@
 #include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 class BdnAuxData;
 
@@ -227,6 +227,6 @@ BdnLatch::_preset()
   return mPreset;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
 #endif // YM_NETWORKS_BDNLATCH_H

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnMgr.cc
+/// @file BdnMgr.cc
 /// @brief BdnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,7 +12,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 ///////////////////////////////////////////////////////////////////////
 // クラス BdnMgr
@@ -577,4 +577,4 @@ BdnMgr::change_xnor(BdnNode* node,
   mImpl->change_logic(node, ~new_handle);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN

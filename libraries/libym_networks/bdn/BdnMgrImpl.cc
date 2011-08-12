@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnMgr.cc
+/// @file BdnMgr.cc
 /// @brief BdnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -16,7 +16,7 @@
 #include "BdnAuxData.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 ///////////////////////////////////////////////////////////////////////
 // クラス BdnMgrImpl
@@ -956,4 +956,4 @@ BdnMgrImpl::alloc_table(ymuint req_size)
   mNextLimit = static_cast<ymuint32>(mHashSize * 1.8);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN

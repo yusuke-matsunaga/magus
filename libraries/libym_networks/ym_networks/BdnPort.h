@@ -12,7 +12,7 @@
 #include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 class BdnAuxData;
 
@@ -176,6 +176,6 @@ BdnPort::_output(ymuint pos)
   return mOutputArray[pos];
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
 #endif // YM_NETWORKS_BDNPORT_H

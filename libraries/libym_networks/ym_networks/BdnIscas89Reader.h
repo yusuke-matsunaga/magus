@@ -12,7 +12,7 @@
 #include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnIscas89Reader BdnIscas89Reader.h "ym_networks/BdnIscas89Reader.h"
@@ -43,6 +43,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
 #endif // YM_NETWORKS_BDNISCAS89READER_H

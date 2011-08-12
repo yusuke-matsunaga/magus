@@ -1,5 +1,5 @@
 
-/// @file libym_networks/BdnDumper.cc
+/// @file BdnDumper.cc
 /// @brief BdnDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -17,7 +17,7 @@
 #include "ym_networks/BdnNodeHandle.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 BEGIN_NONAMESPACE
 
@@ -274,4 +274,4 @@ BdnDumper::operator()(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN

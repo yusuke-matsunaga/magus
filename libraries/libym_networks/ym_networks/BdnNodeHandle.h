@@ -11,7 +11,7 @@
 #include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BDN
 
 //////////////////////////////////////////////////////////////////////
 /// @class BdnNodeHandle BdnNode.h "ym_networks/BdnNode.h"
@@ -235,6 +235,6 @@ operator!=(BdnNodeHandle left,
   return !left.operator==(right);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BDN
 
 #endif // YM_NETWORKS_BDNNODE_H
