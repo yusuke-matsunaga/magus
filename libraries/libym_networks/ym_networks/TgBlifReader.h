@@ -19,6 +19,9 @@ namespace nsBlif {
   class TgBlifHandler;
 }
 
+END_NAMESPACE_YM_NETWORKS
+
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgBlifReader TgBlifReader.h "ym_networks/TgBlifReader.h"
@@ -58,6 +61,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET
 
 #endif // YM_NETWORKS_TGBLIFREADER_H

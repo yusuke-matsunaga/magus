@@ -1,6 +1,4 @@
 # Process this file with autoconf to produce a configure script
-#
-# $Id: configure.ac 2507 2009-10-17 16:24:02Z matsunaga $
 
 # ===================================================================
 # Initial block

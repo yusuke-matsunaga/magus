@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVNCASEEQ_H
-#define LIBYM_NETWORKS_MVNCASEEQ_H
+#ifndef MVNCASEEQ_H
+#define MVNCASEEQ_H
 
-/// @file libym_networks/MvnCaseEq.h
+/// @file MvnCaseEq.h
 /// @brief MvnCaseEq のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -64,4 +64,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_MVNEQX_H
+#endif // MVNEQX_H

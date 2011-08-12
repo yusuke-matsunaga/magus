@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_CONSTPARTSELECTCONV_H
-#define LIBYM_NETWORKSBDNCONV_CONSTPARTSELECTCONV_H
+#ifndef CONSTPARTSELECTCONV_H
+#define CONSTPARTSELECTCONV_H
 
-/// @file libym_networks/ConstPartSelectConv.h
+/// @file ConstPartSelectConv.h
 /// @brief ConstPartSelectConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_CONSTPARTSELECTCONV_H
+#endif // CONSTPARTSELECTCONV_H

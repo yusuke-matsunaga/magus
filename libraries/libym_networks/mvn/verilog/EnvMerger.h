@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVN_VERILOG_ENVMERGER_H
-#define LIBYM_NETWORKS_MVN_VERILOG_ENVMERGER_H
+#ifndef ENVMERGER_H
+#define ENVMERGER_H
 
-/// @file libym_networks/mvn/verilog/EnvMerger.h
+/// @file EnvMerger.h
 /// @brief EnvMerger のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -191,4 +191,4 @@ EnvMerger::mgr() const
 
 END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_NETWORKS_MVN_VERILOG_ENVMERGER_H
+#endif // ENVMERGER_H

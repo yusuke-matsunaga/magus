@@ -19,6 +19,9 @@ namespace nsBlif {
   class BNetBlifHandler;
 }
 
+END_NAMESPACE_YM_NETWORKS
+
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetBlifReader BNetBlifReader.h "ym_networks/BNetBlifReader.h"
@@ -62,6 +65,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 #endif // YM_NETWORKS_BNETBLIFREADER_H

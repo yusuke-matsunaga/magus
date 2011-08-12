@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVNCONSTPARTSELECT_H
-#define LIBYM_NETWORKS_MVNCONSTPARTSELECT_H
+#ifndef MVNCONSTPARTSELECT_H
+#define MVNCONSTPARTSELECT_H
 
-/// @file libym_networks/MvnConstPartSelect.h
+/// @file MvnConstPartSelect.h
 /// @brief MvnConstPartSelect のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -75,4 +75,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_MVNCONSTPARTSELECT_H
+#endif // MVNCONSTPARTSELECT_H

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/OrConv.cc
+/// @file OrConv.cc
 /// @brief OrConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

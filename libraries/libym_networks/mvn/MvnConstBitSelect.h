@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVNCONSTBITSELECT_H
-#define LIBYM_NETWORKS_MVNCONSTBITSELECT_H
+#ifndef MVNCONSTBITSELECT_H
+#define MVNCONSTBITSELECT_H
 
-/// @file libym_networks/MvnConstBitSelect.h
+/// @file MvnConstBitSelect.h
 /// @brief MvnConstBitSelect のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -63,4 +63,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_MVNCONSTBITSELECT_H
+#endif // MVNCONSTBITSELECT_H

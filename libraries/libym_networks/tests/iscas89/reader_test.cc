@@ -1,5 +1,5 @@
 
-/// @file libym_networks/tests/iscas89/reader_test.cc
+/// @file reader_test.cc
 /// @brief Iscas89NetworkReader のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

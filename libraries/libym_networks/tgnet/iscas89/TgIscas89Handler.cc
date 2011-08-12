@@ -1,9 +1,7 @@
 
-/// @file libym_networks/tgnet/iscas89/TgIscas89Handler.cc
+/// @file TgIscas89Handler.cc
 /// @brief TgIscas89Handler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: TgIscas89Handler.cc 2043 2009-02-21 07:08:48Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

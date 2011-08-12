@@ -1,11 +1,9 @@
-#ifndef LIBYM_ISCAS89_ISCAS89PARSERIMPL_H
-#define LIBYM_ISCAS89_ISCAS89PARSERIMPL_H
+#ifndef ISCAS89PARSERIMPL_H
+#define ISCAS89PARSERIMPL_H
 
-/// @file libym_iscas89/Iscas89ParserImpl.h
+/// @file Iscas89ParserImpl.h
 /// @brief Iscas89ParserImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89ParserImpl.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -172,4 +170,4 @@ Iscas89ParserImpl::id2loc(ymuint32 id) const
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_ISCAS89_ISCAS89PARSERIMPL_H
+#endif // ISCAS89PARSERIMPL_H

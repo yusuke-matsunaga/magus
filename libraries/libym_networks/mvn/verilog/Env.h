@@ -1,11 +1,11 @@
-#ifndef LIBYM_NETWORKS_VERILOG_ENV_H
-#define LIBYM_NETWORKS_VERILOG_ENV_H
+#ifndef ENV_H
+#define ENV_H
 
-/// @file libym_networks/verilog/Env.h
+/// @file Env.h
 /// @brief Env のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -267,4 +267,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_NETWORKS_VERILOG_ENV_H
+#endif // ENV_H

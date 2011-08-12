@@ -1,9 +1,7 @@
 
-/// @file libym_iscas89/Iscas89ParserImpl.cc
+/// @file Iscas89ParserImpl.cc
 /// @brief BlibParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89ParserImpl.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

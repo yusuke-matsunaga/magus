@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_RXORCONV_H
-#define LIBYM_NETWORKSBDNCONV_RXORCONV_H
+#ifndef RXORCONV_H
+#define RXORCONV_H
 
-/// @file libym_networks/RxorConv.h
+/// @file RxorConv.h
 /// @brief RxorConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_RXORCONV_H
+#endif // RXORCONV_H

@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_MVNCONV_H
-#define LIBYM_NETWORKSBDNCONV_MVNCONV_H
+#ifndef MVNCONV_H
+#define MVNCONV_H
 
-/// @file libym_networks/MvnConv.h
+/// @file MvnConv.h
 /// @brief MvnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -50,4 +50,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_MVNCONV_H
+#endif // MVNCONV_H

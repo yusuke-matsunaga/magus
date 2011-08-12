@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnModule.cc
+/// @file MvnModule.cc
 /// @brief MvnModule の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

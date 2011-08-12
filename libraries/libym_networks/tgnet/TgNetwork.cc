@@ -1,11 +1,9 @@
 
-/// @file libym_networks/TgNetwork.cc
+/// @file TgNetwork.cc
 /// @brief TgNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TgNetwork.cc 1920 2008-12-20 15:52:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,7 +13,7 @@
 #include "LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 // クラス TgNetwork
@@ -60,15 +58,15 @@ TgNetwork::clear()
   mLogicArray.clear();
   mFFOutArray.clear();
   mFFInArray.clear();
-  
+
   mNameHash->clear();
   mLogicMgr->clear();
-  
+
   mNodeAlloc.destroy();
   mFaninAlloc.destroy();
   mEdgeAlloc.destroy();
 }
-  
+
 // @brief node の論理式を取り出す．
 LogExpr
 TgNetwork::get_lexp(const TgNode* node) const
@@ -248,7 +246,7 @@ TgNetwork::wrap_up()
     inode->mFanouts[pos].mIpos = 0;
     ++ pos;
   }
-  
+
   // ソーティングを行う．
   vector<bool> visited(n, false);
   vector<TgNode*> queue(n);
@@ -374,7 +372,7 @@ dump(ostream& s,
 //////////////////////////////////////////////////////////////////////
 // クラス TgNode
 //////////////////////////////////////////////////////////////////////
-  
+
 // コンストラクタ
 TgNode::TgNode(ymuint32 gid) :
   mTypeId(kTgUndef, 0),
@@ -413,4 +411,4 @@ TgNode::set_type(ymuint32 lid,
   mFanoutNum = 0;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET

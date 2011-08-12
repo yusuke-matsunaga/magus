@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_DIVCONV_H
-#define LIBYM_NETWORKSBDNCONV_DIVCONV_H
+#ifndef DIVCONV_H
+#define DIVCONV_H
 
-/// @file libym_networks/DivConv.h
+/// @file DivConv.h
 /// @brief DivConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_DIVCONV_H
+#endif // DIVCONV_H

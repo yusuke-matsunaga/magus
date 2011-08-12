@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetSopDecomp.cc
+/// @file BNetSopDecomp.cc
 /// @brief BNetSopDecomp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetSopDecomp.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +11,7 @@
 #include "ym_networks/BNetManip.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 // @brief コンストラクタ．
 BNetSopDecomp::BNetSopDecomp()
@@ -24,14 +22,14 @@ BNetSopDecomp::BNetSopDecomp()
 BNetSopDecomp::~BNetSopDecomp()
 {
 }
-  
+
 // @brief ネットワーク全体を積和形論理式に分解する．
 // @param[in] network 対象のネットワーク
 void
 BNetSopDecomp::operator()(BNetwork& network)
 {
   mManip = new BNetManip(&network);
-  
+
   BNodeVector node_list;
   network.tsort(node_list);
   size_t n = network.logic_node_num();
@@ -214,4 +212,4 @@ BNetSopDecomp::build_xorsop_tree(size_t b,
   return root_node;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET

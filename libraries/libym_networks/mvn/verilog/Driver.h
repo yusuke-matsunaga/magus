@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_VERILOG_DRIVER_H
-#define LIBYM_NETWORKS_VERILOG_DRIVER_H
+#ifndef DRIVER_H
+#define DRIVER_H
 
-/// @file libym_networks/verilog/Driver.h
+/// @file Driver.h
 /// @brief Driver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -291,4 +291,4 @@ operator!=(const Driver& lhs,
 
 END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_NETWORKS_VERILOG_DRIVER_H
+#endif // DRIVER_H

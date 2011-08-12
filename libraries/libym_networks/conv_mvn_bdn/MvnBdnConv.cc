@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnBdnConv.cc
+/// @file MvnBdnConv.cc
 /// @brief MvnBdnConv の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -1,21 +1,17 @@
 
-/// @file ymlibs/libym_networks/eliminate.cc
+/// @file eliminate.cc
 /// @brief eliminate() の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: eliminate.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
-
-// ネットワークの eliminate, sweep, clean-up, decomp を行うコマンド
 
 
 #include "ym_networks/BNetwork.h"
 #include "ym_networks/BNetManip.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 
 BEGIN_NONAMESPACE
@@ -33,7 +29,7 @@ struct ElimElem
 
   // ファンアウト先のリテラルの出現頻度
   int mOvalue;
-  
+
   // コンストラクタ
   ElimElem(BNode* node = NULL,
 	   int level = 0,
@@ -43,7 +39,7 @@ struct ElimElem
     mOvalue(ovalue)
   {
   }
-  
+
   // ソート用の比較関数
   friend
   bool
@@ -145,7 +141,7 @@ BNetwork::eliminate(int threshold,
   }
 
   BNetManip manip(this);
-  
+
   // ノードを一時的に格納するベクタを確保する．
   // 現在のノード数よりも増えることはないので
   // 現在のノード数だけ確保しておく．
@@ -236,4 +232,4 @@ BNetwork::eliminate(int threshold,
   } while ( eliminated );
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET

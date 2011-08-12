@@ -1,9 +1,7 @@
 
-/// @file libym_iscas89/IdHash.cc
+/// @file IdHash.cc
 /// @brief BlibParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: IdHash.cc 1921 2008-12-21 13:55:05Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

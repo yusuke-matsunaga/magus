@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1097 2007-12-21 08:12:52Z matsunaga $
-
 SUBDIRS =
 
 AM_CPPFLAGS = \

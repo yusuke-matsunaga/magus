@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_BLIF_BLIF_NSDEF_H
-#define LIBYM_NETWORKS_BLIF_BLIF_NSDEF_H
+#ifndef BLIF_NSDEF_H
+#define BLIF_NSDEF_H
 
-/// @file libym_networks/blif/blif_nsdef.h
+/// @file blif_nsdef.h
 /// @brief nsBlif の名前空間の定義
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -39,4 +39,4 @@ class BlifNetworkReader;
 
 END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_NETWORKS_BLIF_BLIF_NSDEF_H
+#endif // BLIF_NSDEF_H

@@ -12,7 +12,7 @@
 #include "ym_networks/bnet.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetEquWriter BNetEquWriter.h <ym_networks/BNetEquWriter.h>
@@ -40,6 +40,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 #endif // YM_NETWORKS_BNETEQUWRITER_H

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/verilog/Env.cc
+/// @file Env.cc
 /// @brief Env の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

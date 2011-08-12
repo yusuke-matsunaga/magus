@@ -4,9 +4,7 @@
 /// @brief .bench(iscas89) フォーマット用の YACC ソース
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id:
-///
-/// Copyright (C) 2010 Yusuke Matsunaga
+/// Copyright (C) 2010 - 2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

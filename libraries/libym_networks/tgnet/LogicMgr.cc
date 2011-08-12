@@ -1,18 +1,16 @@
 
-/// @file libym_networks/LogicMgr.cc
+/// @file LogicMgr.cc
 /// @brief LogicMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LogicMgr.cc 1920 2008-12-20 15:52:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 // @brief コンストラクタ
 LogicMgr::LogicMgr()
@@ -67,7 +65,7 @@ LogicMgr::get(TgGateTemplate gt_id) const
     switch ( type ) {
     case kTgBuff:
       return literals[0];
-      
+
     case kTgNot:
       return ~literals[0];
 
@@ -76,31 +74,31 @@ LogicMgr::get(TgGateTemplate gt_id) const
 	literals[0] &= literals[i];
       }
       return literals[0];
-      
+
     case kTgNand:
       for (size_t i = 1; i < ni; ++ i) {
 	literals[0] &= literals[i];
       }
       return ~literals[0];
-      
+
     case kTgOr:
       for (size_t i = 1; i < ni; ++ i) {
 	literals[0] |= literals[i];
       }
       return literals[0];
-      
+
     case kTgNor:
       for (size_t i = 1; i < ni; ++ i) {
 	literals[0] |= literals[i];
       }
       return ~literals[0];
-      
+
     case kTgXor:
       for (size_t i = 1; i < ni; ++ i) {
 	literals[0] ^= literals[i];
       }
       return literals[0];
-      
+
     case kTgXnor:
       for (size_t i = 1; i < ni; ++ i) {
 	literals[0] ^= literals[i];
@@ -240,14 +238,14 @@ LogicMgr::reg_logic(const LogExpr& lexp)
 
   // 組み込み型のチェック
   tTgGateType type = check_builtin(lexp, ni, tmp_vec);
-  
+
   if ( type != kTgUndef ) {
     return TgGateTemplate(type, ni);
   }
 
   // ハッシュ表から同一の関数がないか調べる．
   size_t pos0 = hash_func(tmp_vec);
-  size_t pos = pos0 % mHashSize; 
+  size_t pos = pos0 % mHashSize;
   for (Cell* cell = mHashTable[pos]; cell; cell = cell->mLink) {
     if ( cell->mId.ni() == ni && equiv(cell, tmp_vec) ) {
       // 同じ関数が登録されていた．
@@ -258,13 +256,13 @@ LogicMgr::reg_logic(const LogExpr& lexp)
       return cell->mId;
     }
   }
-  
+
   if ( num() > mNextLimit ) {
     // ハッシュ表を拡大する．
     expand();
     pos = pos0 % mHashSize;
   }
-  
+
   Cell* new_cell = new Cell;
   type = static_cast<tTgGateType>(mCellArray.size() + kBase);
   new_cell->mId = TgGateTemplate(type, ni);
@@ -352,10 +350,10 @@ operator<<(ostream& s,
 
   case kTgInput:  s << "--INPUT--"; break;
   case kTgOutput: s << "--OUTPUT--"; break;
-    
+
   case kTgConst0: s << "--CONST0--"; break;
   case kTgConst1: s << "--CONST1--"; break;
-    
+
   case kTgBuff:   s << "--BUFF--"; break;
   case kTgNot:    s << "--NOT--"; break;
 
@@ -382,4 +380,4 @@ operator<<(ostream& s,
   return s;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET

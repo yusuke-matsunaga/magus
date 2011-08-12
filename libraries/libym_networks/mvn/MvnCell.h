@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVN_MVNCELL_H
-#define LIBYM_NETWORKS_MVN_MVNCELL_H
+#ifndef MVNCELL_H
+#define MVNCELL_H
 
-/// @file libym_networks/mvn/MvnCell.h
+/// @file MvnCell.h
 /// @brief MvnCell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -69,4 +69,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_MVN_MVNCELL_H
+#endif // MVNCELL_H

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MultConv.cc
+/// @file MultConv.cc
 /// @brief MultConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

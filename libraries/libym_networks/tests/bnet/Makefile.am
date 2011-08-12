@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1921 2008-12-21 13:55:05Z matsunaga $
-
 SUBDIRS =
 
 EXTRA_DIST = local_defs $(TESTS)

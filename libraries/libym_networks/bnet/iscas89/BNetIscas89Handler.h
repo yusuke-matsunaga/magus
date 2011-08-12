@@ -1,11 +1,9 @@
-#ifndef LIBYM_NETWORKS_BNET_ISCAS89_BNETISCAS89HANDLER_H
-#define LIBYM_NETWORKS_BNET_ISCAS89_BNETISCAS89HANDLER_H
+#ifndef BNETISCAS89HANDLER_H
+#define BNETISCAS89HANDLER_H
 
-/// @file libym_networks/bnet/iscas89/BNetIscas89Handler.h
+/// @file BNetIscas89Handler.h
 /// @brief BNetIscas89Handler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BNetIscas89Reader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -133,4 +131,4 @@ private:
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_NETWORKS_BNET_ISCAS89_BNETISCAS89HANDLER_H
+#endif // BNETISCAS89HANDLER_H

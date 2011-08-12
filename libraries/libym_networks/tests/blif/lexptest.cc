@@ -1,9 +1,7 @@
 
-/// @file libym_networks/tests/blif/lexptest.cc
+/// @file lexptest.cc
 /// @brief blif ファイルの読み込みに置ける LogExpr の性能テスト
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: lexptest.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

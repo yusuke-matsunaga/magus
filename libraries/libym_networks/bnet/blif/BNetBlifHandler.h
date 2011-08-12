@@ -1,11 +1,9 @@
-#ifndef LIBYM_NETWORKS_BNET_BLIF_BNETBLIFHANDLER_H
-#define LIBYM_NETWORKS_BNET_BLIF_BNETBLIFHANDLER_H
+#ifndef BNETBLIFHANDLER_H
+#define BNETBLIFHANDLER_H
 
-/// @file libym_networks/bnet/blif/BNetBlifHandler.h
+/// @file BNetBlifHandler.h
 /// @brief BNetBlifHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BNetBlifReader.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -189,4 +187,4 @@ private:
 
 END_NAMESPACE_YM_BLIF
 
-#endif // LIBYM_NETWORKS_BNET_BLIF_BNETBLIFHANDLER_H
+#endif // BNETBLIFHANDLER_H

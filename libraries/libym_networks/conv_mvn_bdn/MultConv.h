@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_MULTCONV_H
-#define LIBYM_NETWORKSBDNCONV_MULTCONV_H
+#ifndef MULTCONV_H
+#define MULTCONV_H
 
-/// @file libym_networks/MultConv.h
+/// @file MultConv.h
 /// @brief MultConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_MULTCONV_H
+#endif // MULTCONV_H

@@ -19,6 +19,9 @@ namespace nsIscas89 {
   class BNetIscas89Handler;
 }
 
+END_NAMESPACE_YM_NETWORKS
+
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetIscas89Reader BNetIscas89Reader.h "ym_networks/BNetIscas89Reader.h"
@@ -62,6 +65,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 #endif // YM_NETWORKS_BNETISCAS89READER_H

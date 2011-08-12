@@ -19,6 +19,10 @@ namespace nsIscas89 {
   class TgIscas89Handler;
 }
 
+END_NAMESPACE_YM_NETWORKS
+
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
+
 //////////////////////////////////////////////////////////////////////
 /// @class TgIscas89Reader TgIscas89Reader.h "ym_networks/TgIscas89Reader.h"
 /// @brief iscas89 形式のファイルを読み込むためのクラス
@@ -57,6 +61,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET
 
 #endif // YM_NETWORKS_TGISCAS89READER_H

@@ -1,11 +1,9 @@
-#ifndef YM_ISCAS89_ISCAS89PARSER_H
-#define YM_ISCAS89_ISCAS89PARSER_H
+#ifndef ISCAS89PARSER_H
+#define ISCAS89PARSER_H
 
-/// @file ym_iscas89/Iscas89Parser.h
+/// @file Iscas89Parser.h
 /// @brief Iscas89Parser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89Parser.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/DivConv.cc
+/// @file DivConv.cc
 /// @brief DivConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -1,9 +1,7 @@
 
-/// @file libym_networks/tests/base_test.cc
+/// @file base_test.cc
 /// @brief BdnMgr の基本機能のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: base_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.

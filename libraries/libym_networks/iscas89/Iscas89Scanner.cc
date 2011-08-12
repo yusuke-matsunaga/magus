@@ -1,9 +1,7 @@
 
-/// @file libym_networks/Iscas89Scanner.cc
+/// @file Iscas89Scanner.cc
 /// @brief Iscas89Scanner の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89Scanner.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.

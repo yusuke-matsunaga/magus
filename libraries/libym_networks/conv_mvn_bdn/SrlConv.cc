@@ -1,5 +1,5 @@
 
-/// @file libym_networks/SrlConv.cc
+/// @file SrlConv.cc
 /// @brief SrlConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

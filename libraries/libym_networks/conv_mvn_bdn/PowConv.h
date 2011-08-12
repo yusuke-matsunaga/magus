@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_POWCONV_H
-#define LIBYM_NETWORKSBDNCONV_POWCONV_H
+#ifndef POWCONV_H
+#define POWCONV_H
 
-/// @file libym_networks/PowConv.h
+/// @file PowConv.h
 /// @brief PowConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_POWCONV_H
+#endif // POWCONV_H

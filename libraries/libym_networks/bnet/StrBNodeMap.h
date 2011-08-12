@@ -1,13 +1,11 @@
-#ifndef LIBYM_NETWORKS_STRBNODEMAP_H
-#define LIBYM_NETWORKS_STRBNODEMAP_H
+#ifndef STRBNODEMAP_H
+#define STRBNODEMAP_H
 
-/// @file libym_networks/StrBNodeMap.h
+/// @file StrBNodeMap.h
 /// @brief StrBNodeMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: StrBNodeMap.h 1920 2008-12-20 15:52:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,7 +14,7 @@
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class StrBNodeMap StrBNodeMap.h "StrBNodeMap.h"
@@ -84,13 +82,13 @@ private:
   // Cell を未使用にする．
   void
   free_cell(Cell* cell);
-  
+
   // cell の名前が name に等しければ true を返す．
   static
   bool
   check_name(Cell* cell,
 	     const char* name);
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -102,7 +100,7 @@ private:
 
   // 未使用の Cell の先頭
   Cell* mAvail;
-  
+
   // ハッシュ表の大きさ
   size_t mTableSize;
 
@@ -114,7 +112,7 @@ private:
 
   // ハッシュ表を拡大する基準値
   size_t mNextLimit;
-  
+
 };
 
 
@@ -132,6 +130,6 @@ StrBNodeMap::check_name(Cell* cell,
   return name[0] == name1[0] && strcmp(name1, name) == 0;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
-#endif // LIBYM_NETWORKS_STRBNODEMAP_H
+#endif // STRBNODEMAP_H

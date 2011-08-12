@@ -1,20 +1,14 @@
 
-/// @file libym_networks/tests/makenode.cc
+/// @file makenode.cc
 /// @brief BNode を生成するテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: makenode.cc 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
-#include <ym_networks/BNetwork.h>
-#include <ym_networks/BNetManip.h>
+#include "ym_networks/BNetwork.h"
+#include "ym_networks/BNetManip.h"
 
 
 int
@@ -23,11 +17,11 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  
+
   try {
     BNetwork network;
     BNetManip manip(&network);
-    
+
     for (size_t i = 0; i < 1000000; ++ i) {
       manip.new_logic();
     }

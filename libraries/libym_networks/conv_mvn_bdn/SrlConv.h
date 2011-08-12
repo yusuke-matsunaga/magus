@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_SRLCONV_H
-#define LIBYM_NETWORKSBDNCONV_SRLCONV_H
+#ifndef SRLCONV_H
+#define SRLCONV_H
 
-/// @file libym_networks/SrlConv.h
+/// @file SrlConv.h
 /// @brief SrlConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_SRLCONV_H
+#endif // SRLCONV_H

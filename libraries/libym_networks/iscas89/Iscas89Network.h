@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORK_H
-#define LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORK_H
+#ifndef ISCAS89NETWORK_H
+#define ISCAS89NETWORK_H
 
-/// @file libym_networks/iscas89/Iscas89Network.h
+/// @file Iscas89Network.h
 /// @brief Iscas89Network のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -386,4 +386,4 @@ Iscas89Network::gate(ymuint32 pos) const
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORK_H
+#endif // ISCAS89NETWORK_H

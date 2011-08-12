@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_SLACONV_H
-#define LIBYM_NETWORKSBDnCONV_SLACONV_H
+#ifndef SLACONV_H
+#define SLACONV_H
 
-/// @file libym_networks/SlaConv.h
+/// @file SlaConv.h
 /// @brief SlaConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_SLACONV_H
+#endif // SLACONV_H

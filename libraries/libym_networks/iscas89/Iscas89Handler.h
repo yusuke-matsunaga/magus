@@ -1,11 +1,9 @@
-#ifndef YM_ISCAS89_ISCAS89HANDLER_H
-#define YM_ISCAS89_ISCAS89HANDLER_H
+#ifndef ISCAS89HANDLER_H
+#define ISCAS89HANDLER_H
 
-/// @file ym_iscas89/Iscas89Handler.h
+/// @file Iscas89Handler.h
 /// @brief Iscas89Handler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89Handler.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -121,4 +119,4 @@ private:
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // YM_ISCAS89_ISCAS89HANDLER_H
+#endif // ISCAS89HANDLER_H

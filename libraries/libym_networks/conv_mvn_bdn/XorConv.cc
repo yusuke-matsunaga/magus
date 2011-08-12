@@ -1,5 +1,5 @@
 
-/// @file libym_networks/XorConv.cc
+/// @file XorConv.cc
 /// @brief XorConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

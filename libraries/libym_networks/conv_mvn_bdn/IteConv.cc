@@ -1,5 +1,5 @@
 
-/// @file libym_networks/IteConv.cc
+/// @file IteConv.cc
 /// @brief IteConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

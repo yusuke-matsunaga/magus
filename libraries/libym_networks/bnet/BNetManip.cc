@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetManip.cc
+/// @file BNetManip.cc
 /// @brief BNetManip の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetManip.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +11,7 @@
 #include "BNodeMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 // @brief コンストラクタ．
 // @param[in] network 操作対象のネットワーク
@@ -154,13 +152,13 @@ BNetManip::replace_node(BNode* old_node,
   }
 
   if ( old_node->parent() != mNetwork ) {
-    // old_node はこのネットワークに属している節点ではない 
+    // old_node はこのネットワークに属している節点ではない
     BNET_ERROR("node is not a member of the network.");
     return false;
   }
 
   if ( new_node->parent() != mNetwork ) {
-    // new_node はこのネットワークに属している節点ではない 
+    // new_node はこのネットワークに属している節点ではない
     BNET_ERROR("node is not a member of the network.");
     return false;
   }
@@ -288,7 +286,7 @@ BNetManip::change_logic(BNode* node,
     BNET_ERROR("node is not a logic node.");
     return false;
   }
-  
+
   // Phase-1: 重複したファンインを一つにまとめる処理を行う．
   size_t orig_ni = fanins.size();
   size_t new_ni = 0;
@@ -337,7 +335,7 @@ BNetManip::change_logic(BNode* node,
     // リテラルを付け替えたファクタードフォームを作る．
     new_expr = new_expr.remap_var(mTmpMap);
   }
-  
+
   // Phase-2: new_expr に現れないリテラルに対応したファンインは削除する．
   bool redundant = false;
   for (size_t i = 0; i < new_ni; i ++) {
@@ -373,7 +371,7 @@ BNetManip::change_logic(BNode* node,
     }
     mark_TFO(node);
   }
-    
+
   bool ans = true;
   for (size_t i = 0; i < new_ni; i ++) {
     BNode* inode = mTmpNodes[i];
@@ -400,11 +398,11 @@ BNetManip::change_logic(BNode* node,
   if ( tfo_check ) {
     clear_TFO(node);
   }
-  
+
   if ( !ans ) {
     return false;
   }
-  
+
   // 内容をセットしなおす．
   mNetwork->set_node_func(node, new_expr);
   mNetwork->set_node_fanins(node, mTmpNodes);
@@ -504,7 +502,7 @@ BNetManip::change_latch(BNode* node,
     BNET_ERROR("node is not a member of the network.");
     return false;
   }
-  
+
   if ( fanin->parent() != mNetwork ) {
     // このネットワークに属している節点ではない．
     BNET_ERROR("fanin is not a member of the network.");
@@ -526,7 +524,7 @@ BNetManip::change_latch(BNode* node,
   // 内容をセットしなおす．
   mNetwork->set_node_fanins(node, vector<BNode*>(1, fanin));
   mNetwork->set_node_reset_value(node, reset_value);
-  
+
   // 正常終了
   return true;
 }
@@ -904,4 +902,4 @@ BNetManip::make_xnor(const BNodeVector& fanins,
   return node;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET

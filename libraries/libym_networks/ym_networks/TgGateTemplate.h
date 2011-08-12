@@ -5,14 +5,14 @@
 /// @brief 論理ゲートの種類を定義したファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_networks/tgnet.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgGateTemplate TgGateTemplate.h <ym_networks/TgGateTemplate.h>
@@ -89,6 +89,6 @@ TgGateTemplate::ni() const
   return static_cast<size_t>(mData & 0xFFF);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET
 
 #endif // YM_NETWORKS_TGGATETEMPLATE_H

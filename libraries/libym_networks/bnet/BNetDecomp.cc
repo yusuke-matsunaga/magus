@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetDecomp.cc
+/// @file BNetDecomp.cc
 /// @brief BNetDecomp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetDecomp.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +12,7 @@
 #include "ym_utils/HeapTree.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NONAMESPACE
 
@@ -24,9 +22,9 @@ struct Node
   BNode* mNode;
   tPol mPol;
   int mDepth;
-    
+
   Node() { }
-  
+
   Node(BNode* node,
        tPol pol,
        int depth) :
@@ -60,7 +58,7 @@ BNetDecomp::BNetDecomp()
 BNetDecomp::~BNetDecomp()
 {
 }
-  
+
 // @brief 単純分解を行う．(バランス型: type1)
 // @param[in] network 操作対象のネットワーク
 // @param[in] max_fanin ファンインの最大数(0, 1で制限なし)
@@ -74,7 +72,7 @@ BNetDecomp::operator()(BNetwork& network,
 		       bool no_xor)
 {
   network.sweep();
-  
+
   mDepthMap.clear();
 
   // 入力ノードとFFノードの深さを0とする．
@@ -88,16 +86,16 @@ BNetDecomp::operator()(BNetwork& network,
     BNode* node = *p;
     mDepthMap.insert(make_pair(node->id(), 0));
   }
-  
+
   mManip = new BNetManip(&network);
-  
+
   // 内部ノードを入力側からのトポロジカル順で処理する．
   BNodeVector node_list;
   network.tsort(node_list);
   ymuint n = network.logic_node_num();
   for (ymuint i = 0; i < n; ++ i) {
     BNode* node = node_list[i];
-    
+
     ymuint max_fanin1 = ( max_fanin < 2 ) ? node->ni() : max_fanin;
     const LogExpr& expr = node->func();
     if ( !expr.is_simple() || expr.litnum() > max_fanin || no_xor && expr.is_xor() ) {
@@ -114,7 +112,7 @@ BNetDecomp::operator()(BNetwork& network,
   delete mManip;
   mManip = NULL;
 }
-  
+
 // @brief 単純分解を行う．(ランダム型: type2)
 // @param[in] network 操作対象のネットワーク
 // @param[in] max_fanin ファンインの最大数(0, 1で制限なし)
@@ -130,17 +128,17 @@ BNetDecomp::operator()(BNetwork& network,
 		       bool no_xor)
 {
   network.sweep();
-  
+
   mRandGen = &randgen;
-  
+
   mManip = new BNetManip(&network);
-  
+
   BNodeVector node_list;
   network.tsort(node_list);
   ymuint n = network.logic_node_num();
   for (ymuint i = 0; i < n; ++ i) {
     BNode* node = node_list[i];
-    
+
     ymuint max_fanin1 = ( max_fanin < 2 ) ? node->ni() : max_fanin;
     const LogExpr& expr = node->func();
     if ( !expr.is_simple() || expr.litnum() > max_fanin1 || no_xor && expr.is_xor() ) {
@@ -152,7 +150,7 @@ BNetDecomp::operator()(BNetwork& network,
   delete mManip;
   mManip = NULL;
 }
-  
+
 // decomp_type1 で用いられるサブルーティン
 // expr を根とする論理式を分解して root_node を根のノード
 // とする木を作る．
@@ -174,7 +172,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
   for (ymuint i = 0; i < ni; i ++) {
     LogExpr opr1 = expr.child(i);
     assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
-    
+
     BNode* node1;
     tPol pol1;
     if ( opr1.is_literal() ) {
@@ -200,7 +198,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
     // ファンイン数制限なし
     max_fanin = ni;
   }
-  
+
   vector<BNode*> fanins;
   vector<LogExpr> literals;
   fanins.reserve(max_fanin);
@@ -215,7 +213,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
       fanins.push_back(tmp1.mNode);
       literals.push_back(LogExpr::make_literal(new_ni, tmp1.mPol));
     }
-    
+
     LogExpr tmp_expr;
     if ( expr.is_and() ) {
       tmp_expr = LogExpr::make_and(literals);
@@ -263,7 +261,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
     work.put(Node(node, kPolPosi, d));
   }
 }
-  
+
 // decomp_type2_sub で用いられるサブルーティン
 // expr を根とする論理式を分解して root_node を根のノード
 // とする木を作る．
@@ -284,7 +282,7 @@ BNetDecomp::decomp_type2_sub(BNode* orig_node,
   for (ymuint i = 0; i < ni; i ++) {
     LogExpr opr1 = expr.child(i);
     assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
-    
+
     BNode* node1;
     tPol pol1;
     if ( opr1.is_literal() ) {
@@ -340,15 +338,15 @@ BNetDecomp::build_tree(ymuint b,
   ymuint new_ni = ni / max_fanin;
   // ただし 0 から (nodd - 1) までは + 1する．
   ymuint nodd = ni % max_fanin;
-  
+
   ymuint real_fanin = ni;
   if ( real_fanin > max_fanin ) {
     real_fanin = max_fanin;
   }
-  
+
   vector<BNode*> fanins(real_fanin);
   vector<LogExpr> literals(real_fanin);
-  
+
   ymuint b0 = b;
   for (ymuint i = 0; i < real_fanin; ++ i) {
     ymuint b1 = b0;
@@ -429,4 +427,4 @@ BNetDecomp::calc_depth(BNode* node)
   return d;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET

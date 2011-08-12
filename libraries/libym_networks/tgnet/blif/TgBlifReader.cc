@@ -1,9 +1,7 @@
 
-/// @file libym_networks/tgnet/blif/TgBlifReader.cc
+/// @file TgBlifReader.cc
 /// @brief TgBlifReader の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: TgBlifReader.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -14,7 +12,7 @@
 #include "TgBlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 // blif 形式のファイルを読み込むためのクラス
@@ -45,4 +43,4 @@ TgBlifReader::operator()(const string& filename,
   return stat;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET

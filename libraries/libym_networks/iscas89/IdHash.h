@@ -1,11 +1,9 @@
-#ifndef LIBYM_ISCAS89_IDHASH_H
-#define LIBYM_ISCAS89_IDHASH_H
+#ifndef IDHASH_H
+#define IDHASH_H
 
-/// @file libym_iscas89/IdHash.h
+/// @file IdHash.h
 /// @brief IdHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: IdHash.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -356,4 +354,4 @@ IdHash::def_loc(ymuint32 id) const
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_ISCAS89_IDHASH_H
+#endif // IDHASH_H

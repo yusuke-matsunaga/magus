@@ -1,11 +1,9 @@
-#ifndef LIBYM_ISCAS89_ISCAS89SCANNER_H
-#define LIBYM_ISCAS89_ISCAS89SCANNER_H
+#ifndef ISCAS89SCANNER_H
+#define ISCAS89SCANNER_H
 
-/// @file libym_iscas89/Iscas89Scanner.h
+/// @file Iscas89Scanner.h
 /// @brief Iscas89Scanner のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89Scanner.h 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -82,4 +80,4 @@ Iscas89Scanner::cur_string()
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_ISCAS89_ISCAS89SCANNER_H
+#endif // ISCAS89SCANNER_H

@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_VERILOG_DECLMAP_H
-#define LIBYM_NETWORKS_VERILOG_DECLMAP_H
+#ifndef DECLMAP_H
+#define DECLMAP_H
 
-/// @file libym_networks/verilog/DeclMap.h
+/// @file DeclMap.h
 /// @brief DeclMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -146,4 +146,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_NETWORKS_VERILOG_DECLMAP_H
+#endif // DECLMAP_H

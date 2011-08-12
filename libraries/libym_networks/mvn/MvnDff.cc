@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnDff.cc
+/// @file MvnDff.cc
 /// @brief MvnDff の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

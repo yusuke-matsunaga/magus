@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnConstBitSelect.cc
+/// @file MvnConstBitSelect.cc
 /// @brief MvnConstBitSelect の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

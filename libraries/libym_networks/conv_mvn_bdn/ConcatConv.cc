@@ -1,5 +1,5 @@
 
-/// @file libym_networks/ConcatConv.cc
+/// @file ConcatConv.cc
 /// @brief ConcatConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

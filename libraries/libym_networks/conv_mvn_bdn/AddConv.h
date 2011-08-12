@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_ADDCONV_H
-#define LIBYM_NETWORKSBDNCONV_ADDCONV_H
+#ifndef ADDCONV_H
+#define ADDCONV_H
 
-/// @file libym_bdn_mvnconv/AddConv.h
+/// @file AddConv.h
 /// @brief AddConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_ADDCONV_H
+#endif // ADDCONV_H

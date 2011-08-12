@@ -12,7 +12,7 @@
 #include "ym_networks/BNetwork.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetManip BNetManip.h <ym_networks/BNetManip.h>
@@ -1091,6 +1091,6 @@ BNetManip::sop_litnum()
   return mNetwork->sop_litnum();
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 #endif // YM_NETWORKS_BNETMANIP_H

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnConstPartSelect.cc
+/// @file MvnConstPartSelect.cc
 /// @brief MvnConstPartSelect の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVN_MVNDFF_H
-#define LIBYM_NETWORKS_MVN_MVNDFF_H
+#ifndef MVNDFF_H
+#define MVNDFF_H
 
-/// @file libym_networks/mvn/MvnDff.h
+/// @file MvnDff.h
 /// @brief MvnDff のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -94,4 +94,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_MVN_MVNDFF_H
+#endif // MVNDFF_H

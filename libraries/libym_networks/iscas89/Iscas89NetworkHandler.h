@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORKHANDLER_H
-#define LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORKHANDLER_H
+#ifndef ISCAS89NETWORKHANDLER_H
+#define ISCAS89NETWORKHANDLER_H
 
-/// @file libym_networks/iscas89/Iscas89NetworkHandler.h
+/// @file Iscas89NetworkHandler.h
 /// @brief Iscas89NetworkHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -101,4 +101,4 @@ private:
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_NETWORKS_ISCAS89_ISCAS89NETWORKHANDLER_H
+#endif // ISCAS89NETWORKHANDLER_H

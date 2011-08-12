@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_MODCONV_H
-#define LIBYM_NETWORKSBDNCONV_MODCONV_H
+#ifndef MODCONV_H
+#define MODCONV_H
 
-/// @file libym_networks/ModConv.h
+/// @file ModConv.h
 /// @brief ModConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_MODCONV_H
+#endif // MODCONV_H

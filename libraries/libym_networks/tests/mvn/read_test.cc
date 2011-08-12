@@ -1,9 +1,7 @@
 
-/// @file libym_networks/tests/read_test.cc
+/// @file read_test.cc
 /// @brief MvnNode を生成するテスト
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: read.cc 1343 2008-03-25 17:15:35Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

@@ -1,5 +1,5 @@
 
-/// @file libym_networks/mvn/MvnCell.cc
+/// @file MvnCell.cc
 /// @brief MvnCell の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

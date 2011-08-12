@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_SRACONV_H
-#define LIBYM_NETWORKSBDNCONV_SRACONV_H
+#ifndef SRACONV_H
+#define SRACONV_H
 
-/// @file libym_networks/SraConv.h
+/// @file SraConv.h
 /// @brief SraConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_SRACONV_H
+#endif // SRACONV_H

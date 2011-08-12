@@ -1,13 +1,11 @@
-#ifndef LIBYM_NETWORKS_TGNET_ISCAS89_TGISCAS89HANDLER_H
-#define LIBYM_NETWORKS_TGNET_ISCAS89_TGISCAS89HANDLER_H
+#ifndef TGISCAS89HANDLER_H
+#define TGISCAS89HANDLER_H
 
-/// @file libym_networks/TgIscas89Handler.h
+/// @file TgIscas89Handler.h
 /// @brief TgIscas89Handler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TgIscas89Handler.h 2043 2009-02-21 07:08:48Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -135,4 +133,4 @@ private:
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // LIBYM_NETWORKS_TGNET_ISCAS89_TGISCAS89HANDLER_H
+#endif // TGISCAS89HANDLER_H

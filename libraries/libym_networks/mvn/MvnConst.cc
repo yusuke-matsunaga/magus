@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnConst.cc
+/// @file MvnConst.cc
 /// @brief MvnConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

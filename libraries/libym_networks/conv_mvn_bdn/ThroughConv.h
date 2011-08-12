@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_THROUGHCONV_H
-#define LIBYM_NETWORKSBDNCONV_THROUGHCONV_H
+#ifndef THROUGHCONV_H
+#define THROUGHCONV_H
 
-/// @file libym_networks/ThroughConv.h
+/// @file ThroughConv.h
 /// @brief ThroughConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_THROUGHCONV_H
+#endif // THROUGHCONV_H

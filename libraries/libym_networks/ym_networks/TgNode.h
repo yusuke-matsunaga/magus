@@ -13,7 +13,7 @@
 #include "ym_networks/TgGateTemplate.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class TgEdge TgEdge.h <ym_networks/TgNode.h>
@@ -404,6 +404,6 @@ TgNode::alt_node() const
   return mAltNode;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET
 
 #endif // YM_NETWORKS_TGNODE_H

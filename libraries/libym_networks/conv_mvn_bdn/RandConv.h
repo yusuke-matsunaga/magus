@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_RANDCONV_H
-#define LIBYM_NETWORKSBDNCONV_RANDCONV_H
+#ifndef RANDCONV_H
+#define RANDCONV_H
 
-/// @file libym_networks/RandConv.h
+/// @file RandConv.h
 /// @brief RandConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_RANDCONV_H
+#endif // RANDCONV_H

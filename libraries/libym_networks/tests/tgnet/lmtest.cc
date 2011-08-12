@@ -1,18 +1,16 @@
 
-/// @file libym_networks/tests/lmtest.cc
+/// @file lmtest.cc
 /// @brief LogicMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: lmtest.cc 1920 2008-12-20 15:52:42Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "LogicMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 void
 test1(const LogExpr& expr,
@@ -23,7 +21,7 @@ test1(const LogExpr& expr,
   cout << "  ID = " << id << endl;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,7 +34,7 @@ main(int argc,
 {
   using namespace std;
   using namespace nsYm;
-  using namespace nsYm::nsNetworks;
+  using namespace nsYm::nsNetworks::nsTgnet;
 
   try {
     LogExpr v0 = LogExpr::make_posiliteral(0);

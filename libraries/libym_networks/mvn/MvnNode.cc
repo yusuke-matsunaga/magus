@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnNode.cc
+/// @file MvnNode.cc
 /// @brief MvnNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

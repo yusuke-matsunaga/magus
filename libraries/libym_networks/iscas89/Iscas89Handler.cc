@@ -1,9 +1,7 @@
 
-/// @file libym_iscas89/Iscas89Handler.cc
+/// @file Iscas89Handler.cc
 /// @brief BlibHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Iscas89Handler.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.

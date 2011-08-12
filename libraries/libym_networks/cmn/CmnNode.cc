@@ -1,5 +1,5 @@
 
-/// @file libym_networks/cmn/CmnNode.cc
+/// @file CmnNode.cc
 /// @brief CmnNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

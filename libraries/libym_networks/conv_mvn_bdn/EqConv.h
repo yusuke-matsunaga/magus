@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_EQCONV_H
-#define LIBYM_NETWORKSBDNCONV_EQCONV_H
+#ifndef EQCONV_H
+#define EQCONV_H
 
-/// @file libym_networks/EqConv.h
+/// @file EqConv.h
 /// @brief EqConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_EQCONV_H
+#endif // EQCONV_H

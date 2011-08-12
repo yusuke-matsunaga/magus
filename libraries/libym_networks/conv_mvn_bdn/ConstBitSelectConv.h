@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_CONSTBITSELECTCONV_H
-#define LIBYM_NETWORKSBDNCONV_CONSTBITSELECTCONV_H
+#ifndef CONSTBITSELECTCONV_H
+#define CONSTBITSELECTCONV_H
 
-/// @file libym_networks/ConstBitSelectConv.h
+/// @file ConstBitSelectConv.h
 /// @brief ConstBitSelectConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_CONSTBITSELECTCONV_H
+#endif // CONSTBITSELECTCONV_H

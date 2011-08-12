@@ -1,5 +1,5 @@
 
-/// @file libym_networks/MvnCaseEq.cc
+/// @file MvnCaseEq.cc
 /// @brief MvnCaseEq の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

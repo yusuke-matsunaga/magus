@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetwork.cc
+/// @file BNetwork.cc
 /// @brief BNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetwork.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,7 +13,7 @@
 #include "BNodeMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 // コンストラクタ
 BNetwork::BNetwork() :
@@ -171,7 +169,7 @@ void
 BNetwork::set_model_name(const char* name)
 {
   mModelName = name;
-} 
+}
 
 // @brief モデル名を設定する．
 // @param[in] name 設定するモデル名
@@ -195,7 +193,7 @@ BNetwork::clear()
     BNode* node = *p;
     set_node_fanins(node, null_fanins);
   }
-  
+
   mPiList.clear();
   mPoList.clear();
   mLogicList.clear();
@@ -204,7 +202,7 @@ BNetwork::clear()
 
   mNameMap->clear();
   mPoMap->clear();
-  
+
   mItvlMgr.clear();
   mItvlMgr.erase(0);
   mNameMgr.clear();
@@ -231,7 +229,7 @@ BNetwork::copy(const BNetwork& src)
   vector<BNode*> node_assoc(n, NULL);
 
   set_model_name(src.model_name());
-  
+
   BNetManip manip(this);
 
   //////////////////////////////////////////////////////////////////////
@@ -239,7 +237,7 @@ BNetwork::copy(const BNetwork& src)
   //          内部情報はまだ設定できない．
   //          この時点では型と名前だけ．
   //////////////////////////////////////////////////////////////////////
-  
+
   // 外部入力ノード
   for (BNodeList::const_iterator p = src.inputs_begin();
        p != src.inputs_end(); ++ p) {
@@ -340,9 +338,9 @@ void
 BNetwork::lexp_simplify()
 {
   BNetManip manip(this);
-  
+
   sweep();
-  
+
   ymuint n = logic_node_num();
   BNodeVector node_list;
   tsort(node_list);
@@ -353,7 +351,7 @@ BNetwork::lexp_simplify()
       manip.eliminate_node(node);
     }
   }
-  
+
   sweep();
 }
 
@@ -363,7 +361,7 @@ void
 BNetwork::lexp_simplify_node(BNode* node)
 {
   if ( node->parent() != this ) {
-    // node はこのネットワークに属している節点ではない 
+    // node はこのネットワークに属している節点ではない
     BNET_ERROR("node is not a member of the network.");
     return;
   }
@@ -395,7 +393,7 @@ BNetwork::clean_up()
       del_nodes.push_back(node);
     }
   }
-  
+
   // キューが空になるまで削除を続ける．
   // 自分が削除された時にそのファンインのノード
   // のファンアウト数が0になればをキューに積む．
@@ -426,7 +424,7 @@ void
 BNetwork::sweep()
 {
   BNetManip manip(this);
-  
+
   ymuint n_old = 0;
   ymuint n_new = logic_node_num();
   ymuint lit_old = 0;
@@ -507,7 +505,7 @@ BNetwork::new_node(BNode::tType type,
     node->mParent = this;
     mNodeVector.push_back(node);
     // 名前はダミー
-    mNodeName.push_back(NULL); 
+    mNodeName.push_back(NULL);
   }
   BNode* node = mNodeVector[iid];
 
@@ -549,7 +547,7 @@ BNetwork::new_node(BNode::tType type,
 
   // 構造が変わった
   structure_changed();
-  
+
   // 正常終了
   return node;
 }
@@ -607,7 +605,7 @@ BNetwork::delete_node(BNode* node)
 
   // 実際には node は mNodeVector[node->mId] に残ったまま
   // ただし ID そのものは回収されている
-  
+
   // 正常終了
   return true;
 }
@@ -666,7 +664,7 @@ BNetwork::set_node_type(BNode* node,
     BNET_ERROR("illegal node type.");
     break;
   }
-  
+
   // 構造が変わった
   structure_changed();
 }
@@ -774,7 +772,7 @@ BNetwork::set_node_fanins(BNode* node,
     change_edge_fanin(edge, from, NULL);
     edge->mFrom = NULL;
   }
-  
+
   // 新しいファンイン用の配列を確保する．
   BNodeMgr& mgr = BNodeMgr::the_obj();
   ymuint new_ni = fanins.size();
@@ -829,7 +827,7 @@ BNetwork::set_node_func(BNode* node,
     return;
   }
   node->mFunc = lexp;
-  
+
   // node の論理式が変わった．
   mTraceMgr.prop_event(BNetChg::node_func(node->id()));
 }
@@ -870,7 +868,7 @@ BNetwork::tsort(BNodeVector& node_list,
     BNode* node = *p;
     node->flags_set_temp();
   }
-  
+
   for (BNodeList::const_iterator p = logic_nodes_begin();
        p != logic_nodes_end(); ++p) {
     BNode* node = *p;
@@ -893,7 +891,7 @@ BNetwork::tsort(BNodeVector& node_list,
     BNode* node = *p;
     node->flags_clr_temp();
   }
-  
+
   if ( reverse ) {
     // node_list を逆順にならべる．
     ymuint i = 0;
@@ -926,7 +924,7 @@ BNetwork::acyclic_check() const
     BNode* node = *p;
     node->flags_set_temp();
   }
-  
+
   for (BNodeList::const_iterator p = logic_nodes_begin();
        p != logic_nodes_end(); ++p) {
     BNode* node = *p;
@@ -1000,4 +998,4 @@ BNetworkTrace::~BNetworkTrace()
   unbind();
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET

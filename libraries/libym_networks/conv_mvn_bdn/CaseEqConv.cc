@@ -1,5 +1,5 @@
 
-/// @file libym_networks/CaseEqConv.cc
+/// @file CaseEqConv.cc
 /// @brief CaseEqConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

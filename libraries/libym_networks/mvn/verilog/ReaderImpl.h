@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_MVN_VERILOG_READERIMPL_H
-#define LIBYM_NETWORKS_MVN_VERILOG_READERIMPL_H
+#ifndef READERIMPL_H
+#define READERIMPL_H
 
-/// @file libym_networks/mvn/verilog/ReaderImpl.h
+/// @file ReaderImpl.h
 /// @brief ReaderImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -390,4 +390,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
 
-#endif // LIBYM_NETWORKS_MVN_VERILOG_READERIMPL_H
+#endif // READERIMPL_H

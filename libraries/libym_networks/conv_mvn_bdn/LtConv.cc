@@ -1,5 +1,5 @@
 
-/// @file libym_networks/LtConv.cc
+/// @file LtConv.cc
 /// @brief LtConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

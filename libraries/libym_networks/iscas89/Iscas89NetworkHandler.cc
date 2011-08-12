@@ -1,5 +1,5 @@
 
-/// @file libym_networks/iscas89/Iscas89NetworkHandler.cc
+/// @file Iscas89NetworkHandler.cc
 /// @brief Iscas89NetworkHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

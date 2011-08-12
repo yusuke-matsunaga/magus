@@ -27,7 +27,7 @@
 //   記憶ノード:   記憶素子を表すノード latch ノードと呼ぶことにする．
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 class StrBNodeMap;
 
@@ -1932,15 +1932,15 @@ BNetworkTrace::network() const
   return mNetwork;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NAMESPACE_HASH
 // BNode へのポインタをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsNetworks::BNode*>
+struct hash<nsYm::nsNetworks::nsBnet::BNode*>
 {
   ymuint
-  operator()(nsYm::nsNetworks::BNode* node) const
+  operator()(nsYm::nsNetworks::nsBnet::BNode* node) const
   {
     return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }

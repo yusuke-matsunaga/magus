@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_ANDCONV_H
-#define LIBYM_NETWORKSBDNCONV_ANDCONV_H
+#ifndef ANDCONV_H
+#define ANDCONV_H
 
-/// @file libym_networks/AndConv.h
+/// @file AndConv.h
 /// @brief AndConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -53,4 +53,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_ANDCONV_H
+#endif // ANDCONV_H

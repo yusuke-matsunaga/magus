@@ -19,6 +19,17 @@
 #include "ym_utils/DlList.h"
 
 
+/// @brief bnet 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_NETWORKS_BNET	\
+  BEGIN_NAMESPACE_YM_NETWORKS			\
+  BEGIN_NAMESPACE(nsBnet)
+
+/// @brief bnet 用の名前空間の終了
+#define END_NAMESPACE_YM_NETWORKS_BNET		\
+  END_NAMESPACE(nsBnet)				\
+  END_NAMESPACE_YM_NETWORKS
+
+
 // エラー処理が必要な箇所を示すための人畜無害なマーカー
 #if 0
 #define BNET_ERROR(msg)
@@ -27,7 +38,7 @@
 #endif
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 class BNetwork;
 class BNetManip;
@@ -50,8 +61,6 @@ class BNetBlifWriter;
 class BNetEquWriter;
 class BNetVerilogWriter;
 
-class BNet2Sbj;
-
 
 /// @brief 枝のリスト
 /// @ingroup BnetGroup
@@ -65,40 +74,38 @@ typedef DlList<BNodeEdge> BNodeFoList;
 /// @ingroup BnetGroup
 typedef vector<BNode*> BNodeVector;
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NAMESPACE_YM
 
-using nsNetworks::BNetwork;
-using nsNetworks::BNetManip;
-using nsNetworks::BNetDecomp;
-using nsNetworks::BNetGateDecomp;
-using nsNetworks::BNetSopDecomp;
+using nsNetworks::nsBnet::BNetwork;
+using nsNetworks::nsBnet::BNetManip;
+using nsNetworks::nsBnet::BNetDecomp;
+using nsNetworks::nsBnet::BNetGateDecomp;
+using nsNetworks::nsBnet::BNetSopDecomp;
 
-using nsNetworks::BNode;
-using nsNetworks::BNodeVector;
-using nsNetworks::BNodeList;
+using nsNetworks::nsBnet::BNode;
+using nsNetworks::nsBnet::BNodeVector;
+using nsNetworks::nsBnet::BNodeList;
 
-using nsNetworks::BNodeEdge;
-using nsNetworks::BNodeEdgeList;
+using nsNetworks::nsBnet::BNodeEdge;
+using nsNetworks::nsBnet::BNodeEdgeList;
 
-using nsNetworks::BNodeFoList;
+using nsNetworks::nsBnet::BNodeFoList;
 
-using nsNetworks::BNetChg;
-using nsNetworks::BNetworkTrace;
+using nsNetworks::nsBnet::BNetChg;
+using nsNetworks::nsBnet::BNetworkTrace;
 
-using nsNetworks::BNetBlifReader;
-using nsNetworks::BNetIscas89Reader;
+using nsNetworks::nsBnet::BNetBlifReader;
+using nsNetworks::nsBnet::BNetIscas89Reader;
 
-using nsNetworks::BNetBlifWriter;
-using nsNetworks::BNetEquWriter;
-using nsNetworks::BNetVerilogWriter;
+using nsNetworks::nsBnet::BNetBlifWriter;
+using nsNetworks::nsBnet::BNetEquWriter;
+using nsNetworks::nsBnet::BNetVerilogWriter;
 
-using nsNetworks::BNet2Sbj;
-
-using nsNetworks::BNodeEdgeList;
-using nsNetworks::BNodeFoList;
-using nsNetworks::BNodeVector;
+using nsNetworks::nsBnet::BNodeEdgeList;
+using nsNetworks::nsBnet::BNodeFoList;
+using nsNetworks::nsBnet::BNodeVector;
 
 END_NAMESPACE_YM
 

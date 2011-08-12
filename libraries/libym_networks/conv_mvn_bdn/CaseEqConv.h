@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_CASEEQCONV_H
-#define LIBYM_NETWORKSBDNCONV_CASEEQCONV_H
+#ifndef CASEEQCONV_H
+#define CASEEQCONV_H
 
-/// @file libym_networks/CaseEqConv.h
+/// @file CaseEqConv.h
 /// @brief CaseEqConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_EQCONV_H
+#endif // CASEEQCONV_H

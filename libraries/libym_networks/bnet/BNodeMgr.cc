@@ -1,19 +1,16 @@
 
-/// @file libym_networks/BNodeMgr.cc
+/// @file BNodeMgr.cc
 /// @brief BNodeMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNodeMgr.cc 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BNodeMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
-
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 // 唯一のオブジェクトを返す．
 BNodeMgr&
@@ -92,4 +89,4 @@ BNodeMgr::free_edgearray(size_t n,
   mEdgeAlloc.put_memory(sizeof(BNodeEdge) * n, array);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET

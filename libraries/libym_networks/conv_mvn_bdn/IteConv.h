@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_ITECONV_H
-#define LIBYM_NETWORKSBDNCONV_ITECONV_H
+#ifndef ITECONV_H
+#define ITECONV_H
 
-/// @file libym_networks/IteConv.h
+/// @file IteConv.h
 /// @brief IteConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_ITECONV_H
+#endif // ITECONV_H

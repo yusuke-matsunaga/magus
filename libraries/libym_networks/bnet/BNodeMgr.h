@@ -1,13 +1,11 @@
-#ifndef LIBYM_NETWORKS_BNODEMGR_H
-#define LIBYM_NETWORKS_BNODEMGR_H
+#ifndef BNODEMGR_H
+#define BNODEMGR_H
 
-/// @file libym_networks/BNodeMgr.h
+/// @file BNodeMgr.h
 /// @brief BNodeMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNodeMgr.h 958 2007-08-28 05:38:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,7 +13,7 @@
 #include "ym_utils/Alloc.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNodeMgr BNodeMgr.h "BNodeMgr.h"
@@ -35,13 +33,13 @@ private:
 
   /// @brief コンストラクタ．
   BNodeMgr();
-  
+
   /// @brief デストラクタ
   ~BNodeMgr();
 
 
 public:
-  
+
   /// @brief BNode を確保する．
   BNode*
   alloc_node();
@@ -78,12 +76,12 @@ private:
 
   // 文字列領域を確保するクラス
   FragAlloc mNameAlloc;
-  
+
   // BNodeEdge の配列用の領域を確保するクラス
   FragAlloc mEdgeAlloc;
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
-#endif // LIBYM_NETWORKS_BNODEMGR_H
+#endif // BNODEMGR_H

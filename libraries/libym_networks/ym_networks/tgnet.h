@@ -18,7 +18,18 @@
 #include "ym_networks/networks_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+/// @brief tgnet 用の名前空間の開始
+#define BEGIN_NAMESPACE_YM_NETWORKS_TGNET	\
+  BEGIN_NAMESPACE_YM_NETWORKS			\
+  BEGIN_NAMESPACE(nsTgnet)
+
+/// @brief tgnet 用の名前空間の終了
+#define END_NAMESPACE_YM_NETWORKS_TGNET		\
+  END_NAMESPACE(nsTgnet)			\
+  END_NAMESPACE_YM_NETWORKS
+
+
+BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
 /// @brief 組み込み型のゲートの種類を表す列挙型
@@ -67,32 +78,32 @@ class TgNetwork;
 class TgBlifReader;
 class TgIscas89Reader;
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_TGNET
 
 BEGIN_NAMESPACE_YM
 
-using nsNetworks::tTgGateType;
-using nsNetworks::kTgUndef;
-using nsNetworks::kTgInput;
-using nsNetworks::kTgOutput;
-using nsNetworks::kTgConst0;
-using nsNetworks::kTgConst1;
-using nsNetworks::kTgBuff;
-using nsNetworks::kTgNot;
-using nsNetworks::kTgAnd;
-using nsNetworks::kTgNand;
-using nsNetworks::kTgOr;
-using nsNetworks::kTgNor;
-using nsNetworks::kTgXor;
-using nsNetworks::kTgXnor;
-using nsNetworks::kTgUsrDef;
+using nsNetworks::nsTgnet::tTgGateType;
+using nsNetworks::nsTgnet::kTgUndef;
+using nsNetworks::nsTgnet::kTgInput;
+using nsNetworks::nsTgnet::kTgOutput;
+using nsNetworks::nsTgnet::kTgConst0;
+using nsNetworks::nsTgnet::kTgConst1;
+using nsNetworks::nsTgnet::kTgBuff;
+using nsNetworks::nsTgnet::kTgNot;
+using nsNetworks::nsTgnet::kTgAnd;
+using nsNetworks::nsTgnet::kTgNand;
+using nsNetworks::nsTgnet::kTgOr;
+using nsNetworks::nsTgnet::kTgNor;
+using nsNetworks::nsTgnet::kTgXor;
+using nsNetworks::nsTgnet::kTgXnor;
+using nsNetworks::nsTgnet::kTgUsrDef;
 
-using nsNetworks::TgGateTemplate;
-using nsNetworks::TgEdge;
-using nsNetworks::TgNode;
-using nsNetworks::TgNetwork;
-using nsNetworks::TgBlifReader;
-using nsNetworks::TgIscas89Reader;
+using nsNetworks::nsTgnet::TgGateTemplate;
+using nsNetworks::nsTgnet::TgEdge;
+using nsNetworks::nsTgnet::TgNode;
+using nsNetworks::nsTgnet::TgNetwork;
+using nsNetworks::nsTgnet::TgBlifReader;
+using nsNetworks::nsTgnet::TgIscas89Reader;
 
 END_NAMESPACE_YM
 

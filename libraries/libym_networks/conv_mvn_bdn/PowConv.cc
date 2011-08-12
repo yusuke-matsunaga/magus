@@ -1,5 +1,5 @@
 
-/// @file libym_networks/PowConv.cc
+/// @file PowConv.cc
 /// @brief PowConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

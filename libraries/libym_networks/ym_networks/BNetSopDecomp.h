@@ -13,7 +13,7 @@
 #include "ym_logic/LogExpr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetSopDecomp BNetSopDecomp.h <ym_networks/BNetSopDecomp.h>
@@ -89,6 +89,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 #endif // YM_NETWORKS_BNETSOPDECOMP_H

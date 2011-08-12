@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKS_VERILOG_MAPREC_H
-#define LIBYM_NETWORKS_VERILOG_MAPREC_H
+#ifndef MAPREC_H
+#define MAPREC_H
 
-/// @file libym_networks/verilog/MapRec.h
+/// @file MapRec.h
 /// @brief MapRec のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -191,4 +191,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // LIBYM_NETWORKS_VERILOG_MAPREC_H
+#endif // MAPREC_H

@@ -1,11 +1,9 @@
 
-/// @file libym_networks/BNetBlifWriter.cc
-/// @brief ブーリアンネットワークの内容を出力する関数の実装ファイル
+/// @file BNetBlifWriter.cc
+/// @brief BNetBlifWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetBlifWriter.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +12,7 @@
 #include "ym_networks/BNetSopDecomp.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NONAMESPACE
 
@@ -213,7 +211,7 @@ BNetBlifWriter::dump(ostream& s,
 	<< " 1 1" << endl;
     }
   }
-  
+
   // 各内部節点の .names文/ .gate文の処理
   for (BNodeList::const_iterator p = network.logic_nodes_begin();
        p != network.logic_nodes_end(); ++ p) {
@@ -225,4 +223,4 @@ BNetBlifWriter::dump(ostream& s,
   s << ".end" << endl;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET

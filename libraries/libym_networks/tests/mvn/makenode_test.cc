@@ -1,11 +1,9 @@
 
-/// @file libym_networks/tests/makenode_test.cc
+/// @file makenode_test.cc
 /// @brief MvnNode を生成するテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: makenode.cc 1343 2008-03-25 17:15:35Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 

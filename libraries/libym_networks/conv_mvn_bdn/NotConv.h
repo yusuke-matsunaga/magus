@@ -1,7 +1,7 @@
-#ifndef LIBYM_NETWORKSBDNCONV_NOTCONV_H
-#define LIBYM_NETWORKSBDNCONV_NOTCONV_H
+#ifndef NOTCONV_H
+#define NOTCONV_H
 
-/// @file libym_networks/NotConv.h
+/// @file NotConv.h
 /// @brief NotConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -52,4 +52,4 @@ public:
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
-#endif // LIBYM_NETWORKSBDNCONV_NOTCONV_H
+#endif // NOTCONV_H

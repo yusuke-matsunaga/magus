@@ -14,7 +14,7 @@
 #include "ym_utils/RandGen.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetGateDecomp BNetGateDecomp.h "ym_networks/BNetGateDecomp.h"
@@ -126,6 +126,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM_NETWORKS_BNET
 
 #endif // YM_NETWORKS_BNETDECOMP_H

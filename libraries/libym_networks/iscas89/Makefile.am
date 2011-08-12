@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 958 2007-08-28 05:38:02Z matsunaga $
-
 SUBDIRS =
 
 YFLAGS =-d -v
