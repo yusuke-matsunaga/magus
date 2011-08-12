@@ -80,21 +80,18 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 			  "Index is out of range.");
 	  return NULL;
 	}
-	const MvnOutputPin* pin = node->output(0);
 	MvnNode* node1 = mMvnMgr->new_constbitselect(parent_module,
 						     bitpos,
-						     pin->bit_width());
+						     node->bit_width());
 	mMvnMgr->connect(node, 0, node1, 0);
 	node = node1;
       }
       else {
 #warning "TODO-2011-07-07-01: [msb:lsb] のオフセット変換をしていない"
 	MvnNode* node1 = gen_expr(parent_module, expr->index(), env);
-	const MvnOutputPin* pin0 = node->output(0);
-	const MvnOutputPin* pin1 = node1->output(0);
 	MvnNode* node2 = mMvnMgr->new_bitselect(parent_module,
-						pin0->bit_width(),
-						pin1->bit_width());
+						node->bit_width(),
+						node1->bit_width());
 	mMvnMgr->connect(node, 0, node2, 0);
 	mMvnMgr->connect(node1, 0, node2, 1);
 	node = node2;
@@ -121,10 +118,9 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 			  "Right range is out of range");
 	  return NULL;
 	}
-	const MvnOutputPin* pin = node->output(0);
 	MvnNode* node1 = mMvnMgr->new_constpartselect(parent_module,
 						      msb, lsb,
-						      pin->bit_width());
+						      node->bit_width());
 	mMvnMgr->connect(node, 0, node1, 0);
 	node = node1;
       }
@@ -238,7 +234,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlMinusOp:
     {
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       assert_cond( bw == out_bw, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_cmpl(parent_module, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -248,7 +244,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVlNotOp:
     {
       assert_cond( out_bw == 1, __FILE__, __LINE__);
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       assert_cond( bw == 1, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -257,7 +253,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlBitNegOp:
     {
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       assert_cond( bw == out_bw, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_not(parent_module, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -266,7 +262,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlPlusOp:
     {
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       assert_cond( bw == out_bw, __FILE__, __LINE__);
       return operand_array[0];
     }
@@ -274,7 +270,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVlUnaryAndOp:
     {
       assert_cond( out_bw == 1, __FILE__, __LINE__ );
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rand(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
@@ -283,7 +279,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVlUnaryNandOp:
     {
       assert_cond( out_bw == 1, __FILE__, __LINE__ );
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rand(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
@@ -294,7 +290,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVlUnaryOrOp:
     {
       assert_cond( out_bw == 1, __FILE__, __LINE__ );
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_ror(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
@@ -303,7 +299,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVlUnaryNorOp:
     {
       assert_cond( out_bw == 1, __FILE__, __LINE__ );
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_ror(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
@@ -314,7 +310,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVlUnaryXorOp:
     {
       assert_cond( out_bw == 1, __FILE__, __LINE__ );
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rxor(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
@@ -323,7 +319,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   case kVlUnaryXNorOp:
     {
       assert_cond( out_bw == 1, __FILE__, __LINE__ );
-      ymuint bw = operand_array[0]->output(0)->bit_width();
+      ymuint bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rxor(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
@@ -338,9 +334,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlAddOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_add(parent_module, out_bw, out_bw, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -350,9 +346,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlSubOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_sub(parent_module, out_bw, out_bw, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -362,9 +358,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlMultOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_mult(parent_module, out_bw, out_bw, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -374,9 +370,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlDivOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_div(parent_module, out_bw, out_bw, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -386,9 +382,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlModOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_mod(parent_module, out_bw, out_bw, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -398,8 +394,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlPowerOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       ymuint bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_pow(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -409,8 +405,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlLShiftOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       ymuint bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_sll(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -420,8 +416,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlRShiftOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       ymuint bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_srl(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -431,8 +427,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlArithLShiftOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       ymuint bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_sla(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -442,8 +438,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlArithRShiftOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       ymuint bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_sra(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -453,9 +449,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlBitAndOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_and(parent_module, 2, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -465,9 +461,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlBitOrOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_or(parent_module, 2, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -477,9 +473,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlBitXNorOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_xor(parent_module, 2, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -491,9 +487,9 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlBitXorOp:
     {
-      assert_cond( operand_array[0]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[0]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
-      assert_cond( operand_array[1]->output(0)->bit_width() == out_bw,
+      assert_cond( operand_array[1]->bit_width() == out_bw,
 		   __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_xor(parent_module, 2, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -524,8 +520,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlEqOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       assert_cond( bw1 == bw2, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_equal(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -535,8 +531,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlNeqOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       assert_cond( bw1 == bw2, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_equal(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -548,8 +544,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlLtOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       assert_cond( bw1 == bw2, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -559,8 +555,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlGeOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       assert_cond( bw1 == bw2, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -572,8 +568,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlGtOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       assert_cond( bw1 == bw2, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[1], 0, node, 0);
@@ -583,8 +579,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlLeOp:
     {
-      ymuint bw1 = operand_array[0]->output(0)->bit_width();
-      ymuint bw2 = operand_array[1]->output(0)->bit_width();
+      ymuint bw1 = operand_array[0]->bit_width();
+      ymuint bw2 = operand_array[1]->bit_width();
       assert_cond( bw1 == bw2, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[1], 0, node, 0);
@@ -596,8 +592,8 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
 
   case kVlConditionOp:
     {
-      ymuint bw1 = operand_array[1]->output(0)->bit_width();
-      ymuint bw2 = operand_array[2]->output(0)->bit_width();
+      ymuint bw1 = operand_array[1]->bit_width();
+      ymuint bw2 = operand_array[2]->bit_width();
       assert_cond( bw1 == out_bw, __FILE__, __LINE__);
       assert_cond( bw2 == out_bw, __FILE__, __LINE__);
       MvnNode* node = mMvnMgr->new_ite(parent_module, out_bw);
@@ -615,7 +611,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
     {
       vector<ymuint> bw_array(n);
       for (ymuint i = 0; i < n; ++ i) {
-	bw_array[i] = operand_array[i]->output(0)->bit_width();
+	bw_array[i] = operand_array[i]->bit_width();
       }
       MvnNode* node = mMvnMgr->new_concat(parent_module, bw_array);
       for (ymuint i = 0; i < n; ++ i) {
@@ -632,7 +628,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       for (ymuint j = 0; j < r; ++ j) {
 	ymuint base = j * n1;
 	for (ymuint i = 0; i < n1; ++ i) {
-	  bw_array[base + i] = operand_array[i + 1]->output(0)->bit_width();
+	  bw_array[base + i] = operand_array[i + 1]->bit_width();
 	}
       }
       MvnNode* node = mMvnMgr->new_concat(parent_module, bw_array);
@@ -751,7 +747,7 @@ ReaderImpl::coerce_expr(MvnModule* parent_module,
 			VlValueType value_type)
 {
   ymuint bit_width = value_type.size();
-  ymuint src_bw = src_node->output(0)->bit_width();
+  ymuint src_bw = src_node->bit_width();
   MvnNode* node = src_node;
   if ( bit_width > src_bw ) {
     // 左辺のビット幅が大きいとき
@@ -813,7 +809,7 @@ ReaderImpl::splice_rhs(MvnModule* parent_module,
 		       ymuint offset,
 		       ymuint bit_width)
 {
-  ymuint src_bw = rhs_node->output(0)->bit_width();
+  ymuint src_bw = rhs_node->bit_width();
   assert_cond( offset + bit_width <= src_bw, __FILE__, __LINE__);
 
   MvnNode* src_node = NULL;

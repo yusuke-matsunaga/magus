@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_MVN
 // @param[in] val 値
 MvnCaseEq::MvnCaseEq(MvnModule* module,
 		     const vector<ymuint32>& val) :
-  MvnNodeBase(module, MvnNode::kCaseEq, 2, 1),
+  MvnNodeBase(module, MvnNode::kCaseEq, 2),
   mVal(val)
 {
 }
@@ -61,7 +61,7 @@ MvnMgr::new_caseeq(MvnModule* module,
 
     node->_input(0)->mBitWidth = bit_width;
     node->_input(1)->mBitWidth = bit_width;
-    node->_output(0)->mBitWidth = 1;
+    node->mBitWidth = 1;
 
     return node;
   }

@@ -39,10 +39,9 @@ ConstPartSelectConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kConstPartSelect ) {
     const MvnInputPin* ipin = node->input(0);
-    const MvnOutputPin* src_pin = ipin->src_pin();
-    const MvnNode* src_node = src_pin->node();
+    const MvnNode* src_node = ipin->src_node();
 
-    ymuint bw = node->output(0)->bit_width();
+    ymuint bw = node->bit_width();
     ymuint msb = node->msb();
     ymuint lsb = node->lsb();
     assert_cond( bw == msb - lsb + 1, __FILE__, __LINE__);

@@ -48,8 +48,8 @@ MvnBdnMap::put(const MvnNode* mvnode,
 {
   assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
   vector<BdnNodeHandle>& array = mArray[mvnode->id()];
-  if ( array.size() != mvnode->output(0)->bit_width() ) {
-    array.resize(mvnode->output(0)->bit_width());
+  if ( array.size() != mvnode->bit_width() ) {
+    array.resize(mvnode->bit_width());
   }
   array[index] = nodehandle;
 }
@@ -74,7 +74,7 @@ MvnBdnMap::get(const MvnNode* mvnode,
   if ( array.empty() ) {
     return BdnNodeHandle(NULL, false);
   }
-  assert_cond( array.size() == mvnode->output(0)->bit_width(),
+  assert_cond( array.size() == mvnode->bit_width(),
 	       __FILE__, __LINE__);
   return array[index];
 }
@@ -111,8 +111,7 @@ dump_mvnode_map(ostream& s,
   for (ymuint i = 0; i < n; ++ i) {
     const MvnNode* node = mvmgr.node(i);
     if ( node == NULL ) continue;
-    const MvnOutputPin* opin = node->output(0);
-    ymuint bw = opin->bit_width();
+    ymuint bw = node->bit_width();
     if ( bw == 1 ) {
       BdnNodeHandle nodehandle = mvnode_map.get(node);
       s << "// node" << node->id() << " : ";

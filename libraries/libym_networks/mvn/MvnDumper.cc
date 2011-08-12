@@ -45,10 +45,9 @@ dump_inputpin(ostream& s,
 {
   s << "  " << pin_name
     << "(" << pin->bit_width() << ")" << endl;
-  const MvnOutputPin* opin = pin->src_pin();
-  if ( opin ) {
-    s << "    <== OutputPin#" << opin->pos()
-      << "@" << node_idstr(opin->node()) << endl;
+  const MvnNode* onode = pin->src_node();
+  if ( onode ) {
+    s << "    <== Output@" << node_idstr(onode) << endl;
   }
 }
 
@@ -61,22 +60,6 @@ dump_inputpin(ostream& s,
   buf << "InputPin#" << pin->pos();
   string pin_name = buf.str();
   dump_inputpin(s, pin, pin_name);
-}
-
-// MvnOutputPin の内容を出力する．
-void
-dump_outputpin(ostream& s,
-	       const MvnOutputPin* pin)
-{
-  s << "  OutputPin#" << pin->pos()
-    << "(" << pin->bit_width() << ")" << endl;
-  const MvnInputPinList& fo_list = pin->dst_pin_list();
-  for (MvnInputPinList::const_iterator p = fo_list.begin();
-       p != fo_list.end(); ++ p) {
-    const MvnInputPin* ipin = *p;
-    s << "    ==> InputPin#" << ipin->pos()
-      << "@" << node_idstr(ipin->node()) << endl;
-  }
 }
 
 // MvnNode の内容を出力する．
@@ -147,8 +130,6 @@ dump_node(ostream& s,
     break;
   case MvnNode::kBitSelect:  s << "BitSelect"; break;
   case MvnNode::kPartSelect: s << "PartSelect"; break;
-  case MvnNode::kCombUdp:    s << "Combinational UDP"; break;
-  case MvnNode::kSeqUdp:     s << "Sequential UDP"; break;
   case MvnNode::kConst:
     {
       s << "Const(";
@@ -209,10 +190,13 @@ dump_node(ostream& s,
       const MvnInputPin* pin = node->input(i);
       dump_inputpin(s, pin);
     }
-    ymuint no = node->output_num();
-    for (ymuint i = 0; i < no; ++ i) {
-      const MvnOutputPin* pin = node->output(i);
-      dump_outputpin(s, pin);
+    s << "  Output(" << node->bit_width() << ")" << endl;
+    const MvnInputPinList& fo_list = node->dst_pin_list();
+    for (MvnInputPinList::const_iterator p = fo_list.begin();
+	 p != fo_list.end(); ++ p) {
+      const MvnInputPin* ipin = *p;
+      s << "    ==> InputPin#" << ipin->pos()
+	<< "@" << node_idstr(ipin->node()) << endl;
     }
   }
   s << endl;
@@ -287,7 +271,7 @@ MvnDumper::operator()(ostream& s,
     for (ymuint j = 0; j < nio; ++ j) {
       dump_node(s, module->inout(j));
     }
-    for (list<MvnNode*>::const_iterator p = module->nodes_begin();
+    for (MvnNodeList::const_iterator p = module->nodes_begin();
 	 p != module->nodes_end(); ++ p) {
       MvnNode* node = *p;
       dump_node(s, node);

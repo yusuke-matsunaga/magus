@@ -39,8 +39,7 @@ ConstBitSelectConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kConstBitSelect ) {
     const MvnInputPin* ipin = node->input(0);
-    const MvnOutputPin* src_pin = ipin->src_pin();
-    const MvnNode* src_node = src_pin->node();
+    const MvnNode* src_node = ipin->src_node();
 
     BdnNodeHandle handle0 = nodemap.get(src_node, node->bitpos());
     nodemap.put(node, handle0);

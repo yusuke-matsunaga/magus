@@ -46,6 +46,7 @@ class MvnNode;
 class MvnInputPin;
 class MvnOutputPin;
 
+typedef DlList<MvnNode> MvnNodeList;
 typedef DlList<MvnInputPin> MvnInputPinList;
 
 class MvnVerilogReader;
@@ -63,6 +64,7 @@ using nsNetworks::nsMvn::MvnModule;
 using nsNetworks::nsMvn::MvnPort;
 using nsNetworks::nsMvn::MvnPortRef;
 using nsNetworks::nsMvn::MvnNode;
+using nsNetworks::nsMvn::MvnNodeList;
 using nsNetworks::nsMvn::MvnInputPin;
 using nsNetworks::nsMvn::MvnInputPinList;
 using nsNetworks::nsMvn::MvnOutputPin;

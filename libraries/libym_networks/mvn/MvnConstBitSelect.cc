@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_MVN
 // @param[in] bitpos ビット位置
 MvnConstBitSelect::MvnConstBitSelect(MvnModule* module,
 				     ymuint bitpos) :
-  MvnNodeBase(module, MvnNode::kConstBitSelect, 1, 1),
+  MvnNodeBase(module, MvnNode::kConstBitSelect, 1),
   mBitPos(bitpos)
 {
 }
@@ -51,7 +51,7 @@ MvnMgr::new_constbitselect(MvnModule* module,
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width;
-  node->_output(0)->mBitWidth = 1;
+  node->mBitWidth = 1;
 
   return node;
 }

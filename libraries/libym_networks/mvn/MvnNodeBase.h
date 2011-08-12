@@ -1,7 +1,7 @@
-#ifndef YM_NETWORKS_MVNNODEBASE_H
-#define YM_NETWORKS_MVNNODEBASE_H
+#ifndef MVNNODEBASE_H
+#define MVNNODEBASE_H
 
-/// @file libym_networks/MvnNodeBase.h
+/// @file MvnNodeBase.h
 /// @brief MvnNodeBase のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -29,11 +29,9 @@ protected:
   /// @param[in] module 親のモジュール
   /// @param[in] type 型
   /// @param[in] input_num 入力数
-  /// @param[in] output_num 出力数
   MvnNodeBase(MvnModule* parent,
 	      tType type,
-	      ymuint input_num,
-	      ymuint output_num);
+	      ymuint input_num);
 
   /// @brief デストラクタ
   virtual
@@ -61,17 +59,6 @@ public:
   const MvnInputPin*
   input(ymuint pos) const;
 
-  /// @brief 出力ピン数を得る．
-  virtual
-  ymuint
-  output_num() const;
-
-  /// @brief 出力ピンを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < output_num() )
-  virtual
-  const MvnOutputPin*
-  output(ymuint pos) const;
-
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -83,12 +70,6 @@ protected:
   virtual
   MvnInputPin*
   _input(ymuint pos);
-
-  /// @brief 出力ピンを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < output_num() )
-  virtual
-  MvnOutputPin*
-  _output(ymuint pos);
 
 
 private:
@@ -105,14 +86,8 @@ private:
   // 入力ピンの配列
   MvnInputPin* mInputArray;
 
-  // 出力数
-  ymuint32 mOutputNum;
-
-  // 出力ピンの配列
-  MvnOutputPin* mOutputArray;
-
 };
 
 END_NAMESPACE_YM_NETWORKS_MVN
 
-#endif // YM_NETWORKS_MVNNODEBASE_H
+#endif // MVNNODEBASE_H

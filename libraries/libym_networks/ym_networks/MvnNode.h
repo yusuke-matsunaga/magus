@@ -21,7 +21,8 @@ BEGIN_NAMESPACE_YM_NETWORKS_MVN
 /// @class MvnNode MvnNode.h "ym_networks/MvnNode.h"
 /// @brief MvNetwork のノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvnNode
+class MvnNode :
+  public DlElem
 {
   friend class MvnMgr;
 
@@ -116,12 +117,6 @@ public:
     /// @brief part-select ( 3入力, 1出力 )
     kPartSelect,
 
-    /// @brief combinational UDP ( n入力, 1出力 )
-    kCombUdp,
-
-    /// @brief sequential UDP ( n入力, 1出力 )
-    kSeqUdp,
-
     /// @brief constant ( 0入力, 1出力 )
     kConst,
 
@@ -174,6 +169,7 @@ public:
   const MvnInputPin*
   input(ymuint pos) const = 0;
 
+#if 0
   /// @brief 出力ピン数を得る．
   virtual
   ymuint
@@ -184,6 +180,7 @@ public:
   virtual
   const MvnOutputPin*
   output(ymuint pos) const = 0;
+#endif
 
   /// @brief クロック信号の極性を得る．
   /// @retval 1 正極性(posedge)
@@ -193,6 +190,14 @@ public:
   virtual
   ymuint
   clock_pol() const;
+
+  /// @brief 出力のビット幅を得る．
+  ymuint
+  bit_width() const;
+
+  /// @brief 出力に接続している入力ピンのリストを得る．
+  const MvnInputPinList&
+  dst_pin_list() const;
 
   /// @brief 非同期セット信号の極性を得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
@@ -267,12 +272,6 @@ protected:
   MvnInputPin*
   _input(ymuint pos) = 0;
 
-  /// @brief 出力ピンを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < output_num() )
-  virtual
-  MvnOutputPin*
-  _output(ymuint pos) = 0;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -285,8 +284,11 @@ private:
   // 親のモジュール
   MvnModule* mParent;
 
-  // mNodeList からの削除で用いる反復子
-  list<MvnNode*>::iterator mSelfRef;
+  // 出力のビット幅
+  ymuint32 mBitWidth;
+
+  // 接続している入力ピンのリスト
+  MvnInputPinList mDstPinList;
 
 };
 
@@ -309,6 +311,22 @@ const MvnModule*
 MvnNode::parent() const
 {
   return mParent;
+}
+
+// @brief ビット幅を得る．
+inline
+ymuint
+MvnNode::bit_width() const
+{
+  return mBitWidth;
+}
+
+// @brief 接続している入力ピンのリストを得る．
+inline
+const MvnInputPinList&
+MvnNode::dst_pin_list() const
+{
+  return mDstPinList;
 }
 
 END_NAMESPACE_YM_NETWORKS_MVN

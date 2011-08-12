@@ -168,7 +168,7 @@ EnvMerger1::operator()(MvnModule* parent_module,
     }
     else {
       // node1 も node2 も NULL ではない．
-      ymuint bw = node1->output(0)->bit_width();
+      ymuint bw = node1->bit_width();
       new_node = mgr()->new_ite(parent_module, bw);
       mgr()->connect(cond, 0, new_node, 0);
       mgr()->connect(node1, 0, new_node, 1);
@@ -253,8 +253,8 @@ EnvMerger2::operator()(MvnModule* parent_module,
       if ( node0 == NULL ) {
 	node0 = mGlobalEnv.get_from_id(i);
       }
-      ymuint bw = node0->output(0)->bit_width();
-      if ( node2->output(0)->bit_width() != bw ) {
+      ymuint bw = node0->bit_width();
+      if ( node2->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
       }
@@ -270,8 +270,8 @@ EnvMerger2::operator()(MvnModule* parent_module,
       if ( node0 == NULL ) {
 	node0 = mGlobalEnv.get_from_id(i);
       }
-      ymuint bw = node0->output(0)->bit_width();
-      if ( node1->output(0)->bit_width() != bw ) {
+      ymuint bw = node0->bit_width();
+      if ( node1->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
       }
@@ -284,12 +284,12 @@ EnvMerger2::operator()(MvnModule* parent_module,
     else {
       // node1 も node2 も NULL ではない．
       //assert_cond( node0 != NULL, __FILE__, __LINE__);
-      ymuint bw = node1->output(0)->bit_width();
-      if ( node1->output(0)->bit_width() != bw ) {
+      ymuint bw = node1->bit_width();
+      if ( node1->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
       }
-      if ( node2->output(0)->bit_width() != bw ) {
+      if ( node2->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
       }

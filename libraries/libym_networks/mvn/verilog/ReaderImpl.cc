@@ -231,9 +231,8 @@ ReaderImpl::gen_network(MvnMgr& mgr,
     for (ymuint i = 0; i < n; ++ i) {
       MvnNode* node = mMvnMgr->_node(i);
       if ( node != NULL && node->type() == MvnNode::kThrough ) {
-	const MvnOutputPin* src_pin = node->input(0)->src_pin();
-	if ( src_pin != NULL ) {
-	  MvnNode* src_node = src_pin->node();
+	const MvnNode* src_node = node->input(0)->src_node();
+	if ( src_node!= NULL ) {
 	  mNodeMap.copy(node->id(), src_node->id());
 	}
       }
@@ -609,8 +608,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
 		      "Right index is out of range.");
       return;
     }
-    assert_cond( src_node->output(0)->bit_width() == msb - lsb + 1,
-		 __FILE__, __LINE__);
+    assert_cond( src_node->bit_width() == msb - lsb + 1, __FILE__, __LINE__);
     reg_driver(dst_node, Driver(src_loc, src_node, msb, lsb));
   }
 }

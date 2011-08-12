@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_MVN
 // @param[in] val 値
 MvnConst::MvnConst(MvnModule* module,
 		   const vector<ymuint32>& val) :
-  MvnNodeBase(module, MvnNode::kConst, 0, 1),
+  MvnNodeBase(module, MvnNode::kConst, 0),
   mVal(val)
 {
 }
@@ -49,7 +49,7 @@ MvnMgr::new_const(MvnModule* module,
   MvnNode* node = new MvnConst(module, val);
   reg_node(node);
 
-  node->_output(0)->mBitWidth = bit_width;
+  node->mBitWidth = bit_width;
 
   return node;
 }

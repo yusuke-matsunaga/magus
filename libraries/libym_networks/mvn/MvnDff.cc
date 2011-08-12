@@ -26,7 +26,7 @@ MvnDff::MvnDff(MvnModule* module,
 	       ymuint clock_pol,
 	       const vector<ymuint>& pol_array,
 	       const vector<MvnNode*>& val_array) :
-  MvnNodeBase(module, MvnNode::kDff, pol_array.size() + 2, 1)
+  MvnNodeBase(module, MvnNode::kDff, pol_array.size() + 2)
 {
   ymuint np = pol_array.size();
 
@@ -114,7 +114,7 @@ MvnMgr::new_dff(MvnModule* module,
     node->_input(i + 2)->mBitWidth = 1;
   }
   // データ出力
-  node->_output(0)->mBitWidth = bit_width;
+  node->mBitWidth = bit_width;
 
   return node;
 }

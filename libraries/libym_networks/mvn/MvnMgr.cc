@@ -262,16 +262,14 @@ MvnMgr::delete_node(MvnNode* node)
     return;
   }
   for (ymuint i = 0; i < node->input_num(); ++ i) {
-    if ( node->input(i)->src_pin() ) {
+    if ( node->input(i)->src_node() ) {
       cerr << "node" << node->id() << " has fanin" << endl;
       return;
     }
   }
-  for (ymuint i = 0; i < node->output_num(); ++ i) {
-    if ( !node->output(i)->dst_pin_list().empty() ) {
-      cerr << "node" << node->id() << " has fanout" << endl;
-      return;
-    }
+  if ( !node->dst_pin_list().empty() ) {
+    cerr << "node" << node->id() << " has fanout" << endl;
+    return;
   }
   unreg_node(node);
   delete node;
@@ -280,11 +278,8 @@ MvnMgr::delete_node(MvnNode* node)
 bool
 no_fanouts(MvnNode* node)
 {
-  ymuint no = node->output_num();
-  for (ymuint j = 0; j < no; ++ j) {
-    if ( !node->output(j)->dst_pin_list().empty() ) {
-      return false;
-    }
+  if ( !node->dst_pin_list().empty() ) {
+    return false;
   }
   return true;
 }
@@ -307,13 +302,13 @@ MvnMgr::sweep()
     MvnNode* node = *p;
     MvnNode* alt_node = NULL;
     if ( node->type() == MvnNode::kThrough ) {
-      const MvnOutputPin* src_pin = node->input(0)->src_pin();
-      if ( src_pin != NULL ) {
-	alt_node = src_pin->node();
+      MvnNode* src_node = node->input(0)->src_node();
+      if ( src_node != NULL ) {
+	alt_node = src_node;
       }
     }
     else if ( node->type() == MvnNode::kConstBitSelect ) {
-      MvnNode* src_node = node->input(0)->src_pin()->node();
+      MvnNode* src_node = node->input(0)->src_node();
       if ( src_node->type() == MvnNode::kConcat ) {
 	alt_node = select_from_concat(src_node, node->bitpos());
       }
@@ -356,10 +351,9 @@ MvnMgr::sweep()
     node_queue.pop_front();
     ymuint ni = node->input_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      MvnOutputPin* src_pin = node->input(i)->src_pin();
-      if ( src_pin ) {
-	MvnNode* src_node = src_pin->node();
-	disconnect(src_node, src_pin->pos(), node, i);
+      MvnNode* src_node = node->input(i)->src_node();
+      if ( src_node ) {
+	disconnect(src_node, 0, node, i);
 	if ( no_fanouts(src_node) ) {
 	  node_queue.push_back(src_node);
 	}
@@ -383,7 +377,7 @@ MvnMgr::select_from_concat(MvnNode* src_node,
     const MvnInputPin* ipin = src_node->input(idx);
     ymuint bw = ipin->bit_width();
     if ( bitpos < bw ) {
-      MvnNode* inode = ipin->src_pin()->node();
+      MvnNode* inode = ipin->src_node();
       if ( inode->type() == MvnNode::kConcat ) {
 	return select_from_concat(inode, bitpos);
       }
@@ -425,7 +419,7 @@ MvnMgr::select_from_partselect(MvnNode* src_node,
   else {
     bitpos = lsb - bitpos;
   }
-  MvnNode* inode = ipin->src_pin()->node();
+  MvnNode* inode = ipin->src_node();
   if ( inode->type() == MvnNode::kConcat ) {
     return select_from_concat(inode, bitpos);
   }
@@ -447,11 +441,7 @@ void
 MvnMgr::replace(MvnNode* node,
 		MvnNode* alt_node)
 {
-  ymuint no = node->output_num();
-  assert_cond( no == alt_node->output_num(), __FILE__, __LINE__);
-  for (ymuint i = 0; i < no; ++ i) {
-    reconnect(node, i, alt_node, i);
-  }
+  reconnect(node, 0, alt_node, 0);
 }
 
 // @brief ピンとピンを接続する．
@@ -475,17 +465,16 @@ MvnMgr::connect(MvnNode* src_node,
     abort();
     return false;
   }
-  MvnOutputPin* src_pin = src_node->_output(src_pin_pos);
   MvnInputPin* dst_pin = dst_node->_input(dst_pin_pos);
-  if ( src_pin->bit_width() != dst_pin->bit_width() ) {
-    cerr << "src_pin->bit_width() = " << src_pin->bit_width()
+  if ( src_node->bit_width() != dst_pin->bit_width() ) {
+    cerr << "src_node->bit_width() = " << src_node->bit_width()
 	 << ", dst_pin->bit_width() = " << dst_pin->bit_width() << endl;
     cerr << "bit_width mismatch" << endl;
     abort();
     return false;;
   }
-  src_pin->mDstPinList.push_back(dst_pin);
-  dst_pin->mSrcPin = src_pin;
+  src_node->mDstPinList.push_back(dst_pin);
+  dst_pin->mSrcNode = src_node;
   return true;
 }
 
@@ -500,11 +489,10 @@ MvnMgr::disconnect(MvnNode* src_node,
 		   MvnNode* dst_node,
 		   ymuint dst_pin_pos)
 {
-  MvnOutputPin* src_pin = src_node->_output(src_pin_pos);
   MvnInputPin* dst_pin = dst_node->_input(dst_pin_pos);
-  assert_cond( dst_pin->mSrcPin == src_pin, __FILE__, __LINE__);
-  src_pin->mDstPinList.erase(dst_pin);
-  dst_pin->mSrcPin = NULL;
+  assert_cond( dst_pin->mSrcNode == src_node, __FILE__, __LINE__);
+  src_node->mDstPinList.erase(dst_pin);
+  dst_pin->mSrcNode = NULL;
 }
 
 // @brief 接続を切り替える．
@@ -518,9 +506,7 @@ MvnMgr::reconnect(MvnNode* old_node,
 		  MvnNode* new_node,
 		  ymuint new_pin_pos)
 {
-  MvnOutputPin* old_pin = old_node->_output(old_pin_pos);
-  MvnOutputPin* new_pin = new_node->_output(new_pin_pos);
-  const MvnInputPinList& fo_list = old_pin->dst_pin_list();
+  const MvnInputPinList& fo_list = old_node->dst_pin_list();
   // リンクトリストをたどっている途中でリンクの変更はできないので
   // 配列にコピーする．
   vector<MvnInputPin*> tmp_list;
@@ -533,9 +519,9 @@ MvnMgr::reconnect(MvnNode* old_node,
   for (vector<MvnInputPin*>::iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     MvnInputPin* ipin = *p;
-    old_pin->mDstPinList.erase(ipin);
-    ipin->mSrcPin = new_pin;
-    new_pin->mDstPinList.push_back(ipin);
+    old_node->mDstPinList.erase(ipin);
+    ipin->mSrcNode = new_node;
+    new_node->mDstPinList.push_back(ipin);
   }
 }
 
@@ -561,11 +547,7 @@ MvnMgr::reg_node(MvnNode* node)
        node->type() != MvnNode::kOutput &&
        node->type() != MvnNode::kInout ) {
     MvnModule* module = node->mParent;
-    list<MvnNode*>& nodelist = module->mNodeList;
-    nodelist.push_back(node);
-    node->mSelfRef = nodelist.end();
-    -- node->mSelfRef;
-    assert_cond( *node->mSelfRef == node , __FILE__, __LINE__);
+    module->mNodeList.push_back(node);
   }
 }
 
@@ -581,7 +563,7 @@ MvnMgr::unreg_node(MvnNode* node)
        node->type() != MvnNode::kOutput &&
        node->type() != MvnNode::kInout ) {
     MvnModule* module = node->mParent;
-    module->mNodeList.erase(node->mSelfRef);
+    module->mNodeList.erase(node);
   }
 }
 
@@ -595,7 +577,7 @@ MvnInputPin::MvnInputPin() :
   mNode(NULL),
   mPos(0),
   mBitWidth(0),
-  mSrcPin(NULL)
+  mSrcNode(NULL)
 {
 }
 

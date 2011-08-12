@@ -39,11 +39,11 @@ CmplConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kCmpl ) {
     const MvnInputPin* ipin0 = node->input(0);
-    const MvnOutputPin* src_pin0 = ipin0->src_pin();
-    const MvnNode* src_node0 = src_pin0->node();
+    const MvnNode* src_node0 = ipin0->src_node();
 
-    ymuint bw = node->output(0)->bit_width();
-    assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
+    ymuint bw = node->bit_width();
+    assert_cond( src_node0->bit_width() == bw, __FILE__, __LINE__);
+
     BdnNodeHandle cin(BdnNodeHandle::make_one());
     vector<BdnNodeHandle> tmp_list(3);
     for (ymuint i = 0; i < bw; ++ i) {

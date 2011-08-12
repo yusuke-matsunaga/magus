@@ -30,7 +30,7 @@ MvnCell::MvnCell(MvnModule* module,
 		 ymuint ni,
 		 ymuint no,
 		 const vector<ymuint32>& pin_pos) :
-  MvnNodeBase(module, MvnNode::kCell, ni, no),
+  MvnNodeBase(module, MvnNode::kCell, ni),
   mCell(cell)
 {
 }
@@ -84,9 +84,7 @@ MvnMgr::new_cell(MvnModule* module,
   for (ymuint i = 0; i < ni; ++ i) {
     node->_input(i)->mBitWidth = 1;
   }
-  for (ymuint i = 0; i < no; ++ i) {
-    node->_output(i)->mBitWidth = 1;
-  }
+  node->mBitWidth = 1;
 
   return node;
 }

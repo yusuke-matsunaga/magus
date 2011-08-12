@@ -39,10 +39,9 @@ RxorConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kRxor ) {
     const MvnInputPin* ipin0 = node->input(0);
-    const MvnOutputPin* src_pin0 = ipin0->src_pin();
-    const MvnNode* src_node0 = src_pin0->node();
+    const MvnNode* src_node0 = ipin0->src_node();
 
-    ymuint bw = src_pin0->bit_width();
+    ymuint bw = src_node0->bit_width();
     vector<BdnNodeHandle> input_list(bw);
     for (ymuint i = 0; i < bw; ++ i) {
       input_list[i] = nodemap.get(src_node0, i);

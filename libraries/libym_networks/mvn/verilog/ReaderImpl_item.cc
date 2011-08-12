@@ -335,7 +335,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	}
       }
       ymuint n = val_array.size();
-      ymuint bw = node0->output(0)->bit_width();
+      ymuint bw = node0->bit_width();
       MvnNode* ff = mMvnMgr->new_dff(parent_module, clock_pol, pol_array,
 				     val_array, bw);
       mMvnMgr->connect(rhs, 0, ff, 0);
@@ -366,7 +366,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       }
       else {
 	// latch を挿入
-	ymuint bw = node0->output(0)->bit_width();
+	ymuint bw = node0->bit_width();
 	MvnNode* latch = mMvnMgr->new_latch(parent_module, bw);
 	mMvnMgr->connect(rhs, 0, latch, 0);
 	mMvnMgr->connect(cond, 0, latch, 1);

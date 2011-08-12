@@ -41,16 +41,14 @@ SllConv::operator()(const MvnNode* node,
     cerr << "Converter for SLL is not implemented" << endl;
 #if 0
     const MvInputPin* ipin0 = node->input(0);
-    const MvOutputPin* src_pin0 = ipin0->src_pin();
-    const MvnNode* src_node0 = src_pin0->node();
+    const MvnNode* src_node0 = ipin0->src_node();
 
     const MvInputPin* ipin1 = node->input(1);
-    const MvOutputPin* src_pin1 = ipin1->src_pin();
-    const MvnNode* src_node1 = src_pin1->node();
+    const MvnNode* src_node1 = ipin1->src_node();
 
-    ymuint bw = node->output(0)->bit_width();
-    assert_cond( src_pin0->bit_width() == bw, __FILE__, __LINE__);
-    assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
+    ymuint bw = node->bit_width();
+    assert_cond( src_node0->bit_width() == bw, __FILE__, __LINE__);
+    assert_cond( src_node1->bit_width() == bw, __FILE__, __LINE__);
     for (ymuint i = 0; i < bw; ++ i) {
       BdnNodeHandle handle0 = nodemap.get(src_node0, i);
       BdnNodeHandle handle1 = nodemap.get(src_node1, i);

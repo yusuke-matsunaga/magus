@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_MVN
 MvnConstPartSelect::MvnConstPartSelect(MvnModule* module,
 				       ymuint msb,
 				       ymuint lsb) :
-  MvnNodeBase(module, MvnNode::kConstPartSelect, 1, 1),
+  MvnNodeBase(module, MvnNode::kConstPartSelect, 1),
   mMsb(msb),
   mLsb(lsb)
 {
@@ -65,7 +65,7 @@ MvnMgr::new_constpartselect(MvnModule* module,
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width;
-  node->_output(0)->mBitWidth = msb - lsb + 1;
+  node->mBitWidth = msb - lsb + 1;
 
   return node;
 }

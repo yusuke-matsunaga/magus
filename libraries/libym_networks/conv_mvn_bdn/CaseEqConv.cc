@@ -42,15 +42,14 @@ CaseEqConv::operator()(const MvnNode* node,
     node->xmask(xmask);
 
     const MvnInputPin* ipin0 = node->input(0);
-    const MvnOutputPin* src_pin0 = ipin0->src_pin();
-    const MvnNode* src_node0 = src_pin0->node();
+    const MvnNode* src_node0 = ipin0->src_node();
 
     const MvnInputPin* ipin1 = node->input(1);
-    const MvnOutputPin* src_pin1 = ipin1->src_pin();
-    const MvnNode* src_node1 = src_pin1->node();
+    const MvnNode* src_node1 = ipin1->src_node();
 
-    ymuint bw = src_pin0->bit_width();
-    assert_cond( src_pin1->bit_width() == bw, __FILE__, __LINE__);
+    ymuint bw = src_node0->bit_width();
+    assert_cond( src_node1->bit_width() == bw, __FILE__, __LINE__);
+
     vector<BdnNodeHandle> input_array;
     input_array.reserve(bw);
     for (ymuint i = 0; i < bw; ++ i) {
