@@ -1,15 +1,14 @@
 
-/// @file magus/logbase/MagMgr.cc
+/// @file MagMgr.cc
 /// @brief MagMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagMgr.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MagMgr.h"
+#include "ym_cell/CellMgr.h"
 #include "NetHandle.h"
 #include "BNetHandle.h"
 #include "BdnHandle.h"
@@ -24,6 +23,7 @@ string MagMgr::kCurNetwork("_network");
 
 // コンストラクタ
 MagMgr::MagMgr() :
+  mCellMgr(new CellMgr),
   mAlloc(sizeof(Cell), 1024),
   mNetHandleHashSize(0),
   mNetHandleHash(NULL),
@@ -39,6 +39,8 @@ MagMgr::MagMgr() :
 // 全てのネットワークを破壊する．
 MagMgr::~MagMgr()
 {
+  delete mCellMgr;
+
   // このオブジェクトの管理しているネットワークを全て破棄する．
   // といってもこのループでは name_list にネットワーク名を入れている
   // だけ．
@@ -53,6 +55,13 @@ MagMgr::~MagMgr()
     bool stat = delete_nethandle(name);
     assert_cond(stat, __FILE__, __LINE__);
   }
+}
+
+// @brief カレントセルライブラリの取得
+CellMgr*
+MagMgr::cur_cellmgr()
+{
+  return mCellMgr;
 }
 
 // @brief 名前が適切かどうか調べる関数

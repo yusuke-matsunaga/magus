@@ -1,16 +1,15 @@
 
-/// @file magus/techmap/LoadPatCmd.cc
+/// @file LoadPatCmd.cc
 /// @brief LoadPatCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LoadPatCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "LoadPatCmd.h"
 #include "ym_tclpp/TclPopt.h"
+#include "ym_cell/CellMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -20,9 +19,8 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LoadPatCmd::LoadPatCmd(MagMgr* mgr,
-		       TechmapData* data) :
-  TechmapCmd(mgr, data)
+LoadPatCmd::LoadPatCmd(MagMgr* mgr) :
+  MagCmd(mgr)
 {
   set_usage_string("<pat-file>");
 }
@@ -61,7 +59,7 @@ LoadPatCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  if ( !techmap().load_library(is) ) {
+  if ( !cur_cellmgr()->load_library(is) ) {
     TclObj emsg;
     emsg << "Error occured in reading " << filename;
     set_result(emsg);

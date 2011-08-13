@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_CI_CILIBRARY_H
-#define LIBYM_CELL_CI_CILIBRARY_H
+#ifndef CILIBRARY_H
+#define CILIBRARY_H
 
-/// @file libym_cell/ci/CiLibrary.h
+/// @file CiLibrary.h
 /// @brief CiLibrary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -455,4 +455,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_CI_CILIBRARY_H
+#endif // CILIBRARY_H

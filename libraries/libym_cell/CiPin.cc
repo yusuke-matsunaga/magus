@@ -1,5 +1,5 @@
 
-/// @file libym_cell/CiPin.cc
+/// @file CiPin.cc
 /// @brief CiPin の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

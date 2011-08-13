@@ -1,7 +1,7 @@
 #ifndef TECHMAP_DUMPPATCMD_H
 #define TECHMAP_DUMPPATCMD_H
 
-/// @file magus/src/techmap/DumpPatCmd.h
+/// @file DumpPatCmd.h
 /// @brief DumpPatCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -20,13 +20,12 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 /// @brief パタンのバイナリファイルを出力するコマンド
 //////////////////////////////////////////////////////////////////////
 class DumpPatCmd :
-  public TechmapCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  DumpPatCmd(MagMgr* mgr,
-	     TechmapData* data);
+  DumpPatCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

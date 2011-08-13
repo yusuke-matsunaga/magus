@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_CI_CIBUS_H
-#define LIBYM_CELL_CI_CIBUS_H
+#ifndef CIBUS_H
+#define CIBUS_H
 
-/// @file libym_cell/ci/CiBus.h
+/// @file CiBus.h
 /// @brief CiBus のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -170,4 +170,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_CI_CIBUS_H
+#endif // CIBUS_H

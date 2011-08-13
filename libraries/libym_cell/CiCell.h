@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_CI_CICELL_H
-#define LIBYM_CELL_CI_CICELL_H
+#ifndef CICELL_H
+#define CICELL_H
 
-/// @file libym_cell/ci/CiCelll.h
+/// @file CiCelll.h
 /// @brief CiCell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -584,4 +584,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_CI_CICELL_H
+#endif // CICELL_H

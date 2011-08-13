@@ -9,8 +9,8 @@
 
 #include "PatMatcher.h"
 #include "ym_networks/BdnNode.h"
-#include "PatMgr.h"
-#include "PatGraph.h"
+#include "ym_cell/CellPatMgr.h"
+#include "ym_cell/CellPatGraph.h"
 #include "Match.h"
 
 
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_CELLMAP
 
 // @brief コンストラクタ
 // @param[in] pat_mgr パタンを管理するクラス
-PatMatcher::PatMatcher(const PatMgr& pat_mgr) :
+PatMatcher::PatMatcher(const CellPatMgr& pat_mgr) :
   mPatMgr(pat_mgr),
   mSbjMap(pat_mgr.node_num(), NULL),
   mInvMap(pat_mgr.node_num(), false),
@@ -45,23 +45,23 @@ PatMatcher::~PatMatcher()
 // @note input_map の中身は (BdnNode->id() << 1) | pol
 bool
 PatMatcher::operator()(const BdnNode* sbj_root,
-		       const PatGraph& pat_graph)
+		       const CellPatGraph& pat_graph)
 {
   // 根のノードを調べる．
   ymuint root_id = pat_graph.root_id();
   switch ( mPatMgr.node_type(root_id) ) {
-  case PatMgr::kInput:
+  case CellPatMgr::kInput:
     // これはなんでも OK
     break;
 
-  case PatMgr::kAnd:
+  case CellPatMgr::kAnd:
     if ( !sbj_root->is_and() ) {
       // 型が違う．
       return false;
     }
     break;
 
-  case PatMgr::kXor:
+  case CellPatMgr::kXor:
     if ( !sbj_root->is_xor() ) {
       // 型が違う．
       return false;
@@ -88,13 +88,13 @@ PatMatcher::operator()(const BdnNode* sbj_root,
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
     switch ( mPatMgr.node_type(from_id) ) {
-    case PatMgr::kInput:
+    case CellPatMgr::kInput:
       // どんな型でも OK
       // 極性が違っても OK
       inv =  mPatMgr.edge_inv(edge_id) ^ iinv;
       break;
 
-    case PatMgr::kAnd:
+    case CellPatMgr::kAnd:
       if ( !from_node->is_and() ) {
 	// 型が違う
 	goto end;
@@ -105,7 +105,7 @@ PatMatcher::operator()(const BdnNode* sbj_root,
       }
       break;
 
-    case PatMgr::kXor:
+    case CellPatMgr::kXor:
       if ( !from_node->is_xor() ) {
 	// 型が違う
 	goto end;

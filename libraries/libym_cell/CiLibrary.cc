@@ -1,5 +1,5 @@
 
-/// @file libym_cell/CiLibrary.cc
+/// @file CiLibrary.cc
 /// @brief CiLibrary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

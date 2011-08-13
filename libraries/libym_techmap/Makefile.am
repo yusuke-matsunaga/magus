@@ -4,7 +4,6 @@
 
 SUBDIRS = \
 	ym_techmap \
-	sbjgraph \
 	cellmap \
 	lutmap \
 	. \
@@ -14,7 +13,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_techmap.la
 
-INCLUDES = \
+libym_techmap_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

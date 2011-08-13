@@ -9,6 +9,7 @@ SUBDIRS = \
 	ym_cell \
 	mislib \
 	dotlib \
+	libdump \
 	. \
 	tests
 
@@ -46,10 +47,17 @@ libym_cell_la_SOURCES = \
 	CiTiming.h \
 	CiTiming.cc \
 	dump.cc	\
-	restore.cc
+	restore.cc \
+	CellMgr.cc \
+	CellFFClass.cc \
+	CellFFPosArray.cc \
+	CellLatchClass.cc \
+	CellLatchPosArray.cc \
+	CellPatMgr.cc
 
 libym_cell_la_LIBADD = \
 	dotlib/libym_cell_dotlib.la \
-	mislib/libym_cell_mislib.la
+	mislib/libym_cell_mislib.la \
+	libdump/libym_cell_libdump.la
 
 libym_cell_la_LDFLAGS =

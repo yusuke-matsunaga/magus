@@ -1,5 +1,5 @@
 
-/// @file libym_cell/CiTiming.cc
+/// @file CiTiming.cc
 /// @brief CiTiming の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

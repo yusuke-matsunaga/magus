@@ -10,16 +10,13 @@
 
 
 #include "ym_techmap/cellmap_nsdef.h"
-#include "ym_cell/cell_nsdef.h"
+#include "ym_cell/CellFFPosArray.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/cmn.h"
-#include "FFPosArray.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
-class CellMgr;
-class FuncGroup;
 class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
@@ -80,7 +77,7 @@ private:
   void
   add_inv(const BdnNode* node,
 	  bool inv,
-	  const FuncGroup& inv_func,
+	  const CellFuncGroup& inv_func,
 	  MapRecord& maprec);
 
   /// @brief node から各入力にいたる経路の重みを計算する．
@@ -110,7 +107,7 @@ private:
     }
 
     const Cell* mCell;
-    FFPosArray mPosArray;
+    CellFFPosArray mPosArray;
     bool mInv;
   };
 

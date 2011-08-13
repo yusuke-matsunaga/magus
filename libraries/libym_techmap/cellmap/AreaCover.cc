@@ -1,5 +1,5 @@
 
-/// @file libym_techmap/cellmap/AreaCover.cc
+/// @file AreaCover.cc
 /// @brief AreaCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,14 +12,14 @@
 #include "ym_networks/BdnDff.h"
 #include "ym_networks/CmnMgr.h"
 #include "ym_cell/Cell.h"
-#include "CellMgr.h"
-#include "PatMgr.h"
+#include "ym_cell/CellMgr.h"
+#include "ym_cell/CellPatMgr.h"
+#include "ym_cell/CellPatGraph.h"
+#include "ym_cell/CellFuncClass.h"
+#include "ym_cell/CellFuncGroup.h"
+#include "ym_cell/CellFFClass.h"
+#include "ym_cell/CellFFGroup.h"
 #include "PatMatcher.h"
-#include "PatGraph.h"
-#include "RepFunc.h"
-#include "FuncGroup.h"
-#include "FFClass.h"
-#include "FFGroup.h"
 #include "MapRecord.h"
 
 #include "ym_networks/BdnVerilogWriter.h"
@@ -103,11 +103,11 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
     FFInfo& ff_info = mFFInfo[sig];
     if ( ff_info.mCell == NULL ) {
       const Cell* min_cell = NULL;
-      FFPosArray min_pos_array;
+      CellFFPosArray min_pos_array;
       CellArea min_area = CellArea::infty();
       bool min_inv = false;
       for (ymuint i = 0; i < ffc_num; ++ i) {
-	const FFClass& ffc = cell_mgr.ff_class(i);
+	const CellFFClass& ffc = cell_mgr.ff_class(i);
 	bool pmatch = true;
 	bool nmatch = true;
 	if ( ffc.clear_sense() == 0 ) {
@@ -138,7 +138,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 
 	ymuint ng = ffc.group_num();
 	for (ymuint j = 0; j < ng; ++ j) {
-	  const FFGroup& ffg = ffc.group(j);
+	  const CellFFGroup& ffg = ffc.group(j);
 	  ymuint nc = ffg.cell_num();
 	  for (ymuint k = 0; k < nc; ++ k) {
 	    const Cell* cell = ffg.cell(j);
@@ -193,7 +193,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 		       const CellMgr& cell_mgr,
 		       MapRecord& maprec)
 {
-  const PatMgr& pat_mgr = cell_mgr.pat_mgr();
+  const CellPatMgr& pat_mgr = cell_mgr.pat_mgr();
   ymuint n = sbjgraph.max_node_id();
   mCostArray.resize(n * 2);
   ymuint max_input = pat_mgr.max_input();
@@ -201,7 +201,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   mLeafNum.clear();
   mLeafNum.resize(n, -1);
 
-  const FuncGroup& inv_func = cell_mgr.inv_func();
+  const CellFuncGroup& inv_func = cell_mgr.inv_func();
 
   // 入力のコストを設定
   const BdnNodeList& input_list = sbjgraph.input_list();
@@ -245,7 +245,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
     p_cost = DBL_MAX;
     n_cost = DBL_MAX;
     for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
-      const PatGraph& pat = pat_mgr.pat(pat_id);
+      const CellPatGraph& pat = pat_mgr.pat(pat_id);
       ymuint ni = pat.input_num();
       if ( pat_match(node, pat) ) {
 	ymuint rep_id = pat.rep_id();
@@ -253,11 +253,11 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	  cout << "Match with Pat#" << pat_id
 	       << ", Rep#" << rep_id << endl;
 	}
-	const RepFunc& rep = cell_mgr.rep(rep_id);
+	const CellFuncClass& rep = cell_mgr.rep(rep_id);
 	ymuint nf = rep.func_num();
 	for (ymuint f_pos = 0; f_pos < nf; ++ f_pos) {
 	  ymuint func_id = rep.func_id(f_pos);
-	  const FuncGroup& func = cell_mgr.func_group(func_id);
+	  const CellFuncGroup& func = cell_mgr.func_group(func_id);
 	  const NpnMap& npn_map = func.npn_map();
 	  Match c_match(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {
@@ -343,7 +343,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 void
 AreaCover::add_inv(const BdnNode* node,
 		   bool inv,
-		   const FuncGroup& inv_func,
+		   const CellFuncGroup& inv_func,
 		   MapRecord& maprec)
 {
   if ( maprec.get_match(node, !inv).leaf_num() == 1 ) {

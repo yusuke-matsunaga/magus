@@ -1,18 +1,16 @@
-#ifndef MAGUS_MAGMGR_H
-#define MAGUS_MAGMGR_H
+#ifndef MAGMGR_H
+#define MAGMGR_H
 
 /// @file MagMgr.h
 /// @brief MagMgr のヘッダファイル
-///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagMgr.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "magus_nsdef.h"
+#include "ym_cell/cell_nsdef.h"
 #include "ym_utils/Alloc.h"
 #include "ym_utils/ItvlMgr.h"
 
@@ -39,6 +37,10 @@ public:
 
 
 public:
+
+  /// @brief カレントセルライブラリの取得
+  CellMgr*
+  cur_cellmgr();
 
   /// @brief 新たな BNetwork を作成して登録する．
   /// @param[in] name 名前
@@ -201,6 +203,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // セルライブラリ
+  CellMgr* mCellMgr;
+
   // NetHandle 用のアロケータ
   UnitAlloc mAlloc;
 
@@ -239,4 +244,4 @@ private:
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_MAGMGR_H
+#endif // MAGMGR_H

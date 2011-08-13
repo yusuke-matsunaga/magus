@@ -13,10 +13,10 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_cell/cell_nsdef.h"
+#include "ym_cell/CellFFPosArray.h"
+#include "ym_cell/CellLatchPosArray.h"
 #include "ym_networks/cmn.h"
 #include "Match.h"
-#include "FFPosArray.h"
-#include "LatchPosArray.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -56,7 +56,7 @@ public:
   void
   set_dff_match(const BdnDff* dff,
 		const Cell* cell,
-		FFPosArray pos_array,
+		CellFFPosArray pos_array,
 		bool inv);
 
   /// @brief ラッチのマッチを記録する．
@@ -66,7 +66,7 @@ public:
   void
   set_latch_match(const BdnLatch* latch,
 		  const Cell* cell,
-		  LatchPosArray pos_array);
+		  CellLatchPosArray pos_array);
 
   /// @brief 論理ゲートのマッチを記録する．
   /// @param[in] node 該当のノード
@@ -125,7 +125,7 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    FFPosArray mPosArray;
+    CellFFPosArray mPosArray;
 
     // 極性情報
     bool mInv;
@@ -144,7 +144,7 @@ private:
     const Cell* mCell;
 
     // ピンの割り当て情報
-    LatchPosArray mPosArray;
+    CellLatchPosArray mPosArray;
   };
 
   // ノードの割り当て情報

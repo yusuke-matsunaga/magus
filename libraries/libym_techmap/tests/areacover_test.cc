@@ -1,5 +1,5 @@
 
-/// @file libym_techmap/tests/areacover_test.cc
+/// @file areacover_test.cc
 /// @brief AreaCover のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 
+#include "ym_cell/CellMgr.h"
 #include "ym_networks/BdnMgr.h"
 #include "ym_networks/BdnBlifReader.h"
 #include "ym_networks/BdnDumper.h"
@@ -39,8 +40,7 @@ void
 test(string pat_filename,
      string sbj_filename)
 {
-  CellMap mapper;
-
+  CellMgr cell_mgr;
   {
     ifstream ifs;
     ifs.open(pat_filename.c_str(), ios::binary);
@@ -50,7 +50,7 @@ test(string pat_filename,
       return;
     }
 
-    if ( !mapper.load_library(ifs) ) {
+    if ( !cell_mgr.load_library(ifs) ) {
       // エラー
       cerr << "Error occured during load_library()" << endl;
       return;
@@ -75,7 +75,8 @@ test(string pat_filename,
 
   CmnMgr mapnetwork;
 
-  mapper.area_map(sbjgraph, 0, mapnetwork);
+  CellMap mapper;
+  mapper.area_map(cell_mgr, sbjgraph, 0, mapnetwork);
 
   CmnDumper dump;
   dump(cout, mapnetwork);

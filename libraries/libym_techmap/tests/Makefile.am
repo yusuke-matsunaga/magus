@@ -34,21 +34,7 @@ LIBYM_TECHMAP = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 bin_PROGRAMS = \
-	cell_mgr_test \
-	areacover_test \
-	libdump_test
-
-cell_mgr_test_SOURCES = \
-	cell_mgr_test.cc
-
-cell_mgr_test_LDADD = \
-	$(LIBYM_TECHMAP)
-
-libdump_test_SOURCES = \
-	libdump_test.cc
-
-libdump_test_LDADD = \
-	$(LIBYM_TECHMAP)
+	areacover_test
 
 areacover_test_SOURCES = \
 	areacover_test.cc

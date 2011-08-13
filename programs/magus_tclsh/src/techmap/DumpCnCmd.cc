@@ -1,11 +1,9 @@
 
-/// @file magus/techmap/DumpCnCmd.cc
+/// @file DumpCnCmd.cc
 /// @brief DumpCnCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DumpLutCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,8 +21,8 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 
 // @brief コンストラクタ
 DumpCnCmd::DumpCnCmd(MagMgr* mgr,
-		     TechmapData* data) :
-  TechmapCmd(mgr, data)
+		     CmnMgr& cmnmgr) :
+  TechmapCmd(mgr, cmnmgr)
 {
   mPoptVerilog = new TclPopt(this, "verilog",
 			     "verilog mode");

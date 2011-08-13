@@ -17,8 +17,6 @@
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
-class CellMgr;
-
 //////////////////////////////////////////////////////////////////////
 /// @class CellMap CellMap.h "ym_techmap/CellMap.h"
 /// @brief セルライブラリ用ののテクノロジマッピングを行うクラス
@@ -36,30 +34,11 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 情報設定用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief セルライブラリのデータを読み込んでセットする．
-  /// @param[in] s 入力元のストリーム
-  /// @retval true 読み込みが成功した．
-  /// @retval false 読み込みが失敗した．
-  bool
-  load_library(istream& s);
-
-  /// @brief セルライブラリの内容(+パタングラフ)をバイナリファイルに書き出す．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] library ダンプ対象のライブラリ
-  void
-  dump_library(ostream& s,
-	       const CellLibrary& library);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // テクノロジマッピングを行う関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 面積最小化 DAG covering のヒューリスティック関数
+  /// @param[in] cell_mgr セルライブラリ
   /// @param[in] sbjgraph サブジェクトグラフを表す Bdn
   /// @param[in] mode モード
   ///  - 0: fanout フロー, resub なし
@@ -68,7 +47,8 @@ public:
   ///  - 3: weighted フロー, resub あり
   /// @param[out] mapnetwork マッピング結果
   void
-  area_map(const BdnMgr& sbjgraph,
+  area_map(const CellMgr& cell_mgr,
+	   const BdnMgr& sbjgraph,
 	   ymuint mode,
 	   CmnMgr& mapnetwork);
 
@@ -94,15 +74,6 @@ public:
 	    ymuint& lut_num,
 	    ymuint& depth);
 #endif
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // セルライブラリを管理するオブジェクト
-  CellMgr* mCellMgr;
 
 };
 

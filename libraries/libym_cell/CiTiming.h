@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_CI_CITIMING_H
-#define LIBYM_CELL_CI_CITIMING_H
+#ifndef CITIMING_H
+#define CITIMING_H
 
-/// @file　libym_cell/CiTiming.h
+/// @file　CiTiming.h
 /// @brief CellTiming の実装クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -514,4 +514,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_CI_CITIMING_H
+#endif // CITIMING_H

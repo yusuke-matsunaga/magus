@@ -1,5 +1,5 @@
 
-/// @file libym_cell/CiCell.cc
+/// @file CiCell.cc
 /// @brief CiCell の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

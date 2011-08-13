@@ -61,6 +61,19 @@ class CellLut;
 class CellMislibReader;
 class CellDotlibReader;
 
+class CellGroup;
+class CellFuncClass;
+class CellFuncGroup;
+class CellFFClass;
+class CellFFGroup;
+class CellFFPosArray;
+class CellLatchClass;
+class CellLatchGroup;
+class CellLatchPosArray;
+class CellMgr;
+class CellPatMgr;
+class CellPatGraph;
+
 END_NAMESPACE_YM_CELL
 
 BEGIN_NAMESPACE_YM
@@ -82,6 +95,18 @@ using nsCell::CellLut;
 
 using nsCell::CellMislibReader;
 using nsCell::CellDotlibReader;
+
+using nsCell::CellFuncClass;
+using nsCell::CellFuncGroup;
+using nsCell::CellFFClass;
+using nsCell::CellFFGroup;
+using nsCell::CellFFPosArray;
+using nsCell::CellLatchClass;
+using nsCell::CellLatchGroup;
+using nsCell::CellLatchPosArray;
+using nsCell::CellMgr;
+using nsCell::CellPatMgr;
+using nsCell::CellPatGraph;
 
 END_NAMESPACE_YM
 

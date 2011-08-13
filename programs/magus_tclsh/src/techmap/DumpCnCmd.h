@@ -1,13 +1,11 @@
 #ifndef TECHMAP_DUMPCNCMD_H
 #define TECHMAP_DUMPCNCMD_H
 
-/// @file magus/techmap/DumpCnCmd.h
+/// @file DumpCnCmd.h
 /// @brief DumpCnCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DumpCnCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   DumpCnCmd(MagMgr* mgr,
-	    TechmapData* data);
+	    CmnMgr& cmnmgr);
 
   /// @brief デストラクタ
   virtual

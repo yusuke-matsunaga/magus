@@ -1,5 +1,5 @@
 
-/// @file libym_mislib/CellMislibReader.cc
+/// @file CellMislibReader.cc
 /// @brief CellMislibReader の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -45,7 +45,6 @@ noinst_HEADERS = \
 	MvnMgr.h \
 	MvnModule.h \
 	MvnNode.h \
-	MvnOutputPin.h \
 	MvnPort.h \
 	MvnVerilogReader.h \
 	MvnVerilogWriter.h \

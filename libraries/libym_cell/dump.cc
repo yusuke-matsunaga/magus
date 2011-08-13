@@ -1,5 +1,5 @@
 
-/// @file libym_cell/dump.cc
+/// @file dump.cc
 /// @brief CellLibrary の内容をダンプする関数
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

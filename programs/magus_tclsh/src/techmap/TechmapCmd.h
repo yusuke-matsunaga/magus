@@ -1,18 +1,15 @@
 #ifndef TECHMAP_TECHMAPCMD_H
 #define TECHMAP_TECHMAPCMD_H
 
-/// @file magus/techmap/TechmapCmd.h
+/// @file TechmapCmd.h
 /// @brief TechmapCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TechmapCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MagCmd.h"
-#include "ym_techmap/CellMap.h"
 #include "ym_networks/CmnMgr.h"
 
 
@@ -30,21 +27,6 @@ END_NAMESPACE_MAGUS
 BEGIN_NAMESPACE_MAGUS_TECHMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TechmapData TechmapCmd.h "TechmapCmd.h"
-/// @brief TechmapCmd に共通のデータ
-//////////////////////////////////////////////////////////////////////
-struct TechmapData
-{
-  // テクノロジマッパー
-  CellMap mCellMap;
-
-  // セルネットワーク
-  CmnMgr mCmnMgr;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class TechmapCmd TechmapCmd.h "TechmapCmd.h"
 /// @brief テクノロジマッピングを行うコマンドの基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -55,7 +37,7 @@ public:
 
   /// @brief コンストラクタ
   TechmapCmd(MagMgr* mgr,
-	     TechmapData* data);
+	     CmnMgr& cmnmgr);
 
   /// @brief デストラクタ
   virtual
@@ -63,10 +45,6 @@ public:
 
 
 protected:
-
-  /// @brief CellMap を得る．
-  CellMap&
-  techmap();
 
   /// @brief セルネットワークを得る．
   CmnMgr&
@@ -78,7 +56,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  TechmapData* mData;
+  // セルネットワーク
+  CmnMgr& mCmnMgr;
 
 };
 

@@ -71,7 +71,7 @@ MapRecord::copy(const MapRecord& src)
 void
 MapRecord::set_dff_match(const BdnDff* dff,
 			 const Cell* cell,
-			 FFPosArray pos_array,
+			 CellFFPosArray pos_array,
 			 bool inv)
 {
   DffInfo& dffinfo = mDffInfo[dff->id()];
@@ -87,7 +87,7 @@ MapRecord::set_dff_match(const BdnDff* dff,
 void
 MapRecord::set_latch_match(const BdnLatch* latch,
 			   const Cell* cell,
-			   LatchPosArray pos_array)
+			   CellLatchPosArray pos_array)
 {
   LatchInfo& latchinfo = mLatchInfo[latch->id()];
   latchinfo.mCell = cell;
@@ -251,7 +251,7 @@ MapRecord::gen_dff(const BdnDff* sbj_dff)
   const CmnDffCell* dff_cell = mMapGraph->dff_cell(cell);
   if ( dff_cell == NULL ) {
     ymuint pos_array[6];
-    const FFPosArray& pos_array_src = dff_info.mPosArray;
+    const CellFFPosArray& pos_array_src = dff_info.mPosArray;
     pos_array[0] = pos_array_src.data_pos();
     pos_array[1] = encode(pos_array_src.clock_pos(),
 			  pos_array_src.clock_sense());

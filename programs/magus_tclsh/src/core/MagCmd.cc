@@ -1,11 +1,9 @@
 
-/// @file magus/logbase/MagCmd.cc
+/// @file MagCmd.cc
 /// @brief MagCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -38,6 +36,18 @@ MagMgr*
 MagCmd::mgr() const
 {
   return mMagMgr;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// セルライブラリ関係の処理
+//////////////////////////////////////////////////////////////////////
+
+// @brief カレントセルライブラリの取得
+CellMgr*
+MagCmd::cur_cellmgr()
+{
+  return mMagMgr->cur_cellmgr();
 }
 
 

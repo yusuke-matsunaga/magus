@@ -1,13 +1,11 @@
 #ifndef TECHMAP_LOADPATCMD_H
 #define TECHMAP_LOADPATCMD_H
 
-/// @file magus/techmap/LoadPatCmd.h
+/// @file LoadPatCmd.h
 /// @brief LoadPatCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TechmapCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -21,13 +19,12 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 /// @brief パタンのバイナリデータを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
 class LoadPatCmd :
-  public TechmapCmd
+  public MagCmd
 {
 public:
 
   /// @brief コンストラクタ
-  LoadPatCmd(MagMgr* mgr,
-	     TechmapData* data);
+  LoadPatCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual

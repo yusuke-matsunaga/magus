@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_CELLLUTIMPL_H
-#define LIBYM_CELL_CELLLUTIMPL_H
+#ifndef CELLLUTIMPL_H
+#define CELLLUTIMPL_H
 
-/// @file　libym_cell/CellLutImpl.h
+/// @file　CellLutImpl.h
 /// @brief CellLutTemplate/CellLut のの実装クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -405,4 +405,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // YM_CELL_CELLLUT_H
+#endif // CELLLUTIMPL_H

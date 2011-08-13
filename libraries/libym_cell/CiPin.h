@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_CI_CIPIN_H
-#define LIBYM_CELL_CI_CIPIN_H
+#ifndef CIPIN_H
+#define CIPIN_H
 
-/// @file　libym_cell/ci/CiPin.h
+/// @file　CiPin.h
 /// @brief CiPin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -642,4 +642,4 @@ public:
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_CI_CIPIN_H
+#endif // CIPIN_H

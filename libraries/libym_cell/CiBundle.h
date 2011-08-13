@@ -1,7 +1,7 @@
-#ifndef LIBYM_CELL_CI_CIBUNDLE_H
-#define LIBYM_CELL_CI_CIBUNDLE_H
+#ifndef CIBUNDLE_H
+#define CIBUNDLE_H
 
-/// @file libym_cell/ci/CiBundle.h
+/// @file CiBundle.h
 /// @brief CiBundle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -73,4 +73,4 @@ private:
 
 END_NAMESPACE_YM_CELL
 
-#endif // LIBYM_CELL_CI_CIBUNDLE_H
+#endif // CIBUNDLE_H

@@ -1,5 +1,5 @@
 
-/// @file libym_mislib/CellDotlibReader.cc
+/// @file CellDotlibReader.cc
 /// @brief CellDotlibReader の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -1,7 +1,7 @@
-#ifndef LIBYM_TECHMAP_CELLMAP_PATMATCHER_H
-#define LIBYM_TECHMAP_CELLMAP_PATMATCHER_H
+#ifndef PATMATCHER_H
+#define PATMATCHER_H
 
-/// @file libym_techmap/cellmap/PatMatcher.h
+/// @file PatMatcher.h
 /// @brief PatMatcher のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,12 +11,10 @@
 
 #include "ym_techmap/cellmap_nsdef.h"
 #include "ym_networks/bdn.h"
+#include "ym_cell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
-
-class PatMgr;
-class PatGraph;
 
 //////////////////////////////////////////////////////////////////////
 /// @class PatMatcher PatMatcher.h "PatMatcher.h"
@@ -28,7 +26,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] pat_mgr パタンを管理するクラス
-  PatMatcher(const PatMgr& pat_mgr);
+  PatMatcher(const CellPatMgr& pat_mgr);
 
   /// @brief デストラクタ
   ~PatMatcher();
@@ -43,7 +41,7 @@ public:
   /// @retval false マッチしなかった．
   bool
   operator()(const BdnNode* sbj_root,
-	     const PatGraph& pat_graph);
+	     const CellPatGraph& pat_graph);
 
   /// @brief 直前のマッチングにおける出力の極性を得る．
   /// @retval true 反転あり
@@ -87,7 +85,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // パタングラフを管理するクラス
-  const PatMgr& mPatMgr;
+  const CellPatMgr& mPatMgr;
 
   // パタンノードの ID をキーとしてサブジェクトノードを入れる配列
   vector<const BdnNode*> mSbjMap;
@@ -137,4 +135,4 @@ PatMatcher::leaf_inv(ymuint pos) const
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // LIBYM_TECHMAP_CELLMAP_PATMATCHER_H
+#endif // PATMATCHER_H
