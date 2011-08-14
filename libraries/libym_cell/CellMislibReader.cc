@@ -9,7 +9,7 @@
 
 #include "ym_cell/CellMislibReader.h"
 
-#include "CiLibrary.h"
+#include "ci/CiLibrary.h"
 
 #include "mislib/MislibParser.h"
 #include "mislib/MislibMgr.h"

@@ -9,7 +9,7 @@
 
 #include "ym_cell/CellDotlibReader.h"
 
-#include "CiLibrary.h"
+#include "ci/CiLibrary.h"
 
 #include "dotlib/DotlibParser.h"
 #include "dotlib/DotlibMgr.h"
