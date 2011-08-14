@@ -94,6 +94,67 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+inline
+CellFFClass::CellFFClass() :
+  mBits(0U)
+{
+}
+
+// @brief デストラクタ
+inline
+CellFFClass::~CellFFClass()
+{
+  // mGroupList は CellMgr が管理している．
+}
+
+// @brief シグネチャを返す．
+inline
+ymuint
+CellFFClass::signature() const
+{
+  return mBits;
+}
+
+// @brief クリア入力を持つタイプの時に true を返す．
+inline
+bool
+CellFFClass::has_clear() const
+{
+  return clear_sense() != 0U;
+}
+
+// @brief プリセット入力を持つタイプの時に true を返す．
+inline
+bool
+CellFFClass::has_preset() const
+{
+  return preset_sense() != 0U;
+}
+
+// @brief このクラスに属する CellFFGroup の数を返す．
+inline
+ymuint
+CellFFClass::group_num() const
+{
+  return mGroupNum;
+}
+
+// @brief CellFFGroup を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < group_num() )
+inline
+const CellFFGroup&
+CellFFClass::group(ymuint pos) const
+{
+  return *mGroupList[pos];
+}
+
+
 END_NAMESPACE_YM_CELL
 
 #endif // YM_CELL_CELLFFCLASS_H
