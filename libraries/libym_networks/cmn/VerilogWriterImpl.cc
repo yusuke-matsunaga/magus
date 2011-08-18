@@ -73,6 +73,7 @@ VerilogWriterImpl::dump(ostream& s,
       }
     }
   }
+  s << ");" << endl;
 
   for (ymuint i = 0; i < np; ++ i) {
     const CmnPort* port = network.port(i);
