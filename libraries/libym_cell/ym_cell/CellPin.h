@@ -74,21 +74,25 @@ public:
   direction() const = 0;
 
   /// @brief 入力ピンの時に true を返す．
+  /// @note direction() == kInput と等価
   virtual
   bool
   is_input() const = 0;
 
   /// @brief 出力ピンの時に true を返す．
+  /// @note direction() == kOutput と等価
   virtual
   bool
   is_output() const = 0;
 
   /// @brief 入出力ピンの時に true を返す．
+  /// @note direction() == kInout と等価
   virtual
   bool
   is_inout() const = 0;
 
   /// @brief 内部ピンの時に true を返す．
+  /// @note direction() == kInternal と等価
   virtual
   bool
   is_internal() const = 0;
