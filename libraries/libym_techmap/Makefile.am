@@ -20,7 +20,6 @@ libym_techmap_la_CPPFLAGS = \
 libym_techmap_la_SOURCES =
 
 libym_techmap_la_LIBADD = \
-	sbjgraph/libym_techmap_sbj.la \
 	cellmap/libym_techmap_cell.la \
 	lutmap/libym_techmap_lut.la
 
