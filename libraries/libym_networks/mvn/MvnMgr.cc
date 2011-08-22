@@ -586,22 +586,4 @@ MvnInputPin::~MvnInputPin()
 {
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス MvnOutputPin
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-MvnOutputPin::MvnOutputPin() :
-  mNode(NULL),
-  mPos(0),
-  mBitWidth(0)
-{
-}
-
-// @brief デストラクタ
-MvnOutputPin::~MvnOutputPin()
-{
-}
-
 END_NAMESPACE_YM_NETWORKS_MVN

@@ -11,7 +11,6 @@
 
 #include "ym_networks/mvn.h"
 #include "ym_networks/MvnInputPin.h"
-#include "ym_networks/MvnOutputPin.h"
 #include "ym_cell/cell_nsdef.h"
 
 

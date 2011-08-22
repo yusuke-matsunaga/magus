@@ -20,7 +20,6 @@
 #include "ym_networks/MvnPort.h"
 #include "ym_networks/MvnNode.h"
 #include "ym_networks/MvnInputPin.h"
-#include "ym_networks/MvnOutputPin.h"
 
 #include "ThroughConv.h"
 #include "NotConv.h"
