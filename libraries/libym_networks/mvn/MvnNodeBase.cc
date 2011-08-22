@@ -72,6 +72,111 @@ MvnNodeBase::_input(ymuint pos)
   return mInputArray + pos;
 }
 
+// @brief クロック信号の極性を得る．
+// @retval 1 正極性(posedge)
+// @retval 0 負極性(negedge)
+// @note type() が kDff の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::clock_pol() const
+{
+  return 0;
+}
+
+// @brief 非同期セット信号の極性を得る．
+// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+// @retval 1 正極性(posedge)
+// @retval 0 負極性(negedge)
+// @note type() が kDff の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::control_pol(ymuint pos) const
+{
+  return 0;
+}
+
+// @brief 非同期セットの値を表す定数ノードを得る．
+// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
+// @note デフォルトの実装では NULL を返す．
+const MvnNode*
+MvnNodeBase::control_val(ymuint pos) const
+{
+  return NULL;
+}
+
+// @brief ビット位置を得る．
+// @note type() が kConstBitSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::bitpos() const
+{
+  return 0;
+}
+
+// @brief 範囲指定の MSB を得る．
+// @note type() が kConstPartSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::msb() const
+{
+  return 0;
+}
+
+// @brief 範囲指定の LSB を得る．
+// @note type() が kConstPartSelect の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::lsb() const
+{
+  return 0;
+}
+
+// @brief 定数値を得る．
+// @param[out] val 値を格納するベクタ
+// @note type() が kConst の時のみ意味を持つ．
+// @note デフォルトの実装ではなにもしない．
+void
+MvnNodeBase::const_value(vector<ymuint32>& val) const
+{
+}
+
+// @brief Xマスクを得る．
+// @param[out] val 値を格納するベクタ
+// @note type() が kEqX の時のみ意味を持つ．
+// @note デフォルトの実装ではなにもしない．
+void
+MvnNodeBase::xmask(vector<ymuint32>& val) const
+{
+}
+
+// @brief セルを得る．
+// @note type() が kCell の時のみ意味をモツ．
+// @note デフォルトの実装では NULL を返す．
+const Cell*
+MvnNodeBase::cell() const
+{
+  return NULL;
+}
+
+// @brief セルの出力ピン番号を返す．
+// @note type() が kCell の時のみ意味を持つ．
+// @note デフォルトの実装では 0 を返す．
+ymuint
+MvnNodeBase::cell_opin_pos() const
+{
+  return 0;
+}
+
+// @brief 多出力セルノードの場合の代表ノードを返す．
+// @note type() が kCell の時のみ意味を持つ．
+// @note 1出力セルノードの時には自分自身を返す．
+// @note デフォルトの実装では NULL を返す．
+const MvnNode*
+MvnNodeBase::cell_node() const
+{
+  return NULL;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // MvnMgr のノード生成関数

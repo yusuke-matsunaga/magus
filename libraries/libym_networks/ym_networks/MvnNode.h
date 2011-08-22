@@ -169,15 +169,6 @@ public:
   const MvnInputPin*
   input(ymuint pos) const = 0;
 
-  /// @brief クロック信号の極性を得る．
-  /// @retval 1 正極性(posedge)
-  /// @retval 0 負極性(negedge)
-  /// @note type() が kDff の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  virtual
-  ymuint
-  clock_pol() const;
-
   /// @brief 出力のビット幅を得る．
   ymuint
   bit_width() const;
@@ -186,66 +177,79 @@ public:
   const MvnInputPinList&
   dst_pin_list() const;
 
+  /// @brief クロック信号の極性を得る．
+  /// @retval 1 正極性(posedge)
+  /// @retval 0 負極性(negedge)
+  /// @note type() が kDff の時のみ意味を持つ．
+  virtual
+  ymuint
+  clock_pol() const = 0;
+
   /// @brief 非同期セット信号の極性を得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
   /// @retval 1 正極性(posedge)
   /// @retval 0 負極性(negedge)
   /// @note type() が kDff の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
   virtual
   ymuint
-  control_pol(ymuint pos) const;
+  control_pol(ymuint pos) const = 0;
 
   /// @brief 非同期セットの値を表す定数ノードを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
-  /// @note デフォルトの実装では NULL を返す．
   virtual
   const MvnNode*
-  control_val(ymuint pos) const;
+  control_val(ymuint pos) const = 0;
 
   /// @brief ビット位置を得る．
   /// @note type() が kConstBitSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
   virtual
   ymuint
-  bitpos() const;
+  bitpos() const = 0;
 
   /// @brief 範囲指定の MSB を得る．
   /// @note type() が kConstPartSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
   virtual
   ymuint
-  msb() const;
+  msb() const = 0;
 
   /// @brief 範囲指定の LSB を得る．
   /// @note type() が kConstPartSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
   virtual
   ymuint
-  lsb() const;
+  lsb() const = 0;
 
   /// @brief 定数値を得る．
   /// @param[out] val 値を格納するベクタ
   /// @note type() が kConst の時のみ意味を持つ．
-  /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  const_value(vector<ymuint32>& val) const;
+  const_value(vector<ymuint32>& val) const = 0;
 
   /// @brief Xマスクを得る．
   /// @param[out] val 値を格納するベクタ
   /// @note type() が kCaseEq の時のみ意味を持つ．
-  /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  xmask(vector<ymuint32>& val) const;
+  xmask(vector<ymuint32>& val) const = 0;
 
   /// @brief セルを得る．
-  /// @note type() が kCell の時のみ意味をモツ．
-  /// @note デフォルトの実装では NULL を返す．
+  /// @note type() が kCell の時のみ意味を持つ．
   virtual
   const Cell*
-  cell() const;
+  cell() const = 0;
+
+  /// @brief セルの出力ピン番号を返す．
+  /// @note type() が kCell の時のみ意味を持つ．
+  virtual
+  ymuint
+  cell_opin_pos() const = 0;
+
+  /// @brief 多出力セルノードの場合の代表ノードを返す．
+  /// @note type() が kCell の時のみ意味を持つ．
+  /// @note 1出力セルノードの時には自分自身を返す．
+  virtual
+  const MvnNode*
+  cell_node() const = 0;
 
 
 protected:
