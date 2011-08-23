@@ -33,16 +33,6 @@ public:
     kDirInternal
   };
 
-
-  //////////////////////////////////////////////////////////////////////
-  /// @brief タイミングの条件を表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tTimingSense {
-    kSensePosiUnate = 1,
-    kSenseNegaUnate = 2,
-    kSenseNonUnate  = 3
-  };
-
 protected:
 
   /// @brief コンストラクタ
@@ -173,16 +163,6 @@ public:
   virtual
   CellTime
   min_transition() const = 0;
-
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellTiming*
-  timing(ymuint ipos,
-	 tTimingSense sense) const = 0;
 
 };
 

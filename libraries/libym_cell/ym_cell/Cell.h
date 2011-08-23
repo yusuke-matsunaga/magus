@@ -51,6 +51,106 @@ public:
   CellArea
   area() const = 0;
 
+  /// @brief 入力ピン数の取得
+  virtual
+  ymuint
+  input_num() const = 0;
+
+  /// @brief 入力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const CellPin*
+  input(ymuint pos) const = 0;
+
+  /// @brief 出力ピン数の取得
+  virtual
+  ymuint
+  output_num() const = 0;
+
+  /// @brief 出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const CellPin*
+  output(ymuint pos) const = 0;
+
+  /// @brief 入出力ピン数の取得
+  virtual
+  ymuint
+  inout_num() const = 0;
+
+  /// @brief 入出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const CellPin*
+  inout(ymuint pos) const = 0;
+
+  /// @brief 名前からピンの取得
+  /// @param[in] name ピン名
+  /// @return name という名前をピンを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellPin*
+  pin(const string& name) const = 0;
+
+  /// @brief バス数の取得
+  virtual
+  ymuint
+  bus_num() const = 0;
+
+  /// @brief バスの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
+  virtual
+  const CellBus*
+  bus(ymuint pos) const = 0;
+
+  /// @brief 名前からバスの取得
+  /// @param[in] name バス名
+  /// @return name という名前のバスを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellBus*
+  bus(const string& name) const = 0;
+
+  /// @brief バンドル数の取得
+  virtual
+  ymuint
+  bundle_num() const = 0;
+
+  /// @brief バンドルの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
+  virtual
+  const CellBundle*
+  bundle(ymuint pos) const = 0;
+
+  /// @brief 名前からバンドルの取得
+  virtual
+  const CellBundle*
+  bundle(const string& name) const = 0;
+
+  /// @brief 属している CellGroup を返す．
+  virtual
+  const CellGroup*
+  cell_group() const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // タイミング情報の取得
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief タイミング情報の取得
+  /// @param[in] ipos 開始ピン番号
+  /// @param[in] opos 終了ピン番号
+  /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @return 条件に合致するタイミング情報を返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellTiming*
+  timing(ymuint ipos,
+	 ymuint opos,
+	 tCellTimingSense sense) const = 0;
+
+#if 0
   /// @brief 組み合わせ論理セルの時に true を返す．
   bool
   is_logic() const;
@@ -73,10 +173,6 @@ public:
   bool
   is_seq() const;
 
-  /// @brief 論理セルの場合に出力ピン数を返す．
-  ymuint
-  output_num() const;
-
   /// @brief 論理セルの場合に関数を返す．
   /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
   /// @note 非論理セルの場合の返り値は不定
@@ -96,26 +192,6 @@ public:
   /// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
   bool
   has_preset() const;
-
-  /// @brief 論理セルの場合に入力ピン番号を返す．
-  /// @param[in] pos CellClass の関数における入力番号
-  ymuint
-  input_pos(ymuint pos) const;
-
-  /// @brief 論理セルの場合に入力ピンの反転属性を返す．
-  /// @param[in] pos CellClass の関数における入力番号
-  bool
-  input_inv(ymuint pos) const;
-
-  /// @brief 論理セルの場合に出力ピン番号を返す．
-  /// @param[in] pos CellClass の関数における出力番号
-  ymuint
-  output_pos(ymuint pos) const;
-
-  /// @brief 論理セルの場合に出力ピンの反転属性を返す．
-  /// @param[in] pos CellClass の関数における出力番号
-  bool
-  output_inv(ymuint pos) const;
 
   /// @brief FF/ラッチセルの場合にデータ入力ピン番号を返す．
   ymuint
@@ -165,6 +241,7 @@ public:
   /// @brief FF/ラッチセルの場合に XQ出力ピン番号を返す．
   ymuint
   xq_pos() const;
+#endif
 
 #if 0
   /// @brief 状態変数1の名前を返す．
@@ -241,272 +318,7 @@ public:
   clear_preset_var2() const = 0;
 #endif
 
-  /// @brief ピン数の取得
-  virtual
-  ymuint
-  pin_num() const = 0;
-
-  /// @brief ピンの取得
-  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < pin_num()
-  virtual
-  const CellPin*
-  pin(ymuint pin_id) const = 0;
-
-  /// @brief 名前からピンの取得
-  /// @param[in] name ピン名
-  /// @return name という名前をピンを返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellPin*
-  pin(const string& name) const = 0;
-
-  /// @brief バス数の取得
-  virtual
-  ymuint
-  bus_num() const = 0;
-
-  /// @brief バスの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
-  virtual
-  const CellBus*
-  bus(ymuint pos) const = 0;
-
-  /// @brief 名前からバスの取得
-  /// @param[in] name バス名
-  /// @return name という名前のバスを返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellBus*
-  bus(const string& name) const = 0;
-
-  /// @brief バンドル数の取得
-  virtual
-  ymuint
-  bundle_num() const = 0;
-
-  /// @brief バンドルの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
-  virtual
-  const CellBundle*
-  bundle(ymuint pos) const = 0;
-
-  /// @brief 名前からバンドルの取得
-  virtual
-  const CellBundle*
-  bundle(const string& name) const = 0;
-
-  /// @brief 属している CellGroup を返す．
-  virtual
-  const CellGroup*
-  cell_group() const = 0;
-
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 組み合わせ論理セルの時に true を返す．
-inline
-bool
-Cell::is_logic() const
-{
-  return cell_group()->is_logic();
-}
-
-// @brief トライステートセルの場合に true を返す．
-// @note もちろん論理セルでもある．
-// @note 複数出力のうち1つでもトライステートなら true を返す．
-inline
-bool
-Cell::is_tristate() const
-{
-  return cell_group()->is_tristate();
-}
-
-// @brief FFセルの時に true を返す．
-inline
-bool
-Cell::is_ff() const
-{
-  return cell_group()->is_ff();
-}
-
-// @brief ラッチセルの時に true を返す．
-inline
-bool
-Cell::is_latch() const
-{
-  return cell_group()->is_latch();
-}
-
-// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
-inline
-bool
-Cell::is_seq() const
-{
-  return cell_group()->is_seq();
-}
-
-// @brief 論理セルの場合に出力ピン数を返す．
-inline
-ymuint
-Cell::output_num() const
-{
-  return cell_group()->output_num();
-}
-
-// @brief 論理セルの場合に関数を返す．
-// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
-// @note 非論理セルの場合の返り値は不定
-inline
-const TvFunc&
-Cell::logic_function(ymuint pos) const
-{
-  return cell_group()->logic_function(pos);
-}
-
-// @brief トライステートセルの場合にトライステート条件関数を返す．
-// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
-// @note 通常の論理セルの場合には定数0関数を返す．
-inline
-const TvFunc&
-Cell::tristate_function(ymuint pos) const
-{
-  return cell_group()->tristate_function(pos);
-}
-
-// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
-inline
-bool
-Cell::has_clear() const
-{
-  return cell_group()->has_clear();
-}
-
-// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
-inline
-bool
-Cell::has_preset() const
-{
-  return cell_group()->has_preset();
-}
-
-// @brief 論理セルの場合に入力ピン番号を返す．
-// @param[in] pos CellClass の関数における入力番号
-inline
-ymuint
-Cell::input_pos(ymuint pos) const
-{
-  return cell_group()->input_pos(pos);
-}
-
-// @brief 論理セルの場合に出力ピン番号を返す．
-// @param[in] pos CellClass の関数における出力番号
-inline
-ymuint
-Cell::output_pos(ymuint pos) const
-{
-  return cell_group()->output_pos(pos);
-}
-
-// @brief FF/ラッチセルの場合にデータ入力ピン番号を返す．
-inline
-ymuint
-Cell::data_pos() const
-{
-  return cell_group()->data_pos();
-}
-
-// @brief FF/ラッチセルの場合にデータ入力ピンの反転属性を返す．
-inline
-bool
-Cell::data_inv() const
-{
-  return cell_group()->data_inv();
-}
-
-// @brief FFセルの場合にクロック入力ピン番号を返す．
-inline
-ymuint
-Cell::clock_pos() const
-{
-  return cell_group()->clock_pos();
-}
-
-// @brief FFセルの場合にクロック入力ピンの反転属性を返す．
-// @note ポジティブエッジが正極性だと思う．
-inline
-bool
-Cell::clock_inv() const
-{
-  return cell_group()->clock_inv();
-}
-
-// @brief ラッチセルの場合にイネーブル入力ピン番号を返す．
-inline
-ymuint
-Cell::enable_pos() const
-{
-  return cell_group()->enable_pos();
-}
-
-// @brief ラッチセルの場合にイネーブル入力ピンの反転属性を返す．
-inline
-bool
-Cell::enable_inv() const
-{
-  return cell_group()->enable_inv();
-}
-
-// @brief FF/ラッチセルの場合にクリア入力ピン番号を返す．
-inline
-ymuint
-Cell::clear_pos() const
-{
-  return cell_group()->clear_pos();
-}
-
-// @brief FF/ラッチセルの場合にクリア入力ピンの反転属性を返す．
-inline
-bool
-Cell::clear_inv() const
-{
-  return cell_group()->clear_inv();
-}
-
-// @brief FF/ラッチセルの場合にプリセット入力ピン番号を返す．
-inline
-ymuint
-Cell::clear_pos() const
-{
-  return cell_group()->clear_pos();
-}
-
-// @brief FF/ラッチセルの場合にプリセット入力ピンの反転属性を返す．
-inline
-bool
-Cell::clear_inv() const
-{
-  return cell_group()->clear_inv();
-}
-
-// @brief FF/ラッチセルの場合に Q出力ピン番号を返す．
-inline
-ymuint
-Cell::q_pos() const
-{
-  return cell_group()->q_pos();
-}
-
-// @brief FF/ラッチセルの場合に XQ出力ピン番号を返す．
-inline
-ymuint
-Cell::xq_pos() const
-{
-  return cell_group()->xq_pos();
-}
 
 END_NAMESPACE_YM_CELL
 
