@@ -75,23 +75,23 @@ public:
 
   /// @brief 関数グループを返す．
   /// @param[in] id 関数番号　( 0 <= id < func_num() )
-  const CellFuncGroup&
+  const CellGroup&
   func_group(ymuint id) const;
 
   /// @brief 定数0の関数グループを返す．
-  const CellFuncGroup&
+  const CellGroup&
   const0_func() const;
 
   /// @brief 定数1の関数グループを返す．
-  const CellFuncGroup&
+  const CellGroup&
   const1_func() const;
 
   /// @brief バッファセルの関数グループを返す．
-  const CellFuncGroup&
+  const CellGroup&
   buf_func() const;
 
   /// @brief インバータセルの関数グループを返す．
-  const CellFuncGroup&
+  const CellGroup&
   inv_func() const;
 
   /// @brief 代表関数の個数を返す．
@@ -100,7 +100,7 @@ public:
 
   /// @brief 代表関数を返す．
   /// @param[in] id 代表関数番号
-  const CellFuncClass&
+  const CellClass&
   rep(ymuint id) const;
 
 

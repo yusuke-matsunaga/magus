@@ -62,8 +62,7 @@ class CellMislibReader;
 class CellDotlibReader;
 
 class CellGroup;
-class CellFuncClass;
-class CellFuncGroup;
+class CellClass;
 class CellFFClass;
 class CellFFGroup;
 class CellFFPosArray;
@@ -96,8 +95,8 @@ using nsCell::CellLut;
 using nsCell::CellMislibReader;
 using nsCell::CellDotlibReader;
 
-using nsCell::CellFuncClass;
-using nsCell::CellFuncGroup;
+using nsCell::CellGroup;
+using nsCell::CellClass;
 using nsCell::CellFFClass;
 using nsCell::CellFFGroup;
 using nsCell::CellFFPosArray;

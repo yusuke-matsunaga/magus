@@ -10,7 +10,6 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/CellArea.h"
-#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -21,23 +20,6 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class Cell
 {
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 列挙型の定義
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief セルの種類を表す型
-  enum tType {
-    /// @brief 組み合わせ論理
-    kLogic,
-    /// @brief FF
-    kFF,
-    /// @brief ラッチ
-    kLatch,
-    /// @brief FSM (statetable 記述)
-    kFSM
-  };
-
 public:
 
   /// @brief コンストラクタ．
@@ -69,35 +51,122 @@ public:
   CellArea
   area() const = 0;
 
-  /// @brief 型の取得
-  virtual
-  tType
-  type() const = 0;
-
   /// @brief 組み合わせ論理セルの時に true を返す．
-  /// @note type() == kLogic と等価
-  virtual
   bool
-  is_logic() const = 0;
+  is_logic() const;
+
+  /// @brief トライステートセルの場合に true を返す．
+  /// @note もちろん論理セルでもある．
+  /// @note 複数出力のうち1つでもトライステートなら true を返す．
+  bool
+  is_tristate() const;
 
   /// @brief FFセルの時に true を返す．
-  /// @note type() == kFF と等価
-  virtual
   bool
-  is_ff() const = 0;
+  is_ff() const;
 
   /// @brief ラッチセルの時に true を返す．
-  /// @note type() == kLatch と等価
-  virtual
   bool
-  is_latch() const = 0;
+  is_latch() const;
 
-  /// @brief FSMセルの時に true を返す．
-  /// @note type() == kFSM と等価
-  virtual
+  /// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
   bool
-  is_fsm() const = 0;
+  is_seq() const;
 
+  /// @brief 論理セルの場合に出力ピン数を返す．
+  ymuint
+  output_num() const;
+
+  /// @brief 論理セルの場合に関数を返す．
+  /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+  /// @note 非論理セルの場合の返り値は不定
+  const TvFunc&
+  logic_function(ymuint pos) const;
+
+  /// @brief トライステートセルの場合にトライステート条件関数を返す．
+  /// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+  /// @note 通常の論理セルの場合には定数0関数を返す．
+  const TvFunc&
+  tristate_function(ymuint pos) const;
+
+  /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
+  bool
+  has_clear() const;
+
+  /// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
+  bool
+  has_preset() const;
+
+  /// @brief 論理セルの場合に入力ピン番号を返す．
+  /// @param[in] pos CellClass の関数における入力番号
+  ymuint
+  input_pos(ymuint pos) const;
+
+  /// @brief 論理セルの場合に入力ピンの反転属性を返す．
+  /// @param[in] pos CellClass の関数における入力番号
+  bool
+  input_inv(ymuint pos) const;
+
+  /// @brief 論理セルの場合に出力ピン番号を返す．
+  /// @param[in] pos CellClass の関数における出力番号
+  ymuint
+  output_pos(ymuint pos) const;
+
+  /// @brief 論理セルの場合に出力ピンの反転属性を返す．
+  /// @param[in] pos CellClass の関数における出力番号
+  bool
+  output_inv(ymuint pos) const;
+
+  /// @brief FF/ラッチセルの場合にデータ入力ピン番号を返す．
+  ymuint
+  data_pos() const;
+
+  /// @brief FF/ラッチセルの場合にデータ入力ピンの反転属性を返す．
+  bool
+  data_inv() const;
+
+  /// @brief FFセルの場合にクロック入力ピン番号を返す．
+  ymuint
+  clock_pos() const;
+
+  /// @brief FFセルの場合にクロック入力ピンの反転属性を返す．
+  /// @note ポジティブエッジが正極性だと思う．
+  bool
+  clock_inv() const;
+
+  /// @brief ラッチセルの場合にイネーブル入力ピン番号を返す．
+  ymuint
+  enable_pos() const;
+
+  /// @brief ラッチセルの場合にイネーブル入力ピンの反転属性を返す．
+  bool
+  enable_inv() const;
+
+  /// @brief FF/ラッチセルの場合にクリア入力ピン番号を返す．
+  ymuint
+  clear_pos() const;
+
+  /// @brief FF/ラッチセルの場合にクリア入力ピンの反転属性を返す．
+  bool
+  clear_inv() const;
+
+  /// @brief FF/ラッチセルの場合にプリセット入力ピン番号を返す．
+  ymuint
+  clear_pos() const;
+
+  /// @brief FF/ラッチセルの場合にプリセット入力ピンの反転属性を返す．
+  bool
+  clear_inv() const;
+
+  /// @brief FF/ラッチセルの場合に Q出力ピン番号を返す．
+  ymuint
+  q_pos() const;
+
+  /// @brief FF/ラッチセルの場合に XQ出力ピン番号を返す．
+  ymuint
+  xq_pos() const;
+
+#if 0
   /// @brief 状態変数1の名前を返す．
   /// @note FFセルとラッチセルの時に意味を持つ．
   virtual
@@ -170,6 +239,7 @@ public:
   virtual
   ymuint
   clear_preset_var2() const = 0;
+#endif
 
   /// @brief ピン数の取得
   virtual
@@ -225,7 +295,218 @@ public:
   const CellBundle*
   bundle(const string& name) const = 0;
 
+  /// @brief 属している CellGroup を返す．
+  virtual
+  const CellGroup*
+  cell_group() const = 0;
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 組み合わせ論理セルの時に true を返す．
+inline
+bool
+Cell::is_logic() const
+{
+  return cell_group()->is_logic();
+}
+
+// @brief トライステートセルの場合に true を返す．
+// @note もちろん論理セルでもある．
+// @note 複数出力のうち1つでもトライステートなら true を返す．
+inline
+bool
+Cell::is_tristate() const
+{
+  return cell_group()->is_tristate();
+}
+
+// @brief FFセルの時に true を返す．
+inline
+bool
+Cell::is_ff() const
+{
+  return cell_group()->is_ff();
+}
+
+// @brief ラッチセルの時に true を返す．
+inline
+bool
+Cell::is_latch() const
+{
+  return cell_group()->is_latch();
+}
+
+// @brief 順序セル(非FF/非ラッチ)の場合に true を返す．
+inline
+bool
+Cell::is_seq() const
+{
+  return cell_group()->is_seq();
+}
+
+// @brief 論理セルの場合に出力ピン数を返す．
+inline
+ymuint
+Cell::output_num() const
+{
+  return cell_group()->output_num();
+}
+
+// @brief 論理セルの場合に関数を返す．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+// @note 非論理セルの場合の返り値は不定
+inline
+const TvFunc&
+Cell::logic_function(ymuint pos) const
+{
+  return cell_group()->logic_function(pos);
+}
+
+// @brief トライステートセルの場合にトライステート条件関数を返す．
+// @param[in] pos 出力番号 ( 0 <= pos < output_num() )
+// @note 通常の論理セルの場合には定数0関数を返す．
+inline
+const TvFunc&
+Cell::tristate_function(ymuint pos) const
+{
+  return cell_group()->tristate_function(pos);
+}
+
+// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
+inline
+bool
+Cell::has_clear() const
+{
+  return cell_group()->has_clear();
+}
+
+// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
+inline
+bool
+Cell::has_preset() const
+{
+  return cell_group()->has_preset();
+}
+
+// @brief 論理セルの場合に入力ピン番号を返す．
+// @param[in] pos CellClass の関数における入力番号
+inline
+ymuint
+Cell::input_pos(ymuint pos) const
+{
+  return cell_group()->input_pos(pos);
+}
+
+// @brief 論理セルの場合に出力ピン番号を返す．
+// @param[in] pos CellClass の関数における出力番号
+inline
+ymuint
+Cell::output_pos(ymuint pos) const
+{
+  return cell_group()->output_pos(pos);
+}
+
+// @brief FF/ラッチセルの場合にデータ入力ピン番号を返す．
+inline
+ymuint
+Cell::data_pos() const
+{
+  return cell_group()->data_pos();
+}
+
+// @brief FF/ラッチセルの場合にデータ入力ピンの反転属性を返す．
+inline
+bool
+Cell::data_inv() const
+{
+  return cell_group()->data_inv();
+}
+
+// @brief FFセルの場合にクロック入力ピン番号を返す．
+inline
+ymuint
+Cell::clock_pos() const
+{
+  return cell_group()->clock_pos();
+}
+
+// @brief FFセルの場合にクロック入力ピンの反転属性を返す．
+// @note ポジティブエッジが正極性だと思う．
+inline
+bool
+Cell::clock_inv() const
+{
+  return cell_group()->clock_inv();
+}
+
+// @brief ラッチセルの場合にイネーブル入力ピン番号を返す．
+inline
+ymuint
+Cell::enable_pos() const
+{
+  return cell_group()->enable_pos();
+}
+
+// @brief ラッチセルの場合にイネーブル入力ピンの反転属性を返す．
+inline
+bool
+Cell::enable_inv() const
+{
+  return cell_group()->enable_inv();
+}
+
+// @brief FF/ラッチセルの場合にクリア入力ピン番号を返す．
+inline
+ymuint
+Cell::clear_pos() const
+{
+  return cell_group()->clear_pos();
+}
+
+// @brief FF/ラッチセルの場合にクリア入力ピンの反転属性を返す．
+inline
+bool
+Cell::clear_inv() const
+{
+  return cell_group()->clear_inv();
+}
+
+// @brief FF/ラッチセルの場合にプリセット入力ピン番号を返す．
+inline
+ymuint
+Cell::clear_pos() const
+{
+  return cell_group()->clear_pos();
+}
+
+// @brief FF/ラッチセルの場合にプリセット入力ピンの反転属性を返す．
+inline
+bool
+Cell::clear_inv() const
+{
+  return cell_group()->clear_inv();
+}
+
+// @brief FF/ラッチセルの場合に Q出力ピン番号を返す．
+inline
+ymuint
+Cell::q_pos() const
+{
+  return cell_group()->q_pos();
+}
+
+// @brief FF/ラッチセルの場合に XQ出力ピン番号を返す．
+inline
+ymuint
+Cell::xq_pos() const
+{
+  return cell_group()->xq_pos();
+}
 
 END_NAMESPACE_YM_CELL
 

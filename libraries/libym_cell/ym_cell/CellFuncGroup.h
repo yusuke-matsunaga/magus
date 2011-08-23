@@ -15,6 +15,7 @@
 
 BEGIN_NAMESPACE_YM_CELL
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 /// @class CellFuncGroup CellFuncGroup.h "ym_cell/CellFuncGroup.h"
 /// @brief 論理的に等価なセルのグループを表すクラス
@@ -74,7 +75,7 @@ CellFuncGroup::npn_map() const
 {
   return mNpnMap;
 }
-
+#endif
 END_NAMESPACE_YM_CELL
 
 #endif // YM_CELL_CELLFUNCGROUP_H

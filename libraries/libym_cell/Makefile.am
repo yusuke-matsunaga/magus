@@ -36,6 +36,16 @@ libym_cell_la_SOURCES = \
 	CellDotlibReader.cc \
 	CellMislibReader.cc \
 	dump.cc	\
+	CellClassBase.h \
+	CellClassbase.cc \
+	CellLogicClass.h \
+	CellLogicClass.cc \
+	CellTristateClass.h \
+	CellTristateClass.cc \
+	CellFFClass.h \
+	CellFFClass.cc \
+	CellGroupBase.h \
+	CellGroupBase.cc \
 	CellMgr.cc \
 	CellFFClass.cc \
 	CellFFPosArray.cc \
