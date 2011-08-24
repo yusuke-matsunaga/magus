@@ -30,8 +30,12 @@ CiCell::CiCell(ymuint id,
   mId(id),
   mName(name),
   mArea(area),
-  mPinNum(0),
-  mPinArray(NULL),
+  mInputNum(0),
+  mInputArray(NULL),
+  mOutputNum(0),
+  mOutputArray(NULL),
+  mInoutNum(0),
+  mInoutArray(NULL),
   mBusNum(0),
   mBusArray(NULL),
   mBundleNum(0),
@@ -65,6 +69,118 @@ CellArea
 CiCell::area() const
 {
   return mArea;
+}
+
+// @brief 入力ピン数の取得
+ymuint
+CiCell::input_num() const
+{
+  return mInputNum;
+}
+
+// @brief 入力ピンの取得
+// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+const CellPin*
+CiCell::input(ymuint pos) const
+{
+  return mInputArray[pos];
+}
+
+// @brief 出力ピン数の取得
+ymuint
+CiCell::output_num() const
+{
+  return mOutputNum;
+}
+
+// @brief 出力ピンの取得
+// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
+const CellPin*
+CiCell::output(ymuint pos) const
+{
+  return mOutputArray[pos];
+}
+
+// @brief 入出力ピン数の取得
+ymuint
+CiCell::inout_num() const
+{
+  return mInoutNum;
+}
+
+// @brief 入出力ピンの取得
+// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
+const CellPin*
+CiCell::inout(ymuint pos) const
+{
+  return mInoutArray[pos];
+}
+
+// @brief 名前からピンの取得
+// @param[in] name ピン名
+// @return name という名前をピンを返す．
+// @note なければ NULL を返す．
+const CellPin*
+CiCell::pin(const string& name) const
+{
+  // 未完
+  return NULL;
+}
+
+// @brief バス数の取得
+ymuint
+CiCell::bus_num() const
+{
+  return mBusNum;
+}
+
+// @brief バスの取得
+// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
+const CellBus*
+CiCell::bus(ymuint pos) const
+{
+  return &mBusArray[pos];
+}
+
+// @brief 名前からバスの取得
+// @param[in] name バス名
+// @return name という名前のバスを返す．
+// @note なければ NULL を返す．
+const CellBus*
+CiCell::bus(const string& name) const
+{
+  // 未完
+  return NULL;
+}
+
+// @brief バンドル数の取得
+ymuint
+CiCell::bundle_num() const
+{
+  return mBundleNum;
+}
+
+// @brief バンドルの取得
+// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
+const CellBundle*
+CiCell::bundle(ymuint pos) const
+{
+  return &mBundleArray[pos];
+}
+
+// @brief 名前からバンドルの取得
+const CellBundle*
+CiCell::bundle(const string& name) const
+{
+  // 未完
+  return NULL;
+}
+
+// @brief 属している CellGroup を返す．
+const CellGroup*
+CiCell::cell_group() const
+{
+  return mCellGroup;
 }
 
 // @brief 組み合わせ論理セルの時に true を返す．
@@ -208,81 +324,6 @@ CiCell::clear_preset_var2() const
   return 0;
 }
 
-// @brief ピン数の取得
-ymuint
-CiCell::pin_num() const
-{
-  return mPinNum;
-}
-
-// @brief ピンの取得
-// @param[in] pin_id ピン番号 ( 0 <= pin_id < pin_num()
-const CellPin*
-CiCell::pin(ymuint pin_id) const
-{
-  return mPinArray[pin_id];
-}
-
-// @brief 名前からピンの取得
-// @param[in] name ピン名
-// @return name という名前をピンを返す．
-// @note なければ NULL を返す．
-const CellPin*
-CiCell::pin(const string& name) const
-{
-  // 未完
-  return NULL;
-}
-
-// @brief バス数の取得
-ymuint
-CiCell::bus_num() const
-{
-  return mBusNum;
-}
-
-// @brief バスの取得
-// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
-const CellBus*
-CiCell::bus(ymuint pos) const
-{
-  return &mBusArray[pos];
-}
-
-// @brief 名前からバスの取得
-// @param[in] name バス名
-// @return name という名前のバスを返す．
-// @note なければ NULL を返す．
-const CellBus*
-CiCell::bus(const string& name) const
-{
-  // 未完
-  return NULL;
-}
-
-// @brief バンドル数の取得
-ymuint
-CiCell::bundle_num() const
-{
-  return mBundleNum;
-}
-
-// @brief バンドルの取得
-// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
-const CellBundle*
-CiCell::bundle(ymuint pos) const
-{
-  return &mBundleArray[pos];
-}
-
-// @brief 名前からバンドルの取得
-const CellBundle*
-CiCell::bundle(const string& name) const
-{
-  // 未完
-  return NULL;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiLogicCell
@@ -302,13 +343,6 @@ CiLogicCell::CiLogicCell(ymuint id,
 // @brief デストラクタ
 CiLogicCell::~CiLogicCell()
 {
-}
-
-// @brief 型の取得
-Cell::tType
-CiLogicCell::type() const
-{
-  return kLogic;
 }
 
 // @brief 組み合わせ論理セルの時に true を返す．
@@ -453,13 +487,6 @@ CiFFCell::~CiFFCell()
 {
 }
 
-// @brief 型の取得
-Cell::tType
-CiFFCell::type() const
-{
-  return kFF;
-}
-
 // @brief FFセルの時に true を返す．
 // @note type() == kFF と等価
 bool
@@ -534,13 +561,6 @@ CiLatchCell::CiLatchCell(ymuint id,
 // @brief デストラクタ
 CiLatchCell::~CiLatchCell()
 {
-}
-
-// @brief 型の取得
-Cell::tType
-CiLatchCell::type() const
-{
-  return kLatch;
 }
 
 // @brief ラッチセルの時に true を返す．

@@ -178,7 +178,9 @@ public:
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
   /// @param[in] area 面積
-  /// @param[in] np ピン数
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
   /// @return セルへのポインタを返す．
@@ -186,7 +188,9 @@ public:
   new_logic_cell(ymuint cell_id,
 		 ShString name,
 		 CellArea area,
-		 ymuint np,
+		 ymuint ni,
+		 ymuint no,
+		 ymuint nio,
 		 ymuint nb,
 		 ymuint nc);
 
@@ -194,6 +198,11 @@ public:
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
   /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
   /// @param[in] var1, var2 状態変数名
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
@@ -202,14 +211,16 @@ public:
   /// @param[in] preset "preset" 関数の式
   /// @param[in] clear_preset_var1 "clear_preset_var1" の値
   /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  /// @param[in] np ピン数
-  /// @param[in] nb バス数
-  /// @param[in] nc バンドル数
   /// @return セルへのポインタを返す．
   CiCell*
   new_ff_cell(ymuint cell_id,
 	      ShString name,
 	      CellArea area,
+	      ymuint ni,
+	      ymuint no,
+	      ymuint nio,
+	      ymuint nb,
+	      ymuint nc,
 	      const ShString& var1,
 	      const ShString& var2,
 	      const LogExpr& next_state,
@@ -218,15 +229,17 @@ public:
 	      const LogExpr& clear,
 	      const LogExpr& preset,
 	      ymuint clear_preset_var1,
-	      ymuint clear_preset_var2,
-	      ymuint np,
-	      ymuint nb,
-	      ymuint nc);
+	      ymuint clear_preset_var2);
 
   /// @brief ラッチセルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] name 名前
   /// @param[in] area 面積
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
+  /// @param[in] nb バス数
+  /// @param[in] nc バンドル数
   /// @param[in] var1, var2 状態変数名
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
@@ -235,14 +248,16 @@ public:
   /// @param[in] preset "preset" 関数の式
   /// @param[in] clear_preset_var1 "clear_preset_var1" の値
   /// @param[in] clear_preset_var2 "clear_preset_var2" の値
-  /// @param[in] np ピン数
-  /// @param[in] nb バス数
-  /// @param[in] nc バンドル数
   /// @return セルへのポインタを返す．
   CiCell*
   new_latch_cell(ymuint cell_id,
 		 ShString name,
 		 CellArea area,
+		 ymuint ni,
+		 ymuint no,
+		 ymuint nio,
+		 ymuint nb,
+		 ymuint nc,
 		 const ShString& var1,
 		 const ShString& var2,
 		 const LogExpr& data_in,
@@ -251,14 +266,11 @@ public:
 		 const LogExpr& clear,
 		 const LogExpr& preset,
 		 ymuint clear_preset_var1,
-		 ymuint clear_preset_var2,
-		 ymuint np,
-		 ymuint nb,
-		 ymuint nc);
+		 ymuint clear_preset_var2);
 
   /// @brief セルの入力ピンを生成する．
   /// @param[in] cell セル
-  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] pin_id 入力ピン番号 ( 0 <= pin_id < cell->input_num() )
   /// @param[in] name 入力ピン名
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
@@ -273,7 +285,7 @@ public:
 
   /// @brief セルの出力ピンの内容を設定する．
   /// @param[in] cell セル
-  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < cell->output_num() )
   /// @param[in] name 出力ピン名
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
@@ -294,7 +306,7 @@ public:
 
   /// @brief セルの入出力ピンの内容を設定する．
   /// @param[in] cell セル
-  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] pin_id 入出力ピン番号 ( 0 <= pin_id < cell->inout_num() )
   /// @param[in] name 入出力ピン名
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
@@ -349,21 +361,27 @@ public:
 
   /// @brief セルのタイミング情報を設定する．
   /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
-  /// @param[in] ipin_id 関連する入力(入出力)ピン番号
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
+  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
   /// @param[in] sense タイミング条件
   /// @param[in] timing 設定するタイミング情報
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
+  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->input_num() を使う．
   void
-  set_opin_timing(CiCell* cell,
+  set_cell_timing(CiCell* cell,
 		  ymuint opin_id,
 		  ymuint ipin_id,
-		  CellPin::tTimingSense sense,
+		  tCellTimingSense sense,
 		  const CellTiming* timing);
 
   /// @brief 出力ピンの機能を設定する．
   /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
   /// @param[in] function 機能を表す論理式
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
   void
   set_opin_function(CiCell* cell,
 		    ymuint opin_id,
@@ -371,8 +389,10 @@ public:
 
   /// @brief 出力ピンの three_state 条件を設定する．
   /// @param[in] cell セル
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( 0 <= pin_id < cell->pin_num() )
+  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
   /// @param[in] expr three_state 条件を表す論理式
+  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
+  ///  + cell->output_num() を使う．
   void
   set_opin_three_state(CiCell* cell,
 		       ymuint opin_id,
@@ -386,14 +406,18 @@ private:
 
   /// @brief セルにピン数，バス数，バンドル数の設定をする．
   /// @param[in] cell セル
-  /// @param[in] np ピン数
+  /// @param[in] ni 入力ピン数
+  /// @param[in] no 出力ピン数
+  /// @param[in] nio 入出力ピン数
   /// @param[in] nb バス数
   /// @param[in] nc バンドル数
   void
-  set_pbb(CiCell* cell,
-	  ymuint np,
-	  ymuint nb,
-	  ymuint nc);
+  set_pinnum(CiCell* cell,
+	     ymuint ni,
+	     ymuint no,
+	     ymuint nio,
+	     ymuint nb,
+	     ymuint nc);
 
   /// @brief タイミング情報を格納する配列を確保する．
   /// @param[in] pin ピン

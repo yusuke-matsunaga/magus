@@ -150,16 +150,6 @@ public:
   CellTime
   min_transition() const;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellTiming*
-  timing(ymuint ipos,
-	 tTimingSense sense) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -178,6 +168,7 @@ private:
   void
   set_three_state(const LogExpr& expr);
 
+#if 0
   /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
   virtual
   void
@@ -192,7 +183,7 @@ private:
   set_timing(ymuint pin_id,
 	     tTimingSense sense,
 	     const CellTiming* timing);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -375,16 +366,6 @@ public:
   CellTime
   min_transition() const;
 
-  /// @brief タイミング情報の取得
-  /// @param[in] ipos 開始ピン番号
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @return 条件に合致するタイミング情報を返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellTiming*
-  timing(ymuint ipos,
-	 tTimingSense sense) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -402,6 +383,7 @@ private:
   void
   set_three_state(const LogExpr& three_state);
 
+#if 0
   /// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
   virtual
   void
@@ -416,6 +398,7 @@ private:
   set_timing(ymuint pin_id,
 	     tTimingSense sense,
 	     const CellTiming* timing);
+#endif
 
 
 private:
@@ -452,10 +435,6 @@ private:
 
   // 最小遷移時間
   CellTime mMinTransition;
-
-  // タイミング情報を格納する配列
-  // サイズは総ピン数 x 2
-  const CellTiming** mTimingArray;
 
 };
 

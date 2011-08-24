@@ -11,6 +11,7 @@
 
 #include "ym_cell/Cell.h"
 #include "ym_utils/ShString.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -21,6 +22,7 @@ class CiOutputPin;
 class CiInoutPin;
 class CiBus;
 class CiBundle;
+class CiTiming;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CiCell CiCell.h "CiCell.h"
@@ -66,6 +68,99 @@ public:
   virtual
   CellArea
   area() const;
+
+  /// @brief 入力ピン数の取得
+  virtual
+  ymuint
+  input_num() const;
+
+  /// @brief 入力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  virtual
+  const CellPin*
+  input(ymuint pos) const;
+
+  /// @brief 出力ピン数の取得
+  virtual
+  ymuint
+  output_num() const;
+
+  /// @brief 出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < output_num() )
+  virtual
+  const CellPin*
+  output(ymuint pos) const;
+
+  /// @brief 入出力ピン数の取得
+  virtual
+  ymuint
+  inout_num() const;
+
+  /// @brief 入出力ピンの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < inout_num() )
+  virtual
+  const CellPin*
+  inout(ymuint pos) const;
+
+  /// @brief 名前からピンの取得
+  /// @param[in] name ピン名
+  /// @return name という名前をピンを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellPin*
+  pin(const string& name) const;
+
+  /// @brief バス数の取得
+  virtual
+  ymuint
+  bus_num() const;
+
+  /// @brief バスの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
+  virtual
+  const CellBus*
+  bus(ymuint pos) const;
+
+  /// @brief 名前からバスの取得
+  /// @param[in] name バス名
+  /// @return name という名前のバスを返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellBus*
+  bus(const string& name) const;
+
+  /// @brief バンドル数の取得
+  virtual
+  ymuint
+  bundle_num() const;
+
+  /// @brief バンドルの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
+  virtual
+  const CellBundle*
+  bundle(ymuint pos) const;
+
+  /// @brief 名前からバンドルの取得
+  virtual
+  const CellBundle*
+  bundle(const string& name) const;
+
+  /// @brief 属している CellGroup を返す．
+  virtual
+  const CellGroup*
+  cell_group() const;
+
+  /// @brief タイミング情報の取得
+  /// @param[in] ipos 開始ピン番号
+  /// @param[in] opos 終了ピン番号
+  /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @return 条件に合致するタイミング情報を返す．
+  /// @note なければ NULL を返す．
+  virtual
+  const CellTiming*
+  timing(ymuint ipos,
+	 ymuint opos,
+	 tCellTimingSense sense) const;
 
   /// @brief 組み合わせ論理セルの時に true を返す．
   /// @note type() == kLogic と等価
@@ -164,60 +259,6 @@ public:
   ymuint
   clear_preset_var2() const;
 
-  /// @brief ピン数の取得
-  virtual
-  ymuint
-  pin_num() const;
-
-  /// @brief ピンの取得
-  /// @param[in] pin_id ピン番号 ( 0 <= pin_id < pin_num()
-  virtual
-  const CellPin*
-  pin(ymuint pin_id) const;
-
-  /// @brief 名前からピンの取得
-  /// @param[in] name ピン名
-  /// @return name という名前をピンを返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellPin*
-  pin(const string& name) const;
-
-  /// @brief バス数の取得
-  virtual
-  ymuint
-  bus_num() const;
-
-  /// @brief バスの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < bus_num() )
-  virtual
-  const CellBus*
-  bus(ymuint pos) const;
-
-  /// @brief 名前からバスの取得
-  /// @param[in] name バス名
-  /// @return name という名前のバスを返す．
-  /// @note なければ NULL を返す．
-  virtual
-  const CellBus*
-  bus(const string& name) const;
-
-  /// @brief バンドル数の取得
-  virtual
-  ymuint
-  bundle_num() const;
-
-  /// @brief バンドルの取得
-  /// @param[in] pos 位置番号 ( 0 <= pos < bundle_num() )
-  virtual
-  const CellBundle*
-  bundle(ymuint pos) const;
-
-  /// @brief 名前からバンドルの取得
-  virtual
-  const CellBundle*
-  bundle(const string& name) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -233,11 +274,23 @@ private:
   // 面積
   CellArea mArea;
 
-  // 総ピン数
-  ymuint32 mPinNum;
+  // 入力ピン数
+  ymuint32 mInputNum;
 
-  // ピンの配列
-  CiPin** mPinArray;
+  // 入力ピンの配列
+  CiInputPin** mInputArray;
+
+  // 出力ピン数
+  ymuint32 mOutputNum;
+
+  // 出力ピンの配列
+  CiOutputPin** mOutputArray;
+
+  // 入出力ピン数
+  ymuint32 mInoutNum;
+
+  // 入出力ピンの配列
+  CiInoutPin** mInoutArray;
 
   // バス数
   ymuint32 mBusNum;
@@ -250,6 +303,13 @@ private:
 
   // バンドルピンの配列
   CiBundle* mBundleArray;
+
+  // セルグループ
+  CellGroup* mCellGroup;
+
+  // タイミング情報を格納する配列
+  // サイズは(入力数＋入出力数) x (出力数+入出力ピン数)  x 2
+  CiTiming** mTimingArray;
 
 };
 
@@ -282,11 +342,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // セル情報の取得
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型の取得
-  virtual
-  tType
-  type() const;
 
   /// @brief 組み合わせ論理セルの時に true を返す．
   /// @note type() == kLogic と等価
@@ -445,11 +500,6 @@ public:
   // セル情報の取得
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型の取得
-  virtual
-  tType
-  type() const;
-
   /// @brief FFセルの時に true を返す．
   /// @note type() == kFF と等価
   virtual
@@ -537,11 +587,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // セル情報の取得
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型の取得
-  virtual
-  tType
-  type() const;
 
   /// @brief ラッチセルの時に true を返す．
   /// @note type() == kLatch と等価

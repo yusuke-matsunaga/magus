@@ -415,34 +415,6 @@ CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
   mTimingArray = timing_array;
 }
 
-// @brief 出力ピン(入出力ピン)のタイミング情報を設定する．
-// @param[in] pin_id 入力ピンのピン番号
-// @param[in] sense タイミング情報の適用条件
-// @param[in] timing 設定するタイミング情報
-void
-CiOutputPinBase::set_timing(ymuint pin_id,
-			    tTimingSense sense,
-			    const CellTiming* timing)
-{
-  switch ( sense ) {
-  case kSensePosiUnate:
-    mTimingArray[pin_id * 2 + 0] = timing;
-    break;
-
-  case kSenseNegaUnate:
-    mTimingArray[pin_id * 2 + 1] = timing;
-    break;
-
-  case kSenseNonUnate:
-    mTimingArray[pin_id * 2 + 0] = timing;
-    mTimingArray[pin_id * 2 + 1] = timing;
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiOutputPin

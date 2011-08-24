@@ -22,14 +22,7 @@ noinst_HEADERS = \
 	CellTime.h \
 	CellTiming.h \
 	CellMgr.h \
+	CellClass.h \
 	CellGroup.h \
-	CellFuncClass.h \
-	CellFuncGroup.h \
-	CellFFClass.h \
-	CellFFGroup.h \
-	CellFFPosArray.h \
-	CellLatchClass.h \
-	CellLatchGroup.h \
-	CellLatchPosArray.h \
 	CellPatGraph.h \
 	CellPatMgr.h
