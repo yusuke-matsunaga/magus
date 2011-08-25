@@ -10,6 +10,7 @@
 #include "ym_cell/CellDotlibReader.h"
 
 #include "ci/CiLibrary.h"
+#include "ci/CiCell.h"
 
 #include "dotlib/DotlibParser.h"
 #include "dotlib/DotlibMgr.h"
@@ -314,7 +315,7 @@ gen_library(const DotlibNode* dt_library)
 	  const DotlibNode* func_node = pin_info.function();
 	  if ( func_node ) {
 	    LogExpr expr = dot2expr(func_node, pin_map);
-	    library->set_cell_function(cell, o_pos, expr);
+	    cell->set_logic_function(o_pos, expr);
 
 #if 0
 	    TvFunc tv_function = expr_to_tvfunc(expr, ni);
@@ -394,13 +395,13 @@ gen_library(const DotlibNode* dt_library)
 		library->set_cell_timing(cell, i, o_pos, sense, timing);
 	      }
 	    }
+#endif
 	  }
 	  const DotlibNode* three_state = pin_info.three_state();
 	  if ( three_state ) {
 	    LogExpr expr = dot2expr(three_state, pin_map);
-	    library->set_opin_three_state(cell, i, expr);
+	    cell->set_tristate_function(o_pos, expr);
 	  }
-#endif
 	}
 	++ o_pos;
 	break;

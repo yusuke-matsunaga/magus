@@ -10,6 +10,7 @@
 #include "ym_cell/CellMislibReader.h"
 
 #include "ci/CiLibrary.h"
+#include "ci/CiCell.h"
 
 #include "mislib/MislibParser.h"
 #include "mislib/MislibMgr.h"
@@ -168,7 +169,8 @@ gen_library(const string& lib_name,
     }
 
     ymuint ni = ipin_name_list.size();
-    CiCell* cell = library->new_logic_cell(cell_id, name, area, ni +  1, 0, 0);
+    CiCell* cell = library->new_logic_cell(cell_id, name, area,
+					   ni, 1, 0, 0, 0);
     for (ymuint i = 0; i < ni; ++ i) {
       // 入力ピンの設定
       ShString name = ipin_name_list[i];
@@ -185,7 +187,7 @@ gen_library(const string& lib_name,
 			     CellTime::infty(),
 			     CellTime(0.0));
     LogExpr function = opin_expr->to_expr(ipin_name_map);
-    library->set_opin_function(cell, ni, function);
+    cell->set_logic_function(0, function);
 
     TvFunc tv_function = expr_to_tvfunc(function, ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -193,19 +195,19 @@ gen_library(const string& lib_name,
       const MislibNode* pt_pin = ipin_array[i];
       TvFunc p_func = tv_function.cofactor(i, kPolPosi);
       TvFunc n_func = tv_function.cofactor(i, kPolNega);
-      CellPin::tTimingSense sense_real = CellPin::kSenseNonUnate;
+      tCellTimingSense sense_real = kCellNonUnate;
       bool redundant = false;
       if ( ~p_func && n_func ) {
 	if ( ~n_func && p_func ) {
-	  sense_real = CellPin::kSenseNonUnate;
+	  sense_real = kCellNonUnate;
 	}
 	else {
-	  sense_real = CellPin::kSenseNegaUnate;
+	  sense_real = kCellNegaUnate;
 	}
       }
       else {
 	if ( ~n_func && p_func ) {
-	  sense_real = CellPin::kSensePosiUnate;
+	  sense_real = kCellPosiUnate;
 	}
 	else {
 	  // つまり p_func == n_func ということ．
@@ -222,18 +224,18 @@ gen_library(const string& lib_name,
 	}
       }
 
-      CellPin::tTimingSense sense = CellPin::kSenseNonUnate;
+      tCellTimingSense sense = kCellNonUnate;
       switch ( pt_pin->phase()->type() ) {
       case MislibNode::kNoninv:
-	sense = CellPin::kSensePosiUnate;
+	sense = kCellPosiUnate;
 	break;
 
       case MislibNode::kInv:
-	sense = CellPin::kSenseNegaUnate;
+	sense = kCellNegaUnate;
 	break;
 
       case MislibNode::kUnknown:
-	sense = CellPin::kSenseNonUnate;
+	sense = kCellNonUnate;
 	break;
 
       default:
@@ -255,13 +257,13 @@ gen_library(const string& lib_name,
       CellResistance r_r(pt_pin->rise_fanout_delay()->num());
       CellTime f_i(pt_pin->fall_block_delay()->num());
       CellResistance f_r(pt_pin->fall_fanout_delay()->num());
-      CellTiming* timing = library->new_timing(i,
-					       CellTiming::kTimingCombinational,
-					       r_i, f_i,
-					       CellTime(0.0), CellTime(0.0),
-					       r_r, f_r);
+      CiTiming* timing = library->new_timing(i,
+					     CellTiming::kTimingCombinational,
+					     r_i, f_i,
+					     CellTime(0.0), CellTime(0.0),
+					     r_r, f_r);
       if ( !redundant ) {
-	library->set_opin_timing(cell, ni, i, sense, timing);
+	cell->set_timing(i, 0, sense, timing);
       }
     }
   }

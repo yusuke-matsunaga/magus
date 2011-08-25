@@ -8,6 +8,7 @@
 
 
 #include "CiLibrary.h"
+#include "CiCell.h"
 #include "CiPin.h"
 #include "ym_utils/BinIO.h"
 
@@ -152,7 +153,7 @@ restore_library(istream& s)
       ymuint timing_id = BinIO::read_32(s);
       CiTiming* timing = timing_list[timing_id];
       tCellTimingSense sense = ( unate == 1 ) ? kCellPosiUnate : kCellNegaUnate;
-      library->set_cell_timing(cell, ipin_id, opin_id, sense, timing);
+      cell->set_timing(ipin_id, opin_id, sense, timing);
     }
   }
 

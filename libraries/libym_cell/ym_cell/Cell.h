@@ -218,7 +218,6 @@ public:
   LogExpr
   tristate_function(ymuint pin_id) const;
 
-#if 0
   /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
   bool
   has_clear() const;
